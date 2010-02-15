@@ -78,9 +78,7 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
                                 [[[VLCMediaDiscoverer alloc] initWithName:@"sap"] autorelease],
                                 [[[VLCMediaDiscoverer alloc] initWithName:@"upnp_intel"] autorelease],
                                 [[[VLCMediaDiscoverer alloc] initWithName:@"freebox"] autorelease],
-                                [[[VLCMediaDiscoverer alloc] initWithName:@"video_dir"] autorelease],
-                                [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcast"] autorelease],
-                                [[[VLCMediaDiscoverer alloc] initWithName:@"shoutcasttv"] autorelease], nil] retain];
+                                [[[VLCMediaDiscoverer alloc] initWithName:@"video_dir"] autorelease], nil] retain];
     }
     return availableMediaDiscoverer;
 }
@@ -93,7 +91,7 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
         discoveredMedia = nil;
         mdis = libvlc_media_discoverer_new_from_name([VLCLibrary sharedInstance],
                                                      [aServiceName UTF8String]);
-
+        NSAssert(mdis, @"No such media discoverer");
         libvlc_event_manager_t * p_em = libvlc_media_discoverer_event_manager(mdis);
         libvlc_event_attach(p_em, libvlc_MediaDiscovererStarted, HandleMediaDiscovererStarted, self);
         libvlc_event_attach(p_em, libvlc_MediaDiscovererEnded,   HandleMediaDiscovererEnded,   self);
