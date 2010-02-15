@@ -124,6 +124,18 @@ vlc_module_begin ()
         add_string( "lua-sd", "", NULL, "", "", false )
         set_callbacks( Open_LuaSD, Close_LuaSD )
 
+    add_submodule ()
+        set_description( N_("Freebox TV") )
+        add_shortcut( "freebox" )
+        set_capability( "services_discovery", 0 )
+        set_callbacks( Open_LuaSD, Close_LuaSD )
+
+    add_submodule ()
+        set_description( N_("French TV") )
+        add_shortcut( "frenchtv" )
+        set_capability( "services_discovery", 0 )
+        set_callbacks( Open_LuaSD, Close_LuaSD )
+
     VLC_SD_PROBE_SUBMODULE
 
 vlc_module_end ()
