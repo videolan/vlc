@@ -42,7 +42,7 @@
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-static int vlc_sd_probe_Open( vlc_object_t * );
+VLC_SD_PROBE_HELPER("freebox", "Freebox TV", SD_CAT_INTERNET)
 
 vlc_module_begin ()
     set_category( CAT_PLAYLIST )
@@ -134,8 +134,3 @@ static void Close(vlc_object_t *this)
     free(sys);
 }
 
-static int vlc_sd_probe_Open(vlc_object_t *obj)
-{
-    VLC_UNUSED(obj);
-    return VLC_PROBE_CONTINUE;
-}
