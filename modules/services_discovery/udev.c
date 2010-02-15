@@ -561,20 +561,29 @@ static char *disc_get_name (struct udev_device *dev)
 static char *disc_get_cat (struct udev_device *dev)
 {
     const char *val;
-    const char *cat = "Unknown";
+    const char *name;
+    int i_val;
+    const char *cat = _("Unknown Type");
 
-    val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_CD");
-    if (val && atoi (val))
-        cat = "CD";
-    val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_DVD");
-    if (val && atoi (val))
-        cat = "DVD";
-    val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_BD");
-    if (val && atoi (val))
-        cat = "Blue-ray disc";
-    val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_HDDVD");
-    if (val && atoi (val))
-        cat = "HD DVD";
+    struct udev_list_entry *prop_list
+        = udev_device_get_properties_list_entry( dev );
+
+    udev_list_entry_foreach( prop_list, prop_list )
+    {
+        name = udev_list_entry_get_name ( prop_list );
+        i_val = atoi( udev_list_entry_get_value ( prop_list ) );
+        if( !i_val ) continue;
+        if( strncmp( name, "ID_CDROM_MEDIA_CD", strlen( "ID_CDROM_MEDIA_CD" ) ) )
+            cat = _("CD");
+        else if( !strncmp( name, "ID_CDROM_MEDIA_DVD", strlen( "ID_CDROM_MEDIA_DVD" ) ) )
+            cat = _("DVD");
+        else if( !strncmp( name, "ID_CDROM_MEDIA_BD", strlen( "ID_CDROM_MEDIA_BD" ) ) )
+            cat = _("Blu-Ray");
+        else if( !strncmp( name, "ID_CDROM_MEDIA_HDDVD", strlen( "ID_CDROM_MEDIA_HDDVD" ) ) )
+            cat = _("HD DVD");
+    }
+
+    free( prop_list );
 
     return strdup (cat);
 }
