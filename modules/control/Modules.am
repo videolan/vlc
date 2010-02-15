@@ -25,13 +25,11 @@ libvlc_LTLIBRARIES += \
 if !HAVE_WINCE
 libvlc_LTLIBRARIES += \
 	liboldrc_plugin.la
-endif
 if !HAVE_WIN32
 libvlc_LTLIBRARIES += \
 	libsignals_plugin.la \
 	libmotion_plugin.la
 else
-if !HAVE_WINCE
 libvlc_LTLIBRARIES += \
 	libntservice_plugin.la
 endif
