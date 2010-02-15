@@ -23,7 +23,6 @@
       --enable-portaudio \
       --enable-sdl --with-sdl-config-path=/usr/win32/bin \
       --enable-qt4 \
-      --enable-mozilla --with-mozilla-sdk-path=/usr/win32/gecko-sdk \
       --enable-activex \
       --enable-sse --enable-mmx \
       --enable-libcddb \
