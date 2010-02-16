@@ -172,8 +172,8 @@ static int Open( vlc_object_t * p_this )
     p_sys->psz_config = var_InheritString( p_filter, "projectm-config" );
 #else
     p_sys->psz_preset_path = var_InheritString( p_filter, "projectm-preset-path" );
-    p_sys->psz_preset_path = var_InheritString( p_filter, "projectm-title-font" );
-    p_sys->psz_preset_path = var_InheritString( p_filter, "projectm-menu-font" );
+    p_sys->psz_title_font = var_InheritString( p_filter, "projectm-title-font" );
+    p_sys->psz_menu_font = var_InheritString( p_filter, "projectm-menu-font" );
 #endif
     vlc_mutex_init( &p_sys->lock );
     p_sys->p_buffer = NULL;
