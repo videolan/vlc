@@ -969,10 +969,6 @@ modules/misc/stats/encoder.c
 modules/misc/stats/stats.c
 modules/misc/stats/stats.h
 modules/misc/svg.c
-modules/misc/testsuite/test1.c
-modules/misc/testsuite/test2.cpp
-modules/misc/testsuite/test3.m
-modules/misc/testsuite/test4.c
 modules/misc/text_renderer.h
 modules/misc/win32text.c
 modules/misc/xml/libxml.c

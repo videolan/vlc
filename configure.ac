@@ -4703,24 +4703,6 @@ AC_LANG_POP(C++)
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
 dnl
-dnl  test plugins
-dnl
-AC_ARG_ENABLE(testsuite,
-  [  --enable-testsuite      build test modules (default disabled)])
-if test "${enable_testsuite}" = "yes"
-then
-  TESTS="test1 test2 test3 test4"
-
-  dnl  we define those so that bootstrap sets the right linker
-  VLC_ADD_CXXFLAGS([test2],[])
-  VLC_ADD_OBJCFLAGS([test3],[])
-  dnl  this one is needed until automake knows what to do
-  VLC_ADD_LIBS([test3],[-lobjc])
-
-  VLC_ADD_PLUGIN([test1 test2 test3 test4])
-fi
-
-dnl
 dnl  Plugin and builtin checks
 dnl
 plugin_support=yes
@@ -4900,7 +4882,6 @@ AC_CONFIG_FILES([
   modules/misc/dummy/Makefile
   modules/misc/lua/Makefile
   modules/misc/notify/Makefile
-  modules/misc/testsuite/Makefile
   modules/misc/playlist/Makefile
   modules/misc/osd/Makefile
   modules/misc/stats/Makefile
