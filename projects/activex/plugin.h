@@ -270,7 +270,11 @@ public:
     void playlist_delete_item(int idx)
     {
         if( _p_mlist )
+        {
+            libvlc_media_list_lock(_p_mlist);
             libvlc_media_list_remove_index(_p_mlist,idx);
+            libvlc_media_list_unlock(_p_mlist);
+        }
     }
     void playlist_clear()
     {
