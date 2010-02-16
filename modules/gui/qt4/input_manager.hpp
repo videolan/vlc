@@ -253,6 +253,10 @@ public:
 
     input_thread_t *getInput() { return p_input; }
     InputManager *getIM() { return im; }
+    inline input_item_t *currentInputItem()
+    {
+        return ( p_input ? input_GetItem( p_input ) : NULL );
+    }
 
     vout_thread_t* getVout();
     aout_instance_t *getAout();

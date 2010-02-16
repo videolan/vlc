@@ -350,9 +350,7 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
 
 bool PLModel::isCurrent( const QModelIndex &index ) const
 {
-    input_thread_t *p_input_thread = THEMIM->getInput();
-    if( !p_input_thread ) return false;
-    return getItem( index )->p_input == input_GetItem( p_input_thread );
+    return getItem( index )->p_input == THEMIM->currentInputItem();
 }
 
 int PLModel::itemId( const QModelIndex &index ) const
@@ -621,7 +619,10 @@ void PLModel::processItemAppend( int i_item, int i_parent )
 
     PL_LOCK;
     p_item = playlist_ItemGetById( p_playlist, i_item );
-    if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG ) goto end;
+    if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG )
+    {
+        PL_UNLOCK; return;
+    }
 
     for( pos = 0; pos < p_item->p_parent->i_children; pos++ )
         if( p_item->p_parent->pp_children[pos] == p_item ) break;
@@ -633,10 +634,8 @@ void PLModel::processItemAppend( int i_item, int i_parent )
     nodeItem->insertChild( newItem, pos );
     endInsertRows();
 
-    return;
-end:
-    PL_UNLOCK;
-    return;
+    if( newItem->p_input == THEMIM->currentInputItem() )
+        emit currentChanged( index( newItem, 0 ) );
 }
 
 
