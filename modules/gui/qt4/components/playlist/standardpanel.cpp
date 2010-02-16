@@ -455,19 +455,21 @@ LocationBar::LocationBar( PLModel *m )
     mapper = new QSignalMapper( this );
     CONNECT( mapper, mapped( int ), this, invoke( int ) );
 
-    box = new QHBoxLayout;
-    box->setSpacing( 0 );
-    box->setContentsMargins( 0, 0, 0, 0 );
-    setLayout( box );
+    btnMore = new LocationButton( "...", false, true, this );
+    menuMore = new QMenu( this );
+    btnMore->setMenu( menuMore );
 }
 
 void LocationBar::setIndex( const QModelIndex &index )
 {
     qDeleteAll( buttons );
     buttons.clear();
+    qDeleteAll( actions );
+    actions.clear();
+
     QModelIndex i = index;
-    bool bold = true;
-    box->addStretch();
+    bool first = true;
+
     while( true )
     {
         PLItem *item = model->getItem( i );
@@ -475,19 +477,32 @@ void LocationBar::setIndex( const QModelIndex &index )
         char *fb_name = input_item_GetTitleFbName( item->inputItem() );
         QString text = qfu(fb_name);
         free(fb_name);
-        QAbstractButton *btn = new LocationButton( text, bold, i.isValid() );
+
+        QAbstractButton *btn = new LocationButton( text, first, !first, this );
         btn->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
-        box->insertWidget( 0, btn );
         buttons.append( btn );
 
-        mapper->setMapping( btn, item->id() );
-        CONNECT( btn, clicked( ), mapper, map( ) );
+        QAction *action = new QAction( text, this );
+        actions.append( action );
+        CONNECT( btn, clicked(), action, trigger() );
 
-        bold = false;
+        mapper->setMapping( action, item->id() );
+        CONNECT( action, triggered(), mapper, map() );
+
+        first = false;
 
         if( i.isValid() ) i = i.parent();
         else break;
     }
+
+    QString prefix;
+    for( int a = actions.count() - 1; a >= 0 ; a-- )
+    {
+        actions[a]->setText( prefix + actions[a]->text() );
+        prefix += QString("  ");
+    }
+
+    if( isVisible() ) layOut( size() );
 }
 
 void LocationBar::setRootIndex()
@@ -501,8 +516,77 @@ void LocationBar::invoke( int i_id )
     emit invoked ( index );
 }
 
-LocationButton::LocationButton( const QString &text, bool bold, bool arrow )
-  : b_arrow( arrow )
+void LocationBar::layOut( const QSize& size )
+{
+    menuMore->clear();
+
+    int count = buttons.count();
+    QList<int> widths;
+    int totalWidth = 0;
+    for( int i = 0; i < count; i++ )
+    {
+        int w = buttons[i]->sizeHint().width();
+        if( i == 0 || totalWidth + w <= size.width() )
+        {
+            totalWidth += w;
+            widths.append( w );
+        }
+        if( totalWidth > size.width() ) break;
+    }
+
+    int x = 0;
+    int shown = widths.count();
+    if( shown < count )
+    {
+        QSize sz = btnMore->sizeHint();
+        btnMore->setGeometry( 0, 0, sz.width(), size.height() );
+        btnMore->show();
+        x = sz.width();
+        totalWidth += x;
+    }
+    else
+    {
+        btnMore->hide();
+    }
+    shown--;
+    for( int i = count - 1; i >= 0; i-- )
+    {
+        if( i > shown )
+        {
+            menuMore->addAction( actions[i] );
+            buttons[i]->hide();
+        }
+        else if( i > 0 && totalWidth > size.width() )
+        {
+            menuMore->addAction( actions[i] );
+            buttons[i]->hide();
+            totalWidth -= widths[i];
+        }
+        else
+        {
+            buttons[i]->setGeometry( x, 0,
+                                    qMin( widths[i], size.width() - x ),
+                                    size.height() );
+            buttons[i]->show();
+            totalWidth -= widths[i];
+            x += widths[i];
+        }
+    }
+}
+
+void LocationBar::resizeEvent ( QResizeEvent * event )
+{
+    layOut( event->size() );
+}
+
+QSize LocationBar::sizeHint() const
+{
+    return btnMore->sizeHint();
+}
+
+LocationButton::LocationButton( const QString &text, bool bold,
+                                bool arrow, QWidget * parent )
+  : b_arrow( arrow ), QPushButton( parent )
 {
     QFont font;
     font.setBold( bold );
@@ -520,35 +604,41 @@ void LocationButton::paintEvent ( QPaintEvent * event )
     QPainter p( this );
 
     if( underMouse() )
-        style()->drawControl( QStyle::CE_PushButtonBevel, &option, &p );
+    {
+        p.save();
+        p.setRenderHint( QPainter::Antialiasing, true );
+        QColor c = palette().color( QPalette::Highlight );
+        p.setPen( c );
+        p.setBrush( c.lighter( 150 ) );
+        p.setOpacity( 0.2 );
+        p.drawRoundedRect( option.rect.adjusted( 0, 2, 0, -2 ), 5, 5 );
+        p.restore();
+    }
 
-    int margin = style()->pixelMetric(QStyle::PM_DefaultFrameWidth,0,this) + PADDING;
-
-    QRect rect = option.rect.adjusted( b_arrow ? 15 + margin : margin, 0, -margin, 0 );
+    QRect r = option.rect.adjusted( PADDING, 0, -PADDING - (b_arrow ? 10 : 0), 0 );
 
     QString str( text() );
     /* This check is absurd, but either it is not done properly inside elidedText(),
        or boundingRect() is wrong */
-    if( rect.width() < fontMetrics().boundingRect( text() ).width() )
-        str = fontMetrics().elidedText( text(), Qt::ElideRight, rect.width() );
-    p.drawText( rect, Qt::AlignVCenter | Qt::AlignLeft, str );
+    if( r.width() < fontMetrics().boundingRect( text() ).width() )
+        str = fontMetrics().elidedText( text(), Qt::ElideRight, r.width() );
+    p.drawText( r, Qt::AlignVCenter | Qt::AlignLeft, str );
 
     if( b_arrow )
     {
-        option.rect.setX( margin );
-        option.rect.setWidth( 8 );
+        option.rect.setWidth( 10 );
+        option.rect.moveRight( rect().right() );
         style()->drawPrimitive( QStyle::PE_IndicatorArrowRight, &option, &p );
     }
 }
 
 QSize LocationButton::sizeHint() const
 {
-    int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth,0,this);
     QSize s( fontMetrics().boundingRect( text() ).size() );
     /* Add two pixels to width: font metrics are buggy, if you pass text through elidation
        with exactly the width of its bounding rect, sometimes it still elides */
-    s.setWidth( s.width() + ( 2 * frameWidth ) + ( 2 * PADDING ) + ( b_arrow ? 15 : 0 ) + 2 );
-    s.setHeight( QPushButton::sizeHint().height() );
+    s.setWidth( s.width() + ( 2 * PADDING ) + ( b_arrow ? 10 : 0 ) + 2 );
+    s.setHeight( s.height() + 2 * PADDING );
     return s;
 }
 

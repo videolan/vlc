@@ -117,12 +117,24 @@ private slots:
     void browseInto( input_item_t * );
 };
 
+class LocationButton : public QPushButton
+{
+public:
+    LocationButton( const QString &, bool bold, bool arrow, QWidget * parent = NULL );
+    QSize sizeHint() const;
+private:
+    void paintEvent ( QPaintEvent * event );
+    QFontMetrics *metrics;
+    bool b_arrow;
+};
+
 class LocationBar : public QWidget
 {
     Q_OBJECT;
 public:
     LocationBar( PLModel * );
     void setIndex( const QModelIndex & );
+    QSize sizeHint() const;
 signals:
     void invoked( const QModelIndex & );
 public slots:
@@ -130,21 +142,16 @@ public slots:
 private slots:
     void invoke( int i_item_id );
 private:
+    void layOut( const QSize& size );
+    void resizeEvent ( QResizeEvent * event );
+
     PLModel *model;
     QSignalMapper *mapper;
     QHBoxLayout *box;
     QList<QWidget*> buttons;
-};
-
-class LocationButton : public QPushButton
-{
-public:
-    LocationButton( const QString &, bool bold, bool arrow );
-private:
-    void paintEvent ( QPaintEvent * event );
-    QSize sizeHint() const;
-    QFontMetrics *metrics;
-    bool b_arrow;
+    QList<QAction*> actions;
+    LocationButton *btnMore;
+    QMenu *menuMore;
 };
 
 #endif
