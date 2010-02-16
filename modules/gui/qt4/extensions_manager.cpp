@@ -258,6 +258,9 @@ void ExtensionsManager::triggerMenu( int id )
 
 void ExtensionsManager::inputChanged( input_thread_t* p_input )
 {
+    //This is unlikely, but can happen if no extension modules can be loaded.
+    if ( p_extensions_manager == NULL )
+        return ;
     vlc_mutex_lock( &p_extensions_manager->lock );
 
     extension_t *p_ext;
@@ -275,6 +278,9 @@ void ExtensionsManager::inputChanged( input_thread_t* p_input )
 
 void ExtensionsManager::playingChanged( int state )
 {
+    //This is unlikely, but can happen if no extension modules can be loaded.
+    if ( p_extensions_manager == NULL )
+        return ;
     vlc_mutex_lock( &p_extensions_manager->lock );
 
     extension_t *p_ext;
