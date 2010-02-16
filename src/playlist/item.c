@@ -63,9 +63,9 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
     playlist_item_t *p_parent = p_item->p_parent;
     assert( p_parent != NULL );
 
-    bool b_play = var_CreateGetBool( p_playlist, "playlist-autostart" ) &&
-                  get_current_status_item( p_playlist ) == p_item;
-    bool b_stop = b_play && p_item->i_flags & PLAYLIST_SUBITEM_STOP_FLAG;
+    bool b_current = get_current_status_item( p_playlist ) == p_item;
+    bool b_autostart = var_CreateGetBool( p_playlist, "playlist-autostart" );
+    bool b_stop = p_item->i_flags & PLAYLIST_SUBITEM_STOP_FLAG;
     p_item->i_flags &= ~PLAYLIST_SUBITEM_STOP_FLAG;
 
     int pos = 0;
@@ -98,20 +98,23 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
     }
     else
         p_item = playlist_InsertInputItemTree( p_playlist, p_item,
-                                               p_new_root, p_item->i_children, false );
+                                               p_new_root, PLAYLIST_END, false );
 
     if( !b_flat ) var_SetAddress( p_playlist, "leaf-to-parent", p_input );
 
-    if( b_stop && !b_flat )
+    if( b_current )
     {
-        PL_UNLOCK;
-        playlist_Stop( p_playlist );
-        return;
-    }
-    else if( b_play )
-    {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                          pl_Locked, get_current_status_node( p_playlist ), p_item );
+        if( b_stop || !b_autostart )
+        {
+            PL_UNLOCK;
+            playlist_Stop( p_playlist );
+            return;
+        }
+        else
+        {
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+                pl_Locked, get_current_status_node( p_playlist ), p_item );
+        }
     }
 
     PL_UNLOCK;
