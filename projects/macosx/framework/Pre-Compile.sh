@@ -33,6 +33,11 @@ else
     echo "Building for $ARCHS"
 fi
 
+if test "${ACTION}" = "clean"; then
+    rm -Rf "${VLC_BUILD_DIR}/tmp"
+    exit 0
+fi
+
 if test "${ACTION}" != "build"; then
     echo "This script is supposed to run from xcodebuild or Xcode"
     exit 1
@@ -43,6 +48,7 @@ modules="modules"
 share="share"
 include="include"
 target="${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}"
+target_bin="${target}/bin"
 target_lib="${target}/${lib}"            # Should we consider using a different well-known folder like shared resources?
 target_modules="${target}/${modules}"    # Should we consider using a different well-known folder like shared resources?
 target_share="${target}/${share}"    # Should we consider using a different well-known folder like shared resources?
@@ -53,7 +59,7 @@ suffix="dylib"
 
 
 ##########################
-# @function vlc_install_object(src_lib, dest_dir, type, lib_install_prefix, destination_name)
+# @function vlc_install_object(src_lib, dest_dir, type, lib_install_prefix, destination_name, suffix)
 # @description Installs the specified library into the destination folder, automatically changes the references to dependencies
 # @param src_lib     source library to copy to the destination directory
 # @param dest_dir    destination directory where the src_lib should be copied to
@@ -66,18 +72,20 @@ vlc_install_object() {
     local destination_name=${5}
     local suffix=${6}
 
-    if [ $type = "library" ]; then
+    if [ $type = "lib" ]; then
         local install_name="@loader_path/lib"
     elif [ $type = "module" ]; then
         local install_name="@loader_path/modules"
     fi
     if [ "$destination_name" != "" ]; then
         local lib_dest="$dest_dir/$destination_name$suffix"
+        local lib_name=`basename $destination_name`
     else
         local lib_dest="$dest_dir/`basename $src_lib`$suffix"
+        local lib_name=`basename $src_lib`
     fi
 
-    if [ "$lib_install_prefix" != "" ]; then
+    if [ "x$lib_install_prefix" != "x" ]; then
         local lib_install_prefix="$lib_install_prefix"
     else
         local lib_install_prefix="@loader_path/../lib"
@@ -102,7 +110,8 @@ vlc_install_object() {
 
         if [ "${type}" = "lib" ]; then
             # Change the reference of libvlc.1 stored in the usr directory to libvlc.dylib in the framework's library directory
-            install_name_tool -id "${install_name}/`basename ${lib_dest}`" ${lib_dest} > /dev/null
+            install_name_tool -id "${install_name}/${lib_name}" ${lib_dest} > /dev/null
+            echo "ID=${install_name}/${lib_name}"
         fi
 
         if [ "${type}" != "data" ]; then
@@ -141,14 +150,14 @@ vlc_install() {
             vlc_install_object "$main_build_dir/$1/$2" "$dest_dir" "$type" $5
         else
             objects=""
-            mkdir -p "tmp/$1"
+            tmp_dest_dir="$VLC_BUILD_DIR/tmp/$type"
+            mkdir -p "$tmp_dest_dir"
             newinstall="no"
             for arch in $ARCHS; do
-                vlc_install_object "$VLC_BUILD_DIR/$arch/$1/$2" "tmp/$1" "$type" "$5" "$2.$arch"
-                local dest="tmp/$1/$2.$arch"
+                vlc_install_object "$VLC_BUILD_DIR/$arch/$1/$2" "$tmp_dest_dir" "$type" "$5" "" ".$arch"
+                local dest="$tmp_dest_dir/$2.$arch"
                 if test -e ${dest}; then
-                    if test "$VLC_BUILD_DIR/$arch/$1/$2" -nt "${dest}"; then
-                        echo "$VLC_BUILD_DIR/$arch/$1/$2 newer than ${dest}"
+                    if ! test "$dest_dir/$2" -nt "${dest}"; then
                         newinstall="yes"
                     fi
                     objects="${dest} $objects"
@@ -157,8 +166,8 @@ vlc_install() {
                 fi
             done;
             if test "$newinstall" = "yes"; then
-                echo "Creating fat $type $2"
-                lipo $objects -output "${dest}" -create
+                echo "Creating fat $type $dest_dir/$2"
+                lipo $objects -output "$dest_dir/$2" -create
             fi
         fi
     fi
@@ -167,42 +176,10 @@ vlc_install() {
 ##########################
 
 ##########################
-# Hack for VLC-release.app
-if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
-    vlc_install "bin/${prefix}" "vlc" "${target}" "bin" "@loader_path/lib"
-    mv ${target}/vlc ${target}/VLC
-    chmod +x ${target}/VLC
-elif [ "$FULL_PRODUCT_NAME" = "VLC-Plugin.plugin" ] ; then
-    # install Safari webplugin
-    vlc_install "projects/mozilla/${prefix}" "npvlc.${suffix}" "${target}" "library" "@loader_path/lib"
-    mv ${target}/npvlc.${suffix} "${target}/VLC Plugin"
-    chmod +x "${target}/VLC Plugin"
-else
-    vlc_install "bin/${prefix}" "vlc" "${target}/bin" "bin" "@loader_path/../lib"
-fi
-
-##########################
-# Build the modules folder (Same as VLCKit.framework/modules in Makefile)
-echo "Building modules folder..."
-# Figure out what modules are available to install
-for module in `find ${main_build_dir}/modules -path "*dylib.dSYM*" -prune -o -name "lib*_plugin.dylib" -print | sed -e s:${main_build_dir}/::` ; do
-    # Check to see that the reported module actually exists
-    if test -n ${module}; then
-        vlc_install `dirname ${module}` `basename ${module}` ${target_modules} "module"
-    fi
-done
-
-# Install the module cache
-cache=`ls ${main_build_dir}/modules/plugins-*.dat | sed -e s:${main_build_dir}/::`
-vlc_install `dirname ${cache}` `basename ${cache}` ${target_modules} "data"
-
-# Build the modules folder
-##########################
-
-##########################
 # Create a symbolic link in the root of the framework
 mkdir -p ${target_lib}
 mkdir -p ${target_modules}
+mkdir -p ${target_bin}
 
 if [ "$RELEASE_MAKEFILE" != "yes" ] ; then
     pushd `pwd` > /dev/null
@@ -219,8 +196,42 @@ if [ "$RELEASE_MAKEFILE" != "yes" ] ; then
     popd > /dev/null
 fi
 
-vlc_install "src/${prefix}" "libvlc.5.dylib" "${target_lib}" "library"
-vlc_install "src/${prefix}" "libvlccore.4.dylib" "${target_lib}" "library"
+##########################
+# Hack for VLC-release.app
+if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
+    vlc_install "bin/${prefix}" "vlc" "${target}" "bin" "@loader_path/lib"
+    mv ${target}/vlc ${target}/VLC
+    chmod +x ${target}/VLC
+elif [ "$FULL_PRODUCT_NAME" = "VLC-Plugin.plugin" ] ; then
+    # install Safari webplugin
+    vlc_install "projects/mozilla/${prefix}" "npvlc.${suffix}" "${target}" "lib" "@loader_path/lib"
+    mv ${target}/npvlc.${suffix} "${target}/VLC Plugin"
+    chmod +x "${target}/VLC Plugin"
+else
+    vlc_install "bin/${prefix}" "vlc" "${target}/bin" "bin" "@loader_path/../lib"
+fi
+
+
+##########################
+# Build the modules folder (Same as VLCKit.framework/modules in Makefile)
+echo "Building modules folder..."
+# Figure out what modules are available to install
+for module in `find ${main_build_dir}/modules -path "*dylib.dSYM*" -prune -o -name "lib*_plugin.dylib" -print | sed -e s:${main_build_dir}/::` ; do
+    # Check to see that the reported module actually exists
+    if test -n ${module}; then
+        vlc_install `dirname ${module}` `basename ${module}` ${target_modules} "module"
+    fi
+done
+
+# Install the module cache
+cache=`ls ${main_build_dir}/modules/plugins-*.dat | sed -e s:${main_build_dir}/::`
+vlc_install `dirname ${cache}` `basename ${cache}` ${target_modules} "data"
+
+# Build the lib folder
+##########################
+
+vlc_install "src/${prefix}" "libvlc.5.dylib" "${target_lib}" "lib"
+vlc_install "src/${prefix}" "libvlccore.4.dylib" "${target_lib}" "lib"
 pushd `pwd` > /dev/null
 cd ${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}/lib
 ln -sf libvlc.5.dylib libvlc.dylib
