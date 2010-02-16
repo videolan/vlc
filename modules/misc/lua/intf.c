@@ -207,6 +207,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     {
         msg_Warn( p_intf, "Error while setting the module search path for %s",
                   p_sys->psz_filename );
+        lua_close( L );
         goto error;
     }
 
