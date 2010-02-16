@@ -54,9 +54,6 @@ args="--disable-sdl $args"
 args="--disable-sdl-image $args"
 args="--disable-visual $args"
 
-# where to install
-args="--prefix=$SYMROOT/vlc_build_dir/vlc_install_dir $args"
-
 if test "x$SDKROOT" != "x"
 then
 	args="--with-macosx-sdk=$SDKROOT $args"
@@ -73,10 +70,15 @@ top_srcdir="$SRCROOT/../../.."
 
 # 64 bits switches
 for arch in $ARCHS; do
+    this_args="$args"
+
+    # where to install
+    this_args="--prefix=$SYMROOT/vlc_build_dir/vlc_install_dir $this_args"
 
     input="$top_srcdir/configure"
     output="$arch/Makefile"
     if test -e ${output} && test ${output} -nt ${input}; then
+        echo "No need to re-run configure for $arch"
         continue;
     fi
 
@@ -85,10 +87,10 @@ for arch in $ARCHS; do
     cd $arch
 
     if test $arch = "x86_64"; then
-        args="--build=x86_64-apple-darwin10 $args"
+        this_args="--build=x86_64-apple-darwin10 $this_args"
     fi
 
     echo "Running[$arch] configure $args"
-    CFLAGS="-arch $arch" CXXFLAGS="-arch $arch" CPPFLAGS="-arch $arch" OBJCFLAGS="-arch $arch" exec $top_srcdir/configure $args
+    CFLAGS="-arch $arch" CXXFLAGS="-arch $arch" CPPFLAGS="-arch $arch" OBJCFLAGS="-arch $arch" exec $top_srcdir/configure $this_args
     cd ..
 done

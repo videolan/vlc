@@ -30,6 +30,7 @@ if test "${ACTION}" = "release-makefile"; then
 else
     use_archs="yes"
     main_build_dir="${VLC_BUILD_DIR}/x86_64"
+    echo "Building for $ARCHS"
 fi
 
 if test "${ACTION}" != "build"; then
@@ -52,17 +53,18 @@ suffix="dylib"
 
 
 ##########################
-# @function vlc_install(src_lib, dest_dir, type, lib_install_prefix, destination_name)
+# @function vlc_install_object(src_lib, dest_dir, type, lib_install_prefix, destination_name)
 # @description Installs the specified library into the destination folder, automatically changes the references to dependencies
 # @param src_lib     source library to copy to the destination directory
 # @param dest_dir    destination directory where the src_lib should be copied to
-vlc_install() {
+vlc_install_object() {
 
     local src_lib=${1}
     local dest_dir=${2}
     local type=${3}
     local lib_install_prefix=${4}
     local destination_name=${5}
+    local suffix=${6}
 
     if [ $type = "library" ]; then
         local install_name="@loader_path/lib"
@@ -70,9 +72,9 @@ vlc_install() {
         local install_name="@loader_path/modules"
     fi
     if [ "$destination_name" != "" ]; then
-        local lib_dest="$dest_dir/$destination_name"
+        local lib_dest="$dest_dir/$destination_name$suffix"
     else
-        local lib_dest="$dest_dir/`basename $src_lib`"
+        local lib_dest="$dest_dir/`basename $src_lib`$suffix"
     fi
 
     if [ "$lib_install_prefix" != "" ]; then
@@ -81,7 +83,10 @@ vlc_install() {
         local lib_install_prefix="@loader_path/../lib"
     fi
 
-    if test -e ${src_lib} && ((! test -e ${lib_dest}) || test ${src_lib} -nt ${lib_dest} ); then
+    if ! test -e ${src_lib}; then
+        return
+    fi
+    if ((! test -e ${lib_dest}) || test ${src_lib} -nt ${lib_dest} ); then
 
         mkdir -p ${dest_dir}
 
@@ -109,7 +114,7 @@ vlc_install() {
                         if test -e ${linked_lib}; then
                             install_name_tool -change "$linked_lib" "${lib_install_prefix}/${name}" "${lib_dest}"
                             linked_libs="${linked_libs} ${ref_lib}"
-                            vlc_install ${linked_lib} ${target_lib} "library"
+                            vlc_install_object ${linked_lib} ${target_lib} "library"
                         fi
                         ;;
                 esac
@@ -121,33 +126,75 @@ vlc_install() {
 ##########################
 
 ##########################
+# @function vlc_install(src_lib_dir, src_lib_name, dest_dir, type, lib_install_prefix)
+# @description Installs the specified library into the destination folder, automatically changes the references to dependencies
+# @param src_lib     source library to copy to the destination directory
+# @param dest_dir    destination directory where the src_lib should be copied to
+vlc_install() {
+    local dest_dir=$3
+    local type=$4
+
+    if test "$use_archs" = "no"; then
+        vlc_install_object "$VLC_BUILD_DIR/$1/$2" "$dest_dir" "$type" $5
+    else
+        if test $type = "data"; then
+            vlc_install_object "$main_build_dir/$1/$2" "$dest_dir" "$type" $5
+        else
+            objects=""
+            mkdir -p "tmp/$1"
+            newinstall="no"
+            for arch in $ARCHS; do
+                vlc_install_object "$VLC_BUILD_DIR/$arch/$1/$2" "tmp/$1" "$type" "$5" "$2.$arch"
+                local dest="tmp/$1/$2.$arch"
+                if test -e ${dest}; then
+                    if test "$VLC_BUILD_DIR/$arch/$1/$2" -nt "${dest}"; then
+                        echo "$VLC_BUILD_DIR/$arch/$1/$2 newer than ${dest}"
+                        newinstall="yes"
+                    fi
+                    objects="${dest} $objects"
+                else
+                    echo "Warning: building $2 without $arch"
+                fi
+            done;
+            if test "$newinstall" = "yes"; then
+                echo "Creating fat $type $2"
+                lipo $objects -output "${dest}" -create
+            fi
+        fi
+    fi
+}
+# @function vlc_install
+##########################
+
+##########################
 # Hack for VLC-release.app
 if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
-    vlc_install "${main_build_dir}/bin/${prefix}vlc" "${target}" "bin" "@loader_path/lib"
+    vlc_install "bin/${prefix}" "vlc" "${target}" "bin" "@loader_path/lib"
     mv ${target}/vlc ${target}/VLC
     chmod +x ${target}/VLC
 elif [ "$FULL_PRODUCT_NAME" = "VLC-Plugin.plugin" ] ; then
     # install Safari webplugin
-    vlc_install "${main_build_dir}/projects/mozilla/${prefix}npvlc.${suffix}" "${target}" "library" "@loader_path/lib"
+    vlc_install "projects/mozilla/${prefix}" "npvlc.${suffix}" "${target}" "library" "@loader_path/lib"
     mv ${target}/npvlc.${suffix} "${target}/VLC Plugin"
     chmod +x "${target}/VLC Plugin"
 else
-    vlc_install "${main_build_dir}/bin/${prefix}vlc" "${target}/bin" "bin" "@loader_path/../lib"
+    vlc_install "bin/${prefix}" "vlc" "${target}/bin" "bin" "@loader_path/../lib"
 fi
 
 ##########################
 # Build the modules folder (Same as VLCKit.framework/modules in Makefile)
 echo "Building modules folder..."
 # Figure out what modules are available to install
-for module in `find ${main_build_dir}/modules -name *.${suffix}` ; do
+for module in `find ${main_build_dir}/modules -path "*dylib.dSYM*" -prune -o -name "lib*_plugin.dylib" -print | sed -e s:${main_build_dir}/::` ; do
     # Check to see that the reported module actually exists
     if test -n ${module}; then
-        vlc_install ${module} ${target_modules} "module"
+        vlc_install `dirname ${module}` `basename ${module}` ${target_modules} "module"
     fi
 done
 
 # Install the module cache
-vlc_install `ls ${main_build_dir}/modules/plugins-*.dat` ${target_modules} "data"
+cache=`ls ${main_build_dir}/modules/plugins-*.dat | sed -e s:${main_build_dir}/::`
+vlc_install `dirname ${cache}` `basename ${cache}` ${target_modules} "data"
 
 # Build the modules folder
 ##########################
@@ -172,21 +219,8 @@ if [ "$RELEASE_MAKEFILE" != "yes" ] ; then
     popd > /dev/null
 fi
 
-##########################
-# Build the library folder
-echo "Building library folder... ${linked_libs}"
-for linked_lib in ${linked_libs} ; do
-    case "${linked_lib}" in
-        */extras/contrib/lib/*.dylib|*/vlc_install_dir/lib/*.dylib)
-            if test -e ${linked_lib}; then
-                vlc_install ${linked_lib} ${target_lib} "library"
-            fi
-            ;;
-    esac
-done
-
-vlc_install "${main_build_dir}/src/${prefix}libvlc.5.dylib" "${target_lib}" "library"
-vlc_install "${main_build_dir}/src/${prefix}libvlccore.4.dylib" "${target_lib}" "library"
+vlc_install "src/${prefix}" "libvlc.5.dylib" "${target_lib}" "library"
+vlc_install "src/${prefix}" "libvlccore.4.dylib" "${target_lib}" "library"
 pushd `pwd` > /dev/null
 cd ${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}/lib
 ln -sf libvlc.5.dylib libvlc.dylib
