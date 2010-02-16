@@ -1,7 +1,7 @@
 /*****************************************************************************
  * services_discovery.c : Services discovery using lua scripts
  *****************************************************************************
- * Copyright (C) 2009 the VideoLAN team
+ * Copyright (C) 2009 VideoLAN and AUTHORS
  *
  * Authors: Fabio Ritrovato <sephiroth87 at videolan dot org>
  *

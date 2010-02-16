@@ -2,7 +2,7 @@
 --[[
  $Id$
 
- Copyright © 2010 the VideoLAN team
+ Copyright © 2010 VideoLAN and AUTHORS
  
  Authors: Fabio Ritrovato <sephiroth87 at videolan dot org>
 
