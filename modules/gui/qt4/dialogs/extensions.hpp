@@ -75,7 +75,6 @@ public:
     }
     static void killInstance()
     {
-        assert( instance != NULL );
         delete instance;
         instance = NULL;
     }
