@@ -1096,33 +1096,33 @@ DISTCLEAN_PKG += ffmpeg-$(FFMPEG_VERSION).tar.gz
 # libdvdcss
 # ***************************************************************************
 
-libdvdcss-$(LIBDVDCSS_VERSION).tar.gz:
+libdvdcss-$(LIBDVDCSS_VERSION).tar.bz2:
 	$(WGET) $(LIBDVDCSS_URL)
 
-ifdef SVN
-libdvdcss:
-	$(SVN) co svn://svn.videolan.org/libdvdcss/trunk libdvdcss
-	cd $@ && sh bootstrap
-else
-libdvdcss: libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
-	$(EXTRACT_GZ)
-endif
+# ifdef SVN
+# libdvdcss:
+#	$(SVN) co svn://svn.videolan.org/libdvdcss/trunk libdvdcss
+#	cd $@ && sh bootstrap
+# else
+libdvdcss: libdvdcss-$(LIBDVDCSS_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+# endif
 
 .dvdcss: libdvdcss
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --disable-doc --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
-ifdef SVN
-libdvdcss-source: libdvdcss
-	tar cv --exclude=.svn libdvdcss | bzip2 > libdvdcss-$(DATE).tar.bz2
-
-SOURCE += libdvdcss-source
-endif
+# ifdef SVN
+# libdvdcss-source: libdvdcss
+# 	tar cv --exclude=.svn libdvdcss | bzip2 > libdvdcss-$(DATE).tar.bz2
+#
+# SOURCE += libdvdcss-source
+# endif
 
 CLEAN_FILE += .dvdcss
 CLEAN_PKG += libdvdcss
-DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
+DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.bz2
 
 # ***************************************************************************
 # dummy dvdread to trigger the INSTALL_NAME script
