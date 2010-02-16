@@ -56,7 +56,7 @@ int Open_LuaSD( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t * )p_this;
     services_discovery_sys_t *p_sys;
-    lua_State *L;
+    lua_State *L = NULL;
     char *psz_name = strdup(p_sd->psz_name);
 
     if( !strcmp(p_sd->psz_name, "lua"))
@@ -74,7 +74,10 @@ int Open_LuaSD( vlc_object_t *p_this )
     }
 
     if( !( p_sys = malloc( sizeof( services_discovery_sys_t ) ) ) )
+    {
+        free( psz_name );
         return VLC_ENOMEM;
+    }
     p_sd->p_sys = p_sys;
     p_sys->psz_filename = vlclua_find_file( p_this, "sd", psz_name );
     if( !p_sys->psz_filename )
@@ -112,7 +115,6 @@ int Open_LuaSD( vlc_object_t *p_this )
     {
         msg_Warn( p_sd, "Error while setting the module search path for %s",
                   p_sys->psz_filename );
-        lua_close( L );
         goto error;
     }
     if( luaL_dofile( L, p_sys->psz_filename ) )
@@ -121,17 +123,17 @@ int Open_LuaSD( vlc_object_t *p_this )
         msg_Err( p_sd, "Error loading script %s: %s", p_sys->psz_filename,
                   lua_tostring( L, lua_gettop( L ) ) );
         lua_pop( L, 1 );
-        lua_close( L );
         goto error;
     }
     p_sys->L = L;
     if( vlc_clone (&p_sd->p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW) )
     {
-        lua_close( L );
         goto error;
     }
     return VLC_SUCCESS;
 error:
+    if( L )
+        lua_close( L );
     free( p_sys->psz_filename );
     free( p_sys );
     return VLC_EGENERIC;
