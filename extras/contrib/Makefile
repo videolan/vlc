@@ -68,7 +68,7 @@ hosts/$(HOST)/.$(CONTRIBREV): contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
     # result in linking issues
 ifdef HAVE_DARWIN_10
 	(cd $(PREFIX)/lib && sed -e 's%/usr/lib/libiconv.la%$(PREFIX)/lib/libiconv.la%g' -i.orig *.la && rm -f *.la.orig)
-	(cd src && rm .iconv && $(MAKE) .iconv)
+	(cd src && rm -f .iconv && $(MAKE) .iconv)
 endif
 	touch hosts/$(HOST)/.$(CONTRIBREV)
 
