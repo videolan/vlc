@@ -794,6 +794,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      */
     vlc_InitActions( p_libvlc );
 
+    /* Create a variable for showing the fullscreen interface */
+    var_Create( p_libvlc, "intf-show", VLC_VAR_BOOL );
+    var_SetBool( p_libvlc, "intf-show", true );
+
+    /* Create a variable for showing the right click menu */
+    var_Create( p_libvlc, "intf-popupmenu", VLC_VAR_BOOL );
+
     /* variables for signalling creation of new files */
     var_Create( p_libvlc, "snapshot-file", VLC_VAR_STRING );
     var_Create( p_libvlc, "record-file", VLC_VAR_STRING );
@@ -949,13 +956,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_Create( p_libvlc, "drawable-clip-bottom", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "drawable-clip-right", VLC_VAR_INTEGER );
 
-
-    /* Create a variable for showing the fullscreen interface from hotkeys */
-    var_Create( p_libvlc, "intf-show", VLC_VAR_BOOL );
-    var_SetBool( p_libvlc, "intf-show", true );
-
-    /* Create a variable for showing the right click menu */
-    var_Create( p_libvlc, "intf-popupmenu", VLC_VAR_BOOL );
 
     /*
      * Get input filenames given as commandline arguments
