@@ -94,6 +94,7 @@ vlc_install_object() {
     if ! test -e ${src_lib}; then
         return
     fi
+
     if ((! test -e ${lib_dest}) || test ${src_lib} -nt ${lib_dest} ); then
 
         mkdir -p ${dest_dir}
@@ -111,7 +112,6 @@ vlc_install_object() {
         if [ "${type}" = "lib" ]; then
             # Change the reference of libvlc.1 stored in the usr directory to libvlc.dylib in the framework's library directory
             install_name_tool -id "${install_name}/${lib_name}" ${lib_dest} > /dev/null
-            echo "ID=${install_name}/${lib_name}"
         fi
 
         if [ "${type}" != "data" ]; then

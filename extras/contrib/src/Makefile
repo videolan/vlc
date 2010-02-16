@@ -438,7 +438,6 @@ libiconv-snowleopard: libiconv-snowleopard.tar.bz2
 ifdef HAVE_DARWIN_OS
 ifdef HAVE_DARWIN_10
 .iconv: libiconv-snowleopard
-	(cd libiconv-snowleopard && sed -i.orig s:/usr/lib:$(PREFIX)/lib/: libiconv.la)
 	(cd libiconv-snowleopard && cp libiconv.* $(PREFIX)/lib/)
 	touch $@
 else

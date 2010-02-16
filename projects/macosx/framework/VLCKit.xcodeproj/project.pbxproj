@@ -464,7 +464,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "for arch in $ARCHS; do\n\techo \"Make [$arch]\"\n\tcd  $SYMROOT/vlc_build_dir/$arch\n\tmake\ndone";
+			shellScript = "for arch in $ARCHS; do\n\techo \"Make [$arch]\"\n\tcd  $VLC_BUILD_DIR/$arch\n\tmake\ndone";
 		};
 		633754D310ED0D330072A0D9 /* install */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -484,7 +484,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "for arch in $ARCHS; do\n\tcd  $SYMROOT/vlc_build_dir/$arch\n\tcd src\n\techo \"Installing  [$arch] libvlc, libvlccore, vlc\"\n\tmake install --quiet > /dev/null\ndone";
+			shellScript = "for arch in $ARCHS; do\n\tcd  $VLC_BUILD_DIR/$arch\n\tcd src\n\techo \"Installing  [$arch] libvlc, libvlccore, vlc\"\n\tmake install --quiet > /dev/null\ndone";
 		};
 		633BD6E30D2ADF030012A314 /* make */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -605,10 +605,7 @@
 				);
 				INFOPLIST_FILE = Resources/Info.plist;
 				INSTALL_PATH = "@loader_path/../Frameworks";
-				LD_FLAGS_LIBINTL = "-dylib_file @loader_path/../lib/vlc_libintl.dylib:$(VLC_FRAMEWORK)/lib/vlc_libintl.dylib";
-				LD_FLAGS_LIBVLC = "-dylib_file @loader_path/lib/libvlc.dylib:$(VLC_FRAMEWORK)/lib/libvlc.dylib";
-				LD_FLAGS_LIBVLC_CONTROL = "-dylib_file @loader_path/lib/libvlc-control.dylib:$(VLC_FRAMEWORK)/lib/libvlc-control.dylib";
-				LIBRARY_SEARCH_PATHS = "$(VLC_FRAMEWORK)/lib";
+				LIBRARY_SEARCH_PATHS = "$(CONFIGURATION_BUILD_DIR)/$(PRODUCT_NAME).$(WRAPPER_EXTENSION)/lib";
 				OTHER_LDFLAGS = (
 					"-lvlccore",
 					"-single_module",
@@ -620,9 +617,6 @@
 				PRODUCT_NAME = VLCKit;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx10.5;
-				VLC_BUILD_DIR = "$(SYMROOT)/vlc_build_dir";
-				VLC_FRAMEWORK = "$(TARGET_BUILD_DIR)/$(PROJECT_NAME).framework";
-				VLC_SRC_DIR = ../../..;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -645,10 +639,7 @@
 				);
 				INFOPLIST_FILE = Resources/Info.plist;
 				INSTALL_PATH = "@loader_path/../Frameworks";
-				LD_FLAGS_LIBINTL = "-dylib_file @loader_path/../lib/vlc_libintl.dylib:$(VLC_FRAMEWORK)/lib/vlc_libintl.dylib";
-				LD_FLAGS_LIBVLC = "-dylib_file @loader_path/lib/libvlc.dylib:$(VLC_FRAMEWORK)/lib/libvlc.dylib -dylib_file @loader_path/../lib/libvlc.dylib:$(VLC_FRAMEWORK)/lib/libvlc.dylib";
-				LD_FLAGS_LIBVLC_CONTROL = "-dylib_file @loader_path/lib/libvlc-control.dylib:$(VLC_FRAMEWORK)/lib/libvlc-control.dylib";
-				LIBRARY_SEARCH_PATHS = "$(VLC_FRAMEWORK)/lib";
+				LIBRARY_SEARCH_PATHS = "$(CONFIGURATION_BUILD_DIR)/$(PRODUCT_NAME).$(WRAPPER_EXTENSION)/lib";
 				OTHER_LDFLAGS = (
 					"-lvlccore",
 					"-single_module",
@@ -660,9 +651,6 @@
 				PRODUCT_NAME = VLCKit;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx10.5;
-				VLC_BUILD_DIR = "$(SYMROOT)/vlc_build_dir";
-				VLC_FRAMEWORK = "$(TARGET_BUILD_DIR)/$(PROJECT_NAME).framework";
-				VLC_SRC_DIR = ../../..;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;
@@ -682,6 +670,8 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
+				VLC_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/vlc_build_dir";
+				VLC_SRC_DIR = "$(SRCROOT)/../../..";
 			};
 			name = Debug;
 		};
@@ -700,6 +690,8 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
+				VLC_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/vlc_build_dir";
+				VLC_SRC_DIR = "$(SRCROOT)/../../..";
 			};
 			name = Release;
 		};

@@ -9,16 +9,16 @@ if test "x$SYMROOT" = "x"; then
 fi
 
 if test "$ACTION" = "clean"; then
-    rm -Rf $SYMROOT/vlc_build_dir
+    rm -Rf $VLC_BUILD_DIR
     exit 0
 fi
 
 # Contruct the vlc_build_dir
-mkdir -p $SYMROOT/vlc_build_dir
-cd $SYMROOT/vlc_build_dir
+mkdir -p $VLC_BUILD_DIR
+cd $VLC_BUILD_DIR
 
 # Contruct the argument list
-echo "Building for $ARCHS with sdk=\"$SDKROOT\""
+echo "Building for $ARCHS with sdk=\"$SDKROOT\" in $VLC_BUILD_DIR"
 
 
 args="--disable-nls $args"
@@ -62,21 +62,20 @@ fi
 # Debug Flags
 if test "$CONFIGURATION" = "Debug"; then
 	args="--enable-debug $args"
-else
-	args="--enable-release $args"
 fi
 
-top_srcdir="$SRCROOT/../../.."
+top_srcdir="$VLC_SRC_DIR"
 
 # 64 bits switches
 for arch in $ARCHS; do
     this_args="$args"
 
     # where to install
-    this_args="--prefix=$SYMROOT/vlc_build_dir/vlc_install_dir $this_args"
+    this_args="--prefix=${VLC_BUILD_DIR}/$arch/vlc_install_dir $this_args"
 
     input="$top_srcdir/configure"
     output="$arch/Makefile"
+    echo `pwd`"/${output}"
     if test -e ${output} && test ${output} -nt ${input}; then
         echo "No need to re-run configure for $arch"
         continue;
@@ -90,7 +89,7 @@ for arch in $ARCHS; do
         this_args="--build=x86_64-apple-darwin10 $this_args"
     fi
 
-    echo "Running[$arch] configure $args"
-    CFLAGS="-arch $arch" CXXFLAGS="-arch $arch" CPPFLAGS="-arch $arch" OBJCFLAGS="-arch $arch" exec $top_srcdir/configure $this_args
+    echo "Running[$arch] configure $this_args"
+    CFLAGS="-arch $arch" CXXFLAGS="-arch $arch" CPPFLAGS="-arch $arch" OBJCFLAGS="-arch $arch" $top_srcdir/configure $this_args
     cd ..
 done
