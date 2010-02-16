@@ -1347,7 +1347,6 @@ x264-$(X264_VERSION).tar.gz:
 ifdef GIT
 x264:
 	$(GIT) clone git://git.videolan.org/x264.git
-	patch -p0 < Patches/x264-svn-info-threads.patch
 ifdef HAVE_WIN32
 	(cd x264; patch -p0 < ../Patches/x264-svn-win32.patch )
 endif
