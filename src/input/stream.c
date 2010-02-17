@@ -1567,33 +1567,38 @@ char *stream_ReadLine( stream_t *s )
         {
             /* UTF-8: 0A <LF> */
             psz_eol = memchr( p_data, '\n', i_data );
+            if( psz_eol == NULL )
+                /* UTF-8: 0D <CR> */
+                psz_eol = memchr( p_data, '\r', i_data );
         }
         else
         {
-            const uint8_t *p = p_data;
-            const uint8_t *p_last = p + i_data - s->p_text->i_char_width;
+            const uint8_t *p_last = p_data + i_data - s->p_text->i_char_width;
+            uint16_t eol = s->p_text->b_little_endian ? 0x0A00 : 0x00A0;
 
             assert( s->p_text->i_char_width == 2 );
-            if( s->p_text->b_little_endian == true)
+            psz_eol = NULL;
+            /* UTF-16: 000A <LF> */
+            for( const uint8_t *p = p_data; p <= p_last; p += 2 )
             {
-                /* UTF-16LE: 0A 00 <LF> */
-                while( p <= p_last && ( p[0] != 0x0A || p[1] != 0x00 ) )
-                    p += 2;
-            }
-            else
-            {
-                /* UTF-16BE: 00 0A <LF> */
-                while( p <= p_last && ( p[1] != 0x0A || p[0] != 0x00 ) )
-                    p += 2;
+                if( U16_AT( p ) == eol )
+                {
+                     psz_eol = (char *)p + 1;
+                     break;
+                }
             }
 
-            if( p > p_last )
-            {
-                psz_eol = NULL;
-            }
-            else
-            {
-                psz_eol = (char *)p + 1;
+            if( psz_eol == NULL )
+            {   /* UTF-16: 000D <CR> */
+                eol = s->p_text->b_little_endian ? 0x0D00 : 0x00D0;
+                for( const uint8_t *p = p_data; p <= p_last; p += 2 )
+                {
+                    if( U16_AT( p ) == eol )
+                    {
+                        psz_eol = (char *)p + 1;
+                        break;
+                    }
+                }
             }
         }
 
