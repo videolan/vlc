@@ -1573,20 +1573,18 @@ char *stream_ReadLine( stream_t *s )
             const uint8_t *p = p_data;
             const uint8_t *p_last = p + i_data - s->p_text->i_char_width;
 
-            if( s->p_text->i_char_width == 2 )
+            assert( s->p_text->i_char_width == 2 );
+            if( s->p_text->b_little_endian == true)
             {
-                if( s->p_text->b_little_endian == true)
-                {
-                    /* UTF-16LE: 0A 00 <LF> */
-                    while( p <= p_last && ( p[0] != 0x0A || p[1] != 0x00 ) )
-                        p += 2;
-                }
-                else
-                {
-                    /* UTF-16BE: 00 0A <LF> */
-                    while( p <= p_last && ( p[1] != 0x0A || p[0] != 0x00 ) )
-                        p += 2;
-                }
+                /* UTF-16LE: 0A 00 <LF> */
+                while( p <= p_last && ( p[0] != 0x0A || p[1] != 0x00 ) )
+                    p += 2;
+            }
+            else
+            {
+                /* UTF-16BE: 00 0A <LF> */
+                while( p <= p_last && ( p[1] != 0x0A || p[0] != 0x00 ) )
+                    p += 2;
             }
 
             if( p > p_last )
@@ -1595,7 +1593,7 @@ char *stream_ReadLine( stream_t *s )
             }
             else
             {
-                psz_eol = (char *)p + ( s->p_text->i_char_width - 1 );
+                psz_eol = (char *)p + 1;
             }
         }
 
