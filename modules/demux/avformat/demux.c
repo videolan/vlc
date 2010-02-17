@@ -47,6 +47,7 @@
 
 #include "../../codec/avcodec/avcodec.h"
 #include "avformat.h"
+#include "../xiph.h"
 #include "../vobsub.h"
 
 //#define AVFORMAT_DEBUG 1
@@ -337,16 +338,73 @@ int OpenDemux( vlc_object_t *p_this )
             msg_Warn( p_demux, "unsupported track type in ffmpeg demux" );
             break;
         }
-        fmt.psz_language = p_sys->ic->streams[i]->language;
+        fmt.psz_language = strdup( p_sys->ic->streams[i]->language );
 
 #ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
         if( cc->codec_type != CODEC_TYPE_ATTACHMENT )
 #endif
         {
-            fmt.i_extra = cc->extradata_size;
-            fmt.p_extra = cc->extradata;
+            const uint8_t *p_extra = cc->extradata;
+            unsigned      i_extra  = cc->extradata_size;
+
+            if( cc->codec_id == CODEC_ID_THEORA )
+            {
+                unsigned pi_size[3];
+                void     *pp_data[3];
+                unsigned i_count;
+                for( i_count = 0; i_count < 3; i_count++ )
+                {
+                    if( i_extra < 2 )
+                        break;
+                    pi_size[i_count] = GetWBE( p_extra );
+                    pp_data[i_count] = (uint8_t*)&p_extra[2];
+                    if( i_extra < pi_size[i_count] + 2 )
+                        break;
+
+                    p_extra += 2 + pi_size[i_count];
+                    i_extra -= 2 + pi_size[i_count];
+                }
+                if( i_count > 0 && xiph_PackHeaders( &fmt.i_extra, &fmt.p_extra,
+                                                     pi_size, pp_data, i_count ) )
+                {
+                    fmt.i_extra = 0;
+                    fmt.p_extra = NULL;
+                }
+            }
+            else if( cc->codec_id == CODEC_ID_SPEEX )
+            {
+                uint8_t p_dummy_comment[] = {
+                    0, 0, 0, 0,
+                    0, 0, 0, 0,
+                };
+                unsigned pi_size[2];
+                void     *pp_data[2];
+
+                pi_size[0] = i_extra;
+                pp_data[0] = (uint8_t*)p_extra;
+
+                pi_size[1] = sizeof(p_dummy_comment);
+                pp_data[1] = p_dummy_comment;
+
+                if( pi_size[0] > 0 && xiph_PackHeaders( &fmt.i_extra, &fmt.p_extra,
+                                                        pi_size, pp_data, 2 ) )
+                {
+                    fmt.i_extra = 0;
+                    fmt.p_extra = NULL;
+                }
+            }
+            else if( cc->extradata_size > 0 )
+            {
+                fmt.p_extra = malloc( i_extra );
+                if( fmt.p_extra )
+                {
+                    fmt.i_extra = i_extra;
+                    memcpy( fmt.p_extra, p_extra, i_extra );
+                }
+            }
         }
         es = es_out_Add( p_demux->out, &fmt );
+        es_format_Clean( &fmt );
 
         msg_Dbg( p_demux, "adding es: %s codec = %4.4s",
                  psz_type, (char*)&fcc );
