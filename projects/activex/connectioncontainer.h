@@ -2,8 +2,10 @@
  * connectioncontainer.h: ActiveX control for VLC
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2010 M2X BV
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,15 +29,15 @@
 #include <vector>
 #include <queue>
 #include <map>
+#include <cguid.h>
 
 class VLCConnectionPoint : public IConnectionPoint
 {
 
 public:
 
-    VLCConnectionPoint(IConnectionPointContainer *p_cpc, REFIID iid) :
-        _iid(iid), _p_cpc(p_cpc) {};
-    virtual ~VLCConnectionPoint() {};
+    VLCConnectionPoint(IConnectionPointContainer *p_cpc, REFIID iid);
+    virtual ~VLCConnectionPoint();
 
     // IUnknown methods
     STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
@@ -69,6 +71,7 @@ public:
 private:
 
     REFIID _iid;
+    IGlobalInterfaceTable *m_pGIT;
     IConnectionPointContainer *_p_cpc;
     std::map<DWORD, LPUNKNOWN> _connections;
 };
@@ -121,14 +124,20 @@ public:
     void fireEvent(DISPID, DISPPARAMS*);
     void firePropChangedEvent(DISPID dispId);
 
-private:
+public:
+    CRITICAL_SECTION csEvents;
+    HANDLE sEvents;
 
     VLCPlugin *_p_instance;
-    BOOL _b_freeze;
+    BOOL isRunning;
+    BOOL freeze;
     VLCConnectionPoint *_p_events;
     VLCConnectionPoint *_p_props;
     std::vector<LPCONNECTIONPOINT> _v_cps;
     std::queue<class VLCDispatchEvent *> _q_events;
+
+private:
+    HANDLE  hThread;
 };
 
 #endif

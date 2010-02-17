@@ -2,8 +2,10 @@
  * connectioncontainer.cpp: ActiveX control for VLC
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2010 M2X BV
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +27,18 @@
 
 #include "utils.h"
 
+#include <assert.h>
+#include <rpc.h>
+#include <rpcndr.h>
+
 using namespace std;
 
+////////////////////////////////////////////////////////////////////////////////////////////////
+DEFINE_GUID(IID_IGlobalInterfaceTable,     0x00000146, 0x0000, 0x0000, 0xc0,0x00, 0x00,0x00,0x00,0x00,0x00,0x46);
+DEFINE_GUID(CLSID_StdGlobalInterfaceTable, 0x00000323, 0x0000, 0x0000, 0xc0,0x00, 0x00,0x00,0x00,0x00,0x00,0x46);
+
+const GUID  IID_IGlobalInterfaceTable = { 0x00000146, 0, 0, {0xc0, 0, 0, 0, 0, 0, 0, 0x46} };
+const CLSID CLSID_StdGlobalInterfaceTable = { 0x00000323, 0, 0, {0xc0, 0, 0, 0, 0, 0, 0, 0x46} };
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* this function object is used to return the value from a map pair */
@@ -90,6 +102,102 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
+// Condition variable emulation
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+static void ConditionInit(HANDLE *handle)
+{
+    *handle = CreateEvent(NULL, TRUE, FALSE, NULL);
+    assert(*handle != NULL);
+}
+
+static void ConditionDestroy(HANDLE *handle)
+{
+    CloseHandle(*handle);
+}
+
+static void ConditionWait(HANDLE *handle, CRITICAL_SECTION *lock)
+{
+    DWORD dwWaitResult;
+
+    do {
+        LeaveCriticalSection(lock);
+        dwWaitResult = WaitForSingleObjectEx(*handle, INFINITE, TRUE);
+        EnterCriticalSection(lock);
+    } while(dwWaitResult == WAIT_IO_COMPLETION);
+
+    assert(dwWaitResult != WAIT_ABANDONED); /* another thread failed to cleanup! */
+    assert(dwWaitResult != WAIT_FAILED);
+    ResetEvent(*handle);
+}
+
+static void ConditionSignal(HANDLE *handle)
+{
+    SetEvent(*handle);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+// Event handling thread
+//
+// It bridges the gap between libvlc thread context and ActiveX/COM thread context.
+////////////////////////////////////////////////////////////////////////////////////////////////
+DWORD WINAPI ThreadProcEventHandler(LPVOID lpParam)
+{
+    CoInitialize(NULL);
+    VLCConnectionPointContainer *pCPC = (VLCConnectionPointContainer *)lpParam;
+
+    while(pCPC->isRunning)
+    {
+        EnterCriticalSection(&(pCPC->csEvents));
+        ConditionWait(&(pCPC->sEvents), &(pCPC->csEvents));
+
+        if (!pCPC->isRunning)
+        {
+            LeaveCriticalSection(&(pCPC->csEvents));
+            break;
+        }
+
+        while(!pCPC->_q_events.empty())
+        {
+            VLCDispatchEvent *ev = pCPC->_q_events.front();
+            pCPC->_q_events.pop();
+            pCPC->_p_events->fireEvent(ev->_dispId, &ev->_dispParams);
+            delete ev;
+        }
+        LeaveCriticalSection(&(pCPC->csEvents));
+    }
+
+    CoUninitialize();
+    return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+// VLCConnectionPoint
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+VLCConnectionPoint::VLCConnectionPoint(IConnectionPointContainer *p_cpc, REFIID iid) :
+        _iid(iid), _p_cpc(p_cpc)
+{
+    // Get the Global Interface Table per-process singleton:
+    CoCreateInstance(CLSID_StdGlobalInterfaceTable, 0,
+                          CLSCTX_INPROC_SERVER,
+                          IID_IGlobalInterfaceTable,
+                          reinterpret_cast<void**>(&m_pGIT));
+};
+
+VLCConnectionPoint::~VLCConnectionPoint()
+{
+    // Revoke interfaces from the GIT:
+    map<DWORD,LPUNKNOWN>::iterator end = _connections.end();
+    map<DWORD,LPUNKNOWN>::iterator iter = _connections.begin();
+
+    while( iter != end )
+    {
+        m_pGIT->RevokeInterfaceFromGlobal((DWORD)iter->second);
+        ++iter;
+    }
+    m_pGIT->Release();
+};
 
 STDMETHODIMP VLCConnectionPoint::GetConnectionInterface(IID *iid)
 {
@@ -113,17 +221,24 @@ STDMETHODIMP VLCConnectionPoint::GetConnectionPointContainer(LPCONNECTIONPOINTCO
 STDMETHODIMP VLCConnectionPoint::Advise(IUnknown *pUnk, DWORD *pdwCookie)
 {
     static DWORD dwCookieCounter = 0;
+    HRESULT hr;
 
     if( (NULL == pUnk) || (NULL == pdwCookie) )
         return E_POINTER;
 
-    if( SUCCEEDED(pUnk->QueryInterface(_iid, (LPVOID *)&pUnk)) )
+    hr = pUnk->QueryInterface(_iid, (LPVOID *)&pUnk);
+    if( SUCCEEDED(hr) )
     {
-        *pdwCookie = ++dwCookieCounter;
-        _connections[*pdwCookie] = pUnk;
-        return S_OK;
+        DWORD dwGITCookie;
+        hr = m_pGIT->RegisterInterfaceInGlobal( pUnk, _iid, &dwGITCookie );
+        if( SUCCEEDED(hr) )
+        {
+            *pdwCookie = ++dwCookieCounter;
+            _connections[*pdwCookie] = (LPUNKNOWN) dwGITCookie;
+        }
+        pUnk->Release();
     }
-    return CONNECT_E_CANNOTCONNECT;
+    return hr;
 };
 
 STDMETHODIMP VLCConnectionPoint::Unadvise(DWORD pdwCookie)
@@ -131,8 +246,7 @@ STDMETHODIMP VLCConnectionPoint::Unadvise(DWORD pdwCookie)
     map<DWORD,LPUNKNOWN>::iterator pcd = _connections.find((DWORD)pdwCookie);
     if( pcd != _connections.end() )
     {
-        pcd->second->Release();
-
+        m_pGIT->RevokeInterfaceFromGlobal((DWORD)pcd->second);
         _connections.erase(pdwCookie);
         return S_OK;
     }
@@ -154,17 +268,26 @@ void VLCConnectionPoint::fireEvent(DISPID dispId, DISPPARAMS *pDispParams)
     map<DWORD,LPUNKNOWN>::iterator end = _connections.end();
     map<DWORD,LPUNKNOWN>::iterator iter = _connections.begin();
 
+    HRESULT hr = S_OK;
+
     while( iter != end )
     {
-        LPUNKNOWN pUnk = iter->second;
-        if( NULL != pUnk )
+        DWORD dwCookie = (DWORD)iter->second;
+        LPUNKNOWN pUnk;
+
+        hr = m_pGIT->GetInterfaceFromGlobal( dwCookie, _iid,
+                                             reinterpret_cast<void **>(&pUnk) );
+        if( SUCCEEDED(hr) )
         {
             IDispatch *pDisp;
-            if( SUCCEEDED(pUnk->QueryInterface(_iid, (LPVOID *)&pDisp)) )
+            hr = pUnk->QueryInterface(_iid, (LPVOID *)&pDisp);
+            if( SUCCEEDED(hr) )
             {
-                pDisp->Invoke(dispId, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, pDispParams, NULL, NULL, NULL);
+                pDisp->Invoke(dispId, IID_NULL, LOCALE_USER_DEFAULT,
+                              DISPATCH_METHOD, pDispParams, NULL, NULL, NULL);
                 pDisp->Release();
             }
+            pUnk->Release();
         }
         ++iter;
     }
@@ -177,15 +300,21 @@ void VLCConnectionPoint::firePropChangedEvent(DISPID dispId)
 
     while( iter != end )
     {
-        LPUNKNOWN pUnk = iter->second;
-        if( NULL != pUnk )
+        LPUNKNOWN pUnk;
+        HRESULT hr;
+
+        hr = m_pGIT->GetInterfaceFromGlobal( (DWORD)iter->second, IID_IUnknown,
+                                              reinterpret_cast<void **>(&pUnk) );
+        if( SUCCEEDED(hr) )
         {
             IPropertyNotifySink *pPropSink;
-            if( SUCCEEDED(pUnk->QueryInterface(IID_IPropertyNotifySink, (LPVOID *)&pPropSink)) )
+            hr = pUnk->QueryInterface( IID_IPropertyNotifySink, (LPVOID *)&pPropSink );
+            if( SUCCEEDED(hr) )
             {
                 pPropSink->OnChanged(dispId);
                 pPropSink->Release();
             }
+            pUnk->Release();
         }
         ++iter;
     }
@@ -198,8 +327,8 @@ VLCDispatchEvent::~VLCDispatchEvent()
     //clear event arguments
     if( NULL != _dispParams.rgvarg )
     {
-        for(unsigned int c=0; c<_dispParams.cArgs; ++c)
-            VariantClear(_dispParams.rgvarg+c);
+        for(unsigned int c = 0; c < _dispParams.cArgs; ++c)
+            VariantClear(_dispParams.rgvarg + c);
         CoTaskMemFree(_dispParams.rgvarg);
     }
     if( NULL != _dispParams.rgdispidNamedArgs )
@@ -207,9 +336,11 @@ VLCDispatchEvent::~VLCDispatchEvent()
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
+// VLCConnectionPointContainer
+////////////////////////////////////////////////////////////////////////////////////////////////
 
 VLCConnectionPointContainer::VLCConnectionPointContainer(VLCPlugin *p_instance) :
-    _p_instance(p_instance), _b_freeze(FALSE)
+    _p_instance(p_instance), freeze(FALSE), isRunning(TRUE)
 {
     _p_events = new VLCConnectionPoint(dynamic_cast<LPCONNECTIONPOINTCONTAINER>(this),
             _p_instance->getDispEventID());
@@ -220,10 +351,31 @@ VLCConnectionPointContainer::VLCConnectionPointContainer(VLCPlugin *p_instance) 
             IID_IPropertyNotifySink);
 
     _v_cps.push_back(dynamic_cast<LPCONNECTIONPOINT>(_p_props));
+
+    // init protection
+    InitializeCriticalSection(&csEvents);
+    ConditionInit(&sEvents);
+
+    // create thread
+    hThread = CreateThread(NULL, NULL, ThreadProcEventHandler,
+                           dynamic_cast<LPVOID>(this), NULL, NULL);
 };
 
 VLCConnectionPointContainer::~VLCConnectionPointContainer()
 {
+    EnterCriticalSection(&csEvents);
+    isRunning = FALSE;
+    ConditionSignal(&sEvents);
+    LeaveCriticalSection(&csEvents);
+
+    do {
+        /* nothing wait for thread to finish */;
+    } while(WaitForSingleObjectEx (hThread, INFINITE, TRUE) == WAIT_IO_COMPLETION);
+    CloseHandle(hThread);
+
+    ConditionDestroy(&sEvents);
+    DeleteCriticalSection(&csEvents);
+
     delete _p_props;
     delete _p_events;
 };
@@ -261,44 +413,32 @@ STDMETHODIMP VLCConnectionPointContainer::FindConnectionPoint(REFIID riid, IConn
     return NOERROR;
 };
 
-void VLCConnectionPointContainer::freezeEvents(BOOL freeze)
+void VLCConnectionPointContainer::freezeEvents(BOOL bFreeze)
 {
-    if( ! freeze )
-    {
-        // release queued events
-        while( ! _q_events.empty() )
-        {
-            VLCDispatchEvent *ev = _q_events.front();
-            _q_events.pop();
-            _p_events->fireEvent(ev->_dispId, &ev->_dispParams);
-            delete ev;
-        }
-    }
-    _b_freeze = freeze;
+    EnterCriticalSection(&csEvents);
+    freeze = bFreeze;
+    LeaveCriticalSection(&csEvents);
 };
 
 void VLCConnectionPointContainer::fireEvent(DISPID dispId, DISPPARAMS* pDispParams)
 {
-    if( _b_freeze )
+    EnterCriticalSection(&csEvents);
+
+    // queue event for later use when container is ready
+    _q_events.push(new VLCDispatchEvent(dispId, *pDispParams));
+    if( _q_events.size() > 1024 )
     {
-        // queue event for later use when container is ready
-        _q_events.push(new VLCDispatchEvent(dispId, *pDispParams));
-        if( _q_events.size() > 10 )
-        {
-            // too many events in queue, get rid of older one
-            delete _q_events.front();
-            _q_events.pop();
-        }
+        // too many events in queue, get rid of older one
+        delete _q_events.front();
+        _q_events.pop();
     }
-    else
-    {
-        _p_events->fireEvent(dispId, pDispParams);
-    }
+    ConditionSignal(&sEvents);
+    LeaveCriticalSection(&csEvents);
 };
 
 void VLCConnectionPointContainer::firePropChangedEvent(DISPID dispId)
 {
-    if( ! _b_freeze )
+    if( ! freeze )
         _p_props->firePropChangedEvent(dispId);
 };
 
