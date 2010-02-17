@@ -62,10 +62,6 @@
 #   include <CoreFoundation/CFNumber.h>
 #endif
 
-#ifdef HAVE_SYSFS_LIBSYSFS_H
-#   include <sysfs/libsysfs.h>
-#endif
-
 #include "drms.h"
 #include "drmstables.h"
 
@@ -1790,45 +1786,6 @@ static int GetiPodID( int64_t *p_ipod_id )
         }
 
         mach_port_deallocate( mach_task_self(), port );
-    }
-
-#elif defined (HAVE_SYSFS_LIBSYSFS_H)
-    struct sysfs_bus *bus = NULL;
-    struct dlist *devlist = NULL;
-    struct dlist *attributes = NULL;
-    struct sysfs_device *curdev = NULL;
-    struct sysfs_attribute *curattr = NULL;
-
-    bus = sysfs_open_bus( "ieee1394" );
-    if( bus != NULL )
-    {
-        devlist = sysfs_get_bus_devices( bus );
-        if( devlist != NULL )
-        {
-            dlist_for_each_data( devlist, curdev, struct sysfs_device )
-            {
-                attributes = sysfs_get_device_attributes( curdev );
-                if( attributes != NULL )
-                {
-                    dlist_for_each_data( attributes, curattr,
-                                         struct sysfs_attribute )
-                    {
-                        if( ( strcmp( curattr->name, "model_name" ) == 0 ) &&
-                            ( strncmp( curattr->value, PROD_NAME,
-                                       sizeof(PROD_NAME) ) == 0 ) )
-                        {
-                            *p_ipod_id = strtoll( curdev->name, NULL, 16 );
-                            i_ret = 0;
-                            break;
-                        }
-                    }
-               }
-
-                if( !i_ret ) break;
-            }
-        }
-
-        sysfs_close_bus( bus );
     }
 #endif
 
