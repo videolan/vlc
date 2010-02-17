@@ -203,6 +203,7 @@ private slots:
 signals:
     /// Send new position, new time and new length
     void positionUpdated( float , int64_t, int );
+    void seekRequested( float pos );
     void rateChanged( int );
     void nameChanged( const QString& );
     /// Used to signal whether we should show navigation buttons

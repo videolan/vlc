@@ -217,6 +217,8 @@ private slots:
 
     void handleKeyPress( QKeyEvent * );
 
+    void showBuffering( float );
+
 signals:
     void askGetVideo( WId *p_id, int *pi_x, int *pi_y,
                       unsigned *pi_width, unsigned *pi_height );

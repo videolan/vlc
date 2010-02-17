@@ -497,14 +497,18 @@ inline void MainInterface::createStatusBar()
     nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
                                       | Qt::TextSelectableByKeyboard );
     SpeedLabel *speedLabel = new SpeedLabel( p_intf, "1.00x", this );
+    CacheLabel *cacheLabel = new CacheLabel( p_intf, this );
+    cacheLabel->hide();
 
     /* Styling those labels */
     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
+    cacheLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
 
     /* and adding those */
     statusBarr->addWidget( nameLabel, 8 );
+    statusBarr->addPermanentWidget( cacheLabel, 0 );
     statusBarr->addPermanentWidget( speedLabel, 0 );
     statusBarr->addPermanentWidget( timeLabel, 0 );
 
@@ -516,6 +520,9 @@ inline void MainInterface::createStatusBar()
 
     CONNECT( THEMIM->getIM(), encryptionChanged( bool ),
              this, showCryptedLabel( bool ) );
+
+    connect( THEMIM->getIM(), SIGNAL(seekRequested(float)),
+             timeLabel, SLOT(setDisplayPosition(float)) );
 }
 
 #ifdef WIN32
@@ -1178,6 +1185,12 @@ void MainInterface::showCryptedLabel( bool b_show )
     }
 
     cryptedLabel->setVisible( b_show );
+}
+
+void MainInterface::showBuffering( float f_cache )
+{
+    QString amount = QString("Buffering: %1%").arg( (int)(100*f_cache) );
+    statusBar()->showMessage( amount, 1000 );
 }
 
 /*****************************************************************************

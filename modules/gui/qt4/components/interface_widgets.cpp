@@ -42,6 +42,7 @@
 #include <QMenu>
 #include <QWidgetAction>
 #include <QDesktopWidget>
+#include <QPainter>
 
 #ifdef Q_WS_X11
 # include <X11/Xlib.h>
@@ -594,9 +595,6 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf  ) :QLabel(), p_intf( _p_intf )
    setAlignment( Qt::AlignRight | Qt::AlignVCenter );
    setToolTip( qtr( "Toggle between elapsed and remaining time" ) );
 
-
-   CONNECT( THEMIM->getIM(), cachingChanged( float ),
-            this, setCaching( float ) );
    CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
              this, setDisplayPosition( float, int64_t, int ) );
 }
@@ -610,7 +608,7 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
     }
 
     int time = t / 1000000;
-    char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
+
     secstotimestr( psz_length, length );
     secstotimestr( psz_time, ( b_remainingTime && length ) ? length - time
                                                            : time );
@@ -620,18 +618,68 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
                      psz_time, ( !length && time ) ? "--:--" : psz_length );
 
     setText( timestr );
+
+    cachedLength = length;
 }
+
+void TimeLabel::setDisplayPosition( float pos )
+{
+    if( pos == -1.f || cachedLength == 0 )
+    {
+        setText( " --:--/--:-- " );
+        return;
+    }
+
+    int time = pos * cachedLength;
+    secstotimestr( psz_time,
+                   ( b_remainingTime && cachedLength ?
+                   cachedLength - time : time ) );
+    QString timestr;
+    timestr.sprintf( " %s%s/%s ", (b_remainingTime && cachedLength) ? "-" : "",
+                     psz_time, ( !cachedLength && time ) ? "--:--" : psz_length );
+
+    setText( timestr );
+}
+
 
 void TimeLabel::toggleTimeDisplay()
 {
     b_remainingTime = !b_remainingTime;
 }
 
-void TimeLabel::setCaching( float f_cache )
+CacheLabel::CacheLabel( intf_thread_t *_p_intf, QWidget *parent )
+  : QLabel( parent ), p_intf( _p_intf ), cached( 0.f )
 {
-    QString amount;
-    amount.sprintf("Buff: %i%%", (int)(100*f_cache) );
-    setText( amount );
+    setText( qtr( "Buffering..." ) );
+    setMinimumWidth( 70 );
+    setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Preferred );
+    setAlignment( Qt::AlignCenter );
+
+    CONNECT( THEMIM->getIM(), cachingChanged( float ),
+              this, showCaching( float ) );
+    CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
+              this, hideCaching() );
 }
 
+void CacheLabel::showCaching( float _cached )
+{
+    cached = _cached;
+    show();
+    update(); //in case we are already visible
+}
 
+void CacheLabel::hideCaching()
+{
+    hide();
+}
+
+void CacheLabel::paintEvent( QPaintEvent* event )
+{
+    QRect r( rect() );
+    r.setWidth( r.width() * cached );
+    QPainter p( this );
+    p.setOpacity( 0.4 );
+    p.fillRect( r, palette().color( QPalette::Highlight ) );
+
+    QLabel::paintEvent( event );
+}

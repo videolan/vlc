@@ -140,12 +140,15 @@ protected:
 private:
     intf_thread_t *p_intf;
     bool b_remainingTime;
+    int cachedLength;
+    char psz_length[MSTRTIME_MAX_SIZE];
+    char psz_time[MSTRTIME_MAX_SIZE];
     void toggleTimeDisplay();
 signals:
     void timeLabelDoubleClicked();
 private slots:
     void setDisplayPosition( float pos, int64_t time, int length );
-    void setCaching( float );
+    void setDisplayPosition( float pos );
 };
 
 class SpeedLabel : public QLabel
@@ -167,6 +170,20 @@ private:
     intf_thread_t *p_intf;
     QMenu *speedControlMenu;
     SpeedControlWidget *speedControl;
+};
+
+class CacheLabel : public QLabel
+{
+    Q_OBJECT
+public:
+    CacheLabel( intf_thread_t *, QWidget * );
+private slots:
+    void showCaching( float );
+    void hideCaching();
+private:
+    void paintEvent( QPaintEvent* );
+    intf_thread_t *p_intf;
+    float cached;
 };
 
 /******************** Speed Control Widgets ****************/

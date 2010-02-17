@@ -683,6 +683,7 @@ void InputManager::sliderUpdate( float new_pos )
 {
     if( hasInput() )
         var_SetFloat( p_input, "position", new_pos );
+    emit seekRequested( new_pos );
 }
 
 /* User togglePlayPause */
