@@ -36,6 +36,7 @@
 #include <vlc_plugin.h>
 
 #include <vlc_codecs.h>
+#include "../../demux/xiph.h"
 
 #include "rtp.h"
 
@@ -112,28 +113,20 @@ static ssize_t vorbis_header (void **pextra, const uint8_t *buf, size_t len)
     setuplen = len - (idlen + cmtlen);
 
     /* Create the VLC extra format header */
-    uint8_t *extra = malloc ((size_t)6 + idlen + cmtlen + setuplen);
-    if (extra == NULL)
-        return -1;
-    uint8_t *ptr = *pextra = extra;
-    /* Identification header */
-    *ptr++ = idlen >> 8;
-    *ptr++ = idlen & 0xff;
-    memcpy (ptr, buf, idlen);
-    buf += idlen;
-    ptr += idlen;
-    /* Comments header */
-    *ptr++ = cmtlen >> 8;
-    *ptr++ = cmtlen & 0xff;
-    memcpy (ptr, buf, cmtlen);
-    buf += cmtlen;
-    ptr += cmtlen;
-    /* Setup header */
-    *ptr++ = setuplen >> 8;
-    *ptr++ = setuplen & 0xff;
-    memcpy (ptr, buf, setuplen);
-    ptr += setuplen;
-    return ptr - extra;
+    unsigned sizes[3] = {
+        idlen, cmtlen, setuplen
+    };
+    void *payloads[3] = {
+        buf + 0,
+        buf + idlen,
+        buf + cmtlen
+    };
+    void *extra;
+    int  extra_size;
+    if (xiph_PackHeaders (&extra_size, &extra, sizes, payloads, 3))
+        return -1;;
+    *pextra = extra;
+    return extra_size;
 }
 
 

@@ -679,73 +679,10 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         }
         else if( !strncmp( tracks[i_track]->psz_codec, "V_THEORA", 8 ) )
         {
-            uint8_t *p_data = tracks[i_track]->p_extra_data;
             tracks[i_track]->fmt.i_codec = VLC_CODEC_THEORA;
-            if( tracks[i_track]->i_extra_data >= 4 ) {
-                if( p_data[0] == 2 ) {
-                    int i = 1;
-                    int i_size1 = 0, i_size2 = 0;
-                    p_data++;
-                    /* read size of first header packet */
-                    while( *p_data == 0xFF &&
-                           i < tracks[i_track]->i_extra_data )
-                    {
-                        i_size1 += *p_data;
-                        p_data++;
-                        i++;
-                    }
-                    i_size1 += *p_data;
-                    p_data++;
-                    i++;
-                    msg_Dbg( &sys.demuxer, "first theora header size %d", i_size1 );
-                    /* read size of second header packet */
-                    while( *p_data == 0xFF &&
-                           i < tracks[i_track]->i_extra_data )
-                    {
-                        i_size2 += *p_data;
-                        p_data++;
-                        i++;
-                    }
-                    i_size2 += *p_data;
-                    p_data++;
-                    i++;
-                    int i_size3 = tracks[i_track]->i_extra_data - i - i_size1
-                        - i_size2;
-                    msg_Dbg( &sys.demuxer, "second theora header size %d", i_size2 );
-                    msg_Dbg( &sys.demuxer, "third theora header size %d", i_size3 );
-                    tracks[i_track]->fmt.i_extra = i_size1 + i_size2 + i_size3
-                        + 6;
-                    if( i_size1 > 0 && i_size2 > 0 && i_size3 > 0  ) {
-                        tracks[i_track]->fmt.p_extra =
-                            xmalloc( tracks[i_track]->fmt.i_extra );
-                        uint8_t *p_out = (uint8_t*)tracks[i_track]->fmt.p_extra;
-                        *p_out++ = (i_size1>>8) & 0xFF;
-                        *p_out++ = i_size1 & 0xFF;
-                        memcpy( p_out, p_data, i_size1 );
-                        p_data += i_size1;
-                        p_out += i_size1;
- 
-                        *p_out++ = (i_size2>>8) & 0xFF;
-                        *p_out++ = i_size2 & 0xFF;
-                        memcpy( p_out, p_data, i_size2 );
-                        p_data += i_size2;
-                        p_out += i_size2;
-
-                        *p_out++ = (i_size3>>8) & 0xFF;
-                        *p_out++ = i_size3 & 0xFF;
-                        memcpy( p_out, p_data, i_size3 );
-                        p_data += i_size3;
-                        p_out += i_size3;
-                    }
-                    else
-                    {
-                        msg_Err( &sys.demuxer, "inconsistent theora extradata" );
-                    }
-                }
-                else {
-                    msg_Err( &sys.demuxer, "Wrong number of ogg packets with theora headers (%d)", p_data[0] + 1 );
-                }
-            }
+            tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
+            tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->i_extra_data );
+            memcpy( tracks[i_track]->fmt.p_extra,tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
         }
         else if( !strncmp( tracks[i_track]->psz_codec, "V_REAL/RV", 9 ) )
         {
@@ -879,41 +816,10 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "A_VORBIS" ) )
         {
-            int i, i_offset = 1, i_size[3], i_extra;
-            uint8_t *p_extra;
-
             tracks[i_track]->fmt.i_codec = VLC_CODEC_VORBIS;
-
-            /* Split the 3 headers */
-            if( tracks[i_track]->p_extra_data[0] != 0x02 )
-                msg_Err( &sys.demuxer, "invalid vorbis header" );
-
-            for( i = 0; i < 2; i++ )
-            {
-                i_size[i] = 0;
-                while( i_offset < tracks[i_track]->i_extra_data )
-                {
-                    i_size[i] += tracks[i_track]->p_extra_data[i_offset];
-                    if( tracks[i_track]->p_extra_data[i_offset++] != 0xff ) break;
-                }
-            }
-
-            i_size[0] = __MIN(i_size[0], tracks[i_track]->i_extra_data - i_offset);
-            i_size[1] = __MIN(i_size[1], tracks[i_track]->i_extra_data -i_offset -i_size[0]);
-            i_size[2] = tracks[i_track]->i_extra_data - i_offset - i_size[0] - i_size[1];
-
-            tracks[i_track]->fmt.i_extra = 3 * 2 + i_size[0] + i_size[1] + i_size[2];
-            tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->fmt.i_extra );
-            p_extra = (uint8_t *)tracks[i_track]->fmt.p_extra; i_extra = 0;
-            for( i = 0; i < 3; i++ )
-            {
-                *(p_extra++) = i_size[i] >> 8;
-                *(p_extra++) = i_size[i] & 0xFF;
-                memcpy( p_extra, tracks[i_track]->p_extra_data + i_offset + i_extra,
-                        i_size[i] );
-                p_extra += i_size[i];
-                i_extra += i_size[i];
-            }
+            tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
+            tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->i_extra_data );
+            memcpy( tracks[i_track]->fmt.p_extra,tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
         }
         else if( !strncmp( tracks[i_track]->psz_codec, "A_AAC/MPEG2/", strlen( "A_AAC/MPEG2/" ) ) ||
                  !strncmp( tracks[i_track]->psz_codec, "A_AAC/MPEG4/", strlen( "A_AAC/MPEG4/" ) ) )
@@ -1035,47 +941,9 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             tracks[i_track]->fmt.i_codec = VLC_CODEC_KATE;
             tracks[i_track]->fmt.subs.psz_encoding = strdup( "UTF-8" );
 
-            /* Recover the number of headers to expect */
-            num_headers = tracks[i_track]->p_extra_data[0]+1;
-            msg_Dbg( &sys.demuxer, "kate in mkv detected: %d headers in %u bytes",
-                num_headers, tracks[i_track]->i_extra_data);
-
-            /* this won't overflow the stack as is can allocate only 1020 bytes max */
-            uint16_t pi_size[num_headers];
-
-            /* Split the headers */
-            size_so_far = 0;
-            for( i = 0; i < num_headers-1; i++ )
-            {
-                pi_size[i] = 0;
-                while( i_offset < tracks[i_track]->i_extra_data )
-                {
-                    pi_size[i] += tracks[i_track]->p_extra_data[i_offset];
-                    if( tracks[i_track]->p_extra_data[i_offset++] != 0xff ) break;
-                }
-                msg_Dbg( &sys.demuxer, "kate header %d is %d bytes", i, pi_size[i]);
-                size_so_far += pi_size[i];
-            }
-            pi_size[num_headers-1] = tracks[i_track]->i_extra_data - (size_so_far+i_offset);
-            msg_Dbg( &sys.demuxer, "kate last header (%d) is %d bytes", num_headers-1, pi_size[num_headers-1]);
-
-            tracks[i_track]->fmt.i_extra = 1 + num_headers * 2 + size_so_far + pi_size[num_headers-1];
-            tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->fmt.i_extra );
-
-            p_extra = (uint8_t *)tracks[i_track]->fmt.p_extra;
-            i_extra = 0;
-            *(p_extra++) = num_headers;
-            ++i_extra;
-            for( i = 0; i < num_headers; i++ )
-            {
-                *(p_extra++) = pi_size[i] >> 8;
-                *(p_extra++) = pi_size[i] & 0xFF;
-                memcpy( p_extra, tracks[i_track]->p_extra_data + i_offset + i_extra-1,
-                        pi_size[i] );
-
-                p_extra += pi_size[i];
-                i_extra += pi_size[i];
-            }
+            tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
+            tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->i_extra_data );
+            memcpy( tracks[i_track]->fmt.p_extra,tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "S_TEXT/ASCII" ) )
         {

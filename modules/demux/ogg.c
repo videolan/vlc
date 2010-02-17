@@ -39,6 +39,7 @@
 
 #include <vlc_codecs.h>
 #include <vlc_bits.h>
+#include "xiph.h"
 #include "vorbis.h"
 #include "kate_categories.h"
 
@@ -78,7 +79,7 @@ typedef struct logical_stream_s
      * them to the decoder. */
     int              b_force_backup;
     int              i_packets_backup;
-    uint8_t          *p_headers;
+    void             *p_headers;
     int              i_headers;
 
     /* program clock reference (in units of 90kHz) derived from the previous
@@ -624,10 +625,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
     if( p_stream->b_force_backup )
     {
-        uint8_t *p_sav;
-        bool b_store_size = true;
-        bool b_store_num_headers = false;
-
+        bool b_xiph;
         p_stream->i_packets_backup++;
         switch( p_stream->fmt.i_codec )
         {
@@ -635,6 +633,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         case VLC_CODEC_SPEEX:
         case VLC_CODEC_THEORA:
             if( p_stream->i_packets_backup == 3 ) p_stream->b_force_backup = 0;
+            b_xiph = true;
             break;
 
         case VLC_CODEC_FLAC:
@@ -652,44 +651,45 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                     p_oggpacket->bytes -= 9;
                 }
             }
-            b_store_size = false;
+            b_xiph = false;
             break;
 
         case VLC_CODEC_KATE:
-            if( p_stream->i_packets_backup == 1)
-                b_store_num_headers = true;
             if( p_stream->i_packets_backup == p_stream->i_kate_num_headers ) p_stream->b_force_backup = 0;
+            b_xiph = true;
             break;
 
         default:
             p_stream->b_force_backup = 0;
+            b_xiph = false;
             break;
         }
 
         /* Backup the ogg packet (likely an header packet) */
-        p_stream->p_headers =
-            realloc( p_sav = p_stream->p_headers, p_stream->i_headers +
-                     p_oggpacket->bytes + (b_store_size ? 2 : 0) + (b_store_num_headers ? 1 : 0) );
-        if( !p_stream->p_headers )
-            p_stream->p_headers = p_sav;
-        else
+        if( !b_xiph )
         {
-            uint8_t *p_extra = p_stream->p_headers + p_stream->i_headers;
-
-            if( b_store_num_headers )
+            void *p_org = p_stream->p_headers;
+            p_stream->i_headers += p_oggpacket->bytes;
+            p_stream->p_headers = realloc( p_stream->p_headers, p_stream->i_headers );
+            if( p_stream->p_headers )
             {
-                /* Kate streams store the number of headers in the first header,
-                   so we can't just test for 3 as Vorbis/Theora */
-                *(p_extra++) = p_stream->i_kate_num_headers;
+                memcpy( p_stream->p_headers, p_oggpacket->packet, p_stream->i_headers );
             }
-            if( b_store_size )
+            else
             {
-                *(p_extra++) = p_oggpacket->bytes >> 8;
-                *(p_extra++) = p_oggpacket->bytes & 0xFF;
+                p_stream->i_headers = 0;
+                p_stream->p_headers = NULL;
+                free( p_org );
             }
-            memcpy( p_extra, p_oggpacket->packet, p_oggpacket->bytes );
-            p_stream->i_headers += p_oggpacket->bytes + (b_store_size ? 2 : 0) + (b_store_num_headers ? 1 : 0);
-
+        }
+        else if( xiph_AppendHeaders( &p_stream->i_headers, &p_stream->p_headers,
+                                     p_oggpacket->bytes, p_oggpacket->packet ) )
+        {
+            p_stream->i_headers = 0;
+            p_stream->p_headers = NULL;
+        }
+        if( p_stream->i_headers > 0 )
+        {
             if( !p_stream->b_force_backup )
             {
                 /* Last header received, commit changes */
@@ -1464,33 +1464,34 @@ static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_strea
  */
 static bool Ogg_IsVorbisFormatCompatible( const es_format_t *p_new, const es_format_t *p_old )
 {
-    int i_new = 0;
-    int i_old = 0;
-    int i;
+    unsigned pi_new_size[XIPH_MAX_HEADER_COUNT];
+    void     *pp_new_data[XIPH_MAX_HEADER_COUNT];
+    unsigned i_new_count;
+    if( xiph_SplitHeaders(pi_new_size, pp_new_data, &i_new_count, p_new->i_extra, p_new->p_extra ) )
+        i_new_count = 0;
 
-    for( i = 0; i < 3; i++ )
+    unsigned pi_old_size[XIPH_MAX_HEADER_COUNT];
+    void     *pp_old_data[XIPH_MAX_HEADER_COUNT];
+    unsigned i_old_count;
+    if( xiph_SplitHeaders(pi_old_size, pp_old_data, &i_old_count, p_old->i_extra, p_old->p_extra ) )
+        i_old_count = 0;
+
+    bool b_match = i_new_count == i_old_count;
+    for( unsigned i = 0; i < i_new_count && b_match; i++ )
     {
-        const uint8_t *p_new_extra = ( const uint8_t*)p_new->p_extra + i_new;
-        const uint8_t *p_old_extra = ( const uint8_t*)p_old->p_extra + i_old;
-
-        if( p_new->i_extra < i_new+2 || p_old->i_extra < i_old+2 )
-            return false;
-
-        const int i_new_size = GetWBE( &p_new_extra[0] );
-        const int i_old_size = GetWBE( &p_old_extra[0] );
-
-        if( i != 1 ) /* Ignore vorbis comment */
-        {
-            if( i_new_size != i_old_size )
-                return false;
-            if( memcmp( &p_new_extra[2], &p_old_extra[2], i_new_size ) )
-                return false;
-        }
-
-        i_new += 2 + i_new_size;
-        i_old += 2 + i_old_size;
+        /* Ignore vorbis comment */
+        if( i == 1 )
+            continue;
+        if( pi_new_size[i] != pi_old_size[i] ||
+            memcmp( pp_new_data[i], pp_old_data[i], pi_new_size[i] ) )
+            b_match = false;
     }
-    return true;
+
+    for( unsigned i = 0; i < i_new_count; i++ )
+        free( pp_new_data[i] );
+    for( unsigned i = 0; i < i_old_count; i++ )
+        free( pp_old_data[i] );
+    return b_match;
 }
 static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *p_stream )
 {
@@ -1507,44 +1508,22 @@ static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *
 
     return !b_compatible;
 }
-static void Ogg_ExtractXiphMeta( demux_t *p_demux, const uint8_t *p_headers, int i_headers, int i_skip, bool b_has_num_headers )
+static void Ogg_ExtractXiphMeta( demux_t *p_demux, const void *p_headers, unsigned i_headers, unsigned i_skip )
 {
     demux_sys_t *p_ogg = p_demux->p_sys;
 
-    if (b_has_num_headers)
-    {
-        if (i_headers <= 0)
-            return;
-        /* number of headers on a byte, we're interested in the second header, so should be at least 2 to go on */
-        if (*p_headers++ < 2)
-            return;
-        --i_headers;
-    }
-
-    if( i_headers <= 2 )
-        return;
-
-    /* Skip first packet */
-    const int i_tmp = GetWBE( &p_headers[0] );
-    if( i_tmp > i_headers-2 )
-        return;
-    p_headers += 2 + i_tmp;
-    i_headers -= 2 + i_tmp;
-
-    if( i_headers <= 2 )
-        return;
-
-    /* */
-    int i_comment = GetWBE( &p_headers[0] );
-    const uint8_t *p_comment = &p_headers[2];
-    if( i_comment > i_headers - 2 )
-        return;
-
-    if( i_comment <= i_skip )
+    unsigned pi_size[XIPH_MAX_HEADER_COUNT];
+    void     *pp_data[XIPH_MAX_HEADER_COUNT];
+    unsigned i_count;
+    if( xiph_SplitHeaders( pi_size, pp_data, &i_count, i_headers, p_headers ) )
         return;
 
     /* TODO how to handle multiple comments properly ? */
-    vorbis_ParseComment( &p_ogg->p_meta, &p_comment[i_skip], i_comment - i_skip );
+    if( i_count >= 2 && pi_size[1] > i_skip )
+        vorbis_ParseComment( &p_ogg->p_meta, (uint8_t*)pp_data[1] + i_skip, pi_size[1] - i_skip );
+
+    for( unsigned i = 0; i < i_count; i++ )
+        free( pp_data[i] );
 }
 static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8_t *p_headers, int i_headers )
 {
@@ -1554,19 +1533,19 @@ static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8
     {
     /* 3 headers with the 2° one being the comments */
     case VLC_CODEC_VORBIS:
-        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+6, false );
+        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+6 );
         break;
     case VLC_CODEC_THEORA:
-        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+6, false );
+        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+6 );
         break;
     case VLC_CODEC_SPEEX:
-        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 0, false );
+        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 0 );
         break;
 
     /* N headers with the 2° one being the comments */
     case VLC_CODEC_KATE:
-        /* 1 byte for header type, 7 bit for magic, 1 reserved zero byte */
-        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+7+1, true );
+        /* 1 byte for header type, 7 bytes for magic, 1 reserved zero byte */
+        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+7+1 );
         break;
 
     /* TODO */

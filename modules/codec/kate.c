@@ -33,6 +33,7 @@
 #include <vlc_input.h>
 #include <vlc_codec.h>
 #include <vlc_osd.h>
+#include "../demux/xiph.h"
 
 #include <kate/kate.h>
 #ifdef HAVE_TIGER
@@ -73,8 +74,7 @@ struct decoder_sys_t
     /*
      * Input properties
      */
-    int i_num_headers;
-    int i_headers;
+    bool b_has_headers;
 
     /*
      * Kate properties
@@ -377,8 +377,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     kate_comment_init( &p_sys->kc );
     kate_info_init( &p_sys->ki );
 
-    p_sys->i_num_headers = 0;
-    p_sys->i_headers = 0;
+    p_sys->b_has_headers = false;
 
     /* retrieve options */
     p_sys->b_formatted = var_CreateGetBool( p_dec, "kate-formatted" );
@@ -492,42 +491,14 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     /* Block to Kate packet */
     kate_packet_wrap(&kp, p_block->i_buffer, p_block->p_buffer);
 
-    if( p_sys->i_headers == 0 && p_dec->fmt_in.i_extra )
+    if( !p_sys->b_has_headers )
     {
-        /* Headers already available as extra data */
-        p_sys->i_num_headers = ((unsigned char*)p_dec->fmt_in.p_extra)[0];
-        p_sys->i_headers = p_sys->i_num_headers;
-    }
-    else if( kp.nbytes && (p_sys->i_headers==0 || p_sys->i_headers < p_sys->ki.num_headers ))
-    {
-        /* Backup headers as extra data */
-        uint8_t *p_extra;
-
-        p_dec->fmt_in.p_extra = xrealloc( p_dec->fmt_in.p_extra,
-                                      p_dec->fmt_in.i_extra + kp.nbytes + 2 );
-        p_extra = (void*)(((unsigned char*)p_dec->fmt_in.p_extra) + p_dec->fmt_in.i_extra);
-        *(p_extra++) = kp.nbytes >> 8;
-        *(p_extra++) = kp.nbytes & 0xFF;
-
-        memcpy( p_extra, kp.data, kp.nbytes );
-        p_dec->fmt_in.i_extra += kp.nbytes + 2;
-
-        block_Release( *pp_block );
-        p_sys->i_num_headers = ((unsigned char*)p_dec->fmt_in.p_extra)[0];
-        p_sys->i_headers++;
-        return NULL;
-    }
-
-    if( p_sys->i_headers == p_sys->i_num_headers && p_sys->i_num_headers>0 )
-    {
-        if( ProcessHeaders( p_dec ) != VLC_SUCCESS )
+        if( ProcessHeaders( p_dec ) )
         {
-            p_sys->i_headers = 0;
-            p_dec->fmt_in.i_extra = 0;
             block_Release( *pp_block );
             return NULL;
         }
-        else p_sys->i_headers++;
+        p_sys->b_has_headers = true;
     }
 
     return ProcessPacket( p_dec, &kp, pp_block );
@@ -540,37 +511,28 @@ static int ProcessHeaders( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     kate_packet kp;
-    uint8_t *p_extra;
-    int i_extra;
-    int i_headeridx;
-    int i_ret;
 
-    if( !p_dec->fmt_in.i_extra ) return VLC_EGENERIC;
-
-    p_extra = p_dec->fmt_in.p_extra;
-    i_extra = p_dec->fmt_in.i_extra;
-
-    /* skip number of headers */
-    ++p_extra;
-    --i_extra;
-
-    /* Take care of the initial Kate header */
-    kp.nbytes = *(p_extra++) << 8;
-    kp.nbytes |= (*(p_extra++) & 0xFF);
-    kp.data = p_extra;
-    p_extra += kp.nbytes;
-    i_extra -= (kp.nbytes + 2);
-    if( i_extra < 0 )
-    {
-        msg_Err( p_dec, "header data corrupted");
+    unsigned pi_size[XIPH_MAX_HEADER_COUNT];
+    void     *pp_data[XIPH_MAX_HEADER_COUNT];
+    unsigned i_count;
+    if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
+                           p_dec->fmt_in.i_extra, p_dec->fmt_in.p_extra) )
         return VLC_EGENERIC;
+    int i_ret = VLC_SUCCESS;
+    if( i_count < 1 )
+    {
+        i_ret = VLC_EGENERIC;
+        goto end;
     }
 
+    /* Take care of the initial Kate header */
+    kp.nbytes = pi_size[0];
+    kp.data   = pp_data[0];
     i_ret = kate_decode_headerin( &p_sys->ki, &p_sys->kc, &kp );
     if( i_ret < 0 )
     {
         msg_Err( p_dec, "this bitstream does not contain Kate data (%d)", i_ret );
-        return VLC_EGENERIC;
+        goto end;
     }
 
     msg_Dbg( p_dec, "%s %s text, granule rate %f, granule shift %d",
@@ -579,24 +541,15 @@ static int ProcessHeaders( decoder_t *p_dec )
              p_sys->ki.granule_shift);
 
     /* parse all remaining header packets */
-    for( i_headeridx = 1; i_headeridx < p_sys->ki.num_headers; ++i_headeridx )
+    for( unsigned i_headeridx = 1; i_headeridx < i_count; i_headeridx++ )
     {
-        kp.nbytes = *(p_extra++) << 8;
-        kp.nbytes |= (*(p_extra++) & 0xFF);
-        kp.data = p_extra;
-        p_extra += kp.nbytes;
-        i_extra -= (kp.nbytes + 2);
-        if( i_extra < 0 )
-        {
-            msg_Err( p_dec, "header %d data corrupted", i_headeridx );
-            return VLC_EGENERIC;
-        }
-
+        kp.nbytes = pi_size[i_headeridx];
+        kp.data   = pp_data[i_headeridx];
         i_ret = kate_decode_headerin( &p_sys->ki, &p_sys->kc, &kp );
         if( i_ret < 0 )
         {
             msg_Err( p_dec, "Kate header %d is corrupted: %d", i_headeridx, i_ret );
-            return VLC_EGENERIC;
+            goto end;
         }
 
         /* header 1 is comments */
@@ -631,7 +584,10 @@ static int ProcessHeaders( decoder_t *p_dec )
     }
 #endif
 
-    return VLC_SUCCESS;
+end:
+    for( unsigned i = 0; i < i_count; i++ )
+        free( pp_data[i] );
+    return i_ret < 0 ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -668,12 +624,10 @@ static subpicture_t *ProcessPacket( decoder_t *p_dec, kate_packet *p_kp,
     else
 #endif
     {
-        if( p_sys->i_headers >= p_sys->i_num_headers && p_sys->i_num_headers > 0)
-            p_buf = DecodePacket( p_dec, p_kp, p_block );
-        else
-            p_buf = NULL;
+        p_buf = DecodePacket( p_dec, p_kp, p_block );
 
-        if( p_block ) block_Release( p_block );
+        if( p_block )
+            block_Release( p_block );
     }
 
     return p_buf;

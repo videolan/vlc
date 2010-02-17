@@ -35,6 +35,7 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 #include <vlc_codecs.h>
+#include "../demux/xiph.h"
 
 #include <ogg/ogg.h>
 
@@ -562,8 +563,7 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
     block_t *p_hdr = NULL;
     block_t *p_og = NULL;
     ogg_packet op;
-    uint8_t *p_extra;
-    int i, i_extra;
+    int i;
 
     /* Write header for each stream. All b_o_s (beginning of stream) packets
      * must appear first in the ogg stream so we take care of them first. */
@@ -590,18 +590,21 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
                 p_stream->i_fourcc == VLC_CODEC_THEORA )
             {
                 /* First packet in order: vorbis/speex/theora info */
-                p_extra = p_input->p_fmt->p_extra;
-                i_extra = p_input->p_fmt->i_extra;
-
-                op.bytes = *(p_extra++) << 8;
-                op.bytes |= (*(p_extra++) & 0xFF);
-                op.packet = p_extra;
-                i_extra -= (op.bytes + 2);
-                if( i_extra < 0 )
+                unsigned pi_size[XIPH_MAX_HEADER_COUNT];
+                void     *pp_data[XIPH_MAX_HEADER_COUNT];
+                unsigned i_count;
+                if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
+                                       p_input->p_fmt->i_extra, p_input->p_fmt->p_extra ) )
                 {
-                    msg_Err( p_mux, "header data corrupted");
-                    op.bytes += i_extra;
+                    i_count = 0;
+                    pi_size[0] = 0;
+                    pp_data[0] = NULL;
                 }
+
+                op.bytes  = pi_size[0];
+                op.packet = pp_data[0];
+                if( pi_size[0] <= 0 )
+                    msg_Err( p_mux, "header data corrupted");
 
                 op.b_o_s  = 1;
                 op.e_o_s  = 0;
@@ -616,6 +619,9 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
                     p_stream->i_keyframe_granule_shift =
                         ( (op.packet[40] & 0x03) << 3 ) | ( (op.packet[41] & 0xe0) >> 5 );
                 }
+
+                for( unsigned i = 0; i < i_count; i++ )
+                    free( pp_data[i] );
             }
             else if( p_stream->i_fourcc == VLC_CODEC_DIRAC )
             {
@@ -667,34 +673,21 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
             p_stream->i_fourcc == VLC_CODEC_SPEEX ||
             p_stream->i_fourcc == VLC_CODEC_THEORA )
         {
+            unsigned pi_size[XIPH_MAX_HEADER_COUNT];
+            void     *pp_data[XIPH_MAX_HEADER_COUNT];
+            unsigned i_count;
+            if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
+                                   p_input->p_fmt->i_extra, p_input->p_fmt->p_extra ) )
+                i_count = 0;
+
             /* Special case, headers are already there in the incoming stream.
              * We need to gather them an mark them as headers. */
-            int j = 2;
-
-            if( p_stream->i_fourcc == VLC_CODEC_SPEEX ) j = 1;
-
-            p_extra = p_input->p_fmt->p_extra;
-            i_extra = p_input->p_fmt->i_extra;
-
-            /* Skip 1 header */
-            op.bytes = *(p_extra++) << 8;
-            op.bytes |= (*(p_extra++) & 0xFF);
-            op.packet = p_extra;
-            p_extra += op.bytes;
-            i_extra -= (op.bytes + 2);
-
-            while( j-- )
+            for( unsigned i = 1; i < i_count; i++ )
             {
-                op.bytes = *(p_extra++) << 8;
-                op.bytes |= (*(p_extra++) & 0xFF);
-                op.packet = p_extra;
-                p_extra += op.bytes;
-                i_extra -= (op.bytes + 2);
-                if( i_extra < 0 )
-                {
+                op.bytes  = pi_size[i];
+                op.packet = pp_data[i];
+                if( pi_size[i] <= 0 )
                     msg_Err( p_mux, "header data corrupted");
-                    op.bytes += i_extra;
-                }
 
                 op.b_o_s  = 0;
                 op.e_o_s  = 0;
@@ -702,13 +695,15 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
                 op.packetno = p_stream->i_packet_no++;
                 ogg_stream_packetin( &p_stream->os, &op );
 
-                if( j == 0 )
+                if( i == i_count - 1 )
                     p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
                 else
                     p_og = OggStreamPageOut( p_mux, &p_stream->os, 0 );
                 if( p_og )
                     block_ChainAppend( &p_hdr, p_og );
             }
+            for( unsigned i = 0; i < i_count; i++ )
+                free( pp_data[i] );
         }
         else if( p_stream->i_fourcc != VLC_CODEC_FLAC &&
                  p_stream->i_fourcc != VLC_CODEC_DIRAC )
