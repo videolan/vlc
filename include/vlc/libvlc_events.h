@@ -103,12 +103,6 @@ extern "C" {
     DEF( VlmMediaInstanceStatusError ), \
     \
     DEF( MediaPlayerMediaChanged ), \
-    \
-    DEF( MediaPlayerMouseMoved ), \
-    DEF( MediaPlayerMouseButton ), \
-    DEF( MediaPlayerMouseClick ), \
-    DEF( MediaPlayerMouseObject ), \
-    \
 /* New event types HERE */
 
 #ifdef __cplusplus
@@ -240,33 +234,6 @@ struct libvlc_event_t
         {
             libvlc_media_t * new_media;
         } media_player_media_changed;
-
-        /* Mouse events */
-        struct
-        {
-            int x;
-            int y;
-        } media_player_mouse_moved;
-
-        struct
-        {
-            int mb_left;
-            int mb_center;
-            int mb_right;
-            int mb_wheel_up;
-            int mb_wheel_down;
-        } media_player_mouse_button;
-
-        struct
-        {
-            int clicked;
-        } media_player_mouse_clicked;
-
-        struct
-        {
-            int moved;
-        } media_player_mouse_object;
-
     } u;
 };
 

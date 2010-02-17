@@ -58,21 +58,6 @@ static int
 snapshot_was_taken( vlc_object_t *p_this, char const *psz_cmd,
                     vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
-/* Mouse events */
-static int
-mouse_moved( vlc_object_t *p_this, char const *psz_cmd,
-                    vlc_value_t oldval, vlc_value_t newval, void *p_data );
-static int
-mouse_button( vlc_object_t *p_this, char const *psz_cmd,
-                    vlc_value_t oldval, vlc_value_t newval, void *p_data );
-static int
-mouse_clicked( vlc_object_t *p_this, char const *psz_cmd,
-                    vlc_value_t oldval, vlc_value_t newval, void *p_data );
-static int
-mouse_object( vlc_object_t *p_this, char const *psz_cmd,
-                    vlc_value_t oldval, vlc_value_t newval, void *p_data );
-
-/* */
 static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi );
 
 /*
@@ -151,50 +136,6 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_player_t *p_mi )
     unlock(p_mi);
 
     return p_input_thread;
-}
-
-/*
- * Get vout thread from current input
- *
- * Object lock is NOT held.
- */
-static vout_thread_t *get_vout_thread( libvlc_media_player_t *p_mi )
-{
-    vout_thread_t *p_vout_thread;
-
-    p_vout_thread = input_GetVout( p_mi->p_input_thread );
-    if( p_vout_thread )
-    {
-        var_AddCallback( p_vout_thread, "mouse-button-down", mouse_button, p_mi );
-        var_AddCallback( p_vout_thread, "mouse-moved", mouse_moved, p_mi );
-        var_AddCallback( p_vout_thread, "mouse-clicked", mouse_clicked, p_mi );
-        var_AddCallback( p_vout_thread, "mouse-object", mouse_object, p_mi );
-    }
-
-    return p_vout_thread;
-}
-
-/*
- * Release the associated vout thread.
- *
- * Object lock is NOT held.
- */
-static void release_vout_thread( libvlc_media_player_t *p_mi )
-{
-    vout_thread_t *p_vout_thread;
-
-    if( !p_mi || !p_mi->p_vout_thread )
-        return;
-
-    p_vout_thread = p_mi->p_vout_thread;
-
-    var_DelCallback( p_vout_thread, "mouse-button-down", mouse_button, p_mi );
-    var_DelCallback( p_vout_thread, "mouse-moved", mouse_moved, p_mi );
-    var_DelCallback( p_vout_thread, "mouse-clicked", mouse_clicked, p_mi );
-    var_DelCallback( p_vout_thread, "mouse-object", mouse_object, p_mi );
-
-    vlc_object_release( p_vout_thread );
-    p_mi->p_vout_thread = NULL;
 }
 
 /*
@@ -344,16 +285,6 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
            from_mtime(var_GetTime( p_input, "length" ));
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
-    else if( newval.i_int == INPUT_EVENT_VOUT )
-    {
-        lock( p_mi );
-        /* release old vout */
-        if( p_mi->p_vout_thread )
-            release_vout_thread( p_mi );
-        /* remember new vout */
-        p_mi->p_vout_thread = get_vout_thread( p_mi );
-        unlock( p_mi );
-    }
 
     return VLC_SUCCESS;
 
@@ -373,77 +304,6 @@ static int snapshot_was_taken(vlc_object_t *p_this, char const *psz_cmd,
     libvlc_event_t event;
     event.type = libvlc_MediaPlayerSnapshotTaken;
     event.u.media_player_snapshot_taken.psz_filename = newval.psz_string;
-    libvlc_event_send(mp->p_event_manager, &event);
-
-    return VLC_SUCCESS;
-}
-
-/**************************************************************************
- * Mouse  Events.
- *************************************************************************/
-
-static int
-mouse_moved( vlc_object_t *p_this, char const *psz_cmd,
-                    vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_this);
-
-    libvlc_media_player_t *mp = p_data;
-    libvlc_event_t event;
-    event.type = libvlc_MediaPlayerMouseMoved;
-    event.u.media_player_mouse_moved.x = newval.coords.x;
-    event.u.media_player_mouse_moved.y = newval.coords.y;
-    libvlc_event_send(mp->p_event_manager, &event);
-
-    return VLC_SUCCESS;
-}
-
-static int
-mouse_button( vlc_object_t *p_this, char const *psz_cmd,
-                    vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_this);
-
-    libvlc_media_player_t *mp = p_data;
-    libvlc_event_t event;
-    int pressed = newval.i_int;
-
-    event.type = libvlc_MediaPlayerMouseButton;
-    event.u.media_player_mouse_button.mb_left = (pressed & (1<<MOUSE_BUTTON_LEFT));
-    event.u.media_player_mouse_button.mb_center = (pressed & (1<<MOUSE_BUTTON_CENTER));
-    event.u.media_player_mouse_button.mb_right = (pressed & (1<<MOUSE_BUTTON_RIGHT));
-    event.u.media_player_mouse_button.mb_wheel_up = (pressed & (1<<MOUSE_BUTTON_WHEEL_UP));
-    event.u.media_player_mouse_button.mb_wheel_down = (pressed & (1<<MOUSE_BUTTON_WHEEL_DOWN));
-    libvlc_event_send(mp->p_event_manager, &event);
-
-    return VLC_SUCCESS;
-}
-
-static int
-mouse_clicked( vlc_object_t *p_this, char const *psz_cmd,
-                    vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_this);
-
-    libvlc_media_player_t *mp = p_data;
-    libvlc_event_t event;
-    event.type = libvlc_MediaPlayerMouseClick;
-    event.u.media_player_mouse_clicked.clicked = newval.b_bool ? 1 : 0;
-    libvlc_event_send(mp->p_event_manager, &event);
-
-    return VLC_SUCCESS;
-}
-
-static int
-mouse_object( vlc_object_t *p_this, char const *psz_cmd,
-                    vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_this);
-
-    libvlc_media_player_t *mp = p_data;
-    libvlc_event_t event;
-    event.type = libvlc_MediaPlayerMouseObject;
-    event.u.media_player_mouse_object.moved = (newval.b_bool ? 1 : 0);
     libvlc_event_send(mp->p_event_manager, &event);
 
     return VLC_SUCCESS;
@@ -556,7 +416,6 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     mp->p_libvlc_instance = instance;
     mp->p_input_thread = NULL;
     mp->p_input_resource = NULL;
-    mp->p_vout_thread = NULL;
     mp->i_refcount = 1;
     mp->p_event_manager = libvlc_event_manager_new(mp, instance);
     if (unlikely(mp->p_event_manager == NULL))
@@ -588,12 +447,6 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     register_event(mp, SnapshotTaken);
 
     register_event(mp, MediaChanged);
-
-    /* mouse events */
-    register_event(mp, MouseMoved);
-    register_event(mp, MouseButton);
-    register_event(mp, MouseClick);
-    register_event(mp, MouseObject);
 
     /* Attach a var callback to the global object to provide the glue between
      * vout_thread that generates the event and media_player that re-emits it
@@ -644,9 +497,6 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     assert(!p_mi->p_input_thread);
 
     /* Fallback for those who don't use NDEBUG */
-    if( p_mi->p_vout_thread )
-        release_vout_thread( p_mi );
-
     if(p_mi->p_input_thread )
         release_input_thread(p_mi, true);
 
