@@ -102,12 +102,11 @@ static inline void unlock(libvlc_media_player_t *mp)
  */
 static void release_input_thread( libvlc_media_player_t *p_mi, bool b_input_abort )
 {
-    input_thread_t * p_input_thread;
+    assert( p_mi );
 
-    if( !p_mi || !p_mi->p_input_thread )
+    input_thread_t *p_input_thread = p_mi->p_input_thread;
+    if( !p_input_thread )
         return;
-
-    p_input_thread = p_mi->p_input_thread;
 
     var_DelCallback( p_input_thread, "can-seek",
                      input_seekable_changed, p_mi );
