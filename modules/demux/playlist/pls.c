@@ -110,7 +110,6 @@ static int Demux( demux_t *p_demux )
         }
         else
         {
-            msg_Warn( p_demux, "invalid line in pls file" );
             free( psz_line );
             continue;
         }
