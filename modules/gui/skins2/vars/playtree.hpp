@@ -25,6 +25,7 @@
 #ifndef PLAYTREE_HPP
 #define PLAYTREE_HPP
 
+#include <vlc_playlist.h>
 #include "../utils/var_tree.hpp"
 
 /// Variable for VLC playlist (new tree format)
@@ -69,7 +70,7 @@ private:
     void buildNode( playlist_item_t *p_node, VarTree &m_pNode );
 
     /// keep track of item being played
-    Iterator m_playingIt;
+    playlist_item_t* m_currentItem;
 };
 
 #endif

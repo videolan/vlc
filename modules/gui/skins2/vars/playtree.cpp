@@ -32,11 +32,11 @@
 #include <vlc_playlist.h>
 #include "../utils/ustring.hpp"
 
-Playtree::Playtree( intf_thread_t *pIntf ): VarTree( pIntf )
+Playtree::Playtree( intf_thread_t *pIntf ):
+    VarTree( pIntf ), m_currentItem( NULL )
 {
     // Get the VLC playlist object
     m_pPlaylist = pIntf->p_sys->p_playlist;
-    m_playingIt = end();
 
     i_items_to_append = 0;
 
@@ -148,11 +148,12 @@ void Playtree::onUpdateCurrent( bool b_active )
 {
     if( !b_active )
     {
-        if( m_playingIt == end() )
+        if( !m_currentItem )
             return;
 
-        m_playingIt->m_playing = false;
-        m_playingIt = end();
+        Iterator it = findById( m_currentItem->i_id );
+        it->m_playing = false;
+        m_currentItem = NULL;
     }
     else
     {
@@ -167,7 +168,7 @@ void Playtree::onUpdateCurrent( bool b_active )
 
         Iterator it = findById( current->i_id );
         it->m_playing = true;
-        m_playingIt = it;
+        m_currentItem = current;
 
         playlist_Unlock( m_pPlaylist );
     }
