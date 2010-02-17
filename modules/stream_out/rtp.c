@@ -725,7 +725,7 @@ out:
 char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    char *psz_sdp;
+    char *psz_sdp = NULL;
     struct sockaddr_storage dst;
     socklen_t dstlen;
     int i;
