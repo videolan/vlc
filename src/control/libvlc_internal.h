@@ -36,6 +36,10 @@
 
 #include <vlc_common.h>
 
+/* Note well: this header is included from LibVLC core.
+ * Therefore, static inline functions MUST NOT call LibVLC functions here
+ * (this can cause linkage failure on some platforms). */
+
 /***************************************************************************
  * Internal creation and destruction functions
  ***************************************************************************/
