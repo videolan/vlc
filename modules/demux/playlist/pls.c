@@ -87,8 +87,6 @@ static int Demux( demux_t *p_demux )
     char          *psz_key;
     char          *psz_value;
     int            i_item = -1;
-    int            i_new_item = 0;
-    int            i_key_length;
     input_item_t *p_input;
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
@@ -128,43 +126,29 @@ static int Demux( demux_t *p_demux )
             free( psz_line);
             continue;
         }
+
         /* find the number part of of file1, title1 or length1 etc */
-        i_key_length = strlen( psz_key );
-        if( i_key_length >= 4 ) /* Ref1 type case */
-        {
-            i_new_item = atoi( psz_key + 3 );
-            if( i_new_item == 0 && i_key_length >= 5 ) /* file1 type case */
-            {
-                i_new_item = atoi( psz_key + 4 );
-                if( i_new_item == 0 && i_key_length >= 6 ) /* title1 type case */
-                {
-                    i_new_item = atoi( psz_key + 5 );
-                    if( i_new_item == 0 && i_key_length >= 7 ) /* length1 type case */
-                    {
-                        i_new_item = atoi( psz_key + 6 );
-                    }
-                }
-            }
-        }
-        if( i_new_item == 0 )
+        int i_new_item;
+        if( sscanf( psz_key, "%*[^0-9]%d", &i_new_item ) != 1 )
         {
             msg_Warn( p_demux, "couldn't find number of items" );
             free( psz_line );
             continue;
         }
+
         if( i_item == -1 )
-        {
             i_item = i_new_item;
-        }
-        /* we found a new item, insert the previous */
-        if( i_item != i_new_item )
+        else if( i_item != i_new_item )
         {
+            /* we found a new item, insert the previous */
             if( psz_mrl )
             {
                 p_input = input_item_New( p_demux, psz_mrl, psz_name );
                 input_item_CopyOptions( p_current_input, p_input );
                 input_item_node_AppendItem( p_subitems, p_input );
                 vlc_gc_decref( p_input );
+                free( psz_mrl_orig );
+                psz_mrl_orig = NULL;
             }
             else
             {
@@ -174,8 +158,8 @@ static int Demux( demux_t *p_demux )
             psz_name = NULL;
             i_duration = -1;
             i_item = i_new_item;
-            i_new_item = 0;
         }
+
         if( !strncasecmp( psz_key, "file", sizeof("file") -1 ) ||
             !strncasecmp( psz_key, "Ref", sizeof("Ref") -1 ) )
         {
