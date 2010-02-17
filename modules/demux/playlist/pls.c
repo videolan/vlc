@@ -201,7 +201,7 @@ static int Demux( demux_t *p_demux )
         }
         else if( !strncasecmp( psz_key, "length", sizeof("length") -1 ) )
         {
-            i_duration = atoi( psz_value );
+            i_duration = atoll( psz_value );
             if( i_duration != -1 )
             {
                 i_duration *= 1000000;
