@@ -40,8 +40,14 @@ struct libvlc_media_player_t
 
     int                i_refcount;
     vlc_mutex_t        object_lock;
-    input_thread_t *   p_input_thread;
-    input_resource_t * p_input_resource;
+
+    struct
+    {
+        input_thread_t   *p_thread;
+        input_resource_t *p_resource;
+        vlc_mutex_t       lock;
+    } input;
+
     struct libvlc_instance_t * p_libvlc_instance; /* Parent instance */
     libvlc_media_t * p_md; /* current media descriptor */
     libvlc_event_manager_t * p_event_manager;
