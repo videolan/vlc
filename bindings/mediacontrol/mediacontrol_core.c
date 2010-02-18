@@ -196,7 +196,7 @@ mediacontrol_start( mediacontrol_Instance *self,
         HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 
         /* Create a new media */
-        p_media = libvlc_media_new( self->p_instance, psz_name, &ex );
+        p_media = libvlc_media_new_location( self->p_instance, psz_name, &ex );
         HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 
         if( a_position->value )
@@ -257,7 +257,7 @@ mediacontrol_set_mrl( mediacontrol_Instance *self,
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
 
-    p_media = libvlc_media_new( self->p_instance, psz_file, &ex );
+    p_media = libvlc_media_new_location( self->p_instance, psz_file, &ex );
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 
     libvlc_media_player_set_media( self->p_media_player, p_media );

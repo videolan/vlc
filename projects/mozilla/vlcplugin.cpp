@@ -452,7 +452,7 @@ void VlcPlugin::set_player_window()
 int VlcPlugin::playlist_add( const char *mrl )
 {
     int item = -1;
-    libvlc_media_t *p_m = libvlc_media_new(libvlc_instance,mrl);
+    libvlc_media_t *p_m = libvlc_media_new_location(libvlc_instance,mrl);
     if( !p_m )
         return -1;
     assert( libvlc_media_list );
@@ -474,7 +474,7 @@ int VlcPlugin::playlist_add_extended_untrusted( const char *mrl, const char *nam
 
     assert( libvlc_media_list );
 
-    p_m = libvlc_media_new(libvlc_instance, mrl);
+    p_m = libvlc_media_new_location(libvlc_instance, mrl);
     if( !p_m )
         return -1;
 

@@ -1398,7 +1398,7 @@ void VLCPlugin::player_unregister_events()
 int  VLCPlugin::playlist_add_extended_untrusted(const char *mrl, int optc, const char **optv)
 {
     int item = -1;
-    libvlc_media_t *p_m = libvlc_media_new(_p_libvlc,mrl);
+    libvlc_media_t *p_m = libvlc_media_new_location(_p_libvlc,mrl);
     if( !p_m )
         return -1;
 

@@ -170,15 +170,26 @@ typedef struct libvlc_media_es_t
 
 
 /**
- * Create a media with the given MRL.
+ * Create a media with a certain given media resource location.
  *
  * \param p_instance the instance
  * \param psz_mrl the MRL to read
  * \return the newly created media or NULL on error
  */
-VLC_PUBLIC_API libvlc_media_t * libvlc_media_new(
+VLC_PUBLIC_API libvlc_media_t *libvlc_media_new_location(
                                    libvlc_instance_t *p_instance,
                                    const char * psz_mrl );
+
+/**
+ * Create a media with a certain file path.
+ *
+ * \param p_instance the instance
+ * \param path local filesystem path
+ * \return the newly created media or NULL on error
+ */
+VLC_PUBLIC_API libvlc_media_t *libvlc_media_new_path(
+                                   libvlc_instance_t *p_instance,
+                                   const char *path );
 
 /**
  * Create a media as an empty node with a given name.

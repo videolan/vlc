@@ -177,7 +177,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 {
     if (self = [super init])
     {
-        p_md = libvlc_media_new([VLCLibrary sharedInstance],
+        p_md = libvlc_media_new_location([VLCLibrary sharedInstance],
                                            [[anURL absoluteString] UTF8String]);
 
         delegate = nil;

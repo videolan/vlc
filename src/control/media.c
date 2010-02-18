@@ -36,6 +36,7 @@
 #include <vlc_input.h>
 #include <vlc_meta.h>
 #include <vlc_playlist.h> /* For the preparser */
+#include <vlc_url.h>
 
 #include "libvlc.h"
 
@@ -294,8 +295,8 @@ libvlc_media_t * libvlc_media_new_from_input_item(
 /**************************************************************************
  * Create a new media descriptor object
  **************************************************************************/
-libvlc_media_t * libvlc_media_new( libvlc_instance_t *p_instance,
-                                   const char * psz_mrl )
+libvlc_media_t *libvlc_media_new_location( libvlc_instance_t *p_instance,
+                                           const char * psz_mrl )
 {
     input_item_t * p_input_item;
     libvlc_media_t * p_md;
@@ -314,6 +315,21 @@ libvlc_media_t * libvlc_media_new( libvlc_instance_t *p_instance,
     vlc_gc_decref( p_input_item );
 
     return p_md;
+}
+
+libvlc_media_t *libvlc_media_new_path( libvlc_instance_t *p_instance,
+                                       const char *path )
+{
+    char *mrl = make_URI( path );
+    if( unlikely(mrl == NULL) )
+    {
+        libvlc_printerr( "Not enough memory" );
+        return NULL;
+    }
+
+    libvlc_media_t *m = libvlc_media_new_location( p_instance, mrl );
+    free( mrl );
+    return m;
 }
 
 /**************************************************************************

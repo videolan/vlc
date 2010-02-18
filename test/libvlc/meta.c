@@ -37,7 +37,7 @@ static void test_meta (const char ** argv, int argc)
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    media = libvlc_media_new (vlc, "samples/meta.sample");
+    media = libvlc_media_new_path (vlc, "samples/meta.sample");
     assert( media );
 
     /* Tell that we are interested in this precise meta data

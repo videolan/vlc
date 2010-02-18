@@ -98,7 +98,8 @@ libvlc_media_list_remove_index
 libvlc_media_list_retain
 libvlc_media_list_set_media
 libvlc_media_list_unlock
-libvlc_media_new
+libvlc_media_new_location
+libvlc_media_new_path
 libvlc_media_new_as_node
 libvlc_media_new_from_input_item
 libvlc_media_player_can_pause
