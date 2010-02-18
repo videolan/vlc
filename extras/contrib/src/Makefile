@@ -1239,8 +1239,13 @@ ifdef HAVE_BIGENDIAN
 	(cd $<; ./genMakefiles armeb-uclibc && make $(HOSTCC))
 endif
 else
+ifeq ($(ARCH),armel)
+	patch -p0 < Patches/live-armlinux.patch
+	(cd $<; ./genMakefiles armlinux && make $(HOSTCC))
+else
 	(cd $<; sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux)
 	(cd $<; ./genMakefiles linux && make $(HOSTCC))
+endif
 endif
 endif
 endif
