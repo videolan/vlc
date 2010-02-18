@@ -575,7 +575,7 @@ void libvlc_media_player_set_media(
                           !p_mi->input.p_thread->b_error );
 
     lock( p_mi );
-    set_state( p_mi, libvlc_NothingSpecial, false );
+    set_state( p_mi, libvlc_NothingSpecial, true );
     unlock_input( p_mi );
 
     libvlc_media_release( p_mi->p_md );
