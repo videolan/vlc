@@ -24,7 +24,7 @@
 #ifndef FILTER_EVENT_INFO_H_
 #define FILTER_EVENT_INFO_H_
 
-#define VIDEO_FILTER_EVENT_VARIABLE N_("video-filter-event")
+#define VIDEO_FILTER_EVENT_VARIABLE "video-filter-event"
 
 typedef struct video_filter_region_info_t
 {
