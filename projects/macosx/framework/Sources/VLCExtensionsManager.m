@@ -20,11 +20,11 @@
 
 static input_thread_t *libvlc_media_player_get_input_thread(libvlc_media_player_t *player)
 {
-    vlc_mutex_lock(&player->object_lock);
-    input_thread_t *input = player->p_input_thread;
+    vlc_mutex_lock(&player->input.lock);
+    input_thread_t *input = player->input.p_thread;
     if(input)
         vlc_object_hold(input);
-    vlc_mutex_unlock(&player->object_lock);
+    vlc_mutex_unlock(&player->input.lock);
     return input;
 }
 
