@@ -82,7 +82,14 @@ QPixmap AbstractPlViewItemDelegate::getArtPixmap( const QModelIndex & index, con
     {
         if( artUrl.isEmpty() || !artPix.load( artUrl ) )
         {
-            artPix = QPixmap( ":/noart" ).scaled( size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+            key = QString("noart%1%2").arg(size.width()).arg(size.height());
+            if( !QPixmapCache::find( key, artPix ) )
+            {
+                artPix = QPixmap( ":/noart" ).scaled( size,
+                                                      Qt::KeepAspectRatio,
+                                                      Qt::SmoothTransformation );
+                QPixmapCache::insert( key, artPix );
+            }
         }
         else
         {
