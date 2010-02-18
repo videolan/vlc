@@ -270,7 +270,10 @@ EXTRA_DIST += \
 	lua/intf/dummy.lua \
 	lua/intf/dumpmeta.lua \
 	lua/modules/sandbox.lua \
-	lua/modules/simplexml.lua
+	lua/modules/simplexml.lua \
+	lua/sd/fmc.lua \
+	lua/sd/freebox.lua \
+	lua/sd/frenchtv.lua
 
 DIST_http_lua = \
 	lua/http/.hosts \
