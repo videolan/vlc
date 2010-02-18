@@ -362,12 +362,13 @@ char *input_item_GetURI( input_item_t *p_i )
 }
 void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
 {
-    vlc_mutex_lock( &p_i->lock );
 #ifndef NDEBUG
-    if( !strstr( psz_uri, "://" ) || strstr( psz_uri, " " ) || strstr( psz_uri, "\"" ) )
-        fprintf( stderr, "input_item_SetURI() was likely called with a path. FIXME\n" );
+    if( !strstr( psz_uri, "://" )
+     || strchr( psz_uri, ' ' ) || strchr( psz_uri, '"' ) )
+        fprintf( stderr, "Warning: %s(\"%s\"): file path instead of URL.\n",
+                 __func__, psz_uri );
 #endif
-
+    vlc_mutex_lock( &p_i->lock );
     free( p_i->psz_uri );
     p_i->psz_uri = strdup( psz_uri );
 
