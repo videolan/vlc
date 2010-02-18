@@ -71,19 +71,11 @@ static picture_t *DecodeBlock  ( decoder_t *, block_t ** );
 #define LT_CHROMA N_("Output chroma for the memory image as a 4-character " \
                       "string, eg. \"RV32\".")
 
-#define INVMEM_HELP N_( "This module make possible making video stream from raw-image " \
-                        "generating (to memory) from rendering program uses libvlc. " \
-                        "To use this module from libvlc set --codec to invmem, "\
-                        "set all --invmem-* options in vlc_argv an use " \
-                        "libvlc_media_new(libvlc, \"fake://\", &ex);. " \
-                        "Besides is simillar to vmem video output module." )
-
 vlc_module_begin()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_shortname( N_("Memory video decoder") )
     set_description( N_("Memory video decoder") )
-    set_help( INVMEM_HELP )
     set_capability( "decoder", 50 )
     set_callbacks( OpenDecoder, CloseDecoder )
     add_shortcut( "invmem" )
