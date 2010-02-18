@@ -521,24 +521,22 @@ void LocationBar::invoke( int i_id )
 void LocationBar::layOut( const QSize& size )
 {
     menuMore->clear();
+    widths.clear();
 
     int count = buttons.count();
-    QList<int> widths;
     int totalWidth = 0;
     for( int i = 0; i < count; i++ )
     {
         int w = buttons[i]->sizeHint().width();
-        if( i == 0 || totalWidth + w <= size.width() )
-        {
-            totalWidth += w;
-            widths.append( w );
-        }
+        widths.append( w );
+        totalWidth += w;
         if( totalWidth > size.width() ) break;
     }
 
     int x = 0;
     int shown = widths.count();
-    if( shown < count )
+
+    if( totalWidth > size.width() && count > 1 )
     {
         QSize sz = btnMore->sizeHint();
         btnMore->setGeometry( 0, 0, sz.width(), size.height() );
@@ -550,28 +548,20 @@ void LocationBar::layOut( const QSize& size )
     {
         btnMore->hide();
     }
-    shown--;
     for( int i = count - 1; i >= 0; i-- )
     {
-        if( i > shown )
+        if( totalWidth <= size.width() || i == 0)
         {
-            menuMore->addAction( actions[i] );
-            buttons[i]->hide();
-        }
-        else if( i > 0 && totalWidth > size.width() )
-        {
-            menuMore->addAction( actions[i] );
-            buttons[i]->hide();
+            buttons[i]->setGeometry( x, 0, qMin( size.width() - x, widths[i] ), size.height() );
+            buttons[i]->show();
+            x += widths[i];
             totalWidth -= widths[i];
         }
         else
         {
-            buttons[i]->setGeometry( x, 0,
-                                    qMin( widths[i], size.width() - x ),
-                                    size.height() );
-            buttons[i]->show();
-            totalWidth -= widths[i];
-            x += widths[i];
+            menuMore->addAction( actions[i] );
+            buttons[i]->hide();
+            if( i < shown ) totalWidth -= widths[i];
         }
     }
 }

@@ -152,6 +152,7 @@ private:
     QList<QAction*> actions;
     LocationButton *btnMore;
     QMenu *menuMore;
+    QList<int> widths;
 };
 
 #endif
