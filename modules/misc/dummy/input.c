@@ -44,16 +44,79 @@ static int DemuxNoOp( demux_t *demux )
     return 0;
 }
 
+struct demux_sys_t
+{
+    mtime_t end;
+    mtime_t length;
+};
+
 static int DemuxPause( demux_t *demux )
 {
-    const mtime_t *p_end = (void *)demux->p_sys;
+    demux_sys_t *p_sys = demux->p_sys;
     mtime_t now = mdate();
 
-    if( now >= *p_end )
+    if( now >= p_sys->end )
         return 0;
 
     msleep( 10000 ); /* FIXME!!! */
     return 1;
+}
+
+static int ControlPause( demux_t *demux, int query, va_list args )
+{
+    demux_sys_t *p_sys = demux->p_sys;
+
+    switch( query )
+    {
+        case DEMUX_GET_POSITION:
+        {
+            double *ppos = va_arg( args, double * );
+            double pos;
+            mtime_t now = mdate();
+
+            pos = 1. + ((double)(now - p_sys->end) / (double)p_sys->length);
+            *ppos = (pos <= 1.) ? pos : 1.;
+            break;
+        }
+
+        case DEMUX_SET_POSITION:
+        {
+            double pos = va_arg( args, double );
+            mtime_t now = mdate();
+
+            p_sys->end = now + (p_sys->length * (1. - pos));
+            break;
+        }
+
+        case DEMUX_GET_LENGTH:
+        {
+            mtime_t *plen = va_arg( args, mtime_t * );
+            *plen = p_sys->length;
+            break;
+        }
+
+        case DEMUX_GET_TIME:
+        {
+            mtime_t *ppos = va_arg( args, mtime_t * );
+            *ppos = mdate() + p_sys->length - p_sys->end;
+            break;
+        }
+
+        case DEMUX_SET_TIME:
+        {
+            mtime_t pos = va_arg( args, mtime_t );
+            p_sys->end = mdate() + p_sys->length - pos;
+            break;
+        }
+
+        case DEMUX_CAN_SEEK:
+            *va_arg( args, bool * ) = true;
+            break;
+
+        default:
+            return DemuxControl( demux, query, args );
+    }
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -64,14 +127,15 @@ int OpenDemux ( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t*)p_this;
     char * psz_name = p_demux->psz_path;
 
-    p_demux->pf_control = DemuxControl;
     p_demux->p_sys = NULL;
 
     /* Check for a "vlc://nop" command */
     if( !strcasecmp( psz_name, "nop" ) )
     {
+nop:
         msg_Info( p_demux, "command `nop'" );
         p_demux->pf_demux = DemuxNoOp;
+        p_demux->pf_control = DemuxControl;
         return VLC_SUCCESS;
     }
 
@@ -80,6 +144,7 @@ int OpenDemux ( vlc_object_t *p_this )
     {
         msg_Info( p_demux, "command `quit'" );
         p_demux->pf_demux = DemuxNoOp;
+        p_demux->pf_control = DemuxControl;
         libvlc_Quit( p_demux->p_libvlc );
         return VLC_SUCCESS;
     }
@@ -88,15 +153,22 @@ int OpenDemux ( vlc_object_t *p_this )
     if( !strncasecmp( psz_name, "pause:", 6 ) )
     {
         double f = us_atof( psz_name + 6 );
-        mtime_t end = mdate() + f * (mtime_t)1000000;
+        mtime_t length = f * CLOCK_FREQ;
 
         msg_Info( p_demux, "command `pause %f'", f );
-        p_demux->pf_demux = DemuxPause;
+        if( length == 0 )
+            goto nop; /* avoid division by zero */
 
-        p_demux->p_sys = malloc( sizeof( end ) );
-        if( p_demux->p_sys == NULL )
+        demux_sys_t *p_sys = malloc( sizeof( *p_sys ) );
+        if( p_sys == NULL )
             return VLC_ENOMEM;
-        memcpy( p_demux->p_sys, &end, sizeof( end ) );
+
+        p_sys->end = mdate() + length;
+        p_sys->length = length;
+
+        p_demux->p_sys = p_sys;
+        p_demux->pf_demux = DemuxPause;
+        p_demux->pf_control = ControlPause;
         return VLC_SUCCESS;
     }
  
