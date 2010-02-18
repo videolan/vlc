@@ -1013,11 +1013,11 @@ void PLModel::popupExplore()
            char  *psz_path;
            input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_meta );
 
-           if( EMPTY_STR( psz_access ) ||
-               !strncasecmp( psz_access, "file", 4 ) ||
-               !strncasecmp( psz_access, "dire", 4 ) )
+           if( !EMPTY_STR( psz_access ) && (
+                   !strncasecmp( psz_access, "file", 4 ) ||
+                   !strncasecmp( psz_access, "dire", 4 ) ))
            {
-               QFileInfo info( qfu( psz_meta ) );
+               QFileInfo info( qfu( psz_path ) );
                QDesktopServices::openUrl(
                                QUrl::fromLocalFile( info.absolutePath() ) );
            }
