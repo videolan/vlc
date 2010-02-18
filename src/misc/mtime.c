@@ -127,23 +127,19 @@ char *mstrtime( char *psz_buffer, mtime_t date )
  */
 char *secstotimestr( char *psz_buffer, int i_seconds )
 {
-    int i_hours, i_mins;
-    i_mins = i_seconds / 60;
-    i_hours = i_mins / 60 ;
-    if( i_hours )
-    {
+    div_t d;
+
+    d = div( i_seconds, 60 );
+    i_seconds = d.rem;
+    d = div( d.quot, 60 );
+
+    if( d.quot )
         snprintf( psz_buffer, MSTRTIME_MAX_SIZE, "%d:%2.2d:%2.2d",
-                 (int) i_hours,
-                 (int) (i_mins % 60),
-                 (int) (i_seconds % 60) );
-    }
+                 d.quot, d.rem, i_seconds );
     else
-    {
          snprintf( psz_buffer, MSTRTIME_MAX_SIZE, "%2.2d:%2.2d",
-                   (int) i_mins ,
-                   (int) (i_seconds % 60) );
-    }
-    return( psz_buffer );
+                   d.quot, i_seconds );
+    return psz_buffer;
 }
 
 #if defined (HAVE_CLOCK_NANOSLEEP)
