@@ -255,13 +255,6 @@ public:
     void fireOnSeekableChangedEvent(VARIANT_BOOL seekable);
     void fireOnPausableChangedEvent(VARIANT_BOOL pausable);
 
-    void fireOnMouseButtonEvent(VARIANT_BOOL btn_right, VARIANT_BOOL btn_center,
-                VARIANT_BOOL btn_left, VARIANT_BOOL btn_wheel_up,
-                VARIANT_BOOL bnt_wheel_down);
-    void fireOnMouseMovedEvent(long x, long y);
-    void fireOnMouseClickedEvent(VARIANT_BOOL clicked);
-    void fireOnMouseObjectEvent(VARIANT_BOOL moved);
-
     // controlling IUnknown interface
     LPUNKNOWN pUnkOuter;
 
