@@ -43,6 +43,7 @@
 #include <QWidgetAction>
 #include <QDesktopWidget>
 #include <QPainter>
+#include <QTimer>
 
 #ifdef Q_WS_X11
 # include <X11/Xlib.h>
@@ -430,16 +431,18 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, const QString& text,
 
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
              speedControl, activateOnState() );
-
 }
+
 SpeedLabel::~SpeedLabel()
 {
-        delete speedControl;
-        delete speedControlMenu;
+    delete speedControl;
+    delete speedControlMenu;
 }
+
 /****************************************************************************
  * Small right-click menu for rate control
  ****************************************************************************/
+
 void SpeedLabel::showSpeedMenu( QPoint pos )
 {
     speedControlMenu->exec( QCursor::pos() - pos
@@ -477,7 +480,7 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
     speedSlider->setPageStep( 1 );
     speedSlider->setTickInterval( 17 );
 
-    CONNECT( speedSlider, valueChanged( int ), this, updateRate( int ) );
+    CONNECT( speedSlider, sliderMoved( int ), this, updateRate( int ) );
 
     QToolButton *normalSpeedButton = new QToolButton( this );
     normalSpeedButton->setMaximumSize( QSize( 26, 20 ) );
@@ -521,10 +524,7 @@ void SpeedControlWidget::updateControls( int rate )
         sliderValue = speedSlider->maximum();
     }
 
-    //Block signals to avoid feedback loop
-    speedSlider->blockSignals( true );
     speedSlider->setValue( sliderValue );
-    speedSlider->blockSignals( false );
 }
 
 void SpeedControlWidget::updateRate( int sliderValue )
@@ -588,15 +588,21 @@ void CoverArtLabel::askForUpdate()
     THEMIM->getIM()->requestArtUpdate();
 }
 
-TimeLabel::TimeLabel( intf_thread_t *_p_intf  ) :QLabel(), p_intf( _p_intf )
+TimeLabel::TimeLabel( intf_thread_t *_p_intf  )
+    : QLabel(), p_intf( _p_intf ), bufTimer( new QTimer(this) ),
+      buffering( false ), showBuffering(false), bufVal( -1 )
 {
-   b_remainingTime = false;
-   setText( " --:--/--:-- " );
-   setAlignment( Qt::AlignRight | Qt::AlignVCenter );
-   setToolTip( qtr( "Toggle between elapsed and remaining time" ) );
+    b_remainingTime = false;
+    setText( " --:--/--:-- " );
+    setAlignment( Qt::AlignRight | Qt::AlignVCenter );
+    setToolTip( qtr( "Toggle between elapsed and remaining time" ) );
+    bufTimer->setSingleShot( true );
 
-   CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
-             this, setDisplayPosition( float, int64_t, int ) );
+    CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
+              this, setDisplayPosition( float, int64_t, int ) );
+    CONNECT( THEMIM->getIM(), cachingChanged( float ),
+              this, updateBuffering( float ) );
+    CONNECT( bufTimer, timeout(), this, updateBuffering() );
 }
 
 void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
@@ -647,39 +653,38 @@ void TimeLabel::toggleTimeDisplay()
     b_remainingTime = !b_remainingTime;
 }
 
-CacheLabel::CacheLabel( intf_thread_t *_p_intf, QWidget *parent )
-  : QLabel( parent ), p_intf( _p_intf ), cached( 0.f )
-{
-    setText( qtr( "Buffering..." ) );
-    setMinimumWidth( 70 );
-    setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Preferred );
-    setAlignment( Qt::AlignCenter );
 
-    CONNECT( THEMIM->getIM(), cachingChanged( float ),
-              this, showCaching( float ) );
-    CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
-              this, hideCaching() );
+void TimeLabel::updateBuffering( float _buffered )
+{
+    bufVal = _buffered;
+    if( !buffering || bufVal == 0 )
+    {
+        showBuffering = false;
+        buffering = true;
+        bufTimer->start(200);
+    }
+    else if( bufVal == 1 )
+    {
+        showBuffering = buffering = false;
+    }
+    update();
 }
 
-void CacheLabel::showCaching( float _cached )
+void TimeLabel::updateBuffering()
 {
-    cached = _cached;
-    show();
-    update(); //in case we are already visible
+    showBuffering = true;
+    update();
 }
 
-void CacheLabel::hideCaching()
+void TimeLabel::paintEvent( QPaintEvent* event )
 {
-    hide();
-}
-
-void CacheLabel::paintEvent( QPaintEvent* event )
-{
-    QRect r( rect() );
-    r.setWidth( r.width() * cached );
-    QPainter p( this );
-    p.setOpacity( 0.4 );
-    p.fillRect( r, palette().color( QPalette::Highlight ) );
-
+    if( showBuffering )
+    {
+        QRect r( rect() );
+        r.setLeft( r.width() * bufVal );
+        QPainter p( this );
+        p.setOpacity( 0.4 );
+        p.fillRect( r, palette().color( QPalette::Highlight ) );
+    }
     QLabel::paintEvent( event );
 }

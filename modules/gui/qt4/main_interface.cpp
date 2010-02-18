@@ -497,18 +497,14 @@ inline void MainInterface::createStatusBar()
     nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
                                       | Qt::TextSelectableByKeyboard );
     SpeedLabel *speedLabel = new SpeedLabel( p_intf, "1.00x", this );
-    CacheLabel *cacheLabel = new CacheLabel( p_intf, this );
-    cacheLabel->hide();
 
     /* Styling those labels */
     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
-    cacheLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
 
     /* and adding those */
     statusBarr->addWidget( nameLabel, 8 );
-    statusBarr->addPermanentWidget( cacheLabel, 0 );
     statusBarr->addPermanentWidget( speedLabel, 0 );
     statusBarr->addPermanentWidget( timeLabel, 0 );
 
