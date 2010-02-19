@@ -211,7 +211,7 @@ int Import_ASX( vlc_object_t *p_this )
     p_demux->p_sys->i_data_len = -1;
     p_demux->p_sys->b_utf8 = false;
     p_demux->p_sys->b_skip_ads =
-        var_InheritInteger( p_demux, "playlist-skip-ads" );
+        var_InheritBool( p_demux, "playlist-skip-ads" );
 
     return VLC_SUCCESS;
 }
