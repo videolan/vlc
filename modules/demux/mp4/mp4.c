@@ -1899,7 +1899,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
                                    uint32_t *pi_sample )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    MP4_Box_t   *p_stss;
+    MP4_Box_t   *p_box_stss;
     uint64_t     i_dts;
     unsigned int i_sample;
     unsigned int i_chunk;
@@ -2004,43 +2004,34 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
 
 
     /* *** Try to find nearest sync points *** */
-    if( ( p_stss = MP4_BoxGet( p_track->p_stbl, "stss" ) ) )
+    if( ( p_box_stss = MP4_BoxGet( p_track->p_stbl, "stss" ) ) )
     {
-        unsigned int i_index;
-        msg_Dbg( p_demux,
-                    "track[Id 0x%x] using Sync Sample Box (stss)",
-                    p_track->i_track_ID );
-        for( i_index = 0; i_index < p_stss->data.p_stss->i_entry_count; i_index++ )
+        MP4_Box_data_stss_t *p_stss = p_box_stss->data.p_stss;
+        msg_Dbg( p_demux, "track[Id 0x%x] using Sync Sample Box (stss)",
+                 p_track->i_track_ID );
+        for( unsigned i_index = 0; i_index < p_stss->i_entry_count; i_index++ )
         {
-            if( p_stss->data.p_stss->i_sample_number[i_index] >= i_sample )
+            if( i_index >= p_stss->i_entry_count - 1 ||
+                i_sample < p_stss->i_sample_number[i_index+1] )
             {
-                if( i_index > 0 )
+                unsigned i_sync_sample = p_stss->i_sample_number[i_index];
+                msg_Dbg( p_demux, "stts gives %d --> %d (sample number)",
+                         i_sample, i_sync_sample );
+
+                if( i_sync_sample <= i_sample )
                 {
-                    msg_Dbg( p_demux, "stts gives %d --> %d (sample number)",
-                            i_sample,
-                            p_stss->data.p_stss->i_sample_number[i_index-1] );
-                    i_sample = p_stss->data.p_stss->i_sample_number[i_index-1];
-                    /* new i_sample is less than old so i_chunk can only decreased */
                     while( i_chunk > 0 &&
-                            i_sample < p_track->chunk[i_chunk].i_sample_first )
-                    {
+                           i_sync_sample < p_track->chunk[i_chunk].i_sample_first )
                         i_chunk--;
-                    }
                 }
                 else
                 {
-                    msg_Dbg( p_demux, "stts gives %d --> %d (sample number)",
-                            i_sample,
-                            p_stss->data.p_stss->i_sample_number[i_index] );
-                    i_sample = p_stss->data.p_stss->i_sample_number[i_index];
-                    /* new i_sample is more than old so i_chunk can only increased */
                     while( i_chunk < p_track->i_chunk_count - 1 &&
-                           i_sample >= p_track->chunk[i_chunk].i_sample_first +
-                             p_track->chunk[i_chunk].i_sample_count )
-                    {
+                           i_sync_sample >= p_track->chunk[i_chunk].i_sample_first +
+                                            p_track->chunk[i_chunk].i_sample_count )
                         i_chunk++;
-                    }
                 }
+                i_sample = i_sync_sample;
                 break;
             }
         }
