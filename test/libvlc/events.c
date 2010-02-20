@@ -55,6 +55,8 @@ static void test_event_type_reception( libvlc_event_manager_t * em, libvlc_event
     assert (*callback_was_called);
 }
 
+#include <string.h>
+
 static void test_events (const char ** argv, int argc)
 {
     libvlc_instance_t *vlc;
@@ -80,6 +82,9 @@ static void test_events (const char ** argv, int argc)
     assert (mi != NULL);
 
     em = libvlc_media_player_event_manager (mi);
+
+    for( int i = 0; i < 0x700; i++ )
+         strlen(libvlc_event_type_name( i ));
 
     log ("+ Testing attaching to Media Instance\n");
 
