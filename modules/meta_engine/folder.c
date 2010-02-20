@@ -90,20 +90,12 @@ static int FindMeta( vlc_object_t *p_this )
     if( !psz_dir )
         return VLC_EGENERIC;
 
-    char *psz_path = psz_dir;
-    if( strncmp( psz_path, "file://", 7 ) || !decode_URI( psz_path + 7 ) )
-    {
-        free( psz_dir );
+    char *psz_path = make_path( psz_dir );
+    free( psz_dir );
+    if( psz_path == NULL )
         return VLC_EGENERIC;
-    }
 
-#if defined(WIN32) && !defined(UNDER_CE)
-    psz_path += 8;
-#else
-    psz_path += 7;
-#endif
-
-    char *psz_buf = strrchr( psz_path, '/' );
+    char *psz_buf = strrchr( psz_path, DIR_SEP_CHAR );
     if( psz_buf )
         *++psz_buf = '\0';
     else
@@ -133,8 +125,6 @@ static int FindMeta( vlc_object_t *p_this )
             }
         }
     }
-
-    free( psz_dir );
 
     return b_have_art ? VLC_SUCCESS : VLC_EGENERIC;
 }
