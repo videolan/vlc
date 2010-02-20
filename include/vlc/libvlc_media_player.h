@@ -501,15 +501,14 @@ VLC_PUBLIC_API void libvlc_track_description_release( libvlc_track_description_t
 VLC_PUBLIC_API void libvlc_toggle_fullscreen( libvlc_media_player_t *p_mi );
 
 /**
- * Enable or disable fullscreen on non-embedded video outputs.
+ * Enable or disable fullscreen.
  *
- * @warning With most window managers, only a top-level windows can switch to
+ * @warning With most window managers, only a top-level windows can be in
  * full-screen mode. Hence, this function will not operate properly if
- * libvlc_media_player_set_xid() or libvlc_media_player_set_hwnd() was
- * used to embed the video in a non-LibVLC widget. If you want to to render an
- * embedded LibVLC video full-screen, the parent embedding widget must expanded
- * to full screen (LibVLC cannot take care of that).
- * LibVLC will then automatically resize the video as appropriate.
+ * libvlc_media_player_set_xid() was used to embed the video in a non-top-level
+ * window. In that case, the embedding window must be reparented to the root
+ * window <b>before</b> fullscreen mode is enabled. You will want to reparent
+ * it back to its normal parent when disabling fullscreen.
  *
  * \param p_mi the media player
  * \param b_fullscreen boolean for fullscreen status
