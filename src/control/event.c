@@ -241,27 +241,6 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
  */
 
 /**************************************************************************
- *       libvlc_event_type_name (public) :
- *
- * Get the char * name of an event type.
- **************************************************************************/
-static const char event_type_to_name[][libvlc_num_event_types] =
-{
-#define DEF(a) [libvlc_##a]=#a
-    DEFINE_LIBVLC_EVENT_TYPES
-#undef  DEF
-};
-
-static const char unknown_event_name[] = "Unknown Event";
-
-const char * libvlc_event_type_name( libvlc_event_type_t event_type )
-{
-    if( event_type >= libvlc_num_event_types )
-        return unknown_event_name;
-    return event_type_to_name[event_type];
-}
-
-/**************************************************************************
  *       event_attach (internal) :
  *
  * Add a callback for an event.
@@ -299,8 +278,7 @@ int event_attach( libvlc_event_manager_t * p_event_manager,
     vlc_mutex_unlock( &p_event_manager->object_lock );
     
     free(listener);
-    fprintf( stderr, "This object event manager doesn't know about '%s' events",
-             libvlc_event_type_name(event_type) );
+    fprintf( stderr, "Unknown event type %d", event_type );
     assert(0);
     return -1;
 }

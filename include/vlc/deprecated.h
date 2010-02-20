@@ -37,10 +37,9 @@ extern "C" {
 /*****************************************************************************
  * Playlist (Deprecated)
  *****************************************************************************/
-/** \defgroup libvlc_playlist libvlc_playlist (Deprecated)
+/** \defgroup libvlc_playlist LibVLC playlist (legacy)
  * \ingroup libvlc
- * LibVLC Playlist handling (Deprecated)
- * @deprecated Use media_list
+ * @deprecated Use @ref libvlc_media_list instead.
  * @{
  */
 

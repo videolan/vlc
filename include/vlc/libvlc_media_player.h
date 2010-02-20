@@ -38,10 +38,9 @@ extern "C" {
 /*****************************************************************************
  * Media Player
  *****************************************************************************/
-/** \defgroup libvlc_media_player libvlc_media_player
+/** \defgroup libvlc_media_player LibVLC media player
  * \ingroup libvlc
- * LibVLC Media Player, object that let you play a media
- * in a custom drawable
+ * A LibVLC media player plays one media (usually in a custom drawable).
  * @{
  */
 
@@ -197,10 +196,12 @@ VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t *p_mi );
  * The object minimal_macosx expects is of kind NSObject and should
  * respect the protocol:
  *
- * @protocol VLCOpenGLVideoViewEmbedding <NSObject>
+ * @begincode
+ * \@protocol VLCOpenGLVideoViewEmbedding <NSObject>
  * - (void)addVoutSubview:(NSView *)view;
  * - (void)removeVoutSubview:(NSView *)view;
- * @end
+ * \@end
+ * @endcode
  *
  * You can find a live example in VLCVideoView in VLCKit.framework.
  *
@@ -484,9 +485,7 @@ VLC_PUBLIC_API void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi 
  */
 VLC_PUBLIC_API void libvlc_track_description_release( libvlc_track_description_t *p_track_description );
 
-/** \defgroup libvlc_video libvlc_video
- * \ingroup libvlc_media_player
- * LibVLC Video handling
+/** \defgroup libvlc_video LibVLC video controls
  * @{
  */
 
@@ -909,9 +908,7 @@ VLC_PUBLIC_API void libvlc_video_set_logo_string( libvlc_media_player_t *p_mi,
 
 /** @} video */
 
-/** \defgroup libvlc_audio libvlc_audio
- * \ingroup libvlc_media_player
- * LibVLC Audio handling
+/** \defgroup libvlc_audio LibVLC audio controls
  * @{
  */
 

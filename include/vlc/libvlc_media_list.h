@@ -33,12 +33,9 @@
 extern "C" {
 # endif
 
-/*****************************************************************************
- * Media List
- *****************************************************************************/
-/** \defgroup libvlc_media_list libvlc_media_list
+/** \defgroup libvlc_media_list LibVLC media list
  * \ingroup libvlc
- * LibVLC Media List, a media list holds multiple media descriptors
+ * A LibVLC media list holds multiple @ref libvlc_media_t media descriptors.
  * @{
  */
 

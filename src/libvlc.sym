@@ -29,7 +29,6 @@ libvlc_event_manager_new
 libvlc_event_manager_register_event_type
 libvlc_event_manager_release
 libvlc_event_send
-libvlc_event_type_name
 libvlc_get_changeset
 libvlc_get_compiler
 libvlc_get_fullscreen

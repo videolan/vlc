@@ -36,10 +36,13 @@ extern "C" {
 /*****************************************************************************
  * Media List Player
  *****************************************************************************/
-/** \defgroup libvlc_media_list_player libvlc_media_list_player
+/** \defgroup libvlc_media_list_player LibVLC media list player
  * \ingroup libvlc
- * LibVLC Media List Player, play a media_list. You can see that as a media
- * instance subclass
+ * The LibVLC media list player plays a @ref libvlc_media_list_t list of media,
+ * in a certain order.
+ * This is required to especially support playlist files.
+ * The normal @ref libvlc_media_player_t LibVLC media player can only play a
+ * single media, and does not handle playlist files properly.
  * @{
  */
 

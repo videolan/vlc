@@ -29,9 +29,9 @@
  */
 
 /**
- * \defgroup libvlc libvlc
- * This is libvlc, the base library of the VLC program.
- *
+ * \defgroup libvlc LibVLC
+ * LibVLC is the external programming interface of the VLC media player.
+ * It is used to embed VLC into other applications or frameworks.
  * @{
  */
 
@@ -61,12 +61,19 @@ extern "C" {
 #include <stdarg.h>
 #include <vlc/libvlc_structures.h>
 
-/*****************************************************************************
- * Error handling
- *****************************************************************************/
-/** \defgroup libvlc_error libvlc_error
- * \ingroup libvlc_core
- * LibVLC error handling
+/** \defgroup libvlc_core LibVLC core
+ * \ingroup libvlc
+ * Before it can do anything useful, LibVLC must be initialized.
+ * You can create one (or more) instance(s) of LibVLC in a given process,
+ * with libvlc_new() and destroy them with libvlc_release().
+ *
+ * \version This documents LibVLC version 1.1.
+ * Earlier versions (0.9 and 1.0) are <b>not</b> compatible.
+ * @{
+ */
+
+/** \defgroup libvlc_error LibVLC error handling
+ * \ingroup libvlc_error
  * @{
  */
 
@@ -102,17 +109,6 @@ const char *libvlc_vprinterr (const char *fmt, va_list ap);
 const char *libvlc_printerr (const char *fmt, ...);
 
 /**@} */
-
-
-/*****************************************************************************
- * Core handling
- *****************************************************************************/
-
-/** \defgroup libvlc_core libvlc_core
- * \ingroup libvlc
- * LibVLC Core
- * @{
- */
 
 /**
  * Create and initialize a libvlc instance.
@@ -162,7 +158,7 @@ void libvlc_wait( libvlc_instance_t *p_instance );
 /**
  * Retrieve libvlc version.
  *
- * Example: "0.9.0-git Grishenko"
+ * Example: "1.1.0-git The Luggage"
  *
  * \return a string containing the libvlc version
  */
@@ -186,17 +182,15 @@ VLC_PUBLIC_API const char * libvlc_get_compiler(void);
  */
 VLC_PUBLIC_API const char * libvlc_get_changeset(void);
 
-struct vlc_object_t;
 
-/** @}*/
-
-/*****************************************************************************
- * Event handling
- *****************************************************************************/
-
-/** \defgroup libvlc_event libvlc_event
- * \ingroup libvlc_core
- * LibVLC Events
+/** \defgroup libvlc_event LibVLC asynchronous events
+ * LibVLC emits asynchronous events.
+ *
+ * Several LibVLC objects (such @ref libvlc_instance_t as
+ * @ref libvlc_media_player_t) generate events asynchronously. Each of them
+ * provides @ref libvlc_event_manager_t event manager. You can subscribe to
+ * events with libvlc_event_attach() and unsubscribe with
+ * libvlc_event_detach().
  * @{
  */
 
@@ -204,17 +198,20 @@ struct vlc_object_t;
  * Event manager that belongs to a libvlc object, and from whom events can
  * be received.
  */
-
 typedef struct libvlc_event_manager_t libvlc_event_manager_t;
-typedef struct libvlc_event_t libvlc_event_t;
-typedef uint32_t libvlc_event_type_t;
-    
+
+struct libvlc_event_t;
+
+/**
+ * Type of a LibVLC event.
+ */
+typedef int libvlc_event_type_t;
+
 /**
  * Callback function notification
  * \param p_event the event triggering the callback
  */
-
-typedef void ( *libvlc_callback_t )( const libvlc_event_t *, void * );
+typedef void ( *libvlc_callback_t )( const struct libvlc_event_t *, void * );
     
 /**
  * Register for an event notification.
@@ -245,22 +242,11 @@ VLC_PUBLIC_API void libvlc_event_detach( libvlc_event_manager_t *p_event_manager
                                          libvlc_callback_t f_callback,
                                          void *p_user_data );
 
-/**
- * Get an event's type name.
- *
- * \param event_type the desired event
- */
-VLC_PUBLIC_API const char * libvlc_event_type_name( libvlc_event_type_t event_type );
-
 /** @} */
 
-/*****************************************************************************
- * Message log handling
- *****************************************************************************/
-
-/** \defgroup libvlc_log libvlc_log
- * \ingroup libvlc_core
- * LibVLC Message Logging
+/** \defgroup libvlc_log LibVLC logging
+ * libvlc_log_* functions provide access to the LibVLC messages log.
+ * This is used for debugging or by advanced users.
  * @{
  */
 
@@ -349,11 +335,11 @@ VLC_PUBLIC_API libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterat
                                                                libvlc_log_message_t *p_buffer );
 
 /** @} */
+/** @} */
+/** @} */
 
 # ifdef __cplusplus
 }
 # endif
 
 #endif /* <vlc/libvlc.h> */
-
-/** @} */

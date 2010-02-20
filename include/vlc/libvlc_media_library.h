@@ -35,12 +35,8 @@
 extern "C" {
 # endif
 
-/*****************************************************************************
- * Media Library
- *****************************************************************************/
-/** \defgroup libvlc_media_library libvlc_media_library
+/** \defgroup libvlc_media_library LibVLC media library
  * \ingroup libvlc
- * LibVLC Media Library
  * @{
  */
 

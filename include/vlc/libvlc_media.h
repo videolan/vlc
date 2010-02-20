@@ -35,24 +35,21 @@
 extern "C" {
 # endif
 
-/*****************************************************************************
- * media
- *****************************************************************************/
-/** \defgroup libvlc_media libvlc_media
+/** \defgroup libvlc_media LibVLC media
  * \ingroup libvlc
- * LibVLC Media
+ * @ref libvlc_media_t is an abstract representation of a playable media.
+ * It consists of a media location and various optional meta data.
  * @{
  */
 
 typedef struct libvlc_media_t libvlc_media_t;
 
-/* Meta Handling */
-/** defgroup libvlc_meta libvlc_meta
+/** defgroup libvlc_meta LibVLC meta data
  * \ingroup libvlc_media
- * LibVLC Media Meta
  * @{
  */
 
+/** Meta data types */
 typedef enum libvlc_meta_t {
     libvlc_meta_Title,
     libvlc_meta_Artist,
@@ -111,9 +108,8 @@ typedef enum libvlc_es_type_t
     libvlc_es_text      = 2,
 } libvlc_es_type_t;
 
-/** defgroup libvlc_media_stats_t libvlc_media_stats_t
+/** defgroup libvlc_media_stats_t LibVLC media statistics
  * \ingroup libvlc_media
- * LibVLC Media statistics
  * @{
  */
 typedef struct libvlc_media_stats_t
