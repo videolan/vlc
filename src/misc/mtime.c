@@ -134,11 +134,11 @@ char *secstotimestr( char *psz_buffer, int i_seconds )
     d = div( d.quot, 60 );
 
     if( d.quot )
-        snprintf( psz_buffer, MSTRTIME_MAX_SIZE, "%d:%2.2d:%2.2d",
+        snprintf( psz_buffer, MSTRTIME_MAX_SIZE, "%u:%02u:%02u",
                  d.quot, d.rem, i_seconds );
     else
-         snprintf( psz_buffer, MSTRTIME_MAX_SIZE, "%2.2d:%2.2d",
-                   d.quot, i_seconds );
+         snprintf( psz_buffer, MSTRTIME_MAX_SIZE, "%02u:%02u",
+                   d.rem, i_seconds );
     return psz_buffer;
 }
 
