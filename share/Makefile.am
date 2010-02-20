@@ -224,6 +224,9 @@ vlclua_DATA = \
 	lua/playlist/vimeo.luac \
 	lua/playlist/youtube.luac \
 	lua/playlist/youtube_homepage.luac \
+	lua/sd/fmc.luac \
+	lua/sd/freebox.luac \
+	lua/sd/frenchtv.luac \
 	$(NULL)
 if BUILD_HTTPD
 vlclua_DATA += \
