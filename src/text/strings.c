@@ -109,7 +109,6 @@ char *decode_URI( char *psz )
         }
     }
     *out = '\0';
-    EnsureUTF8( psz );
     return psz;
 }
 

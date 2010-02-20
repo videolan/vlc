@@ -41,6 +41,7 @@
 #include <vlc_network.h>
 #include <vlc_url.h>
 #include <vlc_sout.h>
+#include <vlc_charset.h>
 
 #ifndef IPPORT_FTP
 # define IPPORT_FTP 21u
@@ -316,6 +317,8 @@ static int parseURL( vlc_url_t *url, const char *path )
             return VLC_EGENERIC; /* ASCII and directory not supported */
     }
     decode_URI( url->psz_path );
+    /* FIXME: check for UTF-8 support, otherwise only ASCII is allowed */
+    EnsureUTF8( url->psz_path );
     return VLC_SUCCESS;
 }
 

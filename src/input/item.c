@@ -30,6 +30,7 @@
 #include <vlc_url.h>
 #include "vlc_playlist.h"
 #include "vlc_interface.h"
+#include <vlc_charset.h>
 
 #include "item.h"
 #include "info.h"
@@ -388,7 +389,10 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
 
         /* Make the name more readable */
         if( p_i->psz_name )
+        {
             decode_URI( p_i->psz_name );
+            EnsureUTF8( p_i->psz_name );
+        }
     }
     else
     {   /* Strip login and password from title */
