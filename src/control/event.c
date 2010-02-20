@@ -240,6 +240,85 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
  * Public libvlc functions
  */
 
+#define DEF( a ) { libvlc_##a, #a, },
+
+typedef struct
+{
+    int type;
+    const char name[40];
+} event_name_t;
+
+static const event_name_t event_list[] = {
+    DEF(MediaMetaChanged)
+    DEF(MediaSubItemAdded)
+    DEF(MediaDurationChanged)
+    DEF(MediaPreparsedChanged)
+    DEF(MediaFreed)
+    DEF(MediaStateChanged)
+
+    DEF(MediaPlayerMediaChanged)
+    DEF(MediaPlayerNothingSpecial)
+    DEF(MediaPlayerOpening)
+    DEF(MediaPlayerBuffering)
+    DEF(MediaPlayerPlaying)
+    DEF(MediaPlayerPaused)
+    DEF(MediaPlayerStopped)
+    DEF(MediaPlayerForward)
+    DEF(MediaPlayerBackward)
+    DEF(MediaPlayerEndReached)
+    DEF(MediaPlayerEncounteredError)
+    DEF(MediaPlayerTimeChanged)
+    DEF(MediaPlayerPositionChanged)
+    DEF(MediaPlayerSeekableChanged)
+    DEF(MediaPlayerPausableChanged)
+    DEF(MediaPlayerTitleChanged)
+    DEF(MediaPlayerSnapshotTaken)
+    DEF(MediaPlayerLengthChanged)
+
+    DEF(MediaListItemAdded)
+    DEF(MediaListWillAddItem)
+    DEF(MediaListItemDeleted)
+    DEF(MediaListWillDeleteItem)
+
+    DEF(MediaListViewItemAdded)
+    DEF(MediaListViewWillAddItem)
+    DEF(MediaListViewItemDeleted)
+    DEF(MediaListViewWillDeleteItem)
+
+    DEF(MediaListPlayerPlayed)
+    DEF(MediaListPlayerNextItemSet)
+    DEF(MediaListPlayerStopped)
+
+    DEF(MediaDiscovererStarted)
+    DEF(MediaDiscovererEnded)
+
+    DEF(VlmMediaAdded)
+    DEF(VlmMediaRemoved)
+    DEF(VlmMediaChanged)
+    DEF(VlmMediaInstanceStarted)
+    DEF(VlmMediaInstanceStopped)
+    DEF(VlmMediaInstanceStatusInit)
+    DEF(VlmMediaInstanceStatusOpening)
+};
+#undef DEF
+
+static const char unknown_event_name[] = "Unknown Event";
+
+static int evcmp( const void *a, const void *b )
+{
+    return (*(const int *)a) - ((event_name_t *)b)->type;
+}
+
+const char * libvlc_event_type_name( int event_type )
+{
+    const event_name_t *p;
+
+    p = bsearch( &event_type, event_list,
+                 sizeof(event_list)/sizeof(event_list[0]), sizeof(*p),
+                 evcmp );
+    return p ? p->name : unknown_event_name;
+}
+
 /**************************************************************************
  *       event_attach (internal) :
  *
@@ -278,7 +357,8 @@ int event_attach( libvlc_event_manager_t * p_event_manager,
     vlc_mutex_unlock( &p_event_manager->object_lock );
     
     free(listener);
-    fprintf( stderr, "Unknown event type %d", event_type );
+    fprintf( stderr, "This object event manager doesn't know about '%s' events",
+             libvlc_event_type_name(event_type) );
     assert(0);
     return -1;
 }
