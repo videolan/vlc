@@ -798,53 +798,56 @@ int  ArtCallback( httpd_handler_sys_t *p_args,
         psz_art = input_item_GetArtURL( p_item );
     }
 
-    if( psz_art && !strncmp( psz_art, "file://", strlen( "file://" ) ) &&
-        decode_URI( psz_art + 7 ) )
+    if( psz_art )
     {
-        FILE *f;
-        char *psz_ext;
-        char *psz_header;
-        char *p_data = NULL;
-        int i_header_size, i_data;
+        char *psz = make_path( psz_art );
+        free( psz_art );
+        psz_art = psz;
+    }
 
-        if( ( f = vlc_fopen( psz_art + strlen( "file://" ), "r" ) ) == NULL )
-        {
-            msg_Dbg( p_intf, "Couldn't open album art file %s",
-                     psz_art + strlen( "file://" ) );
-            Callback404( &p_args->file, (char**)pp_data, pi_data );
-            free( psz_art );
-            return VLC_SUCCESS;
-        }
+    if( psz_art == NULL )
+    {
+        msg_Dbg( p_intf, "No album art found" );
+        Callback404( &p_args->file, (char**)pp_data, pi_data );
+        return VLC_SUCCESS;
+    }
 
-        FileLoad( f, &p_data, &i_data );
+    FILE *f = vlc_fopen( psz_art, "r" );
+    if( f == NULL )
+    {
+        msg_Dbg( p_intf, "Couldn't open album art file %s", psz_art );
+        Callback404( &p_args->file, (char**)pp_data, pi_data );
+        free( psz_art );
+        return VLC_SUCCESS;
+    }
+    free( psz_art );
 
-        fclose( f );
+    char *p_data = NULL;
+    int i_data;
+    FileLoad( f, &p_data, &i_data );
+    fclose( f );
 
-        psz_ext = strrchr( psz_art, '.' );
-        if( psz_ext ) psz_ext++;
+    char *psz_ext = strrchr( psz_art, '.' );
+    if( psz_ext ) psz_ext++;
 
 #define HEADER  "Content-Type: image/%s\n" \
                 "Content-Length: %d\n" \
                 "\n"
-        i_header_size = asprintf( &psz_header, HEADER, psz_ext, i_data );
+    char *psz_header;
+    int i_header_size = asprintf( &psz_header, HEADER, psz_ext, i_data );
 #undef HEADER
-
-        assert( i_header_size != -1 );
-
-        *pi_data = i_header_size + i_data;
-        *pp_data = (uint8_t*)malloc( *pi_data );
-        memcpy( *pp_data, psz_header, i_header_size );
-        memcpy( *pp_data+i_header_size, p_data, i_data );
-        free( psz_header );
-        free( p_data );
-    }
-    else
+    if( likely(i_header_size != -1) )
     {
-        msg_Dbg( p_intf, "No album art found" );
-        Callback404( &p_args->file, (char**)pp_data, pi_data );
+        *pp_data = malloc( i_header_size + i_data );
+        if( likely(*pp_data != NULL) )
+        {
+            *pi_data = i_header_size + i_data;
+            memcpy( *pp_data, psz_header, i_header_size );
+            memcpy( *pp_data+i_header_size, p_data, i_data );
+        }
+        free( psz_header );
     }
-
-    free( psz_art );
+    free( p_data );
 
     return VLC_SUCCESS;
 }
