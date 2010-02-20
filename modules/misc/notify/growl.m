@@ -210,10 +210,15 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     }
 
     char *psz_arturl = input_item_GetArtURL( p_item );
+    if( psz_arturl )
+    {
+        char *psz = make_path( psz_arturl );
+        free( psz_arturl );
+        psz_arturl = psz;
+    }
     CFDataRef art = NULL;
-    if( psz_arturl && !strncmp( psz_arturl, "file://", 7 ) &&
-                    decode_URI( psz_arturl + 7 ) )
-        art = (CFDataRef) readFile( psz_arturl + 7 );
+    if( psz_arturl )
+        art = (CFDataRef) readFile( psz_arturl );
 
     free( psz_title );
     free( psz_artist );
