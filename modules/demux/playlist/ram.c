@@ -50,6 +50,7 @@ http://service.real.com/help/library/guides/realone/IntroGuide/HTML/htmfiles/ram
 #include <vlc_common.h>
 #include <vlc_demux.h>
 #include <vlc_url.h>
+#include <vlc_charset.h>
 
 #include "playlist.h"
 
@@ -282,7 +283,10 @@ static int Demux( demux_t *p_demux )
                            &psz_cdnum, &psz_comments ); /* clipinfo has various sub parameters, which is parsed by this function */
                     }
                     else if( !strcmp( psz_param, "author" ) )
+                    {
                         psz_author = decode_URI_duplicate(psz_value);
+                        EnsureUTF8( psz_author );
+                    }
                     else if( !strcmp( psz_param, "start" ) )
                     {
                         i_start = ParseTime( psz_value, strlen( psz_value ) );
@@ -304,9 +308,15 @@ static int Demux( demux_t *p_demux )
                         }
                     }
                     else if( !strcmp( psz_param, "title" ) )
+                    {
                         psz_title = decode_URI_duplicate(psz_value);
+                        EnsureUTF8( psz_title );
+                    }
                     else if( !strcmp( psz_param, "copyright" ) )
+                    {
                         psz_copyright = decode_URI_duplicate(psz_value);
+                        EnsureUTF8( psz_copyright );
+                    }
                     else
                     {   /* TODO: insert option anyway? Currently ignores*/
                         /* INSERT_ELEM( ppsz_options, i_options, i_options, psz_option ); */
