@@ -339,6 +339,8 @@ int OpenDemux( vlc_object_t *p_this )
             break;
         }
         fmt.psz_language = strdup( s->language );
+        if( s->disposition & AV_DISPOSITION_DEFAULT )
+            fmt.i_priority = 1000;
 
 #ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
         if( cc->codec_type != CODEC_TYPE_ATTACHMENT )
@@ -405,6 +407,8 @@ int OpenDemux( vlc_object_t *p_this )
             }
         }
         es = es_out_Add( p_demux->out, &fmt );
+        if( s->disposition & AV_DISPOSITION_DEFAULT )
+            es_out_Control( p_demux->out, ES_OUT_SET_ES_DEFAULT, es );
         es_format_Clean( &fmt );
 
         msg_Dbg( p_demux, "adding es: %s codec = %4.4s",
