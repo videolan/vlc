@@ -438,7 +438,7 @@ void VlcPlugin::set_player_window()
 {
 #ifdef XP_UNIX
     libvlc_media_player_set_xwindow(libvlc_media_player,
-                                    (libvlc_drawable_t)getVideoWindow());
+                                    (uint32_t)getVideoWindow());
 #endif
 #ifdef XP_MACOSX
     // XXX FIXME insert appropriate call here

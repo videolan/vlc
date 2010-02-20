@@ -30,13 +30,6 @@
  * This file defines libvlc depreceated API
  */
 
-/**
- * This is the legacy representation of a platform-specific drawable. Because
- * it cannot accomodate a pointer on most 64-bits platforms, it should not be
- * used anymore.
- */
-typedef int libvlc_drawable_t;
-
 # ifdef __cplusplus
 extern "C" {
 # endif
