@@ -6,9 +6,12 @@ LIBTOOL=@LIBTOOL@ --tag=CC
 SOURCES_macosx_dialog_provider = \
     VLCLoginPanel.m \
     VLCProgressPanel.m \
+    VLCUIWidgets.m \
 	dialogProvider.m \
 	$(NULL)
 
 noinst_HEADERS = \
 	VLCLoginPanel.h \
-	VLCProgressPanel.h
+	VLCProgressPanel.h \
+	VLCUIWidgets.h \
+	dialogProvider.h
