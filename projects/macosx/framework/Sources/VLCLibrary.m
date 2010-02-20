@@ -55,7 +55,6 @@ static VLCLibrary * sharedLibrary = nil;
             NSMutableArray *defaultParams = [NSMutableArray array];
             [defaultParams addObject:@"--no-video-title-show"];                     // Don't show the title on overlay when starting to play
             [defaultParams addObject:@"--no-sout-keep"];
-            [defaultParams addObject:@"--ignore-config"];                           // Don't read and write VLC config files
             [defaultParams addObject:@"--vout=macosx"];                             // Select Mac OS X video output
             [defaultParams addObject:@"--text-renderer=quartztext"];                // our CoreText-based renderer
             [defaultParams addObject:@"--verbose=-1"];                              // Don't polute the stdio log
