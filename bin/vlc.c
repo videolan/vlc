@@ -47,6 +47,7 @@ extern char *FromLocale (const char *);
 #include <time.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <string.h>
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
@@ -54,7 +55,7 @@ extern char *FromLocale (const char *);
 int main( int i_argc, const char *ppsz_argv[] )
 {
 #ifdef __APPLE__
-    /* The so-called POSIX-compliant MacOS X is not. 
+    /* The so-called POSIX-compliant MacOS X is not.
      * SIGPIPE fires even when it is blocked in all threads! */
     signal (SIGPIPE, SIG_IGN);
 #endif
@@ -74,7 +75,8 @@ int main( int i_argc, const char *ppsz_argv[] )
 
 #ifndef __APPLE__
     /* This clutters OSX GUI error logs */
-    fprintf( stderr, "VLC media player %s\n", libvlc_get_version() );
+    if (i_argc > 1 && strcmp(ppsz_argv[1], "--quiet")) /* dirty hack to enable really quiet runing of vlc */
+        fprintf( stderr, "VLC media player %s\n", libvlc_get_version() );
 #endif
 
 #ifdef HAVE_PUTENV
