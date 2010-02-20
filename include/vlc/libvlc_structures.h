@@ -35,63 +35,20 @@
 extern "C" {
 # endif
 
-/** This structure is opaque. It represents a libvlc instance */
-typedef struct libvlc_instance_t libvlc_instance_t;
-
-/*****************************************************************************
- * Time
- *****************************************************************************/
-/** \defgroup libvlc_time libvlc_time
+/**
  * \ingroup libvlc_core
- * LibVLC Time support in libvlc
  * @{
  */
+
+/** This structure is opaque. It represents a libvlc instance */
+typedef struct libvlc_instance_t libvlc_instance_t;
 
 typedef int64_t libvlc_time_t;
 
 /**@} */
 
-/*****************************************************************************
- * Media Descriptor
- *****************************************************************************/
-/** \defgroup libvlc_media libvlc_media
- * \ingroup libvlc
- * LibVLC Media Descriptor handling
- * @{
- */
-
-
-/**@} */
-
-
-/*****************************************************************************
- * Playlist
- *****************************************************************************/
-/** \defgroup libvlc_playlist libvlc_playlist (Deprecated)
- * \ingroup libvlc
- * LibVLC Playlist handling (Deprecated)
- * @deprecated Use media_list
- * @{
- */
-
-typedef struct libvlc_playlist_item_t
-{
-    int i_id;
-    char * psz_uri;
-    char * psz_name;
-
-} libvlc_playlist_item_t;
-
-/**@} */
-
-
-/*****************************************************************************
- * Message log handling
- *****************************************************************************/
-
-/** \defgroup libvlc_log libvlc_log
- * \ingroup libvlc_core
- * LibVLC Message Logging
+/**
+ * \ingroup libvlc_log
  * @{
  */
 
