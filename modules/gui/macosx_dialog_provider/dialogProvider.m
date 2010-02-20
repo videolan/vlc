@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
+ *          Pierre d'Herbemont <pdherbemont # videolan dot>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,12 +35,9 @@
 #import <vlc_common.h>
 #import <vlc_plugin.h>
 #import <vlc_dialog.h>
-#import <vlc_interface.h>
 #import <vlc_extensions.h>
 
-#import <Cocoa/Cocoa.h>
-#import "VLCLoginPanel.h"
-#import "VLCProgressPanel.h"
+#import "dialogProvider.h"
 
 /*****************************************************************************
  * Prototypes
@@ -58,28 +56,6 @@ static int DisplayExtension(vlc_object_t *,const char *,vlc_value_t,vlc_value_t,
 static void updateProgressPanel (void *, const char *, float);
 static bool checkProgressPanel (void *);
 static void destroyProgressPanel (void *);
-
-@interface VLCDialogDisplayer : NSObject
-{
-    VLCProgressPanel *_currentProgressBarPanel;
-}
-
-+ (NSDictionary *)dictionaryForDialog:(const char *)title :(const char *)message :(const char *)yes :(const char *)no :(const char *)cancel;
-
-- (void)displayError:(NSDictionary *)dialog;
-- (void)displayCritical:(NSDictionary *)dialog;
-- (NSNumber *)displayQuestion:(NSDictionary *)dialog;
-- (NSDictionary *)displayLogin:(NSDictionary *)dialog;
-
-- (void)displayProgressBar:(NSDictionary *)dict;
-- (void)updateProgressPanel:(NSDictionary *)dict;
-- (void)destroyProgressPanel;
-- (NSNumber *)checkProgressPanel;
-
-- (void)updateExtensionDialog:(NSValue *)extensionDialog;
-
-- (id)resultFromSelectorOnMainThread:(SEL)sel withObject:(id)object;
-@end
 
 @interface VLCDialogButton : NSButton
 {
@@ -545,6 +521,7 @@ int OpenIntf(vlc_object_t *p_this)
     memset(p_intf->p_sys,0,sizeof(*p_intf->p_sys));
 
     p_intf->p_sys->displayer = [[VLCDialogDisplayer alloc] init];
+    [p_intf->p_sys->displayer setIntf:p_intf];
 
     bool hide = var_CreateGetBool(p_intf, prefix "hide-no-user-action-dialogs");
     p_intf->p_sys->is_hidding_noaction_dialogs = hide;
@@ -567,6 +544,13 @@ int OpenIntf(vlc_object_t *p_this)
     var_Create(p_intf,"dialog-extension",VLC_VAR_ADDRESS);
     var_AddCallback(p_intf,"dialog-extension",DisplayExtension,p_intf);
     dialog_Register(p_intf);
+
+    /* subscribe to our last.fm announcements */
+    [[NSDistributedNotificationCenter defaultCenter] addObserver:p_intf->p_sys->displayer
+                                                        selector:@selector(globalNotificationReceived:)
+                                                            name:NULL
+                                                          object:@"VLCLastFMSupport"
+                                              suspensionBehavior:NSNotificationSuspensionBehaviorDeliverImmediately];
 
     msg_Dbg(p_intf,"Mac OS X dialog provider initialised");
 
@@ -724,8 +708,19 @@ bool checkProgressPanel (void *priv)
 @implementation VLCDialogDisplayer
 - (void)dealloc
 {
+    [[NSDistributedNotificationCenter defaultCenter] removeObserver:self];
     assert(!_currentProgressBarPanel); // This has to be closed on main thread.
     [super dealloc];
+}
+
+- (void)setIntf: (intf_thread_t *)p_mainintf
+{
+    p_intf = p_mainintf;
+}
+
+- (intf_thread_t *)intf
+{
+    return p_intf;
 }
 
 + (NSDictionary *)dictionaryForDialog:(const char *)title :(const char *)message :(const char *)yes :(const char *)no :(const char *)cancel
@@ -860,6 +855,31 @@ bool checkProgressPanel (void *priv)
     VLCAssertIsMainThread();
 
     return [NSNumber numberWithBool:[_currentProgressBarPanel isCancelled]];
+}
+
+#pragma mark -
+#pragma mark Last.FM support
+- (void)globalNotificationReceived: (NSNotification *)theNotification
+{
+    NSLog(@"globalNotificationReceived");
+    NSDictionary *userData = [theNotification userInfo];
+    BOOL lastFMEnabled = [[userData objectForKey:@"enabled"] intValue];
+    NSString *lastFMUsername = [userData objectForKey:@"username"];
+    NSString *lastFMPassword = [userData objectForKey:@"password"];
+
+    if (module_exists("audioscrobbler")) {
+        if (lastFMEnabled)
+            config_AddIntf(p_intf, "audioscrobbler");
+        else
+            config_RemoveIntf(p_intf, "audioscrobbler");
+
+        config_PutPsz(p_intf, "lastfm-username", [lastFMUsername UTF8String]);
+        config_PutPsz(p_intf, "lastfm-password", [lastFMPassword UTF8String]);
+        config_SaveConfigFile( p_intf, "main" );
+        config_SaveConfigFile(p_intf, "audioscrobbler");
+    }
+    else
+        msg_Err(p_intf,"Last.FM module not found, no action");
 }
 
 #pragma mark -
