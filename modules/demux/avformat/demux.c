@@ -342,10 +342,11 @@ int OpenDemux( vlc_object_t *p_this )
         if( cc->codec_type != CODEC_TYPE_ATTACHMENT )
 #endif
         {
+            const bool    b_ogg = !strcmp( p_sys->fmt->name, "ogg" );
             const uint8_t *p_extra = cc->extradata;
             unsigned      i_extra  = cc->extradata_size;
 
-            if( cc->codec_id == CODEC_ID_THEORA )
+            if( cc->codec_id == CODEC_ID_THEORA && b_ogg )
             {
                 unsigned pi_size[3];
                 void     *pp_data[3];
@@ -369,7 +370,7 @@ int OpenDemux( vlc_object_t *p_this )
                     fmt.p_extra = NULL;
                 }
             }
-            else if( cc->codec_id == CODEC_ID_SPEEX )
+            else if( cc->codec_id == CODEC_ID_SPEEX && b_ogg )
             {
                 uint8_t p_dummy_comment[] = {
                     0, 0, 0, 0,
