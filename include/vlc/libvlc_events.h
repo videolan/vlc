@@ -45,13 +45,14 @@ extern "C" {
 enum libvlc_event_e {
     /* Append new event types at the end. Do not remove, insert or
      * re-order any entry. The cpp will prepend libvlc_ to the symbols. */
-    libvlc_MediaMetaChanged,
+    libvlc_MediaMetaChanged=0,
     libvlc_MediaSubItemAdded,
     libvlc_MediaDurationChanged,
     libvlc_MediaPreparsedChanged,
     libvlc_MediaFreed,
     libvlc_MediaStateChanged,
 
+    libvlc_MediaPlayerMediaChanged=0x100,
     libvlc_MediaPlayerNothingSpecial,
     libvlc_MediaPlayerOpening,
     libvlc_MediaPlayerBuffering,
@@ -66,29 +67,28 @@ enum libvlc_event_e {
     libvlc_MediaPlayerPositionChanged,
     libvlc_MediaPlayerSeekableChanged,
     libvlc_MediaPlayerPausableChanged,
-
-    libvlc_MediaListItemAdded,
-    libvlc_MediaListWillAddItem,
-    libvlc_MediaListItemDeleted,
-    libvlc_MediaListWillDeleteItem,
-
-    libvlc_MediaListViewItemAdded,
-    libvlc_MediaListViewWillAddItem,
-    libvlc_MediaListViewItemDeleted,
-    libvlc_MediaListViewWillDeleteItem,
-
-    libvlc_MediaListPlayerPlayed,
-    libvlc_MediaListPlayerNextItemSet,
-    libvlc_MediaListPlayerStopped,
-
-    libvlc_MediaDiscovererStarted,
-    libvlc_MediaDiscovererEnded,
-
     libvlc_MediaPlayerTitleChanged,
     libvlc_MediaPlayerSnapshotTaken,
     libvlc_MediaPlayerLengthChanged,
 
-    libvlc_VlmMediaAdded,
+    libvlc_MediaListItemAdded=0x200,
+    libvlc_MediaListWillAddItem,
+    libvlc_MediaListItemDeleted,
+    libvlc_MediaListWillDeleteItem,
+
+    libvlc_MediaListViewItemAdded=0x300,
+    libvlc_MediaListViewWillAddItem,
+    libvlc_MediaListViewItemDeleted,
+    libvlc_MediaListViewWillDeleteItem,
+
+    libvlc_MediaListPlayerPlayed=0x400,
+    libvlc_MediaListPlayerNextItemSet,
+    libvlc_MediaListPlayerStopped,
+
+    libvlc_MediaDiscovererStarted=0x500,
+    libvlc_MediaDiscovererEnded,
+
+    libvlc_VlmMediaAdded=0x600,
     libvlc_VlmMediaRemoved,
     libvlc_VlmMediaChanged,
     libvlc_VlmMediaInstanceStarted,
@@ -99,10 +99,6 @@ enum libvlc_event_e {
     libvlc_VlmMediaInstanceStatusPause,
     libvlc_VlmMediaInstanceStatusEnd,
     libvlc_VlmMediaInstanceStatusError,
-
-    libvlc_MediaPlayerMediaChanged,
-    /* New event types HERE */
-    libvlc_num_event_types
 };
 
 /**
