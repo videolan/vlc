@@ -198,6 +198,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     luaopen_volume( L );
     luaopen_gettext( L );
     luaopen_xml( L );
+    luaopen_md5( L );
 
     /* clean up */
     lua_pop( L, 1 );

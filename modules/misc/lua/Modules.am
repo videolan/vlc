@@ -16,6 +16,7 @@ SOURCES_lua = \
 	libs/httpd.c \
 	libs/input.c \
 	libs/input.h \
+	libs/md5.c \
 	libs/messages.c \
 	libs/misc.c \
 	libs/misc.h \

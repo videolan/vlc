@@ -736,6 +736,7 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
             luaopen_config( L );
             luaopen_dialog( L, p_ext );
             luaopen_input( L );
+            luaopen_md5( L );
             luaopen_msg( L );
             luaopen_misc( L );
             luaopen_net( L );

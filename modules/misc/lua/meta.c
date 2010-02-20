@@ -72,6 +72,7 @@ static lua_State * init( vlc_object_t *p_this, input_item_t * p_item, const char
     luaopen_object( L );
     luaopen_misc( L );
     luaopen_xml( L );
+    luaopen_md5( L );
     luaopen_input_item( L, p_item );
 
     lua_pushlightuserdata( L, p_this );

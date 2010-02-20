@@ -110,7 +110,9 @@ int Open_LuaSD( vlc_object_t *p_this )
     luaopen_stream( L );
     luaopen_gettext( L );
     luaopen_xml( L );
+    luaopen_md5( L );
     lua_pop( L, 1 );
+
     if( vlclua_add_modules_path( p_sd, L, p_sys->psz_filename ) )
     {
         msg_Warn( p_sd, "Error while setting the module search path for %s",
