@@ -215,7 +215,9 @@ int OpenDemux( vlc_object_t *p_this )
 
     for( i = 0; i < p_sys->ic->nb_streams; i++ )
     {
-        AVCodecContext *cc = p_sys->ic->streams[i]->codec;
+        AVStream *s = p_sys->ic->streams[i];
+        AVCodecContext *cc = s->codec;
+
         es_out_id_t  *es;
         es_format_t  fmt;
         vlc_fourcc_t fcc;
@@ -321,7 +323,7 @@ int OpenDemux( vlc_object_t *p_this )
                 psz_type = "attachment";
                 if( cc->codec_id == CODEC_ID_TTF )
                 {
-                    p_attachment = vlc_input_attachment_New( p_sys->ic->streams[i]->filename, "application/x-truetype-font", NULL,
+                    p_attachment = vlc_input_attachment_New( s->filename, "application/x-truetype-font", NULL,
                                              cc->extradata, (int)cc->extradata_size );
                     TAB_APPEND( p_sys->i_attachments, p_sys->attachments, p_attachment );
                 }
@@ -336,7 +338,7 @@ int OpenDemux( vlc_object_t *p_this )
             msg_Warn( p_demux, "unsupported track type in ffmpeg demux" );
             break;
         }
-        fmt.psz_language = strdup( p_sys->ic->streams[i]->language );
+        fmt.psz_language = strdup( s->language );
 
 #ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
         if( cc->codec_type != CODEC_TYPE_ATTACHMENT )
