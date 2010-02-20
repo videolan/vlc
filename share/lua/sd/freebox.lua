@@ -40,7 +40,7 @@ function main()
             _, _, option = string.find( line, ":(.+)" )
             table.insert( options, option )
         else
-            vlc.sd.add_item( {url=line,duration=duration,artist=artist,title=name,options=options} )
+            vlc.sd.add_item( {path=line,duration=duration,artist=artist,title=name,options=options} )
             duration = nil
             artist = nil
             name = nil

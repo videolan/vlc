@@ -156,19 +156,19 @@ static int vlclua_sd_add_item( lua_State *L )
     services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
     if( lua_istable( L, -1 ) )
     {
-        lua_getfield( L, -1, "url" );
+        lua_getfield( L, -1, "path" );
         if( lua_isstring( L, -1 ) )
         {
             char **ppsz_options = NULL;
             int i_options = 0;
-            char *psz_url = strdup( lua_tostring( L, -1 ) );
+            char *psz_path = strdup( lua_tostring( L, -1 ) );
             lua_pop( L, 1 );
             vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
-            input_item_t *p_input = input_item_NewExt( p_sd, psz_url, psz_url,
+            input_item_t *p_input = input_item_NewExt( p_sd, psz_path, psz_path,
                                                        i_options,
                                                        (const char **)ppsz_options,
                                                        VLC_INPUT_OPTION_TRUSTED, -1 );
-            free( psz_url );
+            free( psz_path );
             vlclua_read_meta_data( p_sd, L, p_input );
             /* This one is to be tested... */
             vlclua_read_custom_meta_data( p_sd, L, p_input );
@@ -191,7 +191,7 @@ static int vlclua_sd_add_item( lua_State *L )
             lua_setmetatable( L, -2 );
         }
         else
-            msg_Err( p_sd, "vlc.sd.add_item: the \"url\" parameter can't be empty" );
+            msg_Err( p_sd, "vlc.sd.add_item: the \"path\" parameter can't be empty" );
     }
     else
         msg_Err( p_sd, "Error parsing add_item arguments" );
@@ -220,20 +220,20 @@ static int vlclua_node_add_subitem( lua_State *L )
     {
         if( lua_istable( L, -1 ) )
         {
-            lua_getfield( L, -1, "url" );
+            lua_getfield( L, -1, "path" );
             if( lua_isstring( L, -1 ) )
             {
                 char **ppsz_options = NULL;
                 int i_options = 0;
-                char *url = strdup( lua_tostring( L, -1 ) );
+                char *psz_path = strdup( lua_tostring( L, -1 ) );
                 lua_pop( L, 1 );
                 vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
                 input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
-                input_item_t *p_input = input_item_NewExt( p_sd, url, url,
-                                                           i_options,
+                input_item_t *p_input = input_item_NewExt( p_sd, psz_path,
+                                                           psz_path, i_options,
                                                            (const char **)ppsz_options,
                                                            VLC_INPUT_OPTION_TRUSTED, -1 );
-                free( url );
+                free( psz_path );
                 vlclua_read_meta_data( p_sd, L, p_input );
                 /* This one is to be tested... */
                 vlclua_read_custom_meta_data( p_sd, L, p_input );
@@ -256,7 +256,7 @@ static int vlclua_node_add_subitem( lua_State *L )
                 lua_setmetatable( L, -2 );
             }
             else
-                msg_Err( p_sd, "node:add_subitem: the \"url\" parameter can't be empty" );
+                msg_Err( p_sd, "node:add_subitem: the \"path\" parameter can't be empty" );
         }
         else
             msg_Err( p_sd, "Error parsing add_subitem arguments" );

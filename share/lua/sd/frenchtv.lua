@@ -26,7 +26,7 @@ end
 
 function main()
     node = vlc.sd.add_node( {title="Canal +"} )
-    node:add_subitem( {title="Le SAV des émissions ",url="http://www.canalplus.fr/index.php?pid=1782",options={"http-forward-cookies"}} )
-    node:add_subitem( {title="Les Guignols",url="http://www.canalplus.fr/index.php?pid=1784",options={"http-forward-cookies"}} )
-    node:add_subitem( {title="La Météo de Pauline Lefevre",url="http://www.canalplus.fr/index.php?pid=2834",options={"http-forward-cookies"}} )
+    node:add_subitem( {title="Le SAV des émissions ",path="http://www.canalplus.fr/index.php?pid=1782",options={"http-forward-cookies"}} )
+    node:add_subitem( {title="Les Guignols",path="http://www.canalplus.fr/index.php?pid=1784",options={"http-forward-cookies"}} )
+    node:add_subitem( {title="La Météo de Pauline Lefevre",path="http://www.canalplus.fr/index.php?pid=2834",options={"http-forward-cookies"}} )
 end

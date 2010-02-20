@@ -46,10 +46,10 @@ function main()
                 else
                     votes = "Votes: N/A"
                 end
-                songs_node:add_subitem( {url=song_node.children_map["url"][1].children[1],title=title,artist=artist,description=rank .. ", " .. votes} )
+                songs_node:add_subitem( {path=song_node.children_map["url"][1].children[1],title=title,artist=artist,description=rank .. ", " .. votes} )
             end
         end
-        node:add_subitem( {title=show_node.children_map["date"][1].children[1] .. " MP3 Podcast",url=show_node.children_map["podcastmp3"][1].children[1]} )
-        node:add_subitem( {title=show_node.children_map["date"][1].children[1] .. " OGG Podcast",url=show_node.children_map["podcastogg"][1].children[1]} )
+        node:add_subitem( {title=show_node.children_map["date"][1].children[1] .. " MP3 Podcast",path=show_node.children_map["podcastmp3"][1].children[1]} )
+        node:add_subitem( {title=show_node.children_map["date"][1].children[1] .. " OGG Podcast",path=show_node.children_map["podcastogg"][1].children[1]} )
     end
 end
