@@ -274,6 +274,7 @@ EXTRA_DIST += \
 	lua/intf/dumpmeta.lua \
 	lua/modules/sandbox.lua \
 	lua/modules/simplexml.lua \
+	lua/sd/README.txt \
 	lua/sd/fmc.lua \
 	lua/sd/freebox.lua \
 	lua/sd/frenchtv.lua

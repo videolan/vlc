@@ -17,6 +17,7 @@ All the Lua standard libraries are available.
  * Art fetcher (see meta/README.txt)
  * Interface (see intf/README.txt)
  * Extensions (see extensions/README.txt)
+ * Services Discovery (see sd/README.txt)
 
 Lua scripts are tried in alphabetical order in the user's VLC config
 directory lua/{playlist,meta,intf}/ subdirectory on Windows and Mac OS X or
@@ -313,6 +314,17 @@ sd.get_services_names(): Get a table of all available service discovery
 sd.add( name ): Add service discovery.
 sd.remove( name ): Remove service discovery.
 sd.is_loaded( name ): Check if service discovery is loaded.
+sd.add_item( ... ): Add an item to the service discovery.
+  The item object has the same members as the one in playlist.add().
+  Returns the input item.
+sd.add_node( ... ): Add a node to the service discovery.
+  The node object has the following members:
+      .title: the node's name
+      .arturl: the node's ArtURL (OPTIONAL)
+
+n = vlc.sd.add_node( {title="Node"} )
+n:add_subitem( ... ): Same as sd.add_item(), but as a subitem of n.
+n:add_node( ... ): Same as sd.add_node(), but as a subnode of n.
 
 Stream
 ------
