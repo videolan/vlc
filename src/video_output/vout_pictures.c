@@ -317,18 +317,6 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
-static int vout_LockPicture( vout_thread_t *p_vout, picture_t *p_picture )
-{
-    if( p_picture->pf_lock )
-        return p_picture->pf_lock( p_vout, p_picture );
-    return VLC_SUCCESS;
-}
-static void vout_UnlockPicture( vout_thread_t *p_vout, picture_t *p_picture )
-{
-    if( p_picture->pf_unlock )
-        p_picture->pf_unlock( p_vout, p_picture );
-}
-
 /**
  * Render a picture
  *
@@ -351,16 +339,11 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
             /* We have subtitles. First copy the picture to
              * the spare direct buffer, then render the
              * subtitles. */
-            if( vout_LockPicture( p_vout, PP_OUTPUTPICTURE[0] ) )
-                return NULL;
-
             picture_Copy( PP_OUTPUTPICTURE[0], p_pic );
 
             spu_RenderSubpictures( p_vout->p_spu,
                                    PP_OUTPUTPICTURE[0], &p_vout->fmt_out,
                                    p_subpic, &p_vout->fmt_in, render_date );
-
-            vout_UnlockPicture( p_vout, PP_OUTPUTPICTURE[0] );
 
             return PP_OUTPUTPICTURE[0];
         }
@@ -378,16 +361,10 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         /* Picture is not in a direct buffer, but is exactly the
          * same size as the direct buffers. A memcpy() is enough,
          * then render the subtitles. */
-
-        if( vout_LockPicture( p_vout, PP_OUTPUTPICTURE[0] ) )
-            return NULL;
-
         picture_Copy( PP_OUTPUTPICTURE[0], p_pic );
         spu_RenderSubpictures( p_vout->p_spu,
                                PP_OUTPUTPICTURE[0], &p_vout->fmt_out,
                                p_subpic, &p_vout->fmt_in, render_date );
-
-        vout_UnlockPicture( p_vout, PP_OUTPUTPICTURE[0] );
 
         return PP_OUTPUTPICTURE[0];
     }
@@ -424,16 +401,10 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                                p_tmp_pic, &p_vout->fmt_out,
                                p_subpic, &p_vout->fmt_in, render_date );
 
-        if( vout_LockPicture( p_vout, &p_vout->p_picture[0] ) )
-            return NULL;
-
         picture_Copy( &p_vout->p_picture[0], p_tmp_pic );
     }
     else
     {
-        if( vout_LockPicture( p_vout, &p_vout->p_picture[0] ) )
-            return NULL;
-
         /* Convert image to the first direct buffer */
         p_vout->p->p_chroma->p_owner = (filter_owner_sys_t *)&p_vout->p_picture[0];
         p_vout->p->p_chroma->pf_video_filter( p_vout->p->p_chroma, p_pic );
@@ -443,8 +414,6 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                                &p_vout->p_picture[0], &p_vout->fmt_out,
                                p_subpic, &p_vout->fmt_in, render_date );
     }
-
-    vout_UnlockPicture( p_vout, &p_vout->p_picture[0] );
 
     return &p_vout->p_picture[0];
 }
@@ -711,8 +680,6 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma,
 
     p_picture->pf_release = NULL;
     p_picture->p_release_sys = NULL;
-    p_picture->pf_lock = NULL;
-    p_picture->pf_unlock = NULL;
     p_picture->i_refcount = 0;
 
     p_picture->i_qtype = QTYPE_NONE;

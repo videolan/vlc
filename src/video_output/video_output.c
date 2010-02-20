@@ -330,8 +330,6 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
      * will be initialized later in InitThread */
     for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES + 1; i_index++)
     {
-        p_vout->p_picture[i_index].pf_lock = NULL;
-        p_vout->p_picture[i_index].pf_unlock = NULL;
         p_vout->p_picture[i_index].i_status = FREE_PICTURE;
         p_vout->p_picture[i_index].i_type   = EMPTY_PICTURE;
         p_vout->p_picture[i_index].b_slow   = 0;

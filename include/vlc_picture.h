@@ -113,10 +113,6 @@ struct picture_t
     int             i_qtype;                       /**< quantification style */
     /**@}*/
 
-    /* Some vouts require the picture to be locked before it can be modified */
-    int (* pf_lock) ( vout_thread_t *, picture_t * );
-    int (* pf_unlock) ( vout_thread_t *, picture_t * );
-
     /** Private data - the video output plugin might want to put stuff here to
      * keep track of the picture */
     picture_sys_t * p_sys;
