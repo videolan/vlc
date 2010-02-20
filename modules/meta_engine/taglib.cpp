@@ -539,23 +539,16 @@ static int WriteMeta( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    char *export_file = decode_URI_duplicate(p_export->psz_file);
-    if( export_file == NULL )
-        return VLC_EGENERIC;
-
 #if defined(WIN32) || defined (UNDER_CE)
     wchar_t wpath[MAX_PATH + 1];
-    if( !MultiByteToWideChar( CP_UTF8, 0, export_file , -1, wpath, MAX_PATH) )
+    if( !MultiByteToWideChar( CP_UTF8, 0, p_export->psz_file, -1, wpath, MAX_PATH) )
         return VLC_EGENERIC;
     wpath[MAX_PATH] = L'\0';
     f = FileRef( wpath );
 #else
-    const char* local_name = ToLocale( export_file );
+    const char* local_name = ToLocale( p_export->psz_file );
     if( !local_name )
-    {
-        free( export_file );
         return VLC_EGENERIC;
-    }
     f = FileRef( local_name );
     LocaleFree( local_name );
 #endif
@@ -563,13 +556,11 @@ static int WriteMeta( vlc_object_t *p_this )
     if( f.isNull() || !f.tag() || f.file()->readOnly() )
     {
         msg_Err( p_this, "File %s can't be opened for tag writing",
-            export_file );
-        free( export_file );
+                 p_export->psz_file );
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_this, "Writing metadata for %s", export_file );
-    free( export_file );
+    msg_Dbg( p_this, "Writing metadata for %s", p_export->psz_file );
 
     Tag *p_tag = f.tag();
 
