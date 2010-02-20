@@ -155,11 +155,11 @@ static int vlclua_cachedir( lua_State *L )
 static int vlclua_datadir_list( lua_State *L )
 {
     const char *psz_dirname = luaL_checkstring( L, 1 );
-    char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
+    char **ppsz_dir_list = NULL;
     char **ppsz_dir = ppsz_dir_list;
     int i = 1;
 
-    if( vlclua_dir_list( vlclua_get_this( L ), psz_dirname, ppsz_dir_list )
+    if( vlclua_dir_list( vlclua_get_this( L ), psz_dirname, &ppsz_dir_list )
         != VLC_SUCCESS )
         return 0;
     lua_newtable( L );
