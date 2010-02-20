@@ -107,7 +107,7 @@ public:
     }
 };
 
-typedef bitmap<libvlc_num_event_types> eventtypes_bitmap_t;
+typedef bitmap<libvlc_VlmMediaInstanceStatusError+1> eventtypes_bitmap_t;
 
 
 class EventObj: private eventtypes_bitmap_t
