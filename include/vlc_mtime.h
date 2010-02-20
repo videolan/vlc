@@ -58,7 +58,7 @@ VLC_EXPORT( char *,  mstrtime, ( char *psz_buffer, mtime_t date ) );
 VLC_EXPORT( mtime_t, mdate,    ( void ) );
 VLC_EXPORT( void,    mwait,    ( mtime_t date ) );
 VLC_EXPORT( void,    msleep,   ( mtime_t delay ) );
-VLC_EXPORT( char *,  secstotimestr, ( char *psz_buffer, int secs ) );
+VLC_EXPORT( char *,  secstotimestr, ( char *psz_buffer, int32_t secs ) );
 
 # define VLC_HARD_MIN_SLEEP 10000   /* 10 milliseconds = 1 tick at 100Hz */
 

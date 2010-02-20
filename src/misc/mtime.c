@@ -125,7 +125,7 @@ char *mstrtime( char *psz_buffer, mtime_t date )
  * \param psz_buffer should be a buffer at least MSTRTIME_MAX_SIZE characters
  * \return psz_buffer is returned so this can be used as printf parameter.
  */
-char *secstotimestr( char *psz_buffer, int i_seconds )
+char *secstotimestr( char *psz_buffer, int32_t i_seconds )
 {
     div_t d;
 
