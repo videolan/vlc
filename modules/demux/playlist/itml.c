@@ -347,7 +347,6 @@ static bool parse_track_dict( demux_t *p_demux, input_item_node_t *p_input_node,
     VLC_UNUSED(psz_element); VLC_UNUSED(p_handlers);
     input_item_t *p_new_input = NULL;
     int i_ret;
-    char *psz_uri = NULL;
     p_track = new_track();
 
     xml_elem_hnd_t track_elements[] =
@@ -374,22 +373,15 @@ static bool parse_track_dict( demux_t *p_demux, input_item_node_t *p_input_node,
         return false;
     }
 
-    psz_uri = decode_URI_duplicate( p_track->location );
+    msg_Info( p_demux, "Adding '%s'", p_track->location );
+    p_new_input = input_item_New( p_demux, p_track->location, NULL );
+    input_item_node_AppendItem( p_input_node, p_new_input );
 
-    if( psz_uri )
-    {
-        msg_Info( p_demux, "Adding '%s'", psz_uri );
+    /* add meta info */
+    add_meta( p_new_input, p_track );
+    vlc_gc_decref( p_new_input );
 
-        p_new_input = input_item_New( p_demux, psz_uri, NULL );
-        input_item_node_AppendItem( p_input_node, p_new_input );
-
-        /* add meta info */
-        add_meta( p_new_input, p_track );
-        vlc_gc_decref( p_new_input );
-
-        p_demux->p_sys->i_ntracks++;
-        free( psz_uri );
-    }
+    p_demux->p_sys->i_ntracks++;
 
     free_track( p_track );
     return i_ret;
