@@ -209,9 +209,7 @@ int OpenDemux( vlc_object_t *p_this )
     if( av_find_stream_info( p_sys->ic ) < 0 )
     {
         vlc_avcodec_unlock();
-        msg_Err( p_demux, "av_find_stream_info failed" );
-        CloseDemux( p_this );
-        return VLC_EGENERIC;
+        msg_Warn( p_demux, "av_find_stream_info failed" );
     }
     vlc_avcodec_unlock();
 
