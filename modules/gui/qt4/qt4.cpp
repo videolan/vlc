@@ -271,6 +271,7 @@ static vlc_sem_t ready;
 #ifdef Q_WS_X11
 static char *x11_display = NULL;
 #endif
+static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 
 /*****************************************************************************
  * Module callbacks
@@ -293,6 +294,12 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     putenv( (char *)"XLIB_SKIP_ARGB_VISUALS=1" );
 #endif
 
+    if (vlc_mutex_trylock (&lock))
+    {
+        msg_Err (p_this, "cannot start Qt4 multiple times");
+        return VLC_EGENERIC;
+    }
+
     /* Allocations of p_sys */
     intf_sys_t *p_sys = p_intf->p_sys = new intf_sys_t;
     p_intf->p_sys->b_isDialogProvider = isDialogProvider;
@@ -305,6 +312,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
         delete p_sys;
+        vlc_mutex_unlock (&lock);
         return VLC_ENOMEM;
     }
 
@@ -346,6 +354,7 @@ static void Close( vlc_object_t *p_this )
 
     vlc_join (p_sys->thread, NULL);
     delete p_sys;
+    vlc_mutex_unlock (&lock);
 #ifdef Q_WS_X11
     free (x11_display);
 #endif
