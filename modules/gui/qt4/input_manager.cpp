@@ -609,20 +609,18 @@ const QString InputManager::decodeArtURL( input_item_t *p_item )
     assert( p_item );
 
     char *psz_art = input_item_GetArtURL( p_item );
-    QString url;
-    if( psz_art && !strncmp( psz_art, "file://", 7 ) &&
-            decode_URI( psz_art + 7 ) )
-#ifdef WIN32
-        url = qfu( psz_art + 8 ); // Remove extra / starting on Win32.
-#else
-        url = qfu( psz_art + 7 );
-#endif
-    free( psz_art );
+    if( psz_art )
+    {
+        char *psz = make_path( psz_art );
+        free( psz_art );
+        psz_art = psz;
+    }
 
-    url = url.replace( "file://", "" );
+#if 0
     /* Taglib seems to define a attachment://, It won't work yet */
     url = url.replace( "attachment://", "" );
-    return url;
+#endif
+    return qfu( psz_art ? psz_art : "" );
 }
 
 void InputManager::UpdateArt()

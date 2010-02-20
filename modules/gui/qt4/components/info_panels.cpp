@@ -234,14 +234,13 @@ void MetaPanel::update( input_item_t *p_item )
 
     QString file;
     char *psz_art = input_item_GetArtURL( p_item );
-    if( psz_art && !strncmp( psz_art, "file://", 7 ) &&
-                decode_URI( psz_art + 7 ) )
-#ifdef WIN32
-        file = qfu( psz_art + 8 ); // Remove extra / on Win32 URI.
-#else
-        file = qfu( psz_art + 7 );
-#endif
-    free( psz_art );
+    if( psz_art )
+    {
+        char *psz = make_path( psz_art );
+        free( psz_art );
+        file = qfu( psz );
+        free( psz );
+    }
 
     art_cover->showArtUpdate( file );
 
