@@ -193,7 +193,7 @@ VCDReadBlock( access_t * p_access )
              Until then...
            */
 #if 1
-            msleep( MILLISECONDS_PER_SEC * *p_buf );
+            msleep( INT64_C(1000) * *p_buf );
             VCDSetOrigin(p_access, p_vcdplayer->origin_lsn,
                          p_vcdplayer->i_track, &(p_vcdplayer->play_item));
             // p_vcd->in_still = false;
@@ -1050,7 +1050,7 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
 
     /* */
     case ACCESS_GET_PTS_DELAY:
-        *(int64_t*)va_arg(args,int64_t *) = MILLISECONDS_PER_SEC *
+        *(int64_t*)va_arg(args,int64_t *) = INT64_C(1000) *
                          var_GetInteger( p_access, MODULE_STRING "-caching" );
         dbg_print( INPUT_DBG_EVENT, "GET PTS DELAY" );
         return VLC_SUCCESS;

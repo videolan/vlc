@@ -1520,10 +1520,10 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
 
             /* Position */
             var_Get( p_input, "time", &val );
-            msecstotimestr( buf1, val.i_time / 1000 );
+            secstotimestr( buf1, val.i_time / CLOCK_FREQ );
 
             var_Get( p_input, "length", &val );
-            msecstotimestr( buf2, val.i_time / 1000 );
+            secstotimestr( buf2, val.i_time / CLOCK_FREQ );
 
             mvnprintw( y++, 0, COLS, _(" Position : %s/%s (%.2f%%)"), buf1, buf2, p_sys->f_slider );
 

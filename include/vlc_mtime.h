@@ -51,14 +51,6 @@
  *****************************************************************************/
 #define MSTRTIME_MAX_SIZE 22
 
-/* Well, Duh? But it does clue us in that we are converting from
-   millisecond quantity to a second quantity or vice versa.
-*/
-#define MILLISECONDS_PER_SEC 1000
-
-#define msecstotimestr(psz_buffer, msecs) \
-  secstotimestr( psz_buffer, (msecs / (int) MILLISECONDS_PER_SEC) )
-
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
