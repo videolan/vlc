@@ -213,7 +213,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     {
         char *psz = make_path( psz_arturl );
         free( psz_arturl );
-        psz = psz_arturl;
+        psz_arturl = psz;
     }
 
     if( psz_arturl )
