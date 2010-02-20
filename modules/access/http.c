@@ -761,14 +761,16 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         return 0;
     }
 
-    if( p_sys->b_has_size &&
-        i_len + p_access->info.i_pos > p_access->info.i_size )
+    if( p_sys->b_has_size )
     {
-        if( ( i_len = p_access->info.i_size - p_access->info.i_pos ) == 0 )
-        {
-            p_access->info.b_eof = true;
-            return 0;
-        }
+        /* Remaining bytes in the file */
+        uint64_t remainder = p_access->info.i_size - p_access->info.i_pos;
+        if( remainder < i_len )
+            i_len = remainder;
+
+        /* Remaining bytes in the response */
+        if( p_sys->i_remaining < i_len )
+            i_len = p_sys->i_remaining;
     }
 
     if( p_sys->b_chunked )
@@ -801,19 +803,14 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         }
 
         if( i_len > p_sys->i_chunk )
-        {
             i_len = p_sys->i_chunk;
-        }
-    }
-    else if( p_sys->b_has_size && i_len > p_sys->i_remaining) {
-        /* Only ask for the remaining length */
-        i_len = p_sys->i_remaining;
-        if(i_len == 0) {
-            p_access->info.b_eof = true;
-            return 0;
-        }
     }
 
+    if( i_len == 0 )
+    {
+        p_access->info.b_eof = true;
+        return 0;
+    }
 
     if( p_sys->i_icy_meta > 0 && p_access->info.i_pos-p_sys->i_icy_offset > 0 )
     {
@@ -836,8 +833,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
     if( i_read > 0 )
     {
-        p_access->info.i_pos += i_read;
-
         if( p_sys->b_chunked )
         {
             p_sys->i_chunk -= i_read;
@@ -849,7 +844,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             }
         }
     }
-    else if( i_read <= 0 )
+    else
     {
         /*
          * I very much doubt that this will work.
@@ -880,15 +875,21 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             }
         }
 
-        if( i_read == 0 )
+        if( i_read <= 0 )
+        {
             p_access->info.b_eof = true;
-        if( i_read < 0 )
-            p_sys->b_error = true;
+            if( i_read < 0 )
+                p_sys->b_error = true;
+            return 0;
+        }
     }
 
+    assert( i_read >= 0 );
     if( p_sys->b_has_size )
     {
-        assert( i_read <= p_sys->i_remaining );
+        p_access->info.i_pos += i_read;
+        assert( p_access->info.i_pos <= p_access->info.i_size );
+        assert( (unsigned)i_read <= p_sys->i_remaining );
         p_sys->i_remaining -= i_read;
     }
 
