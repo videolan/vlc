@@ -519,7 +519,7 @@ static int Demux( demux_t *p_demux )
     if( pkt.duration > 0 )
         p_frame->i_length = pkt.duration * 1000000 *
             p_stream->time_base.num /
-            p_stream->time_base.den - i_start_time;
+            p_stream->time_base.den;
 
     if( pkt.dts != AV_NOPTS_VALUE && pkt.dts == pkt.pts &&
         p_stream->codec->codec_type == CODEC_TYPE_VIDEO )
