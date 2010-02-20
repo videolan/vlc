@@ -121,3 +121,5 @@ static inline bool vlc_object_alive (const vlc_object_t *obj)
 }
 
 #define vlc_object_alive(a) vlc_object_alive( VLC_OBJECT(a) )
+
+/** @} */
