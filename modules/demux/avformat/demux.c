@@ -84,6 +84,8 @@ struct demux_sys_t
     int64_t     i_pcr_inc;
     int         i_pcr_tk;
 
+    unsigned    i_ssa_order;
+
     int                i_attachments;
     input_attachment_t **attachments;
 
@@ -100,6 +102,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 static int IORead( void *opaque, uint8_t *buf, int buf_size );
 static int64_t IOSeek( void *opaque, int64_t offset, int whence );
 
+static block_t *BuildSsaFrame( const AVPacket *p_pkt, unsigned i_order );
 static void UpdateSeekPoint( demux_t *p_demux, int64_t i_time );
 
 /*****************************************************************************
@@ -176,6 +179,7 @@ int OpenDemux( vlc_object_t *p_this )
     p_sys->tk = NULL;
     p_sys->i_pcr_tk = -1;
     p_sys->i_pcr = -1;
+    p_sys->i_ssa_order = 0;
     TAB_INIT( p_sys->i_attachments, p_sys->attachments);
     p_sys->p_title = NULL;
 
@@ -494,13 +498,18 @@ static int Demux( demux_t *p_demux )
         return 1;
     }
     const AVStream *p_stream = p_sys->ic->streams[pkt.stream_index];
-
-    if( ( p_frame = block_New( p_demux, pkt.size ) ) == NULL )
+    if( p_stream->codec->codec_id == CODEC_ID_SSA )
     {
-        return 0;
+        p_frame = BuildSsaFrame( &pkt, p_sys->i_ssa_order++ );
+        if( !p_frame )
+            return 1;
     }
-
-    memcpy( p_frame->p_buffer, pkt.data, pkt.size );
+    else
+    {
+        if( ( p_frame = block_New( p_demux, pkt.size ) ) == NULL )
+            return 0;
+        memcpy( p_frame->p_buffer, pkt.data, pkt.size );
+    }
 
     if( pkt.flags & PKT_FLAG_KEY )
         p_frame->i_flags |= BLOCK_FLAG_TYPE_I;
@@ -516,7 +525,7 @@ static int Demux( demux_t *p_demux )
         VLC_TS_INVALID : (pkt.pts) * 1000000 *
         p_stream->time_base.num /
         p_stream->time_base.den - i_start_time + VLC_TS_0;
-    if( pkt.duration > 0 )
+    if( pkt.duration > 0 && p_frame->i_length <= 0 )
         p_frame->i_length = pkt.duration * 1000000 *
             p_stream->time_base.num /
             p_stream->time_base.den;
@@ -569,6 +578,40 @@ static void UpdateSeekPoint( demux_t *p_demux, int64_t i_time )
         p_demux->info.i_seekpoint = i;
         p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
     }
+}
+
+static block_t *BuildSsaFrame( const AVPacket *p_pkt, unsigned i_order )
+{
+    if( p_pkt->size <= 0 )
+        return NULL;
+
+    char buffer[256];
+    const size_t i_buffer_size = __MIN( sizeof(buffer) - 1, p_pkt->size );
+    memcpy( buffer, p_pkt->data, i_buffer_size );
+    buffer[i_buffer_size] = '\0';
+
+    /* */
+    int i_layer;
+    int h0, m0, s0, c0;
+    int h1, m1, s1, c1;
+    int i_position = 0;
+    if( sscanf( buffer, "Dialogue: %d,%d:%d:%d.%d,%d:%d:%d.%d,%n", &i_layer,
+                &h0, &m0, &s0, &c0, &h1, &m1, &s1, &c1, &i_position ) < 9 )
+        return NULL;
+    if( i_position <= 0 || i_position >= i_buffer_size )
+        return NULL;
+
+    char *p;
+    if( asprintf( &p, "%u,%d,%.*s", i_order, i_layer, p_pkt->size - i_position, p_pkt->data + i_position ) < 0 )
+        return NULL;
+
+    block_t *p_frame = block_heap_Alloc( p, p, strlen(p) + 1 );
+    if( p_frame )
+        p_frame->i_length = CLOCK_FREQ * ((h1 - h1) * 3600 +
+                                          (m1-m0) * 60 +
+                                          (s1-s0) * 1) +
+                            CLOCK_FREQ * (c1-c0) / 100;
+    return p_frame;
 }
 
 /*****************************************************************************
