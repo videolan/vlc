@@ -1,4 +1,3 @@
---SD_Description=Free Music Charts
 --[[
  $Id$
 
@@ -21,6 +20,10 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
 require "simplexml"
+
+function descriptor()
+    return { title="Free Music Charts" }
+end
 
 function main()
     local tree = simplexml.parse_url("http://www.archive.org/download/freemusiccharts.songs/fmc.xml")

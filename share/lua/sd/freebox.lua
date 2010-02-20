@@ -1,4 +1,3 @@
---SD_Description=Freebox TV
 --[[
  $Id$
 
@@ -20,6 +19,10 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
+
+function descriptor()
+    return { title="Freebox TV" }
+end
 
 function main()
     local fd = vlc.stream( "http://mafreebox.freebox.fr/freeboxtv/playlist.m3u" )
