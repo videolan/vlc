@@ -57,11 +57,11 @@ static const char *ppsz_dll_list[] =
  * defines
  *****************************************************************************/
 #if defined(HAVE_DL_DLOPEN)
-# define dll_open(name) dlopen( name, RTLD_NOW );
-# define dll_close(handle) dlclose(handle);
+# define dll_open(name) dlopen( name, RTLD_NOW )
+# define dll_close(handle) dlclose(handle)
 #else
-# define dll_open(name) NULL
-# define dll_close(handle)
+# define dll_open(name) (NULL)
+# define dll_close(handle) (void)0
 #endif
 
 /*****************************************************************************
