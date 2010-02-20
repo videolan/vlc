@@ -92,7 +92,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     /* Synchronously intercepted POSIX signals.
      *
      * In a threaded program such as VLC, the only sane way to handle signals
-     * is to block them in all thread but one - this is the only way to
+     * is to block them in all threads but one - this is the only way to
      * predict which thread will receive them. If any piece of code depends
      * on delivery of one of this signal it is intrinsically not thread-safe
      * and MUST NOT be used in VLC, whether we like it or not.
