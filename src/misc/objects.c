@@ -67,6 +67,10 @@
 
 #if defined (HAVE_SYS_EVENTFD_H)
 # include <sys/eventfd.h>
+# ifndef EFD_CLOEXEC
+#  define EFD_CLOEXEC 0
+#  warning EFD_CLOEXEC missing. Consider updating libc.
+# endif
 #endif
 
 
