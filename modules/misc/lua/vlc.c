@@ -579,6 +579,7 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
     char *psz_name;
     char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
     char **ppsz_dir;
+    lua_State *L = NULL;
     vlclua_dir_list( obj, "sd", ppsz_dir_list );
     for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
     {
@@ -603,52 +604,63 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
             {
                 goto error;
             }
-            FILE *fd = vlc_fopen( psz_filename, "r" );
-            if( fd )
+            L = luaL_newstate();
+            if( !L )
             {
-                char description[256];
-                if( fgets( description, 256, fd ) != NULL )
-                {
-                    char *temp = strchr( description, '\n' );
-                    if( temp )
-                        *temp = '\0';
-                    temp = strchr( *ppsz_file, '.' );
-                    if( temp )
-                        *temp = '\0';
-                    char *psz_longname;
-                    if( !strncmp( description, "--SD_Description=", 17 ) )
-                    {
-                        if( !( psz_longname = strdup( description + 17 ) ) )
-                        {
-                            fclose( fd );
-                            free( psz_filename );
-                            goto error;
-                        }
-                    }
-                    else
-                    {
-                        if( !( psz_longname = strdup( *ppsz_file ) ) )
-                        {
-                            fclose( fd );
-                            free( psz_filename );
-                            goto error;
-                        }
-                    }
-                    if( asprintf( &psz_name, "lua{sd=%s,longname=%s}",
-                                  *ppsz_file, psz_longname ) < 0 )
-                    {
-                        fclose( fd );
-                        free( psz_filename );
-                        free( psz_longname );
-                        goto error;
-                    }
-                    vlc_sd_probe_Add( probe, psz_name, psz_longname, SD_CAT_INTERNET );
-                    free( psz_name );
-                    free( psz_longname );
-                }
-                fclose( fd );
+                msg_Err( probe, "Could not create new Lua State" );
+                return VLC_EGENERIC;
             }
+            luaL_openlibs( L );
+            if( vlclua_add_modules_path( probe, L, psz_filename ) )
+            {
+                msg_Err( probe, "Error while setting the module search path for %s",
+                          psz_filename );
+                goto error;
+            }
+            if( luaL_dofile( L, psz_filename ) )
+            {
+
+                msg_Err( probe, "Error loading script %s: %s", psz_filename,
+                          lua_tostring( L, lua_gettop( L ) ) );
+                lua_pop( L, 1 );
+                goto error;
+            }
+            char *psz_longname;
+            char *temp = strchr( *ppsz_file, '.' );
+            if( temp )
+                *temp = '\0';
+            lua_getglobal( L, "descriptor" );
+            if( !lua_isfunction( L, lua_gettop( L ) ) || lua_pcall( L, 0, 1, 0 ) )
+            {
+                lua_pop( L, 1 );
+                if( !( psz_longname = strdup( *ppsz_file ) ) )
+                {
+                    free( psz_filename );
+                    goto error;
+                }
+            }
+            else
+            {
+                lua_getfield( L, -1, "title" );
+                if( !lua_isstring( L, -1 ) ||
+                    !( psz_longname = strdup( lua_tostring( L, -1 ) ) ) )
+                {
+                    free( psz_filename );
+                    goto error;
+                }
+            }
+            if( asprintf( &psz_name, "lua{sd=%s,longname=%s}",
+                          *ppsz_file, psz_longname ) < 0 )
+            {
+                free( psz_filename );
+                free( psz_longname );
+                goto error;
+            }
+            vlc_sd_probe_Add( probe, psz_name, psz_longname, SD_CAT_INTERNET );
+            free( psz_name );
+            free( psz_longname );
             free( psz_filename );
+            lua_close( L );
         }
     }
     if( ppsz_filelist )
@@ -668,6 +680,8 @@ error:
             free( *ppsz_file );
         free( ppsz_filelist );
     }
+    if( L )
+        lua_close( L );
     vlclua_dir_list_free( ppsz_dir_list );
     return VLC_ENOMEM;
 }
