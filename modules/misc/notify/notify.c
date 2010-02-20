@@ -209,11 +209,17 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     psz_arturl = input_item_GetArtURL( p_input_item );
     vlc_object_release( p_input );
 
-    if( psz_arturl && !strncmp( psz_arturl, "file://", 7 ) &&
-                decode_URI( psz_arturl + 7 ) )
+    if( psz_arturl )
+    {
+        char *psz = make_path( psz_arturl );
+        free( psz_arturl );
+        psz = psz_arturl;
+    }
+
+    if( psz_arturl )
     { /* scale the art to show it in notify popup */
         GError *p_error = NULL;
-        pix = gdk_pixbuf_new_from_file_at_scale( &psz_arturl[7],
+        pix = gdk_pixbuf_new_from_file_at_scale( psz_arturl,
                                                  72, 72, TRUE, &p_error );
     }
     else /* else we show state-of-the art logo */
