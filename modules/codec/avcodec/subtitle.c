@@ -65,6 +65,15 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     decoder_sys_t *sys;
 
     /* */
+    switch (codec_id) {
+    case CODEC_ID_HDMV_PGS_SUBTITLE:
+        break;
+    default:
+        msg_Warn(dec, "refusing to decode non validated subtitle codec");
+        return VLC_EGENERIC;
+    }
+
+    /* */
     dec->p_sys = sys = malloc(sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
