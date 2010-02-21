@@ -568,8 +568,8 @@ static int Demux( demux_t *p_demux )
                         {
                             if( uniq_entry_ad_backup != NULL )
                             {
-                                uniq_entry_ad_backup = NULL;
                                 vlc_gc_decref( uniq_entry_ad_backup );
+                                uniq_entry_ad_backup = NULL;
                             }
                             input_item_node_AppendItem( p_subitems, p_entry );
                             vlc_gc_decref( p_entry );
