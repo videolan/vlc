@@ -146,6 +146,10 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
         return -1;
     }
 
+    int timeout = var_InheritInteger (p_this, "ipv4-timeout");
+    if (timeout < 0)
+        timeout = -1;
+
     for( ptr = res; ptr != NULL; ptr = ptr->ai_next )
     {
         int fd = net_Socket( p_this, ptr->ai_family,
@@ -158,20 +162,12 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
         if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) )
         {
-            int timeout, val;
+            int val;
 
             if( net_errno != EINPROGRESS && net_errno != EINTR )
             {
                 msg_Err( p_this, "connection failed: %m" );
                 goto next_ai;
-            }
-            msg_Dbg( p_this, "connection: %m" );
-
-            timeout = var_CreateGetInteger (p_this, "ipv4-timeout");
-            if (timeout < 0)
-            {
-                msg_Err( p_this, "invalid negative value for ipv4-timeout" );
-                timeout = 0;
             }
 
             struct pollfd ufd[2] = {
