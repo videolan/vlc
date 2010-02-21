@@ -44,8 +44,6 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout window hwnd", 70)
     set_callbacks (Open, Close)
-    //add_integer ("drawable-hwnd", 0, NULL, HWN_TEXT, HWND_LONGTEXT, true) /* How to ? */
-    //    change_unsaveable ()
 vlc_module_end ()
 
 static int Control (vout_window_t *, int, va_list);
