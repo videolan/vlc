@@ -1240,7 +1240,7 @@ ifdef HAVE_BIGENDIAN
 	(cd $<; ./genMakefiles armeb-uclibc && make $(HOSTCC))
 endif
 else
-ifeq ($(ARCH),armel)
+ifeq ($(ARCH)$(HAVE_MAEMO),armel)
 	(cd $<; ./genMakefiles armlinux && make $(HOSTCC))
 else
 	(cd $<; sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux)
