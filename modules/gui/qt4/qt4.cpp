@@ -287,6 +287,8 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
 #ifdef Q_WS_X11
+    if( !XInitThreads() )
+        return VLC_EGENERIC;
     x11_display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
     Display *p_display = XOpenDisplay( x11_display );
     if( !p_display )

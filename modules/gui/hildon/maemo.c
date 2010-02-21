@@ -81,6 +81,9 @@ static int Open( vlc_object_t *p_this )
     intf_sys_t *p_sys;;
     vlc_value_t val;
 
+    if( !XInitThreads() )
+        return VLC_EGENERIC;
+
     /* Allocate instance and initialize some members */
     p_intf->p_sys = p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
