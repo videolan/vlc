@@ -818,15 +818,14 @@ static int OpenEncoder( vlc_object_t *p_this )
     /* Create and store headers */
     vorbis_analysis_headerout( &p_sys->vd, &p_sys->vc,
                                &header[0], &header[1], &header[2]);
-    p_enc->fmt_out.i_extra = 3 * 2 + header[0].bytes +
-       header[1].bytes + header[2].bytes;
-    p_extra = p_enc->fmt_out.p_extra = xmalloc( p_enc->fmt_out.i_extra );
-    for( i = 0; i < 3; i++ )
+    for( int i = 0; i < 3; i++ )
     {
-        *(p_extra++) = header[i].bytes >> 8;
-        *(p_extra++) = header[i].bytes & 0xFF;
-        memcpy( p_extra, header[i].packet, header[i].bytes );
-        p_extra += header[i].bytes;
+        if( xiph_AppendHeaders( &p_enc->fmt_out.i_extra, &p_enc->fmt_out.p_extra,
+                                header[i].bytes, header[i].packet ) )
+        {
+            p_enc->fmt_out.i_extra = 0;
+            p_enc->fmt_out.p_extra = NULL;
+        }
     }
 
     p_sys->i_channels = p_enc->fmt_in.audio.i_channels;
