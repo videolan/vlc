@@ -198,7 +198,7 @@ private:
     QCheckBox *jackPace, *jackConnect;
     QLineEdit *jackPortsSelected;
 #endif
-    QSpinBox *screenFPS;
+    QDoubleSpinBox *screenFPS;
 
 public slots:
     virtual void updateMRL();

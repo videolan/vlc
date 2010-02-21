@@ -1012,13 +1012,16 @@ void CaptureOpenPanel::initialize()
             qtr( "Desired frame rate for the capture." ) );
     screenPropLayout->addWidget( screenFPSLabel, 0, 0 );
 
-    screenFPS = new QSpinBox;
-    screenFPS->setValue( 1 );
+    screenFPS = new QDoubleSpinBox;
+    screenFPS->setValue( 1. );
+    screenFPS->setRange( .01, 100. );
     screenFPS->setAlignment( Qt::AlignRight );
+    /* xgettext: frames per second */
+    screenFPS->setSuffix( qtr( " f/s" ) );
     screenPropLayout->addWidget( screenFPS, 0, 1 );
 
     /* Screen connect */
-    CuMRL( screenFPS, valueChanged( int ) );
+    CuMRL( screenFPS, valueChanged( double ) );
 
     /* General connects */
     CONNECT( ui.deviceCombo, activated( int ) ,
@@ -1136,7 +1139,7 @@ void CaptureOpenPanel::updateMRL()
 #endif
     case SCREEN_DEVICE:
         fileList << "screen://";
-        mrl = " :screen-fps=" + QString::number( screenFPS->value() );
+        mrl = " :screen-fps=" + QString::number( screenFPS->value(), 'f' );
         emit methodChanged( "screen-caching" );
         updateButtons();
         break;
