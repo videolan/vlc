@@ -203,7 +203,7 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( logoFileText, editingFinished() )
     SETUP_VFILTER_OPTION( logoYSpin, valueChanged( int ) )
     SETUP_VFILTER_OPTION( logoXSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( logoTransparencySlider, valueChanged( int ) )
+    SETUP_VFILTER_OPTION( logoOpacitySlider, valueChanged( int ) )
 
     if( module_exists( "atmo" ) )
     {
