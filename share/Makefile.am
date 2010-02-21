@@ -184,8 +184,6 @@ DIST_osdmenu_default = \
 #
 # LUA
 #
-vlcluadir = $(vlclibdir)/lua
-
 luac_verbose = $(luac_verbose_$(V))
 luac_verbose_ = $(luac_verbose_$(AM_DEFAULT_VERBOSITY))
 luac_verbose_0 = @echo "  LUAC   $@";
@@ -195,7 +193,7 @@ luac_verbose_0 = @echo "  LUAC   $@";
 	$(luac_verbose)$(LUAC) -o $@ $<
 
 if BUILD_LUA
-vlclua_DATA = \
+nobase_vlclib_DATA = \
 	lua/intf/rc.luac \
 	lua/intf/hotkeys.luac \
 	lua/intf/modules/common.luac \
@@ -229,7 +227,7 @@ vlclua_DATA = \
 	lua/sd/frenchtv.luac \
 	$(NULL)
 if BUILD_HTTPD
-vlclua_DATA += \
+nobase_vlclib_DATA += \
 	lua/intf/http.luac \
 	$(NULL)
 nobase_vlcdata_DATA += $(DIST_http_lua)
