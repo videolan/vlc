@@ -330,92 +330,63 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
     if( p_pic == NULL )
         return NULL;
 
-    if( p_pic->i_type == DIRECT_PICTURE )
+    if( p_pic->i_type == DIRECT_PICTURE && !p_subpic )
     {
-        /* Picture is in a direct buffer. */
-
-        if( p_subpic != NULL )
-        {
-            /* We have subtitles. First copy the picture to
-             * the spare direct buffer, then render the
-             * subtitles. */
-            picture_Copy( PP_OUTPUTPICTURE[0], p_pic );
-
-            spu_RenderSubpictures( p_vout->p_spu,
-                                   PP_OUTPUTPICTURE[0], &p_vout->fmt_out,
-                                   p_subpic, &p_vout->fmt_in, render_date );
-
-            return PP_OUTPUTPICTURE[0];
-        }
-
         /* No subtitles, picture is in a directbuffer so
          * we can display it directly (even if it is still
          * in use or not). */
         return p_pic;
     }
 
-    /* Not a direct buffer. We either need to copy it to a direct buffer,
-     * or render it if the chroma isn't the same. */
-    if( p_vout->p->b_direct )
-    {
-        /* Picture is not in a direct buffer, but is exactly the
-         * same size as the direct buffers. A memcpy() is enough,
-         * then render the subtitles. */
-        picture_Copy( PP_OUTPUTPICTURE[0], p_pic );
-        spu_RenderSubpictures( p_vout->p_spu,
-                               PP_OUTPUTPICTURE[0], &p_vout->fmt_out,
-                               p_subpic, &p_vout->fmt_in, render_date );
-
-        return PP_OUTPUTPICTURE[0];
-    }
-
-    /* Picture is not in a direct buffer, and needs to be converted to
-     * another size/chroma. Then the subtitles need to be rendered as
-     * well. This usually means software YUV, or hardware YUV with a
-     * different chroma. */
-
-    if( p_subpic != NULL && p_vout->p_picture[0].b_slow )
+    /* It is either because:
+     *  - the picture is not a direct buffer
+     *  - we have to render subtitles (we can never do it on the given
+     *  picture even if not referenced).
+     */
+    picture_t *p_render;
+    if( p_subpic != NULL && PP_OUTPUTPICTURE[0]->b_slow )
     {
         /* The picture buffer is in slow memory. We'll use
          * the "2 * VOUT_MAX_PICTURES + 1" picture as a temporary
          * one for subpictures rendering. */
-        picture_t *p_tmp_pic = &p_vout->p_picture[2 * VOUT_MAX_PICTURES];
-        if( p_tmp_pic->i_status == FREE_PICTURE )
+        p_render = &p_vout->p_picture[2 * VOUT_MAX_PICTURES];
+        if( p_render->i_status == FREE_PICTURE )
         {
             vout_AllocatePicture( VLC_OBJECT(p_vout),
-                                  p_tmp_pic, p_vout->fmt_out.i_chroma,
+                                  p_render, p_vout->fmt_out.i_chroma,
                                   p_vout->fmt_out.i_width,
                                   p_vout->fmt_out.i_height,
                                   p_vout->fmt_out.i_sar_num,
                                   p_vout->fmt_out.i_sar_den );
-            p_tmp_pic->i_type = MEMORY_PICTURE;
-            p_tmp_pic->i_status = RESERVED_PICTURE;
+            p_render->i_type = MEMORY_PICTURE;
+            p_render->i_status = RESERVED_PICTURE;
         }
-
-        /* Convert image to the first direct buffer */
-        p_vout->p->p_chroma->p_owner = (filter_owner_sys_t *)p_tmp_pic;
-        p_vout->p->p_chroma->pf_video_filter( p_vout->p->p_chroma, p_pic );
-
-        /* Render subpictures on the first direct buffer */
-        spu_RenderSubpictures( p_vout->p_spu,
-                               p_tmp_pic, &p_vout->fmt_out,
-                               p_subpic, &p_vout->fmt_in, render_date );
-
-        picture_Copy( &p_vout->p_picture[0], p_tmp_pic );
     }
     else
     {
-        /* Convert image to the first direct buffer */
-        p_vout->p->p_chroma->p_owner = (filter_owner_sys_t *)&p_vout->p_picture[0];
-        p_vout->p->p_chroma->pf_video_filter( p_vout->p->p_chroma, p_pic );
-
-        /* Render subpictures on the first direct buffer */
-        spu_RenderSubpictures( p_vout->p_spu,
-                               &p_vout->p_picture[0], &p_vout->fmt_out,
-                               p_subpic, &p_vout->fmt_in, render_date );
+        /* We can directly render into a direct buffer */
+        p_render = PP_OUTPUTPICTURE[0];
     }
+    /* Copy or convert */
+    if( p_vout->p->b_direct )
+    {
+        picture_Copy( p_render, p_pic );
+    }
+    else
+    {
+        p_vout->p->p_chroma->p_owner = (filter_owner_sys_t *)p_render;
+        p_vout->p->p_chroma->pf_video_filter( p_vout->p->p_chroma, p_pic );
+    }
+    /* Render the subtitles if present */
+    if( p_subpic )
+        spu_RenderSubpictures( p_vout->p_spu,
+                               p_render, &p_vout->fmt_out,
+                               p_subpic, &p_vout->fmt_in, render_date );
+    /* Copy in case we used a temporary fast buffer */
+    if( p_render != PP_OUTPUTPICTURE[0] )
+        picture_Copy( PP_OUTPUTPICTURE[0], p_render );
 
-    return &p_vout->p_picture[0];
+    return PP_OUTPUTPICTURE[0];
 }
 
 /**
