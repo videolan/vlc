@@ -524,7 +524,7 @@ int vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
     size_t i_bytes = 0;
     /* i_width_aligned is a multiple of 16, so we can divide by 8 now */
     size_t i_width_aligned_divided = i_width_aligned / 8;
-    if( i_width_aligned_divided <= (SIZE_MAX/i_height_aligned) )
+    if( i_height_aligned > 0 && i_width_aligned_divided <= (SIZE_MAX/i_height_aligned) )
     {
         size_t i_pixels_divided = i_width_aligned_divided * i_height_aligned;
         size_t i_bpp = p_pic->format.i_bits_per_pixel;
