@@ -302,6 +302,7 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
     if( b_attach )
     {
         UpdateSPU( p_spu, VLC_OBJECT(p_input) );
+        var_Create( p_input, "highlight", VLC_VAR_BOOL );
         var_AddCallback( p_input, "highlight", CropCallback, p_spu );
         var_AddCallback( p_input, "sub-margin", MarginCallback, p_spu->p );
 
@@ -313,9 +314,10 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
     }
     else
     {
-        /* Delete callback */
-        var_DelCallback( p_input, "highlight", CropCallback, p_spu );
+        /* Delete callbacks */
         var_DelCallback( p_input, "sub-margin", MarginCallback, p_spu->p );
+        var_DelCallback( p_input, "highlight", CropCallback, p_spu );
+        var_Destroy( p_input, "highlight" );
         vlc_object_release( p_input );
     }
 }
