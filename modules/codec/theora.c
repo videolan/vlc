@@ -550,9 +550,7 @@ static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
-    ogg_packet header;
-    uint8_t *p_extra;
-    int i_quality, i;
+    int i_quality;
 
     if( p_enc->fmt_out.i_codec != VLC_CODEC_THEORA &&
         !p_enc->b_force )
@@ -644,25 +642,24 @@ static int OpenEncoder( vlc_object_t *p_this )
     theora_comment_init( &p_sys->tc );
 
     /* Create and store headers */
-    p_enc->fmt_out.i_extra = 3 * 2;
-    for( i = 0; i < 3; i++ )
+    for( int i = 0; i < 3; i++ )
     {
-        if( i == 0 ) theora_encode_header( &p_sys->td, &header );
-        else if( i == 1 ) theora_encode_comment( &p_sys->tc, &header );
-        else if( i == 2 ) theora_encode_tables( &p_sys->td, &header );
+        ogg_packet header;
 
-        p_enc->fmt_out.p_extra = xrealloc( p_enc->fmt_out.p_extra,
-                                      p_enc->fmt_out.i_extra + header.bytes );
-        p_extra = p_enc->fmt_out.p_extra;
-        p_extra += p_enc->fmt_out.i_extra + (i-3)*2;
-        p_enc->fmt_out.i_extra += header.bytes;
+        if( i == 0 )
+            theora_encode_header( &p_sys->td, &header );
+        else if( i == 1 )
+            theora_encode_comment( &p_sys->tc, &header );
+        else
+            theora_encode_tables( &p_sys->td, &header );
 
-        *(p_extra++) = header.bytes >> 8;
-        *(p_extra++) = header.bytes & 0xFF;
-
-        memcpy( p_extra, header.packet, header.bytes );
+        if( xiph_AppendHeaders( &p_enc->fmt_out.i_extra, &p_enc->fmt_out.p_extra,
+                                header.bytes, header.packet ) )
+        {
+            p_enc->fmt_out.i_extra = 0;
+            p_enc->fmt_out.p_extra = NULL;
+        }
     }
-
     return VLC_SUCCESS;
 }
 
