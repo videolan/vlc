@@ -855,8 +855,6 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     /* Setup of presetsComboBox */
     presetsComboBox = ui.presetsCombo;
-    CONNECT( presetsComboBox, currentIndexChanged( int ),
-             this, updateUISliderValues( int ) );
     CONNECT( presetsComboBox, activated( int ), this, setCorePreset( int ) );
 
     /* Add the sliders for the Bands */
@@ -1040,37 +1038,6 @@ void Equalizer::setCoreBands()
     }
 }
 
-void Equalizer::updateUISliderValues( int i_preset )
-{
-    if( i_preset < 0 ) return;
-
-    char *p = createValuesFromPreset( i_preset );
-    char *psz = p;
-    float f_preamp = eqz_preset_10b[i_preset]->f_preamp;
-
-    if ( p )
-    {
-        for( int i = 0; i < BANDS; i++ )
-        {
-            const float f = us_strtod(p, &p );
-
-            bands[i]->setValue( (int)( ( f + 20 ) * 10 )  );
-
-            band_texts[i]->setText( band_frequencies[i] + "\n"
-                                  + QString("%1").arg( f, 5, 'f', 1 ) + "dB" );
-            if( p == NULL || *p == '\0' )
-                break;
-            p++;
-            if( *p == '\0' )
-                break;
-        }
-        free( psz );
-    }
-    ui.preampSlider->setValue( (int)( ( f_preamp + 20 ) * 10 ) );
-    ui.preampLabel->setText( qtr( "Preamp\n" )
-                   + QString::number( f_preamp, 'f', 1 ) + qtr( "dB" ) );
-}
-
 char * Equalizer::createValuesFromPreset( int i_preset )
 {
     QString values;
@@ -1085,9 +1052,31 @@ char * Equalizer::createValuesFromPreset( int i_preset )
 
 void Equalizer::setCorePreset( int i_preset )
 {
+    if( i_preset < 0 )
+        return;
+
+    /* Update pre-amplification in the UI */
+    float f_preamp = eqz_preset_10b[i_preset]->f_preamp;
+    ui.preampSlider->setValue( (int)( ( f_preamp + 20 ) * 10 ) );
+    ui.preampLabel->setText( qtr( "Preamp\n" )
+                   + QString::number( f_preamp, 'f', 1 ) + qtr( "dB" ) );
+
     char *psz_values = createValuesFromPreset( i_preset );
     if( !psz_values ) return ;
 
+    char *p = psz_values;
+    for( int i = 0; i < BANDS && *p; i++ )
+    {
+        const float f = us_strtod( p, &p );
+
+        bands[i]->setValue( (int)( ( f + 20 ) * 10 )  );
+        band_texts[i]->setText( band_frequencies[i] + "\n"
+                              + QString("%1").arg( f, 5, 'f', 1 ) + "dB" );
+        if( *p )
+            p++; /* skip separator */
+    }
+
+    /* Apply presets to audio output */
     aout_instance_t *p_aout= THEMIM->getAout();
     if( p_aout )
     {

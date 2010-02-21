@@ -113,7 +113,6 @@ private slots:
     void setPreamp();
     void setCoreBands();
     void setCorePreset(int);
-    void updateUISliderValues( int );
 };
 
 class Spatializer: public QWidget
