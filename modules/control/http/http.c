@@ -370,7 +370,6 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     intf_sys_t *p_sys = p_args->p_intf->p_sys;
     int i_request = p_request != NULL ? strlen( p_request ) : 0;
     char *dst;
-    vlc_value_t val;
     char position[4]; /* percentage */
     char time[12]; /* in seconds */
     char length[12]; /* in seconds */
@@ -384,41 +383,31 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     p_sys->p_input = playlist_CurrentInput( p_sys->p_playlist );
     if( p_sys->p_input )
     {
-        var_Get( p_sys->p_input, "position", &val);
-        sprintf( position, "%d" , (int)((val.f_float) * 100.0));
-        var_Get( p_sys->p_input, "time", &val);
-        sprintf( time, "%"PRIi64, (int64_t)val.i_time / INT64_C(1000000) );
-        var_Get( p_sys->p_input, "length", &val);
-        sprintf( length, "%"PRIi64, (int64_t)val.i_time / INT64_C(1000000) );
+        snprintf( position, sizeof(position), "%d",
+                  (int)(var_GetFloat( p_sys->p_input, "position" ) * 100.));
+        snprintf( time, sizeof(time), "%"PRIi64,
+                  var_GetTime( p_sys->p_input, "time" ) / CLOCK_FREQ );
+        snprintf( length, sizeof(length), "%"PRIi64,
+                  var_GetTime( p_sys->p_input, "length" ) / CLOCK_FREQ );
 
-        var_Get( p_sys->p_input, "state", &val );
-        if( val.i_int == PLAYING_S )
+        switch( var_GetInteger( p_sys->p_input, "state" ) )
         {
-            state = "playing";
-        }
-        else if( val.i_int == OPENING_S )
-        {
-            state = "opening/connecting";
-        }
-        else if( val.i_int == PAUSE_S )
-        {
-            state = "paused";
-        }
-        else
-        {
-            state = "stop";
+            case PLAYING_S: state = "playing";            break;
+            case OPENING_S: state = "opening/connecting"; break;
+            case PAUSE_S:   state = "paused";             break;
+            default:        state = "stop";               break;
         }
     }
     else
     {
-        sprintf( position, "%d", 0 );
-        sprintf( time, "%d", 0 );
-        sprintf( length, "%d", 0 );
+        strcpy( position, "0" );
+        strcpy( time, "0" );
+        strcpy( length, "0" );
         state = "stop";
     }
 
     aout_VolumeGet( p_sys->p_playlist, &i_volume );
-    sprintf( volume, "%d", (int)i_volume );
+    snprintf( volume, sizeof(volume), "%d", (int)i_volume );
 
     p_args->vars = mvar_New( "variables", "" );
     mvar_AppendNewVar( p_args->vars, "url_param",
