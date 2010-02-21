@@ -93,7 +93,6 @@ void msg_Destroy (msg_bank_t *);
 void msg_StackSet ( int, const char*, ... );
 void msg_StackAdd ( const char*, ... );
 const char* msg_StackMsg ( void );
-void msg_StackDestroy (void *);
 
 /*
  * Unicode stuff
