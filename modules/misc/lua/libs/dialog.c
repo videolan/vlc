@@ -597,7 +597,6 @@ static int vlclua_widget_set_text( lua_State *L )
         case EXTENSION_WIDGET_LIST:
         case EXTENSION_WIDGET_IMAGE:
         default:
-            vlc_mutex_unlock( &p_widget->p_dialog->lock );
             return luaL_error( L, "method set_text not valid for this widget" );
     }
 
