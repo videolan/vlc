@@ -234,9 +234,8 @@ int ReadMeta( vlc_object_t *p_this )
     demux_meta_t *p_demux_meta = (demux_meta_t *)p_this;
     input_item_t *p_item = p_demux_meta->p_item;
 
-    int i_ret = vlclua_scripts_batch_execute( p_this, "meta/reader", &read_meta, p_item );
-
-    return i_ret;
+    return vlclua_scripts_batch_execute( p_this, "meta"DIR_SEP"reader",
+                                         &read_meta, p_item );
 }
 
 
@@ -249,9 +248,8 @@ int FetchMeta( vlc_object_t *p_this )
     demux_meta_t *p_demux_meta = (demux_meta_t *)p_this;
     input_item_t *p_item = p_demux_meta->p_item;
 
-    int i_ret = vlclua_scripts_batch_execute( p_this, "meta/fetcher", &fetch_meta, p_item );
-
-    return i_ret;
+    return vlclua_scripts_batch_execute( p_this, "meta"DIR_SEP"fetcher",
+                                         &fetch_meta, p_item );
 }
 
 
@@ -263,8 +261,7 @@ int FindArt( vlc_object_t *p_this )
     art_finder_t *p_finder = (art_finder_t *)p_this;
     input_item_t *p_item = p_finder->p_item;
 
-    int i_ret = vlclua_scripts_batch_execute( p_this, "meta/art", &fetch_art, p_item );
-
-    return i_ret;
+    return vlclua_scripts_batch_execute( p_this, "meta"DIR_SEP"art",
+                                         &fetch_art, p_item );
 }
 
