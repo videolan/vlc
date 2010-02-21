@@ -762,6 +762,12 @@ int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
 
     assert( expected_type == 0 ||
             (p_var->i_type & VLC_VAR_CLASS) == expected_type );
+#ifndef NDEBUG
+        /* Alert if the type is VLC_VAR_VOID */
+        if( ( p_var->i_type & VLC_VAR_TYPE ) == VLC_VAR_VOID )
+            msg_Warn( p_this, "Calling var_Set on the void variable '%s' (0x%04x)", psz_name, p_var->i_type );
+#endif
+
 
     WaitUnused( p_this, p_var );
 
@@ -825,7 +831,7 @@ int var_GetChecked( vlc_object_t *p_this, const char *psz_name,
 #ifndef NDEBUG
         /* Alert if the type is VLC_VAR_VOID */
         if( ( p_var->i_type & VLC_VAR_TYPE ) == VLC_VAR_VOID )
-            msg_Warn( p_this, "Calling var_GetVoid on the void variable '%s' (0x%04x)", psz_name, p_var->i_type );
+            msg_Warn( p_this, "Calling var_Get on the void variable '%s' (0x%04x)", psz_name, p_var->i_type );
 #endif
 
         /* Duplicate value if needed */
