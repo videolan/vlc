@@ -98,8 +98,8 @@ typedef enum VLCMediaState
 @end
 
 /**
- * Defines files and streams as a managed object.  Each media object can be 
- * administered seperately.  VLCMediaPlayer or VLCMediaList must be used 
+ * Defines files and streams as a managed object.  Each media object can be
+ * administered seperately.  VLCMediaPlayer or VLCMediaList must be used
  * to execute the appropriate playback functions.
  * \see VLCMediaPlayer
  * \see VLCMediaList
@@ -112,8 +112,8 @@ typedef enum VLCMediaState
     VLCTime *             length;            //< Cached duration of the media
     NSMutableDictionary * metaDictionary;    //< Meta data storage
     id                    delegate;          //< Delegate object
-    BOOL                  isArtFetched;      //< Value used to determine of the artwork has been preparsed
-    BOOL                  areOthersMetaFetched; //< Value used to determine of the other meta has been preparsed
+    BOOL                  isArtFetched;      //< Value used to determine of the artwork has been parsed
+    BOOL                  areOthersMetaFetched; //< Value used to determine of the other meta has been parsed
     BOOL                  isArtURLFetched;   //< Value used to determine of the other meta has been preparsed
     VLCMediaState         state;             //< Current state of the media
 }
@@ -146,14 +146,14 @@ typedef enum VLCMediaState
 
 /* Initializers */
 /**
- * Initializes a new VLCMedia object to use the specified URL.  
+ * Initializes a new VLCMedia object to use the specified URL.
  * \param aPath Path to media to be accessed.
  * \return A new VLCMedia object, only if there were no errors.
  */
 - (id)initWithURL:(NSURL *)anURL;
 
 /**
- * Initializes a new VLCMedia object to use the specified path.  
+ * Initializes a new VLCMedia object to use the specified path.
  * \param aPath Path to media to be accessed.
  * \return A new VLCMedia object, only if there were no errors.
  */
@@ -167,12 +167,12 @@ typedef enum VLCMediaState
 - (id)initAsNodeWithName:(NSString *)aName;
 
 /**
- * Returns an NSComparisonResult value that indicates the lexical ordering of 
+ * Returns an NSComparisonResult value that indicates the lexical ordering of
  * the receiver and a given meda.
  * \param media The media with which to compare with the receiver.
- * \return NSOrderedAscending if the URL of the receiver precedes media in 
- * lexical ordering, NSOrderedSame if the URL of the receiver and media are 
- * equivalent in lexical value, and NSOrderedDescending if the URL of the 
+ * \return NSOrderedAscending if the URL of the receiver precedes media in
+ * lexical ordering, NSOrderedSame if the URL of the receiver and media are
+ * equivalent in lexical value, and NSOrderedDescending if the URL of the
  * receiver follows media. If media is nil, returns NSOrderedDescending.
  */
 - (NSComparisonResult)compare:(VLCMedia *)media;
@@ -201,9 +201,9 @@ typedef enum VLCMediaState
 - (VLCTime *)lengthWaitUntilDate:(NSDate *)aDate;
 
 /**
- * Determines if the media has already been preparsed. 
+ * Determines if the media has already been preparsed.
  */
-@property (readonly) BOOL isPreparsed;
+@property (readonly) BOOL isParsed;
 
 /**
  * The URL for the receiver's media resource.

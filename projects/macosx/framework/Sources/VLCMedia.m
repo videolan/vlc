@@ -310,9 +310,9 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     return [[length retain] autorelease];
 }
 
-- (BOOL)isPreparsed
+- (BOOL)isParsed
 {
-    return libvlc_media_is_preparsed( p_md );
+    return libvlc_media_is_parsed( p_md );
 }
 
 @synthesize url;
