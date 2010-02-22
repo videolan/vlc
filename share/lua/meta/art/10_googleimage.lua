@@ -28,13 +28,16 @@ function get_query( title )
 end
 
 -- Return the artwork
--- This is disabled because we have too much false positive by the inherent
--- nature of this script.
-function fetch_art_disabled()
-    local meta = vlc.item:metas()
+function fetch_art()
+	-- This is disabled because we have too much false positive by the inherent nature of this script.
+	if true then vlc.msg.dbg("10_googleimage.lua is disabled") return nil end
+
+	if vlc.input == nil then return nil end
+	local item = vlc.input.item()
+    local meta = item:metas()
     if meta["artist"] and meta["album"] then
         title = meta["artist"].." "..meta["album"]
-    elseif meta["title"] and meta["artist"] then
+    elseif meta["artist"] and meta["title"] then
         title = meta["artist"].." "..meta["title"]
     elseif meta["title"] then
         title = meta["title"]
