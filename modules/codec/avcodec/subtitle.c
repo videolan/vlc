@@ -259,8 +259,8 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t 
     for (unsigned i = 0; i < ffsub->num_rects; i++) {
         AVSubtitleRect *rec = ffsub->rects[i];
 
-        msg_Err(dec, "SUBS RECT[%d]: %dx%d @%dx%d",
-                 i, rec->w, rec->h, rec->x, rec->y);
+        //msg_Err(dec, "SUBS RECT[%d]: %dx%d @%dx%d",
+        //         i, rec->w, rec->h, rec->x, rec->y);
 
         subpicture_region_t *region;
         switch (ffsub->format) {
