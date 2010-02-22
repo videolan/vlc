@@ -172,6 +172,7 @@ typedef enum vlc_dialog {
     "*.aac;" \
     "*.ac3;" \
     "*.aiff;"\
+    "*.amr;" \
     "*.aob;" \
     "*.ape;" \
     "*.dts;" \

@@ -30,6 +30,7 @@ Decoders:
  * Audio/Video decoder using OpenMAX IL components
  * Support for Indeo5 video codec
  * Support for Windows Media Speech (Voice) audio codec natively on all platforms
+ * Support for AMR-NB audio codec on the Windows and Mac port
 
 Demuxers:
  * Support for ADPCM in .flv streams
