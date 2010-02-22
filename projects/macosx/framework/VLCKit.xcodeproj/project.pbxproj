@@ -144,14 +144,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 6337547910ED090A0072A0D9 /* Make VLC */;
+			remoteGlobalIDString = 6337547910ED090A0072A0D9;
 			remoteInfo = "Make VLC";
 		};
 		CC610952112F4ABF00FAFD22 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216 /* VLCKit */;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = VLCKit;
 		};
 /* End PBXContainerItemProxy section */
@@ -707,6 +707,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
+				VALID_ARCHS = "i386 ppc ppc64 ppc7400 x86_64";
 				VLC_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/vlc_build_dir";
 				VLC_SRC_DIR = "$(SRCROOT)/../../..";
 			};
@@ -727,6 +728,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
+				VALID_ARCHS = "i386 ppc ppc64 ppc7400 x86_64";
 				VLC_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/vlc_build_dir";
 				VLC_SRC_DIR = "$(SRCROOT)/../../..";
 			};
