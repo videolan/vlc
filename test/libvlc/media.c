@@ -43,21 +43,21 @@ static void test_media_preparsed(const char** argv, int argc)
     libvlc_media_t *media = libvlc_media_new_path (vlc, file);
     assert (media != NULL);
 
-    int received = false;
+    volatile int received = false;
 
-    // Force preparsing. FIXME - Expose a better API for that.
-    libvlc_media_es_t *es;
-    int num = libvlc_media_get_es(media, &es);
-    free(es);
-
+    // Check to see if we are properly receiving the event.
     libvlc_event_manager_t *em = libvlc_media_event_manager (media);
     libvlc_event_attach (em, libvlc_MediaPreparsedChanged, preparsed_changed, &received);
+
+    // Parse the media. This is synchronous.
+    libvlc_media_parse(media);
 
     // Wait to see if we properly receive preparsed.
     while (!received);
 
     // We are good, now check Elementary Stream info.
-    num = libvlc_media_get_es(media, &es);
+    libvlc_media_es_t *es;
+    int num = libvlc_media_get_es(media, &es);
     assert(num > 0);
     free(es);
 
