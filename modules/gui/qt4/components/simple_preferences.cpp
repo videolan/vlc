@@ -283,14 +283,14 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             audioControl( DirectX );
             optionWidgets.append( DirectXControl );
             CONFIG_GENERIC_NO_UI( "directx-audio-device-name", StringList,
-                    NULL, DirectXDevice );
+                    DirectXLabel, DirectXDevice );
 #else
             if( module_exists( "alsa" ) )
             {
                 audioControl( alsa );
                 optionWidgets.append( alsaControl );
 
-                CONFIG_GENERIC_NO_UI( "alsa-audio-device" , StringList, NULL,
+                CONFIG_GENERIC_NO_UI( "alsa-audio-device" , StringList, alsaLabel,
                                 alsaDevice );
             }
             else
