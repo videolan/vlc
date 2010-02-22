@@ -219,14 +219,21 @@ void VarText::onUpdate( Subject<VarText> &rVariable, void *arg )
 void VarText::delObservers()
 {
     // Stop observing other variables
-    VlcProc *pVlcProc = VlcProc::instance( getIntf() );
-    pVlcProc->getTimeVar().delObserver( this );
-    pVlcProc->getVolumeVar().delObserver( this );
-    pVlcProc->getStreamNameVar().delObserver( this );
-    pVlcProc->getStreamURIVar().delObserver( this );
-    pVlcProc->getStreamBitRateVar().delObserver( this );
-    pVlcProc->getStreamSampleRateVar().delObserver( this );
-    VarManager *pVarManager = VarManager::instance( getIntf() );
-    pVarManager->getHelpText().delObserver( this );
+
+    VlcProc *pVlcProc = getIntf()->p_sys->p_vlcProc;
+    VarManager *pVarManager = getIntf()->p_sys->p_varManager;
+
+    if( pVlcProc )
+    {
+        pVlcProc->getTimeVar().delObserver( this );
+        pVlcProc->getVolumeVar().delObserver( this );
+        pVlcProc->getStreamNameVar().delObserver( this );
+        pVlcProc->getStreamURIVar().delObserver( this );
+        pVlcProc->getStreamBitRateVar().delObserver( this );
+        pVlcProc->getStreamSampleRateVar().delObserver( this );
+    }
+
+    if( pVarManager )
+        pVarManager->getHelpText().delObserver( this );
 }
 
