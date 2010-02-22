@@ -885,9 +885,9 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     }
 
     assert( i_read >= 0 );
+    p_access->info.i_pos += i_read;
     if( p_sys->b_has_size )
     {
-        p_access->info.i_pos += i_read;
         assert( p_access->info.i_pos <= p_access->info.i_size );
         assert( (unsigned)i_read <= p_sys->i_remaining );
         p_sys->i_remaining -= i_read;
