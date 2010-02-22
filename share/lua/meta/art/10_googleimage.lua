@@ -29,11 +29,12 @@ end
 
 -- Return the artwork
 function fetch_art()
-	-- This is disabled because we have too much false positive by the inherent nature of this script.
-	if true then vlc.msg.dbg("10_googleimage.lua is disabled") return nil end
+    -- This is disabled because we have too much false positive by the inherent nature of this script.
+    if true then vlc.msg.dbg("10_googleimage.lua is disabled") return nil end
 
-	if vlc.input == nil then return nil end
-	local item = vlc.input.item()
+    if vlc.input == nil then return nil end
+
+    local item = vlc.input.item()
     local meta = item:metas()
     if meta["artist"] and meta["album"] then
         title = meta["artist"].." "..meta["album"]
