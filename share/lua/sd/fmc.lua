@@ -26,6 +26,7 @@ function descriptor()
 end
 
 function main()
+    local loading = vlc.sd.add_item( {path="vlc://nop",title="Loading..."} )
     local tree = simplexml.parse_url("http://www.archive.org/download/freemusiccharts.songs/fmc.xml")
     for _, show_node in ipairs( tree.children ) do
         simplexml.add_name_maps( show_node )
@@ -52,4 +53,5 @@ function main()
         node:add_subitem( {title=show_node.children_map["date"][1].children[1] .. " MP3 Podcast",path=show_node.children_map["podcastmp3"][1].children[1]} )
         node:add_subitem( {title=show_node.children_map["date"][1].children[1] .. " OGG Podcast",path=show_node.children_map["podcastogg"][1].children[1]} )
     end
+    vlc.sd.remove_item( loading )
 end
