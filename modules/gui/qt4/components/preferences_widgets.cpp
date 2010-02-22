@@ -1039,6 +1039,7 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
         l->addWidget( checkbox, line, 0 );
     }
 }
+
 BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
                                       module_config_t *_p_item,
                                       QLabel *_label,
