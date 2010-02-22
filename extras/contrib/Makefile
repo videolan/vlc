@@ -64,6 +64,8 @@ hosts/$(HOST)/.$(CONTRIBREV): contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
 	(cd tmp && find . -type d) | while read dir; do mkdir -p -- "$(PREFIX)/$$dir"; done
 	(cd tmp && find . -not -type d) | while read i; do mv -f -- tmp/"$$i" "$(PREFIX)/$$i"; done
 	rm -rf tmp
+	# install the gecko-sdk, which isn't part of the package for size and speed reasons
+	(cd src && rm -rf *gecko* && $(MAKE) .gecko)
     # libiconv.la is no longer present on Snow Leopard, so fix possible references to it, which would
     # result in linking issues
 ifdef HAVE_DARWIN_10
@@ -97,7 +99,9 @@ package-macosx:
 		exit 1 ; \
 	fi
 	mkdir tmp
-	(cd $(PREFIX); tar cf - *) | (cd tmp; tar xf -)
+	rm -rf $(PREFIX)/share/locale $(PREFIX)/share/doc $(PREFIX)/share/man
+	(cd $(PREFIX); tar cf - Sparkle bin sbin include lib share/aclocal* share/autoconf* \
+		share/automake* share/gettext* share/libtool*) | (cd tmp; tar xf -)
 	./change_prefix.sh tmp $(PREFIX) @@CONTRIB_PREFIX@@
 	(cd tmp; tar cf - .) | bzip2 -c > contrib-macosx.tar.bz2
 	rm -rf tmp
