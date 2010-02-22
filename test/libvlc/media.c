@@ -47,7 +47,7 @@ static void test_media_preparsed(const char** argv, int argc)
 
     // Check to see if we are properly receiving the event.
     libvlc_event_manager_t *em = libvlc_media_event_manager (media);
-    libvlc_event_attach (em, libvlc_MediaPreparsedChanged, preparsed_changed, &received);
+    libvlc_event_attach (em, libvlc_MediaPreparsedChanged, preparsed_changed, (void*)&received);
 
     // Parse the media. This is synchronous.
     libvlc_media_parse(media);
@@ -56,10 +56,10 @@ static void test_media_preparsed(const char** argv, int argc)
     while (!received);
 
     // We are good, now check Elementary Stream info.
-    libvlc_media_es_t *es;
-    int num = libvlc_media_get_es(media, &es);
+    libvlc_media_track_info_t *tracks;
+    int num = libvlc_media_get_es(media, &tracks);
     assert(num > 0);
-    free(es);
+    free(tracks);
 
     libvlc_media_release (media);
     libvlc_release (vlc);

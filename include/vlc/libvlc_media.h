@@ -100,13 +100,13 @@ enum
     libvlc_media_option_unique = 0x100
 };
 
-typedef enum libvlc_es_type_t
+typedef enum libvlc_track_type_t
 {
-    libvlc_es_unknown   = -1,
-    libvlc_es_audio     = 0,
-    libvlc_es_video     = 1,
-    libvlc_es_text      = 2,
-} libvlc_es_type_t;
+    libvlc_track_unknown   = -1,
+    libvlc_track_audio     = 0,
+    libvlc_track_video     = 1,
+    libvlc_track_text      = 2,
+} libvlc_track_type_t;
 
 /** defgroup libvlc_media_stats_t LibVLC media statistics
  * \ingroup libvlc_media
@@ -143,12 +143,12 @@ typedef struct libvlc_media_stats_t
 } libvlc_media_stats_t;
 /** @}*/
 
-typedef struct libvlc_media_es_t
+typedef struct libvlc_media_track_info_t
 {
     /* Codec fourcc */
     uint32_t    i_codec;
     int         i_id;
-    libvlc_es_type_t i_type;
+    libvlc_track_type_t i_type;
 
     /* Codec specific */
     int         i_profile;
@@ -162,7 +162,7 @@ typedef struct libvlc_media_es_t
     unsigned    i_height;
     unsigned    i_width;
 
-} libvlc_media_es_t;
+} libvlc_media_track_info_t;
 
 
 /**
@@ -385,7 +385,7 @@ VLC_PUBLIC_API libvlc_time_t
  *
  * \see libvlc_media_parse_async
  * \see libvlc_media_get_meta
- * \see libvlc_media_get_es
+ * \see libvlc_media_get_tracks_info
  *
  * \param media media descriptor object
  */
@@ -405,7 +405,7 @@ libvlc_media_parse(libvlc_media_t *media);
  * \see libvlc_media_parse
  * \see libvlc_MediaPreparsedChanged
  * \see libvlc_media_get_meta
- * \see libvlc_media_get_es
+ * \see libvlc_media_get_tracks_info
  *
  * \param media media descriptor object
  */
@@ -448,15 +448,28 @@ VLC_PUBLIC_API void *
  *
  * Note, you need to play the media _one_ time with --sout="#description"
  * Not doing this will result in an empty array, and doing it more than once
- * will duplicate the entries in the array each time.
+ * will duplicate the entries in the array each time. Something like this:
  *
- * \param p_md media descriptor object
- * \param pp_es address to store an allocated array of Elementary Streams descriptions (must be freed by the caller)
+ * @begincode
+ * libvlc_media_player_t *player = libvlc_media_player_new_from_media(media);
+ * libvlc_media_add_option_flag(media, "sout=\"#description\"");
+ * libvlc_media_player_play(player);
+ * // ... wait until playing
+ * libvlc_media_player_release(player);
+ * @endcode
+ *
+ * This is very likely to change in next release, and be done at the parsing
+ * phase.
+ *
+ * \param media media descriptor object
+ * \param tracks address to store an allocated array of Elementary Streams
+ * descriptions (must be freed by the caller)
  *
  * return the number of Elementary Streams
  */
-VLC_PUBLIC_API int
-    libvlc_media_get_es( libvlc_media_t * p_md, libvlc_media_es_t ** pp_es );
+VLC_PUBLIC_API
+int libvlc_media_get_tracks_info(libvlc_media_t *media,
+                                 libvlc_media_track_info_t **tracks );
 
 /** @}*/
 
