@@ -225,6 +225,7 @@ nobase_vlclib_DATA = \
 	lua/sd/fmc.luac \
 	lua/sd/freebox.luac \
 	lua/sd/frenchtv.luac \
+	lua/sd/icecast.luac \
 	$(NULL)
 if BUILD_HTTPD
 nobase_vlclib_DATA += \
@@ -275,7 +276,8 @@ EXTRA_DIST += \
 	lua/sd/README.txt \
 	lua/sd/fmc.lua \
 	lua/sd/freebox.lua \
-	lua/sd/frenchtv.lua
+	lua/sd/frenchtv.lua \
+	lua/sd/icecast.lua
 
 DIST_http_lua = \
 	lua/http/.hosts \
