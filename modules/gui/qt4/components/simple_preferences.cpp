@@ -150,8 +150,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 controls.append( control );                               \
             }                                                             \
             else {                                                        \
+                QWidget *widget = label;                                  \
                 qcontrol->setVisible( false );                            \
-                if( label ) label->setEnabled( false );                   \
+                if( widget ) widget->setEnabled( false );                 \
             }
 
 
