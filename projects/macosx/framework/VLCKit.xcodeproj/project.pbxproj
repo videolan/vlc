@@ -519,11 +519,9 @@
 			files = (
 			);
 			inputPaths = (
-				$SRCROOT/../../../extras/contrib/bootstrap,
 			);
 			name = make;
 			outputPaths = (
-				$SRCROOT/../../../extras/contrib/config.mak,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
