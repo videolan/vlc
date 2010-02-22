@@ -172,6 +172,6 @@ static void* Run( void *data )
         lua_pop( L, 1 );
         return NULL;
     }
-    msg_Dbg( p_sd, "LuaSD script loaded: %s", p_sd->psz_name );
+    msg_Dbg( p_sd, "LuaSD script loaded: %s", p_sys->psz_filename );
     return NULL;
 }
