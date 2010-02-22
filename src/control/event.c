@@ -212,10 +212,10 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
         else
         {
             /* The listener wants to block the emitter during event callback */
-            
+
             listener_cached->pf_callback( p_event, listener_cached->p_user_data );
             listener_cached++;
-            
+
             if( listeners_group->b_sublistener_removed )
             {
                 /* If a callback was removed, this gets called */
@@ -228,7 +228,7 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
                     listener_cached++;
                     continue;
                 }
-            }            
+            }
         }
     }
     vlc_mutex_unlock( &p_em->event_sending_lock );
@@ -252,7 +252,7 @@ static const event_name_t event_list[] = {
     DEF(MediaMetaChanged)
     DEF(MediaSubItemAdded)
     DEF(MediaDurationChanged)
-    DEF(MediaPreparsedChanged)
+    DEF(MediaParsedChanged)
     DEF(MediaFreed)
     DEF(MediaStateChanged)
 
@@ -333,16 +333,16 @@ int event_attach( libvlc_event_manager_t * p_event_manager,
     libvlc_event_listeners_group_t * listeners_group;
     libvlc_event_listener_t * listener;
     int i;
-    
+
     listener = malloc(sizeof(libvlc_event_listener_t));
     if( unlikely(listener == NULL) )
         return ENOMEM;
-    
+
     listener->event_type = event_type;
     listener->p_user_data = p_user_data;
     listener->pf_callback = pf_callback;
     listener->is_asynchronous = is_asynchronous;
-    
+
     vlc_mutex_lock( &p_event_manager->object_lock );
     for( i = 0; i < vlc_array_count(&p_event_manager->listeners_groups); i++ )
     {
@@ -355,7 +355,7 @@ int event_attach( libvlc_event_manager_t * p_event_manager,
         }
     }
     vlc_mutex_unlock( &p_event_manager->object_lock );
-    
+
     free(listener);
     fprintf( stderr, "This object event manager doesn't know about '%s' events",
              libvlc_event_type_name(event_type) );
@@ -405,7 +405,7 @@ void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
     libvlc_event_listener_t * listener;
     int i, j;
     bool found = false;
-    
+
     vlc_mutex_lock( &p_event_manager->event_sending_lock );
     vlc_mutex_lock( &p_event_manager->object_lock );
     for( i = 0; i < vlc_array_count(&p_event_manager->listeners_groups); i++)

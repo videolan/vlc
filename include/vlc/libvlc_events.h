@@ -49,7 +49,7 @@ enum libvlc_event_e {
     libvlc_MediaMetaChanged=0,
     libvlc_MediaSubItemAdded,
     libvlc_MediaDurationChanged,
-    libvlc_MediaPreparsedChanged,
+    libvlc_MediaParsedChanged,
     libvlc_MediaFreed,
     libvlc_MediaStateChanged,
 
@@ -127,7 +127,7 @@ typedef struct libvlc_event_t
         struct
         {
             int new_status;
-        } media_preparsed_changed;
+        } media_parsed_changed;
         struct
         {
             libvlc_media_t * md;

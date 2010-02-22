@@ -172,8 +172,8 @@ static void input_item_preparsed_changed(const vlc_event_t *p_event,
 
 
     /* Construct the event */
-    event.type = libvlc_MediaPreparsedChanged;
-    event.u.media_preparsed_changed.new_status =
+    event.type = libvlc_MediaParsedChanged;
+    event.u.media_parsed_changed.new_status =
         p_event->u.input_item_preparsed_changed.new_status;
 
     /* Send the event */
@@ -284,18 +284,14 @@ libvlc_media_t * libvlc_media_new_from_input_item(
         free(p_md);
         return NULL;
     }
-    libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaMetaChanged );
-    libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaSubItemAdded );
-    libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaFreed );
-    libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaDurationChanged );
-    libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaStateChanged );
-    libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaPreparsedChanged );
+
+    libvlc_event_manager_t *em = p_md->p_event_manager;
+    libvlc_event_manager_register_event_type(em, libvlc_MediaMetaChanged);
+    libvlc_event_manager_register_event_type(em, libvlc_MediaSubItemAdded);
+    libvlc_event_manager_register_event_type(em, libvlc_MediaFreed);
+    libvlc_event_manager_register_event_type(em, libvlc_MediaDurationChanged);
+    libvlc_event_manager_register_event_type(em, libvlc_MediaStateChanged);
+    libvlc_event_manager_register_event_type(em, libvlc_MediaParsedChanged);
 
     vlc_gc_incref( p_md->p_input_item );
 
@@ -641,10 +637,10 @@ libvlc_media_parse_async(libvlc_media_t *media)
 }
 
 /**************************************************************************
- * Get preparsed status for media object.
+ * Get parsed status for media object.
  **************************************************************************/
 int
-libvlc_media_is_preparsed( libvlc_media_t * p_md )
+libvlc_media_is_parsed( libvlc_media_t * p_md )
 {
     assert( p_md );
 

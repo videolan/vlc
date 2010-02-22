@@ -398,12 +398,12 @@ libvlc_media_parse(libvlc_media_t *media);
  * This fetches (local) meta data and tracks information.
  * The method is the asynchronous of libvlc_media_parse_async().
  *
- * To track when this is over you can listen to libvlc_MediaPreparsedChanged
- * event. However if the media was already preparsed you will not receive this
+ * To track when this is over you can listen to libvlc_MediaParsedChanged
+ * event. However if the media was already parsed you will not receive this
  * event.
  *
  * \see libvlc_media_parse
- * \see libvlc_MediaPreparsedChanged
+ * \see libvlc_MediaParsedChanged
  * \see libvlc_media_get_meta
  * \see libvlc_media_get_tracks_info
  *
@@ -413,13 +413,15 @@ VLC_PUBLIC_API void
 libvlc_media_parse_async(libvlc_media_t *media);
 
 /**
- * Get preparsed status for media descriptor object.
+ * Get Parsed status for media descriptor object.
+ *
+ * \see libvlc_MediaParsedChanged
  *
  * \param p_md media descriptor object
- * \return true if media object has been preparsed otherwise it returns false
+ * \return true if media object has been parsed otherwise it returns false
  */
 VLC_PUBLIC_API int
-   libvlc_media_is_preparsed( libvlc_media_t * p_md );
+   libvlc_media_is_parsed( libvlc_media_t * p_md );
 
 /**
  * Sets media descriptor's user_data. user_data is specialized data
