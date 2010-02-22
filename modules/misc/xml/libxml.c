@@ -45,6 +45,11 @@ vlc_module_begin ()
     set_description( N_("XML Parser (using libxml2)") )
     set_capability( "xml", 10 )
     set_callbacks( Open, Close )
+
+#ifdef WIN32
+    linked_with_a_crap_library_which_uses_atexit()
+#endif
+
 vlc_module_end ()
 
 struct xml_reader_sys_t

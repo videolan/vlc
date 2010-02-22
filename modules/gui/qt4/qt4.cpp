@@ -246,6 +246,10 @@ vlc_module_begin ()
 
     add_obsolete_bool( "qt-blingbling" ) /* Suppressed since 1.0.0 */
 
+#ifdef WIN32
+    linked_with_a_crap_library_which_uses_atexit()
+#endif
+
     add_submodule ()
         set_description( "Dialogs provider" )
         set_capability( "dialogs provider", 51 )
