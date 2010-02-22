@@ -166,7 +166,7 @@ static void input_item_preparsed_changed( const vlc_event_t *p_event,
 
     /* Construct the event */
     event.type = libvlc_MediaPreparsedChanged;
-    event.u.media_preparsed_changed.new_status = 
+    event.u.media_preparsed_changed.new_status =
         p_event->u.input_item_preparsed_changed.new_status;
 
     /* Send the event */
@@ -622,11 +622,11 @@ libvlc_media_is_preparsed( libvlc_media_t * p_md )
 }
 
 /**************************************************************************
- * Sets media descriptor's user_data. user_data is specialized data 
- * accessed by the host application, VLC.framework uses it as a pointer to 
+ * Sets media descriptor's user_data. user_data is specialized data
+ * accessed by the host application, VLC.framework uses it as a pointer to
  * an native object that references a libvlc_media_t pointer
  **************************************************************************/
-void 
+void
 libvlc_media_set_user_data( libvlc_media_t * p_md, void * p_new_user_data )
 {
     assert( p_md );
@@ -634,8 +634,8 @@ libvlc_media_set_user_data( libvlc_media_t * p_md, void * p_new_user_data )
 }
 
 /**************************************************************************
- * Get media descriptor's user_data. user_data is specialized data 
- * accessed by the host application, VLC.framework uses it as a pointer to 
+ * Get media descriptor's user_data. user_data is specialized data
+ * accessed by the host application, VLC.framework uses it as a pointer to
  * an native object that references a libvlc_media_t pointer
  **************************************************************************/
 void *
