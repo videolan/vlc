@@ -102,6 +102,8 @@ libvlc_media_new_location
 libvlc_media_new_path
 libvlc_media_new_as_node
 libvlc_media_new_from_input_item
+libvlc_media_parse
+libvlc_media_parse_async
 libvlc_media_player_can_pause
 libvlc_media_player_next_frame
 libvlc_media_player_event_manager

@@ -158,11 +158,18 @@ static void input_item_duration_changed( const vlc_event_t *p_event,
 /**************************************************************************
  * input_item_preparsed_changed (Private) (vlc event Callback)
  **************************************************************************/
-static void input_item_preparsed_changed( const vlc_event_t *p_event,
-                                          void * user_data )
+static void input_item_preparsed_changed(const vlc_event_t *p_event,
+                                         void * user_data)
 {
-    libvlc_media_t * p_md = user_data;
+    libvlc_media_t *media = user_data;
     libvlc_event_t event;
+
+    /* Eventually notify libvlc_media_parse() */
+    vlc_mutex_lock(&media->parsed_lock);
+    media->is_parsed = true;
+    vlc_cond_broadcast(&media->parsed_cond);
+    vlc_mutex_unlock(&media->parsed_lock);
+
 
     /* Construct the event */
     event.type = libvlc_MediaPreparsedChanged;
@@ -170,7 +177,7 @@ static void input_item_preparsed_changed( const vlc_event_t *p_event,
         p_event->u.input_item_preparsed_changed.new_status;
 
     /* Send the event */
-    libvlc_event_send( p_md->p_event_manager, &event );
+    libvlc_event_send(media->p_event_manager, &event);
 }
 
 /**************************************************************************
@@ -225,12 +232,12 @@ static void uninstall_input_item_observer( libvlc_media_t *p_md )
 static void preparse_if_needed( libvlc_media_t *p_md )
 {
     /* XXX: need some locking here */
-    if (!p_md->b_preparsed)
+    if (!p_md->has_asked_preparse)
     {
         playlist_PreparseEnqueue(
                 libvlc_priv (p_md->p_libvlc_instance->p_libvlc_int)->p_playlist,
                 p_md->p_input_item );
-        p_md->b_preparsed = true;
+        p_md->has_asked_preparse = true;
     }
 }
 
@@ -261,6 +268,9 @@ libvlc_media_t * libvlc_media_new_from_input_item(
     p_md->p_libvlc_instance = p_instance;
     p_md->p_input_item      = p_input_item;
     p_md->i_refcount        = 1;
+
+    vlc_cond_init(&p_md->parsed_cond);
+    vlc_mutex_init(&p_md->parsed_lock);
 
     p_md->state = libvlc_NothingSpecial;
 
@@ -605,6 +615,29 @@ libvlc_media_get_duration( libvlc_media_t * p_md )
         return -1;
 
     return from_mtime(input_item_GetDuration( p_md->p_input_item ));
+}
+
+/**************************************************************************
+ * Parse the media.
+ **************************************************************************/
+void
+libvlc_media_parse(libvlc_media_t *media)
+{
+    preparse_if_needed(media);
+
+    vlc_mutex_lock(&media->parsed_lock);
+    while (!media->is_parsed)
+        vlc_cond_wait(&media->parsed_cond, &media->parsed_lock);
+    vlc_mutex_unlock(&media->parsed_lock);
+}
+
+/**************************************************************************
+ * Parse the media.
+ **************************************************************************/
+void
+libvlc_media_parse_async(libvlc_media_t *media)
+{
+    preparse_if_needed(media);
 }
 
 /**************************************************************************

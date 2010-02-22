@@ -278,6 +278,16 @@ VLC_PUBLIC_API libvlc_media_t * libvlc_media_duplicate( libvlc_media_t *p_md );
 /**
  * Read the meta of the media.
  *
+ * If the media has not yet been parsed this will return NULL.
+ *
+ * This methods automatically calls libvlc_media_parse_async(), so after calling
+ * it you may receive a libvlc_MediaMetaChanged event. If you prefer a synchronous
+ * version ensure that you call libvlc_media_parse() before get_meta().
+ *
+ * \see libvlc_media_parse
+ * \see libvlc_media_parse_async
+ * \see libvlc_MediaMetaChanged
+ *
  * \param p_md the media descriptor
  * \param e_meta the meta to read
  * \return the media's meta
@@ -366,6 +376,41 @@ VLC_PUBLIC_API libvlc_event_manager_t *
  */
 VLC_PUBLIC_API libvlc_time_t
    libvlc_media_get_duration( libvlc_media_t * p_md );
+
+/**
+ * Parse a media.
+ *
+ * This fetches (local) meta data and tracks information.
+ * The method is synchronous.
+ *
+ * \see libvlc_media_parse_async
+ * \see libvlc_media_get_meta
+ * \see libvlc_media_get_es
+ *
+ * \param media media descriptor object
+ */
+VLC_PUBLIC_API void
+libvlc_media_parse(libvlc_media_t *media);
+
+/**
+ * Parse a media.
+ *
+ * This fetches (local) meta data and tracks information.
+ * The method is the asynchronous of libvlc_media_parse_async().
+ *
+ * To track when this is over you can listen to libvlc_MediaPreparsedChanged
+ * event. However if the media was already preparsed you will not receive this
+ * event.
+ *
+ * \see libvlc_media_parse
+ * \see libvlc_MediaPreparsedChanged
+ * \see libvlc_media_get_meta
+ * \see libvlc_media_get_es
+ *
+ * \param media media descriptor object
+ */
+VLC_PUBLIC_API void
+libvlc_media_parse_async(libvlc_media_t *media);
 
 /**
  * Get preparsed status for media descriptor object.
