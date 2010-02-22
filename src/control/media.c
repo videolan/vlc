@@ -284,6 +284,8 @@ libvlc_media_t * libvlc_media_new_from_input_item(
         libvlc_MediaDurationChanged );
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
         libvlc_MediaStateChanged );
+    libvlc_event_manager_register_event_type( p_md->p_event_manager,
+        libvlc_MediaPreparsedChanged );
 
     vlc_gc_incref( p_md->p_input_item );
 
