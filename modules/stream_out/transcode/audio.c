@@ -385,7 +385,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
         if( !p_audio_buf )
             abort();
 
-        p_audio_buf->i_pts = p_audio_buf->i_dts;
+        p_audio_buf->i_dts = p_audio_buf->i_pts;
 
         audio_timer_start( id->p_encoder );
         p_block = id->p_encoder->pf_encode_audio( id->p_encoder, p_audio_buf );
