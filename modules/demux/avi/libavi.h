@@ -174,10 +174,10 @@ typedef struct
 typedef struct avi_chunk_indx_s
 {
     AVI_CHUNK_COMMON
-    int16_t i_longsperentry;
-    int8_t  i_indexsubtype;
-    int8_t  i_indextype;
-    int32_t i_entriesinuse;
+    int16_t  i_longsperentry;
+    int8_t   i_indexsubtype;
+    int8_t   i_indextype;
+    uint32_t i_entriesinuse;
     vlc_fourcc_t i_id;
 
     int64_t i_baseoffset;

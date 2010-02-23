@@ -2180,12 +2180,11 @@ static void __Parse_indx( demux_t    *p_demux,
 {
     demux_sys_t         *p_sys    = p_demux->p_sys;
     avi_entry_t     index;
-    int32_t             i;
 
     msg_Dbg( p_demux, "loading subindex(0x%x) %d entries", p_indx->i_indextype, p_indx->i_entriesinuse );
     if( p_indx->i_indexsubtype == 0 )
     {
-        for( i = 0; i < p_indx->i_entriesinuse; i++ )
+        for( unsigned i = 0; i < p_indx->i_entriesinuse; i++ )
         {
             index.i_id      = p_indx->i_id;
             index.i_flags   = p_indx->idx.std[i].i_size & 0x80000000 ? 0 : AVIIF_KEYFRAME;
@@ -2197,7 +2196,7 @@ static void __Parse_indx( demux_t    *p_demux,
     }
     else if( p_indx->i_indexsubtype == AVI_INDEX_2FIELD )
     {
-        for( i = 0; i < p_indx->i_entriesinuse; i++ )
+        for( unsigned i = 0; i < p_indx->i_entriesinuse; i++ )
         {
             index.i_id      = p_indx->i_id;
             index.i_flags   = p_indx->idx.field[i].i_size & 0x80000000 ? 0 : AVIIF_KEYFRAME;
@@ -2217,7 +2216,6 @@ static void AVI_IndexLoad_indx( demux_t *p_demux )
 {
     demux_sys_t         *p_sys = p_demux->p_sys;
     unsigned int        i_stream;
-    int32_t             i;
 
     avi_chunk_list_t    *p_riff;
     avi_chunk_list_t    *p_hdrl;
@@ -2248,7 +2246,7 @@ static void AVI_IndexLoad_indx( demux_t *p_demux )
         else if( p_indx->i_indextype == AVI_INDEX_OF_INDEXES )
         {
             avi_chunk_t    ck_sub;
-            for( i = 0; i < p_indx->i_entriesinuse; i++ )
+            for( unsigned i = 0; i < p_indx->i_entriesinuse; i++ )
             {
                 if( stream_Seek( p_demux->s, p_indx->idx.super[i].i_offset )||
                     AVI_ChunkRead( p_demux->s, &ck_sub, NULL  ) )
