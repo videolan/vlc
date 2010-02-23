@@ -720,8 +720,7 @@ package-win-common:
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  mkdir -p "$(win32_destdir)/locale/$${i}/LC_MESSAGES" ; \
 	  cp "$(srcdir)/po/$${i}.gmo" \
-	    "$(win32_destdir)/locale/$${i}/LC_MESSAGES/vlc.mo" \
-            || true ; \
+	    "$(win32_destdir)/locale/$${i}/LC_MESSAGES/vlc.mo" || true ; \
 	done
 	mkdir -p $(win32_destdir)/locale/qt4/
 	cp $(QT4LOCALEDIR)/*.qm $(win32_destdir)/locale/qt4/ || true
@@ -739,7 +738,6 @@ if BUILD_ACTIVEX
 	cp $(srcdir)/projects/activex/README.TXT  $(win32_destdir)/activex/
 	cp $(srcdir)/projects/activex/test.html  $(win32_destdir)/activex/
 	unix2dos $(win32_destdir)/activex/*
-
 	cp $(top_builddir)/projects/activex/.libs/axvlc$(LIBEXT) $(win32_destdir)/activex/
 	cp $(top_srcdir)/projects/activex/axvlc.dll.manifest $(win32_destdir)/activex/
 endif
@@ -828,6 +826,10 @@ if BUILD_LUA
 	$(INSTALL) -d $(win32_lua_destdir)/playlist
 	for i in $(srcdir)/share/lua/playlist/*.* ; do \
 	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/playlist/`basename $${i}` ; \
+	done
+	$(INSTALL) -d $(win32_lua_destdir)/sd
+	for i in $(srcdir)/share/lua/sd/*.* ; do \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/sd/`basename $${i}` ; \
 	done
 	$(INSTALL) -d $(win32_lua_destdir)/meta/art
 	for i in $(srcdir)/share/lua/meta/art/*.lua ; do \
