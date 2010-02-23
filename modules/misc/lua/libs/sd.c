@@ -201,9 +201,9 @@ static int vlclua_sd_add_item( lua_State *L )
 static int vlclua_sd_remove_item( lua_State *L )
 {
     services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
-    if( !lua_isnil( L, -1 ) )
+    if( !lua_isnil( L, 1 ) )
     {
-        input_item_t **pp_input = luaL_checkudata( L, -1, "input_item_t" );
+        input_item_t **pp_input = luaL_checkudata( L, 1, "input_item_t" );
         if( *pp_input )
             services_discovery_RemoveItem( p_sd, *pp_input );
         /* Make sure we won't try to remove it again */
