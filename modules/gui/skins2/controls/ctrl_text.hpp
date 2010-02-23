@@ -124,6 +124,9 @@ private:
     /// Method called when the observed variable is modified
     virtual void onUpdate( Subject<VarText> &rVariable, void* );
 
+    /// Method called when visibility is updated
+    virtual void onUpdate( Subject<VarBool> &rVariable , void* );
+
     /// Display the text on the control
     void displayText( const UString &rText );
 

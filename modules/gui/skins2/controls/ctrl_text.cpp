@@ -211,6 +211,23 @@ void CtrlText::onUpdate( Subject<VarText> &rVariable, void* arg )
 }
 
 
+void CtrlText::onUpdate( Subject<VarBool> &rVariable, void *arg  )
+{
+    // Visibility changed
+    if( &rVariable == m_pVisible )
+    {
+        if( isVisible() )
+        {
+            displayText( m_rVariable.get() );
+        }
+        else
+        {
+            notifyLayout();
+        }
+    }
+}
+
+
 void CtrlText::displayText( const UString &rText )
 {
     // Create the images ('normal' and 'double') from the text
