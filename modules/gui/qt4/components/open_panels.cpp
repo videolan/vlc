@@ -35,6 +35,7 @@
 #include "dialogs/open.hpp"
 #include "dialogs_provider.hpp" /* Open Subtitle file */
 #include "util/qt_dirs.hpp"
+#include <vlc_intf_strings.h>
 
 #include <QFileDialog>
 #include <QDialogButtonBox>
@@ -47,7 +48,10 @@
 #include <QUrl>
 #include <QStringListModel>
 
-#define I_DEVICE_TOOLTIP N_("Select the device or the VIDEO_TS directory")
+
+#define I_DEVICE_TOOLTIP \
+    I_DIR_OR_FOLDER( N_("Select a device or a VIDEO_TS directory"), \
+                     N_("Select a device or a VIDEO_TS folder") )
 
 static const char *psz_devModule[] = { "v4l", "v4l2", "pvr", "dvb", "bda",
                                        "dshow", "screen", "jack" };

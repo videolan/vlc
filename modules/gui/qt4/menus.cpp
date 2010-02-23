@@ -313,7 +313,7 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
         ":/type/file-asym", SLOT( simpleOpenDialog() ), "Ctrl+O" );
     addDPStaticEntry( menu, qtr( "Advanced Open File..." ),
         ":/type/file-asym", SLOT( openFileDialog() ), "Ctrl+Shift+O" );
-    addDPStaticEntry( menu, qtr( I_OPEN_FOLDER ),
+    addDPStaticEntry( menu, qtr( I_OP_OPDIR ),
         ":/type/folder-grey", SLOT( PLOpenDir() ), "Ctrl+F" );
     addDPStaticEntry( menu, qtr( "Open &Disc..." ),
         ":/type/disc", SLOT( openDiscDialog() ), "Ctrl+D" );
@@ -853,7 +853,7 @@ void QVLCMenu::PopupMenuStaticEntries( QMenu *menu )
     QMenu *openmenu = new QMenu( qtr( "Open Media" ), menu );
     addDPStaticEntry( openmenu, qtr( "&Open File..." ),
         ":/type/file-asym", SLOT( openFileDialog() ) );
-    addDPStaticEntry( openmenu, qtr( I_OPEN_FOLDER ),
+    addDPStaticEntry( openmenu, qtr( I_OP_OPDIR ),
         ":/type/folder-grey", SLOT( PLOpenDir() ) );
     addDPStaticEntry( openmenu, qtr( "Open &Disc..." ),
         ":/type/disc", SLOT( openDiscDialog() ) );

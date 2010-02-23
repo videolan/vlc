@@ -38,6 +38,7 @@
 #include "util/customwidgets.hpp"
 #include "util/qt_dirs.hpp"
 #include <vlc_keys.h>
+#include <vlc_intf_strings.h>
 
 #include <QString>
 #include <QVariant>
@@ -357,7 +358,7 @@ DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
 void DirectoryConfigControl::updateField()
 {
     QString dir = QFileDialog::getExistingDirectory( NULL,
-                      qtr( "Select Directory" ),
+                      qtr( I_OP_SEL_DIR ),
                       text->text().isEmpty() ?
                         QVLCUserDir( VLC_HOME_DIR ) : text->text(),
                   QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );

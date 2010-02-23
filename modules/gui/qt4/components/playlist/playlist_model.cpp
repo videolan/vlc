@@ -42,8 +42,18 @@
 #include <QMenu>
 #include <QApplication>
 #include <QSettings>
+#include <QUrl>
+#include <QFileInfo>
+#include <QDesktopServices>
+#include <QInputDialog>
 
 #include "sorting.h"
+
+#define I_NEW_DIR \
+    I_DIR_OR_FOLDER( N_("Create Directory"), N_( "Create Folder" ) )
+#define I_NEW_DIR_NAME \
+    I_DIR_OR_FOLDER( N_( "Enter name for new directory:" ), \
+                     N_( "Enter name for new folder:" ) )
 
 QIcon PLModel::icons[ITEM_TYPE_NUMBER];
 
@@ -993,9 +1003,6 @@ void PLModel::popupSave()
         THEDP->streamingDialog( NULL, mrls[0] );
 }
 
-#include <QUrl>
-#include <QFileInfo>
-#include <QDesktopServices>
 void PLModel::popupExplore()
 {
     PL_LOCK;
@@ -1028,12 +1035,11 @@ void PLModel::popupExplore()
         PL_UNLOCK;
 }
 
-#include <QInputDialog>
 void PLModel::popupAddNode()
 {
     bool ok;
     QString name = QInputDialog::getText( PlaylistDialog::getInstance( p_intf ),
-        qtr( "Create Folder" ), qtr( "Enter name for new folder:" ),
+        qtr( I_NEW_DIR ), qtr( I_NEW_DIR_NAME ),
         QLineEdit::Normal, QString(), &ok);
     if( !ok || name.isEmpty() ) return;
     PL_LOCK;

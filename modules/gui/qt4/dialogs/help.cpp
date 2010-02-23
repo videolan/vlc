@@ -268,7 +268,7 @@ void UpdateDialog::UpdateOrDownload()
     else
     {
         QString dest_dir = QFileDialog::getExistingDirectory( this,
-                                 qtr( "Select a directory..." ),
+                                 qtr( I_OP_SEL_DIR ),
                                  QVLCUserDir( VLC_DOWNLOAD_DIR ) );
 
         if( !dest_dir.isEmpty() )

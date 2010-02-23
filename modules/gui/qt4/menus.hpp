@@ -31,13 +31,6 @@
 #include <QAction>
 #include <vector>
 
-/* Folder vs. Directory */
-#if defined( WIN32 ) || defined(__APPLE__)
-#define I_OPEN_FOLDER N_("Open &Folder...")
-#else
-#define I_OPEN_FOLDER N_("Open D&irectory...")
-#endif //WIN32
-
 using namespace std;
 
 class QMenu;

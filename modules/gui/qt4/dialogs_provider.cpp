@@ -61,6 +61,8 @@
 #include <QSignalMapper>
 #include <QFileDialog>
 
+#define I_OP_DIR_WINTITLE I_DIR_OR_FOLDER( N_("Open Directory"), \
+                                           N_("Open Folder") )
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
@@ -488,7 +490,7 @@ void DialogsProvider::openUrlDialog()
  **/
 static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
 {
-    QString dir = QFileDialog::getExistingDirectory( NULL, qtr("Open Directory"), p_intf->p_sys->filepath );
+    QString dir = QFileDialog::getExistingDirectory( NULL, qtr( I_OP_DIR_WINTITLE ), p_intf->p_sys->filepath );
 
     if (!dir.isEmpty() )
     {

@@ -27,12 +27,16 @@
 #include "components/sout/sout_widgets.hpp"
 #include "dialogs/sout.hpp"
 #include "util/qt_dirs.hpp"
+#include <vlc_intf_strings.h>
 
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QFileDialog>
+
+#define I_FILE_SLASH_DIR \
+    I_DIR_OR_FOLDER( N_("File/Directory"), N_("File/Folder") )
 
 SoutInputBox::SoutInputBox( QWidget *_parent, const QString& mrl ) : QGroupBox( _parent )
 {
@@ -72,7 +76,7 @@ void SoutInputBox::setMRL( const QString& mrl )
         type = mrl.left( i );
     }
     else
-        type = qtr( "File/Directory" );
+        type = qtr( I_FILE_SLASH_DIR );
     sourceValueLabel->setText( type );
 }
 
