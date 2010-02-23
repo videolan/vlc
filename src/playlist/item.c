@@ -36,8 +36,6 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
                            playlist_item_t * );
 static void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item );
 
-static playlist_item_t *ItemToNode( playlist_t *, playlist_item_t *, bool );
-
 static int RecursiveAddIntoParent (
                 playlist_t *p_playlist, playlist_item_t *p_parent,
                 input_item_node_t *p_node, int i_pos, bool b_flat,
@@ -479,80 +477,6 @@ playlist_item_t *playlist_InsertInputItemTree (
 /*****************************************************************************
  * Playlist item misc operations
  *****************************************************************************/
-
-/**
- * Item to node
- *
- * Transform an item to a node. Return the node in the category tree, or NULL
- * if not found there
- * This function must be entered without the playlist lock
- * \param p_playlist the playlist object
- * \param p_item the item to transform
- * \param b_locked TRUE if the playlist is locked
- * \return the item transform in a node
- */
-static playlist_item_t *ItemToNode( playlist_t *p_playlist,
-                                    playlist_item_t *p_item,
-                                    bool b_locked )
-{
-    PL_LOCK_IF( !b_locked );
-
-    assert( p_item->p_parent );
-
-    bool b_flat = false;
-    playlist_item_t *p_up = p_item;
-    while( p_up->p_parent )
-    {
-        if( p_up->p_parent == p_playlist->p_playing ||
-            p_up->p_parent == p_playlist->p_media_library )
-        {
-            if( !pl_priv(p_playlist)->b_tree ) b_flat = true;
-            break;
-        }
-        p_up = p_up->p_parent;
-    }
-
-    if( !b_flat )
-    {
-        ChangeToNode( p_playlist, p_item );
-        if( p_up == p_playlist->p_root )
-            var_SetAddress( p_playlist, "item-change", p_item->p_input );
-        PL_UNLOCK_IF( !b_locked );
-        return p_item;
-    }
-    else
-    {
-        playlist_item_t *p_status_item = get_current_status_item( p_playlist );
-        playlist_item_t *p_status_node = get_current_status_node( p_playlist );
-        if( p_item == p_status_item )
-        {
-            /* We're deleting the current playlist item. Update
-              * the playlist object to point at the previous item
-              * so the playlist won't be restarted */
-            playlist_item_t *p_prev_status_item = NULL;
-            int i = 0;
-            while( i < p_status_node->i_children &&
-                    p_status_node->pp_children[i] != p_status_item )
-            {
-                p_prev_status_item = p_status_node->pp_children[i];
-                i++;
-            }
-            if( i == p_status_node->i_children )
-                p_prev_status_item = NULL;
-            if( p_prev_status_item )
-                set_current_status_item( p_playlist, p_prev_status_item );
-        }
-
-        DeleteFromInput( p_playlist, p_item->p_input,
-                          p_playlist->p_root, false );
-
-        pl_priv(p_playlist)->b_reset_currently_playing = true;
-        vlc_cond_signal( &pl_priv(p_playlist)->signal );
-
-        PL_UNLOCK_IF( !b_locked );
-        return p_item->p_parent;
-    }
-}
 
 /**
  * Find an item within a root, given its input id.
