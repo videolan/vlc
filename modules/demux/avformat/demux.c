@@ -498,6 +498,12 @@ static int Demux( demux_t *p_demux )
         return 1;
     }
     const AVStream *p_stream = p_sys->ic->streams[pkt.stream_index];
+    if( p_stream->time_base.den <= 0 )
+    {
+        msg_Warn( p_demux, "Invalid time base for the stream %d", pkt.stream_index );
+        av_free_packet( &pkt );
+        return 1;
+    }
     if( p_stream->codec->codec_id == CODEC_ID_SSA )
     {
         p_frame = BuildSsaFrame( &pkt, p_sys->i_ssa_order++ );
