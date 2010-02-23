@@ -33,7 +33,8 @@ static void preparsed_changed(const libvlc_event_t *event, void *user_data)
 
 static void test_media_preparsed(const char** argv, int argc)
 {
-    const char * file = test_default_sample;
+    // We use this image file because "empty.voc" has no track.
+    const char * file = SRCDIR"/samples/image.jpg";
 
     log ("Testing set_media\n");
 
@@ -58,7 +59,7 @@ static void test_media_preparsed(const char** argv, int argc)
     // We are good, now check Elementary Stream info.
     libvlc_media_track_info_t *tracks;
     int num = libvlc_media_get_tracks_info(media, &tracks);
-    assert(num > 0);
+    assert(num == 1);
     free(tracks);
 
     libvlc_media_release (media);
