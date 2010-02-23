@@ -122,6 +122,7 @@ vlc_module_begin ()
         add_shortcut( "luasd" )
         set_capability( "services_discovery", 0 )
         add_string( "lua-sd", "", NULL, "", "", false )
+        add_string( "lua-longname", "", NULL, "", "", false )
         set_callbacks( Open_LuaSD, Close_LuaSD )
 
     add_submodule ()

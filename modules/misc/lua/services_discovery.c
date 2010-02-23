@@ -36,7 +36,7 @@
  *****************************************************************************/
 static void *Run( void * );
 
-static const char * const ppsz_sd_options[] = { "sd", NULL };
+static const char * const ppsz_sd_options[] = { "sd", "longname", NULL };
 
 /*****************************************************************************
  * Local structures
