@@ -619,13 +619,15 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
             if( !L )
             {
                 msg_Err( probe, "Could not create new Lua State" );
-                return VLC_EGENERIC;
+                free( psz_filename );
+                goto error;
             }
             luaL_openlibs( L );
             if( vlclua_add_modules_path( probe, L, psz_filename ) )
             {
                 msg_Err( probe, "Error while setting the module search path for %s",
                           psz_filename );
+                free( psz_filename );
                 goto error;
             }
             if( luaL_dofile( L, psz_filename ) )
@@ -634,7 +636,9 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
                 msg_Err( probe, "Error loading script %s: %s", psz_filename,
                           lua_tostring( L, lua_gettop( L ) ) );
                 lua_pop( L, 1 );
-                goto error;
+                free( psz_filename );
+                lua_close( L );
+                continue;
             }
             char *psz_longname;
             char *temp = strchr( *ppsz_file, '.' );
