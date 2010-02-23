@@ -254,10 +254,6 @@ static void post_subitems( input_item_node_t *p_node )
  * the input item children. */
 void input_item_PostSubItem( input_item_t *p_parent, input_item_t *p_child )
 {
-    vlc_mutex_lock( &p_parent->lock );
-    p_parent->i_type = ITEM_TYPE_PLAYLIST;
-    vlc_mutex_unlock( &p_parent->lock );
-
     input_item_node_t *p_node = input_item_node_Create( p_parent );
     input_item_node_AppendItem( p_node, p_child );
     input_item_node_PostAndDelete( p_node );
