@@ -508,12 +508,18 @@ static int Demux( demux_t *p_demux )
     {
         p_frame = BuildSsaFrame( &pkt, p_sys->i_ssa_order++ );
         if( !p_frame )
+        {
+            av_free_packet( &pkt );
             return 1;
+        }
     }
     else
     {
         if( ( p_frame = block_New( p_demux, pkt.size ) ) == NULL )
+        {
+            av_free_packet( &pkt );
             return 0;
+        }
         memcpy( p_frame->p_buffer, pkt.data, pkt.size );
     }
 
