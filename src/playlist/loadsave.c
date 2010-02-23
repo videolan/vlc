@@ -112,7 +112,7 @@ static void input_item_subitem_tree_added( const vlc_event_t * p_event,
 
     PL_LOCK;
     playlist_InsertInputItemTree ( p_playlist, p_playlist->p_media_library,
-                                   p_root, 0, !pl_priv(p_playlist)->b_tree );
+                                   p_root, 0, false );
     PL_UNLOCK;
 }
 

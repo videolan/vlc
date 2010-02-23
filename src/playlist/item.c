@@ -82,8 +82,7 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
     playlist_item_t *p_up = p_item;
     while( p_up->p_parent )
     {
-        if( p_up->p_parent == p_playlist->p_playing ||
-            p_up->p_parent == p_playlist->p_media_library )
+        if( p_up->p_parent == p_playlist->p_playing )
         {
             if( !pl_priv(p_playlist)->b_tree ) b_flat = true;
             break;
@@ -104,7 +103,7 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
 
     if( b_current )
     {
-        if( b_stop || !b_autostart )
+        if( ( b_stop && !b_flat ) || !b_autostart )
         {
             PL_UNLOCK;
             playlist_Stop( p_playlist );
