@@ -823,7 +823,7 @@ if BUILD_LUA
 	for i in $(srcdir)/share/lua/*.* ; do \
 	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/`basename $${i}` ; \
 	done
-	$(INSTALL) -d $(win32_lua_destdir)/sd
+	$(INSTALL) -d $(win32_lua_destdir)/modules
 	for i in $(srcdir)/share/lua/modules/*.* ; do \
 	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/modules/`basename $${i}` ; \
 	done
