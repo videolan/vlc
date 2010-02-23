@@ -435,10 +435,11 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Should be resiliant against bad subtitles */
-    psz_subtitle = strndup( (const char *)p_block->p_buffer,
-                            p_block->i_buffer );
+    psz_subtitle = malloc( p_block->i_buffer + 1 );
     if( psz_subtitle == NULL )
         return NULL;
+    memcpy( psz_subtitle, p_block->p_buffer, p_block->i_buffer );
+    psz_subtitle[p_block->i_buffer] = '\0';
 
     if( p_sys->iconv_handle == (vlc_iconv_t)-1 )
     {
@@ -794,9 +795,13 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                     if( psz_attribs[ k ] == NULL )
                     {
                         /* Jump over unrecognised tag */
-                        int i_len = strcspn( psz_subtitle, "\"" ) + 1;
-
-                        i_len += strcspn( psz_subtitle + i_len, "\"" ) + 1;
+                        int i_len = strcspn( psz_subtitle, "\"" );
+                        if( psz_subtitle[i_len] == '\"' )
+                        {
+                            i_len += 1 + strcspn( &psz_subtitle[i_len + 1], "\"" );
+                            if( psz_subtitle[i_len] == '\"' )
+                                i_len++;
+                        }
                         psz_subtitle += i_len;
                     }
                     while (*psz_subtitle == ' ')
