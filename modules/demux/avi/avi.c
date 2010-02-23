@@ -2255,7 +2255,8 @@ static void AVI_IndexLoad_indx( demux_t *p_demux )
                 {
                     break;
                 }
-                __Parse_indx( p_demux, i_stream, &ck_sub.indx );
+                if( ck_sub.indx.i_indextype == AVI_INDEX_OF_CHUNKS )
+                    __Parse_indx( p_demux, i_stream, &ck_sub.indx );
                 AVI_ChunkFree( p_demux->s, &ck_sub );
             }
         }
