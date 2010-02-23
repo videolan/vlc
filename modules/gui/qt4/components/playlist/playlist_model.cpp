@@ -896,7 +896,8 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
         ( rootItem->i_id );
     i_popup_column = index.column();
 
-    bool tree = var_InheritBool( p_intf, "playlist-tree" );
+    bool tree = ( rootItem && rootItem->i_id != p_playlist->p_playing->i_id ) ||
+                var_InheritBool( p_intf, "playlist-tree" );
 
     PL_UNLOCK;
 
