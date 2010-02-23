@@ -1,14 +1,22 @@
 CLEANFILES = skins2/default.vlt
 MOSTLYCLEANFILES =
 
+iconsdatadir = $(datadir)/icons/hicolor/
+icons16dir = $(iconsdatadir)/16x16/apps/
+icons32dir = $(iconsdatadir)/32x32/apps/
+icons48dir = $(iconsdatadir)/48x48/apps/
+icons128dir = $(iconsdatadir)/128x128/apps/
+icons256dir = $(iconsdatadir)/256x256/apps/
+
 nobase_dist_data_DATA = applications/vlc.desktop
 
-dist_vlcdata_DATA = \
-	$(DIST_icons) \
-	$(DIST_icons16) \
-	$(DIST_icons32) \
-	$(DIST_icons48) \
-	$(DIST_icons128)
+dist_vlcdata_DATA = $(DIST_icons)
+dist_icons16_DATA = $(DIST_icons16)
+dist_icons32_DATA = $(DIST_icons32)
+dist_icons48_DATA = $(DIST_icons48)
+dist_icons128_DATA = $(DIST_icons128)
+dist_icons256_DATA = $(DIST_icons256)
+
 nobase_dist_vlcdata_SCRIPTS = \
 	utils/gnome-vlc-default.sh \
 	utils/audio-vlc-default.sh \
@@ -61,6 +69,8 @@ DIST_icons32 = vlc32x32.png vlc32x32.xpm vlc32x32-christmas.xpm
 DIST_icons48 = vlc48x48.png vlc48x48-christmas.png
 
 DIST_icons128 = vlc128x128.png vlc128x128-christmas.png
+
+DIST_icons256 = vlc256x256.png
 
 DIST_skins2 = \
 	skins2/fonts/FreeSans.ttf \
