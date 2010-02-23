@@ -607,6 +607,9 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf  )
 
 void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
 {
+    showBuffering = false;
+    bufTimer->stop();
+
     if( pos == -1.f )
     {
         setText( " --:--/--:-- " );
@@ -666,6 +669,7 @@ void TimeLabel::updateBuffering( float _buffered )
     else if( bufVal == 1 )
     {
         showBuffering = buffering = false;
+        bufTimer->stop();
     }
     update();
 }
