@@ -140,11 +140,18 @@ void Win32Window::reparent( void* OSHandle, int x, int y, int w, int h )
 void Win32Window::show() const
 {
 
-   if( m_type == GenericWindow::VoutWindow )
-       SetWindowPos( m_hWnd, HWND_BOTTOM, 0, 0, 0, 0,
-            SWP_NOMOVE | SWP_NOSIZE );
+    if( m_type == GenericWindow::VoutWindow )
+    {
+        SetWindowPos( m_hWnd, HWND_BOTTOM, 0, 0, 0, 0,
+                              SWP_NOMOVE | SWP_NOSIZE );
+    }
+    else if( m_type == GenericWindow::FullscreenWindow )
+    {
+        SetWindowPos( m_hWnd, HWND_TOPMOST, 0, 0, 0, 0,
+                              SWP_NOMOVE | SWP_NOSIZE );
+    }
 
-   ShowWindow( m_hWnd, SW_SHOW );
+    ShowWindow( m_hWnd, SW_SHOW );
 }
 
 
