@@ -223,7 +223,6 @@ void StandardPLPanel::browseInto( const QModelIndex &index )
     }
 
     locationBar->setIndex( index );
-    model->search( QString(), index, false );
     searchEdit->clear();
 }
 
