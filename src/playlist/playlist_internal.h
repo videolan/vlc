@@ -41,7 +41,7 @@
 #include "fetcher.h"
 #include "preparser.h"
 
-typedef struct vlc_playlist_sd_t vlc_playlist_sd_t;
+typedef struct vlc_sd_internal_t vlc_sd_internal_t;
 
 typedef struct playlist_private_t
 {
@@ -52,7 +52,7 @@ typedef struct playlist_private_t
     playlist_item_array_t items_to_delete; /**< Array of items and nodes to
             delete... At the very end. This sucks. */
 
-    vlc_playlist_sd_t   **pp_sds;
+    vlc_sd_internal_t   **pp_sds;
     int                   i_sds;   /**< Number of service discovery modules */
     input_thread_t *      p_input;  /**< the input thread associated
                                      * with the current item */
