@@ -84,6 +84,7 @@ static int Demux( demux_t *p_demux )
     char *psz_eltname = NULL;
     int i_ret = -1;
     input_item_t *p_current_input = GetCurrentItem(p_demux);
+    input_item_node_t *p_input_node = NULL;
 
     p_xml = xml_Create( p_demux );
     if( !p_xml )
@@ -110,7 +111,7 @@ static int Demux( demux_t *p_demux )
         goto error;
     }
 
-    input_item_node_t *p_input_node = input_item_node_Create( p_current_input );
+    p_input_node = input_item_node_Create( p_current_input );
 
     if( !strcmp( psz_eltname, "genrelist" ) )
     {
@@ -122,7 +123,7 @@ static int Demux( demux_t *p_demux )
     {
         /* we're reading a station list */
         if( DemuxStation( p_demux, p_xml_reader, p_input_node,
-                var_CreateGetBool( p_demux, "shoutcast-show-adult" ) ) )
+                var_InheritBool( p_demux, "shoutcast-show-adult" ) ) )
             goto error;
     }
 
