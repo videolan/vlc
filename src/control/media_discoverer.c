@@ -231,7 +231,7 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
     if( !vlc_sd_Start( p_mdis->p_sd ) )
     {
         libvlc_printerr( "%s: internal module error",
-                         p_mdis->p_sd->psz_name );
+                         psz_name );
         libvlc_media_list_release( p_mdis->p_mlist );
         libvlc_event_manager_release( p_mdis->p_event_manager );
         free( p_mdis );

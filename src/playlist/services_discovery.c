@@ -55,6 +55,15 @@ int vlc_sd_probe_Add (vlc_probe_t *probe, const char *name,
     return VLC_PROBE_CONTINUE;
 }
 
+struct vlc_sd_private_t
+{
+    module_t *          p_module;
+    vlc_event_manager_t event_manager;      /* Accessed through Setters for non class function */
+    char *psz_name;
+    config_chain_t *p_cfg;
+
+};
+
 #undef vlc_sd_GetNames
 
 /**
@@ -114,9 +123,11 @@ services_discovery_t *vlc_sd_Create( vlc_object_t *p_super,
                               "services discovery" );
     if( !p_sd )
         return NULL;
-    free(config_ChainCreate( &p_sd->psz_name, &p_sd->p_cfg, cfg ));
+    p_sd->p = malloc(sizeof(struct vlc_sd_private_t));
 
-    vlc_event_manager_t *em = &p_sd->event_manager;
+    free(config_ChainCreate( &p_sd->p->psz_name, &p_sd->p->p_cfg, cfg ));
+
+    vlc_event_manager_t *em = &p_sd->p->event_manager;
     vlc_event_manager_init( em, p_sd, (vlc_object_t *)p_sd );
     vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryItemAdded);
     vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryItemRemoved);
@@ -136,9 +147,9 @@ bool vlc_sd_Start ( services_discovery_t * p_sd )
 {
     assert(!p_sd->p_module);
 
-    p_sd->p_module = module_need( p_sd, "services_discovery",
-                                  p_sd->psz_name, true );
-    if( p_sd->p_module == NULL )
+    p_sd->p->p_module = module_need( p_sd, "services_discovery",
+                                  p_sd->p->psz_name, true );
+    if( p_sd->p->p_module == NULL )
     {
         msg_Err( p_sd, "no suitable services discovery module" );
         return false;
@@ -147,7 +158,7 @@ bool vlc_sd_Start ( services_discovery_t * p_sd )
     vlc_event_t event = {
         .type = vlc_ServicesDiscoveryStarted
     };
-    vlc_event_send( &p_sd->event_manager, &event );
+    vlc_event_send( &p_sd->p->event_manager, &event );
     return true;
 }
 
@@ -160,16 +171,17 @@ void vlc_sd_Stop ( services_discovery_t * p_sd )
         .type = vlc_ServicesDiscoveryEnded
     };
 
-    vlc_event_send( &p_sd->event_manager, &event );
+    vlc_event_send( &p_sd->p->event_manager, &event );
 
-    module_unneed( p_sd, p_sd->p_module );
-    p_sd->p_module = NULL;
+    module_unneed( p_sd, p_sd->p->p_module );
+    p_sd->p->p_module = NULL;
 }
 
 void vlc_sd_Destroy( services_discovery_t *p_sd )
 {
-    config_ChainDestroy( p_sd->p_cfg );
-    free( p_sd->psz_name );
+    config_ChainDestroy( p_sd->p->p_cfg );
+    free( p_sd->p->psz_name );
+    free( p_sd->p );
     vlc_object_release( p_sd );
 }
 
@@ -179,8 +191,8 @@ void vlc_sd_Destroy( services_discovery_t *p_sd )
 static void services_discovery_Destructor ( vlc_object_t *p_obj )
 {
     services_discovery_t * p_sd = (services_discovery_t *)p_obj;
-    assert(!p_sd->p_module); /* Forgot to call Stop */
-    vlc_event_manager_fini( &p_sd->event_manager );
+    assert(!p_sd->p->p_module); /* Forgot to call Stop */
+    vlc_event_manager_fini( &p_sd->p->event_manager );
 }
 
 /***********************************************************************
@@ -189,7 +201,7 @@ static void services_discovery_Destructor ( vlc_object_t *p_obj )
 char *
 services_discovery_GetLocalizedName ( services_discovery_t * p_sd )
 {
-    return strdup( module_get_name( p_sd->p_module, true ) );
+    return strdup( module_get_name( p_sd->p->p_module, true ) );
 }
 
 /***********************************************************************
@@ -198,7 +210,7 @@ services_discovery_GetLocalizedName ( services_discovery_t * p_sd )
 vlc_event_manager_t *
 services_discovery_EventManager ( services_discovery_t * p_sd )
 {
-    return &p_sd->event_manager;
+    return &p_sd->p->event_manager;
 }
 
 /***********************************************************************
@@ -213,7 +225,7 @@ services_discovery_AddItem ( services_discovery_t * p_sd, input_item_t * p_item,
     event.u.services_discovery_item_added.p_new_item = p_item;
     event.u.services_discovery_item_added.psz_category = psz_category;
 
-    vlc_event_send( &p_sd->event_manager, &event );
+    vlc_event_send( &p_sd->p->event_manager, &event );
 }
 
 /***********************************************************************
@@ -226,14 +238,14 @@ services_discovery_RemoveItem ( services_discovery_t * p_sd, input_item_t * p_it
     event.type = vlc_ServicesDiscoveryItemRemoved;
     event.u.services_discovery_item_removed.p_item = p_item;
 
-    vlc_event_send( &p_sd->event_manager, &event );
+    vlc_event_send( &p_sd->p->event_manager, &event );
 }
 
 /*
  * Playlist - Services discovery bridge
  */
 
-struct vlc_sd_internal_t
+struct vlc_playlist_sd_t
 {
     /* the playlist items for category and onelevel */
     playlist_item_t      *p_node;
@@ -312,7 +324,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,
         return VLC_ENOMEM;
 
     /* Free in playlist_ServicesDiscoveryRemove */
-    vlc_sd_internal_t * p_sds = malloc( sizeof(*p_sds) );
+    vlc_playlist_sd_t * p_sds = malloc( sizeof(*p_sds) );
     if( !p_sds )
     {
         vlc_sd_Destroy( p_sd );
@@ -323,9 +335,9 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,
 
     /* Look for configuration chain "longname" */
     const char *psz_longname = "?";
-    if( p_sd->p_cfg )
+    if( p_sd->p->p_cfg )
     {
-        config_chain_t *cfg = p_sd->p_cfg;
+        config_chain_t *cfg = p_sd->p->p_cfg;
         while( cfg )
         {
             if( cfg->psz_name && !strcmp( cfg->psz_name, "longname" ) )
@@ -373,7 +385,7 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
                                       const char *psz_name )
 {
     playlist_private_t *priv = pl_priv( p_playlist );
-    vlc_sd_internal_t * p_sds = NULL;
+    vlc_playlist_sd_t * p_sds = NULL;
 
     PL_LOCK;
     for( int i = 0; i < priv->i_sds; i++ )
@@ -429,7 +441,7 @@ bool playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
 
     for( int i = 0; i < priv->i_sds; i++ )
     {
-        vlc_sd_internal_t *sd = priv->pp_sds[i];
+        vlc_playlist_sd_t *sd = priv->pp_sds[i];
 
         if( sd->psz_name && !strcmp( psz_name, sd->psz_name ) )
         {

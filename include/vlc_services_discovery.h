@@ -44,13 +44,7 @@ extern "C" {
 struct services_discovery_t
 {
     VLC_COMMON_MEMBERS
-    module_t *          p_module;
-
-    vlc_event_manager_t event_manager;      /* Accessed through Setters for non class function */
-
-    char *psz_name;
-    config_chain_t *p_cfg;
-
+    struct vlc_sd_private_t *p;
     services_discovery_sys_t *p_sys;
 };
 
