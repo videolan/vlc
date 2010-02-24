@@ -1,6 +1,6 @@
 SUBDIRS = asf avformat avi mkv mp4 mpeg playlist
 SOURCES_flacsys = flac.c
-SOURCES_ogg = ogg.c vorbis.h kate_categories.c kate_categories.h
+SOURCES_ogg = ogg.c vorbis.h kate_categories.c kate_categories.h xiph.h
 SOURCES_demuxdump = demuxdump.c
 SOURCES_rawdv = rawdv.c
 SOURCES_rawvid = rawvid.c

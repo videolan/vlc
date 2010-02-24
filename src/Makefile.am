@@ -344,6 +344,7 @@ SOURCES_libvlc_common = \
 	input/es_out_timeshift.c \
 	input/event.c \
 	input/input.c \
+	input/info.h \
 	input/meta.c \
 	input/access.h \
 	input/clock.h \
