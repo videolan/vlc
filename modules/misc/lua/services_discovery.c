@@ -57,21 +57,20 @@ int Open_LuaSD( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t * )p_this;
     services_discovery_sys_t *p_sys;
     lua_State *L = NULL;
-    char *psz_name;
+    char *psz_name = strdup(p_sd->psz_name);
 
-
-    if( !strcmp(vlc_sd_GetName(p_sd), "lua"))
+    if( !strcmp(p_sd->psz_name, "lua"))
     {
         // We want to load the module name "lua"
         // This module can be used to load lua script not registered
         // as builtin lua SD modules.
-        config_ChainParse( p_sd, "lua-", ppsz_sd_options, vlc_sd_GetConfigChain(p_sd) );
+        config_ChainParse( p_sd, "lua-", ppsz_sd_options, p_sd->p_cfg );
         psz_name = var_CreateGetString( p_sd, "lua-sd" );
     }
     else
     {
         // We are loading a builtin lua sd module.
-        psz_name = strdup(vlc_sd_GetName(p_sd));
+        psz_name = strdup(p_sd->psz_name);
     }
 
     if( !( p_sys = malloc( sizeof( services_discovery_sys_t ) ) ) )

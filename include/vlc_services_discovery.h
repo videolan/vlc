@@ -71,8 +71,6 @@ VLC_EXPORT( services_discovery_t *, vlc_sd_Create, ( vlc_object_t *, const char 
 VLC_EXPORT( bool, vlc_sd_Start, ( services_discovery_t * ) );
 VLC_EXPORT( void, vlc_sd_Stop, ( services_discovery_t * ) );
 VLC_EXPORT( void, vlc_sd_Destroy, ( services_discovery_t * ) );
-VLC_EXPORT( const char *, vlc_sd_GetName, ( services_discovery_t * ) );
-VLC_EXPORT( config_chain_t *, vlc_sd_GetConfigChain, ( services_discovery_t * ) );
 
 static inline void vlc_sd_StopAndDestroy( services_discovery_t * p_this )
 {
