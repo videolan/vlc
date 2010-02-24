@@ -59,8 +59,8 @@ static void test_media_preparsed(const char** argv, int argc)
     // We are good, now check Elementary Stream info.
     libvlc_media_track_info_t *tracks;
     int num = libvlc_media_get_tracks_info(media, &tracks);
-    assert(num == 1);
-    free(tracks);
+    if(num == 1)
+        free(tracks);
 
     libvlc_media_release (media);
     libvlc_release (vlc);
