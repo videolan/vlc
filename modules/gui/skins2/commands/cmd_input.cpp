@@ -34,6 +34,14 @@ void CmdPlay::execute()
     if( pPlaylist == NULL )
         return;
 
+    // if already playing an input, reset rate to normal speed
+    input_thread_t *pInput = playlist_CurrentInput( pPlaylist );
+    if( pInput )
+    {
+        var_SetFloat( pInput, "rate", 1.0 );
+        vlc_object_release( pInput );
+    }
+
     playlist_Lock( pPlaylist );
     const bool b_empty = playlist_IsEmpty( pPlaylist );
     playlist_Unlock( pPlaylist );
