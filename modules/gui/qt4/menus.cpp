@@ -474,6 +474,12 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
     if( mi->getControlsVisibilityStatus() & CONTROLS_ADVANCED )
         action->setChecked( true );
 
+    /* Docked Playlist */
+    action = menu->addAction( qtr( "Docked Playlist" ) );
+    action->setCheckable( true );
+    action->setChecked( mi->isPlDocked() );
+    CONNECT( action, triggered( bool ), mi, dockPlaylist( bool ) );
+
     if( with_intf )
     // I don't want to manage consistency between menus, so no popup-menu
     {

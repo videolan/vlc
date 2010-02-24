@@ -62,13 +62,6 @@ enum {
 };
 
 
-typedef enum pl_dock_e {
-    PL_UNDOCKED,
-    PL_BOTTOM,
-    PL_RIGHT,
-    PL_LEFT
-} pl_dock_e;
-
 class MainInterface : public QVLCMW
 {
     Q_OBJECT;
@@ -91,6 +84,7 @@ public:
     QMenu *getSysTrayMenu() { return systrayMenu; }
 #endif
     int getControlsVisibilityStatus();
+    bool isPlDocked() { return ( b_plDocked != false ); }
 
     /* Sizehint() */
     virtual QSize sizeHint() const;
@@ -113,12 +107,12 @@ protected:
 private:
     void createMainWidget( QSettings* );
     void createStatusBar();
+    void createPlaylist();
 
     /* Systray */
     void handleSystray();
     void createSystray();
     void initSystray();
-    bool isDocked() { return ( i_pl_dock != PL_UNDOCKED ); }
 
     void showTab( int i_tab );
     void restoreStackOldWidget();
@@ -167,7 +161,7 @@ private:
     QSize                mainBasedSize;       ///< based Wnd (normal mode only)
     QSize                mainVideoSize;       ///< Wnd with video (all modes)
     int                  i_visualmode;        ///< Visual Mode
-    pl_dock_e            i_pl_dock;
+    bool                 b_plDocked;
     int                  i_bg_height;         ///< Save height of bgWidget
     bool                 b_hideAfterCreation;
 
@@ -177,11 +171,10 @@ private:
     UINT taskbar_wmsg;
     void createTaskBarButtons();
 #endif
-    void createPlaylist( bool );
 
 public slots:
     void undockPlaylist();
-    void dockPlaylist( pl_dock_e i_pos = PL_BOTTOM );
+    void dockPlaylist( bool b_docked = true );
     void toggleMinimalView( bool );
     void togglePlaylist();
 #ifndef HAVE_MAEMO

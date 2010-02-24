@@ -1,7 +1,7 @@
 /*****************************************************************************
  * main_interface.cpp : Main interface
  ****************************************************************************
- * Copyright (C) 2006-2009 the VideoLAN team
+ * Copyright (C) 2006-2010 VideoLAN and AUTHORS
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -72,7 +72,8 @@
 #include <vlc_vout_window.h>
 #include <vlc_vout_display.h>
 
-// #define DEBUG_INTF
+//#define DEBUG_INTF
+
 /* Callback prototypes */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param );
@@ -129,6 +130,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Set the other interface settings */
     settings = getSettings();
     settings->beginGroup( "MainWindow" );
+
+    /* */
+    b_plDocked = getSettings()->value( "pl-dock-status", true ).toBool();
+
 
     /**
      * Retrieve saved sizes for main window
@@ -305,7 +310,7 @@ MainInterface::~MainInterface()
     /* Save playlist state */
     if( playlistWidget )
     {
-        if( !isDocked() )
+        if( !isPlDocked() )
             QVLCTools::saveWidgetPosition( p_intf, "Playlist", playlistWidget );
 
         delete playlistWidget;
@@ -330,7 +335,7 @@ MainInterface::~MainInterface()
 
     /* Save states */
     settings->beginGroup( "MainWindow" );
-    settings->setValue( "pl-dock-status", (int)i_pl_dock );
+    settings->setValue( "pl-dock-status", b_plDocked );
     settings->setValue( "playlist-visible", (int)playlistVisible );
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
@@ -765,7 +770,7 @@ void MainInterface::doComponentsUpdate()
     /* Here we resize to sizeHint() and not adjustsize because we want
        the videoWidget to be exactly the correctSize */
 
-#ifndef NDEBUG
+#ifdef DEBUG_INTF
     debug();
 #endif
     /* This is WRONG, but I believe there is a Qt bug here */
@@ -777,7 +782,7 @@ void MainInterface::doComponentsUpdate()
 
 void MainInterface::debug()
 {
-#ifndef NDEBUG
+#ifdef DEBUG_INTF
     msg_Dbg( p_intf, "Stack Size: %i - %i", stackCentralW->size().height(), size().width() );
     if( videoEmbeddedFlag )
         msg_Dbg( p_intf, "Stack Size: %i - %i",
@@ -994,15 +999,11 @@ int MainInterface::controlVideo( int i_query, va_list args )
 /**
  * Toggle the playlist widget or dialog
  **/
-void MainInterface::createPlaylist( bool b_show )
+void MainInterface::createPlaylist()
 {
     playlistWidget = new PlaylistWidget( p_intf, this );
 
-    i_pl_dock = PL_BOTTOM;
-    /* i_pl_dock = (pl_dock_e)getSettings()
-      ->value( "pl-dock-status", PL_UNDOCKED ).toInt(); */
-
-    if( i_pl_dock == PL_UNDOCKED )
+    if( !b_plDocked )
     {
         playlistWidget->setWindowFlags( Qt::Window );
 
@@ -1014,35 +1015,28 @@ void MainInterface::createPlaylist( bool b_show )
     else
     {
 #ifdef DEBUG_INTF
-        msg_Warn( p_intf, "Here %i", stackCentralW->currentIndex() );
+        msg_Warn( p_intf, "Here 1 %i", stackCentralW->currentIndex() );
 #endif
         stackCentralW->insertWidget( PLAYL_TAB, playlistWidget );
 #ifdef DEBUG_INTF
-        msg_Warn( p_intf, "Here %i", stackCentralW->currentIndex() );
+        msg_Warn( p_intf, "Here 2 %i", stackCentralW->currentIndex() );
 #endif
-    }
-
-    if( b_show )
-    {
-        playlistVisible = true;
-        stackCentralW->show();
     }
 }
 
 void MainInterface::togglePlaylist()
 {
 #ifdef DEBUG_INTF
-    msg_Warn( p_intf, "Here toggling %i %i", stackCentralW->currentIndex(), stackCentralOldState );
+    msg_Warn( p_intf, "Here toggling 1 %i %i", stackCentralW->currentIndex(), stackCentralOldState );
 #endif
     if( !playlistWidget )
-    {
-        createPlaylist( true );
-    }
+        createPlaylist();
+
 #ifdef DEBUG_INTF
-    msg_Warn( p_intf, "Here toggling %i %i", stackCentralW->currentIndex(), stackCentralOldState );
+    msg_Warn( p_intf, "Here toggling 2 %i %i", stackCentralW->currentIndex(), stackCentralOldState );
 
 #endif
-    if( i_pl_dock != PL_UNDOCKED )
+    if( b_plDocked )
     {
         /* Playlist not visible */
         if( stackCentralW->currentIndex() != PLAYL_TAB )
@@ -1057,17 +1051,40 @@ void MainInterface::togglePlaylist()
         playlistVisible = ( stackCentralW->currentIndex() == PLAYL_TAB );
         //doComponentsUpdate(); //resize( sizeHint() );
     }
+    else
+    {
+        playlistWidget->setWindowFlags( Qt::Window );
+        playlistVisible = !playlistVisible;
+        playlistWidget->setVisible( playlistVisible );
+    }
+}
+
+void MainInterface::dockPlaylist( bool p_docked )
+{
+    b_plDocked = p_docked;
+    if( !playlistWidget ) return; /* Playlist wasn't created yet */
+    if( !p_docked )
+    {
+        stackCentralW->removeWidget( playlistWidget );
+        playlistWidget->setWindowFlags( Qt::Window );
+        QVLCTools::restoreWidgetPosition( p_intf, "Playlist",
+                playlistWidget, QSize( 600, 300 ) );
+        playlistWidget->show();
+        stackCentralW->hide();
+        doComponentsUpdate();
+    }
+    else
+    {
+        stackCentralW->insertWidget( PLAYL_TAB, playlistWidget );
+        stackCentralW->setCurrentWidget( playlistWidget );
+        stackCentralW->show();
+    }
 }
 
 /* Function called from the menu to undock the playlist */
 void MainInterface::undockPlaylist()
 {
-//    dockPL->setFloating( true );
-//    adjustSize();
-}
-
-void MainInterface::dockPlaylist( pl_dock_e i_pos )
-{
+    dockPlaylist( false );
 }
 
 void MainInterface::toggleMinimalView( bool b_switch )
