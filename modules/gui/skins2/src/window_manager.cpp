@@ -439,18 +439,26 @@ void WindowManager::hideAll() const
 }
 
 
-void WindowManager::toggleOnTop()
+void WindowManager::setOnTop( bool b_ontop )
 {
     // Update the boolean variable
     VarBoolImpl *pVarOnTop = (VarBoolImpl*)m_cVarOnTop.get();
-    pVarOnTop->set( !pVarOnTop->get() );
+    pVarOnTop->set( b_ontop );
 
-    // Toggle the "on top" status
+    // set/unset the "on top" status
     WinSet_t::const_iterator it;
     for( it = m_allWindows.begin(); it != m_allWindows.end(); it++ )
     {
-        (*it)->toggleOnTop( pVarOnTop->get() );
+        (*it)->toggleOnTop( b_ontop );
     }
+}
+
+
+void WindowManager::toggleOnTop()
+{
+    VarBoolImpl *pVarOnTop = (VarBoolImpl*)m_cVarOnTop.get();
+
+    setOnTop( !pVarOnTop->get() );
 }
 
 

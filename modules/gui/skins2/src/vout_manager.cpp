@@ -26,6 +26,7 @@
 #endif
 
 #include <vlc_vout.h>
+#include <vlc_vout_display.h>
 
 #include "vout_manager.hpp"
 #include "window_manager.hpp"
@@ -34,6 +35,7 @@
 #include "../commands/cmd_show_window.hpp"
 #include "../commands/cmd_resize.hpp"
 #include "../commands/cmd_voutwindow.hpp"
+#include "../commands/cmd_on_top.hpp"
 
 
 
@@ -374,6 +376,22 @@ int VoutManager::controlWindow( struct vout_window_t *pWnd,
 
             return VLC_SUCCESS;
         }
+
+        case VOUT_WINDOW_SET_STATE:
+        {
+            unsigned i_arg = va_arg( args, unsigned );
+            unsigned on_top = i_arg & VOUT_WINDOW_STATE_ABOVE;
+
+            // Post a SetOnTop command
+            CmdSetOnTop* pCmd =
+                new CmdSetOnTop( pThis->getIntf(), on_top );
+
+            AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+            pQueue->push( CmdGenericPtr( pCmd ) );
+
+            return VLC_SUCCESS;
+        }
+
 
         default:
             msg_Dbg( pWnd, "control query not supported" );

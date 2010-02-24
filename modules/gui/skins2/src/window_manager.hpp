@@ -126,6 +126,9 @@ public:
     /// Hide the given window
     void hide( TopWindow &rWindow ) const { rWindow.hide(); }
 
+    /// Set/unset all the windows on top
+    void setOnTop( bool b_ontop );
+
     /// Toggle all the windows on top
     void toggleOnTop();
 

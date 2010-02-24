@@ -31,4 +31,18 @@
 /// "Always on top" command
 DEFINE_COMMAND( OnTop, "always on top" )
 
+class CmdSetOnTop: public CmdGeneric
+{
+public:
+    CmdSetOnTop( intf_thread_t *pIntf, bool b_ontop )
+        : CmdGeneric( pIntf ), m_ontop( b_ontop ) { }
+    virtual ~CmdSetOnTop() { }
+    virtual void execute();
+    virtual string getType() const { return "set on top"; }
+
+private:
+    bool m_ontop;
+};
+
+
 #endif

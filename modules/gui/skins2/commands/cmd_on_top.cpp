@@ -31,3 +31,8 @@ void CmdOnTop::execute()
 {
     getIntf()->p_sys->p_theme->getWindowManager().toggleOnTop();
 }
+
+void CmdSetOnTop::execute()
+{
+    getIntf()->p_sys->p_theme->getWindowManager().setOnTop( m_ontop );
+}
