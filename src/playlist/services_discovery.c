@@ -186,6 +186,20 @@ void vlc_sd_Destroy( services_discovery_t *p_sd )
 }
 
 /***********************************************************************
+ * Getters
+ ***********************************************************************/
+
+const char *vlc_sd_GetName( services_discovery_t *p_sd )
+{
+    return p_sd->p->psz_name;
+}
+
+config_chain_t *vlc_sd_GetConfigChain( services_discovery_t *p_sd )
+{
+    return p_sd->p->p_cfg;
+}
+
+/***********************************************************************
  * Destructor
  ***********************************************************************/
 static void services_discovery_Destructor ( vlc_object_t *p_obj )
