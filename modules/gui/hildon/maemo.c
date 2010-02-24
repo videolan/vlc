@@ -44,12 +44,11 @@
 #include "maemo_interface.h"
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototypes
  *****************************************************************************/
 static int      Open               ( vlc_object_t * );
 static void     Close              ( vlc_object_t * );
 static void     *Thread            ( void * );
-static gboolean should_die         ( gpointer );
 static int      OpenWindow         ( vlc_object_t * );
 static void     CloseWindow        ( vlc_object_t * );
 static int      ControlWindow      ( vout_window_t *, int, va_list );
@@ -78,7 +77,7 @@ vlc_module_end();
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    intf_sys_t *p_sys;;
+    intf_sys_t *p_sys;
     vlc_value_t val;
 
     if( !XInitThreads() )
@@ -96,6 +95,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_video_window = NULL;
     p_sys->p_control_window = NULL;
     p_sys->b_fullscreen = false;
+    p_sys->i_event = 0;
 
     vlc_spin_init( &p_sys->event_lock );
 
@@ -123,6 +123,8 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
     var_Destroy (p_this->p_libvlc, "hildon-iface");
+
+    gtk_main_quit();
     vlc_join (p_intf->p_sys->thread, NULL);
     vlc_spin_destroy( &p_intf->p_sys->event_lock );
     free( p_intf->p_sys );
@@ -142,22 +144,16 @@ static gint quit_event( GtkWidget *widget, GdkEvent *event, gpointer data )
 static void *Thread( void *obj )
 {
     intf_thread_t *p_intf = (intf_thread_t *)obj;
-    const char *p_args[] = { "vlc", "--sync" };
+    const char *p_args[] = { "vlc" };
     int i_args = sizeof(p_args)/sizeof(char *);
     char **pp_args  = (char **)p_args;
 
     HildonProgram *program;
     HildonWindow *window;
-    GtkWidget *main_vbox;
-
-    GtkWidget *video;
-    GtkWidget *bottom_hbox;
-    GtkWidget *play_button;
-    GtkWidget *prev_button;
-    GtkWidget *next_button;
-    GtkWidget *stop_button;
-    GtkWidget *playlist_button;
-    GtkWidget *seekbar;
+    GtkWidget *main_vbox, *bottom_hbox;
+    GtkWidget *video, *seekbar;
+    GtkWidget *play_button, *prev_button, *next_button;
+    GtkWidget *stop_button, *playlist_button;
 
     gtk_init( &i_args, &pp_args );
 
@@ -187,6 +183,20 @@ static void *Thread( void *obj )
     // We create the main vertical box
     main_vbox = gtk_vbox_new( FALSE, 0 );
     gtk_container_add( GTK_CONTAINER( window ), main_vbox );
+
+    // Menubar
+    GtkWidget *main_menu = create_menu( p_intf );
+#ifdef HAVE_MAEMO
+    hildon_window_set_menu( HILDON_WINDOW( p_intf->p_sys->p_main_window ),
+                            GTK_MENU( main_menu ) );
+#else
+    GtkWidget *menu_bar = gtk_menu_bar_new ();
+    GtkWidget *item = gtk_menu_item_new_with_label ("Menu");
+    gtk_menu_bar_append(menu_bar, item);
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), main_menu);
+    gtk_widget_show_all (menu_bar);
+    gtk_box_pack_start(GTK_BOX(main_vbox), menu_bar, FALSE, FALSE, 0);
+#endif
 
     // We put first the embedded video
     video = gtk_event_box_new();
@@ -231,8 +241,6 @@ static void *Thread( void *obj )
     // We add the hbox to the main vbox
     gtk_box_pack_start( GTK_BOX( main_vbox ), bottom_hbox, FALSE, FALSE, 0 );
 
-    g_signal_connect( window, "delete_event",
-                      G_CALLBACK( delete_event_cb ), NULL );
     g_signal_connect( play_button, "clicked", G_CALLBACK( play_cb ), NULL );
     g_signal_connect( stop_button, "clicked", G_CALLBACK( stop_cb ), NULL );
     g_signal_connect( prev_button, "clicked", G_CALLBACK( prev_cb ), NULL );
@@ -243,8 +251,6 @@ static void *Thread( void *obj )
 
     gtk_widget_show_all( GTK_WIDGET( window ) );
     gtk_widget_hide_all( p_intf->p_sys->p_playlist_window );
-
-    create_menu( p_intf );
 
 #if 1
     /* HACK: Only one X11 client can subscribe to mouse button press events.
@@ -259,39 +265,18 @@ static void *Thread( void *obj )
     XSelectInput( dpy, w, attr.your_event_mask );
 #endif
 
-    // Set callback with the vlc core
-    g_timeout_add( 1000 /* miliseconds */, should_die, p_intf );
-    var_AddCallback( p_intf->p_sys->p_playlist, "item-change",
-                     item_changed_cb, p_intf );
-    var_AddCallback( p_intf->p_sys->p_playlist, "item-current",
-                     playlist_current_cb, p_intf );
-    var_AddCallback( p_intf->p_sys->p_playlist, "activity",
-                     activity_cb, p_intf );
-
     // The embedded video is only ready after gtk_main and windows are shown
     g_idle_add( interface_ready, p_intf );
 
     gtk_main();
 
     delete_input( p_intf );
-    var_DelCallback( p_intf->p_sys->p_playlist, "item-change",
-                     item_changed_cb, p_intf );
-    var_DelCallback( p_intf->p_sys->p_playlist, "item-current",
-                     playlist_current_cb, p_intf );
-    var_DelCallback( p_intf->p_sys->p_playlist, "activity",
-                     activity_cb, p_intf );
+    delete_playlist( p_intf );
 
+    gtk_object_destroy( GTK_OBJECT( main_menu ) );
     gtk_object_destroy( GTK_OBJECT( window ) );
 
     return NULL;
-}
-
-static gboolean should_die( gpointer data )
-{
-    intf_thread_t *p_intf = (intf_thread_t *)data;
-    if( !vlc_object_alive( p_intf ) )
-        gtk_main_quit();
-    return TRUE;
 }
 
 /**

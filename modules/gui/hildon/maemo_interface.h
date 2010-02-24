@@ -25,6 +25,5 @@
 
 #include <vlc_common.h>
 
-void create_menu( intf_thread_t *p_intf );
-
 void create_playlist( intf_thread_t *p_intf );
+void delete_playlist( intf_thread_t *p_intf );

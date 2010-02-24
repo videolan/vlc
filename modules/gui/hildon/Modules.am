@@ -5,4 +5,5 @@ SOURCES_hildon = maemo.c \
 		maemo_input.c \
 		maemo_input.h \
 		maemo_interface.c \
-		maemo_interface.h
+		maemo_interface.h \
+		maemo_menus.c

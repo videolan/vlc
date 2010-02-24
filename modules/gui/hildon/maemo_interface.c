@@ -28,6 +28,7 @@
 #include "maemo.h"
 #include "maemo_callbacks.h"
 #include "maemo_interface.h"
+#include "maemo_input.h"
 
 static void scan_maemo_for_media ( intf_thread_t *p_intf );
 static void find_media_in_dir    ( const char *psz_dir, GList **pp_list );
@@ -40,55 +41,6 @@ static const char *ppsz_extensions[] =
 
 static const char *ppsz_media_dirs[] =
     { "/media/mmc1", "/media/mmc2", "/home/user/MyDocs/.videos", NULL };
-
-#define ADD_MENU_ITEM( label, callback ) \
-    item = gtk_menu_item_new_with_label( label ); \
-    gtk_menu_append( main_menu, item ); \
-    g_signal_connect( GTK_OBJECT( item ), "activate", G_CALLBACK( callback ), \
-                      p_intf );
-#define ADD_CHECK_MENU_ITEM( label, callback ) \
-    item = gtk_check_menu_item_new_with_label( label ); \
-    gtk_menu_append( main_menu, item ); \
-    g_signal_connect( GTK_OBJECT( item ), "toggled", G_CALLBACK( callback ), \
-                      p_intf );
-#define ADD_SEPARATOR \
-    item = gtk_separator_menu_item_new(); \
-    gtk_menu_append( main_menu, item );
-
-void create_menu( intf_thread_t *p_intf )
-{
-    /* Needed variables */
-    GtkWidget *main_menu;
-    GtkWidget *item;
-    int i_skip;
-
-    /* Creating the main menu */
-    main_menu = gtk_menu_new();
-
-    /* Getting ffmpeg-skip-frame value */
-    i_skip = config_GetInt( p_intf, "ffmpeg-skip-frame" );
-
-    /* Filling the menu */
-    ADD_MENU_ITEM( "Open", open_cb );
-    ADD_MENU_ITEM( "Open Address", open_address_cb );
-    ADD_MENU_ITEM( "Open Webcam", open_webcam_cb );
-    ADD_SEPARATOR;
-    ADD_MENU_ITEM( "Take a snapshot", snapshot_cb );
-    ADD_CHECK_MENU_ITEM( "Drop frames", dropframe_cb );
-    if( i_skip )
-        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( item ), true );
-    ADD_SEPARATOR;
-    ADD_MENU_ITEM( "Close", delete_event_cb );
-
-    hildon_window_set_menu( HILDON_WINDOW( p_intf->p_sys->p_main_window ),
-                            GTK_MENU( main_menu ) );
-
-    gtk_widget_show_all( main_menu );
-}
-
-#undef ADD_MENU
-#undef ADD_CHECK_MENU_ITEM
-#undef ADD_SEPARATOR
 
 void create_playlist( intf_thread_t *p_intf )
 {
@@ -121,6 +73,24 @@ void create_playlist( intf_thread_t *p_intf )
 
     g_signal_connect( playlist, "row-activated",
                       G_CALLBACK( pl_row_activated_cb ), NULL );
+
+    // Set callback with the vlc core
+    var_AddCallback( p_intf->p_sys->p_playlist, "item-change",
+                     item_changed_cb, p_intf );
+    var_AddCallback( p_intf->p_sys->p_playlist, "item-current",
+                     playlist_current_cb, p_intf );
+    var_AddCallback( p_intf->p_sys->p_playlist, "activity",
+                     activity_cb, p_intf );
+}
+
+void delete_playlist( intf_thread_t *p_intf )
+{
+    var_DelCallback( p_intf->p_sys->p_playlist, "item-change",
+                     item_changed_cb, p_intf );
+    var_DelCallback( p_intf->p_sys->p_playlist, "item-current",
+                     playlist_current_cb, p_intf );
+    var_DelCallback( p_intf->p_sys->p_playlist, "activity",
+                     activity_cb, p_intf );
 }
 
 static void scan_maemo_for_media( intf_thread_t *p_intf )

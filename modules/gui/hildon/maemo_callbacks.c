@@ -54,19 +54,6 @@ static intf_thread_t *get_intf_from_widget( GtkWidget *widget )
                                                  "p_intf" );
 }
 
-gboolean delete_event_cb( GtkWidget *widget,
-                          GdkEvent *event,
-                          gpointer user_data )
-{
-    (void)event; (void)user_data;
-    intf_thread_t *p_intf = get_intf_from_widget( widget );
-
-    libvlc_Quit( p_intf->p_libvlc );
-    gtk_main_quit();
-
-    return TRUE;
-}
-
 void play_cb( GtkButton *button, gpointer user_data )
 {
     (void)user_data;

@@ -29,6 +29,7 @@
 #include <hildon/hildon-seekbar.h>
 #include <hildon/hildon-banner.h>
 
+#include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_input.h>
 #include <vlc_vout.h>
@@ -56,4 +57,10 @@ struct intf_sys_t
     bool b_fullscreen;
 
     GtkWidget *p_control_window;
+
+    GtkMenuItem *menu_input;
+    GtkMenuItem *menu_audio;
+    GtkMenuItem *menu_video;
 };
+
+GtkWidget *create_menu( intf_thread_t *p_intf );

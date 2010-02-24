@@ -26,10 +26,6 @@
 #include <vlc_common.h>
 #include <vlc_interface.h>
 
-gboolean delete_event_cb( GtkWidget *widget,
-                          GdkEvent *event,
-                          gpointer user_data );
-
 void play_cb( GtkButton *button, gpointer user_data );
 void stop_cb( GtkButton *button, gpointer user_data );
 void prev_cb( GtkButton *button, gpointer user_data );

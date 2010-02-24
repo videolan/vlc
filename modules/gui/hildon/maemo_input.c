@@ -63,11 +63,11 @@ void post_event( intf_thread_t *p_intf, int i_event )
 static gboolean process_events( gpointer data )
 {
     intf_thread_t *p_intf = (intf_thread_t *)data;
+    int i_event;
+
     vlc_spin_lock( &p_intf->p_sys->event_lock );
-
-    int i_event = p_intf->p_sys->i_event;
+    i_event = p_intf->p_sys->i_event;
     p_intf->p_sys->i_event = 0;
-
     vlc_spin_unlock( &p_intf->p_sys->event_lock );
 
     if( !i_event ) return TRUE;
