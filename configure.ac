@@ -3992,7 +3992,7 @@ AC_ARG_ENABLE(hildon,
 AS_IF([test "${enable_hildon}" = "yes"], [
   PKG_CHECK_MODULES(HILDON, [hildon-1], [
     PKG_CHECK_MODULES(HILDON_FM, hildon-fm-2, [
-      VLC_ADD_CFLAGS([hildon],[${HILDON_FM_CFLAGS} -IHAVE_HILDON_FM])
+      VLC_ADD_CFLAGS([hildon],[${HILDON_FM_CFLAGS} -DHAVE_HILDON_FM])
       VLC_ADD_LIBS([hildon],[${HILDON_FM_LIBS}])
     ], [
       AC_MSG_WARN(hildon-fm-2 not found)
@@ -4380,7 +4380,7 @@ AS_IF([test "${have_libgcrypt}" = "yes"], [
 dnl
 dnl OSSO (Maemo screen blanking) plugin
 dnl
-PKG_ENABLE_MODULES_VLC([OSSO], [], [libosso], [Maemo support], [auto])
+PKG_ENABLE_MODULES_VLC([OSSO_SCREENSAVER], [], [libosso], [Maemo support], [auto])
 
 AS_IF([test -f "/etc/maemo_version"], [
   AC_DEFINE([HAVE_MAEMO], 1, [Define to 1 if building for the Maemo platform.])
