@@ -590,30 +590,11 @@ found_shortcut:
                                                : p_module->psz_object_name );
     }
     else if( count == 0 )
-    {
-        if( !strcmp( psz_capability, "access_demux" )
-         || !strcmp( psz_capability, "stream_filter" )
-         || !strcmp( psz_capability, "vout_window" ) )
-        {
-            msg_Dbg( p_this, "no %s module matched \"%s\"",
-                psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
-        }
-        else
-        {
-            msg_Err( p_this, "no %s module matched \"%s\"",
+        msg_Dbg( p_this, "no %s module matched \"%s\"",
                  psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
-
-            msg_StackSet( VLC_EGENERIC, "no %s module matched \"%s\"",
-                 psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
-        }
-    }
-    else if( psz_name != NULL && *psz_name )
-    {
-        msg_Warn( p_this, "no %s module matching \"%s\" could be loaded",
-                  psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
-    }
     else
-        msg_StackSet( VLC_EGENERIC, "no suitable %s module", psz_capability );
+        msg_Dbg( p_this, "no %s module matching \"%s\" could be loaded",
+                  psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
 
     free( psz_shortcuts );
     free( psz_var );
