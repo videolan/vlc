@@ -209,6 +209,10 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
         m_mainWindow = XCreateWindow( m_pDisplay, root, 0, 0, 1, 1, 0, 0,
                                       InputOutput, CopyFromParent, 0, &attr );
 
+        // Receive WM_DELETE_WINDOW
+        Atom wm_delete = XInternAtom( m_pDisplay, "WM_DELETE_WINDOW", False);
+        XSetWMProtocols( m_pDisplay, m_mainWindow, &wm_delete, 1);
+
         // Changing decorations
         struct {
             unsigned long flags;
