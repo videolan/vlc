@@ -40,18 +40,7 @@ static void test_meta (const char ** argv, int argc)
     media = libvlc_media_new_path (vlc, "samples/meta.sample");
     assert( media );
 
-    /* Tell that we are interested in this precise meta data
-     * This is needed to trigger meta data reading
-     * (the first calls return NULL) */
-    artist = libvlc_media_get_meta (media, libvlc_meta_Artist);
-
-    free (artist);
-
-    /* Wait for the meta */
-    while (!libvlc_media_is_preparsed (media))
-    {
-        usleep (10000);
-    }
+    libvlc_media_parse (media);
 
     artist = libvlc_media_get_meta (media, libvlc_meta_Artist);
 
