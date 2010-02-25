@@ -44,15 +44,24 @@
 #include <assert.h>
 
 #undef config_LoadCmdLine
-/*****************************************************************************
- * config_LoadCmdLine: parse command line
- *****************************************************************************
+/**
  * Parse command line for configuration options.
+ *
  * Now that the module_bank has been initialized, we can dynamically
  * generate the longopts structure used by getops. We have to do it this way
  * because we don't know (and don't want to know) in advance the configuration
  * options used (ie. exported) by each module.
- *****************************************************************************/
+ *
+ * @param p_this object to write command line options as variables to
+ * @param pi_argc number of command line arguments [IN/OUT]
+ * @param ppsz_args commandl ine arguments [IN/OUT]
+ * @param b_ignore_errors whether to ignore parsing errors
+ * @return 0 on success, -1 on error.
+ *
+ * @warning This function is not re-entrant (because of getopt_long()).
+ * It must be called with the module bank initialization global lock held.
+ * FIXME: this still breaks if getopt() is used outside of LibVLC.
+ */
 int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
                         const char *ppsz_argv[], bool b_ignore_errors )
 {
