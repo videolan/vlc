@@ -215,6 +215,7 @@ nobase_vlclib_DATA = \
 	lua/meta/fetcher/tvrage.luac \
 	lua/meta/reader/filename.luac \
 	lua/modules/sandbox.luac \
+	lua/modules/simplexml.luac \
 	lua/playlist/anevia_streams.luac \
 	lua/playlist/appletrailers.luac \
 	lua/playlist/break.luac \
