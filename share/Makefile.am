@@ -189,6 +189,14 @@ luac_verbose_ = $(luac_verbose_$(AM_DEFAULT_VERBOSITY))
 luac_verbose_0 = @echo "  LUAC   $@";
 
 .lua.luac:
+	$(AM_V_at)for f in $(EXTRA_DIST); do \
+		test "$(srcdir)" = . || f="$(srcdir)/$$f"; \
+		if test $$f = $<; then \
+			exit 0; \
+		fi; \
+	done; \
+	echo "Attempt to byte-compile unknown file: $(<)!"; \
+	exit 1
 	$(AM_V_at)mkdir -p "$$(dirname '$@')"
 	$(luac_verbose)$(LUAC) -o $@ $<
 
