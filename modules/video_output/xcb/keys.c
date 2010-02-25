@@ -228,7 +228,7 @@ int ProcessKeyEvent (key_handler_t *ctx, xcb_generic_event_t *ev)
             if (e->state & XCB_MOD_MASK_1)
                 vk |= KEY_MODIFIER_ALT;
             if (e->state & XCB_MOD_MASK_4)
-                vk |= KEY_MODIFIER_COMMAND;
+                vk |= KEY_MODIFIER_META;
             var_SetInteger (ctx->obj->p_libvlc, "key-pressed", vk);
             break;
         }
