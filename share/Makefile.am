@@ -218,6 +218,7 @@ nobase_vlclib_DATA = \
 	lua/playlist/anevia_streams.luac \
 	lua/playlist/appletrailers.luac \
 	lua/playlist/break.luac \
+	lua/playlist/cue.luac \
 	lua/playlist/dailymotion.luac \
 	lua/playlist/france2.luac \
 	lua/playlist/googlevideo.luac \
@@ -258,6 +259,7 @@ EXTRA_DIST += \
 	lua/playlist/anevia_streams.lua \
 	lua/playlist/appletrailers.lua \
 	lua/playlist/break.lua \
+	lua/playlist/cue.lua \
 	lua/playlist/dailymotion.lua \
 	lua/playlist/france2.lua \
 	lua/playlist/joox.lua \
