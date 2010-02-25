@@ -124,7 +124,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     i_visualmode = var_InheritInteger( p_intf, "qt-display-mode" );
 
     /* Do we want anoying popups or not */
-    notificationEnabled = (bool)var_InheritBool( p_intf, "qt-notification" );
+    notificationEnabled = var_InheritBool( p_intf, "qt-notification" );
 
     /* Set the other interface settings */
     settings = getSettings();
@@ -213,15 +213,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* END CONNECTS ON IM */
 
-    /************
-     * Callbacks
-     ************/
-    var_AddCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
-
-    /* Register callback for the intf-popupmenu variable */
-    var_AddCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
-
-
     /* VideoWidget connects for asynchronous calls */
     connect( this, SIGNAL(askGetVideo(WId*,int*,int*,unsigned*,unsigned *)),
              this, SLOT(getVideoSlot(WId*,int*,int*,unsigned*,unsigned*)),
@@ -249,6 +240,15 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
              this, popupMenu( const QPoint& ) );
 
     /** END of CONNECTS**/
+
+
+    /************
+     * Callbacks
+     ************/
+    var_AddCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
+
+    /* Register callback for the intf-popupmenu variable */
+    var_AddCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
 
     /**** FINAL SIZING and placement of interface */
@@ -298,8 +298,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
 MainInterface::~MainInterface()
 {
-    msg_Dbg( p_intf, "Destroying the main interface" );
-
     /* Unsure we hide the videoWidget before destroying it */
     if( stackCentralOldState == VIDEO_TAB )
         showBg();

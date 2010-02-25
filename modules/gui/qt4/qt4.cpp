@@ -471,15 +471,12 @@ static void *Thread( void *obj )
     app.exec();
 
     /* And quit */
-    msg_Dbg( p_intf, "Quitting the Qt4 Interface" );
-
     QApplication::closeAllWindows();
 
     if (p_mi != NULL)
     {
         /* FIXME: are we sure that video window is already destroyed? */
 
-        msg_Dbg (p_intf, "destroying the main Qt4 interface");
         p_intf->p_sys->p_mi = NULL;
         /* Destroy first the main interface because it is connected to some
            slots in the MainInputManager */
