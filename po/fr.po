@@ -17157,7 +17157,7 @@ msgstr "Global"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1183
 msgid "Set"
-msgstr "Assigné"
+msgstr "Assigner"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1332
 #: modules/gui/qt4/util/customwidgets.cpp:289
