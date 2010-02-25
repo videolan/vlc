@@ -396,6 +396,7 @@ void InputManager::UpdateNavigation()
 {
     /* Update navigation status */
     vlc_value_t val; val.i_int = 0;
+    vlc_value_t val2; val2.i_int = 0;
 
     if( hasInput() )
         var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
@@ -405,10 +406,9 @@ void InputManager::UpdateNavigation()
         emit titleChanged( true );
         msg_Dbg( p_intf, "Title %i", val.i_int );
         /* p_input != NULL since val.i_int != 0 */
-        val.i_int = 0;
-        var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
-        emit chapterChanged( (val.i_int > 0) );
-        msg_Dbg( p_intf, "Chapter: %i", val.i_int );
+        var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val2, NULL );
+        emit chapterChanged( (val2.i_int > 1) || ( val2.i_int > 0 && val.i_int > 1 ) );
+        msg_Dbg( p_intf, "Chapter: %i", val2.i_int );
     }
     else
         emit titleChanged( false );
