@@ -234,7 +234,7 @@ nobase_vlclib_DATA += \
 nobase_vlcdata_DATA += $(DIST_http_lua)
 endif
 endif
-MOSTLYCLEANFILES += $(vlclua_DATA)
+MOSTLYCLEANFILES += $(nobase_vlclib_DATA)
 
 EXTRA_DIST += \
 	lua/README.txt \
