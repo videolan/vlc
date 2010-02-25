@@ -1010,14 +1010,22 @@ void Builder::addVideo( const BuilderData::Video &rData )
         pVisible );
     m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pVideo );
 
+    // if autoresize is true, force the control to resize
+    BuilderData::Video Data = rData;
+    if( rData.m_autoResize )
+    {
+        Data.m_leftTop = "lefttop";
+        Data.m_rightBottom = "rightbottom";
+    }
+
     // Compute the position of the control
     const GenericRect *pRect;
     GET_BOX( pRect, rData.m_panelId , pLayout);
-    const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,
-                                       rData.m_xPos, rData.m_yPos,
-                                       rData.m_width, rData.m_height,
+    const Position pos = makePosition( Data.m_leftTop, Data.m_rightBottom,
+                                       Data.m_xPos, Data.m_yPos,
+                                       Data.m_width, Data.m_height,
                                        *pRect,
-                                       rData.m_xKeepRatio, rData.m_yKeepRatio );
+                                       Data.m_xKeepRatio, Data.m_yKeepRatio );
 
     pLayout->addControl( pVideo, pos, rData.m_layer );
 }
