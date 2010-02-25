@@ -57,15 +57,17 @@ static void test_media_preparsed(const char** argv, int argc)
     while (!received);
 
     // We are good, now check Elementary Stream info.
-    libvlc_media_track_info_t *tracks;
+    libvlc_media_track_info_t *tracks = NULL;
     int num = libvlc_media_get_tracks_info(media, &tracks);
 
 #warning libvlc_media_get_tracks_info is a broken function.
     // This is broken.
     // assert(num == 1);
-    printf("WARNING: libvlc_media_get_tracks_info is not working.");
+    if (num != 1)
+        printf("WARNING: libvlc_media_get_tracks_info is not working.");
 
-    free(tracks);
+    if (num > 0)
+        free(tracks);
 
     libvlc_media_release (media);
     libvlc_release (vlc);
