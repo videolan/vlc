@@ -23,6 +23,19 @@
 
 #include "test.h"
 
+static void wait_playing(libvlc_media_player_t *mp)
+{
+    libvlc_state_t state;
+    do {
+        state = libvlc_media_player_get_state (mp);
+    } while(state != libvlc_Playing &&
+            state != libvlc_Error &&
+            state != libvlc_Ended );
+
+    state = libvlc_media_player_get_state (mp);
+    assert(state == libvlc_Playing || state == libvlc_Ended);
+}
+
 static void test_media_player_set_media(const char** argv, int argc)
 {
     const char * file = test_default_sample;
@@ -44,15 +57,7 @@ static void test_media_player_set_media(const char** argv, int argc)
 
     libvlc_media_player_play (mp);
 
-    /* Wait a correct state */
-    libvlc_state_t state;
-    do {
-        state = libvlc_media_player_get_state (mp);
-    } while(state != libvlc_Playing &&
-            state != libvlc_Error &&
-            state != libvlc_Ended );
-
-    assert(state == libvlc_Playing || state == libvlc_Ended);
+    wait_playing (mp);
 
     libvlc_media_player_stop (mp);
     libvlc_media_player_release (mp);
@@ -81,15 +86,7 @@ static void test_media_player_play_stop(const char** argv, int argc)
 
     libvlc_media_player_play (mi);
 
-    /* Wait a correct state */
-    libvlc_state_t state;
-    do {
-        state = libvlc_media_player_get_state (mi);
-    } while( state != libvlc_Playing &&
-             state != libvlc_Error &&
-             state != libvlc_Ended );
-
-    assert( state == libvlc_Playing || state == libvlc_Ended );
+    wait_playing (mi);
 
     libvlc_media_player_stop (mi);
     libvlc_media_player_release (mi);
@@ -120,15 +117,7 @@ static void test_media_player_pause_stop(const char** argv, int argc)
 
     log ("Waiting for playing\n");
 
-    /* Wait a correct state */
-    libvlc_state_t state;
-    do {
-        state = libvlc_media_player_get_state (mi);
-    } while( state != libvlc_Playing &&
-             state != libvlc_Error &&
-             state != libvlc_Ended );
-
-    assert( state == libvlc_Playing || state == libvlc_Ended );
+    wait_playing (mi);
 
 #if 0
     /* This can't work because under some condition (short file, this is the case) this will be
@@ -137,14 +126,7 @@ static void test_media_player_pause_stop(const char** argv, int argc)
 
     log ("Waiting for pause\n");
 
-    /* Wait a correct state */
-    do {
-        state = libvlc_media_player_get_state (mi);
-    } while( state != libvlc_Paused &&
-            state != libvlc_Error &&
-            state != libvlc_Ended );
-
-    assert( state == libvlc_Paused || state == libvlc_Ended );
+    wait_paused (mp);
 #endif
 
     libvlc_media_player_stop (mi);
