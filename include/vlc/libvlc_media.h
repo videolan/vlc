@@ -154,13 +154,18 @@ typedef struct libvlc_media_track_info_t
     int         i_profile;
     int         i_level;
 
-    /* Audio specific */
-    unsigned    i_channels;
-    unsigned    i_rate;
-
-    /* Video specific */
-    unsigned    i_height;
-    unsigned    i_width;
+    union {
+        struct {
+            /* Audio specific */
+            unsigned    i_channels;
+            unsigned    i_rate;
+        } audio;
+        struct {
+            /* Video specific */
+            unsigned    i_height;
+            unsigned    i_width;
+        } video;
+    } u;
 
 } libvlc_media_track_info_t;
 

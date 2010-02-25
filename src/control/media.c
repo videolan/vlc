@@ -703,10 +703,6 @@ libvlc_media_get_tracks_info( libvlc_media_t *p_md, libvlc_media_track_info_t **
         libvlc_media_track_info_t *p_mes = *pp_es+i;
         const es_format_t *p_es = p_input_item->es[i];
 
-        p_mes->i_channels = p_mes->i_rate = 0;
-        p_mes->i_width = p_mes->i_height = 0;
-
-
         p_mes->i_codec = p_es->i_codec;
         p_mes->i_id = p_es->i_id;
 
@@ -721,13 +717,13 @@ libvlc_media_get_tracks_info( libvlc_media_t *p_md, libvlc_media_track_info_t **
             break;
         case VIDEO_ES:
             p_mes->i_type = libvlc_track_video;
-            p_mes->i_height = p_es->video.i_height;
-            p_mes->i_width = p_es->video.i_width;
+            p_mes->u.video.i_height = p_es->video.i_height;
+            p_mes->u.video.i_width = p_es->video.i_width;
             break;
         case AUDIO_ES:
             p_mes->i_type = libvlc_track_audio;
-            p_mes->i_channels = p_es->audio.i_channels;
-            p_mes->i_rate = p_es->audio.i_rate;
+            p_mes->u.audio.i_channels = p_es->audio.i_channels;
+            p_mes->u.audio.i_rate = p_es->audio.i_rate;
             break;
         case SPU_ES:
             p_mes->i_type = libvlc_track_text;
