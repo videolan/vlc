@@ -36,7 +36,12 @@
 #include "control/npolibvlc.h"
 
 #include <ctype.h>
-#include <pthread.h>
+#if defined(XP_UNIX)
+# include <pthread.h>
+#else
+#warning "locking not implemented for this platform"
+#endif
+
 #include <stdio.h>
 
 /*****************************************************************************
@@ -88,14 +93,34 @@ static bool boolValue(const char *value) {
              !strcasecmp(value, "yes") );
 }
 
+bool EventObj::init()
+{
+#if defined(XP_UNIX)
+    return pthread_mutex_init(&mutex, NULL) == 0;
+#else
+#warning "locking not implemented for this platform"
+#endif
+}
+
+EventObj::~EventObj()
+{
+#if defined(XP_UNIX)
+    pthread_mutex_destroy(&mutex);
+#else
+#warning "locking not implemented for this platform"
+#endif
+}
 
 void EventObj::deliver(NPP browser)
 {
     NPVariant result;
     NPVariant params[1];
 
+#if defined(XP_UNIX)
     pthread_mutex_lock(&mutex);
-
+#else
+#warning "locking not implemented for this platform"
+#endif
     for( ev_l::iterator i=_elist.begin();i!=_elist.end();++i )
     {
         libvlc_event_type_t event = *i;
@@ -114,8 +139,11 @@ void EventObj::deliver(NPP browser)
         }
     }
     _elist.clear();
-
+#if defined(XP_UNIX)
     pthread_mutex_unlock(&mutex);
+#else
+#warning "locking not implemented for this platform"
+#endif
 }
 
 void VlcPlugin::eventAsync(void *param)
@@ -126,18 +154,24 @@ void VlcPlugin::eventAsync(void *param)
 
 void EventObj::callback(const libvlc_event_t* event)
 {
+#if defined(XP_UNIX)
     pthread_mutex_lock(&mutex);
-
+#else
+#warning "locking not implemented for this platform"
+#endif
     if( have_event(event->type) )
         _elist.push_back(event->type);
-
+#if defined(XP_UNIX)
     pthread_mutex_unlock(&mutex);
+#else
+#warning "locking not implemented for this platform"
+#endif
 }
 
 void VlcPlugin::event_callback(const libvlc_event_t* event, void *param)
 {
     VlcPlugin *plugin = (VlcPlugin*)param;
-#ifdef XP_UNIX
+#if defined(XP_UNIX)
     plugin->events.callback(event);
     NPN_PluginThreadAsyncCall(plugin->getBrowser(), eventAsync, plugin);
 #else

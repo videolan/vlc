@@ -135,8 +135,8 @@ private:
     void *_ud;
 public:
     EventObj(): _em(NULL)  { /* deferred to init() */ }
-    bool init() { return pthread_mutex_init(&mutex, NULL) == 0; }
-    ~EventObj() { pthread_mutex_destroy(&mutex); }
+    bool init();
+    ~EventObj();
 
     void deliver(NPP browser);
     void callback(const libvlc_event_t*);
@@ -151,7 +151,9 @@ private:
     lr_l _llist;
     ev_l _elist;
 
+#if defined(XP_UNIX)
     pthread_mutex_t mutex;
+#endif
 
     bool ask_for_event(event_t e);
     void unask_for_event(event_t e);
