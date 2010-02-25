@@ -427,6 +427,8 @@ QString VLCKeyToString( int val )
         r+= qfu( "Alt+" );
     if( val & KEY_MODIFIER_SHIFT )
         r+= qfu( "Shift+" );
+    if( val & KEY_MODIFIER_META )
+        r+= qfu( "Meta+" );
 
     if (base)
     {
