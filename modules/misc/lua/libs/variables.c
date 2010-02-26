@@ -224,7 +224,7 @@ static int vlclua_command( lua_State *L )
     }
     else
     {
-        lua_pushstring( L, "" );
+        lua_pushliteral( L, "" );
     }
     return vlclua_push_ret( L, ret ) + 1;
 }

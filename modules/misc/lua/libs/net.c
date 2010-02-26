@@ -263,31 +263,31 @@ static int vlclua_stat( lua_State *L )
         //return luaL_error( L, "Couldn't stat %s.", psz_path );
     lua_newtable( L );
     if( S_ISREG( s.st_mode ) )
-        lua_pushstring( L, "file" );
+        lua_pushliteral( L, "file" );
     else if( S_ISDIR( s.st_mode ) )
-        lua_pushstring( L, "dir" );
+        lua_pushliteral( L, "dir" );
 #ifdef S_ISCHR
     else if( S_ISCHR( s.st_mode ) )
-        lua_pushstring( L, "character device" );
+        lua_pushliteral( L, "character device" );
 #endif
 #ifdef S_ISBLK
     else if( S_ISBLK( s.st_mode ) )
-        lua_pushstring( L, "block device" );
+        lua_pushliteral( L, "block device" );
 #endif
 #ifdef S_ISFIFO
     else if( S_ISFIFO( s.st_mode ) )
-        lua_pushstring( L, "fifo" );
+        lua_pushliteral( L, "fifo" );
 #endif
 #ifdef S_ISLNK
     else if( S_ISLNK( s.st_mode ) )
-        lua_pushstring( L, "symbolic link" );
+        lua_pushliteral( L, "symbolic link" );
 #endif
 #ifdef S_ISSOCK
     else if( S_ISSOCK( s.st_mode ) )
-        lua_pushstring( L, "socket" );
+        lua_pushliteral( L, "socket" );
 #endif
     else
-        lua_pushstring( L, "unknown" );
+        lua_pushliteral( L, "unknown" );
     lua_setfield( L, -2, "type" );
     lua_pushinteger( L, s.st_mode );
     lua_setfield( L, -2, "mode" );

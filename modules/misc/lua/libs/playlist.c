@@ -338,16 +338,16 @@ static int vlclua_playlist_status( lua_State *L )
     switch( playlist_Status( p_playlist ) )
     {
         case PLAYLIST_STOPPED:
-            lua_pushstring( L, "stopped" );
+            lua_pushliteral( L, "stopped" );
             break;
         case PLAYLIST_RUNNING:
-            lua_pushstring( L, "playing" );
+            lua_pushliteral( L, "playing" );
             break;
         case PLAYLIST_PAUSED:
-            lua_pushstring( L, "paused" );
+            lua_pushliteral( L, "paused" );
             break;
         default:
-            lua_pushstring( L, "unknown" );
+            lua_pushliteral( L, "unknown" );
             break;
     }
     PL_UNLOCK;

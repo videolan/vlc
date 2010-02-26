@@ -185,7 +185,7 @@ static int vlclua_sd_add_item( lua_State *L )
             *udata = p_input;
             if( luaL_newmetatable( L, "input_item_t" ) )
             {
-                lua_pushstring( L, "none of your business" );
+                lua_pushliteral( L, "none of your business" );
                 lua_setfield( L, -2, "__metatable" );
             }
             lua_setmetatable( L, -2 );
@@ -250,7 +250,7 @@ static int vlclua_node_add_subitem( lua_State *L )
                 *udata = p_input;
                 if( luaL_newmetatable( L, "input_item_t" ) )
                 {
-                    lua_pushstring( L, "none of your business" );
+                    lua_pushliteral( L, "none of your business" );
                     lua_setfield( L, -2, "__metatable" );
                 }
                 lua_setmetatable( L, -2 );

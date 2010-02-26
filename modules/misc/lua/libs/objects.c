@@ -61,7 +61,7 @@ int __vlclua_push_vlc_object( lua_State *L, vlc_object_t *p_obj,
     if( luaL_newmetatable( L, "vlc_object" ) )
     {
         /* Hide the metatable */
-        lua_pushstring( L, "none of your business" );
+        lua_pushliteral( L, "none of your business" );
         lua_setfield( L, -2, "__metatable" );
         if( pf_gc ) /* FIXME */
         {
