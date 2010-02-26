@@ -708,7 +708,7 @@ static int vlclua_add_modules_path_inner( lua_State *L, const char *psz_path )
     {
         char *psz_command = NULL;
         if( asprintf( &psz_command,
-                      "package.path =[[%s"DIR_SEP"modules"DIR_SEP"?.%s;]]..package.path",
+                      "package.path =[[%s"DIR_SEP"modules"DIR_SEP"?%s;]]..package.path",
                       psz_path, *ppsz_ext ) < 0 )
         {
             return 1;
