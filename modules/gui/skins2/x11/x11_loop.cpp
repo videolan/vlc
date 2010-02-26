@@ -168,18 +168,6 @@ void X11Loop::handleX11Event()
 
     if( event.xany.window == m_rDisplay.getMainWindow() )
     {
-        if( event.type == MapNotify )
-        {
-            // When the "parent" window is mapped, show all the visible
-            // windows, as it is not automatic, unfortunately
-            Theme *pTheme = getIntf()->p_sys->p_theme;
-            if( pTheme )
-            {
-                // Commented out as it really doesn't seem useful
-                // but rather brings visible problems
-                // pTheme->getWindowManager().synchVisibility();
-            }
-        }
         if( event.type == ClientMessage )
         {
             Atom wm_protocols =
