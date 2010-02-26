@@ -117,6 +117,7 @@ bool LockExtension( extension_t *p_ext );
 void UnlockExtension( extension_t *p_ext );
 
 /* Lua specific functions */
+void vlclua_extension_set( lua_State *L, extension_t * );
 extension_t *vlclua_extension_get( lua_State *L );
 int lua_ExtensionActivate( extensions_manager_t *, extension_t * );
 int lua_ExtensionDeactivate( extensions_manager_t *, extension_t * );

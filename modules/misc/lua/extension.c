@@ -720,13 +720,11 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
             return NULL;
         }
         vlclua_set_this( L, p_mgr );
+        vlclua_extension_set( L, p_ext );
 
         luaL_openlibs( L );
         luaL_register( L, "vlc", p_reg );
         luaopen_msg( L );
-
-        lua_pushlightuserdata( L, p_ext );
-        lua_setfield( L, -2, "extension" );
 
         if( p_ext )
         {
@@ -916,17 +914,27 @@ static int TriggerExtension( extensions_manager_t *p_mgr,
     return i_ret;
 }
 
+/** Set extension associated to the current script
+ * @param L current lua_State
+ * @param p_ext the extension
+ */
+void vlclua_extension_set( lua_State *L, extension_t *p_ext )
+{
+    lua_pushlightuserdata( L, vlclua_extension_set );
+    lua_pushlightuserdata( L, p_ext );
+    lua_rawset( L, LUA_REGISTRYINDEX );
+}
+
 /** Retrieve extension associated to the current script
  * @param L current lua_State
- * @return Lua userdata "vlc.extension"
+ * @return Extension pointer
  **/
 extension_t *vlclua_extension_get( lua_State *L )
 {
-    extension_t *p_ext = NULL;
-    lua_getglobal( L, "vlc" );
-    lua_getfield( L, -1, "extension" );
-    p_ext = (extension_t*) lua_topointer( L, lua_gettop( L ) );
-    lua_pop( L, 2 );
+    lua_pushlightuserdata( L, vlclua_extension_set );
+    lua_rawget( L, LUA_REGISTRYINDEX );
+    extension_t *p_ext = (extension_t*) lua_topointer( L, -1 );
+    lua_pop( L, 1 );
     return p_ext;
 }
 
