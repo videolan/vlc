@@ -81,6 +81,7 @@ struct decoder_sys_t
 
     /* for direct rendering */
     bool b_direct_rendering;
+    int  i_direct_rendering_used;
 
     bool b_has_b_frames;
 
@@ -294,6 +295,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     /* ***** ffmpeg direct rendering ***** */
     p_sys->b_direct_rendering = false;
+    p_sys->i_direct_rendering_used = -1;
     if( var_CreateGetBool( p_dec, "ffmpeg-dr" ) &&
        (p_sys->p_codec->capabilities & CODEC_CAP_DR1) &&
         /* Apparently direct rendering doesn't work with YUV422P */
@@ -313,8 +315,12 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     //if( p_sys->b_hurry_up ) p_sys->b_direct_rendering = false;
     if( p_sys->b_direct_rendering )
     {
-        msg_Dbg( p_dec, "using direct rendering" );
+        msg_Dbg( p_dec, "trying to use direct rendering" );
         p_sys->p_context->flags |= CODEC_FLAG_EMU_EDGE;
+    }
+    else
+    {
+        msg_Dbg( p_dec, "direct rendering is disabled" );
     }
 
     /* Always use our get_buffer wrapper so we can calculate the
@@ -934,14 +940,14 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS ||
         p_context->pix_fmt == PIX_FMT_PAL8 )
-        return avcodec_default_get_buffer( p_context, p_ff_pic );
+        goto no_dr;
 
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
     /* Get a new picture */
     p_pic = ffmpeg_NewPictBuf( p_dec, p_sys->p_context );
     if( !p_pic )
-        return avcodec_default_get_buffer( p_context, p_ff_pic );
+        goto no_dr;
     bool b_compatible = true;
     if( p_pic->p[0].i_pitch / p_pic->p[0].i_pixel_pitch < i_width ||
         p_pic->p[0].i_lines < i_height )
@@ -970,7 +976,13 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     if( !b_compatible )
     {
         decoder_DeletePicture( p_dec, p_pic );
-        return avcodec_default_get_buffer( p_context, p_ff_pic );
+        goto no_dr;
+    }
+
+    if( p_sys->i_direct_rendering_used != 1 )
+    {
+        msg_Dbg( p_dec, "using direct rendering" );
+        p_sys->i_direct_rendering_used = 1;
     }
 
     p_sys->p_context->draw_horiz_band = NULL;
@@ -993,6 +1005,14 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_ff_pic->age = 256*256*256*64; // FIXME FIXME from ffmpeg
 
     return 0;
+
+no_dr:
+    if( p_sys->i_direct_rendering_used != 0 )
+    {
+        msg_Warn( p_dec, "disabling direct rendering" );
+        p_sys->i_direct_rendering_used = 0;
+    }
+    return avcodec_default_get_buffer( p_context, p_ff_pic );
 }
 static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *p_context, AVFrame *p_ff_pic )
 {
