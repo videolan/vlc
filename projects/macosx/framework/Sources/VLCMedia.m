@@ -295,7 +295,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
         [self length];
 
         // wait until we are preparsed
-        while (!length && ![self isPreparsed] && [aDate timeIntervalSinceNow] > 0)
+        while (!length && ![self isParsed] && [aDate timeIntervalSinceNow] > 0)
         {
             usleep( thread_sleep );
         }
