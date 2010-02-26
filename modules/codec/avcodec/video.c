@@ -933,9 +933,6 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     avcodec_align_dimensions( p_sys->p_context, &i_width, &i_height );
 
     if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS ||
-        p_sys->p_context->width % 16 || p_sys->p_context->height % 16 ||
-        /* We only pad picture up to 16 */
-        PAD(p_sys->p_context->width,16) < i_width || PAD(p_sys->p_context->height,16) < i_height ||
         p_context->pix_fmt == PIX_FMT_PAL8 )
         return avcodec_default_get_buffer( p_context, p_ff_pic );
 
@@ -945,6 +942,23 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_pic = ffmpeg_NewPictBuf( p_dec, p_sys->p_context );
     if( !p_pic )
         return avcodec_default_get_buffer( p_context, p_ff_pic );
+    bool b_compatible = true;
+    if( p_pic->p[0].i_pitch / p_pic->p[0].i_pixel_pitch < i_width ||
+        p_pic->p[0].i_lines < i_height )
+        b_compatible = false;
+    for( int i = 0; i < p_pic->i_planes && b_compatible; i++ )
+    {
+        const unsigned i_align = i == 0 ? 16 : 8;
+        if( p_pic->p[i].i_pitch % i_align )
+            b_compatible = false;
+        if( (intptr_t)p_pic->p[i].p_pixels % i_align )
+            b_compatible = false;
+    }
+    if( !b_compatible )
+    {
+        decoder_DeletePicture( p_dec, p_pic );
+        return avcodec_default_get_buffer( p_context, p_ff_pic );
+    }
 
     p_sys->p_context->draw_horiz_band = NULL;
 
