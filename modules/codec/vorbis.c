@@ -744,9 +744,8 @@ static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
-    int i_quality, i_min_bitrate, i_max_bitrate, i;
+    int i_quality, i_min_bitrate, i_max_bitrate;
     ogg_packet header[3];
-    uint8_t *p_extra;
 
     if( p_enc->fmt_out.i_codec != VLC_CODEC_VORBIS &&
         !p_enc->b_force )
