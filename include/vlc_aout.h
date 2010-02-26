@@ -247,7 +247,7 @@ struct aout_instance_t
 };
 
 /**
- * It describes the audio channel order VLC except.
+ * It describes the audio channel order VLC expect.
  */
 static const uint32_t pi_vlc_chan_order_wg4[] =
 {
