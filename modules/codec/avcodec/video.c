@@ -298,8 +298,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->i_direct_rendering_used = -1;
     if( var_CreateGetBool( p_dec, "ffmpeg-dr" ) &&
        (p_sys->p_codec->capabilities & CODEC_CAP_DR1) &&
-        /* H264 uses too many reference frames */
-        p_sys->i_codec_id != CODEC_ID_H264 &&
         /* No idea why ... but this fixes flickering on some TSCC streams */
         p_sys->i_codec_id != CODEC_ID_TSCC &&
         !p_sys->p_context->debug_mv )
@@ -923,9 +921,12 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
         }
         return 0;
     }
-    else if( !p_sys->b_direct_rendering )
+    else if( !p_sys->b_direct_rendering ||
+             ( p_sys->i_codec_id == CODEC_ID_H264 && p_ff_pic->reference ) )
     {
-        /* Not much to do in indirect rendering mode */
+        /* Not much to do in indirect rendering mode.
+         * XXX We also do not allow direct rendering with H264 reference frames
+         * as there can be too many of them. */
         return avcodec_default_get_buffer( p_context, p_ff_pic );
     }
 
