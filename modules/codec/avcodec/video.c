@@ -948,7 +948,20 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
         b_compatible = false;
     for( int i = 0; i < p_pic->i_planes && b_compatible; i++ )
     {
-        const unsigned i_align = i == 0 ? 16 : 8;
+        unsigned i_align;
+        switch( p_sys->i_codec_id )
+        {
+        case CODEC_ID_SVQ1:
+        case CODEC_ID_VP5:
+        case CODEC_ID_VP6:
+        case CODEC_ID_VP6F:
+        case CODEC_ID_VP6A:
+            i_align = 16;
+            break;
+        default:
+            i_align = i == 0 ? 16 : 8;
+            break;
+        }
         if( p_pic->p[i].i_pitch % i_align )
             b_compatible = false;
         if( (intptr_t)p_pic->p[i].p_pixels % i_align )
