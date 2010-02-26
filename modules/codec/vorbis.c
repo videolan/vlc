@@ -99,16 +99,28 @@ static const int pi_channels_maps[9] =
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT
-     | AOUT_CHAN_MIDDLERIGHT,
+     | AOUT_CHAN_REARCENTER | AOUT_CHAN_MIDDLELEFT
+     | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT
      | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
-     | AOUT_CHAN_LFE
+     | AOUT_CHAN_LFE,
 };
 
 /*
-**  channel order as defined in http://www.ogghelp.com/ogg/glossary.cfm#Audio_Channels
+**  channel order as defined in http://www.xiph.org/vorbis/doc/Vorbis_I_spec.html#x1-800004.3.9
 */
+
+/* recommended vorbis channel order for 8 channels */
+static const uint32_t pi_8channels_in[] =
+{ AOUT_CHAN_LEFT, AOUT_CHAN_CENTER, AOUT_CHAN_RIGHT,
+  AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
+  AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,AOUT_CHAN_LFE,0 };
+
+/* recommended vorbis channel order for 7 channels */
+static const uint32_t pi_7channels_in[] =
+{ AOUT_CHAN_LEFT, AOUT_CHAN_CENTER, AOUT_CHAN_RIGHT,
+  AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
+  AOUT_CHAN_REARCENTER,AOUT_CHAN_LFE,0 };
 
 /* recommended vorbis channel order for 6 channels */
 static const uint32_t pi_6channels_in[] =
@@ -612,6 +624,12 @@ static void ConfigureChannelOrder(int *pi_chan_table, int i_channels, uint32_t i
     const uint32_t *pi_channels_in;
     switch( i_channels )
     {
+        case 8:
+            pi_channels_in = pi_8channels_in;
+            break;
+        case 7:
+            pi_channels_in = pi_7channels_in;
+            break;
         case 6:
         case 5:
             pi_channels_in = pi_6channels_in;
