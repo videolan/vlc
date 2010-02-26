@@ -704,20 +704,23 @@ error:
 static int vlclua_add_modules_path_inner( lua_State *L, const char *psz_path )
 {
     /* FIXME: don't use luaL_dostring */
-    char *psz_command = NULL;
-    if( asprintf( &psz_command,
-                  "package.path =[[%s"DIR_SEP"modules"DIR_SEP"?.lua;]]..package.path",
-                  psz_path ) < 0 )
+    for( const char **ppsz_ext = ppsz_lua_exts; *ppsz_ext; ppsz_ext++ )
     {
-        return 1;
-    }
+        char *psz_command = NULL;
+        if( asprintf( &psz_command,
+                      "package.path =[[%s"DIR_SEP"modules"DIR_SEP"?.%s;]]..package.path",
+                      psz_path, *ppsz_ext ) < 0 )
+        {
+            return 1;
+        }
 
-    if( luaL_dostring( L, psz_command ) )
-    {
+        if( luaL_dostring( L, psz_command ) )
+        {
+            free( psz_command );
+            return 1;
+        }
         free( psz_command );
-        return 1;
     }
-    free( psz_command );
 
     return 0;
 }
