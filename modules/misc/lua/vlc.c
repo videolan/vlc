@@ -703,26 +703,15 @@ error:
 
 static int vlclua_add_modules_path_inner( lua_State *L, const char *psz_path )
 {
-    /* FIXME: don't use luaL_dostring */
+    int count = 0;
     for( const char **ppsz_ext = ppsz_lua_exts; *ppsz_ext; ppsz_ext++ )
     {
-        char *psz_command = NULL;
-        if( asprintf( &psz_command,
-                      "package.path =[[%s"DIR_SEP"modules"DIR_SEP"?%s;]]..package.path",
-                      psz_path, *ppsz_ext ) < 0 )
-        {
-            return 1;
-        }
-
-        if( luaL_dostring( L, psz_command ) )
-        {
-            free( psz_command );
-            return 1;
-        }
-        free( psz_command );
+        lua_pushfstring( L, "%s"DIR_SEP"modules"DIR_SEP"?%s;",
+                         psz_path, *ppsz_ext );
+        count ++;
     }
 
-    return 0;
+    return count;
 }
 
 int __vlclua_add_modules_path( vlc_object_t *obj, lua_State *L, const char *psz_filename )
@@ -732,7 +721,6 @@ int __vlclua_add_modules_path( vlc_object_t *obj, lua_State *L, const char *psz_
      *   * "The script's parent directory"/modules
      *   * and so on for all the next directories in the directory list
      */
-
     char *psz_path = strdup( psz_filename );
     if( !psz_path )
         return 1;
@@ -754,20 +742,16 @@ int __vlclua_add_modules_path( vlc_object_t *obj, lua_State *L, const char *psz_
     }
     *psz_char = '\0';
 
+    /* Push package on stack */
+    int count = 0;
+    lua_getglobal( L, "package" );
+
     /* psz_path now holds the file's parent directory */
-    if( vlclua_add_modules_path_inner( L, psz_path ) )
-    {
-        free( psz_path );
-        return 1;
-    }
+    count += vlclua_add_modules_path_inner( L, psz_path );
     *psz_char = DIR_SEP_CHAR;
 
     /* psz_path now holds the file's directory */
-    if( vlclua_add_modules_path_inner( L, psz_path ) )
-    {
-        free( psz_path );
-        return 1;
-    }
+    count += vlclua_add_modules_path_inner( L, psz_path );
 
     char **ppsz_dir_list = NULL;
     vlclua_dir_list( obj, psz_char+1/* gruik? */, &ppsz_dir_list );
@@ -779,24 +763,27 @@ int __vlclua_add_modules_path( vlc_object_t *obj, lua_State *L, const char *psz_
     for( ; *ppsz_dir; ppsz_dir++ )
     {
         psz_path = *ppsz_dir;
+        /* FIXME: doesn't work well with meta/... modules due to the double
+         * directory depth */
         psz_char = strrchr( psz_path, DIR_SEP_CHAR );
         if( !psz_char )
-            goto exit;
+        {
+            vlclua_dir_list_free( ppsz_dir_list );
+            return 1;
+        }
 
         *psz_char = '\0';
-        if( vlclua_add_modules_path_inner( L, psz_path ) )
-            goto exit;
+        count += vlclua_add_modules_path_inner( L, psz_path );
         *psz_char = DIR_SEP_CHAR;
-
-        if( vlclua_add_modules_path_inner( L, psz_path ) )
-            goto exit;
+        count += vlclua_add_modules_path_inner( L, psz_path );
     }
+
+    lua_getfield( L, -(count+1), "path" ); /* Get package.path */
+    lua_concat( L, count+1 ); /* Concat vlc module paths and package.path */
+    lua_setfield( L, -2, "path"); /* Set package.path */
+    lua_pop( L, 1 ); /* Pop the package module */
 
     vlclua_dir_list_free( ppsz_dir_list );
     return 0;
-
-    exit:
-    vlclua_dir_list_free( ppsz_dir_list );
-    return 1;
 }
 
