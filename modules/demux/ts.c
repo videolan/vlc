@@ -3781,6 +3781,38 @@ static void PMTSetupEsHDMV( demux_t *p_demux, ts_pid_t *pid,
         break;
     }
 }
+
+static void PMTSetupEsRegistration( demux_t *p_demux, ts_pid_t *pid,
+                                    const dvbpsi_pmt_es_t *p_es )
+{
+    static const struct
+    {
+        char         psz_tag[5];
+        int          i_cat;
+        vlc_fourcc_t i_codec;
+    } p_regs[] = {
+        { "AC-3", AUDIO_ES, VLC_CODEC_A52   },
+        { "DTS1", AUDIO_ES, VLC_CODEC_DTS   },
+        { "DTS2", AUDIO_ES, VLC_CODEC_DTS   },
+        { "DTS3", AUDIO_ES, VLC_CODEC_DTS   },
+        { "BSSD", AUDIO_ES, VLC_CODEC_302M  },
+        { "VC-1", VIDEO_ES, VLC_CODEC_VC1   },
+        { "drac", VIDEO_ES, VLC_CODEC_DIRAC },
+        { "", UNKNOWN_ES, 0 }
+    };
+    es_format_t *p_fmt = &pid->es->fmt;
+
+    for( int i = 0; p_regs[i].i_cat != UNKNOWN_ES; i++ )
+    {
+        if( PMTEsHasRegistration( p_demux, p_es, p_regs[i].psz_tag ) )
+        {
+            p_fmt->i_cat   = p_regs[i].i_cat;
+            p_fmt->i_codec = p_regs[i].i_codec;
+            break;
+        }
+    }
+}
+
 static void PMTParseEsIso639( demux_t *p_demux, ts_pid_t *pid,
                               const dvbpsi_pmt_es_t *p_es )
 {
@@ -4067,6 +4099,10 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         else if( b_hdmv )
         {
             PMTSetupEsHDMV( p_demux, pid, p_es );
+        }
+        else if( p_es->i_type >= 0x80 )
+        {
+            PMTSetupEsRegistration( p_demux, pid, p_es );
         }
 
         if( pid->es->fmt.i_cat == AUDIO_ES ||
