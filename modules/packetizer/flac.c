@@ -84,8 +84,9 @@ struct decoder_sys_t
     date_t  end_date;
     mtime_t i_pts;
 
-    int i_frame_size, i_frame_length, i_bits_per_sample;
-    unsigned int i_rate, i_channels;
+    int i_frame_length;
+    size_t i_frame_size;
+    unsigned int i_rate, i_channels, i_bits_per_sample;
 };
 
 enum
@@ -104,7 +105,7 @@ enum
 static block_t *Packetize( decoder_t *, block_t ** );
 
 static int SyncInfo( decoder_t *, uint8_t *, unsigned int *,
-                     unsigned int *,int * );
+                     unsigned int *, unsigned int * );
 
 static uint64_t read_utf8( const uint8_t *p_buf, int *pi_read );
 static uint8_t flac_crc8( const uint8_t *data, unsigned len );
@@ -371,7 +372,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
                      unsigned int * pi_channels,
                      unsigned int * pi_sample_rate,
-                     int * pi_bits_per_sample )
+                     unsigned int * pi_bits_per_sample )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_header, i_temp, i_read;
