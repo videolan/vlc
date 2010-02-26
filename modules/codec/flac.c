@@ -64,7 +64,7 @@ struct decoder_sys_t
     bool b_stream_info;
 };
 
-static const int pi_channels_maps[7] =
+static const int pi_channels_maps[9] =
 {
     0,
     AOUT_CHAN_CENTER,
@@ -75,7 +75,13 @@ static const int pi_channels_maps[7] =
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT
+     | AOUT_CHAN_MIDDLERIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT
+     | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
+     | AOUT_CHAN_LFE
 };
 
 /*****************************************************************************
@@ -334,8 +340,8 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
         { 0, 1, 3, 4, 2 },
         { 0, 1, 4, 5, 2, 3 },
 
-        { 0, 1, 6, 2, 3, 4, 5 },    /* 7.0 Unspecified by flac */
-        { 0, 1, 6, 7, 2, 3, 4, 5 }, /* 7.1 Unspecified by flac */
+        { 0, 1, 6, 4, 5, 2, 3 },    /* 7.0 Unspecified by flac, but following SMPTE */
+        { 0, 1, 6, 7, 4, 5, 2, 3 }, /* 7.1 Unspecified by flac, but following SMPTE */
     };
 
     VLC_UNUSED(decoder);
