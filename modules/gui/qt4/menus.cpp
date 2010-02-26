@@ -1285,7 +1285,7 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
     switch( i_type & VLC_VAR_TYPE )
     {
         case VLC_VAR_VOID:
-            var_Get( p_object, psz_var, &val );
+            val.i_int = 0;  // Prevent the copy of an uninitialized value
             CreateAndConnect( menu, psz_var, TEXT_OR_VAR, "", ITEM_NORMAL,
                     p_object, val, i_type );
             break;
