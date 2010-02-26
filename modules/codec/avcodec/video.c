@@ -298,8 +298,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->i_direct_rendering_used = -1;
     if( var_CreateGetBool( p_dec, "ffmpeg-dr" ) &&
        (p_sys->p_codec->capabilities & CODEC_CAP_DR1) &&
-        /* Apparently direct rendering doesn't work with YUV422P */
-        p_sys->p_context->pix_fmt != PIX_FMT_YUV422P &&
         /* H264 uses too many reference frames */
         p_sys->i_codec_id != CODEC_ID_H264 &&
         /* No idea why ... but this fixes flickering on some TSCC streams */
@@ -971,6 +969,12 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
         if( p_pic->p[i].i_pitch % i_align )
             b_compatible = false;
         if( (intptr_t)p_pic->p[i].p_pixels % i_align )
+            b_compatible = false;
+    }
+    if( p_context->pix_fmt == PIX_FMT_YUV422P && b_compatible )
+    {
+        if( 2 * p_pic->p[1].i_pitch != p_pic->p[0].i_pitch ||
+            2 * p_pic->p[2].i_pitch != p_pic->p[0].i_pitch )
             b_compatible = false;
     }
     if( !b_compatible )
