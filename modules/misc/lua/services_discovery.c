@@ -94,10 +94,9 @@ int Open_LuaSD( vlc_object_t *p_this )
         msg_Err( p_sd, "Could not create new Lua State" );
         goto error;
     }
+    vlclua_set_this( L, p_sd );
     luaL_openlibs( L );
     luaL_register( L, "vlc", p_reg );
-    lua_pushlightuserdata( L, p_sd );
-    lua_setfield( L, -2, "private" );
     luaopen_input( L );
     luaopen_msg( L );
     luaopen_misc( L );

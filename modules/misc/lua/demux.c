@@ -135,14 +135,13 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
     /* Load Lua libraries */
     luaL_openlibs( L ); /* FIXME: Don't open all the libs? */
 
+    vlclua_set_this( L, p_demux );
     luaL_register( L, "vlc", p_reg );
     luaopen_msg( L );
     luaopen_strings( L );
     luaopen_stream( L );
     luaopen_xml( L );
     luaopen_md5( L );
-    lua_pushlightuserdata( L, p_demux );
-    lua_setfield( L, -2, "private" );
     lua_pushstring( L, p_demux->psz_path );
     lua_setfield( L, -2, "path" );
     lua_pushstring( L, p_demux->psz_access );

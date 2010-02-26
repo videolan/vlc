@@ -719,12 +719,11 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
             msg_Err( p_mgr, "Could not create new Lua State" );
             return NULL;
         }
+        vlclua_set_this( L, p_mgr );
+
         luaL_openlibs( L );
         luaL_register( L, "vlc", p_reg );
         luaopen_msg( L );
-
-        lua_pushlightuserdata( L, p_mgr );
-        lua_setfield( L, -2, "private" );
 
         lua_pushlightuserdata( L, p_ext );
         lua_setfield( L, -2, "extension" );

@@ -91,6 +91,8 @@ static inline const char *luaL_nilorcheckstring( lua_State *L, int narg )
     return luaL_checkstring( L, narg );
 }
 
+#define vlclua_set_this(a, b) __vlclua_set_this(a, VLC_OBJECT(b))
+void __vlclua_set_this( lua_State *, vlc_object_t * );
 vlc_object_t * vlclua_get_this( lua_State * );
 
 /*****************************************************************************

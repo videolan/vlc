@@ -60,6 +60,8 @@ static lua_State * init( vlc_object_t *p_this, input_item_t * p_item, const char
         return NULL;
     }
 
+    vlclua_set_this( L, p_this );
+
     /* Load Lua libraries */
     luaL_openlibs( L ); /* XXX: Don't open all the libs? */
 
@@ -74,9 +76,6 @@ static lua_State * init( vlc_object_t *p_this, input_item_t * p_item, const char
     luaopen_xml( L );
     luaopen_md5( L );
     luaopen_input_item( L, p_item );
-
-    lua_pushlightuserdata( L, p_this );
-    lua_setfield( L, -2, "private" );
 
     if( vlclua_add_modules_path( p_this, L, psz_filename ) )
     {

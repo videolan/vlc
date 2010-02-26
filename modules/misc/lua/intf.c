@@ -168,14 +168,12 @@ int Open_LuaIntf( vlc_object_t *p_this )
         goto error;
     }
 
+    vlclua_set_this( L, p_intf );
+
     luaL_openlibs( L );
 
     /* register our functions */
     luaL_register( L, "vlc", p_reg );
-
-    /* store a pointer to p_intf (FIXME: user could overwrite this) */
-    lua_pushlightuserdata( L, p_intf );
-    lua_setfield( L, -2, "private" );
 
     /* register submodules */
     luaopen_acl( L );

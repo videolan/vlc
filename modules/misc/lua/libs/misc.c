@@ -50,13 +50,19 @@
 /*****************************************************************************
  * Internal lua<->vlc utils
  *****************************************************************************/
+void __vlclua_set_this( lua_State *L, vlc_object_t *p_this )
+{
+    lua_pushlightuserdata( L, __vlclua_set_this );
+    lua_pushlightuserdata( L, p_this );
+    lua_rawset( L, LUA_REGISTRYINDEX );
+}
+
 vlc_object_t * vlclua_get_this( lua_State *L )
 {
-    vlc_object_t * p_this;
-    lua_getglobal( L, "vlc" );
-    lua_getfield( L, -1, "private" );
-    p_this = (vlc_object_t*)lua_topointer( L, lua_gettop( L ) );
-    lua_pop( L, 2 );
+    lua_pushlightuserdata( L, __vlclua_set_this );
+    lua_rawget( L, LUA_REGISTRYINDEX );
+    vlc_object_t *p_this = (vlc_object_t*)lua_topointer( L, -1 );
+    lua_pop( L, 1 );
     return p_this;
 }
 
