@@ -581,13 +581,10 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 
     if (!p_sys->pool)
     {
-        picture_t *pic = picture_New (vd->fmt.i_chroma, p_sys->att->width,
-                                      p_sys->att->height, 0, 1);
-        if (!pic)
-            return NULL;
-
         memset (p_sys->resource, 0, sizeof(p_sys->resource));
 
+        const uint32_t *pitches =
+            xcb_xv_query_image_attributes_pitches (p_sys->att);
         const uint32_t *offsets =
             xcb_xv_query_image_attributes_offsets (p_sys->att);
         p_sys->data_size = p_sys->att->data_size;
@@ -598,10 +595,12 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
         {
             picture_resource_t *res = &p_sys->resource[count];
 
-            for (int i = 0; i < pic->i_planes; i++)
+            for (int i = 0; i < __MIN (p_sys->att->num_planes, PICTURE_PLANE_MAX); i++)
             {
-                res->p[i].i_lines = pic->p[i].i_lines; /* FIXME seems wrong*/
-                res->p[i].i_pitch = pic->p[i].i_pitch;
+                res->p[i].i_lines =
+                    ((i + 1 < p_sys->att->num_planes ? offsets[i+1] :
+                                                       p_sys->data_size) - offsets[i]) / pitches[i];
+                res->p[i].i_pitch = pitches[i];
             }
             if (PictureResourceAlloc (vd, res, p_sys->att->data_size,
                                       p_sys->conn, p_sys->shm))
@@ -609,7 +608,7 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 
             /* Allocate further planes as specified by XVideo */
             /* We assume that offsets[0] is zero */
-            for (int i = 1; i < pic->i_planes; i++)
+            for (int i = 1; i < __MIN (p_sys->att->num_planes, PICTURE_PLANE_MAX); i++)
                 res->p[i].p_pixels = res->p[0].p_pixels + offsets[i];
             if (vd->fmt.i_chroma == VLC_CODEC_YV12)
             {   /* YVU: swap U and V planes */
@@ -626,7 +625,6 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
                 break;
             }
         }
-        picture_Release (pic);
 
         if (count == 0)
             return NULL;
