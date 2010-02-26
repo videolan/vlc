@@ -51,6 +51,8 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     OSWindow( pIntf ), m_dragDrop( dragDrop ), m_isLayered( false ),
     m_pParent( pParentWindow ), m_type ( type )
 {
+    Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
+
     // Create the window
     if( type == GenericWindow::VoutWindow )
     {
@@ -59,27 +61,23 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW | WS_EX_NOPARENTNOTIFY,
                      "VoutWindowClass", "default name",
                      WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-                     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                     m_hWnd_parent, 0, hInst, NULL );
+                     0, 0, 0, 0, m_hWnd_parent, 0, hInst, NULL );
     }
     else if( type == GenericWindow::FullscreenWindow )
     {
-        // Normal window
-        m_hWnd_parent = NULL;
+        // top-level window
         m_hWnd = CreateWindowEx( WS_EX_APPWINDOW, "SkinWindowClass",
             "default name", WS_POPUP | WS_CLIPCHILDREN,
-            CW_USEDEFAULT, CW_USEDEFAULT,
-            CW_USEDEFAULT, CW_USEDEFAULT, m_hWnd_parent, 0, hInst, NULL );
+            0, 0, 0, 0, NULL, 0, hInst, NULL );
     }
 
     else
     {
-        // Normal window
-        m_hWnd_parent =  NULL;
+        // top-level window (owned by the root window)
+        HWND hWnd_owner = pFactory->getParentWindow();
         m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW, "SkinWindowClass",
             "default name", WS_POPUP | WS_CLIPCHILDREN,
-            CW_USEDEFAULT, CW_USEDEFAULT,
-            CW_USEDEFAULT, CW_USEDEFAULT, m_hWnd_parent, 0, hInst, NULL );
+            0, 0, 0, 0, hWnd_owner, 0, hInst, NULL );
     }
 
     if( !m_hWnd )
@@ -89,7 +87,6 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     }
 
     // Store a pointer to the GenericWindow in a map
-    Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
     pFactory->m_windowMap[m_hWnd] = &rWindow;
 
     // Drag & drop

@@ -128,6 +128,8 @@ public:
     BOOL (WINAPI *SetLayeredWindowAttributes)( HWND, COLORREF,
                                                BYTE, DWORD );
 
+    HWND getParentWindow() { return m_hParentWindow; }
+
 private:
     /// Handle of the instance
     HINSTANCE m_hInst;

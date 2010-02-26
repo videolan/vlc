@@ -53,15 +53,9 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
         return DefWindowProc( hwnd, uMsg, wParam, lParam );
     }
 
-    // Here we know we are getting a message for the parent window, since it is
-    // the only one to store p_intf...
-    // Yes, it is a kludge :)
+    Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( p_intf );
 
-//Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( p_intf );
-//msg_Err( p_intf, "Parent window %p %p %u %i\n", pFactory->m_hParentWindow, hwnd, uMsg, wParam );
-    // If Window is parent window
-    // XXX: this test isn't needed, see the kludge above...
-//    if( hwnd == pFactory->m_hParentWindow )
+    if( hwnd == pFactory->getParentWindow() )
     {
         if( uMsg == WM_SYSCOMMAND )
         {
@@ -69,6 +63,16 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
             if( wParam == SC_CLOSE )
             {
                 libvlc_Quit( p_intf->p_libvlc );
+                return 0;
+            }
+            else if( wParam == SC_MINIMIZE )
+            {
+                pFactory->minimize();
+                return 0;
+            }
+            else if( wParam == SC_RESTORE )
+            {
+                pFactory->restore();
                 return 0;
             }
             else
@@ -176,7 +180,7 @@ bool Win32Factory::init()
 
     // Create Window
     m_hParentWindow = CreateWindowEx( WS_EX_TOOLWINDOW, _T("SkinWindowClass"),
-        _T("VLC media player"), WS_SYSMENU|WS_POPUP,
+        _T("VLC media player"), WS_POPUP | WS_SYSMENU | WS_MINIMIZEBOX,
         -200, -200, 0, 0, 0, 0, m_hInst, 0 );
     if( m_hParentWindow == NULL )
     {
