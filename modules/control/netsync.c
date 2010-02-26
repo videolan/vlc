@@ -208,7 +208,6 @@ static void *Master(void *handle)
                  (from.ss_family == AF_INET) ? inet_ntoa(((struct sockaddr_in *)&from)->sin_addr)
                  : "non-IPv4", /*date*/ 0);
 #endif
-    return NULL;
     }
 }
 
@@ -269,7 +268,6 @@ static void *Slave(void *handle)
     wait:
         msleep(INTF_IDLE_SLEEP);
     }
-    return NULL;
 }
 
 static int InputEvent(vlc_object_t *object, char const *cmd,
