@@ -49,6 +49,8 @@ typedef struct
     int i_au_prepend;
     const uint8_t *p_au_prepend;
 
+    unsigned i_au_min_size;
+
     void *p_private;
     packetizer_reset_t    pf_reset;
     packetizer_parse_t    pf_parse;
@@ -59,6 +61,7 @@ typedef struct
 static inline void packetizer_Init( packetizer_t *p_pack,
                                     const uint8_t *p_startcode, int i_startcode,
                                     const uint8_t *p_au_prepend, int i_au_prepend,
+                                    unsigned i_au_min_size,
                                     packetizer_reset_t pf_reset,
                                     packetizer_parse_t pf_parse,
                                     packetizer_validate_t pf_validate,
@@ -71,6 +74,7 @@ static inline void packetizer_Init( packetizer_t *p_pack,
 
     p_pack->i_au_prepend = i_au_prepend;
     p_pack->p_au_prepend = p_au_prepend;
+    p_pack->i_au_min_size = i_au_min_size;
 
     p_pack->i_startcode = i_startcode;
     p_pack->p_startcode = p_startcode;
@@ -167,11 +171,19 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
             p_pack->i_offset = 0;
 
             /* Parse the NAL */
-            p_pic = p_pack->pf_parse( p_pack->p_private, &b_used_ts, p_pic );
-            if( b_used_ts )
+            if( p_pic->i_buffer < p_pack->i_au_min_size )
             {
-                p_block_bytestream->i_dts = VLC_TS_INVALID;
-                p_block_bytestream->i_pts = VLC_TS_INVALID;
+                block_Release( p_pic );
+                p_pic = NULL;
+            }
+            else
+            {
+                p_pic = p_pack->pf_parse( p_pack->p_private, &b_used_ts, p_pic );
+                if( b_used_ts )
+                {
+                    p_block_bytestream->i_dts = VLC_TS_INVALID;
+                    p_block_bytestream->i_pts = VLC_TS_INVALID;
+                }
             }
 
             if( !p_pic )

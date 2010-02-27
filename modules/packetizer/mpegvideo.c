@@ -170,7 +170,7 @@ static int Open( vlc_object_t *p_this )
     /* Misc init */
     packetizer_Init( &p_sys->packetizer,
                      p_mp2v_startcode, sizeof(p_mp2v_startcode),
-                     NULL, 0,
+                     NULL, 0, 4,
                      PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
 
     p_sys->p_seq = NULL;
@@ -305,7 +305,7 @@ static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_bl
     decoder_t *p_dec = p_private;
 
     /* Check if we have a picture start code */
-    *pb_ts_used = p_block->i_buffer >= 4 && p_block->p_buffer[3] == 0x00;
+    *pb_ts_used = p_block->p_buffer[3] == 0x00;
 
     return ParseMPEGBlock( p_dec, p_block );
 }

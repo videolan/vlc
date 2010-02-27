@@ -202,7 +202,7 @@ static int Open( vlc_object_t *p_this )
 
     packetizer_Init( &p_sys->packetizer,
                      p_h264_startcode, sizeof(p_h264_startcode),
-                     p_h264_startcode, 1,
+                     p_h264_startcode, 1, 5,
                      PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
 
     p_sys->b_slice = false;
@@ -520,7 +520,7 @@ static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_bl
     decoder_t *p_dec = p_private;
 
     /* Remove trailing 0 bytes */
-    while( p_block->i_buffer && p_block->p_buffer[p_block->i_buffer-1] == 0x00 )
+    while( p_block->i_buffer > 5 && p_block->p_buffer[p_block->i_buffer-1] == 0x00 )
         p_block->i_buffer--;
 
     return ParseNALBlock( p_dec, pb_ts_used, p_block );

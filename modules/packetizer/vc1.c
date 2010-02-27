@@ -143,7 +143,7 @@ static int Open( vlc_object_t *p_this )
 
     packetizer_Init( &p_sys->packetizer,
                      p_vc1_startcode, sizeof(p_vc1_startcode),
-                     NULL, 0,
+                     NULL, 0, 4,
                      PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
 
     p_sys->b_sequence_header = false;
