@@ -253,15 +253,14 @@ static int Read( stream_t *s, void *p_read, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    if( !p_read ) return 0;
-
     /* Fill the buffer */
     if( Fill( s ) )
         return -1;
 
     /* Read the buffer */
-    int i_len = __MIN( i_read, p_sys->i_len - p_sys->i_pos );
-    memcpy( p_read, p_sys->psz_xspf + p_sys->i_pos, i_len );
+    unsigned i_len = __MIN( i_read, p_sys->i_len - p_sys->i_pos );
+    if( p_read )
+        memcpy( p_read, p_sys->psz_xspf + p_sys->i_pos, i_len );
     p_sys->i_pos += i_len;
 
     return i_len;
