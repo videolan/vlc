@@ -551,6 +551,8 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
         if( tk->i_compression_type == MATROSKA_COMPRESSION_ZLIB )
         {
             p_block = block_zlib_decompress( VLC_OBJECT(p_demux), p_block );
+            if( p_block == NULL )
+                break;
         }
         else
 #endif
