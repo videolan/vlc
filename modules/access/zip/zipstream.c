@@ -353,23 +353,21 @@ static int CreatePlaylist( stream_t *s, char **pp_buffer )
 {
     stream_sys_t *p_sys = s->p_sys;
 
+    unzFile file = p_sys->zipFile;
+    if( !file )
+        return -1;
+
     /* Get some infos about zip archive */
     int i_ret = 0;
-    unzFile file = p_sys->zipFile;
     vlc_array_t *p_filenames = vlc_array_new(); /* Will contain char* */
 
     /* List all file names in Zip archive */
     i_ret = GetFilesInZip( s, file, p_filenames, NULL );
     if( i_ret < 0 )
     {
-        unzClose( file );
         i_ret = -1;
         goto exit;
     }
-
-    /* Close archive */
-    unzClose( file );
-    p_sys->zipFile = NULL;
 
     /* Construct the xspf playlist */
     i_ret = WriteXSPF( pp_buffer, p_filenames, p_sys->psz_path );
@@ -379,6 +377,10 @@ static int CreatePlaylist( stream_t *s, char **pp_buffer )
         i_ret = -1;
 
 exit:
+    /* Close archive */
+    unzClose( file );
+    p_sys->zipFile = NULL;
+
     for( int i = 0; i < vlc_array_count( p_filenames ); i++ )
     {
         free( vlc_array_item_at_index( p_filenames, i ) );
