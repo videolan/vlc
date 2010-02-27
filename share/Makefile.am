@@ -223,6 +223,7 @@ nobase_vlclib_DATA = \
 	lua/playlist/dailymotion.luac \
 	lua/playlist/france2.luac \
 	lua/playlist/googlevideo.luac \
+	lua/playlist/jamendo.luac \
 	lua/playlist/joox.luac \
 	lua/playlist/katsomo.luac \
 	lua/playlist/lelombrik.luac \
@@ -236,6 +237,7 @@ nobase_vlclib_DATA = \
 	lua/sd/freebox.luac \
 	lua/sd/frenchtv.luac \
 	lua/sd/icecast.luac \
+	lua/sd/jamendo.luac \
 	$(NULL)
 if BUILD_HTTPD
 nobase_vlclib_DATA += \
@@ -263,6 +265,7 @@ EXTRA_DIST += \
 	lua/playlist/cue.lua \
 	lua/playlist/dailymotion.lua \
 	lua/playlist/france2.lua \
+	lua/playlist/jamendo.lua \
 	lua/playlist/joox.lua \
 	lua/playlist/katsomo.lua \
 	lua/playlist/lelombrik.lua \
@@ -288,7 +291,8 @@ EXTRA_DIST += \
 	lua/sd/fmc.lua \
 	lua/sd/freebox.lua \
 	lua/sd/frenchtv.lua \
-	lua/sd/icecast.lua
+	lua/sd/icecast.lua \
+	lua/sd/jamendo.lua
 
 DIST_http_lua = \
 	lua/http/.hosts \
