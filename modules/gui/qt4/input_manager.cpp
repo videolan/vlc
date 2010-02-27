@@ -166,6 +166,8 @@ void InputManager::delInput()
 
     emit encryptionChanged( false );
     emit recordingStateChanged( false );
+
+    emit cachingChanged( 1 );
 }
 
 /* Convert the event from the callbacks in actions */
