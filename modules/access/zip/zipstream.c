@@ -232,6 +232,9 @@ void StreamClose( vlc_object_t *p_this )
     stream_t *s = (stream_t*)p_this;
     stream_sys_t *p_sys = s->p_sys;
 
+    if( p_sys->zipFile )
+        unzClose( p_sys->zipFile );
+
     free( p_sys->fileFunctions );
     free( p_sys->psz_xspf );
     free( p_sys->psz_path );
