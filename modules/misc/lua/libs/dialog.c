@@ -291,8 +291,6 @@ static int vlclua_dialog_delete( lua_State *L )
 /** Show the dialog */
 static int vlclua_dialog_show( lua_State *L )
 {
-    vlc_object_t *p_mgr = vlclua_get_this( L );
-
     extension_dialog_t **pp_dlg =
             (extension_dialog_t**) luaL_checkudata( L, 1, "dialog" );
     if( !pp_dlg || !*pp_dlg )
@@ -308,8 +306,6 @@ static int vlclua_dialog_show( lua_State *L )
 /** Hide the dialog */
 static int vlclua_dialog_hide( lua_State *L )
 {
-    vlc_object_t *p_mgr = vlclua_get_this( L );
-
     extension_dialog_t **pp_dlg =
             (extension_dialog_t**) luaL_checkudata( L, 1, "dialog" );
     if( !pp_dlg || !*pp_dlg )
