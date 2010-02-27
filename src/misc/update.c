@@ -52,9 +52,9 @@
 
 #include <gcrypt.h>
 #include <vlc_gcrypt.h>
-
+#ifdef WIN32
 #include <shellapi.h>
-
+#endif
 #include "update.h"
 #include "../libvlc.h"
 
@@ -732,6 +732,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     msg_Info( p_udt, "%s authenticated", psz_destfile );
     free( p_hash );
 
+#ifdef WIN32
     int answer = dialog_Question( p_udt, _("Update VLC media player"),
     _("The new version was successfully downloaded. Do you want to close VLC and install it now?"),
     _("Install"), _("Cancel"), NULL);
@@ -742,6 +743,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
         if(answer > 32)
             libvlc_Quit(p_this->p_libvlc);
     }
+#endif
 end:
     if( p_progress )
         dialog_ProgressDestroy( p_progress );
