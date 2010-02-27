@@ -319,7 +319,7 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
     for( i = 0, p_peek += 56; i < p_index->i_index_entry_count; i++, p_peek += 6 )
     {
         p_index->index_entry[i].i_packet_number = GetDWLE( p_peek );
-        p_index->index_entry[i].i_packet_count = GetDWLE( p_peek + 4 );
+        p_index->index_entry[i].i_packet_count = GetWLE( p_peek + 4 );
     }
 
     return VLC_SUCCESS;
