@@ -185,15 +185,10 @@ text_style_t *text_style_Copy( text_style_t *p_dst, const text_style_t *p_src )
         return p_dst;
 
     /* */
-    if( p_dst->psz_fontname )
-        free( p_dst->psz_fontname );
-
-    /* */
     *p_dst = *p_src;
 
-    /* */
-    if( p_dst->psz_fontname )
-        p_dst->psz_fontname = strdup( p_dst->psz_fontname );
+    if( p_src->psz_fontname )
+        p_dst->psz_fontname = strdup( p_src->psz_fontname );
 
     return p_dst;
 }
