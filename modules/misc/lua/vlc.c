@@ -194,7 +194,7 @@ int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
                               psz_datapath, luadirname ) != -1) )
             i++;
 
-#if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
+#if defined(__APPLE__) || defined(SYS_BEOS)
         if( likely(asprintf( &ppsz_dir_list[i],
                              "%s"DIR_SEP"share"DIR_SEP"lua"DIR_SEP"%s",
                              psz_datapath, luadirname ) != -1) )
