@@ -38,7 +38,7 @@ function main()
 end
 
 function add_top_albums( album_order, tag, max_results )
-    local url = "http://api.jamendo.com/get2/id+name+artist_name/album/xml/?order=" .. album_order .. "&n=" .. max_results
+    local url = "http://api.jamendo.com/get2/id+name+artist_name+image/album/xml/?imagesize=500&order=" .. album_order .. "&n=" .. max_results
     if tag ~= nil then
         url = url .. "&tag_idstr=" .. tag
     end
@@ -61,11 +61,11 @@ function add_top_albums( album_order, tag, max_results )
     for _, album in ipairs( tree.children ) do
         simplexml.add_name_maps( album )
         local album_node = node:add_node( {title=album.children_map["artist_name"][1].children[1] .. " - " .. album.children_map["name"][1].children[1],
-                                           arturl="http://imgjam.com/albums/".. album.children_map["id"][1].children[1] .. "/covers/1.500.jpg"} )
+                                           arturl=album.children_map["image"][1].children[1]} )
         local tracks = get_tracks_from_album( album.children_map["id"][1].children[1] )
         for _, track in ipairs( tracks ) do
             album_node:add_subitem( {path="http://api.jamendo.com/get2/stream/track/redirect/?id=" .. track.id,
-                                     arturl="http://imgjam.com/albums/".. album.children_map["id"][1].children[1] .. "/covers/1.500.jpg",
+                                     arturl=album.children_map["image"][1].children[1],
                                      title=track.title,
                                      artist=album.children_map["artist_name"][1].children[1],
                                      album=album.children_map["name"][1].children[1],
@@ -77,7 +77,7 @@ function add_top_albums( album_order, tag, max_results )
 end
 
 function add_top_tracks( track_order, tag, max_results )
-    local url = "http://api.jamendo.com/get2/id+name+artist_name+album_name+album_id+duration+album_genre+album_dates/track/xml/track_album+album_artist/?order=" .. track_order .. "&n=" .. max_results
+    local url = "http://api.jamendo.com/get2/id+name+artist_name+album_name+album_id+duration+album_genre+album_image+album_dates/track/xml/track_album+album_artist/?imagesize=500&order=" .. track_order .. "&n=" .. max_results
     if tag ~= nil then
         url = url .. "&tag_idstr=" .. tag
     end
@@ -105,7 +105,7 @@ function add_top_tracks( track_order, tag, max_results )
                            album=track.children_map["album_name"][1].children[1],
                            genre=track.children_map["album_genre"][1].children[1],
                            date=track.children_map["album_dates"][1].children_map["year"][1].children[1],
-                           arturl="http://imgjam.com/albums/".. track.children_map["album_id"][1].children[1] .. "/covers/1.500.jpg",
+                           arturl=track.children_map["album_image"][1].children[1],
                            duration=track.children_map["duration"][1].children[1]} )
     end
 end
@@ -133,7 +133,7 @@ function add_radio_from_id( id, max_results )
     elseif id == "7" then radio_name="Lounge"
     elseif id == "4" then radio_name="Dance / Electro"
     end
-    vlc.sd.add_item( {path="http://api.jamendo.com/get2/id+name+artist_name+album_name+duration+album_genre+album_dates/track/xml/radio_track_inradioplaylist+track_album+album_artist/?order=random_desc&radio_id=" .. id .. "&n=" .. max_results,
+    vlc.sd.add_item( {path="http://api.jamendo.com/get2/id+name+artist_name+album_name+duration+album_genre+album_image+album_dates/track/xml/radio_track_inradioplaylist+track_album+album_artist/?imagesize=500&order=random_desc&radio_id=" .. id .. "&n=" .. max_results,
                       title=radio_name} )
 end
 

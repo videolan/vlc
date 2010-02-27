@@ -56,7 +56,7 @@ function parse()
             stream_url = track.children_map["stream"][1].children[1]
         end
         table.insert( tracks, {path=stream_url,
-                               arturl=track.children_map["album_id"] and "http://imgjam.com/albums/".. track.children_map["album_id"][1].children[1] .. "/covers/1.500.jpg" or ( track.children_map["album_image"] and track.children_map["album_image"][1].children[1] or nil ),
+                               arturl=track.children_map["album_image"] and track.children_map["album_image"][1].children[1] or ( track.children_map["album_id"] and "http://imgjam.com/albums/".. track.children_map["album_id"][1].children[1] .. "/covers/1.500.jpg" or nil ),
                                title=track.children_map["name"] and track.children_map["name"][1].children[1] or nil,
                                artist=track.children_map["artist_name"] and track.children_map["artist_name"][1].children[1] or nil,
                                album=track.children_map["album_name"] and track.children_map["album_name"][1].children[1] or nil,
