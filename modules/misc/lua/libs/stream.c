@@ -92,8 +92,8 @@ static int vlclua_memory_stream_new( lua_State *L )
 {
     vlc_object_t * p_this = vlclua_get_this( L );
     /* FIXME: duplicating the whole buffer is suboptimal. Keeping a reference to the string so that it doesn't get garbage collected would be better */
-    const char * psz_content = strdup( luaL_checkstring( L, 1 ) );
-    stream_t *p_stream = stream_MemoryNew( p_this, psz_content, strlen( psz_content ), false );
+    char * psz_content = strdup( luaL_checkstring( L, 1 ) );
+    stream_t *p_stream = stream_MemoryNew( p_this, (uint8_t *)psz_content, strlen( psz_content ), false );
     return vlclua_stream_new_inner( L, p_stream );
 }
 
