@@ -67,6 +67,7 @@ static int Control( stream_t *, int i_query, va_list );
 typedef struct node node;
 typedef struct item item;
 
+static int Fill( stream_t * );
 static int CreatePlaylist( stream_t *s, char **pp_buffer );
 static int GetFilesInZip( stream_t*, unzFile, vlc_array_t*, vlc_array_t* );
 static node* findOrCreateParentNode( node *root, const char *fullpath );
@@ -255,14 +256,8 @@ static int Read( stream_t *s, void *p_read, unsigned int i_read )
     if( !p_read ) return 0;
 
     /* Fill the buffer */
-    if( p_sys->psz_xspf == NULL )
-    {
-        int i_ret = CreatePlaylist( s, &p_sys->psz_xspf );
-        if( i_ret < 0 )
-            return -1;
-        p_sys->i_len = strlen( p_sys->psz_xspf );
-        p_sys->i_pos = 0;
-    }
+    if( Fill( s ) )
+        return -1;
 
     /* Read the buffer */
     int i_len = __MIN( i_read, p_sys->i_len - p_sys->i_pos );
@@ -280,15 +275,8 @@ static int Peek( stream_t *s, const uint8_t **pp_peek, unsigned int i_peek )
     stream_sys_t *p_sys = s->p_sys;
 
     /* Fill the buffer */
-    if( p_sys->psz_xspf == NULL )
-    {
-        int i_ret = CreatePlaylist( s, &p_sys->psz_xspf );
-        if( i_ret < 0 )
-            return -1;
-        p_sys->i_len = strlen( p_sys->psz_xspf );
-        p_sys->i_pos = 0;
-    }
-
+    if( Fill( s ) )
+        return -1;
 
     /* Point to the buffer */
     int i_len = __MIN( i_peek, p_sys->i_len - p_sys->i_pos );
@@ -347,11 +335,28 @@ static int Control( stream_t *s, int i_query, va_list args )
     }
 }
 
+static int Fill( stream_t *s )
+{
+    stream_sys_t *p_sys = s->p_sys;
+
+    if( p_sys->psz_xspf )
+        return VLC_SUCCESS;
+
+    if( CreatePlaylist( s, &p_sys->psz_xspf ) < 0 )
+        return VLC_EGENERIC;
+
+    p_sys->i_len = strlen( p_sys->psz_xspf );
+    p_sys->i_pos = 0;
+    return VLC_SUCCESS;
+}
+
 static int CreatePlaylist( stream_t *s, char **pp_buffer )
 {
+    stream_sys_t *p_sys = s->p_sys;
+
     /* Get some infos about zip archive */
     int i_ret = 0;
-    unzFile file = s->p_sys->zipFile;
+    unzFile file = p_sys->zipFile;
     vlc_array_t *p_filenames = vlc_array_new(); /* Will contain char* */
 
     /* List all file names in Zip archive */
@@ -365,10 +370,10 @@ static int CreatePlaylist( stream_t *s, char **pp_buffer )
 
     /* Close archive */
     unzClose( file );
-    s->p_sys->zipFile = NULL;
+    p_sys->zipFile = NULL;
 
     /* Construct the xspf playlist */
-    i_ret = WriteXSPF( pp_buffer, p_filenames, s->p_sys->psz_path );
+    i_ret = WriteXSPF( pp_buffer, p_filenames, p_sys->psz_path );
     if( i_ret > 0 )
         i_ret = 1;
     else if( i_ret < 0 )
