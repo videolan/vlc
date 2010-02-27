@@ -35,6 +35,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_aout.h>
+#include <assert.h>
 
 #include <vlc_block_helper.h>
 
@@ -95,7 +96,7 @@ static int  OpenPacketizer( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 static void *DecodeBlock  ( decoder_t *, block_t ** );
 
-static uint8_t       *GetOutBuffer ( decoder_t *, void ** );
+static uint8_t       *GetOutBuffer ( decoder_t *, block_t ** );
 static aout_buffer_t *GetAoutBuffer( decoder_t * );
 static block_t       *GetSoutBuffer( decoder_t * );
 
@@ -200,7 +201,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     uint8_t p_header[MAD_BUFFER_GUARD];
     uint32_t i_header;
     uint8_t *p_buf;
-    void *p_out_buffer;
+    block_t *p_out_buffer;
 
     if( !pp_block || !*pp_block ) return NULL;
 
@@ -460,11 +461,13 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             /* Copy the whole frame into the buffer. When we reach this point
              * we already know we have enough data available. */
-            block_GetBytes( &p_sys->bytestream, p_buf, p_sys->i_frame_size );
+            block_GetBytes( &p_sys->bytestream,
+                            p_buf, __MIN( (unsigned)p_sys->i_frame_size, p_out_buffer->i_buffer ) );
 
             /* Get beginning of next frame for libmad */
             if( !p_sys->b_packetizer )
             {
+                assert( p_out_buffer->i_buffer >= (unsigned)p_sys->i_frame_size + MAD_BUFFER_GUARD );
                 memcpy( p_buf + p_sys->i_frame_size,
                         p_header, MAD_BUFFER_GUARD );
             }
@@ -488,7 +491,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 /*****************************************************************************
  * GetOutBuffer:
  *****************************************************************************/
-static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
+static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t *p_buf;
@@ -549,7 +552,7 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
     p_sys->b_discontinuity = false;
 
     /* Hack for libmad filter */
-    p_buf->i_buffer = p_sys->i_frame_size + MAD_BUFFER_GUARD;
+    p_buf = block_Realloc( p_buf, 0, p_sys->i_frame_size + MAD_BUFFER_GUARD );
 
     return p_buf;
 }

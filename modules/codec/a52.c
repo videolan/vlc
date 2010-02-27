@@ -99,7 +99,7 @@ enum {
  ****************************************************************************/
 static void *DecodeBlock  ( decoder_t *, block_t ** );
 
-static uint8_t       *GetOutBuffer ( decoder_t *, void ** );
+static uint8_t       *GetOutBuffer ( decoder_t *, block_t ** );
 static aout_buffer_t *GetAoutBuffer( decoder_t * );
 static block_t       *GetSoutBuffer( decoder_t * );
 
@@ -180,7 +180,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t p_header[VLC_A52_HEADER_SIZE];
     uint8_t *p_buf;
-    void *p_out_buffer;
+    block_t *p_out_buffer;
 
     if( !pp_block || !*pp_block ) return NULL;
 
@@ -310,7 +310,8 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             /* Copy the whole frame into the buffer. When we reach this point
              * we already know we have enough data available. */
-            block_GetBytes( &p_sys->bytestream, p_buf, p_sys->frame.i_size );
+            block_GetBytes( &p_sys->bytestream,
+                            p_buf, __MIN( p_sys->frame.i_size, p_out_buffer->i_buffer ) );
 
             /* Make sure we don't reuse the same pts twice */
             if( p_sys->i_pts == p_sys->bytestream.p_block->i_pts )
@@ -344,7 +345,7 @@ static void CloseCommon( vlc_object_t *p_this )
 /*****************************************************************************
  * GetOutBuffer:
  *****************************************************************************/
-static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
+static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t *p_buf;
