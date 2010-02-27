@@ -216,7 +216,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
         char *psz_buffer;
         if( asprintf( &psz_buffer, "config={%s}", psz_config ) != -1 )
         {
-            printf("%s\n", psz_buffer);
+            msg_Dbg( p_intf, "Setting config variable: %s", psz_buffer );
             if( luaL_dostring( L, psz_buffer ) == 1 )
                 msg_Err( p_intf, "Error while parsing \"lua-config\"." );
             free( psz_buffer );
