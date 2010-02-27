@@ -225,6 +225,14 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * SeekIndex: goto to i_date or i_percent
  *****************************************************************************/
+static int SeekPercent( demux_t *p_demux, int i_query, va_list args )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
+                                   p_sys->i_data_end, p_sys->i_bitrate,
+                                   p_sys->p_fp->i_min_data_packet_size,
+                                   i_query, args );
+}
 static int SeekIndex( demux_t *p_demux, mtime_t i_date, float f_pos )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -232,7 +240,7 @@ static int SeekIndex( demux_t *p_demux, mtime_t i_date, float f_pos )
     int64_t i_pos;
 
     msg_Dbg( p_demux, "seek with index: %i seconds, position %f",
-             (int)(i_date/1000000), f_pos );
+             i_date >= 0 ? (int)(i_date/1000000) : -1, f_pos );
 
     p_index = ASF_FindObject( p_sys->p_root, &asf_object_index_guid, 0 );
 
@@ -296,10 +304,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         else
         {
-            return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
-                                           p_sys->i_data_end, p_sys->i_bitrate,
-                                           p_sys->p_fp->i_min_data_packet_size,
-                                           i_query, args );
+            return SeekPercent( p_demux, i_query, args );
         }
 
     case DEMUX_GET_POSITION:
@@ -325,10 +330,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         else
         {
-            return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
-                                           p_sys->i_data_end, p_sys->i_bitrate,
-                                           p_sys->p_fp->i_min_data_packet_size,
-                                           i_query, args );
+            return SeekPercent( p_demux, i_query, args );
         }
 
     case DEMUX_GET_META:
