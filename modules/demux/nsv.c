@@ -455,7 +455,7 @@ static int ReadNSVf( demux_t *p_demux )
     return stream_Read( p_demux->s, NULL, i_size ) == i_size ? VLC_SUCCESS : VLC_EGENERIC;
 }
 /*****************************************************************************
- * ReadNSVf:
+ * ReadNSVs:
  *****************************************************************************/
 static int ReadNSVs( demux_t *p_demux )
 {
