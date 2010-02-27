@@ -202,6 +202,7 @@ luac_verbose_0 = @echo "  LUAC   $@";
 
 if BUILD_LUA
 nobase_vlclib_DATA = \
+	lua/intf/luac.luac \
 	lua/intf/rc.luac \
 	lua/intf/hotkeys.luac \
 	lua/intf/modules/common.luac \
@@ -279,6 +280,7 @@ EXTRA_DIST += \
 	lua/intf/README.txt \
 	lua/intf/http.lua \
 	lua/intf/rc.lua \
+	lua/intf/luac.lua \
 	lua/intf/hotkeys.lua \
 	lua/intf/modules/common.lua \
 	lua/intf/modules/host.lua \
