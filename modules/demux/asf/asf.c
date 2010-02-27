@@ -233,24 +233,30 @@ static int SeekPercent( demux_t *p_demux, int i_query, va_list args )
                                    p_sys->p_fp->i_min_data_packet_size,
                                    i_query, args );
 }
+
 static int SeekIndex( demux_t *p_demux, mtime_t i_date, float f_pos )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     asf_object_index_t *p_index;
-    int64_t i_pos;
 
     msg_Dbg( p_demux, "seek with index: %i seconds, position %f",
              i_date >= 0 ? (int)(i_date/1000000) : -1, f_pos );
 
+    if( i_date < 0 )
+        i_date = p_sys->i_length * f_pos;
+
     p_index = ASF_FindObject( p_sys->p_root, &asf_object_index_guid, 0 );
 
-    if( i_date < 0 ) i_date = p_sys->i_length * f_pos;
+    uint64_t i_entry = i_date * 10 / p_index->i_index_entry_time_interval;
+    if( i_entry >= p_index->i_index_entry_count )
+    {
+        msg_Warn( p_demux, "Incomplete index" );
+        return VLC_EGENERIC;
+    }
 
-    i_pos = i_date * 10 / p_index->i_index_entry_time_interval;
-    i_pos = p_index->index_entry[i_pos].i_packet_number *
-        p_sys->p_fp->i_min_data_packet_size;
-
-    return stream_Seek( p_demux->s, p_sys->i_data_begin + i_pos );
+    uint64_t i_offset = (uint64_t)p_index->index_entry[i_entry].i_packet_number *
+                        p_sys->p_fp->i_min_data_packet_size;
+    return stream_Seek( p_demux->s, p_sys->i_data_begin + i_offset );
 }
 
 static void SeekPrepare( demux_t *p_demux )
@@ -299,13 +305,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( p_sys->b_index && p_sys->i_length > 0 )
         {
-            i64 = (int64_t)va_arg( args, int64_t );
-            return SeekIndex( p_demux, i64, -1 );
+            va_list acpy;
+            va_copy( acpy, args );
+            i64 = (int64_t)va_arg( acpy, int64_t );
+            va_end( acpy );
+
+            if( !SeekIndex( p_demux, i64, -1 ) )
+                return VLC_SUCCESS;
         }
-        else
-        {
-            return SeekPercent( p_demux, i_query, args );
-        }
+        return SeekPercent( p_demux, i_query, args );
 
     case DEMUX_GET_POSITION:
         if( p_sys->i_time < 0 ) return VLC_EGENERIC;
@@ -325,13 +333,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( p_sys->b_index && p_sys->i_length > 0 )
         {
-            f = (double)va_arg( args, double );
-            return SeekIndex( p_demux, -1, f );
+            va_list acpy;
+            va_copy( acpy, args );
+            f = (double)va_arg( acpy, double );
+            va_end( acpy );
+
+            if( !SeekIndex( p_demux, -1, f ) )
+                return VLC_SUCCESS;
         }
-        else
-        {
-            return SeekPercent( p_demux, i_query, args );
-        }
+        return SeekPercent( p_demux, i_query, args );
 
     case DEMUX_GET_META:
         p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
