@@ -189,6 +189,10 @@ static int vlclua_sd_add_item( lua_State *L )
                 lua_setfield( L, -2, "__metatable" );
             }
             lua_setmetatable( L, -2 );
+            vlc_gc_decref( p_input );
+            while( i_options > 0 )
+                free( ppsz_options[--i_options] );
+            free( ppsz_options );
         }
         else
             msg_Err( p_sd, "vlc.sd.add_item: the \"path\" parameter can't be empty" );
@@ -254,6 +258,10 @@ static int vlclua_node_add_subitem( lua_State *L )
                     lua_setfield( L, -2, "__metatable" );
                 }
                 lua_setmetatable( L, -2 );
+                vlc_gc_decref( p_input );
+                while( i_options > 0 )
+                    free( ppsz_options[--i_options] );
+                free( ppsz_options );
             }
             else
                 msg_Err( p_sd, "node:add_subitem: the \"path\" parameter can't be empty" );
