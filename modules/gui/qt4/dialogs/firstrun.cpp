@@ -42,10 +42,13 @@ FirstRun::FirstRun( QWidget *_p, intf_thread_t *_p_intf  )
 
 #define ALBUM_ART_WHEN_ASKED 0
 #define ALBUM_ART_ALL 2
+
 void FirstRun::save()
 {
     config_PutInt( p_intf,  "album-art", checkbox->isChecked() ? ALBUM_ART_ALL: ALBUM_ART_WHEN_ASKED );
+#ifdef UPDATE_CHECK
     config_PutInt( p_intf,  "qt-updates-notif", checkbox2->isChecked() );
+#endif
     config_PutInt( p_intf,  "qt-privacy-ask", 0 );
 
     /* We have to save here because the user may not launch Prefs */
