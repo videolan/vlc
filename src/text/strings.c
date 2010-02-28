@@ -1165,20 +1165,6 @@ char *make_path (const char *url)
     size_t schemelen = ((end != NULL) ? end : path) - url;
     path += 3; /* skip "://" */
 
-#ifdef WIN32
-
-    /* skip leading slash before disk drive
-     * when format is file:///C:/path/file.ext
-     */
-    if (schemelen == 4 && !strncasecmp (url, "file", 4))
-    {
-        char* search = strstr (path, ":/");
-        if( search && *path == '/' && search == path+2 )
-            path++;
-    }
-
-#endif
-
     /* Remove HTML anchor if present */
     end = strchr (path, '#');
     if (end)
@@ -1194,32 +1180,26 @@ char *make_path (const char *url)
     if (schemelen == 4 && !strncasecmp (url, "file", 4))
     {
 #if (DIR_SEP_CHAR != '/')
-        for (char *p = strchr (path, '/'); p; p = strchr (p, '/'))
-            *p++ = DIR_SEP_CHAR;
+        for (char *p = strchr (path, '/'); p; p = strchr (p + 1, '/'))
+            *p = DIR_SEP_CHAR;
 #endif
-
-#ifdef WIN32
-
-        /* check for disk drive in the form 'C:\...' */
-        char* search = strstr (path, ":"DIR_SEP);
-        if( search && search == path+1 )
-            return path;
-
-        if (*path && asprintf (&ret, "\\\\%s", path) == -1)
-            ret = NULL;
-
-        goto out;
-#else
+        /* Leading slash => local path */
         if (*path == DIR_SEP_CHAR)
+#ifndef WIN32
             return path;
+#else
+            return memmove (path, path + 1, strlen (path + 1) + 1);
+#endif
 
         /* Local path disguised as a remote one (MacOS X) */
         if (!strncasecmp (path, "localhost"DIR_SEP, 10))
-        {
-            memmove (path, path + 9, strlen (path + 9) + 1);
-            return path;
-        }
+            return memmove (path, path + 9, strlen (path + 9) + 1);
+
+#ifdef WIN32
+        if (*path && asprintf (&ret, "\\\\%s", path) == -1)
+            ret = NULL;
 #endif
+        /* non-local path :-( */
     }
     else
     if (schemelen == 2 && !strncasecmp (url, "fd", 2))
