@@ -458,7 +458,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_it
 }
 
 /* Utility function for BlockDecode */
-static block_t *MemToBlock( demux_t *p_demux, uint8_t *p_mem, int i_mem, size_t offset)
+static block_t *MemToBlock( demux_t *p_demux, uint8_t *p_mem, size_t i_mem, size_t offset)
 {
     block_t *p_block;
     if( !(p_block = block_New( p_demux, i_mem + offset ) ) ) return NULL;
@@ -536,6 +536,8 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
         {
             data = &block->GetBuffer(i);
         }
+        if( !data->Buffer() || data->Size() > SIZE_MAX )
+            break;
 
         if( tk->i_compression_type == MATROSKA_COMPRESSION_HEADER && tk->p_compression_data != NULL )
             p_block = MemToBlock( p_demux, data->Buffer(), data->Size(), tk->p_compression_data->GetSize() );
