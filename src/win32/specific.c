@@ -221,24 +221,24 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
 
             /* We assume that the remaining parameters are filenames
              * and their input options */
-            if( *pi_argc - 1 >= optind )
+            if( *pi_argc - 1 >= vlc_optind )
             {
                 COPYDATASTRUCT wm_data;
                 int i_opt;
                 vlc_ipc_data_t *p_data;
                 size_t i_data = sizeof (*p_data);
 
-                for( i_opt = optind; i_opt < *pi_argc; i_opt++ )
+                for( i_opt = vlc_optind; i_opt < *pi_argc; i_opt++ )
                 {
                     i_data += sizeof (size_t);
                     i_data += strlen( ppsz_argv[ i_opt ] ) + 1;
                 }
 
                 p_data = malloc( i_data );
-                p_data->argc = *pi_argc - optind;
+                p_data->argc = *pi_argc - vlc_optind;
                 p_data->enqueue = var_InheritBool( p_this, "playlist-enqueue" );
                 i_data = 0;
-                for( i_opt = optind; i_opt < *pi_argc; i_opt++ )
+                for( i_opt = vlc_optind; i_opt < *pi_argc; i_opt++ )
                 {
                     size_t i_len = strlen( ppsz_argv[ i_opt ] ) + 1;
                     /* Windows will never switch to an architecture

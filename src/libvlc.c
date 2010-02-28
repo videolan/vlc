@@ -531,6 +531,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Override configuration with command line settings
      */
+    /* config_LoadCmdLine(), DBus (below) and Win32-specific use vlc_optind,
+     * vlc_optarg and vlc_optopt globals. This is not thread-safe!! */
+#warning BUG!
     if( config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, false ) )
     {
 #ifdef WIN32
@@ -603,7 +606,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                 dbus_message_unref( p_test_reply );
                 msg_Warn( p_libvlc, "Another Media Player is running. Exiting");
 
-                for( i_input = optind;i_input < i_argc;i_input++ )
+                for( i_input = vlc_optind; i_input < i_argc;i_input++ )
                 {
                     msg_Dbg( p_libvlc, "Adds %s to the running Media Player",
                             ppsz_argv[i_input] );
@@ -1194,12 +1197,12 @@ static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, const char *ppsz_argv[
 
     /* We assume that the remaining parameters are filenames
      * and their input options */
-    for( i_opt = i_argc - 1; i_opt >= optind; i_opt-- )
+    for( i_opt = i_argc - 1; i_opt >= vlc_optind; i_opt-- )
     {
         i_options = 0;
 
         /* Count the input options */
-        while( *ppsz_argv[ i_opt ] == ':' && i_opt > optind )
+        while( *ppsz_argv[ i_opt ] == ':' && i_opt > vlc_optind )
         {
             i_options++;
             i_opt--;

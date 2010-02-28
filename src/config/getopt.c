@@ -49,7 +49,7 @@
    Also, when `ordering' is RETURN_IN_ORDER,
    each non-option ARGV-element is returned here.  */
 
-char *optarg = NULL;
+char *vlc_optarg = NULL;
 
 /* Index in ARGV of the next element to be scanned.
    This is used for communication to and from the caller
@@ -64,13 +64,13 @@ char *optarg = NULL;
    how much of ARGV has been scanned so far.  */
 
 /* 1003.2 says this must be 1 before any call.  */
-int optind = 1;
+int vlc_optind = 1;
 
 /* Formerly, initialization of getopt depended on optind==0, which
    causes problems with re-calling getopt as programs generally don't
    know that. */
 
-int __getopt_initialized = 0;
+static int vlc_getopt_initialized = 0;
 
 /* The next char to be scanned in the option-element
    in which the last option character we returned was found.
@@ -85,7 +85,7 @@ static char *nextchar;
    This must be initialized on some systems to avoid linking in the
    system's own getopt implementation.  */
 
-int optopt = '?';
+int vlc_optopt = '?';
 
 /* Describe how to deal with options that follow non-option ARGV-elements.
 
@@ -151,7 +151,7 @@ static void
 {
     int bottom = first_nonopt;
     int middle = last_nonopt;
-    int top = optind;
+    int top = vlc_optind;
     char *tem;
 
     /* Exchange the shorter segment with the far end of the longer segment.
@@ -197,16 +197,16 @@ static void
 
     /* Update records for the slots the non-options now occupy.  */
 
-    first_nonopt += (optind - last_nonopt);
-    last_nonopt = optind;
+    first_nonopt += (vlc_optind - last_nonopt);
+    last_nonopt = vlc_optind;
 }
 
 /* Initialize the internal data when the first call is made.  */
 
-static const char *_getopt_initialize(int, char *const *, const char *);
+static const char *vlc_getopt_initialize(int, char *const *, const char *);
 
 static const char *
-     _getopt_initialize(argc, argv, optstring)
+     vlc_getopt_initialize(argc, argv, optstring)
      int argc;
      char *const *argv;
      const char *optstring;
@@ -217,7 +217,7 @@ static const char *
        is the program name); the sequence of previously skipped
        non-option ARGV-elements is empty.  */
 
-    first_nonopt = last_nonopt = optind = 1;
+    first_nonopt = last_nonopt = vlc_optind = 1;
 
     nextchar = NULL;
 
@@ -298,19 +298,19 @@ int
      int argc;
      char *const *argv;
      const char *optstring;
-     const struct option *longopts;
+     const struct vlc_option *restrict longopts;
      int *longind;
 {
-    optarg = NULL;
+    vlc_optarg = NULL;
 
-    if (!__getopt_initialized || optind == 0)
+    if (!vlc_getopt_initialized || vlc_optind == 0)
     {
-        optstring = _getopt_initialize(argc, argv, optstring);
-        optind = 1;    /* Don't scan ARGV[0], the program name.  */
-        __getopt_initialized = 1;
+        optstring = vlc_getopt_initialize(argc, argv, optstring);
+        vlc_optind = 1;    /* Don't scan ARGV[0], the program name.  */
+        vlc_getopt_initialized = 1;
     }
 
-#define NONOPTION_P (argv[optind][0] != '-' || argv[optind][1] == '\0')
+#define NONOPTION_P (argv[vlc_optind][0] != '-' || argv[vlc_optind][1] == '\0')
 
     if (nextchar == NULL || *nextchar == '\0')
     {
@@ -318,27 +318,27 @@ int
 
         /* Give FIRST_NONOPT & LAST_NONOPT rational values if OPTIND has been
            moved back by the user (who may also have changed the arguments).  */
-        if (last_nonopt > optind)
-            last_nonopt = optind;
-        if (first_nonopt > optind)
-            first_nonopt = optind;
+        if (last_nonopt > vlc_optind)
+            last_nonopt = vlc_optind;
+        if (first_nonopt > vlc_optind)
+            first_nonopt = vlc_optind;
 
         if (ordering == PERMUTE)
         {
             /* If we have just processed some options following some non-options,
                exchange them so that the options come first.  */
 
-            if (first_nonopt != last_nonopt && last_nonopt != optind)
+            if (first_nonopt != last_nonopt && last_nonopt != vlc_optind)
                 exchange((char **) argv);
-            else if (last_nonopt != optind)
-                first_nonopt = optind;
+            else if (last_nonopt != vlc_optind)
+                first_nonopt = vlc_optind;
 
             /* Skip any additional non-options
                and extend the range of non-options previously skipped.  */
 
-            while (optind < argc && NONOPTION_P)
-                optind++;
-            last_nonopt = optind;
+            while (vlc_optind < argc && NONOPTION_P)
+                vlc_optind++;
+            last_nonopt = vlc_optind;
         }
 
         /* The special ARGV-element `--' means premature end of options.
@@ -346,28 +346,28 @@ int
            then exchange with previous non-options as if it were an option,
            then skip everything else like a non-option.  */
 
-        if (optind != argc && !strcmp(argv[optind], "--"))
+        if (vlc_optind != argc && !strcmp(argv[vlc_optind], "--"))
         {
-            optind++;
+            vlc_optind++;
 
-            if (first_nonopt != last_nonopt && last_nonopt != optind)
+            if (first_nonopt != last_nonopt && last_nonopt != vlc_optind)
                 exchange((char **) argv);
             else if (first_nonopt == last_nonopt)
-                first_nonopt = optind;
+                first_nonopt = vlc_optind;
             last_nonopt = argc;
 
-            optind = argc;
+            vlc_optind = argc;
         }
 
         /* If we have done all the ARGV-elements, stop the scan
            and back over any non-options that we skipped and permuted.  */
 
-        if (optind == argc)
+        if (vlc_optind == argc)
         {
             /* Set the next-arg-index to point at the non-options
                that we previously skipped, so the caller will digest them.  */
             if (first_nonopt != last_nonopt)
-                optind = first_nonopt;
+                vlc_optind = first_nonopt;
             return -1;
         }
 
@@ -378,26 +378,26 @@ int
         {
             if (ordering == REQUIRE_ORDER)
                 return -1;
-            optarg = argv[optind++];
+            vlc_optarg = argv[vlc_optind++];
             return 1;
         }
 
         /* We have found another option-ARGV-element.
            Skip the initial punctuation.  */
 
-        nextchar = (argv[optind] + 1
-                + (argv[optind][1] == '-'));
+        nextchar = (argv[vlc_optind] + 1
+                + (argv[vlc_optind][1] == '-'));
     }
 
     /* Decode the current option-ARGV-element.  */
 
     /* Check whether the ARGV-element is a long option.  */
 
-    if (argv[optind][1] == '-')
+    if (argv[vlc_optind][1] == '-')
     {
         char *nameend;
-        const struct option *p;
-        const struct option *pfound = NULL;
+        const struct vlc_option *p;
+        const struct vlc_option *pfound = NULL;
         int exact = 0;
         int ambig = 0;
         int indfound = -1;
@@ -434,35 +434,35 @@ int
         if (ambig && !exact)
         {
             nextchar += strlen(nextchar);
-            optind++;
-            optopt = 0;
+            vlc_optind++;
+            vlc_optopt = 0;
             return '?';
         }
 
         if (pfound != NULL)
         {
             option_index = indfound;
-            optind++;
+            vlc_optind++;
             if (*nameend)
             {
                 if (pfound->has_arg)
-                    optarg = nameend + 1;
+                    vlc_optarg = nameend + 1;
                 else
                 {
                     nextchar += strlen(nextchar);
 
-                    optopt = pfound->val;
+                    vlc_optopt = pfound->val;
                     return '?';
                 }
             }
             else if (pfound->has_arg)
             {
-                if (optind < argc)
-                    optarg = argv[optind++];
+                if (vlc_optind < argc)
+                    vlc_optarg = argv[vlc_optind++];
                 else
                 {
                     nextchar += strlen(nextchar);
-                    optopt = pfound->val;
+                    vlc_optopt = pfound->val;
                     return optstring[0] == ':' ? ':' : '?';
                 }
             }
@@ -478,8 +478,8 @@ int
         }
 
         nextchar = (char *) "";
-        optind++;
-        optopt = 0;
+        vlc_optind++;
+        vlc_optopt = 0;
         return '?';
     }
 
@@ -491,19 +491,19 @@ int
 
         /* Increment `optind' when we start to process its last character.  */
         if (*nextchar == '\0')
-            ++optind;
+            ++vlc_optind;
 
         if (temp == NULL || c == ':')
         {
-            optopt = c;
+            vlc_optopt = c;
             return '?';
         }
         /* Convenience. Treat POSIX -W foo same as long option --foo */
         if (temp[0] == 'W' && temp[1] == ';')
         {
             char *nameend;
-            const struct option *p;
-            const struct option *pfound = NULL;
+            const struct vlc_option *p;
+            const struct vlc_option *pfound = NULL;
             int exact = 0;
             int ambig = 0;
             int indfound = 0;
@@ -512,14 +512,14 @@ int
             /* This is an option that requires an argument.  */
             if (*nextchar != '\0')
             {
-                optarg = nextchar;
+                vlc_optarg = nextchar;
                 /* If we end this ARGV-element by taking the rest as an arg,
                    we must advance to the next element now.  */
-                optind++;
+                vlc_optind++;
             }
-            else if (optind == argc)
+            else if (vlc_optind == argc)
             {
-                optopt = c;
+                vlc_optopt = c;
                 if (optstring[0] == ':')
                     c = ':';
                 else
@@ -529,12 +529,12 @@ int
             else
                 /* We already incremented `optind' once;
                    increment it again when taking next ARGV-elt as argument.  */
-                optarg = argv[optind++];
+                vlc_optarg = argv[vlc_optind++];
 
             /* optarg is now the argument, see if it's in the
                table of longopts.  */
 
-            for (nextchar = nameend = optarg; *nameend && *nameend != '='; nameend++)
+            for (nextchar = nameend = vlc_optarg; *nameend && *nameend != '='; nameend++)
                 /* Do nothing.  */ ;
 
             /* Test all long options for either exact match
@@ -563,7 +563,7 @@ int
             if (ambig && !exact)
             {
                 nextchar += strlen(nextchar);
-                optind++;
+                vlc_optind++;
                 return '?';
             }
             if (pfound != NULL)
@@ -572,7 +572,7 @@ int
                 if (*nameend)
                 {
                     if (pfound->has_arg)
-                        optarg = nameend + 1;
+                        vlc_optarg = nameend + 1;
                     else
                     {
                         nextchar += strlen(nextchar);
@@ -581,8 +581,8 @@ int
                 }
                 else if (pfound->has_arg)
                 {
-                    if (optind < argc)
-                        optarg = argv[optind++];
+                    if (vlc_optind < argc)
+                        vlc_optarg = argv[vlc_optind++];
                     else
                     {
                         nextchar += strlen(nextchar);
@@ -607,14 +607,14 @@ int
             /* This is an option that requires an argument.  */
             if (*nextchar != '\0')
             {
-                optarg = nextchar;
+                vlc_optarg = nextchar;
                 /* If we end this ARGV-element by taking the rest as an arg,
                    we must advance to the next element now.  */
-                optind++;
+                vlc_optind++;
             }
-            else if (optind == argc)
+            else if (vlc_optind == argc)
             {
-                optopt = c;
+                vlc_optopt = c;
                 if (optstring[0] == ':')
                     c = ':';
                 else
@@ -623,7 +623,7 @@ int
             else
                 /* We already incremented `optind' once;
                    increment it again when taking next ARGV-elt as argument.  */
-                optarg = argv[optind++];
+                vlc_optarg = argv[vlc_optind++];
             nextchar = NULL;
         }
         return c;

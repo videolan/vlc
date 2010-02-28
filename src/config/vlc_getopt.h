@@ -28,7 +28,7 @@
    Also, when `ordering' is RETURN_IN_ORDER,
    each non-option ARGV-element is returned here.  */
 
-    extern char *optarg;
+extern char *vlc_optarg;
 
 /* Index in ARGV of the next element to be scanned.
    This is used for communication to and from the caller
@@ -42,11 +42,11 @@
    Otherwise, `optind' communicates from one call to the next
    how much of ARGV has been scanned so far.  */
 
-    extern int optind;
+extern int vlc_optind;
 
 /* Set to an option character which was unrecognized.  */
 
-    extern int optopt;
+extern int vlc_optopt;
 
 /* Describe the long-named options requested by the application.
    The LONG_OPTIONS argument to getopt_long or getopt_long_only is a vector
@@ -68,15 +68,15 @@
    one).  For long options that have a zero `flag' field, `getopt'
    returns the contents of the `val' field.  */
 
-    struct option
-    {
-        const char *name;
-        bool has_arg;
-        int *flag;
-        int val;
-    };
+struct vlc_option
+{
+    const char *name;
+    bool has_arg;
+    int *flag;
+    int val;
+};
 
-    extern int vlc_getopt_long(int argc, char *const *argv, const char *shortopts,
-                   const struct option *longopts, int *longind);
+extern int vlc_getopt_long(int argc, char *const *argv, const char *shortopts,
+                           const struct vlc_option *longopts, int *longind);
 
 #endif                /* VLC_GETOPT_H */
