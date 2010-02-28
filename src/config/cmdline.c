@@ -141,8 +141,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
             p_longopts[i_index].name = strdup( p_item->psz_name );
             if( p_longopts[i_index].name == NULL ) continue;
             p_longopts[i_index].has_arg =
-                (p_item->i_type == CONFIG_ITEM_BOOL) ? no_argument : 
-                                                       required_argument;
+                (p_item->i_type != CONFIG_ITEM_BOOL);
             p_longopts[i_index].flag = &flag;
             p_longopts[i_index].val = 0;
             i_index++;
@@ -157,7 +156,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
                 strcat( psz_name, p_item->psz_name );
 
                 p_longopts[i_index].name = psz_name;
-                p_longopts[i_index].has_arg = no_argument;
+                p_longopts[i_index].has_arg = false;
                 p_longopts[i_index].flag = &flag;
                 p_longopts[i_index].val = 1;
                 i_index++;
@@ -168,7 +167,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
                 strcat( psz_name, p_item->psz_name );
 
                 p_longopts[i_index].name = psz_name;
-                p_longopts[i_index].has_arg = no_argument;
+                p_longopts[i_index].has_arg = false;
                 p_longopts[i_index].flag = &flag;
                 p_longopts[i_index].val = 1;
                 i_index++;

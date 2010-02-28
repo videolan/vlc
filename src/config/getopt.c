@@ -267,9 +267,7 @@ static const char *
 
    If a char in OPTSTRING is followed by a colon, that means it wants an arg,
    so the following text in the same ARGV-element, or the text of the following
-   ARGV-element, is returned in `optarg'.  Two colons mean an option that
-   wants an optional arg; if there is text in the current ARGV-element,
-   it is returned in `optarg', otherwise `optarg' is set to zero.
+   ARGV-element, is returned in `optarg'.
 
    If OPTSTRING starts with `-' or `+', it requests different methods of
    handling the non-option ARGV-elements.
@@ -447,8 +445,6 @@ int
             optind++;
             if (*nameend)
             {
-                /* Don't test has_arg with >, because some C compilers don't
-                   allow it to be used on enums.  */
                 if (pfound->has_arg)
                     optarg = nameend + 1;
                 else
@@ -459,7 +455,7 @@ int
                     return '?';
                 }
             }
-            else if (pfound->has_arg == 1)
+            else if (pfound->has_arg)
             {
                 if (optind < argc)
                     optarg = argv[optind++];
@@ -575,8 +571,6 @@ int
                 option_index = indfound;
                 if (*nameend)
                 {
-                    /* Don't test has_arg with >, because some C compilers don't
-                       allow it to be used on enums.  */
                     if (pfound->has_arg)
                         optarg = nameend + 1;
                     else
@@ -585,7 +579,7 @@ int
                         return '?';
                     }
                 }
-                else if (pfound->has_arg == 1)
+                else if (pfound->has_arg)
                 {
                     if (optind < argc)
                         optarg = argv[optind++];
@@ -610,42 +604,27 @@ int
         }
         if (temp[1] == ':')
         {
-            if (temp[2] == ':')
+            /* This is an option that requires an argument.  */
+            if (*nextchar != '\0')
             {
-                /* This is an option that accepts an argument optionally.  */
-                if (*nextchar != '\0')
-                {
-                    optarg = nextchar;
-                    optind++;
-                }
+                optarg = nextchar;
+                /* If we end this ARGV-element by taking the rest as an arg,
+                   we must advance to the next element now.  */
+                optind++;
+            }
+            else if (optind == argc)
+            {
+                optopt = c;
+                if (optstring[0] == ':')
+                    c = ':';
                 else
-                    optarg = NULL;
-                nextchar = NULL;
+                    c = '?';
             }
             else
-            {
-                /* This is an option that requires an argument.  */
-                if (*nextchar != '\0')
-                {
-                    optarg = nextchar;
-                    /* If we end this ARGV-element by taking the rest as an arg,
-                       we must advance to the next element now.  */
-                    optind++;
-                }
-                else if (optind == argc)
-                {
-                    optopt = c;
-                    if (optstring[0] == ':')
-                        c = ':';
-                    else
-                        c = '?';
-                }
-                else
-                    /* We already incremented `optind' once;
-                       increment it again when taking next ARGV-elt as argument.  */
-                    optarg = argv[optind++];
-                nextchar = NULL;
-            }
+                /* We already incremented `optind' once;
+                   increment it again when taking next ARGV-elt as argument.  */
+                optarg = argv[optind++];
+            nextchar = NULL;
         }
         return c;
     }
