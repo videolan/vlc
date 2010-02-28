@@ -144,7 +144,21 @@ static int Open(vlc_object_t *this)
     /* We don't wait, that means that we'll have to be careful about releasing
      * container.
      * That's why we'll release on main thread in Close(). */
-    [(id)container performSelectorOnMainThread:@selector(addVoutSubview:) withObject:sys->glView waitUntilDone:NO];
+    if ([(id)container respondsToSelector:@selector(addVoutSubview:)])
+        [(id)container performSelectorOnMainThread:@selector(addVoutSubview:) withObject:sys->glView waitUntilDone:NO];
+    else if ([container isKindOfClass:[NSView class]])
+    {
+        NSView *parentView = container;
+        [parentView performSelectorOnMainThread:@selector(addSubview:) withObject:sys->glView waitUntilDone:NO];
+        [sys->glView performSelectorOnMainThread:@selector(setFrame:) withObject:[NSValue valueWithRect:[parentView bounds]] waitUntilDone:NO];
+    }
+    else
+    {
+        msg_Err(vd, "Invalid drawable-nsobject object. drawable-nsobject must either be an NSView or comply to the @protocol VLCOpenGLVideoViewEmbedding.");
+        goto error;
+    }
+
+
     [nsPool release];
     nsPool = nil;
 
@@ -192,8 +206,11 @@ void Close(vlc_object_t *this)
     [sys->glView setVoutDisplay:nil];
 
     var_Destroy(vd, "drawable-nsobject");
-    /* This will retain sys->glView */
-    [(id)sys->container performSelectorOnMainThread:@selector(removeVoutSubview:) withObject:sys->glView waitUntilDone:NO];
+    if ([(id)sys->container respondsToSelector:@selector(removeVoutSubview:)])
+    {
+        /* This will retain sys->glView */
+        [(id)sys->container performSelectorOnMainThread:@selector(removeVoutSubview:) withObject:sys->glView waitUntilDone:NO];
+    }
     /* release on main thread as explained in Open() */
     [(id)sys->container performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
     [sys->glView performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:NO];
@@ -353,6 +370,7 @@ static void OpenglSwap(vout_opengl_t *gl)
     GLint params[] = { 1 };
     CGLSetParameter([[self openGLContext] CGLContextObj], kCGLCPSwapInterval, params);
 
+    [self setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
     return self;
 }
 

@@ -193,8 +193,10 @@ VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t *p_mi );
 /**
  * Set the NSView handler where the media player should render its video output.
  *
- * The object minimal_macosx expects is of kind NSObject and should
- * respect the protocol:
+ * Use the vout called "macosx".
+ *
+ * The drawable is an NSObject that follow the VLCOpenGLVideoViewEmbedding
+ * protocol:
  *
  * @begincode
  * \@protocol VLCOpenGLVideoViewEmbedding <NSObject>
@@ -203,10 +205,24 @@ VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t *p_mi );
  * \@end
  * @endcode
  *
+ * Or it can be an NSView object.
+ *
+ * If you want to use it along with Qt4 see the QMacCocoaViewContainer. Then
+ * the following code should work:
+ * @begincode
+ * {
+ *     NSView *video = [[NSView alloc] init];
+ *     QMacCocoaViewContainer *container = new QMacCocoaViewContainer(video, parent);
+ *     libvlc_media_player_set_nsobject(mp, video);
+ *     [video release];
+ * }
+ * @endcode
+ *
  * You can find a live example in VLCVideoView in VLCKit.framework.
  *
  * \param p_mi the Media Player
- * \param drawable the NSView handler
+ * \param drawable the drawable that is either an NSView or an object following
+ * the VLCOpenGLVideoViewEmbedding protocol.
  */
 VLC_PUBLIC_API void libvlc_media_player_set_nsobject ( libvlc_media_player_t *p_mi, void * drawable );
 
