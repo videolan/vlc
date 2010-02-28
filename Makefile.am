@@ -789,8 +789,8 @@ if USE_PEFLAGS
 	done
 endif
 
-# Copy the lua scripts (HTTP)
 if BUILD_LUA
+# Copy the lua scripts (HTTP)
 	mkdir -p "$(win32_lua_destdir)/http/images"
 	mkdir -p "$(win32_lua_destdir)/http/requests"
 	mkdir -p "$(win32_lua_destdir)/http/js"
@@ -815,9 +815,7 @@ if BUILD_LUA
 	unix2dos $(win32_lua_destdir)/http/requests/*.xml
 	cp $(srcdir)/share/lua/http/requests/readme $(win32_lua_destdir)/http/requests/readme.txt
 	unix2dos $(win32_lua_destdir)/http/requests/readme.txt
-endif
 
-if BUILD_LUA
 #Lua Scripts
 	$(INSTALL) -d $(win32_lua_destdir)
 	for i in $(srcdir)/share/lua/*.* ; do \
@@ -827,21 +825,9 @@ if BUILD_LUA
 	for i in $(srcdir)/share/lua/modules/*.* ; do \
 	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/modules/`basename $${i}` ; \
 	done
-	$(INSTALL) -d $(win32_lua_destdir)/playlist
-	for i in $(srcdir)/share/lua/playlist/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/playlist/`basename $${i}` ; \
-	done
-	$(INSTALL) -d $(win32_lua_destdir)/sd
-	for i in $(srcdir)/share/lua/sd/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/sd/`basename $${i}` ; \
-	done
-	$(INSTALL) -d $(win32_lua_destdir)/meta/art
-	for i in $(srcdir)/share/lua/meta/art/*.lua ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/meta/art/`basename $${i}` ; \
-	done
-	$(INSTALL) -d $(win32_lua_destdir)/meta/reader
-	for i in $(srcdir)/share/lua/meta/reader/*.lua ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/meta/reader/`basename $${i}` ; \
+	$(INSTALL) -d $(win32_lua_destdir)/extensions
+	for i in $(srcdir)/share/lua/extensions/*.* ; do \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/extensions/`basename $${i}` ; \
 	done
 	$(INSTALL) -d $(win32_lua_destdir)/intf
 	for i in $(srcdir)/share/lua/intf/*.* ; do \
@@ -851,6 +837,35 @@ if BUILD_LUA
 	for i in $(srcdir)/share/lua/intf/modules/*.* ; do \
 	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/intf/modules/`basename $${i}` ; \
 	done
+	$(INSTALL) -d $(win32_lua_destdir)/meta/art
+	for i in $(srcdir)/share/lua/meta/art/*.* ; do \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/meta/art/`basename $${i}` ; \
+	done
+	$(INSTALL) -d $(win32_lua_destdir)/meta/fetcher
+	for i in $(srcdir)/share/lua/meta/fetcher/*.* ; do \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/meta/fetcher/`basename $${i}` ; \
+	done
+	$(INSTALL) -d $(win32_lua_destdir)/meta/reader
+	for i in $(srcdir)/share/lua/meta/reader/*.* ; do \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/meta/reader/`basename $${i}` ; \
+	done
+	$(INSTALL) -d $(win32_lua_destdir)/playlist
+	for i in $(srcdir)/share/lua/playlist/*.* ; do \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/playlist/`basename $${i}` ; \
+	done
+	$(INSTALL) -d $(win32_lua_destdir)/sd
+	for i in $(srcdir)/share/lua/sd/*.* ; do \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/sd/`basename $${i}` ; \
+	done
+
+	unix2dos $(win32_lua_destdir)/README.txt
+	unix2dos $(win32_lua_destdir)/extensions/README.txt
+	unix2dos $(win32_lua_destdir)/intf/README.txt
+	unix2dos $(win32_lua_destdir)/meta/art/README.txt
+	unix2dos $(win32_lua_destdir)/meta/fetcher/README.txt
+	unix2dos $(win32_lua_destdir)/meta/reader/README.txt
+	unix2dos $(win32_lua_destdir)/playlist/README.txt
+	unix2dos $(win32_lua_destdir)/sd/README.txt
 endif
 
 # Copy the http files
