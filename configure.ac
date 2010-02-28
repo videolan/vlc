@@ -661,7 +661,6 @@ fi
 AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
 
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-AC_TYPE_SIGNAL
 AC_CHECK_LIB(m,cos,[
   VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger],[-lm])
 ])
