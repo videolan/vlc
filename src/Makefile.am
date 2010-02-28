@@ -228,7 +228,6 @@ EXTRA_libvlccore_la_SOURCES = \
 	$(SOURCES_libvlc_win32) \
 	$(SOURCES_libvlc_other) \
 	$(SOURCES_libvlc_dirent) \
-	$(SOURCES_libvlc_getopt) \
 	$(SOURCES_libvlc_httpd) \
 	$(SOURCES_libvlc_sout) \
 	$(SOURCES_libvlc_vlm) \
@@ -256,9 +255,6 @@ endif
 endif
 if BUILD_DIRENT
 libvlccore_la_SOURCES += $(SOURCES_libvlc_dirent)
-endif
-if BUILD_GETOPT
-libvlccore_la_SOURCES += $(SOURCES_libvlc_getopt)
 endif
 if BUILD_HTTPD
 libvlccore_la_SOURCES += $(SOURCES_libvlc_httpd)
@@ -300,12 +296,6 @@ SOURCES_libvlc_other = \
 
 SOURCES_libvlc_dirent = \
 	extras/dirent.c \
-	$(NULL)
-
-SOURCES_libvlc_getopt = \
-	extras/getopt.c \
-	extras/getopt.h \
-	extras/getopt1.c \
 	$(NULL)
 
 SOURCES_libvlc_common = \
@@ -456,6 +446,9 @@ SOURCES_libvlc_common = \
 	misc/filter_chain.c \
 	misc/http_auth.c \
 	misc/sql.c \
+	extras/getopt.c \
+	extras/getopt.h \
+	extras/getopt1.c \
 	$(NULL)
 
 SOURCES_libvlc_httpd = \
@@ -482,7 +475,6 @@ SOURCES_libvlc = \
 	$(OPT_SOURCES_libvlc_darwin) \
 	$(OPT_SOURCES_libvlc_win32) \
 	$(OPT_SOURCES_libvlc_dirent) \
-	$(OPT_SOURCES_libvlc_getopt) \
 	$(NULL)
 
 SOURCES_libvlc_control = \

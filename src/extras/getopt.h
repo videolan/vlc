@@ -108,7 +108,7 @@ extern "C"
 #else                /* not __GNU_LIBRARY__ */
     extern int getopt();
 #endif                /* __GNU_LIBRARY__ */
-    extern int getopt_long(int argc, char *const *argv, const char *shortopts,
+    extern int vlc_getopt_long(int argc, char *const *argv, const char *shortopts,
                    const struct option *longopts, int *longind);
     extern int getopt_long_only(int argc, char *const *argv,
                     const char *shortopts,
@@ -121,7 +121,7 @@ extern "C"
                     int long_only);
 #else                /* not __STDC__ */
     extern int getopt();
-    extern int getopt_long();
+    extern int vlc_getopt_long();
     extern int getopt_long_only();
 
     extern int _getopt_internal();

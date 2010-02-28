@@ -57,5 +57,6 @@ vlc_win32_rc.$(OBJEXT): vlc_win32_rc.rc
 
 vlc_cache_gen_SOURCES = cachegen.c
 vlc_cache_gen_LDADD = \
+	$(GNUGETOPT_LIBS) \
 	../compat/libcompat.la \
 	../src/libvlc.la ../src/libvlccore.la

@@ -646,19 +646,14 @@ AC_CHECK_FUNCS(inet_aton,,[
   ])
 ])
 
-dnl Check for getopt (always use builtin one on win32)
-if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"; then
-need_getopt=:
-else
-need_getopt=false
-AC_CHECK_FUNCS(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
-[ # FreeBSD has a gnugetopt library for this:
-  AC_CHECK_LIB([gnugetopt],[getopt_long],
-    [AC_DEFINE(HAVE_GETOPT_LONG,1,getopt support)
-     VLC_ADD_LIBS([libvlccore],[-lgnugetopt])],
-    [need_getopt=:])])
-fi
-AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
+dnl FreeBSD has a gnugetopt library for this:
+GNUGETOPT_LIBS=""
+AC_CHECK_FUNC(getopt_long,, [
+  AC_CHECK_LIB([gnugetopt],[getopt_long], [
+    GNUGETOPT_LIBS="-lgnugetopt"
+  ])
+])
+AC_SUBST(GNUGETOPT_LIBS)
 
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_CHECK_LIB(m,cos,[

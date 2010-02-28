@@ -30,13 +30,7 @@
 #include <vlc_keys.h>
 #include <vlc_charset.h>
 
-#ifdef HAVE_GETOPT_LONG
-#   ifdef HAVE_GETOPT_H
-#       include <getopt.h>                                       /* getopt() */
-#   endif
-#else
-#   include "../extras/getopt.h"
-#endif
+#include "../extras/getopt.h"
 
 #include "configuration.h"
 #include "modules/modules.h"
@@ -219,7 +213,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
      */
     opterr = 0;
     optind = 0; /* set to 0 to tell GNU getopt to reinitialize */
-    while( ( i_cmd = getopt_long( *pi_argc, (char **)ppsz_argv, psz_shortopts,
+    while( ( i_cmd = vlc_getopt_long( *pi_argc, (char **)ppsz_argv, psz_shortopts,
                                   p_longopts, &i_index ) ) != -1 )
     {
         /* A long option has been recognized */

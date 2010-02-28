@@ -61,8 +61,6 @@
 #endif
 #endif
 
-#ifndef ELIDE_CODE
-
 /* This needs to come after some library #include
    to get __GNU_LIBRARY__ defined.  */
 #ifdef    __GNU_LIBRARY__
@@ -937,8 +935,6 @@ int
                 (int *) 0,
                 0);
 }
-
-#endif /* Not ELIDE_CODE.  */
 
 #ifdef TEST
 

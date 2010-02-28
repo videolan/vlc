@@ -51,8 +51,6 @@
 #endif
 #endif
 
-#ifndef ELIDE_CODE
-
 /* This needs to come after some library #include
    to get __GNU_LIBRARY__ defined.  */
 #ifdef __GNU_LIBRARY__
@@ -64,7 +62,7 @@
 #endif
 
 int
-    getopt_long(argc, argv, options, long_options, opt_index)
+    vlc_getopt_long(argc, argv, options, long_options, opt_index)
      int argc;
      char *const *argv;
      const char *options;
@@ -89,8 +87,6 @@ int
 {
     return _getopt_internal(argc, argv, options, long_options, opt_index, 1);
 }
-
-#endif /* Not ELIDE_CODE.  */
 
 #ifdef TEST
 
