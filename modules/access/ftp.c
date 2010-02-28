@@ -306,8 +306,8 @@ static int parseURL( vlc_url_t *url, const char *path )
     /* FTP URLs are relative to user's default directory (RFC1738 §3.2)
     For absolute path use ftp://foo.bar//usr/local/etc/filename */
     /* FIXME: we should issue a series of CWD, one per slash */
-    if( url->psz_path && *url->psz_path == '/' )
-        url->psz_path++;
+    if( url->psz_path == NULL )
+        return VLC_SUCCESS;
 
     char *type = strstr( url->psz_path, ";type=" );
     if( type )
@@ -345,15 +345,16 @@ static int InOpen( vlc_object_t *p_this )
         goto exit_error;
 
     /* get size */
-    if( ftp_SendCommand( p_this, p_sys, "SIZE %s", p_sys->url.psz_path
-                                               ? p_sys->url.psz_path : "" ) < 0
+    if( p_sys->url.psz_path == NULL )
+        p_sys->directory = true;
+    else
+    if( ftp_SendCommand( p_this, p_sys, "SIZE %s", p_sys->url.psz_path ) < 0
      || ftp_ReadCommand( p_this, p_sys, NULL, &psz_arg ) != 2 )
     {
         msg_Dbg( p_access, "cannot get file size" );
         msg_Dbg( p_access, "will try to get directory contents" );
-        if( ftp_SendCommand( p_this, p_sys, "CWD %s", p_sys->url.psz_path
-                             ? p_sys->url.psz_path : "" ) < 0 ||
-        ftp_ReadCommand( p_this, p_sys, NULL, &psz_arg ) != 2 )
+        if( ftp_SendCommand( p_this, p_sys, "CWD %s", p_sys->url.psz_path ) < 0
+         || ftp_ReadCommand( p_this, p_sys, NULL, &psz_arg ) != 2 )
         {
             msg_Err( p_access, "file or directory doesn't exist" );
             net_Close( p_sys->fd_cmd );
@@ -402,6 +403,11 @@ static int OutOpen( vlc_object_t *p_this )
 
     if( parseURL( &p_sys->url, p_access->psz_path ) )
         goto exit_error;
+    if( p_sys->url.psz_path == NULL )
+    {
+        msg_Err( p_this, "no filename specified" );
+        goto exit_error;
+    }
 
     if( Connect( p_this, p_sys ) )
         goto exit_error;
@@ -514,7 +520,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         }
         else
         {
-            snprintf( (char*)p_buffer, i_len, "ftp://%s:%d/%s/%s\n",
+            snprintf( (char*)p_buffer, i_len, "ftp://%s:%d%s/%s\n",
                       p_sys->url.psz_host, p_sys->url.i_port,
                       p_sys->url.psz_path, psz_line );
             free( psz_line );
@@ -806,9 +812,10 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
     else
     {
         /* "1xx" message */
+        assert( p_sys->url.psz_path );
         if( ftp_SendCommand( p_access, p_sys, "%s %s",
                              p_sys->out ? "STOR" : "RETR",
-                           p_sys->url.psz_path ? p_sys->url.psz_path : "" ) < 0
+                             p_sys->url.psz_path ) < 0
          || ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) > 2 )
         {
             msg_Err( p_access, "cannot retrieve file" );
