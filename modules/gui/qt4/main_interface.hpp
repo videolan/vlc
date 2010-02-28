@@ -92,7 +92,7 @@ public:
 protected:
     void dropEventPlay( QDropEvent *, bool);
 #ifdef WIN32
-    bool winEvent( MSG *, long * );
+    virtual bool winEvent( MSG *, long * );
 #endif
     virtual void dropEvent( QDropEvent *);
     virtual void dragEnterEvent( QDragEnterEvent * );
@@ -105,21 +105,24 @@ protected:
     virtual void resizeEvent( QResizeEvent * event );
 
 private:
+    /* Main Widgets Creation */
     void createMainWidget( QSettings* );
     void createStatusBar();
     void createPlaylist();
 
     /* Systray */
-    void handleSystray();
     void createSystray();
+    void handleSystray();
     void initSystray();
 
+    /* Mess about stackWidget */
     void showTab( int i_tab );
     void restoreStackOldWidget();
     void showVideo() { showTab( VIDEO_TAB ); }
     void showBg() { showTab( BACKG_TAB ); }
     void hideStackWidget() { showTab( HIDDEN_TAB ); }
 
+    /* */
     QSettings           *settings;
 #ifndef HAVE_MAEMO
     QSystemTrayIcon     *sysTray;
@@ -131,6 +134,7 @@ private:
     InputControlsWidget *inputC;
     FullscreenControllerWidget *fullscreenControls;
     QStackedWidget      *stackCentralW;
+
     /* Video */
     VideoWidget         *videoWidget;
 
@@ -151,19 +155,22 @@ private:
     };
     int                  stackCentralOldState;
 
-//    bool                 videoIsActive;       ///< Having a video now / THEMIM->hasV
-    bool                 videoEmbeddedFlag;   ///< Want an external Video Window
-    bool                 playlistVisible;     ///< Is the playlist visible ?
-    bool                 visualSelectorEnabled;
-    bool                 notificationEnabled; /// Systray Notifications
-
+    /* Flags */
+    bool                 b_notificationEnabled; /// Systray Notifications
     bool                 b_keep_size;         ///< persistent resizeable window
+    bool                 b_videoEmbedded;   ///< Want an external Video Window
+    bool                 b_hideAfterCreation;
+    int                  i_visualmode;        ///< Visual Mode
+
+    /* States */
+    bool                 playlistVisible;     ///< Is the playlist visible ?
+//    bool                 videoIsActive;       ///< Having a video now / THEMIM->hasV
+//    bool                 b_visualSelectorEnabled;
+    bool                 b_plDocked;          ///< Is the playlist docked ?
+
     QSize                mainBasedSize;       ///< based Wnd (normal mode only)
     QSize                mainVideoSize;       ///< Wnd with video (all modes)
-    int                  i_visualmode;        ///< Visual Mode
-    bool                 b_plDocked;
     int                  i_bg_height;         ///< Save height of bgWidget
-    bool                 b_hideAfterCreation;
 
 #ifdef WIN32
     HIMAGELIST himl;

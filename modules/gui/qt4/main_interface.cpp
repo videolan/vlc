@@ -83,7 +83,6 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
     /* Variables initialisation */
-    // need_components_update = false;
     bgWidget             = NULL;
     videoWidget          = NULL;
     playlistWidget       = NULL;
@@ -95,11 +94,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     controls             = NULL;
     inputC               = NULL;
 
-    b_hideAfterCreation  = false;
+    b_hideAfterCreation  = false; // --qt-start-minimized
     playlistVisible      = false; // FIXME remove
     input_name           = "";
-
     i_bg_height          = 0;
+
 
     /* Ask for Privacy */
     FirstRun::CheckAndRun( this, p_intf );
@@ -116,7 +115,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setWindowOpacity( var_InheritFloat( p_intf, "qt-opacity" ) );
 
     /* Set The Video In emebedded Mode or not */
-    videoEmbeddedFlag = var_InheritBool( p_intf, "embedded-video" );
+    b_videoEmbedded = var_InheritBool( p_intf, "embedded-video" );
 
     /* Does the interface resize to video size or the opposite */
     b_keep_size = !var_InheritBool( p_intf, "qt-video-autoresize" );
@@ -125,7 +124,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     i_visualmode = var_InheritInteger( p_intf, "qt-display-mode" );
 
     /* Do we want anoying popups or not */
-    notificationEnabled = var_InheritBool( p_intf, "qt-notification" );
+    b_notificationEnabled = var_InheritBool( p_intf, "qt-notification" );
 
     /* Set the other interface settings */
     settings = getSettings();
@@ -343,8 +342,7 @@ MainInterface::~MainInterface()
     settings->setValue( "mainBasedSize", mainBasedSize );
     settings->setValue( "mainVideoSize", mainVideoSize );
 
-    if( bgWidget )
-        settings->setValue( "backgroundSize", bgWidget->size() );
+    settings->setValue( "backgroundSize", bgWidget->size() );
 
     /* Save this size */
     QVLCTools::saveWidgetPosition(settings, this);
@@ -364,6 +362,7 @@ MainInterface::~MainInterface()
  *****************************/
 void MainInterface::recreateToolbars()
 {
+    // FIXME: do the same for the FSC
     //msg_Dbg( p_intf, "Recreating the toolbars" );
     settings->beginGroup( "MainWindow" );
     delete controls;
@@ -406,7 +405,7 @@ void MainInterface::createMainWidget( QSettings *settings )
 
 
     /* And video Outputs */
-    if( videoEmbeddedFlag )
+    if( b_videoEmbedded )
     {
         videoWidget = new VideoWidget( p_intf );
         stackCentralW->insertWidget( VIDEO_TAB, videoWidget );
@@ -784,7 +783,7 @@ void MainInterface::debug()
 {
 #ifdef DEBUG_INTF
     msg_Dbg( p_intf, "Stack Size: %i - %i", stackCentralW->size().height(), size().width() );
-    if( videoEmbeddedFlag )
+    if( b_videoEmbedded )
         msg_Dbg( p_intf, "Stack Size: %i - %i",
                  stackCentralW->widget( VIDEO_TAB )->size().height(),
                  stackCentralW->widget( VIDEO_TAB )->size().width() );
@@ -863,21 +862,22 @@ void MainInterface::destroyPopupMenu()
     QVLCMenu::PopupMenu( p_intf, false );
 }
 
+void MainInterface::popupMenu( const QPoint &p )
+{
+    /* FIXME
+     * Ow, that's ugly: don't show the popup menu if cursor over
+     * the main menu bar or the status bar */
+    if( !childAt( p ) || ( ( childAt( p ) != menuBar() )
+                        && ( childAt( p )->parentWidget() != statusBar() ) ) )
+        QVLCMenu::PopupMenu( p_intf, true );
+}
+
 void MainInterface::toggleFSC()
 {
    if( !fullscreenControls ) return;
 
    IMEvent *eShow = new IMEvent( FullscreenControlToggle_Type, 0 );
    QApplication::postEvent( fullscreenControls, eShow );
-}
-
-void MainInterface::popupMenu( const QPoint &p )
-{
-    /* Ow, that's ugly: don't show the popup menu if cursor over
-     * the main menu bar or the status bar */
-    if( !childAt( p ) || ( ( childAt( p ) != menuBar() )
-                        && ( childAt( p )->parentWidget() != statusBar() ) ) )
-        QVLCMenu::PopupMenu( p_intf, true );
 }
 
 /****************************************************************************
@@ -901,7 +901,7 @@ private:
 
 /**
  * NOTE:
- * You must note change the state of this object or other Qt4 UI objects,
+ * You must not change the state of this object or other Qt4 UI objects,
  * from the video output thread - only from the Qt4 UI main loop thread.
  * All window provider queries must be handled through signals or events.
  * That's why we have all those emit statements...
@@ -1312,7 +1312,7 @@ void MainInterface::updateSystrayTooltipName( const QString& name )
     else
     {
         sysTray->setToolTip( name );
-        if( notificationEnabled && ( isHidden() || isMinimized() ) )
+        if( b_notificationEnabled && ( isHidden() || isMinimized() ) )
         {
             sysTray->showMessage( qtr( "VLC media player" ), name,
                     QSystemTrayIcon::NoIcon, 3000 );
