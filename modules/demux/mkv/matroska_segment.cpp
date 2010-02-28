@@ -641,7 +641,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         mkv_track_t *p_tk = tracks[i_track];
         es_format_t *p_fmt = &p_tk->fmt;
 
-        if( tracks[i_track]->fmt.i_cat == UNKNOWN_ES )
+        if( p_fmt->i_cat == UNKNOWN_ES || !p_tk->psz_codec )
         {
             msg_Warn( &sys.demuxer, "invalid track[%d, n=%d]", (int)i_track, tracks[i_track]->i_number );
             tracks[i_track]->p_es = NULL;
