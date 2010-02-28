@@ -142,13 +142,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
             if( p_longopts[i_index].name == NULL ) continue;
             p_longopts[i_index].has_arg =
                 (p_item->i_type == CONFIG_ITEM_BOOL) ? no_argument : 
-#ifndef __APPLE__
                                                        required_argument;
-#else
-/* It seems that required_argument is broken on Darwin.
- * Radar ticket #6113829 */
-                                                       optional_argument;
-#endif
             p_longopts[i_index].flag = &flag;
             p_longopts[i_index].val = 0;
             i_index++;
@@ -257,14 +251,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
 
                     psz_name = p_conf->psz_name;
                 }
-#ifdef __APPLE__
-                if( p_conf->i_type != CONFIG_ITEM_BOOL && !optarg )
-                {
-                    fprintf( stderr, "Warning: missing argument for option --%s\n", p_conf->psz_name );
-                    fprintf( stderr, "Try specifying options as '--optionname=value' instead of '--optionname value'\n" );
-                    continue;
-                }
-#endif
+
                 switch( p_conf->i_type )
                 {
                     case CONFIG_ITEM_STRING:
