@@ -129,6 +129,18 @@ static long FAR PASCAL DirectXEventProc( HWND, UINT, WPARAM, LPARAM );
 
 static int DirectXConvertKey( int i_key );
 
+static inline bool isMouseEvent( WPARAM type )
+{
+    return type >= WM_MOUSEFIRST &&
+           type <= WM_MOUSELAST;
+}
+
+static inline bool isKeyEvent( WPARAM type )
+{
+    return type >= WM_KEYFIRST &&
+           type <= WM_KEYLAST;
+}
+
 /*****************************************************************************
  * EventThread: Create video window & handle its messages
  *****************************************************************************
@@ -145,6 +157,9 @@ static void *EventThread( void *p_this )
     POINT old_mouse_pos = {0,0}, mouse_pos;
     HMODULE hkernel32;
     int canc = vlc_savecancel ();
+
+    bool b_mouse_support = var_InheritBool( p_event->vd, "mouse-events" );
+    bool b_key_support = var_InheritBool( p_event->vd, "keyboard-events" );
 
     vlc_mutex_lock( &p_event->lock );
     /* Create a window for the video */
@@ -203,6 +218,12 @@ static void *EventThread( void *p_this )
         vlc_mutex_unlock( &p_event->lock );
         if( b_done )
             break;
+
+        if( !b_mouse_support && isMouseEvent( msg.message ) )
+            continue;
+
+        if( !b_key_support && isKeyEvent( msg.message ) )
+            continue;
 
         /* */
         switch( msg.message )
