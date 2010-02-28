@@ -79,6 +79,7 @@ VLC_PUBLIC_API void
  * Return the event manager of this media_list_player.
  *
  * \param p_mlp media list player instance
+ * \return the event manager
  */
 VLC_PUBLIC_API libvlc_event_manager_t *
     libvlc_media_list_player_event_manager(libvlc_media_list_player_t * p_mlp);
@@ -94,6 +95,12 @@ VLC_PUBLIC_API void
                                      libvlc_media_list_player_t * p_mlp,
                                      libvlc_media_player_t * p_mi );
 
+/**
+ * Set the media list associated with the player
+ *
+ * \param p_mlp media list player instance
+ * \param p_mlist list of media
+ */
 VLC_PUBLIC_API void
     libvlc_media_list_player_set_media_list(
                                      libvlc_media_list_player_t * p_mlp,
@@ -144,6 +151,13 @@ VLC_PUBLIC_API
 int libvlc_media_list_player_play_item_at_index(libvlc_media_list_player_t * p_mlp,
                                                 int i_index);
 
+/**
+ * Play the given media item
+ *
+ * \param p_mlp media list player instance
+ * \param p_md the media instance
+ * \return 0 upon success, -1 if the media is not part of the media list
+ */
 VLC_PUBLIC_API
 int libvlc_media_list_player_play_item(libvlc_media_list_player_t * p_mlp,
                                        libvlc_media_t * p_md);
