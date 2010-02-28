@@ -1,101 +1,31 @@
-/* Getopt for GNU.
-   NOTE: getopt is now part of the C library, so if you don't know what
-   "Keep this file name-space clean" means, talk to roland@gnu.ai.mit.edu
-   before changing it!
-
-   Copyright (C) 1987, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97
-   Free Software Foundation, Inc.
-
-   This file is part of the GNU C Library.  Its master source is NOT part of
-   the C library, however.  The master source lives in /gd/gnu/lib.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public License as
-   published by the Free Software Foundation; either version 2 of the
-   License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public
-   License along with the GNU C Library; see the file COPYING.LIB.  If not,
-   write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
-
-/* This tells Alpha OSF/1 not to define a getopt prototype in <stdio.h>.
-   Ditto for AIX 3.2 and <stdlib.h>.  */
-#ifndef _NO_PROTO
-#define _NO_PROTO
-#endif
+/*****************************************************************************
+ * getopt_long()
+ *****************************************************************************
+ * Copyright (C) 1987-1997 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 the VideoLAN team
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 #include <vlc_common.h>
 
-#if !defined (__STDC__) || !__STDC__
-/* This is a separate conditional since some stdc systems
-   reject `defined (const)'.  */
-#ifndef const
-#define const
-#endif
-#endif
-
 #include <stdio.h>
-
-/* Comment out all this code if we are using the GNU C Library, and are not
-   actually compiling the library itself.  This code is part of the GNU C
-   Library, but also included in many other GNU distributions.  Compiling
-   and linking in this code is a waste when using the GNU C library
-   (especially if it is a shared library).  Rather than having every GNU
-   program understand `configure --with-gnu-libc' and omit the object files,
-   it is simpler to just do this in the source for each such file.  */
-
-#define GETOPT_INTERFACE_VERSION 2
-#if !defined (_LIBC) && defined (__GLIBC__) && __GLIBC__ >= 2
-#include <gnu-versions.h>
-#if _GNU_GETOPT_INTERFACE_VERSION == GETOPT_INTERFACE_VERSION
-#define ELIDE_CODE
-#endif
-#endif
-
-/* This needs to come after some library #include
-   to get __GNU_LIBRARY__ defined.  */
-#ifdef    __GNU_LIBRARY__
-/* Don't include stdlib.h for non-GNU C libraries because some of them
-   contain conflicting prototypes for getopt.  */
-#include <stdlib.h>
-#include <unistd.h>
-#endif /* GNU C library.  */
-
-#ifdef VMS
-#include <unixlib.h>
-#if HAVE_STRING_H - 0
 #include <string.h>
-#ifdef STRNCASECMP_IN_STRINGS_H
-#   include <strings.h>
-#endif
-#endif
-#endif
-
-#if defined (WIN32) && !defined (__CYGWIN32__) || defined(UNDER_CE)
-/* It's not Unix, really.  See?  Capital letters.  */
-#include <windows.h>
-#define getpid() GetCurrentProcessId()
-#endif
-
-#ifndef _
-/* This is for other GNU distributions with internationalized messages.
-   When compiling libc, the _ macro is predefined.  */
-#ifdef HAVE_LIBINTL_H
-#include <libintl.h>
-#define _(msgid)    vlc_gettext (msgid)
-#else
-#define _(msgid)    (msgid)
-#endif
-#endif
 
 /* This version of `getopt' appears to the caller like standard Unix `getopt'
    but it behaves differently for the user, since it allows the user
@@ -111,7 +41,7 @@
    GNU application programs can use a third alternative mode in which
    they can distinguish the relative order of options and other arguments.  */
 
-#include "getopt.h"
+#include "vlc_getopt.h"
 
 /* For communication from `getopt' to the caller.
    When `getopt' finds an option that takes an argument,
@@ -199,48 +129,7 @@ ordering;
 
 /* Value of POSIXLY_CORRECT environment variable.  */
 static char *posixly_correct;
-
-#ifdef    __GNU_LIBRARY__
-/* We want to avoid inclusion of string.h with non-GNU libraries
-   because there are many ways it can cause trouble.
-   On some systems, it contains special magic macros that don't work
-   in GCC.  */
-#include <string.h>
-#define    my_index    strchr
-#else
 
-/* Avoid depending on library functions or files
-   whose names are inconsistent.  */
-
-static char *
-     my_index(str, chr)
-     const char *str;
-     int chr;
-{
-    while (*str)
-    {
-        if (*str == chr)
-            return (char *) str;
-        str++;
-    }
-    return 0;
-}
-
-/* If using GCC, we can safely declare strlen this way.
-   If not using GCC, it is ok not to declare it.  */
-#ifdef __GNUC__
-/* Note that Motorola Delta 68k R3V7 comes with GCC but not stddef.h.
-   That was relevant to code that was here before.  */
-#if !defined (__STDC__) || !__STDC__
-/* gcc with -traditional declares the built-in strlen to return int,
-   and has done so at least since version 2.4.5. -- rms.  */
-extern int strlen(const char *);
-
-#endif /* not __STDC__ */
-#endif /* __GNUC__ */
-
-#endif /* not __GNU_LIBRARY__ */
-
 /* Handle permutation of arguments.  */
 
 /* Describe the part of ARGV that contains non-options that have
@@ -249,31 +138,6 @@ extern int strlen(const char *);
 
 static int first_nonopt;
 static int last_nonopt;
-
-#ifdef _LIBC
-/* Bash 2.0 gives us an environment variable containing flags
-   indicating ARGV elements that should not be considered arguments.  */
-
-static const char *nonoption_flags;
-static int nonoption_flags_len;
-
-static int original_argc;
-static char *const *original_argv;
-
-/* Make sure the environment variable bash 2.0 puts in the environment
-   is valid for the getopt call we must make sure that the ARGV passed
-   to getopt is that one passed to the process.  */
-static void store_args(int argc, char *const *argv) __attribute__((unused));
-     static void
-          store_args(int argc, char *const *argv)
-{
-    /* XXX This is no good solution.  We should rather copy the args so
-       that we can compare them later.  But we must not use malloc(3).  */
-    original_argc = argc;
-    original_argv = argv;
-}
-text_set_element(__libc_subinit, store_args);
-#endif
 
 /* Exchange two adjacent subsequences of ARGV.
    One subsequence is elements [first_nonopt,last_nonopt)
@@ -284,10 +148,7 @@ text_set_element(__libc_subinit, store_args);
    `first_nonopt' and `last_nonopt' are relocated so that they describe
    the new indices of the non-options in ARGV after they are moved.  */
 
-#if defined (__STDC__) && __STDC__
 static void exchange(char **);
-
-#endif
 
 static void
      exchange(argv)
@@ -347,10 +208,8 @@ static void
 
 /* Initialize the internal data when the first call is made.  */
 
-#if defined (__STDC__) && __STDC__
 static const char *_getopt_initialize(int, char *const *, const char *);
 
-#endif
 static const char *
      _getopt_initialize(argc, argv, optstring)
      int argc;
@@ -385,27 +244,6 @@ static const char *
         ordering = REQUIRE_ORDER;
     else
         ordering = PERMUTE;
-
-#ifdef _LIBC
-    if (posixly_correct == NULL
-        && argc == original_argc && argv == original_argv)
-    {
-        /* Bash 2.0 puts a special variable in the environment for each
-           command it runs, specifying which ARGV elements are the results of
-           file name wildcard expansion and therefore should not be
-           considered as options.  */
-        char var[100];
-
-        sprintf(var, "_%d_GNU_nonoption_argv_flags_", getpid());
-        nonoption_flags = getenv(var);
-        if (nonoption_flags == NULL)
-            nonoption_flags_len = 0;
-        else
-            nonoption_flags_len = strlen(nonoption_flags);
-    }
-    else
-        nonoption_flags_len = 0;
-#endif
 
     return optstring;
 }
@@ -461,19 +299,15 @@ static const char *
 
    LONGIND returns the index in LONGOPT of the long-named option found.
    It is only valid when a long-named option has been found by the most
-   recent call.
-
-   If LONG_ONLY is nonzero, '-' as well as '--' can introduce
-   long-named options.  */
+   recent call.  */
 
 int
-    _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
+    vlc_getopt_long(argc, argv, optstring, longopts, longind)
      int argc;
      char *const *argv;
      const char *optstring;
      const struct option *longopts;
      int *longind;
-     int long_only;
 {
     optarg = NULL;
 
@@ -484,17 +318,7 @@ int
         __getopt_initialized = 1;
     }
 
-    /* Test whether ARGV[optind] points to a non-option argument.
-       Either it does not have option syntax, or there is an environment flag
-       from the shell indicating it is not an option.  The later information
-       is only used when the used in the GNU libc.  */
-#ifdef _LIBC
-#define NONOPTION_P (argv[optind][0] != '-' || argv[optind][1] == '\0'          \
-             || (optind < nonoption_flags_len                  \
-             && nonoption_flags[optind] == '1'))
-#else
 #define NONOPTION_P (argv[optind][0] != '-' || argv[optind][1] == '\0')
-#endif
 
     if (nextchar == NULL || *nextchar == '\0')
     {
@@ -570,27 +394,14 @@ int
            Skip the initial punctuation.  */
 
         nextchar = (argv[optind] + 1
-                + (longopts != NULL && argv[optind][1] == '-'));
+                + (argv[optind][1] == '-'));
     }
 
     /* Decode the current option-ARGV-element.  */
 
-    /* Check whether the ARGV-element is a long option.
+    /* Check whether the ARGV-element is a long option.  */
 
-       If long_only and the ARGV-element has the form "-f", where f is
-       a valid short option, don't consider it an abbreviated form of
-       a long option that starts with f.  Otherwise there would be no
-       way to give the -f short option.
-
-       On the other hand, if there's a long option "fubar" and
-       the ARGV-element is "-fu", do consider that an abbreviation of
-       the long option, just like "--fu", and not "-f" with arg "u".
-
-       This distinction seems to be the most useful approach.  */
-
-    if (longopts != NULL
-        && (argv[optind][1] == '-'
-        || (long_only && (argv[optind][2] || !my_index(optstring, argv[optind][1])))))
+    if (argv[optind][1] == '-')
     {
         char *nameend;
         const struct option *p;
@@ -697,39 +508,32 @@ int
             return pfound->val;
         }
 
-        /* Can't find it as a long option.  If this is not getopt_long_only,
-           or the option starts with '--' or is not a valid short
-           option, then it's an error.
-           Otherwise interpret it as a short option.  */
-        if (!long_only || argv[optind][1] == '-'
-            || my_index(optstring, *nextchar) == NULL)
+        /* Can't find it as a long option.  It's an error.   */
+        if (opterr)
         {
-            if (opterr)
+            if (argv[optind][1] == '-')
+                /* --option */
+                fprintf(stderr, _("%s: unrecognized option `%s%s'\n"),
+                        "--", argv[0], nextchar);
+            else
             {
-                if (argv[optind][1] == '-')
-                    /* --option */
-                    fprintf(stderr, _("%s: unrecognized option `%s%s'\n"),
-                            "--", argv[0], nextchar);
-                else
-                {
-                    char t[2] = { argv[optind][0], '\0' };
-                    /* +option or -option */
-                    fprintf(stderr, _("%s: unrecognized option `%s%s'\n"),
-                            argv[0], t, nextchar);
-                }
+                char t[2] = { argv[optind][0], '\0' };
+                /* +option or -option */
+                fprintf(stderr, _("%s: unrecognized option `%s%s'\n"),
+                        argv[0], t, nextchar);
             }
-            nextchar = (char *) "";
-            optind++;
-            optopt = 0;
-            return '?';
         }
+        nextchar = (char *) "";
+        optind++;
+        optopt = 0;
+        return '?';
     }
 
     /* Look at and handle the next short option-character.  */
 
     {
         char c = *nextchar++;
-        char *temp = my_index(optstring, c);
+        char *temp = strchr(optstring, c);
 
         /* Increment `optind' when we start to process its last character.  */
         if (*nextchar == '\0')
@@ -923,87 +727,3 @@ int
         return c;
     }
 }
-
-int
-    getopt(argc, argv, optstring)
-     int argc;
-     char *const *argv;
-     const char *optstring;
-{
-    return _getopt_internal(argc, argv, optstring,
-                (const struct option *) 0,
-                (int *) 0,
-                0);
-}
-
-#ifdef TEST
-
-/* Compile with -DTEST to make an executable for use in testing
-   the above definition of `getopt'.  */
-
-int
-    main(argc, argv)
-     int argc;
-     char **argv;
-{
-    int c;
-    int digit_optind = 0;
-
-    while (1)
-    {
-        int this_option_optind = optind ? optind : 1;
-
-        c = getopt(argc, argv, "abc:d:0123456789");
-        if (c == -1)
-            break;
-
-        switch (c)
-        {
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                if (digit_optind != 0 && digit_optind != this_option_optind)
-                    printf("digits occur in two different argv-elements.\n");
-                digit_optind = this_option_optind;
-                printf("option %c\n", c);
-                break;
-
-            case 'a':
-                printf("option a\n");
-                break;
-
-            case 'b':
-                printf("option b\n");
-                break;
-
-            case 'c':
-                printf("option c with value `%s'\n", optarg);
-                break;
-
-            case '?':
-                break;
-
-            default:
-                printf("?? getopt returned character code 0%o ??\n", c);
-        }
-    }
-
-    if (optind < argc)
-    {
-        printf("non-option ARGV-elements: ");
-        while (optind < argc)
-            printf("%s ", argv[optind++]);
-        printf("\n");
-    }
-
-    exit(0);
-}
-
-#endif /* TEST */

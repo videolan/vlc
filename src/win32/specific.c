@@ -30,7 +30,7 @@
 #include "../libvlc.h"
 #include <vlc_playlist.h>
 
-#include "../extras/getopt.h"
+#include "../config/vlc_getopt.h"
 
 #if !defined( UNDER_CE )
 #   include <io.h>

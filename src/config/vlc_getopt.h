@@ -1,31 +1,26 @@
-/* Declarations for getopt.
-   Copyright (C) 1989,90,91,92,93,94,96,97 Free Software Foundation, Inc.
+/*****************************************************************************
+ * Declarations for getopt_long()
+ *****************************************************************************
+ * Copyright (C) 1987-1997 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 the VideoLAN team
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
-   This file is part of the GNU C Library.  Its master source is NOT part of
-   the C library, however.  The master source lives in /gd/gnu/lib.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public License as
-   published by the Free Software Foundation; either version 2 of the
-   License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public
-   License along with the GNU C Library; see the file COPYING.LIB.  If not,
-   write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
-
-#ifndef _GETOPT_H
-#define _GETOPT_H 1
-
-#ifdef    __cplusplus
-extern "C"
-{
-#endif
+#ifndef VLC_GETOPT_H
+#define VLC_GETOPT_H 1
 
 /* For communication from `getopt' to the caller.
    When `getopt' finds an option that takes an argument,
@@ -81,11 +76,7 @@ extern "C"
 
     struct option
     {
-#if defined (__STDC__) && __STDC__
         const char *name;
-#else
-        char *name;
-#endif
         /* has_arg can't be an enum because some compilers complain about
            type mismatches in all the code that assumes it is an int.  */
         int has_arg;
@@ -99,36 +90,7 @@ extern "C"
 #define required_argument    1
 #define optional_argument    2
 
-#if defined (__STDC__) && __STDC__
-#ifdef __GNU_LIBRARY__
-/* Many other libraries have conflicting prototypes for getopt, with
-   differences in the consts, in stdlib.h.  To avoid compilation
-   errors, only prototype getopt for the GNU C library.  */
-    extern int getopt(int argc, char *const *argv, const char *shortopts);
-#else                /* not __GNU_LIBRARY__ */
-    extern int getopt();
-#endif                /* __GNU_LIBRARY__ */
     extern int vlc_getopt_long(int argc, char *const *argv, const char *shortopts,
                    const struct option *longopts, int *longind);
-    extern int getopt_long_only(int argc, char *const *argv,
-                    const char *shortopts,
-                   const struct option *longopts, int *longind);
 
-/* Internal only.  Users should not call this directly.  */
-    extern int _getopt_internal(int argc, char *const *argv,
-                    const char *shortopts,
-                const struct option *longopts, int *longind,
-                    int long_only);
-#else                /* not __STDC__ */
-    extern int getopt();
-    extern int vlc_getopt_long();
-    extern int getopt_long_only();
-
-    extern int _getopt_internal();
-#endif                /* __STDC__ */
-
-#ifdef    __cplusplus
-}
-#endif
-
-#endif                /* _GETOPT_H */
+#endif                /* VLC_GETOPT_H */

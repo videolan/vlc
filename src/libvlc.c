@@ -57,9 +57,7 @@
 #   include <io.h>
 #endif
 
-#ifdef WIN32                       /* optind, getopt(), included in unistd.h */
-#   include "extras/getopt.h"
-#endif
+#include "config/vlc_getopt.h"
 
 #ifdef HAVE_LOCALE_H
 #   include <locale.h>

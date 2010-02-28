@@ -429,6 +429,8 @@ SOURCES_libvlc_common = \
 	config/keys.c \
 	config/cmdline.c \
 	config/dirs.c \
+	config/getopt.c \
+	config/vlc_getopt.h \
 	misc/events.c \
 	misc/image.c \
 	misc/messages.c \
@@ -446,9 +448,6 @@ SOURCES_libvlc_common = \
 	misc/filter_chain.c \
 	misc/http_auth.c \
 	misc/sql.c \
-	extras/getopt.c \
-	extras/getopt.h \
-	extras/getopt1.c \
 	$(NULL)
 
 SOURCES_libvlc_httpd = \
