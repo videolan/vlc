@@ -211,7 +211,6 @@ int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
     /*
      * Parse the command line options
      */
-    opterr = 0;
     optind = 0; /* set to 0 to tell GNU getopt to reinitialize */
     while( ( i_cmd = vlc_getopt_long( *pi_argc, (char **)ppsz_argv, psz_shortopts,
                                   p_longopts, &i_index ) ) != -1 )

@@ -44,11 +44,6 @@
 
     extern int optind;
 
-/* Callers store zero here to inhibit the error message `getopt' prints
-   for unrecognized options.  */
-
-    extern int opterr;
-
 /* Set to an option character which was unrecognized.  */
 
     extern int optopt;
