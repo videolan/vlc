@@ -2466,10 +2466,10 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         msg_Dbg( p_obj, "device supports hardware frequency seeking" );
 #endif
     if( p_sys->dev_cap.capabilities & V4L2_CAP_VBI_CAPTURE )
-        msg_Dbg( p_obj, "device support raw VBI capture" );
+        msg_Dbg( p_obj, "device supports raw VBI capture" );
 
     if( p_sys->dev_cap.capabilities & V4L2_CAP_SLICED_VBI_CAPTURE )
-        msg_Dbg( p_obj, "device support sliced VBI capture" );
+        msg_Dbg( p_obj, "device supports sliced VBI capture" );
 
     /* Now, enumerate all the video inputs. This is useless at the moment
        since we have no way to present that info to the user except with
