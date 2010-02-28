@@ -651,6 +651,7 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
     if( !p_mi->p_md )
     {
         unlock(p_mi);
+        unlock_input( p_mi );
         libvlc_printerr( "No associated media descriptor" );
         return -1;
     }
