@@ -433,6 +433,7 @@ VLC_PUBLIC_API int libvlc_media_player_set_rate( libvlc_media_player_t *p_mi, fl
  * Get current movie state
  *
  * \param p_mi the Media Player
+ * \return the current state of the media player (playing, paused, ...) \see libvlc_state_t
  */
 VLC_PUBLIC_API libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *p_mi );
 
@@ -458,6 +459,7 @@ VLC_PUBLIC_API unsigned libvlc_media_player_has_vout( libvlc_media_player_t *p_m
  * Is this media player seekable?
  *
  * \param p_mi the media player
+ * \return true if the media player can seek
  */
 VLC_PUBLIC_API int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi );
 
@@ -465,6 +467,7 @@ VLC_PUBLIC_API int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi 
  * Can this media player be paused?
  *
  * \param p_mi the media player
+ * \return true if the media player can pause
  */
 VLC_PUBLIC_API int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi );
 
