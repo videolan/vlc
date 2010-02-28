@@ -475,7 +475,9 @@ static void *Thread( void *obj )
 
     if (p_mi != NULL)
     {
-        /* FIXME: are we sure that video window is already destroyed? */
+#warning BUG!
+        /* FIXME: the video window may still be registerd at this point */
+        /* See LP#448082 as an example. */
 
         p_intf->p_sys->p_mi = NULL;
         /* Destroy first the main interface because it is connected to some
