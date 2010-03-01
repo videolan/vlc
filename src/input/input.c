@@ -2632,26 +2632,11 @@ static int InputSourceInit( input_thread_t *p_input,
             psz_demux = in->p_access->psz_demux;
         }
 
-        {
-            /* Take access/stream redirections into account */
-            char *psz_real_path;
-            char *psz_buf = NULL;
-            if( in->p_stream->psz_path )
-            {
-                const char *psz_a, *psz_d;
-                psz_buf = strdup( in->p_stream->psz_path );
-                input_SplitMRL( &psz_a, &psz_d, &psz_real_path, psz_buf );
-            }
-            else
-            {
-                psz_real_path = psz_path;
-            }
-            in->p_demux = demux_New( p_input, p_input, psz_access, psz_demux,
-                                      psz_real_path,
-                                      in->p_stream, p_input->p->p_es_out,
-                                      p_input->b_preparsing );
-            free( psz_buf );
-        }
+        in->p_demux = demux_New( p_input, p_input, psz_access, psz_demux,
+                   /* Take access/stream redirections into account: */
+                   in->p_stream->psz_path ? in->p_stream->psz_path : psz_path,
+                                 in->p_stream, p_input->p->p_es_out,
+                                 p_input->b_preparsing );
 
         if( in->p_demux == NULL )
         {
