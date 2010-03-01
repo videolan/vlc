@@ -429,8 +429,8 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, const QString& text,
     /* Change the SpeedRate in the Status Bar */
     CONNECT( THEMIM->getIM(), rateChanged( int ), this, setRate( int ) );
 
-    CONNECT( THEMIM, inputChanged( input_thread_t * ),
-             speedControl, activateOnState() );
+    DCONNECT( THEMIM, inputChanged( input_thread_t * ),
+              speedControl, activateOnState() );
 }
 
 SpeedLabel::~SpeedLabel()

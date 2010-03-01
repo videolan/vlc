@@ -94,7 +94,10 @@ struct intf_sys_t
 #define qtr( i ) QString::fromUtf8( vlc_gettext(i) )
 #define qtu( i ) ((i).toUtf8().constData())
 
-#define CONNECT( a, b, c, d ) connect( a, SIGNAL( b ), c, SLOT(d) )
+#define CONNECT( a, b, c, d ) \
+        connect( a, SIGNAL( b ), c, SLOT(d) )
+#define DCONNECT( a, b, c, d ) \
+        connect( a, SIGNAL( b ), c, SLOT(d), Qt::DirectConnection )
 #define BUTTONACT( b, a ) connect( b, SIGNAL( clicked() ), this, SLOT(a) )
 
 #define BUTTON_SET( button, text, tooltip )  \

@@ -918,8 +918,8 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     var_AddCallback( THEPL, "volume-muted", SoundMuteChanged, this );
 
     /* Warn our embedded IM about input changes */
-    CONNECT( this, inputChanged( input_thread_t * ),
-             im, setInput( input_thread_t * ) );
+    DCONNECT( this, inputChanged( input_thread_t * ),
+              im, setInput( input_thread_t * ) );
 
     /* emit check if playlist has already started playing */
     input_thread_t *p_input = playlist_CurrentInput( THEPL );

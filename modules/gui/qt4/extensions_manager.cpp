@@ -48,8 +48,8 @@ ExtensionsManager::ExtensionsManager( intf_thread_t *_p_intf, QObject *parent )
     menuMapper = new QSignalMapper( this );
     CONNECT( menuMapper, mapped( int ), this, triggerMenu( int ) );
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, playingChanged( int ) );
-    CONNECT( THEMIM, inputChanged( input_thread_t* ),
-             this, inputChanged( input_thread_t* ) );
+    DCONNECT( THEMIM, inputChanged( input_thread_t* ),
+              this, inputChanged( input_thread_t* ) );
     b_unloading = false;
     b_failed = false;
 }

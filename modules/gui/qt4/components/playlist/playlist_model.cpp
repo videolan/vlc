@@ -89,10 +89,10 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 #undef ADD_ICON
 
     rebuild( p_root );
-    CONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
-            this, processInputItemUpdate( input_item_t *) );
-    CONNECT( THEMIM, inputChanged( input_thread_t * ),
-            this, processInputItemUpdate( input_thread_t* ) );
+    DCONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
+             this, processInputItemUpdate( input_item_t *) );
+    DCONNECT( THEMIM, inputChanged( input_thread_t * ),
+             this, processInputItemUpdate( input_thread_t* ) );
     CONNECT( THEMIM, playlistItemAppended( int, int ),
              this, processItemAppend( int, int ) );
     CONNECT( THEMIM, playlistItemRemoved( int ),

@@ -123,8 +123,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     getSettings()->endGroup();
 
-    CONNECT( THEMIM, leafBecameParent( input_item_t *),
-             this, browseInto( input_item_t * ) );
+    DCONNECT( THEMIM, leafBecameParent( input_item_t *),
+              this, browseInto( input_item_t * ) );
 
     CONNECT( model, currentChanged( const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );

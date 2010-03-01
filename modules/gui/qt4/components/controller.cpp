@@ -682,8 +682,8 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
 
     vlc_mutex_init_recursive( &lock );
 
-    CONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ),
-             this, setVoutList( vout_thread_t **, int ) );
+    DCONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ),
+              this, setVoutList( vout_thread_t **, int ) );
 
     /* First Move */
     QRect rect1 = getSettings()->value( "FullScreen/screen" ).toRect();

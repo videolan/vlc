@@ -132,8 +132,8 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
              this, plItemAdded( int, int ) );
     CONNECT( THEMIM, playlistItemRemoved( int ),
              this, plItemRemoved( int ) );
-    CONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
-            this, inputItemUpdate( input_item_t * ) );
+    DCONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
+              this, inputItemUpdate( input_item_t * ) );
 
     createItems();
     CONNECT( this, itemActivated( QTreeWidgetItem *, int ),

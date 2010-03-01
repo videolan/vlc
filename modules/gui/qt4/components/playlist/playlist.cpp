@@ -96,8 +96,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     rightPanel = new StandardPLPanel( this, p_intf, THEPL, p_root );
 
     /* Connect the activation of the selector to a redefining of the PL */
-    CONNECT( selector, activated( playlist_item_t * ),
-             rightPanel, setRoot( playlist_item_t * ) );
+    DCONNECT( selector, activated( playlist_item_t * ),
+              rightPanel, setRoot( playlist_item_t * ) );
 
     rightPanel->setRoot( p_root );
 
