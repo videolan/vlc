@@ -64,7 +64,7 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
 
     val = var_GetAddress (obj, "drawable-hwnd");
-    var_Destroy (obj, "drawable-hwn");
+    var_Destroy (obj, "drawable-hwnd");
 
     /* Keep a list of busy drawables, so we don't overlap videos if there are
      * more than one video track in the stream. */

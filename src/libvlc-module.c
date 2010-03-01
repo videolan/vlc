@@ -609,7 +609,7 @@ static const char *const ppsz_pos_descriptions[] =
 #define KEYBOARD_EVENTS_LONGTEXT N_( \
     "This enables VLC hotkeys from the (non-embedded) video window." )
 
-#define MOUSE_EVENTS_TEXT N_("Key press events")
+#define MOUSE_EVENTS_TEXT N_("Mouse events")
 #define MOUSE_EVENTS_LONGTEXT N_( \
     "This enables handling of mouse clicks on the video." )
 
