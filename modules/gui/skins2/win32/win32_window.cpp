@@ -59,7 +59,7 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         // Child window (for vout)
         m_hWnd_parent = pParentWindow->getHandle();
         m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW | WS_EX_NOPARENTNOTIFY,
-                     "VoutWindowClass", "default name",
+                     "SkinWindowClass", "default name",
                      WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
                      0, 0, 0, 0, m_hWnd_parent, 0, hInst, NULL );
     }

@@ -125,7 +125,7 @@ bool Win32Factory::init()
 
     // Create window class
     WNDCLASS skinWindowClass;
-    skinWindowClass.style = CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS;
+    skinWindowClass.style = CS_DBLCLKS;
     skinWindowClass.lpfnWndProc = (WNDPROC) Win32Proc;
     skinWindowClass.lpszClassName = _T("SkinWindowClass");
     skinWindowClass.lpszMenuName = NULL;
@@ -146,34 +146,6 @@ bool Win32Factory::init()
         if( !GetClassInfo( m_hInst, _T("SkinWindowClass"), &wndclass ) )
         {
             msg_Err( getIntf(), "cannot register window class" );
-            return false;
-        }
-    }
-
-
-    // Create window class for window of VoutWindow type
-    WNDCLASS voutWindowClass;
-    voutWindowClass.style = CS_OWNDC|CS_DBLCLKS;
-    voutWindowClass.lpfnWndProc = (WNDPROC) Win32Proc;
-    voutWindowClass.lpszClassName = _T("VoutWindowClass");
-    voutWindowClass.lpszMenuName = NULL;
-    voutWindowClass.cbClsExtra = 0;
-    voutWindowClass.cbWndExtra = 0;
-    voutWindowClass.hbrBackground = (HBRUSH__*) GetStockObject( BLACK_BRUSH);
-    voutWindowClass.hCursor = LoadCursor( NULL , IDC_ARROW );
-    voutWindowClass.hIcon = LoadIcon( m_hInst, _T("VLC_ICON") );
-    voutWindowClass.hInstance = m_hInst;
-
-    // Register class and check it
-    if( !RegisterClass( &voutWindowClass ) )
-    {
-        WNDCLASS wndclass;
-
-        // Check why it failed. If it's because the class already exists
-        // then fine, otherwise return with an error.
-        if( !GetClassInfo( m_hInst, _T("VoutWindowClass"), &wndclass ) )
-        {
-            msg_Err( getIntf(), "cannot register voutWindow window class" );
             return false;
         }
     }
