@@ -563,6 +563,9 @@ static void Eia608EraseToEndOfRow( eia608_t *h )
 
 static void Eia608RollUp( eia608_t *h )
 {
+    if( h->mode == EIA608_MODE_TEXT )
+        return;
+
     const int i_screen = Eia608GetWritingScreenIndex( h );
     eia608_screen *screen = &h->screen[i_screen];
 
@@ -616,15 +619,10 @@ static void Eia608ParseChannel( eia608_t *h, const uint8_t d[2] )
 
     /* */
     const int d1 = d[0] & 0x7f;
-    // const int d2 = d[1] & 0x7f;
-    if( d1 == 0x14 )
-        h->i_channel = 1;
-    else if( d1 == 0x1c )
-        h->i_channel = 2;
-    else if( d1 == 0x15 )
+    if( d1 >= 0x10 && d1 <= 0x1f )
+        h->i_channel = 1 + ((d1 & 0x08) != 0);
+    else if( d1 < 0x10 )
         h->i_channel = 3;
-    else if( d1 == 0x1d )
-        h->i_channel = 4;
 }
 static bool Eia608ParseTextAttribute( eia608_t *h, uint8_t d2 )
 {
