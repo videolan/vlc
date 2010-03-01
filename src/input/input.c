@@ -3073,11 +3073,11 @@ static void input_ChangeState( input_thread_t *p_input, int i_state )
  * MRLSplit: parse the access, demux and url part of the
  *           Media Resource Locator.
  *****************************************************************************/
-void input_SplitMRL( const char **ppsz_access, const char **ppsz_demux, char **ppsz_path,
-                     char *psz_dup )
+void input_SplitMRL( const char **ppsz_access, const char **ppsz_demux,
+                     char **ppsz_path, char *psz_dup )
 {
-    char *psz_access = NULL;
-    char *psz_demux  = NULL;
+    const char *psz_access;
+    const char *psz_demux = "";
     char *psz_path;
 
     /* Either there is an access/demux specification before ://
@@ -3090,22 +3090,32 @@ void input_SplitMRL( const char **ppsz_access, const char **ppsz_demux, char **p
 
         /* Separate access from demux (<access>/<demux>://<path>) */
         psz_access = psz_dup;
-        psz_demux = strchr( psz_access, '/' );
-        if( psz_demux )
-            *psz_demux++ = '\0';
 
         /* We really don't want module name substitution here! */
         if( psz_access[0] == '$' )
             psz_access++;
-        if( psz_demux && psz_demux[0] == '$' )
-            psz_demux++;
+
+        char *p = strchr( psz_access, '/' );
+        if( p )
+        {
+            *p = '\0';
+            psz_demux = p + 1;
+            if( psz_demux[0] == '$' )
+                psz_demux++;
+        }
     }
     else
     {
+#ifndef NDEBUG
+        fprintf( stderr, "%s(\"%s\"): not a valid URI!\n", __func__,
+                 psz_dup );
+#endif
         psz_path = psz_dup;
+        psz_access = "";
     }
-    *ppsz_access = psz_access ? psz_access : "";
-    *ppsz_demux = psz_demux ? psz_demux : "";
+
+    *ppsz_access = psz_access;
+    *ppsz_demux = psz_demux;
     *ppsz_path = psz_path;
 }
 
