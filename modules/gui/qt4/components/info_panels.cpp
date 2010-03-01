@@ -162,8 +162,6 @@ MetaPanel::MetaPanel( QWidget *parent,
  **/
 void MetaPanel::update( input_item_t *p_item )
 {
-#warning This is wrong.
-#if 0
     if( !p_item )
     {
         clear();
@@ -245,7 +243,7 @@ void MetaPanel::update( input_item_t *p_item )
     }
 
     art_cover->showArtUpdate( file );
-#endif
+
 }
 
 /**
