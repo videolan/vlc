@@ -328,7 +328,7 @@ void Win32Graphics::copyToWindow( OSWindow &rWindow, int xSrc, int ySrc,
 {
     // Initialize painting
     HWND hWnd = ((Win32Window&)rWindow).getHandle();
-    HDC wndDC = GetWindowDC( hWnd );
+    HDC wndDC = GetDC( hWnd );
     HDC srcDC = m_hDC;
 
     // Draw image on window

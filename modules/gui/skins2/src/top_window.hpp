@@ -48,7 +48,6 @@ public:
     virtual ~TopWindow();
 
     /// Methods to process OS events.
-    virtual void processEvent( EvtRefresh &rEvtRefresh );
     virtual void processEvent( EvtFocus &rEvtFocus );
     virtual void processEvent( EvtMenu &rEvtMenu );
     virtual void processEvent( EvtMotion &rEvtMotion );

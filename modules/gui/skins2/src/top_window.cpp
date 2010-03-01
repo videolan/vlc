@@ -72,24 +72,6 @@ TopWindow::~TopWindow()
 }
 
 
-void TopWindow::processEvent( EvtRefresh &rEvtRefresh )
-{
-    // We override the behaviour defined in GenericWindow, because we don't
-    // want to draw on a video control!
-    if( m_pActiveLayout == NULL )
-    {
-        GenericWindow::processEvent( rEvtRefresh );
-    }
-    else
-    {
-        m_pActiveLayout->computeRefresh( rEvtRefresh.getXStart(),
-                                         rEvtRefresh.getYStart(),
-                                         rEvtRefresh.getWidth(),
-                                         rEvtRefresh.getHeight() );
-    }
-}
-
-
 void TopWindow::processEvent( EvtFocus &rEvtFocus )
 {
 //    fprintf(stderr, rEvtFocus.getAsString().c_str());

@@ -64,7 +64,7 @@ void Win32Tooltip::show( int left, int top, OSGraphics &rText )
     SetWindowPos( m_hWnd, HWND_TOPMOST, left, top, width, height, 0 );
     ShowWindow( m_hWnd, SW_SHOW );
 
-    HDC wndDC = GetWindowDC( m_hWnd );
+    HDC wndDC = GetDC( m_hWnd );
     BitBlt( wndDC, 0, 0, width, height, srcDC, 0, 0, SRCCOPY );
     ReleaseDC( m_hWnd, wndDC );
 }

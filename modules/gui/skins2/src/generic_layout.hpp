@@ -104,9 +104,6 @@ public:
     virtual int getMinHeight() const { return m_minHeight; }
     virtual int getMaxHeight() const { return m_maxHeight; }
 
-    /// specific refresh window (if video controls)
-    virtual void computeRefresh( int x, int y, int width, int height );
-
     /// Resize the layout
     virtual void resize( int width, int height );
 
