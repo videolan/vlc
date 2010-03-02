@@ -430,7 +430,7 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, QWidget *parent )
 
     DCONNECT( THEMIM, inputChanged( input_thread_t * ),
               speedControl, activateOnState() );
-    setRate( INPUT_RATE_DEFAULT );
+    setRate( INPUT_RATE_DEFAULT / var_InheritFloat( p_intf, "rate" ) );
 }
 
 SpeedLabel::~SpeedLabel()

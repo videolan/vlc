@@ -117,7 +117,7 @@ void InputManager::setInput( input_thread_t *_p_input )
         p_input = NULL;
         p_item = NULL;
         assert( !p_input_vbi );
-        emit rateChanged( INPUT_RATE_DEFAULT );
+        emit rateChanged( INPUT_RATE_DEFAULT / var_InheritFloat( p_intf, "rate" ) );
     }
 }
 
@@ -148,7 +148,7 @@ void InputManager::delInput()
     p_input = NULL;
 
     emit positionUpdated( -1.0, 0 ,0 );
-    emit rateChanged( INPUT_RATE_DEFAULT ); /* TODO: Do we want this ? */
+    emit rateChanged( INPUT_RATE_DEFAULT / var_InheritFloat( p_intf, "rate" ) );
     emit nameChanged( "" );
     emit chapterChanged( 0 );
     emit titleChanged( 0 );
@@ -587,7 +587,7 @@ void InputManager::UpdateCaching()
     if( f_newCache != f_cache )
     {
         f_cache = f_newCache;
-        /* Update rate */
+        /* Update cache */
         emit cachingChanged( f_cache );
     }
 }
