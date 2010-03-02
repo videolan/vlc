@@ -365,8 +365,7 @@ int lua_DialogFlush( lua_State *L )
 {
     lua_getglobal( L, "vlc" );
     lua_getfield( L, -1, "__dialog" );
-    extension_dialog_t *p_dlg = ( extension_dialog_t* )
-            lua_topointer( L, lua_gettop( L ) );
+    extension_dialog_t *p_dlg = ( extension_dialog_t* )lua_topointer( L, -1 );
 
     if( !p_dlg )
         return VLC_SUCCESS;
@@ -374,8 +373,7 @@ int lua_DialogFlush( lua_State *L )
     int i_ret = VLC_SUCCESS;
     if( lua_GetDialogUpdate( L ) )
     {
-        i_ret = dialog_ExtensionUpdate( vlclua_get_this( L ),
-                                        p_dlg );
+        i_ret = dialog_ExtensionUpdate( vlclua_get_this( L ), p_dlg );
         lua_SetDialogUpdate( L, 0 );
     }
 
@@ -759,7 +757,7 @@ static int vlclua_widget_clear( lua_State *L )
 
     if( p_widget->type != EXTENSION_WIDGET_DROPDOWN
         && p_widget->type != EXTENSION_WIDGET_LIST )
-        return luaL_error( L, "method add_value not valid for this widget" );
+        return luaL_error( L, "method clear not valid for this widget" );
 
     struct extension_widget_value_t *p_value, *p_next;
 

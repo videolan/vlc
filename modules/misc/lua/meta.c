@@ -138,7 +138,6 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
                       void * user_data )
 {
     input_item_t * p_item = user_data;
-    int s;
 
     lua_State *L = init( p_this, p_item, psz_filename );
     if( !L )
@@ -151,13 +150,13 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
         return i_ret;
     }
 
-    if((s = lua_gettop( L )))
+    if(lua_gettop( L ))
     {
         const char * psz_value;
 
-        if( lua_isstring( L, s ) )
+        if( lua_isstring( L, -1 ) )
         {
-            psz_value = lua_tostring( L, s );
+            psz_value = lua_tostring( L, -1 );
             if( psz_value && *psz_value != 0 )
             {
                 lua_Dbg( p_this, "setting arturl: %s", psz_value );
@@ -166,7 +165,7 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
                 return VLC_SUCCESS;
             }
         }
-        else if( !lua_isnil( L, s ) )
+        else if( !lua_isnoneornil( L, -1 ) )
         {
             msg_Err( p_this, "Lua art fetcher script %s: "
                  "didn't return a string", psz_filename );
