@@ -357,8 +357,10 @@ char *input_item_GetURI( input_item_t *p_i )
     vlc_mutex_unlock( &p_i->lock );
     return psz_s;
 }
+
 void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
 {
+    assert( psz_uri );
 #ifndef NDEBUG
     if( !strstr( psz_uri, "://" )
      || strchr( psz_uri, ' ' ) || strchr( psz_uri, '"' ) )
