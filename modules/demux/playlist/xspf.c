@@ -538,6 +538,9 @@ static bool parse_track_node COMPLEX_INTERFACE
                 /* special case: location */
                 if( !strcmp( p_handler->name, "location" ) )
                 {
+                    if( psz_value == NULL )
+                        input_item_SetURI( p_new_input, "vlc://nop" );
+                    else
                     /* FIXME: This is broken. Scheme-relative (//...) locations
                      * and anchors (#...) are not resolved correctly. Also,
                      * host-relative (/...) and directory-relative locations
