@@ -7,7 +7,7 @@
 
 NULL =
 SUFFIXES =
-libvlcdir = $(vlclibdir)/modules/$(basedir)
+libvlcdir = $(vlclibdir)/plugins/$(basedir)
 EXTRA_DIST = Modules.am
 BUILT_SOURCES =
 CLEANFILES = $(BUILT_SOURCES)

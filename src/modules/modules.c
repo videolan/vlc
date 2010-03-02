@@ -819,10 +819,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
     const bool b_reset = var_InheritBool( p_this, "reset-plugins-cache" );
 
     /* Contruct the special search path for system that have a relocatable
-     * executable. Set it to <vlc path>/modules and <vlc path>/plugins. */
+     * executable. Set it to <vlc path>/plugins. */
 
-    if( vlcpath && asprintf( &path, "%s" DIR_SEP "modules", vlcpath ) != -1 )
-        vlc_array_append( arraypaths, path );
     if( vlcpath && asprintf( &path, "%s" DIR_SEP "plugins", vlcpath ) != -1 )
         vlc_array_append( arraypaths, path );
 #ifndef WIN32
