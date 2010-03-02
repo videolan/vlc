@@ -172,7 +172,7 @@ protected:
     }
 private slots:
     void showSpeedMenu( QPoint );
-    void setRate( int );
+    void setRate( float );
 private:
     intf_thread_t *p_intf;
     QMenu *speedControlMenu;
@@ -185,7 +185,7 @@ class SpeedControlWidget : public QFrame
     Q_OBJECT
 public:
     SpeedControlWidget( intf_thread_t *, QWidget * );
-    void updateControls( int );
+    void updateControls( float );
 private:
     intf_thread_t *p_intf;
     QSlider *speedSlider;

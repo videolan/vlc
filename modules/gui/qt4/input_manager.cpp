@@ -79,7 +79,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
     artUrl       = "";
     p_input      = NULL;
     p_input_vbi  = NULL;
-    i_rate       = 0;
+    f_rate       = 0;
     p_item       = NULL;
     b_video      = false;
     timeA        = 0;
@@ -111,14 +111,14 @@ void InputManager::setInput( input_thread_t *_p_input )
         UpdateVout();
         addCallbacks();
         p_item = input_GetItem( p_input );
-        emit rateChanged( INPUT_RATE_DEFAULT / var_GetFloat( p_input, "rate" ) );
+        emit rateChanged( var_GetFloat( p_input, "rate" ) );
     }
     else
     {
         p_input = NULL;
         p_item = NULL;
         assert( !p_input_vbi );
-        emit rateChanged( INPUT_RATE_DEFAULT / var_InheritFloat( p_intf, "rate" ) );
+        emit rateChanged( var_InheritFloat( p_intf, "rate" ) );
     }
 }
 
@@ -149,7 +149,7 @@ void InputManager::delInput()
     p_input = NULL;
 
     emit positionUpdated( -1.0, 0 ,0 );
-    emit rateChanged( INPUT_RATE_DEFAULT / var_InheritFloat( p_intf, "rate" ) );
+    emit rateChanged( var_InheritFloat( p_intf, "rate" ) );
     emit nameChanged( "" );
     emit chapterChanged( 0 );
     emit titleChanged( 0 );
@@ -431,12 +431,12 @@ void InputManager::UpdateStatus()
 void InputManager::UpdateRate()
 {
     /* Update Rate */
-    int i_new_rate = INPUT_RATE_DEFAULT / var_GetFloat( p_input, "rate" );
-    if( i_new_rate != i_rate )
+    float f_new_rate = var_GetFloat( p_input, "rate" );
+    if( f_new_rate != f_rate )
     {
-        i_rate = i_new_rate;
+        f_rate = f_new_rate;
         /* Update rate */
-        emit rateChanged( i_rate );
+        emit rateChanged( f_rate );
     }
 }
 

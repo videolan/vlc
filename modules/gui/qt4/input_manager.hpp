@@ -144,7 +144,7 @@ private:
     int             i_old_playing_status;
     QString         oldName;
     QString         artUrl;
-    int             i_rate;
+    float           f_rate;
     float           f_cache;
     bool            b_video;
     mtime_t         timeA, timeB;
@@ -204,7 +204,7 @@ signals:
     /// Send new position, new time and new length
     void positionUpdated( float , int64_t, int );
     void seekRequested( float pos );
-    void rateChanged( int );
+    void rateChanged( float );
     void nameChanged( const QString& );
     /// Used to signal whether we should show navigation buttons
     void titleChanged( bool );

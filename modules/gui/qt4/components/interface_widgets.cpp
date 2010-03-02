@@ -426,11 +426,11 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, QWidget *parent )
     speedControlMenu->addAction( widgetAction );
 
     /* Change the SpeedRate in the Status Bar */
-    CONNECT( THEMIM->getIM(), rateChanged( int ), this, setRate( int ) );
+    CONNECT( THEMIM->getIM(), rateChanged( float ), this, setRate( float ) );
 
     DCONNECT( THEMIM, inputChanged( input_thread_t * ),
               speedControl, activateOnState() );
-    setRate( INPUT_RATE_DEFAULT / var_InheritFloat( p_intf, "rate" ) );
+    setRate( var_InheritFloat( p_intf, "rate" ) );
 }
 
 SpeedLabel::~SpeedLabel()
@@ -449,10 +449,10 @@ void SpeedLabel::showSpeedMenu( QPoint pos )
                           + QPoint( 0, height() ) );
 }
 
-void SpeedLabel::setRate( int rate )
+void SpeedLabel::setRate( float rate )
 {
     QString str;
-    str.setNum( ( 1000 / (double)rate ), 'f', 2 );
+    str.setNum( rate, 'f', 2 );
     str.append( "x" );
     setText( str );
     setToolTip( str );
@@ -480,7 +480,7 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
     speedSlider->setPageStep( 1 );
     speedSlider->setTickInterval( 17 );
 
-    CONNECT( speedSlider, sliderMoved( int ), this, updateRate( int ) );
+    CONNECT( speedSlider, valueChanged( int ), this, updateRate( int ) );
 
     QToolButton *normalSpeedButton = new QToolButton( this );
     normalSpeedButton->setMaximumSize( QSize( 26, 20 ) );
@@ -504,7 +504,7 @@ void SpeedControlWidget::activateOnState()
     speedSlider->setEnabled( THEMIM->getIM()->hasInput() );
 }
 
-void SpeedControlWidget::updateControls( int rate )
+void SpeedControlWidget::updateControls( float rate )
 {
     if( speedSlider->isSliderDown() )
     {
@@ -512,7 +512,7 @@ void SpeedControlWidget::updateControls( int rate )
         return;
     }
 
-    double value = 17 * log( (double)INPUT_RATE_DEFAULT / rate ) / log( 2 );
+    double value = 17 * log( rate ) / log( 2 );
     int sliderValue = (int) ( ( value > 0 ) ? value + .5 : value - .5 );
 
     if( sliderValue < speedSlider->minimum() )
