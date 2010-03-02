@@ -63,7 +63,7 @@ They define the position of a widget in the dialog:
 - row_span, col_span represent the relative size of a widget on the grid. A widget with col_span = 4 will be displayed as wide as 4 widgets of col_span = 1.
 Example: w = d:add_label( "My Label", 2, 3, 4, 5 ) will create a label at row 3, col 2, with a relative width of 4, height of 5.
 
-d:add_button( text, func, ... ): Create a button with caption "text" (string). When clicked, call function "func". func is a string.
+d:add_button( text, func, ... ): Create a button with caption "text" (string). When clicked, call function "func". func is a function reference.
 d:add_label( text, ... ): Create a text label with caption "text" (string).
 d:add_html( text, ... ): Create a rich text label with caption "text" (string), that supports basic HTML formatting (such as <i> or <h1> for instance).
 d:add_text_input( text, ... ): Create an editable text field, in order to read user input.

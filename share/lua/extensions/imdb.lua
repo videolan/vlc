@@ -57,8 +57,8 @@ function create_dialog()
     dlg:add_label("<b>Movie Title</b>", 1, 2, 1, 1)
     local item = vlc.input.item()
     txt = dlg:add_text_input(item and item:name() or "", 2, 2, 1, 1)
-    dlg:add_button("Okay", "click_okay", 3, 2, 1, 1)
-    dlg:add_button("*", "update_title", 4, 2, 1, 1)
+    dlg:add_button("Okay", click_okay, 3, 2, 1, 1)
+    dlg:add_button("*", update_title, 4, 2, 1, 1)
     dlg:show() -- Show, if not already visible
 end
 
@@ -91,7 +91,7 @@ function click_okay()
 
     if not list then
         list = dlg:add_list(1, 3, 4, 1)
-        button_open = dlg:add_button("Open", "click_open", 1, 4, 4, 1)
+        button_open = dlg:add_button("Open", click_open, 1, 4, 4, 1)
     end
 
     -- Clear previous results

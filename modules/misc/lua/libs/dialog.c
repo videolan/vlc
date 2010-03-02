@@ -388,13 +388,17 @@ int lua_DialogFlush( lua_State *L )
 static int vlclua_dialog_add_button( lua_State *L )
 {
     /* Verify arguments */
-    if( !lua_isstring( L, 2 ) || !lua_isstring( L, 3 ) )
+    if( !lua_isstring( L, 2 ) || !lua_isfunction( L, 3 ) )
         return luaL_error( L, "dialog:add_button usage: (text, func)" );
 
     extension_widget_t *p_widget = calloc( 1, sizeof( extension_widget_t ) );
     p_widget->type = EXTENSION_WIDGET_BUTTON;
     p_widget->psz_text = strdup( luaL_checkstring( L, 2 ) );
-    p_widget->p_sys = strdup( luaL_checkstring( L, 3 ) );
+    lua_settop( L, 3 );
+    lua_pushlightuserdata( L, p_widget );
+    lua_insert( L, 3 );
+    lua_settable( L, LUA_REGISTRYINDEX );
+    p_widget->p_sys = NULL;
 
     return vlclua_create_widget_inner( L, 2, p_widget );
 }
@@ -878,6 +882,13 @@ static int vlclua_dialog_delete_widget( lua_State *L )
 
     /* Delete widget */
     *pp_widget = NULL;
+    if( p_widget->type == EXTENSION_WIDGET_BUTTON )
+    {
+        /* Remove button action from registry */
+        lua_pushlightuserdata( L, p_widget );
+        lua_pushnil( L );
+        lua_settable( L, LUA_REGISTRYINDEX );
+    }
 
     vlc_object_t *p_mgr = vlclua_get_this( L );
 

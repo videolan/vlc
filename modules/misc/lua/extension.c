@@ -593,7 +593,10 @@ int lua_ExtensionWidgetClick( extensions_manager_t *p_mgr,
     if( !p_ext->p_sys->L )
         return VLC_SUCCESS;
 
-    return lua_ExecuteFunction( p_mgr, p_ext, (const char*) p_widget->p_sys, LUA_END );
+    lua_State *L = GetLuaState( p_mgr, p_ext );
+    lua_pushlightuserdata( L, p_widget );
+    lua_gettable( L, LUA_REGISTRYINDEX );
+    return lua_ExecuteFunction( p_mgr, p_ext, NULL, LUA_END );
 }
 
 
@@ -796,6 +799,9 @@ int lua_ExecuteFunction( extensions_manager_t *p_mgr, extension_t *p_ext,
 
 /**
  * Execute a function in a Lua script
+ * @param psz_function Name of global function to execute. If NULL, assume
+ *                     that the function object is already on top of the
+ *                     stack.
  * @return < 0 in case of failure, >= 0 in case of success
  * @note It's better to call this function from a dedicated thread
  * (see extension_thread.c)
@@ -809,7 +815,8 @@ int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
     assert( p_ext != NULL );
 
     lua_State *L = GetLuaState( p_mgr, p_ext );
-    lua_getglobal( L, psz_function );
+    if( psz_function )
+        lua_getglobal( L, psz_function );
 
     if( !lua_isfunction( L, -1 ) )
     {
