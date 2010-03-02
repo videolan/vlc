@@ -163,7 +163,7 @@ void TopWindow::processEvent( EvtMouse &rEvtMouse )
             if( pNewHitControl != m_pFocusControl )
             {
                 m_pFocusControl = pNewHitControl;
-                EvtFocus evt( getIntf(), false );
+                EvtFocus evt( getIntf(), true );
                 pNewHitControl->handleEvent( evt );
             }
         }
