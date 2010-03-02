@@ -32,6 +32,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -118,117 +119,52 @@ static void DoWork( filter_t * p_filter,
 
     mad_synth_frame( &p_sys->mad_synth, &p_sys->mad_frame );
 
+    struct mad_pcm * p_pcm = &p_sys->mad_synth.pcm;
+    unsigned int i_samples = p_pcm->length;
+    mad_fixed_t const * p_left = p_pcm->samples[0];
+    mad_fixed_t const * p_right = p_pcm->samples[1];
+
+    assert( i_samples == p_out_buf->i_nb_samples );
     if ( p_filter->fmt_out.audio.i_format == VLC_CODEC_FI32 )
     {
         /* Interleave and keep buffers in mad_fixed_t format */
         mad_fixed_t * p_samples = (mad_fixed_t *)p_out_buf->p_buffer;
-        struct mad_pcm * p_pcm = &p_sys->mad_synth.pcm;
-        unsigned int i_samples = p_pcm->length;
-        mad_fixed_t const * p_left = p_pcm->samples[0];
-        mad_fixed_t const * p_right = p_pcm->samples[1];
 
-        switch ( p_pcm->channels )
+        if ( p_pcm->channels == 2 )
         {
-        case 2:
-            if ( p_filter->fmt_out.audio.i_physical_channels == AOUT_CHAN_CENTER )
+            while ( i_samples-- )
             {
-                while ( i_samples-- )
-                {
-                    *p_samples++ = (*p_left++ >> 1) + (*p_right++ >> 1);
-                }
+                *p_samples++ = *p_left++;
+                *p_samples++ = *p_right++;
             }
-            else if ( p_filter->fmt_out.audio.i_original_channels == AOUT_CHAN_LEFT )
-            {
-                while ( i_samples-- )
-                {
-                    *p_samples++ = *p_left;
-                    *p_samples++ = *p_left++;
-                }
-            }
-            else if ( p_filter->fmt_out.audio.i_original_channels == AOUT_CHAN_RIGHT )
-            {
-                while ( i_samples-- )
-                {
-                    *p_samples++ = *p_right;
-                    *p_samples++ = *p_right++;
-                }
-            }
-            else
-            {
-                while ( i_samples-- )
-                {
-                    *p_samples++ = *p_left++;
-                    *p_samples++ = *p_right++;
-                }
-            }
-            break;
-
-        case 1:
+        }
+        else
+        {
+            assert( p_pcm->channels == 1 );
             vlc_memcpy( p_samples, p_left, i_samples * sizeof(mad_fixed_t) );
-            break;
-
-        default:
-            msg_Err( p_filter, "cannot interleave %i channels",
-                     p_pcm->channels );
         }
     }
     else
     {
         /* float32 */
         float * p_samples = (float *)p_out_buf->p_buffer;
-        struct mad_pcm * p_pcm = &p_sys->mad_synth.pcm;
-        unsigned int i_samples = p_pcm->length;
-        mad_fixed_t const * p_left = p_pcm->samples[0];
-        mad_fixed_t const * p_right = p_pcm->samples[1];
-        float f_temp = (float)FIXED32_ONE;
+        const float f_temp = (float)FIXED32_ONE;
 
-        switch ( p_pcm->channels )
+        if ( p_pcm->channels == 2 )
         {
-        case 2:
-            if ( p_filter->fmt_out.audio.i_physical_channels == AOUT_CHAN_CENTER )
+            while ( i_samples-- )
             {
-                while ( i_samples-- )
-                {
-                    *p_samples++ = (float)*p_left++ / f_temp / 2 +
-                                   (float)*p_right++ / f_temp / 2;
-                }
+                *p_samples++ = (float)*p_left++ / f_temp;
+                *p_samples++ = (float)*p_right++ / f_temp;
             }
-            else if ( p_filter->fmt_out.audio.i_original_channels == AOUT_CHAN_LEFT )
-            {
-                while ( i_samples-- )
-                {
-                    *p_samples++ = (float)*p_left / f_temp;
-                    *p_samples++ = (float)*p_left++ / f_temp;
-                }
-            }
-            else if ( p_filter->fmt_out.audio.i_original_channels == AOUT_CHAN_RIGHT )
-            {
-                while ( i_samples-- )
-                {
-                    *p_samples++ = (float)*p_right / f_temp;
-                    *p_samples++ = (float)*p_right++ / f_temp;
-                }
-            }
-            else
-            {
-                while ( i_samples-- )
-                {
-                    *p_samples++ = (float)*p_left++ / f_temp;
-                    *p_samples++ = (float)*p_right++ / f_temp;
-                }
-            }
-            break;
-
-        case 1:
+        }
+        else
+        {
+            assert( p_pcm->channels == 1 );
             while ( i_samples-- )
             {
                 *p_samples++ = (float)*p_left++ / f_temp;
             }
-            break;
-
-        default:
-            msg_Err( p_filter, "cannot interleave %i channels",
-                     p_pcm->channels );
         }
     }
 }
@@ -243,9 +179,9 @@ static int OpenFilter( vlc_object_t *p_this )
 
     if( p_filter->fmt_in.i_codec != VLC_CODEC_MPGA &&
         p_filter->fmt_in.i_codec != VLC_FOURCC('m','p','g','3') )
-    {
         return VLC_EGENERIC;
-    }
+    if( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
+        return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the module's structure */
     p_sys = p_filter->p_sys = malloc( sizeof(filter_sys_t) );
@@ -265,8 +201,6 @@ static int OpenFilter( vlc_object_t *p_this )
     p_filter->fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
     p_filter->fmt_out.audio.i_bitspersample =
         aout_BitsPerSample( p_filter->fmt_out.i_codec );
-
-    p_filter->fmt_out.audio.i_rate = p_filter->fmt_in.audio.i_rate;
 
     msg_Dbg( p_this, "%4.4s->%4.4s, bits per sample: %i",
              (char *)&p_filter->fmt_in.i_codec,
