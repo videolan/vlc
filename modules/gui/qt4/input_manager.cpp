@@ -111,6 +111,7 @@ void InputManager::setInput( input_thread_t *_p_input )
         UpdateVout();
         addCallbacks();
         p_item = input_GetItem( p_input );
+        emit rateChanged( INPUT_RATE_DEFAULT / var_GetFloat( p_input, "rate" ) );
     }
     else
     {
