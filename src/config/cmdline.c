@@ -178,16 +178,11 @@ int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
                 pp_shortopts[(int)p_item->i_short] = p_item;
                 psz_shortopts[i_shortopts] = p_item->i_short;
                 i_shortopts++;
-                if( p_item->i_type != CONFIG_ITEM_BOOL )
+                if( p_item->i_type != CONFIG_ITEM_BOOL
+                 && p_item->i_short != 'v' )
                 {
                     psz_shortopts[i_shortopts] = ':';
                     i_shortopts++;
-
-                    if( p_item->i_short == 'v' )
-                    {
-                        psz_shortopts[i_shortopts] = ':';
-                        i_shortopts++;
-                    }
                 }
             }
         }
@@ -308,26 +303,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
                     var_Create( p_this, name, VLC_VAR_INTEGER );
                     if( i_cmd == 'v' )
                     {
-                        if( vlc_optarg )
-                        {
-                            if( *vlc_optarg == 'v' ) /* eg. -vvv */
-                            {
-                                i_verbose++;
-                                while( *vlc_optarg == 'v' )
-                                {
-                                    i_verbose++;
-                                    vlc_optarg++;
-                                }
-                            }
-                            else
-                            {
-                                i_verbose += atoi( vlc_optarg ); /* eg. -v2 */
-                            }
-                        }
-                        else
-                        {
-                            i_verbose++; /* -v */
-                        }
+                        i_verbose++; /* -v */
                         var_SetInteger( p_this, name, i_verbose );
                     }
                     else
