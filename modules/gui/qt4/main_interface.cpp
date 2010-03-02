@@ -498,7 +498,7 @@ inline void MainInterface::createStatusBar()
     nameLabel = new QLabel( this );
     nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
                                       | Qt::TextSelectableByKeyboard );
-    SpeedLabel *speedLabel = new SpeedLabel( p_intf, "1.00x", this );
+    SpeedLabel *speedLabel = new SpeedLabel( p_intf, this );
 
     /* Styling those labels */
     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );

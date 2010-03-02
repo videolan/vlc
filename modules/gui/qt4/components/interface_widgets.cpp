@@ -412,9 +412,8 @@ void VisualSelector::next()
 }
 #endif
 
-SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, const QString& text,
-                        QWidget *parent )
-           : QLabel( text, parent ), p_intf( _p_intf )
+SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, QWidget *parent )
+           : QLabel( parent ), p_intf( _p_intf )
 {
     setToolTip( qtr( "Current playback speed.\nClick to adjust" ) );
 
@@ -431,6 +430,7 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, const QString& text,
 
     DCONNECT( THEMIM, inputChanged( input_thread_t * ),
               speedControl, activateOnState() );
+    setRate( INPUT_RATE_DEFAULT );
 }
 
 SpeedLabel::~SpeedLabel()
