@@ -337,6 +337,9 @@ n:add_node( ... ): Same as sd.add_node(), but as a subnode of n.
 Stream
 ------
 stream( url ): Instantiate a stream object for specific url.
+memory_stream( string ): Instantiate a stream object containing a specific string.
+  Those two functions return the stream object upon success and nil if an
+  error occured, in that case, the second return value will be an error message.
 
 s = vlc.stream( "http://www.videolan.org/" )
 s:read( 128 ) -- read up to 128 characters. Return 0 if no more data is available (FIXME?).

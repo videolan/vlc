@@ -29,7 +29,8 @@ module("simplexml",package.seeall)
 --     text content (string)
 --]]
 
-local function parsexml(stream)
+local function parsexml(stream, errormsg)
+    if not stream then return nil, errormsg end
     local xml = vlc.xml()
     local reader = xml:create_reader(stream)
 

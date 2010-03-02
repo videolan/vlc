@@ -34,6 +34,7 @@ function try_query(query)
     l = nil
     vlc.msg.dbg( query )
     local s = vlc.stream( query )
+    if not s then return nil end
     local page = s:read( 65653 )
 
     -- FIXME: multiple results may be available

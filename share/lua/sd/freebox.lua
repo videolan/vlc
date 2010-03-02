@@ -25,7 +25,11 @@ function descriptor()
 end
 
 function main()
-    local fd = vlc.stream( "http://mafreebox.freebox.fr/freeboxtv/playlist.m3u" )
+    local fd, msg = vlc.stream( "http://mafreebox.freebox.fr/freeboxtv/playlist.m3u" )
+    if not fd then
+        vlc.msg.warn(msg)
+        return nil
+    end
     local line=  fd:readline()
     if line ~= "#EXTM3U" then
         return nil

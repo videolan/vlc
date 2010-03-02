@@ -100,7 +100,11 @@ function click_okay()
     -- Search IMDb
     local url = "http://www.imdb.com/find?s=all&q="
     local title = string.gsub(txt:get_text(), " ", "+")
-    local s = vlc.stream(url .. title)
+    local s, msg = vlc.stream(url .. title)
+    if not s then
+        vlc.msg.warn(msg)
+        return
+    end
 
     -- Fetch HTML data
     local data = s:read(65000)
@@ -171,7 +175,12 @@ function click_open()
 
     -- userLink:set_text("<a href=\"url\">" .. url .. "</a>")
 
-    local s = vlc.stream(url)
+    local s, msg = vlc.stream(url)
+    if not s then
+        vlc.msg.warn(msg)
+        return
+    end
+
     data = s:read(65000)
 
     text = "<h1>" .. titles[sel].title .. " (" .. titles[sel].year .. ")</h1>"
@@ -214,7 +223,11 @@ function click_open()
     text = text .. actors .. "</table>"
 
     text = text .. "<h2>Plot Summary</h2>"
-    s = vlc.stream(url .. "plotsummary")
+    s, msg = vlc.stream(url .. "plotsummary")
+    if not s then
+        vlc.msg.warn(msg)
+        return
+    end
     data = s:read(65000)
 
     -- We read only the first summary

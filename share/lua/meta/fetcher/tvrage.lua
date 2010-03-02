@@ -46,6 +46,7 @@ function fetch_meta()
     end
 
     local fd = vlc.stream("http://services.tvrage.com/feeds/search.php?show=" .. get_query(showName))
+    if not fd then return nil end
     local page = fd:read( 65653 )
     fd = nil
     _, _, showid = string.find( page, "<showid>(.-)</showid>" )
@@ -54,6 +55,7 @@ function fetch_meta()
     end
 
     fd = vlc.stream("http://services.tvrage.com/feeds/full_show_info.php?sid=" .. showid)
+    if not fd then return nil end
     page = fd:read( 65653 )
     fd = nil
     _, _, season = string.find(page, "<Season no=\""..seasonNumber.."\">(.-)</Season>")

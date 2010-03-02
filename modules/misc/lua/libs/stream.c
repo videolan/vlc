@@ -62,7 +62,11 @@ static const luaL_Reg vlclua_stream_reg[] = {
 static int vlclua_stream_new_inner( lua_State *L, stream_t *p_stream )
 {
     if( !p_stream )
-        return luaL_error( L, "Error when opening stream" );
+    {
+        lua_pushnil( L );
+        lua_pushliteral( L, "Error when opening stream" );
+        return 2;
+    }
 
     stream_t **pp_stream = lua_newuserdata( L, sizeof( stream_t * ) );
     *pp_stream = p_stream;

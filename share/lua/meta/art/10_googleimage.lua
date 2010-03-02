@@ -49,6 +49,8 @@ function fetch_art()
         return nil
     end
     fd = vlc.stream( "http://images.google.com/images?q=" .. get_query( title ) )
+    if not fd then return nil end
+
     page = fd:read( 65653 )
     fd = nil
     _, _, arturl = string.find( page, "imgurl=([^&]+)" )
