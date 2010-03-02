@@ -350,10 +350,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->i_title_offset = p_input->p->i_seekpoint_offset = 0;
     p_input->p->i_state = INIT_S;
     p_input->p->i_rate = INPUT_RATE_DEFAULT
-                         / var_CreateGetFloat( p_input, "rate" );
-    /* Currently, the input rate variable is an integer. So we need to destroy
-     * the float variable inherited from the configuration. */
-    var_Destroy( p_input, "rate" );
+                         / var_InheritFloat( p_input, "rate" );
     p_input->p->b_recording = false;
     memset( &p_input->p->bookmark, 0, sizeof(p_input->p->bookmark) );
     TAB_INIT( p_input->p->i_bookmark, p_input->p->pp_bookmark );
