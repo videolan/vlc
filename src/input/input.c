@@ -335,6 +335,14 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     if( !p_input->p )
         return NULL;
 
+    /* Parse input options */
+    vlc_mutex_lock( &p_item->lock );
+    assert( (int)p_item->optflagc == p_item->i_options );
+    for( i = 0; i < p_item->i_options; i++ )
+        var_OptionParse( VLC_OBJECT(p_input), p_item->ppsz_options[i],
+                         !!(p_item->optflagv[i] & VLC_INPUT_OPTION_TRUSTED) );
+    vlc_mutex_unlock( &p_item->lock );
+
     p_input->b_preparsing = b_quick;
     p_input->psz_header = psz_header ? strdup( psz_header ) : NULL;
 
@@ -401,14 +409,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     vlc_cond_init( &p_input->p->wait_control );
     p_input->p->i_control = 0;
     p_input->p->b_abort = false;
-
-    /* Parse input options */
-    vlc_mutex_lock( &p_item->lock );
-    assert( (int)p_item->optflagc == p_item->i_options );
-    for( i = 0; i < p_item->i_options; i++ )
-        var_OptionParse( VLC_OBJECT(p_input), p_item->ppsz_options[i],
-                         !!(p_item->optflagv[i] & VLC_INPUT_OPTION_TRUSTED) );
-    vlc_mutex_unlock( &p_item->lock );
 
     /* Create Object Variables for private use only */
     input_ConfigVarInit( p_input );
