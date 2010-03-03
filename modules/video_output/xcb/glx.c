@@ -201,6 +201,9 @@ static int CreateWindow (vout_display_t *vd, xcb_connection_t *conn,
  */
 static int Open (vlc_object_t *obj)
 {
+    if (!XInitThreads ())
+        return VLC_EGENERIC;
+
     vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = malloc (sizeof (*sys));
 
