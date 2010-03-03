@@ -1342,6 +1342,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
         vout_DropPicture( p_vout, p_picture );
         return;
     }
+    vout_LinkPicture( p_vout, p_picture );
 
     /* */
     vlc_mutex_lock( &p_owner->lock );
@@ -1421,6 +1422,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
                 p_owner->i_last_rate = i_rate;
             }
             vout_DisplayPicture( p_vout, p_picture );
+            vout_UnlinkPicture( p_vout, p_picture );
         }
         else
         {
@@ -1430,6 +1432,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
                 msg_Warn( p_vout, "non-dated video buffer received" );
 
             *pi_lost_sum += 1;
+            vout_UnlinkPicture( p_vout, p_picture );
             vout_DropPicture( p_vout, p_picture );
         }
         int i_tmp_display;
@@ -1683,7 +1686,10 @@ static void DecoderFlushBuffering( decoder_t *p_dec )
         p_owner->buffer.i_count--;
 
         if( p_owner->p_vout )
+        {
+            vout_UnlinkPicture( p_owner->p_vout, p_picture );
             vout_DropPicture( p_owner->p_vout, p_picture );
+        }
 
         if( !p_owner->buffer.p_picture )
             p_owner->buffer.pp_picture_next = &p_owner->buffer.p_picture;

@@ -311,7 +311,8 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
         msg_Err( p_vout, "Invalid picture reference count (%p, %d)",
                  p_pic, p_pic->i_refcount );
 
-    if( p_pic->i_refcount == 0 && p_pic->i_status == DISPLAYED_PICTURE )
+    if( p_pic->i_refcount == 0 &&
+        ( p_pic->i_status == DISPLAYED_PICTURE || p_pic->i_status == RESERVED_PICTURE ) )
         DestroyPicture( p_vout, p_pic );
 
     vlc_mutex_unlock( &p_vout->picture_lock );
