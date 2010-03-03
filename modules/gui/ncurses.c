@@ -1972,13 +1972,13 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             MainBoxWrite( p_intf, l, 1, _("+-[Incoming]"));
             SHOW_ACS( 1, ACS_ULCORNER );  SHOW_ACS( 2, ACS_HLINE ); l++;
             if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
-            MainBoxWrite( p_intf, l, 1, _("| input bytes read : %8.0f kB"),
-                    (float)(p_item->p_stats->i_read_bytes)/1000 );
+            MainBoxWrite( p_intf, l, 1, _("| input bytes read : %8.0f KiB"),
+                    (float)(p_item->p_stats->i_read_bytes)/1024 );
             SHOW_ACS( 1, ACS_VLINE ); l++;
             MainBoxWrite( p_intf, l, 1, _("| input bitrate    :   %6.0f kb/s"),
                     (float)(p_item->p_stats->f_input_bitrate)*8000 );
-            MainBoxWrite( p_intf, l, 1, _("| demux bytes read : %8.0f kB"),
-                    (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
+            MainBoxWrite( p_intf, l, 1, _("| demux bytes read : %8.0f KiB"),
+                    (float)(p_item->p_stats->i_demux_read_bytes)/1024 );
             SHOW_ACS( 1, ACS_VLINE ); l++;
             MainBoxWrite( p_intf, l, 1, _("| demux bitrate    :   %6.0f kb/s"),
                     (float)(p_item->p_stats->f_demux_bitrate)*8000 );
@@ -2031,8 +2031,8 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
             MainBoxWrite( p_intf, l, 1, _("| packets sent     :    %5i"), p_item->p_stats->i_sent_packets );
             SHOW_ACS( 1, ACS_VLINE ); l++;
-            MainBoxWrite( p_intf, l, 1, _("| bytes sent       : %8.0f kB"),
-                    (float)(p_item->p_stats->i_sent_bytes)/1000 );
+            MainBoxWrite( p_intf, l, 1, _("| bytes sent       : %8.0f KiB"),
+                    (float)(p_item->p_stats->i_sent_bytes)/1024 );
             SHOW_ACS( 1, ACS_VLINE ); l++;
             MainBoxWrite( p_intf, l, 1, _("\\ sending bitrate  :   %6.0f kb/s"),
                     (float)(p_item->p_stats->f_send_bitrate*8)*1000 );

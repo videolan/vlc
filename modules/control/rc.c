@@ -1868,12 +1868,12 @@ static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
 
     /* Input */
     msg_rc("%s", _("+-[Incoming]"));
-    msg_rc(_("| input bytes read : %8.0f kB"),
-            (float)(p_item->p_stats->i_read_bytes)/1000 );
+    msg_rc(_("| input bytes read : %8.0f KiB"),
+            (float)(p_item->p_stats->i_read_bytes)/1024 );
     msg_rc(_("| input bitrate    :   %6.0f kb/s"),
             (float)(p_item->p_stats->f_input_bitrate)*8000 );
-    msg_rc(_("| demux bytes read : %8.0f kB"),
-            (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
+    msg_rc(_("| demux bytes read : %8.0f KiB"),
+            (float)(p_item->p_stats->i_demux_read_bytes)/1024 );
     msg_rc(_("| demux bitrate    :   %6.0f kb/s"),
             (float)(p_item->p_stats->f_demux_bitrate)*8000 );
     msg_rc(_("| demux corrupted  :    %5i"),
@@ -1902,8 +1902,8 @@ static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
     /* Sout */
     msg_rc("%s", _("+-[Streaming]"));
     msg_rc(_("| packets sent     :    %5i"), p_item->p_stats->i_sent_packets );
-    msg_rc(_("| bytes sent       : %8.0f kB"),
-            (float)(p_item->p_stats->i_sent_bytes)/1000 );
+    msg_rc(_("| bytes sent       : %8.0f KiB"),
+            (float)(p_item->p_stats->i_sent_bytes)/1024 );
     msg_rc(_("| sending bitrate  :   %6.0f kb/s"),
             (float)(p_item->p_stats->f_send_bitrate*8)*1000 );
     msg_rc("|");

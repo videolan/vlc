@@ -195,9 +195,9 @@ static VLCInfo *_o_sharedInstance = nil;
 - (void)initMediaPanelStats
 {
     //Initializing Input Variables
-    [o_read_bytes_txt setStringValue: [NSString stringWithFormat:@"%8.0f kB", (float)0]];
+    [o_read_bytes_txt setStringValue: [NSString stringWithFormat:@"%8.0f KiB", (float)0]];
     [o_input_bitrate_txt setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
-    [o_demux_bytes_txt setStringValue: [NSString stringWithFormat:@"%8.0f kB", (float)0]];
+    [o_demux_bytes_txt setStringValue: [NSString stringWithFormat:@"%8.0f KiB", (float)0]];
     [o_demux_bitrate_txt setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
     
     //Initializing Video Variables
@@ -208,7 +208,7 @@ static VLCInfo *_o_sharedInstance = nil;
 
     //Initializing Output Variables
     [o_sent_packets_txt setIntValue: 0];
-    [o_sent_bytes_txt setStringValue: [NSString stringWithFormat:@"%8.0f kB", (float)0]];
+    [o_sent_bytes_txt setStringValue: [NSString stringWithFormat:@"%8.0f KiB", (float)0]];
     [o_sent_bitrate_txt setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
 
     //Initializing Audio Variables
@@ -328,11 +328,11 @@ static VLCInfo *_o_sharedInstance = nil;
 
     /* input */
     [o_read_bytes_txt setStringValue: [NSString stringWithFormat:
-        @"%8.0f kB", (float)(p_item->p_stats->i_read_bytes)/1000]];
+        @"%8.0f KiB", (float)(p_item->p_stats->i_read_bytes)/1024]];
     [o_input_bitrate_txt setStringValue: [NSString stringWithFormat:
         @"%6.0f kb/s", (float)(p_item->p_stats->f_input_bitrate)*8000]];
     [o_demux_bytes_txt setStringValue: [NSString stringWithFormat:
-        @"%8.0f kB", (float)(p_item->p_stats->i_demux_read_bytes)/1000]];
+        @"%8.0f KiB", (float)(p_item->p_stats->i_demux_read_bytes)/1024]];
     [o_demux_bitrate_txt setStringValue: [NSString stringWithFormat:
         @"%6.0f kb/s", (float)(p_item->p_stats->f_demux_bitrate)*8000]];
 
@@ -346,8 +346,8 @@ static VLCInfo *_o_sharedInstance = nil;
 
     /* Sout */
     [o_sent_packets_txt setIntValue: p_item->p_stats->i_sent_packets];
-    [o_sent_bytes_txt setStringValue: [NSString stringWithFormat: @"%8.0f kB",
-        (float)(p_item->p_stats->i_sent_bytes)/1000]];
+    [o_sent_bytes_txt setStringValue: [NSString stringWithFormat: @"%8.0f KiB",
+        (float)(p_item->p_stats->i_sent_bytes)/1024]];
     [o_sent_bitrate_txt setStringValue: [NSString stringWithFormat:
         @"%6.0f kb/s", (float)(p_item->p_stats->f_send_bitrate*8)*1000]];
 

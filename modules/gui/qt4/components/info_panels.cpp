@@ -510,10 +510,10 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
     CREATE_CATEGORY( streaming, qtr("Output/Written/Sent") );
 
     CREATE_AND_ADD_TO_CAT( read_media_stat, qtr("Media data size"),
-                           "0", input , "kB" );
+                           "0", input , "KiB" );
     CREATE_AND_ADD_TO_CAT( input_bitrate_stat, qtr("Input bitrate"),
                            "0", input, "kb/s" );
-    CREATE_AND_ADD_TO_CAT( demuxed_stat, qtr("Demuxed data size"), "0", input, "kB") ;
+    CREATE_AND_ADD_TO_CAT( demuxed_stat, qtr("Demuxed data size"), "0", input, "KiB") ;
     CREATE_AND_ADD_TO_CAT( stream_bitrate_stat, qtr("Content bitrate"),
                            "0", input, "kb/s" );
     CREATE_AND_ADD_TO_CAT( corrupted_stat, qtr("Discarded (corrupted)"),
@@ -530,7 +530,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
 
     CREATE_AND_ADD_TO_CAT( send_stat, qtr("Sent"), "0", streaming, qtr("packets") );
     CREATE_AND_ADD_TO_CAT( send_bytes_stat, qtr("Sent"),
-                           "0", streaming, "kB" );
+                           "0", streaming, "KiB" );
     CREATE_AND_ADD_TO_CAT( send_bitrate_stat, qtr("Upstream rate"),
                            "0", streaming, "kb/s" );
 
@@ -567,11 +567,11 @@ void InputStatsPanel::update( input_item_t *p_item )
     { QString str; widget->setText( 1 , str.sprintf( format, ## calc ) );  }
 
     UPDATE( read_media_stat, "%8.0f",
-            (float)(p_item->p_stats->i_read_bytes)/1000);
+            (float)(p_item->p_stats->i_read_bytes)/1024);
     UPDATE( input_bitrate_stat, "%6.0f",
                     (float)(p_item->p_stats->f_input_bitrate * 8000 ));
     UPDATE( demuxed_stat, "%8.0f",
-                    (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
+                    (float)(p_item->p_stats->i_demux_read_bytes)/1024 );
     UPDATE( stream_bitrate_stat, "%6.0f",
                     (float)(p_item->p_stats->f_demux_bitrate * 8000 ));
     UPDATE( corrupted_stat, "%5i", p_item->p_stats->i_demux_corrupted );
@@ -585,7 +585,7 @@ void InputStatsPanel::update( input_item_t *p_item )
     /* Sout */
     UPDATE( send_stat, "%5i", p_item->p_stats->i_sent_packets );
     UPDATE( send_bytes_stat, "%8.0f",
-            (float)(p_item->p_stats->i_sent_bytes)/1000 );
+            (float)(p_item->p_stats->i_sent_bytes)/1024 );
     UPDATE( send_bitrate_stat, "%6.0f",
             (float)(p_item->p_stats->f_send_bitrate*8)*1000 );
 
