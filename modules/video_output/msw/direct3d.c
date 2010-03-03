@@ -1036,7 +1036,7 @@ static void Direct3DDestroyScene(vout_display_t *vd)
  * It copies picture surface into a texture and renders into a scene.
  *
  * This function is intented for higher end 3D cards, with pixel shader support
- * and at least 64 MB of video RAM.
+ * and at least 64 MiB of video RAM.
  */
 static void Direct3DRenderScene(vout_display_t *vd, LPDIRECT3DSURFACE9 surface)
 {

@@ -885,7 +885,7 @@ static void Close( vlc_object_t *p_this )
     /* If in dump mode, then close the file */
     if( p_sys->b_file_out )
     {
-        msg_Info( p_demux ,"closing %s (%"PRId64" Kbytes dumped)",
+        msg_Info( p_demux ,"closing %s (%"PRId64" KiB dumped)",
                   p_sys->psz_file, p_sys->i_write / 1024 );
 
         if( p_sys->p_file != stdout )

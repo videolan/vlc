@@ -799,7 +799,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
             {
                 var_buffer_add16( &buffer, 0x0000 );
                 msg_Info( p_access,
-                          "selecting stream[0x%x] %s (%d kb/s)",
+                          "selecting stream[0x%x] %s (%d Kib/s)",
                           i,
                           ( p_sys->asfh.stream[i].i_cat == ASF_STREAM_AUDIO  ) ?
                                                   "audio" : "video" ,
@@ -809,7 +809,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
             {
                 var_buffer_add16( &buffer, 0x0002 );
                 msg_Info( p_access,
-                          "ignoring stream[0x%x] %s (%d kb/s)",
+                          "ignoring stream[0x%x] %s (%d Kib/s)",
                           i,
                           ( p_sys->asfh.stream[i].i_cat == ASF_STREAM_AUDIO  ) ?
                                     "audio" : "video" ,

@@ -331,7 +331,7 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
         p_sys->i_tmp_size_max = 50*1024*1024;
     else
         p_sys->i_tmp_size_max = __MAX( i_tmp_size_max, 1*1024*1024 );
-    msg_Dbg( p_input, "using timeshift granularity of %d MBytes",
+    msg_Dbg( p_input, "using timeshift granularity of %d MiB",
              (int)p_sys->i_tmp_size_max/(1024*1024) );
 
     char *psz_tmp_path = var_CreateGetNonEmptyString( p_input, "input-timeshift-path" );
@@ -1074,7 +1074,7 @@ static ts_storage_t *TsStorageNew( const char *psz_tmp_path, int64_t i_tmp_size_
     p_storage->i_cmd_r = 0;
     p_storage->i_cmd_max = 30000;
     p_storage->p_cmd = malloc( p_storage->i_cmd_max * sizeof(*p_storage->p_cmd) );
-    //fprintf( stderr, "\nSTORAGE name=%s size=%d kbytes\n", p_storage->psz_file, p_storage->i_cmd_max * sizeof(*p_storage->p_cmd) /1024 );
+    //fprintf( stderr, "\nSTORAGE name=%s size=%d KiB\n", p_storage->psz_file, p_storage->i_cmd_max * sizeof(*p_storage->p_cmd) /1024 );
 
     if( !p_storage->p_cmd || !p_storage->p_filew || !p_storage->p_filer )
     {

@@ -685,7 +685,7 @@ static void AStreamPrebufferBlock( stream_t *s )
                          (p_sys->stat.i_read_time + 1);
 
             msg_Dbg( s, "prebuffering done %"PRId64" bytes in %"PRId64"s - "
-                     "%"PRId64" kbytes/s",
+                     "%"PRId64" KiB/s",
                      p_sys->stat.i_bytes,
                      p_sys->stat.i_read_time / INT64_C(1000000),
                      i_byterate / 1024 );
@@ -1440,7 +1440,7 @@ static void AStreamPrebufferStream( stream_t *s )
                          (p_sys->stat.i_read_time+1);
 
             msg_Dbg( s, "pre-buffering done %"PRId64" bytes in %"PRId64"s - "
-                     "%"PRId64" kbytes/s",
+                     "%"PRId64" KiB/s",
                      p_sys->stat.i_bytes,
                      p_sys->stat.i_read_time / INT64_C(1000000),
                      i_byterate / 1024 );
