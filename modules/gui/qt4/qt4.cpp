@@ -539,6 +539,10 @@ static int WindowOpen( vlc_object_t *p_obj )
     /* */
     if( p_wnd->cfg->is_standalone )
         return VLC_EGENERIC;
+#if defined (Q_WS_X11)
+    if( var_InheritBool( p_obj, "video-wallpaper" ) )
+        return VLC_EGENERIC;
+#endif
 
     vlc_value_t val;
 
