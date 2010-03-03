@@ -548,7 +548,7 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
          * that the inode is still the same, to avoid TOCTOU race condition.
          */
         if( ( fd == -1)
-         || fstat( fd, &st1 ) || utf8_lstat( psz_dirname, &st2 )
+         || fstat( fd, &st1 ) || vlc_lstat( psz_dirname, &st2 )
          || S_ISLNK( st2.st_mode ) || ( st1.st_ino != st2.st_ino ) )
         {
             closedir( dir );

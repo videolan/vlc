@@ -50,7 +50,7 @@ int vlc_rename( const char *, const char * );
 #endif
 
 VLC_EXPORT( int, vlc_stat, ( const char *filename, struct stat *buf ) );
-VLC_EXPORT( int, utf8_lstat, ( const char *filename, struct stat *buf ) );
+VLC_EXPORT( int, vlc_lstat, ( const char *filename, struct stat *buf ) );
 
 VLC_EXPORT( int, vlc_mkstemp, ( char * ) );
 

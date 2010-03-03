@@ -464,7 +464,7 @@ int vlc_stat( const char *filename, struct stat *buf)
  *
  * @param filename UTF-8 file path
  */
-int utf8_lstat( const char *filename, struct stat *buf)
+int vlc_lstat( const char *filename, struct stat *buf)
 {
     return vlc_statEx( filename, buf, false );
 }

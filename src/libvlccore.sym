@@ -431,7 +431,7 @@ us_strtof
 vlc_fopen
 utf8_fprintf
 vlc_loaddir
-utf8_lstat
+vlc_lstat
 vlc_mkdir
 vlc_mkstemp
 vlc_open
