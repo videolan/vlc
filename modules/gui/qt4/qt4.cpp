@@ -339,10 +339,9 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 
     if( !p_sys->b_isDialogProvider )
     {
-        vlc_value_t val;
-        var_Create (p_this->p_libvlc, "qt4-iface", VLC_VAR_ADDRESS);
-        val.p_address = p_this;
-        var_Set (p_this->p_libvlc, "qt4-iface", val);
+        playlist_t *pl = pl_Get(p_this);
+        var_Create (pl, "qt4-iface", VLC_VAR_ADDRESS);
+        var_SetAddress (pl, "qt4-iface", p_this);
     }
     return VLC_SUCCESS;
 }
@@ -365,7 +364,7 @@ static void Close( vlc_object_t *p_this )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     if( !p_sys->b_isDialogProvider )
-        var_Destroy (p_this->p_libvlc, "qt4-iface");
+        var_Destroy (pl_Get(p_this), "qt4-iface");
 
     QVLCApp::triggerQuit();
 
@@ -547,8 +546,7 @@ static int WindowOpen( vlc_object_t *p_obj )
         return VLC_EGENERIC;
 
     vlc_value_t val;
-
-    if( var_Get( p_obj->p_libvlc, "qt4-iface", &val ) )
+    if( var_Inherit( p_obj, "qt4-iface", VLC_VAR_ADDRESS, &val ) )
         val.p_address = NULL;
 
     intf_thread_t *p_intf = (intf_thread_t *)val.p_address;
