@@ -2405,10 +2405,6 @@ static int InputSourceInit( input_thread_t *p_input,
             }
             psz_path += i_localhost;
         }
-        /* Remove HTML anchor if present (not supported). */
-        char *p = strchr( psz_path, '#' );
-        if( p )
-            *p = '\0';
         /* Then URI-decode the path. */
         decode_URI( psz_path );
 #if defined( WIN32 ) && !defined( UNDER_CE )
@@ -3093,13 +3089,12 @@ void input_SplitMRL( const char **ppsz_access, const char **ppsz_demux,
         *psz_path = '\0';
         psz_path += 3; /* skips "://" */
 
-        /* Separate access from demux (<access>/<demux>://<path>) */
         psz_access = psz_dup;
-
         /* We really don't want module name substitution here! */
         if( psz_access[0] == '$' )
             psz_access++;
 
+        /* Separate access from demux (<access>/<demux>://<path>) */
         char *p = strchr( psz_access, '/' );
         if( p )
         {
@@ -3108,6 +3103,12 @@ void input_SplitMRL( const char **ppsz_access, const char **ppsz_demux,
             if( psz_demux[0] == '$' )
                 psz_demux++;
         }
+
+        /* Remove HTML anchor if present (not supported).
+         * The hash symbol itself should be URI-encoded. */
+        p = strchr( psz_path, '#' );
+        if( p )
+            *p = '\0';
     }
     else
     {
