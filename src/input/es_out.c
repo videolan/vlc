@@ -734,13 +734,13 @@ static bool EsOutIsExtraBufferingAllowed( es_out_t *out )
         if( p_es->p_dec_record )
             i_size += input_DecoderGetFifoSize( p_es->p_dec_record );
     }
-    //fprintf( stderr, "----- EsOutIsExtraBufferingAllowed =% 5d kbytes -- ", i_size / 1024 );
+    //msg_Info( out, "----- EsOutIsExtraBufferingAllowed =% 5d KiB -- ", i_size / 1024 );
 
     /* TODO maybe we want to be able to tune it ? */
 #if defined(OPTIMIZE_MEMORY)
-    const size_t i_level_high = 500000;  /* 0.5 Mbytes */
+    const size_t i_level_high = 512*1024;  /* 0.5 MiB */
 #else
-    const size_t i_level_high = 10000000; /* 10 Mbytes */
+    const size_t i_level_high = 10*1024*1024; /* 10 MiB */
 #endif
     return i_size < i_level_high;
 }

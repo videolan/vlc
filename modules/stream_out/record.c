@@ -148,11 +148,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_date_start = -1;
     p_sys->i_size = 0;
 #ifdef OPTIMIZE_MEMORY
-    p_sys->i_max_wait = 5*1000000; /* 5s */
-    p_sys->i_max_size = 1*1000000; /* 1 Mbyte */
+    p_sys->i_max_wait = 5*CLOCK_FREQ; /* 5s */
+    p_sys->i_max_size = 1*1024*1024; /* 1 MiB */
 #else
-    p_sys->i_max_wait = 30*1000000; /* 30s */
-    p_sys->i_max_size = 20*1000000; /* 20 Mbyte */
+    p_sys->i_max_wait = 30*CLOCK_FREQ; /* 30s */
+    p_sys->i_max_size = 20*1024*1024; /* 20 MiB */
 #endif
     p_sys->b_drop = false;
     p_sys->i_dts_start = 0;

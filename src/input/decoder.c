@@ -369,9 +369,9 @@ void input_DecoderDecode( decoder_t *p_dec, block_t *p_block, bool b_do_pace )
             block_FifoPace( p_owner->p_fifo, 10, SIZE_MAX );
     }
 #ifdef __arm__
-    else if( block_FifoSize( p_owner->p_fifo ) > 50000000 /* 50 MB */ )
+    else if( block_FifoSize( p_owner->p_fifo ) > 50*1024*1024 /* 50 MiB */ )
 #else
-    else if( block_FifoSize( p_owner->p_fifo ) > 400000000 /* 400 MB, ie ~ 50mb/s for 60s */ )
+    else if( block_FifoSize( p_owner->p_fifo ) > 400*1024*1024 /* 400 MiB, ie ~ 50mb/s for 60s */ )
 #endif
     {
         /* FIXME: ideally we would check the time amount of data
