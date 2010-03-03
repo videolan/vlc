@@ -160,6 +160,21 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QFont font( index.data( Qt::FontRole ).value<QFont>() );
     font.setPointSize( 7 );
 
+    //Draw children indicator
+    if( !index.data( PLModel::IsLeafNodeRole ).toBool() )
+    {
+        painter->setOpacity( 0.75 );
+        QRect r( option.rect );
+        r.setSize( QSize( 25, 25 ) );
+        r.translate( 5, 5 );
+        painter->fillRect( r, option.palette.color( QPalette::Mid ) );
+        painter->setOpacity( 1.0 );
+        QPixmap dirPix( ":/type/node" );
+        QRect r2( dirPix.rect() );
+        r2.moveCenter( r.center() );
+        painter->drawPixmap( r2, dirPix );
+    }
+
     // Draw title
     font.setItalic( true );
     painter->setFont( font );
@@ -252,6 +267,15 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     {
         textRect.setHeight( fm.height() );
         textRect.moveBottom( option.rect.center().y() - 1 );
+    }
+
+    //Draw children indicator
+    if( !index.data( PLModel::IsLeafNodeRole ).toBool() )
+    {
+        QPixmap dirPix = QPixmap( ":/type/node" );
+        painter->drawPixmap( QPoint( textRect.x(), textRect.center().y() - dirPix.height() / 2 ),
+                             dirPix );
+        textRect.setLeft( textRect.x() + dirPix.width() + 5 );
     }
 
     painter->drawText( textRect,

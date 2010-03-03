@@ -354,7 +354,19 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
         return QVariant( QBrush( Qt::gray ) );
     }
     else if( role == IsCurrentRole ) return QVariant( isCurrent( index ) );
+    else if( role == IsLeafNodeRole )
+    {
+        QVariant isLeaf;
+        PL_LOCK;
+        playlist_item_t *plItem =
+            playlist_ItemGetById( p_playlist, item->i_id );
 
+        if( plItem )
+            isLeaf = plItem->i_children == -1;
+
+        PL_UNLOCK;
+        return isLeaf;
+    }
     return QVariant();
 }
 

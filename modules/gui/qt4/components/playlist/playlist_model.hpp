@@ -55,7 +55,8 @@ friend class PLItem;
 
 public:
     enum {
-      IsCurrentRole = Qt::UserRole
+      IsCurrentRole = Qt::UserRole,
+      IsLeafNodeRole
     };
 
     PLModel( playlist_t *, intf_thread_t *,
