@@ -48,12 +48,35 @@ QString AbstractPlViewItemDelegate::getMeta( const QModelIndex & index, int meta
                                 .data().toString();
 }
 
-void AbstractPlViewItemDelegate::paintPlayingItemBg( QPainter *painter, const QStyleOptionViewItem & option ) const
+void AbstractPlViewItemDelegate::paintBackground(
+    QPainter *painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
+    /* FIXME: This does not indicate item selection in all QStyles, so for the time being we
+       have to draw it ourselves, to ensure visible effect of selection on all platforms */
+    /* QApplication::style()->drawPrimitive( QStyle::PE_PanelItemViewItem, &option,
+                                            painter ); */
+
     painter->save();
-    painter->setOpacity( 0.5 );
-    painter->setBrush( QBrush( Qt::gray ) );
-    painter->fillRect( option.rect, option.palette.color( QPalette::Dark ) );
+    QRect r = option.rect.adjusted( 0, 0, -1, -1 );
+    if( option.state & QStyle::State_Selected )
+    {
+        painter->setBrush( option.palette.color( QPalette::Highlight ) );
+        painter->setPen( option.palette.color( QPalette::Highlight ).darker( 150 ) );
+        painter->drawRect( r );
+    }
+    else if( index.data( PLModel::IsCurrentRole ).toBool() )
+    {
+        painter->setBrush( QBrush( Qt::lightGray ) );
+        painter->setPen( QColor( Qt::darkGray ) );
+        painter->drawRect( r );
+    }
+    if( option.state & QStyle::State_MouseOver )
+    {
+        painter->setOpacity( 0.5 );
+        painter->setPen( Qt::NoPen );
+        painter->setBrush( option.palette.color( QPalette::Highlight ).lighter( 150 ) );
+        painter->drawRect( option.rect );
+    }
     painter->restore();
 }
 
@@ -108,19 +131,9 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
     QPixmap artPix = getArtPixmap( index, QSize( ART_SIZE_W, ART_SIZE_H ) );
 
-    QApplication::style()->drawPrimitive( QStyle::PE_PanelItemViewItem, &option,
-                                          painter );
+    paintBackground( painter, option, index );
 
     painter->save();
-
-    if( index.data( PLModel::IsCurrentRole ).toBool() )
-    {
-       painter->save();
-       painter->setOpacity( 0.2 );
-       painter->setBrush( QBrush( Qt::gray ) );
-       painter->drawRoundedRect( option.rect.adjusted( 0, 0, -1, -1 ), ART_RADIUS, ART_RADIUS );
-       painter->restore();
-    }
 
     QRect artRect( option.rect.x() + 5 + ( ART_SIZE_W - artPix.width() ) / 2,
                    option.rect.y() + 5 + ( ART_SIZE_H - artPix.height() ) / 2,
@@ -209,12 +222,8 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
     QPixmap artPix = getArtPixmap( index, QSize( LISTVIEW_ART_SIZE, LISTVIEW_ART_SIZE ) );
 
-    //Draw selection rectangle
-    QApplication::style()->drawPrimitive( QStyle::PE_PanelItemViewItem, &option, painter );
-
-    //Paint background if item is playing
-    if( index.data( PLModel::IsCurrentRole ).toBool() )
-        paintPlayingItemBg( painter, option );
+    //Draw selection rectangle and current playing item indication
+    paintBackground( painter, option, index );
 
     QRect artRect( artPix.rect() );
     artRect.moveCenter( QPoint( artRect.center().x() + 3,
