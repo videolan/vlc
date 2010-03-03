@@ -543,6 +543,8 @@ static int WindowOpen( vlc_object_t *p_obj )
     if( var_InheritBool( p_obj, "video-wallpaper" ) )
         return VLC_EGENERIC;
 #endif
+    if( !var_InheritBool( p_obj, "embedded-video" ) )
+        return VLC_EGENERIC;
 
     vlc_value_t val;
 
