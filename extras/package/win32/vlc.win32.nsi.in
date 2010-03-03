@@ -314,6 +314,14 @@ FunctionEnd
 ; 3. Delete prefs and cache ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+!macro gencache
+  SetShellVarContext all
+  CreateDirectory "$APPDATA\\VideoLAN"
+  CreateDirectory "$APPDATA\\VideoLAN\\VLC"
+  ExecWait "$INSTDIR\vlc-cache-gen.exe $APPDATA\\VideoLAN\\VLC"
+  SetShellVarContext current
+!macroend
+
 !macro delprefs
   StrCpy $0 0
   !define Index 'Line${__LINE__}'
@@ -331,6 +339,9 @@ FunctionEnd
     Goto "${Index}-Loop"
   "${Index}-End:"
   !undef Index
+  SetShellVarContext all
+  RMDir /r "$APPDATA\\VideoLAN"
+  SetShellVarContext current
 !macroend
 
 ;;;;;;;;;;;;;;;
@@ -414,6 +425,7 @@ Section $Name_Section01 SEC01
   ; VLC.exe, libvlc.dll
   !insertmacro InstallFile vlc.exe
   !insertmacro InstallFile vlc.exe.manifest
+  !insertmacro InstallFile vlc-cache-gen.exe
 
   ; All dlls
   !insertmacro InstallFile *.dll
@@ -428,6 +440,7 @@ Section $Name_Section01 SEC01
 @BUILD_SKINS_TRUE@   !insertmacro InstallFolder skins
 @BUILD_HTTPD_TRUE@   !insertmacro InstallFolder http
 @BUILD_LUA_TRUE@     !insertmacro InstallFolder lua
+  !insertmacro gencache
 
 
   ; URLs
