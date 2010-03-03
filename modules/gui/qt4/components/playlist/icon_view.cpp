@@ -266,7 +266,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     if( !artistAlbum.isEmpty() )
     {
         textRect.setHeight( fm.height() );
-        textRect.moveBottom( option.rect.center().y() - 1 );
+        textRect.moveBottom( option.rect.center().y() - 2 );
     }
 
     //Draw children indicator
@@ -289,7 +289,8 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
         painter->setFont( f );
         fm = painter->fontMetrics();
 
-        textRect.moveTop( textRect.bottom() + 2 );
+        textRect.moveTop( textRect.bottom() + 4 );
+        textRect.setLeft( textRect.x() + 20 );
 
         painter->drawText( textRect,
                            fm.elidedText( artistAlbum, Qt::ElideRight, textRect.width() ),
@@ -304,7 +305,7 @@ QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, co
   QFont f;
   f.setBold( true );
   QFontMetrics fm( f );
-  int height = qMax( LISTVIEW_ART_SIZE, 2 * fm.height() + 2 ) + 6;
+  int height = qMax( LISTVIEW_ART_SIZE, 2 * fm.height() + 4 ) + 6;
   return QSize( 0, height );
 }
 
