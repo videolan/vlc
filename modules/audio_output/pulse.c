@@ -338,7 +338,6 @@ static void Close ( vlc_object_t *p_this )
     msg_Dbg(p_aout, "Pulse Close");
 
     if(p_sys->stream){
-        pa_operation *o;
         pa_threaded_mainloop_lock(p_sys->mainloop);
         pa_stream_set_write_callback(p_sys->stream, NULL, NULL);
 
@@ -347,7 +346,8 @@ static void Close ( vlc_object_t *p_this )
  * And disabling this speeds up closing pulseaudio quite a lot (atleast for me).
  */
 #if 0
-        if((o = pa_stream_drain(p_sys->stream, success_cb, p_aout))){
+        pa_operation *o = pa_stream_drain(p_sys->stream, success_cb, p_aout);
+        if(o){
             while (pa_operation_get_state(o) != PA_OPERATION_DONE) {
                 CHECK_DEAD_GOTO(fail);
                 pa_threaded_mainloop_wait(p_sys->mainloop);
