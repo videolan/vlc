@@ -406,7 +406,7 @@ void StandardPLPanel::cycleViews()
 
 void StandardPLPanel::activate( const QModelIndex &index )
 {
-    if( model->hasChildren( index ) )
+    if( !index.data( PLModel::IsLeafNodeRole ).toBool() )
     {
         if( currentView != treeView )
             browseInto( index );
