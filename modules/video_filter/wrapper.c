@@ -490,7 +490,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     {
         var_SetInteger( p_vout, "mouse-button-down", nmouse.i_pressed );
         if( vlc_mouse_HasPressed( &omouse, &nmouse, MOUSE_BUTTON_LEFT ) )
-            var_SetBool( p_vout, "mouse-clicked", true );
+            var_SetCoords( p_vout, "mouse-clicked", nmouse.i_x, nmouse.i_y );
     }
     if( m.b_double_click )
     {
