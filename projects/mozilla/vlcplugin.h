@@ -30,7 +30,6 @@
 #define __VLCPLUGIN_H__
 
 #include <vlc/vlc.h>
-#include <pthread.h>
 #include <npapi.h>
 #include <vector>
 
@@ -44,6 +43,7 @@
 
 #ifdef XP_WIN
     /* Windows stuff */
+#   include <winbase.h>
 #endif
 
 #ifdef XP_MACOSX
@@ -52,6 +52,7 @@
 #endif
 
 #ifdef XP_UNIX
+#   include <pthread.h>
     /* X11 stuff */
 #   include <X11/Xlib.h>
 #   include <X11/Intrinsic.h>
@@ -69,6 +70,17 @@
 #ifndef __MIN
 #   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
+
+typedef struct {
+#if defined(XP_UNIX)
+    pthread_mutex_t mutex;
+#elif defined(XP_WIN)
+    CRITICAL_SECTION cs;
+#else
+#warning "locking not implemented in this platform"
+#endif
+} plugin_lock_t;
+
 
 typedef enum vlc_toolbar_clicked_e {
     clicked_Unknown = 0,
@@ -151,9 +163,7 @@ private:
     lr_l _llist;
     ev_l _elist;
 
-#if defined(XP_UNIX)
-    pthread_mutex_t mutex;
-#endif
+    plugin_lock_t lock;
 
     bool ask_for_event(event_t e);
     void unask_for_event(event_t e);

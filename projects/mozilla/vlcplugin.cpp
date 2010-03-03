@@ -37,12 +37,70 @@
 
 #include <ctype.h>
 #if defined(XP_UNIX)
-# include <pthread.h>
+#   include <pthread.h>
+#elif defined(XP_WIN)
+    /* windows headers */
+#   include <winbase.h>
 #else
 #warning "locking not implemented for this platform"
 #endif
 
 #include <stdio.h>
+
+/*****************************************************************************
+ * utilitiy functions
+ *****************************************************************************/
+static void plugin_lock_init(plugin_lock_t *lock)
+{
+    assert(lock);
+
+#if defined(XP_UNIX)
+    pthread_mutex_init(&lock->mutex, NULL);
+#elif defined(XP_WIN)
+    InitializeCriticalSection(&lock->cs);
+#else
+#warning "locking not implemented in this platform"
+#endif
+}
+
+static void plugin_lock_destroy(plugin_lock_t *lock)
+{
+    assert(lock);
+
+#if defined(XP_UNIX)
+    pthread_mutex_destroy(&lock->mutex);
+#elif defined(XP_WIN)
+    DeleteCriticalSection(&lock->cs);
+#else
+#warning "locking not implemented in this platform"
+#endif
+}
+
+static void plugin_lock(plugin_lock_t *lock)
+{
+    assert(lock);
+
+#if defined(XP_UNIX)
+    pthread_mutex_lock(&lock->mutex);
+#elif defined(XP_WIN)
+    EnterCriticalSection(&lock->cs);
+#else
+#warning "locking not implemented in this platform"
+#endif
+}
+
+static void plugin_unlock(plugin_lock_t *lock)
+{
+    assert(lock);
+
+#if defined(XP_UNIX)
+    pthread_mutex_unlock(&lock->mutex);
+#elif defined(XP_WIN)
+    LeaveCriticalSection(&lock->cs);
+#else
+#warning "locking not implemented in this platform"
+#endif
+}
 
 /*****************************************************************************
  * VlcPlugin constructor and destructor
@@ -95,20 +153,13 @@ static bool boolValue(const char *value) {
 
 bool EventObj::init()
 {
-#if defined(XP_UNIX)
-    return pthread_mutex_init(&mutex, NULL) == 0;
-#else
-#warning "locking not implemented for this platform"
-#endif
+    plugin_lock_init(&lock);
+    return true;
 }
 
 EventObj::~EventObj()
 {
-#if defined(XP_UNIX)
-    pthread_mutex_destroy(&mutex);
-#else
-#warning "locking not implemented for this platform"
-#endif
+    plugin_lock_destroy(&lock);
 }
 
 void EventObj::deliver(NPP browser)
@@ -116,11 +167,8 @@ void EventObj::deliver(NPP browser)
     NPVariant result;
     NPVariant params[1];
 
-#if defined(XP_UNIX)
-    pthread_mutex_lock(&mutex);
-#else
-#warning "locking not implemented for this platform"
-#endif
+    plugin_lock(&lock);
+
     for( ev_l::iterator i=_elist.begin();i!=_elist.end();++i )
     {
         libvlc_event_type_t event = *i;
@@ -139,11 +187,8 @@ void EventObj::deliver(NPP browser)
         }
     }
     _elist.clear();
-#if defined(XP_UNIX)
-    pthread_mutex_unlock(&mutex);
-#else
-#warning "locking not implemented for this platform"
-#endif
+
+    plugin_unlock(&lock);
 }
 
 void VlcPlugin::eventAsync(void *param)
@@ -154,18 +199,12 @@ void VlcPlugin::eventAsync(void *param)
 
 void EventObj::callback(const libvlc_event_t* event)
 {
-#if defined(XP_UNIX)
-    pthread_mutex_lock(&mutex);
-#else
-#warning "locking not implemented for this platform"
-#endif
+    plugin_lock(&lock);
+
     if( have_event(event->type) )
         _elist.push_back(event->type);
-#if defined(XP_UNIX)
-    pthread_mutex_unlock(&mutex);
-#else
-#warning "locking not implemented for this platform"
-#endif
+
+    plugin_unlock(&lock);
 }
 
 void VlcPlugin::event_callback(const libvlc_event_t* event, void *param)
@@ -176,7 +215,7 @@ void VlcPlugin::event_callback(const libvlc_event_t* event, void *param)
     NPN_PluginThreadAsyncCall(plugin->getBrowser(), eventAsync, plugin);
 #else
 #warning NPN_PluginThreadAsyncCall not implemented yet.
-    printf("%s","No NPN_PluginThreadAsyncCall(), doing nothing.");
+    printf("No NPN_PluginThreadAsyncCall(), doing nothing.");
 #endif
 }
 
