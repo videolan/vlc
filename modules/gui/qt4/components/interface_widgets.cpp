@@ -282,6 +282,7 @@ QSize VideoWidget::sizeHint() const
 #define ICON_SIZE 128
 #define MAX_BG_SIZE 400
 #define MIN_BG_SIZE 128
+#define MARGIN 5
 
 BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
                  :QWidget( NULL ), p_intf( _p_i )
@@ -298,7 +299,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
 
     /* A cone in the middle */
     label = new QLabel;
-    label->setMargin( 5 );
+    label->setMargin( MARGIN );
     label->setAlignment( Qt::AlignCenter );
 
     /* Init the cone art */
@@ -317,7 +318,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
 
 void BackgroundWidget::resizeEvent( QResizeEvent * event )
 {
-    if( event->size().height() <= MIN_BG_SIZE )
+    if( event->size().height() <= MIN_BG_SIZE + MARGIN * 2 + 2 )
         label->hide();
     else
         label->show();
