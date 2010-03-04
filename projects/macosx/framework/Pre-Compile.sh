@@ -245,7 +245,7 @@ vlc_install `dirname ${cache}` `basename ${cache}` ${target_plugins} "data"
 vlc_install "src/${prefix}" "libvlc.5.dylib" "${target_lib}" "lib"
 vlc_install "src/${prefix}" "libvlccore.4.dylib" "${target_lib}" "lib"
 pushd `pwd` > /dev/null
-cd ${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}/lib
+cd ${target_lib}
 ln -sf libvlc.5.dylib libvlc.dylib
 ln -sf libvlccore.4.dylib libvlccore.dylib
 popd > /dev/null
@@ -263,7 +263,7 @@ $pbxcp ${main_build_dir}/share/lua ${target_share}
 if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
     echo "Exporting headers..."
     mkdir -p ${target_include}/vlc
-    $pbxcp ${main_build_dir}/include/vlc/*.h ${target_include}/vlc
+    $pbxcp ${VLC_SRC_DIR}/include/vlc/*.h ${target_include}/vlc
 else
     echo "Headers not needed for this product"
 fi
