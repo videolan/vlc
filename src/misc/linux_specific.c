@@ -28,23 +28,14 @@
 #include <vlc_common.h>
 #include "../libvlc.h"
 
-#if 0
-#include <assert.h>
-#include <pthread.h>
-#include <limits.h>
+static const char default_path[] = PKGLIBDIR;
 
 static void set_libvlc_path (void)
 {
-    static char libvlc_path[PATH_MAX];
-
-    assert (strlen (LIBDIR) < sizeof (libvlc_path));
-    strcpy (libvlc_path, LIBDIR); /* fail safe */
-    psz_vlcpath = libvlc_path;
-
     /* Find the path to libvlc (i.e. ourselves) */
     FILE *maps = fopen ("/proc/self/maps", "rt");
     if (maps == NULL)
-        return;
+        goto error;
 
     char *line = NULL;
     size_t linelen = 0;
@@ -68,15 +59,29 @@ static void set_libvlc_path (void)
         if (end == NULL)
             continue;
         *file = '\0';
-        printf ("libvlc at %s\n", dir);
-        if (strlen (dir) < sizeof (libvlc_path))
-            strcpy (libvlc_path, dir);
+        if (asprintf (&psz_vlcpath, "%s/"PACKAGE, dir) == -1)
+            goto error;
         break;
     }
     free (line);
     fclose (maps);
+    return;
+
+error:
+    psz_vlcpath = (char *)default_path; /* default, cannot fail */
 }
-#endif
+
+static void unset_libvlc_path (void)
+{
+    if (psz_vlcpath != default_path)
+        free (psz_vlcpath);
+}
+
+static struct
+{
+    vlc_mutex_t lock;
+    unsigned refs;
+} once = { VLC_STATIC_MUTEX, 0 };
 
 #ifdef __GLIBC__
 # include <gnu/libc-version.h>
@@ -102,10 +107,11 @@ void system_Init (libvlc_int_t *libvlc, int *argc, const char *argv[])
     }
 #endif
 
-#if 0
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once (&once, set_libvlc_path);
-#endif
+    vlc_mutex_lock (&once.lock);
+    if (once.refs++ == 0)
+        set_libvlc_path ();
+    vlc_mutex_unlock (&once.lock);
+
     (void)libvlc; (void)argc; (void)argv;
 }
 
@@ -116,6 +122,10 @@ void system_Configure (libvlc_int_t *libvlc, int *argc, const char *argv[])
 
 void system_End (libvlc_int_t *libvlc)
 {
+    vlc_mutex_lock (&once.lock);
+    if (--once.refs == 0)
+        unset_libvlc_path ();
+    vlc_mutex_unlock (&once.lock);
+
     (void)libvlc;
 }
-
