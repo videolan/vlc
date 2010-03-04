@@ -44,13 +44,13 @@ if test "${ACTION}" != "build"; then
 fi
 
 lib="lib"
-modules="modules"
+plugins="plugins"
 share="share"
 include="include"
 target="${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}"
 target_bin="${target}/bin"
 target_lib="${target}/${lib}"            # Should we consider using a different well-known folder like shared resources?
-target_modules="${target}/${modules}"    # Should we consider using a different well-known folder like shared resources?
+target_plugins="${target}/${plugins}"    # Should we consider using a different well-known folder like shared resources?
 target_share="${target}/${share}"    # Should we consider using a different well-known folder like shared resources?
 target_include="${target}/${include}"    # Should we consider using a different well-known folder like shared resources?
 linked_libs=""
@@ -75,7 +75,7 @@ vlc_install_object() {
     if [ $type = "lib" ]; then
         local install_name="@loader_path/lib"
     elif [ $type = "module" ]; then
-        local install_name="@loader_path/modules"
+        local install_name="@loader_path/plugins"
     fi
     if [ "$destination_name" != "" ]; then
         local lib_dest="$dest_dir/$destination_name$suffix"
@@ -149,25 +149,37 @@ vlc_install() {
         if test $type = "data"; then
             vlc_install_object "$main_build_dir/$1/$2" "$dest_dir" "$type" $5
         else
+            fatdest="$dest_dir/$2"
+            shouldUpdateFat="no"
+
             objects=""
+
+            # Create a temporary destination dir to store each ARCH object file
             tmp_dest_dir="$VLC_BUILD_DIR/tmp/$type"
+            rm -Rf "${tmp_dest_dir}/*"
             mkdir -p "$tmp_dest_dir"
-            newinstall="no"
+
             for arch in $ARCHS; do
-                vlc_install_object "$VLC_BUILD_DIR/$arch/$1/$2" "$tmp_dest_dir" "$type" "$5" "" ".$arch"
-                local dest="$tmp_dest_dir/$2.$arch"
-                if test -e ${dest}; then
-                    if ! test "$dest_dir/$2" -nt "${dest}"; then
-                        newinstall="yes"
+                local src="$VLC_BUILD_DIR/$arch/$1/$2"
+
+                # Only install if the new image is newer than the one we have installed.
+                if ((! test -e ${fatdest}) || test ${src} -nt ${fatdest} ); then
+                    vlc_install_object "$src" "$tmp_dest_dir" "$type" "$5" "" ".$arch"
+                    local dest="$tmp_dest_dir/$2.$arch"
+                    if test -e ${dest}; then
+                        if ! test "$dest_dir/$2" -nt "${dest}"; then
+                            shouldUpdateFat="yes"
+                        fi
+                        objects="${dest} $objects"
+                    else
+                        echo "Warning: building $2 without $arch"
                     fi
-                    objects="${dest} $objects"
-                else
-                    echo "Warning: building $2 without $arch"
                 fi
             done;
-            if test "$newinstall" = "yes"; then
-                echo "Creating fat $type $dest_dir/$2"
-                lipo $objects -output "$dest_dir/$2" -create
+
+            if test "$shouldUpdateFat" = "yes"; then
+                echo "Creating fat $type $fatdest"
+                lipo $objects -output "$fatdest" -create
             fi
         fi
     fi
@@ -178,7 +190,7 @@ vlc_install() {
 ##########################
 # Create a symbolic link in the root of the framework
 mkdir -p ${target_lib}
-mkdir -p ${target_modules}
+mkdir -p ${target_plugins}
 mkdir -p ${target_bin}
 
 if [ "$RELEASE_MAKEFILE" != "yes" ] ; then
@@ -186,11 +198,11 @@ if [ "$RELEASE_MAKEFILE" != "yes" ] ; then
     cd ${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}
 
     ln -sf Versions/Current/${lib} .
-    ln -sf Versions/Current/${modules} .
+    ln -sf Versions/Current/${plugins} .
     ln -sf Versions/Current/${include} .
     ln -sf Versions/Current/${share} .
     ln -sf Versions/Current/bin .
-    ln -sf ../modules Versions/Current/bin
+    ln -sf ../plugins Versions/Current/bin
     ln -sf ../share Versions/Current/bin
 
     popd > /dev/null
@@ -213,19 +225,19 @@ fi
 
 
 ##########################
-# Build the modules folder (Same as VLCKit.framework/modules in Makefile)
-echo "Building modules folder..."
-# Figure out what modules are available to install
+# Build the plugins folder (Same as VLCKit.framework/plugins in Makefile)
+echo "Building plugins folder..."
+# Figure out what plugins are available to install
 for module in `find ${main_build_dir}/modules -path "*dylib.dSYM*" -prune -o -name "lib*_plugin.dylib" -print | sed -e s:${main_build_dir}/::` ; do
     # Check to see that the reported module actually exists
     if test -n ${module}; then
-        vlc_install `dirname ${module}` `basename ${module}` ${target_modules} "module"
+        vlc_install `dirname ${module}` `basename ${module}` ${target_plugins} "module"
     fi
 done
 
 # Install the module cache
 cache=`ls ${main_build_dir}/modules/plugins-*.dat | sed -e s:${main_build_dir}/::`
-vlc_install `dirname ${cache}` `basename ${cache}` ${target_modules} "data"
+vlc_install `dirname ${cache}` `basename ${cache}` ${target_plugins} "data"
 
 # Build the lib folder
 ##########################
