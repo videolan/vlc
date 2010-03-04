@@ -148,6 +148,7 @@ struct es_out_sys_t
 
     /* Clock configuration */
     mtime_t     i_pts_delay;
+    mtime_t     i_pts_jitter;
     int         i_cr_average;
     int         i_rate;
 
@@ -310,6 +311,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
 
     p_sys->i_rate = i_rate;
     p_sys->i_pts_delay = 0;
+    p_sys->i_pts_jitter = 0;
     p_sys->i_cr_average = 0;
 
     p_sys->b_buffering = true;
@@ -2307,23 +2309,32 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 else if( b_late && ( !p_sys->p_input->p->p_sout ||
                                      !p_sys->p_input->p->b_out_pace_control ) )
                 {
+                    const mtime_t i_pts_delay_base = p_sys->i_pts_delay - p_sys->i_pts_jitter;
                     mtime_t i_pts_delay = input_clock_GetJitter( p_pgrm->p_clock );
 
                     /* Avoid dangerously high value */
-                    const mtime_t i_pts_delay_max = 30000000;
-                    if( i_pts_delay > i_pts_delay_max )
-                        i_pts_delay = __MAX( i_pts_delay_max, p_sys->i_pts_delay );
+                    const mtime_t i_jitter_max = INT64_C(1000) * var_InheritInteger( p_sys->p_input, "clock-jitter" );
+                    if( i_pts_delay > __MIN( i_pts_delay_base + i_jitter_max, INPUT_PTS_DELAY_MAX ) )
+                    {
+                        msg_Err( p_sys->p_input,
+                                 "ES_OUT_SET_(GROUP_)PCR  is called too late (jitter of %d ms ingnored)",
+                                 (int)(i_pts_delay - i_pts_delay_base) / 1000 );
+                        i_pts_delay = p_sys->i_pts_delay;
+                    }
+                    else
+                    {
+                        msg_Err( p_sys->p_input,
+                                 "ES_OUT_SET_(GROUP_)PCR  is called too late (pts_delay increased to %d ms)",
+                                 (int)(i_pts_delay/1000) );
+                    }
 
                     /* Force a rebufferization when we are too late */
-                    msg_Err( p_sys->p_input,
-                             "ES_OUT_SET_(GROUP_)PCR  is called too late, increasing pts_delay to %d ms",
-                             (int)(i_pts_delay/1000) );
 
                     /* It is not really good, as we throw away already buffered data
                      * TODO have a mean to correctly reenter bufferization */
                     es_out_Control( out, ES_OUT_RESET_PCR );
 
-                    es_out_SetJitter( out, i_pts_delay, 0, p_sys->i_cr_average );
+                    es_out_SetJitter( out, i_pts_delay_base, i_pts_delay - i_pts_delay_base, p_sys->i_cr_average );
                 }
             }
             return VLC_SUCCESS;
@@ -2602,14 +2613,16 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             mtime_t i_pts_jitter = (mtime_t)va_arg( args, mtime_t );
             int     i_cr_average = (int)va_arg( args, int );
 
-            if( i_pts_delay + i_pts_jitter == p_sys->i_pts_delay &&
-                i_cr_average == p_sys->i_cr_average )
-                return VLC_SUCCESS;
+            bool b_change_clock =
+                i_pts_delay + i_pts_jitter != p_sys->i_pts_delay ||
+                i_cr_average != p_sys->i_cr_average;
 
-            p_sys->i_pts_delay = i_pts_delay + i_pts_jitter;
+            assert( i_pts_jitter >= 0 );
+            p_sys->i_pts_delay  = i_pts_delay + i_pts_jitter;
+            p_sys->i_pts_jitter = i_pts_jitter;
             p_sys->i_cr_average = i_cr_average;
 
-            for( int i = 0; i < p_sys->i_pgrm; i++ )
+            for( int i = 0; i < p_sys->i_pgrm && b_change_clock; i++ )
                 input_clock_SetJitter( p_sys->pgrm[i]->p_clock,
                                        i_pts_delay + i_pts_jitter, i_cr_average );
             return VLC_SUCCESS;

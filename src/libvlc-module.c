@@ -634,6 +634,11 @@ static const char *const ppsz_pos_descriptions[] =
     "real-time sources. Use this if you experience jerky playback of " \
     "network streams.")
 
+#define CLOCK_JITTER_TEXT N_("Clock jitter")
+#define CLOCK_JITTER_LONGTEXT N_( \
+    "It tells the clock algorithms what is the maximal input jitter that " \
+    "is considered valid and can be compensated (in milliseconds)" )
+
 #define NETSYNC_TEXT N_("Network synchronisation" )
 #define NETSYNC_LONGTEXT N_( "This allows you to remotely " \
         "synchronise clocks for server and client. The detailed settings " \
@@ -1900,6 +1905,9 @@ vlc_module_begin ()
     add_integer( "clock-synchro", -1, NULL, CLOCK_SYNCHRO_TEXT,
                  CLOCK_SYNCHRO_LONGTEXT, true )
         change_integer_list( pi_clock_values, ppsz_clock_descriptions, NULL )
+    add_integer( "clock-jitter", 5 * CLOCK_FREQ/1000, NULL, CLOCK_JITTER_TEXT,
+              CLOCK_JITTER_LONGTEXT, true )
+        change_safe()
 
     add_bool( "network-synchronisation", false, NULL, NETSYNC_TEXT,
               NETSYNC_LONGTEXT, true )

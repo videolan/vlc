@@ -110,9 +110,6 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
 
 static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO fix name */
 
-/* Do not let a pts_delay from access/demux go beyong 60s */
-#define INPUT_PTS_DELAY_MAX INT64_C(60000000)
-
 #undef input_Create
 /**
  * Create a new input_thread_t.
