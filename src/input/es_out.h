@@ -79,7 +79,7 @@ enum es_out_query_private_e
     ES_OUT_SET_TIMES,                               /* arg1=double f_position arg2=mtime_t i_time arg3=mtime_t i_length res=cannot fail */
 
     /* Set jitter */
-    ES_OUT_SET_JITTER,                              /* arg1=mtime_t i_pts_delay arg2=int i_cr_average res=cannot fail */
+    ES_OUT_SET_JITTER,                              /* arg1=mtime_t i_pts_delay arg2= mtime_t i_pts_jitter, arg2=int i_cr_average res=cannot fail */
 };
 
 static inline void es_out_SetMode( es_out_t *p_out, int i_mode )
@@ -141,9 +141,11 @@ static inline void es_out_SetTimes( es_out_t *p_out, double f_position, mtime_t 
     int i_ret = es_out_Control( p_out, ES_OUT_SET_TIMES, f_position, i_time, i_length );
     assert( !i_ret );
 }
-static inline void es_out_SetJitter( es_out_t *p_out, mtime_t i_pts_delay, int i_cr_average )
+static inline void es_out_SetJitter( es_out_t *p_out,
+                                     mtime_t i_pts_delay, mtime_t i_pts_jitter, int i_cr_average )
 {
-    int i_ret = es_out_Control( p_out, ES_OUT_SET_JITTER, i_pts_delay, i_cr_average );
+    int i_ret = es_out_Control( p_out, ES_OUT_SET_JITTER,
+                                i_pts_delay, i_pts_jitter, i_cr_average );
     assert( !i_ret );
 }
 static inline int es_out_GetEsObjects( es_out_t *p_out, int i_id,

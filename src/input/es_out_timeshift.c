@@ -132,6 +132,7 @@ typedef struct attribute_packed
         struct
         {
             mtime_t i_pts_delay;
+            mtime_t i_pts_jitter;
             int     i_cr_average;
         } jitter;
     } u;
@@ -1426,9 +1427,11 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     case ES_OUT_SET_JITTER:
     {
         mtime_t i_pts_delay = (mtime_t)va_arg( args, mtime_t );
+        mtime_t i_pts_jitter = (mtime_t)va_arg( args, mtime_t );
         int     i_cr_average = (int)va_arg( args, int );
 
         p_cmd->u.control.u.jitter.i_pts_delay = i_pts_delay;
+        p_cmd->u.control.u.jitter.i_pts_jitter = i_pts_jitter;
         p_cmd->u.control.u.jitter.i_cr_average = i_cr_average;
         break;
     }
@@ -1498,6 +1501,7 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
                                                p_cmd->u.control.u.times.i_length );
     case ES_OUT_SET_JITTER:
         return es_out_Control( p_out, i_query, p_cmd->u.control.u.jitter.i_pts_delay,
+                                               p_cmd->u.control.u.jitter.i_pts_jitter,
                                                p_cmd->u.control.u.jitter.i_cr_average );
 
     default:

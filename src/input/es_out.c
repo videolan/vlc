@@ -2323,7 +2323,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                      * TODO have a mean to correctly reenter bufferization */
                     es_out_Control( out, ES_OUT_RESET_PCR );
 
-                    es_out_SetJitter( out, i_pts_delay, p_sys->i_cr_average );
+                    es_out_SetJitter( out, i_pts_delay, 0, p_sys->i_cr_average );
                 }
             }
             return VLC_SUCCESS;
@@ -2598,19 +2598,20 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         }
         case ES_OUT_SET_JITTER:
         {
-            mtime_t i_pts_delay = (mtime_t)va_arg( args, mtime_t );
+            mtime_t i_pts_delay  = (mtime_t)va_arg( args, mtime_t );
+            mtime_t i_pts_jitter = (mtime_t)va_arg( args, mtime_t );
             int     i_cr_average = (int)va_arg( args, int );
 
-            if( i_pts_delay == p_sys->i_pts_delay &&
+            if( i_pts_delay + i_pts_jitter == p_sys->i_pts_delay &&
                 i_cr_average == p_sys->i_cr_average )
                 return VLC_SUCCESS;
 
-            p_sys->i_pts_delay = i_pts_delay;
+            p_sys->i_pts_delay = i_pts_delay + i_pts_jitter;
             p_sys->i_cr_average = i_cr_average;
 
             for( int i = 0; i < p_sys->i_pgrm; i++ )
                 input_clock_SetJitter( p_sys->pgrm[i]->p_clock,
-                                       i_pts_delay, i_cr_average );
+                                       i_pts_delay + i_pts_jitter, i_cr_average );
             return VLC_SUCCESS;
         }
 

@@ -1142,7 +1142,7 @@ static void UpdatePtsDelay( input_thread_t *p_input )
     /* */
     es_out_SetDelay( p_input->p->p_es_out_display, AUDIO_ES, i_audio_delay );
     es_out_SetDelay( p_input->p->p_es_out_display, SPU_ES, i_spu_delay );
-    es_out_SetJitter( p_input->p->p_es_out, i_pts_delay, i_cr_average );
+    es_out_SetJitter( p_input->p->p_es_out, i_pts_delay, 0, i_cr_average );
 }
 
 static void InitPrograms( input_thread_t * p_input )
