@@ -72,6 +72,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     i_cached_id       = -1;
     i_cached_input_id = -1;
     i_popup_item      = i_popup_parent = -1;
+    sortingMenu       = NULL;
 
     rootItem          = NULL; /* PLItem rootItem, will be set in rebuild( ) */
 
@@ -102,6 +103,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 PLModel::~PLModel()
 {
     delete rootItem;
+    delete sortingMenu;
 }
 
 Qt::DropActions PLModel::supportedDropActions() const
@@ -952,12 +954,25 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     if( i_popup_item > -1 )
     {
         menu.addSeparator();
-        QMenu *sort_menu = menu.addMenu( qtr( "Sort by" ) + QString(" ") +
-            qfu( psz_column_title( columnToMeta( index.column() ) ) ) );
-        sort_menu->addAction( qtr( "Ascending" ),
-            this, SLOT( popupSortAsc() ) );
-        sort_menu->addAction( qtr( "Descending" ),
-            this, SLOT( popupSortDesc() ) );
+        if( !sortingMenu )
+        {
+            sortingMenu = new QMenu( qtr( "Sort by" ) );
+            sortingMapper = new QSignalMapper( this );
+            int i, j;
+            for( i = 1, j = 1; i < COLUMN_END; i <<= 1, j++ )
+            {
+                if( i == COLUMN_NUMBER ) continue;
+                QMenu *m = sortingMenu->addMenu( qfu( psz_column_title( i ) ) );
+                QAction *asc = m->addAction( qtr("Ascending") );
+                QAction *desc = m->addAction( qtr("Descending") );
+                sortingMapper->setMapping( asc, j );
+                sortingMapper->setMapping( desc, -j );
+                CONNECT( asc, triggered(), sortingMapper, map() );
+                CONNECT( desc, triggered(), sortingMapper, map() );
+            }
+            CONNECT( sortingMapper, mapped( int ), this, popupSort( int ) );
+        }
+        menu.addMenu( sortingMenu );
     }
     if( !menu.isEmpty() )
     {
@@ -1065,12 +1080,9 @@ void PLModel::popupAddNode()
     PL_UNLOCK;
 }
 
-void PLModel::popupSortAsc()
+void PLModel::popupSort( int column )
 {
-    sort( i_popup_parent, i_popup_column, Qt::AscendingOrder );
-}
-
-void PLModel::popupSortDesc()
-{
-    sort( i_popup_parent, i_popup_column, Qt::DescendingOrder );
+    sort( i_popup_parent,
+          column > 0 ? column - 1 : -column - 1,
+          column > 0 ? Qt::AscendingOrder : Qt::DescendingOrder );
 }

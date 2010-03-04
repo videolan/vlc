@@ -43,8 +43,8 @@
 #include <QSignalMapper>
 #include <QAbstractItemModel>
 #include <QVariant>
+#include <QAction>
 
-class QSignalMapper;
 class PLItem;
 
 class PLModel : public QAbstractItemModel
@@ -145,6 +145,8 @@ private:
     /* Popup */
     int i_popup_item, i_popup_parent, i_popup_column;
     QModelIndexList current_selection;
+    QMenu *sortingMenu;
+    QSignalMapper *sortingMapper;
 
     /* Lookups */
     PLItem *findById( PLItem *, int );
@@ -165,8 +167,7 @@ private slots:
     void popupSave();
     void popupExplore();
     void popupAddNode();
-    void popupSortAsc();
-    void popupSortDesc();
+    void popupSort( int column );
     void processInputItemUpdate( input_item_t *);
     void processInputItemUpdate( input_thread_t* p_input );
     void processItemRemoval( int i_id );
