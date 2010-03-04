@@ -57,7 +57,7 @@ int Open_LuaSD( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t * )p_this;
     services_discovery_sys_t *p_sys;
     lua_State *L = NULL;
-    char *psz_name = strdup(p_sd->psz_name);
+    char *psz_name = NULL;
 
     if( !strcmp(p_sd->psz_name, "lua"))
     {
