@@ -673,7 +673,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             p_stream->p_headers = realloc( p_stream->p_headers, p_stream->i_headers );
             if( p_stream->p_headers )
             {
-                memcpy( p_stream->p_headers, p_oggpacket->packet, p_stream->i_headers );
+                memcpy( p_stream->p_headers + p_stream->i_headers - p_oggpacket->bytes,
+                        p_oggpacket->packet, p_stream->i_headers );
             }
             else
             {
