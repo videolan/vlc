@@ -2323,7 +2323,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                      * TODO have a mean to correctly reenter bufferization */
                     es_out_Control( out, ES_OUT_RESET_PCR );
 
-                    es_out_Control( out, ES_OUT_SET_JITTER, i_pts_delay, p_sys->i_cr_average );
+                    es_out_SetJitter( out, i_pts_delay, p_sys->i_cr_average );
                 }
             }
             return VLC_SUCCESS;
