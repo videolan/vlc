@@ -823,7 +823,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
 
     if( vlcpath && asprintf( &path, "%s" DIR_SEP "plugins", vlcpath ) != -1 )
         vlc_array_append( arraypaths, path );
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__APPLE__)
     vlc_array_append( arraypaths, strdup( PLUGIN_PATH ) );
 #endif
 
