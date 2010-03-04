@@ -820,12 +820,10 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
 
     /* Contruct the special search path for system that have a relocatable
      * executable. Set it to <vlc path>/plugins. */
+    assert( vlcpath );
 
-    if( vlcpath && asprintf( &path, "%s" DIR_SEP "plugins", vlcpath ) != -1 )
+    if( asprintf( &path, "%s" DIR_SEP "plugins", vlcpath ) != -1 )
         vlc_array_append( arraypaths, path );
-#if !defined(WIN32) && !defined(__APPLE__)
-    vlc_array_append( arraypaths, strdup( PLUGIN_PATH ) );
-#endif
 
     /* If the user provided a plugin path, we add it to the list */
     char *userpaths = var_InheritString( p_this, "plugin-path" );
