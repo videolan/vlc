@@ -1,7 +1,7 @@
 /*****************************************************************************
  * interface_widgets.cpp : Custom widgets for the main interface
  ****************************************************************************
- * Copyright (C) 2006-2008 the VideoLAN team
+ * Copyright (C) 2006-2010 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -88,7 +88,7 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i )
       , reparentable( NULL )
 {
     /* Set the policy to expand in both directions */
-//    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+    // setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
     layout = new QHBoxLayout( this );
     layout->setContentsMargins( 0, 0, 0, 0 );
@@ -287,7 +287,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
                  :QWidget( NULL ), p_intf( _p_i )
 {
     /* We should use that one to take the more size it can */
-    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     /* A dark background */
     setAutoFillBackground( true );
@@ -299,17 +299,14 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
     /* A cone in the middle */
     label = new QLabel;
     label->setMargin( 5 );
-/*    label->setMaximumHeight( MAX_BG_SIZE );
-    label->setMaximumWidth( MAX_BG_SIZE );
-    label->setMinimumHeight( MIN_BG_SIZE );
-    label->setMinimumWidth( MIN_BG_SIZE );*/
     label->setAlignment( Qt::AlignCenter );
-    if( QDate::currentDate().dayOfYear() >= 354 )
-        label->setPixmap( QPixmap( ":/logo/vlc128-christmas.png" ) );
-    else
-        label->setPixmap( QPixmap( ":/logo/vlc128.png" ) );
 
+    /* Init the cone art */
+    updateArt( "" );
+
+    /* Grid, because of the visual selector */
     QGridLayout *backgroundLayout = new QGridLayout( this );
+    backgroundLayout->setMargin( 0 );
     backgroundLayout->addWidget( label, 0, 1 );
     backgroundLayout->setColumnStretch( 0, 1 );
     backgroundLayout->setColumnStretch( 2, 1 );
@@ -317,9 +314,6 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
     CONNECT( THEMIM->getIM(), artChanged( QString ),
              this, updateArt( const QString& ) );
 }
-
-BackgroundWidget::~BackgroundWidget()
-{}
 
 void BackgroundWidget::resizeEvent( QResizeEvent * event )
 {
@@ -333,6 +327,7 @@ void BackgroundWidget::updateArt( const QString& url )
 {
     if( url.isEmpty() )
     {
+        /* Xmas joke */
         if( QDate::currentDate().dayOfYear() >= 354 )
             label->setPixmap( QPixmap( ":/logo/vlc128-christmas.png" ) );
         else

@@ -91,7 +91,6 @@ class BackgroundWidget : public QWidget
     Q_OBJECT
 public:
     BackgroundWidget( intf_thread_t * );
-    virtual ~BackgroundWidget();
 
 private:
     QLabel *label;
