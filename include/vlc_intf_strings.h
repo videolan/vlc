@@ -64,7 +64,7 @@
 /* Playlist popup */
 #define I_POP_PLAY N_("Play")
 #define I_POP_PREPARSE N_("Fetch Information")
-#define I_POP_DEL N_("Delete")
+#define I_POP_DEL N_("Remove Selected")
 #define I_POP_INFO N_("Information...")
 #define I_POP_SORT N_("Sort")
 #define I_POP_NEWFOLDER I_DIR_OR_FOLDER( N_("Create Directory..."), \

@@ -921,16 +921,13 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     if( i_popup_item > -1 )
     {
         menu.addAction( QIcon( ":/menu/play" ), qtr(I_POP_PLAY), this, SLOT( popupPlay() ) );
-        menu.addAction( QIcon( ":/buttons/playlist/playlist_remove" ),
-                        qtr(I_POP_DEL), this, SLOT( popupDel() ) );
-        menu.addSeparator();
         menu.addAction( QIcon( ":/menu/stream" ),
                         qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
         menu.addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
-        menu.addSeparator();
         menu.addAction( QIcon( ":/menu/info" ), qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
         menu.addAction( QIcon( ":/type/folder-grey" ),
                         qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
+        menu.addSeparator();
     }
     if( canEdit() )
     {
@@ -953,6 +950,8 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     }
     if( i_popup_item > -1 )
     {
+        menu.addAction( QIcon( ":/buttons/playlist/playlist_remove" ),
+                        qtr(I_POP_DEL), this, SLOT( popupDel() ) );
         menu.addSeparator();
         if( !sortingMenu )
         {
