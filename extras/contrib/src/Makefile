@@ -2451,8 +2451,8 @@ DISTCLEAN_PKG += schroedinger-$(SCHROED_VERSION).tar.gz
 libass-$(ASS_VERSION).tar.bz2:
 	$(WGET) $(ASS_URL)
 
-libass:
-	$(GIT) clone $(ASS_GIT)
+libass: libass-$(ASS_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 	(cd $@; autoreconf -ivf)
 
 .libass: libass .freetype
