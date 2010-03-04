@@ -1103,8 +1103,8 @@ void MainInputManager::toggleRandom()
 
 void MainInputManager::notifyRepeatLoop()
 {
-    int i_value = var_GetBool( THEPL, "loop" ) * REPEAT_ONE
-              + var_GetBool( THEPL, "repeat" ) * REPEAT_ALL;
+    int i_value = var_GetBool( THEPL, "loop" ) * REPEAT_ALL
+              + var_GetBool( THEPL, "repeat" ) * REPEAT_ONE;
 
     emit repeatLoopChanged( i_value );
 }

@@ -258,6 +258,6 @@ void AtoB_Button::setIcons( bool timeA, bool timeB )
 void LoopButton::updateIcons( int value )
 {
     setChecked( value != NORMAL );
-    setIcon( ( value == REPEAT_ALL ) ? QIcon( ":/buttons/playlist/repeat_all" )
-                                     : QIcon( ":/buttons/playlist/repeat_one" ) );
+    setIcon( ( value == REPEAT_ONE ) ? QIcon( ":/buttons/playlist/repeat_one" )
+                                     : QIcon( ":/buttons/playlist/repeat_all" ) );
 }
