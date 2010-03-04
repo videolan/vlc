@@ -27,16 +27,16 @@
 
 void system_Init (libvlc_int_t *libvlc, int *argc, const char *argv[])
 {
-	(void)libvlc; (void)argc; (void)argv;
+    (void)libvlc; (void)argc; (void)argv;
 }
 
 void system_Configure (libvlc_int_t *libvlc, int *argc, const char *argv[])
 {
-	(void)libvlc; (void)argc; (void)argv;
+    (void)libvlc; (void)argc; (void)argv;
 }
 
 void system_End (libvlc_int_t *libvlc)
 {
-	(void)libvlc;
+    (void)libvlc;
 }
 
