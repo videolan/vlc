@@ -90,6 +90,6 @@ for arch in $ARCHS; do
     fi
 
     echo "Running[$arch] configure $this_args"
-    CFLAGS="-arch $arch" CXXFLAGS="-arch $arch" CPPFLAGS="-arch $arch" OBJCFLAGS="-arch $arch" $top_srcdir/configure $this_args
+    $top_srcdir/configure $this_args
     cd ..
 done
