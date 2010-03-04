@@ -643,7 +643,7 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 	touch $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	chmod +x $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	$(INSTALL) $(top_builddir)/bin/.libs/vlc $(top_builddir)/VLC.app/Contents/MacOS/VLC
-	ln -sf ../../../modules $(top_builddir)/VLC.app/Contents/MacOS/modules
+	ln -sf ../../../modules $(top_builddir)/VLC.app/Contents/MacOS/plugins
 	install -d $(top_builddir)/VLC.app/Contents/MacOS/share
 	for i in `ls $(srcdir)/share`; do \
 	   ln -sf `pwd`/$(srcdir)/share/$$i $(top_builddir)/VLC.app/Contents/MacOS/share/; \
