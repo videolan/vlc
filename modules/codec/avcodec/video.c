@@ -921,12 +921,9 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
         }
         return 0;
     }
-    else if( !p_sys->b_direct_rendering ||
-             ( p_sys->i_codec_id == CODEC_ID_H264 && p_ff_pic->reference ) )
+    else if( !p_sys->b_direct_rendering )
     {
-        /* Not much to do in indirect rendering mode.
-         * XXX We also do not allow direct rendering with H264 reference frames
-         * as there can be too many of them. */
+        /* Not much to do in indirect rendering mode. */
         return avcodec_default_get_buffer( p_context, p_ff_pic );
     }
 
