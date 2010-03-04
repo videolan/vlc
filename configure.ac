@@ -201,11 +201,30 @@ case "${host_os}" in
     esac
     ;;
   darwin*)
+
+    dnl Force gcc "-arch" flag
+    ARCH_flag=""
+    case "${host}" in
+      i386*)
+        ARCH_flag="-arch i386"
+      ;;
+      ppc64*)
+        ARCH_flag="-arch ppc64"
+      ;;
+      ppc*)
+        ARCH_flag="-arch ppc"
+      ;;
+      x86_64*)
+        ARCH_flag="-arch x86_64"
+      ;;
+    esac
+
     SYS=darwin
-    CFLAGS_save="${CFLAGS_save} -D_INTL_REDIRECT_MACROS"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="${CXXFLAGS_save} -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="${OBJCFLAGS_save} -D_INTL_REDIRECT_MACROS -std=gnu99"; OBJCFLAGS="${OBJCFLAGS_save}"
-    LDFLAGS_save="${LDFLAGS_save} -Wl,-headerpad_max_install_names"; LDFLAGS="${LDFLAGS_save}"
+    CFLAGS_save="${CFLAGS_save} -D_INTL_REDIRECT_MACROS ${ARCH_flag}"; CFLAGS="${CFLAGS_save}"
+    CXXFLAGS_save="${CXXFLAGS_save} -D_INTL_REDIRECT_MACROS ${ARCH_flag}"; CXXFLAGS="${CXXFLAGS_save}"
+    CPPFLAGS_save="${CPPFLAGS_save} ${ARCH_flag}"; CPPFLAGS="${CPPFLAGS_save}"
+    OBJCFLAGS_save="${OBJCFLAGS_save} -D_INTL_REDIRECT_MACROS -std=gnu99 ${ARCH_flag}"; OBJCFLAGS="${OBJCFLAGS_save}"
+    LDFLAGS_save="${LDFLAGS_save} -Wl,-headerpad_max_install_names ${ARCH_flag}"; LDFLAGS="${LDFLAGS_save}"
     VLC_ADD_LDFLAGS([mkv mp4 motion], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
     VLC_ADD_LDFLAGS([avcodec avformat access_avio swscale postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
