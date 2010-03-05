@@ -172,5 +172,10 @@ static void* Run( void *data )
         return NULL;
     }
     msg_Dbg( p_sd, "LuaSD script loaded: %s", p_sys->psz_filename );
+
+    /* Force garbage collection, because the core will keep the SD
+     * open, but lua will never gc until lua_close(). */
+    lua_gc( L, LUA_GCCOLLECT, 0 );
+
     return NULL;
 }
