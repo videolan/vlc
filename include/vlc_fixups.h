@@ -239,4 +239,9 @@ struct pollfd
 # define tdestroy vlc_tdestroy
 #endif
 
+/* Random numbers */
+#ifndef HAVE_NRAND48
+long nrand48 (unsigned short subi[3]);
+#endif
+
 #endif /* !LIBVLC_FIXUPS_H */
