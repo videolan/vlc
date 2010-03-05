@@ -330,13 +330,13 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Function ExecCacheGen
-  ExecWait "$INSTDIR\vlc-cache-gen.exe $APPDATA\\VideoLAN\\VLC"
+  ExecWait "$INSTDIR\vlc-cache-gen.exe $APPDATA\VideoLAN\VLC"
 FunctionEnd
 
 !macro gencache
   SetShellVarContext all
-  CreateDirectory "$APPDATA\\VideoLAN"
-  CreateDirectory "$APPDATA\\VideoLAN\\VLC"
+  CreateDirectory "$APPDATA\VideoLAN"
+  CreateDirectory "$APPDATA\VideoLAN\VLC"
   !insertmacro UAC.CallFunctionAsUser ExecCacheGen
   SetShellVarContext current
 !macroend
