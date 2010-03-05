@@ -86,6 +86,8 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
             if( (UINT)lParam == WM_LBUTTONDOWN )
             {
                 p_intf->p_sys->p_theme->getWindowManager().raiseAll();
+                CmdDlgHidePopupMenu aCmdPopup( p_intf );
+                aCmdPopup.execute();
             }
             else if( (UINT)lParam == WM_RBUTTONDOWN )
             {
