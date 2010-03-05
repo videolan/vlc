@@ -724,7 +724,7 @@ void PLModel::removeItem( PLItem *item )
 {
     if( !item ) return;
 
-    if( item->i_id == i_cached_id ) i_cached_id = -1;
+    i_cached_id = -1;
     i_cached_input_id = -1;
 
     if( item->parentItem ) {
