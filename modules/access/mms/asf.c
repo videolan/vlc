@@ -26,6 +26,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_rand.h>
 
 #include "asf.h"
 #include "buffer.h"
@@ -47,18 +48,10 @@ static int CmpGuid( const guid_t *p_guid1, const guid_t *p_guid2 )
 
 void  GenerateGuid ( guid_t *p_guid )
 {
-    int i;
-
-    srand( mdate() & 0xffffffff );
-
-    /* FIXME should be generated using random data */
     p_guid->v1 = 0xbabac001;
-    p_guid->v2 = ( (uint64_t)rand() << 16 ) / RAND_MAX;
-    p_guid->v3 = ( (uint64_t)rand() << 16 ) / RAND_MAX;
-    for( i = 0; i < 8; i++ )
-    {
-        p_guid->v4[i] = ( (uint64_t)rand() * 256 ) / RAND_MAX;
-    }
+    vlc_rand_bytes(&p_guid->v2, sizeof(p_guid->v2));
+    vlc_rand_bytes(&p_guid->v3, sizeof(p_guid->v3));
+    vlc_rand_bytes(p_guid->v4, sizeof(p_guid->v4));
 }
 
 void  asf_HeaderParse ( asf_header_t *hdr,

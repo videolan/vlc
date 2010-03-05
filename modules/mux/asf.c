@@ -38,6 +38,7 @@
 #include <vlc_block.h>
 #include <vlc_codecs.h>
 #include <vlc_arrays.h>
+#include <vlc_rand.h>
 
 typedef GUID guid_t;
 
@@ -228,14 +229,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_packet_count= 0;
 
     /* Generate a random fid */
-    srand( mdate() & 0xffffffff );
     p_sys->fid.Data1 = 0xbabac001;
-    p_sys->fid.Data2 = ( (uint64_t)rand() << 16 ) / RAND_MAX;
-    p_sys->fid.Data3 = ( (uint64_t)rand() << 16 ) / RAND_MAX;
-    for( i = 0; i < 8; i++ )
-    {
-        p_sys->fid.Data4[i] = ( (uint64_t)rand() << 8 ) / RAND_MAX;
-    }
+    vlc_rand_bytes(&p_sys->fid.Data2, sizeof(p_sys->fid.Data2));
+    vlc_rand_bytes(&p_sys->fid.Data3, sizeof(p_sys->fid.Data3));
+    vlc_rand_bytes(p_sys->fid.Data4, sizeof(p_sys->fid.Data4));
 
     /* Meta data */
     p_sys->psz_title = var_GetString( p_mux, SOUT_CFG_PREFIX "title" );
