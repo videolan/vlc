@@ -548,11 +548,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
     priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
 
-    /*
-     * System specific configuration
-     */
-    system_Configure( p_libvlc, &i_argc, ppsz_argv );
-
 /* FIXME: could be replaced by using Unix sockets */
 #ifdef HAVE_DBUS
     dbus_threads_init_default();
@@ -818,6 +813,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_EndBank( p_libvlc, true );
         return VLC_EGENERIC;
     }
+
+    /* System specific configuration */
+    system_Configure( p_libvlc, &i_argc, ppsz_argv );
 
     /* Add service discovery modules */
     psz_modules = var_InheritString( p_libvlc, "services-discovery" );
