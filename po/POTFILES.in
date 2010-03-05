@@ -95,10 +95,8 @@ src/control/playlist.c
 src/control/video.c
 src/control/vlm.c
 src/extras/dirent.c
-src/extras/getopt1.c
-src/extras/getopt.c
-src/extras/getopt.h
 src/extras/libc.c
+src/extras/tdestroy.c
 src/input/access.c
 src/input/access.h
 src/input/clock.c
