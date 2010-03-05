@@ -26,7 +26,6 @@ function descriptor()
 end
 
 function main()
-    local loading = vlc.sd.add_item( {path="vlc://nop",title="Loading..."} )
     local tree = simplexml.parse_url("http://dir.xiph.org/yp.xml")
     for _, station in ipairs( tree.children ) do
         simplexml.add_name_maps( station )
@@ -37,5 +36,4 @@ function main()
                           meta={["Icecast"]={["Bitrate"]=station.children_map["bitrate"][1].children[1];
                                              ["Server type"]=station.children_map["server_type"][1].children[1]}}} )
     end
-    vlc.sd.remove_item( loading )
 end

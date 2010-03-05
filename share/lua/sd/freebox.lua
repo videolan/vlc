@@ -34,7 +34,6 @@ function main()
     if line ~= "#EXTM3U" then
         return nil
     end
-    local loading = vlc.sd.add_item( {path="vlc://nop",title="Loading..."} )
     line = fd:readline()
     local duration, artist, name
     local options={"deinterlace=1"}
@@ -53,5 +52,4 @@ function main()
         end
         line = fd:readline()
     end
-    vlc.sd.remove_item( loading )
 end
