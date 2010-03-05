@@ -69,7 +69,7 @@ struct module_cache_t
 };
 
 
-#define MODULE_SHORTCUT_MAX 50
+#define MODULE_SHORTCUT_MAX 20
 
 /* The module handle type. */
 #if defined(HAVE_DL_DYLD) && !defined(__x86_64__)
