@@ -39,6 +39,7 @@
 #include <vlc_sout.h>
 #include <vlc_codecs.h>
 #include <vlc_block.h>
+#include <vlc_rand.h>
 
 #include <vlc_iso_lang.h>
 
@@ -520,7 +521,6 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_mux       = Mux;
     p_mux->p_sys        = p_sys;
 
-    srand( (uint32_t)mdate() );
     for ( i = 0; i < MAX_PMT; i++ )
         p_sys->sdt_descriptors[i].psz_service_name
             = p_sys->sdt_descriptors[i].psz_provider = NULL;
@@ -582,7 +582,9 @@ static int Open( vlc_object_t *p_this )
     }
     free( val.psz_string );
 
-    p_sys->i_pat_version_number = rand() % 32;
+    unsigned short subi[3];
+    vlc_rand_bytes(subi, sizeof(subi));
+    p_sys->i_pat_version_number = nrand48(subi) & 0x1f;
     p_sys->pat.i_pid = 0;
     p_sys->pat.i_continuity_counter = 0;
     p_sys->pat.b_discontinuity = false;
@@ -591,16 +593,16 @@ static int Open( vlc_object_t *p_this )
     if ( val.i_int )
         p_sys->i_tsid = val.i_int;
     else
-        p_sys->i_tsid = rand() % 65536;
+        p_sys->i_tsid = nrand48(subi) & 0xffff;
 
-    p_sys->i_netid = rand() % 65536;
+    p_sys->i_netid = nrand48(subi) & 0xffff;
 #ifdef HAVE_DVBPSI_SDT
     var_Get( p_mux, SOUT_CFG_PREFIX "netid", &val );
     if ( val.i_int )
         p_sys->i_netid = val.i_int;
 #endif
 
-    p_sys->i_pmt_version_number = rand() % 32;
+    p_sys->i_pmt_version_number = nrand48(subi) & 0x1f;
     for( i = 0; i < p_sys->i_num_pmt; i++ )
     {
         p_sys->pmt[i].i_continuity_counter = 0;

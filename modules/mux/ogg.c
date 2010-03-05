@@ -35,6 +35,8 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 #include <vlc_codecs.h>
+#include <limits.h>
+#include <vlc_rand.h>
 #include "../demux/xiph.h"
 
 #include <ogg/ogg.h>
@@ -198,8 +200,9 @@ static int Open( vlc_object_t *p_this )
     /* First serial number is random.
      * (Done like this because on win32 you need to seed the random number
      *  generator once per thread). */
-    srand( (unsigned int)time( NULL ) );
-    p_sys->i_next_serial_no = rand();
+    uint32_t r;
+    vlc_rand_bytes(&r, sizeof(r));
+    p_sys->i_next_serial_no = r & INT_MAX;
 
     return VLC_SUCCESS;
 }
