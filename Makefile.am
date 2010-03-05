@@ -48,6 +48,8 @@ EXTRA_DIST = \
 	extras/package/rpm/vlc.altlinux.spec \
 	extras/package/win32/vlc.win32.nsi.in \
 	extras/package/win32/spad.nsi.in \
+	extras/package/win32/UAC.nsh \
+	extras/package/win32/UAC.dll \
 	extras/package/win32/languages/declaration.nsh \
 	extras/package/win32/languages/english.nsh \
 	extras/package/win32/languages/french.nsh
@@ -772,6 +774,8 @@ package-win32-base-debug: package-win-common
 # Script installer
 	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(win32_destdir)/"
 	cp "$(top_builddir)/extras/package/win32/spad.nsi" "$(win32_destdir)/"
+	cp "$(srcdir)/extras/package/win32/UAC.nsh" "$(win32_destdir)/"
+	cp "$(srcdir)/extras/package/win32/UAC.dll" "$(win32_destdir)/"
 	mkdir "$(win32_destdir)/languages"
 	cp $(srcdir)/extras/package/win32/languages/*.nsh "$(win32_destdir)/languages/"
 
