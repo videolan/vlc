@@ -112,6 +112,9 @@ struct module_t
     char    *psz_capability;                                 /**< Capability */
     int      i_score;                          /**< Score for the capability */
 
+    bool b_unloadable;                        /**< Can we be dlclosed? */
+    bool b_submodule;                        /**< Is this a submodule? */
+
     /* Callbacks */
     int  ( * pf_activate )   ( vlc_object_t * );
     void ( * pf_deactivate ) ( vlc_object_t * );
@@ -134,12 +137,6 @@ struct module_t
 
     bool          b_builtin;  /* Set to true if the module is built in */
     bool          b_loaded;        /* Set to true if the dll is loaded */
-
-    /*
-     * Other variables set by the module to identify itself
-     */
-    bool b_unloadable;                        /**< Can we be dlclosed? */
-    bool b_submodule;                        /**< Is this a submodule? */
 };
 
 module_t *vlc_module_create (vlc_object_t *);
