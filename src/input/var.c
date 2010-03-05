@@ -359,7 +359,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
 void input_ControlVarTitle( input_thread_t *p_input, int i_title )
 {
     input_title_t *t = p_input->p->title[i_title];
-    vlc_value_t val, text;
+    vlc_value_t text;
     int  i;
 
     /* Create/Destroy command variables */
@@ -368,7 +368,7 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title )
         var_Destroy( p_input, "next-chapter" );
         var_Destroy( p_input, "prev-chapter" );
     }
-    else if( var_Get( p_input, "next-chapter", &val ) != VLC_SUCCESS )
+    else if( var_Type( p_input, "next-chapter" ) == 0 )
     {
         var_Create( p_input, "next-chapter", VLC_VAR_VOID );
         text.psz_string = _("Next chapter");
@@ -385,6 +385,7 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title )
     var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL, NULL );
     for( i = 0; i <  t->i_seekpoint; i++ )
     {
+        vlc_value_t val;
         val.i_int = i;
 
         if( t->seekpoint[i]->psz_name == NULL ||
