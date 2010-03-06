@@ -36,9 +36,6 @@ EPGView::EPGView( QWidget *parent ) : QGraphicsView( parent )
 
     m_startTime = QDateTime::currentDateTime();
 
-    //tmp
-    setSceneRect( 0, 0, 20000, 200 );
-
     QGraphicsScene *EPGscene = new QGraphicsScene( this );
 
     setScene( EPGscene );
