@@ -253,7 +253,8 @@ static int Open (vlc_object_t *obj)
 
     xcb_window_t window = xcb_generate_id (conn);
     ck = xcb_create_window_checked (conn, scr->root_depth, window, scr->root,
-                                    0, 0, wnd->cfg->width, wnd->cfg->height, 0,
+                                    wnd->cfg->x, wnd->cfg->y,
+                                    wnd->cfg->width, wnd->cfg->height, 0,
                                     XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                     scr->root_visual, mask, values);
     err = xcb_request_check (conn, ck);
