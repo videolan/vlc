@@ -60,7 +60,11 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem*, QWidget
     QRectF mapped = deviceTransform( viewPortTransform ).mapRect( boundingRect() );
 
     painter->setPen( QPen( Qt::black ) );
-    painter->setBrush( QBrush( Qt::blue ) );
+
+    if ( m_current )
+        painter->setBrush( QBrush( Qt::red ) );
+    else
+        painter->setBrush( QBrush( Qt::blue ) );
 
     painter->drawRect( mapped );
 
