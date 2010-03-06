@@ -831,7 +831,6 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
         if(res == -1 || res >= PATH_MAX)
         {
             vlc_array_destroy( arraypaths );
-            free(path);
             return;
         }
 #endif
