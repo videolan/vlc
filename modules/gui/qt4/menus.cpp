@@ -437,10 +437,6 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
             qtr( "Play&list" ), mi,
             SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
 
-    /*menu->addSeparator();
-    menu->addAction( qtr( "Undock from Interface" ), mi,
-                     SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );*/
-
     menu->addSeparator();
 
     if( with_intf )

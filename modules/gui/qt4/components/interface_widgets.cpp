@@ -314,6 +314,9 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
 
     CONNECT( THEMIM->getIM(), artChanged( QString ),
              this, updateArt( const QString& ) );
+
+    /* Start Hidden */
+    label->hide();
 }
 
 void BackgroundWidget::resizeEvent( QResizeEvent * event )

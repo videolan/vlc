@@ -46,7 +46,7 @@ class ArtLabel : public CoverArtLabel
 {
 public:
     ArtLabel( QWidget *parent, intf_thread_t *intf )
-            : CoverArtLabel( parent, intf ) {};
+            : CoverArtLabel( parent, intf ) {}
 
     virtual void mouseDoubleClickEvent( QMouseEvent *event )
     {
@@ -61,6 +61,8 @@ class PlaylistWidget : public QSplitter
 public:
     PlaylistWidget( intf_thread_t *_p_i, QWidget * );
     virtual ~PlaylistWidget();
+    void forceHide();
+    void forceShow();
 private:
     PLSelector      *selector;
     ArtLabel        *art;
@@ -72,6 +74,7 @@ protected:
     virtual void dropEvent( QDropEvent *);
     virtual void dragEnterEvent( QDragEnterEvent * );
     virtual void closeEvent( QCloseEvent * );
+
 };
 
 #endif

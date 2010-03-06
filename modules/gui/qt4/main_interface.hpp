@@ -29,6 +29,7 @@
 
 #include "util/qvlcframe.hpp"
 #include "components/preferences_widgets.hpp" /* First Start */
+
 #ifdef WIN32
  #include <vlc_windows_interfaces.h>
 #endif
@@ -87,7 +88,7 @@ public:
     bool isPlDocked() { return ( b_plDocked != false ); }
 
     /* Sizehint() */
-    virtual QSize sizeHint() const;
+//    virtual QSize sizeHint() const;
 
 protected:
     void dropEventPlay( QDropEvent *, bool);
@@ -116,11 +117,10 @@ private:
     void initSystray();
 
     /* Mess about stackWidget */
-    void showTab( int i_tab );
+    void showTab( QWidget *);
+    void showVideo();
+    void showBg();
     void restoreStackOldWidget();
-    void showVideo() { showTab( VIDEO_TAB ); }
-    void showBg() { showTab( BACKG_TAB ); }
-    void hideStackWidget() { showTab( HIDDEN_TAB ); }
 
     /* */
     QSettings           *settings;
@@ -133,27 +133,21 @@ private:
     ControlsWidget      *controls;
     InputControlsWidget *inputC;
     FullscreenControllerWidget *fullscreenControls;
+
+    /* Widgets */
     QStackedWidget      *stackCentralW;
 
-    /* Video */
     VideoWidget         *videoWidget;
-
     BackgroundWidget    *bgWidget;
-    VisualSelector      *visualSelector;
     PlaylistWidget      *playlistWidget;
+    //VisualSelector      *visualSelector;
 
     /* Status Bar */
     QLabel              *nameLabel;
     QLabel              *cryptedLabel;
 
     /* Status and flags */
-    enum {
-        HIDDEN_TAB = -1,
-        BACKG_TAB  =  0,
-        VIDEO_TAB  = 1,
-        PLAYL_TAB  = 2,
-    };
-    int                  stackCentralOldState;
+    QWidget             *stackCentralOldWidget;
 
     /* Flags */
     bool                 b_notificationEnabled; /// Systray Notifications
@@ -180,7 +174,6 @@ private:
 #endif
 
 public slots:
-    void undockPlaylist();
     void dockPlaylist( bool b_docked = true );
     void toggleMinimalView( bool );
     void togglePlaylist();

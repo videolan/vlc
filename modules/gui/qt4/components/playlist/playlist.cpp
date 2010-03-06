@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.cpp : Custom widgets for the playlist
  ****************************************************************************
- * Copyright © 2007-2008 the VideoLAN team
+ * Copyright © 2007-2010 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -117,7 +117,6 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     /* In case we want to keep the splitter informations */
     // components shall never write there setting to a fixed location, may infer
     // with other uses of the same component...
-    // getSettings()->beginGroup( "playlist" );
     getSettings()->beginGroup("Playlist");
     restoreState( getSettings()->value("splitterSizes").toByteArray());
     leftSplitter->restoreState( getSettings()->value("leftSplitterGeometry").toByteArray() );
@@ -160,4 +159,18 @@ void PlaylistWidget::closeEvent( QCloseEvent *event )
         hide();
         event->ignore();
     }
+}
+
+void PlaylistWidget::forceHide()
+{
+    leftSplitter->hide();
+    rightPanel->hide();
+    updateGeometry();
+}
+
+void PlaylistWidget::forceShow()
+{
+    leftSplitter->show();
+    rightPanel->show();
+    updateGeometry();
 }

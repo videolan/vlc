@@ -46,12 +46,6 @@
 #define HAS_QT45 ( QT_VERSION >= 0x040500 )
 
 enum {
-    QT_NORMAL_MODE = 0,
-    QT_ALWAYS_VIDEO_MODE,
-    QT_MINIMAL_MODE
-};
-
-enum {
     DialogEventType = 0,
     IMEventType     = 100,
     PLEventType     = 200,

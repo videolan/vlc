@@ -150,10 +150,6 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                                   "as lyrics, album arts...\n" \
                              " - minimal mode with limited controls" )
 
-#define QT_NORMAL_MODE_TEXT N_( "Classic" )
-#define QT_ALWAYS_VIDEO_MODE_TEXT N_( "Complete (with information area)" )
-#define QT_MINIMAL_MODE_TEXT N_( "Minimal (without menu)" )
-
 #define QT_FULLSCREEN_TEXT N_( "Show a controller in fullscreen mode" )
 #define QT_NATIVEOPEN_TEXT N_( "Embed the file browser in open dialog" )
 
@@ -165,12 +161,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define QT_AUTOLOAD_EXTENSIONS_LONGTEXT N_( "Automatically load the "\
                                             "extensions module on startup" )
 
-/* Various modes definition */
-static const int i_mode_list[] =
-    { QT_NORMAL_MODE, QT_ALWAYS_VIDEO_MODE, QT_MINIMAL_MODE };
-static const char *const psz_mode_list_text[] =
-    { QT_NORMAL_MODE_TEXT, QT_ALWAYS_VIDEO_MODE_TEXT, QT_MINIMAL_MODE_TEXT };
-
+#define QT_MINIMAL_MODE_TEXT N_("Start in minimal view (without menus)" )
 
 /**********************************************************************/
 vlc_module_begin ()
@@ -182,9 +173,9 @@ vlc_module_begin ()
     set_callbacks( OpenIntf, Close )
 
     add_shortcut("qt")
-    add_integer( "qt-display-mode", QT_NORMAL_MODE, NULL,
-                 QT_MODE_TEXT, QT_MODE_LONGTEXT, false )
-        change_integer_list( i_mode_list, psz_mode_list_text, NULL )
+
+    add_bool( "qt-minimal-view", false, NULL, QT_MINIMAL_MODE_TEXT,
+              QT_MINIMAL_MODE_TEXT, false );
 
     add_bool( "qt-notification", true, NULL, NOTIFICATION_TEXT,
               NOTIFICATION_LONGTEXT, false )
@@ -245,6 +236,7 @@ vlc_module_begin ()
               false )
 
     add_obsolete_bool( "qt-blingbling" ) /* Suppressed since 1.0.0 */
+    add_obsolete_integer( "qt-display-mode" ) /* Suppressed since 1.1.0 */
 
 #ifdef WIN32
     linked_with_a_crap_library_which_uses_atexit()

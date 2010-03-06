@@ -19,10 +19,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/* TODO:
+   - playlist minimumSize applies to all stackWidgets
+ */
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -30,21 +33,20 @@
 #include "qt4.hpp"
 
 #include "main_interface.hpp"
-#include "input_manager.hpp"
-#include "actions_manager.hpp"
-#include "extensions_manager.hpp" // killInstance
+#include "input_manager.hpp"        // Creation
+#include "actions_manager.hpp"      // killInstance
+#include "extensions_manager.hpp"   // killInstance
 
-#include "util/customwidgets.hpp"
-#include "util/qt_dirs.hpp"
+#include "util/customwidgets.hpp"   // qtEventToVLCKey
+#include "util/qt_dirs.hpp"         // toNativeSeparators
 
-#include "components/interface_widgets.hpp"
-#include "components/controller.hpp"
-#include "components/playlist/playlist.hpp"
-#include "dialogs/external.hpp"
-#include "dialogs/firstrun.hpp"
+#include "components/interface_widgets.hpp" // bgWidget, videoWidget
+#include "components/controller.hpp"        // controllers
+#include "components/playlist/playlist.hpp" // plWidget
+#include "dialogs/firstrun.hpp"             // First Run
 
-#include "menus.hpp"
-#include "recents.hpp"
+#include "menus.hpp"                // Menu creation
+#include "recents.hpp"              // RecentItems when DnD
 
 #include <QCloseEvent>
 #include <QKeyEvent>
@@ -57,22 +59,17 @@
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QLabel>
-#include <QGroupBox>
-#include <QPushButton>
 #include <QStackedWidget>
 
-#ifdef WIN32
+#include <vlc_keys.h>            /* Wheel event */
+#include <vlc_vout_display.h>    /* vout_thread_t and VOUT_ events */
+
+#ifdef WIN32 /* Win7 taskbar */
  #include <vlc_windows_interfaces.h>
  #include <QBitmap>
 #endif
 
-#include <assert.h>
-
-#include <vlc_keys.h> /* Wheel event */
-#include <vlc_vout_window.h>
-#include <vlc_vout_display.h>
-
-//#define DEBUG_INTF
+// #define DEBUG_INTF
 
 /* Callback prototypes */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
@@ -121,7 +118,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     b_keep_size = !var_InheritBool( p_intf, "qt-video-autoresize" );
 
     /* Are we in the enhanced always-video mode or not ? */
-    i_visualmode = var_InheritInteger( p_intf, "qt-display-mode" );
+    i_visualmode = var_InheritInteger( p_intf, "qt-minimal-view" );
 
     /* Do we want anoying popups or not */
     b_notificationEnabled = var_InheritBool( p_intf, "qt-notification" );
@@ -238,7 +235,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
     CONNECT( THEDP, toolBarConfUpdated(), this, recreateToolbars() );
 
-        /* Enable the popup menu in the MI */
+    /* Enable the popup menu in the MI */
     setContextMenuPolicy( Qt::CustomContextMenu );
     CONNECT( this, customContextMenuRequested( const QPoint& ),
              this, popupMenu( const QPoint& ) );
@@ -257,23 +254,17 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /**** FINAL SIZING and placement of interface */
     settings->beginGroup( "MainWindow" );
-    QVLCTools::restoreWidgetPosition( settings, this, QSize(380, 60) );
+    QVLCTools::restoreWidgetPosition( settings, this, QSize(400, 100) );
 
     /* resize to previously saved main window size if appicable */
+    //FIXME remove.
     if( b_keep_size )
     {
-       if( i_visualmode == QT_ALWAYS_VIDEO_MODE ||
-           i_visualmode == QT_MINIMAL_MODE )
-       {
+       if( i_visualmode )
            resize( mainVideoSize );
-       }
        else
-       {
            resize( mainBasedSize );
-       }
     }
-
-    msg_Dbg( p_intf, "%i", stackCentralOldState );
 
     /* Playlist */
     int i_plVis = settings->value( "playlist-visible", 0 ).toInt();
@@ -284,26 +275,19 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* Final sizing and showing */
     setVisible( !b_hideAfterCreation );
-    //setMinimumSize( QSize( 0, 0 ) );
-    //    setMinimumWidth( __MAX( controls->sizeHint().width(),
-    //                          menuBar()->sizeHint().width() ) );
 
-    debug();
-    /* And switch to minimal view if needed
-       Must be called after the show() */
-    if( i_visualmode == QT_MINIMAL_MODE )
+    setMinimumWidth( __MAX( controls->sizeHint().width(),
+                            menuBar()->sizeHint().width() ) + 30 );
+
+    /* Switch to minimal view if needed, must be called after the show() */
+    if( i_visualmode )
         toggleMinimalView( true );
-
-    /* Update the geometry : It is useful if you switch between
-       qt-display-modes */
-    updateGeometry();
-    resize( sizeHint() );
 }
 
 MainInterface::~MainInterface()
 {
     /* Unsure we hide the videoWidget before destroying it */
-    if( stackCentralOldState == VIDEO_TAB )
+    if( stackCentralOldWidget == playlistWidget )
         showBg();
 
     /* Save playlist state */
@@ -388,8 +372,6 @@ void MainInterface::createMainWidget( QSettings *settings )
     QWidget *main = new QWidget;
     setCentralWidget( main );
     mainLayout = new QVBoxLayout( main );
-
-    /* Margins, spacing */
     main->setContentsMargins( 0, 0, 0, 0 );
     mainLayout->setSpacing( 0 ); mainLayout->setMargin( 0 );
 
@@ -398,20 +380,15 @@ void MainInterface::createMainWidget( QSettings *settings )
 
     /* Bg Cone */
     bgWidget = new BackgroundWidget( p_intf );
-    bgWidget->resize(
-            settings->value( "backgroundSize", QSize( 300, 200 ) ).toSize() );
-    bgWidget->updateGeometry();
-    stackCentralW->insertWidget( BACKG_TAB, bgWidget );
-
+    stackCentralW->addWidget( bgWidget );
 
     /* And video Outputs */
     if( b_videoEmbedded )
     {
         videoWidget = new VideoWidget( p_intf );
-        stackCentralW->insertWidget( VIDEO_TAB, videoWidget );
+        stackCentralW->addWidget( videoWidget );
     }
-    mainLayout->insertWidget( 1, stackCentralW, 100 );
-
+    mainLayout->insertWidget( 1, stackCentralW );
 
     /* Create the CONTROLS Widget */
     controls = new ControlsWidget( p_intf,
@@ -422,46 +399,27 @@ void MainInterface::createMainWidget( QSettings *settings )
              this, doComponentsUpdate() );
     inputC = new InputControlsWidget( p_intf, this );
 
-    if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
-        i_visualmode != QT_MINIMAL_MODE )
-    {
-        hideStackWidget();
-        stackCentralOldState = HIDDEN_TAB;
-    }
-    else
-    {
-        showTab( BACKG_TAB );
-        stackCentralOldState = BACKG_TAB;
-    }
-
-
-    //mainLayout->setRowStretch( 1, 10 );
     mainLayout->insertWidget( 2, inputC );
     mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
                               controls );
 
-    /* Visualisation */
-    /* Disabled for now, they SUCK */
+    /* Visualisation, disabled for now, they SUCK */
     #if 0
     visualSelector = new VisualSelector( p_intf );
     mainLayout->insertWidget( 0, visualSelector );
     visualSelector->hide();
     #endif
 
-    /* Finish the sizing */
-    main->updateGeometry();
-
     getSettings()->endGroup();
-#ifdef WIN32
-    if ( depth() > 8 )
-#endif
-    /* Create the FULLSCREEN CONTROLS Widget */
-    if( var_InheritBool( p_intf, "qt-fs-controller" ) )
-    {
-        fullscreenControls = new FullscreenControllerWidget( p_intf, this );
-        CONNECT( fullscreenControls, keyPressed( QKeyEvent * ),
-                 this, handleKeyPress( QKeyEvent * ) );
-    }
+
+    if ( depth() > 8 ) /* 8bit depth has too many issues with opacity */
+        /* Create the FULLSCREEN CONTROLS Widget */
+        if( var_InheritBool( p_intf, "qt-fs-controller" ) )
+        {
+            fullscreenControls = new FullscreenControllerWidget( p_intf, this );
+            CONNECT( fullscreenControls, keyPressed( QKeyEvent * ),
+                     this, handleKeyPress( QKeyEvent * ) );
+        }
 }
 
 inline void MainInterface::initSystray()
@@ -519,8 +477,8 @@ inline void MainInterface::createStatusBar()
     CONNECT( THEMIM->getIM(), encryptionChanged( bool ),
              this, showCryptedLabel( bool ) );
 
-    connect( THEMIM->getIM(), SIGNAL(seekRequested(float)),
-             timeLabel, SLOT(setDisplayPosition(float)) );
+    CONNECT( THEMIM->getIM(), seekRequested( float ),
+             timeLabel, setDisplayPosition( float ) );
 }
 
 #ifdef WIN32
@@ -687,14 +645,14 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
    ask _parent->isFloating()...
    If you think this would be better, please FIXME it...
 */
+#if 0
 
 QSize MainInterface::sizeHint() const
 {
 #if 0
     if( b_keep_size )
     {
-        if( i_visualmode == QT_ALWAYS_VIDEO_MODE ||
-            i_visualmode == QT_MINIMAL_MODE )
+        if( i_visualmode )
         {
                 return mainVideoSize;
         }
@@ -720,11 +678,11 @@ QSize MainInterface::sizeHint() const
                   + statusBar()->size().height()
                   : 0 ;
 
-    if( stackCentralW->isVisible() )
+  /*  if( stackCentralW->isVisible() )
     {
         nheight += stackCentralW->height();
         nwidth  = __MAX( nwidth, stackCentralW->width() );
-    }
+    }*/
 
 /*    if( VISIBLE( bgWidget ) )
     {
@@ -751,7 +709,7 @@ QSize MainInterface::sizeHint() const
 #endif
     return QSize( nwidth, nheight );
 }
-
+#endif
 
 /* Video widget cannot do this synchronously as it runs in another thread */
 /* Well, could it, actually ? Probably dangerous ... */
@@ -774,7 +732,7 @@ void MainInterface::doComponentsUpdate()
 #endif
     /* This is WRONG, but I believe there is a Qt bug here */
     setMinimumSize( 0, 0 );
-    resize( sizeHint() );
+    //resize( sizeHint() );
 
     //adjustSize() ; /* This is not needed, but might help in the future */
 }
@@ -783,10 +741,10 @@ void MainInterface::debug()
 {
 #ifdef DEBUG_INTF
     msg_Dbg( p_intf, "Stack Size: %i - %i", stackCentralW->size().height(), size().width() );
-    if( b_videoEmbedded )
+    if( videoWidget )
         msg_Dbg( p_intf, "Stack Size: %i - %i",
-                 stackCentralW->widget( VIDEO_TAB )->size().height(),
-                 stackCentralW->widget( VIDEO_TAB )->size().width() );
+                 videoWidget->size().height(),
+                 videoWidget->size().width() );
     else
         msg_Dbg( p_intf, "no embedded video" );
 
@@ -794,13 +752,15 @@ void MainInterface::debug()
     msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
     //msg_Dbg( p_intf, "maximumsize: %i - %i", maximumSize().height(), maximumSize().width() );
 
-    msg_Dbg( p_intf, "Stack minimumsize: %i - %i", stackCentralW->minimumSize().height(), stackCentralW->minimumSize().width() );
-    msg_Dbg( p_intf, "Controls minimumsize: %i - %i", controls->minimumSize().height(), controls->minimumSize().width() );
+    msg_Dbg( p_intf, "Stack size: %i - %i", stackCentralW->size().height(), stackCentralW->size().width() );
+    msg_Dbg( p_intf, "Stack minimumSize(): %i - %i", stackCentralW->minimumHeight(), stackCentralW->minimumWidth() );
     msg_Dbg( p_intf, "Central minimumsize: %i - %i", centralWidget()->minimumSize().height(), centralWidget()->minimumSize().width() );
+    msg_Dbg( p_intf, "Central size: %i - %i", centralWidget()->size().height(), centralWidget()->size().width() );
     msg_Dbg( p_intf, "Menu minimumsize: %i - %i", menuBar()->minimumSize().height(), menuBar()->minimumSize().width() );
-    msg_Dbg( p_intf, "Input minimuSize: %i - %i", inputC->minimumSize().height(), inputC->minimumSize().width() );
+    msg_Dbg( p_intf, "Input size: %i - %i", inputC->size().height(), inputC->size().width() );
     msg_Dbg( p_intf, "Status minimumsize: %i - %i", statusBar()->minimumSize().height(), statusBar()->minimumSize().width() );
     msg_Dbg( p_intf, "minimumsize: %i - %i", minimumSize().height(), minimumSize().width() );
+    msg_Dbg( p_intf, "bg Size: %i - %i", bgWidget->size().height(), bgWidget->size().width() );
 
     /*if( videoWidget && videoWidget->isVisible() )
     {
@@ -810,50 +770,35 @@ void MainInterface::debug()
 #endif
 }
 
-inline void MainInterface::showTab( int i_tab )
+inline void MainInterface::showVideo() { showTab( videoWidget ); }
+inline void MainInterface::showBg() { showTab( bgWidget ); }
+
+inline void MainInterface::showTab( QWidget *widget )
 {
 #ifdef DEBUG_INTF
-    msg_Err( p_intf, "showTab %i", i_tab );
-    msg_Warn( p_intf, "Old stackCentralOldState %i", stackCentralOldState );
+    msg_Warn( p_intf, "Old stackCentralOldWidget %i", stackCentralW->indexOf( stackCentralOldWidget ) );
 #endif
-    stackCentralOldState = stackCentralW->isVisible() ? stackCentralW->currentIndex()
-                                          : HIDDEN_TAB;
-#ifdef DEBUG_INTF
-    msg_Warn( p_intf, "State change %i %i",  stackCentralW->currentIndex(), i_tab );
-#endif
-
-    if( i_visualmode == QT_NORMAL_MODE )
-    {
-        stackCentralW->setVisible( i_tab != HIDDEN_TAB );
-        doComponentsUpdate(); // resize the player
-    }
-    else
-        if( i_tab == HIDDEN_TAB ) i_tab = BACKG_TAB;
-
-    stackCentralW->setCurrentIndex( i_tab );
+    stackCentralOldWidget = stackCentralW->currentWidget();
+    stackCentralW->setCurrentWidget( widget );
 
 #ifdef DEBUG_INTF
-    msg_Warn( p_intf, "New stackCentralOldState %i", stackCentralOldState );
+    msg_Warn( p_intf, "State change %i",  stackCentralW->currentIndex() );
+    msg_Warn( p_intf, "New stackCentralOldWidget %i", stackCentralW->indexOf( stackCentralOldWidget ) );
 #endif
 }
 
 inline void MainInterface::restoreStackOldWidget()
 {
 #ifdef DEBUG_INTF
-    msg_Warn( p_intf, "Old stackCentralOldState %i", stackCentralOldState );
+    msg_Warn( p_intf, "New stackCentralOldWidget %i", stackCentralW->indexOf( stackCentralOldWidget ) );
 #endif
-    int temp = stackCentralW->isVisible() ? stackCentralW->currentIndex()
-                                          : HIDDEN_TAB;
-    stackCentralW->setCurrentIndex( stackCentralOldState );
-    if( i_visualmode == QT_NORMAL_MODE )
-    {
-        stackCentralW->setVisible( stackCentralOldState != HIDDEN_TAB );
-        doComponentsUpdate(); // resize the player
-    }
+    QWidget *wTemp = stackCentralW->currentWidget();
 
-    stackCentralOldState = temp;
+    stackCentralW->setCurrentWidget( stackCentralOldWidget );
+
+    stackCentralOldWidget = wTemp;
 #ifdef DEBUG_INTF
-    msg_Warn( p_intf, "Debug %i %i", temp, stackCentralW->currentIndex() );
+    msg_Warn( p_intf, "Debug %i %i",stackCentralW->indexOf( wTemp ), stackCentralW->indexOf( stackCentralW->currentWidget() ) );
 #endif
 }
 
@@ -955,6 +900,9 @@ void MainInterface::releaseVideoSlot( void )
 
     restoreStackOldWidget();
 
+    /* We don't want to have a blank video to popup */
+    stackCentralOldWidget = bgWidget;
+
     /* Try to resize, except when you are in Fullscreen mode */
 //    doComponentsUpdate();
 }
@@ -1017,7 +965,7 @@ void MainInterface::createPlaylist()
 #ifdef DEBUG_INTF
         msg_Warn( p_intf, "Here 1 %i", stackCentralW->currentIndex() );
 #endif
-        stackCentralW->insertWidget( PLAYL_TAB, playlistWidget );
+        stackCentralW->addWidget( playlistWidget );
 #ifdef DEBUG_INTF
         msg_Warn( p_intf, "Here 2 %i", stackCentralW->currentIndex() );
 #endif
@@ -1026,30 +974,25 @@ void MainInterface::createPlaylist()
 
 void MainInterface::togglePlaylist()
 {
-#ifdef DEBUG_INTF
-    msg_Warn( p_intf, "Here toggling 1 %i %i", stackCentralW->currentIndex(), stackCentralOldState );
-#endif
     if( !playlistWidget )
         createPlaylist();
 
-#ifdef DEBUG_INTF
-    msg_Warn( p_intf, "Here toggling 2 %i %i", stackCentralW->currentIndex(), stackCentralOldState );
-
-#endif
     if( b_plDocked )
     {
-        /* Playlist not visible */
-        if( stackCentralW->currentIndex() != PLAYL_TAB )
+        /* Playlist is not visible, show it */
+        if( stackCentralW->currentWidget() != playlistWidget )
         {
-            showTab( PLAYL_TAB );
-            stackCentralW->show();
+            playlistWidget->forceShow();
+            showTab( playlistWidget );
         }
-        else
+        else /* Hide it! */
         {
             restoreStackOldWidget();
+            stackCentralW->updateGeometry();
+            // HACK: So it doesn't limit the stackWidget minimumSize
+            playlistWidget->forceHide();
         }
-        playlistVisible = ( stackCentralW->currentIndex() == PLAYL_TAB );
-        //doComponentsUpdate(); //resize( sizeHint() );
+        playlistVisible = ( stackCentralW->currentWidget() == playlistWidget );
     }
     else
     {
@@ -1057,11 +1000,14 @@ void MainInterface::togglePlaylist()
         playlistVisible = !playlistVisible;
         playlistWidget->setVisible( playlistVisible );
     }
+    debug();
 }
 
 void MainInterface::dockPlaylist( bool p_docked )
 {
+    if( b_plDocked == p_docked ) return;
     b_plDocked = p_docked;
+
     if( !playlistWidget ) return; /* Playlist wasn't created yet */
     if( !p_docked )
     {
@@ -1070,41 +1016,36 @@ void MainInterface::dockPlaylist( bool p_docked )
         QVLCTools::restoreWidgetPosition( p_intf, "Playlist",
                 playlistWidget, QSize( 600, 300 ) );
         playlistWidget->show();
-        stackCentralW->hide();
-        doComponentsUpdate();
+        restoreStackOldWidget();
     }
     else
     {
-        stackCentralW->insertWidget( PLAYL_TAB, playlistWidget );
+        playlistWidget->setWindowFlags( Qt::Widget ); // Probably a Qt bug here
+        // It would be logical that QStackWidget::addWidget reset the flags...
+        stackCentralW->addWidget( playlistWidget );
         stackCentralW->setCurrentWidget( playlistWidget );
-        stackCentralW->show();
     }
-}
-
-/* Function called from the menu to undock the playlist */
-void MainInterface::undockPlaylist()
-{
-    dockPlaylist( false );
 }
 
 void MainInterface::toggleMinimalView( bool b_switch )
 {
-    if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
-        i_visualmode != QT_MINIMAL_MODE )
+    if( i_visualmode == 0 )
     { /* NORMAL MODE then */
-        stackCentralW->show();
-        if( !videoWidget || stackCentralW->currentIndex() != VIDEO_TAB )
+        if( !videoWidget || stackCentralW->currentWidget() != videoWidget )
         {
             showBg();
         }
         else
         {
             /* If video is visible, then toggle the status of bgWidget */
+            //FIXME
             //bgWasVisible = !bgWasVisible;
-            if( stackCentralOldState == BACKG_TAB )
-                stackCentralOldState = HIDDEN_TAB;
+            /* if( stackCentralOldState == BACK G_TAB )
+                stackCentralOldState = HID DEN_TAB;
             else
-                stackCentralOldState = BACKG_TAB;
+                stackCentralOldState = BACK G_TAB;
+
+                */
         }
     }
 
@@ -1466,8 +1407,7 @@ void MainInterface::resizeEvent( QResizeEvent * event )
 #if 0
     if( b_keep_size )
     {
-        if( i_visualmode == QT_ALWAYS_VIDEO_MODE ||
-            i_visualmode == QT_MINIMAL_MODE )
+        if( i_visualmode )
         {
                 mainVideoSize = size();
         }
@@ -1484,6 +1424,7 @@ void MainInterface::resizeEvent( QResizeEvent * event )
 #endif
     QVLCMW::resizeEvent( event );
     msg_Dbg( p_intf, "Resize Event, height: %i", size().height() );
+    debug();
 }
 
 void MainInterface::wheelEvent( QWheelEvent *e )
