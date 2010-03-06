@@ -538,8 +538,8 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     if( psz_session == NULL )
                     {
                         /* Create a dummy session ID */
-                        snprintf( psz_sesbuf, sizeof( psz_sesbuf ), "%d",
-                                  rand() );
+                        snprintf( psz_sesbuf, sizeof( psz_sesbuf ), "%lu",
+                                  vlc_mrand48() );
                         psz_session = psz_sesbuf;
                     }
                     answer->i_status = 200;

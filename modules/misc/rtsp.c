@@ -42,6 +42,7 @@
 #include <vlc_network.h>
 #include <vlc_charset.h>
 #include <vlc_strings.h>
+#include <vlc_rand.h>
 
 #ifndef WIN32
 # include <locale.h>
@@ -1019,7 +1020,8 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                         answer->p_body = NULL;
                         break;
                     }
-                    if( asprintf( &psz_new, "%d", rand() ) < 0 )
+#warning Should use secure randomness here! (spoofing risk)
+                    if( asprintf( &psz_new, "%lu", vlc_mrand48() ) < 0 )
                         return VLC_ENOMEM;
                     psz_session = psz_new;
 
@@ -1358,7 +1360,8 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                         answer->p_body = NULL;
                         break;
                     }
-                    if( asprintf( &psz_new, "%d", rand() ) < 0 )
+#warning Session ID should be securely random (spoofing risk)
+                    if( asprintf( &psz_new, "%lu", vlc_mrand48() ) < 0 )
                         return VLC_ENOMEM;
                     psz_session = psz_new;
 

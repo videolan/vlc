@@ -36,6 +36,7 @@
 #include <vlc_tls.h>
 #include <vlc_acl.h>
 #include <vlc_strings.h>
+#include <vlc_rand.h>
 #include "../libvlc.h"
 
 #include <string.h>
@@ -825,7 +826,8 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
                           "application/octet-stream" );
             httpd_MsgAdd( answer, "Server", "Cougar 4.1.0.3921" );
             httpd_MsgAdd( answer, "Pragma", "no-cache" );
-            httpd_MsgAdd( answer, "Pragma", "client-id=%d", rand()&0x7fff );
+            httpd_MsgAdd( answer, "Pragma", "client-id=%lu",
+                          vlc_mrand48()&0x7fff );
             httpd_MsgAdd( answer, "Pragma", "features=\"broadcast\"" );
 
             /* Check if there is a xPlayStrm=1 */
