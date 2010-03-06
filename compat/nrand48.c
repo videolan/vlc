@@ -26,7 +26,7 @@
 
 long nrand48 (unsigned short subi[3])
 {
-    const uint64_t a = UINT64_C(0x5DEECE66D16);
+    const uint64_t a = UINT64_C(0x5DEECE66D);
     const unsigned c = 13;
     const uint64_t mask = UINT64_C(0xFFFFFFFFFFFF); // 48 bits
 
@@ -42,5 +42,5 @@ long nrand48 (unsigned short subi[3])
     subi[1] = (x >> 16) & 0xFFFF;
     subi[2] = (x >>  0) & 0XFFFF;
 
-    return x >> 16;
+    return x >> 17;
 }
