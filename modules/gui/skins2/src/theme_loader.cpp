@@ -98,7 +98,7 @@ bool ThemeLoader::load( const string &fileName )
     }
 
     // Check if the skin to load is in the config file, to load its config
-    char *skin_last = config_GetPsz( getIntf(), "skins2-last" );
+    char *skin_last = var_InheritString( getIntf(), "skins2-last" );
     if( skin_last != NULL && fileName == (string)skin_last )
     {
         // Restore the theme configuration

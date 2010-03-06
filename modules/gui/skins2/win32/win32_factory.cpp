@@ -183,13 +183,13 @@ bool Win32Factory::init()
     strcpy( m_trayIcon.szTip, "VLC media player" );
 
     // Show the systray icon if needed
-    if( config_GetInt( getIntf(), "skins2-systray" ) )
+    if( var_InheritBool( getIntf(), "skins2-systray" ) )
     {
         addInTray();
     }
 
     // Show the task in the task bar if needed
-    if( config_GetInt( getIntf(), "skins2-taskbar" ) )
+    if( var_InheritBool( getIntf(), "skins2-taskbar" ) )
     {
         addInTaskBar();
     }

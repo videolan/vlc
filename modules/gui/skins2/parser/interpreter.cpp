@@ -256,7 +256,7 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
         string windowId = rAction.substr( 0, leftPos );
 
         if( windowId == "playlist_window" &&
-            !config_GetInt( getIntf(), "skinned-playlist") )
+            !var_InheritBool( getIntf(), "skinned-playlist") )
         {
             list<CmdGeneric *> list;
             list.push_back( new CmdDlgPlaylist( getIntf() ) );
@@ -297,7 +297,7 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
         int leftPos = rAction.find( ".hide()" );
         string windowId = rAction.substr( 0, leftPos );
         if( windowId == "playlist_window" &&
-           ! config_GetInt( getIntf(), "skinned-playlist") )
+           !var_InheritBool( getIntf(), "skinned-playlist") )
         {
             list<CmdGeneric *> list;
             list.push_back( new CmdDlgPlaylist( getIntf() ) );

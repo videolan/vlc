@@ -256,7 +256,7 @@ static void *Run( void * p_obj )
     }
 
     // Load a theme
-    skin_last = config_GetPsz( p_intf, "skins2-last" );
+    skin_last = var_InheritString( p_intf, "skins2-last" );
     pLoader = new ThemeLoader( p_intf );
 
     if( !skin_last || !pLoader->load( skin_last ) )
@@ -339,7 +339,8 @@ static int WindowOpen( vlc_object_t *p_this )
     if( pIntf == NULL )
         return VLC_EGENERIC;
 
-    if( !config_GetInt( pIntf, "skinned-video") ||
+    if( !vlc_object_alive( pIntf ) ||
+        !var_InheritBool( pIntf, "skinned-video") ||
         pWnd->cfg->is_standalone )
     {
         vlc_object_release( pIntf );

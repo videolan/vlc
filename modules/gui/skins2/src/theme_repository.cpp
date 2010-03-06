@@ -89,7 +89,7 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
     }
 
     // retrieve last skins stored or skins requested by user
-    char* psz_current = config_GetPsz( getIntf(), "skins2-last" );
+    char* psz_current = var_InheritString( getIntf(), "skins2-last" );
     string current = string( psz_current ? psz_current : "" );
 
     // set the default skins if no skins provided
@@ -206,7 +206,7 @@ void ThemeRepository::updateRepository()
     vlc_value_t val, text;
 
     // retrieve the current skin
-    char* psz_current = config_GetPsz( getIntf(), "skins2-last" );
+    char* psz_current = var_InheritString( getIntf(), "skins2-last" );
     if( !psz_current )
         return;
 

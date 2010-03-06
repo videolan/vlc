@@ -71,7 +71,7 @@ void WindowManager::startMove( TopWindow &rWindow )
     m_movingWindows.clear();
     buildDependSet( m_movingWindows, &rWindow );
 
-    if( config_GetInt( getIntf(), "skins2-transparency" ) )
+    if( var_InheritBool( getIntf(), "skins2-transparency" ) )
     {
         // Change the opacity of the moving windows
         WinSet_t::const_iterator it;
@@ -96,7 +96,7 @@ void WindowManager::stopMove()
     WinSet_t::const_iterator itWin1, itWin2;
     AncList_t::const_iterator itAnc1, itAnc2;
 
-    if( config_GetInt( getIntf(), "skins2-transparency" ) )
+    if( var_InheritBool( getIntf(), "skins2-transparency" ) )
     {
         // Restore the opacity of the moving windows
         WinSet_t::const_iterator it;

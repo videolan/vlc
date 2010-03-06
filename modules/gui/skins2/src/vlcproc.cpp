@@ -754,7 +754,7 @@ void VlcProc::update_equalizer()
     if( m_pAout )
         pFilters = var_GetNonEmptyString( m_pAout, "audio-filter" );
     else
-        pFilters = config_GetPsz( getIntf(), "audio-filter" );
+        pFilters = var_InheritString( getIntf(), "audio-filter" );
 
     bool b_equalizer = pFilters && strstr( pFilters, "equalizer" );
     free( pFilters );
