@@ -542,9 +542,9 @@ static int DirectXCreateWindow( event_thread_t *p_event )
                     _T("VLC DirectX"),               /* name of window class */
                     _T(VOUT_TITLE) _T(" (DirectX Output)"),  /* window title */
                     i_style,                                 /* window style */
-                    (p_event->wnd_cfg.x < 0) ? CW_USEDEFAULT :
+                    (!p_event->wnd_cfg.x) ? CW_USEDEFAULT :
                         (UINT)p_event->wnd_cfg.x,   /* default X coordinate */
-                    (p_event->wnd_cfg.y < 0) ? CW_USEDEFAULT :
+                    (!p_event->wnd_cfg.y) ? CW_USEDEFAULT :
                         (UINT)p_event->wnd_cfg.y,   /* default Y coordinate */
                     rect_window.right - rect_window.left,    /* window width */
                     rect_window.bottom - rect_window.top,   /* window height */
