@@ -553,6 +553,9 @@ vlc_plugin_set
 vlc_poll
 vlc_tdestroy
 vlc_rand_bytes
+vlc_drand48
+vlc_lrand48
+vlc_mrand48
 vlc_release
 vlc_restorecancel
 vlc_rwlock_destroy

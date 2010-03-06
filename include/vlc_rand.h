@@ -29,4 +29,9 @@
 
 VLC_EXPORT( void, vlc_rand_bytes, (void *buf, size_t len) );
 
+/* Interlocked (but not reproducible) functions for the POSIX PRNG */
+VLC_EXPORT( double, vlc_drand48, (void) LIBVLC_USED );
+VLC_EXPORT( long, vlc_lrand48, (void) LIBVLC_USED );
+VLC_EXPORT( long, vlc_mrand48, (void) LIBVLC_USED );
+
 #endif
