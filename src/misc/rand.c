@@ -92,19 +92,21 @@ void vlc_rand_bytes (void *buf, size_t len)
         uint64_t val;
         struct md5_s mdi, mdo;
 
+        InitMD5 (&mdi);
+        InitMD5 (&mdo);
+
         pthread_mutex_lock (&lock);
         if (counter == 0)
             vlc_rand_init ();
         val = counter++;
+
+        AddMD5 (&mdi, ikey, sizeof (ikey));
+        AddMD5 (&mdo, okey, sizeof (okey));
         pthread_mutex_unlock (&lock);
 
-        InitMD5 (&mdi);
-        AddMD5 (&mdi, ikey, sizeof (ikey));
         AddMD5 (&mdi, &stamp, sizeof (stamp));
         AddMD5 (&mdi, &val, sizeof (val));
         EndMD5 (&mdi);
-        InitMD5 (&mdo);
-        AddMD5 (&mdo, okey, sizeof (okey));
         AddMD5 (&mdo, mdi.p_digest, sizeof (mdi.p_digest));
         EndMD5 (&mdo);
 
