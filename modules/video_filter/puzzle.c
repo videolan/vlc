@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include <vlc_rand.h>
 
 #include "filter_picture.h"
 
@@ -429,19 +430,19 @@ static bool IsValid( filter_sys_t *p_sys )
 
 static void Shuffle( filter_sys_t *p_sys )
 {
-    const int i_count = p_sys->i_cols * p_sys->i_rows;
+    const unsigned i_count = p_sys->i_cols * p_sys->i_rows;
 
     free( p_sys->pi_order );
 
     p_sys->pi_order = calloc( i_count, sizeof(*p_sys->pi_order) );
     do
     {
-        for( int i = 0; i < i_count; i++ )
+        for( unsigned i = 0; i < i_count; i++ )
             p_sys->pi_order[i] = -1;
 
-        for( int c = 0; c < i_count; )
+        for( unsigned c = 0; c < i_count; )
         {
-            int i = rand() % i_count;
+            unsigned i = ((unsigned)vlc_mrand48()) % i_count;
             if( p_sys->pi_order[i] == -1 )
                 p_sys->pi_order[i] = c++;
         }
@@ -451,7 +452,7 @@ static void Shuffle( filter_sys_t *p_sys )
 
     if( p_sys->b_blackslot )
     {
-        for( int i = 0; i < i_count; i++ )
+        for( unsigned i = 0; i < i_count; i++ )
         {
             if( p_sys->pi_order[i] == i_count - 1 )
             {

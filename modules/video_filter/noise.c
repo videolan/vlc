@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_rand.h>
 
 #include <vlc_filter.h>
 #include "filter_picture.h"
@@ -105,7 +106,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         for( i_line = 0 ; i_line < i_num_lines ; i_line++ )
         {
-            if( rand()%8 )
+            if( vlc_mrand48()&7 )
             {
                 /* line isn't noisy */
                 vlc_memcpy( p_out+i_line*i_pitch, p_in+i_line*i_pitch,
@@ -114,17 +115,17 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             else
             {
                 /* this line is noisy */
-                int noise_level = rand()%8+2;
+                unsigned noise_level = (vlc_mrand48()&7)+2;
                 for( i_col = 0; i_col < i_num_cols ; i_col++ )
                 {
-                    if( rand()%noise_level )
+                    if( ((unsigned)vlc_mrand48())%noise_level )
                     {
                         p_out[i_line*i_pitch+i_col] =
                             p_in[i_line*i_pitch+i_col];
                     }
                     else
                     {
-                        p_out[i_line*i_pitch+i_col] = (rand()%3)*0x7f;
+                        p_out[i_line*i_pitch+i_col] = (vlc_mrand48()&3)*0x7f;
                     }
                 }
             }

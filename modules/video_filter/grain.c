@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_rand.h>
 
 #include <vlc_filter.h>
 #include "filter_picture.h"
@@ -135,7 +136,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         {
             for( i_col = 0; i_col < i_num_cols; i_col++ )
             {
-                p_noise[i_line*i_pitch+i_col] = ((rand()&0x1f)-0x0f);
+                p_noise[i_line*i_pitch+i_col] = ((vlc_mrand48()&0x1f)-0x0f);
             }
         }
 
