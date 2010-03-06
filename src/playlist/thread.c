@@ -187,7 +187,7 @@ static void ResetCurrentlyPlaying( playlist_t *p_playlist,
     PL_DEBUG("rebuild done - %i items, index %i", p_playlist->current.i_size,
                                                   p_playlist->i_current_index);
 
-    if( var_GetBool( p_playlist, "random" ) )
+    if( var_GetBool( p_playlist, "random" ) && ( p_playlist->current.i_size > 0 ) )
     {
         /* Shuffle the array */
         for( unsigned j = p_playlist->current.i_size - 1; j > 0; j-- )
