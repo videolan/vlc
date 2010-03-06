@@ -1,5 +1,5 @@
 /*****************************************************************************
- * nrand48.c: POSIX nrand48() replacement
+ * nrand48.c: POSIX erand48(), jrand48() and nrand48() replacements
  *****************************************************************************
  * Copyright © 2010 Rémi Denis-Courmont
  *
@@ -24,7 +24,7 @@
 
 #include <inttypes.h>
 
-long nrand48 (unsigned short subi[3])
+static uint64_t iterate48 (unsigned short subi[3])
 {
     const uint64_t a = UINT64_C(0x5DEECE66D);
     const unsigned c = 13;
@@ -42,5 +42,21 @@ long nrand48 (unsigned short subi[3])
     subi[1] = (x >> 16) & 0xFFFF;
     subi[2] = (x >>  0) & 0XFFFF;
 
-    return x >> 17;
+    return x;
+}
+
+double erand48 (unsigned short subi[3])
+{
+    uint64_t r = iterate48 (subi);
+    return ((double)r) / 281474976710655.;
+}
+
+long jrand48 (unsigned short subi[3])
+{
+    return ((int64_t)iterate48 (subi)) >> 16;
+}
+
+long nrand48 (unsigned short subi[3])
+{
+    return iterate48 (subi) >> 17;
 }

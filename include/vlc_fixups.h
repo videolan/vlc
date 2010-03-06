@@ -241,6 +241,8 @@ struct pollfd
 
 /* Random numbers */
 #ifndef HAVE_NRAND48
+double erand48 (unsigned short subi[3]);
+long jrand48 (unsigned short subi[3]);
 long nrand48 (unsigned short subi[3]);
 #endif
 
