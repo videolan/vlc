@@ -299,28 +299,34 @@ void formatSnapshotItem( input_item_t *p_item )
     if( !p_item )
         return;
 
-    if( !p_item->p_meta )
-        p_item->p_meta = vlc_meta_New();
+    char* psz_file = NULL;
+    char* psz_option = NULL;
+    char* psz_uri = input_item_GetURI( p_item );
+
+    if( !psz_uri )
+        goto end;
 
     /* copy the snapshot mrl as a ArtURL */
-    if( p_item->p_meta )
+    input_item_SetArtURL( p_item, psz_uri );
+
+    psz_file = make_path( psz_uri );
+    if( !psz_file )
+        goto end;
+
+    if( asprintf( &psz_option, "fake-file=%s", psz_file ) == -1 )
     {
-        char* psz_uri = NULL;
-        psz_uri = input_item_GetURI( p_item );
-        if( psz_uri )
-            input_item_SetArtURL( p_item, psz_uri );
-        free( psz_uri );
+        psz_option = NULL;
+        goto end;
     }
 
-    /**
-     * TODO: select the best mrl for displaying snapshots
-     *   - vlc://pause:10  => snapshot are displayed as Art
-     *   - file:///path/image.ext  => snapshot are displayed as videos
-     **/
-    input_item_SetURI( p_item, "vlc://pause:10" );
+    /* display still image as a video */
+    input_item_SetURI( p_item, "fake://" );
+    input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
 
-    // input_item_AddOption( p_item, "fake-duration=10000",
-    //                       VLC_INPUT_OPTION_TRUSTED );
+end:
+    free( psz_option );
+    free( psz_file );
+    free( psz_uri );
 }
 
 
