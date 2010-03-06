@@ -125,6 +125,8 @@ vout_window_t *GetWindow (vout_display_t *vd,
 
     memset( &wnd_cfg, 0, sizeof(wnd_cfg) );
     wnd_cfg.type = VOUT_WINDOW_TYPE_XID;
+    wnd_cfg.x = var_InheritInteger (vd, "video-x");
+    wnd_cfg.y = var_InheritInteger (vd, "video-y");
     wnd_cfg.width  = vd->cfg->display.width;
     wnd_cfg.height = vd->cfg->display.height;
 
