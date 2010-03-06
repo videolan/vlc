@@ -144,9 +144,9 @@ static int Open(vlc_object_t *object)
     sys->allow_hw_yuv = var_CreateGetBool(vd, "directx-hw-yuv");
     sys->desktop_save.is_fullscreen = vd->cfg->is_fullscreen;
     sys->desktop_save.is_on_top     = false;
-    sys->desktop_save.win.left      = 0;
+    sys->desktop_save.win.left      = var_InheritInteger(vd, "video-x");
     sys->desktop_save.win.right     = vd->cfg->display.width;
-    sys->desktop_save.win.top       = 0;
+    sys->desktop_save.win.top       = var_InheritInteger(vd, "video-y");
     sys->desktop_save.win.bottom    = vd->cfg->display.height;
 
     if (CommonInit(vd))

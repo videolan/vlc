@@ -100,8 +100,8 @@ int CommonInit(vout_display_t *vd)
     cfg.use_overlay = sys->use_overlay;
 #endif
     cfg.win.type   = VOUT_WINDOW_TYPE_HWND;
-    cfg.win.x      = 0;
-    cfg.win.y      = 0;
+    cfg.win.x      = var_InheritInteger(vd, "video-x");
+    cfg.win.y      = var_InheritInteger(vd, "video-y");
     cfg.win.width  = vd->cfg->display.width;
     cfg.win.height = vd->cfg->display.height;
 

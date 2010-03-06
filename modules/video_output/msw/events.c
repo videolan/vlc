@@ -507,8 +507,8 @@ static int DirectXCreateWindow( event_thread_t *p_event )
      * have. Unfortunatly these dimensions will include the borders and
      * titlebar. We use the following function to find out the size of
      * the window corresponding to the useable surface we want */
-    rect_window.top    = 10;
     rect_window.left   = 10;
+    rect_window.top    = 10;
     rect_window.right  = rect_window.left + p_event->wnd_cfg.width;
     rect_window.bottom = rect_window.top  + p_event->wnd_cfg.height;
 
