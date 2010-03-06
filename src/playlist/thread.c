@@ -32,6 +32,7 @@
 #include <vlc_input.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
+#include <vlc_rand.h>
 #include "stream_output/stream_output.h"
 #include "playlist_internal.h"
 
@@ -189,10 +190,9 @@ static void ResetCurrentlyPlaying( playlist_t *p_playlist,
     if( var_GetBool( p_playlist, "random" ) )
     {
         /* Shuffle the array */
-        srand( (unsigned int)mdate() );
-        for( int j = p_playlist->current.i_size - 1; j > 0; j-- )
+        for( unsigned j = p_playlist->current.i_size - 1; j > 0; j-- )
         {
-            int i = rand() % (j+1); /* between 0 and j */
+            unsigned i = ((unsigned)vlc_mrand48()) % (j+1); /* between 0 and j */
             playlist_item_t *p_tmp;
             /* swap the two items */
             p_tmp = ARRAY_VAL(p_playlist->current, i);
