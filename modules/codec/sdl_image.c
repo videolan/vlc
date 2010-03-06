@@ -33,7 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 
-#include <SDL/SDL_image.h>
+#include <SDL_image.h>
 
 /*****************************************************************************
  * decoder_sys_t : sdl decoder descriptor

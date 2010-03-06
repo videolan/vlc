@@ -37,7 +37,7 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #define FRAME_SIZE 2048
 

@@ -3448,8 +3448,8 @@ then
         SDL_PATH="${with_sdl_config_path}:${PATH}"
       fi ])
   AC_PATH_PROG(SDL_CONFIG, sdl-config, no, ${SDL_PATH})
-  SDL_HEADER="SDL/SDL.h"
-  SDL_IMAGE="SDL/SDL_image.h"
+  SDL_HEADER="SDL.h"
+  SDL_IMAGE="SDL_image.h"
 
   if test "${SDL_CONFIG}" != "no";  then
      PKG_CHECK_MODULES(SDL, [sdl >= 1.2.10], [
@@ -3457,12 +3457,12 @@ then
         if test "${SYS}" != "darwin"; then
           VLC_ADD_PLUGIN([vout_sdl aout_sdl])
         fi
-        VLC_ADD_CFLAGS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} --cflags | sed 's,SDL,,'`])
+        VLC_ADD_CFLAGS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} --cflags`])
         VLC_ADD_LIBS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`])
 
         # SDL_image
         AS_IF([ test "${enable_sdl_image}" != "no"],[
-          AC_CHECK_HEADERS("SDL/SDL_image.h", [
+          AC_CHECK_HEADERS("SDL_image.h", [
             VLC_ADD_PLUGIN([sdl_image])
             AC_CHECK_LIB(png, png_set_rows, [VLC_ADD_LIBS([sdl_image],[-lpng -lz])],[],[-lz])
             AC_CHECK_LIB(jpeg, jpeg_start_decompress, [VLC_ADD_LIBS([sdl_image],[-ljpeg])])
