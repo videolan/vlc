@@ -2196,6 +2196,7 @@ amf_decode_string( uint8_t **buffer )
     length = ntoh16( *(uint16_t *) *buffer );
     *buffer += sizeof( uint16_t );
 
+#error This size is wrong and breaks just about everything.
     if( length > sizeof( *buffer ) / sizeof( uint8_t ))
         return NULL;
 

@@ -18,5 +18,7 @@ libvlc_LTLIBRARIES += \
 	libaccess_output_file_plugin.la \
 	libaccess_output_udp_plugin.la \
 	libaccess_output_http_plugin.la \
+	$(NULL)
+EXTRA_LTLIBRARIES += \
 	libaccess_output_rtmp_plugin.la \
 	$(NULL)

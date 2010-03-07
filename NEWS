@@ -142,6 +142,7 @@ Removed modules:
  * cmml and tarkin codecs are removed because they are dead codecs.
  * realaudio codecs are removed in favor of libavcodec
  * access_file removed in favor of filesystem
+ * RTMP input and output
 
 
 Changes between 1.0.4 and 1.0.5:
