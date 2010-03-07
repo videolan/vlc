@@ -184,33 +184,28 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     //perform face detection
     cvClearMemStorage(p_filter->p_sys->p_storage);
-    CvSeq* faces = NULL;
     if( p_filter->p_sys->p_cascade )
     {
         //we should make some of these params config variables
-        faces = cvHaarDetectObjects( p_img[0], p_filter->p_sys->p_cascade,
+        CvSeq *faces = cvHaarDetectObjects( p_img[0], p_filter->p_sys->p_cascade,
             p_filter->p_sys->p_storage, 1.15, 5, CV_HAAR_DO_CANNY_PRUNING,
                                             cvSize(20, 20) );
         //create the video_filter_region_info_t struct
-        CvRect* r;
         if (faces && (faces->total > 0))
         {
             //msg_Dbg( p_filter, "Found %d face(s)", faces->total );
             free( p_filter->p_sys->event_info.p_region );
-            p_filter->p_sys->event_info.p_region = NULL;
-            if( NULL == ( p_filter->p_sys->event_info.p_region =
-                  (video_filter_region_info_t *)malloc(faces->total*sizeof(video_filter_region_info_t))))
-            {
+            p_filter->p_sys->event_info.p_region = (video_filter_region_info_t*)
+                    calloc( faces->total, sizeof(video_filter_region_info_t));
+            if( !p_filter->p_sys->event_info.p_region )
                 return NULL;
-            }
-            memset(p_filter->p_sys->event_info.p_region, 0, faces->total*sizeof(video_filter_region_info_t));
             p_filter->p_sys->event_info.i_region_size = faces->total;
         }
 
         //populate the video_filter_region_info_t struct
         for( i = 0; i < (faces ? faces->total : 0); i++ )
         {
-            r = (CvRect*)cvGetSeqElem( faces, i );
+            CvRect *r = (CvRect*)cvGetSeqElem( faces, i );
             pt1.x = r->x*scale;
             pt2.x = (r->x+r->width)*scale;
             pt1.y = r->y*scale;
