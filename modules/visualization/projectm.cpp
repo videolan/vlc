@@ -302,6 +302,8 @@ static void *Thread( void *p_data )
     if( !p_sys->p_vout )
         goto error;
 
+    vlc_object_attach( p_sys->p_vout, p_filter );
+
     /* */
     video_format_Init( &fmt, 0 );
     video_format_Setup( &fmt, VLC_CODEC_RGB32,
