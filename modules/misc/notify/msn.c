@@ -153,7 +153,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char *psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
     char *psz_album = input_item_GetAlbum( input_GetItem( p_input ) );
     char *psz_title = input_item_GetTitleFbName( input_GetItem( p_input ) );
-    char *psz_buf = str_format_meta( p_this, p_intf->p_sys->psz_format );
+    char *psz_buf = str_format_meta( p_intf, p_intf->p_sys->psz_format );
 
     snprintf( psz_tmp,
               MSN_MAX_LENGTH,
