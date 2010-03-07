@@ -1989,45 +1989,7 @@ fi
 dnl
 dnl  OpenCV wrapper and example filters
 dnl
-AC_ARG_ENABLE(opencv,
-  [  --enable-opencv         OpenCV (computer vision) filter (default disabled)])
-if test "${enable_opencv}" = "yes" -a "${CXX}" != "";
-then
-  AC_ARG_WITH(opencv-tree,
-  [  --with-opencv-tree=PATH opencv tree for linking])
-    if test "${SYS}" = "mingw32"
-    then
-      test -z "${with_opencv_tree}" && AC_MSG_ERROR([You have to specify --with-opencv-tree])
-      AC_MSG_CHECKING(for opencv in ${with_opencv_tree})
-      if test -f ${with_opencv_tree}/cv/include/cv.h -a -f ${with_opencv_tree}/cxcore/include/cxcore.h \
-        -a -f ${with_opencv_tree}/cvaux/include/cvaux.h -a -f ${with_opencv_tree}/otherlibs/highgui/highgui.h
-      then
-        AC_MSG_RESULT(yes)
-        VLC_ADD_PLUGIN([opencv_wrapper])
-        VLC_ADD_LIBS([opencv_wrapper],[-L${with_opencv_tree}/lib -lcv -lcxcore -lcvaux -lhighgui])
-        VLC_ADD_CFLAGS([opencv_wrapper],[-I${with_opencv_tree}/cv/include -I${with_opencv_tree}/cxcore/include -I${with_opencv_tree}/cvaux/include -I${with_opencv_tree}/otherlibs/highgui])
-        AC_LANG_PUSH(C++)
-        VLC_ADD_PLUGIN([opencv_example])
-        VLC_ADD_LIBS([opencv_example],[-L${with_opencv_tree}/lib -lcv -lcxcore -lcvaux -lhighgui])
-        VLC_ADD_CXXFLAGS([opencv_example],[-I${with_opencv_tree}/cv/include -I${with_opencv_tree}/cxcore/include -I${with_opencv_tree}/cvaux/include -I${with_opencv_tree}/otherlibs/highgui])
-        AC_LANG_POP(C++)
-      else
-        dnl  No opencv could be found, sorry
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot find opencv in ${with_opencv_tree}])
-      fi
-    else
-      PKG_CHECK_MODULES(OPENCV, opencv,
-        [
-          VLC_ADD_PLUGIN([opencv_example opencv_wrapper])
-          VLC_ADD_LIBS([opencv_example opencv_wrapper],[${OPENCV_LIBS}])
-          VLC_ADD_CFLAGS([opencv_wrapper],[${OPENCV_CFLAGS}])
-          VLC_ADD_CXXFLAGS([opencv_example],[${OPENCV_CFLAGS}])
-        ],
-        [AC_MSG_ERROR([libopencv not found!])]
-      )
-    fi
-fi
+PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example opencv_wrapper], [opencv], (OpenCV (computer vision) filter), [off])
 
 
 dnl
