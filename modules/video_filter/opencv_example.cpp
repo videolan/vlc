@@ -25,10 +25,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <cxcore.h>
-#include <cv.h>
-#include <highgui.h>
-
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -41,6 +37,9 @@
 #include "filter_common.h"
 #include <vlc_image.h>
 #include "filter_event_info.h"
+
+#include <cxcore.h>
+#include <cv.h>
 
 /*****************************************************************************
  * filter_sys_t : filter descriptor

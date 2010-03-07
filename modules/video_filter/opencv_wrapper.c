@@ -24,10 +24,6 @@
  * Preamble
  *****************************************************************************/
 
-#include <cxcore.h>
-#include <cv.h>
-#include <highgui.h>
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -44,6 +40,9 @@
 #include <vlc_image.h>
 #include <vlc_input.h>
 #include <vlc_playlist.h>
+
+#include <cxcore.h>
+#include <cv.h>
 
 
 /*****************************************************************************
