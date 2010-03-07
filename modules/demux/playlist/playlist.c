@@ -31,6 +31,10 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
+#include <vlc_url.h>
+#ifdef WIN32
+# include <ctype.h>
+#endif
 
 #include "playlist.h"
 
@@ -225,19 +229,31 @@ char *ProcessMRL( const char *psz_mrl, const char *psz_prefix )
      * PB: on some file systems, ':' are valid characters though */
 
     /* Simple cases first */
-    if( !psz_mrl || !*psz_mrl ) return NULL;
-    if( !psz_prefix || !*psz_prefix ) return strdup( psz_mrl );
+    if( !psz_mrl || !*psz_mrl )
+        return NULL;
+    if( !psz_prefix || !*psz_prefix )
+        goto uri;
 
     /* Check if the line specifies an absolute path */
-    if( *psz_mrl == '/' || *psz_mrl == '\\' ) return strdup( psz_mrl );
-
-    /* Check if the line specifies an mrl/url
-     * (and on win32, contains a drive letter) */
-    if( strchr( psz_mrl, ':' ) ) return strdup( psz_mrl );
+    /* FIXME: that's wrong if the playlist is not a local file */
+    if( *psz_mrl == DIR_SEP_CHAR )
+        goto uri;
+#ifdef WIN32
+    /* Drive letter (this assumes URL scheme are not a single character) */
+    if( isalpha(psz_mrl[0]) && psz_mrl[1] == ':' )
+        goto uri;
+#endif
 
     /* This a relative path, prepend the prefix */
     char *ret;
-    if( asprintf( &ret, "%s%s", psz_prefix, psz_mrl ) == -1 )
+    char *postfix = encode_URI_component( psz_mrl );
+    /* FIXME: postfix may not be encoded correctly (esp. slashes) */
+    if( postfix == NULL
+     || asprintf( &ret, "%s%s", psz_prefix, postfix ) == -1 )
         ret = NULL;
+    free( postfix );
     return ret;
+
+uri:
+    return make_URI( psz_mrl );
 }
