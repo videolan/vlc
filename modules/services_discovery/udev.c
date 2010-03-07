@@ -523,19 +523,18 @@ static char *disc_get_mrl (struct udev_device *dev)
         return NULL; /* Ignore non-optical block devices */
 
     val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_STATE");
-    if ((val == NULL) || !strcmp (val, "blank"))
+    if (val && !strcmp (val, "blank"))
         return NULL; /* ignore empty drives and virgin recordable discs */
 
-    const char *scheme = "file";
+    const char *scheme = "invalid";
     val = udev_device_get_property_value (dev,
                                           "ID_CDROM_MEDIA_TRACK_COUNT_AUDIO");
     if (val && atoi (val))
         scheme = "cdda"; /* Audio CD rather than file system */
-#if 0 /* we can use file:// for DVDs */
     val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_DVD");
     if (val && atoi (val))
-        scheme = "dvd";
-#endif
+        scheme = "file";
+
     val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_BD");
     if (val && atoi (val))
         scheme = "bd";
@@ -544,6 +543,11 @@ static char *disc_get_mrl (struct udev_device *dev)
     if (val && atoi (val))
         scheme = "hddvd";
 #endif
+
+    /* We didn't get any property that could tell we have optical disc
+       that we can play */
+    if( !strcmp( scheme, "invalid" ) )
+        return NULL;
 
     val = udev_device_get_devnode (dev);
     char *mrl;
