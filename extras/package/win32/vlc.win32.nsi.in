@@ -326,20 +326,8 @@ FunctionEnd
 !macroend
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; 3. Delete prefs and cache ;
+; 3. Delete prefs           ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-Function ExecCacheGen
-  ExecWait "$INSTDIR\vlc-cache-gen.exe $APPDATA\VideoLAN\VLC"
-FunctionEnd
-
-!macro gencache
-  SetShellVarContext all
-  CreateDirectory "$APPDATA\VideoLAN"
-  CreateDirectory "$APPDATA\VideoLAN\VLC"
-  !insertmacro UAC.CallFunctionAsUser ExecCacheGen
-  SetShellVarContext current
-!macroend
 
 !macro delprefs
   StrCpy $0 0
@@ -459,7 +447,7 @@ Section $Name_Section01 SEC01
 @BUILD_SKINS_TRUE@   !insertmacro InstallFolder skins
 @BUILD_HTTPD_TRUE@   !insertmacro InstallFolder http
 @BUILD_LUA_TRUE@     !insertmacro InstallFolder lua
-  !insertmacro gencache
+  ExecWait "$INSTDIR\vlc-cache-gen.exe $INSTDIR\plugins"
 
 
   ; URLs

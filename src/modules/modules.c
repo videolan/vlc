@@ -821,19 +821,9 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
     /* Contruct the special search path for system that have a relocatable
      * executable. Set it to <vlc path>/plugins. */
     assert( vlcpath );
-#ifndef WIN32
+
     if( asprintf( &path, "%s" DIR_SEP "plugins", vlcpath ) != -1 )
         vlc_array_append( arraypaths, path );
-#else
-    /* Store the plugins cache in the common AppData folder */
-    char commonpath[PATH_MAX] = "";
-    int res = snprintf( commonpath, PATH_MAX -1, "%s\\VideoLAN\\VLC", config_GetConfDir());
-        if(res == -1 || res >= PATH_MAX)
-        {
-            vlc_array_destroy( arraypaths );
-            return;
-        }
-#endif
 
     /* If the user provided a plugin path, we add it to the list */
     char *userpaths = var_InheritString( p_this, "plugin-path" );
@@ -855,17 +845,9 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
 
         size_t offset = p_module_bank->i_cache;
         if( b_reset )
-#ifndef WIN32
             CacheDelete( p_this, path );
-#else
-            CacheDelete( p_this, commonpath );
-#endif
         else
-#ifndef WIN32
             CacheLoad( p_this, p_module_bank, path );
-#else
-             CacheLoad( p_this, p_module_bank, commonpath );
-#endif
 
         msg_Dbg( p_this, "recursively browsing `%s'", path );
 
@@ -873,13 +855,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
         AllocatePluginDir( p_this, p_bank, path, 5 );
 
 
-#ifndef WIN32
         CacheSave( p_this, path, p_module_bank->pp_cache + offset,
                    p_module_bank->i_cache - offset );
-#else
-        CacheSave( p_this, commonpath, p_module_bank->pp_cache + offset,
-                   p_module_bank->i_cache - offset );
-#endif
         free( path );
     }
 
