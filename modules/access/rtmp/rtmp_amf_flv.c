@@ -741,7 +741,7 @@ rtmp_build_bytes_read( rtmp_control_thread_t *p_thread, uint32_t reply )
     /* Build bytes read packet */
     rtmp_body = rtmp_body_new( -1 );
 
-    tmp_buffer = (uint8_t *) malloc( sizeof( uint32_t ) * sizeof( uint8_t ) );
+    tmp_buffer = (uint8_t *) malloc( sizeof( uint32_t ) );
     if( !tmp_buffer ) return NULL;
 
     reply = hton32( reply );
