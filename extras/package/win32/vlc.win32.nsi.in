@@ -346,9 +346,6 @@ FunctionEnd
     Goto "${Index}-Loop"
   "${Index}-End:"
   !undef Index
-  SetShellVarContext all
-  RMDir /r "$APPDATA\\VideoLAN"
-  SetShellVarContext current
 !macroend
 
 ;;;;;;;;;;;;;;;
