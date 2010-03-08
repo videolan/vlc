@@ -73,7 +73,6 @@ extern "C" {
  */
 
 /** \defgroup libvlc_error LibVLC error handling
- * \ingroup libvlc_error
  * @{
  */
 

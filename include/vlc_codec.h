@@ -135,7 +135,7 @@ struct decoder_t
  */
 
 /**
- * \defgroup decoder Encoder
+ * \defgroup encoder Encoder
  *
  * The structure describing a Encoder
  *

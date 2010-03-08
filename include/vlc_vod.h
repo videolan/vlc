@@ -30,7 +30,8 @@
  */
 
 /**
- * \defgroup server Video On Demand (VOD)
+ * \defgroup vod Video On Demand (VOD)
+ * \ingroup server
  * Video On Demand (VOD) functionality is provided from VLM.
  * @{
  */
