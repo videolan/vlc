@@ -33,6 +33,7 @@
 #include <vlc_interface.h> /* intf_thread_t */
 #include <vlc_playlist.h>  /* playlist_t */
 
+#define QT_NO_CAST_TO_ASCII
 #include <QString>
 
 #if ( QT_VERSION < 0x040400 )
