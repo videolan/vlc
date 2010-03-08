@@ -293,15 +293,19 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 #ifdef Q_WS_X11
     if( !XInitThreads() )
         return VLC_EGENERIC;
-    x11_display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
+
+    char *display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
     Display *p_display = XOpenDisplay( x11_display );
     if( !p_display )
     {
         msg_Err( p_intf, "Could not connect to X server" );
+        free (display);
         return VLC_EGENERIC;
     }
     XCloseDisplay( p_display );
     putenv( (char *)"XLIB_SKIP_ARGB_VISUALS=1" );
+#else
+    char *display = NULL;
 #endif
 
     bool busy;
@@ -312,6 +316,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     if (busy)
     {
         msg_Err (p_this, "cannot start Qt4 multiple times");
+        free (display);
         return VLC_EGENERIC;
     }
 
@@ -327,11 +332,13 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
         delete p_sys;
+        free (display);
         vlc_mutex_lock (&one.lock);
         one.busy = false;
         vlc_mutex_unlock (&one.lock);
         return VLC_ENOMEM;
     }
+    x11_display = display;
 
     /* */
     vlc_sem_wait (&ready);
@@ -369,13 +376,14 @@ static void Close( vlc_object_t *p_this )
     QVLCApp::triggerQuit();
 
     vlc_join (p_sys->thread, NULL);
+#ifdef Q_WS_X11
+    free (x11_display);
+    x11_display = NULL;
+#endif
     delete p_sys;
     vlc_mutex_lock (&one.lock);
     one.busy = false;
     vlc_mutex_unlock (&one.lock);
-#ifdef Q_WS_X11
-    free (x11_display);
-#endif
 }
 
 static void *Thread( void *obj )
@@ -503,11 +511,7 @@ static void *Thread( void *obj )
     /* Destroy the MainInputManager */
     MainInputManager::killInstance();
 
-
     /* Delete the application automatically */
-#ifdef Q_WS_X11
-    free( x11_display );
-#endif
     return NULL;
 }
 
