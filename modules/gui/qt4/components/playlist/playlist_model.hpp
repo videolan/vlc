@@ -46,12 +46,14 @@
 #include <QAction>
 
 class PLItem;
+class PLSelector;
 
 class PLModel : public QAbstractItemModel
 {
     Q_OBJECT
 
 friend class PLItem;
+friend class PLSelector;
 
 public:
     enum {
@@ -139,6 +141,7 @@ private:
     void updateChildren( playlist_item_t *, PLItem * );
 
     /* Deep actions (affect core playlist) */
+    static void recursiveAppendCopy( playlist_t *, playlist_item_t *, playlist_item_t *, bool );
     void dropAppendCopy( QByteArray& data, PLItem *target );
     void dropMove( QByteArray& data, PLItem *target, int new_pos );
 

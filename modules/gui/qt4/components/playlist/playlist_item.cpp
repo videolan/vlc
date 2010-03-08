@@ -112,3 +112,22 @@ int PLItem::row() const
     return 0;
 }
 
+bool PLItem::operator< ( PLItem& other )
+{
+    PLItem *item1 = this;
+    while( item1->parentItem )
+    {
+        PLItem *item2 = &other;
+        while( item2->parentItem )
+        {
+            if( item1 == item2->parentItem ) return true;
+            if( item2 == item1->parentItem ) return false;
+            if( item1->parentItem == item2->parentItem )
+                return item1->parentItem->children.indexOf( item1 ) <
+                       item1->parentItem->children.indexOf( item2 );
+            item2 = item2->parentItem;
+        }
+        item1 = item1->parentItem;
+    }
+    return false;
+}

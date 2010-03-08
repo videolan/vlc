@@ -29,7 +29,7 @@
 #include <assert.h>
 
 #include "components/playlist/selector.hpp"
-#include "playlist_item.hpp"
+#include "playlist_model.hpp"
 #include "qt4.hpp"
 #include "../../dialogs_provider.hpp"
 #include "playlist.hpp"
@@ -357,15 +357,15 @@ bool PLSelector::dropMimeData ( QTreeWidgetItem * parent, int index,
         playlist_Lock( THEPL );
         while( !stream.atEnd() )
         {
-            PLItem *item;
-            stream.readRawData( (char*)&item, sizeof(PLItem*) );
-            input_item_t *pl_input =item->inputItem();
-            playlist_AddExt ( THEPL,
-                pl_input->psz_uri, pl_input->psz_name,
-                PLAYLIST_APPEND | PLAYLIST_SPREPARSE, PLAYLIST_END,
-                pl_input->i_duration,
-                pl_input->i_options, pl_input->ppsz_options, pl_input->optflagc,
-                to_pl, true );
+            int i_id;
+            stream >> i_id;
+
+            playlist_item_t *p_item = playlist_ItemGetById( THEPL, i_id );
+            if( !p_item ) continue;
+
+            PLModel::recursiveAppendCopy( THEPL, p_item,
+                                          to_pl ? THEPL->p_playing : THEPL->p_media_library,
+                                          to_pl && !var_InheritBool( p_intf, "playlist-tree" ) );
         }
         playlist_Unlock( THEPL );
     }

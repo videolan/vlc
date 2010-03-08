@@ -141,6 +141,15 @@ QStringList PLModel::mimeTypes() const
     return types;
 }
 
+bool modelIndexLessThen( const QModelIndex &i1, const QModelIndex &i2 )
+{
+    if( !i1.isValid() || !i2.isValid() ) return false;
+    PLItem *item1 = static_cast<PLItem*>( i1.internalPointer() );
+    PLItem *item2 = static_cast<PLItem*>( i2.internalPointer() );
+    if( item1->parent() == item2->parent() ) return i1.row() < i2.row();
+    else return *item1 < *item2;
+}
+
 QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
 {
     QMimeData *mimeData = new QMimeData();
@@ -153,11 +162,26 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
             list.append(index);
     }
 
-    qSort(list);
+    qSort(list.begin(), list.end(), modelIndexLessThen);
 
+    PLItem *item = NULL;
     foreach( const QModelIndex &index, list ) {
-        PLItem *item = getItem( index );
-        stream.writeRawData( (char*) &item, sizeof( PLItem* ) );
+        if( item )
+        {
+            PLItem *testee = getItem( index );
+            while( testee->parent() )
+            {
+                if( testee->parent() == item ||
+                    testee->parent() == item->parent() ) break;
+                testee = testee->parent();
+            }
+            if( testee->parent() == item ) continue;
+            item = getItem( index );
+        }
+        else
+            item = getItem( index );
+
+        stream << item->id();
     }
     mimeData->setData( "vlc/qt-playlist-item", encodedData );
     return mimeData;
@@ -172,11 +196,9 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
         if( action == Qt::IgnoreAction )
             return true;
 
-        PLItem *parentItem = parent.isValid() ? getItem( parent ) : rootItem;
-
         PL_LOCK;
         playlist_item_t *p_parent =
-            playlist_ItemGetById( p_playlist, parentItem->i_id );
+            playlist_ItemGetById( p_playlist, itemId( parent ) );
         if( !p_parent || p_parent->i_children == -1 )
         {
             PL_UNLOCK;
@@ -197,9 +219,9 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
 
         QByteArray encodedData = data->data( "vlc/qt-playlist-item" );
         if( copy )
-            dropAppendCopy( encodedData, parentItem );
+            dropAppendCopy( encodedData, getItem( parent ) );
         else
-            dropMove( encodedData, parentItem, row );
+            dropMove( encodedData, getItem( parent ), row );
     }
     return true;
 }
@@ -211,78 +233,109 @@ void PLModel::dropAppendCopy( QByteArray& data, PLItem *target )
     PL_LOCK;
     playlist_item_t *p_parent =
             playlist_ItemGetById( p_playlist, target->i_id );
+    if( !p_parent ) return;
+
+    bool b_flat = p_parent == p_playlist->p_playing &&
+                  !var_InheritBool( p_intf, "playlist-tree" );
+
     while( !stream.atEnd() )
     {
-        PLItem *item;
-        stream.readRawData( (char*)&item, sizeof(PLItem*) );
-        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
+        int i_id;
+        stream >> i_id;
+        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
         if( !p_item ) continue;
-        input_item_t *p_input = p_item->p_input;
-        playlist_AddExt ( p_playlist,
-            p_input->psz_uri, p_input->psz_name,
-            PLAYLIST_APPEND | PLAYLIST_SPREPARSE, PLAYLIST_END,
-            p_input->i_duration,
-            p_input->i_options, p_input->ppsz_options, p_input->optflagc,
-            p_parent == p_playlist->p_playing,
-            true );
+
+        recursiveAppendCopy( p_playlist, p_item, p_parent, b_flat );
     }
     PL_UNLOCK;
+}
+
+/* Must be entered WITH playlist lock! */
+void PLModel::recursiveAppendCopy( playlist_t *p_playlist, playlist_item_t *source,
+                                   playlist_item_t *target, bool b_flat )
+{
+    input_item_t *srcInput = source->p_input;
+
+    if( !(source->i_children != -1 && b_flat) )
+    {
+        vlc_mutex_lock( &srcInput->lock );
+        input_item_t *newInput =
+            input_item_NewWithType( VLC_OBJECT(p_playlist),
+                                    srcInput->psz_uri, srcInput->psz_name,
+                                    srcInput->i_options, srcInput->ppsz_options,
+                                    srcInput->optflagc, srcInput->i_duration,
+                                    srcInput->i_type );
+        vlc_mutex_unlock( &srcInput->lock );
+
+        if( source->i_children != -1 )
+            target = playlist_NodeCreate( p_playlist, newInput->psz_name, target, 0, newInput );
+        else
+            playlist_NodeAddInput( p_playlist, newInput, target,
+                                   PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
+                                   PLAYLIST_END, pl_Locked );
+    }
+    for( int i = 0; i < source->i_children; i++ )
+        recursiveAppendCopy( p_playlist, source->pp_children[i], target, b_flat );
 }
 
 void PLModel::dropMove( QByteArray& data, PLItem *target, int row )
 {
     QDataStream stream( &data, QIODevice::ReadOnly );
     QList<PLItem*> model_items;
-    QList<int> ids;
     int new_pos = row == -1 ? target->children.size() : row;
     int model_pos = new_pos;
+
     while( !stream.atEnd() )
     {
-        PLItem *item;
-        stream.readRawData( (char*)&item, sizeof(PLItem*) );
+        int i_id;
+        stream >> i_id;
+        PLItem *item = findById( rootItem, i_id );
+        if( !item ) continue;
 
-        /* better not try to move a node into itself: */
+        /* Better not try to move a node into itself.
+           Abort the whole operation in that case,
+           because it is ambiguous. */
         PLItem *climber = target;
         while( climber )
         {
-            if( climber == item ) break;
+            if( climber == item ) return;
             climber = climber->parentItem;
         }
-        if( climber ) continue;
 
         if( item->parentItem == target &&
-            target->children.indexOf( item ) < model_pos )
+            target->children.indexOf( item ) < new_pos )
                 model_pos--;
 
-        ids.append( item->i_id );
         model_items.append( item );
+    }
 
+    if( model_items.isEmpty() ) return;
+
+    foreach( PLItem *item, model_items )
         takeItem( item );
-    }
-    int count = ids.size();
-    if( count )
+
+    playlist_item_t *pp_items[model_items.size()];
+
+    PL_LOCK;
+    int i = 0;
+    foreach( PLItem *item, model_items )
     {
-        playlist_item_t *pp_items[count];
-
-        PL_LOCK;
-        for( int i = 0; i < count; i++ )
+        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
+        if( !p_item )
         {
-            playlist_item_t *p_item = playlist_ItemGetById( p_playlist, ids[i] );
-            if( !p_item )
-            {
-                PL_UNLOCK;
-                return;
-            }
-            pp_items[i] = p_item;
+            PL_UNLOCK;
+            return;
         }
-        playlist_item_t *p_parent =
-            playlist_ItemGetById( p_playlist, target->i_id );
-        playlist_TreeMoveMany( p_playlist, count, pp_items, p_parent,
-            new_pos );
-        PL_UNLOCK;
-
-        insertChildren( target, model_items, model_pos );
+        pp_items[i] = p_item;
+        i++;
     }
+    playlist_item_t *p_parent =
+        playlist_ItemGetById( p_playlist, target->i_id );
+    playlist_TreeMoveMany( p_playlist, i, pp_items, p_parent,
+        new_pos );
+    PL_UNLOCK;
+
+    insertChildren( target, model_items, model_pos );
 }
 
 /* remove item with its id */
