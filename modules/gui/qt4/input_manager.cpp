@@ -103,13 +103,14 @@ void InputManager::setInput( input_thread_t *_p_input )
     {
         msg_Dbg( p_intf, "IM: Setting an input" );
         vlc_object_hold( p_input );
-        emit statusChanged( PLAYING_S );
+        addCallbacks();
+        UpdateStatus();
         UpdateName();
         UpdateArt();
         UpdateTeletext();
         UpdateNavigation();
         UpdateVout();
-        addCallbacks();
+
         p_item = input_GetItem( p_input );
         emit rateChanged( var_GetFloat( p_input, "rate" ) );
     }
@@ -695,7 +696,6 @@ void InputManager::togglePlayPause()
         int state = var_GetInteger( p_input, "state" );
         state = ( state != PLAYING_S ) ? PLAYING_S : PAUSE_S;
         var_SetInteger( p_input, "state", state );
-        emit statusChanged( state );
     }
 }
 
