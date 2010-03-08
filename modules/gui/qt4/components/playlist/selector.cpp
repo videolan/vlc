@@ -334,7 +334,7 @@ void PLSelector::createItems()
 QStringList PLSelector::mimeTypes() const
 {
     QStringList types;
-    types << "vlc/qt-playlist-item";
+    types << "vlc/qt-input-items";
     return types;
 }
 
@@ -350,25 +350,22 @@ bool PLSelector::dropMimeData ( QTreeWidgetItem * parent, int index,
     if( i_truth != IS_PL && i_truth != IS_ML ) return false;
     bool to_pl = ( i_truth == IS_PL );
 
-    if( data->hasFormat( "vlc/qt-playlist-item" ) )
+    QList<input_item_t*> inputItems = PlMimeData::inputItems( data );
+
+    playlist_Lock( THEPL );
+
+    foreach( input_item_t *p_input, inputItems )
     {
-        QByteArray encodedData = data->data( "vlc/qt-playlist-item" );
-        QDataStream stream( &encodedData, QIODevice::ReadOnly );
-        playlist_Lock( THEPL );
-        while( !stream.atEnd() )
-        {
-            int i_id;
-            stream >> i_id;
+        playlist_item_t *p_item = playlist_ItemGetByInput( THEPL, p_input );
+        if( !p_item ) continue;
 
-            playlist_item_t *p_item = playlist_ItemGetById( THEPL, i_id );
-            if( !p_item ) continue;
-
-            PLModel::recursiveAppendCopy( THEPL, p_item,
-                                          to_pl ? THEPL->p_playing : THEPL->p_media_library,
-                                          to_pl && !var_InheritBool( p_intf, "playlist-tree" ) );
-        }
-        playlist_Unlock( THEPL );
+        PLModel::recursiveAppendCopy( THEPL, p_item,
+                                      to_pl ? THEPL->p_playing : THEPL->p_media_library,
+                                      to_pl && !var_InheritBool( p_intf, "playlist-tree" ) );
     }
+
+    playlist_Unlock( THEPL );
+
     return true;
 }
 

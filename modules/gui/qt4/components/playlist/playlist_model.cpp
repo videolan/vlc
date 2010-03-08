@@ -137,7 +137,7 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
 QStringList PLModel::mimeTypes() const
 {
     QStringList types;
-    types << "vlc/qt-playlist-item";
+    types << "vlc/qt-input-items";
     return types;
 }
 
@@ -152,9 +152,7 @@ bool modelIndexLessThen( const QModelIndex &i1, const QModelIndex &i2 )
 
 QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
 {
-    QMimeData *mimeData = new QMimeData();
-    QByteArray encodedData;
-    QDataStream stream( &encodedData, QIODevice::WriteOnly );
+    PlMimeData *plMimeData = new PlMimeData();
     QModelIndexList list;
 
     foreach( const QModelIndex &index, indexes ) {
@@ -181,17 +179,17 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
         else
             item = getItem( index );
 
-        stream << item->id();
+        plMimeData->appendItem( item->p_input );
     }
-    mimeData->setData( "vlc/qt-playlist-item", encodedData );
-    return mimeData;
+
+    return plMimeData->mimeData();
 }
 
 /* Drop operation */
 bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
                            int row, int column, const QModelIndex &parent )
 {
-    if( data->hasFormat( "vlc/qt-playlist-item" ) )
+    if( data->hasFormat( "vlc/qt-input-items" ) )
     {
         if( action == Qt::IgnoreAction )
             return true;
@@ -217,36 +215,34 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
             copy = true;
         PL_UNLOCK;
 
-        QByteArray encodedData = data->data( "vlc/qt-playlist-item" );
         if( copy )
-            dropAppendCopy( encodedData, getItem( parent ) );
+            dropAppendCopy( data, getItem( parent ) );
         else
-            dropMove( encodedData, getItem( parent ), row );
+            dropMove( data, getItem( parent ), row );
     }
     return true;
 }
 
-void PLModel::dropAppendCopy( QByteArray& data, PLItem *target )
+void PLModel::dropAppendCopy( const QMimeData *data, PLItem *target )
 {
-    QDataStream stream( &data, QIODevice::ReadOnly );
-
     PL_LOCK;
+
     playlist_item_t *p_parent =
-            playlist_ItemGetById( p_playlist, target->i_id );
+            playlist_ItemGetByInput( p_playlist, target->p_input );
     if( !p_parent ) return;
 
     bool b_flat = p_parent == p_playlist->p_playing &&
                   !var_InheritBool( p_intf, "playlist-tree" );
 
-    while( !stream.atEnd() )
+    QList<input_item_t*> inputItems = PlMimeData::inputItems( data );
+    foreach( input_item_t* p_input, inputItems )
     {
-        int i_id;
-        stream >> i_id;
-        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
+        playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input );
         if( !p_item ) continue;
 
         recursiveAppendCopy( p_playlist, p_item, p_parent, b_flat );
     }
+
     PL_UNLOCK;
 }
 
@@ -278,18 +274,16 @@ void PLModel::recursiveAppendCopy( playlist_t *p_playlist, playlist_item_t *sour
         recursiveAppendCopy( p_playlist, source->pp_children[i], target, b_flat );
 }
 
-void PLModel::dropMove( QByteArray& data, PLItem *target, int row )
+void PLModel::dropMove( const QMimeData * mimeData, PLItem *target, int row )
 {
-    QDataStream stream( &data, QIODevice::ReadOnly );
+    QList<input_item_t*> inputItems = PlMimeData::inputItems( mimeData );
     QList<PLItem*> model_items;
     int new_pos = row == -1 ? target->children.size() : row;
     int model_pos = new_pos;
 
-    while( !stream.atEnd() )
+    foreach( input_item_t *p_input, inputItems )
     {
-        int i_id;
-        stream >> i_id;
-        PLItem *item = findById( rootItem, i_id );
+        PLItem *item = findByInput( rootItem, p_input->i_id );
         if( !item ) continue;
 
         /* Better not try to move a node into itself.
@@ -1137,4 +1131,53 @@ void PLModel::popupSort( int column )
     sort( i_popup_parent,
           column > 0 ? column - 1 : -column - 1,
           column > 0 ? Qt::AscendingOrder : Qt::DescendingOrder );
+}
+
+/******************* Drag and Drop helper class ******************/
+
+PlMimeData::PlMimeData( )
+{
+    _mimeData = new QMimeData;
+    setParent( _mimeData );
+}
+
+PlMimeData::~PlMimeData()
+{
+    foreach( input_item_t *p_item, _inputItems )
+        vlc_gc_decref( p_item );
+}
+
+void PlMimeData::appendItem( input_item_t *p_item )
+{
+    vlc_gc_incref( p_item );
+    _inputItems.append( p_item );
+}
+
+QMimeData * PlMimeData::mimeData()
+{
+    QByteArray encodedData;
+    input_item_t *pp_items[_inputItems.size()];
+
+    for( int i = 0; i < _inputItems.size() ; i++ )
+        pp_items[i] = _inputItems[i];
+
+    _mimeData->setData( "vlc/qt-input-items",
+                        QByteArray( (char*) pp_items, _inputItems.size() * sizeof( input_item_t*) ) );
+    return _mimeData;
+}
+
+QList<input_item_t*> PlMimeData::inputItems( const QMimeData * mimeData )
+{
+    QList<input_item_t*> list;
+
+    if( !mimeData->hasFormat( "vlc/qt-input-items" ) ) return list;
+
+    QByteArray encodedData = mimeData->data( "vlc/qt-input-items" );
+
+    input_item_t **pp_items = (input_item_t **) encodedData.data();
+    int i_items = encodedData.size() / sizeof( input_item_t* );
+    for( int i = 0; i < i_items; i++ )
+        list.append( pp_items[i] );
+
+    return list;
 }

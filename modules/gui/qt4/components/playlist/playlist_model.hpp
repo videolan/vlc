@@ -142,8 +142,8 @@ private:
 
     /* Deep actions (affect core playlist) */
     static void recursiveAppendCopy( playlist_t *, playlist_item_t *, playlist_item_t *, bool );
-    void dropAppendCopy( QByteArray& data, PLItem *target );
-    void dropMove( QByteArray& data, PLItem *target, int new_pos );
+    void dropAppendCopy( const QMimeData * data, PLItem *target );
+    void dropMove( const QMimeData * data, PLItem *target, int new_pos );
 
     /* Popup */
     int i_popup_item, i_popup_parent, i_popup_column;
@@ -175,6 +175,20 @@ private slots:
     void processInputItemUpdate( input_thread_t* p_input );
     void processItemRemoval( int i_id );
     void processItemAppend( int item, int parent );
+};
+
+class PlMimeData : public QObject
+{
+public:
+    PlMimeData();
+    ~PlMimeData();
+    void appendItem( input_item_t *p_item );
+    QMimeData *mimeData();
+    static QList<input_item_t*> inputItems( const QMimeData * mimeData );
+
+private:
+    QList<input_item_t*> _inputItems;
+    QMimeData *_mimeData;
 };
 
 #endif
