@@ -328,6 +328,9 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     p_sys->p_playlist = pl_Get( p_intf );
 
     /* */
+#ifdef Q_WS_X11
+    x11_display = display;
+#endif
     vlc_sem_init (&ready, 0);
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
@@ -338,7 +341,6 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
         vlc_mutex_unlock (&one.lock);
         return VLC_ENOMEM;
     }
-    x11_display = display;
 
     /* */
     vlc_sem_wait (&ready);
