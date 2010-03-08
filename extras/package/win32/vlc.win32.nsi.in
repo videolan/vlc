@@ -444,7 +444,13 @@ Section $Name_Section01 SEC01
 @BUILD_SKINS_TRUE@   !insertmacro InstallFolder skins
 @BUILD_HTTPD_TRUE@   !insertmacro InstallFolder http
 @BUILD_LUA_TRUE@     !insertmacro InstallFolder lua
+
+  ; Generate the cache and add it to uninstall.log
   ExecWait "$INSTDIR\vlc-cache-gen.exe $INSTDIR\plugins"
+  FindFirst $0 $1 "$INSTDIR\plugins\*.dat"
+  FileWrite $UninstallLog "plugins\$1$\r$\n"
+  FindClose $0
+
 
 
   ; URLs
