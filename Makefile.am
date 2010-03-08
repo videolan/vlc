@@ -727,6 +727,10 @@ package-win-common:
 	mkdir -p $(win32_destdir)/locale/qt4/
 	cp $(QT4LOCALEDIR)/*.qm $(win32_destdir)/locale/qt4/ || true
 
+# Copy the UAC NSIS plugin
+	cp "$(srcdir)/extras/package/win32/UAC.nsh" "$(win32_destdir)/"
+	cp "$(srcdir)/extras/package/win32/UAC.dll" "$(win32_destdir)/"
+
 #  Mozilla plugin
 if BUILD_MOZILLA
 	mkdir -p "$(win32_destdir)/mozilla"
@@ -774,8 +778,6 @@ package-win32-base-debug: package-win-common
 # Script installer
 	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(win32_destdir)/"
 	cp "$(top_builddir)/extras/package/win32/spad.nsi" "$(win32_destdir)/"
-	cp "$(srcdir)/extras/package/win32/UAC.nsh" "$(win32_destdir)/"
-	cp "$(srcdir)/extras/package/win32/UAC.dll" "$(win32_destdir)/"
 	mkdir "$(win32_destdir)/languages"
 	cp $(srcdir)/extras/package/win32/languages/*.nsh "$(win32_destdir)/languages/"
 
