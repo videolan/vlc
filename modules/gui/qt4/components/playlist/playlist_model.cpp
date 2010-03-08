@@ -1104,7 +1104,7 @@ void PLModel::popupExplore()
                    !strncasecmp( psz_access, "file", 4 ) ||
                    !strncasecmp( psz_access, "dire", 4 ) ))
            {
-               QFileInfo info( qfu( psz_path ) );
+               QFileInfo info( qfu( decode_URI( psz_path ) ) );
                QDesktopServices::openUrl(
                                QUrl::fromLocalFile( info.absolutePath() ) );
            }
