@@ -243,6 +243,8 @@ char *ProcessMRL( const char *psz_mrl, const char *psz_prefix )
     if( isalpha(psz_mrl[0]) && psz_mrl[1] == ':' )
         goto uri;
 #endif
+    if( strstr( psz_mrl, "://" ) )
+        return strdup( psz_mrl );
 
     /* This a relative path, prepend the prefix */
     char *ret;
