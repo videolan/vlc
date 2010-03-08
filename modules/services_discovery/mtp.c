@@ -147,6 +147,8 @@ static void *Run( void *data )
             msg_Dbg( p_sd, "New device found" );
             if( AddDevice( p_sd, &p_rawdevices[0] ) == VLC_SUCCESS )
                 i_status = 1;
+            else
+                i_status = 2;
         }
         else
         {
@@ -161,7 +163,13 @@ static void *Run( void *data )
         }
         free( p_rawdevices );
         vlc_restorecancel(canc);
-        msleep( 500000 );
+        if( i_status == 2 )
+        {
+            msleep( 5000000 );
+            i_status = 0;
+        }
+        else
+            msleep( 500000 );
     }
     return NULL;
 }
@@ -216,7 +224,7 @@ static int AddDevice( services_discovery_t *p_sd,
     }
     else
     {
-        msg_Warn( p_sd, "No device found, after all" );
+        msg_Info( p_sd, "The device seems to be mounted, unmount it first" );
         return VLC_EGENERIC;
     }
 }

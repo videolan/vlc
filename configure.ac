@@ -4237,7 +4237,7 @@ PKG_ENABLE_MODULES_VLC([UDEV], [], [libudev >= 142], [Linux udev services discov
 
 dnl
 dnl MTP devices services discovery
-PKG_ENABLE_MODULES_VLC([MTP], [], [libmtp >= 0.3.0],[MTP devices support],[auto])
+PKG_ENABLE_MODULES_VLC([MTP], [mtp access_mtp], [libmtp >= 1.0.0], [MTP devices support], [auto])
 
 dnl
 dnl  Lirc plugin
