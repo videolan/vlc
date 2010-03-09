@@ -34,6 +34,7 @@
 #   include <dirent.h>
 #endif
 
+#include <fstream>
 
 
 ThemeRepository *ThemeRepository::instance( intf_thread_t *pIntf )
@@ -77,29 +78,34 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
     map<string,string>::const_iterator itmap, itdefault;
     for( itmap = m_skinsMap.begin(); itmap != m_skinsMap.end(); itmap++ )
     {
-        string path = itmap->first;
-        string name = itmap->second;
+        string name = itmap->first;
+        string path = itmap->second;
         val.psz_string = (char*) path.c_str();
         text.psz_string = (char*) name.c_str();
         var_Change( getIntf(), "intf-skins", VLC_VAR_ADDCHOICE, &val,
                     &text );
 
-        if( name == "default" )
+        if( name == "Default" )
             itdefault = itmap;
     }
 
     // retrieve last skins stored or skins requested by user
     char* psz_current = var_InheritString( getIntf(), "skins2-last" );
     string current = string( psz_current ? psz_current : "" );
-
-    // set the default skins if no skins provided
-    if( current.size() == 0 )
-    {
-        current = itdefault->first;
-        config_PutPsz( getIntf(), "skins2-last", current.c_str() );
-    }
-
     free( psz_current );
+
+    // check if skins exists and is readable
+    bool b_readable = !ifstream( current.c_str() ).fail();
+
+    msg_Dbg( getIntf(), "requested skins %s is %s accessible",
+                         current.c_str(), b_readable ? "" : "NOT" );
+
+    // set the default skins if given skins not accessible
+    if( !b_readable )
+        current = itdefault->second;
+
+    // save this valid skins for reuse
+    config_PutPsz( getIntf(), "skins2-last", current.c_str() );
 
     // Update repository
     updateRepository();
@@ -164,7 +170,11 @@ void ThemeRepository::parseDirectory( const string &rDir_locale )
         {
             string path = rDir + sep + name;
             string shortname = name.substr( 0, name.size() - 4 );
-            m_skinsMap[path] = shortname;
+            for( int i = 0; i < shortname.size(); i++ )
+                shortname[i] = ( i == 0 ) ?
+                               toupper( shortname[i] ) :
+                               tolower( shortname[i] );
+            m_skinsMap[shortname] = path;
 
             msg_Dbg( getIntf(), "found skin %s", path.c_str() );
         }
@@ -206,7 +216,7 @@ void ThemeRepository::updateRepository()
     vlc_value_t val, text;
 
     // retrieve the current skin
-    char* psz_current = var_InheritString( getIntf(), "skins2-last" );
+    char* psz_current = config_GetPsz( getIntf(), "skins2-last" );
     if( !psz_current )
         return;
 
@@ -215,10 +225,18 @@ void ThemeRepository::updateRepository()
 
     // add this new skins if not yet present in repository
     string current( psz_current );
-    if( m_skinsMap.find( current ) == m_skinsMap.end() )
+    map<string,string>::const_iterator it;
+    for( it = m_skinsMap.begin(); it != m_skinsMap.end(); it++ )
+    {
+        if( it->second == current )
+            break;
+    }
+    if( it == m_skinsMap.end() )
     {
         var_Change( getIntf(), "intf-skins", VLC_VAR_ADDCHOICE, &val,
                     &text );
+        string name = psz_current;
+        m_skinsMap[name] = name;
     }
 
     // mark this current skins as 'checked' in list
