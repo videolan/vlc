@@ -889,7 +889,7 @@ void Execute( httpd_file_sys_t *p_args,
         char *p;
         int i_copy;
 
-        p = (char *)strstr( (char *)src, "<vlc" );
+        p = strstr( src, "<vlc" );
         if( p < end && p == src )
         {
             macro_t m;
