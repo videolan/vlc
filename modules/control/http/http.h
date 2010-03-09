@@ -282,7 +282,7 @@ void Execute( httpd_file_sys_t *p_args,
                   char *p_request, int i_request,
                   char **pp_data, int *pi_data,
                   char **pp_dst,
-                  char *_src, char *_end );
+                  const char *_src, const char *_end );
 
 /**@}*/
 

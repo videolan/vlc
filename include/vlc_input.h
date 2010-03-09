@@ -103,7 +103,7 @@ static inline void vlc_seekpoint_Delete( seekpoint_t *point )
     free( point );
 }
 
-static inline seekpoint_t *vlc_seekpoint_Duplicate( seekpoint_t *src )
+static inline seekpoint_t *vlc_seekpoint_Duplicate( const seekpoint_t *src )
 {
     seekpoint_t *point = vlc_seekpoint_New();
     if( src->psz_name ) point->psz_name = strdup( src->psz_name );

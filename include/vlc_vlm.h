@@ -220,7 +220,8 @@ static inline void vlm_media_Init( vlm_media_t *p_media )
  * \param p_dst vlm_media_t instance to copy to
  * \param p_src vlm_media_t instance to copy from
  */
-static inline void vlm_media_Copy( vlm_media_t *p_dst, vlm_media_t *p_src )
+static inline void vlm_media_Copy( vlm_media_t *restrict p_dst,
+                                   const vlm_media_t *restrict p_src )
 {
     int i;
 
