@@ -40,49 +40,35 @@
  ****************************************************************************/
 
 /* ToUrl: create a good name for an url from filename */
-static char *FileToUrl( char *name, bool *pb_index )
+static char *FileToUrl( const char *name, bool *pb_index )
 {
-    char *url, *p;
-
-    url = p = malloc( strlen( name ) + 1 );
-
     *pb_index = false;
-    if( !url || !p )
-    {
+
+    char *url = malloc( strlen( name ) + 2 );
+    if( unlikely(url == NULL) )
         return NULL;
-    }
 
-#ifdef WIN32
-    while( *name == '\\' || *name == '/' )
+#if (DIR_SEP_CHAR == '/')
+    name += strspn( name, "/" );
 #else
-    while( *name == '/' )
+    name += strspn( name, "/"DIR_SEP );
 #endif
-    {
-        name++;
-    }
+    *url = '/';
+    strcpy( url + 1, name );
 
-    *p++ = '/';
-    strcpy( p, name );
-
-#ifdef WIN32
+#if (DIR_SEP_CHAR != '/')
     /* convert '\\' into '/' */
-    name = p;
-    while( *name )
-    {
-        if( *name == '\\' )
+    for( char *ptr = url; *ptr; ptr++ )
+        if( *ptr == DIR_SEP_CHAR )
             *name = '/';
-        name++;
-    }
 #endif
 
     /* index.* -> / */
-    if( ( p = strrchr( url, '/' ) ) != NULL )
+    char *p = strrchr( url, '/' );
+    if( p != NULL && !strncmp( p, "/index.", 7 ) )
     {
-        if( !strncmp( p, "/index.", 7 ) )
-        {
-            p[1] = '\0';
-            *pb_index = true;
-        }
+        p[1] = '\0';
+        *pb_index = true;
     }
     return url;
 }
