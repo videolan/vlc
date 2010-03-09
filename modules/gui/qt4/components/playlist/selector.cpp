@@ -350,7 +350,10 @@ bool PLSelector::dropMimeData ( QTreeWidgetItem * parent, int index,
     if( i_truth != IS_PL && i_truth != IS_ML ) return false;
     bool to_pl = ( i_truth == IS_PL );
 
-    QList<input_item_t*> inputItems = PlMimeData::inputItems( data );
+    const PlMimeData *plMimeData = qobject_cast<const PlMimeData*>( data );
+    if( !plMimeData ) return false;
+
+    QList<input_item_t*> inputItems = plMimeData->inputItems();
 
     playlist_Lock( THEPL );
 

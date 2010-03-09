@@ -47,6 +47,7 @@
 
 class PLItem;
 class PLSelector;
+class PlMimeData;
 
 class PLModel : public QAbstractItemModel
 {
@@ -142,8 +143,8 @@ private:
 
     /* Deep actions (affect core playlist) */
     static void recursiveAppendCopy( playlist_t *, playlist_item_t *, playlist_item_t *, bool );
-    void dropAppendCopy( const QMimeData * data, PLItem *target );
-    void dropMove( const QMimeData * data, PLItem *target, int new_pos );
+    void dropAppendCopy( const PlMimeData * data, PLItem *target );
+    void dropMove( const PlMimeData * data, PLItem *target, int new_pos );
 
     /* Popup */
     int i_popup_item, i_popup_parent, i_popup_column;
@@ -177,14 +178,16 @@ private slots:
     void processItemAppend( int item, int parent );
 };
 
-class PlMimeData : public QObject
+class PlMimeData : public QMimeData
 {
+    Q_OBJECT;
+
 public:
     PlMimeData();
     ~PlMimeData();
     void appendItem( input_item_t *p_item );
-    QMimeData *mimeData();
-    static QList<input_item_t*> inputItems( const QMimeData * mimeData );
+    QList<input_item_t*> inputItems() const;
+    QStringList formats () const;
 
 private:
     QList<input_item_t*> _inputItems;
