@@ -1,7 +1,7 @@
 /*****************************************************************************
  * objectsafety.cpp: ActiveX control for VLC
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2010 the VideoLAN team
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
  *
@@ -44,7 +44,8 @@ STDMETHODIMP VLCObjectSafety::GetInterfaceSafetyOptions(
     *pdwSupportedOptions = INTERFACESAFE_FOR_UNTRUSTED_DATA|INTERFACESAFE_FOR_UNTRUSTED_CALLER;
 
     if( (IID_IDispatch == riid)
-     || (IID_IVLCControl == riid) )
+     || (IID_IVLCControl == riid)
+     || (IID_IVLCControl2 == riid) )
     {
         *pdwEnabledOptions = INTERFACESAFE_FOR_UNTRUSTED_CALLER;
         return NOERROR;
@@ -68,7 +69,8 @@ STDMETHODIMP VLCObjectSafety::SetInterfaceSafetyOptions(
 )
 {
     if( (IID_IDispatch == riid)
-     || (IID_IVLCControl == riid) )
+     || (IID_IVLCControl == riid)
+     || (IID_IVLCControl2 == riid) )
     {
         if( (INTERFACESAFE_FOR_UNTRUSTED_CALLER == dwOptionSetMask)
          && (INTERFACESAFE_FOR_UNTRUSTED_CALLER == dwEnabledOptions) )
@@ -91,4 +93,3 @@ STDMETHODIMP VLCObjectSafety::SetInterfaceSafetyOptions(
     }
     return E_FAIL;
 };
-
