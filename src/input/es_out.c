@@ -2317,7 +2317,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                     if( i_pts_delay > __MIN( i_pts_delay_base + i_jitter_max, INPUT_PTS_DELAY_MAX ) )
                     {
                         msg_Err( p_sys->p_input,
-                                 "ES_OUT_SET_(GROUP_)PCR  is called too late (jitter of %d ms ingnored)",
+                                 "ES_OUT_SET_(GROUP_)PCR  is called too late (jitter of %d ms ignored)",
                                  (int)(i_pts_delay - i_pts_delay_base) / 1000 );
                         i_pts_delay = p_sys->i_pts_delay;
                     }
