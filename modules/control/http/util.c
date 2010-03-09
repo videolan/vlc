@@ -40,7 +40,7 @@
  ****************************************************************************/
 
 /* ToUrl: create a good name for an url from filename */
-char *FileToUrl( char *name, bool *pb_index )
+static char *FileToUrl( char *name, bool *pb_index )
 {
     char *url, *p;
 

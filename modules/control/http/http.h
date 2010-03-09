@@ -93,8 +93,6 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
                         char *psz_dir );
 /** This function loads a file into a buffer */
 int FileLoad( FILE *f, char **pp_data, int *pi_data );
-/** This function creates a suitable URL for a filename */
-char *FileToUrl( char *name, bool *pb_index );
 /** This function returns the real path of a file or directory */
 char *RealPath( const char *psz_src );
 
