@@ -35,6 +35,7 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QMutex>
+#include <QPushButton>
 
 DialogHandler::DialogHandler (intf_thread_t *intf, QObject *_parent)
     : QObject( _parent ), intf (intf),

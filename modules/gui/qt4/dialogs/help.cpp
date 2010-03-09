@@ -44,6 +44,7 @@
 #include <QEvent>
 #include <QFileDialog>
 #include <QDate>
+#include <QPushButton>
 
 #include <assert.h>
 

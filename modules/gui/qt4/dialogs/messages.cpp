@@ -39,6 +39,7 @@
 #include <QHeaderView>
 #include <QMutex>
 #include <QLineEdit>
+#include <QPushButton>
 
 #include <assert.h>
 

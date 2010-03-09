@@ -33,6 +33,7 @@
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QLabel>
+#include <QPushButton>
 
 /* This Dialog has two main modes:
     - General Mode that shows the current Played item, and the stats
