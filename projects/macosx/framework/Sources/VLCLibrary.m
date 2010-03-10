@@ -58,8 +58,6 @@ static VLCLibrary * sharedLibrary = nil;
             [defaultParams addObject:@"--vout=macosx"];                             // Select Mac OS X video output
             [defaultParams addObject:@"--text-renderer=quartztext"];                // our CoreText-based renderer
             [defaultParams addObject:@"--verbose=-1"];                              // Don't polute the stdio log
-            [defaultParams addObject:@"--syslog"];                                  // log to syslog
-            [defaultParams addObject:@"--log-verbose=4"];                           // log everything
             [defaultParams addObject:@"--no-color"];                                // Don't use color in output (Xcode doesn't show it)
             [defaultParams addObject:@"--no-media-library"];                        // We don't need the media library
             [defaultParams addObject:@"--play-and-pause"];                          // We want every movie to pause instead of stopping at eof
