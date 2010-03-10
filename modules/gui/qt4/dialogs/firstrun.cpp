@@ -102,5 +102,6 @@ void FirstRun::buildPrivDialog()
     gLayout->addWidget( ok, 2, 2 );
 
     CONNECT( ok, clicked(), this, save() );
+    ok->setFocus();
 }
 
