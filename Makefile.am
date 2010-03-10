@@ -727,10 +727,6 @@ package-win-common:
 	mkdir -p $(win32_destdir)/locale/qt4/
 	cp $(QT4LOCALEDIR)/*.qm $(win32_destdir)/locale/qt4/ || true
 
-# Copy the UAC NSIS plugin
-	cp "$(srcdir)/extras/package/win32/UAC.nsh" "$(win32_destdir)/"
-	cp "$(srcdir)/extras/package/win32/UAC.dll" "$(win32_destdir)/"
-
 #  Mozilla plugin
 if BUILD_MOZILLA
 	mkdir -p "$(win32_destdir)/mozilla"
@@ -752,6 +748,11 @@ endif
 	if rebase -b 0x42 /dev/null >/dev/null 2>&1; then \
 		find $(win32_destdir) -type f -name '*.dll' -print | rebase -b 0x70000000 -T -; \
 	fi
+
+# Copy the UAC NSIS plugin
+	mkdir -p "$(win32_destdir)/NSIS"
+	cp "$(top_srcdir)/extras/package/win32/UAC.nsh" "$(win32_destdir)/NSIS"
+	cp "$(top_srcdir)/extras/package/win32/UAC.dll" "$(win32_destdir)/NSIS"
 
 package-win32-xpi: package-win-common-strip
 	mkdir -p "$(win32_xpi_destdir)/plugins"

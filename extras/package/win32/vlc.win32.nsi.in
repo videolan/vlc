@@ -49,8 +49,8 @@ InstType $Name_InstTypeMinimum
 InstType $Name_InstTypeFull
 
 RequestExecutionLevel user
-!addincludedir .
-!addplugindir .
+!addincludedir NSIS
+!addplugindir NSIS
 !include UAC.nsh
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
