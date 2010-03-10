@@ -1155,7 +1155,26 @@ GenericFont *Builder::getFont( const string &fontId )
 string Builder::getFilePath( const string &rFileName ) const
 {
     OSFactory *pFactory = OSFactory::instance( getIntf() );
-    return m_path + pFactory->getDirSeparator() + sFromLocale( rFileName );
+    const string &sep = pFactory->getDirSeparator();
+
+    string file = rFileName;
+    if( file.find( "\\" ) != string::npos )
+    {
+        // For skins to be valid on both Linux and Win32,
+        // slash should be used as path separator for both OSs.
+        msg_Warn( getIntf(), "use of '/' is preferred to '\\' for paths" );
+        int pos;
+        while( ( pos = file.find( "\\" ) ) != string::npos )
+           file[pos] = '/';
+    }
+
+#ifdef WIN32
+    int pos;
+    while( ( pos = file.find( "/" ) ) != string::npos )
+       file.replace( pos, 1, sep );
+#endif
+
+    return m_path + sep + sFromLocale( file );
 }
 
 
