@@ -32,6 +32,7 @@
 #include <QStyleOptionViewItem>
 #include <QFontMetrics>
 #include <QPixmapCache>
+#include <QDrag>
 
 #include "assert.h"
 
@@ -309,6 +310,15 @@ QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, co
   return QSize( 0, height );
 }
 
+static void plViewStartDrag( QAbstractItemView *view, const Qt::DropActions & supportedActions )
+{
+    QDrag *drag = new QDrag( view );
+    drag->setPixmap( QPixmap( ":/noart64" ) );
+    drag->setMimeData( view->model()->mimeData(
+        view->selectionModel()->selectedIndexes() ) );
+    drag->exec( supportedActions );
+}
+
 PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
 {
     PlIconViewItemDelegate *delegate = new PlIconViewItemDelegate( this );
@@ -329,6 +339,11 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
     setItemDelegate( delegate );
 }
 
+void PlIconView::startDrag ( Qt::DropActions supportedActions )
+{
+    plViewStartDrag( this, supportedActions );
+}
+
 PlListView::PlListView( PLModel *model, QWidget *parent ) : QListView( parent )
 {
     setModel( model );
@@ -343,3 +358,14 @@ PlListView::PlListView( PLModel *model, QWidget *parent ) : QListView( parent )
     PlListViewItemDelegate *delegate = new PlListViewItemDelegate( this );
     setItemDelegate( delegate );
 }
+
+void PlListView::startDrag ( Qt::DropActions supportedActions )
+{
+    plViewStartDrag( this, supportedActions );
+}
+
+void PlTreeView::startDrag ( Qt::DropActions supportedActions )
+{
+    plViewStartDrag( this, supportedActions );
+}
+

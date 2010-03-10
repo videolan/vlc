@@ -289,7 +289,7 @@ void StandardPLPanel::createListView()
 void StandardPLPanel::createTreeView()
 {
     /* Create and configure the QTreeView */
-    treeView = new QTreeView;
+    treeView = new PlTreeView;
 
     treeView->setIconSize( QSize( 20, 20 ) );
     treeView->setAlternatingRowColors( true );

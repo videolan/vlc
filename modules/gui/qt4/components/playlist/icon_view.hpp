@@ -26,6 +26,7 @@
 
 #include <QStyledItemDelegate>
 #include <QListView>
+#include <QTreeView>
 
 class QPainter;
 class PLModel;
@@ -67,6 +68,8 @@ class PlIconView : public QListView
 
 public:
     PlIconView( PLModel *model, QWidget *parent = 0 );
+private:
+    void startDrag ( Qt::DropActions supportedActions );
 };
 
 class PlListView : public QListView
@@ -75,6 +78,16 @@ class PlListView : public QListView
 
 public:
     PlListView( PLModel *model, QWidget *parent = 0 );
+private:
+    void startDrag ( Qt::DropActions supportedActions );
+};
+
+class PlTreeView : public QTreeView
+{
+    Q_OBJECT
+
+private:
+    void startDrag ( Qt::DropActions supportedActions );
 };
 
 #endif
