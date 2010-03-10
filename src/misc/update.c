@@ -278,8 +278,6 @@ static bool GetUpdateFile( update_t *p_update )
     strncpy( p_update->release.psz_desc, psz_update_data_parser, i_len );
     p_update->release.psz_desc[i_len] = '\0';
 
-    printf("desc %s\n", p_update->release.psz_desc);
-
     /* Now that we know the status is valid, we must download its signature
      * to authenticate it */
     signature_packet_t sign;
