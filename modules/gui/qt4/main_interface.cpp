@@ -453,6 +453,10 @@ inline void MainInterface::createStatusBar()
     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
+    timeLabel->setStyleSheet(
+            "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
+    speedLabel->setStyleSheet(
+            "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
 
     /* and adding those */
     statusBarr->addWidget( nameLabel, 8 );
