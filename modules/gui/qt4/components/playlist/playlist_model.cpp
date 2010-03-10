@@ -108,7 +108,7 @@ PLModel::~PLModel()
 
 Qt::DropActions PLModel::supportedDropActions() const
 {
-    return Qt::CopyAction; /* Why not Qt::MoveAction */
+    return Qt::CopyAction | Qt::MoveAction;
 }
 
 Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
@@ -189,33 +189,13 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
 bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
                            int row, int column, const QModelIndex &parent )
 {
+    bool copy = action == Qt::CopyAction;
+    if( !copy && action != Qt::MoveAction )
+        return true;
+
     const PlMimeData *plMimeData = qobject_cast<const PlMimeData*>( data );
     if( plMimeData )
     {
-        if( action == Qt::IgnoreAction )
-            return true;
-
-        PL_LOCK;
-        playlist_item_t *p_parent =
-            playlist_ItemGetById( p_playlist, itemId( parent ) );
-        if( !p_parent || p_parent->i_children == -1 )
-        {
-            PL_UNLOCK;
-            return false;
-        }
-
-        bool copy = false;
-        playlist_item_t *p_pl = p_playlist->p_playing;
-        playlist_item_t *p_ml = p_playlist->p_media_library;
-        if
-        (
-            row == -1 && (
-            ( p_pl && p_parent == p_pl ) ||
-            ( p_ml && p_parent == p_ml ) )
-        )
-            copy = true;
-        PL_UNLOCK;
-
         if( copy )
             dropAppendCopy( plMimeData, getItem( parent ) );
         else

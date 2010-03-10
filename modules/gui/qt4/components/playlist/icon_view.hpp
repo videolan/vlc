@@ -70,6 +70,7 @@ public:
     PlIconView( PLModel *model, QWidget *parent = 0 );
 private:
     void startDrag ( Qt::DropActions supportedActions );
+    void dragMoveEvent ( QDragMoveEvent * event );
 };
 
 class PlListView : public QListView
@@ -80,6 +81,7 @@ public:
     PlListView( PLModel *model, QWidget *parent = 0 );
 private:
     void startDrag ( Qt::DropActions supportedActions );
+    void dragMoveEvent ( QDragMoveEvent * event );
 };
 
 class PlTreeView : public QTreeView
@@ -88,6 +90,7 @@ class PlTreeView : public QTreeView
 
 private:
     void startDrag ( Qt::DropActions supportedActions );
+    void dragMoveEvent ( QDragMoveEvent * event );
 };
 
 #endif

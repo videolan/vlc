@@ -372,6 +372,12 @@ bool PLSelector::dropMimeData ( QTreeWidgetItem * parent, int index,
     return true;
 }
 
+void PLSelector::dragMoveEvent ( QDragMoveEvent * event )
+{
+    event->setDropAction( Qt::CopyAction );
+    QAbstractItemView::dragMoveEvent( event );
+}
+
 void PLSelector::plItemAdded( int item, int parent )
 {
     if( parent != podcastsParentId ) return;

@@ -119,6 +119,7 @@ protected:
 private:
     QStringList mimeTypes () const;
     bool dropMimeData ( QTreeWidgetItem *, int, const QMimeData *, Qt::DropAction );
+    void dragMoveEvent ( QDragMoveEvent * event );
     void createItems();
     void drawBranches ( QPainter *, const QRect &, const QModelIndex & ) const;
     PLSelItem * addItem (

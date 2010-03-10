@@ -33,6 +33,7 @@
 #include <QFontMetrics>
 #include <QPixmapCache>
 #include <QDrag>
+#include <QDragMoveEvent>
 
 #include "assert.h"
 
@@ -319,6 +320,14 @@ static void plViewStartDrag( QAbstractItemView *view, const Qt::DropActions & su
     drag->exec( supportedActions );
 }
 
+static void plViewDragMoveEvent( QAbstractItemView *view, QDragMoveEvent * event )
+{
+    if( event->keyboardModifiers() & Qt::ControlModifier &&
+        event->possibleActions() & Qt::CopyAction )
+        event->setDropAction( Qt::CopyAction );
+    else event->acceptProposedAction();
+}
+
 PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
 {
     PlIconViewItemDelegate *delegate = new PlIconViewItemDelegate( this );
@@ -344,6 +353,12 @@ void PlIconView::startDrag ( Qt::DropActions supportedActions )
     plViewStartDrag( this, supportedActions );
 }
 
+void PlIconView::dragMoveEvent ( QDragMoveEvent * event )
+{
+    plViewDragMoveEvent( this, event );
+    QAbstractItemView::dragMoveEvent( event );
+}
+
 PlListView::PlListView( PLModel *model, QWidget *parent ) : QListView( parent )
 {
     setModel( model );
@@ -364,8 +379,19 @@ void PlListView::startDrag ( Qt::DropActions supportedActions )
     plViewStartDrag( this, supportedActions );
 }
 
+void PlListView::dragMoveEvent ( QDragMoveEvent * event )
+{
+    plViewDragMoveEvent( this, event );
+    QAbstractItemView::dragMoveEvent( event );
+}
+
 void PlTreeView::startDrag ( Qt::DropActions supportedActions )
 {
     plViewStartDrag( this, supportedActions );
 }
 
+void PlTreeView::dragMoveEvent ( QDragMoveEvent * event )
+{
+    plViewDragMoveEvent( this, event );
+    QAbstractItemView::dragMoveEvent( event );
+}
