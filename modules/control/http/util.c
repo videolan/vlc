@@ -60,7 +60,7 @@ static char *FileToUrl( const char *name, bool *pb_index )
     /* convert '\\' into '/' */
     for( char *ptr = url; *ptr; ptr++ )
         if( *ptr == DIR_SEP_CHAR )
-            *name = '/';
+            *ptr = '/';
 #endif
 
     /* index.* -> / */
