@@ -50,14 +50,15 @@ playlist_item_t *GetPrevItem( playlist_t *p_playlist,
  * \param p_playlist the playlist
  * \param psz_name the name of the node
  * \param p_parent the parent node to attach to or NULL if no attach
+ * \param i_pos position of the node in the parent, PLAYLIST_END to append to end.
  * \param p_flags miscellaneous flags
  * \param p_input the input_item to attach to or NULL if it has to be created
  * \return the new node
  */
 playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
                                        const char *psz_name,
-                                       playlist_item_t *p_parent, int i_flags,
-                                       input_item_t *p_input )
+                                       playlist_item_t *p_parent, int i_pos,
+                                       int i_flags, input_item_t *p_input )
 {
     input_item_t *p_new_input = NULL;
     playlist_item_t *p_item;
@@ -79,7 +80,8 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
     ARRAY_APPEND(p_playlist->all_items, p_item);
 
     if( p_parent != NULL )
-        playlist_NodeAppend( p_playlist, p_item, p_parent );
+        playlist_NodeInsert( p_playlist, p_item, p_parent,
+                             i_pos == PLAYLIST_END ? -1 : i_pos );
     playlist_SendAddNotify( p_playlist, p_item->i_id,
                             p_parent ? p_parent->i_id : -1,
                             !( i_flags & PLAYLIST_NO_REBUILD ));

@@ -348,6 +348,7 @@ VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char *, i
 VLC_EXPORT( int,  playlist_AddExt, ( playlist_t *, const char *, const char *, int, int, mtime_t, int, const char *const *, unsigned, bool, bool ) );
 VLC_EXPORT( int, playlist_AddInput, ( playlist_t *, input_item_t *, int, int, bool, bool ) );
 VLC_EXPORT( playlist_item_t *, playlist_NodeAddInput, ( playlist_t *, input_item_t *, playlist_item_t *, int, int, bool ) );
+VLC_EXPORT( int, playlist_NodeAddCopy, ( playlist_t *, playlist_item_t *, playlist_item_t *, int ) );
 
 /********************************** Item search *************************/
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetById, (playlist_t *, int ) );
@@ -359,7 +360,7 @@ VLC_EXPORT( int, playlist_LiveSearchUpdate, (playlist_t *, playlist_item_t *, co
  * Tree management
  ********************************************************/
 /* Node management */
-VLC_EXPORT( playlist_item_t *, playlist_NodeCreate, ( playlist_t *, const char *, playlist_item_t * p_parent, int i_flags, input_item_t * ) );
+VLC_EXPORT( playlist_item_t *, playlist_NodeCreate, ( playlist_t *, const char *, playlist_item_t * p_parent, int i_pos, int i_flags, input_item_t * ) );
 VLC_EXPORT( int, playlist_NodeAppend, (playlist_t *,playlist_item_t*,playlist_item_t *) );
 VLC_EXPORT( int, playlist_NodeInsert, (playlist_t *,playlist_item_t*,playlist_item_t *, int) );
 VLC_EXPORT( int, playlist_NodeRemoveItem, (playlist_t *,playlist_item_t*,playlist_item_t *) );

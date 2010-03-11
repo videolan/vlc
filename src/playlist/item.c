@@ -40,6 +40,9 @@ static int RecursiveAddIntoParent (
                 playlist_t *p_playlist, playlist_item_t *p_parent,
                 input_item_node_t *p_node, int i_pos, bool b_flat,
                 playlist_item_t **pp_first_leaf );
+static int RecursiveInsertCopy (
+                playlist_t *p_playlist, playlist_item_t *p_item,
+                playlist_item_t *p_parent, int i_pos, bool b_flat );
 
 /*****************************************************************************
  * An input item has gained subitems (Event Callback)
@@ -453,6 +456,45 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
 }
 
 /**
+ * Copy an item (and all its children, if any) into another node
+ *
+ * \param p_playlist the playlist to operate on
+ * \param p_item the playlist item to copy
+ * \param p_parent the parent item to copy into
+ * \param i_pos the position in the parent item for the new copy;
+ *              if this is PLAYLIST_END, the copy is appended after all
+ *              parent's children
+ * \return the position in parent item just behind the last new item inserted
+ */
+int playlist_NodeAddCopy (
+    playlist_t *p_playlist, playlist_item_t *p_item,
+    playlist_item_t *p_parent, int i_pos )
+{
+    PL_ASSERT_LOCKED;
+    assert( p_parent != NULL && p_item != NULL );
+    assert( p_parent->i_children > -1 );
+
+    if( i_pos == PLAYLIST_END ) i_pos = p_parent->i_children;
+
+    bool b_flat = false;
+
+    playlist_item_t *p_up = p_parent;
+    while( p_up )
+    {
+        if( p_up == p_playlist->p_playing )
+            if( !pl_priv(p_playlist)->b_tree ) b_flat = true;
+        if( p_up == p_item )
+            /* TODO: We don't support copying a node into itself (yet),
+            because we insert items as we copy. Instead, we should copy
+            all items first and then insert. */
+            return i_pos;
+        p_up = p_up->p_parent;
+    }
+
+    return RecursiveInsertCopy( p_playlist, p_item, p_parent, i_pos, b_flat );
+}
+
+/**
  * Insert a tree of input items into a given playlist node
  *
  * \param p_playlist the playlist to insert into
@@ -473,6 +515,7 @@ playlist_item_t *playlist_InsertInputItemTree (
   RecursiveAddIntoParent ( p_playlist, p_parent, p_node, i_pos, b_flat, &p_first_leaf );
   return p_first_leaf;
 }
+
 
 /*****************************************************************************
  * Playlist item misc operations
@@ -789,4 +832,51 @@ static int RecursiveAddIntoParent (
       if( i == 0 ) *pp_first_leaf = p_child;
   }
   return i_pos;
+}
+
+static int RecursiveInsertCopy (
+    playlist_t *p_playlist, playlist_item_t *p_item,
+    playlist_item_t *p_parent, int i_pos, bool b_flat )
+{
+    PL_ASSERT_LOCKED;
+    assert( p_parent != NULL && p_item != NULL );
+
+    if( p_item == p_parent ) return i_pos;
+
+    input_item_t *p_input = p_item->p_input;
+
+    if( !(p_item->i_children != -1 && b_flat) )
+    {
+        input_item_t *p_new_input = input_item_Copy( VLC_OBJECT(p_playlist),
+                                                     p_input );
+        if( !p_new_input ) return i_pos;
+
+        playlist_item_t *p_new_item = NULL;
+        if( p_item->i_children == -1 )
+            p_new_item = playlist_NodeAddInput( p_playlist, p_new_input,
+                                   p_parent, PLAYLIST_INSERT, i_pos,
+                                   pl_Locked );
+        else
+            p_new_item = playlist_NodeCreate( p_playlist, NULL,
+                                 p_parent, i_pos, 0, p_new_input );
+        vlc_gc_decref( p_new_input );
+        if( !p_new_item ) return i_pos;
+
+        i_pos++;
+
+        if( p_new_item->i_children != -1 )
+            p_parent = p_new_item;
+    }
+
+    for( int i = 0; i < p_item->i_children; i++ )
+    {
+        if( b_flat )
+            i_pos = RecursiveInsertCopy( p_playlist, p_item->pp_children[i],
+                                         p_parent, i_pos, true );
+        else
+            RecursiveInsertCopy( p_playlist, p_item->pp_children[i],
+                                 p_parent, p_parent->i_children, false );
+    }
+
+    return i_pos;
 }
