@@ -630,9 +630,10 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
     secstotimestr( psz_time, ( b_remainingTime && length ) ? length - time
                                                            : time );
 
-    QString timestr;
-    timestr.sprintf( " %s%s/%s ", (b_remainingTime && length) ? "-" : "",
-                     psz_time, ( !length && time ) ? "--:--" : psz_length );
+    QString timestr = QString( " %1%2/%3 " )
+            .arg( QString( (b_remainingTime && length) ? "-" : "" ) )
+            .arg( QString( psz_time ) )
+            .arg( QString( ( !length && time ) ? "--:--" : psz_length ) );
 
     setText( timestr );
 
@@ -651,9 +652,10 @@ void TimeLabel::setDisplayPosition( float pos )
     secstotimestr( psz_time,
                    ( b_remainingTime && cachedLength ?
                    cachedLength - time : time ) );
-    QString timestr;
-    timestr.sprintf( " %s%s/%s ", (b_remainingTime && cachedLength) ? "-" : "",
-                     psz_time, ( !cachedLength && time ) ? "--:--" : psz_length );
+    QString timestr = QString( " %1%2/%3 " )
+        .arg( QString( (b_remainingTime && cachedLength) ? "-" : "" ) )
+        .arg( QString( psz_time ) )
+        .arg( QString( ( !cachedLength && time ) ? "--:--" : psz_length ) );
 
     setText( timestr );
 }
