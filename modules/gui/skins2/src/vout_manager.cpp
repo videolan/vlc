@@ -211,6 +211,10 @@ void* VoutManager::acceptWnd( vout_window_t* pWnd )
         // directly attach vout thread to it
         pCtrlVideo->attachVoutWindow( pVoutWindow );
     }
+    else
+    {
+        pVoutWindow->setCtrlVideo( NULL );
+    }
 
     // save vout characteristics
     m_SavedWndVec.push_back( SavedWnd( pWnd, pVoutWindow, pCtrlVideo ) );
