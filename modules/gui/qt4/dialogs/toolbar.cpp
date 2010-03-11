@@ -83,7 +83,7 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
                 getSettings()->value( "MainWindow/ToolbarPos", 0 ).toInt() ) );
     mainTboxLayout->addWidget( positionCombo, 0, 2, 1, 1 );
 
-    QLabel *line1Label = new QLabel( "Line 1:" );
+    QLabel *line1Label = new QLabel( qtr("Line 1:") );
     QString line1 = getSettings()->value( "MainWindow/MainToolbar1",
                                           MAIN_TB1_DEFAULT ).toString();
     controller1 = new DroppingController( p_intf, line1,
@@ -91,7 +91,7 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
     mainTboxLayout->addWidget( line1Label, 1, 0, 1, 1 );
     mainTboxLayout->addWidget( controller1, 1, 1, 1, 2 );
 
-    QLabel *line2Label = new QLabel( "Line 2:" );
+    QLabel *line2Label = new QLabel( qtr("Line 2:") );
     QString line2 = getSettings()->value( "MainWindow/MainToolbar2",
                                           MAIN_TB2_DEFAULT ).toString();
     controller2 = new DroppingController( p_intf, line2,
