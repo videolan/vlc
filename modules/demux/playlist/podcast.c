@@ -189,14 +189,14 @@ static int Demux( demux_t *p_demux )
                         }
                         else
                         {
-                            msg_Dbg( p_demux,"unhandled attribure %s in element %s",
+                            msg_Dbg( p_demux,"unhandled attribute %s in element %s",
                                      psz_name, psz_elname );
                             free( psz_value );
                         }
                     }
                     else
                     {
-                        msg_Dbg( p_demux,"unhandled attribure %s in element %s",
+                        msg_Dbg( p_demux,"unhandled attribute %s in element %s",
                                   psz_name, psz_elname );
                         free( psz_value );
                     }

@@ -199,7 +199,7 @@ static int Demux( demux_t *p_demux )
                     }
                     else
                     {
-                        msg_Warn( p_demux, "unexpected attribure %s in element %s",
+                        msg_Warn( p_demux, "unexpected attribute %s in element %s",
                                   psz_name, psz_elname );
                         free( psz_value );
                     }

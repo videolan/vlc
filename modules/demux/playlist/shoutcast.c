@@ -196,7 +196,7 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         else
                         {
                             msg_Warn( p_demux,
-                                      "unexpected attribure %s in element %s",
+                                      "unexpected attribute %s in element %s",
                                       psz_attrname, psz_eltname );
                             free( psz_attrvalue );
                         }
@@ -327,7 +327,7 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         else
                         {
                             msg_Warn( p_demux,
-                                      "unexpected attribure %s in element %s",
+                                      "unexpected attribute %s in element %s",
                                       psz_attrname, psz_eltname );
                             free( psz_attrvalue );
                         }
