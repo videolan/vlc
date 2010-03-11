@@ -876,6 +876,31 @@ input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
     return p_input;
 }
 
+input_item_t *input_item_Copy( vlc_object_t *p_obj, input_item_t *p_input )
+{
+    vlc_mutex_lock( &p_input->lock );
+
+    input_item_t *p_new_input =
+        input_item_NewWithType( p_obj,
+                                p_input->psz_uri, p_input->psz_name,
+                                0, NULL, 0, p_input->i_duration,
+                                p_input->i_type );
+
+    if( p_new_input )
+    {
+        for( int i = 0 ; i< p_input->i_options; i++ )
+        {
+            input_item_AddOption( p_new_input,
+                                  p_input->ppsz_options[i],
+                                  p_input->optflagv[i] );
+        }
+    }
+
+    vlc_mutex_unlock( &p_input->lock );
+
+    return p_new_input;
+}
+
 struct item_type_entry
 {
     const char psz_scheme[7];

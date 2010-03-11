@@ -189,6 +189,7 @@ input_DetachResource
 input_GetItem
 input_item_AddInfo
 input_item_AddOption
+input_item_Copy
 input_item_CopyOptions
 input_item_DelInfo
 input_item_GetDuration

@@ -263,6 +263,12 @@ VLC_EXPORT( input_item_t *, input_item_NewExt, (vlc_object_t *, const char *psz_
  */
 #define input_item_New( a,b,c ) input_item_NewExt( a, b, c, 0, NULL, 0, -1 )
 
+/**
+ * This function creates a new input_item_t as a copy of another.
+ */
+VLC_EXPORT( input_item_t *, input_item_Copy, (vlc_object_t *, input_item_t * ) );
+
+
 /******************
  * Input stats
  ******************/
