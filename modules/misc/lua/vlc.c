@@ -320,7 +320,8 @@ void __vlclua_read_meta_data( vlc_object_t *p_this, lua_State *L,
 {
 #define TRY_META( a, b )                                        \
     lua_getfield( L, -1, a );                                   \
-    if( lua_isstring( L, -1 ) )                                 \
+    if( lua_isstring( L, -1 ) &&                                \
+        strcmp( lua_tostring( L, -1 ), "" ) )                   \
     {                                                           \
         char *psz_value = strdup( lua_tostring( L, -1 ) );      \
         EnsureUTF8( psz_value );                                \
