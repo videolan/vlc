@@ -291,8 +291,8 @@ static int vlclua_node_add_node( lua_State *L )
                                                                 name, 0, NULL, 0,
                                                                 -1, ITEM_TYPE_NODE );
                 free( name );
+                lua_getfield( L, -1, "arturl" );
                 if( lua_isstring( L, -1 ) && strcmp( lua_tostring( L, -1 ), "" ) )
-                if( lua_isstring( L, -1 ) )
                 {
                     char *psz_value = strdup( lua_tostring( L, -1 ) );
                     EnsureUTF8( psz_value );
