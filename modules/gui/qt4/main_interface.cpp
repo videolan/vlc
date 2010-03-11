@@ -23,9 +23,6 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/* TODO:
-   - playlist minimumSize applies to all stackWidgets
- */
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -33,20 +30,20 @@
 #include "qt4.hpp"
 
 #include "main_interface.hpp"
-#include "input_manager.hpp"        // Creation
-#include "actions_manager.hpp"      // killInstance
-#include "extensions_manager.hpp"   // killInstance
+#include "input_manager.hpp"                    // Creation
+#include "actions_manager.hpp"                  // killInstance
+#include "extensions_manager.hpp"               // killInstance
 
-#include "util/customwidgets.hpp"   // qtEventToVLCKey
-#include "util/qt_dirs.hpp"         // toNativeSeparators
+#include "util/customwidgets.hpp"               // qtEventToVLCKey
+#include "util/qt_dirs.hpp"                     // toNativeSeparators
 
-#include "components/interface_widgets.hpp" // bgWidget, videoWidget
-#include "components/controller.hpp"        // controllers
-#include "components/playlist/playlist.hpp" // plWidget
-#include "dialogs/firstrun.hpp"             // First Run
+#include "components/interface_widgets.hpp"     // bgWidget, videoWidget
+#include "components/controller.hpp"            // controllers
+#include "components/playlist/playlist.hpp"     // plWidget
+#include "dialogs/firstrun.hpp"                 // First Run
 
-#include "menus.hpp"                // Menu creation
-#include "recents.hpp"              // RecentItems when DnD
+#include "menus.hpp"                            // Menu creation
+#include "recents.hpp"                          // RecentItems when DnD
 
 #include <QCloseEvent>
 #include <QKeyEvent>
@@ -61,8 +58,8 @@
 #include <QLabel>
 #include <QStackedWidget>
 
-#include <vlc_keys.h>            /* Wheel event */
-#include <vlc_vout_display.h>    /* vout_thread_t and VOUT_ events */
+#include <vlc_keys.h>                       /* Wheel event */
+#include <vlc_vout_display.h>               /* vout_thread_t and VOUT_ events */
 
 #ifdef WIN32 /* Win7 taskbar */
  #include <vlc_windows_interfaces.h>
@@ -250,7 +247,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* Register callback for the intf-popupmenu variable */
     var_AddCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
-
 
     /**** FINAL SIZING and placement of interface */
     settings->beginGroup( "MainWindow" );
@@ -962,13 +958,7 @@ void MainInterface::createPlaylist()
     }
     else
     {
-#ifdef DEBUG_INTF
-        msg_Warn( p_intf, "Here 1 %i", stackCentralW->currentIndex() );
-#endif
         stackCentralW->addWidget( playlistWidget );
-#ifdef DEBUG_INTF
-        msg_Warn( p_intf, "Here 2 %i", stackCentralW->currentIndex() );
-#endif
     }
 }
 
