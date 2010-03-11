@@ -185,8 +185,13 @@ static int vlclua_net_recv( lua_State *L )
     size_t i_len = luaL_optint( L, 2, 1 );
     char psz_buffer[i_len];
     i_len = recv( i_fd, psz_buffer, i_len, 0 );
-    lua_pushlstring( L, psz_buffer, i_len );
-    return 1;
+    if( i_len > 0 )
+    {
+        lua_pushlstring( L, psz_buffer, i_len );
+        return 1;
+    }
+    else
+        return 0;
 }
 
 /*****************************************************************************
