@@ -45,6 +45,7 @@
 #endif
 #include <sys/stat.h>
 
+#include<errno.h>
 #include "../vlc.h"
 #include "../libs.h"
 
@@ -150,6 +151,16 @@ static int vlclua_net_accept( lua_State *L )
 /*****************************************************************************
  *
  *****************************************************************************/
+static int vlclua_net_connect_tcp( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    const char *psz_host = luaL_checkstring( L, 1 );
+    int i_port = luaL_checkint( L, 2 );
+    int i_fd = net_Connect( p_this, psz_host, i_port, SOCK_STREAM, IPPROTO_TCP );
+    lua_pushinteger( L, i_fd );
+    return 1;
+}
+
 static int vlclua_net_close( lua_State *L )
 {
     int i_fd = luaL_checkint( L, 1 );
@@ -339,6 +350,7 @@ static int vlclua_opendir( lua_State *L )
 static const luaL_Reg vlclua_net_reg[] = {
     { "url_parse", vlclua_url_parse },
     { "listen_tcp", vlclua_net_listen_tcp },
+    { "connect_tcp", vlclua_net_connect_tcp },
     { "close", vlclua_net_close },
     { "send", vlclua_net_send },
     { "recv", vlclua_net_recv },
