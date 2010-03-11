@@ -460,7 +460,7 @@ void PLSelector::podcastAdd( PLSelItem* item )
     if( !p_obj ) return;
 
     QString request("ADD:");
-    request += url;
+    request += url.trimmed();
     var_SetString( p_obj, "podcast-request", qtu( request ) );
     vlc_object_release( p_obj );
 }
