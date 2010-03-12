@@ -170,7 +170,7 @@ playlist_item_t *UPnPHandler::AddDevice( Device *dev )
      */
     char *str = strdup( dev->getFriendlyName( ) );
 
-    p_item = playlist_NodeCreate( p_playlist, str, p_sd->p_cat, 0, NULL );
+    p_item = playlist_NodeCreate( p_playlist, str, p_sd->p_cat, PLAYLIST_END, 0, NULL );
     p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
     msg_Dbg( p_sd, "device %s added", str );
     free( str );
@@ -214,7 +214,7 @@ void UPnPHandler::AddContent( playlist_item_t *p_parent, ContentNode *node )
 
         char* p_name = strdup(title); /* See other comment on strdup */
         playlist_item_t* p_node = playlist_NodeCreate( p_playlist, p_name,
-                                                       p_parent, 0, NULL );
+                                                       p_parent, PLAYLIST_END, 0, NULL );
         free(p_name);
 
         unsigned nContentNodes = conNode->getNContentNodes();

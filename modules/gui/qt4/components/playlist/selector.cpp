@@ -362,9 +362,9 @@ bool PLSelector::dropMimeData ( QTreeWidgetItem * parent, int index,
         playlist_item_t *p_item = playlist_ItemGetByInput( THEPL, p_input );
         if( !p_item ) continue;
 
-        PLModel::recursiveAppendCopy( THEPL, p_item,
-                                      to_pl ? THEPL->p_playing : THEPL->p_media_library,
-                                      to_pl && !var_InheritBool( p_intf, "playlist-tree" ) );
+        playlist_NodeAddCopy( THEPL, p_item,
+                              to_pl ? THEPL->p_playing : THEPL->p_media_library,
+                              PLAYLIST_END );
     }
 
     playlist_Unlock( THEPL );

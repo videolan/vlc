@@ -1522,7 +1522,7 @@
 
     PL_LOCK;
     playlist_NodeCreate( p_playlist, _("Empty Folder"),
-                                      p_playlist->p_local_category, 0, NULL );
+                                      p_playlist->p_local_category, PLAYLIST_END, 0, NULL );
     PL_UNLOCK;
 
     [self playlistUpdated];

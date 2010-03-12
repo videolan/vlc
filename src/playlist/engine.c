@@ -121,7 +121,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     /* Create the root node */
     PL_LOCK;
     p_playlist->p_root = playlist_NodeCreate( p_playlist, NULL, NULL,
-                                    0, NULL );
+                                    PLAYLIST_END, 0, NULL );
     PL_UNLOCK;
     if( !p_playlist->p_root ) return NULL;
 
@@ -129,7 +129,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     PL_LOCK;
     p_playlist->p_playing = playlist_NodeCreate(
         p_playlist, _( "Playlist" ), p_playlist->p_root,
-        PLAYLIST_RO_FLAG, NULL );
+        PLAYLIST_END, PLAYLIST_RO_FLAG, NULL );
 
     PL_UNLOCK;
 
@@ -142,7 +142,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
         PL_LOCK;
         p_playlist->p_media_library = playlist_NodeCreate(
             p_playlist, _( "Media Library" ), p_playlist->p_root,
-            PLAYLIST_RO_FLAG, NULL );
+            PLAYLIST_END, PLAYLIST_RO_FLAG, NULL );
         PL_UNLOCK;
 
         if(!p_playlist->p_media_library ) return NULL;

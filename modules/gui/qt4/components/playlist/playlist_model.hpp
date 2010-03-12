@@ -142,8 +142,7 @@ private:
     void updateChildren( playlist_item_t *, PLItem * );
 
     /* Deep actions (affect core playlist) */
-    static void recursiveAppendCopy( playlist_t *, playlist_item_t *, playlist_item_t *, bool );
-    void dropAppendCopy( const PlMimeData * data, PLItem *target );
+    void dropAppendCopy( const PlMimeData * data, PLItem *target, int pos );
     void dropMove( const PlMimeData * data, PLItem *target, int new_pos );
 
     /* Popup */

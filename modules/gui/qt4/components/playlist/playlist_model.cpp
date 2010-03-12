@@ -197,14 +197,14 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
     if( plMimeData )
     {
         if( copy )
-            dropAppendCopy( plMimeData, getItem( parent ) );
+            dropAppendCopy( plMimeData, getItem( parent ), row );
         else
             dropMove( plMimeData, getItem( parent ), row );
     }
     return true;
 }
 
-void PLModel::dropAppendCopy( const PlMimeData *plMimeData, PLItem *target )
+void PLModel::dropAppendCopy( const PlMimeData *plMimeData, PLItem *target, int pos )
 {
     PL_LOCK;
 
@@ -212,47 +212,18 @@ void PLModel::dropAppendCopy( const PlMimeData *plMimeData, PLItem *target )
             playlist_ItemGetByInput( p_playlist, target->p_input );
     if( !p_parent ) return;
 
-    bool b_flat = p_parent == p_playlist->p_playing &&
-                  !var_InheritBool( p_intf, "playlist-tree" );
+    if( pos == -1 ) pos = PLAYLIST_END;
 
     QList<input_item_t*> inputItems = plMimeData->inputItems();
+
     foreach( input_item_t* p_input, inputItems )
     {
         playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input );
         if( !p_item ) continue;
-
-        recursiveAppendCopy( p_playlist, p_item, p_parent, b_flat );
+        pos = playlist_NodeAddCopy( p_playlist, p_item, p_parent, pos );
     }
 
     PL_UNLOCK;
-}
-
-/* Must be entered WITH playlist lock! */
-void PLModel::recursiveAppendCopy( playlist_t *p_playlist, playlist_item_t *source,
-                                   playlist_item_t *target, bool b_flat )
-{
-    input_item_t *srcInput = source->p_input;
-
-    if( !(source->i_children != -1 && b_flat) )
-    {
-        vlc_mutex_lock( &srcInput->lock );
-        input_item_t *newInput =
-            input_item_NewWithType( VLC_OBJECT(p_playlist),
-                                    srcInput->psz_uri, srcInput->psz_name,
-                                    srcInput->i_options, srcInput->ppsz_options,
-                                    srcInput->optflagc, srcInput->i_duration,
-                                    srcInput->i_type );
-        vlc_mutex_unlock( &srcInput->lock );
-
-        if( source->i_children != -1 )
-            target = playlist_NodeCreate( p_playlist, newInput->psz_name, target, 0, newInput );
-        else
-            playlist_NodeAddInput( p_playlist, newInput, target,
-                                   PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                                   PLAYLIST_END, pl_Locked );
-    }
-    for( int i = 0; i < source->i_children; i++ )
-        recursiveAppendCopy( p_playlist, source->pp_children[i], target, b_flat );
 }
 
 void PLModel::dropMove( const PlMimeData * plMimeData, PLItem *target, int row )
@@ -1109,7 +1080,7 @@ void PLModel::popupAddNode()
                                                     i_popup_parent );
     if( p_item )
     {
-        playlist_NodeCreate( p_playlist, qtu( name ), p_item, 0, NULL );
+        playlist_NodeCreate( p_playlist, qtu( name ), p_item, PLAYLIST_END, 0, NULL );
     }
     PL_UNLOCK;
 }
