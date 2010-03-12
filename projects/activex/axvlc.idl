@@ -169,26 +169,21 @@ library AXVLC
     const int DISPID_StopEvent  = 102;
 
     /* async events from libvlc */
-    const int DISPID_NothingSpecialEvent = 200;
-    const int DISPID_OpeningEvent = 201;
-    const int DISPID_BufferingEvent = 202;
-    const int DISPID_PlayingEvent = 203;
-    const int DISPID_PausedEvent = 204;
-    const int DISPID_ForwardEvent = 205;
-    const int DISPID_BackwardEvent = 206;
-    const int DISPID_EncounteredErrorEvent = 207;
-    const int DISPID_EndReachedEvent = 208;
-    const int DISPID_StoppedEvent = 209;
+    const int DISPID_MediaPlayerNothingSpecialEvent = 200;
+    const int DISPID_MediaPlayerOpeningEvent = 201;
+    const int DISPID_MediaPlayerBufferingEvent = 202;
+    const int DISPID_MediaPlayerPlayingEvent = 203;
+    const int DISPID_MediaPlayerPausedEvent = 204;
+    const int DISPID_MediaPlayerForwardEvent = 205;
+    const int DISPID_MediaPlayerBackwardEvent = 206;
+    const int DISPID_MediaPlayerEncounteredErrorEvent = 207;
+    const int DISPID_MediaPlayerEndReachedEvent = 208;
+    const int DISPID_MediaPlayerStoppedEvent = 209;
 
-    const int DISPID_TimeChangedEvent = 210;
-    const int DISPID_PositionChangedEvent = 211;
-    const int DISPID_SeekableChangedEvent = 212;
-    const int DISPID_PausableChangedEvent = 213;
-
-    const int DISPID_MouseButtonEvent = 214;
-    const int DISPID_MouseMovedEvent = 215;
-    const int DISPID_MouseClickedEvent = 216;
-    const int DISPID_MouseObjectEvent = 217;
+    const int DISPID_MediaPlayerTimeChangedEvent = 210;
+    const int DISPID_MediaPlayerPositionChangedEvent = 211;
+    const int DISPID_MediaPlayerSeekableChangedEvent = 212;
+    const int DISPID_MediaPlayerPausableChangedEvent = 213;
 
     [
       uuid(DF48072F-5EF8-434e-9B40-E2F3AE759B5F),
@@ -206,46 +201,35 @@ library AXVLC
             void stop();
 
             /* asyn events from libvlc */
-            [id(DISPID_NothingSpecialEvent), helpstring("Idle state")]
-            void idle();
-            [id(DISPID_OpeningEvent), helpstring("Opening media")]
-            void opening();
-            [id(DISPID_BufferingEvent), helpstring("Buffering media")]
-            void buffering();
-            [id(DISPID_PlayingEvent), helpstring("Media is playing")]
-            void playing();
-            [id(DISPID_PausedEvent), helpstring("Media is paused")]
-            void paused();
-            [id(DISPID_ForwardEvent), helpstring("Forward playback")]
-            void forward();
-            [id(DISPID_BackwardEvent), helpstring("Backward playback")]
-            void backward();
-            [id(DISPID_EncounteredErrorEvent), helpstring("An error has been encountered")]
-            void error();
-            [id(DISPID_EndReachedEvent), helpstring("End of playback reached")]
-            void ended();
-            [id(DISPID_StoppedEvent), helpstring("Playback stopped")]
-            void stopped();
+            [id(DISPID_MediaPlayerNothingSpecialEvent), helpstring("Idle state")]
+            void MediaPlayerNothingSpecial();
+            [id(DISPID_MediaPlayerOpeningEvent), helpstring("Opening media")]
+            void MediaPlayerOpening();
+            [id(DISPID_MediaPlayerBufferingEvent), helpstring("Buffering media")]
+            void MediaPlayerBuffering();
+            [id(DISPID_MediaPlayerPlayingEvent), helpstring("Media is playing")]
+            void MediaPlayerPlaying();
+            [id(DISPID_MediaPlayerPausedEvent), helpstring("Media is paused")]
+            void MediaPlayerPaused();
+            [id(DISPID_MediaPlayerForwardEvent), helpstring("Forward playback")]
+            void MediaPlayerForward();
+            [id(DISPID_MediaPlayerBackwardEvent), helpstring("Backward playback")]
+            void MediaPlayerBackward();
+            [id(DISPID_MediaPlayerEncounteredErrorEvent), helpstring("An error has been encountered")]
+            void MediaPlayerEncounteredError();
+            [id(DISPID_MediaPlayerEndReachedEvent), helpstring("End of playback reached")]
+            void MediaPlayerEndReached();
+            [id(DISPID_MediaPlayerStoppedEvent), helpstring("Playback stopped")]
+            void MediaPlayerStopped();
 
-            [id(DISPID_TimeChangedEvent), helpstring("Time changed")]
-            void TimeChanged([in] long time);
-            [id(DISPID_PositionChangedEvent), helpstring("Position changed")]
-            void PositionChanged([in] long position);
-            [id(DISPID_SeekableChangedEvent), helpstring("Seek changed")]
-            void SeekableChanged([in] VARIANT_BOOL seekable);
-            [id(DISPID_PausableChangedEvent), helpstring("Pause setting changed")]
-            void PausableChanged([in] VARIANT_BOOL pausable);
-
-            [id(DISPID_MouseButtonEvent), helpstring("Mouse button pressed")]
-            void MouseButton([in] VARIANT_BOOL btn_right, [in] VARIANT_BOOL btn_center,
-                [in] VARIANT_BOOL btn_left, [in] VARIANT_BOOL btn_wheel_up,
-                [in] VARIANT_BOOL bnt_wheel_down);
-            [id(DISPID_MouseMovedEvent), helpstring("Mouse moved")]
-            void MouseMoved([in] long x, [in] long y);
-            [id(DISPID_MouseClickedEvent), helpstring("Mouse clicked")]
-            void MouseClicked([in] VARIANT_BOOL clicked);
-            [id(DISPID_MouseObjectEvent), helpstring("Mouse selected holds object")]
-            void MouseObject([in] VARIANT_BOOL moved);
+            [id(DISPID_MediaPlayerTimeChangedEvent), helpstring("Time changed")]
+            void MediaPlayerTimeChanged([in] long time);
+            [id(DISPID_MediaPlayerPositionChangedEvent), helpstring("Position changed")]
+            void MediaPlayerPositionChanged([in] long position);
+            [id(DISPID_MediaPlayerSeekableChangedEvent), helpstring("Seek changed")]
+            void MediaPlayerSeekableChanged([in] VARIANT_BOOL seekable);
+            [id(DISPID_MediaPlayerPausableChangedEvent), helpstring("Pause setting changed")]
+            void MediaPlayerPausableChanged([in] VARIANT_BOOL pausable);
     };
 
     [

@@ -239,21 +239,21 @@ public:
     void fireOnStopEvent(void);
 
     // async events;
-    void fireOnIdleEvent();
-    void fireOnOpeningEvent();
-    void fireOnBufferingEvent();
-    void fireOnPlayingEvent();
-    void fireOnPausedEvent();
-    void fireOnErrorEvent();
-    void fireOnEndedEvent();
-    void fireOnStoppedEvent();
-    void fireOnForwardEvent();
-    void fireOnBackwardEvent();
+    void fireOnMediaPlayerNothingSpecialEvent();
+    void fireOnMediaPlayerOpeningEvent();
+    void fireOnMediaPlayerBufferingEvent();
+    void fireOnMediaPlayerPlayingEvent();
+    void fireOnMediaPlayerPausedEvent();
+    void fireOnMediaPlayerForwardEvent();
+    void fireOnMediaPlayerBackwardEvent();
+    void fireOnMediaPlayerEncounteredErrorEvent();
+    void fireOnMediaPlayerEndReachedEvent();
+    void fireOnMediaPlayerStoppedEvent();
 
-    void fireOnTimeChangedEvent(long time);
-    void fireOnPositionChangedEvent(long position);
-    void fireOnSeekableChangedEvent(VARIANT_BOOL seekable);
-    void fireOnPausableChangedEvent(VARIANT_BOOL pausable);
+    void fireOnMediaPlayerTimeChangedEvent(long time);
+    void fireOnMediaPlayerPositionChangedEvent(long position);
+    void fireOnMediaPlayerSeekableChangedEvent(VARIANT_BOOL seekable);
+    void fireOnMediaPlayerPausableChangedEvent(VARIANT_BOOL pausable);
 
     // controlling IUnknown interface
     LPUNKNOWN pUnkOuter;

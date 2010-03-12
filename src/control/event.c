@@ -1,7 +1,7 @@
 /*****************************************************************************
  * event.c: New libvlc event control API
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2010 the VideoLAN team
  * $Id $
  *
  * Authors: Filippo Carone <filippo@carone.org>

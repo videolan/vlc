@@ -1007,64 +1007,64 @@ void VLCPlugin::fireOnStopEvent(void)
 /*
  * Async events
  */
-void VLCPlugin::fireOnIdleEvent()
+void VLCPlugin::fireOnMediaPlayerNothingSpecialEvent()
 {
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_NothingSpecialEvent, &dispparamsNoArgs);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerNothingSpecialEvent, &dispparamsNoArgs);
 };
 
-void VLCPlugin::fireOnOpeningEvent()
+void VLCPlugin::fireOnMediaPlayerOpeningEvent()
 {
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_OpeningEvent, &dispparamsNoArgs);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerOpeningEvent, &dispparamsNoArgs);
 };
 
-void VLCPlugin::fireOnBufferingEvent()
+void VLCPlugin::fireOnMediaPlayerBufferingEvent()
 {
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_BufferingEvent, &dispparamsNoArgs);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerBufferingEvent, &dispparamsNoArgs);
 };
 
-void VLCPlugin::fireOnPlayingEvent()
+void VLCPlugin::fireOnMediaPlayerPlayingEvent()
 {
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_PlayingEvent, &dispparamsNoArgs);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerPlayingEvent, &dispparamsNoArgs);
 };
 
-void VLCPlugin::fireOnPausedEvent()
+void VLCPlugin::fireOnMediaPlayerPausedEvent()
 {
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_PausedEvent, &dispparamsNoArgs);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerPausedEvent, &dispparamsNoArgs);
 };
 
-void VLCPlugin::fireOnErrorEvent()
+void VLCPlugin::fireOnMediaPlayerEncounteredErrorEvent()
 {
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_EncounteredErrorEvent, &dispparamsNoArgs);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerEncounteredErrorEvent, &dispparamsNoArgs);
 };
 
-void VLCPlugin::fireOnEndedEvent()
+void VLCPlugin::fireOnMediaPlayerEndReachedEvent()
 {
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_EndReachedEvent, &dispparamsNoArgs);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerEndReachedEvent, &dispparamsNoArgs);
 };
 
-void VLCPlugin::fireOnStoppedEvent()
+void VLCPlugin::fireOnMediaPlayerStoppedEvent()
 {
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_StoppedEvent, &dispparamsNoArgs);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerStoppedEvent, &dispparamsNoArgs);
 };
 
-void VLCPlugin::fireOnForwardEvent()
+void VLCPlugin::fireOnMediaPlayerForwardEvent()
 {
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_ForwardEvent, &dispparamsNoArgs);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerForwardEvent, &dispparamsNoArgs);
 };
 
-void VLCPlugin::fireOnBackwardEvent()
+void VLCPlugin::fireOnMediaPlayerBackwardEvent()
 {
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_BackwardEvent, &dispparamsNoArgs);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerBackwardEvent, &dispparamsNoArgs);
 };
 
 static void handle_input_state_event(const libvlc_event_t* event, void *param)
@@ -1073,97 +1073,97 @@ static void handle_input_state_event(const libvlc_event_t* event, void *param)
     switch( event->type )
     {
         case libvlc_MediaPlayerNothingSpecial:
-            plugin->fireOnIdleEvent();
+            plugin->fireOnMediaPlayerNothingSpecialEvent();
             break;
         case libvlc_MediaPlayerOpening:
-            plugin->fireOnOpeningEvent();
+            plugin->fireOnMediaPlayerOpeningEvent();
             break;
         case libvlc_MediaPlayerBuffering:
-            plugin->fireOnBufferingEvent();
+            plugin->fireOnMediaPlayerBufferingEvent();
             break;
         case libvlc_MediaPlayerPlaying:
-            plugin->fireOnPlayingEvent();
+            plugin->fireOnMediaPlayerPlayingEvent();
             break;
         case libvlc_MediaPlayerPaused:
-            plugin->fireOnPausedEvent();
+            plugin->fireOnMediaPlayerPausedEvent();
             break;
         case libvlc_MediaPlayerStopped:
-            plugin->fireOnStoppedEvent();
+            plugin->fireOnMediaPlayerStoppedEvent();
             break;
         case libvlc_MediaPlayerForward:
-            plugin->fireOnForwardEvent();
+            plugin->fireOnMediaPlayerForwardEvent();
             break;
         case libvlc_MediaPlayerBackward:
-            plugin->fireOnBackwardEvent();
+            plugin->fireOnMediaPlayerBackwardEvent();
             break;
         case libvlc_MediaPlayerEndReached:
-            plugin->fireOnEndedEvent();
+            plugin->fireOnMediaPlayerEndReachedEvent();
             break;
         case libvlc_MediaPlayerEncounteredError:
-            plugin->fireOnErrorEvent();
+            plugin->fireOnMediaPlayerEncounteredErrorEvent();
             break;
     }
 }
 
-void VLCPlugin::fireOnTimeChangedEvent(long time)
+void VLCPlugin::fireOnMediaPlayerTimeChangedEvent(long time)
 {
     VARIANT varPos;
     DISPPARAMS params = { &varPos, NULL, 1, 0 };
     varPos.vt = VT_I4;
     varPos.lVal = time;
-    vlcConnectionPointContainer->fireEvent(DISPID_TimeChangedEvent, &params);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerTimeChangedEvent, &params);
 };
 
 static void handle_time_changed_event(const libvlc_event_t* event, void *param)
 {
     VLCPlugin *plugin = (VLCPlugin*)param;
-    plugin->fireOnTimeChangedEvent(event->u.media_player_time_changed.new_time);
+    plugin->fireOnMediaPlayerTimeChangedEvent(event->u.media_player_time_changed.new_time);
 }
 
-void VLCPlugin::fireOnPositionChangedEvent(long position)
+void VLCPlugin::fireOnMediaPlayerPositionChangedEvent(long position)
 {
     VARIANT varPos;
     DISPPARAMS params = { &varPos, NULL, 1, 0 };
     varPos.vt = VT_I4;
     varPos.lVal = position;
-    vlcConnectionPointContainer->fireEvent(DISPID_PositionChangedEvent, &params);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerPositionChangedEvent, &params);
 };
 
 static void handle_position_changed_event(const libvlc_event_t* event, void *param)
 {
     VLCPlugin *plugin = (VLCPlugin*)param;
-    plugin->fireOnPositionChangedEvent(event->u.media_player_position_changed.new_position);
+    plugin->fireOnMediaPlayerPositionChangedEvent(event->u.media_player_position_changed.new_position);
 }
 
 #define B(val) ((val) ? 0xFFFF : 0x0000)
-void VLCPlugin::fireOnSeekableChangedEvent(VARIANT_BOOL seekable)
+void VLCPlugin::fireOnMediaPlayerSeekableChangedEvent(VARIANT_BOOL seekable)
 {
     VARIANT varSeek;
     DISPPARAMS params = { &varSeek, NULL, 1, 0 };
     varSeek.vt = VT_BOOL;
     varSeek.boolVal = seekable;
-    vlcConnectionPointContainer->fireEvent(DISPID_SeekableChangedEvent, &params);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerSeekableChangedEvent, &params);
 };
 
 static void handle_seekable_changed_event(const libvlc_event_t* event, void *param)
 {
     VLCPlugin *plugin = (VLCPlugin*)param;
-    plugin->fireOnSeekableChangedEvent(B(event->u.media_player_seekable_changed.new_seekable));
+    plugin->fireOnMediaPlayerSeekableChangedEvent(B(event->u.media_player_seekable_changed.new_seekable));
 }
 
-void VLCPlugin::fireOnPausableChangedEvent(VARIANT_BOOL pausable)
+void VLCPlugin::fireOnMediaPlayerPausableChangedEvent(VARIANT_BOOL pausable)
 {
     VARIANT varPause;
     DISPPARAMS params = { &varPause, NULL, 1, 0 };
     varPause.vt = VT_BOOL;
     varPause.boolVal = pausable;
-    vlcConnectionPointContainer->fireEvent(DISPID_PausableChangedEvent, &params);
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerPausableChangedEvent, &params);
 };
 
 static void handle_pausable_changed_event(const libvlc_event_t* event, void *param)
 {
     VLCPlugin *plugin = (VLCPlugin*)param;
-    plugin->fireOnPausableChangedEvent(B(event->u.media_player_pausable_changed.new_pausable));
+    plugin->fireOnMediaPlayerPausableChangedEvent(B(event->u.media_player_pausable_changed.new_pausable));
 }
 #undef B
 
