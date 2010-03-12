@@ -495,6 +495,8 @@ VlcPlugin::~VlcPlugin()
 
     if( libvlc_media_player )
     {
+        if( playlist_isplaying() )
+            playlist_stop();
         events.unhook_manager();
         libvlc_media_player_release( libvlc_media_player );
     }

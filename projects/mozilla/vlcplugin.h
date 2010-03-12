@@ -237,6 +237,8 @@ public:
 
     void playlist_play()
     {
+        if( playlist_isplaying() )
+            playlist_stop();
         if( libvlc_media_player||playlist_select(0) )
             libvlc_media_player_play(libvlc_media_player);
     }
