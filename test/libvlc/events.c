@@ -64,8 +64,12 @@ static void test_events (const char ** argv, int argc)
     libvlc_event_manager_t *em;
     bool callback_was_called;
     libvlc_event_type_t mi_events[] = {
+        libvlc_MediaPlayerNothingSpecial,
+        libvlc_MediaPlayerOpening,
+        libvlc_MediaPlayerBuffering,
         libvlc_MediaPlayerPlaying,
         libvlc_MediaPlayerPaused,
+        libvlc_MediaPlayerStopped,
         libvlc_MediaPlayerEndReached,
         libvlc_MediaPlayerEncounteredError,
         libvlc_MediaPlayerTimeChanged,
