@@ -1135,6 +1135,7 @@ static void handle_position_changed_event(const libvlc_event_t* event, void *par
     plugin->fireOnPositionChangedEvent(event->u.media_player_position_changed.new_position);
 }
 
+#define B(val) ((val) ? 0xFFFF : 0x0000)
 void VLCPlugin::fireOnSeekableChangedEvent(VARIANT_BOOL seekable)
 {
     VARIANT varSeek;
@@ -1147,7 +1148,7 @@ void VLCPlugin::fireOnSeekableChangedEvent(VARIANT_BOOL seekable)
 static void handle_seekable_changed_event(const libvlc_event_t* event, void *param)
 {
     VLCPlugin *plugin = (VLCPlugin*)param;
-    plugin->fireOnSeekableChangedEvent(event->u.media_player_seekable_changed.new_seekable);
+    plugin->fireOnSeekableChangedEvent(B(event->u.media_player_seekable_changed.new_seekable));
 }
 
 void VLCPlugin::fireOnPausableChangedEvent(VARIANT_BOOL pausable)
@@ -1162,8 +1163,9 @@ void VLCPlugin::fireOnPausableChangedEvent(VARIANT_BOOL pausable)
 static void handle_pausable_changed_event(const libvlc_event_t* event, void *param)
 {
     VLCPlugin *plugin = (VLCPlugin*)param;
-    plugin->fireOnPausableChangedEvent(event->u.media_player_pausable_changed.new_pausable);
+    plugin->fireOnPausableChangedEvent(B(event->u.media_player_pausable_changed.new_pausable));
 }
+#undef B
 
 /* */
 
