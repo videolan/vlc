@@ -215,6 +215,7 @@ resources.cpp: vlc.qrc $(DEPS_res)
 SOURCES_qt4 = 	qt4.cpp \
 		menus.cpp \
 		main_interface.cpp \
+		main_interface_win32.cpp \
 		dialogs_provider.cpp \
 		input_manager.cpp \
 		actions_manager.cpp \
