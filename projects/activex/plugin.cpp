@@ -274,6 +274,9 @@ VLCPlugin::~VLCPlugin()
 
     if( _p_mplayer )
     {
+        if( isPlaying() )
+            playlist_stop();
+
         player_unregister_events();
         libvlc_media_player_release(_p_mplayer);
         _p_mplayer=NULL;
