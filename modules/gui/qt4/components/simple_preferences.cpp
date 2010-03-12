@@ -564,12 +564,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.native_zone->setEnabled( ui.qt4->isChecked() );
             CONNECT( ui.qt4, toggled( bool ), ui.native_zone, setEnabled( bool ) );
 
-            CONNECT( ui.displayModeBox, currentIndexChanged( int ),
-                     ui.mainPreview, setPreview( int ) );
-            ui.skinsPreview->setPreview( 3 ); /* skins_preview resource index */
+            CONNECT( ui.minimalviewBox, toggled( bool ),
+                     ui.mainPreview, setNormalPreview( bool ) );
+            CONFIG_BOOL( "qt-minimal-view", minimalviewBox );
+            ui.mainPreview->setNormalPreview( ui.minimalviewBox->isChecked() );
+            ui.skinsPreview->setPreview( InterfacePreviewWidget::SKINS );
 
-            CONFIG_GENERIC( "qt-display-mode", IntegerList, ui.displayLabel,
-                            displayModeBox );
             CONFIG_BOOL( "embedded-video", embedVideo );
             CONFIG_BOOL( "qt-fs-controller", fsController );
             CONFIG_BOOL( "qt-system-tray", systrayBox );

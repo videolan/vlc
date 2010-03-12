@@ -342,35 +342,6 @@
          <property name="margin">
           <number>0</number>
          </property>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="displayModeBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="displayLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>Display mode:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
          <item row="4" column="0">
           <widget class="QCheckBox" name="resizingBox">
            <property name="text">
@@ -405,17 +376,24 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="0">
+         <item row="5" column="1">
+          <widget class="QCheckBox" name="sysPop">
+           <property name="text">
+            <string> Systray popup when minimized</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
           <widget class="QCheckBox" name="fsController">
            <property name="text">
             <string>Show controls in full screen mode</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
-          <widget class="QCheckBox" name="sysPop">
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="minimalviewBox">
            <property name="text">
-            <string> Systray popup when minimized</string>
+            <string>Minimal view mode (no toolbars)</string>
            </property>
           </widget>
          </item>
@@ -445,9 +423,6 @@
         </property>
         <property name="alignment">
          <set>Qt::AlignHCenter|Qt::AlignTop</set>
-        </property>
-        <property name="buddy">
-         <cstring>displayModeBox</cstring>
         </property>
        </widget>
       </item>

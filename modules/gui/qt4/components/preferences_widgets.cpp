@@ -205,16 +205,34 @@ InterfacePreviewWidget::InterfacePreviewWidget ( QWidget *parent ) : QLabel( par
     setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 }
 
-void InterfacePreviewWidget::setPreview( int comboid )
+void InterfacePreviewWidget::setNormalPreview( bool b_minimal )
 {
-    /* Need to move resources references as soon as qt4.cpp
-       local defines has been moved somewhere else
-    */
-    static const char pixmaps[][28] = { ":/prefsmenu/sample_classic",
-                                        ":/prefsmenu/sample_complete",
-                                        ":/prefsmenu/sample_minimal",
-                                        ":/prefsmenu/sample_skins" };
-    setPixmap( QPixmap( pixmaps[ comboid ] ) );
+    setPreview( ( b_minimal )?MINIMAL:COMPLETE );
+}
+
+void InterfacePreviewWidget::setPreview( enum_style e_style )
+{
+    QString pixmapLocationString(":/prefsmenu/");
+
+    switch( e_style )
+    {
+    default:
+    case CLASSIC:
+        pixmapLocationString += "sample_classic";
+        break;
+    case COMPLETE:
+        pixmapLocationString += "sample_complete";
+        break;
+    case MINIMAL:
+        pixmapLocationString += "sample_minimal";
+        break;
+    case SKINS:
+        pixmapLocationString += "sample_skins";
+        break;
+    }
+
+    setPixmap( QPixmap( pixmapLocationString ) );
+    update();
 }
 
 
