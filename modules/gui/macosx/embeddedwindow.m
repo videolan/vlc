@@ -37,26 +37,30 @@
 #import <Carbon/Carbon.h>
 
 /*****************************************************************************
- * extension to NSWindow's interface to fix compilation warnings
- * and let us access this functions properly
- * this uses a private Apple-API, but works fine on all current OSX releases
- * keep checking for compatiblity with future releases though
- *****************************************************************************/
-
-@interface NSWindow (UndocumentedWindowProperties)
-- (void)setBottomCornerRounded: (BOOL)value;
-@end
-
-/*****************************************************************************
  * VLCEmbeddedWindow Implementation
  *****************************************************************************/
 
 @implementation VLCEmbeddedWindow
 
+- (id)initWithContentRect:(NSRect)contentRect styleMask: (NSUInteger)windowStyle backing:(NSBackingStoreType)bufferingType defer:(BOOL)deferCreation
+{
+    BOOL b_useTextured = YES;
+    if( [[NSWindow class] instancesRespondToSelector:@selector(setContentBorderThickness:forEdge:)] )
+    {
+        b_useTextured = NO;
+        windowStyle ^= NSTexturedBackgroundWindowMask;
+    }
+    self = [super initWithContentRect:contentRect styleMask:windowStyle backing:bufferingType defer:deferCreation];
+    if(! b_useTextured )
+    {
+        [self setContentBorderThickness:28.0 forEdge:NSMinYEdge];
+    }
+    return self;
+}
+
 - (void)awakeFromNib
 {
     [self setDelegate: self];
-    [self setBottomCornerRounded:NO];
 
     /* button strings */
     [o_btn_backward setToolTip: _NS("Rewind")];
@@ -100,9 +104,13 @@
     [o_btn_fullscreen setState: NO];
     b_fullscreen = NO;
 
+    [self setMovableByWindowBackground:YES];
+
+    [self setDelegate:self];
+
     /* Make sure setVisible: returns NO */
     [self orderOut:self];
-    //b_window_is_invisible = YES;
+    b_window_is_invisible = YES;
     videoRatio = NSMakeSize( 0., 0. );
 }
 
@@ -112,12 +120,19 @@
     if( [o_btn_play alternateImage] == o_img_play_pressed )
         b_playing = YES;
 
-    if( [NSColor currentControlTint] == NSGraphiteControlTint ) {
+    if( [NSColor currentControlTint] == NSGraphiteControlTint )
+    {
         o_img_play_pressed = [NSImage imageNamed: @"play_embedded_graphite"];
         o_img_pause_pressed = [NSImage imageNamed: @"pause_embedded_graphite"];
+        [o_btn_backward setAlternateImage: [NSImage imageNamed: @"skip_previous_embedded_graphite"]];
+        [o_btn_forward setAlternateImage: [NSImage imageNamed: @"skip_forward_embedded_graphite"]];
+        [o_btn_fullscreen setAlternateImage: [NSImage imageNamed: @"fullscreen_graphite"]];
     } else {
-        o_img_play_pressed = [NSImage imageNamed:@"play_embedded_blue"];
-        o_img_pause_pressed = [NSImage imageNamed:@"pause_embedded_blue"];
+        o_img_play_pressed = [NSImage imageNamed: @"play_embedded_blue"];
+        o_img_pause_pressed = [NSImage imageNamed: @"pause_embedded_blue"];
+        [o_btn_backward setAlternateImage: [NSImage imageNamed: @"skip_previous_embedded_blue"]];
+        [o_btn_forward setAlternateImage: [NSImage imageNamed: @"skip_forward_embedded_blue"]];
+        [o_btn_fullscreen setAlternateImage: [NSImage imageNamed: @"fullscreen_blue"]];
     }
 
     if( b_playing )
@@ -213,10 +228,8 @@
 - (BOOL)windowShouldClose:(id)sender
 {
     playlist_t * p_playlist = pl_Get( VLCIntf );
+    playlist_Stop( p_playlist );
 
-    /* Only want to stop playback if video is playing */
-    if( videoRatio.height != 0. && videoRatio.width != 0. )
-        playlist_Stop( p_playlist );
     return YES;
 }
 
@@ -454,8 +467,6 @@
             [[o_view superview] replaceSubview:o_view with:o_temp_view];
             [o_temp_view setFrame:[o_view frame]];
             [o_fullscreen_window setContentView:o_view];
-
-            [o_fullscreen_window makeKeyAndOrderFront:self];
 
             [o_fullscreen_window makeKeyAndOrderFront:self];
             [o_fullscreen_window orderFront:self animate:YES];
