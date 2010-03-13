@@ -244,7 +244,7 @@ static int               MuxSend( sout_stream_t *, sout_stream_id_t *,
                                   block_t* );
 
 static sout_access_out_t *GrabberCreate( sout_stream_t *p_sout );
-static void* ThreadSend( vlc_object_t *p_this );
+static void* ThreadSend( void * );
 static void *rtp_listen_thread( void * );
 
 static void SDPHandleUrl( sout_stream_t *, const char * );
@@ -341,6 +341,7 @@ struct sout_stream_id_t
     pf_rtp_packetizer_t pf_packetize;
 
     /* Packets sinks */
+    vlc_thread_t      thread;
     vlc_mutex_t       lock_sink;
     int               sinkc;
     rtp_sink_t       *sinkv;
@@ -1346,9 +1347,14 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                                  p_sys->i_ttl, id->i_port, id->i_port + 1 );
 
     id->p_fifo = block_FifoNew();
-    if( vlc_thread_create( id, "RTP send thread", ThreadSend,
-                           VLC_THREAD_PRIORITY_HIGHEST ) )
+    if( unlikely(id->p_fifo == NULL) )
         goto error;
+    if( vlc_clone( &id->thread, ThreadSend, id, VLC_THREAD_PRIORITY_HIGHEST ) )
+    {
+        block_FifoRelease( id->p_fifo );
+        id->p_fifo = NULL;
+        goto error;
+    }
 
     /* Update p_sys context */
     vlc_mutex_lock( &p_sys->lock_es );
@@ -1379,16 +1385,16 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    if( id->p_fifo != NULL )
-    {
-        vlc_object_kill( id );
-        vlc_thread_join( id );
-        block_FifoRelease( id->p_fifo );
-    }
-
     vlc_mutex_lock( &p_sys->lock_es );
     TAB_REMOVE( p_sys->i_es, p_sys->es, id );
     vlc_mutex_unlock( &p_sys->lock_es );
+
+    if( likely(id->p_fifo != NULL) )
+    {
+        vlc_cancel( id->thread );
+        vlc_join( id->thread, NULL );
+        block_FifoRelease( id->p_fifo );
+    }
 
     /* Release dynamic payload type */
     if (id->i_payload_type >= 96)
@@ -1550,7 +1556,7 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
 /****************************************************************************
  * RTP send
  ****************************************************************************/
-static void* ThreadSend( vlc_object_t *p_this )
+static void* ThreadSend( void *data )
 {
 #ifdef WIN32
 # define ECONNREFUSED WSAECONNREFUSED
@@ -1562,7 +1568,7 @@ static void* ThreadSend( vlc_object_t *p_this )
 # define EAGAIN       WSAEWOULDBLOCK
 # define EWOULDBLOCK  WSAEWOULDBLOCK
 #endif
-    sout_stream_id_t *id = (sout_stream_id_t *)p_this;
+    sout_stream_id_t *id = data;
     unsigned i_caching = id->i_caching;
 
     for (;;)
