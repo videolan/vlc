@@ -107,7 +107,6 @@ vlc_module_begin ()
     add_shortcut( "pulseaudio" )
     add_shortcut( "pa" )
     set_callbacks( Open, Close )
-    linked_with_a_crap_library_which_uses_atexit()
 vlc_module_end ()
 
 /*****************************************************************************
