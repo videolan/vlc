@@ -567,6 +567,11 @@ modules/gui/macosx/vout.m
 modules/gui/macosx/voutgl.m
 modules/gui/macosx/wizard.h
 modules/gui/macosx/wizard.m
+modules/gui/macosx_dialog_provider/VLCLoginPanel.h
+modules/gui/macosx_dialog_provider/VLCLoginPanel.m
+modules/gui/macosx_dialog_provider/VLCProgressPanel.h
+modules/gui/macosx_dialog_provider/VLCProgressPanel.m
+modules/gui/macosx_dialog_provider/dialogProvider.m
 modules/gui/hildon/maemo.c
 modules/gui/minimal_macosx/VLCMinimalVoutWindow.h
 modules/gui/minimal_macosx/VLCMinimalVoutWindow.m
