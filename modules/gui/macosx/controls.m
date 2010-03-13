@@ -84,7 +84,7 @@
     {
         o_repeat_single = [NSImage imageNamed:@"repeat_single_embedded_graphite"];
         o_repeat_all = [NSImage imageNamed:@"repeat_embedded_graphite"];
-        
+
         [o_btn_shuffle setAlternateImage: [NSImage imageNamed: @"shuffle_embedded_graphite"]];
         [o_btn_addNode setAlternateImage: [NSImage imageNamed: @"add_embedded_graphite"]];
     }
@@ -92,11 +92,11 @@
     {
         o_repeat_single = [NSImage imageNamed:@"repeat_single_embedded_blue"];
         o_repeat_all = [NSImage imageNamed:@"repeat_embedded_blue"];
-        
+
         [o_btn_shuffle setAlternateImage: [NSImage imageNamed: @"shuffle_embedded_blue"]];
         [o_btn_addNode setAlternateImage: [NSImage imageNamed: @"add_embedded_blue"]];
     }
-    
+
     /* update the repeat button, but keep its state */
     if( i_repeat == 1 )
         [self repeatOne];
@@ -109,12 +109,12 @@
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-    
+
     [o_fs_panel release];
     [o_repeat_single release];
     [o_repeat_all release];
     [o_repeat_off release];
-    
+
     [super dealloc];
 }
 
@@ -252,7 +252,7 @@
 	if(val.b_bool)
         [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"sidebarShuffleOn"]];
 	else
-        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"sidebarShuffle"]];    
+        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"sidebarShuffle"]];
 }
 
 - (IBAction)repeatButtonAction:(id)sender
@@ -267,48 +267,48 @@
     if( !repeating.b_bool && !looping.b_bool )
     {
         /* was: no repeating at all, switching to Repeat One */
- 
+
         /* set our button's look */
         [self repeatOne];
- 
+
         /* prepare core communication */
         repeating.b_bool = true;
         looping.b_bool = false;
         config_PutInt( p_playlist, "repeat", 1 );
         config_PutInt( p_playlist, "loop", 0 );
- 
+
         /* show the change */
         vout_OSDMessage( p_intf, DEFAULT_CHAN, "%s", _( "Repeat One" ) );
     }
     else if( repeating.b_bool && !looping.b_bool )
     {
         /* was: Repeat One, switching to Repeat All */
- 
+
         /* set our button's look */
         [self repeatAll];
- 
+
         /* prepare core communication */
         repeating.b_bool = false;
         looping.b_bool = true;
         config_PutInt( p_playlist, "repeat", 0 );
         config_PutInt( p_playlist, "loop", 1 );
- 
+
         /* show the change */
         vout_OSDMessage( p_intf, DEFAULT_CHAN, "%s", _( "Repeat All" ) );
     }
     else
     {
         /* was: Repeat All or bug in VLC, switching to Repeat Off */
- 
+
         /* set our button's look */
         [self repeatOff];
- 
+
         /* prepare core communication */
         repeating.b_bool = false;
         looping.b_bool = false;
         config_PutInt( p_playlist, "repeat", 0 );
         config_PutInt( p_playlist, "loop", 0 );
- 
+
         /* show the change */
         vout_OSDMessage( p_intf, DEFAULT_CHAN, "%s", _( "Repeat Off" ) );
     }
@@ -344,7 +344,7 @@
         vout_OSDMessage( p_intf, DEFAULT_CHAN, "%s", _( "Repeat Off" ) );
         config_PutInt( p_playlist, "repeat", 0 );
     }
- 
+
     p_intf->p_sys->b_playmode_update = true;
     p_intf->p_sys->b_intf_update = true;
 }
@@ -591,7 +591,7 @@
     {
         NSUInteger c = 0;
         if( !p_input ) return;
-        
+
         c = [[openPanel filenames] count];
 
         for (int i = 0; i < [[openPanel filenames] count] ; i++)
@@ -690,7 +690,7 @@
         /* Variable doesn't exist or isn't handled */
         return;
     }
- 
+
     /* Make sure we want to display the variable */
     if( i_type & VLC_VAR_HASCHOICE )
     {
@@ -699,7 +699,7 @@
         if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1 )
             return;
     }
- 
+
     /* Get the descriptive name of the variable */
     var_Change( p_object, psz_variable, VLC_VAR_GETTEXT, &text, NULL );
     [o_mi setTitle: [[VLCMain sharedInstance] localizedString: text.psz_string ?
@@ -711,7 +711,7 @@
 
         [self setupVarMenu: o_menu forMenuItem: o_mi target:p_object
                         var:psz_variable selector:pf_callback];
- 
+
         free( text.psz_string );
         return;
     }
@@ -1091,7 +1091,7 @@
         NSArray *o_windows = [NSApp orderedWindows];
         NSEnumerator *o_enumerator = [o_windows objectEnumerator];
         bEnabled = FALSE;
- 
+
         if( p_input != NULL )
         {
             vout_thread_t *p_vout = input_GetVout( p_input );
@@ -1102,7 +1102,7 @@
                     var_Get( p_vout, "video-on-top", &val );
                     [o_mi setState: val.b_bool ?  NSOnState : NSOffState];
                 }
-    
+
                 while( (o_window = [o_enumerator nextObject]))
                 {
                     if( [[o_window className] isEqualToString: @"VLCVoutWindow"] ||
@@ -1113,7 +1113,7 @@
                         break;
                     }
                 }
-    
+
                 vlc_object_release( (vlc_object_t *)p_vout );
             }
         }

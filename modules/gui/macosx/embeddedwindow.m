@@ -71,8 +71,8 @@
     [o_btn_playlist setToolTip: _NS("Playlist")];
     [self setTitle: _NS("VLC media player")];
 
-    o_img_play = [NSImage imageNamed: @"play_big"];
-    o_img_pause = [NSImage imageNamed: @"pause_big"];
+    o_img_play = [NSImage imageNamed: @"play_embedded"];
+    o_img_pause = [NSImage imageNamed: @"pause_embedded"];
 
     [self controlTintChanged];
     [[NSNotificationCenter defaultCenter] addObserver: self
@@ -85,7 +85,7 @@
                                                                   green:0.843
                                                                    blue:0.886
                                                                   alpha:1.0]];
-    
+
     [self setMinSize:NSMakeSize([o_sidebar_list convertRect:[o_sidebar_list bounds]
                                                      toView: nil].size.width + 551., 114.)];
 
@@ -111,10 +111,15 @@
     BOOL b_playing = NO;
     if( [o_btn_play alternateImage] == o_img_play_pressed )
         b_playing = YES;
-    
-    o_img_play_pressed = [NSImage imageNamed: @"play_big_down"];
-    o_img_pause_pressed = [NSImage imageNamed: @"pause_big_down"];
-    
+
+    if( [NSColor currentControlTint] == NSGraphiteControlTint ) {
+        o_img_play_pressed = [NSImage imageNamed: @"play_embedded_graphite"];
+        o_img_pause_pressed = [NSImage imageNamed: @"pause_embedded_graphite"];
+    } else {
+        o_img_play_pressed = [NSImage imageNamed:@"play_embedded_blue"];
+        o_img_pause_pressed = [NSImage imageNamed:@"pause_embedded_blue"];
+    }
+
     if( b_playing )
         [o_btn_play setAlternateImage: o_img_play_pressed];
     else
@@ -128,7 +133,7 @@
     [o_img_play_pressed release];
     [o_img_pause release];
     [o_img_pause_pressed release];
-    
+
     [super dealloc];
 }
 
@@ -170,7 +175,7 @@
 {
     if( o_main_pgbar )
         return o_main_pgbar;
-    
+
     return nil;
 }
 
@@ -235,11 +240,11 @@
 	if( newList.size.height < 50 && newList.size.height > 0 ) {
 		[self togglePlaylist:self];
 	}
-    
-    /* With no video open or with the playlist open the behavior is odd */    
+
+    /* With no video open or with the playlist open the behavior is odd */
     if( newList.size.height > 50 )
         return proposedFrameSize;
-	
+
     if( videoRatio.height == 0. || videoRatio.width == 0. )
         return proposedFrameSize;
 
@@ -392,8 +397,8 @@
     vout_thread_t *p_vout = getVout();
     BOOL blackout_other_displays = config_GetInt( VLCIntf, "macosx-black" );
 
-    screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_GetInteger( p_vout, "video-device" )]; 
- 
+    screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_GetInteger( p_vout, "video-device" )];
+
     [self lockFullscreenAnimation];
 
     if (!screen)
@@ -414,8 +419,8 @@
     [o_btn_fullscreen setState: YES];
 
     [NSCursor setHiddenUntilMouseMoves: YES];
- 
-    if( blackout_other_displays )        
+
+    if( blackout_other_displays )
         [screen blackoutOtherScreens];
 
     /* Make sure we don't see the window flashes in float-on-top mode */
@@ -439,13 +444,13 @@
             /* We don't animate if we are not visible, instead we
              * simply fade the display */
             CGDisplayFadeReservationToken token;
- 
+
             CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
             CGDisplayFade( token, 0.5, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
- 
+
             if ([screen isMainScreen])
                 SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
- 
+
             [[o_view superview] replaceSubview:o_view with:o_temp_view];
             [o_temp_view setFrame:[o_view frame]];
             [o_fullscreen_window setContentView:o_view];
@@ -465,7 +470,7 @@
 
             return;
         }
- 
+
         /* Make sure we don't see the o_view disappearing of the screen during this operation */
         NSDisableScreenUpdates();
         [[o_view superview] replaceSubview:o_view with:o_temp_view];
@@ -494,7 +499,7 @@
         [o_fullscreen_anim2 stopAnimation];
         [o_fullscreen_anim2 release];
     }
- 
+
     if ([screen isMainScreen])
         SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
 
@@ -854,7 +859,7 @@
     NSString *o_desired_type = [o_paste availableTypeFromArray:o_types];
     NSData *o_carried_data = [o_paste dataForType:o_desired_type];
     BOOL b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
-    
+
     if( o_carried_data )
     {
         if ([o_desired_type isEqualToString:NSFilenamesPboardType])
@@ -863,7 +868,7 @@
             NSArray *o_array = [NSArray array];
             NSArray *o_values = [[o_paste propertyListForType: NSFilenamesPboardType]
                                  sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-            
+
             for( i = 0; i < (int)[o_values count]; i++)
             {
                 NSDictionary *o_dic;
