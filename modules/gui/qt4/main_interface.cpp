@@ -860,6 +860,9 @@ void MainInterface::dockPlaylist( bool p_docked )
     }
 }
 
+/*
+  If b_switch is false, then we are normalView
+ */
 void MainInterface::toggleMinimalView( bool b_switch )
 {
     if( i_visualmode == 0 )

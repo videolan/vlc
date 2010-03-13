@@ -295,8 +295,12 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
     BAR_DADD( VideoMenu( p_intf, bar ), qtr( "&Video" ), 2 );
 
     BAR_ADD( ToolsMenu( bar ), qtr( "&Tools" ) );
-    BAR_ADD( ViewMenu( p_intf, bar ), qtr( "V&iew" ) );
+    QMenu *_menu = ViewMenu( p_intf, bar );
+    _menu->setTitle( qtr( "V&iew" ) );
+    bar->addMenu( _menu );
+    ViewMenu( p_intf, _menu, mi );
     BAR_ADD( HelpMenu( bar ), qtr( "&Help" ) );
+
 }
 #undef BAR_ADD
 #undef BAR_DADD
@@ -415,7 +419,7 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QWidget* parent )
  * View Menu
  * Interface modification, load other interfaces, activate Extensions
  **/
-QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current )
+QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface *_mi )
 {
     QAction *action;
     QMenu *menu;
@@ -430,7 +434,7 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current )
         menu->clear();
     }
 
-    MainInterface *mi = p_intf->p_sys->p_mi;
+    MainInterface *mi = _mi ? _mi : p_intf->p_sys->p_mi;
     assert( mi );
 
     menu->addAction( QIcon( ":/menu/playlist_menu" ),
@@ -446,7 +450,7 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current )
     action = menu->addAction( qtr( "Mi&nimal View" ) );
     action->setShortcut( qtr( "Ctrl+H" ) );
     action->setCheckable( true );
-    action->setChecked( (mi->getControlsVisibilityStatus() & CONTROLS_HIDDEN ) );
+    action->setChecked( !current && (mi->getControlsVisibilityStatus() & CONTROLS_HIDDEN ) );
 
     CONNECT( action, triggered( bool ), mi, toggleMinimalView( bool ) );
     CONNECT( mi, minimalViewToggled( bool ), action, setChecked( bool ) );

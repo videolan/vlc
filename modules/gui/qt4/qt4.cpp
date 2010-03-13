@@ -448,12 +448,12 @@ static void *Thread( void *obj )
         p_mi = new MainInterface( p_intf );
     else
         p_mi = NULL;
+    p_intf->p_sys->p_mi = p_mi;
 
     /* Explain how to show a dialog :D */
     p_intf->pf_show_dialog = ShowDialog;
 
     /* */
-    p_intf->p_sys->p_mi = p_mi;
     vlc_sem_post (&ready);
 
     /* Last settings */

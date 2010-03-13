@@ -85,7 +85,7 @@ public:
     static void MiscPopupMenu( intf_thread_t * );
 
     /* Systray */
-    static void updateSystrayMenu( MainInterface *,intf_thread_t  *,
+    static void updateSystrayMenu( MainInterface *, intf_thread_t  *,
                                    bool b_force_visible = false);
 
     /* Actions */
@@ -100,7 +100,7 @@ private:
     static QMenu *ToolsMenu( QWidget * );
 
     static QMenu *ViewMenu( intf_thread_t *, QWidget * );
-    static QMenu *ViewMenu( intf_thread_t *, QMenu * );
+    static QMenu *ViewMenu( intf_thread_t *, QMenu *, MainInterface * mi = NULL );
 
     static QMenu *InterfacesMenu( intf_thread_t *p_intf, QMenu * );
     static void ExtensionsMenu( intf_thread_t *p_intf, QMenu * );
