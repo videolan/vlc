@@ -284,7 +284,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)updateTitle
 {
-    NSString * o_title = nil; 
+    NSString * o_title = nil;
     NSMutableString * o_mrl = nil;
     input_thread_t * p_input;
     char * psz_title;
@@ -804,7 +804,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     i_time_mouse_last_moved = mdate();
     o_window = [[VLCVoutWindow alloc] initWithVout: p_arg_vout view: self
                                                     frame: s_arg_frame];
-    
+
     [self updateTitle];
     if([self isFullscreen])
         [o_window performSelectorOnMainThread: @selector(enterFullscreen) withObject: NULL waitUntilDone: YES];
@@ -947,7 +947,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     /* o_window needs to point to our o_embeddedwindow, super might have set it
      * to the fullscreen window that o_embeddedwindow setups during fullscreen */
     o_window = o_embeddedwindow;
- 
+
     if( b_return )
     {
         [o_window lockFullscreenAnimation];
@@ -962,8 +962,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         if ([o_window isVisible] && (![o_window isFullscreen]))
             [o_window makeKeyAndOrderFront: self];
 
-        if ( [self window] != o_embeddedwindow )
-            [self scaleWindowWithFactor: 1.0 animate: [o_window isVisible] && (![o_window isFullscreen])];
+        [self scaleWindowWithFactor: 1.0 animate: [o_window isVisible] && (![o_window isFullscreen])];
 
         [o_embeddedwindow setVideoRatio:[self voutSizeForFactor:1.0]];
 
