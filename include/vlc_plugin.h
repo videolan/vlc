@@ -226,7 +226,7 @@ enum vlc_module_properties
      || vlc_module_set (p_submodule, VLC_MODULE_CB_CLOSE, deactivate)) \
         goto error;
 
-#define linked_with_a_crap_library_which_uses_atexit( ) \
+#define cannot_unload_broken_library( ) \
     if (vlc_module_set (p_submodule, VLC_MODULE_NO_UNLOAD)) \
         goto error;
 

@@ -61,7 +61,7 @@ vlc_module_begin ()
     set_description( N_("SVGAlib video output") )
     set_capability( "video output", 0 )
     set_callbacks( Create, Destroy )
-    linked_with_a_crap_library_which_uses_atexit ()
+    cannot_unload_broken_library () /* SVGAlib uses atexit() */
 vlc_module_end ()
 
 /*****************************************************************************

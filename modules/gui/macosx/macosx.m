@@ -105,7 +105,7 @@ vlc_module_begin ()
     set_callbacks( OpenIntf, CloseIntf )
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
-    linked_with_a_crap_library_which_uses_atexit( )
+    cannot_unload_broken_library( )
     add_bool( "macosx-autoplay", true, NULL, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT,
               false )
     add_bool( "macosx-recentitems", true, NULL, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT,

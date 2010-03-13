@@ -47,7 +47,7 @@ vlc_module_begin()
     set_subcategory( SUBCAT_PLAYLIST_SD )
     set_capability( "services_discovery", 0 )
     set_callbacks( Open, Close )
-    linked_with_a_crap_library_which_uses_atexit()
+    cannot_unload_broken_library()
 
     VLC_SD_PROBE_SUBMODULE
 vlc_module_end()

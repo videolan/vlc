@@ -47,7 +47,7 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
 #ifdef WIN32
-    linked_with_a_crap_library_which_uses_atexit()
+    cannot_unload_broken_library()
 #endif
 
 vlc_module_end ()

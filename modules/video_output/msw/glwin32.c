@@ -59,7 +59,7 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 
     /* FIXME: Hack to avoid unregistering our window class */
-    linked_with_a_crap_library_which_uses_atexit ()
+    cannot_unload_broken_library ()
 vlc_module_end()
 
 #if 0 /* FIXME */
