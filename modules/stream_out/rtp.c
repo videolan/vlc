@@ -986,7 +986,18 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
 #ifdef HAVE_SRTP
     id->srtp = NULL;
+#endif
+    vlc_mutex_init( &id->lock_sink );
+    id->sinkc = 0;
+    id->sinkv = NULL;
+    id->rtsp_id = NULL;
+    id->p_fifo = NULL;
+    id->listen.fd = NULL;
 
+    id->i_caching =
+        (int64_t)1000 * var_GetInteger( p_stream, SOUT_CFG_PREFIX "caching");
+
+#ifdef HAVE_SRTP
     char *key = var_CreateGetNonEmptyString (p_stream, SOUT_CFG_PREFIX"key");
     if (key)
     {
@@ -1010,16 +1021,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->i_sequence = 0; /* FIXME: awful hack for libvlc_srtp */
     }
 #endif
-
-    vlc_mutex_init( &id->lock_sink );
-    id->sinkc = 0;
-    id->sinkv = NULL;
-    id->rtsp_id = NULL;
-    id->p_fifo = NULL;
-    id->listen.fd = NULL;
-
-    id->i_caching =
-        (int64_t)1000 * var_GetInteger( p_stream, SOUT_CFG_PREFIX "caching");
 
     if( p_sys->psz_destination != NULL )
         switch( p_sys->proto )
