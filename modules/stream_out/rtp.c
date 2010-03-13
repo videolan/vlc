@@ -311,8 +311,6 @@ typedef struct rtp_sink_t
 
 struct sout_stream_id_t
 {
-    VLC_COMMON_MEMBERS
-
     sout_stream_t *p_stream;
     /* rtp field */
     uint16_t    i_sequence;
@@ -906,7 +904,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     /* NOTE: As a special case, if we use a non-RTP
      * mux (TS/PS), then p_fmt is NULL. */
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    sout_stream_id_t  *id;
     char              *psz_sdp;
 
     if (0 == p_sys->payload_bitmap)
@@ -945,11 +942,9 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                  i_port = 0;
     }
 
-    id = vlc_object_create( p_stream, sizeof( sout_stream_id_t ) );
-    if( id == NULL )
+    sout_stream_id_t *id = malloc( sizeof( *id ) );
+    if( unlikely(id == NULL) )
         return NULL;
-    vlc_object_attach( id, p_stream );
-
     id->p_stream   = p_stream;
 
     /* Look for free dymanic payload type */
@@ -1425,7 +1420,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     if( p_sys->b_export_sap && !p_sys->p_mux ) SapSetup( p_stream );
     if( p_sys->psz_sdp_file != NULL ) FileSetup( p_stream );
 
-    vlc_object_release( id );
+    free( id );
     return VLC_SUCCESS;
 }
 
@@ -1589,7 +1584,7 @@ static void* ThreadSend( void *data )
             if( val )
             {
                 errno = val;
-                msg_Dbg( id, "SRTP sending error: %m" );
+                msg_Dbg( id->p_stream, "SRTP sending error: %m" );
                 block_Release( out );
                 out = NULL;
             }
@@ -1649,7 +1644,7 @@ static void* ThreadSend( void *data )
 
         for( unsigned i = 0; i < deadc; i++ )
         {
-            msg_Dbg( id, "removing socket %d", deadv[i] );
+            msg_Dbg( id->p_stream, "removing socket %d", deadv[i] );
             rtp_del_sink( id, deadv[i] );
         }
         vlc_restorecancel (canc);
@@ -1667,7 +1662,7 @@ static void *rtp_listen_thread( void *data )
 
     for( ;; )
     {
-        int fd = net_Accept( id, id->listen.fd );
+        int fd = net_Accept( id->p_stream, id->listen.fd );
         if( fd == -1 )
             continue;
         int canc = vlc_savecancel( );
@@ -1685,7 +1680,7 @@ int rtp_add_sink( sout_stream_id_t *id, int fd, bool rtcp_mux, uint16_t *seq )
     sink.rtcp = OpenRTCP( VLC_OBJECT( id->p_stream ), fd, IPPROTO_UDP,
                           rtcp_mux );
     if( sink.rtcp == NULL )
-        msg_Err( id, "RTCP failed!" );
+        msg_Err( id->p_stream, "RTCP failed!" );
 
     vlc_mutex_lock( &id->lock_sink );
     INSERT_ELEM( id->sinkv, id->sinkc, id->sinkc, sink );
