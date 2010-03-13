@@ -63,7 +63,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VOUT )
     set_description( N_("OpenGL video output") )
 #ifdef __APPLE__
-    set_capability( "video output", 200 )
+    set_capability( "video output", 400 )
 #else
     set_capability( "video output", 20 )
 #endif
@@ -339,7 +339,7 @@ static int Manage( vout_thread_t *p_vout )
     if (p_sys->p_vout->i_alignment != p_vout->i_alignment)
     {
         p_vout->i_changes |= VOUT_CROP_CHANGE;        //to force change
-        p_sys->p_vout->i_alignment = p_vout->i_alignment;    
+        p_sys->p_vout->i_alignment = p_vout->i_alignment;
     }
 
     /* forward signal that autoscale toggle has changed */
@@ -377,7 +377,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         p_next = picture_pool_Get( p_sys->p_pool );
         assert( p_next );
     }
-  
+
     if( p_sys->p_current )
     {
         assert( p_sys->p_current->p[0].p_pixels == p_pic->p[0].p_pixels );
@@ -394,7 +394,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     if( p_sys->p_current != p_next ) {
         if( p_sys->p_current )
             picture_Release( p_sys->p_current );
-        
+
         /* Swap the picture texture on opengl vout side. */
         p_sys->p_current = p_next;
 
