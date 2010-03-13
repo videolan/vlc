@@ -69,6 +69,7 @@ tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
         var_SetString (srv, "tls-x509-key", key_path);
     }
 
+    vlc_object_attach (srv, obj);
     srv->p_module = module_need (srv, "tls server", NULL, false );
     if (srv->p_module == NULL)
     {
@@ -77,7 +78,6 @@ tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
         return NULL;
     }
 
-    vlc_object_attach (srv, obj);
     msg_Dbg (srv, "TLS server plugin initialized");
     return srv;
 }
@@ -184,6 +184,7 @@ tls_ClientCreate (vlc_object_t *obj, int fd, const char *psz_hostname)
     else
         msg_Dbg (cl, "requested anonymous server");
 
+    vlc_object_attach (cl, obj);
     cl->p_module = module_need (cl, "tls client", NULL, false );
     if (cl->p_module == NULL)
     {
@@ -201,7 +202,6 @@ tls_ClientCreate (vlc_object_t *obj, int fd, const char *psz_hostname)
     if (val == 0)
     {
         msg_Dbg (cl, "TLS client session initialized");
-        vlc_object_attach (cl, obj);
         return cl;
     }
     msg_Err (cl, "TLS client session handshake error");
