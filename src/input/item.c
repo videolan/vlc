@@ -858,7 +858,6 @@ input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
     p_input->b_fixed_name = false;
 
     p_input->i_type = i_type;
-    p_input->b_prefers_tree = false;
 
     if( psz_uri )
         input_item_SetURI( p_input, psz_uri );

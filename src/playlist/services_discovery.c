@@ -356,8 +356,6 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,
         return VLC_EGENERIC;
     }
 
-    /* We want tree-view for service directory */
-    p_node->p_input->b_prefers_tree = true;
     p_sds->p_sd = p_sd;
     p_sds->p_node = p_node;
     p_sds->psz_name = strdup( psz_name );

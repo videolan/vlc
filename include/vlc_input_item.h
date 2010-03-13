@@ -86,7 +86,6 @@ struct input_item_t
     vlc_mutex_t lock;                 /**< Lock for the item */
 
     uint8_t     i_type;              /**< Type (file, disc, ... see input_item_type_e) */
-    bool        b_prefers_tree;      /**< Do we prefer being displayed as tree*/
     bool        b_fixed_name;        /**< Can the interface change the name ?*/
     bool        b_error_when_reading;/**< Error When Reading */
 };
