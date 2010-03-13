@@ -415,15 +415,15 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QWidget* parent )
  * View Menu
  * Interface modification, load other interfaces, activate Extensions
  **/
-QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
-                           QMenu *current,
-                           bool with_intf )
+QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current )
 {
     QAction *action;
-
     QMenu *menu;
-    if( !with_intf )
-        menu = new QMenu( qtr( "&View" ), current );
+
+    if( !current )
+    {
+        menu = new QMenu( qtr( "&View" ) );
+    }
     else
     {
         menu = current;
@@ -439,18 +439,14 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
 
     menu->addSeparator();
 
-    if( with_intf )
-    {
-        QMenu *intfmenu = InterfacesMenu( p_intf, menu );
-        menu->addSeparator();
-    }
+    QMenu *intfmenu = InterfacesMenu( p_intf, menu );
+    menu->addSeparator();
 
     /* Minimal View */
     action = menu->addAction( qtr( "Mi&nimal View" ) );
     action->setShortcut( qtr( "Ctrl+H" ) );
     action->setCheckable( true );
-    action->setChecked( !with_intf &&
-            (mi->getControlsVisibilityStatus() & CONTROLS_HIDDEN ) );
+    action->setChecked( (mi->getControlsVisibilityStatus() & CONTROLS_HIDDEN ) );
 
     CONNECT( action, triggered( bool ), mi, toggleMinimalView( bool ) );
     CONNECT( mi, minimalViewToggled( bool ), action, setChecked( bool ) );
@@ -476,7 +472,7 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
     action->setChecked( mi->isPlDocked() );
     CONNECT( action, triggered( bool ), mi, dockPlaylist( bool ) );
 
-    if( with_intf )
+    if( !current )
     // I don't want to manage consistency between menus, so no popup-menu
     {
         action = menu->addAction( qtr( "Quit after Playback" ) );
@@ -1037,7 +1033,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                 msg_Warn( p_intf, "could not find parent interface" );
         }
         else
-            menu->addMenu( ViewMenu( p_intf, menu, false ));
+            menu->addMenu( ViewMenu( p_intf, (QMenu *)NULL ) );
 
         menu->addMenu( submenu );
     }
