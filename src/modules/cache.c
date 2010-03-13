@@ -67,6 +67,7 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
 /* Magic for the cache filename */
 #define CACHENAME_VALUES \
     sizeof(int), sizeof(void *), *(uint8_t *)&(uint16_t){ 0xbe1e }, vlc_CPU()
+#define CACHE_STRING "cache "PACKAGE_NAME" "PACKAGE_VERSION
 
 
 void CacheDelete( vlc_object_t *obj, const char *dir )
@@ -96,7 +97,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
     char *psz_filename;
     FILE *file;
     int j, i_size, i_read;
-    char p_cachestring[sizeof("cache " COPYRIGHT_MESSAGE)];
+    char p_cachestring[sizeof(CACHE_STRING)];
     size_t i_cache;
     module_cache_t **pp_cache = NULL;
     int32_t i_file_size, i_marker;
@@ -143,10 +144,10 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
     fseek( file, sizeof(i_file_size), SEEK_SET );
 
     /* Check the file is a plugins cache */
-    i_size = sizeof("cache " COPYRIGHT_MESSAGE) - 1;
+    i_size = sizeof(CACHE_STRING) - 1;
     i_read = fread( p_cachestring, 1, i_size, file );
     if( i_read != i_size ||
-        memcmp( p_cachestring, "cache " COPYRIGHT_MESSAGE, i_size ) )
+        memcmp( p_cachestring, CACHE_STRING, i_size ) )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
         fclose( file );
@@ -498,7 +499,7 @@ static int CacheSaveBank (FILE *file, module_cache_t *const *pp_cache,
         goto error;
 
     /* Contains version number */
-    if (fputs ("cache "COPYRIGHT_MESSAGE, file) == EOF)
+    if (fputs (CACHE_STRING, file) == EOF)
         goto error;
 #ifdef DISTRO_VERSION
     /* Allow binary maintaner to pass a string to detect new binary version*/

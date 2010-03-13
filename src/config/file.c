@@ -559,8 +559,15 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         goto error;
     }
 
-    fprintf( file, "\xEF\xBB\xBF###\n###  " COPYRIGHT_MESSAGE "\n###\n\n"
-       "###\n### lines beginning with a '#' character are comments\n###\n\n" );
+    fprintf( file,
+        "\xEF\xBB\xBF###\n"
+        "###  "PACKAGE_NAME" "PACKAGE_VERSION"\n"
+        "###\n"
+        "\n"
+        "###\n"
+        "### lines beginning with a '#' character are comments\n"
+        "###\n"
+        "\n" );
 
     /* Ensure consistent number formatting... */
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);

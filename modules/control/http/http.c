@@ -550,7 +550,7 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
     /* Create environment for the CGI */
     TAB_APPEND( i_env, ppsz_env, strdup("GATEWAY_INTERFACE=CGI/1.1") );
     TAB_APPEND( i_env, ppsz_env, strdup("SERVER_PROTOCOL=HTTP/1.1") );
-    TAB_APPEND( i_env, ppsz_env, strdup("SERVER_SOFTWARE=" COPYRIGHT_MESSAGE) );
+    TAB_APPEND( i_env, ppsz_env, strdup("SERVER_SOFTWARE=VLC "VERSION) );
 
     switch( i_type )
     {
