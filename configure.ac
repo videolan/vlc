@@ -4699,7 +4699,7 @@ dnl
 dnl  Stuff used by the program
 dnl
 VERSION_MESSAGE="${VERSION} ${CODENAME}"
-COPYRIGHT_MESSAGE="VLC media player - version ${VERSION_MESSAGE} - (c) ${COPYRIGHT_YEARS} the VideoLAN team"
+COPYRIGHT_MESSAGE="Copyright © ${COPYRIGHT_YEARS} the VideoLAN team"
 AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "${VERSION_MESSAGE}", [Simple version string])
 AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "${COPYRIGHT_MESSAGE}", [Copyright string])
 AC_DEFINE_UNQUOTED(COPYRIGHT_YEARS, "${COPYRIGHT_YEARS}", [The copyright years])

@@ -328,6 +328,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
     /* Announce who we are - Do it only for first instance ? */
+    msg_Dbg( p_libvlc, "VLC media player - %s", VERSION_MESSAGE );
     msg_Dbg( p_libvlc, "%s", COPYRIGHT_MESSAGE );
     msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
     /*xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
