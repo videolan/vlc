@@ -217,6 +217,7 @@ static void PauseConsole  ( void );
 static int  ConsoleWidth  ( void );
 
 static vlc_mutex_t global_lock = VLC_STATIC_MUTEX;
+extern const char psz_vlc_changeset[];
 
 /**
  * Allocate a libvlc instance, initialize global data if needed
@@ -330,7 +331,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Announce who we are - Do it only for first instance ? */
     msg_Dbg( p_libvlc, "VLC media player - %s", VERSION_MESSAGE );
     msg_Dbg( p_libvlc, "%s", COPYRIGHT_MESSAGE );
-    msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
+    msg_Dbg( p_libvlc, "revision %s", psz_vlc_changeset );
+    msg_Dbg( p_libvlc, "configured with %s", CONFIGURE_LINE );
     /*xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
     msg_Dbg( p_libvlc, "translation test: code is \"%s\"", _("C") );
 
@@ -1902,7 +1904,6 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
  *****************************************************************************/
 static void Version( void )
 {
-    extern const char psz_vlc_changeset[];
 #ifdef WIN32
     ShowConsole( true );
 #endif

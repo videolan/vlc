@@ -74,7 +74,8 @@ int main( int i_argc, const char *ppsz_argv[] )
 
 #ifndef __APPLE__
     /* This clutters OSX GUI error logs */
-    fprintf( stderr, "VLC media player %s\n", libvlc_get_version() );
+    fprintf( stderr, "VLC media player %s (revision %s)\n",
+             libvlc_get_version(), libvlc_get_changeset() );
 #endif
 
 #ifdef HAVE_PUTENV
