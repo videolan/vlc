@@ -313,6 +313,19 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 playlist_Play( p_playlist );
             break;
 
+        case ACTIONID_PLAY:
+            if( p_input && var_GetFloat( p_input, "rate" ) != 1. )
+                /* Return to normal speed */
+                var_SetFloat( p_input, "rate", 1. );
+            else
+            {
+                ClearChannels( p_intf, p_vout );
+                vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                              OSD_PLAY_ICON );
+                playlist_Play( p_playlist );
+            }
+            break;
+
         case ACTIONID_AUDIODEVICE_CYCLE:
         {
             if( !p_aout )
@@ -824,19 +837,6 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 vout_OSDMessage( p_intf, DEFAULT_CHAN,
                                 _( "Audio delay %i ms" ),
                                  (int)(i_delay/1000) );
-            }
-            else if( i_action == ACTIONID_PLAY )
-            {
-                if( var_GetFloat( p_input, "rate" ) != 1. )
-                    /* Return to normal speed */
-                    var_SetFloat( p_input, "rate", 1. );
-                else
-                {
-                    ClearChannels( p_intf, p_vout );
-                    vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
-                                  OSD_PLAY_ICON );
-                    playlist_Play( p_playlist );
-                }
             }
             else if( i_action == ACTIONID_MENU_ON )
             {
