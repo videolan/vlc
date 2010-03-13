@@ -1285,6 +1285,7 @@ static int EventMouse( vlc_object_t *p_vout, char const *psz_var,
         ButtonUpdate( p_demux, true );
         dvdnav_mouse_activate( p_sys->dvdnav, pci, x, y );
     }
+    (void)p_vout;
     (void)oldval;
     return VLC_SUCCESS;
 }
