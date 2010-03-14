@@ -52,9 +52,6 @@
 #import "AppleRemote.h"
 #import "eyetv.h"
 #import "simple_prefs.h"
-#ifdef ENABLE_VLM
-#import "vlm.h"
-#endif
 
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
 #import <IOKit/hidsystem/ev_keymap.h>         /* for the media key support */
@@ -353,9 +350,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_prefs = nil;
     o_open = [[VLCOpen alloc] init];
     o_wizard = [[VLCWizard alloc] init];
-#ifdef ENABLE_VLM
-    o_vlm = [[VLCVLMController alloc] init];
-#endif
     o_extended = nil;
     o_bookmarks = [[VLCBookmarks alloc] init];
     o_embedded_list = [[VLCEmbeddedList alloc] init];
@@ -1449,13 +1443,6 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return nil;
 }
 
-#ifdef ENABLE_VLM
-- (id)vlm
-{
-    return o_vlm;
-}
-#endif
-
 - (id)bookmarks
 {
     if( o_bookmarks )
@@ -2186,20 +2173,6 @@ end:
         [o_wizard resetWizard];
         [o_wizard showWizard];
     }
-}
-
-- (IBAction)showVLM:(id)sender
-{
-#ifdef ENABLE_VLM
-    if( !nib_vlm_loaded )
-        nib_vlm_loaded = [NSBundle loadNibNamed:@"VLM" owner: NSApp];
-
-    [o_vlm showVLMWindow];
-#else
-    NSAlert *theAlert;
-    theAlert = [NSAlert alertWithMessageText:_NS("VLM not available") defaultButton:_NS("OK") alternateButton:nil otherButton:nil informativeTextWithFormat:_NS("The VideoLAN Manager was not enabled in this version of VLC.")];
-    [theAlert runModal];
-#endif
 }
 
 - (IBAction)showExtended:(id)sender

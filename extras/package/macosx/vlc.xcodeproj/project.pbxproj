@@ -169,7 +169,6 @@
 		CC62B9600FC600E90077BB8C /* play_big_down.png in Resources */ = {isa = PBXBuildFile; fileRef = CC62B9580FC600E90077BB8C /* play_big_down.png */; };
 		CC62B9610FC600E90077BB8C /* play_big.png in Resources */ = {isa = PBXBuildFile; fileRef = CC62B9590FC600E90077BB8C /* play_big.png */; };
 		CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = CC8062631021F8790021EB9A /* dsa_pub.pem */; };
-		CCB60A420E6E5E3F00407004 /* VLM.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCB60A400E6E5E3F00407004 /* VLM.nib */; };
 		CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBE999E0F922C51000705F8 /* CoreServices.framework */; };
 		CCD90F4E0E87C86D0034564A /* add_schedule.png in Resources */ = {isa = PBXBuildFile; fileRef = CCD90F4B0E87C86D0034564A /* add_schedule.png */; };
 		CCD90F4F0E87C86D0034564A /* add_vod.png in Resources */ = {isa = PBXBuildFile; fileRef = CCD90F4C0E87C86D0034564A /* add_vod.png */; };
@@ -310,8 +309,6 @@
 		CC4ED9B00ABE07C800CA4CC5 /* repeat_single_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = repeat_single_embedded_blue.png; path = Resources/repeat_single_embedded_blue.png; sourceTree = "<group>"; };
 		CC4ED9B10ABE07C800CA4CC5 /* shuffle_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = shuffle_embedded_blue.png; path = Resources/shuffle_embedded_blue.png; sourceTree = "<group>"; };
 		CC4ED9B20ABE07C800CA4CC5 /* shuffle_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = shuffle_embedded.png; path = Resources/shuffle_embedded.png; sourceTree = "<group>"; };
-		CC61608A0FCC2FDF00D71FB1 /* vlm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vlm.h; path = ../../../modules/gui/macosx/vlm.h; sourceTree = SOURCE_ROOT; };
-		CC61608B0FCC2FDF00D71FB1 /* vlm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vlm.m; path = ../../../modules/gui/macosx/vlm.m; sourceTree = SOURCE_ROOT; };
 		CC62B8C50FC5787D0077BB8C /* aiff.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = aiff.icns; path = Resources/aiff.icns; sourceTree = "<group>"; };
 		CC62B8C60FC5787D0077BB8C /* audio.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = audio.icns; path = Resources/audio.icns; sourceTree = "<group>"; };
 		CC62B8C70FC5787D0077BB8C /* flv.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = flv.icns; path = Resources/flv.icns; sourceTree = "<group>"; };
@@ -363,7 +360,6 @@
 		CC6C01B90DDF3EBC00C7D754 /* darwin_specific.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = darwin_specific.c; path = ../../../src/misc/darwin_specific.c; sourceTree = SOURCE_ROOT; };
 		CC6C01BA0DDF3EEC00C7D754 /* auhal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = auhal.c; path = ../../../modules/audio_output/auhal.c; sourceTree = SOURCE_ROOT; };
 		CC6C01BB0DDF3F0700C7D754 /* opengl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = opengl.c; path = ../../../modules/video_output/opengl.c; sourceTree = SOURCE_ROOT; };
-		CC6C01BC0DDF3F0700C7D754 /* opengllayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = opengllayer.m; path = ../../../modules/video_output/opengllayer.m; sourceTree = SOURCE_ROOT; };
 		CC6C01BD0DDF3F2100C7D754 /* quartztext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = quartztext.c; path = ../../../modules/misc/quartztext.c; sourceTree = SOURCE_ROOT; };
 		CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppleRemote.h; path = ../../../modules/gui/macosx/AppleRemote.h; sourceTree = SOURCE_ROOT; };
 		CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppleRemote.m; path = ../../../modules/gui/macosx/AppleRemote.m; sourceTree = SOURCE_ROOT; };
@@ -378,7 +374,6 @@
 		CC965D5F0DA5880F0088F222 /* display_right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = display_right.png; path = Resources/display_right.png; sourceTree = "<group>"; };
 		CCB24D5D0D54BBAE004D780C /* simple_prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = simple_prefs.m; path = ../../../modules/gui/macosx/simple_prefs.m; sourceTree = SOURCE_ROOT; };
 		CCB24D5E0D54BBAE004D780C /* simple_prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = simple_prefs.h; path = ../../../modules/gui/macosx/simple_prefs.h; sourceTree = SOURCE_ROOT; };
-		CCB60A410E6E5E3F00407004 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/VLM.nib; sourceTree = "<group>"; };
 		CCBE999E0F922C51000705F8 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
 		CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = embeddedwindow.h; path = ../../../modules/gui/macosx/embeddedwindow.h; sourceTree = SOURCE_ROOT; };
 		CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = embeddedwindow.m; path = ../../../modules/gui/macosx/embeddedwindow.m; sourceTree = SOURCE_ROOT; };
@@ -544,8 +539,6 @@
 				CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */,
 				2AEF857609A5FEC900130822 /* fspanel.h */,
 				2AEF857709A5FEC900130822 /* fspanel.m */,
-				CC61608A0FCC2FDF00D71FB1 /* vlm.h */,
-				CC61608B0FCC2FDF00D71FB1 /* vlm.m */,
 				CC6EDD4F0B9CA2140096068A /* eyetv.h */,
 				CC6EDD500B9CA2140096068A /* eyetv.m */,
 				CCB24D5E0D54BBAE004D780C /* simple_prefs.h */,
@@ -785,7 +778,6 @@
 			children = (
 				CC6C01BD0DDF3F2100C7D754 /* quartztext.c */,
 				CC6C01BB0DDF3F0700C7D754 /* opengl.c */,
-				CC6C01BC0DDF3F0700C7D754 /* opengllayer.m */,
 				CC6C01B90DDF3EBC00C7D754 /* darwin_specific.c */,
 				CC6C01BA0DDF3EEC00C7D754 /* auhal.c */,
 				CCC895830D9A8A82005AE59C /* eyetv.m */,
@@ -855,7 +847,6 @@
 			children = (
 				CCF11B520F8BFB520088542D /* ErrorPanel.nib */,
 				CC0FB34A0F8BED1100F057F7 /* CoreDialogs.nib */,
-				CCB60A400E6E5E3F00407004 /* VLM.nib */,
 				CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */,
 				DCA00AA7075F948800E6BF46 /* About.nib */,
 				F74F13EA02C2A79C01EE194C /* MainMenu.nib */,
@@ -1067,7 +1058,6 @@
 				CC402F3D0E00ABBB006A4BA4 /* display_middle.png in Resources */,
 				CC402F3E0E00ABBB006A4BA4 /* display_left.png in Resources */,
 				CC402F3F0E00ABBB006A4BA4 /* display_right.png in Resources */,
-				CCB60A420E6E5E3F00407004 /* VLM.nib in Resources */,
 				CCD90F4E0E87C86D0034564A /* add_schedule.png in Resources */,
 				CCD90F4F0E87C86D0034564A /* add_vod.png in Resources */,
 				CCD90F500E87C86D0034564A /* add_broadcast.png in Resources */,
@@ -1095,14 +1085,6 @@
 				CC0FB34B0F8BED1100F057F7 /* English */,
 			);
 			name = CoreDialogs.nib;
-			sourceTree = "<group>";
-		};
-		CCB60A400E6E5E3F00407004 /* VLM.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				CCB60A410E6E5E3F00407004 /* English */,
-			);
-			name = VLM.nib;
 			sourceTree = "<group>";
 		};
 		CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */ = {
