@@ -12,9 +12,9 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="21"/>
-			<integer value="81"/>
 			<integer value="4376"/>
+			<integer value="235"/>
+			<integer value="21"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -751,6 +751,14 @@
 									<reference key="NSOnImage" ref="447396056"/>
 									<reference key="NSMixedImage" ref="100133332"/>
 								</object>
+								<object class="NSMenuItem" id="351113197">
+									<reference key="NSMenu" ref="1017583928"/>
+									<string key="NSTitle">Normal rate</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="447396056"/>
+									<reference key="NSMixedImage" ref="100133332"/>
+								</object>
 								<object class="NSMenuItem" id="677263432">
 									<reference key="NSMenu" ref="1017583928"/>
 									<string key="NSTitle">Slower</string>
@@ -850,6 +858,24 @@
 									<string key="NSTitle">Repeat Playlist</string>
 									<string key="NSKeyEquiv">l</string>
 									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="447396056"/>
+									<reference key="NSMixedImage" ref="100133332"/>
+								</object>
+								<object class="NSMenuItem" id="780676656">
+									<reference key="NSMenu" ref="1017583928"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="447396056"/>
+									<reference key="NSMixedImage" ref="100133332"/>
+								</object>
+								<object class="NSMenuItem" id="938524312">
+									<reference key="NSMenu" ref="1017583928"/>
+									<string key="NSTitle">Quit after Playback</string>
+									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="447396056"/>
 									<reference key="NSMixedImage" ref="100133332"/>
@@ -2975,7 +3001,7 @@
 											</object>
 											<object class="NSTableColumn" id="965199398">
 												<string key="NSIdentifier">name</string>
-												<double key="NSWidth">309</double>
+												<double key="NSWidth">316</double>
 												<double key="NSMinWidth">16</double>
 												<double key="NSMaxWidth">1000</double>
 												<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -7825,6 +7851,38 @@ LCAuLi4</string>
 					</object>
 					<int key="connectionID">4388</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">o_mi_normalSpeed</string>
+						<reference key="source" ref="199714555"/>
+						<reference key="destination" ref="351113197"/>
+					</object>
+					<int key="connectionID">4390</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">normalSpeed:</string>
+						<reference key="source" ref="113811151"/>
+						<reference key="destination" ref="351113197"/>
+					</object>
+					<int key="connectionID">4391</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">quitAfterPlayback:</string>
+						<reference key="source" ref="113811151"/>
+						<reference key="destination" ref="938524312"/>
+					</object>
+					<int key="connectionID">4394</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">o_mi_quitAfterPB</string>
+						<reference key="source" ref="199714555"/>
+						<reference key="destination" ref="938524312"/>
+					</object>
+					<int key="connectionID">4395</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -8396,6 +8454,9 @@ LCAuLi4</string>
 							<reference ref="252261385"/>
 							<reference ref="348457049"/>
 							<reference ref="375871953"/>
+							<reference ref="351113197"/>
+							<reference ref="780676656"/>
+							<reference ref="938524312"/>
 						</object>
 						<reference key="parent" ref="565445175"/>
 					</object>
@@ -10945,6 +11006,21 @@ LCAuLi4</string>
 						<reference key="object" ref="80936197"/>
 						<reference key="parent" ref="965199398"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4389</int>
+						<reference key="object" ref="351113197"/>
+						<reference key="parent" ref="1017583928"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4392</int>
+						<reference key="object" ref="780676656"/>
+						<reference key="parent" ref="1017583928"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4393</int>
+						<reference key="object" ref="938524312"/>
+						<reference key="parent" ref="1017583928"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -10968,6 +11044,7 @@ LCAuLi4</string>
 					<string>1029.ImportedFromIB2</string>
 					<string>1050.IBPluginDependency</string>
 					<string>1050.ImportedFromIB2</string>
+					<string>1051.IBEditorWindowLastContentRect</string>
 					<string>1051.IBPluginDependency</string>
 					<string>1051.ImportedFromIB2</string>
 					<string>1053.IBPluginDependency</string>
@@ -11002,6 +11079,7 @@ LCAuLi4</string>
 					<string>1084.ImportedFromIB2</string>
 					<string>1134.IBPluginDependency</string>
 					<string>1134.ImportedFromIB2</string>
+					<string>1135.IBEditorWindowLastContentRect</string>
 					<string>1135.IBPluginDependency</string>
 					<string>1135.ImportedFromIB2</string>
 					<string>1136.IBPluginDependency</string>
@@ -11154,6 +11232,7 @@ LCAuLi4</string>
 					<string>2048.ImportedFromIB2</string>
 					<string>2049.IBPluginDependency</string>
 					<string>2049.ImportedFromIB2</string>
+					<string>205.IBEditorWindowLastContentRect</string>
 					<string>205.IBPluginDependency</string>
 					<string>205.ImportedFromIB2</string>
 					<string>2050.IBPluginDependency</string>
@@ -11272,6 +11351,7 @@ LCAuLi4</string>
 					<string>2312.ImportedFromIB2</string>
 					<string>234.IBPluginDependency</string>
 					<string>234.ImportedFromIB2</string>
+					<string>235.IBEditorWindowLastContentRect</string>
 					<string>235.IBPluginDependency</string>
 					<string>235.ImportedFromIB2</string>
 					<string>238.IBPluginDependency</string>
@@ -11288,6 +11368,7 @@ LCAuLi4</string>
 					<string>2395.ImportedFromIB2</string>
 					<string>2398.IBPluginDependency</string>
 					<string>2398.ImportedFromIB2</string>
+					<string>24.IBEditorWindowLastContentRect</string>
 					<string>24.IBPluginDependency</string>
 					<string>24.ImportedFromIB2</string>
 					<string>240.IBPluginDependency</string>
@@ -11466,6 +11547,7 @@ LCAuLi4</string>
 					<string>3292.ImportedFromIB2</string>
 					<string>333.IBPluginDependency</string>
 					<string>333.ImportedFromIB2</string>
+					<string>334.IBEditorWindowLastContentRect</string>
 					<string>334.IBPluginDependency</string>
 					<string>334.ImportedFromIB2</string>
 					<string>3568.IBEditorWindowLastContentRect</string>
@@ -11680,8 +11762,11 @@ LCAuLi4</string>
 					<string>4369.IBShouldRemoveOnLegacySave</string>
 					<string>4372.IBPluginDependency</string>
 					<string>4372.ImportedFromIB2</string>
+					<string>4373.IBPluginDependency</string>
 					<string>4373.IBShouldRemoveOnLegacySave</string>
+					<string>4374.IBPluginDependency</string>
 					<string>4374.IBShouldRemoveOnLegacySave</string>
+					<string>4375.IBPluginDependency</string>
 					<string>4375.IBShouldRemoveOnLegacySave</string>
 					<string>4376.CustomClassName</string>
 					<string>4376.IBPluginDependency</string>
@@ -11702,6 +11787,9 @@ LCAuLi4</string>
 					<string>4383.ImportedFromIB2</string>
 					<string>4384.IBPluginDependency</string>
 					<string>4384.ImportedFromIB2</string>
+					<string>4389.IBPluginDependency</string>
+					<string>4392.IBPluginDependency</string>
+					<string>4393.IBPluginDependency</string>
 					<string>446.IBPluginDependency</string>
 					<string>446.ImportedFromIB2</string>
 					<string>5.IBPluginDependency</string>
@@ -11770,6 +11858,7 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>{{571, 541}, {197, 173}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -11804,6 +11893,7 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>{{757, 551}, {251, 163}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -11956,6 +12046,7 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>{{450, 611}, {137, 103}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12074,6 +12165,7 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>{{494, 311}, {252, 403}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12090,6 +12182,7 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>{{686, 451}, {243, 263}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12268,6 +12361,7 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>{{629, 371}, {195, 343}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>{{0, 702}, {308, 43}}</string>
@@ -12482,8 +12576,11 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>VLCPlaylistView</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12504,6 +12601,9 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12570,7 +12670,7 @@ LCAuLi4</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">4388</int>
+			<int key="maxID">4395</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
