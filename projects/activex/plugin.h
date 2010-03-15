@@ -301,15 +301,11 @@ public:
     }
     void playlist_play()
     {
-        if( !_p_libvlc )
-            initVLC();
         if( _p_mplayer || playlist_select(0) )
             libvlc_media_player_play(_p_mplayer);
     }
     void playlist_play_item(int idx)
     {
-        if( !_p_libvlc )
-            initVLC();
         if( playlist_select(idx) )
             libvlc_media_player_play(_p_mplayer);
     }
