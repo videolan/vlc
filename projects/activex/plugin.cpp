@@ -214,6 +214,11 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class, LPUNKNOWN pUnkOuter) :
     _i_codepage(CP_ACP),
     _b_usermode(TRUE)
 {
+    /*
+    ** bump refcount to avoid recursive release from
+    ** following interfaces when releasing this interface
+    */
+    AddRef();
     p_class->AddRef();
 
     vlcOleControl = new VLCOleControl(this);
@@ -244,12 +249,6 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class, LPUNKNOWN pUnkOuter) :
 
 VLCPlugin::~VLCPlugin()
 {
-    /*
-    ** bump refcount to avoid recursive release from
-    ** following interfaces when releasing this interface
-    */
-    AddRef();
-
     delete vlcSupportErrorInfo;
     delete vlcOleObject;
     delete vlcDataObject;
@@ -285,6 +284,7 @@ VLCPlugin::~VLCPlugin()
     if( _p_libvlc )  { libvlc_release(_p_libvlc); _p_libvlc=NULL; }
 
     _p_class->Release();
+    Release();
 };
 
 STDMETHODIMP VLCPlugin::QueryInterface(REFIID riid, void **ppv)
@@ -442,6 +442,7 @@ void VLCPlugin::initVLC()
     {
         TCHAR w_progpath[MAX_PATH];
         DWORD len = GetModuleFileName(DllGetModule(), w_progpath, MAX_PATH);
+        w_progpath[MAX_PATH-1] = '\0';
         if( len > 0 )
         {
             len = WideCharToMultiByte(CP_UTF8, 0, w_progpath, len, p_progpath,
@@ -466,6 +467,7 @@ void VLCPlugin::initVLC()
         if( RegQueryValueEx( h_key, TEXT("InstallDir"), 0, &i_type,
                              (LPBYTE)w_pluginpath, &i_data ) == ERROR_SUCCESS )
         {
+            w_pluginpath[MAX_PATH-1] = '\0';
             if( i_type == REG_SZ )
             {
                 if( WideCharToMultiByte(CP_UTF8, 0, w_pluginpath, -1, p_pluginpath,
@@ -1107,10 +1109,14 @@ static void handle_input_state_event(const libvlc_event_t* event, void *param)
 
 void VLCPlugin::fireOnMediaPlayerTimeChangedEvent(long time)
 {
-    VARIANT varPos;
-    DISPPARAMS params = { &varPos, NULL, 1, 0 };
-    varPos.vt = VT_I4;
-    varPos.lVal = time;
+    DISPPARAMS params;
+    params.cArgs = 1;
+    params.rgvarg = (VARIANTARG *) CoTaskMemAlloc(sizeof(VARIANTARG) * params.cArgs) ;
+    memset(params.rgvarg, 0, sizeof(VARIANTARG) * params.cArgs);
+    params.rgvarg[0].vt = VT_I4;
+    params.rgvarg[0].lVal = time;
+    params.rgdispidNamedArgs = NULL;
+    params.cNamedArgs = 0;
     vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerTimeChangedEvent, &params);
 };
 
@@ -1122,10 +1128,14 @@ static void handle_time_changed_event(const libvlc_event_t* event, void *param)
 
 void VLCPlugin::fireOnMediaPlayerPositionChangedEvent(long position)
 {
-    VARIANT varPos;
-    DISPPARAMS params = { &varPos, NULL, 1, 0 };
-    varPos.vt = VT_I4;
-    varPos.lVal = position;
+    DISPPARAMS params;
+    params.cArgs = 1;
+    params.rgvarg = (VARIANTARG *) CoTaskMemAlloc(sizeof(VARIANTARG) * params.cArgs) ;
+    memset(params.rgvarg, 0, sizeof(VARIANTARG) * params.cArgs);
+    params.rgvarg[0].vt = VT_I4;
+    params.rgvarg[0].lVal = position;
+    params.rgdispidNamedArgs = NULL;
+    params.cNamedArgs = 0;
     vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerPositionChangedEvent, &params);
 };
 
@@ -1138,10 +1148,14 @@ static void handle_position_changed_event(const libvlc_event_t* event, void *par
 #define B(val) ((val) ? 0xFFFF : 0x0000)
 void VLCPlugin::fireOnMediaPlayerSeekableChangedEvent(VARIANT_BOOL seekable)
 {
-    VARIANT varSeek;
-    DISPPARAMS params = { &varSeek, NULL, 1, 0 };
-    varSeek.vt = VT_BOOL;
-    varSeek.boolVal = seekable;
+    DISPPARAMS params;
+    params.cArgs = 1;
+    params.rgvarg = (VARIANTARG *) CoTaskMemAlloc(sizeof(VARIANTARG) * params.cArgs) ;
+    memset(params.rgvarg, 0, sizeof(VARIANTARG) * params.cArgs);
+    params.rgvarg[0].vt = VT_BOOL;
+    params.rgvarg[0].boolVal = seekable;
+    params.rgdispidNamedArgs = NULL;
+    params.cNamedArgs = 0;
     vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerSeekableChangedEvent, &params);
 };
 
@@ -1153,10 +1167,14 @@ static void handle_seekable_changed_event(const libvlc_event_t* event, void *par
 
 void VLCPlugin::fireOnMediaPlayerPausableChangedEvent(VARIANT_BOOL pausable)
 {
-    VARIANT varPause;
-    DISPPARAMS params = { &varPause, NULL, 1, 0 };
-    varPause.vt = VT_BOOL;
-    varPause.boolVal = pausable;
+    DISPPARAMS params;
+    params.cArgs = 1;
+    params.rgvarg = (VARIANTARG *) CoTaskMemAlloc(sizeof(VARIANTARG) * params.cArgs) ;
+    memset(params.rgvarg, 0, sizeof(VARIANTARG) * params.cArgs);
+    params.rgvarg[0].vt = VT_BOOL;
+    params.rgvarg[0].boolVal = pausable;
+    params.rgdispidNamedArgs = NULL;
+    params.cNamedArgs = 0;
     vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerPausableChangedEvent, &params);
 };
 

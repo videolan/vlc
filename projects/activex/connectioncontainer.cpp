@@ -365,6 +365,7 @@ VLCConnectionPointContainer::~VLCConnectionPointContainer()
 {
     EnterCriticalSection(&csEvents);
     isRunning = FALSE;
+    freeze = TRUE;
     ConditionSignal(&sEvents);
     LeaveCriticalSection(&csEvents);
 
@@ -375,6 +376,11 @@ VLCConnectionPointContainer::~VLCConnectionPointContainer()
 
     ConditionDestroy(&sEvents);
     DeleteCriticalSection(&csEvents);
+
+    _v_cps.clear();
+    while(!_q_events.empty()) {
+        _q_events.pop();
+    };
 
     delete _p_props;
     delete _p_events;

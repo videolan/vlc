@@ -297,6 +297,7 @@ STDAPI DllRegisterServer(VOID)
     DWORD DllPathLen=GetModuleFileName(h_instance, DllPath, MAX_PATH) ;
     if( 0 == DllPathLen )
         return E_UNEXPECTED;
+    DllPath[MAX_PATH-1] = '\0';
 
     HKEY hBaseKey;
 
