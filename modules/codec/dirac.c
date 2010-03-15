@@ -249,12 +249,10 @@ vlc_module_begin()
 
     add_integer( ENC_CFG_PREFIX ENC_MCBLK_WIDTH, -1, NULL,
                  ENC_MCBLK_WIDTH_TEXT, ENC_MCBLK_WIDTH_LONGTEXT, false )
-    add_deprecated_alias( ENC_CFG_PREFIX ENC_MCBLK_XBLEN );
     change_integer_range(-1, INT_MAX);
 
     add_integer( ENC_CFG_PREFIX ENC_MCBLK_HEIGHT, -1, NULL,
                  ENC_MCBLK_HEIGHT, ENC_MCBLK_HEIGHT_LONGTEXT, false )
-    add_deprecated_alias( ENC_CFG_PREFIX ENC_MCBLK_YBLEN );
     change_integer_range(-1, INT_MAX);
 
     add_integer( ENC_CFG_PREFIX ENC_MCBLK_OVERLAP, -1, NULL,
