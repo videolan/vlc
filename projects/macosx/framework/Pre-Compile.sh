@@ -72,7 +72,7 @@ vlc_install_object() {
     local destination_name=${5}
     local suffix=${6}
 
-    if [ $type = "lib" ]; then
+    if [ $type = "library" ]; then
         local install_name="@loader_path/lib"
     elif [ $type = "module" ]; then
         local install_name="@loader_path/plugins"
@@ -109,7 +109,7 @@ vlc_install_object() {
         # Update the dynamic library so it will know where to look for the other libraries
         echo "Installing ${type} `basename ${lib_dest}`"
 
-        if [ "${type}" = "lib" ]; then
+        if [ "${type}" = "library" ]; then
             # Change the reference of libvlc.1 stored in the usr directory to libvlc.dylib in the framework's library directory
             install_name_tool -id "${install_name}/${lib_name}" ${lib_dest} > /dev/null
         fi
