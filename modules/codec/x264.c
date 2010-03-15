@@ -420,7 +420,6 @@ vlc_module_begin ()
 
     add_integer( SOUT_CFG_PREFIX "min-keyint", 25, NULL, MIN_KEYINT_TEXT,
                  MIN_KEYINT_LONGTEXT, false )
-        add_deprecated_alias( SOUT_CFG_PREFIX "keyint-min" ) /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "scenecut", 40, NULL, SCENE_TEXT,
                  SCENE_LONGTEXT, false )
@@ -455,15 +454,12 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "ref", 3, NULL, REF_TEXT,
                  REF_LONGTEXT, false )
         change_integer_range( 1, 16 )
-        add_deprecated_alias( SOUT_CFG_PREFIX "frameref" ) /* Deprecated since 0.8.5 */
 
     add_bool( SOUT_CFG_PREFIX "nf", false, NULL, NF_TEXT,
               NF_LONGTEXT, false )
-        add_deprecated_alias( SOUT_CFG_PREFIX "loopfilter" ) /* Deprecated since 0.8.5 */
 
     add_string( SOUT_CFG_PREFIX "deblock", "0:0", NULL, FILTER_TEXT,
                  FILTER_LONGTEXT, false )
-        add_deprecated_alias( SOUT_CFG_PREFIX "filter" ) /* Deprecated since 0.8.6 */
 
     add_string( SOUT_CFG_PREFIX "psy-rd", "1.0:0.0", NULL, PSY_RD_TEXT,
                 PSY_RD_LONGTEXT, false )
@@ -498,12 +494,10 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "qpmin", 10, NULL, QPMIN_TEXT,
                  QPMIN_LONGTEXT, false )
         change_integer_range( 0, 51 )
-        add_deprecated_alias( SOUT_CFG_PREFIX "qp-min" ) /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "qpmax", 51, NULL, QPMAX_TEXT,
                  QPMAX_LONGTEXT, false )
         change_integer_range( 0, 51 )
-        add_deprecated_alias( SOUT_CFG_PREFIX "qp-max" ) /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "qpstep", 4, NULL, QPSTEP_TEXT,
                  QPSTEP_LONGTEXT, false )
@@ -512,7 +506,6 @@ vlc_module_begin ()
     add_float( SOUT_CFG_PREFIX "ratetol", 1.0, NULL, RATETOL_TEXT,
                RATETOL_LONGTEXT, false )
         change_float_range( 0, 100 )
-        add_deprecated_alias( SOUT_CFG_PREFIX "tolerance" ) /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "vbv-maxrate", 0, NULL, VBV_MAXRATE_TEXT,
                  VBV_MAXRATE_LONGTEXT, false )
@@ -561,7 +554,6 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "partitions", "normal", NULL, ANALYSE_TEXT,
                 ANALYSE_LONGTEXT, false )
         change_string_list( enc_analyse_list, enc_analyse_list_text, 0 );
-        add_deprecated_alias( SOUT_CFG_PREFIX "analyse" ) /* Deprecated since 0.8.6 */
 
     add_string( SOUT_CFG_PREFIX "direct", "spatial", NULL, DIRECT_PRED_TEXT,
                 DIRECT_PRED_LONGTEXT, false )
@@ -595,7 +587,6 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "subme", 5, NULL, SUBME_TEXT,
                  SUBME_LONGTEXT, false )
         change_integer_range( 1, SUBME_MAX )
-        add_deprecated_alias( SOUT_CFG_PREFIX "subpel" ) /* Deprecated since 0.8.5 */
 
     add_obsolete_bool( SOUT_CFG_PREFIX "b-rdo" )
 
