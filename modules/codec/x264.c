@@ -678,16 +678,16 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static const char *const ppsz_sout_options[] = {
-    "8x8dct", "analyse", "asm", "aud", "bframes", "bime", "bpyramid",
+    "8x8dct", "asm", "aud", "bframes", "bime", "bpyramid",
     "b-adapt", "b-bias", "b-rdo", "cabac", "chroma-me", "chroma-qp-offset",
     "cplxblur", "crf", "dct-decimate", "deadzone-inter", "deadzone-intra",
-    "deblock", "direct", "direct-8x8", "filter", "fast-pskip", "frameref",
-    "interlaced", "ipratio", "keyint", "keyint-min", "level", "loopfilter",
+    "deblock", "direct", "direct-8x8", "fast-pskip",
+    "interlaced", "ipratio", "keyint", "level",
     "me", "merange", "min-keyint", "mixed-refs", "mvrange", "mvrange-thread",
     "nf", "non-deterministic", "nr", "partitions", "pass", "pbratio",
     "pre-scenecut", "psnr", "qblur", "qp", "qcomp", "qpstep", "qpmax",
-    "qpmin", "qp-max", "qp-min", "quiet", "ratetol", "ref", "scenecut",
-    "sps-id", "ssim", "stats", "subme", "subpel", "tolerance", "trellis",
+    "qpmin", "quiet", "ratetol", "ref", "scenecut",
+    "sps-id", "ssim", "stats", "subme", "trellis",
     "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "weightp",
     "aq-mode", "aq-strength", "psy-rd", "psy", "profile", "lookahead", "slices",
     "slice-max-size", "slice-max-mbs", "intra-refresh", "mbtree", NULL
