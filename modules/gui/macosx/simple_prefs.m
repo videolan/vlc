@@ -100,7 +100,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 - (void)awakeFromNib
 {
     [self initStrings];
-    
+
     /* setup the toolbar */
     NSToolbar * o_sprefs_toolbar = [[[NSToolbar alloc] initWithIdentifier: VLCSPrefsToolbarIdentifier] autorelease];
     [o_sprefs_toolbar setAllowsUserCustomization: NO];
@@ -109,7 +109,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_sprefs_toolbar setSizeMode: NSToolbarSizeModeRegular];
     [o_sprefs_toolbar setDelegate: self];
     [o_sprefs_win setToolbar: o_sprefs_toolbar];
-    
+
     /* setup useful stuff */
     o_hotkeysNonUseableKeys = [[NSArray arrayWithObjects:
                                 [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'c'],
@@ -169,8 +169,8 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     return o_toolbarItem;
 }
 
-- (NSToolbarItem *) toolbar: (NSToolbar *)o_sprefs_toolbar 
-      itemForItemIdentifier: (NSString *)o_itemIdent 
+- (NSToolbarItem *) toolbar: (NSToolbar *)o_sprefs_toolbar
+      itemForItemIdentifier: (NSString *)o_itemIdent
   willBeInsertedIntoToolbar: (BOOL)b_willBeInserted
 {
     NSToolbarItem *o_toolbarItem = nil;
@@ -205,19 +205,19 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
 
 - (NSArray *)toolbarDefaultItemIdentifiers: (NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, 
+    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier,
         VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
 }
 
 - (NSArray *)toolbarAllowedItemIdentifiers: (NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, 
+    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier,
         VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
 }
 
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier, 
+    return [NSArray arrayWithObjects: VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier,
         VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier, nil];
 }
 
@@ -301,7 +301,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_video_snap_format_txt setStringValue: _NS("Format")];
     [o_video_snap_prefix_txt setStringValue: _NS("Prefix")];
     [o_video_snap_seqnum_ckb setTitle: _NS("Sequential numbering")];
-    
+
     /* generic stuff */
     [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 0] setStringValue: _NS("Basic")];
     [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 1] setStringValue: _NS("All")];
@@ -358,7 +358,8 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
         }
         else if( p_item->ppsz_list[i] )
             mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithUTF8String: p_item->ppsz_list[i]] action:NULL keyEquivalent: @""];
-        else NSLog( @"item %d of pref %s failed to be created", i, name);
+        else
+            msg_Err( p_intf, "item %d of pref %s failed to be created", i, name );
         [mi setRepresentedObject:[NSString stringWithUTF8String: p_item->ppsz_list[i]]];
         [[object menu] addItem: [mi autorelease]];
         if( p_item->value.psz && !strcmp( p_item->value.psz, p_item->ppsz_list[i] ) )
@@ -384,7 +385,8 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
             mi = [[NSMenuItem alloc] initWithTitle: _NS( p_item->ppsz_list_text[i] ) action:NULL keyEquivalent: @""];
         else if( p_item->pi_list[i] )
             mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d", p_item->pi_list[i]] action:NULL keyEquivalent: @""];
-        else NSLog( @"item %d of pref %s failed to be created", i, name);
+        else
+            msg_Err( p_intf, "item %d of pref %s failed to be created", i, name);
         [mi setRepresentedObject:[NSNumber numberWithInt: p_item->pi_list[i]]];
         [[object menu] addItem: [mi autorelease]];
         if( p_item->value.i == p_item->pi_list[i] )
@@ -398,15 +400,15 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     module_config_t *p_item;
     module_t *p_parser, **p_list;
     int y = 0;
-    
+
     [object removeAllItems];
-    
+
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
     p_list = module_list_get( NULL );
     if( !p_item ||!p_list )
     {
         if( p_list ) module_list_free(p_list);
-        NSLog( @"serious problem, item or list not found" );
+        msg_Err( p_intf, "serious problem, item or list not found" );
         return;
     }
 
@@ -447,7 +449,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
 
     [[o_sprefs_basicFull_matrix cellAtRow:0 column:0] setState: NSOnState];
     [[o_sprefs_basicFull_matrix cellAtRow:0 column:1] setState: NSOffState];
-    
+
     /**********************
      * interface settings *
      **********************/
@@ -536,7 +538,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     while( i < y )
     {
         NSRect s_rect = [[[NSScreen screens] objectAtIndex: i] frame];
-        [o_video_device_pop addItemWithTitle: 
+        [o_video_device_pop addItemWithTitle:
          [NSString stringWithFormat: @"%@ %i (%ix%i)", _NS("Screen"), i+1,
                    (int)s_rect.size.width, (int)s_rect.size.height]];
         [[o_video_device_pop lastItem] setTag: (int)[[[NSScreen screens] objectAtIndex: i] displayID]];
@@ -566,7 +568,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [self setupButton: o_input_skipLoop_pop forIntList: "ffmpeg-skiploopfilter"];
 
     [o_input_cachelevel_pop removeAllItems];
-    [o_input_cachelevel_pop addItemsWithTitles: 
+    [o_input_cachelevel_pop addItemsWithTitles:
         [NSArray arrayWithObjects: _NS("Custom"), _NS("Lowest latency"), _NS("Low latency"), _NS("Normal"),
             _NS("High latency"), _NS("Higher latency"), nil]];
     [[o_input_cachelevel_pop itemAtIndex: 0] setTag: 0];
@@ -575,7 +577,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [[o_input_cachelevel_pop itemAtIndex: 3] setTag: 300];
     [[o_input_cachelevel_pop itemAtIndex: 4] setTag: 400];
     [[o_input_cachelevel_pop itemAtIndex: 5] setTag: 500];
-    
+
 #define TestCaC( name ) \
     b_cache_equal =  b_cache_equal && \
         ( i_cache == config_GetInt( p_intf, name ) )
@@ -587,7 +589,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     /* Select the accurate value of the PopupButton */
     bool b_cache_equal = true;
     int i_cache = config_GetInt( p_intf, "file-caching");
-    
+
     TestCaC( "udp-caching" );
     if( module_exists ("dvdread") )
         TestCaC( "dvdread-caching" );
@@ -619,17 +621,17 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
      * subtitle settings *
      *********************/
     [self setupButton: o_osd_osd_ckb forBoolValue: "osd"];
-    
+
     [self setupButton: o_osd_encoding_pop forStringList: "subsdec-encoding"];
     [self setupField: o_osd_lang_fld forOption: "sub-language" ];
-	
+
 	if( module_exists( "quartztext" ) )
 	{
 		[self setupField: o_osd_font_fld forOption: "quartztext-font"];
 		[self setupButton: o_osd_font_color_pop forIntList: "quartztext-color"];
 		[self setupButton: o_osd_font_size_pop forIntList: "quartztext-rel-fontsize"];
 	}
-	else 
+	else
 	{
         /* fallback on freetype */
 		[self setupField: o_osd_font_fld forOption: "freetype-font"];
@@ -674,7 +676,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
         [[o_sprefs_win toolbar] setSelectedItemIdentifier: VLCIntfSettingToolbarIdentifier];
         [self showInterfaceSettings];
     }
-    
+
     [self resetControls];
 
     [o_sprefs_win center];
@@ -707,7 +709,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
         msg_Warn( p_intf, "unknown buttonAction sender" );
 }
 
-- (void)sheetDidEnd:(NSWindow *)o_sheet 
+- (void)sheetDidEnd:(NSWindow *)o_sheet
          returnCode:(int)i_return
         contextInfo:(void *)o_context
 {
@@ -736,7 +738,7 @@ static inline void save_string_list( intf_thread_t * p_intf, id object, const ch
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
     p_stringobject = (NSString *)[[object selectedItem] representedObject];
     assert([p_stringobject isKindOfClass:[NSString class]]);
-    if( p_stringobject ) 
+    if( p_stringobject )
     {
         config_PutPsz( p_intf, name, [p_stringobject UTF8String] );
         [p_stringobject release];
@@ -773,9 +775,9 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 {
     char *psz_tmp;
     int i;
-    
+
 #define SaveIntList( object, name ) save_int_list( p_intf, object, name )
-                    
+
 #define SaveStringList( object, name ) save_string_list( p_intf, object, name )
 
 #define SaveModuleList( object, name ) save_module_list( p_intf, object, name )
@@ -799,8 +801,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 			[[[VLCMain sharedInstance] appleRemoteController] startListening: [VLCMain sharedInstance]];
 		else
 			[[[VLCMain sharedInstance] appleRemoteController] stopListening: [VLCMain sharedInstance]];
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged" 
-                                                            object: nil 
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
+                                                            object: nil
                                                           userInfo: nil];
 
         /* okay, let's save our changes to vlcrc */
@@ -817,7 +819,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
         b_intfSettingChanged = NO;
     }
-    
+
     /******************
      * audio settings *
      ******************/
@@ -825,7 +827,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     {
         config_PutInt( p_intf, "audio", [o_audio_enable_ckb state] );
         config_PutInt( p_intf, "volume", ([o_audio_vol_sld intValue] * 2.56));
-        NSLog( @"slider=%i, pref=%i", [o_audio_vol_sld intValue], config_GetInt( p_intf, "volume" ));
         config_PutInt( p_intf, "spdif", [o_audio_spdif_ckb state] );
 
         SaveIntList( o_audio_dolby_pop, "force-dolby-surround" );
@@ -864,7 +865,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
         /* Last.FM is optional */
         if( module_exists( "audioscrobbler" ) )
-        {   
+        {
             [o_audio_last_ckb setEnabled: YES];
             if( [o_audio_last_ckb state] == NSOnState )
                 config_AddIntf( p_intf, "audioscrobbler" );
@@ -887,12 +888,12 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             msg_Err( p_intf, "An error occurred while saving the Audio settings using SimplePrefs (%i)", i );
             dialog_Fatal( p_intf, _("Audio Settings not saved"),
                         _("An error occured while saving your settings via SimplePrefs (%i)."), i );
-            
+
             i = 0;
         }
         b_audioSettingChanged = NO;
     }
-    
+
     /******************
      * video settings *
      ******************/
@@ -924,7 +925,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         }
         b_videoSettingChanged = NO;
     }
-    
+
     /***************************
      * input & codecs settings *
      ***************************/
@@ -990,7 +991,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         }
         b_inputSettingChanged = NO;
     }
-    
+
     /**********************
      * subtitles settings *
      **********************/
@@ -1004,7 +1005,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             config_PutPsz( p_intf, "subsdec-encoding", "" );
 
         config_PutPsz( p_intf, "sub-language", [[o_osd_lang_fld stringValue] UTF8String] );
-        
+
 		if( module_exists( "quartztext" ) )
 		{
 			config_PutPsz( p_intf, "quartztext-font", [[o_osd_font_fld stringValue] UTF8String] );
@@ -1016,7 +1017,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             /* fallback on freetype */
 			config_PutPsz( p_intf, "freetype-font", [[o_osd_font_fld stringValue] UTF8String] );
 			SaveIntList( o_osd_font_color_pop, "freetype-color" );
-			SaveIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );                
+			SaveIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );
 		}
 
         i = config_SaveConfigFile( p_intf, NULL );
@@ -1030,7 +1031,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         }
         b_osdSettingChanged = NO;
     }
-    
+
     /********************
      * hotkeys settings *
      ********************/
@@ -1042,7 +1043,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         {
             config_PutInt( p_intf, p_hotkeys[i].psz_action, [[o_hotkeySettings objectAtIndex: i-1] intValue] );
             i++;
-        }        
+        }
 
         i = config_SaveConfigFile( p_intf, "main" );
 
@@ -1062,7 +1063,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     NSRect o_win_rect, o_view_rect, o_old_view_rect;
     o_win_rect = [o_sprefs_win frame];
     o_view_rect = [o_new_category_view frame];
-    
+
     if( o_currentlyShownCategoryView != nil )
     {
         /* restore our window's height, if we've shown another category previously */
@@ -1073,20 +1074,20 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         /* remove our previous category view */
         [o_currentlyShownCategoryView removeFromSuperviewWithoutNeedingDisplay];
     }
-    
+
     o_win_rect.size.height = o_win_rect.size.height + o_view_rect.size.height;
-    
+
     [o_sprefs_win displayIfNeeded];
     [o_sprefs_win setFrame: o_win_rect display:YES animate: YES];
-    
-    [o_new_category_view setFrame: NSMakeRect( 0, 
-                                               [o_sprefs_controls_box frame].size.height, 
-                                               o_view_rect.size.width, 
+
+    [o_new_category_view setFrame: NSMakeRect( 0,
+                                               [o_sprefs_controls_box frame].size.height,
+                                               o_view_rect.size.width,
                                                o_view_rect.size.height )];
     [o_new_category_view setNeedsDisplay: YES];
     [o_new_category_view setAutoresizesSubviews: YES];
     [[o_sprefs_win contentView] addSubview: o_new_category_view];
-    
+
     /* keep our current category for further reference */
     [o_currentlyShownCategoryView release];
     o_currentlyShownCategoryView = o_new_category_view;
@@ -1117,8 +1118,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     {
         [o_audio_norm_stepper setEnabled: [o_audio_norm_ckb state]];
         [o_audio_norm_fld setEnabled: [o_audio_norm_ckb state]];
-    }    
-    
+    }
+
     if( sender == o_audio_last_ckb )
     {
         if( [o_audio_last_ckb state] == NSOnState )
@@ -1153,8 +1154,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         [o_selectFolderPanel setMessage: _NS("Choose the folder to save your video snapshots to.")];
         [o_selectFolderPanel setCanCreateDirectories: YES];
         [o_selectFolderPanel setPrompt: _NS("Choose")];
-        [o_selectFolderPanel beginSheetForDirectory: nil file: nil modalForWindow: o_sprefs_win 
-                                      modalDelegate: self 
+        [o_selectFolderPanel beginSheetForDirectory: nil file: nil modalForWindow: o_sprefs_win
+                                      modalDelegate: self
                                      didEndSelector: @selector(savePanelDidEnd:returnCode:contextInfo:)
                                         contextInfo: o_video_snap_folder_btn];
     }
@@ -1238,7 +1239,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 {
     if( sender == o_hotkeys_change_btn || sender == o_hotkeys_listbox )
     {
-        [o_hotkeys_change_lbl setStringValue: [NSString stringWithFormat: _NS("Press new keys for\n\"%@\""), 
+        [o_hotkeys_change_lbl setStringValue: [NSString stringWithFormat: _NS("Press new keys for\n\"%@\""),
                                                [o_hotkeyDescriptions objectAtIndex: [o_hotkeys_listbox selectedRow]]]];
         [o_hotkeys_change_keys_lbl setStringValue: [self OSXKeyToString:[[o_hotkeySettings objectAtIndex: [o_hotkeys_listbox selectedRow]] intValue]]];
         [o_hotkeys_change_taken_lbl setStringValue: @""];
@@ -1340,7 +1341,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         return YES;
     }
 }
-    
+
 @end
 
 /********************

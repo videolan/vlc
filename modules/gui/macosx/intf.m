@@ -1602,8 +1602,6 @@ static void manage_cleanup( void * args )
     }
 
     pthread_cleanup_pop(1);
-
-    msg_Dbg( p_intf, "OS X Manage thread terminating" );
 }
 
 - (void)manageVolumeSlider

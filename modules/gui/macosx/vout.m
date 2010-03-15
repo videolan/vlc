@@ -122,10 +122,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (BOOL)windowContainsEmbedded: (id)o_window
 {
-/*    if( ![[o_window className] isEqualToString: @"VLCVoutWindow"] )
-    {
-        NSLog( @"We were not given a VLCVoutWindow" );
-    }*/
     return ([self viewForWindow: o_window] == nil ? NO : YES );
 }
 
@@ -510,7 +506,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
                 val.i_int |= (int)CocoaKeyToVLC( key );
             var_Set( p_vout->p_libvlc, "key-pressed", val );
         }
-        else NSLog( @"Could not send keyevent to VLC core" );
+        else msg_Warn( p_vout, "could not send keyevent to VLC core" );
     }
     else
         [super keyDown: o_event];
