@@ -248,25 +248,17 @@
 
 - (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)proposedFrameSize
 {
-	NSView *playlist_area = [[o_vertical_split subviews] objectAtIndex:1];
-	NSRect newList = [playlist_area frame];
-	if( newList.size.height < 50 && newList.size.height > 0 ) {
-		[self togglePlaylist:self];
-	}
-
-    /* With no video open or with the playlist open the behavior is odd */
-    if( newList.size.height > 50 )
-        return proposedFrameSize;
-
     if( videoRatio.height == 0. || videoRatio.width == 0. )
         return proposedFrameSize;
 
-    NSRect viewRect = [o_view convertRect:[o_view bounds] toView: nil];
-    NSRect contentRect = [self contentRectForFrameRect:[self frame]];
-    float marginy = viewRect.origin.y + [self frame].size.height - contentRect.size.height;
-    float marginx = contentRect.size.width - viewRect.size.width;
-
-    proposedFrameSize.height = (proposedFrameSize.width - marginx) * videoRatio.height / videoRatio.width + marginy;
+    if( [[[VLCMain sharedInstance] controls] aspectRatioIsLocked] )
+    {
+        NSRect viewRect = [o_view convertRect:[o_view bounds] toView: nil];
+        NSRect contentRect = [self contentRectForFrameRect:[self frame]];
+        float marginy = viewRect.origin.y + [self frame].size.height - contentRect.size.height;
+        float marginx = contentRect.size.width - viewRect.size.width;
+        proposedFrameSize.height = (proposedFrameSize.width - marginx) * videoRatio.height / videoRatio.width + marginy;
+    }
 
     return proposedFrameSize;
 }
