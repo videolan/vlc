@@ -140,14 +140,16 @@ vlc_install_object() {
 # @param src_lib     source library to copy to the destination directory
 # @param dest_dir    destination directory where the src_lib should be copied to
 vlc_install() {
+    local src_dir=$1
+    local src=$2
     local dest_dir=$3
     local type=$4
 
     if test "$use_archs" = "no"; then
-        vlc_install_object "$VLC_BUILD_DIR/$1/$2" "$dest_dir" "$type" $5
+        vlc_install_object "$VLC_BUILD_DIR/$src_dir/$src" "$dest_dir" "$type" $5
     else
         if test $type = "data"; then
-            vlc_install_object "$main_build_dir/$1/$2" "$dest_dir" "$type" $5
+            vlc_install_object "$main_build_dir/$src_dir/$src" "$dest_dir" "$type" $5
         else
             fatdest="$dest_dir/$2"
             shouldUpdateFat="no"
@@ -160,19 +162,19 @@ vlc_install() {
             mkdir -p "$tmp_dest_dir"
 
             for arch in $ARCHS; do
-                local src="$VLC_BUILD_DIR/$arch/$1/$2"
+                local src="$VLC_BUILD_DIR/$arch/$src_dir/$src"
 
                 # Only install if the new image is newer than the one we have installed.
                 if ((! test -e ${fatdest}) || test ${src} -nt ${fatdest} ); then
                     vlc_install_object "$src" "$tmp_dest_dir" "$type" "$5" "" ".$arch"
-                    local dest="$tmp_dest_dir/$2.$arch"
+                    local dest="$tmp_dest_dir/$src.$arch"
                     if test -e ${dest}; then
-                        if ! test "$dest_dir/$2" -nt "${dest}"; then
+                        if ! test "$dest_dir/$src" -nt "${dest}"; then
                             shouldUpdateFat="yes"
                         fi
                         objects="${dest} $objects"
                     else
-                        echo "Warning: building $2 without $arch"
+                        echo "Warning: building $src without $arch"
                     fi
                 fi
             done;
