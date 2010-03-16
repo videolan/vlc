@@ -91,7 +91,11 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
     set_section( N_("Decoding") , NULL )
+#ifdef HAVE_MAEMO
+    set_capability( "decoder", 80 )
+#else
     set_capability( "decoder", 0 )
+#endif
     set_callbacks( OpenDecoder, CloseGeneric )
 
     add_submodule ()
@@ -177,9 +181,51 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     OMX_PARAM_PORTDEFINITIONTYPE *def = &p_port->definition;
+    int i_profile = 0xFFFF, i_level = 0xFFFF;
+
+    /* Try to find out the profile of the video */
+    while(p_fmt->i_cat == VIDEO_ES && def->eDir == OMX_DirInput &&
+          p_fmt->i_codec == VLC_CODEC_H264)
+    {
+        uint8_t *p = (uint8_t*)p_dec->fmt_in.p_extra;
+        if(!p || !p_dec->fmt_in.p_extra) break;
+
+        /* Check the profile / level */
+        if(p_dec->fmt_in.i_original_fourcc == VLC_FOURCC('a','v','c','1') &&
+           p[0] == 1)
+        {
+            if(p_dec->fmt_in.i_extra < 12) break;
+            p_sys->i_nal_size_length = 1 + (p[4]&0x03);
+            if( !(p[5]&0x1f) ) break;
+            p += 8;
+        }
+        else
+        {
+            if(p_dec->fmt_in.i_extra < 8) break;
+            if(!p[0] && !p[1] && !p[2] && p[3] == 1) p += 4;
+            else if(!p[0] && !p[1] && p[2] == 1) p += 3;
+            else break;
+        }
+
+        if( ((*p++)&0x1f) != 7) break;
+
+        /* Get profile/level out of first SPS */
+        i_profile = p[0];
+        i_level = p[2];
+        break;
+    }
 
     if(!strcmp(p_sys->psz_component, "OMX.TI.Video.Decoder"))
     {
+        if(p_fmt->i_cat == VIDEO_ES && def->eDir == OMX_DirInput &&
+           p_fmt->i_codec == VLC_CODEC_H264 &&
+           (i_profile != 66 || i_level > 30))
+        {
+            msg_Dbg(p_dec, "h264 profile/level not supported (0x%x, 0x%x)",
+                    i_profile, i_level);
+            return OMX_ErrorNotImplemented;
+        }
+
         if(p_fmt->i_cat == VIDEO_ES && def->eDir == OMX_DirOutput &&
            p_fmt->i_codec == VLC_CODEC_I420)
         {
@@ -305,7 +351,9 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
     default: return OMX_ErrorNotImplemented;
     }
 
-    ImplementationSpecificWorkarounds(p_dec, p_port, p_fmt);
+    omx_error = ImplementationSpecificWorkarounds(p_dec, p_port, p_fmt);
+    CHECK_ERROR(omx_error, "ImplementationSpecificWorkarounds failed (%x : %s)",
+                omx_error, ErrorToString(omx_error));
 
     omx_error = OMX_SetParameter(p_port->omx_handle,
                                  OMX_IndexParamPortDefinition, def);
@@ -643,6 +691,11 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     if( 0 || !GetOmxRole(p_dec->fmt_in.i_codec, p_dec->fmt_in.i_cat, false) )
         return VLC_EGENERIC;
+
+#ifdef HAVE_MAEMO
+    if( p_dec->fmt_in.i_cat != VIDEO_ES && !p_dec->b_force)
+        return VLC_EGENERIC;
+#endif
 
     status = OpenGeneric( p_this, false );
     if(status != VLC_SUCCESS) return status;
