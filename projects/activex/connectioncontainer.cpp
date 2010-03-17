@@ -163,10 +163,17 @@ DWORD WINAPI ThreadProcEventHandler(LPVOID lpParam)
             pCPC->_q_events.pop();
             pCPC->_p_events->fireEvent(ev->_dispId, &ev->_dispParams);
             delete ev;
+
+
+            if (!pCPC->isRunning)
+            {
+                LeaveCriticalSection(&(pCPC->csEvents));
+                goto out;
+            }
         }
         LeaveCriticalSection(&(pCPC->csEvents));
     }
-
+out:
     CoUninitialize();
     return 0;
 }
