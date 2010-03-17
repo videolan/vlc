@@ -63,6 +63,8 @@ static void Close( vlc_object_t * );
 #define APPEND_TEXT N_("Append to file")
 #define APPEND_LONGTEXT N_( "Append to file if it exists instead " \
                             "of replacing it.")
+#define SYNC_TEXT N_("Synchronous writing")
+#define SYNC_LONGTEXT N_( "Open the file with synchronous writing.")
 
 vlc_module_begin ()
     set_description( N_("File stream output") )
@@ -74,6 +76,8 @@ vlc_module_begin ()
     add_shortcut( "stream" )
     add_bool( SOUT_CFG_PREFIX "append", false, NULL, APPEND_TEXT,APPEND_LONGTEXT,
               true )
+    add_bool( SOUT_CFG_PREFIX "sync", false, NULL, SYNC_TEXT,SYNC_LONGTEXT,
+              false )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -82,7 +86,7 @@ vlc_module_end ()
  * Exported prototypes
  *****************************************************************************/
 static const char *const ppsz_sout_options[] = {
-    "append", NULL
+    "append", "sync", NULL
 };
 
 static ssize_t Write( sout_access_out_t *, block_t * );
@@ -102,6 +106,7 @@ static int Open( vlc_object_t *p_this )
 {
     sout_access_out_t   *p_access = (sout_access_out_t*)p_this;
     int                 fd;
+    bool                sync;
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
@@ -112,6 +117,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     bool append = var_GetBool( p_access, SOUT_CFG_PREFIX "append" );
+    sync = var_GetBool( p_access, SOUT_CFG_PREFIX "sync" );
 
     if( !strcmp( p_access->psz_path, "-" ) )
     {
@@ -132,6 +138,9 @@ static int Open( vlc_object_t *p_this )
         path_sanitize( psz_tmp );
 
         fd = vlc_open( psz_tmp, O_RDWR | O_CREAT | O_LARGEFILE |
+#ifdef O_SYNC
+                        (sync ? O_SYNC : 0) |
+#endif
                         (append ? 0 : O_TRUNC), 0666 );
         free( psz_tmp );
     }
