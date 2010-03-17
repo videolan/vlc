@@ -36,10 +36,13 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QListWidget>
+#include <QSpinBox>
 
 #include <QDragEnterEvent>
 #include <QDialogButtonBox>
 #include <QInputDialog>
+
+#include <assert.h>
 
 ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
                   : QVLCDialog( _w,  _p_intf )

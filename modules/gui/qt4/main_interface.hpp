@@ -28,7 +28,6 @@
 #include "qt4.hpp"
 
 #include "util/qvlcframe.hpp"
-#include "components/preferences_widgets.hpp" /* First Start */
 
 #ifdef WIN32
  #include <vlc_windows_interfaces.h>

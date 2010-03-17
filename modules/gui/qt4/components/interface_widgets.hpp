@@ -45,6 +45,7 @@ class ResizeEvent;
 class QPixmap;
 class QHBoxLayout;
 class QMenu;
+class QSlider;
 class ReparentableWidget;
 
 /******************** Video Widget ****************/

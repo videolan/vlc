@@ -44,6 +44,7 @@
 #include <QDesktopWidget>
 #include <QPainter>
 #include <QTimer>
+#include <QSlider>
 
 #ifdef Q_WS_X11
 # include <X11/Xlib.h>
@@ -60,6 +61,7 @@ static void videoSync( void )
 #endif
 
 #include <math.h>
+#include <assert.h>
 
 class ReparentableWidget : public QWidget
 {
