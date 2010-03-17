@@ -98,7 +98,6 @@ struct vlm_t
     int64_t        i_id;
 
     /* Vod server (used by media) */
-    int            i_vod;
     vod_t          *p_vod;
 
     /* Media list */

@@ -153,7 +153,6 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
     p_vlm->i_id = 1;
     TAB_INIT( p_vlm->i_media, p_vlm->media );
     TAB_INIT( p_vlm->i_schedule, p_vlm->schedule );
-    p_vlm->i_vod = 0;
     p_vlm->p_vod = NULL;
     var_Create( p_vlm, "intf-event", VLC_VAR_ADDRESS );
     vlc_object_attach( p_vlm, p_this->p_libvlc );
@@ -224,6 +223,13 @@ static void vlm_Destructor( vlm_t *p_vlm )
 
     libvlc_priv(p_vlm->p_libvlc)->p_vlm = NULL;
     vlc_object_kill( p_vlm );
+
+    if( p_vlm->p_vod )
+    {
+        module_unneed( p_vlm->p_vod, p_vlm->p_vod->p_module );
+        vlc_object_detach( p_vlm->p_vod );
+        vlc_object_release( p_vlm->p_vod );
+    }
 
     vlc_mutex_lock( &p_vlm->lock_manage );
     p_vlm->input_state_changed = true;
@@ -563,7 +569,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
 {
     vlm_media_t *p_cfg = &p_media->cfg;
     /* Check if we need to create/delete a vod media */
-    if( p_cfg->b_vod )
+    if( p_cfg->b_vod && p_vlm->p_vod )
     {
         if( !p_cfg->b_enabled && p_media->vod.p_media )
         {
@@ -655,6 +661,8 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             }
         }
     }
+    else if ( p_cfg->b_vod )
+        msg_Err( p_vlm, "vod server is not loaded" );
     else
     {
         /* TODO start media if needed */
@@ -696,7 +704,7 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
         return VLC_EGENERIC;
     }
     /* Check if we need to load the VOD server */
-    if( p_cfg->b_vod && !p_vlm->i_vod )
+    if( p_cfg->b_vod && !p_vlm->p_vod )
     {
         p_vlm->p_vod = vlc_custom_create( VLC_OBJECT(p_vlm), sizeof( vod_t ),
                                           VLC_OBJECT_GENERIC, "vod server" );
@@ -717,9 +725,6 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
     p_media = calloc( 1, sizeof( vlm_media_sys_t ) );
     if( !p_media )
         return VLC_ENOMEM;
-
-    if( p_cfg->b_vod )
-        p_vlm->i_vod++;
 
     vlm_media_Copy( &p_media->cfg, p_cfg );
     p_media->cfg.id = p_vlm->i_id++;
@@ -755,7 +760,6 @@ static int vlm_ControlMediaDel( vlm_t *p_vlm, int64_t id )
     {
         p_media->cfg.b_enabled = false;
         vlm_OnMediaUpdate( p_vlm, p_media );
-        p_vlm->i_vod--;
     }
 
     /* */
@@ -770,14 +774,6 @@ static int vlm_ControlMediaDel( vlm_t *p_vlm, int64_t id )
 
     TAB_REMOVE( p_vlm->i_media, p_vlm->media, p_media );
     free( p_media );
-
-    /* Check if we need to unload the VOD server */
-    if( p_vlm->p_vod && p_vlm->i_vod <= 0 )
-    {
-        module_unneed( p_vlm->p_vod, p_vlm->p_vod->p_module );
-        vlc_object_release( p_vlm->p_vod );
-        p_vlm->p_vod = NULL;
-    }
 
     return VLC_SUCCESS;
 }
