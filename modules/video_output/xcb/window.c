@@ -617,6 +617,7 @@ static int EmOpen (vlc_object_t *obj)
     if (p_sys == NULL || xcb_connection_has_error (conn))
         goto error;
 
+    p_sys->keys = NULL;
     wnd->handle.xid = window;
     wnd->control = Control;
     wnd->sys = p_sys;
