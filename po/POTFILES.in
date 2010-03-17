@@ -560,8 +560,6 @@ modules/gui/macosx/prefs_widgets.h
 modules/gui/macosx/prefs_widgets.m
 modules/gui/macosx/simple_prefs.h
 modules/gui/macosx/simple_prefs.m
-modules/gui/macosx/vlm.h
-modules/gui/macosx/vlm.m
 modules/gui/macosx/vout.h
 modules/gui/macosx/vout.m
 modules/gui/macosx/voutgl.m
