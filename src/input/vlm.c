@@ -365,12 +365,12 @@ static void* Manage( void* p_object )
     int canc = vlc_savecancel ();
     i_lastcheck = vlm_Date();
 
+    vlc_mutex_lock( &vlm->lock );
     while( !vlm->b_die )
     {
         char **ppsz_scheduled_commands = NULL;
         int    i_scheduled_commands = 0;
 
-        vlc_mutex_lock( &vlm->lock );
         if( i_nextschedule )
             vlc_cond_timedwait( &vlm->wait, &vlm->lock, i_nextschedule );
         else
@@ -474,8 +474,8 @@ static void* Manage( void* p_object )
 
         i_lastcheck = i_time;
 
-        vlc_mutex_unlock( &vlm->lock );
     }
+    vlc_mutex_unlock( &vlm->lock );
 
     vlc_restorecancel (canc);
     return NULL;
