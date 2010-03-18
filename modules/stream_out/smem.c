@@ -250,8 +250,9 @@ static sout_stream_id_t *AddVideo( sout_stream_t *p_stream, es_format_t *p_fmt )
             i_bits_per_pixel = 8;
             break;
         default:
-            msg_Err( p_stream, "Smem does only support raw video format" );
-            return NULL;
+            i_bits_per_pixel = 0;
+            msg_Dbg( p_stream, "non raw video format detected (%4.4s), buffers will contain compressed video", (char *)&p_fmt->i_codec );
+            break;
     }
 
     id = calloc( 1, sizeof( sout_stream_id_t ) );
@@ -342,15 +343,29 @@ static int SendVideo( sout_stream_t *p_stream, sout_stream_id_t *id,
     int i_line, i_line_size, i_size, i_pixel_pitch;
     uint8_t* p_pixels;
 
-    i_line = id->format->video.i_height;
-    i_pixel_pitch = id->format->video.i_bits_per_pixel / 8;
-    i_line_size = i_pixel_pitch * id->format->video.i_width;
-    i_size = i_line * i_line_size;
+    if( id->format->video.i_bits_per_pixel > 0 )
+    {
+        i_line = id->format->video.i_height;
+        i_pixel_pitch = id->format->video.i_bits_per_pixel / 8;
+        i_line_size = i_pixel_pitch * id->format->video.i_width;
+        i_size = i_line * i_line_size;
+    }
+    else
+    {
+        i_size = p_buffer->i_buffer;
+    }
     /* Calling the prerender callback to get user buffer */
     p_sys->pf_video_prerender_callback( id->p_data, &p_pixels , i_size );
     /* Copying data into user buffer */
-    for ( int line = 0; line < i_line; line++, p_pixels += i_line_size )
-        vlc_memcpy( p_pixels, p_buffer->p_buffer + i_line_size * line , i_line_size );
+    if( id->format->video.i_bits_per_pixel > 0 )
+    {
+        for ( int line = 0; line < i_line; line++, p_pixels += i_line_size )
+            vlc_memcpy( p_pixels, p_buffer->p_buffer + i_line_size * line , i_line_size );
+    }
+    else
+    {
+        vlc_memcpy( p_pixels, p_buffer->p_buffer, i_size );
+    }
     /* Calling the postrender callback to tell the user his buffer is ready */
     p_sys->pf_video_postrender_callback( id->p_data, p_pixels,
                                          id->format->video.i_width, id->format->video.i_height,
