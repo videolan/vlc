@@ -176,11 +176,9 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
 {
     if (reparentable->windowState() & Qt::WindowFullScreen )
         return;
-    msg_Dbg( p_intf, "Video is resizing to: %i %i", w, h );
-    videoSize.setWidth( w );
-    videoSize.setHeight( h );
     if( !isVisible() ) show();
-    updateGeometry(); // Needed for deinterlace
+    resize( w, h );
+    emit sizeChanged( w, h );
     videoSync();
 }
 
@@ -266,15 +264,8 @@ void VideoWidget::release( void )
 
     delete reparentable;
     reparentable = NULL;
-    videoSize = QSize();
     updateGeometry();
     hide();
-}
-
-
-QSize VideoWidget::sizeHint() const
-{
-    return videoSize;
 }
 
 /**********************************************************************

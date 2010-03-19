@@ -34,6 +34,7 @@
 #endif
 
 #include <QSystemTrayIcon>
+#include <QStackedWidget>
 
 class QSettings;
 class QCloseEvent;
@@ -53,7 +54,6 @@ class SpeedControlWidget;
 class QVBoxLayout;
 class QMenu;
 class QSize;
-class QStackedWidget;
 
 enum {
     CONTROLS_VISIBLE  = 0x1,
@@ -210,6 +210,11 @@ private slots:
     void handleKeyPress( QKeyEvent * );
 
     void showBuffering( float );
+
+    void resizeStack( int w, int h ) {
+        resize( size() - stackCentralW->size() + QSize( w, h ) );
+        debug(); }
+
 
 signals:
     void askGetVideo( WId *p_id, int *pi_x, int *pi_y,

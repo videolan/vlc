@@ -61,7 +61,7 @@
 #include <vlc_keys.h>                       /* Wheel event */
 #include <vlc_vout_display.h>               /* vout_thread_t and VOUT_ events */
 
-// #define DEBUG_INTF
+ #define DEBUG_INTF
 
 /* Callback prototypes */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
@@ -218,6 +218,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     {
         CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
                  videoWidget, SetSizing( unsigned int, unsigned int ) );
+        CONNECT( videoWidget, sizeChanged( int, int ),
+                 this, resizeStack( int,  int ) );
         CONNECT( this, askVideoSetFullScreen( bool ),
                  videoWidget, SetFullScreen( bool ) );
         CONNECT( videoWidget, keyPressed( QKeyEvent * ),
@@ -560,6 +562,7 @@ QSize MainInterface::sizeHint() const
  */
 void MainInterface::doComponentsUpdate()
 {
+#if 0
     if( isFullScreen() || isMaximized() ) return;
 
 //    msg_Warn( p_intf, "Updating the geometry" );
@@ -574,6 +577,7 @@ void MainInterface::doComponentsUpdate()
     //resize( sizeHint() );
 
     //adjustSize() ; /* This is not needed, but might help in the future */
+#endif
 }
 
 void MainInterface::debug()
@@ -589,16 +593,12 @@ void MainInterface::debug()
 
     msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
     msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
-    //msg_Dbg( p_intf, "maximumsize: %i - %i", maximumSize().height(), maximumSize().width() );
+    msg_Dbg( p_intf, "maximumsize: %i - %i", maximumSize().height(), maximumSize().width() );
+    msg_Dbg( p_intf, "minimumsize: %i - %i", minimumSize().height(), minimumSize().width() );
 
     msg_Dbg( p_intf, "Stack size: %i - %i", stackCentralW->size().height(), stackCentralW->size().width() );
-    msg_Dbg( p_intf, "Stack minimumSize(): %i - %i", stackCentralW->minimumHeight(), stackCentralW->minimumWidth() );
-    msg_Dbg( p_intf, "Central minimumsize: %i - %i", centralWidget()->minimumSize().height(), centralWidget()->minimumSize().width() );
+    msg_Dbg( p_intf, "Stack sizeHint: %i - %i", stackCentralW->sizeHint().height(), stackCentralW->sizeHint().width() );
     msg_Dbg( p_intf, "Central size: %i - %i", centralWidget()->size().height(), centralWidget()->size().width() );
-    msg_Dbg( p_intf, "Menu minimumsize: %i - %i", menuBar()->minimumSize().height(), menuBar()->minimumSize().width() );
-    msg_Dbg( p_intf, "Input size: %i - %i", inputC->size().height(), inputC->size().width() );
-    msg_Dbg( p_intf, "Status minimumsize: %i - %i", statusBar()->minimumSize().height(), statusBar()->minimumSize().width() );
-    msg_Dbg( p_intf, "minimumsize: %i - %i", minimumSize().height(), minimumSize().width() );
     msg_Dbg( p_intf, "bg Size: %i - %i", bgWidget->size().height(), bgWidget->size().width() );
 
     /*if( videoWidget && videoWidget->isVisible() )
@@ -717,10 +717,6 @@ void MainInterface::getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
 
         /* Consider the video active now */
         showVideo();
-
-        stackCentralW->resize( *pi_width, *pi_height );
-
-        emit askUpdate();
     }
 }
 
@@ -749,8 +745,6 @@ void MainInterface::releaseVideoSlot( void )
 /* Asynchronous call from WindowControl function */
 int MainInterface::controlVideo( int i_query, va_list args )
 {
-    /* Debug to check if VOUT_WINDOW_SET_SIZE is called, because this is broken now */
-    msg_Warn( p_intf, "Control Video: %i", i_query );
     switch( i_query )
     {
     case VOUT_WINDOW_SET_SIZE:
@@ -758,8 +752,7 @@ int MainInterface::controlVideo( int i_query, va_list args )
         unsigned int i_width  = va_arg( args, unsigned int );
         unsigned int i_height = va_arg( args, unsigned int );
         emit askVideoToResize( i_width, i_height );
-        emit askUpdate();
-        return VLC_EGENERIC;
+        return VLC_SUCCESS;
     }
     case VOUT_WINDOW_SET_STATE:
     {
@@ -1283,6 +1276,7 @@ void MainInterface::toggleFullScreen( void )
     {
         showNormal();
         emit askUpdate(); // Needed if video was launched after the F11
+        //FIXMe
         emit fullscreenInterfaceToggled( false );
     }
     else

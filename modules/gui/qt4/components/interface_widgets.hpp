@@ -58,12 +58,9 @@ public:
     VideoWidget( intf_thread_t * );
     virtual ~VideoWidget();
 
-    WId request( int *, int *,
-                 unsigned int *, unsigned int *, bool );
+    WId request( int *, int *, unsigned int *, unsigned int *, bool );
     void  release( void );
     int   control( void *, int, va_list );
-
-    virtual QSize sizeHint() const;
 
 protected:
     virtual QPaintEngine *paintEngine() const
@@ -74,12 +71,12 @@ protected:
 private:
     intf_thread_t *p_intf;
 
-    QSize videoSize;
     QWidget *reparentable;
     QLayout *layout;
 
 signals:
     void keyPressed( QKeyEvent * );
+    void sizeChanged( int, int );
 
 public slots:
     void SetSizing( unsigned int, unsigned int );
