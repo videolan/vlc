@@ -84,7 +84,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     inputC               = NULL;
 
     b_hideAfterCreation  = false; // --qt-start-minimized
-    playlistVisible      = false; // FIXME remove
+    playlistVisible      = false;
     input_name           = "";
     i_bg_height          = 0;
 
@@ -300,10 +300,10 @@ MainInterface::~MainInterface()
     CoUninitialize();
 #endif
 
-    /* Be sure to kill the actionsManager... FIXME */
+    /* Be sure to kill the actionsManager... Only used in the MI and control */
     ActionsManager::killInstance();
 
-    /* Idem, FIXME */
+    /* Idem */
     ExtensionsManager::killInstance();
 
     /* Delete the FSC controller */
@@ -340,7 +340,6 @@ MainInterface::~MainInterface()
 void MainInterface::recreateToolbars()
 {
     // FIXME: do the same for the FSC
-    //msg_Dbg( p_intf, "Recreating the toolbars" );
     settings->beginGroup( "MainWindow" );
     delete controls;
     delete inputC;
