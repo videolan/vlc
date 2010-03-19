@@ -329,6 +329,14 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             notifyLayout();
             return;
         }
+        else
+        {
+            // other keys to be forwarded to vlc core
+            EvtKey& rEvtKey = (EvtKey&)rEvent;
+            var_SetInteger( getIntf()->p_libvlc, "key-pressed",
+                            rEvtKey.getModKey() );
+            return;
+        }
 
 
         for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
