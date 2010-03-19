@@ -1487,7 +1487,7 @@ static void ASF_ObjectDumpDebug( vlc_object_t *p_obj,
     psz_name = ASF_ObjectDumpDebugInfo[i].psz_name;
 
     char str[512];
-    if( i_level * 5 + 1 >= sizeof(str) )
+    if( i_level >= (sizeof(str) - 1)/5 )
         return;
 
     memset( str, ' ', sizeof( str ) );

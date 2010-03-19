@@ -803,7 +803,7 @@ static void AVI_ChunkDumpDebug_level( vlc_object_t *p_obj,
     avi_chunk_t *p_child;
 
     char str[512];
-    if( i_level * 5 + 1 >= sizeof(str) )
+    if( i_level >= (sizeof(str) - 1)/5 )
         return;
 
     memset( str, ' ', sizeof( str ) );

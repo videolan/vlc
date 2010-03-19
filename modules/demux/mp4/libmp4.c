@@ -2895,7 +2895,7 @@ static void __MP4_BoxDumpStructure( stream_t *s,
         unsigned int i;
 
         char str[512];
-        if( i_level * 5 + 1 >= sizeof(str) )
+        if( i_level >= (sizeof(str) - 1)/5 )
             return;
 
         memset( str, ' ', sizeof(str) );
