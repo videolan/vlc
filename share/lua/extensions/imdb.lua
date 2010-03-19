@@ -27,6 +27,7 @@ function descriptor()
              version = "0.1" ;
              author = "Jean-Philippe André" ;
              url = 'http://www.imdb.org/';
+             shortdesc = "The Internet Movie Database\n";
              description = "<center><b>The Internet Movie Database</b></center>\n"
                         .. "Get information about movies from the Internet "
                         .. "Movie Database (IMDb).\nThis Extension will show "
