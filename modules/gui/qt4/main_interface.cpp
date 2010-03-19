@@ -61,7 +61,7 @@
 #include <vlc_keys.h>                       /* Wheel event */
 #include <vlc_vout_display.h>               /* vout_thread_t and VOUT_ events */
 
- #define DEBUG_INTF
+// #define DEBUG_INTF
 
 /* Callback prototypes */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
@@ -478,83 +478,6 @@ inline void MainInterface::createStatusBar()
  * Handling of sizing of the components
  **********************************************************************/
 
-/* This function is probably wrong, but we don't have many many choices...
-   Since we can't know from the playlist Widget if we are inside a dock or not,
-   because the playlist Widget can be called by THEDP, as a separate windows for
-   the skins.
-   Maybe the other solution is to redefine the sizeHint() of the playlist and
-   ask _parent->isFloating()...
-   If you think this would be better, please FIXME it...
-*/
-#if 0
-
-QSize MainInterface::sizeHint() const
-{
-#if 0
-    if( b_keep_size )
-    {
-        if( i_visualmode )
-        {
-                return mainVideoSize;
-        }
-        else
-        {
-            if( VISIBLE( bgWidget) ||
-                ( videoIsActive && videoWidget->isVisible() )
-              )
-                return mainVideoSize;
-            else
-                return mainBasedSize;
-        }
-    }
-#endif
-
-    int nwidth  = __MAX( controls->sizeHint().width(),
-                         menuBar()->sizeHint().width() );
-
-    int nheight = controls->isVisible() ?
-                  controls->size().height()
-                  + inputC->size().height()
-                  + menuBar()->size().height()
-                  + statusBar()->size().height()
-                  : 0 ;
-
-  /*  if( stackCentralW->isVisible() )
-    {
-        nheight += stackCentralW->height();
-        nwidth  = __MAX( nwidth, stackCentralW->width() );
-    }*/
-
-/*    if( VISIBLE( bgWidget ) )
-    {
-        msg_Warn( p_intf, "Hello here" );
-        if( i_bg_height )
-            nheight += i_bg_height;
-        else
-            nheight += bgWidget->size().height();
-        nwidth  = __MAX( nwidth, bgWidget->size().width() );
-    }
-    else if( videoIsActive && videoWidget->isVisible() )
-    {
-        msg_Warn( p_intf, "Hello there" );
-        nheight += videoWidget->sizeHint().height();
-        nwidth  = __MAX( nwidth, videoWidget->sizeHint().width() );
-    }*/
-#if 0
-    if( !dockPL->isFloating() && dockPL->isVisible() && dockPL->widget()  )
-    {
-        nheight += dockPL->size().height();
-        nwidth = __MAX( nwidth, dockPL->size().width() );
-        msg_Warn( p_intf, "3 %i %i", nheight, nwidth );
-    }
-#endif
-    return QSize( nwidth, nheight );
-}
-#endif
-
-/* Video widget cannot do this synchronously as it runs in another thread */
-/* Well, could it, actually ? Probably dangerous ... */
-
 /* This function is called:
    - toggling of minimal View
    - through askUpdate() by Vout thread request video and resize video (zoom)
@@ -583,29 +506,13 @@ void MainInterface::doComponentsUpdate()
 void MainInterface::debug()
 {
 #ifdef DEBUG_INTF
-    msg_Dbg( p_intf, "Stack Size: %i - %i", stackCentralW->size().height(), size().width() );
-    if( videoWidget )
-        msg_Dbg( p_intf, "Stack Size: %i - %i",
-                 videoWidget->size().height(),
-                 videoWidget->size().width() );
-    else
-        msg_Dbg( p_intf, "no embedded video" );
-
     msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
     msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
-    msg_Dbg( p_intf, "maximumsize: %i - %i", maximumSize().height(), maximumSize().width() );
     msg_Dbg( p_intf, "minimumsize: %i - %i", minimumSize().height(), minimumSize().width() );
 
     msg_Dbg( p_intf, "Stack size: %i - %i", stackCentralW->size().height(), stackCentralW->size().width() );
     msg_Dbg( p_intf, "Stack sizeHint: %i - %i", stackCentralW->sizeHint().height(), stackCentralW->sizeHint().width() );
     msg_Dbg( p_intf, "Central size: %i - %i", centralWidget()->size().height(), centralWidget()->size().width() );
-    msg_Dbg( p_intf, "bg Size: %i - %i", bgWidget->size().height(), bgWidget->size().width() );
-
-    /*if( videoWidget && videoWidget->isVisible() )
-    {
-        msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
-        msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
-    }*/
 #endif
 }
 
