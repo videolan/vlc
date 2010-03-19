@@ -27,10 +27,10 @@ function descriptor()
              version = "0.1" ;
              author = "Jean-Philippe André" ;
              url = 'http://www.imdb.org/';
-             shortdesc = "The Internet Movie Database\n";
-             description = "<center><b>The Internet Movie Database</b></center>\n"
+             shortdesc = "The Internet Movie Database";
+             description = "<center><b>The Internet Movie Database</b></center><br />"
                         .. "Get information about movies from the Internet "
-                        .. "Movie Database (IMDb).\nThis Extension will show "
+                        .. "Movie Database (IMDb).<br />This Extension will show "
                         .. "you the cast, a short plot summary and a link to "
                         .. "the web page on imdb.org." ;
              capabilities = { "input-listener" } }
