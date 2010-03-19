@@ -1177,13 +1177,11 @@ void MainInterface::closeEvent( QCloseEvent *e )
     THEDP->quit();
 }
 
-void MainInterface::toggleFullScreen( void )
+void MainInterface::toggleFullScreen()
 {
     if( isFullScreen() )
     {
         showNormal();
-        emit askUpdate(); // Needed if video was launched after the F11
-        //FIXMe
         emit fullscreenInterfaceToggled( false );
     }
     else
@@ -1191,7 +1189,6 @@ void MainInterface::toggleFullScreen( void )
         showFullScreen();
         emit fullscreenInterfaceToggled( true );
     }
-
 }
 
 /*****************************************************************************
