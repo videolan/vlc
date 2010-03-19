@@ -229,11 +229,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
     CONNECT( THEDP, toolBarConfUpdated(), this, recreateToolbars() );
 
-    /* Enable the popup menu in the MI */
-    setContextMenuPolicy( Qt::CustomContextMenu );
-    CONNECT( this, customContextMenuRequested( const QPoint& ),
-             this, popupMenu( const QPoint& ) );
-
     /** END of CONNECTS**/
 
 
@@ -404,6 +399,11 @@ void MainInterface::createMainWidget( QSettings *settings )
 
     getSettings()->endGroup();
 
+    /* Enable the popup menu in the MI */
+    main->setContextMenuPolicy( Qt::CustomContextMenu );
+    CONNECT( main, customContextMenuRequested( const QPoint& ),
+             this, popupMenu( const QPoint& ) );
+
     if ( depth() > 8 ) /* 8bit depth has too many issues with opacity */
         /* Create the FULLSCREEN CONTROLS Widget */
         if( var_InheritBool( p_intf, "qt-fs-controller" ) )
@@ -554,12 +554,7 @@ void MainInterface::destroyPopupMenu()
 
 void MainInterface::popupMenu( const QPoint &p )
 {
-    /* FIXME
-     * Ow, that's ugly: don't show the popup menu if cursor over
-     * the main menu bar or the status bar */
-    if( !childAt( p ) || ( ( childAt( p ) != menuBar() )
-                        && ( childAt( p )->parentWidget() != statusBar() ) ) )
-        QVLCMenu::PopupMenu( p_intf, true );
+    QVLCMenu::PopupMenu( p_intf, true );
 }
 
 void MainInterface::toggleFSC()
