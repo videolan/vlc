@@ -431,8 +431,7 @@ void ExtensionItemDelegate::paint( QPainter *painter,
     // Version: italic
     font.setItalic( true );
     pixpaint->setFont( font );
-    pixpaint->drawText( QRect( width - 40, 7, 20, metrics.height() ),
-                        Qt::AlignLeft, ext->version );
+    pixpaint->drawText( width - 40, 7 + metrics.height(), ext->version );
 
     // Flush paint operations
     delete pixpaint;
