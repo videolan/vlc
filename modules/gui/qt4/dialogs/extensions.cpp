@@ -120,6 +120,9 @@ ExtensionDialog* ExtensionsDialogProvider::UpdateExtDialog(
     {
         dialog->has_lock = true;
         dialog->UpdateWidgets();
+        if( strcmp( qtu( dialog->windowTitle() ),
+	            p_dialog->psz_title ) != 0 )
+	    dialog->setWindowTitle( qfu( p_dialog->psz_title ) );
         dialog->has_lock = false;
         dialog->setVisible( !p_dialog->b_hide );
     }
