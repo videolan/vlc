@@ -9,8 +9,8 @@
 !define VERSION @VERSION@
 !define PRODUCT_VERSION @VERSION@
 !define PRODUCT_GROUP "VideoLAN"
-!define PRODUCT_PUBLISHER "VideoLAN Team"
-!define PRODUCT_WEB_SITE "http://www.videolan.org"
+!define PRODUCT_PUBLISHER "VideoLAN"
+!define PRODUCT_WEB_SITE "http://www.videolan.org/"
 !define PRODUCT_DIR_REGKEY "Software\VideoLAN\VLC"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -91,10 +91,10 @@ RequestExecutionLevel user
 
     !define MUI_FINISHPAGE_RUN
     !define MUI_FINISHPAGE_RUN_FUNCTION AppRunAs
-    !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README.txt"
-    !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
     !define MUI_FINISHPAGE_LINK $Link_VisitWebsite
     !define MUI_FINISHPAGE_LINK_LOCATION "http://www.videolan.org/vlc/"
+    !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README.txt"
+    !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
     !define MUI_FINISHPAGE_NOREBOOTSUPPORT
     !insertmacro MUI_PAGE_FINISH
 
@@ -532,42 +532,13 @@ Section /o $Name_Section03 SEC03
   WriteRegStr HKLM ${Moz} "Product" "VLC media player"
   WriteRegStr HKLM ${Moz} "Vendor" "VideoLAN"
   WriteRegStr HKLM ${Moz} "Version" "${VERSION}"
-
- ; for very old version of mozilla, these lines may be needed
- ;Push $R0
- ;Push $R1
- ;Push $R2
-
- ;!define Index 'Line${__LINE__}'
- ;StrCpy $R1 "0"
-
- ;"${Index}-Loop:"
-
- ;  ; Check for Key
- ;  EnumRegKey $R0 HKLM "SOFTWARE\Mozilla" "$R1"
- ;  StrCmp $R0 "" "${Index}-End"
- ;  IntOp $R1 $R1 + 1
- ;  ReadRegStr $R2 HKLM "SOFTWARE\Mozilla\$R0\Extensions" "Plugins"
- ;  StrCmp $R2 "" "${Index}-Loop" ""
-
- ;  CopyFiles "$INSTDIR\npvlc.dll" "$R2"
- ;  !ifdef LIBVLC_DLL
- ;  CopyFiles ${LIBVLC_DLL} "$R2"
- ;  !endif
- ;  !ifdef LIBVLC_CONTROL_DLL
- ;  CopyFiles ${LIBVLC_CONTROL_DLL} "$R2"
- ;  !endif
- ;  Goto "${Index}-Loop"
-
- ;"${Index}-End:"
- ;!undef Index
-
 SectionEnd
 !endif
 
 !ifdef INSTALL_ACTIVEX
 Section $Name_Section04 SEC04
   SectionIn 3
+
   SetOutPath "$INSTDIR"
   !insertmacro OpenUninstallLog
   !insertmacro InstallFile activex\axvlc.dll
@@ -749,6 +720,7 @@ FunctionEnd
 Function .OnInstSuccess
     UAC::Unload
 FunctionEnd
+
 ;; End function
 Section -Post
   WriteUninstaller "$INSTDIR\uninstall.exe"
