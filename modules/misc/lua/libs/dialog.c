@@ -52,7 +52,7 @@ static int vlclua_dialog_create( lua_State *L );
 static int vlclua_dialog_delete( lua_State *L );
 static int vlclua_dialog_show( lua_State *L );
 static int vlclua_dialog_hide( lua_State *L );
-static int vlclua_dialog_flush( lua_State *L );
+static int vlclua_dialog_update( lua_State *L );
 static void lua_SetDialogUpdate( lua_State *L, int flag );
 static int lua_GetDialogUpdate( lua_State *L );
 int lua_DialogFlush( lua_State *L );
@@ -101,8 +101,8 @@ static int DeleteWidget( extension_dialog_t *p_dialog,
 static const luaL_Reg vlclua_dialog_reg[] = {
     { "show", vlclua_dialog_show },
     { "hide", vlclua_dialog_hide },
-    { "close", vlclua_dialog_delete },
-    { "flush", vlclua_dialog_flush },
+    { "delete" vlclua_dialog_delete },
+    { "update", vlclua_dialog_update },
 
     { "add_button", vlclua_dialog_add_button },
     { "add_label", vlclua_dialog_add_label },
@@ -320,7 +320,7 @@ static int vlclua_dialog_hide( lua_State *L )
 
 
 /** Flush the dialog */
-static int vlclua_dialog_flush( lua_State *L )
+static int vlclua_dialog_update( lua_State *L )
 {
     vlc_object_t *p_mgr = vlclua_get_this( L );
 
@@ -355,7 +355,7 @@ static int lua_GetDialogUpdate( lua_State *L )
     return luaL_checkinteger( L, -1 );
 }
 
-/** Manually flush a dialog
+/** Manually update a dialog
  * This can be called after a lua_pcall
  * @return SUCCESS if there is no dialog or the update was successful
  * @todo If there can be multiple dialogs, this function will have to
@@ -858,7 +858,7 @@ static int vlclua_widget_set_checked( lua_State *L )
 /**
  * Delete a widget from a dialog
  * Remove it from the list once it has been safely destroyed by the interface
- * @note This will always flush the dialog
+ * @note This will always update the dialog
  **/
 static int vlclua_dialog_delete_widget( lua_State *L )
 {
