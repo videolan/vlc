@@ -36,16 +36,18 @@ vlc_module_begin ()
 vlc_module_end ()
 
 void i420_yuyv_neon (uint8_t *out, const uint8_t **in,
-                     uintptr_t pitch, uintptr_t height);
+                     unsigned int pitch, unsigned int s_off,
+                     unsigned int height);
 
 static void I420_YUYV (filter_t *filter, picture_t *src, picture_t *dst)
 {
     uint8_t *out = dst->p->p_pixels;
     const uint8_t *yuv[3] = { src->Y_PIXELS, src->U_PIXELS, src->V_PIXELS, };
-    size_t pitch = (filter->fmt_in.video.i_width + 15) & ~15;
     size_t height = filter->fmt_in.video.i_height;
+    int i_pitch = (dst->p->i_pitch >> 1) & ~0xF;
+    int s_offset = src->p->i_pitch - i_pitch;
 
-    i420_yuyv_neon (out, yuv, pitch, height);
+    i420_yuyv_neon (out, yuv, i_pitch, s_offset, height);
 }
 
 void i420_uyvy_neon (uint8_t *out, const uint8_t **in,
@@ -55,10 +57,11 @@ static void I420_UYVY (filter_t *filter, picture_t *src, picture_t *dst)
 {
     uint8_t *out = dst->p->p_pixels;
     const uint8_t *yuv[3] = { src->Y_PIXELS, src->U_PIXELS, src->V_PIXELS, };
-    size_t pitch = (filter->fmt_in.video.i_width + 15) & ~15;
     size_t height = filter->fmt_in.video.i_height;
+    int i_pitch = (dst->p->i_pitch >> 1) & ~0xF;
+    int s_offset = src->p->i_pitch - i_pitch;
 
-    i420_yuyv_neon (out, yuv, pitch, height);
+    i420_yuyv_neon (out, yuv, i_pitch, s_offset, height);
 }
 
 VIDEO_FILTER_WRAPPER (I420_YUYV)

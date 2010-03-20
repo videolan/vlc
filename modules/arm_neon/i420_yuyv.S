@@ -24,21 +24,24 @@
 #define O1	r0
 #define	O2	r1
 #define	PITCH	r2
-#define	HEIGHT	r3
+#define	S_OFF	r3
 #define	Y1	r4
 #define	Y2	r5
 #define	U	r6
 #define	V	r7
+#define	HEIGHT	r8
 #define	END_O1	r12
 
 	.align
 	.global i420_yuyv_neon
 	.type	i420_yuyv_neon, %function
 i420_yuyv_neon:
-	push		{r4-r7, lr}
+	push		{r4-r8, lr}
+	ldr		HEIGHT, [sp, #(4*6)]
 	ldmia		r1,	{Y1, U, V}
 	add		O2,	O1,	PITCH, lsl #1
 	add		Y2,	Y1,	PITCH
+	add		Y2,	S_OFF
 1:
 	mov		END_O1,	O2
 	pld		[Y2]
@@ -64,21 +67,27 @@ i420_yuyv_neon:
 	sub		HEIGHT,	#2
 	mov		O1,	O2
 	add		O2,	PITCH,	lsl #1
+	add		Y2,	S_OFF
 	mov		Y1,	Y2
 	add		Y2,	PITCH
+	add		Y2,	S_OFF
+	add		U,	S_OFF,	lsr #1
+	add		V,	S_OFF,	lsr #1
 
 	cmp		HEIGHT,	#0
 	bne		1b
 
-	pop		{r4-r7, pc}
+	pop		{r4-r8, pc}
 
 	.global i420_uyvy_neon
 	.type	i420_uyvy_neon, %function
 i420_uyvy_neon:
-	push		{r4-r7, lr}
+	push		{r4-r8, lr}
+	ldr		HEIGHT, [sp, #(4*6)]
 	ldmia		r1,	{Y1, U, V}
 	add		O2,	O1,	PITCH, lsl #1
 	add		Y2,	Y1,	PITCH
+	add		Y2,	S_OFF
 1:
 	mov		END_O1,	O2
 2:
@@ -103,10 +112,14 @@ i420_uyvy_neon:
 	sub		HEIGHT,	#2
 	mov		O1,	O2
 	add		O2,	PITCH,	lsl #1
+	add		Y2,	S_OFF
 	mov		Y1,	Y2
 	add		Y2,	PITCH
+	add		Y2,	S_OFF
+	add		U,	S_OFF,	lsr #1
+	add		V,	S_OFF,	lsr #1
 
 	cmp		HEIGHT,	#0
 	bne		1b
 
-	pop		{r4-r7, pc}
+	pop		{r4-r8, pc}
