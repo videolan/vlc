@@ -988,7 +988,7 @@ static int vlclua_extension_dialog_callback( vlc_object_t *p_this,
     {
         case EXTENSION_EVENT_CLICK:
             assert( p_widget != NULL );
-            PushCommand( p_ext, CMD_CLICK, p_widget );
+            PushCommandUnique( p_ext, CMD_CLICK, p_widget );
             break;
         case EXTENSION_EVENT_CLOSE:
             PushCommandUnique( p_ext, CMD_CLOSE );

@@ -267,7 +267,7 @@ int __PushCommand( extension_t *p_ext,  bool b_unique, int i_command,
             if( b_unique && last->i_command == i_command )
             {
                 // Do not push this 'unique' command a second time
-                b_skip = true;
+                b_skip = !memcmp( last->data, cmd->data, sizeof( cmd->data ) );
                 break;
             }
             else
@@ -276,7 +276,11 @@ int __PushCommand( extension_t *p_ext,  bool b_unique, int i_command,
             }
         }
         if( !b_skip )
-            last->next = cmd;
+        {
+            if( !b_unique || ( last->i_command != i_command )
+                || memcmp( last->data, cmd->data, sizeof( cmd->data ) ) != 0 )
+                last->next = cmd;
+        }
     }
 
     vlc_cond_signal( &p_ext->p_sys->wait );
@@ -296,12 +300,6 @@ static void* Run( void *data )
     {
         /* Pop command in front */
         struct command_t *cmd = p_ext->p_sys->command;
-        if( cmd )
-        {
-            p_ext->p_sys->command = cmd->next;
-            cmd->next = NULL; // This prevents FreeCommands from freeing next
-        }
-
         vlc_mutex_unlock( &p_ext->p_sys->command_lock );
 
         /* Run command */
@@ -394,7 +392,12 @@ static void* Run( void *data )
             }
         }
 
-        FreeCommands( cmd );
+        if( cmd )
+        {
+            p_ext->p_sys->command = cmd->next;
+            cmd->next = NULL; // This prevents FreeCommands from freeing next
+            FreeCommands( cmd );
+        }
 
         vlc_mutex_lock( &p_ext->p_sys->command_lock );
         if( !p_ext->p_sys->b_exiting && !p_ext->p_sys->command )
