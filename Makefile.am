@@ -1151,7 +1151,7 @@ package-macosx-zip: VLC-release.app
 	     $(top_builddir)/vlc-$(VERSION)/Goodies
 	cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf \
 	   $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf
-	zip -r $(top_builddir)/vlc-$(VERSION).zip $(top_builddir)/vlc-$(VERSION)
+	zip -r -y -9 $(top_builddir)/vlc-$(VERSION).zip $(top_builddir)/vlc-$(VERSION)
 	rm -Rf $(top_builddir)/vlc-$(VERSION)
 
 package-macosx-framework-zip:
@@ -1163,7 +1163,7 @@ package-macosx-framework-zip:
 	for i in AUTHORS COPYING ChangeLog README THANKS NEWS; do \
 	  cp $(srcdir)/$$i $(top_builddir)/vlckit-$(VERSION)/Goodies; \
 	done
-	zip -r $(top_builddir)/vlckit-$(VERSION).zip $(top_builddir)/vlckit-$(VERSION)
+	zip -r -y -9 $(top_builddir)/vlckit-$(VERSION).zip $(top_builddir)/vlckit-$(VERSION)
 	rm -Rf $(top_builddir)/vlc-$(VERSION)
 
 package-macosx-plugin:
