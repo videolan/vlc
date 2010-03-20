@@ -54,13 +54,15 @@ Dialog
 local d = vlc.dialog( "My VLC Extension" ): Create a new UI dialog, with a human-readble title: "My VLC Extension"
 d:show(): Show this dialog.
 d:hide(): Hide (but not close) this dialog.
-d:close(): Close and delete this dialog.
+d:delete(): Close and delete this dialog.
 d:del_widget( widget ): Delete 'widget'. It disappears from the dialog and repositionning may occur.
+d:update(): Update the dialog immediately (don't wait for the current function to return)
 
-In the following functions, you can always add some optional parameters: col, row, col_span, row_span.
+In the following functions, you can always add some optional parameters: col, row, col_span, row_span, width, height.
 They define the position of a widget in the dialog:
 - row, col are the absolute positions on a grid of widgets. First row, col are 1.
 - row_span, col_span represent the relative size of a widget on the grid. A widget with col_span = 4 will be displayed as wide as 4 widgets of col_span = 1.
+- width and height are size hints (in pixels) but may be discarded by the GUI module
 Example: w = d:add_label( "My Label", 2, 3, 4, 5 ) will create a label at row 3, col 2, with a relative width of 4, height of 5.
 
 d:add_button( text, func, ... ): Create a button with caption "text" (string). When clicked, call function "func". func is a function reference.
