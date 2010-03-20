@@ -68,6 +68,8 @@ AbstractController::AbstractController( intf_thread_t * _p_i, QWidget *_parent )
     CONNECT( toolbarActionsMapper, mapped( int ),
              ActionsManager::getInstance( p_intf  ), doAction( int ) );
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
+
+    setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
 }
 
 /* Reemit some signals on status Change to activate some buttons */

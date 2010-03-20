@@ -86,7 +86,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     b_hideAfterCreation  = false; // --qt-start-minimized
     playlistVisible      = false;
     input_name           = "";
-    i_bg_height          = 0;
 
 
     /* Ask for Privacy */
@@ -226,7 +225,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
                  this, handleKeyPress( QKeyEvent * ) );
     }
 
-    CONNECT( this, askUpdate(), this, doComponentsUpdate() );
     CONNECT( THEDP, toolBarConfUpdated(), this, recreateToolbars() );
 
     /** END of CONNECTS**/
@@ -341,9 +339,9 @@ void MainInterface::recreateToolbars()
 
     controls = new ControlsWidget( p_intf, false, this ); /* FIXME */
     CONNECT( controls, advancedControlsToggled( bool ),
-             this, doComponentsUpdate() );
+             this, adaptGeometry() );
     CONNECT( controls, sizeChanged(),
-             this, doComponentsUpdate() );
+             this, adaptGeometry() );
 
     inputC = new InputControlsWidget( p_intf, this );
 
@@ -381,9 +379,9 @@ void MainInterface::createMainWidget( QSettings *settings )
     controls = new ControlsWidget( p_intf,
                    settings->value( "adv-controls", false ).toBool(), this );
     CONNECT( controls, advancedControlsToggled( bool ),
-             this, doComponentsUpdate() );
+             this, adaptGeometry() );
     CONNECT( controls, sizeChanged(),
-             this, doComponentsUpdate() );
+             this, adaptGeometry() );
     inputC = new InputControlsWidget( p_intf, this );
 
     mainLayout->insertWidget( 2, inputC );
@@ -478,27 +476,15 @@ inline void MainInterface::createStatusBar()
  **********************************************************************/
 
 /* This function is called:
-   - toggling of minimal View
-   - through askUpdate() by Vout thread request video and resize video (zoom)
    - Advanced buttons toggled
+   - Toolbar geom changed
  */
-void MainInterface::doComponentsUpdate()
+void MainInterface::adaptGeometry()
 {
-#if 0
-    if( isFullScreen() || isMaximized() ) return;
-
-//    msg_Warn( p_intf, "Updating the geometry" );
-    /* Here we resize to sizeHint() and not adjustsize because we want
-       the videoWidget to be exactly the correctSize */
+  resize( sizeHint() );
 
 #ifdef DEBUG_INTF
     debug();
-#endif
-    /* This is WRONG, but I believe there is a Qt bug here */
-    setMinimumSize( 0, 0 );
-    //resize( sizeHint() );
-
-    //adjustSize() ; /* This is not needed, but might help in the future */
 #endif
 }
 
@@ -621,26 +607,21 @@ void MainInterface::getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
     }
 }
 
-
-
 /* Asynchronous call from the WindowClose function */
 void MainInterface::releaseVideo( void )
 {
-    emit askReleaseVideo( );
+    emit askReleaseVideo();
 }
 
 /* Function that is CONNECTED to the previous emit */
 void MainInterface::releaseVideoSlot( void )
 {
-    videoWidget->release( );
+    videoWidget->release();
 
     restoreStackOldWidget();
 
     /* We don't want to have a blank video to popup */
     stackCentralOldWidget = bgWidget;
-
-    /* Try to resize, except when you are in Fullscreen mode */
-//    doComponentsUpdate();
 }
 
 /* Asynchronous call from WindowControl function */
@@ -779,20 +760,16 @@ void MainInterface::toggleMinimalView( bool b_switch )
         }
     }
 
-    i_bg_height = stackCentralW->height();
-
     menuBar()->setVisible( !b_switch );
     controls->setVisible( !b_switch );
     statusBar()->setVisible( !b_switch );
     inputC->setVisible( !b_switch );
 
-    doComponentsUpdate();
-
     emit minimalViewToggled( b_switch );
 }
 
 /* toggling advanced controls buttons */
-void MainInterface::toggleAdvanced()
+void MainInterface::toggleAdvancedButtons()
 {
     controls->toggleAdvanced();
 //    if( fullscreenControls ) fullscreenControls->toggleAdvanced();
@@ -823,7 +800,6 @@ void MainInterface::visual()
         visualSelector->hide();
         visualSelectorEnabled = false;
     }
-    doComponentsUpdate();
 }
 #endif
 

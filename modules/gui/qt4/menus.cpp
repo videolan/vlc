@@ -465,7 +465,7 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
 
     /* Advanced Controls */
     action = menu->addAction( qtr( "&Advanced Controls" ), mi,
-            SLOT( toggleAdvanced() ) );
+            SLOT( toggleAdvancedButtons() ) );
     action->setCheckable( true );
     if( mi->getControlsVisibilityStatus() & CONTROLS_ADVANCED )
         action->setChecked( true );

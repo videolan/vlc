@@ -69,14 +69,15 @@ class MainInterface : public QVLCMW
     friend class PlaylistWidget;
 
 public:
+    /* tors */
     MainInterface( intf_thread_t *);
     virtual ~MainInterface();
 
     /* Video requests from core */
-    WId getVideo( int *pi_x, int *pi_y,
+    WId  getVideo( int *pi_x, int *pi_y,
                   unsigned int *pi_width, unsigned int *pi_height );
-    void releaseVideo( void  );
-    int controlVideo( int i_query, va_list args );
+    void releaseVideo( void );
+    int  controlVideo( int i_query, va_list args );
 
     /* Getters */
 #ifndef HAVE_MAEMO
@@ -85,9 +86,6 @@ public:
 #endif
     int getControlsVisibilityStatus();
     bool isPlDocked() { return ( b_plDocked != false ); }
-
-    /* Sizehint() */
-//    virtual QSize sizeHint() const;
 
 protected:
     void dropEventPlay( QDropEvent *, bool);
@@ -112,10 +110,10 @@ private:
 
     /* Systray */
     void createSystray();
-    void handleSystray();
     void initSystray();
+    void handleSystray();
 
-    /* Mess about stackWidget */
+    /* Central StackWidget Management */
     void showTab( QWidget *);
     void showVideo();
     void showBg();
@@ -127,6 +125,7 @@ private:
     QSystemTrayIcon     *sysTray;
     QMenu               *systrayMenu;
 #endif
+
     QString              input_name;
     QVBoxLayout         *mainLayout;
     ControlsWidget      *controls;
@@ -163,7 +162,6 @@ private:
 
     QSize                mainBasedSize;       ///< based Wnd (normal mode only)
     QSize                mainVideoSize;       ///< Wnd with video (all modes)
-    int                  i_bg_height;         ///< Save height of bgWidget
 
 #ifdef WIN32
     HIMAGELIST himl;
@@ -179,9 +177,10 @@ public slots:
 #ifndef HAVE_MAEMO
     void toggleUpdateSystrayMenu();
 #endif
-    void toggleAdvanced();
+    void toggleAdvancedButtons();
     void toggleFullScreen();
     void toggleFSC();
+
     void popupMenu( const QPoint& );
     void changeThumbbarButtons( int );
 
@@ -194,7 +193,7 @@ private slots:
     void debug();
     void destroyPopupMenu();
     void recreateToolbars();
-    void doComponentsUpdate();
+    void adaptGeometry();
     void setName( const QString& );
     void setVLCWindowsTitle( const QString& title = "" );
 #if 0
@@ -222,7 +221,6 @@ signals:
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoSetFullScreen( bool );
-    void askUpdate();
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );
 
