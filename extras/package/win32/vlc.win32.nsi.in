@@ -496,41 +496,18 @@ SectionEnd
 Section $Name_Section02a SEC02a
   SectionIn 1 2 3
   CreateDirectory "$SMPROGRAMS\VideoLAN"
-  CreateDirectory "$SMPROGRAMS\VideoLAN\Quick Settings"
-  CreateDirectory "$SMPROGRAMS\VideoLAN\Quick Settings\Audio"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Audio\Set Audio mode to DirectX (default).lnk" \
-    "$INSTDIR\vlc.exe" "--aout aout_directx --save-config vlc://quit"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Audio\Set Audio mode to Waveout.lnk" \
-    "$INSTDIR\vlc.exe" "--aout waveout --save-config vlc://quit"
-  CreateDirectory "$SMPROGRAMS\VideoLAN\Quick Settings\Interface"
-@BUILD_SKINS_TRUE@  CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Interface\Set Main Interface to Skinnable.lnk" \
-@BUILD_SKINS_TRUE@    "$INSTDIR\vlc.exe" "-I skins --save-config vlc://quit"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Interface\Set Main Interface to Qt (default).lnk" \
-    "$INSTDIR\vlc.exe" "-I qt --save-config vlc://quit"
-  CreateDirectory "$SMPROGRAMS\VideoLAN\Quick Settings\Video"
-  ; FIXME add detection for Vista. Direct3D will be default there, for all others it's DirectX
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Video\Set Video mode to Direct3D.lnk" \
-    "$INSTDIR\vlc.exe" "--vout direct3d --overlay --directx-hw-yuv --save-config vlc://quit"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Video\Set Video mode to Direct3D (no hardware acceleration).lnk" \
-    "$INSTDIR\vlc.exe" "--vout direct3d --overlay --no-directx-hw-yuv --save-config vlc://quit"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Video\Set Video mode to DirectX.lnk" \
-    "$INSTDIR\vlc.exe" "--vout directx --overlay --directx-hw-yuv --save-config vlc://quit"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Video\Set Video mode to DirectX (no hardware acceleration).lnk" \
-    "$INSTDIR\vlc.exe" "--vout directx --no-overlay --no-directx-hw-yuv --save-config vlc://quit"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Video\Set Video mode to DirectX (no video overlay).lnk" \
-    "$INSTDIR\vlc.exe" "--vout directx --no-overlay --directx-hw-yuv --save-config vlc://quit"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Video\Set Video mode to OpenGL.lnk" \
-    "$INSTDIR\vlc.exe" "--vout opengl --overlay --save-config vlc://quit"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Quick Settings\Reset VLC media player preferences and cache files.lnk" \
+  CreateShortCut "$SMPROGRAMS\VideoLAN\Reset VLC media player preferences and cache files.lnk" \
     "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache vlc://quit"
+  CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player.lnk" \
+    "$INSTDIR\vlc.exe" ""
+  CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player skinned.lnk" \
+    "$INSTDIR\vlc.exe -Iskins" ""
   CreateShortCut "$SMPROGRAMS\VideoLAN\Documentation.lnk" \
     "$INSTDIR\Documentation.url"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Release Notes.lnk" \
     "$INSTDIR\NEWS.txt" ""
   CreateShortCut "$SMPROGRAMS\VideoLAN\${PRODUCT_GROUP} Website.lnk" \
     "$INSTDIR\${PRODUCT_GROUP} Website.url"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player.lnk" \
-    "$INSTDIR\vlc.exe" ""
 SectionEnd
 
 Section $Name_Section02b SEC02b
