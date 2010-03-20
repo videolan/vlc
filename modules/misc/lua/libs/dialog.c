@@ -721,6 +721,8 @@ static int vlclua_widget_add_value( lua_State *L )
     if( !p_widget->p_values )
     {
         p_widget->p_values = p_new_value;
+        if( p_widget->type == EXTENSION_WIDGET_DROPDOWN )
+            p_new_value->b_selected = true;
     }
     else
     {
