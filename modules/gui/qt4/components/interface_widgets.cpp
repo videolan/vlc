@@ -45,6 +45,7 @@
 #include <QPainter>
 #include <QTimer>
 #include <QSlider>
+#include <QBitmap>
 
 #ifdef Q_WS_X11
 # include <X11/Xlib.h>
@@ -272,17 +273,10 @@ void VideoWidget::release( void )
  * Background Widget. Show a simple image background. Currently,
  * it's album art if present or cone.
  **********************************************************************/
-#define ICON_SIZE 128
-#define MAX_BG_SIZE 400
-#define MIN_BG_SIZE 128
-#define MARGIN 5
 
 BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
-                 :QWidget( NULL ), p_intf( _p_i )
+                 :QWidget( NULL ), p_intf( _p_i ), b_expandPixmap( false )
 {
-    /* We should use that one to take the more size it can */
-    //setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding);
-
     /* A dark background */
     setAutoFillBackground( true );
     QPalette plt = palette();
@@ -290,58 +284,79 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
     plt.setColor( QPalette::Inactive, QPalette::Window , Qt::black );
     setPalette( plt );
 
-    /* A cone in the middle */
-    label = new QLabel;
-    label->setMargin( MARGIN );
-    label->setAlignment( Qt::AlignCenter );
-
     /* Init the cone art */
     updateArt( "" );
 
-    /* Grid, because of the visual selector */
-    QGridLayout *backgroundLayout = new QGridLayout( this );
-    backgroundLayout->setMargin( 0 );
-    backgroundLayout->addWidget( label, 0, 1 );
-    backgroundLayout->setColumnStretch( 0, 1 );
-    backgroundLayout->setColumnStretch( 2, 1 );
-
     CONNECT( THEMIM->getIM(), artChanged( QString ),
              this, updateArt( const QString& ) );
-
-    /* Start Hidden */
-    label->hide();
 }
 
 void BackgroundWidget::resizeEvent( QResizeEvent * event )
 {
-    if( event->size().height() <= MIN_BG_SIZE + MARGIN * 2 + 2 )
-        label->hide();
-    else
-        label->show();
+    updateArt( "" );
+    QWidget::resizeEvent( event );
 }
 
 void BackgroundWidget::updateArt( const QString& url )
 {
-    if( url.isEmpty() )
+    if ( !url.isEmpty() )
     {
-        /* Xmas joke */
-        if( QDate::currentDate().dayOfYear() >= 354 )
-            label->setPixmap( QPixmap( ":/logo/vlc128-christmas.png" ) );
-        else
-            label->setPixmap( QPixmap( ":/logo/vlc128.png" ) );
+        pixmapUrl = url;
     }
     else
+    {   /* Xmas joke */
+        if( QDate::currentDate().dayOfYear() >= 354 )
+            pixmapUrl = QString( ":/logo/vlc128-christmas.png" );
+        else
+            pixmapUrl = QString( ":/logo/vlc128.png" );
+    }
+}
+
+void BackgroundWidget::paintEvent( QPaintEvent *e )
+{
+    int i_maxwidth, i_maxheight;
+    QPixmap pixmap = QPixmap( pixmapUrl );
+    QPainter painter(this);
+    QBitmap pMask;
+    float f_alpha = 1.0;
+
+    i_maxwidth = std::min( maximumWidth(), width() ) - MARGIN * 2;
+    i_maxheight = std::min( maximumHeight(), height() ) - MARGIN * 2;
+
+    if ( height() > MARGIN * 2 )
     {
-        QPixmap pixmap( url );
-        if( pixmap.width() > label->maximumWidth() ||
-            pixmap.height() > label->maximumHeight() )
+        /* Scale down the pixmap if the widget is too small */
+        if( pixmap.width() > i_maxwidth || pixmap.height() > i_maxheight )
         {
-            pixmap = pixmap.scaled( label->maximumWidth(),
-                          label->maximumHeight(), Qt::KeepAspectRatio );
+            pixmap = pixmap.scaled( i_maxwidth, i_maxheight,
+                            Qt::KeepAspectRatio, Qt::SmoothTransformation );
+        }
+        else
+        if ( b_expandPixmap &&
+             pixmap.width() < width() && pixmap.height() < height() )
+        {
+            /* Scale up the pixmap to fill widget's size */
+            f_alpha = ( (float) pixmap.height() / (float) height() );
+            pixmap = pixmap.scaled(
+                    width() - MARGIN * 2,
+                    height() - MARGIN * 2,
+                    Qt::KeepAspectRatio,
+                    ( f_alpha < .2 )? /* Don't waste cpu when not visible */
+                        Qt::SmoothTransformation:
+                        Qt::FastTransformation
+                    );
+            /* Non agressive alpha compositing when sizing up */
+            pMask = QBitmap( pixmap.width(), pixmap.height() );
+            pMask.fill( QColor::fromRgbF( 1.0, 1.0, 1.0, f_alpha ) );
+            pixmap.setMask( pMask );
         }
 
-        label->setPixmap( pixmap );
+        painter.drawPixmap(
+                MARGIN + ( i_maxwidth - pixmap.width() ) /2,
+                MARGIN + ( i_maxheight - pixmap.height() ) /2,
+                pixmap);
     }
+    QWidget::paintEvent( e );
 }
 
 void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )

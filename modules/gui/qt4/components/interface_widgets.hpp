@@ -89,13 +89,16 @@ class BackgroundWidget : public QWidget
     Q_OBJECT
 public:
     BackgroundWidget( intf_thread_t * );
-
+    void setExpandstoHeight( bool b_expand ) { b_expandPixmap = b_expand; }
 private:
-    QLabel *label;
+    QString pixmapUrl;
+    bool b_expandPixmap;
     virtual void contextMenuEvent( QContextMenuEvent *event );
     intf_thread_t *p_intf;
     virtual void resizeEvent( QResizeEvent * event );
-
+protected:
+    void paintEvent( QPaintEvent *e );
+    static const int MARGIN = 5;
 public slots:
     void toggle(){ TOGGLEV( this ); }
     void updateArt( const QString& );
