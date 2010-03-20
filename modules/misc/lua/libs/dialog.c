@@ -52,6 +52,7 @@ static int vlclua_dialog_create( lua_State *L );
 static int vlclua_dialog_delete( lua_State *L );
 static int vlclua_dialog_show( lua_State *L );
 static int vlclua_dialog_hide( lua_State *L );
+static int vlclua_dialog_set_title( lua_State *L );
 static int vlclua_dialog_update( lua_State *L );
 static void lua_SetDialogUpdate( lua_State *L, int flag );
 static int lua_GetDialogUpdate( lua_State *L );
@@ -101,7 +102,8 @@ static int DeleteWidget( extension_dialog_t *p_dialog,
 static const luaL_Reg vlclua_dialog_reg[] = {
     { "show", vlclua_dialog_show },
     { "hide", vlclua_dialog_hide },
-    { "delete" vlclua_dialog_delete },
+    { "delete", vlclua_dialog_delete },
+    { "set_title", vlclua_dialog_set_title },
     { "update", vlclua_dialog_update },
 
     { "add_button", vlclua_dialog_add_button },
@@ -319,7 +321,29 @@ static int vlclua_dialog_hide( lua_State *L )
 }
 
 
-/** Flush the dialog */
+/** Set the dialog's title */
+static int vlclua_dialog_set_title( lua_State *L )
+{
+    extension_dialog_t **pp_dlg =
+            (extension_dialog_t**) luaL_checkudata( L, 1, "dialog" );
+    if( !pp_dlg || !*pp_dlg )
+        return luaL_error( L, "Can't get pointer to dialog" );
+    extension_dialog_t *p_dlg = *pp_dlg;
+
+    vlc_mutex_lock( &p_dlg->lock );
+
+    const char *psz_title = luaL_checkstring( L, 2 );
+    free( p_dlg->psz_title );
+    p_dlg->psz_title = strdup( psz_title );
+
+    vlc_mutex_unlock( &p_dlg->lock );
+
+    lua_SetDialogUpdate( L, 1 );
+
+    return 1;
+}
+
+/** Update the dialog immediately */
 static int vlclua_dialog_update( lua_State *L )
 {
     vlc_object_t *p_mgr = vlclua_get_this( L );
