@@ -119,7 +119,7 @@ vlc_install_object() {
             for linked_lib in `otool -L ${lib_dest}  | grep '(' | sed 's/\((.*)\)//'`; do
                 local name=`basename ${linked_lib}`
                 case "${linked_lib}" in
-                    */vlc_build_dir/* | */vlc_install_dir/* | *vlc* | */extras/contrib/lib/*)
+                    */vlc_build_dir/* | */vlc_install_dir/* | *vlc* | */extras/contrib/*)
                         if test -e ${linked_lib}; then
                             install_name_tool -change "$linked_lib" "${lib_install_prefix}/${name}" "${lib_dest}"
                             linked_libs="${linked_libs} ${ref_lib}"
@@ -269,8 +269,11 @@ popd > /dev/null
 echo "Building share folder..."
 pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -resolve-src-symlinks"
 mkdir -p ${target_share}
-$pbxcp ${main_build_dir}/share/lua ${target_share}
-
+if test "$use_archs" = "no"; then
+    $pbxcp ${VLC_BUILD_DIR}/share/lua ${target_share}
+else
+    $pbxcp ${main_build_dir}/share/lua ${target_share}
+fi
 
 ##########################
 # Exporting headers
