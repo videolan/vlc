@@ -110,7 +110,7 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
     VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(instance->pdata);
     if( NULL == p_plugin )
     {
-        // plugin has not been initialized yet !
+        /* plugin has not been initialized yet ! */
         return NPERR_INVALID_INSTANCE_ERROR;
     }
 
@@ -213,8 +213,7 @@ int16_t NPP_HandleEvent( NPP instance, void * event )
 
                 if( ! hasVout )
                 {
-                    /* draw the beautiful "No Picture" */
-
+                    /* draw the text from p_plugin->psz_text */
                     ForeColor(blackColor);
                     PenMode( patCopy );
 
