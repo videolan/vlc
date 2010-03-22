@@ -357,7 +357,11 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
     for( NSString * key in [options allKeys] )
     {
-        libvlc_media_add_option(p_md, [[NSString stringWithFormat:@"%@=#%@", key, [options objectForKey:key]] UTF8String]);
+        if ( [options objectForKey:key] != [NSNull null] )
+            libvlc_media_add_option(p_md, [[NSString stringWithFormat:@"%@=%@", key, [options objectForKey:key]] UTF8String]);
+        else
+            libvlc_media_add_option(p_md, [[NSString stringWithFormat:@"%@", key] UTF8String]);
+
     }
     return [VLCMedia mediaWithLibVLCMediaDescriptor:p_md];
 }
