@@ -1014,7 +1014,9 @@ static int DemuxInit( demux_t *p_demux )
         /* calculate the time duration in micro-s */
         p_sys->i_length = (mtime_t)p_sys->p_fp->i_play_duration / 10 *
                    (mtime_t)i_count /
-                   (mtime_t)p_sys->p_fp->i_data_packets_count;
+                   (mtime_t)p_sys->p_fp->i_data_packets_count - p_sys->p_fp->i_preroll * 1000;
+        if( p_sys->i_length < 0 )
+            p_sys->i_length = 0;
 
         if( p_sys->i_length > 0 )
         {
