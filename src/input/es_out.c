@@ -648,7 +648,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
 
     if( i_stream_duration <= i_buffering_duration && !b_forced )
     {
-        const double f_level = (double)i_stream_duration / i_buffering_duration;
+        const double f_level = __MAX( (double)i_stream_duration / i_buffering_duration, 0 );
         input_SendEventCache( p_sys->p_input, f_level );
 
         msg_Dbg( p_sys->p_input, "Buffering %d%%", (int)(100 * f_level) );
