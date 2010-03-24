@@ -1727,6 +1727,12 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 break;
             case( 0x40):
                 p_track->fmt.i_codec = VLC_FOURCC( 'm','p','4','a' );
+                if( p_decconfig->i_decoder_specific_info_len >= 2 &&
+                     p_decconfig->p_decoder_specific_info[0]       == 0xF8 &&
+                    (p_decconfig->p_decoder_specific_info[1]&0xE0) == 0x80 )
+                {
+                    p_track->fmt.i_codec = VLC_CODEC_ALS;
+                }
                 break;
             case( 0x60):
             case( 0x61):

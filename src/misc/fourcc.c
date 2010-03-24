@@ -875,6 +875,10 @@ static const entry_t p_list_audio[] = {
         A("mp4a"),
         A("aac "),
 
+    /* ALS audio */
+    B(VLC_CODEC_ALS, "MPEG-4 Audio Lossless (ALS)"),
+        A("als "),
+
     /* 4X Technologies */
     B(VLC_CODEC_ADPCM_4XM, "4X Technologies Audio"),
         A("4xma"),
