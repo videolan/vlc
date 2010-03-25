@@ -129,7 +129,7 @@
     NSArray *o_v_bitrates = [NSArray arrayWithObjects: @"16", @"32", @"64", @"96",
         @"128", @"192", @"256", @"384", @"512", @"768", @"1024", @"2048", @"3072", nil];
     NSArray *o_v_scales = [NSArray arrayWithObjects: @"0.25",@"0.5",@"0.75",@"1",@"1.25",@"1.5",@"1.75",@"2",nil];
-    NSArray *o_a_codecs = [NSArray arrayWithObjects: @"mpga", @"mp3 ", @"a52 ", @"vorb", @"flac", @"spx ", nil]; //@"mp4a"
+    NSArray *o_a_codecs = [NSArray arrayWithObjects: @"mpga", @"mp3 ", @"mp4a", @"a52 ", @"vorb", @"flac", @"spx ", nil];
     NSArray *o_v_codecs = [NSArray arrayWithObjects: @"mp1v", @"mp2v", @"mp4v", @"DIV1",
         @"DIV2", @"DIV3", @"h263", @"h264", @"WMV1", @"WMV2", @"MJPG", @"theo", nil];
 

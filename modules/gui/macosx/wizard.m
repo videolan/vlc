@@ -1592,8 +1592,8 @@ static VLCWizard *_o_sharedInstance = nil;
         }
  
         /* add subtitles to the video if desired */
-        [o_opts_string appendFormat: @":sout-transcode-soverlay=%@",
-                [o_userSelections objectForKey:@"soverlay"]];
+        if ([[o_userSelections objectForKey:@"soverlay"] intValue] > 0)
+            [o_opts_string appendString: @" --sout-transcode-soverlay"];
 
         [tempArray addObject: o_opts_string];
 
