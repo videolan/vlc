@@ -34,7 +34,8 @@ EXTRA_DIST = \
 	$(DIST_lua) \
 	$(DIST_osdmenu_default) \
 	$(DIST_mozilla) \
-	$(DIST_maemo)
+	$(DIST_maemo) \
+	$(DIST_solid)
 
 nobase_vlcdata_DATA =
 if BUILD_SKINS
@@ -54,6 +55,9 @@ nobase_vlcdata_DATA += $(DIST_mozilla)
 endif
 if BUILD_HILDON
 nobase_vlcdata_DATA += $(DIST_maemo) $(maemo_FILES)
+endif
+if KDE_SOLID
+soliddata_DATA = $(DIST_solid)
 endif
 
 DIST_rsrc = \
@@ -390,3 +394,8 @@ DIST_maemo = \
 
 maemo_FILES = \
 	vlc32x32.png
+
+DIST_solid = \
+	solid/vlc-opencda.desktop \
+	solid/vlc-opendvd.desktop \
+	solid/vlc-openvcd.dekstop

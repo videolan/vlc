@@ -4426,6 +4426,23 @@ AS_IF([test "${ac_cv_c_bigendian}" = "yes"], [
 AC_SUBST(DEFS_BIGENDIAN)
 
 dnl
+dnl Where to install KDE solid .desktop
+dnl
+AC_ARG_WITH(kde-solid,
+  AS_HELP_STRING([--with-kde-solid=PATH],[KDE Solid action directory (auto)]))
+AS_IF([test "${with_kde_solid}" != "no"],[
+     AS_IF([test -z "${with_kde_solid}"],[
+          AS_IF([which kde4-config],[
+               with_kde_solid="`kde4-config --install data`/solid/actions/"
+          ])
+     ])
+],[
+     with_kde_solid=''
+])
+AC_SUBST(soliddatadir,[${with_kde_solid}])
+AM_CONDITIONAL(KDE_SOLID, [test -n ${with_kde_solid}])
+
+dnl
 dnl  DLL loader copied from MPlayer copied from somewhere else (WINE ?)
 dnl
 loader=false
