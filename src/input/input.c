@@ -1770,63 +1770,10 @@ static bool Control( input_thread_t *p_input,
             break;
 
         case INPUT_CONTROL_SET_RATE:
-        case INPUT_CONTROL_SET_RATE_SLOWER:
-        case INPUT_CONTROL_SET_RATE_FASTER:
         {
-            int i_rate;
-            int i_rate_sign;
-
             /* Get rate and direction */
-            if( i_type == INPUT_CONTROL_SET_RATE )
-            {
-                i_rate = abs( val.i_int );
-                i_rate_sign = val.i_int < 0 ? -1 : 1;
-            }
-            else
-            {
-                static const int ppi_factor[][2] = {
-                    {1,64}, {1,32}, {1,16}, {1,8}, {1,4}, {1,3}, {1,2}, {2,3},
-                    {1,1},
-                    {3,2}, {2,1}, {3,1}, {4,1}, {8,1}, {16,1}, {32,1}, {64,1},
-                    {0,0}
-                };
-                int i_error;
-                int i_idx;
-                int i;
-
-                i_rate_sign = p_input->p->i_rate < 0 ? -1 : 1;
-
-                i_error = INT_MAX;
-                i_idx = -1;
-                for( i = 0; ppi_factor[i][0] != 0; i++ )
-                {
-                    const int i_test_r = INPUT_RATE_DEFAULT * ppi_factor[i][0] / ppi_factor[i][1];
-                    const int i_test_e = abs( abs( p_input->p->i_rate ) - i_test_r );
-                    if( i_test_e < i_error )
-                    {
-                        i_idx = i;
-                        i_error = i_test_e;
-                    }
-                }
-
-                assert( i_idx >= 0 && ppi_factor[i_idx][0] != 0 );
-
-                if( i_type == INPUT_CONTROL_SET_RATE_SLOWER )
-                {
-                    if( ppi_factor[i_idx+1][0] > 0 )
-                        i_rate = INPUT_RATE_DEFAULT * ppi_factor[i_idx+1][0] / ppi_factor[i_idx+1][1];
-                    else
-                        i_rate = INPUT_RATE_MAX+1;
-                }
-                else
-                {
-                    assert( i_type == INPUT_CONTROL_SET_RATE_FASTER );
-                    if( i_idx > 0 )
-                        i_rate = INPUT_RATE_DEFAULT * ppi_factor[i_idx-1][0] / ppi_factor[i_idx-1][1];
-                    else
-                        i_rate = INPUT_RATE_MIN-1;
-                }
-            }
+            int i_rate = abs( val.i_int );
+            int i_rate_sign = val.i_int < 0 ? -1 : 1;
 
             /* Check rate bound */
             if( i_rate < INPUT_RATE_MIN )

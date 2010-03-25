@@ -29,6 +29,8 @@
 #endif
 
 #include <vlc_common.h>
+#include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -566,22 +568,67 @@ static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
     input_thread_t *p_input = (input_thread_t*)p_this;
     VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
-    /* Problem with this way: the "rate" variable is updated after the
-     * input thread did the change */
+    static const int ppi_factor[][2] = {
+        {1,64}, {1,32}, {1,16}, {1,8}, {1,4}, {1,3}, {1,2}, {2,3},
+        {1,1},
+        {3,2}, {2,1}, {3,1}, {4,1}, {8,1}, {16,1}, {32,1}, {64,1},
+        {0,0}
+    };
+
+    int i;
+    int i_idx;
+    float f_rate = var_GetFloat( p_input, "rate" );
+    float f_sign = f_rate >= 0 ? +1. : -1.;
+    float f_error;
+
+    /* Determine the factor closest to the current rate */
+    f_error = 1E20;
+    i_idx = -1;
+    for( i = 0; ppi_factor[i][0] != 0; i++ )
+    {
+        const float f_test_r = (float)ppi_factor[i][0] / ppi_factor[i][1];
+        const float f_test_e = fabs( fabs( f_rate ) - f_test_r );
+        if( f_test_e < f_error )
+        {
+            i_idx = i;
+            f_error = f_test_e;
+        }
+    }
+
+    assert( i_idx >= 0 && ppi_factor[i_idx][0] != 0 );
+
+    float f_new_rate;
+    const float f_rate_min = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MAX;
+    const float f_rate_max = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MIN;
 
     if( !strcmp( psz_cmd, "rate-slower" ) )
     {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_RATE_SLOWER, NULL );
+        if( i_idx > 0 )
+            f_new_rate = (float)ppi_factor[i_idx-1][0] / ppi_factor[i_idx-1][1];
+        else
+            f_new_rate = f_rate_min;
+        f_new_rate *= f_sign;
+
+        var_SetFloat( p_input, "rate", f_new_rate );
     }
     else if( !strcmp( psz_cmd, "rate-faster" ) )
     {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_RATE_FASTER, NULL );
+        if( ppi_factor[i_idx+1][0] > 0 )
+            f_new_rate = (float)ppi_factor[i_idx+1][0] / ppi_factor[i_idx+1][1];
+        else
+            f_new_rate = f_rate_max;
+        f_new_rate *= f_sign;
+
+        var_SetFloat( p_input, "rate", f_new_rate );
     }
     else
     {
+        /* Problem with this way: the "rate" variable is updated after the
+         * input thread did the change */
         newval.i_int = INPUT_RATE_DEFAULT / newval.f_float;
         input_ControlPush( p_input, INPUT_CONTROL_SET_RATE, &newval );
     }
+
     return VLC_SUCCESS;
 }
 

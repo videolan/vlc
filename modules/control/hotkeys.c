@@ -71,6 +71,8 @@ static void PlayBookmark( intf_thread_t *, int );
 static void SetBookmark ( intf_thread_t *, int );
 static void DisplayPosition( intf_thread_t *, vout_thread_t *, input_thread_t * );
 static void DisplayVolume  ( intf_thread_t *, vout_thread_t *, audio_volume_t );
+static void DisplayRate ( input_thread_t *, float );
+static float AdjustRateFine( input_thread_t *, const int );
 static void ClearChannels  ( intf_thread_t *, vout_thread_t * );
 
 /*****************************************************************************
@@ -710,46 +712,30 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                  "%s", _("Next frame") );
             }
-            else if( i_action == ACTIONID_FASTER )
-            {
-                var_TriggerCallback( p_input, "rate-faster" );
-                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
-                                 "%s", _("Faster") );
-            }
-            else if( i_action == ACTIONID_SLOWER )
-            {
-                var_TriggerCallback( p_input, "rate-slower" );
-                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
-                                 "%s", _("Slower") );
-            }
             else if( i_action == ACTIONID_RATE_NORMAL )
             {
                 var_SetFloat( p_input, "rate", 1. );
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                  "%s", _("1.00x") );
             }
+            else if( i_action == ACTIONID_FASTER )
+            {
+                var_TriggerCallback( p_input, "rate-faster" );
+                DisplayRate( p_input, var_GetFloat( p_input, "rate" ) );
+            }
+            else if( i_action == ACTIONID_SLOWER )
+            {
+                var_TriggerCallback( p_input, "rate-slower" );
+                DisplayRate( p_input, var_GetFloat( p_input, "rate" ) );
+            }
             else if( i_action == ACTIONID_RATE_FASTER_FINE ||
                      i_action == ACTIONID_RATE_SLOWER_FINE )
             {
-                const double f_rate_min = (double)INPUT_RATE_DEFAULT / INPUT_RATE_MAX;
-                const double f_rate_max = (double)INPUT_RATE_DEFAULT / INPUT_RATE_MIN;
-                double f_rate = var_GetFloat( p_input, "rate" );
-
-                int i_sign = f_rate < 0 ? -1 : 1;
                 const int i_dir = i_action == ACTIONID_RATE_FASTER_FINE ? 1 : -1;
+                float f_newrate = AdjustRateFine( p_input, i_dir );
 
-                f_rate = floor( fabs(f_rate) / 0.1 + i_dir ) * 0.1;
-                if( f_rate < f_rate_min )
-                    f_rate = f_rate_min;
-                else if( f_rate > f_rate_max )
-                    f_rate = f_rate_max;
-                f_rate *= i_sign;
-
-                var_SetFloat( p_input, "rate", f_rate );
-
-                char psz_msg[7+1];
-                snprintf( psz_msg, sizeof(psz_msg), _("%.2fx"), f_rate );
-                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, "%s", psz_msg );
+                var_SetFloat( p_input, "rate", f_newrate );
+                DisplayRate( p_input, f_newrate );
             }
             else if( i_action == ACTIONID_POSITION )
             {
@@ -1058,6 +1044,30 @@ static void DisplayVolume( intf_thread_t *p_intf, vout_thread_t *p_vout,
         vout_OSDMessage( p_vout, VOLUME_TEXT_CHAN, _( "Volume %d%%" ),
                          i_vol*400/AOUT_VOLUME_MAX );
     }
+}
+
+static void DisplayRate( input_thread_t *p_input, float f_rate )
+{
+    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, _("Speed: %.2fx"), f_rate );
+}
+
+static float AdjustRateFine( input_thread_t *p_input, const int i_dir )
+{
+    const float f_rate_min = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MAX;
+    const float f_rate_max = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MIN;
+    float f_rate = var_GetFloat( p_input, "rate" );
+
+    int i_sign = f_rate < 0 ? -1 : 1;
+
+    f_rate = floor( fabs(f_rate) / 0.1 + i_dir ) * 0.1;
+
+    if( f_rate < f_rate_min )
+        f_rate = f_rate_min;
+    else if( f_rate > f_rate_max )
+        f_rate = f_rate_max;
+    f_rate *= i_sign;
+
+    return f_rate;
 }
 
 static void ClearChannels( intf_thread_t *p_intf, vout_thread_t *p_vout )
