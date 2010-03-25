@@ -99,7 +99,6 @@ struct decoder_sys_t
      * Tiger properties
      */
     tiger_renderer    *p_tr;
-    mtime_t            last_render_ts;
     bool               b_dirty;
 
     uint32_t           i_tiger_default_font_color;
@@ -389,7 +388,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->b_use_tiger = var_CreateGetBool( p_dec, "kate-use-tiger" );
 
     p_sys->p_tr = NULL;
-    p_sys->last_render_ts = 0;
 
     /* get initial value of configuration */
     p_sys->i_tiger_default_font_color = GetTigerColor( p_dec, "kate-tiger-default-font" );
@@ -845,16 +843,6 @@ static void TigerUpdateRegions( spu_t *p_spu, subpicture_t *p_subpic, const vide
     VLC_UNUSED( p_spu );
 
     PROFILE_START( TigerUpdateRegions );
-
-    /* do not render more than once per frame, libtiger renders all events at once */
-    if (ts <= p_sys->last_render_ts)
-    {
-        SubpictureReleaseRegions( p_subpic );
-        return;
-    }
-
-    /* remember what frame we've rendered already */
-    p_sys->last_render_ts = ts;
 
     /* time in seconds from the start of the stream */
     t = (p_subpic->p_sys->i_start + ts - p_subpic->i_start ) / 1000000.0f;
