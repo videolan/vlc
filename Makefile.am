@@ -712,7 +712,7 @@ package-win-common:
 	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(win32_destdir)/$${file}.txt" ; done;
 	for file in NEWS COPYING README; \
 	  do cp "$(srcdir)/$$file" "$(win32_destdir)/$${file}.txt"; done
-	unix2dos "$(win32_destdir)/"*.txt || echo "WARNING: this shouldn't happen"
+	$(U2D) "$(win32_destdir)/"*.txt || echo "WARNING: this shouldn't happen"
 
 # Necessary icons
 	cp $(srcdir)/share/vlc.ico $(win32_destdir)/
@@ -739,7 +739,7 @@ if BUILD_ACTIVEX
 	mkdir -p "$(win32_destdir)/activex"
 	cp $(srcdir)/projects/activex/README.TXT  $(win32_destdir)/activex/
 	cp $(srcdir)/projects/activex/test.html  $(win32_destdir)/activex/
-	unix2dos $(win32_destdir)/activex/*
+	$(U2D) $(win32_destdir)/activex/*
 	cp $(top_builddir)/projects/activex/.libs/axvlc$(LIBEXT) $(win32_destdir)/activex/
 	cp $(top_srcdir)/projects/activex/axvlc.dll.manifest $(win32_destdir)/activex/
 endif
@@ -803,25 +803,25 @@ if BUILD_LUA
 	mkdir -p "$(win32_lua_destdir)/http/js"
 	mkdir -p "$(win32_lua_destdir)/http/dialogs"
 	cp $(srcdir)/share/lua/http/*.html $(win32_lua_destdir)/http/
-	unix2dos $(win32_lua_destdir)/http/*.html
+	$(U2D) $(win32_lua_destdir)/http/*.html
 	cp $(srcdir)/share/lua/http/.hosts $(win32_lua_destdir)/http/
-	unix2dos $(win32_lua_destdir)/http/.hosts
+	$(U2D) $(win32_lua_destdir)/http/.hosts
 	cp $(srcdir)/share/lua/http/*.css $(win32_lua_destdir)/http/
-	unix2dos $(win32_lua_destdir)/http/*.css
+	$(U2D) $(win32_lua_destdir)/http/*.css
 	cp $(srcdir)/share/lua/http/js/*.js $(win32_lua_destdir)/http/js/
-	unix2dos $(win32_lua_destdir)/http/js/*.js
+	$(U2D) $(win32_lua_destdir)/http/js/*.js
 	cp $(srcdir)/share/lua/http/*.lua $(win32_lua_destdir)/http/
-	unix2dos $(win32_lua_destdir)/http/*.lua
+	$(U2D) $(win32_lua_destdir)/http/*.lua
 	cp $(srcdir)/share/lua/http/dialogs/* $(win32_lua_destdir)/http/dialogs/
-	unix2dos $(win32_lua_destdir)/http/dialogs/*
+	$(U2D) $(win32_lua_destdir)/http/dialogs/*
 	cp $(srcdir)/share/lua/http/dialogs/.hosts $(win32_lua_destdir)/http/dialogs/
-	unix2dos $(win32_lua_destdir)/http/dialogs/.hosts
+	$(U2D) $(win32_lua_destdir)/http/dialogs/.hosts
 	cp $(srcdir)/share/lua/http/*.ico $(win32_lua_destdir)/http/
 	cp $(srcdir)/share/lua/http/images/*.png $(win32_lua_destdir)/http/images/
 	cp $(srcdir)/share/lua/http/requests/*.xml $(win32_lua_destdir)/http/requests/
-	unix2dos $(win32_lua_destdir)/http/requests/*.xml
+	$(U2D) $(win32_lua_destdir)/http/requests/*.xml
 	cp $(srcdir)/share/lua/http/requests/readme $(win32_lua_destdir)/http/requests/readme.txt
-	unix2dos $(win32_lua_destdir)/http/requests/readme.txt
+	$(U2D) $(win32_lua_destdir)/http/requests/readme.txt
 
 #Lua Scripts
 	$(INSTALL) -d $(win32_lua_destdir)
@@ -865,14 +865,14 @@ if BUILD_LUA
 	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/sd/`basename $${i}` ; \
 	done
 
-	unix2dos $(win32_lua_destdir)/README.txt
-	unix2dos $(win32_lua_destdir)/extensions/README.txt
-	unix2dos $(win32_lua_destdir)/intf/README.txt
-	unix2dos $(win32_lua_destdir)/meta/art/README.txt
-	unix2dos $(win32_lua_destdir)/meta/fetcher/README.txt
-	unix2dos $(win32_lua_destdir)/meta/reader/README.txt
-	unix2dos $(win32_lua_destdir)/playlist/README.txt
-	unix2dos $(win32_lua_destdir)/sd/README.txt
+	$(U2D) $(win32_lua_destdir)/README.txt
+	$(U2D) $(win32_lua_destdir)/extensions/README.txt
+	$(U2D) $(win32_lua_destdir)/intf/README.txt
+	$(U2D) $(win32_lua_destdir)/meta/art/README.txt
+	$(U2D) $(win32_lua_destdir)/meta/fetcher/README.txt
+	$(U2D) $(win32_lua_destdir)/meta/reader/README.txt
+	$(U2D) $(win32_lua_destdir)/playlist/README.txt
+	$(U2D) $(win32_lua_destdir)/sd/README.txt
 endif
 
 # Copy the http files
@@ -882,23 +882,23 @@ if BUILD_HTTPD
 	mkdir -p "$(win32_http_destdir)/js"
 	mkdir -p "$(win32_http_destdir)/dialogs"
 	cp $(srcdir)/share/http/*.html $(win32_http_destdir)/
-	unix2dos $(win32_http_destdir)/*.html
+	$(U2D) $(win32_http_destdir)/*.html
 	cp $(srcdir)/share/http/.hosts $(win32_http_destdir)/
-	unix2dos $(win32_http_destdir)/.hosts
+	$(U2D) $(win32_http_destdir)/.hosts
 	cp $(srcdir)/share/http/*.css $(win32_http_destdir)/
-	unix2dos $(win32_http_destdir)/*.css
+	$(U2D) $(win32_http_destdir)/*.css
 	cp $(srcdir)/share/http/js/*.js $(win32_http_destdir)/js/
-	unix2dos $(win32_http_destdir)/js/*.js
+	$(U2D) $(win32_http_destdir)/js/*.js
 	cp $(srcdir)/share/http/dialogs/* $(win32_http_destdir)/dialogs/
-	unix2dos $(win32_http_destdir)/dialogs/*
+	$(U2D) $(win32_http_destdir)/dialogs/*
 	cp $(srcdir)/share/http/dialogs/.hosts $(win32_http_destdir)/dialogs/
-	unix2dos $(win32_http_destdir)/dialogs/.hosts
+	$(U2D) $(win32_http_destdir)/dialogs/.hosts
 	cp $(srcdir)/share/http/*.ico $(win32_http_destdir)/
 	cp $(srcdir)/share/http/images/*.png $(win32_http_destdir)/images/
 	cp $(srcdir)/share/http/requests/*.xml $(win32_http_destdir)/requests/
-	unix2dos $(win32_http_destdir)/requests/*.xml
+	$(U2D) $(win32_http_destdir)/requests/*.xml
 	cp $(srcdir)/share/http/requests/readme $(win32_http_destdir)/requests/readme.txt
-	unix2dos $(win32_http_destdir)/requests/readme.txt
+	$(U2D) $(win32_http_destdir)/requests/readme.txt
 
 endif
 
@@ -925,7 +925,7 @@ if BUILD_OSDMENU
 			 cp -- "$$file" "$(win32_destdir)/osdmenu/$$dir"; \
 		done; \
 	done
-	unix2dos $(win32_destdir)/osdmenu/*.cfg;
+	$(U2D) $(win32_destdir)/osdmenu/*.cfg;
 	for file in $(win32_destdir)/osdmenu/*.cfg; do \
 		sed 's%share/osdmenu%osdmenu%g' "$$file" > "$$file.tmp" || exit $$? ; \
 		sed 's%/%\\%g' "$$file.tmp" > "$$file" || exit$$? ; \

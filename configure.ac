@@ -343,6 +343,7 @@ case "${host_os}" in
         then
           AC_CHECK_TOOL(PEFLAGS, peflags, :)
         fi
+        AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
