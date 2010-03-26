@@ -43,6 +43,8 @@ static int StateCallback   ( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
 static int RateCallback    ( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
+static int RateOffsetCallback( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void * );
 static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
 static int TimeCallback    ( vlc_object_t *p_this, char const *psz_cmd,
@@ -88,8 +90,8 @@ static const vlc_input_callback_t p_input_callbacks[] =
 {
     CALLBACK( "state", StateCallback ),
     CALLBACK( "rate", RateCallback ),
-    CALLBACK( "rate-slower", RateCallback ),
-    CALLBACK( "rate-faster", RateCallback ),
+    CALLBACK( "rate-slower", RateOffsetCallback ),
+    CALLBACK( "rate-faster", RateOffsetCallback ),
     CALLBACK( "position", PositionCallback ),
     CALLBACK( "position-offset", PositionCallback ),
     CALLBACK( "time", TimeCallback ),
@@ -566,69 +568,56 @@ static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data); VLC_UNUSED(psz_cmd);
 
-    static const int ppi_factor[][2] = {
-        {1,64}, {1,32}, {1,16}, {1,8}, {1,4}, {1,3}, {1,2}, {2,3},
-        {1,1},
-        {3,2}, {2,1}, {3,1}, {4,1}, {8,1}, {16,1}, {32,1}, {64,1},
-        {0,0}
+    newval.i_int = INPUT_RATE_DEFAULT / newval.f_float;
+    input_ControlPush( p_input, INPUT_CONTROL_SET_RATE, &newval );
+
+    return VLC_SUCCESS;
+}
+
+static int RateOffsetCallback( vlc_object_t *p_this, char const *psz_cmd,
+                               vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t*)p_this;
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data); VLC_UNUSED(newval);
+
+    static const float pf_rate[] = {
+        1.0/64, 1.0/32, 1.0/16, 1.0/8, 1.0/4, 1.0/3, 1.0/2, 2.0/3,
+        1.0/1,
+        3.0/2, 2.0/1, 3.0/1, 4.0/1, 8.0/1, 16.0/1, 32.0/1, 64.0/1,
     };
+    const unsigned i_rate_count = sizeof(pf_rate)/sizeof(*pf_rate);
 
-    int i;
-    int i_idx;
-    float f_rate = var_GetFloat( p_input, "rate" );
-    float f_sign = f_rate >= 0 ? +1. : -1.;
-    float f_error;
+    const float f_rate = var_GetFloat( p_input, "rate" );
 
     /* Determine the factor closest to the current rate */
-    f_error = 1E20;
-    i_idx = -1;
-    for( i = 0; ppi_factor[i][0] != 0; i++ )
+    float f_error;
+    int i_idx;
+    for( unsigned i = 0; i < i_rate_count; i++ )
     {
-        const float f_test_r = (float)ppi_factor[i][0] / ppi_factor[i][1];
-        const float f_test_e = fabs( fabs( f_rate ) - f_test_r );
-        if( f_test_e < f_error )
+        const float f_test_e = fabs( fabs( f_rate ) - pf_rate[i] );
+        if( i == 0 || f_test_e < f_error )
         {
             i_idx = i;
             f_error = f_test_e;
         }
     }
+    assert( i_idx < (int)i_rate_count );
 
-    assert( i_idx >= 0 && ppi_factor[i_idx][0] != 0 );
-
-    float f_new_rate;
-    const float f_rate_min = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MAX;
-    const float f_rate_max = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MIN;
-
-    if( !strcmp( psz_cmd, "rate-slower" ) )
+    /* */
+    i_idx += strcmp( psz_cmd, "rate-faster" ) == 0 ? 1 : -1;
+    if( i_idx >= 0 && i_idx < (int)i_rate_count )
     {
-        if( i_idx > 0 )
-            f_new_rate = (float)ppi_factor[i_idx-1][0] / ppi_factor[i_idx-1][1];
-        else
-            f_new_rate = f_rate_min;
-        f_new_rate *= f_sign;
+        const float f_rate_min = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MAX;
+        const float f_rate_max = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MIN;
+        const float f_sign = f_rate >= 0 ? +1. : -1.;
 
-        var_SetFloat( p_input, "rate", f_new_rate );
+        var_SetFloat( p_input, "rate",
+                      f_sign * __MAX( __MIN( pf_rate[i_idx],
+                                             f_rate_max ),
+                                      f_rate_min ) );
     }
-    else if( !strcmp( psz_cmd, "rate-faster" ) )
-    {
-        if( ppi_factor[i_idx+1][0] > 0 )
-            f_new_rate = (float)ppi_factor[i_idx+1][0] / ppi_factor[i_idx+1][1];
-        else
-            f_new_rate = f_rate_max;
-        f_new_rate *= f_sign;
-
-        var_SetFloat( p_input, "rate", f_new_rate );
-    }
-    else
-    {
-        /* Problem with this way: the "rate" variable is updated after the
-         * input thread did the change */
-        newval.i_int = INPUT_RATE_DEFAULT / newval.f_float;
-        input_ControlPush( p_input, INPUT_CONTROL_SET_RATE, &newval );
-    }
-
     return VLC_SUCCESS;
 }
 
