@@ -95,7 +95,7 @@ static void *Thread (void *data)
     stream_t *stream = data;
     stream_sys_t *p_sys = stream->p_sys;
 #ifdef HAVE_VMSPLICE
-    ssize_t page_mask = sysconf (_SC_PAGE_SIZE) - 1;
+    const ssize_t page_mask = sysconf (_SC_PAGE_SIZE) - 1;
 #endif
     int fd = p_sys->write_fd;
     bool error = false;
@@ -107,6 +107,8 @@ static void *Thread (void *data)
 #ifdef HAVE_VMSPLICE
         unsigned char *buf = mmap (NULL, bufsize, PROT_READ|PROT_WRITE,
                                    MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+        if (unlikely(buf == MAP_FAILED))
+            break;
         vlc_cleanup_push (cleanup_mmap, buf);
 #else
         unsigned char buf[bufsize];
