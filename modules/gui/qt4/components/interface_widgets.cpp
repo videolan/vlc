@@ -503,6 +503,8 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
     speedControlLayout->addWidget( speedSlider );
     speedControlLayout->addWidget( normalSpeedButton );
 
+    lastValue = 0;
+
     activateOnState();
 }
 
@@ -530,12 +532,16 @@ void SpeedControlWidget::updateControls( float rate )
     {
         sliderValue = speedSlider->maximum();
     }
+    lastValue = sliderValue;
 
     speedSlider->setValue( sliderValue );
 }
 
 void SpeedControlWidget::updateRate( int sliderValue )
 {
+    if( sliderValue == lastValue )
+        return;
+
     double speed = pow( 2, (double)sliderValue / 17 );
     int rate = INPUT_RATE_DEFAULT / speed;
 

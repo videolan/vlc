@@ -189,6 +189,7 @@ public:
 private:
     intf_thread_t *p_intf;
     QSlider *speedSlider;
+    int lastValue;
 
 public slots:
     void activateOnState();
