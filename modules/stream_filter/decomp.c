@@ -148,6 +148,9 @@ static void *Thread (void *data)
     while (!error);
 
     msg_Dbg (stream, "compressed stream at EOF");
+    /* Let child process know about EOF */
+    p_sys->write_fd = -1;
+    close (fd);
     return NULL;
 }
 
@@ -364,7 +367,9 @@ static void Close (vlc_object_t *obj)
     vlc_cancel (p_sys->thread);
     close (p_sys->read_fd);
     vlc_join (p_sys->thread, NULL);
-    close (p_sys->write_fd);
+    if (p_sys->write_fd != -1)
+        /* Killed before EOF? */
+        close (p_sys->write_fd);
 
     msg_Dbg (obj, "waiting for PID %u", (unsigned)p_sys->pid);
     while (waitpid (p_sys->pid, &status, 0) == -1);
