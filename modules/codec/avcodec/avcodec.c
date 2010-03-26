@@ -87,7 +87,7 @@ static const char *const enc_hq_list_text[] = {
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define MODULE_DESCRIPTION N_( "Various audio and video decoders/encoders" \
+#define MODULE_DESCRIPTION N_( "Various audio and video decoders/encoders " \
         "delivered by the FFmpeg library. This includes (MS)MPEG4, DivX, SV1,"\
         "H261, H263, H264, WMV, WMA, AAC, AMR, DV, MJPEG and other codecs")
 
