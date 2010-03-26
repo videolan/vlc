@@ -191,16 +191,12 @@ static int Init(vout_thread_t *vout)
     vout->fmt_out.i_x_offset       = 0;
     vout->fmt_out.i_y_offset       = 0;
 
-    /* TODO */
-#if 0
-    if (p_vout->fmt_render.i_visible_width  != source.i_visible_width ||
-        p_vout->fmt_render.i_visible_height != source.i_visible_height ||
-        p_vout->fmt_render.i_x_offset != source.i_x_offset ||
-        p_vout->fmt_render.i_y_offset != source.i_y_offset )
-    {
-        p_vout->i_changes |= VOUT_CROP_CHANGE;
-    }
-#endif
+    if (vout->fmt_in.i_visible_width  != source.i_visible_width ||
+        vout->fmt_in.i_visible_height != source.i_visible_height ||
+        vout->fmt_in.i_x_offset       != source.i_x_offset ||
+        vout->fmt_in.i_y_offset       != source.i_y_offset )
+        vout->i_changes |= VOUT_CROP_CHANGE;
+
     if (vout->b_on_top)
         vout_SetWindowState(vd, VOUT_WINDOW_STATE_ABOVE);
 
