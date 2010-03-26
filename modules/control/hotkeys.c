@@ -1059,7 +1059,7 @@ static float AdjustRateFine( input_thread_t *p_input, const int i_dir )
 
     int i_sign = f_rate < 0 ? -1 : 1;
 
-    f_rate = floor( fabs(f_rate) / 0.1 + i_dir ) * 0.1;
+    f_rate = floor( fabs(f_rate) / 0.1 + i_dir + 0.05 ) * 0.1;
 
     if( f_rate < f_rate_min )
         f_rate = f_rate_min;
