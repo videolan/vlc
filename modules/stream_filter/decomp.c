@@ -111,7 +111,10 @@ static void *Thread (void *data)
             break;
         vlc_cleanup_push (cleanup_mmap, buf);
 #else
-        unsigned char buf[bufsize];
+        unsigned char *buf = malloc (bufsize);
+        if (unlikely(buf == NULL))
+            break;
+        vlc_cleanup_push (free, buf);
 #endif
 
         len = stream_Read (stream->p_source, buf, bufsize);
@@ -140,9 +143,7 @@ static void *Thread (void *data)
                 break;
             }
         }
-#ifdef HAVE_VMSPLICE
-        vlc_cleanup_run (); /* munmap (buf, bufsize) */
-#endif
+        vlc_cleanup_run (); /* free (buf) */
     }
     while (!error);
 
