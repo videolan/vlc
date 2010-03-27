@@ -47,6 +47,7 @@ extern char *FromLocale (const char *);
 #include <time.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <dlfcn.h>
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
@@ -172,5 +173,14 @@ int main( int i_argc, const char *ppsz_argv[] )
     for (int i = 1; i < argc; i++)
         LocaleFree (argv[i]);
 
+#ifdef RTLD_NOLOAD
+    /* Avoid crash in KIO scheduler cleanup. */
+    /* This is ugly, but we get way too many crash reports due to this. */
+    if (dlopen ("libkfilemodule.so", RTLD_LAZY|RTLD_LOCAL|RTLD_NOLOAD) != NULL)
+    {
+        fprintf (stderr, "KFile plugin present. Unclean shutdown!\n");
+        _exit (0);
+    }
+#endif
     return 0;
 }
