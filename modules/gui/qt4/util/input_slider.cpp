@@ -173,7 +173,7 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
     const QPixmap temp( ":/toolbar/volslide-inside" );
     const QBitmap mask( temp.createHeuristicMask() );
 
-    setMinimumSize( pixOutside.size() );
+    setFixedSize( pixOutside.size() );
 
     pixGradient = QPixmap( mask.size() );
     pixGradient2 = QPixmap( mask.size() );

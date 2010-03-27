@@ -98,11 +98,6 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
         volumeSlider->setMaximum( var_InheritBool( p_intf, "qt-volume-complete" )
                                   ? 400 : 200 );
     }
-    if( volumeSlider->orientation() ==  Qt::Horizontal )
-    {
-        volumeSlider->setMaximumSize( QSize( 200, 40 ) );
-        volumeSlider->setMinimumSize( QSize( 85, 30 ) );
-    }
 
     volumeSlider->setFocusPolicy( Qt::NoFocus );
     if( b_special )
