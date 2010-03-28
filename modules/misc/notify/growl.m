@@ -134,13 +134,13 @@ static void Close( vlc_object_t *p_this )
 {
     intf_sys_t *p_sys = ((intf_thread_t*)p_this)->p_sys;
 
+    var_DelCallback( pl_Get( p_this ), "item-current", ItemChange, p_this );
+
     CFRelease( p_sys->default_icon );
     CFRelease( p_sys->app_name );
     CFRelease( p_sys->notification_type );
     [p_sys->p_pool release];
     free( p_sys );
-
-    var_DelCallback( pl_Get( p_this ), "item-current", ItemChange, p_this );
 }
 
 /*****************************************************************************
