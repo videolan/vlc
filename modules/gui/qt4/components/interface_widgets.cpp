@@ -417,7 +417,7 @@ void VisualSelector::next()
 SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, QWidget *parent )
            : QLabel( parent ), p_intf( _p_intf )
 {
-    setToolTip( qtr( "Current playback speed.\nClick to adjust" ) );
+    tooltipStringPattern = qtr( "Current playback speed: %1\nClick to adjust" );
 
     /* Create the Speed Control Widget */
     speedControl = new SpeedControlWidget( p_intf, this );
@@ -457,7 +457,7 @@ void SpeedLabel::setRate( float rate )
     str.setNum( rate, 'f', 2 );
     str.append( "x" );
     setText( str );
-    setToolTip( str );
+    setToolTip( tooltipStringPattern.arg( str ) );
     speedControl->updateControls( rate );
 }
 

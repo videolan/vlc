@@ -175,6 +175,7 @@ private slots:
 private:
     intf_thread_t *p_intf;
     QMenu *speedControlMenu;
+    QString tooltipStringPattern;
     SpeedControlWidget *speedControl;
 };
 
