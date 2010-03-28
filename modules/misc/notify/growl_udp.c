@@ -1,7 +1,7 @@
 /*****************************************************************************
  * growl_udp.c : growl UDP notification plugin
  *****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006 - 2010 the VideoLAN team
  * $Id$
  *
  * Authors: Jérôme Decoodt <djc -at- videolan -dot- org>
@@ -87,10 +87,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
-
-    var_AddCallback( pl_Get( p_intf ), "item-current", ItemChange, p_intf );
-
+    var_AddCallback( pl_Get( p_this ), "item-current", ItemChange, p_this );
     RegisterToGrowl( p_this );
     return VLC_SUCCESS;
 }
@@ -206,11 +203,13 @@ static int RegisterToGrowl( vlc_object_t *p_this )
     }
     psz_encoded[4] = j;
     for( j = 0 ; psz_notifications[j] != NULL ; j++)
+    {
         if(pb_defaults[j] == true)
         {
             psz_encoded[i++] = (uint8_t)j;
             i_defaults++;
         }
+    }
     psz_encoded[5] = i_defaults;
 
     CheckAndSend(p_this, psz_encoded, i);
@@ -255,10 +254,9 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset )
 {
     int i, i_handle;
     struct md5_s md5;
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    char *psz_password = var_InheritString( p_intf, "growl-password" );
-    char *psz_server = var_InheritString( p_intf, "growl-server" );
-    int i_port = var_InheritInteger( p_intf, "growl-port" );
+    char *psz_password = var_InheritString( p_this, "growl-password" );
+    char *psz_server = var_InheritString( p_this, "growl-server" );
+    int i_port = var_InheritInteger( p_this, "growl-port" );
     strcpy( (char*)(p_data+i_offset), psz_password );
     i = i_offset + strlen(psz_password);
 
@@ -285,8 +283,7 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset )
     }
 
     shutdown( i_handle, SHUT_RD );
-    if( send( i_handle, p_data, i_offset, 0 )
-          == -1 )
+    if( send( i_handle, p_data, i_offset, 0 ) == -1 )
     {
         msg_Warn( p_this, "send error: %m" );
     }
