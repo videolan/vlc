@@ -468,13 +468,13 @@ bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
          *
          * This situation occurs if a packet got lost, or if the network has
          * re-ordered packets. Unfortunately, the MSL is 2 minutes, orders of
-         * magnitude too long for multimedia. We need a tradeoff.
+         * magnitude too long for multimedia. We need a trade-off.
          * If we underestimated IPDV, we may have to discard valid but late
          * packets. If we overestimate it, we will either cause too much
          * delay, or worse, underflow our downstream buffers, as we wait for
          * definitely a lost packets.
          *
-         * The rest of the "de-jitter buffer" work is done by the interval
+         * The rest of the "de-jitter buffer" work is done by the internal
          * LibVLC E/S-out clock synchronization. Here, we need to bother about
          * re-ordering packets, as decoders can't cope with mis-ordered data.
          */
