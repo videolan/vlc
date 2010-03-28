@@ -219,7 +219,6 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
 {
     PUSH_INPUTVAR( "video-es" );
     PUSH_INPUTVAR( "spu-es" );
-#warning This is wrong:
     PUSH_VAR( "fullscreen" );
     PUSH_VAR( "video-on-top" );
     PUSH_VAR( "video-wallpaper" );
@@ -1464,8 +1463,11 @@ void QVLCMenu::DoAction( QObject *data )
     vlc_object_t *p_object = itemData->p_obj;
     if( p_object == NULL ) return;
 
-    if( !strcmp( itemData->psz_var, "fullscreen" ) )
-        var_Set( pl_Get( p_object ), "fullscreen", itemData->val );
+    /* Preserve settings across vouts via the playlist object: */
+    if( !strcmp( itemData->psz_var, "fullscreen" )
+     || !strcmp( itemData->psz_var, "video-on-top" ) )
+        var_Set( pl_Get( p_object ), itemData->psz_var, itemData->val );
+
     var_Set( p_object, itemData->psz_var, itemData->val );
 }
 
