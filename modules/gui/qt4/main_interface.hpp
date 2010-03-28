@@ -114,13 +114,10 @@ private:
     void handleSystray();
 
     /* Central StackWidget Management */
-    enum StackTab
-    {
-        PLAYLIST_TAB,
-        VIDEO_TAB,
-        CURRENT_TAB
-    };
-    void showTab( StackTab = CURRENT_TAB );
+    void showTab( QWidget *);
+    void showVideo();
+    void showBg();
+    void restoreStackOldWidget();
 
     /* */
     QSettings           *settings;
@@ -141,13 +138,14 @@ private:
     VideoWidget         *videoWidget;
     BackgroundWidget    *bgWidget;
     PlaylistWidget      *playlistWidget;
-    QWidget             *videoRoleWidget;
     //VisualSelector      *visualSelector;
-    QWidget             *minWidthHolder;
 
     /* Status Bar */
     QLabel              *nameLabel;
     QLabel              *cryptedLabel;
+
+    /* Status and flags */
+    QWidget             *stackCentralOldWidget;
 
     /* Flags */
     bool                 b_notificationEnabled; /// Systray Notifications
@@ -226,16 +224,6 @@ signals:
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );
 
-};
-
-class QVLCStackedWidget : public QStackedWidget
-{
-  public:
-      QVLCStackedWidget( QWidget *parent ) : QStackedWidget( parent ) { }
-      virtual QSize minimumSizeHint () const
-      {
-          return currentWidget() ? currentWidget()->minimumSizeHint() : QSize();
-      }
 };
 
 #endif

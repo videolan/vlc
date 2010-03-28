@@ -75,7 +75,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     bgWidget             = NULL;
     videoWidget          = NULL;
     playlistWidget       = NULL;
-    videoRoleWidget      = NULL;
 #ifndef HAVE_MAEMO
     sysTray              = NULL;
 #endif
@@ -150,11 +149,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     QVLCMenu::createMenuBar( this, p_intf );
     CONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ),
              this, destroyPopupMenu() );
-
-    minWidthHolder = new QWidget;
-    minWidthHolder->setMinimumWidth(
-        __MAX( menuBar()->sizeHint().width() + 30, 400 ) );
-    mainLayout->addWidget( minWidthHolder );
 
     /*********************************
      * Create the Systray Management *
@@ -250,13 +244,13 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* resize to previously saved main window size if appicable */
     //FIXME remove.
-    /*if( b_keep_size )
+    if( b_keep_size )
     {
        if( i_visualmode )
            resize( mainVideoSize );
        else
            resize( mainBasedSize );
-    }*/
+    }
 
     /* Playlist */
     int i_plVis = settings->value( "playlist-visible", 0 ).toInt();
@@ -268,17 +262,19 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Final sizing and showing */
     setVisible( !b_hideAfterCreation );
 
+    setMinimumWidth( __MAX( controls->sizeHint().width(),
+                            menuBar()->sizeHint().width() ) + 30 );
+
     /* Switch to minimal view if needed, must be called after the show() */
     if( i_visualmode )
         toggleMinimalView( true );
-    else
-        showTab();
 }
 
 MainInterface::~MainInterface()
 {
     /* Unsure we hide the videoWidget before destroying it */
-    //showTab( PLAYLIST_TAB );
+    if( stackCentralOldWidget == playlistWidget )
+        showBg();
 
     /* Save playlist state */
     if( playlistWidget )
@@ -365,12 +361,11 @@ void MainInterface::createMainWidget( QSettings *settings )
     mainLayout->setSpacing( 0 ); mainLayout->setMargin( 0 );
 
     /* */
-    stackCentralW = new QVLCStackedWidget( main );
+    stackCentralW = new QStackedWidget( main );
 
     /* Bg Cone */
     bgWidget = new BackgroundWidget( p_intf );
     stackCentralW->addWidget( bgWidget );
-    videoRoleWidget = bgWidget;
 
     /* And video Outputs */
     if( b_videoEmbedded )
@@ -383,7 +378,6 @@ void MainInterface::createMainWidget( QSettings *settings )
     /* Create the CONTROLS Widget */
     controls = new ControlsWidget( p_intf,
                    settings->value( "adv-controls", false ).toBool(), this );
-
     CONNECT( controls, advancedControlsToggled( bool ),
              this, adaptGeometry() );
     CONNECT( controls, sizeChanged(),
@@ -487,7 +481,7 @@ inline void MainInterface::createStatusBar()
  */
 void MainInterface::adaptGeometry()
 {
-  //resize( sizeHint() );
+  resize( sizeHint() );
 
 #ifdef DEBUG_INTF
     debug();
@@ -507,40 +501,36 @@ void MainInterface::debug()
 #endif
 }
 
-inline void MainInterface::showTab( StackTab tab )
+inline void MainInterface::showVideo() { showTab( videoWidget ); }
+inline void MainInterface::showBg() { showTab( bgWidget ); }
+
+inline void MainInterface::showTab( QWidget *widget )
 {
-    if( tab == PLAYLIST_TAB && !b_plDocked ) return;
-
-    QWidget *widget;
-    switch ( tab )
-    {
-        case PLAYLIST_TAB: widget = playlistWidget; break;
-        case VIDEO_TAB: widget = videoRoleWidget; break;
-        case CURRENT_TAB: widget = stackCentralW->currentWidget(); break;
-    }
-
+#ifdef DEBUG_INTF
+    msg_Warn( p_intf, "Old stackCentralOldWidget %i", stackCentralW->indexOf( stackCentralOldWidget ) );
+#endif
+    stackCentralOldWidget = stackCentralW->currentWidget();
     stackCentralW->setCurrentWidget( widget );
 
-    // Go into compact mode if needed (stackCentralW hidden)
-    if( widget == bgWidget && !b_keep_size && controls->isVisible() && !isFullScreen() )
-    {
-        resize( 0, 0 );
-    }
+#ifdef DEBUG_INTF
+    msg_Warn( p_intf, "State change %i",  stackCentralW->currentIndex() );
+    msg_Warn( p_intf, "New stackCentralOldWidget %i", stackCentralW->indexOf( stackCentralOldWidget ) );
+#endif
+}
 
-    /* TODO Alternatively, for compact mode the best thing would be to setSizeConstraint
-       on layout, but sadly, we can only constrain the whole size, while we should
-       constrain height only */
-    /*if( widget == bgWidget && !b_keep_size && controls->isVisible() && !isFullScreen() )
-    {
-        stackCentralW->hide();
-        layout()->setSizeConstraint( QLayout::SetFixedSize );
-    }
-    else
-    {
-        layout()->setSizeConstraint( QLayout::SetDefaultConstraint );
-        setMaximumSize( QWIDGETSIZE_MAX, QWIDGETSIZE_MAX );
-        stackCentralW->show();
-    }*/
+inline void MainInterface::restoreStackOldWidget()
+{
+#ifdef DEBUG_INTF
+    msg_Warn( p_intf, "New stackCentralOldWidget %i", stackCentralW->indexOf( stackCentralOldWidget ) );
+#endif
+    QWidget *wTemp = stackCentralW->currentWidget();
+
+    stackCentralW->setCurrentWidget( stackCentralOldWidget );
+
+    stackCentralOldWidget = wTemp;
+#ifdef DEBUG_INTF
+    msg_Warn( p_intf, "Debug %i %i",stackCentralW->indexOf( wTemp ), stackCentralW->indexOf( stackCentralW->currentWidget() ) );
+#endif
 }
 
 void MainInterface::destroyPopupMenu()
@@ -612,9 +602,8 @@ void MainInterface::getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
         /* ask videoWidget to show */
         videoWidget->SetSizing( *pi_width, *pi_height );
 
-        videoRoleWidget = videoWidget;
         /* Consider the video active now */
-        showTab( VIDEO_TAB );
+        showVideo();
     }
 }
 
@@ -627,11 +616,12 @@ void MainInterface::releaseVideo( void )
 /* Function that is CONNECTED to the previous emit */
 void MainInterface::releaseVideoSlot( void )
 {
-    videoRoleWidget = bgWidget;
-
-    showTab( b_plDocked && playlistVisible ? PLAYLIST_TAB : VIDEO_TAB );
-
     videoWidget->release();
+
+    restoreStackOldWidget();
+
+    /* We don't want to have a blank video to popup */
+    stackCentralOldWidget = bgWidget;
 }
 
 /* Asynchronous call from WindowControl function */
@@ -697,8 +687,19 @@ void MainInterface::togglePlaylist()
 
     if( b_plDocked )
     {
-        showTab( stackCentralW->currentWidget() != playlistWidget ?
-                 PLAYLIST_TAB : VIDEO_TAB );
+        /* Playlist is not visible, show it */
+        if( stackCentralW->currentWidget() != playlistWidget )
+        {
+            playlistWidget->forceShow();
+            showTab( playlistWidget );
+        }
+        else /* Hide it! */
+        {
+            restoreStackOldWidget();
+            stackCentralW->updateGeometry();
+            // HACK: So it doesn't limit the stackWidget minimumSize
+            playlistWidget->forceHide();
+        }
         playlistVisible = ( stackCentralW->currentWidget() == playlistWidget );
     }
     else
@@ -718,21 +719,20 @@ void MainInterface::dockPlaylist( bool p_docked )
     if( !playlistWidget ) return; /* Playlist wasn't created yet */
     if( !p_docked )
     {
-        showTab( VIDEO_TAB );
         stackCentralW->removeWidget( playlistWidget );
         playlistWidget->setWindowFlags( Qt::Window );
         QVLCTools::restoreWidgetPosition( p_intf, "Playlist",
                 playlistWidget, QSize( 600, 300 ) );
         playlistWidget->show();
+        restoreStackOldWidget();
     }
     else
     {
         playlistWidget->setWindowFlags( Qt::Widget ); // Probably a Qt bug here
         // It would be logical that QStackWidget::addWidget reset the flags...
         stackCentralW->addWidget( playlistWidget );
-        showTab( PLAYLIST_TAB );
+        stackCentralW->setCurrentWidget( playlistWidget );
     }
-    playlistVisible = true;
 }
 
 /*
@@ -740,14 +740,30 @@ void MainInterface::dockPlaylist( bool p_docked )
  */
 void MainInterface::toggleMinimalView( bool b_switch )
 {
+    if( i_visualmode == 0 )
+    { /* NORMAL MODE then */
+        if( !videoWidget || stackCentralW->currentWidget() != videoWidget )
+        {
+            showBg();
+        }
+        else
+        {
+            /* If video is visible, then toggle the status of bgWidget */
+            //FIXME
+            //bgWasVisible = !bgWasVisible;
+            /* if( stackCentralOldState == BACK G_TAB )
+                stackCentralOldState = HID DEN_TAB;
+            else
+                stackCentralOldState = BACK G_TAB;
+
+                */
+        }
+    }
+
     menuBar()->setVisible( !b_switch );
     controls->setVisible( !b_switch );
     statusBar()->setVisible( !b_switch );
     inputC->setVisible( !b_switch );
-    minWidthHolder->setVisible( !b_switch );
-
-    // Go to compact mode and back if needed
-    showTab();
 
     emit minimalViewToggled( b_switch );
 }
@@ -1143,7 +1159,6 @@ void MainInterface::toggleFullScreen()
         showFullScreen();
         emit fullscreenInterfaceToggled( true );
     }
-    showTab();
 }
 
 /*****************************************************************************
