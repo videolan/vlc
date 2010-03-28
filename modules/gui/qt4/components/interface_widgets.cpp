@@ -603,7 +603,10 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf  )
     b_remainingTime = false;
     setText( " --:--/--:-- " );
     setAlignment( Qt::AlignRight | Qt::AlignVCenter );
-    setToolTip( qtr( "Toggle between elapsed and remaining time" ) );
+    setToolTip( QString( "- " )
+        + qtr( "Click to toggle between elapsed and remaining time" )
+        + QString( "\n- " )
+        + qtr( "Double click to jump to a chosen time position" ) );
     bufTimer->setSingleShot( true );
 
     CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
