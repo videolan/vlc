@@ -417,8 +417,6 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     const uint32_t timestamp = rtp_timestamp (block);
     block->i_pts = src->ref_ntp
        + CLOCK_FREQ * (int32_t)(timestamp - src->ref_rtp) / pt->frequency;
-    msg_Info (demux, "PTS = %lld, NTP = %lld, RTPd = %d",
-              block->i_pts, src->ref_ntp, timestamp - src->ref_rtp);
     /* TODO: proper inter-medias/sessions sync (using RTCP-SR) */
     src->ref_ntp = block->i_pts;
     src->ref_rtp = timestamp;
