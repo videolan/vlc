@@ -696,6 +696,8 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
 static int ZoomCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void)psz_cmd; (void)oldval; (void)p_data;
+
     return var_SetFloat( p_this, "scale", newval.f_float );
 }
 
