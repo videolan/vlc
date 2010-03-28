@@ -38,7 +38,12 @@ function print_playlist(item)
     print("</node>")
   else
     local name, path = vlc.strings.convert_xml_special_chars(item.name or "",item.path or "")
-    print("<leaf id='"..tostring(item.id).."' uri='"..path.."' name='"..name.."' ro='"..(item.flags.ro and "ro" or "rw").."' duration='"..tostring(item.duration).."'/>")
+    local currentItem = vlc.input.item().uri( vlc.input.item() )
+    local current = ""
+    if currentItem == path then
+       current="current='current'"
+    end
+    print("<leaf id='"..tostring(item.id).."' uri='"..path.."' name='"..name.."' ro='"..(item.flags.ro and "ro" or "rw").."' duration='"..tostring(item.duration).."' "..current.." />")
   end
 end
 function a(t,pre)
