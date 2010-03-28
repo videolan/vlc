@@ -180,25 +180,13 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
             int on = (family == AF_INET6);
             setsockopt (fd, SOL_IPV6, IPV6_V6ONLY, &on, sizeof (on));
         }
-        else if (ptr->ai_family == AF_INET && family == AF_UNSPEC)
-        {
-            for (const struct addrinfo *p = ptr; p != NULL; p = p->ai_next)
-                if (p->ai_family == AF_INET6)
-                {
-                    net_Close (fd);
-                    fd = -1;
-                    break;
-                }
-            if (fd == -1)
-                continue;
-        }
-#else
+        if (ptr->ai_family == AF_INET)
+#endif
         if (family == AF_UNSPEC && ptr->ai_next != NULL)
         {
             msg_Warn (obj, "ambiguous network protocol specification");
             msg_Warn (obj, "please select IP version explicitly");
         }
-#endif
 
         fd = net_SetupDgramSocket( obj, fd, ptr );
         if( fd == -1 )
