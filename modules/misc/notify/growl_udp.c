@@ -255,6 +255,14 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset )
     char *psz_password = var_InheritString( p_this, "growl-password" );
     char *psz_server = var_InheritString( p_this, "growl-server" );
     int i_port = var_InheritInteger( p_this, "growl-port" );
+
+    if(!psz_password || !psz_server)
+    {
+        free( psz_password );
+        free( psz_server );
+        return VLC_EGENERIC;
+    }
+
     strcpy( (char*)(p_data+i_offset), psz_password );
     i = i_offset + strlen(psz_password);
 
