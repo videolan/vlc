@@ -108,12 +108,12 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 {
     VLC_UNUSED(psz_var); VLC_UNUSED(oldval); VLC_UNUSED(newval);
     VLC_UNUSED(param);
+
     char psz_tmp[GROWL_MAX_LENGTH];
-    char *psz_title = NULL;
-    char *psz_artist = NULL;
-    char *psz_album = NULL;
-    input_thread_t *p_input;
-    p_input = playlist_CurrentInput( (playlist_t*)p_this );
+    char *psz_title;
+    char *psz_artist;
+    char *psz_album;
+    input_thread_t *p_input = playlist_CurrentInput( (playlist_t*)p_this );
 
     if( !p_input ) return VLC_SUCCESS;
 
