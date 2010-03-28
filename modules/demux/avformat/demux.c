@@ -212,7 +212,6 @@ int OpenDemux( vlc_object_t *p_this )
     vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
     if( av_find_stream_info( p_sys->ic ) < 0 )
     {
-        vlc_avcodec_unlock();
         msg_Warn( p_demux, "av_find_stream_info failed" );
     }
     vlc_avcodec_unlock();
