@@ -146,7 +146,6 @@ struct rtp_source_t
 
     uint16_t last_seq; /* sequence of the next dequeued packet */
     block_t *blocks; /* re-ordered blocks queue */
-    mtime_t  ref_ts; /* reference timestamp for reordering */
     void    *opaque[0]; /* Per-source private payload data */
 };
 
@@ -165,7 +164,6 @@ rtp_source_create (demux_t *demux, const rtp_session_t *session,
 
     source->ssrc = ssrc;
     source->jitter = 0;
-    source->ref_ts = 0;
     source->max_seq = source->bad_seq = init_seq;
     source->last_seq = init_seq - 1;
     source->blocks = NULL;
@@ -316,6 +314,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
         }
     }
     src->last_rx = now;
+    block->i_pts = now; /* store reception time until dequeued */
     src->last_ts = rtp_timestamp (block);
 
     /* Check sequence number */
@@ -412,7 +411,6 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     /* FIXME: handle timestamp wrap properly */
     /* TODO: inter-medias/sessions sync (using RTCP-SR) */
     const uint32_t timestamp = rtp_timestamp (block);
-    src->ref_ts = 0;
     block->i_pts = CLOCK_FREQ * timestamp / pt->frequency;
 
     /* CSRC count */
@@ -489,19 +487,25 @@ bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
             }
 
             /* Wait for 3 times the inter-arrival delay variance (about 99.7%
-             * match for random gaussian jitter). Additionnaly, we implicitly
-             * wait for misordering times the packetization time.
+             * match for random gaussian jitter).
              */
-            mtime_t deadline = src->ref_ts;
+            mtime_t deadline;
             const rtp_pt_t *pt = rtp_find_ptype (session, src, block, NULL);
-            if (!deadline)
-                deadline = src->ref_ts = now;
             if (pt)
-                deadline += CLOCK_FREQ * 3 * src->jitter / pt->frequency;
+                deadline = CLOCK_FREQ * 3 * src->jitter / pt->frequency;
+            else
+                deadline = 0; /* no jitter estimate with no frequency :( */
 
             /* Make sure we wait at least for 25 msec */
-            deadline = __MAX(deadline, src->ref_ts + CLOCK_FREQ / 40);
+            if (deadline < (CLOCK_FREQ / 40))
+                deadline = CLOCK_FREQ / 40;
 
+            /* Additionnaly, we implicitly wait for the packetization time
+             * multiplied by the number of missing packets. block is the first
+             * non-missing packet (lowest sequence number). We have no better
+             * estimated time of arrival, as we do not know the RTP timestamp
+             * of not yet received packets. */
+            deadline += block->i_pts;
             if (now >= deadline)
             {
                 rtp_decode (demux, session, src);
