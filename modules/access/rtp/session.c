@@ -141,6 +141,9 @@ struct rtp_source_t
     mtime_t  last_rx; /* last received packet local timestamp */
     uint32_t last_ts; /* last received packet RTP timestamp */
 
+    uint32_t ref_rtp; /* sender RTP timestamp reference */
+    mtime_t  ref_ntp; /* sender NTP timestamp reference */
+
     uint16_t bad_seq; /* tentatively next expected sequence for resync */
     uint16_t max_seq; /* next expected sequence */
 
@@ -164,6 +167,9 @@ rtp_source_create (demux_t *demux, const rtp_session_t *session,
 
     source->ssrc = ssrc;
     source->jitter = 0;
+    source->ref_rtp = 0;
+    /* TODO: use 0, but VLC does not like negative PTS at the moment */
+    source->ref_ntp = UINT64_C (1) << 62;
     source->max_seq = source->bad_seq = init_seq;
     source->last_seq = init_seq - 1;
     source->blocks = NULL;
@@ -408,10 +414,14 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
      * DTS is unknown. Also, while the clock frequency depends on the payload
      * format, a single source MUST only use payloads of a chosen frequency.
      * Otherwise it would be impossible to compute consistent timestamps. */
-    /* FIXME: handle timestamp wrap properly */
-    /* TODO: inter-medias/sessions sync (using RTCP-SR) */
     const uint32_t timestamp = rtp_timestamp (block);
-    block->i_pts = CLOCK_FREQ * timestamp / pt->frequency;
+    block->i_pts = src->ref_ntp
+       + CLOCK_FREQ * (int32_t)(timestamp - src->ref_rtp) / pt->frequency;
+    msg_Info (demux, "PTS = %lld, NTP = %lld, RTPd = %d",
+              block->i_pts, src->ref_ntp, timestamp - src->ref_rtp);
+    /* TODO: proper inter-medias/sessions sync (using RTCP-SR) */
+    src->ref_ntp = block->i_pts;
+    src->ref_rtp = timestamp;
 
     /* CSRC count */
     size_t skip = 12u + (block->p_buffer[0] & 0x0F) * 4;
