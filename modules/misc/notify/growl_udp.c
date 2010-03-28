@@ -225,6 +225,17 @@ static int NotifyToGrowl( vlc_object_t *p_this, const char *psz_desc )
     if( psz_encoded == NULL )
         return false;
 
+    // Check the size of the data
+    size_t i_type = strlen( psz_type );
+    size_t i_title = strlen( psz_title );
+    size_t i_app = strlen( APPLICATION_NAME );
+    size_t i_desc = strlen( psz_desc );
+    if( 12 + i_type + i_title + i_desc + i_app >= GROWL_MAX_LENGTH + 42 )
+    {
+        free( psz_encoded );
+        return false;
+    }
+
     psz_encoded[i++] = GROWL_PROTOCOL_VERSION;
     psz_encoded[i++] = GROWL_TYPE_NOTIFICATION;
     flags = 0;
@@ -234,14 +245,15 @@ static int NotifyToGrowl( vlc_object_t *p_this, const char *psz_desc )
     insertstrlen(psz_title);
     insertstrlen(psz_desc);
     insertstrlen(APPLICATION_NAME);
+
     strcpy( (char*)(psz_encoded+i), psz_type );
-    i += strlen(psz_type);
+    i += i_type;
     strcpy( (char*)(psz_encoded+i), psz_title );
-    i += strlen(psz_title);
+    i += i_title;
     strcpy( (char*)(psz_encoded+i), psz_desc );
-    i += strlen(psz_desc);
+    i += i_desc;
     strcpy( (char*)(psz_encoded+i), APPLICATION_NAME );
-    i += strlen(APPLICATION_NAME);
+    i += i_app;
 
     CheckAndSend(p_this, psz_encoded, i, GROWL_MAX_LENGTH + 42);
     free( psz_encoded );
