@@ -93,7 +93,7 @@ static const char *WordInList( const char *psz_list, const char *psz_word )
             return psz_list;
         psz_list = end + 1;
     }
-    return strcmp( psz_list, psz_word ) ? psz_list : NULL;
+    return !strcmp( psz_list, psz_word ) ? psz_list : NULL;
 }
 
 static char *GetModuleName( intf_thread_t *p_intf )
