@@ -48,7 +48,7 @@ static int ItemChange( vlc_object_t *, const char *,
 
 static int RegisterToGrowl( vlc_object_t *p_this );
 static int NotifyToGrowl( vlc_object_t *p_this, const char *psz_desc );
-static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset );
+static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset, size_t is_ze );
 #define GROWL_MAX_LENGTH 256
 
 /*****************************************************************************
@@ -211,7 +211,7 @@ static int RegisterToGrowl( vlc_object_t *p_this )
     }
     psz_encoded[5] = i_defaults;
 
-    CheckAndSend(p_this, psz_encoded, i);
+    CheckAndSend(p_this, psz_encoded, i, 100);
     free( psz_encoded );
     return VLC_SUCCESS;
 }
@@ -243,36 +243,35 @@ static int NotifyToGrowl( vlc_object_t *p_this, const char *psz_desc )
     strcpy( (char*)(psz_encoded+i), APPLICATION_NAME );
     i += strlen(APPLICATION_NAME);
 
-    CheckAndSend(p_this, psz_encoded, i);
+    CheckAndSend(p_this, psz_encoded, i, GROWL_MAX_LENGTH + 42);
     free( psz_encoded );
     return VLC_SUCCESS;
 }
 
-static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset )
+static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset, size_t i_size )
 {
-    int i, i_handle;
+    int i_handle;
     struct md5_s md5;
     char *psz_password = var_InheritString( p_this, "growl-password" );
     char *psz_server = var_InheritString( p_this, "growl-server" );
     int i_port = var_InheritInteger( p_this, "growl-port" );
 
     if(!psz_password || !psz_server)
-    {
-        free( psz_password );
-        free( psz_server );
-        return VLC_EGENERIC;
-    }
+        goto error;
+
+    int i_password_length = strlen( psz_password );
+    // Check that the buffer is larger enought for the string and the md5
+    if( i_offset + i_password_length + 4*4 >= i_size )
+        goto error;
 
     strcpy( (char*)(p_data+i_offset), psz_password );
-    i = i_offset + strlen(psz_password);
 
     InitMD5( &md5 );
-    AddMD5( &md5, p_data, i );
+    AddMD5( &md5, p_data, i_offset + i_password_length );
     EndMD5( &md5 );
 
-    for( i = 0 ; i < 4 ; i++ )
+    for( int i = 0 ; i < 4 ; i++ )
     {
-        md5.p_digest[i] = md5.p_digest[i];
         p_data[i_offset++] =  md5.p_digest[i]     &0xFF;
         p_data[i_offset++] = (md5.p_digest[i]>> 8)&0xFF;
         p_data[i_offset++] = (md5.p_digest[i]>>16)&0xFF;
@@ -282,10 +281,8 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset )
     i_handle = net_ConnectUDP( p_this, psz_server, i_port, -1 );
     if( i_handle == -1 )
     {
-         msg_Err( p_this, "failed to open a connection (udp)" );
-         free( psz_password);
-         free( psz_server);
-         return VLC_EGENERIC;
+        msg_Err( p_this, "failed to open a connection (udp)" );
+        goto error;
     }
 
     shutdown( i_handle, SHUT_RD );
@@ -298,6 +295,11 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset )
     free( psz_password);
     free( psz_server);
     return VLC_SUCCESS;
+
+error:
+    free( psz_password );
+    free( psz_server );
+    return VLC_EGENERIC;
 }
 
 #undef GROWL_PROTOCOL_VERSION
