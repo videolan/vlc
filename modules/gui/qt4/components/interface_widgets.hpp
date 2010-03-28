@@ -95,7 +95,6 @@ private:
     bool b_expandPixmap;
     virtual void contextMenuEvent( QContextMenuEvent *event );
     intf_thread_t *p_intf;
-    virtual void resizeEvent( QResizeEvent * event );
 protected:
     void paintEvent( QPaintEvent *e );
     static const int MARGIN = 5;

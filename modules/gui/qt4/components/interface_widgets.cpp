@@ -291,12 +291,6 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
              this, updateArt( const QString& ) );
 }
 
-void BackgroundWidget::resizeEvent( QResizeEvent * event )
-{
-    updateArt( "" );
-    QWidget::resizeEvent( event );
-}
-
 void BackgroundWidget::updateArt( const QString& url )
 {
     if ( !url.isEmpty() )
@@ -310,6 +304,7 @@ void BackgroundWidget::updateArt( const QString& url )
         else
             pixmapUrl = QString( ":/logo/vlc128.png" );
     }
+    update();
 }
 
 void BackgroundWidget::paintEvent( QPaintEvent *e )
