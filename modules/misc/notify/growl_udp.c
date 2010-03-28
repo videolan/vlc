@@ -38,6 +38,16 @@
 #include <vlc_md5.h>
 
 /*****************************************************************************
+ * intf_sys_t: description
+ *****************************************************************************/
+struct intf_sys_t
+{
+    char *psz_password;
+    char *psz_server;
+    int i_port;
+};
+
+/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  Open    ( vlc_object_t * );
@@ -87,6 +97,23 @@ vlc_module_end ()
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    intf_sys_t *p_sys = p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
+
+    p_sys->psz_password = var_InheritString( p_this, "growl-password" );
+    p_sys->psz_server = var_InheritString( p_this, "growl-server" );
+    p_sys->i_port = var_InheritInteger( p_this, "growl-port" );
+
+    if( !p_sys->psz_password || !p_sys->psz_server )
+    {
+        free( p_sys->psz_password );
+        free( p_sys->psz_server );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
     var_AddCallback( pl_Get( p_this ), "item-current", ItemChange, p_this );
     RegisterToGrowl( p_this );
     return VLC_SUCCESS;
@@ -97,7 +124,13 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
+    intf_sys_t *p_sys = ((intf_thread_t*)p_this)->p_sys;
+
     var_DelCallback( pl_Get( p_this ), "item-current", ItemChange, p_this );
+
+    free( p_sys->psz_password );
+    free( p_sys->psz_server );
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -262,21 +295,16 @@ static int NotifyToGrowl( vlc_object_t *p_this, const char *psz_desc )
 
 static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset, size_t i_size )
 {
+    intf_sys_t *p_sys = ((intf_thread_t*)p_this)->p_sys;
     int i_handle;
     struct md5_s md5;
-    char *psz_password = var_InheritString( p_this, "growl-password" );
-    char *psz_server = var_InheritString( p_this, "growl-server" );
-    int i_port = var_InheritInteger( p_this, "growl-port" );
 
-    if(!psz_password || !psz_server)
-        goto error;
-
-    int i_password_length = strlen( psz_password );
+    int i_password_length = strlen( p_sys->psz_password );
     // Check that the buffer is larger enought for the string and the md5
     if( i_offset + i_password_length + 4*4 >= i_size )
-        goto error;
+        return VLC_EGENERIC;
 
-    strcpy( (char*)(p_data+i_offset), psz_password );
+    strcpy( (char*)(p_data+i_offset), p_sys->psz_password );
 
     InitMD5( &md5 );
     AddMD5( &md5, p_data, i_offset + i_password_length );
@@ -290,11 +318,11 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset, si
         p_data[i_offset++] = (md5.p_digest[i]>>24)&0xFF;
     }
 
-    i_handle = net_ConnectUDP( p_this, psz_server, i_port, -1 );
+    i_handle = net_ConnectUDP( p_this, p_sys->psz_server, p_sys->i_port, -1 );
     if( i_handle == -1 )
     {
         msg_Err( p_this, "failed to open a connection (udp)" );
-        goto error;
+        return VLC_EGENERIC;
     }
 
     shutdown( i_handle, SHUT_RD );
@@ -304,14 +332,7 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset, si
     }
     net_Close( i_handle );
 
-    free( psz_password);
-    free( psz_server);
     return VLC_SUCCESS;
-
-error:
-    free( psz_password );
-    free( psz_server );
-    return VLC_EGENERIC;
 }
 
 #undef GROWL_PROTOCOL_VERSION
