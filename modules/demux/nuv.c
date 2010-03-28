@@ -283,8 +283,10 @@ static int Open( vlc_object_t * p_this )
         if( !p_sys->b_seekable )
             msg_Warn( p_demux, "stream is not seekable, skipping seektable" );
         else if( SeekTableLoad( p_demux, p_sys ) )
-            goto error;
-
+        {
+            p_sys->b_index = false;
+            msg_Warn( p_demux, "Seektable is broken, seek won't be accurate" );
+        }
     }
     else
     {
