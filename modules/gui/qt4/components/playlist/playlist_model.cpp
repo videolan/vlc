@@ -864,6 +864,15 @@ void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
         endInsertRows( );
     }
     PL_UNLOCK;
+    /* if we have popup item, try to make sure that you keep that item visible */
+    if( i_popup_item > -1 )
+    {
+        PLItem *popupitem = findById( rootItem, i_popup_item );
+        if( popupitem ) emit currentChanged( index( popupitem, 0 ) );
+        /* reset i_popup_item as we don't show it as selected anymore anyway */
+        i_popup_item = -1;
+    }
+    else if( currentIndex().isValid() ) emit currentChanged( currentIndex() );
 }
 
 void PLModel::search( const QString& search_text, const QModelIndex & idx, bool b_recursive )
