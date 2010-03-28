@@ -1464,6 +1464,8 @@ void QVLCMenu::DoAction( QObject *data )
     vlc_object_t *p_object = itemData->p_obj;
     if( p_object == NULL ) return;
 
+    if( !strcmp( itemData->psz_var, "fullscreen" ) )
+        var_Set( pl_Get( p_object ), "fullscreen", itemData->val );
     var_Set( p_object, itemData->psz_var, itemData->val );
 }
 
