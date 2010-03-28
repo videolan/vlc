@@ -73,7 +73,7 @@
 {
     NSString * libvlcArgs;
     if( self.drawable )
-        libvlcArgs = [NSString stringWithFormat:@"duplicate{dst=display,dst=\"%@\"}",[streamOutput representedLibVLCOptions]];
+        libvlcArgs = [NSString stringWithFormat:@"#duplicate{dst=display,dst=\"%@\"}",[streamOutput representedLibVLCOptions]];
     else
         libvlcArgs = [streamOutput representedLibVLCOptions];
     if( libvlcArgs )
