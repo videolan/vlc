@@ -1044,8 +1044,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vout_display_cfg_t *cfg = &osys->cfg;
 
     *cfg = state->cfg;
-    osys->wm_state_initial = state->is_on_top
-        ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL;
+    osys->wm_state_initial = VOUT_WINDOW_STATE_NORMAL;
     osys->sar_initial.num = state->sar.num;
     osys->sar_initial.den = state->sar.den;
     vout_display_GetDefaultDisplaySize(&cfg->display.width, &cfg->display.height,
@@ -1069,6 +1068,8 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->is_display_filled = cfg->is_display_filled;
     osys->zoom.num = cfg->zoom.num;
     osys->zoom.den = cfg->zoom.den;
+    osys->wm_state = state->is_on_top ? VOUT_WINDOW_STATE_ABOVE
+                                      : VOUT_WINDOW_STATE_NORMAL;
 
     osys->source = *source_org;
 
@@ -1118,7 +1119,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     if (osys->sar.num != source_org->i_sar_num ||
         osys->sar.den != source_org->i_sar_den)
         osys->ch_sar = true;
-    if (osys->wm_state != VOUT_WINDOW_STATE_NORMAL)
+    if (osys->wm_state != osys->wm_state_initial)
         osys->ch_wm_state = true;
     if (osys->crop.x      != source_org->i_x_offset ||
         osys->crop.y      != source_org->i_y_offset ||
