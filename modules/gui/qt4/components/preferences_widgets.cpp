@@ -217,9 +217,6 @@ void InterfacePreviewWidget::setPreview( enum_style e_style )
     switch( e_style )
     {
     default:
-    case CLASSIC:
-        pixmapLocationString += "sample_classic";
-        break;
     case COMPLETE:
         pixmapLocationString += "sample_complete";
         break;

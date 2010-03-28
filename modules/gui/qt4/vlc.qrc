@@ -96,7 +96,6 @@
         <file alias="cone_interface_64" >pixmaps/prefs/spref_cone_Interface_64.png</file>
         <file alias="cone_subtitles_64" >pixmaps/prefs/spref_cone_Subtitles_64.png</file>
         <file alias="cone_video_64" >pixmaps/prefs/spref_cone_Video_64.png</file>
-        <file alias="sample_classic" >pixmaps/sample_classic.png</file>
         <file alias="sample_complete" >pixmaps/sample_complete.png</file>
         <file alias="sample_minimal" >pixmaps/sample_minimal.png</file>
         <file alias="sample_skins" >pixmaps/sample_skins.png</file>

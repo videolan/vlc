@@ -133,7 +133,6 @@ DEPS_res = \
 	pixmaps/previous.png \
 	pixmaps/previous_16px.png \
 	pixmaps/profile_new.png \
-	pixmaps/sample_classic.png \
 	pixmaps/sample_complete.png \
 	pixmaps/sample_minimal.png \
 	pixmaps/sample_skins.png \

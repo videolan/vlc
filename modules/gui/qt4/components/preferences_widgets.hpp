@@ -63,7 +63,7 @@ class InterfacePreviewWidget : public QLabel
     Q_OBJECT
 public:
     InterfacePreviewWidget( QWidget * );
-    enum enum_style { CLASSIC,  // aka VLC 0.8.6
+    enum enum_style {
                  COMPLETE, // aka MPC
                  MINIMAL,  // aka WMP12 minimal
                  SKINS };
