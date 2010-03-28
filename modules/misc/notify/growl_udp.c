@@ -180,7 +180,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
  *****************************************************************************/
 static int RegisterToGrowl( vlc_object_t *p_this )
 {
-    uint8_t *psz_encoded = malloc(100);
+    uint8_t *psz_encoded = calloc( 100, 1 );
     uint8_t i_defaults = 0;
     static const char *psz_notifications[] = {"Now Playing", NULL};
     bool pb_defaults[] = {true, false};
@@ -188,7 +188,6 @@ static int RegisterToGrowl( vlc_object_t *p_this )
     if( psz_encoded == NULL )
         return false;
 
-    memset( psz_encoded, 0, sizeof(psz_encoded) );
     psz_encoded[i++] = GROWL_PROTOCOL_VERSION;
     psz_encoded[i++] = GROWL_TYPE_REGISTRATION;
     insertstrlen(APPLICATION_NAME);
@@ -220,13 +219,12 @@ static int RegisterToGrowl( vlc_object_t *p_this )
 static int NotifyToGrowl( vlc_object_t *p_this, const char *psz_desc )
 {
     const char *psz_type = "Now Playing", *psz_title = "Now Playing";
-    uint8_t *psz_encoded = malloc(GROWL_MAX_LENGTH + 42);
+    uint8_t *psz_encoded = calloc(GROWL_MAX_LENGTH + 42, 1);
     uint16_t flags;
     int i = 0;
     if( psz_encoded == NULL )
         return false;
 
-    memset( psz_encoded, 0, sizeof(psz_encoded) );
     psz_encoded[i++] = GROWL_PROTOCOL_VERSION;
     psz_encoded[i++] = GROWL_TYPE_NOTIFICATION;
     flags = 0;
