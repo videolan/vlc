@@ -34,7 +34,7 @@
 #include "actions_manager.hpp"                  // killInstance
 #include "extensions_manager.hpp"               // killInstance
 
-#include "util/customwidgets.hpp"               // qtEventToVLCKey
+#include "util/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
 
 #include "components/interface_widgets.hpp"     // bgWidget, videoWidget
@@ -361,7 +361,7 @@ void MainInterface::createMainWidget( QSettings *settings )
     mainLayout->setSpacing( 0 ); mainLayout->setMargin( 0 );
 
     /* */
-    stackCentralW = new QStackedWidget( main );
+    stackCentralW = new QVLCStackedWidget( main );
 
     /* Bg Cone */
     bgWidget = new BackgroundWidget( p_intf );
@@ -690,15 +690,11 @@ void MainInterface::togglePlaylist()
         /* Playlist is not visible, show it */
         if( stackCentralW->currentWidget() != playlistWidget )
         {
-            playlistWidget->forceShow();
             showTab( playlistWidget );
         }
         else /* Hide it! */
         {
             restoreStackOldWidget();
-            stackCentralW->updateGeometry();
-            // HACK: So it doesn't limit the stackWidget minimumSize
-            playlistWidget->forceHide();
         }
         playlistVisible = ( stackCentralW->currentWidget() == playlistWidget );
     }

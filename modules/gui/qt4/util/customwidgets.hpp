@@ -30,6 +30,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
+#include <QStackedWidget>
 
 /**
   This class provides a QLineEdit which contains a greyed-out hinting
@@ -101,6 +102,16 @@ public:
 private:
     void paintEvent( QPaintEvent * event );
     Qt::TextElideMode elideMode;
+};
+
+class QVLCStackedWidget : public QStackedWidget
+{
+public:
+    QVLCStackedWidget( QWidget *parent ) : QStackedWidget( parent ) { }
+    QSize minimumSizeHint () const
+    {
+        return currentWidget() ? currentWidget()->minimumSizeHint() : QSize();
+    }
 };
 
 /* VLC Key/Wheel hotkeys interactions */
