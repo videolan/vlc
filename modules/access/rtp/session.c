@@ -266,7 +266,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
         }
 
         /* RTP source garbage collection */
-        if ((tmp->last_rx + (p_sys->timeout * CLOCK_FREQ)) < now)
+        if ((tmp->last_rx + p_sys->timeout) < now)
         {
             rtp_source_destroy (demux, session, tmp);
             if (--session->srcc > 0)

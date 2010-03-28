@@ -60,14 +60,14 @@ struct demux_sys_t
     vlc_thread_t  thread;
     vlc_timer_t   timer;
     vlc_mutex_t   lock;
-    bool thread_ready;
 
+    mtime_t       timeout;
     unsigned      caching;
-    unsigned      timeout;
     uint16_t      max_dropout; /**< Max packet forward misordering */
     uint16_t      max_misorder; /**< Max packet backward misordering */
     uint8_t       max_src; /**< Max simultaneous RTP sources */
     bool          framed_rtp; /**< Framed RTP packets over TCP */
+    bool          thread_ready;
 #if 0
     bool          dead; /**< End of stream */
 #endif

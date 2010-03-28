@@ -256,7 +256,8 @@ static int Open (vlc_object_t *obj)
     p_sys->rtcp_fd      = rtcp_fd;
     p_sys->caching      = var_CreateGetInteger (obj, "rtp-caching");
     p_sys->max_src      = var_CreateGetInteger (obj, "rtp-max-src");
-    p_sys->timeout      = var_CreateGetInteger (obj, "rtp-timeout");
+    p_sys->timeout      = var_CreateGetInteger (obj, "rtp-timeout")
+                        * CLOCK_FREQ;
     p_sys->max_dropout  = var_CreateGetInteger (obj, "rtp-max-dropout");
     p_sys->max_misorder = var_CreateGetInteger (obj, "rtp-max-misorder");
     p_sys->framed_rtp   = (tp == IPPROTO_TCP);
