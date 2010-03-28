@@ -966,10 +966,6 @@ static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
     p_vout->b_on_top = newval.b_bool;
     vlc_mutex_unlock( &p_vout->change_lock );
 
-    /* Modify libvlc as well because the vout might have to be restarted */
-    var_Create( p_vout->p_libvlc, "video-on-top", VLC_VAR_BOOL );
-    var_Set( p_vout->p_libvlc, "video-on-top", newval );
-
     (void)psz_cmd; (void)oldval; (void)p_data;
     return VLC_SUCCESS;
 }
