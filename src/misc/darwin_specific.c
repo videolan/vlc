@@ -162,10 +162,11 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
+void system_Configure( libvlc_int_t *p_this,
+                       int i_argc, const char *const ppsz_argv[] )
 {
     (void)p_this;
-    (void)pi_argc;
+    (void)i_argc;
     (void)ppsz_argv;
 }
 

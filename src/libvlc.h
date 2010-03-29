@@ -42,7 +42,7 @@ extern void vlc_DeinitActions (libvlc_int_t *);
  * OS-specific initialization
  */
 void system_Init      ( libvlc_int_t *, int *, const char *[] );
-void system_Configure ( libvlc_int_t *, int *, const char *[] );
+void system_Configure ( libvlc_int_t *, int, const char *const [] );
 void system_End       ( libvlc_int_t * );
 
 /*

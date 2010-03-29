@@ -115,7 +115,8 @@ void system_Init (libvlc_int_t *libvlc, int *argc, const char *argv[])
     (void)libvlc; (void)argc; (void)argv;
 }
 
-void system_Configure (libvlc_int_t *libvlc, int *argc, const char *argv[])
+void system_Configure (libvlc_int_t *libvlc,
+                       int argc, const char *const argv[])
 {
     (void)libvlc; (void)argc; (void)argv;
 }
