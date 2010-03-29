@@ -27,20 +27,6 @@
 #include <stdio.h>
 #include <string.h>
 
-/* This version of `getopt' appears to the caller like standard Unix `getopt'
-   but it behaves differently for the user, since it allows the user
-   to intersperse the options with the other arguments.
-
-   As `getopt' works, it permutes the elements of ARGV so that,
-   when it is done, all the options precede everything else.  Thus
-   all application programs are extended to handle flexible argument order.
-
-   Setting the environment variable POSIXLY_CORRECT disables permutation.
-   Then the behavior is completely standard.
-
-   GNU application programs can use a third alternative mode in which
-   they can distinguish the relative order of options and other arguments.  */
-
 #include "vlc_getopt.h"
 
 /* For communication from `getopt' to the caller.
@@ -78,33 +64,6 @@ static char *nextchar;
    system's own getopt implementation.  */
 
 int vlc_optopt = '?';
-
-/* Describe how to deal with options that follow non-option ARGV-elements.
-
-   If the caller did not specify anything,
-   the default is REQUIRE_ORDER if the environment variable
-   POSIXLY_CORRECT is defined, PERMUTE otherwise.
-
-   REQUIRE_ORDER means don't recognize them as options;
-   stop option processing when the first non-option is seen.
-   This is what Unix does.
-   This mode of operation is selected by either setting the environment
-   variable POSIXLY_CORRECT, or using `+' as the first character
-   of the list of option characters.
-
-   PERMUTE is the default.  We permute the contents of ARGV as we scan,
-   so that eventually all the non-options are at the end.  This allows options
-   to be given in any order, even with programs that were not written to
-   expect this.
-
-   The special argument `--' forces an end of option-scanning regardless
-   of the value of `ordering'.  */
-
-static enum
-{
-    REQUIRE_ORDER, PERMUTE
-}
-ordering;
 
 /* Handle permutation of arguments.  */
 
@@ -182,29 +141,6 @@ static void
     last_nonopt = vlc_optind;
 }
 
-/* Initialize the internal data when the first call is made.  */
-
-static const char *vlc_getopt_initialize(const char *optstring)
-{
-    /* Start processing options with ARGV-element 1 (since ARGV-element 0
-       is the program name); the sequence of previously skipped
-       non-option ARGV-elements is empty.  */
-
-    first_nonopt = last_nonopt = vlc_optind = 1;
-
-    nextchar = NULL;
-
-    const char *posixly_correct = getenv("POSIXLY_CORRECT");
-
-    /* Determine how to handle the ordering of options and nonoptions.  */
-
-    if (posixly_correct != NULL)
-        ordering = REQUIRE_ORDER;
-    else
-        ordering = PERMUTE;
-
-    return optstring;
-}
 
 /* Scan elements of ARGV (whose length is ARGC) for option characters
    given in OPTSTRING.
@@ -268,8 +204,12 @@ int
 
     if (vlc_optind == 0)
     {
-        optstring = vlc_getopt_initialize(optstring);
-        vlc_optind = 1;    /* Don't scan ARGV[0], the program name.  */
+        /* Initialize the internal data when the first call is made.  */
+        /* Start processing options with ARGV-element 1 (since ARGV-element 0
+           is the program name); the sequence of previously skipped
+           non-option ARGV-elements is empty.  */
+        first_nonopt = last_nonopt = vlc_optind = 1;
+        nextchar = NULL;
     }
 
 #define NONOPTION_P (argv[vlc_optind][0] != '-' || argv[vlc_optind][1] == '\0')
@@ -285,23 +225,20 @@ int
         if (first_nonopt > vlc_optind)
             first_nonopt = vlc_optind;
 
-        if (ordering == PERMUTE)
-        {
-            /* If we have just processed some options following some non-options,
-               exchange them so that the options come first.  */
+        /* If we have just processed some options following some non-options,
+           exchange them so that the options come first.  */
 
-            if (first_nonopt != last_nonopt && last_nonopt != vlc_optind)
-                exchange((char **) argv);
-            else if (last_nonopt != vlc_optind)
-                first_nonopt = vlc_optind;
+        if (first_nonopt != last_nonopt && last_nonopt != vlc_optind)
+            exchange((char **) argv);
+        else if (last_nonopt != vlc_optind)
+            first_nonopt = vlc_optind;
 
-            /* Skip any additional non-options
-               and extend the range of non-options previously skipped.  */
+        /* Skip any additional non-options
+           and extend the range of non-options previously skipped.  */
 
-            while (vlc_optind < argc && NONOPTION_P)
-                vlc_optind++;
-            last_nonopt = vlc_optind;
-        }
+        while (vlc_optind < argc && NONOPTION_P)
+            vlc_optind++;
+        last_nonopt = vlc_optind;
 
         /* The special ARGV-element `--' means premature end of options.
            Skip it like a null option,
@@ -338,8 +275,6 @@ int
 
         if (NONOPTION_P)
         {
-            if (ordering == REQUIRE_ORDER)
-                return -1;
             vlc_optarg = argv[vlc_optind++];
             return 1;
         }
