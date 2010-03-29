@@ -272,36 +272,7 @@ static const struct
 
 } x11keys_to_vlckeys[] =
 {
-    { XK_F1, KEY_F1 }, { XK_F2, KEY_F2 }, { XK_F3, KEY_F3 }, { XK_F4, KEY_F4 },
-    { XK_F5, KEY_F5 }, { XK_F6, KEY_F6 }, { XK_F7, KEY_F7 }, { XK_F8, KEY_F8 },
-    { XK_F9, KEY_F9 }, { XK_F10, KEY_F10 }, { XK_F11, KEY_F11 },
-    { XK_F12, KEY_F12 },
-
-    { XK_Return, KEY_ENTER },
-    { XK_KP_Enter, KEY_ENTER },
-    { XK_Escape, KEY_ESC },
-
-    { XK_Menu, KEY_MENU },
-    { XK_Left, KEY_LEFT },
-    { XK_Right, KEY_RIGHT },
-    { XK_Up, KEY_UP },
-    { XK_Down, KEY_DOWN },
-
-    { XK_Home, KEY_HOME },
-    { XK_End, KEY_END },
-    { XK_Page_Up, KEY_PAGEUP },
-    { XK_Page_Down, KEY_PAGEDOWN },
-
-    { XK_Insert, KEY_INSERT },
-    { XK_Delete, KEY_DELETE },
-    { XF86XK_AudioNext, KEY_MEDIA_NEXT_TRACK},
-    { XF86XK_AudioPrev, KEY_MEDIA_PREV_TRACK},
-    { XF86XK_AudioMute, KEY_VOLUME_MUTE },
-    { XF86XK_AudioLowerVolume, KEY_VOLUME_DOWN },
-    { XF86XK_AudioRaiseVolume, KEY_VOLUME_UP },
-    { XF86XK_AudioPlay, KEY_MEDIA_PLAY_PAUSE },
-    { XF86XK_AudioPause, KEY_MEDIA_PLAY_PAUSE },
-
+#include "../../video_output/xcb/xcb_keysym.h"
     { 0, 0 }
 };
 static xcb_keysym_t GetX11Key( unsigned i_vlc )
