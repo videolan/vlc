@@ -36,7 +36,7 @@ int  config_AutoSaveConfigFile( vlc_object_t * );
 
 void config_Free( module_t * );
 
-int config_LoadCmdLine   ( vlc_object_t *, int, const char *[], bool );
+int config_LoadCmdLine   ( vlc_object_t *, int, const char *[], int * );
 int config_LoadConfigFile( vlc_object_t *, const char * );
 #define config_LoadCmdLine(a,b,c,d) config_LoadCmdLine(VLC_OBJECT(a),b,c,d)
 #define config_LoadConfigFile(a,b) config_LoadConfigFile(VLC_OBJECT(a),b)

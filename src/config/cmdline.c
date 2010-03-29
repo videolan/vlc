@@ -49,19 +49,18 @@
  * @param p_this object to write command line options as variables to
  * @param i_argc number of command line arguments
  * @param ppsz_args commandl ine arguments [IN/OUT]
- * @param b_ignore_errors whether to ignore parsing errors
+ * @param pindex NULL to ignore unknown options,
+ *               otherwise index of the first non-option argument [OUT]
  * @return 0 on success, -1 on error.
- *
- * @warning This function is not re-entrant (because of getopt_long()).
- * It must be called with the module bank initialization global lock held.
  */
 int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
-                        const char *ppsz_argv[], bool b_ignore_errors )
+                        const char *ppsz_argv[], int *pindex )
 {
     int i_cmd, i_index, i_opts, i_shortopts, flag, i_verbose = 0;
     module_t *p_parser;
     struct vlc_option *p_longopts;
     const char **argv_copy = NULL;
+#define b_ignore_errors (pindex == NULL)
 
     /* Short options */
     module_config_t *pp_shortopts[256];
@@ -200,10 +199,11 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
     /*
      * Parse the command line options
      */
-    vlc_optind = 0; /* set to 0 to tell GNU getopt to reinitialize */
+    vlc_getopt_t state;
+    state.optind = 0 ; /* set to 0 to tell GNU getopt to reinitialize */
     while( ( i_cmd = vlc_getopt_long( i_argc, (char **)ppsz_argv,
                                       psz_shortopts,
-                                      p_longopts, &i_index ) ) != -1 )
+                                      p_longopts, &i_index, &state ) ) != -1 )
     {
         /* A long option has been recognized */
         if( i_cmd == 0 )
@@ -252,21 +252,21 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                     case CONFIG_ITEM_MODULE_LIST_CAT:
                     case CONFIG_ITEM_MODULE_CAT:
                         var_Create( p_this, psz_name, VLC_VAR_STRING );
-                        var_SetString( p_this, psz_name, vlc_optarg );
+                        var_SetString( p_this, psz_name, state.optarg );
                         break;
                     case CONFIG_ITEM_INTEGER:
                         var_Create( p_this, psz_name, VLC_VAR_INTEGER );
                         var_SetInteger( p_this, psz_name,
-                                        strtol(vlc_optarg, NULL, 0));
+                                        strtol(state.optarg, NULL, 0));
                         break;
                     case CONFIG_ITEM_FLOAT:
                         var_Create( p_this, psz_name, VLC_VAR_FLOAT );
-                        var_SetFloat( p_this, psz_name, us_atof(vlc_optarg) );
+                        var_SetFloat( p_this, psz_name, us_atof(state.optarg) );
                         break;
                     case CONFIG_ITEM_KEY:
                         var_Create( p_this, psz_name, VLC_VAR_INTEGER );
                         var_SetInteger( p_this, psz_name,
-                                        ConfigStringToKey( vlc_optarg ) );
+                                        ConfigStringToKey( state.optarg ) );
                         break;
                     case CONFIG_ITEM_BOOL:
                         var_Create( p_this, psz_name, VLC_VAR_BOOL );
@@ -292,7 +292,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                 case CONFIG_ITEM_MODULE_LIST:
                 case CONFIG_ITEM_MODULE_LIST_CAT:
                     var_Create( p_this, name, VLC_VAR_STRING );
-                    var_SetString( p_this, name, vlc_optarg );
+                    var_SetString( p_this, name, state.optarg );
                     break;
                 case CONFIG_ITEM_INTEGER:
                     var_Create( p_this, name, VLC_VAR_INTEGER );
@@ -304,7 +304,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                     else
                     {
                         var_SetInteger( p_this, name,
-                                        strtol(vlc_optarg, NULL, 0) );
+                                        strtol(state.optarg, NULL, 0) );
                     }
                     break;
                 case CONFIG_ITEM_BOOL:
@@ -321,13 +321,13 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         {
             fputs( "vlc: unknown option"
                      " or missing mandatory argument ", stderr );
-            if( vlc_optopt )
+            if( state.optopt )
             {
-                fprintf( stderr, "`-%c'\n", vlc_optopt );
+                fprintf( stderr, "`-%c'\n", state.optopt );
             }
             else
             {
-                fprintf( stderr, "`%s'\n", ppsz_argv[vlc_optind-1] );
+                fprintf( stderr, "`%s'\n", ppsz_argv[state.optind-1] );
             }
             fputs( "Try `vlc --help' for more information.\n", stderr );
             goto out;
@@ -335,6 +335,8 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
     }
 
     ret = 0;
+    if( pindex != NULL )
+        *pindex = state.optind;
 out:
     /* Free allocated resources */
     for( i_index = 0; p_longopts[i_index].name; i_index++ )
