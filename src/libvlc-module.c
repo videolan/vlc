@@ -1651,6 +1651,7 @@ vlc_module_begin ()
     add_obsolete_integer( "x11-event" ) /* renamed since 1.0.0 */
 #ifndef __APPLE__
     add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, false )
+        change_safe()
 #endif
     add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT,
               VIDEO_ON_TOP_LONGTEXT, false )
