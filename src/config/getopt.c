@@ -45,9 +45,7 @@
 
 /* For communication from `getopt' to the caller.
    When `getopt' finds an option that takes an argument,
-   the argument value is returned here.
-   Also, when `ordering' is RETURN_IN_ORDER,
-   each non-option ARGV-element is returned here.  */
+   the argument value is returned here.  */
 
 char *vlc_optarg = NULL;
 
@@ -99,20 +97,12 @@ int vlc_optopt = '?';
    to be given in any order, even with programs that were not written to
    expect this.
 
-   RETURN_IN_ORDER is an option available to programs that were written
-   to expect options and other ARGV-elements in any order and that care about
-   the ordering of the two.  We describe each non-option ARGV-element
-   as if it were the argument of an option with character code 1.
-   Using `-' as the first character of the list of option characters
-   selects this mode of operation.
-
    The special argument `--' forces an end of option-scanning regardless
-   of the value of `ordering'.  In the case of RETURN_IN_ORDER, only
-   `--' can cause `getopt' to return -1 with `optind' != ARGC.  */
+   of the value of `ordering'.  */
 
 static enum
 {
-    REQUIRE_ORDER, PERMUTE, RETURN_IN_ORDER
+    REQUIRE_ORDER, PERMUTE
 }
 ordering;
 
@@ -208,17 +198,7 @@ static const char *vlc_getopt_initialize(const char *optstring)
 
     /* Determine how to handle the ordering of options and nonoptions.  */
 
-    if (optstring[0] == '-')
-    {
-        ordering = RETURN_IN_ORDER;
-        ++optstring;
-    }
-    else if (optstring[0] == '+')
-    {
-        ordering = REQUIRE_ORDER;
-        ++optstring;
-    }
-    else if (posixly_correct != NULL)
+    if (posixly_correct != NULL)
         ordering = REQUIRE_ORDER;
     else
         ordering = PERMUTE;
@@ -254,7 +234,7 @@ static const char *vlc_getopt_initialize(const char *optstring)
 
    If OPTSTRING starts with `-' or `+', it requests different methods of
    handling the non-option ARGV-elements.
-   See the comments about RETURN_IN_ORDER and REQUIRE_ORDER, above.
+   See the comments about REQUIRE_ORDER, above.
 
    Long-named options begin with `--' instead of `-'.
    Their names may be abbreviated as long as the abbreviation is unique
