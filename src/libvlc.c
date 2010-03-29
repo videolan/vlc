@@ -321,7 +321,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * options) */
     module_InitBank( p_libvlc );
 
-    if( config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true ) )
+    if( config_LoadCmdLine( p_libvlc, i_argc, ppsz_argv, true ) )
     {
         module_EndBank( p_libvlc, false );
         return VLC_EGENERIC;
@@ -537,7 +537,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* config_LoadCmdLine(), DBus (below) and Win32-specific use vlc_optind,
      * vlc_optarg and vlc_optopt globals. This is not thread-safe!! */
 #warning BUG!
-    if( config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, false ) )
+    if( config_LoadCmdLine( p_libvlc, i_argc, ppsz_argv, false ) )
     {
 #ifdef WIN32
         ShowConsole( false );

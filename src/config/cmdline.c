@@ -47,7 +47,7 @@
  * options used (ie. exported) by each module.
  *
  * @param p_this object to write command line options as variables to
- * @param pi_argc number of command line arguments [IN/OUT]
+ * @param i_argc number of command line arguments
  * @param ppsz_args commandl ine arguments [IN/OUT]
  * @param b_ignore_errors whether to ignore parsing errors
  * @return 0 on success, -1 on error.
@@ -55,7 +55,7 @@
  * @warning This function is not re-entrant (because of getopt_long()).
  * It must be called with the module bank initialization global lock held.
  */
-int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
+int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                         const char *ppsz_argv[], bool b_ignore_errors )
 {
     int i_cmd, i_index, i_opts, i_shortopts, flag, i_verbose = 0;
@@ -101,7 +101,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
      * us, ignoring the arity of the options */
     if( b_ignore_errors )
     {
-        argv_copy = (const char**)malloc( *pi_argc * sizeof(char *) );
+        argv_copy = (const char**)malloc( i_argc * sizeof(char *) );
         if( argv_copy == NULL )
         {
             free( psz_shortopts );
@@ -109,7 +109,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
             module_list_free (list);
             return -1;
         }
-        memcpy( argv_copy, ppsz_argv, *pi_argc * sizeof(char *) );
+        memcpy( argv_copy, ppsz_argv, i_argc * sizeof(char *) );
         ppsz_argv = argv_copy;
     }
 
@@ -199,7 +199,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
      * Parse the command line options
      */
     vlc_optind = 0; /* set to 0 to tell GNU getopt to reinitialize */
-    while( ( i_cmd = vlc_getopt_long( *pi_argc, (char **)ppsz_argv,
+    while( ( i_cmd = vlc_getopt_long( i_argc, (char **)ppsz_argv,
                                       psz_shortopts,
                                       p_longopts, &i_index ) ) != -1 )
     {
