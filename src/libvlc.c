@@ -818,7 +818,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     /* System specific configuration */
-    system_Configure( p_libvlc, i_argc, ppsz_argv );
+    system_Configure( p_libvlc, i_argc - vlc_optind, ppsz_argv + vlc_optind );
 
     /* Add service discovery modules */
     psz_modules = var_InheritString( p_libvlc, "services-discovery" );
