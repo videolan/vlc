@@ -204,7 +204,7 @@ void vlc_release (gc_object_t *p_gc)
     ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 static void SetLanguage   ( char const * );
 #endif
-static int  GetFilenames  ( libvlc_int_t *, int, const char *[] );
+static void GetFilenames  ( libvlc_int_t *, unsigned, const char *const [] );
 static void Help          ( libvlc_int_t *, char const *psz_help_name );
 static void Usage         ( libvlc_int_t *, char const *psz_search );
 static void ListModules   ( libvlc_int_t *, bool );
@@ -962,9 +962,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #endif
 
     /*
-     * Get input filenames given as commandline arguments
+     * Get input filenames given as commandline arguments.
+     * We assume that the remaining parameters are filenames
+     * and their input options.
      */
-    GetFilenames( p_libvlc, i_argc, ppsz_argv );
+    msg_Info( p_libvlc, "optind = %u", vlc_optind );
+    GetFilenames( p_libvlc, i_argc - vlc_optind, ppsz_argv + vlc_optind );
 
     /*
      * Get --open argument
@@ -1192,36 +1195,35 @@ static void SetLanguage ( const char *psz_lang )
  * Parse command line for input files as well as their associated options.
  * An option always follows its associated input and begins with a ":".
  *****************************************************************************/
-static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, const char *ppsz_argv[] )
+static void GetFilenames( libvlc_int_t *p_vlc, unsigned n,
+                          const char *const args[] )
 {
-    int i_opt, i_options;
-
-    /* We assume that the remaining parameters are filenames
-     * and their input options */
-    for( i_opt = i_argc - 1; i_opt >= vlc_optind; i_opt-- )
+    while( n > 0 )
     {
-        i_options = 0;
-
         /* Count the input options */
-        while( *ppsz_argv[ i_opt ] == ':' && i_opt > vlc_optind )
+        unsigned i_options = 0;
+
+        while( args[--n][0] == ':' )
         {
             i_options++;
-            i_opt--;
+            if( n == 0 )
+            {
+                msg_Warn( p_vlc, "options %s without item", args[n] );
+                return; /* syntax!? */
+            }
         }
 
         /* TODO: write an internal function of this one, to avoid
          *       unnecessary lookups. */
-        char *mrl = make_URI( ppsz_argv[i_opt] );
+        char *mrl = make_URI( args[n] );
         if( !mrl )
             continue;
 
         playlist_AddExt( pl_Get( p_vlc ), mrl, NULL, PLAYLIST_INSERT,
-                0, -1, i_options, ( i_options ? &ppsz_argv[i_opt + 1] : NULL ),
+                0, -1, i_options, ( i_options ? &args[n + 1] : NULL ),
                 VLC_INPUT_OPTION_TRUSTED, true, pl_Unlocked );
         free( mrl );
     }
-
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
