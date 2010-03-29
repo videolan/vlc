@@ -46,7 +46,6 @@
 #include "config.h"
 
 #define XP_UNIX 1
-#define OJI 1
 
 #include <npapi.h>
 #if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) < 20)
