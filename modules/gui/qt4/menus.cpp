@@ -1456,8 +1456,9 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
 
     action->setChecked( checked );
 
-    MenuItemData *itemData = new MenuItemData( THEDP->menusMapper, p_obj, i_val_type,
-            val, psz_var );
+    MenuItemData *itemData = qFindChild<MenuItemData*>( action, QString() );
+    delete itemData;
+    itemData = new MenuItemData( action, p_obj, i_val_type, val, psz_var );
 
     /* remove previous signal-slot connection(s) if any */
     action->disconnect( );
