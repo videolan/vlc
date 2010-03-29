@@ -66,12 +66,6 @@ char *vlc_optarg = NULL;
 /* 1003.2 says this must be 1 before any call.  */
 int vlc_optind = 1;
 
-/* Formerly, initialization of getopt depended on optind==0, which
-   causes problems with re-calling getopt as programs generally don't
-   know that. */
-
-static int vlc_getopt_initialized = 0;
-
 /* The next char to be scanned in the option-element
    in which the last option character we returned was found.
    This allows us to pick up the scan where we left off.
@@ -303,11 +297,10 @@ int
 {
     vlc_optarg = NULL;
 
-    if (!vlc_getopt_initialized || vlc_optind == 0)
+    if (vlc_optind == 0)
     {
         optstring = vlc_getopt_initialize(argc, argv, optstring);
         vlc_optind = 1;    /* Don't scan ARGV[0], the program name.  */
-        vlc_getopt_initialized = 1;
     }
 
 #define NONOPTION_P (argv[vlc_optind][0] != '-' || argv[vlc_optind][1] == '\0')
