@@ -173,7 +173,11 @@ private:
 class VlcPlugin
 {
 public:
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) < 20)
              VlcPlugin( NPP, uint16 );
+#else
+             VlcPlugin( NPP, uint16_t );
+#endif
     virtual ~VlcPlugin();
 
     NPError             init(int argc, char* const argn[], char* const argv[]);
@@ -226,7 +230,11 @@ public:
     vlc_toolbar_clicked_t getToolbarButtonClicked( int i_xpos, int i_ypos );
 #endif
 
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) < 20)
     uint16    i_npmode; /* either NP_EMBED or NP_FULL */
+#else
+    uint16_t  i_npmode; /* either NP_EMBED or NP_FULL */
+#endif
 
     /* plugin properties */
     int      b_stream;
