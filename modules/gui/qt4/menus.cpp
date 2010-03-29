@@ -430,7 +430,16 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
     else
     {
         menu = current;
-        menu->clear();
+        //menu->clear();
+        //HACK menu->clear() does not delete submenus
+        QList<QAction*> actions = menu->actions();
+        foreach( QAction *a, actions )
+        {
+            QMenu *m = a->menu();
+            if( m && m->parent() == menu ) delete m;
+            if( a->parent() == menu ) delete a;
+            else menu->removeAction( a );
+        }
     }
 
     MainInterface *mi = _mi ? _mi : p_intf->p_sys->p_mi;
