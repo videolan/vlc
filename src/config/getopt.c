@@ -83,11 +83,7 @@ static int last_nonopt;
    `first_nonopt' and `last_nonopt' are relocated so that they describe
    the new indices of the non-options in ARGV after they are moved.  */
 
-static void exchange(char **);
-
-static void
-     exchange(argv)
-     char **argv;
+static void exchange(char **argv)
 {
     int bottom = first_nonopt;
     int middle = last_nonopt;
@@ -192,13 +188,9 @@ static void
    It is only valid when a long-named option has been found by the most
    recent call.  */
 
-int
-    vlc_getopt_long(argc, argv, optstring, longopts, longind)
-     int argc;
-     char *const *argv;
-     const char *optstring;
-     const struct vlc_option *restrict longopts;
-     int *longind;
+int vlc_getopt_long(int argc, char *const *argv,
+                    const char *optstring,
+                    const struct vlc_option *restrict longopts, int *longind)
 {
     vlc_optarg = NULL;
 
