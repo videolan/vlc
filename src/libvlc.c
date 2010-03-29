@@ -964,7 +964,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * We assume that the remaining parameters are filenames
      * and their input options.
      */
-    msg_Info( p_libvlc, "optind = %u", vlc_optind );
     GetFilenames( p_libvlc, i_argc - vlc_optind, ppsz_argv + vlc_optind );
 
     /*
