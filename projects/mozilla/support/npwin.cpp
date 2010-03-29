@@ -37,12 +37,10 @@
 #ifndef _NPAPI_H_
 #   include "npapi.h"
 #endif
-#ifdef HAVE_NPFUNCTIONS_H
-#   include "npfunctions.h"
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) < 20)
+#include "npupp.h" 
 #else
-#   ifndef _NPUPP_H_
-#      include "npupp.h"
-#   endif
+#include "npfunctions.h"
 #endif
 
 #include "../vlcshell.h"

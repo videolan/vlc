@@ -76,10 +76,10 @@
 #undef XP_UNIX
 #endif
 
-#ifdef HAVE_NPFUNCTIONS_H
-#include "npfunctions.h"
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) < 20)
+#include "npupp.h" 
 #else
-#include "npupp.h"
+#include "npfunctions.h"
 #endif
 
 #include "../vlcshell.h"
