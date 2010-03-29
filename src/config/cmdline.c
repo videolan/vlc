@@ -195,6 +195,8 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
     memset( &p_longopts[i_index], 0, sizeof(*p_longopts) );
     psz_shortopts[i_shortopts] = '\0';
 
+    int ret = -1;
+
     /*
      * Parse the command line options
      */
@@ -228,19 +230,12 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                 if( p_conf->psz_oldname
                  && !strcmp( p_conf->psz_oldname, psz_name) )
                 {
-                    fprintf( stderr,
-                             "%s: option --%s is deprecated. Use --%s instead.\n",
-                             b_ignore_errors ? "Warning" : "Error",
-                             psz_name, p_conf->psz_name );
                     if( !b_ignore_errors )
                     {
-                        /*free */
-                        for( i_index = 0; p_longopts[i_index].name; i_index++ )
-                             free( (char *)p_longopts[i_index].name );
-
-                        free( p_longopts );
-                        free( psz_shortopts );
-                        return -1;
+                        fprintf( stderr, "Error: option --%s is deprecated. "
+                                 "Use --%s instead.\n",
+                                 psz_name, p_conf->psz_name );
+                        goto out;
                     }
 
                     psz_name = p_conf->psz_name;
@@ -335,22 +330,18 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                 fprintf( stderr, "`%s'\n", ppsz_argv[vlc_optind-1] );
             }
             fputs( "Try `vlc --help' for more information.\n", stderr );
-
-            for( i_index = 0; p_longopts[i_index].name; i_index++ )
-                free( (char *)p_longopts[i_index].name );
-            free( p_longopts );
-            free( psz_shortopts );
-            return -1;
+            goto out;
         }
     }
 
+    ret = 0;
+out:
     /* Free allocated resources */
     for( i_index = 0; p_longopts[i_index].name; i_index++ )
         free( (char *)p_longopts[i_index].name );
     free( p_longopts );
     free( psz_shortopts );
     free( argv_copy );
-
-    return 0;
+    return ret;
 }
 
