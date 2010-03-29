@@ -1036,7 +1036,10 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                 msg_Warn( p_intf, "could not find parent interface" );
         }
         else
-            menu->addMenu( ViewMenu( p_intf, (QMenu *)NULL ) );
+        {
+            QMenu *viewmenu = menu->addMenu( qtr( "V&iew" ) );
+            ViewMenu( p_intf, viewmenu );
+        }
 
         menu->addMenu( submenu );
     }
