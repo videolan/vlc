@@ -116,9 +116,6 @@ static enum
 }
 ordering;
 
-/* Value of POSIXLY_CORRECT environment variable.  */
-static char *posixly_correct;
-
 /* Handle permutation of arguments.  */
 
 /* Describe the part of ARGV that contains non-options that have
@@ -197,16 +194,8 @@ static void
 
 /* Initialize the internal data when the first call is made.  */
 
-static const char *vlc_getopt_initialize(int, char *const *, const char *);
-
-static const char *
-     vlc_getopt_initialize(argc, argv, optstring)
-     int argc;
-     char *const *argv;
-     const char *optstring;
+static const char *vlc_getopt_initialize(const char *optstring)
 {
-    (void)argc;
-    (void)argv;
     /* Start processing options with ARGV-element 1 (since ARGV-element 0
        is the program name); the sequence of previously skipped
        non-option ARGV-elements is empty.  */
@@ -215,7 +204,7 @@ static const char *
 
     nextchar = NULL;
 
-    posixly_correct = getenv("POSIXLY_CORRECT");
+    const char *posixly_correct = getenv("POSIXLY_CORRECT");
 
     /* Determine how to handle the ordering of options and nonoptions.  */
 
@@ -299,7 +288,7 @@ int
 
     if (vlc_optind == 0)
     {
-        optstring = vlc_getopt_initialize(argc, argv, optstring);
+        optstring = vlc_getopt_initialize(optstring);
         vlc_optind = 1;    /* Don't scan ARGV[0], the program name.  */
     }
 
