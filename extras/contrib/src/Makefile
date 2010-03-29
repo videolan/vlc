@@ -2011,10 +2011,10 @@ DISTCLEAN_PKG += firefox-source-$(MOZILLA_VERSION).tar.bz2
 jpegsrc.v$(JPEG_VERSION).tar.gz:
 	$(WGET) $(JPEG_URL)
 
-jpeg-7: jpegsrc.v$(JPEG_VERSION).tar.gz
+jpeg-$(JPEG_VERSION): jpegsrc.v$(JPEG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-.jpeg: jpeg-7
+.jpeg: jpeg-$(JPEG_VERSION)
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(HOSTCC) && make && make install)
 	$(RANLIB) $(PREFIX)/lib/libjpeg.a
 	touch $@
