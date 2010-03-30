@@ -254,8 +254,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     }
 
     /* Playlist */
-    int i_plVis = settings->value( "playlist-visible", 0 ).toInt();
-
+    int i_plVis = settings->value( "playlist-visible", false ).toBool();
     settings->endGroup();
 
     if( i_plVis ) togglePlaylist();
@@ -274,17 +273,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 MainInterface::~MainInterface()
 {
     /* Unsure we hide the videoWidget before destroying it */
-    if( stackCentralOldWidget == playlistWidget )
+    if( stackCentralOldWidget == videoWidget )
         showBg();
-
-    /* Save playlist state */
-    if( playlistWidget )
-    {
-        if( !isPlDocked() )
-            QVLCTools::saveWidgetPosition( p_intf, "Playlist", playlistWidget );
-
-        delete playlistWidget;
-    }
 
 #ifdef WIN32
     if( himl )
@@ -306,7 +296,22 @@ MainInterface::~MainInterface()
     /* Save states */
     settings->beginGroup( "MainWindow" );
     settings->setValue( "pl-dock-status", b_plDocked );
-    settings->setValue( "playlist-visible", (int)playlistVisible );
+    /* Save playlist state */
+    if( playlistWidget )
+    {
+        if( isPlDocked() )
+        {
+            QVLCTools::saveWidgetPosition( p_intf, "Playlist", playlistWidget );
+            settings->setValue( "playlist-visible", playlistVisible );
+        }
+        else
+        {
+            settings->setValue( "playlist-visible", playlistWidget->isVisible() ); // FIXME
+        }
+
+        delete playlistWidget;
+    }
+
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
 
