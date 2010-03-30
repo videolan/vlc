@@ -338,7 +338,7 @@ static int Open(vlc_object_t *object)
     es_format_Clean(&fmt);
 
     if (!sys->es) {
-        free(sys->source.data);
+        free(sys->source.cookie);
         free(sys);
         return VLC_EGENERIC;
     }
