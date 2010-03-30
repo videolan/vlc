@@ -33,12 +33,16 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_access.h>
 #include <vlc_demux.h>
 #include <vlc_charset.h>
 
 /*****************************************************************************
  * Module descriptior
  *****************************************************************************/
+static int  OpenAccess (vlc_object_t *);
+static void CloseAccess(vlc_object_t *);
+
 static int  OpenDemux (vlc_object_t *);
 static void CloseDemux(vlc_object_t *);
 
@@ -59,10 +63,10 @@ static void CloseDemux(vlc_object_t *);
 #define CAT_LONGTEXT N_(\
     "Set the category of the elementary stream")
 static const int cat_values[] = {
-    0, 1, 2, 3
+    0, 1, 2, 3, 4,
 };
 static const char *cat_texts[] = {
-    N_("Unknown"), N_("Audio"), N_("Video"), N_("Subtitle")
+    N_("Unknown"), N_("Audio"), N_("Video"), N_("Subtitle"), N_("Data")
 };
 
 #define CODEC_TEXT N_("Codec")
@@ -169,6 +173,11 @@ vlc_module_begin()
     add_shortcut("imem")
     set_capability("access_demux", 0)
     set_callbacks(OpenDemux, CloseDemux)
+
+    add_submodule()
+        add_shortcut("imem")
+        set_capability("access", 0)
+        set_callbacks(OpenAccess, CloseAccess)
 vlc_module_end()
 
 /*****************************************************************************
@@ -190,6 +199,9 @@ typedef void (*imem_release_t)(void *data, const char *cookie, size_t, void *);
  *****************************************************************************/
 
 /* */
+static block_t *Block(access_t *);
+static int ControlAccess(access_t *, int, va_list);
+
 static int Demux(demux_t *);
 static int ControlDemux(demux_t *, int, va_list);
 
@@ -281,6 +293,114 @@ static int OpenCommon(vlc_object_t *object, imem_sys_t **sys_ptr, const char *ps
 }
 
 /**
+ * It opens an imem access.
+ */
+static int OpenAccess(vlc_object_t *object)
+{
+    access_t   *access = (access_t *)object;
+    imem_sys_t *sys;
+
+    if (OpenCommon(object, &sys, access->psz_path))
+        return VLC_EGENERIC;
+
+    if (var_InheritInteger(object, "imem-cat") != 4) {
+        CloseCommon(sys);
+        return VLC_EGENERIC;
+    }
+
+    /* */
+    access_InitFields(access);
+    access->pf_control = ControlAccess;
+    access->pf_read    = NULL;
+    access->pf_block   = Block;
+    access->pf_seek    = NULL;
+    access->p_sys      = (access_sys_t*)sys;
+
+    return VLC_SUCCESS;
+}
+
+/**
+ * It closes an imem access
+ */
+static void CloseAccess(vlc_object_t *object)
+{
+    access_t *access = (access_t *)object;
+
+    CloseCommon((imem_sys_t*)access->p_sys);
+}
+
+/**
+ * It controls an imem access
+ */
+static int ControlAccess(access_t *access, int i_query, va_list args)
+{
+    imem_sys_t *sys = (imem_sys_t*)access->p_sys;
+
+    switch (i_query)
+    {
+    case ACCESS_CAN_SEEK:
+    case ACCESS_CAN_FASTSEEK: {
+        bool *b = va_arg( args, bool* );
+        *b = false;
+        return VLC_SUCCESS;
+    }
+    case ACCESS_CAN_PAUSE:
+    case ACCESS_CAN_CONTROL_PACE: {
+        bool *b = va_arg( args, bool* );
+        *b = true;
+        return VLC_SUCCESS;
+    }
+    case ACCESS_GET_PTS_DELAY: {
+        int64_t *delay = va_arg(args, int64_t *);
+        *delay = sys->pts_delay;
+        return VLC_SUCCESS;
+    }
+    case ACCESS_SET_PAUSE_STATE:
+        return VLC_SUCCESS;
+
+    case ACCESS_GET_TITLE_INFO:
+    case ACCESS_SET_TITLE:
+    case ACCESS_SET_SEEKPOINT:
+    case ACCESS_SET_PRIVATE_ID_STATE:
+    case ACCESS_GET_META:
+    case ACCESS_GET_PRIVATE_ID_STATE:
+    case ACCESS_GET_CONTENT_TYPE:
+    default:
+        return VLC_EGENERIC;
+    }
+}
+
+/**
+ * It retreives data using the get() callback, copies them,
+ * and then release them using the release() callback.
+ */
+static block_t *Block(access_t *access)
+{
+    imem_sys_t *sys = (imem_sys_t*)access->p_sys;
+
+    unsigned flags;
+    size_t buffer_size;
+    void   *buffer;
+
+    if (sys->source.get(sys->source.data, sys->source.cookie,
+                        NULL, NULL, &flags, &buffer_size, &buffer)) {
+        access->info.b_eof = true;
+        return NULL;
+    }
+
+    block_t *block = NULL;
+    if (buffer_size > 0) {
+        block = block_New(access, buffer_size);
+        if (block)
+            memcpy(block->p_buffer, buffer, buffer_size);
+    }
+
+    sys->source.release(sys->source.data, sys->source.cookie,
+                        buffer_size, buffer);
+    return block;
+}
+
+/**
  * It opens an imem access_demux.
  */
 static int OpenDemux(vlc_object_t *object)
@@ -288,7 +408,7 @@ static int OpenDemux(vlc_object_t *object)
     demux_t    *demux = (demux_t *)object;
     imem_sys_t *sys;
 
-    if (OpenCommon(VLC_OBJECT(demux), &sys, demux->psz_path))
+    if (OpenCommon(object, &sys, demux->psz_path))
         return VLC_EGENERIC;
 
 	/* ES format */
@@ -303,7 +423,8 @@ static int OpenDemux(vlc_object_t *object)
         fmt.i_codec = vlc_fourcc_GetCodecFromString(UNKNOWN_ES, tmp);
     free(tmp);
 
-    switch (var_CreateGetInteger(object, "imem-cat")) {
+    const int cat = var_InheritInteger(object, "imem-cat");
+    switch (cat) {
     case 1: {
         fmt.i_cat = AUDIO_ES;
         fmt.audio.i_channels = var_CreateGetInteger(object, "imem-channels");
@@ -349,7 +470,8 @@ static int OpenDemux(vlc_object_t *object)
         break;
     }
     default:
-        msg_Err(object, "Invalid ES category");
+        if (cat != 4)
+            msg_Err(object, "Invalid ES category");
         es_format_Clean(&fmt);
         CloseCommon(sys);
         return VLC_EGENERIC;
@@ -387,7 +509,7 @@ static void CloseDemux(vlc_object_t *object)
 }
 
 /**
- * It controls imem
+ * It controls an imem access_demux
  */
 static int ControlDemux(demux_t *demux, int i_query, va_list args)
 {
