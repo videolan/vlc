@@ -311,7 +311,6 @@ void StandardPLPanel::createTreeView()
     /* setModel after setSortingEnabled(true), or the model will sort immediately! */
     treeView->setModel( model );
 
-    getSettings()->beginGroup("Playlist");
     if( getSettings()->contains( "headerStateV2" ) )
     {
         treeView->header()->restoreState(
