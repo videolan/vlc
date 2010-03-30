@@ -62,7 +62,7 @@ static int  Start( access_t *, uint64_t );
 static void Stop( access_t * );
 
 static int  GetPacket( access_t *, chunk_t * );
-static void GetHeader( access_t *p_access );
+static void GetHeader( access_t *p_access, int i_content_length );
 
 static int Restart( access_t * );
 static int Reset( access_t * );
@@ -451,7 +451,7 @@ static int Reset( access_t *p_access )
     p_sys->p_packet = NULL;
 
     /* Get the next header FIXME memory loss ? */
-    GetHeader( p_access );
+    GetHeader( p_access, -1 );
     if( p_sys->i_header <= 0 )
         return VLC_EGENERIC;
 
@@ -548,6 +548,8 @@ static int Describe( access_t  *p_access, char **ppsz_location )
 {
     access_sys_t *p_sys = p_access->p_sys;
     char         *psz_location = NULL;
+    int          i_content_length = -1;
+    bool         b_keepalive = false;
     char         *psz;
     int          i_code;
 
@@ -656,6 +658,20 @@ static int Describe( access_t  *p_access, char **ppsz_location )
         {
             psz_location = strdup( p );
         }
+        else if( !strcasecmp( psz, "Content-Length" ) )
+        {
+            i_content_length = atoi( p );
+            msg_Dbg( p_access, "content-length = %d", i_content_length );
+        }
+        else if( !strcasecmp( psz, "Connection" ) )
+        {
+            if( strcasestr( p, "Keep-Alive" ) )
+            {
+                msg_Dbg( p_access, "Keep-Alive header found" );
+                b_keepalive = true;
+            }
+        }
+
 
         free( psz );
     }
@@ -674,7 +690,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     free( psz_location );
 
     /* Read the asf header */
-    GetHeader( p_access );
+    GetHeader( p_access, b_keepalive ? i_content_length : -1);
     if( p_sys->i_header <= 0 )
     {
         msg_Err( p_access, "header size == 0" );
@@ -714,9 +730,10 @@ error:
     return VLC_EGENERIC;
 }
 
-static void GetHeader( access_t *p_access )
+static void GetHeader( access_t *p_access, int i_content_length )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    int i_read_content = 0;
 
     /* Read the asf header */
     p_sys->i_header = 0;
@@ -725,8 +742,10 @@ static void GetHeader( access_t *p_access )
     for( ;; )
     {
         chunk_t ck;
-        if( GetPacket( p_access, &ck ) || ck.i_type != 0x4824 )
+        if( (i_content_length >= 0 && i_read_content >= i_content_length) || GetPacket( p_access, &ck ) || ck.i_type != 0x4824 )
             break;
+
+        i_read_content += (4+ck.i_size);
 
         if( ck.i_data > 0 )
         {
