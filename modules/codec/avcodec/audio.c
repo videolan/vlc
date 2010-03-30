@@ -217,14 +217,16 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->i_previous_channels = 0;
     p_sys->i_previous_layout = 0;
 
-    date_Set( &p_sys->end_date, 0 );
-    if( p_dec->fmt_in.audio.i_rate )
-        date_Init( &p_sys->end_date, p_dec->fmt_in.audio.i_rate, 1 );
-
     /* */
     p_dec->fmt_out.i_cat = AUDIO_ES;
     /* Try to set as much informations as possible but do not trust it */
     SetupOutputFormat( p_dec, false );
+
+    date_Set( &p_sys->end_date, 0 );
+    if( p_dec->fmt_out.audio.i_rate )
+        date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
+    else if( p_dec->fmt_in.audio.i_rate )
+        date_Init( &p_sys->end_date, p_dec->fmt_in.audio.i_rate, 1 );
 
     return VLC_SUCCESS;
 }
