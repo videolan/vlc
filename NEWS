@@ -1,4 +1,4 @@
-Changes between 1.0.5 and 1.1.0-test:
+Changes between 1.0.5 and 1.1.0-pre1:
 ------------------------------------
 Important changes for users:
 
@@ -34,6 +34,7 @@ Decoders:
  * Support for AMR-NB audio codec on the Windows and Mac port
  * Improvements on the FLAC format (7.1 channels and 88.2/176.4/192 kHz support)
  * Direct rendering is always used with H.264 in avcodec module
+ * Partial Support for MPEG-4 ALS
 
 Demuxers:
  * Support for .aob files from DVD-Audio (MLP and LPCM)
