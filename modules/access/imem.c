@@ -95,6 +95,10 @@ static const char *cat_texts[] = {
 #define FPS_LONGTEXT N_(\
     "Frame rate of a video elementary stream")
 
+#define COOKIE_TEXT N_("Callback cookie string")
+#define COOKIE_LONGTEXT N_(\
+    "Text identifier for the callback functions")
+
 #define DATA_TEXT N_("Callback data")
 #define DATA_LONGTEXT N_(\
     "Data for the get and release functions")
@@ -118,6 +122,8 @@ vlc_module_begin()
     add_string ("imem-get", "0", NULL, GET_TEXT, GET_LONGTEXT, true)
         change_volatile()
     add_string ("imem-release", "0", NULL, RELEASE_TEXT, RELEASE_LONGTEXT, true)
+        change_volatile()
+    add_string ("imem-cookie", NULL, NULL, COOKIE_TEXT, COOKIE_LONGTEXT, true)
         change_volatile()
     add_string ("imem-data", "0", NULL, DATA_TEXT, DATA_LONGTEXT, true)
         change_volatile()
@@ -162,10 +168,10 @@ vlc_module_end()
  *
  * TODO define flags
  */
-typedef int  (*imem_get_t)(void *data,
+typedef int  (*imem_get_t)(void *data, const char *cookie,
                            int64_t *dts, int64_t *pts, unsigned *flags,
                            size_t *, void **);
-typedef void (*imem_release_t)(void *data, size_t, void *);
+typedef void (*imem_release_t)(void *data, const char *cookie, size_t, void *);
 
 /*****************************************************************************
  * Local prototypes
@@ -180,7 +186,8 @@ struct demux_sys_t {
     struct {
         imem_get_t      get;
         imem_release_t  release;
-        void            *data;
+        void           *data;
+        char           *cookie;
     } source;
 
     es_out_id_t  *es;
@@ -229,7 +236,7 @@ static int Open(vlc_object_t *object)
 
     tmp = var_CreateGetString(demux, "imem-data");
     if (tmp)
-        sys->source.data = (void*)(intptr_t)strtoll(tmp, NULL, 0);
+        sys->source.data = (void *)(uintptr_t)strtoull(tmp, NULL, 0);
     free(tmp);
 
     /* Now we can parse the MRL (get/release must not be parsed to avoid
@@ -237,8 +244,16 @@ static int Open(vlc_object_t *object)
     if (*demux->psz_path)
         ParseMRL(demux);
 
-    msg_Dbg(demux, "Using get(%p) release(%p) and data(%p)",
-            sys->source.get, sys->source.release, sys->source.data);
+    /* Now we can parse the MRL (get/release must not be parsed to avoid
+     * security risks) */
+    if (*demux->psz_path)
+        ParseMRL(demux);
+
+    sys->source.cookie = var_InheritString(demux, "imem-cookie");
+
+    msg_Dbg(demux, "Using get(%p), release(%p), data(%p), cookie(%s)",
+            sys->source.get, sys->source.release, sys->source.data,
+            sys->source.cookie ? sys->source.cookie : "(null)");
 
 	/* ES format */
     es_format_t fmt;
@@ -311,6 +326,7 @@ static int Open(vlc_object_t *object)
     es_format_Clean(&fmt);
 
     if (!sys->es) {
+        free(sys->source.data);
         free(sys);
         return VLC_EGENERIC;
     }
@@ -337,8 +353,10 @@ static int Open(vlc_object_t *object)
 static void Close(vlc_object_t *object)
 {
     demux_t     *demux = (demux_t *)object;
+    demux_sys_t *sys = demux->p_sys;
 
-    free(demux->p_sys);
+    free(sys->source.cookie);
+    free(sys);
 }
 
 /**
@@ -415,7 +433,8 @@ static int Demux(demux_t *demux)
         size_t buffer_size;
         void   *buffer;
 
-        if (sys->source.get(sys->source.data, &dts, &pts, &flags, &buffer_size, &buffer))
+        if (sys->source.get(sys->source.data, sys->source.cookie,
+                            &dts, &pts, &flags, &buffer_size, &buffer))
             return 0;
 
         if (dts < 0)
@@ -435,7 +454,8 @@ static int Demux(demux_t *demux)
 
         sys->dts = dts;
 
-        sys->source.release(sys->source.data, buffer_size, buffer);
+        sys->source.release(sys->source.data, sys->source.cookie,
+                            buffer_size, buffer);
     }
     sys->deadline = VLC_TS_INVALID;
     return 1;
@@ -511,7 +531,7 @@ static void ParseMRL(demux_t *demux)
         { "channels",   VLC_VAR_INTEGER },
         { "width",      VLC_VAR_INTEGER },
         { "height",     VLC_VAR_INTEGER },
-        { "data",       VLC_VAR_STRING },
+        { "cookie",     VLC_VAR_STRING },
         { "codec",      VLC_VAR_STRING },
         { "language",   VLC_VAR_STRING },
         { "dar",        VLC_VAR_STRING },
