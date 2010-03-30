@@ -18,7 +18,7 @@ include( config )
 add_definitions(-DHAVE_CONFIG_H)
 add_definitions(-D__LIBVLC__)
 # Large file support for Solaris and Linux:
-add_definitions(-D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURCE)
+add_definitions(-D_FILE_OFFSET_BITS=64 -D__USE_UNIX98)
 # Thread safety:
 add_definitions(-D_REENTRANT -D_THREAD_SAFE)
 
