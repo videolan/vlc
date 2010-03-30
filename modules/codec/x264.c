@@ -466,7 +466,7 @@ vlc_module_begin ()
 
     add_bool( SOUT_CFG_PREFIX "psy", true, NULL, PSY_TEXT, PSY_LONGTEXT, false )
 
-    add_string( SOUT_CFG_PREFIX "level", "5.1", NULL, LEVEL_TEXT,
+    add_string( SOUT_CFG_PREFIX "level", "0", NULL, LEVEL_TEXT,
                LEVEL_LONGTEXT, false )
 
     add_string( SOUT_CFG_PREFIX "profile", "high", NULL, PROFILE_TEXT,
@@ -841,10 +841,10 @@ static int  Open ( vlc_object_t *p_this )
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "level" );
     if( psz_val )
     {
-        if( us_atof (psz_val) < 6 )
+        if( us_atof (psz_val) < 6 && us_atof (psz_val) > 0 )
             p_sys->param.i_level_idc = (int) (10 * us_atof (psz_val)
                                               + .5);
-        else
+        else if( atoi(psz_val) > 0 )
             p_sys->param.i_level_idc = atoi (psz_val);
         free( psz_val );
     }
