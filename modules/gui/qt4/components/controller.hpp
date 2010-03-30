@@ -171,7 +171,6 @@ signals:
     void inputPlaying( bool ); /// This might be usefull in the IM ?
     void inputIsRecordable( bool ); /// same ?
     void inputIsTrickPlayable( bool ); /// same ?
-    void sizeChanged();
 };
 
 /* Advanced Button Bar */
@@ -203,7 +202,7 @@ public:
 protected:
     friend class MainInterface;
 
-    bool                 b_advancedVisible;
+    bool b_advancedVisible;
 
 protected slots:
     void toggleAdvanced();

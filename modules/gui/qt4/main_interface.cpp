@@ -339,11 +339,6 @@ void MainInterface::recreateToolbars()
     delete inputC;
 
     controls = new ControlsWidget( p_intf, false, this ); /* FIXME */
-    CONNECT( controls, advancedControlsToggled( bool ),
-             this, adaptGeometry() );
-    CONNECT( controls, sizeChanged(),
-             this, adaptGeometry() );
-
     inputC = new InputControlsWidget( p_intf, this );
 
     mainLayout->insertWidget( 2, inputC );
@@ -379,10 +374,6 @@ void MainInterface::createMainWidget( QSettings *settings )
     /* Create the CONTROLS Widget */
     controls = new ControlsWidget( p_intf,
                    settings->value( "adv-controls", false ).toBool(), this );
-    CONNECT( controls, advancedControlsToggled( bool ),
-             this, adaptGeometry() );
-    CONNECT( controls, sizeChanged(),
-             this, adaptGeometry() );
     inputC = new InputControlsWidget( p_intf, this );
 
     mainLayout->insertWidget( 2, inputC );
@@ -479,19 +470,6 @@ inline void MainInterface::createStatusBar()
 /**********************************************************************
  * Handling of sizing of the components
  **********************************************************************/
-
-/* This function is called:
-   - Advanced buttons toggled
-   - Toolbar geom changed
- */
-void MainInterface::adaptGeometry()
-{
-  resize( sizeHint() );
-
-#ifdef DEBUG_INTF
-    debug();
-#endif
-}
 
 void MainInterface::debug()
 {

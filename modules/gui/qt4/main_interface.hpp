@@ -193,7 +193,6 @@ private slots:
     void debug();
     void destroyPopupMenu();
     void recreateToolbars();
-    void adaptGeometry();
     void setName( const QString& );
     void setVLCWindowsTitle( const QString& title = "" );
 #if 0
