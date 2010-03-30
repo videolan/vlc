@@ -1,7 +1,7 @@
 /*****************************************************************************
  * imem.c : Memory input for VLC
  *****************************************************************************
- * Copyright (C) 2009 Laurent Aimar
+ * Copyright (C) 2009-2010 Laurent Aimar
  * $Id$
  *
  * Author: Laurent Aimar <fenrir _AT_ videolan _DOT org>
@@ -39,8 +39,8 @@
 /*****************************************************************************
  * Module descriptior
  *****************************************************************************/
-static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
+static int  OpenDemux (vlc_object_t *);
+static void CloseDemux(vlc_object_t *);
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_(\
@@ -168,7 +168,7 @@ vlc_module_begin()
 
     add_shortcut("imem")
     set_capability("access_demux", 0)
-    set_callbacks(Open, Close)
+    set_callbacks(OpenDemux, CloseDemux)
 vlc_module_end()
 
 /*****************************************************************************
@@ -191,10 +191,10 @@ typedef void (*imem_release_t)(void *data, const char *cookie, size_t, void *);
 
 /* */
 static int Demux(demux_t *);
-static int Control(demux_t *, int, va_list);
+static int ControlDemux(demux_t *, int, va_list);
 
 /* */
-struct demux_sys_t {
+typedef struct {
     struct {
         imem_get_t      get;
         imem_release_t  release;
@@ -209,99 +209,128 @@ struct demux_sys_t {
     mtime_t      dts;
 
     mtime_t      deadline;
-};
+} imem_sys_t;
 
-static void ParseMRL(demux_t *);
-static int var_CreateGetRational(demux_t *,
-                                 unsigned *num, unsigned *den,
-                                 const char *var);
+static void ParseMRL(vlc_object_t *, const char *);
+#define var_CreateGetRational(a,b,c,d) var_CreateGetRational(VLC_OBJECT(a),b,c,d)
+static int (var_CreateGetRational)(vlc_object_t *,
+                                   unsigned *num, unsigned *den,
+                                   const char *var);
 
 /**
- * It opens an imem access_demux
+ * It closes the common part of the access and access_demux
  */
-static int Open(vlc_object_t *object)
+static void CloseCommon(imem_sys_t *sys)
 {
-    demux_t     *demux = (demux_t*)object;
+    free(sys->source.cookie);
+    free(sys);
+}
+
+/**
+ * It initializes the common part for imem access/access_demux.
+ */
+static int OpenCommon(vlc_object_t *object, imem_sys_t **sys_ptr, const char *psz_path)
+{
     char *tmp;
 
 	/* */
-    demux_sys_t *sys = calloc(1, sizeof(*sys));
+    imem_sys_t *sys = calloc(1, sizeof(*sys));
 	if (!sys)
 		return VLC_ENOMEM;
 
     /* Read the user functions */
-    tmp = var_CreateGetString(demux, "imem-get");
+    tmp = var_CreateGetString(object, "imem-get");
     if (tmp)
         sys->source.get = (imem_get_t)(intptr_t)strtoll(tmp, NULL, 0);
     free(tmp);
 
-    tmp = var_CreateGetString(demux, "imem-release");
+    tmp = var_CreateGetString(object, "imem-release");
     if (tmp)
         sys->source.release = (imem_release_t)(intptr_t)strtoll(tmp, NULL, 0);
     free(tmp);
 
     if (!sys->source.get || !sys->source.release) {
-        msg_Err(demux, "Invalid get/release function pointers");
+        msg_Err(object, "Invalid get/release function pointers");
         free(sys);
         return VLC_EGENERIC;
     }
 
-    tmp = var_CreateGetString(demux, "imem-data");
+    tmp = var_CreateGetString(object, "imem-data");
     if (tmp)
         sys->source.data = (void *)(uintptr_t)strtoull(tmp, NULL, 0);
     free(tmp);
 
     /* Now we can parse the MRL (get/release must not be parsed to avoid
      * security risks) */
-    if (*demux->psz_path)
-        ParseMRL(demux);
+    if (*psz_path)
+        ParseMRL(object, psz_path);
 
-    sys->source.cookie = var_InheritString(demux, "imem-cookie");
+    sys->source.cookie = var_InheritString(object, "imem-cookie");
 
-    msg_Dbg(demux, "Using get(%p), release(%p), data(%p), cookie(%s)",
+    msg_Dbg(object, "Using get(%p), release(%p), data(%p), cookie(%s)",
             sys->source.get, sys->source.release, sys->source.data,
             sys->source.cookie ? sys->source.cookie : "(null)");
+
+    /* */
+    sys->pts_delay = var_CreateGetInteger(object, "imem-caching") * INT64_C(1000);
+    sys->dts       = 0;
+    sys->deadline  = VLC_TS_INVALID;
+
+    *sys_ptr = sys;
+    return VLC_SUCCESS;
+}
+
+/**
+ * It opens an imem access_demux.
+ */
+static int OpenDemux(vlc_object_t *object)
+{
+    demux_t    *demux = (demux_t *)object;
+    imem_sys_t *sys;
+
+    if (OpenCommon(VLC_OBJECT(demux), &sys, demux->psz_path))
+        return VLC_EGENERIC;
 
 	/* ES format */
     es_format_t fmt;
 	es_format_Init(&fmt, UNKNOWN_ES, 0);
 
-    fmt.i_id = var_CreateGetInteger(demux, "imem-id");
-    fmt.i_group = var_CreateGetInteger(demux, "imem-group");
+    fmt.i_id = var_CreateGetInteger(object, "imem-id");
+    fmt.i_group = var_CreateGetInteger(object, "imem-group");
 
-    tmp = var_CreateGetString(demux, "imem-codec");
+    char *tmp = var_CreateGetString(object, "imem-codec");
     if (tmp)
         fmt.i_codec = vlc_fourcc_GetCodecFromString(UNKNOWN_ES, tmp);
     free(tmp);
 
-    switch (var_CreateGetInteger(demux, "imem-cat")) {
+    switch (var_CreateGetInteger(object, "imem-cat")) {
     case 1: {
         fmt.i_cat = AUDIO_ES;
-        fmt.audio.i_channels = var_CreateGetInteger(demux, "imem-channels");
-        fmt.audio.i_rate = var_CreateGetInteger(demux, "imem-samplerate");
+        fmt.audio.i_channels = var_CreateGetInteger(object, "imem-channels");
+        fmt.audio.i_rate = var_CreateGetInteger(object, "imem-samplerate");
 
-        msg_Dbg(demux, "Audio %4.4s %d channels %d Hz",
+        msg_Dbg(object, "Audio %4.4s %d channels %d Hz",
                 (const char *)&fmt.i_codec,
                 fmt.audio.i_channels, fmt.audio.i_rate);
         break;
     }
     case 2: {
         fmt.i_cat = VIDEO_ES;
-        fmt.video.i_width  = var_CreateGetInteger(demux, "imem-width");
-        fmt.video.i_height = var_CreateGetInteger(demux, "imem-height");
+        fmt.video.i_width  = var_CreateGetInteger(object, "imem-width");
+        fmt.video.i_height = var_CreateGetInteger(object, "imem-height");
         unsigned num, den;
-        if (!var_CreateGetRational(demux, &num, &den, "imem-dar") && num > 0 && den > 0) {
+        if (!var_CreateGetRational(object, &num, &den, "imem-dar") && num > 0 && den > 0) {
             if (fmt.video.i_width > 0 && fmt.video.i_height > 0) {
                 fmt.video.i_sar_num = num * fmt.video.i_height;
                 fmt.video.i_sar_den = den * fmt.video.i_width;
             }
         }
-        if (!var_CreateGetRational(demux, &num, &den, "imem-fps") && num > 0 && den > 0) {
+        if (!var_CreateGetRational(object, &num, &den, "imem-fps") && num > 0 && den > 0) {
             fmt.video.i_frame_rate      = num;
             fmt.video.i_frame_rate_base = den;
         }
 
-        msg_Dbg(demux, "Video %4.4s %dx%d  SAR %d:%d frame rate %u/%u",
+        msg_Dbg(object, "Video %4.4s %dx%d  SAR %d:%d frame rate %u/%u",
                 (const char *)&fmt.i_codec,
                 fmt.video.i_width, fmt.video.i_height,
                 fmt.video.i_sar_num, fmt.video.i_sar_den,
@@ -311,42 +340,35 @@ static int Open(vlc_object_t *object)
     case 3: {
         fmt.i_cat = SPU_ES;
         fmt.subs.spu.i_original_frame_width =
-            var_CreateGetInteger(demux, "imem-width");
+            var_CreateGetInteger(object, "imem-width");
         fmt.subs.spu.i_original_frame_height =
-            var_CreateGetInteger(demux, "imem-height");
+            var_CreateGetInteger(object, "imem-height");
 
-        msg_Dbg(demux, "Subtitle %4.4s",
+        msg_Dbg(object, "Subtitle %4.4s",
                 (const char *)&fmt.i_codec);
         break;
     }
     default:
-        msg_Err(demux, "Invalid ES category");
+        msg_Err(object, "Invalid ES category");
         es_format_Clean(&fmt);
-        free(sys);
+        CloseCommon(sys);
         return VLC_EGENERIC;
     }
 
-    fmt.psz_language = var_CreateGetString(demux, "imem-language");
+    fmt.psz_language = var_CreateGetString(object, "imem-language");
 
-    /* */
 	sys->es = es_out_Add(demux->out, &fmt);
     es_format_Clean(&fmt);
 
     if (!sys->es) {
-        free(sys->source.cookie);
-        free(sys);
+        CloseCommon(sys);
         return VLC_EGENERIC;
     }
 
     /* */
-    sys->pts_delay = var_CreateGetInteger(demux, "imem-caching") * INT64_C(1000);
-    sys->dts       = 0;
-    sys->deadline  = VLC_TS_INVALID;
-
-    /* Set up demux */
-    demux->pf_control = Control;
+    demux->pf_control = ControlDemux;
     demux->pf_demux   = Demux;
-    demux->p_sys      = sys;
+    demux->p_sys      = (demux_sys_t*)sys;
 
     demux->info.i_update = 0;
     demux->info.i_title = 0;
@@ -357,21 +379,19 @@ static int Open(vlc_object_t *object)
 /**
  * It closes an imem access_demux
  */
-static void Close(vlc_object_t *object)
+static void CloseDemux(vlc_object_t *object)
 {
-    demux_t     *demux = (demux_t *)object;
-    demux_sys_t *sys = demux->p_sys;
+    demux_t *demux = (demux_t *)object;
 
-    free(sys->source.cookie);
-    free(sys);
+    CloseCommon((imem_sys_t*)demux->p_sys);
 }
 
 /**
  * It controls imem
  */
-static int Control(demux_t *demux, int i_query, va_list args)
+static int ControlDemux(demux_t *demux, int i_query, va_list args)
 {
-    demux_sys_t *sys = demux->p_sys;
+    imem_sys_t *sys = (imem_sys_t*)demux->p_sys;
 
     switch (i_query)
     {
@@ -425,7 +445,7 @@ static int Control(demux_t *demux, int i_query, va_list args)
  */
 static int Demux(demux_t *demux)
 {
-    demux_sys_t *sys = demux->p_sys;
+    imem_sys_t *sys = (imem_sys_t*)demux->p_sys;
 
     if (sys->deadline == VLC_TS_INVALID)
         sys->deadline = sys->dts + 1;
@@ -473,16 +493,16 @@ static int Demux(demux_t *demux)
  *
  * It returns an error if the rational number cannot be parsed (0/0 is valid).
  */
-static int var_CreateGetRational(demux_t *demux,
-                                 unsigned *num, unsigned *den,
-                                 const char *var)
+static int (var_CreateGetRational)(vlc_object_t *object,
+                                   unsigned *num, unsigned *den,
+                                   const char *var)
 {
     /* */
     *num = 0;
     *den = 0;
 
     /* */
-    char *tmp = var_CreateGetString(demux, var);
+    char *tmp = var_CreateGetString(object, var);
     if (!tmp)
         goto error;
 
@@ -524,7 +544,7 @@ error:
  *
  * XXX get and release are not supported on purpose.
  */
-static void ParseMRL(demux_t *demux)
+static void ParseMRL(vlc_object_t *object, const char *psz_path)
 {
     static const struct {
         const char *name;
@@ -546,7 +566,7 @@ static void ParseMRL(demux_t *demux)
         { NULL, -1 }
     };
 
-    char *dup = strdup(demux->psz_path);
+    char *dup = strdup(psz_path);
     if (!dup)
         return;
     char *current = dup;
@@ -560,9 +580,9 @@ static void ParseMRL(demux_t *demux)
         char *value = strchr(current, '=');
         if (value) {
             *value++ = '\0';
-            msg_Dbg(demux, "option '%s' value '%s'", option, value);
+            msg_Dbg(object, "option '%s' value '%s'", option, value);
         } else {
-            msg_Dbg(demux, "option '%s' without value (unsupported)", option);
+            msg_Dbg(object, "option '%s' without value (unsupported)", option);
         }
 
         char *name;
@@ -572,11 +592,11 @@ static void ParseMRL(demux_t *demux)
             if (strcmp(options[i].name, option))
                 continue;
             /* */
-            var_Create(demux, name, options[i].type | VLC_VAR_DOINHERIT);
+            var_Create(object, name, options[i].type | VLC_VAR_DOINHERIT);
             if (options[i].type == VLC_VAR_INTEGER && value) {
-                var_SetInteger(demux, name, strtol(value, NULL, 0));
+                var_SetInteger(object, name, strtol(value, NULL, 0));
             } else if (options[i].type == VLC_VAR_STRING && value) {
-                var_SetString(demux, name, value);
+                var_SetString(object, name, value);
             }
             break;
         }
