@@ -443,6 +443,7 @@ vlc_readdir
 vlc_scandir
 vlc_stat
 vlc_unlink
+vlc_rename
 vlc_dup
 utf8_vfprintf
 var_AddCallback

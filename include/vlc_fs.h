@@ -42,8 +42,7 @@ VLC_EXPORT( int, vlc_scandir, ( const char *dirname, char ***namelist, int (*sel
 VLC_EXPORT( int, vlc_mkdir, ( const char *filename, mode_t mode ) );
 
 VLC_EXPORT( int, vlc_unlink, ( const char *filename ) );
-/* Not exported */
-int vlc_rename( const char *, const char * );
+VLC_EXPORT( int, vlc_rename, ( const char *oldpath, const char *newpath ) );
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
 # define stat _stati64
