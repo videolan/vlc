@@ -880,13 +880,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
     else
     {
-        NSString *o_url = [o_net_http_url stringValue];
-
-        if ( ![o_url hasPrefix:@"http:"] && ![o_url hasPrefix:@"ftp:"]
-              && ![o_url hasPrefix:@"mms"] && ![o_url hasPrefix:@"rtsp"] && ![o_url hasPrefix:@"rtmp"] )
-            o_mrl_string = [NSString stringWithFormat: @"http://%@", o_url];
-        else
-            o_mrl_string = o_url;
+        o_mrl_string = [o_net_http_url stringValue];
     }
     [o_mrl setStringValue: o_mrl_string];
 }
