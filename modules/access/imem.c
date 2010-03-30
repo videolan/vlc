@@ -224,10 +224,10 @@ typedef struct {
 } imem_sys_t;
 
 static void ParseMRL(vlc_object_t *, const char *);
-#define var_CreateGetRational(a,b,c,d) var_CreateGetRational(VLC_OBJECT(a),b,c,d)
-static int (var_CreateGetRational)(vlc_object_t *,
-                                   unsigned *num, unsigned *den,
-                                   const char *var);
+#define var_InheritRational(a,b,c,d) var_InheritRational(VLC_OBJECT(a),b,c,d)
+static int (var_InheritRational)(vlc_object_t *,
+                                 unsigned *num, unsigned *den,
+                                 const char *var);
 
 /**
  * It closes the common part of the access and access_demux
@@ -251,12 +251,12 @@ static int OpenCommon(vlc_object_t *object, imem_sys_t **sys_ptr, const char *ps
 		return VLC_ENOMEM;
 
     /* Read the user functions */
-    tmp = var_CreateGetString(object, "imem-get");
+    tmp = var_InheritString(object, "imem-get");
     if (tmp)
         sys->source.get = (imem_get_t)(intptr_t)strtoll(tmp, NULL, 0);
     free(tmp);
 
-    tmp = var_CreateGetString(object, "imem-release");
+    tmp = var_InheritString(object, "imem-release");
     if (tmp)
         sys->source.release = (imem_release_t)(intptr_t)strtoll(tmp, NULL, 0);
     free(tmp);
@@ -267,7 +267,7 @@ static int OpenCommon(vlc_object_t *object, imem_sys_t **sys_ptr, const char *ps
         return VLC_EGENERIC;
     }
 
-    tmp = var_CreateGetString(object, "imem-data");
+    tmp = var_InheritString(object, "imem-data");
     if (tmp)
         sys->source.data = (void *)(uintptr_t)strtoull(tmp, NULL, 0);
     free(tmp);
@@ -284,7 +284,7 @@ static int OpenCommon(vlc_object_t *object, imem_sys_t **sys_ptr, const char *ps
             sys->source.cookie ? sys->source.cookie : "(null)");
 
     /* */
-    sys->pts_delay = var_CreateGetInteger(object, "imem-caching") * INT64_C(1000);
+    sys->pts_delay = var_InheritInteger(object, "imem-caching") * INT64_C(1000);
     sys->dts       = 0;
     sys->deadline  = VLC_TS_INVALID;
 
@@ -415,10 +415,10 @@ static int OpenDemux(vlc_object_t *object)
     es_format_t fmt;
 	es_format_Init(&fmt, UNKNOWN_ES, 0);
 
-    fmt.i_id = var_CreateGetInteger(object, "imem-id");
-    fmt.i_group = var_CreateGetInteger(object, "imem-group");
+    fmt.i_id = var_InheritInteger(object, "imem-id");
+    fmt.i_group = var_InheritInteger(object, "imem-group");
 
-    char *tmp = var_CreateGetString(object, "imem-codec");
+    char *tmp = var_InheritString(object, "imem-codec");
     if (tmp)
         fmt.i_codec = vlc_fourcc_GetCodecFromString(UNKNOWN_ES, tmp);
     free(tmp);
@@ -427,8 +427,8 @@ static int OpenDemux(vlc_object_t *object)
     switch (cat) {
     case 1: {
         fmt.i_cat = AUDIO_ES;
-        fmt.audio.i_channels = var_CreateGetInteger(object, "imem-channels");
-        fmt.audio.i_rate = var_CreateGetInteger(object, "imem-samplerate");
+        fmt.audio.i_channels = var_InheritInteger(object, "imem-channels");
+        fmt.audio.i_rate = var_InheritInteger(object, "imem-samplerate");
 
         msg_Dbg(object, "Audio %4.4s %d channels %d Hz",
                 (const char *)&fmt.i_codec,
@@ -437,16 +437,16 @@ static int OpenDemux(vlc_object_t *object)
     }
     case 2: {
         fmt.i_cat = VIDEO_ES;
-        fmt.video.i_width  = var_CreateGetInteger(object, "imem-width");
-        fmt.video.i_height = var_CreateGetInteger(object, "imem-height");
+        fmt.video.i_width  = var_InheritInteger(object, "imem-width");
+        fmt.video.i_height = var_InheritInteger(object, "imem-height");
         unsigned num, den;
-        if (!var_CreateGetRational(object, &num, &den, "imem-dar") && num > 0 && den > 0) {
+        if (!var_InheritRational(object, &num, &den, "imem-dar") && num > 0 && den > 0) {
             if (fmt.video.i_width > 0 && fmt.video.i_height > 0) {
                 fmt.video.i_sar_num = num * fmt.video.i_height;
                 fmt.video.i_sar_den = den * fmt.video.i_width;
             }
         }
-        if (!var_CreateGetRational(object, &num, &den, "imem-fps") && num > 0 && den > 0) {
+        if (!var_InheritRational(object, &num, &den, "imem-fps") && num > 0 && den > 0) {
             fmt.video.i_frame_rate      = num;
             fmt.video.i_frame_rate_base = den;
         }
@@ -461,9 +461,9 @@ static int OpenDemux(vlc_object_t *object)
     case 3: {
         fmt.i_cat = SPU_ES;
         fmt.subs.spu.i_original_frame_width =
-            var_CreateGetInteger(object, "imem-width");
+            var_InheritInteger(object, "imem-width");
         fmt.subs.spu.i_original_frame_height =
-            var_CreateGetInteger(object, "imem-height");
+            var_InheritInteger(object, "imem-height");
 
         msg_Dbg(object, "Subtitle %4.4s",
                 (const char *)&fmt.i_codec);
@@ -477,7 +477,7 @@ static int OpenDemux(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
-    fmt.psz_language = var_CreateGetString(object, "imem-language");
+    fmt.psz_language = var_InheritString(object, "imem-language");
 
 	sys->es = es_out_Add(demux->out, &fmt);
     es_format_Clean(&fmt);
@@ -615,16 +615,16 @@ static int Demux(demux_t *demux)
  *
  * It returns an error if the rational number cannot be parsed (0/0 is valid).
  */
-static int (var_CreateGetRational)(vlc_object_t *object,
-                                   unsigned *num, unsigned *den,
-                                   const char *var)
+static int (var_InheritRational)(vlc_object_t *object,
+                                 unsigned *num, unsigned *den,
+                                 const char *var)
 {
     /* */
     *num = 0;
     *den = 0;
 
     /* */
-    char *tmp = var_CreateGetString(object, var);
+    char *tmp = var_InheritString(object, var);
     if (!tmp)
         goto error;
 
