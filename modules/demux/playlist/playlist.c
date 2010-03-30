@@ -61,8 +61,7 @@ vlc_module_begin ()
     add_bool( "playlist-autostart", true, NULL,
               AUTOSTART_TEXT, AUTOSTART_LONGTEXT, false )
 
-    add_integer( "parent-item", 0, NULL, NULL, NULL, true )
-        change_internal ()
+    add_obsolete_integer( "parent-item" ) /* removed since 1.1.0 */
 
     add_bool( "playlist-skip-ads", true, NULL,
               SKIP_ADS_TEXT, SKIP_ADS_LONGTEXT, false )
