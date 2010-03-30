@@ -227,15 +227,15 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
-    /* Now we can parse the MRL (get/release must not be parsed to avoid
-     * security risks) */
-    if (*demux->psz_path)
-        ParseMRL(demux);
-
     tmp = var_CreateGetString(demux, "imem-data");
     if (tmp)
         sys->source.data = (void*)(intptr_t)strtoll(tmp, NULL, 0);
     free(tmp);
+
+    /* Now we can parse the MRL (get/release must not be parsed to avoid
+     * security risks) */
+    if (*demux->psz_path)
+        ParseMRL(demux);
 
     msg_Dbg(demux, "Using get(%p) release(%p) and data(%p)",
             sys->source.get, sys->source.release, sys->source.data);
