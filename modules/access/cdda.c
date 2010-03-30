@@ -77,11 +77,11 @@ vlc_module_begin ()
         change_safe()
 
     add_integer( "cdda-track", 0 , NULL, NULL, NULL, true )
-        change_internal ()
+        change_volatile ()
     add_integer( "cdda-first-sector", -1, NULL, NULL, NULL, true )
-        change_internal ()
+        change_volatile ()
     add_integer( "cdda-last-sector", -1, NULL, NULL, NULL, true )
-        change_internal ()
+        change_volatile ()
 
 #ifdef HAVE_LIBCDDB
     add_string( "cddb-server", "freedb.freedb.org", NULL, N_( "CDDB Server" ),

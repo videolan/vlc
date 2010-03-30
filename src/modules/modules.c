@@ -730,7 +730,6 @@ module_config_t *module_config_get( const module_t *module, unsigned *restrict p
     {
         const module_config_t *item = module->p_config + i;
         if( item->b_internal /* internal option */
-         || item->b_unsaveable /* non-modifiable option */
          || item->b_removed /* removed option */ )
             continue;
 

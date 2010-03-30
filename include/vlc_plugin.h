@@ -417,16 +417,19 @@ enum vlc_module_properties
     vlc_config_set (p_config, VLC_CONFIG_ADD_ACTION, \
                     (vlc_callback_t)(pf_action), (const char *)(text));
 
-#define change_internal() \
-    vlc_config_set (p_config, VLC_CONFIG_PRIVATE);
-
 #define change_need_restart() \
     vlc_config_set (p_config, VLC_CONFIG_RESTART);
 
 #define change_autosave() \
     vlc_config_set (p_config, VLC_CONFIG_PERSISTENT);
 
-#define change_unsaveable() \
+/* For options that are saved but hidden from the preferences panel */
+#define change_private() \
+    vlc_config_set (p_config, VLC_CONFIG_PRIVATE);
+
+/* For options that cannot be saved in the configuration */
+#define change_volatile() \
+    change_private() \
     vlc_config_set (p_config, VLC_CONFIG_VOLATILE);
 
 #define change_safe() \

@@ -226,7 +226,7 @@ vlc_module_begin ()
 
     add_bool( "qt-privacy-ask", true, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
               false )
-        change_internal ()
+        change_private ()
 
     add_integer( "qt-fullscreen-screennumber", -1, NULL, FULLSCREEN_NUMBER_TEXT,
                FULLSCREEN_NUMBER_LONGTEXT, false );

@@ -76,7 +76,7 @@ vlc_module_begin ()
     set_callbacks (EmOpen, EmClose)
 
     add_integer ("drawable-xid", 0, NULL, XID_TEXT, XID_LONGTEXT, true)
-        change_unsaveable ()
+        change_volatile ()
 
 vlc_module_end ()
 
