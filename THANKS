@@ -87,11 +87,13 @@ Daniel Stränger <vlc at schmaller d0t de> - M3U, xtag and playlist improvements
 Danko Dolch <info at dolchonline d0t net> - Icons and Design for Qt4 Interface
 Danny Wood <danwood76 -- gmail | com> - Surround PulseAudio support.
 David Flynn - Dirac video codec
+David González <pico.dev at gmail dot com> - Spanish translation
 David Kennedy <dkennedy at tinytoad.com> - X11 fullscreen patch
 David J LaBarre "DJ" - Forum help, moderation and support
 David Thiel - security audit and report
 David Weber <david_weber at gmx.de> - Mac OS X interface design & graphics (v0.5.0)
 Davor Orel <syntheticamac at yahoo.it> - Mac OS X icons
+Dean Lee <xslidian at gmail dot com> - Chinese translation
 Dennis Lou <dlou99 at yahoo dot com> - ATSC support in the DVB module, MPEG2 support in the v4l2 module
 Dennis Perov - Hardware donation
 Dennis van Amerongen <Dennis dot vanAmerongen at nob dot nl> - x264 options unification
@@ -105,6 +107,7 @@ Douglas West <dwest at crystaldata dot com> - dynamicoverlay patch
 Dugal Harris - DirectShow fixes and MJPEG patches
 Dylan Aïssi <aissi dot dylan at free dot fr> - French translation
 Dylan Yudaken <dyudaken -- gmail # com> - hotkeys patch
+Eirik U. Birkeland <eirbir  at gmail  dot com> - Norwegian Nynorsk translation
 Emmanuel Blindauer <manu at agat.net> - aRts audio output
 Enrico Gueli <e_gueli at yahoo.it> - Brightness threshold in adjust video filter
 Enrique Osuna <enrique.osuna at gmail.com> - Various bug fixes in libvlc. Major Mac OS X Framework improvements.
@@ -128,6 +131,7 @@ Geoffroy Couprie <geo dot couprie -- gmail # com> - Podcast fix
 Georgi Chorbadzhiyski <gf at unixsol dot org> - HTTP access error handling fix, ASF output patches.
 Gisle Vanem <giva at bgnet dot no>  - gettimeoffay under win32
 Glen Gray <slaine at slaine do rog> - RTSP keepalive
+Goce Manevski <Goce92 at live dot com> - Macedonian translation
 Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
 Gorana Milicevic <gorana.milicevic at gmail dot com> - Serbian localisation
 Greg Farrell <greg at gregfarell dot org> - rc interface "enqueue" command
@@ -140,6 +144,7 @@ Hans-Peter Jansen <hpj at urpla.net> - patch for module options handling
 Hannes Domani <ssbssa at yahoo dot de> - Qt4 interfaces patches
 Harris Dugal <dugalh at protoclea dot. co dot za > - ActiveX bug fixes
 Harry Sintonen <sintonen at iki.fi> - fix for MKV demuxer
+H.Shalitha Vikum <HSVIKUM at sinhalaya dot com> - Sinhala translation
 Igor Helman - VLM msecseek command
 Ilkka Ollakka - SDP bitrate patch, various VLM fixes, transcode afilter/vfilter fix, qt4 interface patches
 Isaac Osunkunle - <osunkunle - at - gmail d0t com> - Spatializer (GSoc 2007)
@@ -273,9 +278,11 @@ Sašo Kiselkov <skiselkov _at_ gmail dot com> - RTSP session timeout fix for som
 Scott Caudle <dorkmanzcot at gmail dot com> - Visualization, WX improvements
 Sebastian Jenny <jenny - sebastian &t gmail - com > - AAC decoding channel ordering fix.
 Sebastien Chaumat <Sebastien.Chaumat at ens-lyon.fr> - YOPY port tests
+Сергей Дарьичев <charnabog at rambler dot ru> - Belarusian translation
 Sidney Doria <ssdoria qt gmail.com> - Brazilian Portuguese localisation
 Simon Damkjær Andersen <simondamkjaer at gmail.com> - playmode icons and the entire Fullscreen Panel design for the OSX GUI (v0.8.6)
 Søren Bøg <avacore at videolan dot org> - dynamicoverlays
+Sreejith P <sreejithpro at gmail dot com> - Malayalam translation
 Srikanth Raju - Chorus flanger audio filter
 Stefán Freyr Stefánsson <stefan.freyr -at- gmail.com> - Qt4 speed slider
 Steve Brown <sbrown at cortland.com> - fix for optional PES size bug
