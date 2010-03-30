@@ -1041,7 +1041,6 @@ ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-internal-define.patch
 	patch -p0 < Patches/ffmpeg-svn-libavformat.patch
 endif
-	(cd $@; patch -p1 < ../Patches/eac3_spectral.patch)
 else
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	echo "ffmpeg snapshot is too old, you MUST use subversion !"
