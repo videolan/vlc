@@ -1659,7 +1659,7 @@ msgid "Audio desynchronization compensation"
 msgstr ""
 
 #: src/libvlc-module.c:266
-msgid "This delays the audio output. The delay must be given in milliseconds.This can be handy if you notice a lag between the video and the audio."
+msgid "This delays the audio output. The delay must be given in milliseconds. This can be handy if you notice a lag between the video and the audio."
 msgstr ""
 
 #: src/libvlc-module.c:269
@@ -2015,7 +2015,7 @@ msgid "Video filter module"
 msgstr ""
 
 #: src/libvlc-module.c:449
-msgid "This adds post-processing filters to enhance the picture quality, for instance deinterlacing, or distortthe video."
+msgid "This adds post-processing filters to enhance the picture quality, for instance deinterlacing, or distort the video."
 msgstr ""
 
 #: src/libvlc-module.c:453
@@ -2639,7 +2639,7 @@ msgid "Default stream output chain"
 msgstr ""
 
 #: src/libvlc-module.c:852
-msgid "You can enter here a default stream output chain. Refer to the documentation to learn how to build such chains.Warning: this chain will be enabled for all streams."
+msgid "You can enter here a default stream output chain. Refer to the documentation to learn how to build such chains. Warning: this chain will be enabled for all streams."
 msgstr ""
 
 #: src/libvlc-module.c:856
