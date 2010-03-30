@@ -106,12 +106,14 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
 
     b_var_mute = var_GetBool( p_object, "volume-muted");
 
-    const bool b_unmute_condition = ( /* Also unmute on increments */
+    const bool b_unmute_condition = ( b_var_mute
+                && ( /* Unmute: on increments */
                     ( action == INCREMENT_VOLUME )
                     || /* On explicit unmute */
-                    ( ( action == SET_MUTE ) && ( b_var_mute && !b_mute ) )
+                    ( ( action == SET_MUTE ) && !b_mute )
                     || /* On toggle from muted */
-                    ( ( action == TOGGLE_MUTE ) && b_var_mute ) );
+                    ( action == TOGGLE_MUTE )
+                ));
 
     const bool b_mute_condition = ( !b_var_mute
                     && ( /* explicit */
