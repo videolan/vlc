@@ -1234,7 +1234,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
     char **ppsz_all_keys = vlc_meta_CopyExtraNames(p_meta );
 
     info_category_t *p_cat = NULL;
-    if( psz_provider || *ppsz_all_keys[0] )
+    if( psz_provider || ( ppsz_all_keys[0] && *ppsz_all_keys[0] ) )
     {
         char *psz_cat = EsOutProgramGetMetaName( p_pgrm );
         if( psz_cat )
