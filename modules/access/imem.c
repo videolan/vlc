@@ -256,11 +256,6 @@ static int Open(vlc_object_t *object)
     if (*demux->psz_path)
         ParseMRL(demux);
 
-    /* Now we can parse the MRL (get/release must not be parsed to avoid
-     * security risks) */
-    if (*demux->psz_path)
-        ParseMRL(demux);
-
     sys->source.cookie = var_InheritString(demux, "imem-cookie");
 
     msg_Dbg(demux, "Using get(%p), release(%p), data(%p), cookie(%s)",
