@@ -108,8 +108,8 @@ local vout = input and vlc.object.find(input,'vout','child')
 ?>
 <root>
   <volume><?vlc print(vlc.volume.get()) ?></volume>
-  <length><?vlc if input then print(vlc.var.get(input,"length")) else print(0) end?></length>
-  <time><?vlc if input then print(vlc.var.get(input,"time")) else print(0) end?></time>
+  <length><?vlc if input then print(math.floor(vlc.var.get(input,"length"))) else print(0) end?></length>
+  <time><?vlc if input then print(math.floor(vlc.var.get(input,"time"))) else print(0) end?></time>
   <state><?vlc print(status) ?></state>
   <position><?vlc if input then print(vlc.var.get(input,"position")) else print(0) end?></position>
   <fullscreen><?vlc if vout then vlc.var.get(vout,"fullscreen") else print(0) end?></fullscreen>
