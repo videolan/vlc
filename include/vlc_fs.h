@@ -54,5 +54,6 @@ VLC_EXPORT( int, vlc_lstat, ( const char *filename, struct stat *buf ) );
 VLC_EXPORT( int, vlc_mkstemp, ( char * ) );
 
 VLC_EXPORT( int, vlc_dup, ( int ) );
+int vlc_socket (int, int, int, bool nonblock);
 
 #endif

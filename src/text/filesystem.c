@@ -42,9 +42,6 @@
 #ifdef HAVE_DIRENT_H
 #  include <dirent.h>
 #endif
-#ifdef UNDER_CE
-#  include <tchar.h>
-#endif
 #ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
 #endif
@@ -53,11 +50,15 @@
 #endif
 #ifdef WIN32
 # include <io.h>
+# include <winsock2.h>
 # ifndef UNDER_CE
 #  include <direct.h>
+# else
+#  include <tchar.h>
 # endif
 #else
 # include <unistd.h>
+# include <sys/socket.h>
 #endif
 
 #ifndef HAVE_LSTAT
@@ -614,4 +615,43 @@ int vlc_dup (int oldfd)
         fcntl (newfd, F_SETFD, FD_CLOEXEC);
 #endif
     return newfd;
+}
+
+/**
+ * Creates a socket file descriptor. The new file descriptor has the
+ * close-on-exec flag set.
+ * @param pf protocol family
+ * @param type socket type
+ * @param proto network protocol
+ * @param nonblock true to create a non-blocking socket
+ * @return a new file descriptor or -1
+ */
+int vlc_socket (int pf, int type, int proto, bool nonblock)
+{
+    int fd;
+
+#ifdef SOCK_CLOEXEC
+    type |= SOCK_CLOEXEC;
+    if (nonblock)
+        type |= SOCK_NONBLOCK;
+    fd = socket (pf, type | SOCK_NONBLOCK | SOCK_CLOEXEC, proto);
+    if (fd != -1 || errno != EINVAL)
+        return fd;
+
+    type &= ~(SOCK_CLOEXEC|SOCK_NONBLOCK);
+#endif
+
+    fd = socket (pf, type, proto);
+    if (fd == -1)
+        return -1;
+
+#ifndef WIN32
+    fcntl (fd, F_SETFD, FD_CLOEXEC);
+    if (nonblock)
+        fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
+#else
+    if (nonblock)
+        ioctlsocket (fd, FIONBIO, &(unsigned long){ 1 });
+#endif
+    return fd;
 }
