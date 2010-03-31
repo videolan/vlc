@@ -1191,12 +1191,13 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     table->headerItem()->setText( 1, qtr( "Hotkey" ) );
     table->headerItem()->setText( 2, qtr( "Global" ) );
     table->setAlternatingRowColors( true );
+    table->setSelectionBehavior( QAbstractItemView::SelectItems );
 
     shortcutValue = new KeyShortcutEdit;
     shortcutValue->setReadOnly(true);
 
     QPushButton *clearButton = new QPushButton( qtr( "Clear" ) );
-    QPushButton *setButton = new QPushButton( qtr( "Set" ) );
+    QPushButton *setButton = new QPushButton( qtr( "Apply" ) );
     setButton->setDefault( true );
     finish();
 
@@ -1284,6 +1285,8 @@ void KeySelectorControl::finish()
 
     CONNECT( table, itemDoubleClicked( QTreeWidgetItem *, int ),
              this, selectKey( QTreeWidgetItem *, int ) );
+    CONNECT( table, itemClicked( QTreeWidgetItem *, int ),
+             this, select( QTreeWidgetItem *, int) );
     CONNECT( table, itemSelectionChanged(),
              this, select1Key() );
 
@@ -1299,6 +1302,11 @@ void KeySelectorControl::filter( const QString &qs_search )
         table->topLevelItem( i )->setHidden(
                 !resultList.contains( table->topLevelItem( i ) ) );
     }
+}
+
+void KeySelectorControl::select( QTreeWidgetItem *keyItem, int column )
+{
+    shortcutValue->setGlobal( column == 2 );
 }
 
 /* Show the key selected from the table in the keySelector */

@@ -452,7 +452,7 @@ public:
     void setGlobal( bool _value ) { b_global = _value; }
     bool getGlobal()  const { return b_global; }
 public slots:
-    virtual void clear(void) { value = 0; QLineEdit::clear(); b_global = false;}
+    virtual void clear(void) { value = 0; QLineEdit::clear(); }
 private:
     int value;
     bool b_global;
@@ -483,6 +483,7 @@ private:
 private slots:
     void setTheKey();
     void selectKey( QTreeWidgetItem * = NULL, int column = 1 );
+    void select( QTreeWidgetItem * = NULL, int column = 1 );
     void select1Key();
     void filter( const QString & );
 };
