@@ -2018,6 +2018,12 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
     }
 
     p_ts = block_New( p_mux, 188 );
+
+    if (b_new_pes && !(p_pes->i_flags & BLOCK_FLAG_NO_KEYFRAME) && p_pes->i_flags & BLOCK_FLAG_TYPE_I)
+    {
+        p_ts->i_flags |= BLOCK_FLAG_TYPE_I;
+    }
+
     p_ts->i_dts = p_pes->i_dts;
 
     p_ts->p_buffer[0] = 0x47;
