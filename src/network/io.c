@@ -52,6 +52,7 @@
 #endif
 
 #include <vlc_network.h>
+#include <vlc_fs.h>
 
 #ifndef INADDR_ANY
 #   define INADDR_ANY  0x00000000
@@ -93,26 +94,12 @@ int net_SetupSocket (int fd)
 int net_Socket (vlc_object_t *p_this, int family, int socktype,
                 int protocol)
 {
-    int fd;
-
-#ifdef SOCK_CLOEXEC
-    fd = socket (family, socktype | SOCK_NONBLOCK | SOCK_CLOEXEC, protocol);
-    if (fd == -1 && errno == EINVAL)
-#endif
+    int fd = vlc_socket (family, socktype, protocol, true);
+    if (fd == -1)
     {
-        fd = socket (family, socktype, protocol);
-        if (fd == -1)
-        {
-            if (net_errno != EAFNOSUPPORT)
-                msg_Err (p_this, "cannot create socket: %m");
-            return -1;
-        }
-#ifndef WIN32
-        fcntl (fd, F_SETFD, FD_CLOEXEC);
-        fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
-#else
-        ioctlsocket (fd, FIONBIO, &(unsigned long){ 1 });
-#endif
+        if (net_errno != EAFNOSUPPORT)
+            msg_Err (p_this, "cannot create socket: %m");
+        return -1;
     }
 
     setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
