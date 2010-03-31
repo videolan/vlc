@@ -33,6 +33,7 @@
 #include <assert.h>
 
 #include <vlc_network.h>
+#include <vlc_fs.h>
 #include <vlc_tls.h>
 #include <vlc_acl.h>
 #include <vlc_strings.h>
@@ -2515,15 +2516,12 @@ static void* httpd_HostThread( void *data )
                 continue;
 
             /* */
-#ifdef HAVE_ACCEPT4
-            fd = accept4 (fd, NULL, NULL, SOCK_CLOEXEC);
-            if (fd == -1 && errno == ENOSYS)
-#endif
-            fd = accept (fd, NULL, NULL);
+            fd = vlc_accept (fd, NULL, NULL, true);
             if (fd == -1)
                 continue;
+            setsockopt (fd, SOL_SOCKET, SO_REUSEADDR,
+                        &(int){ 1 }, sizeof(int));
 
-            net_SetupSocket (fd);
             if( p_tls != NULL )
             {
                 switch( tls_ServerSessionHandshake( p_tls, fd ) )

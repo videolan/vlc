@@ -43,6 +43,7 @@
 #endif
 
 #include <vlc_network.h>
+#include <vlc_fs.h>
 #if defined (WIN32) || defined (UNDER_CE)
 #   undef EINPROGRESS
 #   define EINPROGRESS WSAEWOULDBLOCK
@@ -244,18 +245,7 @@ next_ai: /* failure */
 
 int net_AcceptSingle (vlc_object_t *obj, int lfd)
 {
-    int fd;
-
-    do
-    {
-#ifdef HAVE_ACCEPT4
-        fd = accept4 (lfd, NULL, NULL, SOCK_CLOEXEC);
-        if (fd == -1 && errno == ENOSYS)
-#endif
-        fd = accept (lfd, NULL, NULL);
-    }
-    while (fd == -1 && errno == EINTR);
-
+    int fd = vlc_accept (lfd, NULL, NULL, true);
     if (fd == -1)
     {
         if (net_errno != EAGAIN && net_errno != EWOULDBLOCK)
@@ -264,7 +254,7 @@ int net_AcceptSingle (vlc_object_t *obj, int lfd)
     }
 
     msg_Dbg (obj, "accepted socket %d (from socket %d)", fd, lfd);
-    net_SetupSocket (fd);
+    setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int));
     return fd;
 }
 
