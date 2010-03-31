@@ -352,10 +352,15 @@ static int Create( vlc_object_t *p_this )
         goto error;
 
 #ifdef WIN32
-    dialog_progress_bar_t *p_dialog = dialog_ProgressCreate( p_filter,
+    dialog_progress_bar_t *p_dialog = NULL;
+
+    if( !FcConfigUptoDate( NULL ) )
+    {
+        p_dialog = dialog_ProgressCreate( p_filter,
             _("Building font cache"),
             _("Please wait while your font cache is rebuilt.\n"
                 "This should take less than a few minutes."), NULL );
+    }
     char *path = xmalloc( PATH_MAX + 1 );
     /* Fontconfig doesnt seem to know where windows fonts are with
      * current contribs. So just tell default windows font directory
