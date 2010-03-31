@@ -607,7 +607,8 @@ void MainInterface::releaseVideoSlot( void )
 {
     videoWidget->release();
 
-    restoreStackOldWidget();
+    if( stackCentralW->currentWidget() == videoWidget )
+        restoreStackOldWidget();
 
     /* We don't want to have a blank video to popup */
     stackCentralOldWidget = bgWidget;
@@ -718,8 +719,9 @@ void MainInterface::dockPlaylist( bool p_docked )
         playlistWidget->setWindowFlags( Qt::Widget ); // Probably a Qt bug here
         // It would be logical that QStackWidget::addWidget reset the flags...
         stackCentralW->addWidget( playlistWidget );
-        stackCentralW->setCurrentWidget( playlistWidget );
+        showTab( playlistWidget );
     }
+    playlistVisible = true;
 }
 
 /*
