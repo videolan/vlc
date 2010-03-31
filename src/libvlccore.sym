@@ -445,6 +445,7 @@ vlc_stat
 vlc_unlink
 vlc_rename
 vlc_dup
+vlc_accept
 utf8_vfprintf
 var_AddCallback
 var_Change

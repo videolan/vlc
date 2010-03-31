@@ -655,3 +655,45 @@ int vlc_socket (int pf, int type, int proto, bool nonblock)
 #endif
     return fd;
 }
+
+/**
+ * Accepts an inbound connection request on a listening socket.
+ * The new file descriptor has the close-on-exec flag set.
+ * @param lfd listening socket file descriptor
+ * @param addr pointer to the peer address or NULL [OUT]
+ * @param alen pointer to the length of the peer address or NULL [OUT]
+ * @param nonblock whether to put the new socket in non-blocking mode
+ * @return a new file descriptor, or -1 on error.
+ */
+int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)
+{
+#ifdef HAVE_ACCEPT4
+    int flags = SOCK_CLOEXEC;
+    if (nonblock)
+        flags |= SOCK_NONBLOCK;
+
+    do
+    {
+        int fd = accept4 (lfd, addr, alen, flags);
+        if (fd != -1)
+            return fd;
+    }
+    while (errno == EINTR);
+
+    if (errno != ENOSYS)
+        return -1;
+#endif
+#ifdef WIN32
+    errno = 0;
+#endif
+
+    do
+    {
+        int fd = accept (lfd, addr, alen);
+        if (fd != -1)
+            return fd;
+    }
+    while (errno == EINTR);
+
+    return -1;
+}
