@@ -52,7 +52,6 @@
 #endif
 
 #include <vlc_network.h>
-#include <vlc_fs.h>
 
 #ifndef INADDR_ANY
 #   define INADDR_ANY  0x00000000

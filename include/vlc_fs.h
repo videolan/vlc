@@ -54,9 +54,4 @@ VLC_EXPORT( int, vlc_lstat, ( const char *filename, struct stat *buf ) );
 VLC_EXPORT( int, vlc_mkstemp, ( char * ) );
 
 VLC_EXPORT( int, vlc_dup, ( int ) );
-int vlc_socket (int, int, int, bool nonblock) LIBVLC_USED;
-
-struct sockaddr;
-VLC_EXPORT( int, vlc_accept, ( int, struct sockaddr *, socklen_t *, bool ) LIBVLC_USED );
-
 #endif

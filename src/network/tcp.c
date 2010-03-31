@@ -43,7 +43,6 @@
 #endif
 
 #include <vlc_network.h>
-#include <vlc_fs.h>
 #if defined (WIN32) || defined (UNDER_CE)
 #   undef EINPROGRESS
 #   define EINPROGRESS WSAEWOULDBLOCK

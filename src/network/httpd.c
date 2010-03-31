@@ -33,7 +33,6 @@
 #include <assert.h>
 
 #include <vlc_network.h>
-#include <vlc_fs.h>
 #include <vlc_tls.h>
 #include <vlc_acl.h>
 #include <vlc_strings.h>

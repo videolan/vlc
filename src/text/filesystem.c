@@ -617,6 +617,8 @@ int vlc_dup (int oldfd)
     return newfd;
 }
 
+#include <vlc_network.h>
+
 /**
  * Creates a socket file descriptor. The new file descriptor has the
  * close-on-exec flag set.
