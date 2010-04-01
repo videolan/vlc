@@ -844,7 +844,7 @@ static int  Open ( vlc_object_t *p_this )
         if( us_atof (psz_val) < 6 && us_atof (psz_val) > 0 )
             p_sys->param.i_level_idc = (int) (10 * us_atof (psz_val)
                                               + .5);
-        else if( atoi(psz_val) > 0 )
+        else if( atoi(psz_val) >= 10 && atoi(psz_val) <= 51 )
             p_sys->param.i_level_idc = atoi (psz_val);
         free( psz_val );
     }
