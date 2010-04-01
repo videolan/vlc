@@ -131,7 +131,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      **/
     mainBasedSize = settings->value( "mainBasedSize", QSize( 350, 120 ) ).toSize();
     mainVideoSize = settings->value( "mainVideoSize", QSize( 400, 300 ) ).toSize();
-
+    settings->endGroup( );
 
     /**************
      * Status Bar *
@@ -308,8 +308,6 @@ MainInterface::~MainInterface()
         {
             settings->setValue( "playlist-visible", playlistWidget->isVisible() ); // FIXME
         }
-
-        delete playlistWidget;
     }
 
     settings->setValue( "adv-controls",
@@ -324,6 +322,7 @@ MainInterface::~MainInterface()
     QVLCTools::saveWidgetPosition(settings, this);
     settings->endGroup();
 
+    delete playlistWidget;
     delete statusBar();
 
     /* Unregister callbacks */
@@ -376,6 +375,8 @@ void MainInterface::createMainWidget( QSettings *settings )
     }
     mainLayout->insertWidget( 1, stackCentralW );
 
+    settings->beginGroup( "MainWindow" );
+
     /* Create the CONTROLS Widget */
     controls = new ControlsWidget( p_intf,
                    settings->value( "adv-controls", false ).toBool(), this );
@@ -392,7 +393,7 @@ void MainInterface::createMainWidget( QSettings *settings )
     visualSelector->hide();
     #endif
 
-    getSettings()->endGroup();
+    settings->endGroup();
 
     /* Enable the popup menu in the MI */
     main->setContextMenuPolicy( Qt::CustomContextMenu );

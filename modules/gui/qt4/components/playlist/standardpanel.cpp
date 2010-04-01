@@ -119,9 +119,10 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     getSettings()->beginGroup("Playlist");
 
     int i_viewMode = getSettings()->value( "view-mode", TREE_VIEW ).toInt();
-    showView( i_viewMode );
 
     getSettings()->endGroup();
+
+    showView( i_viewMode );
 
     DCONNECT( THEMIM, leafBecameParent( input_item_t *),
               this, browseInto( input_item_t * ) );
@@ -311,6 +312,8 @@ void StandardPLPanel::createTreeView()
     /* setModel after setSortingEnabled(true), or the model will sort immediately! */
     treeView->setModel( model );
 
+    getSettings()->beginGroup("Playlist");
+
     if( getSettings()->contains( "headerStateV2" ) )
     {
         treeView->header()->restoreState(
@@ -325,6 +328,8 @@ void StandardPLPanel::createTreeView()
             else if( m == COLUMN_DURATION ) treeView->header()->resizeSection( c, 80 );
         }
     }
+
+    getSettings()->endGroup();
 
     /* Connections for the TreeView */
     CONNECT( treeView, activated( const QModelIndex& ),
