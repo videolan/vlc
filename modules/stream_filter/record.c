@@ -197,6 +197,10 @@ static int Start( stream_t *s, const char *psz_extension )
         free( psz_file );
         return VLC_EGENERIC;
     }
+
+    /* signal new record file */
+    var_SetString( s->p_libvlc, "record-file", psz_file );
+
     msg_Dbg( s, "Recording into %s", psz_file );
     free( psz_file );
 
