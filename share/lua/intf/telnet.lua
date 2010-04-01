@@ -185,7 +185,10 @@ while not vlc.misc.should_die() do
     for _, client in pairs(r) do
         local str = client:recv(1000)
         local done = false
-        if string.match(str,"\n$") then
+        if not str then -- the telnet client program has leave
+            client.buffer = "quit"
+            done = true
+        elseif string.match(str,"\n$") then
             client.buffer = string.gsub(client.buffer..str,"\r?\n$","")
             done = true
         elseif client.buffer == ""
