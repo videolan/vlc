@@ -6709,7 +6709,7 @@ msgstr "La session a échoué"
 
 #: modules/access/rtsp/access.c:239
 msgid "The requested RTSP session could not be established."
-msgstr "La sesion TRSP demandée n'a pu être établie."
+msgstr "La session RTSP demandée n'a pu être établie."
 
 #: modules/access/screen/screen.c:42 modules/access/screen/xcb.c:35
 msgid ""
