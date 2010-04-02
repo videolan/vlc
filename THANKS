@@ -334,7 +334,7 @@ Zhang Tong <admin at wisestudio dot org> - Chinese translation
 
 Some VLC plugins use external libraries and makes extensive use of the following persons' or companies' code:
 
-FFmpeg - Copyright (c) 2000-2007 Fabrice Bellard, et al.
+FFmpeg - Copyright (c) 2000-2010 the FFmpeg developers
 liba52 - Aaron Holtzman & Michel Lespinasse, et al.
 FAAD2 - "Code from FAAD2 is copyright (c) Nero AG, www.nero.com"
 FAAC - Menno Bakker, Krzysztof Nikiel & The individual contributors
