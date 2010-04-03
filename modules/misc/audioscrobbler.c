@@ -464,6 +464,12 @@ static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
 
     if( newval.i_int != INPUT_EVENT_STATE ) return VLC_SUCCESS;
 
+    if( var_CountChoices( p_input, "video-es" ) )
+    {
+        msg_Dbg( p_this, "Not an audio-only input, not submitting");
+        return VLC_SUCCESS;
+    }
+
     state_value.i_int = 0;
 
     var_Get( p_input, "state", &state_value );
@@ -499,7 +505,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     intf_thread_t       *p_intf     = ( intf_thread_t* ) p_data;
     intf_sys_t          *p_sys      = p_intf->p_sys;
     input_item_t        *p_item;
-    vlc_value_t         video_val;
 
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var );
     VLC_UNUSED( oldval ); VLC_UNUSED( newval );
@@ -520,8 +525,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         return VLC_SUCCESS;
     }
 
-    var_Change( p_input, "video-es", VLC_VAR_CHOICESCOUNT, &video_val, NULL );
-    if( video_val.i_int > 0 )
+    if( var_CountChoices( p_input, "video-es" ) )
     {
         msg_Dbg( p_this, "Not an audio-only input, not submitting");
         vlc_object_release( p_input );
