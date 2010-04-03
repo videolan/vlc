@@ -636,7 +636,7 @@ int vlc_socket (int pf, int type, int proto, bool nonblock)
     type |= SOCK_CLOEXEC;
     if (nonblock)
         type |= SOCK_NONBLOCK;
-    fd = socket (pf, type | SOCK_NONBLOCK | SOCK_CLOEXEC, proto);
+    fd = socket (pf, type, proto);
     if (fd != -1 || errno != EINVAL)
         return fd;
 
@@ -693,7 +693,17 @@ int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)
     {
         int fd = accept (lfd, addr, alen);
         if (fd != -1)
+        {
+#ifndef WIN32
+    fcntl (fd, F_SETFD, FD_CLOEXEC);
+    if (nonblock)
+        fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
+#else
+    if (nonblock)
+        ioctlsocket (fd, FIONBIO, &(unsigned long){ 1 });
+#endif
             return fd;
+        }
     }
     while (errno == EINTR);
 
