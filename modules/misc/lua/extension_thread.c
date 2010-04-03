@@ -315,6 +315,7 @@ static void* Run( void *data )
                         {
                             msg_Dbg( p_mgr, "Could not activate extension!" );
                             Deactivate( p_mgr, p_ext );
+                            cmd = NULL;
                         }
                         break;
                     }
