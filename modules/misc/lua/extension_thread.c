@@ -392,6 +392,7 @@ static void* Run( void *data )
             }
         }
 
+        vlc_mutex_lock( &p_ext->p_sys->command_lock );
         if( cmd )
         {
             p_ext->p_sys->command = cmd->next;
@@ -399,7 +400,6 @@ static void* Run( void *data )
             FreeCommands( cmd );
         }
 
-        vlc_mutex_lock( &p_ext->p_sys->command_lock );
         if( !p_ext->p_sys->b_exiting && !p_ext->p_sys->command )
         {
             vlc_cond_wait( &p_ext->p_sys->wait, &p_ext->p_sys->command_lock );
