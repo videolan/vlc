@@ -147,7 +147,7 @@ static void Close( vlc_object_t *p_this )
     UPnPHandler *u = (UPnPHandler *)p_this->p_private;
     u->stop( );
 
-    msg_Dbg( p_this, "upnp discovery started" );
+    msg_Dbg( p_this, "upnp discovery stopped" );
 }
 
 
