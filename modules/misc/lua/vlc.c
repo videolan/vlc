@@ -665,7 +665,7 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
                     goto error;
                 }
             }
-            if( asprintf( &psz_name, "lua{sd=%s,longname=%s}",
+            if( asprintf( &psz_name, "lua{sd='%s',longname='%s'}",
                           *ppsz_file, psz_longname ) < 0 )
             {
                 free( psz_filename );
