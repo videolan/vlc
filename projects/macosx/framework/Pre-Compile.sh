@@ -162,19 +162,19 @@ vlc_install() {
             mkdir -p "$tmp_dest_dir"
 
             for arch in $ARCHS; do
-                local src="$VLC_BUILD_DIR/$arch/$src_dir/$src"
+                local arch_src="$VLC_BUILD_DIR/$arch/$src_dir/$src"
 
                 # Only install if the new image is newer than the one we have installed.
-                if ((! test -e ${fatdest}) || test ${src} -nt ${fatdest} ); then
-                    vlc_install_object "$src" "$tmp_dest_dir" "$type" "$5" "" ".$arch"
+                if ((! test -e ${fatdest}) || test ${arch_src} -nt ${fatdest} ); then
+                    vlc_install_object "$arch_src" "$tmp_dest_dir" "$type" "$5" "" ".$arch"
                     local dest="$tmp_dest_dir/$src.$arch"
                     if test -e ${dest}; then
-                        if ! test "$dest_dir/$src" -nt "${dest}"; then
+                        if (! test "$dest_dir/$arch_src" -nt "${dest}"); then
                             shouldUpdateFat="yes"
                         fi
                         objects="${dest} $objects"
                     else
-                        echo "Warning: building $src without $arch"
+                        echo "Warning: building $arch_src without $arch"
                     fi
                 fi
             done;
@@ -256,8 +256,8 @@ fi
 ##########################
 # Build the lib folder
 
-vlc_install "src/${prefix}" "libvlc.5.dylib" "${target_lib}" "lib"
-vlc_install "src/${prefix}" "libvlccore.4.dylib" "${target_lib}" "lib"
+vlc_install "src/${prefix}" "libvlc.5.dylib" "${target_lib}" "library"
+vlc_install "src/${prefix}" "libvlccore.4.dylib" "${target_lib}" "library"
 pushd `pwd` > /dev/null
 cd ${target_lib}
 ln -sf libvlc.5.dylib libvlc.dylib
