@@ -582,6 +582,37 @@ int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
     return i_count;
 }
 
+static char *escape( const char *psz )
+{
+    if( !psz )
+        return NULL;
+
+    /* Count the number of ' and \ in the string */
+    const char *it = psz;
+    int i_esc = 0;
+    while( *it != '\0')
+    {
+        if( *it == '\'' || *it == '\\' )
+            i_esc++;
+        it++;
+    }
+
+    if( i_esc == 0 )
+        return strdup( psz );
+
+    char *psz_esc = malloc( strlen( psz ) + i_esc + 1 );
+    char *it2 = psz_esc;
+    it = psz;
+    while( *it != '\0' )
+    {
+        if( *it == '\'' || *it == '\\' )
+            *it2++ = '\\';
+        *it2++ = *it++;
+    }
+    *it2 = '\0';
+
+    return psz_esc;
+}
 static int vlc_sd_probe_Open( vlc_object_t *obj )
 {
     vlc_probe_t *probe = (vlc_probe_t *)obj;
@@ -665,13 +696,20 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
                     goto error;
                 }
             }
+
+            char *psz_file_esc = escape( *ppsz_file );
+            char *psz_longname_esc = escape( psz_longname );
             if( asprintf( &psz_name, "lua{sd='%s',longname='%s'}",
-                          *ppsz_file, psz_longname ) < 0 )
+                          psz_file_esc, psz_longname_esc ) < 0 )
             {
+                free( psz_file_esc );
+                free( psz_longname_esc );
                 free( psz_filename );
                 free( psz_longname );
                 goto error;
             }
+            free( psz_file_esc );
+            free( psz_longname_esc );
             vlc_sd_probe_Add( probe, psz_name, psz_longname, SD_CAT_INTERNET );
             free( psz_name );
             free( psz_longname );
