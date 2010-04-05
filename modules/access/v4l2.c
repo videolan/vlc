@@ -1352,7 +1352,8 @@ static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
         mtime_t i_dur = (mtime_t)((double)1000000 / (double)p_sys->f_fps);
 
         /* Did we wait long enough ? (frame rate reduction) */
-        if( p_sys->i_video_pts + i_dur > mdate() ) return 0;
+        if( p_sys->i_video_pts + i_dur > mdate() )
+            return NULL;
     }
 
     /* Grab Video Frame */
@@ -1365,7 +1366,7 @@ static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
             switch( errno )
             {
             case EAGAIN:
-                return 0;
+                return NULL;
             case EIO:
                 /* Could ignore EIO, see spec. */
                 /* fall through */
@@ -1376,7 +1377,8 @@ static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
         }
 
         p_block = ProcessVideoFrame( p_demux, (uint8_t*)p_sys->p_buffers[0].start, i_ret );
-        if( !p_block ) return 0;
+        if( !p_block )
+            return NULL;
 
         break;
 
@@ -1391,30 +1393,31 @@ static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
             switch( errno )
             {
             case EAGAIN:
-                return 0;
+                return NULL;
             case EIO:
                 /* Could ignore EIO, see spec. */
                 /* fall through */
             default:
                 msg_Err( p_demux, "Failed to wait (VIDIOC_DQBUF)" );
-                return 0;
+                return NULL;
                }
         }
 
         if( buf.index >= p_sys->i_nbuffers ) {
             msg_Err( p_demux, "Failed capturing new frame as i>=nbuffers" );
-            return 0;
+            return NULL;
         }
 
         p_block = ProcessVideoFrame( p_demux, p_sys->p_buffers[buf.index].start, buf.bytesused );
-        if( !p_block ) return 0;
+        if( !p_block )
+            return NULL;
 
         /* Unlock */
         if( v4l2_ioctl( p_sys->i_fd, VIDIOC_QBUF, &buf ) < 0 )
         {
             msg_Err( p_demux, "Failed to unlock (VIDIOC_QBUF)" );
             block_Release( p_block );
-            return 0;
+            return NULL;
         }
 
         break;
@@ -1430,13 +1433,13 @@ static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
             switch( errno )
             {
             case EAGAIN:
-                return 0;
+                return NULL;
             case EIO:
                 /* Could ignore EIO, see spec. */
                 /* fall through */
             default:
                 msg_Err( p_demux, "Failed to wait (VIDIOC_DQBUF)" );
-                return 0;
+                return NULL;
             }
         }
 
@@ -1451,18 +1454,19 @@ static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
         if( i >= p_sys->i_nbuffers )
         {
             msg_Err( p_demux, "Failed capturing new frame as i>=nbuffers" );
-            return 0;
+            return NULL;
         }
 
         p_block = ProcessVideoFrame( p_demux, (uint8_t*)buf.m.userptr, buf.bytesused );
-        if( !p_block ) return 0;
+        if( !p_block )
+            return NULL;
 
         /* Unlock */
         if( v4l2_ioctl( p_sys->i_fd, VIDIOC_QBUF, &buf ) < 0 )
         {
             msg_Err( p_demux, "Failed to unlock (VIDIOC_QBUF)" );
             block_Release( p_block );
-            return 0;
+            return NULL;
         }
 
         break;
@@ -1486,13 +1490,13 @@ static block_t* ProcessVideoFrame( vlc_object_t *p_demux, uint8_t *p_frame, size
 {
     block_t *p_block;
 
-    if( !p_frame ) return 0;
+    if( !p_frame ) return NULL;
 
     /* New block */
     if( !( p_block = block_New( p_demux, i_size ) ) )
     {
         msg_Warn( p_demux, "Cannot get new block" );
-        return 0;
+        return NULL;
     }
 
     /* Copy frame */
