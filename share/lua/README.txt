@@ -4,7 +4,7 @@ $Id$
 1 - About Lua
 =============
 
-Lua documenation is available on http://www.lua.org . The reference manual
+Lua documention is available on http://www.lua.org . The reference manual
 is very usefull: http://www.lua.org/manual/5.1/ .
 VLC uses Lua 5.1
 All the Lua standard libraries are available.
@@ -12,7 +12,7 @@ All the Lua standard libraries are available.
 2 - Lua in VLC
 ==============
 
-3 types of VLC Lua scripts can currently be coded:
+Several types of VLC Lua scripts can currently be coded:
  * Playlist (see playlist/README.txt)
  * Art fetcher (see meta/README.txt)
  * Interface (see intf/README.txt)
