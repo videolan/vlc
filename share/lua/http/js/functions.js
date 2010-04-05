@@ -360,9 +360,9 @@ function pl_repeat()
 {
     loadXMLDoc( 'requests/status.xml?command=pl_repeat', parse_status );
 }
-function pl_sd( value )
+function pl_sd( value, islua )
 {
-    loadXMLDoc( 'requests/status.xml?command=pl_sd&val='+value, parse_status );
+    loadXMLDoc( 'requests/status.xml?command=pl_sd&val='+value+'&islua='+islua, parse_status );
 }
 
 /* misc actions */

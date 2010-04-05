@@ -83,7 +83,13 @@ This dialog needs the following dialogs to be fully functional: <none>
           <?vlc
             local sd = vlc.sd.get_services_names()
             for n,ln in pairs(sd) do
-              print([[<button onclick="pl_sd(']]..n..[[');hide_menu('menu_sd');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" class="menuout" title="Toggle ]]..ln..[[" >]]..ln..[[</button><br/>]])
+                local sdname = string.gsub(n, "([^{]*)({.*)", "%1")
+                local islua = 0
+                if(sdname == "lua") then
+                    sdname = string.gsub(n, "(lua{sd=')([^']*)'(.*)", "%2")
+                    islua = 1
+                end
+              print([[<button class="menuout" onclick='pl_sd("]]..sdname..[[", "]]..islua..[[");hide_menu("menu_sd");' onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" class="menuout" title="Toggle ]]..ln..[[" >]]..ln..[[</button><br/>]])
             end
           ?>
           </div>
