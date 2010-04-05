@@ -4,8 +4,8 @@ $Id$
 1 - About Lua
 =============
 
-Lua documention is available on http://www.lua.org . The reference manual
-is very usefull: http://www.lua.org/manual/5.1/ .
+Lua documentation is available on http://www.lua.org . The reference manual
+is very useful: http://www.lua.org/manual/5.1/ .
 VLC uses Lua 5.1
 All the Lua standard libraries are available.
 
@@ -27,7 +27,7 @@ then in the global VLC lua/{playlist,meta,intf}/ directory.
 3 - VLC specific Lua modules
 ============================
 
-All VLC specifc modules are in the "vlc" object. For example, if you want
+All VLC specifics modules are in the "vlc" object. For example, if you want
 to use the "info" function of the "msg" VLC specific Lua module:
 vlc.msg.info( "This is an info message and will be displayed in the console" )
 
@@ -51,11 +51,11 @@ config.set( name, value ): Set the VLC configuration option "name"'s value.
 
 Dialog
 ------
-local d = vlc.dialog( "My VLC Extension" ): Create a new UI dialog, with a human-readble title: "My VLC Extension"
+local d = vlc.dialog( "My VLC Extension" ): Create a new UI dialog, with a human-readable title: "My VLC Extension"
 d:show(): Show this dialog.
 d:hide(): Hide (but not close) this dialog.
 d:delete(): Close and delete this dialog.
-d:del_widget( widget ): Delete 'widget'. It disappears from the dialog and repositionning may occur.
+d:del_widget( widget ): Delete 'widget'. It disappears from the dialog and repositioning may occur.
 d:update(): Update the dialog immediately (don't wait for the current function to return)
 
 In the following functions, you can always add some optional parameters: col, row, col_span, row_span, width, height.
@@ -160,7 +160,7 @@ misc.configdir(): Get the user's VLC config directory.
 misc.cachedir(): Get the user's VLC cache directory.
 
 misc.datadir_list( name ): FIXME: write description ... or ditch function
-  if it isn't usefull anymore, we have datadir and userdatadir :)
+  if it isn't useful anymore, we have datadir and userdatadir :)
 
 misc.mdate(): Get the current date (in milliseconds).
 misc.mwait(): Wait for the given date (in milliseconds).
@@ -177,7 +177,7 @@ net.url_parse( url, [option delimiter] ): Parse URL. Returns a table with
   "option".
 net.listen_tcp( host, port ): Listen to TCP connections. This returns an
   object with an accept and an fds method. accept is blocking (Poll on the
-  fds with the net.POLLIN flag if you want to be non blockin).
+  fds with the net.POLLIN flag if you want to be non blocking).
   The fds method returns a list of fds you can call poll on before using
   the accept method. For example:
 local l = vlc.net.listen_tcp( "localhost", 1234 )
@@ -192,7 +192,7 @@ net.close( fd ): Close file descriptor.
 net.send( fd, string, [length] ): Send data on fd.
 net.recv( fd, [max length] ): Receive data from fd.
 net.poll( { fd = events }, [timeout in seconds] ): Implement poll function.
-  Retruns the numbers of file descriptors with a non 0 revent. The function
+  Returns the numbers of file descriptors with a non 0 revent. The function
   modifies the input table to { fd = revents }. See "man poll".
 net.POLLIN/POLLPRI/POLLOUT/POLLRDHUP/POLLERR/POLLHUP/POLLNVAL: poll event flags
 net.fd_read( fd, [max length] ): Read data from fd.
@@ -248,14 +248,14 @@ Playlist
 --------
 playlist.prev(): Play previous track.
 playlist.next(): Play next track.
-playlist.skip( n ): Skip n tracs.
+playlist.skip( n ): Skip n tracks.
 playlist.play(): Play.
 playlist.pause(): Pause.
 playlist.stop(): Stop.
 playlist.clear(): Clear the playlist.
 playlist.repeat_( [status] ): Toggle item repeat or set to specified value.
 playlist.loop( [status] ): Toggle playlist loop or set to specified value.
-playlist.random( [status] ): Toggle playlsit random or set to specified value.
+playlist.random( [status] ): Toggle playlist random or set to specified value.
 playlist.goto( id ): Go to specified track.
 playlist.add( ... ): Add a bunch of items to the playlist.
   The playlist is a table of playlist objects.
@@ -288,20 +288,20 @@ playlist.add( ... ): Add a bunch of items to the playlist.
              example: .meta = { ["Google video"] = { ["docid"] = "-5784010886294950089"; ["GVP version"] = "1.1" }; ["misc"] = { "Hello" = "World!" } }
   Invalid playlist items will be discarded by VLC.
 playlist.enqueue( ... ): like playlist.add() except that track isn't played.
-playlist.get( [what, [tree]] ): Get the playist.
+playlist.get( [what, [tree]] ): Get the playlist.
   If "what" is a number, then this will return the corresponding playlist
   item's playlist hierarchy. If it is "normal" or "playlist", it will
   return the normal playlist. If it is "ml" or "media library", it will
   return the media library. If it is "root" it will return the full playlist.
   If it is a service discovery module's name, it will return that service
   discovery's playlist. If it is any other string, it won't return anything.
-  Else it will return the fullplaylist.
+  Else it will return the full playlist.
   The second argument, "tree", is optional. If set to true or unset, the
   playlist will be returned in a tree layout. If set to false, the playlist
   will be returned using the flat layout.
   Each playlist item returned will have the following members:
       .id: The item's id.
-      .flags: a table with the following members if the corresponing flag is
+      .flags: a table with the following members if the corresponding flag is
               set:
           .save
           .skip
@@ -341,7 +341,7 @@ Stream
 stream( url ): Instantiate a stream object for specific url.
 memory_stream( string ): Instantiate a stream object containing a specific string.
   Those two functions return the stream object upon success and nil if an
-  error occured, in that case, the second return value will be an error message.
+  error occurred, in that case, the second return value will be an error message.
 
 s = vlc.stream( "http://www.videolan.org/" )
 s:read( 128 ) -- read up to 128 characters. Return 0 if no more data is available (FIXME?).
@@ -380,7 +380,7 @@ var.trigger_callback( object, name ): Trigger the callbacks associated with the
 
 var.command( object name, name, argument ): Issue "object name"'s "name"
   command with argument "argument".
-var.libvlc_command( name, arguement ): Issue libvlc's "name" command with
+var.libvlc_command( name, argument ): Issue libvlc's "name" command with
   argument "argument".
 
 Video
