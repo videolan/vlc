@@ -45,6 +45,7 @@ class PLModel;
 class QPushButton;
 class QKeyEvent;
 class QWheelEvent;
+class QStackedLayout;
 class PlIconView;
 class PlListView;
 class LocationBar;
@@ -82,6 +83,7 @@ private:
     PlIconView  *iconView;
     PlListView  *listView;
     QAbstractItemView *currentView;
+    QStackedLayout *viewStack;
 
     QAction *viewActions[ VIEW_COUNT ];
     QAction *iconViewAction, *treeViewAction;

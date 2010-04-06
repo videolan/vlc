@@ -47,6 +47,7 @@
 #include <QToolButton>
 #include <QFontMetrics>
 #include <QPainter>
+#include <QStackedLayout>
 
 #include <assert.h>
 
@@ -69,6 +70,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     iconView = NULL;
     treeView = NULL;
     listView = NULL;
+    viewStack = new QStackedLayout();
+    layout->addLayout( viewStack, 1, 0, 1, -1 );
 
     model = new PLModel( p_playlist, p_intf, p_root, this );
     currentRootId = -1;
@@ -271,7 +274,7 @@ void StandardPLPanel::createIconView()
     CONNECT( iconView, activated( const QModelIndex & ),
              this, activate( const QModelIndex & ) );
     iconView->installEventFilter( this );
-    layout->addWidget( iconView, 1, 0, 1, -1 );
+    viewStack->addWidget( iconView );
 }
 
 void StandardPLPanel::createListView()
@@ -283,7 +286,7 @@ void StandardPLPanel::createListView()
     CONNECT( listView, activated( const QModelIndex & ),
              this, activate( const QModelIndex & ) );
     listView->installEventFilter( this );
-    layout->addWidget( listView, 1, 0, 1, -1 );
+    viewStack->addWidget( listView );
 }
 
 
@@ -346,7 +349,7 @@ void StandardPLPanel::createTreeView()
              this, toggleColumnShown( int ) );
 
     /* Finish the layout */
-    layout->addWidget( treeView, 1, 0, 1, -1 );
+    viewStack->addWidget( treeView );
 }
 
 void StandardPLPanel::showView( int i_view )
@@ -357,40 +360,28 @@ void StandardPLPanel::showView( int i_view )
     {
         if( treeView == NULL )
             createTreeView();
-        if( iconView ) iconView->hide();
-        if( listView ) listView->hide();
-        treeView->show();
         currentView = treeView;
-        viewActions[i_view]->setChecked( true );
         break;
     }
     case ICON_VIEW:
     {
         if( iconView == NULL )
             createIconView();
-
-        if( treeView ) treeView->hide();
-        if( listView ) listView->hide();
-        iconView->show();
         currentView = iconView;
-        viewActions[i_view]->setChecked( true );
         break;
     }
     case LIST_VIEW:
     {
         if( listView == NULL )
             createListView();
-
-        if( treeView ) treeView->hide();
-        if( iconView ) iconView->hide();
-        listView->show();
         currentView = listView;
-        viewActions[i_view]->setChecked( true );
         break;
     }
     default: return;
     }
 
+    viewStack->setCurrentWidget( currentView );
+    viewActions[i_view]->setChecked( true );
     browseInto();
     gotoPlayingItem();
 }
