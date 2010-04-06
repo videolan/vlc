@@ -113,6 +113,7 @@ struct intf_sys_t
     vlc_array_t    *p_events;
     vlc_mutex_t     lock;
     input_thread_t *p_input;
+    bool            b_unique;
 };
 
 typedef struct
@@ -129,6 +130,10 @@ typedef struct
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define DBUS_UNIQUE_TEXT N_("Unique DBUS service id (org.mpris.vlc-<pid>)")
+#define DBUS_UNIQUE_LONGTEXT N_( \
+    "Use a unique dbus service id to identify this VLC instance on the DBUS bus. " \
+    "The process identifier (PID) is added to the service name: org.mpris.vlc-<pid>" )
 
 vlc_module_begin ()
     set_shortname( N_("dbus"))
@@ -137,6 +142,8 @@ vlc_module_begin ()
     set_description( N_("D-Bus control interface") )
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
+    add_bool( "dbus-unique-service-id", false, NULL,
+              DBUS_UNIQUE_TEXT, DBUS_UNIQUE_LONGTEXT, true )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -698,6 +705,7 @@ static int Open( vlc_object_t *p_this )
     playlist_t      *p_playlist;
     DBusConnection  *p_conn;
     DBusError       error;
+    char            *psz_service_name = NULL;
 
     if( !p_sys )
         return VLC_ENOMEM;
@@ -706,6 +714,21 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_caps = CAPS_NONE;
     p_sys->b_dead = false;
     p_sys->p_input = NULL;
+
+    p_sys->b_unique = var_CreateGetBool( p_intf, "dbus-unique-service-id" );
+    if( p_sys->b_unique )
+    {
+        if( asprintf( &psz_service_name, "%s-%d",
+            VLC_MPRIS_DBUS_SERVICE, getpid() ) < 0 )
+        {
+            free( p_sys );
+            return VLC_ENOMEM;
+        }
+    }
+    else
+    {
+        psz_service_name = strdup(VLC_MPRIS_DBUS_SERVICE);
+    }
 
     dbus_error_init( &error );
 
@@ -721,15 +744,18 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* register a well-known name on the bus */
-    dbus_bus_request_name( p_conn, VLC_MPRIS_DBUS_SERVICE, 0, &error );
+    dbus_bus_request_name( p_conn, psz_service_name, 0, &error );
     if( dbus_error_is_set( &error ) )
     {
-        msg_Err( p_this, "Error requesting service " VLC_MPRIS_DBUS_SERVICE
-                 ": %s", error.message );
+        msg_Err( p_this, "Error requesting service %s: %s",
+                 psz_service_name, error.message );
         dbus_error_free( &error );
+        free( psz_service_name );
         free( p_sys );
         return VLC_EGENERIC;
     }
+    msg_Info( p_intf, "listening on dbus as: %s", psz_service_name );
+    free( psz_service_name );
 
     /* we register the objects */
     dbus_connection_register_object_path( p_conn, MPRIS_DBUS_ROOT_PATH,
