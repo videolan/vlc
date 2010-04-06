@@ -231,11 +231,13 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QString artist = getMeta( index, COLUMN_ARTIST );
     QString album = getMeta( index, COLUMN_ALBUM );
     QString trackNum = getMeta( index, COLUMN_TRACK_NUMBER );
-    QString artistAlbum = artist
-                          + ( artist.isEmpty() ? QString() : QString( ": " ) )
-                          + album
-                          + ( album.isEmpty() || trackNum.isEmpty() ?
-                              QString() : QString( " [#%1]" ).arg( trackNum ) );
+    QString artistAlbum = artist;
+    if( !album.isEmpty() )
+    {
+        if( !artist.isEmpty() ) artistAlbum += ": ";
+        artistAlbum += album;
+        if( !trackNum.isEmpty() ) artistAlbum += QString( " [#%1]" ).arg( trackNum );
+    }
 
     QPixmap artPix = getArtPixmap( index, QSize( LISTVIEW_ART_SIZE, LISTVIEW_ART_SIZE ) );
 
