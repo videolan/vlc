@@ -295,19 +295,15 @@ MainInterface::~MainInterface()
 
     /* Save states */
     settings->beginGroup( "MainWindow" );
+
     settings->setValue( "pl-dock-status", b_plDocked );
     /* Save playlist state */
     if( playlistWidget )
     {
-        if( isPlDocked() )
-        {
-            QVLCTools::saveWidgetPosition( p_intf, "Playlist", playlistWidget );
-            settings->setValue( "playlist-visible", playlistVisible );
-        }
-        else
-        {
-            settings->setValue( "playlist-visible", playlistWidget->isVisible() ); // FIXME
-        }
+        settings->setValue( "playlist-visible",
+                            isPlDocked() ?
+                            playlistVisible :
+                            playlistWidget->isVisible() /* FIXME */ );
     }
 
     settings->setValue( "adv-controls",
@@ -320,9 +316,15 @@ MainInterface::~MainInterface()
 
     /* Save this size */
     QVLCTools::saveWidgetPosition(settings, this);
+
     settings->endGroup();
 
+    /* Save undocked playlist size */
+    if( playlistWidget && !isPlDocked() )
+        QVLCTools::saveWidgetPosition( p_intf, "Playlist", playlistWidget );
+
     delete playlistWidget;
+
     delete statusBar();
 
     /* Unregister callbacks */
@@ -717,6 +719,7 @@ void MainInterface::dockPlaylist( bool p_docked )
     }
     else
     {
+        QVLCTools::saveWidgetPosition( p_intf, "Playlist", playlistWidget );
         playlistWidget->setWindowFlags( Qt::Widget ); // Probably a Qt bug here
         // It would be logical that QStackWidget::addWidget reset the flags...
         stackCentralW->addWidget( playlistWidget );
