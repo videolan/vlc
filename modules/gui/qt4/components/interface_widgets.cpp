@@ -356,7 +356,7 @@ void BackgroundWidget::paintEvent( QPaintEvent *e )
 
 void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )
 {
-    QVLCMenu::PopupMenu( p_intf, true );
+    QVLCMenu::PopupMenu( p_intf, true, this );
     event->accept();
 }
 

@@ -130,6 +130,7 @@ private:
     static DialogsProvider *instance;
 
     intf_thread_t *p_intf;
+    QWidget* root;
     bool b_isDying;
 
     void openDialog( int );

@@ -423,9 +423,12 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
     QAction *action;
     QMenu *menu;
 
+    MainInterface *mi = _mi ? _mi : p_intf->p_sys->p_mi;
+    assert( mi );
+
     if( !current )
     {
-        menu = new QMenu( qtr( "&View" ) );
+        menu = new QMenu( qtr( "&View" ), mi );
     }
     else
     {
@@ -441,9 +444,6 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
             else menu->removeAction( a );
         }
     }
-
-    MainInterface *mi = _mi ? _mi : p_intf->p_sys->p_mi;
-    assert( mi );
 
     menu->addAction( QIcon( ":/menu/playlist_menu" ),
             qtr( "Play&list" ), mi,
@@ -885,7 +885,7 @@ void QVLCMenu::PopupMenuStaticEntries( QMenu *menu )
 }
 
 /* Video Tracks and Subtitles tracks */
-void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
+void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf, QWidget *parent  )
 {
     POPUP_BOILERPLATE;
     if( p_input )
@@ -897,12 +897,12 @@ void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
             vlc_object_release( p_vout );
         }
     }
-    QMenu *menu = new QMenu();
+    QMenu *menu = new QMenu( parent );
     CREATE_POPUP;
 }
 
 /* Audio Tracks */
-void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf )
+void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf, QWidget *parent )
 {
     POPUP_BOILERPLATE;
     if( p_input )
@@ -912,12 +912,12 @@ void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf )
         if( p_aout )
             vlc_object_release( p_aout );
     }
-    QMenu *menu = new QMenu();
+    QMenu *menu = new QMenu( parent );
     CREATE_POPUP;
 }
 
 /* Navigation stuff, and general menus ( open ), used only for skins */
-void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
+void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf, QWidget *parent )
 {
     POPUP_BOILERPLATE;
 
@@ -928,7 +928,7 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
         PUSH_SEPARATOR;
     }
 
-    QMenu *menu = new QMenu();
+    QMenu *menu = new QMenu( parent );
     Populate( p_intf, menu, varnames, objects );
 
     menu->addSeparator();
@@ -947,7 +947,7 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
 }
 
 /* Main Menu that sticks everything together  */
-void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
+void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show, QWidget *parent )
 {
     /* Delete old popup if there is one */
     delete p_intf->p_sys->p_popup_menu;
@@ -959,7 +959,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
     }
 
     /* */
-    QMenu *menu = new QMenu();
+    QMenu *menu = new QMenu( parent );
     QAction *action;
     bool b_isFullscreen = false;
     MainInterface *mi = p_intf->p_sys->p_mi;

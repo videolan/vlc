@@ -174,7 +174,7 @@ void StandardPLPanel::popupPlView( const QPoint &point )
     QModelIndexList list = selection->selectedIndexes();
 
     if( !model->popup( index, globalPoint, list ) )
-        QVLCMenu::PopupMenu( p_intf, true );
+        QVLCMenu::PopupMenu( p_intf, true, this );
 }
 
 void StandardPLPanel::popupSelectColumn( QPoint pos )
