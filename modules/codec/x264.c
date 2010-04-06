@@ -1069,7 +1069,9 @@ static int  Open ( vlc_object_t *p_this )
     {
         p_sys->param.i_fps_num = p_enc->fmt_in.video.i_frame_rate;
         p_sys->param.i_fps_den = p_enc->fmt_in.video.i_frame_rate_base;
+#if X264_BUILD >= 81
         p_sys->param.b_vfr_input = 0;
+#endif
     }
 
     /* Check slice-options */
