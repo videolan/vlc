@@ -719,7 +719,6 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
 
             return;
         }
-        ep->Down();
 
         for( i_track = 0; i_track < tracks.size(); i_track++ )
         {
@@ -737,7 +736,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
 
         if( i_track < tracks.size() )
         {
-            if( sys.i_pts >= sys.i_start_pts )
+            if( sys.i_pts > sys.i_start_pts )
             {
                 cluster = static_cast<KaxCluster*>(ep->UnGet( i_block_pos, i_cluster_pos ));
                 i_track_skipping = 0;
