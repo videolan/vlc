@@ -206,7 +206,6 @@ VLC_EXPORT( unsigned, vlc_timer_getoverrun, (vlc_timer_t) LIBVLC_USED );
 
 #ifndef LIBVLC_USE_PTHREAD_CANCEL
 enum {
-    VLC_DO_CANCEL,
     VLC_CLEANUP_PUSH,
     VLC_CLEANUP_POP,
 };

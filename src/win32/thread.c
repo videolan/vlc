@@ -636,8 +636,12 @@ void vlc_detach (vlc_thread_t handle)
 /* APC procedure for thread cancellation */
 static void CALLBACK vlc_cancel_self (ULONG_PTR dummy)
 {
+    vlc_cancel_t *nfo = vlc_threadvar_get (cancel_key);
+
+    if (likely(nfo != NULL))
+        nfo->killed = true;
+
     (void)dummy;
-    vlc_control_cancel (VLC_DO_CANCEL);
 }
 
 void vlc_cancel (vlc_thread_t thread_id)
@@ -705,10 +709,6 @@ void vlc_control_cancel (int cmd, ...)
     va_start (ap, cmd);
     switch (cmd)
     {
-        case VLC_DO_CANCEL:
-            nfo->killed = true;
-            break;
-
         case VLC_CLEANUP_PUSH:
         {
             /* cleaner is a pointer to the caller stack, no need to allocate
