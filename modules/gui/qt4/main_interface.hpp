@@ -100,7 +100,6 @@ protected:
     virtual void customEvent( QEvent *);
     virtual void keyPressEvent( QKeyEvent *);
     virtual void wheelEvent( QWheelEvent * );
-    virtual void resizeEvent( QResizeEvent * event );
 
 private:
     /* Main Widgets Creation */

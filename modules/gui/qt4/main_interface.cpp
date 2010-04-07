@@ -1081,31 +1081,6 @@ void MainInterface::handleKeyPress( QKeyEvent *e )
         e->ignore();
 }
 
-void MainInterface::resizeEvent( QResizeEvent * event )
-{
-#if 0
-    if( b_keep_size )
-    {
-        if( i_visualmode )
-        {
-                mainVideoSize = size();
-        }
-        else
-        {
-            if( VISIBLE( bgWidget) ||
-                ( videoIsActive && videoWidget->isVisible() )
-              )
-                mainVideoSize = size();
-            else
-                mainBasedSize = size();
-        }
-    }
-#endif
-    QVLCMW::resizeEvent( event );
-    msg_Dbg( p_intf, "Resize Event, height: %i", size().height() );
-    debug();
-}
-
 void MainInterface::wheelEvent( QWheelEvent *e )
 {
     int i_vlckey = qtWheelEventToVLCKey( e );
