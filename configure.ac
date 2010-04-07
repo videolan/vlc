@@ -971,16 +971,6 @@ CFLAGS="${CFLAGS_save}"
 RDC_PROG_CC_WFLAGS([all extra sign-compare undef pointer-arith bad-function-cast write-strings missing-prototypes volatile-register-var error-implicit-function-declaration])
 RDC_PROG_CC_FLAGS([-pipe])
 
-AC_ARG_ENABLE(warnings-as-error,
-      AS_HELP_STRING([--enable-warnings-as-error],[Treat acceptable warnings as error (default disabled)]),, [enable_warnings_as_error="no"])
-AS_IF([test "${enable_warnings_as_error}" = "yes"], [
-    RDC_PROG_CC_WERRORFLAGS([unused-function unused-label unused-value unused-parameter unused-variable unused \
-     missing-braces nonnull parentheses uninitialized address enum-compare undef comment switch \
-     bad-function-cast implicit sequence-point strict-aliasing array-bounds missing-parameter-type \
-     overflow int-to-pointer-cast pointer-to-int-cast div-by-zero overflow ignored])
-])
-AC_SUBST(CFLAGS_WERROR)
-
 dnl Check for various optimization flags
 AC_CACHE_CHECK([if \$CC accepts -Os],
     [ac_cv_c_os],

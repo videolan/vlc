@@ -26,8 +26,6 @@ cflags_optim_speed="@CFLAGS_OPTIM_SPEED@"
 cflags_optim_nodebug="@CFLAGS_OPTIM_NODEBUG@"
 cflags_nooptim="@CFLAGS_NOOPTIM@"
 
-cflags_werror="@CFLAGS_WERROR@"
-
 #
 #  Do not touch below this place unless you really know what you are doing
 #
@@ -213,10 +211,6 @@ while test $# -gt 0; do
       echo_builtin=yes
       cppflags="${cppflags} -D__LIBVLC__ -D__BUILTIN__"
       ;;
-    libs)
-      # Avoid to use werror on what is not vlc's code.
-      cflags_werror=""
-      ;;
     pic)
       ;;
     mozilla)
@@ -238,12 +232,6 @@ done
 if test -n "${module}"; then
   cppflags="${cppflags} -DMODULE_NAME=${module} -DMODULE_NAME_IS_${module} -DMODULE_STRING=\"${module}\""
 fi
-
-#
-# Set the Werror flags.
-#
-
-cflags="${cflags} ${cflags_werror}"
 
 #
 #  Output what we were asked

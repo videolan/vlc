@@ -60,13 +60,6 @@ AC_DEFUN([VLC_ADD_LIBS], [
   ])
 ])
 
-AC_DEFUN([VLC_SET_CFLAGS_WERROR], [
-  m4_foreach_w([element], [$1], [
-    [eval "CFLAGS_WERROR_]element[="'"'"$2"'"']
-    [am_modules_with_werror="${am_modules_with_werror} ]element["]
-  ])
-])
-
 dnl ===========================================================================
 dnl  Macros to save and restore default flags
 
@@ -95,7 +88,7 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
 
   AC_MSG_RESULT(configure: creating ./vlc-config.in)
 
-  am_all_modules="`for x in ${am_modules_with_cppflags} ${am_modules_with_cflags} ${am_modules_with_cxxflags} ${am_modules_with_objcflags} ${am_modules_with_ldflags} ${am_modules_with_libs} ${am_modules_with_werror}; do echo $x; done | sort | uniq`"
+  am_all_modules="`for x in ${am_modules_with_cppflags} ${am_modules_with_cflags} ${am_modules_with_cxxflags} ${am_modules_with_objcflags} ${am_modules_with_ldflags} ${am_modules_with_libs}; do echo $x; done | sort | uniq`"
 
   rm -f vlc-config.in
   sed -ne '/#@1@#/q;p' < "${srcdir}/vlc-config.in.in" \
@@ -139,9 +132,6 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
     fi
     if test "`eval echo @'$'LIBS_${x}@`" != "@@"; then
       echo "      libs=\"\${libs} `eval echo '$'LIBS_${x}`\""
-    fi
-    if test "`eval echo @'$'CFLAGS_WERROR_${x}@`" != "@@"; then
-      echo "      cflags_werror=\"`eval echo '$'CFLAGS_WERROR_${x}`\""
     fi
     echo "    ;;"
   ] done >> vlc-config.in
