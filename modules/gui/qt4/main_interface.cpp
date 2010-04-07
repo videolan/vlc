@@ -339,11 +339,13 @@ MainInterface::~MainInterface()
  *****************************/
 void MainInterface::recreateToolbars()
 {
+    bool b_adv = getControlsVisibilityStatus() & CONTROLS_ADVANCED;
+
     settings->beginGroup( "MainWindow" );
     delete controls;
     delete inputC;
 
-    controls = new ControlsWidget( p_intf, false, this );
+    controls = new ControlsWidget( p_intf, b_adv, this );
     inputC = new InputControlsWidget( p_intf, this );
 
     if( fullscreenControls )
@@ -768,6 +770,7 @@ void MainInterface::toggleAdvancedButtons()
 /* Get the visibility status of the controls (hidden or not, advanced or not) */
 int MainInterface::getControlsVisibilityStatus()
 {
+    if( !controls ) return 0;
     return( (controls->isVisible() ? CONTROLS_VISIBLE : CONTROLS_HIDDEN )
                 + CONTROLS_ADVANCED * controls->b_advancedVisible );
 }
