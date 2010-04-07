@@ -534,12 +534,12 @@ inline void MainInterface::restoreStackOldWidget()
 
 void MainInterface::destroyPopupMenu()
 {
-    QVLCMenu::PopupMenu( p_intf, false, this );
+    QVLCMenu::PopupMenu( p_intf, false );
 }
 
 void MainInterface::popupMenu( const QPoint &p )
 {
-    QVLCMenu::PopupMenu( p_intf, true, this );
+    QVLCMenu::PopupMenu( p_intf, true );
 }
 
 void MainInterface::toggleFSC()
