@@ -961,23 +961,15 @@ void MainInterface::updateSystrayTooltipStatus( int i_status )
 {
     switch( i_status )
     {
-        case  0:
-        case  END_S:
-            {
-                sysTray->setToolTip( qtr( "VLC media player" ) );
-                break;
-            }
-        case PLAYING_S:
-            {
-                sysTray->setToolTip( input_name );
-                break;
-            }
-        case PAUSE_S:
-            {
-                sysTray->setToolTip( input_name + " - "
-                        + qtr( "Paused") );
-                break;
-            }
+    case PLAYING_S:
+        sysTray->setToolTip( input_name );
+        break;
+    case PAUSE_S:
+        sysTray->setToolTip( input_name + " - " + qtr( "Paused") );
+        break;
+    default:
+        sysTray->setToolTip( qtr( "VLC media player" ) );
+        break;
     }
     QVLCMenu::updateSystrayMenu( this, p_intf );
 }
