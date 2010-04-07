@@ -505,6 +505,7 @@ struct vlc_entry_data
 {
     void * (*func) (void *);
     void *  data;
+    vlc_sem_t ready;
 #ifdef UNDER_CE
     HANDLE  cancel_event;
 #endif
@@ -512,18 +513,17 @@ struct vlc_entry_data
 
 static unsigned __stdcall vlc_entry (void *p)
 {
+    struct vlc_entry_data *entry = p;
     vlc_cancel_t cancel_data = VLC_CANCEL_INIT;
-    struct vlc_entry_data data;
-
-    memcpy (&data, p, sizeof (data));
-    free (p);
+    void *(*func) (void *) = entry->func;
+    void *data = entry->data;
 
 #ifdef UNDER_CE
-    cancel_data.cancel_event = data.cancel_event;
+    cancel_data.cancel_event = entry->cancel_event;
 #endif
-
     vlc_threadvar_set (cancel_key, &cancel_data);
-    data.func (data.data);
+    vlc_sem_post (&entry->ready);
+    func (data);
     return 0;
 }
 
@@ -538,6 +538,7 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         return ENOMEM;
     entry_data->func = entry;
     entry_data->data = data;
+    vlc_sem_init (&entry_data->ready, 0);
 
 #ifndef UNDER_CE
     /* When using the MSVCRT C library you have to use the _beginthreadex
@@ -594,9 +595,17 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
     if (priority)
         SetThreadPriority (hThread, priority);
 
+    /* Prevent cancellation until cancel_data is initialized. */
+    /* XXX: This could be postponed to vlc_cancel() or avoided completely by
+     * passing the "right" pointer to vlc_cancel_self(). */
+    vlc_sem_wait (&entry_data->ready);
+    vlc_sem_destroy (&entry_data->ready);
+    free (entry_data);
+
     return 0;
 
 error:
+    vlc_sem_destroy (&entry_data->ready);
     free (entry_data);
     return err;
 }
