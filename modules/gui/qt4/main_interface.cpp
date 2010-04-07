@@ -734,22 +734,13 @@ void MainInterface::dockPlaylist( bool p_docked )
 void MainInterface::toggleMinimalView( bool b_switch )
 {
     if( i_visualmode == 0 )
-    { /* NORMAL MODE then */
-        if( !videoWidget || stackCentralW->currentWidget() != videoWidget )
+    {
+        if( stackCentralW->currentWidget() == bgWidget )
         {
-            showBg();
-        }
-        else
-        {
-            /* If video is visible, then toggle the status of bgWidget */
-            //FIXME
-            //bgWasVisible = !bgWasVisible;
-            /* if( stackCentralOldState == BACK G_TAB )
-                stackCentralOldState = HID DEN_TAB;
-            else
-                stackCentralOldState = BACK G_TAB;
-
-                */
+            if( stackCentralW->height() < 16 )
+            {
+                resizeStack( stackCentralW->width(), 100 );
+            }
         }
     }
 
@@ -1055,17 +1046,6 @@ void MainInterface::dragLeaveEvent(QDragLeaveEvent *event)
  ************************************************************************/
 void MainInterface::customEvent( QEvent *event )
 {
-#if 0
-    if( event->type() == PLDockEvent_Type )
-    {
-        PlaylistDialog::killInstance();
-        playlistEmbeddedFlag = true;
-        menuBar()->clear();
-        QVLCMenu::createMenuBar(this, p_intf, true, visualSelectorEnabled);
-        togglePlaylist();
-    }
-#endif
-    /*else */
     if ( event->type() == (int)SetVideoOnTopEvent_Type )
     {
         SetVideoOnTopQtEvent* p_event = (SetVideoOnTopQtEvent*)event;
