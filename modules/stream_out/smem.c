@@ -37,8 +37,6 @@
  *
  * the video-data and audio-data pointers will be passed to lock/unlock function
  *
- * For now, audio is NOT IMPLEMENTED.
- *
  ******************************************************************************/
 
 /*****************************************************************************
@@ -382,3 +380,4 @@ static int SendAudio( sout_stream_t *p_stream, sout_stream_id_t *id,
     block_ChainRelease( p_buffer );
     return VLC_SUCCESS;
 }
+
