@@ -13,7 +13,7 @@ Important changes for packagers:
 Access:
  * Support for the sftp protocol
  * Support for CDDB servers for Audio-CD on the Windows port
- * New memory input (imem) module to feed VLC from data in memory
+ * New memory input (imem) access and access_demux module to feed VLC from data in memory
  * New avio module to use libavformat capabilities for network streams, like rtmp://
  * Port of the screen module from Xlib to XCB
  * Port of the dc1394 module from libdc1394 to libdc1394 v2.0
