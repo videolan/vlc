@@ -152,7 +152,7 @@ void ExtensionsManager::menu( QMenu *current )
 
         if( b_Active && extension_HasMenu( p_extensions_manager, p_ext ) )
         {
-            QMenu *submenu = new QMenu( qfu( p_ext->psz_title ) );
+            QMenu *submenu = new QMenu( qfu( p_ext->psz_title ), current );
             char **ppsz_titles = NULL;
             uint16_t *pi_ids = NULL;
             size_t i_num = 0;
