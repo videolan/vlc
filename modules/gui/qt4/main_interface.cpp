@@ -339,14 +339,20 @@ MainInterface::~MainInterface()
  *****************************/
 void MainInterface::recreateToolbars()
 {
-    // FIXME: do the same for the FSC
     settings->beginGroup( "MainWindow" );
     delete controls;
     delete inputC;
 
-    controls = new ControlsWidget( p_intf, false, this ); /* FIXME */
+    controls = new ControlsWidget( p_intf, false, this );
     inputC = new InputControlsWidget( p_intf, this );
 
+    if( fullscreenControls )
+    {
+        delete fullscreenControls;
+        fullscreenControls = new FullscreenControllerWidget( p_intf, this );
+        CONNECT( fullscreenControls, keyPressed( QKeyEvent * ),
+                 this, handleKeyPress( QKeyEvent * ) );
+    }
     mainLayout->insertWidget( 2, inputC );
     mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
                               controls );
