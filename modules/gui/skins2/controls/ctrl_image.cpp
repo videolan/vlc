@@ -60,6 +60,9 @@ void CtrlImage::handleEvent( EvtGeneric &rEvent )
     else if( rEvent.getAsString() == "mouse:left:up:none" )
     {
         CmdDlgHidePopupMenu( getIntf() ).execute();
+        CmdDlgHideVideoPopupMenu( getIntf() ).execute();
+        CmdDlgHideAudioPopupMenu( getIntf() ).execute();
+        CmdDlgHideMiscPopupMenu( getIntf() ).execute();
     }
     else if( rEvent.getAsString() == "mouse:left:dblclick:none" )
     {
