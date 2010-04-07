@@ -763,16 +763,19 @@ QMenu *QVLCMenu::HelpMenu( QWidget *parent )
  * Popup menus - Right Click menus                                           *
  *****************************************************************************/
 #define POPUP_BOILERPLATE \
+    static QMenu* menu = NULL;  \
+    delete menu; menu = NULL; \
+    if( !show ) \
+        return; \
     unsigned int i_last_separator = 0; \
     vector<vlc_object_t *> objects; \
     vector<const char *> varnames; \
     input_thread_t *p_input = THEMIM->getInput();
 
 #define CREATE_POPUP \
+    menu = new QMenu(); \
     Populate( p_intf, menu, varnames, objects ); \
-    p_intf->p_sys->p_popup_menu = menu; \
     menu->popup( QCursor::pos() ); \
-    p_intf->p_sys->p_popup_menu = NULL; \
     i_last_separator = 0;
 
 void QVLCMenu::PopupPlayEntries( QMenu *menu,
@@ -885,9 +888,9 @@ void QVLCMenu::PopupMenuStaticEntries( QMenu *menu )
 }
 
 /* Video Tracks and Subtitles tracks */
-void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf, QWidget *parent  )
+void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf, bool show )
 {
-    POPUP_BOILERPLATE;
+    POPUP_BOILERPLATE
     if( p_input )
     {
         vout_thread_t *p_vout = THEMIM->getVout();
@@ -897,14 +900,13 @@ void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf, QWidget *parent  )
             vlc_object_release( p_vout );
         }
     }
-    QMenu *menu = new QMenu( parent );
-    CREATE_POPUP;
+    CREATE_POPUP
 }
 
 /* Audio Tracks */
-void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf, QWidget *parent )
+void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf, bool show )
 {
-    POPUP_BOILERPLATE;
+    POPUP_BOILERPLATE
     if( p_input )
     {
         aout_instance_t *p_aout = THEMIM->getAout();
@@ -912,14 +914,13 @@ void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf, QWidget *parent )
         if( p_aout )
             vlc_object_release( p_aout );
     }
-    QMenu *menu = new QMenu( parent );
-    CREATE_POPUP;
+    CREATE_POPUP
 }
 
 /* Navigation stuff, and general menus ( open ), used only for skins */
-void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf, QWidget *parent )
+void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf, bool show )
 {
-    POPUP_BOILERPLATE;
+    POPUP_BOILERPLATE
 
     if( p_input )
     {
@@ -928,7 +929,7 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf, QWidget *parent )
         PUSH_SEPARATOR;
     }
 
-    QMenu *menu = new QMenu( parent );
+    menu = new QMenu();
     Populate( p_intf, menu, varnames, objects );
 
     menu->addSeparator();
@@ -941,30 +942,19 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf, QWidget *parent )
     menu->addSeparator();
     PopupMenuStaticEntries( menu );
 
-    p_intf->p_sys->p_popup_menu = menu;
     menu->popup( QCursor::pos() );
-    p_intf->p_sys->p_popup_menu = NULL;
 }
 
 /* Main Menu that sticks everything together  */
-void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show, QWidget *parent )
+void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 {
-    /* Delete old popup if there is one */
-    delete p_intf->p_sys->p_popup_menu;
-
-    if( !show )
-    {
-        p_intf->p_sys->p_popup_menu = NULL;
-        return;
-    }
+    POPUP_BOILERPLATE
 
     /* */
-    QMenu *menu = new QMenu( parent );
+    menu = new QMenu( );
     QAction *action;
     bool b_isFullscreen = false;
     MainInterface *mi = p_intf->p_sys->p_mi;
-
-    POPUP_BOILERPLATE;
 
     PopupPlayEntries( menu, p_intf, p_input );
     PopupMenuPlaylistControlEntries( menu, p_intf );
@@ -1056,13 +1046,15 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show, QWidget *parent )
     /* Static entries for ending, like open */
     PopupMenuStaticEntries( menu );
 
-    p_intf->p_sys->p_popup_menu = menu;
-    p_intf->p_sys->p_popup_menu->popup( QCursor::pos() );
+    menu->popup( QCursor::pos() );
 }
 
 #undef ACT_ADD
 #undef ACT_ADDMENU
 #undef ACT_ADDCHECK
+
+#undef CREATE_POPUP
+#undef POPUP_BOILERPLATE
 
 #ifndef HAVE_MAEMO
 /************************************************************************
@@ -1073,7 +1065,10 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
                                   intf_thread_t *p_intf,
                                   bool b_force_visible )
 {
-    POPUP_BOILERPLATE;
+    unsigned int i_last_separator = 0;
+    vector<vlc_object_t *> objects;
+    vector<const char *> varnames;
+    input_thread_t *p_input = THEMIM->getInput();
 
     /* Get the systray menu and clean it */
     QMenu *sysMenu = mi->getSysTrayMenu();
@@ -1109,8 +1104,6 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
 }
 #endif
 
-#undef CREATE_POPUP
-#undef POPUP_BOILERPLATE
 
 #undef PUSH_VAR
 #undef PUSH_SEPARATOR

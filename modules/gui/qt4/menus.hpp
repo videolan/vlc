@@ -79,10 +79,10 @@ public:
     static void createMenuBar( MainInterface *mi, intf_thread_t * );
 
     /* Popups Menus */
-    static void PopupMenu( intf_thread_t *, bool, QWidget * );
-    static void AudioPopupMenu( intf_thread_t *, QWidget * );
-    static void VideoPopupMenu( intf_thread_t *, QWidget * );
-    static void MiscPopupMenu( intf_thread_t *, QWidget * );
+    static void PopupMenu( intf_thread_t *, bool );
+    static void AudioPopupMenu( intf_thread_t *, bool );
+    static void VideoPopupMenu( intf_thread_t *, bool );
+    static void MiscPopupMenu( intf_thread_t *, bool );
 
     /* Systray */
     static void updateSystrayMenu( MainInterface *, intf_thread_t  *,

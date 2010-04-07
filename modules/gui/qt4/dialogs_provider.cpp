@@ -83,13 +83,6 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
     CONNECT( SDMapper, mapped (QString), this, SDMenuAction( QString ) );
 
     new DialogHandler (p_intf, this );
-
-    /* a root widget intended to be the ancestor of all
-       menus/actions created by the dialog_provider methods.
-       At destruction time, deleting this fake widget ensures
-       all child menus/actions are also deleted
-     */
-    root = new QWidget();
 }
 
 DialogsProvider::~DialogsProvider()
@@ -109,7 +102,10 @@ DialogsProvider::~DialogsProvider()
     delete menusUpdateMapper;
     delete SDMapper;
 
-    delete root;
+    QVLCMenu::PopupMenu( p_intf, false );
+    QVLCMenu::AudioPopupMenu( p_intf, false );
+    QVLCMenu::VideoPopupMenu( p_intf, false );
+    QVLCMenu::MiscPopupMenu( p_intf, false );
 }
 
 void DialogsProvider::quit()
@@ -156,13 +152,13 @@ void DialogsProvider::customEvent( QEvent *event )
            vlmDialog(); break;
 #endif
         case INTF_DIALOG_POPUPMENU:
-           QVLCMenu::PopupMenu( p_intf, (de->i_arg != 0), root ); break;
+           QVLCMenu::PopupMenu( p_intf, (de->i_arg != 0) ); break;
         case INTF_DIALOG_AUDIOPOPUPMENU:
-           QVLCMenu::AudioPopupMenu( p_intf, root ); break;
+           QVLCMenu::AudioPopupMenu( p_intf, (de->i_arg != 0) ); break;
         case INTF_DIALOG_VIDEOPOPUPMENU:
-           QVLCMenu::VideoPopupMenu( p_intf, root ); break;
+           QVLCMenu::VideoPopupMenu( p_intf, (de->i_arg != 0) ); break;
         case INTF_DIALOG_MISCPOPUPMENU:
-           QVLCMenu::MiscPopupMenu( p_intf, root ); break;
+           QVLCMenu::MiscPopupMenu( p_intf, (de->i_arg != 0) ); break;
         case INTF_DIALOG_WIZARD:
         case INTF_DIALOG_STREAMWIZARD:
             openAndStreamingDialogs(); break;

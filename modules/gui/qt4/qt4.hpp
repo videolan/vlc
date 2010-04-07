@@ -74,7 +74,6 @@ struct intf_sys_t
 
     QString filepath;        /* Last path used in dialogs */
 
-    QMenu * p_popup_menu;    /* The right click menu */
 };
 
 #define THEPL p_intf->p_sys->p_playlist
