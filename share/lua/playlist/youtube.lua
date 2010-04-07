@@ -72,10 +72,13 @@ function parse()
             if string.match( line, "subscribe_to_user=" ) then
                 _,_,artist = string.find( line, "subscribe_to_user=([^&]*)" )
             end
-            -- OLD: var swfArgs = {hl:'en',BASE_YT_URL:'http://youtube.com/',video_id:'XPJ7d8dq0t8',l:'292',t:'OEgsToPDskLFdOYrrlDm3FQPoQBYaCP1',sk:'0gnr-AE6QZJEZmCMd3lq_AC'};
-            -- NEW: var swfArgs = { "BASE_YT_URL": "http://youtube.com", "video_id": "OHVvVmUNBFc", "l": 88, "sk": "WswKuJzDBsdD6oG3IakCXgC", "t": "OEgsToPDskK3zO44y0QN8Fr5ZSAZwCQp", "plid": "AARGnwWMrmGkbpOxAAAA4AT4IAA", "tk": "mEL4E7PqHeaZp5OG19NQThHt9mXJU4PbRTOw6lz9osHi4Hixp7RE1w=="};
-            -- NEWER: 'SWF_ARGS': { [a lot of stuff...], "video_id": "OHVvVmUNBFc", "sk": "WswKuJzDBsdD6oG3IakCXgC", "t": "OEgsToPDskK3zO44y0QN8Fr5ZSAZwCQp", "plid": "AARGnwWMrmGkbpOxAAAA4AT4IAA"};
-            if ( string.match( line, "SWF_ARGS" ) or string.match( line, "swfArgs" ) ) and string.match( line, "video_id" ) then
+            -- CURRENT: var swfHTML = (isIE) ? "<object [...]><param name=\"flashvars\" value=\"rv.2.thumbnailUrl=http%3A%2F%2Fi4.ytimg.com%2Fvi%2F3MLp7YNTznE%2Fdefault.jpg&rv.7.length_seconds=384 [...] &video_id=OHVvVmUNBFc [...] &t=OEgsToPDskK3zO44y0QN8Fr5ZSAZwCQp [...]
+            if string.match( line, "swfHTML" ) and string.match( line, "video_id" ) then
+                _,_,t = string.find( line, "&t=(.-)&" )
+            -- OLD 1: var swfArgs = {hl:'en',BASE_YT_URL:'http://youtube.com/',video_id:'XPJ7d8dq0t8',l:'292',t:'OEgsToPDskLFdOYrrlDm3FQPoQBYaCP1',sk:'0gnr-AE6QZJEZmCMd3lq_AC'};
+            -- OLD 2: var swfArgs = { "BASE_YT_URL": "http://youtube.com", "video_id": "OHVvVmUNBFc", "l": 88, "sk": "WswKuJzDBsdD6oG3IakCXgC", "t": "OEgsToPDskK3zO44y0QN8Fr5ZSAZwCQp", "plid": "AARGnwWMrmGkbpOxAAAA4AT4IAA", "tk": "mEL4E7PqHeaZp5OG19NQThHt9mXJU4PbRTOw6lz9osHi4Hixp7RE1w=="};
+            -- OLD 3: 'SWF_ARGS': { [a lot of stuff...], "video_id": "OHVvVmUNBFc", "sk": "WswKuJzDBsdD6oG3IakCXgC", "t": "OEgsToPDskK3zO44y0QN8Fr5ZSAZwCQp", "plid": "AARGnwWMrmGkbpOxAAAA4AT4IAA"};
+            elseif ( string.match( line, "SWF_ARGS" ) or string.match( line, "swfArgs" ) ) and string.match( line, "video_id" ) then
                 if string.match( line, "BASE_YT_URL" ) then
                     _,_,base_yt_url = string.find( line, "\"BASE_YT_URL\": \"(.-)\"" )
                 end
