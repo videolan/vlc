@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 1.0.3-rc\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-03-29 23:20+0100\n"
-"PO-Revision-Date: 2010-03-22 18:22+0100\n"
+"POT-Creation-Date: 2010-04-08 00:07+0100\n"
+"PO-Revision-Date: 2010-03-31 18:57+0100\n"
 "Last-Translator: Rousseaux Gaetan <gaetan_rousseaux@voo.be>\n"
 "Language-Team: Walloon <gaetan_rousseaux@voo.be>\n"
 "MIME-Version: 1.0\n"
@@ -41,7 +41,7 @@ msgstr "Tchoezi \"Sipepieusès Tchuzes\" po vey totes les tchuzes."
 
 #: include/vlc_config_cat.h:37 modules/gui/macosx/simple_prefs.m:180
 #: modules/gui/qt4/components/simple_preferences.cpp:81
-#: modules/gui/qt4/menus.cpp:1023 modules/misc/dummy/dummy.c:69
+#: modules/gui/qt4/menus.cpp:1013 modules/misc/dummy/dummy.c:69
 msgid "Interface"
 msgstr "Eterface"
 
@@ -171,7 +171,7 @@ msgstr "Intrêye / Codecs"
 
 #: include/vlc_config_cat.h:94
 msgid "Settings for input, demultiplexing, decoding and encoding"
-msgstr ""
+msgstr "Apontiaedjes po intrêye, dismultiplecsaedje, decôdaedje et ecôdaedje"
 
 #: include/vlc_config_cat.h:97
 msgid "Access modules"
@@ -281,7 +281,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:151
 msgid "Packetizers"
-msgstr ""
+msgstr "Ewalpeus"
 
 #: include/vlc_config_cat.h:153
 msgid ""
@@ -320,9 +320,9 @@ msgstr "VOD"
 msgid "VLC's implementation of Video On Demand"
 msgstr "Implemintåcion di VLC del Videyo Al Dimande"
 
-#: include/vlc_config_cat.h:175 src/libvlc-module.c:2102
-#: src/playlist/engine.c:131 modules/demux/playlist/playlist.c:70
-#: modules/demux/playlist/playlist.c:71 modules/gui/macosx/embeddedwindow.m:75
+#: include/vlc_config_cat.h:175 src/libvlc-module.c:2101
+#: src/playlist/engine.c:131 modules/demux/playlist/playlist.c:69
+#: modules/demux/playlist/playlist.c:70 modules/gui/macosx/embeddedwindow.m:75
 #: modules/gui/macosx/intf.m:608 modules/gui/qt4/components/controller.hpp:106
 #: modules/gui/qt4/components/playlist/playlist.cpp:126
 #: modules/gui/qt4/components/playlist/selector.cpp:259
@@ -504,7 +504,7 @@ msgstr "&Åd fwait"
 #: modules/gui/macosx/intf.m:743 modules/gui/macosx/intf.m:2006
 #: modules/gui/macosx/intf.m:2007 modules/gui/macosx/intf.m:2008
 #: modules/gui/macosx/intf.m:2009 modules/gui/macosx/playlist.m:464
-#: modules/gui/qt4/components/controller.hpp:104 modules/gui/qt4/menus.cpp:787
+#: modules/gui/qt4/components/controller.hpp:104 modules/gui/qt4/menus.cpp:790
 msgid "Play"
 msgstr "Djouwer"
 
@@ -757,7 +757,7 @@ msgstr "Sitårêye"
 
 #: src/audio_output/input.c:116
 msgid "Spectrum"
-msgstr "Sipeke"
+msgstr "Speke"
 
 #: src/audio_output/input.c:118
 msgid "Vu meter"
@@ -857,7 +857,7 @@ msgstr "Rimårke %i"
 #: src/input/decoder.c:270
 #, fuzzy
 msgid "packetizer"
-msgstr "Grandeu do paket"
+msgstr "Ewalpeus"
 
 #: src/input/decoder.c:270
 #, fuzzy
@@ -875,11 +875,11 @@ msgstr ""
 #: src/input/decoder.c:279
 #, fuzzy, c-format
 msgid "VLC could not open the %s module."
-msgstr "VLC n' a savou drovi l' module do decôdeu."
+msgstr "VLC n' saveut nén drovi l' module do decôdeu."
 
 #: src/input/decoder.c:431
 msgid "VLC could not open the decoder module."
-msgstr "VLC n' a savou drovi l' module do decôdeu."
+msgstr "VLC n' saveut nén drovi l' module do decôdeu."
 
 #: src/input/decoder.c:682
 msgid "No suitable decoder module"
@@ -1297,7 +1297,7 @@ msgstr ""
 "Tchôki RITOÛ po continouwer...\n"
 
 #: src/libvlc.h:173 src/libvlc-module.c:1462 src/libvlc-module.c:1463
-#: src/libvlc-module.c:2636 src/video_output/vout_intf.c:193
+#: src/libvlc-module.c:2635 src/video_output/vout_intf.c:195
 msgid "Zoom"
 msgstr "Zoum"
 
@@ -1588,7 +1588,7 @@ msgstr "Odio forvoeyaedjes"
 
 #: src/libvlc-module.c:325
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
-msgstr "Çouci radjoute des modules di voeyaedje (sipeke analijheu, evnd)."
+msgstr "Çouci radjoute des modules di voeyaedje (analijheu do speke, evnd)."
 
 #: src/libvlc-module.c:329
 msgid "Replay gain mode"
@@ -1857,7 +1857,7 @@ msgid ""
 "to render video directly). VLC will try to use it by default."
 msgstr ""
 
-#: src/libvlc-module.c:442 src/video_output/vout_intf.c:342
+#: src/libvlc-module.c:442 src/video_output/vout_intf.c:344
 #: modules/gui/macosx/simple_prefs.m:295
 msgid "Always on top"
 msgstr "Tofer al copete"
@@ -2059,7 +2059,7 @@ msgstr ""
 
 #: src/libvlc-module.c:550
 msgid "Video cropping"
-msgstr ""
+msgstr "Côpaedje dvins l' videyo"
 
 #: src/libvlc-module.c:552
 msgid ""
@@ -2287,21 +2287,24 @@ msgstr "Eterface del rexhowe Multicast"
 
 #: src/libvlc-module.c:674
 msgid "Default multicast interface. This overrides the routing table."
-msgstr ""
+msgstr "Prémetowe eterface multicast. Çouci spotche li tåve di routaedje."
 
 #: src/libvlc-module.c:676
 msgid "IPv4 multicast output interface address"
 msgstr "Adresse di l' eterface del rexhowe multicast IPv4"
 
 #: src/libvlc-module.c:678
+#, fuzzy
 msgid ""
 "IPv4 address for the default multicast interface. This overrides the routing "
 "table."
 msgstr ""
+"Adresse IPv4 pol prémetowe eterface multicast. Çouci spotche li tåve di "
+"routaedje."
 
 #: src/libvlc-module.c:681
 msgid "DiffServ Code Point"
-msgstr ""
+msgstr "Pont côde DiffServ"
 
 #: src/libvlc-module.c:682
 msgid ""
@@ -2328,7 +2331,7 @@ msgstr "Boket odio"
 
 #: src/libvlc-module.c:702
 msgid "Stream number of the audio track to use (from 0 to n)."
-msgstr ""
+msgstr "Limero do floû do boket odio a eployî (di 0 a n)."
 
 #: src/libvlc-module.c:705
 msgid "Subtitles track"
@@ -2336,7 +2339,7 @@ msgstr "Sortite do boket"
 
 #: src/libvlc-module.c:707
 msgid "Stream number of the subtitle track to use (from 0 to n)."
-msgstr ""
+msgstr "Limero do floû do boket do sortite a eployî (di 0 a n)."
 
 #: src/libvlc-module.c:710
 msgid "Audio language"
@@ -2517,7 +2520,7 @@ msgstr ""
 
 #: src/libvlc-module.c:801
 msgid "Enable sub-pictures"
-msgstr ""
+msgstr "Mete en alaedje les dzo-imådjes"
 
 #: src/libvlc-module.c:803
 msgid "You can completely disable the sub-picture processing."
@@ -2539,7 +2542,7 @@ msgstr ""
 
 #: src/libvlc-module.c:810
 msgid "Text rendering module"
-msgstr ""
+msgstr "Module do rindou do tecse"
 
 #: src/libvlc-module.c:812
 msgid ""
@@ -2551,7 +2554,7 @@ msgstr ""
 
 #: src/libvlc-module.c:814
 msgid "Subpictures filter module"
-msgstr ""
+msgstr "Module do passete des dzo-imådjes"
 
 #: src/libvlc-module.c:816
 msgid ""
@@ -2613,6 +2616,8 @@ msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (eg. D:)"
 msgstr ""
+"Çouci est l' prémetou plake DVD (ou fitchî) a eployî. N' rovyîz nén les deus "
+"ponts après li lete do plake (pa egzimpe D:)"
 
 #: src/libvlc-module.c:851
 msgid "This is the default DVD device to use."
@@ -2757,7 +2762,7 @@ msgstr ""
 
 #: src/libvlc-module.c:925
 msgid "Preferred decoders list"
-msgstr ""
+msgstr "Djivêye des discôdeus eployîs l' pus voltî"
 
 #: src/libvlc-module.c:927
 msgid ""
@@ -2768,7 +2773,7 @@ msgstr ""
 
 #: src/libvlc-module.c:932
 msgid "Preferred encoders list"
-msgstr ""
+msgstr "Djivêye des ecôdeus eployîs l' pus voltî"
 
 #: src/libvlc-module.c:934
 msgid ""
@@ -2779,7 +2784,7 @@ msgstr ""
 
 #: src/libvlc-module.c:937
 msgid "Prefer system plugins over VLC"
-msgstr ""
+msgstr "Preferer les tchôkes-divins do sistinme ås cis di VLC"
 
 #: src/libvlc-module.c:939
 msgid ""
@@ -2795,7 +2800,7 @@ msgstr ""
 
 #: src/libvlc-module.c:951
 msgid "Default stream output chain"
-msgstr ""
+msgstr "Tchinne di rexhowe do prémetou floû"
 
 #: src/libvlc-module.c:953
 msgid ""
@@ -2803,6 +2808,9 @@ msgid ""
 "to learn how to build such chains. Warning: this chain will be enabled for "
 "all streams."
 msgstr ""
+"Vos ploz intrer chal ine tchinne di rexhowe do prémetou floû. Rapoirtez vos "
+"al documintåcion po-z aprinde kimint basti di téles tchinnes. Prindez "
+"asteme: cisse tchinne serè metowe en alaedje po tos les floûs."
 
 #: src/libvlc-module.c:957
 msgid "Enable streaming of all ES"
@@ -2882,7 +2890,7 @@ msgstr ""
 
 #: src/libvlc-module.c:996
 msgid "Mux module"
-msgstr ""
+msgstr "Module do multiplecse"
 
 #: src/libvlc-module.c:998
 msgid "This is a legacy entry to let you configure mux modules"
@@ -3089,7 +3097,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1094
 msgid "Demux module"
-msgstr ""
+msgstr "Module do dismultiplecse"
 
 #: src/libvlc-module.c:1096
 msgid ""
@@ -3193,19 +3201,21 @@ msgstr "Scrît l' id do processus dins on specifyî fitchî."
 
 #: src/libvlc-module.c:1149
 msgid "Log to file"
-msgstr ""
+msgstr "Sicrire divins on fitchî djournå"
 
 #: src/libvlc-module.c:1151
 msgid "Log all VLC messages to a text file."
-msgstr ""
+msgstr "Sicrire tos les messaedjes VLC dvins on fitchî tecse."
 
 #: src/libvlc-module.c:1153
 msgid "Log to syslog"
-msgstr ""
+msgstr "Sicrire dvins l' djournå sistinme (syslog)"
 
 #: src/libvlc-module.c:1155
 msgid "Log all VLC messages to syslog (UNIX systems)."
 msgstr ""
+"Sicrire tos les messaedjes VLC dvins l' djournå sistinme (syslog) (sistinmes "
+"UNIX)."
 
 #: src/libvlc-module.c:1157
 msgid "Allow only one running instance"
@@ -3391,7 +3401,7 @@ msgstr ""
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
 msgstr ""
 
-#: src/libvlc-module.c:1274 src/video_output/vout_intf.c:355
+#: src/libvlc-module.c:1274 src/video_output/vout_intf.c:357
 #: modules/gui/macosx/controls.m:454 modules/gui/macosx/controls.m:510
 #: modules/gui/macosx/controls.m:1087 modules/gui/macosx/controls.m:1120
 #: modules/gui/macosx/embeddedwindow.m:68 modules/gui/macosx/intf.m:605
@@ -3471,11 +3481,11 @@ msgstr "Randoe normå"
 msgid "Select the hotkey to set the playback rate back to normal."
 msgstr ""
 
-#: src/libvlc-module.c:1290 modules/gui/qt4/menus.cpp:808
+#: src/libvlc-module.c:1290 modules/gui/qt4/menus.cpp:811
 msgid "Faster (fine)"
 msgstr "Pus roed (fén)"
 
-#: src/libvlc-module.c:1292 modules/gui/qt4/menus.cpp:816
+#: src/libvlc-module.c:1292 modules/gui/qt4/menus.cpp:819
 msgid "Slower (fine)"
 msgstr "Pus londjin (fén)"
 
@@ -3642,7 +3652,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1341 modules/control/hotkeys.c:179
 #: modules/gui/qt4/components/controller.hpp:108
-#: modules/gui/qt4/components/controller.hpp:118 modules/gui/qt4/menus.cpp:883
+#: modules/gui/qt4/components/controller.hpp:118 modules/gui/qt4/menus.cpp:886
 #: modules/gui/skins2/commands/cmd_quit.cpp:40
 msgid "Quit"
 msgstr "Cwiter"
@@ -4085,39 +4095,39 @@ msgstr ""
 
 #: src/libvlc-module.c:1465 src/libvlc-module.c:1466
 msgid "Un-Zoom"
-msgstr ""
+msgstr "Diszoumer"
 
 #: src/libvlc-module.c:1468 src/libvlc-module.c:1469
 msgid "Crop one pixel from the top of the video"
-msgstr ""
+msgstr "Côper dvins on picsel dal copete del videyo"
 
 #: src/libvlc-module.c:1470 src/libvlc-module.c:1471
 msgid "Uncrop one pixel from the top of the video"
-msgstr ""
+msgstr "Discôper dvins on picsel dal copete del videyo"
 
 #: src/libvlc-module.c:1473 src/libvlc-module.c:1474
 msgid "Crop one pixel from the left of the video"
-msgstr ""
+msgstr "Côper dvins on picsel dal hintche del videyo"
 
 #: src/libvlc-module.c:1475 src/libvlc-module.c:1476
 msgid "Uncrop one pixel from the left of the video"
-msgstr ""
+msgstr "Discôper dvins on picsel dal hintche del videyo"
 
 #: src/libvlc-module.c:1478 src/libvlc-module.c:1479
 msgid "Crop one pixel from the bottom of the video"
-msgstr ""
+msgstr "Côper dvins on picsel dal valêye del videyo"
 
 #: src/libvlc-module.c:1480 src/libvlc-module.c:1481
 msgid "Uncrop one pixel from the bottom of the video"
-msgstr ""
+msgstr "Discôper dvins on picsel dal valêye del videyo"
 
 #: src/libvlc-module.c:1483 src/libvlc-module.c:1484
 msgid "Crop one pixel from the right of the video"
-msgstr ""
+msgstr "Côper dvins on picsel dal droete del videyo"
 
 #: src/libvlc-module.c:1485 src/libvlc-module.c:1486
 msgid "Uncrop one pixel from the right of the video"
-msgstr ""
+msgstr "Discôper dvins on picsel dal droete del videyo"
 
 #: src/libvlc-module.c:1488
 msgid "Toggle wallpaper mode in video output"
@@ -4188,7 +4198,7 @@ msgstr ""
 msgid "Cycle through available audio devices"
 msgstr ""
 
-#: src/libvlc-module.c:1683 src/video_output/vout_intf.c:361
+#: src/libvlc-module.c:1683 src/video_output/vout_intf.c:363
 #: modules/gui/macosx/controls.m:494 modules/gui/macosx/controls.m:1086
 #: modules/gui/macosx/intf.m:687 modules/gui/macosx/intf.m:751
 #: modules/gui/qt4/components/controller.hpp:106
@@ -4265,69 +4275,70 @@ msgstr "Tchôke-divins"
 
 #: src/libvlc-module.c:2055
 msgid "Performance options"
-msgstr ""
+msgstr "Tchuzes del performance"
 
-#: src/libvlc-module.c:2204
+#: src/libvlc-module.c:2203
 msgid "Hot keys"
 msgstr "Rascourtis taprece"
 
-#: src/libvlc-module.c:2646
+#: src/libvlc-module.c:2645
 msgid "Jump sizes"
 msgstr ""
 
-#: src/libvlc-module.c:2723
+#: src/libvlc-module.c:2722
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr ""
 
-#: src/libvlc-module.c:2726
+#: src/libvlc-module.c:2725
 msgid "Exhaustive help for VLC and its modules"
 msgstr ""
 
-#: src/libvlc-module.c:2728
+#: src/libvlc-module.c:2727
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
 msgstr ""
 
-#: src/libvlc-module.c:2731
+#: src/libvlc-module.c:2730
 msgid "ask for extra verbosity when displaying help"
 msgstr ""
 
-#: src/libvlc-module.c:2733
+#: src/libvlc-module.c:2732
 msgid "print a list of available modules"
 msgstr "imprimer on djivêye des modules disponibes"
 
-#: src/libvlc-module.c:2735
+#: src/libvlc-module.c:2734
 msgid "print a list of available modules with extra detail"
 msgstr ""
+"imprimer ine djivêye des modules disponibes avou des ptites sacwès di rawete"
 
-#: src/libvlc-module.c:2737
+#: src/libvlc-module.c:2736
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose). Prefix the module name with = for strict matches."
 msgstr ""
 
-#: src/libvlc-module.c:2741
+#: src/libvlc-module.c:2740
 msgid "no configuration option will be loaded nor saved to config file"
 msgstr ""
 
-#: src/libvlc-module.c:2743
+#: src/libvlc-module.c:2742
 msgid "reset the current config to the default values"
-msgstr ""
+msgstr "rimete a zero l' apontiaedje do moumint ås prémetowes valixhances"
 
-#: src/libvlc-module.c:2745
+#: src/libvlc-module.c:2744
 msgid "use alternate config file"
 msgstr ""
 
-#: src/libvlc-module.c:2747
+#: src/libvlc-module.c:2746
 msgid "resets the current plugins cache"
-msgstr ""
+msgstr "rimete a zero l' muchete des tchôkes-divins do moumint"
 
-#: src/libvlc-module.c:2749
+#: src/libvlc-module.c:2748
 msgid "print version information"
 msgstr "rexhe l' informåcion sol modêye"
 
-#: src/libvlc-module.c:2802
+#: src/libvlc-module.c:2788
 msgid "main program"
 msgstr "mwaisse programe"
 
@@ -4383,7 +4394,7 @@ msgstr "Dj' aberwete..."
 #: modules/gui/macosx/simple_prefs.m:308 modules/gui/macosx/simple_prefs.m:696
 #: modules/gui/macosx/wizard.m:320
 #: modules/gui/qt4/components/open_panels.cpp:1265
-#: modules/gui/qt4/components/preferences_widgets.cpp:1412
+#: modules/gui/qt4/components/preferences_widgets.cpp:1420
 #: modules/gui/qt4/components/sout/profile_selector.cpp:253
 msgid "Cancel"
 msgstr "Rinoncî"
@@ -4416,6 +4427,8 @@ msgid ""
 "It was not possible to download a cryptographic signature for the downloaded "
 "file \"%s\". Thus, it was deleted."
 msgstr ""
+"Ci n' esteut nén possibe d' aberweter ine chifrêye sinateure pol aberweté "
+"fitchî \"%s\". Adon, il esteut disfacé."
 
 #: src/misc/update.c:673 src/misc/update.c:685
 msgid "Invalid signature"
@@ -4427,6 +4440,9 @@ msgid ""
 "The cryptographic signature for the downloaded file \"%s\" was invalid and "
 "could not be used to securely verify it. Thus, the file was deleted."
 msgstr ""
+"Li chifrêye sinateure pol aberweté fitchî \"%s\" n' esteut nén valide et n' "
+"poleu nén esse eployî pol aveuri avou såvrité. Adon, l' fitchî esteut "
+"disfacé."
 
 #: src/misc/update.c:698
 msgid "File not verifiable"
@@ -4438,6 +4454,8 @@ msgid ""
 "It was not possible to securely verify the downloaded file \"%s\". Thus, it "
 "was deleted."
 msgstr ""
+"Ci n' esteut nén possibe d' aveuri avou såvrité l' aberweté fitchî \"%s\". "
+"Adon, il esteut disfacé."
 
 #: src/misc/update.c:710 src/misc/update.c:722
 msgid "File corrupted"
@@ -4477,22 +4495,22 @@ msgstr "Nén defini"
 msgid "Post processing"
 msgstr "Après traitmint"
 
-#: src/video_output/vout_intf.c:226 modules/gui/macosx/intf.m:692
+#: src/video_output/vout_intf.c:228 modules/gui/macosx/intf.m:692
 #: modules/gui/macosx/intf.m:693 modules/video_filter/crop.c:107
 #: modules/video_filter/croppadd.c:86
 msgid "Crop"
 msgstr "Côper dvins"
 
-#: src/video_output/vout_intf.c:293 modules/gui/macosx/controls.m:810
+#: src/video_output/vout_intf.c:295 modules/gui/macosx/controls.m:810
 #: modules/gui/macosx/intf.m:690 modules/gui/macosx/intf.m:691
 msgid "Aspect-ratio"
 msgstr "Rapoirt lårdjeur/hôteur"
 
-#: src/video_output/vout_intf.c:323
+#: src/video_output/vout_intf.c:325
 msgid "Autoscale video"
 msgstr ""
 
-#: src/video_output/vout_intf.c:330
+#: src/video_output/vout_intf.c:332
 msgid "Scale factor"
 msgstr "Facteur di schåle"
 
@@ -4530,12 +4548,14 @@ msgstr ""
 #: modules/access/v4l.c:77 modules/access/v4l2.c:182
 #: modules/access/vcd/vcd.c:46
 msgid "Caching value in ms"
-msgstr ""
+msgstr "Valixhance di muchete e ms"
 
 #: modules/access/alsa.c:77
 msgid ""
 "Caching value for Alsa captures. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les egaloyaedjes Alsa. Cisse valixhance duvreut "
+"esse defineye e milisegondes."
 
 #: modules/access/alsa.c:81
 msgid ""
@@ -4550,11 +4570,13 @@ msgstr "Alsa"
 
 #: modules/access/alsa.c:90
 msgid "Alsa audio capture input"
-msgstr ""
+msgstr "Intrêye di l' egaloyaedje odio Alsa"
 
 #: modules/access/bd/bd.c:54
 msgid "Caching value for BDs. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les BDs. Cisse valixhance duvreut esse defineye e "
+"milisegondes."
 
 #: modules/access/bd/bd.c:61
 msgid "BD"
@@ -4568,6 +4590,8 @@ msgstr "Intrêye Blu-Ray Disc"
 msgid ""
 "Caching value for DVB streams. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les floûs DVB. Cisse valixhance duvreut esse "
+"defineye e milisegondes."
 
 #: modules/access/bda/bda.c:51 modules/access/dvb/access.c:88
 #: modules/gui/qt4/components/open_panels.cpp:928
@@ -4608,7 +4632,7 @@ msgstr ""
 
 #: modules/access/bda/bda.c:71 modules/access/dvb/access.c:100
 msgid "Probe DVB card for capabilities"
-msgstr ""
+msgstr "Sayî l' cwåte DVB po les ahessaedjes"
 
 #: modules/access/bda/bda.c:72 modules/access/dvb/access.c:101
 msgid ""
@@ -4752,7 +4776,7 @@ msgstr "Pitit Canå ATSC"
 
 #: modules/access/bda/bda.c:129 modules/access/bda/bda.c:130
 msgid "ATSC Physical Channel"
-msgstr ""
+msgstr "Canå fizike ATSC"
 
 #: modules/access/bda/bda.c:133
 msgid "FEC rate"
@@ -4792,11 +4816,11 @@ msgstr ""
 
 #: modules/access/bda/bda.c:147 modules/access/dvb/access.c:146
 msgid "Terrestrial bandwidth"
-msgstr ""
+msgstr "Lårdjeu di binde daegnrece"
 
 #: modules/access/bda/bda.c:148 modules/access/dvb/access.c:147
 msgid "Terrestrial bandwidth [0=auto,6,7,8 in MHz]"
-msgstr ""
+msgstr "Lårdjeu di binde daegnrece [0=tot seu,6,7,8 in MHz]"
 
 #: modules/access/bda/bda.c:151 modules/gui/qt4/components/open_panels.cpp:978
 msgid "6 MHz"
@@ -4812,11 +4836,11 @@ msgstr "8 MHz"
 
 #: modules/access/bda/bda.c:153 modules/access/dvb/access.c:149
 msgid "Terrestrial guard interval"
-msgstr ""
+msgstr "Tins inte les wådes daegnreces"
 
 #: modules/access/bda/bda.c:154
 msgid "Guard interval [Undefined,1/4,1/8,1/16,1/32]"
-msgstr ""
+msgstr "Tins inte les wådes [Nén defini,1/4,1/8,1/16,1/32]"
 
 #: modules/access/bda/bda.c:157
 msgid "1/4"
@@ -4836,7 +4860,7 @@ msgstr "1/32"
 
 #: modules/access/bda/bda.c:159 modules/access/dvb/access.c:152
 msgid "Terrestrial transmission mode"
-msgstr ""
+msgstr "Môde d' evoyaedje daegnrece"
 
 #: modules/access/bda/bda.c:160
 msgid "Transmission mode [Undefined,2k,8k]"
@@ -4955,6 +4979,8 @@ msgid ""
 "Default caching value for Audio CDs. This value should be set in "
 "milliseconds."
 msgstr ""
+"Prémetowe valixhance di muchete po les CD odio. Cisse valixhance duvreut "
+"esse defineye e milisegondes."
 
 #: modules/access/cdda.c:67 modules/gui/macosx/open.m:198
 #: modules/gui/macosx/open.m:643 modules/gui/macosx/open.m:731
@@ -5023,6 +5049,8 @@ msgid ""
 "Caching value for DirectShow streams. This value should be set in "
 "milliseconds."
 msgstr ""
+"Valixhance di muchete po les floûs DirectShow. Cisse valixhance duvreut esse "
+"defineye e milisegondes."
 
 #: modules/access/dshow/dshow.cpp:103 modules/access/v4l.c:81
 #: modules/gui/qt4/components/open_panels.cpp:737
@@ -5126,7 +5154,7 @@ msgstr "Tchoezixhoz li sôre d' intrêye di tuner (Cåbe/Antene)."
 
 #: modules/access/dshow/dshow.cpp:144
 msgid "Video input pin"
-msgstr ""
+msgstr "PIN del intrêye videyo"
 
 #: modules/access/dshow/dshow.cpp:146
 msgid ""
@@ -5138,15 +5166,16 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:150
 msgid "Audio input pin"
-msgstr ""
+msgstr "PIN del intrêye odio"
 
 #: modules/access/dshow/dshow.cpp:152
 msgid "Select the audio input source. See the \"video input\" option."
 msgstr ""
+"Tchoezi l' sourdant del intrêye odio. Voeyoz l' tchuze \"intrêye videyo\"."
 
 #: modules/access/dshow/dshow.cpp:153
 msgid "Video output pin"
-msgstr ""
+msgstr "PIN del rexhowe videyo"
 
 #: modules/access/dshow/dshow.cpp:155
 msgid "Select the video output type. See the \"video input\" option."
@@ -5155,7 +5184,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:156
 msgid "Audio output pin"
-msgstr ""
+msgstr "PIN del rexhowe odio"
 
 #: modules/access/dshow/dshow.cpp:158
 msgid "Select the audio output type. See the \"video input\" option."
@@ -5216,7 +5245,7 @@ msgid "Configure"
 msgstr "Apontyî"
 
 #: modules/access/dshow/dshow.cpp:459 modules/access/dshow/dshow.cpp:533
-#: modules/access/dshow/dshow.cpp:966 modules/access/dshow/dshow.cpp:1019
+#: modules/access/dshow/dshow.cpp:968 modules/access/dshow/dshow.cpp:1021
 msgid "Capture failed"
 msgstr "L'egaloaedjes a fwait berwete"
 
@@ -5228,20 +5257,22 @@ msgstr "Nol éndjin videyo ou odio di tchoezi"
 msgid "VLC cannot open ANY capture device.Check the error log for details."
 msgstr ""
 
-#: modules/access/dshow/dshow.cpp:967
+#: modules/access/dshow/dshow.cpp:969
 #, c-format
 msgid "VLC cannot use the device \"%s\", because its type is not supported."
 msgstr ""
 "VLC n' pout nén eployî l' éndjin \"%s\", paski si sôre n' est nén sopoirté."
 
-#: modules/access/dshow/dshow.cpp:1020
+#: modules/access/dshow/dshow.cpp:1022
 #, c-format
 msgid "The capture device \"%s\" does not support the required parameters."
-msgstr ""
+msgstr "L' éndjin d' egaloyaedje \"%s\" n' sopoite nén les parametes dmandés."
 
 #: modules/access/dv.c:61
 msgid "Caching value for DV streams. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les floûs DV. Cisse valixhance duvreut esse "
+"defineye e milisegondes."
 
 #: modules/access/dv.c:65
 msgid "Digital Video (Firewire/ieee1394)  input"
@@ -5312,12 +5343,12 @@ msgstr "Fitchî del clé privêye"
 
 #: modules/access/dvb/access.c:183
 msgid "HTTP interface x509 PEM private key file"
-msgstr ""
+msgstr "Fitchî del clé privêye x509 PEM di l' etercade HTTP"
 
 #: modules/access/dvb/access.c:185 modules/access_output/http.c:81
 #: modules/control/http/http.c:62
 msgid "Root CA file"
-msgstr ""
+msgstr "Raecene l' fitchî CA"
 
 #: modules/access/dvb/access.c:186
 msgid "HTTP interface x509 PEM trusted root CA certificates file"
@@ -5380,6 +5411,8 @@ msgstr "Prémetou inglêye DVD"
 #: modules/access/dvdnav.c:74 modules/access/dvdread.c:76
 msgid "Caching value for DVDs. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les DVD. Cisse valixhance duvreut esse defineye e "
+"milisegondes."
 
 #: modules/access/dvdnav.c:76
 msgid "Start directly in menu"
@@ -5474,11 +5507,15 @@ msgid ""
 "EyeTV program number, or use 0 for last channel, -1 for S-Video input, -2 "
 "for Composite input"
 msgstr ""
+"Limero do programe EyeTV, ou eployî 0 pol dierin canå, -1 pol intrêye S-"
+"Video, -2 pol intrêye Compozite"
 
 #: modules/access/eyetv.m:63
 msgid ""
 "Caching value for EyeTV captures. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les egaloyaedjes EyeTV. Cisse valixhance duvreut "
+"esse defineye e milisegondes."
 
 #: modules/access/eyetv.m:68
 msgid "EyeTV input"
@@ -5488,6 +5525,8 @@ msgstr "EyeTV intrêye"
 msgid ""
 "Caching value for fake streams. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les fås floûs. Cisse valixhance duvreut esse "
+"defineye e milisegondes."
 
 #: modules/access/fake.c:48 modules/access/pvr.c:85 modules/access/v4l.c:130
 #: modules/access/v4l2.c:95
@@ -5548,6 +5587,8 @@ msgstr "VLC n' a savou lére l' fitchî"
 msgid ""
 "Caching value for FTP streams. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les floûs FTP. Cisse valixhance duvreut esse "
+"defineye e milisegondes."
 
 #: modules/access/ftp.c:62
 msgid "FTP user name"
@@ -5579,7 +5620,7 @@ msgstr "Intrêye FTP"
 
 #: modules/access/ftp.c:92
 msgid "FTP upload output"
-msgstr ""
+msgstr "Rexhowe d' eberwetaedje FTP"
 
 #: modules/access/ftp.c:139 modules/access/ftp.c:149 modules/access/ftp.c:214
 #: modules/access/ftp.c:223 modules/access/ftp.c:230
@@ -5588,11 +5629,11 @@ msgstr ""
 
 #: modules/access/ftp.c:140
 msgid "VLC could not connect with the given server."
-msgstr ""
+msgstr "VLC n' pout nén s' elodjî avou l' diné sierveu."
 
 #: modules/access/ftp.c:150
 msgid "VLC's connection to the given server was rejected."
-msgstr ""
+msgstr "L' raloyaedje di VLC å sierveu diné esteut rfuzêye."
 
 #: modules/access/ftp.c:215
 msgid "Your account was rejected."
@@ -5604,12 +5645,14 @@ msgstr "Vosse sicret esteut rfuzêye."
 
 #: modules/access/ftp.c:231
 msgid "Your connection attempt to the server was rejected."
-msgstr ""
+msgstr "Vosse saye di raloyaedje å sierveu esteut rfuzêye."
 
 #: modules/access/gnomevfs.c:50
 msgid ""
 "Caching value for GnomeVFS streams.This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les floûs GnomeVFS. Cisse valixhance duvreut esse "
+"defineye e milisegondes."
 
 #: modules/access/gnomevfs.c:54
 msgid "GnomeVFS input"
@@ -5637,6 +5680,8 @@ msgstr ""
 msgid ""
 "Caching value for HTTP streams. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les floûs HTTP. Cisse valixhance duvreut esse "
+"defineye e milisegondes."
 
 #: modules/access/http.c:86
 msgid "HTTP user agent"
@@ -5648,12 +5693,14 @@ msgstr "Idintifiaedje do betchteu ki serè eployî pol raloyaedje."
 
 #: modules/access/http.c:90
 msgid "Auto re-connect"
-msgstr ""
+msgstr "Riraloyî otomaticmint"
 
 #: modules/access/http.c:92
 msgid ""
 "Automatically try to reconnect to the stream in case of a sudden disconnect."
 msgstr ""
+"Sayî otomaticmint di riraloyî å floû si an cas d' ine disraloyaede tot d' on "
+"côp."
 
 #: modules/access/http.c:95
 msgid "Continuous stream"
@@ -5718,7 +5765,7 @@ msgstr ""
 
 #: modules/access/jack.c:64
 msgid "Pace"
-msgstr ""
+msgstr "Cadince"
 
 #: modules/access/jack.c:66
 msgid "Read the audio stream at VLC pace rather than Jack pace."
@@ -5760,6 +5807,8 @@ msgstr ""
 msgid ""
 "Caching value for MMS streams. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les floûs MMS. Cisse valixhance duvreut esse "
+"defineye e milisegondes."
 
 #: modules/access/mms/mms.c:54
 msgid "Force selection of all streams"
@@ -5803,6 +5852,8 @@ msgstr "Intrêye Microsoft Media Server (MMS)"
 #: modules/access/mtp.c:65
 msgid "Caching value for files. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les fitchîs. Cisse valixhance duvreut esse defineye "
+"e milisegondes."
 
 #: modules/access/mtp.c:69
 msgid "MTP input"
@@ -5816,6 +5867,8 @@ msgstr "MTP"
 msgid ""
 "Caching value for OSS captures. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les egaloyaedjes OSS. Cisse valixhance duvreut esse "
+"defineye e milisegondes."
 
 #: modules/access/oss.c:80
 msgid "OSS"
@@ -5830,6 +5883,8 @@ msgid ""
 "Default caching value for PVR streams. This value should be set in "
 "milliseconds."
 msgstr ""
+"Prémetowe valixhance di muchete po les floûs PVR. Cisse valixhance duvreut "
+"esse defineye e milisegondes."
 
 #: modules/access/pvr.c:64 modules/services_discovery/udev.c:484
 msgid "Device"
@@ -5851,11 +5906,11 @@ msgstr "PVR éndjin radio"
 #: modules/gui/qt4/components/open_panels.cpp:785
 #: modules/gui/qt4/components/open_panels.cpp:885
 msgid "Norm"
-msgstr ""
+msgstr "Rîle"
 
 #: modules/access/pvr.c:71 modules/access/v4l.c:98
 msgid "Norm of the stream (Automatic, SECAM, PAL, or NTSC)."
-msgstr ""
+msgstr "Rîle do floû (Otomatike, SECAM, PAL, or NTSC)."
 
 #: modules/access/pvr.c:74 modules/access/v4l.c:102 modules/access/v4l2.c:89
 #: modules/codec/invmem.c:53 modules/demux/rawvid.c:48
@@ -5865,7 +5920,7 @@ msgstr "Lårdjeur"
 
 #: modules/access/pvr.c:75
 msgid "Width of the stream to capture (-1 for autodetection)."
-msgstr ""
+msgstr "Lårdjeur do floû a egaloyer (-1 po otodeteccion)."
 
 #: modules/access/pvr.c:78 modules/access/v4l.c:105 modules/access/v4l2.c:92
 #: modules/codec/invmem.c:56 modules/demux/rawvid.c:52
@@ -5875,7 +5930,7 @@ msgstr "Hôteur"
 
 #: modules/access/pvr.c:79
 msgid "Height of the stream to capture (-1 for autodetection)."
-msgstr ""
+msgstr "Hôteur do floû a egaloyer (-1 po otodeteccion)."
 
 #: modules/access/pvr.c:82 modules/access/v4l.c:89 modules/access/v4l2.c:197
 #: modules/gui/qt4/components/open_panels.cpp:792
@@ -5908,6 +5963,8 @@ msgid ""
 "If this option is set, B-Frames will be used. Use this option to set the "
 "number of B-Frames."
 msgstr ""
+"Si cisse tchuze est defineye, B-Cådes seront eployeyes. Eployî cisse tchuze "
+"po defini l' nombe di B-C"
 
 #: modules/access/pvr.c:97
 msgid "Bitrate to use (-1 for default)."
@@ -5915,7 +5972,7 @@ msgstr "Roedeur des bits a eployî (-1 po prémetou)."
 
 #: modules/access/pvr.c:99
 msgid "Bitrate peak"
-msgstr ""
+msgstr "Copete do roedeur des bits"
 
 #: modules/access/pvr.c:100
 msgid "Peak bitrate in VBR mode."
@@ -5927,7 +5984,7 @@ msgstr "Môde do roedeur des bits"
 
 #: modules/access/pvr.c:103
 msgid "Bitrate mode to use (VBR or CBR)."
-msgstr ""
+msgstr "Môde di roedeur des bits a eployî (VBR oubén CBR)."
 
 #: modules/access/pvr.c:105
 msgid "Audio bitmask"
@@ -5956,6 +6013,7 @@ msgstr "Canå"
 msgid ""
 "Channel of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)"
 msgstr ""
+"Canå del cwåte a eployî (Normålmint, 0 = tuner, 1 = compozite, 2 = svideo)"
 
 #: modules/access/pvr.c:119 modules/access/v4l.c:142
 msgid "Automatic"
@@ -5987,7 +6045,7 @@ msgstr "PVR"
 
 #: modules/access/pvr.c:128
 msgid "IVTV MPEG Encoding cards input"
-msgstr ""
+msgstr "Intrêye des cwåtes d' ecôdaedje IVTV MPEG"
 
 #: modules/access/qtcapture.m:55 modules/access/qtcapture.m:56
 msgid "Quicktime Capture"
@@ -6007,6 +6065,8 @@ msgstr ""
 msgid ""
 "Caching value for RTMP streams. This value should be set in milliseconds."
 msgstr ""
+"alixhance di muchete po les floûs RMTP. Cisse valixhance duvreut esse "
+"defineye e milisegondes."
 
 #: modules/access/rtmp/access.c:48
 #, fuzzy
@@ -6115,17 +6175,19 @@ msgstr "RTP"
 
 #: modules/access/rtp/rtp.c:88
 msgid "Real-Time Protocol (RTP) input"
-msgstr ""
+msgstr "Intrêye do protocole Real-Time (RTP)"
 
 #: modules/access/rtsp/access.c:46 modules/access_output/udp.c:64
 #: modules/demux/live555.cpp:75 modules/stream_out/rtp.c:133
 msgid "Caching value (ms)"
-msgstr ""
+msgstr "Valixhance di muchete (ms)"
 
 #: modules/access/rtsp/access.c:48
 msgid ""
 "Caching value for RTSP streams. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les floûs RTSP. Cisse valixhance duvreut esse "
+"defineye e milisegondes."
 
 #: modules/access/rtsp/access.c:52 modules/access/rtsp/access.c:53
 msgid "Real RTSP"
@@ -6212,7 +6274,7 @@ msgstr "Intrêye del waitroûle"
 
 #: modules/access/screen/screen.c:95 modules/access/screen/xcb.c:69
 #: modules/gui/macosx/open.m:223 modules/gui/macosx/open.m:426
-#: modules/gui/macosx/open.m:1020 modules/gui/macosx/simple_prefs.m:542
+#: modules/gui/macosx/open.m:1014 modules/gui/macosx/simple_prefs.m:542
 #: modules/gui/macosx/vout.m:223
 msgid "Screen"
 msgstr "Waitroûle"
@@ -6263,8 +6325,8 @@ msgstr ""
 msgid ""
 "Caching value for SFTP streams. This value should be set in milliseconds."
 msgstr ""
-"Valixhance di muchete po les floûs TCP. Cisse valixhance duvreut esse "
-"difineye e milisegondes."
+"Valixhance di muchete po les floûs FTP. Cisse valixhance duvreut esse "
+"defineye e milisegondes."
 
 #: modules/access/sftp.c:54
 #, fuzzy
@@ -6743,6 +6805,8 @@ msgstr ""
 msgid ""
 "Caching value for V4L2 captures. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les egaloyaedjes V4L2. Cisse valixhance duvreut "
+"esse defineye e milisegondes."
 
 #: modules/access/v4l2.c:186
 msgid "v4l2 driver controls"
@@ -6853,13 +6917,15 @@ msgstr ""
 msgid "Video4Linux2 Compressed A/V"
 msgstr ""
 
-#: modules/access/v4l2.c:2958
+#: modules/access/v4l2.c:2962
 msgid "Reset controls to default"
 msgstr ""
 
 #: modules/access/vcd/vcd.c:48
 msgid "Caching value for VCDs. This value should be set in milliseconds."
 msgstr ""
+"Valixhance di muchete po les VCD. Cisse valixhance duvreut esse defineye e "
+"milisegondes."
 
 #: modules/access/vcd/vcd.c:52 modules/gui/macosx/open.m:197
 #: modules/gui/macosx/open.m:637 modules/gui/macosx/open.m:723
@@ -6992,7 +7058,7 @@ msgstr ""
 
 #: modules/access/vcdx/vcd.c:106
 msgid "Use playback control?"
-msgstr ""
+msgstr "Eployî l' contrôle do djouwaedje?"
 
 #: modules/access/vcdx/vcd.c:107
 msgid ""
@@ -7012,7 +7078,7 @@ msgstr ""
 
 #: modules/access/vcdx/vcd.c:119
 msgid "Show extended VCD info?"
-msgstr ""
+msgstr "Mostrer l' sitindowe informåcion VCD?"
 
 #: modules/access/vcdx/vcd.c:120
 msgid ""
@@ -7062,7 +7128,7 @@ msgstr ""
 
 #: modules/access_output/file.c:68
 msgid "File stream output"
-msgstr ""
+msgstr "Rexhowe del fitchî do floû"
 
 #: modules/access_output/file.c:69 modules/audio_output/file.c:112
 #: modules/gui/macosx/open.m:178 modules/gui/macosx/open.m:451
@@ -7078,7 +7144,7 @@ msgstr "No d' uzeu"
 
 #: modules/access_output/http.c:66
 msgid "User name that will be requested to access the stream."
-msgstr ""
+msgstr "No d' uzeu ki serè dmandé po ariver å floû."
 
 #: modules/access_output/http.c:68 modules/control/telnet.c:81
 #: modules/gui/macosx/coredialogs.m:65 modules/gui/macosx/simple_prefs.m:234
@@ -7089,7 +7155,7 @@ msgstr "Sicret"
 
 #: modules/access_output/http.c:69
 msgid "Password that will be requested to access the stream."
-msgstr ""
+msgstr "Sicret ki serè dmandé po ariver å floû."
 
 #: modules/access_output/http.c:71 modules/demux/playlist/qtl.c:312
 #: modules/demux/playlist/shoutcast.c:412
@@ -7217,7 +7283,7 @@ msgstr ""
 
 #: modules/access_output/shout.c:103
 msgid "Stream public"
-msgstr ""
+msgstr "Publike floû"
 
 #: modules/access_output/shout.c:104
 msgid ""
@@ -7290,7 +7356,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/headphone.c:63
 msgid "Compensate delay"
-msgstr ""
+msgstr "Compinser l' tårdaedje"
 
 #: modules/audio_filter/channel_mixer/headphone.c:65
 msgid ""
@@ -7330,7 +7396,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/mono.c:88
 msgid "Select channel to keep"
-msgstr ""
+msgstr "Tchoezi l' canå a wårder"
 
 #: modules/audio_filter/channel_mixer/mono.c:89
 msgid ""
@@ -7356,7 +7422,7 @@ msgstr "Passete odio pol coviertixheu di stereyo a mono"
 
 #: modules/audio_filter/channel_mixer/simple.c:44
 msgid "Audio filter for simple channel mixing"
-msgstr ""
+msgstr "Passete odio pol maxhaedje do simpe canå"
 
 #: modules/audio_filter/channel_mixer/trivial.c:48
 msgid "Audio filter for trivial channel mixing"
@@ -7422,12 +7488,14 @@ msgid "Level of delayed signal"
 msgstr ""
 
 #: modules/audio_filter/chorus_flanger.c:96
+#, fuzzy
 msgid "Dry Mix"
-msgstr ""
+msgstr "Setch"
 
 #: modules/audio_filter/chorus_flanger.c:96
+#, fuzzy
 msgid "Level of input signal"
-msgstr ""
+msgstr "PIN del intrêye videyo"
 
 #: modules/audio_filter/converter/a52tofloat32.c:82
 msgid "A/52 dynamic range compression"
@@ -7456,7 +7524,7 @@ msgstr "Decôdeu odio ATSC A/52 (AC-3)"
 
 #: modules/audio_filter/converter/a52tospdif.c:51
 msgid "Audio filter for A/52->S/PDIF encapsulation"
-msgstr ""
+msgstr "Passete odio pol A/52->ecapsulaedje S/PDIF"
 
 #: modules/audio_filter/converter/dtstofloat32.c:75
 msgid "DTS dynamic range compression"
@@ -7468,7 +7536,7 @@ msgstr ""
 
 #: modules/audio_filter/converter/dtstospdif.c:65
 msgid "Audio filter for DTS->S/PDIF encapsulation"
-msgstr ""
+msgstr "Passete odio pol DTS->ecapsulaedje S/PDIF"
 
 #: modules/audio_filter/converter/fixed.c:46
 msgid "Fixed point audio format conversions"
@@ -7553,7 +7621,7 @@ msgstr ""
 
 #: modules/audio_filter/equalizer_presets.h:41
 msgid "Headphones"
-msgstr ""
+msgstr "Casses odio"
 
 #: modules/audio_filter/equalizer_presets.h:42
 msgid "Large Hall"
@@ -7734,11 +7802,11 @@ msgstr ""
 
 #: modules/audio_filter/spatializer/spatializer.cpp:58
 msgid "Room width"
-msgstr ""
+msgstr "Lårdjeu del plaece"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:59
 msgid "Width of the virtual room"
-msgstr ""
+msgstr "Lårdjeu del forveyowe plaece"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:61
 msgid "Wet"
@@ -7746,7 +7814,7 @@ msgstr ""
 
 #: modules/audio_filter/spatializer/spatializer.cpp:64
 msgid "Dry"
-msgstr ""
+msgstr "Setch"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:67
 msgid "Damp"
@@ -7763,7 +7831,7 @@ msgstr ""
 
 #: modules/audio_mixer/float32.c:50
 msgid "Float32 audio mixer"
-msgstr ""
+msgstr "Maxheu odio Float32"
 
 #: modules/audio_mixer/spdif.c:51
 msgid "Dummy S/PDIF audio mixer"
@@ -7875,7 +7943,7 @@ msgstr "Tchoezixhoz Éndjin Odio"
 #: modules/audio_output/directx.c:123
 #, fuzzy
 msgid "Speaker configuration"
-msgstr "Apontiaedje del eterface Lua"
+msgstr "Tchoezi l' apontiaedje des hôt-pårloes"
 
 #: modules/audio_output/directx.c:124
 msgid ""
@@ -7931,7 +7999,7 @@ msgstr ""
 
 #: modules/audio_output/file.c:111
 msgid "File audio output"
-msgstr ""
+msgstr "Rexhowe do fitchî odio"
 
 #: modules/audio_output/hd1000a.cpp:77
 msgid "Roku HD1000 audio output"
@@ -7995,14 +8063,14 @@ msgstr "5.1"
 #: modules/audio_output/pulse.c:65 modules/gui/macosx/embeddedwindow.m:76
 #: modules/gui/macosx/intf.m:595 modules/gui/macosx/intf.m:596
 #: modules/gui/macosx/intf.m:1986 modules/gui/qt4/dialogs/help.cpp:99
-#: modules/gui/qt4/main_interface.cpp:827
-#: modules/gui/qt4/main_interface.cpp:831
-#: modules/gui/qt4/main_interface.cpp:871
-#: modules/gui/qt4/main_interface.cpp:873
-#: modules/gui/qt4/main_interface.cpp:941
-#: modules/gui/qt4/main_interface.cpp:958
-#: modules/gui/qt4/main_interface.cpp:965
-#: modules/gui/qt4/main_interface.cpp:984
+#: modules/gui/qt4/main_interface.cpp:819
+#: modules/gui/qt4/main_interface.cpp:823
+#: modules/gui/qt4/main_interface.cpp:863
+#: modules/gui/qt4/main_interface.cpp:865
+#: modules/gui/qt4/main_interface.cpp:933
+#: modules/gui/qt4/main_interface.cpp:950
+#: modules/gui/qt4/main_interface.cpp:957
+#: modules/gui/qt4/main_interface.cpp:980
 #: modules/video_output/xcb/window.c:319
 msgid "VLC media player"
 msgstr "VLC media player"
@@ -8031,7 +8099,7 @@ msgstr ""
 
 #: modules/audio_output/waveout.c:94
 msgid "Default Audio Device"
-msgstr ""
+msgstr "Prémetou éndjin odio"
 
 #: modules/audio_output/waveout.c:98
 msgid "Win32 waveOut extension output"
@@ -8053,7 +8121,7 @@ msgstr ""
 
 #: modules/codec/a52.c:56
 msgid "A/52 audio packetizer"
-msgstr ""
+msgstr "Ewalpeu odio A/52"
 
 #: modules/codec/adpcm.c:48
 msgid "ADPCM audio decoder"
@@ -8065,7 +8133,7 @@ msgstr "Decôdeu odio AES3/SMPTE 302M"
 
 #: modules/codec/aes3.c:53
 msgid "AES3/SMPTE 302M audio packetizer"
-msgstr ""
+msgstr "Ewalpeu odio AES3/SMPTE 302M"
 
 #: modules/codec/araw.c:49
 msgid "Raw/Log Audio decoder"
@@ -8073,7 +8141,7 @@ msgstr ""
 
 #: modules/codec/araw.c:58
 msgid "Raw audio encoder"
-msgstr ""
+msgstr "Ecôdeu RAW odio"
 
 #: modules/codec/avcodec/avcodec.c:74
 msgid "Non-ref"
@@ -8114,7 +8182,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:102
 msgid "AltiVec FFmpeg audio/video decoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
-msgstr ""
+msgstr "Decôdeu odio/videyo AltiVec FFmpeg ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
 
 #: modules/codec/avcodec/avcodec.c:106
 msgid "FFmpeg audio/video decoder"
@@ -8212,11 +8280,12 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:115
 msgid "Debug mask"
-msgstr ""
+msgstr "Disbuguer l' masse"
 
 #: modules/codec/avcodec/avcodec.h:116
+#, fuzzy
 msgid "Set FFmpeg debug mask"
-msgstr ""
+msgstr "Defini l' disbugaedje do masse ffmpeg"
 
 #: modules/codec/avcodec/avcodec.h:119
 msgid "Visualize motion vectors"
@@ -8429,7 +8498,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:229
 msgid "Darkness masking"
-msgstr ""
+msgstr "Mascaedje del neorixheur"
 
 #: modules/codec/avcodec/avcodec.h:230
 msgid "Raise the quantizer for very dark macroblocks (default: 0.0)."
@@ -8437,7 +8506,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:233
 msgid "Motion masking"
-msgstr ""
+msgstr "Mascaedje do movmint"
 
 #: modules/codec/avcodec/avcodec.h:234
 msgid ""
@@ -8447,7 +8516,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:237
 msgid "Border masking"
-msgstr ""
+msgstr "Mascaedje del boirdeur"
 
 #: modules/codec/avcodec/avcodec.h:238
 msgid ""
@@ -8529,7 +8598,7 @@ msgstr "Decôdeu do sortite CVD"
 
 #: modules/codec/cvdsub.c:55
 msgid "Chaoji VCD subtitle packetizer"
-msgstr ""
+msgstr "Ewalpeu do sortite VCD Chaoji"
 
 #: modules/codec/dirac.c:61
 msgid "Constant quality factor"
@@ -8756,7 +8825,7 @@ msgstr ""
 
 #: modules/codec/dts.c:54
 msgid "DTS audio packetizer"
-msgstr ""
+msgstr "Ewalpeu odio DTS"
 
 #: modules/codec/dvbsub.c:83
 msgid "Decoding X coordinate"
@@ -9080,7 +9149,7 @@ msgstr "Vert"
 #: modules/misc/win32text.c:89 modules/video_filter/marq.c:63
 #: modules/video_filter/rss.c:75
 msgid "Teal"
-msgstr ""
+msgstr "Bleu sarcele"
 
 #: modules/codec/kate.c:213 modules/gui/fbosd.c:174
 #: modules/misc/freetype.c:144 modules/misc/quartztext.c:100
@@ -9241,7 +9310,7 @@ msgstr "Sortites (sipepieus)"
 msgid "Subtitle renderers using libass"
 msgstr ""
 
-#: modules/codec/libass.c:706 modules/misc/freetype.c:356
+#: modules/codec/libass.c:706 modules/misc/freetype.c:360
 msgid "Building font cache"
 msgstr "Costrure li muchete des fontes"
 
@@ -9253,7 +9322,7 @@ msgstr ""
 
 #: modules/codec/libmpeg2.c:128
 msgid "MPEG I/II video decoder (using libmpeg2)"
-msgstr ""
+msgstr "Decôdeu videyo MPEG I/II (eployant libmpeg2)"
 
 #: modules/codec/lpcm.c:52
 msgid "Linear PCM audio decoder"
@@ -9278,11 +9347,12 @@ msgstr ""
 #: modules/codec/omxil/omxil.c:90
 #, fuzzy
 msgid "Audio/Video decoder (using OpenMAX IL)"
-msgstr "Decôdeu odio AAC (eployant libfaad2)"
+msgstr "Decôdeu videyo MPEG I/II (eployant libmpeg2)"
 
 #: modules/codec/omxil/omxil.c:103
+#, fuzzy
 msgid "Video encoder (using OpenMAX IL)"
-msgstr ""
+msgstr "Decôdeu videyo MPEG I/II (eployant libmpeg2)"
 
 #: modules/codec/png.c:58
 msgid "PNG video decoder"
@@ -9306,15 +9376,15 @@ msgstr "Decôdeu del livreye RealVideo"
 
 #: modules/codec/schroedinger.c:50
 msgid "Schroedinger video decoder"
-msgstr ""
+msgstr "Decôdeu videyo Schroedinger"
 
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
-msgstr ""
+msgstr "Discôdeu d' imådje SDL"
 
 #: modules/codec/sdl_image.c:61
 msgid "SDL_image video decoder"
-msgstr ""
+msgstr "Discôdeu d' imådje videyo SDL"
 
 #: modules/codec/shine/shine_mod.c:66
 msgid "MP3 fixed point audio encoder"
@@ -9404,7 +9474,7 @@ msgstr "Speex"
 
 #: modules/codec/speex.c:102
 msgid "Speex audio packetizer"
-msgstr ""
+msgstr "Ewalpeu odio Speex"
 
 #: modules/codec/speex.c:107
 msgid "Speex audio encoder"
@@ -9429,7 +9499,7 @@ msgstr "Sortites DVB"
 
 #: modules/codec/spudec/spudec.c:60
 msgid "DVD subtitles packetizer"
-msgstr ""
+msgstr "Ewalpeu des sortites DVD"
 
 #: modules/codec/subtitles/subsdec.c:98
 msgid "Universal (UTF-8)"
@@ -9541,7 +9611,7 @@ msgstr "Celtike (Latén-8)"
 
 #: modules/codec/subtitles/subsdec.c:143
 msgid "South-Eastern European (Latin-10)"
-msgstr ""
+msgstr "Urope Nonne-Levantrece (Latin-10)"
 
 #: modules/codec/subtitles/subsdec.c:145
 msgid "Simplified Chinese (ISO-2022-CN-EXT)"
@@ -9593,7 +9663,7 @@ msgstr "Vietnamyin (Windows-1258)"
 
 #: modules/codec/subtitles/subsdec.c:189
 msgid "Subtitles text encoding"
-msgstr ""
+msgstr "Ecôdaedje do tecse des sortites"
 
 #: modules/codec/subtitles/subsdec.c:190
 msgid "Set the encoding used in text subtitles"
@@ -9674,7 +9744,7 @@ msgstr "Sortites SVCD"
 
 #: modules/codec/svcdsub.c:66
 msgid "Philips OGT (SVCD subtitle) packetizer"
-msgstr ""
+msgstr "Ewalpeu Philips OGT (sortite SVCD)"
 
 #: modules/codec/telx.c:54
 msgid "Override page"
@@ -9722,7 +9792,7 @@ msgstr "Decôdeu videyo Theora"
 
 #: modules/codec/theora.c:111
 msgid "Theora video packetizer"
-msgstr ""
+msgstr "Ewalpeu videyo Theora"
 
 #: modules/codec/theora.c:117
 msgid "Theora video encoder"
@@ -9798,7 +9868,7 @@ msgstr "Decôdeu odio Vorbis"
 
 #: modules/codec/vorbis.c:198
 msgid "Vorbis audio packetizer"
-msgstr ""
+msgstr "Ewalpeu odio Vorbis"
 
 #: modules/codec/vorbis.c:205
 msgid "Vorbis audio encoder"
@@ -10945,7 +11015,7 @@ msgstr "Drovaedje"
 #: modules/control/rc.c:73 modules/gui/macosx/embeddedwindow.m:167
 #: modules/gui/macosx/intf.m:1996 modules/gui/macosx/intf.m:1997
 #: modules/gui/macosx/intf.m:1998 modules/gui/macosx/intf.m:1999
-#: modules/gui/qt4/menus.cpp:793 modules/misc/notify/xosd.c:235
+#: modules/gui/qt4/menus.cpp:796 modules/misc/notify/xosd.c:235
 msgid "Pause"
 msgstr "Djoker"
 
@@ -11515,11 +11585,11 @@ msgstr ""
 
 #: modules/demux/aiff.c:49
 msgid "AIFF demuxer"
-msgstr ""
+msgstr "Dismultiplecseu AIFF"
 
 #: modules/demux/asf/asf.c:56
 msgid "ASF v1.0 demuxer"
-msgstr ""
+msgstr "Dismultiplecseu ASF v1.0"
 
 #: modules/demux/asf/asf.c:178
 msgid "Could not demux ASF stream"
@@ -11531,11 +11601,11 @@ msgstr ""
 
 #: modules/demux/au.c:50
 msgid "AU demuxer"
-msgstr ""
+msgstr "Dismultiplecseu AU"
 
 #: modules/demux/avformat/avformat.c:40
 msgid "FFmpeg demuxer"
-msgstr ""
+msgstr "Dismultiplecseu FFmpeg"
 
 #: modules/demux/avformat/avformat.c:41
 msgid "Avformat"
@@ -11543,7 +11613,7 @@ msgstr ""
 
 #: modules/demux/avformat/avformat.c:49
 msgid "FFmpeg muxer"
-msgstr ""
+msgstr "Multiplecseu FFmpeg"
 
 #: modules/demux/avformat/avformat.h:35
 msgid "Ffmpeg mux"
@@ -11586,7 +11656,7 @@ msgstr "Måy remantchî"
 
 #: modules/demux/avi/avi.c:68
 msgid "AVI demuxer"
-msgstr ""
+msgstr "Dismultiplecseu AVI"
 
 #: modules/demux/avi/avi.c:639
 msgid "AVI Index"
@@ -11643,7 +11713,7 @@ msgstr ""
 #: modules/demux/dirac.c:54
 #, fuzzy
 msgid "Dirac video demuxer"
-msgstr "Decôdeu videyo CDG"
+msgstr "Dismultiplecseu videyo VC1"
 
 #: modules/demux/flac.c:49
 msgid "FLAC demuxer"
@@ -11764,40 +11834,40 @@ msgstr ""
 msgid "RTSP/RTP access and demux"
 msgstr ""
 
-#: modules/demux/live555.cpp:116 modules/demux/live555.cpp:117
+#: modules/demux/live555.cpp:117 modules/demux/live555.cpp:118
 #: modules/gui/macosx/simple_prefs.m:261
 msgid "Use RTP over RTSP (TCP)"
 msgstr ""
 
-#: modules/demux/live555.cpp:120
+#: modules/demux/live555.cpp:121
 msgid "Client port"
 msgstr "Pôrt cliyint"
 
-#: modules/demux/live555.cpp:121
+#: modules/demux/live555.cpp:122
 msgid "Port to use for the RTP source of the session"
 msgstr ""
 
-#: modules/demux/live555.cpp:123 modules/demux/live555.cpp:124
+#: modules/demux/live555.cpp:124 modules/demux/live555.cpp:125
 msgid "Force multicast RTP via RTSP"
 msgstr "Foirci l' multicast RTP viè RTSP"
 
-#: modules/demux/live555.cpp:127 modules/demux/live555.cpp:128
+#: modules/demux/live555.cpp:128 modules/demux/live555.cpp:129
 msgid "Tunnel RTSP and RTP over HTTP"
 msgstr ""
 
-#: modules/demux/live555.cpp:131
+#: modules/demux/live555.cpp:132
 msgid "HTTP tunnel port"
 msgstr ""
 
-#: modules/demux/live555.cpp:132
+#: modules/demux/live555.cpp:133
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr ""
 
-#: modules/demux/live555.cpp:605
+#: modules/demux/live555.cpp:606
 msgid "RTSP authentication"
 msgstr "Otintifiaedje RTSP"
 
-#: modules/demux/live555.cpp:606
+#: modules/demux/live555.cpp:607
 msgid "Please enter a valid login name and a password."
 msgstr ""
 
@@ -11990,11 +12060,11 @@ msgstr ""
 
 #: modules/demux/mpeg/h264.c:51
 msgid "H264 video demuxer"
-msgstr ""
+msgstr "Dismultiplecseu videyo H264"
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
-msgstr ""
+msgstr "Dismultiplecseu videyo MPEG-I/II"
 
 #: modules/demux/nsc.c:46
 msgid "Windows Media NSC metademux"
@@ -12006,11 +12076,11 @@ msgstr ""
 
 #: modules/demux/nuv.c:49
 msgid "Nuv demuxer"
-msgstr ""
+msgstr "Dismultiplecseu Nuv"
 
 #: modules/demux/ogg.c:54
 msgid "OGG demuxer"
-msgstr ""
+msgstr "Dismultiplecseu OGG"
 
 #: modules/demux/playlist/gvp.c:209
 msgid "Google Video"
@@ -12042,68 +12112,68 @@ msgid ""
 "prevent adding them to the playlist."
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:73
+#: modules/demux/playlist/playlist.c:72
 msgid "M3U playlist import"
 msgstr "Abaguer l' djivêye a djouver M3U"
 
-#: modules/demux/playlist/playlist.c:81
+#: modules/demux/playlist/playlist.c:80
 msgid "RAM playlist import"
 msgstr "Abaguer l' djivêye a djouver RAM"
 
-#: modules/demux/playlist/playlist.c:87
+#: modules/demux/playlist/playlist.c:86
 msgid "PLS playlist import"
 msgstr "Abaguer l' djivêye a djouver PLS"
 
-#: modules/demux/playlist/playlist.c:93
+#: modules/demux/playlist/playlist.c:92
 msgid "B4S playlist import"
 msgstr "Abaguer l' djivêye a djouver B4S"
 
-#: modules/demux/playlist/playlist.c:100
+#: modules/demux/playlist/playlist.c:99
 msgid "DVB playlist import"
 msgstr "Abaguer l' djivêye a djouver DVB"
 
-#: modules/demux/playlist/playlist.c:106
+#: modules/demux/playlist/playlist.c:105
 msgid "Podcast parser"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:112
+#: modules/demux/playlist/playlist.c:111
 msgid "XSPF playlist import"
 msgstr "Abaguer l' djivêye a djouver XSPF"
 
-#: modules/demux/playlist/playlist.c:118
+#: modules/demux/playlist/playlist.c:117
 msgid "New winamp 5.2 shoutcast import"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:126
+#: modules/demux/playlist/playlist.c:125
 msgid "ASX playlist import"
 msgstr "Abaguer l' djivêye a djouver ASX"
 
-#: modules/demux/playlist/playlist.c:132
+#: modules/demux/playlist/playlist.c:131
 msgid "Kasenna MediaBase parser"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:138
+#: modules/demux/playlist/playlist.c:137
 msgid "QuickTime Media Link importer"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:144
+#: modules/demux/playlist/playlist.c:143
 msgid "Google Video Playlist importer"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:150
+#: modules/demux/playlist/playlist.c:149
 msgid "Dummy ifo demux"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:155
+#: modules/demux/playlist/playlist.c:154
 msgid "iTunes Music Library importer"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:161
+#: modules/demux/playlist/playlist.c:160
 #, fuzzy
 msgid "WPL playlist import"
 msgstr "Abaguer l' djivêye a djouver PLS"
 
-#: modules/demux/playlist/playlist.c:167
+#: modules/demux/playlist/playlist.c:166
 #, fuzzy
 msgid "ZPL playlist import"
 msgstr "Abaguer l' djivêye a djouver PLS"
@@ -12146,15 +12216,15 @@ msgstr ""
 
 #: modules/demux/ps.c:56 modules/demux/ps.c:69
 msgid "MPEG-PS demuxer"
-msgstr ""
+msgstr "Dismultiplecseu MPEG-PS"
 
 #: modules/demux/ps.c:57
 msgid "PS"
-msgstr ""
+msgstr "PS"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
-msgstr ""
+msgstr "Dismultiplecseu PVA"
 
 #: modules/demux/rawaud.c:43
 #, fuzzy
@@ -12195,7 +12265,7 @@ msgstr ""
 #: modules/demux/rawaud.c:64
 #, fuzzy
 msgid "Raw audio demuxer"
-msgstr "Decôdeu odio Flac"
+msgstr "Ecôdeu RAW odio"
 
 #: modules/demux/rawdv.c:41
 msgid ""
@@ -12246,7 +12316,7 @@ msgstr ""
 
 #: modules/demux/smf.c:43
 msgid "SMF demuxer"
-msgstr ""
+msgstr "Dismultiplecseu SMF"
 
 #: modules/demux/subtitle.c:51 modules/demux/subtitle_asa.c:49
 msgid "Apply a delay to all subtitles (in 1/10s, eg 100 means 10s)."
@@ -12468,7 +12538,7 @@ msgstr ""
 
 #: modules/demux/tta.c:45
 msgid "TTA demuxer"
-msgstr ""
+msgstr "Dismultiplecseu TTA"
 
 #: modules/demux/ty.c:59
 msgid "TY"
@@ -12500,7 +12570,7 @@ msgstr ""
 
 #: modules/demux/vc1.c:50
 msgid "VC1 video demuxer"
-msgstr ""
+msgstr "Dismultiplecseu videyo VC1"
 
 #: modules/demux/vobsub.c:52
 msgid "Vobsub subtitles parser"
@@ -12508,15 +12578,15 @@ msgstr ""
 
 #: modules/demux/voc.c:46
 msgid "VOC demuxer"
-msgstr ""
+msgstr "Dismultiplecseu VOC"
 
 #: modules/demux/wav.c:45
 msgid "WAV demuxer"
-msgstr ""
+msgstr "Dismultiplecseu WAV"
 
 #: modules/demux/xa.c:45
 msgid "XA demuxer"
-msgstr ""
+msgstr "Dismultiplecseu XA"
 
 #: modules/gui/fbosd.c:101 modules/video_output/fb.c:56
 msgid "Framebuffer device"
@@ -12695,7 +12765,7 @@ msgstr "Radjouter"
 
 #: modules/gui/macosx/bookmarks.m:89 modules/gui/macosx/intf.m:642
 #: modules/gui/macosx/simple_prefs.m:246
-#: modules/gui/qt4/components/preferences_widgets.cpp:1198
+#: modules/gui/qt4/components/preferences_widgets.cpp:1199
 #: modules/gui/qt4/dialogs/bookmarks.cpp:47
 msgid "Clear"
 msgstr "Vûdî"
@@ -12732,7 +12802,7 @@ msgstr "Tins"
 #: modules/gui/macosx/wizard.m:1686 modules/gui/macosx/wizard.m:1867
 #: modules/gui/macosx/wizard.m:1878 modules/gui/macosx/wizard.m:1891
 #: modules/gui/qt4/components/open_panels.cpp:1264
-#: modules/gui/qt4/components/preferences_widgets.cpp:1411
+#: modules/gui/qt4/components/preferences_widgets.cpp:1419
 msgid "OK"
 msgstr "I va"
 
@@ -13188,7 +13258,7 @@ msgid "Bring All to Front"
 msgstr "Mete totafwait å prumî plan"
 
 #: modules/gui/macosx/intf.m:726 modules/gui/qt4/dialogs/help.cpp:54
-#: modules/gui/qt4/menus.cpp:879
+#: modules/gui/qt4/menus.cpp:882
 msgid "Help"
 msgstr "Aidance"
 
@@ -13428,7 +13498,7 @@ msgstr "Media Resource Locator (MRL)"
 
 #: modules/gui/macosx/open.m:175 modules/gui/macosx/open.m:207
 #: modules/gui/macosx/open.m:588 modules/gui/macosx/open.m:779
-#: modules/gui/macosx/open.m:960 modules/gui/macosx/open.m:1196
+#: modules/gui/macosx/open.m:954 modules/gui/macosx/open.m:1190
 #: modules/gui/qt4/components/controller.hpp:104
 msgid "Open"
 msgstr "Drovi"
@@ -13520,12 +13590,12 @@ msgid "Address"
 msgstr "Adresse"
 
 #: modules/gui/macosx/open.m:213 modules/gui/macosx/open.m:849
-#: modules/gui/macosx/open.m:913
+#: modules/gui/macosx/open.m:907
 msgid "Unicast"
 msgstr "Unicast"
 
 #: modules/gui/macosx/open.m:214 modules/gui/macosx/open.m:864
-#: modules/gui/macosx/open.m:928
+#: modules/gui/macosx/open.m:922
 msgid "Multicast"
 msgstr "Multicast"
 
@@ -13569,7 +13639,7 @@ msgstr "Canå di dvant"
 msgid "Next Channel"
 msgstr "Canå shuvant"
 
-#: modules/gui/macosx/open.m:236 modules/gui/macosx/open.m:1130
+#: modules/gui/macosx/open.m:236 modules/gui/macosx/open.m:1124
 msgid "Retrieving Channel Info..."
 msgstr ""
 
@@ -13627,8 +13697,8 @@ msgstr "Prôpietés del fonte"
 msgid "Subtitle File"
 msgstr "Fitchî Sortite"
 
-#: modules/gui/macosx/open.m:587 modules/gui/macosx/open.m:959
-#: modules/gui/macosx/open.m:1195 modules/gui/qt4/ui/open_file.h:217
+#: modules/gui/macosx/open.m:587 modules/gui/macosx/open.m:953
+#: modules/gui/macosx/open.m:1189 modules/gui/qt4/ui/open_file.h:217
 msgid "Open File"
 msgstr "Drovi fitchî"
 
@@ -13641,11 +13711,11 @@ msgstr "Nole %@s di trovêye"
 msgid "Open VIDEO_TS Directory"
 msgstr "Drovi l' Ridant VIDEO_TS"
 
-#: modules/gui/macosx/open.m:1033
+#: modules/gui/macosx/open.m:1027
 msgid "iSight Capture Input"
 msgstr ""
 
-#: modules/gui/macosx/open.m:1034
+#: modules/gui/macosx/open.m:1028
 msgid ""
 "This facility allows you to process your iSight's input signal.\n"
 "\n"
@@ -13655,11 +13725,11 @@ msgid ""
 "Live Audio input is not supported."
 msgstr ""
 
-#: modules/gui/macosx/open.m:1136
+#: modules/gui/macosx/open.m:1130
 msgid "Composite input"
 msgstr "Intrêye compozite"
 
-#: modules/gui/macosx/open.m:1139
+#: modules/gui/macosx/open.m:1133
 msgid "S-Video input"
 msgstr "Intrêye S-Video"
 
@@ -13890,7 +13960,7 @@ msgid "Lost frames"
 msgstr "Pierdowes cådes"
 
 #: modules/gui/macosx/playlistinfo.m:109 modules/gui/macosx/wizard.m:363
-#: modules/gui/qt4/dialogs_provider.cpp:622
+#: modules/gui/qt4/dialogs_provider.cpp:627
 #: modules/video_filter/deinterlace.c:149
 msgid "Streaming"
 msgstr ""
@@ -14108,7 +14178,7 @@ msgstr ""
 
 #: modules/gui/macosx/simple_prefs.m:273
 msgid "...when VLC is in background"
-msgstr ""
+msgstr "...cwand VLC est come bouye di fond"
 
 #: modules/gui/macosx/simple_prefs.m:274
 msgid "Automatically check for updates"
@@ -15177,11 +15247,11 @@ msgstr "Dressêye"
 msgid "Next Chapter/Title"
 msgstr "Tchaptrê/Tite shuvant"
 
-#: modules/gui/qt4/components/controller.cpp:490
+#: modules/gui/qt4/components/controller.cpp:486
 msgid "Teletext Activation"
 msgstr ""
 
-#: modules/gui/qt4/components/controller.cpp:506
+#: modules/gui/qt4/components/controller.cpp:502
 msgid "Toggle Transparency "
 msgstr ""
 
@@ -15666,16 +15736,16 @@ msgstr ""
 msgid "URI"
 msgstr "URI"
 
-#: modules/gui/qt4/components/playlist/standardpanel.cpp:55
+#: modules/gui/qt4/components/playlist/standardpanel.cpp:56
 msgid "Detailed View"
 msgstr ""
 
-#: modules/gui/qt4/components/playlist/standardpanel.cpp:56
+#: modules/gui/qt4/components/playlist/standardpanel.cpp:57
 #, fuzzy
 msgid "Icon View"
 msgstr "Vuwe"
 
-#: modules/gui/qt4/components/playlist/standardpanel.cpp:57
+#: modules/gui/qt4/components/playlist/standardpanel.cpp:58
 #, fuzzy
 msgid "List View"
 msgstr "ID di djivêye"
@@ -15693,33 +15763,33 @@ msgid "Hotkey"
 msgstr ""
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1192
-#: modules/gui/qt4/components/preferences_widgets.cpp:1398
+#: modules/gui/qt4/components/preferences_widgets.cpp:1406
 msgid "Global"
 msgstr "Globå"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1199
-msgid "Set"
-msgstr "Defini"
+#: modules/gui/qt4/components/preferences_widgets.cpp:1200
+msgid "Apply"
+msgstr "Mete en ouve"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1348
+#: modules/gui/qt4/components/preferences_widgets.cpp:1356
 #: modules/gui/qt4/util/customwidgets.cpp:439
 msgid "Unset"
 msgstr "Disfé"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1399
+#: modules/gui/qt4/components/preferences_widgets.cpp:1407
 msgid "Hotkey for "
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1403
+#: modules/gui/qt4/components/preferences_widgets.cpp:1411
 msgid "Press the new keys for "
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1434
+#: modules/gui/qt4/components/preferences_widgets.cpp:1442
 msgid "Warning: the key is already assigned to \""
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1454
 #: modules/gui/qt4/components/preferences_widgets.cpp:1462
+#: modules/gui/qt4/components/preferences_widgets.cpp:1470
 msgid "Key: "
 msgstr "Tape:"
 
@@ -15974,7 +16044,7 @@ msgid "Errors"
 msgstr "Arokes"
 
 #: modules/gui/qt4/dialogs/errors.cpp:48
-#: modules/gui/qt4/dialogs/messages.cpp:184 modules/gui/qt4/menus.cpp:1514
+#: modules/gui/qt4/dialogs/messages.cpp:184 modules/gui/qt4/menus.cpp:1507
 msgid "&Clear"
 msgstr "&Netyî"
 
@@ -16170,7 +16240,7 @@ msgstr "&Metaedje a djoû"
 
 #: modules/gui/qt4/dialogs/messages.cpp:290
 msgid "Save log file as..."
-msgstr ""
+msgstr "Schaper l' fitchî do djournå come..."
 
 #: modules/gui/qt4/dialogs/messages.cpp:292
 msgid "Texts / Logs (*.log *.txt);; All (*.*) "
@@ -16184,7 +16254,7 @@ msgstr ""
 "Dji n' sai scrire e fitchî %1:\n"
 "%2."
 
-#: modules/gui/qt4/dialogs/open.cpp:80 modules/gui/qt4/menus.cpp:863
+#: modules/gui/qt4/dialogs/open.cpp:80 modules/gui/qt4/menus.cpp:866
 msgid "Open Media"
 msgstr "Drovi Media"
 
@@ -16278,7 +16348,7 @@ msgstr "Informåcion sol media..."
 #: modules/gui/qt4/dialogs/plugins.cpp:217
 #, fuzzy
 msgid "Reload extensions"
-msgstr "Tchôkes-divins eyet rawetes"
+msgstr "Cawetes passêyes houte"
 
 #: modules/gui/qt4/dialogs/plugins.cpp:488
 #, fuzzy
@@ -16528,32 +16598,32 @@ msgstr "Drovi Ridant"
 msgid "Open Folder"
 msgstr "Drovi Ridant..."
 
-#: modules/gui/qt4/dialogs_provider.cpp:533
+#: modules/gui/qt4/dialogs_provider.cpp:538
 msgid "Open playlist..."
 msgstr "Drovi djivêye a djouwer..."
 
-#: modules/gui/qt4/dialogs_provider.cpp:548
+#: modules/gui/qt4/dialogs_provider.cpp:553
 msgid "XSPF playlist (*.xspf)"
 msgstr "Djivêye a djouwer XSPF (*.xspf)"
 
-#: modules/gui/qt4/dialogs_provider.cpp:549
+#: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
 msgid "M3U8 playlist (*.m3u)"
 msgstr "Djivêye a djouwer M3U (*.m3u)"
 
-#: modules/gui/qt4/dialogs_provider.cpp:550
+#: modules/gui/qt4/dialogs_provider.cpp:555
 msgid "M3U playlist (*.m3u)"
 msgstr "Djivêye a djouwer M3U (*.m3u)"
 
-#: modules/gui/qt4/dialogs_provider.cpp:551
+#: modules/gui/qt4/dialogs_provider.cpp:556
 msgid "HTML playlist (*.html)"
 msgstr "Djivêye a djouwer HTML (*.html)"
 
-#: modules/gui/qt4/dialogs_provider.cpp:563
+#: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."
 msgstr "Schaper l' djivêye a djouwer come..."
 
-#: modules/gui/qt4/dialogs_provider.cpp:672
+#: modules/gui/qt4/dialogs_provider.cpp:677
 msgid "Open subtitles..."
 msgstr "Drovi sortites..."
 
@@ -16569,11 +16639,11 @@ msgstr "Fitchîs Sortites"
 msgid "All Files"
 msgstr "Tos les Fitchîs"
 
-#: modules/gui/qt4/main_interface.cpp:942
+#: modules/gui/qt4/main_interface.cpp:934
 msgid "Control menu for the player"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:995
+#: modules/gui/qt4/main_interface.cpp:977
 msgid "Paused"
 msgstr "Djoké"
 
@@ -16585,11 +16655,11 @@ msgstr "&Media"
 msgid "P&layback"
 msgstr "Dj&ouwaedje"
 
-#: modules/gui/qt4/menus.cpp:293 modules/gui/qt4/menus.cpp:999
+#: modules/gui/qt4/menus.cpp:293 modules/gui/qt4/menus.cpp:989
 msgid "&Audio"
 msgstr "&Odio"
 
-#: modules/gui/qt4/menus.cpp:294 modules/gui/qt4/menus.cpp:1006
+#: modules/gui/qt4/menus.cpp:294 modules/gui/qt4/menus.cpp:996
 msgid "&Video"
 msgstr "&Videyo"
 
@@ -16597,7 +16667,7 @@ msgstr "&Videyo"
 msgid "&Tools"
 msgstr "&Usteyes"
 
-#: modules/gui/qt4/menus.cpp:298 modules/gui/qt4/menus.cpp:1049
+#: modules/gui/qt4/menus.cpp:298 modules/gui/qt4/menus.cpp:1039
 msgid "V&iew"
 msgstr "V&ey"
 
@@ -16605,11 +16675,11 @@ msgstr "V&ey"
 msgid "&Help"
 msgstr "&Aidance"
 
-#: modules/gui/qt4/menus.cpp:315 modules/gui/qt4/menus.cpp:864
+#: modules/gui/qt4/menus.cpp:315 modules/gui/qt4/menus.cpp:867
 msgid "&Open File..."
 msgstr "&Drovi Fitchî..."
 
-#: modules/gui/qt4/menus.cpp:321 modules/gui/qt4/menus.cpp:868
+#: modules/gui/qt4/menus.cpp:321 modules/gui/qt4/menus.cpp:871
 msgid "Open &Disc..."
 msgstr "Drovi &Plake..."
 
@@ -16617,7 +16687,7 @@ msgstr "Drovi &Plake..."
 msgid "Open &Network Stream..."
 msgstr ""
 
-#: modules/gui/qt4/menus.cpp:325 modules/gui/qt4/menus.cpp:872
+#: modules/gui/qt4/menus.cpp:325 modules/gui/qt4/menus.cpp:875
 msgid "Open &Capture Device..."
 msgstr "Drovi &on Éndjin d' Egaloyaedje..."
 
@@ -16637,7 +16707,7 @@ msgstr "Covier&ser / Schaper..."
 msgid "&Streaming..."
 msgstr ""
 
-#: modules/gui/qt4/menus.cpp:354 modules/gui/qt4/menus.cpp:1104
+#: modules/gui/qt4/menus.cpp:354 modules/gui/qt4/menus.cpp:1099
 msgid "&Quit"
 msgstr "&Cwiter"
 
@@ -16662,7 +16732,7 @@ msgstr "Tchôkes-&divins eyet rawetes"
 msgid "&Preferences"
 msgstr "&Preferinces"
 
-#: modules/gui/qt4/menus.cpp:428
+#: modules/gui/qt4/menus.cpp:431
 #, fuzzy
 msgid "&View"
 msgstr "Vuwe"
@@ -16809,63 +16879,63 @@ msgstr "&Aidance..."
 msgid "Check for &Updates..."
 msgstr "Cachî après &des metaedjes a djoû..."
 
-#: modules/gui/qt4/menus.cpp:803
+#: modules/gui/qt4/menus.cpp:806
 msgid "&Faster"
 msgstr "&Pus roed"
 
-#: modules/gui/qt4/menus.cpp:812
+#: modules/gui/qt4/menus.cpp:815
 msgid "N&ormal Speed"
 msgstr "N&ormåle Raddisté"
 
-#: modules/gui/qt4/menus.cpp:820
+#: modules/gui/qt4/menus.cpp:823
 msgid "Slo&wer"
 msgstr "Pus lon&djin"
 
-#: modules/gui/qt4/menus.cpp:827
+#: modules/gui/qt4/menus.cpp:830
 msgid "&Jump Forward"
 msgstr ""
 
-#: modules/gui/qt4/menus.cpp:832
+#: modules/gui/qt4/menus.cpp:835
 msgid "Jump Bac&kward"
 msgstr ""
 
-#: modules/gui/qt4/menus.cpp:847
+#: modules/gui/qt4/menus.cpp:850
 msgid "&Stop"
 msgstr "&Arester"
 
-#: modules/gui/qt4/menus.cpp:854
+#: modules/gui/qt4/menus.cpp:857
 msgid "Pre&vious"
 msgstr "Di &dvant"
 
-#: modules/gui/qt4/menus.cpp:856
+#: modules/gui/qt4/menus.cpp:859
 msgid "Ne&xt"
 msgstr "Shu&vant"
 
-#: modules/gui/qt4/menus.cpp:870
+#: modules/gui/qt4/menus.cpp:873
 msgid "Open &Network..."
 msgstr "Drovi &Rantoele..."
 
-#: modules/gui/qt4/menus.cpp:986
+#: modules/gui/qt4/menus.cpp:976
 msgid "Leave Fullscreen"
 msgstr ""
 
-#: modules/gui/qt4/menus.cpp:1013
+#: modules/gui/qt4/menus.cpp:1003
 msgid "&Playback"
 msgstr "&Djouwaedje"
 
-#: modules/gui/qt4/menus.cpp:1086
+#: modules/gui/qt4/menus.cpp:1081
 msgid "Hide VLC media player in taskbar"
 msgstr "Catchî VLC media player dins l' bår des bouyes"
 
-#: modules/gui/qt4/menus.cpp:1092
+#: modules/gui/qt4/menus.cpp:1087
 msgid "Show VLC media player"
 msgstr "Mostrer VLC media player"
 
-#: modules/gui/qt4/menus.cpp:1102
+#: modules/gui/qt4/menus.cpp:1097
 msgid "&Open Media"
 msgstr "&Drovi Media"
 
-#: modules/gui/qt4/menus.cpp:1499
+#: modules/gui/qt4/menus.cpp:1492
 msgid " - Empty - "
 msgstr " - Vude - "
 
@@ -17502,11 +17572,11 @@ msgid ""
 "Visit http://www.last.fm/join/ to get an account."
 msgstr ""
 
-#: modules/misc/audioscrobbler.c:820
+#: modules/misc/audioscrobbler.c:824
 msgid "last.fm: Authentication failed"
 msgstr "last.fm: l'Otintifiaedje a fwait berwete"
 
-#: modules/misc/audioscrobbler.c:821
+#: modules/misc/audioscrobbler.c:825
 msgid ""
 "last.fm username or password is incorrect. Please verify your settings and "
 "relaunch VLC."
@@ -17717,7 +17787,7 @@ msgstr ""
 msgid "Freetype2 font renderer"
 msgstr ""
 
-#: modules/misc/freetype.c:357
+#: modules/misc/freetype.c:361
 msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a few minutes."
@@ -18073,8 +18143,9 @@ msgid ""
 msgstr ""
 
 #: modules/misc/quartztext.c:107
+#, fuzzy
 msgid "Text renderer for Mac"
-msgstr ""
+msgstr "Module do rindou do tecse"
 
 #: modules/misc/quartztext.c:108
 #, fuzzy
@@ -18174,7 +18245,7 @@ msgstr ""
 
 #: modules/misc/xml/xtag.c:90
 msgid "Simple XML Parser"
-msgstr "Simpe XML Parser"
+msgstr ""
 
 #: modules/mmx/memcpy.c:46
 msgid "MMX memcpy"
@@ -18229,7 +18300,7 @@ msgstr ""
 
 #: modules/mux/asf.c:73
 msgid "ASF muxer"
-msgstr ""
+msgstr "Multiplecseu ASF"
 
 #: modules/mux/asf.c:567
 msgid "Unknown Video"
@@ -18237,7 +18308,7 @@ msgstr "Videyo nén cnoxhou"
 
 #: modules/mux/avi.c:47
 msgid "AVI muxer"
-msgstr ""
+msgstr "Multiplecseu AVI"
 
 #: modules/mux/dummy.c:45
 msgid "Dummy/Raw muxer"
@@ -18256,7 +18327,7 @@ msgstr ""
 
 #: modules/mux/mp4.c:58
 msgid "MP4/MOV muxer"
-msgstr ""
+msgstr "Multiplecseu MP4/MOV"
 
 #: modules/mux/mpeg/ps.c:49 modules/mux/mpeg/ts.c:158
 msgid "DTS delay (ms)"
@@ -18279,7 +18350,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ps.c:65
 msgid "PS muxer"
-msgstr ""
+msgstr "Multiplecseu PS"
 
 #: modules/mux/mpeg/ts.c:98
 msgid "Video PID"
@@ -18482,7 +18553,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:191
 msgid "TS muxer (libdvbpsi)"
-msgstr ""
+msgstr "Multiplecseu TS (libdvbpsi)"
 
 #: modules/mux/mpjpeg.c:47
 msgid "Multipart JPEG muxer"
@@ -18490,23 +18561,24 @@ msgstr ""
 
 #: modules/mux/ogg.c:51
 msgid "Ogg/OGM muxer"
-msgstr ""
+msgstr "Multiplecseu Ogg/OGM"
 
 #: modules/mux/wav.c:46
 msgid "WAV muxer"
-msgstr ""
+msgstr "Multiplecseu WAV"
 
 #: modules/packetizer/copy.c:47
 msgid "Copy packetizer"
 msgstr ""
 
 #: modules/packetizer/dirac.c:87
+#, fuzzy
 msgid "Dirac packetizer"
-msgstr ""
+msgstr "Ewalpeu odio DTS"
 
 #: modules/packetizer/h264.c:56
 msgid "H.264 video packetizer"
-msgstr ""
+msgstr "Ewalpeu videyo H.264"
 
 #: modules/packetizer/mlp.c:48
 msgid "MLP/TrueHD parser"
@@ -18514,11 +18586,11 @@ msgstr ""
 
 #: modules/packetizer/mpeg4audio.c:183
 msgid "MPEG4 audio packetizer"
-msgstr ""
+msgstr "Ewalpeu odio MPEG4"
 
 #: modules/packetizer/mpeg4video.c:53
 msgid "MPEG4 video packetizer"
-msgstr ""
+msgstr "Ewalpeu videyo MPEG4"
 
 #: modules/packetizer/mpegvideo.c:57
 msgid "Sync on Intra Frame"
@@ -18532,7 +18604,7 @@ msgstr ""
 
 #: modules/packetizer/mpegvideo.c:71
 msgid "MPEG-I/II video packetizer"
-msgstr ""
+msgstr "Ewalpeu videyo MPEG-I/II"
 
 #: modules/packetizer/mpegvideo.c:72
 msgid "MPEG Video"
@@ -18540,20 +18612,20 @@ msgstr "Videyo MPEG"
 
 #: modules/packetizer/vc1.c:51
 msgid "VC-1 packetizer"
-msgstr ""
+msgstr "Ewalpeu VC-1"
 
 #: modules/services_discovery/bonjour.c:55
 msgid "Bonjour services"
 msgstr "Siervices Bonjour"
 
 #: modules/services_discovery/mediadirs.c:71
-#: modules/services_discovery/mediadirs.c:361
+#: modules/services_discovery/mediadirs.c:372
 #, fuzzy
 msgid "My Videos"
 msgstr "Videyo MPEG"
 
 #: modules/services_discovery/mediadirs.c:78
-#: modules/services_discovery/mediadirs.c:363
+#: modules/services_discovery/mediadirs.c:374
 #, fuzzy
 msgid "My Music"
 msgstr "Muzicå"
@@ -18564,7 +18636,7 @@ msgid "Picture"
 msgstr "Poûrpe"
 
 #: modules/services_discovery/mediadirs.c:85
-#: modules/services_discovery/mediadirs.c:365
+#: modules/services_discovery/mediadirs.c:376
 msgid "My Pictures"
 msgstr ""
 
@@ -18687,11 +18759,12 @@ msgstr "Maxhaedje des imådjes videyo"
 #: modules/services_discovery/udev.c:54 modules/services_discovery/udev.c:89
 #, fuzzy
 msgid "Audio capture"
-msgstr "Pôrt odio"
+msgstr "Intrêye di l' egaloyaedje odio Alsa"
 
 #: modules/services_discovery/udev.c:55
+#, fuzzy
 msgid "Audio capture (ALSA)"
-msgstr ""
+msgstr "Intrêye di l' egaloyaedje odio Alsa"
 
 #: modules/services_discovery/udev.c:63 modules/services_discovery/udev.c:64
 #: modules/services_discovery/udev.c:90
@@ -18884,7 +18957,7 @@ msgstr "Çouci est l' metôde d' accès del rexhowe ki serè eployêye pol videy
 
 #: modules/stream_out/es.c:52 modules/stream_out/standard.c:48
 msgid "Output muxer"
-msgstr ""
+msgstr "Multiplecseu d' rexhowe"
 
 #: modules/stream_out/es.c:54
 msgid "This is the default muxer method that will be used."
@@ -18892,7 +18965,7 @@ msgstr ""
 
 #: modules/stream_out/es.c:55
 msgid "Audio output muxer"
-msgstr ""
+msgstr "Multiplecseu d' rexhowe odio"
 
 #: modules/stream_out/es.c:57
 msgid "This is the muxer that will be used for audio."
@@ -18900,7 +18973,7 @@ msgstr ""
 
 #: modules/stream_out/es.c:58
 msgid "Video output muxer"
-msgstr ""
+msgstr "Multiplecseu d' rexhowe videyo"
 
 #: modules/stream_out/es.c:60
 msgid "This is the muxer that will be used for video."
@@ -19081,7 +19154,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:85
 msgid "Muxer"
-msgstr ""
+msgstr "Multiplecseu"
 
 #: modules/stream_out/rtp.c:87
 msgid ""
@@ -19164,7 +19237,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:128
 msgid "RTP/RTCP multiplexing"
-msgstr ""
+msgstr "Multiplecsaedje RTP/RTCP"
 
 #: modules/stream_out/rtp.c:130
 msgid ""
@@ -19178,8 +19251,8 @@ msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
 "milliseconds."
 msgstr ""
-"Valixhance di muchete po les floûs TCP. Cisse valixhance duvreut esse "
-"difineye e milisegondes."
+"Prémetowe valixhance di muchete po les floûs PVR. Cisse valixhance duvreut "
+"esse defineye e milisegondes."
 
 #: modules/stream_out/rtp.c:138
 msgid "Transport protocol"
@@ -19207,83 +19280,83 @@ msgstr ""
 msgid "RTP stream output"
 msgstr "Rexhowe do floû RTP"
 
-#: modules/stream_out/smem.c:62
+#: modules/stream_out/smem.c:60
 msgid "Video prerender callback"
 msgstr ""
 
-#: modules/stream_out/smem.c:63
+#: modules/stream_out/smem.c:61
 msgid ""
 "Address of the video prerender callback functionthis function will set the "
 "buffer where render will be done"
 msgstr ""
 
-#: modules/stream_out/smem.c:66
+#: modules/stream_out/smem.c:64
 msgid "Audio prerender callback"
 msgstr ""
 
-#: modules/stream_out/smem.c:67
+#: modules/stream_out/smem.c:65
 msgid ""
 "Address of the audio prerender callback function.this function will set the "
 "buffer where render will be done"
 msgstr ""
 
-#: modules/stream_out/smem.c:70
+#: modules/stream_out/smem.c:68
 msgid "Video postrender callback"
 msgstr ""
 
-#: modules/stream_out/smem.c:71
+#: modules/stream_out/smem.c:69
 msgid ""
 "Address of the video postrender callback function.this function will be "
 "called when the render is into the buffer"
 msgstr ""
 
-#: modules/stream_out/smem.c:74
+#: modules/stream_out/smem.c:72
 #, fuzzy
 msgid "Audio postrender callback"
 msgstr "Boket odio"
 
-#: modules/stream_out/smem.c:75
+#: modules/stream_out/smem.c:73
 msgid ""
 "Address of the audio postrender callback function.this function will be "
 "called when the render is into the buffer"
 msgstr ""
 
-#: modules/stream_out/smem.c:78
+#: modules/stream_out/smem.c:76
 #, fuzzy
 msgid "Video Callback data"
 msgstr "Boket videyo"
 
-#: modules/stream_out/smem.c:79
+#: modules/stream_out/smem.c:77
 msgid "Data for the video callback function."
 msgstr ""
 
-#: modules/stream_out/smem.c:81
+#: modules/stream_out/smem.c:79
 #, fuzzy
 msgid "Audio callback data"
 msgstr "ID do boket odio"
 
-#: modules/stream_out/smem.c:82
+#: modules/stream_out/smem.c:80
 #, fuzzy
 msgid "Data for the audio callback function."
 msgstr "ID do floû del boket odio a eployî."
 
-#: modules/stream_out/smem.c:84
+#: modules/stream_out/smem.c:82
 #, fuzzy
 msgid "Time Synchronized output"
 msgstr "Sincronijhî al copete eyet al valeye"
 
-#: modules/stream_out/smem.c:85
+#: modules/stream_out/smem.c:83
 msgid ""
 "Time Synchronisation option for output. If true, stream will render as "
 "usual, else it will be rendered as fast as possible."
 msgstr ""
 
-#: modules/stream_out/smem.c:97
+#: modules/stream_out/smem.c:95
 #, fuzzy
 msgid "Smem"
 msgstr "Floû"
 
-#: modules/stream_out/smem.c:98
+#: modules/stream_out/smem.c:96
 #, fuzzy
 msgid "Stream output to memory buffer"
 msgstr "Rexhowe do floû"
@@ -19916,8 +19989,9 @@ msgid "Number of zones on top"
 msgstr "Nombe di clônes"
 
 #: modules/video_filter/atmo/atmo.cpp:223
+#, fuzzy
 msgid "Number of zones on the top of the screen"
-msgstr ""
+msgstr "Côper dvins on picsel dal copete del videyo"
 
 #: modules/video_filter/atmo/atmo.cpp:224
 #, fuzzy
@@ -19925,8 +19999,9 @@ msgid "Number of zones on bottom"
 msgstr "Nombe di clônes"
 
 #: modules/video_filter/atmo/atmo.cpp:225
+#, fuzzy
 msgid "Number of zones on the bottom of the screen"
-msgstr ""
+msgstr "Côper dvins on picsel dal valêye del videyo"
 
 #: modules/video_filter/atmo/atmo.cpp:226
 msgid "Zones on left / right side"
@@ -22443,7 +22518,7 @@ msgstr "Videyo"
 #: modules/video_output/xcb/xvideo.c:59
 #, fuzzy
 msgid "XVideo output (XCB)"
-msgstr "URL del rexhowe videyo"
+msgstr "PIN del rexhowe videyo"
 
 #: modules/video_output/xcb/xvideo.c:273
 #, fuzzy
@@ -22700,7 +22775,7 @@ msgstr ""
 
 #: modules/visualization/visual/visual.c:121
 msgid "Spectrum analyser"
-msgstr ""
+msgstr "Analijheu do speke"
 
 #: modules/gui/qt4/ui/open_file.h:219
 msgid "Choose one or more media file to open"
@@ -22842,8 +22917,9 @@ msgid "RTP over RTSP (TCP)"
 msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_input.h:315
+#, fuzzy
 msgid "Live555 stream transport"
-msgstr ""
+msgstr "Rexhowe del fitchî do floû"
 
 #: modules/gui/qt4/ui/sprefs_input.h:316
 #, fuzzy
@@ -22958,7 +23034,7 @@ msgstr "Netyî Djivêye"
 #~ msgstr "%s: tchuze `-W %s' n' permetenén en årgumint\n"
 
 #~ msgid "VLC could not open the packetizer module."
-#~ msgstr "VLC n' savet nén drovi l' module d' ewalpeu."
+#~ msgstr "VLC n' saveut nén drovi l' module d' ewalpeu."
 
 #~ msgid "Show interface with mouse"
 #~ msgstr "Mostrer l' eterface avou l' sori"
@@ -22972,6 +23048,10 @@ msgstr "Netyî Djivêye"
 #~ msgid "Enable FPU support"
 #~ msgstr "Mete en alaedje li sopoirt FPU"
 
+#~ msgid "save the current command line options in the config"
+#~ msgstr ""
+#~ "schaper les tchuzes di roye di comande do moumint dvins l' apontiaedje"
+
 #~ msgid "%.1f kB"
 #~ msgstr "%.1f kB"
 
@@ -22984,6 +23064,13 @@ msgstr "Netyî Djivêye"
 #~ msgid "full"
 #~ msgstr "plin"
 
+#~ msgid ""
+#~ "Caching value for CDDA streams. This value should be set in millisecond "
+#~ "units."
+#~ msgstr ""
+#~ "Valixhance di muchete po les floûs CDDA. Cisse valixhance duvreut esse "
+#~ "defineye e milisegondes."
+
 #~ msgid "cddax://[device-or-file][@[T]track]"
 #~ msgstr "cddax://[éndjin-ou-fitchî][@[B]boket]"
 
@@ -22993,10 +23080,19 @@ msgstr "Netyî Djivêye"
 #~ msgid "Additional debug"
 #~ msgstr "Disbugaedje di pus"
 
+#~ msgid "Caching value in microseconds"
+#~ msgstr "Valixhance di muchete e microsegondes"
+
 #~ msgid "Format to use in playlist \"title\" field when no CDDB"
 #~ msgstr ""
 #~ "Cogne a eployî dins l' tchamp \"tite\" del djivêye a djouwer cwand i gn a "
 #~ "nén CDDB"
+
+#~ msgid "Use CD audio controls and output?"
+#~ msgstr "Eployî les contrôles et l' rexhowe do CD odio?"
+
+#~ msgid "If set, audio controls and audio jack output are used"
+#~ msgstr "Si defini, les contrôles odio et l' rexhowe odio jack sont eployîs"
 
 #~ msgid "CDDB"
 #~ msgstr "CDDB"
@@ -23042,11 +23138,17 @@ msgstr "Netyî Djivêye"
 #~ msgid "File input"
 #~ msgstr "Fitchî d'intrêye"
 
+#~ msgid "audio filter for simple channel mixing"
+#~ msgstr "passete odio pol maxhaedje do simpe canå"
+
 #~ msgid "Max level"
 #~ msgstr "Livea macs"
 
 #~ msgid "CMML annotations decoder"
 #~ msgstr "Decôdeu des anotåcions CMML"
+
+#~ msgid "Flac audio packetizer"
+#~ msgstr "Ewalpeu odio Flac"
 
 #~ msgid "RealAudio library decoder"
 #~ msgstr "Decôdeu del livreye RealAudio"
@@ -23071,6 +23173,9 @@ msgstr "Netyî Djivêye"
 
 #~ msgid "Ask"
 #~ msgstr "Dimander"
+
+#~ msgid "MPEG-4 video demuxer"
+#~ msgstr "Dismultiplecseu videyo MPEG-4"
 
 #~ msgid "MPEG-4 V"
 #~ msgstr "MPEG-4 V"
@@ -23119,9 +23224,6 @@ msgstr "Netyî Djivêye"
 
 #~ msgid "Remove All"
 #~ msgstr "Waester tertos"
-
-#~ msgid "Apply"
-#~ msgstr "Mete en ouve"
 
 #~ msgid "Defaults"
 #~ msgstr "Tchoezis por vos"
@@ -23356,6 +23458,9 @@ msgstr "Netyî Djivêye"
 
 #~ msgid "Access:"
 #~ msgstr "Accès:"
+
+#~ msgid "Muxer:"
+#~ msgstr "Multiplecseu:"
 
 #~ msgid "URL:"
 #~ msgstr "URL:"
