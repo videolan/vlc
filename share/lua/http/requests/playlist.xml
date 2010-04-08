@@ -26,26 +26,7 @@ vim:syntax=lua
 ]] ?>
 
 <?vlc
---[[<node id="0" name="Undefined" ro="ro">]]
-function print_playlist(item)
-  if item.flags.disabled then return end
-  if item.children then
-    local name = vlc.strings.convert_xml_special_chars(item.name or "")
-    print("<node id=\""..tostring(item.id).."\" name=\""..name.."\" ro=\""..(item.flags.ro and "ro" or "rw").."\">")
-    for _, c in ipairs(item.children) do
-      print_playlist(c)
-    end
-    print("</node>")
-  else
-    local name, path = vlc.strings.convert_xml_special_chars(item.name or "",item.path or "")
-    local currentItem = vlc.input.item().uri( vlc.input.item() )
-    local current = ""
-    if currentItem == path then
-       current="current='current'"
-    end
-    print("<leaf id='"..tostring(item.id).."' uri='"..path.."' name='"..name.."' ro='"..(item.flags.ro and "ro" or "rw").."' duration='"..tostring(item.duration).."' "..current.." />")
-  end
-end
+--[[
 function a(t,pre)
   local pre = pre or ""
   for k,v in pairs(t) do
@@ -55,13 +36,31 @@ function a(t,pre)
     end
   end
 end
---[[
-for cat,pl in pairs(p) do
-  print("<node id=\"-1\" name=\""..cat.."\" ro=\"ro\">")
-  print_playlist(pl)
-  print("</node>")
-end
 --]]
+
+function print_playlist(item)
+    if item.flags.disabled then return end
+    if(item.children) then
+        local name = vlc.strings.convert_xml_special_chars(item.name or "")
+        print('<node id="' ..tostring(item.id).. '" name="' ..tostring(name).. '" ro="' ..(item.flags.ro and "ro" or "rw").. '">')
+        for _, child in ipairs(item.children) do
+            print_playlist(child)
+        end
+        print('</node>')
+    else
+        local name, path = vlc.strings.convert_xml_special_chars(item.name or "", item.path or "")
+        local current_item = vlc.input.item()
+        local current = ""
+        -- Is the item the one currently played
+        if(current_item ~= nil) then
+            if(vlc.input.item().uri(current_item) == path) then
+                current = 'current="current"'
+            end
+        end
+        print('<leaf id="' ..tostring(item.id).. '" uri="' ..tostring(path).. '" name="' ..name.. '" ro="' ..(item.flags.ro and "ro" or "rw").. '" duration ="' ..tostring(item.duration).. '" ' ..current.. ' />')
+    end
+end
+
 local p
 if _GET["search"] then
   if _GET["search"] ~= "" then
@@ -74,12 +73,6 @@ if _GET["search"] then
 else
   p = vlc.playlist.get()
 end
--- a(p) Uncomment to debug
+--a(p) --Uncomment to debug
 print_playlist(p)
 ?>
-
-<?vlc --[[
-</node>
-<node id="9" name="Nevermind" ro="rw">
-<leaf id="10" current="current" uri="file:///mnt/stuff/media/Nirvana/Nevermind/01 - Smells Like Teen Spirit.mp3" name="Smells Like Teen Spirit" ro="rw" duration="-1"/>
-]]?>
