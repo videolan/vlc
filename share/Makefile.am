@@ -398,4 +398,4 @@ maemo_FILES = \
 DIST_solid = \
 	solid/vlc-opencda.desktop \
 	solid/vlc-opendvd.desktop \
-	solid/vlc-openvcd.dekstop
+	solid/vlc-openvcd.desktop
