@@ -47,14 +47,14 @@
 #define PORT_LONGTEXT N_("TCP port to use to communicate with the video "\
                 "part of the Bar Graph (default 12345)." \
                 "Use the same port as the one used in the rc interface." )
-#define BARGRAPH_TEXT N_("Defines if BarGraph information should be send (default 1)")
-#define BARGRAPH_LONGTEXT N_("Defines if BarGraph information should be send. "\
+#define BARGRAPH_TEXT N_("Defines if BarGraph information should be sent (default 1)")
+#define BARGRAPH_LONGTEXT N_("Defines if BarGraph information should be sent. "\
                 "1 if the information should be sent, 0 otherwise (default 1)." )
 #define BARGRAPH_REPETITION_TEXT N_("Sends the barGraph information every n audio packets (default 4)")
 #define BARGRAPH_REPETITION_LONGTEXT N_("Defines how often the barGraph information should be sent. "\
                 "Sends the barGraph information every n audio packets (default 4)." )
-#define SILENCE_TEXT N_("Defines if silence alarm information should be send (default 1)")
-#define SILENCE_LONGTEXT N_("Defines if silence alarm information should be send. "\
+#define SILENCE_TEXT N_("Defines if silence alarm information should be sent (default 1)")
+#define SILENCE_LONGTEXT N_("Defines if silence alarm information should be sent. "\
                 "1 if the information should be sent, 0 otherwise (default 1)." )
 #define TIME_WINDOW_TEXT N_("Time window to use in ms (default 5000)")
 #define TIME_WINDOW_LONGTEXT N_("Time Window during when the audio level is measured in ms for silence detection. "\
