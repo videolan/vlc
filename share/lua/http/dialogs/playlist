@@ -83,7 +83,7 @@ This dialog needs the following dialogs to be fully functional: <none>
           <?vlc
             local sd = vlc.sd.get_services_names()
             for n,ln in pairs(sd) do
-              print([[<button onclick="pl_sd(']]..n..[[');hide_menu('menu_sd');" onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" class="menuout" title="Toggle ]]..ln..[[" >]]..ln..[[</button><br/>]])
+              print([[<button class="menuout" onclick='pl_sd("]]..vlc.strings.encode_uri_component(n)..[[");hide_menu("menu_sd");' onmouseover="setclass(this,'menuover');" onmouseout="setclass(this,'menuout');" class="menuout" title="Toggle ]]..ln..[[" >]]..ln..[[</button><br/>]])
             end
           ?>
           </div>
