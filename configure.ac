@@ -108,10 +108,9 @@ dnl  Check for the contrib directory
 dnl
 AC_ARG_WITH(contrib,
     [  --without-contrib       do not use the libraries in CONTRIB_DIR],[],[])
-  AS_IF([test "${with_contrib}" != "no"],[
-    AC_ARG_VAR([CONTRIB_DIR], [directory containing pre-built contrib, overriding extras/contrib])
-    if test -z "$CONTRIB_DIR"
-    then
+AC_ARG_VAR([CONTRIB_DIR], [directory containing pre-built contrib, overriding extras/contrib])
+AS_IF([test "${with_contrib}" != "no"],[
+  AS_IF([test -z "$CONTRIB_DIR"], [
       topdir="`dirname $0`"
       if test "`echo \"$topdir\" | cut -c 1`" != "/"; then
          topdir="`pwd`/$topdir"
@@ -122,8 +121,8 @@ AC_ARG_WITH(contrib,
         gccmachine=`$CC -dumpmachine`
         CONTRIB_DIR="${topdir}/extras/contrib/hosts/${gccmachine}"
       fi
-    fi
-    AC_MSG_CHECKING([for libs in ${CONTRIB_DIR}])
+  ])
+  AC_MSG_CHECKING([for libs in ${CONTRIB_DIR}])
   AS_IF([test -d "${CONTRIB_DIR}/lib"],[
     AC_MSG_RESULT([yes])
     AC_SUBST(CONTRIB_DIR)
@@ -158,9 +157,10 @@ AC_ARG_WITH(contrib,
       export LIBRARY_PATH="${CONTRIB_DIR}/lib:$LIBRARY_PATH"
       export BELIBRARIES="${CONTRIB_DIR}/lib:$BELIBRARIES"
     fi
-    ],[
-       AC_MSG_RESULT([no])
-    ])
+  ],[
+    AC_MSG_RESULT([no])
+    CONTRIB_DIR=""
+  ])
 ])
 dnl
 dnl  Set default values
