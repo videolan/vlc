@@ -186,8 +186,8 @@ void     mvar_AppendNewVar( mvar_t *vars, const char *name,
  * The arg parameter must be of the form "start[:stop[:step]]"  */
 mvar_t *mvar_IntegerSetNew( const char *name, const char *arg );
 
-/** This function creates a set variable with a list of VLC objects */
-mvar_t *mvar_ObjectSetNew( intf_thread_t *p_intf, char *name, const char *arg );
+/** This function creates a set variable with a list of SD plugins */
+mvar_t *mvar_ServicesSetNew( intf_thread_t *p_intf, char *name );
 
 /** This function creates a set variable with the contents of the playlist */
 mvar_t *mvar_PlaylistSetNew( intf_thread_t *p_intf, char *name,

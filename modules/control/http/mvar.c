@@ -35,6 +35,7 @@
 #include <sys/stat.h>
 #endif
 #include <vlc_fs.h>
+#include <vlc_services_discovery.h>
 
 /* Utility function for scandir */
 static int Filter( const char *foo )
@@ -337,29 +338,26 @@ mvar_t *mvar_InfoSetNew( char *name, input_thread_t *p_input )
     return s;
 }
 
-mvar_t *mvar_ObjectSetNew( intf_thread_t *p_intf, char *psz_name,
-                               const char *psz_capability )
+mvar_t *mvar_ServicesSetNew( intf_thread_t *p_intf, char *psz_name )
 {
-    VLC_UNUSED(p_intf);
     mvar_t *s = mvar_New( psz_name, "set" );
-    size_t i;
+    char **longnames;
+    char **names = vlc_sd_GetNames( p_intf, &longnames, NULL );
+    if( names == NULL )
+        goto out;
 
-    module_t **p_list = module_list_get( NULL );
-
-    for( i = 0; p_list[i]; i++ )
+    for( size_t i = 0; names[i]; i++ )
     {
-        module_t *p_parser = p_list[i];
-        if( module_provides( p_parser, psz_capability ) )
-        {
-            mvar_t *sd = mvar_New( "sd", module_get_object( p_parser ) );
-            mvar_AppendNewVar( sd, "name",
-                                   module_get_name( p_parser, true ) );
-            mvar_AppendVar( s, sd );
-        }
+        mvar_t *sd = mvar_New( "sd", names[i] );
+        mvar_AppendNewVar( sd, "name", longnames[i] );
+        mvar_AppendVar( s, sd );
+        free( names[i] );
+        free( longnames[i] );
     }
 
-    module_list_free( p_list );
-
+    free( longnames );
+    free( names );
+out:
     return s;
 }
 

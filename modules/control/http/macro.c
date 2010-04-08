@@ -1019,11 +1019,9 @@ void Execute( httpd_file_sys_t *p_args,
                             index = mvar_FileSetNew( p_intf, m.param1, arg );
                             free( arg );
                         }
-                        else if( !strcmp( m.param2, "object" ) )
+                        else if( !strcmp( m.param2, "services" ) )
                         {
-                            char *arg = SSPop( &p_args->stack );
-                            index = mvar_ObjectSetNew( p_intf, m.param1, arg );
-                            free( arg );
+                            index = mvar_ServicesSetNew( p_intf, m.param1 );
                         }
                         else if( !strcmp( m.param2, "playlist" ) )
                         {
