@@ -79,15 +79,10 @@ elseif command == "pl_loop" then
 elseif command == "pl_repeat" then
   vlc.playlist.repeat_()
 elseif command == "pl_sd" then
-  if(_GET['islua'] == "1") then
-    sdname = "lua{sd='" .. val .. "'}"
+  if vlc.sd.is_loaded(val) then
+    vlc.sd.remove(val)
   else
-    sdname = val
-  end
-  if vlc.sd.is_loaded(sdname) then
-    vlc.sd.remove(sdname)
-  else
-    vlc.sd.add(sdname)
+    vlc.sd.add(val)
   end
 elseif command == "fullscreen" then
   vlc.fullscreen()
