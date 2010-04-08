@@ -160,7 +160,6 @@ static int vlclua_playlist_enqueue( lua_State *L )
     return 1;
 }
 
-static void push_playlist_item( lua_State *L, playlist_item_t *p_item );
 static void push_playlist_item( lua_State *L, playlist_item_t *p_item )
 {
     input_item_t *p_input = p_item->p_input;
@@ -186,7 +185,9 @@ static void push_playlist_item( lua_State *L, playlist_item_t *p_item )
     lua_setfield( L, -2, "flags" );
     if( p_input )
     {
-        lua_pushstring( L, p_input->psz_name );
+        char *psz_name = input_item_GetTitleFbName( p_input );
+        lua_pushstring( L, psz_name );
+        free( psz_name );
         lua_setfield( L, -2, "name" );
         lua_pushstring( L, p_input->psz_uri );
         lua_setfield( L, -2, "path" );
