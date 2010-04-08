@@ -1,23 +1,27 @@
-# translation of vlca.po to
+# translation of vlc.po to Serbian
+# Copyright (C) 2007 Marko Uskokoddic
+# Copyright (C) VideoLAN 2007,2008, 2010
 # Marko Uskokovic <uskokovic@etf.bg.ac.yu>, 2007, 2008.
 # Gorana Milicevic <gorana.milicevic@gmail.com>, 2008.
-# translation of vlc.po to
 # Serbian linux distribution cp6Linux
-# Copyright (C) 2007 Marko Uskokovic
+# Predrag Ljubenović <predragljubenovic@gmail.com>, 2010
+
 msgid ""
 msgstr ""
 "Project-Id-Version: vlca\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-03-29 23:20+0100\n"
-"PO-Revision-Date: 2008-05-14 16:16+0100\n"
-"Last-Translator: Gorana Milicevic <gorana.milicevic@gmail.com>\n"
+"POT-Creation-Date: 2010-04-08 00:07+0100\n"
+"PO-Revision-Date: 2010-04-08 18:30+0100\n"
+"Last-Translator: Predrag <predrag83yu@yahoo.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
+"X-Poedit-Bookmarks: 3593,-1,-1,-1,-1,-1,-1,-1,-1,3591\n"
 
 #: include/vlc_common.h:916
+#, fuzzy
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -40,7 +44,7 @@ msgstr "Изаберите \"Напредне опције\"да бисте ви
 
 #: include/vlc_config_cat.h:37 modules/gui/macosx/simple_prefs.m:180
 #: modules/gui/qt4/components/simple_preferences.cpp:81
-#: modules/gui/qt4/menus.cpp:1023 modules/misc/dummy/dummy.c:69
+#: modules/gui/qt4/menus.cpp:1013 modules/misc/dummy/dummy.c:69
 msgid "Interface"
 msgstr "Интерфејс"
 
@@ -49,7 +53,6 @@ msgid "Settings for VLC's interfaces"
 msgstr "Подешавања за интерфејс VLC"
 
 #: include/vlc_config_cat.h:40
-#, fuzzy
 msgid "Main interfaces settings"
 msgstr "Општа подешавања интерфејса"
 
@@ -106,11 +109,11 @@ msgstr "Звучни филтери се користе за додатну об
 #: include/vlc_config_cat.h:60 src/audio_output/input.c:108
 #: modules/gui/macosx/intf.m:677 modules/gui/macosx/intf.m:678
 msgid "Visualizations"
-msgstr "Визуализације"
+msgstr "Визуелизација"
 
 #: include/vlc_config_cat.h:61 src/audio_output/input.c:182
 msgid "Audio visualizations"
-msgstr "Звучне визуализације"
+msgstr "Звучна визуелизација"
 
 #: include/vlc_config_cat.h:63 include/vlc_config_cat.h:75
 msgid "Output modules"
@@ -360,9 +363,9 @@ msgstr "VOD(Видео на захтев)"
 msgid "VLC's implementation of Video On Demand"
 msgstr "VLC-ијев проказ VOD (Видеа на захтев)"
 
-#: include/vlc_config_cat.h:175 src/libvlc-module.c:2102
-#: src/playlist/engine.c:131 modules/demux/playlist/playlist.c:70
-#: modules/demux/playlist/playlist.c:71 modules/gui/macosx/embeddedwindow.m:75
+#: include/vlc_config_cat.h:175 src/libvlc-module.c:2101
+#: src/playlist/engine.c:131 modules/demux/playlist/playlist.c:69
+#: modules/demux/playlist/playlist.c:70 modules/gui/macosx/embeddedwindow.m:75
 #: modules/gui/macosx/intf.m:608 modules/gui/qt4/components/controller.hpp:106
 #: modules/gui/qt4/components/playlist/playlist.cpp:126
 #: modules/gui/qt4/components/playlist/selector.cpp:259
@@ -502,9 +505,8 @@ msgid "Open D&irectory..."
 msgstr "Отвори Д&иректоријум..."
 
 #: include/vlc_intf_strings.h:49
-#, fuzzy
 msgid "Open &Folder..."
-msgstr "Отвори Фајл..."
+msgstr "Отвори &фасциклу..."
 
 #: include/vlc_intf_strings.h:50
 #, fuzzy
@@ -522,39 +524,32 @@ msgid "Select Folder"
 msgstr "Изаберите фајл"
 
 #: include/vlc_intf_strings.h:55
-#, fuzzy
 msgid "Media &Information"
-msgstr "Више Информација"
+msgstr "Информације &датотеке"
 
 #: include/vlc_intf_strings.h:56
-#, fuzzy
 msgid "&Codec Information"
-msgstr "Више Информација"
+msgstr "&Информације о кодеку"
 
 #: include/vlc_intf_strings.h:57
-#, fuzzy
 msgid "&Messages"
-msgstr "Поруке"
+msgstr "&Поруке"
 
 #: include/vlc_intf_strings.h:58
-#, fuzzy
 msgid "Jump to Specific &Time"
-msgstr "Идите на Наслов"
+msgstr "Скок на одређено &време"
 
 #: include/vlc_intf_strings.h:59 modules/gui/qt4/menus.cpp:664
-#, fuzzy
 msgid "&Bookmarks"
-msgstr "Обележивачи"
+msgstr "&Маркери"
 
 #: include/vlc_intf_strings.h:60
-#, fuzzy
 msgid "&VLM Configuration"
-msgstr "Учитај Конфигурацију"
+msgstr "&VLM подешавање"
 
 #: include/vlc_intf_strings.h:62
-#, fuzzy
 msgid "&About"
-msgstr "Нешто О"
+msgstr "&О програму"
 
 #: include/vlc_intf_strings.h:65 modules/control/rc.c:72
 #: modules/gui/macosx/embeddedwindow.m:69
@@ -563,7 +558,7 @@ msgstr "Нешто О"
 #: modules/gui/macosx/intf.m:743 modules/gui/macosx/intf.m:2006
 #: modules/gui/macosx/intf.m:2007 modules/gui/macosx/intf.m:2008
 #: modules/gui/macosx/intf.m:2009 modules/gui/macosx/playlist.m:464
-#: modules/gui/qt4/components/controller.hpp:104 modules/gui/qt4/menus.cpp:787
+#: modules/gui/qt4/components/controller.hpp:104 modules/gui/qt4/menus.cpp:790
 msgid "Play"
 msgstr "Репродукуј/Пусти"
 
@@ -578,14 +573,12 @@ msgid "Remove Selected"
 msgstr "Није изабран фајл"
 
 #: include/vlc_intf_strings.h:68
-#, fuzzy
 msgid "Information..."
-msgstr "Информација"
+msgstr "Информација..."
 
 #: include/vlc_intf_strings.h:69
-#, fuzzy
 msgid "Sort"
-msgstr "С&ортирај"
+msgstr "Сортирај"
 
 #: include/vlc_intf_strings.h:70
 #, fuzzy
@@ -612,9 +605,8 @@ msgid "Stream..."
 msgstr "Ток"
 
 #: include/vlc_intf_strings.h:75
-#, fuzzy
 msgid "Save..."
-msgstr "Сачувај &Као..."
+msgstr "Сачувај..."
 
 #: include/vlc_intf_strings.h:80 modules/gui/macosx/controls.m:297
 #: modules/gui/macosx/controls.m:367 modules/gui/macosx/controls.m:1052
@@ -646,17 +638,15 @@ msgstr "Искључено Насумице"
 
 #: include/vlc_intf_strings.h:87
 msgid "Add to Playlist"
-msgstr "Додај у Листу за пуштање"
+msgstr "Додај у листу за пуштање"
 
 #: include/vlc_intf_strings.h:88
-#, fuzzy
 msgid "Add to Media Library"
-msgstr "VLC музички програм"
+msgstr ""
 
 #: include/vlc_intf_strings.h:90
-#, fuzzy
 msgid "Add File..."
-msgstr "Сачувај фајл..."
+msgstr "Додај фајл..."
 
 #: include/vlc_intf_strings.h:91
 #, fuzzy
@@ -664,24 +654,20 @@ msgid "Advanced Open..."
 msgstr "Напредне опције..."
 
 #: include/vlc_intf_strings.h:92
-#, fuzzy
 msgid "Add Directory..."
-msgstr "Додај &Директоријум..."
+msgstr "Додај директоријум..."
 
 #: include/vlc_intf_strings.h:93
-#, fuzzy
 msgid "Add Folder..."
-msgstr "Сачувај фајл..."
+msgstr "Додај фолдер..."
 
 #: include/vlc_intf_strings.h:95
-#, fuzzy
 msgid "Save Playlist to &File..."
-msgstr "Сачувај Листу за пуштање..."
+msgstr "Сачувај листу за &пуштање..."
 
 #: include/vlc_intf_strings.h:96
-#, fuzzy
 msgid "Open Play&list..."
-msgstr "&Отвори Листу за Пуштање..."
+msgstr "&Отвори листу за пуштање..."
 
 #: include/vlc_intf_strings.h:98
 #: modules/gui/qt4/components/preferences_widgets.cpp:1185
@@ -689,14 +675,12 @@ msgid "Search"
 msgstr "Претражи"
 
 #: include/vlc_intf_strings.h:99
-#, fuzzy
 msgid "Search Filter"
-msgstr "Претражи у Листи за пуштање"
+msgstr "Филтер претраге"
 
 #: include/vlc_intf_strings.h:101
-#, fuzzy
 msgid "&Services Discovery"
-msgstr "Откривање Сервиса"
+msgstr "&Откривање сервиса"
 
 #: include/vlc_intf_strings.h:105
 msgid ""
@@ -797,6 +781,31 @@ msgid ""
 "code. You can also give funds and material to help us. And of course, you "
 "can <b>promote</b> VLC media player.</p></body></html>"
 msgstr ""
+"<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
+"charset=utf-8\" /></head><body><h2>Добро дошли у VLC медија плејер страницу "
+"за помоћ</h2><h3>Документација</h3><p>Документацију VLC можете наћи на "
+"VideoLAN <a href=\"http://wiki.videolan.org\">wiki</a> интернет страници.</"
+"p><p>Ако нисте упознати са VLC медија плејером, молимо прочитајте<br><a href="
+"\"http://wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Упознавање са "
+"VLC медија плејером</em></a>.</p><p>Наћи ћете информацију како да користите "
+"плејер у <br>\"<a href=\"http://wiki.videolan.org/Documentation:Play_HowTo"
+"\"><em>Како пуштати фајлове са VLC медија плејером</em></a>\" докумету.</"
+"p><p>За све задатке чувања, конвертовања, транскодинга, енкодинг, муксинга и "
+"емитовања, наћи ћете корисне информције на <a href=\"http://wiki.videolan."
+"org/Documentation:Streaming_HowTo\">Документација за емитовање</a>.</"
+"p><p>Ако нисте сигурни у терминологију, молимо консултујте се у <a href="
+"\"http://wiki.videolan.org/Knowledge_Base\">бази знања</a>.</p><p>За "
+"разумевање главних пречица на тастатури, прочитајте страницу <a href="
+"\"http://wiki.videolan.org/Hotkeys\">пречице</a>.</p><h3>Помоћ</h3><p>Пре "
+"него што поставите питање, молимо погледајте <a href=\"http://www.videolan."
+"org/support/faq.html\">ЧПП(FAQ)</a>.</p><p>Онда можете добити(понудити) "
+"помоћ на <a href=\"http://forum.videolan.org\">Форуму</a>, на <a href="
+"\"http://www.videolan.org/vlc/lists.html\">мејлинг листи</a> или нашем ИРЦ "
+"каналу (<em>#videolan</em> on irc.freenode.net).</p><h3>Допринеси пројекту</"
+"h3><p>И ти можеш помоћи VideoLAN пројекту делећи своје време за помоћ "
+"заједници, дизајнирајући изглед, преводећи документацију, тестирајући и "
+"кодирајући. Исто тако можеш дати средстава и материјал да нам помогнеш. И "
+"наравно, можеш <b>промовисати</b> VLC медија плејер.</p></body></html>"
 
 #: src/audio_output/filters.c:166 src/audio_output/filters.c:213
 #: src/audio_output/filters.c:236
@@ -918,7 +927,7 @@ msgstr "string"
 #: src/playlist/loadsave.c:162
 #: modules/gui/qt4/components/playlist/selector.cpp:263
 msgid "Media Library"
-msgstr ""
+msgstr "Библиотека датотека"
 
 #: src/input/control.c:217
 #, c-format
@@ -983,9 +992,8 @@ msgid "Program"
 msgstr "Програм"
 
 #: src/input/es_out.c:1355 src/input/es_out.c:1357
-#, fuzzy
 msgid "Scrambled"
-msgstr "Скалирање"
+msgstr "Закључан"
 
 #: src/input/es_out.c:1355
 msgid "Yes"
@@ -1072,7 +1080,7 @@ msgstr "Подразумевани ток"
 #: src/input/es_out.c:2921
 #, c-format
 msgid "%.2f dB"
-msgstr ""
+msgstr "%.2f dB"
 
 #: src/input/es_out.c:2930
 msgid "Resolution"
@@ -1407,7 +1415,7 @@ msgstr ""
 "Притисните RETURN дугме за наставак...\n"
 
 #: src/libvlc.h:173 src/libvlc-module.c:1462 src/libvlc-module.c:1463
-#: src/libvlc-module.c:2636 src/video_output/vout_intf.c:193
+#: src/libvlc-module.c:2635 src/video_output/vout_intf.c:195
 msgid "Zoom"
 msgstr "Увеличај"
 
@@ -1733,11 +1741,11 @@ msgstr ""
 
 #: src/libvlc-module.c:323
 msgid "Audio visualizations "
-msgstr "Звучне визуализације."
+msgstr "Звучна визуелизација"
 
 #: src/libvlc-module.c:325
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
-msgstr "Ово додаје модуле визуализације (спектрални анализатор, итд.)"
+msgstr "Ово додаје модуле визуелизације (спектрални анализатор, итд.)"
 
 #: src/libvlc-module.c:329
 #, fuzzy
@@ -2035,7 +2043,7 @@ msgstr ""
 "Преклапање је способностграфичке картице да убрза хардверски (могућност да "
 "директно исцртава видео). VLC ће покушати да ово користи као подразумевано."
 
-#: src/libvlc-module.c:442 src/video_output/vout_intf.c:342
+#: src/libvlc-module.c:442 src/video_output/vout_intf.c:344
 #: modules/gui/macosx/simple_prefs.m:295
 msgid "Always on top"
 msgstr "Увек на врху"
@@ -2676,9 +2684,8 @@ msgid "Favor speed over precision while seeking"
 msgstr ""
 
 #: src/libvlc-module.c:749
-#, fuzzy
 msgid "Playback speed"
-msgstr "Преслушавање"
+msgstr "Брзина репродукције"
 
 #: src/libvlc-module.c:751
 msgid "This defines the playback speed (nominal speed is 1.0)."
@@ -2713,18 +2720,16 @@ msgstr ""
 
 #: src/libvlc-module.c:764
 msgid "Bookmarks list for a stream"
-msgstr "Списак обелижавача за ток"
+msgstr "Списак маркера за ток"
 
 #: src/libvlc-module.c:766
-#, fuzzy
 msgid ""
 "You can manually give a list of bookmarks for a stream in the form "
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
 "{...}\""
 msgstr ""
-"Можете ручно да задате листу обележених страница за ток у форми "
-"\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
-"{...}\""
+"Можете ручно да задате листу маркера за ток у форми \"{name=bookmark-name,"
+"time=optional-time-offset,bytes=optional-byte-offset},{...}\""
 
 #: src/libvlc-module.c:770 modules/gui/qt4/ui/sprefs_input.h:307
 #, fuzzy
@@ -3510,7 +3515,7 @@ msgstr "Фајл за подешавање VLM"
 
 #: src/libvlc-module.c:1131
 msgid "Read a VLM configuration file as soon as VLM is started."
-msgstr "Прочитај фајл за подешавање VLM чим је VLM покренут."
+msgstr "Учитај фајл за подешавање VLM чим је VLM покренут."
 
 #: src/libvlc-module.c:1133
 msgid "Use a plugins cache"
@@ -3785,7 +3790,7 @@ msgstr ""
 "Ова подешавања су опште VLC везе кључева, познате као \"hotkeys\" тј. "
 "пречице."
 
-#: src/libvlc-module.c:1274 src/video_output/vout_intf.c:355
+#: src/libvlc-module.c:1274 src/video_output/vout_intf.c:357
 #: modules/gui/macosx/controls.m:454 modules/gui/macosx/controls.m:510
 #: modules/gui/macosx/controls.m:1087 modules/gui/macosx/controls.m:1120
 #: modules/gui/macosx/embeddedwindow.m:68 modules/gui/macosx/intf.m:605
@@ -3800,9 +3805,8 @@ msgid "Select the hotkey to use to swap fullscreen state."
 msgstr "Изаберите пречицу за пребацивање у стање пуног екрана."
 
 #: src/libvlc-module.c:1276
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Пун екран"
+msgstr "Искључи приказ преко целог екрана"
 
 #: src/libvlc-module.c:1277
 #, fuzzy
@@ -3864,15 +3868,13 @@ msgstr "Нормална Величина"
 msgid "Select the hotkey to set the playback rate back to normal."
 msgstr "Изаберите тастер за постављање овог обележивача у листу за пуштање."
 
-#: src/libvlc-module.c:1290 modules/gui/qt4/menus.cpp:808
-#, fuzzy
+#: src/libvlc-module.c:1290 modules/gui/qt4/menus.cpp:811
 msgid "Faster (fine)"
-msgstr "Убрзано"
+msgstr "Убрзано (фино)"
 
-#: src/libvlc-module.c:1292 modules/gui/qt4/menus.cpp:816
-#, fuzzy
+#: src/libvlc-module.c:1292 modules/gui/qt4/menus.cpp:819
 msgid "Slower (fine)"
-msgstr "Спорије"
+msgstr "Спорије (фино)"
 
 #: src/libvlc-module.c:1294 modules/control/hotkeys.c:696
 #: modules/gui/macosx/about.m:187 modules/gui/macosx/controls.m:1032
@@ -4036,7 +4038,7 @@ msgstr "Дугачка дужина скока, у секундама."
 
 #: src/libvlc-module.c:1341 modules/control/hotkeys.c:179
 #: modules/gui/qt4/components/controller.hpp:108
-#: modules/gui/qt4/components/controller.hpp:118 modules/gui/qt4/menus.cpp:883
+#: modules/gui/qt4/components/controller.hpp:118 modules/gui/qt4/menus.cpp:886
 #: modules/gui/skins2/commands/cmd_quit.cpp:40
 msgid "Quit"
 msgstr "Излаз"
@@ -4334,7 +4336,7 @@ msgstr "Листа за пуштање обележивач 10"
 
 #: src/libvlc-module.c:1421
 msgid "This allows you to define playlist bookmarks."
-msgstr "Ово Вам дозвољава да дефинишете обележиваче листе за пуштање."
+msgstr "Ово Вам дозвољава да дефинишете маркере листе за пуштање."
 
 #: src/libvlc-module.c:1423
 msgid "Go back in browsing history"
@@ -4593,13 +4595,13 @@ msgstr "Прођи циклично кроз режиме рада распли�
 msgid "Cycle through available audio devices"
 msgstr "Циклично прођи кроз доступне аудио траке (језике)"
 
-#: src/libvlc-module.c:1683 src/video_output/vout_intf.c:361
+#: src/libvlc-module.c:1683 src/video_output/vout_intf.c:363
 #: modules/gui/macosx/controls.m:494 modules/gui/macosx/controls.m:1086
 #: modules/gui/macosx/intf.m:687 modules/gui/macosx/intf.m:751
 #: modules/gui/qt4/components/controller.hpp:106
 #: modules/video_output/snapshot.c:73
 msgid "Snapshot"
-msgstr "Брз снимак"
+msgstr "Снимак слике"
 
 #: src/libvlc-module.c:1700
 msgid "Window properties"
@@ -4672,24 +4674,24 @@ msgstr "Додаци"
 msgid "Performance options"
 msgstr "Опције перформанси"
 
-#: src/libvlc-module.c:2204
+#: src/libvlc-module.c:2203
 msgid "Hot keys"
 msgstr "Пречице"
 
-#: src/libvlc-module.c:2646
+#: src/libvlc-module.c:2645
 msgid "Jump sizes"
 msgstr "Величине скокова"
 
-#: src/libvlc-module.c:2723
+#: src/libvlc-module.c:2722
 #, fuzzy
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr "штампај помоћ за VLC (може да се комбинује са --advanced)"
 
-#: src/libvlc-module.c:2726
+#: src/libvlc-module.c:2725
 msgid "Exhaustive help for VLC and its modules"
 msgstr ""
 
-#: src/libvlc-module.c:2728
+#: src/libvlc-module.c:2727
 #, fuzzy
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
@@ -4697,47 +4699,47 @@ msgid ""
 msgstr ""
 "штампај помоћ за VLC и све његове модуле (може да се комбинује са --advanced)"
 
-#: src/libvlc-module.c:2731
+#: src/libvlc-module.c:2730
 msgid "ask for extra verbosity when displaying help"
 msgstr "питајте за додатну опширност при приказивању помоћи"
 
-#: src/libvlc-module.c:2733
+#: src/libvlc-module.c:2732
 msgid "print a list of available modules"
 msgstr "одштампај листу доступних модула"
 
-#: src/libvlc-module.c:2735
+#: src/libvlc-module.c:2734
 #, fuzzy
 msgid "print a list of available modules with extra detail"
 msgstr "одштампај листу доступних модула"
 
-#: src/libvlc-module.c:2737
+#: src/libvlc-module.c:2736
 #, fuzzy
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose). Prefix the module name with = for strict matches."
 msgstr "штампај помоћ за одређени модул (може да се комбинује са --advanced)"
 
-#: src/libvlc-module.c:2741
+#: src/libvlc-module.c:2740
 msgid "no configuration option will be loaded nor saved to config file"
 msgstr ""
 
-#: src/libvlc-module.c:2743
+#: src/libvlc-module.c:2742
 msgid "reset the current config to the default values"
 msgstr "подеси тренутна подешавања на подразумеване вредности"
 
-#: src/libvlc-module.c:2745
+#: src/libvlc-module.c:2744
 msgid "use alternate config file"
 msgstr "користи алтернативни config фајл"
 
-#: src/libvlc-module.c:2747
+#: src/libvlc-module.c:2746
 msgid "resets the current plugins cache"
 msgstr "враћа на првобитне вредности кеш додатака"
 
-#: src/libvlc-module.c:2749
+#: src/libvlc-module.c:2748
 msgid "print version information"
 msgstr "одштампај информацију о верзији програма"
 
-#: src/libvlc-module.c:2802
+#: src/libvlc-module.c:2788
 msgid "main program"
 msgstr "главни програм"
 
@@ -4793,7 +4795,7 @@ msgstr "Growl Додатак за Обавештења"
 #: modules/gui/macosx/simple_prefs.m:308 modules/gui/macosx/simple_prefs.m:696
 #: modules/gui/macosx/wizard.m:320
 #: modules/gui/qt4/components/open_panels.cpp:1265
-#: modules/gui/qt4/components/preferences_widgets.cpp:1412
+#: modules/gui/qt4/components/preferences_widgets.cpp:1420
 #: modules/gui/qt4/components/sout/profile_selector.cpp:253
 msgid "Cancel"
 msgstr "Обустави"
@@ -4859,9 +4861,8 @@ msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
 msgstr ""
 
 #: src/misc/update.c:734
-#, fuzzy
 msgid "Update VLC media player"
-msgstr "VLC музички програм"
+msgstr "Надоградња VLC медија плејера"
 
 #: src/misc/update.c:735
 msgid ""
@@ -4887,23 +4888,23 @@ msgstr "Недефинисано"
 msgid "Post processing"
 msgstr "Пост-процесирање"
 
-#: src/video_output/vout_intf.c:226 modules/gui/macosx/intf.m:692
+#: src/video_output/vout_intf.c:228 modules/gui/macosx/intf.m:692
 #: modules/gui/macosx/intf.m:693 modules/video_filter/crop.c:107
 #: modules/video_filter/croppadd.c:86
 msgid "Crop"
-msgstr "Исеци"
+msgstr "Опсеци"
 
-#: src/video_output/vout_intf.c:293 modules/gui/macosx/controls.m:810
+#: src/video_output/vout_intf.c:295 modules/gui/macosx/controls.m:810
 #: modules/gui/macosx/intf.m:690 modules/gui/macosx/intf.m:691
 msgid "Aspect-ratio"
 msgstr "Однос-пропорција"
 
-#: src/video_output/vout_intf.c:323
+#: src/video_output/vout_intf.c:325
 #, fuzzy
 msgid "Autoscale video"
 msgstr "Укључи видео"
 
-#: src/video_output/vout_intf.c:330
+#: src/video_output/vout_intf.c:332
 #, fuzzy
 msgid "Scale factor"
 msgstr "Степен замућења (1-127)."
@@ -5139,23 +5140,23 @@ msgstr ""
 
 #: modules/access/bda/bda.c:121
 msgid "QAM16"
-msgstr ""
+msgstr "QAM16"
 
 #: modules/access/bda/bda.c:121
 msgid "QAM32"
-msgstr ""
+msgstr "QAM32"
 
 #: modules/access/bda/bda.c:121
 msgid "QAM64"
-msgstr ""
+msgstr "QAM64"
 
 #: modules/access/bda/bda.c:121
 msgid "QAM128"
-msgstr ""
+msgstr "QAM128"
 
 #: modules/access/bda/bda.c:121
 msgid "QAM256"
-msgstr ""
+msgstr "QAM256"
 
 #: modules/access/bda/bda.c:122
 #, fuzzy
@@ -5169,11 +5170,11 @@ msgstr "PS"
 
 #: modules/access/bda/bda.c:122
 msgid "8VSB"
-msgstr ""
+msgstr "8VSB"
 
 #: modules/access/bda/bda.c:122
 msgid "16VSB"
-msgstr ""
+msgstr "16VSB"
 
 #: modules/access/bda/bda.c:125 modules/access/bda/bda.c:126
 #, fuzzy
@@ -5200,23 +5201,23 @@ msgstr ""
 
 #: modules/access/bda/bda.c:138 modules/access/bda/bda.c:145
 msgid "1/2"
-msgstr ""
+msgstr "1/2"
 
 #: modules/access/bda/bda.c:138 modules/access/bda/bda.c:145
 msgid "2/3"
-msgstr ""
+msgstr "2/3"
 
 #: modules/access/bda/bda.c:138 modules/access/bda/bda.c:145
 msgid "3/4"
-msgstr ""
+msgstr "3/4"
 
 #: modules/access/bda/bda.c:138 modules/access/bda/bda.c:145
 msgid "5/6"
-msgstr ""
+msgstr "5/6"
 
 #: modules/access/bda/bda.c:138 modules/access/bda/bda.c:145
 msgid "7/8"
-msgstr ""
+msgstr "7/8"
 
 #: modules/access/bda/bda.c:140 modules/access/dvb/access.c:143
 msgid "Terrestrial low priority stream code rate (FEC)"
@@ -5259,19 +5260,19 @@ msgstr ""
 
 #: modules/access/bda/bda.c:157
 msgid "1/4"
-msgstr ""
+msgstr "1/4"
 
 #: modules/access/bda/bda.c:157
 msgid "1/8"
-msgstr ""
+msgstr "1/8"
 
 #: modules/access/bda/bda.c:157
 msgid "1/16"
-msgstr ""
+msgstr "1/16"
 
 #: modules/access/bda/bda.c:157
 msgid "1/32"
-msgstr ""
+msgstr "1/32"
 
 #: modules/access/bda/bda.c:159 modules/access/dvb/access.c:152
 msgid "Terrestrial transmission mode"
@@ -5283,11 +5284,11 @@ msgstr ""
 
 #: modules/access/bda/bda.c:163
 msgid "2k"
-msgstr ""
+msgstr "2k"
 
 #: modules/access/bda/bda.c:163
 msgid "8k"
-msgstr ""
+msgstr "8k"
 
 #: modules/access/bda/bda.c:165 modules/access/dvb/access.c:155
 msgid "Terrestrial hierarchy mode"
@@ -5299,15 +5300,15 @@ msgstr ""
 
 #: modules/access/bda/bda.c:169 modules/gui/qt4/ui/streampanel.h:170
 msgid "1"
-msgstr ""
+msgstr "1"
 
 #: modules/access/bda/bda.c:169
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: modules/access/bda/bda.c:169
 msgid "4"
-msgstr ""
+msgstr "4"
 
 #: modules/access/bda/bda.c:172
 msgid "Satellite Azimuth"
@@ -5450,7 +5451,7 @@ msgstr "Антена"
 
 #: modules/access/dshow/dshow.cpp:94
 msgid "TV"
-msgstr ""
+msgstr "ТВ"
 
 #: modules/access/dshow/dshow.cpp:95
 #, fuzzy
@@ -5691,7 +5692,7 @@ msgid "Configure"
 msgstr "Подеси"
 
 #: modules/access/dshow/dshow.cpp:459 modules/access/dshow/dshow.cpp:533
-#: modules/access/dshow/dshow.cpp:966 modules/access/dshow/dshow.cpp:1019
+#: modules/access/dshow/dshow.cpp:968 modules/access/dshow/dshow.cpp:1021
 #, fuzzy
 msgid "Capture failed"
 msgstr "са слушним потешкоћама"
@@ -5704,12 +5705,12 @@ msgstr ""
 msgid "VLC cannot open ANY capture device.Check the error log for details."
 msgstr ""
 
-#: modules/access/dshow/dshow.cpp:967
+#: modules/access/dshow/dshow.cpp:969
 #, c-format
 msgid "VLC cannot use the device \"%s\", because its type is not supported."
 msgstr ""
 
-#: modules/access/dshow/dshow.cpp:1020
+#: modules/access/dshow/dshow.cpp:1022
 #, c-format
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
@@ -5889,9 +5890,8 @@ msgstr "DVDnav Улаз"
 
 #: modules/access/dvdnav.c:312 modules/access/dvdread.c:250
 #: modules/access/dvdread.c:510 modules/access/dvdread.c:572
-#, fuzzy
 msgid "Playback failure"
-msgstr "Преслушавање"
+msgstr "Немогућност репродукције"
 
 #: modules/access/dvdnav.c:313
 msgid ""
@@ -6797,7 +6797,7 @@ msgstr "Улазни Екран"
 
 #: modules/access/screen/screen.c:95 modules/access/screen/xcb.c:69
 #: modules/gui/macosx/open.m:223 modules/gui/macosx/open.m:426
-#: modules/gui/macosx/open.m:1020 modules/gui/macosx/simple_prefs.m:542
+#: modules/gui/macosx/open.m:1014 modules/gui/macosx/simple_prefs.m:542
 #: modules/gui/macosx/vout.m:223
 msgid "Screen"
 msgstr "Екран"
@@ -7331,7 +7331,7 @@ msgstr ""
 
 #: modules/access/v4l2.c:178
 msgid "Loudness"
-msgstr ""
+msgstr "Гласност"
 
 #: modules/access/v4l2.c:180
 msgid "Loudness of the audio input (if supported by the v4l2 driver)."
@@ -7396,7 +7396,7 @@ msgstr ""
 
 #: modules/access/v4l2.c:244
 msgid "AUTO"
-msgstr ""
+msgstr "АУТО"
 
 #: modules/access/v4l2.c:244
 msgid "READ"
@@ -7461,7 +7461,7 @@ msgstr ""
 msgid "Video4Linux2 Compressed A/V"
 msgstr ""
 
-#: modules/access/v4l2.c:2958
+#: modules/access/v4l2.c:2962
 #, fuzzy
 msgid "Reset controls to default"
 msgstr "Интерфејс удаљене контроле"
@@ -8711,17 +8711,17 @@ msgstr "5.1"
 #: modules/audio_output/pulse.c:65 modules/gui/macosx/embeddedwindow.m:76
 #: modules/gui/macosx/intf.m:595 modules/gui/macosx/intf.m:596
 #: modules/gui/macosx/intf.m:1986 modules/gui/qt4/dialogs/help.cpp:99
-#: modules/gui/qt4/main_interface.cpp:827
-#: modules/gui/qt4/main_interface.cpp:831
-#: modules/gui/qt4/main_interface.cpp:871
-#: modules/gui/qt4/main_interface.cpp:873
-#: modules/gui/qt4/main_interface.cpp:941
-#: modules/gui/qt4/main_interface.cpp:958
-#: modules/gui/qt4/main_interface.cpp:965
-#: modules/gui/qt4/main_interface.cpp:984
+#: modules/gui/qt4/main_interface.cpp:819
+#: modules/gui/qt4/main_interface.cpp:823
+#: modules/gui/qt4/main_interface.cpp:863
+#: modules/gui/qt4/main_interface.cpp:865
+#: modules/gui/qt4/main_interface.cpp:933
+#: modules/gui/qt4/main_interface.cpp:950
+#: modules/gui/qt4/main_interface.cpp:957
+#: modules/gui/qt4/main_interface.cpp:980
 #: modules/video_output/xcb/window.c:319
 msgid "VLC media player"
-msgstr "VLC музички програм"
+msgstr "VLC медија плејер"
 
 #: modules/audio_output/pulse.c:103
 #, fuzzy
@@ -9001,7 +9001,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:132 modules/gui/macosx/simple_prefs.m:262
 msgid "Skip the loop filter for H.264 decoding"
-msgstr "Прескочи филтер петње за H.264 декодирање"
+msgstr "Прескочи филтер петље за H.264 декодирање"
 
 #: modules/codec/avcodec/avcodec.h:133
 msgid ""
@@ -9397,15 +9397,15 @@ msgstr ""
 
 #: modules/codec/dirac.c:93
 msgid "4:2:0"
-msgstr ""
+msgstr "4:2:0"
 
 #: modules/codec/dirac.c:93
 msgid "4:2:2"
-msgstr ""
+msgstr "4:2:2"
 
 #: modules/codec/dirac.c:93
 msgid "4:4:4"
-msgstr ""
+msgstr "4:4:4"
 
 #: modules/codec/dirac.c:96
 #, fuzzy
@@ -9905,7 +9905,6 @@ msgstr "Зелена "
 #: modules/misc/freetype.c:143 modules/misc/quartztext.c:99
 #: modules/misc/win32text.c:89 modules/video_filter/marq.c:63
 #: modules/video_filter/rss.c:75
-#, fuzzy
 msgid "Teal"
 msgstr "Тегет"
 
@@ -9968,9 +9967,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/kate.c:225
-#, fuzzy
 msgid "Default font effect"
-msgstr "Примени ефекат цртаћа"
+msgstr "Општи ефекат фонта"
 
 #: modules/codec/kate.c:226
 msgid ""
@@ -9999,9 +9997,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/kate.c:241
-#, fuzzy
 msgid "Default font color"
-msgstr "Подразумевана боја текста"
+msgstr "Подразумевана боја фонта"
 
 #: modules/codec/kate.c:242
 msgid ""
@@ -10081,7 +10078,7 @@ msgstr "Енкодер титлова"
 msgid "Subtitle renderers using libass"
 msgstr "Подешавања демултиплексера за титлове"
 
-#: modules/codec/libass.c:706 modules/misc/freetype.c:356
+#: modules/codec/libass.c:706 modules/misc/freetype.c:360
 msgid "Building font cache"
 msgstr ""
 
@@ -10276,9 +10273,8 @@ msgid "DVD subtitles decoder"
 msgstr "DVD декодер титлова"
 
 #: modules/codec/spudec/spudec.c:51
-#, fuzzy
 msgid "DVD subtitles"
-msgstr "титлови"
+msgstr "DVD титлови"
 
 #: modules/codec/spudec/spudec.c:60
 msgid "DVD subtitles packetizer"
@@ -10318,7 +10314,7 @@ msgstr ""
 
 #: modules/codec/subtitles/subsdec.c:110
 msgid "Eastern European (Windows-1250)"
-msgstr ""
+msgstr "Српска латиница (Windows-1250)"
 
 #: modules/codec/subtitles/subsdec.c:112
 #, fuzzy
@@ -11471,29 +11467,24 @@ msgid ""
 msgstr ""
 
 #: modules/codec/x264.c:389
-#, fuzzy
 msgid "dia"
 msgstr "dia"
 
 #: modules/codec/x264.c:389
-#, fuzzy
 msgid "hex"
 msgstr "hex"
 
 #: modules/codec/x264.c:389
-#, fuzzy
 msgid "umh"
 msgstr "umh"
 
 #: modules/codec/x264.c:389
-#, fuzzy
 msgid "esa"
 msgstr "esa"
 
 #: modules/codec/x264.c:389
-#, fuzzy
 msgid "tesa"
-msgstr "esa"
+msgstr "tesa"
 
 #: modules/codec/x264.c:402
 msgid "fast"
@@ -11638,9 +11629,8 @@ msgid "Global Hotkeys interface"
 msgstr "Интерфејс управљања пречицама"
 
 #: modules/control/hotkeys.c:92
-#, fuzzy
 msgid "Volume Control"
-msgstr "Преклапање времена"
+msgstr "Контрола звука"
 
 #: modules/control/hotkeys.c:92
 #, fuzzy
@@ -11699,7 +11689,7 @@ msgstr "Однос пропорције: %s"
 #: modules/control/hotkeys.c:565
 #, c-format
 msgid "Crop: %s"
-msgstr "Исеци: %s"
+msgstr "Опсеци: %s"
 
 #: modules/control/hotkeys.c:579
 msgid "Zooming reset"
@@ -11731,9 +11721,8 @@ msgid "Zoom mode: %s"
 msgstr "Увећај видео"
 
 #: modules/control/hotkeys.c:719
-#, fuzzy
 msgid "1.00x"
-msgstr "100%"
+msgstr "1.00x"
 
 #: modules/control/hotkeys.c:774 modules/control/hotkeys.c:784
 #, fuzzy, c-format
@@ -11761,9 +11750,9 @@ msgid "Recording done"
 msgstr "Однос снимања"
 
 #: modules/control/hotkeys.c:1044
-#, fuzzy, c-format
+#, c-format
 msgid "Volume %d%%"
-msgstr "Јачина Звука: %d%%"
+msgstr "Јачина Звука %d%%"
 
 #: modules/control/hotkeys.c:1051
 #, c-format
@@ -11930,11 +11919,11 @@ msgstr "Уклони Сервис и изађи."
 
 #: modules/control/ntservice.c:49
 msgid "Display name of the Service"
-msgstr "Прикажи име Сервиса"
+msgstr "Прикажи име сервиса"
 
 #: modules/control/ntservice.c:51
 msgid "Change the display name of the Service."
-msgstr "Промени приказано име Сервиса."
+msgstr "Промени приказано име сервиса."
 
 #: modules/control/ntservice.c:52
 msgid "Configuration options"
@@ -11980,14 +11969,13 @@ msgstr "Отвори"
 #: modules/control/rc.c:73 modules/gui/macosx/embeddedwindow.m:167
 #: modules/gui/macosx/intf.m:1996 modules/gui/macosx/intf.m:1997
 #: modules/gui/macosx/intf.m:1998 modules/gui/macosx/intf.m:1999
-#: modules/gui/qt4/menus.cpp:793 modules/misc/notify/xosd.c:235
+#: modules/gui/qt4/menus.cpp:796 modules/misc/notify/xosd.c:235
 msgid "Pause"
 msgstr "Пауза"
 
 #: modules/control/rc.c:74
-#, fuzzy
 msgid "End"
-msgstr "крај"
+msgstr "Крај"
 
 #: modules/control/rc.c:75
 msgid "Error"
@@ -12067,9 +12055,8 @@ msgid "+----[ Remote control commands ]"
 msgstr "+----[ Удаљене контролне команде ]"
 
 #: modules/control/rc.c:800
-#, fuzzy
 msgid "| add XYZ  . . . . . . . . . . . . add XYZ to playlist"
-msgstr "| add XYZ  . . . . . . . . . . додај XYZ у листу за пуштање"
+msgstr "| додај XYZ  . . . . . . . . . . . . додај XYZ у листу за пуштање"
 
 #: modules/control/rc.c:801
 #, fuzzy
@@ -12077,9 +12064,10 @@ msgid "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
 msgstr "| enqueue XYZ  . . . . . . . убаци редно XYZ у листу за пуштање"
 
 #: modules/control/rc.c:802
-#, fuzzy
 msgid "| playlist . . . . .  show items currently in playlist"
-msgstr "| playlist . . .  прикажи ставке које су тренутно у листи за пуштање"
+msgstr ""
+"| листа за пуштање . . . . .  прикажи ставке које су тренутно у листи за "
+"пуштање"
 
 #: modules/control/rc.c:803
 #, fuzzy
@@ -12286,9 +12274,8 @@ msgid "| vzoom [X]  . . . . . . . . . . .  set/get video zoom"
 msgstr "| vzoom [X]  . . . . . . . . .  подеси/узми видео увеличавање"
 
 #: modules/control/rc.c:846
-#, fuzzy
 msgid "| snapshot . . . . . . . . . . . . take video snapshot"
-msgstr "| goto . . . . . . . . . . . .  иди на ставку у индексу"
+msgstr "| Сними слику . . . . . . . . . . . .Сними слику видео снимка"
 
 #: modules/control/rc.c:847
 #, fuzzy
@@ -12719,7 +12706,6 @@ msgid "AVI Index"
 msgstr "AVI Индекс"
 
 #: modules/demux/avi/avi.c:640
-#, fuzzy
 msgid ""
 "This AVI file is broken. Seeking will not work correctly.\n"
 "Do you want to try to fix it?\n"
@@ -12727,7 +12713,9 @@ msgid ""
 "This might take a long time."
 msgstr ""
 "Овај AVI фајл је покварен. Претрага неће радити правилно.\n"
-"Желите ли да покушате да да покравите (може да потраје) ?"
+"Да ли желиш да га поправиш?\n"
+"\n"
+"Може дуго да потраје."
 
 #: modules/demux/avi/avi.c:643
 #, fuzzy
@@ -12739,9 +12727,8 @@ msgid "Don't repair"
 msgstr ""
 
 #: modules/demux/avi/avi.c:2336
-#, fuzzy
 msgid "Fixing AVI Index..."
-msgstr "Поправљање AVI Индекса"
+msgstr "Поправљање AVI Индекса..."
 
 #: modules/demux/cdg.c:45
 #, fuzzy
@@ -12916,41 +12903,41 @@ msgstr "RTP/RTSP/SDP демултиплексер (користи Live555)"
 msgid "RTSP/RTP access and demux"
 msgstr "RTSP/RTP приступ и демултиплексер"
 
-#: modules/demux/live555.cpp:116 modules/demux/live555.cpp:117
+#: modules/demux/live555.cpp:117 modules/demux/live555.cpp:118
 #: modules/gui/macosx/simple_prefs.m:261
 msgid "Use RTP over RTSP (TCP)"
 msgstr "Користи RTP преко RTSP-а (TCP)"
 
-#: modules/demux/live555.cpp:120
+#: modules/demux/live555.cpp:121
 msgid "Client port"
 msgstr "Порт клијента"
 
-#: modules/demux/live555.cpp:121
+#: modules/demux/live555.cpp:122
 msgid "Port to use for the RTP source of the session"
 msgstr "Порт за употребу за RTP извор сесије"
 
-#: modules/demux/live555.cpp:123 modules/demux/live555.cpp:124
+#: modules/demux/live555.cpp:124 modules/demux/live555.cpp:125
 msgid "Force multicast RTP via RTSP"
 msgstr ""
 
-#: modules/demux/live555.cpp:127 modules/demux/live555.cpp:128
+#: modules/demux/live555.cpp:128 modules/demux/live555.cpp:129
 msgid "Tunnel RTSP and RTP over HTTP"
 msgstr "Тунелуј RTSP и RTP преко HTTP-а"
 
-#: modules/demux/live555.cpp:131
+#: modules/demux/live555.cpp:132
 msgid "HTTP tunnel port"
 msgstr "HTTP порт за тунеловање"
 
-#: modules/demux/live555.cpp:132
+#: modules/demux/live555.cpp:133
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "Порт за употребу за тунеловање RTSP/RTP преко HTTP-а."
 
-#: modules/demux/live555.cpp:605
+#: modules/demux/live555.cpp:606
 #, fuzzy
 msgid "RTSP authentication"
 msgstr "RTP вишеструко емитовање (мултикаст)"
 
-#: modules/demux/live555.cpp:606
+#: modules/demux/live555.cpp:607
 msgid "Please enter a valid login name and a password."
 msgstr ""
 
@@ -13218,72 +13205,72 @@ msgid ""
 "prevent adding them to the playlist."
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:73
+#: modules/demux/playlist/playlist.c:72
 msgid "M3U playlist import"
 msgstr "M3U увоз листе за пуштање"
 
-#: modules/demux/playlist/playlist.c:81
+#: modules/demux/playlist/playlist.c:80
 #, fuzzy
 msgid "RAM playlist import"
 msgstr "M3U увоз листе за пуштање"
 
-#: modules/demux/playlist/playlist.c:87
+#: modules/demux/playlist/playlist.c:86
 msgid "PLS playlist import"
 msgstr "PLS увоз листе за пуштање"
 
-#: modules/demux/playlist/playlist.c:93
+#: modules/demux/playlist/playlist.c:92
 msgid "B4S playlist import"
 msgstr "B4S увоз листе за пуштање"
 
-#: modules/demux/playlist/playlist.c:100
+#: modules/demux/playlist/playlist.c:99
 msgid "DVB playlist import"
 msgstr "DVB увоз листе за пуштање"
 
-#: modules/demux/playlist/playlist.c:106
+#: modules/demux/playlist/playlist.c:105
 msgid "Podcast parser"
 msgstr "Анализатор Подкаста"
 
-#: modules/demux/playlist/playlist.c:112
+#: modules/demux/playlist/playlist.c:111
 msgid "XSPF playlist import"
 msgstr "XSPF увоз листе за пуштање"
 
-#: modules/demux/playlist/playlist.c:118
+#: modules/demux/playlist/playlist.c:117
 msgid "New winamp 5.2 shoutcast import"
 msgstr "Нови winamp 5.2 увоз шоуткаста"
 
-#: modules/demux/playlist/playlist.c:126
+#: modules/demux/playlist/playlist.c:125
 #, fuzzy
 msgid "ASX playlist import"
 msgstr "PLS увоз листе за пуштање"
 
-#: modules/demux/playlist/playlist.c:132
+#: modules/demux/playlist/playlist.c:131
 msgid "Kasenna MediaBase parser"
 msgstr "Kasenna MediaBase анализатор"
 
-#: modules/demux/playlist/playlist.c:138
+#: modules/demux/playlist/playlist.c:137
 msgid "QuickTime Media Link importer"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:144
+#: modules/demux/playlist/playlist.c:143
 #, fuzzy
 msgid "Google Video Playlist importer"
 msgstr "Стари извоз листе за пуштање"
 
-#: modules/demux/playlist/playlist.c:150
+#: modules/demux/playlist/playlist.c:149
 #, fuzzy
 msgid "Dummy ifo demux"
 msgstr "Псеудо декодер"
 
-#: modules/demux/playlist/playlist.c:155
+#: modules/demux/playlist/playlist.c:154
 msgid "iTunes Music Library importer"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:161
+#: modules/demux/playlist/playlist.c:160
 #, fuzzy
 msgid "WPL playlist import"
 msgstr "PLS увоз листе за пуштање"
 
-#: modules/demux/playlist/playlist.c:167
+#: modules/demux/playlist/playlist.c:166
 #, fuzzy
 msgid "ZPL playlist import"
 msgstr "PLS увоз листе за пуштање"
@@ -13926,9 +13913,8 @@ msgid "License"
 msgstr "Лиценца"
 
 #: modules/gui/macosx/about.m:186
-#, fuzzy
 msgid "VLC media player Help"
-msgstr "VLC музички програм"
+msgstr "VLC медија плејер помоћ"
 
 #: modules/gui/macosx/about.m:189 modules/gui/macosx/controls.m:540
 #: modules/gui/macosx/intf.m:705
@@ -13937,7 +13923,7 @@ msgstr "Индекс "
 
 #: modules/gui/macosx/bookmarks.m:87
 msgid "Bookmarks"
-msgstr "Обележивачи"
+msgstr "Маркери"
 
 #: modules/gui/macosx/bookmarks.m:88 modules/gui/qt4/ui/sout.h:337
 msgid "Add"
@@ -13945,7 +13931,7 @@ msgstr "Додај"
 
 #: modules/gui/macosx/bookmarks.m:89 modules/gui/macosx/intf.m:642
 #: modules/gui/macosx/simple_prefs.m:246
-#: modules/gui/qt4/components/preferences_widgets.cpp:1198
+#: modules/gui/qt4/components/preferences_widgets.cpp:1199
 #: modules/gui/qt4/dialogs/bookmarks.cpp:47
 msgid "Clear"
 msgstr "Обриши"
@@ -13982,7 +13968,7 @@ msgstr "Време"
 #: modules/gui/macosx/wizard.m:1686 modules/gui/macosx/wizard.m:1867
 #: modules/gui/macosx/wizard.m:1878 modules/gui/macosx/wizard.m:1891
 #: modules/gui/qt4/components/open_panels.cpp:1264
-#: modules/gui/qt4/components/preferences_widgets.cpp:1411
+#: modules/gui/qt4/components/preferences_widgets.cpp:1419
 msgid "OK"
 msgstr "ОК"
 
@@ -14003,7 +13989,7 @@ msgstr "Нема улаза"
 msgid ""
 "No input found. A stream must be playing or paused for bookmarks to work."
 msgstr ""
-"Није пронађен улаз. Ток мора да се репродукује или паузира да би обележивачи "
+"Није пронађен улаз. Ток мора да се репродукује или паузира да би маркери "
 "радили."
 
 #: modules/gui/macosx/bookmarks.m:221
@@ -14024,7 +14010,7 @@ msgstr "Неисправна селекција"
 
 #: modules/gui/macosx/bookmarks.m:273
 msgid "Two bookmarks have to be selected."
-msgstr "Два обележивача трена да буду изабрана."
+msgstr "Два маркера треба да буду изабрана."
 
 #: modules/gui/macosx/bookmarks.m:279
 msgid "No input found"
@@ -14032,7 +14018,7 @@ msgstr "Није пронађен улаз"
 
 #: modules/gui/macosx/bookmarks.m:281
 msgid "The stream must be playing or paused for bookmarks to work."
-msgstr "Ток мора да се преслушава или паузира да би обележивачи радили."
+msgstr "Ток мора да се преслушава или паузира да би маркери радили."
 
 #: modules/gui/macosx/controls.m:59 modules/gui/macosx/controls.m:1068
 msgid "Jump To Time"
@@ -14088,21 +14074,20 @@ msgstr "Исправи пропорције"
 #: modules/gui/macosx/controls.m:825 modules/gui/macosx/intf.m:630
 #: modules/gui/macosx/intf.m:698 modules/gui/qt4/menus.cpp:616
 msgid "Open File..."
-msgstr "Отвори Фајл..."
+msgstr "Отвори датотеку..."
 
 #: modules/gui/macosx/controls.m:1059 modules/gui/macosx/intf.m:656
 #: modules/gui/qt4/menus.cpp:490
-#, fuzzy
 msgid "Quit after Playback"
-msgstr "Локално преслушавање"
+msgstr "Искључи после репродукције"
 
 #: modules/gui/macosx/controls.m:1066 modules/gui/macosx/intf.m:657
 msgid "Step Forward"
-msgstr "Корак Унапред"
+msgstr "Корак унапред"
 
 #: modules/gui/macosx/controls.m:1067 modules/gui/macosx/intf.m:658
 msgid "Step Backward"
-msgstr "Корак Уназад"
+msgstr "Корак уназад"
 
 #: modules/gui/macosx/coredialogs.m:64 modules/gui/macosx/simple_prefs.m:235
 #: modules/gui/qt4/dialogs/external.cpp:119
@@ -14312,14 +14297,12 @@ msgid "Open CrashLog..."
 msgstr "Отвори ДневникГрешака"
 
 #: modules/gui/macosx/intf.m:613
-#, fuzzy
 msgid "Save this Log..."
-msgstr "Сачувај &Као..."
+msgstr "Сачувај овај извештај..."
 
 #: modules/gui/macosx/intf.m:618
-#, fuzzy
 msgid "Check for Update..."
-msgstr "Провери да ли има ажурирања"
+msgstr "Провери да ли је верзија ажурна..."
 
 #: modules/gui/macosx/intf.m:619
 msgid "Preferences..."
@@ -14350,22 +14333,20 @@ msgid "1:File"
 msgstr "1:Фајл"
 
 #: modules/gui/macosx/intf.m:629 modules/gui/qt4/menus.cpp:317
-#, fuzzy
 msgid "Advanced Open File..."
-msgstr "Напредне опције..."
+msgstr "Напредне опције за отварање..."
 
 #: modules/gui/macosx/intf.m:631
 msgid "Open Disc..."
-msgstr "Отвори Диск..."
+msgstr "Отвори диск..."
 
 #: modules/gui/macosx/intf.m:632
 msgid "Open Network..."
 msgstr "Отвори Мрежу..."
 
 #: modules/gui/macosx/intf.m:633
-#, fuzzy
 msgid "Open Capture Device..."
-msgstr "Отвори &Уређај за Захватање..."
+msgstr "Отвори &уређај за снимање..."
 
 #: modules/gui/macosx/intf.m:634
 msgid "Open Recent"
@@ -14400,14 +14381,12 @@ msgid "Playback"
 msgstr "Преслушавање"
 
 #: modules/gui/macosx/intf.m:668 modules/gui/qt4/menus.cpp:569
-#, fuzzy
 msgid "Increase Volume"
-msgstr "Подразумевани ниво звука"
+msgstr "Појачај звук"
 
 #: modules/gui/macosx/intf.m:669 modules/gui/qt4/menus.cpp:572
-#, fuzzy
 msgid "Decrease Volume"
-msgstr "Подразумевани ниво звука"
+msgstr "Утишај звук"
 
 #: modules/gui/macosx/intf.m:694 modules/gui/macosx/intf.m:695
 #: modules/gui/macosx/simple_prefs.m:291 modules/gui/macosx/vout.m:206
@@ -14438,39 +14417,32 @@ msgid "Player..."
 msgstr "Репродукуј/Пусти"
 
 #: modules/gui/macosx/intf.m:715
-#, fuzzy
 msgid "Controller..."
-msgstr "Контролер"
+msgstr "Контролер..."
 
 #: modules/gui/macosx/intf.m:716
-#, fuzzy
 msgid "Equalizer..."
-msgstr "Еквилајзер"
+msgstr "Еквилајзер..."
 
 #: modules/gui/macosx/intf.m:717
-#, fuzzy
 msgid "Extended Controls..."
-msgstr "Проширене Контроле"
+msgstr "Проширене Контроле..."
 
 #: modules/gui/macosx/intf.m:718
-#, fuzzy
 msgid "Bookmarks..."
-msgstr "Обележивачи"
+msgstr "Маркери..."
 
 #: modules/gui/macosx/intf.m:719
-#, fuzzy
 msgid "Playlist..."
-msgstr "Листа за пуштање"
+msgstr "Листа за пуштање..."
 
 #: modules/gui/macosx/intf.m:720 modules/gui/macosx/playlist.m:468
-#, fuzzy
 msgid "Media Information..."
-msgstr "Више Информација"
+msgstr "Информациjе о медију..."
 
 #: modules/gui/macosx/intf.m:721
-#, fuzzy
 msgid "Messages..."
-msgstr "&Поруке..."
+msgstr "Поруке..."
 
 #: modules/gui/macosx/intf.m:722
 msgid "Errors and Warnings..."
@@ -14481,14 +14453,13 @@ msgid "Bring All to Front"
 msgstr "Донеси све Напред"
 
 #: modules/gui/macosx/intf.m:726 modules/gui/qt4/dialogs/help.cpp:54
-#: modules/gui/qt4/menus.cpp:879
+#: modules/gui/qt4/menus.cpp:882
 msgid "Help"
 msgstr "Помоћ"
 
 #: modules/gui/macosx/intf.m:727
-#, fuzzy
 msgid "VLC media player Help..."
-msgstr "VLC музички програм"
+msgstr "VLC медија плејер помоћ..."
 
 #: modules/gui/macosx/intf.m:728
 #, fuzzy
@@ -14496,9 +14467,8 @@ msgid "ReadMe / FAQ..."
 msgstr "ПрочитајМе..."
 
 #: modules/gui/macosx/intf.m:730
-#, fuzzy
 msgid "Online Documentation..."
-msgstr "Документација на Интернету"
+msgstr "Документација на Интернету..."
 
 #: modules/gui/macosx/intf.m:731
 #, fuzzy
@@ -14506,9 +14476,8 @@ msgid "VideoLAN Website..."
 msgstr "VideoLAN Интернет Страница"
 
 #: modules/gui/macosx/intf.m:732
-#, fuzzy
 msgid "Make a donation..."
-msgstr "Учествујте у Донацији"
+msgstr "Направи донацију..."
 
 #: modules/gui/macosx/intf.m:733
 #, fuzzy
@@ -14748,7 +14717,7 @@ msgstr "Локатор Медија Извора (MRL)"
 
 #: modules/gui/macosx/open.m:175 modules/gui/macosx/open.m:207
 #: modules/gui/macosx/open.m:588 modules/gui/macosx/open.m:779
-#: modules/gui/macosx/open.m:960 modules/gui/macosx/open.m:1196
+#: modules/gui/macosx/open.m:954 modules/gui/macosx/open.m:1190
 #: modules/gui/qt4/components/controller.hpp:104
 msgid "Open"
 msgstr "Отвори"
@@ -14845,13 +14814,13 @@ msgid "Address"
 msgstr "Адреса"
 
 #: modules/gui/macosx/open.m:213 modules/gui/macosx/open.m:849
-#: modules/gui/macosx/open.m:913
+#: modules/gui/macosx/open.m:907
 #, fuzzy
 msgid "Unicast"
 msgstr "једноструко емитовање (уникаст)"
 
 #: modules/gui/macosx/open.m:214 modules/gui/macosx/open.m:864
-#: modules/gui/macosx/open.m:928
+#: modules/gui/macosx/open.m:922
 #, fuzzy
 msgid "Multicast"
 msgstr "вишеструко емитовање (мултикаст)"
@@ -14905,7 +14874,7 @@ msgstr "Претходно поглавље"
 msgid "Next Channel"
 msgstr "Канал"
 
-#: modules/gui/macosx/open.m:236 modules/gui/macosx/open.m:1130
+#: modules/gui/macosx/open.m:236 modules/gui/macosx/open.m:1124
 msgid "Retrieving Channel Info..."
 msgstr ""
 
@@ -14965,8 +14934,8 @@ msgstr "Особине Фонта"
 msgid "Subtitle File"
 msgstr "Титл Фајл"
 
-#: modules/gui/macosx/open.m:587 modules/gui/macosx/open.m:959
-#: modules/gui/macosx/open.m:1195 modules/gui/qt4/ui/open_file.h:217
+#: modules/gui/macosx/open.m:587 modules/gui/macosx/open.m:953
+#: modules/gui/macosx/open.m:1189 modules/gui/qt4/ui/open_file.h:217
 msgid "Open File"
 msgstr "Отвори Фајл"
 
@@ -14979,11 +14948,11 @@ msgstr " %@s није пронађено"
 msgid "Open VIDEO_TS Directory"
 msgstr "Отвори VIDEO_TS Директоријум"
 
-#: modules/gui/macosx/open.m:1033
+#: modules/gui/macosx/open.m:1027
 msgid "iSight Capture Input"
 msgstr ""
 
-#: modules/gui/macosx/open.m:1034
+#: modules/gui/macosx/open.m:1028
 msgid ""
 "This facility allows you to process your iSight's input signal.\n"
 "\n"
@@ -14993,12 +14962,12 @@ msgid ""
 "Live Audio input is not supported."
 msgstr ""
 
-#: modules/gui/macosx/open.m:1136
+#: modules/gui/macosx/open.m:1130
 #, fuzzy
 msgid "Composite input"
 msgstr "Изаберите улаз"
 
-#: modules/gui/macosx/open.m:1139
+#: modules/gui/macosx/open.m:1133
 #, fuzzy
 msgid "S-Video input"
 msgstr "Видео улазни пин"
@@ -15093,7 +15062,7 @@ msgstr "Трајање"
 
 #: modules/gui/macosx/playlist.m:463
 msgid "Save Playlist..."
-msgstr "Сачувај Листу за пуштање..."
+msgstr "Сачувај листу за пуштање..."
 
 #: modules/gui/macosx/playlist.m:465 modules/gui/qt4/dialogs/bookmarks.cpp:45
 #: modules/gui/qt4/ui/streampanel.h:173
@@ -15137,7 +15106,7 @@ msgstr "Претражи у Листи за пуштање"
 
 #: modules/gui/macosx/playlist.m:483
 msgid "Add Folder to Playlist"
-msgstr "Додај Фасциклу у Листу за пуштање"
+msgstr "Додај Фасциклу у листу за пуштање"
 
 #: modules/gui/macosx/playlist.m:485
 msgid "File Format:"
@@ -15171,7 +15140,7 @@ msgstr "%i ставки"
 
 #: modules/gui/macosx/playlist.m:744
 msgid "Save Playlist"
-msgstr "Сачувај Листу за пуштање"
+msgstr "Сачувај листу за пуштање"
 
 #: modules/gui/macosx/playlist.m:1283 modules/gui/ncurses.c:1737
 msgid "Meta-information"
@@ -15183,9 +15152,8 @@ msgstr "Празна Фасцикла"
 
 #: modules/gui/macosx/playlistinfo.m:74
 #: modules/gui/qt4/dialogs/mediainfo.cpp:49
-#, fuzzy
 msgid "Media Information"
-msgstr "Више Информација"
+msgstr "Информације о медију"
 
 #: modules/gui/macosx/playlistinfo.m:75
 #, fuzzy
@@ -15238,10 +15206,10 @@ msgid "Lost frames"
 msgstr "Изгубљени фрејмови"
 
 #: modules/gui/macosx/playlistinfo.m:109 modules/gui/macosx/wizard.m:363
-#: modules/gui/qt4/dialogs_provider.cpp:622
+#: modules/gui/qt4/dialogs_provider.cpp:627
 #: modules/video_filter/deinterlace.c:149
 msgid "Streaming"
-msgstr "Пуштање тока"
+msgstr "Емитовање"
 
 #: modules/gui/macosx/playlistinfo.m:110
 msgid "Sent packets"
@@ -15325,45 +15293,37 @@ msgstr "Ништа"
 
 #: modules/gui/macosx/simple_prefs.m:180
 #: modules/gui/qt4/components/simple_preferences.cpp:519
-#, fuzzy
 msgid "Interface Settings"
-msgstr "Општа подешавања интерфејса"
+msgstr "Подешавање интерфејса"
 
 #: modules/gui/macosx/simple_prefs.m:184
-#, fuzzy
 msgid "General Audio Settings"
 msgstr "Општа звучна подешавања"
 
 #: modules/gui/macosx/simple_prefs.m:188
-#, fuzzy
 msgid "General Video Settings"
 msgstr "Општа видео подешавања"
 
 #: modules/gui/macosx/simple_prefs.m:192
-#, fuzzy
 msgid "Subtitles & OSD"
-msgstr "Титлови/OSD"
+msgstr "Титлови и OSD"
 
 #: modules/gui/macosx/simple_prefs.m:192
 #: modules/gui/qt4/components/simple_preferences.cpp:618
-#, fuzzy
 msgid "Subtitles & On Screen Display Settings"
-msgstr "Подешавања демултиплексера за титлове"
+msgstr "Подешавање титлова и дисплеја на екрану(OSD)"
 
 #: modules/gui/macosx/simple_prefs.m:196
-#, fuzzy
 msgid "Input & Codecs"
-msgstr "Улаз / Кодеци"
+msgstr "Улаз и Кодеци"
 
 #: modules/gui/macosx/simple_prefs.m:196
-#, fuzzy
 msgid "Input & Codec settings"
-msgstr "Улаз / Кодеци"
+msgstr "Улаз и подешавање Кодека"
 
 #: modules/gui/macosx/simple_prefs.m:228
-#, fuzzy
 msgid "Effects"
-msgstr "Ефекат"
+msgstr "Ефекти"
 
 #: modules/gui/macosx/simple_prefs.m:229
 #, fuzzy
@@ -15371,31 +15331,26 @@ msgid "Enable Audio"
 msgstr "Укључи звук"
 
 #: modules/gui/macosx/simple_prefs.m:230
-#, fuzzy
 msgid "General Audio"
-msgstr "Опште"
+msgstr "Општа аудио подешавања"
 
 #: modules/gui/macosx/simple_prefs.m:231
-#, fuzzy
 msgid "Headphone surround effect"
 msgstr "Ефекат Слушалица"
 
 #: modules/gui/macosx/simple_prefs.m:232
-#, fuzzy
 msgid "Preferred Audio language"
-msgstr "Језик звука"
+msgstr "Подразумевани аудио језик"
 
 #: modules/gui/macosx/simple_prefs.m:233
 msgid "Enable Last.fm submissions"
 msgstr ""
 
 #: modules/gui/macosx/simple_prefs.m:238
-#, fuzzy
 msgid "Visualization"
-msgstr "Визуализације"
+msgstr "Визуелизације"
 
 #: modules/gui/macosx/simple_prefs.m:239
-#, fuzzy
 msgid "Default Volume"
 msgstr "Подразумевани ниво звука"
 
@@ -15426,7 +15381,7 @@ msgstr "Шоуткаст"
 
 #: modules/gui/macosx/simple_prefs.m:252
 msgid "Repair AVI Files"
-msgstr ""
+msgstr "Поправи АВИ фајл"
 
 #: modules/gui/macosx/simple_prefs.m:253
 #, fuzzy
@@ -15444,7 +15399,6 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/simple_prefs.m:256
-#, fuzzy
 msgid "HTTP Proxy"
 msgstr "HTTP прокси"
 
@@ -15477,7 +15431,6 @@ msgid "Add controls to the video window"
 msgstr "Контраст видео улаза."
 
 #: modules/gui/macosx/simple_prefs.m:268
-#, fuzzy
 msgid "Show Fullscreen Controller"
 msgstr "Прикажи контролер пуног екрана"
 
@@ -15491,44 +15444,36 @@ msgid "...when VLC is in background"
 msgstr ""
 
 #: modules/gui/macosx/simple_prefs.m:274
-#, fuzzy
 msgid "Automatically check for updates"
-msgstr "Провери да ли има ажурирања"
+msgstr "Аутоматски провери за надоградње"
 
 #: modules/gui/macosx/simple_prefs.m:278
-#, fuzzy
 msgid "Default Encoding"
-msgstr "Декодирање"
+msgstr "Подразумевано енкодовање"
 
 #: modules/gui/macosx/simple_prefs.m:279
-#, fuzzy
 msgid "Display Settings"
-msgstr "Резолуција приказа"
+msgstr "Подешавање приказа"
 
 #: modules/gui/macosx/simple_prefs.m:281
-#, fuzzy
 msgid "Font Color"
-msgstr "Боја"
+msgstr "Боја фонта"
 
 #: modules/gui/macosx/simple_prefs.m:282
-#, fuzzy
 msgid "Font Size"
 msgstr "Величина фонта"
 
 #: modules/gui/macosx/simple_prefs.m:284
-#, fuzzy
 msgid "Subtitle Languages"
 msgstr "Језик титла"
 
 #: modules/gui/macosx/simple_prefs.m:285
-#, fuzzy
 msgid "Preferred Subtitle Language"
-msgstr "Језик титла"
+msgstr "Подразумевани језик титла"
 
 #: modules/gui/macosx/simple_prefs.m:287
-#, fuzzy
 msgid "Enable OSD"
-msgstr "Укључи"
+msgstr "Укључи OSD"
 
 #: modules/gui/macosx/simple_prefs.m:290
 #, fuzzy
@@ -15551,9 +15496,8 @@ msgid "Output module"
 msgstr "Излазни модули"
 
 #: modules/gui/macosx/simple_prefs.m:298
-#, fuzzy
 msgid "Video snapshots"
-msgstr "Формат слика видеа"
+msgstr "Видео снимак слике"
 
 #: modules/gui/macosx/simple_prefs.m:300 modules/meta_engine/folder.c:66
 #, fuzzy
@@ -15561,9 +15505,8 @@ msgid "Folder"
 msgstr "Празна Фасцикла"
 
 #: modules/gui/macosx/simple_prefs.m:301
-#, fuzzy
 msgid "Format"
-msgstr "VCD Формат"
+msgstr "Формат"
 
 #: modules/gui/macosx/simple_prefs.m:302
 msgid "Prefix"
@@ -16351,9 +16294,8 @@ msgid "[Repeat] "
 msgstr "Понови све"
 
 #: modules/gui/ncurses.c:1487
-#, fuzzy
 msgid "[Random] "
-msgstr "Насумице"
+msgstr "[Насумице] "
 
 #: modules/gui/ncurses.c:1488
 #, fuzzy
@@ -16386,9 +16328,9 @@ msgid " Position : %s/%s (%.2f%%)"
 msgstr ""
 
 #: modules/gui/ncurses.c:1532
-#, fuzzy, c-format
+#, c-format
 msgid " Volume   : %i%%"
-msgstr "Јачина Звука: %d%%"
+msgstr " Звук   : %i%%"
 
 #: modules/gui/ncurses.c:1539
 #, c-format
@@ -16396,9 +16338,9 @@ msgid " Title    : %d/%d"
 msgstr ""
 
 #: modules/gui/ncurses.c:1547
-#, fuzzy, c-format
+#, c-format
 msgid " Chapter  : %d/%d"
-msgstr "Поглавље %i"
+msgstr "Поглавље  : %d/%d"
 
 #: modules/gui/ncurses.c:1557
 #, c-format
@@ -16411,14 +16353,12 @@ msgid " [ h for help ]"
 msgstr "+----[ крај помоћи ]"
 
 #: modules/gui/ncurses.c:1581
-#, fuzzy
 msgid " Help "
-msgstr "Помоћ"
+msgstr "&Помоћ"
 
 #: modules/gui/ncurses.c:1585
-#, fuzzy
 msgid "[Display]"
-msgstr "Прикажи"
+msgstr "[Дисплеј]"
 
 #: modules/gui/ncurses.c:1588
 msgid "     h,H         Show/Hide help box"
@@ -16462,9 +16402,8 @@ msgid "     Esc         Close Add/Search entry"
 msgstr ""
 
 #: modules/gui/ncurses.c:1602
-#, fuzzy
 msgid "[Global]"
-msgstr "Глобално појачање"
+msgstr "[Глобално]"
 
 #: modules/gui/ncurses.c:1605
 msgid "     q, Q, Esc   Quit"
@@ -16484,9 +16423,8 @@ msgid "     f           Toggle Fullscreen"
 msgstr "| f [on|off] . . . . . . . . . . пребаци се у стање пуног екрана"
 
 #: modules/gui/ncurses.c:1609
-#, fuzzy
 msgid "     n, p        Next/Previous playlist item"
-msgstr "| prev . . . . . . . . . .  претходна ставка у листи за пуштање"
+msgstr "     n, p        Следећа/Претходна ставка у листи за пуштање"
 
 #: modules/gui/ncurses.c:1610
 msgid "     [, ]        Next/Previous title"
@@ -16508,16 +16446,15 @@ msgstr ""
 
 #: modules/gui/ncurses.c:1614
 msgid "     a           Volume Up"
-msgstr ""
+msgstr "    a           Појачај звук"
 
 #: modules/gui/ncurses.c:1615
 msgid "     z           Volume Down"
-msgstr ""
+msgstr "     z           Смањи звук"
 
 #: modules/gui/ncurses.c:1620
-#, fuzzy
 msgid "[Playlist]"
-msgstr "Листа за пуштање"
+msgstr "[Листа за пуштање]"
 
 #: modules/gui/ncurses.c:1623
 msgid "     r           Toggle Random playing"
@@ -16550,7 +16487,7 @@ msgstr ""
 
 #: modules/gui/ncurses.c:1630
 msgid "     A           Add an entry"
-msgstr ""
+msgstr "     A           Додај унос"
 
 #: modules/gui/ncurses.c:1631
 msgid "     D, <del>    Delete an entry"
@@ -16594,9 +16531,8 @@ msgid "     <pgup>,<pgdown> Navigate through the box page by page"
 msgstr ""
 
 #: modules/gui/ncurses.c:1657
-#, fuzzy
 msgid "[Player]"
-msgstr "Репродукуј/Пусти"
+msgstr "[Плејер]"
 
 #: modules/gui/ncurses.c:1660
 #, c-format
@@ -16637,18 +16573,16 @@ msgid " Logs "
 msgstr ""
 
 #: modules/gui/ncurses.c:1873
-#, fuzzy
 msgid " Browse "
-msgstr "Потражи..."
+msgstr "Претражи"
 
 #: modules/gui/ncurses.c:1928
 msgid " Objects "
 msgstr ""
 
 #: modules/gui/ncurses.c:1942
-#, fuzzy
 msgid " Stats "
-msgstr "Сачувај"
+msgstr "Статистика"
 
 #: modules/gui/ncurses.c:2037
 #, c-format
@@ -16675,39 +16609,36 @@ msgid "Find: %s"
 msgstr ""
 
 #: modules/gui/ncurses.c:2186
-#, fuzzy, c-format
+#, c-format
 msgid "Open: %s"
-msgstr "Отвори:"
+msgstr "Отвори: %s"
 
 #: modules/gui/qt4/components/controller.cpp:281
-#, fuzzy
 msgid "Shift+L"
-msgstr "Shift тастер"
+msgstr "Shift+L"
 
 #: modules/gui/qt4/components/controller.cpp:378
 msgid "Click to toggle between loop one, loop all"
-msgstr ""
+msgstr "Кликни да изабереш између понављај једну, понављај све"
 
 #: modules/gui/qt4/components/controller.cpp:441
-#, fuzzy
 msgid "Previous Chapter/Title"
-msgstr "Претходно поглавље"
+msgstr "Претходно поглавље/наслов"
 
 #: modules/gui/qt4/components/controller.cpp:447
 msgid "Menu"
 msgstr "Мени"
 
 #: modules/gui/qt4/components/controller.cpp:453
-#, fuzzy
 msgid "Next Chapter/Title"
-msgstr "Следеће поглавље"
+msgstr "Следеће поглавље/наслов"
 
-#: modules/gui/qt4/components/controller.cpp:490
+#: modules/gui/qt4/components/controller.cpp:486
 #, fuzzy
 msgid "Teletext Activation"
 msgstr "Поравнање података"
 
-#: modules/gui/qt4/components/controller.cpp:506
+#: modules/gui/qt4/components/controller.cpp:502
 #, fuzzy
 msgid "Toggle Transparency "
 msgstr "Провидност"
@@ -16717,16 +16648,16 @@ msgid ""
 "Play\n"
 "If the playlist is empty, open a medium"
 msgstr ""
+"Пусти\n"
+"Ако је листа за пуштање празна, отвори датотеку"
 
 #: modules/gui/qt4/components/controller.hpp:106
-#, fuzzy
 msgid "De-Fullscreen"
-msgstr "Пун екран"
+msgstr "Искључи приказ преко пуног екрана"
 
 #: modules/gui/qt4/components/controller.hpp:106
-#, fuzzy
 msgid "Extended panel"
-msgstr "Проширене контроле"
+msgstr "Проширени панел"
 
 #: modules/gui/qt4/components/controller.hpp:107
 #, fuzzy
@@ -16734,9 +16665,8 @@ msgid "A->B Loop"
 msgstr "У круг"
 
 #: modules/gui/qt4/components/controller.hpp:107
-#, fuzzy
 msgid "Frame By Frame"
-msgstr "Брзина оквира"
+msgstr "Фрејм по фрејм"
 
 #: modules/gui/qt4/components/controller.hpp:107
 #, fuzzy
@@ -16745,15 +16675,13 @@ msgstr "Сортирај Наопачке"
 
 #: modules/gui/qt4/components/controller.hpp:108
 #: modules/gui/qt4/components/controller.hpp:118
-#, fuzzy
 msgid "Step backward"
-msgstr "Корак Уназад"
+msgstr "Корак уназад"
 
 #: modules/gui/qt4/components/controller.hpp:108
 #: modules/gui/qt4/components/controller.hpp:118
-#, fuzzy
 msgid "Step forward"
-msgstr "Корак Унапред"
+msgstr "Корак унапред"
 
 #: modules/gui/qt4/components/controller.hpp:109
 #, fuzzy
@@ -16761,58 +16689,48 @@ msgid "Loop/Repeat mode"
 msgstr "Понављај Једно"
 
 #: modules/gui/qt4/components/controller.hpp:111
-#, fuzzy
 msgid "Stop playback"
-msgstr "Локално преслушавање"
+msgstr "Прекини репродукцију"
 
 #: modules/gui/qt4/components/controller.hpp:111
-#, fuzzy
 msgid "Open a medium"
-msgstr "Отвори Фајл"
+msgstr "Отвори датотеку"
 
 #: modules/gui/qt4/components/controller.hpp:112
-#, fuzzy
 msgid "Previous media in the playlist"
-msgstr "Нема ставки у листи за пуштање"
+msgstr "Претходна датотека у листи за пуштање"
 
 #: modules/gui/qt4/components/controller.hpp:113
-#, fuzzy
 msgid "Next media in the playlist"
-msgstr "Нема ставки у листи за пуштање"
+msgstr "Следећа датотека у листи за пуштање"
 
 #: modules/gui/qt4/components/controller.hpp:114
-#, fuzzy
 msgid "Toggle the video in fullscreen"
-msgstr "Покрени видео у режиму пуног екрана"
+msgstr "Пребаци видео у режим пуног екрана"
 
 #: modules/gui/qt4/components/controller.hpp:114
-#, fuzzy
 msgid "Toggle the video out fullscreen"
-msgstr "Покрени видео у режиму пуног екрана"
+msgstr "Пребаци видео из режима пуног екрана"
 
 #: modules/gui/qt4/components/controller.hpp:115
-#, fuzzy
 msgid "Show extended settings"
 msgstr "Прикажи напредне опције"
 
 #: modules/gui/qt4/components/controller.hpp:115
-#, fuzzy
 msgid "Show playlist"
-msgstr "Сачувај листу за пуштање"
+msgstr "Прикажи листу за пуштање"
 
 #: modules/gui/qt4/components/controller.hpp:116
-#, fuzzy
 msgid "Take a snapshot"
-msgstr "Узми слику видеа"
+msgstr "Сними слику"
 
 #: modules/gui/qt4/components/controller.hpp:117
 msgid "Loop from point A to point B continuously."
-msgstr ""
+msgstr "Понављај од тачке А до тачке Б непрестано."
 
 #: modules/gui/qt4/components/controller.hpp:117
-#, fuzzy
 msgid "Frame by frame"
-msgstr "Брзина оквира"
+msgstr "Фрејм по фрејм"
 
 #: modules/gui/qt4/components/controller.hpp:118
 #, fuzzy
@@ -16824,21 +16742,18 @@ msgid "Change the loop and repeat modes"
 msgstr ""
 
 #: modules/gui/qt4/components/controller_widget.cpp:133
-#, fuzzy
 msgctxt "Tooltip|Unmute"
 msgid "Unmute"
-msgstr "Искључи звук"
+msgstr "Укључи звук"
 
 #: modules/gui/qt4/components/controller_widget.cpp:142
-#, fuzzy
 msgctxt "Tooltip|Mute"
 msgid "Mute"
 msgstr "Искључи звук"
 
 #: modules/gui/qt4/components/controller_widget.cpp:229
-#, fuzzy
 msgid "Pause the playback"
-msgstr "Локално преслушавање"
+msgstr "Паузирај репродукцију"
 
 #: modules/gui/qt4/components/controller_widget.cpp:238
 msgid ""
@@ -16863,7 +16778,7 @@ msgstr "Појачање"
 #: modules/gui/qt4/components/extended_panels.cpp:1005
 #: modules/gui/qt4/components/extended_panels.cpp:1062
 msgid "dB"
-msgstr ""
+msgstr "dB"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1143
 #, fuzzy
@@ -16941,9 +16856,8 @@ msgid "Output/Written/Sent"
 msgstr ""
 
 #: modules/gui/qt4/components/info_panels.cpp:512
-#, fuzzy
 msgid "Media data size"
-msgstr "Медитација"
+msgstr ""
 
 #: modules/gui/qt4/components/info_panels.cpp:516
 msgid "Demuxed data size"
@@ -17029,6 +16943,8 @@ msgid ""
 "Current playback speed: %1\n"
 "Click to adjust"
 msgstr ""
+"Тренутна брзина репродукције: %1\n"
+"Кликни да подесиш"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:491
 msgid "Revert to normal play speed"
@@ -17040,7 +16956,7 @@ msgstr ""
 
 #: modules/gui/qt4/components/interface_widgets.cpp:607
 msgid "Click to toggle between elapsed and remaining time"
-msgstr ""
+msgstr "Кликни да пребацујеш између протеклог и преосталог времена"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:609
 #, fuzzy
@@ -17084,9 +17000,8 @@ msgstr "Изаберите фајл"
 
 #: modules/gui/qt4/components/open_panels.cpp:668
 #: modules/gui/qt4/components/open_panels.cpp:929
-#, fuzzy
 msgid "DVB Type:"
-msgstr "Врста"
+msgstr "DVB Врста:"
 
 #: modules/gui/qt4/components/open_panels.cpp:694
 #: modules/gui/qt4/components/open_panels.cpp:960
@@ -17112,7 +17027,7 @@ msgstr "Улазни Екран"
 
 #: modules/gui/qt4/components/open_panels.cpp:833
 msgid ".*"
-msgstr ""
+msgstr ".*"
 
 #: modules/gui/qt4/components/open_panels.cpp:840
 #, fuzzy
@@ -17195,7 +17110,7 @@ msgstr ""
 
 #: modules/gui/qt4/components/playlist/selector.cpp:267
 msgid "My Computer"
-msgstr ""
+msgstr "Компијутер"
 
 #: modules/gui/qt4/components/playlist/selector.cpp:269
 msgid "Devices"
@@ -17237,16 +17152,16 @@ msgstr ""
 msgid "URI"
 msgstr "URI"
 
-#: modules/gui/qt4/components/playlist/standardpanel.cpp:55
+#: modules/gui/qt4/components/playlist/standardpanel.cpp:56
 msgid "Detailed View"
 msgstr ""
 
-#: modules/gui/qt4/components/playlist/standardpanel.cpp:56
+#: modules/gui/qt4/components/playlist/standardpanel.cpp:57
 #, fuzzy
 msgid "Icon View"
 msgstr "Преглед"
 
-#: modules/gui/qt4/components/playlist/standardpanel.cpp:57
+#: modules/gui/qt4/components/playlist/standardpanel.cpp:58
 #, fuzzy
 msgid "List View"
 msgstr "Преглед Листе за пуштање"
@@ -17266,70 +17181,63 @@ msgid "Hotkey"
 msgstr "Пречице"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1192
-#: modules/gui/qt4/components/preferences_widgets.cpp:1398
+#: modules/gui/qt4/components/preferences_widgets.cpp:1406
 #, fuzzy
 msgid "Global"
 msgstr "Глобално појачање"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1199
-#, fuzzy
-msgid "Set"
-msgstr "Подеси QP"
+#: modules/gui/qt4/components/preferences_widgets.cpp:1200
+msgid "Apply"
+msgstr "Примени"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1348
+#: modules/gui/qt4/components/preferences_widgets.cpp:1356
 #: modules/gui/qt4/util/customwidgets.cpp:439
 #, fuzzy
 msgid "Unset"
 msgstr "Корисник"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1399
+#: modules/gui/qt4/components/preferences_widgets.cpp:1407
 #, fuzzy
 msgid "Hotkey for "
 msgstr "Пречице"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1403
+#: modules/gui/qt4/components/preferences_widgets.cpp:1411
 msgid "Press the new keys for "
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1434
+#: modules/gui/qt4/components/preferences_widgets.cpp:1442
 msgid "Warning: the key is already assigned to \""
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1454
 #: modules/gui/qt4/components/preferences_widgets.cpp:1462
+#: modules/gui/qt4/components/preferences_widgets.cpp:1470
 #, fuzzy
 msgid "Key: "
 msgstr "Кључ"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:87
-#, fuzzy
 msgid "Subtitles && OSD"
-msgstr "Титлови/OSD"
+msgstr "Титлови &и OSD"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:89
-#, fuzzy
 msgid "Input && Codecs"
-msgstr "Улаз / Кодеци"
+msgstr "Улаз &и Кодеци"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:212
-#, fuzzy
 msgid "Video Settings"
-msgstr "Видео подешавања"
+msgstr "Видео подешавање"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:248
-#, fuzzy
 msgid "Audio Settings"
-msgstr "Подешавање за звук"
+msgstr "Аудио подешавање"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:260
-#, fuzzy
 msgid "Device:"
-msgstr "Уређај"
+msgstr "Уређај:"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:406
-#, fuzzy
 msgid "Input & Codecs Settings"
-msgstr "Улаз / Кодеци"
+msgstr "Улаз и подешавање Кодека"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:411
 msgid ""
@@ -17349,9 +17257,8 @@ msgid "System's default"
 msgstr "Id Система"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:646
-#, fuzzy
 msgid "Configure Hotkeys"
-msgstr "Подеси"
+msgstr "Подешавање пречица"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:910
 #: modules/gui/qt4/dialogs_provider.hpp:51
@@ -17372,9 +17279,8 @@ msgid "Playlist Files"
 msgstr "Преглед Листе за пуштање"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:964
-#, fuzzy
 msgid "&Apply"
-msgstr "Примени"
+msgstr "&Примени"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:965
 #: modules/gui/qt4/dialogs/convert.cpp:96
@@ -17388,9 +17294,8 @@ msgstr "&Одустани"
 
 #: modules/gui/qt4/components/sout/profile_selector.cpp:41
 #: modules/gui/qt4/dialogs/toolbar.cpp:142
-#, fuzzy
 msgid "Profile"
-msgstr "Љубичаста"
+msgstr "Профил"
 
 #: modules/gui/qt4/components/sout/profile_selector.cpp:49
 #, fuzzy
@@ -17512,14 +17417,12 @@ msgid "Login:pass"
 msgstr "Пријава"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:38
-#, fuzzy
 msgid "Edit Bookmarks"
-msgstr "Уреди обележивач"
+msgstr "Уреди маркере"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:43
-#, fuzzy
 msgid "Create"
-msgstr "Центар"
+msgstr "Направи"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:44
 msgid "Create a new bookmark"
@@ -17531,9 +17434,8 @@ msgid "Delete the selected item"
 msgstr "Уклања изабране обележиваче"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:48
-#, fuzzy
 msgid "Delete all the bookmarks"
-msgstr "Одреди обележиваче листе за пуштање."
+msgstr "Обриши све маркере"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:53
 #: modules/gui/qt4/dialogs/errors.cpp:47
@@ -17590,7 +17492,7 @@ msgid "Errors"
 msgstr "Грешке"
 
 #: modules/gui/qt4/dialogs/errors.cpp:48
-#: modules/gui/qt4/dialogs/messages.cpp:184 modules/gui/qt4/menus.cpp:1514
+#: modules/gui/qt4/dialogs/messages.cpp:184 modules/gui/qt4/menus.cpp:1507
 msgid "&Clear"
 msgstr "&Очисти"
 
@@ -17609,19 +17511,16 @@ msgid "Graphic Equalizer"
 msgstr "Параметрички Еквилајзер"
 
 #: modules/gui/qt4/dialogs/extended.cpp:61
-#, fuzzy
 msgid "Audio Effects"
-msgstr "Аудио кодеци"
+msgstr "Аудио ефекти"
 
 #: modules/gui/qt4/dialogs/extended.cpp:72
-#, fuzzy
 msgid "Video Effects"
-msgstr "Видео кодеци"
+msgstr "Видео ефекти"
 
 #: modules/gui/qt4/dialogs/extended.cpp:75
-#, fuzzy
 msgid "Synchronization"
-msgstr "Синхронизација сата"
+msgstr "Синхронизација"
 
 #: modules/gui/qt4/dialogs/extended.cpp:80
 #, fuzzy
@@ -17629,24 +17528,21 @@ msgid "v4l2 controls"
 msgstr "Контрола преслушавања"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:42
-#, fuzzy
 msgid "Go to Time"
-msgstr "Идите на Наслов"
+msgstr "Иди на време"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:48
-#, fuzzy
 msgid "&Go"
-msgstr "&Не"
+msgstr "&Иди"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:59
-#, fuzzy
 msgid "Go to time"
-msgstr "Идите на Наслов"
+msgstr "Иди на време"
 
 #: modules/gui/qt4/dialogs/help.cpp:85 modules/gui/qt4/dialogs/help.cpp:163
 #: modules/gui/qt4/dialogs/plugins.cpp:467
 msgid "About"
-msgstr "Нешто О"
+msgstr "О програму"
 
 #: modules/gui/qt4/dialogs/help.cpp:114
 msgid ""
@@ -17656,12 +17552,19 @@ msgid ""
 "platform.\n"
 "\n"
 msgstr ""
+"VLC медија плејер је бесплатан медија плејер, енкодер и стример који може "
+"читати из фајлова, ЦД-ова, ДВД-ова, мрежних стимова, греб картица и још "
+"више!\n"
+"VLC користи своје интерне кодеке и ради на свим познатим платформама.\n"
+"\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:119
 msgid ""
 "This version of VLC was compiled by:\n"
 " "
 msgstr ""
+"Ова верзија VLC-а је састављена од стране:\n"
+" "
 
 #: modules/gui/qt4/dialogs/help.cpp:122
 msgid "Compiler: "
@@ -17672,17 +17575,17 @@ msgid ""
 "You are using the Qt4 Interface.\n"
 "\n"
 msgstr ""
+"Користите Qt4 интерфејс.\n"
+"\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:124
-#, fuzzy
 msgid "Copyright (C) "
-msgstr "Право умножавања"
+msgstr "Ауторско право (C) "
 
 #: modules/gui/qt4/dialogs/help.cpp:125
-#, fuzzy
 msgid " by the VideoLAN Team.\n"
 msgstr ""
-"(c) 1996-2006 - VideoLAN Тим\n"
+" VideoLAN Тим.\n"
 "\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:146
@@ -17691,41 +17594,41 @@ msgid ""
 "the following people (and the missing ones...) for their collaboration to "
 "create the best free software."
 msgstr ""
+"Хтели би да се захвалимо целој VLC заједници, тестерима, нама и следећим "
+"људима (и онима који недостају...) за њихово залагање да се направи најбољи "
+"бесплатни софтвер."
 
 #: modules/gui/qt4/dialogs/help.cpp:164
-#, fuzzy
 msgid "Authors"
-msgstr "Аутор"
+msgstr "Аутори"
 
 #: modules/gui/qt4/dialogs/help.cpp:165
-#, fuzzy
 msgid "Thanks"
-msgstr "Траке"
+msgstr "Захвалница"
 
 #: modules/gui/qt4/dialogs/help.cpp:201
-#, fuzzy
 msgid "VLC media player updates"
-msgstr "VLC музички програм"
+msgstr "VLC медија плејер надоградња"
 
 #: modules/gui/qt4/dialogs/help.cpp:207
 msgid "&Recheck version"
-msgstr ""
+msgstr "&Поново провери верзију"
 
 #: modules/gui/qt4/dialogs/help.cpp:214
-#, fuzzy
 msgid "Checking for an update..."
-msgstr "Провери да ли има ажурирања"
+msgstr "Провера за надоградњу..."
 
 #: modules/gui/qt4/dialogs/help.cpp:218
 msgid ""
 "\n"
 "Do you want to download it?\n"
 msgstr ""
+"\n"
+"Да ли желиш да је преузмеш?\n"
 
 #: modules/gui/qt4/dialogs/help.cpp:266
-#, fuzzy
 msgid "Launching an update request..."
-msgstr "Провери да ли има ажурирања"
+msgstr "Покрећем захтев за надоградњу..."
 
 #: modules/gui/qt4/dialogs/help.cpp:305
 msgid "&Yes"
@@ -17733,7 +17636,7 @@ msgstr "&Да"
 
 #: modules/gui/qt4/dialogs/help.cpp:306
 msgid "A new version of VLC("
-msgstr ""
+msgstr "Нова верзија VLC("
 
 #: modules/gui/qt4/dialogs/help.cpp:312
 #, fuzzy
@@ -17742,11 +17645,11 @@ msgstr "Нема помоћних објашњења."
 
 #: modules/gui/qt4/dialogs/help.cpp:325
 msgid "You have the latest version of VLC media player."
-msgstr ""
+msgstr "Имаш последњу верзију VLC медија плејера."
 
 #: modules/gui/qt4/dialogs/help.cpp:329
 msgid "An error occurred while checking for updates..."
-msgstr ""
+msgstr "Десила се грешка приликом провере за надоградњу..."
 
 #: modules/gui/qt4/dialogs/mediainfo.cpp:56
 #, fuzzy
@@ -17789,9 +17692,8 @@ msgid "C&lear"
 msgstr "Обриши"
 
 #: modules/gui/qt4/dialogs/messages.cpp:113
-#, fuzzy
 msgid "&Save as..."
-msgstr "Сачувај &Као..."
+msgstr "&Сачувај као..."
 
 #: modules/gui/qt4/dialogs/messages.cpp:114
 msgid "Saves all the displayed logs to a file"
@@ -17808,9 +17710,8 @@ msgid "Message filter"
 msgstr "Приступни филтери"
 
 #: modules/gui/qt4/dialogs/messages.cpp:173
-#, fuzzy
 msgid "&Update"
-msgstr "Ажурирај"
+msgstr "&Ажурирај"
 
 #: modules/gui/qt4/dialogs/messages.cpp:290
 #, fuzzy
@@ -17827,10 +17728,9 @@ msgid ""
 "%2."
 msgstr ""
 
-#: modules/gui/qt4/dialogs/open.cpp:80 modules/gui/qt4/menus.cpp:863
-#, fuzzy
+#: modules/gui/qt4/dialogs/open.cpp:80 modules/gui/qt4/menus.cpp:866
 msgid "Open Media"
-msgstr "Отвори Фајл"
+msgstr "Отвори Датотеку"
 
 #: modules/gui/qt4/dialogs/open.cpp:92
 msgid "&File"
@@ -17847,9 +17747,8 @@ msgid "&Network"
 msgstr "Мрежа"
 
 #: modules/gui/qt4/dialogs/open.cpp:98
-#, fuzzy
 msgid "Capture &Device"
-msgstr "Отвори &Уређај за Захватање..."
+msgstr "Отвори &уређај за снимање..."
 
 #: modules/gui/qt4/dialogs/open.cpp:113
 #, fuzzy
@@ -17862,9 +17761,8 @@ msgid "&Enqueue"
 msgstr ""
 
 #: modules/gui/qt4/dialogs/open.cpp:119 modules/gui/qt4/dialogs/open.cpp:221
-#, fuzzy
 msgid "&Play"
-msgstr "Репродукуј/Пусти"
+msgstr "&Репродукуј/Пусти"
 
 #: modules/gui/qt4/dialogs/open.cpp:121 modules/gui/qt4/dialogs/open.cpp:211
 #: modules/gui/qt4/dialogs/sout.cpp:96
@@ -17879,7 +17777,7 @@ msgstr "Контраст"
 
 #: modules/gui/qt4/dialogs/open.cpp:214
 msgid "&Convert / Save"
-msgstr ""
+msgstr "&Ковертуј / Сачувај"
 
 #: modules/gui/qt4/dialogs/openurl.cpp:47
 #, fuzzy
@@ -17902,9 +17800,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/dialogs/plugins.cpp:58
-#, fuzzy
 msgid "Plugins and extensions"
-msgstr "Игнорисане екстензије"
+msgstr "Додаци и екстензије"
 
 #: modules/gui/qt4/dialogs/plugins.cpp:64
 #, fuzzy
@@ -17921,9 +17818,8 @@ msgid "Score"
 msgstr "Опсег"
 
 #: modules/gui/qt4/dialogs/plugins.cpp:114
-#, fuzzy
 msgid "&Search:"
-msgstr "Претражи"
+msgstr "&Претражи"
 
 #: modules/gui/qt4/dialogs/plugins.cpp:208
 #, fuzzy
@@ -17951,14 +17847,12 @@ msgid "Deletes the selected item"
 msgstr "Уклања изабране обележиваче"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:63
-#, fuzzy
 msgid "Show settings"
-msgstr "Видео подешавања"
+msgstr "Прикажи подешавања"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:67
-#, fuzzy
 msgid "Simple"
-msgstr "једноставно"
+msgstr "Основно"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:68
 msgid "Switch to simple preferences view"
@@ -17978,9 +17872,8 @@ msgid "Save and close the dialog"
 msgstr "Прикажи напредне опције"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:86
-#, fuzzy
 msgid "&Reset Preferences"
-msgstr "Карактеристике врати на подразумеване вредности"
+msgstr "&Врати на подразумевано"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:313
 msgid "Are you sure you want to reset your VLC media player preferences?"
@@ -18090,9 +17983,8 @@ msgid "Delete the current profile"
 msgstr "враћа на првобитне вредности кеш додатака"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:187
-#, fuzzy
 msgid "Cl&ose"
-msgstr "Затвори"
+msgstr "За&твори"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:217
 #, fuzzy
@@ -18143,9 +18035,8 @@ msgid "Broadcast"
 msgstr "Емитовање"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:75
-#, fuzzy
 msgid "Schedule"
-msgstr "Промешај"
+msgstr "Закажи"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:76
 msgid "Video On Demand ( VOD )"
@@ -18171,90 +18062,79 @@ msgstr "Понови све"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:112
 msgid " days"
-msgstr ""
+msgstr " дана"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:131
-#, fuzzy
 msgid "I&mport"
-msgstr "Порт"
+msgstr "У&вези"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:134
-#, fuzzy
 msgid "E&xport"
-msgstr "Извези"
+msgstr "И&звези"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:267
-#, fuzzy
 msgid "Save VLM configuration as..."
-msgstr "Учитај Конфигурацију"
+msgstr "Сачувај VLM подешавање као..."
 
 #: modules/gui/qt4/dialogs/vlm.cpp:269 modules/gui/qt4/dialogs/vlm.cpp:341
 msgid "VLM conf (*.vlm);;All (*)"
 msgstr ""
 
 #: modules/gui/qt4/dialogs/vlm.cpp:339
-#, fuzzy
 msgid "Open VLM configuration..."
-msgstr "Учитај Конфигурацију"
+msgstr "Учитај VLM подешавање..."
 
 #: modules/gui/qt4/dialogs/vlm.cpp:533
-#, fuzzy
 msgid "Broadcast: "
-msgstr "Емитовање"
+msgstr "Емитовање: "
 
 #: modules/gui/qt4/dialogs/vlm.cpp:601
 msgid "Schedule: "
 msgstr ""
 
 #: modules/gui/qt4/dialogs/vlm.cpp:623
-#, fuzzy
 msgid "VOD: "
 msgstr "VOD(Видео на захтев)"
 
 #: modules/gui/qt4/dialogs_provider.cpp:64
-#, fuzzy
 msgid "Open Directory"
-msgstr "Отвори Д&иректоријум..."
+msgstr "Отвори Директоријум"
 
 #: modules/gui/qt4/dialogs_provider.cpp:65
-#, fuzzy
 msgid "Open Folder"
-msgstr "Отвори Фајл..."
+msgstr "Отвори фолдер"
 
-#: modules/gui/qt4/dialogs_provider.cpp:533
-#, fuzzy
+#: modules/gui/qt4/dialogs_provider.cpp:538
 msgid "Open playlist..."
-msgstr "&Отвори Листу за Пуштање..."
+msgstr "Отвори листу за пуштање..."
 
-#: modules/gui/qt4/dialogs_provider.cpp:548
+#: modules/gui/qt4/dialogs_provider.cpp:553
 #, fuzzy
 msgid "XSPF playlist (*.xspf)"
 msgstr "XSPF извоз листе за пуштање"
 
-#: modules/gui/qt4/dialogs_provider.cpp:549
+#: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
 msgid "M3U8 playlist (*.m3u)"
 msgstr "XSPF извоз листе за пуштање"
 
-#: modules/gui/qt4/dialogs_provider.cpp:550
+#: modules/gui/qt4/dialogs_provider.cpp:555
 #, fuzzy
 msgid "M3U playlist (*.m3u)"
 msgstr "XSPF извоз листе за пуштање"
 
-#: modules/gui/qt4/dialogs_provider.cpp:551
+#: modules/gui/qt4/dialogs_provider.cpp:556
 #, fuzzy
 msgid "HTML playlist (*.html)"
 msgstr "Следећа ставка у листи за пуштање"
 
-#: modules/gui/qt4/dialogs_provider.cpp:563
-#, fuzzy
+#: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."
-msgstr "Сачувај Листу за пуштање..."
+msgstr "Сачувај листу за пуштање као..."
 
-#: modules/gui/qt4/dialogs_provider.cpp:672
-#, fuzzy
+#: modules/gui/qt4/dialogs_provider.cpp:677
 msgid "Open subtitles..."
-msgstr "Отвори Титлове"
+msgstr "Отвори титлове..."
 
 #: modules/gui/qt4/dialogs_provider.hpp:41
 #, fuzzy
@@ -18262,104 +18142,92 @@ msgid "Media Files"
 msgstr "Медиј: %s"
 
 #: modules/gui/qt4/dialogs_provider.hpp:61
-#, fuzzy
 msgid "Subtitles Files"
-msgstr "Титл Фајл"
+msgstr "Титлови"
 
 #: modules/gui/qt4/dialogs_provider.hpp:66
-#, fuzzy
 msgid "All Files"
-msgstr "Фајлови"
+msgstr "Сви фајлови"
 
-#: modules/gui/qt4/main_interface.cpp:942
+#: modules/gui/qt4/main_interface.cpp:934
 msgid "Control menu for the player"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:995
+#: modules/gui/qt4/main_interface.cpp:977
 msgid "Paused"
 msgstr "Паузирано"
 
 #: modules/gui/qt4/menus.cpp:289
-#, fuzzy
 msgid "&Media"
-msgstr "Медиј: %s"
+msgstr "&Датотеке"
 
 #: modules/gui/qt4/menus.cpp:292
-#, fuzzy
 msgid "P&layback"
-msgstr "Преслушавање"
+msgstr "Р&епродукција"
 
-#: modules/gui/qt4/menus.cpp:293 modules/gui/qt4/menus.cpp:999
+#: modules/gui/qt4/menus.cpp:293 modules/gui/qt4/menus.cpp:989
 msgid "&Audio"
 msgstr "&Аудио"
 
-#: modules/gui/qt4/menus.cpp:294 modules/gui/qt4/menus.cpp:1006
+#: modules/gui/qt4/menus.cpp:294 modules/gui/qt4/menus.cpp:996
 msgid "&Video"
 msgstr "&Видео"
 
 #: modules/gui/qt4/menus.cpp:296
-#, fuzzy
 msgid "&Tools"
-msgstr "Алат"
+msgstr "&Алати"
 
-#: modules/gui/qt4/menus.cpp:298 modules/gui/qt4/menus.cpp:1049
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:298 modules/gui/qt4/menus.cpp:1039
 msgid "V&iew"
-msgstr "Преглед"
+msgstr "&Преглед"
 
 #: modules/gui/qt4/menus.cpp:301
 msgid "&Help"
 msgstr "&Помоћ"
 
-#: modules/gui/qt4/menus.cpp:315 modules/gui/qt4/menus.cpp:864
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:315 modules/gui/qt4/menus.cpp:867
 msgid "&Open File..."
-msgstr "Отвори Фајл..."
+msgstr "&Отвори датотеку..."
 
-#: modules/gui/qt4/menus.cpp:321 modules/gui/qt4/menus.cpp:868
+#: modules/gui/qt4/menus.cpp:321 modules/gui/qt4/menus.cpp:871
 msgid "Open &Disc..."
-msgstr "Отвори &Диск..."
+msgstr "Отвори &диск..."
 
 #: modules/gui/qt4/menus.cpp:323
 msgid "Open &Network Stream..."
-msgstr "Отвори &Мрежни Ток..."
+msgstr "Отвори &мрежни ток..."
 
-#: modules/gui/qt4/menus.cpp:325 modules/gui/qt4/menus.cpp:872
+#: modules/gui/qt4/menus.cpp:325 modules/gui/qt4/menus.cpp:875
 msgid "Open &Capture Device..."
-msgstr "Отвори &Уређај за Захватање..."
+msgstr "Отвори &уређај за снимање..."
 
 #: modules/gui/qt4/menus.cpp:330
 msgid "Open &Location from clipboard"
-msgstr ""
+msgstr "Отвори &локацију из клипборда"
 
 #: modules/gui/qt4/menus.cpp:335
-#, fuzzy
 msgid "&Recent Media"
-msgstr "Отвори Фајл"
+msgstr "&Скорашње датотеке"
 
 #: modules/gui/qt4/menus.cpp:346
 msgid "Conve&rt / Save..."
-msgstr ""
+msgstr "Конверт&уј / Сачувај"
 
 #: modules/gui/qt4/menus.cpp:348
-#, fuzzy
 msgid "&Streaming..."
-msgstr "Пуштање тока"
+msgstr "&Емитовање..."
 
-#: modules/gui/qt4/menus.cpp:354 modules/gui/qt4/menus.cpp:1104
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:354 modules/gui/qt4/menus.cpp:1099
 msgid "&Quit"
-msgstr "Излаз"
+msgstr "&Излаз"
 
 #: modules/gui/qt4/menus.cpp:364
-#, fuzzy
 msgid "&Effects and Filters"
-msgstr "Списак ефеката"
+msgstr "&Ефекти и филтери"
 
 #: modules/gui/qt4/menus.cpp:367
-#, fuzzy
 msgid "&Track Synchronization"
-msgstr "Синхронизација сата"
+msgstr "&Синхронизација"
 
 #: modules/gui/qt4/menus.cpp:382
 #, fuzzy
@@ -18367,23 +18235,20 @@ msgid "Program Guide"
 msgstr "Програм"
 
 #: modules/gui/qt4/menus.cpp:389
-#, fuzzy
 msgid "Plu&gins and extensions"
-msgstr "Игнорисане екстензије"
+msgstr "Дод&аци и екстензије"
 
 #: modules/gui/qt4/menus.cpp:393
-#, fuzzy
 msgid "&Preferences"
-msgstr "Карактеристике"
+msgstr "&Подешавање"
 
-#: modules/gui/qt4/menus.cpp:428
+#: modules/gui/qt4/menus.cpp:431
 msgid "&View"
 msgstr "&Преглед"
 
 #: modules/gui/qt4/menus.cpp:449
-#, fuzzy
 msgid "Play&list"
-msgstr "Листа за пуштање"
+msgstr "Листа за &пуштање"
 
 #: modules/gui/qt4/menus.cpp:450
 #, fuzzy
@@ -18391,9 +18256,8 @@ msgid "Ctrl+L"
 msgstr "Ctrl тастер"
 
 #: modules/gui/qt4/menus.cpp:458
-#, fuzzy
 msgid "Mi&nimal View"
-msgstr "Минимални интерфејс"
+msgstr "Ми&нимални интерфејс"
 
 #: modules/gui/qt4/menus.cpp:459
 #, fuzzy
@@ -18401,14 +18265,12 @@ msgid "Ctrl+H"
 msgstr "Ctrl тастер"
 
 #: modules/gui/qt4/menus.cpp:467
-#, fuzzy
 msgid "&Fullscreen Interface"
-msgstr "Интерфејс Telnet-а"
+msgstr "&Интерфејс преко целог екрана"
 
 #: modules/gui/qt4/menus.cpp:475
-#, fuzzy
 msgid "&Advanced Controls"
-msgstr "Напредне опције"
+msgstr "&Напредне контроле"
 
 #: modules/gui/qt4/menus.cpp:482
 #, fuzzy
@@ -18421,123 +18283,100 @@ msgid "Visualizations selector"
 msgstr "Визеуелизуј векторе кретања"
 
 #: modules/gui/qt4/menus.cpp:503
-#, fuzzy
 msgid "Customi&ze Interface..."
-msgstr "Псеудо Интерфејс"
+msgstr "Прила&годи интерфејс"
 
 #: modules/gui/qt4/menus.cpp:561
-#, fuzzy
 msgid "Audio &Track"
-msgstr "Аудио трака"
+msgstr "&Аудио трака"
 
 #: modules/gui/qt4/menus.cpp:562
-#, fuzzy
 msgid "Audio &Channels"
-msgstr "Звучни канали"
+msgstr "Звучни &канали"
 
 #: modules/gui/qt4/menus.cpp:563
-#, fuzzy
 msgid "Audio &Device"
-msgstr "Аудио Уређај"
+msgstr "Аудио &уређај"
 
 #: modules/gui/qt4/menus.cpp:566
-#, fuzzy
 msgid "&Visualizations"
-msgstr "Визуализације"
+msgstr "&Визуелизације"
 
 #: modules/gui/qt4/menus.cpp:610
-#, fuzzy
 msgid "Video &Track"
-msgstr "Видео трака"
+msgstr "Видео &трака"
 
 #: modules/gui/qt4/menus.cpp:613
-#, fuzzy
 msgid "&Subtitles Track"
-msgstr "Титл трака"
+msgstr "&Титлови"
 
 #: modules/gui/qt4/menus.cpp:621
-#, fuzzy
 msgid "&Fullscreen"
-msgstr "Пун екран"
+msgstr "&Пун екран"
 
 #: modules/gui/qt4/menus.cpp:622
-#, fuzzy
 msgid "Always &On Top"
-msgstr "Увек на врху"
+msgstr "Увек &на врху"
 
 #: modules/gui/qt4/menus.cpp:623
-#, fuzzy
 msgid "DirectX Wallpaper"
-msgstr "Тапета"
+msgstr "DirectX позадина"
 
 #: modules/gui/qt4/menus.cpp:625
-#, fuzzy
 msgid "Direct3D Desktop mode"
-msgstr "Директно MV предвиђање режим рада"
+msgstr "Direct3D мод радне површине"
 
 #: modules/gui/qt4/menus.cpp:627
-#, fuzzy
 msgid "Sna&pshot"
-msgstr "Брз снимак"
+msgstr "Сними& слику"
 
 #: modules/gui/qt4/menus.cpp:631
-#, fuzzy
 msgid "&Zoom"
-msgstr "Увеличај"
+msgstr "&Увеличај"
 
 #: modules/gui/qt4/menus.cpp:632
-#, fuzzy
 msgid "Sca&le"
-msgstr "Скалирање"
+msgstr "&Скалирање"
 
 #: modules/gui/qt4/menus.cpp:633
-#, fuzzy
 msgid "&Aspect Ratio"
-msgstr "Пропорције"
+msgstr "&Пропорције слике"
 
 #: modules/gui/qt4/menus.cpp:634
-#, fuzzy
 msgid "&Crop"
-msgstr "Исеци"
+msgstr "&Опсеци"
 
 #: modules/gui/qt4/menus.cpp:635
-#, fuzzy
 msgid "&Deinterlace"
-msgstr "Расплитање"
+msgstr "&Расплитање"
 
 #: modules/gui/qt4/menus.cpp:636
-#, fuzzy
 msgid "&Deinterlace mode"
-msgstr "Расплитање режим рада"
+msgstr "&Расплитање мод"
 
 #: modules/gui/qt4/menus.cpp:637
-#, fuzzy
 msgid "&Post processing"
-msgstr "Пост-процесирање"
+msgstr "&Пост процесирање"
 
 #: modules/gui/qt4/menus.cpp:665
-#, fuzzy
 msgid "Manage &bookmarks"
-msgstr "Обележивачи"
+msgstr "Уреди &маркере"
 
 #: modules/gui/qt4/menus.cpp:671
-#, fuzzy
 msgid "T&itle"
-msgstr "Наслов"
+msgstr "Н&аслов"
 
 #: modules/gui/qt4/menus.cpp:672
-#, fuzzy
 msgid "&Chapter"
-msgstr "Поглавља"
+msgstr "&Поглавље"
 
 #: modules/gui/qt4/menus.cpp:673
 msgid "&Navigation"
 msgstr "&Навигација"
 
 #: modules/gui/qt4/menus.cpp:674
-#, fuzzy
 msgid "&Program"
-msgstr "Програм"
+msgstr "&Програм"
 
 #: modules/gui/qt4/menus.cpp:731
 #, fuzzy
@@ -18545,89 +18384,72 @@ msgid "Configure podcasts..."
 msgstr "Подеси"
 
 #: modules/gui/qt4/menus.cpp:750
-#, fuzzy
 msgid "&Help..."
-msgstr "Помоћ"
+msgstr "&Помоћ..."
 
 #: modules/gui/qt4/menus.cpp:753
-#, fuzzy
 msgid "Check for &Updates..."
-msgstr "Провери да ли има ажурирања"
+msgstr "Провери да ли је верзија &ажурна..."
 
-#: modules/gui/qt4/menus.cpp:803
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:806
 msgid "&Faster"
-msgstr "Убрзано"
+msgstr "&Убрзано"
 
-#: modules/gui/qt4/menus.cpp:812
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:815
 msgid "N&ormal Speed"
-msgstr "Нормална Величина"
+msgstr "Н&ормална брзина"
 
-#: modules/gui/qt4/menus.cpp:820
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:823
 msgid "Slo&wer"
-msgstr "Спорије"
+msgstr "Спо&рије"
 
-#: modules/gui/qt4/menus.cpp:827
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:830
 msgid "&Jump Forward"
-msgstr "Корак Унапред"
+msgstr "&Скок унапред"
 
-#: modules/gui/qt4/menus.cpp:832
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:835
 msgid "Jump Bac&kward"
-msgstr "Корак Уназад"
+msgstr "Скок уна&зад"
 
-#: modules/gui/qt4/menus.cpp:847
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:850
 msgid "&Stop"
-msgstr "Заустави"
+msgstr "&Заустави"
 
-#: modules/gui/qt4/menus.cpp:854
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:857
 msgid "Pre&vious"
-msgstr "Претходно"
+msgstr "Пре&тходно"
 
-#: modules/gui/qt4/menus.cpp:856
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:859
 msgid "Ne&xt"
-msgstr "Следеће"
+msgstr "Сл&едеће"
 
-#: modules/gui/qt4/menus.cpp:870
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:873
 msgid "Open &Network..."
-msgstr "Отвори Мрежу..."
+msgstr "Отвори &мрежни ток..."
 
-#: modules/gui/qt4/menus.cpp:986
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:976
 msgid "Leave Fullscreen"
-msgstr "Пун екран"
+msgstr "Искључи приказ преко целог екрана"
 
-#: modules/gui/qt4/menus.cpp:1013
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:1003
 msgid "&Playback"
-msgstr "Преслушавање"
+msgstr "&Репродукција"
 
-#: modules/gui/qt4/menus.cpp:1086
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:1081
 msgid "Hide VLC media player in taskbar"
-msgstr "VLC музички програм"
+msgstr "Сакриј VLC медија плејер у таскбару"
 
-#: modules/gui/qt4/menus.cpp:1092
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:1087
 msgid "Show VLC media player"
-msgstr "VLC музички програм"
+msgstr "Прикажи VLC медија плејер"
 
-#: modules/gui/qt4/menus.cpp:1102
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:1097
 msgid "&Open Media"
-msgstr "Отвори Фајл"
+msgstr "&Отвори датотеку"
 
-#: modules/gui/qt4/menus.cpp:1499
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:1492
 msgid " - Empty - "
-msgstr "Празно"
+msgstr " - Празно - "
 
 #: modules/gui/qt4/qt4.cpp:70
 #, fuzzy
@@ -19292,11 +19114,11 @@ msgid ""
 "Visit http://www.last.fm/join/ to get an account."
 msgstr ""
 
-#: modules/misc/audioscrobbler.c:820
+#: modules/misc/audioscrobbler.c:824
 msgid "last.fm: Authentication failed"
 msgstr ""
 
-#: modules/misc/audioscrobbler.c:821
+#: modules/misc/audioscrobbler.c:825
 msgid ""
 "last.fm username or password is incorrect. Please verify your settings and "
 "relaunch VLC."
@@ -19529,7 +19351,7 @@ msgstr "Рендерер текста"
 msgid "Freetype2 font renderer"
 msgstr "Freetype2 рендерер фонта"
 
-#: modules/misc/freetype.c:357
+#: modules/misc/freetype.c:361
 msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a few minutes."
@@ -20445,13 +20267,13 @@ msgid "Bonjour services"
 msgstr "Bonjour сервиси"
 
 #: modules/services_discovery/mediadirs.c:71
-#: modules/services_discovery/mediadirs.c:361
+#: modules/services_discovery/mediadirs.c:372
 #, fuzzy
 msgid "My Videos"
 msgstr "Видео"
 
 #: modules/services_discovery/mediadirs.c:78
-#: modules/services_discovery/mediadirs.c:363
+#: modules/services_discovery/mediadirs.c:374
 #, fuzzy
 msgid "My Music"
 msgstr "Музикална"
@@ -20462,7 +20284,7 @@ msgid "Picture"
 msgstr "Подслике"
 
 #: modules/services_discovery/mediadirs.c:85
-#: modules/services_discovery/mediadirs.c:365
+#: modules/services_discovery/mediadirs.c:376
 #, fuzzy
 msgid "My Pictures"
 msgstr "Подслике"
@@ -21165,83 +20987,83 @@ msgstr ""
 msgid "RTP stream output"
 msgstr "RTP излаз тока"
 
-#: modules/stream_out/smem.c:62
+#: modules/stream_out/smem.c:60
 msgid "Video prerender callback"
 msgstr ""
 
-#: modules/stream_out/smem.c:63
+#: modules/stream_out/smem.c:61
 msgid ""
 "Address of the video prerender callback functionthis function will set the "
 "buffer where render will be done"
 msgstr ""
 
-#: modules/stream_out/smem.c:66
+#: modules/stream_out/smem.c:64
 msgid "Audio prerender callback"
 msgstr ""
 
-#: modules/stream_out/smem.c:67
+#: modules/stream_out/smem.c:65
 msgid ""
 "Address of the audio prerender callback function.this function will set the "
 "buffer where render will be done"
 msgstr ""
 
-#: modules/stream_out/smem.c:70
+#: modules/stream_out/smem.c:68
 msgid "Video postrender callback"
 msgstr ""
 
-#: modules/stream_out/smem.c:71
+#: modules/stream_out/smem.c:69
 msgid ""
 "Address of the video postrender callback function.this function will be "
 "called when the render is into the buffer"
 msgstr ""
 
-#: modules/stream_out/smem.c:74
+#: modules/stream_out/smem.c:72
 #, fuzzy
 msgid "Audio postrender callback"
 msgstr "Аудио трака"
 
-#: modules/stream_out/smem.c:75
+#: modules/stream_out/smem.c:73
 msgid ""
 "Address of the audio postrender callback function.this function will be "
 "called when the render is into the buffer"
 msgstr ""
 
-#: modules/stream_out/smem.c:78
+#: modules/stream_out/smem.c:76
 #, fuzzy
 msgid "Video Callback data"
 msgstr "Видео трака"
 
-#: modules/stream_out/smem.c:79
+#: modules/stream_out/smem.c:77
 msgid "Data for the video callback function."
 msgstr ""
 
-#: modules/stream_out/smem.c:81
+#: modules/stream_out/smem.c:79
 #, fuzzy
 msgid "Audio callback data"
 msgstr "Аудио брзина узорка"
 
-#: modules/stream_out/smem.c:82
+#: modules/stream_out/smem.c:80
 #, fuzzy
 msgid "Data for the audio callback function."
 msgstr "ID тока аудио траке који се користи."
 
-#: modules/stream_out/smem.c:84
+#: modules/stream_out/smem.c:82
 #, fuzzy
 msgid "Time Synchronized output"
 msgstr "Синхронизуј на аудио траци"
 
-#: modules/stream_out/smem.c:85
+#: modules/stream_out/smem.c:83
 msgid ""
 "Time Synchronisation option for output. If true, stream will render as "
 "usual, else it will be rendered as fast as possible."
 msgstr ""
 
-#: modules/stream_out/smem.c:97
+#: modules/stream_out/smem.c:95
 #, fuzzy
 msgid "Smem"
 msgstr "Ток"
 
-#: modules/stream_out/smem.c:98
+#: modules/stream_out/smem.c:96
 #, fuzzy
 msgid "Stream output to memory buffer"
 msgstr "Излазни ток"
@@ -21474,9 +21296,8 @@ msgstr ""
 "Брзина узорка транскодованог аудио тока  (11250, 22500, 44100 или 48000)."
 
 #: modules/stream_out/transcode/transcode.c:96
-#, fuzzy
 msgid "Audio Language"
-msgstr "Језик звука"
+msgstr "Аудио језик"
 
 #: modules/stream_out/transcode/transcode.c:98
 #, fuzzy
@@ -22548,7 +22369,7 @@ msgstr "Праг осветљености"
 
 #: modules/video_filter/crop.c:73
 msgid "Crop geometry (pixels)"
-msgstr "Исеци геометријски (пиксели)"
+msgstr "Опсеци геометријски (пиксели)"
 
 #: modules/video_filter/crop.c:74
 msgid ""
@@ -24018,7 +23839,7 @@ msgstr ""
 
 #: modules/video_filter/rss.c:185
 msgid "Don't show"
-msgstr ""
+msgstr "Не приказуј"
 
 #: modules/video_filter/rss.c:185
 #, fuzzy
@@ -24622,7 +24443,7 @@ msgstr "Видео порт"
 
 #: modules/video_output/xcb/glx.c:50
 msgid "GLX"
-msgstr ""
+msgstr "GLX"
 
 #: modules/video_output/xcb/glx.c:51
 #, fuzzy
@@ -24650,10 +24471,9 @@ msgid "X11 video window (XCB)"
 msgstr ""
 
 #: modules/video_output/xcb/window.c:289
-#, fuzzy
 msgctxt "ASCII"
 msgid "VLC media player"
-msgstr "VLC музички програм"
+msgstr "VLC медија плејер"
 
 #: modules/video_output/xcb/window.c:293
 #, fuzzy
@@ -24676,7 +24496,7 @@ msgstr "Дељена меморија за комуникацију између
 
 #: modules/video_output/xcb/x11.c:51
 msgid "X11"
-msgstr ""
+msgstr "Х11"
 
 #: modules/video_output/xcb/x11.c:52
 #, fuzzy
@@ -24970,7 +24790,7 @@ msgstr "Визуализатор"
 
 #: modules/visualization/visual/visual.c:113
 msgid "Visualizer filter"
-msgstr "Филтер визуализације"
+msgstr "Филтер визуелизације"
 
 #: modules/visualization/visual/visual.c:121
 msgid "Spectrum analyser"
@@ -24991,14 +24811,12 @@ msgid "You can select local files with the following list and buttons."
 msgstr ""
 
 #: modules/gui/qt4/ui/open_file.h:223
-#, fuzzy
 msgid "Add..."
-msgstr "Сачувај фајл..."
+msgstr "Додај..."
 
 #: modules/gui/qt4/ui/open_file.h:226
-#, fuzzy
 msgid "Add a subtitles file"
-msgstr "Користи фајл титлова"
+msgstr "Додај титл"
 
 #: modules/gui/qt4/ui/open_file.h:228
 #, fuzzy
@@ -25155,7 +24973,7 @@ msgstr ""
 
 #: modules/gui/qt4/ui/sprefs_input.h:319
 msgid "System codecs (better quality)"
-msgstr ""
+msgstr "Системмски кодеци (бољи квалитет)"
 
 #: modules/gui/qt4/ui/sprefs_input.h:320
 #, fuzzy
@@ -25179,7 +24997,7 @@ msgstr "Контролер"
 
 #: modules/gui/qt4/ui/streampanel.h:176
 msgid "Run manually"
-msgstr ""
+msgstr "Покрени ручно"
 
 #: modules/gui/qt4/ui/streampanel.h:177
 #, fuzzy
@@ -25220,6 +25038,10 @@ msgstr "Улаз"
 #, fuzzy
 msgid "Clear List"
 msgstr "Очисти"
+
+#, fuzzy
+#~ msgid "Set"
+#~ msgstr "Подеси QP"
 
 #~ msgid "Other codecs"
 #~ msgstr "Остали кодеци"
@@ -25793,9 +25615,6 @@ msgstr "Очисти"
 
 #~ msgid "Remove All"
 #~ msgstr "Уклони Све"
-
-#~ msgid "Apply"
-#~ msgstr "Примени"
 
 #~ msgid "Defaults"
 #~ msgstr "Подразумевано"
