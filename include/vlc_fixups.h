@@ -43,7 +43,8 @@ typedef struct
 # include <stddef.h> /* NULL */
 #endif
 
-#ifndef HAVE_REWIND
+#if !defined (HAVE_REWIND) || \
+    !defined (HAVE_GETDELIM)
 # include <stdio.h> /* FILE */
 #endif
 
@@ -140,6 +141,11 @@ void rewind (FILE *);
 
 #ifndef HAVE_GETCWD
 char *getcwd (char *buf, size_t size);
+#endif
+
+#ifndef HAVE_GETDELIM
+ssize_t getdelim (char **, size_t *, int, FILE *);
+ssize_t getline (char **, size_t *, FILE *);
 #endif
 
 #ifndef HAVE_GETPID

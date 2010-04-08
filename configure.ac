@@ -549,7 +549,7 @@ need_libc=false
 
 dnl Check for usual libc functions
 AC_CHECK_FUNCS([ctime_r daemon fcntl fdopendir fork getenv getpwuid_r gettimeofday isatty lstat memalign posix_fadvise posix_madvise posix_memalign putenv setenv setlocale stricmp strnicmp tdestroy uselocale])
-AC_REPLACE_FUNCS([asprintf atof atoll getcwd getpid gmtime_r lldiv localtime_r nrand48 rewind strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtok_r strtoll swab vasprintf])
+AC_REPLACE_FUNCS([asprintf atof atoll getcwd getdelim getpid gmtime_r lldiv localtime_r nrand48 rewind strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtok_r strtoll swab vasprintf])
 AC_CHECK_FUNCS(fdatasync,,
   [AC_DEFINE(fdatasync, fsync, [Alias fdatasync() to fsync() if missing.])
 ])
