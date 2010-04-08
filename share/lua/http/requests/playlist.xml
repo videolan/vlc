@@ -57,7 +57,7 @@ function print_playlist(item)
                 current = 'current="current"'
             end
         end
-        print('<leaf id="' ..tostring(item.id).. '" uri="' ..tostring(path).. '" name="' ..name.. '" ro="' ..(item.flags.ro and "ro" or "rw").. '" duration ="' ..tostring(item.duration).. '" ' ..current.. ' />')
+        print('<leaf id="' ..tostring(item.id).. '" uri="' ..tostring(path).. '" name="' ..name.. '" ro="' ..(item.flags.ro and "ro" or "rw").. '" duration ="' ..math.floor(item.duration).. '" ' ..current.. ' />')
     end
 end
 
