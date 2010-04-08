@@ -44,7 +44,7 @@ end
 local status = vlc.playlist.status()
 
 if command == "in_play" then
-  ---[[
+  --[[
   vlc.msg.err( "<options>" )
   for a,b in ipairs(options) do
     vlc.msg.err(b)
@@ -57,8 +57,7 @@ elseif command == "in_enqueue" then
 elseif command == "pl_play" then
   vlc.playlist.goto(id)
 elseif command == "pl_pause" then
-  vlc.msg.err("FIXME: pl_pause implementation is ugly")
-  common.hotkey("key-play-pause") -- gruik
+  vlc.playlist.pause()
 elseif command == "pl_stop" then
   vlc.playlist.stop()
 elseif command == "pl_next" then
