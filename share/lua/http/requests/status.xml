@@ -84,7 +84,7 @@ elseif command == "pl_sd" then
     vlc.sd.add(val)
   end
 elseif command == "fullscreen" then
-  vlc.fullscreen()
+  vlc.video.fullscreen()
 elseif command == "snapshot" then
   common.snapshot()
 elseif command == "volume" then
