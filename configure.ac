@@ -116,15 +116,15 @@ AC_ARG_WITH(contrib,
       if test "`echo \"$topdir\" | cut -c 1`" != "/"; then
          topdir="`pwd`/$topdir"
       fi
-      CONTRIB_DIR=${topdir}/extras/contrib/hosts/${host}
+      CONTRIB_DIR="${topdir}/extras/contrib/hosts/${host}"
       if ! test -d "$CONTRIB_DIR"
       then
         gccmachine=`$CC -dumpmachine`
-        CONTRIB_DIR=${topdir}/extras/contrib/hosts/${gccmachine}
+        CONTRIB_DIR="${topdir}/extras/contrib/hosts/${gccmachine}"
       fi
     fi
     AC_MSG_CHECKING([for libs in ${CONTRIB_DIR}])
-  AS_IF([test -d ${CONTRIB_DIR}/lib],[
+  AS_IF([test -d "${CONTRIB_DIR}/lib"],[
     AC_MSG_RESULT([yes])
     AC_SUBST(CONTRIB_DIR)
     export PATH=${CONTRIB_DIR}/bin:$PATH
@@ -136,27 +136,27 @@ AC_ARG_WITH(contrib,
     CXXFLAGS_save="${CXXFLAGS_save} -I${CONTRIB_DIR}/include"
     OBJCFLAGS="${OBJCFLAGS} -I${CONTRIB_DIR}/include"
     OBJCFLAGS_save="${OBJCFLAGS_save} -I${CONTRIB_DIR}/include"
-    if test $build = $host -o "$PKG_CONFIG_LIBDIR"; then
-        export PKG_CONFIG_PATH=${CONTRIB_DIR}/lib/pkgconfig:$PKG_CONFIG_PATH
+    if test "$build" = "$host" -o "$PKG_CONFIG_LIBDIR"; then
+        export PKG_CONFIG_PATH="${CONTRIB_DIR}/lib/pkgconfig:$PKG_CONFIG_PATH"
     else
-        export PKG_CONFIG_LIBDIR=${CONTRIB_DIR}/lib/pkgconfig
+        export PKG_CONFIG_LIBDIR="${CONTRIB_DIR}/lib/pkgconfig"
     fi
     LDFLAGS="${LDFLAGS} -L${CONTRIB_DIR}/lib"
     LDFLAGS_save="${LDFLAGS_save} -L${CONTRIB_DIR}/lib"
 
-    if test -z $with_mozilla_sdk_path; then
-       with_mozilla_sdk_path=${CONTRIB_DIR}/gecko-sdk
+    if test -z "$with_mozilla_sdk_path"; then
+       with_mozilla_sdk_path="${CONTRIB_DIR}/gecko-sdk"
     fi
-    if test -z $with_cyberlink_tree; then
-       with_cyberlink_tree=${CONTRIB_DIR}/src/clinkcc
+    if test -z "$with_cyberlink_tree"; then
+       with_cyberlink_tree="${CONTRIB_DIR}/src/clinkcc"
     fi
 
     if test "${SYS}" = "darwin"; then
-      export LD_LIBRARY_PATH=${CONTRIB_DIR}/lib:$LD_LIBRARY_PATH
-      export DYLD_LIBRARY_PATH=${CONTRIB_DIR}/lib:$DYLD_LIBRARY_PATH
+      export LD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$LD_LIBRARY_PATH"
+      export DYLD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$DYLD_LIBRARY_PATH"
     elif test "${SYS}" = "beos"; then
-      export LIBRARY_PATH=${CONTRIB_DIR}/lib:$LIBRARY_PATH
-      export BELIBRARIES=${CONTRIB_DIR}/lib:$BELIBRARIES
+      export LIBRARY_PATH="${CONTRIB_DIR}/lib:$LIBRARY_PATH"
+      export BELIBRARIES="${CONTRIB_DIR}/lib:$BELIBRARIES"
     fi
     ],[
        AC_MSG_RESULT([no])
