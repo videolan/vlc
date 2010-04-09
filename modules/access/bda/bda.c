@@ -53,7 +53,7 @@ static int Control( access_t *, int, va_list );
     "named /dev/dvb/adapter[n] with n>=0.")
 
 #define DEVICE_TEXT N_("Device number to use on adapter")
-#define DEVICE_LONGTEXT ""
+#define DEVICE_LONGTEXT NULL
 
 #define FREQ_TEXT N_("Transponder/multiplex frequency")
 #if defined(WIN32) || defined(WINCE)
