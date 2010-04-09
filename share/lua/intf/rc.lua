@@ -509,7 +509,7 @@ commands_ordered = {
     { "chapter_p"; { func = titlechap_offset(-1); help = "previous chapter in current item" } };
     { "" };
     { "seek"; { func = seek; args = "X"; help = "seek in seconds, for instance `seek 12'" } };
-    { "pause"; { func = setarg(common.hotkey,"key-play-pause"); help = "toggle pause" } };
+    { "pause"; { func = skip2(vlc.playlist.pause); help = "toggle pause" } };
     { "fastforward"; { func = setarg(common.hotkey,"key-jump+extrashort"); help = "set to maximum rate" } };
     { "rewind"; { func = setarg(common.hotkey,"key-jump-extrashort"); help = "set to minimum rate" } };
     { "faster"; { func = rate; help = "faster playing of stream" } };
