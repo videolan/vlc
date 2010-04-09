@@ -54,7 +54,7 @@ end
 
 -- Return the artwork
 function fetch_art()
-    local meta = vlc.item:metas()
+    local meta = vlc.input.item:metas()
     if not (meta["artist"] and meta["album"]) then
         return nil
     end

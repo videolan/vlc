@@ -24,7 +24,7 @@ function trim (s)
 end
 
 function read_meta()
-    local metas = vlc.item:metas()
+    local metas = vlc.input.item:metas()
 
     -- Don't do anything if there is already a title
     if metas["title"] then
@@ -45,8 +45,8 @@ function read_meta()
 
     -- Remove . in showName
     showName = trim(string.gsub(showName, "%.", " "))
-    vlc.item:set_meta("title", showName.." S"..seasonNumber.."E"..episodeNumber)
-    vlc.item:set_meta("showName", showName)
-    vlc.item:set_meta("episodeNumber", episodeNumber)
-    vlc.item:set_meta("seasonNumber", seasonNumber)
+    vlc.input.item:set_meta("title", showName.." S"..seasonNumber.."E"..episodeNumber)
+    vlc.input.item:set_meta("showName", showName)
+    vlc.input.item:set_meta("episodeNumber", episodeNumber)
+    vlc.input.item:set_meta("seasonNumber", seasonNumber)
 end

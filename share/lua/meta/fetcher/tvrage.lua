@@ -28,7 +28,7 @@ function get_query( title )
 end
 
 function fetch_meta()
-    local metas = vlc.item:metas()
+    local metas = vlc.input.item:metas()
 
     local showName = metas["showName"]
     if not showName then
@@ -73,9 +73,9 @@ function fetch_meta()
         return false
     end
 
-    vlc.item:set_meta("title", showName.. " S"..seasonNumber.."E"..episodeNumber.." - ".. title)
-    vlc.item:set_meta("artwork_url", artwork)
-    vlc.item:set_meta("episodeName", title)
+    vlc.input.item:set_meta("title", showName.. " S"..seasonNumber.."E"..episodeNumber.." - ".. title)
+    vlc.input.item:set_meta("artwork_url", artwork)
+    vlc.input.item:set_meta("episodeName", title)
 
     return true
 end
