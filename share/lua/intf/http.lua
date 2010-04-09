@@ -140,7 +140,7 @@ end
 -- FIXME: Experimental art support. Needs some cleaning up.
 function callback_art(data, request)
     local art = function(data, request)
-        local item = vlc.item()
+        local item = vlc.input.item()
         local metas = item:metas()
         local filename = vlc.strings.decode_uri(string.gsub(metas["artwork_url"],"file://",""))
         local size = vlc.net.stat(filename).size
