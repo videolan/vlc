@@ -359,7 +359,10 @@ function stats(name,client)
 end
 
 function playlist_status(name,client)
-    client:append( "( new input: " .. "FIXME" .. " )" )
+    local item = vlc.input.item()
+    if(item ~= nil) then
+        client:append( "( new input: " .. vlc.strings.decode_uri(item:uri()) .. " )" )
+    end
     client:append( "( audio volume: " .. tostring(vlc.volume.get()) .. " )")
     client:append( "( state " .. vlc.playlist.status() .. " )")
 end
