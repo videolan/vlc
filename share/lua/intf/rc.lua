@@ -313,7 +313,8 @@ function help(name,client,arg)
 end
 
 function input_info(name,client)
-    local item = vlc.item()
+    local item = vlc.input.item()
+    if(item == nil) then return end
     local categories = item:info()
     for cat, infos in pairs(categories) do
         client:append("+----[ "..cat.." ]")
@@ -327,7 +328,8 @@ function input_info(name,client)
 end
 
 function stats(name,client)
-    local item = vlc.item()
+    local item = vlc.input.item()
+    if(item == nil) then return end
     local stats_tab = item:stats()
 
     client:append("+----[ begin of statistical info")
