@@ -39,7 +39,7 @@
 
 EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {
-    setWindowTitle( "Program Guide" );
+    setWindowTitle( qtr( "Program Guide" ) );
 
     QVBoxLayout *layout = new QVBoxLayout( this );
     layout->setMargin( 0 );

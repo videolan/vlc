@@ -449,7 +449,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
         for( int i = 0; i < p_item->i_action; i++ )
         {
             QPushButton *button =
-                new QPushButton( qfu( p_item->ppsz_action_text[i] ));
+                new QPushButton( qtr( p_item->ppsz_action_text[i] ));
             CONNECT( button, clicked(), signalMapper, map() );
             signalMapper->setMapping( button, i );
             l->addWidget( button, line, LAST_COLUMN - p_item->i_action + i,
