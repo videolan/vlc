@@ -1954,7 +1954,7 @@ DISTCLEAN_PKG += gecko-sdk-ppc-macosx10.2-1.7.5.tar.gz
 # Gecko SDK win32
 # ***************************************************************************
 
-gecko-sdk-i586-pc-msvc-1.8b1.zip:
+xulrunner-1.9.2.en-US.win32.sdk.zip:
 	$(WGET) $(GECKO_SDK_WIN32_URL)
 
 libIDL-0.6.3-win32-bin.zip:
@@ -1963,10 +1963,10 @@ libIDL-0.6.3-win32-bin.zip:
 glib-19990228.zip:
 	$(WGET) $(GLIB_WIN32_BIN_URL)
 
-.gecko-win32: gecko-sdk-i586-pc-msvc-1.8b1.zip libIDL-0.6.3-win32-bin.zip glib-19990228.zip
-	unzip gecko-sdk-i586-pc-msvc-1.8b1.zip
+.gecko-win32: xulrunner-1.9.2.en-US.win32.sdk.zip libIDL-0.6.3-win32-bin.zip glib-19990228.zip
+	unzip xulrunner-1.9.2.en-US.win32.sdk.zip
 	rm -rf $(PREFIX)/gecko-sdk
-	mv gecko-sdk $(PREFIX)
+	mv xulrunner-sdk $(PREFIX)/gecko-sdk
 	unzip -j libIDL-0.6.3-win32-bin.zip libIDL-0.6.3-win32-bin/libIDL-0.6.dll -d $(PREFIX)/gecko-sdk/bin
 	unzip glib-19990228.zip glib-1.2.dll -d $(PREFIX)/gecko-sdk/bin
 	chmod a+x $(PREFIX)/gecko-sdk/bin/*
@@ -1974,7 +1974,7 @@ glib-19990228.zip:
 
 CLEAN_FILE += .gecko-win32
 CLEAN_PKG += gecko-sdk-win32
-DISTCLEAN_PKG += gecko-sdk-i586-pc-msvc-1.8b1.zip libIDL-0.6.3-win32-bin.zip glib-19990228.zip
+DISTCLEAN_PKG += xulrunner-1.9.2.en-US.win32.sdk.zip libIDL-0.6.3-win32-bin.zip glib-19990228.zip
 
 # ***************************************************************************
 # mozilla-macosx
