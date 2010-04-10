@@ -4555,16 +4555,19 @@ then
     else
       if test -n "$PKG_CONFIG"; then
 	for i in "${with_mozilla_pkg}" libxul {seamonkey,iceape,xulrunner,firefox,iceweasel,mozilla}-plugin; do
-	  echo "Trying to find $i.pc files" >&5
-	  if $PKG_CONFIG --exists --print-errors "$i" 2>&5
-	  then
-            echo "Using $i.pc files." >&5
-            echo "Using $i.pc files." >&6
-	    found=1
-	    MOZILLA_CFLAGS=$(eval $PKG_CONFIG --cflags "$i" )
-	    MOZILLA_LIBS=$(eval $PKG_CONFIG --libs "$i" )
-	    break
-	  fi
+          if test -n "$i"
+          then
+            echo "Trying to find $i package" >&5
+            if $PKG_CONFIG --exists --print-errors "$i" 2>&5
+            then
+              echo "Using $i pkg-config package." >&5
+              echo "Using $i package." >&6
+              found=1
+              MOZILLA_CFLAGS=$(eval $PKG_CONFIG --cflags "$i" )
+              MOZILLA_LIBS=$(eval $PKG_CONFIG --libs "$i" )
+              break
+            fi
+          fi
 	done
       fi
     fi
