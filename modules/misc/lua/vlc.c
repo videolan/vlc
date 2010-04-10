@@ -62,10 +62,23 @@
 static int vlc_sd_probe_Open( vlc_object_t * );
 
 vlc_module_begin ()
-        set_shortname( N_( "Lua Art" ) )
-        set_description( N_("Fetch artwork using lua scripts") )
-        set_capability( "art finder", 10 )
-        set_callbacks( FindArt, NULL )
+        set_shortname( N_("Lua Interface Module") )
+        set_description( N_("Interfaces implemented using lua scripts") )
+        add_shortcut( "luaintf" )
+        add_shortcut( "luahttp" )
+        add_shortcut( "http" )
+        add_shortcut( "luatelnet" )
+        add_shortcut( "telnet" )
+        add_shortcut( "luahotkeys" )
+        /* add_shortcut( "hotkeys" ) */
+        set_capability( "interface", 0 )
+        set_category( CAT_INTERFACE )
+        set_subcategory( SUBCAT_INTERFACE_CONTROL )
+        add_string( "lua-intf", "dummy", NULL,
+                    INTF_TEXT, INTF_LONGTEXT, false )
+        add_string( "lua-config", "", NULL,
+                    CONFIG_TEXT, CONFIG_LONGTEXT, false )
+        set_callbacks( Open_LuaIntf, Close_LuaIntf )
 
     add_submodule ()
         set_shortname( N_( "Lua Meta Fetcher" ) )
@@ -81,8 +94,6 @@ vlc_module_begin ()
 
     add_submodule ()
         add_shortcut( "luaplaylist" )
-        set_category( CAT_INPUT )
-        set_subcategory( SUBCAT_INPUT_DEMUX )
         set_shortname( N_("Lua Playlist") )
         set_description( N_("Lua Playlist Parser Interface") )
         set_capability( "demux", 2 )
@@ -96,20 +107,10 @@ vlc_module_begin ()
         set_callbacks( Open_LuaIntf, Close_LuaIntf )
 
     add_submodule ()
-        set_description( N_("Lua Interface Module") )
-        add_shortcut( "luaintf" )
-        add_shortcut( "luahttp" )
-        add_shortcut( "http" )
-        add_shortcut( "luatelnet" )
-        add_shortcut( "telnet" )
-        add_shortcut( "luahotkeys" )
-        /* add_shortcut( "hotkeys" ) */
-        set_capability( "interface", 0 )
-        add_string( "lua-intf", "dummy", NULL,
-                    INTF_TEXT, INTF_LONGTEXT, false )
-        add_string( "lua-config", "", NULL,
-                    CONFIG_TEXT, CONFIG_LONGTEXT, false )
-        set_callbacks( Open_LuaIntf, Close_LuaIntf )
+        set_shortname( N_( "Lua Art" ) )
+        set_description( N_("Fetch artwork using lua scripts") )
+        set_capability( "art finder", 10 )
+        set_callbacks( FindArt, NULL )
 
     add_submodule ()
         set_shortname( N_("Lua Extension") )
