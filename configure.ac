@@ -4557,11 +4557,11 @@ then
 	for i in "${with_mozilla_pkg}" libxul {seamonkey,iceape,xulrunner,firefox,iceweasel,mozilla}-plugin; do
           if test -n "$i"
           then
-            echo "Trying to find $i package" >&5
-            if $PKG_CONFIG --exists --print-errors "$i" 2>&5
+            echo "Trying to find $i package" >&AS_MESSAGE_LOG_FD
+            if $PKG_CONFIG --exists --print-errors "$i" 2>&AS_MESSAGE_LOG_FD
             then
-              echo "Using $i pkg-config package." >&5
-              echo "Using $i package." >&6
+              echo "Using $i pkg-config package." >&AS_MESSAGE_LOG_FD
+              echo "Using $i package." >&AS_MESSAGE_FD
               found=1
               MOZILLA_CFLAGS=$(eval $PKG_CONFIG --cflags "$i" )
               MOZILLA_LIBS=$(eval $PKG_CONFIG --libs "$i" )
