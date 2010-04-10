@@ -58,8 +58,8 @@
 #   include <shlwapi.h>
 #else
 #   include <unistd.h>
-#   include <poll.h>
 #endif
+#include <dirent.h>
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
 #   ifdef lseek
