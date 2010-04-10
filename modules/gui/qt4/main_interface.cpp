@@ -1015,14 +1015,12 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
     bool first = b_play;
     foreach( const QUrl &url, mimeData->urls() )
     {
-        QString s = toNativeSeparators( url.toLocalFile() );
+        QString s = url.toString();
 
         if( s.length() > 0 ) {
-            char* psz_uri = make_URI( qtu(s) );
-            playlist_Add( THEPL, psz_uri, NULL,
+            playlist_Add( THEPL, qtu(s), NULL,
                           PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
                           PLAYLIST_END, true, pl_Unlocked );
-            free( psz_uri );
             first = false;
             RecentsMRL::getInstance( p_intf )->addRecent( s );
         }
