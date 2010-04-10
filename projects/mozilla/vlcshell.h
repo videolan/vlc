@@ -29,6 +29,7 @@
 #   include <mozilla-config.h>
 #endif
 
+
 char * NPP_GetMIMEDescription( void );
 
 NPError NPP_Initialize( void );
@@ -38,8 +39,14 @@ jref NPP_GetJavaClass( void );
 #endif
 void NPP_Shutdown( void );
 
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) < 20)
 NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
                  char* argn[], char* argv[], NPSavedData* saved );
+#else
+NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t argc,
+                 char* argn[], char* argv[], NPSavedData* saved );
+#endif
+
 NPError NPP_Destroy( NPP instance, NPSavedData** save );
 
 NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value );

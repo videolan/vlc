@@ -46,6 +46,7 @@
 #endif
 
 #include <stdio.h>
+#include <assert.h>
 
 /*****************************************************************************
  * utilitiy functions
@@ -105,7 +106,11 @@ static void plugin_unlock(plugin_lock_t *lock)
 /*****************************************************************************
  * VlcPlugin constructor and destructor
  *****************************************************************************/
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) < 20)
 VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
+#else
+VlcPlugin::VlcPlugin( NPP instance, uint16_t mode ) :
+#endif
     i_npmode(mode),
     b_stream(0),
     b_autoplay(1),
