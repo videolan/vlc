@@ -44,6 +44,7 @@
 #ifdef XP_WIN
     /* Windows stuff */
 #   include <winbase.h>
+#   include <windows.h>
 #endif
 
 #ifdef XP_MACOSX
