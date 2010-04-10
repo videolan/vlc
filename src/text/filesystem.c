@@ -225,7 +225,7 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
         return -1;
     }
 
-#ifdef HAVE_FDOPENDIR
+#ifdef HAVE_OPENAT
     int fd = openat (dir, local_name, flags, mode);
 # ifdef HAVE_FCNTL
     if (fd != -1)

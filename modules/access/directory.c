@@ -76,7 +76,7 @@ struct directory_t
 #ifndef WIN32
     struct stat  st;
 #endif
-#ifndef HAVE_FDOPENDIR
+#ifndef HAVE_OPENAT
     char         *path;
 #endif
 };
@@ -175,7 +175,7 @@ void DirClose( vlc_object_t * p_this )
         p_sys->current = current->parent;
         closedir (current->handle);
         free (current->uri);
-#ifndef HAVE_FDOPENDIR
+#ifndef HAVE_OPENAT
         free (current->path);
 #endif
         free (current);
@@ -237,7 +237,7 @@ block_t *DirBlock (access_t *p_access)
         }
         current->parent = NULL;
         current->handle = p_sys->handle;
-#ifndef HAVE_FDOPENDIR
+#ifndef HAVE_OPENAT
         current->path = strdup (p_access->psz_path);
 #endif
         current->uri = p_sys->uri;
@@ -260,7 +260,7 @@ block_t *DirBlock (access_t *p_access)
         closedir (current->handle);
         p_sys->current = current->parent;
         free (current->uri);
-#ifndef HAVE_FDOPENDIR
+#ifndef HAVE_OPENAT
         free (current->path);
 #endif
         free (current);
@@ -315,7 +315,7 @@ block_t *DirBlock (access_t *p_access)
         }
 
         DIR *handle;
-#ifdef HAVE_FDOPENDIR
+#ifdef HAVE_OPENAT
         int fd = vlc_openat (dirfd (current->handle), entry, O_RDONLY);
         if (fd != -1)
         {

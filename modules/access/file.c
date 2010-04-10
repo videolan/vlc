@@ -145,7 +145,6 @@ int Open( vlc_object_t *p_this )
 
         if (*end == '\0')
             fd = vlc_dup (oldfd);
-#ifdef HAVE_FDOPENDIR
         else if (*end == '/' && end > path)
         {
             char *name = decode_URI_duplicate (end - 1);
@@ -156,7 +155,6 @@ int Open( vlc_object_t *p_this )
                 free (name);
             }
         }
-#endif
     }
     else
     {
