@@ -449,8 +449,8 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
         NPString script;
         NPVariant result;
 
-        script.utf8characters = docLocHref;
-        script.utf8length = sizeof(docLocHref)-1;
+        script.UTF8Characters = docLocHref;
+        script.UTF8Length = sizeof(docLocHref)-1;
 
         if( NPN_Evaluate(p_browser, plugin, &script, &result) )
         {
@@ -458,11 +458,11 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
             {
                 NPString &location = NPVARIANT_TO_STRING(result);
 
-                psz_baseURL = (char *) malloc(location.utf8length+1);
+                psz_baseURL = (char *) malloc(location.UTF8Length+1);
                 if( psz_baseURL )
                 {
-                    strncpy(psz_baseURL, location.utf8characters, location.utf8length);
-                    psz_baseURL[location.utf8length] = '\0';
+                    strncpy(psz_baseURL, location.UTF8Characters, location.UTF8Length);
+                    psz_baseURL[location.UTF8Length] = '\0';
                 }
             }
             NPN_ReleaseVariantValue(&result);

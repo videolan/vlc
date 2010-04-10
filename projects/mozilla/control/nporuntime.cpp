@@ -37,11 +37,11 @@
 
 char* RuntimeNPObject::stringValue(const NPString &s)
 {
-    NPUTF8 *val = static_cast<NPUTF8*>(malloc((s.utf8length+1) * sizeof(*val)));
+    NPUTF8 *val = static_cast<NPUTF8*>(malloc((s.UTF8Length+1) * sizeof(*val)));
     if( val )
     {
-        strncpy(val, s.utf8characters, s.utf8length);
-        val[s.utf8length] = '\0';
+        strncpy(val, s.UTF8Characters, s.UTF8Length);
+        val[s.UTF8Length] = '\0';
     }
     return val;
 }

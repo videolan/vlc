@@ -967,7 +967,7 @@ LibvlcPlaylistNPObject::invoke(int index, const NPVariant *args,
 void LibvlcPlaylistNPObject::parseOptions(const NPString &nps,
                                          int *i_options, char*** ppsz_options)
 {
-    if( nps.utf8length )
+    if( nps.UTF8Length )
     {
         char *s = stringValue(nps);
         char *val = s;
@@ -979,7 +979,7 @@ void LibvlcPlaylistNPObject::parseOptions(const NPString &nps,
             {
                 int nOptions = 0;
 
-                char *end = val + nps.utf8length;
+                char *end = val + nps.UTF8Length;
                 while( val < end )
                 {
                     // skip leading blanks
