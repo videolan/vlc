@@ -47,7 +47,7 @@ if HAVE_WIN32
 vlc_LDADD += -lwininet vlc_win32_rc.$(OBJEXT)
 vlc_DEPENDENCIES += vlc_win32_rc.$(OBJEXT)
 else
-vlc_LDADD += -ldl
+vlc_LDADD += $(LIBDL)
 endif
 
 .rc.in.rc: $(top_builddir)/config.status

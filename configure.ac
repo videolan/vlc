@@ -749,22 +749,30 @@ if test "${ac_cv_have_plugins}" = "no"; then
 fi
 
 # Only test for dlopen() if the others didn't work
+LIBDL=""
 if test "${ac_cv_have_plugins}" = "no" -o "${SYS}" = "darwin"; then
   AC_CHECK_HEADERS(dlfcn.h sys/dl.h)
   ac_cv_my_have_dlopen=no
-  AC_CHECK_FUNC(dlopen,
-    ac_cv_my_have_dlopen=yes,
-    AC_CHECK_LIB(dl, dlopen,
+  AC_CHECK_FUNC(dlopen, [
+    ac_cv_my_have_dlopen=yes
+  ], [
+    AC_CHECK_LIB(dl, dlopen, [
       ac_cv_my_have_dlopen=yes
-      VLC_ADD_LIBS([libvlccore realvideo lua],[-ldl]),
-      AC_CHECK_LIB(svld, dlopen,
+      LIBDL="-ldl"
+    ], [
+      AC_CHECK_LIB(svld, dlopen, [
         ac_cv_my_have_dlopen=yes
-        VLC_ADD_LIBS([libvlccore],[-lsvld]))))
+        LIBDL="-lsvld"
+      ])
+    ])
+  ])
   if test "${ac_cv_my_have_dlopen}" = "yes"; then
     AC_DEFINE(HAVE_DL_DLOPEN, 1, [Define if you have the dlopen API])
     ac_cv_have_plugins=yes
+    VLC_ADD_LIBS([libvlccore realvideo lua],[$LIBDL]),
   fi
 fi
+AC_SUBST(LIBDL)
 
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 dnl Check for pthreads - borrowed from XMMS
@@ -2567,7 +2575,7 @@ AC_ARG_ENABLE(omxil,
 if test "${enable_omxil}" = "yes"
 then
   VLC_ADD_PLUGIN([omxil])
-  VLC_ADD_LIBS([omxil], [-ldl])
+  VLC_ADD_LIBS([omxil], [$LIBDL])
 fi
 
 dnl
@@ -3657,7 +3665,7 @@ if test "${enable_directfb}" = "yes"; then
         LIBS="${LIBS_save}"
 
         if test "${have_directfb}" = "true"; then
-            LIBS_mydirectfb="${LIBS_new} -lz -ldl -ldirectfb -lfusion -ldirect -lpthread"
+            LIBS_mydirectfb="${LIBS_new} -lz $LIBDL -ldirectfb -lfusion -ldirect -lpthread"
             CPPFLAGS_mydirectfb="${CPPFLAGS_new}"
         fi
     else
