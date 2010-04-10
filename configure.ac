@@ -4549,7 +4549,7 @@ then
     AC_ARG_VAR([MOZILLA_LIBS], [linker flags for Mozilla, overriding pkg-config])
     AC_MSG_NOTICE([Checking for Mozilla])
     found=0
-    if test -n "$MOZILLA_CFLAGS" -a -n "$MOZILLA_LIBS"
+    if test -n "$MOZILLA_CFLAGS" -o -n "$MOZILLA_LIBS"
     then
       found=1
     else
