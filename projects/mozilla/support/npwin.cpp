@@ -544,7 +544,7 @@ const char* NPN_UserAgent(NPP instance)
 /* allocates memory from the Navigator's memory space.  Necessary so that
  * saved instance data may be freed by Navigator when exiting.
  */
-void *NPN_MemAlloc(uint32 size)
+void *NPN_MemAlloc(uint32_t size)
 {
     return g_pNavigatorFuncs->memalloc(size);
 }

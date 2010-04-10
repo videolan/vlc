@@ -57,7 +57,7 @@ NPVariant copyNPVariant(const NPVariant& original)
     NPVariant res;
 
     if (NPVARIANT_IS_STRING(original))
-        STRINGZ_TO_NPVARIANT(strdup(NPVARIANT_TO_STRING(original).utf8characters), res);
+        STRINGZ_TO_NPVARIANT(strdup(NPVARIANT_TO_STRING(original).UTF8Characters), res);
     else if (NPVARIANT_IS_INT32(original))
         INT32_TO_NPVARIANT(NPVARIANT_TO_INT32(original), res);
     else if (NPVARIANT_IS_DOUBLE(original))
@@ -1639,7 +1639,7 @@ LibvlcMarqueeNPObject::setProperty(int index, const NPVariant &value)
 
     case ID_marquee_position:
         if( !NPVARIANT_IS_STRING(value) ||
-            !position_byname( NPVARIANT_TO_STRING(value).utf8characters, i ) )
+            !position_byname( NPVARIANT_TO_STRING(value).UTF8Characters, i ) )
             return INVOKERESULT_INVALID_VALUE;
 
         libvlc_video_set_marquee_int(p_md, libvlc_marquee_Position, i);
@@ -1785,7 +1785,7 @@ LibvlcLogoNPObject::setProperty(int index, const NPVariant &value)
 
     case ID_logo_position:
         if( !NPVARIANT_IS_STRING(value) ||
-            !position_byname( NPVARIANT_TO_STRING(value).utf8characters, i ) )
+            !position_byname( NPVARIANT_TO_STRING(value).UTF8Characters, i ) )
             return INVOKERESULT_INVALID_VALUE;
 
         libvlc_video_set_logo_int(p_md, libvlc_logo_position, i);
@@ -1843,7 +1843,7 @@ LibvlcLogoNPObject::invoke(int index, const NPVariant *args,
         {
             if( !NPVARIANT_IS_STRING(args[i]) )
                 return INVOKERESULT_INVALID_VALUE;
-            len+=NPVARIANT_TO_STRING(args[i]).utf8length+1;
+            len+=NPVARIANT_TO_STRING(args[i]).UTF8Length+1;
         }
 
         buf = (char *)malloc( len+1 );
@@ -1853,8 +1853,8 @@ LibvlcLogoNPObject::invoke(int index, const NPVariant *args,
         for( h=buf,i=0;i<argCount;++i )
         {
             if(i) *h++=';';
-            len=NPVARIANT_TO_STRING(args[i]).utf8length;
-            memcpy(h,NPVARIANT_TO_STRING(args[i]).utf8characters,len);
+            len=NPVARIANT_TO_STRING(args[i]).UTF8Length;
+            memcpy(h,NPVARIANT_TO_STRING(args[i]).UTF8Characters,len);
             h+=len;
         }
         *h='\0';

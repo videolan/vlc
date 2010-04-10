@@ -36,6 +36,7 @@
 #include "control/npolibvlc.h"
 
 #include <ctype.h>
+
 #if defined(XP_UNIX)
 #   include <pthread.h>
 #elif defined(XP_WIN)
@@ -236,7 +237,7 @@ inline EventObj::event_t EventObj::find_event(const char *s) const
 
 bool EventObj::insert(const NPString &s, NPObject *l, bool b)
 {
-    event_t e = find_event(s.utf8characters);
+    event_t e = find_event(s.UTF8Characters);
     if( e>=maxbit() )
         return false;
 
@@ -261,7 +262,7 @@ bool EventObj::insert(const NPString &s, NPObject *l, bool b)
 
 bool EventObj::remove(const NPString &s, NPObject *l, bool b)
 {
-    event_t e = find_event(s.utf8characters);
+    event_t e = find_event(s.UTF8Characters);
     if( e>=maxbit() || !get(e) )
         return false;
 
