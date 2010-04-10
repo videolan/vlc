@@ -1003,9 +1003,9 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
     /* D&D of a subtitles file, add it on the fly */
     if( mimeData->urls().size() == 1 && THEMIM->getIM()->hasInput() )
     {
-        if( !input_AddSubtitle( THEMIM->getInput(),
-                 qtu( toNativeSeparators( mimeData->urls()[0].toLocalFile() ) ),
-                 true ) )
+        QString s = toNativeSeparators( mimeData->urls()[0].toLocalFile() );
+        if( s.length() > 0
+         && input_AddSubtitle( THEMIM->getInput(), qtu(s), true ) == 0 )
         {
             event->accept();
             return;
