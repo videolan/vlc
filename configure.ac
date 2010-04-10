@@ -4558,15 +4558,18 @@ then
           if test -n "$i"
           then
             echo "Trying to find $i package" >&AS_MESSAGE_LOG_FD
-            if $PKG_CONFIG --exists --print-errors "$i" 2>&AS_MESSAGE_LOG_FD
+            AC_MSG_CHECKING([for $i >= 1.9.2])
+            if $PKG_CONFIG --exists --print-errors "$i >= 1.9.2" 2>&AS_MESSAGE_LOG_FD
             then
               echo "Using $i pkg-config package." >&AS_MESSAGE_LOG_FD
               echo "Using $i package." >&AS_MESSAGE_FD
               found=1
               MOZILLA_CFLAGS=$(eval $PKG_CONFIG --cflags "$i" )
               MOZILLA_LIBS=$(eval $PKG_CONFIG --libs "$i" )
+              AC_MSG_RESULT([yes])
               break
             fi
+            AC_MSG_RESULT([no])
           fi
 	done
       fi
@@ -4581,7 +4584,7 @@ then
            #endif
           ])
         if test "${MOZILLA_REQUIRED_HEADERS}" = "0"; then
-            AC_MSG_ERROR([Please install the Firefox development tools; mozilla-config.h, plugin/npapi.h and plugin/npruntime.h were not found.])
+            AC_MSG_ERROR([Please install the Firefox development tools; plugin/npapi.h and/or plugin/npruntime.h were not found.])
         fi
         MOZILLA_REQUIRED_HEADERS=
         mozilla=:
@@ -4606,7 +4609,7 @@ then
             AC_PATH_PROGS(MOZILLA_CONFIG,
 	    [mozilla-config seamonkey-config xulrunner-config],
         [no])
-            test "${MOZILLA_CONFIG}" = "no" && AC_MSG_ERROR([Please install the Mozilla development tools. mozilla-config was not found.])
+            test "${MOZILLA_CONFIG}" = "no" && AC_MSG_ERROR([Please install the Mozilla development tools (version 1.9.2 or higher) or use --disable-mozilla.])
           ]
         )
     dnl pkg-config failed but we might have found a mozilla-config
