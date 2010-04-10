@@ -193,6 +193,10 @@ luac_verbose_ = $(luac_verbose_$(AM_DEFAULT_VERBOSITY))
 luac_verbose_0 = @echo "  LUAC   $@";
 
 .lua.luac:
+	$(AM_V_at)if test -z "$(LUAC)"; then \
+		echo "LUA byte compiler missing." >&2; \
+		exit 1 ; \
+	fi
 	$(AM_V_at)for f in $(EXTRA_DIST); do \
 		test "$(srcdir)" = . || f="$(srcdir)/$$f"; \
 		if test $$f = $<; then \
