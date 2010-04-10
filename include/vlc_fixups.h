@@ -59,8 +59,10 @@ typedef struct
 # include <stdarg.h> /* va_list */
 #endif
 
-#ifndef HAVE_GETPID
-# include <sys/types.h> /* pid_t */
+#if !defined (HAVE_GETDELIM) || \
+    !defined (HAVE_GETPID)   || \
+    !defined (HAVE_SWAB)
+# include <sys/types.h> /* ssize_t, pid_t */
 #endif
 
 #ifdef __cplusplus
