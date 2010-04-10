@@ -201,6 +201,7 @@ vlc_module_begin ()
         change_safe()
     add_integer( "dvb-frequency", 0, NULL, FREQ_TEXT, FREQ_LONGTEXT,
                  false )
+        change_safe()
 #   if defined(WIN32) || defined(WINCE)
         add_string( "dvb-network-name", NULL, NULL, NAME_TEXT, NAME_LONGTEXT,
                     true )
@@ -281,6 +282,7 @@ vlc_module_begin ()
     add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
         false )
         change_integer_list( i_band_list, ppsz_band_text, NULL )
+        change_safe()
     add_integer( "dvb-guard", -1, NULL, GUARD_TEXT, GUARD_LONGTEXT, true )
         change_integer_list( i_guard_list, ppsz_guard_text, NULL )
     add_integer( "dvb-transmission", -1, NULL, TRANSMISSION_TEXT,

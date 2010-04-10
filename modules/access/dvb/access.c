@@ -204,6 +204,7 @@ vlc_module_begin ()
                  true )
     add_integer( "dvb-frequency", 0, NULL, FREQ_TEXT, FREQ_LONGTEXT,
                  false )
+        change_safe()
     add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT, INVERSION_LONGTEXT,
                  true )
     add_bool( "dvb-probe", true, NULL, PROBE_TEXT, PROBE_LONGTEXT, true )
@@ -237,6 +238,7 @@ vlc_module_begin ()
                  CODE_RATE_LP_LONGTEXT, true )
     add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
                  true )
+        change_safe()
     add_integer( "dvb-guard", 0, NULL, GUARD_TEXT, GUARD_LONGTEXT, true )
     add_integer( "dvb-transmission", 0, NULL, TRANSMISSION_TEXT,
                  TRANSMISSION_LONGTEXT, true )
