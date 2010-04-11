@@ -203,8 +203,7 @@ static int vlclua_datadir_list( lua_State *L )
  *****************************************************************************/
 static int vlclua_lock_and_wait( lua_State *L )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)vlclua_get_this( L );
-    intf_sys_t *p_sys = p_intf->p_sys;
+    intf_sys_t *p_sys = vlclua_get_intf( L );
 
     vlc_mutex_lock( &p_sys->lock );
     mutex_cleanup_push( &p_sys->lock );
@@ -230,8 +229,8 @@ static int vlclua_mwait( lua_State *L )
 
 static int vlclua_intf_should_die( lua_State *L )
 {
-    intf_thread_t *p_intf = (intf_thread_t*)vlclua_get_this( L );
-    lua_pushboolean( L, p_intf->p_sys->exiting );
+    intf_sys_t *p_sys = vlclua_get_intf( L );
+    lua_pushboolean( L, p_sys->exiting );
     return 1;
 }
 
