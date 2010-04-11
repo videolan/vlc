@@ -3298,6 +3298,9 @@ dnl  Xlib
 dnl
 
 AC_PATH_XTRA()
+AC_CHECK_HEADERS(X11/Xlib.h, [
+  VLC_ADD_LIBS([omapfb],[${X_LIBS} ${X_PRE_LIBS} -lX11])
+])
 
 dnl
 dnl  X C Bindings modules
@@ -3611,8 +3614,6 @@ AC_ARG_ENABLE(omapfb,
     then
       AC_CHECK_HEADERS(asm/arch-omap/omapfb.h, [
         VLC_ADD_PLUGIN([omapfb])
-        AC_CHECK_HEADERS(X11/Xlib.h, [
-          VLC_ADD_LIBS([omapfb],[${X_LIBS} ${X_PRE_LIBS} -lX11]) ])
       ])
       VLC_ADD_PLUGIN([swscale_omap])
     fi
