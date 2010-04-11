@@ -26,13 +26,6 @@
 
 void vlc_enable_override (void);
 
-static bool override = false;
-
-void vlc_enable_override (void)
-{
-    override = true;
-}
-
 #if defined (__GNUC__) /* typeof and statement-expression */ \
  && (defined (__ELF__) && !defined (__sun__))
 /* Solaris crashes on printf("%s", NULL); which is legal, but annoying. */
@@ -45,6 +38,19 @@ void vlc_enable_override (void)
 #ifdef HAVE_EXECINFO_H
 # include <execinfo.h>
 #endif
+
+static bool override = false;
+
+static void vlc_reset_override (void)
+{
+    override = false;
+}
+
+void vlc_enable_override (void)
+{
+    override = true;
+    pthread_atfork (NULL, NULL, vlc_reset_override);
+}
 
 static void vlogbug (const char *level, const char *func, const char *fmt,
                      va_list ap)
@@ -186,4 +192,8 @@ int sigaction (int signum, const struct sigaction *act, struct sigaction *old)
 }
 
 
-#endif /* __ELF__ */
+#else
+static void vlc_enable_override (void)
+{
+}
+#endif
