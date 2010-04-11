@@ -41,6 +41,7 @@ void vlc_enable_override (void)
 #include <stdio.h>
 #include <stdlib.h>
 #include <dlfcn.h>
+#include <pthread.h>
 
 static void vlogbug (const char *level, const char *func, const char *fmt,
                      va_list ap)
@@ -113,6 +114,36 @@ int unsetenv (const char *name)
         return 0;
     }
     return CALL(unsetenv, name);
+}
+
+
+/*** Pseudo random numbers ***
+ *
+ * The C PRNG is not thread-safe (and generally sucks, the POSIX 48-bits PRNG
+ * is much better as a reproducible non-secure PRNG). To work around this, we
+ * force evil callers to serialize. This makes the call safe, but fails to
+ * preserve reproducibility of the number sequence (which usually does not
+ * matter).
+ **/
+static pthread_mutex_t prng_lock = PTHREAD_MUTEX_INITIALIZER;
+
+void srand (unsigned int seed)
+{
+    pthread_mutex_lock (&prng_lock);
+    LOG("Warning", "%d", seed);
+    CALL(srand, seed);
+    pthread_mutex_unlock (&prng_lock);
+}
+
+int rand (void)
+{
+    int ret;
+
+    pthread_mutex_lock (&prng_lock);
+    LOG("Warning", "");
+    ret = CALL(rand);
+    pthread_mutex_unlock (&prng_lock);
+    return ret;
 }
 
 
