@@ -54,11 +54,12 @@ extern char *FromLocale (const char *);
  *****************************************************************************/
 int main( int i_argc, const char *ppsz_argv[] )
 {
-#ifdef __APPLE__
-    /* The so-called POSIX-compliant MacOS X is not. 
-     * SIGPIPE fires even when it is blocked in all threads! */
+    /* The so-called POSIX-compliant MacOS X reportedly processes SIGPIPE even
+     * if it is blocked in all thread. Also some libraries want SIGPIPE blocked
+     * as they have no clue about signal masks.
+     * Note: this is NOT an excuse for not protecting against SIGPIPE. If
+     * LibVLC runs outside of VLC, we cannot rely on this code snippet. */
     signal (SIGPIPE, SIG_IGN);
-#endif
 
 #ifndef ALLOW_RUN_AS_ROOT
     if (geteuid () == 0)
