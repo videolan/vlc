@@ -38,6 +38,9 @@ void vlc_enable_override (void);
 #ifdef HAVE_EXECINFO_H
 # include <execinfo.h>
 #endif
+#ifdef NDEBUG
+# undef HAVE_BACKTRACE
+#endif
 
 static bool override = false;
 
@@ -56,7 +59,7 @@ static void vlogbug (const char *level, const char *func, const char *fmt,
                      va_list ap)
 {
 #ifdef HAVE_BACKTRACE
-    const size_t framec = 8;
+    const size_t framec = 4;
     void *framev[framec];
 
     backtrace (framev, framec);
