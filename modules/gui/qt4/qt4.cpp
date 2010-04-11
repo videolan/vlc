@@ -295,7 +295,6 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
         return VLC_EGENERIC;
     }
     XCloseDisplay( p_display );
-    putenv( (char *)"XLIB_SKIP_ARGB_VISUALS=1" );
 #else
     char *display = NULL;
 #endif
