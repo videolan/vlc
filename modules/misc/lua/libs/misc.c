@@ -47,24 +47,44 @@
 #include "../vlc.h"
 #include "../libs.h"
 
-#undef vlclua_set_this
 /*****************************************************************************
  * Internal lua<->vlc utils
  *****************************************************************************/
+static void vlclua_set_object( lua_State *L, void *id, void *value )
+{
+    lua_pushlightuserdata( L, id );
+    lua_pushlightuserdata( L, value );
+    lua_rawset( L, LUA_REGISTRYINDEX );
+}
+
+static void *vlclua_get_object( lua_State *L, void *id )
+{
+    lua_pushlightuserdata( L, id );
+    lua_rawget( L, LUA_REGISTRYINDEX );
+    const void *p = lua_topointer( L, -1 );
+    lua_pop( L, 1 );
+    return (void *)p;
+}
+
+#undef vlclua_set_this
 void vlclua_set_this( lua_State *L, vlc_object_t *p_this )
 {
-    lua_pushlightuserdata( L, vlclua_set_this );
-    lua_pushlightuserdata( L, p_this );
-    lua_rawset( L, LUA_REGISTRYINDEX );
+    vlclua_set_object( L, vlclua_set_this, p_this );
 }
 
 vlc_object_t * vlclua_get_this( lua_State *L )
 {
-    lua_pushlightuserdata( L, vlclua_set_this );
-    lua_rawget( L, LUA_REGISTRYINDEX );
-    vlc_object_t *p_this = (vlc_object_t*)lua_topointer( L, -1 );
-    lua_pop( L, 1 );
-    return p_this;
+    return vlclua_get_object( L, vlclua_set_this );
+}
+
+void vlclua_set_intf( lua_State *L, intf_sys_t *p_intf )
+{
+    vlclua_set_object( L, vlclua_set_intf, p_intf );
+}
+
+static intf_sys_t * vlclua_get_intf( lua_State *L )
+{
+    return vlclua_get_object( L, vlclua_set_intf );
 }
 
 /*****************************************************************************

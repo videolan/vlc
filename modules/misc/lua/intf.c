@@ -171,6 +171,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     }
 
     vlclua_set_this( L, p_intf );
+    vlclua_set_intf( L, p_sys );
 
     luaL_openlibs( L );
 
