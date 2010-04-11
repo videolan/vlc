@@ -55,6 +55,7 @@ struct decoder_sys_t
      */
     block_t *p_block;
     aout_buffer_t *p_aout_buffer;
+    date_t        end_date;
 
     /*
      * FLAC properties
@@ -272,6 +273,10 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_sys->p_block = *pp_block;
     *pp_block = NULL;
 
+    if( p_sys->p_block->i_pts > VLC_TS_INVALID &&
+        p_sys->p_block->i_pts != date_Get( &p_sys->end_date ) )
+        date_Set( &p_sys->end_date, p_sys->p_block->i_pts );
+
     p_sys->p_aout_buffer = 0;
 
     if( !FLAC__stream_decoder_process_single( p_sys->p_flac ) )
@@ -351,6 +356,9 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
     if( p_dec->fmt_out.audio.i_channels <= 0 ||
         p_dec->fmt_out.audio.i_channels > 8 )
         return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+    if( date_Get( &p_sys->end_date ) <= VLC_TS_INVALID )
+        return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+
     const int * const pi_reorder = ppi_reorder[p_dec->fmt_out.audio.i_channels];
 
     p_sys->p_aout_buffer =
@@ -375,8 +383,10 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
     }
 
     /* Date management (already done by packetizer) */
-    p_sys->p_aout_buffer->i_pts = p_sys->p_block->i_pts;
-    p_sys->p_aout_buffer->i_length = p_sys->p_block->i_length;
+    p_sys->p_aout_buffer->i_pts = date_Get( &p_sys->end_date );
+    p_sys->p_aout_buffer->i_length =
+        date_Increment( &p_sys->end_date, frame->header.blocksize ) -
+        p_sys->p_aout_buffer->i_pts;
 
     return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
@@ -429,7 +439,8 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
     p_sys->b_stream_info = true;
     p_sys->stream_info = metadata->data.stream_info;
 
-    return;
+    date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
 }
 
 /*****************************************************************************
