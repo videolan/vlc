@@ -244,9 +244,13 @@ static int net_SetMcastHopLimit( vlc_object_t *p_this,
         /* BSD compatibility */
         unsigned char buf;
 
+        msg_Dbg( p_this, "cannot set hop limit (%d): %m", hlim );
         buf = (unsigned char)(( hlim > 255 ) ? 255 : hlim);
         if( setsockopt( fd, proto, cmd, &buf, sizeof( buf ) ) )
+        {
+            msg_Err( p_this, "cannot set hop limit (%d): %m", hlim );
             return VLC_EGENERIC;
+        }
     }
 
     return VLC_SUCCESS;
