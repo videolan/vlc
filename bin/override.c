@@ -192,6 +192,43 @@ int sigaction (int signum, const struct sigaction *act, struct sigaction *old)
 }
 
 
+/*** Xlib ****/
+#ifdef HAVE_X11_XLIB_H
+# include <X11/Xlib.h>
+
+static pthread_mutex_t xlib_lock = PTHREAD_MUTEX_INITIALIZER;
+
+int (*XSetErrorHandler (int (*handler) (Display *, XErrorEvent *)))
+     (Display *, XErrorEvent *)
+{
+    if (override)
+    {
+        int (*ret) (Display *, XErrorEvent *);
+
+        pthread_mutex_lock (&xlib_lock);
+        LOG("Error", "%p", handler);
+        ret = CALL(XSetErrorHandler, handler);
+        pthread_mutex_unlock (&xlib_lock);
+        return ret;
+    }
+    return CALL(XSetErrorHandler, handler);
+}
+
+int (*XSetIOErrorHandler (int (*handler) (Display *))) (Display *)
+{
+    if (override)
+    {
+        int (*ret) (Display *);
+
+        pthread_mutex_lock (&xlib_lock);
+        LOG("Error", "%p", handler);
+        ret = CALL(XSetIOErrorHandler, handler);
+        pthread_mutex_unlock (&xlib_lock);
+        return ret;
+    }
+    return CALL(XSetIOErrorHandler, handler);
+}
+#endif
 #else
 static void vlc_enable_override (void)
 {
