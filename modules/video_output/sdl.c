@@ -51,10 +51,6 @@ static void Close(vlc_object_t *);
     "Force the SDL renderer to use a specific chroma format instead of " \
     "trying to improve performances by using the most efficient one.")
 
-#define DRIVER_TEXT N_("SDL video driver name")
-#define DRIVER_LONGTEXT N_(\
-    "Force a specific SDL video output driver.")
-
 vlc_module_begin()
     set_shortname("SDL")
     set_category(CAT_VIDEO)
@@ -63,9 +59,7 @@ vlc_module_begin()
     set_capability("vout display", 60)
     add_shortcut("sdl")
     add_string("sdl-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
-#ifdef HAVE_SETENV
-    add_string("sdl-video-driver", NULL, NULL, DRIVER_TEXT, DRIVER_LONGTEXT, true)
-#endif
+    add_obsolete_string("sdl-video-driver") /* obsolete since 1.1.0 */
     set_callbacks(Open, Close)
 #if defined(__i386__) || defined(__x86_64__)
     /* On i386, SDL is linked against svgalib */
@@ -129,14 +123,6 @@ static int Open(vlc_object_t *object)
         vlc_mutex_unlock(&sdl_lock);
         return VLC_ENOMEM;
     }
-
-#ifdef HAVE_SETENV
-    char *psz_driver = var_CreateGetNonEmptyString(vd, "sdl-video-driver");
-    if (psz_driver) {
-        setenv("SDL_VIDEODRIVER", psz_driver, 1);
-        free(psz_driver);
-    }
-#endif
 
     /* */
     int sdl_flags = SDL_INIT_VIDEO;
