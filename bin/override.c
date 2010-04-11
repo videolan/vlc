@@ -42,14 +42,27 @@ void vlc_enable_override (void)
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <pthread.h>
+#ifdef HAVE_EXECINFO_H
+# include <execinfo.h>
+#endif
 
 static void vlogbug (const char *level, const char *func, const char *fmt,
                      va_list ap)
 {
+#ifdef HAVE_BACKTRACE
+    const size_t framec = 8;
+    void *framev[framec];
+
+    backtrace (framev, framec);
+#endif
     flockfile (stderr);
     fprintf (stderr, "%s: call to %s(", level, func);
     vfprintf (stderr, fmt, ap);
     fputs (")\n", stderr);
+    fflush (stderr);
+#ifdef HAVE_BACKTRACE
+    backtrace_symbols_fd (framev + 2, framec - 2, fileno (stderr));
+#endif
     funlockfile (stderr);
 }
 
