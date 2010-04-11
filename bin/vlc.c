@@ -42,6 +42,7 @@
 /* Explicit HACK */
 extern void LocaleFree (const char *);
 extern char *FromLocale (const char *);
+extern void vlc_enable_override (void);
 
 #include <signal.h>
 #include <time.h>
@@ -156,6 +157,8 @@ int main( int i_argc, const char *ppsz_argv[] )
         if ((argv[argc++] = FromLocale (ppsz_argv[i])) == NULL)
             return 1; // BOOM!
     argv[argc] = NULL;
+
+    vlc_enable_override ();
 
     /* Initialize libvlc */
     libvlc_instance_t *vlc = libvlc_new (argc, argv);
