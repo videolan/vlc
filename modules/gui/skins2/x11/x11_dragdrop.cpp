@@ -163,35 +163,24 @@ void X11DragDrop::dndDrop( ldata_t data )
     XGetWindowProperty( XDISPLAY, src, propAtom, 0, 1024, False,
                         AnyPropertyType, &type, &format, &nitems, &nbytes,
                         (unsigned char**)&buffer );
-    string selection = "";
+
     if( buffer != NULL )
     {
-        selection = buffer;
-        XFree( buffer );
-    }
-
-    if( selection != "" )
-    {
-        // TODO: multiple files handling
-        string::size_type end = selection.find( "\n", 0 );
-        selection = selection.substr( 0, end - 1 );
-        end = selection.find( "\r", 0 );
-        selection = selection.substr( 0, end - 1 );
-
-        // Find the protocol, if any
-        if( selection.find( "file://", 0 ) == 0 )
+        char* psz_dup = strdup( buffer );
+        char* psz_new = psz_dup;
+        while( psz_new && *psz_new )
         {
-            selection.erase( 0, 7 );
+            char* psz_end = strchr( psz_new, '\n' );
+            if( psz_end )
+                *psz_end = '\0';
+
+            CmdAddItem cmd( getIntf(), psz_new, m_playOnDrop );
+            cmd.execute();
+
+            psz_new = psz_end ? psz_end + 1 : NULL;
         }
-
-        char *psz_fileName = new char[selection.size() + 1];
-        strncpy( psz_fileName, selection.c_str(), selection.size() + 1 );
-
-        // Add the file
-        CmdAddItem cmd( getIntf(), psz_fileName, m_playOnDrop );
-        cmd.execute();
-
-        delete[] psz_fileName;
+        free( psz_dup );
+        XFree( buffer );
     }
 
     // Tell the source we accepted the drop
