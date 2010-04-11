@@ -77,4 +77,43 @@ static void *getsym (const char *name)
     ({ typeof (func) *sym = getsym ( # func); sym (__VA_ARGS__); })
 
 
+/*** Environment ***
+ *
+ * "Conforming multi-threaded applications shall not use the environ variable
+ *  to access or modify any environment variable while any other thread is
+ *  concurrently modifying any environment variable." -- POSIX.
+ *
+ * Some evil libraries modify the environment. We currently ignore the calls as
+ * they could crash the process. This may cause funny behaviour though. */
+int putenv (char *str)
+{
+    if (override)
+    {
+        LOG("Blocked", "\"%s\"", str);
+        return 0;
+    }
+    return CALL(putenv, str);
+}
+
+int setenv (const char *name, const char *value, int overwrite)
+{
+    if (override)
+    {
+        LOG("Blocked", "\"%s\", \"%s\", %d", name, value, overwrite);
+        return 0;
+    }
+    return CALL(setenv, name, value, overwrite);
+}
+
+int unsetenv (const char *name)
+{
+    if (override)
+    {
+        LOG("Blocked", "\"%s\"", name);
+        return 0;
+    }
+    return CALL(unsetenv, name);
+}
+
+
 #endif /* __ELF__ */
