@@ -1219,7 +1219,7 @@ char *make_path (const char *url)
                 ret = strdup ("/dev/stdout");
                 break;
             case 2:
-                ret = strdup ("/dev/strerr");
+                ret = strdup ("/dev/stderr");
                 break;
             default:
                 if (asprintf (&ret, "/dev/fd/%d", fd) == -1)
