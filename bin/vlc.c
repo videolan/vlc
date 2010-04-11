@@ -61,6 +61,20 @@ int main( int i_argc, const char *ppsz_argv[] )
      * LibVLC runs outside of VLC, we cannot rely on this code snippet. */
     signal (SIGPIPE, SIG_IGN);
 
+#ifdef HAVE_PUTENV
+# ifndef NDEBUG
+    /* Activate malloc checking routines to detect heap corruptions. */
+    putenv( (char*)"MALLOC_CHECK_=2" );
+
+    /* Disable the ugly Gnome crash dialog so that we properly segfault */
+    putenv( (char *)"GNOME_DISABLE_CRASH_DIALOG=1" );
+# endif
+
+    /* Make Xlib hide visuals with an alphachannel. Ensure that Qt4 will not
+     * use the alpha channel for the embedded video window. */
+    putenv( (char *)"XLIB_SKIP_ARGB_VISUALS=1" );
+#endif
+
 #ifndef ALLOW_RUN_AS_ROOT
     if (geteuid () == 0)
     {
@@ -79,20 +93,6 @@ int main( int i_argc, const char *ppsz_argv[] )
     fprintf( stderr, "VLC media player %s (revision %s)\n",
              libvlc_get_version(), libvlc_get_changeset() );
 #endif
-
-#ifdef HAVE_PUTENV
-#   ifndef NDEBUG
-    /* Activate malloc checking routines to detect heap corruptions. */
-    putenv( (char*)"MALLOC_CHECK_=2" );
-
-    /* Disable the ugly Gnome crash dialog so that we properly segfault */
-    putenv( (char *)"GNOME_DISABLE_CRASH_DIALOG=1" );
-#   endif
-#endif
-
-    /* Make Xlib hide visuals with an alphachannel. Ensure that Qt4 will not
-     * use the alpha channel for the embedded video window. */
-    putenv( (char *)"XLIB_SKIP_ARGB_VISUALS=1" );
 
     /* Synchronously intercepted POSIX signals.
      *
