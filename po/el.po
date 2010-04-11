@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-03-29 23:20+0100\n"
+"POT-Creation-Date: 2010-04-11 23:45+0100\n"
 "PO-Revision-Date: 2005-01-22 01:24+0000\n"
 "Last-Translator: Simos Xenitellis <simos74@gmx.net>\n"
 "Language-Team: Greek <nls@tux.hellug.gr>\n"
@@ -40,7 +40,7 @@ msgstr "Επιλογές για προχωρημένους"
 
 #: include/vlc_config_cat.h:37 modules/gui/macosx/simple_prefs.m:180
 #: modules/gui/qt4/components/simple_preferences.cpp:81
-#: modules/gui/qt4/menus.cpp:1023 modules/misc/dummy/dummy.c:69
+#: modules/gui/qt4/menus.cpp:1013 modules/misc/dummy/dummy.c:69
 msgid "Interface"
 msgstr "Διασύνδεση"
 
@@ -371,9 +371,9 @@ msgstr "VOD"
 msgid "VLC's implementation of Video On Demand"
 msgstr "η υλοποίηση του VLC για το Video On Demand"
 
-#: include/vlc_config_cat.h:175 src/libvlc-module.c:2102
-#: src/playlist/engine.c:131 modules/demux/playlist/playlist.c:70
-#: modules/demux/playlist/playlist.c:71 modules/gui/macosx/embeddedwindow.m:75
+#: include/vlc_config_cat.h:175 src/libvlc-module.c:2101
+#: src/playlist/engine.c:131 modules/demux/playlist/playlist.c:69
+#: modules/demux/playlist/playlist.c:70 modules/gui/macosx/embeddedwindow.m:75
 #: modules/gui/macosx/intf.m:608 modules/gui/qt4/components/controller.hpp:106
 #: modules/gui/qt4/components/playlist/playlist.cpp:126
 #: modules/gui/qt4/components/playlist/selector.cpp:259
@@ -435,7 +435,6 @@ msgstr "Ρυθμίσεις για προχωρημένους"
 
 #: include/vlc_config_cat.h:198 modules/gui/macosx/open.m:180
 #: modules/gui/macosx/open.m:459 modules/gui/macosx/simple_prefs.m:259
-#: modules/gui/qt4/ui/sprefs_input.h:309
 msgid "Network"
 msgstr "Δίκτυο"
 
@@ -582,7 +581,7 @@ msgstr "Περί"
 #: modules/gui/macosx/intf.m:743 modules/gui/macosx/intf.m:2006
 #: modules/gui/macosx/intf.m:2007 modules/gui/macosx/intf.m:2008
 #: modules/gui/macosx/intf.m:2009 modules/gui/macosx/playlist.m:464
-#: modules/gui/qt4/components/controller.hpp:104 modules/gui/qt4/menus.cpp:787
+#: modules/gui/qt4/components/controller.hpp:104 modules/gui/qt4/menus.cpp:790
 msgid "Play"
 msgstr "Αναπαραγωγή"
 
@@ -920,15 +919,15 @@ msgstr "κλειδί"
 msgid "boolean"
 msgstr "boolean"
 
-#: src/config/file.c:630 src/libvlc.c:1582
+#: src/config/file.c:630 src/libvlc.c:1581
 msgid "integer"
 msgstr "ακέραιος"
 
-#: src/config/file.c:639 src/libvlc.c:1612
+#: src/config/file.c:639 src/libvlc.c:1611
 msgid "float"
 msgstr "Κινητής Υποδιαστολής"
 
-#: src/config/file.c:662 src/libvlc.c:1560
+#: src/config/file.c:662 src/libvlc.c:1559
 msgid "string"
 msgstr "συμβολοσειρά"
 
@@ -1303,11 +1302,11 @@ msgid ""
 "interface."
 msgstr ""
 
-#: src/libvlc.c:1234
+#: src/libvlc.c:1233
 msgid "To get exhaustive help, use '-H'."
 msgstr ""
 
-#: src/libvlc.c:1238 src/libvlc-module.c:1515
+#: src/libvlc.c:1237 src/libvlc-module.c:1515
 #, fuzzy, c-format
 msgid ""
 "Usage: %s [options] [stream] ...\n"
@@ -1357,53 +1356,53 @@ msgstr ""
 " από\n"
 "\n"
 
-#: src/libvlc.c:1628
+#: src/libvlc.c:1627
 msgid " (default enabled)"
 msgstr " (ενεργοποίηση προεπιλογής)"
 
-#: src/libvlc.c:1629
+#: src/libvlc.c:1628
 msgid " (default disabled)"
 msgstr " (απενεργοποίηση προεπιλογής)"
 
 # #-#-#-#-#  nautilus.HEAD.el.po (el)  #-#-#-#-#
 #
-#: src/libvlc.c:1792 src/libvlc.c:1795 src/libvlc.c:1803 src/libvlc.c:1808
+#: src/libvlc.c:1791 src/libvlc.c:1794 src/libvlc.c:1802 src/libvlc.c:1807
 #, fuzzy
 msgid "Note:"
 msgstr "Κανένα"
 
-#: src/libvlc.c:1793 src/libvlc.c:1796
+#: src/libvlc.c:1792 src/libvlc.c:1795
 msgid "add --advanced to your command line to see advanced options."
 msgstr ""
 
-#: src/libvlc.c:1804 src/libvlc.c:1809
+#: src/libvlc.c:1803 src/libvlc.c:1808
 #, c-format
 msgid ""
 "%d module(s) were not displayed because they only have advanced options.\n"
 msgstr ""
 
-#: src/libvlc.c:1816 src/libvlc.c:1820
+#: src/libvlc.c:1815 src/libvlc.c:1819
 msgid ""
 "No matching module found. Use --list or --list-verbose to list available "
 "modules."
 msgstr ""
 
-#: src/libvlc.c:1910
+#: src/libvlc.c:1909
 #, fuzzy, c-format
 msgid "VLC version %s (%s)\n"
 msgstr "Έκδοση VLC %s↵\n"
 
-#: src/libvlc.c:1912
+#: src/libvlc.c:1911
 #, fuzzy, c-format
 msgid "Compiled by %s on %s (%s)\n"
 msgstr "To compiled έγινε από %s@%s.%s\n"
 
-#: src/libvlc.c:1914
+#: src/libvlc.c:1913
 #, c-format
 msgid "Compiler: %s\n"
 msgstr "Compiler: %s\n"
 
-#: src/libvlc.c:1949
+#: src/libvlc.c:1948
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
@@ -1411,7 +1410,7 @@ msgstr ""
 "\n"
 "Μη λειτουργικό περιεχόμενο στο αρχείο vlc-help.txt.\n"
 
-#: src/libvlc.c:1969
+#: src/libvlc.c:1968
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -1422,7 +1421,7 @@ msgstr ""
 # #-#-#-#-#  nautilus.HEAD.el.po (el)  #-#-#-#-#
 #
 #: src/libvlc.h:173 src/libvlc-module.c:1462 src/libvlc-module.c:1463
-#: src/libvlc-module.c:2636 src/video_output/vout_intf.c:193
+#: src/libvlc-module.c:2635 src/video_output/vout_intf.c:195
 msgid "Zoom"
 msgstr "Μεγέθυνση"
 
@@ -2063,7 +2062,7 @@ msgstr ""
 "σας (ικανότητα απευθείας απόδοσης βίντεο). Το VLC θα προσπαθήσει να το "
 "χρησιμοποιείσει εξ'ορισμού."
 
-#: src/libvlc-module.c:442 src/video_output/vout_intf.c:342
+#: src/libvlc-module.c:442 src/video_output/vout_intf.c:344
 #: modules/gui/macosx/simple_prefs.m:295
 msgid "Always on top"
 msgstr "Πάντα στην κορυφή"
@@ -2733,7 +2732,7 @@ msgid ""
 "{...}\""
 msgstr ""
 
-#: src/libvlc-module.c:770 modules/gui/qt4/ui/sprefs_input.h:307
+#: src/libvlc-module.c:770
 #, fuzzy
 msgid "Record directory or filename"
 msgstr "Εγγραφή καταλόγου"
@@ -3146,7 +3145,7 @@ msgid ""
 "facility when this last one is enabled."
 msgstr ""
 
-#: src/libvlc-module.c:980 modules/gui/qt4/ui/sout.h:348
+#: src/libvlc-module.c:980
 msgid "Keep stream output open"
 msgstr "Διατήρηση της εξόδου ροής ανοιχτή"
 
@@ -3731,7 +3730,7 @@ msgstr ""
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
 msgstr ""
 
-#: src/libvlc-module.c:1274 src/video_output/vout_intf.c:355
+#: src/libvlc-module.c:1274 src/video_output/vout_intf.c:357
 #: modules/gui/macosx/controls.m:454 modules/gui/macosx/controls.m:510
 #: modules/gui/macosx/controls.m:1087 modules/gui/macosx/controls.m:1120
 #: modules/gui/macosx/embeddedwindow.m:68 modules/gui/macosx/intf.m:605
@@ -3821,12 +3820,12 @@ msgstr ""
 "Επέλεξε την συντόμευση πληκτρολογίου για την δημιουργία σελιδοδείκτη λίστας "
 "αναπαραγωγής."
 
-#: src/libvlc-module.c:1290 modules/gui/qt4/menus.cpp:808
+#: src/libvlc-module.c:1290 modules/gui/qt4/menus.cpp:811
 #, fuzzy
 msgid "Faster (fine)"
 msgstr "Πιο γρήγορα"
 
-#: src/libvlc-module.c:1292 modules/gui/qt4/menus.cpp:816
+#: src/libvlc-module.c:1292 modules/gui/qt4/menus.cpp:819
 #, fuzzy
 msgid "Slower (fine)"
 msgstr "Πιο αργά"
@@ -3838,8 +3837,7 @@ msgstr "Πιο αργά"
 #: modules/gui/macosx/intf.m:746 modules/gui/macosx/wizard.m:309
 #: modules/gui/macosx/wizard.m:321 modules/gui/macosx/wizard.m:1623
 #: modules/gui/qt4/components/controller.hpp:105
-#: modules/misc/notify/notify.c:321 modules/gui/qt4/ui/sout.h:333
-#: modules/gui/qt4/ui/sout.h:344 modules/gui/qt4/ui/streampanel.h:182
+#: modules/misc/notify/notify.c:321
 msgid "Next"
 msgstr "Επόμενο"
 
@@ -3854,8 +3852,7 @@ msgstr ""
 #: modules/gui/macosx/embeddedwindow.m:71 modules/gui/macosx/intf.m:599
 #: modules/gui/macosx/intf.m:651 modules/gui/macosx/intf.m:739
 #: modules/gui/macosx/intf.m:745 modules/gui/qt4/components/controller.hpp:105
-#: modules/misc/notify/notify.c:319 modules/gui/qt4/ui/sout.h:343
-#: modules/gui/qt4/ui/sout.h:353
+#: modules/misc/notify/notify.c:319
 msgid "Previous"
 msgstr "Προηγούμενο"
 
@@ -3871,7 +3868,7 @@ msgstr ""
 #: modules/gui/macosx/embeddedwindow.m:72 modules/gui/macosx/intf.m:602
 #: modules/gui/macosx/intf.m:647 modules/gui/macosx/intf.m:737
 #: modules/gui/macosx/intf.m:744 modules/gui/qt4/components/controller.hpp:104
-#: modules/misc/notify/xosd.c:231 modules/gui/qt4/ui/streampanel.h:181
+#: modules/misc/notify/xosd.c:231
 msgid "Stop"
 msgstr "Διακοπή"
 
@@ -4018,7 +4015,7 @@ msgstr "Μεγάλο μήκος μεταπήδησης , σε δεύτερα ."
 
 #: src/libvlc-module.c:1341 modules/control/hotkeys.c:179
 #: modules/gui/qt4/components/controller.hpp:108
-#: modules/gui/qt4/components/controller.hpp:118 modules/gui/qt4/menus.cpp:883
+#: modules/gui/qt4/components/controller.hpp:118 modules/gui/qt4/menus.cpp:886
 #: modules/gui/skins2/commands/cmd_quit.cpp:40
 msgid "Quit"
 msgstr "Έξοδος"
@@ -4600,7 +4597,7 @@ msgstr "Διασύνδεση"
 msgid "Cycle through available audio devices"
 msgstr "Διασύνδεση"
 
-#: src/libvlc-module.c:1683 src/video_output/vout_intf.c:361
+#: src/libvlc-module.c:1683 src/video_output/vout_intf.c:363
 #: modules/gui/macosx/controls.m:494 modules/gui/macosx/controls.m:1086
 #: modules/gui/macosx/intf.m:687 modules/gui/macosx/intf.m:751
 #: modules/gui/qt4/components/controller.hpp:106
@@ -4679,24 +4676,24 @@ msgstr "Πρόσθετες Λειτουργίες"
 msgid "Performance options"
 msgstr "Eπιλογές για την απόδοση"
 
-#: src/libvlc-module.c:2204
+#: src/libvlc-module.c:2203
 msgid "Hot keys"
 msgstr "Συντομεύσεις πληκτρολογίου"
 
-#: src/libvlc-module.c:2646
+#: src/libvlc-module.c:2645
 msgid "Jump sizes"
 msgstr "Μεγέθη μετατόπισης"
 
-#: src/libvlc-module.c:2723
+#: src/libvlc-module.c:2722
 #, fuzzy
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr "εκτύπωση βοηθείας για το VLC (μπορεί να συνδειαστεί με --προχωρημένα)"
 
-#: src/libvlc-module.c:2726
+#: src/libvlc-module.c:2725
 msgid "Exhaustive help for VLC and its modules"
 msgstr ""
 
-#: src/libvlc-module.c:2728
+#: src/libvlc-module.c:2727
 #, fuzzy
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
@@ -4705,20 +4702,20 @@ msgstr ""
 "εκτύπωση βοηθείας για το VLC και όλα του τα modules (μπορεί να συνδειαστεί "
 "με --προχωρημένα)"
 
-#: src/libvlc-module.c:2731
+#: src/libvlc-module.c:2730
 msgid "ask for extra verbosity when displaying help"
 msgstr ""
 
-#: src/libvlc-module.c:2733
+#: src/libvlc-module.c:2732
 msgid "print a list of available modules"
 msgstr "εκτύπωση λίστας διαθέσιμων modules"
 
-#: src/libvlc-module.c:2735
+#: src/libvlc-module.c:2734
 #, fuzzy
 msgid "print a list of available modules with extra detail"
 msgstr "εκτύπωση λίστας διαθέσιμων modules"
 
-#: src/libvlc-module.c:2737
+#: src/libvlc-module.c:2736
 #, fuzzy
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
@@ -4727,27 +4724,27 @@ msgstr ""
 "εκτύπωση βοηθείας για ένα συγκεκριμένο module  (μπορεί να συνδειαστεί με --"
 "προχωρημένα)"
 
-#: src/libvlc-module.c:2741
+#: src/libvlc-module.c:2740
 msgid "no configuration option will be loaded nor saved to config file"
 msgstr ""
 
-#: src/libvlc-module.c:2743
+#: src/libvlc-module.c:2742
 msgid "reset the current config to the default values"
 msgstr "ανάκληση της τρέχουσας ρύθμισης στις προκαθορισμένες τιμές"
 
-#: src/libvlc-module.c:2745
+#: src/libvlc-module.c:2744
 msgid "use alternate config file"
 msgstr "χρησιμοποίηση εναλλακτικού αρχείου ρυθμίσεων"
 
-#: src/libvlc-module.c:2747
+#: src/libvlc-module.c:2746
 msgid "resets the current plugins cache"
 msgstr ""
 
-#: src/libvlc-module.c:2749
+#: src/libvlc-module.c:2748
 msgid "print version information"
 msgstr "Τύπωσε πληροφορίες έκδοσης"
 
-#: src/libvlc-module.c:2802
+#: src/libvlc-module.c:2788
 msgid "main program"
 msgstr "κύριο πρόγραμμα"
 
@@ -4803,7 +4800,7 @@ msgstr "Λήψη αρχείου..."
 #: modules/gui/macosx/simple_prefs.m:308 modules/gui/macosx/simple_prefs.m:696
 #: modules/gui/macosx/wizard.m:320
 #: modules/gui/qt4/components/open_panels.cpp:1265
-#: modules/gui/qt4/components/preferences_widgets.cpp:1412
+#: modules/gui/qt4/components/preferences_widgets.cpp:1420
 #: modules/gui/qt4/components/sout/profile_selector.cpp:253
 msgid "Cancel"
 msgstr "Ακύρωση"
@@ -4898,23 +4895,23 @@ msgstr "Αόριστο"
 msgid "Post processing"
 msgstr "Ποιότητα προεπεξεργασίας"
 
-#: src/video_output/vout_intf.c:226 modules/gui/macosx/intf.m:692
+#: src/video_output/vout_intf.c:228 modules/gui/macosx/intf.m:692
 #: modules/gui/macosx/intf.m:693 modules/video_filter/crop.c:107
 #: modules/video_filter/croppadd.c:86
 msgid "Crop"
 msgstr "Αποκοπή"
 
-#: src/video_output/vout_intf.c:293 modules/gui/macosx/controls.m:810
+#: src/video_output/vout_intf.c:295 modules/gui/macosx/controls.m:810
 #: modules/gui/macosx/intf.m:690 modules/gui/macosx/intf.m:691
 msgid "Aspect-ratio"
 msgstr "Λόγος διαστάσεων"
 
-#: src/video_output/vout_intf.c:323
+#: src/video_output/vout_intf.c:325
 #, fuzzy
 msgid "Autoscale video"
 msgstr "Ενεργοποίηση βίντεο"
 
-#: src/video_output/vout_intf.c:330
+#: src/video_output/vout_intf.c:332
 #, fuzzy
 msgid "Scale factor"
 msgstr "Κλίμακα"
@@ -5302,7 +5299,7 @@ msgstr "Τύπος γήινης ιεραρχείας"
 msgid "Hierarchy alpha value [Undefined,1,2,4]"
 msgstr ""
 
-#: modules/access/bda/bda.c:169 modules/gui/qt4/ui/streampanel.h:170
+#: modules/access/bda/bda.c:169
 msgid "1"
 msgstr ""
 
@@ -5686,7 +5683,7 @@ msgid "Configure"
 msgstr "Ρύθμιση"
 
 #: modules/access/dshow/dshow.cpp:459 modules/access/dshow/dshow.cpp:533
-#: modules/access/dshow/dshow.cpp:966 modules/access/dshow/dshow.cpp:1019
+#: modules/access/dshow/dshow.cpp:968 modules/access/dshow/dshow.cpp:1021
 #, fuzzy
 msgid "Capture failed"
 msgstr "Άνοιγμα αρχείου..."
@@ -5699,12 +5696,12 @@ msgstr ""
 msgid "VLC cannot open ANY capture device.Check the error log for details."
 msgstr ""
 
-#: modules/access/dshow/dshow.cpp:967
+#: modules/access/dshow/dshow.cpp:969
 #, c-format
 msgid "VLC cannot use the device \"%s\", because its type is not supported."
 msgstr ""
 
-#: modules/access/dshow/dshow.cpp:1020
+#: modules/access/dshow/dshow.cpp:1022
 #, c-format
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
@@ -5810,27 +5807,27 @@ msgstr ""
 msgid "DVB input with v4l2 support"
 msgstr "Είσοδος DVB με υποστήριξη v4l2"
 
-#: modules/access/dvb/access.c:247
+#: modules/access/dvb/access.c:249
 msgid "HTTP server"
 msgstr "Εξυπηρετητής HTTP"
 
-#: modules/access/dvb/access.c:941
+#: modules/access/dvb/access.c:943
 #, fuzzy
 msgid "Input syntax is deprecated"
 msgstr "Η πηγή εισόδου άλλαξε"
 
-#: modules/access/dvb/access.c:942
+#: modules/access/dvb/access.c:944
 msgid ""
 "The given syntax is deprecated. Run \"vlc -p dvb\" to see an explanation of "
 "the new syntax."
 msgstr ""
 
-#: modules/access/dvb/access.c:988
+#: modules/access/dvb/access.c:990
 #, fuzzy
 msgid "Invalid polarization"
 msgstr "Μη αποδεκτή επιλογή"
 
-#: modules/access/dvb/access.c:989
+#: modules/access/dvb/access.c:991
 #, c-format
 msgid "The provided polarization \"%c\" is not valid."
 msgstr ""
@@ -5877,8 +5874,8 @@ msgstr "DVD με μενού"
 msgid "DVDnav Input"
 msgstr "Είσοδος DVDnav"
 
-#: modules/access/dvdnav.c:312 modules/access/dvdread.c:250
-#: modules/access/dvdread.c:510 modules/access/dvdread.c:572
+#: modules/access/dvdnav.c:312 modules/access/dvdread.c:205
+#: modules/access/dvdread.c:465 modules/access/dvdread.c:527
 #, fuzzy
 msgid "Playback failure"
 msgstr "Αναπαραγωγή"
@@ -5888,59 +5885,26 @@ msgid ""
 "VLC cannot set the DVD's title. It possibly cannot decrypt the entire disc."
 msgstr ""
 
-#: modules/access/dvdread.c:79
-msgid "Method used by libdvdcss for decryption"
-msgstr "Μέθοδος που χρησιμοποιείται από libdvdcss για την αποκρυπτογράφηση"
-
-#: modules/access/dvdread.c:81
-msgid ""
-"Set the method used by libdvdcss for key decryption.\n"
-"title: decrypted title key is guessed from the encrypted sectors of the "
-"stream. Thus it should work with a file as well as the DVD device. But it "
-"sometimes takes much time to decrypt a title key and may even fail. With "
-"this method, the key is only checked at the beginning of each title, so it "
-"won't work if the key changes in the middle of a title.\n"
-"disc: the disc key is first cracked, then all title keys can be decrypted "
-"instantly, which allows us to check them often.\n"
-"key: the same as \"disc\" if you don't have a file with player keys at "
-"compilation time. If you do, the decryption of the disc key will be faster "
-"with this method. It is the one that was used by libcss.\n"
-"The default method is: key."
-msgstr "από στις στις από."
-
-#: modules/access/dvdread.c:97
-msgid "title"
-msgstr "τίτλος"
-
-#: modules/access/dvdread.c:97 modules/access/vcdx/info.c:54
-#: modules/gui/macosx/open.m:179 modules/gui/macosx/open.m:455
-msgid "Disc"
-msgstr "Δίσκος"
-
-#: modules/access/dvdread.c:97
-msgid "Key"
-msgstr "Πλήκτρο"
-
-#: modules/access/dvdread.c:103
+#: modules/access/dvdread.c:83
 msgid "DVD without menus"
 msgstr "DVD άνευ μενού"
 
-#: modules/access/dvdread.c:104
+#: modules/access/dvdread.c:84
 #, fuzzy
 msgid "DVDRead Input (no menu support)"
 msgstr "Είσοδος DVDRead (DVD χωρίς υποστήριξη μενού)"
 
-#: modules/access/dvdread.c:251
+#: modules/access/dvdread.c:206
 #, fuzzy, c-format
 msgid "DVDRead could not open the disc \"%s\"."
 msgstr "Πλήρης οθόνη"
 
-#: modules/access/dvdread.c:511
+#: modules/access/dvdread.c:466
 #, c-format
 msgid "DVDRead could not read block %d."
 msgstr ""
 
-#: modules/access/dvdread.c:573
+#: modules/access/dvdread.c:528
 #, c-format
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
 msgstr ""
@@ -6011,18 +5975,18 @@ msgstr "Ψευδές"
 msgid "Fake video input"
 msgstr "Ψευδής είσοδος"
 
-#: modules/access/file.c:168 modules/access/file.c:301
+#: modules/access/file.c:166 modules/access/file.c:299
 #: modules/access/mmap.c:228 modules/access/mtp.c:216 modules/access/mtp.c:304
 #, fuzzy
 msgid "File reading failed"
 msgstr "Ήχος"
 
-#: modules/access/file.c:169 modules/access/mtp.c:305
+#: modules/access/file.c:167 modules/access/mtp.c:305
 #, fuzzy, c-format
 msgid "VLC could not open the file \"%s\"."
 msgstr "Πλήρης οθόνη"
 
-#: modules/access/file.c:302 modules/access/mmap.c:229
+#: modules/access/file.c:300 modules/access/mmap.c:229
 #: modules/access/mtp.c:217
 #, fuzzy
 msgid "VLC could not read the file."
@@ -6758,7 +6722,7 @@ msgstr "Είσοδος οθόνης"
 
 #: modules/access/screen/screen.c:95 modules/access/screen/xcb.c:69
 #: modules/gui/macosx/open.m:223 modules/gui/macosx/open.m:426
-#: modules/gui/macosx/open.m:1020 modules/gui/macosx/simple_prefs.m:542
+#: modules/gui/macosx/open.m:1014 modules/gui/macosx/simple_prefs.m:542
 #: modules/gui/macosx/vout.m:223
 msgid "Screen"
 msgstr "Οθόνη"
@@ -7429,7 +7393,7 @@ msgstr ""
 msgid "Video4Linux2 Compressed A/V"
 msgstr "Είσοδος Video4Linux"
 
-#: modules/access/v4l2.c:2958
+#: modules/access/v4l2.c:2962
 #, fuzzy
 msgid "Reset controls to default"
 msgstr "Διεπαφή απομακρυσμένου ελέγχου VLM"
@@ -7469,6 +7433,11 @@ msgstr "Τμήμα"
 #: modules/access/vcdx/access.c:519
 msgid "LID"
 msgstr "LID"
+
+#: modules/access/vcdx/info.c:54 modules/gui/macosx/open.m:179
+#: modules/gui/macosx/open.m:455
+msgid "Disc"
+msgstr "Δίσκος"
 
 #: modules/access/vcdx/info.c:62
 msgid "VCD Format"
@@ -8683,14 +8652,14 @@ msgstr "5.1"
 #: modules/audio_output/pulse.c:65 modules/gui/macosx/embeddedwindow.m:76
 #: modules/gui/macosx/intf.m:595 modules/gui/macosx/intf.m:596
 #: modules/gui/macosx/intf.m:1986 modules/gui/qt4/dialogs/help.cpp:99
-#: modules/gui/qt4/main_interface.cpp:827
-#: modules/gui/qt4/main_interface.cpp:831
-#: modules/gui/qt4/main_interface.cpp:871
-#: modules/gui/qt4/main_interface.cpp:873
-#: modules/gui/qt4/main_interface.cpp:941
-#: modules/gui/qt4/main_interface.cpp:958
-#: modules/gui/qt4/main_interface.cpp:965
-#: modules/gui/qt4/main_interface.cpp:984
+#: modules/gui/qt4/main_interface.cpp:819
+#: modules/gui/qt4/main_interface.cpp:823
+#: modules/gui/qt4/main_interface.cpp:863
+#: modules/gui/qt4/main_interface.cpp:865
+#: modules/gui/qt4/main_interface.cpp:933
+#: modules/gui/qt4/main_interface.cpp:950
+#: modules/gui/qt4/main_interface.cpp:957
+#: modules/gui/qt4/main_interface.cpp:980
 #: modules/video_output/xcb/window.c:319
 msgid "VLC media player"
 msgstr "Αναπαραγωγός πολυμέσων VLC"
@@ -9656,11 +9625,11 @@ msgstr ""
 msgid "Fake video decoder"
 msgstr "Ψευδής αποκωδικοποιητής βίντεο"
 
-#: modules/codec/flac.c:133
+#: modules/codec/flac.c:134
 msgid "Flac audio decoder"
 msgstr "Αποκωδικοποιητής ήχου Flac"
 
-#: modules/codec/flac.c:139
+#: modules/codec/flac.c:140
 msgid "Flac audio encoder"
 msgstr "Κωδικοποιητής ήχου Flac"
 
@@ -10031,7 +10000,7 @@ msgstr "Κωδικοποιητής υποτίτλων"
 msgid "Subtitle renderers using libass"
 msgstr "Ρυθμίσεις αποπλέκτηυπότιτλων."
 
-#: modules/codec/libass.c:706 modules/misc/freetype.c:356
+#: modules/codec/libass.c:706 modules/misc/freetype.c:360
 msgid "Building font cache"
 msgstr ""
 
@@ -11310,7 +11279,6 @@ msgid "Quiet mode."
 msgstr "Κατάσταση σιωπηρής λειτουργίας"
 
 #: modules/codec/x264.c:371 modules/gui/macosx/playlistinfo.m:82
-#: modules/gui/qt4/ui/streampanel.h:171
 msgid "Statistics"
 msgstr "Στατιστικά"
 
@@ -11869,7 +11837,7 @@ msgstr "Άνοιγμα πρόσοψης"
 #: modules/control/rc.c:73 modules/gui/macosx/embeddedwindow.m:167
 #: modules/gui/macosx/intf.m:1996 modules/gui/macosx/intf.m:1997
 #: modules/gui/macosx/intf.m:1998 modules/gui/macosx/intf.m:1999
-#: modules/gui/qt4/menus.cpp:793 modules/misc/notify/xosd.c:235
+#: modules/gui/qt4/menus.cpp:796 modules/misc/notify/xosd.c:235
 msgid "Pause"
 msgstr "Παύση"
 
@@ -12432,7 +12400,7 @@ msgstr ""
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:243
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:293
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:386
-#: modules/stream_out/rtp.c:112 modules/gui/qt4/ui/open_net.h:126
+#: modules/stream_out/rtp.c:112
 msgid "Port"
 msgstr "Θύρα"
 
@@ -12738,42 +12706,42 @@ msgstr ""
 msgid "RTSP/RTP access and demux"
 msgstr ""
 
-#: modules/demux/live555.cpp:116 modules/demux/live555.cpp:117
+#: modules/demux/live555.cpp:117 modules/demux/live555.cpp:118
 #: modules/gui/macosx/simple_prefs.m:261
 msgid "Use RTP over RTSP (TCP)"
 msgstr ""
 
-#: modules/demux/live555.cpp:120
+#: modules/demux/live555.cpp:121
 #, fuzzy
 msgid "Client port"
 msgstr "Εκκαθάριση"
 
-#: modules/demux/live555.cpp:121
+#: modules/demux/live555.cpp:122
 msgid "Port to use for the RTP source of the session"
 msgstr ""
 
-#: modules/demux/live555.cpp:123 modules/demux/live555.cpp:124
+#: modules/demux/live555.cpp:124 modules/demux/live555.cpp:125
 msgid "Force multicast RTP via RTSP"
 msgstr ""
 
-#: modules/demux/live555.cpp:127 modules/demux/live555.cpp:128
+#: modules/demux/live555.cpp:128 modules/demux/live555.cpp:129
 msgid "Tunnel RTSP and RTP over HTTP"
 msgstr ""
 
-#: modules/demux/live555.cpp:131
+#: modules/demux/live555.cpp:132
 #, fuzzy
 msgid "HTTP tunnel port"
 msgstr "Εισαγωγή HTTP"
 
-#: modules/demux/live555.cpp:132
+#: modules/demux/live555.cpp:133
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr ""
 
-#: modules/demux/live555.cpp:605
+#: modules/demux/live555.cpp:606
 msgid "RTSP authentication"
 msgstr ""
 
-#: modules/demux/live555.cpp:606
+#: modules/demux/live555.cpp:607
 msgid "Please enter a valid login name and a password."
 msgstr ""
 
@@ -13040,74 +13008,74 @@ msgid ""
 "prevent adding them to the playlist."
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:73
+#: modules/demux/playlist/playlist.c:72
 msgid "M3U playlist import"
 msgstr "Εισαγωγή λίστας αναπαραγωγής M3U"
 
-#: modules/demux/playlist/playlist.c:81
+#: modules/demux/playlist/playlist.c:80
 #, fuzzy
 msgid "RAM playlist import"
 msgstr "Εισαγωγή λίστας αναπαραγωγής M3U"
 
-#: modules/demux/playlist/playlist.c:87
+#: modules/demux/playlist/playlist.c:86
 msgid "PLS playlist import"
 msgstr "Εισαγωγή λίστας αναπαραγωγής PLS"
 
-#: modules/demux/playlist/playlist.c:93
+#: modules/demux/playlist/playlist.c:92
 msgid "B4S playlist import"
 msgstr "Εισαγωγή λίστας αναπαραγωγής B4S"
 
-#: modules/demux/playlist/playlist.c:100
+#: modules/demux/playlist/playlist.c:99
 msgid "DVB playlist import"
 msgstr "Εισαγωγή λίστας αναπαραγωγής DVB"
 
-#: modules/demux/playlist/playlist.c:106
+#: modules/demux/playlist/playlist.c:105
 #, fuzzy
 msgid "Podcast parser"
 msgstr "Τύπος του Podcast"
 
-#: modules/demux/playlist/playlist.c:112
+#: modules/demux/playlist/playlist.c:111
 #, fuzzy
 msgid "XSPF playlist import"
 msgstr "Εισαγωγή λίστας αναπαραγωγής PLS"
 
-#: modules/demux/playlist/playlist.c:118
+#: modules/demux/playlist/playlist.c:117
 msgid "New winamp 5.2 shoutcast import"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:126
+#: modules/demux/playlist/playlist.c:125
 #, fuzzy
 msgid "ASX playlist import"
 msgstr "Εισαγωγή λίστας αναπαραγωγής PLS"
 
-#: modules/demux/playlist/playlist.c:132
+#: modules/demux/playlist/playlist.c:131
 msgid "Kasenna MediaBase parser"
 msgstr "Αναλυτής Kasenna MediaBase"
 
-#: modules/demux/playlist/playlist.c:138
+#: modules/demux/playlist/playlist.c:137
 msgid "QuickTime Media Link importer"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:144
+#: modules/demux/playlist/playlist.c:143
 #, fuzzy
 msgid "Google Video Playlist importer"
 msgstr "Εισαγωγή τοπικής λίστας αναπαραγωγής"
 
-#: modules/demux/playlist/playlist.c:150
+#: modules/demux/playlist/playlist.c:149
 #, fuzzy
 msgid "Dummy ifo demux"
 msgstr "CD Audio demux"
 
-#: modules/demux/playlist/playlist.c:155
+#: modules/demux/playlist/playlist.c:154
 msgid "iTunes Music Library importer"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:161
+#: modules/demux/playlist/playlist.c:160
 #, fuzzy
 msgid "WPL playlist import"
 msgstr "Εισαγωγή λίστας αναπαραγωγής PLS"
 
-#: modules/demux/playlist/playlist.c:167
+#: modules/demux/playlist/playlist.c:166
 #, fuzzy
 msgid "ZPL playlist import"
 msgstr "Εισαγωγή λίστας αναπαραγωγής PLS"
@@ -13766,13 +13734,13 @@ msgstr "Ευρετήριο"
 msgid "Bookmarks"
 msgstr "Σελιδοδείκτες"
 
-#: modules/gui/macosx/bookmarks.m:88 modules/gui/qt4/ui/sout.h:337
+#: modules/gui/macosx/bookmarks.m:88
 msgid "Add"
 msgstr "Προσθήκη"
 
 #: modules/gui/macosx/bookmarks.m:89 modules/gui/macosx/intf.m:642
 #: modules/gui/macosx/simple_prefs.m:246
-#: modules/gui/qt4/components/preferences_widgets.cpp:1198
+#: modules/gui/qt4/components/preferences_widgets.cpp:1199
 #: modules/gui/qt4/dialogs/bookmarks.cpp:47
 msgid "Clear"
 msgstr "Εκκαθάριση"
@@ -13816,7 +13784,7 @@ msgstr "Αποσυμπίεση"
 
 # #-#-#-#-#  nautilus.HEAD.el.po (el)  #-#-#-#-#
 #
-#: modules/gui/macosx/bookmarks.m:92 modules/gui/qt4/ui/open_file.h:224
+#: modules/gui/macosx/bookmarks.m:92
 msgid "Remove"
 msgstr "Αφαίρεση"
 
@@ -13843,7 +13811,7 @@ msgstr "Χρόνος"
 #: modules/gui/macosx/wizard.m:1686 modules/gui/macosx/wizard.m:1867
 #: modules/gui/macosx/wizard.m:1878 modules/gui/macosx/wizard.m:1891
 #: modules/gui/qt4/components/open_panels.cpp:1264
-#: modules/gui/qt4/components/preferences_widgets.cpp:1411
+#: modules/gui/qt4/components/preferences_widgets.cpp:1419
 msgid "OK"
 msgstr "Εντάξει"
 
@@ -14471,7 +14439,7 @@ msgstr "Μεταφορά Όλων Μπροστά"
 # #-#-#-#-#  yelp.HEAD.el.po (yelp 2.9.1)  #-#-#-#-#
 #
 #: modules/gui/macosx/intf.m:726 modules/gui/qt4/dialogs/help.cpp:54
-#: modules/gui/qt4/menus.cpp:879
+#: modules/gui/qt4/menus.cpp:882
 msgid "Help"
 msgstr "Βοήθεια"
 
@@ -14734,7 +14702,7 @@ msgstr ""
 #
 #: modules/gui/macosx/open.m:175 modules/gui/macosx/open.m:207
 #: modules/gui/macosx/open.m:588 modules/gui/macosx/open.m:779
-#: modules/gui/macosx/open.m:960 modules/gui/macosx/open.m:1196
+#: modules/gui/macosx/open.m:954 modules/gui/macosx/open.m:1190
 #: modules/gui/qt4/components/controller.hpp:104
 msgid "Open"
 msgstr "Άνοιγμα"
@@ -14752,8 +14720,6 @@ msgstr "Άλλοι κωδικοποιητές κεφαλαίων"
 #: modules/gui/qt4/components/preferences_widgets.cpp:299
 #: modules/gui/qt4/components/simple_preferences.cpp:276
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:102
-#: modules/gui/qt4/ui/open_file.h:232 modules/gui/qt4/ui/sprefs_input.h:304
-#: modules/gui/qt4/ui/sprefs_input.h:308
 msgid "Browse..."
 msgstr "Περιήγηση..."
 
@@ -14815,7 +14781,7 @@ msgstr ""
 msgid "Open RTP/UDP Stream"
 msgstr ""
 
-#: modules/gui/macosx/open.m:210 modules/gui/qt4/ui/open_net.h:121
+#: modules/gui/macosx/open.m:210
 msgid "Protocol"
 msgstr "Πρωτόκολλο"
 
@@ -14824,18 +14790,17 @@ msgstr "Πρωτόκολλο"
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:292
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:339
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:385
-#: modules/gui/qt4/ui/open_net.h:125
 msgid "Address"
 msgstr "Διεύθυνση"
 
 #: modules/gui/macosx/open.m:213 modules/gui/macosx/open.m:849
-#: modules/gui/macosx/open.m:913
+#: modules/gui/macosx/open.m:907
 #, fuzzy
 msgid "Unicast"
 msgstr "unicast"
 
 #: modules/gui/macosx/open.m:214 modules/gui/macosx/open.m:864
-#: modules/gui/macosx/open.m:928
+#: modules/gui/macosx/open.m:922
 #, fuzzy
 msgid "Multicast"
 msgstr "multicast"
@@ -14888,7 +14853,7 @@ msgstr "Προηγούμενο Κεφάλαιο"
 msgid "Next Channel"
 msgstr "Επόμενο κεφάλαιο"
 
-#: modules/gui/macosx/open.m:236 modules/gui/macosx/open.m:1130
+#: modules/gui/macosx/open.m:236 modules/gui/macosx/open.m:1124
 msgid "Retrieving Channel Info..."
 msgstr ""
 
@@ -14947,8 +14912,8 @@ msgstr "Ιδιότητες Γραμματοσειράς"
 msgid "Subtitle File"
 msgstr "Αρχείο  Υποτίτλων"
 
-#: modules/gui/macosx/open.m:587 modules/gui/macosx/open.m:959
-#: modules/gui/macosx/open.m:1195 modules/gui/qt4/ui/open_file.h:217
+#: modules/gui/macosx/open.m:587 modules/gui/macosx/open.m:953
+#: modules/gui/macosx/open.m:1189
 msgid "Open File"
 msgstr "Άνοιγμα Αρχείου"
 
@@ -14961,11 +14926,11 @@ msgstr "Δεν βρέθηκαν %@s"
 msgid "Open VIDEO_TS Directory"
 msgstr "Άνοιγμα καταλόγου VIDEO_TS"
 
-#: modules/gui/macosx/open.m:1033
+#: modules/gui/macosx/open.m:1027
 msgid "iSight Capture Input"
 msgstr ""
 
-#: modules/gui/macosx/open.m:1034
+#: modules/gui/macosx/open.m:1028
 msgid ""
 "This facility allows you to process your iSight's input signal.\n"
 "\n"
@@ -14975,12 +14940,12 @@ msgid ""
 "Live Audio input is not supported."
 msgstr ""
 
-#: modules/gui/macosx/open.m:1136
+#: modules/gui/macosx/open.m:1130
 #, fuzzy
 msgid "Composite input"
 msgstr "Επιλογή εισόδου"
 
-#: modules/gui/macosx/open.m:1139
+#: modules/gui/macosx/open.m:1133
 #, fuzzy
 msgid "S-Video input"
 msgstr "Ρυθμίσεις βίντεο"
@@ -15011,7 +14976,7 @@ msgstr "Κατεστραμένη πηγη εξόδου"
 msgid "Encapsulation Method"
 msgstr "Μέθοδος Εγκύστωσης"
 
-#: modules/gui/macosx/output.m:159 modules/gui/qt4/ui/sout.h:341
+#: modules/gui/macosx/output.m:159
 msgid "Transcoding options"
 msgstr "Επιλογές επανακωδικοποίησης"
 
@@ -15029,7 +14994,7 @@ msgstr "Κλίμακα"
 msgid "Stream Announcing"
 msgstr "Ροή"
 
-#: modules/gui/macosx/output.m:181 modules/gui/qt4/ui/sout.h:349
+#: modules/gui/macosx/output.m:181
 msgid "SAP announce"
 msgstr "ανακοίνωση SAP"
 
@@ -15082,7 +15047,6 @@ msgid "Save Playlist..."
 msgstr "Σώσιμο λίστας αναπαραγωγής..."
 
 #: modules/gui/macosx/playlist.m:465 modules/gui/qt4/dialogs/bookmarks.cpp:45
-#: modules/gui/qt4/ui/streampanel.h:173
 msgid "Delete"
 msgstr "Διαγραφή"
 
@@ -15232,7 +15196,7 @@ msgid "Lost frames"
 msgstr "Απόρριψη καθυστερημένων καρέ"
 
 #: modules/gui/macosx/playlistinfo.m:109 modules/gui/macosx/wizard.m:363
-#: modules/gui/qt4/dialogs_provider.cpp:622
+#: modules/gui/qt4/dialogs_provider.cpp:627
 #: modules/video_filter/deinterlace.c:149
 msgid "Streaming"
 msgstr "Ροή"
@@ -16016,7 +15980,6 @@ msgstr ""
 "επανακωδικοποίησης."
 
 #: modules/gui/macosx/wizard.m:401 modules/gui/macosx/wizard.m:1866
-#: modules/gui/qt4/ui/sout.h:351
 msgid "Time-To-Live (TTL)"
 msgstr "Time-To-Live (TTL)"
 
@@ -16635,12 +16598,12 @@ msgstr "Μενού"
 msgid "Next Chapter/Title"
 msgstr "Επόμενο κεφάλαιο"
 
-#: modules/gui/qt4/components/controller.cpp:490
+#: modules/gui/qt4/components/controller.cpp:486
 #, fuzzy
 msgid "Teletext Activation"
 msgstr "Επιλογή γωνίας"
 
-#: modules/gui/qt4/components/controller.cpp:506
+#: modules/gui/qt4/components/controller.cpp:502
 #, fuzzy
 msgid "Toggle Transparency "
 msgstr "Διαφάνεια"
@@ -17177,7 +17140,7 @@ msgstr ""
 msgid "URI"
 msgstr "URI"
 
-#: modules/gui/qt4/components/playlist/standardpanel.cpp:55
+#: modules/gui/qt4/components/playlist/standardpanel.cpp:56
 msgid "Detailed View"
 msgstr ""
 
@@ -17195,12 +17158,12 @@ msgstr ""
 #
 # #-#-#-#-#  screem-el.po (screem 1.0)  #-#-#-#-#
 #
-#: modules/gui/qt4/components/playlist/standardpanel.cpp:56
+#: modules/gui/qt4/components/playlist/standardpanel.cpp:57
 #, fuzzy
 msgid "Icon View"
 msgstr "Προβολή"
 
-#: modules/gui/qt4/components/playlist/standardpanel.cpp:57
+#: modules/gui/qt4/components/playlist/standardpanel.cpp:58
 #, fuzzy
 msgid "List View"
 msgstr "Λίστα αναπαραγωγής"
@@ -17219,37 +17182,36 @@ msgid "Hotkey"
 msgstr "Συντομεύσεις πληκτρολογίου"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1192
-#: modules/gui/qt4/components/preferences_widgets.cpp:1398
+#: modules/gui/qt4/components/preferences_widgets.cpp:1406
 #, fuzzy
 msgid "Global"
 msgstr "Ολικό κέρδος"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1199
-#, fuzzy
-msgid "Set"
-msgstr "Ρύθμιση QP"
+#: modules/gui/qt4/components/preferences_widgets.cpp:1200
+msgid "Apply"
+msgstr "Εφαρμογή"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1348
+#: modules/gui/qt4/components/preferences_widgets.cpp:1356
 #: modules/gui/qt4/util/customwidgets.cpp:439
 #, fuzzy
 msgid "Unset"
 msgstr "Χρήστης"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1399
+#: modules/gui/qt4/components/preferences_widgets.cpp:1407
 #, fuzzy
 msgid "Hotkey for "
 msgstr "Συντομεύσεις πληκτρολογίου"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1403
+#: modules/gui/qt4/components/preferences_widgets.cpp:1411
 msgid "Press the new keys for "
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1434
+#: modules/gui/qt4/components/preferences_widgets.cpp:1442
 msgid "Warning: the key is already assigned to \""
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1454
 #: modules/gui/qt4/components/preferences_widgets.cpp:1462
+#: modules/gui/qt4/components/preferences_widgets.cpp:1470
 #, fuzzy
 msgid "Key: "
 msgstr "Πλήκτρο"
@@ -17381,7 +17343,6 @@ msgid "File/Folder"
 msgstr "Φίλτρα"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:46
-#: modules/gui/qt4/ui/sout.h:334
 #, fuzzy
 msgid "Source"
 msgstr "Σκοπός"
@@ -17546,7 +17507,7 @@ msgid "Errors"
 msgstr "Σφάλματα"
 
 #: modules/gui/qt4/dialogs/errors.cpp:48
-#: modules/gui/qt4/dialogs/messages.cpp:184 modules/gui/qt4/menus.cpp:1514
+#: modules/gui/qt4/dialogs/messages.cpp:184 modules/gui/qt4/menus.cpp:1507
 #, fuzzy
 msgid "&Clear"
 msgstr "Εκκαθάριση"
@@ -17789,7 +17750,7 @@ msgid ""
 "%2."
 msgstr ""
 
-#: modules/gui/qt4/dialogs/open.cpp:80 modules/gui/qt4/menus.cpp:863
+#: modules/gui/qt4/dialogs/open.cpp:80 modules/gui/qt4/menus.cpp:866
 #, fuzzy
 msgid "Open Media"
 msgstr "Άνοιγμα MRL"
@@ -17956,7 +17917,7 @@ msgstr "Αναίρεση προτιμήσεων"
 msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/sout.cpp:42 modules/gui/qt4/ui/sout.h:332
+#: modules/gui/qt4/dialogs/sout.cpp:42
 #, fuzzy
 msgid "Stream Output"
 msgstr "Ροή εξόδου"
@@ -18192,37 +18153,37 @@ msgstr "Επιλογή Αρχείου"
 msgid "Open Folder"
 msgstr "Άνοιγμα Αρχείου ..."
 
-#: modules/gui/qt4/dialogs_provider.cpp:533
+#: modules/gui/qt4/dialogs_provider.cpp:538
 #, fuzzy
 msgid "Open playlist..."
 msgstr "Άνοιγμα &Λίστας Αναπαραγωγής..."
 
-#: modules/gui/qt4/dialogs_provider.cpp:548
+#: modules/gui/qt4/dialogs_provider.cpp:553
 #, fuzzy
 msgid "XSPF playlist (*.xspf)"
 msgstr "Αρχείο M3U|*.m3u|Λίστας αναπαραγωγής XSPF |*.xspf"
 
-#: modules/gui/qt4/dialogs_provider.cpp:549
+#: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
 msgid "M3U8 playlist (*.m3u)"
 msgstr "Αρχείο M3U|*.m3u|Λίστας αναπαραγωγής XSPF |*.xspf"
 
-#: modules/gui/qt4/dialogs_provider.cpp:550
+#: modules/gui/qt4/dialogs_provider.cpp:555
 #, fuzzy
 msgid "M3U playlist (*.m3u)"
 msgstr "Αρχείο M3U|*.m3u|Λίστας αναπαραγωγής XSPF |*.xspf"
 
-#: modules/gui/qt4/dialogs_provider.cpp:551
+#: modules/gui/qt4/dialogs_provider.cpp:556
 #, fuzzy
 msgid "HTML playlist (*.html)"
 msgstr "Επόμενο αντικείμενο λίστας αναπαραγωγής"
 
-#: modules/gui/qt4/dialogs_provider.cpp:563
+#: modules/gui/qt4/dialogs_provider.cpp:568
 #, fuzzy
 msgid "Save playlist as..."
 msgstr "Σώσιμο λίστας αναπαραγωγής..."
 
-#: modules/gui/qt4/dialogs_provider.cpp:672
+#: modules/gui/qt4/dialogs_provider.cpp:677
 #, fuzzy
 msgid "Open subtitles..."
 msgstr "Άνοιγμα Υποτίτλων"
@@ -18259,11 +18220,11 @@ msgstr "Αρχείο  Υποτίτλων"
 msgid "All Files"
 msgstr "Αρχείο"
 
-#: modules/gui/qt4/main_interface.cpp:942
+#: modules/gui/qt4/main_interface.cpp:934
 msgid "Control menu for the player"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:995
+#: modules/gui/qt4/main_interface.cpp:977
 msgid "Paused"
 msgstr "Σε παύση"
 
@@ -18277,11 +18238,11 @@ msgstr "Πολυμέσα %s"
 msgid "P&layback"
 msgstr "Αναπαραγωγή"
 
-#: modules/gui/qt4/menus.cpp:293 modules/gui/qt4/menus.cpp:999
+#: modules/gui/qt4/menus.cpp:293 modules/gui/qt4/menus.cpp:989
 msgid "&Audio"
 msgstr "Ή&χος"
 
-#: modules/gui/qt4/menus.cpp:294 modules/gui/qt4/menus.cpp:1006
+#: modules/gui/qt4/menus.cpp:294 modules/gui/qt4/menus.cpp:996
 msgid "&Video"
 msgstr "&Βίντεο"
 
@@ -18304,7 +18265,7 @@ msgstr "Εργαλείο"
 #
 # #-#-#-#-#  screem-el.po (screem 1.0)  #-#-#-#-#
 #
-#: modules/gui/qt4/menus.cpp:298 modules/gui/qt4/menus.cpp:1049
+#: modules/gui/qt4/menus.cpp:298 modules/gui/qt4/menus.cpp:1039
 #, fuzzy
 msgid "V&iew"
 msgstr "Προβολή"
@@ -18313,12 +18274,12 @@ msgstr "Προβολή"
 msgid "&Help"
 msgstr "&Βοήθεια"
 
-#: modules/gui/qt4/menus.cpp:315 modules/gui/qt4/menus.cpp:864
+#: modules/gui/qt4/menus.cpp:315 modules/gui/qt4/menus.cpp:867
 #, fuzzy
 msgid "&Open File..."
 msgstr "Άνοιγμα Αρχείου ..."
 
-#: modules/gui/qt4/menus.cpp:321 modules/gui/qt4/menus.cpp:868
+#: modules/gui/qt4/menus.cpp:321 modules/gui/qt4/menus.cpp:871
 msgid "Open &Disc..."
 msgstr "Άνοιγμα &Δίσκου..."
 
@@ -18326,7 +18287,7 @@ msgstr "Άνοιγμα &Δίσκου..."
 msgid "Open &Network Stream..."
 msgstr "Άνοιγμα &Ροής Δικτύου..."
 
-#: modules/gui/qt4/menus.cpp:325 modules/gui/qt4/menus.cpp:872
+#: modules/gui/qt4/menus.cpp:325 modules/gui/qt4/menus.cpp:875
 msgid "Open &Capture Device..."
 msgstr "Άνοιγμα &Συσκευής Σύλληψης..."
 
@@ -18348,7 +18309,7 @@ msgstr ""
 msgid "&Streaming..."
 msgstr "Ροή"
 
-#: modules/gui/qt4/menus.cpp:354 modules/gui/qt4/menus.cpp:1104
+#: modules/gui/qt4/menus.cpp:354 modules/gui/qt4/menus.cpp:1099
 #, fuzzy
 msgid "&Quit"
 msgstr "Έξοδος"
@@ -18378,7 +18339,7 @@ msgstr "Αγνοημένες επεκτάσεις"
 msgid "&Preferences"
 msgstr "Προτιμήσεις"
 
-#: modules/gui/qt4/menus.cpp:428
+#: modules/gui/qt4/menus.cpp:431
 msgid "&View"
 msgstr "&Προβολή"
 
@@ -18580,81 +18541,81 @@ msgstr "Βοήθεια"
 msgid "Check for &Updates..."
 msgstr "Έλεγχος για ενημερώσεις..."
 
-#: modules/gui/qt4/menus.cpp:803
+#: modules/gui/qt4/menus.cpp:806
 #, fuzzy
 msgid "&Faster"
 msgstr "Πιο γρήγορα"
 
 # #-#-#-#-#  gnomemeeting.HEAD.el.po (el)  #-#-#-#-#
 #
-#: modules/gui/qt4/menus.cpp:812
+#: modules/gui/qt4/menus.cpp:815
 #, fuzzy
 msgid "N&ormal Speed"
 msgstr "Κανονικό Μέγεθος"
 
-#: modules/gui/qt4/menus.cpp:820
+#: modules/gui/qt4/menus.cpp:823
 #, fuzzy
 msgid "Slo&wer"
 msgstr "Πιο αργά"
 
-#: modules/gui/qt4/menus.cpp:827
+#: modules/gui/qt4/menus.cpp:830
 #, fuzzy
 msgid "&Jump Forward"
 msgstr "Βήμα Εμπρός"
 
-#: modules/gui/qt4/menus.cpp:832
+#: modules/gui/qt4/menus.cpp:835
 #, fuzzy
 msgid "Jump Bac&kward"
 msgstr "Βήμα Πίσω"
 
 # #-#-#-#-#  nautilus.HEAD.el.po (el)  #-#-#-#-#
 #
-#: modules/gui/qt4/menus.cpp:847
+#: modules/gui/qt4/menus.cpp:850
 #, fuzzy
 msgid "&Stop"
 msgstr "Διακοπή"
 
-#: modules/gui/qt4/menus.cpp:854
+#: modules/gui/qt4/menus.cpp:857
 #, fuzzy
 msgid "Pre&vious"
 msgstr "Προηγούμενο"
 
-#: modules/gui/qt4/menus.cpp:856
+#: modules/gui/qt4/menus.cpp:859
 #, fuzzy
 msgid "Ne&xt"
 msgstr "Επόμενο"
 
-#: modules/gui/qt4/menus.cpp:870
+#: modules/gui/qt4/menus.cpp:873
 #, fuzzy
 msgid "Open &Network..."
 msgstr "Άνοιγμα Δικτύου..."
 
-#: modules/gui/qt4/menus.cpp:986
+#: modules/gui/qt4/menus.cpp:976
 #, fuzzy
 msgid "Leave Fullscreen"
 msgstr "Γέμισμα πλήρους οθόνης"
 
-#: modules/gui/qt4/menus.cpp:1013
+#: modules/gui/qt4/menus.cpp:1003
 #, fuzzy
 msgid "&Playback"
 msgstr "Αναπαραγωγή"
 
-#: modules/gui/qt4/menus.cpp:1086
+#: modules/gui/qt4/menus.cpp:1081
 #, fuzzy
 msgid "Hide VLC media player in taskbar"
 msgstr "Αναπαραγωγός πολυμέσων VLC"
 
-#: modules/gui/qt4/menus.cpp:1092
+#: modules/gui/qt4/menus.cpp:1087
 #, fuzzy
 msgid "Show VLC media player"
 msgstr "Αναπαραγωγός πολυμέσων VLC"
 
-#: modules/gui/qt4/menus.cpp:1102
+#: modules/gui/qt4/menus.cpp:1097
 #, fuzzy
 msgid "&Open Media"
 msgstr "Άνοιγμα MRL"
 
-#: modules/gui/qt4/menus.cpp:1499
+#: modules/gui/qt4/menus.cpp:1492
 #, fuzzy
 msgid " - Empty - "
 msgstr "Άδειο"
@@ -19330,11 +19291,11 @@ msgid ""
 "Visit http://www.last.fm/join/ to get an account."
 msgstr ""
 
-#: modules/misc/audioscrobbler.c:820
+#: modules/misc/audioscrobbler.c:824
 msgid "last.fm: Authentication failed"
 msgstr ""
 
-#: modules/misc/audioscrobbler.c:821
+#: modules/misc/audioscrobbler.c:825
 msgid ""
 "last.fm username or password is incorrect. Please verify your settings and "
 "relaunch VLC."
@@ -19551,7 +19512,7 @@ msgstr "Είδος κειμένου οπτικού δίσκου CD"
 msgid "Freetype2 font renderer"
 msgstr ""
 
-#: modules/misc/freetype.c:357
+#: modules/misc/freetype.c:361
 msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a few minutes."
@@ -19694,65 +19655,69 @@ msgid ""
 msgstr ""
 
 #: modules/misc/lua/vlc.c:65
-msgid "Lua Art"
-msgstr ""
-
-#: modules/misc/lua/vlc.c:66
-msgid "Fetch artwork using lua scripts"
-msgstr ""
-
-#: modules/misc/lua/vlc.c:71
-#, fuzzy
-msgid "Lua Meta Fetcher"
-msgstr "Metal"
-
-#: modules/misc/lua/vlc.c:72
-msgid "Fetch meta data using lua scripts"
-msgstr ""
-
-#: modules/misc/lua/vlc.c:77
-#, fuzzy
-msgid "Lua Meta Reader"
-msgstr "Metal"
-
-#: modules/misc/lua/vlc.c:78
-msgid "Read meta data using lua scripts"
-msgstr ""
-
-#: modules/misc/lua/vlc.c:86
-#, fuzzy
-msgid "Lua Playlist"
-msgstr "Λίστα αναπαραγωγής"
-
-#: modules/misc/lua/vlc.c:87
-msgid "Lua Playlist Parser Interface"
-msgstr ""
-
-#: modules/misc/lua/vlc.c:92
-#, fuzzy
-msgid "Lua Interface Module (shortcuts)"
-msgstr "Module διεπαφής"
-
-#: modules/misc/lua/vlc.c:99
 #, fuzzy
 msgid "Lua Interface Module"
 msgstr "Module διεπαφής"
 
-#: modules/misc/lua/vlc.c:115
+#: modules/misc/lua/vlc.c:66
+msgid "Interfaces implemented using lua scripts"
+msgstr ""
+
+#: modules/misc/lua/vlc.c:84
+#, fuzzy
+msgid "Lua Meta Fetcher"
+msgstr "Metal"
+
+#: modules/misc/lua/vlc.c:85
+msgid "Fetch meta data using lua scripts"
+msgstr ""
+
+#: modules/misc/lua/vlc.c:90
+#, fuzzy
+msgid "Lua Meta Reader"
+msgstr "Metal"
+
+#: modules/misc/lua/vlc.c:91
+msgid "Read meta data using lua scripts"
+msgstr ""
+
+#: modules/misc/lua/vlc.c:97
+#, fuzzy
+msgid "Lua Playlist"
+msgstr "Λίστα αναπαραγωγής"
+
+#: modules/misc/lua/vlc.c:98
+msgid "Lua Playlist Parser Interface"
+msgstr ""
+
+#: modules/misc/lua/vlc.c:103
+#, fuzzy
+msgid "Lua Interface Module (shortcuts)"
+msgstr "Module διεπαφής"
+
+#: modules/misc/lua/vlc.c:110
+msgid "Lua Art"
+msgstr ""
+
+#: modules/misc/lua/vlc.c:111
+msgid "Fetch artwork using lua scripts"
+msgstr ""
+
+#: modules/misc/lua/vlc.c:116
 #, fuzzy
 msgid "Lua Extension"
 msgstr "Αγνοημένες επεκτάσεις"
 
-#: modules/misc/lua/vlc.c:121
+#: modules/misc/lua/vlc.c:122
 #, fuzzy
 msgid "Lua SD Module"
 msgstr "Module διεπαφής"
 
-#: modules/misc/lua/vlc.c:129
+#: modules/misc/lua/vlc.c:132
 msgid "Freebox TV"
 msgstr ""
 
-#: modules/misc/lua/vlc.c:135
+#: modules/misc/lua/vlc.c:138
 #, fuzzy
 msgid "French TV"
 msgstr "Γαλλική"
@@ -20463,13 +20428,13 @@ msgid "Bonjour services"
 msgstr "Bonjour"
 
 #: modules/services_discovery/mediadirs.c:71
-#: modules/services_discovery/mediadirs.c:361
+#: modules/services_discovery/mediadirs.c:372
 #, fuzzy
 msgid "My Videos"
 msgstr "Βίντεο"
 
 #: modules/services_discovery/mediadirs.c:78
-#: modules/services_discovery/mediadirs.c:363
+#: modules/services_discovery/mediadirs.c:374
 #, fuzzy
 msgid "My Music"
 msgstr "Μιούζικαλ"
@@ -20480,7 +20445,7 @@ msgid "Picture"
 msgstr "Υποεικόνες"
 
 #: modules/services_discovery/mediadirs.c:85
-#: modules/services_discovery/mediadirs.c:365
+#: modules/services_discovery/mediadirs.c:376
 #, fuzzy
 msgid "My Pictures"
 msgstr "Υποεικόνες"
@@ -21190,84 +21155,84 @@ msgstr ""
 msgid "RTP stream output"
 msgstr "Έξοδος ροής HTTP"
 
-#: modules/stream_out/smem.c:62
+#: modules/stream_out/smem.c:60
 msgid "Video prerender callback"
 msgstr ""
 
-#: modules/stream_out/smem.c:63
+#: modules/stream_out/smem.c:61
 msgid ""
 "Address of the video prerender callback functionthis function will set the "
 "buffer where render will be done"
 msgstr ""
 
-#: modules/stream_out/smem.c:66
+#: modules/stream_out/smem.c:64
 msgid "Audio prerender callback"
 msgstr ""
 
-#: modules/stream_out/smem.c:67
+#: modules/stream_out/smem.c:65
 msgid ""
 "Address of the audio prerender callback function.this function will set the "
 "buffer where render will be done"
 msgstr ""
 
-#: modules/stream_out/smem.c:70
+#: modules/stream_out/smem.c:68
 #, fuzzy
 msgid "Video postrender callback"
 msgstr "Κομμάτι βίντεο"
 
-#: modules/stream_out/smem.c:71
+#: modules/stream_out/smem.c:69
 msgid ""
 "Address of the video postrender callback function.this function will be "
 "called when the render is into the buffer"
 msgstr ""
 
-#: modules/stream_out/smem.c:74
+#: modules/stream_out/smem.c:72
 #, fuzzy
 msgid "Audio postrender callback"
 msgstr "ηχητικό κομμάτι"
 
-#: modules/stream_out/smem.c:75
+#: modules/stream_out/smem.c:73
 msgid ""
 "Address of the audio postrender callback function.this function will be "
 "called when the render is into the buffer"
 msgstr ""
 
-#: modules/stream_out/smem.c:78
+#: modules/stream_out/smem.c:76
 #, fuzzy
 msgid "Video Callback data"
 msgstr "Τμήμα video"
 
-#: modules/stream_out/smem.c:79
+#: modules/stream_out/smem.c:77
 msgid "Data for the video callback function."
 msgstr ""
 
-#: modules/stream_out/smem.c:81
+#: modules/stream_out/smem.c:79
 #, fuzzy
 msgid "Audio callback data"
 msgstr "Ηχητικό sample rate"
 
-#: modules/stream_out/smem.c:82
+#: modules/stream_out/smem.c:80
 #, fuzzy
 msgid "Data for the audio callback function."
 msgstr "Ταυτότητα ροής του ηχητικού κομματιού προς χρήση."
 
-#: modules/stream_out/smem.c:84
+#: modules/stream_out/smem.c:82
 #, fuzzy
 msgid "Time Synchronized output"
 msgstr "Επιλέξτε ένα ηχητικό κομμάτι"
 
-#: modules/stream_out/smem.c:85
+#: modules/stream_out/smem.c:83
 msgid ""
 "Time Synchronisation option for output. If true, stream will render as "
 "usual, else it will be rendered as fast as possible."
 msgstr ""
 
-#: modules/stream_out/smem.c:97
+#: modules/stream_out/smem.c:95
 #, fuzzy
 msgid "Smem"
 msgstr "Ροή"
 
-#: modules/stream_out/smem.c:98
+#: modules/stream_out/smem.c:96
 #, fuzzy
 msgid "Stream output to memory buffer"
 msgstr "Ροή εξόδου"
@@ -21345,7 +21310,7 @@ msgstr "Προκαθορισμένη ροή"
 #
 # #-#-#-#-#  gimp-print-el.po (gimp-print 1.0)  #-#-#-#-#
 #
-#: modules/stream_out/switcher.c:90 modules/gui/qt4/ui/sprefs_input.h:305
+#: modules/stream_out/switcher.c:90
 msgid "Files"
 msgstr "Αρχεία"
 
@@ -24608,16 +24573,7 @@ msgstr ""
 "Εξαναγκασμός του XVideo renderer να κάνει χρήση ειδικής μορφής chroma αντί "
 "προσπάθειας βελτίωσης απόδοσης με την χρήση του πλέον ικανού."
 
-#: modules/video_output/sdl.c:54
-#, fuzzy
-msgid "SDL video driver name"
-msgstr "Όνομα συσκευής βίντεο"
-
-#: modules/video_output/sdl.c:56
-msgid "Force a specific SDL video output driver."
-msgstr ""
-
-#: modules/video_output/sdl.c:62
+#: modules/video_output/sdl.c:58
 msgid "Simple DirectMedia Layer video output"
 msgstr "Έξοδος βίντεο Simple DirectMedia Layer"
 
@@ -25045,247 +25001,202 @@ msgstr "Φίλτρο εικονοποιητή"
 msgid "Spectrum analyser"
 msgstr "Αναλυτής φάσματος"
 
-#: modules/gui/qt4/ui/open_file.h:219
+#~ msgid "Method used by libdvdcss for decryption"
+#~ msgstr "Μέθοδος που χρησιμοποιείται από libdvdcss για την αποκρυπτογράφηση"
+
+#~ msgid ""
+#~ "Set the method used by libdvdcss for key decryption.\n"
+#~ "title: decrypted title key is guessed from the encrypted sectors of the "
+#~ "stream. Thus it should work with a file as well as the DVD device. But it "
+#~ "sometimes takes much time to decrypt a title key and may even fail. With "
+#~ "this method, the key is only checked at the beginning of each title, so "
+#~ "it won't work if the key changes in the middle of a title.\n"
+#~ "disc: the disc key is first cracked, then all title keys can be decrypted "
+#~ "instantly, which allows us to check them often.\n"
+#~ "key: the same as \"disc\" if you don't have a file with player keys at "
+#~ "compilation time. If you do, the decryption of the disc key will be "
+#~ "faster with this method. It is the one that was used by libcss.\n"
+#~ "The default method is: key."
+#~ msgstr "από στις στις από."
+
+#~ msgid "title"
+#~ msgstr "τίτλος"
+
+#~ msgid "Key"
+#~ msgstr "Πλήκτρο"
+
 #, fuzzy
-msgid "Choose one or more media file to open"
-msgstr "αρχείο ρυθμίσεων VLM"
+#~ msgid "Set"
+#~ msgstr "Ρύθμιση QP"
 
-#: modules/gui/qt4/ui/open_file.h:221
 #, fuzzy
-msgid "File Selection"
-msgstr "Μη αποδεκτή επιλογή"
+#~ msgid "SDL video driver name"
+#~ msgstr "Όνομα συσκευής βίντεο"
 
-#: modules/gui/qt4/ui/open_file.h:222
-msgid "You can select local files with the following list and buttons."
-msgstr ""
-
-#: modules/gui/qt4/ui/open_file.h:223
 #, fuzzy
-msgid "Add..."
-msgstr "Αποθήκευση αρχείου"
+#~ msgid "Choose one or more media file to open"
+#~ msgstr "αρχείο ρυθμίσεων VLM"
 
-#: modules/gui/qt4/ui/open_file.h:226
 #, fuzzy
-msgid "Add a subtitles file"
-msgstr "Χρήση αρχείου υποτίτλων"
+#~ msgid "File Selection"
+#~ msgstr "Μη αποδεκτή επιλογή"
 
-#: modules/gui/qt4/ui/open_file.h:228
 #, fuzzy
-msgid "Use a sub&titles file"
-msgstr "Χρήση αρχείου υποτίτλων"
+#~ msgid "Add..."
+#~ msgstr "Αποθήκευση αρχείου"
 
-#: modules/gui/qt4/ui/open_file.h:230
 #, fuzzy
-msgid "Select the subtitles file"
-msgstr "Επιλέξτε ένα αρχείο υπότιτλων"
+#~ msgid "Add a subtitles file"
+#~ msgstr "Χρήση αρχείου υποτίτλων"
 
-#: modules/gui/qt4/ui/open_file.h:233
 #, fuzzy
-msgid "Font size:"
-msgstr "Μέγεθος γραμματοσειράς"
+#~ msgid "Use a sub&titles file"
+#~ msgstr "Χρήση αρχείου υποτίτλων"
 
-#: modules/gui/qt4/ui/open_file.h:234
 #, fuzzy
-msgid "Text alignment:"
-msgstr "Επιλογή γωνίας"
+#~ msgid "Select the subtitles file"
+#~ msgstr "Επιλέξτε ένα αρχείο υπότιτλων"
 
-#: modules/gui/qt4/ui/open_net.h:116 modules/gui/qt4/ui/sprefs_input.h:301
-#: modules/gui/qt4/ui/streampanel.h:168
 #, fuzzy
-msgid "Form"
-msgstr "Από"
+#~ msgid "Font size:"
+#~ msgstr "Μέγεθος γραμματοσειράς"
 
-#: modules/gui/qt4/ui/open_net.h:117
 #, fuzzy
-msgid "Network Protocol"
-msgstr "Πρωτόκολλο"
+#~ msgid "Text alignment:"
+#~ msgstr "Επιλογή γωνίας"
 
-#: modules/gui/qt4/ui/open_net.h:119
 #, fuzzy
-msgid "Select the protocol for the URL."
-msgstr "Επέλεξε το φάκελο όπου θα γίνει η αποθήκευση."
+#~ msgid "Form"
+#~ msgstr "Από"
 
-#: modules/gui/qt4/ui/open_net.h:123
 #, fuzzy
-msgid "Select the port used"
-msgstr "Επιλεγμένα:"
+#~ msgid "Network Protocol"
+#~ msgstr "Πρωτόκολλο"
 
-#: modules/gui/qt4/ui/open_net.h:128
-msgid "Enter the URL of the network stream here, with or without the protocol."
-msgstr ""
-
-#: modules/gui/qt4/ui/sout.h:335 modules/gui/qt4/ui/sout.h:345
 #, fuzzy
-msgid "Destinations"
-msgstr "Προορισμός"
+#~ msgid "Select the protocol for the URL."
+#~ msgstr "Επέλεξε το φάκελο όπου θα γίνει η αποθήκευση."
 
-#: modules/gui/qt4/ui/sout.h:336
 #, fuzzy
-msgid "New destination"
-msgstr "Προορισμός"
+#~ msgid "Select the port used"
+#~ msgstr "Επιλεγμένα:"
 
-#: modules/gui/qt4/ui/sout.h:338
-msgid ""
-"Add destinations following the streaming methods you need. Be sure to check "
-"with transcoding that the format is compatible with the method used."
-msgstr ""
-
-#: modules/gui/qt4/ui/sout.h:339
 #, fuzzy
-msgid "Display locally"
-msgstr "Αναπαραγωγή μόνο"
+#~ msgid "Destinations"
+#~ msgstr "Προορισμός"
 
-#: modules/gui/qt4/ui/sout.h:342
 #, fuzzy
-msgid "Activate Transcoding"
-msgstr "MPEG 1"
+#~ msgid "New destination"
+#~ msgstr "Προορισμός"
 
-#: modules/gui/qt4/ui/sout.h:346
 #, fuzzy
-msgid "Miscellaneous Options"
-msgstr "Διάφορα"
+#~ msgid "Display locally"
+#~ msgstr "Αναπαραγωγή μόνο"
 
-#: modules/gui/qt4/ui/sout.h:347
 #, fuzzy
-msgid "Stream all elementary streams"
-msgstr "Επιλέξτε μία ροή διαδικτύου"
+#~ msgid "Activate Transcoding"
+#~ msgstr "MPEG 1"
 
-#: modules/gui/qt4/ui/sout.h:350
-msgid "Group name"
-msgstr "Όνομα ομάδας"
-
-#: modules/gui/qt4/ui/sout.h:352
 #, fuzzy
-msgid "Generated stream output string"
-msgstr "Γενικές ρυθμίσεις ροής εξαγωγής"
+#~ msgid "Miscellaneous Options"
+#~ msgstr "Διάφορα"
 
-#: modules/gui/qt4/ui/sout.h:354
-msgid "Options"
-msgstr "Επιλογές"
-
-#: modules/gui/qt4/ui/sprefs_input.h:302
-msgid "Optical drive"
-msgstr ""
-
-#: modules/gui/qt4/ui/sprefs_input.h:303
 #, fuzzy
-msgid "Default optical device"
-msgstr "Προκαθορισμένες συσκευές"
+#~ msgid "Stream all elementary streams"
+#~ msgstr "Επιλέξτε μία ροή διαδικτύου"
 
-#: modules/gui/qt4/ui/sprefs_input.h:306
+#~ msgid "Group name"
+#~ msgstr "Όνομα ομάδας"
+
 #, fuzzy
-msgid "Damaged or incomplete AVI file"
-msgstr "Ιδιότητες συντονιστή"
+#~ msgid "Generated stream output string"
+#~ msgstr "Γενικές ρυθμίσεις ροής εξαγωγής"
 
-#: modules/gui/qt4/ui/sprefs_input.h:310
+#~ msgid "Options"
+#~ msgstr "Επιλογές"
+
 #, fuzzy
-msgid "Default port (server mode)"
-msgstr "Προκαθορισμένες συσκευές"
+#~ msgid "Default optical device"
+#~ msgstr "Προκαθορισμένες συσκευές"
 
-#: modules/gui/qt4/ui/sprefs_input.h:311
 #, fuzzy
-msgid "HTTP proxy URL"
-msgstr "HTTP proxy"
+#~ msgid "Damaged or incomplete AVI file"
+#~ msgstr "Ιδιότητες συντονιστή"
 
-#: modules/gui/qt4/ui/sprefs_input.h:312
 #, fuzzy
-msgid "Default caching policy"
-msgstr "Προκαθορισμένη γωνία DVD"
+#~ msgid "Default port (server mode)"
+#~ msgstr "Προκαθορισμένες συσκευές"
 
-#: modules/gui/qt4/ui/sprefs_input.h:313
 #, fuzzy
-msgid "HTTP (default)"
-msgstr "εξ ορισμού"
+#~ msgid "HTTP proxy URL"
+#~ msgstr "HTTP proxy"
 
-#: modules/gui/qt4/ui/sprefs_input.h:314
-msgid "RTP over RTSP (TCP)"
-msgstr ""
-
-#: modules/gui/qt4/ui/sprefs_input.h:315
 #, fuzzy
-msgid "Live555 stream transport"
-msgstr "Θύρα UDP"
+#~ msgid "Default caching policy"
+#~ msgstr "Προκαθορισμένη γωνία DVD"
 
-#: modules/gui/qt4/ui/sprefs_input.h:316
 #, fuzzy
-msgid "Codecs"
-msgstr "κωδικοποιητής"
+#~ msgid "HTTP (default)"
+#~ msgstr "εξ ορισμού"
 
-#: modules/gui/qt4/ui/sprefs_input.h:317
 #, fuzzy
-msgid "Video quality post-processing level"
-msgstr "Φίλτρο βίντεο"
+#~ msgid "Live555 stream transport"
+#~ msgstr "Θύρα UDP"
 
-#: modules/gui/qt4/ui/sprefs_input.h:318
-msgid "H.264 in-loop deblocking filter"
-msgstr ""
-
-#: modules/gui/qt4/ui/sprefs_input.h:319
-msgid "System codecs (better quality)"
-msgstr ""
-
-#: modules/gui/qt4/ui/sprefs_input.h:320
 #, fuzzy
-msgid "Use host codecs if available"
-msgstr "Επανακωδικοποίηση του βίντεο (αν υπάρχει)"
+#~ msgid "Codecs"
+#~ msgstr "κωδικοποιητής"
 
-#: modules/gui/qt4/ui/streampanel.h:172
 #, fuzzy
-msgid "Stuff"
-msgstr "huff"
+#~ msgid "Video quality post-processing level"
+#~ msgstr "Φίλτρο βίντεο"
 
-#: modules/gui/qt4/ui/streampanel.h:174
 #, fuzzy
-msgid "Edit settings"
-msgstr "Ρυθμίσεις ήχου"
+#~ msgid "Use host codecs if available"
+#~ msgstr "Επανακωδικοποίηση του βίντεο (αν υπάρχει)"
 
-#: modules/gui/qt4/ui/streampanel.h:175
-msgid "Control"
-msgstr "Έλεγχος"
-
-#: modules/gui/qt4/ui/streampanel.h:176
-msgid "Run manually"
-msgstr ""
-
-#: modules/gui/qt4/ui/streampanel.h:177
 #, fuzzy
-msgid "Setup schedule"
-msgstr "Ανακάτεμα"
+#~ msgid "Stuff"
+#~ msgstr "huff"
 
-#: modules/gui/qt4/ui/streampanel.h:178
 #, fuzzy
-msgid "Run on schedule"
-msgstr "Ανακάτεμα"
+#~ msgid "Edit settings"
+#~ msgstr "Ρυθμίσεις ήχου"
 
-#: modules/gui/qt4/ui/streampanel.h:179
-#, fuzzy
-msgid "Status"
-msgstr "&Ρυθμίσεις"
+#~ msgid "Control"
+#~ msgstr "Έλεγχος"
 
-#: modules/gui/qt4/ui/streampanel.h:180
 #, fuzzy
-msgid "P/P"
-msgstr "UDP/RTP"
+#~ msgid "Setup schedule"
+#~ msgstr "Ανακάτεμα"
 
-#: modules/gui/qt4/ui/streampanel.h:183
 #, fuzzy
-msgid "Prev"
-msgstr "Προηγούμενο"
+#~ msgid "Run on schedule"
+#~ msgstr "Ανακάτεμα"
 
-#: modules/gui/qt4/ui/streampanel.h:184
 #, fuzzy
-msgid "Add Input"
-msgstr "Ουδεμία εισαγωγή"
+#~ msgid "Status"
+#~ msgstr "&Ρυθμίσεις"
 
-#: modules/gui/qt4/ui/streampanel.h:185
 #, fuzzy
-msgid "Edit Input"
-msgstr "Είσοδος αρχείου"
+#~ msgid "P/P"
+#~ msgstr "UDP/RTP"
 
-#: modules/gui/qt4/ui/streampanel.h:186
 #, fuzzy
-msgid "Clear List"
-msgstr "λίστα αναπαραγωγής"
+#~ msgid "Prev"
+#~ msgstr "Προηγούμενο"
+
+#, fuzzy
+#~ msgid "Add Input"
+#~ msgstr "Ουδεμία εισαγωγή"
+
+#, fuzzy
+#~ msgid "Edit Input"
+#~ msgstr "Είσοδος αρχείου"
+
+#, fuzzy
+#~ msgid "Clear List"
+#~ msgstr "λίστα αναπαραγωγής"
 
 #~ msgid "Other codecs"
 #~ msgstr "Άλλοι κωδικοποιητές"
@@ -25664,9 +25575,6 @@ msgstr "λίστα αναπαραγωγής"
 
 #~ msgid "Remove All"
 #~ msgstr "Αφαίρεση όλων"
-
-#~ msgid "Apply"
-#~ msgstr "Εφαρμογή"
 
 #~ msgid "Defaults"
 #~ msgstr "Προεπιλογές"

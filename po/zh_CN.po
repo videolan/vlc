@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 1.1.x\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-04-08 00:07+0100\n"
+"POT-Creation-Date: 2010-04-11 23:45+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Dean Lee <xslidian@lidian.info>\n"
 "Language-Team: Simplified Chinese <xslidian+vlc@gmail.com>\n"
@@ -387,7 +387,6 @@ msgstr "高级设置"
 
 #: include/vlc_config_cat.h:198 modules/gui/macosx/open.m:180
 #: modules/gui/macosx/open.m:459 modules/gui/macosx/simple_prefs.m:259
-#: modules/gui/qt4/ui/sprefs_input.h:309
 msgid "Network"
 msgstr "网络"
 
@@ -848,15 +847,15 @@ msgstr "按键"
 msgid "boolean"
 msgstr "气泡"
 
-#: src/config/file.c:630 src/libvlc.c:1582
+#: src/config/file.c:630 src/libvlc.c:1581
 msgid "integer"
 msgstr "整数"
 
-#: src/config/file.c:639 src/libvlc.c:1612
+#: src/config/file.c:639 src/libvlc.c:1611
 msgid "float"
 msgstr "浮点"
 
-#: src/config/file.c:662 src/libvlc.c:1560
+#: src/config/file.c:662 src/libvlc.c:1559
 msgid "string"
 msgstr "字串"
 
@@ -1208,11 +1207,11 @@ msgid ""
 "interface."
 msgstr "正在以默认界面运行 vlc，使用 'cvlc' 将 vlc 运行在无界面的状态下。"
 
-#: src/libvlc.c:1234
+#: src/libvlc.c:1233
 msgid "To get exhaustive help, use '-H'."
 msgstr "要获取全面的帮助, 请使用 '-H'。"
 
-#: src/libvlc.c:1238 src/libvlc-module.c:1515
+#: src/libvlc.c:1237 src/libvlc-module.c:1515
 #, c-format
 msgid ""
 "Usage: %s [options] [stream] ...\n"
@@ -1278,50 +1277,50 @@ msgstr ""
 "  vlc://pause:<秒>               指定播放列表中的项目在某一时间暂停\n"
 "  vlc://quit                     指定项目推出 VLC\n"
 
-#: src/libvlc.c:1628
+#: src/libvlc.c:1627
 msgid " (default enabled)"
 msgstr " (默认开启)"
 
-#: src/libvlc.c:1629
+#: src/libvlc.c:1628
 msgid " (default disabled)"
 msgstr " (默认关闭)"
 
-#: src/libvlc.c:1792 src/libvlc.c:1795 src/libvlc.c:1803 src/libvlc.c:1808
+#: src/libvlc.c:1791 src/libvlc.c:1794 src/libvlc.c:1802 src/libvlc.c:1807
 msgid "Note:"
 msgstr "说明:"
 
-#: src/libvlc.c:1793 src/libvlc.c:1796
+#: src/libvlc.c:1792 src/libvlc.c:1795
 msgid "add --advanced to your command line to see advanced options."
 msgstr "add -- 查看您命令行的高级选项。"
 
-#: src/libvlc.c:1804 src/libvlc.c:1809
+#: src/libvlc.c:1803 src/libvlc.c:1808
 #, c-format
 msgid ""
 "%d module(s) were not displayed because they only have advanced options.\n"
 msgstr "由于只有高级选项，%d 个模块没有被显示。\n"
 
-#: src/libvlc.c:1816 src/libvlc.c:1820
+#: src/libvlc.c:1815 src/libvlc.c:1819
 msgid ""
 "No matching module found. Use --list or --list-verbose to list available "
 "modules."
 msgstr "未找到匹配的模块。使用 --list 或 --list-verbose 来列出可用模块。"
 
-#: src/libvlc.c:1910
+#: src/libvlc.c:1909
 #, c-format
 msgid "VLC version %s (%s)\n"
 msgstr "VLC 版本 %s (%s)\n"
 
-#: src/libvlc.c:1912
+#: src/libvlc.c:1911
 #, c-format
 msgid "Compiled by %s on %s (%s)\n"
 msgstr "编译者 %s 编译时间 %s (%s)\n"
 
-#: src/libvlc.c:1914
+#: src/libvlc.c:1913
 #, c-format
 msgid "Compiler: %s\n"
 msgstr "编译器: %s\n"
 
-#: src/libvlc.c:1949
+#: src/libvlc.c:1948
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
@@ -1329,7 +1328,7 @@ msgstr ""
 "\n"
 "转储内容到 vlc-help.txt 文件中。\n"
 
-#: src/libvlc.c:1969
+#: src/libvlc.c:1968
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -2540,7 +2539,7 @@ msgstr ""
 "您可以手动以 \"{name=bookmark-name,time=optional-time-offset,bytes=optional-"
 "byte-offset},{...}\" 形式给予一个输入流的书签列表"
 
-#: src/libvlc-module.c:770 modules/gui/qt4/ui/sprefs_input.h:307
+#: src/libvlc-module.c:770
 msgid "Record directory or filename"
 msgstr "记录目录或文件名"
 
@@ -2945,7 +2944,7 @@ msgid ""
 "facility when this last one is enabled."
 msgstr "在最后一个 SPU 流被开启时选择 SPU 流是否应该重定向到流输出设备中。"
 
-#: src/libvlc-module.c:980 modules/gui/qt4/ui/sout.h:348
+#: src/libvlc-module.c:980
 msgid "Keep stream output open"
 msgstr "保持流输出打开"
 
@@ -3569,8 +3568,7 @@ msgstr "较慢 (好)"
 #: modules/gui/macosx/intf.m:746 modules/gui/macosx/wizard.m:309
 #: modules/gui/macosx/wizard.m:321 modules/gui/macosx/wizard.m:1623
 #: modules/gui/qt4/components/controller.hpp:105
-#: modules/misc/notify/notify.c:321 modules/gui/qt4/ui/sout.h:333
-#: modules/gui/qt4/ui/sout.h:344 modules/gui/qt4/ui/streampanel.h:182
+#: modules/misc/notify/notify.c:321
 msgid "Next"
 msgstr "下一个"
 
@@ -3583,8 +3581,7 @@ msgstr "选择用于跳到下一个播放列表项目的热键。"
 #: modules/gui/macosx/embeddedwindow.m:71 modules/gui/macosx/intf.m:599
 #: modules/gui/macosx/intf.m:651 modules/gui/macosx/intf.m:739
 #: modules/gui/macosx/intf.m:745 modules/gui/qt4/components/controller.hpp:105
-#: modules/misc/notify/notify.c:319 modules/gui/qt4/ui/sout.h:343
-#: modules/gui/qt4/ui/sout.h:353
+#: modules/misc/notify/notify.c:319
 msgid "Previous"
 msgstr "上一个"
 
@@ -3596,7 +3593,7 @@ msgstr "选择用于跳到上一个播放列表项目的热键。"
 #: modules/gui/macosx/embeddedwindow.m:72 modules/gui/macosx/intf.m:602
 #: modules/gui/macosx/intf.m:647 modules/gui/macosx/intf.m:737
 #: modules/gui/macosx/intf.m:744 modules/gui/qt4/components/controller.hpp:104
-#: modules/misc/notify/xosd.c:231 modules/gui/qt4/ui/streampanel.h:181
+#: modules/misc/notify/xosd.c:231
 msgid "Stop"
 msgstr "停止"
 
@@ -4934,7 +4931,7 @@ msgstr "地面控制模式"
 msgid "Hierarchy alpha value [Undefined,1,2,4]"
 msgstr "控制 alpha 值 [未定义,1,2,4]"
 
-#: modules/access/bda/bda.c:169 modules/gui/qt4/ui/streampanel.h:170
+#: modules/access/bda/bda.c:169
 msgid "1"
 msgstr "1"
 
@@ -5425,25 +5422,25 @@ msgstr "HTTP 接口证书废止列表文件"
 msgid "DVB input with v4l2 support"
 msgstr "带 v4l2 支持的 DVB 输入"
 
-#: modules/access/dvb/access.c:247
+#: modules/access/dvb/access.c:249
 msgid "HTTP server"
 msgstr "HTTP 服务器"
 
-#: modules/access/dvb/access.c:941
+#: modules/access/dvb/access.c:943
 msgid "Input syntax is deprecated"
 msgstr "输入语法被拒绝"
 
-#: modules/access/dvb/access.c:942
+#: modules/access/dvb/access.c:944
 msgid ""
 "The given syntax is deprecated. Run \"vlc -p dvb\" to see an explanation of "
 "the new syntax."
 msgstr "给予的语法被拒绝。运行 \"vlc -p dvb\" 查看新语法的解释。"
 
-#: modules/access/dvb/access.c:988
+#: modules/access/dvb/access.c:990
 msgid "Invalid polarization"
 msgstr "非法极化"
 
-#: modules/access/dvb/access.c:989
+#: modules/access/dvb/access.c:991
 #, c-format
 msgid "The provided polarization \"%c\" is not valid."
 msgstr "提供的极化 \"%c\" 无效。"
@@ -5487,8 +5484,8 @@ msgstr "有菜单的 DVD"
 msgid "DVDnav Input"
 msgstr "DVD 导航输入"
 
-#: modules/access/dvdnav.c:312 modules/access/dvdread.c:250
-#: modules/access/dvdread.c:510 modules/access/dvdread.c:572
+#: modules/access/dvdnav.c:312 modules/access/dvdread.c:205
+#: modules/access/dvdread.c:465 modules/access/dvdread.c:527
 msgid "Playback failure"
 msgstr "播放失败"
 
@@ -5497,67 +5494,25 @@ msgid ""
 "VLC cannot set the DVD's title. It possibly cannot decrypt the entire disc."
 msgstr "VLC 无法设置 DVD 标题。可能无法解密整张光盘。"
 
-#: modules/access/dvdread.c:79
-msgid "Method used by libdvdcss for decryption"
-msgstr "libdvdcss 用于解密的模式"
-
-#: modules/access/dvdread.c:81
-msgid ""
-"Set the method used by libdvdcss for key decryption.\n"
-"title: decrypted title key is guessed from the encrypted sectors of the "
-"stream. Thus it should work with a file as well as the DVD device. But it "
-"sometimes takes much time to decrypt a title key and may even fail. With "
-"this method, the key is only checked at the beginning of each title, so it "
-"won't work if the key changes in the middle of a title.\n"
-"disc: the disc key is first cracked, then all title keys can be decrypted "
-"instantly, which allows us to check them often.\n"
-"key: the same as \"disc\" if you don't have a file with player keys at "
-"compilation time. If you do, the decryption of the disc key will be faster "
-"with this method. It is the one that was used by libcss.\n"
-"The default method is: key."
-msgstr ""
-"设置 libdvdcss 用于密匙解密的模式。\n"
-"标题: 从被加密的流的扇区猜测标题密匙。因此它将可以工作于文件以及 DVD 设备。但"
-"是有时它会花费许多时间解密一个标题密匙并可能失败。此模式只能在每个标题开始时"
-"检测密匙,所以它在密匙在标题中间被更改时无法工作。\n"
-"光盘: 首先破解光盘密匙,然后所有光盘密匙将被立即解密,这样就可以允许我们经常检"
-"测它们。\n"
-"密匙: 与 \"光盘\" 相同,如果您没有在编译时的播放器密匙的话。如果您有光盘密匙的"
-"解密将在此模式中更快。这是 libccs 使用的模式。\n"
-"默认的模式是: 密匙。"
-
-#: modules/access/dvdread.c:97
-msgid "title"
-msgstr "标题"
-
-#: modules/access/dvdread.c:97 modules/access/vcdx/info.c:54
-#: modules/gui/macosx/open.m:179 modules/gui/macosx/open.m:455
-msgid "Disc"
-msgstr "光盘"
-
-#: modules/access/dvdread.c:97
-msgid "Key"
-msgstr "密匙"
-
-#: modules/access/dvdread.c:103
+#: modules/access/dvdread.c:83
 msgid "DVD without menus"
 msgstr "没有菜单的 DVD"
 
-#: modules/access/dvdread.c:104
+#: modules/access/dvdread.c:84
 msgid "DVDRead Input (no menu support)"
 msgstr "DVDRead 输入 (无菜单支持)"
 
-#: modules/access/dvdread.c:251
+#: modules/access/dvdread.c:206
 #, c-format
 msgid "DVDRead could not open the disc \"%s\"."
 msgstr "DVDRead 无法打开光碟 \"%s\"。"
 
-#: modules/access/dvdread.c:511
+#: modules/access/dvdread.c:466
 #, c-format
 msgid "DVDRead could not read block %d."
 msgstr "DVD 读取无法读取块 %d。"
 
-#: modules/access/dvdread.c:573
+#: modules/access/dvdread.c:528
 #, c-format
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
 msgstr "DVDRead 无法读取 %d/%d 块，位于 0x%02x。"
@@ -5628,17 +5583,17 @@ msgstr "伪装"
 msgid "Fake video input"
 msgstr "伪装视频输入"
 
-#: modules/access/file.c:168 modules/access/file.c:301
+#: modules/access/file.c:166 modules/access/file.c:299
 #: modules/access/mmap.c:228 modules/access/mtp.c:216 modules/access/mtp.c:304
 msgid "File reading failed"
 msgstr "文件读取失败"
 
-#: modules/access/file.c:169 modules/access/mtp.c:305
+#: modules/access/file.c:167 modules/access/mtp.c:305
 #, c-format
 msgid "VLC could not open the file \"%s\"."
 msgstr "VLC 无法打开文件 \"%s\"。"
 
-#: modules/access/file.c:302 modules/access/mmap.c:229
+#: modules/access/file.c:300 modules/access/mmap.c:229
 #: modules/access/mtp.c:217
 msgid "VLC could not read the file."
 msgstr "VLC 无法读取文件。"
@@ -6985,6 +6940,11 @@ msgstr "片段"
 #: modules/access/vcdx/access.c:519
 msgid "LID"
 msgstr "LID"
+
+#: modules/access/vcdx/info.c:54 modules/gui/macosx/open.m:179
+#: modules/gui/macosx/open.m:455
+msgid "Disc"
+msgstr "光盘"
 
 #: modules/access/vcdx/info.c:62
 msgid "VCD Format"
@@ -9065,11 +9025,11 @@ msgstr "强制为输出使用指定的色度。默认是 I420。"
 msgid "Fake video decoder"
 msgstr "伪视频解码器"
 
-#: modules/codec/flac.c:133
+#: modules/codec/flac.c:134
 msgid "Flac audio decoder"
 msgstr "Flac 音频解码器"
 
-#: modules/codec/flac.c:139
+#: modules/codec/flac.c:140
 msgid "Flac audio encoder"
 msgstr "Flac 音频编码器"
 
@@ -10708,7 +10668,6 @@ msgid "Quiet mode."
 msgstr "静默模式。"
 
 #: modules/codec/x264.c:371 modules/gui/macosx/playlistinfo.m:82
-#: modules/gui/qt4/ui/streampanel.h:171
 msgid "Statistics"
 msgstr "统计"
 
@@ -11760,7 +11719,7 @@ msgstr ""
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:243
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:293
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:386
-#: modules/stream_out/rtp.c:112 modules/gui/qt4/ui/open_net.h:126
+#: modules/stream_out/rtp.c:112
 msgid "Port"
 msgstr "端口"
 
@@ -12978,7 +12937,7 @@ msgstr "索引"
 msgid "Bookmarks"
 msgstr "书签"
 
-#: modules/gui/macosx/bookmarks.m:88 modules/gui/qt4/ui/sout.h:337
+#: modules/gui/macosx/bookmarks.m:88
 msgid "Add"
 msgstr "添加"
 
@@ -12998,7 +12957,7 @@ msgstr "编辑"
 msgid "Extract"
 msgstr "释放"
 
-#: modules/gui/macosx/bookmarks.m:92 modules/gui/qt4/ui/open_file.h:224
+#: modules/gui/macosx/bookmarks.m:92
 msgid "Remove"
 msgstr "移除"
 
@@ -13747,8 +13706,6 @@ msgstr "捕获"
 #: modules/gui/qt4/components/preferences_widgets.cpp:299
 #: modules/gui/qt4/components/simple_preferences.cpp:276
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:102
-#: modules/gui/qt4/ui/open_file.h:232 modules/gui/qt4/ui/sprefs_input.h:304
-#: modules/gui/qt4/ui/sprefs_input.h:308
 msgid "Browse..."
 msgstr "浏览..."
 
@@ -13814,7 +13771,7 @@ msgstr ""
 msgid "Open RTP/UDP Stream"
 msgstr "打开 RTP/UDP 串流"
 
-#: modules/gui/macosx/open.m:210 modules/gui/qt4/ui/open_net.h:121
+#: modules/gui/macosx/open.m:210
 msgid "Protocol"
 msgstr "协议"
 
@@ -13823,7 +13780,6 @@ msgstr "协议"
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:292
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:339
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:385
-#: modules/gui/qt4/ui/open_net.h:125
 msgid "Address"
 msgstr "地址"
 
@@ -13938,7 +13894,7 @@ msgid "Subtitle File"
 msgstr "字幕文件"
 
 #: modules/gui/macosx/open.m:587 modules/gui/macosx/open.m:953
-#: modules/gui/macosx/open.m:1189 modules/gui/qt4/ui/open_file.h:217
+#: modules/gui/macosx/open.m:1189
 msgid "Open File"
 msgstr "打开文件"
 
@@ -14003,7 +13959,7 @@ msgstr "转储 raw 输入"
 msgid "Encapsulation Method"
 msgstr "封装模式"
 
-#: modules/gui/macosx/output.m:159 modules/gui/qt4/ui/sout.h:341
+#: modules/gui/macosx/output.m:159
 msgid "Transcoding options"
 msgstr "转码选项"
 
@@ -14020,7 +13976,7 @@ msgstr "比例"
 msgid "Stream Announcing"
 msgstr "流式广播"
 
-#: modules/gui/macosx/output.m:181 modules/gui/qt4/ui/sout.h:349
+#: modules/gui/macosx/output.m:181
 msgid "SAP announce"
 msgstr "SAP 广播"
 
@@ -14071,7 +14027,6 @@ msgid "Save Playlist..."
 msgstr "保存播放列表..."
 
 #: modules/gui/macosx/playlist.m:465 modules/gui/qt4/dialogs/bookmarks.cpp:45
-#: modules/gui/qt4/ui/streampanel.h:173
 msgid "Delete"
 msgstr "删除"
 
@@ -14939,7 +14894,6 @@ msgid "In this page, a few additional streaming parameters can be set."
 msgstr "在此页中,可以设置一些附加的流参数。"
 
 #: modules/gui/macosx/wizard.m:401 modules/gui/macosx/wizard.m:1866
-#: modules/gui/qt4/ui/sout.h:351
 msgid "Time-To-Live (TTL)"
 msgstr "实时 (TTL)"
 
@@ -16157,7 +16111,6 @@ msgid "File/Folder"
 msgstr "文件/文件夹"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:46
-#: modules/gui/qt4/ui/sout.h:334
 msgid "Source"
 msgstr "来源"
 
@@ -16656,7 +16609,7 @@ msgstr "重置参数(&R)"
 msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr "您是否确定要复位 VLC media player 的首选项?"
 
-#: modules/gui/qt4/dialogs/sout.cpp:42 modules/gui/qt4/ui/sout.h:332
+#: modules/gui/qt4/dialogs/sout.cpp:42
 msgid "Stream Output"
 msgstr "流输出"
 
@@ -18202,58 +18155,63 @@ msgstr ""
 ">, ...}, ...'。"
 
 #: modules/misc/lua/vlc.c:65
-msgid "Lua Art"
-msgstr "Lua Art"
-
-#: modules/misc/lua/vlc.c:66
-msgid "Fetch artwork using lua scripts"
-msgstr "使用 lua 脚本获取封面"
-
-#: modules/misc/lua/vlc.c:71
-msgid "Lua Meta Fetcher"
-msgstr "Lua 元装取器"
-
-#: modules/misc/lua/vlc.c:72
-msgid "Fetch meta data using lua scripts"
-msgstr "使用 lua 脚本获取元数据"
-
-#: modules/misc/lua/vlc.c:77
-msgid "Lua Meta Reader"
-msgstr "Lua 元读取器"
-
-#: modules/misc/lua/vlc.c:78
-msgid "Read meta data using lua scripts"
-msgstr "使用 lua 脚本读取元数据"
-
-#: modules/misc/lua/vlc.c:86
-msgid "Lua Playlist"
-msgstr "Lua 播放列表"
-
-#: modules/misc/lua/vlc.c:87
-msgid "Lua Playlist Parser Interface"
-msgstr "Lua 播放列表解析器界面"
-
-#: modules/misc/lua/vlc.c:92
-msgid "Lua Interface Module (shortcuts)"
-msgstr "Lua 界面模块 (快捷方式)"
-
-#: modules/misc/lua/vlc.c:99
 msgid "Lua Interface Module"
 msgstr "Lua 界面模块"
 
-#: modules/misc/lua/vlc.c:115
+#: modules/misc/lua/vlc.c:66
+#, fuzzy
+msgid "Interfaces implemented using lua scripts"
+msgstr "使用 lua 脚本读取元数据"
+
+#: modules/misc/lua/vlc.c:84
+msgid "Lua Meta Fetcher"
+msgstr "Lua 元装取器"
+
+#: modules/misc/lua/vlc.c:85
+msgid "Fetch meta data using lua scripts"
+msgstr "使用 lua 脚本获取元数据"
+
+#: modules/misc/lua/vlc.c:90
+msgid "Lua Meta Reader"
+msgstr "Lua 元读取器"
+
+#: modules/misc/lua/vlc.c:91
+msgid "Read meta data using lua scripts"
+msgstr "使用 lua 脚本读取元数据"
+
+#: modules/misc/lua/vlc.c:97
+msgid "Lua Playlist"
+msgstr "Lua 播放列表"
+
+#: modules/misc/lua/vlc.c:98
+msgid "Lua Playlist Parser Interface"
+msgstr "Lua 播放列表解析器界面"
+
+#: modules/misc/lua/vlc.c:103
+msgid "Lua Interface Module (shortcuts)"
+msgstr "Lua 界面模块 (快捷方式)"
+
+#: modules/misc/lua/vlc.c:110
+msgid "Lua Art"
+msgstr "Lua Art"
+
+#: modules/misc/lua/vlc.c:111
+msgid "Fetch artwork using lua scripts"
+msgstr "使用 lua 脚本获取封面"
+
+#: modules/misc/lua/vlc.c:116
 msgid "Lua Extension"
 msgstr "Lua 扩展"
 
-#: modules/misc/lua/vlc.c:121
+#: modules/misc/lua/vlc.c:122
 msgid "Lua SD Module"
 msgstr "Lua SD 模块"
 
-#: modules/misc/lua/vlc.c:129
+#: modules/misc/lua/vlc.c:132
 msgid "Freebox TV"
 msgstr "Freebox TV"
 
-#: modules/misc/lua/vlc.c:135
+#: modules/misc/lua/vlc.c:138
 msgid "French TV"
 msgstr "法国 TV"
 
@@ -19705,7 +19663,7 @@ msgstr "如果您选择了 SAP 的话这将允许您为宣告指定一组会话�
 msgid "Standard stream output"
 msgstr "标准流输出"
 
-#: modules/stream_out/switcher.c:90 modules/gui/qt4/ui/sprefs_input.h:305
+#: modules/stream_out/switcher.c:90
 msgid "Files"
 msgstr "文件"
 
@@ -22709,15 +22667,7 @@ msgid ""
 msgstr ""
 "强制 SDL 渲染器使用指定的色度格式替代尝试通过使用最有效的一个改进性能。"
 
-#: modules/video_output/sdl.c:54
-msgid "SDL video driver name"
-msgstr "SDL 视频驱动名称"
-
-#: modules/video_output/sdl.c:56
-msgid "Force a specific SDL video output driver."
-msgstr "强行制定 SDL 视频输出驱动。"
-
-#: modules/video_output/sdl.c:62
+#: modules/video_output/sdl.c:58
 msgid "Simple DirectMedia Layer video output"
 msgstr "Simple DirectMedia Layer 视频输出"
 
@@ -23117,213 +23067,202 @@ msgstr "可视化过滤器"
 msgid "Spectrum analyser"
 msgstr "光谱分析器"
 
-#: modules/gui/qt4/ui/open_file.h:219
-msgid "Choose one or more media file to open"
-msgstr "选择一个或多个要打开的媒体文件"
+#~ msgid "Method used by libdvdcss for decryption"
+#~ msgstr "libdvdcss 用于解密的模式"
 
-#: modules/gui/qt4/ui/open_file.h:221
-msgid "File Selection"
-msgstr "文件选择"
+#~ msgid ""
+#~ "Set the method used by libdvdcss for key decryption.\n"
+#~ "title: decrypted title key is guessed from the encrypted sectors of the "
+#~ "stream. Thus it should work with a file as well as the DVD device. But it "
+#~ "sometimes takes much time to decrypt a title key and may even fail. With "
+#~ "this method, the key is only checked at the beginning of each title, so "
+#~ "it won't work if the key changes in the middle of a title.\n"
+#~ "disc: the disc key is first cracked, then all title keys can be decrypted "
+#~ "instantly, which allows us to check them often.\n"
+#~ "key: the same as \"disc\" if you don't have a file with player keys at "
+#~ "compilation time. If you do, the decryption of the disc key will be "
+#~ "faster with this method. It is the one that was used by libcss.\n"
+#~ "The default method is: key."
+#~ msgstr ""
+#~ "设置 libdvdcss 用于密匙解密的模式。\n"
+#~ "标题: 从被加密的流的扇区猜测标题密匙。因此它将可以工作于文件以及 DVD 设"
+#~ "备。但是有时它会花费许多时间解密一个标题密匙并可能失败。此模式只能在每个标"
+#~ "题开始时检测密匙,所以它在密匙在标题中间被更改时无法工作。\n"
+#~ "光盘: 首先破解光盘密匙,然后所有光盘密匙将被立即解密,这样就可以允许我们经常"
+#~ "检测它们。\n"
+#~ "密匙: 与 \"光盘\" 相同,如果您没有在编译时的播放器密匙的话。如果您有光盘密"
+#~ "匙的解密将在此模式中更快。这是 libccs 使用的模式。\n"
+#~ "默认的模式是: 密匙。"
 
-#: modules/gui/qt4/ui/open_file.h:222
-msgid "You can select local files with the following list and buttons."
-msgstr "您可以使用以下列表及按钮选择本地文件。"
+#~ msgid "title"
+#~ msgstr "标题"
 
-#: modules/gui/qt4/ui/open_file.h:223
-msgid "Add..."
-msgstr "添加..."
-
-#: modules/gui/qt4/ui/open_file.h:226
-msgid "Add a subtitles file"
-msgstr "添加一个字幕文件"
-
-#: modules/gui/qt4/ui/open_file.h:228
-msgid "Use a sub&titles file"
-msgstr "使用一个字幕文件(&T)"
-
-#: modules/gui/qt4/ui/open_file.h:230
-msgid "Select the subtitles file"
-msgstr "选择字幕文件"
-
-#: modules/gui/qt4/ui/open_file.h:233
-msgid "Font size:"
-msgstr "字体尺寸:"
-
-#: modules/gui/qt4/ui/open_file.h:234
-msgid "Text alignment:"
-msgstr "文本对齐:"
-
-#: modules/gui/qt4/ui/open_net.h:116 modules/gui/qt4/ui/sprefs_input.h:301
-#: modules/gui/qt4/ui/streampanel.h:168
-msgid "Form"
-msgstr "形式"
-
-#: modules/gui/qt4/ui/open_net.h:117
-msgid "Network Protocol"
-msgstr "网络协议"
-
-#: modules/gui/qt4/ui/open_net.h:119
-msgid "Select the protocol for the URL."
-msgstr "选择 URL 的网络协议。"
-
-#: modules/gui/qt4/ui/open_net.h:123
-msgid "Select the port used"
-msgstr "选择使用的端口"
-
-#: modules/gui/qt4/ui/open_net.h:128
-msgid "Enter the URL of the network stream here, with or without the protocol."
-msgstr "请在这里输入网络流的 URL,带或不带协议。"
-
-#: modules/gui/qt4/ui/sout.h:335 modules/gui/qt4/ui/sout.h:345
-msgid "Destinations"
-msgstr "目标"
-
-#: modules/gui/qt4/ui/sout.h:336
-msgid "New destination"
-msgstr "新目标"
-
-#: modules/gui/qt4/ui/sout.h:338
-msgid ""
-"Add destinations following the streaming methods you need. Be sure to check "
-"with transcoding that the format is compatible with the method used."
-msgstr ""
-"根据您需要的流化方式添加目的地。一定要检查转码器所设的格式是否与所用方式兼"
-"容。"
-
-#: modules/gui/qt4/ui/sout.h:339
-msgid "Display locally"
-msgstr "在本地显示"
-
-#: modules/gui/qt4/ui/sout.h:342
-msgid "Activate Transcoding"
-msgstr "激活转码"
-
-#: modules/gui/qt4/ui/sout.h:346
-msgid "Miscellaneous Options"
-msgstr "杂项选项"
-
-#: modules/gui/qt4/ui/sout.h:347
-msgid "Stream all elementary streams"
-msgstr "流所有通量流"
-
-#: modules/gui/qt4/ui/sout.h:350
-msgid "Group name"
-msgstr "组名"
-
-#: modules/gui/qt4/ui/sout.h:352
-msgid "Generated stream output string"
-msgstr "生成串流输出字符串"
-
-#: modules/gui/qt4/ui/sout.h:354
-msgid "Options"
-msgstr "选项"
-
-#: modules/gui/qt4/ui/sprefs_input.h:302
-msgid "Optical drive"
-msgstr "光盘驱动器"
-
-#: modules/gui/qt4/ui/sprefs_input.h:303
-msgid "Default optical device"
-msgstr "默认光盘设备"
-
-#: modules/gui/qt4/ui/sprefs_input.h:306
-msgid "Damaged or incomplete AVI file"
-msgstr "损坏的或不完整的 avi 文件"
-
-#: modules/gui/qt4/ui/sprefs_input.h:310
-msgid "Default port (server mode)"
-msgstr "默认端口 (服务器模式)"
-
-#: modules/gui/qt4/ui/sprefs_input.h:311
-msgid "HTTP proxy URL"
-msgstr "HTTP 代理 URL"
-
-#: modules/gui/qt4/ui/sprefs_input.h:312
-msgid "Default caching policy"
-msgstr "默认缓存策略"
-
-#: modules/gui/qt4/ui/sprefs_input.h:313
-msgid "HTTP (default)"
-msgstr "HTTP (默认)"
-
-#: modules/gui/qt4/ui/sprefs_input.h:314
-msgid "RTP over RTSP (TCP)"
-msgstr "RTP over RTSP (TCP)"
-
-#: modules/gui/qt4/ui/sprefs_input.h:315
-msgid "Live555 stream transport"
-msgstr "Live555 流传输"
-
-#: modules/gui/qt4/ui/sprefs_input.h:316
-msgid "Codecs"
-msgstr "编解码器"
-
-#: modules/gui/qt4/ui/sprefs_input.h:317
-msgid "Video quality post-processing level"
-msgstr "视频质量后处理层级"
-
-#: modules/gui/qt4/ui/sprefs_input.h:318
-msgid "H.264 in-loop deblocking filter"
-msgstr "H.264 环内去块滤镜"
-
-#: modules/gui/qt4/ui/sprefs_input.h:319
-msgid "System codecs (better quality)"
-msgstr "系统编解码器 (质量较好)"
-
-#: modules/gui/qt4/ui/sprefs_input.h:320
-msgid "Use host codecs if available"
-msgstr "如果可用使用宿主编解码器"
-
-#: modules/gui/qt4/ui/streampanel.h:172
-msgid "Stuff"
-msgstr "东西"
-
-#: modules/gui/qt4/ui/streampanel.h:174
-msgid "Edit settings"
-msgstr "编辑设置"
-
-#: modules/gui/qt4/ui/streampanel.h:175
-msgid "Control"
-msgstr "控制"
-
-#: modules/gui/qt4/ui/streampanel.h:176
-msgid "Run manually"
-msgstr "手动运行"
-
-#: modules/gui/qt4/ui/streampanel.h:177
-msgid "Setup schedule"
-msgstr "安装计划"
-
-#: modules/gui/qt4/ui/streampanel.h:178
-msgid "Run on schedule"
-msgstr "按计划运行"
-
-#: modules/gui/qt4/ui/streampanel.h:179
-msgid "Status"
-msgstr "状态"
-
-#: modules/gui/qt4/ui/streampanel.h:180
-msgid "P/P"
-msgstr "P/P"
-
-#: modules/gui/qt4/ui/streampanel.h:183
-msgid "Prev"
-msgstr "上一个"
-
-#: modules/gui/qt4/ui/streampanel.h:184
-msgid "Add Input"
-msgstr "添加输入"
-
-#: modules/gui/qt4/ui/streampanel.h:185
-msgid "Edit Input"
-msgstr "编辑输入"
-
-#: modules/gui/qt4/ui/streampanel.h:186
-msgid "Clear List"
-msgstr "清除列表"
+#~ msgid "Key"
+#~ msgstr "密匙"
 
 #~ msgid "Set"
 #~ msgstr "设置"
+
+#~ msgid "SDL video driver name"
+#~ msgstr "SDL 视频驱动名称"
+
+#~ msgid "Force a specific SDL video output driver."
+#~ msgstr "强行制定 SDL 视频输出驱动。"
+
+#~ msgid "Choose one or more media file to open"
+#~ msgstr "选择一个或多个要打开的媒体文件"
+
+#~ msgid "File Selection"
+#~ msgstr "文件选择"
+
+#~ msgid "You can select local files with the following list and buttons."
+#~ msgstr "您可以使用以下列表及按钮选择本地文件。"
+
+#~ msgid "Add..."
+#~ msgstr "添加..."
+
+#~ msgid "Add a subtitles file"
+#~ msgstr "添加一个字幕文件"
+
+#~ msgid "Use a sub&titles file"
+#~ msgstr "使用一个字幕文件(&T)"
+
+#~ msgid "Select the subtitles file"
+#~ msgstr "选择字幕文件"
+
+#~ msgid "Font size:"
+#~ msgstr "字体尺寸:"
+
+#~ msgid "Text alignment:"
+#~ msgstr "文本对齐:"
+
+#~ msgid "Form"
+#~ msgstr "形式"
+
+#~ msgid "Network Protocol"
+#~ msgstr "网络协议"
+
+#~ msgid "Select the protocol for the URL."
+#~ msgstr "选择 URL 的网络协议。"
+
+#~ msgid "Select the port used"
+#~ msgstr "选择使用的端口"
+
+#~ msgid ""
+#~ "Enter the URL of the network stream here, with or without the protocol."
+#~ msgstr "请在这里输入网络流的 URL,带或不带协议。"
+
+#~ msgid "Destinations"
+#~ msgstr "目标"
+
+#~ msgid "New destination"
+#~ msgstr "新目标"
+
+#~ msgid ""
+#~ "Add destinations following the streaming methods you need. Be sure to "
+#~ "check with transcoding that the format is compatible with the method used."
+#~ msgstr ""
+#~ "根据您需要的流化方式添加目的地。一定要检查转码器所设的格式是否与所用方式兼"
+#~ "容。"
+
+#~ msgid "Display locally"
+#~ msgstr "在本地显示"
+
+#~ msgid "Activate Transcoding"
+#~ msgstr "激活转码"
+
+#~ msgid "Miscellaneous Options"
+#~ msgstr "杂项选项"
+
+#~ msgid "Stream all elementary streams"
+#~ msgstr "流所有通量流"
+
+#~ msgid "Group name"
+#~ msgstr "组名"
+
+#~ msgid "Generated stream output string"
+#~ msgstr "生成串流输出字符串"
+
+#~ msgid "Options"
+#~ msgstr "选项"
+
+#~ msgid "Optical drive"
+#~ msgstr "光盘驱动器"
+
+#~ msgid "Default optical device"
+#~ msgstr "默认光盘设备"
+
+#~ msgid "Damaged or incomplete AVI file"
+#~ msgstr "损坏的或不完整的 avi 文件"
+
+#~ msgid "Default port (server mode)"
+#~ msgstr "默认端口 (服务器模式)"
+
+#~ msgid "HTTP proxy URL"
+#~ msgstr "HTTP 代理 URL"
+
+#~ msgid "Default caching policy"
+#~ msgstr "默认缓存策略"
+
+#~ msgid "HTTP (default)"
+#~ msgstr "HTTP (默认)"
+
+#~ msgid "RTP over RTSP (TCP)"
+#~ msgstr "RTP over RTSP (TCP)"
+
+#~ msgid "Live555 stream transport"
+#~ msgstr "Live555 流传输"
+
+#~ msgid "Codecs"
+#~ msgstr "编解码器"
+
+#~ msgid "Video quality post-processing level"
+#~ msgstr "视频质量后处理层级"
+
+#~ msgid "H.264 in-loop deblocking filter"
+#~ msgstr "H.264 环内去块滤镜"
+
+#~ msgid "System codecs (better quality)"
+#~ msgstr "系统编解码器 (质量较好)"
+
+#~ msgid "Use host codecs if available"
+#~ msgstr "如果可用使用宿主编解码器"
+
+#~ msgid "Stuff"
+#~ msgstr "东西"
+
+#~ msgid "Edit settings"
+#~ msgstr "编辑设置"
+
+#~ msgid "Control"
+#~ msgstr "控制"
+
+#~ msgid "Run manually"
+#~ msgstr "手动运行"
+
+#~ msgid "Setup schedule"
+#~ msgstr "安装计划"
+
+#~ msgid "Run on schedule"
+#~ msgstr "按计划运行"
+
+#~ msgid "Status"
+#~ msgstr "状态"
+
+#~ msgid "P/P"
+#~ msgstr "P/P"
+
+#~ msgid "Prev"
+#~ msgstr "上一个"
+
+#~ msgid "Add Input"
+#~ msgstr "添加输入"
+
+#~ msgid "Edit Input"
+#~ msgstr "编辑输入"
+
+#~ msgid "Clear List"
+#~ msgstr "清除列表"
 
 #~ msgid "%.2fx"
 #~ msgstr "%.2fx"

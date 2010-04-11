@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 1.1.0\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-04-08 00:07+0100\n"
+"POT-Creation-Date: 2010-04-11 23:45+0100\n"
 "PO-Revision-Date: 2010-04-04 00:28+0300\n"
 "Last-Translator: Oleksandr Natalenko <pfactum@gmail.com>\n"
 "Language-Team: Ukrainian <kde-i18n-doc@kde.org>\n"
@@ -407,7 +407,6 @@ msgstr "Додаткові налаштування"
 
 #: include/vlc_config_cat.h:198 modules/gui/macosx/open.m:180
 #: modules/gui/macosx/open.m:459 modules/gui/macosx/simple_prefs.m:259
-#: modules/gui/qt4/ui/sprefs_input.h:309
 msgid "Network"
 msgstr "Мережа"
 
@@ -879,15 +878,15 @@ msgstr "ключ"
 msgid "boolean"
 msgstr "булеве"
 
-#: src/config/file.c:630 src/libvlc.c:1582
+#: src/config/file.c:630 src/libvlc.c:1581
 msgid "integer"
 msgstr "ціле"
 
-#: src/config/file.c:639 src/libvlc.c:1612
+#: src/config/file.c:639 src/libvlc.c:1611
 msgid "float"
 msgstr "десяткове"
 
-#: src/config/file.c:662 src/libvlc.c:1560
+#: src/config/file.c:662 src/libvlc.c:1559
 msgid "string"
 msgstr "рядок"
 
@@ -1243,11 +1242,11 @@ msgstr ""
 "Запуск vlc з інтерфейсом за змовчуванням. Використовуйте 'cvlc' для "
 "використання vlc без інтерфейсу."
 
-#: src/libvlc.c:1234
+#: src/libvlc.c:1233
 msgid "To get exhaustive help, use '-H'."
 msgstr "Для отримання вичерпної допомоги використовуйте '-H'."
 
-#: src/libvlc.c:1238 src/libvlc-module.c:1515
+#: src/libvlc.c:1237 src/libvlc-module.c:1515
 #, c-format
 msgid ""
 "Usage: %s [options] [stream] ...\n"
@@ -1319,32 +1318,32 @@ msgstr ""
 "відтворення на певний час\n"
 "  vlc:quit                           Спеціальний пункт для виходу з VLC\n"
 
-#: src/libvlc.c:1628
+#: src/libvlc.c:1627
 msgid " (default enabled)"
 msgstr " (за змовчуванням увімкнено)"
 
-#: src/libvlc.c:1629
+#: src/libvlc.c:1628
 msgid " (default disabled)"
 msgstr " (за змовчуванням вимкнено)"
 
-#: src/libvlc.c:1792 src/libvlc.c:1795 src/libvlc.c:1803 src/libvlc.c:1808
+#: src/libvlc.c:1791 src/libvlc.c:1794 src/libvlc.c:1802 src/libvlc.c:1807
 msgid "Note:"
 msgstr "Примітка:"
 
-#: src/libvlc.c:1793 src/libvlc.c:1796
+#: src/libvlc.c:1792 src/libvlc.c:1795
 msgid "add --advanced to your command line to see advanced options."
 msgstr ""
 "додайте --advanced у командному рядку для того, аби бачити додаткові "
 "параметри."
 
-#: src/libvlc.c:1804 src/libvlc.c:1809
+#: src/libvlc.c:1803 src/libvlc.c:1808
 #, c-format
 msgid ""
 "%d module(s) were not displayed because they only have advanced options.\n"
 msgstr ""
 "%d модуль(і) не були відображені, бо вони мають лише додаткові параметри.\n"
 
-#: src/libvlc.c:1816 src/libvlc.c:1820
+#: src/libvlc.c:1815 src/libvlc.c:1819
 msgid ""
 "No matching module found. Use --list or --list-verbose to list available "
 "modules."
@@ -1352,22 +1351,22 @@ msgstr ""
 "Не знайдено підходящого модуля. Використовуйте --list або --list-verbose для "
 "перегляду доступних модулів."
 
-#: src/libvlc.c:1910
+#: src/libvlc.c:1909
 #, c-format
 msgid "VLC version %s (%s)\n"
 msgstr "Версія VLC %s (%s)\n"
 
-#: src/libvlc.c:1912
+#: src/libvlc.c:1911
 #, c-format
 msgid "Compiled by %s on %s (%s)\n"
 msgstr "Скомпільовано %s на %s (%s)\n"
 
-#: src/libvlc.c:1914
+#: src/libvlc.c:1913
 #, c-format
 msgid "Compiler: %s\n"
 msgstr "Компілятор: %s\n"
 
-#: src/libvlc.c:1949
+#: src/libvlc.c:1948
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
@@ -1375,7 +1374,7 @@ msgstr ""
 "\n"
 "Вміст збережено до файлу vlc-help.txt .\n"
 
-#: src/libvlc.c:1969
+#: src/libvlc.c:1968
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -2694,7 +2693,7 @@ msgstr ""
 "Можна задати список закладок для потоку у формі «{name=ім’я-закладки,time= "
 "необов'язковий-зсув-часу,bytes= необов'язковий-зсув-по-байтам},{...}»."
 
-#: src/libvlc-module.c:770 modules/gui/qt4/ui/sprefs_input.h:307
+#: src/libvlc-module.c:770
 msgid "Record directory or filename"
 msgstr "Каталог чи ім’я файлу для запису"
 
@@ -3134,7 +3133,7 @@ msgstr ""
 "Перенаправлення потоку субтитрів у відповідний модуль виводу, якщо останній "
 "увімкнений."
 
-#: src/libvlc-module.c:980 modules/gui/qt4/ui/sout.h:348
+#: src/libvlc-module.c:980
 msgid "Keep stream output open"
 msgstr "Тримати потік виведення відкритим"
 
@@ -3811,8 +3810,7 @@ msgstr "Повільніше (точно)"
 #: modules/gui/macosx/intf.m:746 modules/gui/macosx/wizard.m:309
 #: modules/gui/macosx/wizard.m:321 modules/gui/macosx/wizard.m:1623
 #: modules/gui/qt4/components/controller.hpp:105
-#: modules/misc/notify/notify.c:321 modules/gui/qt4/ui/sout.h:333
-#: modules/gui/qt4/ui/sout.h:344 modules/gui/qt4/ui/streampanel.h:182
+#: modules/misc/notify/notify.c:321
 msgid "Next"
 msgstr "Наступний"
 
@@ -3827,8 +3825,7 @@ msgstr ""
 #: modules/gui/macosx/embeddedwindow.m:71 modules/gui/macosx/intf.m:599
 #: modules/gui/macosx/intf.m:651 modules/gui/macosx/intf.m:739
 #: modules/gui/macosx/intf.m:745 modules/gui/qt4/components/controller.hpp:105
-#: modules/misc/notify/notify.c:319 modules/gui/qt4/ui/sout.h:343
-#: modules/gui/qt4/ui/sout.h:353
+#: modules/misc/notify/notify.c:319
 msgid "Previous"
 msgstr "Попередній"
 
@@ -3842,7 +3839,7 @@ msgstr ""
 #: modules/gui/macosx/embeddedwindow.m:72 modules/gui/macosx/intf.m:602
 #: modules/gui/macosx/intf.m:647 modules/gui/macosx/intf.m:737
 #: modules/gui/macosx/intf.m:744 modules/gui/qt4/components/controller.hpp:104
-#: modules/misc/notify/xosd.c:231 modules/gui/qt4/ui/streampanel.h:181
+#: modules/misc/notify/xosd.c:231
 msgid "Stop"
 msgstr "Зупинити"
 
@@ -5203,7 +5200,7 @@ msgstr "Наземний режим ієрархії"
 msgid "Hierarchy alpha value [Undefined,1,2,4]"
 msgstr "Альфа-значення ієрархії [не визначено,1,2,4]"
 
-#: modules/access/bda/bda.c:169 modules/gui/qt4/ui/streampanel.h:170
+#: modules/access/bda/bda.c:169
 msgid "1"
 msgstr "1"
 
@@ -5709,15 +5706,15 @@ msgstr "Файл зі списком відкликаних сертифікат
 msgid "DVB input with v4l2 support"
 msgstr "DVB введення із підтримкою v4l2"
 
-#: modules/access/dvb/access.c:247
+#: modules/access/dvb/access.c:249
 msgid "HTTP server"
 msgstr "Сервер HTTP"
 
-#: modules/access/dvb/access.c:941
+#: modules/access/dvb/access.c:943
 msgid "Input syntax is deprecated"
 msgstr "Вхідний синтаксис застарів"
 
-#: modules/access/dvb/access.c:942
+#: modules/access/dvb/access.c:944
 msgid ""
 "The given syntax is deprecated. Run \"vlc -p dvb\" to see an explanation of "
 "the new syntax."
@@ -5725,11 +5722,11 @@ msgstr ""
 "Даний синтаксис застарів. Запустіть «vlc -p dvb» для того, аби побачити "
 "пояснення нового синтаксису."
 
-#: modules/access/dvb/access.c:988
+#: modules/access/dvb/access.c:990
 msgid "Invalid polarization"
 msgstr "Неправильна поляризація"
 
-#: modules/access/dvb/access.c:989
+#: modules/access/dvb/access.c:991
 #, c-format
 msgid "The provided polarization \"%c\" is not valid."
 msgstr "Поляризація \"%c\" не є правильною."
@@ -5775,8 +5772,8 @@ msgstr "DVD з меню"
 msgid "DVDnav Input"
 msgstr "Ввід DVDnav"
 
-#: modules/access/dvdnav.c:312 modules/access/dvdread.c:250
-#: modules/access/dvdread.c:510 modules/access/dvdread.c:572
+#: modules/access/dvdnav.c:312 modules/access/dvdread.c:205
+#: modules/access/dvdread.c:465 modules/access/dvdread.c:527
 msgid "Playback failure"
 msgstr "Помилка відтворення"
 
@@ -5787,70 +5784,25 @@ msgstr ""
 "VLC не може встановити заголовок DVD. Можливо, не вдалося декодувати цілий "
 "диск."
 
-#: modules/access/dvdread.c:79
-msgid "Method used by libdvdcss for decryption"
-msgstr "Метод, використовуваний libdvdcss для декодування"
-
-#: modules/access/dvdread.c:81
-msgid ""
-"Set the method used by libdvdcss for key decryption.\n"
-"title: decrypted title key is guessed from the encrypted sectors of the "
-"stream. Thus it should work with a file as well as the DVD device. But it "
-"sometimes takes much time to decrypt a title key and may even fail. With "
-"this method, the key is only checked at the beginning of each title, so it "
-"won't work if the key changes in the middle of a title.\n"
-"disc: the disc key is first cracked, then all title keys can be decrypted "
-"instantly, which allows us to check them often.\n"
-"key: the same as \"disc\" if you don't have a file with player keys at "
-"compilation time. If you do, the decryption of the disc key will be faster "
-"with this method. It is the one that was used by libcss.\n"
-"The default method is: key."
-msgstr ""
-"Виберіть метод дешифрування ключа libdvdcss.\n"
-"Розділ: розшифрований ключ розділу вгадується із зашифрованих секторів "
-"потоку. Це повинно працювати для файлу також, як і для пристрою DVD. Але "
-"іноді розшифрування ключа розділу займає дуже багато часу і навіть може не "
-"завершитись. З цим методом ключ перевіряється тільки на початку кожного "
-"розділу, так що він не буде працювати, якщо ключ змінює середину.\n"
-"Диск: спочатку зламується ключ диска, потім усі ключі заголовків можуть бути "
-"розшифровані відразу, що дозволяє нам часто їх вибирати.\n"
-"Ключ: те ж саме, що і «диск», якщо у Вас немає файлу з ключами під час "
-"компіляції. Якщо є, то розшифрування ключа диска буде тривати швидше з цим "
-"методом. Це єдиний метод, використовуваний libcss.\n"
-"Метод за змовчуванням: ключ."
-
-#: modules/access/dvdread.c:97
-msgid "title"
-msgstr "Розділ"
-
-#: modules/access/dvdread.c:97 modules/access/vcdx/info.c:54
-#: modules/gui/macosx/open.m:179 modules/gui/macosx/open.m:455
-msgid "Disc"
-msgstr "Диск"
-
-#: modules/access/dvdread.c:97
-msgid "Key"
-msgstr "Ключ"
-
-#: modules/access/dvdread.c:103
+#: modules/access/dvdread.c:83
 msgid "DVD without menus"
 msgstr "DVD без меню"
 
-#: modules/access/dvdread.c:104
+#: modules/access/dvdread.c:84
 msgid "DVDRead Input (no menu support)"
 msgstr "Введення DVDRead (без підтримки меню)"
 
-#: modules/access/dvdread.c:251
+#: modules/access/dvdread.c:206
 #, c-format
 msgid "DVDRead could not open the disc \"%s\"."
 msgstr "DVDRead не зміг відкрити диск \"%s\"."
 
-#: modules/access/dvdread.c:511
+#: modules/access/dvdread.c:466
 #, c-format
 msgid "DVDRead could not read block %d."
 msgstr "DVDRead не зміг прочитати блок %d."
 
-#: modules/access/dvdread.c:573
+#: modules/access/dvdread.c:528
 #, c-format
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
 msgstr "DVDRead не зміг прочитати%d/%d блоків на 0x%02x."
@@ -5926,17 +5878,17 @@ msgstr "Фіктивний"
 msgid "Fake video input"
 msgstr "Фіктивний відеоввід"
 
-#: modules/access/file.c:168 modules/access/file.c:301
+#: modules/access/file.c:166 modules/access/file.c:299
 #: modules/access/mmap.c:228 modules/access/mtp.c:216 modules/access/mtp.c:304
 msgid "File reading failed"
 msgstr "Помилка читання файлу"
 
-#: modules/access/file.c:169 modules/access/mtp.c:305
+#: modules/access/file.c:167 modules/access/mtp.c:305
 #, c-format
 msgid "VLC could not open the file \"%s\"."
 msgstr "VLC не зміг відкрити файл \"%s\"."
 
-#: modules/access/file.c:302 modules/access/mmap.c:229
+#: modules/access/file.c:300 modules/access/mmap.c:229
 #: modules/access/mtp.c:217
 msgid "VLC could not read the file."
 msgstr "VLC не зміг прочитати файл."
@@ -7328,6 +7280,11 @@ msgstr "Сегмент"
 #: modules/access/vcdx/access.c:519
 msgid "LID"
 msgstr "LID"
+
+#: modules/access/vcdx/info.c:54 modules/gui/macosx/open.m:179
+#: modules/gui/macosx/open.m:455
+msgid "Disc"
+msgstr "Диск"
 
 #: modules/access/vcdx/info.c:62
 msgid "VCD Format"
@@ -9506,11 +9463,11 @@ msgstr ""
 msgid "Fake video decoder"
 msgstr "Фіктивний відеодекодер"
 
-#: modules/codec/flac.c:133
+#: modules/codec/flac.c:134
 msgid "Flac audio decoder"
 msgstr "Аудіодекодер FLAC"
 
-#: modules/codec/flac.c:139
+#: modules/codec/flac.c:140
 msgid "Flac audio encoder"
 msgstr "Аудіокодувальник FLAC"
 
@@ -11235,7 +11192,6 @@ msgid "Quiet mode."
 msgstr "Тихий режим."
 
 #: modules/codec/x264.c:371 modules/gui/macosx/playlistinfo.m:82
-#: modules/gui/qt4/ui/streampanel.h:171
 msgid "Statistics"
 msgstr "Статистика"
 
@@ -12320,7 +12276,7 @@ msgstr ""
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:243
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:293
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:386
-#: modules/stream_out/rtp.c:112 modules/gui/qt4/ui/open_net.h:126
+#: modules/stream_out/rtp.c:112
 msgid "Port"
 msgstr "Порт"
 
@@ -13596,7 +13552,7 @@ msgstr "Індекс"
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: modules/gui/macosx/bookmarks.m:88 modules/gui/qt4/ui/sout.h:337
+#: modules/gui/macosx/bookmarks.m:88
 msgid "Add"
 msgstr "Додати"
 
@@ -13616,7 +13572,7 @@ msgstr "Редагування"
 msgid "Extract"
 msgstr "Витягти"
 
-#: modules/gui/macosx/bookmarks.m:92 modules/gui/qt4/ui/open_file.h:224
+#: modules/gui/macosx/bookmarks.m:92
 msgid "Remove"
 msgstr "Видалити"
 
@@ -14395,8 +14351,6 @@ msgstr "Заголовок"
 #: modules/gui/qt4/components/preferences_widgets.cpp:299
 #: modules/gui/qt4/components/simple_preferences.cpp:276
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:102
-#: modules/gui/qt4/ui/open_file.h:232 modules/gui/qt4/ui/sprefs_input.h:304
-#: modules/gui/qt4/ui/sprefs_input.h:308
 msgid "Browse..."
 msgstr "Огляд…"
 
@@ -14465,7 +14419,7 @@ msgstr ""
 msgid "Open RTP/UDP Stream"
 msgstr "Відкрити потік RTP/UDP"
 
-#: modules/gui/macosx/open.m:210 modules/gui/qt4/ui/open_net.h:121
+#: modules/gui/macosx/open.m:210
 msgid "Protocol"
 msgstr "Протокол"
 
@@ -14474,7 +14428,6 @@ msgstr "Протокол"
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:292
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:339
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:385
-#: modules/gui/qt4/ui/open_net.h:125
 msgid "Address"
 msgstr "Адреса"
 
@@ -14589,7 +14542,7 @@ msgid "Subtitle File"
 msgstr "Файл субтитрів"
 
 #: modules/gui/macosx/open.m:587 modules/gui/macosx/open.m:953
-#: modules/gui/macosx/open.m:1189 modules/gui/qt4/ui/open_file.h:217
+#: modules/gui/macosx/open.m:1189
 msgid "Open File"
 msgstr "Відкрити файл"
 
@@ -14655,7 +14608,7 @@ msgstr "Зберегти вхідний потік"
 msgid "Encapsulation Method"
 msgstr "Метод інкапсуляції"
 
-#: modules/gui/macosx/output.m:159 modules/gui/qt4/ui/sout.h:341
+#: modules/gui/macosx/output.m:159
 msgid "Transcoding options"
 msgstr "Налаштування перекодування"
 
@@ -14672,7 +14625,7 @@ msgstr "Масштаб"
 msgid "Stream Announcing"
 msgstr "Повідомлення про потік"
 
-#: modules/gui/macosx/output.m:181 modules/gui/qt4/ui/sout.h:349
+#: modules/gui/macosx/output.m:181
 msgid "SAP announce"
 msgstr "Повідомлення по SAP"
 
@@ -14723,7 +14676,6 @@ msgid "Save Playlist..."
 msgstr "Зберегти список відтворення…"
 
 #: modules/gui/macosx/playlist.m:465 modules/gui/qt4/dialogs/bookmarks.cpp:45
-#: modules/gui/qt4/ui/streampanel.h:173
 msgid "Delete"
 msgstr "Видалити"
 
@@ -15626,7 +15578,6 @@ msgid "In this page, a few additional streaming parameters can be set."
 msgstr "Тут можуть бути задані кілька додаткових параметрів."
 
 #: modules/gui/macosx/wizard.m:401 modules/gui/macosx/wizard.m:1866
-#: modules/gui/qt4/ui/sout.h:351
 msgid "Time-To-Live (TTL)"
 msgstr "«Час життя» (TTL)"
 
@@ -16871,7 +16822,6 @@ msgid "File/Folder"
 msgstr "Файл/Каталог"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:46
-#: modules/gui/qt4/ui/sout.h:334
 msgid "Source"
 msgstr "Джерело"
 
@@ -17373,7 +17323,7 @@ msgstr "Скинути налаштування"
 msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr "Ви впевнені у скиданні налаштувань медіаплеєра VLC?"
 
-#: modules/gui/qt4/dialogs/sout.cpp:42 modules/gui/qt4/ui/sout.h:332
+#: modules/gui/qt4/dialogs/sout.cpp:42
 msgid "Stream Output"
 msgstr "Вивід потоку"
 
@@ -18961,58 +18911,63 @@ msgstr ""
 "\"] = { <параметр> = <значення>, ...}, ...'."
 
 #: modules/misc/lua/vlc.c:65
-msgid "Lua Art"
-msgstr "Мистецтво Lua"
-
-#: modules/misc/lua/vlc.c:66
-msgid "Fetch artwork using lua scripts"
-msgstr "Отримувати мистецькі роботи за допомогою скриптів lua"
-
-#: modules/misc/lua/vlc.c:71
-msgid "Lua Meta Fetcher"
-msgstr "Отримувач метаінформації Lua"
-
-#: modules/misc/lua/vlc.c:72
-msgid "Fetch meta data using lua scripts"
-msgstr "Отримувати метадані за допомогою скриптів Lua"
-
-#: modules/misc/lua/vlc.c:77
-msgid "Lua Meta Reader"
-msgstr "Читач метаінформації Lua"
-
-#: modules/misc/lua/vlc.c:78
-msgid "Read meta data using lua scripts"
-msgstr "Читати метадані за допомогою скриптів Lua"
-
-#: modules/misc/lua/vlc.c:86
-msgid "Lua Playlist"
-msgstr "Список відтворення Lua"
-
-#: modules/misc/lua/vlc.c:87
-msgid "Lua Playlist Parser Interface"
-msgstr "Інтерфейс парсера списку відтворення Lua"
-
-#: modules/misc/lua/vlc.c:92
-msgid "Lua Interface Module (shortcuts)"
-msgstr "Модуль інтерфейсу Lua (швидкі клавіші)"
-
-#: modules/misc/lua/vlc.c:99
 msgid "Lua Interface Module"
 msgstr "Модуль інтерфейсу Lua"
 
-#: modules/misc/lua/vlc.c:115
+#: modules/misc/lua/vlc.c:66
+#, fuzzy
+msgid "Interfaces implemented using lua scripts"
+msgstr "Читати метадані за допомогою скриптів Lua"
+
+#: modules/misc/lua/vlc.c:84
+msgid "Lua Meta Fetcher"
+msgstr "Отримувач метаінформації Lua"
+
+#: modules/misc/lua/vlc.c:85
+msgid "Fetch meta data using lua scripts"
+msgstr "Отримувати метадані за допомогою скриптів Lua"
+
+#: modules/misc/lua/vlc.c:90
+msgid "Lua Meta Reader"
+msgstr "Читач метаінформації Lua"
+
+#: modules/misc/lua/vlc.c:91
+msgid "Read meta data using lua scripts"
+msgstr "Читати метадані за допомогою скриптів Lua"
+
+#: modules/misc/lua/vlc.c:97
+msgid "Lua Playlist"
+msgstr "Список відтворення Lua"
+
+#: modules/misc/lua/vlc.c:98
+msgid "Lua Playlist Parser Interface"
+msgstr "Інтерфейс парсера списку відтворення Lua"
+
+#: modules/misc/lua/vlc.c:103
+msgid "Lua Interface Module (shortcuts)"
+msgstr "Модуль інтерфейсу Lua (швидкі клавіші)"
+
+#: modules/misc/lua/vlc.c:110
+msgid "Lua Art"
+msgstr "Мистецтво Lua"
+
+#: modules/misc/lua/vlc.c:111
+msgid "Fetch artwork using lua scripts"
+msgstr "Отримувати мистецькі роботи за допомогою скриптів lua"
+
+#: modules/misc/lua/vlc.c:116
 msgid "Lua Extension"
 msgstr "Розширення Lua"
 
-#: modules/misc/lua/vlc.c:121
+#: modules/misc/lua/vlc.c:122
 msgid "Lua SD Module"
 msgstr "Модуль SD Lua"
 
-#: modules/misc/lua/vlc.c:129
+#: modules/misc/lua/vlc.c:132
 msgid "Freebox TV"
 msgstr "ТБ Freebox"
 
-#: modules/misc/lua/vlc.c:135
+#: modules/misc/lua/vlc.c:138
 msgid "French TV"
 msgstr "Французьке ТБ"
 
@@ -20539,7 +20494,7 @@ msgstr "Група сесій, яка буде зазначена в спові�
 msgid "Standard stream output"
 msgstr "Стандартний вивід потоку"
 
-#: modules/stream_out/switcher.c:90 modules/gui/qt4/ui/sprefs_input.h:305
+#: modules/stream_out/switcher.c:90
 msgid "Files"
 msgstr "Файли"
 
@@ -23694,15 +23649,7 @@ msgstr ""
 "Використовувати зазначений формат кольоровості для SDL замість того, щоб "
 "збільшити продуктивність, підбираючи найбільш ефективний."
 
-#: modules/video_output/sdl.c:54
-msgid "SDL video driver name"
-msgstr "Ім’я відеодрайвера SDL"
-
-#: modules/video_output/sdl.c:56
-msgid "Force a specific SDL video output driver."
-msgstr "Використовувати вказаний драйвер SDL для відеовиводу."
-
-#: modules/video_output/sdl.c:62
+#: modules/video_output/sdl.c:58
 msgid "Simple DirectMedia Layer video output"
 msgstr "Вивід відео через Simple DirectMedia Layer"
 
@@ -24109,215 +24056,208 @@ msgstr "Фільтр візуалізатора"
 msgid "Spectrum analyser"
 msgstr "Аналізатор спектра"
 
-#: modules/gui/qt4/ui/open_file.h:219
-msgid "Choose one or more media file to open"
-msgstr "Оберіть один чи більше медіафайлів для відкриття"
+#~ msgid "Method used by libdvdcss for decryption"
+#~ msgstr "Метод, використовуваний libdvdcss для декодування"
 
-#: modules/gui/qt4/ui/open_file.h:221
-msgid "File Selection"
-msgstr "Вибір файлу"
+#~ msgid ""
+#~ "Set the method used by libdvdcss for key decryption.\n"
+#~ "title: decrypted title key is guessed from the encrypted sectors of the "
+#~ "stream. Thus it should work with a file as well as the DVD device. But it "
+#~ "sometimes takes much time to decrypt a title key and may even fail. With "
+#~ "this method, the key is only checked at the beginning of each title, so "
+#~ "it won't work if the key changes in the middle of a title.\n"
+#~ "disc: the disc key is first cracked, then all title keys can be decrypted "
+#~ "instantly, which allows us to check them often.\n"
+#~ "key: the same as \"disc\" if you don't have a file with player keys at "
+#~ "compilation time. If you do, the decryption of the disc key will be "
+#~ "faster with this method. It is the one that was used by libcss.\n"
+#~ "The default method is: key."
+#~ msgstr ""
+#~ "Виберіть метод дешифрування ключа libdvdcss.\n"
+#~ "Розділ: розшифрований ключ розділу вгадується із зашифрованих секторів "
+#~ "потоку. Це повинно працювати для файлу також, як і для пристрою DVD. Але "
+#~ "іноді розшифрування ключа розділу займає дуже багато часу і навіть може "
+#~ "не завершитись. З цим методом ключ перевіряється тільки на початку "
+#~ "кожного розділу, так що він не буде працювати, якщо ключ змінює "
+#~ "середину.\n"
+#~ "Диск: спочатку зламується ключ диска, потім усі ключі заголовків можуть "
+#~ "бути розшифровані відразу, що дозволяє нам часто їх вибирати.\n"
+#~ "Ключ: те ж саме, що і «диск», якщо у Вас немає файлу з ключами під час "
+#~ "компіляції. Якщо є, то розшифрування ключа диска буде тривати швидше з "
+#~ "цим методом. Це єдиний метод, використовуваний libcss.\n"
+#~ "Метод за змовчуванням: ключ."
 
-#: modules/gui/qt4/ui/open_file.h:222
-msgid "You can select local files with the following list and buttons."
-msgstr ""
-"Ви можете обрати локальні файли за допомогою наступного списку та кнопок."
+#~ msgid "title"
+#~ msgstr "Розділ"
 
-#: modules/gui/qt4/ui/open_file.h:223
-msgid "Add..."
-msgstr "Додати…"
-
-#: modules/gui/qt4/ui/open_file.h:226
-msgid "Add a subtitles file"
-msgstr "Додати файл субтитрів"
-
-#: modules/gui/qt4/ui/open_file.h:228
-msgid "Use a sub&titles file"
-msgstr "Використовувати файл субтитрів"
-
-#: modules/gui/qt4/ui/open_file.h:230
-msgid "Select the subtitles file"
-msgstr "Оберіть файл субтитрів"
-
-#: modules/gui/qt4/ui/open_file.h:233
-msgid "Font size:"
-msgstr "Розмір шрифту:"
-
-#: modules/gui/qt4/ui/open_file.h:234
-msgid "Text alignment:"
-msgstr "Вирівнювання тексту:"
-
-#: modules/gui/qt4/ui/open_net.h:116 modules/gui/qt4/ui/sprefs_input.h:301
-#: modules/gui/qt4/ui/streampanel.h:168
-msgid "Form"
-msgstr "Форма"
-
-#: modules/gui/qt4/ui/open_net.h:117
-msgid "Network Protocol"
-msgstr "Мережевий протокол"
-
-#: modules/gui/qt4/ui/open_net.h:119
-msgid "Select the protocol for the URL."
-msgstr "Оберіть протокол для URL."
-
-#: modules/gui/qt4/ui/open_net.h:123
-msgid "Select the port used"
-msgstr "Оберіть використовуваний порт"
-
-#: modules/gui/qt4/ui/open_net.h:128
-msgid "Enter the URL of the network stream here, with or without the protocol."
-msgstr "Введіть URL мережевого потоку тут з або без протоколу."
-
-#: modules/gui/qt4/ui/sout.h:335 modules/gui/qt4/ui/sout.h:345
-msgid "Destinations"
-msgstr "Призначення"
-
-#: modules/gui/qt4/ui/sout.h:336
-msgid "New destination"
-msgstr "Нове призначення"
-
-#: modules/gui/qt4/ui/sout.h:338
-msgid ""
-"Add destinations following the streaming methods you need. Be sure to check "
-"with transcoding that the format is compatible with the method used."
-msgstr ""
-"Додати призначення, слідуючи методам мовлення, які Вам потрібні. "
-"Впевненіться перевіркою перекодуванням, що формат сумісний із "
-"використовуваним методом."
-
-#: modules/gui/qt4/ui/sout.h:339
-msgid "Display locally"
-msgstr "Показувати локально"
-
-#: modules/gui/qt4/ui/sout.h:342
-msgid "Activate Transcoding"
-msgstr "Активувати перекодування"
-
-#: modules/gui/qt4/ui/sout.h:346
-msgid "Miscellaneous Options"
-msgstr "Інші налаштування"
-
-#: modules/gui/qt4/ui/sout.h:347
-msgid "Stream all elementary streams"
-msgstr "Надсилати усі елементарні потоки"
-
-#: modules/gui/qt4/ui/sout.h:350
-msgid "Group name"
-msgstr "Ім'я групи"
-
-#: modules/gui/qt4/ui/sout.h:352
-msgid "Generated stream output string"
-msgstr "Генерований рядок вихідного потоку"
-
-#: modules/gui/qt4/ui/sout.h:354
-msgid "Options"
-msgstr "Параметри"
-
-#: modules/gui/qt4/ui/sprefs_input.h:302
-msgid "Optical drive"
-msgstr "Оптичний накопичувач"
-
-#: modules/gui/qt4/ui/sprefs_input.h:303
-msgid "Default optical device"
-msgstr "Оптичний накопичував за змовчуванням"
-
-#: modules/gui/qt4/ui/sprefs_input.h:306
-msgid "Damaged or incomplete AVI file"
-msgstr "Пошкоджений чи неповний AVI-файл"
-
-#: modules/gui/qt4/ui/sprefs_input.h:310
-msgid "Default port (server mode)"
-msgstr "Порт за змовчуванням (режим сервера)"
-
-#: modules/gui/qt4/ui/sprefs_input.h:311
-msgid "HTTP proxy URL"
-msgstr "URL HTTP-проксі"
-
-#: modules/gui/qt4/ui/sprefs_input.h:312
-msgid "Default caching policy"
-msgstr "Політика кешування за змовчуванням"
-
-#: modules/gui/qt4/ui/sprefs_input.h:313
-msgid "HTTP (default)"
-msgstr "HTTP (за змовчуванням)"
-
-#: modules/gui/qt4/ui/sprefs_input.h:314
-msgid "RTP over RTSP (TCP)"
-msgstr "RTP поверх RTSP (TCP)"
-
-#: modules/gui/qt4/ui/sprefs_input.h:315
-msgid "Live555 stream transport"
-msgstr "Транспорт потоку Live555"
-
-#: modules/gui/qt4/ui/sprefs_input.h:316
-msgid "Codecs"
-msgstr "Кодеки"
-
-#: modules/gui/qt4/ui/sprefs_input.h:317
-msgid "Video quality post-processing level"
-msgstr "Рівень якості постобробки відео"
-
-#: modules/gui/qt4/ui/sprefs_input.h:318
-msgid "H.264 in-loop deblocking filter"
-msgstr "Неблокуючий фільтр H.264 у циклі"
-
-#: modules/gui/qt4/ui/sprefs_input.h:319
-msgid "System codecs (better quality)"
-msgstr "Системні кодеки (краща якість)"
-
-#: modules/gui/qt4/ui/sprefs_input.h:320
-msgid "Use host codecs if available"
-msgstr "Використовувати системні кодеки, якщо доступні"
-
-#: modules/gui/qt4/ui/streampanel.h:172
-msgid "Stuff"
-msgstr "Речі"
-
-#: modules/gui/qt4/ui/streampanel.h:174
-msgid "Edit settings"
-msgstr "Редагувати налаштування"
-
-#: modules/gui/qt4/ui/streampanel.h:175
-msgid "Control"
-msgstr "Контроль"
-
-#: modules/gui/qt4/ui/streampanel.h:176
-msgid "Run manually"
-msgstr "Запустити вручну"
-
-#: modules/gui/qt4/ui/streampanel.h:177
-msgid "Setup schedule"
-msgstr "Встановити планування"
-
-#: modules/gui/qt4/ui/streampanel.h:178
-msgid "Run on schedule"
-msgstr "Запустити по плану"
-
-#: modules/gui/qt4/ui/streampanel.h:179
-msgid "Status"
-msgstr "Статус"
-
-#: modules/gui/qt4/ui/streampanel.h:180
-msgid "P/P"
-msgstr "P/P"
-
-#: modules/gui/qt4/ui/streampanel.h:183
-msgid "Prev"
-msgstr "Попередній"
-
-#: modules/gui/qt4/ui/streampanel.h:184
-msgid "Add Input"
-msgstr "Додати ввід"
-
-#: modules/gui/qt4/ui/streampanel.h:185
-msgid "Edit Input"
-msgstr "Редагувати ввід"
-
-#: modules/gui/qt4/ui/streampanel.h:186
-msgid "Clear List"
-msgstr "Очистити список"
+#~ msgid "Key"
+#~ msgstr "Ключ"
 
 #~ msgid "Set"
 #~ msgstr "Встановити"
+
+#~ msgid "SDL video driver name"
+#~ msgstr "Ім’я відеодрайвера SDL"
+
+#~ msgid "Force a specific SDL video output driver."
+#~ msgstr "Використовувати вказаний драйвер SDL для відеовиводу."
+
+#~ msgid "Choose one or more media file to open"
+#~ msgstr "Оберіть один чи більше медіафайлів для відкриття"
+
+#~ msgid "File Selection"
+#~ msgstr "Вибір файлу"
+
+#~ msgid "You can select local files with the following list and buttons."
+#~ msgstr ""
+#~ "Ви можете обрати локальні файли за допомогою наступного списку та кнопок."
+
+#~ msgid "Add..."
+#~ msgstr "Додати…"
+
+#~ msgid "Add a subtitles file"
+#~ msgstr "Додати файл субтитрів"
+
+#~ msgid "Use a sub&titles file"
+#~ msgstr "Використовувати файл субтитрів"
+
+#~ msgid "Select the subtitles file"
+#~ msgstr "Оберіть файл субтитрів"
+
+#~ msgid "Font size:"
+#~ msgstr "Розмір шрифту:"
+
+#~ msgid "Text alignment:"
+#~ msgstr "Вирівнювання тексту:"
+
+#~ msgid "Form"
+#~ msgstr "Форма"
+
+#~ msgid "Network Protocol"
+#~ msgstr "Мережевий протокол"
+
+#~ msgid "Select the protocol for the URL."
+#~ msgstr "Оберіть протокол для URL."
+
+#~ msgid "Select the port used"
+#~ msgstr "Оберіть використовуваний порт"
+
+#~ msgid ""
+#~ "Enter the URL of the network stream here, with or without the protocol."
+#~ msgstr "Введіть URL мережевого потоку тут з або без протоколу."
+
+#~ msgid "Destinations"
+#~ msgstr "Призначення"
+
+#~ msgid "New destination"
+#~ msgstr "Нове призначення"
+
+#~ msgid ""
+#~ "Add destinations following the streaming methods you need. Be sure to "
+#~ "check with transcoding that the format is compatible with the method used."
+#~ msgstr ""
+#~ "Додати призначення, слідуючи методам мовлення, які Вам потрібні. "
+#~ "Впевненіться перевіркою перекодуванням, що формат сумісний із "
+#~ "використовуваним методом."
+
+#~ msgid "Display locally"
+#~ msgstr "Показувати локально"
+
+#~ msgid "Activate Transcoding"
+#~ msgstr "Активувати перекодування"
+
+#~ msgid "Miscellaneous Options"
+#~ msgstr "Інші налаштування"
+
+#~ msgid "Stream all elementary streams"
+#~ msgstr "Надсилати усі елементарні потоки"
+
+#~ msgid "Group name"
+#~ msgstr "Ім'я групи"
+
+#~ msgid "Generated stream output string"
+#~ msgstr "Генерований рядок вихідного потоку"
+
+#~ msgid "Options"
+#~ msgstr "Параметри"
+
+#~ msgid "Optical drive"
+#~ msgstr "Оптичний накопичувач"
+
+#~ msgid "Default optical device"
+#~ msgstr "Оптичний накопичував за змовчуванням"
+
+#~ msgid "Damaged or incomplete AVI file"
+#~ msgstr "Пошкоджений чи неповний AVI-файл"
+
+#~ msgid "Default port (server mode)"
+#~ msgstr "Порт за змовчуванням (режим сервера)"
+
+#~ msgid "HTTP proxy URL"
+#~ msgstr "URL HTTP-проксі"
+
+#~ msgid "Default caching policy"
+#~ msgstr "Політика кешування за змовчуванням"
+
+#~ msgid "HTTP (default)"
+#~ msgstr "HTTP (за змовчуванням)"
+
+#~ msgid "RTP over RTSP (TCP)"
+#~ msgstr "RTP поверх RTSP (TCP)"
+
+#~ msgid "Live555 stream transport"
+#~ msgstr "Транспорт потоку Live555"
+
+#~ msgid "Codecs"
+#~ msgstr "Кодеки"
+
+#~ msgid "Video quality post-processing level"
+#~ msgstr "Рівень якості постобробки відео"
+
+#~ msgid "H.264 in-loop deblocking filter"
+#~ msgstr "Неблокуючий фільтр H.264 у циклі"
+
+#~ msgid "System codecs (better quality)"
+#~ msgstr "Системні кодеки (краща якість)"
+
+#~ msgid "Use host codecs if available"
+#~ msgstr "Використовувати системні кодеки, якщо доступні"
+
+#~ msgid "Stuff"
+#~ msgstr "Речі"
+
+#~ msgid "Edit settings"
+#~ msgstr "Редагувати налаштування"
+
+#~ msgid "Control"
+#~ msgstr "Контроль"
+
+#~ msgid "Run manually"
+#~ msgstr "Запустити вручну"
+
+#~ msgid "Setup schedule"
+#~ msgstr "Встановити планування"
+
+#~ msgid "Run on schedule"
+#~ msgstr "Запустити по плану"
+
+#~ msgid "Status"
+#~ msgstr "Статус"
+
+#~ msgid "P/P"
+#~ msgstr "P/P"
+
+#~ msgid "Prev"
+#~ msgstr "Попередній"
+
+#~ msgid "Add Input"
+#~ msgstr "Додати ввід"
+
+#~ msgid "Edit Input"
+#~ msgstr "Редагувати ввід"
+
+#~ msgid "Clear List"
+#~ msgstr "Очистити список"
 
 #~ msgid "Other codecs"
 #~ msgstr "Інші кодеки"

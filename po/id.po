@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: id\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-04-08 00:07+0100\n"
+"POT-Creation-Date: 2010-04-11 23:45+0100\n"
 "PO-Revision-Date: 2010-04-06 02:53+0700\n"
 "Last-Translator: Luqman Hakim <ovdl@rocketmail.com>\n"
 "Language-Team: Indonesia <id@li.org>\n"
@@ -410,7 +410,6 @@ msgstr "Setting Lanjutan"
 
 #: include/vlc_config_cat.h:198 modules/gui/macosx/open.m:180
 #: modules/gui/macosx/open.m:459 modules/gui/macosx/simple_prefs.m:259
-#: modules/gui/qt4/ui/sprefs_input.h:309
 msgid "Network"
 msgstr "Jaringan"
 
@@ -864,15 +863,15 @@ msgstr "kekunci"
 msgid "boolean"
 msgstr "boolean"
 
-#: src/config/file.c:630 src/libvlc.c:1582
+#: src/config/file.c:630 src/libvlc.c:1581
 msgid "integer"
 msgstr "integer"
 
-#: src/config/file.c:639 src/libvlc.c:1612
+#: src/config/file.c:639 src/libvlc.c:1611
 msgid "float"
 msgstr "apung"
 
-#: src/config/file.c:662 src/libvlc.c:1560
+#: src/config/file.c:662 src/libvlc.c:1559
 msgid "string"
 msgstr "rentetan"
 
@@ -1231,11 +1230,11 @@ msgstr ""
 "Menjalankan vlc dengan antarmuka default. Gunakan 'cvlc' untuk menggunakan "
 "vlc tanpa antarmuka."
 
-#: src/libvlc.c:1234
+#: src/libvlc.c:1233
 msgid "To get exhaustive help, use '-H'."
 msgstr "Untuk memperoleh bantuan menyeluruh, gunakan '-H'."
 
-#: src/libvlc.c:1238 src/libvlc-module.c:1515
+#: src/libvlc.c:1237 src/libvlc-module.c:1515
 #, c-format
 msgid ""
 "Usage: %s [options] [stream] ...\n"
@@ -1306,29 +1305,29 @@ msgstr ""
 "untuk waktu tertentu\n"
 "  vlc:quit                        Item khusus untuk keluar dari VLC\n"
 
-#: src/libvlc.c:1628
+#: src/libvlc.c:1627
 msgid " (default enabled)"
 msgstr "(default dihidupkan)"
 
-#: src/libvlc.c:1629
+#: src/libvlc.c:1628
 msgid " (default disabled)"
 msgstr "(default dimatikan)"
 
-#: src/libvlc.c:1792 src/libvlc.c:1795 src/libvlc.c:1803 src/libvlc.c:1808
+#: src/libvlc.c:1791 src/libvlc.c:1794 src/libvlc.c:1802 src/libvlc.c:1807
 msgid "Note:"
 msgstr "Catatan:"
 
-#: src/libvlc.c:1793 src/libvlc.c:1796
+#: src/libvlc.c:1792 src/libvlc.c:1795
 msgid "add --advanced to your command line to see advanced options."
 msgstr "tambahkan --advanced pada command line untuk melihat opsi lanjutan."
 
-#: src/libvlc.c:1804 src/libvlc.c:1809
+#: src/libvlc.c:1803 src/libvlc.c:1808
 #, c-format
 msgid ""
 "%d module(s) were not displayed because they only have advanced options.\n"
 msgstr "modul %d tidak ditampilkan karena hanya memiliki opsi lanjutan.\n"
 
-#: src/libvlc.c:1816 src/libvlc.c:1820
+#: src/libvlc.c:1815 src/libvlc.c:1819
 msgid ""
 "No matching module found. Use --list or --list-verbose to list available "
 "modules."
@@ -1336,22 +1335,22 @@ msgstr ""
 "Tidak menemukan modul yang sesuai. Gunakan --list atau --list-verbose untuk "
 "melihat daftar modul yang tersedia."
 
-#: src/libvlc.c:1910
+#: src/libvlc.c:1909
 #, c-format
 msgid "VLC version %s (%s)\n"
 msgstr "VLC versi %s (%s)\n"
 
-#: src/libvlc.c:1912
+#: src/libvlc.c:1911
 #, c-format
 msgid "Compiled by %s on %s (%s)\n"
 msgstr "Dikompilasi oleh %s pada %s (%s)\n"
 
-#: src/libvlc.c:1914
+#: src/libvlc.c:1913
 #, c-format
 msgid "Compiler: %s\n"
 msgstr "Pengkompilasi: %s\n"
 
-#: src/libvlc.c:1949
+#: src/libvlc.c:1948
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
@@ -1359,7 +1358,7 @@ msgstr ""
 "\n"
 "Memindahkan isi ke file vlc-help.txt.\n"
 
-#: src/libvlc.c:1969
+#: src/libvlc.c:1968
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -2667,7 +2666,7 @@ msgstr ""
 "bentuk \"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-"
 "offset},{...}\""
 
-#: src/libvlc-module.c:770 modules/gui/qt4/ui/sprefs_input.h:307
+#: src/libvlc-module.c:770
 #, fuzzy
 msgid "Record directory or filename"
 msgstr "Direktori snapshot video (atau nama fail)"
@@ -3111,7 +3110,7 @@ msgstr ""
 "Pilih apakah stream SPU perlu diarahkan kepada fasilitas output stream "
 "apabila yang akhir ini dihidupkan."
 
-#: src/libvlc-module.c:980 modules/gui/qt4/ui/sout.h:348
+#: src/libvlc-module.c:980
 msgid "Keep stream output open"
 msgstr "Selalu buka output stream"
 
@@ -3805,8 +3804,7 @@ msgstr "Lebih lambat (bagus)"
 #: modules/gui/macosx/intf.m:746 modules/gui/macosx/wizard.m:309
 #: modules/gui/macosx/wizard.m:321 modules/gui/macosx/wizard.m:1623
 #: modules/gui/qt4/components/controller.hpp:105
-#: modules/misc/notify/notify.c:321 modules/gui/qt4/ui/sout.h:333
-#: modules/gui/qt4/ui/sout.h:344 modules/gui/qt4/ui/streampanel.h:182
+#: modules/misc/notify/notify.c:321
 msgid "Next"
 msgstr "Maju"
 
@@ -3821,8 +3819,7 @@ msgstr ""
 #: modules/gui/macosx/embeddedwindow.m:71 modules/gui/macosx/intf.m:599
 #: modules/gui/macosx/intf.m:651 modules/gui/macosx/intf.m:739
 #: modules/gui/macosx/intf.m:745 modules/gui/qt4/components/controller.hpp:105
-#: modules/misc/notify/notify.c:319 modules/gui/qt4/ui/sout.h:343
-#: modules/gui/qt4/ui/sout.h:353
+#: modules/misc/notify/notify.c:319
 msgid "Previous"
 msgstr "Terdahulu"
 
@@ -3835,7 +3832,7 @@ msgstr ""
 #: modules/gui/macosx/embeddedwindow.m:72 modules/gui/macosx/intf.m:602
 #: modules/gui/macosx/intf.m:647 modules/gui/macosx/intf.m:737
 #: modules/gui/macosx/intf.m:744 modules/gui/qt4/components/controller.hpp:104
-#: modules/misc/notify/xosd.c:231 modules/gui/qt4/ui/streampanel.h:181
+#: modules/misc/notify/xosd.c:231
 msgid "Stop"
 msgstr "Henti"
 
@@ -5206,7 +5203,7 @@ msgstr "Mode hirarki terrestrial"
 msgid "Hierarchy alpha value [Undefined,1,2,4]"
 msgstr ""
 
-#: modules/access/bda/bda.c:169 modules/gui/qt4/ui/streampanel.h:170
+#: modules/access/bda/bda.c:169
 msgid "1"
 msgstr "1"
 
@@ -5724,15 +5721,15 @@ msgstr "File Daftar Penarikan Sertifikat antarmuka HTTP"
 msgid "DVB input with v4l2 support"
 msgstr "Input DVB dengan dukungan v4l2"
 
-#: modules/access/dvb/access.c:247
+#: modules/access/dvb/access.c:249
 msgid "HTTP server"
 msgstr "Server HTTP"
 
-#: modules/access/dvb/access.c:941
+#: modules/access/dvb/access.c:943
 msgid "Input syntax is deprecated"
 msgstr "Sintaks input telah ditinggalkan"
 
-#: modules/access/dvb/access.c:942
+#: modules/access/dvb/access.c:944
 msgid ""
 "The given syntax is deprecated. Run \"vlc -p dvb\" to see an explanation of "
 "the new syntax."
@@ -5740,11 +5737,11 @@ msgstr ""
 "Sintaks yang diberikan telah ditinggalkan. Jalankan \"vlc -p dvb\" untuk "
 "melihat penjelasan sintaks baru."
 
-#: modules/access/dvb/access.c:988
+#: modules/access/dvb/access.c:990
 msgid "Invalid polarization"
 msgstr "Polarisasi tidak sah"
 
-#: modules/access/dvb/access.c:989
+#: modules/access/dvb/access.c:991
 #, c-format
 msgid "The provided polarization \"%c\" is not valid."
 msgstr "Pengutuban yang disediakan \"%c\" tidak sah."
@@ -5790,8 +5787,8 @@ msgstr "DVD dengan menu"
 msgid "DVDnav Input"
 msgstr "Input DVDnav"
 
-#: modules/access/dvdnav.c:312 modules/access/dvdread.c:250
-#: modules/access/dvdread.c:510 modules/access/dvdread.c:572
+#: modules/access/dvdnav.c:312 modules/access/dvdread.c:205
+#: modules/access/dvdread.c:465 modules/access/dvdread.c:527
 msgid "Playback failure"
 msgstr "Kegagalan playback"
 
@@ -5802,73 +5799,26 @@ msgstr ""
 "VLC tidak dapat menentukan judul DVD. Ada kemungkinan tidak dapat "
 "mendekripsi keseluruhan disk."
 
-#: modules/access/dvdread.c:79
-msgid "Method used by libdvdcss for decryption"
-msgstr "Metode yang digunakan oleh libdvdcss untuk deskripsi"
-
-#: modules/access/dvdread.c:81
-msgid ""
-"Set the method used by libdvdcss for key decryption.\n"
-"title: decrypted title key is guessed from the encrypted sectors of the "
-"stream. Thus it should work with a file as well as the DVD device. But it "
-"sometimes takes much time to decrypt a title key and may even fail. With "
-"this method, the key is only checked at the beginning of each title, so it "
-"won't work if the key changes in the middle of a title.\n"
-"disc: the disc key is first cracked, then all title keys can be decrypted "
-"instantly, which allows us to check them often.\n"
-"key: the same as \"disc\" if you don't have a file with player keys at "
-"compilation time. If you do, the decryption of the disc key will be faster "
-"with this method. It is the one that was used by libcss.\n"
-"The default method is: key."
-msgstr ""
-"Menentukan metode untuk digunakan oleh libdvdcss untuk mendekripsikan "
-"kunci.\n"
-"judul: dekripsi kunci judul ditebak dari sektor stream terdekripsi. Maka ia "
-"sepatutnya berfungsi dengan fail sebagaimana peranti DVD. Tetapi kadangkala "
-"mengambil waktu lebih untuk mendekripsi kunci judul dan mungkin juga gagal. "
-"Dengan metode ini, kunci hanya diperiksa pada awal setiap judul, jadi tidak "
-"akan berfungsi jika kunci berubah di tengah-tengah judul.\n"
-"disk: kunci cakera pertama kali dipecahkan, kemudian semua kunci judul dapat "
-"didekripsikan segera, yang mengizinkan kita untuk selalu memeriksanya.\n"
-"kunci: sama seperti \"disk\" jika Anda tidak mempunyai file dengan kunci "
-"pemain pada waktu kompilasi. Jika Anda buat, dekripsi untuk kunci disk akan "
-"lebih cepat menggunakan metode ini. Ini adalah salah satu yang telah "
-"digunakan oleh libcss.\n"
-"Metode default adalah: kunci."
-
-#: modules/access/dvdread.c:97
-msgid "title"
-msgstr "judul"
-
-#: modules/access/dvdread.c:97 modules/access/vcdx/info.c:54
-#: modules/gui/macosx/open.m:179 modules/gui/macosx/open.m:455
-msgid "Disc"
-msgstr "Cakera"
-
-#: modules/access/dvdread.c:97
-msgid "Key"
-msgstr "Kekunci"
-
-#: modules/access/dvdread.c:103
+#: modules/access/dvdread.c:83
 msgid "DVD without menus"
 msgstr "DVD tanpa menu"
 
-#: modules/access/dvdread.c:104
+#: modules/access/dvdread.c:84
 #, fuzzy
 msgid "DVDRead Input (no menu support)"
 msgstr "Input DVDRead (DVD tanpa sokongan menu)"
 
-#: modules/access/dvdread.c:251
+#: modules/access/dvdread.c:206
 #, fuzzy, c-format
 msgid "DVDRead could not open the disc \"%s\"."
 msgstr "DVDRead tidak dapat membuka cakera \"%s\"."
 
-#: modules/access/dvdread.c:511
+#: modules/access/dvdread.c:466
 #, c-format
 msgid "DVDRead could not read block %d."
 msgstr "DVDRead tidak dapat membaca blok %d."
 
-#: modules/access/dvdread.c:573
+#: modules/access/dvdread.c:528
 #, c-format
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
 msgstr "DVDRead tidak dapat membaca blok %d/%d pada 0x%02x."
@@ -5945,17 +5895,17 @@ msgstr "Tiru"
 msgid "Fake video input"
 msgstr "Input palsu"
 
-#: modules/access/file.c:168 modules/access/file.c:301
+#: modules/access/file.c:166 modules/access/file.c:299
 #: modules/access/mmap.c:228 modules/access/mtp.c:216 modules/access/mtp.c:304
 msgid "File reading failed"
 msgstr "Gagal membaca file"
 
-#: modules/access/file.c:169 modules/access/mtp.c:305
+#: modules/access/file.c:167 modules/access/mtp.c:305
 #, c-format
 msgid "VLC could not open the file \"%s\"."
 msgstr "VLC tidak dapat membuka file \"%s\"."
 
-#: modules/access/file.c:302 modules/access/mmap.c:229
+#: modules/access/file.c:300 modules/access/mmap.c:229
 #: modules/access/mtp.c:217
 msgid "VLC could not read the file."
 msgstr "VLC tidak dapat membaca file."
@@ -7374,6 +7324,11 @@ msgstr "Segmen"
 #: modules/access/vcdx/access.c:519
 msgid "LID"
 msgstr "LID"
+
+#: modules/access/vcdx/info.c:54 modules/gui/macosx/open.m:179
+#: modules/gui/macosx/open.m:455
+msgid "Disc"
+msgstr "Cakera"
 
 #: modules/access/vcdx/info.c:62
 msgid "VCD Format"
@@ -9552,11 +9507,11 @@ msgstr "Paksa penggunaan kroma spesifik untuk output. Default adalah I420."
 msgid "Fake video decoder"
 msgstr "Dekoder video palsu"
 
-#: modules/codec/flac.c:133
+#: modules/codec/flac.c:134
 msgid "Flac audio decoder"
 msgstr "Dekoder audio FLAC"
 
-#: modules/codec/flac.c:139
+#: modules/codec/flac.c:140
 msgid "Flac audio encoder"
 msgstr "Enkoder audio FLAC"
 
@@ -11235,7 +11190,6 @@ msgid "Quiet mode."
 msgstr "Mode senyap."
 
 #: modules/codec/x264.c:371 modules/gui/macosx/playlistinfo.m:82
-#: modules/gui/qt4/ui/streampanel.h:171
 msgid "Statistics"
 msgstr "Statistik"
 
@@ -12377,7 +12331,7 @@ msgstr ""
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:243
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:293
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:386
-#: modules/stream_out/rtp.c:112 modules/gui/qt4/ui/open_net.h:126
+#: modules/stream_out/rtp.c:112
 msgid "Port"
 msgstr "Port"
 
@@ -13668,7 +13622,7 @@ msgstr "Indeks"
 msgid "Bookmarks"
 msgstr "Tanda Buku"
 
-#: modules/gui/macosx/bookmarks.m:88 modules/gui/qt4/ui/sout.h:337
+#: modules/gui/macosx/bookmarks.m:88
 msgid "Add"
 msgstr "Tambah"
 
@@ -13688,7 +13642,7 @@ msgstr "Edit"
 msgid "Extract"
 msgstr "Ekstrak"
 
-#: modules/gui/macosx/bookmarks.m:92 modules/gui/qt4/ui/open_file.h:224
+#: modules/gui/macosx/bookmarks.m:92
 msgid "Remove"
 msgstr "Hilangkan"
 
@@ -14475,8 +14429,6 @@ msgstr "Kodek bab"
 #: modules/gui/qt4/components/preferences_widgets.cpp:299
 #: modules/gui/qt4/components/simple_preferences.cpp:276
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:102
-#: modules/gui/qt4/ui/open_file.h:232 modules/gui/qt4/ui/sprefs_input.h:304
-#: modules/gui/qt4/ui/sprefs_input.h:308
 msgid "Browse..."
 msgstr "Lungsur..."
 
@@ -14536,7 +14488,7 @@ msgstr ""
 msgid "Open RTP/UDP Stream"
 msgstr "Buka Stream RTP/UDP"
 
-#: modules/gui/macosx/open.m:210 modules/gui/qt4/ui/open_net.h:121
+#: modules/gui/macosx/open.m:210
 msgid "Protocol"
 msgstr "Protokol"
 
@@ -14545,7 +14497,6 @@ msgstr "Protokol"
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:292
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:339
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:385
-#: modules/gui/qt4/ui/open_net.h:125
 msgid "Address"
 msgstr "Alamat"
 
@@ -14665,7 +14616,7 @@ msgid "Subtitle File"
 msgstr "File Subtitle"
 
 #: modules/gui/macosx/open.m:587 modules/gui/macosx/open.m:953
-#: modules/gui/macosx/open.m:1189 modules/gui/qt4/ui/open_file.h:217
+#: modules/gui/macosx/open.m:1189
 msgid "Open File"
 msgstr "Buka File"
 
@@ -14725,7 +14676,7 @@ msgstr "Singkir input mentah"
 msgid "Encapsulation Method"
 msgstr "Metode Enkapsulasi"
 
-#: modules/gui/macosx/output.m:159 modules/gui/qt4/ui/sout.h:341
+#: modules/gui/macosx/output.m:159
 msgid "Transcoding options"
 msgstr "Pilihan transkode"
 
@@ -14742,7 +14693,7 @@ msgstr "Skala"
 msgid "Stream Announcing"
 msgstr "Pemberitahuan Stream"
 
-#: modules/gui/macosx/output.m:181 modules/gui/qt4/ui/sout.h:349
+#: modules/gui/macosx/output.m:181
 msgid "SAP announce"
 msgstr "Pengumuman SAP"
 
@@ -14793,7 +14744,6 @@ msgid "Save Playlist..."
 msgstr "Simpan Playlist..."
 
 #: modules/gui/macosx/playlist.m:465 modules/gui/qt4/dialogs/bookmarks.cpp:45
-#: modules/gui/qt4/ui/streampanel.h:173
 msgid "Delete"
 msgstr "Hapus"
 
@@ -15722,7 +15672,6 @@ msgstr ""
 "Pada laman ini, beberapa parameter tambahan untuk streaming dapat ditentukan."
 
 #: modules/gui/macosx/wizard.m:401 modules/gui/macosx/wizard.m:1866
-#: modules/gui/qt4/ui/sout.h:351
 msgid "Time-To-Live (TTL)"
 msgstr "Time-To-Live (TTL)"
 
@@ -17020,7 +16969,6 @@ msgid "File/Folder"
 msgstr "File/Folder"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:46
-#: modules/gui/qt4/ui/sout.h:334
 msgid "Source"
 msgstr "Sumber"
 
@@ -17535,7 +17483,7 @@ msgstr "Reset Keutamaan"
 msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/sout.cpp:42 modules/gui/qt4/ui/sout.h:332
+#: modules/gui/qt4/dialogs/sout.cpp:42
 msgid "Stream Output"
 msgstr "Output stream"
 
@@ -19127,59 +19075,63 @@ msgid ""
 msgstr ""
 
 #: modules/misc/lua/vlc.c:65
-msgid "Lua Art"
-msgstr ""
+msgid "Lua Interface Module"
+msgstr "Modul Antarmuka Lua"
 
 #: modules/misc/lua/vlc.c:66
-msgid "Fetch artwork using lua scripts"
+msgid "Interfaces implemented using lua scripts"
 msgstr ""
 
-#: modules/misc/lua/vlc.c:71
+#: modules/misc/lua/vlc.c:84
 msgid "Lua Meta Fetcher"
 msgstr ""
 
-#: modules/misc/lua/vlc.c:72
+#: modules/misc/lua/vlc.c:85
 msgid "Fetch meta data using lua scripts"
 msgstr ""
 
-#: modules/misc/lua/vlc.c:77
+#: modules/misc/lua/vlc.c:90
 msgid "Lua Meta Reader"
 msgstr ""
 
-#: modules/misc/lua/vlc.c:78
+#: modules/misc/lua/vlc.c:91
 msgid "Read meta data using lua scripts"
 msgstr ""
 
-#: modules/misc/lua/vlc.c:86
+#: modules/misc/lua/vlc.c:97
 msgid "Lua Playlist"
 msgstr "Playlist Lua"
 
-#: modules/misc/lua/vlc.c:87
+#: modules/misc/lua/vlc.c:98
 msgid "Lua Playlist Parser Interface"
 msgstr ""
 
-#: modules/misc/lua/vlc.c:92
+#: modules/misc/lua/vlc.c:103
 #, fuzzy
 msgid "Lua Interface Module (shortcuts)"
 msgstr "Modul Antarmuka Lua"
 
-#: modules/misc/lua/vlc.c:99
-msgid "Lua Interface Module"
-msgstr "Modul Antarmuka Lua"
+#: modules/misc/lua/vlc.c:110
+msgid "Lua Art"
+msgstr ""
 
-#: modules/misc/lua/vlc.c:115
+#: modules/misc/lua/vlc.c:111
+msgid "Fetch artwork using lua scripts"
+msgstr ""
+
+#: modules/misc/lua/vlc.c:116
 msgid "Lua Extension"
 msgstr "Ekstensi Lua"
 
-#: modules/misc/lua/vlc.c:121
+#: modules/misc/lua/vlc.c:122
 msgid "Lua SD Module"
 msgstr "Modul Lua SD"
 
-#: modules/misc/lua/vlc.c:129
+#: modules/misc/lua/vlc.c:132
 msgid "Freebox TV"
 msgstr ""
 
-#: modules/misc/lua/vlc.c:135
+#: modules/misc/lua/vlc.c:138
 msgid "French TV"
 msgstr "French TV"
 
@@ -20715,7 +20667,7 @@ msgstr ""
 msgid "Standard stream output"
 msgstr "Output stream standar"
 
-#: modules/stream_out/switcher.c:90 modules/gui/qt4/ui/sprefs_input.h:305
+#: modules/stream_out/switcher.c:90
 msgid "Files"
 msgstr "File"
 
@@ -23863,15 +23815,7 @@ msgstr ""
 "Paksa renderer SDL menggunakan format kroma tertentu daripada mencoba "
 "menaikkan kinerja dengan menggunakan kroma yang paling efisien."
 
-#: modules/video_output/sdl.c:54
-msgid "SDL video driver name"
-msgstr "Nama driver video SDL"
-
-#: modules/video_output/sdl.c:56
-msgid "Force a specific SDL video output driver."
-msgstr ""
-
-#: modules/video_output/sdl.c:62
+#: modules/video_output/sdl.c:58
 msgid "Simple DirectMedia Layer video output"
 msgstr "Output video DirectMedia Layer Simpel"
 
@@ -24271,223 +24215,204 @@ msgstr "Filter pemvisual"
 msgid "Spectrum analyser"
 msgstr "Penganalisa spektrum"
 
-#: modules/gui/qt4/ui/open_file.h:219
-msgid "Choose one or more media file to open"
-msgstr "Plih satu atau lebih file media untuk dibuka"
+#~ msgid "Method used by libdvdcss for decryption"
+#~ msgstr "Metode yang digunakan oleh libdvdcss untuk deskripsi"
 
-#: modules/gui/qt4/ui/open_file.h:221
-msgid "File Selection"
-msgstr "Pilihan File"
+#~ msgid ""
+#~ "Set the method used by libdvdcss for key decryption.\n"
+#~ "title: decrypted title key is guessed from the encrypted sectors of the "
+#~ "stream. Thus it should work with a file as well as the DVD device. But it "
+#~ "sometimes takes much time to decrypt a title key and may even fail. With "
+#~ "this method, the key is only checked at the beginning of each title, so "
+#~ "it won't work if the key changes in the middle of a title.\n"
+#~ "disc: the disc key is first cracked, then all title keys can be decrypted "
+#~ "instantly, which allows us to check them often.\n"
+#~ "key: the same as \"disc\" if you don't have a file with player keys at "
+#~ "compilation time. If you do, the decryption of the disc key will be "
+#~ "faster with this method. It is the one that was used by libcss.\n"
+#~ "The default method is: key."
+#~ msgstr ""
+#~ "Menentukan metode untuk digunakan oleh libdvdcss untuk mendekripsikan "
+#~ "kunci.\n"
+#~ "judul: dekripsi kunci judul ditebak dari sektor stream terdekripsi. Maka "
+#~ "ia sepatutnya berfungsi dengan fail sebagaimana peranti DVD. Tetapi "
+#~ "kadangkala mengambil waktu lebih untuk mendekripsi kunci judul dan "
+#~ "mungkin juga gagal. Dengan metode ini, kunci hanya diperiksa pada awal "
+#~ "setiap judul, jadi tidak akan berfungsi jika kunci berubah di tengah-"
+#~ "tengah judul.\n"
+#~ "disk: kunci cakera pertama kali dipecahkan, kemudian semua kunci judul "
+#~ "dapat didekripsikan segera, yang mengizinkan kita untuk selalu "
+#~ "memeriksanya.\n"
+#~ "kunci: sama seperti \"disk\" jika Anda tidak mempunyai file dengan kunci "
+#~ "pemain pada waktu kompilasi. Jika Anda buat, dekripsi untuk kunci disk "
+#~ "akan lebih cepat menggunakan metode ini. Ini adalah salah satu yang telah "
+#~ "digunakan oleh libcss.\n"
+#~ "Metode default adalah: kunci."
 
-#: modules/gui/qt4/ui/open_file.h:222
-msgid "You can select local files with the following list and buttons."
-msgstr "Anda dapat memilih file lokal dengan daftar dan tombol berikut."
+#~ msgid "title"
+#~ msgstr "judul"
 
-#: modules/gui/qt4/ui/open_file.h:223
-msgid "Add..."
-msgstr "Tambah..."
-
-#: modules/gui/qt4/ui/open_file.h:226
-msgid "Add a subtitles file"
-msgstr "Tambahkan sebuah file subtitle"
-
-#: modules/gui/qt4/ui/open_file.h:228
-msgid "Use a sub&titles file"
-msgstr "Gunakan sebuah file sub&title"
-
-#: modules/gui/qt4/ui/open_file.h:230
-msgid "Select the subtitles file"
-msgstr "Pilih file subtitle"
-
-#: modules/gui/qt4/ui/open_file.h:233
-msgid "Font size:"
-msgstr "Ukuran font:"
-
-#: modules/gui/qt4/ui/open_file.h:234
-msgid "Text alignment:"
-msgstr "Rataan teks:"
-
-#: modules/gui/qt4/ui/open_net.h:116 modules/gui/qt4/ui/sprefs_input.h:301
-#: modules/gui/qt4/ui/streampanel.h:168
-#, fuzzy
-msgid "Form"
-msgstr "Bentuk"
-
-#: modules/gui/qt4/ui/open_net.h:117
-msgid "Network Protocol"
-msgstr "Protokol Jaringan"
-
-#: modules/gui/qt4/ui/open_net.h:119
-msgid "Select the protocol for the URL."
-msgstr "Pilih protokol untuk URL."
-
-#: modules/gui/qt4/ui/open_net.h:123
-msgid "Select the port used"
-msgstr "Pilih port yang digunakan"
-
-#: modules/gui/qt4/ui/open_net.h:128
-msgid "Enter the URL of the network stream here, with or without the protocol."
-msgstr ""
-
-#: modules/gui/qt4/ui/sout.h:335 modules/gui/qt4/ui/sout.h:345
-msgid "Destinations"
-msgstr "Destinasi"
-
-#: modules/gui/qt4/ui/sout.h:336
-msgid "New destination"
-msgstr "Destinasi baru"
-
-#: modules/gui/qt4/ui/sout.h:338
-msgid ""
-"Add destinations following the streaming methods you need. Be sure to check "
-"with transcoding that the format is compatible with the method used."
-msgstr ""
-
-#: modules/gui/qt4/ui/sout.h:339
-#, fuzzy
-msgid "Display locally"
-msgstr "Tayang lokal"
-
-#: modules/gui/qt4/ui/sout.h:342
-#, fuzzy
-msgid "Activate Transcoding"
-msgstr "Transkod"
-
-#: modules/gui/qt4/ui/sout.h:346
-msgid "Miscellaneous Options"
-msgstr "Opsi Lain-lain"
-
-#: modules/gui/qt4/ui/sout.h:347
-#, fuzzy
-msgid "Stream all elementary streams"
-msgstr "Pilih keseluruhan asas strim"
-
-#: modules/gui/qt4/ui/sout.h:350
-msgid "Group name"
-msgstr "Nama grup"
-
-#: modules/gui/qt4/ui/sout.h:352
-#, fuzzy
-msgid "Generated stream output string"
-msgstr "Tetapan umum output stream"
-
-#: modules/gui/qt4/ui/sout.h:354
-msgid "Options"
-msgstr "Pilihan"
-
-#: modules/gui/qt4/ui/sprefs_input.h:302
-msgid "Optical drive"
-msgstr "Drive optik"
-
-#: modules/gui/qt4/ui/sprefs_input.h:303
-msgid "Default optical device"
-msgstr "Piranti optik default"
-
-#: modules/gui/qt4/ui/sprefs_input.h:306
-msgid "Damaged or incomplete AVI file"
-msgstr "File AVI rusak atau tidak lengkap"
-
-#: modules/gui/qt4/ui/sprefs_input.h:310
-msgid "Default port (server mode)"
-msgstr "Port default (mode server)"
-
-#: modules/gui/qt4/ui/sprefs_input.h:311
-msgid "HTTP proxy URL"
-msgstr "URL Proksi HTTP"
-
-#: modules/gui/qt4/ui/sprefs_input.h:312
-msgid "Default caching policy"
-msgstr "Kebijakan caching default"
-
-#: modules/gui/qt4/ui/sprefs_input.h:313
-msgid "HTTP (default)"
-msgstr "HTTP (default)"
-
-#: modules/gui/qt4/ui/sprefs_input.h:314
-msgid "RTP over RTSP (TCP)"
-msgstr "RTP di atas RTSP (TCP)"
-
-#: modules/gui/qt4/ui/sprefs_input.h:315
-#, fuzzy
-msgid "Live555 stream transport"
-msgstr "Output stream file"
-
-#: modules/gui/qt4/ui/sprefs_input.h:316
-msgid "Codecs"
-msgstr "Kodek"
-
-#: modules/gui/qt4/ui/sprefs_input.h:317
-#, fuzzy
-msgid "Video quality post-processing level"
-msgstr "Rantai penapis pasca memproses FFmpeg"
-
-#: modules/gui/qt4/ui/sprefs_input.h:318
-msgid "H.264 in-loop deblocking filter"
-msgstr ""
-
-#: modules/gui/qt4/ui/sprefs_input.h:319
-msgid "System codecs (better quality)"
-msgstr "Kodek sistem (kualitas lebih baik)"
-
-#: modules/gui/qt4/ui/sprefs_input.h:320
-msgid "Use host codecs if available"
-msgstr "Gunakan kodek host jika tersedia"
-
-#: modules/gui/qt4/ui/streampanel.h:172
-#, fuzzy
-msgid "Stuff"
-msgstr "huff"
-
-#: modules/gui/qt4/ui/streampanel.h:174
-msgid "Edit settings"
-msgstr "Edit setting"
-
-#: modules/gui/qt4/ui/streampanel.h:175
-msgid "Control"
-msgstr "Kontrol"
-
-#: modules/gui/qt4/ui/streampanel.h:176
-msgid "Run manually"
-msgstr "Jalankan secara manual"
-
-#: modules/gui/qt4/ui/streampanel.h:177
-#, fuzzy
-msgid "Setup schedule"
-msgstr "Jadwal"
-
-#: modules/gui/qt4/ui/streampanel.h:178
-#, fuzzy
-msgid "Run on schedule"
-msgstr "Jadwal"
-
-#: modules/gui/qt4/ui/streampanel.h:179
-msgid "Status"
-msgstr "Status"
-
-#: modules/gui/qt4/ui/streampanel.h:180
-msgid "P/P"
-msgstr "P/P"
-
-#: modules/gui/qt4/ui/streampanel.h:183
-#, fuzzy
-msgid "Prev"
-msgstr "Terdahulu"
-
-#: modules/gui/qt4/ui/streampanel.h:184
-msgid "Add Input"
-msgstr "Tambah Input"
-
-#: modules/gui/qt4/ui/streampanel.h:185
-msgid "Edit Input"
-msgstr "Edit Input"
-
-#: modules/gui/qt4/ui/streampanel.h:186
-msgid "Clear List"
-msgstr "Hapus Daftar"
+#~ msgid "Key"
+#~ msgstr "Kekunci"
 
 #, fuzzy
 #~ msgid "Set"
 #~ msgstr "Tetapkan QP"
+
+#~ msgid "SDL video driver name"
+#~ msgstr "Nama driver video SDL"
+
+#~ msgid "Choose one or more media file to open"
+#~ msgstr "Plih satu atau lebih file media untuk dibuka"
+
+#~ msgid "File Selection"
+#~ msgstr "Pilihan File"
+
+#~ msgid "You can select local files with the following list and buttons."
+#~ msgstr "Anda dapat memilih file lokal dengan daftar dan tombol berikut."
+
+#~ msgid "Add..."
+#~ msgstr "Tambah..."
+
+#~ msgid "Add a subtitles file"
+#~ msgstr "Tambahkan sebuah file subtitle"
+
+#~ msgid "Use a sub&titles file"
+#~ msgstr "Gunakan sebuah file sub&title"
+
+#~ msgid "Select the subtitles file"
+#~ msgstr "Pilih file subtitle"
+
+#~ msgid "Font size:"
+#~ msgstr "Ukuran font:"
+
+#~ msgid "Text alignment:"
+#~ msgstr "Rataan teks:"
+
+#, fuzzy
+#~ msgid "Form"
+#~ msgstr "Bentuk"
+
+#~ msgid "Network Protocol"
+#~ msgstr "Protokol Jaringan"
+
+#~ msgid "Select the protocol for the URL."
+#~ msgstr "Pilih protokol untuk URL."
+
+#~ msgid "Select the port used"
+#~ msgstr "Pilih port yang digunakan"
+
+#~ msgid "Destinations"
+#~ msgstr "Destinasi"
+
+#~ msgid "New destination"
+#~ msgstr "Destinasi baru"
+
+#, fuzzy
+#~ msgid "Display locally"
+#~ msgstr "Tayang lokal"
+
+#, fuzzy
+#~ msgid "Activate Transcoding"
+#~ msgstr "Transkod"
+
+#~ msgid "Miscellaneous Options"
+#~ msgstr "Opsi Lain-lain"
+
+#, fuzzy
+#~ msgid "Stream all elementary streams"
+#~ msgstr "Pilih keseluruhan asas strim"
+
+#~ msgid "Group name"
+#~ msgstr "Nama grup"
+
+#, fuzzy
+#~ msgid "Generated stream output string"
+#~ msgstr "Tetapan umum output stream"
+
+#~ msgid "Options"
+#~ msgstr "Pilihan"
+
+#~ msgid "Optical drive"
+#~ msgstr "Drive optik"
+
+#~ msgid "Default optical device"
+#~ msgstr "Piranti optik default"
+
+#~ msgid "Damaged or incomplete AVI file"
+#~ msgstr "File AVI rusak atau tidak lengkap"
+
+#~ msgid "Default port (server mode)"
+#~ msgstr "Port default (mode server)"
+
+#~ msgid "HTTP proxy URL"
+#~ msgstr "URL Proksi HTTP"
+
+#~ msgid "Default caching policy"
+#~ msgstr "Kebijakan caching default"
+
+#~ msgid "HTTP (default)"
+#~ msgstr "HTTP (default)"
+
+#~ msgid "RTP over RTSP (TCP)"
+#~ msgstr "RTP di atas RTSP (TCP)"
+
+#, fuzzy
+#~ msgid "Live555 stream transport"
+#~ msgstr "Output stream file"
+
+#~ msgid "Codecs"
+#~ msgstr "Kodek"
+
+#, fuzzy
+#~ msgid "Video quality post-processing level"
+#~ msgstr "Rantai penapis pasca memproses FFmpeg"
+
+#~ msgid "System codecs (better quality)"
+#~ msgstr "Kodek sistem (kualitas lebih baik)"
+
+#~ msgid "Use host codecs if available"
+#~ msgstr "Gunakan kodek host jika tersedia"
+
+#, fuzzy
+#~ msgid "Stuff"
+#~ msgstr "huff"
+
+#~ msgid "Edit settings"
+#~ msgstr "Edit setting"
+
+#~ msgid "Control"
+#~ msgstr "Kontrol"
+
+#~ msgid "Run manually"
+#~ msgstr "Jalankan secara manual"
+
+#, fuzzy
+#~ msgid "Setup schedule"
+#~ msgstr "Jadwal"
+
+#, fuzzy
+#~ msgid "Run on schedule"
+#~ msgstr "Jadwal"
+
+#~ msgid "Status"
+#~ msgstr "Status"
+
+#~ msgid "P/P"
+#~ msgstr "P/P"
+
+#, fuzzy
+#~ msgid "Prev"
+#~ msgstr "Terdahulu"
+
+#~ msgid "Add Input"
+#~ msgstr "Tambah Input"
+
+#~ msgid "Edit Input"
+#~ msgstr "Edit Input"
+
+#~ msgid "Clear List"
+#~ msgstr "Hapus Daftar"
 
 #~ msgid "Other codecs"
 #~ msgstr "Lain-lain kodek"
