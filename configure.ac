@@ -1629,7 +1629,10 @@ then
   else
       AC_MSG_ERROR([Could not find lua. Lua is needed for some interfaces (rc, telnet, http) as well as many other custom scripts. Use --disable-lua to ignore this error.])
   fi
-  AC_PATH_PROG(LUAC, luac)
+  AC_ARG_VAR([LUAC], [LUA byte compiler])
+  AC_PATH_PROG(LUAC, luac, [
+    AC_MSG_ERROR([Could not find the LUA byte compiler.])
+  ])
 fi
 AM_CONDITIONAL(BUILD_LUA, [test "${have_lua}" = "yes"])
 
