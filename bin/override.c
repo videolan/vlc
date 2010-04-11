@@ -233,7 +233,7 @@ int (*XSetIOErrorHandler (int (*handler) (Display *))) (Display *)
 }
 #endif
 #else
-static void vlc_enable_override (void)
+void vlc_enable_override (void)
 {
 }
 #endif
