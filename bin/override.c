@@ -147,4 +147,30 @@ int rand (void)
 }
 
 
+/** Signals **/
+#include <signal.h>
+
+void (*signal (int signum, void (*handler) (int))) (int)
+{
+    if (override)
+    {
+        const char *msg = "Error";
+
+        if ((signum == SIGPIPE && handler == SIG_IGN)
+         || (signum != SIGPIPE && handler == SIG_DFL))
+            /* Same settings we already use */
+            msg = "Warning";
+        LOG(msg, "%d, %p", signum, handler);
+    }
+    return CALL(signal, signum, handler);
+}
+
+int sigaction (int signum, const struct sigaction *act, struct sigaction *old)
+{
+    if (act != NULL)
+        LOG("Error", "%d, %p, %p", signum, act, old);
+    return CALL(sigaction, signum, act, old);
+}
+
+
 #endif /* __ELF__ */
