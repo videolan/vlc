@@ -1540,6 +1540,28 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             p_soun->i_qt_version = 0;
         }
     }
+    else if( p_track->fmt.i_cat == AUDIO_ES && p_sample->data.p_sample_soun->i_qt_version == 1 )
+    {
+        MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
+
+        switch( p_sample->i_type )
+        {
+            case( VLC_FOURCC( '.', 'm', 'p', '3' ) ):
+            case( VLC_FOURCC( 'm', 's', 0x00, 0x55 ) ):
+            {
+                if( p_track->i_sample_size > 1 )
+                    p_soun->i_qt_version = 0;
+                break;
+            }
+            case( VLC_FOURCC( 'a', 'c', '-', '3' ) ):
+            case( VLC_FOURCC( 'e', 'c', '-', '3' ) ):
+            case( VLC_FOURCC( 'm', 's', 0x20, 0x00 ) ):
+                p_soun->i_qt_version = 0;
+                break;
+            default:
+                break;
+        }
+    }
 
     /* */
     switch( p_track->fmt.i_cat )
@@ -1607,10 +1629,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         case( VLC_FOURCC( '.', 'm', 'p', '3' ) ):
         case( VLC_FOURCC( 'm', 's', 0x00, 0x55 ) ):
         {
-            MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
             p_track->fmt.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'a' );
-            if( p_track->i_sample_size > 1 )
-                p_soun->i_qt_version = 0;
             break;
         }
         case( VLC_FOURCC( 'a', 'c', '-', '3' ) ):
