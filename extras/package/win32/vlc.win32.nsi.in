@@ -501,7 +501,7 @@ Section $Name_Section02a SEC02a
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player.lnk" \
     "$INSTDIR\vlc.exe" ""
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player skinned.lnk" \
-    "$INSTDIR\vlc.exe -Iskins" ""
+    "$INSTDIR\vlc.exe" "-Iskins"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Documentation.lnk" \
     "$INSTDIR\Documentation.url"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Release Notes.lnk" \
