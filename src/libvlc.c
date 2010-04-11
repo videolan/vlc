@@ -1177,8 +1177,7 @@ static void SetLanguage ( const char *psz_lang )
      * makes the environment unconsistent when libvlc is unloaded and
      * should probably be moved to a safer place like vlc.c. */
     static char psz_lcall[20];
-    snprintf( psz_lcall, 19, "LC_ALL=%s", psz_lang );
-    psz_lcall[19] = '\0';
+    snprintf( psz_lcall, sizeof(psz_lcall), "LC_ALL=%s", psz_lang );
     putenv( psz_lcall );
 #endif
 
