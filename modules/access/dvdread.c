@@ -76,26 +76,6 @@
     "Caching value for DVDs. " \
     "This value should be set in milliseconds." )
 
-#define CSSMETHOD_TEXT N_("Method used by libdvdcss for decryption")
-#define CSSMETHOD_LONGTEXT N_( \
-    "Set the method used by libdvdcss for key decryption.\n" \
-    "title: decrypted title key is guessed from the encrypted sectors of " \
-           "the stream. Thus it should work with a file as well as the " \
-           "DVD device. But it sometimes takes much time to decrypt a title " \
-           "key and may even fail. With this method, the key is only checked "\
-           "at the beginning of each title, so it won't work if the key " \
-           "changes in the middle of a title.\n" \
-    "disc: the disc key is first cracked, then all title keys can be " \
-           "decrypted instantly, which allows us to check them often.\n" \
-    "key: the same as \"disc\" if you don't have a file with player keys " \
-           "at compilation time. If you do, the decryption of the disc key " \
-           "will be faster with this method. It is the one that was used by " \
-           "libcss.\n" \
-    "The default method is: key.")
-
-static const char *const psz_css_list[] = { "title", "disc", "key" };
-static const char *const psz_css_list_text[] = { N_("title"), N_("Disc"), N_("Key") };
-
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -108,9 +88,7 @@ vlc_module_begin ()
         ANGLE_LONGTEXT, false )
     add_integer( "dvdread-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, true )
-    add_string( "dvdread-css-method", NULL, NULL, CSSMETHOD_TEXT,
-                CSSMETHOD_LONGTEXT, true )
-        change_string_list( psz_css_list, psz_css_list_text, 0 )
+    add_obsolete_string( "dvdread-css-method" ) /* obsolete since 1.1.0 */
     set_capability( "access_demux", 0 )
     add_shortcut( "dvd" )
     add_shortcut( "dvdread" )
@@ -197,7 +175,6 @@ static int Open( vlc_object_t *p_this )
     demux_t      *p_demux = (demux_t*)p_this;
     demux_sys_t  *p_sys;
     char         *psz_name;
-    char         *psz_dvdcss_env;
     dvd_reader_t *p_dvdread;
     ifo_handle_t *p_vmg_file;
 
@@ -220,28 +197,6 @@ static int Open( vlc_object_t *p_this )
     if( psz_name[0] && psz_name[1] == ':' &&
         psz_name[2] == '\\' && psz_name[3] == '\0' ) psz_name[2] = '\0';
 #endif
-
-    /* Override environment variable DVDCSS_METHOD with config option */
-    psz_dvdcss_env = var_InheritString( p_demux, "dvdread-css-method" );
-    if( psz_dvdcss_env )
-#ifdef HAVE_SETENV
-        setenv( "DVDCSS_METHOD", psz_dvdcss_env, 1 );
-#else
-    {
-        /* FIXME: this create a small memory leak */
-        char *psz_env;
-        psz_env = malloc( strlen("DVDCSS_METHOD=") +
-                          strlen( psz_dvdcss_env ) + 1 );
-        if( !psz_env )
-        {
-            free( psz_dvdcss_env );
-            return VLC_ENOMEM;
-        }
-        sprintf( psz_env, "%s%s", "DVDCSS_METHOD=", psz_dvdcss_env );
-        putenv( psz_env );
-    }
-#endif
-    free( psz_dvdcss_env );
 
     /* Open dvdread */
     if( !(p_dvdread = DVDOpen( psz_name )) )
