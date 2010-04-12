@@ -75,6 +75,12 @@ int main( int i_argc, const char *ppsz_argv[] )
      * use the alpha channel for the embedded video window. */
     putenv( (char *)"XLIB_SKIP_ARGB_VISUALS=1" );
 #endif
+#ifdef HAVE_SETENV
+    /* Clear the X.Org startup notification ID. Otherwise the UI might try to
+     * change the environment while the process is multi-threaded. That could
+     * crash. Screw you X.Org. Next time write a thread-safe specification. */
+    unsetenv ("DESKTOP_STARTUP_ID");
+#endif
 
 #ifndef ALLOW_RUN_AS_ROOT
     if (geteuid () == 0)
