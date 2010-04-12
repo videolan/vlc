@@ -173,26 +173,51 @@ int rand (void)
 /** Signals **/
 #include <signal.h>
 
+static bool blocked_signal (int num)
+{
+    switch (num)
+    {
+        case SIGINT:
+        case SIGHUP:
+        case SIGQUIT:
+        case SIGTERM:
+        case SIGPIPE:
+        case SIGCHLD:
+            return true;
+    }
+    return false;
+}
+
 void (*signal (int signum, void (*handler) (int))) (int)
 {
     if (override)
     {
-        const char *msg = "Error";
-
-        if ((signum == SIGPIPE && handler == SIG_IGN)
-         || (signum != SIGPIPE && handler == SIG_DFL))
-            /* Same settings we already use */
-            msg = "Warning";
-        LOG(msg, "%d, %p", signum, handler);
+        if (handler != SIG_IGN && handler != SIG_DFL)
+            goto error;
+        if (!blocked_signal (signum))
+            goto error;
+        /* For our blocked signals, the handler won't matter much... */
+        LOG("Warning", "%d, %p", signum, handler);
     }
     return CALL(signal, signum, handler);
+error:
+    LOG("Blocked", "%d, %p", signum, handler);
+    return SIG_DFL;
 }
 
 int sigaction (int signum, const struct sigaction *act, struct sigaction *old)
 {
-    if (act != NULL)
-        LOG("Error", "%d, %p, %p", signum, act, old);
+    if (override && act != NULL)
+    {
+        if ((act->sa_flags & SA_SIGINFO)
+         || (act->sa_handler != SIG_IGN && act->sa_handler != SIG_DFL))
+            goto error;
+        LOG("Warning", "%d, %p, %p", signum, act, old);
+    }
     return CALL(sigaction, signum, act, old);
+error:
+    LOG("Blocked", "%d, %p, %p", signum, act, old);
+    return -1;
 }
 
 
