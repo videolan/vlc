@@ -604,6 +604,152 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
     return true;
 }
 
+void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_global_position )
+{
+    KaxBlock    *block;
+    KaxSimpleBlock *simpleblock;
+    int         i_track_skipping;
+    int64_t     i_block_duration;
+    int64_t     i_block_ref1;
+    int64_t     i_block_ref2;
+    size_t      i_track;
+    int64_t     i_seek_position = i_start_pos;
+    int64_t     i_seek_time = i_start_time;
+
+    if( i_global_position >= 0 )
+    {
+        /* Special case for seeking in files with no cues */
+        EbmlElement *el = NULL;
+        es.I_O().setFilePointer( i_start_pos, seek_beginning );
+        delete ep;
+        ep = new EbmlParser( &es, segment, &sys.demuxer );
+        cluster = NULL;
+
+        while( ( el = ep->Get() ) != NULL )
+        {
+            if( MKV_IS_ID( el, KaxCluster ) )
+            {
+                cluster = (KaxCluster *)el;
+                i_cluster_pos = cluster->GetElementPosition();
+                if( i_index == 0 ||
+                        ( i_index > 0 && p_indexes[i_index - 1].i_position < (int64_t)cluster->GetElementPosition() ) )
+                {
+                    IndexAppendCluster( cluster );
+                }
+                if( es.I_O().getFilePointer() >= i_global_position )
+                {
+                    ParseCluster();
+                    msg_Dbg( &sys.demuxer, "we found a cluster that is in the neighbourhood" );
+                    return;
+                }
+            }
+        }
+        msg_Err( &sys.demuxer, "This file has no cues, and we were unable to seek to the requested position by parsing." );
+        return;
+    }
+
+    if ( i_index > 0 )
+    {
+        int i_idx = 0;
+
+        for( ; i_idx < i_index; i_idx++ )
+        {
+            if( p_indexes[i_idx].i_time + i_time_offset > i_date )
+            {
+                break;
+            }
+        }
+
+        if( i_idx > 0 )
+        {
+            i_idx--;
+        }
+
+        i_seek_position = p_indexes[i_idx].i_position;
+        i_seek_time = p_indexes[i_idx].i_time;
+    }
+
+    msg_Dbg( &sys.demuxer, "seek got %"PRId64" (%d%%)",
+                i_seek_time, (int)( 100 * i_seek_position / stream_Size( sys.demuxer.s ) ) );
+
+    es.I_O().setFilePointer( i_seek_position, seek_beginning );
+
+    delete ep;
+    ep = new EbmlParser( &es, segment, &sys.demuxer );
+    cluster = NULL;
+
+    sys.i_start_pts = i_date;
+
+    /* now parse until key frame */
+    i_track_skipping = 0;
+    for( i_track = 0; i_track < tracks.size(); i_track++ )
+    {
+        if( tracks[i_track]->fmt.i_cat == VIDEO_ES )
+        {
+            tracks[i_track]->b_search_keyframe = true;
+            i_track_skipping++;
+        }
+    }
+    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
+
+    while( i_track_skipping > 0 )
+    {
+        if( BlockGet( block, simpleblock, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+        {
+            msg_Warn( &sys.demuxer, "cannot get block EOF?" );
+
+            return;
+        }
+
+        for( i_track = 0; i_track < tracks.size(); i_track++ )
+        {
+            if( (simpleblock && tracks[i_track]->i_number == simpleblock->TrackNum()) ||
+                (block && tracks[i_track]->i_number == block->TrackNum()) )
+            {
+                break;
+            }
+        }
+
+        if( simpleblock )
+            sys.i_pts = (sys.i_chapter_time + simpleblock->GlobalTimecode()) / (mtime_t) 1000;
+        else
+            sys.i_pts = (sys.i_chapter_time + block->GlobalTimecode()) / (mtime_t) 1000;
+
+        if( i_track < tracks.size() )
+        {
+            if( sys.i_pts > sys.i_start_pts )
+            {
+                cluster = static_cast<KaxCluster*>(ep->UnGet( i_block_pos, i_cluster_pos ));
+                i_track_skipping = 0;
+            }
+            else if( tracks[i_track]->fmt.i_cat == VIDEO_ES )
+            {
+                if( i_block_ref1 == 0 && tracks[i_track]->b_search_keyframe )
+                {
+                    tracks[i_track]->b_search_keyframe = false;
+                    i_track_skipping--;
+                }
+                if( !tracks[i_track]->b_search_keyframe )
+                {
+                    BlockDecode( &sys.demuxer, block, simpleblock, sys.i_pts, 0, i_block_ref1 >= 0 || i_block_ref2 > 0 );
+                }
+            }
+        }
+
+        delete block;
+    }
+
+    /* FIXME current ES_OUT_SET_NEXT_DISPLAY_TIME does not work that well if
+     * the delay is too high. */
+    if( sys.i_pts + 500*1000 < sys.i_start_pts )
+    {
+        sys.i_start_pts = sys.i_pts;
+
+        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, sys.i_start_pts );
+    }
+}
+
+
 int matroska_segment_c::BlockFindTrackIndex( size_t *pi_track,
                                              const KaxBlock *p_block, const KaxSimpleBlock *p_simpleblock )
 {

@@ -49,7 +49,6 @@
 #   include <time.h>                                               /* time() */
 #endif
 
-
 #include <vlc_codecs.h>               /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include <vlc_iso_lang.h>
 #include <vlc_meta.h>
@@ -125,6 +124,9 @@ extern "C" {
 
 using namespace LIBMATROSKA_NAMESPACE;
 using namespace std;
+
+void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
+                         mtime_t i_pts, mtime_t i_duration, bool f_mandatory );
 
 class attachment_c
 {
