@@ -932,6 +932,14 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             }
             tracks[i_track]->fmt.audio.i_blockalign = ( tracks[i_track]->fmt.audio.i_bitspersample + 7 ) / 8 * tracks[i_track]->fmt.audio.i_channels;
         }
+        else if( !strncmp( tracks[i_track]->psz_codec, "A_REAL/", 7 ) )
+        {
+            if( !strcmp( tracks[i_track]->psz_codec, "A_REAL/COOK" ) )
+                tracks[i_track]->fmt.i_codec = VLC_CODEC_COOK;
+            tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
+            tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->i_extra_data );
+            memcpy( tracks[i_track]->fmt.p_extra,tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
+        }
         /* disabled due to the potential "S_KATE" namespace issue */
         else if( !strcmp( tracks[i_track]->psz_codec, "S_KATE" ) )
         {
