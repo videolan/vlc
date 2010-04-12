@@ -595,7 +595,6 @@ void MainInterface::releaseVideoSlot( void )
 {
     videoWidget->release();
 
-    msg_Warn( p_intf, "Here" );
     if( stackCentralW->currentWidget() == videoWidget )
         restoreStackOldWidget();
 
