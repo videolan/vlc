@@ -208,7 +208,8 @@ private slots:
     void showBuffering( float );
 
     void resizeStack( int w, int h ) {
-        resize( size() - stackCentralW->size() + QSize( w, h ) );
+        if( !isFullScreen() && !isMaximized() )
+            resize( size() - stackCentralW->size() + QSize( w, h ) );
         debug(); }
 
 
