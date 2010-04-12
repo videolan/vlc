@@ -196,6 +196,24 @@ int sigaction (int signum, const struct sigaction *act, struct sigaction *old)
 }
 
 
+/*** Locales ***
+ * setlocale() is not thread-safe and has a tendency to crash other threads as
+ * quite many libc and libintl calls depend on the locale.
+ * Use uselocale() instead for thread-safety.
+ */
+#include <locale.h>
+
+char *setlocale (int cat, const char *locale)
+{
+    if (override && locale != NULL)
+    {
+        LOG("Blocked", "%d, \"%s\"", cat, locale);
+        return NULL;
+    }
+    return CALL(setlocale, cat, locale);
+}
+
+
 /*** Xlib ****/
 #ifdef HAVE_X11_XLIB_H
 # include <X11/Xlib.h>
