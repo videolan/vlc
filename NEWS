@@ -4,7 +4,7 @@ Important changes for users:
 
 Important changes for packagers:
  * The module cache has moved to ${libdir}/vlc/. The module cache can now be
-   generated at install time except if you use staged installation. In the 
+   generated at install time except if you use staged installation. In the
    later case, you can generate the module cache in your post-inst script
    by invoking 'vlc-cache-gen'. If the module cache is not present and vlc
    can't write in ${libdir}/vlc/, it will result it vlc taking a long time to
@@ -21,32 +21,30 @@ Access:
 Decoders:
  * Support for DxVA2 for H.264 decoding on GPU on Windows Vista and 7
  * Support for VAAPI for H.264 decoding on GPU on GNU/Linux
- * Audio/Video decoder using OpenMAX IL components
+ * Audio/Video decoders and encoders using OpenMAX IL components for DSP usage
 
- * Support for HD dvb subtitles - Display Definition Segment
+ * Support for HD-DVB subtitles - Display Definition Segment
  * Support PGS subtitles for Blu-Ray
  * Invmem module improvements
  * Support for Atrac1 audio codec
- * Support for SSE3 and SSE4 capabilities
+ * Support for SSE3 and SSE4 capabilities in some codecs
  * Multiple improvements for subtitles styles .SRT and .SSA
  * Support for Indeo5 video codec
  * Support for Windows Media Speech (Voice) audio codec natively on all platforms
  * Support for AMR-NB audio codec on the Windows and Mac port
  * Improvements on the FLAC format (7.1 channels and 88.2/176.4/192 kHz support)
  * Direct rendering is always used with H.264 in avcodec module
- * Support for MPEG-4 ALS audio codec
+ * Support for MPEG-4 ALS lossless audio codec
 
 Demuxers:
- * Support for .aob files from DVD-Audio (MLP and LPCM)
-   (Full disc support is NOT present yet)
+ * Support for .aob files from DVD-Audio (MLP and LPCM) (Full disc support is NOT present yet)
  * Support for ADPCM in .flv streams
  * Support for TwinVQ (.vqf) and AMV (.amv) files
  * Various EGP improvements
  * Support for embedded subtitles in OpenDML and legacy .avi files
 
 Playlist:
- * WPL playlist support
- * ZPL playlist support
+ * WPL and ZPL playlist support
  * Lua scripts for Mpora, Vimeo playback and Rockbox FM radios
  * New Play-And-Pause function to stop playback on latest video image
  * Podcast images are now displayed
@@ -84,7 +82,7 @@ Service discovery:
  * Service discoveries can now be written in lua
  * Service discovery for Picture/Music/Video user directories
  * Service discovery based on libudev
- * Shoutcast Service discovery is now removed
+ * Shoutcast Service discoveries are now removed
 
 Encoders:
  * x264, add psy-rd parameter and change default settings
@@ -114,12 +112,12 @@ Mac OS X Port:
 
 Windows port:
  * Integration in Windows 7 taskbar
- * Playback of .Midi files is supported through fluidsynth's module
+ * Experimental playback of .Midi files is supported through fluidsynth's module
 
 Maemo port:
  * Multiple improvements for N900 compliance and efficiency
  * Support for HW accelerated video decoding on N900
- * Improvements to the maemo interface
+ * Improvements to the maemo/hildon interface
 
 Misc:
  * new sqlite module
@@ -128,26 +126,27 @@ Misc:
 
 Bindings:
  * new C++ wrapper around libVLC: libVLCpp
+ * phonon bindings are now usable
 
 Removed modules:
- * csri codec. Use the libass module instead.
- * galaktos. Use the new projectM module instead.
- * showintf. Useless in Qt and on Mac OS X
- * transrate
- * Xlib x11, Xlib xvideo, Xlib glx. Use the new XCB modules instead.
- * HAL. Use libudev instead.
+ * csri codec: use the libass module instead.
+ * galaktos visualisation: use the new projectM module instead.
+ * showintf: Useless in Qt and on Mac OS X
+ * transrate: broken since too long
+ * Xlib x11, Xlib xvideo, Xlib glx: Use the new XCB modules instead.
+ * HAL: Use libudev instead.
  * gtk_main, gtk_main2, gnome_main, gnome_main2 and pda interfaces
  * WinCE, BeOS and qnx interfaces
- * opie, qte and qte_main
- * linear_resampler and trivial_resampler are removed. Use the ugly one.
- * XvMC accelerated modules. Use VAAPI instead.
- * MGA (Matroska) for Linux. Use Linux Framebuffer (or X) instead.
- * opengllayer. Use macosx_video instead.
- * cddax. Use cdda instead.
+ * opie, qte and qte_main interfaces
+ * linear_resampler and trivial_resampler are removed: use the ugly one.
+ * XvMC accelerated modules: use VAAPI instead.
+ * MGA (Matroska) for Linux: use Linux Framebuffer (or X) instead.
+ * opengllayer: use macosx_video instead.
+ * cddax: use cdda instead.
  * cmml and tarkin codecs are removed because they are dead codecs.
- * realaudio codecs are removed in favor of libavcodec
+ * realaudio codecs: use libavcodec
  * access_file removed in favor of filesystem
- * RTMP input and output
+ * RTMP input and output: use avio module
 
 
 Changes between 1.0.4 and 1.0.5:
