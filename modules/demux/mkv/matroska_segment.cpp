@@ -1082,6 +1082,11 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         {
             if( !strcmp( tracks[i_track]->psz_codec, "A_REAL/COOK" ) )
                 tracks[i_track]->fmt.i_codec = VLC_CODEC_COOK;
+            else if( !strcmp( tracks[i_track]->psz_codec, "A_REAL/ATRC" ) )
+                tracks[i_track]->fmt.i_codec = VLC_CODEC_ATRAC3;
+            else if( !strcmp( tracks[i_track]->psz_codec, "A_REAL/28_8" ) )
+                tracks[i_track]->fmt.i_codec = VLC_CODEC_RA_288;
+            /* FIXME 14_4, RALF and SIPR */
             tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
             tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->i_extra_data );
             memcpy( tracks[i_track]->fmt.p_extra,tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
