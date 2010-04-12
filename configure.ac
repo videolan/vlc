@@ -4558,7 +4558,7 @@ then
       found=1
     else
       if test -n "$PKG_CONFIG"; then
-	for i in "${with_mozilla_pkg}" libxul {seamonkey,iceape,xulrunner,firefox,iceweasel,mozilla}-plugin; do
+        for i in "${with_mozilla_pkg}" libxul {seamonkey,iceape,xulrunner,firefox,iceweasel,mozilla}-plugin; do
           if test -n "$i"
           then
             echo "Trying to find $i package" >&AS_MESSAGE_LOG_FD
@@ -4575,7 +4575,7 @@ then
             fi
             AC_MSG_RESULT([no])
           fi
-	done
+        done
       fi
     fi
     AS_IF( [test $found = 1],[
@@ -4593,16 +4593,16 @@ then
         MOZILLA_REQUIRED_HEADERS=
         mozilla=:
         AS_IF([ test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"],[
-	   VLC_ADD_CPPFLAGS([mozilla],[-DXP_UNIX -DOJI])
-	   AS_IF([ test "${SYS}" != "darwin"],[
-	     PKG_CHECK_MODULES(XPM, [xpm xt],[
-		VLC_ADD_CPPFLAGS([mozilla],[-DMOZ_X11])
-	     ],[
-		AC_MSG_ERROR([Please install the libXpm and libXt development files.])
-	     ])
+           VLC_ADD_CPPFLAGS([mozilla],[-DXP_UNIX])
+           AS_IF([ test "${SYS}" != "darwin"],[
+             PKG_CHECK_MODULES(XPM, [xpm xt],[
+                VLC_ADD_CPPFLAGS([mozilla],[-DMOZ_X11])
+             ],[
+                AC_MSG_ERROR([Please install the libXpm and libXt development files.])
+             ])
           ])
         ])
-	VLC_ADD_CPPFLAGS([mozilla],[${CPPFLAGS} ${XPM_CFLAGS}])
+        VLC_ADD_CPPFLAGS([mozilla],[${CPPFLAGS} ${XPM_CFLAGS}])
         VLC_ADD_LIBS([mozilla],[${MOZILLA_LIBS} ${XPM_LIBS}])
         VLC_ADD_PLUGIN([mozilla])
         PLUGINS_BINDINGS="${PLUGINS_BINDINGS} mozilla"
@@ -4611,7 +4611,7 @@ then
           ],
           [
             AC_PATH_PROGS(MOZILLA_CONFIG,
-	    [mozilla-config seamonkey-config xulrunner-config],
+            [mozilla-config seamonkey-config xulrunner-config],
         [no])
             test "${MOZILLA_CONFIG}" = "no" && AC_MSG_ERROR([Please install the Mozilla development tools (version 1.9.2 or higher) or use --disable-mozilla.])
           ]
