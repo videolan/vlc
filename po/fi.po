@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 1.0.0\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-04-11 23:45+0100\n"
+"POT-Creation-Date: 2010-04-12 23:59+0100\n"
 "PO-Revision-Date: 2009-06-17 17:53+0200\n"
 "Last-Translator: Otto Kekäläinen <otto@sange.fi>\n"
 "Language-Team: Finnish <fi@li.org>\n"
@@ -68,13 +68,14 @@ msgid "Hotkeys settings"
 msgstr "Pikanäppäinten asetukset"
 
 #: include/vlc_config_cat.h:52 src/input/es_out.c:2840 src/input/es_out.c:2880
-#: src/libvlc-module.c:1567 modules/gui/macosx/intf.m:667
-#: modules/gui/macosx/output.m:170 modules/gui/macosx/playlistinfo.m:114
-#: modules/gui/macosx/simple_prefs.m:184 modules/gui/macosx/wizard.m:380
+#: src/libvlc-module.c:1567 modules/access/imem.c:69
+#: modules/gui/macosx/intf.m:667 modules/gui/macosx/output.m:170
+#: modules/gui/macosx/playlistinfo.m:114 modules/gui/macosx/simple_prefs.m:184
+#: modules/gui/macosx/wizard.m:380
 #: modules/gui/qt4/components/info_panels.cpp:507
 #: modules/gui/qt4/components/simple_preferences.cpp:83
-#: modules/services_discovery/mediadirs.c:77 modules/stream_out/es.c:93
-#: modules/stream_out/transcode/transcode.c:192
+#: modules/gui/qt4/ui/profiles.h:487 modules/services_discovery/mediadirs.c:77
+#: modules/stream_out/es.c:93 modules/stream_out/transcode/transcode.c:192
 msgid "Audio"
 msgstr "Ääni"
 
@@ -122,11 +123,13 @@ msgid "Miscellaneous audio settings and modules."
 msgstr "Muut ääniasetukset ja -moduulit"
 
 #: include/vlc_config_cat.h:70 src/input/es_out.c:2843 src/input/es_out.c:2927
-#: src/libvlc-module.c:1620 modules/gui/macosx/intf.m:680
-#: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:103
-#: modules/gui/macosx/simple_prefs.m:188 modules/gui/macosx/wizard.m:381
+#: src/libvlc-module.c:1620 modules/access/imem.c:69
+#: modules/gui/macosx/intf.m:680 modules/gui/macosx/output.m:160
+#: modules/gui/macosx/playlistinfo.m:103 modules/gui/macosx/simple_prefs.m:188
+#: modules/gui/macosx/wizard.m:381
 #: modules/gui/qt4/components/info_panels.cpp:508
 #: modules/gui/qt4/components/simple_preferences.cpp:85
+#: modules/gui/qt4/ui/profiles.h:469 modules/gui/qt4/ui/sprefs_video.h:321
 #: modules/misc/dummy/dummy.c:106 modules/services_discovery/mediadirs.c:70
 #: modules/stream_out/es.c:101 modules/stream_out/transcode/transcode.c:161
 msgid "Video"
@@ -371,6 +374,7 @@ msgstr "Lisäasetukset"
 
 #: include/vlc_config_cat.h:198 modules/gui/macosx/open.m:180
 #: modules/gui/macosx/open.m:459 modules/gui/macosx/simple_prefs.m:259
+#: modules/gui/qt4/ui/sprefs_input.h:318
 msgid "Network"
 msgstr "Verkko"
 
@@ -508,6 +512,7 @@ msgstr "Tietoj&a"
 #: modules/gui/macosx/intf.m:2007 modules/gui/macosx/intf.m:2008
 #: modules/gui/macosx/intf.m:2009 modules/gui/macosx/playlist.m:464
 #: modules/gui/qt4/components/controller.hpp:104 modules/gui/qt4/menus.cpp:790
+#: modules/gui/qt4/ui/open.h:256
 msgid "Play"
 msgstr "Toista"
 
@@ -660,7 +665,7 @@ msgid ""
 msgstr ""
 "Lähennä johonkin kohtaa videota. Suurennettava kuvan kohta voidaan valita."
 
-#: include/vlc_intf_strings.h:117
+#: include/vlc_intf_strings.h:117 modules/gui/qt4/ui/video_effects.h:1141
 msgid "Waves"
 msgstr "Aallot"
 
@@ -803,9 +808,12 @@ msgstr "Stereo"
 #: modules/audio_filter/channel_mixer/mono.c:95 modules/codec/dvbsub.c:102
 #: modules/codec/subtitles/subsdec.c:187 modules/codec/zvbi.c:78
 #: modules/control/gestures.c:97 modules/gui/fbosd.c:162
-#: modules/video_filter/logo.c:79 modules/video_filter/marq.c:137
-#: modules/video_filter/mosaic.c:171 modules/video_filter/osdmenu.c:85
-#: modules/video_filter/rss.c:174
+#: modules/gui/qt4/ui/video_effects.h:1114
+#: modules/gui/qt4/ui/video_effects.h:1177
+#: modules/gui/qt4/ui/video_effects.h:1182
+#: modules/video_filter/audiobargraph_v.c:74 modules/video_filter/logo.c:79
+#: modules/video_filter/marq.c:137 modules/video_filter/mosaic.c:171
+#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:174
 msgid "Left"
 msgstr "Vasen"
 
@@ -814,9 +822,10 @@ msgstr "Vasen"
 #: modules/audio_filter/channel_mixer/mono.c:95 modules/codec/dvbsub.c:102
 #: modules/codec/subtitles/subsdec.c:187 modules/codec/zvbi.c:78
 #: modules/control/gestures.c:97 modules/gui/fbosd.c:162
-#: modules/video_filter/logo.c:79 modules/video_filter/marq.c:137
-#: modules/video_filter/mosaic.c:171 modules/video_filter/osdmenu.c:85
-#: modules/video_filter/rss.c:174
+#: modules/gui/qt4/ui/video_effects.h:1116
+#: modules/video_filter/audiobargraph_v.c:74 modules/video_filter/logo.c:79
+#: modules/video_filter/marq.c:137 modules/video_filter/mosaic.c:171
+#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:174
 msgid "Right"
 msgstr "Oikea"
 
@@ -935,7 +944,7 @@ msgstr "Purkaja epäonnistui: virhe %d"
 msgid "Stream %d"
 msgstr "Suoratoista %d"
 
-#: src/input/es_out.c:2846 src/input/es_out.c:2954
+#: src/input/es_out.c:2846 src/input/es_out.c:2954 modules/access/imem.c:69
 msgid "Subtitle"
 msgstr "Tekstitys"
 
@@ -949,13 +958,15 @@ msgstr "Tyyppi"
 msgid "Original ID"
 msgstr "Alkuperäinen ääni"
 
-#: src/input/es_out.c:2864 src/input/es_out.c:2867
-#: modules/gui/macosx/wizard.m:385
+#: src/input/es_out.c:2864 src/input/es_out.c:2867 modules/access/imem.c:72
+#: modules/gui/macosx/wizard.m:385 modules/gui/qt4/ui/profiles.h:470
+#: modules/gui/qt4/ui/profiles.h:489
 msgid "Codec"
 msgstr "Koodekki"
 
 #: src/input/es_out.c:2871 src/input/meta.c:62 src/libvlc-module.c:212
-#: modules/gui/macosx/simple_prefs.m:269
+#: modules/access/imem.c:76 modules/gui/macosx/simple_prefs.m:269
+#: modules/gui/qt4/ui/sprefs_interface.h:386
 msgid "Language"
 msgstr "Kieli"
 
@@ -965,11 +976,11 @@ msgid "Description"
 msgstr "Kuvaus"
 
 #: src/input/es_out.c:2883 src/input/es_out.c:2886
-#: modules/gui/macosx/output.m:176
+#: modules/gui/macosx/output.m:176 modules/gui/qt4/ui/profiles.h:492
 msgid "Channels"
 msgstr "Kanavat"
 
-#: src/input/es_out.c:2891
+#: src/input/es_out.c:2891 modules/access/imem.c:80
 msgid "Sample rate"
 msgstr "Näytteenottotaajuus"
 
@@ -985,6 +996,7 @@ msgstr "Bittejä näytettä kohti"
 #: src/input/es_out.c:2906 modules/access/pvr.c:96
 #: modules/access_output/shout.c:91 modules/demux/playlist/shoutcast.c:413
 #: modules/gui/qt4/components/open_panels.cpp:901
+#: modules/gui/qt4/ui/profiles.h:471 modules/gui/qt4/ui/profiles.h:490
 msgid "Bitrate"
 msgstr "Bittinopeus"
 
@@ -1008,7 +1020,7 @@ msgstr "Oletusarvoinen toistonvahvistus"
 msgid "%.2f dB"
 msgstr ""
 
-#: src/input/es_out.c:2930
+#: src/input/es_out.c:2930 modules/gui/qt4/ui/profiles.h:476
 msgid "Resolution"
 msgstr "Tarkkuus"
 
@@ -1016,7 +1028,7 @@ msgstr "Tarkkuus"
 msgid "Display resolution"
 msgstr "Näytön tarkkuus"
 
-#: src/input/es_out.c:2945 src/input/es_out.c:2948
+#: src/input/es_out.c:2945 src/input/es_out.c:2948 modules/access/imem.c:98
 #: modules/access/screen/screen.c:44 modules/access/screen/xcb.c:38
 msgid "Frame rate"
 msgstr "Ruutunopeus"
@@ -1045,7 +1057,8 @@ msgstr "Kohteen \"%s\" muotoa ei voi tunnistaa. Katso lokista lisätietoja."
 #: src/input/meta.c:51 src/input/var.c:187 modules/gui/macosx/intf.m:662
 #: modules/gui/macosx/intf.m:663 modules/gui/macosx/open.m:190
 #: modules/gui/macosx/playlistinfo.m:76 modules/gui/macosx/wizard.m:348
-#: modules/gui/qt4/components/open_panels.cpp:372 modules/mux/asf.c:56
+#: modules/gui/qt4/components/open_panels.cpp:372
+#: modules/gui/qt4/ui/open_disk.h:302 modules/mux/asf.c:56
 msgid "Title"
 msgstr "Nimi"
 
@@ -1083,6 +1096,8 @@ msgid "Setting"
 msgstr "Asetus"
 
 #: src/input/meta.c:61 modules/gui/macosx/open.m:203
+#: modules/gui/qt4/ui/open_net.h:85
+#: modules/gui/qt4/ui/podcast_configuration.h:103
 msgid "URL"
 msgstr "URL"
 
@@ -1116,6 +1131,7 @@ msgstr "Ohjelmat"
 
 #: src/input/var.c:192 modules/gui/macosx/intf.m:664
 #: modules/gui/macosx/intf.m:665 modules/gui/macosx/open.m:191
+#: modules/gui/qt4/ui/open_disk.h:303
 msgid "Chapter"
 msgstr "Luku"
 
@@ -1494,7 +1510,8 @@ msgid ""
 "automatically select the best method available."
 msgstr ""
 
-#: src/libvlc-module.c:252 modules/stream_out/display.c:41
+#: src/libvlc-module.c:252 modules/gui/qt4/ui/sprefs_audio.h:404
+#: modules/stream_out/display.c:41
 msgid "Enable audio"
 msgstr "Käytä ääntä"
 
@@ -1584,6 +1601,7 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:301 modules/gui/macosx/simple_prefs.m:237
+#: modules/gui/qt4/ui/sprefs_audio.h:413
 msgid "Use S/PDIF when available"
 msgstr "Käytä S/PDIF-ominaisuutta, jos mahdollista"
 
@@ -1705,7 +1723,8 @@ msgstr ""
 "Tämä on VLC:n käyttämä videon ulostulometodi. Oletustoiminto valitsee "
 "automaattisesti parhaan mahdollisen metodin."
 
-#: src/libvlc-module.c:375 modules/stream_out/display.c:43
+#: src/libvlc-module.c:375 modules/gui/qt4/ui/sprefs_video.h:309
+#: modules/stream_out/display.c:43
 msgid "Enable video"
 msgstr "Käytä videota"
 
@@ -1791,57 +1810,62 @@ msgstr ""
 #: src/libvlc-module.c:412 src/libvlc-module.c:493
 #: modules/audio_filter/channel_mixer/mono.c:95 modules/codec/dvbsub.c:102
 #: modules/codec/subtitles/subsdec.c:187 modules/codec/zvbi.c:78
-#: modules/gui/fbosd.c:162 modules/video_filter/logo.c:79
-#: modules/video_filter/marq.c:137 modules/video_filter/mosaic.c:171
-#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:174
+#: modules/gui/fbosd.c:162 modules/video_filter/audiobargraph_v.c:74
+#: modules/video_filter/logo.c:79 modules/video_filter/marq.c:137
+#: modules/video_filter/mosaic.c:171 modules/video_filter/osdmenu.c:85
+#: modules/video_filter/rss.c:174
 msgid "Center"
 msgstr "Keski"
 
 #: src/libvlc-module.c:412 src/libvlc-module.c:493 modules/codec/dvbsub.c:102
 #: modules/codec/zvbi.c:78 modules/gui/fbosd.c:162
-#: modules/video_filter/logo.c:79 modules/video_filter/marq.c:137
-#: modules/video_filter/mosaic.c:171 modules/video_filter/osdmenu.c:85
-#: modules/video_filter/rss.c:174
+#: modules/gui/qt4/ui/video_effects.h:1112
+#: modules/gui/qt4/ui/video_effects.h:1178
+#: modules/gui/qt4/ui/video_effects.h:1181
+#: modules/video_filter/audiobargraph_v.c:74 modules/video_filter/logo.c:79
+#: modules/video_filter/marq.c:137 modules/video_filter/mosaic.c:171
+#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:174
 msgid "Top"
 msgstr "Ylä"
 
 #: src/libvlc-module.c:412 src/libvlc-module.c:493 modules/codec/dvbsub.c:102
 #: modules/codec/zvbi.c:78 modules/gui/fbosd.c:162
-#: modules/video_filter/logo.c:79 modules/video_filter/marq.c:137
-#: modules/video_filter/mosaic.c:171 modules/video_filter/osdmenu.c:85
-#: modules/video_filter/rss.c:174
+#: modules/gui/qt4/ui/video_effects.h:1118
+#: modules/video_filter/audiobargraph_v.c:74 modules/video_filter/logo.c:79
+#: modules/video_filter/marq.c:137 modules/video_filter/mosaic.c:171
+#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:174
 msgid "Bottom"
 msgstr "Ala"
 
 #: src/libvlc-module.c:413 src/libvlc-module.c:494 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:79 modules/gui/fbosd.c:163
-#: modules/video_filter/logo.c:80 modules/video_filter/marq.c:138
-#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:86
-#: modules/video_filter/rss.c:175
+#: modules/video_filter/audiobargraph_v.c:75 modules/video_filter/logo.c:80
+#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
+#: modules/video_filter/osdmenu.c:86 modules/video_filter/rss.c:175
 msgid "Top-Left"
 msgstr "Vasen ylänurkka"
 
 #: src/libvlc-module.c:413 src/libvlc-module.c:494 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:79 modules/gui/fbosd.c:163
-#: modules/video_filter/logo.c:80 modules/video_filter/marq.c:138
-#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:86
-#: modules/video_filter/rss.c:175
+#: modules/video_filter/audiobargraph_v.c:75 modules/video_filter/logo.c:80
+#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
+#: modules/video_filter/osdmenu.c:86 modules/video_filter/rss.c:175
 msgid "Top-Right"
 msgstr "Oikea ylänurkka"
 
 #: src/libvlc-module.c:413 src/libvlc-module.c:494 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:79 modules/gui/fbosd.c:163
-#: modules/video_filter/logo.c:80 modules/video_filter/marq.c:138
-#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:86
-#: modules/video_filter/rss.c:175
+#: modules/video_filter/audiobargraph_v.c:75 modules/video_filter/logo.c:80
+#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
+#: modules/video_filter/osdmenu.c:86 modules/video_filter/rss.c:175
 msgid "Bottom-Left"
 msgstr "Vasen alanurkka"
 
 #: src/libvlc-module.c:413 src/libvlc-module.c:494 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:79 modules/gui/fbosd.c:163
-#: modules/video_filter/logo.c:80 modules/video_filter/marq.c:138
-#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:86
-#: modules/video_filter/rss.c:175
+#: modules/video_filter/audiobargraph_v.c:75 modules/video_filter/logo.c:80
+#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
+#: modules/video_filter/osdmenu.c:86 modules/video_filter/rss.c:175
 msgid "Bottom-Right"
 msgstr "Oikea alanurkka"
 
@@ -1901,7 +1925,7 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:442 src/video_output/vout_intf.c:344
-#: modules/gui/macosx/simple_prefs.m:295
+#: modules/gui/macosx/simple_prefs.m:295 modules/gui/qt4/ui/sprefs_video.h:312
 msgid "Always on top"
 msgstr "Aina päällimmäisenä"
 
@@ -2013,7 +2037,7 @@ msgid ""
 "computer being suspended because of inactivity."
 msgstr ""
 
-#: src/libvlc-module.c:503
+#: src/libvlc-module.c:503 modules/gui/qt4/ui/sprefs_video.h:316
 msgid "Window decorations"
 msgstr "Ikkunan sisältö"
 
@@ -2191,6 +2215,7 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:597 modules/gui/macosx/simple_prefs.m:297
+#: modules/gui/qt4/ui/sprefs_video.h:315
 msgid "Skip frames"
 msgstr "Ohita ruutuja"
 
@@ -2303,6 +2328,7 @@ msgstr "Oletusarvo"
 
 #: src/libvlc-module.c:653 modules/gui/macosx/equalizer.m:149
 #: modules/gui/macosx/extended.m:97 modules/gui/macosx/wizard.m:354
+#: modules/gui/qt4/ui/equalizer.h:127 modules/gui/qt4/ui/vlm.h:290
 msgid "Enable"
 msgstr "Käytä"
 
@@ -2378,7 +2404,7 @@ msgid ""
 "(like DVB streams for example)."
 msgstr ""
 
-#: src/libvlc-module.c:700
+#: src/libvlc-module.c:700 modules/gui/qt4/ui/open_disk.h:305
 msgid "Audio track"
 msgstr "Ääniraita"
 
@@ -2386,7 +2412,7 @@ msgstr "Ääniraita"
 msgid "Stream number of the audio track to use (from 0 to n)."
 msgstr "Käytettävän ääniraidan numero, väliltä 0 ja n."
 
-#: src/libvlc-module.c:705
+#: src/libvlc-module.c:705 modules/gui/qt4/ui/open_disk.h:306
 msgid "Subtitles track"
 msgstr "Tekstitysraita"
 
@@ -2513,7 +2539,7 @@ msgid ""
 "{...}\""
 msgstr ""
 
-#: src/libvlc-module.c:770
+#: src/libvlc-module.c:770 modules/gui/qt4/ui/sprefs_input.h:316
 #, fuzzy
 msgid "Record directory or filename"
 msgstr "Video-otosten hakemisto (tai tiedostonimi)"
@@ -2561,7 +2587,7 @@ msgid ""
 "section. You can also set many miscellaneous subpictures options."
 msgstr ""
 
-#: src/libvlc-module.c:796
+#: src/libvlc-module.c:796 modules/gui/qt4/ui/sprefs_subtitles.h:213
 msgid "Force subtitle position"
 msgstr "Pakota tekstityksen sijainti"
 
@@ -2581,6 +2607,7 @@ msgstr "Alikuvien käsittely voidaan ottaa pois käytöstä kokonaan."
 
 #: src/libvlc-module.c:805 src/libvlc-module.c:1758
 #: modules/gui/macosx/simple_prefs.m:286
+#: modules/gui/qt4/ui/sprefs_subtitles.h:201
 #: modules/stream_out/transcode/transcode.c:222
 msgid "On Screen Display"
 msgstr "On Screen Display -näyttö"
@@ -3452,6 +3479,7 @@ msgstr "Nämä asetukset ovat VLC:n globaaleja pikanäppäimiä."
 #: modules/gui/macosx/intf.m:685 modules/gui/macosx/intf.m:750
 #: modules/gui/macosx/simple_prefs.m:294
 #: modules/gui/qt4/components/controller.hpp:105
+#: modules/gui/qt4/ui/sprefs_video.h:311
 msgid "Fullscreen"
 msgstr "Koko näyttö"
 
@@ -3535,7 +3563,8 @@ msgstr "Hitaammin (hivenen)"
 #: modules/gui/macosx/intf.m:652 modules/gui/macosx/intf.m:738
 #: modules/gui/macosx/intf.m:746 modules/gui/macosx/wizard.m:309
 #: modules/gui/macosx/wizard.m:321 modules/gui/macosx/wizard.m:1623
-#: modules/gui/qt4/components/controller.hpp:105
+#: modules/gui/qt4/components/controller.hpp:105 modules/gui/qt4/ui/sout.h:327
+#: modules/gui/qt4/ui/sout.h:338 modules/gui/qt4/ui/streampanel.h:182
 #: modules/misc/notify/notify.c:321
 msgid "Next"
 msgstr "Seuraava"
@@ -3550,6 +3579,7 @@ msgstr ""
 #: modules/gui/macosx/embeddedwindow.m:71 modules/gui/macosx/intf.m:599
 #: modules/gui/macosx/intf.m:651 modules/gui/macosx/intf.m:739
 #: modules/gui/macosx/intf.m:745 modules/gui/qt4/components/controller.hpp:105
+#: modules/gui/qt4/ui/sout.h:337 modules/gui/qt4/ui/sout.h:346
 #: modules/misc/notify/notify.c:319
 msgid "Previous"
 msgstr "Edellinen"
@@ -3563,7 +3593,7 @@ msgstr ""
 #: modules/gui/macosx/embeddedwindow.m:72 modules/gui/macosx/intf.m:602
 #: modules/gui/macosx/intf.m:647 modules/gui/macosx/intf.m:737
 #: modules/gui/macosx/intf.m:744 modules/gui/qt4/components/controller.hpp:104
-#: modules/misc/notify/xosd.c:231
+#: modules/gui/qt4/ui/streampanel.h:181 modules/misc/notify/xosd.c:231
 msgid "Stop"
 msgstr "Keskeytä"
 
@@ -3574,7 +3604,8 @@ msgstr "Valitse pikanäppäin toiston keskeyttämistä varten."
 #: src/libvlc-module.c:1300 modules/gui/fbosd.c:127 modules/gui/fbosd.c:195
 #: modules/gui/macosx/bookmarks.m:96 modules/gui/macosx/bookmarks.m:105
 #: modules/gui/macosx/embeddedwindow.m:70 modules/gui/macosx/intf.m:607
-#: modules/video_filter/marq.c:158 modules/video_filter/rss.c:201
+#: modules/gui/qt4/ui/video_effects.h:1167 modules/video_filter/marq.c:158
+#: modules/video_filter/rss.c:201
 msgid "Position"
 msgstr "Sijainti"
 
@@ -4271,7 +4302,8 @@ msgstr ""
 
 #: src/libvlc-module.c:1767 modules/codec/subtitles/subsdec.c:202
 #: modules/demux/kate_categories.c:41 modules/demux/kate_categories.c:54
-#: modules/demux/subtitle.c:73
+#: modules/demux/subtitle.c:73 modules/gui/qt4/ui/profiles.h:495
+#: modules/gui/qt4/ui/profiles.h:497
 msgid "Subtitles"
 msgstr "Tekstitykset"
 
@@ -4556,8 +4588,8 @@ msgid "Post processing"
 msgstr "Jälkikäsittely"
 
 #: src/video_output/vout_intf.c:228 modules/gui/macosx/intf.m:692
-#: modules/gui/macosx/intf.m:693 modules/video_filter/crop.c:107
-#: modules/video_filter/croppadd.c:86
+#: modules/gui/macosx/intf.m:693 modules/gui/qt4/ui/video_effects.h:1122
+#: modules/video_filter/crop.c:107 modules/video_filter/croppadd.c:86
 msgid "Crop"
 msgstr "Rajaus"
 
@@ -4603,12 +4635,12 @@ msgstr "Äänen näytetaajuus Hz:nä (esim. 11025, 22050, 44100, 48000)"
 #: modules/access/dvdread.c:74 modules/access/eyetv.m:61
 #: modules/access/fake.c:44 modules/access/ftp.c:58
 #: modules/access/gnomevfs.c:48 modules/access/http.c:81
-#: modules/access/jack.c:60 modules/access/mms/mms.c:49
-#: modules/access/mtp.c:63 modules/access/oss.c:70 modules/access/pvr.c:59
-#: modules/access/rtmp/access.c:43 modules/access/screen/screen.c:40
-#: modules/access/screen/xcb.c:33 modules/access/sftp.c:51
-#: modules/access/smb.c:61 modules/access/tcp.c:41 modules/access/udp.c:49
-#: modules/access/v4l.c:77 modules/access/v4l2.c:182
+#: modules/access/imem.c:49 modules/access/jack.c:60
+#: modules/access/mms/mms.c:49 modules/access/mtp.c:63 modules/access/oss.c:70
+#: modules/access/pvr.c:59 modules/access/rtmp/access.c:43
+#: modules/access/screen/screen.c:40 modules/access/screen/xcb.c:33
+#: modules/access/sftp.c:51 modules/access/smb.c:61 modules/access/tcp.c:41
+#: modules/access/udp.c:49 modules/access/v4l.c:77 modules/access/v4l2.c:182
 #: modules/access/vcd/vcd.c:46
 msgid "Caching value in ms"
 msgstr "Puskurointi (ms)"
@@ -4632,6 +4664,14 @@ msgstr "Alsa"
 #: modules/access/alsa.c:90
 msgid "Alsa audio capture input"
 msgstr "Alsa äänilaite kaappauksessa"
+
+#: modules/access/attachment.c:44
+msgid "Attachment"
+msgstr ""
+
+#: modules/access/attachment.c:45
+msgid "Attachment input"
+msgstr ""
 
 #: modules/access/bd/bd.c:54
 msgid "Caching value for BDs. This value should be set in milliseconds."
@@ -4955,7 +4995,7 @@ msgstr "Muuta näkymää"
 msgid "Hierarchy alpha value [Undefined,1,2,4]"
 msgstr ""
 
-#: modules/access/bda/bda.c:169
+#: modules/access/bda/bda.c:169 modules/gui/qt4/ui/streampanel.h:170
 msgid "1"
 msgstr ""
 
@@ -5063,6 +5103,7 @@ msgstr ""
 
 #: modules/access/cdda.c:67 modules/gui/macosx/open.m:198
 #: modules/gui/macosx/open.m:643 modules/gui/macosx/open.m:731
+#: modules/gui/qt4/ui/open_disk.h:293
 msgid "Audio CD"
 msgstr "Äänilevy"
 
@@ -5590,7 +5631,8 @@ msgstr "Kuvanopeus"
 msgid "Number of frames per second (eg. 24, 25, 29.97, 30)."
 msgstr "Kuvien lukumäärä sekunnissa (esim. 24, 25, 29.97, 30)."
 
-#: modules/access/fake.c:51 modules/gui/qt4/components/playlist/sorting.h:49
+#: modules/access/fake.c:51 modules/access/imem.c:54
+#: modules/gui/qt4/components/playlist/sorting.h:49
 #: modules/stream_out/bridge.c:41 modules/stream_out/mosaic_bridge.c:105
 msgid "ID"
 msgstr "Tunniste"
@@ -5637,6 +5679,94 @@ msgstr "Lukkotiedostoa %s ei voitu avata"
 #, fuzzy
 msgid "VLC could not read the file."
 msgstr "Allekirjoitustiedostoa &quot;{0}&quot; ei voi lukea."
+
+#: modules/access/fs.c:33 modules/access/rtsp/access.c:46
+#: modules/access_output/udp.c:64 modules/demux/live555.cpp:75
+#: modules/stream_out/rtp.c:133
+msgid "Caching value (ms)"
+msgstr "Välimuistin koko (ms)"
+
+#: modules/access/fs.c:35
+#, fuzzy
+msgid "Caching value for files, in milliseconds."
+msgstr "Puskurointi DB:lle. Arvo annetaan millisekuntteina."
+
+#: modules/access/fs.c:37
+#, fuzzy
+msgid "Extra network caching value (ms)"
+msgstr "Välimuistin koko (ms)"
+
+#: modules/access/fs.c:39
+#, fuzzy
+msgid "Supplementary caching value for remote files, in milliseconds."
+msgstr "Puskurointi DV virralle. Arvo pitää olla millisekunneissa."
+
+#: modules/access/fs.c:41
+#, fuzzy
+msgid "Subdirectory behavior"
+msgstr "Reunan käyttäytyminen"
+
+#: modules/access/fs.c:43
+msgid ""
+"Select whether subdirectories must be expanded.\n"
+"none: subdirectories do not appear in the playlist.\n"
+"collapse: subdirectories appear but are expanded on first play.\n"
+"expand: all subdirectories are expanded.\n"
+msgstr ""
+
+#: modules/access/fs.c:50 modules/codec/dirac.c:79 modules/codec/x264.c:402
+#: modules/codec/x264.c:407
+msgid "none"
+msgstr "ei mikään"
+
+#: modules/access/fs.c:50
+#, fuzzy
+msgid "collapse"
+msgstr "piilota"
+
+#: modules/access/fs.c:50
+#, fuzzy
+msgid "expand"
+msgstr "laajenna"
+
+#: modules/access/fs.c:52
+#, fuzzy
+msgid "Ignored extensions"
+msgstr ""
+"\n"
+"Mahdolliset laajennokset:\n"
+
+#: modules/access/fs.c:54
+msgid ""
+"Files with these extensions will not be added to playlist when opening a "
+"directory.\n"
+"This is useful if you add directories that contain playlist files for "
+"instance. Use a comma-separated list of extensions."
+msgstr ""
+
+#: modules/access/fs.c:60
+#, fuzzy
+msgid "File input"
+msgstr "Tiedoston syöte"
+
+#: modules/access/fs.c:61 modules/access_output/file.c:69
+#: modules/audio_output/file.c:112 modules/gui/macosx/open.m:178
+#: modules/gui/macosx/open.m:451 modules/gui/macosx/output.m:142
+#: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
+#: modules/gui/qt4/dialogs/plugins.cpp:521 modules/gui/qt4/dialogs/sout.cpp:74
+#: modules/gui/qt4/dialogs/sout.cpp:152
+msgid "File"
+msgstr "Tiedosto"
+
+#: modules/access/fs.c:78 modules/gui/qt4/ui/sprefs_video.h:327
+#, fuzzy
+msgid "Directory"
+msgstr "Hakemisto"
+
+#: modules/access/fs.c:79
+#, fuzzy
+msgid "Directory input"
+msgstr "DirectShow syöte"
 
 #: modules/access/ftp.c:60
 msgid ""
@@ -5812,6 +5942,152 @@ msgstr "HTTP-todentaminen"
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "Syötä käyttäjätunnus ja salasana alueeseen %s."
 
+#: modules/access/imem.c:51
+#, fuzzy
+msgid ""
+"Caching value for imem streams. This value should be set in milliseconds."
+msgstr "Puskurointi DV virralle. Arvo pitää olla millisekunneissa."
+
+#: modules/access/imem.c:56
+#, fuzzy
+msgid "Set the ID of the elementary stream"
+msgstr "Suoratoista kaikki peruslähetykset"
+
+#: modules/access/imem.c:58
+msgid "Group"
+msgstr "Ryhmä"
+
+#: modules/access/imem.c:60
+#, fuzzy
+msgid "Set the group of the elementary stream"
+msgstr "Suoratoista kaikki peruslähetykset"
+
+#: modules/access/imem.c:62
+#, fuzzy
+msgid "Category"
+msgstr "Luku"
+
+#: modules/access/imem.c:64
+#, fuzzy
+msgid "Set the category of the elementary stream"
+msgstr "Valitse kaikilla tasoilla"
+
+#: modules/access/imem.c:69
+msgid "Unknown"
+msgstr "Tuntematon"
+
+#: modules/access/imem.c:69
+#, fuzzy
+msgid "Data"
+msgstr "Päiväys"
+
+#: modules/access/imem.c:74
+#, fuzzy
+msgid "Set the codec of the elementary stream"
+msgstr "Valitse kaikilla tasoilla"
+
+#: modules/access/imem.c:78
+msgid "Language of the elementary stream as described by ISO639"
+msgstr ""
+
+#: modules/access/imem.c:82
+#, fuzzy
+msgid "Sample rate of an audio elementary stream"
+msgstr "Suoratoista kaikki peruslähetykset"
+
+#: modules/access/imem.c:84
+#, fuzzy
+msgid "Channels count"
+msgstr "Kanavat"
+
+#: modules/access/imem.c:86
+#, fuzzy
+msgid "Channels count of an audio elementary stream"
+msgstr "Valitse kaikilla tasoilla"
+
+#: modules/access/imem.c:88 modules/access/pvr.c:74 modules/access/v4l.c:102
+#: modules/access/v4l2.c:89 modules/codec/invmem.c:53
+#: modules/demux/rawvid.c:48 modules/gui/qt4/ui/profiles.h:479
+#: modules/video_filter/mosaic.c:95 modules/video_output/vmem.c:42
+msgid "Width"
+msgstr "Leveys"
+
+#: modules/access/imem.c:89
+#, fuzzy
+msgid "Width of video or subtitle elementary streams"
+msgstr "Suoratoista kaikki peruslähetykset"
+
+#: modules/access/imem.c:91 modules/access/pvr.c:78 modules/access/v4l.c:105
+#: modules/access/v4l2.c:92 modules/codec/invmem.c:56
+#: modules/demux/rawvid.c:52 modules/gui/qt4/ui/profiles.h:482
+#: modules/video_filter/mosaic.c:93 modules/video_output/vmem.c:45
+msgid "Height"
+msgstr "Korkeus"
+
+#: modules/access/imem.c:92
+#, fuzzy
+msgid "Height of video or subtitle elementary streams"
+msgstr "Suoratoista kaikki peruslähetykset"
+
+#: modules/access/imem.c:94
+#, fuzzy
+msgid "Display aspect ratio"
+msgstr "Kiinteä kuvasuhde"
+
+#: modules/access/imem.c:96
+#, fuzzy
+msgid "Display aspect ratio of a video elementary stream"
+msgstr "Valitse kaikilla tasoilla"
+
+#: modules/access/imem.c:100
+#, fuzzy
+msgid "Frame rate of a video elementary stream"
+msgstr "Suoratoista kaikki peruslähetykset"
+
+#: modules/access/imem.c:102
+msgid "Callback cookie string"
+msgstr ""
+
+#: modules/access/imem.c:104
+#, fuzzy
+msgid "Text identifier for the callback functions"
+msgstr "Käytettävän ääniraidan tunnus."
+
+#: modules/access/imem.c:106 modules/codec/invmem.c:67
+#: modules/video_output/vmem.c:63
+msgid "Callback data"
+msgstr ""
+
+#: modules/access/imem.c:108
+#, fuzzy
+msgid "Data for the get and release functions"
+msgstr "Käytettävän ääniraidan tunnus."
+
+#: modules/access/imem.c:110
+#, fuzzy
+msgid "Get function"
+msgstr "Sijainti :"
+
+#: modules/access/imem.c:112
+#, fuzzy
+msgid "Address of the get callback function"
+msgstr "Käytettävän ääniraidan tunnus."
+
+#: modules/access/imem.c:114
+#, fuzzy
+msgid "Release function"
+msgstr "Varusfunktion avainsana"
+
+#: modules/access/imem.c:116
+#, fuzzy
+msgid "Address of the release callback function"
+msgstr "Käytettävän ääniraidan tunnus."
+
+#: modules/access/imem.c:119 modules/access/imem.c:120
+#, fuzzy
+msgid "Memory input"
+msgstr "Ei syötettä"
+
 #: modules/access/jack.c:62
 msgid ""
 "Make VLC buffer audio data captured from jack for the specified length in "
@@ -5967,21 +6243,9 @@ msgstr "Standardi"
 msgid "Norm of the stream (Automatic, SECAM, PAL, or NTSC)."
 msgstr "Tietovirran tyyppi (automaattinen, SECAM, PAL vai NTSC)."
 
-#: modules/access/pvr.c:74 modules/access/v4l.c:102 modules/access/v4l2.c:89
-#: modules/codec/invmem.c:53 modules/demux/rawvid.c:48
-#: modules/video_filter/mosaic.c:95 modules/video_output/vmem.c:42
-msgid "Width"
-msgstr "Leveys"
-
 #: modules/access/pvr.c:75
 msgid "Width of the stream to capture (-1 for autodetection)."
 msgstr ""
-
-#: modules/access/pvr.c:78 modules/access/v4l.c:105 modules/access/v4l2.c:92
-#: modules/codec/invmem.c:56 modules/demux/rawvid.c:52
-#: modules/video_filter/mosaic.c:93 modules/video_output/vmem.c:45
-msgid "Height"
-msgstr "Korkeus"
 
 #: modules/access/pvr.c:79
 msgid "Height of the stream to capture (-1 for autodetection)."
@@ -6053,7 +6317,7 @@ msgstr ""
 #: modules/access/pvr.c:109 modules/access/v4l2.c:163
 #: modules/access/vcdx/info.c:69 modules/gui/macosx/embeddedwindow.m:74
 #: modules/gui/macosx/intf.m:606 modules/gui/qt4/dialogs/toolbar.cpp:347
-#: modules/stream_out/raop.c:150
+#: modules/gui/qt4/ui/sprefs_audio.h:405 modules/stream_out/raop.c:150
 msgid "Volume"
 msgstr "Äänenvoimakkuus"
 
@@ -6232,11 +6496,6 @@ msgstr "RTP"
 #: modules/access/rtp/rtp.c:88
 msgid "Real-Time Protocol (RTP) input"
 msgstr ""
-
-#: modules/access/rtsp/access.c:46 modules/access_output/udp.c:64
-#: modules/demux/live555.cpp:75 modules/stream_out/rtp.c:133
-msgid "Caching value (ms)"
-msgstr "Välimuistin koko (ms)"
 
 #: modules/access/rtsp/access.c:48
 msgid ""
@@ -6530,7 +6789,8 @@ msgid "Height of the stream to capture (-1 for autodetect)."
 msgstr "Kaappauksen korkeus (-1 = autotunnistus)."
 
 #: modules/access/v4l.c:108 modules/access/v4l2.c:108
-#: modules/gui/macosx/extended.m:98 modules/video_filter/atmo/atmo.cpp:257
+#: modules/gui/macosx/extended.m:98 modules/gui/qt4/ui/video_effects.h:1107
+#: modules/video_filter/atmo/atmo.cpp:257
 msgid "Brightness"
 msgstr "Kirkkaus"
 
@@ -6539,7 +6799,7 @@ msgid "Brightness of the video input."
 msgstr "Videosyötteen kirkkaus."
 
 #: modules/access/v4l.c:111 modules/access/v4l2.c:117
-#: modules/gui/macosx/extended.m:101
+#: modules/gui/macosx/extended.m:101 modules/gui/qt4/ui/video_effects.h:1109
 msgid "Hue"
 msgstr "Värisävy"
 
@@ -6548,8 +6808,11 @@ msgid "Hue of the video input."
 msgstr "Videosyötteen värisävy"
 
 #: modules/access/v4l.c:114 modules/gui/fbosd.c:141
-#: modules/misc/notify/xosd.c:82 modules/video_filter/colorthres.c:54
-#: modules/video_filter/marq.c:123 modules/video_filter/rss.c:155
+#: modules/gui/qt4/ui/video_effects.h:1132
+#: modules/gui/qt4/ui/video_effects.h:1138
+#: modules/gui/qt4/ui/video_effects.h:1150 modules/misc/notify/xosd.c:82
+#: modules/video_filter/colorthres.c:54 modules/video_filter/marq.c:123
+#: modules/video_filter/rss.c:155
 msgid "Color"
 msgstr "Väri"
 
@@ -6558,7 +6821,7 @@ msgid "Color of the video input."
 msgstr "Videosyötteen väri."
 
 #: modules/access/v4l.c:117 modules/access/v4l2.c:111
-#: modules/gui/macosx/extended.m:99
+#: modules/gui/macosx/extended.m:99 modules/gui/qt4/ui/video_effects.h:1106
 msgid "Contrast"
 msgstr "Kontrasti"
 
@@ -6574,7 +6837,7 @@ msgstr "Viritin"
 msgid "Tuner to use, if there are several ones."
 msgstr "Käytettävä viritin, mikäli virittimiä on useita."
 
-#: modules/access/v4l.c:122
+#: modules/access/v4l.c:122 modules/gui/qt4/ui/profiles.h:466
 msgid "MJPEG"
 msgstr "MJPEG"
 
@@ -6693,6 +6956,8 @@ msgid "Contrast of the video input (if supported by the v4l2 driver)."
 msgstr "Videosyötteen kontrasti."
 
 #: modules/access/v4l2.c:114 modules/gui/macosx/extended.m:102
+#: modules/gui/qt4/ui/video_effects.h:1108
+#: modules/gui/qt4/ui/video_effects.h:1137
 msgid "Saturation"
 msgstr "Värikylläisyys"
 
@@ -6753,6 +7018,7 @@ msgid "Blue balance of the video input (if supported by the v4l2 driver)."
 msgstr ""
 
 #: modules/access/v4l2.c:137 modules/gui/macosx/extended.m:100
+#: modules/gui/qt4/ui/video_effects.h:1105
 msgid "Gamma"
 msgstr "Gamma"
 
@@ -7060,7 +7326,7 @@ msgstr "Järjestelmä-id"
 msgid "Entries"
 msgstr "Poista hävinneet kohdat"
 
-#: modules/access/vcdx/info.c:75
+#: modules/access/vcdx/info.c:75 modules/gui/qt4/ui/sprefs_audio.h:421
 #, fuzzy
 msgid "Tracks"
 msgstr "Kappaleita"
@@ -7212,14 +7478,6 @@ msgstr ""
 #, fuzzy
 msgid "File stream output"
 msgstr "Valitse tulostusvirta:"
-
-#: modules/access_output/file.c:69 modules/audio_output/file.c:112
-#: modules/gui/macosx/open.m:178 modules/gui/macosx/open.m:451
-#: modules/gui/macosx/output.m:142 modules/gui/macosx/output.m:230
-#: modules/gui/macosx/output.m:369 modules/gui/qt4/dialogs/plugins.cpp:521
-#: modules/gui/qt4/dialogs/sout.cpp:74 modules/gui/qt4/dialogs/sout.cpp:152
-msgid "File"
-msgstr "Tiedosto"
 
 #: modules/access_output/http.c:65 modules/misc/audioscrobbler.c:134
 #, fuzzy
@@ -7424,6 +7682,106 @@ msgstr "Aseta näyttötyyppi normaalimuotoon"
 #, fuzzy
 msgid "ARM NEON video chroma conversions"
 msgstr "FFmpeg:n kylläisyyden muunnos"
+
+#: modules/audio_filter/audiobargraph_a.c:42
+msgid "TCP address to use (default localhost)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:43
+msgid ""
+"TCP address to use to communicate with the video part of the Bar Graph "
+"(default localhost).In the case of bargraph incrustation, use localhost."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:46
+#, fuzzy
+msgid "TCP port to use (default 12345)"
+msgstr "Bittinopeus (-1 on oletus)."
+
+#: modules/audio_filter/audiobargraph_a.c:47
+msgid ""
+"TCP port to use to communicate with the video part of the Bar Graph (default "
+"12345).Use the same port as the one used in the rc interface."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:50
+msgid "Defines if BarGraph information should be sent (default 1)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:51
+msgid ""
+"Defines if BarGraph information should be sent. 1 if the information should "
+"be sent, 0 otherwise (default 1)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:53
+msgid "Sends the barGraph information every n audio packets (default 4)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:54
+msgid ""
+"Defines how often the barGraph information should be sent. Sends the "
+"barGraph information every n audio packets (default 4)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:56
+msgid "Defines if silence alarm information should be sent (default 1)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:57
+msgid ""
+"Defines if silence alarm information should be sent. 1 if the information "
+"should be sent, 0 otherwise (default 1)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:59
+msgid "Time window to use in ms (default 5000)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:60
+msgid ""
+"Time Window during when the audio level is measured in ms for silence "
+"detection. If the audio level is under the threshold during this time, an "
+"alarm is sent (default 5000)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:63
+msgid "Minimum Audio level to raise the alarm (default 0.1)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:64
+msgid ""
+"Threshold to be attained to raise an alarm. If the audio level is under the "
+"threshold during this time, an alarm is sent (default 0.1)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:67
+msgid "Time between two alamr messages in ms (default 2000)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:68
+msgid ""
+"Time between two alarm messages in ms. This value is used to avoid alarm "
+"saturation (default 2000)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:70
+msgid "Force connection reset regularly (default 1)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:71
+msgid ""
+"Defines if the TCP connection should be reset. This is to be used when using "
+"with audiobargraph_v (default 1)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:84
+msgid "Audio part of the BarGraph function"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:85
+msgid "audiobargraph_a"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/dolby.c:49
 msgid "Simple decoder for Dolby Surround encoded streams"
@@ -8188,14 +8546,14 @@ msgstr "5.1"
 #: modules/audio_output/pulse.c:65 modules/gui/macosx/embeddedwindow.m:76
 #: modules/gui/macosx/intf.m:595 modules/gui/macosx/intf.m:596
 #: modules/gui/macosx/intf.m:1986 modules/gui/qt4/dialogs/help.cpp:99
-#: modules/gui/qt4/main_interface.cpp:819
-#: modules/gui/qt4/main_interface.cpp:823
-#: modules/gui/qt4/main_interface.cpp:863
-#: modules/gui/qt4/main_interface.cpp:865
-#: modules/gui/qt4/main_interface.cpp:933
-#: modules/gui/qt4/main_interface.cpp:950
-#: modules/gui/qt4/main_interface.cpp:957
-#: modules/gui/qt4/main_interface.cpp:980
+#: modules/gui/qt4/main_interface.cpp:799
+#: modules/gui/qt4/main_interface.cpp:803
+#: modules/gui/qt4/main_interface.cpp:843
+#: modules/gui/qt4/main_interface.cpp:845
+#: modules/gui/qt4/main_interface.cpp:913
+#: modules/gui/qt4/main_interface.cpp:930
+#: modules/gui/qt4/main_interface.cpp:937
+#: modules/gui/qt4/main_interface.cpp:960
 #: modules/video_output/xcb/window.c:319
 msgid "VLC media player"
 msgstr "VLC-mediasoitin"
@@ -8801,10 +9159,6 @@ msgstr "Profiili"
 msgid "Enable adaptive prefiltering"
 msgstr "Kytke päälle/pois välityspalvelimen tuki"
 
-#: modules/codec/dirac.c:79 modules/codec/x264.c:402 modules/codec/x264.c:407
-msgid "none"
-msgstr "ei mikään"
-
 #: modules/codec/dirac.c:79
 msgid "Centre Weighted Median"
 msgstr ""
@@ -9219,10 +9573,6 @@ msgstr "Kellotahdistus"
 msgid "Address of the unlocking callback function"
 msgstr ""
 
-#: modules/codec/invmem.c:67 modules/video_output/vmem.c:63
-msgid "Callback data"
-msgstr ""
-
 #: modules/codec/invmem.c:68 modules/video_output/vmem.c:64
 msgid "Data for the locking and unlocking functions"
 msgstr ""
@@ -9288,8 +9638,8 @@ msgstr "Hopea"
 
 #: modules/codec/kate.c:211 modules/gui/fbosd.c:172
 #: modules/misc/freetype.c:142 modules/misc/quartztext.c:98
-#: modules/misc/win32text.c:88 modules/video_filter/marq.c:61
-#: modules/video_filter/rss.c:73
+#: modules/misc/win32text.c:88 modules/video_filter/ball.c:132
+#: modules/video_filter/marq.c:61 modules/video_filter/rss.c:73
 msgid "White"
 msgstr "Valkoinen"
 
@@ -9303,8 +9653,9 @@ msgstr "Ruskeanpunainen"
 #: modules/codec/kate.c:212 modules/gui/fbosd.c:172
 #: modules/gui/macosx/controls.m:542 modules/gui/macosx/intf.m:706
 #: modules/misc/freetype.c:143 modules/misc/quartztext.c:99
-#: modules/misc/win32text.c:89 modules/video_filter/colorthres.c:64
-#: modules/video_filter/marq.c:61 modules/video_filter/rss.c:73
+#: modules/misc/win32text.c:89 modules/video_filter/ball.c:131
+#: modules/video_filter/colorthres.c:64 modules/video_filter/marq.c:61
+#: modules/video_filter/rss.c:73
 msgid "Red"
 msgstr "Punainen"
 
@@ -9333,8 +9684,8 @@ msgstr "Oliivi"
 #: modules/codec/kate.c:212 modules/gui/fbosd.c:173
 #: modules/gui/macosx/controls.m:544 modules/gui/macosx/intf.m:707
 #: modules/misc/freetype.c:143 modules/misc/quartztext.c:99
-#: modules/misc/win32text.c:89 modules/video_filter/marq.c:62
-#: modules/video_filter/rss.c:74
+#: modules/misc/win32text.c:89 modules/video_filter/ball.c:131
+#: modules/video_filter/marq.c:62 modules/video_filter/rss.c:74
 msgid "Green"
 msgstr "Vihreä"
 
@@ -9369,8 +9720,9 @@ msgstr "Laivastonsininen"
 #: modules/codec/kate.c:213 modules/gui/fbosd.c:174
 #: modules/gui/macosx/controls.m:548 modules/gui/macosx/intf.m:709
 #: modules/misc/freetype.c:144 modules/misc/quartztext.c:100
-#: modules/misc/win32text.c:90 modules/video_filter/colorthres.c:64
-#: modules/video_filter/marq.c:63 modules/video_filter/rss.c:75
+#: modules/misc/win32text.c:90 modules/video_filter/ball.c:132
+#: modules/video_filter/colorthres.c:64 modules/video_filter/marq.c:63
+#: modules/video_filter/rss.c:75
 msgid "Blue"
 msgstr "Sininen"
 
@@ -9612,7 +9964,8 @@ msgid "MP3 fixed point audio encoder"
 msgstr "\"%s\" ei ole äänenpakkausmuoto."
 
 #: modules/codec/speex.c:57 modules/codec/speex.c:800
-#: modules/gui/macosx/open.m:209
+#: modules/gui/macosx/open.m:209 modules/gui/qt4/ui/sprefs_video.h:324
+#: modules/gui/qt4/ui/video_effects.h:1149
 msgid "Mode"
 msgstr "Tila"
 
@@ -10814,6 +11167,7 @@ msgid "Quiet mode."
 msgstr "Simulaatiotila"
 
 #: modules/codec/x264.c:371 modules/gui/macosx/playlistinfo.m:82
+#: modules/gui/qt4/ui/streampanel.h:171
 msgid "Statistics"
 msgstr "Tilastot"
 
@@ -13083,8 +13437,8 @@ msgid ""
 "fully opaque (255). (from 0 for full transparency to 255 for full opacity)"
 msgstr ""
 
-#: modules/gui/fbosd.c:118 modules/misc/logger.c:112
-#: modules/video_filter/marq.c:87
+#: modules/gui/fbosd.c:118 modules/gui/qt4/ui/video_effects.h:1168
+#: modules/misc/logger.c:112 modules/video_filter/marq.c:87
 msgid "Text"
 msgstr "Teksti"
 
@@ -13092,8 +13446,9 @@ msgstr "Teksti"
 msgid "Text to display on the overlay framebuffer."
 msgstr ""
 
-#: modules/gui/fbosd.c:121 modules/video_filter/erase.c:57
-#: modules/video_filter/logo.c:58 modules/video_filter/osdmenu.c:51
+#: modules/gui/fbosd.c:121 modules/video_filter/audiobargraph_v.c:51
+#: modules/video_filter/erase.c:57 modules/video_filter/logo.c:58
+#: modules/video_filter/osdmenu.c:51
 msgid "X coordinate"
 msgstr "X-koordinaatti"
 
@@ -13102,8 +13457,9 @@ msgstr "X-koordinaatti"
 msgid "X coordinate of the rendered image"
 msgstr "Renderöidyn tekstityksen X-koordinaatti"
 
-#: modules/gui/fbosd.c:124 modules/video_filter/erase.c:59
-#: modules/video_filter/logo.c:61 modules/video_filter/osdmenu.c:54
+#: modules/gui/fbosd.c:124 modules/video_filter/audiobargraph_v.c:53
+#: modules/video_filter/erase.c:59 modules/video_filter/logo.c:61
+#: modules/video_filter/osdmenu.c:54
 msgid "Y coordinate"
 msgstr "Y-koordinaatti"
 
@@ -13183,9 +13539,10 @@ msgid ""
 msgstr ""
 
 #: modules/gui/fbosd.c:203 modules/gui/macosx/simple_prefs.m:283
-#: modules/misc/freetype.c:92 modules/misc/notify/xosd.c:80
-#: modules/misc/quartztext.c:80 modules/misc/win32text.c:58
-#: modules/video_filter/marq.c:164 modules/video_filter/rss.c:207
+#: modules/gui/qt4/ui/sprefs_subtitles.h:211 modules/misc/freetype.c:92
+#: modules/misc/notify/xosd.c:80 modules/misc/quartztext.c:80
+#: modules/misc/win32text.c:58 modules/video_filter/marq.c:164
+#: modules/video_filter/rss.c:207
 msgid "Font"
 msgstr "Kirjasin"
 
@@ -13197,6 +13554,11 @@ msgstr "Komento"
 #: modules/gui/fbosd.c:217
 msgid "GNU/Linux osd/overlay framebuffer interface"
 msgstr ""
+
+#: modules/gui/hildon/maemo.c:62
+#, fuzzy
+msgid "Maemo hildon interface"
+msgstr "Pääkäyttöliittymät"
 
 #: modules/gui/macosx/about.m:86 modules/gui/macosx/intf.m:616
 msgid "About VLC media player"
@@ -13230,13 +13592,15 @@ msgid "Bookmarks"
 msgstr "Kirjanmerkit"
 
 #: modules/gui/macosx/bookmarks.m:88
+#: modules/gui/qt4/ui/podcast_configuration.h:104
+#: modules/gui/qt4/ui/sout.h:331 modules/gui/qt4/ui/vlm.h:300
 msgid "Add"
 msgstr "Lisää"
 
 #: modules/gui/macosx/bookmarks.m:89 modules/gui/macosx/intf.m:642
 #: modules/gui/macosx/simple_prefs.m:246
 #: modules/gui/qt4/components/preferences_widgets.cpp:1199
-#: modules/gui/qt4/dialogs/bookmarks.cpp:47
+#: modules/gui/qt4/dialogs/bookmarks.cpp:47 modules/gui/qt4/ui/vlm.h:301
 msgid "Clear"
 msgstr "Tyhjennä"
 
@@ -13249,7 +13613,7 @@ msgstr "Muokkaa"
 msgid "Extract"
 msgstr "Pura"
 
-#: modules/gui/macosx/bookmarks.m:92
+#: modules/gui/macosx/bookmarks.m:92 modules/gui/qt4/ui/open_file.h:224
 msgid "Remove"
 msgstr "Poista"
 
@@ -13422,7 +13786,7 @@ msgstr "Kelaa taaksepäin"
 msgid "Fast Forward"
 msgstr "Pikakelaus eteenpäin"
 
-#: modules/gui/macosx/equalizer.m:146
+#: modules/gui/macosx/equalizer.m:146 modules/gui/qt4/ui/equalizer.h:128
 msgid "2 Pass"
 msgstr "Kaksi läpikäyntiä"
 
@@ -13436,7 +13800,7 @@ msgstr ""
 "Käytä taajuuskorjainta. Taajuusalue voidaan asettaa käsin tai esiasetusta "
 "käyttäen."
 
-#: modules/gui/macosx/equalizer.m:152
+#: modules/gui/macosx/equalizer.m:152 modules/gui/qt4/ui/equalizer.h:130
 msgid "Preamp"
 msgstr "Esivahvistus"
 
@@ -13456,13 +13820,13 @@ msgstr "Aalto"
 msgid "Ripple"
 msgstr "Värähtely"
 
-#: modules/gui/macosx/extended.m:72 modules/meta_engine/id3genres.h:95
-#: modules/video_filter/psychedelic.c:55
+#: modules/gui/macosx/extended.m:72 modules/gui/qt4/ui/video_effects.h:1143
+#: modules/meta_engine/id3genres.h:95 modules/video_filter/psychedelic.c:55
 msgid "Psychedelic"
 msgstr "Psykedeelinen"
 
-#: modules/gui/macosx/extended.m:73 modules/video_filter/gradient.c:76
-#: modules/video_filter/gradient.c:82
+#: modules/gui/macosx/extended.m:73 modules/gui/qt4/ui/video_effects.h:1148
+#: modules/video_filter/gradient.c:76 modules/video_filter/gradient.c:82
 msgid "Gradient"
 msgstr "Gradientti"
 
@@ -13494,7 +13858,7 @@ msgstr "Kuvanrajaus"
 msgid "Crops a defined part of the image"
 msgstr "Rajaa kuvasta määrätyn alueen"
 
-#: modules/gui/macosx/extended.m:83
+#: modules/gui/macosx/extended.m:83 modules/gui/qt4/ui/video_effects.h:1134
 msgid "Invert colors"
 msgstr "Käänteiset värit"
 
@@ -14028,6 +14392,10 @@ msgstr "Kaappaa"
 #: modules/gui/qt4/components/preferences_widgets.cpp:299
 #: modules/gui/qt4/components/simple_preferences.cpp:276
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:102
+#: modules/gui/qt4/ui/open.h:246 modules/gui/qt4/ui/open_disk.h:300
+#: modules/gui/qt4/ui/open_file.h:232 modules/gui/qt4/ui/sprefs_audio.h:412
+#: modules/gui/qt4/ui/sprefs_input.h:308 modules/gui/qt4/ui/sprefs_input.h:317
+#: modules/gui/qt4/ui/sprefs_video.h:326
 msgid "Browse..."
 msgstr "Selaa..."
 
@@ -14042,6 +14410,7 @@ msgstr "Toista toista mediaa samalla (esim. lisä-äänitiedostoa)"
 
 #: modules/gui/macosx/open.m:186 modules/gui/macosx/simple_prefs.m:280
 #: modules/gui/macosx/wizard.m:346 modules/gui/macosx/wizard.m:414
+#: modules/gui/qt4/ui/sprefs_interface.h:394
 msgid "Choose..."
 msgstr "Valitse..."
 
@@ -14050,7 +14419,7 @@ msgstr "Valitse..."
 msgid "Device name"
 msgstr "Laitenimi"
 
-#: modules/gui/macosx/open.m:193
+#: modules/gui/macosx/open.m:193 modules/gui/qt4/ui/open_disk.h:298
 msgid "No DVD menus"
 msgstr "Ei DVD-valikkoja"
 
@@ -14060,7 +14429,7 @@ msgid "VIDEO_TS folder"
 msgstr "VIDEO_TS-kansio"
 
 #: modules/gui/macosx/open.m:196 modules/gui/macosx/open.m:739
-#: modules/services_discovery/udev.c:587
+#: modules/gui/qt4/ui/open_disk.h:292 modules/services_discovery/udev.c:587
 msgid "DVD"
 msgstr "DVD"
 
@@ -14206,7 +14575,7 @@ msgstr "FPS"
 msgid "Subtitles encoding"
 msgstr "Tekstityksen koodaus"
 
-#: modules/gui/macosx/open.m:316
+#: modules/gui/macosx/open.m:316 modules/gui/qt4/ui/sprefs_subtitles.h:210
 msgid "Font size"
 msgstr "Fonttikoko"
 
@@ -14223,7 +14592,7 @@ msgid "Subtitle File"
 msgstr "Tekstitystiedosto"
 
 #: modules/gui/macosx/open.m:587 modules/gui/macosx/open.m:953
-#: modules/gui/macosx/open.m:1189
+#: modules/gui/macosx/open.m:1189 modules/gui/qt4/ui/open_file.h:217
 msgid "Open File"
 msgstr "Avaa tiedosto"
 
@@ -14285,7 +14654,7 @@ msgstr "Tee vedos raakasyötteestä"
 msgid "Encapsulation Method"
 msgstr "Kapselointitapa"
 
-#: modules/gui/macosx/output.m:159
+#: modules/gui/macosx/output.m:159 modules/gui/qt4/ui/sout.h:335
 msgid "Transcoding options"
 msgstr "Transkoodauksen asetukset"
 
@@ -14294,7 +14663,7 @@ msgstr "Transkoodauksen asetukset"
 msgid "Bitrate (kb/s)"
 msgstr "Bittinopeus (kt/s)"
 
-#: modules/gui/macosx/output.m:166
+#: modules/gui/macosx/output.m:166 modules/gui/qt4/ui/profiles.h:478
 msgid "Scale"
 msgstr "Sovita"
 
@@ -14302,7 +14671,7 @@ msgstr "Sovita"
 msgid "Stream Announcing"
 msgstr "Suoratoiston julkaisu"
 
-#: modules/gui/macosx/output.m:181
+#: modules/gui/macosx/output.m:181 modules/gui/qt4/ui/sout.h:342
 msgid "SAP announce"
 msgstr "SAP-julkaisu"
 
@@ -14333,6 +14702,7 @@ msgstr "Tallenna tiedosto"
 #: modules/gui/macosx/output.m:526 modules/gui/macosx/playlist.m:745
 #: modules/gui/macosx/prefs.m:203 modules/gui/macosx/simple_prefs.m:310
 #: modules/gui/qt4/components/sout/profile_selector.cpp:250
+#: modules/gui/qt4/ui/vlm.h:302
 msgid "Save"
 msgstr "Tallenna"
 
@@ -14353,6 +14723,8 @@ msgid "Save Playlist..."
 msgstr "Tallenna soittolista..."
 
 #: modules/gui/macosx/playlist.m:465 modules/gui/qt4/dialogs/bookmarks.cpp:45
+#: modules/gui/qt4/ui/podcast_configuration.h:105
+#: modules/gui/qt4/ui/streampanel.h:173
 msgid "Delete"
 msgstr "Poista"
 
@@ -14541,6 +14913,7 @@ msgid "Reset All"
 msgstr "Nollaa kaikki"
 
 #: modules/gui/macosx/prefs.m:206 modules/gui/macosx/simple_prefs.m:306
+#: modules/gui/qt4/ui/video_effects.h:1111
 msgid "Basic"
 msgstr "Perus"
 
@@ -14603,7 +14976,7 @@ msgstr "Syöte ja koodekit"
 msgid "Input & Codec settings"
 msgstr "Syöte- ja koodekkiasetukset"
 
-#: modules/gui/macosx/simple_prefs.m:228
+#: modules/gui/macosx/simple_prefs.m:228 modules/gui/qt4/ui/sprefs_audio.h:414
 msgid "Effects"
 msgstr "Tehosteet"
 
@@ -14616,7 +14989,7 @@ msgstr "Käytä ääntä"
 msgid "General Audio"
 msgstr "Yleiset äänet"
 
-#: modules/gui/macosx/simple_prefs.m:231
+#: modules/gui/macosx/simple_prefs.m:231 modules/gui/qt4/ui/sprefs_audio.h:419
 msgid "Headphone surround effect"
 msgstr "Kuulokkeiden ympäristötehoste"
 
@@ -14672,7 +15045,7 @@ msgstr "Korjaa AVI tiedostoja"
 msgid "Default Caching Level"
 msgstr "Oletusmerkistö"
 
-#: modules/gui/macosx/simple_prefs.m:254
+#: modules/gui/macosx/simple_prefs.m:254 modules/gui/qt4/ui/open.h:235
 msgid "Caching"
 msgstr "Välimuisti"
 
@@ -14720,6 +15093,7 @@ msgid "Show Fullscreen Controller"
 msgstr "Näytä koko näytön tilan säätimet"
 
 #: modules/gui/macosx/simple_prefs.m:270
+#: modules/gui/qt4/ui/sprefs_interface.h:376
 msgid "Privacy / Network Interaction"
 msgstr "Yksityisyys / verkon käyttö"
 
@@ -14737,6 +15111,7 @@ msgid "Default Encoding"
 msgstr "Oletusmerkistö"
 
 #: modules/gui/macosx/simple_prefs.m:279
+#: modules/gui/qt4/ui/sprefs_subtitles.h:207
 #, fuzzy
 msgid "Display Settings"
 msgstr "<b>Ulkoasun asetukset</b>"
@@ -14769,8 +15144,8 @@ msgstr "Käytä OSD:tä"
 msgid "Black screens in Fullscreen mode"
 msgstr "Musta koko näytön tila"
 
-#: modules/gui/macosx/simple_prefs.m:292 modules/stream_out/display.c:54
-#: modules/video_filter/deinterlace.c:138
+#: modules/gui/macosx/simple_prefs.m:292 modules/gui/qt4/ui/sprefs_video.h:310
+#: modules/stream_out/display.c:54 modules/video_filter/deinterlace.c:138
 msgid "Display"
 msgstr "Näyttö"
 
@@ -14784,7 +15159,7 @@ msgstr "Käytä videota"
 msgid "Output module"
 msgstr "Ulostulomoduulit"
 
-#: modules/gui/macosx/simple_prefs.m:298
+#: modules/gui/macosx/simple_prefs.m:298 modules/gui/qt4/ui/sprefs_video.h:325
 msgid "Video snapshots"
 msgstr "Videokuvankaappaukset"
 
@@ -14792,15 +15167,15 @@ msgstr "Videokuvankaappaukset"
 msgid "Folder"
 msgstr "Kansio"
 
-#: modules/gui/macosx/simple_prefs.m:301
+#: modules/gui/macosx/simple_prefs.m:301 modules/gui/qt4/ui/sprefs_video.h:330
 msgid "Format"
 msgstr "Muoto"
 
-#: modules/gui/macosx/simple_prefs.m:302
+#: modules/gui/macosx/simple_prefs.m:302 modules/gui/qt4/ui/sprefs_video.h:328
 msgid "Prefix"
 msgstr "Etuliite"
 
-#: modules/gui/macosx/simple_prefs.m:303
+#: modules/gui/macosx/simple_prefs.m:303 modules/gui/qt4/ui/sprefs_video.h:331
 msgid "Sequential numbering"
 msgstr "Järjestysnumerot"
 
@@ -15269,6 +15644,7 @@ msgid "In this page, a few additional streaming parameters can be set."
 msgstr "Tällä sivulla voidaan asettaa suoratoiston lisäparametreja."
 
 #: modules/gui/macosx/wizard.m:401 modules/gui/macosx/wizard.m:1866
+#: modules/gui/qt4/ui/sout.h:344
 #, fuzzy
 msgid "Time-To-Live (TTL)"
 msgstr "Kelaa annettuun ajankohtaan"
@@ -15475,11 +15851,6 @@ msgid ""
 "Don't display dialogs that don't require user action (Critical and error "
 "panel)."
 msgstr ""
-
-#: modules/gui/hildon/maemo.c:62
-#, fuzzy
-msgid "Maemo hildon interface"
-msgstr "Pääkäyttöliittymät"
 
 #: modules/gui/minimal_macosx/macosx.c:58
 #, fuzzy
@@ -16208,6 +16579,7 @@ msgid "File names:"
 msgstr "Tiedostonimet:"
 
 #: modules/gui/qt4/components/open_panels.cpp:149
+#: modules/gui/qt4/ui/sprefs_interface.h:382
 msgid "Filter:"
 msgstr "Suodatin:"
 
@@ -16540,6 +16912,7 @@ msgid "File/Folder"
 msgstr "Kansio"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:46
+#: modules/gui/qt4/ui/sout.h:328
 msgid "Source"
 msgstr "Lähde"
 
@@ -16658,6 +17031,7 @@ msgid "Convert"
 msgstr "Muunna"
 
 #: modules/gui/qt4/dialogs/convert.cpp:58
+#: modules/gui/qt4/ui/sprefs_audio.h:411
 msgid "Destination file:"
 msgstr "Kohdetiedosto:"
 
@@ -17060,7 +17434,7 @@ msgstr "&Nollaa asetukset"
 msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr "Haluatko varmasti poistaa kaikki VLC-mediasoittimen asetukset?"
 
-#: modules/gui/qt4/dialogs/sout.cpp:42
+#: modules/gui/qt4/dialogs/sout.cpp:42 modules/gui/qt4/ui/sout.h:326
 msgid "Stream Output"
 msgstr "Suoratoiston ulostulo"
 
@@ -17159,7 +17533,7 @@ msgstr "Poistaa nykyinen profiili"
 msgid "Cl&ose"
 msgstr "&Sulje"
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:217
+#: modules/gui/qt4/dialogs/toolbar.cpp:217 modules/gui/qt4/ui/profiles.h:455
 msgid "Profile Name"
 msgstr "Profiilin nimi"
 
@@ -17226,6 +17600,7 @@ msgid "Repeat delay:"
 msgstr "Toiston viive:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:112
+#: modules/gui/qt4/ui/sprefs_interface.h:379
 msgid " days"
 msgstr " päivää"
 
@@ -17320,11 +17695,11 @@ msgstr "Tekstitystiedostot"
 msgid "All Files"
 msgstr "Kaikki tiedostot"
 
-#: modules/gui/qt4/main_interface.cpp:934
+#: modules/gui/qt4/main_interface.cpp:914
 msgid "Control menu for the player"
 msgstr "Soittimen säädinvalikko"
 
-#: modules/gui/qt4/main_interface.cpp:977
+#: modules/gui/qt4/main_interface.cpp:957
 msgid "Paused"
 msgstr "Tauko"
 
@@ -17835,6 +18210,997 @@ msgstr "Minimaalinen ilman menuja"
 msgid "Qt interface"
 msgstr "Qt-käyttöliittymä"
 
+#: modules/gui/qt4/ui/equalizer.h:126 modules/gui/qt4/ui/open_disk.h:290
+#: modules/gui/qt4/ui/open_net.h:83 modules/gui/qt4/ui/profiles.h:454
+#: modules/gui/qt4/ui/sprefs_audio.h:403 modules/gui/qt4/ui/sprefs_input.h:305
+#: modules/gui/qt4/ui/sprefs_interface.h:372
+#: modules/gui/qt4/ui/sprefs_subtitles.h:200
+#: modules/gui/qt4/ui/sprefs_video.h:308 modules/gui/qt4/ui/streampanel.h:168
+#: modules/gui/qt4/ui/v4l2.h:58
+#, fuzzy
+msgid "Form"
+msgstr "Muoto"
+
+#: modules/gui/qt4/ui/equalizer.h:129
+msgid "Preset"
+msgstr "Esiasetus"
+
+#: modules/gui/qt4/ui/open.h:230
+#: modules/gui/qt4/ui/podcast_configuration.h:101
+#, fuzzy
+msgid "Dialog"
+msgstr "Poista käytöstä"
+
+#: modules/gui/qt4/ui/open.h:232
+msgid "Show extended options"
+msgstr "Näytä laajennetut asetukset"
+
+#: modules/gui/qt4/ui/open.h:234
+msgid "Show &more options"
+msgstr "Näytä lisäasetukset"
+
+#: modules/gui/qt4/ui/open.h:237
+msgid "Change the caching for the media"
+msgstr "Vaihda median välimuistitusta"
+
+#: modules/gui/qt4/ui/open.h:239
+#, fuzzy
+msgid " ms"
+msgstr "ms"
+
+#: modules/gui/qt4/ui/open.h:240
+msgid "Start Time"
+msgstr "Aloitusaika"
+
+#: modules/gui/qt4/ui/open.h:241
+msgid "Play another media synchronously (extra audio file, ...)"
+msgstr "Toista toista mediaa samalla (esim. lisä-äänitiedostoa)"
+
+#: modules/gui/qt4/ui/open.h:242
+msgid "Extra media"
+msgstr "Lisämedia"
+
+#: modules/gui/qt4/ui/open.h:244
+msgid "Select the file"
+msgstr "Valitse tiedosto"
+
+#: modules/gui/qt4/ui/open.h:247
+#, fuzzy
+msgid "MRL"
+msgstr "rtsp: huono mrl (median latauslähde): %s\n"
+
+#: modules/gui/qt4/ui/open.h:249
+msgid "Complete MRL for VLC internal"
+msgstr ""
+
+#: modules/gui/qt4/ui/open.h:251
+msgid "Edit Options"
+msgstr "Muokkaa optioita"
+
+#: modules/gui/qt4/ui/open.h:253
+msgid "Change the start time for the media"
+msgstr "Vaihda median aloitusaika"
+
+#: modules/gui/qt4/ui/open.h:255
+#, fuzzy
+msgid "s"
+msgstr "ms"
+
+#: modules/gui/qt4/ui/open_capture.h:98
+msgid "Capture mode"
+msgstr "Kaappaustila"
+
+#: modules/gui/qt4/ui/open_capture.h:100
+msgid "Select the capture device type"
+msgstr "Valitse kaappauslaitteen tyyppi"
+
+#: modules/gui/qt4/ui/open_capture.h:102
+msgid "Device Selection"
+msgstr "Laitteen valinta"
+
+#: modules/gui/qt4/ui/open_capture.h:103 modules/gui/qt4/ui/sout.h:347
+msgid "Options"
+msgstr "Optiot"
+
+#: modules/gui/qt4/ui/open_capture.h:105
+msgid "Access advanced options to tweak the device"
+msgstr "Käytä laitteen hienosäädön lisäasetuksia"
+
+#: modules/gui/qt4/ui/open_capture.h:107
+msgid "Advanced options..."
+msgstr "Lisäasetukset..."
+
+#: modules/gui/qt4/ui/open_disk.h:291
+msgid "Disc Selection"
+msgstr "Levyn valinta"
+
+#: modules/gui/qt4/ui/open_disk.h:294
+msgid "SVCD/VCD"
+msgstr ""
+
+#: modules/gui/qt4/ui/open_disk.h:296
+msgid "Disable DVD Menus (for compatibility)"
+msgstr "Älä käytä DVD-valikkoja (yhteensopivuuden vuoksi)"
+
+#: modules/gui/qt4/ui/open_disk.h:299
+msgid "Disc device"
+msgstr "Levyasema"
+
+#: modules/gui/qt4/ui/open_disk.h:301
+msgid "Starting Position"
+msgstr "Aloituskohta"
+
+#: modules/gui/qt4/ui/open_disk.h:304
+msgid "Audio and Subtitles"
+msgstr "Ääni ja tekstitykset"
+
+#: modules/gui/qt4/ui/open_file.h:219
+msgid "Choose one or more media file to open"
+msgstr "Valitse yksi tai useampi mediatiedosto avattavaksi"
+
+#: modules/gui/qt4/ui/open_file.h:221
+msgid "File Selection"
+msgstr "Tiedoston valinta"
+
+#: modules/gui/qt4/ui/open_file.h:222
+msgid "You can select local files with the following list and buttons."
+msgstr "Voit valita tiedostoja käyttäen seuraavaa listaa ja painikkeita."
+
+#: modules/gui/qt4/ui/open_file.h:223
+msgid "Add..."
+msgstr "Lisää..."
+
+#: modules/gui/qt4/ui/open_file.h:226
+msgid "Add a subtitles file"
+msgstr "Lisää tekstitystiedosto"
+
+#: modules/gui/qt4/ui/open_file.h:228
+msgid "Use a sub&titles file"
+msgstr "Käytä &tekstitystiedostoa"
+
+#: modules/gui/qt4/ui/open_file.h:230
+msgid "Select the subtitles file"
+msgstr "Valitse tekstitystiedosto"
+
+#: modules/gui/qt4/ui/open_file.h:233
+#, fuzzy
+msgid "Font size:"
+msgstr "Fonttikoko"
+
+#: modules/gui/qt4/ui/open_file.h:234
+#, fuzzy
+msgid "Text alignment:"
+msgstr "Sivukoko"
+
+#: modules/gui/qt4/ui/open_net.h:84
+msgid "Network Protocol"
+msgstr "Verkkoprotokolla"
+
+#: modules/gui/qt4/ui/open_net.h:87
+#, fuzzy
+msgid "Enter the URL of the network stream here."
+msgstr ""
+"Syötä tähän verkkotoiston URL osoite joko protokollan kanssa tai ilman sitä."
+
+#: modules/gui/qt4/ui/podcast_configuration.h:102
+#: modules/services_discovery/podcast.c:58
+#, fuzzy
+msgid "Podcast URLs list"
+msgstr "&Raidallinen käännettävien lista"
+
+#: modules/gui/qt4/ui/profiles.h:456
+msgid "MPEG-TS"
+msgstr "MPEG-TS"
+
+#: modules/gui/qt4/ui/profiles.h:457
+msgid "MPEG-PS"
+msgstr "MPEG-PS"
+
+#: modules/gui/qt4/ui/profiles.h:458
+msgid "WAV"
+msgstr "WAV"
+
+#: modules/gui/qt4/ui/profiles.h:459
+msgid "ASF/WMV"
+msgstr "ASF/WMV"
+
+#: modules/gui/qt4/ui/profiles.h:460
+msgid "Ogg/Ogm"
+msgstr "Ogg/Ogm"
+
+#: modules/gui/qt4/ui/profiles.h:461
+msgid "RAW"
+msgstr "RAW"
+
+#: modules/gui/qt4/ui/profiles.h:462
+msgid "MPEG 1"
+msgstr "MPEG 1"
+
+#: modules/gui/qt4/ui/profiles.h:463
+msgid "FLV"
+msgstr "FLV"
+
+#: modules/gui/qt4/ui/profiles.h:464
+msgid "AVI"
+msgstr "AVI"
+
+#: modules/gui/qt4/ui/profiles.h:465
+msgid "MP4/MOV"
+msgstr "MP4/MOV"
+
+#: modules/gui/qt4/ui/profiles.h:467
+msgid "MKV"
+msgstr "MKV"
+
+#: modules/gui/qt4/ui/profiles.h:468
+msgid "Encapsulation"
+msgstr "Kapselointi"
+
+#: modules/gui/qt4/ui/profiles.h:472 modules/gui/qt4/ui/profiles.h:491
+msgid " kb/s"
+msgstr "kb/s"
+
+#: modules/gui/qt4/ui/profiles.h:473
+msgid "Frame Rate"
+msgstr "Ruutunopeus"
+
+#: modules/gui/qt4/ui/profiles.h:475
+#, fuzzy
+msgid " fps"
+msgstr " fps"
+
+#: modules/gui/qt4/ui/profiles.h:477
+msgid ""
+"You just need to fill one of the three following parameters, VLC will "
+"autodetect the other using the original aspect ratio"
+msgstr ""
+
+#: modules/gui/qt4/ui/profiles.h:480 modules/gui/qt4/ui/profiles.h:483
+#, fuzzy
+msgid "00000; "
+msgstr "00:00:00"
+
+#: modules/gui/qt4/ui/profiles.h:485
+#, fuzzy
+msgid "Keep original video track"
+msgstr "Näytä alkuperäinen k_oko"
+
+#: modules/gui/qt4/ui/profiles.h:486
+msgid "Video codec"
+msgstr "Videokoodekki"
+
+#: modules/gui/qt4/ui/profiles.h:488
+msgid "Keep original audio track"
+msgstr "Säilytä alkuperäinen ääniraita"
+
+#: modules/gui/qt4/ui/profiles.h:493
+#, fuzzy
+msgid "Sample Rate"
+msgstr "Näytteenottotaajuus"
+
+#: modules/gui/qt4/ui/profiles.h:494
+msgid "Audio codec"
+msgstr "Äänikoodekki"
+
+#: modules/gui/qt4/ui/profiles.h:496
+#, fuzzy
+msgid "Overlay subtitles on the video"
+msgstr "Tekstityksen suhde videoon:"
+
+#: modules/gui/qt4/ui/sout.h:329 modules/gui/qt4/ui/sout.h:339
+msgid "Destinations"
+msgstr "Kohteet"
+
+#: modules/gui/qt4/ui/sout.h:330
+msgid "New destination"
+msgstr "Uusi kohde"
+
+#: modules/gui/qt4/ui/sout.h:332
+msgid ""
+"Add destinations following the streaming methods you need. Be sure to check "
+"with transcoding that the format is compatible with the method used."
+msgstr ""
+
+#: modules/gui/qt4/ui/sout.h:333
+msgid "Display locally"
+msgstr "Toista paikallisesti"
+
+#: modules/gui/qt4/ui/sout.h:336
+#, fuzzy
+msgid "Activate Transcoding"
+msgstr "Transkoodaus"
+
+#: modules/gui/qt4/ui/sout.h:340
+msgid "Miscellaneous Options"
+msgstr "Muut optiot"
+
+#: modules/gui/qt4/ui/sout.h:341
+msgid "Stream all elementary streams"
+msgstr "Suoratoista kaikki peruslähetykset"
+
+#: modules/gui/qt4/ui/sout.h:343
+msgid "Group name"
+msgstr "Ryhmän nimi"
+
+#: modules/gui/qt4/ui/sout.h:345
+#, fuzzy
+msgid "Generated stream output string"
+msgstr "Suoratoiston yleiset ulostuloasetukset"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:406
+msgid "Keep audio level between sessions"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_audio.h:407
+msgid "Always reset audio start level to:"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_audio.h:408
+msgid " %"
+msgstr " %"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:409 modules/gui/qt4/ui/sprefs_video.h:313
+msgid "Output"
+msgstr "Ulostulo"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:410
+#, fuzzy
+msgid "Output module:"
+msgstr "Ulostulomoduulit"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:415
+#, fuzzy
+msgid "Dolby Surround:"
+msgstr "Dolby Surround"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:416
+msgid "Normalize volume to:"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_audio.h:417
+#, fuzzy
+msgid "Replay gain mode:"
+msgstr "Toistonvahvistustila"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:418
+#, fuzzy
+msgid "Visualization:"
+msgstr "Visualisointi"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:420
+#, fuzzy
+msgid "Enable Time-Stretching audio"
+msgstr "Käytä ääntä"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:422
+#, fuzzy
+msgid "Preferred audio language:"
+msgstr "Haluttu äänen kieli"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:423
+msgid "Password:"
+msgstr "Salasana:"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:424
+#, fuzzy
+msgid "Username:"
+msgstr "Käyttäjätunnus"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:425
+msgid "Submit played tracks stats to Last.fm"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_input.h:306
+msgid "Optical drive"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_input.h:307
+#, fuzzy
+msgid "Default optical device"
+msgstr "Oletuslaitteet"
+
+#: modules/gui/qt4/ui/sprefs_input.h:309
+#, fuzzy
+msgid "Codecs"
+msgstr "Koodekki"
+
+#: modules/gui/qt4/ui/sprefs_input.h:310
+#, fuzzy
+msgid "Skip H.264 in-loop deblocking filter"
+msgstr "Kirjasinlaji: (suodatettu)"
+
+#: modules/gui/qt4/ui/sprefs_input.h:311
+#, fuzzy
+msgid "Video quality post-processing level"
+msgstr "Videonskaalauksen suodatin"
+
+#: modules/gui/qt4/ui/sprefs_input.h:312
+msgid "Use GPU acceleration (experimental)"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_input.h:313
+#, fuzzy
+msgid "Use system codecs if available (better quality, but dangerous)"
+msgstr "Käytä järjestelmä koodekkeja, jos tarjolla (parempi laatu)"
+
+#: modules/gui/qt4/ui/sprefs_input.h:314 modules/stream_out/switcher.c:90
+msgid "Files"
+msgstr "Tiedostot"
+
+#: modules/gui/qt4/ui/sprefs_input.h:315
+#, fuzzy
+msgid "Damaged or incomplete AVI file"
+msgstr "Näytä kuvan ominaisuudet"
+
+#: modules/gui/qt4/ui/sprefs_input.h:319
+#, fuzzy
+msgid "Default port (server mode)"
+msgstr "Oletuslaitteet"
+
+#: modules/gui/qt4/ui/sprefs_input.h:320
+#, fuzzy
+msgid "HTTP proxy URL"
+msgstr "HTTP-välityspalvelin"
+
+#: modules/gui/qt4/ui/sprefs_input.h:321
+#, fuzzy
+msgid "Default caching policy"
+msgstr "Puskuroinnin oletustaso"
+
+#: modules/gui/qt4/ui/sprefs_input.h:322
+#, fuzzy
+msgid "HTTP (default)"
+msgstr "oletus"
+
+#: modules/gui/qt4/ui/sprefs_input.h:323
+#, fuzzy
+msgid "RTP over RTSP (TCP)"
+msgstr "Käytä RPT:tä RTSP:n päällä (TCP)"
+
+#: modules/gui/qt4/ui/sprefs_input.h:324
+#, fuzzy
+msgid "Live555 stream transport"
+msgstr "Valitse tulostusvirta:"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:373
+msgid "Instances"
+msgstr "Instanssit"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:374
+msgid "Allow only one instance"
+msgstr "Vain yksi instanssi"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:375
+msgid "Enqueue files when in one instance mode"
+msgstr "Lisää tiedostot soittolistaan, jos vain yksi instanssi"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:377
+#, fuzzy
+msgid "Album art download policy:"
+msgstr "Albumin kuvien lataussääntö"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:378
+msgid "Activate update notifier"
+msgstr "Ilmoita päivityksistä"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:380
+#, fuzzy
+msgid "Every "
+msgstr "Päällekkäiskuva"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:381
+msgid "Save recently played items"
+msgstr "Tallenna viimeisimmät toistokohteet"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:384
+msgid "Separate words by | (without space)"
+msgstr "Erota sanat |-merkillä (ilman välilyöntiä)"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:387
+#, fuzzy
+msgid "Menus language:"
+msgstr "Äänen kieli"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:388
+#, fuzzy
+msgid "File associations"
+msgstr "Avataan sovelluksessa:"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:389
+#, fuzzy
+msgid "Set up associations..."
+msgstr "Avataan sovelluksessa:"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:390
+msgid "Look and feel"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_interface.h:391
+#, fuzzy
+msgid "Use custom skin"
+msgstr "Teematuki"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:393
+#, fuzzy
+msgid "Skin resource file:"
+msgstr "Avaa tiedosto..."
+
+#: modules/gui/qt4/ui/sprefs_interface.h:395
+#, fuzzy
+msgid "Resize interface to video size"
+msgstr "Videon lomituksenpoisto"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:396
+#, fuzzy
+msgid "Force window style:"
+msgstr "Seuraava nimi"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:397
+#, fuzzy
+msgid "Show systray icon"
+msgstr "Kuvake tehtäväpalkissa"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:398
+msgid "Embed video in interface"
+msgstr "Sisällytä video käyttöliittymään"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:399
+msgid " Systray popup when minimized"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_interface.h:400
+#, fuzzy
+msgid "Show controls in full screen mode"
+msgstr "Näytä kontrollit kokoruututilassa."
+
+#: modules/gui/qt4/ui/sprefs_interface.h:401
+msgid "Minimal view mode (no toolbars)"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_interface.h:403
+msgid "This is VLC's default interface, with a native look and feel."
+msgstr "Tämä on VLC:n oletus käyttöliittymä"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:405
+#, fuzzy
+msgid "Use native style"
+msgstr "Käytä tekstitystiedostoa"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:202
+#, fuzzy
+msgid "Enable On Screen Display (OSD)"
+msgstr "On Screen Display -näyttö"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:203
+#, fuzzy
+msgid "Show media title on video start"
+msgstr "Näytä median otsiko videolla"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:204
+msgid "Subtitles Language"
+msgstr "Tekstityksen kieli"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:205
+msgid "Preferred subtitles language"
+msgstr "Haluttu tekstityksen kieli"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:206
+msgid "Default encoding"
+msgstr "Merkistökoodauksen oletus"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:208
+#, fuzzy
+msgid "Effect"
+msgstr "Tehosteet"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:209
+msgid "Font color"
+msgstr "Kirjasimen väri"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:212
+#: modules/gui/qt4/ui/video_effects.h:1113
+#: modules/gui/qt4/ui/video_effects.h:1115
+#: modules/gui/qt4/ui/video_effects.h:1117
+#: modules/gui/qt4/ui/video_effects.h:1119
+msgid " px"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_video.h:314
+msgid "Accelerated video output (Overlay)"
+msgstr "Kiihdytetty ulostulo (overlay)"
+
+#: modules/gui/qt4/ui/sprefs_video.h:317 modules/video_output/msw/directx.c:64
+msgid "Use hardware YUV->RGB conversions"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_video.h:318
+msgid "DirectX"
+msgstr "DirectX"
+
+#: modules/gui/qt4/ui/sprefs_video.h:319
+msgid "Display device"
+msgstr "Näyttölaite"
+
+#: modules/gui/qt4/ui/sprefs_video.h:320
+msgid "Enable wallpaper mode"
+msgstr "Käytä taustakuvatilaa"
+
+#: modules/gui/qt4/ui/sprefs_video.h:322
+#, fuzzy
+msgid "Deinterlacing"
+msgstr "Lomituksen poisto"
+
+#: modules/gui/qt4/ui/sprefs_video.h:323
+msgid "Force Aspect Ratio"
+msgstr "Pakota kuvasuhde"
+
+#: modules/gui/qt4/ui/sprefs_video.h:329
+msgid "vlc-snap"
+msgstr ""
+
+#: modules/gui/qt4/ui/streampanel.h:172
+#, fuzzy
+msgid "Stuff"
+msgstr "Satunnaistoisto"
+
+#: modules/gui/qt4/ui/streampanel.h:174
+msgid "Edit settings"
+msgstr "Muokkaa asetuksia"
+
+#: modules/gui/qt4/ui/streampanel.h:175
+msgid "Control"
+msgstr "Hallinta"
+
+#: modules/gui/qt4/ui/streampanel.h:176
+msgid "Run manually"
+msgstr "Suorita käsin"
+
+#: modules/gui/qt4/ui/streampanel.h:177
+msgid "Setup schedule"
+msgstr "Aseta aikataulu"
+
+#: modules/gui/qt4/ui/streampanel.h:178
+msgid "Run on schedule"
+msgstr "Suorita ajastettuna"
+
+#: modules/gui/qt4/ui/streampanel.h:179
+msgid "Status"
+msgstr "Tilanne"
+
+#: modules/gui/qt4/ui/streampanel.h:180
+#, fuzzy
+msgid "P/P"
+msgstr "UDP/RTP"
+
+#: modules/gui/qt4/ui/streampanel.h:183
+msgid "Prev"
+msgstr "Edellinen"
+
+#: modules/gui/qt4/ui/streampanel.h:184
+#, fuzzy
+msgid "Add Input"
+msgstr "Syöteparametrit"
+
+#: modules/gui/qt4/ui/streampanel.h:185
+#, fuzzy
+msgid "Edit Input"
+msgstr "Syöteparametrit"
+
+#: modules/gui/qt4/ui/streampanel.h:186
+#, fuzzy
+msgid "Clear List"
+msgstr "Tyhjennä lista"
+
+#: modules/gui/qt4/ui/v4l2.h:59
+#, fuzzy
+msgid "Refresh"
+msgstr "Virkistä lista"
+
+#: modules/gui/qt4/ui/v4l2.h:60
+msgid "No v4l2 instance found. Press the refresh button to try again."
+msgstr ""
+
+#: modules/gui/qt4/ui/video_effects.h:1101
+msgid "Transform"
+msgstr "Muunna"
+
+#: modules/gui/qt4/ui/video_effects.h:1102 modules/video_filter/sharpen.c:67
+msgid "Sharpen"
+msgstr "Tarkenna"
+
+#: modules/gui/qt4/ui/video_effects.h:1103
+#, fuzzy
+msgid "Sigma"
+msgstr "Viiveominaisuus (sigma)"
+
+#: modules/gui/qt4/ui/video_effects.h:1104 modules/video_filter/adjust.c:81
+msgid "Image adjust"
+msgstr "Kuvan säätö"
+
+#: modules/gui/qt4/ui/video_effects.h:1110 modules/video_filter/adjust.c:64
+msgid "Brightness threshold"
+msgstr "Kirkkauden raja-arvo"
+
+#: modules/gui/qt4/ui/video_effects.h:1120
+#, fuzzy
+msgid "Synchronize top and bottom"
+msgstr "Yhtenäistä vasen ja oikea"
+
+#: modules/gui/qt4/ui/video_effects.h:1121
+msgid "Synchronize left and right"
+msgstr "Yhtenäistä vasen ja oikea"
+
+#: modules/gui/qt4/ui/video_effects.h:1123
+msgid "Magnification/Zoom"
+msgstr "Suurennus/Zoomaus"
+
+#: modules/gui/qt4/ui/video_effects.h:1124
+msgid "Puzzle game"
+msgstr "Palapeli"
+
+#: modules/gui/qt4/ui/video_effects.h:1125
+msgid "Black slot"
+msgstr "Musta aukko"
+
+#: modules/gui/qt4/ui/video_effects.h:1126
+#: modules/gui/qt4/ui/video_effects.h:1165
+#: modules/gui/qt4/ui/video_effects.h:1171
+msgid "Columns"
+msgstr "Sarakkeet"
+
+#: modules/gui/qt4/ui/video_effects.h:1127
+#: modules/gui/qt4/ui/video_effects.h:1164
+#: modules/gui/qt4/ui/video_effects.h:1170
+msgid "Rows"
+msgstr "Rivit"
+
+#: modules/gui/qt4/ui/video_effects.h:1128 modules/video_filter/rotate.c:67
+msgid "Rotate"
+msgstr "Kierrä"
+
+#: modules/gui/qt4/ui/video_effects.h:1129
+msgid "Angle"
+msgstr "Kulma"
+
+#: modules/gui/qt4/ui/video_effects.h:1130
+msgid "Geometry"
+msgstr "Geometria"
+
+#: modules/gui/qt4/ui/video_effects.h:1131
+msgid "Color extraction"
+msgstr "Värin poisto"
+
+#: modules/gui/qt4/ui/video_effects.h:1133
+#: modules/gui/qt4/ui/video_effects.h:1139
+msgid ">HHHHHH;#"
+msgstr ""
+
+#: modules/gui/qt4/ui/video_effects.h:1135
+#: modules/video_filter/colorthres.c:70
+msgid "Color threshold"
+msgstr "Väri raja-arvolla"
+
+#: modules/gui/qt4/ui/video_effects.h:1136
+#, fuzzy
+msgid "Similarity"
+msgstr "Sovella kynnysarvoa"
+
+#: modules/gui/qt4/ui/video_effects.h:1140
+msgid "Color fun"
+msgstr "Värihupailu"
+
+#: modules/gui/qt4/ui/video_effects.h:1142
+msgid "Water effect"
+msgstr "Vesitehoste"
+
+#: modules/gui/qt4/ui/video_effects.h:1144 modules/meta_engine/id3genres.h:67
+#: modules/video_filter/noise.c:52
+msgid "Noise"
+msgstr "Kohina"
+
+#: modules/gui/qt4/ui/video_effects.h:1145
+msgid "Motion detect"
+msgstr "Liikkeen tunnistus"
+
+#: modules/gui/qt4/ui/video_effects.h:1146
+#: modules/video_filter/motionblur.c:59
+msgid "Motion blur"
+msgstr "Liike-epäterävyys"
+
+#: modules/gui/qt4/ui/video_effects.h:1147
+msgid "Factor"
+msgstr "Kerroin"
+
+#: modules/gui/qt4/ui/video_effects.h:1151
+msgid "Cartoon"
+msgstr "Sarjakuva"
+
+#: modules/gui/qt4/ui/video_effects.h:1152
+msgid "Image modification"
+msgstr "Kuvan muokkaus"
+
+#: modules/gui/qt4/ui/video_effects.h:1153
+#: modules/gui/qt4/ui/video_effects.h:1162
+#: modules/video_filter/atmo/atmo.cpp:361
+msgid "AtmoLight"
+msgstr ""
+
+#: modules/gui/qt4/ui/video_effects.h:1154
+msgid "Edge weightning"
+msgstr ""
+
+#: modules/gui/qt4/ui/video_effects.h:1155
+#, fuzzy
+msgid "Output Color Filtermode"
+msgstr "Videoulostulon suodatinmoduuli"
+
+#: modules/gui/qt4/ui/video_effects.h:1156
+#, fuzzy
+msgid "Brightness (%)"
+msgstr "Kirkkaus"
+
+#: modules/gui/qt4/ui/video_effects.h:1157
+#, fuzzy
+msgid "Darknesslimit"
+msgstr "Varjon tummuus"
+
+#: modules/gui/qt4/ui/video_effects.h:1158
+msgid "Mark analyzed Pixels"
+msgstr ""
+
+#: modules/gui/qt4/ui/video_effects.h:1159
+#: modules/video_filter/atmo/atmo.cpp:268
+msgid "Filter length (ms)"
+msgstr ""
+
+#: modules/gui/qt4/ui/video_effects.h:1160
+#, fuzzy
+msgid "Filter threshold (%)"
+msgstr "Valitse-värin-mukaan raja"
+
+#: modules/gui/qt4/ui/video_effects.h:1161
+#, fuzzy
+msgid "Filter smoothness (%)"
+msgstr "Sijainti ohjatussa toiminnossa"
+
+#: modules/gui/qt4/ui/video_effects.h:1163
+msgid "Wall"
+msgstr "Seinä"
+
+#: modules/gui/qt4/ui/video_effects.h:1166
+msgid "Add text"
+msgstr "Lisää teksti"
+
+#: modules/gui/qt4/ui/video_effects.h:1169 modules/video_filter/panoramix.c:79
+msgid "Panoramix"
+msgstr ""
+
+#: modules/gui/qt4/ui/video_effects.h:1172 modules/video_filter/clone.c:57
+msgid "Clone"
+msgstr "Kloonaus"
+
+#: modules/gui/qt4/ui/video_effects.h:1173 modules/video_filter/clone.c:39
+msgid "Number of clones"
+msgstr "Kloonien määrä"
+
+#: modules/gui/qt4/ui/video_effects.h:1174
+#, fuzzy
+msgid "Vout/Overlay"
+msgstr "Päällekkäiskuva"
+
+#: modules/gui/qt4/ui/video_effects.h:1175
+msgid "Add logo"
+msgstr "Lisää logo"
+
+#: modules/gui/qt4/ui/video_effects.h:1176
+#: modules/stream_out/mosaic_bridge.c:128 modules/video_filter/mosaic.c:88
+msgid "Transparency"
+msgstr "Läpinäkyvyys"
+
+#: modules/gui/qt4/ui/video_effects.h:1179
+#: modules/gui/qt4/ui/video_effects.h:1184
+msgid "Logo"
+msgstr "Logo"
+
+#: modules/gui/qt4/ui/video_effects.h:1180
+msgid "Logo erase"
+msgstr "Logon poisto"
+
+#: modules/gui/qt4/ui/video_effects.h:1183
+#, fuzzy
+msgid "Mask"
+msgstr "Peite"
+
+#: modules/gui/qt4/ui/video_effects.h:1185
+#, fuzzy
+msgid "Subpicture filters"
+msgstr "Alikuvan suotimet"
+
+#: modules/gui/qt4/ui/video_effects.h:1186
+msgid "Video filters"
+msgstr "Videosuodattimet"
+
+#: modules/gui/qt4/ui/video_effects.h:1187
+#, fuzzy
+msgid "Vout filters"
+msgstr "Aktiiviset suodattimet"
+
+#: modules/gui/qt4/ui/video_effects.h:1188
+msgid "Reset"
+msgstr "Nollaa"
+
+#: modules/gui/qt4/ui/video_effects.h:1189
+msgid "Update"
+msgstr "Päivitä"
+
+#: modules/gui/qt4/ui/video_effects.h:1190
+#, fuzzy
+msgid "Advanced video filter controls"
+msgstr "Lisä&säätimet"
+
+#: modules/gui/qt4/ui/vlm.h:287
+#, fuzzy
+msgid "VLM configurator"
+msgstr "Vedosasetustiedosto"
+
+#: modules/gui/qt4/ui/vlm.h:288
+#, fuzzy
+msgid "Media Manager Edition"
+msgstr "Median tietoja"
+
+#: modules/gui/qt4/ui/vlm.h:289
+#, fuzzy
+msgid "Name:"
+msgstr "Nimi"
+
+#: modules/gui/qt4/ui/vlm.h:291
+#, fuzzy
+msgid "Input:"
+msgstr "Syöte"
+
+#: modules/gui/qt4/ui/vlm.h:292
+#, fuzzy
+msgid "Select Input"
+msgstr "Syöteparametrit"
+
+#: modules/gui/qt4/ui/vlm.h:293
+#, fuzzy
+msgid "Output:"
+msgstr "Ulostulo"
+
+#: modules/gui/qt4/ui/vlm.h:294
+#, fuzzy
+msgid "Select Output"
+msgstr "Suoratoiston ulostulo"
+
+#: modules/gui/qt4/ui/vlm.h:295
+#, fuzzy
+msgid "Time Control"
+msgstr "Hallinta"
+
+#: modules/gui/qt4/ui/vlm.h:296
+#, fuzzy
+msgid "Mux Control"
+msgstr "Hallinta"
+
+#: modules/gui/qt4/ui/vlm.h:297
+msgid "Muxer:"
+msgstr "Kanavoinninpurku:"
+
+#: modules/gui/qt4/ui/vlm.h:298
+msgid "AAAA; "
+msgstr ""
+
+#: modules/gui/qt4/ui/vlm.h:299
+#, fuzzy
+msgid "Loop"
+msgstr "[Silmukka]"
+
+#: modules/gui/qt4/ui/vlm.h:303
+#, fuzzy
+msgid "Media Manager List"
+msgstr "Median tietoja"
+
 #: modules/gui/qt4/util/customwidgets.cpp:131
 #, fuzzy
 msgctxt "Tooltip|Clear"
@@ -18095,10 +19461,6 @@ msgstr "Äänileike"
 #: modules/meta_engine/id3genres.h:66
 msgid "Gospel"
 msgstr ""
-
-#: modules/meta_engine/id3genres.h:67 modules/video_filter/noise.c:52
-msgid "Noise"
-msgstr "Kohina"
 
 #: modules/meta_engine/id3genres.h:68
 msgid "Alternative rock"
@@ -18531,6 +19893,24 @@ msgid ""
 "This should take less than a few minutes."
 msgstr ""
 
+#: modules/misc/gnome-session.c:75 modules/misc/inhibit.c:75
+msgid "Power Management Inhibitor"
+msgstr ""
+
+#: modules/misc/gnome-session.c:169 modules/misc/inhibit.c:168
+msgid "Playing some media."
+msgstr ""
+
+#: modules/misc/gnome-session2.c:41
+#, fuzzy
+msgid "SessionManager"
+msgstr "Aseta nykyisen istunnon nimi"
+
+#: modules/misc/gnome-session2.c:42 modules/misc/inhibit/xdg.c:36
+#, fuzzy
+msgid "XDG screen saver inhibition"
+msgstr "<b>Näytönsäästäjän esikatselu</b>"
+
 #: modules/misc/gnutls.c:79
 msgid "Expiration time for resumed TLS sessions"
 msgstr ""
@@ -18558,14 +19938,6 @@ msgstr ""
 msgid "GnuTLS server"
 msgstr "GnuTLS palvelin"
 
-#: modules/misc/inhibit.c:75
-msgid "Power Management Inhibitor"
-msgstr ""
-
-#: modules/misc/inhibit.c:168
-msgid "Playing some media."
-msgstr ""
-
 #: modules/misc/inhibit/osso.c:40
 #, fuzzy
 msgid "OSSO"
@@ -18579,11 +19951,6 @@ msgstr ""
 #, fuzzy
 msgid "XDG-screensaver"
 msgstr "Estä näytönsäästäjä"
-
-#: modules/misc/inhibit/xdg.c:36
-#, fuzzy
-msgid "XDG screen saver inhibition"
-msgstr "<b>Näytönsäästäjän esikatselu</b>"
 
 #: modules/misc/inhibit/xscreensaver.c:67
 #, fuzzy
@@ -18958,6 +20325,11 @@ msgstr "rtsp: huono mrl (median latauslähde): %s\n"
 #, fuzzy
 msgid "RTSP VoD server"
 msgstr "Kutsu: palvelin-paluukutsu"
+
+#: modules/misc/sqlite.c:115
+#, fuzzy
+msgid "SQLite database module"
+msgstr "Alikuvien suodatinmoduuli"
 
 #: modules/misc/stats/stats.c:48
 #, fuzzy
@@ -19383,6 +20755,10 @@ msgstr "_Kopioi yhtälö"
 msgid "Dirac packetizer"
 msgstr "DTS-äänen paketointi"
 
+#: modules/packetizer/flac.c:49
+msgid "Flac audio packetizer"
+msgstr "Flac-äänenpaketointi"
+
 #: modules/packetizer/h264.c:56
 #, fuzzy
 msgid "H.264 video packetizer"
@@ -19452,11 +20828,6 @@ msgstr "Purppura"
 #: modules/services_discovery/mediadirs.c:376
 msgid "My Pictures"
 msgstr ""
-
-#: modules/services_discovery/podcast.c:58
-#, fuzzy
-msgid "Podcast URLs list"
-msgstr "&Raidallinen käännettävien lista"
 
 #: modules/services_discovery/podcast.c:59
 msgid "Enter the list of podcasts to retrieve, separated by '|' (pipe)."
@@ -19622,6 +20993,29 @@ msgstr "tuntematon tyyppi"
 #, fuzzy
 msgid "Universal Plug'n'Play"
 msgstr "Universal Plug and Play"
+
+#: modules/services_discovery/xcb_apps.c:46
+#: modules/services_discovery/xcb_apps.c:47
+#: modules/services_discovery/xcb_apps.c:84
+#: modules/services_discovery/xcb_apps.c:149
+#, fuzzy
+msgid "Screen capture"
+msgstr "Syöteparametrit"
+
+#: modules/services_discovery/xcb_apps.c:150
+msgid "Your window manager does not provide a list of applications."
+msgstr ""
+
+#: modules/services_discovery/xcb_apps.c:273
+#, fuzzy
+msgid "Applications"
+msgstr "Sovellusohjelma"
+
+#: modules/services_discovery/xcb_apps.c:348
+#: modules/video_output/msw/direct3d.c:175
+#, fuzzy
+msgid "Desktop"
+msgstr "ylä"
 
 #: modules/stream_filter/decomp.c:54
 #, fuzzy
@@ -19907,10 +21301,6 @@ msgid ""
 "Force the use of a specific chroma. Use YUVA if you're planning to use the "
 "Alphamask or Bluescreen video filter."
 msgstr ""
-
-#: modules/stream_out/mosaic_bridge.c:128 modules/video_filter/mosaic.c:88
-msgid "Transparency"
-msgstr "Läpinäkyvyys"
 
 #: modules/stream_out/mosaic_bridge.c:130
 #, fuzzy
@@ -20290,10 +21680,6 @@ msgstr ""
 msgid "Standard stream output"
 msgstr "Valitse tulostusvirta:"
 
-#: modules/stream_out/switcher.c:90
-msgid "Files"
-msgstr "Tiedostot"
-
 #: modules/stream_out/switcher.c:92
 msgid "Full paths of the files separated by colons."
 msgstr ""
@@ -20623,10 +22009,6 @@ msgstr "P&äivitä lähteestä"
 msgid "AltiVec conversions from "
 msgstr "P&äivitä lähteestä"
 
-#: modules/video_filter/adjust.c:64
-msgid "Brightness threshold"
-msgstr "Kirkkauden raja-arvo"
-
 #: modules/video_filter/adjust.c:65
 msgid ""
 "When this mode is enabled, pixels will be shown as black or white. The "
@@ -20681,10 +22063,6 @@ msgstr ""
 #, fuzzy
 msgid "Image properties filter"
 msgstr "Näytä kuvan ominaisuudet"
-
-#: modules/video_filter/adjust.c:81
-msgid "Image adjust"
-msgstr "Kuvan säätö"
 
 #: modules/video_filter/alphamask.c:39
 msgid "Use an image's alpha channel as a transparency mask."
@@ -21033,10 +22411,6 @@ msgstr "Kerää tilastotietoja"
 msgid "Sat windowing"
 msgstr ""
 
-#: modules/video_filter/atmo/atmo.cpp:268
-msgid "Filter length (ms)"
-msgstr ""
-
 #: modules/video_filter/atmo/atmo.cpp:269
 msgid ""
 "Time it takes until a color is completely changed. This prevents flickering."
@@ -21223,10 +22597,6 @@ msgstr ""
 msgid "AtmoLight Filter"
 msgstr ""
 
-#: modules/video_filter/atmo/atmo.cpp:361
-msgid "AtmoLight"
-msgstr ""
-
 #: modules/video_filter/atmo/atmo.cpp:368
 msgid "Choose Devicetype and Connection"
 msgstr ""
@@ -21269,6 +22639,142 @@ msgstr ""
 #: modules/video_filter/atmo/atmo.cpp:576
 msgid "Change gradients"
 msgstr ""
+
+#: modules/video_filter/audiobargraph_v.c:48
+#, fuzzy
+msgid "Value of the audio channels levels"
+msgstr "Äänikanavien määrä"
+
+#: modules/video_filter/audiobargraph_v.c:49
+msgid ""
+"Value of the audio level of each channels between 0 and 1Each level should "
+"be separated with ':'."
+msgstr ""
+
+#: modules/video_filter/audiobargraph_v.c:52
+#, fuzzy
+msgid "X coordinate of the bargraph."
+msgstr "Maskin X-koordinaatti"
+
+#: modules/video_filter/audiobargraph_v.c:54
+#, fuzzy
+msgid "Y coordinate of the bargraph."
+msgstr "Maskin Y-koordinaatti"
+
+#: modules/video_filter/audiobargraph_v.c:55
+#, fuzzy
+msgid "Transparency of the bargraph"
+msgstr "Logotiedosto"
+
+#: modules/video_filter/audiobargraph_v.c:56
+msgid ""
+"Bargraph transparency value (from 0 for full transparency to 255 for full "
+"opacity)."
+msgstr ""
+
+#: modules/video_filter/audiobargraph_v.c:58
+#, fuzzy
+msgid "Bargraph position"
+msgstr "Sijainti: %0.4f"
+
+#: modules/video_filter/audiobargraph_v.c:60
+msgid ""
+"Enforce the bargraph position on the video (0=center, 1=left, 2=right, "
+"4=top, 8=bottom, you can also use combinations of these values, eg 6 = top-"
+"right)."
+msgstr ""
+
+#: modules/video_filter/audiobargraph_v.c:63
+#, fuzzy
+msgid "Alarm"
+msgstr "Alsa"
+
+#: modules/video_filter/audiobargraph_v.c:64
+msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+msgstr ""
+
+#: modules/video_filter/audiobargraph_v.c:66
+msgid "Bar width in pixel (default : 10)"
+msgstr ""
+
+#: modules/video_filter/audiobargraph_v.c:67
+msgid ""
+"Width in pixel of each bar in the BarGraph to be displayed (default : 10)."
+msgstr ""
+
+#: modules/video_filter/audiobargraph_v.c:88
+#: modules/video_filter/audiobargraph_v.c:106
+#, fuzzy
+msgid "Audio Bar Graph Video sub filter"
+msgstr "Suodata a_iheen mukaan"
+
+#: modules/video_filter/audiobargraph_v.c:89
+#, fuzzy
+msgid "Audio Bar Graph Video"
+msgstr "Ääni/Video"
+
+#: modules/video_filter/ball.c:109
+#, fuzzy
+msgid "Ball color"
+msgstr "Säädä värejä"
+
+#: modules/video_filter/ball.c:110
+msgid "Ball color, one of \"red\", \"blue\" and \"green\"."
+msgstr ""
+
+#: modules/video_filter/ball.c:112
+#, fuzzy
+msgid "Edge visible"
+msgstr "Näytä aina näkyvässä työtilassa"
+
+#: modules/video_filter/ball.c:113
+msgid "Set edge visibility."
+msgstr ""
+
+#: modules/video_filter/ball.c:115
+#, fuzzy
+msgid "Ball speed"
+msgstr "Normaali nopeus"
+
+#: modules/video_filter/ball.c:116
+msgid ""
+"Set ball speed, the displacement value                                 in "
+"number of pixels by frame."
+msgstr ""
+
+#: modules/video_filter/ball.c:119
+#, fuzzy
+msgid "Ball size"
+msgstr "Huoneen koko"
+
+#: modules/video_filter/ball.c:120
+msgid ""
+"Set ball size giving its radius in number                                 of "
+"pixels"
+msgstr ""
+
+#: modules/video_filter/ball.c:123
+#, fuzzy
+msgid "Gradient threshold"
+msgstr "Valitse-värin-mukaan raja"
+
+#: modules/video_filter/ball.c:124
+msgid "Set gradient threshold for edge computation."
+msgstr ""
+
+#: modules/video_filter/ball.c:126
+msgid "Augmented reality ball game"
+msgstr ""
+
+#: modules/video_filter/ball.c:135
+#, fuzzy
+msgid "Ball video filter"
+msgstr "Valitse videosuodin"
+
+#: modules/video_filter/ball.c:136
+#, fuzzy
+msgid "Ball"
+msgstr "kaikki"
 
 #: modules/video_filter/blend.c:44
 #, fuzzy
@@ -21473,10 +22979,6 @@ msgstr "Valitse videosuodin"
 msgid "Video filtering using a chain of video filter modules"
 msgstr ""
 
-#: modules/video_filter/clone.c:39
-msgid "Number of clones"
-msgstr "Kloonien määrä"
-
 #: modules/video_filter/clone.c:40
 msgid "Number of video windows in which to clone the video."
 msgstr ""
@@ -21501,10 +23003,6 @@ msgstr ""
 msgid "Clone video filter"
 msgstr "Valitse videosuodin"
 
-#: modules/video_filter/clone.c:57
-msgid "Clone"
-msgstr "Kloonaus"
-
 #: modules/video_filter/colorthres.c:55
 msgid ""
 "Colors similar to this will be kept, others will be grayscaled. This must be "
@@ -21522,10 +23020,6 @@ msgstr "Valitse ainakin yksi avattava tiedosto"
 #, fuzzy
 msgid "Color threshold filter"
 msgstr "Gammasuodatin"
-
-#: modules/video_filter/colorthres.c:70
-msgid "Color threshold"
-msgstr "Väri raja-arvolla"
 
 #: modules/video_filter/colorthres.c:79
 #, fuzzy
@@ -22301,10 +23795,6 @@ msgstr "Numeroiden tekijöiden mutustajat"
 msgid "The degree of blurring from 1 to 127."
 msgstr ""
 
-#: modules/video_filter/motionblur.c:59
-msgid "Motion blur"
-msgstr "Liike-epäterävyys"
-
 #: modules/video_filter/motionblur.c:60
 #, fuzzy
 msgid "Motion blur filter"
@@ -22543,10 +24033,6 @@ msgstr ""
 
 #: modules/video_filter/panoramix.c:78
 msgid "Panoramix: wall with overlap video filter"
-msgstr ""
-
-#: modules/video_filter/panoramix.c:79
-msgid "Panoramix"
 msgstr ""
 
 #: modules/video_filter/panoramix.c:89
@@ -22918,10 +24404,6 @@ msgstr "Animoitujen ikkunanpalasten kiertokulma"
 msgid "Rotate video filter"
 msgstr "Valitse videosuodin"
 
-#: modules/video_filter/rotate.c:67
-msgid "Rotate"
-msgstr "Kierrä"
-
 #: modules/video_filter/rss.c:130
 #, fuzzy
 msgid "Feed URLs"
@@ -23137,10 +24619,6 @@ msgstr ""
 #, fuzzy
 msgid "Sharpen video filter"
 msgstr "Valitse videosuodin"
-
-#: modules/video_filter/sharpen.c:67
-msgid "Sharpen"
-msgstr "Tarkenna"
 
 #: modules/video_filter/swscale.c:58
 #, fuzzy
@@ -23390,15 +24868,6 @@ msgstr ""
 #, fuzzy
 msgid "Direct3D video output"
 msgstr "Videoulostuloa ei voi käynnistää"
-
-#: modules/video_output/msw/direct3d.c:175
-#, fuzzy
-msgid "Desktop"
-msgstr "ylä"
-
-#: modules/video_output/msw/directx.c:64
-msgid "Use hardware YUV->RGB conversions"
-msgstr ""
 
 #: modules/video_output/msw/directx.c:66
 msgid ""
@@ -23965,171 +25434,15 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "SDL video driver name"
 #~ msgstr "Videolaitteen nimi"
 
-#~ msgid "Choose one or more media file to open"
-#~ msgstr "Valitse yksi tai useampi mediatiedosto avattavaksi"
-
-#~ msgid "File Selection"
-#~ msgstr "Tiedoston valinta"
-
-#~ msgid "You can select local files with the following list and buttons."
-#~ msgstr "Voit valita tiedostoja käyttäen seuraavaa listaa ja painikkeita."
-
-#~ msgid "Add..."
-#~ msgstr "Lisää..."
-
-#~ msgid "Add a subtitles file"
-#~ msgstr "Lisää tekstitystiedosto"
-
-#~ msgid "Use a sub&titles file"
-#~ msgstr "Käytä &tekstitystiedostoa"
-
-#~ msgid "Select the subtitles file"
-#~ msgstr "Valitse tekstitystiedosto"
-
-#, fuzzy
-#~ msgid "Font size:"
-#~ msgstr "Fonttikoko"
-
-#, fuzzy
-#~ msgid "Text alignment:"
-#~ msgstr "Sivukoko"
-
-#, fuzzy
-#~ msgid "Form"
-#~ msgstr "Muoto"
-
-#~ msgid "Network Protocol"
-#~ msgstr "Verkkoprotokolla"
-
 #~ msgid "Select the protocol for the URL."
 #~ msgstr "Valitse osoitteen protokolla."
 
 #~ msgid "Select the port used"
 #~ msgstr "Valitse käytettävä portti"
 
-#~ msgid ""
-#~ "Enter the URL of the network stream here, with or without the protocol."
-#~ msgstr ""
-#~ "Syötä tähän verkkotoiston URL osoite joko protokollan kanssa tai ilman "
-#~ "sitä."
-
-#~ msgid "Destinations"
-#~ msgstr "Kohteet"
-
-#~ msgid "New destination"
-#~ msgstr "Uusi kohde"
-
-#~ msgid "Display locally"
-#~ msgstr "Toista paikallisesti"
-
-#, fuzzy
-#~ msgid "Activate Transcoding"
-#~ msgstr "Transkoodaus"
-
-#~ msgid "Miscellaneous Options"
-#~ msgstr "Muut optiot"
-
-#~ msgid "Stream all elementary streams"
-#~ msgstr "Suoratoista kaikki peruslähetykset"
-
-#~ msgid "Group name"
-#~ msgstr "Ryhmän nimi"
-
-#, fuzzy
-#~ msgid "Generated stream output string"
-#~ msgstr "Suoratoiston yleiset ulostuloasetukset"
-
-#~ msgid "Options"
-#~ msgstr "Optiot"
-
-#, fuzzy
-#~ msgid "Default optical device"
-#~ msgstr "Oletuslaitteet"
-
-#, fuzzy
-#~ msgid "Damaged or incomplete AVI file"
-#~ msgstr "Näytä kuvan ominaisuudet"
-
-#, fuzzy
-#~ msgid "Default port (server mode)"
-#~ msgstr "Oletuslaitteet"
-
-#, fuzzy
-#~ msgid "HTTP proxy URL"
-#~ msgstr "HTTP-välityspalvelin"
-
-#, fuzzy
-#~ msgid "Default caching policy"
-#~ msgstr "Puskuroinnin oletustaso"
-
-#, fuzzy
-#~ msgid "HTTP (default)"
-#~ msgstr "oletus"
-
-#, fuzzy
-#~ msgid "RTP over RTSP (TCP)"
-#~ msgstr "Käytä RPT:tä RTSP:n päällä (TCP)"
-
-#, fuzzy
-#~ msgid "Live555 stream transport"
-#~ msgstr "Valitse tulostusvirta:"
-
-#, fuzzy
-#~ msgid "Codecs"
-#~ msgstr "Koodekki"
-
-#, fuzzy
-#~ msgid "Video quality post-processing level"
-#~ msgstr "Videonskaalauksen suodatin"
-
-#, fuzzy
-#~ msgid "System codecs (better quality)"
-#~ msgstr "Käytä järjestelmä koodekkeja, jos tarjolla (parempi laatu)"
-
 #, fuzzy
 #~ msgid "Use host codecs if available"
 #~ msgstr "Käytä järjestelmä koodekkeja, jos tarjolla (parempi laatu)"
-
-#, fuzzy
-#~ msgid "Stuff"
-#~ msgstr "Satunnaistoisto"
-
-#~ msgid "Edit settings"
-#~ msgstr "Muokkaa asetuksia"
-
-#~ msgid "Control"
-#~ msgstr "Hallinta"
-
-#~ msgid "Run manually"
-#~ msgstr "Suorita käsin"
-
-#~ msgid "Setup schedule"
-#~ msgstr "Aseta aikataulu"
-
-#~ msgid "Run on schedule"
-#~ msgstr "Suorita ajastettuna"
-
-#~ msgid "Status"
-#~ msgstr "Tilanne"
-
-#, fuzzy
-#~ msgid "P/P"
-#~ msgstr "UDP/RTP"
-
-#~ msgid "Prev"
-#~ msgstr "Edellinen"
-
-#, fuzzy
-#~ msgid "Add Input"
-#~ msgstr "Syöteparametrit"
-
-#, fuzzy
-#~ msgid "Edit Input"
-#~ msgstr "Syöteparametrit"
-
-#, fuzzy
-#~ msgid "Clear List"
-#~ msgstr "Tyhjennä lista"
 
 #~ msgid "Other codecs"
 #~ msgstr "Muut koodekit"
@@ -24274,32 +25587,12 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "Directory to cache CDDB requests"
 #~ msgstr "Määrittele käytettävä välihakemisto"
 
-#, fuzzy
-#~ msgid "MRL"
-#~ msgstr "rtsp: huono mrl (median latauslähde): %s\n"
-
 #~ msgid "Track %i"
 #~ msgstr "Raita %i"
 
 #, fuzzy
-#~ msgid "Subdirectory behavior"
-#~ msgstr "Reunan käyttäytyminen"
-
-#, fuzzy
-#~ msgid "collapse"
-#~ msgstr "piilota"
-
-#, fuzzy
-#~ msgid "expand"
-#~ msgstr "laajenna"
-
-#, fuzzy
 #~ msgid "Standard filesystem directory input"
 #~ msgstr "vakiosyöte on suljettu"
-
-#, fuzzy
-#~ msgid "File input"
-#~ msgstr "Tiedoston syöte"
 
 #, fuzzy
 #~ msgid "audio filter for simple channel mixing"
@@ -24321,9 +25614,6 @@ msgstr "Spektrin tarkastelu"
 #, fuzzy
 #~ msgid "CMML annotations decoder"
 #~ msgstr "Purkaja epäonnistui: virhe %d"
-
-#~ msgid "Flac audio packetizer"
-#~ msgstr "Flac-äänenpaketointi"
 
 #, fuzzy
 #~ msgid "RealAudio library decoder"
@@ -24489,9 +25779,6 @@ msgstr "Spektrin tarkastelu"
 
 #~ msgid "Owner"
 #~ msgstr "Omistaja"
-
-#~ msgid "Group"
-#~ msgstr "Ryhmä"
 
 #~ msgid "Forward"
 #~ msgstr "Eteenpäin"
@@ -24673,9 +25960,6 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "Access:"
 #~ msgstr "Käyttö:"
 
-#~ msgid "Muxer:"
-#~ msgstr "Kanavoinninpurku:"
-
 #~ msgid "URL:"
 #~ msgstr "Osoite:"
 
@@ -24699,9 +25983,6 @@ msgstr "Spektrin tarkastelu"
 
 #~ msgid "MPEG1"
 #~ msgstr "MPEG1"
-
-#~ msgid "AVI"
-#~ msgstr "AVI"
 
 #~ msgid "OGG"
 #~ msgstr "OGG"
@@ -24747,9 +26028,6 @@ msgstr "Spektrin tarkastelu"
 
 #~ msgid "Announce Channel:"
 #~ msgstr "Julkaisukanava:"
-
-#~ msgid "Update"
-#~ msgstr "Päivitä"
 
 #~ msgid " Clear "
 #~ msgstr " Tyhjennä "
@@ -24838,139 +26116,11 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "Complete look with information area"
 #~ msgstr "Täydellinen sisältäen infoalueen"
 
-#~ msgid "Preset"
-#~ msgstr "Esiasetus"
-
-#, fuzzy
-#~ msgid "Dialog"
-#~ msgstr "Poista käytöstä"
-
-#~ msgid "Show extended options"
-#~ msgstr "Näytä laajennetut asetukset"
-
-#~ msgid "Show &more options"
-#~ msgstr "Näytä lisäasetukset"
-
-#~ msgid "Change the caching for the media"
-#~ msgstr "Vaihda median välimuistitusta"
-
-#, fuzzy
-#~ msgid " ms"
-#~ msgstr "ms"
-
-#~ msgid "Start Time"
-#~ msgstr "Aloitusaika"
-
-#~ msgid "Play another media synchronously (extra audio file, ...)"
-#~ msgstr "Toista toista mediaa samalla (esim. lisä-äänitiedostoa)"
-
-#~ msgid "Extra media"
-#~ msgstr "Lisämedia"
-
-#~ msgid "Select the file"
-#~ msgstr "Valitse tiedosto"
-
-#~ msgid "Edit Options"
-#~ msgstr "Muokkaa optioita"
-
-#~ msgid "Change the start time for the media"
-#~ msgstr "Vaihda median aloitusaika"
-
-#, fuzzy
-#~ msgid "s"
-#~ msgstr "ms"
-
 #~ msgid "Select play mode"
 #~ msgstr "Valitse soittotila"
 
-#~ msgid "Capture mode"
-#~ msgstr "Kaappaustila"
-
-#~ msgid "Select the capture device type"
-#~ msgstr "Valitse kaappauslaitteen tyyppi"
-
-#~ msgid "Device Selection"
-#~ msgstr "Laitteen valinta"
-
-#~ msgid "Access advanced options to tweak the device"
-#~ msgstr "Käytä laitteen hienosäädön lisäasetuksia"
-
-#~ msgid "Advanced options..."
-#~ msgstr "Lisäasetukset..."
-
-#~ msgid "Disc Selection"
-#~ msgstr "Levyn valinta"
-
-#~ msgid "Disable DVD Menus (for compatibility)"
-#~ msgstr "Älä käytä DVD-valikkoja (yhteensopivuuden vuoksi)"
-
-#~ msgid "Disc device"
-#~ msgstr "Levyasema"
-
-#~ msgid "Starting Position"
-#~ msgstr "Aloituskohta"
-
-#~ msgid "Audio and Subtitles"
-#~ msgstr "Ääni ja tekstitykset"
-
 #~ msgid "Alignment:"
 #~ msgstr "Tasaus:"
-
-#~ msgid "MPEG-TS"
-#~ msgstr "MPEG-TS"
-
-#~ msgid "MPEG-PS"
-#~ msgstr "MPEG-PS"
-
-#~ msgid "WAV"
-#~ msgstr "WAV"
-
-#~ msgid "ASF/WMV"
-#~ msgstr "ASF/WMV"
-
-#~ msgid "Ogg/Ogm"
-#~ msgstr "Ogg/Ogm"
-
-#~ msgid "RAW"
-#~ msgstr "RAW"
-
-#~ msgid "MPEG 1"
-#~ msgstr "MPEG 1"
-
-#~ msgid "FLV"
-#~ msgstr "FLV"
-
-#~ msgid "MP4/MOV"
-#~ msgstr "MP4/MOV"
-
-#~ msgid "MKV"
-#~ msgstr "MKV"
-
-#~ msgid "Encapsulation"
-#~ msgstr "Kapselointi"
-
-#~ msgid " kb/s"
-#~ msgstr "kb/s"
-
-#~ msgid "Frame Rate"
-#~ msgstr "Ruutunopeus"
-
-#, fuzzy
-#~ msgid "00000; "
-#~ msgstr "00:00:00"
-
-#, fuzzy
-#~ msgid "Keep original video track"
-#~ msgstr "Näytä alkuperäinen k_oko"
-
-#~ msgid "Video codec"
-#~ msgstr "Videokoodekki"
-
-#~ msgid "Keep original audio track"
-#~ msgstr "Säilytä alkuperäinen ääniraita"
-
-#~ msgid "Audio codec"
-#~ msgstr "Äänikoodekki"
 
 #~ msgid "Default volume"
 #~ msgstr "Oletusäänenvoimakkuus"
@@ -24978,14 +26128,8 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "256 corresponds to 100%, 1024 to 400%"
 #~ msgstr "256 vastaa 100%, 1024 vastaa 400%"
 
-#~ msgid " %"
-#~ msgstr " %"
-
 #~ msgid "Save volume on exit"
 #~ msgstr "Tallenna äänen voimakkuus suljettaessa"
-
-#~ msgid "Output"
-#~ msgstr "Ulostulo"
 
 #~ msgid "last.fm"
 #~ msgstr "last.fm"
@@ -25004,33 +26148,11 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "Repair AVI files"
 #~ msgstr "Korjaa AVI tiedostoja"
 
-#~ msgid "Instances"
-#~ msgstr "Instanssit"
-
-#~ msgid "Allow only one instance"
-#~ msgstr "Vain yksi instanssi"
-
-#, fuzzy
-#~ msgid "File associations:"
-#~ msgstr "Avataan sovelluksessa:"
-
-#~ msgid "Enqueue files when in one instance mode"
-#~ msgstr "Lisää tiedostot soittolistaan, jos vain yksi instanssi"
-
 #~ msgid "Association Setup"
 #~ msgstr "Valitse tiedostot"
 
-#~ msgid "Activate update notifier"
-#~ msgstr "Ilmoita päivityksistä"
-
-#~ msgid "Save recently played items"
-#~ msgstr "Tallenna viimeisimmät toistokohteet"
-
 #~ msgid "Filter"
 #~ msgstr "Suodatin"
-
-#~ msgid "Separate words by | (without space)"
-#~ msgstr "Erota sanat |-merkillä (ilman välilyöntiä)"
 
 #~ msgid "Interface Type"
 #~ msgstr "Käyttöliittymä"
@@ -25038,15 +26160,9 @@ msgstr "Spektrin tarkastelu"
 #~ msgid "Native"
 #~ msgstr "Natiivi"
 
-#~ msgid "This is VLC's default interface, with a native look and feel."
-#~ msgstr "Tämä on VLC:n oletus käyttöliittymä"
-
 #, fuzzy
 #~ msgid "Display mode"
 #~ msgstr "Näytömuoto"
-
-#~ msgid "Embed video in interface"
-#~ msgstr "Sisällytä video käyttöliittymään"
 
 #~ msgid "Show a controller in fullscreen"
 #~ msgstr "Näytä kontrollit kokoruututilassa"
@@ -25054,185 +26170,6 @@ msgstr "Spektrin tarkastelu"
 #, fuzzy
 #~ msgid "Skin file"
 #~ msgstr "Yhteys ei toiminut"
-
-#, fuzzy
-#~ msgid "Resize interface to video size"
-#~ msgstr "Videon lomituksenpoisto"
-
-#~ msgid "Subtitles Language"
-#~ msgstr "Tekstityksen kieli"
-
-#~ msgid "Preferred subtitles language"
-#~ msgstr "Haluttu tekstityksen kieli"
-
-#~ msgid "Default encoding"
-#~ msgstr "Merkistökoodauksen oletus"
-
-#, fuzzy
-#~ msgid "Effect"
-#~ msgstr "Tehosteet"
-
-#~ msgid "Font color"
-#~ msgstr "Kirjasimen väri"
-
-#~ msgid "Accelerated video output (Overlay)"
-#~ msgstr "Kiihdytetty ulostulo (overlay)"
-
-#~ msgid "DirectX"
-#~ msgstr "DirectX"
-
-#~ msgid "Display device"
-#~ msgstr "Näyttölaite"
-
-#~ msgid "Enable wallpaper mode"
-#~ msgstr "Käytä taustakuvatilaa"
-
-#~ msgid "Deinterlacing Mode"
-#~ msgstr "Lomituksen poisto"
-
-#~ msgid "Force Aspect Ratio"
-#~ msgstr "Pakota kuvasuhde"
-
-#, fuzzy
-#~ msgid "Refresh"
-#~ msgstr "Virkistä lista"
-
-#~ msgid "Transform"
-#~ msgstr "Muunna"
-
-#, fuzzy
-#~ msgid "Sigma"
-#~ msgstr "Viiveominaisuus (sigma)"
-
-#~ msgid "Synchronize left and right"
-#~ msgstr "Yhtenäistä vasen ja oikea"
-
-#~ msgid "Magnification/Zoom"
-#~ msgstr "Suurennus/Zoomaus"
-
-#~ msgid "Puzzle game"
-#~ msgstr "Palapeli"
-
-#~ msgid "Black slot"
-#~ msgstr "Musta aukko"
-
-#~ msgid "Columns"
-#~ msgstr "Sarakkeet"
-
-#~ msgid "Rows"
-#~ msgstr "Rivit"
-
-#~ msgid "Angle"
-#~ msgstr "Kulma"
-
-#~ msgid "Geometry"
-#~ msgstr "Geometria"
-
-#~ msgid "Color extraction"
-#~ msgstr "Värin poisto"
-
-#, fuzzy
-#~ msgid "Similarity"
-#~ msgstr "Sovella kynnysarvoa"
-
-#~ msgid "Color fun"
-#~ msgstr "Värihupailu"
-
-#~ msgid "Water effect"
-#~ msgstr "Vesitehoste"
-
-#~ msgid "Motion detect"
-#~ msgstr "Liikkeen tunnistus"
-
-#~ msgid "Factor"
-#~ msgstr "Kerroin"
-
-#~ msgid "Cartoon"
-#~ msgstr "Sarjakuva"
-
-#~ msgid "Image modification"
-#~ msgstr "Kuvan muokkaus"
-
-#~ msgid "Wall"
-#~ msgstr "Seinä"
-
-#~ msgid "Add text"
-#~ msgstr "Lisää teksti"
-
-#, fuzzy
-#~ msgid "Vout/Overlay"
-#~ msgstr "Päällekkäiskuva"
-
-#~ msgid "Add logo"
-#~ msgstr "Lisää logo"
-
-#~ msgid "Logo"
-#~ msgstr "Logo"
-
-#~ msgid "Logo erase"
-#~ msgstr "Logon poisto"
-
-#, fuzzy
-#~ msgid "Mask"
-#~ msgstr "Peite"
-
-#~ msgid "Video filters"
-#~ msgstr "Videosuodattimet"
-
-#, fuzzy
-#~ msgid "Vout filters"
-#~ msgstr "Aktiiviset suodattimet"
-
-#~ msgid "Reset"
-#~ msgstr "Nollaa"
-
-#, fuzzy
-#~ msgid "Advanced video filter controls"
-#~ msgstr "Lisä&säätimet"
-
-#, fuzzy
-#~ msgid "VLM configurator"
-#~ msgstr "Vedosasetustiedosto"
-
-#, fuzzy
-#~ msgid "Media Manager Edition"
-#~ msgstr "Median tietoja"
-
-#, fuzzy
-#~ msgid "Name:"
-#~ msgstr "Nimi"
-
-#, fuzzy
-#~ msgid "Input:"
-#~ msgstr "Syöte"
-
-#, fuzzy
-#~ msgid "Select Input"
-#~ msgstr "Syöteparametrit"
-
-#, fuzzy
-#~ msgid "Output:"
-#~ msgstr "Ulostulo"
-
-#, fuzzy
-#~ msgid "Select Output"
-#~ msgstr "Suoratoiston ulostulo"
-
-#, fuzzy
-#~ msgid "Time Control"
-#~ msgstr "Hallinta"
-
-#, fuzzy
-#~ msgid "Mux Control"
-#~ msgstr "Hallinta"
-
-#, fuzzy
-#~ msgid "Loop"
-#~ msgstr "[Silmukka]"
-
-#, fuzzy
-#~ msgid "Media Manager List"
-#~ msgstr "Median tietoja"
 
 #, fuzzy
 #~ msgid ""
@@ -25253,9 +26190,6 @@ msgstr "Spektrin tarkastelu"
 
 #~ msgid "Open:"
 #~ msgstr "Avaa:"
-
-#~ msgid "Unknown"
-#~ msgstr "Tuntematon"
 
 #~ msgid "Choose directory"
 #~ msgstr "Valitse hakemisto"
@@ -25418,83 +26352,12 @@ msgstr "Spektrin tarkastelu"
 #~ msgstr "Satunnaistehosteessa näytettävien tähtien lukumäärä"
 
 #, fuzzy
-#~ msgid "Output module:"
-#~ msgstr "Ulostulomoduulit"
-
-#, fuzzy
 #~ msgid "Spatialization"
 #~ msgstr "Visualisointi"
 
 #, fuzzy
-#~ msgid "Dolby Surround:"
-#~ msgstr "Dolby Surround"
-
-#, fuzzy
 #~ msgid "Processing"
 #~ msgstr "Jälkikäsittely"
-
-#, fuzzy
-#~ msgid "Visualization:"
-#~ msgstr "Visualisointi"
-
-#, fuzzy
-#~ msgid "Replay gain mode:"
-#~ msgstr "Toistonvahvistustila"
-
-#~ msgid "Password:"
-#~ msgstr "Salasana:"
-
-#, fuzzy
-#~ msgid "Username:"
-#~ msgstr "Käyttäjätunnus"
-
-#, fuzzy
-#~ msgid "Album art download policy:"
-#~ msgstr "Albumin kuvien lataussääntö"
-
-#, fuzzy
-#~ msgid "Every "
-#~ msgstr "Päällekkäiskuva"
-
-#, fuzzy
-#~ msgid "Menus language:"
-#~ msgstr "Äänen kieli"
-
-#, fuzzy
-#~ msgid "Set up associations..."
-#~ msgstr "Avataan sovelluksessa:"
-
-#, fuzzy
-#~ msgid "Use custom skin"
-#~ msgstr "Teematuki"
-
-#, fuzzy
-#~ msgid "Skin resource file:"
-#~ msgstr "Avaa tiedosto..."
-
-#, fuzzy
-#~ msgid "Show controls in full screen mode"
-#~ msgstr "Näytä kontrollit kokoruututilassa."
-
-#, fuzzy
-#~ msgid "Show systray icon"
-#~ msgstr "Kuvake tehtäväpalkissa"
-
-#, fuzzy
-#~ msgid "Force window style:"
-#~ msgstr "Seuraava nimi"
-
-#, fuzzy
-#~ msgid "Use native style"
-#~ msgstr "Käytä tekstitystiedostoa"
-
-#, fuzzy
-#~ msgid "Enable On Screen Display (OSD)"
-#~ msgstr "On Screen Display -näyttö"
-
-#, fuzzy
-#~ msgid "Show media title on video start"
-#~ msgstr "Näytä median otsiko videolla"
 
 #, fuzzy
 #~ msgid "Shaping delay"
@@ -26472,9 +27335,6 @@ msgstr "Spektrin tarkastelu"
 #~ msgstr ""
 #~ "Osa asetuksista on kätketty. Valitse \"Lisäasetukset\" näyttääksesi ne."
 
-#~ msgid "Subpicture Filters"
-#~ msgstr "Alikuvan suotimet"
-
 #~ msgid "Enabled"
 #~ msgstr "Käytössä"
 
@@ -26706,9 +27566,6 @@ msgstr "Spektrin tarkastelu"
 
 #~ msgid "MMSH"
 #~ msgstr "MMSH"
-
-#~ msgid "Select all elementary streams"
-#~ msgstr "Valitse kaikilla tasoilla"
 
 #~ msgid "Open file"
 #~ msgstr "Avaa tiedosto"

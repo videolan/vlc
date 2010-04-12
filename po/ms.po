@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ms\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-04-11 23:45+0100\n"
+"POT-Creation-Date: 2010-04-12 23:59+0100\n"
 "PO-Revision-Date: 2009-05-24 22:14+0730\n"
 "Last-Translator: Mahrazi Mohd Kamal <mahrazi@gmail.com>\n"
 "Language-Team: Malay <ms@li.org>\n"
@@ -76,13 +76,14 @@ msgid "Hotkeys settings"
 msgstr "Tetapan Hotkey"
 
 #: include/vlc_config_cat.h:52 src/input/es_out.c:2840 src/input/es_out.c:2880
-#: src/libvlc-module.c:1567 modules/gui/macosx/intf.m:667
-#: modules/gui/macosx/output.m:170 modules/gui/macosx/playlistinfo.m:114
-#: modules/gui/macosx/simple_prefs.m:184 modules/gui/macosx/wizard.m:380
+#: src/libvlc-module.c:1567 modules/access/imem.c:69
+#: modules/gui/macosx/intf.m:667 modules/gui/macosx/output.m:170
+#: modules/gui/macosx/playlistinfo.m:114 modules/gui/macosx/simple_prefs.m:184
+#: modules/gui/macosx/wizard.m:380
 #: modules/gui/qt4/components/info_panels.cpp:507
 #: modules/gui/qt4/components/simple_preferences.cpp:83
-#: modules/services_discovery/mediadirs.c:77 modules/stream_out/es.c:93
-#: modules/stream_out/transcode/transcode.c:192
+#: modules/gui/qt4/ui/profiles.h:487 modules/services_discovery/mediadirs.c:77
+#: modules/stream_out/es.c:93 modules/stream_out/transcode/transcode.c:192
 msgid "Audio"
 msgstr "Audio"
 
@@ -130,11 +131,13 @@ msgid "Miscellaneous audio settings and modules."
 msgstr "Lain-lain tetapan audio dan modul."
 
 #: include/vlc_config_cat.h:70 src/input/es_out.c:2843 src/input/es_out.c:2927
-#: src/libvlc-module.c:1620 modules/gui/macosx/intf.m:680
-#: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:103
-#: modules/gui/macosx/simple_prefs.m:188 modules/gui/macosx/wizard.m:381
+#: src/libvlc-module.c:1620 modules/access/imem.c:69
+#: modules/gui/macosx/intf.m:680 modules/gui/macosx/output.m:160
+#: modules/gui/macosx/playlistinfo.m:103 modules/gui/macosx/simple_prefs.m:188
+#: modules/gui/macosx/wizard.m:381
 #: modules/gui/qt4/components/info_panels.cpp:508
 #: modules/gui/qt4/components/simple_preferences.cpp:85
+#: modules/gui/qt4/ui/profiles.h:469 modules/gui/qt4/ui/sprefs_video.h:321
 #: modules/misc/dummy/dummy.c:106 modules/services_discovery/mediadirs.c:70
 #: modules/stream_out/es.c:101 modules/stream_out/transcode/transcode.c:161
 msgid "Video"
@@ -410,6 +413,7 @@ msgstr "Tetapan lanjutan"
 
 #: include/vlc_config_cat.h:198 modules/gui/macosx/open.m:180
 #: modules/gui/macosx/open.m:459 modules/gui/macosx/simple_prefs.m:259
+#: modules/gui/qt4/ui/sprefs_input.h:318
 msgid "Network"
 msgstr "Rangkaian"
 
@@ -541,6 +545,7 @@ msgstr "Perih&al"
 #: modules/gui/macosx/intf.m:2007 modules/gui/macosx/intf.m:2008
 #: modules/gui/macosx/intf.m:2009 modules/gui/macosx/playlist.m:464
 #: modules/gui/qt4/components/controller.hpp:104 modules/gui/qt4/menus.cpp:790
+#: modules/gui/qt4/ui/open.h:256
 msgid "Play"
 msgstr "Tayang"
 
@@ -693,7 +698,7 @@ msgid ""
 "be magnified."
 msgstr ""
 
-#: include/vlc_intf_strings.h:117
+#: include/vlc_intf_strings.h:117 modules/gui/qt4/ui/video_effects.h:1141
 msgid "Waves"
 msgstr "Gelombang"
 
@@ -829,9 +834,12 @@ msgstr "Stereo"
 #: modules/audio_filter/channel_mixer/mono.c:95 modules/codec/dvbsub.c:102
 #: modules/codec/subtitles/subsdec.c:187 modules/codec/zvbi.c:78
 #: modules/control/gestures.c:97 modules/gui/fbosd.c:162
-#: modules/video_filter/logo.c:79 modules/video_filter/marq.c:137
-#: modules/video_filter/mosaic.c:171 modules/video_filter/osdmenu.c:85
-#: modules/video_filter/rss.c:174
+#: modules/gui/qt4/ui/video_effects.h:1114
+#: modules/gui/qt4/ui/video_effects.h:1177
+#: modules/gui/qt4/ui/video_effects.h:1182
+#: modules/video_filter/audiobargraph_v.c:74 modules/video_filter/logo.c:79
+#: modules/video_filter/marq.c:137 modules/video_filter/mosaic.c:171
+#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:174
 msgid "Left"
 msgstr "Kiri"
 
@@ -840,9 +848,10 @@ msgstr "Kiri"
 #: modules/audio_filter/channel_mixer/mono.c:95 modules/codec/dvbsub.c:102
 #: modules/codec/subtitles/subsdec.c:187 modules/codec/zvbi.c:78
 #: modules/control/gestures.c:97 modules/gui/fbosd.c:162
-#: modules/video_filter/logo.c:79 modules/video_filter/marq.c:137
-#: modules/video_filter/mosaic.c:171 modules/video_filter/osdmenu.c:85
-#: modules/video_filter/rss.c:174
+#: modules/gui/qt4/ui/video_effects.h:1116
+#: modules/video_filter/audiobargraph_v.c:74 modules/video_filter/logo.c:79
+#: modules/video_filter/marq.c:137 modules/video_filter/mosaic.c:171
+#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:174
 msgid "Right"
 msgstr "Kanan"
 
@@ -960,7 +969,7 @@ msgstr "Capsyen tertutup %u"
 msgid "Stream %d"
 msgstr "Strim %d"
 
-#: src/input/es_out.c:2846 src/input/es_out.c:2954
+#: src/input/es_out.c:2846 src/input/es_out.c:2954 modules/access/imem.c:69
 msgid "Subtitle"
 msgstr "Sarikata"
 
@@ -973,13 +982,15 @@ msgstr "Jenis"
 msgid "Original ID"
 msgstr "ID Asal"
 
-#: src/input/es_out.c:2864 src/input/es_out.c:2867
-#: modules/gui/macosx/wizard.m:385
+#: src/input/es_out.c:2864 src/input/es_out.c:2867 modules/access/imem.c:72
+#: modules/gui/macosx/wizard.m:385 modules/gui/qt4/ui/profiles.h:470
+#: modules/gui/qt4/ui/profiles.h:489
 msgid "Codec"
 msgstr "Kodek"
 
 #: src/input/es_out.c:2871 src/input/meta.c:62 src/libvlc-module.c:212
-#: modules/gui/macosx/simple_prefs.m:269
+#: modules/access/imem.c:76 modules/gui/macosx/simple_prefs.m:269
+#: modules/gui/qt4/ui/sprefs_interface.h:386
 msgid "Language"
 msgstr "Bahasa"
 
@@ -989,11 +1000,11 @@ msgid "Description"
 msgstr "Huraian"
 
 #: src/input/es_out.c:2883 src/input/es_out.c:2886
-#: modules/gui/macosx/output.m:176
+#: modules/gui/macosx/output.m:176 modules/gui/qt4/ui/profiles.h:492
 msgid "Channels"
 msgstr "Saluran"
 
-#: src/input/es_out.c:2891
+#: src/input/es_out.c:2891 modules/access/imem.c:80
 msgid "Sample rate"
 msgstr "Kadar pensampelan"
 
@@ -1009,6 +1020,7 @@ msgstr "Bit per sampel"
 #: src/input/es_out.c:2906 modules/access/pvr.c:96
 #: modules/access_output/shout.c:91 modules/demux/playlist/shoutcast.c:413
 #: modules/gui/qt4/components/open_panels.cpp:901
+#: modules/gui/qt4/ui/profiles.h:471 modules/gui/qt4/ui/profiles.h:490
 msgid "Bitrate"
 msgstr "Kadar bit"
 
@@ -1030,7 +1042,7 @@ msgstr "Gandaan main semula album"
 msgid "%.2f dB"
 msgstr "%.2f dB:"
 
-#: src/input/es_out.c:2930
+#: src/input/es_out.c:2930 modules/gui/qt4/ui/profiles.h:476
 msgid "Resolution"
 msgstr "Resolusi"
 
@@ -1038,7 +1050,7 @@ msgstr "Resolusi"
 msgid "Display resolution"
 msgstr "Resolusi paparan"
 
-#: src/input/es_out.c:2945 src/input/es_out.c:2948
+#: src/input/es_out.c:2945 src/input/es_out.c:2948 modules/access/imem.c:98
 #: modules/access/screen/screen.c:44 modules/access/screen/xcb.c:38
 msgid "Frame rate"
 msgstr "Kadar kerangka"
@@ -1065,7 +1077,8 @@ msgstr "Format '%s' tidak dapat dikesan. Sila lihat log untuk perincian."
 #: src/input/meta.c:51 src/input/var.c:187 modules/gui/macosx/intf.m:662
 #: modules/gui/macosx/intf.m:663 modules/gui/macosx/open.m:190
 #: modules/gui/macosx/playlistinfo.m:76 modules/gui/macosx/wizard.m:348
-#: modules/gui/qt4/components/open_panels.cpp:372 modules/mux/asf.c:56
+#: modules/gui/qt4/components/open_panels.cpp:372
+#: modules/gui/qt4/ui/open_disk.h:302 modules/mux/asf.c:56
 msgid "Title"
 msgstr "Judul"
 
@@ -1103,6 +1116,8 @@ msgid "Setting"
 msgstr "Tetapan"
 
 #: src/input/meta.c:61 modules/gui/macosx/open.m:203
+#: modules/gui/qt4/ui/open_net.h:85
+#: modules/gui/qt4/ui/podcast_configuration.h:103
 msgid "URL"
 msgstr "URL"
 
@@ -1136,6 +1151,7 @@ msgstr "Program"
 
 #: src/input/var.c:192 modules/gui/macosx/intf.m:664
 #: modules/gui/macosx/intf.m:665 modules/gui/macosx/open.m:191
+#: modules/gui/qt4/ui/open_disk.h:303
 msgid "Chapter"
 msgstr "Bab"
 
@@ -1511,7 +1527,8 @@ msgstr ""
 "Ini adalah metod output audio yang digunakan oleh VLC. Kelakuan lalai adalah "
 "automatik pilih metod terbaik yang ada."
 
-#: src/libvlc-module.c:252 modules/stream_out/display.c:41
+#: src/libvlc-module.c:252 modules/gui/qt4/ui/sprefs_audio.h:404
+#: modules/stream_out/display.c:41
 msgid "Enable audio"
 msgstr "Benarkan audio"
 
@@ -1619,6 +1636,7 @@ msgstr ""
 "dengan strim audio yang dimainkan."
 
 #: src/libvlc-module.c:301 modules/gui/macosx/simple_prefs.m:237
+#: modules/gui/qt4/ui/sprefs_audio.h:413
 msgid "Use S/PDIF when available"
 msgstr "Guna S/PDIF jika wujud"
 
@@ -1747,7 +1765,8 @@ msgstr ""
 "Ini adalah metod output video yang digunakan oleh VLC. Kelakuan lalai adalah "
 "automatik pilih metod terbaik yang ada."
 
-#: src/libvlc-module.c:375 modules/stream_out/display.c:43
+#: src/libvlc-module.c:375 modules/gui/qt4/ui/sprefs_video.h:309
+#: modules/stream_out/display.c:43
 msgid "Enable video"
 msgstr "Benarkan video"
 
@@ -1842,57 +1861,62 @@ msgstr ""
 #: src/libvlc-module.c:412 src/libvlc-module.c:493
 #: modules/audio_filter/channel_mixer/mono.c:95 modules/codec/dvbsub.c:102
 #: modules/codec/subtitles/subsdec.c:187 modules/codec/zvbi.c:78
-#: modules/gui/fbosd.c:162 modules/video_filter/logo.c:79
-#: modules/video_filter/marq.c:137 modules/video_filter/mosaic.c:171
-#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:174
+#: modules/gui/fbosd.c:162 modules/video_filter/audiobargraph_v.c:74
+#: modules/video_filter/logo.c:79 modules/video_filter/marq.c:137
+#: modules/video_filter/mosaic.c:171 modules/video_filter/osdmenu.c:85
+#: modules/video_filter/rss.c:174
 msgid "Center"
 msgstr "Tengah"
 
 #: src/libvlc-module.c:412 src/libvlc-module.c:493 modules/codec/dvbsub.c:102
 #: modules/codec/zvbi.c:78 modules/gui/fbosd.c:162
-#: modules/video_filter/logo.c:79 modules/video_filter/marq.c:137
-#: modules/video_filter/mosaic.c:171 modules/video_filter/osdmenu.c:85
-#: modules/video_filter/rss.c:174
+#: modules/gui/qt4/ui/video_effects.h:1112
+#: modules/gui/qt4/ui/video_effects.h:1178
+#: modules/gui/qt4/ui/video_effects.h:1181
+#: modules/video_filter/audiobargraph_v.c:74 modules/video_filter/logo.c:79
+#: modules/video_filter/marq.c:137 modules/video_filter/mosaic.c:171
+#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:174
 msgid "Top"
 msgstr "Atas"
 
 #: src/libvlc-module.c:412 src/libvlc-module.c:493 modules/codec/dvbsub.c:102
 #: modules/codec/zvbi.c:78 modules/gui/fbosd.c:162
-#: modules/video_filter/logo.c:79 modules/video_filter/marq.c:137
-#: modules/video_filter/mosaic.c:171 modules/video_filter/osdmenu.c:85
-#: modules/video_filter/rss.c:174
+#: modules/gui/qt4/ui/video_effects.h:1118
+#: modules/video_filter/audiobargraph_v.c:74 modules/video_filter/logo.c:79
+#: modules/video_filter/marq.c:137 modules/video_filter/mosaic.c:171
+#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:174
 msgid "Bottom"
 msgstr "Bawah"
 
 #: src/libvlc-module.c:413 src/libvlc-module.c:494 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:79 modules/gui/fbosd.c:163
-#: modules/video_filter/logo.c:80 modules/video_filter/marq.c:138
-#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:86
-#: modules/video_filter/rss.c:175
+#: modules/video_filter/audiobargraph_v.c:75 modules/video_filter/logo.c:80
+#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
+#: modules/video_filter/osdmenu.c:86 modules/video_filter/rss.c:175
 msgid "Top-Left"
 msgstr "Atas-Kiri"
 
 #: src/libvlc-module.c:413 src/libvlc-module.c:494 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:79 modules/gui/fbosd.c:163
-#: modules/video_filter/logo.c:80 modules/video_filter/marq.c:138
-#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:86
-#: modules/video_filter/rss.c:175
+#: modules/video_filter/audiobargraph_v.c:75 modules/video_filter/logo.c:80
+#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
+#: modules/video_filter/osdmenu.c:86 modules/video_filter/rss.c:175
 msgid "Top-Right"
 msgstr "Atas-Kanan"
 
 #: src/libvlc-module.c:413 src/libvlc-module.c:494 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:79 modules/gui/fbosd.c:163
-#: modules/video_filter/logo.c:80 modules/video_filter/marq.c:138
-#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:86
-#: modules/video_filter/rss.c:175
+#: modules/video_filter/audiobargraph_v.c:75 modules/video_filter/logo.c:80
+#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
+#: modules/video_filter/osdmenu.c:86 modules/video_filter/rss.c:175
 msgid "Bottom-Left"
 msgstr "Bawah-Kiri"
 
 #: src/libvlc-module.c:413 src/libvlc-module.c:494 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:79 modules/gui/fbosd.c:163
-#: modules/video_filter/logo.c:80 modules/video_filter/marq.c:138
-#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:86
-#: modules/video_filter/rss.c:175
+#: modules/video_filter/audiobargraph_v.c:75 modules/video_filter/logo.c:80
+#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
+#: modules/video_filter/osdmenu.c:86 modules/video_filter/rss.c:175
 msgid "Bottom-Right"
 msgstr "Bawah-Kanan"
 
@@ -1957,7 +1981,7 @@ msgstr ""
 "persembahkan terus video). VLC akan cuba menggunakannya sebagai lalai."
 
 #: src/libvlc-module.c:442 src/video_output/vout_intf.c:344
-#: modules/gui/macosx/simple_prefs.m:295
+#: modules/gui/macosx/simple_prefs.m:295 modules/gui/qt4/ui/sprefs_video.h:312
 msgid "Always on top"
 msgstr "Sentiasa di atas"
 
@@ -2069,7 +2093,7 @@ msgstr ""
 "Halang daemon pengurusan kuasa semasa sebarang mainbalik, bagi mengelakkan "
 "komputer terhenti kerana ketiadaan aktiviti."
 
-#: src/libvlc-module.c:503
+#: src/libvlc-module.c:503 modules/gui/qt4/ui/sprefs_video.h:316
 msgid "Window decorations"
 msgstr "Dekorasi tetingkap"
 
@@ -2268,6 +2292,7 @@ msgstr ""
 "kepada 4:3 untuk simpan ukuran."
 
 #: src/libvlc-module.c:597 modules/gui/macosx/simple_prefs.m:297
+#: modules/gui/qt4/ui/sprefs_video.h:315
 msgid "Skip frames"
 msgstr "Langkau kerangka"
 
@@ -2394,6 +2419,7 @@ msgstr "Lalai"
 
 #: src/libvlc-module.c:653 modules/gui/macosx/equalizer.m:149
 #: modules/gui/macosx/extended.m:97 modules/gui/macosx/wizard.m:354
+#: modules/gui/qt4/ui/equalizer.h:127 modules/gui/qt4/ui/vlm.h:290
 msgid "Enable"
 msgstr "Benarkan"
 
@@ -2479,7 +2505,7 @@ msgstr ""
 "Hanya gunakan pilihan ini jika anda ingin membaca strim multi-program "
 "(contohnya DVB strim)."
 
-#: src/libvlc-module.c:700
+#: src/libvlc-module.c:700 modules/gui/qt4/ui/open_disk.h:305
 msgid "Audio track"
 msgstr "Trek audio"
 
@@ -2487,7 +2513,7 @@ msgstr "Trek audio"
 msgid "Stream number of the audio track to use (from 0 to n)."
 msgstr "Strim bilangan trek audio untuk guna (dari 0 hingga n)."
 
-#: src/libvlc-module.c:705
+#: src/libvlc-module.c:705 modules/gui/qt4/ui/open_disk.h:306
 msgid "Subtitles track"
 msgstr "Trek sarikata"
 
@@ -2627,7 +2653,7 @@ msgstr ""
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
 "{...}\""
 
-#: src/libvlc-module.c:770
+#: src/libvlc-module.c:770 modules/gui/qt4/ui/sprefs_input.h:316
 msgid "Record directory or filename"
 msgstr "Direktori atau namafail rakaman"
 
@@ -2677,7 +2703,7 @@ msgstr ""
 "tetapan ini di sini dan konfigurnya dalam seksyen modul \"penapis subgambar"
 "\". Anda boleh juga tetapkan perlbagai pilihan subgambar."
 
-#: src/libvlc-module.c:796
+#: src/libvlc-module.c:796 modules/gui/qt4/ui/sprefs_subtitles.h:213
 msgid "Force subtitle position"
 msgstr "Paksa posisi sarikata"
 
@@ -2699,6 +2725,7 @@ msgstr "VLC boleh lumpuhkan keseluruhan memproses sub-gambar."
 
 #: src/libvlc-module.c:805 src/libvlc-module.c:1758
 #: modules/gui/macosx/simple_prefs.m:286
+#: modules/gui/qt4/ui/sprefs_subtitles.h:201
 #: modules/stream_out/transcode/transcode.c:222
 msgid "On Screen Display"
 msgstr "Paparan Atas Skrin (OSD)"
@@ -3675,6 +3702,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:685 modules/gui/macosx/intf.m:750
 #: modules/gui/macosx/simple_prefs.m:294
 #: modules/gui/qt4/components/controller.hpp:105
+#: modules/gui/qt4/ui/sprefs_video.h:311
 msgid "Fullscreen"
 msgstr "Skrin Penuh"
 
@@ -3757,7 +3785,8 @@ msgstr "Perlahan (halus)"
 #: modules/gui/macosx/intf.m:652 modules/gui/macosx/intf.m:738
 #: modules/gui/macosx/intf.m:746 modules/gui/macosx/wizard.m:309
 #: modules/gui/macosx/wizard.m:321 modules/gui/macosx/wizard.m:1623
-#: modules/gui/qt4/components/controller.hpp:105
+#: modules/gui/qt4/components/controller.hpp:105 modules/gui/qt4/ui/sout.h:327
+#: modules/gui/qt4/ui/sout.h:338 modules/gui/qt4/ui/streampanel.h:182
 #: modules/misc/notify/notify.c:321
 msgid "Next"
 msgstr "Maju"
@@ -3773,6 +3802,7 @@ msgstr ""
 #: modules/gui/macosx/embeddedwindow.m:71 modules/gui/macosx/intf.m:599
 #: modules/gui/macosx/intf.m:651 modules/gui/macosx/intf.m:739
 #: modules/gui/macosx/intf.m:745 modules/gui/qt4/components/controller.hpp:105
+#: modules/gui/qt4/ui/sout.h:337 modules/gui/qt4/ui/sout.h:346
 #: modules/misc/notify/notify.c:319
 msgid "Previous"
 msgstr "Terdahulu"
@@ -3787,7 +3817,7 @@ msgstr ""
 #: modules/gui/macosx/embeddedwindow.m:72 modules/gui/macosx/intf.m:602
 #: modules/gui/macosx/intf.m:647 modules/gui/macosx/intf.m:737
 #: modules/gui/macosx/intf.m:744 modules/gui/qt4/components/controller.hpp:104
-#: modules/misc/notify/xosd.c:231
+#: modules/gui/qt4/ui/streampanel.h:181 modules/misc/notify/xosd.c:231
 msgid "Stop"
 msgstr "Henti"
 
@@ -3798,7 +3828,8 @@ msgstr "Pilih hotkey untuk henti."
 #: src/libvlc-module.c:1300 modules/gui/fbosd.c:127 modules/gui/fbosd.c:195
 #: modules/gui/macosx/bookmarks.m:96 modules/gui/macosx/bookmarks.m:105
 #: modules/gui/macosx/embeddedwindow.m:70 modules/gui/macosx/intf.m:607
-#: modules/video_filter/marq.c:158 modules/video_filter/rss.c:201
+#: modules/gui/qt4/ui/video_effects.h:1167 modules/video_filter/marq.c:158
+#: modules/video_filter/rss.c:201
 msgid "Position"
 msgstr "Posisi"
 
@@ -4477,7 +4508,8 @@ msgstr "Subgambar"
 
 #: src/libvlc-module.c:1767 modules/codec/subtitles/subsdec.c:202
 #: modules/demux/kate_categories.c:41 modules/demux/kate_categories.c:54
-#: modules/demux/subtitle.c:73
+#: modules/demux/subtitle.c:73 modules/gui/qt4/ui/profiles.h:495
+#: modules/gui/qt4/ui/profiles.h:497
 msgid "Subtitles"
 msgstr "Sarikata"
 
@@ -4754,8 +4786,8 @@ msgid "Post processing"
 msgstr "Pasca memproses"
 
 #: src/video_output/vout_intf.c:228 modules/gui/macosx/intf.m:692
-#: modules/gui/macosx/intf.m:693 modules/video_filter/crop.c:107
-#: modules/video_filter/croppadd.c:86
+#: modules/gui/macosx/intf.m:693 modules/gui/qt4/ui/video_effects.h:1122
+#: modules/video_filter/crop.c:107 modules/video_filter/croppadd.c:86
 msgid "Crop"
 msgstr "Pangkas"
 
@@ -4800,12 +4832,12 @@ msgstr ""
 #: modules/access/dvdread.c:74 modules/access/eyetv.m:61
 #: modules/access/fake.c:44 modules/access/ftp.c:58
 #: modules/access/gnomevfs.c:48 modules/access/http.c:81
-#: modules/access/jack.c:60 modules/access/mms/mms.c:49
-#: modules/access/mtp.c:63 modules/access/oss.c:70 modules/access/pvr.c:59
-#: modules/access/rtmp/access.c:43 modules/access/screen/screen.c:40
-#: modules/access/screen/xcb.c:33 modules/access/sftp.c:51
-#: modules/access/smb.c:61 modules/access/tcp.c:41 modules/access/udp.c:49
-#: modules/access/v4l.c:77 modules/access/v4l2.c:182
+#: modules/access/imem.c:49 modules/access/jack.c:60
+#: modules/access/mms/mms.c:49 modules/access/mtp.c:63 modules/access/oss.c:70
+#: modules/access/pvr.c:59 modules/access/rtmp/access.c:43
+#: modules/access/screen/screen.c:40 modules/access/screen/xcb.c:33
+#: modules/access/sftp.c:51 modules/access/smb.c:61 modules/access/tcp.c:41
+#: modules/access/udp.c:49 modules/access/v4l.c:77 modules/access/v4l2.c:182
 #: modules/access/vcd/vcd.c:46
 msgid "Caching value in ms"
 msgstr "Nilai caching dalan ms"
@@ -4831,6 +4863,14 @@ msgstr "Alsa"
 #: modules/access/alsa.c:90
 msgid "Alsa audio capture input"
 msgstr "Input tangkapan audio Alsa"
+
+#: modules/access/attachment.c:44
+msgid "Attachment"
+msgstr ""
+
+#: modules/access/attachment.c:45
+msgid "Attachment input"
+msgstr ""
 
 #: modules/access/bd/bd.c:54
 msgid "Caching value for BDs. This value should be set in milliseconds."
@@ -5147,7 +5187,7 @@ msgstr "Mod hirarki terrestrial"
 msgid "Hierarchy alpha value [Undefined,1,2,4]"
 msgstr ""
 
-#: modules/access/bda/bda.c:169
+#: modules/access/bda/bda.c:169 modules/gui/qt4/ui/streampanel.h:170
 msgid "1"
 msgstr "1"
 
@@ -5249,6 +5289,7 @@ msgstr ""
 
 #: modules/access/cdda.c:67 modules/gui/macosx/open.m:198
 #: modules/gui/macosx/open.m:643 modules/gui/macosx/open.m:731
+#: modules/gui/qt4/ui/open_disk.h:293
 msgid "Audio CD"
 msgstr "CD Audio"
 
@@ -5800,7 +5841,8 @@ msgstr "Kadar kerangka"
 msgid "Number of frames per second (eg. 24, 25, 29.97, 30)."
 msgstr "Bilangan bingkai sesaat (cth. 24, 25, 29.97, 30)."
 
-#: modules/access/fake.c:51 modules/gui/qt4/components/playlist/sorting.h:49
+#: modules/access/fake.c:51 modules/access/imem.c:54
+#: modules/gui/qt4/components/playlist/sorting.h:49
 #: modules/stream_out/bridge.c:41 modules/stream_out/mosaic_bridge.c:105
 msgid "ID"
 msgstr "ID"
@@ -5851,6 +5893,99 @@ msgstr "VLC tidak dapat membuka fail \"%s\"."
 #, fuzzy
 msgid "VLC could not read the file."
 msgstr "VLC gagal membaca fail \"%s\"."
+
+#: modules/access/fs.c:33 modules/access/rtsp/access.c:46
+#: modules/access_output/udp.c:64 modules/demux/live555.cpp:75
+#: modules/stream_out/rtp.c:133
+msgid "Caching value (ms)"
+msgstr "Nilai cache (ms)"
+
+#: modules/access/fs.c:35
+#, fuzzy
+msgid "Caching value for files, in milliseconds."
+msgstr "Nilai caching untuk fail. Nilai ini perlu ditetapkan dalam milisaat."
+
+#: modules/access/fs.c:37
+#, fuzzy
+msgid "Extra network caching value (ms)"
+msgstr "Nilai cache (ms)"
+
+#: modules/access/fs.c:39
+#, fuzzy
+msgid "Supplementary caching value for remote files, in milliseconds."
+msgstr ""
+"Nilai caching lalai untuk strim PVR. Nilai ini perlu ditetapkan dalam "
+"milisaat."
+
+#: modules/access/fs.c:41
+msgid "Subdirectory behavior"
+msgstr "Ragam subdirektori"
+
+#: modules/access/fs.c:43
+msgid ""
+"Select whether subdirectories must be expanded.\n"
+"none: subdirectories do not appear in the playlist.\n"
+"collapse: subdirectories appear but are expanded on first play.\n"
+"expand: all subdirectories are expanded.\n"
+msgstr ""
+"Pilih sama ada subdirktori mesti dipanjangkan.\n"
+"tiada: subdirektori tidak kelihatan dalam senarai tayang.\n"
+"rebah: subdirektori kelihatan tetapi tidak dikembangkan pada tayangan "
+"pertama.\n"
+"kembang: semua subdirektori dikembangkan.\n"
+
+#: modules/access/fs.c:50 modules/codec/dirac.c:79 modules/codec/x264.c:402
+#: modules/codec/x264.c:407
+msgid "none"
+msgstr "tiada"
+
+#: modules/access/fs.c:50
+msgid "collapse"
+msgstr "lipat"
+
+#: modules/access/fs.c:50
+msgid "expand"
+msgstr "kembang"
+
+#: modules/access/fs.c:52
+#, fuzzy
+msgid "Ignored extensions"
+msgstr "Sambungan diabai"
+
+#: modules/access/fs.c:54
+msgid ""
+"Files with these extensions will not be added to playlist when opening a "
+"directory.\n"
+"This is useful if you add directories that contain playlist files for "
+"instance. Use a comma-separated list of extensions."
+msgstr ""
+"Fail dengan sambungan ini tidak akan ditambah kepada senarai tayang apabila "
+"membuka direktori.\n"
+"Ini berguna jika anda menambah direktori yang mengandungi fail senarai "
+"tayang untuk misalan. Guna senarai dipisah-koma bagi sambungan."
+
+#: modules/access/fs.c:60
+msgid "File input"
+msgstr "Fail masukan"
+
+#: modules/access/fs.c:61 modules/access_output/file.c:69
+#: modules/audio_output/file.c:112 modules/gui/macosx/open.m:178
+#: modules/gui/macosx/open.m:451 modules/gui/macosx/output.m:142
+#: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
+#: modules/gui/qt4/dialogs/plugins.cpp:521 modules/gui/qt4/dialogs/sout.cpp:74
+#: modules/gui/qt4/dialogs/sout.cpp:152
+msgid "File"
+msgstr "Fail"
+
+#: modules/access/fs.c:78 modules/gui/qt4/ui/sprefs_video.h:327
+#, fuzzy
+msgid "Directory"
+msgstr "Pilih direktori"
+
+#: modules/access/fs.c:79
+#, fuzzy
+msgid "Directory input"
+msgstr "Input DirectShow"
 
 #: modules/access/ftp.c:60
 msgid ""
@@ -6034,6 +6169,153 @@ msgstr "Pengesahan HTTP"
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "Sila masukkan nama login dan kata laluan yang sah."
 
+#: modules/access/imem.c:51
+#, fuzzy
+msgid ""
+"Caching value for imem streams. This value should be set in milliseconds."
+msgstr ""
+"Nilai caching untuk strim palsu. Nilai ini perlu ditetapkan dalam milisaat."
+
+#: modules/access/imem.c:56
+#, fuzzy
+msgid "Set the ID of the elementary stream"
+msgstr "Pilih keseluruhan asas strim"
+
+#: modules/access/imem.c:58
+msgid "Group"
+msgstr "Kumpulan"
+
+#: modules/access/imem.c:60
+#, fuzzy
+msgid "Set the group of the elementary stream"
+msgstr "Pilih keseluruhan asas strim"
+
+#: modules/access/imem.c:62
+#, fuzzy
+msgid "Category"
+msgstr "CDDB Category"
+
+#: modules/access/imem.c:64
+#, fuzzy
+msgid "Set the category of the elementary stream"
+msgstr "Pilih keseluruhan asas strim"
+
+#: modules/access/imem.c:69
+msgid "Unknown"
+msgstr "Tidak Diketahui"
+
+#: modules/access/imem.c:69
+#, fuzzy
+msgid "Data"
+msgstr "Tarikh"
+
+#: modules/access/imem.c:74
+#, fuzzy
+msgid "Set the codec of the elementary stream"
+msgstr "Pilih keseluruhan asas strim"
+
+#: modules/access/imem.c:78
+msgid "Language of the elementary stream as described by ISO639"
+msgstr ""
+
+#: modules/access/imem.c:82
+#, fuzzy
+msgid "Sample rate of an audio elementary stream"
+msgstr "Pilih keseluruhan asas strim"
+
+#: modules/access/imem.c:84
+#, fuzzy
+msgid "Channels count"
+msgstr "Saluran"
+
+#: modules/access/imem.c:86
+#, fuzzy
+msgid "Channels count of an audio elementary stream"
+msgstr "Pilih keseluruhan asas strim"
+
+#: modules/access/imem.c:88 modules/access/pvr.c:74 modules/access/v4l.c:102
+#: modules/access/v4l2.c:89 modules/codec/invmem.c:53
+#: modules/demux/rawvid.c:48 modules/gui/qt4/ui/profiles.h:479
+#: modules/video_filter/mosaic.c:95 modules/video_output/vmem.c:42
+msgid "Width"
+msgstr "Lebar"
+
+#: modules/access/imem.c:89
+#, fuzzy
+msgid "Width of video or subtitle elementary streams"
+msgstr "Pilih keseluruhan asas strim"
+
+#: modules/access/imem.c:91 modules/access/pvr.c:78 modules/access/v4l.c:105
+#: modules/access/v4l2.c:92 modules/codec/invmem.c:56
+#: modules/demux/rawvid.c:52 modules/gui/qt4/ui/profiles.h:482
+#: modules/video_filter/mosaic.c:93 modules/video_output/vmem.c:45
+msgid "Height"
+msgstr "Tinggi"
+
+#: modules/access/imem.c:92
+#, fuzzy
+msgid "Height of video or subtitle elementary streams"
+msgstr "Pilih keseluruhan asas strim"
+
+#: modules/access/imem.c:94
+#, fuzzy
+msgid "Display aspect ratio"
+msgstr "Contoh nisbah aspek"
+
+#: modules/access/imem.c:96
+#, fuzzy
+msgid "Display aspect ratio of a video elementary stream"
+msgstr "Pilih keseluruhan asas strim"
+
+#: modules/access/imem.c:100
+#, fuzzy
+msgid "Frame rate of a video elementary stream"
+msgstr "Pilih keseluruhan asas strim"
+
+#: modules/access/imem.c:102
+msgid "Callback cookie string"
+msgstr ""
+
+#: modules/access/imem.c:104
+#, fuzzy
+msgid "Text identifier for the callback functions"
+msgstr "ID Strim trek audio untuk diguna."
+
+#: modules/access/imem.c:106 modules/codec/invmem.c:67
+#: modules/video_output/vmem.c:63
+msgid "Callback data"
+msgstr "Mod panggil balik"
+
+#: modules/access/imem.c:108
+#, fuzzy
+msgid "Data for the get and release functions"
+msgstr "ID Strim trek audio untuk diguna."
+
+#: modules/access/imem.c:110
+#, fuzzy
+msgid "Get function"
+msgstr "Kunci fungsi"
+
+#: modules/access/imem.c:112
+#, fuzzy
+msgid "Address of the get callback function"
+msgstr "ID Strim trek audio untuk diguna."
+
+#: modules/access/imem.c:114
+#, fuzzy
+msgid "Release function"
+msgstr "Released on"
+
+#: modules/access/imem.c:116
+#, fuzzy
+msgid "Address of the release callback function"
+msgstr "ID Strim trek audio untuk diguna."
+
+#: modules/access/imem.c:119 modules/access/imem.c:120
+#, fuzzy
+msgid "Memory input"
+msgstr "Tiada input"
+
 #: modules/access/jack.c:62
 msgid ""
 "Make VLC buffer audio data captured from jack for the specified length in "
@@ -6194,21 +6476,9 @@ msgstr "Normal"
 msgid "Norm of the stream (Automatic, SECAM, PAL, or NTSC)."
 msgstr "Norma strim (Automatik, SECAM, PAL, atau NTSC)."
 
-#: modules/access/pvr.c:74 modules/access/v4l.c:102 modules/access/v4l2.c:89
-#: modules/codec/invmem.c:53 modules/demux/rawvid.c:48
-#: modules/video_filter/mosaic.c:95 modules/video_output/vmem.c:42
-msgid "Width"
-msgstr "Lebar"
-
 #: modules/access/pvr.c:75
 msgid "Width of the stream to capture (-1 for autodetection)."
 msgstr "Lebar strim untuk ditangkap (-1 untuk auto kesan)."
-
-#: modules/access/pvr.c:78 modules/access/v4l.c:105 modules/access/v4l2.c:92
-#: modules/codec/invmem.c:56 modules/demux/rawvid.c:52
-#: modules/video_filter/mosaic.c:93 modules/video_output/vmem.c:45
-msgid "Height"
-msgstr "Tinggi"
 
 #: modules/access/pvr.c:79
 msgid "Height of the stream to capture (-1 for autodetection)."
@@ -6279,7 +6549,7 @@ msgstr "Topeng bit yang digunakan olh bahagian audio kad."
 #: modules/access/pvr.c:109 modules/access/v4l2.c:163
 #: modules/access/vcdx/info.c:69 modules/gui/macosx/embeddedwindow.m:74
 #: modules/gui/macosx/intf.m:606 modules/gui/qt4/dialogs/toolbar.cpp:347
-#: modules/stream_out/raop.c:150
+#: modules/gui/qt4/ui/sprefs_audio.h:405 modules/stream_out/raop.c:150
 msgid "Volume"
 msgstr "Volum"
 
@@ -6458,11 +6728,6 @@ msgstr "RTP"
 #: modules/access/rtp/rtp.c:88
 msgid "Real-Time Protocol (RTP) input"
 msgstr "Input Protokol Masa-Nyata(RTP) "
-
-#: modules/access/rtsp/access.c:46 modules/access_output/udp.c:64
-#: modules/demux/live555.cpp:75 modules/stream_out/rtp.c:133
-msgid "Caching value (ms)"
-msgstr "Nilai cache (ms)"
 
 #: modules/access/rtsp/access.c:48
 msgid ""
@@ -6764,7 +7029,8 @@ msgid "Height of the stream to capture (-1 for autodetect)."
 msgstr "Tinggi strim untuk ditangkap (-1 untuk auto kesan)."
 
 #: modules/access/v4l.c:108 modules/access/v4l2.c:108
-#: modules/gui/macosx/extended.m:98 modules/video_filter/atmo/atmo.cpp:257
+#: modules/gui/macosx/extended.m:98 modules/gui/qt4/ui/video_effects.h:1107
+#: modules/video_filter/atmo/atmo.cpp:257
 msgid "Brightness"
 msgstr "Kecerahan"
 
@@ -6773,7 +7039,7 @@ msgid "Brightness of the video input."
 msgstr "Kecerahan input audio."
 
 #: modules/access/v4l.c:111 modules/access/v4l2.c:117
-#: modules/gui/macosx/extended.m:101
+#: modules/gui/macosx/extended.m:101 modules/gui/qt4/ui/video_effects.h:1109
 msgid "Hue"
 msgstr "Hue"
 
@@ -6782,8 +7048,11 @@ msgid "Hue of the video input."
 msgstr "Hue input video."
 
 #: modules/access/v4l.c:114 modules/gui/fbosd.c:141
-#: modules/misc/notify/xosd.c:82 modules/video_filter/colorthres.c:54
-#: modules/video_filter/marq.c:123 modules/video_filter/rss.c:155
+#: modules/gui/qt4/ui/video_effects.h:1132
+#: modules/gui/qt4/ui/video_effects.h:1138
+#: modules/gui/qt4/ui/video_effects.h:1150 modules/misc/notify/xosd.c:82
+#: modules/video_filter/colorthres.c:54 modules/video_filter/marq.c:123
+#: modules/video_filter/rss.c:155
 msgid "Color"
 msgstr "Warna"
 
@@ -6792,7 +7061,7 @@ msgid "Color of the video input."
 msgstr "Wana input video"
 
 #: modules/access/v4l.c:117 modules/access/v4l2.c:111
-#: modules/gui/macosx/extended.m:99
+#: modules/gui/macosx/extended.m:99 modules/gui/qt4/ui/video_effects.h:1106
 msgid "Contrast"
 msgstr "Kontra"
 
@@ -6808,7 +7077,7 @@ msgstr "Penala"
 msgid "Tuner to use, if there are several ones."
 msgstr "Penala untuk diguna, jika ada lebih dari satu."
 
-#: modules/access/v4l.c:122
+#: modules/access/v4l.c:122 modules/gui/qt4/ui/profiles.h:466
 msgid "MJPEG"
 msgstr "MJPEG"
 
@@ -6924,6 +7193,8 @@ msgid "Contrast of the video input (if supported by the v4l2 driver)."
 msgstr "Kontra input video"
 
 #: modules/access/v4l2.c:114 modules/gui/macosx/extended.m:102
+#: modules/gui/qt4/ui/video_effects.h:1108
+#: modules/gui/qt4/ui/video_effects.h:1137
 msgid "Saturation"
 msgstr "Ketepuan"
 
@@ -6980,6 +7251,7 @@ msgid "Blue balance of the video input (if supported by the v4l2 driver)."
 msgstr ""
 
 #: modules/access/v4l2.c:137 modules/gui/macosx/extended.m:100
+#: modules/gui/qt4/ui/video_effects.h:1105
 msgid "Gamma"
 msgstr "Gamma"
 
@@ -7285,7 +7557,7 @@ msgstr "ID Sistem"
 msgid "Entries"
 msgstr "Masuka"
 
-#: modules/access/vcdx/info.c:75
+#: modules/access/vcdx/info.c:75 modules/gui/qt4/ui/sprefs_audio.h:421
 msgid "Tracks"
 msgstr "Trek"
 
@@ -7431,14 +7703,6 @@ msgstr "Tokok kepada fail jika wujud disebalik mengantikannya."
 #: modules/access_output/file.c:68
 msgid "File stream output"
 msgstr "Output strim fail"
-
-#: modules/access_output/file.c:69 modules/audio_output/file.c:112
-#: modules/gui/macosx/open.m:178 modules/gui/macosx/open.m:451
-#: modules/gui/macosx/output.m:142 modules/gui/macosx/output.m:230
-#: modules/gui/macosx/output.m:369 modules/gui/qt4/dialogs/plugins.cpp:521
-#: modules/gui/qt4/dialogs/sout.cpp:74 modules/gui/qt4/dialogs/sout.cpp:152
-msgid "File"
-msgstr "Fail"
 
 #: modules/access_output/http.c:65 modules/misc/audioscrobbler.c:134
 msgid "Username"
@@ -7650,6 +7914,106 @@ msgstr "Titik tetap pertukaran format audio"
 #, fuzzy
 msgid "ARM NEON video chroma conversions"
 msgstr "Penukaran kroma FFmpeg"
+
+#: modules/audio_filter/audiobargraph_a.c:42
+msgid "TCP address to use (default localhost)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:43
+msgid ""
+"TCP address to use to communicate with the video part of the Bar Graph "
+"(default localhost).In the case of bargraph incrustation, use localhost."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:46
+#, fuzzy
+msgid "TCP port to use (default 12345)"
+msgstr "Kadat bit untuk diguna (-1 untuk lalai)."
+
+#: modules/audio_filter/audiobargraph_a.c:47
+msgid ""
+"TCP port to use to communicate with the video part of the Bar Graph (default "
+"12345).Use the same port as the one used in the rc interface."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:50
+msgid "Defines if BarGraph information should be sent (default 1)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:51
+msgid ""
+"Defines if BarGraph information should be sent. 1 if the information should "
+"be sent, 0 otherwise (default 1)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:53
+msgid "Sends the barGraph information every n audio packets (default 4)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:54
+msgid ""
+"Defines how often the barGraph information should be sent. Sends the "
+"barGraph information every n audio packets (default 4)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:56
+msgid "Defines if silence alarm information should be sent (default 1)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:57
+msgid ""
+"Defines if silence alarm information should be sent. 1 if the information "
+"should be sent, 0 otherwise (default 1)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:59
+msgid "Time window to use in ms (default 5000)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:60
+msgid ""
+"Time Window during when the audio level is measured in ms for silence "
+"detection. If the audio level is under the threshold during this time, an "
+"alarm is sent (default 5000)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:63
+msgid "Minimum Audio level to raise the alarm (default 0.1)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:64
+msgid ""
+"Threshold to be attained to raise an alarm. If the audio level is under the "
+"threshold during this time, an alarm is sent (default 0.1)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:67
+msgid "Time between two alamr messages in ms (default 2000)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:68
+msgid ""
+"Time between two alarm messages in ms. This value is used to avoid alarm "
+"saturation (default 2000)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:70
+msgid "Force connection reset regularly (default 1)"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:71
+msgid ""
+"Defines if the TCP connection should be reset. This is to be used when using "
+"with audiobargraph_v (default 1)."
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:84
+msgid "Audio part of the BarGraph function"
+msgstr ""
+
+#: modules/audio_filter/audiobargraph_a.c:85
+msgid "audiobargraph_a"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/dolby.c:49
 msgid "Simple decoder for Dolby Surround encoded streams"
@@ -8439,14 +8803,14 @@ msgstr "5.1"
 #: modules/audio_output/pulse.c:65 modules/gui/macosx/embeddedwindow.m:76
 #: modules/gui/macosx/intf.m:595 modules/gui/macosx/intf.m:596
 #: modules/gui/macosx/intf.m:1986 modules/gui/qt4/dialogs/help.cpp:99
-#: modules/gui/qt4/main_interface.cpp:819
-#: modules/gui/qt4/main_interface.cpp:823
-#: modules/gui/qt4/main_interface.cpp:863
-#: modules/gui/qt4/main_interface.cpp:865
-#: modules/gui/qt4/main_interface.cpp:933
-#: modules/gui/qt4/main_interface.cpp:950
-#: modules/gui/qt4/main_interface.cpp:957
-#: modules/gui/qt4/main_interface.cpp:980
+#: modules/gui/qt4/main_interface.cpp:799
+#: modules/gui/qt4/main_interface.cpp:803
+#: modules/gui/qt4/main_interface.cpp:843
+#: modules/gui/qt4/main_interface.cpp:845
+#: modules/gui/qt4/main_interface.cpp:913
+#: modules/gui/qt4/main_interface.cpp:930
+#: modules/gui/qt4/main_interface.cpp:937
+#: modules/gui/qt4/main_interface.cpp:960
 #: modules/video_output/xcb/window.c:319
 msgid "VLC media player"
 msgstr "Pemain media VLC"
@@ -9072,10 +9436,6 @@ msgstr "Pra tapisan"
 msgid "Enable adaptive prefiltering"
 msgstr "Bolehkan pra-penapisan adaptif"
 
-#: modules/codec/dirac.c:79 modules/codec/x264.c:402 modules/codec/x264.c:407
-msgid "none"
-msgstr "tiada"
-
 #: modules/codec/dirac.c:79
 #, fuzzy
 msgid "Centre Weighted Median"
@@ -9487,10 +9847,6 @@ msgstr "Buka kunci fungsi"
 msgid "Address of the unlocking callback function"
 msgstr ""
 
-#: modules/codec/invmem.c:67 modules/video_output/vmem.c:63
-msgid "Callback data"
-msgstr "Mod panggil balik"
-
 #: modules/codec/invmem.c:68 modules/video_output/vmem.c:64
 msgid "Data for the locking and unlocking functions"
 msgstr ""
@@ -9555,8 +9911,8 @@ msgstr "Perak"
 
 #: modules/codec/kate.c:211 modules/gui/fbosd.c:172
 #: modules/misc/freetype.c:142 modules/misc/quartztext.c:98
-#: modules/misc/win32text.c:88 modules/video_filter/marq.c:61
-#: modules/video_filter/rss.c:73
+#: modules/misc/win32text.c:88 modules/video_filter/ball.c:132
+#: modules/video_filter/marq.c:61 modules/video_filter/rss.c:73
 msgid "White"
 msgstr "Putih"
 
@@ -9570,8 +9926,9 @@ msgstr "Maroon"
 #: modules/codec/kate.c:212 modules/gui/fbosd.c:172
 #: modules/gui/macosx/controls.m:542 modules/gui/macosx/intf.m:706
 #: modules/misc/freetype.c:143 modules/misc/quartztext.c:99
-#: modules/misc/win32text.c:89 modules/video_filter/colorthres.c:64
-#: modules/video_filter/marq.c:61 modules/video_filter/rss.c:73
+#: modules/misc/win32text.c:89 modules/video_filter/ball.c:131
+#: modules/video_filter/colorthres.c:64 modules/video_filter/marq.c:61
+#: modules/video_filter/rss.c:73
 msgid "Red"
 msgstr "Merah"
 
@@ -9600,8 +9957,8 @@ msgstr "Olive"
 #: modules/codec/kate.c:212 modules/gui/fbosd.c:173
 #: modules/gui/macosx/controls.m:544 modules/gui/macosx/intf.m:707
 #: modules/misc/freetype.c:143 modules/misc/quartztext.c:99
-#: modules/misc/win32text.c:89 modules/video_filter/marq.c:62
-#: modules/video_filter/rss.c:74
+#: modules/misc/win32text.c:89 modules/video_filter/ball.c:131
+#: modules/video_filter/marq.c:62 modules/video_filter/rss.c:74
 msgid "Green"
 msgstr "Hijau"
 
@@ -9636,8 +9993,9 @@ msgstr "Navy"
 #: modules/codec/kate.c:213 modules/gui/fbosd.c:174
 #: modules/gui/macosx/controls.m:548 modules/gui/macosx/intf.m:709
 #: modules/misc/freetype.c:144 modules/misc/quartztext.c:100
-#: modules/misc/win32text.c:90 modules/video_filter/colorthres.c:64
-#: modules/video_filter/marq.c:63 modules/video_filter/rss.c:75
+#: modules/misc/win32text.c:90 modules/video_filter/ball.c:132
+#: modules/video_filter/colorthres.c:64 modules/video_filter/marq.c:63
+#: modules/video_filter/rss.c:75
 msgid "Blue"
 msgstr "Biru"
 
@@ -9858,7 +10216,8 @@ msgid "MP3 fixed point audio encoder"
 msgstr "\"%s\" tiada enkoder audio."
 
 #: modules/codec/speex.c:57 modules/codec/speex.c:800
-#: modules/gui/macosx/open.m:209
+#: modules/gui/macosx/open.m:209 modules/gui/qt4/ui/sprefs_video.h:324
+#: modules/gui/qt4/ui/video_effects.h:1149
 msgid "Mode"
 msgstr "Mod"
 
@@ -11102,6 +11461,7 @@ msgid "Quiet mode."
 msgstr "Mod senyap."
 
 #: modules/codec/x264.c:371 modules/gui/macosx/playlistinfo.m:82
+#: modules/gui/qt4/ui/streampanel.h:171
 msgid "Statistics"
 msgstr "Statistik"
 
@@ -13353,8 +13713,8 @@ msgid ""
 msgstr ""
 "Nilai ketelusan logo (dari 0 untuk telus penuh hingga 255 untuk legap penuh)."
 
-#: modules/gui/fbosd.c:118 modules/misc/logger.c:112
-#: modules/video_filter/marq.c:87
+#: modules/gui/fbosd.c:118 modules/gui/qt4/ui/video_effects.h:1168
+#: modules/misc/logger.c:112 modules/video_filter/marq.c:87
 msgid "Text"
 msgstr "Teks"
 
@@ -13362,8 +13722,9 @@ msgstr "Teks"
 msgid "Text to display on the overlay framebuffer."
 msgstr ""
 
-#: modules/gui/fbosd.c:121 modules/video_filter/erase.c:57
-#: modules/video_filter/logo.c:58 modules/video_filter/osdmenu.c:51
+#: modules/gui/fbosd.c:121 modules/video_filter/audiobargraph_v.c:51
+#: modules/video_filter/erase.c:57 modules/video_filter/logo.c:58
+#: modules/video_filter/osdmenu.c:51
 msgid "X coordinate"
 msgstr "Koordinat X"
 
@@ -13372,8 +13733,9 @@ msgstr "Koordinat X"
 msgid "X coordinate of the rendered image"
 msgstr "Kordinat X sarikata diterjemahkan"
 
-#: modules/gui/fbosd.c:124 modules/video_filter/erase.c:59
-#: modules/video_filter/logo.c:61 modules/video_filter/osdmenu.c:54
+#: modules/gui/fbosd.c:124 modules/video_filter/audiobargraph_v.c:53
+#: modules/video_filter/erase.c:59 modules/video_filter/logo.c:61
+#: modules/video_filter/osdmenu.c:54
 msgid "Y coordinate"
 msgstr "Koordinat Y"
 
@@ -13461,9 +13823,10 @@ msgid ""
 msgstr ""
 
 #: modules/gui/fbosd.c:203 modules/gui/macosx/simple_prefs.m:283
-#: modules/misc/freetype.c:92 modules/misc/notify/xosd.c:80
-#: modules/misc/quartztext.c:80 modules/misc/win32text.c:58
-#: modules/video_filter/marq.c:164 modules/video_filter/rss.c:207
+#: modules/gui/qt4/ui/sprefs_subtitles.h:211 modules/misc/freetype.c:92
+#: modules/misc/notify/xosd.c:80 modules/misc/quartztext.c:80
+#: modules/misc/win32text.c:58 modules/video_filter/marq.c:164
+#: modules/video_filter/rss.c:207
 msgid "Font"
 msgstr "Font"
 
@@ -13475,6 +13838,11 @@ msgstr "Arahan"
 #, fuzzy
 msgid "GNU/Linux osd/overlay framebuffer interface"
 msgstr "Video output penimbal-bingkai konsol GNU/Linux "
+
+#: modules/gui/hildon/maemo.c:62
+#, fuzzy
+msgid "Maemo hildon interface"
+msgstr "Bahasa Antaramuka Pengguna"
 
 #: modules/gui/macosx/about.m:86 modules/gui/macosx/intf.m:616
 msgid "About VLC media player"
@@ -13509,13 +13877,15 @@ msgid "Bookmarks"
 msgstr "Tanda Buku"
 
 #: modules/gui/macosx/bookmarks.m:88
+#: modules/gui/qt4/ui/podcast_configuration.h:104
+#: modules/gui/qt4/ui/sout.h:331 modules/gui/qt4/ui/vlm.h:300
 msgid "Add"
 msgstr "Tambah"
 
 #: modules/gui/macosx/bookmarks.m:89 modules/gui/macosx/intf.m:642
 #: modules/gui/macosx/simple_prefs.m:246
 #: modules/gui/qt4/components/preferences_widgets.cpp:1199
-#: modules/gui/qt4/dialogs/bookmarks.cpp:47
+#: modules/gui/qt4/dialogs/bookmarks.cpp:47 modules/gui/qt4/ui/vlm.h:301
 msgid "Clear"
 msgstr "Kosongkan"
 
@@ -13528,7 +13898,7 @@ msgstr "Edit"
 msgid "Extract"
 msgstr "Ekstrak"
 
-#: modules/gui/macosx/bookmarks.m:92
+#: modules/gui/macosx/bookmarks.m:92 modules/gui/qt4/ui/open_file.h:224
 msgid "Remove"
 msgstr "Buang"
 
@@ -13700,7 +14070,7 @@ msgstr "Gulung"
 msgid "Fast Forward"
 msgstr "Maju Pantas"
 
-#: modules/gui/macosx/equalizer.m:146
+#: modules/gui/macosx/equalizer.m:146 modules/gui/qt4/ui/equalizer.h:128
 msgid "2 Pass"
 msgstr "2 Lepas"
 
@@ -13715,7 +14085,7 @@ msgstr ""
 "Hidupkan penyama. Jalur boleh ditetapkan secara manual atau menggunakan "
 "praset."
 
-#: modules/gui/macosx/equalizer.m:152
+#: modules/gui/macosx/equalizer.m:152 modules/gui/qt4/ui/equalizer.h:130
 msgid "Preamp"
 msgstr "Preamp"
 
@@ -13735,13 +14105,13 @@ msgstr "Gelombang"
 msgid "Ripple"
 msgstr "Desir"
 
-#: modules/gui/macosx/extended.m:72 modules/meta_engine/id3genres.h:95
-#: modules/video_filter/psychedelic.c:55
+#: modules/gui/macosx/extended.m:72 modules/gui/qt4/ui/video_effects.h:1143
+#: modules/meta_engine/id3genres.h:95 modules/video_filter/psychedelic.c:55
 msgid "Psychedelic"
 msgstr "Psychedelic"
 
-#: modules/gui/macosx/extended.m:73 modules/video_filter/gradient.c:76
-#: modules/video_filter/gradient.c:82
+#: modules/gui/macosx/extended.m:73 modules/gui/qt4/ui/video_effects.h:1148
+#: modules/video_filter/gradient.c:76 modules/video_filter/gradient.c:82
 msgid "Gradient"
 msgstr "Kecuraman"
 
@@ -13773,7 +14143,7 @@ msgstr "Cantas imej"
 msgid "Crops a defined part of the image"
 msgstr "Cantas bahagian imej yang ditakrifkan"
 
-#: modules/gui/macosx/extended.m:83
+#: modules/gui/macosx/extended.m:83 modules/gui/qt4/ui/video_effects.h:1134
 msgid "Invert colors"
 msgstr "Balikan warna"
 
@@ -14302,6 +14672,10 @@ msgstr "Tangkap"
 #: modules/gui/qt4/components/preferences_widgets.cpp:299
 #: modules/gui/qt4/components/simple_preferences.cpp:276
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:102
+#: modules/gui/qt4/ui/open.h:246 modules/gui/qt4/ui/open_disk.h:300
+#: modules/gui/qt4/ui/open_file.h:232 modules/gui/qt4/ui/sprefs_audio.h:412
+#: modules/gui/qt4/ui/sprefs_input.h:308 modules/gui/qt4/ui/sprefs_input.h:317
+#: modules/gui/qt4/ui/sprefs_video.h:326
 msgid "Browse..."
 msgstr "Lungsur..."
 
@@ -14315,6 +14689,7 @@ msgstr ""
 
 #: modules/gui/macosx/open.m:186 modules/gui/macosx/simple_prefs.m:280
 #: modules/gui/macosx/wizard.m:346 modules/gui/macosx/wizard.m:414
+#: modules/gui/qt4/ui/sprefs_interface.h:394
 msgid "Choose..."
 msgstr "Pilih..."
 
@@ -14323,7 +14698,7 @@ msgstr "Pilih..."
 msgid "Device name"
 msgstr "Nama peranti"
 
-#: modules/gui/macosx/open.m:193
+#: modules/gui/macosx/open.m:193 modules/gui/qt4/ui/open_disk.h:298
 msgid "No DVD menus"
 msgstr "Tiada menu DVD"
 
@@ -14332,7 +14707,7 @@ msgid "VIDEO_TS folder"
 msgstr "VIDEO_TS folder"
 
 #: modules/gui/macosx/open.m:196 modules/gui/macosx/open.m:739
-#: modules/services_discovery/udev.c:587
+#: modules/gui/qt4/ui/open_disk.h:292 modules/services_discovery/udev.c:587
 msgid "DVD"
 msgstr "DVD"
 
@@ -14468,7 +14843,7 @@ msgstr "FPS"
 msgid "Subtitles encoding"
 msgstr "Pengenkodan sarikata"
 
-#: modules/gui/macosx/open.m:316
+#: modules/gui/macosx/open.m:316 modules/gui/qt4/ui/sprefs_subtitles.h:210
 msgid "Font size"
 msgstr "Saiz Font"
 
@@ -14485,7 +14860,7 @@ msgid "Subtitle File"
 msgstr "Fail Sarikata:"
 
 #: modules/gui/macosx/open.m:587 modules/gui/macosx/open.m:953
-#: modules/gui/macosx/open.m:1189
+#: modules/gui/macosx/open.m:1189 modules/gui/qt4/ui/open_file.h:217
 msgid "Open File"
 msgstr "Buka Fail"
 
@@ -14548,7 +14923,7 @@ msgstr "Singkir input mentah"
 msgid "Encapsulation Method"
 msgstr "Metod Pengurungan"
 
-#: modules/gui/macosx/output.m:159
+#: modules/gui/macosx/output.m:159 modules/gui/qt4/ui/sout.h:335
 msgid "Transcoding options"
 msgstr "Pilihan transkod"
 
@@ -14557,7 +14932,7 @@ msgstr "Pilihan transkod"
 msgid "Bitrate (kb/s)"
 msgstr "Kadar bit (kb/s)"
 
-#: modules/gui/macosx/output.m:166
+#: modules/gui/macosx/output.m:166 modules/gui/qt4/ui/profiles.h:478
 msgid "Scale"
 msgstr "Skala"
 
@@ -14565,7 +14940,7 @@ msgstr "Skala"
 msgid "Stream Announcing"
 msgstr "Pemberitahuan Strim"
 
-#: modules/gui/macosx/output.m:181
+#: modules/gui/macosx/output.m:181 modules/gui/qt4/ui/sout.h:342
 msgid "SAP announce"
 msgstr "Pengumuman SAP"
 
@@ -14596,6 +14971,7 @@ msgstr "Simpan Fail"
 #: modules/gui/macosx/output.m:526 modules/gui/macosx/playlist.m:745
 #: modules/gui/macosx/prefs.m:203 modules/gui/macosx/simple_prefs.m:310
 #: modules/gui/qt4/components/sout/profile_selector.cpp:250
+#: modules/gui/qt4/ui/vlm.h:302
 msgid "Save"
 msgstr "Simpan"
 
@@ -14616,6 +14992,8 @@ msgid "Save Playlist..."
 msgstr "Simpan Senarai Tayang..."
 
 #: modules/gui/macosx/playlist.m:465 modules/gui/qt4/dialogs/bookmarks.cpp:45
+#: modules/gui/qt4/ui/podcast_configuration.h:105
+#: modules/gui/qt4/ui/streampanel.h:173
 msgid "Delete"
 msgstr "Padam"
 
@@ -14805,6 +15183,7 @@ msgid "Reset All"
 msgstr "Reset Semua"
 
 #: modules/gui/macosx/prefs.m:206 modules/gui/macosx/simple_prefs.m:306
+#: modules/gui/qt4/ui/video_effects.h:1111
 msgid "Basic"
 msgstr "Asas"
 
@@ -14873,7 +15252,7 @@ msgstr "Input / Kodek"
 msgid "Input & Codec settings"
 msgstr "Tetapan Carian Sistem"
 
-#: modules/gui/macosx/simple_prefs.m:228
+#: modules/gui/macosx/simple_prefs.m:228 modules/gui/qt4/ui/sprefs_audio.h:414
 msgid "Effects"
 msgstr "Kesan"
 
@@ -14887,7 +15266,7 @@ msgstr "Benarkan audio"
 msgid "General Audio"
 msgstr "Tetapan audio am"
 
-#: modules/gui/macosx/simple_prefs.m:231
+#: modules/gui/macosx/simple_prefs.m:231 modules/gui/qt4/ui/sprefs_audio.h:419
 #, fuzzy
 msgid "Headphone surround effect"
 msgstr "Kesan renggang maya fon kepala"
@@ -14947,7 +15326,7 @@ msgstr "Senaraikan fail pakej"
 msgid "Default Caching Level"
 msgstr "Paras kepayahan lalai"
 
-#: modules/gui/macosx/simple_prefs.m:254
+#: modules/gui/macosx/simple_prefs.m:254 modules/gui/qt4/ui/open.h:235
 msgid "Caching"
 msgstr "Caching"
 
@@ -14998,6 +15377,7 @@ msgid "Show Fullscreen Controller"
 msgstr "Output video skrin penuh"
 
 #: modules/gui/macosx/simple_prefs.m:270
+#: modules/gui/qt4/ui/sprefs_interface.h:376
 #, fuzzy
 msgid "Privacy / Network Interaction"
 msgstr "Interaksi rangkaian gagal"
@@ -15017,6 +15397,7 @@ msgid "Default Encoding"
 msgstr "Pengenkodan default"
 
 #: modules/gui/macosx/simple_prefs.m:279
+#: modules/gui/qt4/ui/sprefs_subtitles.h:207
 #, fuzzy
 msgid "Display Settings"
 msgstr "Tetapan Penapis"
@@ -15049,8 +15430,8 @@ msgstr "Sarikata/OSD"
 msgid "Black screens in Fullscreen mode"
 msgstr "Mula video mod skrin penuh"
 
-#: modules/gui/macosx/simple_prefs.m:292 modules/stream_out/display.c:54
-#: modules/video_filter/deinterlace.c:138
+#: modules/gui/macosx/simple_prefs.m:292 modules/gui/qt4/ui/sprefs_video.h:310
+#: modules/stream_out/display.c:54 modules/video_filter/deinterlace.c:138
 msgid "Display"
 msgstr "Paparan"
 
@@ -15064,7 +15445,7 @@ msgstr "Benarkan video"
 msgid "Output module"
 msgstr "Modul output audio"
 
-#: modules/gui/macosx/simple_prefs.m:298
+#: modules/gui/macosx/simple_prefs.m:298 modules/gui/qt4/ui/sprefs_video.h:325
 #, fuzzy
 msgid "Video snapshots"
 msgstr "Video - Noatun"
@@ -15073,15 +15454,15 @@ msgstr "Video - Noatun"
 msgid "Folder"
 msgstr "Folder"
 
-#: modules/gui/macosx/simple_prefs.m:301
+#: modules/gui/macosx/simple_prefs.m:301 modules/gui/qt4/ui/sprefs_video.h:330
 msgid "Format"
 msgstr "Format "
 
-#: modules/gui/macosx/simple_prefs.m:302
+#: modules/gui/macosx/simple_prefs.m:302 modules/gui/qt4/ui/sprefs_video.h:328
 msgid "Prefix"
 msgstr "Awalan "
 
-#: modules/gui/macosx/simple_prefs.m:303
+#: modules/gui/macosx/simple_prefs.m:303 modules/gui/qt4/ui/sprefs_video.h:331
 #, fuzzy
 msgid "Sequential numbering"
 msgstr "Jenis per&nomboran:"
@@ -15574,6 +15955,7 @@ msgid "In this page, a few additional streaming parameters can be set."
 msgstr "Pada laman ini, parameter strim tambahan kecil boleh ditetapkan."
 
 #: modules/gui/macosx/wizard.m:401 modules/gui/macosx/wizard.m:1866
+#: modules/gui/qt4/ui/sout.h:344
 msgid "Time-To-Live (TTL)"
 msgstr "Masa-Untuk-Hidup (TTL)"
 
@@ -15816,11 +16198,6 @@ msgid ""
 "Don't display dialogs that don't require user action (Critical and error "
 "panel)."
 msgstr ""
-
-#: modules/gui/hildon/maemo.c:62
-#, fuzzy
-msgid "Maemo hildon interface"
-msgstr "Bahasa Antaramuka Pengguna"
 
 #: modules/gui/minimal_macosx/macosx.c:58
 #, fuzzy
@@ -16567,6 +16944,7 @@ msgid "File names:"
 msgstr "Carian fail"
 
 #: modules/gui/qt4/components/open_panels.cpp:149
+#: modules/gui/qt4/ui/sprefs_interface.h:382
 msgid "Filter:"
 msgstr "Tapis:"
 
@@ -16918,6 +17296,7 @@ msgid "File/Folder"
 msgstr "Folder"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:46
+#: modules/gui/qt4/ui/sout.h:328
 msgid "Source"
 msgstr "Sumber"
 
@@ -17037,6 +17416,7 @@ msgid "Convert"
 msgstr "Tukar"
 
 #: modules/gui/qt4/dialogs/convert.cpp:58
+#: modules/gui/qt4/ui/sprefs_audio.h:411
 #, fuzzy
 msgid "Destination file:"
 msgstr "Buat sandaran fail destinasi"
@@ -17451,7 +17831,7 @@ msgstr ""
 "Ini akan mengulang tetap keutamaan pemain media VLC.\n"
 "Anda pasti untuk meneruskannya?"
 
-#: modules/gui/qt4/dialogs/sout.cpp:42
+#: modules/gui/qt4/dialogs/sout.cpp:42 modules/gui/qt4/ui/sout.h:326
 #, fuzzy
 msgid "Stream Output"
 msgstr "Output strim"
@@ -17558,7 +17938,7 @@ msgstr "Tentang Modul Semasa"
 msgid "Cl&ose"
 msgstr "&Tutup"
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:217
+#: modules/gui/qt4/dialogs/toolbar.cpp:217 modules/gui/qt4/ui/profiles.h:455
 #, fuzzy
 msgid "Profile Name"
 msgstr "Name=Keep"
@@ -17634,6 +18014,7 @@ msgid "Repeat delay:"
 msgstr "Lengahan Ulangan:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:112
+#: modules/gui/qt4/ui/sprefs_interface.h:379
 msgid " days"
 msgstr "hari"
 
@@ -17728,12 +18109,12 @@ msgstr "Fail Sarikata"
 msgid "All Files"
 msgstr "Semua Fail"
 
-#: modules/gui/qt4/main_interface.cpp:934
+#: modules/gui/qt4/main_interface.cpp:914
 #, fuzzy
 msgid "Control menu for the player"
 msgstr "Fail konfigurasi untuk Menu OSD"
 
-#: modules/gui/qt4/main_interface.cpp:977
+#: modules/gui/qt4/main_interface.cpp:957
 msgid "Paused"
 msgstr "Henti sebentar"
 
@@ -18238,6 +18619,982 @@ msgstr ""
 msgid "Qt interface"
 msgstr "Antaramuka Qt"
 
+#: modules/gui/qt4/ui/equalizer.h:126 modules/gui/qt4/ui/open_disk.h:290
+#: modules/gui/qt4/ui/open_net.h:83 modules/gui/qt4/ui/profiles.h:454
+#: modules/gui/qt4/ui/sprefs_audio.h:403 modules/gui/qt4/ui/sprefs_input.h:305
+#: modules/gui/qt4/ui/sprefs_interface.h:372
+#: modules/gui/qt4/ui/sprefs_subtitles.h:200
+#: modules/gui/qt4/ui/sprefs_video.h:308 modules/gui/qt4/ui/streampanel.h:168
+#: modules/gui/qt4/ui/v4l2.h:58
+msgid "Form"
+msgstr "Bentuk "
+
+#: modules/gui/qt4/ui/equalizer.h:129
+msgid "Preset"
+msgstr "Praset"
+
+#: modules/gui/qt4/ui/open.h:230
+#: modules/gui/qt4/ui/podcast_configuration.h:101
+msgid "Dialog"
+msgstr "Dialog"
+
+#: modules/gui/qt4/ui/open.h:232
+msgid "Show extended options"
+msgstr "Tunjuk pilihan lanjutan "
+
+#: modules/gui/qt4/ui/open.h:234
+msgid "Show &more options"
+msgstr "Tunjuk lagi pilihan"
+
+#: modules/gui/qt4/ui/open.h:237
+msgid "Change the caching for the media"
+msgstr "Tukar nilai caching media"
+
+#: modules/gui/qt4/ui/open.h:239
+msgid " ms"
+msgstr " ms"
+
+#: modules/gui/qt4/ui/open.h:240
+msgid "Start Time"
+msgstr "Masa Mula"
+
+#: modules/gui/qt4/ui/open.h:241
+msgid "Play another media synchronously (extra audio file, ...)"
+msgstr ""
+
+#: modules/gui/qt4/ui/open.h:242
+msgid "Extra media"
+msgstr "Media Tambahan"
+
+#: modules/gui/qt4/ui/open.h:244
+msgid "Select the file"
+msgstr "Pilih fail "
+
+#: modules/gui/qt4/ui/open.h:247
+msgid "MRL"
+msgstr "MRL"
+
+#: modules/gui/qt4/ui/open.h:249
+msgid "Complete MRL for VLC internal"
+msgstr ""
+
+#: modules/gui/qt4/ui/open.h:251
+msgid "Edit Options"
+msgstr "Edit Opsyen"
+
+#: modules/gui/qt4/ui/open.h:253
+msgid "Change the start time for the media"
+msgstr "Tukar masa mula media"
+
+#: modules/gui/qt4/ui/open.h:255
+#, fuzzy
+msgid "s"
+msgstr " s"
+
+#: modules/gui/qt4/ui/open_capture.h:98
+msgid "Capture mode"
+msgstr "Mod Cekupan"
+
+#: modules/gui/qt4/ui/open_capture.h:100
+msgid "Select the capture device type"
+msgstr "Pilih jenis peranti cekupan"
+
+#: modules/gui/qt4/ui/open_capture.h:102
+msgid "Device Selection"
+msgstr "Pemilihan Peranti"
+
+#: modules/gui/qt4/ui/open_capture.h:103 modules/gui/qt4/ui/sout.h:347
+msgid "Options"
+msgstr "Pilihan"
+
+#: modules/gui/qt4/ui/open_capture.h:105
+msgid "Access advanced options to tweak the device"
+msgstr ""
+
+#: modules/gui/qt4/ui/open_capture.h:107
+msgid "Advanced options..."
+msgstr "Pilihan lanjutan..."
+
+#: modules/gui/qt4/ui/open_disk.h:291
+msgid "Disc Selection"
+msgstr "Pemilihan Cakera"
+
+#: modules/gui/qt4/ui/open_disk.h:294
+msgid "SVCD/VCD"
+msgstr "SVCD/VCD"
+
+#: modules/gui/qt4/ui/open_disk.h:296
+msgid "Disable DVD Menus (for compatibility)"
+msgstr ""
+
+#: modules/gui/qt4/ui/open_disk.h:299
+msgid "Disc device"
+msgstr "Peranti Cakera"
+
+#: modules/gui/qt4/ui/open_disk.h:301
+msgid "Starting Position"
+msgstr "Posisi Permulaan"
+
+#: modules/gui/qt4/ui/open_disk.h:304
+msgid "Audio and Subtitles"
+msgstr "Audio dan Sarikata"
+
+#: modules/gui/qt4/ui/open_file.h:219
+msgid "Choose one or more media file to open"
+msgstr "Plih satu atau lebih fail media untuk dibuka"
+
+#: modules/gui/qt4/ui/open_file.h:221
+msgid "File Selection"
+msgstr "Pemilihan Fail"
+
+#: modules/gui/qt4/ui/open_file.h:222
+msgid "You can select local files with the following list and buttons."
+msgstr ""
+
+#: modules/gui/qt4/ui/open_file.h:223
+msgid "Add..."
+msgstr "Tambah..."
+
+#: modules/gui/qt4/ui/open_file.h:226
+msgid "Add a subtitles file"
+msgstr "Tambah fail sarikata"
+
+#: modules/gui/qt4/ui/open_file.h:228
+msgid "Use a sub&titles file"
+msgstr "Guna fail sarikata"
+
+#: modules/gui/qt4/ui/open_file.h:230
+msgid "Select the subtitles file"
+msgstr "Pilih fail sarikata"
+
+#: modules/gui/qt4/ui/open_file.h:233
+#, fuzzy
+msgid "Font size:"
+msgstr "Saiz Font"
+
+#: modules/gui/qt4/ui/open_file.h:234
+#, fuzzy
+msgid "Text alignment:"
+msgstr "Jajaran tengah"
+
+#: modules/gui/qt4/ui/open_net.h:84
+msgid "Network Protocol"
+msgstr "Protokol Rangkaian"
+
+#: modules/gui/qt4/ui/open_net.h:87
+#, fuzzy
+msgid "Enter the URL of the network stream here."
+msgstr "Masukkan alamat komputer untuk strim kepadanya."
+
+#: modules/gui/qt4/ui/podcast_configuration.h:102
+#: modules/services_discovery/podcast.c:58
+msgid "Podcast URLs list"
+msgstr "Senarai URL Podcast"
+
+#: modules/gui/qt4/ui/profiles.h:456
+msgid "MPEG-TS"
+msgstr "MPEG-TS"
+
+#: modules/gui/qt4/ui/profiles.h:457
+msgid "MPEG-PS"
+msgstr "MPEG-PS"
+
+#: modules/gui/qt4/ui/profiles.h:458
+msgid "WAV"
+msgstr "WAV"
+
+#: modules/gui/qt4/ui/profiles.h:459
+msgid "ASF/WMV"
+msgstr "ASF/WMV"
+
+#: modules/gui/qt4/ui/profiles.h:460
+msgid "Ogg/Ogm"
+msgstr "Ogg/Ogm"
+
+#: modules/gui/qt4/ui/profiles.h:461
+msgid "RAW"
+msgstr "RAW"
+
+#: modules/gui/qt4/ui/profiles.h:462
+msgid "MPEG 1"
+msgstr "MPEG 1"
+
+#: modules/gui/qt4/ui/profiles.h:463
+msgid "FLV"
+msgstr "FLV"
+
+#: modules/gui/qt4/ui/profiles.h:464
+msgid "AVI"
+msgstr "AVI"
+
+#: modules/gui/qt4/ui/profiles.h:465
+msgid "MP4/MOV"
+msgstr "MP4/MOV"
+
+#: modules/gui/qt4/ui/profiles.h:467
+msgid "MKV"
+msgstr "MKV"
+
+#: modules/gui/qt4/ui/profiles.h:468
+msgid "Encapsulation"
+msgstr "Persampulan"
+
+#: modules/gui/qt4/ui/profiles.h:472 modules/gui/qt4/ui/profiles.h:491
+msgid " kb/s"
+msgstr " kb/s"
+
+#: modules/gui/qt4/ui/profiles.h:473
+msgid "Frame Rate"
+msgstr "Kadar Kerangka"
+
+#: modules/gui/qt4/ui/profiles.h:475
+#, fuzzy
+msgid " fps"
+msgstr " fps"
+
+#: modules/gui/qt4/ui/profiles.h:477
+msgid ""
+"You just need to fill one of the three following parameters, VLC will "
+"autodetect the other using the original aspect ratio"
+msgstr ""
+
+#: modules/gui/qt4/ui/profiles.h:480 modules/gui/qt4/ui/profiles.h:483
+msgid "00000; "
+msgstr "00000; "
+
+#: modules/gui/qt4/ui/profiles.h:485
+msgid "Keep original video track"
+msgstr "Kekalkan trek video asal"
+
+#: modules/gui/qt4/ui/profiles.h:486
+msgid "Video codec"
+msgstr "Kodek video"
+
+#: modules/gui/qt4/ui/profiles.h:488
+msgid "Keep original audio track"
+msgstr "Kekalkan trek audio asal"
+
+#: modules/gui/qt4/ui/profiles.h:493
+#, fuzzy
+msgid "Sample Rate"
+msgstr "Kadar pensampelan"
+
+#: modules/gui/qt4/ui/profiles.h:494
+msgid "Audio codec"
+msgstr "Kodek audio"
+
+#: modules/gui/qt4/ui/profiles.h:496
+#, fuzzy
+msgid "Overlay subtitles on the video"
+msgstr "Lappisan/Sarikata"
+
+#: modules/gui/qt4/ui/sout.h:329 modules/gui/qt4/ui/sout.h:339
+msgid "Destinations"
+msgstr "Destinasi"
+
+#: modules/gui/qt4/ui/sout.h:330
+msgid "New destination"
+msgstr "Destinasi baru"
+
+#: modules/gui/qt4/ui/sout.h:332
+msgid ""
+"Add destinations following the streaming methods you need. Be sure to check "
+"with transcoding that the format is compatible with the method used."
+msgstr ""
+
+#: modules/gui/qt4/ui/sout.h:333
+msgid "Display locally"
+msgstr "Papar secara lokal"
+
+#: modules/gui/qt4/ui/sout.h:336
+#, fuzzy
+msgid "Activate Transcoding"
+msgstr "Pilihan transkod"
+
+#: modules/gui/qt4/ui/sout.h:340
+#, fuzzy
+msgid "Miscellaneous Options"
+msgstr "Opsyen Umum"
+
+#: modules/gui/qt4/ui/sout.h:341
+#, fuzzy
+msgid "Stream all elementary streams"
+msgstr "Pilih keseluruhan asas strim"
+
+#: modules/gui/qt4/ui/sout.h:343
+msgid "Group name"
+msgstr "Nama kumpulan"
+
+#: modules/gui/qt4/ui/sout.h:345
+#, fuzzy
+msgid "Generated stream output string"
+msgstr "Tetapan output strim am"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:406
+msgid "Keep audio level between sessions"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_audio.h:407
+msgid "Always reset audio start level to:"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_audio.h:408
+msgid " %"
+msgstr " %"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:409 modules/gui/qt4/ui/sprefs_video.h:313
+msgid "Output"
+msgstr "Keluaran"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:410
+#, fuzzy
+msgid "Output module:"
+msgstr "Modul output audio"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:415
+#, fuzzy
+msgid "Dolby Surround:"
+msgstr "Dolby Surround"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:416
+msgid "Normalize volume to:"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_audio.h:417
+#, fuzzy
+msgid "Replay gain mode:"
+msgstr "Mod gandaan ulang tayang"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:418
+#, fuzzy
+msgid "Visualization:"
+msgstr "Visualisasi"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:420
+#, fuzzy
+msgid "Enable Time-Stretching audio"
+msgstr "Bolehkan audio regangan masa"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:422
+#, fuzzy
+msgid "Preferred audio language:"
+msgstr "Muat turun sokongan bahasa?"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:423
+msgid "Password:"
+msgstr "Katalaluan:"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:424
+#, fuzzy
+msgid "Username:"
+msgstr "Namapengguna"
+
+#: modules/gui/qt4/ui/sprefs_audio.h:425
+msgid "Submit played tracks stats to Last.fm"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_input.h:306
+msgid "Optical drive"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_input.h:307
+#, fuzzy
+msgid "Default optical device"
+msgstr "Nama peranti jauh"
+
+#: modules/gui/qt4/ui/sprefs_input.h:309
+#, fuzzy
+msgid "Codecs"
+msgstr "Kodek"
+
+#: modules/gui/qt4/ui/sprefs_input.h:310
+#, fuzzy
+msgid "Skip H.264 in-loop deblocking filter"
+msgstr "Penapis langkau gelung"
+
+#: modules/gui/qt4/ui/sprefs_input.h:311
+#, fuzzy
+msgid "Video quality post-processing level"
+msgstr "Rantai penapis pasca memproses FFmpeg"
+
+#: modules/gui/qt4/ui/sprefs_input.h:312
+msgid "Use GPU acceleration (experimental)"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_input.h:313
+msgid "Use system codecs if available (better quality, but dangerous)"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_input.h:314 modules/stream_out/switcher.c:90
+msgid "Files"
+msgstr "Fail"
+
+#: modules/gui/qt4/ui/sprefs_input.h:315
+#, fuzzy
+msgid "Damaged or incomplete AVI file"
+msgstr "Penapis hakmilik imej"
+
+#: modules/gui/qt4/ui/sprefs_input.h:319
+#, fuzzy
+msgid "Default port (server mode)"
+msgstr "Port pelayan CDDB"
+
+#: modules/gui/qt4/ui/sprefs_input.h:320
+#, fuzzy
+msgid "HTTP proxy URL"
+msgstr "Proksi HTTP"
+
+#: modules/gui/qt4/ui/sprefs_input.h:321
+#, fuzzy
+msgid "Default caching policy"
+msgstr "Paras kepayahan lalai"
+
+#: modules/gui/qt4/ui/sprefs_input.h:322
+#, fuzzy
+msgid "HTTP (default)"
+msgstr "lalai"
+
+#: modules/gui/qt4/ui/sprefs_input.h:323
+#, fuzzy
+msgid "RTP over RTSP (TCP)"
+msgstr "Guna RTP atas RTSP (TCP)"
+
+#: modules/gui/qt4/ui/sprefs_input.h:324
+#, fuzzy
+msgid "Live555 stream transport"
+msgstr "Port UDP"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:373
+msgid "Instances"
+msgstr "Misalan"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:374
+#, fuzzy
+msgid "Allow only one instance"
+msgstr "Benarkan hanya satu &contoh Noatun"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:375
+#, fuzzy
+msgid "Enqueue files when in one instance mode"
+msgstr "Bariskan item kepada senarai tayang apabila mod satu misalan"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:377
+#, fuzzy
+msgid "Album art download policy:"
+msgstr "Polisi seni album"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:378
+#, fuzzy
+msgid "Activate update notifier"
+msgstr "Pengurus Kemaskini Ubuntu"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:380
+#, fuzzy
+msgid "Every "
+msgstr "Lapisan"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:381
+#, fuzzy
+msgid "Save recently played items"
+msgstr "simpan pilihan baris perintah semasadalam konfig"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:384
+msgid "Separate words by | (without space)"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_interface.h:387
+#, fuzzy
+msgid "Menus language:"
+msgstr "Bahasa audio"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:388
+#, fuzzy
+msgid "File associations"
+msgstr "Carian fail"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:389
+#, fuzzy
+msgid "Set up associations..."
+msgstr "Carian fail"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:390
+msgid "Look and feel"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_interface.h:391
+#, fuzzy
+msgid "Use custom skin"
+msgstr "Pilih kulit"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:393
+#, fuzzy
+msgid "Skin resource file:"
+msgstr "Fail kulit"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:395
+#, fuzzy
+msgid "Resize interface to video size"
+msgstr "Kecilkan VLC untuk padankan pada resulusi video."
+
+#: modules/gui/qt4/ui/sprefs_interface.h:396
+#, fuzzy
+msgid "Force window style:"
+msgstr "Ubah gaya gelung"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:397
+#, fuzzy
+msgid "Show systray icon"
+msgstr "Systray icon"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:398
+msgid "Embed video in interface"
+msgstr "Antaramuka video terbenam"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:399
+msgid " Systray popup when minimized"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_interface.h:400
+#, fuzzy
+msgid "Show controls in full screen mode"
+msgstr "Mula video mod skrin penuh"
+
+#: modules/gui/qt4/ui/sprefs_interface.h:401
+msgid "Minimal view mode (no toolbars)"
+msgstr ""
+
+#: modules/gui/qt4/ui/sprefs_interface.h:403
+#, fuzzy
+msgid "This is VLC's default interface, with a native look and feel."
+msgstr "Guna antaramuka minima, tanpa bar alatan dan menu yang kurang."
+
+#: modules/gui/qt4/ui/sprefs_interface.h:405
+#, fuzzy
+msgid "Use native style"
+msgstr "Guna fail sarikata"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:202
+#, fuzzy
+msgid "Enable On Screen Display (OSD)"
+msgstr "Paparan Atas Skrin (OSD)"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:203
+#, fuzzy
+msgid "Show media title on video start"
+msgstr "Tunjuk judul media pada video"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:204
+msgid "Subtitles Language"
+msgstr "Bahasa Sarikata"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:205
+#, fuzzy
+msgid "Preferred subtitles language"
+msgstr "Muat turun sokongan bahasa?"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:206
+msgid "Default encoding"
+msgstr "Pengenkodan lalai"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:208
+msgid "Effect"
+msgstr "Kesan"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:209
+msgid "Font color"
+msgstr "Warna fon"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.h:212
+#: modules/gui/qt4/ui/video_effects.h:1113
+#: modules/gui/qt4/ui/video_effects.h:1115
+#: modules/gui/qt4/ui/video_effects.h:1117
+#: modules/gui/qt4/ui/video_effects.h:1119
+msgid " px"
+msgstr " px"
+
+#: modules/gui/qt4/ui/sprefs_video.h:314
+#, fuzzy
+msgid "Accelerated video output (Overlay)"
+msgstr "Benarkan output strim video"
+
+#: modules/gui/qt4/ui/sprefs_video.h:317 modules/video_output/msw/directx.c:64
+msgid "Use hardware YUV->RGB conversions"
+msgstr "Guna pertukaran perkakasan YUV->RGB"
+
+#: modules/gui/qt4/ui/sprefs_video.h:318
+msgid "DirectX"
+msgstr "DirectX"
+
+#: modules/gui/qt4/ui/sprefs_video.h:319
+msgid "Display device"
+msgstr "Peranti paparan"
+
+#: modules/gui/qt4/ui/sprefs_video.h:320
+msgid "Enable wallpaper mode"
+msgstr "Bolehkan mod kertas dinding"
+
+#: modules/gui/qt4/ui/sprefs_video.h:322
+#, fuzzy
+msgid "Deinterlacing"
+msgstr "Mod Deinterlace"
+
+#: modules/gui/qt4/ui/sprefs_video.h:323
+msgid "Force Aspect Ratio"
+msgstr "Paksa Nisbah Aspek"
+
+#: modules/gui/qt4/ui/sprefs_video.h:329
+msgid "vlc-snap"
+msgstr "vlc-snap"
+
+#: modules/gui/qt4/ui/streampanel.h:172
+msgid "Stuff"
+msgstr "Stuff"
+
+#: modules/gui/qt4/ui/streampanel.h:174
+msgid "Edit settings"
+msgstr "Edit tetapan"
+
+#: modules/gui/qt4/ui/streampanel.h:175
+msgid "Control"
+msgstr "Kawalan"
+
+#: modules/gui/qt4/ui/streampanel.h:176
+#, fuzzy
+msgid "Run manually"
+msgstr "Manual ditambah"
+
+#: modules/gui/qt4/ui/streampanel.h:177
+#, fuzzy
+msgid "Setup schedule"
+msgstr "URL Jadual"
+
+#: modules/gui/qt4/ui/streampanel.h:178
+#, fuzzy
+msgid "Run on schedule"
+msgstr "Muatturun jadual program"
+
+#: modules/gui/qt4/ui/streampanel.h:179
+msgid "Status"
+msgstr "Status"
+
+#: modules/gui/qt4/ui/streampanel.h:180
+msgid "P/P"
+msgstr "P/P"
+
+#: modules/gui/qt4/ui/streampanel.h:183
+#, fuzzy
+msgid "Prev"
+msgstr "Prev"
+
+#: modules/gui/qt4/ui/streampanel.h:184
+msgid "Add Input"
+msgstr "Tambah Input"
+
+#: modules/gui/qt4/ui/streampanel.h:185
+msgid "Edit Input"
+msgstr "Edit Input"
+
+#: modules/gui/qt4/ui/streampanel.h:186
+msgid "Clear List"
+msgstr "Lapangkan Senarai"
+
+#: modules/gui/qt4/ui/v4l2.h:59
+#, fuzzy
+msgid "Refresh"
+msgstr "Menyegarkan"
+
+#: modules/gui/qt4/ui/v4l2.h:60
+msgid "No v4l2 instance found. Press the refresh button to try again."
+msgstr ""
+
+#: modules/gui/qt4/ui/video_effects.h:1101
+#, fuzzy
+msgid "Transform"
+msgstr "jenis pengubahan"
+
+#: modules/gui/qt4/ui/video_effects.h:1102 modules/video_filter/sharpen.c:67
+msgid "Sharpen"
+msgstr "Ketajaman"
+
+#: modules/gui/qt4/ui/video_effects.h:1103
+msgid "Sigma"
+msgstr "Sigma"
+
+#: modules/gui/qt4/ui/video_effects.h:1104 modules/video_filter/adjust.c:81
+msgid "Image adjust"
+msgstr "Ubah imej"
+
+#: modules/gui/qt4/ui/video_effects.h:1110 modules/video_filter/adjust.c:64
+msgid "Brightness threshold"
+msgstr "Ambang kecerahan"
+
+#: modules/gui/qt4/ui/video_effects.h:1120
+#, fuzzy
+msgid "Synchronize top and bottom"
+msgstr "Teks kiri-ke-kanan"
+
+#: modules/gui/qt4/ui/video_effects.h:1121
+#, fuzzy
+msgid "Synchronize left and right"
+msgstr "Teks kiri-ke-kanan"
+
+#: modules/gui/qt4/ui/video_effects.h:1123
+msgid "Magnification/Zoom"
+msgstr "Pembesaran/Zum"
+
+#: modules/gui/qt4/ui/video_effects.h:1124
+#, fuzzy
+msgid "Puzzle game"
+msgstr "Nombor permainan: %1"
+
+#: modules/gui/qt4/ui/video_effects.h:1125
+msgid "Black slot"
+msgstr "Slot Hitam"
+
+#: modules/gui/qt4/ui/video_effects.h:1126
+#: modules/gui/qt4/ui/video_effects.h:1165
+#: modules/gui/qt4/ui/video_effects.h:1171
+msgid "Columns"
+msgstr "Lajur"
+
+#: modules/gui/qt4/ui/video_effects.h:1127
+#: modules/gui/qt4/ui/video_effects.h:1164
+#: modules/gui/qt4/ui/video_effects.h:1170
+msgid "Rows"
+msgstr "Baris"
+
+#: modules/gui/qt4/ui/video_effects.h:1128 modules/video_filter/rotate.c:67
+msgid "Rotate"
+msgstr "Putar"
+
+#: modules/gui/qt4/ui/video_effects.h:1129
+msgid "Angle"
+msgstr "Sudut"
+
+#: modules/gui/qt4/ui/video_effects.h:1130
+msgid "Geometry"
+msgstr "Geometri"
+
+#: modules/gui/qt4/ui/video_effects.h:1131
+msgid "Color extraction"
+msgstr "Mengekstrak warna"
+
+#: modules/gui/qt4/ui/video_effects.h:1133
+#: modules/gui/qt4/ui/video_effects.h:1139
+msgid ">HHHHHH;#"
+msgstr ">HHHHHH;#"
+
+#: modules/gui/qt4/ui/video_effects.h:1135
+#: modules/video_filter/colorthres.c:70
+msgid "Color threshold"
+msgstr "Ambang warna"
+
+#: modules/gui/qt4/ui/video_effects.h:1136
+msgid "Similarity"
+msgstr "Kesamaan"
+
+#: modules/gui/qt4/ui/video_effects.h:1140
+msgid "Color fun"
+msgstr "Warna ceria"
+
+#: modules/gui/qt4/ui/video_effects.h:1142
+msgid "Water effect"
+msgstr "Kesan air"
+
+#: modules/gui/qt4/ui/video_effects.h:1144 modules/meta_engine/id3genres.h:67
+#: modules/video_filter/noise.c:52
+msgid "Noise"
+msgstr "Noise"
+
+#: modules/gui/qt4/ui/video_effects.h:1145
+msgid "Motion detect"
+msgstr "Kesan gerak"
+
+#: modules/gui/qt4/ui/video_effects.h:1146
+#: modules/video_filter/motionblur.c:59
+msgid "Motion blur"
+msgstr "Kabur gerakan"
+
+#: modules/gui/qt4/ui/video_effects.h:1147
+msgid "Factor"
+msgstr "Faktor"
+
+#: modules/gui/qt4/ui/video_effects.h:1151
+msgid "Cartoon"
+msgstr "Kartun"
+
+#: modules/gui/qt4/ui/video_effects.h:1152
+msgid "Image modification"
+msgstr "Pengubahsuaian imej"
+
+#: modules/gui/qt4/ui/video_effects.h:1153
+#: modules/gui/qt4/ui/video_effects.h:1162
+#: modules/video_filter/atmo/atmo.cpp:361
+msgid "AtmoLight"
+msgstr "AtmoLight"
+
+#: modules/gui/qt4/ui/video_effects.h:1154
+msgid "Edge weightning"
+msgstr ""
+
+#: modules/gui/qt4/ui/video_effects.h:1155
+#, fuzzy
+msgid "Output Color Filtermode"
+msgstr "Modul penapis output video"
+
+#: modules/gui/qt4/ui/video_effects.h:1156
+#, fuzzy
+msgid "Brightness (%)"
+msgstr "Kecerahan"
+
+#: modules/gui/qt4/ui/video_effects.h:1157
+#, fuzzy
+msgid "Darknesslimit"
+msgstr "Had Kegelapan"
+
+#: modules/gui/qt4/ui/video_effects.h:1158
+msgid "Mark analyzed Pixels"
+msgstr ""
+
+#: modules/gui/qt4/ui/video_effects.h:1159
+#: modules/video_filter/atmo/atmo.cpp:268
+msgid "Filter length (ms)"
+msgstr "Panjang penapis (ms)"
+
+#: modules/gui/qt4/ui/video_effects.h:1160
+#, fuzzy
+msgid "Filter threshold (%)"
+msgstr "Penapis ambangan"
+
+#: modules/gui/qt4/ui/video_effects.h:1161
+#, fuzzy
+msgid "Filter smoothness (%)"
+msgstr "Penapis Kelancaran (dalam %)"
+
+#: modules/gui/qt4/ui/video_effects.h:1163
+msgid "Wall"
+msgstr "Dinding"
+
+#: modules/gui/qt4/ui/video_effects.h:1166
+msgid "Add text"
+msgstr "Tambah teks"
+
+#: modules/gui/qt4/ui/video_effects.h:1169 modules/video_filter/panoramix.c:79
+msgid "Panoramix"
+msgstr "Panoramiks"
+
+#: modules/gui/qt4/ui/video_effects.h:1172 modules/video_filter/clone.c:57
+msgid "Clone"
+msgstr "Klon"
+
+#: modules/gui/qt4/ui/video_effects.h:1173 modules/video_filter/clone.c:39
+msgid "Number of clones"
+msgstr "Bilangan klon"
+
+#: modules/gui/qt4/ui/video_effects.h:1174
+msgid "Vout/Overlay"
+msgstr "Lapisan/Vout"
+
+#: modules/gui/qt4/ui/video_effects.h:1175
+msgid "Add logo"
+msgstr "Tambah logo"
+
+#: modules/gui/qt4/ui/video_effects.h:1176
+#: modules/stream_out/mosaic_bridge.c:128 modules/video_filter/mosaic.c:88
+msgid "Transparency"
+msgstr "Ketelusan"
+
+#: modules/gui/qt4/ui/video_effects.h:1179
+#: modules/gui/qt4/ui/video_effects.h:1184
+msgid "Logo"
+msgstr "Logo"
+
+#: modules/gui/qt4/ui/video_effects.h:1180
+msgid "Logo erase"
+msgstr "Padam logo"
+
+#: modules/gui/qt4/ui/video_effects.h:1183
+msgid "Mask"
+msgstr "Topeng"
+
+#: modules/gui/qt4/ui/video_effects.h:1185
+#, fuzzy
+msgid "Subpicture filters"
+msgstr "Penapis Subgambar"
+
+#: modules/gui/qt4/ui/video_effects.h:1186
+msgid "Video filters"
+msgstr "Penapis video"
+
+#: modules/gui/qt4/ui/video_effects.h:1187
+msgid "Vout filters"
+msgstr "Penapis Vout"
+
+#: modules/gui/qt4/ui/video_effects.h:1188
+msgid "Reset"
+msgstr "Ulangtetap"
+
+#: modules/gui/qt4/ui/video_effects.h:1189
+msgid "Update"
+msgstr "Kemaskini"
+
+#: modules/gui/qt4/ui/video_effects.h:1190
+msgid "Advanced video filter controls"
+msgstr "Kawalan penapis video lanjutan"
+
+#: modules/gui/qt4/ui/vlm.h:287
+msgid "VLM configurator"
+msgstr "Pengkonfigurasi VLM"
+
+#: modules/gui/qt4/ui/vlm.h:288
+#, fuzzy
+msgid "Media Manager Edition"
+msgstr "Pengurus Kemaskini Ubuntu"
+
+#: modules/gui/qt4/ui/vlm.h:289
+msgid "Name:"
+msgstr "Nama: "
+
+#: modules/gui/qt4/ui/vlm.h:291
+msgid "Input:"
+msgstr "Input:"
+
+#: modules/gui/qt4/ui/vlm.h:292
+msgid "Select Input"
+msgstr "Pilih input"
+
+#: modules/gui/qt4/ui/vlm.h:293
+msgid "Output:"
+msgstr "Output:"
+
+#: modules/gui/qt4/ui/vlm.h:294
+msgid "Select Output"
+msgstr "Pilih output"
+
+#: modules/gui/qt4/ui/vlm.h:295
+msgid "Time Control"
+msgstr "Kawalan Masa"
+
+#: modules/gui/qt4/ui/vlm.h:296
+msgid "Mux Control"
+msgstr "Kawalan Mux"
+
+#: modules/gui/qt4/ui/vlm.h:297
+msgid "Muxer:"
+msgstr "Muxer:"
+
+#: modules/gui/qt4/ui/vlm.h:298
+msgid "AAAA; "
+msgstr "AAAA; "
+
+#: modules/gui/qt4/ui/vlm.h:299
+msgid "Loop"
+msgstr "Gelung "
+
+#: modules/gui/qt4/ui/vlm.h:303
+msgid "Media Manager List"
+msgstr "Senarai Pengurus Media"
+
 #: modules/gui/qt4/util/customwidgets.cpp:131
 #, fuzzy
 msgctxt "Tooltip|Clear"
@@ -18486,10 +19843,6 @@ msgstr "Sound clip"
 #: modules/meta_engine/id3genres.h:66
 msgid "Gospel"
 msgstr "Gospel"
-
-#: modules/meta_engine/id3genres.h:67 modules/video_filter/noise.c:52
-msgid "Noise"
-msgstr "Noise"
 
 #: modules/meta_engine/id3genres.h:68
 msgid "Alternative rock"
@@ -18922,6 +20275,25 @@ msgid ""
 "This should take less than a few minutes."
 msgstr ""
 
+#: modules/misc/gnome-session.c:75 modules/misc/inhibit.c:75
+#, fuzzy
+msgid "Power Management Inhibitor"
+msgstr "Antaramuka pengurusan Hotkey"
+
+#: modules/misc/gnome-session.c:169 modules/misc/inhibit.c:168
+msgid "Playing some media."
+msgstr "Menayangkan beberapa media."
+
+#: modules/misc/gnome-session2.c:41
+#, fuzzy
+msgid "SessionManager"
+msgstr "Nama sessi"
+
+#: modules/misc/gnome-session2.c:42 modules/misc/inhibit/xdg.c:36
+#, fuzzy
+msgid "XDG screen saver inhibition"
+msgstr "Pelumpuh X Screensaver"
+
 #: modules/misc/gnutls.c:79
 msgid "Expiration time for resumed TLS sessions"
 msgstr "Masa lupus untuk menyambung sessi TLS"
@@ -18953,15 +20325,6 @@ msgstr "Lapisan keselamatan TLS GnuTLS"
 msgid "GnuTLS server"
 msgstr "Pelayan GnuTLS"
 
-#: modules/misc/inhibit.c:75
-#, fuzzy
-msgid "Power Management Inhibitor"
-msgstr "Antaramuka pengurusan Hotkey"
-
-#: modules/misc/inhibit.c:168
-msgid "Playing some media."
-msgstr "Menayangkan beberapa media."
-
 #: modules/misc/inhibit/osso.c:40
 #, fuzzy
 msgid "OSSO"
@@ -18975,11 +20338,6 @@ msgstr ""
 #, fuzzy
 msgid "XDG-screensaver"
 msgstr "Lumpuhkan penjimat skrin"
-
-#: modules/misc/inhibit/xdg.c:36
-#, fuzzy
-msgid "XDG screen saver inhibition"
-msgstr "Pelumpuh X Screensaver"
 
 #: modules/misc/inhibit/xscreensaver.c:67
 msgid "X Screensaver disabler"
@@ -19372,6 +20730,11 @@ msgstr "RTSP VoD"
 #: modules/misc/rtsp.c:83
 msgid "RTSP VoD server"
 msgstr "Pelayan VoD RTSP"
+
+#: modules/misc/sqlite.c:115
+#, fuzzy
+msgid "SQLite database module"
+msgstr "Modul penapis strim"
 
 #: modules/misc/stats/stats.c:48
 msgid "Stats"
@@ -19787,6 +21150,10 @@ msgstr "Salin packetizer"
 msgid "Dirac packetizer"
 msgstr "Packetizer audio DTS"
 
+#: modules/packetizer/flac.c:49
+msgid "Flac audio packetizer"
+msgstr "Packetizer audio FLAC"
+
 #: modules/packetizer/h264.c:56
 msgid "H.264 video packetizer"
 msgstr "Packetizer video H.624"
@@ -19853,10 +21220,6 @@ msgstr "Subgambar"
 #, fuzzy
 msgid "My Pictures"
 msgstr "Subgambar"
-
-#: modules/services_discovery/podcast.c:58
-msgid "Podcast URLs list"
-msgstr "Senarai URL Podcast"
 
 #: modules/services_discovery/podcast.c:59
 msgid "Enter the list of podcasts to retrieve, separated by '|' (pipe)."
@@ -20021,6 +21384,29 @@ msgstr "Jenis tidak diketahui"
 #, fuzzy
 msgid "Universal Plug'n'Play"
 msgstr "Penerokaan Plug'n'Play Universal"
+
+#: modules/services_discovery/xcb_apps.c:46
+#: modules/services_discovery/xcb_apps.c:47
+#: modules/services_discovery/xcb_apps.c:84
+#: modules/services_discovery/xcb_apps.c:149
+#, fuzzy
+msgid "Screen capture"
+msgstr "Input Tangkapan Skrin"
+
+#: modules/services_discovery/xcb_apps.c:150
+msgid "Your window manager does not provide a list of applications."
+msgstr ""
+
+#: modules/services_discovery/xcb_apps.c:273
+#, fuzzy
+msgid "Applications"
+msgstr "Aplikasi"
+
+#: modules/services_discovery/xcb_apps.c:348
+#: modules/video_output/msw/direct3d.c:175
+#, fuzzy
+msgid "Desktop"
+msgstr "atas"
 
 #: modules/stream_filter/decomp.c:54
 msgid "Decompression"
@@ -20284,10 +21670,6 @@ msgid ""
 "Force the use of a specific chroma. Use YUVA if you're planning to use the "
 "Alphamask or Bluescreen video filter."
 msgstr ""
-
-#: modules/stream_out/mosaic_bridge.c:128 modules/video_filter/mosaic.c:88
-msgid "Transparency"
-msgstr "Ketelusan"
 
 #: modules/stream_out/mosaic_bridge.c:130
 msgid "Transparency of the mosaic picture."
@@ -20668,10 +22050,6 @@ msgstr ""
 msgid "Standard stream output"
 msgstr "Output strim piawai"
 
-#: modules/stream_out/switcher.c:90
-msgid "Files"
-msgstr "Fail"
-
 #: modules/stream_out/switcher.c:92
 msgid "Full paths of the files separated by colons."
 msgstr "Laluan penuh fail diasingkan dengan titik dua."
@@ -20984,10 +22362,6 @@ msgstr "Penukaran SSE2 daripada"
 msgid "AltiVec conversions from "
 msgstr "penukaran AltiVec daripada"
 
-#: modules/video_filter/adjust.c:64
-msgid "Brightness threshold"
-msgstr "Ambang kecerahan"
-
 #: modules/video_filter/adjust.c:65
 msgid ""
 "When this mode is enabled, pixels will be shown as black or white. The "
@@ -21039,10 +22413,6 @@ msgstr "Tetapkan gamma imej, antara 0.01 dan 10. Lalai ialah 1."
 #: modules/video_filter/adjust.c:80
 msgid "Image properties filter"
 msgstr "Penapis hakmilik imej"
-
-#: modules/video_filter/adjust.c:81
-msgid "Image adjust"
-msgstr "Ubah imej"
 
 #: modules/video_filter/alphamask.c:39
 msgid "Use an image's alpha channel as a transparency mask."
@@ -21382,10 +22752,6 @@ msgstr "Kegunaan statistik."
 msgid "Sat windowing"
 msgstr "Peningkapan sat"
 
-#: modules/video_filter/atmo/atmo.cpp:268
-msgid "Filter length (ms)"
-msgstr "Panjang penapis (ms)"
-
 #: modules/video_filter/atmo/atmo.cpp:269
 msgid ""
 "Time it takes until a color is completely changed. This prevents flickering."
@@ -21567,10 +22933,6 @@ msgstr ""
 msgid "AtmoLight Filter"
 msgstr "Penapis AtmoLight"
 
-#: modules/video_filter/atmo/atmo.cpp:361
-msgid "AtmoLight"
-msgstr "AtmoLight"
-
 #: modules/video_filter/atmo/atmo.cpp:368
 msgid "Choose Devicetype and Connection"
 msgstr ""
@@ -21613,6 +22975,147 @@ msgstr ""
 #: modules/video_filter/atmo/atmo.cpp:576
 msgid "Change gradients"
 msgstr "Ubah kecerunan"
+
+#: modules/video_filter/audiobargraph_v.c:48
+#, fuzzy
+msgid "Value of the audio channels levels"
+msgstr "Jumlah saluran audio"
+
+#: modules/video_filter/audiobargraph_v.c:49
+msgid ""
+"Value of the audio level of each channels between 0 and 1Each level should "
+"be separated with ':'."
+msgstr ""
+
+#: modules/video_filter/audiobargraph_v.c:52
+#, fuzzy
+msgid "X coordinate of the bargraph."
+msgstr "Kordinat X topeng."
+
+#: modules/video_filter/audiobargraph_v.c:54
+#, fuzzy
+msgid "Y coordinate of the bargraph."
+msgstr "Kordinat Y topeng."
+
+#: modules/video_filter/audiobargraph_v.c:55
+#, fuzzy
+msgid "Transparency of the bargraph"
+msgstr "Plugin Pengimbas"
+
+#: modules/video_filter/audiobargraph_v.c:56
+#, fuzzy
+msgid ""
+"Bargraph transparency value (from 0 for full transparency to 255 for full "
+"opacity)."
+msgstr ""
+"Nilai ketelusan logo (dari 0 untuk telus penuh hingga 255 untuk legap penuh)."
+
+#: modules/video_filter/audiobargraph_v.c:58
+#, fuzzy
+msgid "Bargraph position"
+msgstr "Posisi logo"
+
+#: modules/video_filter/audiobargraph_v.c:60
+#, fuzzy
+msgid ""
+"Enforce the bargraph position on the video (0=center, 1=left, 2=right, "
+"4=top, 8=bottom, you can also use combinations of these values, eg 6 = top-"
+"right)."
+msgstr ""
+"Paksa posisi logo di atas video (0=tengah, 1=kiri, 4=atas, 8=bawah, anda "
+"juga boleh gunakan kombinasi nilai ini, cth 6=atas-kanan)."
+
+#: modules/video_filter/audiobargraph_v.c:63
+#, fuzzy
+msgid "Alarm"
+msgstr "Alsa"
+
+#: modules/video_filter/audiobargraph_v.c:64
+msgid "Signals a silence and displays and alert (0=no alarm, 1=alarm)."
+msgstr ""
+
+#: modules/video_filter/audiobargraph_v.c:66
+msgid "Bar width in pixel (default : 10)"
+msgstr ""
+
+#: modules/video_filter/audiobargraph_v.c:67
+msgid ""
+"Width in pixel of each bar in the BarGraph to be displayed (default : 10)."
+msgstr ""
+
+#: modules/video_filter/audiobargraph_v.c:88
+#: modules/video_filter/audiobargraph_v.c:106
+#, fuzzy
+msgid "Audio Bar Graph Video sub filter"
+msgstr "Penapis sub video mozek"
+
+#: modules/video_filter/audiobargraph_v.c:89
+#, fuzzy
+msgid "Audio Bar Graph Video"
+msgstr "Enkoder audio/video FFmpeg"
+
+#: modules/video_filter/ball.c:109
+#, fuzzy
+msgid "Ball color"
+msgstr "Warna satah-V"
+
+#: modules/video_filter/ball.c:110
+msgid "Ball color, one of \"red\", \"blue\" and \"green\"."
+msgstr ""
+
+#: modules/video_filter/ball.c:112
+#, fuzzy
+msgid "Edge visible"
+msgstr "Sentiasa terlihat"
+
+#: modules/video_filter/ball.c:113
+msgid "Set edge visibility."
+msgstr ""
+
+#: modules/video_filter/ball.c:115
+#, fuzzy
+msgid "Ball speed"
+msgstr "Kelajuan Normal"
+
+#: modules/video_filter/ball.c:116
+msgid ""
+"Set ball speed, the displacement value                                 in "
+"number of pixels by frame."
+msgstr ""
+
+#: modules/video_filter/ball.c:119
+#, fuzzy
+msgid "Ball size"
+msgstr "Saiz Bilik"
+
+#: modules/video_filter/ball.c:120
+msgid ""
+"Set ball size giving its radius in number                                 of "
+"pixels"
+msgstr ""
+
+#: modules/video_filter/ball.c:123
+#, fuzzy
+msgid "Gradient threshold"
+msgstr "Penapis ambangan"
+
+#: modules/video_filter/ball.c:124
+msgid "Set gradient threshold for edge computation."
+msgstr ""
+
+#: modules/video_filter/ball.c:126
+msgid "Augmented reality ball game"
+msgstr ""
+
+#: modules/video_filter/ball.c:135
+#, fuzzy
+msgid "Ball video filter"
+msgstr "Penapis video dinding"
+
+#: modules/video_filter/ball.c:136
+#, fuzzy
+msgid "Ball"
+msgstr "semua"
 
 #: modules/video_filter/blend.c:44
 msgid "Video pictures blending"
@@ -21819,10 +23322,6 @@ msgstr "Penapis video wave"
 msgid "Video filtering using a chain of video filter modules"
 msgstr ""
 
-#: modules/video_filter/clone.c:39
-msgid "Number of clones"
-msgstr "Bilangan klon"
-
 #: modules/video_filter/clone.c:40
 msgid "Number of video windows in which to clone the video."
 msgstr "Bilangan tetingkap video untuk klon video."
@@ -21847,10 +23346,6 @@ msgstr ""
 msgid "Clone video filter"
 msgstr "Penapis video Klon"
 
-#: modules/video_filter/clone.c:57
-msgid "Clone"
-msgstr "Klon"
-
 #: modules/video_filter/colorthres.c:55
 #, fuzzy
 msgid ""
@@ -21872,10 +23367,6 @@ msgstr "Plih satu antara muka atau lebih untuk dibuka"
 #: modules/video_filter/colorthres.c:69
 msgid "Color threshold filter"
 msgstr "Tapis ambang warna"
-
-#: modules/video_filter/colorthres.c:70
-msgid "Color threshold"
-msgstr "Ambang warna"
 
 #: modules/video_filter/colorthres.c:79
 msgid "Saturaton threshold"
@@ -22640,10 +24131,6 @@ msgstr "Faktor kabur (1-127)"
 msgid "The degree of blurring from 1 to 127."
 msgstr "Darjah kekaburan dari 1 ingga 127."
 
-#: modules/video_filter/motionblur.c:59
-msgid "Motion blur"
-msgstr "Kabur gerakan"
-
 #: modules/video_filter/motionblur.c:60
 msgid "Motion blur filter"
 msgstr "Penapis kabus gerakan"
@@ -22875,10 +24362,6 @@ msgstr ""
 #: modules/video_filter/panoramix.c:78
 msgid "Panoramix: wall with overlap video filter"
 msgstr "Panoramik:dinding dengan penapis video berlapis"
-
-#: modules/video_filter/panoramix.c:79
-msgid "Panoramix"
-msgstr "Panoramiks"
 
 #: modules/video_filter/panoramix.c:89
 msgid "length of the overlapping area (in %)"
@@ -23220,10 +24703,6 @@ msgstr ""
 msgid "Rotate video filter"
 msgstr "Penapis video putar"
 
-#: modules/video_filter/rotate.c:67
-msgid "Rotate"
-msgstr "Putar"
-
 #: modules/video_filter/rss.c:130
 msgid "Feed URLs"
 msgstr "URL suapan"
@@ -23436,10 +24915,6 @@ msgstr ""
 #: modules/video_filter/sharpen.c:66
 msgid "Sharpen video filter"
 msgstr "Penapis ketajaman video"
-
-#: modules/video_filter/sharpen.c:67
-msgid "Sharpen"
-msgstr "Ketajaman"
 
 #: modules/video_filter/swscale.c:58
 msgid "Scaling mode"
@@ -23675,15 +25150,6 @@ msgstr ""
 #, fuzzy
 msgid "Direct3D video output"
 msgstr "Output video 3D DirectX"
-
-#: modules/video_output/msw/direct3d.c:175
-#, fuzzy
-msgid "Desktop"
-msgstr "atas"
-
-#: modules/video_output/msw/directx.c:64
-msgid "Use hardware YUV->RGB conversions"
-msgstr "Guna pertukaran perkakasan YUV->RGB"
 
 #: modules/video_output/msw/directx.c:66
 msgid ""
@@ -24278,158 +25744,15 @@ msgstr "Penganalisa spektrum"
 #~ msgid "SDL video driver name"
 #~ msgstr "Nama peranti video"
 
-#~ msgid "Choose one or more media file to open"
-#~ msgstr "Plih satu atau lebih fail media untuk dibuka"
-
-#~ msgid "File Selection"
-#~ msgstr "Pemilihan Fail"
-
-#~ msgid "Add..."
-#~ msgstr "Tambah..."
-
-#~ msgid "Add a subtitles file"
-#~ msgstr "Tambah fail sarikata"
-
-#~ msgid "Use a sub&titles file"
-#~ msgstr "Guna fail sarikata"
-
-#~ msgid "Select the subtitles file"
-#~ msgstr "Pilih fail sarikata"
-
-#, fuzzy
-#~ msgid "Font size:"
-#~ msgstr "Saiz Font"
-
-#, fuzzy
-#~ msgid "Text alignment:"
-#~ msgstr "Jajaran tengah"
-
-#~ msgid "Form"
-#~ msgstr "Bentuk "
-
-#~ msgid "Network Protocol"
-#~ msgstr "Protokol Rangkaian"
-
 #~ msgid "Select the protocol for the URL."
 #~ msgstr "Pilih protokol untuk URL."
 
 #~ msgid "Select the port used"
 #~ msgstr "Pilih port diguna"
 
-#~ msgid "Destinations"
-#~ msgstr "Destinasi"
-
-#~ msgid "New destination"
-#~ msgstr "Destinasi baru"
-
-#~ msgid "Display locally"
-#~ msgstr "Papar secara lokal"
-
-#, fuzzy
-#~ msgid "Activate Transcoding"
-#~ msgstr "Pilihan transkod"
-
-#, fuzzy
-#~ msgid "Miscellaneous Options"
-#~ msgstr "Opsyen Umum"
-
-#, fuzzy
-#~ msgid "Stream all elementary streams"
-#~ msgstr "Pilih keseluruhan asas strim"
-
-#~ msgid "Group name"
-#~ msgstr "Nama kumpulan"
-
-#, fuzzy
-#~ msgid "Generated stream output string"
-#~ msgstr "Tetapan output strim am"
-
-#~ msgid "Options"
-#~ msgstr "Pilihan"
-
-#, fuzzy
-#~ msgid "Default optical device"
-#~ msgstr "Nama peranti jauh"
-
-#, fuzzy
-#~ msgid "Damaged or incomplete AVI file"
-#~ msgstr "Penapis hakmilik imej"
-
-#, fuzzy
-#~ msgid "Default port (server mode)"
-#~ msgstr "Port pelayan CDDB"
-
-#, fuzzy
-#~ msgid "HTTP proxy URL"
-#~ msgstr "Proksi HTTP"
-
-#, fuzzy
-#~ msgid "Default caching policy"
-#~ msgstr "Paras kepayahan lalai"
-
-#, fuzzy
-#~ msgid "HTTP (default)"
-#~ msgstr "lalai"
-
-#, fuzzy
-#~ msgid "RTP over RTSP (TCP)"
-#~ msgstr "Guna RTP atas RTSP (TCP)"
-
-#, fuzzy
-#~ msgid "Live555 stream transport"
-#~ msgstr "Port UDP"
-
-#, fuzzy
-#~ msgid "Codecs"
-#~ msgstr "Kodek"
-
-#, fuzzy
-#~ msgid "Video quality post-processing level"
-#~ msgstr "Rantai penapis pasca memproses FFmpeg"
-
 #, fuzzy
 #~ msgid "Use host codecs if available"
 #~ msgstr "Transkod video (jika ada)"
-
-#~ msgid "Stuff"
-#~ msgstr "Stuff"
-
-#~ msgid "Edit settings"
-#~ msgstr "Edit tetapan"
-
-#~ msgid "Control"
-#~ msgstr "Kawalan"
-
-#, fuzzy
-#~ msgid "Run manually"
-#~ msgstr "Manual ditambah"
-
-#, fuzzy
-#~ msgid "Setup schedule"
-#~ msgstr "URL Jadual"
-
-#, fuzzy
-#~ msgid "Run on schedule"
-#~ msgstr "Muatturun jadual program"
-
-#~ msgid "Status"
-#~ msgstr "Status"
-
-#~ msgid "P/P"
-#~ msgstr "P/P"
-
-#, fuzzy
-#~ msgid "Prev"
-#~ msgstr "Prev"
-
-#~ msgid "Add Input"
-#~ msgstr "Tambah Input"
-
-#~ msgid "Edit Input"
-#~ msgstr "Edit Input"
-
-#~ msgid "Clear List"
-#~ msgstr "Lapangkan Senarai"
 
 #~ msgid "Other codecs"
 #~ msgstr "Lain-lain kodek"
@@ -24742,49 +26065,11 @@ msgstr "Penganalisa spektrum"
 #~ msgid "Media Catalog Number (MCN)"
 #~ msgstr "Nombor Katalog Media (MCN)"
 
-#~ msgid "MRL"
-#~ msgstr "MRL"
-
 #~ msgid "Track %i"
 #~ msgstr "Trek %i"
 
-#~ msgid "Subdirectory behavior"
-#~ msgstr "Ragam subdirektori"
-
-#~ msgid ""
-#~ "Select whether subdirectories must be expanded.\n"
-#~ "none: subdirectories do not appear in the playlist.\n"
-#~ "collapse: subdirectories appear but are expanded on first play.\n"
-#~ "expand: all subdirectories are expanded.\n"
-#~ msgstr ""
-#~ "Pilih sama ada subdirktori mesti dipanjangkan.\n"
-#~ "tiada: subdirektori tidak kelihatan dalam senarai tayang.\n"
-#~ "rebah: subdirektori kelihatan tetapi tidak dikembangkan pada tayangan "
-#~ "pertama.\n"
-#~ "kembang: semua subdirektori dikembangkan.\n"
-
-#~ msgid "collapse"
-#~ msgstr "lipat"
-
-#~ msgid "expand"
-#~ msgstr "kembang"
-
-#~ msgid ""
-#~ "Files with these extensions will not be added to playlist when opening a "
-#~ "directory.\n"
-#~ "This is useful if you add directories that contain playlist files for "
-#~ "instance. Use a comma-separated list of extensions."
-#~ msgstr ""
-#~ "Fail dengan sambungan ini tidak akan ditambah kepada senarai tayang "
-#~ "apabila membuka direktori.\n"
-#~ "Ini berguna jika anda menambah direktori yang mengandungi fail senarai "
-#~ "tayang untuk misalan. Guna senarai dipisah-koma bagi sambungan."
-
 #~ msgid "Standard filesystem directory input"
 #~ msgstr "Direktori sistem fail piawai input"
-
-#~ msgid "File input"
-#~ msgstr "Fail masukan"
 
 #~ msgid "audio filter for simple channel mixing"
 #~ msgstr "penapis audio untuk mengadun saluran mudah"
@@ -24811,9 +26096,6 @@ msgstr "Penganalisa spektrum"
 
 #~ msgid "CMML annotations decoder"
 #~ msgstr "Dekoder catatan CMML"
-
-#~ msgid "Flac audio packetizer"
-#~ msgstr "Packetizer audio FLAC"
 
 #~ msgid "RealAudio library decoder"
 #~ msgstr "Dekoder pustaka RealAudio"
@@ -25067,9 +26349,6 @@ msgstr "Penganalisa spektrum"
 #~ msgid "Owner"
 #~ msgstr "Pemilik"
 
-#~ msgid "Group"
-#~ msgstr "Kumpulan"
-
 #~ msgid "Forward"
 #~ msgstr "Maju"
 
@@ -25250,9 +26529,6 @@ msgstr "Penganalisa spektrum"
 #~ msgid "Access:"
 #~ msgstr "Capaian:"
 
-#~ msgid "Muxer:"
-#~ msgstr "Muxer:"
-
 #~ msgid "URL:"
 #~ msgstr "URL:"
 
@@ -25276,9 +26552,6 @@ msgstr "Penganalisa spektrum"
 
 #~ msgid "MPEG1"
 #~ msgstr "MPEG1"
-
-#~ msgid "AVI"
-#~ msgstr "AVI"
 
 #~ msgid "OGG"
 #~ msgstr "OGG"
@@ -25324,9 +26597,6 @@ msgstr "Penganalisa spektrum"
 
 #~ msgid "Announce Channel:"
 #~ msgstr "Saluran Pengumuman:"
-
-#~ msgid "Update"
-#~ msgstr "Kemaskini"
 
 #~ msgid " Clear "
 #~ msgstr "Kosongkan"
@@ -25392,142 +26662,18 @@ msgstr "Penganalisa spektrum"
 #~ msgid "Classic look"
 #~ msgstr "Rupa Klasik"
 
-#~ msgid "Preset"
-#~ msgstr "Praset"
-
-#~ msgid "Dialog"
-#~ msgstr "Dialog"
-
-#~ msgid "Show extended options"
-#~ msgstr "Tunjuk pilihan lanjutan "
-
-#~ msgid "Show &more options"
-#~ msgstr "Tunjuk lagi pilihan"
-
-#~ msgid "Change the caching for the media"
-#~ msgstr "Tukar nilai caching media"
-
-#~ msgid " ms"
-#~ msgstr " ms"
-
-#~ msgid "Start Time"
-#~ msgstr "Masa Mula"
-
-#~ msgid "Extra media"
-#~ msgstr "Media Tambahan"
-
-#~ msgid "Select the file"
-#~ msgstr "Pilih fail "
-
-#~ msgid "Edit Options"
-#~ msgstr "Edit Opsyen"
-
-#~ msgid "Change the start time for the media"
-#~ msgstr "Tukar masa mula media"
-
-#, fuzzy
-#~ msgid "s"
-#~ msgstr " s"
-
 #~ msgid "Select play mode"
 #~ msgstr "Pilih mod tayangan"
-
-#~ msgid "Capture mode"
-#~ msgstr "Mod Cekupan"
-
-#~ msgid "Select the capture device type"
-#~ msgstr "Pilih jenis peranti cekupan"
-
-#~ msgid "Device Selection"
-#~ msgstr "Pemilihan Peranti"
-
-#~ msgid "Advanced options..."
-#~ msgstr "Pilihan lanjutan..."
-
-#~ msgid "Disc Selection"
-#~ msgstr "Pemilihan Cakera"
-
-#~ msgid "SVCD/VCD"
-#~ msgstr "SVCD/VCD"
-
-#~ msgid "Disc device"
-#~ msgstr "Peranti Cakera"
-
-#~ msgid "Starting Position"
-#~ msgstr "Posisi Permulaan"
-
-#~ msgid "Audio and Subtitles"
-#~ msgstr "Audio dan Sarikata"
 
 #~ msgid "Alignment:"
 #~ msgstr "Jajaran: "
 
-#~ msgid "MPEG-TS"
-#~ msgstr "MPEG-TS"
-
-#~ msgid "MPEG-PS"
-#~ msgstr "MPEG-PS"
-
-#~ msgid "WAV"
-#~ msgstr "WAV"
-
-#~ msgid "ASF/WMV"
-#~ msgstr "ASF/WMV"
-
-#~ msgid "Ogg/Ogm"
-#~ msgstr "Ogg/Ogm"
-
-#~ msgid "RAW"
-#~ msgstr "RAW"
-
-#~ msgid "MPEG 1"
-#~ msgstr "MPEG 1"
-
-#~ msgid "FLV"
-#~ msgstr "FLV"
-
-#~ msgid "MP4/MOV"
-#~ msgstr "MP4/MOV"
-
-#~ msgid "MKV"
-#~ msgstr "MKV"
-
-#~ msgid "Encapsulation"
-#~ msgstr "Persampulan"
-
-#~ msgid " kb/s"
-#~ msgstr " kb/s"
-
-#~ msgid "Frame Rate"
-#~ msgstr "Kadar Kerangka"
-
-#~ msgid "00000; "
-#~ msgstr "00000; "
-
-#~ msgid "Keep original video track"
-#~ msgstr "Kekalkan trek video asal"
-
-#~ msgid "Video codec"
-#~ msgstr "Kodek video"
-
-#~ msgid "Keep original audio track"
-#~ msgstr "Kekalkan trek audio asal"
-
-#~ msgid "Audio codec"
-#~ msgstr "Kodek audio"
-
 #~ msgid "Default volume"
 #~ msgstr "Volum lalai"
-
-#~ msgid " %"
-#~ msgstr " %"
 
 #, fuzzy
 #~ msgid "Save volume on exit"
 #~ msgstr "Simpan &Baris Gilir Main semasa Keluar"
-
-#~ msgid "Output"
-#~ msgstr "Keluaran"
 
 #~ msgid "last.fm"
 #~ msgstr "last.fm"
@@ -25549,32 +26695,9 @@ msgstr "Penganalisa spektrum"
 #~ msgid "Repair AVI files"
 #~ msgstr "Baiki fail AVI"
 
-#~ msgid "Instances"
-#~ msgstr "Misalan"
-
-#, fuzzy
-#~ msgid "Allow only one instance"
-#~ msgstr "Benarkan hanya satu &contoh Noatun"
-
-#, fuzzy
-#~ msgid "File associations:"
-#~ msgstr "Carian fail"
-
-#, fuzzy
-#~ msgid "Enqueue files when in one instance mode"
-#~ msgstr "Bariskan item kepada senarai tayang apabila mod satu misalan"
-
 #, fuzzy
 #~ msgid "Association Setup"
 #~ msgstr "Tetapan Halaman"
-
-#, fuzzy
-#~ msgid "Activate update notifier"
-#~ msgstr "Pengurus Kemaskini Ubuntu"
-
-#, fuzzy
-#~ msgid "Save recently played items"
-#~ msgstr "simpan pilihan baris perintah semasadalam konfig"
 
 #~ msgid "Filter"
 #~ msgstr "Penapis"
@@ -25586,15 +26709,8 @@ msgstr "Penganalisa spektrum"
 #~ msgstr "Natif"
 
 #, fuzzy
-#~ msgid "This is VLC's default interface, with a native look and feel."
-#~ msgstr "Guna antaramuka minima, tanpa bar alatan dan menu yang kurang."
-
-#, fuzzy
 #~ msgid "Display mode"
 #~ msgstr "Mod paparan"
-
-#~ msgid "Embed video in interface"
-#~ msgstr "Antaramuka video terbenam"
 
 #, fuzzy
 #~ msgid "Show a controller in fullscreen"
@@ -25603,186 +26719,6 @@ msgstr "Penganalisa spektrum"
 #, fuzzy
 #~ msgid "Skin file"
 #~ msgstr "Sessi gagal"
-
-#, fuzzy
-#~ msgid "Resize interface to video size"
-#~ msgstr "Kecilkan VLC untuk padankan pada resulusi video."
-
-#~ msgid "Subtitles Language"
-#~ msgstr "Bahasa Sarikata"
-
-#, fuzzy
-#~ msgid "Preferred subtitles language"
-#~ msgstr "Muat turun sokongan bahasa?"
-
-#~ msgid "Default encoding"
-#~ msgstr "Pengenkodan lalai"
-
-#~ msgid "Effect"
-#~ msgstr "Kesan"
-
-#~ msgid "Font color"
-#~ msgstr "Warna fon"
-
-#~ msgid " px"
-#~ msgstr " px"
-
-#, fuzzy
-#~ msgid "Accelerated video output (Overlay)"
-#~ msgstr "Benarkan output strim video"
-
-#~ msgid "DirectX"
-#~ msgstr "DirectX"
-
-#~ msgid "Display device"
-#~ msgstr "Peranti paparan"
-
-#~ msgid "Enable wallpaper mode"
-#~ msgstr "Bolehkan mod kertas dinding"
-
-#, fuzzy
-#~ msgid "Deinterlacing Mode"
-#~ msgstr "Mod Deinterlace"
-
-#~ msgid "Force Aspect Ratio"
-#~ msgstr "Paksa Nisbah Aspek"
-
-#~ msgid "vlc-snap"
-#~ msgstr "vlc-snap"
-
-#, fuzzy
-#~ msgid "Refresh"
-#~ msgstr "Menyegarkan"
-
-#, fuzzy
-#~ msgid "Transform"
-#~ msgstr "jenis pengubahan"
-
-#~ msgid "Sigma"
-#~ msgstr "Sigma"
-
-#, fuzzy
-#~ msgid "Synchronize left and right"
-#~ msgstr "Teks kiri-ke-kanan"
-
-#~ msgid "Magnification/Zoom"
-#~ msgstr "Pembesaran/Zum"
-
-#, fuzzy
-#~ msgid "Puzzle game"
-#~ msgstr "Nombor permainan: %1"
-
-#~ msgid "Black slot"
-#~ msgstr "Slot Hitam"
-
-#~ msgid "Columns"
-#~ msgstr "Lajur"
-
-#~ msgid "Rows"
-#~ msgstr "Baris"
-
-#~ msgid "Angle"
-#~ msgstr "Sudut"
-
-#~ msgid "Geometry"
-#~ msgstr "Geometri"
-
-#~ msgid "Color extraction"
-#~ msgstr "Mengekstrak warna"
-
-#~ msgid ">HHHHHH;#"
-#~ msgstr ">HHHHHH;#"
-
-#~ msgid "Similarity"
-#~ msgstr "Kesamaan"
-
-#~ msgid "Color fun"
-#~ msgstr "Warna ceria"
-
-#~ msgid "Water effect"
-#~ msgstr "Kesan air"
-
-#~ msgid "Motion detect"
-#~ msgstr "Kesan gerak"
-
-#~ msgid "Factor"
-#~ msgstr "Faktor"
-
-#~ msgid "Cartoon"
-#~ msgstr "Kartun"
-
-#~ msgid "Image modification"
-#~ msgstr "Pengubahsuaian imej"
-
-#~ msgid "Wall"
-#~ msgstr "Dinding"
-
-#~ msgid "Add text"
-#~ msgstr "Tambah teks"
-
-#~ msgid "Vout/Overlay"
-#~ msgstr "Lapisan/Vout"
-
-#~ msgid "Add logo"
-#~ msgstr "Tambah logo"
-
-#~ msgid "Logo"
-#~ msgstr "Logo"
-
-#~ msgid "Logo erase"
-#~ msgstr "Padam logo"
-
-#~ msgid "Mask"
-#~ msgstr "Topeng"
-
-#~ msgid "Video filters"
-#~ msgstr "Penapis video"
-
-#~ msgid "Vout filters"
-#~ msgstr "Penapis Vout"
-
-#~ msgid "Reset"
-#~ msgstr "Ulangtetap"
-
-#~ msgid "Advanced video filter controls"
-#~ msgstr "Kawalan penapis video lanjutan"
-
-#~ msgid "VLM configurator"
-#~ msgstr "Pengkonfigurasi VLM"
-
-#, fuzzy
-#~ msgid "Media Manager Edition"
-#~ msgstr "Pengurus Kemaskini Ubuntu"
-
-#~ msgid "Name:"
-#~ msgstr "Nama: "
-
-#~ msgid "Input:"
-#~ msgstr "Input:"
-
-#~ msgid "Select Input"
-#~ msgstr "Pilih input"
-
-#~ msgid "Output:"
-#~ msgstr "Output:"
-
-#~ msgid "Select Output"
-#~ msgstr "Pilih output"
-
-#~ msgid "Time Control"
-#~ msgstr "Kawalan Masa"
-
-#~ msgid "Mux Control"
-#~ msgstr "Kawalan Mux"
-
-#~ msgid "AAAA; "
-#~ msgstr "AAAA; "
-
-#~ msgid "Loop"
-#~ msgstr "Gelung "
-
-#~ msgid "Media Manager List"
-#~ msgstr "Senarai Pengurus Media"
 
 #~ msgid ""
 #~ "\n"
@@ -25819,9 +26755,6 @@ msgstr "Penganalisa spektrum"
 #~ msgstr ""
 #~ "Alternatif, anda boleh bina MRL menggunakan satu daripada sasaran pra-"
 #~ "takrif berikut:"
-
-#~ msgid "Unknown"
-#~ msgstr "Tidak Diketahui"
 
 #~ msgid "Choose directory"
 #~ msgstr "Pilih direktori"
@@ -26089,83 +27022,12 @@ msgstr "Penganalisa spektrum"
 #~ msgstr "Terima kasih untuk laporan anda!"
 
 #, fuzzy
-#~ msgid "Output module:"
-#~ msgstr "Modul output audio"
-
-#, fuzzy
 #~ msgid "Spatialization"
 #~ msgstr "Visualisasi"
 
 #, fuzzy
-#~ msgid "Dolby Surround:"
-#~ msgstr "Dolby Surround"
-
-#, fuzzy
 #~ msgid "Processing"
 #~ msgstr "Pasca memproses"
-
-#, fuzzy
-#~ msgid "Visualization:"
-#~ msgstr "Visualisasi"
-
-#, fuzzy
-#~ msgid "Replay gain mode:"
-#~ msgstr "Mod gandaan ulang tayang"
-
-#~ msgid "Password:"
-#~ msgstr "Katalaluan:"
-
-#, fuzzy
-#~ msgid "Username:"
-#~ msgstr "Namapengguna"
-
-#, fuzzy
-#~ msgid "Album art download policy:"
-#~ msgstr "Polisi seni album"
-
-#, fuzzy
-#~ msgid "Every "
-#~ msgstr "Lapisan"
-
-#, fuzzy
-#~ msgid "Menus language:"
-#~ msgstr "Bahasa audio"
-
-#, fuzzy
-#~ msgid "Set up associations..."
-#~ msgstr "Carian fail"
-
-#, fuzzy
-#~ msgid "Use custom skin"
-#~ msgstr "Pilih kulit"
-
-#, fuzzy
-#~ msgid "Skin resource file:"
-#~ msgstr "Fail kulit"
-
-#, fuzzy
-#~ msgid "Show controls in full screen mode"
-#~ msgstr "Mula video mod skrin penuh"
-
-#, fuzzy
-#~ msgid "Show systray icon"
-#~ msgstr "Systray icon"
-
-#, fuzzy
-#~ msgid "Force window style:"
-#~ msgstr "Ubah gaya gelung"
-
-#, fuzzy
-#~ msgid "Use native style"
-#~ msgstr "Guna fail sarikata"
-
-#, fuzzy
-#~ msgid "Enable On Screen Display (OSD)"
-#~ msgstr "Paparan Atas Skrin (OSD)"
-
-#, fuzzy
-#~ msgid "Show media title on video start"
-#~ msgstr "Tunjuk judul media pada video"
 
 #~ msgid "Shaping delay"
 #~ msgstr "Pembentukan lengah"
@@ -27341,9 +28203,6 @@ msgstr "Penganalisa spektrum"
 #~ msgid "Enable the strict rate control algorithm."
 #~ msgstr "Bolehkan algritma kawalan kadar tegas."
 
-#~ msgid "Subpicture Filters"
-#~ msgstr "Penapis Subgambar"
-
 #~ msgid "Enabled"
 #~ msgstr "Dihidupkan"
 
@@ -27709,9 +28568,6 @@ msgstr "Penganalisa spektrum"
 
 #~ msgid "Channel name"
 #~ msgstr "Nama saluran"
-
-#~ msgid "Select all elementary streams"
-#~ msgstr "Pilih keseluruhan asas strim"
 
 #~ msgid "Subtitles overlay"
 #~ msgstr "Lapisan sarikata "
@@ -29031,9 +29887,6 @@ msgstr "Penganalisa spektrum"
 #~ msgid "CDDB Artist"
 #~ msgstr "CDDB Artist"
 
-#~ msgid "CDDB Category"
-#~ msgstr "CDDB Category"
-
 #~ msgid "CDDB Disc ID"
 #~ msgstr "CDDB Disc ID"
 
@@ -29674,9 +30527,6 @@ msgstr "Penganalisa spektrum"
 
 #~ msgid "Current version"
 #~ msgstr "Current version"
-
-#~ msgid "Released on"
-#~ msgstr "Released on"
 
 #~ msgid "Your version"
 #~ msgstr "Your version"
