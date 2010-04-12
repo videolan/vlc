@@ -107,7 +107,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     b_videoEmbedded = var_InheritBool( p_intf, "embedded-video" );
 
     /* Does the interface resize to video size or the opposite */
-    b_keep_size = !var_InheritBool( p_intf, "qt-video-autoresize" );
+    b_autoresize = var_InheritBool( p_intf, "qt-video-autoresize" );
 
     /* Are we in the enhanced always-video mode or not ? */
     i_visualmode = var_InheritInteger( p_intf, "qt-minimal-view" );
@@ -122,15 +122,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* */
     b_plDocked = getSettings()->value( "pl-dock-status", true ).toBool();
 
-
-    /**
-     * Retrieve saved sizes for main window
-     *   mainBasedSize = based window size for normal mode
-     *                  (no video, no background)
-     *   mainVideoSize = window size with video (all modes)
-     **/
-    mainBasedSize = settings->value( "mainBasedSize", QSize( 350, 120 ) ).toSize();
-    mainVideoSize = settings->value( "mainVideoSize", QSize( 400, 300 ) ).toSize();
     settings->endGroup( );
 
     /**************
@@ -216,10 +207,13 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     if( videoWidget )
     {
-        CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
-                 videoWidget, SetSizing( unsigned int, unsigned int ) );
-        CONNECT( videoWidget, sizeChanged( int, int ),
-                 this, resizeStack( int,  int ) );
+        if( b_autoresize )
+        {
+            CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
+                     videoWidget, SetSizing( unsigned int, unsigned int ) );
+            CONNECT( videoWidget, sizeChanged( int, int ),
+                     this, resizeStack( int,  int ) );
+        }
         CONNECT( this, askVideoSetFullScreen( bool ),
                  videoWidget, SetFullScreen( bool ) );
         CONNECT( videoWidget, keyPressed( QKeyEvent * ),
@@ -243,16 +237,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     settings->beginGroup( "MainWindow" );
     QVLCTools::restoreWidgetPosition( settings, this, QSize(400, 100) );
 
-    /* resize to previously saved main window size if appicable */
-    //FIXME remove.
-    if( b_keep_size )
-    {
-       if( i_visualmode )
-           resize( mainVideoSize );
-       else
-           resize( mainBasedSize );
-    }
-
     /* Playlist */
     int i_plVis = settings->value( "playlist-visible", false ).toBool();
     settings->endGroup();
@@ -274,7 +258,7 @@ MainInterface::~MainInterface()
 {
     /* Unsure we hide the videoWidget before destroying it */
     if( stackCentralOldWidget == videoWidget )
-        showBg();
+        showTab( bgWidget );
 
 #ifdef WIN32
     if( himl )
@@ -309,10 +293,9 @@ MainInterface::~MainInterface()
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
 
-    settings->setValue( "mainBasedSize", mainBasedSize );
-    settings->setValue( "mainVideoSize", mainVideoSize );
-
-    settings->setValue( "backgroundSize", bgWidget->size() );
+    /* Save the stackCentralW sizes */
+    settings->setValue( "bgSize", stackWidgetsSizes[bgWidget] );
+    settings->setValue( "playlistSize", stackWidgetsSizes[playlistWidget] );
 
     /* Save this size */
     QVLCTools::saveWidgetPosition(settings, this);
@@ -386,6 +369,9 @@ void MainInterface::createMainWidget( QSettings *settings )
     mainLayout->insertWidget( 1, stackCentralW );
 
     settings->beginGroup( "MainWindow" );
+    stackWidgetsSizes[bgWidget] = settings->value( "bgSize", QSize( 400, 0 ) ).toSize();
+    /* Resize even if no-auto-resize, because we are at creation */
+    resizeStack( stackWidgetsSizes[bgWidget].width(), stackWidgetsSizes[bgWidget].height() );
 
     /* Create the CONTROLS Widget */
     controls = new ControlsWidget( p_intf,
@@ -501,34 +487,25 @@ void MainInterface::debug()
 }
 
 inline void MainInterface::showVideo() { showTab( videoWidget ); }
-inline void MainInterface::showBg() { showTab( bgWidget ); }
+inline void MainInterface::restoreStackOldWidget()
+            { showTab( stackCentralOldWidget ); }
 
 inline void MainInterface::showTab( QWidget *widget )
 {
 #ifdef DEBUG_INTF
     msg_Warn( p_intf, "Old stackCentralOldWidget %i", stackCentralW->indexOf( stackCentralOldWidget ) );
 #endif
+
     stackCentralOldWidget = stackCentralW->currentWidget();
+    stackWidgetsSizes[stackCentralOldWidget] = stackCentralW->size();
+
     stackCentralW->setCurrentWidget( widget );
+    if( b_autoresize )
+        resizeStack( stackWidgetsSizes[widget].width(), stackWidgetsSizes[widget].height() );
 
 #ifdef DEBUG_INTF
     msg_Warn( p_intf, "State change %i",  stackCentralW->currentIndex() );
     msg_Warn( p_intf, "New stackCentralOldWidget %i", stackCentralW->indexOf( stackCentralOldWidget ) );
-#endif
-}
-
-inline void MainInterface::restoreStackOldWidget()
-{
-#ifdef DEBUG_INTF
-    msg_Warn( p_intf, "New stackCentralOldWidget %i", stackCentralW->indexOf( stackCentralOldWidget ) );
-#endif
-    QWidget *wTemp = stackCentralW->currentWidget();
-
-    stackCentralW->setCurrentWidget( stackCentralOldWidget );
-
-    stackCentralOldWidget = wTemp;
-#ifdef DEBUG_INTF
-    msg_Warn( p_intf, "Debug %i %i",stackCentralW->indexOf( wTemp ), stackCentralW->indexOf( stackCentralW->currentWidget() ) );
 #endif
 }
 
@@ -594,16 +571,16 @@ void MainInterface::getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
 {
     /* Request the videoWidget */
     WId ret = videoWidget->request( pi_x, pi_y,
-                                    pi_width, pi_height, b_keep_size );
+                                    pi_width, pi_height, !b_autoresize );
     *p_id = ret;
     if( ret ) /* The videoWidget is available */
     {
-        /* Ask videoWidget to resize correctly, if we are in normal mode */
-        if( !isFullScreen() && !isMaximized() )
-            videoWidget->SetSizing( *pi_width, *pi_height );
-
         /* Consider the video active now */
         showVideo();
+
+        /* Ask videoWidget to resize correctly, if we are in normal mode */
+        if( !isFullScreen() && !isMaximized() && b_autoresize )
+            videoWidget->SetSizing( *pi_width, *pi_height );
     }
 }
 
@@ -618,6 +595,7 @@ void MainInterface::releaseVideoSlot( void )
 {
     videoWidget->release();
 
+    msg_Warn( p_intf, "Here" );
     if( stackCentralW->currentWidget() == videoWidget )
         restoreStackOldWidget();
 
@@ -668,7 +646,12 @@ void MainInterface::createPlaylist()
 {
     playlistWidget = new PlaylistWidget( p_intf, this );
 
-    if( !b_plDocked )
+    if( b_plDocked )
+    {
+        stackCentralW->addWidget( playlistWidget );
+        stackWidgetsSizes[playlistWidget] = settings->value( "playlistSize", QSize( 500, 250 ) ).toSize();
+    }
+    else
     {
         playlistWidget->setWindowFlags( Qt::Window );
 
@@ -677,16 +660,14 @@ void MainInterface::createPlaylist()
         QVLCTools::restoreWidgetPosition( p_intf, "Playlist",
                 playlistWidget, QSize( 600, 300 ) );
     }
-    else
-    {
-        stackCentralW->addWidget( playlistWidget );
-    }
 }
 
 void MainInterface::togglePlaylist()
 {
     if( !playlistWidget )
+    {
         createPlaylist();
+    }
 
     if( b_plDocked )
     {
@@ -741,7 +722,7 @@ void MainInterface::dockPlaylist( bool p_docked )
  */
 void MainInterface::toggleMinimalView( bool b_switch )
 {
-    if( i_visualmode == 0 )
+    if( i_visualmode == 0 && b_autoresize ) /* Normal mode */
     {
         if( stackCentralW->currentWidget() == bgWidget )
         {
@@ -1003,9 +984,9 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
     /* D&D of a subtitles file, add it on the fly */
     if( mimeData->urls().size() == 1 && THEMIM->getIM()->hasInput() )
     {
-        QString s = toNativeSeparators( mimeData->urls()[0].toLocalFile() );
-        if( s.length() > 0
-         && input_AddSubtitle( THEMIM->getInput(), qtu(s), true ) == 0 )
+        if( !input_AddSubtitle( THEMIM->getInput(),
+                 qtu( toNativeSeparators( mimeData->urls()[0].toLocalFile() ) ),
+                 true ) )
         {
             event->accept();
             return;
@@ -1015,12 +996,14 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
     bool first = b_play;
     foreach( const QUrl &url, mimeData->urls() )
     {
-        QString s = url.toString();
+        QString s = toNativeSeparators( url.toLocalFile() );
 
         if( s.length() > 0 ) {
-            playlist_Add( THEPL, qtu(s), NULL,
+            char* psz_uri = make_URI( qtu(s) );
+            playlist_Add( THEPL, psz_uri, NULL,
                           PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
                           PLAYLIST_END, true, pl_Unlocked );
+            free( psz_uri );
             first = false;
             RecentsMRL::getInstance( p_intf )->addRecent( s );
         }

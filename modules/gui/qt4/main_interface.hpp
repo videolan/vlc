@@ -1,7 +1,7 @@
 /*****************************************************************************
  * main_interface.hpp : Main Interface
  ****************************************************************************
- * Copyright (C) 2006-2008 the VideoLAN team
+ * Copyright (C) 2006-2010 VideoLAN and AUTHORS
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -115,7 +115,6 @@ private:
     /* Central StackWidget Management */
     void showTab( QWidget *);
     void showVideo();
-    void showBg();
     void restoreStackOldWidget();
 
     /* */
@@ -146,21 +145,21 @@ private:
     /* Status and flags */
     QWidget             *stackCentralOldWidget;
 
+    QMap<QWidget *, QSize> stackWidgetsSizes;
+
     /* Flags */
     bool                 b_notificationEnabled; /// Systray Notifications
-    bool                 b_keep_size;         ///< persistent resizeable window
-    bool                 b_videoEmbedded;   ///< Want an external Video Window
+    bool                 b_autoresize;          ///< persistent resizeable window
+    bool                 b_videoEmbedded;       ///< Want an external Video Window
     bool                 b_hideAfterCreation;
-    int                  i_visualmode;        ///< Visual Mode
+    int                  i_visualmode;          ///< Visual Mode
 
     /* States */
-    bool                 playlistVisible;     ///< Is the playlist visible ?
+    bool                 playlistVisible;       ///< Is the playlist visible ?
 //    bool                 videoIsActive;       ///< Having a video now / THEMIM->hasV
 //    bool                 b_visualSelectorEnabled;
-    bool                 b_plDocked;          ///< Is the playlist docked ?
+    bool                 b_plDocked;            ///< Is the playlist docked ?
 
-    QSize                mainBasedSize;       ///< based Wnd (normal mode only)
-    QSize                mainVideoSize;       ///< Wnd with video (all modes)
 
 #ifdef WIN32
     HIMAGELIST himl;
