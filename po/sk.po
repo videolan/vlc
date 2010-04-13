@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Slovak translation for VLC Media Player\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-04-12 23:59+0100\n"
+"POT-Creation-Date: 2010-04-13 23:30+0100\n"
 "PO-Revision-Date: 2010-04-10 12:53+0100\n"
 "Last-Translator: Marian Hikanik <podnety-at-mojepreklady.net>\n"
 "Language-Team: Marián Hikaník (controlled by Pavel Kříž)\n"
@@ -540,9 +540,9 @@ msgstr "&O programe"
 #: modules/gui/macosx/embeddedwindow.m:69
 #: modules/gui/macosx/embeddedwindow.m:173 modules/gui/macosx/intf.m:601
 #: modules/gui/macosx/intf.m:646 modules/gui/macosx/intf.m:736
-#: modules/gui/macosx/intf.m:743 modules/gui/macosx/intf.m:2006
-#: modules/gui/macosx/intf.m:2007 modules/gui/macosx/intf.m:2008
-#: modules/gui/macosx/intf.m:2009 modules/gui/macosx/playlist.m:464
+#: modules/gui/macosx/intf.m:743 modules/gui/macosx/intf.m:2012
+#: modules/gui/macosx/intf.m:2013 modules/gui/macosx/intf.m:2014
+#: modules/gui/macosx/intf.m:2015 modules/gui/macosx/playlist.m:464
 #: modules/gui/qt4/components/controller.hpp:104 modules/gui/qt4/menus.cpp:790
 #: modules/gui/qt4/ui/open.h:256
 msgid "Play"
@@ -648,7 +648,7 @@ msgid "Open Play&list..."
 msgstr "Otvoriť p&laylist..."
 
 #: include/vlc_intf_strings.h:98
-#: modules/gui/qt4/components/preferences_widgets.cpp:1185
+#: modules/gui/qt4/components/preferences_widgets.cpp:1187
 msgid "Search"
 msgstr "Hľadať"
 
@@ -1141,7 +1141,6 @@ msgid "Setting"
 msgstr "Nastavenie"
 
 #: src/input/meta.c:61 modules/gui/macosx/open.m:203
-#: modules/gui/qt4/ui/open_net.h:85
 #: modules/gui/qt4/ui/podcast_configuration.h:103
 msgid "URL"
 msgstr "URL adresa"
@@ -2511,7 +2510,7 @@ msgstr ""
 #: modules/gui/macosx/prefs_widgets.m:1297
 #: modules/gui/macosx/simple_prefs.m:415 modules/gui/macosx/simple_prefs.m:536
 #: modules/gui/macosx/simple_prefs.m:770 modules/gui/macosx/vout.m:212
-#: modules/gui/qt4/components/preferences_widgets.cpp:612
+#: modules/gui/qt4/components/preferences_widgets.cpp:614
 #: modules/video_filter/marq.c:60 modules/video_filter/rss.c:72
 #: modules/video_filter/rss.c:185 modules/video_output/msw/directx.c:91
 msgid "Default"
@@ -4844,7 +4843,7 @@ msgstr "Prebieha sťahovanie ..."
 #: modules/gui/macosx/simple_prefs.m:308 modules/gui/macosx/simple_prefs.m:696
 #: modules/gui/macosx/wizard.m:320
 #: modules/gui/qt4/components/open_panels.cpp:1265
-#: modules/gui/qt4/components/preferences_widgets.cpp:1420
+#: modules/gui/qt4/components/preferences_widgets.cpp:1422
 #: modules/gui/qt4/components/sout/profile_selector.cpp:253
 msgid "Cancel"
 msgstr "Storno"
@@ -4990,7 +4989,7 @@ msgstr ""
 #: modules/access/dvdread.c:74 modules/access/eyetv.m:61
 #: modules/access/fake.c:44 modules/access/ftp.c:58
 #: modules/access/gnomevfs.c:48 modules/access/http.c:81
-#: modules/access/imem.c:49 modules/access/jack.c:60
+#: modules/access/imem.c:49 modules/access/jack.c:59
 #: modules/access/mms/mms.c:49 modules/access/mtp.c:63 modules/access/oss.c:70
 #: modules/access/pvr.c:59 modules/access/rtmp/access.c:43
 #: modules/access/screen/screen.c:40 modules/access/screen/xcb.c:33
@@ -6119,8 +6118,8 @@ msgstr ""
 "zbaliť: podpriečinky sa v playliste objavia, ale rozbalia sa až pri prvom "
 "prehrávaní.\n"
 
-#: modules/access/fs.c:50 modules/codec/dirac.c:79 modules/codec/x264.c:402
-#: modules/codec/x264.c:407
+#: modules/access/fs.c:50 modules/codec/dirac.c:79 modules/codec/x264.c:403
+#: modules/codec/x264.c:408
 msgid "none"
 msgstr "žiaden"
 
@@ -6501,7 +6500,7 @@ msgstr "Adrela pre odomknutie funkcie spätného volania"
 msgid "Memory input"
 msgstr "Žiaden vstup"
 
-#: modules/access/jack.c:62
+#: modules/access/jack.c:61
 msgid ""
 "Make VLC buffer audio data captured from jack for the specified length in "
 "milliseconds."
@@ -6509,30 +6508,30 @@ msgstr ""
 "Zachytávať údaje o zvuku vo vyrovávacej pamäti programu VLC z jack konektora "
 "počas zadaného času (čas sa udáva v milisekundách). "
 
-#: modules/access/jack.c:64
+#: modules/access/jack.c:63
 msgid "Pace"
 msgstr "Krokovať"
 
-#: modules/access/jack.c:66
+#: modules/access/jack.c:65
 msgid "Read the audio stream at VLC pace rather than Jack pace."
 msgstr ""
 "Načítať zvukový stream radšej pomocou programu VLC, nie priamo zo vstupu "
 "Jack."
 
-#: modules/access/jack.c:67
+#: modules/access/jack.c:66
 msgid "Auto Connection"
 msgstr "Automatické pripojenie"
 
-#: modules/access/jack.c:69
+#: modules/access/jack.c:68
 msgid "Automatically connect VLC input ports to available output ports."
 msgstr ""
 "Automaticky pripojiť vstupné porty programu VLC na dostupné výstupné porty."
 
-#: modules/access/jack.c:72
+#: modules/access/jack.c:71
 msgid "JACK audio input"
 msgstr "Zvukový vstup JACK"
 
-#: modules/access/jack.c:74
+#: modules/access/jack.c:73
 msgid "JACK Input"
 msgstr "Vstup JACK"
 
@@ -6848,21 +6847,21 @@ msgstr "Vstup RTMP"
 msgid "RTMP"
 msgstr "RTMP"
 
-#: modules/access/rtp/rtp.c:44
+#: modules/access/rtp/rtp.c:42
 msgid "RTP de-jitter buffer length (msec)"
 msgstr "Veľkosť vyrovnávacej pamäte RTP pre zabránenie trhaniu (v milisek.)"
 
-#: modules/access/rtp/rtp.c:46
+#: modules/access/rtp/rtp.c:44
 msgid "How long to wait for late RTP packets (and delay the performance)."
 msgstr ""
 "Udáva, ako dlho sa bude čakať na oneskorené RTP pakety (a o koľko sa "
 "oneskorí výkon)."
 
-#: modules/access/rtp/rtp.c:48
+#: modules/access/rtp/rtp.c:46
 msgid "RTCP (local) port"
 msgstr "(Lokálny) port RTCP"
 
-#: modules/access/rtp/rtp.c:50
+#: modules/access/rtp/rtp.c:48
 msgid ""
 "RTCP packets will be received on this transport protocol port. If zero, "
 "multiplexed RTP/RTCP is used."
@@ -6870,11 +6869,11 @@ msgstr ""
 "Na tomto porte protokolu sa prijmajú RTCP pakety. Ak je hodnota nulová, "
 "používa sa multiplexovaný protokol RTP/RTCP."
 
-#: modules/access/rtp/rtp.c:53 modules/stream_out/rtp.c:142
+#: modules/access/rtp/rtp.c:51 modules/stream_out/rtp.c:142
 msgid "SRTP key (hexadecimal)"
 msgstr "Kľúč SRTP (hexadecimálny)"
 
-#: modules/access/rtp/rtp.c:55
+#: modules/access/rtp/rtp.c:53
 msgid ""
 "RTP packets will be authenticated and deciphered with this Secure RTP master "
 "shared secret key."
@@ -6882,36 +6881,36 @@ msgstr ""
 "RTP pakety sa autentifikujú a dekódouj pomocou tohto primárneho zdieľaného "
 "bezpečnostného RTP kľúča."
 
-#: modules/access/rtp/rtp.c:58 modules/stream_out/rtp.c:147
+#: modules/access/rtp/rtp.c:56 modules/stream_out/rtp.c:147
 msgid "SRTP salt (hexadecimal)"
 msgstr "SRTP salt (hexadecimálne)"
 
-#: modules/access/rtp/rtp.c:60 modules/stream_out/rtp.c:149
+#: modules/access/rtp/rtp.c:58 modules/stream_out/rtp.c:149
 msgid "Secure RTP requires a (non-secret) master salt value."
 msgstr "Bezpetné RTP si vyžaduje (neutajenú) hodnotu prim. salt."
 
-#: modules/access/rtp/rtp.c:62
+#: modules/access/rtp/rtp.c:60
 msgid "Maximum RTP sources"
 msgstr "Maxim. počet RTP zdrojov"
 
-#: modules/access/rtp/rtp.c:64
+#: modules/access/rtp/rtp.c:62
 msgid "How many distinct active RTP sources are allowed at a time."
 msgstr "Udáva, nakoľko sa budú rozlišovať aktívne RTP zdroje."
 
-#: modules/access/rtp/rtp.c:66
+#: modules/access/rtp/rtp.c:64
 msgid "RTP source timeout (sec)"
 msgstr "Časový limit pre RTP zdroj (v sek.)"
 
-#: modules/access/rtp/rtp.c:68
+#: modules/access/rtp/rtp.c:66
 msgid "How long to wait for any packet before a source is expired."
 msgstr ""
 "Udáva, ako dlho sa bude čakať na nejaký balík predtým, než expiruje zdroj."
 
-#: modules/access/rtp/rtp.c:70
+#: modules/access/rtp/rtp.c:68
 msgid "Maximum RTP sequence number dropout"
 msgstr "Maximálny počet výpadkov v RTP sekvencii"
 
-#: modules/access/rtp/rtp.c:72
+#: modules/access/rtp/rtp.c:70
 msgid ""
 "RTP packets will be discarded if they are too much ahead (i.e. in the "
 "future) by this many packets from the last received packet."
@@ -6919,11 +6918,11 @@ msgstr ""
 "RTP pakety sa zahodia v prípade, že ich je načítaných priveľa dopredu. Max. "
 "počet paketov, načítavaných dopredu sa udáva v tomto políčku."
 
-#: modules/access/rtp/rtp.c:75
+#: modules/access/rtp/rtp.c:73
 msgid "Maximum RTP sequence number misordering"
 msgstr "Maximálny počet nesprávnych usporiadaní v RTP sekvencii"
 
-#: modules/access/rtp/rtp.c:77
+#: modules/access/rtp/rtp.c:75
 msgid ""
 "RTP packets will be discarded if they are too far behind (i.e. in the past) "
 "by this many packets from the last received packet."
@@ -6932,11 +6931,11 @@ msgstr ""
 "prijatého paketu. Max. vzdialenosť od posledného paketu sa zadáva v tomto "
 "políčku."
 
-#: modules/access/rtp/rtp.c:87 modules/stream_out/rtp.c:170
+#: modules/access/rtp/rtp.c:85 modules/stream_out/rtp.c:170
 msgid "RTP"
 msgstr "RTP"
 
-#: modules/access/rtp/rtp.c:88
+#: modules/access/rtp/rtp.c:86
 msgid "Real-Time Protocol (RTP) input"
 msgstr "Vstup protokolu Real-time (RTP)"
 
@@ -8242,7 +8241,7 @@ msgid ""
 msgstr ""
 
 #: modules/audio_filter/audiobargraph_a.c:67
-msgid "Time between two alamr messages in ms (default 2000)"
+msgid "Time between two alarm messages in ms (default 2000)"
 msgstr ""
 
 #: modules/audio_filter/audiobargraph_a.c:68
@@ -9048,7 +9047,7 @@ msgstr "5.1"
 
 #: modules/audio_output/pulse.c:65 modules/gui/macosx/embeddedwindow.m:76
 #: modules/gui/macosx/intf.m:595 modules/gui/macosx/intf.m:596
-#: modules/gui/macosx/intf.m:1986 modules/gui/qt4/dialogs/help.cpp:99
+#: modules/gui/macosx/intf.m:1992 modules/gui/qt4/dialogs/help.cpp:99
 #: modules/gui/qt4/main_interface.cpp:799
 #: modules/gui/qt4/main_interface.cpp:803
 #: modules/gui/qt4/main_interface.cpp:843
@@ -9445,7 +9444,7 @@ msgstr ""
 "Kvantizačný faktor I snímok, v porovnaní s P snímkami (hodnota 1.0 napríklad "
 "znamená, že I aj P snímky budú mať rovnakú škálu q)."
 
-#: modules/codec/avcodec/avcodec.h:182 modules/codec/x264.c:336
+#: modules/codec/avcodec/avcodec.h:182 modules/codec/x264.c:334
 #: modules/demux/mod.c:78
 msgid "Noise reduction"
 msgstr "Redukcia šumu"
@@ -11618,7 +11617,7 @@ msgstr ""
 msgid "Subpixel motion estimation and partition decision quality"
 msgstr "Odhadovanie pohybu subpixelov a rozhodovanie o kvalite partícií"
 
-#: modules/codec/x264.c:294
+#: modules/codec/x264.c:292
 msgid ""
 "This parameter controls quality versus speed tradeoffs involved in the "
 "motion estimation decision process (lower = quicker and higher = better "
@@ -11628,21 +11627,21 @@ msgstr ""
 "procese odhadovania pohybu. Menšia hodnota = rýchlejšie, vyššia hodnota = "
 "lepšia kvalita. Povolený rozsah je od 1 do 9. "
 
-#: modules/codec/x264.c:298
+#: modules/codec/x264.c:296
 msgid "RD based mode decision for B-frames"
 msgstr "RD-režim pri rozhodovaní o B-snímkach."
 
-#: modules/codec/x264.c:299
+#: modules/codec/x264.c:297
 msgid "RD based mode decision for B-frames. This requires subme 6 (or higher)."
 msgstr ""
 "RD-režim pri rozhodovaní o B-snímkach. Táto funkcia vyžaduje komponent "
 "subme6 (alebo novší)."
 
-#: modules/codec/x264.c:302
+#: modules/codec/x264.c:300
 msgid "Decide references on a per partition basis"
 msgstr "O referenčných snímkach rozhodovať na základe partície"
 
-#: modules/codec/x264.c:303
+#: modules/codec/x264.c:301
 msgid ""
 "Allows each 8x8 or 16x8 partition to independently select a reference frame, "
 "as opposed to only one ref per macroblock."
@@ -11650,37 +11649,37 @@ msgstr ""
 "Umožňuje nastaviť referenčnú snímku v každej partícií s veľkosťou 8x8 alebo "
 "16x8. "
 
-#: modules/codec/x264.c:307
+#: modules/codec/x264.c:305
 msgid "Chroma in motion estimation"
 msgstr "Aplikovať efekt chroma aj pri odhadovaní pohybu"
 
-#: modules/codec/x264.c:308
+#: modules/codec/x264.c:306
 msgid "Chroma ME for subpel and mode decision in P-frames."
 msgstr ""
 "Používať formát Chroma ME pri subpixeloch a pri rozhodovaní o P-snímkach."
 
-#: modules/codec/x264.c:311
+#: modules/codec/x264.c:309
 msgid "Jointly optimize both MVs in B-frames"
 msgstr "Spoločne optimalizovať MV v B-snímkach"
 
-#: modules/codec/x264.c:312
+#: modules/codec/x264.c:310
 msgid "Joint bidirectional motion refinement."
 msgstr "Spojiť obojsmerné čistenie pohybu. "
 
-#: modules/codec/x264.c:314
+#: modules/codec/x264.c:312
 msgid "Adaptive spatial transform size"
 msgstr "Adaptívna veľkosť transformácie"
 
-#: modules/codec/x264.c:316
+#: modules/codec/x264.c:314
 msgid "SATD-based decision for 8x8 transform in inter-MBs."
 msgstr ""
 "Rozhodovanie založené na SATD (používa sa pri transformácií blokov 8x8)."
 
-#: modules/codec/x264.c:318
+#: modules/codec/x264.c:316
 msgid "Trellis RD quantization"
 msgstr "Kvantizácia Trellis RD"
 
-#: modules/codec/x264.c:319
+#: modules/codec/x264.c:317
 msgid ""
 "Trellis RD quantization: \n"
 " - 0: disabled\n"
@@ -11694,19 +11693,19 @@ msgstr ""
 " - 2: aktívna pri všetkých režimoch\n"
 "Toto nastavenie vyžaduje CABAC."
 
-#: modules/codec/x264.c:325
+#: modules/codec/x264.c:323
 msgid "Early SKIP detection on P-frames"
 msgstr "Včasná detekcia preskočenia pri P-snímkach"
 
-#: modules/codec/x264.c:326
+#: modules/codec/x264.c:324
 msgid "Early SKIP detection on P-frames."
 msgstr "Včasná detekcia preskočenia pri P-snímkach."
 
-#: modules/codec/x264.c:328
+#: modules/codec/x264.c:326
 msgid "Coefficient thresholding on P-frames"
 msgstr "Hraničný koeficient pri P-snímkach"
 
-#: modules/codec/x264.c:329
+#: modules/codec/x264.c:327
 msgid ""
 "Coefficient thresholding on P-frames.Eliminate dct blocks containing only a "
 "small single coefficient."
@@ -11714,71 +11713,71 @@ msgstr ""
 "Hraničný koeficient pri P-snímkach. Eliminujú sa bloky dct, obsahujúce len "
 "malý koeficient."
 
-#: modules/codec/x264.c:332
+#: modules/codec/x264.c:330
 msgid "Use Psy-optimizations"
 msgstr "Použiť optimalizácie Psy"
 
-#: modules/codec/x264.c:333
+#: modules/codec/x264.c:331
 msgid "Use all visual optimizations that can worsen both PSNR and SSIM"
 msgstr "Použiť všetky vizuálne optimalizácie, ktoré môžu zhoršiť PSNR a SSIM"
 
-#: modules/codec/x264.c:337
+#: modules/codec/x264.c:335
 msgid ""
 "Dct-domain noise reduction. Adaptive pseudo-deadzone. 10 to 1000 seems to be "
 "a useful range."
 msgstr ""
 "Redukcia šumu na Dct-doméne. Sem môžete zadávať hodnoty v rozsahu 10 - 1000."
 
-#: modules/codec/x264.c:340
+#: modules/codec/x264.c:338
 msgid "Inter luma quantization deadzone"
 msgstr "Neaktívna zóna pri kvantizácií typu Inter luma"
 
-#: modules/codec/x264.c:341
+#: modules/codec/x264.c:339
 msgid "Set the size of the inter luma quantization deadzone. Range 0 to 32."
 msgstr ""
 "Tu môžete nastaviť veľkosť neaktívnej zóny, ktorá sa bude používať pri "
 "kvantizácií typu Inter luma. Zadajte hodnotu v rozsahu od 0 do 32."
 
-#: modules/codec/x264.c:344
+#: modules/codec/x264.c:342
 msgid "Intra luma quantization deadzone"
 msgstr "Neaktívna zóna pri kvantizácií typu Intra luma"
 
-#: modules/codec/x264.c:345
+#: modules/codec/x264.c:343
 msgid "Set the size of the intra luma quantization deadzone. Range 0 to 32."
 msgstr ""
 "Tu môžete nastaviť veľkosť neaktívnej zóny, ktorá sa bude používať pri "
 "kvantizácií typu Inter luma. Zadajte hodnotu v rozsahu od 0 do 32."
 
-#: modules/codec/x264.c:350
+#: modules/codec/x264.c:348
 msgid "Non-deterministic optimizations when threaded"
 msgstr "Nedeterministické optimalizácie pri použití viacerých vlákien"
 
-#: modules/codec/x264.c:351
+#: modules/codec/x264.c:349
 msgid "Slightly improve quality of SMP, at the cost of repeatability."
 msgstr ""
 "Mierne vylepšiť kvalitu SMP, aj na úkor počtu možných opakovaných prehratí."
 
-#: modules/codec/x264.c:354
+#: modules/codec/x264.c:352
 msgid "CPU optimizations"
 msgstr "Optimalizácie procesora"
 
-#: modules/codec/x264.c:355
+#: modules/codec/x264.c:353
 msgid "Use assembler CPU optimizations."
 msgstr "Použiť assemblovacie optimalizácie pre procesor."
 
-#: modules/codec/x264.c:357
+#: modules/codec/x264.c:355
 msgid "Filename for 2 pass stats file"
 msgstr "Názov dvojsmerného štatistického súboru "
 
-#: modules/codec/x264.c:358
+#: modules/codec/x264.c:356
 msgid "Filename for 2 pass stats file for multi-pass encoding."
 msgstr "Názov súboru so štatistikou obojsmerného filtra pre enkódovanie."
 
-#: modules/codec/x264.c:360
+#: modules/codec/x264.c:358
 msgid "PSNR computation"
 msgstr "Vykalkulovanie PSNR"
 
-#: modules/codec/x264.c:361
+#: modules/codec/x264.c:359
 msgid ""
 "Compute and print PSNR stats. This has no effect on the actual encoding "
 "quality."
@@ -11786,11 +11785,11 @@ msgstr ""
 "Vykalkukovať a zobraziť štatistiku pre PSNR. Táto voľba nemá žiaden vplyv na "
 "kvalitu kódovania."
 
-#: modules/codec/x264.c:364
+#: modules/codec/x264.c:362
 msgid "SSIM computation"
 msgstr "Vykalkulovať SMB"
 
-#: modules/codec/x264.c:365
+#: modules/codec/x264.c:363
 msgid ""
 "Compute and print SSIM stats. This has no effect on the actual encoding "
 "quality."
@@ -11798,28 +11797,28 @@ msgstr ""
 "Vykalkulovať a zobraziť štatistiku pre SSIM. Táto voľba nemá žiaden vplyv na "
 "kvalitu kódovania"
 
-#: modules/codec/x264.c:368
+#: modules/codec/x264.c:366
 msgid "Quiet mode"
 msgstr "Tichý režim"
 
-#: modules/codec/x264.c:369
+#: modules/codec/x264.c:367
 msgid "Quiet mode."
 msgstr "Tichý režim. "
 
-#: modules/codec/x264.c:371 modules/gui/macosx/playlistinfo.m:82
+#: modules/codec/x264.c:369 modules/gui/macosx/playlistinfo.m:82
 #: modules/gui/qt4/ui/streampanel.h:171
 msgid "Statistics"
 msgstr "Štatistiky"
 
-#: modules/codec/x264.c:372
+#: modules/codec/x264.c:370
 msgid "Print stats for each frame."
 msgstr "Zobrazovať štatistiky pre každú snímku."
 
-#: modules/codec/x264.c:374
+#: modules/codec/x264.c:372
 msgid "SPS and PPS id numbers"
 msgstr "Identifikačné čísla SPS a PPS"
 
-#: modules/codec/x264.c:375
+#: modules/codec/x264.c:373
 msgid ""
 "Set SPS and PPS id numbers to allow concatenating streams with different "
 "settings."
@@ -11827,19 +11826,19 @@ msgstr ""
 "Nastaviť identifikačné čísla SPS a PPS - tieto čísla umožňujú zreťazenie "
 "streamov s rozdielnymi nastaveniami."
 
-#: modules/codec/x264.c:378
+#: modules/codec/x264.c:376
 msgid "Access unit delimiters"
 msgstr "Oddeľovače prístupových bodov"
 
-#: modules/codec/x264.c:379
+#: modules/codec/x264.c:377
 msgid "Generate access unit delimiter NAL units."
 msgstr "Generovať oddeľovače prístupových bodov pre NAL jednotky."
 
-#: modules/codec/x264.c:381
+#: modules/codec/x264.c:379
 msgid "Framecount to use on frametype lookahead"
 msgstr "Počet snímok používaných pri snímkach tohto typu v okolí"
 
-#: modules/codec/x264.c:382
+#: modules/codec/x264.c:380
 msgid ""
 "Framecount to use on frametype lookahead. Currently default is lower than "
 "x264 default because unmuxable outputdoesn't handle larger values that well "
@@ -11849,55 +11848,60 @@ msgstr ""
 "je nižšia ako je predvolená hodnota kodeku x264, pretože nemuxovateľný "
 "výstup nepodporuje vyššie hodnoty tak dobre ako túto hodnotu."
 
-#: modules/codec/x264.c:389
+#: modules/codec/x264.c:384 modules/codec/x264.c:385
+#, fuzzy
+msgid "HRD-timing information"
+msgstr "zobraziť informácie o verzii programu"
+
+#: modules/codec/x264.c:390
 msgid "dia"
 msgstr "dia"
 
-#: modules/codec/x264.c:389
+#: modules/codec/x264.c:390
 msgid "hex"
 msgstr "hex"
 
-#: modules/codec/x264.c:389
+#: modules/codec/x264.c:390
 msgid "umh"
 msgstr "umh"
 
-#: modules/codec/x264.c:389
+#: modules/codec/x264.c:390
 msgid "esa"
 msgstr "esa"
 
-#: modules/codec/x264.c:389
+#: modules/codec/x264.c:390
 msgid "tesa"
 msgstr "tesa"
 
-#: modules/codec/x264.c:402
+#: modules/codec/x264.c:403
 msgid "fast"
 msgstr "rýchlo"
 
-#: modules/codec/x264.c:402
+#: modules/codec/x264.c:403
 msgid "normal"
 msgstr "normálne"
 
-#: modules/codec/x264.c:402
+#: modules/codec/x264.c:403
 msgid "slow"
 msgstr "pomaly"
 
-#: modules/codec/x264.c:402
+#: modules/codec/x264.c:403
 msgid "all"
 msgstr "všetky"
 
-#: modules/codec/x264.c:407
+#: modules/codec/x264.c:408
 msgid "spatial"
 msgstr "Priestorový efekt"
 
-#: modules/codec/x264.c:407
+#: modules/codec/x264.c:408
 msgid "temporal"
 msgstr "dočasný"
 
-#: modules/codec/x264.c:407 modules/video_filter/mosaic.c:167
+#: modules/codec/x264.c:408 modules/video_filter/mosaic.c:167
 msgid "auto"
 msgstr "automaticky"
 
-#: modules/codec/x264.c:410
+#: modules/codec/x264.c:411
 msgid "H.264/MPEG4 AVC encoder (x264)"
 msgstr "Enkodér H.264/MPEG4 AVC (x264)"
 
@@ -12014,7 +12018,7 @@ msgstr "Kontrola hlasitosti"
 msgid "Position Control"
 msgstr "Kontrola pozície"
 
-#: modules/control/hotkeys.c:92 modules/gui/macosx/intf.m:2443
+#: modules/control/hotkeys.c:92 modules/gui/macosx/intf.m:2449
 msgid "Ignore"
 msgstr "Ignorovať"
 
@@ -12342,8 +12346,8 @@ msgid "Opening"
 msgstr "Otváranie"
 
 #: modules/control/rc.c:73 modules/gui/macosx/embeddedwindow.m:167
-#: modules/gui/macosx/intf.m:1996 modules/gui/macosx/intf.m:1997
-#: modules/gui/macosx/intf.m:1998 modules/gui/macosx/intf.m:1999
+#: modules/gui/macosx/intf.m:2002 modules/gui/macosx/intf.m:2003
+#: modules/gui/macosx/intf.m:2004 modules/gui/macosx/intf.m:2005
 #: modules/gui/qt4/menus.cpp:796 modules/misc/notify/xosd.c:235
 msgid "Pause"
 msgstr "Pozastaviť"
@@ -13033,7 +13037,7 @@ msgstr "Neopravovať"
 msgid "Fixing AVI Index..."
 msgstr "Opravuje sa index súboru AVI..."
 
-#: modules/demux/cdg.c:45
+#: modules/demux/cdg.c:43
 msgid "CDG demuxer"
 msgstr "Demuxér CDG"
 
@@ -13233,13 +13237,13 @@ msgstr "Autentifikácia RTSP"
 msgid "Please enter a valid login name and a password."
 msgstr "Prosím zadajte platné meno používateľa a heslo."
 
-#: modules/demux/mjpeg.c:47 modules/demux/mpeg/es.c:49
+#: modules/demux/mjpeg.c:45 modules/demux/mpeg/es.c:49
 #: modules/demux/mpeg/h264.c:43 modules/demux/rawvid.c:44
 #: modules/demux/vc1.c:43 modules/gui/macosx/playlistinfo.m:107
 msgid "Frames per Second"
 msgstr "Snímky za sekundu"
 
-#: modules/demux/mjpeg.c:48
+#: modules/demux/mjpeg.c:46
 msgid ""
 "This is the desired frame rate when playing MJPEG from a file. Use 0 (this "
 "is the default value) for a live stream (from a camera)."
@@ -13248,7 +13252,7 @@ msgstr ""
 "hodnotu 0 (čo je aj predvolená hodnota) v prípade, že prehrávate live-stream "
 "(napríklad z kamery)."
 
-#: modules/demux/mjpeg.c:54
+#: modules/demux/mjpeg.c:52
 msgid "M-JPEG camera demuxer"
 msgstr "Demuxér formátu M-JPEG camera"
 
@@ -13704,7 +13708,7 @@ msgstr "Demuxér videa vo formáte Raw"
 msgid "Real demuxer"
 msgstr "Demuxér Real"
 
-#: modules/demux/smf.c:43
+#: modules/demux/smf.c:42
 msgid "SMF demuxer"
 msgstr "Demuxér pre formát SMF"
 
@@ -13829,11 +13833,11 @@ msgstr "CSA ck"
 msgid "Control word for the CSA encryption algorithm"
 msgstr "Heslo pre kryptovací algoritmus CSA"
 
-#: modules/demux/ts.c:130 modules/mux/mpeg/ts.c:173
+#: modules/demux/ts.c:130 modules/mux/mpeg/ts.c:172
 msgid "Second CSA Key"
 msgstr "Druhý kľúč CSA"
 
-#: modules/demux/ts.c:131 modules/mux/mpeg/ts.c:174
+#: modules/demux/ts.c:131 modules/mux/mpeg/ts.c:173
 msgid ""
 "The even CSA encryption key. This must be a 16 char string (8 hexadecimal "
 "bytes)."
@@ -13994,7 +13998,7 @@ msgstr "Demuxér videa vo formáte VC1"
 msgid "Vobsub subtitles parser"
 msgstr "Analyzátor titulkov vo formáte Vobsub"
 
-#: modules/demux/voc.c:46
+#: modules/demux/voc.c:44
 msgid "VOC demuxer"
 msgstr "VOC demuxér"
 
@@ -14002,7 +14006,7 @@ msgstr "VOC demuxér"
 msgid "WAV demuxer"
 msgstr "WAV demuxér"
 
-#: modules/demux/xa.c:45
+#: modules/demux/xa.c:43
 msgid "XA demuxer"
 msgstr "XA demuxér"
 
@@ -14219,7 +14223,7 @@ msgstr "Pridať"
 
 #: modules/gui/macosx/bookmarks.m:89 modules/gui/macosx/intf.m:642
 #: modules/gui/macosx/simple_prefs.m:246
-#: modules/gui/qt4/components/preferences_widgets.cpp:1199
+#: modules/gui/qt4/components/preferences_widgets.cpp:1201
 #: modules/gui/qt4/dialogs/bookmarks.cpp:47 modules/gui/qt4/ui/vlm.h:301
 msgid "Clear"
 msgstr "Vyčistiť"
@@ -14256,7 +14260,7 @@ msgstr "Čas"
 #: modules/gui/macosx/wizard.m:1686 modules/gui/macosx/wizard.m:1867
 #: modules/gui/macosx/wizard.m:1878 modules/gui/macosx/wizard.m:1891
 #: modules/gui/qt4/components/open_panels.cpp:1264
-#: modules/gui/qt4/components/preferences_widgets.cpp:1419
+#: modules/gui/qt4/components/preferences_widgets.cpp:1421
 msgid "OK"
 msgstr "OK"
 
@@ -14630,7 +14634,7 @@ msgstr "Otvoriť snímacie zariadenie..."
 msgid "Open Recent"
 msgstr "Otvoriť naposledy otvorený súbor"
 
-#: modules/gui/macosx/intf.m:635 modules/gui/macosx/intf.m:2732
+#: modules/gui/macosx/intf.m:635 modules/gui/macosx/intf.m:2738
 msgid "Clear Menu"
 msgstr "Vyčistiť menu"
 
@@ -14804,42 +14808,42 @@ msgstr ""
 "Odošle sa len Vaša predvolená e-mailová adresa, bez akýchkoľvek ďalších "
 "informácií."
 
-#: modules/gui/macosx/intf.m:1829
+#: modules/gui/macosx/intf.m:1835
 #, c-format
 msgid "Volume: %d%%"
 msgstr "Hlasitosť: %d%%"
 
-#: modules/gui/macosx/intf.m:2323
+#: modules/gui/macosx/intf.m:2329
 msgid "Error when sending the Crash Report"
 msgstr "Chyba pri odosielaní e-mailu s popisom chyby."
 
-#: modules/gui/macosx/intf.m:2414
+#: modules/gui/macosx/intf.m:2420
 msgid "No CrashLog found"
 msgstr "Nenašiel sa žiaden záznam o havárií programu"
 
-#: modules/gui/macosx/intf.m:2414 modules/gui/macosx/prefs.m:226
+#: modules/gui/macosx/intf.m:2420 modules/gui/macosx/prefs.m:226
 #: modules/gui/macosx/simple_prefs.m:697
 msgid "Continue"
 msgstr "Pokračovať"
 
-#: modules/gui/macosx/intf.m:2414
+#: modules/gui/macosx/intf.m:2420
 msgid "Couldn't find any trace of a previous crash."
 msgstr ""
 "Nemožno nájsť žiadnu stopu svedčiacu o predčasnom ukončení / chybe programu."
 
-#: modules/gui/macosx/intf.m:2441
+#: modules/gui/macosx/intf.m:2447
 msgid "Remove old preferences?"
 msgstr "Odstrániť staršie nastavenia?"
 
-#: modules/gui/macosx/intf.m:2442
+#: modules/gui/macosx/intf.m:2448
 msgid "We just found an older version of VLC's preferences files."
 msgstr "Našla sa staršia verzia nastavení programu VLC."
 
-#: modules/gui/macosx/intf.m:2443
+#: modules/gui/macosx/intf.m:2449
 msgid "Move To Trash and Relaunch VLC"
 msgstr "Presunúť do koša a reštartovať program VLC"
 
-#: modules/gui/macosx/intf.m:2577
+#: modules/gui/macosx/intf.m:2583
 #, c-format
 msgid "VLC Debug Log (%s).rtfd"
 msgstr "Záznam pre ladenie programu VLC (%s).rtfd"
@@ -15642,7 +15646,7 @@ msgid "Select an action to change the associated hotkey:"
 msgstr "Vyberte akciu, ktorej klávesovú skratku chcete zmeniť:"
 
 #: modules/gui/macosx/simple_prefs.m:248
-#: modules/gui/qt4/components/preferences_widgets.cpp:1190
+#: modules/gui/qt4/components/preferences_widgets.cpp:1192
 msgid "Action"
 msgstr "Akcia"
 
@@ -17384,42 +17388,42 @@ msgstr "Zoznam"
 msgid "Select File"
 msgstr "Vyberte si súbor"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1183
+#: modules/gui/qt4/components/preferences_widgets.cpp:1185
 msgid "Select an action to change the associated hotkey"
 msgstr "Vyberte akciu, ktorej klávesovú skratku chcete upraviť"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1191
+#: modules/gui/qt4/components/preferences_widgets.cpp:1193
 msgid "Hotkey"
 msgstr "Klávesová skratka"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1192
-#: modules/gui/qt4/components/preferences_widgets.cpp:1406
+#: modules/gui/qt4/components/preferences_widgets.cpp:1194
+#: modules/gui/qt4/components/preferences_widgets.cpp:1408
 msgid "Global"
 msgstr "Všeobecné"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1200
+#: modules/gui/qt4/components/preferences_widgets.cpp:1202
 msgid "Apply"
 msgstr "Použiť"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1356
+#: modules/gui/qt4/components/preferences_widgets.cpp:1358
 #: modules/gui/qt4/util/customwidgets.cpp:439
 msgid "Unset"
 msgstr "Nenast."
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1407
+#: modules/gui/qt4/components/preferences_widgets.cpp:1409
 msgid "Hotkey for "
 msgstr "Klávesová skratka pre"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1411
+#: modules/gui/qt4/components/preferences_widgets.cpp:1413
 msgid "Press the new keys for "
 msgstr "Stlačte novú klávesovú skratku pre"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1442
+#: modules/gui/qt4/components/preferences_widgets.cpp:1444
 msgid "Warning: the key is already assigned to \""
 msgstr "Upozornenie: takáto klávesová skratka je už pridelená akcii \""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1462
-#: modules/gui/qt4/components/preferences_widgets.cpp:1470
+#: modules/gui/qt4/components/preferences_widgets.cpp:1464
+#: modules/gui/qt4/components/preferences_widgets.cpp:1472
 msgid "Key: "
 msgstr "Kľúč:"
 
@@ -18686,7 +18690,8 @@ msgstr ""
 "Windows a X11 s príslušnými rozšíreniami."
 
 #: modules/gui/qt4/qt4.cpp:109
-msgid "Fullscreen controller opacity opacity between 0.1 and 1"
+#, fuzzy
+msgid "Fullscreen controller opacity between 0.1 and 1"
 msgstr ""
 "Nepriehľadnosť ovládacích prvkov pri celoobrazovkovom režime. Od 0.1 do 1"
 
@@ -18820,7 +18825,7 @@ msgid "Qt interface"
 msgstr "Rozhranie QT"
 
 #: modules/gui/qt4/ui/equalizer.h:126 modules/gui/qt4/ui/open_disk.h:290
-#: modules/gui/qt4/ui/open_net.h:83 modules/gui/qt4/ui/profiles.h:454
+#: modules/gui/qt4/ui/open_net.h:91 modules/gui/qt4/ui/profiles.h:454
 #: modules/gui/qt4/ui/sprefs_audio.h:403 modules/gui/qt4/ui/sprefs_input.h:305
 #: modules/gui/qt4/ui/sprefs_interface.h:372
 #: modules/gui/qt4/ui/sprefs_subtitles.h:200
@@ -18975,14 +18980,45 @@ msgstr "Veľkosť písma:"
 msgid "Text alignment:"
 msgstr "Zarovnanie textu:"
 
-#: modules/gui/qt4/ui/open_net.h:84
+#: modules/gui/qt4/ui/open_net.h:92
 msgid "Network Protocol"
 msgstr "Sieťový protokol"
 
-#: modules/gui/qt4/ui/open_net.h:87
+#: modules/gui/qt4/ui/open_net.h:93
+#, fuzzy
+msgid "Please enter a network URL:"
+msgstr "Zadajte prosím názov nového profilu."
+
+#: modules/gui/qt4/ui/open_net.h:95
 #, fuzzy
 msgid "Enter the URL of the network stream here."
 msgstr "Sem zadajte URL adresu sieťového stremu, s alebo bez udania protokolu."
+
+#: modules/gui/qt4/ui/open_net.h:97
+msgid ""
+"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/"
+"REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css"
+"\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'DejaVu Sans'; font-size:8pt; font-"
+"weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-"
+"right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" color:"
+"#838383;\">http://www.example.com/stream.avi</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-"
+"right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" color:"
+"#838383;\">rtp://@1234</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-"
+"right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" color:"
+"#838383;\">mms://mms.examples.com/stream.asx</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-"
+"right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" color:"
+"#838383;\">rtsp://server.example.org:8080/test.sdp</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-"
+"right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" color:"
+"#838383;\">http://www.yourtube.com/watch?v=gg64x</span></p></body></html>"
+msgstr ""
 
 #: modules/gui/qt4/ui/podcast_configuration.h:102
 #: modules/services_discovery/podcast.c:58
@@ -21044,11 +21080,11 @@ msgstr ""
 msgid "MP4/MOV muxer"
 msgstr "Muxér pre formát MP4/MOV"
 
-#: modules/mux/mpeg/ps.c:49 modules/mux/mpeg/ts.c:158
+#: modules/mux/mpeg/ps.c:48 modules/mux/mpeg/ts.c:157
 msgid "DTS delay (ms)"
 msgstr "Oneskorenie DTS (v ms)"
 
-#: modules/mux/mpeg/ps.c:50
+#: modules/mux/mpeg/ps.c:49
 msgid ""
 "Delay the DTS (decoding time stamps) and PTS (presentation timestamps) of "
 "the data in the stream, compared to the SCRs. This allows for some buffering "
@@ -21058,75 +21094,75 @@ msgstr ""
 "prezentácie) v dátach v streame, vzhľadom k SCR. Touto voľbou povolíte "
 "klientskému dekodéru ukladanie streamu do vyrovnávacej pamäte."
 
-#: modules/mux/mpeg/ps.c:55
+#: modules/mux/mpeg/ps.c:54
 msgid "PES maximum size"
 msgstr "Maximálna veľkosť PES"
 
-#: modules/mux/mpeg/ps.c:56
+#: modules/mux/mpeg/ps.c:55
 msgid "Set the maximum allowed PES size when producing the MPEG PS streams."
 msgstr ""
 "Zadajte maximálnu povolenú hodnotu parametra PES, ktorý sa používa pri "
 "vytváraní MPEG PS streamov."
 
-#: modules/mux/mpeg/ps.c:65
+#: modules/mux/mpeg/ps.c:64
 msgid "PS muxer"
 msgstr "Muxér pre formát PS"
 
-#: modules/mux/mpeg/ts.c:98
+#: modules/mux/mpeg/ts.c:97
 msgid "Video PID"
 msgstr "Video PID"
 
-#: modules/mux/mpeg/ts.c:99
+#: modules/mux/mpeg/ts.c:98
 msgid ""
 "Assign a fixed PID to the video stream. The PCR PID will automatically be "
 "the video."
 msgstr "Tu môžete prideliť fixný PID identifikátor k určitému video-streamu. "
 
-#: modules/mux/mpeg/ts.c:101
+#: modules/mux/mpeg/ts.c:100
 msgid "Audio PID"
 msgstr "Audio PID"
 
-#: modules/mux/mpeg/ts.c:102
+#: modules/mux/mpeg/ts.c:101
 msgid "Assign a fixed PID to the audio stream."
 msgstr "Tu môžete prideliť fixný identifikátor k určitému zvuk. streamu."
 
-#: modules/mux/mpeg/ts.c:103
+#: modules/mux/mpeg/ts.c:102
 msgid "SPU PID"
 msgstr "SPU PID"
 
-#: modules/mux/mpeg/ts.c:104
+#: modules/mux/mpeg/ts.c:103
 msgid "Assign a fixed PID to the SPU."
 msgstr "Tu môžete prideliť PID identifikátor k SPU."
 
-#: modules/mux/mpeg/ts.c:105
+#: modules/mux/mpeg/ts.c:104
 msgid "PMT PID"
 msgstr "PMT PID"
 
-#: modules/mux/mpeg/ts.c:106
+#: modules/mux/mpeg/ts.c:105
 msgid "Assign a fixed PID to the PMT"
 msgstr "Tu môžete prideliť PID identifikátor k PMT."
 
-#: modules/mux/mpeg/ts.c:107
+#: modules/mux/mpeg/ts.c:106
 msgid "TS ID"
 msgstr "TS ID"
 
-#: modules/mux/mpeg/ts.c:108
+#: modules/mux/mpeg/ts.c:107
 msgid "Assign a fixed Transport Stream ID."
 msgstr "Prideliť fixné ident. číslo transportnému streamu."
 
-#: modules/mux/mpeg/ts.c:109
+#: modules/mux/mpeg/ts.c:108
 msgid "NET ID"
 msgstr "NET ID"
 
-#: modules/mux/mpeg/ts.c:110
+#: modules/mux/mpeg/ts.c:109
 msgid "Assign a fixed Network ID (for SDT table)"
 msgstr "Tu môžete prideliť fixný identifikátor Network ID (pre tabuľku SDT)."
 
-#: modules/mux/mpeg/ts.c:112
+#: modules/mux/mpeg/ts.c:111
 msgid "PMT Program numbers"
 msgstr "Číslo programu PMT"
 
-#: modules/mux/mpeg/ts.c:113
+#: modules/mux/mpeg/ts.c:112
 msgid ""
 "Assign a program number to each PMT. This requires \"Set PID to ID of ES\" "
 "to be enabled."
@@ -21135,11 +21171,11 @@ msgstr ""
 "použiť, musíte zapnúť aj funkciu \"Nastaviť hodnotu PID na ident. číslo "
 "elementárneho streamu\"."
 
-#: modules/mux/mpeg/ts.c:116
+#: modules/mux/mpeg/ts.c:115
 msgid "Mux PMT (requires --sout-ts-es-id-pid)"
 msgstr "Muxovať PMT (vyžaduje sa --sout-ts-es-id-pid)"
 
-#: modules/mux/mpeg/ts.c:117
+#: modules/mux/mpeg/ts.c:116
 msgid ""
 "Define the pids to add to each pmt. This requires \"Set PID to ID of ES\" to "
 "be enabled."
@@ -21148,11 +21184,11 @@ msgstr ""
 "použiť túto funkciu, musí byť aktivovaná aj funkcia \"Nastaviť hodnotu PID "
 "na ident. číslo elementárneho streamu\"."
 
-#: modules/mux/mpeg/ts.c:120
+#: modules/mux/mpeg/ts.c:119
 msgid "SDT Descriptors (requires --sout-ts-es-id-pid)"
 msgstr "Popisovače SDT (vyžaduje sa --sout-ts-es-id-pid)"
 
-#: modules/mux/mpeg/ts.c:121
+#: modules/mux/mpeg/ts.c:120
 msgid ""
 "Defines the descriptors of each SDT. Thisrequires \"Set PID to ID of ES\" to "
 "be enabled."
@@ -21161,11 +21197,11 @@ msgstr ""
 "musí byť aktivovaná aj funkcia \"Nastaviť hodnotu PID na ident. číslo "
 "elementárneho streamu\"."
 
-#: modules/mux/mpeg/ts.c:124
+#: modules/mux/mpeg/ts.c:123
 msgid "Set PID to ID of ES"
 msgstr "Nastaviť hodnotu PID na ident. číslo elementárneho streamu"
 
-#: modules/mux/mpeg/ts.c:125
+#: modules/mux/mpeg/ts.c:124
 msgid ""
 "Sets PID to the ID if the incoming ES. This is for use with --ts-es-id-pid, "
 "and allows to have the same PIDs in the input and output streams."
@@ -21174,11 +21210,11 @@ msgstr ""
 "umožňuje to, aby vo vstupnom aj výstupnom streame boli použité rovnaké "
 "identifikátory PID."
 
-#: modules/mux/mpeg/ts.c:129
+#: modules/mux/mpeg/ts.c:128
 msgid "Data alignment"
 msgstr "Zrovnanie dát"
 
-#: modules/mux/mpeg/ts.c:130
+#: modules/mux/mpeg/ts.c:129
 msgid ""
 "Enforces alignment of all access units on PES boundaries. Disabling this "
 "might save some bandwidth but introduce incompatibilities."
@@ -21187,11 +21223,11 @@ msgstr ""
 "Zablokovaním tejto funkcie sa môže ušetriť prenosové pásmo, ale môžu nastať "
 "aj problémy s kompatibilitou."
 
-#: modules/mux/mpeg/ts.c:133
+#: modules/mux/mpeg/ts.c:132
 msgid "Shaping delay (ms)"
 msgstr "Oneskorenie vytvárania (v ms)"
 
-#: modules/mux/mpeg/ts.c:134
+#: modules/mux/mpeg/ts.c:133
 msgid ""
 "Cut the stream in slices of the given duration, and ensure a constant "
 "bitrate between the two boundaries. This avoids having huge bitrate peaks, "
@@ -21202,11 +21238,11 @@ msgstr ""
 "aby vznikali priveľké špičky v dátovom toku. Takéto špičky by prekážali "
 "obzvlášť v referenčných snímkach."
 
-#: modules/mux/mpeg/ts.c:139
+#: modules/mux/mpeg/ts.c:138
 msgid "Use keyframes"
 msgstr "Použiť kľúčové snímky"
 
-#: modules/mux/mpeg/ts.c:140
+#: modules/mux/mpeg/ts.c:139
 msgid ""
 "If enabled, and shaping is specified, the TS muxer will place the boundaries "
 "at the end of I pictures. In that case, the shaping duration given by the "
@@ -21218,11 +21254,11 @@ msgstr ""
 "zvýši efektivitu algoritmu pre vytváranie snímok, pretože I-snímky bývajú "
 "väčšinou najväčšími snímkami v streame."
 
-#: modules/mux/mpeg/ts.c:147
+#: modules/mux/mpeg/ts.c:146
 msgid "PCR interval (ms)"
 msgstr "Interval PCR (v ms)"
 
-#: modules/mux/mpeg/ts.c:148
+#: modules/mux/mpeg/ts.c:147
 msgid ""
 "Set at which interval PCRs (Program Clock Reference) will be sent (in "
 "milliseconds). This value should be below 100ms. (default is 70ms)."
@@ -21231,19 +21267,19 @@ msgstr ""
 "Reference). Interval sa udáva v milisekundách. Táto hodnota by mala byť "
 "nižšia ako 100 ms - predvolená hodnota je 70 ms."
 
-#: modules/mux/mpeg/ts.c:152
+#: modules/mux/mpeg/ts.c:151
 msgid "Minimum B (deprecated)"
 msgstr "Minimum B (odporúčame: nenastavovať)"
 
-#: modules/mux/mpeg/ts.c:153 modules/mux/mpeg/ts.c:156
+#: modules/mux/mpeg/ts.c:152 modules/mux/mpeg/ts.c:155
 msgid "This setting is deprecated and not used anymore"
 msgstr "Toto nastavenie je veľmi diskutabilné a preto sa už prestáva používať."
 
-#: modules/mux/mpeg/ts.c:155
+#: modules/mux/mpeg/ts.c:154
 msgid "Maximum B (deprecated)"
 msgstr "Maximum B (odporúčame: nenastavovať)"
 
-#: modules/mux/mpeg/ts.c:159
+#: modules/mux/mpeg/ts.c:158
 msgid ""
 "Delay the DTS (decoding time stamps) and PTS (presentation timestamps) of "
 "the data in the stream, compared to the PCRs. This allows for some buffering "
@@ -21253,38 +21289,38 @@ msgstr ""
 "prezentácie) v dátach v streame, vzhľadom k PCR. Touto voľbou povolíte "
 "klientskému dekodéru ukladanie streamu do vyrovnávacej pamäte."
 
-#: modules/mux/mpeg/ts.c:164
+#: modules/mux/mpeg/ts.c:163
 msgid "Crypt audio"
 msgstr "Kryptovať zvuk"
 
-#: modules/mux/mpeg/ts.c:165
+#: modules/mux/mpeg/ts.c:164
 msgid "Crypt audio using CSA"
 msgstr "Kryptovať zvuk použitím algoritmu CSA"
 
-#: modules/mux/mpeg/ts.c:166
+#: modules/mux/mpeg/ts.c:165
 msgid "Crypt video"
 msgstr "Kryptovať video"
 
-#: modules/mux/mpeg/ts.c:167
+#: modules/mux/mpeg/ts.c:166
 msgid "Crypt video using CSA"
 msgstr "Kryptovať video použitím algoritmu CSA"
 
-#: modules/mux/mpeg/ts.c:169
+#: modules/mux/mpeg/ts.c:168
 msgid "CSA Key"
 msgstr "Kľúč CSA"
 
-#: modules/mux/mpeg/ts.c:170
+#: modules/mux/mpeg/ts.c:169
 msgid ""
 "CSA encryption key. This must be a 16 char string (8 hexadecimal bytes)."
 msgstr ""
 "Kryptovací kľúč CSA. Tento príkaz musí mať 16 znakov (alebo 8 bytov v "
 "hexadecimálnom vyjadrení)."
 
-#: modules/mux/mpeg/ts.c:177
+#: modules/mux/mpeg/ts.c:176
 msgid "CSA Key in use"
 msgstr "Používaný kľúč CSA"
 
-#: modules/mux/mpeg/ts.c:178
+#: modules/mux/mpeg/ts.c:177
 msgid ""
 "CSA encryption key used. It can be the odd/first/1 (default) or the even/"
 "second/2 one."
@@ -21292,11 +21328,11 @@ msgstr ""
 "Používaný kryptovací kľúč CSA. Môže byť nepárny/prvý/1 (predvolené) alebo "
 "párny/druhý/2."
 
-#: modules/mux/mpeg/ts.c:181
+#: modules/mux/mpeg/ts.c:180
 msgid "Packet size in bytes to encrypt"
 msgstr "Veľkosť kryptovaného paketu v bytoch"
 
-#: modules/mux/mpeg/ts.c:182
+#: modules/mux/mpeg/ts.c:181
 msgid ""
 "Size of the TS packet to encrypt. The encryption routines subtract the TS-"
 "header from the value before encrypting."
@@ -21304,7 +21340,7 @@ msgstr ""
 "Veľkosť TS paketu, ktorý sa bude kryptovať. Pred kryptovaním sa extrahuje TS-"
 "hlavička."
 
-#: modules/mux/mpeg/ts.c:191
+#: modules/mux/mpeg/ts.c:190
 msgid "TS muxer (libdvbpsi)"
 msgstr "Muxér TS (libdvbpsi)"
 
@@ -22679,7 +22715,8 @@ msgstr ""
 "naživo."
 
 #: modules/video_filter/atmo/atmo.cpp:135
-msgid "Devicetype"
+#, fuzzy
+msgid "Device type"
 msgstr "Typ zariadenia"
 
 #: modules/video_filter/atmo/atmo.cpp:136
