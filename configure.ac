@@ -4443,10 +4443,9 @@ AC_ARG_WITH(kde-solid,
 soliddatadir=""
 AS_IF([test "${with_kde_solid}" != "no"], [
   AS_IF([test "${with_kde_solid}" = "yes"], [
-    soliddatadir="`${KDE4_CONFIG} --install data`solid/actions"
-    AS_IF([test "x${soliddatadir}" = "x"], [
-      soliddatadir='$(datadir)/kde4/apps/solid/actions'
-    ])
+    kde4datadir="`${KDE4_CONFIG} --install data`"
+    AS_IF([test "x$kde4datadir" = "x"], [kde4datadir='${datadir}/kde4/apps'])
+    soliddatadir="${kde4datadir}/solid/actions"
   ], [
     soliddatadir="${with_kde_solid}"
   ])
