@@ -289,8 +289,6 @@ static void Close( vlc_object_t * );
 
 #define SUBME_TEXT N_("Subpixel motion estimation and partition decision " \
     "quality")
-
-#define SUBME_MAX 9
 #define SUBME_LONGTEXT N_( "This parameter controls quality versus speed " \
     "tradeoffs involved in the motion estimation decision process " \
     "(lower = quicker and higher = better quality). Range 1 to 9." )
@@ -584,9 +582,8 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "mvrange-thread", -1, NULL, MVRANGE_THREAD_TEXT,
                  MVRANGE_THREAD_LONGTEXT, false )
 
-    add_integer( SOUT_CFG_PREFIX "subme", 5, NULL, SUBME_TEXT,
+    add_integer( SOUT_CFG_PREFIX "subme", 7, NULL, SUBME_TEXT,
                  SUBME_LONGTEXT, false )
-        change_integer_range( 1, SUBME_MAX )
 
     add_obsolete_bool( SOUT_CFG_PREFIX "b-rdo" )
 
@@ -913,7 +910,7 @@ static int  Open ( vlc_object_t *p_this )
                         SOUT_CFG_PREFIX "non-deterministic" );
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "subme" );
-    if( i_val >= 1 && i_val <= SUBME_MAX )
+    if( i_val >= 1 )
         p_sys->param.analyse.i_subpel_refine = i_val;
 
     //TODO: psz_val == NULL ?
