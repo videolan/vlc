@@ -349,6 +349,7 @@ case "${host_os}" in
         # add ws2 for closesocket, select, recv
         VLC_ADD_LIBS([libvlccore access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_rtmp sap oldhttp netsync audioscrobbler growl rtp stream_out_rtp remoteosd ts oldtelnet audiobargraph_a netsync],[-lws2])
         VLC_ADD_LIBS([libvlccore],[-lmmtimer])
+        AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
    fi
     ;;
   *nto*)
