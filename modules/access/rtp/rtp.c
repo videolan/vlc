@@ -34,8 +34,6 @@
 #include <vlc_network.h>
 #include <vlc_plugin.h>
 
-#include <vlc_codecs.h>
-
 #include "rtp.h"
 #ifdef HAVE_SRTP
 # include <srtp.h>

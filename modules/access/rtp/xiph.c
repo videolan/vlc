@@ -35,7 +35,6 @@
 #endif
 #include <vlc_plugin.h>
 
-#include <vlc_codecs.h>
 #include "../../demux/xiph.h"
 
 #include "rtp.h"

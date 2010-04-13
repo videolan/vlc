@@ -31,7 +31,6 @@
 
 #include <vlc_common.h>
 #include <vlc_codec.h>
-#include <vlc_codecs.h>                               /* BITMAPINFOHEADER */
 #include <vlc_avcodec.h>
 #include <assert.h>
 

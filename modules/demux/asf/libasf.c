@@ -31,7 +31,6 @@
 
 #include <vlc_demux.h>
 
-#include <vlc_codecs.h>                   /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "libasf.h"
 
 #define ASF_DEBUG 1

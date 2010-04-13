@@ -41,7 +41,6 @@
 #include <vlc_plugin.h>
 #include <vlc_input.h>
 #include <vlc_demux.h>
-#include <vlc_codecs.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
 

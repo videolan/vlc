@@ -35,7 +35,6 @@
 #include <vlc_block.h>
 #include <assert.h>
 
-#include <vlc_codecs.h>
 #include "pes.h"
 #include "bits.h"
 
