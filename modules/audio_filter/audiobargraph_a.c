@@ -64,7 +64,7 @@
 #define ALARM_THRESHOLD_LONGTEXT N_("Threshold to be attained to raise an alarm. "\
                 "If the audio level is under the threshold during this time, "\
                 "an alarm is sent (default 0.1)." )
-#define REPETITION_TIME_TEXT N_("Time between two alamr messages in ms (default 2000)" )
+#define REPETITION_TIME_TEXT N_("Time between two alarm messages in ms (default 2000)" )
 #define REPETITION_TIME_LONGTEXT N_("Time between two alarm messages in ms. "\
                 "This value is used to avoid alarm saturation (default 2000)." )
 #define CONNECTION_RESET_TEXT N_("Force connection reset regularly (default 1)" )
