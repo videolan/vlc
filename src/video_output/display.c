@@ -1422,6 +1422,15 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
 #include "vout_internal.h"
 void vout_SendDisplayEventMouse(vout_thread_t *vout, const vlc_mouse_t *m)
 {
+    vlc_mouse_t tmp;
+
+    vlc_mutex_lock( &vout->p->vfilter_lock );
+    if (vout->p->p_vf2_chain) {
+        if (!filter_chain_MouseFilter(vout->p->p_vf2_chain, &tmp, m))
+            m = &tmp;
+    }
+    vlc_mutex_unlock( &vout->p->vfilter_lock );
+
     if (vlc_mouse_HasMoved(&vout->p->mouse, m)) {
         vout_SendEventMouseMoved(vout, m->i_x, m->i_y);
     }
@@ -1453,10 +1462,13 @@ static void DummyVoutSendDisplayEventMouse(vout_thread_t *vout, vlc_mouse_t *fal
 
     if (!vout->p) {
         p.mouse = *fallback;
+        vlc_mutex_init(&p.vfilter_lock);
+        p.p_vf2_chain = NULL;
         vout->p = &p;
     }
     vout_SendDisplayEventMouse(vout, m);
     if (vout->p == &p) {
+        vlc_mutex_destroy(&p.vfilter_lock);
         *fallback = p.mouse;
         vout->p = NULL;
     }

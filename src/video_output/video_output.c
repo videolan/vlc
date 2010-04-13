@@ -1111,8 +1111,12 @@ static void* RunThread( void *p_this )
 
         p_filtered_picture = NULL;
         if( p_picture )
+        {
+            vlc_mutex_lock( &p_vout->p->vfilter_lock );
             p_filtered_picture = filter_chain_VideoFilter( p_vout->p->p_vf2_chain,
                                                            p_picture );
+            vlc_mutex_unlock( &p_vout->p->vfilter_lock );
+        }
 
         const bool b_snapshot = vout_snapshot_IsRequested( &p_vout->p->snapshot );
 

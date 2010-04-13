@@ -60,7 +60,7 @@ struct vout_thread_sys_t
     vlc_cond_t      picture_wait;
 
     /* */
-    vlc_mutex_t     vfilter_lock;         /**< video filter2 change lock */
+    vlc_mutex_t     vfilter_lock;         /**< video filter2 lock */
 
     /* */
     uint32_t        render_time;           /**< last picture render time */
