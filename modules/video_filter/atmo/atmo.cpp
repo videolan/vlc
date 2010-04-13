@@ -132,7 +132,7 @@ strings for settings menus and hints
  "You can also have a look at pictures and some movies showing such a device " \
  "in live action.")
 
-#define DRIVER_TEXT            N_("Devicetype")
+#define DRIVER_TEXT            N_("Device type")
 #define DRIVER_LONGTEXT        N_("Choose your prefered hardware from " \
                                   "the list, or choose AtmoWin Software " \
                                   "to delegate processing to the external " \
