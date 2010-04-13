@@ -11105,11 +11105,11 @@ msgstr ""
 
 #: modules/codec/x264.c:142
 msgid "Interlaced mode"
-msgstr "Mode de désentrelacement"
+msgstr "Mode entrelacé"
 
 #: modules/codec/x264.c:143
 msgid "Pure-interlaced mode."
-msgstr "Mode d'entrelacement pur"
+msgstr "Mode entrelacé pur"
 
 #: modules/codec/x264.c:145
 msgid "Use Periodic Intra Refresh"
@@ -11391,7 +11391,7 @@ msgstr "Prédiction pondérée pour les images B."
 
 #: modules/codec/x264.c:257
 msgid "Weighted prediction for P-frames"
-msgstr "Prédiction pondérée pour les images B"
+msgstr "Prédiction pondérée pour les images P"
 
 #: modules/codec/x264.c:258
 msgid ""
