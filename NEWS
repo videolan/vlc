@@ -112,6 +112,7 @@ Mac OS X Port:
    by Andy Matuschak et al.
  * New CoreText based text renderer replacing the former ATSUI renderer
  * New Video output module (mostly targetting VLCKit)
+ * Optimised behavior when using the 2009 Apple Remote
 
 Windows port:
  * Integration in Windows 7 taskbar
