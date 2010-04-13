@@ -216,6 +216,7 @@ nobase_vlclib_DATA = \
 	lua/intf/dumpmeta.luac \
 	lua/meta/art/01_musicbrainz.luac \
 	lua/meta/art/02_frenchtv.luac \
+	lua/meta/art/03_lastfm.luac \
 	lua/meta/art/10_googleimage.luac \
 	lua/meta/fetcher/tvrage.luac \
 	lua/meta/reader/filename.luac \
@@ -258,6 +259,7 @@ EXTRA_DIST += \
 	lua/meta/art/README.txt \
 	lua/meta/art/01_musicbrainz.lua \
 	lua/meta/art/02_frenchtv.lua \
+	lua/meta/art/03_lastfm.lua \
 	lua/meta/art/10_googleimage.lua \
 	lua/meta/fetcher/README.txt \
 	lua/meta/fetcher/tvrage.lua \
