@@ -47,10 +47,6 @@ static void Close( vlc_object_t * );
 #define DECLARE_OPEN(name,filter) \
     static int  Open##name ( vlc_object_t *p_this ) { return Open( p_this, #name, filter ); }
 
-DECLARE_OPEN(magnify, true)
-DECLARE_OPEN(puzzle, true)
-DECLARE_OPEN(logo, true)
-
 DECLARE_OPEN(clone, false)
 DECLARE_OPEN(wall, false)
 DECLARE_OPEN(panoramix, false)
@@ -68,15 +64,6 @@ vlc_module_begin()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    DECLARE_MODULE(magnify)
-
-    add_submodule()
-    DECLARE_MODULE(puzzle)
-
-    add_submodule()
-    DECLARE_MODULE(logo)
-
-    add_submodule()
     DECLARE_MODULE(clone)
 
     add_submodule()
