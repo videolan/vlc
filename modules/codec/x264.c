@@ -481,7 +481,7 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "slice-max-size", 0, NULL, SLICE_MAX_SIZE, SLICE_MAX_SIZE_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "slice-max-mbs", 0, NULL, SLICE_MAX_MBS, SLICE_MAX_MBS_LONGTEXT, false )
 
-#if X264_BUILD >= 92
+#if X264_BUILD >= 89
     add_string( SOUT_CFG_PREFIX "hrd", "none", NULL, HRD_TEXT, HRD_LONGTEXT, false )
         change_string_list( x264_nal_hrd_names, x264_nal_hrd_names, 0 );
 #endif
@@ -921,7 +921,7 @@ static int  Open ( vlc_object_t *p_this )
     if( i_val >= 1 )
         p_sys->param.analyse.i_subpel_refine = i_val;
 
-#if X264_BUILD >= 92
+#if X264_BUILD >= 89
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "hrd");
     if( !strcmp( psz_val, "vbr" ) )
         p_sys->param.i_nal_hrd = X264_NAL_HRD_VBR;
