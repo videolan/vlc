@@ -2,16 +2,16 @@ dnl Autoconf settings for vlc
 
 AC_COPYRIGHT([Copyright 2002-2010 the VideoLAN team])
 
-AC_INIT(vlc, 1.1.0-pre1)
+AC_INIT(vlc, 1.2.0-git)
 VERSION_MAJOR="1"
-VERSION_MINOR="1"
+VERSION_MINOR="2"
 VERSION_REVISION="0"
-VERSION_EXTRA="-pre1"
+VERSION_EXTRA="-git"
 PKGDIR="vlc"
 AC_SUBST(PKGDIR)
 
 CONFIGURE_LINE="`echo "$0 $ac_configure_args" | sed -e 's/\\\/\\\\\\\/g'`"
-CODENAME="The Luggage"
+CODENAME="Twoflower"
 COPYRIGHT_YEARS="1996-2010"
 
 AC_PREREQ(2.59c)
