@@ -88,7 +88,7 @@ static int vlc_sd_probe_Open (vlc_object_t *obj)
         vlc_sd_probe_Add (probe, "alsa{longname=\"Audio capture\"}",
                           N_("Audio capture"), SD_CAT_DEVICES);
         vlc_sd_probe_Add (probe, "disc{longname=\"Discs\"}", N_("Discs"),
-                          SD_CAT_MYCOMPUTER);
+                          SD_CAT_DEVICES);
         udev_monitor_unref (mon);
     }
     udev_unref (udev);
