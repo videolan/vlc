@@ -21,9 +21,8 @@
 
 -- Return the artwork
 function fetch_art()
-    if vlc.input == nil then return nil end
-    local item = vlc.input.item()
-    local meta = item:metas()
+    if vlc.item == nil then return nil end
+    local meta = vlc.item:metas()
     if meta["artist"] and meta["album"] then
         title = meta["artist"].."/"..meta["album"]
     else
