@@ -39,6 +39,9 @@
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
 #endif
+#if defined(HAVE_FSTATFS) && defined(__SunOS)
+#   undef HAVE_FSTATFS
+#endif
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
 #endif
