@@ -1937,11 +1937,11 @@ DISTCLEAN_PKG += libIDL-$(LIBIDL_VERSION).tar.gz
 # Gecko SDK
 # ***************************************************************************
 
-gecko-sdk-ppc-macosx10.2-1.7.5.tar.gz:
+xulrunner-1.9.2.en-US.mac-i386.sdk.tar.bz2:
 	$(WGET) $(GECKO_SDK_MAC_URL)
 
-gecko-sdk: gecko-sdk-ppc-macosx10.2-1.7.5.tar.gz
-	$(EXTRACT_GZ)
+gecko-sdk: xulrunner-1.9.2.en-US.mac-i386.sdk.tar.bz2
+	$(EXTRACT_BZ2)
 
 .gecko: gecko-sdk
 	rm -rf $(PREFIX)/gecko-sdk
@@ -1952,7 +1952,7 @@ gecko-sdk: gecko-sdk-ppc-macosx10.2-1.7.5.tar.gz
 
 CLEAN_FILE += .gecko
 CLEAN_PKG += gecko-sdk
-DISTCLEAN_PKG += gecko-sdk-ppc-macosx10.2-1.7.5.tar.gz
+DISTCLEAN_PKG += xulrunner-1.9.2.en-US.mac-i386.sdk.tar.bz2
 
 # ***************************************************************************
 # Gecko SDK win32
