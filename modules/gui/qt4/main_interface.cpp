@@ -235,7 +235,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /**** FINAL SIZING and placement of interface */
     settings->beginGroup( "MainWindow" );
-    QVLCTools::restoreWidgetPosition( settings, this, QSize(400, 100) );
 
     /* Playlist */
     int i_plVis = settings->value( "playlist-visible", false ).toBool();
@@ -243,6 +242,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     if( i_plVis ) togglePlaylist();
 
+    QVLCTools::restoreWidgetPosition( settings, this, QSize(400, 100) );
     /* Final sizing and showing */
     setVisible( !b_hideAfterCreation );
 
