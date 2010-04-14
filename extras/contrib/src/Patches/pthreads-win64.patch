@@ -1,0 +1,11 @@
+--- pthreads/pthread.h	2006-01-24 14:59:57.000000000 +0100
++++ pthreads.new/pthread.h	2010-04-14 15:49:39.000000000 +0200
+@@ -302,7 +302,7 @@
+ #endif
+ #endif
+ 
+-#ifndef HAVE_STRUCT_TIMESPEC
++#if !defined( HAVE_STRUCT_TIMESPEC ) && !defined( _TIMESPEC_DEFINED )
+ #define HAVE_STRUCT_TIMESPEC 1
+ struct timespec {
+         long tv_sec;
