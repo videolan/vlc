@@ -154,7 +154,7 @@ NPError NPP_SetValue( NPP instance, NPNVariable variable, void *value )
  * Mac-only API calls
  *****************************************************************************/
 #ifdef XP_MACOSX
-int16 NPP_HandleEvent( NPP instance, void * event )
+int16_t NPP_HandleEvent( NPP instance, void * event )
 {
     static UInt32 lastMouseUp = 0;
     if( instance == NULL )
