@@ -30,12 +30,6 @@
  * This file defines codec related structures needed by the demuxers and decoders
  */
 
-#ifdef HAVE_ATTRIBUTE_PACKED
-#   define ATTR_PACKED __attribute__((__packed__))
-#else
-#   error FIXME
-#endif
-
 /* Structures exported to the demuxers and decoders */
 
 #if !(defined _GUID_DEFINED || defined GUID_DEFINED)
@@ -48,6 +42,15 @@ typedef struct _GUID
     uint8_t  Data4[8];
 } GUID, *REFGUID, *LPGUID;
 #endif /* GUID_DEFINED */
+
+#ifdef HAVE_ATTRIBUTE_PACKED
+#   define ATTR_PACKED __attribute__((__packed__))
+#elif defined(__SUNPRO_C)
+#   pragma pack(1)
+#   define ATTR_PACKED
+#else
+#   error FIXME
+#endif
 
 #ifndef _WAVEFORMATEX_
 #define _WAVEFORMATEX_
@@ -197,6 +200,10 @@ ATTR_PACKED
     };
 
 } VIDEOINFO;
+#endif
+
+#if defined(__SUNPRO_C)
+#   pragma pack()
 #endif
 
 /* WAVE format wFormatTag IDs */
