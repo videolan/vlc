@@ -179,7 +179,7 @@ static const char *const ppsz_snap_formats[] =
 #define EXTRAINTF_LONGTEXT N_( \
     "You can select \"additional interfaces\" for VLC. " \
     "They will be launched in the background in addition to the default " \
-    "interface. Use a comma separated list of interface modules. (common " \
+    "interface. Use a colon separated list of interface modules. (common " \
     "values are \"rc\" (remote control), \"http\", \"gestures\" ...)")
 
 #define CONTROL_TEXT N_("Control interfaces")

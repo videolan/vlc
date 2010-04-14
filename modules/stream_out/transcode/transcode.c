@@ -78,7 +78,7 @@
 #define VFILTER_TEXT N_("Video filter")
 #define VFILTER_LONGTEXT N_( \
     "Video filters will be applied to the video streams (after overlays " \
-    "are applied). You must enter a comma-separated list of filters." )
+    "are applied). You can enter a colon-separated list of filters." )
 
 #define AENC_TEXT N_("Audio encoder")
 #define AENC_LONGTEXT N_( \
@@ -102,7 +102,7 @@
 #define AFILTER_TEXT N_("Audio filter")
 #define AFILTER_LONGTEXT N_( \
     "Audio filters will be applied to the audio streams (after conversion " \
-    "filters are applied). You must enter a comma-separated list of filters." )
+    "filters are applied). You can enter a colon-separated list of filters." )
 
 #define SENC_TEXT N_("Subtitles encoder")
 #define SENC_LONGTEXT N_( \
@@ -116,7 +116,7 @@
 #define SFILTER_LONGTEXT N_( \
     "This allows you to add overlays (also known as \"subpictures\" on the "\
     "transcoded video stream. The subpictures produced by the filters will "\
-    "be overlayed directly onto the video. You must specify a comma-separated "\
+    "be overlayed directly onto the video. You can specify a colon-separated "\
     "list of subpicture modules" )
 
 #define OSD_TEXT N_("OSD menu")
