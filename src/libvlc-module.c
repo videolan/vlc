@@ -1226,7 +1226,7 @@ static const char *const ppsz_albumart_descriptions[] =
 #define SD_TEXT N_( "Services discovery modules")
 #define SD_LONGTEXT N_( \
      "Specifies the services discovery modules to load, separated by " \
-     "semi-colons. Typical values are sap, hal, ..." )
+     "colons. Typical values are sap, hal, ..." )
 
 #define RANDOM_TEXT N_("Play files randomly forever")
 #define RANDOM_LONGTEXT N_( \
