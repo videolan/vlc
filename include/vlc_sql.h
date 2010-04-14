@@ -300,7 +300,7 @@ static inline int sql_CommitTransaction( sql_t *p_sql )
  **/
 static inline void sql_RollbackTransaction( sql_t *p_sql )
 {
-    return p_sql->pf_rollback( p_sql );
+    p_sql->pf_rollback( p_sql );
 }
 
 /**

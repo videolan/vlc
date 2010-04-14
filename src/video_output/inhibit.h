@@ -28,6 +28,6 @@ void vlc_inhibit_Destroy (vlc_inhibit_t *);
 
 static inline void vlc_inhibit_Set (vlc_inhibit_t *ih, bool suspend)
 {
-    return ih->inhibit (ih, suspend);
+    ih->inhibit (ih, suspend);
 }
 #endif
