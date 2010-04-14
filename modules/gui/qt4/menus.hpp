@@ -71,7 +71,7 @@ private:
 
 class QVLCMenu : public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
     friend class MenuFunc;
 
 public:

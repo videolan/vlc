@@ -43,7 +43,7 @@ class QLabel;
 
 class PrefsDialog : public QVLCDialog
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     PrefsDialog( QWidget *, intf_thread_t * );
     virtual ~PrefsDialog() {}

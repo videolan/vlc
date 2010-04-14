@@ -32,7 +32,7 @@ class EPGEvent;
 class EPGWidget;
 class EpgDialog : public QVLCFrame, public Singleton<EpgDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 private:
     EpgDialog( intf_thread_t * );
     virtual ~EpgDialog();

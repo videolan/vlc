@@ -49,7 +49,7 @@ class QComboBox;
 
 class WidgetListing : public QListWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     WidgetListing( intf_thread_t *, QWidget *_parent = 0 );
 protected:
@@ -60,7 +60,7 @@ private:
 
 class ToolbarEditDialog : public QVLCDialog
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     ToolbarEditDialog( QWidget *, intf_thread_t * );
     int getOptions() { return flatBox->isChecked() * WIDGET_FLAT +
@@ -86,7 +86,7 @@ private slots:
 
 class DroppingController: public AbstractController
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     DroppingController( intf_thread_t *, const QString& line, QWidget *parent = 0 );
     QString getValue();

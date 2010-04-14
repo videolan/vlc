@@ -32,7 +32,7 @@ class VLCProfileSelector;
 
 class ConvertDialog : public QVLCDialog
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     ConvertDialog( QWidget *, intf_thread_t *, const QString& );
     virtual ~ConvertDialog(){}

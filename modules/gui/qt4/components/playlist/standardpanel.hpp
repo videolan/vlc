@@ -132,7 +132,7 @@ private:
 
 class LocationBar : public QWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     LocationBar( PLModel * );
     void setIndex( const QModelIndex & );

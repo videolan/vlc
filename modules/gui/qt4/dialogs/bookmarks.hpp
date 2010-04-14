@@ -33,7 +33,7 @@
 
 class BookmarksDialog : public QVLCFrame, public Singleton<BookmarksDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 private:
     BookmarksDialog( intf_thread_t * );
     virtual ~BookmarksDialog();

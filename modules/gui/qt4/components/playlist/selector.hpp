@@ -83,7 +83,7 @@ private:
 
 class PLSelItem : public QWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     PLSelItem( QTreeWidgetItem*, const QString& );
     void setText( const QString& );
@@ -110,7 +110,7 @@ Q_DECLARE_METATYPE( playlist_item_t *);
 Q_DECLARE_METATYPE( input_item_t *);
 class PLSelector: public QTreeWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     PLSelector( QWidget *p, intf_thread_t *_p_intf );
     virtual ~PLSelector();

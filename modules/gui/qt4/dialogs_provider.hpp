@@ -87,7 +87,7 @@ class QVLCMenu;
 
 class DialogsProvider : public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
     friend class QVLCMenu;
 
 public:

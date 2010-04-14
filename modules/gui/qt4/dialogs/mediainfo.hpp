@@ -33,7 +33,7 @@ class QTabWidget;
 
 class MediaInfoDialog : public QVLCFrame, public Singleton<MediaInfoDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     MediaInfoDialog( intf_thread_t *,
                      input_item_t * input = NULL );

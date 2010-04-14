@@ -31,7 +31,7 @@ class QTimeEdit;
 
 class GotoTimeDialog : public QVLCDialog, public Singleton<GotoTimeDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 private:
     GotoTimeDialog( intf_thread_t * );
     virtual ~GotoTimeDialog();

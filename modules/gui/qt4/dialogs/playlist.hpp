@@ -37,7 +37,7 @@ class QSettings;
 
 class PlaylistDialog : public QVLCMW, public Singleton<PlaylistDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 private:
     PlaylistWidget *playlistWidget;
 

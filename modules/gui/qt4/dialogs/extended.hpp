@@ -33,7 +33,7 @@ class QTabWidget;
 
 class ExtendedDialog : public QVLCFrame, public Singleton<ExtendedDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     void showTab( int i );
     int currentTab();

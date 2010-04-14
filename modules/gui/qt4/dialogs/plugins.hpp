@@ -53,7 +53,7 @@ class ExtensionCopy;
 
 class PluginDialog : public QVLCFrame, public Singleton<PluginDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 private:
     PluginDialog( intf_thread_t * );
@@ -68,7 +68,7 @@ private:
 
 class PluginTab : public QVLCFrame
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 private:
     PluginTab( intf_thread_t *p_intf );
@@ -86,7 +86,7 @@ private slots:
 
 class ExtensionTab : public QVLCFrame
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 protected:
     virtual void keyPressEvent( QKeyEvent *keyEvent );

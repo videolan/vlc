@@ -65,7 +65,7 @@ class QStringListModel;
 
 class OpenPanel: public QWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     OpenPanel( QWidget *p, intf_thread_t *_p_intf ) : QWidget( p )
     {
@@ -84,7 +84,7 @@ signals:
 
 class FileOpenBox: public QFileDialog
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     FileOpenBox( QWidget *parent, const QString &caption,
                  const QString &directory, const QString &filter ):
@@ -97,7 +97,7 @@ public slots:
 
 class FileOpenPanel: public OpenPanel
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     FileOpenPanel( QWidget *, intf_thread_t * );
     virtual ~FileOpenPanel();
@@ -130,7 +130,7 @@ private slots:
 
 class NetOpenPanel: public OpenPanel
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     NetOpenPanel( QWidget *, intf_thread_t * );
     virtual ~NetOpenPanel();
@@ -146,7 +146,7 @@ private slots:
 
 class DiscOpenPanel: public OpenPanel
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     DiscOpenPanel( QWidget *, intf_thread_t * );
     virtual ~DiscOpenPanel();
@@ -167,7 +167,7 @@ private slots:
 
 class CaptureOpenPanel: public OpenPanel
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     CaptureOpenPanel( QWidget *, intf_thread_t * );
     virtual ~CaptureOpenPanel();

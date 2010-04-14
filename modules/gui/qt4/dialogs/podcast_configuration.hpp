@@ -30,7 +30,7 @@
 
 class PodcastConfigDialog : public QVLCDialog, public Singleton<PodcastConfigDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 private:
     PodcastConfigDialog( intf_thread_t * );

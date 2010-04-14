@@ -52,7 +52,7 @@ class CoverArtLabel;
 
 class MetaPanel: public QWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     MetaPanel( QWidget *, struct intf_thread_t * );
     void saveMeta();
@@ -95,7 +95,7 @@ signals:
 
 class ExtraMetaPanel: public QWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     ExtraMetaPanel( QWidget *, struct intf_thread_t * );
 private:
@@ -108,7 +108,7 @@ public slots:
 
 class InputStatsPanel: public QWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     InputStatsPanel( QWidget *, struct intf_thread_t * );
 private:
@@ -146,7 +146,7 @@ public slots:
 
 class InfoPanel: public QWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     InfoPanel( QWidget *, struct intf_thread_t * );
 private:

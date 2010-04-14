@@ -111,7 +111,7 @@ private:
 
 class SoutDialog : public QVLCDialog
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     SoutDialog( QWidget* parent, intf_thread_t *, const QString& mrl = "");
     virtual ~SoutDialog(){}

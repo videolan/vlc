@@ -70,7 +70,7 @@ class VLMWrapper;
 
 class VLMDialog : public QVLCDialog, public Singleton<VLMDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     void toggleVisible();

@@ -34,7 +34,7 @@ class QTextEdit;
 
 class ErrorsDialog : public QVLCDialog, public Singleton<ErrorsDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
 
     void addError( const QString&, const QString& );

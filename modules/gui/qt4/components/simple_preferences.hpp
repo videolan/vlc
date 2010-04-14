@@ -93,7 +93,7 @@ class QTreeWidgetItem;
 
 class SPrefsCatList : public QWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     SPrefsCatList( intf_thread_t *, QWidget *, bool );
     virtual ~SPrefsCatList() {};

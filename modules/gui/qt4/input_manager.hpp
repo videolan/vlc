@@ -113,7 +113,7 @@ public:
 
 class InputManager : public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
     friend class MainInputManager;
 
 public:
@@ -238,7 +238,7 @@ signals:
 
 class MainInputManager : public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     static MainInputManager *getInstance( intf_thread_t *_p_intf )
     {

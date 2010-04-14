@@ -61,7 +61,7 @@ private:
 
 class QVLCFramelessButton : public QPushButton
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QVLCFramelessButton( QWidget *parent = NULL );
     QSize sizeHint() const;

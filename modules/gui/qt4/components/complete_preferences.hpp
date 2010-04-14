@@ -64,7 +64,7 @@ Q_DECLARE_METATYPE( PrefsItemData* );
 
 class PrefsTree : public QTreeWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     PrefsTree( intf_thread_t *, QWidget * );
     virtual ~PrefsTree();

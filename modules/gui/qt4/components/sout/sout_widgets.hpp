@@ -46,7 +46,7 @@ class SoutInputBox : public QGroupBox
 
 class VirtualDestBox : public QWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
     public:
         VirtualDestBox( QWidget *_parent = NULL ) : QWidget( _parent ){}
         virtual QString getMRL( const QString& ) = 0;
@@ -58,7 +58,7 @@ class VirtualDestBox : public QWidget
 
 class FileDestBox: public VirtualDestBox
 {
-    Q_OBJECT;
+    Q_OBJECT
     public:
         FileDestBox( QWidget *_parent = NULL );
         virtual QString getMRL( const QString& );
@@ -70,7 +70,7 @@ class FileDestBox: public VirtualDestBox
 
 class HTTPDestBox: public VirtualDestBox
 {
-    Q_OBJECT;
+    Q_OBJECT
     public:
         HTTPDestBox( QWidget *_parent = NULL );
         virtual QString getMRL( const QString& );
@@ -81,7 +81,7 @@ class HTTPDestBox: public VirtualDestBox
 
 class MMSHDestBox: public VirtualDestBox
 {
-    Q_OBJECT;
+    Q_OBJECT
     public:
         MMSHDestBox( QWidget *_parent = NULL );
         virtual QString getMRL( const QString& );
@@ -92,7 +92,7 @@ class MMSHDestBox: public VirtualDestBox
 
 class RTSPDestBox: public VirtualDestBox
 {
-    Q_OBJECT;
+    Q_OBJECT
     public:
         RTSPDestBox( QWidget *_parent = NULL );
         virtual QString getMRL( const QString& );
@@ -103,7 +103,7 @@ class RTSPDestBox: public VirtualDestBox
 
 class UDPDestBox: public VirtualDestBox
 {
-    Q_OBJECT;
+    Q_OBJECT
     public:
         UDPDestBox( QWidget *_parent = NULL );
         virtual QString getMRL( const QString& );
@@ -114,7 +114,7 @@ class UDPDestBox: public VirtualDestBox
 
 class RTPDestBox: public VirtualDestBox
 {
-    Q_OBJECT;
+    Q_OBJECT
     public:
         RTPDestBox( QWidget *_parent = NULL, const char *mux = NULL );
         virtual QString getMRL( const QString& );
@@ -126,7 +126,7 @@ class RTPDestBox: public VirtualDestBox
 
 class ICEDestBox: public VirtualDestBox
 {
-    Q_OBJECT;
+    Q_OBJECT
     public:
         ICEDestBox( QWidget *_parent = NULL );
         virtual QString getMRL( const QString& );

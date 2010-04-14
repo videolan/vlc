@@ -179,7 +179,7 @@ private slots:
 
 class PlMimeData : public QMimeData
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     PlMimeData();

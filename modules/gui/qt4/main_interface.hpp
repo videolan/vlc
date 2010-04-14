@@ -64,7 +64,7 @@ enum {
 
 class MainInterface : public QVLCMW
 {
-    Q_OBJECT;
+    Q_OBJECT
 
     friend class PlaylistWidget;
 

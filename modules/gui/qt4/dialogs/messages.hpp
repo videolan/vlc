@@ -39,7 +39,7 @@ class QLineEdit;
 
 class MessagesDialog : public QVLCFrame, public Singleton<MessagesDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 private:
     MessagesDialog( intf_thread_t * );
     virtual ~MessagesDialog();

@@ -42,7 +42,7 @@ class QTextEdit;
 
 class HelpDialog : public QVLCFrame, public Singleton<HelpDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 private:
     HelpDialog( intf_thread_t * );
     virtual ~HelpDialog();
@@ -56,7 +56,7 @@ public slots:
 
 class AboutDialog : public QVLCDialog, public Singleton<AboutDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 private:
     AboutDialog( intf_thread_t * );
@@ -75,7 +75,7 @@ static const int UDErrorEvent = QEvent::User + DialogEventType + 22;
 
 class UpdateDialog : public QVLCFrame, public Singleton<UpdateDialog>
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     void updateNotify( bool );
 

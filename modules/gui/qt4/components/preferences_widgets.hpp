@@ -303,7 +303,7 @@ private:
 
 class FileConfigControl : public VStringConfigControl
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     FileConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                        QGridLayout *, int& );
@@ -324,7 +324,7 @@ protected:
 
 class DirectoryConfigControl : public FileConfigControl
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     DirectoryConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                             QGridLayout *, int& );
@@ -337,7 +337,7 @@ public slots:
 
 class FontConfigControl : public VStringConfigControl
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     FontConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                        QGridLayout *, int&);
@@ -374,7 +374,7 @@ struct checkBoxListItem {
 
 class ModuleListConfigControl : public VStringConfigControl
 {
-    Q_OBJECT;
+    Q_OBJECT
     friend class ConfigControl;
 public:
     ModuleListConfigControl( vlc_object_t *, module_config_t *, QWidget *,
@@ -396,7 +396,7 @@ private:
 
 class StringListConfigControl : public VStringConfigControl
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     StringListConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                              bool, QGridLayout*, int& );
@@ -444,7 +444,7 @@ private slot:
  **********************************************************************/
 class KeyShortcutEdit: public QLineEdit
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     void setValue( int _value ){ value = _value; }
     int getValue() const { return value; }
@@ -464,7 +464,7 @@ signals:
 class SearchLineEdit;
 class KeySelectorControl : public ConfigControl
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     KeySelectorControl( vlc_object_t *, module_config_t *, QWidget *,
                         QGridLayout*, int& );
