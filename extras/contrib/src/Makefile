@@ -1062,10 +1062,14 @@ FFMPEGCONF += \
 	--disable-protocols \
 	--disable-filters \
 	--disable-network
+ifdef HAVE_WIN64
+FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --disable-dxva2 --disable-bsfs
+else
 ifdef HAVE_WIN32
 FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --enable-dxva2 --disable-bsfs
 else
 FFMPEGCONFG += --enable-pthreads
+endif
 endif
 
 ifdef HAVE_WINCE
