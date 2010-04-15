@@ -17,7 +17,6 @@ SOURCES_opengl = opengl.c opengl.h
 SOURCES_directfb = directfb.c
 SOURCES_vmem = vmem.c
 SOURCES_yuv = yuv.c
-SOURCES_vout_wrapper = wrapper.c
 SOURCES_vout_macosx = macosx.m
 
 libxcb_x11_plugin_la_SOURCES = \
@@ -85,5 +84,4 @@ endif
 
 libvlc_LTLIBRARIES += \
 	libvmem_plugin.la \
-	libyuv_plugin.la \
-	libvout_wrapper_plugin.la
+	libyuv_plugin.la

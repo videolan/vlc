@@ -41,7 +41,6 @@
 struct vout_thread_sys_t
 {
     /* module */
-    const char *psz_module_type;
     char       *psz_module_name;
 
     /* Thread & synchronization */
@@ -117,6 +116,10 @@ picture_t *vout_RenderPicture( vout_thread_t *, picture_t *,
  * This function supposes that you call it with picture_lock taken.
  */
 void vout_UsePictureLocked( vout_thread_t *p_vout, picture_t *p_pic  );
+
+/* */
+int  vout_OpenWrapper (vout_thread_t *, const char *);
+void vout_CloseWrapper(vout_thread_t *);
 
 #endif
 

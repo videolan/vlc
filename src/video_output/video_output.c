@@ -472,7 +472,7 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     }
 
     /* Create the vout thread */
-    char* psz_tmp = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
+    char *psz_tmp = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
     free( psz_parser );
     free( psz_tmp );
     p_vout->p_cfg = p_cfg;
@@ -487,9 +487,13 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     DeinterlaceEnable( p_vout );
 
     if( p_vout->p->psz_filter_chain && *p_vout->p->psz_filter_chain )
-        p_vout->p->psz_module_type = "video filter";
-    else
-        p_vout->p->psz_module_type = "video output";
+    {
+        char *psz_tmp;
+        if( asprintf( &psz_tmp, "%s,none", psz_name ) < 0 )
+            psz_tmp = strdup( "" );
+        free( psz_name );
+        psz_name = psz_tmp;
+    }
     p_vout->p->psz_module_name = psz_name;
     p_vout->p_module = NULL;
 
@@ -555,7 +559,7 @@ static void vout_Destructor( vlc_object_t * p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
     /* Make sure the vout was stopped first */
-    assert( !p_vout->p_module );
+    //assert( !p_vout->p_module );
 
     free( p_vout->p->psz_module_name );
 
@@ -939,6 +943,7 @@ static int InitThread( vout_thread_t *p_vout )
 static void* RunThread( void *p_this )
 {
     vout_thread_t *p_vout = p_this;
+    bool            b_has_wrapper;
     int             i_idle_loops = 0;  /* loops without displaying a picture */
     int             i_picture_qtype_last = QTYPE_NONE;
     bool            b_picture_interlaced_last = false;
@@ -947,14 +952,11 @@ static void* RunThread( void *p_this )
     /*
      * Initialize thread
      */
-    p_vout->p_module = module_need( p_vout,
-                                    p_vout->p->psz_module_type,
-                                    p_vout->p->psz_module_name,
-                                    !strcmp(p_vout->p->psz_module_type, "video filter") );
+    b_has_wrapper = !vout_OpenWrapper( p_vout, p_vout->p->psz_module_name );
 
     vlc_mutex_lock( &p_vout->change_lock );
 
-    if( p_vout->p_module )
+    if( b_has_wrapper )
         p_vout->b_error = InitThread( p_vout );
     else
         p_vout->b_error = true;
@@ -1387,9 +1389,8 @@ exit_thread:
     EndThread( p_vout );
     vlc_mutex_unlock( &p_vout->change_lock );
 
-    if( p_vout->p_module )
-        module_unneed( p_vout, p_vout->p_module );
-    p_vout->p_module = NULL;
+    if( b_has_wrapper )
+        vout_CloseWrapper( p_vout );
 
     return NULL;
 }

@@ -33,25 +33,8 @@
 #include <vlc_vout_display.h>
 #include <vlc_vout_wrapper.h>
 #include <vlc_vout.h>
-#include "../video_filter/filter_common.h"
 #include <assert.h>
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
-
-vlc_module_begin()
-    set_category( CAT_VIDEO )
-    set_subcategory( SUBCAT_VIDEO_VOUT )
-
-    set_description( "Transitional video display wrapper" )
-    set_shortname( "Video display wrapper" )
-    set_capability( "video output", 210 )
-    set_callbacks( Open, Close )
-
-vlc_module_end()
+#include "vout_internal.h"
 
 /*****************************************************************************
  *
@@ -85,9 +68,8 @@ static int  Forward(vlc_object_t *, char const *,
 /*****************************************************************************
  *
  *****************************************************************************/
-static int Open(vlc_object_t *object)
+int vout_OpenWrapper(vout_thread_t *vout, const char *name)
 {
-    vout_thread_t *vout = (vout_thread_t *)object;
     vout_sys_t *sys;
 
     msg_Dbg(vout, "Opening vout display wrapper");
@@ -115,7 +97,7 @@ static int Open(vlc_object_t *object)
     const mtime_t double_click_timeout = 300000;
     const mtime_t hide_timeout = var_CreateGetInteger(vout, "mouse-hide-timeout") * 1000;
 
-    sys->vd = vout_NewDisplay(vout, &source, &state, "$vout",
+    sys->vd = vout_NewDisplay(vout, &source, &state, name ? name : "$vout",
                               double_click_timeout, hide_timeout);
     if (!sys->vd) {
         free(sys->title);
@@ -146,9 +128,8 @@ static int Open(vlc_object_t *object)
 /*****************************************************************************
  *
  *****************************************************************************/
-static void Close(vlc_object_t *object)
+void vout_CloseWrapper(vout_thread_t *vout)
 {
-    vout_thread_t *vout = (vout_thread_t *)object;
     vout_sys_t *sys = vout->p_sys;
 
 #ifdef WIN32
