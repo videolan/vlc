@@ -665,9 +665,10 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
     }
     *pp_status = vlm_MessageSimpleNew( psz_cmd );
 
-    vlc_mutex_lock( &p_vlm->lock );
-    vlc_cond_signal( &p_vlm->wait );
-    vlc_mutex_unlock( &p_vlm->lock );
+    vlc_mutex_lock( &p_vlm->lock_manage );
+    p_vlm->input_state_changed = true;
+    vlc_cond_signal( &p_vlm->wait_manage );
+    vlc_mutex_unlock( &p_vlm->lock_manage );
 
     return VLC_SUCCESS;
 
