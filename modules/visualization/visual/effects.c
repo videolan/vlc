@@ -854,7 +854,6 @@ int vuMeter_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
                 const block_t * p_buffer , picture_t * p_picture)
 {
     VLC_UNUSED(p_aout);
-    int j;
     float i_value_l = 0;
     float i_value_r = 0;
 
@@ -911,21 +910,23 @@ int vuMeter_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
             i_value[1] = i_value[1] - 6;
     }
 
-    int x, y, k;
+    int x, y;
     float teta;
     float teta_grad;
 
-    for ( j = 0; j < 2; j++ )
+    int start_x = p_effect->i_width / 2 - 120; /* i_width.min = 532 (visual.c) */
+
+    for ( int j = 0; j < 2; j++ )
     {
         /* Draw the two scales */
-        k = 0;
+        int k = 0;
         teta_grad = GRAD_ANGLE_MIN;
         for ( teta = -M_PI_4; teta <= M_PI_4; teta = teta + 0.003 )
         {
             for ( unsigned i = 140; i <= 150; i++ )
             {
                 y = i * cos(teta) + 20;
-                x = i * sin(teta) + 150 + 240 * j;
+                x = i * sin(teta) + start_x + 240 * j;
                 /* Compute the last color for the gradation */
                 if (teta >= teta_grad + GRAD_INCR && teta_grad <= GRAD_ANGLE_MAX)
                 {
@@ -949,7 +950,7 @@ int vuMeter_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
         for ( int i = 0; i <= 150; i++ )
         {
             y = i * cos(teta) + 20;
-            x = i * sin(teta) + 150 + 240 * j;
+            x = i * sin(teta) + start_x + 240 * j;
             *(p_picture->p[0].p_pixels +
                     (p_picture->p[0].i_lines - y - 1 ) * p_picture->p[0].i_pitch
                     + x ) = 0xAD;
@@ -967,7 +968,7 @@ int vuMeter_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
             for ( int i = 0; i < 10; i++ )
             {
                 y = i * cos(teta) + 20;
-                x = i * sin(teta) + 150 + 240 * j;
+                x = i * sin(teta) + start_x + 240 * j;
                 *(p_picture->p[0].p_pixels +
                         (p_picture->p[0].i_lines - y - 1 ) * p_picture->p[0].i_pitch
                         + x ) = 0xFF;
