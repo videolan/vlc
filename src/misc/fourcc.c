@@ -1197,7 +1197,8 @@ static entry_t Lookup( const entry_t p_list[], vlc_fourcc_t i_fourcc )
 
             memcpy( e.p_class, p_class, 4 );
             memcpy( e.p_fourcc, p->p_fourcc, 4 );
-            e.psz_description = p->psz_description ?: psz_description;
+            e.psz_description = p->psz_description ?
+                                p->psz_description : psz_description;
             break;
         }
     }
