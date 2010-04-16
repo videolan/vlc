@@ -38,6 +38,7 @@
 #include "filter_picture.h"
 #include <vlc_image.h>
 #include <vlc_strings.h>
+#include <vlc_fs.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -318,7 +319,7 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
     else
     {
         /* switch to the final destination */
-        i_ret = rename( psz_temp, psz_filename );
+        i_ret = vlc_rename( psz_temp, psz_filename );
         if( i_ret == -1 )
         {
             msg_Err( p_filter, "could not rename snapshot %s %m", psz_filename );
