@@ -217,13 +217,8 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     /*  ***** Get configuration of ffmpeg plugin ***** */
     p_sys->p_context->workaround_bugs =
         var_InheritInteger( p_dec, "ffmpeg-workaround-bugs" );
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 0, 0 )
-    p_sys->p_context->error_resilience =
-        var_InheritInteger( p_dec, "ffmpeg-error-resilience" );
-#else
     p_sys->p_context->error_recognition =
         var_InheritInteger( p_dec, "ffmpeg-error-resilience" );
-#endif
 
     if( var_CreateGetBool( p_dec, "grayscale" ) )
         p_sys->p_context->flags |= CODEC_FLAG_GRAY;
@@ -810,11 +805,7 @@ static int ffmpeg_OpenCodec( decoder_t *p_dec )
     }
     p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
     p_sys->p_context->height = p_dec->fmt_in.video.i_height;
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(52, 0, 0)
-    p_sys->p_context->bits_per_sample = p_dec->fmt_in.video.i_bits_per_pixel;
-#else
     p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
-#endif
 
     int ret;
     vlc_avcodec_lock();

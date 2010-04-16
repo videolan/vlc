@@ -113,11 +113,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     p_sys->p_context->block_align = p_dec->fmt_in.audio.i_blockalign;
     p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 0, 0 )
-    p_sys->p_context->bits_per_sample = p_dec->fmt_in.audio.i_bitspersample;
-#else
     p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.audio.i_bitspersample;
-#endif
 
     if( p_dec->fmt_in.i_extra > 0 )
     {
@@ -330,15 +326,9 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
             p_sys->p_output = av_realloc( p_sys->p_output, i_output );
         }
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 0, 0 )
         i_used = avcodec_decode_audio2( p_sys->p_context,
                                        (int16_t*)p_sys->p_output, &i_output,
                                        p_block->p_buffer, p_block->i_buffer );
-#else
-        i_used = avcodec_decode_audio( p_sys->p_context,
-                                       (int16_t*)p_sys->p_output, &i_output,
-                                       p_block->p_buffer, p_block->i_buffer );
-#endif
 
         if( i_used < 0 || i_output < 0 )
         {
@@ -413,13 +403,7 @@ void EndAudioDec( decoder_t *p_dec )
 /*****************************************************************************
  *
  *****************************************************************************/
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 2, 0 )
-#   define LIBAVCODEC_AUDIO_LAYOUT
-#else
-#   warning "Audio channel layout is unsupported by your avcodec version."
-#endif
 
-#if defined(LIBAVCODEC_AUDIO_LAYOUT)
 static const uint64_t pi_channels_map[][2] =
 {
     { CH_FRONT_LEFT,        AOUT_CHAN_LEFT },
@@ -443,37 +427,11 @@ static const uint64_t pi_channels_map[][2] =
     { CH_STEREO_LEFT,       0 },
     { CH_STEREO_RIGHT,      0 },
 };
-#else
-static const uint64_t pi_channels_map[][2] =
-{
-    { 0, AOUT_CHAN_LEFT },
-    { 0, AOUT_CHAN_RIGHT },
-    { 0, AOUT_CHAN_CENTER },
-    { 0, AOUT_CHAN_LFE },
-    { 0, AOUT_CHAN_REARLEFT },
-    { 0, AOUT_CHAN_REARRIGHT },
-    { 0, 0 },
-    { 0, 0 },
-    { 0, AOUT_CHAN_REARCENTER },
-    { 0, AOUT_CHAN_MIDDLELEFT },
-    { 0, AOUT_CHAN_MIDDLERIGHT },
-    { 0, 0 },
-    { 0, 0 },
-    { 0, 0 },
-    { 0, 0 },
-    { 0, 0 },
-    { 0, 0 },
-    { 0, 0 },
-    { 0, 0 },
-    { 0, 0 },
-};
-#endif
 
 static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 65, 0 )
     switch( p_sys->p_context->sample_fmt )
     {
     case SAMPLE_FMT_U8:
@@ -499,41 +457,25 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
         p_dec->fmt_out.audio.i_bitspersample = 16;
         break;
     }
-#else
-    p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
-    p_dec->fmt_out.audio.i_bitspersample = 16;
-#endif
     p_dec->fmt_out.audio.i_rate     = p_sys->p_context->sample_rate;
 
     /* */
-#if defined(LIBAVCODEC_AUDIO_LAYOUT)
     if( p_sys->i_previous_channels == p_sys->p_context->channels &&
         p_sys->i_previous_layout == p_sys->p_context->channel_layout )
         return;
-#else
-    if( p_sys->i_previous_channels == p_sys->p_context->channels )
-        return;
-#endif
     if( b_trust )
     {
         p_sys->i_previous_channels = p_sys->p_context->channels;
-#if defined(LIBAVCODEC_AUDIO_LAYOUT)
         p_sys->i_previous_layout = p_sys->p_context->channel_layout;
-#endif
     }
 
     /* Specified order
      * FIXME should we use fmt_in.audio.i_physical_channels or not ?
      */
-#if defined(LIBAVCODEC_AUDIO_LAYOUT)
     const unsigned i_order_max = 8 * sizeof(p_sys->p_context->channel_layout);
-#else
-    const unsigned i_order_max = 64;
-#endif
     uint32_t pi_order_src[i_order_max];
     int i_channels_src = 0;
 
-#if defined(LIBAVCODEC_AUDIO_LAYOUT)
     if( p_sys->p_context->channel_layout )
     {
         for( unsigned i = 0; i < sizeof(pi_channels_map)/sizeof(*pi_channels_map); i++ )
@@ -543,7 +485,6 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
         }
     }
     else
-#endif
     {
         /* Create default order  */
         if( b_trust )

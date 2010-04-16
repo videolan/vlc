@@ -492,12 +492,7 @@ int OpenEncoder( vlc_object_t *p_this )
             }
         }
 
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 0, 0 )
-        if ( p_sys->b_trellis )
-            p_context->flags |= CODEC_FLAG_TRELLIS_QUANT;
-#else
         p_context->trellis = p_sys->b_trellis;
-#endif
 
         if ( p_sys->i_qmin > 0 && p_sys->i_qmin == p_sys->i_qmax )
             p_context->flags |= CODEC_FLAG_QSCALE;
@@ -748,11 +743,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             if ( current_date + HURRY_UP_GUARD3 > frame.pts )
             {
                 p_sys->p_context->mb_decision = FF_MB_DECISION_SIMPLE;
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 0, 0 )
-                p_sys->p_context->flags &= ~CODEC_FLAG_TRELLIS_QUANT;
-#else
                 p_sys->p_context->trellis = 0;
-#endif
                 msg_Dbg( p_enc, "hurry up mode 3" );
             }
             else
@@ -761,23 +752,14 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 
                 if ( current_date + HURRY_UP_GUARD2 > frame.pts )
                 {
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 0, 0 )
-                    p_sys->p_context->flags &= ~CODEC_FLAG_TRELLIS_QUANT;
-#else
                     p_sys->p_context->trellis = 0;
-#endif
                     p_sys->p_context->noise_reduction = p_sys->i_noise_reduction
                          + (HURRY_UP_GUARD2 + current_date - frame.pts) / 500;
                     msg_Dbg( p_enc, "hurry up mode 2" );
                 }
                 else
                 {
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 0, 0 )
-                    if ( p_sys->b_trellis )
-                        p_sys->p_context->flags |= CODEC_FLAG_TRELLIS_QUANT;
-#else
                     p_sys->p_context->trellis = p_sys->b_trellis;
-#endif
 
                     p_sys->p_context->noise_reduction =
                         p_sys->i_noise_reduction;
