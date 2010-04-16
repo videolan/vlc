@@ -1164,17 +1164,11 @@ vout_display_t *vout_NewDisplay(vout_thread_t *vout,
                       double_click_timeout, hide_timeout, NULL);
 }
 
-static void SplitterClose(vout_display_t *vd)
-{
-    VLC_UNUSED(vd);
-    assert(0);
-}
-
-#if 0
 /*****************************************************************************
  *
  *****************************************************************************/
 struct vout_display_sys_t {
+    picture_pool_t   *pool;
     video_splitter_t *splitter;
 
     /* */
@@ -1205,7 +1199,7 @@ static void SplitterDelWindow(vout_display_t *vd, vout_window_t *window)
 }
 static void SplitterEvent(vout_display_t *vd, int event, va_list args)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    //vout_display_owner_sys_t *osys = vd->owner.sys;
 
     switch (event) {
 #if 0
@@ -1231,10 +1225,12 @@ static void SplitterEvent(vout_display_t *vd, int event, va_list args)
     }
 }
 
-static picture_t *SplitterGet(vout_display_t *vd)
+static picture_pool_t *SplitterPool(vout_display_t *vd, unsigned count)
 {
-    /* TODO pool ? */
-    return picture_NewFromFormat(&vd->fmt);
+    vout_display_sys_t *sys = vd->sys;
+    if (!sys->pool)
+        sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
+    return sys->pool;
 }
 static void SplitterPrepare(vout_display_t *vd, picture_t *picture)
 {
@@ -1250,27 +1246,10 @@ static void SplitterPrepare(vout_display_t *vd, picture_t *picture)
     }
 
     for (int i = 0; i < sys->count; i++) {
-        /* */
-        /* FIXME now vout_FilterDisplay already return a direct buffer FIXME */
-        sys->picture[i] = vout_FilterDisplay(sys->display[i], sys->picture[i]);
-        if (!sys->picture[i])
-            continue;
-
-        /* */
-        picture_t *direct = vout_display_Get(sys->display[i]);
-        if (!direct) {
-            msg_Err(vd, "Failed to get a direct buffer");
-            picture_Release(sys->picture[i]);
-            sys->picture[i] = NULL;
-            continue;
-        }
-
-        /* FIXME not always needed (easy when there is a osys->filters) */
-        picture_Copy(direct, sys->picture[i]);
-        picture_Release(sys->picture[i]);
-        sys->picture[i] = direct;
-
-        vout_display_Prepare(sys->display[i], sys->picture[i]);
+        if (vout_IsDisplayFiltered(sys->display[i]))
+            sys->picture[i] = vout_FilterDisplay(sys->display[i], sys->picture[i]);
+        if (sys->picture[i])
+            vout_display_Prepare(sys->display[i], sys->picture[i]);
     }
 }
 static void SplitterDisplay(vout_display_t *vd, picture_t *picture)
@@ -1292,7 +1271,7 @@ static void SplitterManage(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     for (int i = 0; i < sys->count; i++)
-        vout_ManageDisplay(sys->display[i]);
+        vout_ManageDisplay(sys->display[i], true);
 }
 
 static int SplitterPictureNew(video_splitter_t *splitter, picture_t *picture[])
@@ -1300,8 +1279,13 @@ static int SplitterPictureNew(video_splitter_t *splitter, picture_t *picture[])
     vout_display_sys_t *wsys = splitter->p_owner->wrapper->sys;
 
     for (int i = 0; i < wsys->count; i++) {
-        /* TODO pool ? */
-        picture[i] = picture_NewFromFormat(&wsys->display[i]->source);
+        if (vout_IsDisplayFiltered(wsys->display[i])) {
+            /* TODO use a pool ? */
+            picture[i] = picture_NewFromFormat(&wsys->display[i]->source);
+        } else {
+            picture_pool_t *pool = vout_display_Pool(wsys->display[i], 1);
+            picture[i] = pool ? picture_pool_Get(pool) : NULL;
+        }
         if (!picture[i]) {
             for (int j = 0; j < i; j++)
                 picture_Release(picture[j]);
@@ -1325,6 +1309,9 @@ static void SplitterClose(vout_display_t *vd)
     video_splitter_t *splitter = sys->splitter;
     free(splitter->p_owner);
     video_splitter_Delete(splitter);
+
+    if (sys->pool)
+        picture_pool_Delete(sys->pool);
 
     /* */
     for (int i = 0; i < sys->count; i++)
@@ -1363,8 +1350,9 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
     if (!sys->picture )
         abort();
     sys->splitter = splitter;
+    sys->pool     = NULL;
 
-    wrapper->get     = SplitterGet;
+    wrapper->pool    = SplitterPool;
     wrapper->prepare = SplitterPrepare;
     wrapper->display = SplitterDisplay;
     wrapper->control = SplitterControl;
@@ -1414,7 +1402,6 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
 
     return wrapper;
 }
-#endif
 
 /*****************************************************************************
  * TODO move out

@@ -35,6 +35,7 @@
 #include <vlc_vout.h>
 #include <assert.h>
 #include "vout_internal.h"
+#include "display.h"
 
 /*****************************************************************************
  *
@@ -99,6 +100,11 @@ int vout_OpenWrapper(vout_thread_t *vout, const char *name)
 
     sys->vd = vout_NewDisplay(vout, &source, &state, name ? name : "$vout",
                               double_click_timeout, hide_timeout);
+    /* If we need to video filter and it fails, then try a splitter
+     * XXX it is a hack for now FIXME */
+    if (name && !sys->vd)
+        sys->vd = vout_NewSplitter(vout, &source, &state, "$vout", name,
+                                   double_click_timeout, hide_timeout);
     if (!sys->vd) {
         free(sys->title);
         free(sys);
