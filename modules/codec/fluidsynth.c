@@ -196,6 +196,9 @@ static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
                 fluid_synth_sysex (p_sys->synth, (char *)p_block->p_buffer + 1,
                                    p_block->i_buffer - 2, NULL, NULL, NULL, 0);
                 break;
+            case 0xF:
+                fluid_synth_system_reset (p_sys->synth);
+                break;
         }
 
     uint8_t p1 = (p_block->i_buffer > 1) ? (p_block->p_buffer[1] & 0x7f) : 0;
