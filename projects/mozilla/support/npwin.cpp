@@ -30,10 +30,6 @@
 
 //#define OJI 1
 
-#ifdef HAVE_MOZILLA_CONFIG_H
-#   include <mozilla-config.h>
-#endif
-
 #ifndef _NPAPI_H_
 #   include "npapi.h"
 #endif

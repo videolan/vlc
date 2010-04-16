@@ -31,11 +31,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-/* Mozilla stuff */
-#ifdef HAVE_MOZILLA_CONFIG_H
-#   include <mozilla-config.h>
-#endif
-
 /* This is from mozilla java, do we really need it? */
 #if 0
 #include <jri.h>

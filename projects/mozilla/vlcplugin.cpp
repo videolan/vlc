@@ -28,10 +28,6 @@
  *****************************************************************************/
 #include "config.h"
 
-#ifdef HAVE_MOZILLA_CONFIG_H
-#   include <mozilla-config.h>
-#endif
-
 #include "vlcplugin.h"
 #include "control/npolibvlc.h"
 

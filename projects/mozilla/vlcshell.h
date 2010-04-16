@@ -24,12 +24,6 @@
 #ifndef __VLCSHELL_H__
 #define __VLCSHELL_H__
 
-/* Mozilla stuff */
-#ifdef HAVE_MOZILLA_CONFIG_H
-#   include <mozilla-config.h>
-#endif
-
-
 char * NPP_GetMIMEDescription( void );
 
 NPError NPP_Initialize( void );

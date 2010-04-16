@@ -4578,9 +4578,8 @@ then
     fi
 
     real_mozilla_sdk="`cd ${with_mozilla_sdk_path} 2>/dev/null && pwd`"
-    CPPFLAGS="${CPPFLAGS_save} -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include"
+    CPPFLAGS="${CPPFLAGS_save} -I${real_mozilla_sdk}/include"
     MOZILLA_REQUIRED_HEADERS=1
-    AC_CHECK_HEADERS(mozilla-config.h,,MOZILLA_REQUIRED_HEADERS=0)
     AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
     AC_CHECK_HEADERS(npruntime.h,,MOZILLA_REQUIRED_HEADERS=0,
         [#if HAVE_NPAPI_H
@@ -4594,17 +4593,7 @@ then
     MOZILLA_REQUIRED_HEADERS=
     mozilla=:
     PLUGINS_BINDINGS="${PLUGINS_BINDINGS} mozilla"
-    VLC_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -DHAVE_CPP_MODERN_SPECIALIZE_TEMPLATE_SYNTAX -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
-    if ${need_xpcom_libs}; then
-       VLC_ADD_LIBS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -L${real_mozilla_sdk}/lib -lnspr4 -lplds4 -lplc4 -lxpcomglue])
-      if test "${SYS}" = "mingw32"; then
-        dnl latest gecko sdk does not have embedstring
-        if test -d "${real_mozilla_sdk}/embedstring/bin"
-        then
-          VLC_ADD_LIBS([mozilla],[-lembedstring])
-        fi
-      fi
-    fi
+    VLC_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -DHAVE_CPP_MODERN_SPECIALIZE_TEMPLATE_SYNTAX -I${real_mozilla_sdk}/include])
     MOZILLA_SDK_PATH="${real_mozilla_sdk}"
 
     if test -n "${CYGPATH}"; then

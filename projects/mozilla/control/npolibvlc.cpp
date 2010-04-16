@@ -28,11 +28,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-/* Mozilla stuff */
-#ifdef HAVE_MOZILLA_CONFIG_H
-#   include <mozilla-config.h>
-#endif
-
 #include "vlcplugin.h"
 #include "npolibvlc.h"
 
