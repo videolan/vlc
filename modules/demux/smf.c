@@ -472,19 +472,22 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
         case 0xF0: /* System Exclusive */
             switch (event)
             {
-                case 0xF0: /* System Specific */
+                case 0xF0: /* System Specific start */
+                case 0xF7: /* System Specific continuation */
                 {
-                    /* TODO: don't skip these */
-                    stream_Read (s, NULL, 1); /* Manuf ID */
-                    for (;;)
-                    {
-                        uint8_t c;
-                        if (stream_Read (s, &c, 1) != 1)
-                            return -1;
-                        if (c == 0xF7)
-                            goto skip;
-                    }
-                    /* never reached */
+                    /* Variable length followed by SysEx event data */
+                    int32_t len = ReadVarInt (s);
+                    if (len == -1)
+                        return -1;
+
+                    block = stream_Block (s, len);
+                    if (block == NULL)
+                        return -1;
+                    block = block_Realloc (block, 1, len);
+                    if (block == NULL)
+                        return -1;
+                    block->p_buffer[0] = event;
+                    goto send;
                 }
                 case 0xFF: /* SMF Meta Event */
                     if (HandleMeta (p_demux, tr))
@@ -504,9 +507,6 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
                     /* We cannot handle undefined "common" (non-real-time)
                      * events inside SMF, as we cannot differentiate a
                      * one byte delta-time (< 0x80) from event data. */
-                case 0xF7: /* End of sysex -> should never happen(?) */
-                    msg_Err (p_demux, "unknown MIDI event 0x%02X", event);
-                    return -1; /* undefined events */
                 default:
                     datalen = 0;
                     break;
@@ -544,6 +544,7 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
             stream_Read (s, block->p_buffer + 2, datalen - 1);
     }
 
+send:
     block->i_dts = block->i_pts = VLC_TS_0 + date_Get (&p_demux->p_sys->pts);
     es_out_Send (p_demux->out, p_demux->p_sys->es, block);
 
