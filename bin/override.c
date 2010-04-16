@@ -148,24 +148,28 @@ int unsetenv (const char *name)
  * preserve reproducibility of the number sequence (which usually does not
  * matter).
  **/
-static pthread_mutex_t prng_lock = PTHREAD_MUTEX_INITIALIZER;
+static struct
+{
+    pthread_mutex_t lock;
+    unsigned int seed;
+} prng = { PTHREAD_MUTEX_INITIALIZER, 0, };
 
 void srand (unsigned int seed)
 {
-    pthread_mutex_lock (&prng_lock);
+    pthread_mutex_lock (&prng.lock);
     LOG("Warning", "%d", seed);
-    CALL(srand, seed);
-    pthread_mutex_unlock (&prng_lock);
+    prng.seed = seed;
+    pthread_mutex_unlock (&prng.lock);
 }
 
 int rand (void)
 {
     int ret;
 
-    pthread_mutex_lock (&prng_lock);
+    pthread_mutex_lock (&prng.lock);
     LOG("Warning", "");
-    ret = CALL(rand);
-    pthread_mutex_unlock (&prng_lock);
+    ret = rand_r (&prng.seed);
+    pthread_mutex_unlock (&prng.lock);
     return ret;
 }
 
