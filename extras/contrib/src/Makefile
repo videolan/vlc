@@ -1946,11 +1946,8 @@ DISTCLEAN_PKG += libIDL-$(LIBIDL_VERSION).tar.gz
 # Gecko SDK
 # ***************************************************************************
 
-xulrunner-1.9.2.en-US.mac-i386.sdk.tar.bz2:
-	$(WGET) $(GECKO_SDK_MAC_URL)
-
-gecko-sdk: xulrunner-1.9.2.en-US.mac-i386.sdk.tar.bz2
-	$(EXTRACT_BZ2)
+gecko-sdk: 
+	$(SVN) co $(NPAPI_HEADERS_SVN_URL) -r $(NPAPI_HEADERS_SVN_REVISION) gecko-sdk/include
 
 .gecko: gecko-sdk
 	rm -rf $(PREFIX)/gecko-sdk
