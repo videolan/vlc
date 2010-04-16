@@ -163,6 +163,7 @@ int16_t NPP_HandleEvent( NPP instance, void * event )
         return false;
     }
 
+#ifndef __x86_64__  
     EventRecord *myEvent = (EventRecord*)event;
 
     switch( myEvent->what )
@@ -255,6 +256,7 @@ int16_t NPP_HandleEvent( NPP instance, void * event )
         default:
             ;
     }
+#endif // __x86_64__
     return false;
 }
 #endif /* XP_MACOSX */
