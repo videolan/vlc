@@ -520,7 +520,17 @@ int vlc_rename (const char *oldpath, const char *newpath)
     else
         return -1;
 #else
-    return _wrename (wold, wnew);
+    if (_wrename (wold, wnew) && errno == EACCES)
+    {   /* Windows does not allow atomic file replacement */
+        if (_wremove (wnew))
+        {
+            errno = EACCES; /* restore errno */
+            return -1;
+        }
+        if (_wrename (wold, wnew))
+            return -1;
+    }
+    return 0;
 #endif
 
 #endif
