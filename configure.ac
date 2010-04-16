@@ -1631,7 +1631,8 @@ then
       AC_MSG_ERROR([Could not find lua. Lua is needed for some interfaces (rc, telnet, http) as well as many other custom scripts. Use --disable-lua to ignore this error.])
   fi
   AC_ARG_VAR([LUAC], [LUA byte compiler])
-  AC_PATH_PROG(LUAC, luac, [
+  AC_PATH_PROG(LUAC, luac, [false])
+  AS_IF([test "${ac_cv_path_LUAC}" = "false"], [
     AC_MSG_ERROR([Could not find the LUA byte compiler.])
   ])
 fi
