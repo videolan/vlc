@@ -2667,7 +2667,7 @@ AC_ARG_ENABLE(avcodec,
 [  --enable-avcodec        libavcodec codec (default enabled)])
 if test "${enable_avcodec}" != "no"
 then
-  PKG_CHECK_MODULES(AVCODEC,[libavcodec >= 51.48.0 libavutil],
+  PKG_CHECK_MODULES(AVCODEC,[libavcodec >= 52.2.0 libavutil],
     [
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
