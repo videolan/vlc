@@ -198,7 +198,7 @@ static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
             fluid_synth_program_change (p_sys->synth, channel, p1);
             break;
         case 0xE0:
-            fluid_synth_pitch_bend (p_sys->synth, channel, (p1 << 7) | p2);
+            fluid_synth_pitch_bend (p_sys->synth, channel, (p2 << 7) | p1);
             break;
     }
 
