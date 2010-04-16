@@ -179,11 +179,29 @@ static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
     if (p_block->i_buffer < 1)
         goto drop;
 
+    uint8_t event = p_block->p_buffer[0];
     uint8_t channel = p_block->p_buffer[0] & 0xf;
+    event &= 0xF0;
+
+    if (event == 0xF0)
+        switch (channel)
+        {
+            case 0:
+                if (p_block->p_buffer[p_block->i_buffer - 1] != 0xF7)
+                {
+            case 7:
+                    msg_Warn (p_dec, "fragmented SysEx not implemented");
+                    goto drop;
+                }
+                fluid_synth_sysex (p_sys->synth, (char *)p_block->p_buffer + 1,
+                                   p_block->i_buffer - 2, NULL, NULL, NULL, 0);
+                break;
+        }
+
     uint8_t p1 = (p_block->i_buffer > 1) ? (p_block->p_buffer[1] & 0x7f) : 0;
     uint8_t p2 = (p_block->i_buffer > 2) ? (p_block->p_buffer[2] & 0x7f) : 0;
 
-    switch (p_block->p_buffer[0] & 0xf0)
+    switch (event & 0xF0)
     {
         case 0x80:
             fluid_synth_noteoff (p_sys->synth, channel, p1);
