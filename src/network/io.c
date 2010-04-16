@@ -328,6 +328,7 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
             switch (WSAGetLastError ())
             {
                 case WSAEWOULDBLOCK:
+                case WSAEINTR:
                 /* only happens with vs != NULL (TLS) - not really an error */
                     continue;
 
