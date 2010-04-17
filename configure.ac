@@ -3521,31 +3521,6 @@ then
 fi
 
 dnl
-dnl Roku HD1000 Video output module
-dnl
-AC_ARG_ENABLE(hd1000v,
-  [  --enable-hd1000v        HD1000 Video Output module (default enabled on HD1000)])
-if test "${enable_hd1000v}" != "no" -a "${CXX}" != "" &&
-  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
-   test "${enable_hd1000v}" = "yes"); then
-  AC_LANG_PUSH([C++])
-  AC_CHECK_HEADERS([cascade/graphics/CascadeScreen.h cascade/graphics/CascadeBitmap.h],
-  [
-    can_build_roku="yes"
-  ],
-  [
-    can_build_roku="no"
-    AC_MSG_WARN([Not building Roku HD1000 compatible video output])
-  ])
-  if test "$can_build_roku" = "yes"
-  then
-    VLC_ADD_PLUGIN([hd1000v])
-    VLC_ADD_LIBS([hd1000v],[-lCascade -ldvbpsi -lmad])
-  fi
-  AC_LANG_POP([C++])
-fi
-
-dnl
 dnl  Windows DirectX module
 dnl
 
