@@ -322,12 +322,18 @@ char *vlc_readdir( DIR *dir )
     return FromWide (ent->d_name);
 #else
     struct dirent *ent;
-
-    ent = readdir( (DIR *)dir );
-    if( ent == NULL )
+    struct
+    {
+        struct dirent ent;
+        char buf[NAME_MAX + 1];
+    } buf;
+    int val = readdir_r (dir, &buf.ent, &ent);
+    if (val)
+    {
+        errno = val;
         return NULL;
-
-    return vlc_fix_readdir( ent->d_name );
+    }
+    return ent ? vlc_fix_readdir( ent->d_name ) : NULL;
 #endif
 }
 
