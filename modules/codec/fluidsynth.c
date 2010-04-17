@@ -219,7 +219,7 @@ static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
         case 0xC0:
             fluid_synth_program_change (p_sys->synth, channel, p1);
             break;
-        case 0xA0:
+        case 0xD0:
             fluid_synth_channel_pressure (p_sys->synth, channel, p1);
             break;
         case 0xE0:
