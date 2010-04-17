@@ -1761,16 +1761,25 @@ typedef struct
  */
 static const deinterlace_mode_t p_deinterlace_mode[] = {
     { "",        false },
-    { "discard", true },
+    //{ "discard", true },
     { "blend",   false },
-    { "mean",    true  },
-    { "bob",     true },
-    { "linear",  true },
+    //{ "mean",    true  },
+    //{ "bob",     true },
+    //{ "linear",  true },
     { "x",       false },
-    { "yadif",   true },
-    { "yadif2x", true },
-    { NULL,      true }
+    //{ "yadif",   true },
+    //{ "yadif2x", true },
+    { NULL,      false }
 };
+static const deinterlace_mode_t *DeinterlaceGetMode( const char *psz_mode )
+{
+    for( const deinterlace_mode_t *p_mode = &p_deinterlace_mode[0]; p_mode->psz_mode; p_mode++ )
+    {
+        if( !strcmp( p_mode->psz_mode, psz_mode ) )
+            return p_mode;
+    }
+    return NULL;
+}
 
 static char *FilterFind( char *psz_filter_base, const char *psz_module )
 {
@@ -1901,15 +1910,10 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
     DeinterlaceSave( p_vout, i_deinterlace, psz_mode, is_needed );
 
     /* */
-    bool b_vout_filter = true;
-    for( const deinterlace_mode_t *p_mode = &p_deinterlace_mode[0]; p_mode->psz_mode; p_mode++ )
-    {
-        if( !strcmp( p_mode->psz_mode, psz_mode ) )
-        {
-            b_vout_filter = p_mode->b_vout_filter;
-            break;
-        }
-    }
+    bool b_vout_filter = false;
+    const deinterlace_mode_t *p_mode = DeinterlaceGetMode( psz_mode );
+    if( p_mode )
+        b_vout_filter = p_mode->b_vout_filter;
 
     /* */
     char *psz_old;
@@ -1988,6 +1992,9 @@ static void DeinterlaceEnable( vout_thread_t *p_vout )
     var_Change( p_vout, "deinterlace-mode", VLC_VAR_CLEARCHOICES, NULL, NULL );
     for( int i = 0; p_optm && i < p_optm->i_list; i++ )
     {
+        if( !DeinterlaceGetMode( p_optm->ppsz_list[i] ) )
+            continue;
+
         val.psz_string  = p_optm->ppsz_list[i];
         text.psz_string = (char*)vlc_gettext(p_optm->ppsz_list_text[i]);
         var_Change( p_vout, "deinterlace-mode", VLC_VAR_ADDCHOICE, &val, &text );
