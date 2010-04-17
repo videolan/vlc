@@ -26,7 +26,7 @@
 
 void vlc_enable_override (void);
 
-#if defined (__GNUC__) /* typeof and statement-expression */ \
+#if defined (__GNUC__) \
  && (defined (__ELF__) && !defined (__sun__))
 /* Solaris crashes on printf("%s", NULL); which is legal, but annoying. */
 
@@ -97,8 +97,23 @@ static void *getsym (const char *name)
 }
 
 #define LOG(level, ...) logbug(level, __func__, __VA_ARGS__)
+/* Evil non-standard GNU C macro ;)
+ *  typeof keyword,
+ *  statement-expression,
+ *  nested function...
+ */
 #define CALL(func, ...) \
-    ({ typeof (func) *sym = getsym ( # func); sym (__VA_ARGS__); })
+({ \
+    static typeof (func) *sym = NULL; \
+    static pthread_once_t once = PTHREAD_ONCE_INIT; \
+    auto void getsym_once (void); \
+    void getsym_once (void) \
+    { \
+        sym = getsym ( # func); \
+    } \
+    pthread_once (&once, getsym_once); \
+    sym (__VA_ARGS__); \
+})
 
 
 /*** Environment ***
