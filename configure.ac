@@ -1993,7 +1993,7 @@ fi
 dnl
 dnl  OpenCV wrapper and example filters
 dnl
-PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example opencv_wrapper], [opencv], (OpenCV (computer vision) filter), [off])
+PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example], [opencv], (OpenCV (computer vision) filter), [off])
 
 
 dnl
