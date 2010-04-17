@@ -1427,6 +1427,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
             sscanf(p,"bytes %"SCNu64"-%"SCNu64"/%"SCNu64,&i_ntell,&i_nend,&i_nsize);
             if(i_nend > i_ntell ) {
                 p_access->info.i_pos = i_ntell;
+                p_sys->i_icy_offset  = i_ntell;
                 p_sys->i_remaining = i_nend+1-i_ntell;
                 int64_t i_size = (i_nsize > i_nend) ? i_nsize : (i_nend + 1);
                 if(i_size > p_access->info.i_size) {
