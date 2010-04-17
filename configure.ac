@@ -3300,9 +3300,7 @@ dnl  Xlib
 dnl
 
 AC_PATH_XTRA()
-AC_CHECK_HEADERS(X11/Xlib.h, [
-  VLC_ADD_LIBS([omapfb],[${X_LIBS} ${X_PRE_LIBS} -lX11])
-])
+AC_CHECK_HEADERS(X11/Xlib.h)
 
 dnl
 dnl  X C Bindings modules
@@ -3580,19 +3578,6 @@ AC_ARG_ENABLE(fb,
       AC_CHECK_HEADERS(linux/fb.h, [
         VLC_ADD_PLUGIN([fb])
       ])
-    fi
-
-dnl
-dnl  OMAP Framebuffer module
-dnl
-AC_ARG_ENABLE(omapfb,
-  [  --enable-omapfb         OMAP framebuffer support (default disabled)])
-    if test "${enable_omapfb}" = "yes"
-    then
-      AC_CHECK_HEADERS(asm/arch-omap/omapfb.h, [
-        VLC_ADD_PLUGIN([omapfb])
-      ])
-      VLC_ADD_PLUGIN([swscale_omap])
     fi
 
 dnl
