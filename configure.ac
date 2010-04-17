@@ -681,7 +681,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc ffmpegaltivec i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realvideo opengl],[-lm])
+  VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc ffmpegaltivec i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realvideo],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LIBS([headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball],[-lm])
@@ -3382,20 +3382,6 @@ AS_IF([test "${enable_glx}" != "no"], [
 ])
 AC_SUBST([GL_CFLAGS])
 AC_SUBST([GL_LIBS])
-
-
-dnl
-dnl  OpenGL module
-dnl  (enabled by default except on beos)
-dnl
-AC_ARG_ENABLE(opengl,
-  [  --enable-opengl         OpenGL support (default enabled)])
-if test "${enable_opengl}" != "no" &&
-   test "${SYS}" = "darwin"; then
-    dnl OS X special case (no GL/gl.h but OpenGL/gl.h)
-    VLC_ADD_PLUGIN([opengl])
-    VLC_ADD_LIBS([opengl],[-Wl,-framework,OpenGL])
-fi
 
 dnl
 dnl  SDL module
