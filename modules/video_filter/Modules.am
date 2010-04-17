@@ -86,7 +86,6 @@ libvlc_LTLIBRARIES += \
 	libchain_plugin.la \
 	libclone_plugin.la \
 	libcolorthres_plugin.la \
-	libcrop_plugin.la \
 	libcroppadd_plugin.la \
 	libdeinterlace_plugin.la \
 	liberase_plugin.la \
