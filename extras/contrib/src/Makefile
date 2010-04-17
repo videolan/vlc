@@ -1224,6 +1224,9 @@ live: live555-$(LIVEDOTCOM_VERSION).tar.gz
 ifdef HAVE_WIN64
 	patch -p0 < Patches/live-win64.patch
 endif
+ifndef HAVE_WIN32
+	patch -p0 < Patches/live-getaddrinfo.patch
+endif
 
 .live: live
 ifdef HAVE_WIN32
