@@ -1220,6 +1220,7 @@ live555-$(LIVEDOTCOM_VERSION).tar.gz:
 live: live555-$(LIVEDOTCOM_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/live-uselocale.patch
+	patch -p0 < Patches/live-inet_ntop.patch
 ifdef HAVE_WIN64
 	patch -p0 < Patches/live-win64.patch
 endif

@@ -1,0 +1,302 @@
+Copyright (C) 2010 Rémi Denis-Courmont.
+Licensed under GNU General Public License version 2 or higher.
+diff -ru live.orig//groupsock/Groupsock.cpp live//groupsock/Groupsock.cpp
+--- live.orig//groupsock/Groupsock.cpp	2010-04-09 22:27:39.000000000 +0300
++++ live//groupsock/Groupsock.cpp	2010-04-17 19:51:07.000000000 +0300
+@@ -331,8 +331,10 @@
+     }
+   }
+   if (DebugLevel >= 3) {
++    char buf[16];
++
+     env() << *this << ": read " << bytesRead << " bytes from ";
+-    env() << our_inet_ntoa(fromAddress.sin_addr);
++    env() << our_inet_ntoa(fromAddress.sin_addr, buf);
+     if (numMembers > 0) {
+       env() << "; relayed to " << numMembers << " members";
+     }
+@@ -441,13 +443,14 @@
+ }
+ 
+ UsageEnvironment& operator<<(UsageEnvironment& s, const Groupsock& g) {
++  char buf[16];
+   UsageEnvironment& s1 = s << timestampString() << " Groupsock("
+ 			   << g.socketNum() << ": "
+-			   << our_inet_ntoa(g.groupAddress())
++			   << our_inet_ntoa(g.groupAddress(), buf)
+ 			   << ", " << g.port() << ", ";
+   if (g.isSSM()) {
+     return s1 << "SSM source: "
+-	      <<  our_inet_ntoa(g.sourceFilterAddress()) << ")";
++	      <<  our_inet_ntoa(g.sourceFilterAddress(), buf) << ")";
+   } else {
+     return s1 << (unsigned)(g.ttl()) << ")";
+   }
+diff -ru live.orig//groupsock/include/GroupsockHelper.hh live//groupsock/include/GroupsockHelper.hh
+--- live.orig//groupsock/include/GroupsockHelper.hh	2010-04-09 22:27:39.000000000 +0300
++++ live//groupsock/include/GroupsockHelper.hh	2010-04-17 19:43:44.000000000 +0300
+@@ -124,7 +124,7 @@
+ 
+ // The following are implemented in inet.c:
+ extern "C" netAddressBits our_inet_addr(char const*);
+-extern "C" char* our_inet_ntoa(struct in_addr);
++extern "C" char* our_inet_ntoa(struct in_addr, char *);
+ extern "C" struct hostent* our_gethostbyname(char* name);
+ extern "C" void our_srandom(int x);
+ extern "C" long our_random();
+diff -ru live.orig//groupsock/inet.c live//groupsock/inet.c
+--- live.orig//groupsock/inet.c	2010-04-09 22:27:39.000000000 +0300
++++ live//groupsock/inet.c	2010-04-17 19:42:52.000000000 +0300
+@@ -21,26 +21,18 @@
+ }
+ 
+ char *
+-our_inet_ntoa(in)
+-        struct in_addr in;
++our_inet_ntoa(in, result)
++	struct in_addr in;
++	char *result;
+ {
+-#ifndef VXWORKS
+-  return inet_ntoa(in);
++#ifdef WIN32
++  char *ret = inet_ntoa(in);
++  if(ret != NULL)
++     strncpy(result, ret, 16);
++  return ret;
++#elif !defined (VXWORKS)
++  return inet_ntop(AF_INET, &in, result, 16);
+ #else
+-  /* according the man pages of inet_ntoa :
+-
+-     NOTES
+-     The return value from inet_ntoa() points to a  buffer  which
+-     is  overwritten on each call.  This buffer is implemented as
+-     thread-specific data in multithreaded applications.
+-
+-     the vxworks version of inet_ntoa allocates a buffer for each
+-     ip address string, and does not reuse the same buffer.
+-
+-     this is merely to simulate the same behaviour (not multithread
+-     safe though):
+-  */
+-  static char result[INET_ADDR_LEN];
+   inet_ntoa_b(in, result);
+   return(result);
+ #endif
+diff -ru live.orig//liveMedia/DarwinInjector.cpp live//liveMedia/DarwinInjector.cpp
+--- live.orig//liveMedia/DarwinInjector.cpp	2010-04-09 22:27:39.000000000 +0300
++++ live//liveMedia/DarwinInjector.cpp	2010-04-17 19:45:19.000000000 +0300
+@@ -128,7 +128,8 @@
+       NetAddress const* address = addresses.firstAddress();
+       addr.s_addr = *(unsigned*)(address->data());
+     }
+-    char const* remoteRTSPServerAddressStr = our_inet_ntoa(addr);
++    char buf[16];
++    char const* remoteRTSPServerAddressStr = our_inet_ntoa(addr, buf);
+ 
+     // Construct a SDP description for the session that we'll be streaming:
+     char const* const sdpFmt =
+diff -ru live.orig//liveMedia/OnDemandServerMediaSubsession.cpp live//liveMedia/OnDemandServerMediaSubsession.cpp
+--- live.orig//liveMedia/OnDemandServerMediaSubsession.cpp	2010-04-09 22:27:39.000000000 +0300
++++ live//liveMedia/OnDemandServerMediaSubsession.cpp	2010-04-17 19:50:05.000000000 +0300
+@@ -365,7 +365,8 @@
+   char const* mediaType = rtpSink->sdpMediaType();
+   unsigned char rtpPayloadType = rtpSink->rtpPayloadType();
+   struct in_addr serverAddrForSDP; serverAddrForSDP.s_addr = fServerAddressForSDP;
+-  char* const ipAddressStr = strDup(our_inet_ntoa(serverAddrForSDP));
++  char ipAddressStr[16];
++  our_inet_ntoa(serverAddrForSDP, ipAddressStr);
+   char* rtpmapLine = rtpSink->rtpmapLine();
+   char const* rangeLine = rangeSDPLine();
+   char const* auxSDPLine = getAuxSDPLine(rtpSink, inputSource);
+@@ -398,7 +399,7 @@
+ 	  rangeLine, // a=range:... (if present)
+ 	  auxSDPLine, // optional extra SDP line
+ 	  trackId()); // a=control:<track-id>
+-  delete[] (char*)rangeLine; delete[] rtpmapLine; delete[] ipAddressStr;
++  delete[] (char*)rangeLine; delete[] rtpmapLine;
+ 
+   fSDPLines = strDup(sdpLines);
+   delete[] sdpLines;
+diff -ru live.orig//liveMedia/PassiveServerMediaSubsession.cpp live//liveMedia/PassiveServerMediaSubsession.cpp
+--- live.orig//liveMedia/PassiveServerMediaSubsession.cpp	2010-04-09 22:27:39.000000000 +0300
++++ live//liveMedia/PassiveServerMediaSubsession.cpp	2010-04-17 19:46:28.000000000 +0300
+@@ -54,7 +54,8 @@
+     char const* auxSDPLine = fRTPSink.auxSDPLine();
+     if (auxSDPLine == NULL) auxSDPLine = "";
+ 
+-    char* const ipAddressStr = strDup(our_inet_ntoa(ipAddress));
++    char ipAddressStr[16];
++    our_inet_ntoa(ipAddress, ipAddressStr);
+ 
+     char const* const sdpFmt =
+       "m=%s %d RTP/AVP %d\r\n"
+@@ -84,7 +85,7 @@
+ 	    rangeLine, // a=range:... (if present)
+ 	    auxSDPLine, // optional extra SDP line
+ 	    trackId()); // a=control:<track-id>
+-    delete[] ipAddressStr; delete[] (char*)rangeLine; delete[] rtpmapLine;
++    delete[] (char*)rangeLine; delete[] rtpmapLine;
+ 
+     fSDPLines = strDup(sdpLines);
+     delete[] sdpLines;
+diff -ru live.orig//liveMedia/RTCP.cpp live//liveMedia/RTCP.cpp
+--- live.orig//liveMedia/RTCP.cpp	2010-04-09 22:27:39.000000000 +0300
++++ live//liveMedia/RTCP.cpp	2010-04-17 19:46:44.000000000 +0300
+@@ -359,7 +359,8 @@
+     }
+ 
+ #ifdef DEBUG
+-    fprintf(stderr, "[%p]saw incoming RTCP packet (from address %s, port %d)\n", this, our_inet_ntoa(fromAddress.sin_addr), ntohs(fromAddress.sin_port));
++    char buf[16];
++    fprintf(stderr, "[%p]saw incoming RTCP packet (from address %s, port %d)\n", this, our_inet_ntoa(fromAddress.sin_addr, buf), ntohs(fromAddress.sin_port));
+     unsigned char* p = pkt;
+     for (unsigned i = 0; i < packetSize; ++i) {
+       if (i%4 == 0) fprintf(stderr, " ");
+diff -ru live.orig//liveMedia/RTSPOverHTTPServer.cpp live//liveMedia/RTSPOverHTTPServer.cpp
+--- live.orig//liveMedia/RTSPOverHTTPServer.cpp	2010-04-09 22:27:39.000000000 +0300
++++ live//liveMedia/RTSPOverHTTPServer.cpp	2010-04-17 19:50:41.000000000 +0300
+@@ -128,7 +128,8 @@
+   makeSocketNonBlocking(clientSocket);
+   increaseSendBufferTo(envir(), clientSocket, 50*1024);
+ #if defined(DEBUG) || defined(DEBUG_CONNECTIONS)
+-  fprintf(stderr, "accept()ed connection from %s\n", our_inet_ntoa(clientAddr.sin_addr));
++  char buf[16];
++  fprintf(stderr, "accept()ed connection from %s\n", our_inet_ntoa(clientAddr.sin_addr, buf));
+ #endif
+ 
+   // Create a new object for handling this HTTP connection:
+diff -ru live.orig//liveMedia/RTSPServer.cpp live//liveMedia/RTSPServer.cpp
+--- live.orig//liveMedia/RTSPServer.cpp	2010-04-09 22:27:39.000000000 +0300
++++ live//liveMedia/RTSPServer.cpp	2010-04-17 19:49:32.000000000 +0300
+@@ -112,11 +112,12 @@
+   char urlBuffer[100]; // more than big enough for "rtsp://<ip-address>:<port>/"
+ 
+   portNumBits portNumHostOrder = ntohs(fServerPort.num());
++  char buf[16];
+   if (portNumHostOrder == 554 /* the default port number */) {
+-    sprintf(urlBuffer, "rtsp://%s/", our_inet_ntoa(ourAddress.sin_addr));
++    sprintf(urlBuffer, "rtsp://%s/", our_inet_ntoa(ourAddress.sin_addr, buf));
+   } else {
+     sprintf(urlBuffer, "rtsp://%s:%hu/",
+-	    our_inet_ntoa(ourAddress.sin_addr), portNumHostOrder);
++	    our_inet_ntoa(ourAddress.sin_addr, buf), portNumHostOrder);
+   }
+ 
+   return strDup(urlBuffer);
+@@ -233,7 +234,8 @@
+   increaseSendBufferTo(envir(), clientSocket, 50*1024);
+ 
+ #if defined(DEBUG) || defined(DEBUG_CONNECTIONS)
+-  envir() << "accept()ed connection from " << our_inet_ntoa(clientAddr.sin_addr) << '\n';
++  char buf[16];
++  envir() << "accept()ed connection from " << our_inet_ntoa(clientAddr.sin_addr, buf) << '\n';
+ #endif
+ 
+   // Create a new object for this RTSP session.
+@@ -747,10 +749,12 @@
+ 				  serverRTPPort, serverRTCPPort,
+ 				  fStreamStates[streamNum].streamToken);
+   struct in_addr destinationAddr; destinationAddr.s_addr = destinationAddress;
+-  char* destAddrStr = strDup(our_inet_ntoa(destinationAddr));
++  char destAddrStr[16];
++  our_inet_ntoa(destinationAddr, destAddrStr);
+   struct sockaddr_in sourceAddr; SOCKLEN_T namelen = sizeof sourceAddr;
+   getsockname(fClientSocket, (struct sockaddr*)&sourceAddr, &namelen);
+-  char* sourceAddrStr = strDup(our_inet_ntoa(sourceAddr.sin_addr));
++  char sourceAddrStr[16];
++  our_inet_ntoa(sourceAddr.sin_addr, sourceAddrStr);
+   if (fIsMulticast) {
+     switch (streamingMode) {
+     case RTP_UDP:
+@@ -825,7 +829,7 @@
+     }
+     }
+   }
+-  delete[] destAddrStr; delete[] sourceAddrStr; delete[] streamingModeString;
++  delete[] streamingModeString;
+ }
+ 
+ void RTSPServer::RTSPClientSession
+@@ -1226,7 +1230,8 @@
+   // If this gets called, the client session is assumed to have timed out,
+   // so delete it:
+ #ifdef DEBUG
+-  fprintf(stderr, "RTSP client session from %s has timed out (due to inactivity)\n", our_inet_ntoa(clientSession->fClientAddr.sin_addr));
++  char buf[16];
++  fprintf(stderr, "RTSP client session from %s has timed out (due to inactivity)\n", our_inet_ntoa(clientSession->fClientAddr.sin_addr, buf));
+ #endif
+   delete clientSession;
+ }
+diff -ru live.orig//liveMedia/ServerMediaSession.cpp live//liveMedia/ServerMediaSession.cpp
+--- live.orig//liveMedia/ServerMediaSession.cpp	2010-04-09 22:27:39.000000000 +0300
++++ live//liveMedia/ServerMediaSession.cpp	2010-04-17 19:50:31.000000000 +0300
+@@ -185,7 +185,8 @@
+ char* ServerMediaSession::generateSDPDescription() {
+   struct in_addr ipAddress;
+   ipAddress.s_addr = ourIPAddress(envir());
+-  char* const ipAddressStr = strDup(our_inet_ntoa(ipAddress));
++  char ipAddressStr[16];
++  our_inet_ntoa(ipAddress, ipAddressStr);
+   unsigned ipAddressStrSize = strlen(ipAddressStr);
+ 
+   // For a SSM sessions, we need a "a=source-filter: incl ..." line also:
+@@ -281,7 +282,7 @@
+     }
+   } while (0);
+ 
+-  delete[] rangeLine; delete[] sourceFilterLine; delete[] ipAddressStr;
++  delete[] rangeLine; delete[] sourceFilterLine;
+   return sdp;
+ }
+ 
+diff -ru live.orig//liveMedia/SIPClient.cpp live//liveMedia/SIPClient.cpp
+--- live.orig//liveMedia/SIPClient.cpp	2010-04-09 22:27:39.000000000 +0300
++++ live//liveMedia/SIPClient.cpp	2010-04-17 19:47:42.000000000 +0300
+@@ -60,13 +60,14 @@
+ 
+   struct in_addr ourAddress;
+   ourAddress.s_addr = ourIPAddress(env); // hack
+-  fOurAddressStr = strDup(our_inet_ntoa(ourAddress));
++  char buf[16];
++  fOurAddressStr = strDup(our_inet_ntoa(ourAddress, buf));
+   fOurAddressStrSize = strlen(fOurAddressStr);
+ 
+   fOurSocket = new Groupsock(env, ourAddress, 0, 255);
+   if (fOurSocket == NULL) {
+     env << "ERROR: Failed to create socket for addr "
+-	<< our_inet_ntoa(ourAddress) << ": "
++	<< our_inet_ntoa(ourAddress, buf) << ": "
+ 	<< env.getResultMsg() << "\n";
+   }
+ 
+@@ -84,7 +85,7 @@
+     fOurSocket = new Groupsock(env, ourAddress, fOurPortNum, 255);
+     if (fOurSocket == NULL) {
+       env << "ERROR: Failed to create socket for addr "
+-	  << our_inet_ntoa(ourAddress) << ", port "
++	  << our_inet_ntoa(ourAddress, buf) << ", port "
+ 	  << fOurPortNum << ": "
+ 	  << env.getResultMsg() << "\n";
+     }
+diff -ru live.orig//testProgs/sapWatch.cpp live//testProgs/sapWatch.cpp
+--- live.orig//testProgs/sapWatch.cpp	2010-04-09 22:27:39.000000000 +0300
++++ live//testProgs/sapWatch.cpp	2010-04-17 19:51:29.000000000 +0300
+@@ -49,13 +49,14 @@
+   struct sockaddr_in fromAddress;
+   while (inputGroupsock.handleRead(packet, maxPacketSize,
+ 				   packetSize, fromAddress)) {
++    char buf[16];
+     printf("\n[packet from %s (%d bytes)]\n",
+-	   our_inet_ntoa(fromAddress.sin_addr), packetSize);
++	   our_inet_ntoa(fromAddress.sin_addr, buf), packetSize);
+ 
+     // Ignore the first 8 bytes (SAP header).
+     if (packetSize < 8) {
+       *env << "Ignoring short packet from "
+-	   << our_inet_ntoa(fromAddress.sin_addr) << "%s!\n";
++	   << our_inet_ntoa(fromAddress.sin_addr, buf) << "%s!\n";
+       continue;
+     }
+ 
