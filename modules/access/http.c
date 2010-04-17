@@ -872,6 +872,8 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
                 p_sys->b_reconnect = false;
                 i_read = Read( p_access, p_buffer, i_len );
                 p_sys->b_reconnect = true;
+
+                return i_read;
             }
         }
 
