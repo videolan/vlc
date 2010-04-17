@@ -72,7 +72,6 @@ SOURCES_atmo = atmo/atmo.cpp \
 	atmo/AtmoMultiConnection.cpp atmo/AtmoMultiConnection.h \
 	atmo/MoMoConnection.cpp atmo/MoMoConnection.h \
 	atmo/AtmoPacketQueue.cpp atmo/AtmoPacketQueue.h
-SOURCES_video_filter_wrapper = wrapper.c
 noinst_HEADERS = filter_common.h filter_picture.h
 
 libvlc_LTLIBRARIES += \
@@ -116,5 +115,4 @@ libvlc_LTLIBRARIES += \
 	libtransform_plugin.la \
 	libwall_plugin.la \
 	libwave_plugin.la \
-	libyuvp_plugin.la \
-	libvideo_filter_wrapper_plugin.la
+	libyuvp_plugin.la
