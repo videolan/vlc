@@ -72,7 +72,7 @@ SOURCES_atmo = atmo/atmo.cpp \
 	atmo/AtmoMultiConnection.cpp atmo/AtmoMultiConnection.h \
 	atmo/MoMoConnection.cpp atmo/MoMoConnection.h \
 	atmo/AtmoPacketQueue.cpp atmo/AtmoPacketQueue.h
-noinst_HEADERS = filter_common.h filter_picture.h
+noinst_HEADERS = filter_picture.h
 
 libvlc_LTLIBRARIES += \
 	libadjust_plugin.la \
