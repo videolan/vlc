@@ -3699,30 +3699,6 @@ if test "${enable_directfb}" = "yes"; then
     fi
 fi
 
-
-
-dnl
-dnl  GGI module
-dnl
-AC_ARG_ENABLE(ggi,
-  [  --enable-ggi            GGI support (default disabled)])
-if test "${enable_ggi}" = "yes"
-then
-  AC_CHECK_HEADER([ggi/ggi.h],[
-    VLC_ADD_PLUGIN([ggi])
-    VLC_ADD_LIBS([ggi],[-lggi])
-    AC_ARG_WITH(ggi,
-      [  --with-ggi=PATH         path to libggi],
-      [ if test "${with_ggi}" != "no" -a -n "${with_ggi}"
-        then
-          VLC_ADD_CPPFLAGS([ggi],[-I${with_ggi}/include])
-          VLC_ADD_LIBS([ggi],[-L${with_ggi}/lib])
-        fi ])
-    ],[
-       AC_MSG_ERROR([LibGGI development files can't be found])
-    ])
-fi
-
 dnl
 dnl  AA plugin
 dnl
