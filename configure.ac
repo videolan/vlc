@@ -3621,17 +3621,6 @@ AC_ARG_ENABLE(omapfb,
     fi
 
 dnl
-dnl  SVGAlib module
-dnl
-AC_ARG_ENABLE(svgalib,
-  [  --enable-svgalib        SVGAlib support (default disabled)])
-if test "${enable_svgalib}" = "yes"
-then
-  VLC_ADD_PLUGIN([svgalib])
-  VLC_ADD_LIBS([svgalib],[-lvgagl -lvga])
-fi
-
-dnl
 dnl  DirectFB module
 dnl  try to find using: 1 - given location; 2 - directfb-config; 3 - pkg-config
 dnl  TODO: support for static linking
