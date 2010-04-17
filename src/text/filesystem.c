@@ -37,6 +37,7 @@
 #include <assert.h>
 
 #include <stdio.h>
+#include <limits.h> /* NAME_MAX */
 #include <errno.h>
 #include <sys/types.h>
 #ifdef HAVE_DIRENT_H
