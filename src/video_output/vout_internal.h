@@ -66,10 +66,6 @@ struct vout_thread_sys_t
     unsigned int    i_par_num;           /**< monitor pixel aspect-ratio */
     unsigned int    i_par_den;           /**< monitor pixel aspect-ratio */
 
-    /* */
-    bool            b_direct;            /**< rendered are like direct ? */
-    filter_t        *p_chroma;
-
     /**
      * These numbers are not supposed to be accurate, but are a
      * good indication of the thread status */

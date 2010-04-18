@@ -766,22 +766,6 @@ spu_t *vout_GetSpu( vout_thread_t *p_vout )
 static int ChromaCreate( vout_thread_t *p_vout );
 static void ChromaDestroy( vout_thread_t *p_vout );
 
-static bool ChromaIsEqual( const picture_heap_t *p_output, const picture_heap_t *p_render )
-{
-     if( !vout_ChromaCmp( p_output->i_chroma, p_render->i_chroma ) )
-         return false;
-
-     if( p_output->i_chroma != VLC_CODEC_RGB15 &&
-         p_output->i_chroma != VLC_CODEC_RGB16 &&
-         p_output->i_chroma != VLC_CODEC_RGB24 &&
-         p_output->i_chroma != VLC_CODEC_RGB32 )
-         return true;
-
-     return p_output->i_rmask == p_render->i_rmask &&
-            p_output->i_gmask == p_render->i_gmask &&
-            p_output->i_bmask == p_render->i_bmask;
-}
-
 static int InitThread( vout_thread_t *p_vout )
 {
     int i;
@@ -868,65 +852,33 @@ static int InitThread( vout_thread_t *p_vout )
              p_vout->fmt_out.i_sar_num, p_vout->fmt_out.i_sar_den,
              p_vout->fmt_out.i_rmask, p_vout->fmt_out.i_gmask, p_vout->fmt_out.i_bmask );
 
+    assert( p_vout->output.i_width == p_vout->render.i_width &&
+            p_vout->output.i_height == p_vout->render.i_height &&
+            p_vout->output.i_chroma == p_vout->render.i_chroma );
     /* Check whether we managed to create direct buffers similar to
      * the render buffers, ie same size and chroma */
-    if( ( p_vout->output.i_width == p_vout->render.i_width )
-     && ( p_vout->output.i_height == p_vout->render.i_height )
-     && ( ChromaIsEqual( &p_vout->output, &p_vout->render ) ) )
+
+    /* Cool ! We have direct buffers, we can ask the decoder to
+     * directly decode into them ! Map the first render buffers to
+     * the first direct buffers, but keep the first direct buffer
+     * for memcpy operations */
+    for( i = 1; i < VOUT_MAX_PICTURES; i++ )
     {
-        /* Cool ! We have direct buffers, we can ask the decoder to
-         * directly decode into them ! Map the first render buffers to
-         * the first direct buffers, but keep the first direct buffer
-         * for memcpy operations */
-        p_vout->p->b_direct = true;
-
-        for( i = 1; i < VOUT_MAX_PICTURES; i++ )
+        if( p_vout->p_picture[ i ].i_type != DIRECT_PICTURE &&
+            I_RENDERPICTURES >= VOUT_MIN_DIRECT_PICTURES - 1 &&
+            p_vout->p_picture[ i - 1 ].i_type == DIRECT_PICTURE )
         {
-            if( p_vout->p_picture[ i ].i_type != DIRECT_PICTURE &&
-                I_RENDERPICTURES >= VOUT_MIN_DIRECT_PICTURES - 1 &&
-                p_vout->p_picture[ i - 1 ].i_type == DIRECT_PICTURE )
-            {
-                /* We have enough direct buffers so there's no need to
-                 * try to use system memory buffers. */
-                break;
-            }
-            PP_RENDERPICTURE[ I_RENDERPICTURES ] = &p_vout->p_picture[ i ];
-            I_RENDERPICTURES++;
+            /* We have enough direct buffers so there's no need to
+             * try to use system memory buffers. */
+            break;
         }
-
-        msg_Dbg( p_vout, "direct render, mapping "
-                 "render pictures 0-%i to system pictures 1-%i",
-                 VOUT_MAX_PICTURES - 2, VOUT_MAX_PICTURES - 1 );
+        PP_RENDERPICTURE[ I_RENDERPICTURES ] = &p_vout->p_picture[ i ];
+        I_RENDERPICTURES++;
     }
-    else
-    {
-        /* Rats... Something is wrong here, we could not find an output
-         * plugin able to directly render what we decode. See if we can
-         * find a chroma plugin to do the conversion */
-        p_vout->p->b_direct = false;
 
-        if( ChromaCreate( p_vout ) )
-        {
-            vout_EndWrapper( p_vout );
-            return VLC_EGENERIC;
-        }
-
-        msg_Dbg( p_vout, "indirect render, mapping "
-                 "render pictures 0-%i to system pictures %i-%i",
-                 VOUT_MAX_PICTURES - 1, I_OUTPUTPICTURES,
-                 I_OUTPUTPICTURES + VOUT_MAX_PICTURES - 1 );
-
-        /* Append render buffers after the direct buffers */
-        for( i = I_OUTPUTPICTURES; i < 2 * VOUT_MAX_PICTURES; i++ )
-        {
-            PP_RENDERPICTURE[ I_RENDERPICTURES ] = &p_vout->p_picture[ i ];
-            I_RENDERPICTURES++;
-
-            /* Check if we have enough render pictures */
-            if( I_RENDERPICTURES == VOUT_MAX_PICTURES )
-                break;
-        }
-    }
+    msg_Dbg( p_vout, "direct render, mapping "
+             "render pictures 0-%i to system pictures 1-%i",
+             VOUT_MAX_PICTURES - 2, VOUT_MAX_PICTURES - 1 );
 
     return VLC_SUCCESS;
 }
@@ -1248,53 +1200,6 @@ static void* RunThread( void *p_this )
         if( p_vout->i_changes & VOUT_ON_TOP_CHANGE )
             p_vout->i_changes &= ~VOUT_ON_TOP_CHANGE;
 
-        if( p_vout->i_changes & VOUT_SIZE_CHANGE )
-        {
-            /* this must only happen when the vout plugin is incapable of
-             * rescaling the picture itself. In this case we need to destroy
-             * the current picture buffers and recreate new ones with the right
-             * dimensions */
-            int i;
-
-            p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-
-            assert( !p_vout->p->b_direct );
-
-            ChromaDestroy( p_vout );
-
-            vlc_mutex_lock( &p_vout->picture_lock );
-
-            vout_EndWrapper( p_vout );
-
-            p_vout->p->p_picture_displayed = NULL;
-            for( i = 0; i < I_OUTPUTPICTURES; i++ )
-                 p_vout->p_picture[ i ].i_status = FREE_PICTURE;
-            vlc_cond_signal( &p_vout->p->picture_wait );
-
-            I_OUTPUTPICTURES = 0;
-
-            if( vout_InitWrapper( p_vout ) )
-            {
-                msg_Err( p_vout, "cannot resize display" );
-                /* FIXME: pf_end will be called again in CleanThread()? */
-                p_vout->b_error = 1;
-            }
-
-            vlc_mutex_unlock( &p_vout->picture_lock );
-
-            /* Need to reinitialise the chroma plugin. Since we might need
-             * resizing too and it's not sure that we already had it,
-             * recreate the chroma plugin chain from scratch. */
-            /* dionoea */
-            if( ChromaCreate( p_vout ) )
-            {
-                msg_Err( p_vout, "WOW THIS SUCKS BIG TIME!!!!!" );
-                p_vout->b_error = 1;
-            }
-            if( p_vout->b_error )
-                break;
-        }
-
         if( p_vout->i_changes & VOUT_PICTURE_BUFFERS_CHANGE )
         {
             /* This happens when the picture buffers need to be recreated.
@@ -1303,9 +1208,6 @@ static void* RunThread( void *p_this )
              * Warning: This only works when the vout creates only 1 picture
              * buffer!! */
             p_vout->i_changes &= ~VOUT_PICTURE_BUFFERS_CHANGE;
-
-            if( !p_vout->p->b_direct )
-                ChromaDestroy( p_vout );
 
             vlc_mutex_lock( &p_vout->picture_lock );
 
@@ -1412,9 +1314,6 @@ static void CleanThread( vout_thread_t *p_vout )
 {
     int     i_index;                                        /* index in heap */
 
-    if( !p_vout->p->b_direct )
-        ChromaDestroy( p_vout );
-
     /* Destroy all remaining pictures */
     for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES + 1; i_index++ )
     {
@@ -1446,64 +1345,6 @@ static void EndThread( vout_thread_t *p_vout )
 
     /* Destroy the video filters2 */
     filter_chain_Delete( p_vout->p->p_vf2_chain );
-}
-
-/* Thread helpers */
-static picture_t *ChromaGetPicture( filter_t *p_filter )
-{
-    picture_t *p_pic = (picture_t *)p_filter->p_owner;
-    p_filter->p_owner = NULL;
-    return p_pic;
-}
-
-static int ChromaCreate( vout_thread_t *p_vout )
-{
-    static const char typename[] = "chroma";
-    filter_t *p_chroma;
-
-    /* Choose the best module */
-    p_chroma = p_vout->p->p_chroma =
-        vlc_custom_create( p_vout, sizeof(filter_t), VLC_OBJECT_GENERIC,
-                           typename );
-
-    vlc_object_attach( p_chroma, p_vout );
-
-    /* TODO: Set the fmt_in and fmt_out stuff here */
-    p_chroma->fmt_in.video = p_vout->fmt_render;
-    p_chroma->fmt_out.video = p_vout->fmt_out;
-    VideoFormatImportRgb( &p_chroma->fmt_in.video, &p_vout->render );
-    VideoFormatImportRgb( &p_chroma->fmt_out.video, &p_vout->output );
-
-    p_chroma->p_module = module_need( p_chroma, "video filter2", NULL, false );
-
-    if( p_chroma->p_module == NULL )
-    {
-        msg_Err( p_vout, "no chroma module for %4.4s to %4.4s i=%dx%d o=%dx%d",
-                 (char*)&p_vout->render.i_chroma,
-                 (char*)&p_vout->output.i_chroma,
-                 p_chroma->fmt_in.video.i_width, p_chroma->fmt_in.video.i_height,
-                 p_chroma->fmt_out.video.i_width, p_chroma->fmt_out.video.i_height
-                 );
-
-        vlc_object_release( p_vout->p->p_chroma );
-        p_vout->p->p_chroma = NULL;
-
-        return VLC_EGENERIC;
-    }
-    p_chroma->pf_video_buffer_new = ChromaGetPicture;
-    return VLC_SUCCESS;
-}
-
-static void ChromaDestroy( vout_thread_t *p_vout )
-{
-    assert( !p_vout->p->b_direct );
-
-    if( !p_vout->p->p_chroma )
-        return;
-
-    module_unneed( p_vout->p->p_chroma, p_vout->p->p_chroma->p_module );
-    vlc_object_release( p_vout->p->p_chroma );
-    p_vout->p->p_chroma = NULL;
 }
 
 /* following functions are local */

@@ -368,16 +368,10 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         /* We can directly render into a direct buffer */
         p_render = PP_OUTPUTPICTURE[0];
     }
-    /* Copy or convert */
-    if( p_vout->p->b_direct )
-    {
-        picture_Copy( p_render, p_pic );
-    }
-    else
-    {
-        p_vout->p->p_chroma->p_owner = (filter_owner_sys_t *)p_render;
-        p_vout->p->p_chroma->pf_video_filter( p_vout->p->p_chroma, p_pic );
-    }
+
+    /* Copy */
+    picture_Copy( p_render, p_pic );
+
     /* Render the subtitles if present */
     if( p_subpic )
         spu_RenderSubpictures( p_vout->p_spu,
@@ -538,56 +532,6 @@ int vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
     }
 
     return VLC_SUCCESS;
-}
-
-/**
- * Compare two chroma values
- *
- * This function returns 1 if the two fourcc values given as argument are
- * the same format (eg. UYVY/UYNV) or almost the same format (eg. I420/YV12)
- */
-int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
-{
-    static const vlc_fourcc_t p_I420[] = {
-        VLC_CODEC_I420, VLC_CODEC_YV12, VLC_CODEC_J420, 0
-    };
-    static const vlc_fourcc_t p_I422[] = {
-        VLC_CODEC_I422, VLC_CODEC_J422, 0
-    };
-    static const vlc_fourcc_t p_I440[] = {
-        VLC_CODEC_I440, VLC_CODEC_J440, 0
-    };
-    static const vlc_fourcc_t p_I444[] = {
-        VLC_CODEC_I444, VLC_CODEC_J444, 0
-    };
-    static const vlc_fourcc_t *pp_fcc[] = {
-        p_I420, p_I422, p_I440, p_I444, NULL
-    };
-
-    /* */
-    i_chroma = vlc_fourcc_GetCodec( VIDEO_ES, i_chroma );
-    i_amorhc = vlc_fourcc_GetCodec( VIDEO_ES, i_amorhc );
-
-    /* If they are the same, they are the same ! */
-    if( i_chroma == i_amorhc )
-        return 1;
-
-    /* Check for equivalence classes */
-    for( int i = 0; pp_fcc[i] != NULL; i++ )
-    {
-        bool b_fcc1 = false;
-        bool b_fcc2 = false;
-        for( int j = 0; pp_fcc[i][j] != 0; j++ )
-        {
-            if( i_chroma == pp_fcc[i][j] )
-                b_fcc1 = true;
-            if( i_amorhc == pp_fcc[i][j] )
-                b_fcc2 = true;
-        }
-        if( b_fcc1 && b_fcc2 )
-            return 1;
-    }
-    return 0;
 }
 
 /*****************************************************************************

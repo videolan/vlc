@@ -175,8 +175,6 @@ struct vout_thread_t
 #define VOUT_FULLSCREEN_CHANGE  0x0040
 /** i_zoom changed */
 #define VOUT_ZOOM_CHANGE        0x0080
-/** size changed */
-#define VOUT_SIZE_CHANGE        0x0200
 /** depth changed */
 #define VOUT_DEPTH_CHANGE       0x0400
 /** change chroma tables */
@@ -281,8 +279,6 @@ VLC_EXPORT( int, vout_GetSnapshot, ( vout_thread_t *p_vout,
                                      const char *psz_format, mtime_t i_timeout ) );
 
 /* */
-VLC_EXPORT( int,             vout_ChromaCmp,      ( uint32_t, uint32_t ) );
-
 VLC_EXPORT( picture_t *,     vout_CreatePicture,  ( vout_thread_t *, bool, bool, unsigned int ) );
 VLC_EXPORT( void,            vout_DestroyPicture, ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_DisplayPicture, ( vout_thread_t *, picture_t * ) );
