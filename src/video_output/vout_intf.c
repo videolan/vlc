@@ -817,10 +817,6 @@ static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
     /* Restore defaults */
     p_vout->fmt_in.i_sar_num = p_vout->fmt_render.i_sar_num;
     p_vout->fmt_in.i_sar_den = p_vout->fmt_render.i_sar_den;
-    p_vout->render.i_aspect = (int64_t)p_vout->fmt_render.i_sar_num *
-                                       p_vout->fmt_render.i_width *
-                                       VOUT_ASPECT_FACTOR /
-                                       p_vout->fmt_render.i_sar_den / p_vout->fmt_render.i_height;
 
     if( !psz_parser ) goto aspect_end;
 
@@ -835,18 +831,12 @@ static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
     vlc_ureduce( &i_sar_num, &i_sar_den, i_sar_num, i_sar_den, 0 );
     p_vout->fmt_in.i_sar_num = i_sar_num;
     p_vout->fmt_in.i_sar_den = i_sar_den;
-    p_vout->render.i_aspect = i_aspect_num * VOUT_ASPECT_FACTOR / i_aspect_den;
 
  aspect_end:
     if( p_vout->p->i_par_num && p_vout->p->i_par_den )
     {
         p_vout->fmt_in.i_sar_num *= p_vout->p->i_par_den;
         p_vout->fmt_in.i_sar_den *= p_vout->p->i_par_num;
-        p_vout->render.i_aspect = (int64_t)p_vout->fmt_in.i_sar_num *
-                                           p_vout->fmt_in.i_width *
-                                           VOUT_ASPECT_FACTOR /
-                                           p_vout->fmt_in.i_sar_den /
-                                           p_vout->fmt_in.i_height;
     }
 
     p_vout->i_changes |= VOUT_ASPECT_CHANGE;

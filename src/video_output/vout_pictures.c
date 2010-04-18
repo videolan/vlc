@@ -167,10 +167,9 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
     if( p_freepic != NULL )
     {
         vout_AllocatePicture( VLC_OBJECT(p_vout),
-                              p_freepic, p_vout->render.i_chroma,
-                              p_vout->render.i_width, p_vout->render.i_height,
-                              p_vout->render.i_aspect * p_vout->render.i_height,
-                              VOUT_ASPECT_FACTOR      * p_vout->render.i_width);
+                              p_freepic, p_vout->fmt_render.i_chroma,
+                              p_vout->fmt_render.i_width, p_vout->fmt_render.i_height,
+                              p_vout->fmt_in.i_sar_num, p_vout->fmt_in.i_sar_den ); /* The right AR is in fmt_in and not fmt_render */
 
         if( p_freepic->i_planes )
         {

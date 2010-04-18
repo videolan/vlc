@@ -46,11 +46,13 @@ void vout_OSDSlider( vlc_object_t *p_caller, int i_channel, int i_position,
 
     if( p_vout && ( var_InheritBool( p_caller, "osd" ) && ( i_position >= 0 ) ) )
     {
-        osd_Slider( p_caller, vout_GetSpu( p_vout ), p_vout->render.i_width,
-            p_vout->render.i_height, p_vout->fmt_in.i_x_offset,
-            p_vout->fmt_in.i_height - p_vout->fmt_in.i_visible_height
-                                    - p_vout->fmt_in.i_y_offset,
-            i_channel, i_position, i_type );
+        osd_Slider( p_caller, vout_GetSpu( p_vout ),
+                    p_vout->fmt_render.i_width,
+                    p_vout->fmt_render.i_height,
+                    p_vout->fmt_in.i_x_offset,
+                    p_vout->fmt_in.i_height - p_vout->fmt_in.i_visible_height
+                                            - p_vout->fmt_in.i_y_offset,
+                    i_channel, i_position, i_type );
     }
     vlc_object_release( p_vout );
 }
@@ -70,8 +72,8 @@ void vout_OSDIcon( vlc_object_t *p_caller, int i_channel, short i_type )
     {
         osd_Icon( p_caller,
                   vout_GetSpu( p_vout ),
-                  p_vout->render.i_width,
-                  p_vout->render.i_height,
+                  p_vout->fmt_render.i_width,
+                  p_vout->fmt_render.i_height,
                   p_vout->fmt_in.i_width - p_vout->fmt_in.i_visible_width
                                          - p_vout->fmt_in.i_x_offset,
                   p_vout->fmt_in.i_y_offset,

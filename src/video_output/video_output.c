@@ -241,12 +241,6 @@ vout_thread_t *vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 
                 p_vout->fmt_render.i_sar_num = i_sar_num;
                 p_vout->fmt_render.i_sar_den = i_sar_den;
-
-                p_vout->render.i_aspect = (int64_t)i_sar_num *
-                                                   p_vout->fmt_render.i_width *
-                                                   VOUT_ASPECT_FACTOR /
-                                                   i_sar_den /
-                                                   p_vout->fmt_render.i_height;
                 p_vout->i_changes |= VOUT_ASPECT_CHANGE;
             }
             vlc_mutex_unlock( &p_vout->change_lock );
@@ -289,26 +283,19 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     int              i_index;                               /* loop variable */
     vlc_value_t      text;
 
-    unsigned int i_width = p_fmt->i_width;
-    unsigned int i_height = p_fmt->i_height;
-    vlc_fourcc_t i_chroma = vlc_fourcc_GetCodec( VIDEO_ES, p_fmt->i_chroma );
 
     config_chain_t *p_cfg;
     char *psz_parser;
     char *psz_name;
 
-    if( i_width <= 0 || i_height <= 0 )
+    if( p_fmt->i_width <= 0 || p_fmt->i_height <= 0 )
         return NULL;
+    const vlc_fourcc_t i_chroma = vlc_fourcc_GetCodec( VIDEO_ES, p_fmt->i_chroma );
 
     vlc_ureduce( &p_fmt->i_sar_num, &p_fmt->i_sar_den,
                  p_fmt->i_sar_num, p_fmt->i_sar_den, 50000 );
     if( p_fmt->i_sar_num <= 0 || p_fmt->i_sar_den <= 0 )
         return NULL;
-    unsigned int i_aspect = (int64_t)p_fmt->i_sar_num *
-                                     i_width *
-                                     VOUT_ASPECT_FACTOR /
-                                     p_fmt->i_sar_den /
-                                     i_height;
 
     /* Allocate descriptor */
     static const char typename[] = "video output";
@@ -340,22 +327,15 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->fmt_render        = *p_fmt;   /* FIXME palette */
     p_vout->fmt_in            = *p_fmt;   /* FIXME palette */
 
+    p_vout->fmt_render.i_chroma = 
+    p_vout->fmt_in.i_chroma     = i_chroma;
     video_format_FixRgb( &p_vout->fmt_render );
     video_format_FixRgb( &p_vout->fmt_in );
-
-    p_vout->render.i_width    = i_width;
-    p_vout->render.i_height   = i_height;
-    p_vout->render.i_chroma   = i_chroma;
-    p_vout->render.i_aspect   = i_aspect;
 
     p_vout->render.i_last_used_pic = -1;
 
     /* Zero the output heap */
     I_OUTPUTPICTURES = 0;
-    p_vout->output.i_width    = 0;
-    p_vout->output.i_height   = 0;
-    p_vout->output.i_chroma   = 0;
-    p_vout->output.i_aspect   = 0;
 
     /* Initialize misc stuff */
     p_vout->i_changes    = 0;
@@ -778,22 +758,12 @@ static int InitThread( vout_thread_t *p_vout )
 
     msg_Dbg( p_vout, "got %i direct buffer(s)", I_OUTPUTPICTURES );
 
-    if( !p_vout->fmt_out.i_width || !p_vout->fmt_out.i_height )
-    {
-        p_vout->fmt_out.i_width = p_vout->fmt_out.i_visible_width =
-            p_vout->output.i_width;
-        p_vout->fmt_out.i_height = p_vout->fmt_out.i_visible_height =
-            p_vout->output.i_height;
-        p_vout->fmt_out.i_x_offset =  p_vout->fmt_out.i_y_offset = 0;
-
-        p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
-    }
+    assert( p_vout->fmt_out.i_width > 0 && p_vout->fmt_out.i_height > 0 );
     if( !p_vout->fmt_out.i_sar_num || !p_vout->fmt_out.i_sar_num )
     {
-        p_vout->fmt_out.i_sar_num = p_vout->output.i_aspect *
-            p_vout->fmt_out.i_height;
-        p_vout->fmt_out.i_sar_den = VOUT_ASPECT_FACTOR *
-            p_vout->fmt_out.i_width;
+        /* FIXME is it possible to end up here ? */
+        p_vout->fmt_out.i_sar_num = 1;
+        p_vout->fmt_out.i_sar_den = 1;
     }
 
     vlc_ureduce( &p_vout->fmt_out.i_sar_num, &p_vout->fmt_out.i_sar_den,
@@ -833,9 +803,9 @@ static int InitThread( vout_thread_t *p_vout )
              p_vout->fmt_out.i_sar_num, p_vout->fmt_out.i_sar_den,
              p_vout->fmt_out.i_rmask, p_vout->fmt_out.i_gmask, p_vout->fmt_out.i_bmask );
 
-    assert( p_vout->output.i_width == p_vout->render.i_width &&
-            p_vout->output.i_height == p_vout->render.i_height &&
-            p_vout->output.i_chroma == p_vout->render.i_chroma );
+    assert( p_vout->fmt_out.i_width == p_vout->fmt_render.i_width &&
+            p_vout->fmt_out.i_height == p_vout->fmt_render.i_height &&
+            p_vout->fmt_out.i_chroma == p_vout->fmt_render.i_chroma );
     /* Check whether we managed to create direct buffers similar to
      * the render buffers, ie same size and chroma */
 

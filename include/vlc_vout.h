@@ -43,16 +43,6 @@ struct picture_heap_t
 {
     int i_pictures;                                   /**< current heap size */
 
-    /* \name Picture static properties
-     * Those properties are fixed at initialization and should NOT be modified
-     * @{
-     */
-    unsigned int i_width;                                 /**< picture width */
-    unsigned int i_height;                               /**< picture height */
-    vlc_fourcc_t i_chroma;                               /**< picture chroma */
-    unsigned int i_aspect;                                 /**< aspect ratio */
-    /**@}*/
-
     /* Real pictures */
     picture_t*      pp_picture[VOUT_MAX_PICTURES];             /**< pictures */
     int             i_last_used_pic;              /**< last used pic in heap */

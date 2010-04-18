@@ -146,19 +146,13 @@ int vout_InitWrapper(vout_thread_t *vout)
     /* */
     video_format_t source = vd->source;
 
-    vout->output.i_chroma = source.i_chroma;
-    vout->output.i_width  = source.i_width;
-    vout->output.i_height = source.i_height;
-    vout->output.i_aspect = (int64_t)source.i_sar_num * source.i_width * VOUT_ASPECT_FACTOR / source.i_sar_den / source.i_height;
-
-    /* also set fmt_out (completly broken API) */
-    vout->fmt_out.i_chroma         = vout->output.i_chroma;
+    vout->fmt_out.i_chroma         = source.i_chroma;
     vout->fmt_out.i_width          =
-    vout->fmt_out.i_visible_width  = vout->output.i_width;
+    vout->fmt_out.i_visible_width  = source.i_width;
     vout->fmt_out.i_height         =
-    vout->fmt_out.i_visible_height = vout->output.i_height;
-    vout->fmt_out.i_sar_num        = vout->output.i_aspect * vout->output.i_height;
-    vout->fmt_out.i_sar_den        = VOUT_ASPECT_FACTOR    * vout->output.i_width;
+    vout->fmt_out.i_visible_height = source.i_height;
+    vout->fmt_out.i_sar_num        = source.i_sar_num;
+    vout->fmt_out.i_sar_den        = source.i_sar_den;
     vout->fmt_out.i_x_offset       = 0;
     vout->fmt_out.i_y_offset       = 0;
     vout->fmt_out.i_rmask          = source.i_rmask;
@@ -277,8 +271,6 @@ int vout_ManageWrapper(vout_thread_t *vout)
             vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
         }
         if (vout->i_changes & VOUT_ASPECT_CHANGE) {
-            vout->output.i_aspect   = (int64_t)vout->fmt_in.i_sar_num * vout->fmt_in.i_width * VOUT_ASPECT_FACTOR /
-                                      vout->fmt_in.i_sar_den / vout->fmt_in.i_height;
             vout->fmt_out.i_sar_num = vout->fmt_in.i_sar_num;
             vout->fmt_out.i_sar_den = vout->fmt_in.i_sar_den;
 
