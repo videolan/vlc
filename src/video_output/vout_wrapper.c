@@ -429,6 +429,6 @@ static int Forward(vlc_object_t *object, char const *var,
 
     VLC_UNUSED(oldval);
     VLC_UNUSED(data);
-    return var_Set(vout->p_sys->vd, var, newval);
+    return var_Set(vout->p->p_sys->vd, var, newval);
 }
 #endif
