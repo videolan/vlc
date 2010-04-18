@@ -114,7 +114,6 @@ struct vout_thread_t
 
     /** \name Video heap and translation tables */
     /**@{*/
-    int                 i_heap_size;                          /**< heap size */
     picture_heap_t      render;                       /**< rendered pictures */
     picture_heap_t      output;                          /**< direct buffers */
 

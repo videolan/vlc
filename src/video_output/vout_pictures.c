@@ -142,7 +142,6 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
                 p_pic->i_nb_fields          = i_nb_fields;
                 p_pic->b_top_field_first    = b_top_field_first;
 
-                p_vout->i_heap_size++;
                 p_vout->render.i_last_used_pic =
                     ( p_vout->render.i_last_used_pic + i_pic + 1 )
                     % I_RENDERPICTURES;
@@ -187,7 +186,6 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
             p_freepic->i_nb_fields          = i_nb_fields;
             p_freepic->b_top_field_first    = b_top_field_first;
 
-            p_vout->i_heap_size++;
         }
         else
         {
@@ -216,7 +214,6 @@ static void DestroyPicture( vout_thread_t *p_vout, picture_t *p_picture )
     vlc_assert_locked( &p_vout->picture_lock );
 
     p_picture->i_status = DESTROYED_PICTURE;
-    p_vout->i_heap_size--;
     picture_CleanupQuant( p_picture );
 
     vlc_cond_signal( &p_vout->p->picture_wait );

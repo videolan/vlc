@@ -335,9 +335,6 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         p_vout->p_picture[i_index].b_slow   = 0;
     }
 
-    /* No images in the heap */
-    p_vout->i_heap_size = 0;
-
     /* Initialize the rendering heap */
     I_RENDERPICTURES = 0;
 
