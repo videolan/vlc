@@ -1526,6 +1526,7 @@ static int RollOverTcp( demux_t *p_demux )
     p_sys->i_track = 0;
     p_sys->b_no_data = true;
     p_sys->i_no_data_ti = 0;
+    p_sys->p_out_asf = NULL;
 
     /* Reopen rtsp client */
     if( ( i_return = Connect( p_demux ) ) != VLC_SUCCESS )
