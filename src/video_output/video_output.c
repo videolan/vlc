@@ -757,9 +757,6 @@ spu_t *vout_GetSpu( vout_thread_t *p_vout )
  * modified inside this function.
  * XXX You have to enter it with change_lock taken.
  *****************************************************************************/
-static int ChromaCreate( vout_thread_t *p_vout );
-static void ChromaDestroy( vout_thread_t *p_vout );
-
 static int InitThread( vout_thread_t *p_vout )
 {
     int i;
