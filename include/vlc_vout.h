@@ -132,7 +132,6 @@ struct vout_thread_t
 
     /** \name Plugin used and shortcuts to access its capabilities */
     /**@{*/
-    module_t *   p_module;
     int       ( *pf_init )       ( vout_thread_t * );
     void      ( *pf_end )        ( vout_thread_t * );
     int       ( *pf_manage )     ( vout_thread_t * );

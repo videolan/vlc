@@ -495,7 +495,6 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         psz_name = psz_tmp;
     }
     p_vout->p->psz_module_name = psz_name;
-    p_vout->p_module = NULL;
 
     /* */
     vlc_object_set_destructor( p_vout, vout_Destructor );
