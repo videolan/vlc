@@ -40,6 +40,19 @@
 /* */
 typedef struct vout_sys_t vout_sys_t;
 
+/**
+ * Video picture heap, either render (to store pictures used
+ * by the decoder) or output (to store pictures displayed by the vout plugin)
+ */
+typedef struct
+{
+    int i_pictures;                                   /**< current heap size */
+
+    /* Real pictures */
+    picture_t*      pp_picture[VOUT_MAX_PICTURES];             /**< pictures */
+    int             i_last_used_pic;              /**< last used pic in heap */
+} picture_heap_t;
+
 /* */
 struct vout_thread_sys_t
 {

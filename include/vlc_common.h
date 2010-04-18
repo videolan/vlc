@@ -251,7 +251,6 @@ typedef struct vout_thread_t vout_thread_t;
 typedef video_format_t video_frame_format_t;
 typedef struct picture_t picture_t;
 typedef struct picture_sys_t picture_sys_t;
-typedef struct picture_heap_t picture_heap_t;
 
 /* Subpictures */
 typedef struct spu_t spu_t;

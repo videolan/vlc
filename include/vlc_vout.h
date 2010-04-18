@@ -35,19 +35,6 @@
 #include <vlc_filter.h>
 #include <vlc_subpicture.h>
 
-/**
- * Video picture heap, either render (to store pictures used
- * by the decoder) or output (to store pictures displayed by the vout plugin)
- */
-struct picture_heap_t
-{
-    int i_pictures;                                   /**< current heap size */
-
-    /* Real pictures */
-    picture_t*      pp_picture[VOUT_MAX_PICTURES];             /**< pictures */
-    int             i_last_used_pic;              /**< last used pic in heap */
-};
-
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
