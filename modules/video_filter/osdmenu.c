@@ -648,8 +648,8 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     vout_thread_t *p_vout = (vout_thread_t*)p_sys->p_vout;
     int i_x = newval.coords.x;
     int i_y = newval.coords.y;
-    int v_h = p_vout->output.i_height;
-    int v_w = p_vout->output.i_width;
+    int v_h = p_vout->fmt_out.i_height;
+    int v_w = p_vout->fmt_out.i_width;
 
     if( i_y < 0 || i_x < 0 || i_y >= v_h || i_x >= v_w )
         return VLC_SUCCESS;
