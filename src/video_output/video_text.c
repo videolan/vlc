@@ -110,7 +110,7 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
     if( p_style )
         p_spu->p_region->p_style = text_style_Duplicate( p_style );
 
-    spu_DisplaySubpicture( p_vout->p_spu, p_spu );
+    spu_DisplaySubpicture( vout_GetSpu( p_vout ), p_spu );
 
     return VLC_SUCCESS;
 }

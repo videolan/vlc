@@ -374,7 +374,7 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
 
     /* Render the subtitles if present */
     if( p_subpic )
-        spu_RenderSubpictures( p_vout->p_spu,
+        spu_RenderSubpictures( p_vout->p->p_spu,
                                p_render, &p_vout->fmt_out,
                                p_subpic, &p_vout->fmt_in, render_date );
     /* Copy in case we used a temporary fast buffer */

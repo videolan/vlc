@@ -259,11 +259,11 @@ vout_thread_t *vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         {
             msg_Dbg( p_this, "reusing provided vout" );
 
-            spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), false );
+            spu_Attach( p_vout->p->p_spu, VLC_OBJECT(p_vout), false );
             vlc_object_detach( p_vout );
 
             vlc_object_attach( p_vout, p_this );
-            spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), true );
+            spu_Attach( p_vout->p->p_spu, VLC_OBJECT(p_vout), true );
         }
     }
 
@@ -409,12 +409,12 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     vlc_object_attach( p_vout, p_parent );
 
     /* Initialize subpicture unit */
-    p_vout->p_spu = spu_Create( p_vout );
+    p_vout->p->p_spu = spu_Create( p_vout );
 
     /* */
-    spu_Init( p_vout->p_spu );
+    spu_Init( p_vout->p->p_spu );
 
-    spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), true );
+    spu_Attach( p_vout->p->p_spu, VLC_OBJECT(p_vout), true );
 
     /* Take care of some "interface/control" related initialisations */
     vout_IntfInit( p_vout );
@@ -474,7 +474,7 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     char *psz_tmp = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
     free( psz_parser );
     free( psz_tmp );
-    p_vout->p_cfg = p_cfg;
+    p_vout->p->p_cfg = p_cfg;
 
     /* Create a few object variables for interface interaction */
     var_Create( p_vout, "vout-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -503,9 +503,9 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     if( vlc_clone( &p_vout->p->thread, RunThread, p_vout,
                    VLC_THREAD_PRIORITY_OUTPUT ) )
     {
-        spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), false );
-        spu_Destroy( p_vout->p_spu );
-        p_vout->p_spu = NULL;
+        spu_Attach( p_vout->p->p_spu, VLC_OBJECT(p_vout), false );
+        spu_Destroy( p_vout->p->p_spu );
+        p_vout->p->p_spu = NULL;
         vlc_object_release( p_vout );
         return NULL;
     }
@@ -519,7 +519,7 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     }
     vlc_mutex_unlock( &p_vout->change_lock );
 
-    if( p_vout->b_error )
+    if( p_vout->p->b_error )
     {
         msg_Err( p_vout, "video output creation failed" );
         vout_CloseAndRelease( p_vout );
@@ -562,8 +562,8 @@ static void vout_Destructor( vlc_object_t * p_this )
     free( p_vout->p->psz_module_name );
 
     /* */
-    if( p_vout->p_spu )
-        spu_Destroy( p_vout->p_spu );
+    if( p_vout->p->p_spu )
+        spu_Destroy( p_vout->p->p_spu );
 
     /* Destroy the locks */
     vlc_cond_destroy( &p_vout->p->change_wait );
@@ -582,7 +582,7 @@ static void vout_Destructor( vlc_object_t * p_this )
     free( p_vout->p->psz_filter_chain );
     free( p_vout->p->psz_title );
 
-    config_ChainDestroy( p_vout->p_cfg );
+    config_ChainDestroy( p_vout->p->p_cfg );
 
     free( p_vout->p );
 
@@ -613,7 +613,7 @@ void vout_ChangePause( vout_thread_t *p_vout, bool b_paused, mtime_t i_date )
         vlc_cond_signal( &p_vout->p->picture_wait );
         vlc_mutex_unlock( &p_vout->picture_lock );
 
-        spu_OffsetSubtitleDate( p_vout->p_spu, i_duration );
+        spu_OffsetSubtitleDate( p_vout->p->p_spu, i_duration );
     }
     else
     {
@@ -752,7 +752,7 @@ void vout_DisplayTitle( vout_thread_t *p_vout, const char *psz_title )
 
 spu_t *vout_GetSpu( vout_thread_t *p_vout )
 {
-    return p_vout->p_spu;
+    return p_vout->p->p_spu;
 }
 
 /*****************************************************************************
@@ -907,15 +907,15 @@ static void* RunThread( void *p_this )
     vlc_mutex_lock( &p_vout->change_lock );
 
     if( b_has_wrapper )
-        p_vout->b_error = InitThread( p_vout );
+        p_vout->p->b_error = InitThread( p_vout );
     else
-        p_vout->b_error = true;
+        p_vout->p->b_error = true;
 
     /* signal the creation of the vout */
     p_vout->p->b_ready = true;
     vlc_cond_signal( &p_vout->p->change_wait );
 
-    if( p_vout->b_error )
+    if( p_vout->p->b_error )
         goto exit_thread;
 
     /* */
@@ -926,7 +926,7 @@ static void* RunThread( void *p_this )
      * Main loop - it is not executed if an error occurred during
      * initialization
      */
-    while( !p_vout->p->b_done && !p_vout->b_error )
+    while( !p_vout->p->b_done && !p_vout->p->b_error )
     {
         /* Initialize loop variables */
         const mtime_t current_date = mdate();
@@ -1083,7 +1083,7 @@ static void* RunThread( void *p_this )
         else
             spu_render_time = 0;
 
-        subpicture_t *p_subpic = spu_SortSubpictures( p_vout->p_spu,
+        subpicture_t *p_subpic = spu_SortSubpictures( p_vout->p->p_spu,
                                                       spu_render_time,
                                                       b_snapshot );
         /*
@@ -1193,7 +1193,7 @@ static void* RunThread( void *p_this )
              * immediately, without displaying anything - setting b_error to 1
              * causes the immediate end of the main while() loop. */
             // FIXME pf_end
-            p_vout->b_error = 1;
+            p_vout->p->b_error = 1;
             break;
         }
 
@@ -1215,14 +1215,14 @@ static void* RunThread( void *p_this )
 
             I_OUTPUTPICTURES = I_RENDERPICTURES = 0;
 
-            p_vout->b_error = InitThread( p_vout );
-            if( p_vout->b_error )
+            p_vout->p->b_error = InitThread( p_vout );
+            if( p_vout->p->b_error )
                 msg_Err( p_vout, "InitThread after VOUT_PICTURE_BUFFERS_CHANGE failed" );
 
             vlc_cond_signal( &p_vout->p->picture_wait );
             vlc_mutex_unlock( &p_vout->picture_lock );
 
-            if( p_vout->b_error )
+            if( p_vout->p->b_error )
                 break;
         }
 
@@ -1272,7 +1272,7 @@ static void* RunThread( void *p_this )
     /*
      * Error loop - wait until the thread destruction is requested
      */
-    if( p_vout->b_error )
+    if( p_vout->p->b_error )
         ErrorThread( p_vout );
 
     /* Clean thread */
@@ -1324,7 +1324,7 @@ static void CleanThread( vout_thread_t *p_vout )
     }
 
     /* Destroy translation tables */
-    if( !p_vout->b_error )
+    if( !p_vout->p->b_error )
         vout_EndWrapper( p_vout );
 }
 
@@ -1340,8 +1340,8 @@ static void EndThread( vout_thread_t *p_vout )
     /* FIXME does that function *really* need to be called inside the thread ? */
 
     /* Detach subpicture unit from both input and vout */
-    spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), false );
-    vlc_object_detach( p_vout->p_spu );
+    spu_Attach( p_vout->p->p_spu, VLC_OBJECT(p_vout), false );
+    vlc_object_detach( p_vout->p->p_spu );
 
     /* Destroy the video filters2 */
     filter_chain_Delete( p_vout->p->p_vf2_chain );

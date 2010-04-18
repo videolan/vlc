@@ -114,7 +114,7 @@ int vout_OpenWrapper(vout_thread_t *vout, const char *name)
 #endif
 
     /* */
-    vout->p_sys      = sys;
+    vout->p->p_sys = sys;
 
     return VLC_SUCCESS;
 }
@@ -124,7 +124,7 @@ int vout_OpenWrapper(vout_thread_t *vout, const char *name)
  *****************************************************************************/
 void vout_CloseWrapper(vout_thread_t *vout)
 {
-    vout_sys_t *sys = vout->p_sys;
+    vout_sys_t *sys = vout->p->p_sys;
 
 #ifdef WIN32
     var_DelCallback(vout, "direct3d-desktop", Forward, NULL);
@@ -140,7 +140,7 @@ void vout_CloseWrapper(vout_thread_t *vout)
  *****************************************************************************/
 int vout_InitWrapper(vout_thread_t *vout)
 {
-    vout_sys_t *sys = vout->p_sys;
+    vout_sys_t *sys = vout->p->p_sys;
     vout_display_t *vd = sys->vd;
 
     /* */
@@ -234,7 +234,7 @@ int vout_InitWrapper(vout_thread_t *vout)
  *****************************************************************************/
 void vout_EndWrapper(vout_thread_t *vout)
 {
-    vout_sys_t *sys = vout->p_sys;
+    vout_sys_t *sys = vout->p->p_sys;
 
     for (int i = 0; i < VOUT_MAX_PICTURES; i++) {
         picture_t *picture = &vout->p_picture[i];
@@ -259,7 +259,7 @@ void vout_EndWrapper(vout_thread_t *vout)
  *****************************************************************************/
 int vout_ManageWrapper(vout_thread_t *vout)
 {
-    vout_sys_t *sys = vout->p_sys;
+    vout_sys_t *sys = vout->p->p_sys;
     vout_display_t *vd = sys->vd;
 
     while (vout->i_changes & (VOUT_FULLSCREEN_CHANGE |
@@ -353,7 +353,7 @@ int vout_ManageWrapper(vout_thread_t *vout)
  *****************************************************************************/
 void vout_RenderWrapper(vout_thread_t *vout, picture_t *picture)
 {
-    vout_sys_t *sys = vout->p_sys;
+    vout_sys_t *sys = vout->p->p_sys;
     vout_display_t *vd = sys->vd;
 
     assert(sys->use_dr || !picture->p_sys->direct);
@@ -375,7 +375,7 @@ void vout_RenderWrapper(vout_thread_t *vout, picture_t *picture)
  *****************************************************************************/
 void vout_DisplayWrapper(vout_thread_t *vout, picture_t *picture)
 {
-    vout_sys_t *sys = vout->p_sys;
+    vout_sys_t *sys = vout->p->p_sys;
     vout_display_t *vd = sys->vd;
 
     picture_t *direct = picture->p_sys->direct;

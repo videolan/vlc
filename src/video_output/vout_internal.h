@@ -43,11 +43,18 @@ struct vout_thread_sys_t
     /* module */
     char       *psz_module_name;
 
+    /* Video output configuration */
+    config_chain_t *p_cfg;
+
+    /* Place holder for the vout_wrapper code */
+    vout_sys_t      *p_sys;
+
     /* Thread & synchronization */
     vlc_thread_t    thread;
     vlc_cond_t      change_wait;
     bool            b_ready;
     bool            b_done;
+    bool            b_error;
 
     /* */
     bool            b_picture_displayed;
@@ -97,6 +104,9 @@ struct vout_thread_sys_t
     int             i_title_position;
 
     char            *psz_title;
+
+    /* Subpicture unit */
+    spu_t          *p_spu;
 
     /* */
     vlc_mouse_t     mouse;

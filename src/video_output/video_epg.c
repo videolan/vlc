@@ -280,7 +280,7 @@ int vout_OSDEpg( vout_thread_t *p_vout, input_item_t *p_input )
                                         p_vout->fmt_in.i_height );
 
     vlc_epg_Delete( p_epg );
-    spu_DisplaySubpicture( p_vout->p_spu, p_spu );
+    spu_DisplaySubpicture( vout_GetSpu( p_vout ), p_spu );
 
     return VLC_SUCCESS;
 }

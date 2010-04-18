@@ -91,13 +91,11 @@ typedef struct vout_thread_sys_t vout_thread_sys_t;
 struct vout_thread_t
 {
     VLC_COMMON_MEMBERS
-    bool                b_error;
 
     /** \name Thread properties and locks */
     /**@{*/
     vlc_mutex_t         picture_lock;                 /**< picture heap lock */
     vlc_mutex_t         change_lock;                 /**< thread change lock */
-    vout_sys_t *        p_sys;                     /**< system output method */
     /**@}*/
 
     /** \name Current display properties */
@@ -127,12 +125,6 @@ struct vout_thread_t
 
     /* Picture heap */
     picture_t           p_picture[2*VOUT_MAX_PICTURES+1];      /**< pictures */
-
-    /* Subpicture unit */
-    spu_t          *p_spu;
-
-    /* Video output configuration */
-    config_chain_t *p_cfg;
 
     /* Private vout_thread data */
     vout_thread_sys_t *p;
