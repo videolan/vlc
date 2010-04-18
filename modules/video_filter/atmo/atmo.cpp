@@ -67,12 +67,6 @@ static void DelStateVariableCallback( filter_t *);
 static int StateCallback(vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void *);
 
-/* callback for variable crop-update */
-static void AddCropVariableCallback( filter_t *);
-static void DelCropVariableCallback( filter_t *);
-static int CropCallback(vlc_object_t *, char const *,
-                        vlc_value_t, vlc_value_t, void *);
-
 /* callback for atmo settings variables whose change
    should be immediately realized and applied to output
 */
@@ -1711,16 +1705,6 @@ static void Atmo_SetupParameters(filter_t *p_filter)
         p_sys->pf_extract_mini_image = NULL;
     }
 
-    p_sys->i_crop_x_offset  = 0;
-    p_sys->i_crop_y_offset  = 0;
-    p_sys->i_crop_width     = p_filter->fmt_in.video.i_visible_width;
-    p_sys->i_crop_height    = p_filter->fmt_in.video.i_visible_height;
-
-    msg_Dbg( p_filter, "set default crop %d,%d %dx%d",p_sys->i_crop_x_offset,
-        p_sys->i_crop_y_offset,
-        p_sys->i_crop_width,
-        p_sys->i_crop_height );
-
     /*
     for debugging purpose show the samplinggrid on each frame as
     white dots
@@ -1922,8 +1906,6 @@ static int CreateFilter( vlc_object_t *p_this )
 
     AddStateVariableCallback(p_filter);
 
-    AddCropVariableCallback(p_filter);
-
     AddAtmoSettingsVariablesCallbacks(p_filter);
 
     Atmo_SetupParameters(p_filter);
@@ -1948,7 +1930,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     msg_Dbg( p_filter, "Destroy Atmo Filter");
 
     DelStateVariableCallback(p_filter);
-    DelCropVariableCallback(p_filter);
+
     DelAtmoSettingsVariablesCallbacks(p_filter);
 
     Atmo_Shutdown(p_filter);
@@ -2276,6 +2258,11 @@ static picture_t * Filter( filter_t *p_filter, picture_t *p_pic )
         (p_sys->pf_extract_mini_image != NULL) &&
         (p_sys->b_pause_live == false))
     {
+        p_sys->i_crop_x_offset  = p_filter->fmt_in.video.i_x_offset;
+        p_sys->i_crop_y_offset  = p_filter->fmt_in.video.i_y_offset;
+        p_sys->i_crop_width     = p_filter->fmt_in.video.i_visible_width;
+        p_sys->i_crop_height    = p_filter->fmt_in.video.i_visible_height;
+
         CreateMiniImage(p_filter, p_pic);
     }
 
@@ -2515,71 +2502,6 @@ static void DelStateVariableCallback( filter_t *p_filter )
         vlc_object_release( p_input );
     }
 }
-
-
-static int CropCallback(vlc_object_t *p_this, char const *psz_cmd,
-                        vlc_value_t oldval, vlc_value_t newval,
-                        void *p_data)
-{
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    filter_t *p_filter = (filter_t *)p_data;
-    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
-
-    /*
-    //if the handler is attache to crop variable directly!
-    int i_visible_width, i_visible_height, i_x_offset, i_y_offset;
-    atmo_parse_crop(newval.psz_string, p_vout->fmt_render,
-    p_vout->fmt_render,
-    i_visible_width, i_visible_height,
-    i_x_offset, i_y_offset);
-    p_sys->i_crop_x_offset  = i_x_offset;
-    p_sys->i_crop_y_offset  = i_y_offset;
-    p_sys->i_crop_width     = i_visible_width;
-    p_sys->i_crop_height    = i_visible_height;
-    */
-
-    p_sys->i_crop_x_offset  = p_vout->fmt_in.i_x_offset;
-    p_sys->i_crop_y_offset  = p_vout->fmt_in.i_y_offset;
-    p_sys->i_crop_width     = p_vout->fmt_in.i_visible_width;
-    p_sys->i_crop_height    = p_vout->fmt_in.i_visible_height;
-
-    msg_Dbg(p_filter, "cropping picture %ix%i to %i,%i,%ix%i",
-        p_vout->fmt_in.i_width,
-        p_vout->fmt_in.i_height,
-        p_sys->i_crop_x_offset,
-        p_sys->i_crop_y_offset,
-        p_sys->i_crop_width,
-        p_sys->i_crop_height
-        );
-
-    return VLC_SUCCESS;
-}
-
-
-static void AddCropVariableCallback( filter_t *p_filter)
-{
-    vout_thread_t *p_vout = (vout_thread_t *)vlc_object_find( p_filter,
-        VLC_OBJECT_VOUT,
-        FIND_ANYWHERE );
-    if( p_vout )
-    {
-        var_AddCallback( p_vout, "crop-update", CropCallback, p_filter );
-        vlc_object_release( p_vout );
-    }
-}
-
-static void DelCropVariableCallback( filter_t *p_filter)
-{
-    vout_thread_t *p_vout = (vout_thread_t *)vlc_object_find( p_filter,
-        VLC_OBJECT_VOUT,
-        FIND_ANYWHERE );
-    if( p_vout )
-    {
-        var_DelCallback( p_vout, "crop-update", CropCallback, p_filter );
-        vlc_object_release( p_vout );
-    }
-}
-
 
 /****************************************************************************
 * StateCallback: Callback for the inputs variable "State" to get notified
