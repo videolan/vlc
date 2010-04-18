@@ -161,24 +161,14 @@ struct vout_thread_t
  * thread changed a variable
  * @{
  */
-/** b_info changed */
-#define VOUT_INFO_CHANGE        0x0001
-/** b_interface changed */
-#define VOUT_INTF_CHANGE        0x0004
 /** b_autoscale changed */
 #define VOUT_SCALE_CHANGE       0x0008
 /** b_on_top changed */
 #define VOUT_ON_TOP_CHANGE	0x0010
-/** b_cursor changed */
-#define VOUT_CURSOR_CHANGE      0x0020
 /** b_fullscreen changed */
 #define VOUT_FULLSCREEN_CHANGE  0x0040
 /** i_zoom changed */
 #define VOUT_ZOOM_CHANGE        0x0080
-/** depth changed */
-#define VOUT_DEPTH_CHANGE       0x0400
-/** change chroma tables */
-#define VOUT_CHROMA_CHANGE      0x0800
 /** cropping parameters changed */
 #define VOUT_CROP_CHANGE        0x1000
 /** aspect ratio changed */
