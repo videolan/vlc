@@ -619,7 +619,6 @@ vout_OSDIcon
 vout_OSDMessage
 vout_OSDEpg
 vout_OSDSlider
-vout_PlacePicture
 vout_Request
 vout_ShowTextAbsolute
 vout_ShowTextRelative

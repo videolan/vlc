@@ -185,8 +185,6 @@ struct vout_thread_t
 #define VOUT_ALIGN_BOTTOM       0x0008
 #define VOUT_ALIGN_VMASK        0x000C
 
-#define MAX_JITTER_SAMPLES      20
-
 /* scaling factor (applied to i_zoom in vout_thread_t) */
 #define ZOOM_FP_FACTOR          1000
 
@@ -274,7 +272,6 @@ VLC_EXPORT( void,            vout_DestroyPicture, ( vout_thread_t *, picture_t *
 VLC_EXPORT( void,            vout_DisplayPicture, ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_LinkPicture,    ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_UnlinkPicture,  ( vout_thread_t *, picture_t * ) );
-VLC_EXPORT( void,            vout_PlacePicture,   ( const vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int * ) );
 
 /**
  * Return the spu_t object associated to a vout_thread_t.
