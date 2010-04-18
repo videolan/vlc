@@ -282,7 +282,6 @@ VLC_EXPORT( void,            vout_UnlinkPicture,  ( vout_thread_t *, picture_t *
  */
 VLC_EXPORT( spu_t *, vout_GetSpu, ( vout_thread_t * ) );
 
-void vout_IntfInit( vout_thread_t * );
 VLC_EXPORT( void, vout_EnableFilter, ( vout_thread_t *, const char *,bool , bool  ) );
 
 /**@}*/

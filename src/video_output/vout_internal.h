@@ -102,10 +102,11 @@ struct vout_thread_sys_t
     vlc_mouse_t     mouse;
 };
 
-/* DO NOT use vout_RenderPicture unless you are in src/video_ouput */
+/* DO NOT use vout_RenderPicture/vout_IntfInit unless you are in src/video_ouput */
 picture_t *vout_RenderPicture( vout_thread_t *, picture_t *,
                                subpicture_t *,
                                mtime_t render_date );
+void vout_IntfInit( vout_thread_t * );
 
 /* DO NOT use vout_UsePictureLocked unless you are in src/video_ouput
  *
