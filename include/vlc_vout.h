@@ -56,11 +56,6 @@ struct picture_heap_t
     /* Real pictures */
     picture_t*      pp_picture[VOUT_MAX_PICTURES];             /**< pictures */
     int             i_last_used_pic;              /**< last used pic in heap */
-
-    /* Stuff used for truecolor RGB planes */
-    uint32_t i_rmask; int i_rrshift, i_lrshift;
-    uint32_t i_gmask; int i_rgshift, i_lgshift;
-    uint32_t i_bmask; int i_rbshift, i_lbshift;
 };
 
 /*****************************************************************************

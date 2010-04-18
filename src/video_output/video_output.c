@@ -66,9 +66,6 @@ static void     ErrorThread       ( vout_thread_t * );
 static void     CleanThread       ( vout_thread_t * );
 static void     EndThread         ( vout_thread_t * );
 
-static void VideoFormatImportRgb( video_format_t *, const picture_heap_t * );
-static void PictureHeapFixRgb( picture_heap_t * );
-
 static void     vout_Destructor   ( vlc_object_t * p_this );
 
 /* Object variables callbacks */
@@ -203,6 +200,8 @@ vout_thread_t *vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
             free( psz_filter_chain );
         }
 
+#warning "FIXME: Check RGB masks in vout_Request"
+        /* FIXME: check RGB masks */
         if( p_vout->fmt_render.i_chroma != vlc_fourcc_GetCodec( VIDEO_ES, p_fmt->i_chroma ) ||
             p_vout->fmt_render.i_width != p_fmt->i_width ||
             p_vout->fmt_render.i_height != p_fmt->i_height ||
@@ -341,14 +340,13 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->fmt_render        = *p_fmt;   /* FIXME palette */
     p_vout->fmt_in            = *p_fmt;   /* FIXME palette */
 
+    video_format_FixRgb( &p_vout->fmt_render );
+    video_format_FixRgb( &p_vout->fmt_in );
+
     p_vout->render.i_width    = i_width;
     p_vout->render.i_height   = i_height;
     p_vout->render.i_chroma   = i_chroma;
     p_vout->render.i_aspect   = i_aspect;
-
-    p_vout->render.i_rmask    = p_fmt->i_rmask;
-    p_vout->render.i_gmask    = p_fmt->i_gmask;
-    p_vout->render.i_bmask    = p_fmt->i_bmask;
 
     p_vout->render.i_last_used_pic = -1;
 
@@ -358,10 +356,6 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->output.i_height   = 0;
     p_vout->output.i_chroma   = 0;
     p_vout->output.i_aspect   = 0;
-
-    p_vout->output.i_rmask    = 0;
-    p_vout->output.i_gmask    = 0;
-    p_vout->output.i_bmask    = 0;
 
     /* Initialize misc stuff */
     p_vout->i_changes    = 0;
@@ -807,11 +801,8 @@ static int InitThread( vout_thread_t *p_vout )
 
     /* FIXME removed the need of both fmt_* and heap infos */
     /* Calculate shifts from system-updated masks */
-    PictureHeapFixRgb( &p_vout->render );
-    VideoFormatImportRgb( &p_vout->fmt_render, &p_vout->render );
-
-    PictureHeapFixRgb( &p_vout->output );
-    VideoFormatImportRgb( &p_vout->fmt_out, &p_vout->output );
+    video_format_FixRgb( &p_vout->fmt_render );
+    video_format_FixRgb( &p_vout->fmt_out );
 
     /* print some usefull debug info about different vout formats
      */
@@ -1338,57 +1329,6 @@ static void EndThread( vout_thread_t *p_vout )
 }
 
 /* following functions are local */
-
-/**
- * This function copies all RGB informations from a picture_heap_t into
- * a video_format_t
- */
-static void VideoFormatImportRgb( video_format_t *p_fmt, const picture_heap_t *p_heap )
-{
-    p_fmt->i_rmask = p_heap->i_rmask;
-    p_fmt->i_gmask = p_heap->i_gmask;
-    p_fmt->i_bmask = p_heap->i_bmask;
-    p_fmt->i_rrshift = p_heap->i_rrshift;
-    p_fmt->i_lrshift = p_heap->i_lrshift;
-    p_fmt->i_rgshift = p_heap->i_rgshift;
-    p_fmt->i_lgshift = p_heap->i_lgshift;
-    p_fmt->i_rbshift = p_heap->i_rbshift;
-    p_fmt->i_lbshift = p_heap->i_lbshift;
-}
-
-/**
- * This funtion copes all RGB informations from a video_format_t into
- * a picture_heap_t
- */
-static void VideoFormatExportRgb( const video_format_t *p_fmt, picture_heap_t *p_heap )
-{
-    p_heap->i_rmask = p_fmt->i_rmask;
-    p_heap->i_gmask = p_fmt->i_gmask;
-    p_heap->i_bmask = p_fmt->i_bmask;
-    p_heap->i_rrshift = p_fmt->i_rrshift;
-    p_heap->i_lrshift = p_fmt->i_lrshift;
-    p_heap->i_rgshift = p_fmt->i_rgshift;
-    p_heap->i_lgshift = p_fmt->i_lgshift;
-    p_heap->i_rbshift = p_fmt->i_rbshift;
-    p_heap->i_lbshift = p_fmt->i_lbshift;
-}
-
-/**
- * This function computes rgb shifts from masks
- */
-static void PictureHeapFixRgb( picture_heap_t *p_heap )
-{
-    video_format_t fmt;
-
-    /* */
-    fmt.i_chroma = p_heap->i_chroma;
-    VideoFormatImportRgb( &fmt, p_heap );
-
-    /* */
-    video_format_FixRgb( &fmt );
-
-    VideoFormatExportRgb( &fmt, p_heap );
-}
 
 /*****************************************************************************
  * object variables callbacks: a bunch of object variables are used by the

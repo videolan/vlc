@@ -150,9 +150,6 @@ int vout_InitWrapper(vout_thread_t *vout)
     vout->output.i_width  = source.i_width;
     vout->output.i_height = source.i_height;
     vout->output.i_aspect = (int64_t)source.i_sar_num * source.i_width * VOUT_ASPECT_FACTOR / source.i_sar_den / source.i_height;
-    vout->output.i_rmask  = source.i_rmask;
-    vout->output.i_gmask  = source.i_gmask;
-    vout->output.i_bmask  = source.i_bmask;
 
     /* also set fmt_out (completly broken API) */
     vout->fmt_out.i_chroma         = vout->output.i_chroma;
@@ -164,6 +161,9 @@ int vout_InitWrapper(vout_thread_t *vout)
     vout->fmt_out.i_sar_den        = VOUT_ASPECT_FACTOR    * vout->output.i_width;
     vout->fmt_out.i_x_offset       = 0;
     vout->fmt_out.i_y_offset       = 0;
+    vout->fmt_out.i_rmask          = source.i_rmask;
+    vout->fmt_out.i_gmask          = source.i_gmask;
+    vout->fmt_out.i_bmask          = source.i_bmask;
 
     if (vout->fmt_in.i_visible_width  != source.i_visible_width ||
         vout->fmt_in.i_visible_height != source.i_visible_height ||

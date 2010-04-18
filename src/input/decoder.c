@@ -2349,13 +2349,6 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             p_dec->b_error = true;
             return NULL;
         }
-
-        if( p_owner->video.i_rmask )
-            p_owner->p_vout->render.i_rmask = p_owner->video.i_rmask;
-        if( p_owner->video.i_gmask )
-            p_owner->p_vout->render.i_gmask = p_owner->video.i_gmask;
-        if( p_owner->video.i_bmask )
-            p_owner->p_vout->render.i_bmask = p_owner->video.i_bmask;
     }
 
     /* Get a new picture
