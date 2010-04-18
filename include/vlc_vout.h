@@ -103,7 +103,6 @@ struct vout_thread_t
                                                       \see \ref vout_changes */
     unsigned            b_fullscreen:1;       /**< toogle fullscreen display */
     unsigned            b_on_top:1; /**< stay always on top of other windows */
-    int                 i_zoom;               /**< scaling factor if no auto */
 
     /**@}*/
 

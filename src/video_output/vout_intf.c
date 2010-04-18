@@ -329,7 +329,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     text.psz_string = _("Scale factor");
     var_Change( p_vout, "scale", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "scale", ScalingCallback, NULL );
-    p_vout->i_zoom = (int)( ZOOM_FP_FACTOR * var_GetFloat( p_vout, "scale" ) );
 
     /* Add a variable to indicate if the window should be on top of others */
     var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
