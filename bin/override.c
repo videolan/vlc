@@ -33,6 +33,7 @@ void vlc_enable_override (void);
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <dlfcn.h>
 #include <pthread.h>
 #ifdef HAVE_EXECINFO_H
@@ -259,6 +260,20 @@ char *setlocale (int cat, const char *locale)
     return CALL(setlocale, cat, locale);
 }
 
+
+/* strerror() is not thread-safe in theory (POSIX), nor in practice (glibc).
+ * This caused quite nasty crashes in the history of VLC/Linux. */
+char *strerror (int val)
+{
+    if (override)
+    {
+        static const char msg[] =
+            "Error message unavailable (use strerror_r instead of strerror)!";
+        LOG("Blocked", "%d", val);
+        return (char *)msg;
+    }
+    return CALL(strerror, val);
+}
 
 /*** Xlib ****/
 #ifdef HAVE_X11_XLIB_H
