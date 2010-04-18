@@ -102,6 +102,11 @@ struct vout_thread_sys_t
     vlc_mouse_t     mouse;
 };
 
+/* */
+int vout_AllocatePicture( vlc_object_t *, picture_t *, uint32_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den );
+#define vout_AllocatePicture(a,b,c,d,e,f,g) \
+        vout_AllocatePicture(VLC_OBJECT(a),b,c,d,e,f,g)
+
 /* DO NOT use vout_RenderPicture/vout_IntfInit unless you are in src/video_ouput */
 picture_t *vout_RenderPicture( vout_thread_t *, picture_t *,
                                subpicture_t *,

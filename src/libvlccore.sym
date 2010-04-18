@@ -605,7 +605,6 @@ vlm_MessageDelete
 vlm_MessageNew
 vlm_MessageSimpleNew
 vlm_New
-vout_AllocatePicture
 vout_Close
 vout_Create
 vout_CreatePicture

@@ -69,19 +69,6 @@ struct picture_heap_t
  *****************************************************************************/
 
 /**
- * Initialise different fields of a picture_t and allocates the picture buffer.
- * \param p_this a vlc object
- * \param p_pic pointer to the picture structure.
- * \param i_chroma the wanted chroma for the picture.
- * \param i_width the wanted width for the picture.
- * \param i_height the wanted height for the picture.
- * \param i_aspect the wanted aspect ratio for the picture.
- */
-VLC_EXPORT( int, vout_AllocatePicture,( vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) );
-#define vout_AllocatePicture(a,b,c,d,e,f,g) \
-        vout_AllocatePicture(VLC_OBJECT(a),b,c,d,e,f,g)
-
-/**
  * \defgroup video_output Video Output
  * This module describes the programming interface for video output threads.
  * It includes functions allowing to open a new thread, send pictures to a
