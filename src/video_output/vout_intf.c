@@ -344,7 +344,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     if( var_CreateGetBoolCommand( p_vout, "fullscreen" ) )
     {
         /* user requested fullscreen */
-        p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+        p_vout->p->i_changes |= VOUT_FULLSCREEN_CHANGE;
     }
     text.psz_string = _("Fullscreen");
     var_Change( p_vout, "fullscreen", VLC_VAR_SETTEXT, &text, NULL );
@@ -791,7 +791,7 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
 
  crop_end:
-    p_vout->i_changes |= VOUT_CROP_CHANGE;
+    p_vout->p->i_changes |= VOUT_CROP_CHANGE;
 
     msg_Dbg( p_vout, "cropping picture %ix%i to %i,%i,%ix%i",
              p_vout->fmt_in.i_width, p_vout->fmt_in.i_height,
@@ -839,7 +839,7 @@ static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
         p_vout->fmt_in.i_sar_den *= p_vout->p->i_par_num;
     }
 
-    p_vout->i_changes |= VOUT_ASPECT_CHANGE;
+    p_vout->p->i_changes |= VOUT_ASPECT_CHANGE;
 
     msg_Dbg( p_vout, "new aspect-ratio %i:%i, sample aspect-ratio %i:%i",
              p_vout->fmt_in.i_sar_num * p_vout->fmt_in.i_width,
@@ -860,18 +860,18 @@ static int ScalingCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     (void)oldval; (void)newval; (void)p_data;
 
-    vlc_mutex_lock( &p_vout->change_lock );
+    vlc_mutex_lock( &p_vout->p->change_lock );
 
     if( !strcmp( psz_cmd, "autoscale" ) )
     {
-        p_vout->i_changes |= VOUT_SCALE_CHANGE;
+        p_vout->p->i_changes |= VOUT_SCALE_CHANGE;
     }
     else if( !strcmp( psz_cmd, "scale" ) )
     {
-        p_vout->i_changes |= VOUT_ZOOM_CHANGE;
+        p_vout->p->i_changes |= VOUT_ZOOM_CHANGE;
     }
 
-    vlc_mutex_unlock( &p_vout->change_lock );
+    vlc_mutex_unlock( &p_vout->p->change_lock );
 
     return VLC_SUCCESS;
 }
@@ -881,10 +881,10 @@ static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    vlc_mutex_lock( &p_vout->change_lock );
-    p_vout->i_changes |= VOUT_ON_TOP_CHANGE;
-    p_vout->b_on_top = newval.b_bool;
-    vlc_mutex_unlock( &p_vout->change_lock );
+    vlc_mutex_lock( &p_vout->p->change_lock );
+    p_vout->p->i_changes |= VOUT_ON_TOP_CHANGE;
+    p_vout->p->b_on_top = newval.b_bool;
+    vlc_mutex_unlock( &p_vout->p->change_lock );
 
     (void)psz_cmd; (void)oldval; (void)p_data;
     return VLC_SUCCESS;
@@ -899,7 +899,7 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( oldval.b_bool == newval.b_bool )
         return VLC_SUCCESS; /* no-op */
-    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+    p_vout->p->i_changes |= VOUT_FULLSCREEN_CHANGE;
 
     val.b_bool = true;
     var_Set( p_vout, "intf-change", val );

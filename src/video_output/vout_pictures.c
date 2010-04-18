@@ -52,7 +52,7 @@
  */
 void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    vlc_mutex_lock( &p_vout->picture_lock );
+    vlc_mutex_lock( &p_vout->p->picture_lock );
 
     if( p_pic->i_status == RESERVED_PICTURE )
     {
@@ -67,7 +67,7 @@ void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_vout->p->i_picture_qtype = p_pic->i_qtype;
     p_vout->p->b_picture_interlaced = !p_pic->b_progressive;
 
-    vlc_mutex_unlock( &p_vout->picture_lock );
+    vlc_mutex_unlock( &p_vout->p->picture_lock );
 }
 
 /**
@@ -84,10 +84,10 @@ int vout_CountPictureAvailable( vout_thread_t *p_vout )
     int i_free = 0;
     int i_pic;
 
-    vlc_mutex_lock( &p_vout->picture_lock );
+    vlc_mutex_lock( &p_vout->p->picture_lock );
     for( i_pic = 0; i_pic < I_RENDERPICTURES; i_pic++ )
     {
-        picture_t *p_pic = PP_RENDERPICTURE[(p_vout->render.i_last_used_pic + i_pic + 1) % I_RENDERPICTURES];
+        picture_t *p_pic = PP_RENDERPICTURE[(p_vout->p->render.i_last_used_pic + i_pic + 1) % I_RENDERPICTURES];
 
         switch( p_pic->i_status )
         {
@@ -103,7 +103,7 @@ int vout_CountPictureAvailable( vout_thread_t *p_vout )
                 break;
         }
     }
-    vlc_mutex_unlock( &p_vout->picture_lock );
+    vlc_mutex_unlock( &p_vout->p->picture_lock );
 
     return i_free;
 }
@@ -118,14 +118,14 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
     picture_t * p_freepic = NULL;                      /* first free picture */
 
     /* Get lock */
-    vlc_mutex_lock( &p_vout->picture_lock );
+    vlc_mutex_lock( &p_vout->p->picture_lock );
 
     /*
      * Look for an empty place in the picture heap.
      */
     for( i_pic = 0; i_pic < I_RENDERPICTURES; i_pic++ )
     {
-        p_pic = PP_RENDERPICTURE[(p_vout->render.i_last_used_pic + i_pic + 1)
+        p_pic = PP_RENDERPICTURE[(p_vout->p->render.i_last_used_pic + i_pic + 1)
                                  % I_RENDERPICTURES];
 
         switch( p_pic->i_status )
@@ -142,16 +142,16 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
                 p_pic->i_nb_fields          = i_nb_fields;
                 p_pic->b_top_field_first    = b_top_field_first;
 
-                p_vout->render.i_last_used_pic =
-                    ( p_vout->render.i_last_used_pic + i_pic + 1 )
+                p_vout->p->render.i_last_used_pic =
+                    ( p_vout->p->render.i_last_used_pic + i_pic + 1 )
                     % I_RENDERPICTURES;
-                vlc_mutex_unlock( &p_vout->picture_lock );
+                vlc_mutex_unlock( &p_vout->p->picture_lock );
                 return( p_pic );
 
             case FREE_PICTURE:
                 /* Picture is empty and ready for allocation */
-                p_vout->render.i_last_used_pic =
-                    ( p_vout->render.i_last_used_pic + i_pic + 1 )
+                p_vout->p->render.i_last_used_pic =
+                    ( p_vout->p->render.i_last_used_pic + i_pic + 1 )
                     % I_RENDERPICTURES;
                 p_freepic = p_pic;
                 break;
@@ -195,14 +195,14 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
             msg_Err( p_vout, "picture allocation failed" );
         }
 
-        vlc_mutex_unlock( &p_vout->picture_lock );
+        vlc_mutex_unlock( &p_vout->p->picture_lock );
 
         return( p_freepic );
     }
 
     /* No free or destroyed picture could be found, but the decoder
      * will try again in a while. */
-    vlc_mutex_unlock( &p_vout->picture_lock );
+    vlc_mutex_unlock( &p_vout->p->picture_lock );
 
     return( NULL );
 }
@@ -210,7 +210,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
 /* */
 static void DestroyPicture( vout_thread_t *p_vout, picture_t *p_picture )
 {
-    vlc_assert_locked( &p_vout->picture_lock );
+    vlc_assert_locked( &p_vout->p->picture_lock );
 
     p_picture->i_status = DESTROYED_PICTURE;
     picture_CleanupQuant( p_picture );
@@ -231,13 +231,13 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
 #ifndef NDEBUG
     /* Check if picture status is valid */
-    vlc_mutex_lock( &p_vout->picture_lock );
+    vlc_mutex_lock( &p_vout->p->picture_lock );
     if( p_pic->i_status != RESERVED_PICTURE )
     {
         msg_Err( p_vout, "picture to destroy %p has invalid status %d",
                          p_pic, p_pic->i_status );
     }
-    vlc_mutex_unlock( &p_vout->picture_lock );
+    vlc_mutex_unlock( &p_vout->p->picture_lock );
 #endif
 
     vout_DropPicture( p_vout, p_pic );
@@ -246,7 +246,7 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 /* */
 void vout_UsePictureLocked( vout_thread_t *p_vout, picture_t *p_picture )
 {
-    vlc_assert_locked( &p_vout->picture_lock );
+    vlc_assert_locked( &p_vout->p->picture_lock );
     if( p_picture->i_refcount > 0 )
     {
         /* Pretend we displayed the picture, but don't destroy
@@ -263,7 +263,7 @@ void vout_UsePictureLocked( vout_thread_t *p_vout, picture_t *p_picture )
 /* */
 void vout_DropPicture( vout_thread_t *p_vout, picture_t *p_pic  )
 {
-    vlc_mutex_lock( &p_vout->picture_lock );
+    vlc_mutex_lock( &p_vout->p->picture_lock );
 
     if( p_pic->i_status == READY_PICTURE )
     {
@@ -276,7 +276,7 @@ void vout_DropPicture( vout_thread_t *p_vout, picture_t *p_pic  )
         vout_UsePictureLocked( p_vout, p_pic );
     }
 
-    vlc_mutex_unlock( &p_vout->picture_lock );
+    vlc_mutex_unlock( &p_vout->p->picture_lock );
 }
 
 /**
@@ -287,9 +287,9 @@ void vout_DropPicture( vout_thread_t *p_vout, picture_t *p_pic  )
  */
 void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    vlc_mutex_lock( &p_vout->picture_lock );
+    vlc_mutex_lock( &p_vout->p->picture_lock );
     p_pic->i_refcount++;
-    vlc_mutex_unlock( &p_vout->picture_lock );
+    vlc_mutex_unlock( &p_vout->p->picture_lock );
 }
 
 /**
@@ -299,7 +299,7 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
  */
 void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    vlc_mutex_lock( &p_vout->picture_lock );
+    vlc_mutex_lock( &p_vout->p->picture_lock );
 
     if( p_pic->i_refcount > 0 )
         p_pic->i_refcount--;
@@ -311,7 +311,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
         ( p_pic->i_status == DISPLAYED_PICTURE || p_pic->i_status == RESERVED_PICTURE ) )
         DestroyPicture( p_vout, p_pic );
 
-    vlc_mutex_unlock( &p_vout->picture_lock );
+    vlc_mutex_unlock( &p_vout->p->picture_lock );
 }
 
 /**
@@ -346,7 +346,7 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         /* The picture buffer is in slow memory. We'll use
          * the "2 * VOUT_MAX_PICTURES + 1" picture as a temporary
          * one for subpictures rendering. */
-        p_render = &p_vout->p_picture[2 * VOUT_MAX_PICTURES];
+        p_render = &p_vout->p->p_picture[2 * VOUT_MAX_PICTURES];
         if( p_render->i_status == FREE_PICTURE )
         {
             vout_AllocatePicture( VLC_OBJECT(p_vout),

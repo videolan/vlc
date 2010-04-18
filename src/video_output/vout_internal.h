@@ -113,7 +113,48 @@ struct vout_thread_sys_t
 
     /* */
     vlc_mouse_t     mouse;
+
+    /* */
+    vlc_mutex_t         picture_lock;                 /**< picture heap lock */
+    vlc_mutex_t         change_lock;                 /**< thread change lock */
+
+    uint16_t            i_changes;          /**< changes made to the thread.
+                                                      \see \ref vout_changes */
+    unsigned            b_fullscreen:1;       /**< toogle fullscreen display */
+    unsigned            b_on_top:1; /**< stay always on top of other windows */
+
+    picture_heap_t      render;                       /**< rendered pictures */
+    picture_heap_t      output;                          /**< direct buffers */
+
+    picture_t           p_picture[2*VOUT_MAX_PICTURES+1];      /**< pictures */
 };
+
+#define I_OUTPUTPICTURES p_vout->p->output.i_pictures
+#define PP_OUTPUTPICTURE p_vout->p->output.pp_picture
+#define I_RENDERPICTURES p_vout->p->render.i_pictures
+#define PP_RENDERPICTURE p_vout->p->render.pp_picture
+
+/** \defgroup vout_changes Flags for changes
+ * These flags are set in the vout_thread_t::i_changes field when another
+ * thread changed a variable
+ * @{
+ */
+/** b_autoscale changed */
+#define VOUT_SCALE_CHANGE       0x0008
+/** b_on_top changed */
+#define VOUT_ON_TOP_CHANGE      0x0010
+/** b_fullscreen changed */
+#define VOUT_FULLSCREEN_CHANGE  0x0040
+/** i_zoom changed */
+#define VOUT_ZOOM_CHANGE        0x0080
+/** cropping parameters changed */
+#define VOUT_CROP_CHANGE        0x1000
+/** aspect ratio changed */
+#define VOUT_ASPECT_CHANGE      0x2000
+/** change/recreate picture buffers */
+#define VOUT_PICTURE_BUFFERS_CHANGE 0x4000
+/**@}*/
+
 
 /* */
 int vout_AllocatePicture( vlc_object_t *, picture_t *, uint32_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den );
