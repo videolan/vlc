@@ -153,7 +153,6 @@ int vout_InitWrapper(vout_thread_t *vout)
     vout->output.i_rmask  = source.i_rmask;
     vout->output.i_gmask  = source.i_gmask;
     vout->output.i_bmask  = source.i_bmask;
-    vout->output.pf_setpalette = NULL; /* FIXME What to do ? Seems unused anyway */
 
     /* also set fmt_out (completly broken API) */
     vout->fmt_out.i_chroma         = vout->output.i_chroma;

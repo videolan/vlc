@@ -62,9 +62,6 @@ struct picture_heap_t
     uint32_t i_rmask; int i_rrshift, i_lrshift;
     uint32_t i_gmask; int i_rgshift, i_lgshift;
     uint32_t i_bmask; int i_rbshift, i_lbshift;
-
-    /** Stuff used for palettized RGB planes */
-    void (* pf_setpalette) ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 };
 
 /*****************************************************************************
