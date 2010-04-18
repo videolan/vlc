@@ -224,6 +224,7 @@ nobase_vlclib_DATA = \
 	lua/modules/simplexml.luac \
 	lua/playlist/anevia_streams.luac \
 	lua/playlist/appletrailers.luac \
+	lua/playlist/appletrailers_iphone.luac \
 	lua/playlist/break.luac \
 	lua/playlist/cue.luac \
 	lua/playlist/dailymotion.luac \
@@ -244,6 +245,7 @@ nobase_vlclib_DATA = \
 	lua/sd/frenchtv.luac \
 	lua/sd/icecast.luac \
 	lua/sd/jamendo.luac \
+	lua/sd/appletrailers.luac \
 	$(NULL)
 if BUILD_HTTPD
 nobase_vlclib_DATA += \
@@ -268,6 +270,7 @@ EXTRA_DIST += \
 	lua/playlist/README.txt \
 	lua/playlist/anevia_streams.lua \
 	lua/playlist/appletrailers.lua \
+	lua/playlist/appletrailers_iphone.lua \
 	lua/playlist/break.lua \
 	lua/playlist/cue.lua \
 	lua/playlist/dailymotion.lua \
@@ -300,6 +303,7 @@ EXTRA_DIST += \
 	lua/sd/freebox.lua \
 	lua/sd/frenchtv.lua \
 	lua/sd/icecast.lua \
+	lua/sd/appletrailers.lua \
 	lua/sd/jamendo.lua
 
 DIST_http_lua = \
