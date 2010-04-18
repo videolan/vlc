@@ -158,6 +158,7 @@ libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, unsigned num,
 int libvlc_video_get_size( libvlc_media_player_t *p_mi, unsigned num,
                            unsigned *restrict px, unsigned *restrict py )
 {
+#if 0
     vout_thread_t *p_vout = GetVout (p_mi, num);
     if (p_vout == NULL)
         return -1;
@@ -166,6 +167,9 @@ int libvlc_video_get_size( libvlc_media_player_t *p_mi, unsigned num,
     *py = p_vout->i_window_width;
     vlc_object_release (p_vout);
     return 0;
+#else
+    return -1;
+#endif
 }
 
 int libvlc_video_get_height( libvlc_media_player_t *p_mi )
