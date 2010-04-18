@@ -612,8 +612,6 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     KaxSimpleBlock *simpleblock;
     int         i_track_skipping;
     int64_t     i_block_duration;
-    int64_t     i_block_ref1;
-    int64_t     i_block_ref2;
     size_t      i_track;
     int64_t     i_seek_position = i_start_pos;
     int64_t     i_seek_time = i_start_time;
@@ -696,7 +694,9 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
 
     while( i_track_skipping > 0 )
     {
-        if( BlockGet( block, simpleblock, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+        bool b_key_picture;
+        bool b_discardable_picture;
+        if( BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
         {
             msg_Warn( &sys.demuxer, "cannot get block EOF?" );
 
@@ -726,14 +726,14 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
             }
             else if( tracks[i_track]->fmt.i_cat == VIDEO_ES )
             {
-                if( i_block_ref1 == 0 && tracks[i_track]->b_search_keyframe )
+                if( b_key_picture && tracks[i_track]->b_search_keyframe )
                 {
                     tracks[i_track]->b_search_keyframe = false;
                     i_track_skipping--;
                 }
                 if( !tracks[i_track]->b_search_keyframe )
                 {
-                    BlockDecode( &sys.demuxer, block, simpleblock, sys.i_pts, 0, i_block_ref1 >= 0 || i_block_ref2 > 0 );
+                    BlockDecode( &sys.demuxer, block, simpleblock, sys.i_pts, 0, b_key_picture || b_discardable_picture );
                 }
             }
         }
@@ -1252,12 +1252,13 @@ void matroska_segment_c::UnSelect( )
     ep = NULL;
 }
 
-int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_simpleblock, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
+int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_simpleblock, bool *pb_key_picture, bool *pb_discardable_picture, int64_t *pi_duration )
 {
     pp_simpleblock = NULL;
     pp_block = NULL;
-    *pi_ref1  = 0;
-    *pi_ref2  = 0;
+
+    *pb_key_picture         = true;
+    *pb_discardable_picture = false;
 
     for( ;; )
     {
@@ -1277,6 +1278,11 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                 pp_block = NULL;
                 continue;
             }
+            if( pp_simpleblock != NULL )
+            {
+                *pb_key_picture         = pp_simpleblock->IsKeyframe();
+                *pb_discardable_picture = pp_simpleblock->IsDiscardable();
+            }
 
             /* update the index */
 #define idx p_indexes[i_index - 1]
@@ -1286,7 +1292,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                     idx.i_time        = pp_simpleblock->GlobalTimecode() / (mtime_t)1000;
                 else
                     idx.i_time        = (*pp_block).GlobalTimecode() / (mtime_t)1000;
-                idx.b_key         = *pi_ref1 == 0 ? true : false;
+                idx.b_key         = *pb_key_picture;
             }
 #undef idx
             return VLC_SUCCESS;
@@ -1400,14 +1406,11 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                 KaxReferenceBlock &ref = *(KaxReferenceBlock*)el;
 
                 ref.ReadData( es.I_O() );
-                if( *pi_ref1 == 0 )
-                {
-                    *pi_ref1 = int64( ref ) * cluster->GlobalTimecodeScale();
-                }
-                else if( *pi_ref2 == 0 )
-                {
-                    *pi_ref2 = int64( ref ) * cluster->GlobalTimecodeScale();
-                }
+
+                if( int64( ref ) < 0 )
+                    *pb_key_picture = false;
+                else if( int64( ref ) > 0 )
+                    *pb_discardable_picture = true;
             }
             else if( MKV_IS_ID( el, KaxClusterSilentTrackNumber ) )
             {

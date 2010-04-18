@@ -673,10 +673,9 @@ static int Demux( demux_t *p_demux)
         KaxBlock *block;
         KaxSimpleBlock *simpleblock;
         int64_t i_block_duration = 0;
-        int64_t i_block_ref1;
-        int64_t i_block_ref2;
-
-        if( p_segment->BlockGet( block, simpleblock, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+        bool b_key_picture;
+        bool b_discardable_picture;
+        if( p_segment->BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
         {
             if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered )
             {
@@ -760,7 +759,7 @@ static int Demux( demux_t *p_demux)
             continue;
         }
 
-        BlockDecode( p_demux, block, simpleblock, p_sys->i_pts, i_block_duration, i_block_ref1 >= 0 || i_block_ref2 > 0 );
+        BlockDecode( p_demux, block, simpleblock, p_sys->i_pts, i_block_duration, b_key_picture || b_discardable_picture );
 
         delete block;
         i_block_count++;

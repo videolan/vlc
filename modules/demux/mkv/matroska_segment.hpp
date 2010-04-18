@@ -148,7 +148,7 @@ public:
     void LoadTags( KaxTags *tags );
     void InformationCreate( );
     void Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_global_position );
-    int BlockGet( KaxBlock * &, KaxSimpleBlock * &, int64_t *, int64_t *, int64_t *);
+    int BlockGet( KaxBlock * &, KaxSimpleBlock * &, bool *, bool *, int64_t *);
 
     int BlockFindTrackIndex( size_t *pi_track,
                              const KaxBlock *, const KaxSimpleBlock * );
