@@ -483,24 +483,13 @@ static int exec_DataSharedMem( filter_t *p_filter,
         uint8_t *p_data, *p_in;
         size_t i_neededsize = 0;
 
-        p_ovl->data.p_pic = malloc( sizeof( picture_t ) );
+        p_ovl->data.p_pic = picture_New( p_params->fourcc,
+                                         p_params->i_width, p_params->i_height,
+                                         1, 1 );
         if( p_ovl->data.p_pic == NULL )
             return VLC_ENOMEM;
 
-        video_format_Setup( &p_ovl->format, p_params->fourcc,
-                            p_params->i_width, p_params->i_height,
-                            1, 1 );
-        if( vout_AllocatePicture( p_filter, p_ovl->data.p_pic,
-                                  p_ovl->format.i_chroma, p_params->i_width,
-                                  p_params->i_height,
-                                  p_ovl->format.i_sar_num,
-                                  p_ovl->format.i_sar_den ) )
-        {
-            msg_Err( p_filter, "Unable to allocate picture" );
-            free( p_ovl->data.p_pic );
-            p_ovl->data.p_pic = NULL;
-            return VLC_ENOMEM;
-        }
+        p_ovl->format = p_ovl->data.p_pic->format;
 
         for( size_t i_plane = 0; i_plane < (size_t)p_ovl->data.p_pic->i_planes;
              ++i_plane )
@@ -515,7 +504,6 @@ static int exec_DataSharedMem( filter_t *p_filter,
                      "Insufficient data in shared memory. need %zu, got %zu",
                      i_neededsize, i_size );
             picture_Release( p_ovl->data.p_pic );
-            free( p_ovl->data.p_pic );
             p_ovl->data.p_pic = NULL;
             return VLC_EGENERIC;
         }
@@ -525,7 +513,6 @@ static int exec_DataSharedMem( filter_t *p_filter,
         {
             msg_Err( p_filter, "Unable to attach to shared memory" );
             picture_Release( p_ovl->data.p_pic );
-            free( p_ovl->data.p_pic );
             p_ovl->data.p_pic = NULL;
             return VLC_ENOMEM;
         }
