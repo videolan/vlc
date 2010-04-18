@@ -787,7 +787,7 @@ static int InitThread( vout_thread_t *p_vout )
     int i;
 
     /* Initialize output method, it allocates direct buffers for us */
-    if( p_vout->pf_init( p_vout ) )
+    if( vout_InitWrapper( p_vout ) )
         return VLC_EGENERIC;
 
     p_vout->p->p_picture_displayed = NULL;
@@ -796,7 +796,7 @@ static int InitThread( vout_thread_t *p_vout )
     {
         msg_Err( p_vout, "plugin was unable to allocate at least "
                          "one direct buffer" );
-        p_vout->pf_end( p_vout );
+        vout_EndWrapper( p_vout );
         return VLC_EGENERIC;
     }
 
@@ -804,7 +804,7 @@ static int InitThread( vout_thread_t *p_vout )
     {
         msg_Err( p_vout, "plugin allocated too many direct buffers, "
                          "our internal buffers must have overflown." );
-        p_vout->pf_end( p_vout );
+        vout_EndWrapper( p_vout );
         return VLC_EGENERIC;
     }
 
@@ -907,7 +907,7 @@ static int InitThread( vout_thread_t *p_vout )
 
         if( ChromaCreate( p_vout ) )
         {
-            p_vout->pf_end( p_vout );
+            vout_EndWrapper( p_vout );
             return VLC_EGENERIC;
         }
 
@@ -1152,10 +1152,10 @@ static void* RunThread( void *p_this )
         /*
          * Call the plugin-specific rendering method if there is one
          */
-        if( p_filtered_picture != NULL && p_directbuffer != NULL && p_vout->pf_render )
+        if( p_filtered_picture != NULL && p_directbuffer != NULL )
         {
             /* Render the direct buffer returned by vout_RenderPicture */
-            p_vout->pf_render( p_vout, p_directbuffer );
+            vout_RenderWrapper( p_vout, p_directbuffer );
         }
 
         /*
@@ -1211,8 +1211,7 @@ static void* RunThread( void *p_this )
         if( p_filtered_picture != NULL && p_directbuffer != NULL )
         {
             /* Display the direct buffer returned by vout_RenderPicture */
-            if( p_vout->pf_display )
-                p_vout->pf_display( p_vout, p_directbuffer );
+            vout_DisplayWrapper( p_vout, p_directbuffer );
 
             /* Tell the vout this was the last picture and that it does not
              * need to be forced anymore. */
@@ -1236,7 +1235,7 @@ static void* RunThread( void *p_this )
         /*
          * Check events and manage thread
          */
-        if( p_vout->pf_manage && p_vout->pf_manage( p_vout ) )
+        if( vout_ManageWrapper( p_vout ) )
         {
             /* A fatal error occurred, and the thread must terminate
              * immediately, without displaying anything - setting b_error to 1
@@ -1265,7 +1264,7 @@ static void* RunThread( void *p_this )
 
             vlc_mutex_lock( &p_vout->picture_lock );
 
-            p_vout->pf_end( p_vout );
+            vout_EndWrapper( p_vout );
 
             p_vout->p->p_picture_displayed = NULL;
             for( i = 0; i < I_OUTPUTPICTURES; i++ )
@@ -1274,7 +1273,7 @@ static void* RunThread( void *p_this )
 
             I_OUTPUTPICTURES = 0;
 
-            if( p_vout->pf_init( p_vout ) )
+            if( vout_InitWrapper( p_vout ) )
             {
                 msg_Err( p_vout, "cannot resize display" );
                 /* FIXME: pf_end will be called again in CleanThread()? */
@@ -1310,7 +1309,7 @@ static void* RunThread( void *p_this )
 
             vlc_mutex_lock( &p_vout->picture_lock );
 
-            p_vout->pf_end( p_vout );
+            vout_EndWrapper( p_vout );
 
             I_OUTPUTPICTURES = I_RENDERPICTURES = 0;
 
@@ -1427,7 +1426,7 @@ static void CleanThread( vout_thread_t *p_vout )
 
     /* Destroy translation tables */
     if( !p_vout->b_error )
-        p_vout->pf_end( p_vout );
+        vout_EndWrapper( p_vout );
 }
 
 /*****************************************************************************

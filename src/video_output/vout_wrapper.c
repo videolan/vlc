@@ -53,12 +53,6 @@ struct picture_sys_t {
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Init   (vout_thread_t *);
-static void End    (vout_thread_t *);
-static int  Manage (vout_thread_t *);
-static void Render (vout_thread_t *, picture_t *);
-static void Display(vout_thread_t *, picture_t *);
-
 static void VoutGetDisplayCfg(vout_thread_t *,
                               vout_display_cfg_t *, const char *title);
 #ifdef WIN32
@@ -120,11 +114,6 @@ int vout_OpenWrapper(vout_thread_t *vout, const char *name)
 #endif
 
     /* */
-    vout->pf_init    = Init;
-    vout->pf_end     = End;
-    vout->pf_manage  = Manage;
-    vout->pf_render  = Render;
-    vout->pf_display = Display;
     vout->p_sys      = sys;
 
     return VLC_SUCCESS;
@@ -149,7 +138,7 @@ void vout_CloseWrapper(vout_thread_t *vout)
 /*****************************************************************************
  *
  *****************************************************************************/
-static int Init(vout_thread_t *vout)
+int vout_InitWrapper(vout_thread_t *vout)
 {
     vout_sys_t *sys = vout->p_sys;
     vout_display_t *vd = sys->vd;
@@ -244,7 +233,7 @@ static int Init(vout_thread_t *vout)
 /*****************************************************************************
  *
  *****************************************************************************/
-static void End(vout_thread_t *vout)
+void vout_EndWrapper(vout_thread_t *vout)
 {
     vout_sys_t *sys = vout->p_sys;
 
@@ -269,7 +258,7 @@ static void End(vout_thread_t *vout)
 /*****************************************************************************
  *
  *****************************************************************************/
-static int Manage(vout_thread_t *vout)
+int vout_ManageWrapper(vout_thread_t *vout)
 {
     vout_sys_t *sys = vout->p_sys;
     vout_display_t *vd = sys->vd;
@@ -363,7 +352,7 @@ static int Manage(vout_thread_t *vout)
 /*****************************************************************************
  * Render
  *****************************************************************************/
-static void Render(vout_thread_t *vout, picture_t *picture)
+void vout_RenderWrapper(vout_thread_t *vout, picture_t *picture)
 {
     vout_sys_t *sys = vout->p_sys;
     vout_display_t *vd = sys->vd;
@@ -385,7 +374,7 @@ static void Render(vout_thread_t *vout, picture_t *picture)
 /*****************************************************************************
  *
  *****************************************************************************/
-static void Display(vout_thread_t *vout, picture_t *picture)
+void vout_DisplayWrapper(vout_thread_t *vout, picture_t *picture)
 {
     vout_sys_t *sys = vout->p_sys;
     vout_display_t *vd = sys->vd;

@@ -130,15 +130,6 @@ struct vout_thread_t
 
     /**@}*/
 
-    /** \name Plugin used and shortcuts to access its capabilities */
-    /**@{*/
-    int       ( *pf_init )       ( vout_thread_t * );
-    void      ( *pf_end )        ( vout_thread_t * );
-    int       ( *pf_manage )     ( vout_thread_t * );
-    void      ( *pf_render )     ( vout_thread_t *, picture_t * );
-    void      ( *pf_display )    ( vout_thread_t *, picture_t * );
-    /**@}*/
-
     /** \name Video heap and translation tables */
     /**@{*/
     int                 i_heap_size;                          /**< heap size */
