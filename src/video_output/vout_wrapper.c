@@ -125,7 +125,6 @@ int vout_OpenWrapper(vout_thread_t *vout, const char *name)
     vout->pf_manage  = Manage;
     vout->pf_render  = Render;
     vout->pf_display = Display;
-    vout->pf_control = NULL;
     vout->p_sys      = sys;
 
     return VLC_SUCCESS;

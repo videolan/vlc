@@ -140,7 +140,6 @@ struct vout_thread_t
     void      ( *pf_swap )       ( vout_thread_t * );         /* OpenGL only */
     int       ( *pf_lock )       ( vout_thread_t * );         /* OpenGL only */
     void      ( *pf_unlock )     ( vout_thread_t * );         /* OpenGL only */
-    int       ( *pf_control )    ( vout_thread_t *, int, va_list );
     /**@}*/
 
     /** \name Video heap and translation tables */
@@ -317,34 +316,6 @@ VLC_EXPORT( spu_t *, vout_GetSpu, ( vout_thread_t * ) );
 
 void vout_IntfInit( vout_thread_t * );
 VLC_EXPORT( void, vout_EnableFilter, ( vout_thread_t *, const char *,bool , bool  ) );
-
-
-static inline int vout_vaControl( vout_thread_t *p_vout, int i_query,
-                                  va_list args )
-{
-    if( p_vout->pf_control )
-        return p_vout->pf_control( p_vout, i_query, args );
-    else
-        return VLC_EGENERIC;
-}
-
-static inline int vout_Control( vout_thread_t *p_vout, int i_query, ... )
-{
-    va_list args;
-    int i_result;
-
-    va_start( args, i_query );
-    i_result = vout_vaControl( p_vout, i_query, args );
-    va_end( args );
-    return i_result;
-}
-
-enum output_query_e
-{
-    VOUT_SET_STAY_ON_TOP=1, /* arg1= bool       res=    */
-    VOUT_SET_VIEWPORT,      /* arg1= view rect, arg2=clip rect, res= */
-    VOUT_REDRAW_RECT,       /* arg1= area rect, res= */
-};
 
 /**@}*/
 

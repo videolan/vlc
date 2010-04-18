@@ -379,7 +379,6 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->p->b_filter_change = 0;
     p_vout->p->b_paused = false;
     p_vout->p->i_pause_date = 0;
-    p_vout->pf_control = NULL;
     p_vout->p->i_par_num =
     p_vout->p->i_par_den = 1;
     p_vout->p->p_picture_displayed = NULL;
@@ -1247,13 +1246,8 @@ static void* RunThread( void *p_this )
             break;
         }
 
-        while( p_vout->i_changes & VOUT_ON_TOP_CHANGE )
-        {
+        if( p_vout->i_changes & VOUT_ON_TOP_CHANGE )
             p_vout->i_changes &= ~VOUT_ON_TOP_CHANGE;
-            vlc_mutex_unlock( &p_vout->change_lock );
-            vout_Control( p_vout, VOUT_SET_STAY_ON_TOP, p_vout->b_on_top );
-            vlc_mutex_lock( &p_vout->change_lock );
-        }
 
         if( p_vout->i_changes & VOUT_SIZE_CHANGE )
         {
