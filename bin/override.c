@@ -216,7 +216,8 @@ void (*signal (int signum, void (*handler) (int))) (int)
         if (!blocked_signal (signum))
             goto error;
         /* For our blocked signals, the handler won't matter much... */
-        LOG("Warning", "%d, %p", signum, handler);
+        if (handler == SIG_DFL)
+            LOG("Warning", "%d, SIG_DFL", signum, handler);
     }
     return CALL(signal, signum, handler);
 error:
@@ -231,7 +232,8 @@ int sigaction (int signum, const struct sigaction *act, struct sigaction *old)
         if ((act->sa_flags & SA_SIGINFO)
          || (act->sa_handler != SIG_IGN && act->sa_handler != SIG_DFL))
             goto error;
-        LOG("Warning", "%d, %p, %p", signum, act, old);
+        if (act->sa_handler == SIG_DFL)
+            LOG("Warning", "%d, %p, SIG_DFL", signum, act);
     }
     return CALL(sigaction, signum, act, old);
 error:
