@@ -38,6 +38,9 @@
 #define VOUT_FPS_SAMPLES                20
 
 /* */
+typedef struct vout_sys_t vout_sys_t;
+
+/* */
 struct vout_thread_sys_t
 {
     /* module */
