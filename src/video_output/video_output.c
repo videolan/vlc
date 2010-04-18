@@ -365,10 +365,8 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 
     /* Initialize misc stuff */
     p_vout->i_changes    = 0;
-    p_vout->b_autoscale  = 1;
     p_vout->i_zoom      = ZOOM_FP_FACTOR;
     p_vout->b_fullscreen = 0;
-    p_vout->i_alignment  = 0;
     p_vout->p->render_time  = 10;
     p_vout->p->c_fps_samples = 0;
     vout_statistic_Init( &p_vout->p->statistic );

@@ -102,12 +102,8 @@ struct vout_thread_t
     uint16_t            i_changes;          /**< changes made to the thread.
                                                       \see \ref vout_changes */
     unsigned            b_fullscreen:1;       /**< toogle fullscreen display */
-    unsigned            b_autoscale:1;      /**< auto scaling picture or not */
     unsigned            b_on_top:1; /**< stay always on top of other windows */
     int                 i_zoom;               /**< scaling factor if no auto */
-    unsigned int        i_window_width;              /**< video window width */
-    unsigned int        i_window_height;            /**< video window height */
-    unsigned int        i_alignment;          /**< video alignment in window */
 
     /**@}*/
 
