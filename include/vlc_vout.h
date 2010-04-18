@@ -56,7 +56,6 @@ struct picture_heap_t
     /* Real pictures */
     picture_t*      pp_picture[VOUT_MAX_PICTURES];             /**< pictures */
     int             i_last_used_pic;              /**< last used pic in heap */
-    bool            b_allow_modify_pics;
 
     /* Stuff used for truecolor RGB planes */
     uint32_t i_rmask; int i_rrshift, i_lrshift;

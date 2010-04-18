@@ -351,7 +351,6 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->render.i_bmask    = p_fmt->i_bmask;
 
     p_vout->render.i_last_used_pic = -1;
-    p_vout->render.b_allow_modify_pics = 1;
 
     /* Zero the output heap */
     I_OUTPUTPICTURES = 0;
