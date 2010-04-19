@@ -36,8 +36,6 @@
 #include <vlc_vout.h>
 #include <vlc_dialog.h>
 
-#include "filter_common.h"
-
 #define BEST_AUTOCROP 1
 #ifdef BEST_AUTOCROP
     #define RATIO_MAX 15000  // 10*4/3 for a 360

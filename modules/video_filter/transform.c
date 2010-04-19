@@ -33,7 +33,6 @@
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
 
-#include "filter_common.h"
 #include "filter_picture.h"
 
 #define TRANSFORM_MODE_HFLIP   1
