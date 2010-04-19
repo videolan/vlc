@@ -2166,7 +2166,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         DrawEmptyLine( p_sys->w, 7, 1, COLS-2 );
         if( p_sys->psz_search_chain )
         {
-            if( strlen( p_sys->psz_search_chain ) == 0 &&
+            if( *p_sys->psz_search_chain == '\0' &&
                 p_sys->psz_old_search != NULL )
             {
                 /* Searching next entry */

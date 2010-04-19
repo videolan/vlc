@@ -1855,7 +1855,7 @@ static int ParsePSB( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
 static int64_t ParseRealTime( char *psz, int *h, int *m, int *s, int *f )
 {
-    if( strlen( psz ) == 0 ) return 0;
+    if( *psz == '\0' ) return 0;
     if( sscanf( psz, "%d:%d:%d.%d", h, m, s, f ) == 4 ||
             sscanf( psz, "%d:%d.%d", m, s, f ) == 3 ||
             sscanf( psz, "%d.%d", s, f ) == 2 ||

@@ -911,7 +911,7 @@ HRESULT BDAGraph::CreateTuneRequest()
 
             /* Test for a specific Tuning space name supplied on the command
              * line as dvb-networkname=xxx */
-            if( strlen( l.psz_network_name ) == 0 ||
+            if( *l.psz_network_name == '\0' ||
                 strcmp( l.psz_network_name, l.psz_bstr_name ) == 0 )
             {
                 msg_Dbg( p_access, "CreateTuneRequest: Using Tuning Space: %s",
@@ -1001,7 +1001,7 @@ HRESULT BDAGraph::CreateTuneRequest()
             l.psz_bstr_name = new char[ l.i_name_len ];
             l.i_name_len = WideCharToMultiByte( CP_ACP, 0, l.bstr_name, -1,
                 l.psz_bstr_name, l.i_name_len, NULL, NULL );
-            if( strlen( l.psz_network_name ) == 0 ||
+            if( *l.psz_network_name == '\0' ||
                 strcmp( l.psz_network_name, l.psz_bstr_name ) == 0 )
             {
                 msg_Dbg( p_access, "CreateTuneRequest: Using Tuning Space: %s",

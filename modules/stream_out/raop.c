@@ -577,7 +577,7 @@ static char *ReadPasswordFile( vlc_object_t *p_this, const char *psz_path )
             *psz_newline = '\0';
     }
 
-    if ( strlen( ps_buffer ) == 0 ) {
+    if ( *ps_buffer == '\0' ) {
         msg_Err( p_this, "No password could be read from '%s'", psz_path );
         goto error;
     }

@@ -3084,7 +3084,7 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
             }
         }
         else
-        if( strlen( psz_token ) == 0 )
+        if( *psz_token == '\0' )
         {
             p_box = p_box->p_first;
             for( ; ; )
