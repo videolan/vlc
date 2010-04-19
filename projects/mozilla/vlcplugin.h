@@ -30,6 +30,17 @@
 #define __VLCPLUGIN_H__
 
 #include <vlc/vlc.h>
+
+// Setup XP_MACOSX, XP_UNIX, XP_WIN
+#if defined(_WIN32)
+#define XP_WIN 1
+#elif defined(__APPLE__)
+#define XP_MACOSX 1
+#else
+#define XP_UNIX 1
+#define MOZ_X11 1
+#endif
+
 #include <npapi.h>
 #include <vector>
 
