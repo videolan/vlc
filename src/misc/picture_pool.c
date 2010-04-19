@@ -52,29 +52,43 @@ struct picture_release_sys_t {
 
 struct picture_pool_t {
     /* */
-    int64_t   tick;
+    picture_pool_t *master;
+    int64_t        tick;
     /* */
-    int       picture_count;
-    picture_t **picture;
+    int            picture_count;
+    picture_t      **picture;
+    bool           *picture_reserved;
 };
 
 static void Release(picture_t *);
 static int  Lock(picture_t *);
 static void Unlock(picture_t *);
 
-picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg)
+static picture_pool_t *Create(picture_pool_t *master, int picture_count)
 {
     picture_pool_t *pool = calloc(1, sizeof(*pool));
     if (!pool)
         return NULL;
 
-    pool->tick = 1;
-    pool->picture_count = cfg->picture_count;
+    pool->master = master;
+    pool->tick = master ? master->tick : 1;
+    pool->picture_count = picture_count;
     pool->picture = calloc(pool->picture_count, sizeof(*pool->picture));
-    if (!pool->picture) {
+    pool->picture_reserved = calloc(pool->picture_count, sizeof(*pool->picture_reserved));
+    if (!pool->picture || !pool->picture_reserved) {
+        free(pool->picture);
+        free(pool->picture_reserved);
         free(pool);
         return NULL;
     }
+    return pool;
+}
+
+picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg)
+{
+    picture_pool_t *pool = Create(NULL, cfg->picture_count);
+    if (!pool)
+        return NULL;
 
     for (int i = 0; i < cfg->picture_count; i++) {
         picture_t *picture = cfg->picture[i];
@@ -99,6 +113,7 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
 
         /* */
         pool->picture[i] = picture;
+        pool->picture_reserved[i] = false;
     }
     return pool;
 
@@ -139,23 +154,57 @@ error:
     return NULL;
 }
 
+picture_pool_t *picture_pool_Reserve(picture_pool_t *master, int count)
+{
+    picture_pool_t *pool = Create(master, count);
+    if (!pool)
+        return NULL;
+
+    int found = 0;
+    for (int i = 0; i < master->picture_count && found < count; i++) {
+        if (master->picture_reserved[i])
+            continue;
+
+        assert(master->picture[i]->i_refcount == 0);
+        master->picture_reserved[i] = true;
+
+        pool->picture[found]          = master->picture[i];
+        pool->picture_reserved[found] = false;
+        found++;
+    }
+    if (found < count) {
+        picture_pool_Delete(pool);
+        return NULL;
+    }
+    return pool;
+}
+
 void picture_pool_Delete(picture_pool_t *pool)
 {
     for (int i = 0; i < pool->picture_count; i++) {
         picture_t *picture = pool->picture[i];
-        picture_release_sys_t *release_sys = picture->p_release_sys;
+        if (pool->master) {
+            for (int j = 0; j < pool->master->picture_count; j++) {
+                if (pool->master->picture[j] == picture)
+                    pool->master->picture_reserved[j] = false;
+            }
+        } else {
+            picture_release_sys_t *release_sys = picture->p_release_sys;
 
-        assert(picture->i_refcount == 0);
+            assert(picture->i_refcount == 0);
+            assert(!pool->picture_reserved[i]);
 
-        /* Restore old release callback */
-        picture->i_refcount    = 1;
-        picture->pf_release    = release_sys->release;
-        picture->p_release_sys = release_sys->release_sys;
+            /* Restore old release callback */
+            picture->i_refcount    = 1;
+            picture->pf_release    = release_sys->release;
+            picture->p_release_sys = release_sys->release_sys;
 
-        picture_Release(picture);
+            picture_Release(picture);
 
-        free(release_sys);
+            free(release_sys);
+        }
     }
+    free(pool->picture_reserved);
     free(pool->picture);
     free(pool);
 }
@@ -163,6 +212,9 @@ void picture_pool_Delete(picture_pool_t *pool)
 picture_t *picture_pool_Get(picture_pool_t *pool)
 {
     for (int i = 0; i < pool->picture_count; i++) {
+        if (pool->picture_reserved[i])
+            continue;
+
         picture_t *picture = pool->picture[i];
         if (picture->i_refcount > 0)
             continue;
@@ -183,8 +235,10 @@ void picture_pool_NonEmpty(picture_pool_t *pool, bool reset)
     picture_t *old = NULL;
 
     for (int i = 0; i < pool->picture_count; i++) {
-        picture_t *picture = pool->picture[i];
+        if (pool->picture_reserved[i])
+            continue;
 
+        picture_t *picture = pool->picture[i];
         if (reset) {
             if (picture->i_refcount > 0)
                 Unlock(picture);

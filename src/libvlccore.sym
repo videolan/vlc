@@ -314,6 +314,7 @@ picture_pool_New
 picture_pool_NewExtended
 picture_pool_NewFromFormat
 picture_pool_NonEmpty
+picture_pool_Reserve
 picture_Reset
 picture_Setup
 plane_CopyPixels

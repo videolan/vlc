@@ -106,5 +106,16 @@ VLC_EXPORT( picture_t *, picture_pool_Get, ( picture_pool_t * ) );
  */
 VLC_EXPORT( void, picture_pool_NonEmpty, ( picture_pool_t *, bool reset ) );
 
+/**
+ * It reserves picture_count pictures from the given pool and returns
+ * a new pool with thoses pictures.
+ *
+ * The master pool must be full.
+ * The returned pool must be deleted before the master pool.
+ * When deleted, all pictures return to the master pool.
+ */
+VLC_EXPORT( picture_pool_t *, picture_pool_Reserve, (picture_pool_t *, int picture_count) );
+
+
 #endif /* VLC_PICTURE_POOL_H */
 
