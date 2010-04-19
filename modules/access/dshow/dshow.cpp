@@ -1849,9 +1849,8 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 static int AccessControl( access_t *p_access, int i_query, va_list args )
 {
-    bool   *pb_bool;
-    int          *pi_int;
-    int64_t      *pi_64;
+    bool    *pb_bool;
+    int64_t *pi_64;
 
     switch( i_query )
     {
@@ -1891,8 +1890,8 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
  ****************************************************************************/
 static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 {
-    bool *pb;
-    int64_t    *pi64;
+    bool    *pb;
+    int64_t *pi64;
 
     switch( i_query )
     {
