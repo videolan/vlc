@@ -15,6 +15,7 @@ SOURCES_mozilla_common = \
 	control/npolibvlc.h \
 	control/nporuntime.cpp \
 	control/nporuntime.h \
+	control/position.h \
 	support/classinfo.h
 
 DIST_sources = $(SOURCES_mozilla_common) \
