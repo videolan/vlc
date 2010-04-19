@@ -1085,7 +1085,6 @@ modules/video_filter/dynamicoverlay/dynamicoverlay_list.c
 modules/video_filter/dynamicoverlay/dynamicoverlay_queue.c
 modules/video_filter/erase.c
 modules/video_filter/extract.c
-modules/video_filter/filter_common.h
 modules/video_filter/filter_event_info.h
 modules/video_filter/filter_picture.h
 modules/video_filter/gaussianblur.c
@@ -1129,18 +1128,13 @@ modules/video_output/caca.c
 modules/video_output/directfb.c
 modules/video_output/drawable.c
 modules/video_output/fb.c
-modules/video_output/ggi.c
-modules/video_output/hd1000v.cpp
 modules/video_output/msw/direct3d.c
 modules/video_output/msw/directx.c
 modules/video_output/msw/events.c
 modules/video_output/msw/glwin32.c
 modules/video_output/msw/wingdi.c
-modules/video_output/omapfb.c
-modules/video_output/opengl.c
 modules/video_output/sdl.c
 modules/video_output/snapshot.c
-modules/video_output/svgalib.c
 modules/video_output/vmem.c
 modules/video_output/xcb/glx.c
 modules/video_output/xcb/window.c
