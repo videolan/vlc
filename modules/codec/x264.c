@@ -35,6 +35,7 @@
 #include <vlc_codec.h>
 #include <vlc_charset.h>
 #include <vlc_cpu.h>
+#include <math.h>
 
 #ifdef PTW32_STATIC_LIB
 #include <pthread.h>
@@ -667,6 +668,11 @@ vlc_module_begin ()
 
     add_string( SOUT_CFG_PREFIX "stats", "x264_2pass.log", NULL, STATS_TEXT,
                 STATS_LONGTEXT, false )
+    
+    add_string( SOUT_CFG_PREFIX "preset", NULL , NULL, NULL, NULL, false )
+        change_string_list( x264_preset_names, x264_preset_names, 0 );
+    add_string( SOUT_CFG_PREFIX "tune", NULL , NULL, NULL, NULL, false )
+        change_string_list( x264_tune_names, x264_tune_names, 0 );
 
 vlc_module_end ()
 
@@ -686,7 +692,8 @@ static const char *const ppsz_sout_options[] = {
     "sps-id", "ssim", "stats", "subme", "trellis",
     "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "weightp",
     "aq-mode", "aq-strength", "psy-rd", "psy", "profile", "lookahead", "slices",
-    "slice-max-size", "slice-max-mbs", "intra-refresh", "mbtree", "hrd", NULL
+    "slice-max-size", "slice-max-mbs", "intra-refresh", "mbtree", "hrd",
+    "tune","preset",NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -750,10 +757,21 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->psz_stat_name = NULL;
 
     x264_param_default( &p_sys->param );
+    char *psz_preset = var_GetString( p_enc, SOUT_CFG_PREFIX  "preset" );
+    char *psz_tune = var_GetString( p_enc, SOUT_CFG_PREFIX  "tune" );
+    if( *psz_preset == '\0' )
+    {
+        free(psz_preset);
+        psz_preset = NULL;
+    }
+    x264_param_default_preset( &p_sys->param, psz_preset, psz_tune );
+    free( psz_preset );
+    free( psz_tune );
     p_sys->param.i_width  = p_enc->fmt_in.video.i_width;
     p_sys->param.i_height = p_enc->fmt_in.video.i_height;
 
-    p_sys->param.rc.f_qcompress = var_GetFloat( p_enc, SOUT_CFG_PREFIX "qcomp" );
+    if( fabs(var_GetFloat( p_enc, SOUT_CFG_PREFIX "qcomp" ) - 0.60) > 0.005 )
+       p_sys->param.rc.f_qcompress = var_GetFloat( p_enc, SOUT_CFG_PREFIX "qcomp" );
 
     /* transcode-default bitrate is 0,
      * set more to ABR if user specifies bitrate */
@@ -817,31 +835,41 @@ static int  Open ( vlc_object_t *p_this )
     else if ( i_val )
         p_sys->param.rc.i_vbv_max_bitrate = i_val;
 
-    p_sys->param.b_cabac = var_GetBool( p_enc, SOUT_CFG_PREFIX "cabac" );
+    
+    if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "cabac" ) )
+        p_sys->param.b_cabac = var_GetBool( p_enc, SOUT_CFG_PREFIX "cabac" );
 
     /* disable deblocking when nf (no loop filter) is enabled */
-    p_sys->param.b_deblocking_filter = !var_GetBool( p_enc, SOUT_CFG_PREFIX "nf" );
+    if( var_GetBool( p_enc, SOUT_CFG_PREFIX "nf" ) )
+       p_sys->param.b_deblocking_filter = !var_GetBool( p_enc, SOUT_CFG_PREFIX "nf" );
 
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "deblock" );
     if( psz_val )
     {
-        char *p = strchr( psz_val, ':' );
-        p_sys->param.i_deblocking_filter_alphac0 = atoi( psz_val );
-        p_sys->param.i_deblocking_filter_beta = p ?
+        if( atoi( psz_val ) != 0 )
+        {
+           char *p = strchr( psz_val, ':' );
+           p_sys->param.i_deblocking_filter_alphac0 = atoi( psz_val );
+           p_sys->param.i_deblocking_filter_beta = p ?
                     atoi( p+1 ) : p_sys->param.i_deblocking_filter_alphac0;
+        }
         free( psz_val );
     }
 
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "psy-rd" );
     if( psz_val )
     {
-        char *p = strchr( psz_val, ':' );
-        p_sys->param.analyse.f_psy_rd = us_atof( psz_val );
-        p_sys->param.analyse.f_psy_trellis = p ? us_atof( p+1 ) : 0;
+        if( us_atof( psz_val ) != 1.0 )
+        {
+           char *p = strchr( psz_val, ':' );
+           p_sys->param.analyse.f_psy_rd = us_atof( psz_val );
+           p_sys->param.analyse.f_psy_trellis = p ? us_atof( p+1 ) : 0;
+        }
         free( psz_val );
     }
 
-    p_sys->param.analyse.b_psy = var_GetBool( p_enc, SOUT_CFG_PREFIX "psy" );
+    if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "psy" ) )
+       p_sys->param.analyse.b_psy = var_GetBool( p_enc, SOUT_CFG_PREFIX "psy" );
 
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "level" );
     if( psz_val )
@@ -855,12 +883,16 @@ static int  Open ( vlc_object_t *p_this )
     }
 
     p_sys->param.b_interlaced = var_GetBool( p_enc, SOUT_CFG_PREFIX "interlaced" );
-    p_sys->param.rc.f_ip_factor = var_GetFloat( p_enc, SOUT_CFG_PREFIX "ipratio" );
-    p_sys->param.rc.f_pb_factor = var_GetFloat( p_enc, SOUT_CFG_PREFIX "pbratio" );
+    if( fabs(var_GetFloat( p_enc, SOUT_CFG_PREFIX "ipratio" ) - 1.4) > 0.005 )
+       p_sys->param.rc.f_ip_factor = var_GetFloat( p_enc, SOUT_CFG_PREFIX "ipratio" );
+    if( fabs(var_GetFloat( p_enc, SOUT_CFG_PREFIX "pbratio" ) - 1.3 ) > 0.005 )
+       p_sys->param.rc.f_pb_factor = var_GetFloat( p_enc, SOUT_CFG_PREFIX "pbratio" );
     p_sys->param.rc.f_complexity_blur = var_GetFloat( p_enc, SOUT_CFG_PREFIX "cplxblur" );
     p_sys->param.rc.f_qblur = var_GetFloat( p_enc, SOUT_CFG_PREFIX "qblur" );
-    p_sys->param.rc.i_aq_mode = var_GetInteger( p_enc, SOUT_CFG_PREFIX "aq-mode" );
-    p_sys->param.rc.f_aq_strength = var_GetFloat( p_enc, SOUT_CFG_PREFIX "aq-strength" );
+    if( var_GetInteger( p_enc, SOUT_CFG_PREFIX "aq-mode" ) != X264_AQ_VARIANCE )
+       p_sys->param.rc.i_aq_mode = var_GetInteger( p_enc, SOUT_CFG_PREFIX "aq-mode" );
+    if( fabs( var_GetFloat( p_enc, SOUT_CFG_PREFIX "aq-strength" ) - 1.0) > 0.005 )
+       p_sys->param.rc.f_aq_strength = var_GetFloat( p_enc, SOUT_CFG_PREFIX "aq-strength" );
 
     if( var_GetBool( p_enc, SOUT_CFG_PREFIX "verbose" ) )
         p_sys->param.i_log_level = X264_LOG_DEBUG;
@@ -875,13 +907,13 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.b_aud = true;
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "keyint" );
-    if( i_val > 0 ) p_sys->param.i_keyint_max = i_val;
+    if( i_val > 0 && i_val != 250 ) p_sys->param.i_keyint_max = i_val;
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "min-keyint" );
-    if( i_val > 0 ) p_sys->param.i_keyint_min = i_val;
+    if( i_val > 0 && i_val != 25 ) p_sys->param.i_keyint_min = i_val;
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "bframes" );
-    if( i_val >= 0 && i_val <= 16 )
+    if( i_val >= 0 && i_val <= 16 && i_val != 3 )
         p_sys->param.i_bframe = i_val;
 
 #if X264_BUILD >= 82
@@ -890,16 +922,15 @@ static int  Open ( vlc_object_t *p_this )
 
 #if X264_BUILD >= 78
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "bpyramid" );
-    p_sys->param.i_bframe_pyramid = X264_B_PYRAMID_NONE;
-    if( !strcmp( psz_val, "none" ) )
+    if( strcmp( psz_val, "none" ) )
     {
-       p_sys->param.i_bframe_pyramid = X264_B_PYRAMID_NONE;
-    } else if ( !strcmp( psz_val, "strict" ) )
-    {
-       p_sys->param.i_bframe_pyramid = X264_B_PYRAMID_STRICT;
-    } else if ( !strcmp( psz_val, "normal" ) )
-    {
-       p_sys->param.i_bframe_pyramid = X264_B_PYRAMID_NORMAL;
+       if ( !strcmp( psz_val, "strict" ) )
+       {
+          p_sys->param.i_bframe_pyramid = X264_B_PYRAMID_STRICT;
+       } else if ( !strcmp( psz_val, "normal" ) )
+       {
+          p_sys->param.i_bframe_pyramid = X264_B_PYRAMID_NORMAL;
+       }
     }
     free( psz_val );
 #else
@@ -907,18 +938,18 @@ static int  Open ( vlc_object_t *p_this )
  #endif
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "ref" );
-    if( i_val > 0 && i_val <= 15 )
+    if( i_val > 0 && i_val <= 15 && i_val != 3 )
         p_sys->param.i_frame_reference = i_val;
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "scenecut" );
-    if( i_val >= -1 && i_val <= 100 )
+    if( i_val >= -1 && i_val <= 100 && i_val != 40 )
         p_sys->param.i_scenecut_threshold = i_val;
 
     p_sys->param.b_deterministic = var_GetBool( p_enc,
                         SOUT_CFG_PREFIX "non-deterministic" );
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "subme" );
-    if( i_val >= 1 )
+    if( i_val >= 1 && i_val != 7 )
         p_sys->param.analyse.i_subpel_refine = i_val;
 
 #if X264_BUILD >= 89
@@ -931,30 +962,29 @@ static int  Open ( vlc_object_t *p_this )
 
     //TODO: psz_val == NULL ?
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "me" );
-    if( !strcmp( psz_val, "dia" ) )
+    if( psz_val && strcmp( psz_val, "hex" ) )
     {
-        p_sys->param.analyse.i_me_method = X264_ME_DIA;
+       if( !strcmp( psz_val, "dia" ) )
+       {
+            p_sys->param.analyse.i_me_method = X264_ME_DIA;
+       }
+       else if( !strcmp( psz_val, "umh" ) )
+       {
+            p_sys->param.analyse.i_me_method = X264_ME_UMH;
+        }
+       else if( !strcmp( psz_val, "esa" ) )
+       {
+           p_sys->param.analyse.i_me_method = X264_ME_ESA;
+       }
+       else if( !strcmp( psz_val, "tesa" ) )
+       {
+           p_sys->param.analyse.i_me_method = X264_ME_TESA;
+       }
+       free( psz_val );
     }
-    else if( !strcmp( psz_val, "hex" ) )
-    {
-        p_sys->param.analyse.i_me_method = X264_ME_HEX;
-    }
-    else if( !strcmp( psz_val, "umh" ) )
-    {
-        p_sys->param.analyse.i_me_method = X264_ME_UMH;
-    }
-    else if( !strcmp( psz_val, "esa" ) )
-    {
-        p_sys->param.analyse.i_me_method = X264_ME_ESA;
-    }
-    else if( !strcmp( psz_val, "tesa" ) )
-    {
-        p_sys->param.analyse.i_me_method = X264_ME_TESA;
-    }
-    free( psz_val );
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "merange" );
-    if( i_val >= 0 && i_val <= 64 )
+    if( i_val >= 0 && i_val <= 64 && i_val != 16 )
         p_sys->param.analyse.i_me_range = i_val;
 
     p_sys->param.analyse.i_mv_range = var_GetInteger( p_enc,
@@ -983,45 +1013,51 @@ static int  Open ( vlc_object_t *p_this )
 
     p_sys->param.analyse.b_psnr = var_GetBool( p_enc, SOUT_CFG_PREFIX "psnr" );
     p_sys->param.analyse.b_ssim = var_GetBool( p_enc, SOUT_CFG_PREFIX "ssim" );
-    p_sys->param.analyse.b_weighted_bipred = var_GetBool( p_enc,
+    if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "weightb" ) ) 
+       p_sys->param.analyse.b_weighted_bipred = var_GetBool( p_enc,
                                     SOUT_CFG_PREFIX "weightb" );
 #if X264_BUILD >= 79
-    p_sys->param.analyse.i_weighted_pred = var_GetInteger( p_enc, SOUT_CFG_PREFIX "weightp" );
+    if( var_GetInteger( p_enc, SOUT_CFG_PREFIX "weightp" ) != 2 )
+       p_sys->param.analyse.i_weighted_pred = var_GetInteger( p_enc, SOUT_CFG_PREFIX "weightp" );
 #endif
-    p_sys->param.i_bframe_adaptive = var_GetInteger( p_enc,
-                                    SOUT_CFG_PREFIX "b-adapt" );
+    i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "b-adapt" );
+    if( i_val != 1 )
+       p_sys->param.i_bframe_adaptive = i_val;
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "b-bias" );
-    if( i_val >= -100 && i_val <= 100 )
+    if( i_val >= -100 && i_val <= 100 && i_val != 0)
         p_sys->param.i_bframe_bias = i_val;
 
     p_sys->param.analyse.b_chroma_me = var_GetBool( p_enc,
                                     SOUT_CFG_PREFIX "chroma-me" );
     p_sys->param.analyse.i_chroma_qp_offset = var_GetInteger( p_enc,
                                     SOUT_CFG_PREFIX "chroma-qp-offset" );
-    p_sys->param.analyse.b_mixed_references = var_GetBool( p_enc,
+    if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "mixed-refs" ) )
+       p_sys->param.analyse.b_mixed_references = var_GetBool( p_enc,
                                     SOUT_CFG_PREFIX "mixed-refs" );
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "trellis" );
-    if( i_val >= 0 && i_val <= 2 )
+    if( i_val >= 0 && i_val <= 2 && i_val != 1 )
         p_sys->param.analyse.i_trellis = i_val;
 
-    p_sys->param.analyse.b_fast_pskip = var_GetBool( p_enc,
+    if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "fast-pskip" ) )
+       p_sys->param.analyse.b_fast_pskip = var_GetBool( p_enc,
                                     SOUT_CFG_PREFIX "fast-pskip" );
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "nr" );
-    if( i_val >= 0 && i_val <= 1000 )
+    if( i_val > 0 && i_val <= 1000 )
         p_sys->param.analyse.i_noise_reduction = i_val;
 
-    p_sys->param.analyse.b_dct_decimate = var_GetBool( p_enc,
+    if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "dct-decimate" ) )
+       p_sys->param.analyse.b_dct_decimate = var_GetBool( p_enc,
                                     SOUT_CFG_PREFIX "dct-decimate" );
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "deadzone-inter" );
-    if( i_val >= 0 && i_val <= 32 )
+    if( i_val >= 0 && i_val <= 32 && i_val != 21 )
         p_sys->param.analyse.i_luma_deadzone[0] = i_val;
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "deadzone-intra" );
-    if( i_val >= 0 && i_val <= 32 )
+    if( i_val >= 0 && i_val <= 32 && i_val != 11)
         p_sys->param.analyse.i_luma_deadzone[1] = i_val;
 
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "asm" ) )
@@ -1064,7 +1100,8 @@ static int  Open ( vlc_object_t *p_this )
     }
     free( psz_val );
 
-    p_sys->param.analyse.b_transform_8x8 = var_GetBool( p_enc,
+    if( var_GetBool( p_enc, SOUT_CFG_PREFIX "8x8dct" ) )
+       p_sys->param.analyse.b_transform_8x8 = var_GetBool( p_enc,
                                     SOUT_CFG_PREFIX "8x8dct" );
 
     if( p_enc->fmt_in.video.i_sar_num > 0 &&
@@ -1178,7 +1215,8 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.rc.b_stat_read = i_val & 2;
     }
 
-    p_sys->param.rc.b_mb_tree = var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" );
+    if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" ) ) 
+       p_sys->param.rc.b_mb_tree = var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" );
 
     /* We need to initialize pthreadw32 before we open the encoder,
        but only once for the whole application. Since pthreadw32

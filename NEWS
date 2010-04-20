@@ -94,6 +94,7 @@ Encoders:
  * x264, defaults to crf=23 as x264.exe-does, if bitrate is given,
    uses ABR and if qp-value is set uses CQP
  * libx264-version 0.76 or higher is required
+ * x264 has tune/preset parameters supported
 
 Stream output:
  * New smem module, streaming to memory
