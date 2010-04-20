@@ -32,12 +32,12 @@ end
 function main()
     fd = vlc.stream( "http://trailers.apple.com/trailers/iphone/home/feeds/just_added.json" )
     if not fd then return nil end
-    options = {"http-user-agent='iPhone'"}
+    options = {":http-user-agent='iPhone'"}
     while true
     do
          line = fd:readline()
          if not line then break end
-         if string.match( line, "title" ) then
+         if string.match( line, "title" ) and string.match( line, "hd\":true")then
             title = vlc.strings.resolve_xml_special_chars( find( line, "title\":\"(.-)\""))
             art = find( line, "poster\":\"(.-)\"")
             url = find( line, "url\":\"(.-)\"")

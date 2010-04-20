@@ -34,14 +34,20 @@ end
 -- Parse function.
 function parse()
     p = {}
+    path=""
+    arturl=""
+    title=""
+    description=""
     while true
     do 
         line = vlc.readline()
         if not line then break end
-        for path in string.gmatch( line, "http://trailers.apple.com/movies/.-%.mov" ) do
-            path = vlc.strings.decode_uri( path )
-            path = string.gsub( path, "r320i.mov","h480p.mov")
-            table.insert( p, { path=path; name=title; description=description; options={"http-user-agent=Quicktime/7.2.0 vlc lua edition","input-fast-seek";};} )
+        for urli in string.gmatch( line, "http://trailers.apple.com/movies/.-%.mov" ) do
+            path = vlc.strings.decode_uri( urli )
+            vlc.msg.err(path)
+        end
+        for urli in string.gmatch( line, "http://.-%/poster.jpg") do
+            arturl = vlc.strings.decode_uri( urli )
         end
         if string.match( line, "<title>" )
         then
@@ -51,6 +57,11 @@ function parse()
         then
             description = vlc.strings.resolve_xml_special_chars( find( line, "name=\"Description\" content=\"(.-)\"" ) )
         end
+    end
+    for index,resolution in ipairs({"480p","720p","1080p"}) do
+        path = string.gsub( path, "r320i.mov","h"..resolution..".mov")
+        vlc.msg.err(arturl)
+        table.insert( p, { path=path; name=title.." ("..resolution..")"; arturl=arturl; description=description; options={":http-user-agent=Quicktime/7.2.0 vlc lua edition",":input-fast-seek",":play-and-stop"};} )
     end
     return p
 end
