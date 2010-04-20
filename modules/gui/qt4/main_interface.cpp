@@ -233,16 +233,16 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Register callback for the intf-popupmenu variable */
     var_AddCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
-    /**** FINAL SIZING and placement of interface */
-    settings->beginGroup( "MainWindow" );
-
     /* Playlist */
-    int i_plVis = settings->value( "playlist-visible", false ).toBool();
-    settings->endGroup();
+    int i_plVis = settings->value( "MainWindow/playlist-visible", false ).toBool();
 
     if( i_plVis ) togglePlaylist();
 
+    /**** FINAL SIZING and placement of interface */
+    settings->beginGroup( "MainWindow" );
     QVLCTools::restoreWidgetPosition( settings, this, QSize(400, 100) );
+    settings->endGroup();
+
     /* Final sizing and showing */
     setVisible( !b_hideAfterCreation );
 
