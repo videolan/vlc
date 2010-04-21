@@ -1,0 +1,51 @@
+Index: swscale.c
+===================================================================
+--- swscale.c	(revision 31036)
++++ swscale.c	(working copy)
+@@ -994,7 +994,7 @@
+     }
+ }
+ 
+-static inline void rgb48ToY(uint8_t *dst, const uint8_t *src, int width,
++static inline void rgb48ToY(uint8_t *dst, const uint8_t *src, long width,
+                             uint32_t *unused)
+ {
+     int i;
+@@ -1009,7 +1009,7 @@
+ 
+ static inline void rgb48ToUV(uint8_t *dstU, uint8_t *dstV,
+                              const uint8_t *src1, const uint8_t *src2,
+-                             int width, uint32_t *unused)
++                             long width, uint32_t *unused)
+ {
+     int i;
+     assert(src1==src2);
+@@ -1025,7 +1025,7 @@
+ 
+ static inline void rgb48ToUV_half(uint8_t *dstU, uint8_t *dstV,
+                                   const uint8_t *src1, const uint8_t *src2,
+-                                  int width, uint32_t *unused)
++                                  long width, uint32_t *unused)
+ {
+     int i;
+     assert(src1==src2);
+Index: swscale_template.c
+===================================================================
+--- swscale_template.c	(revision 31036)
++++ swscale_template.c	(working copy)
+@@ -2466,6 +2466,7 @@
+         }
+     } else {
+ #endif /* COMPILE_TEMPLATE_MMX2 */
++#if 0
+         x86_reg xInc_shr16 = (x86_reg) (xInc >> 16);
+         uint16_t xInc_mask = xInc & 0xffff;
+         __asm__ volatile(
+@@ -2501,6 +2502,7 @@
+             "r" (src2)
+             : "%"REG_a, "%"REG_d, "%ecx", "%"REG_D, "%esi"
+         );
++#endif
+ #if COMPILE_TEMPLATE_MMX2
+     } //if MMX2 can't be used
+ #endif

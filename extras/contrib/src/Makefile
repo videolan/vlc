@@ -1036,6 +1036,9 @@ endif
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
 endif
+ifdef HAVE_WIN64
+	(cd ffmpeg/libswscale; patch -p0 < ../../Patches/ffmpeg-win64.patch;)
+endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
 	patch -p0 < Patches/ffmpeg-svn-internal-define.patch
@@ -1063,7 +1066,7 @@ FFMPEGCONF += \
 	--disable-filters \
 	--disable-network
 ifdef HAVE_WIN64
-FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --disable-dxva2 --disable-bsfs
+FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --disable-dxva2 --disable-bsfs 
 else
 ifdef HAVE_WIN32
 FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --enable-dxva2 --disable-bsfs
