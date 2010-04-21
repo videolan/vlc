@@ -1407,7 +1407,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
 
                 ref.ReadData( es.I_O() );
 
-                if( int64( ref ) < 0 )
+                if( *pb_key_picture )
                     *pb_key_picture = false;
                 else if( int64( ref ) > 0 )
                     *pb_discardable_picture = true;
