@@ -149,10 +149,8 @@ typedef union
 
 struct module_config_t
 {
-    int          i_type;                               /* Configuration type */
     char        *psz_type;                          /* Configuration subtype */
     char        *psz_name;                                    /* Option name */
-    char         i_short;                      /* Optional short option name */
     char        *psz_text;      /* Short comment on the configuration option */
     char        *psz_longtext;   /* Long comment on the configuration option */
     module_value_t value;                                    /* Option value */
@@ -170,12 +168,18 @@ struct module_config_t
     int         *pi_list;                              /* Idem for integers */
     char       **ppsz_list_text;          /* Friendly names for list values */
     int          i_list;                               /* Options list size */
+    int          i_type;                               /* Configuration type */
     vlc_callback_t pf_update_list; /*callback to initialize dropdownlists */
+    char         i_short;                      /* Optional short option name */
 
     /* Actions list */
+    int            i_action;                           /* actions list size */
     vlc_callback_t *ppf_action;    /* List of possible actions for a config */
     char          **ppsz_action_text;         /* Friendly names for actions */
-    int            i_action;                           /* actions list size */
+
+    /* Deprecated */
+    char        *psz_oldname;                          /* Old option name */
+    bool        b_removed;
 
     /* Misc */
     bool        b_dirty;          /* Dirty flag to indicate a config change */
@@ -183,11 +187,6 @@ struct module_config_t
     bool        b_internal;   /* Flag to indicate option is not to be shown */
     bool        b_restart;   /* Flag to indicate the option needs a restart */
                               /* to take effect */
-
-    /* Deprecated */
-    char        *psz_oldname;                          /* Old option name */
-    bool        b_removed;
-
     /* Option values loaded from config file */
     bool        b_autosave;      /* Config will be auto-saved at exit time */
     bool        b_unsaveable;                /* Config should not be saved */
