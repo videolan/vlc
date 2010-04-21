@@ -274,10 +274,7 @@ static int  Open ( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
     }
-    else
-    {
-        var_Create( p_demux, "rtsp-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    }
+    var_Create( p_demux, "rtsp-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
     p_demux->pf_demux  = Demux;
     p_demux->pf_control= Control;
