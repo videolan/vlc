@@ -93,11 +93,16 @@ typedef shl_t module_handle_t;
 struct module_t
 {
     char       *psz_object_name;
-    module_t   *next;
-    module_t   *submodule;
-    module_t   *parent;
-    unsigned    submodule_count;
     gc_object_t vlc_gc_data;
+
+    module_t   *next;
+    module_t   *parent;
+    module_t   *submodule;
+    unsigned    submodule_count;
+
+    /** Shortcuts to the module */
+    int    i_shortcuts;
+    char **pp_shortcuts;
 
     /*
      * Variables set by the module to identify itself
@@ -106,13 +111,11 @@ struct module_t
     char *psz_longname;                   /**< Module descriptive name */
     char *psz_help;        /**< Long help string for "special" modules */
 
-    /** Shortcuts to the module */
-    char **pp_shortcuts;
-    int    i_shortcuts;
-
     char    *psz_capability;                                 /**< Capability */
     int      i_score;                          /**< Score for the capability */
 
+    bool          b_builtin;  /* Set to true if the module is built in */
+    bool          b_loaded;        /* Set to true if the dll is loaded */
     bool b_unloadable;                        /**< Can we be dlclosed? */
     bool b_submodule;                        /**< Is this a submodule? */
 
@@ -135,9 +138,6 @@ struct module_t
     module_handle_t     handle;                             /* Unique handle */
     char *              psz_filename;                     /* Module filename */
     char *              domain;                            /* gettext domain */
-
-    bool          b_builtin;  /* Set to true if the module is built in */
-    bool          b_loaded;        /* Set to true if the dll is loaded */
 };
 
 module_t *vlc_module_create (vlc_object_t *);
