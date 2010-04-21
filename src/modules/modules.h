@@ -107,7 +107,8 @@ struct module_t
     char *psz_help;        /**< Long help string for "special" modules */
 
     /** Shortcuts to the module */
-    char *pp_shortcuts[ MODULE_SHORTCUT_MAX ];
+    char **pp_shortcuts;
+    int    i_shortcuts;
 
     char    *psz_capability;                                 /**< Capability */
     int      i_score;                          /**< Score for the capability */
