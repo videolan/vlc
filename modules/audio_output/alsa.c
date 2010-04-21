@@ -283,6 +283,18 @@ static void Probe( aout_instance_t * p_aout,
     if( val.i_int <= 0 )
     {
         /* Probe() has failed. */
+#if (SND_LIB_VERSION <= 0x010017)
+# warning Please update alsa-lib to version > 1.0.23.
+        var_Create( p_aout->p_libvlc, "alsa-broken", VLC_VAR_BOOL );
+        if( !var_GetBool( p_aout->p_libvlc, "alsa-broken" ) )
+        {
+            var_SetBool( p_aout->p_libvlc, "alsa-broken", true );
+            dialog_FatalWait( p_aout, "Potential ALSA version problem",
+                "VLC failed to initialize your sound output device (if any).\n"
+                "Please update alsa-lib to version 1.0.24 or higher "
+                "to try to fix this issue." );
+        }
+#endif
         msg_Dbg( p_aout, "failed to find a usable ALSA configuration" );
         var_Destroy( p_aout, "audio-device" );
         GetDevices( VLC_OBJECT(p_aout), NULL );
