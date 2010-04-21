@@ -47,6 +47,7 @@ vlc_module_begin()
     set_description( N_("Uncompressed RAR") )
     set_capability( "stream_filter", 1 )
     set_callbacks( Open, Close )
+    add_shortcut( "rar" )
 vlc_module_end()
 
 /*****************************************************************************
