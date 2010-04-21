@@ -481,7 +481,7 @@ module_t * module_need( vlc_object_t *p_this, const char *psz_capability,
 
             for( unsigned i_short = i_shortcuts; i_short > 0; i_short-- )
             {
-                for( unsigned i = 0; i < p_module->i_shortcuts; i++ )
+                for( unsigned i = 0; p_module->pp_shortcuts[i]; i++ )
                 {
                     char *c;
                     if( ( c = strchr( name, '@' ) )
@@ -691,7 +691,9 @@ module_t *module_find_by_shortcut (const char *psz_shortcut)
 
     for (size_t i = 0; (module = list[i]) != NULL; i++)
     {
-        for (size_t j = 0; j < module->i_shortcuts; j++)
+        for (size_t j = 0;
+             (module->pp_shortcuts[j] != NULL) && (j < MODULE_SHORTCUT_MAX);
+             j++)
         {
             if (!strcmp (module->pp_shortcuts[j], psz_shortcut))
             {
@@ -1052,9 +1054,12 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, const char *psz_file )
  *****************************************************************************/
 static void DupModule( module_t *p_module )
 {
-    char **pp_shortcuts = p_module->pp_shortcuts;
-    for( unsigned i = 0; i < p_module->i_shortcuts; i++ )
-        pp_shortcuts[i] = strdup( p_module->pp_shortcuts[i] );
+    char **pp_shortcut;
+
+    for( pp_shortcut = p_module->pp_shortcuts ; *pp_shortcut ; pp_shortcut++ )
+    {
+        *pp_shortcut = strdup( *pp_shortcut );
+    }
 
     /* We strdup() these entries so that they are still valid when the
      * module is unloaded. */
@@ -1077,13 +1082,15 @@ static void DupModule( module_t *p_module )
  *****************************************************************************/
 static void UndupModule( module_t *p_module )
 {
-    char **pp_shortcuts = p_module->pp_shortcuts;
+    char **pp_shortcut;
 
     for (module_t *subm = p_module->submodule; subm; subm = subm->next)
         UndupModule (subm);
 
-    for( unsigned i = 0; i < p_module->i_shortcuts; i++ )
-        free( pp_shortcuts[i] );
+    for( pp_shortcut = p_module->pp_shortcuts ; *pp_shortcut ; pp_shortcut++ )
+    {
+        free( *pp_shortcut );
+    }
 
     free( p_module->psz_capability );
     FREENULL( p_module->psz_shortname );

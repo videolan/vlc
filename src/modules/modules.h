@@ -100,16 +100,15 @@ struct module_t
     module_t   *submodule;
     unsigned    submodule_count;
 
-    /** Shortcuts to the module */
-    int    i_shortcuts;
-    char **pp_shortcuts;
-
     /*
      * Variables set by the module to identify itself
      */
     char *psz_shortname;                              /**< Module name */
     char *psz_longname;                   /**< Module descriptive name */
     char *psz_help;        /**< Long help string for "special" modules */
+
+    /** Shortcuts to the module */
+    char *pp_shortcuts[ MODULE_SHORTCUT_MAX ];
 
     char    *psz_capability;                                 /**< Capability */
     int      i_score;                          /**< Score for the capability */

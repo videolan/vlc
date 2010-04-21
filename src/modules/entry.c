@@ -37,7 +37,6 @@ static void vlc_module_destruct (gc_object_t *obj)
 {
     module_t *module = vlc_priv (obj, module_t);
 
-    free (module->pp_shortcuts);
     free (module->psz_object_name);
     free (module);
 }
@@ -60,8 +59,8 @@ module_t *vlc_module_create (vlc_object_t *obj)
     module->psz_shortname = NULL;
     module->psz_longname = (char*)default_name;
     module->psz_help = NULL;
-    module->pp_shortcuts = NULL;
-    module->i_shortcuts = 0;
+    for (unsigned i = 0; i < MODULE_SHORTCUT_MAX; i++)
+        module->pp_shortcuts[i] = NULL;
     module->psz_capability = (char*)"";
     module->i_score = 1;
     module->b_unloadable = true;
@@ -86,7 +85,6 @@ module_t *vlc_module_create (vlc_object_t *obj)
 static void vlc_submodule_destruct (gc_object_t *obj)
 {
     module_t *module = vlc_priv (obj, module_t);
-    free (module->pp_shortcuts);
     free (module->psz_object_name);
     free (module);
 }
@@ -107,9 +105,9 @@ module_t *vlc_submodule_create (module_t *module)
     module->submodule_count++;
 
     /* Muahahaha! Heritage! Polymorphism! Ugliness!! */
-    submodule->pp_shortcuts = malloc( sizeof( char ** ) );
     submodule->pp_shortcuts[0] = module->pp_shortcuts[0]; /* object name */
-    submodule->i_shortcuts = 1;
+    for (unsigned i = 1; i < MODULE_SHORTCUT_MAX; i++)
+        submodule->pp_shortcuts[i] = NULL;
 
     submodule->psz_object_name = strdup( module->psz_object_name );
     submodule->psz_shortname = module->psz_shortname;
@@ -181,9 +179,12 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
 
         case VLC_MODULE_SHORTCUT:
         {
-            const char *psz_new = va_arg (ap, char*);
-            module->pp_shortcuts = realloc (module->pp_shortcuts, sizeof( char ** ) * (module->i_shortcuts + 1));
-            module->pp_shortcuts[module->i_shortcuts++] = psz_new;
+            unsigned i;
+            for (i = 0; module->pp_shortcuts[i] != NULL; i++);
+                if (i >= (MODULE_SHORTCUT_MAX - 1))
+                    break;
+
+            module->pp_shortcuts[i] = va_arg (ap, char *);
             break;
         }
 
@@ -212,10 +213,7 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             const char *value = va_arg (ap, const char *);
             free( module->psz_object_name );
             module->psz_object_name = strdup( value );
-            module->pp_shortcuts = malloc( sizeof( char ** ) );
             module->pp_shortcuts[0] = (char*)value; /* dooh! */
-            module->i_shortcuts = 1;
-
             if (module->psz_longname == default_name)
                 module->psz_longname = (char*)value; /* dooh! */
             break;
