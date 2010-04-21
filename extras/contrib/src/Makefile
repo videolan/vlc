@@ -2343,7 +2343,9 @@ pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz:
 pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 	$(EXTRACT_GZ)
 	(cd $@; patch -p0 < ../Patches/pthreads-detach.patch)
+ifdef HAVE_WIN64
 	(patch -p0 < Patches/pthreads-win64.patch)
+endif
 
 .pthreads: pthreads
 	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC GC-static && mkdir -p $(PREFIX)/include && cp -v pthread.h sched.h semaphore.h $(PREFIX)/include/ && mkdir -p $(PREFIX)/lib && cp -v *.a *.dll $(PREFIX)/lib/)
