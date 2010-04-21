@@ -763,7 +763,7 @@
        <item row="2" column="0">
         <widget class="QLabel" name="label_39">
          <property name="text">
-          <string>Darknesslimit</string>
+          <string>Darkness limit</string>
          </property>
         </widget>
        </item>

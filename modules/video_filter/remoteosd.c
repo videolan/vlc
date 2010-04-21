@@ -76,7 +76,7 @@
 
 #define RMTOSD_PORT_TEXT N_("VNC Port")
 #define RMTOSD_PORT_LONGTEXT N_( \
-    "VNC portnumber." )
+    "VNC port number." )
 
 #define RMTOSD_PASSWORD_TEXT N_("VNC Password")
 #define RMTOSD_PASSWORD_LONGTEXT N_( \

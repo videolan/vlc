@@ -94,7 +94,7 @@ static void Destroy( vlc_object_t * );
 #ifdef HAVE_FONTCONFIG
 #define FONT_LONGTEXT N_("Font family for the font you want to use")
 #else
-#define FONT_LONGTEXT N_("Fontfile for the font you want to use")
+#define FONT_LONGTEXT N_("Font file for the font you want to use")
 #endif
 
 #define FONTSIZE_TEXT N_("Font size in pixels")
