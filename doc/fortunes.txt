@@ -908,3 +908,11 @@ VLC development is NOT about being a sed god.
 < xand_> guys how can i force ffplay to use avcodec ?
  -- #videolan
 %
+< nefrir> btw, anyone *really* opposed to temporary (1 month at most) breakage of video splitter (wall, clone, panoramix) and some vout filters (ie some mode of deinterlacing, opencv, autocrop) in master ?
+< j-b> NO
+< j-b> nefrir: seriously, if people care, they can branch
+< Dark_Shikari> isn't this what local branches are for?
+< j-b> Dark_Shikari: indeed. But you could consider master as nefrir 's local branch :)
+< Dark_Shikari> lol
+ -- #videolan
+%
