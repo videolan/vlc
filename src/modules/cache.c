@@ -253,10 +253,20 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
         LOAD_STRING( pp_cache[i]->p_module->psz_shortname );
         LOAD_STRING( pp_cache[i]->p_module->psz_longname );
         LOAD_STRING( pp_cache[i]->p_module->psz_help );
-        for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
+
+        LOAD_IMMEDIATE( pp_cache[i]->p_module->i_shortcuts );
+        if( pp_cache[i]->p_module->i_shortcuts > MODULE_SHORTCUT_MAX )
+            goto error;
+        else if( pp_cache[i]->p_module->i_shortcuts == 0 )
+            pp_cache[i]->p_module->pp_shortcuts = NULL;
+        else
         {
-            LOAD_STRING( pp_cache[i]->p_module->pp_shortcuts[j] ); // FIX
+            pp_cache[i]->p_module->pp_shortcuts =
+                    xmalloc( sizeof( char ** ) * pp_cache[i]->p_module->i_shortcuts );
+            for( j = 0; j < pp_cache[i]->p_module->i_shortcuts; j++ )
+                LOAD_STRING( pp_cache[i]->p_module->pp_shortcuts[j] );
         }
+
         LOAD_STRING( pp_cache[i]->p_module->psz_capability );
         LOAD_IMMEDIATE( pp_cache[i]->p_module->i_score );
         LOAD_IMMEDIATE( pp_cache[i]->p_module->b_unloadable );
@@ -277,14 +287,24 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
         {
             module_t *p_module = vlc_submodule_create( pp_cache[i]->p_module );
             free( p_module->psz_object_name );
+            free( p_module->pp_shortcuts );
             LOAD_STRING( p_module->psz_object_name );
             LOAD_STRING( p_module->psz_shortname );
             LOAD_STRING( p_module->psz_longname );
             LOAD_STRING( p_module->psz_help );
-            for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
+
+            LOAD_IMMEDIATE( p_module->i_shortcuts );
+            if( p_module->i_shortcuts > MODULE_SHORTCUT_MAX )
+                goto error;
+            else if( p_module->i_shortcuts == 0 )
+                p_module->pp_shortcuts = NULL;
+            else
             {
-                LOAD_STRING( p_module->pp_shortcuts[j] ); // FIX
+                p_module->pp_shortcuts = xmalloc( sizeof( char ** ) * p_module->i_shortcuts );
+                for( j = 0; j < p_module->i_shortcuts; j++ )
+                    LOAD_STRING( p_module->pp_shortcuts[j] );
             }
+
             LOAD_STRING( p_module->psz_capability );
             LOAD_IMMEDIATE( p_module->i_score );
             LOAD_IMMEDIATE( p_module->b_unloadable );
@@ -545,10 +565,10 @@ static int CacheSaveBank (FILE *file, module_cache_t *const *pp_cache,
         SAVE_STRING( pp_cache[i]->p_module->psz_shortname );
         SAVE_STRING( pp_cache[i]->p_module->psz_longname );
         SAVE_STRING( pp_cache[i]->p_module->psz_help );
-        for (unsigned j = 0; j < MODULE_SHORTCUT_MAX; j++)
-        {
-            SAVE_STRING( pp_cache[i]->p_module->pp_shortcuts[j] ); // FIX
-        }
+        SAVE_IMMEDIATE( pp_cache[i]->p_module->i_shortcuts );
+        for (unsigned j = 0; j < pp_cache[i]->p_module->i_shortcuts; j++)
+            SAVE_STRING( pp_cache[i]->p_module->pp_shortcuts[j] );
+
         SAVE_STRING( pp_cache[i]->p_module->psz_capability );
         SAVE_IMMEDIATE( pp_cache[i]->p_module->i_score );
         SAVE_IMMEDIATE( pp_cache[i]->p_module->b_unloadable );
@@ -590,8 +610,9 @@ static int CacheSaveSubmodule( FILE *file, const module_t *p_module )
     SAVE_STRING( p_module->psz_shortname );
     SAVE_STRING( p_module->psz_longname );
     SAVE_STRING( p_module->psz_help );
-    for( unsigned j = 0; j < MODULE_SHORTCUT_MAX; j++ )
-         SAVE_STRING( p_module->pp_shortcuts[j] ); // FIXME
+    SAVE_IMMEDIATE( p_module->i_shortcuts );
+    for( unsigned j = 0; j < p_module->i_shortcuts; j++ )
+         SAVE_STRING( p_module->pp_shortcuts[j] );
 
     SAVE_STRING( p_module->psz_capability );
     SAVE_IMMEDIATE( p_module->i_score );

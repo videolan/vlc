@@ -1423,15 +1423,15 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
             ( b_strict ? strcmp( psz_search, p_parser->psz_object_name )
                        : !strstr( p_parser->psz_object_name, psz_search ) ) )
         {
-            char *const *pp_shortcut = p_parser->pp_shortcuts;
-            while( *pp_shortcut )
+            char *const *pp_shortcuts = p_parser->pp_shortcuts;
+            int i;
+            for( i = 0; i < p_parser->i_shortcuts; i++ )
             {
-                if( b_strict ? !strcmp( psz_search, *pp_shortcut )
-                             : !!strstr( *pp_shortcut, psz_search ) )
+                if( b_strict ? !strcmp( psz_search, pp_shortcuts[i] )
+                             : !!strstr( pp_shortcuts[i], psz_search ) )
                     break;
-                pp_shortcut ++;
             }
-            if( !*pp_shortcut )
+            if( i == p_parser->i_shortcuts )
                 continue;
         }
 
@@ -1861,19 +1861,18 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
 
         if( b_verbose )
         {
-            char *const *pp_shortcut = p_parser->pp_shortcuts;
-            while( *pp_shortcut )
+            char *const *pp_shortcuts = p_parser->pp_shortcuts;
+            for( int i = 0; i < p_parser->i_shortcuts; i++ )
             {
-                if( strcmp( *pp_shortcut, p_parser->psz_object_name ) )
+                if( strcmp( pp_shortcuts[i], p_parser->psz_object_name ) )
                 {
                     if( b_color )
                         utf8_fprintf( stdout, CYAN"   s %s\n"GRAY,
-                                      *pp_shortcut );
+                                      pp_shortcuts[i] );
                     else
                         utf8_fprintf( stdout, "   s %s\n",
-                                      *pp_shortcut );
+                                      pp_shortcuts[i] );
                 }
-                pp_shortcut++;
             }
             if( p_parser->psz_capability )
             {
