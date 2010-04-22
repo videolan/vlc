@@ -183,6 +183,7 @@ src/stream_output/sap.c
 src/stream_output/sdp.c
 src/stream_output/stream_output.c
 src/stream_output/stream_output.h
+src/text/iso-639_def.h
 src/version.c
 src/video_output/video_output.c
 src/video_output/video_text.c
@@ -197,6 +198,8 @@ src/video_output/vout_subpictures.c
 # modules
 modules/3dnow/memcpy.c
 modules/access/alsa.c
+modules/access/attachment.c
+modules/access/avio.h
 modules/access/bd/bd.c
 modules/access/bda/bda.c
 modules/access/bda/bda.h
@@ -224,9 +227,11 @@ modules/access/dvdread.c
 modules/access/eyetv.m
 modules/access/fake.c
 modules/access/file.c
+modules/access/fs.c
 modules/access/ftp.c
 modules/access/gnomevfs.c
 modules/access/http.c
+modules/access/imem.c
 modules/access/jack.c
 modules/access/mmap.c
 modules/access/mms/asf.c
@@ -297,6 +302,7 @@ modules/access_output/udp.c
 modules/altivec/memcpy.c
 modules/arm_neon/audio_format.c
 modules/arm_neon/i420_yuy2.c
+modules/audio_filter/audiobargraph_a.c
 modules/audio_filter/channel_mixer/dolby.c
 modules/audio_filter/channel_mixer/headphone.c
 modules/audio_filter/channel_mixer/mono.c
@@ -964,6 +970,7 @@ modules/misc/playlist/xspf.c
 modules/misc/playlist/xspf.h
 modules/misc/quartztext.c
 modules/misc/rtsp.c
+modules/misc/sqlite.c
 modules/misc/stats/decoder.c
 modules/misc/stats/demux.c
 modules/misc/stats/encoder.c
@@ -992,6 +999,7 @@ modules/mux/ogg.c
 modules/mux/wav.c
 modules/packetizer/copy.c
 modules/packetizer/dirac.c
+modules/packetizer/flac.c
 modules/packetizer/h264.c
 modules/packetizer/mlp.c
 modules/packetizer/mpeg4audio.c
@@ -1000,11 +1008,13 @@ modules/packetizer/mpegvideo.c
 modules/packetizer/vc1.c
 modules/services_discovery/bonjour.c
 modules/services_discovery/mediadirs.c
+modules/services_discovery/mtp.c
 modules/services_discovery/podcast.c
 modules/services_discovery/sap.c
 modules/services_discovery/udev.c
 modules/services_discovery/upnp_cc.cpp
 modules/services_discovery/upnp_intel.cpp
+modules/services_discovery/xcb_apps.c
 modules/stream_filter/decomp.c
 modules/stream_filter/rar.c
 modules/stream_filter/record.c
@@ -1067,6 +1077,8 @@ modules/video_filter/atmo/AtmoTools.h
 modules/video_filter/atmo/AtmoZoneDefinition.cpp
 modules/video_filter/atmo/AtmoZoneDefinition.h
 modules/video_filter/atmo/atmo.cpp
+modules/video_filter/audiobargraph_v.c
+modules/video_filter/ball.c
 modules/video_filter/blend.c
 modules/video_filter/blendbench.c
 modules/video_filter/bluescreen.c
@@ -1128,6 +1140,7 @@ modules/video_output/caca.c
 modules/video_output/directfb.c
 modules/video_output/drawable.c
 modules/video_output/fb.c
+modules/video_output/macosx.m
 modules/video_output/msw/direct3d.c
 modules/video_output/msw/directx.c
 modules/video_output/msw/events.c
