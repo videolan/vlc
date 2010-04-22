@@ -385,6 +385,10 @@ static void Close( vlc_object_t * );
 #define HRD_TEXT N_("HRD-timing information")
 #define HRD_LONGTEXT N_("HRD-timing information")
 
+#define TUNE_TEXT N_("Tune the settings for a particular type of source or situation. " \
+     "Overridden by user settings." )
+#define PRESET_TEXT N_("Use preset as default settings. Overridden by user settings." )
+
 static const char *const enc_me_list[] =
   { "dia", "hex", "umh", "esa", "tesa" };
 static const char *const enc_me_list_text[] =
@@ -669,9 +673,9 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "stats", "x264_2pass.log", NULL, STATS_TEXT,
                 STATS_LONGTEXT, false )
     
-    add_string( SOUT_CFG_PREFIX "preset", NULL , NULL, NULL, NULL, false )
+    add_string( SOUT_CFG_PREFIX "preset", NULL , NULL, PRESET_TEXT , PRESET_TEXT, false )
         change_string_list( x264_preset_names, x264_preset_names, 0 );
-    add_string( SOUT_CFG_PREFIX "tune", NULL , NULL, NULL, NULL, false )
+    add_string( SOUT_CFG_PREFIX "tune", NULL , NULL, TUNE_TEXT, TUNE_TEXT, false )
         change_string_list( x264_tune_names, x264_tune_names, 0 );
 
 vlc_module_end ()
