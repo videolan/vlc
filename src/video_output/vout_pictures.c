@@ -44,6 +44,12 @@
 #include "vout_pictures.h"
 #include "vout_internal.h"
 
+static void tracep(const char *msg, picture_t *picture)
+{
+//fprintf(stderr, "########## %s === picture=%p::%d\n", msg,
+//                picture, picture ? picture->i_refcount : -1);
+}
+
 /**
  * Display a picture
  *
@@ -54,19 +60,12 @@ void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->p->picture_lock );
 
-    if( p_pic->i_status == RESERVED_PICTURE )
-    {
-        p_pic->i_status = READY_PICTURE;
-        vlc_cond_signal( &p_vout->p->picture_wait );
-    }
-    else
-    {
-        msg_Err( p_vout, "picture to display %p has invalid status %d",
-                         p_pic, p_pic->i_status );
-    }
-    p_vout->p->i_picture_qtype = p_pic->i_qtype;
-    p_vout->p->b_picture_interlaced = !p_pic->b_progressive;
+    tracep("vout_DisplayPicture", p_pic);
 
+    p_pic->p_next = NULL;
+    picture_fifo_Push(p_vout->p->decoder_fifo, p_pic);
+
+    vlc_cond_signal( &p_vout->p->picture_wait );
     vlc_mutex_unlock( &p_vout->p->picture_lock );
 }
 
@@ -81,31 +80,8 @@ void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
  */
 int vout_CountPictureAvailable( vout_thread_t *p_vout )
 {
-    int i_free = 0;
-    int i_pic;
-
-    vlc_mutex_lock( &p_vout->p->picture_lock );
-    for( i_pic = 0; i_pic < I_RENDERPICTURES; i_pic++ )
-    {
-        picture_t *p_pic = PP_RENDERPICTURE[(p_vout->p->render.i_last_used_pic + i_pic + 1) % I_RENDERPICTURES];
-
-        switch( p_pic->i_status )
-        {
-            case DESTROYED_PICTURE:
-                i_free++;
-                break;
-
-            case FREE_PICTURE:
-                i_free++;
-                break;
-
-            default:
-                break;
-        }
-    }
-    vlc_mutex_unlock( &p_vout->p->picture_lock );
-
-    return i_free;
+#warning "TODO remove vout_CountPictureAvailable"
+    return VOUT_MAX_PICTURES;
 }
 
 picture_t *vout_CreatePicture( vout_thread_t *p_vout,
@@ -113,151 +89,18 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
                                bool b_top_field_first,
                                unsigned int i_nb_fields )
 {
-    int         i_pic;                                      /* picture index */
-    picture_t * p_pic;
-    picture_t * p_freepic = NULL;                      /* first free picture */
-
+#warning "TODO remove unused vout_CreatePicture parameters"
     /* Get lock */
     vlc_mutex_lock( &p_vout->p->picture_lock );
-
-    /*
-     * Look for an empty place in the picture heap.
-     */
-    for( i_pic = 0; i_pic < I_RENDERPICTURES; i_pic++ )
-    {
-        p_pic = PP_RENDERPICTURE[(p_vout->p->render.i_last_used_pic + i_pic + 1)
-                                 % I_RENDERPICTURES];
-
-        switch( p_pic->i_status )
-        {
-            case DESTROYED_PICTURE:
-                /* Memory will not be reallocated, and function can end
-                 * immediately - this is the best possible case, since no
-                 * memory allocation needs to be done */
-                p_pic->i_status   = RESERVED_PICTURE;
-                p_pic->i_refcount = 0;
-                p_pic->b_force    = 0;
-
-                p_pic->b_progressive        = b_progressive;
-                p_pic->i_nb_fields          = i_nb_fields;
-                p_pic->b_top_field_first    = b_top_field_first;
-
-                p_vout->p->render.i_last_used_pic =
-                    ( p_vout->p->render.i_last_used_pic + i_pic + 1 )
-                    % I_RENDERPICTURES;
-                vlc_mutex_unlock( &p_vout->p->picture_lock );
-                return( p_pic );
-
-            case FREE_PICTURE:
-                /* Picture is empty and ready for allocation */
-                p_vout->p->render.i_last_used_pic =
-                    ( p_vout->p->render.i_last_used_pic + i_pic + 1 )
-                    % I_RENDERPICTURES;
-                p_freepic = p_pic;
-                break;
-
-            default:
-                break;
-        }
+    picture_t *p_pic = picture_pool_Get(p_vout->p->decoder_pool);
+    if (p_pic) {
+        picture_Reset(p_pic);
+        p_pic->p_next = NULL; // FIXME put it in picture_Reset ?
     }
-
-    /*
-     * Prepare picture
-     */
-    if( p_freepic != NULL )
-    {
-        vout_AllocatePicture( VLC_OBJECT(p_vout),
-                              p_freepic, p_vout->fmt_render.i_chroma,
-                              p_vout->fmt_render.i_width, p_vout->fmt_render.i_height,
-                              p_vout->fmt_in.i_sar_num, p_vout->fmt_in.i_sar_den ); /* The right AR is in fmt_in and not fmt_render */
-
-        if( p_freepic->i_planes )
-        {
-            /* Copy picture information, set some default values */
-            p_freepic->i_status   = RESERVED_PICTURE;
-            p_freepic->i_type     = MEMORY_PICTURE;
-            p_freepic->b_slow     = 0;
-
-            p_freepic->i_refcount = 0;
-            p_freepic->b_force = 0;
-
-            p_freepic->b_progressive        = b_progressive;
-            p_freepic->i_nb_fields          = i_nb_fields;
-            p_freepic->b_top_field_first    = b_top_field_first;
-
-        }
-        else
-        {
-            /* Memory allocation failed : set picture as empty */
-            p_freepic->i_status = FREE_PICTURE;
-            p_freepic = NULL;
-
-            msg_Err( p_vout, "picture allocation failed" );
-        }
-
-        vlc_mutex_unlock( &p_vout->p->picture_lock );
-
-        return( p_freepic );
-    }
-
-    /* No free or destroyed picture could be found, but the decoder
-     * will try again in a while. */
+    tracep("vout_CreatePicture", p_pic);
     vlc_mutex_unlock( &p_vout->p->picture_lock );
 
-    return( NULL );
-}
-
-/* */
-static void DestroyPicture( vout_thread_t *p_vout, picture_t *p_picture )
-{
-    vlc_assert_locked( &p_vout->p->picture_lock );
-
-    p_picture->i_status = DESTROYED_PICTURE;
-    picture_CleanupQuant( p_picture );
-
-    vlc_cond_signal( &p_vout->p->picture_wait );
-}
-
-/**
- * Remove a permanent or reserved picture from the heap
- *
- * This function frees a previously reserved picture or a permanent
- * picture. It is meant to be used when the construction of a picture aborted.
- * Note that the picture will be destroyed even if it is linked !
- *
- * TODO remove it, vout_DropPicture should be used instead
- */
-void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-#ifndef NDEBUG
-    /* Check if picture status is valid */
-    vlc_mutex_lock( &p_vout->p->picture_lock );
-    if( p_pic->i_status != RESERVED_PICTURE )
-    {
-        msg_Err( p_vout, "picture to destroy %p has invalid status %d",
-                         p_pic, p_pic->i_status );
-    }
-    vlc_mutex_unlock( &p_vout->p->picture_lock );
-#endif
-
-    vout_DropPicture( p_vout, p_pic );
-}
-
-/* */
-void vout_UsePictureLocked( vout_thread_t *p_vout, picture_t *p_picture )
-{
-    vlc_assert_locked( &p_vout->p->picture_lock );
-    if( p_picture->i_refcount > 0 )
-    {
-        /* Pretend we displayed the picture, but don't destroy
-         * it since the decoder might still need it. */
-        p_picture->i_status = DISPLAYED_PICTURE;
-    }
-    else
-    {
-        /* Destroy the picture without displaying it */
-        DestroyPicture( p_vout, p_picture );
-    }
+    return p_pic;
 }
 
 /* */
@@ -265,19 +108,19 @@ void vout_DropPicture( vout_thread_t *p_vout, picture_t *p_pic  )
 {
     vlc_mutex_lock( &p_vout->p->picture_lock );
 
-    if( p_pic->i_status == READY_PICTURE )
-    {
-        /* Grr cannot destroy ready picture by myself so be sure vout won't like it */
-        p_pic->date = 1;
-        vlc_cond_signal( &p_vout->p->picture_wait );
-    }
-    else
-    {
-        vout_UsePictureLocked( p_vout, p_pic );
-    }
+    tracep("vout_DropPicture", p_pic);
+    picture_Release( p_pic );
 
+    vlc_cond_signal( &p_vout->p->picture_wait );
     vlc_mutex_unlock( &p_vout->p->picture_lock );
 }
+
+void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    tracep("vout_DestroyPicture", p_pic);
+    vout_DropPicture( p_vout, p_pic );
+}
+
 
 /**
  * Increment reference counter of a picture
@@ -288,7 +131,8 @@ void vout_DropPicture( vout_thread_t *p_vout, picture_t *p_pic  )
 void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->p->picture_lock );
-    p_pic->i_refcount++;
+    tracep("vout_LinkPicture", p_pic);
+    picture_Hold( p_pic );
     vlc_mutex_unlock( &p_vout->p->picture_lock );
 }
 
@@ -300,87 +144,13 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->p->picture_lock );
+    tracep("vout_UnlinkPicture", p_pic);
+    picture_Release( p_pic );
 
-    if( p_pic->i_refcount > 0 )
-        p_pic->i_refcount--;
-    else
-        msg_Err( p_vout, "Invalid picture reference count (%p, %d)",
-                 p_pic, p_pic->i_refcount );
-
-    if( p_pic->i_refcount == 0 &&
-        ( p_pic->i_status == DISPLAYED_PICTURE || p_pic->i_status == RESERVED_PICTURE ) )
-        DestroyPicture( p_vout, p_pic );
-
+    vlc_cond_signal( &p_vout->p->picture_wait );
     vlc_mutex_unlock( &p_vout->p->picture_lock );
 }
 
-/**
- * Render a picture
- *
- * This function chooses whether the current picture needs to be copied
- * before rendering, does the subpicture magic, and tells the video output
- * thread which direct buffer needs to be displayed.
- */
-picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
-                               subpicture_t *p_subpic, mtime_t render_date )
-{
-    if( p_pic == NULL )
-        return NULL;
-
-    if( p_pic->i_type == DIRECT_PICTURE && !p_subpic )
-    {
-        /* No subtitles, picture is in a directbuffer so
-         * we can display it directly (even if it is still
-         * in use or not). */
-        return p_pic;
-    }
-
-    /* It is either because:
-     *  - the picture is not a direct buffer
-     *  - we have to render subtitles (we can never do it on the given
-     *  picture even if not referenced).
-     */
-    picture_t *p_render;
-    if( p_subpic != NULL && PP_OUTPUTPICTURE[0]->b_slow )
-    {
-        /* The picture buffer is in slow memory. We'll use
-         * the "2 * VOUT_MAX_PICTURES + 1" picture as a temporary
-         * one for subpictures rendering. */
-        p_render = &p_vout->p->p_picture[2 * VOUT_MAX_PICTURES];
-        if( p_render->i_status == FREE_PICTURE )
-        {
-            vout_AllocatePicture( VLC_OBJECT(p_vout),
-                                  p_render, p_vout->fmt_out.i_chroma,
-                                  p_vout->fmt_out.i_width,
-                                  p_vout->fmt_out.i_height,
-                                  p_vout->fmt_out.i_sar_num,
-                                  p_vout->fmt_out.i_sar_den );
-            p_render->i_type = MEMORY_PICTURE;
-            p_render->i_status = RESERVED_PICTURE;
-        }
-    }
-    else
-    {
-        /* We can directly render into a direct buffer */
-        p_render = PP_OUTPUTPICTURE[0];
-    }
-
-    /* Copy */
-    picture_Copy( p_render, p_pic );
-
-    /* Render the subtitles if present */
-    if( p_subpic )
-        spu_RenderSubpictures( p_vout->p->p_spu,
-                               p_render, &p_vout->fmt_out,
-                               p_subpic, &p_vout->fmt_in, render_date );
-    /* Copy in case we used a temporary fast buffer */
-    if( p_render != PP_OUTPUTPICTURE[0] )
-        picture_Copy( PP_OUTPUTPICTURE[0], p_render );
-
-    return PP_OUTPUTPICTURE[0];
-}
-
-#undef vout_AllocatePicture
 /**
  * Allocate a new picture in the heap.
  *
@@ -388,13 +158,11 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
  * used exactly like a video buffer. The video output thread then manages
  * how it gets displayed.
  */
-int vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
-                          vlc_fourcc_t i_chroma,
-                          int i_width, int i_height,
-                          int i_sar_num, int i_sar_den )
+static int vout_AllocatePicture( picture_t *p_pic,
+                                 vlc_fourcc_t i_chroma,
+                                 int i_width, int i_height,
+                                 int i_sar_num, int i_sar_den )
 {
-    VLC_UNUSED(p_this);
-
     /* Make sure the real dimensions are a multiple of 16 */
     if( picture_Setup( p_pic, i_chroma, i_width, i_height,
                        i_sar_num, i_sar_den ) != VLC_SUCCESS )
@@ -632,7 +400,7 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     }
     else
     {
-        if( vout_AllocatePicture( (vlc_object_t *)NULL, p_picture,
+        if( vout_AllocatePicture( p_picture,
                                   fmt.i_chroma, fmt.i_width, fmt.i_height,
                                   fmt.i_sar_num, fmt.i_sar_den ) )
         {

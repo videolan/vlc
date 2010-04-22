@@ -30,6 +30,9 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+#include <limits.h>
+
 #include <vlc_common.h>
 #include <vlc_vout.h>
 #include <vlc_block.h>
@@ -38,9 +41,6 @@
 #include "../libvlc.h"
 #include "vout_internal.h"
 #include <vlc_image.h>
-
-#include <assert.h>
-#include <limits.h>
 
 /*****************************************************************************
  * Local prototypes

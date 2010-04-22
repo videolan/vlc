@@ -44,11 +44,17 @@ struct vout_sys_t {
     char           *title;
     vout_display_t *vd;
     bool           use_dr;
+
+    picture_t      *filtered;
 };
 
-struct picture_sys_t {
-    picture_t *direct;
-};
+/* Minimum number of direct pictures the video output will accept without
+ * creating additional pictures in system memory */
+#ifdef OPTIMIZE_MEMORY
+#   define VOUT_MIN_DIRECT_PICTURES        (VOUT_MAX_PICTURES/2)
+#else
+#   define VOUT_MIN_DIRECT_PICTURES        (3*VOUT_MAX_PICTURES/4)
+#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -115,6 +121,7 @@ int vout_OpenWrapper(vout_thread_t *vout, const char *name)
 
     /* */
     vout->p->p_sys = sys;
+    vout->p->decoder_pool = NULL;
 
     return VLC_SUCCESS;
 }
@@ -130,6 +137,8 @@ void vout_CloseWrapper(vout_thread_t *vout)
     var_DelCallback(vout, "direct3d-desktop", Forward, NULL);
     var_DelCallback(vout, "video-wallpaper", Forward, NULL);
 #endif
+    vout->p->decoder_pool = NULL; /* FIXME remove */
+
     vout_DeleteDisplay(sys->vd, NULL);
     free(sys->title);
     free(sys );
@@ -165,6 +174,7 @@ int vout_InitWrapper(vout_thread_t *vout)
         vout->fmt_in.i_y_offset       != source.i_y_offset )
         vout->p->i_changes |= VOUT_CROP_CHANGE;
 
+#warning "vout_InitWrapper: vout_SetWindowState should NOT be called there"
     if (vout->p->b_on_top)
         vout_SetWindowState(vd, VOUT_WINDOW_STATE_ABOVE);
 
@@ -174,52 +184,22 @@ int vout_InitWrapper(vout_thread_t *vout)
      */
     sys->use_dr = !vout_IsDisplayFiltered(vd);
     const bool allow_dr = !vd->info.has_pictures_invalid && sys->use_dr;
-    const int picture_max = allow_dr ? VOUT_MAX_PICTURES : 1;
-    for (vout->p->output.i_pictures = 0;
-            vout->p->output.i_pictures < picture_max;
-                vout->p->output.i_pictures++) {
-        /* Find an empty picture slot */
-        picture_t *picture = NULL;
-        for (int index = 0; index < VOUT_MAX_PICTURES; index++) {
-            if (vout->p->p_picture[index].i_status == FREE_PICTURE) {
-                picture = &vout->p->p_picture[index];
-                break;
-            }
-        }
-        if (!picture)
-            break;
-        memset(picture, 0, sizeof(*picture));
 
-        picture->p_sys = malloc(sizeof(*picture->p_sys));
-
-        if (sys->use_dr) {
-            picture_pool_t *pool = vout_display_Pool(vd, picture_max);
-            if (!pool)
-                break;
-            picture_t *direct = picture_pool_Get(pool);
-            if (!direct)
-                break;
-            picture->format = direct->format;
-            picture->i_planes = direct->i_planes;
-            for (int i = 0; i < direct->i_planes; i++)
-                picture->p[i] = direct->p[i];
-            picture->b_slow = vd->info.is_slow;
-
-            picture->p_sys->direct = direct;
-        } else {
-            vout_AllocatePicture(VLC_OBJECT(vd), picture,
-                                 vd->source.i_chroma,
-                                 vd->source.i_width, vd->source.i_height,
-                                 vd->source.i_sar_num, vd->source.i_sar_den);
-            if (!picture->i_planes)
-                break;
-            picture->p_sys->direct = NULL;
-        }
-        picture->i_status = DESTROYED_PICTURE;
-        picture->i_type    = DIRECT_PICTURE;
-
-        vout->p->output.pp_picture[vout->p->output.i_pictures] = picture;
+    picture_pool_t *display_pool = vout_display_Pool(vd, allow_dr ? VOUT_MAX_PICTURES : 3);
+    if (allow_dr && picture_pool_GetSize(display_pool) >= VOUT_MIN_DIRECT_PICTURES) {
+        vout->p->decoder_pool = display_pool;
+        vout->p->display_pool = display_pool;
+        vout->p->is_decoder_pool_slow = vd->info.is_slow;
+    } else if (!vout->p->decoder_pool) {
+        vout->p->decoder_pool = picture_pool_NewFromFormat(&source, VOUT_MAX_PICTURES);
+        if (sys->use_dr)
+            vout->p->display_pool = display_pool;
+        else
+            vout->p->display_pool = picture_pool_Reserve(vout->p->decoder_pool, 1);;
+        vout->p->is_decoder_pool_slow = false;
     }
+    vout->p->private_pool = picture_pool_Reserve(vout->p->decoder_pool, 3); /* XXX 2 for filter, 1 for SPU */
+    sys->filtered = NULL;
     return VLC_SUCCESS;
 }
 
@@ -230,22 +210,15 @@ void vout_EndWrapper(vout_thread_t *vout)
 {
     vout_sys_t *sys = vout->p->p_sys;
 
-    for (int i = 0; i < VOUT_MAX_PICTURES; i++) {
-        picture_t *picture = &vout->p->p_picture[i];
+    assert(!sys->filtered);
+    if (vout->p->private_pool)
+        picture_pool_Delete(vout->p->private_pool);
 
-        if (picture->i_type != DIRECT_PICTURE)
-            continue;
-
-        if (picture->p_sys->direct)
-            picture_Release(picture->p_sys->direct);
+    if (vout->p->decoder_pool != vout->p->display_pool) {
         if (!sys->use_dr)
-            free(picture->p_data_orig);
-        free(picture->p_sys);
-
-        picture->i_status = FREE_PICTURE;
+            picture_pool_Delete(vout->p->display_pool);
+        picture_pool_Delete(vout->p->decoder_pool);
     }
-    if (sys->use_dr && vout_AreDisplayPicturesInvalid(sys->vd))
-        vout_ManageDisplay(sys->vd, true);
 }
 
 /*****************************************************************************
@@ -333,10 +306,12 @@ int vout_ManageWrapper(vout_thread_t *vout)
 
     }
 
-    if (sys->use_dr && vout_AreDisplayPicturesInvalid(vd)) {
-        vout->p->i_changes |= VOUT_PICTURE_BUFFERS_CHANGE;
-    }
-    vout_ManageDisplay(vd, !sys->use_dr);
+    bool reset_display_pool = sys->use_dr && vout_AreDisplayPicturesInvalid(vd);
+    vout_ManageDisplay(vd, !sys->use_dr || reset_display_pool);
+
+    if (reset_display_pool)
+        vout->p->display_pool = vout_display_Pool(vd, 3);
+
     return VLC_SUCCESS;
 }
 
@@ -348,17 +323,14 @@ void vout_RenderWrapper(vout_thread_t *vout, picture_t *picture)
     vout_sys_t *sys = vout->p->p_sys;
     vout_display_t *vd = sys->vd;
 
-    assert(sys->use_dr || !picture->p_sys->direct);
     assert(vout_IsDisplayFiltered(vd) == !sys->use_dr);
 
     if (sys->use_dr) {
-        assert(picture->p_sys->direct);
-        vout_display_Prepare(vd, picture->p_sys->direct);
+        vout_display_Prepare(vd, picture);
     } else {
-        picture_t *direct = picture->p_sys->direct = vout_FilterDisplay(vd, picture);
-        if (direct) {
-            vout_display_Prepare(vd, direct);
-        }
+        sys->filtered = vout_FilterDisplay(vd, picture);
+        if (sys->filtered)
+            vout_display_Prepare(vd, sys->filtered);
     }
 }
 
@@ -370,25 +342,8 @@ void vout_DisplayWrapper(vout_thread_t *vout, picture_t *picture)
     vout_sys_t *sys = vout->p->p_sys;
     vout_display_t *vd = sys->vd;
 
-    picture_t *direct = picture->p_sys->direct;
-    if (!direct)
-        return;
-
-    /* XXX This is a hack that will work with current vout_display_t modules */
-    if (sys->use_dr)
-        picture_Hold(direct);
-
-     vout_display_Display(vd, direct);
-
-     if (sys->use_dr) {
-         for (int i = 0; i < picture->i_planes; i++) {
-             picture->p[i].p_pixels = direct->p[i].p_pixels;
-             picture->p[i].i_pitch  = direct->p[i].i_pitch;
-             picture->p[i].i_lines  = direct->p[i].i_lines;
-         }
-     } else {
-         picture->p_sys->direct = NULL;
-     }
+     vout_display_Display(vd, sys->filtered ? sys->filtered : picture);
+     sys->filtered = NULL;
 }
 
 static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, const char *title)
