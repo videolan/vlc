@@ -40,7 +40,6 @@
 #define EPG_NAME_SIZE 0.05
 #define EPG_PROGRAM_SIZE 0.03
 
-#define NO_EPG N_( "No EPG found for this program." )
 
 
 static subpicture_region_t * vout_OSDEpgSlider( vout_thread_t *p_vout,
