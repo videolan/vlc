@@ -59,8 +59,8 @@ function parse()
         end
     end
     for index,resolution in ipairs({"480p","720p","1080p"}) do
-        path = string.gsub( path, "r320i.mov","h"..resolution..".mov")
-        table.insert( p, { path=path; name=title.." ("..resolution..")"; arturl=arturl; description=description; options={":http-user-agent=Quicktime/7.2.0 vlc lua edition",":input-fast-seek",":play-and-stop"};} )
+        locationurl = string.gsub( path, "r320i.mov","h"..resolution..".mov")
+        table.insert( p, { path=locationurl ; name=title.." ("..resolution..")"; arturl=arturl; description=description; options={":http-user-agent=Quicktime/7.2.0 vlc lua edition",":input-fast-seek",":play-and-stop"};} )
     end
     return p
 end
