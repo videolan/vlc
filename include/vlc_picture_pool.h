@@ -116,6 +116,11 @@ VLC_EXPORT( void, picture_pool_NonEmpty, ( picture_pool_t *, bool reset ) );
  */
 VLC_EXPORT( picture_pool_t *, picture_pool_Reserve, (picture_pool_t *, int picture_count) );
 
+/**
+ * It returns the size of the given pool.
+ */
+VLC_EXPORT( int, picture_pool_GetSize, (picture_pool_t *) );
+
 
 #endif /* VLC_PICTURE_POOL_H */
 

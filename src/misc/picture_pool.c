@@ -255,6 +255,10 @@ void picture_pool_NonEmpty(picture_pool_t *pool, bool reset)
         old->i_refcount = 0;
     }
 }
+int picture_pool_GetSize(picture_pool_t *pool)
+{
+    return pool->picture_count;
+}
 
 static void Release(picture_t *picture)
 {
