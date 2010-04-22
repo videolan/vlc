@@ -607,7 +607,11 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             /* Do not display the picture */
             p_pic = (picture_t *)p_sys->p_ff_pic->opaque;
             if( !b_drawpicture && p_pic )
+            {
+                if( p_sys->p_ff_pic->opaque )
+                    decoder_LinkPicture( p_dec, p_pic );
                 decoder_DeletePicture( p_dec, p_pic );
+            }
 
             ffmpeg_NextPts( p_dec );
             continue;
@@ -630,6 +634,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         else
         {
             p_pic = (picture_t *)p_sys->p_ff_pic->opaque;
+            decoder_LinkPicture( p_dec, p_pic );
         }
 
         /* Sanity check (seems to be needed for some streams) */
@@ -990,8 +995,6 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_ff_pic->linesize[1] = p_pic->p[1].i_pitch;
     p_ff_pic->linesize[2] = p_pic->p[2].i_pitch;
     p_ff_pic->linesize[3] = 0;
-
-    decoder_LinkPicture( p_dec, p_pic );
 
     /* FIXME what is that, should give good value */
     p_ff_pic->age = 256*256*256*64; // FIXME FIXME from ffmpeg
