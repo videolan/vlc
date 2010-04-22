@@ -443,6 +443,7 @@ static const entry_t p_list_video[] = {
 
     B(VLC_CODEC_VP6F, "On2's VP6.2 Video (Flash)"),
         A("VP6F"),
+        A("FLV4"),
 
     B(VLC_CODEC_VP6A, "On2's VP6 A Video"),
         A("VP6A"),
