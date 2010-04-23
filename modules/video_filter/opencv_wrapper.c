@@ -562,7 +562,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         if ((p_vout->p_sys->p_opencv) && (p_vout->p_sys->p_opencv->p_module))
             p_vout->p_sys->p_opencv->pf_video_filter( p_vout->p_sys->p_opencv, &(p_vout->p_sys->hacked_pic));
         //copy the processed image into the output image
-        if ((p_vout->p_sys->p_proc_image) && (p_vout->p_sys->p_proc_image->p_data))
+        if ((p_vout->p_sys->p_proc_image) && (p_vout->p_sys->p_proc_image->i_planes > 0))
             picture_Copy( p_outpic, p_vout->p_sys->p_proc_image );
     }
 

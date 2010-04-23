@@ -144,15 +144,15 @@ static int vout_AllocatePicture( picture_t *p_pic,
         i_bytes += p->i_pitch * p->i_lines;
     }
 
-    p_pic->p_data = vlc_memalign( &p_pic->p_data_orig, 16, i_bytes );
-    if( p_pic->p_data == NULL )
+    uint8_t *p_data = vlc_memalign( &p_pic->p_data_orig, 16, i_bytes );
+    if( !p_data )
     {
         p_pic->i_planes = 0;
         return VLC_EGENERIC;
     }
 
     /* Fill the p_pixels field for each plane */
-    p_pic->p[0].p_pixels = p_pic->p_data;
+    p_pic->p[0].p_pixels = p_data;
     for( int i = 1; i < p_pic->i_planes; i++ )
     {
         p_pic->p[i].p_pixels = &p_pic->p[i-1].p_pixels[ p_pic->p[i-1].i_lines *
@@ -373,7 +373,6 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     p_picture->format = fmt;
     p_picture->i_refcount = 1;
     p_picture->pf_release = PictureReleaseCallback;
-    p_picture->i_status = RESERVED_PICTURE;
 
     return p_picture;
 }

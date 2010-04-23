@@ -63,11 +63,6 @@ typedef struct picture_release_sys_t picture_release_sys_t;
 
 /**
  * Video picture
- *
- * Any picture destined to be displayed by a video output thread should be
- * stored in this structure from it's creation to it's effective display.
- * Picture type and flags should only be modified by the output thread. Note
- * that an empty picture MUST have its flags set to 0.
  */
 struct picture_t
 {
@@ -76,21 +71,9 @@ struct picture_t
      */
     video_frame_format_t format;
 
-    /** Picture data - data can always be freely modified, but p_data may
-     * NEVER be modified. A direct buffer can be handled as the plugin
-     * wishes, it can even swap p_pixels buffers. */
-    uint8_t        *p_data;
     void           *p_data_orig;                /**< pointer before memalign */
     plane_t         p[PICTURE_PLANE_MAX];     /**< description of the planes */
     int             i_planes;                /**< number of allocated planes */
-
-    /** \name Type and flags
-     * Should NOT be modified except by the vout thread
-     * @{*/
-    int             i_status;                             /**< picture flags */
-    int             i_type;                /**< is picture a direct buffer ? */
-    bool            b_slow;                 /**< is picture in slow memory ? */
-    /**@}*/
 
     /** \name Picture management properties
      * These properties can be modified using the video output thread API,
@@ -299,25 +282,6 @@ VLC_EXPORT( int, picture_Setup, ( picture_t *, vlc_fourcc_t i_chroma, int i_widt
 /*****************************************************************************
  * Flags used to describe the status of a picture
  *****************************************************************************/
-
-/* Picture type
- * FIXME are the values meaningfull ? */
-enum
-{
-    EMPTY_PICTURE = 0,                             /* empty buffer */
-    MEMORY_PICTURE = 100,                 /* heap-allocated buffer */
-    DIRECT_PICTURE = 200,                         /* direct buffer */
-};
-
-/* Picture status */
-enum
-{
-    FREE_PICTURE,                              /* free and not allocated */
-    RESERVED_PICTURE,                          /* allocated and reserved */
-    READY_PICTURE,                                  /* ready for display */
-    DISPLAYED_PICTURE,                   /* been displayed but is linked */
-    DESTROYED_PICTURE,                     /* allocated but no more used */
-};
 
 /* Quantification type */
 enum
