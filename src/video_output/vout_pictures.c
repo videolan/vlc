@@ -70,12 +70,6 @@ void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
  * It needs locking since several pictures can be created by several producers
  * threads.
  */
-int vout_CountPictureAvailable( vout_thread_t *p_vout )
-{
-#warning "TODO remove vout_CountPictureAvailable"
-    return VOUT_MAX_PICTURES;
-}
-
 picture_t *vout_CreatePicture( vout_thread_t *p_vout,
                                bool b_progressive,
                                bool b_top_field_first,

@@ -30,9 +30,6 @@
 #ifndef _VOUT_CONTROL_H
 #define _VOUT_CONTROL_H 1
 
-/* DO NOT use vout_CountPictureAvailable unless your are in src/input/decoder.c (no exception) */
-int vout_CountPictureAvailable( vout_thread_t * );
-
 /**
  * This function will (un)pause the display of pictures.
  * It is thread safe
