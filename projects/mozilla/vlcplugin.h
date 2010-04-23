@@ -41,11 +41,6 @@
 #define MOZ_X11 1
 #endif
 
-#include <npapi.h>
-#include <vector>
-
-#include "control/nporuntime.h"
-
 #if !defined(XP_MACOSX) && !defined(XP_UNIX) && !defined(XP_WIN)
 #define XP_UNIX 1
 #elif defined(XP_MACOSX)
@@ -54,8 +49,8 @@
 
 #ifdef XP_WIN
     /* Windows stuff */
-#   include <winbase.h>
 #   include <windows.h>
+#   include <winbase.h>
 #endif
 
 #ifdef XP_MACOSX
@@ -82,6 +77,12 @@
 #ifndef __MIN
 #   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
+
+#include <npapi.h>
+#include <vector>
+
+#include "control/nporuntime.h"
+
 
 typedef struct {
 #if defined(XP_UNIX)

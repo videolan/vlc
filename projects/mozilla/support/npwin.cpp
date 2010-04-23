@@ -30,6 +30,8 @@
 
 //#define OJI 1
 
+#include "../vlcplugin.h"
+
 #ifndef _NPAPI_H_
 #   include "npapi.h"
 #endif
