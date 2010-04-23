@@ -838,15 +838,6 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
         vout->p->displayed.decoded = decoded;
 
         /* */
-#warning "TODO interlace+postproc"
-#if 0
-        const int postproc_type = vout->p->i_picture_qtype;
-        const int postproc_state = (vout->p->i_picture_qtype != QTYPE_NONE) - (picture_qtype_last != QTYPE_NONE);
-
-        const bool is_picture_interlaced = p_vout->p->b_picture_interlaced;
-        const int  picture_interlaced_state = (!!p_vout->p->b_picture_interlaced) - (!!b_picture_interlaced_last);
-#endif
-
         vout_chrono_Start(&vout->p->render);
 
         picture_t *filtered = NULL;
