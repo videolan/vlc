@@ -60,7 +60,7 @@ picture_t *vout_GetPicture( vout_thread_t *p_vout )
     picture_t *p_pic = picture_pool_Get(p_vout->p->decoder_pool);
     if (p_pic) {
         picture_Reset(p_pic);
-        p_pic->p_next = NULL; // FIXME put it in picture_Reset ?
+        p_pic->p_next = NULL;
     }
     vlc_mutex_unlock( &p_vout->p->picture_lock );
 
