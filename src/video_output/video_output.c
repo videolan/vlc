@@ -567,17 +567,21 @@ void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_l
                              pi_displayed, pi_lost );
 }
 
-static void Flush(vout_thread_t *vout, mtime_t date, bool below)
+static void Flush(vout_thread_t *vout, mtime_t date, bool reset, bool below)
 {
     vlc_assert_locked(&vout->p->picture_lock);
     vout->p->step.timestamp = VLC_TS_INVALID;
     vout->p->step.last      = VLC_TS_INVALID;
 
     picture_t *last = vout->p->displayed.decoded;
-    if (last &&
-        (( below  && last->date <= date) ||
-          (!below && last->date >= date))) {
-        vout->p->step.is_requested = true;
+    if (last) {
+        if (reset) {
+            picture_Release(last);
+            vout->p->displayed.decoded = NULL;
+        } else if (( below  && last->date <= date) ||
+                   (!below && last->date >= date)) {
+            vout->p->step.is_requested = true;
+        }
     }
     picture_fifo_Flush( vout->p->decoder_fifo, date, below );
 }
@@ -586,7 +590,7 @@ void vout_Flush(vout_thread_t *vout, mtime_t date)
 {
     vlc_mutex_lock(&vout->p->picture_lock);
 
-    Flush(vout, date, false);
+    Flush(vout, date, false, false);
 
     vlc_cond_signal(&vout->p->picture_wait);
     vlc_mutex_unlock(&vout->p->picture_lock);
@@ -596,7 +600,7 @@ void vout_Reset(vout_thread_t *vout)
 {
     vlc_mutex_lock(&vout->p->picture_lock);
 
-    Flush(vout, INT64_MAX, true);
+    Flush(vout, INT64_MAX, true, true);
     if (vout->p->decoder_pool)
         picture_pool_NonEmpty(vout->p->decoder_pool, true);
     vout->p->pause.is_on = false;
