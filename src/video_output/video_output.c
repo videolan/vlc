@@ -592,25 +592,22 @@ void vout_Flush(vout_thread_t *vout, mtime_t date)
     vlc_mutex_unlock(&vout->p->picture_lock);
 }
 
-static void vout_Reset(vout_thread_t *vout)
+void vout_Reset(vout_thread_t *vout)
 {
-#warning "TODO reset pause in vout_Reset"
     vlc_mutex_lock(&vout->p->picture_lock);
+
     Flush(vout, INT64_MAX, true);
     if (vout->p->decoder_pool)
         picture_pool_NonEmpty(vout->p->decoder_pool, true);
+    vout->p->pause.is_on = false;
+    vout->p->pause.date  = mdate();
+
     vlc_cond_signal( &vout->p->picture_wait );
     vlc_mutex_unlock(&vout->p->picture_lock);
 }
 
-void vout_FixLeaks( vout_thread_t *vout, bool b_forced )
+void vout_FixLeaks( vout_thread_t *vout )
 {
-#warning "TODO split vout_FixLeaks into vout_FixLeaks and vout_Reset"
-    if (b_forced) {
-        vout_Reset(vout);
-        return;
-    }
-
     vlc_mutex_lock(&vout->p->picture_lock);
 
     picture_t *picture = picture_fifo_Peek(vout->p->decoder_fifo);

@@ -2068,9 +2068,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     {
         /* Hack to make sure all the the pictures are freed by the decoder
          * and that the vout is not paused anymore */
-        vout_FixLeaks( p_owner->p_vout, true );
-        if( p_owner->b_paused )
-            vout_ChangePause( p_owner->p_vout, false, mdate() );
+        vout_Reset( p_owner->p_vout );
 
         /* */
         input_resource_RequestVout( p_owner->p_input->p->p_resource, p_owner->p_vout, NULL, true );
@@ -2379,7 +2377,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         DecoderSignalBuffering( p_dec, true );
 
         /* Check the decoder doesn't leak pictures */
-        vout_FixLeaks( p_owner->p_vout, false );
+        vout_FixLeaks( p_owner->p_vout );
 
         /* FIXME add a vout_WaitPictureAvailable (timedwait) */
         msleep( VOUT_OUTMEM_SLEEP );

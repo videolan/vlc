@@ -61,7 +61,12 @@ void vout_Flush( vout_thread_t *p_vout, mtime_t i_date );
  *
  * XXX This function is there to workaround bugs in decoder
  */
-void vout_FixLeaks( vout_thread_t *p_vout, bool b_forced );
+void vout_FixLeaks( vout_thread_t *p_vout );
+
+/*
+ * Reset the states of the vout.
+ */
+void vout_Reset( vout_thread_t *p_vout );
 
 /**
  * This functions will drop a picture retreived by vout_CreatePicture.
