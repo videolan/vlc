@@ -44,12 +44,6 @@
 #include "vout_pictures.h"
 #include "vout_internal.h"
 
-static void tracep(const char *msg, picture_t *picture)
-{
-//fprintf(stderr, "########## %s === picture=%p::%d\n", msg,
-//                picture, picture ? picture->i_refcount : -1);
-}
-
 /**
  * Display a picture
  *
@@ -59,8 +53,6 @@ static void tracep(const char *msg, picture_t *picture)
 void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->p->picture_lock );
-
-    tracep("vout_DisplayPicture", p_pic);
 
     p_pic->p_next = NULL;
     picture_fifo_Push(p_vout->p->decoder_fifo, p_pic);
@@ -97,7 +89,6 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
         picture_Reset(p_pic);
         p_pic->p_next = NULL; // FIXME put it in picture_Reset ?
     }
-    tracep("vout_CreatePicture", p_pic);
     vlc_mutex_unlock( &p_vout->p->picture_lock );
 
     return p_pic;
@@ -108,7 +99,6 @@ void vout_DropPicture( vout_thread_t *p_vout, picture_t *p_pic  )
 {
     vlc_mutex_lock( &p_vout->p->picture_lock );
 
-    tracep("vout_DropPicture", p_pic);
     picture_Release( p_pic );
 
     vlc_cond_signal( &p_vout->p->picture_wait );
@@ -117,7 +107,6 @@ void vout_DropPicture( vout_thread_t *p_vout, picture_t *p_pic  )
 
 void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    tracep("vout_DestroyPicture", p_pic);
     vout_DropPicture( p_vout, p_pic );
 }
 
@@ -131,7 +120,6 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->p->picture_lock );
-    tracep("vout_LinkPicture", p_pic);
     picture_Hold( p_pic );
     vlc_mutex_unlock( &p_vout->p->picture_lock );
 }
@@ -144,7 +132,6 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->p->picture_lock );
-    tracep("vout_UnlinkPicture", p_pic);
     picture_Release( p_pic );
 
     vlc_cond_signal( &p_vout->p->picture_wait );

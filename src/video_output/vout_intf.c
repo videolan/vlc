@@ -175,12 +175,12 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "mouse-hide-timeout",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
-    p_vout->p->b_title_show = var_CreateGetBool( p_vout, "video-title-show" );
-    p_vout->p->i_title_timeout =
-        (mtime_t)var_CreateGetInteger( p_vout, "video-title-timeout" );
-    p_vout->p->i_title_position =
-        var_CreateGetInteger( p_vout, "video-title-position" );
-    p_vout->p->psz_title =  NULL;
+    p_vout->p->title.show = var_CreateGetBool( p_vout, "video-title-show" );
+    p_vout->p->title.timeout = var_CreateGetInteger( p_vout,
+                                                     "video-title-timeout" );
+    p_vout->p->title.position = var_CreateGetInteger( p_vout,
+                                                      "video-title-position" );
+    p_vout->p->title.value =  NULL;
 
     var_AddCallback( p_vout, "video-title-show", TitleShowCallback, NULL );
     var_AddCallback( p_vout, "video-title-timeout", TitleTimeoutCallback, NULL );
@@ -923,7 +923,7 @@ static int TitleShowCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     VLC_UNUSED(p_data);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    p_vout->p->b_title_show = newval.b_bool;
+    p_vout->p->title.show = newval.b_bool;
     return VLC_SUCCESS;
 }
 
@@ -932,7 +932,7 @@ static int TitleTimeoutCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    p_vout->p->i_title_timeout = (mtime_t) newval.i_int;
+    p_vout->p->title.timeout = (mtime_t) newval.i_int;
     return VLC_SUCCESS;
 }
 
@@ -942,6 +942,6 @@ static int TitlePositionCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     VLC_UNUSED(p_data);
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    p_vout->p->i_title_position = newval.i_int;
+    p_vout->p->title.position = newval.i_int;
     return VLC_SUCCESS;
 }

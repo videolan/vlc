@@ -66,17 +66,30 @@ struct vout_thread_sys_t
     bool            b_picture_empty;
     vlc_cond_t      picture_wait;
     struct {
-        mtime_t     clock;
-        mtime_t     timestampX;
+        mtime_t     date;
+        mtime_t     timestamp;
         int         qtype;
         bool        is_interlaced;
         picture_t   *decoded;
     } displayed;
+
     struct {
         bool        is_requested;
         mtime_t     last;
         mtime_t     timestamp;
     } step;
+
+    struct {
+        bool        is_on;
+        mtime_t     date;
+    } pause;
+
+    struct {
+        bool        show;
+        mtime_t     timeout;
+        int         position;
+        char        *value;
+    } title;
 
     /* */
     vlc_mutex_t     vfilter_lock;         /**< video filter2 lock */
@@ -89,10 +102,6 @@ struct vout_thread_sys_t
     /* Statistics */
     vout_statistic_t statistic;
 
-    /* Pause */
-    bool            b_paused;
-    mtime_t         i_pause_date;
-
     /* Filter chain */
     bool           b_first_vout;  /* True if it is the first vout of the filter chain */
     char           *psz_filter_chain;
@@ -104,13 +113,6 @@ struct vout_thread_sys_t
 
     /* Snapshot interface */
     vout_snapshot_t snapshot;
-
-    /* Show media title on videoutput */
-    bool            b_title_show;
-    mtime_t         i_title_timeout;
-    int             i_title_position;
-
-    char            *psz_title;
 
     /* Subpicture unit */
     spu_t          *p_spu;
@@ -157,12 +159,6 @@ struct vout_thread_sys_t
 
 /* */
 void vout_IntfInit( vout_thread_t * );
-
-/* DO NOT use vout_UsePictureLocked unless you are in src/video_ouput
- *
- * This function supposes that you call it with picture_lock taken.
- */
-void vout_UsePictureLocked( vout_thread_t *p_vout, picture_t *p_pic  );
 
 /* */
 int  vout_OpenWrapper (vout_thread_t *, const char *);

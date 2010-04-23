@@ -160,6 +160,13 @@ int vout_InitWrapper(vout_thread_t *vout)
     vout->fmt_out.i_visible_width  = source.i_width;
     vout->fmt_out.i_height         =
     vout->fmt_out.i_visible_height = source.i_height;
+    if (source.i_sar_num > 0 && source.i_sar_den > 0) {
+        vlc_ureduce(&vout->fmt_out.i_sar_num, &vout->fmt_out.i_sar_den,
+                    source.i_sar_num, source.i_sar_den, 0);
+    } else {
+        vout->fmt_out.i_sar_num    = 1;
+        vout->fmt_out.i_sar_den    = 1;
+    }
     vout->fmt_out.i_sar_num        = source.i_sar_num;
     vout->fmt_out.i_sar_den        = source.i_sar_den;
     vout->fmt_out.i_x_offset       = 0;
@@ -167,6 +174,7 @@ int vout_InitWrapper(vout_thread_t *vout)
     vout->fmt_out.i_rmask          = source.i_rmask;
     vout->fmt_out.i_gmask          = source.i_gmask;
     vout->fmt_out.i_bmask          = source.i_bmask;
+    video_format_FixRgb(&vout->fmt_out);
 
     if (vout->fmt_in.i_visible_width  != source.i_visible_width ||
         vout->fmt_in.i_visible_height != source.i_visible_height ||
