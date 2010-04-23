@@ -161,11 +161,11 @@ VLC_EXPORT( int, vout_GetSnapshot, ( vout_thread_t *p_vout,
                                      const char *psz_format, mtime_t i_timeout ) );
 
 /* */
-VLC_EXPORT( picture_t *,     vout_CreatePicture,  ( vout_thread_t *, bool, bool, unsigned int ) );
-VLC_EXPORT( void,            vout_DestroyPicture, ( vout_thread_t *, picture_t * ) );
-VLC_EXPORT( void,            vout_DisplayPicture, ( vout_thread_t *, picture_t * ) );
-VLC_EXPORT( void,            vout_LinkPicture,    ( vout_thread_t *, picture_t * ) );
-VLC_EXPORT( void,            vout_UnlinkPicture,  ( vout_thread_t *, picture_t * ) );
+VLC_EXPORT( picture_t *,     vout_GetPicture,     ( vout_thread_t * ) );
+VLC_EXPORT( void,            vout_PutPicture,     ( vout_thread_t *, picture_t * ) );
+
+VLC_EXPORT( void,            vout_HoldPicture,    ( vout_thread_t *, picture_t * ) );
+VLC_EXPORT( void,            vout_ReleasePicture, ( vout_thread_t *, picture_t * ) );
 
 /**
  * Return the spu_t object associated to a vout_thread_t.

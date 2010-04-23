@@ -45,37 +45,16 @@
 #include "vout_internal.h"
 
 /**
- * Display a picture
+ * It retreives a picture from the vout or NULL if no pictures are
+ * available yet.
  *
- * Remove the reservation flag of a picture, which will cause it to be ready
- * for display.
- */
-void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    vlc_mutex_lock( &p_vout->p->picture_lock );
-
-    p_pic->p_next = NULL;
-    picture_fifo_Push(p_vout->p->decoder_fifo, p_pic);
-
-    vlc_cond_signal( &p_vout->p->picture_wait );
-    vlc_mutex_unlock( &p_vout->p->picture_lock );
-}
-
-/**
- * Allocate a picture in the video output heap.
+ * You MUST call vout_PutPicture or vout_ReleasePicture on it.
  *
- * This function creates a reserved image in the video output heap.
- * A null pointer is returned if the function fails. This method provides an
- * already allocated zone of memory in the picture data fields.
- * It needs locking since several pictures can be created by several producers
- * threads.
+ * You may use vout_HoldPicture(paired with vout_ReleasePicture) to keep a
+ * read-only reference.
  */
-picture_t *vout_CreatePicture( vout_thread_t *p_vout,
-                               bool b_progressive,
-                               bool b_top_field_first,
-                               unsigned int i_nb_fields )
+picture_t *vout_GetPicture( vout_thread_t *p_vout )
 {
-#warning "TODO remove unused vout_CreatePicture parameters"
     /* Get lock */
     vlc_mutex_lock( &p_vout->p->picture_lock );
     picture_t *p_pic = picture_pool_Get(p_vout->p->decoder_pool);
@@ -88,8 +67,29 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
     return p_pic;
 }
 
-/* */
-void vout_DropPicture( vout_thread_t *p_vout, picture_t *p_pic  )
+/**
+ * It gives to the vout a picture to be displayed.
+ *
+ * The given picture MUST comes from vout_GetPicture.
+ *
+ * Becareful, after vout_PutPicture is called, picture_t::p_next cannot be
+ * read/used.
+ */
+void vout_PutPicture( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    vlc_mutex_lock( &p_vout->p->picture_lock );
+
+    p_pic->p_next = NULL;
+    picture_fifo_Push(p_vout->p->decoder_fifo, p_pic);
+
+    vlc_cond_signal( &p_vout->p->picture_wait );
+    vlc_mutex_unlock( &p_vout->p->picture_lock );
+}
+
+/**
+ * It releases a picture retreived by vout_GetPicture.
+ */
+void vout_ReleasePicture( vout_thread_t *p_vout, picture_t *p_pic  )
 {
     vlc_mutex_lock( &p_vout->p->picture_lock );
 
@@ -99,36 +99,16 @@ void vout_DropPicture( vout_thread_t *p_vout, picture_t *p_pic  )
     vlc_mutex_unlock( &p_vout->p->picture_lock );
 }
 
-void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    vout_DropPicture( p_vout, p_pic );
-}
-
-
 /**
- * Increment reference counter of a picture
- *
- * This function increments the reference counter of a picture in the video
- * heap. It needs a lock since several producer threads can access the picture.
+ * It increment the reference counter of a picture retreived by
+ * vout_GetPicture.
  */
-void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
+void vout_HoldPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->p->picture_lock );
+
     picture_Hold( p_pic );
-    vlc_mutex_unlock( &p_vout->p->picture_lock );
-}
 
-/**
- * Decrement reference counter of a picture
- *
- * This function decrement the reference counter of a picture in the video heap
- */
-void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    vlc_mutex_lock( &p_vout->p->picture_lock );
-    picture_Release( p_pic );
-
-    vlc_cond_signal( &p_vout->p->picture_wait );
     vlc_mutex_unlock( &p_vout->p->picture_lock );
 }
 

@@ -609,13 +609,13 @@ vlm_MessageSimpleNew
 vlm_New
 vout_Close
 vout_Create
-vout_CreatePicture
-vout_DestroyPicture
-vout_DisplayPicture
+vout_GetPicture
+vout_PutPicture
+vout_HoldPicture
+vout_ReleasePicture
 vout_EnableFilter
 vout_GetSnapshot
 vout_GetSpu
-vout_LinkPicture
 vout_OSDIcon
 vout_OSDMessage
 vout_OSDEpg
@@ -623,7 +623,6 @@ vout_OSDSlider
 vout_Request
 vout_ShowTextAbsolute
 vout_ShowTextRelative
-vout_UnlinkPicture
 vout_window_New
 vout_window_Control
 vout_window_Delete

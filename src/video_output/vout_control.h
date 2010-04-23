@@ -66,11 +66,6 @@ void vout_FixLeaks( vout_thread_t *p_vout );
 void vout_Reset( vout_thread_t *p_vout );
 
 /**
- * This functions will drop a picture retreived by vout_CreatePicture.
- */
-void vout_DropPicture( vout_thread_t *p_vout, picture_t * );
-
-/**
  * This function will force to display the next picture while paused
  */
 void vout_NextPicture( vout_thread_t *p_vout, mtime_t *pi_duration );

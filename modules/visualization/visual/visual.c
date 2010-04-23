@@ -336,7 +336,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     int i;
 
     /* First, get a new picture */
-    while( ( p_outpic = vout_CreatePicture( p_sys->p_vout, 0, 0, 3 ) ) == NULL)
+    while( ( p_outpic = vout_GetPicture( p_sys->p_vout ) ) == NULL)
     {   /* XXX: This looks like a bad idea. Don't run to me for sympathy if it
          * dead locks... */
         if( !vlc_object_alive (p_sys->p_vout) )
@@ -365,7 +365,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 
     p_outpic->date = p_in_buf->i_pts + (p_in_buf->i_length / 2);
 
-    vout_DisplayPicture( p_sys->p_vout, p_outpic );
+    vout_PutPicture( p_sys->p_vout, p_outpic );
     return p_in_buf;
 }
 

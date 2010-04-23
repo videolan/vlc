@@ -353,7 +353,7 @@ static void* Thread( vlc_object_t *p_this )
         free( p_thread->psz_title );
         p_thread->psz_title = NULL;
 
-        while( !( p_pic = vout_CreatePicture( p_thread->p_vout, 0, 0, 0 ) ) &&
+        while( !( p_pic = vout_GetPicture( p_thread->p_vout ) ) &&
                vlc_object_alive (p_thread) )
         {
             msleep( VOUT_OUTMEM_SLEEP );
@@ -364,7 +364,7 @@ static void* Thread( vlc_object_t *p_this )
         memcpy( p_pic->p[0].p_pixels, plane, width * height * 4 );
 
         p_pic->date = date_Get( &i_pts ) + GOOM_DELAY;
-        vout_DisplayPicture( p_thread->p_vout, p_pic );
+        vout_PutPicture( p_thread->p_vout, p_pic );
     }
 
     goom_close( p_plugin_info );

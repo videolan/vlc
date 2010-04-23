@@ -1339,10 +1339,10 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     {
         msg_Warn( p_vout, "non-dated video buffer received" );
         *pi_lost_sum += 1;
-        vout_DropPicture( p_vout, p_picture );
+        vout_ReleasePicture( p_vout, p_picture );
         return;
     }
-    vout_LinkPicture( p_vout, p_picture );
+    vout_HoldPicture( p_vout, p_picture );
 
     /* */
     vlc_mutex_lock( &p_owner->lock );
@@ -1421,8 +1421,8 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
                 vout_Flush( p_vout, p_picture->date );
                 p_owner->i_last_rate = i_rate;
             }
-            vout_DisplayPicture( p_vout, p_picture );
-            vout_UnlinkPicture( p_vout, p_picture );
+            vout_PutPicture( p_vout, p_picture );
+            vout_ReleasePicture( p_vout, p_picture );
         }
         else
         {
@@ -1432,8 +1432,8 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
                 msg_Warn( p_vout, "non-dated video buffer received" );
 
             *pi_lost_sum += 1;
-            vout_UnlinkPicture( p_vout, p_picture );
-            vout_DropPicture( p_vout, p_picture );
+            vout_ReleasePicture( p_vout, p_picture );
+            vout_ReleasePicture( p_vout, p_picture );
         }
         int i_tmp_display;
         int i_tmp_lost;
@@ -1469,7 +1469,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
         if( p_dec->b_die )
         {
             /* It prevent freezing VLC in case of broken decoder */
-            vout_DropPicture( p_vout, p_pic );
+            vout_ReleasePicture( p_vout, p_pic );
             if( p_block )
                 block_Release( p_block );
             break;
@@ -1479,7 +1479,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 
         if( p_owner->i_preroll_end > VLC_TS_INVALID && p_pic->date < p_owner->i_preroll_end )
         {
-            vout_DropPicture( p_vout, p_pic );
+            vout_ReleasePicture( p_vout, p_pic );
             continue;
         }
 
@@ -1687,8 +1687,8 @@ static void DecoderFlushBuffering( decoder_t *p_dec )
 
         if( p_owner->p_vout )
         {
-            vout_UnlinkPicture( p_owner->p_vout, p_picture );
-            vout_DropPicture( p_owner->p_vout, p_picture );
+            vout_ReleasePicture( p_owner->p_vout, p_picture );
+            vout_ReleasePicture( p_owner->p_vout, p_picture );
         }
 
         if( !p_owner->buffer.p_picture )
@@ -2353,7 +2353,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         if( p_dec->b_die || p_dec->b_error )
             return NULL;
 
-        picture_t *p_picture = vout_CreatePicture( p_owner->p_vout, 0, 0, 0 );
+        picture_t *p_picture = vout_GetPicture( p_owner->p_vout );
         if( p_picture )
             return p_picture;
 
@@ -2373,17 +2373,17 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
 static void vout_del_buffer( decoder_t *p_dec, picture_t *p_pic )
 {
-    vout_DropPicture( p_dec->p_owner->p_vout, p_pic );
+    vout_ReleasePicture( p_dec->p_owner->p_vout, p_pic );
 }
 
 static void vout_link_picture( decoder_t *p_dec, picture_t *p_pic )
 {
-    vout_LinkPicture( p_dec->p_owner->p_vout, p_pic );
+    vout_HoldPicture( p_dec->p_owner->p_vout, p_pic );
 }
 
 static void vout_unlink_picture( decoder_t *p_dec, picture_t *p_pic )
 {
-    vout_UnlinkPicture( p_dec->p_owner->p_vout, p_pic );
+    vout_ReleasePicture( p_dec->p_owner->p_vout, p_pic );
 }
 
 static subpicture_t *spu_new_buffer( decoder_t *p_dec )
