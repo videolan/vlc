@@ -605,14 +605,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         if( !b_drawpicture || ( !p_sys->p_va && !p_sys->p_ff_pic->linesize[0] ) )
         {
             /* Do not display the picture */
-            p_pic = (picture_t *)p_sys->p_ff_pic->opaque;
-            if( !b_drawpicture && p_pic )
-            {
-                if( p_sys->p_ff_pic->opaque )
-                    decoder_LinkPicture( p_dec, p_pic );
-                decoder_DeletePicture( p_dec, p_pic );
-            }
-
             ffmpeg_NextPts( p_dec );
             continue;
         }
