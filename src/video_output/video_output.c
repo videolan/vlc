@@ -299,7 +299,6 @@ vout_thread_t * (vout_Create)( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->p->b_filter_change = 0;
     p_vout->p->i_par_num =
     p_vout->p->i_par_den = 1;
-    p_vout->p->is_late_dropped = var_InheritBool( p_vout, "drop-late-frames" );
     p_vout->p->b_picture_empty = false;
     p_vout->p->displayed.date = VLC_TS_INVALID;
     p_vout->p->displayed.decoded = NULL;
@@ -344,6 +343,8 @@ vout_thread_t * (vout_Create)( vlc_object_t *p_parent, video_format_t *p_fmt )
     spu_Init( p_vout->p->p_spu );
 
     spu_Attach( p_vout->p->p_spu, VLC_OBJECT(p_vout), true );
+
+    p_vout->p->is_late_dropped = var_InheritBool( p_vout, "drop-late-frames" );
 
     /* Take care of some "interface/control" related initialisations */
     vout_IntfInit( p_vout );
