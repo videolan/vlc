@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: it\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-04-23 00:50+0100\n"
-"PO-Revision-Date: 2010-04-17 10:57+0100\n"
+"POT-Creation-Date: 2010-04-24 23:21+0100\n"
+"PO-Revision-Date: 2010-04-24 11:19+0200\n"
 "Last-Translator: Vincenzo Reale <smart2128@baslug.org>\n"
 "Language-Team: Italian <kde-i18n-it@kde.org>\n"
 "MIME-Version: 1.0\n"
@@ -98,7 +98,7 @@ msgid "General audio settings"
 msgstr "Impostazioni generali audio"
 
 #: include/vlc_config_cat.h:57 include/vlc_config_cat.h:79
-#: src/video_output/video_output.c:448
+#: src/video_output/video_output.c:411
 msgid "Filters"
 msgstr "Filtri"
 
@@ -186,28 +186,25 @@ msgid "Access modules"
 msgstr "Moduli di accesso"
 
 #: include/vlc_config_cat.h:99
-#, fuzzy
 msgid ""
 "Settings related to the various access methods. Common settings you may want "
 "to alter are HTTP proxy or caching settings."
 msgstr ""
-"Impostazioni relative ai diversi metodi di accesso utilizzati da VLC. Le "
-"impostazioni più comuni che potresti voler modificare sono il proxy HTTP e "
-"le impostazioni di cache."
+"Impostazioni relative ai diversi metodi di accesso. Le impostazioni più "
+"comuni che potresti voler modificare sono il proxy HTTP e le impostazioni di "
+"cache."
 
 #: include/vlc_config_cat.h:103
 msgid "Stream filters"
 msgstr "Filtri di flusso"
 
 #: include/vlc_config_cat.h:105
-#, fuzzy
 msgid ""
 "Stream filters are special modules that allow advanced operations on the "
 "input side of VLC. Use with care..."
 msgstr ""
 "I filtri di flusso sono moduli speciali che permettono operazioni avanzate "
-"dal lato degli ingressi di VLC. Non dovresti modificare nulla, se non sai "
-"esattamente cosa stai facendo."
+"dal lato degli ingressi di VLC. Usare con cautela..."
 
 #: include/vlc_config_cat.h:108
 msgid "Demuxers"
@@ -486,7 +483,6 @@ msgid "There is no help available for these modules."
 msgstr "La guida per questi moduli non è disponibile."
 
 #: include/vlc_interface.h:126
-#, fuzzy
 msgid ""
 "\n"
 "Warning: if you can't access the GUI anymore, open a command-line window, go "
@@ -494,7 +490,7 @@ msgid ""
 msgstr ""
 "\n"
 "Attenzione: se l'interfaccia grafica non è più accessibile, apri una "
-"finestra a linea di comando, vai nella cartella in cui hai installato VLC ed "
+"finestra a riga di comando, vai nella cartella in cui hai installato VLC ed "
 "esegui \"vlc -I qt\"\n"
 
 #: include/vlc_intf_strings.h:46
@@ -817,7 +813,7 @@ msgstr "Il numero massimo di filtri (%d) è stato raggiunto."
 
 #: src/audio_output/input.c:110 src/audio_output/input.c:156
 #: src/input/es_out.c:931 src/libvlc-module.c:653
-#: src/video_output/video_output.c:1425 modules/video_filter/postproc.c:230
+#: src/video_output/video_output.c:1204 modules/video_filter/postproc.c:230
 msgid "Disable"
 msgstr "Disabilita"
 
@@ -949,9 +945,9 @@ msgid "Streaming / Transcoding failed"
 msgstr "Trasmissione / Transcodifica non riuscita"
 
 #: src/input/decoder.c:279
-#, fuzzy, c-format
+#, c-format
 msgid "VLC could not open the %s module."
-msgstr "VLC non è in grado di aprire il modulo di decodifica."
+msgstr "VLC non è in grado di aprire il modulo %s."
 
 #: src/input/decoder.c:431
 msgid "VLC could not open the decoder module."
@@ -1392,22 +1388,22 @@ msgstr ""
 "Nessun modulo corrispondente trovato. Usa --list o--list-verbose per "
 "elencare i moduli disponibili."
 
-#: src/libvlc.c:1909
+#: src/libvlc.c:1908
 #, c-format
 msgid "VLC version %s (%s)\n"
 msgstr "VLC versione %s (%s)\n"
 
-#: src/libvlc.c:1911
+#: src/libvlc.c:1910
 #, c-format
 msgid "Compiled by %s on %s (%s)\n"
 msgstr "Compilato da %s su %s (%s)\n"
 
-#: src/libvlc.c:1913
+#: src/libvlc.c:1912
 #, c-format
 msgid "Compiler: %s\n"
 msgstr "Compilatore: %s\n"
 
-#: src/libvlc.c:1948
+#: src/libvlc.c:1947
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
@@ -1415,7 +1411,7 @@ msgstr ""
 "\n"
 "contenuto copiato nel file vlc-help.txt.\n"
 
-#: src/libvlc.c:1968
+#: src/libvlc.c:1967
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -1798,15 +1794,17 @@ msgid "Protect against sound clipping"
 msgstr ""
 
 #: src/libvlc-module.c:347
-#, fuzzy
 msgid "Enable time streching audio"
-msgstr "Abilita audio"
+msgstr "Abilita manipolazione temporale dell'audio"
 
 #: src/libvlc-module.c:349
+#, fuzzy
 msgid ""
 "This allows to play audio at lower or higher speed without affecting the "
 "audio pitch"
 msgstr ""
+"Consente di riprodurre audio a velocità più bassa o più alta senza "
+"interessare"
 
 #: src/libvlc-module.c:356 modules/access/dshow/dshow.cpp:82
 #: modules/access/dshow/dshow.cpp:84 modules/codec/avcodec/avcodec.c:74
@@ -1916,7 +1914,6 @@ msgid "Video title"
 msgstr "Titolo video"
 
 #: src/libvlc-module.c:402
-#, fuzzy
 msgid ""
 "Custom title for the video window (in case the video is not embedded in the "
 "interface)."
@@ -2073,13 +2070,11 @@ msgid "Enable wallpaper mode "
 msgstr "Attiva modalità wallpaper "
 
 #: src/libvlc-module.c:448
-#, fuzzy
 msgid ""
 "The wallpaper mode allows you to display the video as the desktop background."
 msgstr ""
 "La modalità wallpaper permette di visualizzare il video come sfondo dello "
-"schermo. Funziona solo in modalità overlay, ed il desktop non deve avere "
-"un'altra immagine di sfondo."
+"schermo."
 
 #: src/libvlc-module.c:451
 msgid "Show media title on video"
@@ -2088,14 +2083,13 @@ msgstr "Mostra titolo del media nel video"
 #: src/libvlc-module.c:453
 #, fuzzy
 msgid "Display the title of the video on top of the movie."
-msgstr "Mettere la finestra video sempre in primo piano rispetto alle altre."
+msgstr "Visualizza il titolo del video ."
 
 #: src/libvlc-module.c:455
 msgid "Show video title for x milliseconds"
 msgstr "Mostra il titolo del video per n millisecondi"
 
 #: src/libvlc-module.c:457
-#, fuzzy
 msgid "Show the video title for n milliseconds, default is 5000 ms (5 sec.)"
 msgstr ""
 "Mostra titolo del video per n millisecondi, il valore predefinito è 5000 ms "
@@ -2124,21 +2118,20 @@ msgstr ""
 "predefinito 3000 ms (3 sec.)"
 
 #: src/libvlc-module.c:469 src/libvlc-module.c:471
-#: src/video_output/video_output.c:1705 modules/gui/macosx/intf.m:699
+#: src/video_output/video_output.c:1484 modules/gui/macosx/intf.m:699
 #: modules/gui/macosx/intf.m:700 modules/gui/qt4/dialogs/convert.cpp:86
 #: modules/video_filter/deinterlace.c:77
 msgid "Deinterlace"
 msgstr "Deinterlacciamento"
 
-#: src/libvlc-module.c:479 src/video_output/video_output.c:1721
+#: src/libvlc-module.c:479 src/video_output/video_output.c:1500
 #: modules/video_filter/deinterlace.c:62
 msgid "Deinterlace mode"
 msgstr "Modalità deinterlacciata"
 
 #: src/libvlc-module.c:481
-#, fuzzy
 msgid "Deinterlace method to use for video processing."
-msgstr "Metodo di deinterlacciamento da utilizzare per la trasmissione."
+msgstr "Metodo di deinterlacciamento da utilizzare per l'elaborazione video."
 
 #: src/libvlc-module.c:487 modules/video_filter/deinterlace.c:73
 msgid "Discard"
@@ -2162,7 +2155,7 @@ msgstr "Lineare"
 
 #: src/libvlc-module.c:496
 msgid "Disable screensaver"
-msgstr "Disabilita Salvaschermo"
+msgstr "Disabilita salvaschermo"
 
 #: src/libvlc-module.c:497
 msgid "Disable the screensaver during video playback."
@@ -2174,11 +2167,13 @@ msgstr ""
 "Inibisce il demone di gestione dell'alimentazione durante la riproduzione"
 
 #: src/libvlc-module.c:500
-#, fuzzy
 msgid ""
 "Inhibits the power management daemon during any playback, to avoid the "
 "computer being suspended because of inactivity."
-msgstr "Disabilita il salvaschermo durante la riproduzione video."
+msgstr ""
+"Disabilita il servizio di gestione del risparmio energetico durante "
+"qualsiasi riproduzione, per evitare che il computer vada in sospensione per "
+"inattività."
 
 #: src/libvlc-module.c:503 modules/gui/qt4/ui/sprefs_video.h:316
 msgid "Window decorations"
@@ -2347,7 +2342,6 @@ msgid "Custom aspect ratios list"
 msgstr "Elenco proporzioni personalizzate"
 
 #: src/libvlc-module.c:581
-#, fuzzy
 msgid ""
 "Comma separated list of aspect ratios which will be added in the interface's "
 "aspect ratio list."
@@ -2390,7 +2384,6 @@ msgid "Skip frames"
 msgstr "Salta fotogrammi"
 
 #: src/libvlc-module.c:599
-#, fuzzy
 msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
@@ -2400,9 +2393,8 @@ msgstr ""
 "potente."
 
 #: src/libvlc-module.c:602
-#, fuzzy
 msgid "Drop late frames"
-msgstr "Frame B"
+msgstr "Scarta fotogrammi in ritardo"
 
 #: src/libvlc-module.c:604
 msgid ""
@@ -2422,7 +2414,7 @@ msgstr ""
 
 #: src/libvlc-module.c:612
 msgid "Key press events"
-msgstr ""
+msgstr "Eventi di pressione tasti"
 
 #: src/libvlc-module.c:614
 msgid "This enables VLC hotkeys from the (non-embedded) video window."
@@ -2434,7 +2426,7 @@ msgstr "Eventi del mouse"
 
 #: src/libvlc-module.c:618
 msgid "This enables handling of mouse clicks on the video."
-msgstr ""
+msgstr "Questa opzione abilita la gestione dei clic del mouse sul video."
 
 #: src/libvlc-module.c:626
 msgid ""
@@ -2538,14 +2530,14 @@ msgid "Hop limit (TTL)"
 msgstr "Limite hop (TTL)"
 
 #: src/libvlc-module.c:668 modules/stream_out/rtp.c:124
-#, fuzzy
 msgid ""
 "This is the hop limit (also known as \"Time-To-Live\" or TTL) of the "
 "multicast packets sent by the stream output (-1 = use operating system built-"
 "in default)."
 msgstr ""
-"Specificare qui la durata di vita (TTL) dei pacchetti multicast inviati dal "
-"modulo di trasmissione in uscita (stream output)."
+"Questa è la durata di vita (conosciuta come \"Time-To-Live\" o TTL) dei "
+"pacchetti multicast inviati dal modulo di trasmissione in uscita (-1 = "
+"predefinito integrato nel sistema operativo)."
 
 #: src/libvlc-module.c:672
 msgid "Multicast output interface"
@@ -2560,7 +2552,6 @@ msgid "IPv4 multicast output interface address"
 msgstr "Indirizzo dell'interfaccia di uscita multicast IPv4"
 
 #: src/libvlc-module.c:678
-#, fuzzy
 msgid ""
 "IPv4 address for the default multicast interface. This overrides the routing "
 "table."
@@ -5538,7 +5529,7 @@ msgstr "Zhuang"
 msgid "Zulu"
 msgstr "Zulu"
 
-#: src/video_output/video_output.c:1413 modules/gui/macosx/intf.m:701
+#: src/video_output/video_output.c:1192 modules/gui/macosx/intf.m:701
 #: modules/gui/macosx/intf.m:702 modules/video_filter/postproc.c:196
 msgid "Post processing"
 msgstr "Post-elaborazione"
@@ -20630,14 +20621,14 @@ msgid "Font size in pixels"
 msgstr "Dimensione carattere (px)"
 
 #: modules/misc/freetype.c:101 modules/misc/win32text.c:61
-#, fuzzy
 msgid ""
 "This is the default size of the fonts that will be rendered on the video. If "
 "set to something different than 0 this option will override the relative "
 "font size."
 msgstr ""
-"La dimensione dei caratteri utilizzati dal modulo osd. Se impostata ad un "
-"valore diverso da 0, modifica la dimensione relativa dei caratteri "
+"La dimensione predefinita dei caratteri visualizzati a video. Se impostata "
+"ad un valore diverso da 0, questa opzione ignorerà la dimensione relativa "
+"del carattere."
 
 #: modules/misc/freetype.c:106 modules/misc/win32text.c:66
 #, fuzzy
@@ -20701,10 +20692,11 @@ msgid "Use YUVP renderer"
 msgstr "Usa rendering YUVP"
 
 #: modules/misc/freetype.c:123
+#, fuzzy
 msgid ""
 "This renders the font using \"paletized YUV\". This option is only needed if "
 "you want to encode into DVB subtitles"
-msgstr ""
+msgstr "Visualizza il carattere utilizzando "
 
 #: modules/misc/freetype.c:125
 msgid "Font Effect"
@@ -22878,7 +22870,6 @@ msgid "Alpha mask"
 msgstr "Maschera alfa"
 
 #: modules/video_filter/atmo/atmo.cpp:118
-#, fuzzy
 msgid ""
 "This module allows to control an so called AtmoLight device connected to "
 "your computer.\n"
@@ -22896,13 +22887,13 @@ msgstr ""
 "Questo modulo consente di controllare un dispositivo AtmoLight connesso al "
 "computer.\n"
 "AtmoLight è la nostra versione di ciò che Philips chiama AmbiLight.\n"
-"Se hai bisogno di ulteriori informazioni vi i seguenti indirizzi\n"
+"Se hai bisogno di ulteriori informazioni visita i seguenti indirizzi\n"
 "\n"
 "http://www.vdr-wiki.de/wiki/index.php/Atmo-plugin\n"
 "http://www.vdr-wiki.de/wiki/index.php/AtmoWin\n"
 "\n"
-"Qui puoi trovare anche informazioni dettagliate su come costruirlo da solo e "
-"dove trovare le parti richieste.\n"
+"Qui puoi trovare informazioni dettagliate su come costruirlo da solo e dove "
+"trovare le parti necessarie.\n"
 "Puoi trovare inoltre immagini e alcuni filmati che mostrano dispositivi in "
 "azione."
 
@@ -22964,9 +22955,8 @@ msgid "Depending on your MoMoLight hardware choose 3 or 4 channels"
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:172
-#, fuzzy
 msgid "Save Debug Frames"
-msgstr "Immagini al secondo"
+msgstr "Salva fotogrammi di debug"
 
 #: modules/video_filter/atmo/atmo.cpp:173
 msgid "Write every 128th miniframe to a folder."
@@ -22981,18 +22971,16 @@ msgid "The path where the debugframes should be saved"
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:179
-#, fuzzy
 msgid "Extracted Image Width"
-msgstr "Larghezza immagine"
+msgstr "Larghezza immagine estratta"
 
 #: modules/video_filter/atmo/atmo.cpp:180
 msgid "The width of the mini image for further processing (64 is default)"
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:183
-#, fuzzy
 msgid "Extracted Image Height"
-msgstr "Altezza immagine"
+msgstr "Altezza immagine estratta"
 
 #: modules/video_filter/atmo/atmo.cpp:184
 msgid "The height of the mini image for further processing (48 is default)"
@@ -23086,24 +23074,20 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:216
-#, fuzzy
 msgid "Number of zones on top"
-msgstr "Numero di cloni"
+msgstr "Numero di zone in alto"
 
 #: modules/video_filter/atmo/atmo.cpp:217
-#, fuzzy
 msgid "Number of zones on the top of the screen"
-msgstr "Numero di pixel da tagliare nella parte alta del video."
+msgstr "Numero di zone nella parte alta dello schermo"
 
 #: modules/video_filter/atmo/atmo.cpp:218
-#, fuzzy
 msgid "Number of zones on bottom"
-msgstr "Numero di cloni"
+msgstr "Numero di zone in basso"
 
 #: modules/video_filter/atmo/atmo.cpp:219
-#, fuzzy
 msgid "Number of zones on the bottom of the screen"
-msgstr "Numero di pixel da tagliare nella parte bassa del video."
+msgstr "Numero di zone nella parte bassa dello schermo"
 
 #: modules/video_filter/atmo/atmo.cpp:220
 msgid "Zones on left / right side"
@@ -23411,9 +23395,8 @@ msgid "Change gradients"
 msgstr "Cambia gradienti"
 
 #: modules/video_filter/audiobargraph_v.c:48
-#, fuzzy
 msgid "Value of the audio channels levels"
-msgstr "Numero di canali audio"
+msgstr "Valore dei livelli dei canali audio"
 
 #: modules/video_filter/audiobargraph_v.c:49
 msgid ""
@@ -23422,19 +23405,16 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/audiobargraph_v.c:52
-#, fuzzy
 msgid "X coordinate of the bargraph."
-msgstr "Coordinata X della maschera."
+msgstr "Coordinata X del grafico a barre."
 
 #: modules/video_filter/audiobargraph_v.c:54
-#, fuzzy
 msgid "Y coordinate of the bargraph."
-msgstr "Coordinata Y della maschera."
+msgstr "Coordinata Y del grafico a barre."
 
 #: modules/video_filter/audiobargraph_v.c:55
-#, fuzzy
 msgid "Transparency of the bargraph"
-msgstr "Trasparenza dell'immagine"
+msgstr "Trasparenza del grafico a barre"
 
 #: modules/video_filter/audiobargraph_v.c:56
 #, fuzzy
@@ -23446,9 +23426,8 @@ msgstr ""
 "l'opacità totale)."
 
 #: modules/video_filter/audiobargraph_v.c:58
-#, fuzzy
 msgid "Bargraph position"
-msgstr "Posizione del logo"
+msgstr "Posizione del grafico a barre"
 
 #: modules/video_filter/audiobargraph_v.c:60
 #, fuzzy
@@ -23471,7 +23450,7 @@ msgstr ""
 
 #: modules/video_filter/audiobargraph_v.c:66
 msgid "Bar width in pixel (default : 10)"
-msgstr ""
+msgstr "Larghezza delle barre in pixel (predefinita: 10)"
 
 #: modules/video_filter/audiobargraph_v.c:67
 msgid ""
@@ -23498,9 +23477,8 @@ msgid "Ball color, one of \"red\", \"blue\" and \"green\"."
 msgstr ""
 
 #: modules/video_filter/ball.c:112
-#, fuzzy
 msgid "Edge visible"
-msgstr "Sempre visibile"
+msgstr "Bordo visibile"
 
 #: modules/video_filter/ball.c:113
 msgid "Set edge visibility."
@@ -24318,9 +24296,8 @@ msgstr ""
 "valori, ad es. 6 = alto-destra)."
 
 #: modules/video_filter/marq.c:142
-#, fuzzy
 msgid "Display text above the video"
-msgstr "Riproduzione durante la trasmissione"
+msgstr "Visualizza testo sul video"
 
 #: modules/video_filter/marq.c:149
 #, fuzzy
@@ -25594,9 +25571,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/msw/directx.c:100
-#, fuzzy
 msgid "DirectX (DirectDraw) video output"
-msgstr "Uscita video DirectX 3D"
+msgstr "Uscita video DirectX (DirectDraw)"
 
 #: modules/video_output/msw/directx.c:229
 msgid "Wallpaper"
