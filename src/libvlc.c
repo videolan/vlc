@@ -1424,7 +1424,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                        : !strstr( p_parser->psz_object_name, psz_search ) ) )
         {
             char *const *pp_shortcuts = p_parser->pp_shortcuts;
-            int i;
+            unsigned i;
             for( i = 0; i < p_parser->i_shortcuts; i++ )
             {
                 if( b_strict ? !strcmp( psz_search, pp_shortcuts[i] )
@@ -1862,7 +1862,7 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
         if( b_verbose )
         {
             char *const *pp_shortcuts = p_parser->pp_shortcuts;
-            for( int i = 0; i < p_parser->i_shortcuts; i++ )
+            for( unsigned i = 0; i < p_parser->i_shortcuts; i++ )
             {
                 if( strcmp( pp_shortcuts[i], p_parser->psz_object_name ) )
                 {

@@ -96,7 +96,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
 {
     char *psz_filename;
     FILE *file;
-    int j, i_size, i_read;
+    int i_size, i_read;
     char p_cachestring[sizeof(CACHE_STRING)];
     size_t i_cache;
     module_cache_t **pp_cache = NULL;
@@ -263,7 +263,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
         {
             pp_cache[i]->p_module->pp_shortcuts =
                     xmalloc( sizeof( char ** ) * pp_cache[i]->p_module->i_shortcuts );
-            for( j = 0; j < pp_cache[i]->p_module->i_shortcuts; j++ )
+            for( unsigned j = 0; j < pp_cache[i]->p_module->i_shortcuts; j++ )
                 LOAD_STRING( pp_cache[i]->p_module->pp_shortcuts[j] );
         }
 
@@ -301,7 +301,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
             else
             {
                 p_module->pp_shortcuts = xmalloc( sizeof( char ** ) * p_module->i_shortcuts );
-                for( j = 0; j < p_module->i_shortcuts; j++ )
+                for( unsigned j = 0; j < p_module->i_shortcuts; j++ )
                     LOAD_STRING( p_module->pp_shortcuts[j] );
             }
 
