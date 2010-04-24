@@ -1,7 +1,7 @@
 /*****************************************************************************
  * x264.c: h264 video encoder
  *****************************************************************************
- * Copyright (C) 2004-2006 the VideoLAN team
+ * Copyright (C) 2004-2010 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -672,11 +672,13 @@ vlc_module_begin ()
 
     add_string( SOUT_CFG_PREFIX "stats", "x264_2pass.log", NULL, STATS_TEXT,
                 STATS_LONGTEXT, false )
-    
+
+#if X264_BUILD >= 93
     add_string( SOUT_CFG_PREFIX "preset", NULL , NULL, PRESET_TEXT , PRESET_TEXT, false )
         change_string_list( x264_preset_names, x264_preset_names, 0 );
     add_string( SOUT_CFG_PREFIX "tune", NULL , NULL, TUNE_TEXT, TUNE_TEXT, false )
         change_string_list( x264_tune_names, x264_tune_names, 0 );
+#endif
 
 vlc_module_end ()
 
@@ -697,7 +699,7 @@ static const char *const ppsz_sout_options[] = {
     "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "weightp",
     "aq-mode", "aq-strength", "psy-rd", "psy", "profile", "lookahead", "slices",
     "slice-max-size", "slice-max-mbs", "intra-refresh", "mbtree", "hrd",
-    "tune","preset",NULL
+    "tune","preset", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -761,6 +763,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->psz_stat_name = NULL;
 
     x264_param_default( &p_sys->param );
+#if X264_BUILD >= 93
     char *psz_preset = var_GetString( p_enc, SOUT_CFG_PREFIX  "preset" );
     char *psz_tune = var_GetString( p_enc, SOUT_CFG_PREFIX  "tune" );
     if( *psz_preset == '\0' )
@@ -771,6 +774,7 @@ static int  Open ( vlc_object_t *p_this )
     x264_param_default_preset( &p_sys->param, psz_preset, psz_tune );
     free( psz_preset );
     free( psz_tune );
+#endif
     p_sys->param.i_width  = p_enc->fmt_in.video.i_width;
     p_sys->param.i_height = p_enc->fmt_in.video.i_height;
 
