@@ -2399,6 +2399,7 @@ endif
 		--disable-coreaudio \
 		--disable-lash \
 		--disable-ladcca \
+		--disable-portaudio-support \
 		--without-readline
 	cd $< && make
 	cd $< && make install
