@@ -32,6 +32,7 @@
 
 #include <vlc_picture_fifo.h>
 #include <vlc_picture_pool.h>
+#include <vlc_vout_display.h>
 #include "vout_control.h"
 #include "snapshot.h"
 #include "statistic.h"
@@ -39,9 +40,6 @@
 
 /* Number of pictures required to computes the FPS rate */
 #define VOUT_FPS_SAMPLES                20
-
-/* */
-typedef struct vout_sys_t vout_sys_t;
 
 /* */
 struct vout_thread_sys_t
@@ -52,9 +50,6 @@ struct vout_thread_sys_t
     /* Video output configuration */
     config_chain_t *p_cfg;
 
-    /* Place holder for the vout_wrapper code */
-    vout_sys_t      *p_sys;
-
     /* Thread & synchronization */
     vlc_thread_t    thread;
     vlc_cond_t      change_wait;
@@ -63,6 +58,13 @@ struct vout_thread_sys_t
     bool            b_error;
 
     /* */
+    struct {
+        char           *title;
+        vout_display_t *vd;
+        bool           use_dr;
+        picture_t      *filtered;
+    } display;
+
     bool            b_picture_empty;
     vlc_cond_t      picture_wait;
     struct {

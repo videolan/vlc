@@ -30,23 +30,11 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_vout_display.h>
 #include <vlc_vout_wrapper.h>
 #include <vlc_vout.h>
 #include <assert.h>
 #include "vout_internal.h"
 #include "display.h"
-
-/*****************************************************************************
- *
- *****************************************************************************/
-struct vout_sys_t {
-    char           *title;
-    vout_display_t *vd;
-    bool           use_dr;
-
-    picture_t      *filtered;
-};
 
 /* Minimum number of direct pictures the video output will accept without
  * creating additional pictures in system memory */
@@ -71,16 +59,11 @@ static int  Forward(vlc_object_t *, char const *,
  *****************************************************************************/
 int vout_OpenWrapper(vout_thread_t *vout, const char *name)
 {
-    vout_sys_t *sys;
-
+    vout_thread_sys_t *sys = vout->p;
     msg_Dbg(vout, "Opening vout display wrapper");
 
     /* */
-    sys = malloc(sizeof(*sys));
-    if (!sys)
-        return VLC_ENOMEM;
-
-    sys->title = var_CreateGetNonEmptyString(vout, "video-title");
+    sys->display.title = var_CreateGetNonEmptyString(vout, "video-title");
 
     /* */
     video_format_t source   = vout->fmt_render;
@@ -90,7 +73,7 @@ int vout_OpenWrapper(vout_thread_t *vout, const char *name)
     source.i_y_offset       = 0;
 
     vout_display_state_t state;
-    VoutGetDisplayCfg(vout, &state.cfg, sys->title);
+    VoutGetDisplayCfg(vout, &state.cfg, sys->display.title);
     state.is_on_top = var_CreateGetBool(vout, "video-on-top");
     state.sar.num = 0;
     state.sar.den = 0;
@@ -98,16 +81,15 @@ int vout_OpenWrapper(vout_thread_t *vout, const char *name)
     const mtime_t double_click_timeout = 300000;
     const mtime_t hide_timeout = var_CreateGetInteger(vout, "mouse-hide-timeout") * 1000;
 
-    sys->vd = vout_NewDisplay(vout, &source, &state, name ? name : "$vout",
-                              double_click_timeout, hide_timeout);
+    sys->display.vd = vout_NewDisplay(vout, &source, &state, name ? name : "$vout",
+                                      double_click_timeout, hide_timeout);
     /* If we need to video filter and it fails, then try a splitter
      * XXX it is a hack for now FIXME */
-    if (name && !sys->vd)
-        sys->vd = vout_NewSplitter(vout, &source, &state, "$vout", name,
-                                   double_click_timeout, hide_timeout);
-    if (!sys->vd) {
-        free(sys->title);
-        free(sys);
+    if (name && !sys->display.vd)
+        sys->display.vd = vout_NewSplitter(vout, &source, &state, "$vout", name,
+                                           double_click_timeout, hide_timeout);
+    if (!sys->display.vd) {
+        free(sys->display.title);
         return VLC_EGENERIC;
     }
 
@@ -120,8 +102,7 @@ int vout_OpenWrapper(vout_thread_t *vout, const char *name)
 #endif
 
     /* */
-    vout->p->p_sys = sys;
-    vout->p->decoder_pool = NULL;
+    sys->decoder_pool = NULL;
 
     return VLC_SUCCESS;
 }
@@ -131,17 +112,16 @@ int vout_OpenWrapper(vout_thread_t *vout, const char *name)
  *****************************************************************************/
 void vout_CloseWrapper(vout_thread_t *vout)
 {
-    vout_sys_t *sys = vout->p->p_sys;
+    vout_thread_sys_t *sys = vout->p;
 
 #ifdef WIN32
     var_DelCallback(vout, "direct3d-desktop", Forward, NULL);
     var_DelCallback(vout, "video-wallpaper", Forward, NULL);
 #endif
-    vout->p->decoder_pool = NULL; /* FIXME remove */
+    sys->decoder_pool = NULL; /* FIXME remove */
 
-    vout_DeleteDisplay(sys->vd, NULL);
-    free(sys->title);
-    free(sys );
+    vout_DeleteDisplay(sys->display.vd, NULL);
+    free(sys->display.title);
 }
 
 /*****************************************************************************
@@ -149,8 +129,8 @@ void vout_CloseWrapper(vout_thread_t *vout)
  *****************************************************************************/
 int vout_InitWrapper(vout_thread_t *vout)
 {
-    vout_sys_t *sys = vout->p->p_sys;
-    vout_display_t *vd = sys->vd;
+    vout_thread_sys_t *sys = vout->p;
+    vout_display_t *vd = sys->display.vd;
 
     /* */
     video_format_t source = vd->source;
@@ -180,34 +160,34 @@ int vout_InitWrapper(vout_thread_t *vout)
         vout->fmt_in.i_visible_height != source.i_visible_height ||
         vout->fmt_in.i_x_offset       != source.i_x_offset ||
         vout->fmt_in.i_y_offset       != source.i_y_offset )
-        vout->p->i_changes |= VOUT_CROP_CHANGE;
+        sys->i_changes |= VOUT_CROP_CHANGE;
 
 #warning "vout_InitWrapper: vout_SetWindowState should NOT be called there"
-    if (vout->p->b_on_top)
+    if (sys->b_on_top)
         vout_SetWindowState(vd, VOUT_WINDOW_STATE_ABOVE);
 
     /* XXX For non dr case, the current vout implementation force us to
      * create at most 1 direct picture (otherwise the buffers will be kept
      * referenced even through the Init/End.
      */
-    sys->use_dr = !vout_IsDisplayFiltered(vd);
-    const bool allow_dr = !vd->info.has_pictures_invalid && sys->use_dr;
+    sys->display.use_dr = !vout_IsDisplayFiltered(vd);
+    const bool allow_dr = !vd->info.has_pictures_invalid && sys->display.use_dr;
 
     picture_pool_t *display_pool = vout_display_Pool(vd, allow_dr ? VOUT_MAX_PICTURES : 3);
     if (allow_dr && picture_pool_GetSize(display_pool) >= VOUT_MIN_DIRECT_PICTURES) {
-        vout->p->decoder_pool = display_pool;
-        vout->p->display_pool = display_pool;
-        vout->p->is_decoder_pool_slow = vd->info.is_slow;
-    } else if (!vout->p->decoder_pool) {
-        vout->p->decoder_pool = picture_pool_NewFromFormat(&source, VOUT_MAX_PICTURES);
-        if (sys->use_dr)
-            vout->p->display_pool = display_pool;
+        sys->decoder_pool = display_pool;
+        sys->display_pool = display_pool;
+        sys->is_decoder_pool_slow = vd->info.is_slow;
+    } else if (!sys->decoder_pool) {
+        sys->decoder_pool = picture_pool_NewFromFormat(&source, VOUT_MAX_PICTURES);
+        if (sys->display.use_dr)
+            sys->display_pool = display_pool;
         else
-            vout->p->display_pool = picture_pool_Reserve(vout->p->decoder_pool, 1);;
-        vout->p->is_decoder_pool_slow = false;
+            sys->display_pool = picture_pool_Reserve(sys->decoder_pool, 1);;
+        sys->is_decoder_pool_slow = false;
     }
-    vout->p->private_pool = picture_pool_Reserve(vout->p->decoder_pool, 3); /* XXX 2 for filter, 1 for SPU */
-    sys->filtered = NULL;
+    sys->private_pool = picture_pool_Reserve(sys->decoder_pool, 3); /* XXX 2 for filter, 1 for SPU */
+    sys->display.filtered = NULL;
     return VLC_SUCCESS;
 }
 
@@ -216,16 +196,16 @@ int vout_InitWrapper(vout_thread_t *vout)
  *****************************************************************************/
 void vout_EndWrapper(vout_thread_t *vout)
 {
-    vout_sys_t *sys = vout->p->p_sys;
+    vout_thread_sys_t *sys = vout->p;
 
-    assert(!sys->filtered);
-    if (vout->p->private_pool)
-        picture_pool_Delete(vout->p->private_pool);
+    assert(!sys->display.filtered);
+    if (sys->private_pool)
+        picture_pool_Delete(sys->private_pool);
 
-    if (vout->p->decoder_pool != vout->p->display_pool) {
-        if (!sys->use_dr)
-            picture_pool_Delete(vout->p->display_pool);
-        picture_pool_Delete(vout->p->decoder_pool);
+    if (sys->decoder_pool != sys->display_pool) {
+        if (!sys->display.use_dr)
+            picture_pool_Delete(sys->display_pool);
+        picture_pool_Delete(sys->decoder_pool);
     }
 }
 
@@ -234,32 +214,32 @@ void vout_EndWrapper(vout_thread_t *vout)
  *****************************************************************************/
 int vout_ManageWrapper(vout_thread_t *vout)
 {
-    vout_sys_t *sys = vout->p->p_sys;
-    vout_display_t *vd = sys->vd;
+    vout_thread_sys_t *sys = vout->p;
+    vout_display_t *vd = sys->display.vd;
 
-    while (vout->p->i_changes & (VOUT_FULLSCREEN_CHANGE |
+    while (sys->i_changes & (VOUT_FULLSCREEN_CHANGE |
                               VOUT_ASPECT_CHANGE |
                               VOUT_ZOOM_CHANGE |
                               VOUT_SCALE_CHANGE |
                               VOUT_ON_TOP_CHANGE |
                               VOUT_CROP_CHANGE)) {
         /* */
-        if (vout->p->i_changes & VOUT_FULLSCREEN_CHANGE) {
-            vout->p->b_fullscreen = !vout->p->b_fullscreen;
+        if (sys->i_changes & VOUT_FULLSCREEN_CHANGE) {
+            sys->b_fullscreen = !sys->b_fullscreen;
 
-            var_SetBool(vout, "fullscreen", vout->p->b_fullscreen);
-            vout_SetDisplayFullscreen(vd, vout->p->b_fullscreen);
-            vout->p->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
+            var_SetBool(vout, "fullscreen", sys->b_fullscreen);
+            vout_SetDisplayFullscreen(vd, sys->b_fullscreen);
+            sys->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
         }
-        if (vout->p->i_changes & VOUT_ASPECT_CHANGE) {
+        if (sys->i_changes & VOUT_ASPECT_CHANGE) {
             vout->fmt_out.i_sar_num = vout->fmt_in.i_sar_num;
             vout->fmt_out.i_sar_den = vout->fmt_in.i_sar_den;
 
             vout_SetDisplayAspect(vd, vout->fmt_in.i_sar_num, vout->fmt_in.i_sar_den);
 
-            vout->p->i_changes &= ~VOUT_ASPECT_CHANGE;
+            sys->i_changes &= ~VOUT_ASPECT_CHANGE;
         }
-        if (vout->p->i_changes & VOUT_ZOOM_CHANGE) {
+        if (sys->i_changes & VOUT_ZOOM_CHANGE) {
             const float zoom = var_GetFloat(vout, "scale");
 
             unsigned den = ZOOM_FP_FACTOR;
@@ -271,23 +251,23 @@ int vout_ManageWrapper(vout_thread_t *vout)
 
             vout_SetDisplayZoom(vd, num, den);
 
-            vout->p->i_changes &= ~VOUT_ZOOM_CHANGE;
+            sys->i_changes &= ~VOUT_ZOOM_CHANGE;
         }
-        if (vout->p->i_changes & VOUT_SCALE_CHANGE) {
+        if (sys->i_changes & VOUT_SCALE_CHANGE) {
             const bool is_display_filled = var_GetBool(vout, "autoscale");
 
             vout_SetDisplayFilled(vd, is_display_filled);
 
-            vout->p->i_changes &= ~VOUT_SCALE_CHANGE;
+            sys->i_changes &= ~VOUT_SCALE_CHANGE;
         }
-        if (vout->p->i_changes & VOUT_ON_TOP_CHANGE) {
-            vout_SetWindowState(vd, vout->p->b_on_top
+        if (sys->i_changes & VOUT_ON_TOP_CHANGE) {
+            vout_SetWindowState(vd, sys->b_on_top
                 ? VOUT_WINDOW_STATE_ABOVE
                 : VOUT_WINDOW_STATE_NORMAL);
 
-            vout->p->i_changes &= ~VOUT_ON_TOP_CHANGE;
+            sys->i_changes &= ~VOUT_ON_TOP_CHANGE;
         }
-        if (vout->p->i_changes & VOUT_CROP_CHANGE) {
+        if (sys->i_changes & VOUT_CROP_CHANGE) {
             const video_format_t crop = vout->fmt_in;
             const video_format_t org = vout->fmt_render;
             /* FIXME because of rounding errors, the reconstructed ratio is wrong */
@@ -309,16 +289,16 @@ int vout_ManageWrapper(vout_thread_t *vout)
             vout_SetDisplayCrop(vd, num, den,
                                 crop.i_x_offset, crop.i_y_offset,
                                 crop.i_visible_width, crop.i_visible_height);
-            vout->p->i_changes &= ~VOUT_CROP_CHANGE;
+            sys->i_changes &= ~VOUT_CROP_CHANGE;
         }
 
     }
 
-    bool reset_display_pool = sys->use_dr && vout_AreDisplayPicturesInvalid(vd);
-    vout_ManageDisplay(vd, !sys->use_dr || reset_display_pool);
+    bool reset_display_pool = sys->display.use_dr && vout_AreDisplayPicturesInvalid(vd);
+    vout_ManageDisplay(vd, !sys->display.use_dr || reset_display_pool);
 
     if (reset_display_pool)
-        vout->p->display_pool = vout_display_Pool(vd, 3);
+        sys->display_pool = vout_display_Pool(vd, 3);
 
     return VLC_SUCCESS;
 }
@@ -328,17 +308,17 @@ int vout_ManageWrapper(vout_thread_t *vout)
  *****************************************************************************/
 void vout_RenderWrapper(vout_thread_t *vout, picture_t *picture)
 {
-    vout_sys_t *sys = vout->p->p_sys;
-    vout_display_t *vd = sys->vd;
+    vout_thread_sys_t *sys = vout->p;
+    vout_display_t *vd = sys->display.vd;
 
-    assert(vout_IsDisplayFiltered(vd) == !sys->use_dr);
+    assert(vout_IsDisplayFiltered(vd) == !sys->display.use_dr);
 
-    if (sys->use_dr) {
+    if (sys->display.use_dr) {
         vout_display_Prepare(vd, picture);
     } else {
-        sys->filtered = vout_FilterDisplay(vd, picture);
-        if (sys->filtered)
-            vout_display_Prepare(vd, sys->filtered);
+        sys->display.filtered = vout_FilterDisplay(vd, picture);
+        if (sys->display.filtered)
+            vout_display_Prepare(vd, sys->display.filtered);
     }
 }
 
@@ -347,11 +327,11 @@ void vout_RenderWrapper(vout_thread_t *vout, picture_t *picture)
  *****************************************************************************/
 void vout_DisplayWrapper(vout_thread_t *vout, picture_t *picture)
 {
-    vout_sys_t *sys = vout->p->p_sys;
-    vout_display_t *vd = sys->vd;
+    vout_thread_sys_t *sys = vout->p;
+    vout_display_t *vd = sys->display.vd;
 
-     vout_display_Display(vd, sys->filtered ? sys->filtered : picture);
-     sys->filtered = NULL;
+     vout_display_Display(vd, sys->display.filtered ? sys->display.filtered : picture);
+     sys->display.filtered = NULL;
 }
 
 static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, const char *title)
@@ -392,6 +372,7 @@ static int Forward(vlc_object_t *object, char const *var,
 
     VLC_UNUSED(oldval);
     VLC_UNUSED(data);
-    return var_Set(vout->p->p_sys->vd, var, newval);
+    return var_Set(vout->p->display.vd, var, newval);
 }
 #endif
+
