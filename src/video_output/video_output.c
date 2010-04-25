@@ -64,9 +64,6 @@ static int FilterCallback( vlc_object_t *, char const *,
 static int VideoFilter2Callback( vlc_object_t *, char const *,
                                  vlc_value_t, vlc_value_t, void * );
 
-/* Display media title in OSD */
-static void DisplayTitleOnOSD( vout_thread_t *p_vout );
-
 /* */
 static void PrintVideoFormat(vout_thread_t *, const char *, const video_format_t *);
 
@@ -878,6 +875,104 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
     return VLC_SUCCESS;
 }
 
+static int ThreadManage(vout_thread_t *vout,
+                        mtime_t *deadline,
+                        vout_interlacing_support_t *interlacing,
+                        vout_postprocessing_support_t *postprocessing)
+{
+    vlc_mutex_lock(&vout->p->picture_lock);
+
+    *deadline = VLC_TS_INVALID;
+    bool has_displayed = !ThreadDisplayPicture(vout, vout->p->step.is_requested, deadline);
+
+    if (has_displayed) {
+        vout->p->step.timestamp = vout->p->displayed.timestamp;
+        if (vout->p->step.last <= VLC_TS_INVALID)
+            vout->p->step.last = vout->p->step.timestamp;
+    }
+    if (vout->p->step.is_requested) {
+        if (!has_displayed && !vout->p->b_picture_empty) {
+            picture_t *peek = picture_fifo_Peek(vout->p->decoder_fifo);
+            if (peek)
+                picture_Release(peek);
+            if (!peek) {
+                vout->p->b_picture_empty = true;
+                vlc_cond_signal(&vout->p->picture_wait);
+            }
+        }
+        if (has_displayed) {
+            vout->p->step.is_requested = false;
+            vlc_cond_signal(&vout->p->picture_wait);
+        }
+    }
+
+    const int  picture_qtype      = vout->p->displayed.qtype;
+    const bool picture_interlaced = vout->p->displayed.is_interlaced;
+
+    vlc_mutex_unlock(&vout->p->picture_lock);
+
+    /* Post processing */
+    vout_SetPostProcessingState(vout, postprocessing, picture_qtype);
+
+    /* Deinterlacing */
+    vout_SetInterlacingState(vout, interlacing, picture_interlaced);
+
+    if (vout_ManageWrapper(vout)) {
+        /* A fatal error occurred, and the thread must terminate
+         * immediately, without displaying anything - setting b_error to 1
+         * causes the immediate end of the main while() loop. */
+        // FIXME pf_end
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
+static void ThreadDisplayOsdTitle(vout_thread_t *vout)
+{
+    if (!vout->p->title.show || !vout->p->title.value)
+        return;
+
+    vlc_assert_locked(&vout->p->change_lock);
+
+    const mtime_t start = mdate();
+    const mtime_t stop = start +
+                         INT64_C(1000) * vout->p->title.timeout;
+
+    if (stop > start)
+        vout_ShowTextAbsolute(vout, DEFAULT_CHAN,
+                              vout->p->title.value, NULL,
+                              vout->p->title.position,
+                              30 + vout->fmt_in.i_width
+                                 - vout->fmt_in.i_visible_width
+                                 - vout->fmt_in.i_x_offset,
+                              20 + vout->fmt_in.i_y_offset,
+                              start, stop);
+
+    free(vout->p->title.value);
+    vout->p->title.value = NULL;
+}
+
+static void ThreadChangeFilter(vout_thread_t *vout)
+{
+    /* Check for "video filter2" changes */
+    vlc_mutex_lock(&vout->p->vfilter_lock);
+    if (vout->p->psz_vf2) {
+        es_format_t fmt;
+
+        es_format_Init(&fmt, VIDEO_ES, vout->fmt_render.i_chroma);
+        fmt.video = vout->fmt_render;
+        filter_chain_Reset(vout->p->p_vf2_chain, &fmt, &fmt);
+
+        if (filter_chain_AppendFromString(vout->p->p_vf2_chain,
+                                          vout->p->psz_vf2) < 0)
+            msg_Err(vout, "Video filter chain creation failed");
+
+        free(vout->p->psz_vf2);
+        vout->p->psz_vf2 = NULL;
+    }
+    vlc_mutex_unlock(&vout->p->vfilter_lock);
+}
+
 /*****************************************************************************
  * Thread: video output thread
  *****************************************************************************
@@ -924,72 +1019,15 @@ static void *Thread(void *object)
      */
     while (!vout->p->b_done && !vout->p->b_error) {
         /* */
-        if(vout->p->title.show && vout->p->title.value)
-            DisplayTitleOnOSD(vout);
-
-        vlc_mutex_lock(&vout->p->picture_lock);
-
-        mtime_t deadline = VLC_TS_INVALID;
-        bool has_displayed = !ThreadDisplayPicture(vout, vout->p->step.is_requested, &deadline);
-
-        if (has_displayed) {
-            vout->p->step.timestamp = vout->p->displayed.timestamp;
-            if (vout->p->step.last <= VLC_TS_INVALID)
-                vout->p->step.last = vout->p->step.timestamp;
-        }
-        if (vout->p->step.is_requested) {
-            if (!has_displayed && !vout->p->b_picture_empty) {
-                picture_t *peek = picture_fifo_Peek(vout->p->decoder_fifo);
-                if (peek)
-                    picture_Release(peek);
-                if (!peek) {
-                    vout->p->b_picture_empty = true;
-                    vlc_cond_signal(&vout->p->picture_wait);
-                }
-            }
-            if (has_displayed) {
-                vout->p->step.is_requested = false;
-                vlc_cond_signal(&vout->p->picture_wait);
-            }
-        }
-
-        const int  picture_qtype      = vout->p->displayed.qtype;
-        const bool picture_interlaced = vout->p->displayed.is_interlaced;
-
-        vlc_mutex_unlock(&vout->p->picture_lock);
-
-        if (vout_ManageWrapper(vout)) {
-            /* A fatal error occurred, and the thread must terminate
-             * immediately, without displaying anything - setting b_error to 1
-             * causes the immediate end of the main while() loop. */
-            // FIXME pf_end
+        mtime_t deadline;
+        if (ThreadManage(vout, &deadline,
+                         &interlacing, &postprocessing)) {
             vout->p->b_error = true;
             break;
         }
 
-        /* Post processing */
-        vout_SetPostProcessingState(vout, &postprocessing, picture_qtype);
-
-        /* Deinterlacing */
-        vout_SetInterlacingState(vout, &interlacing, picture_interlaced);
-
-        /* Check for "video filter2" changes */
-        vlc_mutex_lock(&vout->p->vfilter_lock);
-        if (vout->p->psz_vf2) {
-            es_format_t fmt;
-
-            es_format_Init(&fmt, VIDEO_ES, vout->fmt_render.i_chroma);
-            fmt.video = vout->fmt_render;
-            filter_chain_Reset(vout->p->p_vf2_chain, &fmt, &fmt);
-
-            if (filter_chain_AppendFromString(vout->p->p_vf2_chain,
-                                              vout->p->psz_vf2) < 0)
-                msg_Err(vout, "Video filter chain creation failed");
-
-            free(vout->p->psz_vf2);
-            vout->p->psz_vf2 = NULL;
-        }
-        vlc_mutex_unlock(&vout->p->vfilter_lock);
+        ThreadDisplayOsdTitle(vout);
+        ThreadChangeFilter(vout);
 
         vlc_mutex_unlock(&vout->p->change_lock);
 
@@ -1076,30 +1114,6 @@ static int VideoFilter2Callback( vlc_object_t *p_this, char const *psz_cmd,
     vlc_mutex_unlock( &p_vout->p->vfilter_lock );
 
     return VLC_SUCCESS;
-}
-
-static void DisplayTitleOnOSD( vout_thread_t *p_vout )
-{
-    const mtime_t i_start = mdate();
-    const mtime_t i_stop = i_start + INT64_C(1000) * p_vout->p->title.timeout;
-
-    if( i_stop <= i_start )
-        return;
-
-    vlc_assert_locked( &p_vout->p->change_lock );
-
-    vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
-                           p_vout->p->title.value, NULL,
-                           p_vout->p->title.position,
-                           30 + p_vout->fmt_in.i_width
-                              - p_vout->fmt_in.i_visible_width
-                              - p_vout->fmt_in.i_x_offset,
-                           20 + p_vout->fmt_in.i_y_offset,
-                           i_start, i_stop );
-
-    free( p_vout->p->title.value );
-
-    p_vout->p->title.value = NULL;
 }
 
 /* */
