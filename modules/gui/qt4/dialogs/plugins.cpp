@@ -524,10 +524,12 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
     layout->addWidget( line, 6, 2, 1, -1 );
 
     // Close button
-    QDialogButtonBox *group = new QDialogButtonBox( QDialogButtonBox::Close,
-                                                    Qt::Horizontal, this );
+    QDialogButtonBox *group = new QDialogButtonBox( this );
+    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
+    group->addButton( closeButton, QDialogButtonBox::AcceptRole );
+    BUTTONACT( closeButton, close() );
+
     layout->addWidget( group, 7, 0, 1, -1 );
-    connect( group, SIGNAL(clicked(QAbstractButton*)), this, SLOT(close()) );
 
     // Fix layout
     layout->setColumnStretch( 2, 1 );
