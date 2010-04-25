@@ -65,7 +65,6 @@ static int VideoFilter2Callback( vlc_object_t *, char const *,
 /* */
 static void PostProcessEnable( vout_thread_t * );
 static void PostProcessDisable( vout_thread_t * );
-static void PostProcessSetFilterQuality( vout_thread_t *p_vout );
 static int  PostProcessCallback( vlc_object_t *, char const *,
                                  vlc_value_t, vlc_value_t, void * );
 /* */
@@ -1006,9 +1005,6 @@ static void *Thread(void *object)
 
             free(vout->p->psz_vf2);
             vout->p->psz_vf2 = NULL;
-
-            if (last_picture_qtype != QTYPE_NONE)
-                PostProcessSetFilterQuality(vout);
         }
         vlc_mutex_unlock(&vout->p->vfilter_lock);
 
@@ -1148,12 +1144,17 @@ static int PostProcessCallback( vlc_object_t *p_this, char const *psz_cmd,
             }
         }
     }
+    if( newval.i_int > 0 )
+        var_SetInteger( p_vout, "postproc-q", newval.i_int );
     if( psz_vf2 )
     {
         var_SetString( p_vout, "video-filter", psz_vf2 );
         free( psz_vf2 );
     }
-
+    else if( newval.i_int > 0 )
+    {
+        var_TriggerCallback( p_vout, "video-filter" );
+    }
     return VLC_SUCCESS;
 }
 static void PostProcessEnable( vout_thread_t *p_vout )
@@ -1195,16 +1196,6 @@ static void PostProcessDisable( vout_thread_t *p_vout )
     msg_Dbg( p_vout, "Post-processing no more available" );
     var_Destroy( p_vout, "postprocess" );
 }
-static void PostProcessSetFilterQuality( vout_thread_t *p_vout )
-{
-    vlc_object_t *p_pp = vlc_object_find_name( p_vout, "postproc", FIND_CHILD );
-    if( !p_pp )
-        return;
-
-    var_SetInteger( p_pp, "postproc-q", var_GetInteger( p_vout, "postprocess" ) );
-    vlc_object_release( p_pp );
-}
-
 
 static void DisplayTitleOnOSD( vout_thread_t *p_vout )
 {
