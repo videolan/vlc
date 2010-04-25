@@ -80,7 +80,7 @@ static const char *const ppsz_inversion_text[] = { N_("Undefined"), N_("Off"),
 /* Satellite */
 #if defined(WIN32) || defined(WINCE)
 #    define NETID_TEXT N_("Network Identifier")
-#    define NETID_LONGTEXT ""
+#    define NETID_LONGTEXT NULL
 #else
 #    define SATNO_TEXT N_("Satellite number in the Diseqc system")
 #    define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=satellite number].")
@@ -100,7 +100,7 @@ static const char *const ppsz_inversion_text[] = { N_("Undefined"), N_("Off"),
 #define FEC_LONGTEXT N_("FEC=Forward Error Correction mode [9=auto].")
 
 #define SRATE_TEXT N_("Transponder symbol rate in kHz")
-#define SRATE_LONGTEXT ""
+#define SRATE_LONGTEXT NULL
 
 #define LNB_LOF1_TEXT N_("Antenna lnb_lof1 (kHz)")
 #define LNB_LOF1_LONGTEXT N_("Low Band Local Osc Freq in kHz (usually 9.75GHz)")
