@@ -361,9 +361,13 @@ SOURCES_libvlc_common = \
 	video_output/event.h \
 	video_output/inhibit.c \
 	video_output/inhibit.h \
+	video_output/interlacing.c \
+	video_output/interlacing.h \
 	video_output/snapshot.c \
 	video_output/snapshot.h \
 	video_output/statistic.h \
+	video_output/postprocessing.c \
+	video_output/postprocessing.h \
 	video_output/video_output.c \
 	video_output/vout_pictures.c \
 	video_output/vout_pictures.h \
