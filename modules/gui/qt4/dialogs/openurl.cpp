@@ -51,12 +51,13 @@ OpenUrlDialog::OpenUrlDialog( intf_thread_t *_p_intf,
     QPushButton *but;
 
     QDialogButtonBox *box = new QDialogButtonBox( this );
-    but = box->addButton( QDialogButtonBox::Ok );
+    but = box->addButton( qtr( "&Play" ), QDialogButtonBox::AcceptRole );
     CONNECT( but, clicked(), this, play() );
-    but = box->addButton( QDialogButtonBox::Cancel );
+
     but = box->addButton( qtr( "&Enqueue" ), QDialogButtonBox::AcceptRole );
     CONNECT( but, clicked(), this, enqueue() );
 
+    but = box->addButton( qtr( "&Cancel" ) , QDialogButtonBox::RejectRole );
     CONNECT( box, rejected(), this, reject() );
 
     /* Info label and line edit */
