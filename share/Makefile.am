@@ -87,7 +87,7 @@ skins2_default_vlt_FILES = \
 
 skins2/default.vlt: $(skins2_default_vlt_FILES)
 	mkdir -p skins2
-	tar cvvzf skins2/default.vlt --exclude .svn -C $(srcdir)/skins2 default/
+	tar cvvzf skins2/default.vlt -C $(srcdir)/skins2 default/
 
 DIST_http = \
 	http/.hosts \
