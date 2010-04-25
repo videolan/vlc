@@ -128,11 +128,14 @@ void DialogHandler::requestLogin (vlc_object_t *, void *value)
     layout->addWidget (panel);
 
     /* OK, Cancel buttons */
-    QDialogButtonBox *buttonBox;
-    buttonBox = new QDialogButtonBox (QDialogButtonBox::Ok
-                                       | QDialogButtonBox::Cancel);
-    connect (buttonBox, SIGNAL(accepted()), dialog, SLOT(accept()));
-    connect (buttonBox, SIGNAL(rejected()), dialog, SLOT(reject()));
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    QPushButton *okButton = new QPushButton( "&Ok" );
+    QPushButton *cancelButton = new QPushButton( "&Cancel" );
+    buttonBox->addButton( okButton, QDialogButtonBox::AcceptRole );
+    buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
+
+    CONNECT( okButton, accepted(), dialog, accept() );
+    CONNECT( cancelButton, rejected(), dialog, reject() );
     layout->addWidget (buttonBox);
 
     /* Run the dialog */
