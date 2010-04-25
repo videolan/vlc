@@ -38,12 +38,6 @@ enum {
     VOUT_CONTROL_START,
     VOUT_CONTROL_STOP,
 
-    /* */
-    VOUT_CONTROL_RESET,
-    VOUT_CONTROL_FLUSH,
-    VOUT_CONTROL_PAUSE,
-    VOUT_CONTROL_STEP,
-
     /* Controls */
     VOUT_CONTROL_FULLSCREEN,
     VOUT_CONTROL_DISPLAY_FILLED,
@@ -62,7 +56,13 @@ enum {
     VOUT_CONTROL_OSD_ICON,
     VOUT_CONTROL_OSD_SUBPICTURE,
 #endif
-    VOUT_CONTROL_OSD_TITLE,
+    VOUT_CONTROL_OSD_TITLE,             /* string */
+    VOUT_CONTROL_CHANGE_FILTERS,        /* string */
+
+    VOUT_CONTROL_PAUSE,
+    VOUT_CONTROL_RESET,
+    VOUT_CONTROL_FLUSH,                 /* time */
+    VOUT_CONTROL_STEP,                  /* time_ptr */
 };
 
 typedef struct {
@@ -71,6 +71,8 @@ typedef struct {
     union {
         bool    boolean;
         mtime_t time;
+        mtime_t *time_ptr;
+        char    *string;
         struct {
             int a;
             int b;
@@ -149,6 +151,7 @@ void vout_control_PushBool(vout_control_t *, int type, bool boolean);
 void vout_control_PushTime(vout_control_t *, int type, mtime_t time);
 void vout_control_PushMessage(vout_control_t *, int type, int channel, const char *string);
 void vout_control_PushPair(vout_control_t *, int type, int a, int b);
+void vout_control_PushString(vout_control_t *, int type, const char *string);
 void vout_control_Wake(vout_control_t *);
 
 /* control inside of the vout thread */

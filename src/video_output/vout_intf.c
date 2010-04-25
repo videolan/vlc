@@ -180,8 +180,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
                                                      "video-title-timeout" );
     p_vout->p->title.position = var_CreateGetInteger( p_vout,
                                                       "video-title-position" );
-    p_vout->p->title.value =  NULL;
-
     var_AddCallback( p_vout, "video-title-show", TitleShowCallback, NULL );
     var_AddCallback( p_vout, "video-title-timeout", TitleTimeoutCallback, NULL );
     var_AddCallback( p_vout, "video-title-position", TitlePositionCallback, NULL );

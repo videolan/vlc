@@ -40,7 +40,8 @@ void vout_control_cmd_Clean(vout_control_cmd_t *cmd)
     switch (cmd->type) {
     //case VOUT_CONTROL_OSD_MESSAGE:
     case VOUT_CONTROL_OSD_TITLE:
-        free(cmd->u.message.string);
+    case VOUT_CONTROL_CHANGE_FILTERS:
+        free(cmd->u.string);
         break;
 #if 0
     case VOUT_CONTROL_OSD_TEXT:
@@ -163,6 +164,14 @@ void vout_control_PushPair(vout_control_t *ctrl, int type, int a, int b)
     vout_control_cmd_Init(&cmd, type);
     cmd.u.pair.a = a;
     cmd.u.pair.b = b;
+    vout_control_Push(ctrl, &cmd);
+}
+void vout_control_PushString(vout_control_t *ctrl, int type, const char *string)
+{
+    vout_control_cmd_t cmd;
+
+    vout_control_cmd_Init(&cmd, type);
+    cmd.u.string = strdup(string);
     vout_control_Push(ctrl, &cmd);
 }
 

@@ -67,8 +67,6 @@ struct vout_thread_sys_t
         picture_t      *filtered;
     } display;
 
-    bool            b_picture_empty;
-    vlc_cond_t      picture_wait;
     struct {
         mtime_t     date;
         mtime_t     timestamp;
@@ -78,7 +76,6 @@ struct vout_thread_sys_t
     } displayed;
 
     struct {
-        bool        is_requested;
         mtime_t     last;
         mtime_t     timestamp;
     } step;
@@ -88,15 +85,12 @@ struct vout_thread_sys_t
         mtime_t     date;
     } pause;
 
+    /* OSD title configuration */
     struct {
         bool        show;
         mtime_t     timeout;
         int         position;
-        char        *value;
     } title;
-
-    /* */
-    vlc_mutex_t     vfilter_lock;         /**< video filter2 lock */
 
     /* */
     unsigned int    i_par_num;           /**< monitor pixel aspect-ratio */
@@ -111,8 +105,8 @@ struct vout_thread_sys_t
     bool            b_filter_change;
 
     /* Video filter2 chain */
+    vlc_mutex_t     vfilter_lock;
     filter_chain_t *p_vf2_chain;
-    char           *psz_vf2;
 
     /* Snapshot interface */
     vout_snapshot_t snapshot;
