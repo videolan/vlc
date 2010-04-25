@@ -356,6 +356,8 @@ SOURCES_libvlc_common = \
 	input/subtitles.c \
 	input/var.c \
 	video_output/chrono.h \
+	video_output/control.c \
+	video_output/control.h \
 	video_output/display.c \
 	video_output/display.h \
 	video_output/event.h \

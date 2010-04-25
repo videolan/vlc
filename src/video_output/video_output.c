@@ -281,6 +281,7 @@ vout_thread_t * (vout_Create)( vlc_object_t *p_parent, video_format_t *p_fmt )
     video_format_FixRgb( &p_vout->fmt_in );
 
     /* Initialize misc stuff */
+    vout_control_Init( &p_vout->p->control );
     p_vout->p->i_changes    = 0;
     p_vout->p->b_fullscreen = 0;
     vout_chrono_Init( &p_vout->p->render, 5, 10000 ); /* Arbitrary initial time */
@@ -468,6 +469,7 @@ static void vout_Destructor( vlc_object_t * p_this )
     vlc_mutex_destroy( &p_vout->p->picture_lock );
     vlc_mutex_destroy( &p_vout->p->change_lock );
     vlc_mutex_destroy( &p_vout->p->vfilter_lock );
+    vout_control_Clean( &p_vout->p->control );
 
     /* */
     vout_statistic_Clean( &p_vout->p->statistic );
@@ -506,8 +508,9 @@ void vout_ChangePause( vout_thread_t *p_vout, bool b_paused, mtime_t i_date )
         if (p_vout->p->displayed.decoded)
             p_vout->p->displayed.decoded->date += i_duration;
 
-        vlc_cond_signal( &p_vout->p->picture_wait );
         vlc_mutex_unlock( &p_vout->p->picture_lock );
+
+        vout_control_Wake( &p_vout->p->control );
 
         spu_OffsetSubtitleDate( p_vout->p->p_spu, i_duration );
     }
@@ -554,8 +557,8 @@ void vout_Flush(vout_thread_t *vout, mtime_t date)
 
     Flush(vout, date, false, false);
 
-    vlc_cond_signal(&vout->p->picture_wait);
     vlc_mutex_unlock(&vout->p->picture_lock);
+    vout_control_Wake(&vout->p->control);
 }
 
 void vout_Reset(vout_thread_t *vout)
@@ -568,8 +571,8 @@ void vout_Reset(vout_thread_t *vout)
     vout->p->pause.is_on = false;
     vout->p->pause.date  = mdate();
 
-    vlc_cond_signal( &vout->p->picture_wait );
     vlc_mutex_unlock(&vout->p->picture_lock);
+    vout_control_Wake(&vout->p->control);
 }
 
 void vout_FixLeaks( vout_thread_t *vout )
@@ -596,8 +599,8 @@ void vout_FixLeaks( vout_thread_t *vout )
     /* */
     picture_pool_NonEmpty(vout->p->decoder_pool, false);
 
-    vlc_cond_signal(&vout->p->picture_wait);
     vlc_mutex_unlock(&vout->p->picture_lock);
+    vout_control_Wake(&vout->p->control);
 }
 void vout_NextPicture(vout_thread_t *vout, mtime_t *duration)
 {
@@ -606,9 +609,11 @@ void vout_NextPicture(vout_thread_t *vout, mtime_t *duration)
     vout->p->b_picture_empty = false;
     vout->p->step.is_requested = true;
 
-    /* FIXME I highly doubt that it can works with only one cond_t FIXME */
-    vlc_cond_signal(&vout->p->picture_wait);
+    vlc_mutex_unlock(&vout->p->picture_lock);
 
+    vout_control_Wake(&vout->p->control);
+
+    vlc_mutex_lock(&vout->p->picture_lock);
     while (vout->p->step.is_requested && !vout->p->b_picture_empty)
         vlc_cond_wait(&vout->p->picture_wait, &vout->p->picture_lock);
 
@@ -1017,9 +1022,23 @@ static void *Thread(void *object)
      * Main loop - it is not executed if an error occurred during
      * initialization
      */
+    mtime_t deadline = VLC_TS_INVALID;
     while (!vout->p->b_done && !vout->p->b_error) {
+        vout_control_cmd_t cmd;
+
+        vlc_mutex_unlock(&vout->p->change_lock);
+        /* FIXME remove thoses ugly timeouts
+         */
+        while (!vout_control_Pop(&vout->p->control, &cmd, deadline, 100000)) {
+            switch(cmd.type) {
+            default:
+                break;
+            }
+            vout_control_cmd_Clean(&cmd);
+        }
+        vlc_mutex_lock(&vout->p->change_lock);
+
         /* */
-        mtime_t deadline;
         if (ThreadManage(vout, &deadline,
                          &interlacing, &postprocessing)) {
             vout->p->b_error = true;
@@ -1028,16 +1047,6 @@ static void *Thread(void *object)
 
         ThreadDisplayOsdTitle(vout);
         ThreadChangeFilter(vout);
-
-        vlc_mutex_unlock(&vout->p->change_lock);
-
-        if (deadline > VLC_TS_INVALID) {
-            vlc_mutex_lock(&vout->p->picture_lock);
-            vlc_cond_timedwait(&vout->p->picture_wait, &vout->p->picture_lock, deadline);
-            vlc_mutex_unlock(&vout->p->picture_lock);
-        }
-
-        vlc_mutex_lock(&vout->p->change_lock);
     }
 
     /*
@@ -1064,6 +1073,7 @@ exit_thread:
 
     if (has_wrapper)
         vout_CloseWrapper(vout);
+    vout_control_Dead(&vout->p->control);
 
     return NULL;
 }

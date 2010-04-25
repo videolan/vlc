@@ -34,6 +34,7 @@
 #include <vlc_picture_pool.h>
 #include <vlc_vout_display.h>
 #include "vout_control.h"
+#include "control.h"
 #include "snapshot.h"
 #include "statistic.h"
 #include "chrono.h"
@@ -56,6 +57,7 @@ struct vout_thread_sys_t
     bool            b_ready;
     bool            b_done;
     bool            b_error;
+    vout_control_t  control;
 
     /* */
     struct {

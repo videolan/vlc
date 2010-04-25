@@ -82,8 +82,9 @@ void vout_PutPicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_pic->p_next = NULL;
     picture_fifo_Push(p_vout->p->decoder_fifo, p_pic);
 
-    vlc_cond_signal( &p_vout->p->picture_wait );
     vlc_mutex_unlock( &p_vout->p->picture_lock );
+
+    vout_control_Wake( &p_vout->p->control);
 }
 
 /**
@@ -95,8 +96,9 @@ void vout_ReleasePicture( vout_thread_t *p_vout, picture_t *p_pic  )
 
     picture_Release( p_pic );
 
-    vlc_cond_signal( &p_vout->p->picture_wait );
     vlc_mutex_unlock( &p_vout->p->picture_lock );
+
+    vout_control_Wake( &p_vout->p->control);
 }
 
 /**
