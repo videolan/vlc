@@ -105,7 +105,6 @@ struct vout_thread_sys_t
     vout_statistic_t statistic;
 
     /* Filter chain */
-    bool           b_first_vout;  /* True if it is the first vout of the filter chain */
     char           *psz_filter_chain;
     bool            b_filter_change;
 
