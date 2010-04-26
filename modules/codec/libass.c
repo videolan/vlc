@@ -698,15 +698,6 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     }
     free( pp_attachments );
 
-#if defined(WIN32)
-    dialog_progress_bar_t *p_dialog = dialog_ProgressCreate( p_dec,
-        _("Building font cache"),
-        _( "Please wait while your font cache is rebuilt.\n"
-        "This should take less than a minute." ), NULL );
-    if( p_dialog )
-        dialog_ProgressSet( p_dialog, NULL, 0.1 );
-#endif
-
     ass_set_extract_fonts( p_library, true );
     ass_set_style_overrides( p_library, NULL );
 
@@ -726,7 +717,11 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     const char *psz_family = "Arial"; /* Use Arial if we can't find anything more suitable */
 
 #ifdef HAVE_FONTCONFIG
-#ifdef WIN32
+#if defined(WIN32)
+    dialog_progress_bar_t *p_dialog = dialog_ProgressCreate( p_dec,
+        _("Building font cache"),
+        _( "Please wait while your font cache is rebuilt.\n"
+        "This should take less than a minute." ), NULL );
     if( p_dialog )
         dialog_ProgressSet( p_dialog, NULL, 0.2 );
 #endif
