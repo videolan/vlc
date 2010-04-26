@@ -60,6 +60,7 @@
     //WINSHELLAPI BOOL WINAPI SHFullScreen(HWND hwndRequester, DWORD dwState);
 #endif
 
+static void CommonChangeThumbnailClip(vout_display_t *, bool show);
 static int CommonControlSetFullscreen(vout_display_t *, bool is_fullscreen);
 
 static void DisableScreensaver(vout_display_t *);
@@ -135,6 +136,7 @@ void CommonClean(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->event) {
+        CommonChangeThumbnailClip(vd, false);
         EventThreadStop(sys->event);
         EventThreadDestroy(sys->event);
     }
@@ -228,6 +230,49 @@ void AlignRect(RECT *r, int align_boundary, int align_size)
         r->left = (r->left + align_boundary/2) & ~align_boundary;
     if (align_size)
         r->right = ((r->right - r->left + align_size/2) & ~align_size) + r->left;
+}
+
+/* */
+static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
+{
+#ifndef UNDER_CE
+    vout_display_sys_t *sys = vd->sys;
+
+    /* Windows 7 taskbar thumbnail code */
+    OSVERSIONINFO winVer;
+    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    if (!GetVersionEx(&winVer) || winVer.dwMajorVersion <= 5)
+        return;
+
+    CoInitialize(0);
+
+    LPTASKBARLIST3 taskbl;
+    if (S_OK == CoCreateInstance(&clsid_ITaskbarList,
+                                 NULL, CLSCTX_INPROC_SERVER,
+                                 &IID_ITaskbarList3,
+                                 &taskbl)) {
+        taskbl->vt->HrInit(taskbl);
+
+        HWND hroot = GetAncestor(sys->hwnd,GA_ROOT);
+        RECT relative;
+        if (show) {
+            RECT video, parent;
+            GetWindowRect(sys->hvideownd, &video);
+            GetWindowRect(hroot, &parent);
+            relative.left   = video.left   - parent.left - 8;
+            relative.top    = video.top    - parent.top - 10;
+
+            relative.right  = video.right  - video.left + relative.left;
+            relative.bottom = video.bottom - video.top  + relative.top - 25;
+        }
+        if (S_OK != taskbl->vt->SetThumbnailClip(taskbl, hroot,
+                                                 show ? &relative : NULL))
+            msg_Err(vd, "SetThumbNailClip failed");
+
+        taskbl->vt->Release(taskbl);
+    }
+    CoUninitialize();
+#endif
 }
 
 /*****************************************************************************
@@ -397,37 +442,8 @@ void UpdateRects(vout_display_t *vd,
     rect_dest_clipped.bottom -= sys->rect_display.top;
 #endif
 
-#ifndef UNDER_CE
-    /* Windows 7 taskbar thumbnail code */
-    LPTASKBARLIST3 taskbl;
-    OSVERSIONINFO winVer;
-    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    if (GetVersionEx(&winVer) && winVer.dwMajorVersion > 5) {
-        CoInitialize(0);
+    CommonChangeThumbnailClip(vd, true);
 
-        if (S_OK == CoCreateInstance(&clsid_ITaskbarList,
-                                     NULL, CLSCTX_INPROC_SERVER,
-                                     &IID_ITaskbarList3,
-                                     &taskbl)) {
-            RECT rect_video, rect_parent, rect_relative;
-            HWND hroot = GetAncestor(sys->hwnd,GA_ROOT);
-
-            taskbl->vt->HrInit(taskbl);
-            GetWindowRect(sys->hvideownd, &rect_video);
-            GetWindowRect(hroot, &rect_parent);
-            rect_relative.left = rect_video.left - rect_parent.left - 8;
-            rect_relative.right = rect_video.right - rect_video.left + rect_relative.left;
-            rect_relative.top = rect_video.top - rect_parent.top - 10;
-            rect_relative.bottom = rect_video.bottom - rect_video.top + rect_relative.top - 25;
-
-            if (S_OK != taskbl->vt->SetThumbnailClip(taskbl, hroot, &rect_relative))
-                msg_Err(vd, "SetThumbNailClip failed");
-
-            taskbl->vt->Release(taskbl);
-        }
-        CoUninitialize();
-    }
-#endif
     /* Signal the change in size/position */
     sys->changes |= DX_POSITION_CHANGE;
 
