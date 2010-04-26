@@ -346,12 +346,6 @@ static int Create( vlc_object_t *p_this )
     }
 
 #ifdef HAVE_FONTCONFIG
-    /* Lets find some fontfile from freetype-font variable family */
-    char *psz_fontsize;
-    if( asprintf( &psz_fontsize, "%d", p_sys->i_default_font_size ) == -1 )
-        goto error;
-
-
     msg_Dbg( p_filter, "Building font databases.");
     mtime_t t1, t2;
     t1 = mdate();
@@ -367,10 +361,22 @@ static int Create( vlc_object_t *p_this )
 
     if( p_dialog )
         dialog_ProgressSet( p_dialog, NULL, 0.5 );
-#endif
+
     FcConfigBuildFonts( fcConfig );
     t2 = mdate();
     msg_Dbg( p_filter, "Took %ld microseconds", (long)((t2 - t1)) );
+
+    if( p_dialog )
+    {
+        dialog_ProgressSet( p_dialog, NULL, 1.0 );
+        dialog_ProgressDestroy( p_dialog );
+        p_dialog = NULL;
+    }
+#endif
+    /* Lets find some fontfile from freetype-font variable family */
+    char *psz_fontsize;
+    if( asprintf( &psz_fontsize, "%d", p_sys->i_default_font_size ) == -1 )
+        goto error;
 
     fontpattern = FcPatternCreate();
     if( !fontpattern )
@@ -379,10 +385,6 @@ static int Create( vlc_object_t *p_this )
         goto error;
     }
 
-#ifdef WIN32
-    if( p_dialog )
-        dialog_ProgressSet( p_dialog, NULL, 0.7 );
-#endif
     FcPatternAddString( fontpattern, FC_FAMILY, psz_fontfamily);
     FcPatternAddString( fontpattern, FC_SIZE, psz_fontsize );
     free( psz_fontsize );
@@ -394,10 +396,6 @@ static int Create( vlc_object_t *p_this )
     }
     FcDefaultSubstitute( fontpattern );
 
-#ifdef WIN32
-    if( p_dialog )
-        dialog_ProgressSet( p_dialog, NULL, 0.8 );
-#endif
     /* testing fontresult here doesn't do any good really, but maybe it will
      * in future as fontconfig code doesn't set it in all cases and just
      * returns NULL or doesn't set to to Match on all Match cases.*/
@@ -419,21 +417,11 @@ static int Create( vlc_object_t *p_this )
     msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily,
              psz_fontfile ? psz_fontfile : "(null)" );
     p_sys->psz_fontfamily = strdup( psz_fontfamily );
-# ifdef WIN32
-    if( p_dialog )
-    {
-        dialog_ProgressSet( p_dialog, NULL, 1.0 );
-        dialog_ProgressDestroy( p_dialog );
-        p_dialog = NULL;
-    }
-# endif
 
 #else
 
-#ifdef HAVE_FONTCONFIG
     p_sys->psz_fontfamily = strdup( DEFAULT_FONT );
     psz_fontfile = psz_fontfamily;
-#endif
 
 #endif
 
