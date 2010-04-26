@@ -1,6 +1,6 @@
 {
-  "name": "VideoLAN",
+  "name": "VLC Web Plugin",
   "version": "@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_REVISION@.@VERSION_EXTRA_RC@",
-  "description": "VLC Web Plugin Bundle",
+  "description": "VLC Web Plugin Bundle, by VideoLAN",
   "plugins": [{"path":"plugins/npvlc.dll", "public":true }]
 }

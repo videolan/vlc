@@ -358,9 +358,9 @@ private:
 /*******************************************************************************
  * Plugin properties.
  ******************************************************************************/
-#define PLUGIN_NAME         "VLC Multimedia Plug-in"
+#define PLUGIN_NAME         "VLC Web Plugin"
 #define PLUGIN_DESCRIPTION \
-    "Version %s, copyright 1996-2007 The VideoLAN Team" \
+    "Version %s, copyright 1996-2010 VideoLAN and Authors" \
     "<br><a href=\"http://www.videolan.org/\">http://www.videolan.org/</a>"
 
 #define PLUGIN_MIMETYPES \

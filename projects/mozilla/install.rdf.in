@@ -1,7 +1,7 @@
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
     <em:id>vlc-plugin@videolan.org</em:id>
-    <em:name>VideoLAN</em:name>
+    <em:name>VLC Web Plugin</em:name>
     <em:version>@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_REVISION@@VERSION_EXTRA@</em:version>
     <em:targetApplication>
       <Description>

@@ -36,7 +36,7 @@ using namespace std;
 
 #define COMPANY_STR "VideoLAN"
 #define PROGRAM_STR "VLCPlugin"
-#define DESCRIPTION "VideoLAN VLC ActiveX Plugin"
+#define DESCRIPTION "VLC ActiveX Plugin and IE Web Plugin"
 
 #define THREADING_MODEL "Apartment"
 #define MISC_STATUS     "131473"

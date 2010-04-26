@@ -11,10 +11,10 @@ BEGIN
   BEGIN
     BLOCK "040904E4"
     BEGIN
-      VALUE "CompanyName", "the VideoLAN Team"
+      VALUE "CompanyName", "VideoLAN"
       VALUE "FileVersion", "@VERSION@"
       VALUE "FileDescription", "VLC media player (Activex Plugin)"
-      VALUE "LegalCopyright", "(c) @COPYRIGHT_YEARS@ the VideoLAN Team"
+      VALUE "LegalCopyright", "(c) @COPYRIGHT_YEARS@ VideoLAN and Authors"
       VALUE "OLESelfRegister", "\0"
     END
   END
