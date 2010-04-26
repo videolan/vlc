@@ -351,45 +351,28 @@ static int Create( vlc_object_t *p_this )
     if( asprintf( &psz_fontsize, "%d", p_sys->i_default_font_size ) == -1 )
         goto error;
 
+
+    msg_Dbg( p_filter, "Building font databases.");
+    mtime_t t1, t2;
+    t1 = mdate();
+
 #ifdef WIN32
     dialog_progress_bar_t *p_dialog = NULL;
+    FcConfig *fcConfig = FcInitLoadConfig();
 
-    if( !FcConfigUptoDate( NULL ) )
-    {
-        p_dialog = dialog_ProgressCreate( p_filter,
+    p_dialog = dialog_ProgressCreate( p_filter,
             _("Building font cache"),
             _("Please wait while your font cache is rebuilt.\n"
                 "This should take less than a few minutes."), NULL );
-    }
-    char *path = xmalloc( PATH_MAX + 1 );
-    /* Fontconfig doesnt seem to know where windows fonts are with
-     * current contribs. So just tell default windows font directory
-     * is the place to search fonts
-     */
-    GetWindowsDirectory( path, PATH_MAX + 1 );
-    strcat( path, "\\fonts" );
-    if( p_dialog )
-        dialog_ProgressSet( p_dialog, NULL, 0.4 );
-
-    FcConfigAppFontAddDir( NULL , path );
-    free(path);
-
 
     if( p_dialog )
         dialog_ProgressSet( p_dialog, NULL, 0.5 );
 #endif
-    mtime_t t1, t2;
-
-    msg_Dbg( p_filter, "Building font database.");
-    t1 = mdate();
-    FcConfigBuildFonts( NULL );
+    FcConfigBuildFonts( fcConfig );
     t2 = mdate();
-
-    msg_Dbg( p_filter, "Finished building font database." );
     msg_Dbg( p_filter, "Took %ld microseconds", (long)((t2 - t1)) );
 
     fontpattern = FcPatternCreate();
-
     if( !fontpattern )
     {
         msg_Err( p_filter, "Creating fontpattern failed");
