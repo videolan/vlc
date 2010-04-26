@@ -4728,6 +4728,7 @@ AC_CONFIG_FILES([
   projects/mozilla/vlc.r
   projects/mozilla/install.js
   projects/mozilla/install.rdf
+  projects/mozilla/manifest.json
   share/Makefile
   compat/Makefile
   src/Makefile
