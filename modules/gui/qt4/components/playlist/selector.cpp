@@ -226,8 +226,8 @@ PLSelItem * PLSelector::addItem (
 
 PLSelItem * putSDData( PLSelItem* item, const char* name, const char* longname )
 {
-    item->treeItem()->setData( 0, NAME_ROLE, qfu( name ) );
-    item->treeItem()->setData( 0, LONGNAME_ROLE, qfu( longname ) );
+    item->treeItem()->setData( 0, NAME_ROLE, qtr( name ) );
+    item->treeItem()->setData( 0, LONGNAME_ROLE, qtr( longname ) );
     return item;
 }
 
