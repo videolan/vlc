@@ -1077,8 +1077,6 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
         return VLC_EGENERIC;
     }
 
-    var_SetBool( p_vout, "intf-change", true );
-
     /* Modify input as well because the vout might have to be restarted */
     var_Create( p_input, "vout-filter", VLC_VAR_STRING );
     var_SetString( p_input, "vout-filter", newval.psz_string );

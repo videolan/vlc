@@ -359,9 +359,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "mouse-moved", VLC_VAR_COORDS );
     var_Create( p_vout, "mouse-clicked", VLC_VAR_COORDS );
     var_Create( p_vout, "mouse-object", VLC_VAR_BOOL );
-
-    var_Create( p_vout, "intf-change", VLC_VAR_BOOL );
-    var_SetBool( p_vout, "intf-change", true );
 }
 
 /*****************************************************************************
@@ -899,8 +896,6 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
         return VLC_SUCCESS; /* no-op */
     p_vout->p->i_changes |= VOUT_FULLSCREEN_CHANGE;
 
-    val.b_bool = true;
-    var_Set( p_vout, "intf-change", val );
     return VLC_SUCCESS;
 }
 
