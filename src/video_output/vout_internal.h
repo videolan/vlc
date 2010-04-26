@@ -130,8 +130,6 @@ struct vout_thread_sys_t
 
     uint16_t            i_changes;          /**< changes made to the thread.
                                                       \see \ref vout_changes */
-    unsigned            b_fullscreen:1;       /**< toogle fullscreen display */
-    unsigned            b_on_top:1; /**< stay always on top of other windows */
 };
 
 /** \defgroup vout_changes Flags for changes
@@ -139,20 +137,17 @@ struct vout_thread_sys_t
  * thread changed a variable
  * @{
  */
-/** b_autoscale changed */
-#define VOUT_SCALE_CHANGE       0x0008
-/** b_on_top changed */
-#define VOUT_ON_TOP_CHANGE      0x0010
-/** b_fullscreen changed */
-#define VOUT_FULLSCREEN_CHANGE  0x0040
-/** i_zoom changed */
-#define VOUT_ZOOM_CHANGE        0x0080
 /** cropping parameters changed */
 #define VOUT_CROP_CHANGE        0x1000
 /** aspect ratio changed */
 #define VOUT_ASPECT_CHANGE      0x2000
 /**@}*/
 
+/* TODO to move them to vlc_vout.h */
+void vout_ControlChangeFullscreen(vout_thread_t *, bool fullscreen);
+void vout_ControlChangeOnTop(vout_thread_t *, bool is_on_top);
+void vout_ControlChangeDisplayFilled(vout_thread_t *, bool is_filled);
+void vout_ControlChangeZoom(vout_thread_t *, int num, int den);
 
 /* */
 void vout_IntfInit( vout_thread_t * );

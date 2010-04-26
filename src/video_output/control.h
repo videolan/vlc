@@ -39,10 +39,6 @@ enum {
     VOUT_CONTROL_STOP,
 
     /* Controls */
-    VOUT_CONTROL_FULLSCREEN,
-    VOUT_CONTROL_DISPLAY_FILLED,
-    VOUT_CONTROL_ZOOM,
-    VOUT_CONTROL_ON_TOP,
 
     VOUT_CONTROL_SOURCE_ASPECT,
     VOUT_CONTROL_SOURCE_CROP_BORDER,
@@ -63,6 +59,11 @@ enum {
     VOUT_CONTROL_RESET,
     VOUT_CONTROL_FLUSH,                 /* time */
     VOUT_CONTROL_STEP,                  /* time_ptr */
+
+    VOUT_CONTROL_FULLSCREEN,            /* bool */
+    VOUT_CONTROL_ON_TOP,                /* bool */
+    VOUT_CONTROL_DISPLAY_FILLED,        /* bool */
+    VOUT_CONTROL_ZOOM,                  /* pair */
 };
 
 typedef struct {

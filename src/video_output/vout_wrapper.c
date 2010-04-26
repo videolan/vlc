@@ -162,10 +162,6 @@ int vout_InitWrapper(vout_thread_t *vout)
         vout->fmt_in.i_y_offset       != source.i_y_offset )
         sys->i_changes |= VOUT_CROP_CHANGE;
 
-#warning "vout_InitWrapper: vout_SetWindowState should NOT be called there"
-    if (sys->b_on_top)
-        vout_SetWindowState(vd, VOUT_WINDOW_STATE_ABOVE);
-
     /* XXX For non dr case, the current vout implementation force us to
      * create at most 1 direct picture (otherwise the buffers will be kept
      * referenced even through the Init/End.
@@ -217,20 +213,9 @@ int vout_ManageWrapper(vout_thread_t *vout)
     vout_thread_sys_t *sys = vout->p;
     vout_display_t *vd = sys->display.vd;
 
-    while (sys->i_changes & (VOUT_FULLSCREEN_CHANGE |
-                              VOUT_ASPECT_CHANGE |
-                              VOUT_ZOOM_CHANGE |
-                              VOUT_SCALE_CHANGE |
-                              VOUT_ON_TOP_CHANGE |
+    while (sys->i_changes & (VOUT_ASPECT_CHANGE |
                               VOUT_CROP_CHANGE)) {
         /* */
-        if (sys->i_changes & VOUT_FULLSCREEN_CHANGE) {
-            sys->b_fullscreen = !sys->b_fullscreen;
-
-            var_SetBool(vout, "fullscreen", sys->b_fullscreen);
-            vout_SetDisplayFullscreen(vd, sys->b_fullscreen);
-            sys->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
-        }
         if (sys->i_changes & VOUT_ASPECT_CHANGE) {
             vout->fmt_out.i_sar_num = vout->fmt_in.i_sar_num;
             vout->fmt_out.i_sar_den = vout->fmt_in.i_sar_den;
@@ -238,34 +223,6 @@ int vout_ManageWrapper(vout_thread_t *vout)
             vout_SetDisplayAspect(vd, vout->fmt_in.i_sar_num, vout->fmt_in.i_sar_den);
 
             sys->i_changes &= ~VOUT_ASPECT_CHANGE;
-        }
-        if (sys->i_changes & VOUT_ZOOM_CHANGE) {
-            const float zoom = var_GetFloat(vout, "scale");
-
-            unsigned den = ZOOM_FP_FACTOR;
-            unsigned num = den * zoom;
-            if (num < (ZOOM_FP_FACTOR+9) / 10)
-                num = (ZOOM_FP_FACTOR+9) / 10;
-            else if (num > ZOOM_FP_FACTOR * 10)
-                num = ZOOM_FP_FACTOR * 10;
-
-            vout_SetDisplayZoom(vd, num, den);
-
-            sys->i_changes &= ~VOUT_ZOOM_CHANGE;
-        }
-        if (sys->i_changes & VOUT_SCALE_CHANGE) {
-            const bool is_display_filled = var_GetBool(vout, "autoscale");
-
-            vout_SetDisplayFilled(vd, is_display_filled);
-
-            sys->i_changes &= ~VOUT_SCALE_CHANGE;
-        }
-        if (sys->i_changes & VOUT_ON_TOP_CHANGE) {
-            vout_SetWindowState(vd, sys->b_on_top
-                ? VOUT_WINDOW_STATE_ABOVE
-                : VOUT_WINDOW_STATE_NORMAL);
-
-            sys->i_changes &= ~VOUT_ON_TOP_CHANGE;
         }
         if (sys->i_changes & VOUT_CROP_CHANGE) {
             const video_format_t crop = vout->fmt_in;

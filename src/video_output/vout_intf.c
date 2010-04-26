@@ -334,16 +334,14 @@ void vout_IntfInit( vout_thread_t *p_vout )
     text.psz_string = _("Always on top");
     var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "video-on-top", OnTopCallback, NULL );
+    var_TriggerCallback( p_vout, "video-on-top" );
 
     /* Add a variable to indicate whether we want window decoration or not */
     var_Create( p_vout, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* Add a fullscreen variable */
-    if( var_CreateGetBoolCommand( p_vout, "fullscreen" ) )
-    {
-        /* user requested fullscreen */
-        p_vout->p->i_changes |= VOUT_FULLSCREEN_CHANGE;
-    }
+    var_Create( p_vout, "fullscreen",
+                VLC_VAR_BOOL | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     text.psz_string = _("Fullscreen");
     var_Change( p_vout, "fullscreen", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
@@ -855,18 +853,10 @@ static int ScalingCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     (void)oldval; (void)newval; (void)p_data;
 
-    vlc_mutex_lock( &p_vout->p->change_lock );
-
     if( !strcmp( psz_cmd, "autoscale" ) )
-    {
-        p_vout->p->i_changes |= VOUT_SCALE_CHANGE;
-    }
+        vout_ControlChangeDisplayFilled( p_vout, newval.b_bool );
     else if( !strcmp( psz_cmd, "scale" ) )
-    {
-        p_vout->p->i_changes |= VOUT_ZOOM_CHANGE;
-    }
-
-    vlc_mutex_unlock( &p_vout->p->change_lock );
+        vout_ControlChangeZoom( p_vout, 1000 * newval.f_float, 1000 );
 
     return VLC_SUCCESS;
 }
@@ -875,13 +865,9 @@ static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-
-    vlc_mutex_lock( &p_vout->p->change_lock );
-    p_vout->p->i_changes |= VOUT_ON_TOP_CHANGE;
-    p_vout->p->b_on_top = newval.b_bool;
-    vlc_mutex_unlock( &p_vout->p->change_lock );
-
     (void)psz_cmd; (void)oldval; (void)p_data;
+
+    vout_ControlChangeOnTop( p_vout, newval.b_bool );
     return VLC_SUCCESS;
 }
 
@@ -889,13 +875,10 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    vlc_value_t val;
     (void)psz_cmd; (void)p_data;
 
-    if( oldval.b_bool == newval.b_bool )
-        return VLC_SUCCESS; /* no-op */
-    p_vout->p->i_changes |= VOUT_FULLSCREEN_CHANGE;
-
+    if( oldval.b_bool != newval.b_bool )
+        vout_ControlChangeFullscreen( p_vout, newval.b_bool );
     return VLC_SUCCESS;
 }
 

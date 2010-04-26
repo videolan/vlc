@@ -51,6 +51,7 @@
 #include "vout_internal.h"
 #include "interlacing.h"
 #include "postprocessing.h"
+#include "display.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -283,7 +284,6 @@ vout_thread_t * (vout_Create)( vlc_object_t *p_parent, video_format_t *p_fmt )
     /* Initialize misc stuff */
     vout_control_Init( &p_vout->p->control );
     p_vout->p->i_changes    = 0;
-    p_vout->p->b_fullscreen = 0;
     vout_chrono_Init( &p_vout->p->render, 5, 10000 ); /* Arbitrary initial time */
     vout_statistic_Init( &p_vout->p->statistic );
     p_vout->p->b_filter_change = 0;
@@ -558,6 +558,28 @@ void vout_DisplayTitle(vout_thread_t *vout, const char *title)
 spu_t *vout_GetSpu( vout_thread_t *p_vout )
 {
     return p_vout->p->p_spu;
+}
+
+/* vout_Control* are usable by anyone at anytime */
+void vout_ControlChangeFullscreen(vout_thread_t *vout, bool fullscreen)
+{
+    vout_control_PushBool(&vout->p->control, VOUT_CONTROL_FULLSCREEN,
+                          fullscreen);
+}
+void vout_ControlChangeOnTop(vout_thread_t *vout, bool is_on_top)
+{
+    vout_control_PushBool(&vout->p->control, VOUT_CONTROL_ON_TOP,
+                          is_on_top);
+}
+void vout_ControlChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
+{
+    vout_control_PushBool(&vout->p->control, VOUT_CONTROL_DISPLAY_FILLED,
+                          is_filled);
+}
+void vout_ControlChangeZoom(vout_thread_t *vout, int num, int den)
+{
+    vout_control_PushPair(&vout->p->control, VOUT_CONTROL_ZOOM,
+                          num, den);
 }
 
 /*****************************************************************************
@@ -938,6 +960,36 @@ static void ThreadStep(vout_thread_t *vout, mtime_t *duration)
     }
 }
 
+static void ThreadChangeFullscreen(vout_thread_t *vout, bool fullscreen)
+{
+    /* FIXME not sure setting "fullscreen" is good ... */
+    var_SetBool(vout, "fullscreen", fullscreen);
+    vout_SetDisplayFullscreen(vout->p->display.vd, fullscreen);
+}
+
+static void ThreadChangeOnTop(vout_thread_t *vout, bool is_on_top)
+{
+    vout_SetWindowState(vout->p->display.vd,
+                        is_on_top ? VOUT_WINDOW_STATE_ABOVE :
+                                    VOUT_WINDOW_STATE_NORMAL);
+}
+
+static void ThreadChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
+{
+    vout_SetDisplayFilled(vout->p->display.vd, is_filled);
+}
+
+static void ThreadChangeZoom(vout_thread_t *vout, int num, int den)
+{
+    if (num * 10 < den) {
+        num = den;
+        den *= 10;
+    } else if (num > den * 10) {
+        num = den * 10;
+    }
+
+    vout_SetDisplayZoom(vout->p->display.vd, num, den);
+}
 
 /*****************************************************************************
  * Thread: video output thread
@@ -1012,6 +1064,18 @@ static void *Thread(void *object)
                 break;
             case VOUT_CONTROL_STEP:
                 ThreadStep(vout, cmd.u.time_ptr);
+                break;
+            case VOUT_CONTROL_FULLSCREEN:
+                ThreadChangeFullscreen(vout, cmd.u.boolean);
+                break;
+            case VOUT_CONTROL_ON_TOP:
+                ThreadChangeOnTop(vout, cmd.u.boolean);
+                break;
+            case VOUT_CONTROL_DISPLAY_FILLED:
+                ThreadChangeDisplayFilled(vout, cmd.u.boolean);
+                break;
+            case VOUT_CONTROL_ZOOM:
+                ThreadChangeZoom(vout, cmd.u.pair.a, cmd.u.pair.b);
                 break;
             default:
                 break;
