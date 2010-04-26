@@ -732,7 +732,11 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 #endif
 #ifdef WIN32
     if( p_dialog )
+    {
         dialog_ProgressSet( p_dialog, NULL, 1.0 );
+        dialog_ProgressDestroy( p_dialog );
+        p_dialog = NULL;
+    }
 #endif
 #else
     /* FIXME you HAVE to give him a font if no fontconfig */
@@ -750,10 +754,6 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 
     /* */
     vlc_mutex_unlock( &libass_lock );
-#ifdef WIN32
-    if( p_dialog )
-        dialog_ProgressDestroy( p_dialog );
-#endif
     return p_ass;
 
 error:
