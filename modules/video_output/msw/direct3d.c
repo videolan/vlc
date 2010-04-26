@@ -69,17 +69,19 @@ vlc_module_begin ()
 
     add_bool("direct3d-desktop", false, NULL, DESKTOP_TEXT, DESKTOP_LONGTEXT, true)
 
-    set_capability("vout display", 70)
-    add_shortcut("direct3d_xp")
-    set_callbacks(OpenVideoXP, Close)
+    set_capability("vout display", 150)
+    add_shortcut("direct3d")
+    set_callbacks(OpenVideoVista, Close)
 
     /* FIXME: Hack to avoid unregistering our window class */
     cannot_unload_broken_library()
 
     add_submodule()
-        set_capability("vout display", 150)
-        add_shortcut("direct3d_vista")
-        set_callbacks(OpenVideoVista, Close)
+        set_description(N_("Direct3D video output (XP)"))
+        set_capability("vout display", 70)
+        add_shortcut("direct3d_xp")
+        set_callbacks(OpenVideoXP, Close)
+
 vlc_module_end ()
 
 #if 0 /* FIXME */
