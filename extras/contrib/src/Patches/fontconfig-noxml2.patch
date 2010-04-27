@@ -88,3 +88,23 @@ diff -ruN fontconfig/src/fcxml.c fontconfig.new/src/fcxml.c
      XML_Parser	    p;
      FcChar8	    *filename;
      int		    fd;
+--- fontconfig/src/fcinit.c	2010-04-27 15:31:41.000000000 +0200
++++ fontconfig.new/src/fcinit.c	2010-04-27 15:35:42.000000000 +0200
+@@ -34,11 +34,16 @@
+     config = FcConfigCreate ();
+     if (!config)
+ 	goto bail0;
+-    if (!FcConfigAddDir (config, (FcChar8 *) FC_DEFAULT_FONTS))
++    char *path = malloc( MAX_PATH + 1 );
++    GetWindowsDirectory( path, MAX_PATH + 1 );
++    strcat( path, "\\fonts" );
++//    printf( "Fonts dir: %s\n", path );
++    if (!FcConfigAddDir (config, (FcChar8 *) path))
+ 	goto bail1;
+     char dir[MAX_PATH+5];
+     SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, dir );
+     strncat( dir, "\\vlc", 4 );
++//    printf( "Cache dir: %s\n", dir );
+     if (!FcConfigAddCacheDir (config, (FcChar8 *)dir))
+ 	goto bail1;
+     return config;
