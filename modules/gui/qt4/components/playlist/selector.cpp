@@ -211,12 +211,12 @@ void PLSelector::setSource( QTreeWidgetItem *item )
 }
 
 PLSelItem * PLSelector::addItem (
-  SelectorItemType type, const QString& str, bool drop,
+  SelectorItemType type, const char* str, bool drop,
   QTreeWidgetItem* parentItem )
 {
   QTreeWidgetItem *item = parentItem ?
       new QTreeWidgetItem( parentItem ) : new QTreeWidgetItem( this );
-  PLSelItem *selItem = new PLSelItem( item, str );
+  PLSelItem *selItem = new PLSelItem( item, qtr( str ) );
   setItemWidget( item, 0, selItem );
   item->setData( 0, TYPE_ROLE, (int)type );
   if( !drop ) item->setFlags( item->flags() & ~Qt::ItemIsDropEnabled );
@@ -244,7 +244,7 @@ PLSelItem *PLSelector::addPodcastItem( playlist_item_t *p_item )
     vlc_gc_incref( p_item->p_input );
     char *psz_name = input_item_GetName( p_item->p_input );
     PLSelItem *item = addItem(
-            PL_ITEM_TYPE, qfu( psz_name ), false, podcastsParent );
+            PL_ITEM_TYPE,  psz_name, false, podcastsParent );
     item->addAction( RM_ACTION, qtr( "Remove this podcast subscription" ) );
     item->treeItem()->setData( 0, PL_ITEM_ROLE, QVariant::fromValue( p_item ) );
     item->treeItem()->setData( 0, PL_ITEM_ID_ROLE, QVariant(p_item->i_id) );
@@ -256,21 +256,21 @@ PLSelItem *PLSelector::addPodcastItem( playlist_item_t *p_item )
 
 void PLSelector::createItems()
 {
-    PLSelItem *pl = putPLData( addItem( PL_ITEM_TYPE, qtr( "Playlist" ), true ),
+    PLSelItem *pl = putPLData( addItem( PL_ITEM_TYPE, "Playlist", true ),
                               THEPL->p_playing );
     pl->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PL ) );
 
-    PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, qtr( "Media Library" ), true ),
+    PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, "Media Library", true ),
                               THEPL->p_media_library );
     ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
 
-    QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, qtr( "My Computer" ),
+    QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, "My Computer",
                                         false )->treeItem();
-    QTreeWidgetItem *devices = addItem( CATEGORY_TYPE, qtr( "Devices" ),
+    QTreeWidgetItem *devices = addItem( CATEGORY_TYPE, "Devices",
                                         false )->treeItem();
-    QTreeWidgetItem *lan = addItem( CATEGORY_TYPE, qtr( "Local Network" ),
+    QTreeWidgetItem *lan = addItem( CATEGORY_TYPE, "Local Network",
                                     false )->treeItem();
-    QTreeWidgetItem *internet = addItem( CATEGORY_TYPE, qtr( "Internet" ),
+    QTreeWidgetItem *internet = addItem( CATEGORY_TYPE, "Internet",
                                           false )->treeItem();;
 
     char **ppsz_longnames;
@@ -314,7 +314,7 @@ void PLSelector::createItems()
         }
         else
         {
-            putSDData( addItem( SD_TYPE, qtr( *ppsz_longname ), false ),
+            putSDData( addItem( SD_TYPE, *ppsz_longname, false ),
                        *ppsz_name, *ppsz_longname );
         }
 

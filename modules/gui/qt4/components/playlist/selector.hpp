@@ -123,7 +123,7 @@ private:
     void createItems();
     void drawBranches ( QPainter *, const QRect &, const QModelIndex & ) const;
     PLSelItem * addItem (
-        SelectorItemType type, const QString& str, bool drop,
+        SelectorItemType type, const char* str, bool drop,
         QTreeWidgetItem* parentItem = 0 );
     PLSelItem * addPodcastItem( playlist_item_t *p_item );
     inline PLSelItem * itemWidget( QTreeWidgetItem * );
