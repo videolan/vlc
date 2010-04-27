@@ -215,14 +215,14 @@ void VideoWidget::SetFullScreen( bool b_fs )
 
         QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
 
-        reparentable->setParent( NULL, newflags );
-        reparentable->setWindowState( newstate );
         /* To be sure window is on proper-screen in xinerama */
         if( !screenres.contains( reparentable->pos() ) )
         {
             msg_Dbg( p_intf, "Moving video to correct screen");
             reparentable->move( QPoint( screenres.x(), screenres.y() ) );
         }
+        reparentable->setParent( NULL, newflags );
+        reparentable->setWindowState( newstate );
         reparentable->show();
     }
     else
