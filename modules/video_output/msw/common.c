@@ -368,7 +368,7 @@ void UpdateRects(vout_display_t *vd,
     if (!IntersectRect(&rect_dest_clipped, &rect_dest,
                        &sys->rect_display)) {
         SetRectEmpty(&rect_src_clipped);
-        return;
+        goto exit;
     }
 
 #ifndef NDEBUG
@@ -389,7 +389,7 @@ void UpdateRects(vout_display_t *vd,
     if ((rect_dest_clipped.right - rect_dest_clipped.left) == 0 ||
         (rect_dest_clipped.bottom - rect_dest_clipped.top) == 0) {
         SetRectEmpty(&rect_src_clipped);
-        return;
+        goto exit;
     }
 
     /* src image dimensions */
@@ -444,6 +444,7 @@ void UpdateRects(vout_display_t *vd,
 
     CommonChangeThumbnailClip(vd, true);
 
+exit:
     /* Signal the change in size/position */
     sys->changes |= DX_POSITION_CHANGE;
 

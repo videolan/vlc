@@ -58,6 +58,10 @@
 
 #include "common.h"
 
+#ifdef UNICODE
+#   error "Unicode mode not supported"
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -190,7 +194,7 @@ static int Open(vlc_object_t *object)
     HMODULE huser32 = GetModuleHandle(_T("USER32"));
     if (huser32) {
         sys->MonitorFromWindow = (void*)GetProcAddress(huser32, _T("MonitorFromWindow"));
-        sys->GetMonitorInfo = (void*)GetProcAddress(huser32, _T("GetMonitorInfoW"));
+        sys->GetMonitorInfo = (void*)GetProcAddress(huser32, _T("GetMonitorInfoA"));
     } else {
         sys->MonitorFromWindow = NULL;
         sys->GetMonitorInfo = NULL;
@@ -588,7 +592,7 @@ static int DirectXOpenDDraw(vout_display_t *vd)
     if (sys->MonitorFromWindow) {
         HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEXA, LPVOID, DWORD);
         OurDirectDrawEnumerateEx =
-          (void *)GetProcAddress(sys->hddraw_dll, _T("DirectDrawEnumerateExW"));
+          (void *)GetProcAddress(sys->hddraw_dll, _T("DirectDrawEnumerateExA"));
 
         if (OurDirectDrawEnumerateEx) {
             char *device = var_GetString(vd, "directx-device");
@@ -1486,7 +1490,7 @@ static int FindDevicesCallback(vlc_object_t *object, char const *name,
     /* Enumerate displays */
     HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEXA,
                                                LPVOID, DWORD) =
-        (void *)GetProcAddress(hddraw_dll, _T("DirectDrawEnumerateExW"));
+        (void *)GetProcAddress(hddraw_dll, _T("DirectDrawEnumerateExA"));
     if (OurDirectDrawEnumerateEx)
         OurDirectDrawEnumerateEx(DirectXEnumCallback2, item,
                                  DDENUM_ATTACHEDSECONDARYDEVICES);
