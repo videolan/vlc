@@ -191,7 +191,8 @@ QVLCProgressDialog::QVLCProgressDialog (DialogHandler *parent,
     if (data->title != NULL)
         setWindowTitle (qfu(data->title));
     setWindowRole ("vlc-progress");
-    setMinimumDuration (0);
+    setMinimumDuration (300);
+    setValue( 0 );
 
     connect (this, SIGNAL(progressed(int)), SLOT(setValue(int)));
     connect (this, SIGNAL(described(const QString&)),
@@ -244,7 +245,7 @@ void DialogHandler::startProgressBar (vlc_object_t *, void *value)
     dialog_progress_bar_t *data = (dialog_progress_bar_t *)value;
     QWidget *dlg = new QVLCProgressDialog (this, data);
 
-    dlg->show ();
+//    dlg->show ();
 }
 
 void DialogHandler::stopProgressBar (QWidget *dlg)
