@@ -619,27 +619,8 @@ dnl getaddrinfo, getnameinfo and gai_strerror check
 dnl  -lnsl and -lsocket are needed on Solaris;
 dnl  we purposedly make the test fail on Windows
 LIBS_save="${LIBS}"
-AH_TEMPLATE(HAVE_GETADDRINFO, [Define to 1 if you have the `getaddrinfo' function.])
-AC_SEARCH_LIBS([getaddrinfo], [nsl], [AC_DEFINE(HAVE_GETADDRINFO)],, [${SOCKET_LIBS}])
-
-dnl NOTE: we assume getaddrinfo will be present if getnameinfo or gai_strerro
-dnl are
-LIBS="${LIBS_gai}"
-AC_CHECK_FUNCS([getnameinfo gai_strerror])
+AC_SEARCH_LIBS([getaddrinfo], [nsl],,, [${SOCKET_LIBS}])
 LIBS="${LIBS_save}"
-
-AH_TEMPLATE(HAVE_ADDRINFO, [Define to 1 if <netdb.h> defines `struct addrinfo'.])
-AC_CHECK_TYPES([struct addrinfo],[AC_DEFINE(HAVE_ADDRINFO)],,
-[#include <sys/types.h>
-#if defined( WIN32 ) || defined( UNDER_CE )
-# if defined(UNDER_CE) && defined(sockaddr_storage)
-#  undef sockaddr_storage
-# endif
-# include <winsock2.h>
-# include <ws2tcpip.h>
-#else
-# include <netdb.h>
-#endif])
 
 dnl Check for va_copy
 AC_CACHE_CHECK([for va_copy], ac_cv_c_va_copy,

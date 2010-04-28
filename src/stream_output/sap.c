@@ -307,7 +307,7 @@ int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
 
     if( i )
     {
-        msg_Err( p_sap, "%s", vlc_gai_strerror( i ) );
+        msg_Err( p_sap, "%s", gai_strerror( i ) );
         return VLC_EGENERIC;
     }
 

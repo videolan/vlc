@@ -142,7 +142,7 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     if( i_val )
     {
         msg_Err( p_this, "cannot resolve %s port %d : %s", psz_realhost,
-                 i_realport, vlc_gai_strerror( i_val ) );
+                 i_realport, gai_strerror( i_val ) );
         return -1;
     }
 

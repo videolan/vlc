@@ -141,7 +141,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
     if (i_val)
     {
         msg_Err (p_this, "Cannot resolve %s port %d : %s", psz_host, i_port,
-                 vlc_gai_strerror (i_val));
+                 gai_strerror (i_val));
         return NULL;
     }
 
