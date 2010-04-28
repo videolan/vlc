@@ -720,100 +720,107 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 
 
     memset( &frame, 0, sizeof( AVFrame ) );
-    for( i_plane = 0; i_plane < p_pict->i_planes; i_plane++ )
-    {
-        frame.data[i_plane] = p_pict->p[i_plane].p_pixels;
-        frame.linesize[i_plane] = p_pict->p[i_plane].i_pitch;
-    }
+    if( likely(p_pict) ) {
+       for( i_plane = 0; i_plane < p_pict->i_planes; i_plane++ )
+       {
+           frame.data[i_plane] = p_pict->p[i_plane].p_pixels;
+           frame.linesize[i_plane] = p_pict->p[i_plane].i_pitch;
+       }
 
-    /* Let ffmpeg select the frame type */
-    frame.pict_type = 0;
+       /* Let ffmpeg select the frame type */
+       frame.pict_type = 0;
 
-    frame.repeat_pict = p_pict->i_nb_fields - 2;
-    frame.interlaced_frame = !p_pict->b_progressive;
-    frame.top_field_first = !!p_pict->b_top_field_first;
+       frame.repeat_pict = p_pict->i_nb_fields - 2;
+       frame.interlaced_frame = !p_pict->b_progressive;
+       frame.top_field_first = !!p_pict->b_top_field_first;
 
-    /* Set the pts of the frame being encoded (segfaults with mpeg4!)*/
-    if( p_enc->fmt_out.i_codec != VLC_CODEC_MP4V )
-    {
-        frame.pts = p_pict->date ? p_pict->date : (int64_t)AV_NOPTS_VALUE;
+       /* Set the pts of the frame being encoded (segfaults with mpeg4!)*/
+       if( p_enc->fmt_out.i_codec != VLC_CODEC_MP4V )
+       {
+           frame.pts = p_pict->date ? p_pict->date : (int64_t)AV_NOPTS_VALUE;
 
-        if ( p_sys->b_hurry_up && frame.pts != (int64_t)AV_NOPTS_VALUE )
-        {
-            mtime_t current_date = mdate();
+           if ( p_sys->b_hurry_up && frame.pts != (int64_t)AV_NOPTS_VALUE )
+           {
+               mtime_t current_date = mdate();
 
-            if ( current_date + HURRY_UP_GUARD3 > frame.pts )
-            {
-                p_sys->p_context->mb_decision = FF_MB_DECISION_SIMPLE;
-                p_sys->p_context->trellis = 0;
-                msg_Dbg( p_enc, "hurry up mode 3" );
-            }
-            else
-            {
-                p_sys->p_context->mb_decision = p_sys->i_hq;
+               if ( current_date + HURRY_UP_GUARD3 > frame.pts )
+               {
+                   p_sys->p_context->mb_decision = FF_MB_DECISION_SIMPLE;
+                   p_sys->p_context->trellis = 0;
+                   msg_Dbg( p_enc, "hurry up mode 3" );
+               }
+               else
+               {
+                   p_sys->p_context->mb_decision = p_sys->i_hq;
 
-                if ( current_date + HURRY_UP_GUARD2 > frame.pts )
-                {
-                    p_sys->p_context->trellis = 0;
-                    p_sys->p_context->noise_reduction = p_sys->i_noise_reduction
-                         + (HURRY_UP_GUARD2 + current_date - frame.pts) / 500;
-                    msg_Dbg( p_enc, "hurry up mode 2" );
-                }
-                else
-                {
-                    p_sys->p_context->trellis = p_sys->b_trellis;
+                   if ( current_date + HURRY_UP_GUARD2 > frame.pts )
+                   {
+                       p_sys->p_context->trellis = 0;
+                       p_sys->p_context->noise_reduction = p_sys->i_noise_reduction
+                            + (HURRY_UP_GUARD2 + current_date - frame.pts) / 500;
+                       msg_Dbg( p_enc, "hurry up mode 2" );
+                   }
+                   else
+                   {
+                       p_sys->p_context->trellis = p_sys->b_trellis;
 
-                    p_sys->p_context->noise_reduction =
-                        p_sys->i_noise_reduction;
-                }
-            }
+                       p_sys->p_context->noise_reduction =
+                           p_sys->i_noise_reduction;
+                   }
+               }
 
-            if ( current_date + HURRY_UP_GUARD1 > frame.pts )
-            {
-                frame.pict_type = FF_P_TYPE;
-                /* msg_Dbg( p_enc, "hurry up mode 1 %lld", current_date + HURRY_UP_GUARD1 - frame.pts ); */
-            }
-        }
+               if ( current_date + HURRY_UP_GUARD1 > frame.pts )
+               {
+                   frame.pict_type = FF_P_TYPE;
+                   /* msg_Dbg( p_enc, "hurry up mode 1 %lld", current_date + HURRY_UP_GUARD1 - frame.pts ); */
+               }
+           }
+       }
+       else
+       {
+           frame.pts = (int64_t)AV_NOPTS_VALUE;
+       }
+
+       if ( frame.pts != (int64_t)AV_NOPTS_VALUE && frame.pts != 0 )
+       {
+           if ( p_sys->i_last_pts == frame.pts )
+           {
+               msg_Warn( p_enc, "almost fed libavcodec with two frames with the "
+                         "same PTS (%"PRId64 ")", frame.pts );
+               return NULL;
+           }
+           else if ( p_sys->i_last_pts > frame.pts )
+           {
+               msg_Warn( p_enc, "almost fed libavcodec with a frame in the "
+                         "past (current: %"PRId64 ", last: %"PRId64")",
+                         frame.pts, p_sys->i_last_pts );
+               return NULL;
+           }
+           else
+           {
+               p_sys->i_last_pts = frame.pts;
+           }
+       }
+
+       frame.quality = p_sys->i_quality;
+
+       /* Ugly work-around for stupid libavcodec behaviour */
+       p_sys->i_framenum++;
+       p_sys->pi_delay_pts[p_sys->i_framenum % MAX_FRAME_DELAY] = frame.pts;
+       frame.pts = p_sys->i_framenum * AV_TIME_BASE *
+           p_enc->fmt_in.video.i_frame_rate_base;
+       frame.pts += p_enc->fmt_in.video.i_frame_rate - 1;
+       frame.pts /= p_enc->fmt_in.video.i_frame_rate;
+       /* End work-around */
+
+       i_out = avcodec_encode_video( p_sys->p_context, p_sys->p_buffer_out,
+                                     p_sys->i_buffer_out, &frame );
     }
     else
     {
-        frame.pts = (int64_t)AV_NOPTS_VALUE;
+       i_out = avcodec_encode_video( p_sys->p_context, p_sys->p_buffer_out,
+                                     p_sys->i_buffer_out, NULL);
     }
-
-    if ( frame.pts != (int64_t)AV_NOPTS_VALUE && frame.pts != 0 )
-    {
-        if ( p_sys->i_last_pts == frame.pts )
-        {
-            msg_Warn( p_enc, "almost fed libavcodec with two frames with the "
-                      "same PTS (%"PRId64 ")", frame.pts );
-            return NULL;
-        }
-        else if ( p_sys->i_last_pts > frame.pts )
-        {
-            msg_Warn( p_enc, "almost fed libavcodec with a frame in the "
-                      "past (current: %"PRId64 ", last: %"PRId64")",
-                      frame.pts, p_sys->i_last_pts );
-            return NULL;
-        }
-        else
-        {
-            p_sys->i_last_pts = frame.pts;
-        }
-    }
-
-    frame.quality = p_sys->i_quality;
-
-    /* Ugly work-around for stupid libavcodec behaviour */
-    p_sys->i_framenum++;
-    p_sys->pi_delay_pts[p_sys->i_framenum % MAX_FRAME_DELAY] = frame.pts;
-    frame.pts = p_sys->i_framenum * AV_TIME_BASE *
-        p_enc->fmt_in.video.i_frame_rate_base;
-    frame.pts += p_enc->fmt_in.video.i_frame_rate - 1;
-    frame.pts /= p_enc->fmt_in.video.i_frame_rate;
-    /* End work-around */
-
-    i_out = avcodec_encode_video( p_sys->p_context, p_sys->p_buffer_out,
-                                  p_sys->i_buffer_out, &frame );
 
     if( i_out > 0 )
     {

@@ -637,6 +637,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
             transcode_audio_close( id );
             break;
         case VIDEO_ES:
+            Send( p_stream, id, NULL );
             transcode_video_close( p_stream, id );
             break;
         case SPU_ES:

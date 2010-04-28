@@ -535,6 +535,19 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
     picture_t *p_pic, *p_pic2 = NULL;
     *out = NULL;
 
+    if( in == NULL )
+    {
+       block_t *p_block;
+       do {
+           video_timer_start( id->p_encoder );
+           p_block = id->p_encoder->pf_encode_video(id->p_encoder, NULL );
+           video_timer_stop( id->p_encoder );
+           block_ChainAppend( out, p_block );
+       } while( p_block );
+       return VLC_SUCCESS;
+    }
+
+
     while( (p_pic = id->p_decoder->pf_decode_video( id->p_decoder, &in )) )
     {
         subpicture_t *p_subpic = NULL;

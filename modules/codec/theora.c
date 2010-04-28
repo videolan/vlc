@@ -676,6 +676,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     yuv_buffer yuv;
     int i;
 
+    if( !p_pict ) return NULL;
     /* Sanity check */
     if( p_pict->p[0].i_pitch < (int)p_sys->i_width ||
         p_pict->p[0].i_lines < (int)p_sys->i_height )

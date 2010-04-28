@@ -781,6 +781,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
     int i_plane, i_line, i_width, i_src_stride;
     uint8_t *p_dst;
 
+    if( !p_pic ) return NULL;
     /* we only know if the sequence is interlaced when the first
      * picture arrives, so final setup is done here */
     /* XXX todo, detect change of interlace */

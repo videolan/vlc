@@ -1302,11 +1302,13 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pic )
     OMX_BUFFERHEADERTYPE *p_header;
     block_t *p_block = 0;
 
+    if( !p_pic ) return NULL;
+
     /* Check for errors from codec */
     if(p_sys->b_error)
     {
         msg_Dbg(p_dec, "error during encoding");
-        return 0;
+        return NULL;
     }
 
     /* Send the input buffer to the component */

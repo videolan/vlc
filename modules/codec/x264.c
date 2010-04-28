@@ -1292,20 +1292,26 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     x264_picture_t pic;
     x264_nal_t *nal;
     block_t *p_block;
-    int i_nal, i_out, i;
+    int i_nal=0, i_out=0, i=0;
 
     /* init pic */
     memset( &pic, 0, sizeof( x264_picture_t ) );
-    pic.i_pts = p_pict->date;
-    pic.img.i_csp = X264_CSP_I420;
-    pic.img.i_plane = p_pict->i_planes;
-    for( i = 0; i < p_pict->i_planes; i++ )
-    {
-        pic.img.plane[i] = p_pict->p[i].p_pixels;
-        pic.img.i_stride[i] = p_pict->p[i].i_pitch;
-    }
+    if( likely(p_pict) ) {
+       pic.i_pts = p_pict->date;
+       pic.img.i_csp = X264_CSP_I420;
+       pic.img.i_plane = p_pict->i_planes;
+       for( i = 0; i < p_pict->i_planes; i++ )
+       {
+           pic.img.plane[i] = p_pict->p[i].p_pixels;
+           pic.img.i_stride[i] = p_pict->p[i].i_pitch;
+       }
 
-    x264_encoder_encode( p_sys->h, &nal, &i_nal, &pic, &pic );
+       x264_encoder_encode( p_sys->h, &nal, &i_nal, &pic, &pic );
+    } else {
+       if( x264_encoder_delayed_frames( p_sys->h ) ) {
+           x264_encoder_encode( p_sys->h, &nal, &i_nal, NULL, &pic );
+       }
+    }
 
     if( !i_nal ) return NULL;
 
