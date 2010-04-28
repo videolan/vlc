@@ -245,10 +245,10 @@ static int OpenCommon(vlc_object_t *object, imem_sys_t **sys_ptr, const char *ps
 {
     char *tmp;
 
-	/* */
+    /* */
     imem_sys_t *sys = calloc(1, sizeof(*sys));
-	if (!sys)
-		return VLC_ENOMEM;
+    if (!sys)
+        return VLC_ENOMEM;
 
     /* Read the user functions */
     tmp = var_InheritString(object, "imem-get");
@@ -411,9 +411,9 @@ static int OpenDemux(vlc_object_t *object)
     if (OpenCommon(object, &sys, demux->psz_path))
         return VLC_EGENERIC;
 
-	/* ES format */
+    /* ES format */
     es_format_t fmt;
-	es_format_Init(&fmt, UNKNOWN_ES, 0);
+    es_format_Init(&fmt, UNKNOWN_ES, 0);
 
     fmt.i_id = var_InheritInteger(object, "imem-id");
     fmt.i_group = var_InheritInteger(object, "imem-group");
@@ -479,7 +479,7 @@ static int OpenDemux(vlc_object_t *object)
 
     fmt.psz_language = var_InheritString(object, "imem-language");
 
-	sys->es = es_out_Add(demux->out, &fmt);
+    sys->es = es_out_Add(demux->out, &fmt);
     es_format_Clean(&fmt);
 
     if (!sys->es) {
