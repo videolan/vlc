@@ -99,11 +99,11 @@ static int ACL_Resolve( vlc_object_t *p_this, uint8_t *p_bytes,
 
         default:
             msg_Err( p_this, "unknown address family" );
-            vlc_freeaddrinfo( res );
+            freeaddrinfo( res );
             return -1;
     }
 
-    vlc_freeaddrinfo( res );
+    freeaddrinfo( res );
     return i_family;
 }
 

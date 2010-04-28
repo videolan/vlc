@@ -215,7 +215,7 @@ next_ai: /* failure */
         continue;
     }
 
-    vlc_freeaddrinfo( res );
+    freeaddrinfo( res );
 
     if( i_handle == -1 )
         return -1;
@@ -459,7 +459,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
         SetWBE( &buffer[2], i_port );   /* Port */
         memcpy( &buffer[4],             /* Address */
                 &((struct sockaddr_in *)(p_res->ai_addr))->sin_addr, 4 );
-        vlc_freeaddrinfo( p_res );
+        freeaddrinfo( p_res );
 
         buffer[8] = 0;                  /* Empty user id */
 

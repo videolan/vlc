@@ -227,7 +227,6 @@ VLC_EXPORT (int, vlc_poll, (struct pollfd *fds, unsigned nfds, int timeout));
 
 VLC_EXPORT( int, vlc_getnameinfo, ( const struct sockaddr *, int, char *, int, int *, int ) );
 VLC_EXPORT( int, vlc_getaddrinfo, ( vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo ** ) );
-VLC_EXPORT( void, vlc_freeaddrinfo, ( struct addrinfo * ) );
 
 
 static inline bool

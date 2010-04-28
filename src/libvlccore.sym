@@ -502,7 +502,6 @@ vlc_event_manager_register_event_type
 vlc_event_send
 vlc_execve
 vlc_fastmem_register
-vlc_freeaddrinfo
 vlc_fourcc_GetCodec
 vlc_fourcc_GetCodecAudio
 vlc_fourcc_GetCodecFromString

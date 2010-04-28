@@ -81,7 +81,7 @@ sout_AnnounceRegisterSDP( vlc_object_t *obj, const char *psz_sdp,
         if (res->ai_addrlen <= sizeof (p_session->addr))
             memcpy (&p_session->addr, res->ai_addr,
                     p_session->addrlen = res->ai_addrlen);
-        vlc_freeaddrinfo (res);
+        freeaddrinfo (res);
     }
 
     vlc_mutex_lock (&sap_mutex);

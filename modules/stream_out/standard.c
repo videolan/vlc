@@ -438,13 +438,13 @@ static int Open( vlc_object_t *p_this )
         if ( vlc_getaddrinfo ( VLC_OBJECT(p_stream), dhost, dport, &hints, &res) == 0)
         {
             memcpy (&dst, res->ai_addr, dstlen = res->ai_addrlen);
-            vlc_freeaddrinfo (res);
+            freeaddrinfo (res);
         }
 
         if (vlc_getaddrinfo ( VLC_OBJECT(p_stream), shost, sport, &hints, &res) == 0)
         {
             memcpy (&src, res->ai_addr, srclen = res->ai_addrlen);
-            vlc_freeaddrinfo (res);
+            freeaddrinfo (res);
         }
 
         char *head = vlc_sdp_Start (VLC_OBJECT (p_stream), SOUT_CFG_PREFIX,

@@ -203,7 +203,7 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
         break;
     }
 
-    vlc_freeaddrinfo (res);
+    freeaddrinfo (res);
     return val;
 }
 
@@ -723,7 +723,7 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
         }
     }
 
-    vlc_freeaddrinfo( res );
+    freeaddrinfo( res );
 
     if( i_handle == -1 )
     {
@@ -774,7 +774,7 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
     {
         msg_Err (obj, "cannot resolve %s port %d : %s", psz_bind, i_bind,
                  gai_strerror (val));
-        vlc_freeaddrinfo (rem);
+        freeaddrinfo (rem);
         return -1;
     }
 
@@ -817,8 +817,8 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
         net_Close (fd);
     }
 
-    vlc_freeaddrinfo (rem);
-    vlc_freeaddrinfo (loc);
+    freeaddrinfo (rem);
+    freeaddrinfo (loc);
     return val;
 }
 

@@ -235,7 +235,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
             net_Close (fd);
     }
 
-    vlc_freeaddrinfo (res);
+    freeaddrinfo (res);
 
     if (sockv != NULL)
         sockv[sockc] = -1;

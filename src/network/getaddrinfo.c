@@ -79,7 +79,7 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
  * @param res pointer set to the resulting chained list.
  * @return 0 on success, a getaddrinfo() error otherwise.
  * On failure, *res is undefined. On success, it must be freed with
- * vlc_freeaddrinfo().
+ * freeaddrinfo().
  */
 int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
                      int i_port, const struct addrinfo *p_hints,
@@ -201,11 +201,6 @@ out:
     return ret;
 }
 
-
-void vlc_freeaddrinfo( struct addrinfo *infos )
-{
-    freeaddrinfo (infos);
-}
 
 /**
  * inet_pton() replacement
