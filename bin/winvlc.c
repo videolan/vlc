@@ -46,11 +46,6 @@
 static void check_crashdump(void);
 LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo);
 # endif
-typedef enum _HEAP_INFORMATION_CLASS {
-        HeapCompatibilityInformation,
-        HeapEnableTerminationOnCorruption
-} HEAP_INFORMATION_CLASS;
-WINBASEAPI BOOL WINAPI HeapSetInformation(HANDLE,HEAP_INFORMATION_CLASS,PVOID,SIZE_T);
 #define HeapEnableTerminationOnCorruption (HEAP_INFORMATION_CLASS)1
 #endif
 
