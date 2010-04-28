@@ -164,6 +164,7 @@ typedef struct
     bool            b_muxed;
     bool            b_quicktime;
     bool            b_asf;
+    block_t         *p_asf_block;
     bool            b_discard_trunc;
     stream_t        *p_out_muxed;    /* for muxed stream */
 
@@ -703,7 +704,7 @@ static int SessionsSetup( demux_t *p_demux )
         }
 
         if( !strcmp( sub->codecName(), "X-ASF-PF" ) )
-            bInit = sub->initiate( 4 ); /* Constant ? */
+            bInit = sub->initiate( 0 );
         else
             bInit = sub->initiate();
 
@@ -771,6 +772,7 @@ static int SessionsSetup( demux_t *p_demux )
             tk->p_es        = NULL;
             tk->b_quicktime = false;
             tk->b_asf       = false;
+            tk->p_asf_block = NULL;
             tk->b_muxed     = false;
             tk->b_discard_trunc = false;
             tk->p_out_muxed = NULL;
@@ -1506,6 +1508,7 @@ static int RollOverTcp( demux_t *p_demux )
 
         if( tk->b_muxed ) stream_Delete( tk->p_out_muxed );
         if( tk->p_es ) es_out_Del( p_demux->out, tk->p_es );
+        if( tk->p_asf_block ) block_Release( tk->p_asf_block );
         es_format_Clean( &tk->fmt );
         free( tk->p_buffer );
         free( tk );
@@ -1554,6 +1557,91 @@ error:
     return VLC_EGENERIC;
 }
 
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static block_t *StreamParseAsf( demux_t *p_demux, live_track_t *tk,
+                                bool b_marker,
+                                const uint8_t *p_data, unsigned i_size )
+{
+    const unsigned i_packet_size = p_demux->p_sys->asfh.i_min_data_packet_size;
+    block_t *p_list = NULL;
+
+    while( i_size >= 4 )
+    {
+        unsigned i_flags = p_data[0];
+        unsigned i_length_offset = (p_data[1] << 16) |
+                                   (p_data[2] <<  8) |
+                                   (p_data[3]      );
+        bool b_key = i_flags & 0x80;
+        bool b_length = i_flags & 0x40;
+        bool b_relative_ts = i_flags & 0x20;
+        bool b_duration = i_flags & 0x10;
+        bool b_location_id = i_flags & 0x08;
+
+        //msg_Dbg( p_demux, "ASF: marker=%d size=%d : %c=%d id=%d",
+        //         b_marker, i_size, b_length ? 'L' : 'O', i_length_offset );
+        unsigned i_header_size = 4;
+        if( b_relative_ts )
+            i_header_size += 4;
+        if( b_duration )
+            i_header_size += 4;
+        if( b_location_id )
+            i_header_size += 4;
+
+        if( i_header_size > i_size )
+        {
+            msg_Warn( p_demux, "Invalid header size" );
+            break;
+        }
+
+        /* XXX
+         * When b_length is true, the streams I found do not seems to respect
+         * the documentation.
+         * From them, I have failed to find which choice between '__MIN()' or
+         * 'i_length_offset - i_header_size' is the right one.
+         */
+        unsigned i_payload;
+        if( b_length )
+            i_payload = __MIN( i_length_offset, i_size - i_header_size);
+        else
+            i_payload = i_size - i_header_size;
+
+        if( !tk->p_asf_block )
+        {
+            tk->p_asf_block = block_New( p_demux, i_packet_size );
+            if( !tk->p_asf_block )
+                break;
+            tk->p_asf_block->i_buffer = 0;
+        }
+        unsigned i_offset  = b_length ? 0 : i_length_offset;
+        if( i_offset == tk->p_asf_block->i_buffer && i_offset + i_payload <= i_packet_size )
+        {
+            memcpy( &tk->p_asf_block->p_buffer[i_offset], &p_data[i_header_size], i_payload );
+            tk->p_asf_block->i_buffer += i_payload;
+            if( b_marker )
+            {
+                /* We have a complete packet */
+                tk->p_asf_block->i_buffer = i_packet_size;
+                block_ChainAppend( &p_list, tk->p_asf_block );
+                tk->p_asf_block = NULL;
+            }
+        }
+        else
+        {
+            /* Reset on broken stream */
+            msg_Err( p_demux, "Broken packet detected (%d vs %d or %d + %d vs %d)",
+                     i_offset, tk->p_asf_block->i_buffer, i_offset, i_payload, i_packet_size);
+            tk->p_asf_block->i_buffer = 0;
+        }
+
+        /* */
+        p_data += i_header_size + i_payload;
+        i_size -= i_header_size + i_payload;
+    }
+    return p_list;
+}
 
 /*****************************************************************************
  *
@@ -1709,10 +1797,9 @@ static void StreamRead( void *p_private, unsigned int i_size,
     }
     else if( tk->b_asf )
     {
-        int i_copy = __MIN( p_sys->asfh.i_min_data_packet_size, (int)i_size );
-        p_block = block_New( p_demux, p_sys->asfh.i_min_data_packet_size );
-
-        memcpy( p_block->p_buffer, tk->p_buffer, i_copy );
+        p_block = StreamParseAsf( p_demux, tk,
+                                  tk->sub->rtpSource()->curPacketMarkerBit(),
+                                  tk->p_buffer, i_size );
     }
     else
     {
@@ -1725,32 +1812,26 @@ static void StreamRead( void *p_private, unsigned int i_size,
         p_sys->i_pcr = i_pts;
     }
 
-    if( (i_pts != tk->i_pts) && (!tk->b_muxed) )
-    {
-        p_block->i_pts = VLC_TS_0 + i_pts;
-    }
-
     /* Update our global npt value */
     if( tk->i_npt > 0 && tk->i_npt > p_sys->i_npt && tk->i_npt < p_sys->i_npt_length)
         p_sys->i_npt = tk->i_npt;
 
-    if( !tk->b_muxed )
+    if( p_block )
     {
-        /*FIXME: for h264 you should check that packetization-mode=1 in sdp-file */
-        p_block->i_dts = ( tk->fmt.i_codec == VLC_CODEC_MPGV ) ? VLC_TS_INVALID : (VLC_TS_0 + i_pts);
-    }
+        if( !tk->b_muxed && !tk->b_asf )
+        {
+            if( i_pts != tk->i_pts )
+                p_block->i_pts = VLC_TS_0 + i_pts;
+            /*FIXME: for h264 you should check that packetization-mode=1 in sdp-file */
+            p_block->i_dts = ( tk->fmt.i_codec == VLC_CODEC_MPGV ) ? VLC_TS_INVALID : (VLC_TS_0 + i_pts);
+        }
 
-    if( tk->b_muxed )
-    {
-        stream_DemuxSend( tk->p_out_muxed, p_block );
-    }
-    else if( tk->b_asf )
-    {
-        stream_DemuxSend( p_sys->p_out_asf, p_block );
-    }
-    else
-    {
-        es_out_Send( p_demux->out, tk->p_es, p_block );
+        if( tk->b_muxed )
+            stream_DemuxSend( tk->p_out_muxed, p_block );
+        else if( tk->b_asf )
+            stream_DemuxSend( p_sys->p_out_asf, p_block );
+        else
+            es_out_Send( p_demux->out, tk->p_es, p_block );
     }
 
     /* warn that's ok */
