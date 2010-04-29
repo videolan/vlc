@@ -142,6 +142,7 @@ inline void PluginTab::FillTree()
         QTreeWidgetItem *item = new PluginTreeItem( qs_item );
         treePlugins->addTopLevelItem( item );
     }
+    module_list_free( p_list );
 }
 
 void PluginTab::search( const QString& qs )
