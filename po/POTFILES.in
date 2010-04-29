@@ -1135,3 +1135,25 @@ modules/visualization/visual/fft.c
 modules/visualization/visual/fft.h
 modules/visualization/visual/visual.c
 modules/visualization/visual/visual.h
+
+# Qt4 .ui files
+# uncomment (and prepend $builddir} if you want to generate a proper vlc.pot 
+
+#modules/gui/qt4/ui/equalizer.h
+#modules/gui/qt4/ui/open.h
+#modules/gui/qt4/ui/open_capture.h
+#modules/gui/qt4/ui/open_disk.h
+#modules/gui/qt4/ui/open_file.h
+#modules/gui/qt4/ui/open_net.h
+#modules/gui/qt4/ui/podcast_configuration.h
+#modules/gui/qt4/ui/profiles.h
+#modules/gui/qt4/ui/sout.h
+#modules/gui/qt4/ui/sprefs_audio.h
+#modules/gui/qt4/ui/sprefs_input.h
+#modules/gui/qt4/ui/sprefs_interface.h
+#modules/gui/qt4/ui/sprefs_subtitles.h
+#modules/gui/qt4/ui/sprefs_video.h
+#modules/gui/qt4/ui/streampanel.h
+#modules/gui/qt4/ui/v4l2.h
+#modules/gui/qt4/ui/video_effects.h
+#modules/gui/qt4/ui/vlm.h
