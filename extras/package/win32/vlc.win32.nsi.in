@@ -658,6 +658,10 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_DUTCH} Dutch 0
   StrCmp $LANGUAGE ${LANG_SIMPCHINESE} SChinese 0
   StrCmp $LANGUAGE ${LANG_FINNISH} Finnish 0
+;  StrCmp $LANGUAGE ${LANG_BENGALI} Bengali 0
+;  StrCmp $LANGUAGE ${LANG_PUNJABI} Punjabi 0
+;  StrCmp $LANGUAGE ${LANG_SLOVENIAN} Slovenian 0
+  StrCmp $LANGUAGE ${LANG_SPANISH} Spanish 0
   StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
   French:
   !include "languages\french.nsh"
@@ -694,6 +698,18 @@ UAC_Success:
   Goto EndLanguageCmp
   Finnish:
   !include "languages\finnish.nsh"
+  Goto EndLanguageCmp
+  Bengali:
+  !include "languages\bengali.nsh"
+  Goto EndLanguageCmp
+  Punjabi:
+  !include "languages\punjabi.nsh"
+  Goto EndLanguageCmp
+  Slovenian:
+  !include "languages\slovenian.nsh"
+  Goto EndLanguageCmp
+  Spanish:
+  !include "languages\spanish.nsh"
   Goto EndLanguageCmp
   Brazilian:
   !include "languages\brazilian_portuguese.nsh"
@@ -950,6 +966,10 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_DUTCH} Dutch 0
   StrCmp $LANGUAGE ${LANG_SIMPCHINESE} SChinese 0
   StrCmp $LANGUAGE ${LANG_FINNISH} Finnish 0
+;  StrCmp $LANGUAGE ${LANG_BENGALI} Bengali 0
+;  StrCmp $LANGUAGE ${LANG_PUNJABI} Punjabi 0
+;  StrCmp $LANGUAGE ${LANG_SLOVENIAN} Slovenian 0
+  StrCmp $LANGUAGE ${LANG_SPANISH} Spanish 0
   StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
   French:
   !include "languages\french.nsh"
@@ -987,8 +1007,20 @@ UAC_Success:
   Finnish:
   !include "languages\finnish.nsh"
   Goto EndLanguageCmp
+  Bengali:
+  !include "languages\bengali.nsh"
+  Goto EndLanguageCmp
+  Punjabi:
+  !include "languages\punjabi.nsh"
+  Goto EndLanguageCmp
+  Slovenian:
+  !include "languages\slovenian.nsh"
+  Goto EndLanguageCmp
+  Spanish:
+  !include "languages\spanish.nsh"
+  Goto EndLanguageCmp
   Brazilian:
   !include "languages\brazilian_portuguese.nsh"
   EndLanguageCmp:
-
+  
 FunctionEnd

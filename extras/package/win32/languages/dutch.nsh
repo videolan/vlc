@@ -5,8 +5,8 @@ StrCpy $Name_Section03 "Mozilla plugin"
 StrCpy $Name_Section04 "ActiveX plugin"
 StrCpy $Name_Section05 "Schijven afspelen"
 StrCpy $Name_Section06 "Bestandstype-associaties"
-StrCpy $Name_SectionGroupAudio "Audio bestanden"
-StrCpy $Name_SectionGroupVideo "Video bestanden"
+StrCpy $Name_SectionGroupAudio "Audiobestanden"
+StrCpy $Name_SectionGroupVideo "Videobestanden"
 StrCpy $Name_SectionGroupOther "Andere"
 StrCpy $Name_Section07 "Context menu's"
 StrCpy $Name_Section08 "Voorkeuren en buffers wissen"
@@ -31,10 +31,10 @@ StrCpy $Desc_Section08 \
     "Verwijdert VLC mediaspeler voorkeuren en bufferbestanden die van vorige installaties overgebleven zijn"
 
 StrCpy $Message_AlreadyInstalled  \
-"VLC mediaspeler is reeds geinstalleerd. $\nWilt u de vorige versie \
+"VLC mediaspeler is reeds geïnstalleerd. $\nWilt u de vorige versie \
 verwijderen voordat u $(^Name) installeert ?"
 
-StrCpy $Name_Section91 "Deinstalleren"
+StrCpy $Name_Section91 "Deïnstalleren"
 StrCpy $Name_Section92 "Voorkeuren en buffers wissen"
 
 StrCpy $Desc_Section91 \

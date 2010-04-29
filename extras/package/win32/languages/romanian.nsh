@@ -1,6 +1,6 @@
 StrCpy $Name_Section01 "Player-ul media (necesar)"
 StrCpy $Name_Section02a "Scurtãturã în meniul Start"
-StrCpy $Name_Section02b "Scurtãturã pe Desktop"
+StrCpy $Name_Section02b "Scurtãturã pe desktop"
 StrCpy $Name_Section03 "Plugin Mozilla"
 StrCpy $Name_Section04 "Plugin ActiveX"
 StrCpy $Name_Section05 "Redare de discuri"
@@ -18,7 +18,7 @@ StrCpy $Desc_Section02a \
 StrCpy $Desc_Section02b \
     "Adaugã o pictogramã pe desktop pentru acces facil"
 StrCpy $Desc_Section03 \
-    "Pluginul VLC Mozilla and Mozilla Firefox"
+    "Pluginul VLC Mozilla ºi Mozilla Firefox"
 StrCpy $Desc_Section04 \
     "Pluginul VLC ActiveX"
 StrCpy $Desc_Section05 \
@@ -31,8 +31,8 @@ StrCpy $Desc_Section08 \
     "ªterge preferinþele ºi cache-ul VLC media player rãmase de la instalãri precedente"
 
 StrCpy $Message_AlreadyInstalled  \
-"VLC media player a fost deja instalat. $\nVreþi sã eliminaþi \
-versiunea precedentã înainte de a instala $(^Name) ?"
+"VLC media player este deja instalat. $\nVreþi sã dezinstalaþi \
+versiunea existentã înainte de a instala $(^Name) ?"
 
 StrCpy $Name_Section91 "Dezinstalare"
 StrCpy $Name_Section92 "ªtergere preferinþe ºi cache"
@@ -40,7 +40,7 @@ StrCpy $Name_Section92 "ªtergere preferinþe ºi cache"
 StrCpy $Desc_Section91 \
 "Dezinstaleazã VLC media player ºi toate componentele lui"
 StrCpy $Desc_Section92 \
-"ªterge preferinþele ºi cache-ul VLC media player"
+"ªterge preferinþele VLC ºi fiºierele stocate în cache"
 
 StrCpy $ShellAssociation_Play "Redã"
 StrCpy $ContextMenuEntry_PlayWith "Redã cu VLC media player"
