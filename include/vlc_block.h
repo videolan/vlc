@@ -180,7 +180,7 @@ static inline void block_Cleanup (void *block)
  ****************************************************************************
  * - block_ChainAppend : append a block to the last block of a chain. Try to
  *      avoid using with a lot of data as it's really slow, prefer
- *      block_ChainLastAppend
+ *      block_ChainLastAppend, p_block can be NULL
  * - block_ChainLastAppend : use a pointer over a pointer to the next blocks,
  *      and update it.
  * - block_ChainRelease : release a chain of block
