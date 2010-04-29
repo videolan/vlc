@@ -103,6 +103,26 @@ VLC_EXPORT( void, subpicture_region_Delete, ( subpicture_region_t *p_region ) );
 VLC_EXPORT( void, subpicture_region_ChainDelete, ( subpicture_region_t *p_head ) );
 
 /**
+ *
+ */
+typedef struct subpicture_updater_sys_t subpicture_updater_sys_t;
+typedef struct
+{
+    int  (*pf_validate)( subpicture_t *,
+                         bool has_src_changed, const video_format_t *p_fmt_src,
+                         bool has_dst_changed, const video_format_t *p_fmt_dst,
+                         mtime_t);
+    void (*pf_update)  ( subpicture_t *,
+                         const video_format_t *p_fmt_src,
+                         const video_format_t *p_fmt_dst,
+                         mtime_t );
+    void (*pf_destroy) ( subpicture_t * );
+    subpicture_updater_sys_t *p_sys;
+} subpicture_updater_t;
+
+typedef struct subpicture_private_t subpicture_private_t;
+
+/**
  * Video subtitle
  *
  * Any subtitle destined to be displayed by a video output thread should
@@ -147,25 +167,17 @@ struct subpicture_t
     int          i_alpha;                                  /**< transparency */
      /**@}*/
 
-    /** Pointer to function that cleans up the private data of this subtitle */
-    void ( *pf_destroy ) ( subpicture_t * );
+    subpicture_updater_t updater;
 
-    /** Pointer to function that update the regions before rendering (optionnal) */
-    void (*pf_update_regions)( spu_t *,
-                               subpicture_t *, const video_format_t *, mtime_t );
-
-    /** Private data - the subtitle plugin might want to put stuff here to
-     * keep track of the subpicture */
-    subpicture_sys_t *p_sys;                              /* subpicture data */
+    subpicture_private_t *p_private;    /* Reserved to the core */
 };
-
 
 /**
  * This function create a new empty subpicture.
  *
  * You must use subpicture_Delete to destroy it.
  */
-VLC_EXPORT( subpicture_t *, subpicture_New, ( void ) );
+VLC_EXPORT( subpicture_t *, subpicture_New, ( const subpicture_updater_t * ) );
 
 /**
  * This function delete a subpicture created by subpicture_New.

@@ -74,9 +74,6 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static subpicture_t *DecodeBlock( decoder_t *, block_t ** );
-static void DestroySubpicture( subpicture_t * );
-static void UpdateRegions( spu_t *,
-                           subpicture_t *, const video_format_t *, mtime_t );
 
 /* Yes libass sux with threads */
 typedef struct
@@ -109,12 +106,25 @@ struct decoder_sys_t
 static void DecSysRelease( decoder_sys_t *p_sys );
 static void DecSysHold( decoder_sys_t *p_sys );
 
-struct subpicture_sys_t
+/* */
+static int SubpictureValidate( subpicture_t *,
+                               bool, const video_format_t *,
+                               bool, const video_format_t *,
+                               mtime_t );
+static void SubpictureUpdate( subpicture_t *,
+                              const video_format_t *,
+                              const video_format_t *,
+                              mtime_t );
+static void SubpictureDestroy( subpicture_t * );
+
+struct subpicture_updater_sys_t
 {
     decoder_sys_t *p_dec_sys;
     void          *p_subs_data;
     int           i_subs_len;
     mtime_t       i_pts;
+
+    ASS_Image     *p_img;
 };
 
 typedef struct
@@ -125,8 +135,7 @@ typedef struct
     int y1;
 } rectangle_t;
 
-static int BuildRegions( spu_t *p_spu, rectangle_t *p_region, int i_max_region, ASS_Image *p_img_list, int i_width, int i_height );
-static void SubpictureReleaseRegions( spu_t *p_spu, subpicture_t *p_subpic );
+static int BuildRegions( rectangle_t *p_region, int i_max_region, ASS_Image *p_img_list, int i_width, int i_height );
 static void RegionDraw( subpicture_region_t *p_region, ASS_Image *p_img );
 
 static vlc_mutex_t libass_lock = VLC_STATIC_MUTEX;
@@ -246,34 +255,41 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    p_spu = decoder_NewSubpicture( p_dec );
+    subpicture_updater_sys_t *p_spu_sys = malloc( sizeof(*p_spu_sys) );
+    if( !p_spu_sys )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
+
+    subpicture_updater_t updater = {
+        .pf_validate = SubpictureValidate,
+        .pf_update   = SubpictureUpdate,
+        .pf_destroy  = SubpictureDestroy,
+        .p_sys       = p_spu_sys,
+    };
+    p_spu = decoder_NewSubpicture( p_dec, &updater );
     if( !p_spu )
     {
         msg_Warn( p_dec, "can't get spu buffer" );
+        free( p_spu_sys );
         block_Release( p_block );
         return NULL;
     }
 
-    p_spu->p_sys = malloc( sizeof( subpicture_sys_t ));
-    if( !p_spu->p_sys )
+    p_spu_sys->p_img = NULL;
+    p_spu_sys->p_dec_sys = p_sys;
+    p_spu_sys->i_subs_len = p_block->i_buffer;
+    p_spu_sys->p_subs_data = malloc( p_block->i_buffer );
+    p_spu_sys->i_pts = p_block->i_pts;
+    if( !p_spu_sys->p_subs_data )
     {
         decoder_DeleteSubpicture( p_dec, p_spu );
         block_Release( p_block );
         return NULL;
     }
-
-    p_spu->p_sys->i_subs_len = p_block->i_buffer;
-    p_spu->p_sys->p_subs_data = malloc( p_block->i_buffer );
-    if( !p_spu->p_sys->p_subs_data )
-    {
-        free( p_spu->p_sys );
-        decoder_DeleteSubpicture( p_dec, p_spu );
-        block_Release( p_block );
-        return NULL;
-    }
-    memcpy( p_spu->p_sys->p_subs_data, p_block->p_buffer,
+    memcpy( p_spu_sys->p_subs_data, p_block->p_buffer,
             p_block->i_buffer );
-    p_spu->p_sys->i_pts = p_block->i_pts;
 
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = __MAX( p_sys->i_max_stop, p_block->i_pts + p_block->i_length );
@@ -285,16 +301,12 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     vlc_mutex_lock( &libass_lock );
     if( p_sys->p_track )
     {
-        ass_process_chunk( p_sys->p_track, p_spu->p_sys->p_subs_data, p_spu->p_sys->i_subs_len,
+        ass_process_chunk( p_sys->p_track, p_spu_sys->p_subs_data, p_spu_sys->i_subs_len,
                            p_block->i_pts / 1000, p_block->i_length / 1000 );
     }
     vlc_mutex_unlock( &libass_lock );
 
-    p_spu->pf_update_regions = UpdateRegions;
-    p_spu->pf_destroy = DestroySubpicture;
-    p_spu->p_sys->p_dec_sys = p_sys;
-
-    DecSysHold( p_sys );
+    DecSysHold( p_sys ); /* Keep a reference for the returned subpicture */
 
     block_Release( p_block );
 
@@ -304,63 +316,71 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 /****************************************************************************
  *
  ****************************************************************************/
-static void DestroySubpicture( subpicture_t *p_subpic )
+static int SubpictureValidate( subpicture_t *p_subpic,
+                               bool b_fmt_src, const video_format_t *p_fmt_src,
+                               bool b_fmt_dst, const video_format_t *p_fmt_dst,
+                               mtime_t i_ts )
 {
-    DecSysRelease( p_subpic->p_sys->p_dec_sys );
-
-    free( p_subpic->p_sys->p_subs_data );
-    free( p_subpic->p_sys );
-}
-
-static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
-                           const video_format_t *p_fmt, mtime_t i_ts )
-{
-    decoder_sys_t *p_sys = p_subpic->p_sys->p_dec_sys;
+    decoder_sys_t *p_sys = p_subpic->updater.p_sys->p_dec_sys;
     ass_handle_t *p_ass = p_sys->p_ass;
-
-    video_format_t fmt;
-    bool b_fmt_changed;
 
     vlc_mutex_lock( &libass_lock );
 
-    /* */
-    fmt = *p_fmt;
-    fmt.i_chroma = VLC_CODEC_RGBA;
-    fmt.i_width = fmt.i_visible_width;
-    fmt.i_height = fmt.i_visible_height;
+    /* FIXME why this mix of src/dst */
+    video_format_t fmt = *p_fmt_dst;
+    fmt.i_chroma         = VLC_CODEC_RGBA;
     fmt.i_bits_per_pixel = 0;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
+    fmt.i_width          =
+    fmt.i_visible_width  = p_fmt_src->i_width;
+    fmt.i_height         =
+    fmt.i_visible_height = p_fmt_src->i_height;
+    fmt.i_x_offset       =
+    fmt.i_y_offset       = 0;
 
-    b_fmt_changed = memcmp( &fmt, &p_ass->fmt, sizeof(fmt) ) != 0;
-    if( b_fmt_changed )
+    if( b_fmt_src || b_fmt_dst )
     {
         ass_set_frame_size( p_ass->p_renderer, fmt.i_width, fmt.i_height );
 #if defined( LIBASS_VERSION ) && LIBASS_VERSION >= 0x00907000
-    ass_set_aspect_ratio( p_ass->p_renderer, 1.0, 1.0 ); // TODO ?
+        ass_set_aspect_ratio( p_ass->p_renderer, 1.0, 1.0 ); // TODO ?
 #else
-    ass_set_aspect_ratio( p_ass->p_renderer, 1.0 ); // TODO ?
+        ass_set_aspect_ratio( p_ass->p_renderer, 1.0 ); // TODO ?
 #endif
-
         p_ass->fmt = fmt;
     }
 
     /* */
-    const mtime_t i_stream_date = p_subpic->p_sys->i_pts + (i_ts - p_subpic->i_start);
+    const mtime_t i_stream_date = p_subpic->updater.p_sys->i_pts + (i_ts - p_subpic->i_start);
     int i_changed;
     ASS_Image *p_img = ass_render_frame( p_ass->p_renderer, p_sys->p_track,
                                          i_stream_date/1000, &i_changed );
 
-    if( !i_changed && !b_fmt_changed &&
+    if( !i_changed && !b_fmt_src && !b_fmt_dst &&
         (p_img != NULL) == (p_subpic->p_region != NULL) )
     {
         vlc_mutex_unlock( &libass_lock );
-        return;
+        return VLC_SUCCESS;
     }
+    p_subpic->updater.p_sys->p_img = p_img;
+
+    /* The lock is released by SubpictureUpdate */
+    return VLC_EGENERIC;
+}
+
+static void SubpictureUpdate( subpicture_t *p_subpic,
+                              const video_format_t *p_fmt_src,
+                              const video_format_t *p_fmt_dst,
+                              mtime_t i_ts )
+{
+    decoder_sys_t *p_sys = p_subpic->updater.p_sys->p_dec_sys;
+    ass_handle_t *p_ass = p_sys->p_ass;
+
+    video_format_t fmt = p_ass->fmt;
+    ASS_Image *p_img = p_subpic->updater.p_sys->p_img;
+    //vlc_assert_locked( &libass_lock );
 
     /* */
     p_subpic->i_original_picture_height = fmt.i_height;
     p_subpic->i_original_picture_width = fmt.i_width;
-    SubpictureReleaseRegions( p_spu, p_subpic );
 
     /* XXX to improve efficiency we merge regions that are close minimizing
      * the lost surface.
@@ -370,7 +390,7 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
      */
     const int i_max_region = 4;
     rectangle_t region[i_max_region];
-    const int i_region = BuildRegions( p_spu, region, i_max_region, p_img, fmt.i_width, fmt.i_height );
+    const int i_region = BuildRegions( region, i_max_region, p_img, fmt.i_width, fmt.i_height );
 
     if( i_region <= 0 )
     {
@@ -409,6 +429,15 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
         pp_region_last = &r->p_next;
     }
     vlc_mutex_unlock( &libass_lock );
+
+}
+static void SubpictureDestroy( subpicture_t *p_subpic )
+{
+    subpicture_updater_sys_t *p_sys = p_subpic->updater.p_sys;
+
+    DecSysRelease( p_sys->p_dec_sys );
+    free( p_sys->p_subs_data );
+    free( p_sys );
 }
 
 static rectangle_t r_create( int x0, int y0, int x1, int y1 )
@@ -437,12 +466,10 @@ static bool r_overlap( const rectangle_t *a, const rectangle_t *b, int i_dx, int
             __MAX(a->y0-i_dy, b->y0) < __MIN( a->y1+i_dy, b->y1 );
 }
 
-static int BuildRegions( spu_t *p_spu, rectangle_t *p_region, int i_max_region, ASS_Image *p_img_list, int i_width, int i_height )
+static int BuildRegions( rectangle_t *p_region, int i_max_region, ASS_Image *p_img_list, int i_width, int i_height )
 {
     ASS_Image *p_tmp;
     int i_count;
-
-    VLC_UNUSED(p_spu);
 
 #ifdef DEBUG_REGION
     int64_t i_ck_start = mdate();
@@ -627,14 +654,6 @@ static void RegionDraw( subpicture_region_t *p_region, ASS_Image *p_img )
         *P(x/4,0) = *P(x/4,p->i_visible_lines-1) = 0xff000000;
 #undef P
 #endif
-}
-
-
-static void SubpictureReleaseRegions( spu_t *p_spu, subpicture_t *p_subpic )
-{
-    VLC_UNUSED( p_spu );
-    subpicture_region_ChainDelete( p_subpic->p_region );
-    p_subpic->p_region = NULL;
 }
 
 /* */

@@ -101,7 +101,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     spu_properties_t spu_properties;
 
     /* Allocate the subpicture internal data. */
-    p_spu = decoder_NewSubpicture( p_dec );
+    p_spu = decoder_NewSubpicture( p_dec, NULL );
     if( !p_spu ) return NULL;
 
     p_spu->i_original_picture_width =

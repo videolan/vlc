@@ -685,7 +685,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     strcpy( p_sys->psz_prev_text, psz_text );
 
     /* Create the subpicture unit */
-    p_spu = decoder_NewSubpicture( p_dec );
+    p_spu = decoder_NewSubpicture( p_dec, NULL );
     if( !p_spu )
     {
         msg_Warn( p_dec, "can't get spu buffer" );

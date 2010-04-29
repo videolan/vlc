@@ -239,7 +239,7 @@ static subpicture_region_t *ConvertRegionRGBA(AVSubtitleRect *ffregion)
  */
 static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t pts)
 {
-    subpicture_t *spu = decoder_NewSubpicture(dec);
+    subpicture_t *spu = decoder_NewSubpicture(dec, NULL);
     if (!spu)
         return NULL;
 

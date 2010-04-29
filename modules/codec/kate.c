@@ -116,7 +116,7 @@ struct decoder_sys_t
     bool   b_use_tiger;
 };
 
-struct subpicture_sys_t
+struct subpicture_updater_sys_t
 {
     decoder_sys_t *p_dec_sys;
     mtime_t        i_start;
@@ -764,18 +764,9 @@ static void SetupText( decoder_t *p_dec, subpicture_t *p_spu, const kate_event *
 
 static void TigerDestroySubpicture( subpicture_t *p_subpic )
 {
-    DecSysRelease( p_subpic->p_sys->p_dec_sys );
+    DecSysRelease( p_subpic->updater.p_sys->p_dec_sys );
+    free( p_subpic->updater.p_sys );
 }
-
-static void SubpictureReleaseRegions( subpicture_t *p_subpic )
-{
-    if( p_subpic->p_region)
-    {
-        subpicture_region_ChainDelete( p_subpic->p_region );
-        p_subpic->p_region = NULL;
-    }
-}
-
 /*
  * We get premultiplied alpha, but VLC doesn't expect this, so we demultiply
  * alpha to avoid double multiply (and thus thinner text than we should)).
@@ -827,66 +818,76 @@ static void PostprocessTigerImage( plane_t *p_plane, unsigned int i_width )
     PROFILE_STOP( tiger_renderer_postprocess );
 }
 
+static int TigerValidateSubpicture( subpicture_t *p_subpic,
+                                    bool b_fmt_src, const video_format_t *p_fmt_src,
+                                    bool b_fmt_dst, const video_format_t *p_fmt_dst,
+                                    mtime_t ts )
+{
+    decoder_sys_t *p_sys = p_subpic->updater.p_sys->p_dec_sys;
+
+    if( b_fmt_src || b_fmt_dst )
+        return VLC_EGENERIC;
+
+    PROFILE_START( TigerValidateSubpicture );
+
+    /* time in seconds from the start of the stream */
+    kate_float t = (p_subpic->updater.p_sys->i_start + ts - p_subpic->i_start ) / 1000000.0f;
+
+    /* it is likely that the current region (if any) can be kept as is; test for this */
+    vlc_mutex_lock( &p_sys->lock );
+    int i_ret;
+    if( p_sys->b_dirty || tiger_renderer_is_dirty( p_sys->p_tr ) )
+    {
+        i_ret = VLC_EGENERIC;
+        goto exit;
+    }
+    if( tiger_renderer_update( p_sys->p_tr, t, 1 ) >= 0 &&
+        tiger_renderer_is_dirty( p_sys->p_tr ) )
+    {
+        i_ret = VLC_EGENERIC;
+        goto exit;
+    }
+
+    i_ret = VLC_SUCCESS;
+exit:
+    vlc_mutex_unlock( &p_sys->lock );
+    PROFILE_STOP( TigerValidateSubpicture );
+    return i_ret;
+}
+
 /* Tiger renders can end up looking a bit crap since they get overlaid on top of
    a subsampled YUV image, so there can be a fair amount of chroma bleeding.
    Looks good with white though since it's all luma. Hopefully that will be the
    common case. */
-static void TigerUpdateRegions( spu_t *p_spu, subpicture_t *p_subpic, const video_format_t *p_fmt, mtime_t ts )
+static void TigerUpdateSubpicture( subpicture_t *p_subpic,
+                                   const video_format_t *p_fmt_src,
+                                   const video_format_t *p_fmt_dst,
+                                   mtime_t ts )
 {
-    decoder_sys_t *p_sys = p_subpic->p_sys->p_dec_sys;
-    subpicture_region_t *p_r;
-    video_format_t fmt;
+    decoder_sys_t *p_sys = p_subpic->updater.p_sys->p_dec_sys;
     plane_t *p_plane;
     kate_float t;
     int i_ret;
 
-    VLC_UNUSED( p_spu );
-
-    PROFILE_START( TigerUpdateRegions );
 
     /* time in seconds from the start of the stream */
-    t = (p_subpic->p_sys->i_start + ts - p_subpic->i_start ) / 1000000.0f;
+    t = (p_subpic->updater.p_sys->i_start + ts - p_subpic->i_start ) / 1000000.0f;
 
-    /* it is likely that the current region (if any) can be kept as is; test for this */
-    vlc_mutex_lock( &p_sys->lock );
-    if( p_subpic->p_region && !p_sys->b_dirty && !tiger_renderer_is_dirty( p_sys->p_tr ))
-    {
-        PROFILE_START( tiger_renderer_update1 );
-        i_ret = tiger_renderer_update( p_sys->p_tr, t, 1 );
-        PROFILE_STOP( tiger_renderer_update1 );
-        if( i_ret < 0 )
-        {
-            SubpictureReleaseRegions( p_subpic );
-            vlc_mutex_unlock( &p_sys->lock );
-            return;
-        }
-
-        if( !tiger_renderer_is_dirty( p_sys->p_tr ) )
-        {
-            /* we can keep the current region list */
-            PROFILE_STOP( TigerUpdateRegions );
-            vlc_mutex_unlock( &p_sys->lock );
-            return;
-        }
-    }
-    vlc_mutex_unlock( &p_sys->lock );
-
-    /* we have to render again, reset current region list */
-    SubpictureReleaseRegions( p_subpic );
+    PROFILE_START( TigerUpdateSubpicture );
 
     /* create a full frame region - this will also tell Tiger the size of the frame */
-    fmt = *p_fmt;
-    fmt.i_chroma = VLC_CODEC_RGBA;
-    fmt.i_width = fmt.i_visible_width;
-    fmt.i_height = fmt.i_visible_height;
+    video_format_t fmt = *p_fmt_dst;
+    fmt.i_chroma         = VLC_CODEC_RGBA;
     fmt.i_bits_per_pixel = 0;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
+    fmt.i_width          =
+    fmt.i_visible_width  = p_fmt_src->i_width;
+    fmt.i_height         =
+    fmt.i_visible_height = p_fmt_src->i_height;
+    fmt.i_x_offset       = fmt.i_y_offset = 0;
 
-    p_r = subpicture_region_New( &fmt );
+    subpicture_region_t *p_r = subpicture_region_New( &fmt );
     if( !p_r )
-    {
         return;
-    }
 
     p_r->i_x = 0;
     p_r->i_y = 0;
@@ -921,7 +922,7 @@ static void TigerUpdateRegions( spu_t *p_spu, subpicture_t *p_subpic, const vide
     p_subpic->p_region = p_r;
     p_sys->b_dirty = false;
 
-    PROFILE_STOP( TigerUpdateRegions );
+    PROFILE_STOP( TigerUpdateSubpicture );
 
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -1174,9 +1175,23 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
     /* we have an event */
 
     /* Get a new spu */
-    p_spu = decoder_NewSubpicture( p_dec );
+    subpicture_updater_sys_t *p_spu_sys = NULL;
+    if( p_sys->b_use_tiger)
+    {
+        p_spu_sys = malloc( sizeof(*p_spu_sys) );
+        if( !p_spu_sys )
+            return NULL;
+    }
+    subpicture_updater_t updater = {
+        .pf_validate = TigerValidateSubpicture,
+        .pf_update   = TigerUpdateSubpicture,
+        .pf_destroy  = TigerDestroySubpicture,
+        .p_sys       = p_spu_sys,
+    };
+    p_spu = decoder_NewSubpicture( p_dec, p_sys->b_use_tiger ? &updater : NULL );
     if( !p_spu )
     {
+        free( p_spu_sys );
         /* this will happen for lyrics as there is no vout - so no error */
         /* msg_Err( p_dec, "Failed to allocate spu buffer" ); */
         return NULL;
@@ -1190,15 +1205,8 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
 #ifdef HAVE_TIGER
     if( p_sys->b_use_tiger)
     {
-        /* setup the structure to get our decoder struct back */
-        p_spu->p_sys = malloc( sizeof( subpicture_sys_t ));
-        if( !p_spu->p_sys )
-        {
-            decoder_DeleteSubpicture( p_dec, p_spu );
-            return NULL;
-        }
-        p_spu->p_sys->p_dec_sys = p_sys;
-        p_spu->p_sys->i_start = p_block->i_pts;
+        p_spu_sys->p_dec_sys = p_sys;
+        p_spu_sys->i_start   = p_block->i_pts;
         DecSysHold( p_sys );
 
         p_spu->i_stop = __MAX( p_sys->i_max_stop, p_spu->i_stop );
@@ -1209,10 +1217,6 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
         vlc_mutex_lock( &p_sys->lock );
         CHECK_TIGER_RET( tiger_renderer_add_event( p_sys->p_tr, ev->ki, ev ) );
         vlc_mutex_unlock( &p_sys->lock );
-
-        /* hookup render/update routines */
-        p_spu->pf_update_regions = TigerUpdateRegions;
-        p_spu->pf_destroy = TigerDestroySubpicture;
     }
     else
 #endif

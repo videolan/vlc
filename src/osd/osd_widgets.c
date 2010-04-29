@@ -198,7 +198,7 @@ subpicture_t *osd_CreateWidget( spu_t *p_spu, int i_channel )
     VLC_UNUSED(p_spu);
 
     /* Create and initialize a subpicture */
-    p_subpic = subpicture_New();
+    p_subpic = subpicture_New( NULL );
     if( p_subpic == NULL ) return NULL;
 
     p_subpic->i_channel = i_channel;

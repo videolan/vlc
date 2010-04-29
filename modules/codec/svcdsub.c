@@ -469,7 +469,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     int i;
 
     /* Allocate the subpicture internal data. */
-    p_spu = decoder_NewSubpicture( p_dec );
+    p_spu = decoder_NewSubpicture( p_dec, NULL );
     if( !p_spu ) return NULL;
 
     p_spu->i_start = p_data->i_pts;

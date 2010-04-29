@@ -109,7 +109,7 @@ struct decoder_t
 
     /* SPU output callbacks
      * XXX use decoder_NewSubpicture and decoder_DeleteSubpicture */
-    subpicture_t   *(*pf_spu_buffer_new)( decoder_t * );
+    subpicture_t   *(*pf_spu_buffer_new)( decoder_t *, const subpicture_updater_t * );
     void            (*pf_spu_buffer_del)( decoder_t *, subpicture_t * );
 
     /* Input attachments
@@ -216,7 +216,7 @@ VLC_EXPORT( void, decoder_DeleteAudioBuffer, ( decoder_t *, aout_buffer_t *p_buf
  * buffer. You have to release it using decoder_DeleteSubpicture or by returning
  * it to the caller as a pf_decode_sub return value.
  */
-VLC_EXPORT( subpicture_t *, decoder_NewSubpicture, ( decoder_t * ) LIBVLC_USED );
+VLC_EXPORT( subpicture_t *, decoder_NewSubpicture, ( decoder_t *, const subpicture_updater_t * ) LIBVLC_USED );
 
 /**
  * This function will release a subpicture created by decoder_NewSubicture.

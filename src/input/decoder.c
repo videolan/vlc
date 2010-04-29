@@ -75,7 +75,7 @@ static void vout_del_buffer( decoder_t *, picture_t * );
 static void vout_link_picture( decoder_t *, picture_t * );
 static void vout_unlink_picture( decoder_t *, picture_t * );
 
-static subpicture_t *spu_new_buffer( decoder_t * );
+static subpicture_t *spu_new_buffer( decoder_t *, const subpicture_updater_t * );
 static void spu_del_buffer( decoder_t *, subpicture_t * );
 
 struct decoder_owner_sys_t
@@ -213,13 +213,15 @@ void decoder_DeleteAudioBuffer( decoder_t *p_decoder, aout_buffer_t *p_buffer )
     p_decoder->pf_aout_buffer_del( p_decoder, p_buffer );
 }
 
-subpicture_t *decoder_NewSubpicture( decoder_t *p_decoder )
+subpicture_t *decoder_NewSubpicture( decoder_t *p_decoder,
+                                     const subpicture_updater_t *p_dyn )
 {
-    subpicture_t *p_subpicture = p_decoder->pf_spu_buffer_new( p_decoder );
+    subpicture_t *p_subpicture = p_decoder->pf_spu_buffer_new( p_decoder, p_dyn );
     if( !p_subpicture )
         msg_Warn( p_decoder, "can't get output subpicture" );
     return p_subpicture;
 }
+
 void decoder_DeleteSubpicture( decoder_t *p_decoder, subpicture_t *p_subpicture )
 {
     p_decoder->pf_spu_buffer_del( p_decoder, p_subpicture );
@@ -2382,7 +2384,8 @@ static void vout_unlink_picture( decoder_t *p_dec, picture_t *p_pic )
     vout_ReleasePicture( p_dec->p_owner->p_vout, p_pic );
 }
 
-static subpicture_t *spu_new_buffer( decoder_t *p_dec )
+static subpicture_t *spu_new_buffer( decoder_t *p_dec,
+                                     const subpicture_updater_t *p_updater )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     vout_thread_t *p_vout = NULL;
@@ -2421,7 +2424,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec )
         p_owner->p_spu_vout = p_vout;
     }
 
-    p_subpic = subpicture_New();
+    p_subpic = subpicture_New( p_updater );
     if( p_subpic )
     {
         p_subpic->i_channel = p_owner->i_spu_channel;

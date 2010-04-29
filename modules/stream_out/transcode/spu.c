@@ -34,10 +34,11 @@
 #include <vlc_osd.h>
 #include <assert.h>
 
-static subpicture_t *spu_new_buffer( decoder_t *p_dec )
+static subpicture_t *spu_new_buffer( decoder_t *p_dec,
+                                     const subpicture_updater_t *p_upd )
 {
     VLC_UNUSED( p_dec );
-    return subpicture_New();
+    return subpicture_New( p_upd );
 }
 
 static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )

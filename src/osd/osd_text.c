@@ -78,7 +78,7 @@ int osd_ShowTextAbsolute( spu_t *p_spu_channel, int i_channel,
 
     if( !psz_string ) return VLC_EGENERIC;
 
-    p_spu = subpicture_New();
+    p_spu = subpicture_New( NULL );
     if( !p_spu )
         return VLC_EGENERIC;
 

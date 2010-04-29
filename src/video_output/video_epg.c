@@ -259,7 +259,7 @@ int vout_OSDEpg( vout_thread_t *p_vout, input_item_t *p_input )
     if( p_epg == NULL )
         return VLC_EGENERIC;
 
-    p_spu = subpicture_New();
+    p_spu = subpicture_New( NULL );
     if( !p_spu )
     {
         vlc_epg_Delete( p_epg );

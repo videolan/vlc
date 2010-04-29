@@ -142,6 +142,10 @@ static bool spu_area_overlap( spu_area_t, spu_area_t );
 
 #define SCALE_UNIT (1000)
 
+static void SubpictureUpdate( subpicture_t *,
+                              const video_format_t *p_fmt_src,
+                              const video_format_t *p_fmt_dst,
+                              mtime_t i_ts );
 static void SubpictureChain( subpicture_t **pp_head, subpicture_t *p_subpic );
 static int SubpictureCmp( const void *s0, const void *s1 );
 
@@ -387,17 +391,9 @@ void spu_RenderSubpictures( spu_t *p_spu,
             p_subpic != NULL;
                 p_subpic = p_subpic->p_next )
     {
-        if( p_subpic->pf_update_regions )
-        {
-            video_format_t fmt_org = *p_fmt_dst;
-            fmt_org.i_width =
-            fmt_org.i_visible_width = i_source_video_width;
-            fmt_org.i_height =
-            fmt_org.i_visible_height = i_source_video_height;
-
-            p_subpic->pf_update_regions( p_spu, p_subpic, &fmt_org,
-                                         p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
-        }
+        SubpictureUpdate( p_subpic,
+                          p_fmt_src, p_fmt_dst,
+                          p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
 
         /* */
         if( p_subpic->b_subtitle )
@@ -702,7 +698,13 @@ void spu_OffsetSubtitleDate( spu_t *p_spu, mtime_t i_duration )
 /*****************************************************************************
  * subpicture_t allocation
  *****************************************************************************/
-subpicture_t *subpicture_New( void )
+struct subpicture_private_t
+{
+    video_format_t src;
+    video_format_t dst;
+};
+
+subpicture_t *subpicture_New( const subpicture_updater_t *p_upd )
 {
     subpicture_t *p_subpic = calloc( 1, sizeof(*p_subpic) );
     if( !p_subpic )
@@ -714,9 +716,30 @@ subpicture_t *subpicture_New( void )
     p_subpic->b_subtitle = false;
     p_subpic->i_alpha    = 0xFF;
     p_subpic->p_region   = NULL;
-    p_subpic->pf_destroy = NULL;
-    p_subpic->p_sys      = NULL;
 
+    if( p_upd )
+    {
+        subpicture_private_t *p_private = malloc( sizeof(*p_private) );
+        if( !p_private )
+        {
+            free( p_subpic );
+            return NULL;
+        }
+        video_format_Init( &p_private->src, 0 );
+        video_format_Init( &p_private->dst, 0 );
+
+        p_subpic->updater   = *p_upd;
+        p_subpic->p_private = p_private;
+    }
+    else
+    {
+        p_subpic->p_private = NULL;
+
+        p_subpic->updater.pf_validate = NULL;
+        p_subpic->updater.pf_update   = NULL;
+        p_subpic->updater.pf_destroy  = NULL;
+        p_subpic->updater.p_sys       = NULL;
+    }
     return p_subpic;
 }
 
@@ -725,10 +748,10 @@ void subpicture_Delete( subpicture_t *p_subpic )
     subpicture_region_ChainDelete( p_subpic->p_region );
     p_subpic->p_region = NULL;
 
-    if( p_subpic->pf_destroy )
-    {
-        p_subpic->pf_destroy( p_subpic );
-    }
+    if( p_subpic->updater.pf_destroy )
+        p_subpic->updater.pf_destroy( p_subpic );
+
+    free( p_subpic->p_private );
     free( p_subpic );
 }
 
@@ -762,7 +785,7 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
     if( !p_pip )
         return NULL;
 
-    subpicture_t *p_subpic = subpicture_New();
+    subpicture_t *p_subpic = subpicture_New( NULL );
     if( !p_subpic )
     {
          picture_Release( p_pip );
@@ -786,6 +809,36 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
         picture_Release( p_pip );
     }
     return p_subpic;
+}
+
+static void SubpictureUpdate( subpicture_t *p_subpicture,
+                              const video_format_t *p_fmt_src,
+                              const video_format_t *p_fmt_dst,
+                              mtime_t i_ts )
+{
+    subpicture_updater_t *p_upd = &p_subpicture->updater;
+    subpicture_private_t *p_private = p_subpicture->p_private;
+
+    if( !p_upd->pf_validate )
+        return;
+    if( !p_upd->pf_validate( p_subpicture,
+                          !video_format_IsSimilar( p_fmt_src,
+                                                   &p_private->src ), p_fmt_src,
+                          !video_format_IsSimilar( p_fmt_dst,
+                                                   &p_private->dst ), p_fmt_dst,
+                          i_ts ) )
+        return;
+
+    subpicture_region_ChainDelete( p_subpicture->p_region );
+    p_subpicture->p_region = NULL;
+
+    p_upd->pf_update( p_subpicture, p_fmt_src, p_fmt_dst, i_ts );
+
+    video_format_Clean( &p_private->src );
+    video_format_Clean( &p_private->dst );
+
+    video_format_Copy( &p_private->src, p_fmt_src );
+    video_format_Copy( &p_private->dst, p_fmt_dst );
 }
 
 /*****************************************************************************
@@ -1835,7 +1888,7 @@ static subpicture_t *sub_new_buffer( filter_t *p_filter )
 {
     filter_owner_sys_t *p_sys = p_filter->p_owner;
 
-    subpicture_t *p_subpicture = subpicture_New();
+    subpicture_t *p_subpicture = subpicture_New( NULL );
     if( p_subpicture )
         p_subpicture->i_channel = p_sys->i_channel;
     return p_subpicture;
@@ -1849,7 +1902,7 @@ static void sub_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
 static subpicture_t *spu_new_buffer( filter_t *p_filter )
 {
     VLC_UNUSED(p_filter);
-    return subpicture_New();
+    return subpicture_New( NULL );
 }
 static void spu_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
 {
