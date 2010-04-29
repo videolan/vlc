@@ -439,9 +439,9 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
         foreach( QAction *a, actions )
         {
             QMenu *m = a->menu();
-            if( m && m->parent() == menu ) delete m;
             if( a->parent() == menu ) delete a;
             else menu->removeAction( a );
+            if( m && m->parent() == menu ) delete m;
         }
     }
 
