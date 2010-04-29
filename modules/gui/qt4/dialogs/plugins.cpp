@@ -292,6 +292,9 @@ ExtensionListModel::ExtensionListModel( QListView *view, intf_thread_t *intf )
 
 ExtensionListModel::~ExtensionListModel()
 {
+    // Clear extensions list
+    while( !extensions.isEmpty() )
+        delete extensions.takeLast();
 }
 
 void ExtensionListModel::updateList()
