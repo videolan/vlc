@@ -171,12 +171,15 @@ void ExtensionsManager::menu( QMenu *current )
                     menuMapper->setMapping( action,
                                             MENU_MAP( pi_ids[i], i_ext ) );
                     CONNECT( action, triggered(), menuMapper, map() );
+                    free( ppsz_titles[i] );
                 }
                 if( !i_num )
                 {
                     action = submenu->addAction( qtr( "Empty" ) );
                     action->setEnabled( false );
                 }
+                free( ppsz_titles );
+                free( pi_ids );
             }
             else
             {

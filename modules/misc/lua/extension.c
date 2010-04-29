@@ -605,7 +605,7 @@ int lua_ExtensionWidgetClick( extensions_manager_t *p_mgr,
  * @param p_mgr
  * @param p_ext
  * @param pppsz_titles Pointer to NULL. All strings must be freed by the caller
- * @param ppi_ids Pointer to NULL. Must be feed by the caller.
+ * @param ppi_ids Pointer to NULL. Must be freed by the caller.
  * @note This function is allowed to run in the UI thread. This means
  *       that it MUST respond very fast.
  * @todo Remove the menu() hook and provide a new function vlc.set_menu()
