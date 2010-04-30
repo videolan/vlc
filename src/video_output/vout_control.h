@@ -75,5 +75,10 @@ void vout_NextPicture( vout_thread_t *p_vout, mtime_t *pi_duration );
  */
 void vout_DisplayTitle( vout_thread_t *p_vout, const char *psz_title );
 
+/**
+ * This function will return true if no more pictures are to be displayed.
+ */
+bool vout_IsEmpty( vout_thread_t *p_vout );
+
 #endif
 
