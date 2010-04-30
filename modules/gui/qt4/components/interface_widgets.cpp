@@ -239,7 +239,7 @@ void VideoWidget::release( void )
     msg_Dbg( p_intf, "Video is not needed anymore" );
     //layout->removeWidget( reparentable );
 
-    delete reparentable;
+    reparentable->deleteLater();
     reparentable = NULL;
     updateGeometry();
     hide();
