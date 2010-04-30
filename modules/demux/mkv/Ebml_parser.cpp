@@ -1,6 +1,6 @@
 
 /*****************************************************************************
- * mkv.cpp : matroska demuxer
+ * EbmlParser for the matroska demuxer
  *****************************************************************************
  * Copyright (C) 2003-2004 the VideoLAN team
  * $Id$
@@ -22,6 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #include "Ebml_parser.hpp"
 
 /*****************************************************************************
@@ -29,14 +30,12 @@
  *****************************************************************************/
 EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux )
 {
-    int i;
-
     m_es = es;
     m_got = NULL;
     m_el[0] = el_start;
     mi_remain_size[0] = el_start->GetSize();
 
-    for( i = 1; i < 6; i++ )
+    for( int i = 1; i < 6; i++ )
     {
         m_el[i] = NULL;
     }
@@ -48,9 +47,7 @@ EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux 
 
 EbmlParser::~EbmlParser( void )
 {
-    int i;
-
-    for( i = 1; i < mi_level; i++ )
+    for( int i = 1; i < mi_level; i++ )
     {
         if( !mb_keep )
         {
@@ -94,7 +91,7 @@ void EbmlParser::Up( void )
 {
     if( mi_user_level == mi_level )
     {
-        fprintf( stderr," arrrrrrrrrrrrrg Up cannot escape itself\n" );
+        fprintf( stderr,"MKV/Ebml Parser: Up cannot escape itself\n" );
     }
 
     mi_user_level--;
@@ -129,18 +126,6 @@ void EbmlParser::Reset( demux_t *p_demux )
     m_es->I_O().setFilePointer( static_cast<KaxSegment*>(m_el[0])->GetGlobalPosition(0) );
     mb_dummy = var_InheritInteger( p_demux, "mkv-use-dummy" );
 }
-
-
-/* This function workarounds a bug in KaxBlockVirtual implementation */
-class KaxBlockVirtualWorkaround : public KaxBlockVirtual
-{
-public:
-    void Fix()
-    {
-        if( Data == DataBlock )
-            SetBuffer( NULL, 0 );
-    }
-};
 
 EbmlElement *EbmlParser::Get( void )
 {
@@ -193,7 +178,7 @@ EbmlElement *EbmlParser::Get( void )
     }
     else if( m_el[mi_level] == NULL )
     {
-        fprintf( stderr," m_el[mi_level] == NULL\n" );
+        fprintf( stderr,"MKV/Ebml Parser: m_el[mi_level] == NULL\n" );
     }
 
     return m_el[mi_level];
@@ -208,5 +193,4 @@ bool EbmlParser::IsTopPresent( EbmlElement *el )
     }
     return false;
 }
-
 

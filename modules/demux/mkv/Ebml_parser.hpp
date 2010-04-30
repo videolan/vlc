@@ -26,6 +26,7 @@
 #define _EBML_PARSER_HPP_
 
 #include "mkv.hpp"
+
 /*****************************************************************************
  * Ebml Stream parser
  *****************************************************************************/
@@ -58,6 +59,17 @@ class EbmlParser
     int         mi_user_level;
     bool        mb_keep;
     bool        mb_dummy;
+};
+
+/* This class works around a bug in KaxBlockVirtual implementation */
+class KaxBlockVirtualWorkaround : public KaxBlockVirtual
+{
+public:
+    void Fix()
+    {
+        if( Data == DataBlock )
+            SetBuffer( NULL, 0 );
+    }
 };
 
 #endif
