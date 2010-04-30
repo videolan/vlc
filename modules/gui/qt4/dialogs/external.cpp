@@ -134,8 +134,8 @@ void DialogHandler::requestLogin (vlc_object_t *, void *value)
     buttonBox->addButton( okButton, QDialogButtonBox::AcceptRole );
     buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
-    CONNECT( okButton, accepted(), dialog, accept() );
-    CONNECT( cancelButton, rejected(), dialog, reject() );
+    CONNECT( buttonBox, accepted(), dialog, accept() );
+    CONNECT( buttonBox, rejected(), dialog, reject() );
     layout->addWidget (buttonBox);
 
     /* Run the dialog */
