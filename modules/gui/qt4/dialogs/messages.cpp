@@ -125,6 +125,10 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
     vbobjectsEdit->setMaximumWidth( 100 );
     vbobjectsEdit->setText(config_GetPsz( p_intf, "verbose-objects"));
+    vbobjectsEdit->setToolTip( "verbose-objects usage: \n"
+                            "--verbose-objects=+printthatobject,-dontprintthatone\n"
+                            "(keyword 'all' to applies to all objects)");
+
     vbobjectsLabel =  new QLabel( qtr( "Message filter" ) );
 
     mainLayout->addWidget( mainTab, 0, 0, 1, 0 );
@@ -190,7 +194,6 @@ void MessagesDialog::updateConfig()
 {
     config_PutPsz(p_intf, "verbose-objects", qtu(vbobjectsEdit->text()));
     //vbobjectsEdit->setText("vbEdit changed!");
-    msg_Dbg( p_intf, "Here" );
 
     char * psz_verbose_objects = strdup(qtu(vbobjectsEdit->text()));
     msg_EnableObjectPrinting(p_intf, "all");
@@ -204,12 +207,7 @@ void MessagesDialog::updateConfig()
                 printf("%s\n", psz_object+1);
                 case '+': msg_EnableObjectPrinting(p_intf, psz_object+1); break;
                 case '-': msg_DisableObjectPrinting(p_intf, psz_object+1); break;
-                default:
-                    msg_Err( p_intf, "verbose-objects usage: \n"
-                            "--verbose-objects=+printthatobject,"
-                            "-dontprintthatone\n"
-                            "(keyword 'all' to applies to all objects)");
-            }
+             }
         }
         free( psz_verbose_objects );
     }
