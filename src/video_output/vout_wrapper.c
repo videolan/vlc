@@ -66,7 +66,7 @@ int vout_OpenWrapper(vout_thread_t *vout, const char *name)
     sys->display.title = var_CreateGetNonEmptyString(vout, "video-title");
 
     /* */
-    video_format_t source   = vout->fmt_render;
+    video_format_t source   = vout->p->fmt_render;
     source.i_visible_width  = source.i_width;
     source.i_visible_height = source.i_height;
     source.i_x_offset       = 0;
@@ -135,31 +135,31 @@ int vout_InitWrapper(vout_thread_t *vout)
     /* */
     video_format_t source = vd->source;
 
-    vout->fmt_out.i_chroma         = source.i_chroma;
-    vout->fmt_out.i_width          =
-    vout->fmt_out.i_visible_width  = source.i_width;
-    vout->fmt_out.i_height         =
-    vout->fmt_out.i_visible_height = source.i_height;
+    vout->p->fmt_out.i_chroma         = source.i_chroma;
+    vout->p->fmt_out.i_width          =
+    vout->p->fmt_out.i_visible_width  = source.i_width;
+    vout->p->fmt_out.i_height         =
+    vout->p->fmt_out.i_visible_height = source.i_height;
     if (source.i_sar_num > 0 && source.i_sar_den > 0) {
-        vlc_ureduce(&vout->fmt_out.i_sar_num, &vout->fmt_out.i_sar_den,
+        vlc_ureduce(&vout->p->fmt_out.i_sar_num, &vout->p->fmt_out.i_sar_den,
                     source.i_sar_num, source.i_sar_den, 0);
     } else {
-        vout->fmt_out.i_sar_num    = 1;
-        vout->fmt_out.i_sar_den    = 1;
+        vout->p->fmt_out.i_sar_num    = 1;
+        vout->p->fmt_out.i_sar_den    = 1;
     }
-    vout->fmt_out.i_sar_num        = source.i_sar_num;
-    vout->fmt_out.i_sar_den        = source.i_sar_den;
-    vout->fmt_out.i_x_offset       = 0;
-    vout->fmt_out.i_y_offset       = 0;
-    vout->fmt_out.i_rmask          = source.i_rmask;
-    vout->fmt_out.i_gmask          = source.i_gmask;
-    vout->fmt_out.i_bmask          = source.i_bmask;
-    video_format_FixRgb(&vout->fmt_out);
+    vout->p->fmt_out.i_sar_num        = source.i_sar_num;
+    vout->p->fmt_out.i_sar_den        = source.i_sar_den;
+    vout->p->fmt_out.i_x_offset       = 0;
+    vout->p->fmt_out.i_y_offset       = 0;
+    vout->p->fmt_out.i_rmask          = source.i_rmask;
+    vout->p->fmt_out.i_gmask          = source.i_gmask;
+    vout->p->fmt_out.i_bmask          = source.i_bmask;
+    video_format_FixRgb(&vout->p->fmt_out);
 
-    if (vout->fmt_in.i_visible_width  != source.i_visible_width ||
-        vout->fmt_in.i_visible_height != source.i_visible_height ||
-        vout->fmt_in.i_x_offset       != source.i_x_offset ||
-        vout->fmt_in.i_y_offset       != source.i_y_offset )
+    if (vout->p->fmt_in.i_visible_width  != source.i_visible_width ||
+        vout->p->fmt_in.i_visible_height != source.i_visible_height ||
+        vout->p->fmt_in.i_x_offset       != source.i_x_offset ||
+        vout->p->fmt_in.i_y_offset       != source.i_y_offset )
         sys->i_changes |= VOUT_CROP_CHANGE;
 
     /* XXX For non dr case, the current vout implementation force us to
@@ -217,16 +217,16 @@ int vout_ManageWrapper(vout_thread_t *vout)
                               VOUT_CROP_CHANGE)) {
         /* */
         if (sys->i_changes & VOUT_ASPECT_CHANGE) {
-            vout->fmt_out.i_sar_num = vout->fmt_in.i_sar_num;
-            vout->fmt_out.i_sar_den = vout->fmt_in.i_sar_den;
+            vout->p->fmt_out.i_sar_num = vout->p->fmt_in.i_sar_num;
+            vout->p->fmt_out.i_sar_den = vout->p->fmt_in.i_sar_den;
 
-            vout_SetDisplayAspect(vd, vout->fmt_in.i_sar_num, vout->fmt_in.i_sar_den);
+            vout_SetDisplayAspect(vd, vout->p->fmt_in.i_sar_num, vout->p->fmt_in.i_sar_den);
 
             sys->i_changes &= ~VOUT_ASPECT_CHANGE;
         }
         if (sys->i_changes & VOUT_CROP_CHANGE) {
-            const video_format_t crop = vout->fmt_in;
-            const video_format_t org = vout->fmt_render;
+            const video_format_t crop = vout->p->fmt_in;
+            const video_format_t org = vout->p->fmt_render;
             /* FIXME because of rounding errors, the reconstructed ratio is wrong */
             unsigned num = 0;
             unsigned den = 0;

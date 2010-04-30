@@ -23,6 +23,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_vout.h>
@@ -33,6 +34,8 @@
 #include <vlc_input_item.h>
 #include <vlc_epg.h>
 
+/* TODO remove access to private vout data */
+#include "vout_internal.h"
 
 /* Layout percentage defines */
 #define EPG_TOP 0.7
@@ -275,8 +278,8 @@ int vout_OSDEpg( vout_thread_t *p_vout, input_item_t *p_input )
 
     /* Build the EPG event subpictures. */
     p_spu->p_region = vout_BuildOSDEpg( p_vout, p_epg,
-                                        p_vout->fmt_in.i_width,
-                                        p_vout->fmt_in.i_height );
+                                        p_vout->p->fmt_in.i_width,
+                                        p_vout->p->fmt_in.i_height );
 
     vlc_epg_Delete( p_epg );
     spu_DisplaySubpicture( vout_GetSpu( p_vout ), p_spu );

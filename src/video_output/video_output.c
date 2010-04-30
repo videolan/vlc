@@ -164,9 +164,9 @@ vout_thread_t *vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 
 #warning "FIXME: Check RGB masks in vout_Request"
         /* FIXME: check RGB masks */
-        if( p_vout->fmt_render.i_chroma != vlc_fourcc_GetCodec( VIDEO_ES, p_fmt->i_chroma ) ||
-            p_vout->fmt_render.i_width != p_fmt->i_width ||
-            p_vout->fmt_render.i_height != p_fmt->i_height ||
+        if( p_vout->p->fmt_render.i_chroma != vlc_fourcc_GetCodec( VIDEO_ES, p_fmt->i_chroma ) ||
+            p_vout->p->fmt_render.i_width != p_fmt->i_width ||
+            p_vout->p->fmt_render.i_height != p_fmt->i_height ||
             p_vout->p->b_filter_change )
         {
             vlc_mutex_unlock( &p_vout->p->change_lock );
@@ -195,14 +195,14 @@ vout_thread_t *vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 #endif
 
             if( i_sar_num > 0 && i_sar_den > 0 &&
-                ( i_sar_num != p_vout->fmt_render.i_sar_num ||
-                  i_sar_den != p_vout->fmt_render.i_sar_den ) )
+                ( i_sar_num != p_vout->p->fmt_render.i_sar_num ||
+                  i_sar_den != p_vout->p->fmt_render.i_sar_den ) )
             {
-                p_vout->fmt_in.i_sar_num = i_sar_num;
-                p_vout->fmt_in.i_sar_den = i_sar_den;
+                p_vout->p->fmt_in.i_sar_num = i_sar_num;
+                p_vout->p->fmt_in.i_sar_den = i_sar_den;
 
-                p_vout->fmt_render.i_sar_num = i_sar_num;
-                p_vout->fmt_render.i_sar_den = i_sar_den;
+                p_vout->p->fmt_render.i_sar_num = i_sar_num;
+                p_vout->p->fmt_render.i_sar_den = i_sar_den;
                 p_vout->p->i_changes |= VOUT_ASPECT_CHANGE;
             }
             vlc_mutex_unlock( &p_vout->p->change_lock );
@@ -273,13 +273,13 @@ vout_thread_t * (vout_Create)( vlc_object_t *p_parent, video_format_t *p_fmt )
     }
 
     /* */
-    p_vout->fmt_render        = *p_fmt;   /* FIXME palette */
-    p_vout->fmt_in            = *p_fmt;   /* FIXME palette */
+    p_vout->p->fmt_render        = *p_fmt;   /* FIXME palette */
+    p_vout->p->fmt_in            = *p_fmt;   /* FIXME palette */
 
-    p_vout->fmt_render.i_chroma = 
-    p_vout->fmt_in.i_chroma     = i_chroma;
-    video_format_FixRgb( &p_vout->fmt_render );
-    video_format_FixRgb( &p_vout->fmt_in );
+    p_vout->p->fmt_render.i_chroma = 
+    p_vout->p->fmt_in.i_chroma     = i_chroma;
+    video_format_FixRgb( &p_vout->p->fmt_render );
+    video_format_FixRgb( &p_vout->p->fmt_in );
 
     /* Initialize misc stuff */
     vout_control_Init( &p_vout->p->control );
@@ -614,13 +614,13 @@ static int ThreadInit(vout_thread_t *vout)
 
     /* print some usefull debug info about different vout formats
      */
-    PrintVideoFormat(vout, "pic render", &vout->fmt_render);
-    PrintVideoFormat(vout, "pic in",     &vout->fmt_in);
-    PrintVideoFormat(vout, "pic out",    &vout->fmt_out);
+    PrintVideoFormat(vout, "pic render", &vout->p->fmt_render);
+    PrintVideoFormat(vout, "pic in",     &vout->p->fmt_in);
+    PrintVideoFormat(vout, "pic out",    &vout->p->fmt_out);
 
-    assert(vout->fmt_out.i_width  == vout->fmt_render.i_width &&
-           vout->fmt_out.i_height == vout->fmt_render.i_height &&
-           vout->fmt_out.i_chroma == vout->fmt_render.i_chroma);
+    assert(vout->p->fmt_out.i_width  == vout->p->fmt_render.i_width &&
+           vout->p->fmt_out.i_height == vout->p->fmt_render.i_height &&
+           vout->p->fmt_out.i_chroma == vout->p->fmt_render.i_chroma);
     return VLC_SUCCESS;
 }
 
@@ -760,7 +760,7 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
             (vout->p->decoder_pool != vout->p->display_pool || subpic)) {
             picture_t *render;
             if (vout->p->is_decoder_pool_slow)
-                render = picture_NewFromFormat(&vout->fmt_out);
+                render = picture_NewFromFormat(&vout->p->fmt_out);
             else if (vout->p->decoder_pool != vout->p->display_pool)
                 render = picture_pool_Get(vout->p->display_pool);
             else
@@ -770,8 +770,8 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
                 picture_Copy(render, filtered);
 
                 spu_RenderSubpictures(vout->p->p_spu,
-                                      render, &vout->fmt_out,
-                                      subpic, &vout->fmt_in, spu_render_time);
+                                      render, &vout->p->fmt_out,
+                                      subpic, &vout->p->fmt_in, spu_render_time);
             }
             if (vout->p->is_decoder_pool_slow) {
                 direct = picture_pool_Get(vout->p->display_pool);
@@ -792,7 +792,7 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
          * Take a snapshot if requested
          */
         if (direct && do_snapshot)
-            vout_snapshot_Set(&vout->p->snapshot, &vout->fmt_out, direct);
+            vout_snapshot_Set(&vout->p->snapshot, &vout->p->fmt_out, direct);
 
         /* Render the direct buffer returned by vout_RenderPicture */
         if (direct) {
@@ -876,18 +876,18 @@ static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
         vout_ShowTextAbsolute(vout, DEFAULT_CHAN,
                               string, NULL,
                               vout->p->title.position,
-                              30 + vout->fmt_in.i_width
-                                 - vout->fmt_in.i_visible_width
-                                 - vout->fmt_in.i_x_offset,
-                              20 + vout->fmt_in.i_y_offset,
+                              30 + vout->p->fmt_in.i_width
+                                 - vout->p->fmt_in.i_visible_width
+                                 - vout->p->fmt_in.i_x_offset,
+                              20 + vout->p->fmt_in.i_y_offset,
                               start, stop);
 }
 
 static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
 {
     es_format_t fmt;
-    es_format_Init(&fmt, VIDEO_ES, vout->fmt_render.i_chroma);
-    fmt.video = vout->fmt_render;
+    es_format_Init(&fmt, VIDEO_ES, vout->p->fmt_render.i_chroma);
+    fmt.video = vout->p->fmt_render;
 
     vlc_mutex_lock(&vout->p->vfilter_lock);
 
@@ -1057,7 +1057,7 @@ static void *Thread(void *object)
          */
         while (!vout_control_Pop(&vout->p->control, &cmd, deadline, 100000)) {
             /* TODO remove the lock when possible (ie when
-             * vout->fmt_* are not protected by it anymore) */
+             * vout->p->fmt_* are not protected by it anymore) */
             vlc_mutex_lock(&vout->p->change_lock);
             switch(cmd.type) {
             case VOUT_CONTROL_OSD_TITLE:

@@ -63,10 +63,6 @@ struct vout_thread_t
 {
     VLC_COMMON_MEMBERS
 
-    video_format_t      fmt_render;      /* render format (from the decoder) */
-    video_format_t      fmt_in;            /* input (modified render) format */
-    video_format_t      fmt_out;     /* output format (for the video output) */
-
     /* Private vout_thread data */
     vout_thread_sys_t *p;
 };

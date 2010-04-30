@@ -51,6 +51,11 @@ struct vout_thread_sys_t
     /* Video output configuration */
     config_chain_t *p_cfg;
 
+    /* */
+    video_format_t  fmt_render;      /* render format (from the decoder) */
+    video_format_t  fmt_in;            /* input (modified render) format */
+    video_format_t  fmt_out;     /* output format (for the video output) */
+
     /* Thread & synchronization */
     vlc_thread_t    thread;
     vlc_cond_t      change_wait;

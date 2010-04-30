@@ -31,6 +31,9 @@
 #include <vlc_filter.h>
 #include <vlc_osd.h>
 
+/* TODO remove access to private vout data */
+#include "vout_internal.h"
+
 /**
  * \brief Show text on the video for some time
  * \param p_vout pointer to the vout the text is to be showed on
@@ -140,10 +143,10 @@ void vout_OSDMessage( vlc_object_t *p_caller, int i_channel,
         {
             vout_ShowTextRelative( p_vout, i_channel, psz_string, NULL,
                                    OSD_ALIGN_TOP|OSD_ALIGN_RIGHT,
-                                   30 + p_vout->fmt_in.i_width
-                                      - p_vout->fmt_in.i_visible_width
-                                      - p_vout->fmt_in.i_x_offset,
-                                   20 + p_vout->fmt_in.i_y_offset, 1000000 );
+                                   30 + p_vout->p->fmt_in.i_width
+                                      - p_vout->p->fmt_in.i_visible_width
+                                      - p_vout->p->fmt_in.i_x_offset,
+                                   20 + p_vout->p->fmt_in.i_y_offset, 1000000 );
             free( psz_string );
         }
         vlc_object_release( p_vout );
