@@ -474,10 +474,9 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
     demux_sys_t        *p_sys = p_demux->p_sys;
     matroska_segment_c *p_segment = p_sys->p_current_segment->Segment();
 
-    size_t          i_track;
-    unsigned int    i;
-    bool            b;
+    if( !p_segment ) return;
 
+    size_t          i_track;
     if( p_segment->BlockFindTrackIndex( &i_track, block, simpleblock ) )
     {
         msg_Err( p_demux, "invalid track number" );
@@ -498,6 +497,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
 
     if ( tk->fmt.i_cat != NAV_ES )
     {
+        bool b;
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
 
         if( !b )
@@ -520,7 +520,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
     tk->b_inited = true;
 
 
-    for( i = 0;
+    for( unsigned int i = 0;
          (block != NULL && i < block->NumberFrames()) || (simpleblock != NULL && i < simpleblock->NumberFrames());
          i++ )
     {

@@ -51,7 +51,6 @@ demux_sys_t::~demux_sys_t()
 matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlStream *p_estream, bool b_initial )
 {
     int i_upper_lvl = 0;
-    size_t i;
     EbmlElement *p_l0, *p_l1, *p_l2;
     bool b_keep_stream = false, b_keep_segment;
 
@@ -112,7 +111,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
                     KaxInfo *p_info = static_cast<KaxInfo*>(p_l1);
 
                     p_info->Read(*p_estream, KaxInfo::ClassInfos.Context, i_upper_lvl, p_l2, true);
-                    for( i = 0; i < p_info->ListSize(); i++ )
+                    for( size_t i = 0; i < p_info->ListSize(); i++ )
                     {
                         EbmlElement *l = (*p_info)[i];
 
