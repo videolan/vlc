@@ -33,17 +33,16 @@ void virtual_segment_c::PrepareChapters( )
 
     // !!! should be called only once !!!
     matroska_segment_c *p_segment;
-    size_t i, j;
 
     // copy editions from the first segment
     p_segment = linked_segments[0];
     p_editions = &p_segment->stored_editions;
 
-    for ( i=1 ; i<linked_segments.size(); i++ )
+    for ( size_t i=1 ; i<linked_segments.size(); i++ )
     {
         p_segment = linked_segments[i];
         // FIXME assume we have the same editions in all segments
-        for (j=0; j<p_segment->stored_editions.size(); j++)
+        for ( size_t j=0; j<p_segment->stored_editions.size(); j++)
         {
             if( j >= p_editions->size() ) /* Protect against broken files (?) */
                 break;
