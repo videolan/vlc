@@ -153,8 +153,8 @@ osd_menu_t *osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
     p_lock = osd_GetMutex( p_this );
     vlc_mutex_lock( p_lock );
 
-    var_Create( p_this->p_libvlc, "osd", VLC_VAR_ADDRESS );
-    var_Get( p_this->p_libvlc, "osd", &val );
+    var_Create( p_this->p_libvlc, "osd-object", VLC_VAR_ADDRESS );
+    var_Get( p_this->p_libvlc, "osd-object", &val );
     if( val.p_address == NULL )
     {
         static const char osdmenu_name[] = "osd menu";
@@ -200,7 +200,7 @@ osd_menu_t *osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
         var_SetBool( p_osd, "osd-menu-visible", false );
 
         val.p_address = p_osd;
-        var_Set( p_this->p_libvlc, "osd", val );
+        var_Set( p_this->p_libvlc, "osd-object", val );
     }
     else
         p_osd = val.p_address;
@@ -232,7 +232,7 @@ void osd_MenuDelete( vlc_object_t *p_this, osd_menu_t *p_osd )
         var_Destroy( p_osd, "osd-menu-update" );
         osd_ParserUnload( p_osd );
         val.p_address = NULL;
-        var_Set( p_this->p_libvlc, "osd", val );
+        var_Set( p_this->p_libvlc, "osd-object", val );
     }
 
     vlc_object_release( p_osd );
@@ -243,7 +243,7 @@ static osd_menu_t *osd_Find( vlc_object_t *p_this )
 {
     vlc_value_t val;
 
-    if( var_Get( p_this->p_libvlc, "osd", &val ) )
+    if( var_Get( p_this->p_libvlc, "osd-object", &val ) )
         return NULL;
     return val.p_address;
 }
