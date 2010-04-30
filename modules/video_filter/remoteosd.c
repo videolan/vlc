@@ -153,8 +153,10 @@ vlc_module_end ()
 /* subfilter functions */
 static subpicture_t *Filter( filter_t *, mtime_t );
 
-static int MouseEvent ( vlc_object_t *p_this, char const *psz_var,
-                        vlc_value_t oldval, vlc_value_t newval, void *p_data );
+static int MouseEvent( filter_t *,
+                       const vlc_mouse_t *,
+                       const vlc_mouse_t *,
+                       const video_format_t * );
 
 static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data );
@@ -306,15 +308,12 @@ static int CreateFilter ( vlc_object_t *p_this )
 
     /* Attach subpicture filter callback */
     p_filter->pf_sub_filter = Filter;
+    p_filter->pf_sub_mouse  = MouseEvent;
 
     p_sys->p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT, FIND_PARENT );
 
     if( p_sys->p_vout )
     {
-        var_AddCallback( p_sys->p_vout, "mouse-moved",
-                         MouseEvent, p_this );
-        var_AddCallback( p_sys->p_vout, "mouse-button-down",
-                         MouseEvent, p_this );
         var_AddCallback( p_sys->p_vout->p_libvlc, "key-pressed",
                          KeyEvent, p_this );
     }
@@ -367,10 +366,6 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     if( p_sys->p_vout )
     {
-        var_DelCallback( p_sys->p_vout, "mouse-moved",
-                         MouseEvent, p_this );
-        var_DelCallback( p_sys->p_vout, "mouse-button-down",
-                         MouseEvent, p_this );
         var_DelCallback( p_sys->p_vout->p_libvlc, "key-pressed",
                          KeyEvent, p_this );
 
@@ -1319,36 +1314,33 @@ static inline bool raw_line(  filter_sys_t* p_sys,
 /*****************************************************************************
  * MouseEvent: callback for mouse events
  *****************************************************************************/
-static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int MouseEvent( filter_t *p_filter,
+                       const vlc_mouse_t *p_old,
+                       const vlc_mouse_t *p_new,
+                       const video_format_t *p_fmt )
 {
-    VLC_UNUSED(oldval); VLC_UNUSED(newval); VLC_UNUSED(psz_var);
-
-    filter_t *p_filter = (filter_t *)p_data;
     filter_sys_t *p_sys = p_filter->p_sys;
+    VLC_UNUSED(p_old);
 
     if( !p_sys->b_vnc_mouse_events )
         return VLC_SUCCESS;
 
-    vout_thread_t *p_vout = (vout_thread_t*)p_sys->p_vout;
-    int i_x, i_y;
-    int i_v;
-
-    i_v = var_GetInteger( p_sys->p_vout, "mouse-button-down" );
-    var_GetCoords( p_sys->p_vout, "mouse-moved", &i_x, &i_y );
+    int i_v = p_new->i_pressed;
+    int i_x = p_new->i_x;
+    int i_y = p_new->i_y;
 
     vlc_mutex_lock( &p_sys->lock );
 
-    const int v_h = p_vout->fmt_in.i_visible_height;
+    const int v_h = p_fmt->i_visible_height;
     const int v_w = p_sys->i_vnc_width * v_h / p_sys->i_vnc_height;
-    const int v_x = (p_vout->fmt_in.i_visible_width-v_w)/2;
+    const int v_x = (p_fmt->i_visible_width-v_w)/2;
 
     i_x -= v_x;
 
     if( i_y < 0 || i_x < 0 || i_y >= v_h || i_x >= v_w )
     {
         vlc_mutex_unlock( &p_sys->lock );
-        msg_Dbg( p_this, "invalid mouse event? x=%d y=%d btn=%x", i_x, i_y, i_v );
+        msg_Dbg( p_filter, "invalid mouse event? x=%d y=%d btn=%x", i_x, i_y, i_v );
         return VLC_SUCCESS;
     }
     if( !p_sys->b_connection_active )
@@ -1358,7 +1350,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     }
 
 #ifdef VNC_DEBUG
-    msg_Dbg( p_this, "mouse event x=%d y=%d btn=%x", i_x, i_y, i_v );
+    msg_Dbg( p_filter, "mouse event x=%d y=%d btn=%x", i_x, i_y, i_v );
 #endif
 
     /* */
@@ -1377,7 +1369,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
 
     vlc_mutex_unlock( &p_sys->lock );
 
-    return VLC_SUCCESS;
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
