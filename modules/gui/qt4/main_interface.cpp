@@ -652,6 +652,9 @@ void MainInterface::createPlaylist()
     }
     else
     {
+#ifdef WIN32
+        playlistWidget->setParent( NULL );
+#endif
         playlistWidget->setWindowFlags( Qt::Window );
 
         /* This will restore the geometry but will not work for position,
@@ -683,6 +686,9 @@ void MainInterface::togglePlaylist()
     }
     else
     {
+#ifdef WIN32
+        playlistWidget->setParent( NULL );
+#endif
         playlistWidget->setWindowFlags( Qt::Window );
         playlistVisible = !playlistVisible;
         playlistWidget->setVisible( playlistVisible );
@@ -699,6 +705,9 @@ void MainInterface::dockPlaylist( bool p_docked )
     if( !p_docked )
     {
         stackCentralW->removeWidget( playlistWidget );
+#ifdef WIN32
+        playlistWidget->setParent( NULL );
+#endif
         playlistWidget->setWindowFlags( Qt::Window );
         QVLCTools::restoreWidgetPosition( p_intf, "Playlist",
                 playlistWidget, QSize( 600, 300 ) );
