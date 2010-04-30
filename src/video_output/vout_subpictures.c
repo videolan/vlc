@@ -88,6 +88,7 @@ struct spu_private_t
 
     /* Subpiture filters */
     char           *psz_chain_update;
+    vlc_mutex_t    chain_lock;
     filter_chain_t *p_chain;
 
     /* */
@@ -226,6 +227,7 @@ spu_t *spu_Create( vlc_object_t *p_this )
     p_sys->i_channel = 2;
 
     p_sys->psz_chain_update = NULL;
+    vlc_mutex_init( &p_sys->chain_lock );
     p_sys->p_chain = filter_chain_New( p_spu, "sub filter", false,
                                        SubFilterAllocationInit,
                                        SubFilterAllocationClean,
@@ -279,6 +281,7 @@ void spu_Destroy( spu_t *p_spu )
         FilterRelease( p_sys->p_scale );
 
     filter_chain_Delete( p_sys->p_chain );
+    vlc_mutex_destroy( &p_sys->chain_lock );
     free( p_sys->psz_chain_update );
 
     /* Destroy all remaining subpictures */
@@ -324,6 +327,22 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
         var_Destroy( p_input, "highlight" );
         vlc_object_release( p_input );
     }
+}
+
+/**
+ * Inform the SPU filters of mouse event
+ */
+int spu_ProcessMouse( spu_t *p_spu,
+                      const vlc_mouse_t *p_mouse,
+                      const video_format_t *p_fmt )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    vlc_mutex_lock( &p_sys->chain_lock );
+    filter_chain_MouseEvent( p_sys->p_chain, p_mouse, p_fmt );
+    vlc_mutex_unlock( &p_sys->chain_lock );
+
+    return VLC_SUCCESS;
 }
 
 /**
@@ -552,6 +571,7 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_subtitle_date,
     p_sys->psz_chain_update = NULL;
     vlc_mutex_unlock( &p_sys->lock );
 
+    vlc_mutex_lock( &p_sys->chain_lock );
     if( psz_chain_update )
     {
         filter_chain_Reset( p_sys->p_chain, NULL, NULL );
@@ -560,9 +580,9 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_subtitle_date,
 
         free( psz_chain_update );
     }
-
     /* Run subpicture filters */
     filter_chain_SubFilter( p_sys->p_chain, render_osd_date );
+    vlc_mutex_unlock( &p_sys->chain_lock );
 
     vlc_mutex_lock( &p_sys->lock );
 

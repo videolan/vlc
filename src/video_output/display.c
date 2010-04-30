@@ -1411,6 +1411,9 @@ void vout_SendDisplayEventMouse(vout_thread_t *vout, const vlc_mouse_t *m)
 {
     vlc_mouse_t tmp;
 
+    if (spu_ProcessMouse( vout->p->p_spu, m, &vout->fmt_out))
+        return;
+
     vlc_mutex_lock( &vout->p->vfilter_lock );
     if (vout->p->p_vf2_chain) {
         if (!filter_chain_MouseFilter(vout->p->p_vf2_chain, &tmp, m))

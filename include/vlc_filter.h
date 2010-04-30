@@ -101,13 +101,18 @@ struct filter_t
 
         struct
         {
-            subpicture_t * (*pf_filter) ( filter_t *, mtime_t );
-            subpicture_t * (*pf_buffer_new) ( filter_t * );
-            void        (*pf_buffer_del) ( filter_t *, subpicture_t * );
+            subpicture_t * (*pf_filter)    ( filter_t *, mtime_t );
+            subpicture_t * (*pf_buffer_new)( filter_t * );
+            void           (*pf_buffer_del)( filter_t *, subpicture_t * );
+            int            (*pf_mouse)     ( filter_t *,
+                                             const vlc_mouse_t *p_old,
+                                             const vlc_mouse_t *p_new,
+                                             const video_format_t * );
         } sub;
 #define pf_sub_filter      u.sub.pf_filter
 #define pf_sub_buffer_new  u.sub.pf_buffer_new
 #define pf_sub_buffer_del  u.sub.pf_buffer_del
+#define pf_sub_mouse       u.sub.pf_mouse
 
         struct
         {
@@ -369,6 +374,13 @@ VLC_EXPORT( void, filter_chain_SubFilter, ( filter_chain_t *, mtime_t ) );
  * The vlc_mouse_t* pointers may be the same.
  */
 VLC_EXPORT( int, filter_chain_MouseFilter, ( filter_chain_t *, vlc_mouse_t *, const vlc_mouse_t * ) );
+
+/**
+ * Inform the filter chain of mouse state.
+ *
+ * It makes sense only for a sub filter chain.
+ */
+VLC_EXPORT( int, filter_chain_MouseEvent, ( filter_chain_t *, const vlc_mouse_t *, const video_format_t * ) );
 
 #endif /* _VLC_FILTER_H */
 
