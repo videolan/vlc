@@ -75,20 +75,11 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
     }
     return;
 }
-size_t vlc_stream_io_callback::write( const void *p_buffer, size_t i_size )
-{
-    return 0;
-}
+
 uint64 vlc_stream_io_callback::getFilePointer( void )
 {
     if ( s == NULL )
         return 0;
     return stream_Tell( s );
 }
-void vlc_stream_io_callback::close( void )
-{
-    return;
-}
-
-
 
