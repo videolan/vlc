@@ -480,21 +480,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
      * when OSD menu should be hidden and menu picture is not allocated.
      */
     if( !p_filter->p_sys->p_menu->p_state->p_pic ||
-        ( p_filter->p_sys->b_visible == false ) )
+        !p_filter->p_sys->b_visible )
     {
-        /* Create new spu regions and allocate an empty picture in it. */
-        p_region = create_picture_region( p_filter, p_spu,
-            p_filter->p_sys->p_menu->p_state->i_width,
-            p_filter->p_sys->p_menu->p_state->i_height,
-            NULL );
-
-        /* proper positioning of OSD menu image */
-        p_region->i_x = p_filter->p_sys->p_menu->p_state->i_x;
-        p_region->i_y = p_filter->p_sys->p_menu->p_state->i_y;
-        /* FIXME is it needed ?
-        p_region->i_align = p_sys->i_position;
-        */
-        p_spu->p_region = p_region;
         p_spu->i_alpha = 0xFF; /* Picture is completely non transparent. */
         return p_spu;
     }
