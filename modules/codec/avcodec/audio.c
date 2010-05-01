@@ -404,6 +404,35 @@ void EndAudioDec( decoder_t *p_dec )
  *
  *****************************************************************************/
 
+void GetVlcAudioFormat( vlc_fourcc_t *pi_codec, unsigned *pi_bits, int i_sample_fmt )
+{
+    switch( i_sample_fmt )
+    {
+    case SAMPLE_FMT_U8:
+        *pi_codec = VLC_CODEC_U8;
+        *pi_bits = 8;
+        break;
+    case SAMPLE_FMT_S32:
+        *pi_codec = VLC_CODEC_S32N;
+        *pi_bits = 32;
+        break;
+    case SAMPLE_FMT_FLT:
+        *pi_codec = VLC_CODEC_FL32;
+        *pi_bits = 32;
+        break;
+    case SAMPLE_FMT_DBL:
+        *pi_codec = VLC_CODEC_FL64;
+        *pi_bits = 64;
+        break;
+
+    case SAMPLE_FMT_S16:
+    default:
+        *pi_codec = VLC_CODEC_S16N;
+        *pi_bits = 16;
+        break;
+    }
+}
+
 static const uint64_t pi_channels_map[][2] =
 {
     { CH_FRONT_LEFT,        AOUT_CHAN_LEFT },
@@ -432,32 +461,10 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    switch( p_sys->p_context->sample_fmt )
-    {
-    case SAMPLE_FMT_U8:
-        p_dec->fmt_out.i_codec = VLC_CODEC_U8;
-        p_dec->fmt_out.audio.i_bitspersample = 8;
-        break;
-    case SAMPLE_FMT_S32:
-        p_dec->fmt_out.i_codec = VLC_CODEC_S32N;
-        p_dec->fmt_out.audio.i_bitspersample = 32;
-        break;
-    case SAMPLE_FMT_FLT:
-        p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
-        p_dec->fmt_out.audio.i_bitspersample = 32;
-        break;
-    case SAMPLE_FMT_DBL:
-        p_dec->fmt_out.i_codec = VLC_CODEC_FL64;
-        p_dec->fmt_out.audio.i_bitspersample = 64;
-        break;
-
-    case SAMPLE_FMT_S16:
-    default:
-        p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
-        p_dec->fmt_out.audio.i_bitspersample = 16;
-        break;
-    }
-    p_dec->fmt_out.audio.i_rate     = p_sys->p_context->sample_rate;
+    GetVlcAudioFormat( &p_dec->fmt_out.i_codec,
+                       &p_dec->fmt_out.audio.i_bitspersample,
+                       p_sys->p_context->sample_fmt );
+    p_dec->fmt_out.audio.i_rate = p_sys->p_context->sample_rate;
 
     /* */
     if( p_sys->i_previous_channels == p_sys->p_context->channels &&

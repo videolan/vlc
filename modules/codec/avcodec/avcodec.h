@@ -29,6 +29,7 @@ int GetVlcFourcc( int i_ffmpeg_codec, int *pi_cat,
 int TestFfmpegChroma( const int i_ffmpeg_id, const vlc_fourcc_t i_vlc_fourcc );
 int GetFfmpegChroma( int *i_ffmpeg_chroma, const video_format_t fmt );
 int GetVlcChroma( video_format_t *fmt, const int i_ffmpeg_chroma );
+void GetVlcAudioFormat( vlc_fourcc_t *, unsigned *pi_bits, int i_sample_fmt );
 
 
 picture_t * DecodeVideo    ( decoder_t *, block_t ** );
