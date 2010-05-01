@@ -70,10 +70,6 @@ int main( int i_argc, const char *ppsz_argv[] )
     /* Disable the ugly Gnome crash dialog so that we properly segfault */
     putenv( (char *)"GNOME_DISABLE_CRASH_DIALOG=1" );
 # endif
-
-    /* Make Xlib hide visuals with an alphachannel. Ensure that Qt4 will not
-     * use the alpha channel for the embedded video window. */
-    putenv( (char *)"XLIB_SKIP_ARGB_VISUALS=1" );
 #endif
 #ifdef HAVE_SETENV
     /* Clear the X.Org startup notification ID. Otherwise the UI might try to
