@@ -200,7 +200,7 @@ unsigned int aout_FormatNbChannels( const audio_sample_format_t * p_format )
  *****************************************************************************/
 unsigned int aout_BitsPerSample( vlc_fourcc_t i_format )
 {
-    switch( i_format )
+    switch( vlc_fourcc_GetCodec( AUDIO_ES, i_format ) )
     {
     case VLC_CODEC_U8:
     case VLC_CODEC_S8:
