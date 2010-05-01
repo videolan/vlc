@@ -629,7 +629,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     tk->i_id = vlc_array_index_of_item( p_sys->p_tracks, tk ) + 1;
 
 
-    p_sys->b_write_header = true;
+    if( p_sys->b_asf_http )
+        p_sys->b_write_header = true;
 
     return VLC_SUCCESS;
 }
@@ -663,10 +664,10 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     if( p_sys->b_asf_http )
+    {
         vlc_array_remove( p_sys->p_tracks, vlc_array_index_of_item( p_sys->p_tracks, (void *)tk ) );
-
-
-    p_sys->b_write_header = true;
+        p_sys->b_write_header = true;
+    }
     return VLC_SUCCESS;
 }
 
