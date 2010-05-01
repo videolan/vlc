@@ -947,13 +947,12 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
 #if 0
         msg_Warn( p_enc, "avcodec_encode_audio: %d", i_out );
 #endif
-        if( i_out < 0 ) break;
-
         p_buffer += p_sys->i_frame_size;
         p_sys->i_samples_delay -= p_sys->p_context->frame_size;
         i_samples -= p_sys->p_context->frame_size;
 
-        if( i_out == 0 ) continue;
+        if( i_out <= 0 )
+            continue;
 
         p_block = block_New( p_enc, i_out );
         memcpy( p_block->p_buffer, p_sys->p_buffer_out, i_out );
@@ -972,8 +971,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     /* Backup the remaining raw samples */
     if( i_samples )
     {
-        memcpy( p_sys->p_buffer + i_samples_delay * 2 *
-                p_sys->p_context->channels, p_buffer,
+        memcpy( &p_sys->p_buffer[i_samples_delay * 2 * p_sys->p_context->channels],
+                p_buffer,
                 i_samples * 2 * p_sys->p_context->channels );
     }
 
