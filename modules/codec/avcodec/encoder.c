@@ -58,6 +58,8 @@
 
 #define MAX_FRAME_DELAY (FF_MAX_B_FRAMES + 2)
 
+#define RAW_AUDIO_FRAME_SIZE (2048)
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -115,6 +117,7 @@ struct encoder_sys_t
     /*
      * Audio properties
      */
+    int i_sample_bytes;
     int i_frame_size;
     int i_samples_delay;
     mtime_t i_pts;
@@ -551,7 +554,10 @@ int OpenEncoder( vlc_object_t *p_this )
         if( i_codec_id == CODEC_ID_MP3 && p_enc->fmt_in.audio.i_channels > 2 )
             p_enc->fmt_in.audio.i_channels = 2;
 
-        p_context->codec_type = CODEC_TYPE_AUDIO;
+        p_context->codec_type  = CODEC_TYPE_AUDIO;
+        p_context->sample_fmt  = p_codec->sample_fmts ?
+                                    p_codec->sample_fmts[0] :
+                                    SAMPLE_FMT_S16;
         p_enc->fmt_in.i_codec  = VLC_CODEC_S16N;
         p_context->sample_rate = p_enc->fmt_out.audio.i_rate;
         p_context->channels    = p_enc->fmt_out.audio.i_channels;
@@ -697,11 +703,23 @@ int OpenEncoder( vlc_object_t *p_this )
 
     if( p_enc->fmt_in.i_cat == AUDIO_ES )
     {
-        p_sys->i_buffer_out = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
-        p_sys->p_buffer_out = malloc( p_sys->i_buffer_out );
-        p_sys->i_frame_size = p_context->frame_size * 2 * p_context->channels;
-        p_sys->p_buffer = malloc( p_sys->i_frame_size );
+        GetVlcAudioFormat( &p_enc->fmt_in.i_codec,
+                           &p_enc->fmt_in.audio.i_bitspersample,
+                           p_sys->p_context->sample_fmt );
+        p_sys->i_sample_bytes = (p_enc->fmt_in.audio.i_bitspersample / 8) *
+                                p_context->channels;
+        p_sys->i_frame_size = p_context->frame_size > 1 ?
+                                    p_context->frame_size :
+                                    RAW_AUDIO_FRAME_SIZE;
+        p_sys->p_buffer = malloc( p_sys->i_frame_size * p_sys->i_sample_bytes );
         p_enc->fmt_out.audio.i_blockalign = p_context->block_align;
+        p_enc->fmt_out.audio.i_bitspersample = aout_BitsPerSample( vlc_fourcc_GetCodec( AUDIO_ES, p_enc->fmt_out.i_codec ) );
+
+        if( p_context->frame_size > 1 )
+            p_sys->i_buffer_out = 8 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
+        else
+            p_sys->i_buffer_out = p_sys->i_frame_size * p_sys->i_sample_bytes;
+        p_sys->p_buffer_out = malloc( p_sys->i_buffer_out );
     }
 
     msg_Dbg( p_enc, "found encoder %s", psz_namecodec );
@@ -906,6 +924,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
+
     block_t *p_block, *p_chain = NULL;
 
     uint8_t *p_buffer = p_aout_buf->p_buffer;
@@ -918,27 +937,29 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
 
     p_sys->i_samples_delay += i_samples;
 
-    while( p_sys->i_samples_delay >= p_sys->p_context->frame_size )
+    while( p_sys->i_samples_delay >= p_sys->i_frame_size )
     {
-        int16_t *p_samples;
+        void *p_samples;
         int i_out;
 
         if( i_samples_delay )
         {
             /* Take care of the left-over from last time */
-            int i_delay_size = i_samples_delay * 2 *
-                                 p_sys->p_context->channels;
-            int i_size = p_sys->i_frame_size - i_delay_size;
+            int i_delay_size = i_samples_delay;
+            int i_size = (p_sys->i_frame_size - i_delay_size) *
+                         p_sys->i_sample_bytes;
 
-            p_samples = (int16_t *)p_sys->p_buffer;
-            memcpy( p_sys->p_buffer + i_delay_size, p_buffer, i_size );
-            p_buffer -= i_delay_size;
+            memcpy( p_sys->p_buffer + i_delay_size * p_sys->i_sample_bytes,
+                    p_buffer, i_size );
+            p_buffer -= i_delay_size * p_sys->i_sample_bytes;
             i_samples += i_samples_delay;
             i_samples_delay = 0;
+
+            p_samples = p_sys->p_buffer;
         }
         else
         {
-            p_samples = (int16_t *)p_buffer;
+            p_samples = p_buffer;
         }
 
         i_out = avcodec_encode_audio( p_sys->p_context, p_sys->p_buffer_out,
@@ -947,9 +968,9 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
 #if 0
         msg_Warn( p_enc, "avcodec_encode_audio: %d", i_out );
 #endif
-        p_buffer += p_sys->i_frame_size;
-        p_sys->i_samples_delay -= p_sys->p_context->frame_size;
-        i_samples -= p_sys->p_context->frame_size;
+        p_buffer += p_sys->i_frame_size * p_sys->i_sample_bytes;
+        p_sys->i_samples_delay -= p_sys->i_frame_size;
+        i_samples -= p_sys->i_frame_size;
 
         if( i_out <= 0 )
             continue;
@@ -958,7 +979,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
         memcpy( p_block->p_buffer, p_sys->p_buffer_out, i_out );
 
         p_block->i_length = (mtime_t)1000000 *
-            (mtime_t)p_sys->p_context->frame_size /
+            (mtime_t)p_sys->i_frame_size /
             (mtime_t)p_sys->p_context->sample_rate;
 
         p_block->i_dts = p_block->i_pts = p_sys->i_pts;
@@ -971,9 +992,9 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     /* Backup the remaining raw samples */
     if( i_samples )
     {
-        memcpy( &p_sys->p_buffer[i_samples_delay * 2 * p_sys->p_context->channels],
+        memcpy( &p_sys->p_buffer[i_samples_delay * p_sys->i_sample_bytes],
                 p_buffer,
-                i_samples * 2 * p_sys->p_context->channels );
+                i_samples * p_sys->i_sample_bytes );
     }
 
     return p_chain;
