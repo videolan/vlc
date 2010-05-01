@@ -468,6 +468,7 @@ static int Open (vlc_object_t *obj)
             }
         }
         xcb_xv_ungrab_port (conn, p_sys->port, XCB_CURRENT_TIME);
+        msg_Dbg (vd, "no usable X11 visual");
         continue; /* No workable XVideo format (visual/depth) */
 
     created_window:
