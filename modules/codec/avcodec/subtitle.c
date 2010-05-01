@@ -262,7 +262,7 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t 
         //msg_Err(dec, "SUBS RECT[%d]: %dx%d @%dx%d",
         //         i, rec->w, rec->h, rec->x, rec->y);
 
-        subpicture_region_t *region;
+        subpicture_region_t *region = NULL;
         switch (ffsub->format) {
         case 0:
             region = ConvertRegionRGBA(rec);
@@ -276,13 +276,11 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t 
             *region_next = region;
             region_next = &region->p_next;
         }
-        /* Free AVSubtitleRect
-         * FIXME isn't there an avcodec function ? */
-        free(rec->pict.data[0]); /* Plane */
-        free(rec->pict.data[1]); /* Palette */
-        free(rec);
+        /* Free AVSubtitleRect */
+        avpicture_free(&rec->pict);
+        av_free(rec);
     }
-    free(ffsub->rects);
+    av_free(ffsub->rects);
 
     return spu;
 }
