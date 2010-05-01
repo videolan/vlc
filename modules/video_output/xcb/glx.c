@@ -414,13 +414,12 @@ static void Close (vlc_object_t *obj)
     if (sys->ctx != NULL)
     {
         if (sys->v1_3)
-        {
             glXMakeContextCurrent (dpy, None, None, NULL);
-            glXDestroyWindow (dpy, sys->glwin);
-        }
         else
             glXMakeCurrent (dpy, None, NULL);
         glXDestroyContext (dpy, sys->ctx);
+        if (sys->v1_3)
+            glXDestroyWindow (dpy, sys->glwin);
     }
 
     /* show the default cursor */
