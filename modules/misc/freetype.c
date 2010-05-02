@@ -420,7 +420,6 @@ static int Create( vlc_object_t *p_this )
 
 #else
 
-    p_sys->psz_fontfamily = strdup( DEFAULT_FONT );
     psz_fontfile = psz_fontfamily;
 
 #endif
