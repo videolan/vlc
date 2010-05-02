@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_codec.h>
 #include <vlc_avcodec.h>
+#include <vlc_cpu.h>
 #include <assert.h>
 
 /* ffmpeg header */
@@ -53,6 +54,9 @@
 #include "va.h"
 #if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2)
 #   define HAVE_AVCODEC_VA
+#endif
+#if defined(FF_THREAD_FRAME)
+#   define HAVE_AVCODEC_MT
 #endif
 
 /*****************************************************************************
@@ -93,7 +97,17 @@ struct decoder_sys_t
 
     /* VA API */
     vlc_va_t *p_va;
+
+    vlc_sem_t sem_mt;
 };
+
+#ifdef HAVE_AVCODEC_MT
+#   define wait_mt(s) vlc_sem_wait( &s->sem_mt )
+#   define post_mt(s) vlc_sem_post( &s->sem_mt )
+#else
+#   define wait_mt(s)
+#   define post_mt(s)
+#endif
 
 /* FIXME (dummy palette for now) */
 static const AVPaletteControl palette_control;
@@ -207,6 +221,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_ff_pic = avcodec_alloc_frame();
     p_sys->b_delayed_open = true;
     p_sys->p_va = NULL;
+    vlc_sem_init( &p_sys->sem_mt, 0 );
 
     /* ***** Fill p_context with init values ***** */
     p_sys->p_context->codec_tag = ffmpeg_CodecTag( p_dec->fmt_in.i_original_fourcc ?: p_dec->fmt_in.i_codec );
@@ -318,9 +333,27 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context->opaque = p_dec;
 
 #ifdef HAVE_AVCODEC_VA
-    if( var_CreateGetBool( p_dec, "ffmpeg-hw" ) )
+    const bool b_use_hw = var_CreateGetBool( p_dec, "ffmpeg-hw" );
+    if( b_use_hw )
         p_sys->p_context->get_format = ffmpeg_GetFormat;
 #endif
+
+#ifdef HAVE_AVCODEC_MT
+    int i_thread_count = var_InheritInteger( p_dec, "ffmpeg-threads" );
+    if( i_thread_count <= 0 )
+        i_thread_count = vlc_GetCPUCount();
+#ifdef HAVE_AVCODEC_VA
+    if( b_use_hw )
+    {
+        if( i_thread_count > 1 )
+            msg_Err( p_dec, "ffmpeg-hw and ffmpeg-threads options are not compatible" );
+        i_thread_count = 1;
+    }
+#endif
+    msg_Dbg( p_dec, "allowing %d thread(s) for decoding", i_thread_count );
+    p_sys->p_context->thread_count = i_thread_count;
+#endif
+
 
     /* ***** misc init ***** */
     p_sys->i_pts = VLC_TS_INVALID;
@@ -376,6 +409,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     {
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
         av_free( p_sys->p_ff_pic );
+        vlc_sem_destroy( &p_sys->sem_mt );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -533,6 +567,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_block->i_pts =
         p_block->i_dts = VLC_TS_INVALID;
 
+        post_mt( p_sys );
 
         i_used = avcodec_decode_video( p_context, p_sys->p_ff_pic,
                                        &b_gotpicture,
@@ -549,6 +584,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                                            &b_gotpicture, p_block->p_buffer,
                                            p_block->i_buffer );
         }
+        wait_mt( p_sys );
 
         if( p_sys->b_flush )
             p_sys->b_first_frame = true;
@@ -564,7 +600,8 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             block_Release( p_block );
             return NULL;
         }
-        else if( i_used > p_block->i_buffer )
+        else if( i_used > p_block->i_buffer ||
+                 p_context->thread_count > 1 )
         {
             i_used = p_block->i_buffer;
         }
@@ -749,14 +786,19 @@ void EndVideoDec( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    post_mt( p_sys );
+
     /* do not flush buffers if codec hasn't been opened (theora/vorbis/VC1) */
     if( p_sys->p_context->codec )
         avcodec_flush_buffers( p_sys->p_context );
+
+    wait_mt( p_sys );
 
     if( p_sys->p_ff_pic ) av_free( p_sys->p_ff_pic );
 
     if( p_sys->p_va )
         vlc_va_Delete( p_sys->p_va );
+    vlc_sem_destroy( &p_sys->sem_mt );
 }
 
 /*****************************************************************************
@@ -852,6 +894,27 @@ static int ffmpeg_OpenCodec( decoder_t *p_dec )
     if( ret < 0 )
         return VLC_EGENERIC;
     msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
+#ifdef HAVE_AVCODEC_MT
+    switch( p_sys->p_context->active_thread_type )
+    {
+    case FF_THREAD_FRAME:
+        msg_Dbg( p_dec, "using frame thread mode with %d threads",
+                 p_sys->p_context->thread_count );
+        break;
+    case FF_THREAD_SLICE:
+        msg_Dbg( p_dec, "using slice thread mode with %d threads",
+                 p_sys->p_context->thread_count );
+        break;
+    case 0:
+        if( p_sys->p_context->thread_count > 1 )
+            msg_Warn( p_dec, "failed to enable threaded decoding" );
+        break;
+    default:
+        msg_Warn( p_dec, "using unknown thread mode with %d threads",
+                  p_sys->p_context->thread_count );
+        break;
+    }
+#endif
 
     p_sys->b_delayed_open = false;
 
@@ -951,6 +1014,8 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
         return avcodec_default_get_buffer( p_context, p_ff_pic );
     }
 
+    wait_mt( p_sys );
+
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so we need to check for direct rendering again. */
 
@@ -1028,6 +1093,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     /* FIXME what is that, should give good value */
     p_ff_pic->age = 256*256*256*64; // FIXME FIXME from ffmpeg
 
+    post_mt( p_sys );
     return 0;
 
 no_dr:
@@ -1036,6 +1102,7 @@ no_dr:
         msg_Warn( p_dec, "disabling direct rendering" );
         p_sys->i_direct_rendering_used = 0;
     }
+    post_mt( p_sys );
     return avcodec_default_get_buffer( p_context, p_ff_pic );
 }
 static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *p_context, AVFrame *p_ff_pic )

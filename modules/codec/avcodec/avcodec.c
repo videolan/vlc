@@ -140,6 +140,10 @@ vlc_module_begin ()
 #if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2)
     add_bool( "ffmpeg-hw", false, NULL, HW_TEXT, HW_LONGTEXT, true )
 #endif
+#if defined(FF_THREAD_FRAME)
+    add_integer( "ffmpeg-threads", 0, NULL, THREADS_TEXT, THREADS_LONGTEXT, true );
+#endif
+
 
 #ifdef ENABLE_SOUT
     /* encoder submodule */
