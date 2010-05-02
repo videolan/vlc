@@ -1183,9 +1183,11 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
             return NULL;
     }
     subpicture_updater_t updater = {
+#ifdef HAVE_TIGER
         .pf_validate = TigerValidateSubpicture,
         .pf_update   = TigerUpdateSubpicture,
         .pf_destroy  = TigerDestroySubpicture,
+#endif
         .p_sys       = p_spu_sys,
     };
     p_spu = decoder_NewSubpicture( p_dec, p_sys->b_use_tiger ? &updater : NULL );
