@@ -57,7 +57,7 @@ static void CloseFilter( vlc_object_t * );
 static block_t *Resample( filter_t *, block_t * );
 
 static void ResampleFloat( filter_t *p_filter,
-                           block_t *p_out_buf,  size_t *pi_out,
+                           block_t **pp_out_buf,  size_t *pi_out,
                            float **pp_in,
                            int i_in, int i_in_end,
                            double d_factor, bool b_factor_old,
@@ -147,7 +147,6 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
         block_Release( p_in_buf );
         return NULL;
     }
-    float *p_out = (float *)p_out_buf->p_buffer;
 
     if( (p_in_buf->i_flags & BLOCK_FLAG_DISCONTINUITY) || p_sys->b_first )
     {
@@ -194,7 +193,7 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
     const float *p_in_orig = p_in;
 
     /* Make sure the output buffer is reset */
-    memset( p_out, 0, p_out_buf->i_buffer );
+    memset( p_out_buf->p_buffer, 0, p_out_buf->i_buffer );
 
     /* Calculate the new length of the filter wing */
     d_factor = (double)i_out_rate / p_filter->fmt_in.audio.i_rate;
@@ -214,7 +213,7 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
         i_old_in_end = __MIN( i_filter_wing, i_in_nb - p_sys->i_old_wing );
 
     ResampleFloat( p_filter,
-                   p_out_buf, &i_out, &p_in,
+                   &p_out_buf, &i_out, &p_in,
                    i_in, i_old_in_end,
                    p_sys->d_old_factor, true,
                    i_nb_channels, i_bytes_per_frame );
@@ -226,20 +225,23 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
         p_sys->d_old_factor = d_factor;
         p_sys->i_old_wing   = i_filter_wing;
     }
-    ResampleFloat( p_filter,
-                   p_out_buf, &i_out, &p_in,
-                   i_in, i_in_nb - i_filter_wing,
-                   d_factor, false,
-                   i_nb_channels, i_bytes_per_frame );
+    if( p_out_buf )
+    {
+        ResampleFloat( p_filter,
+                       &p_out_buf, &i_out, &p_in,
+                       i_in, i_in_nb - i_filter_wing,
+                       d_factor, false,
+                       i_nb_channels, i_bytes_per_frame );
 
-    /* Finalize aout buffer */
-    p_out_buf->i_nb_samples = i_out;
-    p_out_buf->i_pts = date_Get( &p_sys->end_date );
-    p_out_buf->i_length = date_Increment( &p_sys->end_date,
-                                  p_out_buf->i_nb_samples ) - p_out_buf->i_pts;
+        /* Finalize aout buffer */
+        p_out_buf->i_nb_samples = i_out;
+        p_out_buf->i_pts = date_Get( &p_sys->end_date );
+        p_out_buf->i_length = date_Increment( &p_sys->end_date,
+                                      p_out_buf->i_nb_samples ) - p_out_buf->i_pts;
 
-    p_out_buf->i_buffer = p_out_buf->i_nb_samples *
-        i_nb_channels * sizeof(int32_t);
+        p_out_buf->i_buffer = p_out_buf->i_nb_samples *
+            i_nb_channels * sizeof(int32_t);
+    }
 
     /* Buffer i_filter_wing * 2 samples for next time */
     if( p_sys->i_old_wing )
@@ -435,8 +437,28 @@ static void FilterFloatUD( const float Imp[], const float ImpD[], uint16_t Nwing
     }
 }
 
+static int ReallocBuffer( block_t **pp_out_buf,
+                          float **pp_out, size_t i_out,
+                          int i_nb_channels, int i_bytes_per_frame )
+{
+    if( i_out < (*pp_out_buf)->i_buffer/i_bytes_per_frame )
+        return VLC_SUCCESS;
+
+    /* It may happen when the wing size changes */
+    const unsigned i_extra_frame = 256;
+    *pp_out_buf = block_Realloc( *pp_out_buf, 0,
+                                 (*pp_out_buf)->i_buffer +
+                                    i_extra_frame * i_bytes_per_frame );
+    if( !*pp_out_buf )
+        return VLC_EGENERIC;
+
+    *pp_out = (float*)(*pp_out_buf)->p_buffer + i_out * i_nb_channels;
+    memset( *pp_out, 0, i_extra_frame * i_bytes_per_frame );
+    return VLC_SUCCESS;
+}
+
 static void ResampleFloat( filter_t *p_filter,
-                           block_t *p_out_buf,  size_t *pi_out,
+                           block_t **pp_out_buf,  size_t *pi_out,
                            float **pp_in,
                            int i_in, int i_in_end,
                            double d_factor, bool b_factor_old,
@@ -446,12 +468,15 @@ static void ResampleFloat( filter_t *p_filter,
 
     float *p_in = *pp_in;
     size_t i_out = *pi_out;
-    float *p_out = (float*)p_out_buf->p_buffer + i_out * i_nb_channels;
+    float *p_out = (float*)(*pp_out_buf)->p_buffer + i_out * i_nb_channels;
 
     for( ; i_in < i_in_end; i_in++ )
     {
         if( b_factor_old && d_factor == 1 )
         {
+            if( ReallocBuffer( pp_out_buf, &p_out,
+                               i_out, i_nb_channels, i_bytes_per_frame ) )
+                return;
             /* Just copy the samples */
             memcpy( p_out, p_in, i_bytes_per_frame );
             p_in += i_nb_channels;
@@ -462,8 +487,9 @@ static void ResampleFloat( filter_t *p_filter,
 
         while( p_sys->i_remainder < p_filter->fmt_out.audio.i_rate )
         {
-            if( p_out_buf->i_buffer/i_bytes_per_frame <= i_out )
-                break;
+            if( ReallocBuffer( pp_out_buf, &p_out,
+                               i_out, i_nb_channels, i_bytes_per_frame ) )
+                return;
 
             if( d_factor >= 1 )
             {
