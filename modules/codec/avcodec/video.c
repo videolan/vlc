@@ -63,8 +63,6 @@ struct decoder_sys_t
     FFMPEG_COMMON_MEMBERS
 
     /* Video decoder specific part */
-    mtime_t input_pts;
-    mtime_t input_dts;
     mtime_t i_pts;
 
     AVFrame          *p_ff_pic;
@@ -109,7 +107,6 @@ static void ffmpeg_CopyPicture    ( decoder_t *, picture_t *, AVFrame * );
 static int  ffmpeg_GetFrameBuf    ( struct AVCodecContext *, AVFrame * );
 static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
-static void ffmpeg_NextPts( decoder_t * );
 
 #ifdef HAVE_AVCODEC_VA
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *,
@@ -326,8 +323,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 #endif
 
     /* ***** misc init ***** */
-    p_sys->input_pts = p_sys->input_dts = 0;
-    p_sys->i_pts = 0;
+    p_sys->i_pts = VLC_TS_INVALID;
     p_sys->b_has_b_frames = false;
     p_sys->b_first_frame = true;
     p_sys->b_flush = false;
@@ -393,6 +389,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    AVCodecContext *p_context = p_sys->p_context;
     int b_drawpicture;
     int b_null_size = false;
     block_t *p_block;
@@ -400,7 +397,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     if( !pp_block || !*pp_block )
         return NULL;
 
-    if( !p_sys->p_context->extradata_size && p_dec->fmt_in.i_extra )
+    if( !p_context->extradata_size && p_dec->fmt_in.i_extra )
     {
         ffmpeg_InitCodec( p_dec );
         if( p_sys->b_delayed_open )
@@ -419,15 +416,14 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        p_sys->i_pts = 0; /* To make sure we recover properly */
+        p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
 
-        p_sys->input_pts = p_sys->input_dts = 0;
         p_sys->i_late_frames = 0;
 
         block_Release( p_block );
 
         //if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
-            //avcodec_flush_buffers( p_sys->p_context );
+            //avcodec_flush_buffers( p_context );
         return NULL;
     }
 
@@ -442,24 +438,15 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     if( !p_dec->b_pace_control && (p_sys->i_late_frames > 0) &&
         (mdate() - p_sys->i_late_frames_start > INT64_C(5000000)) )
     {
-        if( p_sys->i_pts )
+        if( p_sys->i_pts > VLC_TS_INVALID )
         {
             msg_Err( p_dec, "more than 5 seconds of late video -> "
                      "dropping frame (computer too slow ?)" );
-            p_sys->i_pts = 0; /* To make sure we recover properly */
+            p_sys->i_pts = VLC_TS_INVALID; /* To make sure we recover properly */
         }
         block_Release( p_block );
         p_sys->i_late_frames--;
         return NULL;
-    }
-
-    if( p_block->i_pts > 0 || p_block->i_dts > 0 )
-    {
-        p_sys->input_pts = p_block->i_pts;
-        p_sys->input_dts = p_block->i_dts;
-
-        /* Make sure we don't reuse the same timestamps twice */
-        p_block->i_pts = p_block->i_dts = 0;
     }
 
     /* A good idea could be to decode all I pictures and see for the other */
@@ -470,7 +457,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         b_drawpicture = 0;
         if( p_sys->i_late_frames < 12 )
         {
-            p_sys->p_context->skip_frame =
+            p_context->skip_frame =
                     (p_sys->i_skip_frame <= AVDISCARD_BIDIR) ?
                     AVDISCARD_BIDIR : p_sys->i_skip_frame;
         }
@@ -486,17 +473,17 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     else
     {
         if( p_sys->b_hurry_up )
-            p_sys->p_context->skip_frame = p_sys->i_skip_frame;
+            p_context->skip_frame = p_sys->i_skip_frame;
         if( !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
             b_drawpicture = 1;
         else
             b_drawpicture = 0;
     }
 
-    if( p_sys->p_context->width <= 0 || p_sys->p_context->height <= 0 )
+    if( p_context->width <= 0 || p_context->height <= 0 )
     {
         if( p_sys->b_hurry_up )
-            p_sys->p_context->skip_frame = p_sys->i_skip_frame;
+            p_context->skip_frame = p_sys->i_skip_frame;
         b_null_size = true;
     }
     else if( !b_drawpicture )
@@ -505,14 +492,13 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
          * FIXME either our parser or ffmpeg is broken */
 #if 0
         if( p_sys->b_hurry_up )
-            p_sys->p_context->skip_frame = __MAX( p_sys->p_context->skip_frame,
+            p_context->skip_frame = __MAX( p_context->skip_frame,
                                                   AVDISCARD_NONREF );
 #endif
     }
 
     /*
-     * Do the actual decoding now
-     */
+     * Do the actual decoding now */
 
     /* Don't forget that ffmpeg requires a little more bytes
      * that the real frame size */
@@ -535,19 +521,31 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         int i_used, b_gotpicture;
         picture_t *p_pic;
 
-        i_used = avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
+        /* Set the PTS/DTS in the context reordered_opaque field */
+        if( p_block->i_pts > VLC_TS_INVALID  )
+            p_context->reordered_opaque = (p_block->i_pts << 1) | 0;
+        else if( p_block->i_dts > VLC_TS_INVALID )
+            p_context->reordered_opaque = (p_block->i_dts << 1) | 1;
+        else
+            p_context->reordered_opaque = INT64_MIN;
+
+        /* Make sure we don't reuse the same timestamps twice */
+        p_block->i_pts =
+        p_block->i_dts = VLC_TS_INVALID;
+
+
+        i_used = avcodec_decode_video( p_context, p_sys->p_ff_pic,
                                        &b_gotpicture,
                                        p_block->i_buffer <= 0 && p_sys->b_flush ? NULL : p_block->p_buffer, p_block->i_buffer );
 
-        if( b_null_size && p_sys->p_context->width > 0 &&
-            p_sys->p_context->height > 0 &&
-            !p_sys->b_flush )
+        if( b_null_size && !p_sys->b_flush &&
+            p_context->width > 0 && p_context->height > 0 )
         {
             /* Reparse it to not drop the I frame */
             b_null_size = false;
             if( p_sys->b_hurry_up )
-                p_sys->p_context->skip_frame = p_sys->i_skip_frame;
-            i_used = avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
+                p_context->skip_frame = p_sys->i_skip_frame;
+            i_used = avcodec_decode_video( p_context, p_sys->p_ff_pic,
                                            &b_gotpicture, p_block->p_buffer,
                                            p_block->i_buffer );
         }
@@ -582,14 +580,63 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             continue;
         }
 
-        /* Set the PTS */
-        if( p_sys->p_ff_pic->pts )
-            p_sys->i_pts = p_sys->p_ff_pic->pts;
+        /* Compute the PTS */
+        mtime_t i_pts = VLC_TS_INVALID;
+        if( p_sys->p_ff_pic->reordered_opaque != INT64_MIN )
+        {
+            mtime_t i_ts = p_sys->p_ff_pic->reordered_opaque >> 1;
+            bool    b_dts = p_sys->p_ff_pic->reordered_opaque & 1;
+            if( b_dts )
+            {
+                if( !p_context->has_b_frames ||
+                    !p_sys->b_has_b_frames ||
+                    !p_sys->p_ff_pic->reference ||
+                    p_sys->i_pts <= VLC_TS_INVALID )
+                    i_pts = i_ts;
+            }
+            else
+            {
+                i_pts = i_ts;
+            }
+        }
+        if( i_pts <= VLC_TS_INVALID )
+            i_pts = p_sys->i_pts;
+
+        /* Interpolate the next PTS */
+        if( i_pts > VLC_TS_INVALID )
+            p_sys->i_pts = i_pts;
+        if( p_sys->i_pts > VLC_TS_INVALID )
+        {
+            /* interpolate the next PTS */
+            if( p_dec->fmt_in.video.i_frame_rate > 0 &&
+                p_dec->fmt_in.video.i_frame_rate_base > 0 )
+            {
+                p_sys->i_pts += INT64_C(1000000) *
+                    (2 + p_sys->p_ff_pic->repeat_pict) *
+                    p_dec->fmt_in.video.i_frame_rate_base /
+                    (2 * p_dec->fmt_in.video.i_frame_rate);
+            }
+            else if( p_context->time_base.den > 0 )
+            {
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
+                int i_tick = p_context->ticks_per_frame;
+                if( i_tick <= 0 )
+                    i_tick = 1;
+#else
+                int i_tick = 1;
+#endif
+
+                p_sys->i_pts += INT64_C(1000000) *
+                    (2 + p_sys->p_ff_pic->repeat_pict) *
+                    i_tick * p_context->time_base.num /
+                    (2 * p_context->time_base.den);
+            }
+        }
 
         /* Update frame late count (except when doing preroll) */
         mtime_t i_display_date = 0;
         if( !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
-            i_display_date = decoder_GetDisplayDate( p_dec, p_sys->i_pts );
+            i_display_date = decoder_GetDisplayDate( p_dec, i_pts );
 
         if( i_display_date > 0 && i_display_date <= mdate() )
         {
@@ -603,16 +650,12 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         }
 
         if( !b_drawpicture || ( !p_sys->p_va && !p_sys->p_ff_pic->linesize[0] ) )
-        {
-            /* Do not display the picture */
-            ffmpeg_NextPts( p_dec );
             continue;
-        }
 
         if( !p_sys->p_ff_pic->opaque )
         {
             /* Get a new picture */
-            p_pic = ffmpeg_NewPictBuf( p_dec, p_sys->p_context );
+            p_pic = ffmpeg_NewPictBuf( p_dec, p_context );
             if( !p_pic )
             {
                 block_Release( p_block );
@@ -639,9 +682,9 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         {
             /* Fetch again the aspect ratio in case it changed */
             p_dec->fmt_out.video.i_sar_num
-                = p_sys->p_context->sample_aspect_ratio.num;
+                = p_context->sample_aspect_ratio.num;
             p_dec->fmt_out.video.i_sar_den
-                = p_sys->p_context->sample_aspect_ratio.den;
+                = p_context->sample_aspect_ratio.den;
 
             if( !p_dec->fmt_out.video.i_sar_num || !p_dec->fmt_out.video.i_sar_den )
             {
@@ -651,11 +694,9 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         }
 
         /* Send decoded frame to vout */
-        if( p_sys->i_pts )
+        if( i_pts > VLC_TS_INVALID)
         {
-            p_pic->date = p_sys->i_pts;
-
-            ffmpeg_NextPts( p_dec );
+            p_pic->date = i_pts;
 
             if( p_sys->b_first_frame )
             {
@@ -866,8 +907,6 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
  * It is used for direct rendering as well as to get the right PTS for each
  * decoded picture (even in indirect rendering mode).
  *****************************************************************************/
-static void ffmpeg_SetFrameBufferPts( decoder_t *p_dec, AVFrame *p_ff_pic );
-
 static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
                                AVFrame *p_ff_pic )
 {
@@ -875,10 +914,8 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     decoder_sys_t *p_sys = p_dec->p_sys;
     picture_t *p_pic;
 
-    /* Set picture PTS */
-    ffmpeg_SetFrameBufferPts( p_dec, p_ff_pic );
-
     /* */
+    p_ff_pic->reordered_opaque = p_context->reordered_opaque;
     p_ff_pic->opaque = NULL;
 
     if( p_sys->p_va )
@@ -1003,55 +1040,10 @@ no_dr:
 }
 static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *p_context, AVFrame *p_ff_pic )
 {
-    decoder_t *p_dec = (decoder_t *)p_context->opaque;
-    int i_ret;
-
-    /* */
-    p_ff_pic->pts = AV_NOPTS_VALUE;
+    p_ff_pic->reordered_opaque = p_context->reordered_opaque;
 
     /* We always use default reget function, it works perfectly fine */
-    i_ret = avcodec_default_reget_buffer( p_context, p_ff_pic );
-
-    /* Set picture PTS if avcodec_default_reget_buffer didn't set it (through a
-     * ffmpeg_GetFrameBuf call) */
-    if( !i_ret && p_ff_pic->pts == AV_NOPTS_VALUE )
-        ffmpeg_SetFrameBufferPts( p_dec, p_ff_pic );
-
-    return i_ret;
-}
-
-static void ffmpeg_SetFrameBufferPts( decoder_t *p_dec, AVFrame *p_ff_pic )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    /* Set picture PTS */
-    if( p_sys->input_pts )
-    {
-        p_ff_pic->pts = p_sys->input_pts;
-    }
-    else if( p_sys->input_dts )
-    {
-        /* Some demuxers only set the dts so let's try to find a useful
-         * timestamp from this */
-        if( !p_sys->p_context->has_b_frames || !p_sys->b_has_b_frames ||
-            !p_ff_pic->reference || !p_sys->i_pts )
-        {
-            p_ff_pic->pts = p_sys->input_dts;
-        }
-        else
-        {
-            p_ff_pic->pts = 0;
-        }
-    }
-    else
-    {
-        p_ff_pic->pts = 0;
-    }
-
-    if( p_sys->i_pts ) /* make sure 1st frame has a pts > 0 */
-    {
-        p_sys->input_pts = p_sys->input_dts = 0;
-    }
+    return avcodec_default_reget_buffer( p_context, p_ff_pic );
 }
 
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
@@ -1081,39 +1073,6 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
         /* */
         for( int i = 0; i < 4; i++ )
             p_ff_pic->data[i] = NULL;
-    }
-}
-
-static void ffmpeg_NextPts( decoder_t *p_dec )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if( p_sys->i_pts <= 0 )
-        return;
-
-    /* interpolate the next PTS */
-    if( p_dec->fmt_in.video.i_frame_rate > 0 &&
-        p_dec->fmt_in.video.i_frame_rate_base > 0 )
-    {
-        p_sys->i_pts += INT64_C(1000000) *
-            (2 + p_sys->p_ff_pic->repeat_pict) *
-            p_dec->fmt_in.video.i_frame_rate_base /
-            (2 * p_dec->fmt_in.video.i_frame_rate);
-    }
-    else if( p_sys->p_context->time_base.den > 0 )
-    {
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
-        int i_tick = p_sys->p_context->ticks_per_frame;
-        if( i_tick <= 0 )
-            i_tick = 1;
-#else
-        int i_tick = 1;
-#endif
-
-        p_sys->i_pts += INT64_C(1000000) *
-            (2 + p_sys->p_ff_pic->repeat_pict) *
-            i_tick * p_sys->p_context->time_base.num /
-            (2 * p_sys->p_context->time_base.den);
     }
 }
 
