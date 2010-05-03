@@ -122,6 +122,14 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    res = UpnpSetMaxContentLength( 262144 );
+    if( res != UPNP_E_SUCCESS )
+    {
+        msg_Err( p_sd, "%s", UpnpGetErrorMessage( res ) );
+        Close( (vlc_object_t*) p_sd );
+        return VLC_EGENERIC;
+    }
+
     return VLC_SUCCESS;
 }
 
