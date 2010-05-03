@@ -518,11 +518,11 @@ void StringListConfigControl::finish(module_config_t *p_module_config, bool byca
     {
         if( !p_module_config->ppsz_list[i_index] )
               continue;
-        combo->addItem( qtr((p_module_config->ppsz_list_text &&
+        combo->addItem( qfu((p_module_config->ppsz_list_text &&
                             p_module_config->ppsz_list_text[i_index])?
                             p_module_config->ppsz_list_text[i_index] :
                             p_module_config->ppsz_list[i_index] ),
-                   QVariant( qtr(p_module_config->ppsz_list[i_index] )) );
+                   QVariant( qfu(p_module_config->ppsz_list[i_index] )) );
         if( p_item->value.psz && !strcmp( p_module_config->value.psz,
                                           p_module_config->ppsz_list[i_index] ) )
             combo->setCurrentIndex( combo->count() - 1 );
@@ -560,14 +560,14 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
 
         for ( int i_index = 0; i_index < p_config->i_list; i_index++ )
         {
-            combo->addItem( qtr( p_config->ppsz_list_text[i_index] ),
+            combo->addItem( qfu( p_config->ppsz_list_text[i_index] ),
                     QVariant( p_config->pi_list[i_index] ) );
             if( p_config->value.i == p_config->pi_list[i_index] )
             {
                 combo->setCurrentIndex( i_index );
             }
         }
-        combo->setToolTip( qtr( p_config->psz_longtext ) );
+        combo->setToolTip( qfu( p_config->psz_longtext ) );
     }
 }
 
@@ -952,7 +952,7 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
         for( int i = 0; i < p_item->i_action; i++ )
         {
             QPushButton *button =
-                new QPushButton( qtr( p_item->ppsz_action_text[i] ));
+                new QPushButton( qfu( p_item->ppsz_action_text[i] ));
             CONNECT( button, clicked(), signalMapper, map() );
             signalMapper->setMapping( button, i );
             l->addWidget( button, line, LAST_COLUMN - p_item->i_action + i,
