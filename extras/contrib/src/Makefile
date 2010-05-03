@@ -1903,50 +1903,10 @@ CLEAN_PKG += libopendaap
 DISTCLEAN_PKG += libopendaap-$(DAAP_VERSION).tar.bz2
 
 # ***************************************************************************
-# glib
-# ***************************************************************************
-
-glib-$(GLIB_VERSION).tar.bz2:
-	$(WGET) $(GLIB_URL)
-
-glib: glib-$(GLIB_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
-	(cd $@; patch -p0 < ../Patches/glib-remove-gtkdoc.patch)
-ifdef HAVE_DARWIN_64
-	(cd $@; patch -p0 < ../Patches/glib-Darwin64.patch)
-endif
-
-.glib: glib
-	(cd $<; sh autogen.sh --prefix=$(PREFIX) --host=$(HOST) && make && make install)
-	touch $@
-
-CLEAN_FILE += .glib
-CLEAN_PKG += glib
-DISTCLEAN_PKG += glib-$(GLIB_VERSION).tar.gz
-
-# ***************************************************************************
-# libIDL
-# ***************************************************************************
-
-libIDL-$(LIBIDL_VERSION).tar.bz2:
-	$(WGET) $(LIBIDL_URL)
-
-libIDL: libIDL-$(LIBIDL_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
-
-.IDL: libIDL
-	(cd $<; ./configure --prefix=$(PREFIX) --host=$(HOST) && make && make install )
-	touch $@
-
-CLEAN_FILE += .IDL
-CLEAN_PKG += libIDL
-DISTCLEAN_PKG += libIDL-$(LIBIDL_VERSION).tar.gz
-
-# ***************************************************************************
 # Gecko SDK
 # ***************************************************************************
 
-gecko-sdk: 
+gecko-sdk:
 	$(SVN) co $(NPAPI_HEADERS_SVN_URL) -r $(NPAPI_HEADERS_SVN_REVISION) gecko-sdk/include
 
 .gecko: gecko-sdk
@@ -1958,60 +1918,7 @@ gecko-sdk:
 
 CLEAN_FILE += .gecko
 CLEAN_PKG += gecko-sdk
-DISTCLEAN_PKG += xulrunner-1.9.2.en-US.mac-i386.sdk.tar.bz2
-
-# ***************************************************************************
-# Gecko SDK win32
-# ***************************************************************************
-
-xulrunner-1.9.2.en-US.win32.sdk.zip:
-	$(WGET) $(GECKO_SDK_WIN32_URL)
-
-libIDL-0.6.3-win32-bin.zip:
-	$(WGET) $(LIBIDL_WIN32_BIN_URL)
-
-glib-19990228.zip:
-	$(WGET) $(GLIB_WIN32_BIN_URL)
-
-.gecko-win32: xulrunner-1.9.2.en-US.win32.sdk.zip libIDL-0.6.3-win32-bin.zip glib-19990228.zip
-	unzip xulrunner-1.9.2.en-US.win32.sdk.zip
-	rm -rf $(PREFIX)/gecko-sdk
-	mv xulrunner-sdk $(PREFIX)/gecko-sdk
-	unzip -j libIDL-0.6.3-win32-bin.zip libIDL-0.6.3-win32-bin/libIDL-0.6.dll -d $(PREFIX)/gecko-sdk/bin
-	unzip glib-19990228.zip glib-1.2.dll -d $(PREFIX)/gecko-sdk/bin
-	chmod a+x $(PREFIX)/gecko-sdk/bin/*
-	touch $@
-
-CLEAN_FILE += .gecko-win32
-CLEAN_PKG += gecko-sdk-win32
-DISTCLEAN_PKG += xulrunner-1.9.2.en-US.win32.sdk.zip libIDL-0.6.3-win32-bin.zip glib-19990228.zip
-
-# ***************************************************************************
-# mozilla-macosx
-#
-# Note that this dependency needs to be compiled against the 10.4u SDK using
-# using GCC-4.0. Using newer releases of one of these won't lead to a 
-# successful compilation! Adapt the respective variables in ../config.mak!
-# ***************************************************************************
-
-firefox-$(MOZILLA_VERSION)-source.tar.bz2:
-	$(WGET) $(MOZILLA_URL)
-
-mozilla: firefox-$(MOZILLA_VERSION)-source.tar.bz2
-	$(EXTRACT_BZ2)
-	(cd $@; patch -p0 < ../Patches/firefox-darwin.patch)
-
-.mozilla-macosx: mozilla .glib .IDL
-	ifneq($(SDK_TARGET),"10.4")
-	echo "Compiling the mozilla target requires the 10.4 SDK!"
-	exit -1
-	endif
-	(cd $<; ./configure --prefix=$(PREFIX)/gecko-sdk-new --enable-default-toolkit=cairo-cocoa --enable-standalone-modules=xpcom,plugin  --enable-application=xulrunner && make && make install)
-	touch $@
-
-CLEAN_FILE += .mozilla-macosx
-CLEAN_PKG += mozilla
-DISTCLEAN_PKG += firefox-source-$(MOZILLA_VERSION).tar.bz2
+DISTCLEAN_PKG += gecko-sdk
 
 # ***************************************************************************
 # libjpeg
