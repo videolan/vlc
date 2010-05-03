@@ -63,6 +63,7 @@
 # endif
 
 VLC_EXPORT( unsigned, vlc_CPU, ( void ) );
+VLC_EXPORT( unsigned, vlc_GetCPUCount, ( void ) );
 
 /** Are floating point operations fast?
  * If this bit is not set, you should try to use fixed-point instead.

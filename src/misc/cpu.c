@@ -319,6 +319,38 @@ const struct
 };
 
 /**
+ * Return the number of available logical CPU.
+ */
+unsigned vlc_GetCPUCount(void)
+{
+#ifdef WIN32
+    DWORD process_mask;
+    DWORD system_mask;
+    if (!GetProcessAffinityMask(GetCurrentProcess(), &process_mask, &system_mask))
+        return 1;
+
+    unsigned count = 0;
+    while (system_mask) {
+        count++;
+        system_mask >>= 1;
+    }
+    return count;
+#elif HAVE_SCHED_GETAFFINITY
+    cpu_set_t cpu;
+    CPU_ZERO(&cpu);
+    if (sched_getaffinity(0, sizeof(cpu), &cpu) < 0)
+        return 1;
+    unsigned count = 0;
+    for (unsigned i = 0; i < CPU_SETSIZE; i++)
+        count += CPU_ISSET(i, &cpu) != 0;
+    return count;
+#else
+#   warning "vlc_GetCPUCount is not implemented for your platform"
+    return 1;
+#endif
+}
+
+/**
  * Check if a directory name contains usable plugins w.r.t. the hardware
  * capabilities. Loading a plugin when the hardware has insufficient
  * capabilities may lead to illegal instructions (SIGILL) and must be avoided.

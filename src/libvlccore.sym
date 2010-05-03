@@ -493,6 +493,7 @@ vlc_sem_destroy
 vlc_sem_post
 vlc_sem_wait
 vlc_control_cancel
+vlc_GetCPUCount
 vlc_CPU
 vlc_error
 vlc_event_attach
