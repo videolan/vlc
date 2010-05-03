@@ -419,7 +419,10 @@ static void OpenglSwap(vout_opengl_t *gl)
 - (BOOL)lockgl
 {
     VLCAssertMainThread();
-    CGLError err = CGLLockContext([[self openGLContext] CGLContextObj]);
+    NSOpenGLContext *context = [self openGLContext];
+    CGLError err = CGLLockContext([context CGLContextObj]);
+    if (err == kCGLNoError)
+        [context makeCurrentContext];
     return err == kCGLNoError;
 }
 
@@ -493,21 +496,21 @@ static void OpenglSwap(vout_opengl_t *gl)
         }
     }
 
-    [self lockgl];
+    if ([self lockgl]) {
+        glViewport((width - x) / 2, (height - y) / 2, x, y);
 
-    glViewport((width - x) / 2, (height - y) / 2, x, y);
+        @synchronized(self) {
+            // This may be cleared before -drawRect is being called,
+            // in this case we'll skip the rendering.
+            // This will save us for rendering two frames (or more) for nothing
+            // (one by the vout, one (or more) by drawRect)
+            _hasPendingReshape = YES;
+        }
 
-    @synchronized(self) {
-        // This may be cleared before -drawRect is being called,
-        // in this case we'll skip the rendering.
-        // This will save us for rendering two frames (or more) for nothing
-        // (one by the vout, one (or more) by drawRect)
-        _hasPendingReshape = YES;
+        [self unlockgl];
+
+        [super reshape];
     }
-
-    [self unlockgl];
-
-    [super reshape];
 }
 
 /**
