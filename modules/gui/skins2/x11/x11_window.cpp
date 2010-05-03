@@ -164,6 +164,25 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     classhint.res_class = (char*) "Vlc";
     XSetClassHint( XDISPLAY, m_wnd, &classhint );
 
+    // initialize WM_CLIENT_MACHINE
+    char* hostname = NULL;
+    long host_name_max = sysconf( _SC_HOST_NAME_MAX );
+    if( host_name_max <= 0 )
+        host_name_max = _POSIX_HOST_NAME_MAX;
+    hostname = new char[host_name_max];
+    if( hostname && gethostname( hostname, host_name_max ) == 0 )
+    {
+        hostname[host_name_max - 1] = '\0';
+
+        XTextProperty textprop;
+        textprop.value = (unsigned char *) hostname;
+        textprop.encoding = XA_STRING;
+        textprop.format = 8;
+        textprop.nitems = strlen( hostname );
+        XSetWMClientMachine( XDISPLAY, m_wnd, &textprop);
+    }
+    delete hostname;
+
     // initialize EWMH pid
     pid_t pid = getpid();
     XChangeProperty( XDISPLAY, m_wnd, NET_WM_PID, XA_CARDINAL, 32,
