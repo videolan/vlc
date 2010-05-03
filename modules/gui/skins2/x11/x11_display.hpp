@@ -43,6 +43,7 @@
 #define NET_WM_STAYS_ON_TOP       m_rDisplay.m_net_wm_stays_on_top
 #define NET_WM_WINDOW_OPACITY     m_rDisplay.m_net_wm_window_opacity
 
+#define NET_WM_PID                m_rDisplay.m_net_wm_pid
 
 /// Class for encapsulation of a X11 Display
 class X11Display: public SkinObject
@@ -93,6 +94,8 @@ public:
 
     Atom m_net_wm_stays_on_top;
     Atom m_net_wm_window_opacity;
+
+    Atom m_net_wm_pid;
 
     /// test EWMH capabilities
     void testEWMH();

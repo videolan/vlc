@@ -158,6 +158,17 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     // Associate the window to the main "parent" window
     XSetTransientForHint( XDISPLAY, m_wnd, m_rDisplay.getMainWindow() );
 
+    // initialize Class Hint
+    XClassHint classhint;
+    classhint.res_name = (char*) "vlc";
+    classhint.res_class = (char*) "Vlc";
+    XSetClassHint( XDISPLAY, m_wnd, &classhint );
+
+    // initialize EWMH pid
+    pid_t pid = getpid();
+    XChangeProperty( XDISPLAY, m_wnd, NET_WM_PID, XA_CARDINAL, 32,
+                     PropModeReplace, (unsigned char *)&pid, 1 );
+
 }
 
 
