@@ -272,7 +272,7 @@ static void Probe( aout_instance_t * p_aout,
     if( val.i_int <= 0 )
     {
         if( var_GetBool( p_aout->p_libvlc, "alsa-working" ) )
-            dialog_FatalWait( p_aout, "ALSA version problem",
+            dialog_Fatal( p_aout, "ALSA version problem",
                 "VLC failed to re-initialize your sound output device.\n"
                 "Please update alsa-lib to version 1.0.22 or higher "
                 "to fix this issue." );
@@ -289,7 +289,7 @@ static void Probe( aout_instance_t * p_aout,
         if( !var_GetBool( p_aout->p_libvlc, "alsa-broken" ) )
         {
             var_SetBool( p_aout->p_libvlc, "alsa-broken", true );
-            dialog_FatalWait( p_aout, "Potential ALSA version problem",
+            dialog_Fatal( p_aout, "Potential ALSA version problem",
                 "VLC failed to initialize your sound output device (if any).\n"
                 "Please update alsa-lib to version 1.0.24 or higher "
                 "to try to fix this issue." );
