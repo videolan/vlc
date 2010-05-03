@@ -26,7 +26,7 @@ StrCpy $Desc_Section05 \
 StrCpy $Desc_Section06 \
     "Imposta il lettore multimediale VLC come applicazione predefinita per i tipi di file specificati"
 StrCpy $Desc_Section07 \
-    "Aggiungi elementi al menu contestuale ('Riproduci con VLC' e 'Aggiungi alla playlist di VLC')"
+    "Aggiungi elementi al menu contestuale ('Riproduci con VLC' e 'Aggiungi alla scaletta di VLC')"
 StrCpy $Desc_Section08 \
     "Elimina le preferenze del lettore multimediale VLC e i file in cache lasciati da precedenti installazioni"
 
@@ -44,7 +44,7 @@ StrCpy $Desc_Section92 \
 
 StrCpy $ShellAssociation_Play "Riproduci"
 StrCpy $ContextMenuEntry_PlayWith "Riproduci con VLC"
-StrCpy $ContextMenuEntry_AddToPlaylist "Aggiungi alla playlist di VLC"
+StrCpy $ContextMenuEntry_AddToPlaylist "Aggiungi alla scaletta di VLC"
 
 StrCpy $Link_VisitWebsite "Visita il sito web VideoLAN del lettore multimediale VLC"
 
