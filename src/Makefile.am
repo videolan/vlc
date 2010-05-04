@@ -104,6 +104,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_vout.h \
 	../include/vlc_vout_display.h \
 	../include/vlc_vout_opengl.h \
+	../include/vlc_vout_osd.h \
 	../include/vlc_vout_window.h \
 	../include/vlc_xml.h \
 	$(NULL)

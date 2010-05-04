@@ -32,6 +32,7 @@
 
 #include <vlc_vout.h>
 #include <vlc_spu.h>
+#include <vlc_vout_osd.h>
 
 # ifdef __cplusplus
 extern "C" {
@@ -118,17 +119,6 @@ extern "C" {
  * CONFIG_FILE_CONTENTS = DIR [ACTION_BLOCK]+
  *
  */
-
-/**
- * OSD menu position and picture type defines
- */
-#define OSD_HOR_SLIDER 1
-#define OSD_VERT_SLIDER 2
-
-#define OSD_PLAY_ICON 1
-#define OSD_PAUSE_ICON 2
-#define OSD_SPEAKER_ICON 3
-#define OSD_MUTE_ICON 4
 
 /**
  * OSD menu button states
@@ -468,42 +458,6 @@ VLC_EXPORT( int, osd_Slider, ( vlc_object_t *, spu_t *, int, int, int, int, int,
 VLC_EXPORT( int, osd_Icon, ( vlc_object_t *, spu_t *, int, int, int, int, int, short ) );
 
 /** @} */
-
-/**********************************************************************
- * Vout text and widget overlays
- **********************************************************************/
-VLC_EXPORT( int, vout_OSDEpg, ( vout_thread_t *, input_item_t * ) );
-
-/**
- * Write an informative message at the default location,
- * for the default duration and only if the OSD option is enabled.
- * \param p_caller The object that called the function.
- * \param i_channel Subpicture channel
- * \param psz_format printf style formatting
- **/
-VLC_EXPORT( void,  vout_OSDMessage, ( vlc_object_t *, int, const char *, ... ) LIBVLC_FORMAT( 3, 4 ) );
-
-#define vout_OSDMessage( obj, chan, ...) \
-        vout_OSDMessage( VLC_OBJECT(obj), chan, __VA_ARGS__ )
-
-/**
- * Display a slider on the video output.
- * \param p_this    The object that called the function.
- * \param i_channel Subpicture channel
- * \param i_postion Current position in the slider
- * \param i_type    Types are: OSD_HOR_SLIDER and OSD_VERT_SLIDER.
- * @see vlc_osd.h
- */
-VLC_EXPORT( void, vout_OSDSlider, ( vlc_object_t *, int, int , short ) );
-
-/**
- * Display an Icon on the video output.
- * \param p_this    The object that called the function.
- * \param i_channel Subpicture channel
- * \param i_type    Types are: OSD_PLAY_ICON, OSD_PAUSE_ICON, OSD_SPEAKER_ICON, OSD_MUTE_ICON
- * @see vlc_osd.h
- */
-VLC_EXPORT( void, vout_OSDIcon, ( vlc_object_t *, int, short ) );
 
 # ifdef __cplusplus
 }
