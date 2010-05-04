@@ -503,7 +503,7 @@ int OpenEncoder( vlc_object_t *p_this )
         if ( p_enc->i_threads >= 1 )
             avcodec_thread_init( p_context, p_enc->i_threads );
         else
-            avcodec_thread_init( p_context, 2 );
+            avcodec_thread_init( p_context, vlc_GetCPUCount() );
 
         if( p_sys->i_vtolerance > 0 )
             p_context->bit_rate_tolerance = p_sys->i_vtolerance;
