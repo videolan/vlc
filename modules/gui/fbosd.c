@@ -861,7 +861,7 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
             return NULL;
         }
         p_region->p_style = text_style_Duplicate( p_style );
-        p_region->i_align = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
+        p_region->i_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
 
         if( p_sys->p_text->pf_render_text )
         {

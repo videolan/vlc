@@ -375,7 +375,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         }
         p_region->i_x = p_overlay->i_x;
         p_region->i_y = p_overlay->i_y;
-        p_region->i_align = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
+        p_region->i_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
         p_region->i_alpha = p_overlay->i_alpha;
         pp_region = &p_region->p_next;
     }

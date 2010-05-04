@@ -143,7 +143,7 @@ void vout_OSDMessage( vlc_object_t *p_caller, int i_channel,
         if( vasprintf( &psz_string, psz_format, args ) != -1 )
         {
             vout_ShowTextRelative( p_vout, i_channel, psz_string, NULL,
-                                   OSD_ALIGN_TOP|OSD_ALIGN_RIGHT,
+                                   SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_RIGHT,
                                    30 + p_vout->p->fmt_in.i_width
                                       - p_vout->p->fmt_in.i_visible_width
                                       - p_vout->p->fmt_in.i_x_offset,

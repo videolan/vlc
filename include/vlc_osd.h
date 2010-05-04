@@ -207,12 +207,6 @@ VLC_EXPORT( void, spu_RenderSubpictures, ( spu_t *,  picture_t *, const video_fo
 /**
  * OSD menu position and picture type defines
  */
-
-#define OSD_ALIGN_LEFT 0x1
-#define OSD_ALIGN_RIGHT 0x2
-#define OSD_ALIGN_TOP 0x4
-#define OSD_ALIGN_BOTTOM 0x8
-
 #define OSD_HOR_SLIDER 1
 #define OSD_VERT_SLIDER 2
 

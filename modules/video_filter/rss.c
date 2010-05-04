@@ -484,7 +484,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     /*  where to locate the string: */
     if( p_sys->i_pos < 0 )
     {   /*  set to an absolute xy */
-        p_spu->p_region->i_align = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
+        p_spu->p_region->i_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
         p_spu->b_absolute = true;
     }
     else

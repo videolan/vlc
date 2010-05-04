@@ -131,7 +131,7 @@ void osd_Message( spu_t *p_spu, int i_channel,
         if( vasprintf( &psz_string, psz_format, args ) != -1 )
         {
             osd_ShowTextRelative( p_spu, i_channel, psz_string, NULL,
-                    OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,1000000 );
+                    SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_RIGHT, 30,20,1000000 );
 
             free( psz_string );
         }
