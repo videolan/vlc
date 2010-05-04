@@ -73,7 +73,7 @@ private:
 
     QWidget *reparentable;
     QLayout *layout;
-
+    virtual bool eventFilter ( QObject * watched, QEvent * event );
 signals:
     void keyPressed( QKeyEvent * );
     void sizeChanged( int, int );

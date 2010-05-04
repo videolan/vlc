@@ -29,6 +29,8 @@
 #endif
 
 #include "components/interface_widgets.hpp"
+#include "dialogs_provider.hpp"
+#include "util/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 
 #include "menus.hpp"             /* Popup menu on bgWidget */
 
@@ -37,6 +39,7 @@
 #include <QLabel>
 #include <QToolButton>
 #include <QPalette>
+#include <QEvent>
 #include <QResizeEvent>
 #include <QDate>
 #include <QMenu>
@@ -70,14 +73,7 @@ private:
     VideoWidget *owner;
 public:
     ReparentableWidget( VideoWidget *owner ) : owner( owner )
-    {
-    }
-
-protected:
-    void keyPressEvent( QKeyEvent *e )
-    {
-        emit owner->keyPressed( e );
-    }
+    {}
 };
 
 /**********************************************************************
@@ -130,6 +126,7 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
      * mode, and within the root window (NULL parent) in full-screen mode.
      */
     reparentable = new ReparentableWidget( this );
+    reparentable->installEventFilter(this );
     QLayout *innerLayout = new QHBoxLayout( reparentable );
     innerLayout->setContentsMargins( 0, 0, 0, 0 );
 
@@ -243,6 +240,32 @@ void VideoWidget::release( void )
     reparentable = NULL;
     updateGeometry();
     hide();
+}
+
+#undef KeyPress
+bool VideoWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    if( obj == reparentable )
+    {
+        if (event->type() == QEvent::Close)
+        {
+            THEDP->quit();
+            return true;
+        }
+        else if( event->type() == QEvent::KeyPress )
+        {
+            emit keyPressed( static_cast<QKeyEvent *>(event) );
+            return true;
+        }
+        else if( event->type() == QEvent::Wheel )
+        {
+            int i_vlckey = qtWheelEventToVLCKey( static_cast<QWheelEvent *>( event) );
+            var_SetInteger( p_intf->p_libvlc, "key-pressed", i_vlckey );
+            msg_Dbg( p_intf, "Here: %i", i_vlckey );
+            return true;
+        }
+    }
+    return false;
 }
 
 /**********************************************************************
