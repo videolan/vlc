@@ -323,7 +323,7 @@ const struct
  */
 unsigned vlc_GetCPUCount(void)
 {
-#ifdef WIN32
+#if defined(WIN32) && !defined(UNDER_CE)
     DWORD process_mask;
     DWORD system_mask;
     if (!GetProcessAffinityMask(GetCurrentProcess(), &process_mask, &system_mask))
