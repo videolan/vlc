@@ -624,22 +624,6 @@ static int ThreadInit(vout_thread_t *vout)
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * CleanThread: clean up after InitThread
- *****************************************************************************
- * This function is called after a sucessful
- * initialization. It frees all resources allocated by InitThread.
- * XXX You have to enter it with change_lock taken.
- *****************************************************************************/
-static void ThreadClean(vout_thread_t *vout)
-{
-    /* Destroy translation tables */
-    if (!vout->p->b_error) {
-        picture_fifo_Flush(vout->p->decoder_fifo, INT64_MAX, false);
-        vout_EndWrapper(vout);
-    }
-}
-
 static int ThreadDisplayPicture(vout_thread_t *vout,
                                 bool now, mtime_t *deadline)
 {
@@ -1002,6 +986,15 @@ static void ThreadChangeZoom(vout_thread_t *vout, int num, int den)
     }
 
     vout_SetDisplayZoom(vout->p->display.vd, num, den);
+}
+
+static void ThreadClean(vout_thread_t *vout)
+{
+    /* Destroy translation tables */
+    if (!vout->p->b_error) {
+        ThreadFlush(vout, true, INT64_MAX);
+        vout_EndWrapper(vout);
+    }
 }
 
 /*****************************************************************************
