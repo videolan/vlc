@@ -79,6 +79,12 @@ static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
     case MOUSE_BUTTON_RIGHT:
         var_SetBool(vout->p_libvlc, "intf-popupmenu", true);
         break;
+    case MOUSE_BUTTON_WHEEL_UP:
+        vout_SendEventKey(vout, KEY_MOUSEWHEELUP);
+        break;
+    case MOUSE_BUTTON_WHEEL_DOWN:
+        vout_SendEventKey(vout, KEY_MOUSEWHEELDOWN);
+        break;
     }
 }
 static inline void vout_SendEventMouseReleased(vout_thread_t *vout, int button)
