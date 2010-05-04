@@ -344,6 +344,12 @@ unsigned vlc_GetCPUCount(void)
     for (unsigned i = 0; i < CPU_SETSIZE; i++)
         count += CPU_ISSET(i, &cpu) != 0;
     return count;
+#elif defined(__APPLE_)
+    int count;
+    size_t size = sizeof(count) ;
+    if (sysctlbyname("hw.ncpu", &count, &size, NULL, 0))
+        return 1; /* Failure */
+    return count;
 #else
 #   warning "vlc_GetCPUCount is not implemented for your platform"
     return 1;
