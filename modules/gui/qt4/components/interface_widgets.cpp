@@ -257,13 +257,6 @@ bool VideoWidget::eventFilter(QObject *obj, QEvent *event)
             emit keyPressed( static_cast<QKeyEvent *>(event) );
             return true;
         }
-        else if( event->type() == QEvent::Wheel )
-        {
-            int i_vlckey = qtWheelEventToVLCKey( static_cast<QWheelEvent *>( event) );
-            var_SetInteger( p_intf->p_libvlc, "key-pressed", i_vlckey );
-            msg_Dbg( p_intf, "Here: %i", i_vlckey );
-            return true;
-        }
     }
     return false;
 }
