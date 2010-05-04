@@ -40,7 +40,6 @@
 
 #include <vlc_filter.h>
 #include <vlc_block.h>
-#include <vlc_osd.h>
 
 #include <vlc_stream.h>
 #include <vlc_xml.h>

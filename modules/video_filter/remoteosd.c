@@ -56,7 +56,6 @@
 
 #include <vlc_filter.h>
 #include <vlc_image.h>
-#include <vlc_osd.h>
 #include <vlc_keys.h>
 
 #include <vlc_network.h>

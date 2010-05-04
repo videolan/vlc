@@ -47,7 +47,7 @@
 #include <libzvbi.h>
 
 #include <vlc_codec.h>
-#include <vlc_osd.h>
+#include <vlc_vout_osd.h>
 
 /*****************************************************************************
  * Module descriptor.

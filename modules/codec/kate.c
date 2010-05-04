@@ -32,7 +32,6 @@
 #include <vlc_plugin.h>
 #include <vlc_input.h>
 #include <vlc_codec.h>
-#include <vlc_osd.h>
 #include "../demux/xiph.h"
 
 #include <kate/kate.h>

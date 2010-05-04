@@ -32,7 +32,6 @@
 #include <vlc_common.h>
 #include <vlc_codec.h>
 #include <vlc_avcodec.h>
-#include <vlc_osd.h>
 
 /* ffmpeg header */
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H
