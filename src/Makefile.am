@@ -91,6 +91,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_services_discovery.h \
 	../include/vlc_sql.h \
 	../include/vlc_sout.h \
+	../include/vlc_spu.h \
 	../include/vlc_stream.h \
 	../include/vlc_strings.h \
 	../include/vlc_subpicture.h \

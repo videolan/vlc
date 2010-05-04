@@ -30,7 +30,8 @@
 #ifndef VLC_OSD_H
 #define VLC_OSD_H 1
 
-#include "vlc_vout.h"
+#include <vlc_vout.h>
+#include <vlc_spu.h>
 
 # ifdef __cplusplus
 extern "C" {
@@ -40,92 +41,6 @@ extern "C" {
  * \file
  * This file defines SPU subpicture and OSD functions and object types.
  */
-
-/**********************************************************************
- * Base SPU structures
- **********************************************************************/
-/**
- * \defgroup spu Subpicture Unit
- * This module describes the programming interface for the subpicture unit.
- * It includes functions allowing to create/destroy an spu, create/destroy
- * subpictures and render them.
- * @{
- */
-
-#include <vlc_vout.h>
-
-typedef struct spu_private_t spu_private_t;
-
-/* Default subpicture channel ID */
-#define DEFAULT_CHAN           1
-
-/**
- * Subpicture unit descriptor
- */
-struct spu_t
-{
-    VLC_COMMON_MEMBERS
-
-    int (*pf_control)( spu_t *, int, va_list );
-
-    spu_private_t *p;
-};
-
-enum spu_query_e
-{
-    SPU_CHANNEL_REGISTER,         /* arg1= int *   res=    */
-    SPU_CHANNEL_CLEAR             /* arg1= int     res=    */
-};
-
-static inline int spu_vaControl( spu_t *p_spu, int i_query, va_list args )
-{
-    if( p_spu->pf_control )
-        return p_spu->pf_control( p_spu, i_query, args );
-    else
-        return VLC_EGENERIC;
-}
-
-static inline int spu_Control( spu_t *p_spu, int i_query, ... )
-{
-    va_list args;
-    int i_result;
-
-    va_start( args, i_query );
-    i_result = spu_vaControl( p_spu, i_query, args );
-    va_end( args );
-    return i_result;
-}
-
-VLC_EXPORT( spu_t *, spu_Create, ( vlc_object_t * ) );
-#define spu_Create(a) spu_Create(VLC_OBJECT(a))
-VLC_EXPORT( int, spu_Init, ( spu_t * ) );
-VLC_EXPORT( void, spu_Destroy, ( spu_t * ) );
-void spu_Attach( spu_t *, vlc_object_t *, bool );
-
-/**
- * This function sends a subpicture to the spu_t core.
- * 
- * You cannot use the provided subpicture anymore. The spu_t core
- * will destroy it at its convenience.
- */
-VLC_EXPORT( void, spu_DisplaySubpicture, ( spu_t *, subpicture_t * ) );
-
-/**
- * This function asks the spu_t core a list of subpictures to display.
- *
- * The returned list can only be used by spu_RenderSubpictures.
- */
-VLC_EXPORT( subpicture_t *, spu_SortSubpictures, ( spu_t *, mtime_t render_subtitle_date, bool b_subtitle_only ) );
-
-/**
- * This function renders a list of subpicture_t on the provided picture.
- *
- * \param p_fmt_dst is the format of the destination picture.
- * \param p_fmt_src is the format of the original(source) video.
- */
-VLC_EXPORT( void, spu_RenderSubpictures, ( spu_t *,  picture_t *, const video_format_t *p_fmt_dst, subpicture_t *p_list, const video_format_t *p_fmt_src, mtime_t render_subtitle_date ) );
-
-/** @}*/
 
 /**********************************************************************
  * OSD Menu
