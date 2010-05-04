@@ -26,6 +26,7 @@
 
 #include <vlc_common.h>
 #include <vlc_filter.h>
+#include <vlc_text_style.h>
 
 /*****************************************************************************
  * buffer_t: Command and response buffer
@@ -66,7 +67,7 @@ typedef struct commandparams_t
 
     int32_t i_alpha;    /*< alpha value of overlay */
 
-    struct text_style_t fontstyle; /*< text style */
+    text_style_t fontstyle; /*< text style */
 
     bool b_visible; /*< visibility flag of overlay */
 } commandparams_t;
@@ -133,7 +134,7 @@ typedef struct overlay_t
     bool b_active;
 
     video_format_t format;
-    struct text_style_t *p_fontstyle;
+    text_style_t *p_fontstyle;
     union {
         picture_t *p_pic;
         char *p_text;

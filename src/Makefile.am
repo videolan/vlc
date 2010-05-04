@@ -94,6 +94,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_stream.h \
 	../include/vlc_strings.h \
 	../include/vlc_subpicture.h \
+	../include/vlc_text_style.h \
 	../include/vlc_threads.h \
 	../include/vlc_url.h \
 	../include/vlc_variables.h \

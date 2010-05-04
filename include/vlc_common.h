@@ -257,7 +257,6 @@ typedef struct spu_t spu_t;
 typedef struct subpicture_t subpicture_t;
 typedef struct subpicture_sys_t subpicture_sys_t;
 typedef struct subpicture_region_t subpicture_region_t;
-typedef struct text_style_t text_style_t;
 
 typedef struct image_handler_t image_handler_t;
 
