@@ -621,8 +621,6 @@ vout_OSDMessage
 vout_OSDEpg
 vout_OSDSlider
 vout_Request
-vout_ShowTextAbsolute
-vout_ShowTextRelative
 vout_window_New
 vout_window_Control
 vout_window_Delete

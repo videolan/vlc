@@ -624,11 +624,6 @@ VLC_EXPORT( int, osd_Icon, ( vlc_object_t *, spu_t *, int, int, int, int, int, s
 /**********************************************************************
  * Vout text and widget overlays
  **********************************************************************/
-
-VLC_EXPORT( int, vout_ShowTextRelative, ( vout_thread_t *, int, char *, const text_style_t *, int, int, int, mtime_t ) );
-
-VLC_EXPORT( int, vout_ShowTextAbsolute, ( vout_thread_t *, int, const char *, const text_style_t *, int, int, int, mtime_t, mtime_t ) );
-
 VLC_EXPORT( int, vout_OSDEpg, ( vout_thread_t *, input_item_t * ) );
 
 /**
