@@ -373,7 +373,7 @@ static int VoutSnapshotPip( vout_thread_t *p_vout, picture_t *p_pic )
     if( !p_subpic )
         return VLC_EGENERIC;
 
-    /* FIXME DEFAULT_CHAN is not good (used by the text) but
+    /* FIXME SPU_DEFAULT_CHANNEL is not good (used by the text) but
      * hardcoded 0 doesn't seem right */
     p_subpic->i_channel = 0;
     p_subpic->i_start = mdate();
@@ -395,7 +395,7 @@ static int VoutSnapshotPip( vout_thread_t *p_vout, picture_t *p_pic )
 static void VoutOsdSnapshot( vout_thread_t *p_vout, picture_t *p_pic, const char *psz_filename )
 {
     msg_Dbg( p_vout, "snapshot taken (%s)", psz_filename );
-    vout_OSDMessage( VLC_OBJECT( p_vout ), DEFAULT_CHAN, "%s", psz_filename );
+    vout_OSDMessage( VLC_OBJECT( p_vout ), SPU_DEFAULT_CHANNEL, "%s", psz_filename );
 
     if( var_GetBool( p_vout, "snapshot-preview" ) )
     {

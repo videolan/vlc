@@ -37,7 +37,7 @@
 void CmdQuit::execute()
 {
     // Stop the playlist
-    vout_OSDMessage( getIntf(), DEFAULT_CHAN, "%s", _( "Quit" ) );
+    vout_OSDMessage( getIntf(), SPU_DEFAULT_CHANNEL, "%s", _( "Quit" ) );
 
     // Kill libvlc
     libvlc_Quit( getIntf()->p_libvlc );

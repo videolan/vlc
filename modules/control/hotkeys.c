@@ -165,8 +165,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
      * Alternatively, we should keep a reference to the vout thread. */
     if( p_vout && p_vout != p_sys->p_last_vout )
         for( unsigned i = 0; i < CHANNELS_NUMBER; i++ )
-             spu_Control( vout_GetSpu( p_vout ), SPU_CHANNEL_REGISTER,
-                          &p_intf->p_sys->p_channels[ i ] );
+            p_intf->p_sys->p_channels[i] = spu_RegisterChannel( vout_GetSpu( p_vout ) );
     p_sys->p_last_vout = p_vout;
 
     /* Quit */
@@ -176,7 +175,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             libvlc_Quit( p_intf->p_libvlc );
 
             ClearChannels( p_intf, p_vout );
-            vout_OSDMessage( p_intf, DEFAULT_CHAN, "%s", _( "Quit" ) );
+            vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Quit" ) );
             break;
 
         /* Volume and audio actions */
@@ -205,7 +204,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 if( i_newvol == 0 )
                 {
                     ClearChannels( p_intf, p_vout );
-                    vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                    vout_OSDIcon( VLC_OBJECT( p_intf ), SPU_DEFAULT_CHANNEL,
                                   OSD_MUTE_ICON );
                 }
                 else
@@ -299,13 +298,13 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 int state = var_GetInteger( p_input, "state" );
                 if( state != PAUSE_S )
                 {
-                    vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                    vout_OSDIcon( VLC_OBJECT( p_intf ), SPU_DEFAULT_CHANNEL,
                                   OSD_PAUSE_ICON );
                     state = PAUSE_S;
                 }
                 else
                 {
-                    vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                    vout_OSDIcon( VLC_OBJECT( p_intf ), SPU_DEFAULT_CHANNEL,
                                   OSD_PLAY_ICON );
                     state = PLAYING_S;
                 }
@@ -322,7 +321,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             else
             {
                 ClearChannels( p_intf, p_vout );
-                vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                vout_OSDIcon( VLC_OBJECT( p_intf ), SPU_DEFAULT_CHANNEL,
                               OSD_PLAY_ICON );
                 playlist_Play( p_playlist );
             }
@@ -370,7 +369,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                             list.p_list->p_values[i+1] );
                     i++;
                 }
-                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL,
                         _("Audio Device: %s"),
                         list2.p_list->p_values[i].psz_string);
             }
@@ -392,7 +391,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 if( var_GetInteger( p_input, "state" ) != PAUSE_S )
                 {
                     ClearChannels( p_intf, p_vout );
-                    vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                    vout_OSDIcon( VLC_OBJECT( p_intf ), SPU_DEFAULT_CHANNEL,
                                   OSD_PAUSE_ICON );
                     var_SetInteger( p_input, "state", PAUSE_S );
                 }
@@ -467,7 +466,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     else
                         i++;
                     var_Set( p_input, "audio-es", list.p_list->p_values[i] );
-                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                    vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL,
                                      _("Audio track: %s"),
                                      list2.p_list->p_values[i].psz_string );
                 }
@@ -484,7 +483,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 i_count = list.p_list->i_count;
                 if( i_count <= 1 )
                 {
-                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                    vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL,
                                      _("Subtitle track: %s"), _("N/A") );
                     var_FreeList( &list, &list2 );
                     goto cleanup_and_continue;
@@ -508,7 +507,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 else
                     i++;
                 var_Set( p_input, "spu-es", list.p_list->p_values[i] );
-                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL,
                                  _("Subtitle track: %s"),
                                  list2.p_list->p_values[i].psz_string );
                 var_FreeList( &list, &list2 );
@@ -533,7 +532,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     if( i == val_list.p_list->i_count ) i = 0;
                     var_SetString( p_vout, "aspect-ratio",
                                    val_list.p_list->p_values[i].psz_string );
-                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                    vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL,
                                      _("Aspect ratio: %s"),
                                      text_list.p_list->p_values[i].psz_string );
 
@@ -561,7 +560,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     if( i == val_list.p_list->i_count ) i = 0;
                     var_SetString( p_vout, "crop",
                                    val_list.p_list->p_values[i].psz_string );
-                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                    vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL,
                                      _("Crop: %s"),
                                      text_list.p_list->p_values[i].psz_string );
 
@@ -575,7 +574,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 if ( f_scalefactor != 1.0 )
                 {
                     var_SetFloat( p_vout, "scale", 1.0 );
-                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                    vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL,
                                          "%s", _("Zooming reset") );
                 }
                 else
@@ -583,10 +582,10 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     bool b_autoscale = !var_GetBool( p_vout, "autoscale" );
                     var_SetBool( p_vout, "autoscale", b_autoscale );
                     if( b_autoscale )
-                        vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                        vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL,
                                          "%s", _("Scaled to screen") );
                     else
-                        vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                        vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL,
                                          "%s", _("Original Size") );
                 }
             }
@@ -614,7 +613,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 if( i_deinterlace != 0 )
                 {
                     var_SetInteger( p_vout, "deinterlace", 0 );
-                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                    vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL,
                                      "%s", _("Deinterlace off") );
                 }
                 else
@@ -634,7 +633,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                                 break;
                             }
                         }
-                        vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                        vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL,
                                          "%s (%s)", _("Deinterlace on"), psz_text ? psz_text : psz_mode );
 
                         var_FreeList( &vlist, &tlist );
@@ -667,7 +666,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     if( i == -1 ) i = val_list.p_list->i_count-1;
                     var_SetFloat( p_vout, "zoom",
                                   val_list.p_list->p_values[i].f_float );
-                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                    vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL,
                                      _("Zoom mode: %s"),
                                 text_list.p_list->p_values[i].psz_string );
 
@@ -693,12 +692,12 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
             else if( i_action == ACTIONID_NEXT )
             {
-                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, "%s", _("Next") );
+                vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL, "%s", _("Next") );
                 playlist_Next( p_playlist );
             }
             else if( i_action == ACTIONID_PREV )
             {
-                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, "%s",
+                vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL, "%s",
                                  _("Previous") );
                 playlist_Prev( p_playlist );
             }
@@ -709,13 +708,13 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             else if( i_action == ACTIONID_FRAME_NEXT )
             {
                 var_TriggerCallback( p_input, "frame-next" );
-                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL,
                                  "%s", _("Next frame") );
             }
             else if( i_action == ACTIONID_RATE_NORMAL )
             {
                 var_SetFloat( p_input, "rate", 1. );
-                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL,
                                  "%s", _("1.00x") );
             }
             else if( i_action == ACTIONID_FASTER )
@@ -770,7 +769,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 i_delay -= 50000;    /* 50 ms */
                 var_SetTime( p_input, "spu-delay", i_delay );
                 ClearChannels( p_intf, p_vout );
-                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL,
                                  _( "Subtitle delay %i ms" ),
                                  (int)(i_delay/1000) );
             }
@@ -780,7 +779,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 i_delay += 50000;    /* 50 ms */
                 var_SetTime( p_input, "spu-delay", i_delay );
                 ClearChannels( p_intf, p_vout );
-                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL,
                                 _( "Subtitle delay %i ms" ),
                                  (int)(i_delay/1000) );
             }
@@ -790,7 +789,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 --i_pos;
                 var_SetInteger( p_input, "sub-margin", i_pos );
                 ClearChannels( p_intf, p_vout );
-                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL,
                                 _( "Subtitle position %i px" ),
                                  (int)(i_pos) );
             }
@@ -800,7 +799,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 ++i_pos;
                 var_SetInteger( p_input, "sub-margin", i_pos );
                 ClearChannels( p_intf, p_vout );
-                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL,
                                 _( "Subtitle position %i px" ),
                                  (int)(i_pos) );
             }
@@ -810,7 +809,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 i_delay -= 50000;    /* 50 ms */
                 var_SetTime( p_input, "audio-delay", i_delay );
                 ClearChannels( p_intf, p_vout );
-                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL,
                                 _( "Audio delay %i ms" ),
                                  (int)(i_delay/1000) );
             }
@@ -820,7 +819,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 i_delay += 50000;    /* 50 ms */
                 var_SetTime( p_input, "audio-delay", i_delay );
                 ClearChannels( p_intf, p_vout );
-                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL,
                                 _( "Audio delay %i ms" ),
                                  (int)(i_delay/1000) );
             }
@@ -859,9 +858,9 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     const bool b_record = var_ToggleBool( p_input, "record" );
 
                     if( b_record )
-                        vout_OSDMessage( p_intf, DEFAULT_CHAN, "%s", _("Recording") );
+                        vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _("Recording") );
                     else
-                        vout_OSDMessage( p_intf, DEFAULT_CHAN, "%s", _("Recording done") );
+                        vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _("Recording done") );
                 }
             }
         }
@@ -1048,7 +1047,7 @@ static void DisplayVolume( intf_thread_t *p_intf, vout_thread_t *p_vout,
 
 static void DisplayRate( input_thread_t *p_input, float f_rate )
 {
-    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, _("Speed: %.2fx"), f_rate );
+    vout_OSDMessage( VLC_OBJECT(p_input), SPU_DEFAULT_CHANNEL, _("Speed: %.2fx"), f_rate );
 }
 
 static float AdjustRateFine( input_thread_t *p_input, const int i_dir )
@@ -1072,16 +1071,11 @@ static float AdjustRateFine( input_thread_t *p_input, const int i_dir )
 
 static void ClearChannels( intf_thread_t *p_intf, vout_thread_t *p_vout )
 {
-    int i;
-
     if( p_vout )
     {
         spu_t *p_spu = vout_GetSpu( p_vout );
-        spu_Control( p_spu, SPU_CHANNEL_CLEAR, DEFAULT_CHAN );
-        for( i = 0; i < CHANNELS_NUMBER; i++ )
-        {
-            spu_Control( p_spu, SPU_CHANNEL_CLEAR,
-                         p_intf->p_sys->p_channels[ i ] );
-        }
+        spu_ClearChannel( p_spu, SPU_DEFAULT_CHANNEL );
+        for( int i = 0; i < CHANNELS_NUMBER; i++ )
+            spu_ClearChannel( p_spu, p_intf->p_sys->p_channels[i]  );
     }
 }

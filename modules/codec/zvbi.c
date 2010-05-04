@@ -683,7 +683,7 @@ static int EventKey( vlc_object_t *p_this, char const *psz_cmd,
         if ( !vbi_bcd_digits_greater( p_sys->i_wanted_subpage, 0x00 ) || vbi_bcd_digits_greater( p_sys->i_wanted_subpage, 0x99 ) )
                 p_sys->i_wanted_subpage = VBI_ANY_SUBNO;
         else
-            vout_OSDMessage( p_this, DEFAULT_CHAN, "%s: %d", _("Subpage"), vbi_bcd2dec( p_sys->i_wanted_subpage) );
+            vout_OSDMessage( p_this, SPU_DEFAULT_CHANNEL, "%s: %d", _("Subpage"), vbi_bcd2dec( p_sys->i_wanted_subpage) );
 
         p_sys->b_update = true;
         vlc_mutex_unlock( &p_sys->lock );
@@ -697,7 +697,7 @@ static int EventKey( vlc_object_t *p_this, char const *psz_cmd,
     p_sys->i_key[0] = p_sys->i_key[1];
     p_sys->i_key[1] = p_sys->i_key[2];
     p_sys->i_key[2] = (int)(newval.i_int - '0');
-    vout_OSDMessage( p_this, DEFAULT_CHAN, "%s: %c%c%c", _("Page"), (char)(p_sys->i_key[0]+'0'), (char)(p_sys->i_key[1]+'0'), (char)(p_sys->i_key[2]+'0') );
+    vout_OSDMessage( p_this, SPU_DEFAULT_CHANNEL, "%s: %c%c%c", _("Page"), (char)(p_sys->i_key[0]+'0'), (char)(p_sys->i_key[1]+'0'), (char)(p_sys->i_key[2]+'0') );
 
     int i_new_page = 0;
 

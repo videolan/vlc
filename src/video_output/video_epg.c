@@ -269,7 +269,7 @@ int vout_OSDEpg( vout_thread_t *p_vout, input_item_t *p_input )
         return VLC_EGENERIC;
     }
 
-    p_spu->i_channel = DEFAULT_CHAN;
+    p_spu->i_channel = SPU_DEFAULT_CHANNEL;
     p_spu->i_start = i_now;
     p_spu->i_stop = i_now + 3000 * INT64_C(1000);
     p_spu->b_ephemer = true;

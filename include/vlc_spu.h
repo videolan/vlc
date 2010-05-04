@@ -46,7 +46,7 @@ extern "C" {
 typedef struct spu_private_t spu_private_t;
 
 /* Default subpicture channel ID */
-#define DEFAULT_CHAN           1
+#define SPU_DEFAULT_CHANNEL (1)
 
 /**
  * Subpicture unit descriptor
@@ -55,35 +55,8 @@ struct spu_t
 {
     VLC_COMMON_MEMBERS
 
-    int (*pf_control)( spu_t *, int, va_list );
-
     spu_private_t *p;
 };
-
-enum spu_query_e
-{
-    SPU_CHANNEL_REGISTER,         /* arg1= int *   res=    */
-    SPU_CHANNEL_CLEAR             /* arg1= int     res=    */
-};
-
-static inline int spu_vaControl( spu_t *p_spu, int i_query, va_list args )
-{
-    if( p_spu->pf_control )
-        return p_spu->pf_control( p_spu, i_query, args );
-    else
-        return VLC_EGENERIC;
-}
-
-static inline int spu_Control( spu_t *p_spu, int i_query, ... )
-{
-    va_list args;
-    int i_result;
-
-    va_start( args, i_query );
-    i_result = spu_vaControl( p_spu, i_query, args );
-    va_end( args );
-    return i_result;
-}
 
 VLC_EXPORT( spu_t *, spu_Create, ( vlc_object_t * ) );
 #define spu_Create(a) spu_Create(VLC_OBJECT(a))
@@ -113,6 +86,16 @@ VLC_EXPORT( subpicture_t *, spu_SortSubpictures, ( spu_t *, mtime_t render_subti
  * \param p_fmt_src is the format of the original(source) video.
  */
 VLC_EXPORT( void, spu_RenderSubpictures, ( spu_t *,  picture_t *, const video_format_t *p_fmt_dst, subpicture_t *p_list, const video_format_t *p_fmt_src, mtime_t render_subtitle_date ) );
+
+/**
+ * It registers a new SPU channel.
+ */
+VLC_EXPORT( int, spu_RegisterChannel, ( spu_t * ) );
+
+/**
+ * It clears all subpictures associated to a SPU channel.
+ */
+VLC_EXPORT( void, spu_ClearChannel, ( spu_t *, int ) );
 
 /** @}*/
 

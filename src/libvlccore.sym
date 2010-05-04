@@ -390,6 +390,8 @@ spu_DisplaySubpicture
 spu_Init
 spu_RenderSubpictures
 spu_SortSubpictures
+spu_RegisterChannel
+spu_ClearChannel
 sql_Create
 sql_Destroy
 stats_TimerClean

@@ -873,7 +873,7 @@ static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
                          INT64_C(1000) * vout->p->title.timeout;
 
     if (stop > start)
-        vout_ShowTextAbsolute(vout, DEFAULT_CHAN,
+        vout_ShowTextAbsolute(vout, SPU_DEFAULT_CHANNEL,
                               string, NULL,
                               vout->p->title.position,
                               30 + vout->p->fmt_in.i_width
