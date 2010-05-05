@@ -658,6 +658,7 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_DUTCH} Dutch 0
   StrCmp $LANGUAGE ${LANG_SIMPCHINESE} SChinese 0
   StrCmp $LANGUAGE ${LANG_FINNISH} Finnish 0
+  StrCmp $LANGUAGE ${LANG_JAPANESE} Japanese 0
 ;  StrCmp $LANGUAGE ${LANG_BENGALI} Bengali 0
 ;  StrCmp $LANGUAGE ${LANG_PUNJABI} Punjabi 0
 ;  StrCmp $LANGUAGE ${LANG_SLOVENIAN} Slovenian 0
@@ -698,6 +699,9 @@ UAC_Success:
   Goto EndLanguageCmp
   Finnish:
   !include "languages\finnish.nsh"
+  Goto EndLanguageCmp
+  Japanese:
+  !include "languages\japanese.nsh"
   Goto EndLanguageCmp
   Bengali:
   !include "languages\bengali.nsh"
@@ -966,6 +970,7 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_DUTCH} Dutch 0
   StrCmp $LANGUAGE ${LANG_SIMPCHINESE} SChinese 0
   StrCmp $LANGUAGE ${LANG_FINNISH} Finnish 0
+  StrCmp $LANGUAGE ${LANG_JAPANESE} Japanese 0
 ;  StrCmp $LANGUAGE ${LANG_BENGALI} Bengali 0
 ;  StrCmp $LANGUAGE ${LANG_PUNJABI} Punjabi 0
 ;  StrCmp $LANGUAGE ${LANG_SLOVENIAN} Slovenian 0
@@ -1006,6 +1011,9 @@ UAC_Success:
   Goto EndLanguageCmp
   Finnish:
   !include "languages\finnish.nsh"
+  Goto EndLanguageCmp
+  Japanese:
+  !include "languages\japanese.nsh"
   Goto EndLanguageCmp
   Bengali:
   !include "languages\bengali.nsh"
