@@ -456,6 +456,7 @@ SOURCES_libvlc_common = \
 	misc/filter_chain.c \
 	misc/http_auth.c \
 	misc/sql.c \
+	misc/text_style.c \
 	$(NULL)
 
 SOURCES_libvlc_httpd = \
