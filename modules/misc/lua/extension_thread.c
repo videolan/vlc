@@ -277,9 +277,11 @@ int __PushCommand( extension_t *p_ext,  bool b_unique, int i_command,
         }
         if( !b_skip )
         {
-            if( !b_unique || ( last->i_command != i_command )
-                || memcmp( last->data, cmd->data, sizeof( cmd->data ) ) != 0 )
-                last->next = cmd;
+            last->next = cmd;
+        }
+        else
+        {
+            FreeCommands( cmd );
         }
     }
 
@@ -394,8 +396,9 @@ static void* Run( void *data )
         }
 
         vlc_mutex_lock( &p_ext->p_sys->command_lock );
-        if( cmd )
+        if( p_ext->p_sys->command )
         {
+            cmd = p_ext->p_sys->command;
             p_ext->p_sys->command = cmd->next;
             cmd->next = NULL; // This prevents FreeCommands from freeing next
             FreeCommands( cmd );
