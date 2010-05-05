@@ -446,17 +446,6 @@ VLC_EXPORT( int, osd_ShowTextRelative, ( spu_t *, int, const char *, const text_
 VLC_EXPORT( int, osd_ShowTextAbsolute, ( spu_t *, int, const char *, const text_style_t *, int, int, int, mtime_t, mtime_t ) );
 VLC_EXPORT( void, osd_Message, ( spu_t *, int, char *, ... ) LIBVLC_FORMAT( 3, 4 ) );
 
-/**
- * Default feedback images
- *
- * Functions that provide the default OSD feedback images on hotkey
- * commands. These feedback images are also part of the osd_button_t
- * object. The types are declared in the include file include/vlc_osd.h
- * @see vlc_osd.h
- */
-VLC_EXPORT( int, osd_Slider, ( vlc_object_t *, spu_t *, int, int, int, int, int, int, short ) );
-VLC_EXPORT( int, osd_Icon, ( vlc_object_t *, spu_t *, int, int, int, int, int, short ) );
-
 /** @} */
 
 # ifdef __cplusplus

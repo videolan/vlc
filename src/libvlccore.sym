@@ -280,7 +280,6 @@ net_Write
 NTPtime64
 osd_ButtonFind
 osd_ButtonSelect
-osd_Icon
 osd_MenuActivate
 osd_MenuCreate
 osd_MenuDelete
@@ -293,7 +292,6 @@ osd_MenuUp
 osd_Message
 osd_ShowTextAbsolute
 osd_ShowTextRelative
-osd_Slider
 osd_Volume
 path_sanitize
 picture_CopyPixels

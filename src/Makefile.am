@@ -394,7 +394,6 @@ SOURCES_libvlc_common = \
 	audio_output/intf.c \
 	osd/osd.c \
 	osd/osd_text.c \
-	osd/osd_widgets.c \
 	network/acl.c \
 	network/getaddrinfo.c \
 	network/io.c \
