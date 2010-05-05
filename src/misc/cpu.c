@@ -44,7 +44,7 @@
 
 #include "libvlc.h"
 
-#if defined(__APPLE__) && (defined(__ppc__) || defined(__ppc64__))
+#if defined(__APPLE__)
 #include <sys/sysctl.h>
 #endif
 
