@@ -127,11 +127,12 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
 
 
 int *net_Listen (vlc_object_t *p_this, const char *psz_host,
-                 int i_port, int protocol)
+                 int i_port, int type, int protocol)
 {
     struct addrinfo hints, *res;
 
     memset (&hints, 0, sizeof( hints ));
+    hints.ai_socktype = type;
     hints.ai_protocol = protocol;
     hints.ai_flags = AI_PASSIVE;
 

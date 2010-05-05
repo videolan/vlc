@@ -1023,8 +1023,12 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 #endif
 
     if( p_sys->psz_destination != NULL )
+    {
+        int type = SOCK_STREAM;
+
         switch( p_sys->proto )
         {
+#ifdef SOCK_DCCP
             case IPPROTO_DCCP:
             {
                 const char *code;
@@ -1036,11 +1040,13 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                     default:       code = "RTPORTPV"; break;
                 }
                 var_SetString (p_stream, "dccp-service", code);
+                type = SOCK_DCCP;
             }   /* fall through */
+#endif
             case IPPROTO_TCP:
                 id->listen.fd = net_Listen( VLC_OBJECT(p_stream),
                                             p_sys->psz_destination, i_port,
-                                            p_sys->proto );
+                                            type, p_sys->proto );
                 if( id->listen.fd == NULL )
                 {
                     msg_Err( p_stream, "passive COMEDIA RTP socket failed" );
@@ -1072,6 +1078,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 rtp_add_sink( id, fd, p_sys->rtcp_mux, NULL );
             }
         }
+    }
 
     if( p_fmt == NULL )
     {
