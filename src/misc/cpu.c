@@ -335,7 +335,7 @@ unsigned vlc_GetCPUCount(void)
         system_mask >>= 1;
     }
     return count;
-#elif HAVE_SCHED_GETAFFINITY
+#elif defined(HAVE_SCHED_GETAFFINITY)
     cpu_set_t cpu;
     CPU_ZERO(&cpu);
     if (sched_getaffinity(0, sizeof(cpu), &cpu) < 0)
