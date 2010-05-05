@@ -146,12 +146,16 @@ int Deactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
     }
 
     /* Free the list of commands */
-    FreeCommands( p_ext->p_sys->command );
+    if( p_ext->p_sys->command )
+        FreeCommands( p_ext->p_sys->command->next );
 
     /* Push command */
     struct command_t *cmd = calloc( 1, sizeof( struct command_t ) );
     cmd->i_command = CMD_DEACTIVATE;
-    p_ext->p_sys->command = cmd;
+    if( p_ext->p_sys->command )
+        p_ext->p_sys->command->next = cmd;
+    else
+        p_ext->p_sys->command = cmd;
 
     vlc_cond_signal( &p_ext->p_sys->wait );
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );
