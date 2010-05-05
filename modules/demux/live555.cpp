@@ -487,7 +487,8 @@ static int Connect( demux_t *p_demux )
     else
     {
         if( asprintf( &psz_url, "rtsp://%s:%d%s", p_sys->url.psz_host,
-                      p_sys->url.i_port, p_sys->url.psz_path ) == -1 )
+                      p_sys->url.i_port,
+                      strempty( p_sys->url.psz_path ) ) == -1 )
             return VLC_ENOMEM;
     }
 
