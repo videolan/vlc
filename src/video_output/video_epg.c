@@ -34,19 +34,13 @@
 #include <vlc_input_item.h>
 #include <vlc_epg.h>
 
-/* TODO remove access to private vout data */
-#include "vout_internal.h"
-
 /* Layout percentage defines */
 #define EPG_TOP 0.7
 #define EPG_LEFT 0.1
 #define EPG_NAME_SIZE 0.05
 #define EPG_PROGRAM_SIZE 0.03
 
-
-
-static subpicture_region_t * vout_OSDEpgSlider( vout_thread_t *p_vout,
-                                                int i_x, int i_y,
+static subpicture_region_t * vout_OSDEpgSlider( int i_x, int i_y,
                                                 int i_width, int i_height,
                                                 float f_ratio )
 {
@@ -62,10 +56,7 @@ static subpicture_region_t * vout_OSDEpgSlider( vout_thread_t *p_vout,
 
     p_region = subpicture_region_New( &fmt );
     if( !p_region )
-    {
-        msg_Err( p_vout, "Cannot allocate SPU region." );
         return NULL;
-    }
 
     p_region->i_x = i_x;
     p_region->i_y = i_y;
@@ -104,8 +95,7 @@ static subpicture_region_t * vout_OSDEpgSlider( vout_thread_t *p_vout,
 }
 
 
-static subpicture_region_t * vout_OSDEpgText( vout_thread_t *p_vout,
-                                              const char *psz_string,
+static subpicture_region_t * vout_OSDEpgText( const char *psz_string,
                                               int i_x, int i_y,
                                               int i_size, uint32_t i_color )
 {
@@ -122,10 +112,7 @@ static subpicture_region_t * vout_OSDEpgText( vout_thread_t *p_vout,
 
     p_region = subpicture_region_New( &fmt );
     if( !p_region )
-    {
-        msg_Err( p_vout, "Cannot allocate SPU region." );
         return NULL;
-    }
 
     /* Set subpicture parameters */
     p_region->psz_text = strdup( psz_string );
@@ -146,8 +133,8 @@ static subpicture_region_t * vout_OSDEpgText( vout_thread_t *p_vout,
 }
 
 
-static subpicture_region_t * vout_BuildOSDEpg( vout_thread_t *p_vout,
-                                               vlc_epg_t *p_epg,
+static subpicture_region_t * vout_BuildOSDEpg( vlc_epg_t *p_epg,
+                                               int i_x, int i_y,
                                                int i_visible_width,
                                                int i_visible_height )
 {
@@ -157,10 +144,9 @@ static subpicture_region_t * vout_BuildOSDEpg( vout_thread_t *p_vout,
     time_t i_test = time( NULL );
 
     /* Display the name of the channel. */
-    *pp_region = vout_OSDEpgText( p_vout,
-                                  p_epg->psz_name,
-                                  i_visible_width * EPG_LEFT,
-                                  i_visible_height * EPG_TOP,
+    *pp_region = vout_OSDEpgText( p_epg->psz_name,
+                                  i_x + i_visible_width * EPG_LEFT,
+                                  i_y + i_visible_height * EPG_TOP,
                                   i_visible_height * EPG_NAME_SIZE,
                                   0x00ffffff );
 
@@ -169,9 +155,9 @@ static subpicture_region_t * vout_BuildOSDEpg( vout_thread_t *p_vout,
 
     /* Display the name of the current program. */
     pp_region = &(* pp_region)->p_next;
-    *pp_region = vout_OSDEpgText( p_vout, p_epg->p_current->psz_name,
-                                  i_visible_width * ( EPG_LEFT + 0.025 ),
-                                  i_visible_height * ( EPG_TOP + 0.05 ),
+    *pp_region = vout_OSDEpgText( p_epg->p_current->psz_name,
+                                  i_x + i_visible_width * ( EPG_LEFT + 0.025 ),
+                                  i_y + i_visible_height * ( EPG_TOP + 0.05 ),
                                   i_visible_height * EPG_PROGRAM_SIZE,
                                   0x00ffffff );
 
@@ -180,9 +166,8 @@ static subpicture_region_t * vout_BuildOSDEpg( vout_thread_t *p_vout,
 
     /* Display the current program time slider. */
     pp_region = &(* pp_region)->p_next;
-    *pp_region = vout_OSDEpgSlider( p_vout,
-                                    i_visible_width * EPG_LEFT,
-                                    i_visible_height * ( EPG_TOP + 0.1 ),
+    *pp_region = vout_OSDEpgSlider( i_x + i_visible_width * EPG_LEFT,
+                                    i_y + i_visible_height * ( EPG_TOP + 0.1 ),
                                     i_visible_width * ( 1 - 2 * EPG_LEFT ),
                                     i_visible_height * 0.05,
                                     ( i_test - p_epg->p_current->i_start )
@@ -206,9 +191,9 @@ static subpicture_region_t * vout_BuildOSDEpg( vout_thread_t *p_vout,
 
     /* Display those hours. */
     pp_region = &(* pp_region)->p_next;
-    *pp_region = vout_OSDEpgText( p_vout, psz_start,
-                                  i_visible_width * ( EPG_LEFT + 0.02 ),
-                                  i_visible_height * ( EPG_TOP + 0.15 ),
+    *pp_region = vout_OSDEpgText( psz_start,
+                                  i_x + i_visible_width * ( EPG_LEFT + 0.02 ),
+                                  i_y + i_visible_height * ( EPG_TOP + 0.15 ),
                                   i_visible_height * EPG_PROGRAM_SIZE,
                                   0x00ffffff );
 
@@ -216,15 +201,57 @@ static subpicture_region_t * vout_BuildOSDEpg( vout_thread_t *p_vout,
         return p_region_ret;
 
     pp_region = &(* pp_region)->p_next;
-    *pp_region = vout_OSDEpgText( p_vout, psz_end,
-                                  i_visible_width * ( 1 - EPG_LEFT - 0.085 ),
-                                  i_visible_height * ( EPG_TOP + 0.15 ),
+    *pp_region = vout_OSDEpgText( psz_end,
+                                  i_x + i_visible_width * ( 1 - EPG_LEFT - 0.085 ),
+                                  i_y + i_visible_height * ( EPG_TOP + 0.15 ),
                                   i_visible_height * EPG_PROGRAM_SIZE,
                                   0x00ffffff );
 
     return p_region_ret;
 }
 
+struct subpicture_updater_sys_t
+{
+    vlc_epg_t *p_epg;
+};
+
+static int OSDEpgValidate( subpicture_t *p_subpic,
+                           bool has_src_changed, const video_format_t *p_fmt_src,
+                           bool has_dst_changed, const video_format_t *p_fmt_dst,
+                           mtime_t i_ts )
+{
+    VLC_UNUSED(p_subpic); VLC_UNUSED(i_ts); VLC_UNUSED(p_fmt_src);
+    VLC_UNUSED(has_dst_changed); VLC_UNUSED(p_fmt_dst);
+
+    if( !has_src_changed && !has_dst_changed)
+        return VLC_SUCCESS;
+    return VLC_EGENERIC;
+}
+
+static void OSDEpgUpdate( subpicture_t *p_subpic,
+                          const video_format_t *p_fmt_src,
+                          const video_format_t *p_fmt_dst,
+                          mtime_t i_ts )
+{
+    subpicture_updater_sys_t *p_sys = p_subpic->updater.p_sys;
+    VLC_UNUSED(p_fmt_dst); VLC_UNUSED(i_ts);
+
+    p_subpic->i_original_picture_width  = p_fmt_src->i_width;
+    p_subpic->i_original_picture_height = p_fmt_src->i_height;
+    p_subpic->p_region = vout_BuildOSDEpg( p_sys->p_epg,
+                                           p_fmt_src->i_x_offset,
+                                           p_fmt_src->i_y_offset,
+                                           p_fmt_src->i_visible_width,
+                                           p_fmt_src->i_visible_height );
+}
+
+static void OSDEpgDestroy( subpicture_t *p_subpic )
+{
+    subpicture_updater_sys_t *p_sys = p_subpic->updater.p_sys;
+
+    vlc_epg_Delete( p_sys->p_epg );
+    free( p_sys );
+}
 
 /**
  * \brief Show EPG information about the current program of an input item
@@ -262,10 +289,25 @@ int vout_OSDEpg( vout_thread_t *p_vout, input_item_t *p_input )
     if( p_epg == NULL )
         return VLC_EGENERIC;
 
-    p_spu = subpicture_New( NULL );
-    if( !p_spu )
+    subpicture_updater_sys_t *p_sys = malloc( sizeof( *p_sys ) );
+    if( !p_sys )
     {
         vlc_epg_Delete( p_epg );
+        return VLC_EGENERIC;
+    }
+    p_sys->p_epg = p_epg;
+    subpicture_updater_t updater = {
+        .pf_validate = OSDEpgValidate,
+        .pf_update   = OSDEpgUpdate,
+        .pf_destroy  = OSDEpgDestroy,
+        .p_sys       = p_sys
+    };
+
+    p_spu = subpicture_New( &updater );
+    if( !p_spu )
+    {
+        vlc_epg_Delete( p_sys->p_epg );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -276,12 +318,6 @@ int vout_OSDEpg( vout_thread_t *p_vout, input_item_t *p_input )
     p_spu->b_absolute = true;
     p_spu->b_fade = true;
 
-    /* Build the EPG event subpictures. */
-    p_spu->p_region = vout_BuildOSDEpg( p_vout, p_epg,
-                                        p_vout->p->fmt_in.i_width,
-                                        p_vout->p->fmt_in.i_height );
-
-    vlc_epg_Delete( p_epg );
     spu_DisplaySubpicture( vout_GetSpu( p_vout ), p_spu );
 
     return VLC_SUCCESS;
