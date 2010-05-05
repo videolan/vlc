@@ -6,7 +6,7 @@ StrCpy $Name_Section04 "Prídavnı modul pre ActiveX"
 StrCpy $Name_Section05 "Prehrávanie diskov"
 StrCpy $Name_Section06 "Asociácie s typmi súborov"
 StrCpy $Name_SectionGroupAudio "Zvukové súbory"
-StrCpy $Name_SectionGroupVideo "Video-súbory"
+StrCpy $Name_SectionGroupVideo "Súbory s videom"
 StrCpy $Name_SectionGroupOther "Ostatné"
 StrCpy $Name_Section07 "Kontextová ponuka"
 StrCpy $Name_Section08 "Vymaza nastavenia a vyrovnávaciu pamä"
@@ -26,7 +26,7 @@ StrCpy $Desc_Section05 \
 StrCpy $Desc_Section06 \
     "Nastaví prehrávaè VLC media player ako predvolenú aplikáciu pre špecifikovanı typ súboru"
 StrCpy $Desc_Section07 \
-    "Pridá poloky kontextového menu ('Prehra v programe VLC' a 'Prida do playlistu programu VLC)"
+    "Pridá poloky kontextového menu ('Prehra v programe VLC' a 'Prida do playlistu programu VLC')"
 StrCpy $Desc_Section08 \
     "Vymae nastavenia prehrávaèa VLC media player a vyrovnávaciu pamä"
 
@@ -35,7 +35,7 @@ StrCpy $Message_AlreadyInstalled  \
 predchádzajúcu verziu pred nainštalovaním novej verzie: $(^Name) ?"
 
 StrCpy $Name_Section91 "Odinštalova"
-StrCpy $Name_Section92 "Vymaza nastavenia a vyrovanávaciu pamä"
+StrCpy $Name_Section92 "Vymaza nastavenia a vyrovnávaciu pamä"
 
 StrCpy $Desc_Section91 \
 "Odinštalova program VLC media player a všetky jeho súèasti"
@@ -44,7 +44,7 @@ StrCpy $Desc_Section92 \
 
 StrCpy $ShellAssociation_Play "Prehra"
 StrCpy $ContextMenuEntry_PlayWith "Prehra v programe VLC media player"
-StrCpy $ContextMenuEntry_AddToPlaylist "Prida do playlistu programu VLC media player"
+StrCpy $ContextMenuEntry_AddToPlaylist "Prida do playlistu VLC media player"
 
 StrCpy $Link_VisitWebsite "Navštívi webstránku programu VideoLAN VLC media player"
 
