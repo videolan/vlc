@@ -55,10 +55,7 @@ VLC_EXPORT( int, vout_OSDEpg, ( vout_thread_t *, input_item_t * ) );
  * \param i_channel Subpicture channel
  * \param psz_format printf style formatting
  **/
-VLC_EXPORT( void,  vout_OSDMessage, ( vlc_object_t *, int, const char *, ... ) LIBVLC_FORMAT( 3, 4 ) );
-
-#define vout_OSDMessage( obj, chan, ...) \
-        vout_OSDMessage( VLC_OBJECT(obj), chan, __VA_ARGS__ )
+VLC_EXPORT( void,  vout_OSDMessage, ( vout_thread_t *, int, const char *, ... ) LIBVLC_FORMAT( 3, 4 ) );
 
 /**
  * Display a slider on the video output.
@@ -68,7 +65,7 @@ VLC_EXPORT( void,  vout_OSDMessage, ( vlc_object_t *, int, const char *, ... ) L
  * \param i_type    Types are: OSD_HOR_SLIDER and OSD_VERT_SLIDER.
  * @see vlc_osd.h
  */
-VLC_EXPORT( void, vout_OSDSlider, ( vlc_object_t *, int, int , short ) );
+VLC_EXPORT( void, vout_OSDSlider, ( vout_thread_t *, int, int , short ) );
 
 /**
  * Display an Icon on the video output.
@@ -77,7 +74,7 @@ VLC_EXPORT( void, vout_OSDSlider, ( vlc_object_t *, int, int , short ) );
  * \param i_type    Types are: OSD_PLAY_ICON, OSD_PAUSE_ICON, OSD_SPEAKER_ICON, OSD_MUTE_ICON
  * @see vlc_osd.h
  */
-VLC_EXPORT( void, vout_OSDIcon, ( vlc_object_t *, int, short ) );
+VLC_EXPORT( void, vout_OSDIcon, ( vout_thread_t *, int, short ) );
 
 #ifdef __cplusplus
 }

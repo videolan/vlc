@@ -42,47 +42,36 @@
  * Displays an OSD slider.
  * Types are: OSD_HOR_SLIDER and OSD_VERT_SLIDER.
  *****************************************************************************/
-void vout_OSDSlider( vlc_object_t *p_caller, int i_channel, int i_position,
+void vout_OSDSlider( vout_thread_t *p_vout, int i_channel, int i_position,
                      short i_type )
 {
-    vout_thread_t *p_vout = vlc_object_find( p_caller, VLC_OBJECT_VOUT,
-                                             FIND_ANYWHERE );
+    if( !var_InheritBool( p_vout, "osd" ) || i_position < 0 )
+        return;
 
-    if( p_vout && ( var_InheritBool( p_caller, "osd" ) && ( i_position >= 0 ) ) )
-    {
-        osd_Slider( p_caller, vout_GetSpu( p_vout ),
-                    p_vout->p->fmt_render.i_width,
-                    p_vout->p->fmt_render.i_height,
-                    p_vout->p->fmt_in.i_x_offset,
-                    p_vout->p->fmt_in.i_height - p_vout->p->fmt_in.i_visible_height
-                                            - p_vout->p->fmt_in.i_y_offset,
-                    i_channel, i_position, i_type );
-    }
-    vlc_object_release( p_vout );
+    osd_Slider( VLC_OBJECT( p_vout ), vout_GetSpu( p_vout ),
+                p_vout->p->fmt_render.i_width,
+                p_vout->p->fmt_render.i_height,
+                p_vout->p->fmt_in.i_x_offset,
+                p_vout->p->fmt_in.i_height - p_vout->p->fmt_in.i_visible_height
+                                        - p_vout->p->fmt_in.i_y_offset,
+                i_channel, i_position, i_type );
 }
 
 /*****************************************************************************
  * Displays an OSD icon.
  * Types are: OSD_PLAY_ICON, OSD_PAUSE_ICON, OSD_SPEAKER_ICON, OSD_MUTE_ICON
  *****************************************************************************/
-void vout_OSDIcon( vlc_object_t *p_caller, int i_channel, short i_type )
+void vout_OSDIcon( vout_thread_t *p_vout, int i_channel, short i_type )
 {
-    vout_thread_t *p_vout = vlc_object_find( p_caller, VLC_OBJECT_VOUT,
-                                             FIND_ANYWHERE );
-
-    if( !p_vout ) return;
-
-    if( var_InheritBool( p_caller, "osd" ) )
-    {
-        osd_Icon( p_caller,
-                  vout_GetSpu( p_vout ),
-                  p_vout->p->fmt_render.i_width,
-                  p_vout->p->fmt_render.i_height,
-                  p_vout->p->fmt_in.i_width - p_vout->p->fmt_in.i_visible_width
-                                         - p_vout->p->fmt_in.i_x_offset,
-                  p_vout->p->fmt_in.i_y_offset,
-                  i_channel, i_type );
-    }
-    vlc_object_release( p_vout );
+    if( !var_InheritBool( p_vout, "osd" ) )
+        return;
+    osd_Icon( VLC_OBJECT( p_vout ),
+              vout_GetSpu( p_vout ),
+              p_vout->p->fmt_render.i_width,
+              p_vout->p->fmt_render.i_height,
+              p_vout->p->fmt_in.i_width - p_vout->p->fmt_in.i_visible_width
+                                     - p_vout->p->fmt_in.i_x_offset,
+              p_vout->p->fmt_in.i_y_offset,
+              i_channel, i_type );
 }
 

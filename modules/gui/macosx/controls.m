@@ -211,12 +211,12 @@
     var_Set( p_playlist, "random", val );
     if( val.b_bool )
     {
-        vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Random On" ) );
+        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Random On" ) );
         config_PutInt( p_playlist, "random", 1 );
     }
     else
     {
-        vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Random Off" ) );
+        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Random Off" ) );
         config_PutInt( p_playlist, "random", 0 );
     }
 
@@ -278,7 +278,7 @@
         config_PutInt( p_playlist, "loop", 0 );
 
         /* show the change */
-        vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat One" ) );
+        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat One" ) );
     }
     else if( repeating.b_bool && !looping.b_bool )
     {
@@ -294,7 +294,7 @@
         config_PutInt( p_playlist, "loop", 1 );
 
         /* show the change */
-        vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat All" ) );
+        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat All" ) );
     }
     else
     {
@@ -310,7 +310,7 @@
         config_PutInt( p_playlist, "loop", 0 );
 
         /* show the change */
-        vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
+        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
     }
 
     /* communicate with core and the main intf loop */
@@ -336,12 +336,12 @@
     var_Set( p_playlist, "repeat", val );
     if( val.b_bool )
     {
-        vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat One" ) );
+        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat One" ) );
         config_PutInt( p_playlist, "repeat", 1 );
     }
     else
     {
-        vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
+        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
         config_PutInt( p_playlist, "repeat", 0 );
     }
 
@@ -364,12 +364,12 @@
     var_Set( p_playlist, "loop", val );
     if( val.b_bool )
     {
-        vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat All" ) );
+        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat All" ) );
         config_PutInt( p_playlist, "loop", 1 );
     }
     else
     {
-        vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
+        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
         config_PutInt( p_playlist, "loop", 0 );
     }
 

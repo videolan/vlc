@@ -36,7 +36,7 @@
 #include "vout_internal.h"
 
 /**
- * \brief Show text on the video for some time
+ * \brief Show text on the video from a given start date to a given end date
  * \param p_vout pointer to the vout the text is to be showed on
  * \param i_channel Subpicture channel
  * \param psz_string The text to be shown
@@ -47,35 +47,9 @@
  * \param i_duration Amount of time the text is to be shown.
  */
 int vout_ShowTextRelative( vout_thread_t *p_vout, int i_channel,
-                           char *psz_string, const text_style_t *p_style,
-                           int i_flags, int i_hmargin, int i_vmargin,
-                           mtime_t i_duration )
-{
-    mtime_t i_now = mdate();
-
-    return vout_ShowTextAbsolute( p_vout, i_channel, psz_string,
-                                  p_style, i_flags, i_hmargin, i_vmargin,
-                                  i_now, i_now + i_duration );
-}
-
-/**
- * \brief Show text on the video from a given start date to a given end date
- * \param p_vout pointer to the vout the text is to be showed on
- * \param i_channel Subpicture channel
- * \param psz_string The text to be shown
- * \param p_style Pointer to a struct with text style info (it is duplicated if non NULL)
- * \param i_flags flags for alignment and such
- * \param i_hmargin horizontal margin in pixels
- * \param i_vmargin vertical margin in pixels
- * \param i_start the time when this string is to appear on the video
- * \param i_stop the time when this string should stop to be displayed
- *               if this is 0 the string will be shown untill the next string
- *               is about to be shown
- */
-int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
                            const char *psz_string, const text_style_t *p_style,
                            int i_flags, int i_hmargin, int i_vmargin,
-                           mtime_t i_start, mtime_t i_stop )
+                           mtime_t i_duration )
 {
     subpicture_t *p_spu;
     video_format_t fmt;
@@ -87,8 +61,8 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
         return VLC_EGENERIC;
 
     p_spu->i_channel = i_channel;
-    p_spu->i_start = i_start;
-    p_spu->i_stop = i_stop;
+    p_spu->i_start = mdate();
+    p_spu->i_stop  = p_spu->i_start + i_duration;
     p_spu->b_ephemer = true;
     p_spu->b_absolute = false;
     p_spu->b_fade = true;
@@ -119,7 +93,6 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
     return VLC_SUCCESS;
 }
 
-#undef vout_OSDMessage
 /**
  * \brief Write an informative message at the default location,
  *        for the default duration and only if the OSD option is enabled.
@@ -127,31 +100,26 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
  * \param i_channel Subpicture channel
  * \param psz_format printf style formatting
  **/
-void vout_OSDMessage( vlc_object_t *p_caller, int i_channel,
+void vout_OSDMessage( vout_thread_t *p_vout, int i_channel,
                       const char *psz_format, ... )
 {
-    vout_thread_t *p_vout;
-    char *psz_string = NULL;
+    if( !var_InheritBool( p_vout, "osd" ) )
+        return;
+
     va_list args;
+    va_start( args, psz_format );
 
-    if( !var_InheritBool( p_caller, "osd" ) ) return;
-
-    p_vout = vlc_object_find( p_caller, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( p_vout )
+    char *psz_string;
+    if( vasprintf( &psz_string, psz_format, args ) != -1 )
     {
-        va_start( args, psz_format );
-        if( vasprintf( &psz_string, psz_format, args ) != -1 )
-        {
-            vout_ShowTextRelative( p_vout, i_channel, psz_string, NULL,
-                                   SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_RIGHT,
-                                   30 + p_vout->p->fmt_in.i_width
-                                      - p_vout->p->fmt_in.i_visible_width
-                                      - p_vout->p->fmt_in.i_x_offset,
-                                   20 + p_vout->p->fmt_in.i_y_offset, 1000000 );
-            free( psz_string );
-        }
-        vlc_object_release( p_vout );
-        va_end( args );
+        vout_ShowTextRelative( p_vout, i_channel, psz_string, NULL,
+                               SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_RIGHT,
+                               30 + p_vout->p->fmt_in.i_width
+                                  - p_vout->p->fmt_in.i_visible_width
+                                  - p_vout->p->fmt_in.i_x_offset,
+                               20 + p_vout->p->fmt_in.i_y_offset, 1000000 );
+        free( psz_string );
     }
+    va_end( args );
 }
 

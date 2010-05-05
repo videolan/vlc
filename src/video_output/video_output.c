@@ -851,19 +851,15 @@ static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
 
     vlc_assert_locked(&vout->p->change_lock);
 
-    const mtime_t start = mdate();
-    const mtime_t stop = start +
-                         INT64_C(1000) * vout->p->title.timeout;
-
-    if (stop > start)
-        vout_ShowTextAbsolute(vout, SPU_DEFAULT_CHANNEL,
+    if (vout->p->title.timeout > 0)
+        vout_ShowTextRelative(vout, SPU_DEFAULT_CHANNEL,
                               string, NULL,
                               vout->p->title.position,
                               30 + vout->p->fmt_in.i_width
                                  - vout->p->fmt_in.i_visible_width
                                  - vout->p->fmt_in.i_x_offset,
                               20 + vout->p->fmt_in.i_y_offset,
-                              start, stop);
+                              INT64_C(1000) * vout->p->title.timeout);
 }
 
 static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)

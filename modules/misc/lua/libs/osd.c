@@ -75,7 +75,13 @@ static int vlclua_osd_icon( lua_State *L )
     else
     {
         vlc_object_t *p_this = vlclua_get_this( L );
-        vout_OSDIcon( p_this, i_chan, i_icon );
+        vout_thread_t *p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT,
+                                                 FIND_ANYWHERE );
+        if( p_vout )
+        {
+            vout_OSDIcon( p_vout, i_chan, i_icon );
+            vlc_object_release( p_vout );
+        }
         return 0;
     }
 }
@@ -85,7 +91,13 @@ static int vlclua_osd_message( lua_State *L )
     const char *psz_message = luaL_checkstring( L, 1 );
     int i_chan = luaL_optint( L, 2, SPU_DEFAULT_CHANNEL );
     vlc_object_t *p_this = vlclua_get_this( L );
-    vout_OSDMessage( p_this, i_chan, "%s", psz_message );
+    vout_thread_t *p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT,
+                                             FIND_ANYWHERE );
+    if( p_vout )
+    {
+        vout_OSDMessage( p_vout, i_chan, "%s", psz_message );
+        vlc_object_release( p_vout );
+    }
     return 0;
 }
 
@@ -120,7 +132,13 @@ static int vlclua_osd_slider( lua_State *L )
     else
     {
         vlc_object_t *p_this = vlclua_get_this( L );
-        vout_OSDSlider( p_this, i_chan, i_position, i_type );
+        vout_thread_t *p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT,
+                                                 FIND_ANYWHERE );
+        if( p_vout )
+        {
+            vout_OSDSlider( p_vout, i_chan, i_position, i_type );
+            vlc_object_release( p_vout );
+        }
         return 0;
     }
 }

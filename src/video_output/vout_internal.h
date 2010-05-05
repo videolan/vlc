@@ -170,9 +170,7 @@ void vout_DisplayWrapper(vout_thread_t *, picture_t *);
 int spu_ProcessMouse(spu_t *, const vlc_mouse_t *, const video_format_t *);
 
 /* */
-int vout_ShowTextRelative( vout_thread_t *, int, char *, const text_style_t *, int, int, int, mtime_t );
-int vout_ShowTextAbsolute( vout_thread_t *, int, const char *, const text_style_t *, int, int, int, mtime_t, mtime_t );
-
+int vout_ShowTextRelative( vout_thread_t *, int, const char *, const text_style_t *, int, int, int, mtime_t );
 
 #endif
 
