@@ -482,7 +482,8 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     }
 
     msg_Dbg( p_access, "http: server='%s' port=%d file='%s'",
-             p_sys->url.psz_host, p_sys->url.i_port, p_sys->url.psz_path );
+             p_sys->url.psz_host, p_sys->url.i_port,
+             p_sys->url.psz_path != NULL ? p_sys->url.psz_path : "" );
     if( p_sys->b_proxy )
     {
         msg_Dbg( p_access, "      proxy %s:%d", p_sys->proxy.psz_host,
