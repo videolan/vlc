@@ -85,6 +85,7 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
         return -1;
 
     memset( &hints, 0, sizeof( hints ) );
+    hints.ai_socktype = type;
     hints.ai_protocol = proto;
 
     psz_socks = var_CreateGetNonEmptyString( p_this, "socks" );
