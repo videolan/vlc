@@ -190,9 +190,10 @@ int main( int i_argc, const char *ppsz_argv[] )
 #ifdef RTLD_NOLOAD
     /* Avoid crash in KIO scheduler cleanup. */
     /* This is ugly, but we get way too many crash reports due to this. */
-    if (dlopen ("libkfilemodule.so", RTLD_LAZY|RTLD_LOCAL|RTLD_NOLOAD) != NULL)
+    if (dlopen ("libkio.so.5", RTLD_LAZY|RTLD_LOCAL|RTLD_NOLOAD) != NULL)
     {
-        fprintf (stderr, "KFile plugin present. Unclean shutdown!\n");
+        fprintf (stderr, "KIO present. Unclean shutdown!\n"
+           " (see http://bugs.kde.org/show_bug.cgi?id=234484 for details)\n");
         _exit (0);
     }
 #endif
