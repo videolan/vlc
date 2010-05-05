@@ -344,7 +344,7 @@ unsigned vlc_GetCPUCount(void)
     for (unsigned i = 0; i < CPU_SETSIZE; i++)
         count += CPU_ISSET(i, &cpu) != 0;
     return count;
-#elif defined(__APPLE_)
+#elif defined(__APPLE__)
     int count;
     size_t size = sizeof(count) ;
     if (sysctlbyname("hw.ncpu", &count, &size, NULL, 0))
