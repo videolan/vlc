@@ -2,6 +2,8 @@
 Version=1.0
 Name=VLC media player
 Comment=Read, capture, broadcast your multimedia streams
+Name[bn]=VLC মিডিয়া প্লেয়ার
+Comment[bn]=আপনার মাল্টিমিডিয়া স্ট্রীম পড়ুন, ধরে রাখুন এবং ছড়িয়ে দিন
 Name[ca]=Reproductor multimèdia VLC
 Comment[ca]=Reproduïu, captureu i difoneu fluxos multimèdia
 Name[de]=VLC Media Player
