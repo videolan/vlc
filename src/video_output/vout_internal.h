@@ -39,9 +39,6 @@
 #include "statistic.h"
 #include "chrono.h"
 
-/* Number of pictures required to computes the FPS rate */
-#define VOUT_FPS_SAMPLES                20
-
 /* */
 struct vout_thread_sys_t
 {
