@@ -38,7 +38,7 @@
 #include <vlc_aout.h>
 #include <vlc_sout.h>
 #include <vlc_codec.h>
-#include <vlc_osd.h>
+#include <vlc_spu.h>
 #include <vlc_meta.h>
 #include <vlc_dialog.h>
 

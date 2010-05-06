@@ -37,7 +37,7 @@
 #include <vlc_vout.h>
 #include <vlc_block.h>
 #include <vlc_filter.h>
-#include <vlc_osd.h>
+#include <vlc_spu.h>
 #include "../libvlc.h"
 #include "vout_internal.h"
 #include <vlc_image.h>

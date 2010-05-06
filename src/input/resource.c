@@ -32,7 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_vout.h>
-#include <vlc_osd.h>
+#include <vlc_spu.h>
 #include <vlc_aout.h>
 #include <vlc_sout.h>
 #include "../libvlc.h"

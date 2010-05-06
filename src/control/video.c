@@ -38,7 +38,6 @@
 #include <vlc_vout.h>
 
 #include "media_player_internal.h"
-#include <vlc_osd.h>
 #include <assert.h>
 
 /*
