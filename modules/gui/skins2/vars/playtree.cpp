@@ -192,7 +192,7 @@ void Playtree::onDelete( int i_id )
     {
         if( item->parent() )
             item->parent()->removeChild( item );
-        descr.b_visible = item->parent() ? true : item->parent()->m_expanded;
+        descr.b_visible = item->parent() ? item->parent()->m_expanded : true;
         notify( &descr );
     }
 }
