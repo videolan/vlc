@@ -219,6 +219,8 @@ bool video_format_IsSimilar( const video_format_t *p_fmt1, const video_format_t 
         v1.i_visible_height != v2.i_visible_height ||
         v1.i_x_offset != v2.i_x_offset || v1.i_y_offset != v2.i_y_offset )
         return false;
+    if( v1.i_sar_num * v2.i_sar_den != v2.i_sar_num * v1.i_sar_den )
+        return false;
 
     if( v1.i_chroma == VLC_CODEC_RGB15 ||
         v1.i_chroma == VLC_CODEC_RGB16 ||
