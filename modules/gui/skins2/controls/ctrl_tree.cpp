@@ -138,6 +138,8 @@ int CtrlTree::maxItems()
 void CtrlTree::onUpdate( Subject<VarTree, tree_update> &rTree,
                          tree_update *arg )
 {
+    m_firstPos = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+
     if( arg->i_type == 0 ) // Item update
     {
         if( arg->b_active_item )
@@ -150,7 +152,6 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update> &rTree,
     /// \todo handle delete in a more clever way
     else if ( arg->i_type == 1 ) // Global change or deletion
     {
-        m_firstPos = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
         makeImage();
     }
     else if ( arg->i_type == 2 ) // Item-append
