@@ -71,8 +71,18 @@ class CmdPlaytreeAppend: public CmdGeneric
 {
 public:
     CmdPlaytreeAppend( intf_thread_t *pIntf, playlist_add_t *p_add ):
-        CmdGeneric( pIntf ), m_pAdd( p_add ) { }
-    virtual ~CmdPlaytreeAppend() { }
+        CmdGeneric( pIntf ), m_pAdd( NULL )
+    {
+        if( p_add )
+        {
+            m_pAdd = new playlist_add_t;
+            *m_pAdd = *p_add;
+        }
+    }
+    virtual ~CmdPlaytreeAppend()
+    {
+        delete m_pAdd;
+    }
     virtual void execute();
     virtual string getType() const { return "playtree append"; }
 

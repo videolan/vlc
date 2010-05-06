@@ -287,10 +287,7 @@ int VlcProc::onItemAppend( vlc_object_t *pObj, const char *pVariable,
 {
     VlcProc *pThis = (VlcProc*)pParam;
 
-    playlist_add_t *p_add = (playlist_add_t*)malloc( sizeof(
-                                                playlist_add_t ) ) ;
-
-    memcpy( p_add, newVal.p_address, sizeof( playlist_add_t ) ) ;
+    playlist_add_t *p_add = static_cast<playlist_add_t*>(newVal.p_address);
 
     CmdGenericPtr ptrTree;
     CmdPlaytreeAppend *pCmdTree = new CmdPlaytreeAppend( pThis->getIntf(),
