@@ -35,13 +35,17 @@ extern "C" {
 /**
  * OSD menu position and picture type defines
  */
-#define OSD_HOR_SLIDER 1
-#define OSD_VERT_SLIDER 2
-
-#define OSD_PLAY_ICON 1
-#define OSD_PAUSE_ICON 2
-#define OSD_SPEAKER_ICON 3
-#define OSD_MUTE_ICON 4
+enum
+{
+    /* Icons */
+    OSD_PLAY_ICON = 1,
+    OSD_PAUSE_ICON,
+    OSD_SPEAKER_ICON,
+    OSD_MUTE_ICON,
+    /* Sliders */
+    OSD_HOR_SLIDER,
+    OSD_VERT_SLIDER,
+};
 
 /**********************************************************************
  * Vout text and widget overlays
