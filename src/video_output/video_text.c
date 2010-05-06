@@ -1,10 +1,11 @@
 /*****************************************************************************
- * video_text.c : text manipulation functions
+ * video_text.c : OSD text manipulation functions
  *****************************************************************************
- * Copyright (C) 1999-2007 the VideoLAN team
+ * Copyright (C) 1999-2010 the VideoLAN team
  * $Id$
  *
  * Author: Sigmund Augdal Helberg <dnumgis@videolan.org>
+ *         Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,98 +29,110 @@
 
 #include <vlc_common.h>
 #include <vlc_vout.h>
-#include <vlc_block.h>
-#include <vlc_filter.h>
-#include <vlc_osd.h>
+#include <vlc_vout_osd.h>
 
-/* TODO remove access to private vout data */
-#include "vout_internal.h"
+struct subpicture_updater_sys_t {
+    int  position;
+    char *text;
+};
 
-/**
- * \brief Show text on the video from a given start date to a given end date
- * \param p_vout pointer to the vout the text is to be showed on
- * \param i_channel Subpicture channel
- * \param psz_string The text to be shown
- * \param p_style Pointer to a struct with text style info (it is duplicated if non NULL)
- * \param i_flags flags for alignment and such
- * \param i_hmargin horizontal margin in pixels
- * \param i_vmargin vertical margin in pixels
- * \param i_duration Amount of time the text is to be shown.
- */
-int vout_ShowTextRelative( vout_thread_t *p_vout, int i_channel,
-                           const char *psz_string, const text_style_t *p_style,
-                           int i_flags, int i_hmargin, int i_vmargin,
-                           mtime_t i_duration )
+static int OSDTextValidate(subpicture_t *subpic,
+                           bool has_src_changed, const video_format_t *fmt_src,
+                           bool has_dst_changed, const video_format_t *fmt_dst,
+                           mtime_t ts)
 {
-    subpicture_t *p_spu;
-    video_format_t fmt;
+    VLC_UNUSED(subpic); VLC_UNUSED(ts); VLC_UNUSED(fmt_src);
+    VLC_UNUSED(has_dst_changed); VLC_UNUSED(fmt_dst);
 
-    if( !psz_string ) return VLC_EGENERIC;
-
-    p_spu = subpicture_New( NULL );
-    if( !p_spu )
-        return VLC_EGENERIC;
-
-    p_spu->i_channel = i_channel;
-    p_spu->i_start = mdate();
-    p_spu->i_stop  = p_spu->i_start + i_duration;
-    p_spu->b_ephemer = true;
-    p_spu->b_absolute = false;
-    p_spu->b_fade = true;
-
-
-    /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_CODEC_TEXT;
-    fmt.i_width = fmt.i_height = 0;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_spu->p_region = subpicture_region_New( &fmt );
-    if( !p_spu->p_region )
-    {
-        msg_Err( p_vout, "cannot allocate SPU region" );
-        subpicture_Delete( p_spu );
-        return VLC_EGENERIC;
-    }
-
-    p_spu->p_region->psz_text = strdup( psz_string );
-    p_spu->p_region->i_align = i_flags & SUBPICTURE_ALIGN_MASK;
-    p_spu->p_region->i_x = i_hmargin;
-    p_spu->p_region->i_y = i_vmargin;
-    if( p_style )
-        p_spu->p_region->p_style = text_style_Duplicate( p_style );
-
-    spu_DisplaySubpicture( vout_GetSpu( p_vout ), p_spu );
-
-    return VLC_SUCCESS;
+    if( !has_src_changed && !has_dst_changed)
+        return VLC_SUCCESS;
+    return VLC_EGENERIC;
 }
 
-/**
- * \brief Write an informative message at the default location,
- *        for the default duration and only if the OSD option is enabled.
- * \param p_caller The object that called the function.
- * \param i_channel Subpicture channel
- * \param psz_format printf style formatting
- **/
-void vout_OSDMessage( vout_thread_t *p_vout, int i_channel,
-                      const char *psz_format, ... )
+static void OSDTextUpdate(subpicture_t *subpic,
+                          const video_format_t *fmt_src,
+                          const video_format_t *fmt_dst,
+                          mtime_t ts)
 {
-    if( !var_InheritBool( p_vout, "osd" ) )
+    subpicture_updater_sys_t *sys = subpic->updater.p_sys;
+    VLC_UNUSED(fmt_dst); VLC_UNUSED(ts);
+
+    subpic->i_original_picture_width  = fmt_src->i_width;
+    subpic->i_original_picture_height = fmt_src->i_height;
+
+    video_format_t fmt;
+    video_format_Init( &fmt, VLC_CODEC_TEXT);
+    fmt.i_sar_num = 0;
+    fmt.i_sar_den = 1;
+
+    subpicture_region_t *r = subpic->p_region = subpicture_region_New(&fmt);
+    if (!r)
         return;
 
-    va_list args;
-    va_start( args, psz_format );
+    r->psz_text = strdup(sys->text);
+    r->i_align  = sys->position;
+    r->i_x      = 30 + fmt_src->i_width
+                     - fmt_src->i_visible_width
+                     - fmt_src->i_x_offset;
+    r->i_y      = 20 + fmt_src->i_y_offset;
+}
 
-    char *psz_string;
-    if( vasprintf( &psz_string, psz_format, args ) != -1 )
-    {
-        vout_ShowTextRelative( p_vout, i_channel, psz_string, NULL,
-                               SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_RIGHT,
-                               30 + p_vout->p->fmt_in.i_width
-                                  - p_vout->p->fmt_in.i_visible_width
-                                  - p_vout->p->fmt_in.i_x_offset,
-                               20 + p_vout->p->fmt_in.i_y_offset, 1000000 );
-        free( psz_string );
+static void OSDTextDestroy(subpicture_t *subpic)
+{
+    subpicture_updater_sys_t *sys = subpic->updater.p_sys;
+
+    free(sys->text);
+    free(sys);
+}
+
+void vout_OSDText(vout_thread_t *vout, int channel,
+                   int position, mtime_t duration, const char *text)
+{
+    assert( (position & ~SUBPICTURE_ALIGN_MASK) == 0);
+    if (!var_InheritBool(vout, "osd") || duration <= 0)
+        return;
+
+    subpicture_updater_sys_t *sys = malloc(sizeof(*sys));
+    if (!sys)
+        return;
+    sys->position = position;
+    sys->text     = strdup(text);
+
+    subpicture_updater_t updater = {
+        .pf_validate = OSDTextValidate,
+        .pf_update   = OSDTextUpdate,
+        .pf_destroy  = OSDTextDestroy,
+        .p_sys       = sys,
+    };
+    subpicture_t *subpic = subpicture_New(&updater);
+    if (!subpic) {
+        free(sys->text);
+        free(sys);
+        return;
     }
-    va_end( args );
+
+    subpic->i_channel  = channel;
+    subpic->i_start    = mdate();
+    subpic->i_stop     = subpic->i_start + duration;
+    subpic->b_ephemer  = true;
+    subpic->b_absolute = false;
+    subpic->b_fade     = true;
+
+    spu_DisplaySubpicture(vout_GetSpu(vout), subpic);
+}
+
+void vout_OSDMessage(vout_thread_t *vout, int channel, const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+
+    char *string;
+    if (vasprintf(&string, format, args) != -1) {
+        vout_OSDText(vout, channel,
+                     SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_RIGHT, 1000000,
+                     string);
+        free(string);
+    }
+    va_end(args);
 }
 

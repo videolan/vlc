@@ -844,22 +844,14 @@ static int ThreadManage(vout_thread_t *vout,
 
 static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
 {
-    if( !var_InheritBool(vout, "osd"))
-        return;
     if (!vout->p->title.show)
         return;
 
     vlc_assert_locked(&vout->p->change_lock);
 
-    if (vout->p->title.timeout > 0)
-        vout_ShowTextRelative(vout, SPU_DEFAULT_CHANNEL,
-                              string, NULL,
-                              vout->p->title.position,
-                              30 + vout->p->fmt_in.i_width
-                                 - vout->p->fmt_in.i_visible_width
-                                 - vout->p->fmt_in.i_x_offset,
-                              20 + vout->p->fmt_in.i_y_offset,
-                              INT64_C(1000) * vout->p->title.timeout);
+    vout_OSDText(vout, SPU_DEFAULT_CHANNEL,
+                 vout->p->title.position, INT64_C(1000) * vout->p->title.timeout,
+                 string);
 }
 
 static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)

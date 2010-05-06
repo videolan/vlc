@@ -621,6 +621,7 @@ vout_OSDIcon
 vout_OSDMessage
 vout_OSDEpg
 vout_OSDSlider
+vout_OSDText
 vout_Request
 vout_window_New
 vout_window_Control

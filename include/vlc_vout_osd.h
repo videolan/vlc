@@ -49,12 +49,24 @@ extern "C" {
 VLC_EXPORT( int, vout_OSDEpg, ( vout_thread_t *, input_item_t * ) );
 
 /**
- * Write an informative message at the default location,
- * for the default duration and only if the OSD option is enabled.
- * \param p_caller The object that called the function.
- * \param i_channel Subpicture channel
- * \param psz_format printf style formatting
- **/
+ * \brief Write an informative message if the OSD option is enabled.
+ * \param vout The vout on which the message will be displayed
+ * \param channel Subpicture channel
+ * \param position Position of the text
+ * \param duration Duration of the text being displayed
+ * \param text Text to be displayed
+ */
+VLC_EXPORT( void,  vout_OSDText, ( vout_thread_t *vout, int channel, int position, mtime_t duration, const char *text ) );
+
+/**
+ * \brief Write an informative message at the default location,
+ *        for the default duration and only if the OSD option is enabled.
+ * \param vout The vout on which the message will be displayed
+ * \param channel Subpicture channel
+ * \param format printf style formatting
+ *
+ * Provided for convenience.
+ */
 VLC_EXPORT( void,  vout_OSDMessage, ( vout_thread_t *, int, const char *, ... ) LIBVLC_FORMAT( 3, 4 ) );
 
 /**
@@ -63,7 +75,6 @@ VLC_EXPORT( void,  vout_OSDMessage, ( vout_thread_t *, int, const char *, ... ) 
  * \param i_channel Subpicture channel
  * \param i_postion Current position in the slider
  * \param i_type    Types are: OSD_HOR_SLIDER and OSD_VERT_SLIDER.
- * @see vlc_osd.h
  */
 VLC_EXPORT( void, vout_OSDSlider, ( vout_thread_t *, int, int , short ) );
 
@@ -72,7 +83,6 @@ VLC_EXPORT( void, vout_OSDSlider, ( vout_thread_t *, int, int , short ) );
  * \param p_this    The object that called the function.
  * \param i_channel Subpicture channel
  * \param i_type    Types are: OSD_PLAY_ICON, OSD_PAUSE_ICON, OSD_SPEAKER_ICON, OSD_MUTE_ICON
- * @see vlc_osd.h
  */
 VLC_EXPORT( void, vout_OSDIcon, ( vout_thread_t *, int, short ) );
 
