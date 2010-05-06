@@ -48,6 +48,7 @@
 
 #ifdef __APPLE__
 # include <sys/time.h> /* gettimeofday in vlc_cond_timedwait */
+# include <mach/mach_init.h> /* mach_task_self in semaphores */
 #endif
 
 /**
@@ -402,8 +403,13 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
  */
 void vlc_sem_init (vlc_sem_t *sem, unsigned value)
 {
+#if defined(__APPLE__)
+    if (unlikely(semaphore_create(mach_task_self(), sem, SYNC_POLICY_FIFO, value) != KERN_SUCCESS))
+        abort ();
+#else
     if (unlikely(sem_init (sem, 0, value)))
         abort ();
+#endif
 }
 
 /**
@@ -411,10 +417,20 @@ void vlc_sem_init (vlc_sem_t *sem, unsigned value)
  */
 void vlc_sem_destroy (vlc_sem_t *sem)
 {
+    int val;
+
+#if defined(__APPLE__)
+    if (likely(semaphore_destroy(mach_task_self(), *sem) == KERN_SUCCESS))
+        return;
+
+    val = EINVAL;
+#else
     if (likely(sem_destroy (sem) == 0))
         return;
 
-    int val = errno;
+    val = errno;
+#endif
+
     VLC_THREAD_ASSERT ("destroying semaphore");
 }
 
@@ -424,10 +440,20 @@ void vlc_sem_destroy (vlc_sem_t *sem)
  */
 int vlc_sem_post (vlc_sem_t *sem)
 {
+    int val;
+
+#if defined(__APPLE__)
+    if (likely(semaphore_signal(*sem) == KERN_SUCCESS))
+        return 0;
+
+    val = EINVAL;
+#else
     if (likely(sem_post (sem) == 0))
         return 0;
 
-    int val = errno;
+    val = errno;
+#endif
+
     if (unlikely(val != EOVERFLOW))
         VLC_THREAD_ASSERT ("unlocking semaphore");
     return val;
@@ -441,10 +467,17 @@ void vlc_sem_wait (vlc_sem_t *sem)
 {
     int val;
 
+#if defined(__APPLE__)
+    if (likely(semaphore_wait(*sem) == KERN_SUCCESS))
+        return;
+
+    val = EINVAL;
+#else
     do
         if (likely(sem_wait (sem) == 0))
             return;
     while ((val = errno) == EINTR);
+#endif
 
     VLC_THREAD_ASSERT ("locking semaphore");
 }

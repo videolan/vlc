@@ -45,7 +45,14 @@
 
 #   include <unistd.h> /* _POSIX_SPIN_LOCKS */
 #   include <pthread.h>
-#   include <semaphore.h>
+
+/* Unnamed POSIX semaphores not supported on Mac OS X, use Mach semaphores instead */
+#   if defined (__APPLE__)
+#      include <mach/semaphore.h>
+#      include <mach/task.h>
+#   else
+#      include <semaphore.h>
+#   endif
 
 #endif
 
@@ -103,10 +110,15 @@ typedef pthread_mutex_t vlc_mutex_t;
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
 typedef pthread_cond_t  vlc_cond_t;
 #define VLC_STATIC_COND  PTHREAD_COND_INITIALIZER
-typedef sem_t           vlc_sem_t;
 typedef pthread_rwlock_t vlc_rwlock_t;
 typedef pthread_key_t   vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
+
+#if defined (__APPLE__)
+typedef semaphore_t     vlc_sem_t;
+#else
+typedef sem_t           vlc_sem_t;
+#endif
 
 #elif defined( WIN32 )
 #if !defined( UNDER_CE )
