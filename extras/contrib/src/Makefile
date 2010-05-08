@@ -2320,28 +2320,24 @@ DISTCLEAN_PKG += fluidsynth-$(FLUID_VERSION).tar.gz
 # liboil
 # ***************************************************************************
 
-liboil-$(OIL_VERSION).tar.gz:
-	$(WGET) $(OIL_URL)
+orc-$(ORC_VERSION).tar.gz:
+	$(WGET) $(ORC_URL)
 
-liboil: liboil-$(OIL_VERSION).tar.gz
+orc: orc-$(ORC_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -d liboil -p1 < Patches/liboil-noshared.patch
-	patch -d liboil -p1 < Patches/liboil-win64.patch
-	patch -d liboil -p1 < Patches/liboil-Xcompile.patch
-	(cd $@; autoreconf)
 
-.liboil: liboil
+.orc: orc
 ifdef HAVE_DARWIN_OS
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)")
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O2")
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX))
 endif
 	(cd $<; make && make install)
 	touch $@
 
-CLEAN_FILE += .liboil
-CLEAN_PKG += liboil
-DISTCLEAN_PKG += liboil-$(OIL_VERSION).tar.gz
+CLEAN_FILE += .orc
+CLEAN_PKG += orc
+DISTCLEAN_PKG += orc-$(ORC_VERSION).tar.gz
 
 # ***************************************************************************
 # Schroedinger library
@@ -2355,8 +2351,14 @@ schroedinger: schroedinger-$(SCHROED_VERSION).tar.gz
 	patch -p0 < Patches/schroedinger-notests.patch
 	(cd $@; autoreconf -iv)
 
-.schroedinger: schroedinger .liboil
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --with-thread=none --disable-gtk-doc --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
+ifdef HAVE_WIN32
+ORCC="wine $(PREFIX)/bin/orcc.exe"
+else
+ORCC="orcc"
+endif
+
+.schroedinger: schroedinger .orc
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --with-thread=none --disable-gtk-doc --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make ORCC=$(ORCC) && make install)
 	touch $@
 
 CLEAN_FILE += .schroedinger
