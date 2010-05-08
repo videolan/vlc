@@ -1,3 +1,8 @@
+if [ -z $CONTRIBS ]
+then
+	CONTRIBS=/usr/win32
+fi
+
       $CONFIG \
       --without-contrib \
       --enable-update-check \
@@ -15,15 +20,15 @@
       --enable-x264 \
       --enable-schroedinger \
       --enable-realrtsp \
-      --enable-live555 --with-live555-tree=/usr/win32/live.com \
-      --enable-dvdread --with-dvdnav-config-path=/usr/win32/bin \
+      --enable-live555 --with-live555-tree=$CONTRIBS/live.com \
+      --enable-dvdread --with-dvdnav-config-path=$CONTRIBS/bin \
       --enable-shout \
       --enable-goom \
       --enable-caca \
       --enable-portaudio \
-      --enable-sdl --with-sdl-config-path=/usr/win32/bin \
+      --enable-sdl --with-sdl-config-path=$CONTRIBS/bin \
       --enable-qt4 \
-      --enable-mozilla --with-mozilla-sdk-path=/usr/win32/gecko-sdk \
+      --enable-mozilla --with-mozilla-sdk-path=$CONTRIBS/gecko-sdk \
       --enable-activex \
       --enable-sse --enable-mmx \
       --enable-libcddb \
