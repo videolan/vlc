@@ -1808,8 +1808,8 @@ msgid ""
 "This allows to play audio at lower or higher speed without affecting the "
 "audio pitch"
 msgstr ""
-"Ceci permet de jouer l'audio à une vitesse supérieure ou inférience sans "
-"affecter la tonie (« pitch »)"
+"Ceci permet de jouer l'audio à une vitesse supérieure ou inférieure en "
+"préservant le ton"
 
 #: src/libvlc-module.c:356 modules/access/dshow/dshow.cpp:82
 #: modules/access/dshow/dshow.cpp:84 modules/codec/avcodec/avcodec.c:74
