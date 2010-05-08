@@ -2331,12 +2331,8 @@ static int InputSourceInit( input_thread_t *p_input,
      * for non-standard VLC-specific schemes. */
     if( !strcmp( psz_access, "file" ) )
     {
-        if( psz_path[0] != '/'
-#if (DIR_SEP_CHAR != '/')
-            /* We accept invalid URIs too. */
-            && psz_path[0] != DIR_SEP_CHAR
-#endif
-          )
+        if( psz_path[0] != '/' )
+#ifndef WIN32
         {   /* host specified -> only localhost is supported */
             static const size_t i_localhost = sizeof("localhost")-1;
             if( strncmp( psz_path, "localhost/", i_localhost + 1) != 0 )
@@ -2349,12 +2345,22 @@ static int InputSourceInit( input_thread_t *p_input,
             }
             psz_path += i_localhost;
         }
+#else
+        {
+            /* XXX: very very ugly. Always true for valid URIs though. */
+            if( (psz_path - psz_dup) >= 2 && psz_path[-2] && psz_path[-1] )
+            {
+                *(--psz_path) = '\\';
+                *(--psz_path) = '\\';
+            }
+            msg_Err( p_input, "REMOTE: %s", psz_path );
+        }
+        else
+            /* Strip leading slash in front of the drive letter */
+            psz_path++;
+#endif
         /* Then URI-decode the path. */
         decode_URI( psz_path );
-#if defined( WIN32 ) && !defined( UNDER_CE )
-        /* Strip leading slash in front of the drive letter */
-        psz_path++;
-#endif
 #if (DIR_SEP_CHAR != '/')
         /* Turn slashes into anti-slashes */
         for( char *s = strchr( psz_path, '/' ); s; s = strchr( s + 1, '/' ) )
