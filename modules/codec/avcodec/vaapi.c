@@ -39,6 +39,7 @@
 
 #include "avcodec.h"
 #include "va.h"
+#include "copy.h"
 
 #ifdef HAVE_AVCODEC_VAAPI
 
@@ -82,6 +83,7 @@ typedef struct
     vlc_va_surface_t *p_surface;
 
     VAImage      image;
+    copy_cache_t image_cache;
 
 } vlc_va_vaapi_t;
 
@@ -172,7 +174,10 @@ error:
 static void DestroySurfaces( vlc_va_vaapi_t *p_va )
 {
     if( p_va->image.image_id )
+    {
+        CopyCleanCache( &p_va->image_cache );
         vaDestroyImage( p_va->p_display, p_va->image.image_id );
+    }
 
     if( p_va->i_context_id )
         vaDestroyContext( p_va->p_display, p_va->i_context_id );
@@ -248,17 +253,13 @@ static int CreateSurfaces( vlc_va_vaapi_t *p_va, void **pp_hw_ctx, vlc_fourcc_t 
     for( int i = 0; i < i_fmt_count; i++ )
     {
         if( p_fmt[i].fourcc == VA_FOURCC( 'Y', 'V', '1', '2' ) ||
-            p_fmt[i].fourcc == VA_FOURCC( 'I', '4', '2', '0' ) )
+            p_fmt[i].fourcc == VA_FOURCC( 'I', '4', '2', '0' ) ||
+            p_fmt[i].fourcc == VA_FOURCC( 'N', 'V', '1', '2' ) )
         {
-            i_chroma = VLC_FOURCC( 'I', '4', '2', '0' );
+            i_chroma = VLC_CODEC_YV12;
             fmt = p_fmt[i];
+            break;
         }
-        /* TODO: It seems that these may also be available (but not
-         * with my setup):
-         * VA_FOURCC( 'N', 'V', '1', '2')
-         * VA_FOURCC( 'U', 'Y', 'V', 'Y')
-         * VA_FOURCC( 'Y', 'U', 'Y', 'V')
-         */
     }
     free( p_fmt );
     if( !i_chroma )
@@ -271,6 +272,7 @@ static int CreateSurfaces( vlc_va_vaapi_t *p_va, void **pp_hw_ctx, vlc_fourcc_t 
         p_va->image.image_id = 0;
         goto error;
     }
+    CopyInitCache( &p_va->image_cache, i_width );
 
     /* Setup the ffmpeg hardware context */
     *pp_hw_ctx = &p_va->hw_ctx;
@@ -318,6 +320,9 @@ static int Extract( vlc_va_t *p_external, picture_t *p_picture, AVFrame *p_ff )
 {
     vlc_va_vaapi_t *p_va = vlc_va_vaapi_Get(p_external);
 
+    if( !p_va->image_cache.buffer )
+        return VLC_EGENERIC;
+
     VASurfaceID i_surface_id = (VASurfaceID)(uintptr_t)p_ff->data[3];
 
 #if VA_CHECK_VERSION(0,31,0)
@@ -340,28 +345,40 @@ static int Extract( vlc_va_t *p_external, picture_t *p_picture, AVFrame *p_ff )
     if( vaMapBuffer( p_va->p_display, p_va->image.buf, &p_base ) )
         return VLC_EGENERIC;
 
-    for( int i_plane = 0; i_plane < p_picture->i_planes; i_plane++ )
+    const uint32_t i_fourcc = p_va->image.format.fourcc;
+    if( i_fourcc == VA_FOURCC('Y','V','1','2') ||
+        i_fourcc == VA_FOURCC('I','4','2','0') )
     {
-        const int i_src_plane = ((p_va->image.format.fourcc == VA_FOURCC('Y','V','1','2' )) && i_plane != 0) ?  (3 - i_plane) : i_plane;
-        const uint8_t *p_src = (uint8_t*)p_base + p_va->image.offsets[i_src_plane];
-        const int i_src_stride = p_va->image.pitches[i_src_plane];
+        bool b_swap_uv = i_fourcc == VA_FOURCC('I','4','2','0');
+        uint8_t *pp_plane[3];
+        size_t  pi_pitch[3];
 
-        uint8_t *p_dst = p_picture->p[i_plane].p_pixels;
-        const int i_dst_stride = p_picture->p[i_plane].i_pitch;
+        for( int i = 0; i < 3; i++ )
+        {
+            const int i_src_plane = (b_swap_uv && i != 0) ?  (3 - i) : i;
+            pp_plane[i] = (uint8_t*)p_base + p_va->image.offsets[i_src_plane];
+            pi_pitch[i] = p_va->image.pitches[i_src_plane];
+        }
+        CopyFromYv12( p_picture, pp_plane, pi_pitch,
+                      p_va->i_surface_width,
+                      p_va->i_surface_height,
+                      &p_va->image_cache );
+    }
+    else
+    {
+        assert( i_fourcc == VA_FOURCC('N','V','1','2') );
+        uint8_t *pp_plane[2];
+        size_t  pi_pitch[2];
 
-        if( i_src_stride != i_dst_stride )
+        for( int i = 0; i < 2; i++ )
         {
-            for( int i = 0; i < p_picture->p[i_plane].i_visible_lines; i++ )
-            {
-                vlc_memcpy( p_dst, p_src, __MIN( i_src_stride, i_dst_stride ) );
-                p_src += i_src_stride;
-                p_dst += i_dst_stride;
-            }
+            pp_plane[i] = (uint8_t*)p_base + p_va->image.offsets[i];
+            pi_pitch[i] = p_va->image.pitches[i];
         }
-        else
-        {
-            vlc_memcpy( p_dst, p_src, p_picture->p[i_plane].i_visible_lines * i_src_stride );
-        }
+        CopyFromNv12( p_picture, pp_plane, pi_pitch,
+                      p_va->i_surface_width,
+                      p_va->i_surface_height,
+                      &p_va->image_cache );
     }
 
     if( vaUnmapBuffer( p_va->p_display, p_va->image.buf ) )
