@@ -86,6 +86,7 @@ struct vout_display_sys_t
     uint16_t width;      /* display width */
     uint16_t height;     /* display height */
     uint32_t data_size;  /* picture byte size (for non-SHM) */
+    bool     swap_uv;    /* U/V pointer must be swapped in a picture */
     bool shm;            /* whether to use MIT-SHM */
     bool visible;        /* whether it makes sense to draw at all */
 
@@ -319,6 +320,7 @@ static int Open (vlc_object_t *obj)
     p_sys->conn = conn;
     p_sys->att = NULL;
     p_sys->pool = NULL;
+    p_sys->swap_uv = false;
 
     if (!CheckXVideo (vd, conn))
     {
@@ -398,7 +400,10 @@ static int Open (vlc_object_t *obj)
             if (xfmt != NULL)
             {
                 p_sys->id = xfmt->id;
-                fmt.i_chroma = chroma;
+                p_sys->swap_uv = vlc_fourcc_AreUVPlanesSwapped (fmt.i_chroma,
+                                                                chroma);
+                if (!p_sys->swap_uv)
+                    fmt.i_chroma = chroma;
                 if (xfmt->type == XCB_XV_IMAGE_FORMAT_INFO_TYPE_RGB)
                 {
                     fmt.i_rmask = xfmt->red_mask;
@@ -611,7 +616,7 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
             /* We assume that offsets[0] is zero */
             for (int i = 1; i < __MIN (p_sys->att->num_planes, PICTURE_PLANE_MAX); i++)
                 res->p[i].p_pixels = res->p[0].p_pixels + offsets[i];
-            if (vd->fmt.i_chroma == VLC_CODEC_YV12)
+            if (p_sys->swap_uv)
             {   /* YVU: swap U and V planes */
                 uint8_t *buf = res->p[2].p_pixels;
                 res->p[2].p_pixels = res->p[1].p_pixels;
