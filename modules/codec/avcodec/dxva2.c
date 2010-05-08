@@ -180,7 +180,6 @@ static const dxva2_mode_t *Dxva2FindMode(const GUID *guid)
 }
 
 /* */
-#define VLC_CODEC_NV12 VLC_FOURCC('N','V','1','2') /* TODO move to vlc_fourcc.h */
 typedef struct {
     const char   *name;
     D3DFORMAT    format;

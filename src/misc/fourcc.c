@@ -700,6 +700,9 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_V210, "10-bit 4:2:2 Component YCbCr"),
         A("v210"),
 
+    B(VLC_CODEC_NV12, "Planar  Y, Packet UV (420)"),
+        A("NV12"),
+
     /* Videogames Codecs */
 
     /* Interplay MVE */
