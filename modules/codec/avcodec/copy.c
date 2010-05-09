@@ -297,12 +297,9 @@ static void SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
 int CopyInitCache(copy_cache_t *cache, unsigned width)
 {
     cache->size = __MAX((width + 0x0f) & ~ 0x0f, 4096);
-    cache->base = malloc(16 + cache->size);
-    if (cache->base == NULL) {
-        cache->buffer = NULL;
+    cache->buffer = vlc_memalign(&cache->base, 16, cache->size);
+    if (!cache->base)
         return VLC_EGENERIC;
-    }
-    cache->buffer = &cache->base[16 - ((intptr_t)cache->base & 0x0f)];
     return VLC_SUCCESS;
 }
 void CopyCleanCache(copy_cache_t *cache)
