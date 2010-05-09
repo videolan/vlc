@@ -51,7 +51,7 @@ static void I420_YUYV (filter_t *filter, picture_t *src, picture_t *dst)
 }
 
 void i420_uyvy_neon (uint8_t *out, const uint8_t **in,
-                     uintptr_t pitch, uintptr_t height);
+                     uintptr_t pitch, uintptr_t s_off, uintptr_t height);
 
 static void I420_UYVY (filter_t *filter, picture_t *src, picture_t *dst)
 {
@@ -61,7 +61,7 @@ static void I420_UYVY (filter_t *filter, picture_t *src, picture_t *dst)
     int i_pitch = (dst->p->i_pitch >> 1) & ~0xF;
     int s_offset = src->p->i_pitch - i_pitch;
 
-    i420_yuyv_neon (out, yuv, i_pitch, s_offset, height);
+    i420_uyvy_neon (out, yuv, i_pitch, s_offset, height);
 }
 
 VIDEO_FILTER_WRAPPER (I420_YUYV)
