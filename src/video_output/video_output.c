@@ -47,7 +47,6 @@
 
 #include <libvlc.h>
 #include <vlc_input.h>
-#include "vout_pictures.h"
 #include "vout_internal.h"
 #include "interlacing.h"
 #include "postprocessing.h"

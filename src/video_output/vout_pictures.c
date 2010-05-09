@@ -41,7 +41,6 @@
 #include <vlc_picture_fifo.h>
 #include <vlc_picture_pool.h>
 
-#include "vout_pictures.h"
 #include "vout_internal.h"
 
 /**

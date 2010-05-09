@@ -41,6 +41,7 @@
 #else
 #include <errno.h>
 #endif
+#include <assert.h>
 
 #include "libvlc.h"
 
@@ -405,3 +406,32 @@ void *vlc_memset (void *tgt, int c, size_t n)
 {
     return pf_vlc_memset (tgt, c, n);
 }
+
+/**
+ * Returned an aligned pointer on newly allocated memory.
+ * \param alignment must be a power of 2 and a multiple of sizeof(void*)
+ * \param size is the size of the usable memory returned.
+ *
+ * It must not be freed directly, *base must.
+ */
+void *vlc_memalign(void **base, size_t alignment, size_t size)
+{
+    assert(alignment >= sizeof(void*));
+    for (size_t t = alignment; t > 1; t >>= 1)
+        assert((t&1) == 0);
+#if defined(HAVE_POSIX_MEMALIGN)
+    if (posix_memalign(base, alignment, size)) {
+        *base = NULL;
+        return NULL;
+    }
+    return *base;
+#elif defined(HAVE_MEMALIGN)
+    return *base = memalign(alignment, size);
+#else
+    unsigned char *p = *base = malloc(size + alignment - 1);
+    if (!p)
+        return NULL;
+    return (void*)((uintptr_t)(p + alignment - 1) & ~(alignment - 1));
+#endif
+}
+
