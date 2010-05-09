@@ -22,15 +22,15 @@
 	.text
 
 #define O1	r0
-#define	O2	r1
-#define	PITCH	r2
-#define	S_OFF	r3
-#define	Y1	r4
-#define	Y2	r5
-#define	U	r6
-#define	V	r7
-#define	HEIGHT	r8
-#define	END_O1	r12
+#define O2	r1
+#define PITCH	r2
+#define S_OFF	r3
+#define Y1	r4
+#define Y2	r5
+#define U	r6
+#define V	r7
+#define HEIGHT	r8
+#define END_O1	r12
 
 	.align
 	.global i420_yuyv_neon
