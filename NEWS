@@ -1,6 +1,13 @@
 Changes between 1.1.0 and 1.2.0-git:
 ------------------------------------
 
+Codecs
+ * You can now use ffmpeg-mt in conjunction with vlc
+
+Video Filter:
+ * New gradfun filter for debanding videos using dithering
+
+
 Changes between 1.0.5 and 1.1.0-pre1:
 ------------------------------------
 Important changes for users:
