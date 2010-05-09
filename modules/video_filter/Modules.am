@@ -72,6 +72,7 @@ SOURCES_atmo = atmo/atmo.cpp \
 	atmo/AtmoMultiConnection.cpp atmo/AtmoMultiConnection.h \
 	atmo/MoMoConnection.cpp atmo/MoMoConnection.h \
 	atmo/AtmoPacketQueue.cpp atmo/AtmoPacketQueue.h
+SOURCES_gradfun = gradfun.c gradfun.h
 noinst_HEADERS = filter_picture.h
 
 libvlc_LTLIBRARIES += \
@@ -113,4 +114,5 @@ libvlc_LTLIBRARIES += \
 	libsharpen_plugin.la \
 	libwall_plugin.la \
 	libwave_plugin.la \
+	libgradfun_plugin.la \
 	libyuvp_plugin.la

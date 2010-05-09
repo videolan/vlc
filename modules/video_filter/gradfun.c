@@ -1,0 +1,262 @@
+/*****************************************************************************
+ * gradfun.c: wrapper for the gradfun filter from mplayer
+ *****************************************************************************
+ * Copyright (C) 2010 Laurent Aimar
+ * $Id$
+ *
+ * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <vlc_common.h>
+#include <vlc_plugin.h>
+#include <vlc_cpu.h>
+#include <vlc_filter.h>
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  Open (vlc_object_t *);
+static void Close(vlc_object_t *);
+
+#define CFG_PREFIX "gradfun-"
+
+#define RADIUS_MIN (4)
+#define RADIUS_MAX (32)
+#define RADIUS_TEXT N_("Radius")
+#define RADIUS_LONGTEXT N_("Radius in pixels")
+
+#define STRENGTH_MIN (0.51)
+#define STRENGTH_MAX (255)
+#define STRENGTH_TEXT N_("Strength")
+#define STRENGTH_LONGTEXT N_("Strength used to modify the value of a pixel")
+
+vlc_module_begin()
+    set_description(N_("Gradfun video filter"))
+    set_shortname(N_("Gradfun"))
+    set_help("Debanding algorithm")
+    set_capability("video filter2", 0)
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VFILTER)
+    add_integer_with_range(CFG_PREFIX "radius", 16, RADIUS_MIN, RADIUS_MAX,
+                           NULL, RADIUS_TEXT, RADIUS_LONGTEXT, false)
+    add_float_with_range(CFG_PREFIX "strength", 1.2, STRENGTH_MIN, STRENGTH_MAX,
+                         NULL, STRENGTH_TEXT, STRENGTH_LONGTEXT, false)
+
+    set_callbacks(Open, Close)
+vlc_module_end()
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+#define FFMAX(a,b) __MAX(a,b)
+#ifdef CAN_COMPILE_MMXEXT
+#   define HAVE_MMX2 1
+#else
+#   define HAVE_MMX2 0
+#endif
+#ifdef CAN_COMPILE_SSE2
+#   define HAVE_SSE2 1
+#else
+#   define HAVE_SSE2 0
+#endif
+#ifdef CAN_COMPILE_SSSE3
+#   define HAVE_SSSE3 1
+#else
+#   define HAVE_SSSE3 0
+#endif
+// FIXME too restrictive
+#ifdef __x86_64__
+#   define HAVE_6REGS 1
+#else
+#   define HAVE_6REGS 0
+#endif
+#define av_clip_uint8 clip_uint8_vlc
+#include "gradfun.h"
+
+static picture_t *Filter(filter_t *, picture_t *);
+static int Callback(vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void *);
+
+struct filter_sys_t {
+    vlc_mutex_t      lock;
+    float            strength;
+    int              radius;
+    int              h_shift;
+    int              v_shift;
+    void             *base_buf;
+    struct vf_priv_s cfg;
+};
+
+static int Open(vlc_object_t *object)
+{
+    filter_t *filter = (filter_t *)object;
+
+    int h_shift;
+    int v_shift;
+    switch (filter->fmt_in.video.i_chroma) {
+    case VLC_CODEC_I410:
+    case VLC_CODEC_YV9:
+        h_shift = 2; v_shift = 2;
+        break;
+    case VLC_CODEC_I411:
+        h_shift = 2; v_shift = 0;
+        break;
+    case VLC_CODEC_I420:
+    case VLC_CODEC_J420:
+    case VLC_CODEC_YV12:
+        h_shift = 1; v_shift = 1;
+        break;
+    case VLC_CODEC_I422:
+    case VLC_CODEC_J422:
+        h_shift = 1; v_shift = 0;
+        break;
+    case VLC_CODEC_I444:
+    case VLC_CODEC_J444:
+    case VLC_CODEC_YUVA:
+        h_shift = 0; v_shift = 0;
+        break;
+    case VLC_CODEC_I440:
+    case VLC_CODEC_J440:
+        h_shift = 0; v_shift = 1;
+        break;
+    default:
+        return VLC_EGENERIC;
+    }
+
+    filter_sys_t *sys = malloc(sizeof(*sys));
+    if (!sys)
+        return VLC_ENOMEM;
+
+    vlc_mutex_init(&sys->lock);
+    sys->h_shift  = h_shift;
+    sys->v_shift  = v_shift;
+    sys->strength = var_CreateGetFloatCommand(filter,   CFG_PREFIX "strength");
+    sys->radius   = var_CreateGetIntegerCommand(filter, CFG_PREFIX "radius");
+    var_AddCallback(filter, CFG_PREFIX "strength", Callback, NULL);
+    var_AddCallback(filter, CFG_PREFIX "radius",   Callback, NULL);
+    sys->base_buf = NULL;
+
+    struct vf_priv_s *cfg = &sys->cfg;
+    cfg->thresh      = 0.0;
+    cfg->radius      = 0;
+    cfg->buf         = NULL;
+    cfg->filter_line = filter_line_c;
+    cfg->blur_line   = blur_line_c;
+
+#if HAVE_SSE2 && HAVE_6REGS
+    if (vlc_CPU() & CPU_CAPABILITY_SSE2)
+        cfg->blur_line = blur_line_sse2;
+#endif
+#if HAVE_MMX2
+    if (vlc_CPU() & CPU_CAPABILITY_MMXEXT)
+        cfg->filter_line = filter_line_mmx2;
+#endif
+#if HAVE_SSSE3
+    if (vlc_CPU() & CPU_CAPABILITY_SSSE3)
+        cfg->filter_line = filter_line_ssse3;
+#endif
+
+    filter->p_sys           = sys;
+    filter->pf_video_filter = Filter;
+    return VLC_SUCCESS;
+}
+
+static void Close(vlc_object_t *object)
+{
+    filter_t     *filter = (filter_t *)object;
+    filter_sys_t *sys = filter->p_sys;
+
+    free(sys->base_buf);
+    vlc_mutex_destroy(&sys->lock);
+    free(sys);
+}
+
+static picture_t *Filter(filter_t *filter, picture_t *src)
+{
+    filter_sys_t *sys = filter->p_sys;
+
+    picture_t *dst = filter_NewPicture(filter);
+    if (!dst) {
+        picture_Release(src);
+        return NULL;
+    }
+
+    vlc_mutex_lock(&sys->lock);
+    float strength = __MIN(__MAX(sys->strength, STRENGTH_MIN), STRENGTH_MAX);
+    int   radius   = __MIN(__MAX((sys->radius + 1) & ~1, RADIUS_MIN), RADIUS_MAX);
+    vlc_mutex_unlock(&sys->lock);
+
+    const video_format_t *fmt = &filter->fmt_in.video;
+    struct vf_priv_s *cfg = &sys->cfg;
+
+    cfg->thresh = (1 << 15) / strength;
+    if (cfg->radius != radius) {
+        cfg->radius = radius;
+        cfg->buf    = vlc_memalign(&sys->base_buf, 16,
+                                   (((fmt->i_width + 15) & ~15) * (cfg->radius + 1) / 2 + 32) * sizeof(*cfg->buf));
+    }
+
+    for (int i = 0; i < dst->i_planes; i++) {
+        const plane_t *srcp = &src->p[i];
+        plane_t       *dstp = &dst->p[i];
+
+        int w = fmt->i_width;
+        int h = fmt->i_height;
+        int r = cfg->radius;
+        if (i > 0) {
+            w >>= sys->h_shift;
+            h >>= sys->v_shift;
+            r = ((r >> sys->h_shift) + (r >> sys->v_shift)) / 2;
+            r = __MIN(__MAX((r + 1) & ~1, RADIUS_MIN), RADIUS_MAX);
+        }
+        if (__MIN(w, h) > 2 * r && cfg->buf) {
+            filter_plane(cfg, dstp->p_pixels, srcp->p_pixels,
+                         w, h, dstp->i_pitch, srcp->i_pitch, r);
+        } else {
+            plane_CopyPixels(dstp, srcp);
+        }
+    }
+
+    picture_CopyProperties(dst, src);
+    picture_Release(src);
+    return dst;
+}
+
+static int Callback(vlc_object_t *object, char const *cmd,
+                    vlc_value_t oldval, vlc_value_t newval, void *data)
+{
+    filter_t     *filter = (filter_t *)object;
+    filter_sys_t *sys = filter->p_sys;
+    VLC_UNUSED(oldval); VLC_UNUSED(data);
+
+    vlc_mutex_lock(&sys->lock);
+    if (!strcmp(cmd, CFG_PREFIX "strength"))
+        sys->strength = newval.f_float;
+    else
+        sys->radius    = newval.i_int;
+    vlc_mutex_unlock(&sys->lock);
+
+    return VLC_SUCCESS;
+}
+
