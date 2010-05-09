@@ -2301,6 +2301,7 @@ endif
 		--disable-ladspa \
 		--disable-oss-support \
 		--disable-alsa-support \
+		--disable-pulse-support \
 		--disable-midishare \
 		--disable-jack-support \
 		--disable-coreaudio \
