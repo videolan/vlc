@@ -184,14 +184,9 @@ static int vlclua_net_recv( lua_State *L )
     int i_fd = luaL_checkint( L, 1 );
     size_t i_len = luaL_optint( L, 2, 1 );
     char psz_buffer[i_len];
-    i_len = recv( i_fd, psz_buffer, i_len, 0 );
-    if( i_len > 0 )
-    {
-        lua_pushlstring( L, psz_buffer, i_len );
-        return 1;
-    }
-    else
-        return 0;
+    ssize_t i_ret = recv( i_fd, psz_buffer, i_len, 0 );
+    lua_pushlstring( L, psz_buffer, (i_ret >= 0) ? i_ret : 0 );
+    return 1;
 }
 
 /*****************************************************************************
@@ -261,8 +256,8 @@ static int vlclua_fd_read( lua_State *L )
     int i_fd = luaL_checkint( L, 1 );
     size_t i_len = luaL_optint( L, 2, 1 );
     char psz_buffer[i_len];
-    i_len = read( i_fd, psz_buffer, i_len );
-    lua_pushlstring( L, psz_buffer, i_len );
+    ssize_t i_ret = read( i_fd, psz_buffer, i_len );
+    lua_pushlstring( L, psz_buffer, (i_ret >= 0) ? i_ret : 0 );
     return 1;
 }
 
