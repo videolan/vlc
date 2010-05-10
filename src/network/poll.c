@@ -30,7 +30,7 @@
 #include <vlc_network.h>
 
 
-#if HAVE_MAEMO
+#ifdef HAVE_MAEMO
 # include <signal.h>
 # include <errno.h>
 # include <poll.h>
