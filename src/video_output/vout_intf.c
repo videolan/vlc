@@ -57,6 +57,8 @@ static int ZoomCallback( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 static int CropCallback( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
+static int CropBorderCallback( vlc_object_t *, char const *,
+                               vlc_value_t, vlc_value_t, void * );
 static int AspectCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int ScalingCallback( vlc_object_t *, char const *,
@@ -212,10 +214,10 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "crop-right", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_Create( p_vout, "crop-bottom", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
 
-    var_AddCallback( p_vout, "crop-left", CropCallback, NULL );
-    var_AddCallback( p_vout, "crop-top", CropCallback, NULL );
-    var_AddCallback( p_vout, "crop-right", CropCallback, NULL );
-    var_AddCallback( p_vout, "crop-bottom", CropCallback, NULL );
+    var_AddCallback( p_vout, "crop-left", CropBorderCallback, NULL );
+    var_AddCallback( p_vout, "crop-top", CropBorderCallback, NULL );
+    var_AddCallback( p_vout, "crop-right", CropBorderCallback, NULL );
+    var_AddCallback( p_vout, "crop-bottom", CropBorderCallback, NULL );
 
     /* Crop object var */
     var_Create( p_vout, "crop", VLC_VAR_STRING | VLC_VAR_ISCOMMAND |
@@ -627,224 +629,59 @@ static int ZoomCallback( vlc_object_t *p_this, char const *psz_cmd,
     return var_SetFloat( p_this, "scale", newval.f_float );
 }
 
-static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int CropCallback( vlc_object_t *object, char const *cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *data )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    int64_t i_aspect_num, i_aspect_den;
-    unsigned int i_width, i_height;
+    vout_thread_t *vout = (vout_thread_t *)object;
+    VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(data);
+    unsigned num, den;
+    unsigned y, x;
+    unsigned width, height;
+    unsigned left, top, right, bottom;
 
-    (void)oldval; (void)p_data;
-
-    /* Restore defaults */
-    p_vout->p->fmt_in.i_x_offset = p_vout->p->fmt_render.i_x_offset;
-    p_vout->p->fmt_in.i_visible_width = p_vout->p->fmt_render.i_visible_width;
-    p_vout->p->fmt_in.i_y_offset = p_vout->p->fmt_render.i_y_offset;
-    p_vout->p->fmt_in.i_visible_height = p_vout->p->fmt_render.i_visible_height;
-
-    if( !strcmp( psz_cmd, "crop" ) )
-    {
-        char *psz_end = NULL, *psz_parser = strchr( newval.psz_string, ':' );
-        if( psz_parser )
-        {
-            /* We're using the 3:4 syntax */
-            i_aspect_num = strtol( newval.psz_string, &psz_end, 10 );
-            if( psz_end == newval.psz_string || !i_aspect_num ) goto crop_end;
-
-            i_aspect_den = strtol( ++psz_parser, &psz_end, 10 );
-            if( psz_end == psz_parser || !i_aspect_den ) goto crop_end;
-
-            i_width = p_vout->p->fmt_in.i_sar_den*p_vout->p->fmt_render.i_visible_height *
-                i_aspect_num / i_aspect_den / p_vout->p->fmt_in.i_sar_num;
-            i_height = p_vout->p->fmt_render.i_visible_width*p_vout->p->fmt_in.i_sar_num *
-                i_aspect_den / i_aspect_num / p_vout->p->fmt_in.i_sar_den;
-
-            if( i_width < p_vout->p->fmt_render.i_visible_width )
-            {
-                p_vout->p->fmt_in.i_x_offset = p_vout->p->fmt_render.i_x_offset +
-                    (p_vout->p->fmt_render.i_visible_width - i_width) / 2;
-                p_vout->p->fmt_in.i_visible_width = i_width;
-            }
-            else
-            {
-                p_vout->p->fmt_in.i_y_offset = p_vout->p->fmt_render.i_y_offset +
-                    (p_vout->p->fmt_render.i_visible_height - i_height) / 2;
-                p_vout->p->fmt_in.i_visible_height = i_height;
-            }
-        }
-        else
-        {
-            psz_parser = strchr( newval.psz_string, 'x' );
-            if( psz_parser )
-            {
-                /* Maybe we're using the <width>x<height>+<left>+<top> syntax */
-                unsigned int i_crop_width, i_crop_height, i_crop_top, i_crop_left;
-
-                i_crop_width = strtol( newval.psz_string, &psz_end, 10 );
-                if( psz_end != psz_parser ) goto crop_end;
-
-                psz_parser = strchr( ++psz_end, '+' );
-                i_crop_height = strtol( psz_end, &psz_end, 10 );
-                if( psz_end != psz_parser ) goto crop_end;
-
-                psz_parser = strchr( ++psz_end, '+' );
-                i_crop_left = strtol( psz_end, &psz_end, 10 );
-                if( psz_end != psz_parser ) goto crop_end;
-
-                psz_end++;
-                i_crop_top = strtol( psz_end, &psz_end, 10 );
-                if( *psz_end != '\0' ) goto crop_end;
-
-                if( i_crop_top + i_crop_height >= p_vout->p->fmt_render.i_visible_height ||
-                    i_crop_left + i_crop_width >= p_vout->p->fmt_render.i_visible_width )
-                {
-                    msg_Err( p_vout, "Unable to crop over picture boundaries");
-                    return VLC_EGENERIC;
-                }
-
-                i_width = i_crop_width;
-                p_vout->p->fmt_in.i_visible_width = i_width;
-
-                i_height = i_crop_height;
-                p_vout->p->fmt_in.i_visible_height = i_height;
-
-                p_vout->p->fmt_in.i_x_offset = i_crop_left;
-                p_vout->p->fmt_in.i_y_offset = i_crop_top;
-            }
-            else
-            {
-                /* Maybe we're using the <left>+<top>+<right>+<bottom> syntax */
-                unsigned int i_crop_top, i_crop_left, i_crop_bottom, i_crop_right;
-
-                psz_parser = strchr( newval.psz_string, '+' );
-                i_crop_left = strtol( newval.psz_string, &psz_end, 10 );
-                if( psz_end != psz_parser ) goto crop_end;
-
-                psz_parser = strchr( ++psz_end, '+' );
-                i_crop_top = strtol( psz_end, &psz_end, 10 );
-                if( psz_end != psz_parser ) goto crop_end;
-
-                psz_parser = strchr( ++psz_end, '+' );
-                i_crop_right = strtol( psz_end, &psz_end, 10 );
-                if( psz_end != psz_parser ) goto crop_end;
-
-                psz_end++;
-                i_crop_bottom = strtol( psz_end, &psz_end, 10 );
-                if( *psz_end != '\0' ) goto crop_end;
-
-                if( i_crop_top + i_crop_bottom >= p_vout->p->fmt_render.i_visible_height ||
-                    i_crop_right + i_crop_left >= p_vout->p->fmt_render.i_visible_width )
-                {
-                    msg_Err( p_vout, "Unable to crop over picture boundaries" );
-                    return VLC_EGENERIC;
-                }
-
-                i_width = p_vout->p->fmt_render.i_visible_width
-                          - i_crop_left - i_crop_right;
-                p_vout->p->fmt_in.i_visible_width = i_width;
-
-                i_height = p_vout->p->fmt_render.i_visible_height
-                           - i_crop_top - i_crop_bottom;
-                p_vout->p->fmt_in.i_visible_height = i_height;
-
-                p_vout->p->fmt_in.i_x_offset = i_crop_left;
-                p_vout->p->fmt_in.i_y_offset = i_crop_top;
-            }
-        }
+    if (sscanf(newval.psz_string, "%u:%u", &num, &den) == 2) {
+        vout_ControlChangeCropRatio(vout, num, den);
+    } else if (sscanf(newval.psz_string, "%ux%u+%u+%u",
+                      &width, &height, &x, &y) == 4) {
+        vout_ControlChangeCropWindow(vout, x, y, width, height);
+    } else if (sscanf(newval.psz_string, "%u+%u+%u+%u",
+                    &left, &top, &right, &bottom) == 4) {
+        vout_ControlChangeCropBorder(vout, left, top, right, bottom);
+    } else if (*newval.psz_string == '\0') {
+        vout_ControlChangeCropRatio(vout, 0, 0);
+    } else {
+        msg_Err(object, "Unknown crop format (%s)", newval.psz_string);
     }
-    else if( !strcmp( psz_cmd, "crop-top" )
-          || !strcmp( psz_cmd, "crop-left" )
-          || !strcmp( psz_cmd, "crop-bottom" )
-          || !strcmp( psz_cmd, "crop-right" ) )
-    {
-        unsigned int i_crop_top, i_crop_left, i_crop_bottom, i_crop_right;
-
-        i_crop_top = var_GetInteger( p_vout, "crop-top" );
-        i_crop_left = var_GetInteger( p_vout, "crop-left" );
-        i_crop_right = var_GetInteger( p_vout, "crop-right" );
-        i_crop_bottom = var_GetInteger( p_vout, "crop-bottom" );
-
-        if( i_crop_top + i_crop_bottom >= p_vout->p->fmt_render.i_visible_height ||
-            i_crop_right + i_crop_left >= p_vout->p->fmt_render.i_visible_width )
-        {
-            msg_Err( p_vout, "Unable to crop over picture boundaries" );
-            return VLC_EGENERIC;
-        }
-
-        i_width = p_vout->p->fmt_render.i_visible_width
-                  - i_crop_left - i_crop_right;
-        p_vout->p->fmt_in.i_visible_width = i_width;
-
-        i_height = p_vout->p->fmt_render.i_visible_height
-                   - i_crop_top - i_crop_bottom;
-        p_vout->p->fmt_in.i_visible_height = i_height;
-
-        p_vout->p->fmt_in.i_x_offset = i_crop_left;
-        p_vout->p->fmt_in.i_y_offset = i_crop_top;
-    }
-
- crop_end:
-    p_vout->p->i_changes |= VOUT_CROP_CHANGE;
-
-    msg_Dbg( p_vout, "cropping picture %ix%i to %i,%i,%ix%i",
-             p_vout->p->fmt_in.i_width, p_vout->p->fmt_in.i_height,
-             p_vout->p->fmt_in.i_x_offset, p_vout->p->fmt_in.i_y_offset,
-             p_vout->p->fmt_in.i_visible_width,
-             p_vout->p->fmt_in.i_visible_height );
-
-    var_TriggerCallback( p_vout, "crop-update" );
-
     return VLC_SUCCESS;
 }
 
-static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int CropBorderCallback(vlc_object_t *object, char const *cmd,
+                              vlc_value_t oldval, vlc_value_t newval, void *data)
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    unsigned int i_aspect_num, i_aspect_den, i_sar_num, i_sar_den;
-    vlc_value_t val;
+    vout_thread_t *vout = (vout_thread_t *)object;
+    VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(data); VLC_UNUSED(newval);
 
-    char *psz_end, *psz_parser = strchr( newval.psz_string, ':' );
-    (void)psz_cmd; (void)oldval; (void)p_data;
+    vout_ControlChangeCropBorder(vout,
+                                 var_GetInteger(object, "crop-left"),
+                                 var_GetInteger(object, "crop-top"),
+                                 var_GetInteger(object, "crop-right"),
+                                 var_GetInteger(object, "crop-bottom"));
+    return VLC_SUCCESS;
+}
 
-    /* Restore defaults */
-    p_vout->p->fmt_in.i_sar_num = p_vout->p->fmt_render.i_sar_num;
-    p_vout->p->fmt_in.i_sar_den = p_vout->p->fmt_render.i_sar_den;
+static int AspectCallback( vlc_object_t *object, char const *cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *data )
+{
+    vout_thread_t *vout = (vout_thread_t *)object;
+    VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(data);
+    unsigned num, den;
 
-    if( !psz_parser ) goto aspect_end;
-
-    i_aspect_num = strtol( newval.psz_string, &psz_end, 10 );
-    if( psz_end == newval.psz_string || !i_aspect_num ) goto aspect_end;
-
-    i_aspect_den = strtol( ++psz_parser, &psz_end, 10 );
-    if( psz_end == psz_parser || !i_aspect_den ) goto aspect_end;
-
-    i_sar_num = i_aspect_num * p_vout->p->fmt_render.i_visible_height;
-    i_sar_den = i_aspect_den * p_vout->p->fmt_render.i_visible_width;
-    vlc_ureduce( &i_sar_num, &i_sar_den, i_sar_num, i_sar_den, 0 );
-    p_vout->p->fmt_in.i_sar_num = i_sar_num;
-    p_vout->p->fmt_in.i_sar_den = i_sar_den;
-
- aspect_end:
-    if( p_vout->p->i_par_num && p_vout->p->i_par_den )
-    {
-        p_vout->p->fmt_in.i_sar_num *= p_vout->p->i_par_den;
-        p_vout->p->fmt_in.i_sar_den *= p_vout->p->i_par_num;
-    }
-
-    p_vout->p->i_changes |= VOUT_ASPECT_CHANGE;
-
-    msg_Dbg( p_vout, "new aspect-ratio %i:%i, sample aspect-ratio %i:%i",
-             p_vout->p->fmt_in.i_sar_num * p_vout->p->fmt_in.i_width,
-             p_vout->p->fmt_in.i_sar_den * p_vout->p->fmt_in.i_height,
-             p_vout->p->fmt_in.i_sar_num, p_vout->p->fmt_in.i_sar_den );
-
-    if( var_Get( p_vout, "crop", &val ) )
-        return VLC_EGENERIC;
-
-    int i_ret = CropCallback( p_this, "crop", val, val, 0 );
-    free( val.psz_string );
-    return i_ret;
+    if (sscanf(newval.psz_string, "%u:%u", &num, &den) == 2 &&
+        (num > 0) == (den > 0))
+        vout_ControlChangeSampleAspectRatio(vout, num, den);
+    else if (*newval.psz_string == '\0')
+        vout_ControlChangeSampleAspectRatio(vout, 0, 0);
+    return VLC_SUCCESS;
 }
 
 static int ScalingCallback( vlc_object_t *p_this, char const *psz_cmd,

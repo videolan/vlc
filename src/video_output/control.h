@@ -40,10 +40,6 @@ enum {
 
     /* Controls */
 
-    VOUT_CONTROL_SOURCE_ASPECT,
-    VOUT_CONTROL_SOURCE_CROP_BORDER,
-    VOUT_CONTROL_SOURCE_CROP_RATIO,
-    VOUT_CONTROL_SOURCE_CROP_WINDOW,
 
     /* OSD */
     VOUT_CONTROL_OSD_MESSAGE,
@@ -64,6 +60,11 @@ enum {
     VOUT_CONTROL_ON_TOP,                /* bool */
     VOUT_CONTROL_DISPLAY_FILLED,        /* bool */
     VOUT_CONTROL_ZOOM,                  /* pair */
+
+    VOUT_CONTROL_ASPECT_RATIO,          /* pair */
+    VOUT_CONTROL_CROP_BORDER,           /* border */
+    VOUT_CONTROL_CROP_RATIO,            /* pair */
+    VOUT_CONTROL_CROP_WINDOW,           /* window */
 };
 
 typedef struct {
@@ -86,17 +87,6 @@ typedef struct {
             int channel;
             char *string;
         } message;
-#if 0
-        struct {
-            int channel;
-            char *string;
-            text_style_t *style;
-            int flags;
-            int hmargin;
-            int vmargin;
-            mtime_t start;
-            mtime_t stop;
-        } text;
         struct {
             unsigned left;
             unsigned top;
@@ -109,17 +99,6 @@ typedef struct {
             unsigned width;
             unsigned height;
         } window;
-        struct {
-            int   channel;
-            int   type;
-            float position;
-        } slider;
-        struct {
-            int channel;
-            int icon;
-        } icon;
-        subpicture_t *subpicture;
-#endif
     } u;
 } vout_control_cmd_t;
 

@@ -49,9 +49,7 @@ struct vout_thread_sys_t
     config_chain_t *p_cfg;
 
     /* */
-    video_format_t  fmt_render;      /* render format (from the decoder) */
-    video_format_t  fmt_in;            /* input (modified render) format */
-    video_format_t  fmt_out;     /* output format (for the video output) */
+    video_format_t  original; /* Original format ie coming from the decoder */
 
     /* Thread & synchronization */
     vlc_thread_t    thread;
@@ -129,27 +127,17 @@ struct vout_thread_sys_t
     vout_chrono_t       render;           /**< picture render time estimator */
 
     vlc_mutex_t         change_lock;                 /**< thread change lock */
-
-    uint16_t            i_changes;          /**< changes made to the thread.
-                                                      \see \ref vout_changes */
 };
-
-/** \defgroup vout_changes Flags for changes
- * These flags are set in the vout_thread_t::i_changes field when another
- * thread changed a variable
- * @{
- */
-/** cropping parameters changed */
-#define VOUT_CROP_CHANGE        0x1000
-/** aspect ratio changed */
-#define VOUT_ASPECT_CHANGE      0x2000
-/**@}*/
 
 /* TODO to move them to vlc_vout.h */
 void vout_ControlChangeFullscreen(vout_thread_t *, bool fullscreen);
 void vout_ControlChangeOnTop(vout_thread_t *, bool is_on_top);
 void vout_ControlChangeDisplayFilled(vout_thread_t *, bool is_filled);
 void vout_ControlChangeZoom(vout_thread_t *, int num, int den);
+void vout_ControlChangeSampleAspectRatio(vout_thread_t *, unsigned num, unsigned den);
+void vout_ControlChangeCropRatio(vout_thread_t *, unsigned num, unsigned den);
+void vout_ControlChangeCropWindow(vout_thread_t *, int x, int y, int width, int height);
+void vout_ControlChangeCropBorder(vout_thread_t *, int left, int top, int right, int bottom);
 
 /* */
 void vout_IntfInit( vout_thread_t * );

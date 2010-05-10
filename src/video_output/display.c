@@ -526,15 +526,13 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
         osys->mouse.last_moved = mdate();
 
     /* */
-    vlc_mutex_unlock(&osys->lock);
-
-    /* */
     vout_SendEventMouseVisible(osys->vout);
 #ifdef ALLOW_DUMMY_VOUT
     DummyVoutSendDisplayEventMouse(osys->vout, &osys->vout_mouse, &m);
 #else
     vout_SendDisplayEventMouse(osys->vout, &m);
 #endif
+    vlc_mutex_unlock(&osys->lock);
 }
 
 static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
@@ -1412,7 +1410,7 @@ void vout_SendDisplayEventMouse(vout_thread_t *vout, const vlc_mouse_t *m)
     vlc_mouse_t tmp;
 
     /* The check on p_spu is needed as long as ALLOW_DUMMY_VOUT is defined */
-    if (vout->p->p_spu && spu_ProcessMouse( vout->p->p_spu, m, &vout->p->fmt_out))
+    if (vout->p->p_spu && spu_ProcessMouse( vout->p->p_spu, m, &vout->p->display.vd->source))
         return;
 
     vlc_mutex_lock( &vout->p->vfilter_lock );

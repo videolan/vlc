@@ -161,11 +161,7 @@ vout_thread_t *vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
             free( psz_filter_chain );
         }
 
-#warning "FIXME: Check RGB masks in vout_Request"
-        /* FIXME: check RGB masks */
-        if( p_vout->p->fmt_render.i_chroma != vlc_fourcc_GetCodec( VIDEO_ES, p_fmt->i_chroma ) ||
-            p_vout->p->fmt_render.i_width != p_fmt->i_width ||
-            p_vout->p->fmt_render.i_height != p_fmt->i_height ||
+        if( !video_format_IsSimilar( &p_vout->p->original, p_fmt ) ||
             p_vout->p->b_filter_change )
         {
             vlc_mutex_unlock( &p_vout->p->change_lock );
@@ -178,32 +174,6 @@ vout_thread_t *vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         else
         {
             /* This video output is cool! Hijack it. */
-            /* Correct aspect ratio on change
-             * FIXME factorize this code with other aspect ration related code */
-            unsigned int i_sar_num;
-            unsigned int i_sar_den;
-            vlc_ureduce( &i_sar_num, &i_sar_den,
-                         p_fmt->i_sar_num, p_fmt->i_sar_den, 50000 );
-#if 0
-            /* What's that, it does not seems to be used correcly everywhere */
-            if( p_vout->i_par_num > 0 && p_vout->i_par_den > 0 )
-            {
-                i_sar_num *= p_vout->i_par_den;
-                i_sar_den *= p_vout->i_par_num;
-            }
-#endif
-
-            if( i_sar_num > 0 && i_sar_den > 0 &&
-                ( i_sar_num != p_vout->p->fmt_render.i_sar_num ||
-                  i_sar_den != p_vout->p->fmt_render.i_sar_den ) )
-            {
-                p_vout->p->fmt_in.i_sar_num = i_sar_num;
-                p_vout->p->fmt_in.i_sar_den = i_sar_den;
-
-                p_vout->p->fmt_render.i_sar_num = i_sar_num;
-                p_vout->p->fmt_render.i_sar_den = i_sar_den;
-                p_vout->p->i_changes |= VOUT_ASPECT_CHANGE;
-            }
             vlc_mutex_unlock( &p_vout->p->change_lock );
 
             vlc_object_release( p_vout );
@@ -272,17 +242,12 @@ vout_thread_t * (vout_Create)( vlc_object_t *p_parent, video_format_t *p_fmt )
     }
 
     /* */
-    p_vout->p->fmt_render        = *p_fmt;   /* FIXME palette */
-    p_vout->p->fmt_in            = *p_fmt;   /* FIXME palette */
-
-    p_vout->p->fmt_render.i_chroma = 
-    p_vout->p->fmt_in.i_chroma     = i_chroma;
-    video_format_FixRgb( &p_vout->p->fmt_render );
-    video_format_FixRgb( &p_vout->p->fmt_in );
+    p_vout->p->original = *p_fmt;   /* FIXME palette */
+    p_vout->p->original.i_chroma = i_chroma;
+    video_format_FixRgb( &p_vout->p->original );
 
     /* Initialize misc stuff */
     vout_control_Init( &p_vout->p->control );
-    p_vout->p->i_changes    = 0;
     vout_chrono_Init( &p_vout->p->render, 5, 10000 ); /* Arbitrary initial time */
     vout_statistic_Init( &p_vout->p->statistic );
     p_vout->p->b_filter_change = 0;
@@ -593,6 +558,42 @@ void vout_ControlChangeZoom(vout_thread_t *vout, int num, int den)
     vout_control_PushPair(&vout->p->control, VOUT_CONTROL_ZOOM,
                           num, den);
 }
+void vout_ControlChangeSampleAspectRatio(vout_thread_t *vout,
+                                         unsigned num, unsigned den)
+{
+    vout_control_PushPair(&vout->p->control, VOUT_CONTROL_ASPECT_RATIO,
+                          num, den);
+}
+void vout_ControlChangeCropRatio(vout_thread_t *vout,
+                                 unsigned num, unsigned den)
+{
+    vout_control_PushPair(&vout->p->control, VOUT_CONTROL_CROP_RATIO,
+                          num, den);
+}
+void vout_ControlChangeCropWindow(vout_thread_t *vout,
+                                  int x, int y, int width, int height)
+{
+    vout_control_cmd_t cmd;
+    vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_WINDOW);
+    cmd.u.window.x      = x;
+    cmd.u.window.y      = y;
+    cmd.u.window.width  = width;
+    cmd.u.window.height = height;
+
+    vout_control_Push(&vout->p->control, &cmd);
+}
+void vout_ControlChangeCropBorder(vout_thread_t *vout,
+                                  int left, int top, int right, int bottom)
+{
+    vout_control_cmd_t cmd;
+    vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_BORDER);
+    cmd.u.border.left   = left;
+    cmd.u.border.top    = top;
+    cmd.u.border.right  = right;
+    cmd.u.border.bottom = bottom;
+
+    vout_control_Push(&vout->p->control, &cmd);
+}
 
 /*****************************************************************************
  * InitThread: initialize video output thread
@@ -613,19 +614,14 @@ static int ThreadInit(vout_thread_t *vout)
 
     /* print some usefull debug info about different vout formats
      */
-    PrintVideoFormat(vout, "pic render", &vout->p->fmt_render);
-    PrintVideoFormat(vout, "pic in",     &vout->p->fmt_in);
-    PrintVideoFormat(vout, "pic out",    &vout->p->fmt_out);
-
-    assert(vout->p->fmt_out.i_width  == vout->p->fmt_render.i_width &&
-           vout->p->fmt_out.i_height == vout->p->fmt_render.i_height &&
-           vout->p->fmt_out.i_chroma == vout->p->fmt_render.i_chroma);
+    PrintVideoFormat(vout, "pic render", &vout->p->original);
     return VLC_SUCCESS;
 }
 
 static int ThreadDisplayPicture(vout_thread_t *vout,
                                 bool now, mtime_t *deadline)
 {
+    vout_display_t *vd = vout->p->display.vd;
     int displayed_count = 0;
     int lost_count = 0;
 
@@ -743,7 +739,7 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
             (vout->p->decoder_pool != vout->p->display_pool || subpic)) {
             picture_t *render;
             if (vout->p->is_decoder_pool_slow)
-                render = picture_NewFromFormat(&vout->p->fmt_out);
+                render = picture_NewFromFormat(&vd->source);
             else if (vout->p->decoder_pool != vout->p->display_pool)
                 render = picture_pool_Get(vout->p->display_pool);
             else
@@ -753,8 +749,8 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
                 picture_Copy(render, filtered);
 
                 spu_RenderSubpictures(vout->p->p_spu,
-                                      render, &vout->p->fmt_out,
-                                      subpic, &vout->p->fmt_in, spu_render_time);
+                                      render, &vd->source,
+                                      subpic, &vd->source, spu_render_time);
             }
             if (vout->p->is_decoder_pool_slow) {
                 direct = picture_pool_Get(vout->p->display_pool);
@@ -775,7 +771,7 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
          * Take a snapshot if requested
          */
         if (direct && do_snapshot)
-            vout_snapshot_Set(&vout->p->snapshot, &vout->p->fmt_out, direct);
+            vout_snapshot_Set(&vout->p->snapshot, &vd->source, direct);
 
         /* Render the direct buffer returned by vout_RenderPicture */
         if (direct) {
@@ -857,8 +853,8 @@ static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
 static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
 {
     es_format_t fmt;
-    es_format_Init(&fmt, VIDEO_ES, vout->p->fmt_render.i_chroma);
-    fmt.video = vout->p->fmt_render;
+    es_format_Init(&fmt, VIDEO_ES, vout->p->original.i_chroma);
+    fmt.video = vout->p->original;
 
     vlc_mutex_lock(&vout->p->vfilter_lock);
 
@@ -975,6 +971,79 @@ static void ThreadChangeZoom(vout_thread_t *vout, int num, int den)
     vout_SetDisplayZoom(vout->p->display.vd, num, den);
 }
 
+static void ThreadChangeAspectRatio(vout_thread_t *vout,
+                                    unsigned num, unsigned den)
+{
+    const video_format_t *source = &vout->p->original;
+
+    if (num > 0 && den > 0) {
+        num *= source->i_visible_height;
+        den *= source->i_visible_width;
+        vlc_ureduce(&num, &den, num, den, 0);
+    }
+    vout_SetDisplayAspect(vout->p->display.vd, num, den);
+}
+
+
+static void ThreadExecuteCropWindow(vout_thread_t *vout,
+                                    unsigned crop_num, unsigned crop_den,
+                                    unsigned x, unsigned y,
+                                    unsigned width, unsigned height)
+{
+    const video_format_t *source = &vout->p->original;
+
+    vout_SetDisplayCrop(vout->p->display.vd,
+                        crop_num, crop_den,
+                        source->i_x_offset + x,
+                        source->i_y_offset + y,
+                        width, height);
+}
+static void ThreadExecuteCropBorder(vout_thread_t *vout,
+                                    unsigned left, unsigned top,
+                                    unsigned right, unsigned bottom)
+{
+    const video_format_t *source = &vout->p->original;
+    ThreadExecuteCropWindow(vout, 0, 0,
+                            left,
+                            top,
+                            /* At worst, it becomes < 0 (but unsigned) and will be rejected */
+                            source->i_visible_width  - (left + right),
+                            source->i_visible_height - (top  + bottom));
+}
+
+static void ThreadExecuteCropRatio(vout_thread_t *vout,
+                                   unsigned num, unsigned den)
+{
+    const video_format_t *source = &vout->p->original;
+
+    int x, y;
+    int width, height;
+    if (num <= 0 || den <= 0) {
+        num = 0;
+        den = 0;
+        x   = 0;
+        y   = 0;
+        width  = source->i_visible_width;
+        height = source->i_visible_height;
+    } else {
+        unsigned scaled_width  = (uint64_t)source->i_visible_height * num * source->i_sar_den / den / source->i_sar_num;
+        unsigned scaled_height = (uint64_t)source->i_visible_width  * den * source->i_sar_num / num / source->i_sar_den;
+
+        if (scaled_width < source->i_visible_width) {
+            x      = (source->i_visible_width - scaled_width) / 2;
+            y      = 0;
+            width  = scaled_width;
+            height = source->i_visible_height;
+        } else {
+            x      = 0;
+            y      = (source->i_visible_height - scaled_height) / 2;
+            width  = source->i_visible_width;
+            height = scaled_height;
+        }
+    }
+    ThreadExecuteCropWindow(vout, num, den, x, y, width, height);
+}
+
 static void ThreadClean(vout_thread_t *vout)
 {
     /* Destroy translation tables */
@@ -1069,6 +1138,22 @@ static void *Thread(void *object)
                 break;
             case VOUT_CONTROL_ZOOM:
                 ThreadChangeZoom(vout, cmd.u.pair.a, cmd.u.pair.b);
+                break;
+            case VOUT_CONTROL_ASPECT_RATIO:
+                ThreadChangeAspectRatio(vout, cmd.u.pair.a, cmd.u.pair.b);
+                break;
+           case VOUT_CONTROL_CROP_RATIO:
+                ThreadExecuteCropRatio(vout, cmd.u.pair.a, cmd.u.pair.b);
+                break;
+            case VOUT_CONTROL_CROP_WINDOW:
+                ThreadExecuteCropWindow(vout, 0, 0,
+                                        cmd.u.window.x, cmd.u.window.y,
+                                        cmd.u.window.width, cmd.u.window.height);
+                break;
+            case VOUT_CONTROL_CROP_BORDER:
+                ThreadExecuteCropBorder(vout,
+                                        cmd.u.border.left,  cmd.u.border.top,
+                                        cmd.u.border.right, cmd.u.border.bottom);
                 break;
             default:
                 break;
