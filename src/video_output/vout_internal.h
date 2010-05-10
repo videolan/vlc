@@ -105,7 +105,7 @@ struct vout_thread_sys_t
 
     /* Video filter2 chain */
     vlc_mutex_t     vfilter_lock;
-    filter_chain_t *p_vf2_chain;
+    filter_chain_t *vfilter_chain;
 
     /* Snapshot interface */
     vout_snapshot_t snapshot;

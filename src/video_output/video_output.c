@@ -245,8 +245,9 @@ vout_thread_t * (vout_Create)( vlc_object_t *p_parent, video_format_t *p_fmt )
 
     vout_snapshot_Init( &p_vout->p->snapshot );
 
-    p_vout->p->p_vf2_chain = filter_chain_New( p_vout, "video filter2",
-        false, video_filter_buffer_allocation_init, NULL, p_vout );
+    p_vout->p->vfilter_chain =
+        filter_chain_New( p_vout, "video filter2", false,
+                          video_filter_buffer_allocation_init, NULL, p_vout );
 
     /* Initialize locks */
     vlc_mutex_init( &p_vout->p->picture_lock );
@@ -680,7 +681,7 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
         picture_t *filtered = NULL;
         if (decoded) {
             vlc_mutex_lock(&vout->p->vfilter_lock);
-            filtered = filter_chain_VideoFilter(vout->p->p_vf2_chain, decoded);
+            filtered = filter_chain_VideoFilter(vout->p->vfilter_chain, decoded);
             //assert(filtered == decoded); // TODO implement
             vlc_mutex_unlock(&vout->p->vfilter_lock);
             if (!filtered)
@@ -831,8 +832,8 @@ static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
 
     vlc_mutex_lock(&vout->p->vfilter_lock);
 
-    filter_chain_Reset(vout->p->p_vf2_chain, &fmt, &fmt);
-    if (filter_chain_AppendFromString(vout->p->p_vf2_chain,
+    filter_chain_Reset(vout->p->vfilter_chain, &fmt, &fmt);
+    if (filter_chain_AppendFromString(vout->p->vfilter_chain,
                                       filters) < 0)
         msg_Err(vout, "Video filter chain creation failed");
 
@@ -1168,7 +1169,7 @@ exit_thread:
     vout_control_Dead(&vout->p->control);
 
     /* Destroy the video filters2 */
-    filter_chain_Delete(vout->p->p_vf2_chain);
+    filter_chain_Delete(vout->p->vfilter_chain);
 
     return NULL;
 }
