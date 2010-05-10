@@ -102,7 +102,6 @@ struct vout_thread_sys_t
 
     /* Filter chain */
     char           *psz_filter_chain;
-    bool            b_filter_change;
 
     /* Video filter2 chain */
     vlc_mutex_t     vfilter_lock;

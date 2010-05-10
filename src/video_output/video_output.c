@@ -136,33 +136,7 @@ vout_thread_t *vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
     {
         vlc_mutex_lock( &p_vout->p->change_lock );
 
-        /* We don't directly check for the "vout-filter" variable for obvious
-         * performance reasons. */
-        if( p_vout->p->b_filter_change )
-        {
-            char *psz_filter_chain = var_GetString( p_vout, "vout-filter" );
-
-            if( psz_filter_chain && !*psz_filter_chain )
-            {
-                free( psz_filter_chain );
-                psz_filter_chain = NULL;
-            }
-            if( p_vout->p->psz_filter_chain && !*p_vout->p->psz_filter_chain )
-            {
-                free( p_vout->p->psz_filter_chain );
-                p_vout->p->psz_filter_chain = NULL;
-            }
-
-            if( !psz_filter_chain && !p_vout->p->psz_filter_chain )
-            {
-                p_vout->p->b_filter_change = false;
-            }
-
-            free( psz_filter_chain );
-        }
-
-        if( !video_format_IsSimilar( &p_vout->p->original, p_fmt ) ||
-            p_vout->p->b_filter_change )
+        if( !video_format_IsSimilar( &p_vout->p->original, p_fmt ) )
         {
             vlc_mutex_unlock( &p_vout->p->change_lock );
 
@@ -250,7 +224,6 @@ vout_thread_t * (vout_Create)( vlc_object_t *p_parent, video_format_t *p_fmt )
     vout_control_Init( &p_vout->p->control );
     vout_chrono_Init( &p_vout->p->render, 5, 10000 ); /* Arbitrary initial time */
     vout_statistic_Init( &p_vout->p->statistic );
-    p_vout->p->b_filter_change = 0;
     p_vout->p->i_par_num =
     p_vout->p->i_par_den = 1;
     p_vout->p->displayed.date = VLC_TS_INVALID;
