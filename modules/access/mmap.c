@@ -83,7 +83,7 @@ static int Open (vlc_object_t *p_this)
 {
     access_t *p_access = (access_t *)p_this;
     access_sys_t *p_sys;
-    const char *path = p_access->psz_path;
+    const char *path = p_access->psz_filepath;
     int fd;
 
     assert ((INT64_C(1) << 63) == ((off_t)(INT64_C(1) << 63)));

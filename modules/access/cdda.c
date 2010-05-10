@@ -139,7 +139,7 @@ static int Open( vlc_object_t *p_this )
     vcddev_t     *vcddev;
     char         *psz_name;
 
-    if( !p_access->psz_path || !*p_access->psz_path )
+    if( !p_access->psz_filepath || !*p_access->psz_filepath )
     {
         /* Only when selected */
         if( !p_access->psz_access || !*p_access->psz_access )
@@ -152,7 +152,7 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
     }
-    else psz_name = ToLocaleDup( p_access->psz_path );
+    else psz_name = ToLocaleDup( p_access->psz_filepath );
 
 #ifdef WIN32
     if( psz_name[0] && psz_name[1] == ':' &&

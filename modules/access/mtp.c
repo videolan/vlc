@@ -126,8 +126,10 @@ static int Open( vlc_object_t *p_this )
             if( ( p_device = LIBMTP_Open_Raw_Device( &p_rawdevices[i] )
                 ) != NULL )
             {
-                free( p_access->psz_path );
-                if( ( p_access->psz_path = tempnam( NULL, "vlc" ) ) == NULL )
+                free( p_access->psz_filepath );
+#warning Oooh no! Not tempnam()!
+                p_access->psz_filepath = tempnam( NULL, "vlc" );
+                if( p_access->psz_filepath == NULL )
                 {
                     LIBMTP_Release_Device( p_device );
                     free( p_rawdevices );
@@ -135,9 +137,11 @@ static int Open( vlc_object_t *p_this )
                 }
                 else
                 {
-                    msg_Dbg( p_access, "About to write %s", p_access->psz_path );
+                    msg_Dbg( p_access, "About to write %s",
+                             p_access->psz_filepath );
                     LIBMTP_Get_File_To_File( p_device, i_track_id,
-                                             p_access->psz_path, NULL, NULL );
+                                             p_access->psz_filepath, NULL,
+                                             NULL );
                     LIBMTP_Release_Device( p_device );
                     i = i_numrawdevices;
                 }
@@ -156,8 +160,8 @@ static int Open( vlc_object_t *p_this )
     int fd = p_sys->fd = -1;
 
     /* Open file */
-    msg_Dbg( p_access, "opening file `%s'", p_access->psz_path );
-    fd = open_file( p_access, p_access->psz_path );
+    msg_Dbg( p_access, "opening file `%s'", p_access->psz_filepath );
+    fd = open_file( p_access, p_access->psz_filepath );
 
     if( fd == -1 )
     {
@@ -187,8 +191,9 @@ static void Close( vlc_object_t * p_this )
     access_sys_t *p_sys = p_access->p_sys;
 
     close ( p_sys->fd );
-    if(	vlc_unlink( p_access->psz_path ) != 0 )
-        msg_Err( p_access, "Error deleting file %s, %m", p_access->psz_path );
+    if(	vlc_unlink( p_access->psz_filepath ) != 0 )
+        msg_Err( p_access, "Error deleting file %s, %m",
+                 p_access->psz_filepath );
     free( p_sys );
 }
 

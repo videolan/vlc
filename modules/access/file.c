@@ -133,7 +133,7 @@ static bool IsRemote (int fd)
 int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
-    const char   *path = p_access->psz_path;
+    const char   *path = p_access->psz_filepath;
 #ifdef WIN32
     bool is_remote = false;
 #endif

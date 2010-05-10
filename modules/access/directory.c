@@ -99,10 +99,10 @@ int DirOpen( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
 
-    if( !p_access->psz_path )
+    if( !p_access->psz_filepath )
         return VLC_EGENERIC;
 
-    DIR *handle = vlc_opendir (p_access->psz_path);
+    DIR *handle = vlc_opendir (p_access->psz_filepath);
     if (handle == NULL)
         return VLC_EGENERIC;
 
@@ -122,7 +122,7 @@ int DirInit (access_t *p_access, DIR *handle)
             uri = NULL;
     }
     else
-        uri = make_URI (p_access->psz_path);
+        uri = make_URI (p_access->psz_filepath);
     if (unlikely(uri == NULL))
         goto error;
 
@@ -238,7 +238,7 @@ block_t *DirBlock (access_t *p_access)
         current->parent = NULL;
         current->handle = p_sys->handle;
 #ifndef HAVE_OPENAT
-        current->path = strdup (p_access->psz_path);
+        current->path = strdup (p_access->psz_filepath);
 #endif
         current->uri = p_sys->uri;
         if (fstat (dirfd (current->handle), &current->st))

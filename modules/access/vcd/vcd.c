@@ -96,7 +96,7 @@ static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t *)p_this;
     access_sys_t *p_sys;
-    char *psz_dup = ToLocaleDup( p_access->psz_path );
+    char *psz_dup = ToLocaleDup( p_access->psz_filepath );
     char *psz;
     int i_title = 0;
     int i_chapter = 0;
