@@ -309,7 +309,7 @@ static void OSDWidget(vout_thread_t *vout, int channel, int type, int position)
     subpic->b_absolute = true;
     subpic->b_fade     = true;
 
-    spu_DisplaySubpicture(vout_GetSpu(vout), subpic);
+    vout_PutSubpicture(vout, subpic);
 }
 
 void vout_OSDSlider(vout_thread_t *vout, int channel, int position, short type)

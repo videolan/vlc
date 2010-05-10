@@ -1593,7 +1593,7 @@ static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic,
                          p_subpic->i_start - SPU_MAX_PREPARE_TIME );
 
         if( !b_reject )
-            spu_DisplaySubpicture( vout_GetSpu( p_vout ), p_subpic );
+            vout_PutSubpicture( p_vout, p_subpic );
         else
             subpicture_Delete( p_subpic );
 
@@ -1935,8 +1935,7 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block, bool b_flush 
         p_vout = input_resource_HoldVout( p_input->p->p_resource );
 
         if( p_vout && p_owner->p_spu_vout == p_vout )
-            spu_ClearChannel( vout_GetSpu( p_vout ),
-                              p_owner->i_spu_channel );
+            vout_FlushSubpictureChannel( p_vout, p_owner->i_spu_channel );
 
         if( p_vout )
             vlc_object_release( p_vout );
@@ -2098,7 +2097,7 @@ static void DeleteDecoder( decoder_t * p_dec )
         if( p_vout )
         {
             if( p_owner->p_spu_vout == p_vout )
-                spu_ClearChannel( vout_GetSpu( p_vout ), p_owner->i_spu_channel );
+                vout_FlushSubpictureChannel( p_vout, p_owner->i_spu_channel );
             vlc_object_release( p_vout );
         }
     }
@@ -2427,7 +2426,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
 
         vlc_mutex_unlock( &p_owner->lock );
 
-        p_owner->i_spu_channel = spu_RegisterChannel( vout_GetSpu( p_vout ) );
+        p_owner->i_spu_channel = vout_RegisterSubpictureChannel( p_vout );
         p_owner->i_spu_order = 0;
         p_owner->p_spu_vout = p_vout;
     }

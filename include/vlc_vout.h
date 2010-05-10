@@ -163,6 +163,11 @@ VLC_EXPORT( void,            vout_PutPicture,     ( vout_thread_t *, picture_t *
 VLC_EXPORT( void,            vout_HoldPicture,    ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_ReleasePicture, ( vout_thread_t *, picture_t * ) );
 
+/* */
+VLC_EXPORT( void, vout_PutSubpicture,             ( vout_thread_t *, subpicture_t * ) );
+VLC_EXPORT( int,  vout_RegisterSubpictureChannel, ( vout_thread_t * ) );
+VLC_EXPORT( void, vout_FlushSubpictureChannel,    ( vout_thread_t *, int ) );
+
 /**
  * Return the spu_t object associated to a vout_thread_t.
  *

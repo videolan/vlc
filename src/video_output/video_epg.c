@@ -315,7 +315,7 @@ int vout_OSDEpg( vout_thread_t *p_vout, input_item_t *p_input )
     p_spu->b_absolute = true;
     p_spu->b_fade = true;
 
-    spu_DisplaySubpicture( vout_GetSpu( p_vout ), p_spu );
+    vout_PutSubpicture( p_vout, p_spu );
 
     return VLC_SUCCESS;
 }

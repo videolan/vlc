@@ -170,7 +170,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
      * Alternatively, we should keep a reference to the vout thread. */
     if( p_vout && p_vout != p_sys->p_last_vout )
         for( unsigned i = 0; i < CHANNELS_NUMBER; i++ )
-            p_intf->p_sys->p_channels[i] = spu_RegisterChannel( vout_GetSpu( p_vout ) );
+            p_intf->p_sys->p_channels[i] = vout_RegisterSubpictureChannel( p_vout );
     p_sys->p_last_vout = p_vout;
 
     /* Quit */
@@ -1073,9 +1073,8 @@ static void ClearChannels( intf_thread_t *p_intf, vout_thread_t *p_vout )
 {
     if( p_vout )
     {
-        spu_t *p_spu = vout_GetSpu( p_vout );
-        spu_ClearChannel( p_spu, SPU_DEFAULT_CHANNEL );
+        vout_FlushSubpictureChannel( p_vout, SPU_DEFAULT_CHANNEL );
         for( int i = 0; i < CHANNELS_NUMBER; i++ )
-            spu_ClearChannel( p_spu, p_intf->p_sys->p_channels[i]  );
+            vout_FlushSubpictureChannel( p_vout, p_intf->p_sys->p_channels[i]  );
     }
 }

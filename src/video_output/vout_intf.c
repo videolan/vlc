@@ -384,7 +384,7 @@ static int VoutSnapshotPip( vout_thread_t *p_vout, picture_t *p_pic )
     p_subpic->i_original_picture_width  *= 4;
     p_subpic->i_original_picture_height *= 4;
 
-    spu_DisplaySubpicture( vout_GetSpu( p_vout ), p_subpic );
+    vout_PutSubpicture( p_vout, p_subpic );
     return VLC_SUCCESS;
 }
 

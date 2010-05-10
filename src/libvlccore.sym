@@ -614,6 +614,9 @@ vout_GetPicture
 vout_PutPicture
 vout_HoldPicture
 vout_ReleasePicture
+vout_PutSubpicture
+vout_RegisterSubpictureChannel
+vout_FlushSubpictureChannel
 vout_EnableFilter
 vout_GetSnapshot
 vout_GetSpu

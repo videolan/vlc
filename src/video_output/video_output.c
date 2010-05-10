@@ -506,6 +506,19 @@ void vout_DisplayTitle(vout_thread_t *vout, const char *title)
     vout_control_PushString(&vout->p->control, VOUT_CONTROL_OSD_TITLE, title);
 }
 
+void vout_PutSubpicture( vout_thread_t *vout, subpicture_t *subpic )
+{
+    spu_DisplaySubpicture(vout->p->p_spu, subpic);
+}
+int vout_RegisterSubpictureChannel( vout_thread_t *vout )
+{
+    return spu_RegisterChannel(vout->p->p_spu);
+}
+void vout_FlushSubpictureChannel( vout_thread_t *vout, int channel )
+{
+    spu_ClearChannel(vout->p->p_spu, channel);
+}
+
 spu_t *vout_GetSpu( vout_thread_t *p_vout )
 {
     return p_vout->p->p_spu;

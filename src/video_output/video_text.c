@@ -118,7 +118,7 @@ void vout_OSDText(vout_thread_t *vout, int channel,
     subpic->b_absolute = false;
     subpic->b_fade     = true;
 
-    spu_DisplaySubpicture(vout_GetSpu(vout), subpic);
+    vout_PutSubpicture(vout, subpic);
 }
 
 void vout_OSDMessage(vout_thread_t *vout, int channel, const char *format, ...)
