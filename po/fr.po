@@ -4179,11 +4179,11 @@ msgstr ""
 #: modules/gui/macosx/intf.m:740 modules/gui/macosx/intf.m:749
 #: modules/gui/qt4/menus.cpp:575
 msgid "Mute"
-msgstr "Muet"
+msgstr "Couper le son"
 
 #: src/libvlc-module.c:1368
 msgid "Select the key to mute audio."
-msgstr "Sélectionnez la combinaison de touches à utiliser pour couper l'audio."
+msgstr "Sélectionnez la combinaison de touches à utiliser pour couper le son."
 
 #: src/libvlc-module.c:1369
 msgid "Subtitle delay up"
@@ -17494,12 +17494,12 @@ msgstr "Basculer les modes de liste de lecture Normal/Répéter/Boucler"
 #: modules/gui/qt4/components/controller_widget.cpp:133
 msgctxt "Tooltip|Unmute"
 msgid "Unmute"
-msgstr "Son actif"
+msgstr "Rétablir le son"
 
 #: modules/gui/qt4/components/controller_widget.cpp:142
 msgctxt "Tooltip|Mute"
 msgid "Mute"
-msgstr "Muet"
+msgstr "Couper le son"
 
 #: modules/gui/qt4/components/controller_widget.cpp:229
 msgid "Pause the playback"
@@ -22763,11 +22763,11 @@ msgstr "Échelle de quantisation fixe à utiliser."
 
 #: modules/stream_out/switcher.c:111
 msgid "Mute audio"
-msgstr "Muter l'audio"
+msgstr "Couper le son"
 
 #: modules/stream_out/switcher.c:113
 msgid "Mute audio when command is not 0."
-msgstr "Muter l'audio lorsque la commande n'est pas 0"
+msgstr "Couper le son lorsque la commande n'est pas 0"
 
 #: modules/stream_out/switcher.c:116
 msgid "MPEG2 video switcher stream output"
