@@ -138,25 +138,25 @@ static int Open( vlc_object_t *p_this )
 
     /* Parse input URI
      * [[[domain;]user[:password@]]server[/share[/path[/file]]]] */
-    psz_path = strchr( p_access->psz_path, '/' );
+    psz_path = strchr( p_access->psz_location, '/' );
     if( !psz_path )
     {
-        msg_Err( p_access, "invalid SMB URI: smb://%s", psz_path );
+        msg_Err( p_access, "invalid SMB URI: smb://%s", psz_location );
         return VLC_EGENERIC;
     }
     else
     {
-        char *psz_tmp = strdup( p_access->psz_path );
+        char *psz_tmp = strdup( p_access->psz_location );
         char *psz_parser;
 
-        psz_tmp[ psz_path - p_access->psz_path ] = 0;
-        psz_path = p_access->psz_path;
+        psz_tmp[ psz_path - p_access->psz_location ] = 0;
+        psz_path = p_access->psz_location;
         psz_parser = strchr( psz_tmp, '@' );
         if( psz_parser )
         {
             /* User info is there */
             *psz_parser = 0;
-            psz_path = p_access->psz_path + (psz_parser - psz_tmp) + 1;
+            psz_path = p_access->psz_location + (psz_parser - psz_tmp) + 1;
 
             psz_parser = strchr( psz_tmp, ':' );
             if( psz_parser )
@@ -230,7 +230,8 @@ static int Open( vlc_object_t *p_this )
 #endif
     if( (i_smb = smbc_open( psz_uri, O_RDONLY, 0 )) < 0 )
     {
-        msg_Err( p_access, "open failed for '%s' (%m)", p_access->psz_path );
+        msg_Err( p_access, "open failed for '%s' (%m)",
+                 p_access->psz_location );
         free( psz_uri );
         return VLC_EGENERIC;
     }

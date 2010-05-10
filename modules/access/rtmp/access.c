@@ -106,7 +106,7 @@ static int Open( vlc_object_t *p_this )
     vlc_object_attach( p_sys->p_thread, p_access );
 
     /* Parse URI - remove spaces */
-    p = psz = strdup( p_access->psz_path );
+    p = psz = strdup( p_access->psz_location );
     while( (p = strchr( p, ' ' )) != NULL )
         *p = '+';
     vlc_UrlParse( &p_sys->p_thread->url, psz, 0 );

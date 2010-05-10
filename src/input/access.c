@@ -63,7 +63,7 @@ access_t *__access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     p_access->p_input = p_parent_input;
 
     p_access->psz_access = strdup( psz_access );
-    p_access->psz_path   = strdup( psz_location );
+    p_access->psz_location = strdup( psz_location );
     p_access->psz_filepath = get_path( psz_location );
     p_access->psz_demux  = strdup( psz_demux );
 
@@ -86,7 +86,7 @@ access_t *__access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     if( p_access->p_module == NULL )
     {
         free( p_access->psz_access );
-        free( p_access->psz_path );
+        free( p_access->psz_location );
         free( p_access->psz_filepath );
         free( p_access->psz_demux );
         vlc_object_release( p_access );
@@ -104,7 +104,7 @@ void access_Delete( access_t *p_access )
     module_unneed( p_access, p_access->p_module );
 
     free( p_access->psz_access );
-    free( p_access->psz_path );
+    free( p_access->psz_location );
     free( p_access->psz_filepath );
     free( p_access->psz_demux );
 

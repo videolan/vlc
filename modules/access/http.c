@@ -320,7 +320,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     http_auth_Init( &p_sys->proxy_auth );
 
     /* Parse URI - remove spaces */
-    p = psz = strdup( p_access->psz_path );
+    p = psz = strdup( p_access->psz_location );
     while( (p = strchr( p, ' ' )) != NULL )
         *p = '+';
     vlc_UrlParse( &p_sys->url, psz, 0 );
@@ -363,7 +363,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
         {
             char *buf;
             int i;
-            i=asprintf(&buf, "%s://%s", psz_access, p_access->psz_path);
+            i=asprintf(&buf, "%s://%s", psz_access, p_access->psz_location);
             if (i >= 0)
             {
                 msg_Dbg(p_access, "asking libproxy about url '%s'", buf);
@@ -581,8 +581,8 @@ connect:
             msg_Err( p_access, "insecure redirection ignored" );
             goto error;
         }
-        free( p_access->psz_path );
-        p_access->psz_path = strdup( p_sys->psz_location );
+        free( p_access->psz_location );
+        p_access->psz_location = strdup( p_sys->psz_location );
         /* Clean up current Open() run */
         vlc_UrlClean( &p_sys->url );
         http_auth_Reset( &p_sys->auth );

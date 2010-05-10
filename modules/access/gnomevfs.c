@@ -121,11 +121,11 @@ static int Open( vlc_object_t *p_this )
                                             *(p_access->psz_access) != '\0')
     {
         asprintf( &psz_name, "%s://%s", p_access->psz_access,
-                                                    p_access->psz_path );
+                  p_access->psz_location );
     }
     else
     {
-        psz_name = strdup( p_access->psz_path );
+        psz_name = strdup( p_access->psz_location );
     }
     psz = ToLocale( psz_name );
     psz_expand_tilde = gnome_vfs_expand_initial_tilde( psz );

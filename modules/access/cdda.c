@@ -493,7 +493,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         msg_Dbg( p_access, "track[%d] start=%d", i, p_sys->p_sectors[i] );
 
         /* */
-        if( asprintf( &psz_uri, "cdda://%s", p_access->psz_path ) == -1 )
+        if( asprintf( &psz_uri, "cdda://%s", p_access->psz_location ) == -1 )
             psz_uri = NULL;
         if( asprintf( &psz_opt, "cdda-track=%i", i+1 ) == -1 )
             psz_opt = NULL;

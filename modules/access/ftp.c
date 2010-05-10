@@ -338,7 +338,7 @@ static int InOpen( vlc_object_t *p_this )
     p_sys->out = false;
     p_sys->directory = false;
 
-    if( parseURL( &p_sys->url, p_access->psz_path ) )
+    if( parseURL( &p_sys->url, p_access->psz_location ) )
         goto exit_error;
 
     if( Connect( p_this, p_sys ) )

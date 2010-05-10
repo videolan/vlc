@@ -118,7 +118,7 @@ int DirInit (access_t *p_access, DIR *handle)
     char *uri;
     if (!strcmp (p_access->psz_access, "fd"))
     {
-        if (asprintf (&uri, "fd://%s", p_access->psz_path) == -1)
+        if (asprintf (&uri, "fd://%s", p_access->psz_location) == -1)
             uri = NULL;
     }
     else

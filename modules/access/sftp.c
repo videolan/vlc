@@ -109,13 +109,13 @@ static int Open( vlc_object_t* p_this )
     int i_ret;
     vlc_url_t url;
 
-    if( !p_access->psz_path )
+    if( !p_access->psz_location )
         return VLC_EGENERIC;
 
     STANDARD_BLOCK_ACCESS_INIT;
 
     /* Parse the URL */
-    char* path = p_access->psz_path;
+    const char* path = p_access->psz_location;
     vlc_UrlParse( &url, path, 0 );
 
     /* Check for some parameters */

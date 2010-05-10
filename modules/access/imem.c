@@ -300,7 +300,7 @@ static int OpenAccess(vlc_object_t *object)
     access_t   *access = (access_t *)object;
     imem_sys_t *sys;
 
-    if (OpenCommon(object, &sys, access->psz_path))
+    if (OpenCommon(object, &sys, access->psz_location))
         return VLC_EGENERIC;
 
     if (var_InheritInteger(object, "imem-cat") != 4) {

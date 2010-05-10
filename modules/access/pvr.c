@@ -577,7 +577,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_input      = var_CreateGetInteger( p_access, "pvr-channel" );
 
     /* parse command line options */
-    psz_tofree = strdup( p_access->psz_path );
+    psz_tofree = strdup( p_access->psz_location );
     if( !psz_tofree )
     {
         free( p_sys->psz_radiodev );

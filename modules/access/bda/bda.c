@@ -463,7 +463,7 @@ static int ParsePath( access_t *p_access, const char* psz_module,
     }
     for( int i = 0; i < i_param_count; i++ )
         b_used[i] = false;
-    psz_parser = p_access->psz_path;
+    psz_parser = p_access->psz_location;
     if( strlen( psz_parser ) <= 0 )
         return VLC_SUCCESS;
 

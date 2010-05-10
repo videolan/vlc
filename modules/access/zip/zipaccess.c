@@ -105,9 +105,9 @@ int AccessOpen( vlc_object_t *p_this )
 
     char *psz_pathToZip = NULL, *psz_path = NULL, *psz_sep = NULL;
 
-    if( !strstr( p_access->psz_path, ZIP_SEP ) )
+    if( !strstr( p_access->psz_location, ZIP_SEP ) )
     {
-        msg_Dbg( p_access, "path does not contain separator " ZIP_SEP );
+        msg_Dbg( p_access, "location does not contain separator " ZIP_SEP );
         return VLC_EGENERIC;
     }
 
@@ -117,7 +117,7 @@ int AccessOpen( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Split the MRL */
-    psz_path = strdup( p_access->psz_path );
+    psz_path = strdup( p_access->psz_location );
     psz_sep = strstr( psz_path, ZIP_SEP );
 
     *psz_sep = '\0';
@@ -125,7 +125,7 @@ int AccessOpen( vlc_object_t *p_this )
     if( !psz_pathToZip )
     {
         /* Maybe this was not an encoded string */
-        msg_Dbg( p_access, "this is not an encoded url. Trying file '%s'",
+        msg_Dbg( p_access, "not an encoded URL  Trying file '%s'",
                  psz_path );
         psz_pathToZip = strdup( psz_path );
     }

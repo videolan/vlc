@@ -84,8 +84,9 @@ int OpenAvio(vlc_object_t *object)
      */
     char *url;
     if (!strcmp(access->psz_access, "avio"))
-        url = strdup(access->psz_path);
-    else if (asprintf(&url, "%s://%s", access->psz_access, access->psz_path) < 0)
+        url = strdup(access->psz_location);
+    else if (asprintf(&url, "%s://%s", access->psz_access,
+                      access->psz_location) < 0)
         url = NULL;
 
     if (!url)

@@ -110,8 +110,8 @@ static int Open( vlc_object_t *p_this )
     /* Update default_pts to a suitable value for file access */
     var_Create( p_access, "file-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
-    if( sscanf( p_access->psz_path, "%"SCNu32":%"SCNu8":%"SCNu16":%d", &i_bus,
-                &i_dev, &i_product_id, &i_track_id ) != 4 )
+    if( sscanf( p_access->psz_location, "%"SCNu32":%"SCNu8":%"SCNu16":%d",
+                &i_bus, &i_dev, &i_product_id, &i_track_id ) != 4 )
         return VLC_EGENERIC;
     i_ret = LIBMTP_Detect_Raw_Devices( &p_rawdevices, &i_numrawdevices );
     if( i_ret != 0 || i_numrawdevices <= 0 || !p_rawdevices )

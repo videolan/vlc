@@ -294,7 +294,7 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
         return NULL;
 
     s->p_input = p_access->p_input;
-    s->psz_path = strdup( p_access->psz_path );
+    s->psz_path = strdup( p_access->psz_location );
     s->p_sys = p_sys = malloc( sizeof( *p_sys ) );
     if( !s->psz_path || !s->p_sys )
     {
@@ -339,7 +339,7 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
             goto error;
 
         p_entry->i_size = p_access->info.i_size;
-        p_entry->psz_path = strdup( p_access->psz_path );
+        p_entry->psz_path = strdup( p_access->psz_location );
         if( !p_entry->psz_path )
         {
             free( p_entry );

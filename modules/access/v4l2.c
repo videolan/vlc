@@ -1131,7 +1131,7 @@ static int AccessOpen( vlc_object_t * p_this )
 
     GetV4L2Params( p_sys, (vlc_object_t *) p_access );
 
-    ParseMRL( p_sys, p_access->psz_path, (vlc_object_t *) p_access );
+    ParseMRL( p_sys, p_access->psz_location, (vlc_object_t *) p_access );
 
 #ifdef HAVE_LIBV4L2
     if( !var_InheritInteger( p_this, CFG_PREFIX "use-libv4l2" ) )

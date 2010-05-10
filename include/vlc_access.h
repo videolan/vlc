@@ -80,7 +80,7 @@ struct access_t
 
     /* Access name (empty if non forced) */
     char        *psz_access;
-    char        *psz_path; /**< Location (URL with the scheme stripped) */
+    char        *psz_location; /**< Location (URL with the scheme stripped) */
     char        *psz_filepath; /**< Local file path (if applicable) */
 
     /* Access can fill this entry to force a demuxer

@@ -563,12 +563,12 @@ VCDParse( access_t * p_access, /*out*/ vcdinfo_itemid_t * p_itemid,
     if( !p_access->psz_access || !*p_access->psz_access ) return NULL;
 #endif
 
-    if( !p_access->psz_path )
+    if( !p_access->psz_location )
     {
         return NULL;
     }
 
-    psz_parser = psz_source = strdup( p_access->psz_path );
+    psz_parser = psz_source = strdup( p_access->psz_location );
 
     /* Parse input string :
      * [device][@[type][title]] */
@@ -884,7 +884,7 @@ VCDOpen ( vlc_object_t *p_this )
     }
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "source: %s: mrl: %s",
-               psz_source, p_access->psz_path );
+               psz_source, p_access->psz_location );
 
     p_vcdplayer->psz_source        = strdup(psz_source);
     p_vcdplayer->i_blocks_per_read = var_InheritInteger( p_this, MODULE_STRING

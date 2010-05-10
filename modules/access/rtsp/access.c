@@ -193,7 +193,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_rtsp->pf_read_line = RtspReadLine;
     p_sys->p_rtsp->pf_write = RtspWrite;
 
-    i_result = rtsp_connect( p_sys->p_rtsp, p_access->psz_path, 0 );
+    i_result = rtsp_connect( p_sys->p_rtsp, p_access->psz_location, 0 );
     if( i_result )
     {
         msg_Dbg( p_access, "could not connect to: %s", p_access->psz_path );
