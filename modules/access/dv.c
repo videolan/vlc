@@ -133,11 +133,10 @@ static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
-    char *psz_name = strdup( p_access->psz_path );
 
     struct raw1394_portinfo port_inf[ 16 ];
 
-    msg_Dbg( p_access, "opening device %s", psz_name );
+    msg_Dbg( p_access, "opening device" );
 
     /* Set up p_access */
     access_InitFields( p_access );
@@ -145,10 +144,7 @@ static int Open( vlc_object_t *p_this )
 
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
     if( !p_sys )
-    {
-        free( psz_name );
         return VLC_EGENERIC;
-    }
 
     p_sys->i_cards = 0;
     p_sys->i_node = 0;
@@ -167,42 +163,37 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_access, "failed to open a Firewire (IEEE1394) connection" );
         Close( p_this );
-        free( psz_name );
         return VLC_EGENERIC;
     }
 
     p_sys->p_avc1394 = AVCOpen( p_access, p_sys->i_port );
     if( !p_sys->p_avc1394 )
     {
-        msg_Err( p_access, "no Digital Video Control device found on %s", psz_name );
+        msg_Err( p_access, "no Digital Video Control device found" );
         Close( p_this );
-        free( psz_name );
         return VLC_EGENERIC;
     }
 
     p_sys->p_raw1394 = raw1394_new_handle();
     if( !p_sys->p_raw1394 )
     {
-        msg_Err( p_access, "no Digital Video device found on %s", psz_name );
+        msg_Err( p_access, "no Digital Video device found" );
         Close( p_this );
-        free( psz_name );
         return VLC_EGENERIC;
     }
 
     p_sys->i_cards = raw1394_get_port_info( p_sys->p_raw1394, port_inf, 16 );
     if( p_sys->i_cards < 0 )
     {
-        msg_Err( p_access, "failed to get port info for %s", psz_name );
+        msg_Err( p_access, "failed to get port info" );
         Close( p_this );
-        free( psz_name );
         return VLC_EGENERIC;
     }
 
     if( raw1394_set_port( p_sys->p_raw1394, p_sys->i_port ) < 0 )
     {
-        msg_Err( p_access, "failed to set port info for %s", psz_name );
+        msg_Err( p_access, "failed to set port info" );
         Close( p_this );
-        free( psz_name );
         return VLC_EGENERIC;
     }
 
@@ -210,9 +201,8 @@ static int Open( vlc_object_t *p_this )
                 ISOCHRONOUS_QUEUE_LENGTH, ISOCHRONOUS_MAX_PACKET_SIZE,
                 p_sys->i_channel, RAW1394_DMA_PACKET_PER_BUFFER, -1 ) < 0 )
     {
-        msg_Err( p_access, "failed to init isochronous recv for %s", psz_name );
+        msg_Err( p_access, "failed to init isochronous recv" );
         Close( p_this );
-        free( psz_name );
         return VLC_EGENERIC;
     }
 
@@ -229,9 +219,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_ev = vlc_object_create( p_access, sizeof( event_thread_t ) );
     if( !p_sys->p_ev )
     {
-        msg_Err( p_access, "failed to create event thread for %s", psz_name );
+        msg_Err( p_access, "failed to create event thread" );
         Close( p_this );
-        free( psz_name );
         return VLC_EGENERIC;
     }
 
@@ -242,7 +231,6 @@ static int Open( vlc_object_t *p_this )
     vlc_thread_create( p_sys->p_ev, "dv event thread handler",
                        Raw1394EventThread, VLC_THREAD_PRIORITY_OUTPUT );
 
-    free( psz_name );
     return VLC_SUCCESS;
 }
 
