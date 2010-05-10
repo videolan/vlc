@@ -2326,48 +2326,6 @@ static int InputSourceInit( input_thread_t *p_input,
     /* Split uri */
     input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_dup );
 
-    /* FIXME: file:// handling plugins do not support URIs properly...
-     * So we pre-decode the URI to a path for them. Note that we do not do it
-     * for non-standard VLC-specific schemes. */
-    if( !strcmp( psz_access, "file" ) )
-    {
-        if( psz_path[0] != '/' )
-#ifndef WIN32
-        {   /* host specified -> only localhost is supported */
-            static const size_t i_localhost = sizeof("localhost")-1;
-            if( strncmp( psz_path, "localhost/", i_localhost + 1) != 0 )
-            {
-                msg_Err( p_input, "cannot open remote file `%s://%s'",
-                         psz_access, psz_path );
-                msg_Info( p_input, "Did you mean `%s:///%s'?",
-                          psz_access, psz_path );
-                goto error;
-            }
-            psz_path += i_localhost;
-        }
-#else
-        {
-            /* XXX: very very ugly. Always true for valid URIs though. */
-            if( (psz_path - psz_dup) >= 2 && psz_path[-2] && psz_path[-1] )
-            {
-                *(--psz_path) = '\\';
-                *(--psz_path) = '\\';
-            }
-            msg_Err( p_input, "REMOTE: %s", psz_path );
-        }
-        else
-            /* Strip leading slash in front of the drive letter */
-            psz_path++;
-#endif
-        /* Then URI-decode the path. */
-        decode_URI( psz_path );
-#if (DIR_SEP_CHAR != '/')
-        /* Turn slashes into anti-slashes */
-        for( char *s = strchr( psz_path, '/' ); s; s = strchr( s + 1, '/' ) )
-            *s = DIR_SEP_CHAR;
-#endif
-    }
-
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
     if( !p_input->b_preparsing )
