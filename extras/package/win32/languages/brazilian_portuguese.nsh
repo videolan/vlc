@@ -24,29 +24,29 @@ StrCpy $Desc_Section04 \
 StrCpy $Desc_Section05 \
     "Registro para reprodução de DVD e CD"
 StrCpy $Desc_Section06 \
-    "Configura o VLC media player como o reprodutor padrão para as extensões de arquivo especificadas"
+    "Configura o VLC como o reprodutor padrão para as extensões de arquivo especificadas"
 StrCpy $Desc_Section07 \
     "Adiciona no menu de contexto os itens ('Reproduzir com o VLC' e 'Adicionar à Lista de Reprodução do VLC')"
 StrCpy $Desc_Section08 \
     "Exclui os arquivos de preferências e temporários do VLC, deixados pelas instalações anteriores"
 
 StrCpy $Message_AlreadyInstalled  \
-"O VLC media player já está instalado. $\nDeseja remover \
+"O reprodutor de mídias VLC já está instalado. $\nDeseja remover \
 a versão anterior antes de instalar a $(^Name) ?"
 
 StrCpy $Name_Section91 "Desinstalar"
 StrCpy $Name_Section92 "Excluir arquivos de preferências e temporários"
 
 StrCpy $Desc_Section91 \
-"Desinstala o VLC media player e todos os seus componentes"
+"Desinstala o reprodutor de mídias VLC e todos os seus componentes"
 StrCpy $Desc_Section92 \
-"Exclui os arquivos de preferências e temporários do VLC media player"
+"Exclui os arquivos de preferências e temporários do reprodutor de mídias VLC"
 
 StrCpy $ShellAssociation_Play "Reproduzir"
-StrCpy $ContextMenuEntry_PlayWith "Reproduzir com o VLC media player"
-StrCpy $ContextMenuEntry_AddToPlaylist "Adicionar à Lista de Reprodução do VLC media player"
+StrCpy $ContextMenuEntry_PlayWith "Reproduzir com o reprodutor de mídias VLC"
+StrCpy $ContextMenuEntry_AddToPlaylist "Adicionar à Lista de Reprodução do VLC"
 
-StrCpy $Link_VisitWebsite "Visite o sítio do VideoLAN VLC media player"
+StrCpy $Link_VisitWebsite "Visite o sítio do reprodutor de mídias VLC"
 
 StrCpy $Name_InstTypeRecommended "Recomendada"
 StrCpy $Name_InstTypeMinimum "Mínima"
