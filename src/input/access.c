@@ -27,13 +27,30 @@
 
 #include "access.h"
 #include <libvlc.h>
+#include <vlc_url.h>
+
+/* Decode URL (which has had its scheme stripped earlier) to a file path. */
+static char *get_path(const char *location)
+{
+    char *url, *path;
+
+    /* Appending "file://" is a bit hackish. But then again, we do not want
+     * to hard-code the list of schemes that use file paths in make_path().
+     */
+    if (asprintf(&url, "file://%s", location) == -1)
+        return NULL;
+
+    path = make_path (url);
+    free (url);
+    return path;
+}
 
 /*****************************************************************************
  * access_New:
  *****************************************************************************/
 access_t *__access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
                         const char *psz_access, const char *psz_demux,
-                        const char *psz_path )
+                        const char *psz_location )
 {
     access_t *p_access = vlc_custom_create( p_obj, sizeof (*p_access),
                                             VLC_OBJECT_GENERIC, "access" );
@@ -42,14 +59,16 @@ access_t *__access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
         return NULL;
 
     /* */
-    msg_Dbg( p_obj, "creating access '%s' path='%s'",
-             psz_access, psz_path );
 
     p_access->p_input = p_parent_input;
 
-    p_access->psz_path   = strdup( psz_path );
     p_access->psz_access = strdup( psz_access );
+    p_access->psz_path   = strdup( psz_location );
+    p_access->psz_filepath = get_path( psz_location );
     p_access->psz_demux  = strdup( psz_demux );
+
+    msg_Dbg( p_obj, "creating access '%s' location='%s', path='%s'",
+             psz_access, psz_location, p_access->psz_filepath );
 
     p_access->pf_read    = NULL;
     p_access->pf_block   = NULL;
@@ -68,6 +87,7 @@ access_t *__access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     {
         free( p_access->psz_access );
         free( p_access->psz_path );
+        free( p_access->psz_filepath );
         free( p_access->psz_demux );
         vlc_object_release( p_access );
         return NULL;
@@ -85,6 +105,7 @@ void access_Delete( access_t *p_access )
 
     free( p_access->psz_access );
     free( p_access->psz_path );
+    free( p_access->psz_filepath );
     free( p_access->psz_demux );
 
     vlc_object_release( p_access );
