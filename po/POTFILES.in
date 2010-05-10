@@ -192,7 +192,6 @@ src/video_output/vout_control.h
 src/video_output/vout_internal.h
 src/video_output/vout_intf.c
 src/video_output/vout_pictures.c
-src/video_output/vout_pictures.h
 src/video_output/vout_subpictures.c
 
 # modules
@@ -1101,6 +1100,7 @@ modules/video_filter/filter_event_info.h
 modules/video_filter/filter_picture.h
 modules/video_filter/gaussianblur.c
 modules/video_filter/gradient.c
+modules/video_filter/gradfun.c
 modules/video_filter/grain.c
 modules/video_filter/invert.c
 modules/video_filter/logo.c
