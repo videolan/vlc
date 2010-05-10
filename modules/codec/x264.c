@@ -966,6 +966,7 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_nal_hrd = X264_NAL_HRD_VBR;
     else if( !strcmp( psz_val, "cbr" ) )
         p_sys->param.i_nal_hrd = X264_NAL_HRD_CBR;
+    free( psz_val );
 #endif
 
     //TODO: psz_val == NULL ?
