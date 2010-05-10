@@ -1404,25 +1404,6 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
         i_y = i_delta_y;
     }
 
-    /* Margin shifts all subpictures */
-    /* NOTE We have margin only for subtitles, so we don't really need this here
-    if( i_margin_y != 0 )
-        i_y -= i_margin_y;*/
-
-    /* Clamp offset to not go out of the screen (when possible) */
-    /* NOTE Again, useful only for subtitles, otherwise goes against the alignment logic above
-    const int i_error_x = (i_x + p_region->fmt.i_width) - p_subpic->i_original_picture_width;
-    if( i_error_x > 0 )
-        i_x -= i_error_x;
-    if( i_x < 0 )
-        i_x = 0;
-
-    const int i_error_y = (i_y + p_region->fmt.i_height) - p_subpic->i_original_picture_height;
-    if( i_error_y > 0 )
-        i_y -= i_error_y;
-    if( i_y < 0 )
-        i_y = 0;*/
-
     *pi_x = i_x;
     *pi_y = i_y;
 }
@@ -1529,12 +1510,11 @@ static void SpuRenderRegion( spu_t *p_spu,
 
     /* apply margin to subtitles and correct if they go over the picture edge */
     if( p_subpic->b_subtitle )
-    {
         restrained.i_y -= i_margin_y;
-        spu_area_t display = spu_area_create( 0, 0, p_fmt->i_width, p_fmt->i_height,
-                                              spu_scale_unit() );
-        SpuAreaFitInside( &restrained, &display );
-    }
+
+    spu_area_t display = spu_area_create( 0, 0, p_fmt->i_width, p_fmt->i_height,
+                                          spu_scale_unit() );
+    SpuAreaFitInside( &restrained, &display );
 
     /* Fix the position for the current scale_size */
     i_x_offset = spu_scale_w( restrained.i_x, restrained.scale );
