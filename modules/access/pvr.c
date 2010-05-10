@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_access.h>
 #include <vlc_fs.h>
+#include <vlc_url.h>
 
 #include <sys/types.h>
 #include <fcntl.h>
@@ -592,7 +593,7 @@ static int Open( vlc_object_t * p_this )
         if( *psz_parser == '/' )
         {
             free( p_sys->psz_videodev );
-            p_sys->psz_videodev = strdup( psz_parser );
+            p_sys->psz_videodev = decode_URI_duplicate( psz_parser );
             break;
         }
 
