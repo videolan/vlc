@@ -12,6 +12,7 @@ The VideoLAN team would like to thank the following contributors:
 Adam Sampson <ats @t offog d0t org> - libFLAC >= 1.1.3 API support
 Adrien Grand <jpountz -at- jpountz 0 net> - Java and VLM corrections
 Adrien Maglo - VU meter, Direct3D desktop mode and various fixes
+Ajith Manjula <uthmax dot sms at gmail dot com> - Sinhala translation
 Alan Wright <the dot smoothness at gmail d0t com> - Forum help and support
 Alex Antropoff <alant at transtelecom dot md> - RFC3016 (LATM) RTP packetizer extension, MMS fixes
 Alex Izvorski <aizvorski at gmail dot com> - some more x264 options
