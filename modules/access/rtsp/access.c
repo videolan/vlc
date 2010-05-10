@@ -196,7 +196,7 @@ static int Open( vlc_object_t *p_this )
     i_result = rtsp_connect( p_sys->p_rtsp, p_access->psz_location, 0 );
     if( i_result )
     {
-        msg_Dbg( p_access, "could not connect to: %s", p_access->psz_path );
+        msg_Dbg( p_access, "could not connect to: %s", p_access->psz_location );
         free( p_sys->p_rtsp );
         p_sys->p_rtsp = NULL;
         goto error;

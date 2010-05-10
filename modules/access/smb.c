@@ -131,15 +131,15 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     struct stat  filestat;
-    char         *psz_path, *psz_uri;
+    char         *psz_location, *psz_uri;
     char         *psz_user = NULL, *psz_pwd = NULL, *psz_domain = NULL;
     int          i_ret;
     int          i_smb;
 
     /* Parse input URI
      * [[[domain;]user[:password@]]server[/share[/path[/file]]]] */
-    psz_path = strchr( p_access->psz_location, '/' );
-    if( !psz_path )
+    psz_location = strchr( p_access->psz_location, '/' );
+    if( !psz_location )
     {
         msg_Err( p_access, "invalid SMB URI: smb://%s", psz_location );
         return VLC_EGENERIC;
@@ -149,14 +149,14 @@ static int Open( vlc_object_t *p_this )
         char *psz_tmp = strdup( p_access->psz_location );
         char *psz_parser;
 
-        psz_tmp[ psz_path - p_access->psz_location ] = 0;
-        psz_path = p_access->psz_location;
+        psz_tmp[ psz_location - p_access->psz_location ] = 0;
+        psz_location = p_access->psz_location;
         psz_parser = strchr( psz_tmp, '@' );
         if( psz_parser )
         {
             /* User info is there */
             *psz_parser = 0;
-            psz_path = p_access->psz_location + (psz_parser - psz_tmp) + 1;
+            psz_location = p_access->psz_location + (psz_parser - psz_tmp) + 1;
 
             psz_parser = strchr( psz_tmp, ':' );
             if( psz_parser )
@@ -193,16 +193,16 @@ static int Open( vlc_object_t *p_this )
 
 #ifdef WIN32
     if( psz_user )
-        Win32AddConnection( p_access, psz_path, psz_user, psz_pwd, psz_domain);
-    i_ret = asprintf( &psz_uri, "//%s", psz_path );
+        Win32AddConnection( p_access, psz_location, psz_user, psz_pwd, psz_domain);
+    i_ret = asprintf( &psz_uri, "//%s", psz_location );
 #else
     if( psz_user )
         i_ret = asprintf( &psz_uri, "smb://%s%s%s%s%s@%s",
                           psz_domain ? psz_domain : "", psz_domain ? ";" : "",
                           psz_user, psz_pwd ? ":" : "",
-                          psz_pwd ? psz_pwd : "", psz_path );
+                          psz_pwd ? psz_pwd : "", psz_location );
     else
-        i_ret = asprintf( &psz_uri, "smb://%s", psz_path );
+        i_ret = asprintf( &psz_uri, "smb://%s", psz_location );
 #endif
 
     free( psz_user );
