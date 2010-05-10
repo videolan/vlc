@@ -3012,7 +3012,9 @@ static void EITCallBack( demux_t *p_demux,
             {
                 dvbpsi_short_event_dr_t *pE = dvbpsi_DecodeShortEventDr( p_dr );
 
-                if( pE )
+                /* Only take first description, as we don't handle language-info
+                   for epg atm*/
+                if( pE && psz_name == NULL)
                 {
                     psz_name = EITConvertToUTF8( pE->i_event_name, pE->i_event_name_length,
                                                  p_sys->b_broken_charset );
