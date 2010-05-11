@@ -38,22 +38,10 @@ void vout_control_cmd_Init(vout_control_cmd_t *cmd, int type)
 void vout_control_cmd_Clean(vout_control_cmd_t *cmd)
 {
     switch (cmd->type) {
-    //case VOUT_CONTROL_OSD_MESSAGE:
     case VOUT_CONTROL_OSD_TITLE:
     case VOUT_CONTROL_CHANGE_FILTERS:
         free(cmd->u.string);
         break;
-#if 0
-    case VOUT_CONTROL_OSD_TEXT:
-        free(cmd->text.string);
-        if (cmd->text.style)
-            text_style_Delete(cmd->text.style);
-        break;
-    case VOUT_CONTROL_OSD_SUBPICTURE:
-        if (cmd->subpicture)
-            subpicture_Delete(cmd->subpicture);
-        break;
-#endif
     default:
         break;
     }

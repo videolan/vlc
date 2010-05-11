@@ -37,16 +37,6 @@ enum {
     /* */
     VOUT_CONTROL_START,
     VOUT_CONTROL_STOP,
-
-    /* Controls */
-
-
-    /* OSD */
-    VOUT_CONTROL_OSD_MESSAGE,
-    VOUT_CONTROL_OSD_TEXT,
-    VOUT_CONTROL_OSD_SLIDER,
-    VOUT_CONTROL_OSD_ICON,
-    VOUT_CONTROL_OSD_SUBPICTURE,
 #endif
     VOUT_CONTROL_OSD_TITLE,             /* string */
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
