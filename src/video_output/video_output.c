@@ -134,12 +134,8 @@ vout_thread_t *vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
     /* If we now have a video output, check it has the right properties */
     if( p_vout )
     {
-        vlc_mutex_lock( &p_vout->p->change_lock );
-
         if( !video_format_IsSimilar( &p_vout->p->original, p_fmt ) )
         {
-            vlc_mutex_unlock( &p_vout->p->change_lock );
-
             /* We are not interested in this format, close this vout */
             vout_CloseAndRelease( p_vout );
             vlc_object_release( p_vout );
@@ -148,8 +144,6 @@ vout_thread_t *vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         else
         {
             /* This video output is cool! Hijack it. */
-            vlc_mutex_unlock( &p_vout->p->change_lock );
-
             vlc_object_release( p_vout );
         }
 
@@ -222,6 +216,7 @@ vout_thread_t * (vout_Create)( vlc_object_t *p_parent, video_format_t *p_fmt )
 
     /* Initialize misc stuff */
     vout_control_Init( &p_vout->p->control );
+    vout_control_PushVoid( &p_vout->p->control, VOUT_CONTROL_INIT );
     vout_chrono_Init( &p_vout->p->render, 5, 10000 ); /* Arbitrary initial time */
     vout_statistic_Init( &p_vout->p->statistic );
     p_vout->p->i_par_num =
@@ -251,7 +246,6 @@ vout_thread_t * (vout_Create)( vlc_object_t *p_parent, video_format_t *p_fmt )
 
     /* Initialize locks */
     vlc_mutex_init( &p_vout->p->picture_lock );
-    vlc_mutex_init( &p_vout->p->change_lock );
     vlc_mutex_init( &p_vout->p->vfilter_lock );
 
     /* Mouse coordinates */
@@ -327,7 +321,6 @@ vout_thread_t * (vout_Create)( vlc_object_t *p_parent, video_format_t *p_fmt )
     vlc_object_set_destructor( p_vout, vout_Destructor );
 
     /* */
-    vlc_cond_init( &p_vout->p->change_wait );
     if( vlc_clone( &p_vout->p->thread, Thread, p_vout,
                    VLC_THREAD_PRIORITY_OUTPUT ) )
     {
@@ -338,16 +331,9 @@ vout_thread_t * (vout_Create)( vlc_object_t *p_parent, video_format_t *p_fmt )
         return NULL;
     }
 
-    vlc_mutex_lock( &p_vout->p->change_lock );
-    while( !p_vout->p->b_ready )
-    {   /* We are (ab)using the same condition in opposite directions for
-         * b_ready and b_done. This works because of the strict ordering. */
-        assert( !p_vout->p->b_done );
-        vlc_cond_wait( &p_vout->p->change_wait, &p_vout->p->change_lock );
-    }
-    vlc_mutex_unlock( &p_vout->p->change_lock );
+    vout_control_WaitEmpty( &p_vout->p->control );
 
-    if( p_vout->p->b_error )
+    if (p_vout->p->dead )
     {
         msg_Err( p_vout, "video output creation failed" );
         vout_CloseAndRelease( p_vout );
@@ -369,13 +355,9 @@ void vout_Close( vout_thread_t *p_vout )
 {
     assert( p_vout );
 
-    vlc_mutex_lock( &p_vout->p->change_lock );
-    p_vout->p->b_done = true;
-    vlc_cond_signal( &p_vout->p->change_wait );
-    vlc_mutex_unlock( &p_vout->p->change_lock );
-
     vout_snapshot_End( &p_vout->p->snapshot );
 
+    vout_control_PushVoid( &p_vout->p->control, VOUT_CONTROL_CLEAN );
     vlc_join( p_vout->p->thread, NULL );
 }
 
@@ -400,9 +382,7 @@ static void vout_Destructor( vlc_object_t * p_this )
     assert( !p_vout->p->decoder_pool );
 
     /* Destroy the locks */
-    vlc_cond_destroy( &p_vout->p->change_wait );
     vlc_mutex_destroy( &p_vout->p->picture_lock );
-    vlc_mutex_destroy( &p_vout->p->change_lock );
     vlc_mutex_destroy( &p_vout->p->vfilter_lock );
     vout_control_Clean( &p_vout->p->control );
 
@@ -582,29 +562,7 @@ void vout_ControlChangeCropBorder(vout_thread_t *vout,
     vout_control_Push(&vout->p->control, &cmd);
 }
 
-/*****************************************************************************
- * InitThread: initialize video output thread
- *****************************************************************************
- * This function is called from Thread and performs the second step of the
- * initialization. It returns 0 on success. Note that the thread's flag are not
- * modified inside this function.
- * XXX You have to enter it with change_lock taken.
- *****************************************************************************/
-static int ThreadInit(vout_thread_t *vout)
-{
-    /* Initialize output method, it allocates direct buffers for us */
-    if (vout_InitWrapper(vout))
-        return VLC_EGENERIC;
-    assert(vout->p->decoder_pool);
-
-    vout->p->displayed.decoded = NULL;
-
-    /* print some usefull debug info about different vout formats
-     */
-    PrintVideoFormat(vout, "pic render", &vout->p->original);
-    return VLC_SUCCESS;
-}
-
+/* */
 static int ThreadDisplayPicture(vout_thread_t *vout,
                                 bool now, mtime_t *deadline)
 {
@@ -794,10 +752,10 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
     return VLC_SUCCESS;
 }
 
-static int ThreadManage(vout_thread_t *vout,
-                        mtime_t *deadline,
-                        vout_interlacing_support_t *interlacing,
-                        vout_postprocessing_support_t *postprocessing)
+static void ThreadManage(vout_thread_t *vout,
+                         mtime_t *deadline,
+                         vout_interlacing_support_t *interlacing,
+                         vout_postprocessing_support_t *postprocessing)
 {
     vlc_mutex_lock(&vout->p->picture_lock);
 
@@ -815,22 +773,13 @@ static int ThreadManage(vout_thread_t *vout,
     /* Deinterlacing */
     vout_SetInterlacingState(vout, interlacing, picture_interlaced);
 
-    if (vout_ManageWrapper(vout)) {
-        /* A fatal error occurred, and the thread must terminate
-         * immediately, without displaying anything - setting b_error to 1
-         * causes the immediate end of the main while() loop. */
-        // FIXME pf_end
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
+    vout_ManageWrapper(vout);
 }
 
 static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
 {
     if (!vout->p->title.show)
         return;
-
-    vlc_assert_locked(&vout->p->change_lock);
 
     vout_OSDText(vout, SPU_DEFAULT_CHANNEL,
                  vout->p->title.position, INT64_C(1000) * vout->p->title.timeout,
@@ -855,7 +804,6 @@ static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
 
 static void ThreadChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
 {
-    vlc_assert_locked(&vout->p->change_lock);
     assert(!vout->p->pause.is_on || !is_paused);
 
     if (vout->p->pause.is_on) {
@@ -1031,13 +979,42 @@ static void ThreadExecuteCropRatio(vout_thread_t *vout,
     ThreadExecuteCropWindow(vout, num, den, x, y, width, height);
 }
 
+static int ThreadInit(vout_thread_t *vout)
+{
+    vout->p->dead = false;
+
+    if (vout_OpenWrapper(vout, vout->p->psz_module_name))
+        return VLC_EGENERIC;
+    if (vout_InitWrapper(vout))
+        return VLC_EGENERIC;
+    assert(vout->p->decoder_pool);
+
+    vout->p->displayed.decoded = NULL;
+
+    PrintVideoFormat(vout, "original format", &vout->p->original);
+    return VLC_SUCCESS;
+}
+
 static void ThreadClean(vout_thread_t *vout)
 {
+    /* Destroy the video filters2 */
+    filter_chain_Delete(vout->p->vfilter_chain);
+
     /* Destroy translation tables */
-    if (!vout->p->b_error) {
-        ThreadFlush(vout, true, INT64_MAX);
-        vout_EndWrapper(vout);
+    if (vout->p->display.vd) {
+        if (vout->p->decoder_pool) {
+            ThreadFlush(vout, true, INT64_MAX);
+            vout_EndWrapper(vout);
+        }
+        vout_CloseWrapper(vout);
     }
+
+    /* Detach subpicture unit from both input and vout */
+    spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), false);
+    vlc_object_detach(vout->p->p_spu);
+
+    vout->p->dead = true;
+    vout_control_Dead(&vout->p->control);
 }
 
 /*****************************************************************************
@@ -1050,28 +1027,7 @@ static void ThreadClean(vout_thread_t *vout)
 static void *Thread(void *object)
 {
     vout_thread_t *vout = object;
-    bool          has_wrapper;
 
-    /*
-     * Initialize thread
-     */
-    has_wrapper = !vout_OpenWrapper(vout, vout->p->psz_module_name);
-
-    vlc_mutex_lock(&vout->p->change_lock);
-
-    if (has_wrapper)
-        vout->p->b_error = ThreadInit(vout);
-    else
-        vout->p->b_error = true;
-
-    /* signal the creation of the vout */
-    vout->p->b_ready = true;
-    vlc_cond_signal(&vout->p->change_wait);
-
-    if (vout->p->b_error)
-        goto exit_thread;
-
-    /* */
     vout_interlacing_support_t interlacing = {
         .is_interlaced = false,
         .date = mdate(),
@@ -1080,22 +1036,23 @@ static void *Thread(void *object)
         .qtype = QTYPE_NONE,
     };
 
-    /*
-     * Main loop - it is not executed if an error occurred during
-     * initialization
-     */
     mtime_t deadline = VLC_TS_INVALID;
-    while (!vout->p->b_done && !vout->p->b_error) {
+    for (;;) {
         vout_control_cmd_t cmd;
 
-        vlc_mutex_unlock(&vout->p->change_lock);
         /* FIXME remove thoses ugly timeouts
          */
         while (!vout_control_Pop(&vout->p->control, &cmd, deadline, 100000)) {
-            /* TODO remove the lock when possible (ie when
-             * vout->p->fmt_* are not protected by it anymore) */
-            vlc_mutex_lock(&vout->p->change_lock);
             switch(cmd.type) {
+            case VOUT_CONTROL_INIT:
+                if (ThreadInit(vout)) {
+                    ThreadClean(vout);
+                    return NULL;
+                }
+                break;
+            case VOUT_CONTROL_CLEAN:
+                ThreadClean(vout);
+                return NULL;
             case VOUT_CONTROL_OSD_TITLE:
                 ThreadDisplayOsdTitle(vout, cmd.u.string);
                 break;
@@ -1145,46 +1102,11 @@ static void *Thread(void *object)
             default:
                 break;
             }
-            vlc_mutex_unlock(&vout->p->change_lock);
             vout_control_cmd_Clean(&cmd);
         }
-        vlc_mutex_lock(&vout->p->change_lock);
 
-        /* */
-        if (ThreadManage(vout, &deadline,
-                         &interlacing, &postprocessing)) {
-            vout->p->b_error = true;
-            break;
-        }
+        ThreadManage(vout, &deadline, &interlacing, &postprocessing);
     }
-
-    /*
-     * Error loop - wait until the thread destruction is requested
-     *
-     * XXX I wonder if we should periodically clean the decoder_fifo
-     * or have a way to prevent it filling up.
-     */
-    while (vout->p->b_error && !vout->p->b_done)
-        vlc_cond_wait(&vout->p->change_wait, &vout->p->change_lock);
-
-    /* Clean thread */
-    ThreadClean(vout);
-
-exit_thread:
-    /* Detach subpicture unit from both input and vout */
-    spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), false);
-    vlc_object_detach(vout->p->p_spu);
-
-    vlc_mutex_unlock(&vout->p->change_lock);
-
-    if (has_wrapper)
-        vout_CloseWrapper(vout);
-    vout_control_Dead(&vout->p->control);
-
-    /* Destroy the video filters2 */
-    filter_chain_Delete(vout->p->vfilter_chain);
-
-    return NULL;
 }
 
 /*****************************************************************************

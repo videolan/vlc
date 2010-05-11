@@ -53,10 +53,7 @@ struct vout_thread_sys_t
 
     /* Thread & synchronization */
     vlc_thread_t    thread;
-    vlc_cond_t      change_wait;
-    bool            b_ready;
-    bool            b_done;
-    bool            b_error;
+    bool            dead;
     vout_control_t  control;
 
     /* */
@@ -124,8 +121,6 @@ struct vout_thread_sys_t
     picture_fifo_t      *decoder_fifo;
     bool                is_decoder_pool_slow;
     vout_chrono_t       render;           /**< picture render time estimator */
-
-    vlc_mutex_t         change_lock;                 /**< thread change lock */
 };
 
 /* TODO to move them to vlc_vout.h */
@@ -146,7 +141,7 @@ int  vout_OpenWrapper (vout_thread_t *, const char *);
 void vout_CloseWrapper(vout_thread_t *);
 int  vout_InitWrapper(vout_thread_t *);
 void vout_EndWrapper(vout_thread_t *);
-int  vout_ManageWrapper(vout_thread_t *);
+void vout_ManageWrapper(vout_thread_t *);
 void vout_RenderWrapper(vout_thread_t *, picture_t *);
 void vout_DisplayWrapper(vout_thread_t *, picture_t *);
 

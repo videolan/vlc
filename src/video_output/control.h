@@ -30,10 +30,10 @@
 
 /* */
 enum {
-#if 0
     VOUT_CONTROL_INIT,
-    VOUT_CONTROL_EXIT,
+    VOUT_CONTROL_CLEAN,
 
+#if 0
     /* */
     VOUT_CONTROL_START,
     VOUT_CONTROL_STOP,

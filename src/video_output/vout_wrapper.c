@@ -179,7 +179,7 @@ void vout_EndWrapper(vout_thread_t *vout)
 /*****************************************************************************
  *
  *****************************************************************************/
-int vout_ManageWrapper(vout_thread_t *vout)
+void vout_ManageWrapper(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
     vout_display_t *vd = sys->display.vd;
@@ -189,8 +189,6 @@ int vout_ManageWrapper(vout_thread_t *vout)
 
     if (reset_display_pool)
         sys->display_pool = vout_display_Pool(vd, 3);
-
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
