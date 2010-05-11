@@ -69,6 +69,10 @@ static int FullscreenCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 static int SnapshotCallback( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
+static int VideoFilterCallback( vlc_object_t *, char const *,
+                                vlc_value_t, vlc_value_t, void * );
+static int VideoSplitterCallback( vlc_object_t *, char const *,
+                                  vlc_value_t, vlc_value_t, void * );
 
 static int TitleShowCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
@@ -350,6 +354,20 @@ void vout_IntfInit( vout_thread_t *p_vout )
     text.psz_string = _("Snapshot");
     var_Change( p_vout, "video-snapshot", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "video-snapshot", SnapshotCallback, NULL );
+
+    /* Add a video-filter variable */
+    var_Create( p_vout, "video-filter",
+                VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_vout, "video-filter", VideoFilterCallback, NULL );
+    var_TriggerCallback( p_vout, "video-filter" );
+
+    /* Add a video-splitter variable
+     * TODO rename vout-filter into vout-splitter */
+    var_Create( p_vout, "vout-filter",
+                VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
+    text.psz_string = _("Video splitter");
+    var_Change( p_vout, "vout-filter", VLC_VAR_SETTEXT, &text, NULL );
+    var_AddCallback( p_vout, "vout-filter", VideoSplitterCallback, NULL );
 
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
@@ -724,6 +742,42 @@ static int SnapshotCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(newval); VLC_UNUSED(p_data);
 
     VoutSaveSnapshot( p_vout );
+    return VLC_SUCCESS;
+}
+
+static int VideoFilterCallback( vlc_object_t *p_this, char const *psz_cmd,
+                                vlc_value_t oldval, vlc_value_t newval, void *p_data)
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+
+    vout_ControlChangeFilters( p_vout, newval.psz_string );
+    return VLC_SUCCESS;
+}
+
+static int VideoSplitterCallback( vlc_object_t *p_this, char const *psz_cmd,
+                                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    input_thread_t *p_input;
+    (void)psz_cmd; (void)oldval; (void)p_data;
+
+    p_input = (input_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
+                                                 FIND_PARENT );
+    if (!p_input)
+    {
+        msg_Err( p_vout, "Input not found" );
+        return VLC_EGENERIC;
+    }
+
+    /* Modify input as well because the vout might have to be restarted */
+    var_Create( p_input, "vout-filter", VLC_VAR_STRING );
+    var_SetString( p_input, "vout-filter", newval.psz_string );
+
+    /* Now restart current video stream */
+    input_Control( p_input, INPUT_RESTART_ES, -VIDEO_ES );
+    vlc_object_release( p_input );
+
     return VLC_SUCCESS;
 }
 

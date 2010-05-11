@@ -42,14 +42,24 @@
 /* */
 struct vout_thread_sys_t
 {
-    /* module */
-    char       *psz_module_name;
-
-    /* Video output configuration */
-    config_chain_t *p_cfg;
+    /* Splitter module if used */
+    char            *splitter_name;
 
     /* */
     video_format_t  original; /* Original format ie coming from the decoder */
+
+    /* Snapshot interface */
+    vout_snapshot_t snapshot;
+
+    /* Statistics */
+    vout_statistic_t statistic;
+
+    /* Subpicture unit */
+    spu_t           *p_spu;
+
+    /* Monitor Pixel Aspect Ratio */
+    unsigned int    i_par_num;
+    unsigned int    i_par_den;
 
     /* Thread & synchronization */
     vlc_thread_t    thread;
@@ -90,37 +100,23 @@ struct vout_thread_sys_t
     } title;
 
     /* */
-    unsigned int    i_par_num;           /**< monitor pixel aspect-ratio */
-    unsigned int    i_par_den;           /**< monitor pixel aspect-ratio */
     bool            is_late_dropped;
-
-    /* Statistics */
-    vout_statistic_t statistic;
-
-    /* Filter chain */
-    char           *psz_filter_chain;
 
     /* Video filter2 chain */
     vlc_mutex_t     vfilter_lock;
     filter_chain_t *vfilter_chain;
 
-    /* Snapshot interface */
-    vout_snapshot_t snapshot;
-
-    /* Subpicture unit */
-    spu_t          *p_spu;
-
     /* */
     vlc_mouse_t     mouse;
 
     /* */
-    vlc_mutex_t         picture_lock;                 /**< picture heap lock */
-    picture_pool_t      *private_pool;
-    picture_pool_t      *display_pool;
-    picture_pool_t      *decoder_pool;
-    picture_fifo_t      *decoder_fifo;
-    bool                is_decoder_pool_slow;
-    vout_chrono_t       render;           /**< picture render time estimator */
+    vlc_mutex_t     picture_lock;                 /**< picture heap lock */
+    picture_pool_t  *private_pool;
+    picture_pool_t  *display_pool;
+    picture_pool_t  *decoder_pool;
+    picture_fifo_t  *decoder_fifo;
+    bool            is_decoder_pool_slow;
+    vout_chrono_t   render;           /**< picture render time estimator */
 };
 
 /* TODO to move them to vlc_vout.h */
@@ -132,6 +128,7 @@ void vout_ControlChangeSampleAspectRatio(vout_thread_t *, unsigned num, unsigned
 void vout_ControlChangeCropRatio(vout_thread_t *, unsigned num, unsigned den);
 void vout_ControlChangeCropWindow(vout_thread_t *, int x, int y, int width, int height);
 void vout_ControlChangeCropBorder(vout_thread_t *, int left, int top, int right, int bottom);
+void vout_ControlChangeFilters(vout_thread_t *, const char *);
 
 /* */
 void vout_IntfInit( vout_thread_t * );
