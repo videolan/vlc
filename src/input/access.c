@@ -34,7 +34,7 @@ static char *get_path(const char *location)
 {
     char *url, *path;
 
-    /* Appending "file://" is a bit hackish. But then again, we do not want
+    /* Prepending "file://" is a bit hackish. But then again, we do not want
      * to hard-code the list of schemes that use file paths in make_path().
      */
     if (asprintf(&url, "file://%s", location) == -1)
