@@ -468,6 +468,7 @@ var_Inherit
 video_format_FixRgb
 video_format_IsSimilar
 video_format_Setup
+video_format_Print
 video_splitter_Delete
 video_splitter_New
 vlc_avcodec_mutex

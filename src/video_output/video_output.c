@@ -64,9 +64,6 @@ static int FilterCallback( vlc_object_t *, char const *,
 static int VideoFilter2Callback( vlc_object_t *, char const *,
                                  vlc_value_t, vlc_value_t, void * );
 
-/* */
-static void PrintVideoFormat(vout_thread_t *, const char *, const video_format_t *);
-
 /* Maximum delay between 2 displayed pictures.
  * XXX it is needed for now but should be removed in the long term.
  */
@@ -991,7 +988,7 @@ static int ThreadInit(vout_thread_t *vout)
 
     vout->p->displayed.decoded = NULL;
 
-    PrintVideoFormat(vout, "original format", &vout->p->original);
+    video_format_Print(VLC_OBJECT(vout), "original format", &vout->p->original);
     return VLC_SUCCESS;
 }
 
@@ -1152,19 +1149,5 @@ static int VideoFilter2Callback(vlc_object_t *object, char const *cmd,
     vout_control_PushString(&vout->p->control, VOUT_CONTROL_CHANGE_FILTERS,
                             newval.psz_string);
     return VLC_SUCCESS;
-}
-
-/* */
-static void PrintVideoFormat(vout_thread_t *vout,
-                             const char *description,
-                             const video_format_t *fmt)
-{
-    msg_Dbg(vout, "%s sz %ix%i, of (%i,%i), vsz %ix%i, 4cc %4.4s, sar %i:%i, msk r0x%x g0x%x b0x%x",
-            description,
-            fmt->i_width, fmt->i_height, fmt->i_x_offset, fmt->i_y_offset,
-            fmt->i_visible_width, fmt->i_visible_height,
-            (char*)&fmt->i_chroma,
-            fmt->i_sar_num, fmt->i_sar_den,
-            fmt->i_rmask, fmt->i_gmask, fmt->i_bmask);
 }
 

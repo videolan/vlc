@@ -179,6 +179,11 @@ VLC_EXPORT( void, video_format_Setup, ( video_format_t *, vlc_fourcc_t i_chroma,
 VLC_EXPORT( bool, video_format_IsSimilar, ( const video_format_t *, const video_format_t * ) );
 
 /**
+ * It prints details about the given video_format_t
+ */
+VLC_EXPORT( void, video_format_Print, ( vlc_object_t *, const char *, const video_format_t * ) );
+
+/**
  * subtitles format description
  */
 struct subs_format_t
