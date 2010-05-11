@@ -37,6 +37,7 @@
 #include <vlc_demux.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
+#include <vlc_url.h>
 
 #include <vlc_dialog.h>
 
@@ -203,6 +204,7 @@ static int Open( vlc_object_t *p_this )
         *(psz_name + strlen(psz_name) - 1) = '\0';
     }
 #endif
+    decode_URI( psz_name );
 
     /* Try some simple probing to avoid going through dvdnav_open too often */
     if( ProbeDVD( p_demux, psz_name ) != VLC_SUCCESS )
