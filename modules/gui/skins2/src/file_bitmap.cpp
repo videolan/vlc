@@ -28,6 +28,7 @@
 
 #include <vlc_common.h>
 #include <vlc_image.h>
+#include <vlc_url.h>
 #include "file_bitmap.hpp"
 
 FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
@@ -41,8 +42,12 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
 
     fmt_out.i_chroma = VLC_CODEC_RGBA;
 
-    pPic = image_ReadUrl( pImageHandler, fileName.c_str(), &fmt_in, &fmt_out );
-    if( !pPic ) return;
+    char* psz_uri = make_URI( fileName.c_str() );
+    pPic = image_ReadUrl( pImageHandler, psz_uri, &fmt_in, &fmt_out );
+    free( psz_uri );
+
+    if( !pPic )
+        return;
 
     m_width = fmt_out.i_width;
     m_height = fmt_out.i_height;

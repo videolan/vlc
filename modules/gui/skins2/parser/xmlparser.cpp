@@ -23,6 +23,7 @@
 
 #include "xmlparser.hpp"
 #include "../src/os_factory.hpp"
+#include <vlc_url.h>
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
@@ -54,7 +55,10 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
     // }
     LoadCatalog();
 
-    m_pStream = stream_UrlNew( pIntf, rFileName.c_str() );
+    char* psz_uri = make_URI( rFileName.c_str() );
+    m_pStream = stream_UrlNew( pIntf, psz_uri );
+    free( psz_uri );
+
     if( !m_pStream )
     {
         msg_Err( getIntf(), "failed to open %s for reading",
