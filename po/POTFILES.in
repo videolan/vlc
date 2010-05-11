@@ -167,7 +167,6 @@ src/network/tls.c
 src/network/udp.c
 src/osd/osd.c
 src/osd/osd_text.c
-src/osd/osd_widgets.c
 src/playlist/control.c
 src/playlist/engine.c
 src/playlist/item.c
