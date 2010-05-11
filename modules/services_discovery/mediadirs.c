@@ -258,6 +258,8 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 static int onNewFileAdded( vlc_object_t *p_this, char const *psz_var,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void)p_this;
+
     services_discovery_t *p_sd = p_data;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
 
@@ -310,7 +312,6 @@ void formatSnapshotItem( input_item_t *p_item )
     if( !p_item )
         return;
 
-    char* psz_file = NULL;
     char* psz_option = NULL;
     char* psz_uri = input_item_GetURI( p_item );
 
@@ -320,11 +321,7 @@ void formatSnapshotItem( input_item_t *p_item )
     /* copy the snapshot mrl as a ArtURL */
     input_item_SetArtURL( p_item, psz_uri );
 
-    psz_file = make_path( psz_uri );
-    if( !psz_file )
-        goto end;
-
-    if( asprintf( &psz_option, "fake-file=%s", psz_file ) == -1 )
+    if( asprintf( &psz_option, "fake-file=%s", psz_uri ) == -1 )
     {
         psz_option = NULL;
         goto end;
@@ -336,7 +333,6 @@ void formatSnapshotItem( input_item_t *p_item )
 
 end:
     free( psz_option );
-    free( psz_file );
     free( psz_uri );
 }
 
