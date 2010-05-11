@@ -1078,7 +1078,7 @@ char *make_URI (const char *path)
 #ifndef WIN32
         /* \\host\share\path -> smb://host/share/path */
         if (strchr (path + 2, '\\') != NULL)
-        {   /* Convert antislashes to slashes */
+        {   /* Convert backslashes to slashes */
             char *dup = strdup (path);
             if (dup == NULL)
                 return NULL;
