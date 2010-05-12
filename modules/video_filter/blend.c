@@ -93,55 +93,11 @@ static void BlendRGBAR16( filter_t *, picture_t *, const picture_t *,
 static void BlendRGBAR24( filter_t *, picture_t *, const picture_t *,
                           int, int, int, int, int );
 
-/*****************************************************************************
- * OpenFilter: probe the filter and return score
- *****************************************************************************/
-static int OpenFilter( vlc_object_t *p_this )
+struct filter_sys_t
 {
-    filter_t *p_filter = (filter_t*)p_this;
+    int i_blendcfg;
+};
 
-    /* Check if we can handle that format.
-     * We could try to use a chroma filter if we can't. */
-    int in_chroma = p_filter->fmt_in.video.i_chroma;
-    int out_chroma = p_filter->fmt_out.video.i_chroma;
-    if( ( in_chroma  != VLC_CODEC_YUVA && in_chroma  != VLC_CODEC_I420 &&
-          in_chroma  != VLC_CODEC_YV12 && in_chroma  != VLC_CODEC_YUVP &&
-          in_chroma  != VLC_CODEC_RGBA ) ||
-        ( out_chroma != VLC_CODEC_I420 && out_chroma != VLC_CODEC_J420 &&
-          out_chroma != VLC_CODEC_YV12 &&
-          out_chroma != VLC_CODEC_YUYV && out_chroma != VLC_CODEC_YVYU &&
-          out_chroma != VLC_CODEC_UYVY && out_chroma != VLC_CODEC_VYUY &&
-          out_chroma != VLC_CODEC_RGB15 &&
-          out_chroma != VLC_CODEC_RGB16 &&
-          out_chroma != VLC_CODEC_RGB24 &&
-          out_chroma != VLC_CODEC_RGB32 ) )
-    {
-        return VLC_EGENERIC;
-    }
-
-    /* Misc init */
-    p_filter->pf_video_blend = Blend;
-
-    msg_Dbg( p_filter, "chroma: %4.4s -> %4.4s",
-             (char *)&p_filter->fmt_in.video.i_chroma,
-             (char *)&p_filter->fmt_out.video.i_chroma );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * CloseFilter: clean up the filter
- *****************************************************************************/
-static void CloseFilter( vlc_object_t *p_this )
-{
-    (void)p_this;
-}
-
-/****************************************************************************
- * Blend: the whole thing
- ****************************************************************************
- * This function is called just after the thread is launched.
- ****************************************************************************/
 typedef void (*BlendFunction)( filter_t *,
                        picture_t *, const picture_t *,
                        int , int , int , int , int );
@@ -177,6 +133,84 @@ static const struct
     { 0, {0,}, NULL }
 };
 
+/*****************************************************************************
+ * OpenFilter: probe the filter and return score
+ *****************************************************************************/
+static int OpenFilter( vlc_object_t *p_this )
+{
+    filter_t *p_filter = (filter_t*)p_this;
+    filter_sys_t *p_sys = (filter_sys_t *)malloc( sizeof( filter_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
+    p_filter->p_sys = p_sys;
+    p_filter->p_sys->i_blendcfg = -1;
+
+    /* Check if we can handle that format.
+     * We could try to use a chroma filter if we can't. */
+    int in_chroma = p_filter->fmt_in.video.i_chroma;
+    int out_chroma = p_filter->fmt_out.video.i_chroma;
+
+    if( ( in_chroma  != VLC_CODEC_YUVA && in_chroma  != VLC_CODEC_I420 &&
+          in_chroma  != VLC_CODEC_YV12 && in_chroma  != VLC_CODEC_YUVP &&
+          in_chroma  != VLC_CODEC_RGBA ) ||
+        ( out_chroma != VLC_CODEC_I420 && out_chroma != VLC_CODEC_J420 &&
+          out_chroma != VLC_CODEC_YV12 &&
+          out_chroma != VLC_CODEC_YUYV && out_chroma != VLC_CODEC_YVYU &&
+          out_chroma != VLC_CODEC_UYVY && out_chroma != VLC_CODEC_VYUY &&
+          out_chroma != VLC_CODEC_RGB15 &&
+          out_chroma != VLC_CODEC_RGB16 &&
+          out_chroma != VLC_CODEC_RGB24 &&
+          out_chroma != VLC_CODEC_RGB32 ) )
+    {
+        return VLC_EGENERIC;
+    }
+    for( int i = 0; p_blend_cfg[i].src != 0; i++ )
+    {
+        if( p_blend_cfg[i].src != p_filter->fmt_in.video.i_chroma )
+            continue;
+        for( int j = 0; p_blend_cfg[i].p_dst[j] != 0; j++ )
+        {
+            if( p_blend_cfg[i].p_dst[j] != p_filter->fmt_out.video.i_chroma )
+                continue;
+            p_sys->i_blendcfg = i;
+        }
+    }
+
+    if( p_sys->i_blendcfg == -1 )
+    {
+       msg_Dbg( p_filter, "no matching alpha blending routine "
+             "(chroma: %4.4s -> %4.4s)",
+             (char *)&p_filter->fmt_in.video.i_chroma,
+             (char *)&p_filter->fmt_out.video.i_chroma );
+      free( p_sys );
+      return VLC_EGENERIC;
+   }
+
+    /* Misc init */
+    p_filter->pf_video_blend = Blend;
+
+    msg_Dbg( p_filter, "chroma: %4.4s -> %4.4s",
+             (char *)&p_filter->fmt_in.video.i_chroma,
+             (char *)&p_filter->fmt_out.video.i_chroma );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * CloseFilter: clean up the filter
+ *****************************************************************************/
+static void CloseFilter( vlc_object_t *p_this )
+{
+    filter_t *p_filter = (filter_t*)p_this;
+    free( p_filter->p_sys );
+}
+
+/****************************************************************************
+ * Blend: the whole thing
+ ****************************************************************************
+ * This function is called just after the thread is launched.
+ ****************************************************************************/
+
 static void Blend( filter_t *p_filter,
                    picture_t *p_dst, const picture_t *p_src,
                    int i_x_offset, int i_y_offset, int i_alpha )
@@ -204,26 +238,11 @@ static void Blend( filter_t *p_filter,
              (char *)&p_filter->fmt_out.video.i_chroma );
 #endif
 
-    for( int i = 0; p_blend_cfg[i].src != 0; i++ )
-    {
-        if( p_blend_cfg[i].src != p_filter->fmt_in.video.i_chroma )
-            continue;
-        for( int j = 0; p_blend_cfg[i].p_dst[j] != 0; j++ )
-        {
-            if( p_blend_cfg[i].p_dst[j] != p_filter->fmt_out.video.i_chroma )
-                continue;
 
-            p_blend_cfg[i].pf_blend( p_filter, p_dst, p_src,
-                                     i_x_offset, i_y_offset,
-                                     i_width, i_height, i_alpha );
-            return;
-        }
-    }
+    p_blend_cfg[p_filter->p_sys->i_blendcfg].pf_blend( p_filter, p_dst, p_src,
+                            i_x_offset, i_y_offset,
+                            i_width, i_height, i_alpha );
 
-    msg_Dbg( p_filter, "no matching alpha blending routine "
-             "(chroma: %4.4s -> %4.4s)",
-             (char *)&p_filter->fmt_in.video.i_chroma,
-             (char *)&p_filter->fmt_out.video.i_chroma );
 }
 
 /***********************************************************************
