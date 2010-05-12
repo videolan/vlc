@@ -279,17 +279,17 @@ static int Open (vlc_object_t *obj)
 
     /* ICCCM
      * No cut&paste nor drag&drop, only Window Manager communication. */
-    /* xgettext:
-       Plain ASCII of "VLC media player" for the ICCCM window name.
-       This must be ASCII. The limitation is partially with ICCCM
-       and partially with VLC.
+    set_ascii_prop (conn, window, XA_WM_NAME,
+    /* xgettext: This is a plain ASCII spelling of "VLC media player"
+       for the ICCCM window name. This must be pure ASCII.
+       The limitation is partially with ICCCM and partially with VLC.
        For Latin script languages, you may need to strip accents.
        For other scripts, you will need to transliterate into Latin. */
-    set_ascii_prop (conn, window, XA_WM_NAME,
-                  vlc_pgettext ("ASCII", "VLC media player"));
-    /* xgettext:
-       Plain ASCII of "VLC" for the ICCCM window name. */
+                    vlc_pgettext ("ASCII", "VLC media player"));
+
     set_ascii_prop (conn, window, XA_WM_ICON_NAME,
+    /* xgettext: This is a plain ASCII spelling of "VLC"
+       for the ICCCM window name. This must be pure ASCII. */
                     vlc_pgettext ("ASCII", "VLC"));
     set_wm_hints (conn, window);
     xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window, XA_WM_CLASS,
