@@ -3157,14 +3157,19 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
         free( psz_path );
     }
 
+    char *url = make_URI( psz_subtitle );
+
     var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
 
     sub = InputSourceNew( p_input );
-    if( !sub || InputSourceInit( p_input, sub, psz_subtitle, "subtitle" ) )
+    if( !sub || !url
+     || InputSourceInit( p_input, sub, url, "subtitle" ) )
     {
         free( sub );
+        free( url );
         return;
     }
+    free( url );
     TAB_APPEND( p_input->p->i_slave, p_input->p->slave, sub );
 
     /* Select the ES */
