@@ -102,8 +102,7 @@ struct filter_sys_t {
     vlc_mutex_t      lock;
     float            strength;
     int              radius;
-    int              h_shift;
-    int              v_shift;
+    const vlc_chroma_description_t *chroma;
     void             *base_buf;
     struct vf_priv_s cfg;
 };
@@ -111,36 +110,11 @@ struct filter_sys_t {
 static int Open(vlc_object_t *object)
 {
     filter_t *filter = (filter_t *)object;
+    const vlc_fourcc_t fourcc = filter->fmt_in.video.i_chroma;
 
-    int h_shift;
-    int v_shift;
-    switch (filter->fmt_in.video.i_chroma) {
-    case VLC_CODEC_I410:
-    case VLC_CODEC_YV9:
-        h_shift = 2; v_shift = 2;
-        break;
-    case VLC_CODEC_I411:
-        h_shift = 2; v_shift = 0;
-        break;
-    case VLC_CODEC_I420:
-    case VLC_CODEC_J420:
-    case VLC_CODEC_YV12:
-        h_shift = 1; v_shift = 1;
-        break;
-    case VLC_CODEC_I422:
-    case VLC_CODEC_J422:
-        h_shift = 1; v_shift = 0;
-        break;
-    case VLC_CODEC_I444:
-    case VLC_CODEC_J444:
-    case VLC_CODEC_YUVA:
-        h_shift = 0; v_shift = 0;
-        break;
-    case VLC_CODEC_I440:
-    case VLC_CODEC_J440:
-        h_shift = 0; v_shift = 1;
-        break;
-    default:
+    const vlc_chroma_description_t *chroma = vlc_fourcc_GetChromaDescription(fourcc);
+    if (!chroma || chroma->plane_count < 3) {
+        msg_Err(filter, "Unsupported chroma (%4.4s)", (char*)&fourcc);
         return VLC_EGENERIC;
     }
 
@@ -149,8 +123,7 @@ static int Open(vlc_object_t *object)
         return VLC_ENOMEM;
 
     vlc_mutex_init(&sys->lock);
-    sys->h_shift  = h_shift;
-    sys->v_shift  = v_shift;
+    sys->chroma   = chroma;
     sys->strength = var_CreateGetFloatCommand(filter,   CFG_PREFIX "strength");
     sys->radius   = var_CreateGetIntegerCommand(filter, CFG_PREFIX "radius");
     var_AddCallback(filter, CFG_PREFIX "strength", Callback, NULL);
@@ -221,15 +194,12 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
         const plane_t *srcp = &src->p[i];
         plane_t       *dstp = &dst->p[i];
 
-        int w = fmt->i_width;
-        int h = fmt->i_height;
-        int r = cfg->radius;
-        if (i > 0) {
-            w >>= sys->h_shift;
-            h >>= sys->v_shift;
-            r = ((r >> sys->h_shift) + (r >> sys->v_shift)) / 2;
-            r = __MIN(__MAX((r + 1) & ~1, RADIUS_MIN), RADIUS_MAX);
-        }
+        const vlc_chroma_description_t *chroma = sys->chroma;
+        int w = fmt->i_width  * chroma->p[i].w.num / chroma->p[i].w.den;
+        int h = fmt->i_height * chroma->p[i].h.num / chroma->p[i].h.den;
+        int r = (cfg->radius  * chroma->p[i].w.num / chroma->p[i].w.den +
+                 cfg->radius  * chroma->p[i].h.num / chroma->p[i].h.den) / 2;
+        r = __MIN(__MAX((r + 1) & ~1, RADIUS_MIN), RADIUS_MAX);
         if (__MIN(w, h) > 2 * r && cfg->buf) {
             filter_plane(cfg, dstp->p_pixels, srcp->p_pixels,
                          w, h, dstp->i_pitch, srcp->i_pitch, r);
