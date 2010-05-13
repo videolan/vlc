@@ -400,6 +400,29 @@ VLC_EXPORT( bool, vlc_fourcc_IsYUV, ( vlc_fourcc_t ) );
  */
 VLC_EXPORT( bool, vlc_fourcc_AreUVPlanesSwapped, (vlc_fourcc_t , vlc_fourcc_t ) );
 
+/**
+ * Chroma related informations.
+ */
+typedef struct {
+    unsigned plane_count;
+    struct {
+        struct {
+            unsigned num;
+            unsigned den;
+        } w;
+        struct {
+            unsigned num;
+            unsigned den;
+        } h;
+    } p[4];
+    unsigned pixel_size;
+} vlc_chroma_description_t;
+
+/**
+ * It returns a vlc_chroma_description_t describing the request fourcc or NULL
+ * if not found.
+ */
+VLC_EXPORT( const vlc_chroma_description_t *, vlc_fourcc_GetChromaDescription, ( vlc_fourcc_t fourcc ) );
 
 #endif /* _VLC_FOURCC_H */
 

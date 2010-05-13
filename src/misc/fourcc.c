@@ -1571,3 +1571,58 @@ bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
     return false;
 }
 
+#define PLANAR(n, w_den, h_den) \
+    { .plane_count = n, \
+      .p = { {.w = {1,    1}, .h = {1,    1}}, \
+             {.w = {1,w_den}, .h = {1,h_den}}, \
+             {.w = {1,w_den}, .h = {1,h_den}}, \
+             {.w = {1,    1}, .h = {1,    1}} }, \
+      .pixel_size = 1 }
+
+#define PACKED(size) \
+    { .plane_count = 1, \
+      .p = { {.w = {1,1}, .h = {1,1}} }, \
+      .pixel_size = size }
+
+static const struct
+{
+    vlc_fourcc_t             p_fourcc[5];
+    vlc_chroma_description_t description;
+} p_list_chroma_description[] = {
+    { { VLC_CODEC_I411, 0 },                   PLANAR(3, 4, 1) },
+    { { VLC_CODEC_YUV_PLANAR_410, 0 },         PLANAR(3, 4, 4) },
+    { { VLC_CODEC_YUV_PLANAR_420, 0 },         PLANAR(3, 2, 2) },
+    { { VLC_CODEC_YUV_PLANAR_422, 0 },         PLANAR(3, 2, 1) },
+    { { VLC_CODEC_YUV_PLANAR_440, 0 },         PLANAR(3, 1, 2) },
+    { { VLC_CODEC_YUV_PLANAR_444, 0 },         PLANAR(3, 1, 1) },
+    { { VLC_CODEC_YUVA, 0 },                   PLANAR(4, 1, 1) },
+
+    { { VLC_CODEC_YUV_PACKED, 0 },             PACKED(2) },
+    { { VLC_CODEC_RGB8, VLC_CODEC_GREY,
+        VLC_CODEC_YUVP, VLC_CODEC_RGBP, 0 },   PACKED(1) },
+    { { VLC_CODEC_RGB16, VLC_CODEC_RGB15, 0 }, PACKED(2) },
+    { { VLC_CODEC_RGB24, 0 },                  PACKED(3) },
+    { { VLC_CODEC_RGB32, VLC_CODEC_RGBA, 0 },  PACKED(4) },
+
+    { { VLC_CODEC_Y211, 0 },                   { 1, { {{1,4}, {1,1}} }, 4 } },
+
+    { {0}, { 0, {}, 0 } }
+};
+
+#undef PACKED
+#undef PLANAR
+
+const vlc_chroma_description_t *vlc_fourcc_GetChromaDescription( vlc_fourcc_t i_fourcc )
+{
+    for( unsigned i = 0; p_list_chroma_description[i].p_fourcc[0]; i++ )
+    {
+        const vlc_fourcc_t *p_fourcc = p_list_chroma_description[i].p_fourcc;
+        for( unsigned j = 0; p_fourcc[j]; j++ )
+        {
+            if( p_fourcc[j] == i_fourcc )
+                return &p_list_chroma_description[i].description;
+        }
+    }
+    return NULL;
+}
+
