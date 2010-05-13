@@ -1185,7 +1185,7 @@ char *make_path (const char *url)
 #endif
         /* Leading slash => local path */
         if (*path == DIR_SEP_CHAR)
-#ifndef WIN32
+#if !defined (WIN32) || defined (UNDER_CE)
             return path;
 #else
             return memmove (path, path + 1, strlen (path + 1) + 1);
@@ -1226,6 +1226,7 @@ char *make_path (const char *url)
                     ret = NULL;
         }
 #else
+        /* XXX: Does this work on WinCE? */
         if (fd < 2)
             ret = strdup ("CON");
         else
