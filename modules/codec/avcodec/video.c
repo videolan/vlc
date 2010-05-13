@@ -332,28 +332,25 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
     p_sys->p_context->opaque = p_dec;
 
-#ifdef HAVE_AVCODEC_VA
-    const bool b_use_hw = var_CreateGetBool( p_dec, "ffmpeg-hw" );
-    if( b_use_hw )
-        p_sys->p_context->get_format = ffmpeg_GetFormat;
-#endif
-
 #ifdef HAVE_AVCODEC_MT
     int i_thread_count = var_InheritInteger( p_dec, "ffmpeg-threads" );
     if( i_thread_count <= 0 )
         i_thread_count = vlc_GetCPUCount();
-#ifdef HAVE_AVCODEC_VA
-    if( b_use_hw )
-    {
-        if( i_thread_count > 1 )
-            msg_Err( p_dec, "ffmpeg-hw and ffmpeg-threads options are not compatible" );
-        i_thread_count = 1;
-    }
-#endif
     msg_Dbg( p_dec, "allowing %d thread(s) for decoding", i_thread_count );
     p_sys->p_context->thread_count = i_thread_count;
 #endif
 
+#ifdef HAVE_AVCODEC_VA
+    const bool b_use_hw = var_CreateGetBool( p_dec, "ffmpeg-hw" );
+    if( b_use_hw )
+    {
+#ifdef HAVE_AVCODEC_MT
+        msg_Err( p_dec, "ffmpeg-hw is not compatible with ffmpeg-mt" );
+#else
+        p_sys->p_context->get_format = ffmpeg_GetFormat;
+#endif
+    }
+#endif
 
     /* ***** misc init ***** */
     p_sys->i_pts = VLC_TS_INVALID;
