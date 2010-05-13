@@ -146,7 +146,7 @@ static int Open(vlc_object_t *object)
 end:
     dst->audio = src->audio;
     dst->audio.i_format = dst->i_codec;
-    dst->audio.i_bitspersample = aout_BitsPerSample(dst->i_codec);
+    aout_FormatPrepare(&dst->audio);
 
     msg_Dbg(filter, "%4.4s->%4.4s, bits per sample: %i->%i",
             (char *)&src->i_codec, (char *)&dst->i_codec,
