@@ -384,7 +384,7 @@ static int Extract(vlc_va_t *external, picture_t *picture, AVFrame *ff)
         };
         size_t  pitch[2] = {
             lock.Pitch,
-            lock.Pitch / 2,
+            lock.Pitch,
         };
         CopyFromNv12(picture, plane, pitch,
                      va->surface_width, va->surface_height,
