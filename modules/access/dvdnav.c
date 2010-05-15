@@ -144,11 +144,14 @@ struct demux_sys_t
 
     /* lenght of program group chain */
     mtime_t     i_pgc_length;
+    int         i_vobu_index;
+    int         i_vobu_flush;
 };
 
 static int Control( demux_t *, int, va_list );
 static int Demux( demux_t * );
 static int DemuxBlock( demux_t *, const uint8_t *, int );
+static void DemuxForceStill( demux_t * );
 
 static void DemuxTitles( demux_t * );
 static void ESSubtitleUpdate( demux_t * );
@@ -231,6 +234,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_mux_rate = 0;
     p_sys->i_pgc_length = 0;
     p_sys->b_spu_change = false;
+    p_sys->i_vobu_index = 0;
+    p_sys->i_vobu_flush = 0;
 
     if( 1 )
     {
@@ -616,6 +621,12 @@ static int Demux( demux_t *p_demux )
             p_sys->b_reset_pcr = false;
         }
         DemuxBlock( p_demux, packet, i_len );
+        if( p_sys->i_vobu_index > 0 )
+        {
+            if( p_sys->i_vobu_flush == p_sys->i_vobu_index )
+                DemuxForceStill( p_demux );
+            p_sys->i_vobu_index++;
+        }
         break;
 
     case DVDNAV_NOP:    /* Nothing */
@@ -646,16 +657,7 @@ static int Demux( demux_t *p_demux )
 
         if( b_still_init )
         {
-            /* We send a dummy mpeg2 end of sequence to force still frame display */
-            static const uint8_t buffer[] = {
-                0x00, 0x00, 0x01, 0xe0, 0x00, 0x07,
-                0x80, 0x00, 0x00,
-                0x00, 0x00, 0x01, 0xB7,
-            };
-            DemuxBlock( p_demux, buffer, sizeof(buffer) );
-
-            bool b_empty;
-            es_out_Control( p_demux->out, ES_OUT_GET_EMPTY, &b_empty );
+            DemuxForceStill( p_demux );
             p_sys->b_reset_pcr = true;
         }
         msleep( 40000 );
@@ -773,6 +775,8 @@ static int Demux( demux_t *p_demux )
 
         /* Store the lenght in time of the current PGC */
         p_sys->i_pgc_length = event->pgc_length / 90 * 1000;
+        p_sys->i_vobu_index = 0;
+        p_sys->i_vobu_flush = 0;
 
         /* FIXME is it correct or there is better way to know chapter change */
         if( dvdnav_current_title_info( p_sys->dvdnav, &i_title,
@@ -791,6 +795,22 @@ static int Demux( demux_t *p_demux )
 
     case DVDNAV_NAV_PACKET:
     {
+        p_sys->i_vobu_index = 1;
+        p_sys->i_vobu_flush = 0;
+
+        /* Look if we have need to force a flush (and when) */
+        const pci_gi_t *p_pci_gi = &dvdnav_get_current_nav_pci( p_sys->dvdnav )->pci_gi;
+        if( p_pci_gi->vobu_se_e_ptm != 0 && p_pci_gi->vobu_se_e_ptm < p_pci_gi->vobu_e_ptm )
+        {
+            const dsi_gi_t *p_dsi_gi = &dvdnav_get_current_nav_dsi( p_sys->dvdnav )->dsi_gi;
+            if( p_dsi_gi->vobu_3rdref_ea != 0 )
+                p_sys->i_vobu_flush = p_dsi_gi->vobu_3rdref_ea;
+            else if( p_dsi_gi->vobu_2ndref_ea != 0 )
+                p_sys->i_vobu_flush = p_dsi_gi->vobu_2ndref_ea;
+            else if( p_dsi_gi->vobu_1stref_ea != 0 )
+                p_sys->i_vobu_flush = p_dsi_gi->vobu_1stref_ea;
+        }
+
 #ifdef DVDNAV_DEBUG
         msg_Dbg( p_demux, "DVDNAV_NAV_PACKET" );
 #endif
@@ -828,6 +848,8 @@ static int Demux( demux_t *p_demux )
 
     case DVDNAV_HOP_CHANNEL:
         msg_Dbg( p_demux, "DVDNAV_HOP_CHANNEL" );
+        p_sys->i_vobu_index = 0;
+        p_sys->i_vobu_flush = 0;
         es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
         break;
 
@@ -1157,6 +1179,22 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *pkt, int i_pkt )
     }
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Force still images to be displayed by sending EOS and stopping buffering.
+ *****************************************************************************/
+static void DemuxForceStill( demux_t *p_demux )
+{
+    static const uint8_t buffer[] = {
+        0x00, 0x00, 0x01, 0xe0, 0x00, 0x07,
+        0x80, 0x00, 0x00,
+        0x00, 0x00, 0x01, 0xB7,
+    };
+    DemuxBlock( p_demux, buffer, sizeof(buffer) );
+
+    bool b_empty;
+    es_out_Control( p_demux->out, ES_OUT_GET_EMPTY, &b_empty );
 }
 
 /*****************************************************************************
