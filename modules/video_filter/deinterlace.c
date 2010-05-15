@@ -829,7 +829,8 @@ static void MergeNEON (void *restrict out, const void *in1,
                 "vst1.u8  {q10-q11}, [%[out],:128]!\n"
                 : [out] "+r" (outp), [in1] "+r" (in1p), [in2] "+r" (in2p)
                 :
-                : "q0", "q1", "q2", "memory");
+                : "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7",
+                  "q8", "q9", "q10", "q11", "memory");
     else
          while (outp < end)
             asm volatile (
@@ -845,7 +846,8 @@ static void MergeNEON (void *restrict out, const void *in1,
                 "vst1.u8  {q10-q11}, [%[out],:128]!\n"
                 : [out] "+r" (outp), [in1] "+r" (in1p), [in2] "+r" (in2p)
                 :
-                : "q0", "q1", "q2", "memory");
+                : "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7",
+                  "q8", "q9", "q10", "q11", "memory");
     n &= 15;
     if (n)
         MergeGeneric (outp, in1p, in2p, n);
