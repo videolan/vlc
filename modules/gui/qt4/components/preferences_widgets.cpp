@@ -519,6 +519,7 @@ void StringListConfigControl::finish(module_config_t *p_module_config, bool byca
         if( !p_module_config->ppsz_list[i_index] )
         {
               combo->addItem( "", QVariant(""));
+              combo->setCurrentIndex( combo->count() - 1 );
               continue;
         }
         combo->addItem( qfu((p_module_config->ppsz_list_text &&
