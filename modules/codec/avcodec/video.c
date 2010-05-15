@@ -451,10 +451,10 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
         p_sys->i_late_frames = 0;
 
-        block_Release( p_block );
+        if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+            avcodec_flush_buffers( p_context );
 
-        //if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
-            //avcodec_flush_buffers( p_context );
+        block_Release( p_block );
         return NULL;
     }
 
