@@ -285,6 +285,65 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     }
     return VLC_SUCCESS;
 }
+
+static void transcode_video_filter_init( sout_stream_t *p_stream,
+                                         sout_stream_id_t *id )
+{
+
+    id->p_f_chain = filter_chain_New( p_stream, "video filter2",
+                                     false,
+                                     transcode_video_filter_allocation_init,
+                                     transcode_video_filter_allocation_clear,
+                                     p_stream->p_sys );
+    /* Deinterlace */
+    if( p_stream->p_sys->b_deinterlace )
+    {
+       filter_chain_AppendFilter( id->p_f_chain,
+                                  p_stream->p_sys->psz_deinterlace,
+                                  p_stream->p_sys->p_deinterlace_cfg,
+                                  &id->p_decoder->fmt_out,
+                                  &id->p_decoder->fmt_out );
+    }
+
+    /* Take care of the scaling and chroma conversions */
+    if( ( id->p_decoder->fmt_out.video.i_chroma !=
+          id->p_encoder->fmt_in.video.i_chroma ) ||
+        ( id->p_decoder->fmt_out.video.i_width !=
+          id->p_encoder->fmt_in.video.i_width ) ||
+        ( id->p_decoder->fmt_out.video.i_height !=
+          id->p_encoder->fmt_in.video.i_height ) )
+    {
+       filter_chain_AppendFilter( id->p_f_chain,
+                                  NULL, NULL,
+                                  &id->p_decoder->fmt_out,
+                                  &id->p_encoder->fmt_in );
+    }
+
+    if( p_stream->p_sys->psz_vf2 )
+    {
+        const es_format_t *p_fmt_out;
+        id->p_uf_chain = filter_chain_New( p_stream, "video filter2",
+                                          true,
+                           transcode_video_filter_allocation_init,
+                           transcode_video_filter_allocation_clear,
+                           p_stream->p_sys );
+        filter_chain_Reset( id->p_uf_chain, &id->p_encoder->fmt_in,
+                            &id->p_encoder->fmt_in );
+        filter_chain_AppendFromString( id->p_uf_chain, p_stream->p_sys->psz_vf2 );
+        p_fmt_out = filter_chain_GetFmtOut( id->p_uf_chain );
+        es_format_Copy( &id->p_encoder->fmt_in, p_fmt_out );
+        id->p_encoder->fmt_out.video.i_width =
+            id->p_encoder->fmt_in.video.i_width;
+        id->p_encoder->fmt_out.video.i_height =
+            id->p_encoder->fmt_in.video.i_height;
+        id->p_encoder->fmt_out.video.i_sar_num =
+            id->p_encoder->fmt_in.video.i_sar_num;
+        id->p_encoder->fmt_out.video.i_sar_den =
+            id->p_encoder->fmt_in.video.i_sar_den;
+    }
+
+}
+
 static void transcode_video_encoder_init( sout_stream_t *p_stream,
                                           sout_stream_id_t *id )
 {
@@ -605,61 +664,11 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
             }
         }
 
-        if( !id->p_encoder->p_module )
+        if( unlikely( !id->p_encoder->p_module ) )
         {
             transcode_video_encoder_init( p_stream, id );
 
-            id->p_f_chain = filter_chain_New( p_stream, "video filter2",
-                                              false,
-                               transcode_video_filter_allocation_init,
-                               transcode_video_filter_allocation_clear,
-                               p_stream->p_sys );
-
-            /* Deinterlace */
-            if( p_stream->p_sys->b_deinterlace )
-            {
-                filter_chain_AppendFilter( id->p_f_chain,
-                                           p_sys->psz_deinterlace,
-                                           p_sys->p_deinterlace_cfg,
-                                           &id->p_decoder->fmt_out,
-                                           &id->p_decoder->fmt_out );
-            }
-            /* Take care of the scaling and chroma conversions */
-            if( ( id->p_decoder->fmt_out.video.i_chroma !=
-                  id->p_encoder->fmt_in.video.i_chroma ) ||
-                ( id->p_decoder->fmt_out.video.i_width !=
-                  id->p_encoder->fmt_in.video.i_width ) ||
-                ( id->p_decoder->fmt_out.video.i_height !=
-                  id->p_encoder->fmt_in.video.i_height ) )
-            {
-                filter_chain_AppendFilter( id->p_f_chain,
-                                           NULL, NULL,
-                                           &id->p_decoder->fmt_out,
-                                           &id->p_encoder->fmt_in );
-            }
-
-            if( p_sys->psz_vf2 )
-            {
-                const es_format_t *p_fmt_out;
-                id->p_uf_chain = filter_chain_New( p_stream, "video filter2",
-                                                   true,
-                                   transcode_video_filter_allocation_init,
-                                   transcode_video_filter_allocation_clear,
-                                   p_stream->p_sys );
-                filter_chain_Reset( id->p_uf_chain, &id->p_encoder->fmt_in,
-                                    &id->p_encoder->fmt_in );
-                filter_chain_AppendFromString( id->p_uf_chain, p_sys->psz_vf2 );
-                p_fmt_out = filter_chain_GetFmtOut( id->p_uf_chain );
-                es_format_Copy( &id->p_encoder->fmt_in, p_fmt_out );
-                id->p_encoder->fmt_out.video.i_width =
-                    id->p_encoder->fmt_in.video.i_width;
-                id->p_encoder->fmt_out.video.i_height =
-                    id->p_encoder->fmt_in.video.i_height;
-                id->p_encoder->fmt_out.video.i_sar_num =
-                    id->p_encoder->fmt_in.video.i_sar_num;
-                id->p_encoder->fmt_out.video.i_sar_den =
-                    id->p_encoder->fmt_in.video.i_sar_den;
-            }
+            transcode_video_filter_init( p_stream, id );
 
             if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
             {
@@ -738,39 +747,30 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                 i_pts = p_pic->date + 1;
             }
             date_Increment( &id->interpolated_pts, 1 );
-        }
 
-        if( p_sys->b_master_sync && i_duplicate > 1 )
-        {
-            mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
-            if( (p_pic->date - i_pts > MASTER_SYNC_MAX_DRIFT)
-                 || ((p_pic->date - i_pts) < -MASTER_SYNC_MAX_DRIFT) )
+            if( i_duplicate > 1 )
             {
-                msg_Dbg( p_stream, "drift is too high, resetting master sync" );
-                date_Set( &id->interpolated_pts, p_pic->date );
-                i_pts = p_pic->date + 1;
-            }
-            date_Increment( &id->interpolated_pts, 1 );
 
-            if( p_sys->i_threads >= 1 )
-            {
-                /* We can't modify the picture, we need to duplicate it */
-                p_pic2 = video_new_buffer_decoder( id->p_decoder );
-                if( p_pic2 != NULL )
-                {
-                    picture_Copy( p_pic2, p_pic );
-                    p_pic2->date = i_pts;
-                }
-            }
-            else
-            {
-                block_t *p_block;
-                p_pic->date = i_pts;
-                video_timer_start( id->p_encoder );
-                p_block = id->p_encoder->pf_encode_video(id->p_encoder, p_pic);
-                video_timer_stop( id->p_encoder );
-                block_ChainAppend( out, p_block );
-            }
+               if( p_sys->i_threads >= 1 )
+               {
+                   /* We can't modify the picture, we need to duplicate it */
+                   p_pic2 = video_new_buffer_decoder( id->p_decoder );
+                   if( p_pic2 != NULL )
+                   {
+                       picture_Copy( p_pic2, p_pic );
+                       p_pic2->date = i_pts + 1;
+                   }
+               }
+               else
+               {
+                   block_t *p_block;
+                   p_pic->date = i_pts;
+                   video_timer_start( id->p_encoder );
+                   p_block = id->p_encoder->pf_encode_video(id->p_encoder, p_pic);
+                   video_timer_stop( id->p_encoder );
+                   block_ChainAppend( out, p_block );
+               }
+           }
         }
 
         if( p_sys->i_threads == 0 )
