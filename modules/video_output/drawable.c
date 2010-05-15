@@ -69,8 +69,7 @@ static int Open (vlc_object_t *obj)
     /* Keep a list of busy drawables, so we don't overlap videos if there are
      * more than one video track in the stream. */
     vlc_mutex_lock (&serializer);
-    /* TODO: per-type list of busy drawables */
-    used = var_GetAddress (obj->p_libvlc, "drawables-in-use");
+    used = var_GetAddress (obj->p_libvlc, "hwnd-in-use");
     if (used != NULL)
     {
         while (used[n] != NULL)
