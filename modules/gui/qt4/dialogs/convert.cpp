@@ -135,10 +135,12 @@ void ConvertDialog::close()
             mrl.remove( '}' );
             mrl += ",deinterlace}";
         }
-        mrl += ":duplicate{";
-        if( displayBox->isChecked() ) mrl += "dst=display,";
-        mrl += "dst=std{access=file,mux=" + profile->getMux() +
-            ",dst='" + fileLine->text() + "'}";
+        mrl += ":";
+        if( displayBox->isChecked() )
+            mrl += "duplicate{dst=display,dst=";
+        mrl += "file{dst='" + fileLine->text() + "'}";
+        if( displayBox->isChecked() )
+            mrl += "}";
     }
 
     msg_Warn( p_intf, "Transcode MRL: %s", qtu( mrl ) );
