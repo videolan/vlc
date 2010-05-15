@@ -6,7 +6,6 @@
 # Authors: Sam Hocevar <sam@zoy.org>
 
 NULL =
-SUFFIXES =
 libvlcdir = $(vlclibdir)/plugins/$(basedir)
 EXTRA_DIST = Modules.am
 BUILT_SOURCES =
