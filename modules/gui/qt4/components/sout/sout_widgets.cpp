@@ -113,11 +113,21 @@ QString FileDestBox::getMRL( const QString& mux )
     if( fileEdit->text().isEmpty() ) return "";
 
     SoutMrl m;
-    m.begin( "std" );
-    m.option( "access", "file" );
+    m.begin( "file" );
+    QString outputfile = fileEdit->text();
     if( !mux.isEmpty() )
-        m.option( "mux", mux ); //FIXME: alert if ext doesn't match
-    m.option( "dst", fileEdit->text() );
+    {
+        if( outputfile.contains( QRegExp("\\..{2,3}$")) &&
+            !outputfile.endsWith(mux) )
+        {
+           /* Replace the extension according to muxer */
+           outputfile.replace(QRegExp("\\..{2,3}$"),"."+mux);
+        } else if (!outputfile.endsWith( mux ) )
+        {
+           m.option( "mux", mux );
+        }
+    }
+    m.option( "dst", outputfile );
     m.end();
 
     return m.getMrl();
@@ -175,10 +185,13 @@ QString HTTPDestBox::getMRL( const QString& mux )
     QString dst = ":" + port + path;
 
     SoutMrl m;
-    m.begin( "std" );
-    m.option(  "access", "http" );
-    if( !mux.isEmpty() )
+    m.begin( "http" );
+    /* http-output can't do mp4-mux, so don't accept it,
+       if we don't get usable mux, fallback to flv */
+    if( !mux.isEmpty() && mux.compare("mp4") )
         m.option( "mux", mux );
+    else if ( !path.contains(QRegExp("\\..{2,3}$") ) )
+        m.option( "mux", "ffmpeg{mux=flv}" );
     m.option( "dst", dst );
     m.end();
 
@@ -314,9 +327,9 @@ QString UDPDestBox::getMRL( const QString& mux )
     if( UDPEdit->text().isEmpty() ) return "";
 
     SoutMrl m;
-    m.begin( "std" );
-    m.option(  "access", "udp" );
-    if( !mux.isEmpty() )
+    m.begin( "udp" );
+    /* udp output, ts-mux is really only reasonable one to use*/
+    if( !mux.isEmpty() && !mux.compare("ts" ) )
         m.option( "mux", mux );
     m.option( "dst", UDPEdit->text(), UDPPort->value() );
     m.end();
@@ -365,6 +378,7 @@ QString RTPDestBox::getMRL( const QString& )
     m.begin( "rtp" );
     m.option( "dst", RTPEdit->text() );
     m.option( "port", RTPPort->value() );
+    /* mp4-mux ain't usable in rtp-output either */
     if( mux != NULL )
         m.option( "mux", qfu( mux ) );
     m.end();
