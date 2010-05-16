@@ -186,12 +186,16 @@ QString HTTPDestBox::getMRL( const QString& mux )
 
     SoutMrl m;
     m.begin( "http" );
-    /* http-output can't do mp4-mux, so don't accept it,
-       if we don't get usable mux, fallback to flv */
-    if( !mux.isEmpty() && mux.compare("mp4") )
-        m.option( "mux", mux );
-    else if ( !path.contains(QRegExp("\\..{2,3}$") ) )
-        m.option( "mux", "ffmpeg{mux=flv}" );
+    /* Path-extension is primary muxer to use if possible,
+       otherwise check for mux-choise and see that it isn't mp4
+       then fallback to flv*/
+    if ( !path.contains(QRegExp("\\..{2,3}$") ) )
+    {
+        if( !mux.isEmpty() && mux.compare("mp4") )
+           m.option( "mux", mux );
+        else
+           m.option( "mux", "ffmpeg{mux=flv}" );
+    }
     m.option( "dst", dst );
     m.end();
 
