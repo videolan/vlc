@@ -52,6 +52,7 @@ function parse()
         if string.match( line, "<title>" )
         then
             title = vlc.strings.resolve_xml_special_chars( find( line, "<title>(.-)<" ) )
+            title = string.gsub( title, " %- .*", "" )
         end
         if string.match( line, "<meta name=\"Description\"" )
         then
@@ -60,7 +61,7 @@ function parse()
     end
     for index,resolution in ipairs({"480p","720p","1080p"}) do
         locationurl = string.gsub( path, "r320i.mov","h"..resolution..".mov")
-        table.insert( p, { path=locationurl ; name=title.." ("..resolution..")"; arturl=arturl; description=description; options={":http-user-agent=Quicktime/7.2.0 vlc lua edition",":input-fast-seek",":play-and-stop"};} )
+        table.insert( p, { path=locationurl ; name=title.." ("..resolution..")"; arturl=arturl; description=description; options={":http-user-agent=Quicktime/7.2.0 vlc lua edition",":play-and-pause",":demux=avformat"};} )
     end
     return p
 end
