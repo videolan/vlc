@@ -2141,11 +2141,6 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux,
     if( AVI_IndexFind_idx1( p_demux, &p_idx1, &i_offset ) )
         return VLC_EGENERIC;
 
-    /* Init b_keyset */
-    bool b_keyset[100];
-    for( unsigned i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
-        b_keyset[i_stream] = false;
-
     for( unsigned i_index = 0; i_index < p_idx1->i_entry_count; i_index++ )
     {
         unsigned i_cat;
@@ -2162,22 +2157,8 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux,
             index.i_flags  = p_idx1->entry[i_index].i_flags&(~AVIIF_FIXKEYFRAME);
             index.i_pos    = p_idx1->entry[i_index].i_pos + i_offset;
             index.i_length = p_idx1->entry[i_index].i_length;
-            if( index.i_flags&AVIIF_KEYFRAME )
-                b_keyset[i_stream] = true;
 
             avi_index_Append( pp_index[i_stream], pi_last_offset, &index );
-        }
-    }
-
-    for( unsigned i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
-    {
-        if( !b_keyset[i_stream] )
-        {
-            avi_track_t *tk = p_sys->track[i_stream];
-
-            msg_Dbg( p_demux, "no key frame set for track %d", i_stream );
-            for( unsigned i_index = 0; i_index < tk->idx.i_size; i_index++ )
-                tk->idx.p_entry[i_index].i_flags |= AVIIF_KEYFRAME;
         }
     }
     return VLC_SUCCESS;
@@ -2186,7 +2167,6 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux,
 static void __Parse_indx( demux_t *p_demux, avi_index_t *p_index, off_t *pi_max_offset,
                           avi_chunk_indx_t *p_indx )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
     avi_entry_t index;
 
     msg_Dbg( p_demux, "loading subindex(0x%x) %d entries", p_indx->i_indextype, p_indx->i_entriesinuse );
@@ -2277,7 +2257,6 @@ static void AVI_IndexLoad_indx( demux_t *p_demux,
 static void AVI_IndexLoad( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    unsigned int i_stream;
 
     assert( p_sys->i_track <= 100 );
     avi_index_t *pp_index[p_sys->i_track];
@@ -2297,10 +2276,24 @@ static void AVI_IndexLoad( demux_t *p_demux )
         AVI_IndexLoad_indx( p_demux, pp_index, pi_last_offset );
     }
 
-    for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
+    for( unsigned i = 0; i < p_sys->i_track; i++ )
     {
+        avi_index_t *p_index = &p_sys->track[i]->idx;
+
+        /* Fix key flag */
+        bool b_key = false;
+        for( unsigned j = 0; !b_key && j < p_index->i_size; j++ )
+            b_key = p_index->p_entry[j].i_flags & AVIIF_KEYFRAME;
+        if( !b_key )
+        {
+            msg_Err( p_demux, "no key frame set for track %u", i );
+            for( unsigned j = 0; j < p_index->i_size; j++ )
+                p_index->p_entry[j].i_flags |= AVIIF_KEYFRAME;
+        }
+
+        /* */
         msg_Dbg( p_demux, "stream[%d] created %d index entries",
-                i_stream, p_sys->track[i_stream]->idx.i_size );
+                 i, p_index->i_size );
     }
 }
 
