@@ -2132,7 +2132,7 @@ static int AVI_IndexFind_idx1( demux_t *p_demux,
 }
 
 static int AVI_IndexLoad_idx1( demux_t *p_demux,
-                               avi_index_t *pp_index[], off_t *pi_last_offset )
+                               avi_index_t p_index[], off_t *pi_last_offset )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -2158,7 +2158,7 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux,
             index.i_pos    = p_idx1->entry[i_index].i_pos + i_offset;
             index.i_length = p_idx1->entry[i_index].i_length;
 
-            avi_index_Append( pp_index[i_stream], pi_last_offset, &index );
+            avi_index_Append( &p_index[i_stream], pi_last_offset, &index );
         }
     }
     return VLC_SUCCESS;
@@ -2201,7 +2201,7 @@ static void __Parse_indx( demux_t *p_demux, avi_index_t *p_index, off_t *pi_max_
 }
 
 static void AVI_IndexLoad_indx( demux_t *p_demux,
-                                avi_index_t *pp_index[], off_t *pi_last_offset )
+                                avi_index_t p_index[], off_t *pi_last_offset )
 {
     demux_sys_t         *p_sys = p_demux->p_sys;
 
@@ -2222,14 +2222,15 @@ static void AVI_IndexLoad_indx( demux_t *p_demux,
 
         if( !p_indx )
         {
-            msg_Warn( p_demux, "cannot find indx (misdetect/broken OpenDML "
-                               "file?)" );
+            if( p_sys->b_odml )
+                msg_Warn( p_demux, "cannot find indx (misdetect/broken OpenDML "
+                                   "file?)" );
             continue;
         }
 
         if( p_indx->i_indextype == AVI_INDEX_OF_CHUNKS )
         {
-            __Parse_indx( p_demux, pp_index[i_stream], pi_last_offset, p_indx );
+            __Parse_indx( p_demux, &p_index[i_stream], pi_last_offset, p_indx );
         }
         else if( p_indx->i_indextype == AVI_INDEX_OF_INDEXES )
         {
@@ -2242,7 +2243,7 @@ static void AVI_IndexLoad_indx( demux_t *p_demux,
                     break;
                 }
                 if( ck_sub.indx.i_indextype == AVI_INDEX_OF_CHUNKS )
-                    __Parse_indx( p_demux, pp_index[i_stream], pi_last_offset, &ck_sub.indx );
+                    __Parse_indx( p_demux, &p_index[i_stream], pi_last_offset, &ck_sub.indx );
                 AVI_ChunkFree( p_demux->s, &ck_sub );
             }
         }
@@ -2258,23 +2259,39 @@ static void AVI_IndexLoad( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    /* Load indexes */
     assert( p_sys->i_track <= 100 );
-    avi_index_t *pp_index[p_sys->i_track];
+    avi_index_t p_idx_indx[p_sys->i_track];
+    avi_index_t p_idx_idx1[p_sys->i_track];
     for( unsigned i = 0; i < p_sys->i_track; i++ )
     {
-        pp_index[i] = &p_sys->track[i]->idx;
-        avi_index_Init( pp_index[i] );
+        avi_index_Init( &p_idx_indx[i] );
+        avi_index_Init( &p_idx_idx1[i] );
     }
-    off_t *pi_last_offset = &p_sys->i_movi_lastchunk_pos;
-    if( p_sys->b_odml )
+    off_t i_indx_last_pos = p_sys->i_movi_lastchunk_pos;
+    off_t i_idx1_last_pos = p_sys->i_movi_lastchunk_pos;
+
+    AVI_IndexLoad_indx( p_demux, p_idx_indx, &i_indx_last_pos );
+    if( !p_sys->b_odml )
+        AVI_IndexLoad_idx1( p_demux, p_idx_idx1, &i_idx1_last_pos );
+
+    /* Select the longest index */
+    for( unsigned i = 0; i < p_sys->i_track; i++ )
     {
-        AVI_IndexLoad_indx( p_demux, pp_index, pi_last_offset );
+        if( p_idx_indx[i].i_size > p_idx_idx1[i].i_size )
+        {
+            msg_Dbg( p_demux, "selected ODML index for stream[%u]", i );
+            p_sys->track[i]->idx = p_idx_indx[i];
+            avi_index_Clean( &p_idx_idx1[i] );
+        }
+        else
+        {
+            msg_Dbg( p_demux, "selected standard index for stream[%u]", i );
+            p_sys->track[i]->idx = p_idx_idx1[i];
+            avi_index_Clean( &p_idx_indx[i] );
+        }
     }
-    else  if( AVI_IndexLoad_idx1( p_demux, pp_index, pi_last_offset ) )
-    {
-        /* try indx if idx1 failed as some "normal" file have indx too */
-        AVI_IndexLoad_indx( p_demux, pp_index, pi_last_offset );
-    }
+    p_sys->i_movi_lastchunk_pos = __MAX( i_indx_last_pos, i_idx1_last_pos );
 
     for( unsigned i = 0; i < p_sys->i_track; i++ )
     {
