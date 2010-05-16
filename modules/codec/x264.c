@@ -94,7 +94,6 @@ static void Close( vlc_object_t * );
 
 
 #define BPYRAMID_TEXT N_("Keep some B-frames as references")
-#if X264_BUILD >= 78
 #define BPYRAMID_LONGTEXT N_( "Allows B-frames to be used as references for " \
     "predicting other frames. Keeps the middle of 2+ consecutive B-frames " \
     "as a reference, and reorders frame appropriately.\n" \
@@ -102,11 +101,6 @@ static void Close( vlc_object_t * );
     " - strict: Strictly hierarchical pyramid\n" \
     " - normal: Non-strict (not Blu-ray compatible)\n"\
     )
-#else
-#define BPYRAMID_LONGTEXT N_( "Allows B-frames to be used as references for " \
-    "predicting other frames. Keeps the middle of 2+ consecutive B-frames " \
-    "as a reference, and reorders frame appropriately." )
-#endif
 
 #define CABAC_TEXT N_("CABAC")
 #define CABAC_LONGTEXT N_( "CABAC (Context-Adaptive Binary Arithmetic "\
@@ -397,10 +391,8 @@ static const char *const enc_me_list_text[] =
 static const char *const profile_list[] =
   { "baseline", "main", "high" };
 
-#if X264_BUILD >= 78
 static const char *const bpyramid_list[] =
   { "none", "strict", "normal" };
-#endif
 
 static const char *const enc_analyse_list[] =
   { "none", "fast", "normal", "slow", "all" };
@@ -445,14 +437,9 @@ vlc_module_begin ()
                  B_BIAS_LONGTEXT, false )
         change_integer_range( -100, 100 )
 
-#if X264_BUILD >= 78
     add_string( SOUT_CFG_PREFIX "bpyramid", "none", NULL, BPYRAMID_TEXT,
               BPYRAMID_LONGTEXT, false )
         change_string_list( bpyramid_list, bpyramid_list, 0 );
-#else
-    add_bool( SOUT_CFG_PREFIX "bpyramid", false, NULL, BPYRAMID_TEXT,
-              BPYRAMID_LONGTEXT, false )
-#endif
 
     add_bool( SOUT_CFG_PREFIX "cabac", true, NULL, CABAC_TEXT, CABAC_LONGTEXT,
               false )
@@ -477,7 +464,7 @@ vlc_module_begin ()
 
     add_string( SOUT_CFG_PREFIX "profile", "high", NULL, PROFILE_TEXT,
                PROFILE_LONGTEXT, false )
-        change_string_list( profile_list, profile_list, 0 );
+        change_string_list( x264_profile_names, x264_profile_names, 0 );
 
     add_bool( SOUT_CFG_PREFIX "interlaced", false, NULL, INTERLACED_TEXT, INTERLACED_LONGTEXT,
               false )
@@ -709,11 +696,7 @@ struct encoder_sys_t
     x264_t          *h;
     x264_param_t    param;
 
-#if X264_BUILD >= 83
     int  i_initial_delay;
-#else
-    mtime_t         i_interpolated_dts;
-#endif
 
     char *psz_stat_name;
 };
@@ -755,11 +738,7 @@ static int  Open ( vlc_object_t *p_this )
     p_enc->p_sys = p_sys = malloc( sizeof( encoder_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
-#if X264_BUILD >= 83
     p_sys->i_initial_delay = 0;
-#else
-    p_sys->i_interpolated_dts = 0;
-#endif
     p_sys->psz_stat_name = NULL;
 
     x264_param_default( &p_sys->param );
@@ -924,11 +903,8 @@ static int  Open ( vlc_object_t *p_this )
     if( i_val >= 0 && i_val <= 16 && i_val != 3 )
         p_sys->param.i_bframe = i_val;
 
-#if X264_BUILD >= 82
     p_sys->param.b_intra_refresh = var_GetBool( p_enc, SOUT_CFG_PREFIX "intra-refresh" );
-#endif
 
-#if X264_BUILD >= 78
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "bpyramid" );
     if( strcmp( psz_val, "none" ) )
     {
@@ -941,9 +917,6 @@ static int  Open ( vlc_object_t *p_this )
        }
     }
     free( psz_val );
-#else
-    p_sys->param.b_bframe_pyramid = var_GetBool( p_enc, SOUT_CFG_PREFIX "bpyramid" );
- #endif
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "ref" );
     if( i_val > 0 && i_val <= 15 && i_val != 3 )
@@ -1025,10 +998,9 @@ static int  Open ( vlc_object_t *p_this )
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "weightb" ) ) 
        p_sys->param.analyse.b_weighted_bipred = var_GetBool( p_enc,
                                     SOUT_CFG_PREFIX "weightb" );
-#if X264_BUILD >= 79
     if( var_GetInteger( p_enc, SOUT_CFG_PREFIX "weightp" ) != 2 )
        p_sys->param.analyse.i_weighted_pred = var_GetInteger( p_enc, SOUT_CFG_PREFIX "weightp" );
-#endif
+
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "b-adapt" );
     if( i_val != 1 )
        p_sys->param.i_bframe_adaptive = i_val;
@@ -1128,9 +1100,7 @@ static int  Open ( vlc_object_t *p_this )
     {
         p_sys->param.i_fps_num = p_enc->fmt_in.video.i_frame_rate;
         p_sys->param.i_fps_den = p_enc->fmt_in.video.i_frame_rate_base;
-#if X264_BUILD >= 81
         p_sys->param.b_vfr_input = 0;
-#endif
     }
 
     /* Check slice-options */
@@ -1170,9 +1140,7 @@ static int  Open ( vlc_object_t *p_this )
             p_sys->param.analyse.b_transform_8x8 = 0;
             p_sys->param.b_cabac = 0;
             p_sys->param.i_bframe = 0;
-#if X264_BUILD >= 79
             p_sys->param.analyse.i_weighted_pred = X264_WEIGHTP_NONE;
-#endif
         }
         else if (!strcasecmp( psz_val, "main" ) )
         {
@@ -1331,20 +1299,8 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
         i_out += nal[i].i_payload;
     }
 
-#if X264_BUILD >= 83
     if( pic.b_keyframe )
         p_block->i_flags |= BLOCK_FLAG_TYPE_I;
-#else
-     /* We only set IDR-frames as type_i as packetizer
-      * places sps/pps on keyframes and we don't want it
-      * to place sps/pps stuff with normal I-frames.
-      * FIXME: This is a workaround and should be fixed when
-      * there is some nice way to tell packetizer what is
-      * keyframe.
-      */
-    if( pic.i_type == X264_TYPE_IDR )
-        p_block->i_flags |= BLOCK_FLAG_TYPE_I;
-#endif
     else if( pic.i_type == X264_TYPE_P || pic.i_type == X264_TYPE_I )
         p_block->i_flags |= BLOCK_FLAG_TYPE_P;
     else if( pic.i_type == X264_TYPE_B )
@@ -1357,7 +1313,6 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
         p_enc->fmt_in.video.i_frame_rate_base /
             p_enc->fmt_in.video.i_frame_rate;
 
-#if X264_BUILD >= 83
     /* libx264 gives pts/dts values from >= 83 onward,
      * also pts starts from 0 so dts can be negative,
      * but vlc doesn't handle if dts is < VLC_TS_0 so we
@@ -1370,41 +1325,6 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     }
     p_block->i_pts = pic.i_pts + p_sys->i_initial_delay;
     p_block->i_dts = pic.i_dts + p_sys->i_initial_delay;
-#else
-
-    p_block->i_pts = pic.i_pts;
-
-    if( p_sys->param.i_bframe > 0 )
-    {
-        if( p_block->i_flags & BLOCK_FLAG_TYPE_B )
-        {
-            /* FIXME : this is wrong if bpyramid is set */
-            p_block->i_dts = p_block->i_pts;
-            p_sys->i_interpolated_dts = p_block->i_dts;
-        }
-        else
-        {
-#if 1       /* XXX: remove me when 0 is a valid timestamp (see #3135) */
-            if( p_sys->i_interpolated_dts )
-            {
-                p_block->i_dts = p_sys->i_interpolated_dts;
-            }
-            else
-            {
-                /* Let's put something sensible */
-                p_block->i_dts = p_block->i_pts;
-            }
-#else
-            p_block->i_dts = p_sys->i_interpolated_dts;
-#endif
-            p_sys->i_interpolated_dts += p_block->i_length;
-        }
-    }
-    else
-    {
-        p_block->i_dts = p_block->i_pts;
-    }
-#endif
 
     return p_block;
 }
