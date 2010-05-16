@@ -131,7 +131,7 @@ static void Close( vlc_object_t * );
 #define LEVEL_LONGTEXT N_( "Specify H.264 level (as defined by Annex A " \
     "of the standard). Levels are not enforced; it's up to the user to select " \
     "a level compatible with the rest of the encoding options. Range 1 to 5.1 " \
-    "(10 to 51 is also allowed).")
+    "(10 to 51 is also allowed). Set to 0 for letting x264 set level.")
 
 #define PROFILE_TEXT N_("H.264 profile")
 #define PROFILE_LONGTEXT N_("Specify H.264 profile which limits are enforced over" \
