@@ -73,8 +73,25 @@
       <item row="7" column="1">
        <widget class="QComboBox" name="loopFilterBox"/>
       </item>
-      <item row="9" column="0">
+      <item row="10" column="0">
        <widget class="QLabel" name="x264Label">
+        <property name="text">
+         <string>x264 profile and level selection</string>
+        </property>
+        <property name="buddy">
+         <cstring>profileBox</cstring>
+         <cstring>levelBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="1">
+       <widget class="QComboBox" name="profileBox"/>
+      </item>
+      <item row="10" column="2">
+       <widget class="QLineEdit" name="levelBox"/>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="x264profileLabel">
         <property name="text">
          <string>x264 preset and tuning selection</string>
         </property>

@@ -457,6 +457,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "ffmpeg-skiploopfilter", IntegerList, ui.filterLabel, loopFilterBox );
             CONFIG_GENERIC( "sout-x264-tune", StringList, ui.x264Label, tuneBox );
             CONFIG_GENERIC( "sout-x264-preset", StringList, ui.x264Label, presetBox );
+            CONFIG_GENERIC( "sout-x264-profile", StringList, ui.x264profileLabel, profileBox );
+            CONFIG_GENERIC( "sout-x264-level", String, ui.x264profileLabel, levelBox );
 
             /* Caching */
             /* Add the things to the ComboBox */
