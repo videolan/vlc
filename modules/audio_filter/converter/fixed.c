@@ -73,7 +73,7 @@ static int CreateFrom( vlc_object_t *p_this )
         default:
             return VLC_EGENERIC;
     }
-    return VLC_SUCCESS;;
+    return VLC_SUCCESS;
 }
 
 union dw
