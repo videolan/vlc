@@ -40,9 +40,17 @@ function main()
          if string.match( line, "title" ) and string.match( line, "hd\":true")then
             title = vlc.strings.resolve_xml_special_chars( find( line, "title\":\"(.-)\""))
             art = find( line, "poster\":\"(.-)\"")
-            url = find( line, "url\":\"(.-)\"")
-            url = string.gsub( url, "trailers/","trailers/iphone/")
-            url = "http://trailers.apple.com"..url.."trailer/"
+            url = find( line, "location\":\"(.-)\"")
+            trailertype = ""
+            trailertype = find( line, "type\":\"(.-)\"")
+            vlc.msg.err(trailertype)
+            if trailertype then
+               trailertype = string.gsub( trailertype, " ", "")
+               trailertype = string.lower( trailertype )
+            else
+               trailertype = "trailer"
+            end
+            url = "http://trailers.apple.com"..url..trailertype.."/"
             vlc.sd.add_item( { path = url, name=title, title=title, options=options, arturl=art})
          end
     end
