@@ -2432,10 +2432,10 @@ vlc_module_begin ()
 #   define KEY_UNCROP_RIGHT       KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'f'
 
 /* Zooming */
-#   define KEY_ZOOM_QUARTER       KEY_MODIFIER_CTRL|'1'
-#   define KEY_ZOOM_HALF          KEY_MODIFIER_CTRL|'2'
-#   define KEY_ZOOM_ORIGINAL      KEY_MODIFIER_CTRL|'3'
-#   define KEY_ZOOM_DOUBLE        KEY_MODIFIER_CTRL|'4'
+#   define KEY_ZOOM_QUARTER       KEY_MODIFIER_ALT|'1'
+#   define KEY_ZOOM_HALF          KEY_MODIFIER_ALT|'2'
+#   define KEY_ZOOM_ORIGINAL      KEY_MODIFIER_ALT|'3'
+#   define KEY_ZOOM_DOUBLE        KEY_MODIFIER_ALT|'4'
 
 /* Bookmarks */
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_CTRL|KEY_F1
