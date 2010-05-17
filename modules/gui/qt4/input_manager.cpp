@@ -79,7 +79,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
     artUrl       = "";
     p_input      = NULL;
     p_input_vbi  = NULL;
-    f_rate       = 0;
+    f_rate       = 1.;
     p_item       = NULL;
     b_video      = false;
     timeA        = 0;
@@ -139,6 +139,7 @@ void InputManager::delInput()
     b_video              = false;
     timeA                = 0;
     timeB                = 0;
+    f_rate               = 1. ;
 
     if( p_input_vbi )
     {
