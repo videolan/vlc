@@ -44,7 +44,6 @@ function parse()
         if not line then break end
         for urli in string.gmatch( line, "http://trailers.apple.com/movies/.-%.mov" ) do
             path = vlc.strings.decode_uri( urli )
-            vlc.msg.err(path)
         end
         for urli in string.gmatch( line, "http://.-%/poster.jpg") do
             arturl = vlc.strings.decode_uri( urli )
