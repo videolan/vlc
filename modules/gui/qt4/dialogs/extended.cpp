@@ -87,12 +87,12 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     CONNECT( closeButton, clicked(), this, close() );
 
     /* Restore geometry or move this dialog on the left pane of the MI */
-    if( !restoreGeometry(getSettings()->value("EPanel/geometry").toByteArray()))
+    if( !restoreGeometry( getSettings()->value("EPanel/geometry").toByteArray() ) )
     {
         resize( QSize( 400, 280 ) );
 
         MainInterface *p_mi = p_intf->p_sys->p_mi;
-        if( p_mi )
+        if( p_mi && p_mi->x() > 50 )
             move( ( p_mi->x() - frameGeometry().width() - 10 ), p_mi->y() );
         else
             move ( 450 , 0 );
