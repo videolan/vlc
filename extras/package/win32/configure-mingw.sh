@@ -2,7 +2,7 @@
 
 root=$(echo $0|sed 's#extras/package/win32/configure-mingw.sh##')./
 
-if [ -n $1 ]
+if [ -n "$1" ]
 then
 	CONTRIBS="$1"
 else
