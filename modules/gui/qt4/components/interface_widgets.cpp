@@ -177,6 +177,13 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
     if( !isVisible() ) show();
     resize( w, h );
     emit sizeChanged( w, h );
+    /* Work-around a bug?misconception? that would happen when vout core resize
+       twice to the same size and would make the vout not centered.
+       This cause a small flicker.
+       See #3621
+     */
+    if( size().width() == w && size().height() == h )
+        updateGeometry();
     videoSync();
 }
 
