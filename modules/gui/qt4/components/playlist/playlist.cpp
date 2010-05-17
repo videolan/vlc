@@ -156,6 +156,7 @@ void PlaylistWidget::closeEvent( QCloseEvent *event )
     }
     else
     {
+        p_intf->p_sys->p_mi->playlistVisible = false;
         hide();
         event->ignore();
     }
