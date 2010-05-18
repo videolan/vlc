@@ -98,8 +98,8 @@ static int VoutValidateFormat(video_format_t *dst,
  * This function looks for a video output thread matching the current
  * properties. If not found, it spawns a new one.
  *****************************************************************************/
-vout_thread_t *(vout_Request)( vlc_object_t *object, vout_thread_t *vout,
-                               const video_format_t *fmt )
+vout_thread_t *(vout_Request)(vlc_object_t *object, vout_thread_t *vout,
+                              const video_format_t *fmt)
 {
     if (!fmt) {
         if (vout)
@@ -138,86 +138,84 @@ vout_thread_t *(vout_Request)( vlc_object_t *object, vout_thread_t *vout,
  * This function creates a new video output thread, and returns a pointer
  * to its description. On error, it returns NULL.
  *****************************************************************************/
-vout_thread_t * (vout_Create)( vlc_object_t *p_parent, const video_format_t *p_fmt )
+vout_thread_t *(vout_Create)(vlc_object_t *object, const video_format_t *fmt)
 {
     video_format_t original;
-    if (VoutValidateFormat(&original, p_fmt))
+    if (VoutValidateFormat(&original, fmt))
         return NULL;
 
     /* Allocate descriptor */
-    vout_thread_t *p_vout = vlc_custom_create(p_parent,
-                                              sizeof(*p_vout) + sizeof(*p_vout->p),
-                                              VLC_OBJECT_VOUT, "video output");
-    if (!p_vout) {
+    vout_thread_t *vout = vlc_custom_create(object,
+                                            sizeof(*vout) + sizeof(*vout->p),
+                                            VLC_OBJECT_VOUT, "video output");
+    if (!vout) {
         video_format_Clean(&original);
         return NULL;
     }
 
     /* */
-    p_vout->p = (vout_thread_sys_t*)&p_vout[1];
+    vout->p = (vout_thread_sys_t*)&vout[1];
 
-    p_vout->p->original = original;
+    vout->p->original = original;
 
-    vout_control_Init( &p_vout->p->control );
-    vout_control_PushVoid( &p_vout->p->control, VOUT_CONTROL_INIT );
+    vout_control_Init(&vout->p->control);
+    vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_INIT);
 
-    vout_statistic_Init( &p_vout->p->statistic );
-    p_vout->p->i_par_num =
-    p_vout->p->i_par_den = 1;
+    vout_statistic_Init(&vout->p->statistic);
+    vout->p->i_par_num =
+    vout->p->i_par_den = 1;
 
-    vout_snapshot_Init( &p_vout->p->snapshot );
+    vout_snapshot_Init(&vout->p->snapshot);
 
     /* Initialize locks */
-    vlc_mutex_init( &p_vout->p->picture_lock );
-    vlc_mutex_init( &p_vout->p->vfilter_lock );
+    vlc_mutex_init(&vout->p->picture_lock);
+    vlc_mutex_init(&vout->p->vfilter_lock);
 
     /* Attach the new object now so we can use var inheritance below */
-    vlc_object_attach( p_vout, p_parent );
+    vlc_object_attach(vout, object);
 
     /* Initialize subpicture unit */
-    p_vout->p->p_spu = spu_Create( p_vout );
+    vout->p->p_spu = spu_Create(vout);
 
     /* */
-    spu_Init( p_vout->p->p_spu );
+    spu_Init(vout->p->p_spu);
 
     /* Take care of some "interface/control" related initialisations */
-    vout_IntfInit( p_vout );
+    vout_IntfInit(vout);
 
     /* Get splitter name if present */
-    char *splitter_name = var_GetNonEmptyString(p_vout, "vout-filter");
+    char *splitter_name = var_GetNonEmptyString(vout, "vout-filter");
     if (splitter_name) {
-        if (asprintf(&p_vout->p->splitter_name, "%s,none", splitter_name) < 0)
-            p_vout->p->splitter_name = NULL;
+        if (asprintf(&vout->p->splitter_name, "%s,none", splitter_name) < 0)
+            vout->p->splitter_name = NULL;
         free(splitter_name);
     } else {
-        p_vout->p->splitter_name = NULL;
+        vout->p->splitter_name = NULL;
     }
 
     /* */
-    vout_InitInterlacingSupport( p_vout, p_vout->p->displayed.is_interlaced );
+    vout_InitInterlacingSupport(vout, vout->p->displayed.is_interlaced);
 
     /* */
-    vlc_object_set_destructor( p_vout, VoutDestructor );
+    vlc_object_set_destructor(vout, VoutDestructor);
 
     /* */
-    if( vlc_clone( &p_vout->p->thread, Thread, p_vout,
-                   VLC_THREAD_PRIORITY_OUTPUT ) )
-    {
-        vlc_object_release( p_vout );
+    if (vlc_clone(&vout->p->thread, Thread, vout,
+                  VLC_THREAD_PRIORITY_OUTPUT)) {
+        vlc_object_release(vout);
         return NULL;
     }
-    spu_Attach( p_vout->p->p_spu, VLC_OBJECT(p_vout), true );
+    spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), true);
 
-    vout_control_WaitEmpty( &p_vout->p->control );
+    vout_control_WaitEmpty(&vout->p->control);
 
-    if (p_vout->p->dead )
-    {
-        msg_Err( p_vout, "video output creation failed" );
-        vout_CloseAndRelease( p_vout );
+    if (vout->p->dead) {
+        msg_Err(vout, "video output creation failed");
+        vout_CloseAndRelease(vout);
         return NULL;
     }
 
-    return p_vout;
+    return vout;
 }
 
 /*****************************************************************************
@@ -228,43 +226,43 @@ vout_thread_t * (vout_Create)( vlc_object_t *p_parent, const video_format_t *p_f
  * (like with vout_Request or vlc_object_find.)
  * You can use vout_CloseAndRelease() as a convenience method.
  *****************************************************************************/
-void vout_Close( vout_thread_t *p_vout )
+void vout_Close(vout_thread_t *vout)
 {
-    assert( p_vout );
+    assert(vout);
 
-    spu_Attach( p_vout->p->p_spu, VLC_OBJECT(p_vout), false );
+    spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), false);
 
-    vout_snapshot_End( &p_vout->p->snapshot );
+    vout_snapshot_End(&vout->p->snapshot);
 
-    vout_control_PushVoid( &p_vout->p->control, VOUT_CONTROL_CLEAN );
-    vlc_join( p_vout->p->thread, NULL );
+    vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_CLEAN);
+    vlc_join(vout->p->thread, NULL);
 }
 
 /* */
-static void VoutDestructor( vlc_object_t * p_this )
+static void VoutDestructor(vlc_object_t *object)
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    vout_thread_t *vout = (vout_thread_t *)object;
 
     /* Make sure the vout was stopped first */
-    //assert( !p_vout->p_module );
+    //assert(!vout->p_module);
 
-    free( p_vout->p->splitter_name );
+    free(vout->p->splitter_name);
 
     /* */
-    spu_Destroy( p_vout->p->p_spu );
+    spu_Destroy(vout->p->p_spu);
 
     /* Destroy the locks */
-    vlc_mutex_destroy( &p_vout->p->picture_lock );
-    vlc_mutex_destroy( &p_vout->p->vfilter_lock );
-    vout_control_Clean( &p_vout->p->control );
+    vlc_mutex_destroy(&vout->p->picture_lock);
+    vlc_mutex_destroy(&vout->p->vfilter_lock);
+    vout_control_Clean(&vout->p->control);
 
     /* */
-    vout_statistic_Clean( &p_vout->p->statistic );
+    vout_statistic_Clean(&vout->p->statistic);
 
     /* */
-    vout_snapshot_Clean( &p_vout->p->snapshot );
+    vout_snapshot_Clean(&vout->p->snapshot);
 
-    video_format_Clean( &p_vout->p->original );
+    video_format_Clean(&vout->p->original);
 }
 
 /* */
@@ -279,10 +277,9 @@ void vout_ChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
     vout_control_WaitEmpty(&vout->p->control);
 }
 
-void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_lost )
+void vout_GetResetStatistic(vout_thread_t *vout, int *displayed, int *lost)
 {
-    vout_statistic_GetReset( &p_vout->p->statistic,
-                             pi_displayed, pi_lost );
+    vout_statistic_GetReset( &vout->p->statistic, displayed, lost );
 }
 
 void vout_Flush(vout_thread_t *vout, mtime_t date)
@@ -365,9 +362,9 @@ void vout_FlushSubpictureChannel( vout_thread_t *vout, int channel )
     spu_ClearChannel(vout->p->p_spu, channel);
 }
 
-spu_t *vout_GetSpu( vout_thread_t *p_vout )
+spu_t *vout_GetSpu(vout_thread_t *vout)
 {
-    return p_vout->p->p_spu;
+    return vout->p->p_spu;
 }
 
 /* vout_Control* are usable by anyone at anytime */
