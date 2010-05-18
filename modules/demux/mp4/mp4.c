@@ -41,6 +41,7 @@
 
 #include "libmp4.h"
 #include "drms.h"
+#include "../../meta_engine/id3genres.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -901,6 +902,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     break;
                 case FOURCC_0xa9gen: /* Genre */
                     SET( vlc_meta_SetGenre );
+                    break;
+
+                case FOURCC_gnre:
+                    if( p_0xa9xxx->data.p_gnre->i_genre < NUM_GENRES )
+                        vlc_meta_SetGenre( p_meta, ppsz_genres[p_0xa9xxx->data.p_gnre->i_genre] );
                     break;
 
                 case FOURCC_0xa9alb: /* Album */

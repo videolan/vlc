@@ -1152,6 +1152,33 @@ static int MP4_ReadBox_enda( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_gnre( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_Box_data_gnre_t *p_gnre;
+    MP4_READBOX_ENTER( MP4_Box_data_gnre_t );
+
+    p_gnre = p_box->data.p_gnre;
+
+    uint32_t i_data_len;
+    uint32_t i_data_tag;
+
+    MP4_GET4BYTES( i_data_len );
+    MP4_GETFOURCC( i_data_tag );
+    if( i_data_len < 10 || i_data_tag != VLC_FOURCC('d', 'a', 't', 'a') )
+        MP4_READBOX_EXIT( 0 );
+
+    uint32_t i_version;
+    uint32_t i_reserved;
+    MP4_GET4BYTES( i_version );
+    MP4_GET4BYTES( i_reserved );
+    MP4_GET2BYTES( p_gnre->i_genre );
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream, "read box: \"gnre\" genre=%i", p_gnre->i_genre );
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
@@ -2571,6 +2598,7 @@ static const struct
     { FOURCC_avcC,  MP4_ReadBox_avcC,       MP4_FreeBox_avcC },
     { FOURCC_dac3,  MP4_ReadBox_dac3,       MP4_FreeBox_Common },
     { FOURCC_enda,  MP4_ReadBox_enda,       MP4_FreeBox_Common },
+    { FOURCC_gnre,  MP4_ReadBox_gnre,       MP4_FreeBox_Common },
 
     /* Nothing to do with this box */
     { FOURCC_mdat,  MP4_ReadBoxSkip,        MP4_FreeBox_Common },
