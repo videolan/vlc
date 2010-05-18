@@ -154,6 +154,7 @@ void CtrlVideo::onUpdate( Subject<VarBool> &rVariable, void *arg  )
     {
         msg_Dbg( getIntf(), "VideoCtrl : Visibility changed (visible=%d)",
                                   isVisible() );
+        notifyLayout();
     }
 
     // Active Layout changed
