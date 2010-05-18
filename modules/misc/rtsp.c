@@ -1239,9 +1239,12 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             p_rtsp = RtspClientGet( p_media, psz_session );
             if( !p_rtsp ) break;
 
-            CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media, psz_session,
-                         0, NULL );
-            p_rtsp->b_paused = true;
+            if( !p_rtsp->b_paused )
+            {
+                CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media, psz_session,
+                             0, NULL );
+                p_rtsp->b_paused = true;
+            }
 
             answer->i_status = 200;
             answer->i_body = 0;
@@ -1499,9 +1502,12 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             p_rtsp = RtspClientGet( p_media, psz_session );
             if( !p_rtsp ) break;
 
-            CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media, psz_session,
-                         0, NULL );
-            p_rtsp->b_paused = true;
+            if( !p_rtsp->b_paused )
+            {
+                CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media, psz_session,
+                             0, NULL );
+                p_rtsp->b_paused = true;
+            }
 
             answer->i_status = 200;
             answer->i_body = 0;
