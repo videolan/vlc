@@ -935,7 +935,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 case FOURCC_0xa9enc: /* Encoded By */
                     SET( vlc_meta_SetEncodedBy );
                     break;
-                    
+
                 case FOURCC_0xa9swr:
                 case FOURCC_0xa9inf: /* Information */
                 case FOURCC_0xa9dir: /* Director */

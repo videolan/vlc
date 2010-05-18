@@ -920,17 +920,17 @@ typedef union MP4_Box_data_s
     MP4_Box_data_stts_t *p_stts;
     MP4_Box_data_ctts_t *p_ctts;
     MP4_Box_data_stsd_t *p_stsd;
-        MP4_Box_data_sample_vide_t *p_sample_vide;
-        MP4_Box_data_sample_soun_t *p_sample_soun;
-        MP4_Box_data_sample_text_t *p_sample_text;
-        MP4_Box_data_sample_hint_t *p_sample_hint;
+    MP4_Box_data_sample_vide_t *p_sample_vide;
+    MP4_Box_data_sample_soun_t *p_sample_soun;
+    MP4_Box_data_sample_text_t *p_sample_text;
+    MP4_Box_data_sample_hint_t *p_sample_hint;
 
-        MP4_Box_data_esds_t *p_esds;
-        MP4_Box_data_avcC_t *p_avcC;
-        MP4_Box_data_dac3_t *p_dac3;
-        MP4_Box_data_enda_t *p_enda;
-        MP4_Box_data_gnre_t *p_gnre;
-        MP4_Box_data_trkn_t *p_trkn;
+    MP4_Box_data_esds_t *p_esds;
+    MP4_Box_data_avcC_t *p_avcC;
+    MP4_Box_data_dac3_t *p_dac3;
+    MP4_Box_data_enda_t *p_enda;
+    MP4_Box_data_gnre_t *p_gnre;
+    MP4_Box_data_trkn_t *p_trkn;
 
     MP4_Box_data_stsz_t *p_stsz;
     MP4_Box_data_stz2_t *p_stz2;

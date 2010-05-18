@@ -1,7 +1,7 @@
 /*****************************************************************************
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2004, 2010 the VideoLAN team
  * $Id$
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
@@ -20,13 +20,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include <vlc_common.h>
-
-
 #include <vlc_demux.h>
 
 #ifdef HAVE_ZLIB_H
@@ -38,9 +37,10 @@
 
 /*****************************************************************************
  * Here are defined some macro to make life simpler but before using it
- *  *look* at the code.
+ * *look* at the code.
  *
  *****************************************************************************/
+
 #define MP4_BOX_HEADERSIZE( p_box )             \
   ( 8 + ( p_box->i_shortsize == 1 ? 8 : 0 )     \
       + ( p_box->i_type == FOURCC_uuid ? 16 : 0 ) )
@@ -114,7 +114,7 @@
 
 
 /* Some assumptions:
-        * The input method HAVE to be seekable
+ * The input method HAS to be seekable
 
 */
 
