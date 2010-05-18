@@ -73,6 +73,8 @@ static int VideoFilterCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
 static int VideoSplitterCallback( vlc_object_t *, char const *,
                                   vlc_value_t, vlc_value_t, void * );
+static int SubFilterCallback( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
 
 static int TitleShowCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
@@ -369,6 +371,12 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "vout-filter", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "vout-filter", VideoSplitterCallback, NULL );
 
+    /* Add a sub-filter variable */
+    var_Create( p_vout, "sub-filter",
+                VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_vout, "sub-filter", SubFilterCallback, NULL );
+    var_TriggerCallback( p_vout, "sub-filter" );
+
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
     var_Create( p_vout, "mouse-moved", VLC_VAR_COORDS );
@@ -571,10 +579,7 @@ void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
     }
     module_release( p_obj );
 
-    if( !strcmp( psz_filter_type, "sub-filter") )
-        psz_string = var_GetString( vout_GetSpu( p_vout ), psz_filter_type );
-    else
-        psz_string = var_GetString( p_vout, psz_filter_type );
+    psz_string = var_GetString( p_vout, psz_filter_type );
 
     /* Todo : Use some generic chain manipulation functions */
     if( !psz_string ) psz_string = strdup("");
@@ -619,16 +624,10 @@ void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
 
     if( b_setconfig )
     {
-        if( !strcmp( psz_filter_type, "sub-filter") )
-            config_PutPsz( vout_GetSpu( p_vout ), psz_filter_type, psz_string );
-        else
-            config_PutPsz( p_vout, psz_filter_type, psz_string );
+        config_PutPsz( p_vout, psz_filter_type, psz_string );
     }
 
-    if( !strcmp( psz_filter_type, "sub-filter") )
-        var_SetString( vout_GetSpu( p_vout ), psz_filter_type, psz_string );
-    else
-        var_SetString( p_vout, psz_filter_type, psz_string );
+    var_SetString( p_vout, psz_filter_type, psz_string );
 
     free( psz_string );
 }
@@ -778,6 +777,16 @@ static int VideoSplitterCallback( vlc_object_t *p_this, char const *psz_cmd,
     input_Control( p_input, INPUT_RESTART_ES, -VIDEO_ES );
     vlc_object_release( p_input );
 
+    return VLC_SUCCESS;
+}
+
+static int SubFilterCallback( vlc_object_t *p_this, char const *psz_cmd,
+                              vlc_value_t oldval, vlc_value_t newval, void *p_data)
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+
+    vout_ControlChangeSubFilters( p_vout, newval.psz_string );
     return VLC_SUCCESS;
 }
 

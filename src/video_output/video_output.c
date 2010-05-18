@@ -177,9 +177,6 @@ vout_thread_t *(vout_Create)(vlc_object_t *object, const video_format_t *fmt)
     /* Initialize subpicture unit */
     vout->p->p_spu = spu_Create(vout);
 
-    /* */
-    spu_Init(vout->p->p_spu);
-
     /* Take care of some "interface/control" related initialisations */
     vout_IntfInit(vout);
 
@@ -362,11 +359,6 @@ void vout_FlushSubpictureChannel( vout_thread_t *vout, int channel )
     spu_ClearChannel(vout->p->p_spu, channel);
 }
 
-spu_t *vout_GetSpu(vout_thread_t *vout)
-{
-    return vout->p->p_spu;
-}
-
 /* vout_Control* are usable by anyone at anytime */
 void vout_ControlChangeFullscreen(vout_thread_t *vout, bool fullscreen)
 {
@@ -427,6 +419,11 @@ void vout_ControlChangeCropBorder(vout_thread_t *vout,
 void vout_ControlChangeFilters(vout_thread_t *vout, const char *filters)
 {
     vout_control_PushString(&vout->p->control, VOUT_CONTROL_CHANGE_FILTERS,
+                            filters);
+}
+void vout_ControlChangeSubFilters(vout_thread_t *vout, const char *filters)
+{
+    vout_control_PushString(&vout->p->control, VOUT_CONTROL_CHANGE_SUB_FILTERS,
                             filters);
 }
 
@@ -687,6 +684,11 @@ static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
         msg_Err(vout, "Video filter chain creation failed");
 
     vlc_mutex_unlock(&vout->p->vfilter_lock);
+}
+
+static void ThreadChangeSubFilters(vout_thread_t *vout, const char *filters)
+{
+    spu_ChangeFilters(vout->p->p_spu, filters);
 }
 
 static void ThreadChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
@@ -990,6 +992,9 @@ static void *Thread(void *object)
                 break;
             case VOUT_CONTROL_CHANGE_FILTERS:
                 ThreadChangeFilters(vout, cmd.u.string);
+                break;
+            case VOUT_CONTROL_CHANGE_SUB_FILTERS:
+                ThreadChangeSubFilters(vout, cmd.u.string);
                 break;
             case VOUT_CONTROL_PAUSE:
                 ThreadChangePause(vout, cmd.u.pause.is_on, cmd.u.pause.date);

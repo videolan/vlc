@@ -450,9 +450,8 @@ static int Open( vlc_object_t *p_this )
     if( val.psz_string && *val.psz_string )
     {
         p_sys->p_spu = spu_Create( p_stream );
-        var_Create( p_sys->p_spu, "sub-filter", VLC_VAR_STRING );
-        var_Set( p_sys->p_spu, "sub-filter", val );
-        spu_Init( p_sys->p_spu );
+        if( p_sys->p_spu )
+            spu_ChangeFilters( p_sys->p_spu, val.psz_string );
     }
     free( val.psz_string );
 
@@ -465,7 +464,6 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_stream, SOUT_CFG_PREFIX "osd", &val );
     if( val.b_bool )
     {
-        vlc_value_t osd_val;
         char *psz_next;
 
         psz_next = config_ChainCreate( &p_sys->psz_osdenc,
@@ -478,18 +476,13 @@ static int Open( vlc_object_t *p_this )
 
         if( !p_sys->p_spu )
         {
-            osd_val.psz_string = strdup("osdmenu");
             p_sys->p_spu = spu_Create( p_stream );
-            var_Create( p_sys->p_spu, "sub-filter", VLC_VAR_STRING );
-            var_Set( p_sys->p_spu, "sub-filter", osd_val );
-            spu_Init( p_sys->p_spu );
-            free( osd_val.psz_string );
+            if( p_sys->p_spu )
+                spu_ChangeFilters( p_sys->p_spu, "osdmenu" );
         }
         else
         {
-            osd_val.psz_string = strdup("osdmenu");
-            var_Set( p_sys->p_spu, "sub-filter", osd_val );
-            free( osd_val.psz_string );
+            spu_ChangeFilters( p_sys->p_spu, "osdmenu" );
         }
     }
 

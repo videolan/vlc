@@ -385,7 +385,7 @@ sout_UpdateStatistic
 spu_Create
 spu_Destroy
 spu_DisplaySubpicture
-spu_Init
+spu_ChangeFilters
 spu_RenderSubpictures
 spu_SortSubpictures
 spu_RegisterChannel
@@ -621,7 +621,6 @@ vout_RegisterSubpictureChannel
 vout_FlushSubpictureChannel
 vout_EnableFilter
 vout_GetSnapshot
-vout_GetSpu
 vout_OSDIcon
 vout_OSDMessage
 vout_OSDEpg

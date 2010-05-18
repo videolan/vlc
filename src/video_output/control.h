@@ -41,6 +41,7 @@ enum {
 #endif
     VOUT_CONTROL_OSD_TITLE,             /* string */
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
+    VOUT_CONTROL_CHANGE_SUB_FILTERS,    /* string */
 
     VOUT_CONTROL_PAUSE,
     VOUT_CONTROL_RESET,

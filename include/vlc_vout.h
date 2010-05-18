@@ -168,15 +168,6 @@ VLC_EXPORT( void, vout_PutSubpicture,             ( vout_thread_t *, subpicture_
 VLC_EXPORT( int,  vout_RegisterSubpictureChannel, ( vout_thread_t * ) );
 VLC_EXPORT( void, vout_FlushSubpictureChannel,    ( vout_thread_t *, int ) );
 
-/**
- * Return the spu_t object associated to a vout_thread_t.
- *
- * The return object is valid only as long as the vout is. You must not
- * release the spu_t object returned.
- * It cannot return NULL so no need to check.
- */
-VLC_EXPORT( spu_t *, vout_GetSpu, ( vout_thread_t * ) );
-
 VLC_EXPORT( void, vout_EnableFilter, ( vout_thread_t *, const char *,bool , bool  ) );
 
 /**@}*/

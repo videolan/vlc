@@ -171,9 +171,6 @@ static picture_t *spu_new_video_buffer( filter_t * );
 static void spu_del_video_buffer( filter_t *, picture_t * );
 
 /* Buffer aloccation fir SUB filter */
-static int SubFilterCallback( vlc_object_t *, char const *,
-                              vlc_value_t, vlc_value_t, void * );
-
 static int SubFilterAllocationInit( filter_t *, void * );
 static void SubFilterAllocationClean( filter_t * );
 
@@ -239,20 +236,6 @@ spu_t *spu_Create( vlc_object_t *p_this )
 }
 
 /**
- * Initialise the subpicture unit
- *
- * \param p_spu the subpicture unit object
- */
-int spu_Init( spu_t *p_spu )
-{
-    var_Create( p_spu, "sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_AddCallback( p_spu, "sub-filter", SubFilterCallback, p_spu );
-    var_TriggerCallback( p_spu, "sub-filter" );
-
-    return VLC_SUCCESS;
-}
-
-/**
  * Destroy the subpicture unit
  *
  * \param p_this the parent object which destroys the subpicture unit
@@ -260,8 +243,6 @@ int spu_Init( spu_t *p_spu )
 void spu_Destroy( spu_t *p_spu )
 {
     spu_private_t *p_sys = p_spu->p;
-
-    var_DelCallback( p_spu, "sub-filter", SubFilterCallback, p_spu );
 
     if( p_sys->p_blend )
         filter_DeleteBlend( p_sys->p_blend );
@@ -740,6 +721,18 @@ void spu_ClearChannel( spu_t *p_spu, int i_channel )
         /* You cannot delete subpicture outside of spu_SortSubpictures */
         p_entry->b_reject = true;
     }
+
+    vlc_mutex_unlock( &p_sys->lock );
+}
+
+void spu_ChangeFilters( spu_t *p_spu, const char *psz_filters )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    vlc_mutex_lock( &p_sys->lock );
+
+    free( p_sys->psz_chain_update );
+    p_sys->psz_chain_update = strdup( psz_filters );
 
     vlc_mutex_unlock( &p_sys->lock );
 }
@@ -1915,22 +1908,5 @@ static void SubFilterAllocationClean( filter_t *p_filter )
 
     spu_ClearChannel( p_sys->p_spu, p_sys->i_channel );
     free( p_filter->p_owner );
-}
-
-static int SubFilterCallback( vlc_object_t *p_object, char const *psz_var,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    spu_t *p_spu = p_data;
-    spu_private_t *p_sys = p_spu->p;
-
-    VLC_UNUSED(p_object); VLC_UNUSED(oldval); VLC_UNUSED(psz_var);
-
-    vlc_mutex_lock( &p_sys->lock );
-
-    free( p_sys->psz_chain_update );
-    p_sys->psz_chain_update = strdup( newval.psz_string );
-
-    vlc_mutex_unlock( &p_sys->lock );
-    return VLC_SUCCESS;
 }
 

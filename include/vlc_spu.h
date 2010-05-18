@@ -60,7 +60,6 @@ struct spu_t
 
 VLC_EXPORT( spu_t *, spu_Create, ( vlc_object_t * ) );
 #define spu_Create(a) spu_Create(VLC_OBJECT(a))
-VLC_EXPORT( int, spu_Init, ( spu_t * ) );
 VLC_EXPORT( void, spu_Destroy, ( spu_t * ) );
 void spu_Attach( spu_t *, vlc_object_t *, bool );
 
@@ -96,6 +95,11 @@ VLC_EXPORT( int, spu_RegisterChannel, ( spu_t * ) );
  * It clears all subpictures associated to a SPU channel.
  */
 VLC_EXPORT( void, spu_ClearChannel, ( spu_t *, int ) );
+
+/**
+ * It changes the sub filters list
+ */
+VLC_EXPORT( void, spu_ChangeFilters, ( spu_t *, const char * ) );
 
 /** @}*/
 

@@ -114,10 +114,9 @@ int mediacontrol_showtext( vout_thread_t *p_vout, int i_channel,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_start, mtime_t i_stop )
 {
-    return osd_ShowTextAbsolute( vout_GetSpu( p_vout ), i_channel,
-                                 psz_string, p_style,
-                                 i_flags, i_hmargin, i_vmargin,
-                                 i_start, i_stop );
+    (void)p_style; (void)i_hmargin; (void)i_vmargin;
+    vout_OSDText( p_vout, i_channel, i_flags & ~SUBPICTURE_ALIGN_MASK,
+                  i_stop - i_start, psz_string );
 }
 
 

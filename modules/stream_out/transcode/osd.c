@@ -84,10 +84,7 @@ int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     }
 
     if( !p_sys->p_spu )
-    {
         p_sys->p_spu = spu_Create( p_stream );
-        spu_Init( p_sys->p_spu );
-    }
 
     return VLC_SUCCESS;
 
@@ -127,10 +124,7 @@ int transcode_osd_process( sout_stream_t *p_stream, sout_stream_id_t *id,
     {
         msg_Warn( p_stream, "spu channel not initialized, doing it now" );
         if( !p_sys->p_spu )
-        {
             p_sys->p_spu = spu_Create( p_stream );
-            spu_Init( p_sys->p_spu );
-        }
     }
 
     if( p_subpic )

@@ -129,6 +129,7 @@ void vout_ControlChangeCropRatio(vout_thread_t *, unsigned num, unsigned den);
 void vout_ControlChangeCropWindow(vout_thread_t *, int x, int y, int width, int height);
 void vout_ControlChangeCropBorder(vout_thread_t *, int left, int top, int right, int bottom);
 void vout_ControlChangeFilters(vout_thread_t *, const char *);
+void vout_ControlChangeSubFilters(vout_thread_t *, const char *);
 
 /* */
 void vout_IntfInit( vout_thread_t * );
