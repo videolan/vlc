@@ -98,63 +98,38 @@ static int VoutValidateFormat(video_format_t *dst,
  * This function looks for a video output thread matching the current
  * properties. If not found, it spawns a new one.
  *****************************************************************************/
-vout_thread_t *(vout_Request)( vlc_object_t *p_this, vout_thread_t *p_vout,
-                               const video_format_t *p_fmt )
+vout_thread_t *(vout_Request)( vlc_object_t *object, vout_thread_t *vout,
+                               const video_format_t *fmt )
 {
-    if( !p_fmt )
-    {
-        /* Video output is no longer used.
-         * TODO: support for reusing video outputs with proper _thread-safe_
-         * reference handling. */
-        if( p_vout )
-            vout_CloseAndRelease( p_vout );
+    if (!fmt) {
+        if (vout)
+            vout_CloseAndRelease(vout);
         return NULL;
     }
 
-    /* If a video output was provided, lock it, otherwise look for one. */
-    if( p_vout )
-    {
-        vlc_object_hold( p_vout );
-    }
+    /* If a vout is provided, try reusing it */
+    if (vout) {
+        spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), false);
+        vlc_object_detach(vout);
 
-    /* TODO: find a suitable unused video output */
+        vout_control_cmd_t cmd;
+        vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
+        cmd.u.reinit.fmt = fmt;
 
-    /* If we now have a video output, check it has the right properties */
-    if( p_vout )
-    {
-        if( !video_format_IsSimilar( &p_vout->p->original, p_fmt ) )
-        {
-            /* We are not interested in this format, close this vout */
-            vout_CloseAndRelease( p_vout );
-            vlc_object_release( p_vout );
-            p_vout = NULL;
+        vout_control_Push(&vout->p->control, &cmd);
+        vout_control_WaitEmpty(&vout->p->control);
+        if (!vout->p->dead) {
+            vlc_object_attach(vout, object);
+            spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), true);
+
+            msg_Dbg(object, "reusing provided vout");
+            return vout;
         }
-        else
-        {
-            /* This video output is cool! Hijack it. */
-            vlc_object_release( p_vout );
-        }
+        vout_CloseAndRelease(vout);
 
-        if( p_vout )
-        {
-            msg_Dbg( p_this, "reusing provided vout" );
-
-            spu_Attach( p_vout->p->p_spu, VLC_OBJECT(p_vout), false );
-            vlc_object_detach( p_vout );
-
-            vlc_object_attach( p_vout, p_this );
-            spu_Attach( p_vout->p->p_spu, VLC_OBJECT(p_vout), true );
-        }
+        msg_Warn(object, "cannot reuse provided vout");
     }
-
-    if( !p_vout )
-    {
-        msg_Dbg( p_this, "no usable vout present, spawning one" );
-
-        p_vout = vout_Create( p_this, p_fmt );
-    }
-
-    return p_vout;
+    return vout_Create(object, fmt);
 }
 
 /*****************************************************************************
@@ -958,6 +933,18 @@ static void ThreadClean(vout_thread_t *vout)
     vout->p->dead = true;
     vout_control_Dead(&vout->p->control);
 }
+static int ThreadReinit(vout_thread_t *vout,
+                        const video_format_t *fmt)
+{
+    video_format_t original;
+    if (VoutValidateFormat(&original, fmt))
+        return VLC_EGENERIC;
+    if (video_format_IsSimilar(&original, &vout->p->original))
+        return VLC_SUCCESS;
+
+    /* TODO */
+    return VLC_EGENERIC;
+}
 
 /*****************************************************************************
  * Thread: video output thread
@@ -995,6 +982,12 @@ static void *Thread(void *object)
             case VOUT_CONTROL_CLEAN:
                 ThreadClean(vout);
                 return NULL;
+            case VOUT_CONTROL_REINIT:
+                if (ThreadReinit(vout, cmd.u.reinit.fmt)) {
+                    ThreadClean(vout);
+                    return NULL;
+                }
+                break;
             case VOUT_CONTROL_OSD_TITLE:
                 ThreadDisplayOsdTitle(vout, cmd.u.string);
                 break;
