@@ -916,7 +916,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 case FOURCC_0xa9trk: /* Track */
                     SET( vlc_meta_SetTrackNum );
                     break;
-
+                case FOURCC_trkn:
+                {
+                    char psz_trck[11];
+                    snprintf( psz_trck, sizeof( psz_trck ), "%i",
+                              p_0xa9xxx->data.p_trkn->i_track_number );
+                    vlc_meta_SetTrackNum( p_meta, psz_trck );
+                    break;
+                }
                 case FOURCC_0xa9cmt: /* Commment */
                     SET( vlc_meta_SetDescription );
                     break;
