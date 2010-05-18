@@ -181,7 +181,7 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         textprop.nitems = strlen( hostname );
         XSetWMClientMachine( XDISPLAY, m_wnd, &textprop);
     }
-    delete hostname;
+    delete[] hostname;
 
     // initialize EWMH pid
     pid_t pid = getpid();
