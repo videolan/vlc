@@ -1145,7 +1145,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                                          psz_session, f_scale, NULL );
                         }
 
-                        if( p_rtsp->b_paused == true )
+                        if( p_rtsp->b_paused )
                         {
                             p_rtsp->b_paused = false;
                             CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media,
