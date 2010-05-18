@@ -102,7 +102,7 @@ struct vout_thread_t
  * \return a vout if p_fmt is non NULL and the request is successfull, NULL
  * otherwise
  */
-VLC_EXPORT( vout_thread_t *, vout_Request, ( vlc_object_t *p_this, vout_thread_t *p_vout, video_format_t *p_fmt ) );
+VLC_EXPORT( vout_thread_t *, vout_Request, ( vlc_object_t *p_this, vout_thread_t *p_vout, const video_format_t *p_fmt ) );
 #define vout_Request(a,b,c) vout_Request(VLC_OBJECT(a),b,c)
 
 /**
@@ -114,7 +114,7 @@ VLC_EXPORT( vout_thread_t *, vout_Request, ( vlc_object_t *p_this, vout_thread_t
  * \param p_fmt the video format requested
  * \return a vout if the request is successfull, NULL otherwise
  */
-VLC_EXPORT( vout_thread_t *, vout_Create, ( vlc_object_t *p_this, video_format_t *p_fmt ) );
+VLC_EXPORT( vout_thread_t *, vout_Create, ( vlc_object_t *p_this, const video_format_t *p_fmt ) );
 #define vout_Create(a,b) vout_Create(VLC_OBJECT(a),b)
 
 /**
