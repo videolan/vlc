@@ -354,6 +354,8 @@ struct vout_display_owner_sys_t {
     bool display_is_fullscreen;
     bool display_is_forced;
 
+    int  fit_window;
+
 #ifdef ALLOW_DUMMY_VOUT
     vlc_mouse_t vout_mouse;
 #endif
@@ -638,6 +640,39 @@ static void VoutDisplayDelWindow(vout_display_t *vd, vout_window_t *window)
     vout_DeleteDisplayWindow(osys->vout, vd, window);
 }
 
+static void VoutDisplayFitWindow(vout_display_t *vd, bool default_size)
+{
+    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_cfg_t cfg = osys->cfg;
+
+    if (!cfg.is_display_filled)
+        return;
+
+    cfg.display.width = 0;
+    if (default_size) {
+        cfg.display.height = 0;
+    } else {
+        cfg.display.height = osys->height_saved;
+        cfg.zoom.num = 1;
+        cfg.zoom.den = 1;
+    }
+
+    unsigned display_width;
+    unsigned display_height;
+    vout_display_GetDefaultDisplaySize(&display_width, &display_height,
+                                       &vd->source, &cfg);
+
+    vlc_mutex_lock(&osys->lock);
+
+    osys->ch_display_size       = true;
+    osys->display_width         = display_width;
+    osys->display_height        = display_height;
+    osys->display_is_fullscreen = osys->cfg.is_fullscreen;
+    osys->display_is_forced     = true;
+
+    vlc_mutex_unlock(&osys->lock);
+}
+
 void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
@@ -704,8 +739,15 @@ void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             !osys->ch_zoom &&
             !ch_wm_state &&
             !osys->ch_sar &&
-            !osys->ch_crop)
+            !osys->ch_crop) {
+
+            if (!osys->cfg.is_fullscreen && osys->fit_window != 0) {
+                VoutDisplayFitWindow(vd, osys->fit_window == -1);
+                osys->fit_window = 0;
+                continue;
+            }
             break;
+        }
 
         /* */
         if (ch_fullscreen) {
@@ -782,19 +824,8 @@ void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                 msg_Err(vd, "Failed to change zoom");
                 osys->zoom.num = osys->cfg.zoom.num;
                 osys->zoom.den = osys->cfg.zoom.den;
-            } else if (cfg.is_display_filled) {
-                const int display_width  = (int64_t)vd->source.i_width  * osys->zoom.num / osys->zoom.den;
-                const int display_height = (int64_t)vd->source.i_height * osys->zoom.num / osys->zoom.den;
-
-                vlc_mutex_lock(&osys->lock);
-
-                osys->ch_display_size       = true;
-                osys->display_width         = display_width;
-                osys->display_height        = display_height;
-                osys->display_is_fullscreen = osys->cfg.is_fullscreen;
-                osys->display_is_forced     = true;
-
-                vlc_mutex_unlock(&osys->lock);
+            } else {
+                osys->fit_window = -1;
             }
 
             osys->cfg.zoom.num = osys->zoom.num;
@@ -834,6 +865,8 @@ void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                  */
                 msg_Err(vd, "Failed to change source AR");
                 source = vd->source;
+            } else if (!osys->fit_window) {
+                osys->fit_window = 1;
             }
             vd->source = source;
             osys->sar.num = source.i_sar_num;
@@ -886,6 +919,8 @@ void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                 /* FIXME implement cropping in the core if not supported by the
                  * vout module (easy)
                  */
+            } else if (!osys->fit_window) {
+                osys->fit_window = 1;
             }
             vd->source = source;
             osys->crop.x      = source.i_x_offset;
@@ -1068,6 +1103,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->zoom.den = cfg->zoom.den;
     osys->wm_state = state->is_on_top ? VOUT_WINDOW_STATE_ABOVE
                                       : VOUT_WINDOW_STATE_NORMAL;
+    osys->fit_window = 0;
 
     osys->source = *source_org;
 
