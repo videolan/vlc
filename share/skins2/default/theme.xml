@@ -194,8 +194,9 @@
         <Button up="sysbuttons.png.aot1.normal" down="sysbuttons.png.aot1.down" over="sysbuttons.png.aot1.hover" action="vlc.onTop()" id="main.normal.titlebar.aot1" x="26" y="3" visible="vlc.isOnTop" tooltiptext="Disable Always On Top"/>
       </Panel>
       <Panel id="main.normal.component" y="24" width="0" height="0" rightbottom="rightbottom">
-        <Image id="main.normal.component.background" image="main.png.background" resize="scale" rightbottom="rightbottom"/>
-        <Video id="main.normal.component.video" width="500" height="224" rightbottom="rightbottom"/>
+        <Image id="main.normal.component.background" image="main.png.background" resize="scale" rightbottom="rightbottom" />
+        <Image id="main.normal.component.art" image="main.png.background" resize="scale2" rightbottom="rightbottom" art="true"/>
+        <Video id="main.normal.component.video" width="500" height="224" rightbottom="rightbottom" visible="vlc.hasVout"/>
       </Panel>
       <Panel id="main.normal.controls" y="248" width="0" height="0" lefttop="leftbottom" rightbottom="rightbottom">
         <Image id="main.normal.controls.bg.left" image="main.png.controls.bg.left" action="move"/>
