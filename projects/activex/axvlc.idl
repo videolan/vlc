@@ -206,7 +206,7 @@ library AXVLC
             [id(DISPID_MediaPlayerOpeningEvent), helpstring("Opening media")]
             void MediaPlayerOpening();
             [id(DISPID_MediaPlayerBufferingEvent), helpstring("Buffering media")]
-            void MediaPlayerBuffering();
+            void MediaPlayerBuffering([in] long cache);
             [id(DISPID_MediaPlayerPlayingEvent), helpstring("Media is playing")]
             void MediaPlayerPlaying();
             [id(DISPID_MediaPlayerPausedEvent), helpstring("Media is paused")]

@@ -1021,10 +1021,17 @@ void VLCPlugin::fireOnMediaPlayerOpeningEvent()
     vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerOpeningEvent, &dispparamsNoArgs);
 };
 
-void VLCPlugin::fireOnMediaPlayerBufferingEvent()
+void VLCPlugin::fireOnMediaPlayerBufferingEvent(long cache)
 {
-    DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerBufferingEvent, &dispparamsNoArgs);
+    DISPPARAMS params;
+    params.cArgs = 1;
+    params.rgvarg = (VARIANTARG *) CoTaskMemAlloc(sizeof(VARIANTARG) * params.cArgs) ;
+    memset(params.rgvarg, 0, sizeof(VARIANTARG) * params.cArgs);
+    params.rgvarg[0].vt = VT_I4;
+    params.rgvarg[0].lVal = cache;
+    params.rgdispidNamedArgs = NULL;
+    params.cNamedArgs = 0;
+    vlcConnectionPointContainer->fireEvent(DISPID_MediaPlayerBufferingEvent, &params);
 };
 
 void VLCPlugin::fireOnMediaPlayerPlayingEvent()
@@ -1081,7 +1088,7 @@ static void handle_input_state_event(const libvlc_event_t* event, void *param)
             plugin->fireOnMediaPlayerOpeningEvent();
             break;
         case libvlc_MediaPlayerBuffering:
-            plugin->fireOnMediaPlayerBufferingEvent();
+            plugin->fireOnMediaPlayerBufferingEvent(event->u.media_player_buffering.new_cache);
             break;
         case libvlc_MediaPlayerPlaying:
             plugin->fireOnMediaPlayerPlayingEvent();

@@ -112,7 +112,7 @@ static vlcplugin_event_t vlcevents[] = {
     { "MediaPlayerMediaChanged", libvlc_MediaPlayerMediaChanged, handle_input_event },
     { "MediaPlayerNothingSpecial", libvlc_MediaPlayerNothingSpecial, handle_input_event },
     { "MediaPlayerOpening", libvlc_MediaPlayerOpening, handle_input_event },
-    { "MediaPlayerBuffering", libvlc_MediaPlayerBuffering, handle_input_event },
+    { "MediaPlayerBuffering", libvlc_MediaPlayerBuffering, handle_changed_event },
     { "MediaPlayerPlaying", libvlc_MediaPlayerPlaying, handle_input_event },
     { "MediaPlayerPaused", libvlc_MediaPlayerPaused, handle_input_event },
     { "MediaPlayerStopped", libvlc_MediaPlayerStopped, handle_input_event },
@@ -135,7 +135,6 @@ static void handle_input_event(const libvlc_event_t* event, void *param)
     {
         case libvlc_MediaPlayerNothingSpecial:
         case libvlc_MediaPlayerOpening:
-        case libvlc_MediaPlayerBuffering:
         case libvlc_MediaPlayerPlaying:
         case libvlc_MediaPlayerPaused:
         case libvlc_MediaPlayerStopped:
@@ -158,6 +157,9 @@ static void handle_changed_event(const libvlc_event_t* event, void *param)
     VlcPlugin *plugin = (VlcPlugin*)param;
     switch( event->type )
     {
+        case libvlc_MediaPlayerBuffering:
+            DOUBLE_TO_NPVARIANT(event->u.media_player_buffering.new_cache, npparam[0]);
+            break;
         case libvlc_MediaPlayerTimeChanged:
             DOUBLE_TO_NPVARIANT(event->u.media_player_time_changed.new_time, npparam[0]);
             break;
@@ -207,7 +209,6 @@ void EventObj::deliver(NPP browser)
                 NPVariant result;
                 NPVariant *params = iter->params();
                 uint32_t   count  = iter->count();
-                assert( params );
 
                 NPObject *listener = j->listener();
                 assert( listener );
@@ -225,7 +226,7 @@ void EventObj::deliver(NPP browser)
                         NPN_MemFree( (void*)NPVARIANT_TO_OBJECT(params[n]) );
                     }
                 }
-                NPN_MemFree( params );
+                if (params) NPN_MemFree( params );
             }
         }
     }

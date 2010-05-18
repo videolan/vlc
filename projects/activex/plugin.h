@@ -241,7 +241,7 @@ public:
     // async events;
     void fireOnMediaPlayerNothingSpecialEvent();
     void fireOnMediaPlayerOpeningEvent();
-    void fireOnMediaPlayerBufferingEvent();
+    void fireOnMediaPlayerBufferingEvent(long cache);
     void fireOnMediaPlayerPlayingEvent();
     void fireOnMediaPlayerPausedEvent();
     void fireOnMediaPlayerForwardEvent();

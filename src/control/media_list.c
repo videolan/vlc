@@ -183,6 +183,7 @@ libvlc_media_list_new( libvlc_instance_t * p_inst )
     vlc_mutex_init( &p_mlist->refcount_lock ); // FIXME: spinlock?
 
     vlc_array_init( &p_mlist->items );
+    assert( p_mlist->items.i_count == 0 );
     p_mlist->i_refcount = 1;
     p_mlist->p_md = NULL;
 

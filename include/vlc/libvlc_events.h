@@ -140,6 +140,10 @@ typedef struct libvlc_event_t
         /* media instance */
         struct
         {
+            float new_cache;
+        } media_player_buffering;
+        struct
+        {
             float new_position;
         } media_player_position_changed;
         struct
