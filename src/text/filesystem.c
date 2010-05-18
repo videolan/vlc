@@ -38,6 +38,9 @@
 
 #include <stdio.h>
 #include <limits.h> /* NAME_MAX */
+#if !defined(NAME_MAX) && defined(_POSIX_NAME_MAX)
+# define NAME_MAX _POSIX_NAME_MAX
+#endif
 #include <errno.h>
 #include <sys/types.h>
 #ifdef HAVE_DIRENT_H
