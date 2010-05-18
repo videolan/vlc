@@ -50,6 +50,7 @@
 #include "../commands/cmd_audio.hpp"
 #include "../commands/cmd_callbacks.hpp"
 #include "../utils/var_bool.hpp"
+#include "../utils/var_string.hpp"
 #include <sstream>
 
 #include <assert.h>
@@ -129,6 +130,8 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     pVarManager->registerVar( m_cVarStreamBitRate, "bitrate" );
     m_cVarStreamSampleRate = VariablePtr( new VarText( getIntf(), false ) );
     pVarManager->registerVar( m_cVarStreamSampleRate, "samplerate" );
+    m_cVarStreamArt = VariablePtr( new VarString( getIntf() ) );
+    pVarManager->registerVar( m_cVarStreamArt, "streamArt" );
 
     // Register the equalizer bands
     for( int i = 0; i < EqualizerBands::kNbBands; i++)
@@ -430,6 +433,7 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
 #define SET_BOOL(m,v)         ((VarBoolImpl*)(m).get())->set(v)
 #define SET_STREAMTIME(m,v,b) ((StreamTime*)(m).get())->set(v,b)
 #define SET_TEXT(m,v)         ((VarText*)(m).get())->set(v)
+#define SET_STRING(m,v)       ((VarString*)(m).get())->set(v)
 #define SET_VOLUME(m,v,b)     ((Volume*)(m).get())->set(v,b)
 
 void VlcProc::on_item_current_changed( vlc_object_t* p_obj, vlc_value_t newVal )
@@ -445,6 +449,11 @@ void VlcProc::on_item_current_changed( vlc_object_t* p_obj, vlc_value_t newVal )
     char *psz_uri = input_item_GetURI( p_item );
     SET_TEXT( m_cVarStreamURI, UString( getIntf(), psz_uri ) );
     free( psz_uri );
+
+    // Update art uri
+    char *psz_art = input_item_GetArtURL( p_item );
+    SET_STRING( m_cVarStreamArt, string( psz_art ? psz_art : "" ) );
+    free( psz_art );
 
     // Update playtree
     getPlaytreeVar().onUpdateCurrent( true );
@@ -767,4 +776,5 @@ void VlcProc::setFullscreenVar( bool b_fullscreen )
 #undef  SET_BOOL
 #undef  SET_STREAMTIME
 #undef  SET_TEXT
+#undef  SET_STRING
 #undef  SET_VOLUME

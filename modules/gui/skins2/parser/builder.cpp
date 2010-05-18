@@ -574,9 +574,12 @@ void Builder::addImage( const BuilderData::Image &rData )
     VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
 
     CtrlImage::resize_t resizeMethod =
-        (rData.m_resize == "scale" ? CtrlImage::kScale : CtrlImage::kMosaic);
+        rData.m_resize == "scale"  ? CtrlImage::kScale :
+        rData.m_resize == "mosaic" ? CtrlImage::kMosaic :
+                                     CtrlImage::kScaleAndRatioPreserved;
     CtrlImage *pImage = new CtrlImage( getIntf(), *pBmp, *pCommand,
-        resizeMethod, UString( getIntf(), rData.m_help.c_str() ), pVisible );
+        resizeMethod, UString( getIntf(), rData.m_help.c_str() ), pVisible,
+        rData.m_art );
     m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pImage );
 
     // Compute the position of the control

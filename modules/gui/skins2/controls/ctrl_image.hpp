@@ -26,28 +26,31 @@
 #define CTRL_IMAGE_HPP
 
 #include "../commands/cmd_generic.hpp"
+#include "../utils/observer.hpp"
 #include "ctrl_flat.hpp"
 
 class GenericBitmap;
 class OSGraphics;
 class CmdGeneric;
+class VarString;
 
 
 /// Control image
-class CtrlImage: public CtrlFlat
+class CtrlImage: public CtrlFlat, public Observer<VarString>
 {
 public:
     /// Resize methods
     enum resize_t
     {
-        kMosaic,  // Repeat the base image in a mosaic
-        kScale    // Scale the base image
+        kMosaic,                // Repeat the base image in a mosaic
+        kScale,                 // Scale the base image
+        kScaleAndRatioPreserved // Scale image (aspect ratio preserved)
     };
 
     // Create an image with the given bitmap (which is NOT copied)
-    CtrlImage( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
+    CtrlImage( intf_thread_t *pIntf, GenericBitmap &rBitmap,
                CmdGeneric &rCommand, resize_t resizeMethod,
-               const UString &rHelp, VarBool *pVisible );
+               const UString &rHelp, VarBool *pVisible, bool art );
     virtual ~CtrlImage();
 
     /// Handle an event on the control
@@ -64,13 +67,22 @@ public:
 
 private:
     /// Bitmap
-    const GenericBitmap &m_rBitmap;
+    GenericBitmap* m_pBitmap;
+    /// original Bitmap
+    GenericBitmap* m_pOriginalBitmap;
     /// Buffer to stored the rendered bitmap
     OSGraphics *m_pImage;
     /// Command triggered by a double-click on the image
     CmdGeneric &m_rCommand;
     /// Resize method
     resize_t m_resizeMethod;
+    /// does the image get updated as art
+    bool m_art;
+
+    /// Method called when the observed variable is modified
+    virtual void onUpdate( Subject<VarString> &rVariable, void* );
+
+
 };
 
 #endif

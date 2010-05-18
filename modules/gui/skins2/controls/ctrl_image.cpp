@@ -27,26 +27,47 @@
 #include "../events/evt_generic.hpp"
 #include "../src/os_factory.hpp"
 #include "../src/os_graphics.hpp"
+#include "../src/vlcproc.hpp"
 #include "../src/scaled_bitmap.hpp"
+#include "../src/art_bitmap.hpp"
 #include "../utils/position.hpp"
 
 
-CtrlImage::CtrlImage( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
+CtrlImage::CtrlImage( intf_thread_t *pIntf, GenericBitmap &rBitmap,
                       CmdGeneric &rCommand, resize_t resizeMethod,
-                      const UString &rHelp, VarBool *pVisible ):
-    CtrlFlat( pIntf, rHelp, pVisible ), m_rBitmap( rBitmap ),
-    m_rCommand( rCommand ), m_resizeMethod( resizeMethod )
+                      const UString &rHelp, VarBool *pVisible, bool art ):
+    CtrlFlat( pIntf, rHelp, pVisible ),
+    m_pBitmap( &rBitmap ), m_pOriginalBitmap( &rBitmap ),
+    m_rCommand( rCommand ), m_resizeMethod( resizeMethod ), m_art( art )
 {
     // Create an initial unscaled image in the buffer
     m_pImage = OSFactory::instance( pIntf )->createOSGraphics(
                                     rBitmap.getWidth(), rBitmap.getHeight() );
-    m_pImage->drawBitmap( m_rBitmap );
+    m_pImage->drawBitmap( *m_pBitmap );
+
+    // Observe the variable
+    if( m_art )
+    {
+        VlcProc *pVlcProc = VlcProc::instance( getIntf() );
+        pVlcProc->getStreamArtVar().addObserver( this );
+
+        ArtBitmap::initArtBitmap( getIntf() );
+    }
+
 }
 
 
 CtrlImage::~CtrlImage()
 {
     delete m_pImage;
+
+    if( m_art )
+    {
+        VlcProc *pVlcProc = VlcProc::instance( getIntf() );
+        pVlcProc->getStreamArtVar().delObserver( this );
+
+        ArtBitmap::freeArtBitmap( );
+    }
 }
 
 
@@ -104,7 +125,7 @@ void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest )
                 {
                     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
                     // Rescale the image with the actual size of the control
-                    ScaledBitmap bmp( getIntf(), m_rBitmap, width, height );
+                    ScaledBitmap bmp( getIntf(), *m_pBitmap, width, height );
                     delete m_pImage;
                     m_pImage = pOsFactory->createOSGraphics( width, height );
                     m_pImage->drawBitmap( bmp, 0, 0 );
@@ -112,7 +133,7 @@ void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest )
                 rImage.drawGraphics( *m_pImage, 0, 0, xDest, yDest );
             }
         }
-        else
+        else if( m_resizeMethod == kMosaic )
         {
             // Use mosaic method
             while( width > 0 )
@@ -132,6 +153,68 @@ void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest )
                 width -= m_pImage->getWidth();
             }
         }
+        else if( m_resizeMethod == kScaleAndRatioPreserved )
+        {
+            int width = pPos->getWidth();
+            int height = pPos->getHeight();
+
+            int w = m_pBitmap->getWidth();
+            int h = m_pBitmap->getHeight();
+
+            int scaled_height = width * h / w;
+            int scaled_width  = height * w / h;
+
+            int x, y;
+
+            if( scaled_height > height )
+            {
+                width = scaled_width;
+                x = ( pPos->getWidth() - width ) / 2;
+                y = 0;
+            }
+            else
+            {
+                height = scaled_height;
+                x =  0;
+                y = ( pPos->getHeight() - height ) / 2;
+            }
+
+            OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+            // Rescale the image with the actual size of the control
+            ScaledBitmap bmp( getIntf(), *m_pBitmap, width, height );
+            delete m_pImage;
+            m_pImage = pOsFactory->createOSGraphics( width, height );
+            m_pImage->drawBitmap( bmp, 0, 0 );
+
+            rImage.drawGraphics( *m_pImage, 0, 0, xDest + x, yDest + y );
+        }
     }
 }
+
+void CtrlImage::onUpdate( Subject<VarString> &rVariable, void* arg )
+{
+    VlcProc *pVlcProc = VlcProc::instance( getIntf() );
+
+    if( &rVariable == &pVlcProc->getStreamArtVar() )
+    {
+        string str = ((VarString&)rVariable).get();
+        GenericBitmap* pArt = (GenericBitmap*) ArtBitmap::getArtBitmap( str );
+
+        m_pBitmap = pArt ? pArt : m_pOriginalBitmap;
+
+        msg_Dbg( getIntf(), "art file %s to be displayed (wxh = %ix%i)",
+                            str.c_str(),
+                            m_pBitmap->getWidth(),
+                            m_pBitmap->getHeight() );
+
+        delete m_pImage;
+        m_pImage = OSFactory::instance( getIntf() )->createOSGraphics(
+                                        m_pBitmap->getWidth(),
+                                        m_pBitmap->getHeight() );
+        m_pImage->drawBitmap( *m_pBitmap );
+
+        notifyLayout();
+    }
+}
+
 

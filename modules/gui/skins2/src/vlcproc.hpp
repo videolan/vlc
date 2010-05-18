@@ -36,6 +36,7 @@
 #include "../vars/volume.hpp"
 #include "../utils/position.hpp"
 #include "../utils/var_text.hpp"
+#include "../utils/var_string.hpp"
 #include "../commands/cmd_generic.hpp"
 #include "../controls/ctrl_video.hpp"
 
@@ -80,6 +81,10 @@ public:
     /// Getter for the stream sample rate variable
     VarText &getStreamSampleRateVar()
         { return *((VarText*)(m_cVarStreamSampleRate.get())); }
+
+    /// Getter for the stream Art url variable
+    VarString &getStreamArtVar()
+       { return *((VarString*)(m_cVarStreamArt.get())); }
 
     /// Getter/Setter for the fullscreen variable
     VarBool &getFullscreenVar() { return *((VarBool*)(m_cVarFullscreen.get())); }
@@ -128,6 +133,7 @@ private:
     VariablePtr m_cVarStreamURI;
     VariablePtr m_cVarStreamBitRate;
     VariablePtr m_cVarStreamSampleRate;
+    VariablePtr m_cVarStreamArt;
     /// Variable for the "mute" state
     VariablePtr m_cVarMute;
     /// Variables related to the input

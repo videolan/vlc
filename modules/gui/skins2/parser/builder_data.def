@@ -11,7 +11,7 @@ Layout id:string width:int height:int minWidth:int maxWidth:int minHeight:int ma
 Anchor xPos:int yPos:int leftTop:string range:int priority:int points:string layoutId:string
 Button id:string xPos:int yPos:int leftTop:string rightBottom:string xKeepRatio:bool yKeepRatio:bool visible:string upId:string downId:string overId:string actionId:string tooltip:string help:string layer:int windowId:string layoutId:string panelId:string
 Checkbox id:string xPos:int yPos:int leftTop:string rightBottom:string xKeepRatio:bool yKeepRatio:bool visible:string up1Id:string down1Id:string over1Id:string up2Id:string down2Id:string over2Id:string state:string action1:string action2:string tooltip1:string tooltip2:string help:string layer:int windowId:string layoutId:string panelId:string
-Image id:string xPos:int yPos:int leftTop:string rightBottom:string xKeepRatio:bool yKeepRatio:bool visible:string bmpId:string actionId:string action2Id:string resize:string help:string layer:int windowId:string layoutId:string panelId:string
+Image id:string xPos:int yPos:int leftTop:string rightBottom:string xKeepRatio:bool yKeepRatio:bool visible:string bmpId:string actionId:string action2Id:string resize:string help:string art:bool layer:int windowId:string layoutId:string panelId:string
 IniFile id:string file:string
 Panel id:string xPos:int yPos:int leftTop:string rightBottom:string xKeepRatio:bool yKeepRatio:bool width:int height:int layer:int windowId:string layoutId:string panelId:string
 Text id:string xPos:int yPos:int visible:string fontId:string text:string width:int leftTop:string rightBottom:string xKeepRatio:bool yKeepRatio:bool color:uint32_t scrolling:string alignment:string help:string layer:int windowId:string layoutId:string panelId:string

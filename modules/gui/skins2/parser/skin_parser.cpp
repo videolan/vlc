@@ -288,6 +288,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         DefaultAttr( attr, "action2", "none" );
         DefaultAttr( attr, "resize", "mosaic" );
         DefaultAttr( attr, "help", "" );
+        DefaultAttr( attr, "art", "false" );
 
         const BuilderData::Image imageData( uniqueId( attr["id"] ),
                 atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
@@ -295,7 +296,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 convertBoolean( attr["xkeepratio"] ),
                 convertBoolean( attr["ykeepratio"] ), attr["visible"],
                 attr["image"], attr["action"], attr["action2"], attr["resize"],
-                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId,
+                attr["help"], convertBoolean( attr["art"] ),
+                m_curLayer, m_curWindowId, m_curLayoutId,
                 m_panelStack.back() );
         m_curLayer++;
         m_pData->m_listImage.push_back( imageData );

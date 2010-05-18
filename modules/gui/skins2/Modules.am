@@ -107,6 +107,8 @@ SOURCES_skins2 = \
 	src/dialogs.hpp \
 	src/file_bitmap.cpp \
 	src/file_bitmap.hpp \
+	src/art_bitmap.cpp \
+	src/art_bitmap.hpp \
 	src/ft2_bitmap.cpp \
 	src/ft2_bitmap.hpp \
 	src/ft2_font.cpp \
@@ -178,6 +180,8 @@ SOURCES_skins2 = \
 	utils/var_percent.hpp \
 	utils/var_text.cpp \
 	utils/var_text.hpp \
+	utils/var_string.cpp \
+	utils/var_string.hpp \
 	utils/var_tree.cpp \
 	utils/var_tree.hpp \
 	\
