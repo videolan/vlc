@@ -26,7 +26,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_vout.h>
+#include <vlc_fourcc.h>
 #include <assert.h>
 
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H
