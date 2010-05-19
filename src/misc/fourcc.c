@@ -448,6 +448,10 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_VP6A, "On2's VP6 A Video"),
         A("VP6A"),
 
+    B(VLC_CODEC_VP8, "On2's VP8 Video"),
+        A("VP80"),
+
+
     /* Xiph.org theora */
     B(VLC_CODEC_THEORA, "Xiph.org's Theora Video"),
         A("theo"),

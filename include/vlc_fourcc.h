@@ -113,6 +113,7 @@
 #define VLC_CODEC_FRWU      VLC_FOURCC('F','R','W','U')
 #define VLC_CODEC_AMV       VLC_FOURCC('A','M','V',' ')
 #define VLC_CODEC_INDEO5    VLC_FOURCC('I','V','5','0')
+#define VLC_CODEC_VP8       VLC_FOURCC('V','P','8','0')
 
 
 /* Planar YUV 4:1:0 Y:V:U */
