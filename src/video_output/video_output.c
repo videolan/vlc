@@ -111,6 +111,8 @@ vout_thread_t *(vout_Request)(vlc_object_t *object, vout_thread_t *vout,
     if (vout) {
         spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), false);
         vlc_object_detach(vout);
+        vlc_object_attach(vout, object);
+        spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), true);
 
         vout_control_cmd_t cmd;
         vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
@@ -119,9 +121,6 @@ vout_thread_t *(vout_Request)(vlc_object_t *object, vout_thread_t *vout,
         vout_control_Push(&vout->p->control, &cmd);
         vout_control_WaitEmpty(&vout->p->control);
         if (!vout->p->dead) {
-            vlc_object_attach(vout, object);
-            spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), true);
-
             msg_Dbg(object, "reusing provided vout");
             return vout;
         }
@@ -228,6 +227,7 @@ void vout_Close(vout_thread_t *vout)
     assert(vout);
 
     spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), false);
+    vlc_object_detach(vout->p->p_spu);
 
     vout_snapshot_End(&vout->p->snapshot);
 
@@ -845,10 +845,8 @@ static void ThreadExecuteCropRatio(vout_thread_t *vout,
                             source->i_visible_height);
 }
 
-static int ThreadInit(vout_thread_t *vout)
+static int ThreadStart(vout_thread_t *vout)
 {
-    vout->p->dead = false;
-    vout->p->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
     vlc_mouse_Init(&vout->p->mouse);
     vout->p->decoder_fifo = picture_fifo_New();
     vout->p->decoder_pool = NULL;
@@ -865,8 +863,6 @@ static int ThreadInit(vout_thread_t *vout)
         return VLC_EGENERIC;
     assert(vout->p->decoder_pool);
 
-    vout_chrono_Init(&vout->p->render, 5, 10000); /* Arbitrary initial time */
-
     vout->p->displayed.decoded       = NULL;
     vout->p->displayed.date          = VLC_TS_INVALID;
     vout->p->displayed.decoded       = NULL;
@@ -877,14 +873,11 @@ static int ThreadInit(vout_thread_t *vout)
     vout->p->step.last               = VLC_TS_INVALID;
     vout->p->step.timestamp          = VLC_TS_INVALID;
 
-    vout->p->pause.is_on             = false;
-    vout->p->pause.date              = VLC_TS_INVALID;
-
     video_format_Print(VLC_OBJECT(vout), "original format", &vout->p->original);
     return VLC_SUCCESS;
 }
 
-static void ThreadClean(vout_thread_t *vout)
+static void ThreadStop(vout_thread_t *vout)
 {
     /* Destroy the video filters2 */
     filter_chain_Delete(vout->p->vfilter_chain);
@@ -898,28 +891,48 @@ static void ThreadClean(vout_thread_t *vout)
         vout_CloseWrapper(vout);
     }
 
-    /* Detach subpicture unit from vout */
-    vlc_object_detach(vout->p->p_spu);
-
     if (vout->p->decoder_fifo)
         picture_fifo_Delete(vout->p->decoder_fifo);
     assert(!vout->p->decoder_pool);
-    vout_chrono_Clean(&vout->p->render);
+}
 
+static void ThreadInit(vout_thread_t *vout)
+{
+    vout->p->dead            = false;
+    vout->p->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
+    vout->p->pause.is_on     = false;
+    vout->p->pause.date      = VLC_TS_INVALID;
+
+    vout_chrono_Init(&vout->p->render, 5, 10000); /* Arbitrary initial time */
+}
+
+static void ThreadClean(vout_thread_t *vout)
+{
+    vout_chrono_Clean(&vout->p->render);
     vout->p->dead = true;
     vout_control_Dead(&vout->p->control);
 }
+
 static int ThreadReinit(vout_thread_t *vout,
                         const video_format_t *fmt)
 {
     video_format_t original;
-    if (VoutValidateFormat(&original, fmt))
+    if (VoutValidateFormat(&original, fmt)) {
+        ThreadStop(vout);
+        ThreadClean(vout);
         return VLC_EGENERIC;
+    }
     if (video_format_IsSimilar(&original, &vout->p->original))
         return VLC_SUCCESS;
 
-    /* TODO */
-    return VLC_EGENERIC;
+    ThreadStop(vout);
+
+    vout->p->original = original;
+    if (ThreadStart(vout)) {
+        ThreadClean(vout);
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -950,19 +963,20 @@ static void *Thread(void *object)
         while (!vout_control_Pop(&vout->p->control, &cmd, deadline, 100000)) {
             switch(cmd.type) {
             case VOUT_CONTROL_INIT:
-                if (ThreadInit(vout)) {
+                ThreadInit(vout);
+                if (ThreadStart(vout)) {
+                    ThreadStop(vout);
                     ThreadClean(vout);
                     return NULL;
                 }
                 break;
             case VOUT_CONTROL_CLEAN:
+                ThreadStop(vout);
                 ThreadClean(vout);
                 return NULL;
             case VOUT_CONTROL_REINIT:
-                if (ThreadReinit(vout, cmd.u.reinit.fmt)) {
-                    ThreadClean(vout);
+                if (ThreadReinit(vout, cmd.u.reinit.fmt))
                     return NULL;
-                }
                 break;
             case VOUT_CONTROL_OSD_TITLE:
                 ThreadDisplayOsdTitle(vout, cmd.u.string);
