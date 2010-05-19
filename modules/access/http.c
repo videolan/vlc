@@ -1287,6 +1287,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
         p_sys->b_persist = true;
         net_Printf( p_access, p_sys->fd, pvs,
                     "Range: bytes=%"PRIu64"-\r\n", i_tell );
+        net_Printf( p_access, p_sys->fd, pvs, "Connection: close\r\n" );
     }
 
     /* Cookies */
