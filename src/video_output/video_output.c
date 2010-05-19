@@ -839,33 +839,10 @@ static void ThreadExecuteCropRatio(vout_thread_t *vout,
                                    unsigned num, unsigned den)
 {
     const video_format_t *source = &vout->p->original;
-
-    int x, y;
-    int width, height;
-    if (num <= 0 || den <= 0) {
-        num = 0;
-        den = 0;
-        x   = 0;
-        y   = 0;
-        width  = source->i_visible_width;
-        height = source->i_visible_height;
-    } else {
-        unsigned scaled_width  = (uint64_t)source->i_visible_height * num * source->i_sar_den / den / source->i_sar_num;
-        unsigned scaled_height = (uint64_t)source->i_visible_width  * den * source->i_sar_num / num / source->i_sar_den;
-
-        if (scaled_width < source->i_visible_width) {
-            x      = (source->i_visible_width - scaled_width) / 2;
-            y      = 0;
-            width  = scaled_width;
-            height = source->i_visible_height;
-        } else {
-            x      = 0;
-            y      = (source->i_visible_height - scaled_height) / 2;
-            width  = source->i_visible_width;
-            height = scaled_height;
-        }
-    }
-    ThreadExecuteCropWindow(vout, num, den, x, y, width, height);
+    ThreadExecuteCropWindow(vout, num, den,
+                            0, 0,
+                            source->i_visible_width,
+                            source->i_visible_height);
 }
 
 static int ThreadInit(vout_thread_t *vout)

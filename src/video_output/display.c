@@ -673,6 +673,29 @@ static void VoutDisplayFitWindow(vout_display_t *vd, bool default_size)
     vlc_mutex_unlock(&osys->lock);
 }
 
+static void VoutDisplayCropRatio(unsigned *x, unsigned *y,
+                                 unsigned *width, unsigned *height,
+                                 const video_format_t *source,
+                                 unsigned num, unsigned den)
+{
+    unsigned scaled_width  = (uint64_t)source->i_visible_height * num * source->i_sar_den / den / source->i_sar_num;
+    unsigned scaled_height = (uint64_t)source->i_visible_width  * den * source->i_sar_num / num / source->i_sar_den;
+
+    if (scaled_width < source->i_visible_width) {
+        *x      = (source->i_visible_width - scaled_width) / 2;
+        *y      = 0;
+        *width  = scaled_width;
+        *height = source->i_visible_height;
+    } else {
+        *x      = 0;
+        *y      = (source->i_visible_height - scaled_height) / 2;
+        *width  = source->i_visible_width;
+        *height = scaled_height;
+    }
+    *x += source->i_x_offset;
+    *y += source->i_y_offset;
+}
+
 void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
@@ -888,12 +911,24 @@ void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                              65536);
                 vout_SendEventSourceAspect(osys->vout, dar_num, dar_den);
             }
+            /* If a crop ratio is requested, recompute the parameters */
+            if (osys->crop.num > 0 && osys->crop.den > 0)
+                osys->ch_crop = true;
         }
         /* */
         if (osys->ch_crop) {
             video_format_t source = vd->source;
+
             unsigned crop_num = osys->crop.num;
             unsigned crop_den = osys->crop.den;
+            if (crop_num > 0 && crop_den > 0) {
+                video_format_t fmt = osys->source;
+                fmt.i_sar_num = source.i_sar_num;
+                fmt.i_sar_den = source.i_sar_den;
+                VoutDisplayCropRatio(&osys->crop.x, &osys->crop.y,
+                                     &osys->crop.width, &osys->crop.height,
+                                     &fmt, crop_num, crop_den);
+            }
 
             source.i_x_offset       = osys->crop.x;
             source.i_y_offset       = osys->crop.y;
@@ -1043,7 +1078,9 @@ void vout_SetDisplayCrop(vout_display_t *vd,
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
     if (osys->crop.x != x || osys->crop.y != y ||
-        osys->crop.width  != width || osys->crop.height != height) {
+        osys->crop.width  != width || osys->crop.height != height ||
+        (crop_num > 0 && crop_den > 0 &&
+         (crop_num != osys->crop.num || crop_den != osys->crop.den))) {
 
         osys->crop.x      = x;
         osys->crop.y      = y;
