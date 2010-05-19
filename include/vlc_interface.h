@@ -205,7 +205,7 @@ typedef enum vlc_dialog {
     "*.xa;"  \
     "*.xm"
 
-#define EXTENSIONS_VIDEO "*.amv;*.asf;*.avi;*.divx;*.dv;*.flv;*.gxf;*.iso;*.m1v;*.m2v;" \
+#define EXTENSIONS_VIDEO "*.3gp;*.amv;*.asf;*.avi;*.divx;*.dv;*.flv;*.gxf;*.iso;*.m1v;*.m2v;" \
                          "*.m2t;*.m2ts;*.m4v;*.mkv;*.mov;*.mp2;*.mp4;*.mpeg;*.mpeg1;" \
                          "*.mpeg2;*.mpeg4;*.mpg;*.mts;*.mxf;*.nsv;*.nuv;" \
                          "*.ogg;*.ogm;*.ogv;*.ogx;*.ps;" \
