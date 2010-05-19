@@ -909,6 +909,36 @@ CLEAN_FILE += .faad
 CLEAN_PKG += faad2
 DISTCLEAN_PKG += faad2-$(FAAD2_VERSION).tar.gz
 
+
+# ***************************************************************************
+# libvp8
+# ***************************************************************************
+
+libvpx-$(VPX_VERSION).tar.bz2:
+	$(WGET) $(VPX_URL)
+
+vpx: libvpx-$(VPX_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+ifneq ($(HOST),$(BUILD))
+	patch -p0 < Patches/libvpx-cross.patch
+endif
+
+ifdef HAVE_WIN32
+VPX_TARGET=x86-win32-gcc
+else
+VPX_TARGET=FIXME
+endif
+
+.vpx: vpx
+	(cd $<; ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-examples && XCC=$(CC) XNM=$(NM) XSTRIP=$(STRIP) make && make install)
+	(cd $<; cp vp8/*.h vpx_codec/*.h $(PREFIX)/include) # Of course, why the hell would one expect it to be listed or in make install?
+	(cd $<; cp libvpx.a $(PREFIX)/lib) # Of course, why the hell would one expect it to be listed or in make install?
+	touch $@
+
+CLEAN_FILE += .vpx
+CLEAN_PKG += vpx
+DISTCLEAN_PKG += libvpx-$(VPX_VERSION).tar.bz2
+
 # ***************************************************************************
 # lame
 # ***************************************************************************
