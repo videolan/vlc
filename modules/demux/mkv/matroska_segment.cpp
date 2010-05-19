@@ -858,6 +858,10 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         {
             tracks[i_track]->fmt.i_codec = VLC_CODEC_DIRAC;
         }
+        else if( !strncmp( tracks[i_track]->psz_codec, "V_VP8", 5 ) )
+        {
+            tracks[i_track]->fmt.i_codec = VLC_CODEC_VP8;
+        }
         else if( !strncmp( tracks[i_track]->psz_codec, "V_MPEG4", 7 ) )
         {
             if( !strcmp( tracks[i_track]->psz_codec, "V_MPEG4/MS/V3" ) )

@@ -66,7 +66,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
     p_l0->Read(*p_estream, EbmlHead::ClassInfos.Context, i_upper_lvl, p_l0, true);
 
     EDocType doc_type = GetChild<EDocType>(*static_cast<EbmlHead*>(p_l0));
-    if (std::string(doc_type) != "matroska")
+    if (std::string(doc_type) != "matroska" && std::string(doc_type) != "webm" )
     {
         msg_Err( p_demux, "Not a Matroska file : DocType = %s ", std::string(doc_type).c_str());
         return NULL;
