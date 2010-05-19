@@ -415,6 +415,9 @@ private:
     "video/x-matroska:mkv:Matroska video;" \
     "audio/x-matroska:mka:Matroska audio;" \
     /* XSPF */ \
-    "application/xspf+xml:xspf:Playlist xspf;"
+    "application/xspf+xml:xspf:Playlist xspf;" \
+    /* Webm */ \
+    "video/webm:webm:WebM video;" \
+    "audio/webm:webm:WebM audio;"
 
 #endif
