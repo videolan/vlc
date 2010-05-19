@@ -10,7 +10,7 @@
 <title>HowTo create your own skin</title>
 
 <copyright>
-<year>2004-2006</year>
+<year>2004-2010</year>
 <holder>
 the VideoLAN project
 </holder>
@@ -176,6 +176,11 @@ difficulty to understand how VLC skins work.</para>
     <para>Only used in animated bitmaps; it is the number of frames (images) per seconds of the animation. (since VLC 0.8.5)</para>
     <para>Default value: 0</para>
   </sect3>
+  <sect3 id="bitmaploop">
+    <title>loop</title>
+    <para>Only used in animated bitmaps; it is the number of loops before animation stops. Default value 0 means animation doesn't stop. Otherwise, animation stops on the last frame after the number of loops has been reached (since VLC 1.1)</para>
+    <para>Default value: 0</para>
+  </sect3>
 
 </sect2>
 
@@ -215,6 +220,10 @@ difficulty to understand how VLC skins work.</para>
   <sect3 id="subbitmapfps">
     <title>fps</title>
     <para>Same as in <link linkend="bitmapfps">Bitmap</link> tag.</para>
+  </sect3>
+  <sect3 id="subbitmaploop">
+    <title>loop</title>
+    <para>Same as in <link linkend="bitmaploop">Bitmap</link> tag.</para>
   </sect3>
 
 </sect2>
@@ -266,6 +275,7 @@ difficulty to understand how VLC skins work.</para>
     <title>id</title>
     <para>Name of the window (it may be used for actions). Two windows cannot have the same id.</para>
     <para>Default value: none</para>
+    <para>As of vlc1.1, a special id has been added to provide a skinnable fullscreen controller. This value id="fullscreenController" allows the window to be displayed only in fullscreen mode. Display is toggled by pressing the 'i' hotkey or clicking the mouse middle button</para>
   </sect3>
   <sect3 id="windowvisible">
     <title>visible</title>
@@ -491,6 +501,7 @@ difficulty to understand how VLC skins work.</para>
   <sect3 id="imageresize">
     <title>resize</title>
     <para>Since VLC 0.8.2. Specify the behaviour of the image when it is resized. Possible values are 'mosaic' (the image is repeated as many times as necessary to reach the wanted dimensions) and 'scale' (the image is actually rescaled). Beware that the 'scale' behaviour is much slower than the 'mosaic' one, so make sure to use it only when it's really needed.</para>
+    <para>In future VLC 1.2. a third value 'scale2' is available to scale an image, yet preserving its aspect ratio. The image is centered and scaled either heightwise or widthwise to fill up as much area as possible. Extra borders are made transparent.</para>
     <para>Default value: mosaic.</para>
   </sect3>
   <sect3 id="imageaction">
@@ -502,6 +513,11 @@ difficulty to understand how VLC skins work.</para>
     <title>action2</title>
     <para>Action triggered by a double-click on the control. See <link linkend="actions">Actions</link> for a list of possible actions. (Since VLC 0.8.5).</para>
     <para>Default value: none</para>
+  </sect3>
+  <sect3 id="imageart">
+    <title>art</title>
+    <para>if set to true, the skin engine reuses the control to display the art file of the resource currently being played back. Usually, resize="scale2" is desirable, for art to be rendered in the best possible way. (in future VLC 1.2).</para>
+    <para>Default value: false</para>
   </sect3>
 </sect2>
 
@@ -935,6 +951,12 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>vlc.snapshot()</emphasis>: Take a snapshot (since VLC 0.8.5).
   </para></listitem>
   <listitem><para>
+    <emphasis>vlc.toggleRecord()</emphasis>: Start/Stop recording (since VLC 1.1).
+  </para></listitem>
+  <listitem><para>
+    <emphasis>vlc.nextFrame()</emphasis>: Advance one frame at a time (since VLC 1.1).
+  </para></listitem>
+  <listitem><para>
     <emphasis>vlc.onTop()</emphasis>: Toggle the "Always on top" status (since VLC 0.8.0).
   </para></listitem>
   <listitem><para>
@@ -1092,6 +1114,12 @@ difficulty to understand how VLC skins work.</para>
   </para></listitem>
   <listitem><para>
     <emphasis>vlc.isSeekable</emphasis>: True when the stream is seekable, false otherwise. This one can be used if you want to display a slider only when seeking is allowed.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>vlc.canRecord</emphasis>: True if the stream can be recorded, false otherwise. (since vlc1.1)
+  </para></listitem>
+  <listitem><para>
+    <emphasis>vlc.isRecording</emphasis>: True if the stream is being recorded, false otherwise. (since vlc1.1)
   </para></listitem>
   <listitem><para>
     <emphasis>vlc.isMute</emphasis>: True when the sound is mute (in VLC, not on your OS), false otherwise.
