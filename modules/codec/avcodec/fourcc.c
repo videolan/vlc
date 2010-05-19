@@ -200,6 +200,10 @@ static const struct
     { VLC_CODEC_INDEO5, CODEC_ID_INDEO5, VIDEO_ES },
 #endif
 
+#if 0
+    { VLC_CODEC_VP8, CODEC_ID_VP8, VIDEO_ES },
+#endif
+
     /* Videogames Codecs */
 
     { VLC_CODEC_INTERPLAY, CODEC_ID_INTERPLAY_VIDEO, VIDEO_ES },
