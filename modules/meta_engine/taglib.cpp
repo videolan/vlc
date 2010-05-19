@@ -335,6 +335,8 @@ static int ReadMeta( vlc_object_t* p_this)
     p_demux_meta->p_meta = NULL;
     if( !psz_path )
         return VLC_ENOMEM;
+    if( strncmp( p_demux->psz_access, "file", strlen("file") ) )
+        return VLC_EGENERIC;
 
 
 #if defined(WIN32) || defined (UNDER_CE)
