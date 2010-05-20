@@ -116,6 +116,7 @@ int OpenDemux( vlc_object_t *p_this )
     AVInputFormat *fmt;
     unsigned int  i;
     int64_t       i_start_time = -1;
+    bool          b_can_seek;
 
     /* Init Probe data */
     pd.filename = p_demux->psz_path;
@@ -199,12 +200,17 @@ int OpenDemux( vlc_object_t *p_this )
     p_sys->url.prot->next = 0;
     init_put_byte( &p_sys->io, p_sys->io_buffer, p_sys->io_buffer_size,
                    0, &p_sys->url, IORead, NULL, IOSeek );
-    /* Tell avformat that input is stream, so it doesn't get stuck
+
+    stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek );
+    if( !b_can_seek )
+    {
+       /* Tell avformat that input is stream, so it doesn't get stuck
        when trying av_find_stream_info() trying to seek all the wrong places
        init_put_byte defaults io.is_streamed=0, so thats why we set them after it
        */
-    p_sys->url.is_streamed = 1;
-    p_sys->io.is_streamed = 1;
+       p_sys->url.is_streamed = 1;
+       p_sys->io.is_streamed = 1;
+    }
 
 
     /* Open it */
