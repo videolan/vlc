@@ -532,10 +532,13 @@ static int Open (vlc_object_t *obj)
     vd->manage = Manage;
 
     /* */
-    vout_display_SendEventFullscreen (vd, false);
+    bool is_fullscreen = vd->cfg->is_fullscreen;
+    if (is_fullscreen && vout_window_SetFullScreen (p_sys->embed, true))
+        is_fullscreen = false;
+    vout_display_SendEventFullscreen (vd, is_fullscreen);
     unsigned width, height;
     if (!GetWindowSize (p_sys->embed, conn, &width, &height))
-        vout_display_SendEventDisplaySize (vd, width, height, false);
+        vout_display_SendEventDisplaySize (vd, width, height, is_fullscreen);
 
     return VLC_SUCCESS;
 
