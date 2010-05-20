@@ -242,7 +242,7 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         module_need( id->p_encoder, "encoder", p_sys->psz_venc, true );
     if( !id->p_encoder->p_module )
     {
-        msg_Err( p_stream, "cannot find video encoder (module:%s fourcc:%4.4s)",
+        msg_Err( p_stream, "cannot find video encoder (module:%s fourcc:%4.4s). Take a look few lines earlier to see possible reason.",
                  p_sys->psz_venc ? p_sys->psz_venc : "any",
                  (char *)&p_sys->i_vcodec );
         module_unneed( id->p_decoder, id->p_decoder->p_module );

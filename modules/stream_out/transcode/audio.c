@@ -266,7 +266,7 @@ int transcode_audio_new( sout_stream_t *p_stream,
         module_need( id->p_encoder, "encoder", p_sys->psz_aenc, true );
     if( !id->p_encoder->p_module )
     {
-        msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s)",
+        msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s). Take a look few lines earlier to see possible reason.",
                  p_sys->psz_aenc ? p_sys->psz_aenc : "any",
                  (char *)&p_sys->i_acodec );
         module_unneed( id->p_decoder, id->p_decoder->p_module );
