@@ -559,6 +559,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_context->reordered_opaque = (p_block->i_dts << 1) | 1;
         else
             p_context->reordered_opaque = INT64_MIN;
+        p_sys->p_ff_pic->reordered_opaque = p_context->reordered_opaque;
 
         /* Make sure we don't reuse the same timestamps twice */
         p_block->i_pts =
