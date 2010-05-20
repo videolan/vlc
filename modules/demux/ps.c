@@ -514,6 +514,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 if( !i_now )
                     return i64 ? VLC_EGENERIC : VLC_SUCCESS;
 
+                p_sys->i_current_pts = 0;
                 i_pos *= (float)i64 / (float)i_now;
                 stream_Seek( p_demux->s, i_pos );
                 return VLC_SUCCESS;
