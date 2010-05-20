@@ -1535,6 +1535,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
                 case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
                     p_soun->i_samplesize = 8;
+                    p_track->i_sample_size = p_soun->i_channelcount;
                     break;
                 case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
                 case VLC_FOURCC( 'r', 'a', 'w', ' ' ):
