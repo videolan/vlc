@@ -389,6 +389,10 @@ static inline vout_window_t *vout_display_NewWindow(vout_display_t *vd, const vo
 {
     return vd->owner.window_new(vd, cfg);
 }
+/**
+ * Deletes a window created by vout_display_NewWindow if window is non NULL
+ * or any unused windows otherwise.
+ */
 static inline void vout_display_DeleteWindow(vout_display_t *vd,
                                              vout_window_t *window)
 {
