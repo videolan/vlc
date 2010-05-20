@@ -251,6 +251,7 @@ static int Open(vlc_object_t *object)
         Close(VLC_OBJECT(vd));
         return VLC_EGENERIC;
     }
+    vout_display_DeleteWindow(vd, NULL);
 
     /* */
     video_format_t fmt = vd->fmt;

@@ -97,6 +97,7 @@ static int Open(vlc_object_t *object)
         msg_Err(vd, "cannot initialize aalib");
         goto error;
     }
+    vout_display_DeleteWindow(vd, NULL);
 
     aa_autoinitkbd(sys->aa_context, 0);
     aa_autoinitmouse(sys->aa_context, AA_MOUSEALLMASK);

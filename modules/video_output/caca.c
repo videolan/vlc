@@ -153,6 +153,7 @@ static int Open(vlc_object_t *object)
         msg_Err(vd, "cannot initialize libcaca");
         goto error;
     }
+    vout_display_DeleteWindow(vd, NULL);
 
     if (vd->cfg->display.title)
         caca_set_display_title(sys->dp,

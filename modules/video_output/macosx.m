@@ -127,6 +127,7 @@ static int Open(vlc_object_t *this)
         msg_Dbg(vd, "No drawable-nsobject, passing over.");
         goto error;
     }
+    vout_display_DeleteWindow(vd, NULL);
 
     /* This will be released in Close(), on
      * main thread, after we are done using it. */

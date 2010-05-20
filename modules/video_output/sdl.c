@@ -180,6 +180,7 @@ static int Open(vlc_object_t *object)
         msg_Err(vd, "no video mode available");
         goto error;
     }
+    vout_display_DeleteWindow(vd, NULL);
 
     sys->display = SDL_SetVideoMode(display_width, display_height,
                                     sys->display_bpp, sys->display_flags);
