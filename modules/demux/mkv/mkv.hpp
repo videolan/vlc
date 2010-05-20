@@ -187,6 +187,7 @@ typedef struct
 
     char         *psz_codec;
     bool         b_dts_only;
+    bool         b_pts_only;
 
     uint64_t     i_default_duration;
     float        f_timecodescale;

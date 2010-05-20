@@ -589,6 +589,11 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                 p_block->i_pts = VLC_TS_INVALID;
                 p_block->i_dts = i_pts;
             }
+            else if( tk->b_pts_only )
+            {
+                p_block->i_pts = i_pts;
+                p_block->i_dts = i_pts;
+            }
             else
             {
                 p_block->i_pts = i_pts;
@@ -596,7 +601,6 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                     p_block->i_dts = p_block->i_pts;
                 else
                     p_block->i_dts = min( i_pts, tk->i_last_dts + (mtime_t)(tk->i_default_duration >> 10));
-                p_sys->i_pts = p_block->i_dts;
             }
         }
         tk->i_last_dts = p_block->i_dts;

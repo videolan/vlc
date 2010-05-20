@@ -831,6 +831,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
             tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->i_extra_data );
             memcpy( tracks[i_track]->fmt.p_extra,tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
+            tracks[i_track]->b_pts_only = true;
         }
         else if( !strncmp( tracks[i_track]->psz_codec, "V_REAL/RV", 9 ) )
         {
@@ -861,6 +862,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         else if( !strncmp( tracks[i_track]->psz_codec, "V_VP8", 5 ) )
         {
             tracks[i_track]->fmt.i_codec = VLC_CODEC_VP8;
+            tracks[i_track]->b_pts_only = true;
         }
         else if( !strncmp( tracks[i_track]->psz_codec, "V_MPEG4", 7 ) )
         {
