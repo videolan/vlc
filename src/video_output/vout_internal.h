@@ -33,6 +33,7 @@
 #include <vlc_picture_fifo.h>
 #include <vlc_picture_pool.h>
 #include <vlc_vout_display.h>
+#include <vlc_vout_wrapper.h>
 #include "vout_control.h"
 #include "control.h"
 #include "snapshot.h"
@@ -60,6 +61,13 @@ struct vout_thread_sys_t
     /* Monitor Pixel Aspect Ratio */
     unsigned int    i_par_num;
     unsigned int    i_par_den;
+
+    /* Video output window */
+    struct {
+        bool              is_unused;
+        vout_window_cfg_t cfg;
+        vout_window_t     *object;
+    } window;
 
     /* Thread & synchronization */
     vlc_thread_t    thread;
@@ -135,8 +143,8 @@ void vout_ControlChangeSubFilters(vout_thread_t *, const char *);
 void vout_IntfInit( vout_thread_t * );
 
 /* */
-int  vout_OpenWrapper (vout_thread_t *, const char *);
-void vout_CloseWrapper(vout_thread_t *);
+int  vout_OpenWrapper (vout_thread_t *, const char *, const vout_display_state_t *);
+void vout_CloseWrapper(vout_thread_t *, vout_display_state_t *);
 int  vout_InitWrapper(vout_thread_t *);
 void vout_EndWrapper(vout_thread_t *);
 void vout_ManageWrapper(vout_thread_t *);

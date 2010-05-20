@@ -59,8 +59,7 @@ static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
  */
 typedef struct {
     vout_display_cfg_t cfg;
-
-    bool is_on_top;
+    unsigned wm_state;
     struct {
         int num;
         int den;

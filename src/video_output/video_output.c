@@ -428,6 +428,89 @@ void vout_ControlChangeSubFilters(vout_thread_t *vout, const char *filters)
 }
 
 /* */
+static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, const char *title)
+{
+    /* Load configuration */
+    cfg->is_fullscreen = var_CreateGetBool(vout, "fullscreen");
+    cfg->display.title = title;
+    const int display_width = var_CreateGetInteger(vout, "width");
+    const int display_height = var_CreateGetInteger(vout, "height");
+    cfg->display.width   = display_width > 0  ? display_width  : 0;
+    cfg->display.height  = display_height > 0 ? display_height : 0;
+    cfg->is_display_filled  = var_CreateGetBool(vout, "autoscale");
+    cfg->display.sar.num = 1; /* TODO monitor AR */
+    cfg->display.sar.den = 1;
+    unsigned zoom_den = 1000;
+    unsigned zoom_num = zoom_den * var_CreateGetFloat(vout, "scale");
+    vlc_ureduce(&zoom_num, &zoom_den, zoom_num, zoom_den, 0);
+    cfg->zoom.num = zoom_num;
+    cfg->zoom.den = zoom_den;
+    cfg->align.vertical = VOUT_DISPLAY_ALIGN_CENTER;
+    cfg->align.horizontal = VOUT_DISPLAY_ALIGN_CENTER;
+    const int align_mask = var_CreateGetInteger(vout, "align");
+    if (align_mask & 0x1)
+        cfg->align.horizontal = VOUT_DISPLAY_ALIGN_LEFT;
+    else if (align_mask & 0x2)
+        cfg->align.horizontal = VOUT_DISPLAY_ALIGN_RIGHT;
+    if (align_mask & 0x4)
+        cfg->align.horizontal = VOUT_DISPLAY_ALIGN_TOP;
+    else if (align_mask & 0x8)
+        cfg->align.horizontal = VOUT_DISPLAY_ALIGN_BOTTOM;
+}
+
+vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout, vout_display_t *vd,
+                                      const vout_window_cfg_t *cfg)
+{
+    VLC_UNUSED(vd);
+    vout_window_cfg_t cfg_override = *cfg;
+
+    if (!var_InheritBool( vout, "embedded-video"))
+        cfg_override.is_standalone = true;
+
+    if (vout->p->window.is_unused && vout->p->window.object) {
+        assert(!vout->p->splitter_name);
+        if (!cfg_override.is_standalone == !vout->p->window.cfg.is_standalone &&
+            cfg_override.type           == vout->p->window.cfg.type) {
+            /* Reuse the stored window */
+            msg_Dbg(vout, "Reusing previous vout window");
+            vout_window_t *window = vout->p->window.object;
+            if (cfg_override.width  != vout->p->window.cfg.width ||
+                cfg_override.height != vout->p->window.cfg.height)
+                vout_window_SetSize(window,
+                                    cfg_override.width, cfg_override.height);
+            vout->p->window.is_unused = false;
+            vout->p->window.cfg       = cfg_override;
+            return window;
+        }
+
+        vout_window_Delete(vout->p->window.object);
+        vout->p->window.is_unused = true;
+        vout->p->window.object    = NULL;
+    }
+
+    vout_window_t *window = vout_window_New(VLC_OBJECT(vout), NULL,
+                                            &cfg_override);
+    if (!window)
+        return NULL;
+    if (!vout->p->splitter_name) {
+        vout->p->window.is_unused = false;
+        vout->p->window.cfg       = cfg_override;
+        vout->p->window.object    = window;
+    }
+    return window;
+}
+
+void vout_DeleteDisplayWindow(vout_thread_t *vout, vout_display_t *vd,
+                              vout_window_t *window)
+{
+    VLC_UNUSED(vd);
+    if (!vout->p->window.is_unused && vout->p->window.object == window)
+        vout->p->window.is_unused = true;
+    else
+        vout_window_Delete(window);
+}
+
+/* */
 static picture_t *VoutVideoFilterNewPicture(filter_t *filter)
 {
     vout_thread_t *vout = (vout_thread_t*)filter->p_owner;
@@ -845,7 +928,7 @@ static void ThreadExecuteCropRatio(vout_thread_t *vout,
                             source->i_visible_height);
 }
 
-static int ThreadStart(vout_thread_t *vout)
+static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
 {
     vlc_mouse_Init(&vout->p->mouse);
     vout->p->decoder_fifo = picture_fifo_New();
@@ -857,7 +940,18 @@ static int ThreadStart(vout_thread_t *vout)
         filter_chain_New( vout, "video filter2", false,
                           VoutVideoFilterAllocationSetup, NULL, vout);
 
-    if (vout_OpenWrapper(vout, vout->p->splitter_name))
+    vout_display_state_t state_default;
+    if (!state) {
+        VoutGetDisplayCfg(vout, &state_default.cfg, vout->p->display.title);
+        state_default.wm_state = var_CreateGetBool(vout, "video-on-top") ? VOUT_WINDOW_STATE_ABOVE :
+                                                                           VOUT_WINDOW_STATE_NORMAL;
+        state_default.sar.num = 0;
+        state_default.sar.den = 0;
+
+        state = &state_default;
+    }
+
+    if (vout_OpenWrapper(vout, vout->p->splitter_name, state))
         return VLC_EGENERIC;
     if (vout_InitWrapper(vout))
         return VLC_EGENERIC;
@@ -877,7 +971,7 @@ static int ThreadStart(vout_thread_t *vout)
     return VLC_SUCCESS;
 }
 
-static void ThreadStop(vout_thread_t *vout)
+static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
 {
     /* Destroy the video filters2 */
     filter_chain_Delete(vout->p->vfilter_chain);
@@ -888,7 +982,7 @@ static void ThreadStop(vout_thread_t *vout)
             ThreadFlush(vout, true, INT64_MAX);
             vout_EndWrapper(vout);
         }
-        vout_CloseWrapper(vout);
+        vout_CloseWrapper(vout, state);
     }
 
     if (vout->p->decoder_fifo)
@@ -898,16 +992,22 @@ static void ThreadStop(vout_thread_t *vout)
 
 static void ThreadInit(vout_thread_t *vout)
 {
-    vout->p->dead            = false;
-    vout->p->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
-    vout->p->pause.is_on     = false;
-    vout->p->pause.date      = VLC_TS_INVALID;
+    vout->p->window.is_unused = true;
+    vout->p->window.object    = NULL;
+    vout->p->dead             = false;
+    vout->p->is_late_dropped  = var_InheritBool(vout, "drop-late-frames");
+    vout->p->pause.is_on      = false;
+    vout->p->pause.date       = VLC_TS_INVALID;
 
     vout_chrono_Init(&vout->p->render, 5, 10000); /* Arbitrary initial time */
 }
 
 static void ThreadClean(vout_thread_t *vout)
 {
+    if (vout->p->window.object) {
+        assert(vout->p->window.is_unused);
+        vout_window_Delete(vout->p->window.object);
+    }
     vout_chrono_Clean(&vout->p->render);
     vout->p->dead = true;
     vout_control_Dead(&vout->p->control);
@@ -918,17 +1018,29 @@ static int ThreadReinit(vout_thread_t *vout,
 {
     video_format_t original;
     if (VoutValidateFormat(&original, fmt)) {
-        ThreadStop(vout);
+        ThreadStop(vout, NULL);
         ThreadClean(vout);
         return VLC_EGENERIC;
     }
     if (video_format_IsSimilar(&original, &vout->p->original))
         return VLC_SUCCESS;
 
-    ThreadStop(vout);
+    vout_display_state_t state;
+    memset(&state, 0, sizeof(state));
+
+    ThreadStop(vout, &state);
+
+    if (!state.cfg.is_fullscreen) {
+        state.cfg.display.width  = 0;
+        state.cfg.display.height = 0;
+    }
+    state.sar.num = 0;
+    state.sar.den = 0;
+    /* FIXME current vout "variables" are not in sync here anymore
+     * and I am not sure what to do */
 
     vout->p->original = original;
-    if (ThreadStart(vout)) {
+    if (ThreadStart(vout, &state)) {
         ThreadClean(vout);
         return VLC_EGENERIC;
     }
@@ -964,14 +1076,14 @@ static void *Thread(void *object)
             switch(cmd.type) {
             case VOUT_CONTROL_INIT:
                 ThreadInit(vout);
-                if (ThreadStart(vout)) {
-                    ThreadStop(vout);
+                if (ThreadStart(vout, NULL)) {
+                    ThreadStop(vout, NULL);
                     ThreadClean(vout);
                     return NULL;
                 }
                 break;
             case VOUT_CONTROL_CLEAN:
-                ThreadStop(vout);
+                ThreadStop(vout, NULL);
                 ThreadClean(vout);
                 return NULL;
             case VOUT_CONTROL_REINIT:

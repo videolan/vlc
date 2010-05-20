@@ -783,6 +783,8 @@ void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN, &cfg)) {
                 msg_Err(vd, "Failed to set fullscreen");
                 is_fullscreen = osys->cfg.is_fullscreen;
+            } else if (!is_fullscreen) {
+                vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &cfg, true);
             }
             osys->cfg.is_fullscreen = is_fullscreen;
 
@@ -1114,7 +1116,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vout_display_cfg_t *cfg = &osys->cfg;
 
     *cfg = state->cfg;
-    osys->wm_state_initial = VOUT_WINDOW_STATE_NORMAL;
+    osys->wm_state_initial = -1;
     osys->sar_initial.num = state->sar.num;
     osys->sar_initial.den = state->sar.den;
     vout_display_GetDefaultDisplaySize(&cfg->display.width, &cfg->display.height,
@@ -1131,15 +1133,23 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->mouse.double_click_timeout = double_click_timeout;
     osys->mouse.hide_timeout = hide_timeout;
     osys->is_fullscreen  = cfg->is_fullscreen;
-    osys->width_saved    =
     osys->display_width  = cfg->display.width;
-    osys->height_saved   =
     osys->display_height = cfg->display.height;
     osys->is_display_filled = cfg->is_display_filled;
+    osys->width_saved    = cfg->display.width;
+    osys->height_saved   = cfg->display.height;
+    if (osys->is_fullscreen) {
+        vout_display_cfg_t cfg_windowed = *cfg;
+        cfg_windowed.is_fullscreen  = false;
+        cfg_windowed.display.width  = 0;
+        cfg_windowed.display.height = 0;
+        vout_display_GetDefaultDisplaySize(&osys->width_saved,
+                                           &osys->height_saved,
+                                           source_org, &cfg_windowed);
+    }
     osys->zoom.num = cfg->zoom.num;
     osys->zoom.den = cfg->zoom.den;
-    osys->wm_state = state->is_on_top ? VOUT_WINDOW_STATE_ABOVE
-                                      : VOUT_WINDOW_STATE_NORMAL;
+    osys->wm_state = state->wm_state;
     osys->fit_window = 0;
 
     osys->source = *source_org;
@@ -1208,9 +1218,9 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
     if (state) {
         if (!osys->is_wrapper )
             state->cfg = osys->cfg;
-        state->is_on_top = (osys->wm_state & VOUT_WINDOW_STATE_ABOVE) != 0;
-        state->sar.num   = osys->sar_initial.num;
-        state->sar.den   = osys->sar_initial.den;
+        state->wm_state = osys->wm_state;
+        state->sar.num  = osys->sar_initial.num;
+        state->sar.den  = osys->sar_initial.den;
     }
 
     VoutDisplayDestroyRender(vd);
@@ -1537,20 +1547,4 @@ static void DummyVoutSendDisplayEventMouse(vout_thread_t *vout, vlc_mouse_t *fal
     }
 }
 #endif
-vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout, vout_display_t *vd, const vout_window_cfg_t *cfg)
-{
-    VLC_UNUSED(vd);
-    vout_window_cfg_t cfg_override = *cfg;
-
-    if( !var_InheritBool( vout, "embedded-video" ) )
-        cfg_override.is_standalone = true;
-
-    return vout_window_New(VLC_OBJECT(vout), NULL, &cfg_override);
-}
-void vout_DeleteDisplayWindow(vout_thread_t *vout, vout_display_t *vd, vout_window_t *window)
-{
-    VLC_UNUSED(vout);
-    VLC_UNUSED(vd);
-    vout_window_Delete(window);
-}
 
