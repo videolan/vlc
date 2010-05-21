@@ -929,7 +929,7 @@ endif
 
 .vpx: vpx
 	(cd $<; ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-examples && XCC=$(CC) XNM=$(NM) XSTRIP=$(STRIP) make && make install)
-	(cd $<; cp vp8/*.h vpx_codec/*.h vpx_port/*.h $(PREFIX)/include) # Of course, why the hell would one expect it to be listed or in make install?
+	(cd $<; cp vp8/*.h vpx_codec/*.h vpx_ports/*.h $(PREFIX)/include) # Of course, why the hell would one expect it to be listed or in make install?
 	rm $(PREFIX)/include/config.h
 	(cd $<; $(RANLIB) libvpx.a && cp libvpx.a $(PREFIX)/lib) # Of course, why the hell would one expect it to be listed or in make install?
 	touch $@
