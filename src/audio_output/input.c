@@ -816,8 +816,9 @@ static vout_thread_t *RequestVout( void *p_private,
     aout_instance_t *p_aout = p_private;
     VLC_UNUSED(b_recycle);
     vout_configuration_t cfg = {
-        .vout = p_vout,
-        .fmt  = p_fmt,
+        .vout  = p_vout,
+        .input = NULL,
+        .fmt   = p_fmt,
     };
     return vout_Request( p_aout, &cfg );
 }

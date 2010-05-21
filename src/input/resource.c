@@ -243,8 +243,9 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
 
         /* */
         vout_configuration_t cfg = {
-            .vout = p_vout,
-            .fmt  = p_fmt,
+            .vout  = p_vout,
+            .input = VLC_OBJECT(p_resource->p_input),
+            .fmt   = p_fmt,
         };
         p_vout = vout_Request( p_resource->p_input, &cfg );
         if( !p_vout )
@@ -279,7 +280,12 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
             vout_Flush( p_vout, 1 );
             vout_FlushSubpictureChannel( p_vout, -1 );
 
-            p_resource->p_vout_free = p_vout;
+            vout_configuration_t cfg = {
+                .vout  = p_vout,
+                .input = NULL,
+                .fmt   = p_fmt,
+            };
+            p_resource->p_vout_free = vout_Request( p_resource->p_input, &cfg );
         }
         return NULL;
     }

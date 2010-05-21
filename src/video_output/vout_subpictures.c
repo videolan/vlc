@@ -274,14 +274,8 @@ void spu_Destroy( spu_t *p_spu )
  * \param p_this the object in which to destroy the subpicture unit
  * \param b_attach to select attach or detach
  */
-void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
+void spu_Attach( spu_t *p_spu, vlc_object_t *p_input, bool b_attach )
 {
-    vlc_object_t *p_input;
-
-    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( !p_input )
-        return;
-
     if( b_attach )
     {
         UpdateSPU( p_spu, VLC_OBJECT(p_input) );
@@ -292,8 +286,6 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
         vlc_mutex_lock( &p_spu->p->lock );
         p_spu->p->i_margin = var_GetInteger( p_input, "sub-margin" );
         vlc_mutex_unlock( &p_spu->p->lock );
-
-        vlc_object_release( p_input );
     }
     else
     {
@@ -301,7 +293,6 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
         var_DelCallback( p_input, "sub-margin", MarginCallback, p_spu->p );
         var_DelCallback( p_input, "highlight", CropCallback, p_spu );
         var_Destroy( p_input, "highlight" );
-        vlc_object_release( p_input );
     }
 }
 

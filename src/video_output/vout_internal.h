@@ -46,8 +46,11 @@ struct vout_thread_sys_t
     /* Splitter module if used */
     char            *splitter_name;
 
+    /* Input thread for dvd menu interactions */
+    vlc_object_t    *input;
+
     /* */
-    video_format_t  original; /* Original format ie coming from the decoder */
+    video_format_t  original;   /* Original format ie coming from the decoder */
 
     /* Snapshot interface */
     vout_snapshot_t snapshot;
@@ -153,7 +156,7 @@ void vout_DisplayWrapper(vout_thread_t *, picture_t *);
 
 /* */
 int spu_ProcessMouse(spu_t *, const vlc_mouse_t *, const video_format_t *);
-void spu_Attach( spu_t *, vlc_object_t *, bool );
+void spu_Attach( spu_t *, vlc_object_t *input, bool );
 
 #endif
 
