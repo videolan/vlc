@@ -224,7 +224,6 @@ nobase_vlclib_DATA = \
 	lua/modules/simplexml.luac \
 	lua/playlist/anevia_streams.luac \
 	lua/playlist/appletrailers.luac \
-	lua/playlist/appletrailers_iphone.luac \
 	lua/playlist/break.luac \
 	lua/playlist/cue.luac \
 	lua/playlist/dailymotion.luac \
@@ -270,7 +269,6 @@ EXTRA_DIST += \
 	lua/playlist/README.txt \
 	lua/playlist/anevia_streams.lua \
 	lua/playlist/appletrailers.lua \
-	lua/playlist/appletrailers_iphone.lua \
 	lua/playlist/break.lua \
 	lua/playlist/cue.lua \
 	lua/playlist/dailymotion.lua \
