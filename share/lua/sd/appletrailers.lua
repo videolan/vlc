@@ -30,28 +30,47 @@ function find( haystack, needle )
 end
 
 function main()
-    fd = vlc.stream( "http://trailers.apple.com/trailers/iphone/home/feeds/just_added.json" )
+    fd = vlc.stream( "http://trailers.apple.com/trailers/home/feeds/just_hd.json" )
     if not fd then return nil end
-    options = {":http-user-agent='iPhone'"}
-    while true
+    options = {":http-user-agent=QuickTime/7.2 vlc edition",":demux=avformat",":play-and-pause"}
+    line = fd:readline()
+    while line ~= nil
     do
-         line = fd:readline()
-         if not line then break end
-         if string.match( line, "title" ) and string.match( line, "hd\":true")then
+         if string.match( line, "title" ) then 
             title = vlc.strings.resolve_xml_special_chars( find( line, "title\":\"(.-)\""))
             art = find( line, "poster\":\"(.-)\"")
-            url = find( line, "location\":\"(.-)\"")
-            trailertype = ""
-            trailertype = find( line, "type\":\"(.-)\"")
-            vlc.msg.err(trailertype)
-            if trailertype then
-               trailertype = string.gsub( trailertype, " ", "")
-               trailertype = string.lower( trailertype )
-            else
-               trailertype = "trailer"
+
+            url = find( line, "url\":\"(.-)\"")
+            playlist = vlc.stream( "http://trailers.apple.com"..url.."includes/playlists/web.inc" )
+            if not playlist then 
+                vlc.msg.info("Didn't get playlist...")
             end
-            url = "http://trailers.apple.com"..url..trailertype.."/"
-            vlc.sd.add_item( { path = url, name=title, title=title, options=options, arturl=art})
+
+            node = vlc.sd.add_node( {title=title,arturl=art} )
+
+            playlistline = playlist:readline()
+            description =""
+            vlc.msg.info( "http://trailers.apple.com"..url.."includes/playlists/web.inc" )
+            if not playlistline then vlc.msg.info("Empty playlists-file") end
+            while playlistline ~= nil
+            do
+                if string.match( playlistline, "class=\".-first" ) then
+                    description = find( playlistline, "h%d.->(.-)</h%d")
+                    vlc.msg.info( "Got type:"..description )
+                end
+                if string.match( playlistline, "class=\"hd\".-\.mov") then
+                    for urlline,resolution in string.gmatch(playlistline, "class=\"hd\".-href=\"(.-.mov)\".-(%d+.-p)") do
+                        urlline = string.gsub( urlline, "_"..resolution, "_h"..resolution )
+                        vlc.msg.info( "adding url:"..urlline )
+                        node:add_subitem( {path = urlline,
+                                  title=title.." "..description.." ("..resolution..")",
+                                  options=options, arturl=art })
+                    end
+                end
+                playlistline = playlist:readline()
+            end
+            vlc.msg.info( "entry done...")
          end
+         line = fd:readline()
     end
 end
