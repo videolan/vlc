@@ -61,7 +61,6 @@ struct spu_t
 VLC_EXPORT( spu_t *, spu_Create, ( vlc_object_t * ) );
 #define spu_Create(a) spu_Create(VLC_OBJECT(a))
 VLC_EXPORT( void, spu_Destroy, ( spu_t * ) );
-void spu_Attach( spu_t *, vlc_object_t *, bool );
 
 /**
  * This function sends a subpicture to the spu_t core.

@@ -153,6 +153,7 @@ void vout_DisplayWrapper(vout_thread_t *, picture_t *);
 
 /* */
 int spu_ProcessMouse(spu_t *, const vlc_mouse_t *, const video_format_t *);
+void spu_Attach( spu_t *, vlc_object_t *, bool );
 
 #endif
 
