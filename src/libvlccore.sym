@@ -611,7 +611,6 @@ vlm_MessageNew
 vlm_MessageSimpleNew
 vlm_New
 vout_Close
-vout_Create
 vout_GetPicture
 vout_PutPicture
 vout_HoldPicture

@@ -48,6 +48,14 @@
  */
 
 /**
+ * Vout configuration
+ */
+typedef struct {
+    vout_thread_t        *vout;
+    const video_format_t *fmt;
+} vout_configuration_t;
+
+/**
  * Video ouput thread private structure
  */
 typedef struct vout_thread_sys_t vout_thread_sys_t;
@@ -59,8 +67,7 @@ typedef struct vout_thread_sys_t vout_thread_sys_t;
  * is represented by a video output thread, and described using the following
  * structure.
  */
-struct vout_thread_t
-{
+struct vout_thread_t {
     VLC_COMMON_MEMBERS
 
     /* Private vout_thread data */
@@ -83,42 +90,24 @@ struct vout_thread_t
  *****************************************************************************/
 
 /**
- * This function will
- *  - returns a suitable vout (if requested by a non NULL p_fmt)
- *  - recycles an old vout (if given) by either destroying it or by saving it
- *  for latter usage.
+ * Returns a suitable vout or release the given one.
  *
- * The purpose of this function is to avoid unnecessary creation/destruction of
- * vout (and to allow optional vout reusing).
+ * If cfg->fmt is non NULL and valid, a vout will be returned, reusing cfg->vout
+ * is possible, otherwise it returns NULL.
+ * If cfg->vout is not used, it will be closed and released.
  *
- * You can call vout_Request on a vout created by vout_Create or by a previous
- * call to vout_Request.
  * You can release the returned value either by vout_Request or vout_Close()
  * followed by a vlc_object_release() or shorter vout_CloseAndRelease()
  *
- * \param p_this a vlc object
- * \param p_vout a vout candidate
- * \param p_fmt the video format requested or NULL
- * \return a vout if p_fmt is non NULL and the request is successfull, NULL
- * otherwise
+ * \param object a vlc object
+ * \param cfg the video configuration requested.
+ * \return a vout
  */
-VLC_EXPORT( vout_thread_t *, vout_Request, ( vlc_object_t *p_this, vout_thread_t *p_vout, const video_format_t *p_fmt ) );
-#define vout_Request(a,b,c) vout_Request(VLC_OBJECT(a),b,c)
+VLC_EXPORT( vout_thread_t *, vout_Request, ( vlc_object_t *object, const vout_configuration_t *cfg ) );
+#define vout_Request(a,b) vout_Request(VLC_OBJECT(a),b)
 
 /**
- * This function will create a suitable vout for a given p_fmt. It will never
- * reuse an already existing unused vout.
- *
- * You have to call either vout_Close or vout_Request on the returned value
- * \param p_this a vlc object to which the returned vout will be attached
- * \param p_fmt the video format requested
- * \return a vout if the request is successfull, NULL otherwise
- */
-VLC_EXPORT( vout_thread_t *, vout_Create, ( vlc_object_t *p_this, const video_format_t *p_fmt ) );
-#define vout_Create(a,b) vout_Create(VLC_OBJECT(a),b)
-
-/**
- * This function will close a vout created by vout_Create or vout_Request.
+ * This function will close a vout created by vout_Request.
  * The associated vout module is closed.
  * Note: It is not released yet, you'll have to call vlc_object_release()
  * or use the convenient vout_CloseAndRelease().

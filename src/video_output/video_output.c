@@ -92,55 +92,11 @@ static int VoutValidateFormat(video_format_t *dst,
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * vout_Request: find a video output thread, create one, or destroy one.
- *****************************************************************************
- * This function looks for a video output thread matching the current
- * properties. If not found, it spawns a new one.
- *****************************************************************************/
-vout_thread_t *(vout_Request)(vlc_object_t *object, vout_thread_t *vout,
-                              const video_format_t *fmt)
-{
-    if (!fmt) {
-        if (vout)
-            vout_CloseAndRelease(vout);
-        return NULL;
-    }
-
-    /* If a vout is provided, try reusing it */
-    if (vout) {
-        spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), false);
-        vlc_object_detach(vout);
-        vlc_object_attach(vout, object);
-        spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), true);
-
-        vout_control_cmd_t cmd;
-        vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
-        cmd.u.reinit.fmt = fmt;
-
-        vout_control_Push(&vout->p->control, &cmd);
-        vout_control_WaitEmpty(&vout->p->control);
-        if (!vout->p->dead) {
-            msg_Dbg(object, "reusing provided vout");
-            return vout;
-        }
-        vout_CloseAndRelease(vout);
-
-        msg_Warn(object, "cannot reuse provided vout");
-    }
-    return vout_Create(object, fmt);
-}
-
-/*****************************************************************************
- * vout_Create: creates a new video output thread
- *****************************************************************************
- * This function creates a new video output thread, and returns a pointer
- * to its description. On error, it returns NULL.
- *****************************************************************************/
-vout_thread_t *(vout_Create)(vlc_object_t *object, const video_format_t *fmt)
+static vout_thread_t *VoutCreate(vlc_object_t *object,
+                                 const vout_configuration_t *cfg)
 {
     video_format_t original;
-    if (VoutValidateFormat(&original, fmt))
+    if (VoutValidateFormat(&original, cfg->fmt))
         return NULL;
 
     /* Allocate descriptor */
@@ -214,11 +170,45 @@ vout_thread_t *(vout_Create)(vlc_object_t *object, const video_format_t *fmt)
     return vout;
 }
 
+vout_thread_t *(vout_Request)(vlc_object_t *object,
+                              const vout_configuration_t *cfg)
+{
+    vout_thread_t *vout = cfg->vout;
+    if (!cfg->fmt) {
+        if (vout)
+            vout_CloseAndRelease(vout);
+        return NULL;
+    }
+
+    /* If a vout is provided, try reusing it */
+    if (vout) {
+        spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), false);
+        vlc_object_detach(vout);
+        vlc_object_attach(vout, object);
+        spu_Attach(vout->p->p_spu, VLC_OBJECT(vout), true);
+
+        vout_control_cmd_t cmd;
+        vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
+        cmd.u.cfg = cfg;
+
+        vout_control_Push(&vout->p->control, &cmd);
+        vout_control_WaitEmpty(&vout->p->control);
+        if (!vout->p->dead) {
+            msg_Dbg(object, "reusing provided vout");
+            return vout;
+        }
+        vout_CloseAndRelease(vout);
+
+        msg_Warn(object, "cannot reuse provided vout");
+    }
+    return VoutCreate(object, cfg);
+}
+
 /*****************************************************************************
- * vout_Close: Close a vout created by vout_Create.
+ * vout_Close: Close a vout created by VoutCreate.
  *****************************************************************************
- * You HAVE to call it on vout created by vout_Create before vlc_object_release.
- * You should NEVER call it on vout not obtained through vout_Create
+ * You HAVE to call it on vout created by VoutCreate before vlc_object_release.
+ * You should NEVER call it on vout not obtained through VoutCreate
  * (like with vout_Request or vlc_object_find.)
  * You can use vout_CloseAndRelease() as a convenience method.
  *****************************************************************************/
@@ -1019,10 +1009,10 @@ static void ThreadClean(vout_thread_t *vout)
 }
 
 static int ThreadReinit(vout_thread_t *vout,
-                        const video_format_t *fmt)
+                        const vout_configuration_t *cfg)
 {
     video_format_t original;
-    if (VoutValidateFormat(&original, fmt)) {
+    if (VoutValidateFormat(&original, cfg->fmt)) {
         ThreadStop(vout, NULL);
         ThreadClean(vout);
         return VLC_EGENERIC;
@@ -1092,7 +1082,7 @@ static void *Thread(void *object)
                 ThreadClean(vout);
                 return NULL;
             case VOUT_CONTROL_REINIT:
-                if (ThreadReinit(vout, cmd.u.reinit.fmt))
+                if (ThreadReinit(vout, cmd.u.cfg))
                     return NULL;
                 break;
             case VOUT_CONTROL_OSD_TITLE:

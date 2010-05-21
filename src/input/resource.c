@@ -242,7 +242,11 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
         }
 
         /* */
-        p_vout = vout_Request( p_resource->p_input, p_vout, p_fmt );
+        vout_configuration_t cfg = {
+            .vout = p_vout,
+            .fmt  = p_fmt,
+        };
+        p_vout = vout_Request( p_resource->p_input, &cfg );
         if( !p_vout )
             return NULL;
 

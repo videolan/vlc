@@ -815,7 +815,11 @@ static vout_thread_t *RequestVout( void *p_private,
 {
     aout_instance_t *p_aout = p_private;
     VLC_UNUSED(b_recycle);
-    return vout_Request( p_aout, p_vout, p_fmt );
+    vout_configuration_t cfg = {
+        .vout = p_vout,
+        .fmt  = p_fmt,
+    };
+    return vout_Request( p_aout, &cfg );
 }
 
 vout_thread_t *aout_filter_RequestVout( filter_t *p_filter,

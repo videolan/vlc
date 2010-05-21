@@ -26,6 +26,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_vout.h>
 #include "control.h"
 
 /* */

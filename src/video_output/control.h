@@ -32,7 +32,7 @@
 enum {
     VOUT_CONTROL_INIT,
     VOUT_CONTROL_CLEAN,
-    VOUT_CONTROL_REINIT,                /* reinit */
+    VOUT_CONTROL_REINIT,                /* cfg */
 
 #if 0
     /* */
@@ -91,9 +91,7 @@ typedef struct {
             unsigned width;
             unsigned height;
         } window;
-        struct {
-            const video_format_t *fmt;
-        } reinit;
+        const vout_configuration_t *cfg;
     } u;
 } vout_control_cmd_t;
 
