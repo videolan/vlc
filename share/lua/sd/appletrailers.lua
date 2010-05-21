@@ -50,18 +50,15 @@ function main()
 
             playlistline = playlist:readline()
             description =""
-            vlc.msg.info( "http://trailers.apple.com"..url.."includes/playlists/web.inc" )
             if not playlistline then vlc.msg.info("Empty playlists-file") end
             while playlistline ~= nil
             do
                 if string.match( playlistline, "class=\".-first" ) then
                     description = find( playlistline, "h%d.->(.-)</h%d")
-                    vlc.msg.info( "Got type:"..description )
                 end
                 if string.match( playlistline, "class=\"hd\".-\.mov") then
                     for urlline,resolution in string.gmatch(playlistline, "class=\"hd\".-href=\"(.-.mov)\".-(%d+.-p)") do
                         urlline = string.gsub( urlline, "_"..resolution, "_h"..resolution )
-                        vlc.msg.info( "adding url:"..urlline )
                         node:add_subitem( {path = urlline,
                                   title=title.." "..description.." ("..resolution..")",
                                   options=options, arturl=art })
@@ -69,7 +66,6 @@ function main()
                 end
                 playlistline = playlist:readline()
             end
-            vlc.msg.info( "entry done...")
          end
          line = fd:readline()
     end
