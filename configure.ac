@@ -3373,48 +3373,29 @@ AC_ARG_ENABLE(sdl-image,
   [  --enable-sdl-image      SDL image support (default enabled)])
 if test "${enable_sdl}" != "no"
 then
-  SDL_PATH="${PATH}"
-  AC_ARG_WITH(sdl-config-path,
-    [  --with-sdl-config-path=PATH sdl-config path (default search in \$PATH)],
-    [ if test "${with_sdl_config_path}" != "no"
-      then
-        SDL_PATH="${with_sdl_config_path}:${PATH}"
-      fi ])
-  AC_PATH_PROG(SDL_CONFIG, sdl-config, no, ${SDL_PATH})
-  SDL_HEADER="SDL.h"
-  SDL_IMAGE="SDL_image.h"
-
-  if test "${SDL_CONFIG}" != "no";  then
-     PKG_CHECK_MODULES(SDL, [sdl >= 1.2.10], [
-        # SDL on Darwin is heavily patched and can only run SDL_image
-        if test "${SYS}" != "darwin"; then
-          VLC_ADD_PLUGIN([vout_sdl aout_sdl])
-        fi
-        VLC_ADD_CFLAGS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} --cflags`])
-        VLC_ADD_LIBS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`])
-
-        # SDL_image
-        AS_IF([ test "${enable_sdl_image}" != "no"],[
-          AC_CHECK_HEADERS("SDL_image.h", [
-            VLC_ADD_PLUGIN([sdl_image])
-            AC_CHECK_LIB(png, png_set_rows, [VLC_ADD_LIBS([sdl_image],[-lpng -lz])],[],[-lz])
-            AC_CHECK_LIB(jpeg, jpeg_start_decompress, [VLC_ADD_LIBS([sdl_image],[-ljpeg])])
-            AC_CHECK_LIB(tiff, TIFFClientOpen, [VLC_ADD_LIBS([sdl_image],[-ltiff])])
-            VLC_ADD_LIBS([sdl_image], [-lSDL_image])],
-            [ AC_MSG_WARN([The development package for SDL_image is not installed.
-      You should install it alongside your SDL package.])
-            ])
-        ])
-     ],[
-       AC_MSG_ERROR([The development package for SDL is too old. You need 1.2.10.
-                    Alternatively you can also configure with --disable-sdl.])
-     ])
-  else if test "${enable_sdl}" =  "yes"; then
-    AC_MSG_ERROR([I could not find the SDL package. You can download libSDL
-from http://www.libsdl.org/, or configure with --disable-sdl. Have a nice day.
-    ])
+   PKG_CHECK_MODULES(SDL, [sdl >= 1.2.10], [
+      # SDL on Darwin is heavily patched and can only run SDL_image
+      if test "${SYS}" != "darwin"; then
+        VLC_ADD_PLUGIN([vout_sdl aout_sdl])
       fi
-  fi
+      VLC_ADD_CFLAGS([vout_sdl aout_sdl],[${SDL_CFLAGS}])
+      VLC_ADD_LIBS([vout_sdl aout_sdl],[${SDL_LIBS}])
+
+      # SDL_image
+      AS_IF([ test "${enable_sdl_image}" != "no"],[
+        PKG_CHECK_MODULES(SDL_IMAGE, [SDL_image >= 1.2.10], [
+          VLC_ADD_PLUGIN([sdl_image])
+          VLC_ADD_LIBS([sdl_image],[${SDL_IMAGE_LIBS}])
+          VLC_ADD_CFLAGS([sdl_image], [${SDL_IMAGE_CFLAGS}])],
+          [ AC_MSG_WARN([The development package for SDL_image is not installed.
+    You should install it alongside your SDL package.])
+          ])
+      ])
+   ],[
+     AC_MSG_ERROR([The development package for SDL is not present or too old.
+                   You need 1.2.10. Alternatively you can also configure with
+                   --disable-sdl.])
+   ])
 fi
 
 dnl
