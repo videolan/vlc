@@ -149,6 +149,7 @@ endif
 ifdef HAVE_DARWIN_OS
 X264CONF=--host=$(HOST)
 X264CONF += --enable-pic
+FFMPEGCONF += --enable-libvpx
 ifdef HAVE_DARWIN_32
 FFMPEGCONF += --cc=gcc-4.0
 else
@@ -920,11 +921,26 @@ libvpx-$(VPX_VERSION).tar.bz2:
 vpx: libvpx-$(VPX_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch -p0 < Patches/libvpx-cross.patch
+ifdef HAVE_DARWIN_OS
+	patch -p0 < Patches/libvpx-darwin.patch
+endif
 
 ifdef HAVE_WIN32
 VPX_TARGET=x86-win32-gcc
 else
+ifdef HAVE_DARWIN_OS
+ifdef HAVE_DARWIN_64
+VPX_TARGET=x86_64-darwin9-gcc
+else
+ifdef HAVE_DARWIN_OS_ON_INTEL
+VPX_TARGET=x86-darwin9-gcc
+else
+VPX_TARGET=ppc32-darwin9-gcc
+endif
+endif
+else
 VPX_TARGET=FIXME
+endif
 endif
 
 .vpx: vpx

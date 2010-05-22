@@ -1,0 +1,13 @@
+--- vpx/configure	2010-05-18 17:58:33.000000000 +0200
++++ vpx_fixed/configure	2010-05-23 01:03:13.000000000 +0200
+@@ -411,9 +411,7 @@
+         }
+     fi
+     check_header stdio.h || die "Unable to invoke compiler: ${CC} ${CFLAGS}"
+-    check_ld <<EOF || die "Toolchain is unable to link executables"
+-int main(void) {return 0;}
+-EOF
++    
+     # check system headers
+     check_header stdint.h
+     check_header pthread.h
