@@ -1280,7 +1280,7 @@
 		</dict>
 	</array>
 	<key>SUFeedURL</key>
-	<string>http://jones.videolan.org/~videolan/fpk/sparkle/vlc.xml</string>
+	<string>http://update.videolan.org/vlc/sparkle/vlc.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 	<key>CFBundleExecutable</key>
