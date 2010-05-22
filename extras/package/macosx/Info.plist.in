@@ -1281,6 +1281,8 @@
 	</array>
 	<key>SUFeedURL</key>
 	<string>http://jones.videolan.org/~videolan/fpk/sparkle/vlc.xml</string>
+	<key>SUPublicDSAKeyFile</key>
+	<string>dsa_pub.pem</string>
 	<key>CFBundleExecutable</key>
 	<string>VLC</string>
 	<key>CFBundleGetInfoString</key>
