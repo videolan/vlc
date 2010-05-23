@@ -1078,6 +1078,7 @@ else
 ffmpeg: 
 endif
 	$(SVN) co $(FFMPEG_SVN) ffmpeg
+	(cd ffmpeg; patch -p0 < ../Patches/ffmpeg-libvpx.patch;)
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
 endif
@@ -1116,7 +1117,7 @@ else
 ifdef HAVE_WIN32
 FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --enable-dxva2 --disable-bsfs
 else
-FFMPEGCONFG += --enable-pthreads
+FFMPEGCONF += --enable-pthreads
 endif
 endif
 

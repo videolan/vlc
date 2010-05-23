@@ -11,3 +11,16 @@
      # check system headers
      check_header stdint.h
      check_header pthread.h
+--- vpx/vpx_ports/vpx_integer.h	2010-05-18 17:58:33.000000000 +0200
++++ vpx_fixed/vpx_ports/vpx_integer.h	2010-05-23 01:41:37.000000000 +0200
+@@ -43,10 +43,6 @@
+ typedef signed char int_fast8_t;
+ typedef unsigned char uint_fast8_t;
+ 
+-#ifndef _UINTPTR_T_DEFINED
+-typedef unsigned int   uintptr_t;
+-#endif
+-
+ #endif
+ 
+ #endif
