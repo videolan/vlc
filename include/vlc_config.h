@@ -151,10 +151,6 @@
 /* Number of planes in a picture */
 #define VOUT_MAX_PLANES                 5
 
-/* Video heap size - remember that a decompressed picture is big
- * (~1 Mbyte) before using huge values */
-#define VOUT_MAX_PICTURES              20
-
 /*
  * Time settings
  */

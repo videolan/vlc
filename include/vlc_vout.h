@@ -54,6 +54,7 @@ typedef struct {
     vout_thread_t        *vout;
     vlc_object_t         *input;
     const video_format_t *fmt;
+    unsigned             dpb_size;
 } vout_configuration_t;
 
 /**

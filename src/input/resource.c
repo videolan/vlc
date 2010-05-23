@@ -205,7 +205,8 @@ static void DisplayVoutTitle( input_resource_t *p_resource,
     free( psz_nowplaying );
 }
 static vout_thread_t *RequestVout( input_resource_t *p_resource,
-                                   vout_thread_t *p_vout, video_format_t *p_fmt,
+                                   vout_thread_t *p_vout,
+                                   video_format_t *p_fmt, unsigned dpb_size,
                                    bool b_recycle )
 {
     vlc_assert_locked( &p_resource->lock );
@@ -243,9 +244,10 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
 
         /* */
         vout_configuration_t cfg = {
-            .vout  = p_vout,
-            .input = VLC_OBJECT(p_resource->p_input),
-            .fmt   = p_fmt,
+            .vout     = p_vout,
+            .input    = VLC_OBJECT(p_resource->p_input),
+            .fmt      = p_fmt,
+            .dpb_size = dpb_size,
         };
         p_vout = vout_Request( p_resource->p_input, &cfg );
         if( !p_vout )
@@ -281,9 +283,10 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
             vout_FlushSubpictureChannel( p_vout, -1 );
 
             vout_configuration_t cfg = {
-                .vout  = p_vout,
-                .input = NULL,
-                .fmt   = p_fmt,
+                .vout     = p_vout,
+                .input    = NULL,
+                .fmt      = p_fmt,
+                .dpb_size = 0,
             };
             p_resource->p_vout_free = vout_Request( p_resource->p_input, &cfg );
         }
@@ -467,10 +470,12 @@ input_resource_t *input_resource_Detach( input_resource_t *p_resource )
 }
 
 vout_thread_t *input_resource_RequestVout( input_resource_t *p_resource,
-                                            vout_thread_t *p_vout, video_format_t *p_fmt, bool b_recycle )
+                                            vout_thread_t *p_vout,
+                                            video_format_t *p_fmt, unsigned dpb_size,
+                                            bool b_recycle )
 {
     vlc_mutex_lock( &p_resource->lock );
-    vout_thread_t *p_ret = RequestVout( p_resource, p_vout, p_fmt, b_recycle );
+    vout_thread_t *p_ret = RequestVout( p_resource, p_vout, p_fmt, dpb_size, b_recycle );
     vlc_mutex_unlock( &p_resource->lock );
 
     return p_ret;
@@ -488,7 +493,7 @@ void input_resource_HoldVouts( input_resource_t *p_resource, vout_thread_t ***pp
 
 void input_resource_TerminateVout( input_resource_t *p_resource )
 {
-    input_resource_RequestVout( p_resource, NULL, NULL, false );
+    input_resource_RequestVout( p_resource, NULL, NULL, 0, false );
 }
 bool input_resource_HasVout( input_resource_t *p_resource )
 {

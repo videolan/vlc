@@ -2077,7 +2077,7 @@ static void DeleteDecoder( decoder_t * p_dec )
         vout_Reset( p_owner->p_vout );
 
         /* */
-        input_resource_RequestVout( p_owner->p_input->p->p_resource, p_owner->p_vout, NULL, true );
+        input_resource_RequestVout( p_owner->p_input->p->p_resource, p_owner->p_vout, NULL, 0, true );
         input_SendEventVout( p_owner->p_input );
     }
 
@@ -2157,7 +2157,7 @@ static vout_thread_t *aout_request_vout( void *p_private,
     decoder_t *p_dec = p_private;
     input_thread_t *p_input = p_dec->p_owner->p_input;
 
-    p_vout = input_resource_RequestVout( p_input->p->p_resource, p_vout, p_fmt, b_recyle );
+    p_vout = input_resource_RequestVout( p_input->p->p_resource, p_vout, p_fmt, 1, b_recyle );
     input_SendEventVout( p_input );
 
     return p_vout;
@@ -2333,9 +2333,27 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         p_owner->p_vout = NULL;
         vlc_mutex_unlock( &p_owner->lock );
 
+        unsigned dpb_size;
+        switch( p_dec->fmt_in.i_codec )
+        {
+        case VLC_CODEC_H264:
+        case VLC_CODEC_DIRAC: /* FIXME valid ? */
+            dpb_size = 18;
+            break;
+        case VLC_CODEC_VP5:
+        case VLC_CODEC_VP6:
+        case VLC_CODEC_VP6F:
+        case VLC_CODEC_VP8:
+            dpb_size = 3;
+            break;
+        default:
+            dpb_size = 2;
+            break;
+        }
         p_vout = input_resource_RequestVout( p_owner->p_input->p->p_resource,
-                                              p_vout, &p_dec->fmt_out.video, true );
-
+                                             p_vout, &p_dec->fmt_out.video,
+                                             dpb_size + 1 + DECODER_MAX_BUFFERING_COUNT,
+                                             true );
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_vout = p_vout;
 

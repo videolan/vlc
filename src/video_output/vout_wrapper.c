@@ -36,14 +36,6 @@
 #include "vout_internal.h"
 #include "display.h"
 
-/* Minimum number of direct pictures the video output will accept without
- * creating additional pictures in system memory */
-#ifdef OPTIMIZE_MEMORY
-#   define VOUT_MIN_DIRECT_PICTURES        (VOUT_MAX_PICTURES/2)
-#else
-#   define VOUT_MIN_DIRECT_PICTURES        (3*VOUT_MAX_PICTURES/4)
-#endif
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -126,27 +118,42 @@ int vout_InitWrapper(vout_thread_t *vout)
     vout_display_t *vd = sys->display.vd;
     video_format_t source = vd->source;
 
-    /* XXX For non dr case, the current vout implementation force us to
-     * create at most 1 direct picture (otherwise the buffers will be kept
-     * referenced even through the Init/End.
-     */
     sys->display.use_dr = !vout_IsDisplayFiltered(vd);
     const bool allow_dr = !vd->info.has_pictures_invalid && sys->display.use_dr;
-
-    picture_pool_t *display_pool = vout_display_Pool(vd, allow_dr ? VOUT_MAX_PICTURES : 3);
-    if (allow_dr && picture_pool_GetSize(display_pool) >= VOUT_MIN_DIRECT_PICTURES) {
+    const unsigned private_picture  = 3; /* XXX 2 for filter, 1 for SPU */
+    const unsigned display_picture  = 1; /* Minimum number of display picture */
+    const unsigned decoder_picture  = 1 + sys->dpb_size;
+    const unsigned kept_picture     = 1; /* last displayed picture */
+    const unsigned reserved_picture = display_picture +
+                                      private_picture +
+                                      kept_picture;
+    picture_pool_t *display_pool =
+        vout_display_Pool(vd, allow_dr ? __MAX(VOUT_MAX_PICTURES,
+                                               reserved_picture + decoder_picture) : 3);
+    if (allow_dr &&
+        picture_pool_GetSize(display_pool) >= reserved_picture + decoder_picture) {
+        sys->dpb_size     = picture_pool_GetSize(display_pool) - reserved_picture - kept_picture;
         sys->decoder_pool = display_pool;
         sys->display_pool = display_pool;
         sys->is_decoder_pool_slow = vd->info.is_slow;
     } else if (!sys->decoder_pool) {
-        sys->decoder_pool = picture_pool_NewFromFormat(&source, VOUT_MAX_PICTURES);
+        sys->decoder_pool =
+            picture_pool_NewFromFormat(&source,
+                                       __MAX(VOUT_MAX_PICTURES,
+                                             private_picture + kept_picture + decoder_picture));
+        if (allow_dr) {
+            msg_Warn(vout, "Not enough direct buffers, using system memory");
+            sys->dpb_size = 0;
+        } else {
+            sys->dpb_size = picture_pool_GetSize(display_pool) - private_picture - kept_picture;
+        }
         if (sys->display.use_dr)
             sys->display_pool = display_pool;
         else
-            sys->display_pool = picture_pool_Reserve(sys->decoder_pool, 1);;
+            sys->display_pool = picture_pool_Reserve(sys->decoder_pool, display_picture);
         sys->is_decoder_pool_slow = false;
     }
-    sys->private_pool = picture_pool_Reserve(sys->decoder_pool, 3); /* XXX 2 for filter, 1 for SPU */
+    sys->private_pool = picture_pool_Reserve(sys->decoder_pool, private_picture);
     sys->display.filtered = NULL;
     return VLC_SUCCESS;
 }

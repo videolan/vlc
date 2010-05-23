@@ -40,6 +40,14 @@
 #include "statistic.h"
 #include "chrono.h"
 
+/* It should be high enough to absorbe jitter due to difficult picture(s)
+ * to decode but not too high as memory is not that cheap.
+ *
+ * It can be made lower at compilation time if needed, but performance
+ * may be degraded.
+ */
+#define VOUT_MAX_PICTURES (20)
+
 /* */
 struct vout_thread_sys_t
 {
@@ -51,6 +59,7 @@ struct vout_thread_sys_t
 
     /* */
     video_format_t  original;   /* Original format ie coming from the decoder */
+    unsigned        dpb_size;
 
     /* Snapshot interface */
     vout_snapshot_t snapshot;

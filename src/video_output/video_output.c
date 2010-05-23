@@ -112,6 +112,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vout->p = (vout_thread_sys_t*)&vout[1];
 
     vout->p->original = original;
+    vout->p->dpb_size = cfg->dpb_size;
 
     vout_control_Init(&vout->p->control);
     vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_INIT);
@@ -1027,8 +1028,11 @@ static int ThreadReinit(vout_thread_t *vout,
         ThreadClean(vout);
         return VLC_EGENERIC;
     }
-    if (video_format_IsSimilar(&original, &vout->p->original))
-        return VLC_SUCCESS;
+    if (video_format_IsSimilar(&original, &vout->p->original)) {
+        if (cfg->dpb_size <= vout->p->dpb_size)
+            return VLC_SUCCESS;
+        msg_Warn(vout, "DPB need to be increased");
+    }
 
     vout_display_state_t state;
     memset(&state, 0, sizeof(state));
@@ -1045,6 +1049,7 @@ static int ThreadReinit(vout_thread_t *vout,
      * and I am not sure what to do */
 
     vout->p->original = original;
+    vout->p->dpb_size = cfg->dpb_size;
     if (ThreadStart(vout, &state)) {
         ThreadClean(vout);
         return VLC_EGENERIC;
