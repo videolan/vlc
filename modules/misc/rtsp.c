@@ -492,6 +492,13 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
 static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
 {
     char *psz_urlc;
+
+    if( p_media->i_payload_type >= 128 )
+    {
+        msg_Err( p_vod, "too many elementary streams");
+        return VLC_EGENERIC;
+    }
+
     media_es_t *p_es = calloc( 1, sizeof(media_es_t) );
     if( !p_es )
         return VLC_ENOMEM;
