@@ -816,10 +816,11 @@ static vout_thread_t *RequestVout( void *p_private,
     aout_instance_t *p_aout = p_private;
     VLC_UNUSED(b_recycle);
     vout_configuration_t cfg = {
-        .vout     = p_vout,
-        .input    = NULL,
-        .fmt      = p_fmt,
-        .dpb_size = 1,
+        .vout       = p_vout,
+        .input      = NULL,
+        .change_fmt = true,
+        .fmt        = p_fmt,
+        .dpb_size   = 1,
     };
     return vout_Request( p_aout, &cfg );
 }

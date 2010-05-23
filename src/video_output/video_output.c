@@ -178,7 +178,7 @@ vout_thread_t *(vout_Request)(vlc_object_t *object,
                               const vout_configuration_t *cfg)
 {
     vout_thread_t *vout = cfg->vout;
-    if (!cfg->fmt) {
+    if (cfg->change_fmt && !cfg->fmt) {
         if (vout)
             vout_CloseAndRelease(vout);
         return NULL;
@@ -197,12 +197,15 @@ vout_thread_t *(vout_Request)(vlc_object_t *object,
                 spu_Attach(vout->p->p_spu, vout->p->input, true);
         }
 
-        vout_control_cmd_t cmd;
-        vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
-        cmd.u.cfg = cfg;
+        if (cfg->change_fmt) {
+            vout_control_cmd_t cmd;
+            vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
+            cmd.u.cfg = cfg;
 
-        vout_control_Push(&vout->p->control, &cmd);
-        vout_control_WaitEmpty(&vout->p->control);
+            vout_control_Push(&vout->p->control, &cmd);
+            vout_control_WaitEmpty(&vout->p->control);
+        }
+
         if (!vout->p->dead) {
             msg_Dbg(object, "reusing provided vout");
             return vout;
