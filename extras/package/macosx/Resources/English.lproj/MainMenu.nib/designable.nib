@@ -3,19 +3,19 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1040</int>
 		<string key="IBDocument.SystemVersion">10D573</string>
-		<string key="IBDocument.InterfaceBuilderVersion">740</string>
+		<string key="IBDocument.InterfaceBuilderVersion">762</string>
 		<string key="IBDocument.AppKitVersion">1038.29</string>
 		<string key="IBDocument.HIToolboxVersion">460.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">740</string>
+			<string key="NS.object.0">762</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="4376"/>
+			<integer value="21"/>
 			<integer value="235"/>
 			<integer value="2417"/>
-			<integer value="21"/>
+			<integer value="4376"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3348,7 +3348,7 @@
 				<int key="NSWindowStyleMask">271</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{97, 644}, {238, 63}}</string>
-				<int key="NSWTFlags">1886912512</int>
+				<int key="NSWTFlags">1618477056</int>
 				<string key="NSWindowTitle">Window</string>
 				<string key="NSWindowClass">VLCEmbeddedWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
@@ -12128,7 +12128,7 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{223, 595}, {576, 81}}</string>
+					<string>{{350, 595}, {576, 81}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12193,9 +12193,9 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{237, 786}, {238, 63}}</string>
+					<string>{{237, 693}, {238, 63}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{237, 786}, {238, 63}}</string>
+					<string>{{237, 693}, {238, 63}}</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
@@ -14681,6 +14681,7 @@ LCAuLi4</string>
 			</object>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
+		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
 			<integer value="1040" key="NS.object.0"/>
@@ -14696,5 +14697,114 @@ LCAuLi4</string>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<string key="IBDocument.LastKnownRelativeProjectPath">../../vlc.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
+		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
+			<bool key="EncodedWithXMLCoder">YES</bool>
+			<object class="NSArray" key="dict.sortedKeys">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+				<string>NSApplicationIcon</string>
+				<string>NSMenuCheckmark</string>
+				<string>NSMenuMixedState</string>
+				<string>NSSwitch</string>
+				<string>add_embedded</string>
+				<string>add_embedded_blue</string>
+				<string>display_left</string>
+				<string>display_middle</string>
+				<string>display_right</string>
+				<string>equalizerdrawer_active</string>
+				<string>equalizerdrawer_blue</string>
+				<string>fs_background</string>
+				<string>fs_exit_fullscreen</string>
+				<string>fs_forward</string>
+				<string>fs_play</string>
+				<string>fs_rewind</string>
+				<string>fs_skip_next</string>
+				<string>fs_skip_previous</string>
+				<string>fs_time_slider</string>
+				<string>fs_volume_max</string>
+				<string>fs_volume_mute</string>
+				<string>fs_volume_slider_bar</string>
+				<string>fullscreen_active</string>
+				<string>fullscreen_blue</string>
+				<string>next_active</string>
+				<string>next_blue</string>
+				<string>pause_embedded</string>
+				<string>pause_embedded_blue</string>
+				<string>play</string>
+				<string>play_blue</string>
+				<string>playlistdrawer_active</string>
+				<string>playlistdrawer_blue</string>
+				<string>previous_active</string>
+				<string>previous_blue</string>
+				<string>repeat_embedded</string>
+				<string>repeat_single_embedded_blue</string>
+				<string>shuffle_embedded</string>
+				<string>shuffle_embedded_blue</string>
+				<string>skip_forward_active</string>
+				<string>skip_forward_active_embedded</string>
+				<string>skip_forward_blue</string>
+				<string>skip_forward_embedded_blue</string>
+				<string>skip_previous_active</string>
+				<string>skip_previous_active_embedded</string>
+				<string>skip_previous_blue</string>
+				<string>skip_previous_embedded_blue</string>
+				<string>stop</string>
+				<string>stop_blue</string>
+				<string>volume_high</string>
+				<string>volume_low</string>
+			</object>
+			<object class="NSMutableArray" key="dict.values">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+				<string>{128, 128}</string>
+				<string>{9, 8}</string>
+				<string>{7, 2}</string>
+				<string>{15, 15}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{8, 36}</string>
+				<string>{8, 36}</string>
+				<string>{8, 36}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{549, 87}</string>
+				<string>{26, 20}</string>
+				<string>{43, 19}</string>
+				<string>{34, 27}</string>
+				<string>{43, 19}</string>
+				<string>{30, 18}</string>
+				<string>{30, 18}</string>
+				<string>{518, 9}</string>
+				<string>{15, 13}</string>
+				<string>{7, 11}</string>
+				<string>{95, 2}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{39, 39}</string>
+				<string>{39, 39}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{31, 31}</string>
+				<string>{33, 20}</string>
+				<string>{31, 31}</string>
+				<string>{33, 20}</string>
+				<string>{31, 31}</string>
+				<string>{33, 20}</string>
+				<string>{31, 31}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{33, 20}</string>
+				<string>{13, 13}</string>
+				<string>{6, 11}</string>
+			</object>
+		</object>
 	</data>
 </archive>
