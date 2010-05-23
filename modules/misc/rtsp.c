@@ -184,7 +184,6 @@ struct vod_sys_t
     int i_session_timeout;
 
     /* List of media */
-    vlc_mutex_t lock_media;
     int i_media_id;
     int i_media;
     vod_media_t **media;
@@ -296,8 +295,6 @@ static int Open( vlc_object_t *p_this )
 
     vlc_UrlClean( &url );
 
-    vlc_mutex_init( &p_sys->lock_media );
-
     TAB_INIT( p_sys->i_media, p_sys->media );
     p_sys->i_media_id = 0;
 
@@ -366,8 +363,6 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->i_media > 0 )
         msg_Err( p_vod, "rtsp vod leaking %d medias", p_sys->i_media );
     TAB_CLEAN( p_sys->i_media, p_sys->media );
-
-    vlc_mutex_destroy( &p_sys->lock_media );
 
     free( p_sys->psz_path );
     free( p_sys->psz_raw_mux );
@@ -473,9 +468,7 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
 
     msg_Dbg( p_vod, "deleting media: %s", p_media->psz_rtsp_path );
 
-    vlc_mutex_lock( &p_sys->lock_media );
     TAB_REMOVE( p_sys->i_media, p_sys->media, p_media );
-    vlc_mutex_unlock( &p_sys->lock_media );
 
     httpd_UrlDelete( p_media->p_rtsp_url );
 
@@ -800,9 +793,7 @@ static void* CommandThread( vlc_object_t *p_this )
 
         if ( cmd.i_type == RTSP_CMD_TYPE_ADD )
         {
-            vlc_mutex_lock( &p_sys->lock_media );
             TAB_APPEND( p_sys->i_media, p_sys->media, cmd.p_media );
-            vlc_mutex_unlock( &p_sys->lock_media );
             goto next;
         }
 
@@ -813,7 +804,6 @@ static void* CommandThread( vlc_object_t *p_this )
         }
 
         /* */
-        vlc_mutex_lock( &p_sys->lock_media );
         for( i = 0; i < p_sys->i_media; i++ )
         {
             if( p_sys->media[i]->id == cmd.i_media_id )
@@ -821,7 +811,6 @@ static void* CommandThread( vlc_object_t *p_this )
         }
         if( i >= p_sys->i_media )
         {
-            vlc_mutex_unlock( &p_sys->lock_media );
             goto next;
         }
         p_media = p_sys->media[i];
@@ -859,7 +848,6 @@ static void* CommandThread( vlc_object_t *p_this )
         default:
             break;
         }
-        vlc_mutex_unlock( &p_sys->lock_media );
 
     next:
         free( cmd.psz_session );
