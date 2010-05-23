@@ -197,12 +197,12 @@ void VideoWidget::SetFullScreen( bool b_fs )
     if( b_fs )
     {
         newstate |= Qt::WindowFullScreen;
-        newflags |= Qt::WindowStaysOnTopHint;
+        newflags |= Qt::WindowStaysOnTopHint | Qt::Tool;
     }
     else
     {
         newstate &= ~Qt::WindowFullScreen;
-        newflags &= ~Qt::WindowStaysOnTopHint;
+        newflags &= ~(Qt::WindowStaysOnTopHint | Qt::Tool);
     }
     if( newstate == curstate )
         return; /* no changes needed */
