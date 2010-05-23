@@ -4,7 +4,7 @@ all: .autoconf .gnumake .automake .libtool .intl .pkgcfg .yasm .freetype \
     .flac .speex .shout .faad .lame .twolame .ebml .matroska .vpx .ffmpeg \
     .dvdcss .libdvdread .dvdnav .dvbpsi .live .caca .mod .fontconfig \
     .png .jpeg .tiff .gpg-error .gcrypt .gnutls .cddb .cdio .vcdimager \
-    .glib .gecko .mpcdec .dirac_encoder .dirac_decoder \
+    .gecko .mpcdec .dirac_encoder .dirac_decoder \
     .dca .tag .x264 .lua .zvbi .fontconfig .ncurses .liboil \
     .schroedinger .libass .libupnp .kate .sqlite3 .Sparkle .aclocal
 # .expat .clinkcc don't work with SDK yet
