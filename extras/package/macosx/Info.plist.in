@@ -137,18 +137,6 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>vlc</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>generic.icns</string>
-			<key>CFBundleTypeName</key>
-			<string>Generic VLC media player file</string>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
 				<string>ape</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
@@ -848,6 +836,10 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
+            <key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>video/mp2t</string>
+			</array>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>ts</string>
