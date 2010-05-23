@@ -71,7 +71,7 @@ vlc_module_begin ()
     add_shortcut ("xvideo")
 vlc_module_end ()
 
-#define MAX_PICTURES (VOUT_MAX_PICTURES)
+#define MAX_PICTURES (128)
 
 struct vout_display_sys_t
 {
@@ -586,7 +586,6 @@ static void Close (vlc_object_t *obj)
 static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *p_sys = vd->sys;
-    (void)requested_count;
 
     if (!p_sys->pool)
     {
@@ -600,8 +599,10 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 
         unsigned count;
         picture_t *pic_array[MAX_PICTURES];
-        for (count = 0; count < MAX_PICTURES; count++)
+        for (count = 0; count < requested_count; count++)
         {
+            if (count >= MAX_PICTURES)
+                break;
             picture_resource_t *res = &p_sys->resource[count];
 
             for (int i = 0; i < __MIN (p_sys->att->num_planes, PICTURE_PLANE_MAX); i++)
