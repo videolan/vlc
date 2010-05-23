@@ -1172,6 +1172,8 @@ static int MP4_ReadBox_gnre( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET4BYTES( i_version );
     MP4_GET4BYTES( i_reserved );
     MP4_GET2BYTES( p_gnre->i_genre );
+    if( p_gnre->i_genre == 0 )
+        MP4_READBOX_EXIT( 0 );
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"gnre\" genre=%i", p_gnre->i_genre );
 #endif

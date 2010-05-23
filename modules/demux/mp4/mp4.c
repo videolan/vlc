@@ -905,8 +905,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     break;
 
                 case FOURCC_gnre:
-                    if( p_0xa9xxx->data.p_gnre->i_genre < NUM_GENRES )
-                        vlc_meta_SetGenre( p_meta, ppsz_genres[p_0xa9xxx->data.p_gnre->i_genre] );
+                    if( p_0xa9xxx->data.p_gnre->i_genre <= NUM_GENRES )
+                        vlc_meta_SetGenre( p_meta, ppsz_genres[p_0xa9xxx->data.p_gnre->i_genre - 1] );
                     break;
 
                 case FOURCC_0xa9alb: /* Album */
