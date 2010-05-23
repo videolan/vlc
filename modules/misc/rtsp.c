@@ -1113,7 +1113,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 {
                     double f_pos = ParseNPT (psz_position + 4);
                     msg_Dbg( p_vod, "seeking request: %s", psz_position );
-                    f_pos /= ((double)(p_media->i_length))/1000 /1000 / 100;
+                    f_pos /= ((double)(p_media->i_length)) / CLOCK_FREQ / 100;
                     CommandPush( p_vod, RTSP_CMD_TYPE_SEEK, p_media,
                                  psz_session, f_pos, NULL );
                 }
@@ -1447,7 +1447,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             {
                 double f_pos = ParseNPT (psz_position + 4);
                 msg_Dbg( p_vod, "seeking request: %s", psz_position );
-                f_pos /= ((double)(p_media->i_length))/1000 /1000 / 100;
+                f_pos /= ((double)(p_media->i_length)) / CLOCK_FREQ / 100;
                 CommandPush( p_vod, RTSP_CMD_TYPE_SEEK, p_media,
                              psz_session, f_pos, NULL );
             }
