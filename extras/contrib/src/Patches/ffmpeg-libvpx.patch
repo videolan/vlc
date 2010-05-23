@@ -49,7 +49,7 @@ Index: libavcodec/libvpxdec.c
 ===================================================================
 --- libavcodec/libvpxdec.c	(revision 0)
 +++ libavcodec/libvpxdec.c	(revision 0)
-@@ -0,0 +1,128 @@
+@@ -0,0 +1,132 @@
 +/*
 + * Copyright (c) 2010, Google, Inc.
 + *
