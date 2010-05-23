@@ -8,12 +8,13 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 1.1.x\n"
+"Project-Id-Version: vlc 1.2.x\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-05-16 00:09+0100\n"
+"POT-Creation-Date: 2010-05-20 19:50+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Dean Lee <xslidian@lidian.info>\n"
 "Language-Team: Simplified Chinese <xslidian+vlc@gmail.com>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -878,8 +879,8 @@ msgstr "解码器"
 
 #: src/input/decoder.c:280 src/input/decoder.c:441
 #: modules/codec/avcodec/encoder.c:224 modules/codec/avcodec/encoder.c:232
-#: modules/codec/avcodec/encoder.c:254 modules/codec/avcodec/encoder.c:653
-#: modules/codec/avcodec/encoder.c:662 modules/stream_out/es.c:363
+#: modules/codec/avcodec/encoder.c:254 modules/codec/avcodec/encoder.c:670
+#: modules/codec/avcodec/encoder.c:679 modules/stream_out/es.c:363
 #: modules/stream_out/es.c:378
 msgid "Streaming / Transcoding failed"
 msgstr "流 / 编码转换失败"
@@ -1335,23 +1336,23 @@ msgstr ""
 "请按回车键继续...\n"
 
 #: src/libvlc.h:173 src/libvlc-module.c:1462 src/libvlc-module.c:1463
-#: src/libvlc-module.c:2635 src/video_output/vout_intf.c:197
+#: src/libvlc-module.c:2635 src/video_output/vout_intf.c:199
 msgid "Zoom"
 msgstr "缩放"
 
-#: src/libvlc.h:174 src/libvlc-module.c:1382 src/video_output/vout_intf.c:92
+#: src/libvlc.h:174 src/libvlc-module.c:1382 src/video_output/vout_intf.c:94
 msgid "1:4 Quarter"
 msgstr "1:4 四分之一"
 
-#: src/libvlc.h:175 src/libvlc-module.c:1383 src/video_output/vout_intf.c:93
+#: src/libvlc.h:175 src/libvlc-module.c:1383 src/video_output/vout_intf.c:95
 msgid "1:2 Half"
 msgstr "1:2 二分之一"
 
-#: src/libvlc.h:176 src/libvlc-module.c:1384 src/video_output/vout_intf.c:94
+#: src/libvlc.h:176 src/libvlc-module.c:1384 src/video_output/vout_intf.c:96
 msgid "1:1 Original"
 msgstr "1:1 原始"
 
-#: src/libvlc.h:177 src/libvlc-module.c:1385 src/video_output/vout_intf.c:95
+#: src/libvlc.h:177 src/libvlc-module.c:1385 src/video_output/vout_intf.c:97
 msgid "2:1 Double"
 msgstr "2:1 双倍"
 
@@ -1692,7 +1693,7 @@ msgstr "这允许以稍低或稍高的速度播放音频且不影响音频音调
 #: src/libvlc-module.c:356 modules/access/dshow/dshow.cpp:82
 #: modules/access/dshow/dshow.cpp:84 modules/codec/avcodec/avcodec.c:74
 #: modules/codec/kate.c:202
-#: modules/gui/qt4/components/interface_widgets.cpp:375
+#: modules/gui/qt4/components/interface_widgets.cpp:382
 msgid "None"
 msgstr "无"
 
@@ -1913,7 +1914,7 @@ msgid ""
 msgstr ""
 "覆盖是您显卡的硬件加速功能 (直接渲染视频的能力)。VLC 将默认尝试使用它。"
 
-#: src/libvlc-module.c:442 src/video_output/vout_intf.c:337
+#: src/libvlc-module.c:442 src/video_output/vout_intf.c:339
 #: modules/gui/macosx/simple_prefs.m:295
 msgid "Always on top"
 msgstr "总在最前"
@@ -2299,8 +2300,8 @@ msgid ""
 msgstr ""
 "这将允许您远程为服务器和客户端同步时钟。详细的设置在高级 / 网络同步中可用。"
 
-#: src/libvlc-module.c:653 src/video_output/vout_intf.c:103
-#: src/video_output/vout_intf.c:121 modules/access/dshow/dshow.cpp:82
+#: src/libvlc-module.c:653 src/video_output/vout_intf.c:105
+#: src/video_output/vout_intf.c:123 modules/access/dshow/dshow.cpp:82
 #: modules/access/dshow/dshow.cpp:84 modules/access/dshow/dshow.cpp:87
 #: modules/access/dshow/dshow.cpp:93 modules/access/v4l2.c:232
 #: modules/audio_output/alsa.c:107 modules/gui/fbosd.c:171
@@ -3476,7 +3477,7 @@ msgstr "播放列表可以使用树形结构来分类某些项目，类似一个
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
 msgstr "这些设置被绑定为全局的 VLC 按键，也被称作 \"热键\"。"
 
-#: src/libvlc-module.c:1274 src/video_output/vout_intf.c:348
+#: src/libvlc-module.c:1274 src/video_output/vout_intf.c:350
 #: modules/gui/macosx/controls.m:454 modules/gui/macosx/controls.m:510
 #: modules/gui/macosx/controls.m:1087 modules/gui/macosx/controls.m:1120
 #: modules/gui/macosx/embeddedwindow.m:68 modules/gui/macosx/intf.m:605
@@ -4254,7 +4255,7 @@ msgstr "在音频设备之间切换"
 msgid "Cycle through available audio devices"
 msgstr "在可用的音频设备之间切换"
 
-#: src/libvlc-module.c:1683 src/video_output/vout_intf.c:354
+#: src/libvlc-module.c:1683 src/video_output/vout_intf.c:356
 #: modules/gui/macosx/controls.m:494 modules/gui/macosx/controls.m:1086
 #: modules/gui/macosx/intf.m:687 modules/gui/macosx/intf.m:751
 #: modules/gui/qt4/components/controller.hpp:106
@@ -4443,7 +4444,7 @@ msgid "Downloading ..."
 msgstr "正在下载..."
 
 #: src/misc/update.c:606 src/misc/update.c:736 modules/access/dvb/scan.c:327
-#: modules/demux/avi/avi.c:643 modules/demux/avi/avi.c:2337
+#: modules/demux/avi/avi.c:652 modules/demux/avi/avi.c:2353
 #: modules/gui/macosx/bookmarks.m:102 modules/gui/macosx/controls.m:60
 #: modules/gui/macosx/coredialogs.m:66 modules/gui/macosx/coredialogs.m:68
 #: modules/gui/macosx/coredialogs.m:186 modules/gui/macosx/open.m:176
@@ -5201,29 +5202,28 @@ msgstr "壮语"
 msgid "Zulu"
 msgstr "祖鲁语"
 
-#: src/video_output/vout_intf.c:230 modules/gui/macosx/intf.m:692
+#: src/video_output/vout_intf.c:232 modules/gui/macosx/intf.m:692
 #: modules/gui/macosx/intf.m:693 modules/video_filter/crop.c:105
 #: modules/video_filter/croppadd.c:86
 msgid "Crop"
 msgstr "裁剪"
 
-#: src/video_output/vout_intf.c:294 modules/gui/macosx/controls.m:810
+#: src/video_output/vout_intf.c:296 modules/gui/macosx/controls.m:810
 #: modules/gui/macosx/intf.m:690 modules/gui/macosx/intf.m:691
 msgid "Aspect-ratio"
 msgstr "高宽比"
 
-#: src/video_output/vout_intf.c:324
+#: src/video_output/vout_intf.c:326
 msgid "Autoscale video"
 msgstr "自动缩放视频"
 
-#: src/video_output/vout_intf.c:330
+#: src/video_output/vout_intf.c:332
 msgid "Scale factor"
 msgstr "缩放因数"
 
-#: src/video_output/vout_intf.c:368
-#, fuzzy
+#: src/video_output/vout_intf.c:370
 msgid "Video splitter"
-msgstr "视频滤镜"
+msgstr "视频分离器"
 
 #: modules/3dnow/memcpy.c:46
 msgid "3D Now! memcpy"
@@ -6159,12 +6159,12 @@ msgstr "有菜单的 DVD"
 msgid "DVDnav Input"
 msgstr "DVD 导航输入"
 
-#: modules/access/dvdnav.c:314 modules/access/dvdread.c:205
+#: modules/access/dvdnav.c:319 modules/access/dvdread.c:205
 #: modules/access/dvdread.c:465 modules/access/dvdread.c:527
 msgid "Playback failure"
 msgstr "播放失败"
 
-#: modules/access/dvdnav.c:315
+#: modules/access/dvdnav.c:320
 msgid ""
 "VLC cannot set the DVD's title. It possibly cannot decrypt the entire disc."
 msgstr "VLC 无法设置 DVD 标题。可能无法解密整张光盘。"
@@ -6308,8 +6308,8 @@ msgstr ""
 "收缩: 子目录显示但是只在播放前展开。\n"
 "展开: 展开所有子目录。\n"
 
-#: modules/access/fs.c:50 modules/codec/dirac.c:79 modules/codec/x264.c:408
-#: modules/codec/x264.c:413
+#: modules/access/fs.c:50 modules/codec/dirac.c:79 modules/codec/x264.c:400
+#: modules/codec/x264.c:405
 msgid "none"
 msgstr "无"
 
@@ -7979,13 +7979,12 @@ msgid "Append to file if it exists instead of replacing it."
 msgstr "增补到文件，如果它已经存在就替换它。"
 
 #: modules/access_output/file.c:66
-#, fuzzy
 msgid "Synchronous writing"
-msgstr "同步"
+msgstr "同期写入"
 
 #: modules/access_output/file.c:67
 msgid "Open the file with synchronous writing."
-msgstr ""
+msgstr "以同期写入模式打开文件。"
 
 #: modules/access_output/file.c:70
 msgid "File stream output"
@@ -8541,8 +8540,8 @@ msgstr "带宽增益"
 #: modules/audio_filter/equalizer.c:63
 msgid ""
 "Don't use presets, but manually specified bands. You need to provide 10 "
-"values between -20dB and 20dB, separated by spaces, e.g. \"0 2 4 2 0 -2 -4 -"
-"2 0 2\"."
+"values between -20dB and 20dB, separated by spaces, e.g. \"0 2 4 2 0 -2 -4 "
+"-2 0 2\"."
 msgstr ""
 "不使用预设，但是手动指定带宽。您需要提供 -20dB 与 20dB 之间的 10 个值，由空格"
 "分隔，例如 \"0 2 4 2 0 -2 -4 -2 0 2\"。"
@@ -9230,8 +9229,8 @@ msgid ""
 "16 no padding\n"
 "32 ac vlc\n"
 "64 Qpel chroma.\n"
-"This must be the sum of the values. For example, to fix \"ac vlc\" and \"ump4"
-"\", enter 40."
+"This must be the sum of the values. For example, to fix \"ac vlc\" and "
+"\"ump4\", enter 40."
 msgstr ""
 "尝试修正一些问题:\n"
 "1  自动检测\n"
@@ -9432,7 +9431,7 @@ msgid ""
 "same qscale for I and P frames)."
 msgstr "I 帧的量化因数，与 P 帧相比较 (例如 1.0 => 相同比例的 I 和 P 帧)。"
 
-#: modules/codec/avcodec/avcodec.h:186 modules/codec/x264.c:335
+#: modules/codec/avcodec/avcodec.h:186 modules/codec/x264.c:329
 #: modules/demux/mod.c:78
 msgid "Noise reduction"
 msgstr "噪点消除"
@@ -9620,7 +9619,7 @@ msgstr ""
 "这不是一个 VLC media player 内部的错误。\n"
 "请不要向 VideoLAN 项目报告此问题。\n"
 
-#: modules/codec/avcodec/encoder.c:654 modules/codec/avcodec/encoder.c:663
+#: modules/codec/avcodec/encoder.c:671 modules/codec/avcodec/encoder.c:680
 msgid "VLC could not open the encoder."
 msgstr "VLC 无法打开编码器。"
 
@@ -10139,7 +10138,7 @@ msgstr "银色"
 
 #: modules/codec/kate.c:210 modules/gui/fbosd.c:172
 #: modules/misc/freetype.c:141 modules/misc/quartztext.c:98
-#: modules/misc/win32text.c:88 modules/video_filter/ball.c:132
+#: modules/misc/win32text.c:88 modules/video_filter/ball.c:130
 #: modules/video_filter/marq.c:60 modules/video_filter/rss.c:72
 msgid "White"
 msgstr "白色"
@@ -10154,7 +10153,7 @@ msgstr "栗色"
 #: modules/codec/kate.c:211 modules/gui/fbosd.c:172
 #: modules/gui/macosx/controls.m:542 modules/gui/macosx/intf.m:706
 #: modules/misc/freetype.c:142 modules/misc/quartztext.c:99
-#: modules/misc/win32text.c:89 modules/video_filter/ball.c:131
+#: modules/misc/win32text.c:89 modules/video_filter/ball.c:129
 #: modules/video_filter/colorthres.c:64 modules/video_filter/marq.c:60
 #: modules/video_filter/rss.c:72
 msgid "Red"
@@ -10185,7 +10184,7 @@ msgstr "橄榄绿"
 #: modules/codec/kate.c:211 modules/gui/fbosd.c:173
 #: modules/gui/macosx/controls.m:544 modules/gui/macosx/intf.m:707
 #: modules/misc/freetype.c:142 modules/misc/quartztext.c:99
-#: modules/misc/win32text.c:89 modules/video_filter/ball.c:131
+#: modules/misc/win32text.c:89 modules/video_filter/ball.c:129
 #: modules/video_filter/marq.c:61 modules/video_filter/rss.c:73
 msgid "Green"
 msgstr "绿色"
@@ -10221,7 +10220,7 @@ msgstr "藏青色"
 #: modules/codec/kate.c:212 modules/gui/fbosd.c:174
 #: modules/gui/macosx/controls.m:548 modules/gui/macosx/intf.m:709
 #: modules/misc/freetype.c:143 modules/misc/quartztext.c:100
-#: modules/misc/win32text.c:90 modules/video_filter/ball.c:132
+#: modules/misc/win32text.c:90 modules/video_filter/ball.c:130
 #: modules/video_filter/colorthres.c:64 modules/video_filter/marq.c:62
 #: modules/video_filter/rss.c:74
 msgid "Blue"
@@ -11027,7 +11026,7 @@ msgstr "倾向使用 B 帧。积极的值将造成更多的 B 帧, 保守的值�
 msgid "Keep some B-frames as references"
 msgstr "保留一些 B 帧作为参考"
 
-#: modules/codec/x264.c:98
+#: modules/codec/x264.c:97
 msgid ""
 "Allows B-frames to be used as references for predicting other frames. Keeps "
 "the middle of 2+ consecutive B-frames as a reference, and reorders frame "
@@ -11042,19 +11041,11 @@ msgstr ""
 " - strict: 严格的等级椎\n"
 " - normal: 不严格 (与 Blu-ray 不兼容)\n"
 
-#: modules/codec/x264.c:106
-msgid ""
-"Allows B-frames to be used as references for predicting other frames. Keeps "
-"the middle of 2+ consecutive B-frames as a reference, and reorders frame "
-"appropriately."
-msgstr ""
-"允许 B 帧被用做参考预测其它帧。保持 2+ 连续 B 帧作为参考，并记录帧框架。"
-
-#: modules/codec/x264.c:111
+#: modules/codec/x264.c:105
 msgid "CABAC"
 msgstr "CABAC"
 
-#: modules/codec/x264.c:112
+#: modules/codec/x264.c:106
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -11062,11 +11053,11 @@ msgstr ""
 "CABAC (内容适应二进制算法编码)。将轻微的降速编码和解码, 但是会节省 10 到 15% "
 "位率。"
 
-#: modules/codec/x264.c:116
+#: modules/codec/x264.c:110
 msgid "Number of reference frames"
 msgstr "参考帧数量"
 
-#: modules/codec/x264.c:117
+#: modules/codec/x264.c:111
 msgid ""
 "Number of previous frames used as predictors. This is effective in Anime, "
 "but seems to make little difference in live-action source material. Some "
@@ -11075,19 +11066,19 @@ msgstr ""
 "用作预测的前帧数量。这在动画中非常有效，但是可能会造成看上去和原始版本稍有差"
 "异。某些解码器可能无法分析大的参考帧值。范围是 1 到 16。"
 
-#: modules/codec/x264.c:122
+#: modules/codec/x264.c:116
 msgid "Skip loop filter"
 msgstr "跳过循环滤镜"
 
-#: modules/codec/x264.c:123
+#: modules/codec/x264.c:117
 msgid "Deactivate the deblocking loop filter (decreases quality)."
 msgstr "取消去块循环滤镜 (降低质量)。"
 
-#: modules/codec/x264.c:125
+#: modules/codec/x264.c:119
 msgid "Loop filter AlphaC0 and Beta parameters alpha:beta"
 msgstr "循环滤镜 AlphaCO 和 Beta 参数 alpha: beta"
 
-#: modules/codec/x264.c:126
+#: modules/codec/x264.c:120
 msgid ""
 "Loop filter AlphaC0 and Beta parameters. Range -6 to 6 for both alpha and "
 "beta parameters. -6 means light filter, 6 means strong."
@@ -11095,80 +11086,82 @@ msgstr ""
 "循环滤镜 AlphaCO 和 Beta 参数。alpha 和 beta 参数的范围是 -6 到 6。-6 表示很"
 "少的过滤，6 表示强过滤。"
 
-#: modules/codec/x264.c:130
+#: modules/codec/x264.c:124
 msgid "H.264 level"
 msgstr "H.264 等级"
 
-#: modules/codec/x264.c:131
+#: modules/codec/x264.c:125
+#, fuzzy
 msgid ""
 "Specify H.264 level (as defined by Annex A of the standard). Levels are not "
 "enforced; it's up to the user to select a level compatible with the rest of "
-"the encoding options. Range 1 to 5.1 (10 to 51 is also allowed)."
+"the encoding options. Range 1 to 5.1 (10 to 51 is also allowed). Set to 0 "
+"for letting x264 set level."
 msgstr ""
 "指定 H.264 等级 (由 AnnexA 定义标准)。等级不是强制的; 它将服从用户选择的其它"
 "编码选项。范围是 1 到 5.1 (10 到 51 也被允许)。"
 
-#: modules/codec/x264.c:136
+#: modules/codec/x264.c:130
 msgid "H.264 profile"
 msgstr "H.264 档案"
 
-#: modules/codec/x264.c:137
+#: modules/codec/x264.c:131
 msgid "Specify H.264 profile which limits are enforced overother settings"
 msgstr "指定 H.264 profile，将对已有设置强加限制"
 
-#: modules/codec/x264.c:143
+#: modules/codec/x264.c:137
 msgid "Interlaced mode"
 msgstr "交错模式"
 
-#: modules/codec/x264.c:144
+#: modules/codec/x264.c:138
 msgid "Pure-interlaced mode."
 msgstr "纯交错模式。"
 
-#: modules/codec/x264.c:146
+#: modules/codec/x264.c:140
 msgid "Use Periodic Intra Refresh"
 msgstr "使用周期性的内部刷新"
 
-#: modules/codec/x264.c:147
+#: modules/codec/x264.c:141
 msgid "Use Periodic Intra Refresh instead of IDR frames"
 msgstr "使用周期性的内部刷新而不是 IDR 帧"
 
-#: modules/codec/x264.c:149
+#: modules/codec/x264.c:143
 msgid "Use mb-tree ratecontrol"
 msgstr "使用 mb-tree 速率控制"
 
-#: modules/codec/x264.c:150
+#: modules/codec/x264.c:144
 msgid "You can disable use of Macroblock-tree on ratecontrol"
 msgstr "您可以禁用 Macroblock-tree 宏块树速率控制"
 
-#: modules/codec/x264.c:152
+#: modules/codec/x264.c:146
 msgid "Force number of slices per frame"
 msgstr "强制每帧切片数"
 
-#: modules/codec/x264.c:153
+#: modules/codec/x264.c:147
 msgid "Force rectangular slices and is overridden by other slicing optinos"
 msgstr "强制矩形切片，可被其他切片设置覆盖"
 
-#: modules/codec/x264.c:155
+#: modules/codec/x264.c:149
 msgid "Limit the size of each slice in bytes"
 msgstr "限定各切片的尺寸为指定字节数"
 
-#: modules/codec/x264.c:156
+#: modules/codec/x264.c:150
 msgid "Sets a maximum slice size in bytes, Includes NAL overhead in size"
 msgstr "设定以字节为单位的最大切片尺寸，含 NAL 开销所占的尺寸"
 
-#: modules/codec/x264.c:158
+#: modules/codec/x264.c:152
 msgid "Limit the size of each slice in macroblocks"
 msgstr "限定宏块中各切片的尺寸"
 
-#: modules/codec/x264.c:159
+#: modules/codec/x264.c:153
 msgid "Sets a maximum number of macroblocks per slice"
 msgstr "设置每切片的最大宏块数"
 
-#: modules/codec/x264.c:162
+#: modules/codec/x264.c:156
 msgid "Set QP"
 msgstr "设置 QP"
 
-#: modules/codec/x264.c:163
+#: modules/codec/x264.c:157
 msgid ""
 "This selects the quantizer to use. Lower values result in better fidelity, "
 "but higher bitrates. 26 is a good default value. Range 0 (lossless) to 51."
@@ -11176,77 +11169,77 @@ msgstr ""
 "这将选择要使用的量化器。较低的值会有较佳的精确性，但是有较高的位率。26 是一个"
 "比较好的值。范围从 0 (无损) 到 51。"
 
-#: modules/codec/x264.c:167
+#: modules/codec/x264.c:161
 msgid "Quality-based VBR"
 msgstr "基于质量的 VBR"
 
-#: modules/codec/x264.c:168
+#: modules/codec/x264.c:162
 msgid "1-pass Quality-based VBR. Range 0 to 51."
 msgstr "基于质量的 1 pass VBR。范围从 0 到 51。"
 
-#: modules/codec/x264.c:170
+#: modules/codec/x264.c:164
 msgid "Min QP"
 msgstr "最小 QP"
 
-#: modules/codec/x264.c:171
+#: modules/codec/x264.c:165
 msgid "Minimum quantizer parameter. 15 to 35 seems to be a useful range."
 msgstr "最小的量化器参数。15 到 35 看上去是一个有用的范围。"
 
-#: modules/codec/x264.c:174
+#: modules/codec/x264.c:168
 msgid "Max QP"
 msgstr "最大 QP"
 
-#: modules/codec/x264.c:175
+#: modules/codec/x264.c:169
 msgid "Maximum quantizer parameter."
 msgstr "最大量化器参数。"
 
-#: modules/codec/x264.c:177
+#: modules/codec/x264.c:171
 msgid "Max QP step"
 msgstr "最大 QP 步进"
 
-#: modules/codec/x264.c:178
+#: modules/codec/x264.c:172
 msgid "Max QP step between frames."
 msgstr "在帧之前的最大 QP 步进。"
 
-#: modules/codec/x264.c:180
+#: modules/codec/x264.c:174
 msgid "Average bitrate tolerance"
 msgstr "平均位率公差"
 
-#: modules/codec/x264.c:181
+#: modules/codec/x264.c:175
 msgid "Allowed variance in average bitrate (in kbits/s)."
 msgstr "平均位率内允许的误差 (以 kbits/s 为单位)。"
 
-#: modules/codec/x264.c:184
+#: modules/codec/x264.c:178
 msgid "Max local bitrate"
 msgstr "最大本地位率"
 
-#: modules/codec/x264.c:185
+#: modules/codec/x264.c:179
 msgid "Sets a maximum local bitrate (in kbits/s)."
 msgstr "设置最大本地位率 (以 kbits/s 为位率)。"
 
-#: modules/codec/x264.c:187
+#: modules/codec/x264.c:181
 msgid "VBV buffer"
 msgstr "VBV 缓冲"
 
-#: modules/codec/x264.c:188
+#: modules/codec/x264.c:182
 msgid "Averaging period for the maximum local bitrate (in kbits)."
 msgstr "最大本地位率的平均周期 (以 kbits 为单位)。"
 
-#: modules/codec/x264.c:191
+#: modules/codec/x264.c:185
 msgid "Initial VBV buffer occupancy"
 msgstr "初始 VBV 缓冲占有期"
 
-#: modules/codec/x264.c:192
+#: modules/codec/x264.c:186
 msgid ""
 "Sets the initial buffer occupancy as a fraction of the buffer size. Range "
 "0.0 to 1.0."
 msgstr "设置初始缓存占有期作为缓存的一部分。范围从 0.0 到 1.0。"
 
-#: modules/codec/x264.c:195
+#: modules/codec/x264.c:189
 msgid "How AQ distributes bits"
 msgstr "AQ 如何发布位"
 
-#: modules/codec/x264.c:196
+#: modules/codec/x264.c:190
 msgid ""
 "Defines bitdistribution mode for AQ, default 1\n"
 " - 0: Disabled\n"
@@ -11259,11 +11252,11 @@ msgstr ""
 " - 1: 当前 x264 的默认模式\n"
 " - 2: 使用 log(数值)^2 替代 log(数值) 并尝试适应各帧强度"
 
-#: modules/codec/x264.c:201
+#: modules/codec/x264.c:195
 msgid "Strength of AQ"
 msgstr "AQ 强度"
 
-#: modules/codec/x264.c:202
+#: modules/codec/x264.c:196
 msgid ""
 "Strength to reduce blocking and blurring in flat\n"
 "and textured areas, default 1.0 recommented to be between 0..2\n"
@@ -11275,35 +11268,35 @@ msgstr ""
 " - 0.5: 弱 AQ\n"
 " - 1.5: 强 AQ"
 
-#: modules/codec/x264.c:208
+#: modules/codec/x264.c:202
 msgid "QP factor between I and P"
 msgstr "I 和 P 之间的 QP 因数"
 
-#: modules/codec/x264.c:209
+#: modules/codec/x264.c:203
 msgid "QP factor between I and P. Range 1.0 to 2.0."
 msgstr "在 I 和 P 之间的 QP 因数。范围从 1.0 到 2.0。"
 
-#: modules/codec/x264.c:212
+#: modules/codec/x264.c:206
 msgid "QP factor between P and B"
 msgstr "P 和 B 之间的 QP 因数"
 
-#: modules/codec/x264.c:213
+#: modules/codec/x264.c:207
 msgid "QP factor between P and B. Range 1.0 to 2.0."
 msgstr "在 P 和 B 之间的 QP 因数。范围从 1.0 到 2.0。"
 
-#: modules/codec/x264.c:215
+#: modules/codec/x264.c:209
 msgid "QP difference between chroma and luma"
 msgstr "在色度和亮度之间的差异"
 
-#: modules/codec/x264.c:216
+#: modules/codec/x264.c:210
 msgid "QP difference between chroma and luma."
 msgstr "在色度和亮度之间的差异。"
 
-#: modules/codec/x264.c:218
+#: modules/codec/x264.c:212
 msgid "Multipass ratecontrol"
 msgstr "多重编码码率控制"
 
-#: modules/codec/x264.c:219
+#: modules/codec/x264.c:213
 msgid ""
 "Multipass ratecontrol:\n"
 " - 1: First pass, creates stats file\n"
@@ -11315,35 +11308,35 @@ msgstr ""
 " - 2: 二重, 不覆盖状态文件\n"
 " - 3: 多重, 覆盖状态文件\n"
 
-#: modules/codec/x264.c:224
+#: modules/codec/x264.c:218
 msgid "QP curve compression"
 msgstr "QP 曲线压缩"
 
-#: modules/codec/x264.c:225
+#: modules/codec/x264.c:219
 msgid "QP curve compression. Range 0.0 (CBR) to 1.0 (QCP)."
 msgstr "QP 曲线压缩。范围从 0.0 (CBR) 到 1.0 (QCP)。"
 
-#: modules/codec/x264.c:227 modules/codec/x264.c:231
+#: modules/codec/x264.c:221 modules/codec/x264.c:225
 msgid "Reduce fluctuations in QP"
 msgstr "减少 QP 波动"
 
-#: modules/codec/x264.c:228
+#: modules/codec/x264.c:222
 msgid ""
 "This reduces the fluctuations in QP before curve compression. Temporally "
 "blurs complexity."
 msgstr "这将减少在曲线压缩之前的 QP 波动。临时模糊的复杂性。"
 
-#: modules/codec/x264.c:232
+#: modules/codec/x264.c:226
 msgid ""
 "This reduces the fluctations in QP after curve compression. Temporally blurs "
 "quants."
 msgstr "这在曲线压缩之后减少 QP 的波动。临时模糊突增。"
 
-#: modules/codec/x264.c:237
+#: modules/codec/x264.c:231
 msgid "Partitions to consider"
 msgstr "分割计算器"
 
-#: modules/codec/x264.c:238
+#: modules/codec/x264.c:232
 msgid ""
 "Partitions to consider in analyse mode: \n"
 " - none  : \n"
@@ -11361,19 +11354,19 @@ msgstr ""
 " - 全部  : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
 "(p4x4 需要 p8x8。i8x8 需要 8x8dct)。"
 
-#: modules/codec/x264.c:246
+#: modules/codec/x264.c:240
 msgid "Direct MV prediction mode"
 msgstr "直接 MV 预计模式"
 
-#: modules/codec/x264.c:247
+#: modules/codec/x264.c:241
 msgid "Direct MV prediction mode."
 msgstr "直接 MV 预计模式。"
 
-#: modules/codec/x264.c:249
+#: modules/codec/x264.c:243
 msgid "Direct prediction size"
 msgstr "直接预计大小"
 
-#: modules/codec/x264.c:250
+#: modules/codec/x264.c:244
 msgid ""
 "Direct prediction size:  -  0: 4x4\n"
 " -  1: 8x8\n"
@@ -11383,19 +11376,19 @@ msgstr ""
 " -  1: 8x8\n"
 " - -1: 按照等级的最小可能\n"
 
-#: modules/codec/x264.c:255
+#: modules/codec/x264.c:249
 msgid "Weighted prediction for B-frames"
 msgstr "用于 B 帧的有利预计"
 
-#: modules/codec/x264.c:256
+#: modules/codec/x264.c:250
 msgid "Weighted prediction for B-frames."
 msgstr "用于 B 帧的有利预计。"
 
-#: modules/codec/x264.c:258
+#: modules/codec/x264.c:252
 msgid "Weighted prediction for P-frames"
 msgstr "P 帧加权预测"
 
-#: modules/codec/x264.c:259
+#: modules/codec/x264.c:253
 msgid ""
 " Weighted prediction for P-frames:  - 0: Disabled\n"
 " - 1: Blind offset\n"
@@ -11405,11 +11398,11 @@ msgstr ""
 " - 1: 隐性补偿\n"
 " - 2: 智能分析\n"
 
-#: modules/codec/x264.c:264
+#: modules/codec/x264.c:258
 msgid "Integer pixel motion estimation method"
 msgstr "整数像素运动估计模式"
 
-#: modules/codec/x264.c:265
+#: modules/codec/x264.c:259
 msgid ""
 "Selects the motion estimation algorithm:  - dia: diamond search, radius 1 "
 "(fast)\n"
@@ -11424,11 +11417,11 @@ msgstr ""
 " - esa: 穷举搜索 (非常慢, 主要用于测试)\n"
 " - tesa: hadamard 穷举搜索 (非常慢, 主要用于测试)\n"
 
-#: modules/codec/x264.c:272
+#: modules/codec/x264.c:266
 msgid "Maximum motion vector search range"
 msgstr "最大运动向量搜索范围"
 
-#: modules/codec/x264.c:273
+#: modules/codec/x264.c:267
 msgid ""
 "Maximum distance to search for motion estimation, measured from predicted "
 "position(s). Default of 16 is good for most footage, high motion sequences "
@@ -11437,30 +11430,30 @@ msgstr ""
 "运动估算搜索的最大距离，较慎重的预测点。默认的 16 适合大多数的距离，高连续动"
 "态场景可以设置为 24 和 32。范围是 0 到 64。"
 
-#: modules/codec/x264.c:278
+#: modules/codec/x264.c:272
 msgid "Maximum motion vector length"
 msgstr "最大运动向量长度"
 
-#: modules/codec/x264.c:279
+#: modules/codec/x264.c:273
 msgid ""
 "Maximum motion vector length in pixels. -1 is automatic, based on level."
 msgstr "以像素为单位的最大运动向量长度。-1 是自动，基于等级。"
 
-#: modules/codec/x264.c:282
+#: modules/codec/x264.c:276
 msgid "Minimum buffer space between threads"
 msgstr "线程之间的最小缓存空间"
 
-#: modules/codec/x264.c:283
+#: modules/codec/x264.c:277
 msgid ""
 "Minimum buffer space between threads. -1 is automatic, based on number of "
 "threads."
 msgstr "线程之间的最小缓冲空间。-1 是自动，基于线程数量。"
 
-#: modules/codec/x264.c:286
+#: modules/codec/x264.c:280
 msgid "Strength of psychovisual optimization, default is \"1.0:0.0\""
 msgstr "疯狂视觉优化的强度，默认为 \"1.0:0.0\""
 
-#: modules/codec/x264.c:287
+#: modules/codec/x264.c:281
 msgid ""
 "First parameter controls if RD is on (subme>=6) or offsecond parameter "
 "controls if Trellis is used on psychovisual optimization,default off"
@@ -11468,11 +11461,11 @@ msgstr ""
 "第一个参数控制是否启用 RD (subme>=6) 第二个参数控制疯狂视觉优化是否使用 "
 "Trellis，默认关闭"
 
-#: modules/codec/x264.c:291
+#: modules/codec/x264.c:285
 msgid "Subpixel motion estimation and partition decision quality"
 msgstr "子像素运动估计和切割确定质量"
 
-#: modules/codec/x264.c:293
+#: modules/codec/x264.c:287
 msgid ""
 "This parameter controls quality versus speed tradeoffs involved in the "
 "motion estimation decision process (lower = quicker and higher = better "
@@ -11481,19 +11474,19 @@ msgstr ""
 "此参数控制了在运动估计处理过程中的质量与速度比 (较低 = 快速和高质量 = 较佳的"
 "质量)。范围是 1 到 9。"
 
-#: modules/codec/x264.c:297
+#: modules/codec/x264.c:291
 msgid "RD based mode decision for B-frames"
 msgstr "为 B 帧 RD 基于模式判断"
 
-#: modules/codec/x264.c:298
+#: modules/codec/x264.c:292
 msgid "RD based mode decision for B-frames. This requires subme 6 (or higher)."
 msgstr "为 B 帧 RD 基于模式判断。这需要 subme 6 (或更高)。"
 
-#: modules/codec/x264.c:301
+#: modules/codec/x264.c:295
 msgid "Decide references on a per partition basis"
 msgstr "在一个每分割基础上判断参考"
 
-#: modules/codec/x264.c:302
+#: modules/codec/x264.c:296
 msgid ""
 "Allows each 8x8 or 16x8 partition to independently select a reference frame, "
 "as opposed to only one ref per macroblock."
@@ -11501,35 +11494,35 @@ msgstr ""
 "允许每 8x8 或 16x8 的分割独立的选择一个参考帧，相反的每个预宏块只有一个参考"
 "帧。"
 
-#: modules/codec/x264.c:306
+#: modules/codec/x264.c:300
 msgid "Chroma in motion estimation"
 msgstr "动态估算中的色度"
 
-#: modules/codec/x264.c:307
+#: modules/codec/x264.c:301
 msgid "Chroma ME for subpel and mode decision in P-frames."
 msgstr "在 P 帧中的用于 subpel 和模式确定的色度 ME。"
 
-#: modules/codec/x264.c:310
+#: modules/codec/x264.c:304
 msgid "Jointly optimize both MVs in B-frames"
 msgstr "在 B 帧中的 MVs 连带优化"
 
-#: modules/codec/x264.c:311
+#: modules/codec/x264.c:305
 msgid "Joint bidirectional motion refinement."
 msgstr "联合双向动态优化。"
 
-#: modules/codec/x264.c:313
+#: modules/codec/x264.c:307
 msgid "Adaptive spatial transform size"
 msgstr "适应空间改版大小"
 
-#: modules/codec/x264.c:315
+#: modules/codec/x264.c:309
 msgid "SATD-based decision for 8x8 transform in inter-MBs."
 msgstr "用于 inter-MB 中的 8x8 的传输中的基于 SATD 的判断。"
 
-#: modules/codec/x264.c:317
+#: modules/codec/x264.c:311
 msgid "Trellis RD quantization"
 msgstr "格式 RD 量化"
 
-#: modules/codec/x264.c:318
+#: modules/codec/x264.c:312
 msgid ""
 "Trellis RD quantization: \n"
 " - 0: disabled\n"
@@ -11543,137 +11536,137 @@ msgstr ""
 " - 2: 在所有模式判断时开启\n"
 "这需要 CABAC。"
 
-#: modules/codec/x264.c:324
+#: modules/codec/x264.c:318
 msgid "Early SKIP detection on P-frames"
 msgstr "在 P 帧上的早期跳过检测"
 
-#: modules/codec/x264.c:325
+#: modules/codec/x264.c:319
 msgid "Early SKIP detection on P-frames."
 msgstr "在 P 帧上的早期跳过检测。"
 
-#: modules/codec/x264.c:327
+#: modules/codec/x264.c:321
 msgid "Coefficient thresholding on P-frames"
 msgstr "P 帧的阀系数"
 
-#: modules/codec/x264.c:328
+#: modules/codec/x264.c:322
 msgid ""
 "Coefficient thresholding on P-frames.Eliminate dct blocks containing only a "
 "small single coefficient."
 msgstr "P 帧上的阀系数。消除 dct 块仅包含一个小的单一系数。"
 
-#: modules/codec/x264.c:331
+#: modules/codec/x264.c:325
 msgid "Use Psy-optimizations"
 msgstr "使用疯狂视觉优化"
 
-#: modules/codec/x264.c:332
+#: modules/codec/x264.c:326
 msgid "Use all visual optimizations that can worsen both PSNR and SSIM"
 msgstr "使用所有可能同时恶化 PSNR 与 SSIM 的视觉优化"
 
-#: modules/codec/x264.c:336
+#: modules/codec/x264.c:330
 msgid ""
 "Dct-domain noise reduction. Adaptive pseudo-deadzone. 10 to 1000 seems to be "
 "a useful range."
 msgstr "Dct-域噪点消除。适应伪造的死区。10 到 1000 看上去是一个有用的范围。"
 
-#: modules/codec/x264.c:339
+#: modules/codec/x264.c:333
 msgid "Inter luma quantization deadzone"
 msgstr "Inter 亮度量化死区"
 
-#: modules/codec/x264.c:340
+#: modules/codec/x264.c:334
 msgid "Set the size of the inter luma quantization deadzone. Range 0 to 32."
 msgstr "设置 inter 量化死区的大小。范围是 0 到 32。"
 
-#: modules/codec/x264.c:343
+#: modules/codec/x264.c:337
 msgid "Intra luma quantization deadzone"
 msgstr "Intra 亮度量化死区"
 
-#: modules/codec/x264.c:344
+#: modules/codec/x264.c:338
 msgid "Set the size of the intra luma quantization deadzone. Range 0 to 32."
 msgstr "设置 intra 量化死区的大小。范围是 0 到 32。"
 
-#: modules/codec/x264.c:349
+#: modules/codec/x264.c:343
 msgid "Non-deterministic optimizations when threaded"
 msgstr "在线程中的非确定性优化"
 
-#: modules/codec/x264.c:350
+#: modules/codec/x264.c:344
 msgid "Slightly improve quality of SMP, at the cost of repeatability."
 msgstr "以可重复性为代价轻微改进 SMP 的质量。"
 
-#: modules/codec/x264.c:353
+#: modules/codec/x264.c:347
 msgid "CPU optimizations"
 msgstr "CPU 优化"
 
-#: modules/codec/x264.c:354
+#: modules/codec/x264.c:348
 msgid "Use assembler CPU optimizations."
 msgstr "使用汇编 CPU 优化。"
 
-#: modules/codec/x264.c:356
+#: modules/codec/x264.c:350
 msgid "Filename for 2 pass stats file"
 msgstr "2 重状态文件名"
 
-#: modules/codec/x264.c:357
+#: modules/codec/x264.c:351
 msgid "Filename for 2 pass stats file for multi-pass encoding."
 msgstr "用于多重编码的 2 重状态文件文件名。"
 
-#: modules/codec/x264.c:359
+#: modules/codec/x264.c:353
 msgid "PSNR computation"
 msgstr "PSNR 计算"
 
-#: modules/codec/x264.c:360
+#: modules/codec/x264.c:354
 msgid ""
 "Compute and print PSNR stats. This has no effect on the actual encoding "
 "quality."
 msgstr "计算并打印 PSNR 状态。这不会影响实际编码质量。"
 
-#: modules/codec/x264.c:363
+#: modules/codec/x264.c:357
 msgid "SSIM computation"
 msgstr "SSIM 计算"
 
-#: modules/codec/x264.c:364
+#: modules/codec/x264.c:358
 msgid ""
 "Compute and print SSIM stats. This has no effect on the actual encoding "
 "quality."
 msgstr "计算并打印 SSIM 状态。这不会影响实际编码质量。"
 
-#: modules/codec/x264.c:367
+#: modules/codec/x264.c:361
 msgid "Quiet mode"
 msgstr "静默模式"
 
-#: modules/codec/x264.c:368
+#: modules/codec/x264.c:362
 msgid "Quiet mode."
 msgstr "静默模式。"
 
-#: modules/codec/x264.c:370 modules/gui/macosx/playlistinfo.m:82
+#: modules/codec/x264.c:364 modules/gui/macosx/playlistinfo.m:82
 msgid "Statistics"
 msgstr "统计"
 
-#: modules/codec/x264.c:371
+#: modules/codec/x264.c:365
 msgid "Print stats for each frame."
 msgstr "打印每帧的状态。"
 
-#: modules/codec/x264.c:373
+#: modules/codec/x264.c:367
 msgid "SPS and PPS id numbers"
 msgstr "SPS 和 PPS id 号"
 
-#: modules/codec/x264.c:374
+#: modules/codec/x264.c:368
 msgid ""
 "Set SPS and PPS id numbers to allow concatenating streams with different "
 "settings."
 msgstr "设置 SPS 和 PPS id 号以允许用不同的设置连接流。"
 
-#: modules/codec/x264.c:377
+#: modules/codec/x264.c:371
 msgid "Access unit delimiters"
 msgstr "访问单元分隔符"
 
-#: modules/codec/x264.c:378
+#: modules/codec/x264.c:372
 msgid "Generate access unit delimiter NAL units."
 msgstr "生成反问单元分隔符 NAL 单元。"
 
-#: modules/codec/x264.c:380
+#: modules/codec/x264.c:374
 msgid "Framecount to use on frametype lookahead"
 msgstr "统计帧数以供帧类预测"
 
-#: modules/codec/x264.c:381
+#: modules/codec/x264.c:375
 msgid ""
 "Framecount to use on frametype lookahead. Currently default is lower than "
 "x264 default because unmuxable outputdoesn't handle larger values that well "
@@ -11682,69 +11675,69 @@ msgstr ""
 "统计帧数以供帧类预测。目前默认低于 x264 的默认设置，因为不可混流的输出仍然无"
 "法很好处理更大的值"
 
-#: modules/codec/x264.c:385 modules/codec/x264.c:386
+#: modules/codec/x264.c:379 modules/codec/x264.c:380
 msgid "HRD-timing information"
 msgstr "HRD 计时信息"
 
-#: modules/codec/x264.c:388
+#: modules/codec/x264.c:382
 msgid ""
 "Tune the settings for a particular type of source or situation. Overridden "
 "by user settings."
 msgstr "根据特定类型源或情况调整设置。将被用户设置覆盖。"
 
-#: modules/codec/x264.c:390
+#: modules/codec/x264.c:384
 msgid "Use preset as default settings. Overridden by user settings."
 msgstr "使用预设作为默认设置。将被用户设置覆盖。"
 
-#: modules/codec/x264.c:395
+#: modules/codec/x264.c:389
 msgid "dia"
 msgstr "dia"
 
-#: modules/codec/x264.c:395
+#: modules/codec/x264.c:389
 msgid "hex"
 msgstr "hex"
 
-#: modules/codec/x264.c:395
+#: modules/codec/x264.c:389
 msgid "umh"
 msgstr "umh"
 
-#: modules/codec/x264.c:395
+#: modules/codec/x264.c:389
 msgid "esa"
 msgstr "esa"
 
-#: modules/codec/x264.c:395
+#: modules/codec/x264.c:389
 msgid "tesa"
 msgstr "tesa"
 
-#: modules/codec/x264.c:408
+#: modules/codec/x264.c:400
 msgid "fast"
 msgstr "快速"
 
-#: modules/codec/x264.c:408
+#: modules/codec/x264.c:400
 msgid "normal"
 msgstr "普通"
 
-#: modules/codec/x264.c:408
+#: modules/codec/x264.c:400
 msgid "slow"
 msgstr "慢"
 
-#: modules/codec/x264.c:408
+#: modules/codec/x264.c:400
 msgid "all"
 msgstr "全部"
 
-#: modules/codec/x264.c:413
+#: modules/codec/x264.c:405
 msgid "spatial"
 msgstr "三位"
 
-#: modules/codec/x264.c:413
+#: modules/codec/x264.c:405
 msgid "temporal"
 msgstr "临时"
 
-#: modules/codec/x264.c:413 modules/video_filter/mosaic.c:167
+#: modules/codec/x264.c:405 modules/video_filter/mosaic.c:167
 msgid "auto"
 msgstr "自动"
 
-#: modules/codec/x264.c:416
+#: modules/codec/x264.c:408
 msgid "H.264/MPEG4 AVC encoder (x264)"
 msgstr "H.264/MPEG4 AVC 编码器 (x264)"
 
@@ -12704,11 +12697,11 @@ msgstr ""
 
 #: modules/control/telnet.c:77 modules/gui/macosx/open.m:200
 #: modules/gui/macosx/open.m:202 modules/gui/macosx/output.m:147
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:146
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:198
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:243
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:293
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:386
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:156
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:215
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:260
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:310
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:404
 #: modules/stream_out/rtp.c:112
 msgid "Port"
 msgstr "端口"
@@ -12769,19 +12762,19 @@ msgstr "Ffmpeg 复用"
 msgid "Force use of ffmpeg muxer."
 msgstr "强制使用 ffmpeg 复用器。"
 
-#: modules/demux/avi/avi.c:49
+#: modules/demux/avi/avi.c:50
 msgid "Force interleaved method"
 msgstr "强制交错模式"
 
-#: modules/demux/avi/avi.c:50
+#: modules/demux/avi/avi.c:51
 msgid "Force interleaved method."
 msgstr "前置交错模式。"
 
-#: modules/demux/avi/avi.c:52
+#: modules/demux/avi/avi.c:53
 msgid "Force index creation"
 msgstr "强制创建缩影"
 
-#: modules/demux/avi/avi.c:54
+#: modules/demux/avi/avi.c:55
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
@@ -12789,27 +12782,27 @@ msgstr ""
 "为 AVI 文件创建一个缩影。如果您的 AVI 文件已损坏或不完整 (无法搜索) 请使用此"
 "功能。"
 
-#: modules/demux/avi/avi.c:62
+#: modules/demux/avi/avi.c:63
 msgid "Ask for action"
 msgstr "询问操作"
 
-#: modules/demux/avi/avi.c:63
+#: modules/demux/avi/avi.c:64
 msgid "Always fix"
 msgstr "总是修复"
 
-#: modules/demux/avi/avi.c:64
+#: modules/demux/avi/avi.c:65
 msgid "Never fix"
 msgstr "不修复"
 
-#: modules/demux/avi/avi.c:68
+#: modules/demux/avi/avi.c:69
 msgid "AVI demuxer"
 msgstr "AVI 去复用器"
 
-#: modules/demux/avi/avi.c:639
+#: modules/demux/avi/avi.c:648
 msgid "AVI Index"
 msgstr "AVI 缩影"
 
-#: modules/demux/avi/avi.c:640
+#: modules/demux/avi/avi.c:649
 msgid ""
 "This AVI file is broken. Seeking will not work correctly.\n"
 "Do you want to try to fix it?\n"
@@ -12821,15 +12814,15 @@ msgstr ""
 "\n"
 "这可能需要很长的时间。"
 
-#: modules/demux/avi/avi.c:643
+#: modules/demux/avi/avi.c:652
 msgid "Repair"
 msgstr "修复"
 
-#: modules/demux/avi/avi.c:643
+#: modules/demux/avi/avi.c:652
 msgid "Don't repair"
 msgstr "不修复"
 
-#: modules/demux/avi/avi.c:2336
+#: modules/demux/avi/avi.c:2352
 msgid "Fixing AVI Index..."
 msgstr "正在修复 AVI 索引..."
 
@@ -13185,11 +13178,11 @@ msgstr "环绕声等级"
 msgid "Surround delay (ms)"
 msgstr "环绕声延迟 (毫秒)"
 
-#: modules/demux/mp4/mp4.c:54
+#: modules/demux/mp4/mp4.c:55
 msgid "MP4 stream demuxer"
 msgstr "MP4 流去复用器"
 
-#: modules/demux/mp4/mp4.c:55
+#: modules/demux/mp4/mp4.c:56
 msgid "MP4"
 msgstr "MP4"
 
@@ -13491,10 +13484,10 @@ msgid ""
 "\", \"realtext\", \"dks\", \"subviewer1\",  and \"auto\" (meaning "
 "autodetection, this should always work)."
 msgstr ""
-"强制字幕格式。可用的值是 : \"microdvd\", \"subrip\", \"subviewer\", \"ssa1"
-"\", \"ssa2-4\", \"ass\", \"vplayer\", \"sami\", \"dvdsubtitle\", \"mpl2\", "
-"\"aqt\", \"pjs\", \"mpsub\", \"jacosub\", \"psb\", \"realtext\", \"dks\", "
-"\"subviewer1\",  和 \"auto\" (自动检测，此选项应该总是有效)。"
+"强制字幕格式。可用的值是 : \"microdvd\", \"subrip\", \"subviewer\", "
+"\"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\", \"sami\", \"dvdsubtitle\", "
+"\"mpl2\", \"aqt\", \"pjs\", \"mpsub\", \"jacosub\", \"psb\", \"realtext\", "
+"\"dks\", \"subviewer1\",  和 \"auto\" (自动检测，此选项应该总是有效)。"
 
 #: modules/demux/subtitle.c:62
 msgid "Override the default track description."
@@ -14764,10 +14757,10 @@ msgid "Protocol"
 msgstr "协议"
 
 #: modules/gui/macosx/open.m:211 modules/gui/macosx/output.m:146
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:197
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:292
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:339
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:385
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:214
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:309
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:356
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:403
 msgid "Address"
 msgstr "地址"
 
@@ -15229,7 +15222,7 @@ msgid "Not Set"
 msgstr "未设置"
 
 #: modules/gui/macosx/simple_prefs.m:180
-#: modules/gui/qt4/components/simple_preferences.cpp:521
+#: modules/gui/qt4/components/simple_preferences.cpp:523
 msgid "Interface Settings"
 msgstr "界面设置"
 
@@ -15246,7 +15239,7 @@ msgid "Subtitles & OSD"
 msgstr "字幕与 OSD"
 
 #: modules/gui/macosx/simple_prefs.m:192
-#: modules/gui/qt4/components/simple_preferences.cpp:620
+#: modules/gui/qt4/components/simple_preferences.cpp:622
 msgid "Subtitles & On Screen Display Settings"
 msgstr "字幕与屏幕显示设置"
 
@@ -15447,34 +15440,34 @@ msgstr "尚未执行检查。"
 
 #: modules/gui/macosx/simple_prefs.m:572 modules/gui/macosx/simple_prefs.m:616
 #: modules/gui/macosx/simple_prefs.m:1224
-#: modules/gui/qt4/components/simple_preferences.cpp:465
+#: modules/gui/qt4/components/simple_preferences.cpp:467
 msgid "Custom"
 msgstr "自定义"
 
 #: modules/gui/macosx/simple_prefs.m:572
-#: modules/gui/qt4/components/simple_preferences.cpp:466
+#: modules/gui/qt4/components/simple_preferences.cpp:468
 msgid "Lowest latency"
 msgstr "最低潜伏时间"
 
 #: modules/gui/macosx/simple_prefs.m:572
-#: modules/gui/qt4/components/simple_preferences.cpp:467
+#: modules/gui/qt4/components/simple_preferences.cpp:469
 msgid "Low latency"
 msgstr "低潜伏"
 
 #: modules/gui/macosx/simple_prefs.m:572
-#: modules/gui/qt4/components/simple_preferences.cpp:468
+#: modules/gui/qt4/components/simple_preferences.cpp:470
 #: modules/misc/freetype.c:120 modules/misc/quartztext.c:104
 #: modules/misc/win32text.c:81
 msgid "Normal"
 msgstr "普通"
 
 #: modules/gui/macosx/simple_prefs.m:573
-#: modules/gui/qt4/components/simple_preferences.cpp:469
+#: modules/gui/qt4/components/simple_preferences.cpp:471
 msgid "High latency"
 msgstr "高潜伏时间"
 
 #: modules/gui/macosx/simple_prefs.m:573
-#: modules/gui/qt4/components/simple_preferences.cpp:470
+#: modules/gui/qt4/components/simple_preferences.cpp:472
 msgid "Higher latency"
 msgstr "较高潜伏时间"
 
@@ -16596,29 +16589,29 @@ msgstr "单击设置点 B"
 msgid "Stop the A to B loop"
 msgstr "停止 A 到 B 循环"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1001
-#: modules/gui/qt4/components/extended_panels.cpp:1058
+#: modules/gui/qt4/components/extended_panels.cpp:998
+#: modules/gui/qt4/components/extended_panels.cpp:1055
 msgid "Preamp\n"
 msgstr "预放大\n"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1002
-#: modules/gui/qt4/components/extended_panels.cpp:1059
+#: modules/gui/qt4/components/extended_panels.cpp:999
+#: modules/gui/qt4/components/extended_panels.cpp:1056
 msgid "dB"
 msgstr "dB"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1140
+#: modules/gui/qt4/components/extended_panels.cpp:1137
 msgid "Enable spatializer"
 msgstr "开启空间化"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1281
+#: modules/gui/qt4/components/extended_panels.cpp:1278
 msgid "Audio/Video"
 msgstr "音频/视频"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1297
+#: modules/gui/qt4/components/extended_panels.cpp:1294
 msgid "Advance of audio over video:"
 msgstr "通过视频的高级音频:"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1306
+#: modules/gui/qt4/components/extended_panels.cpp:1303
 msgid ""
 "A positive value means that\n"
 "the audio is ahead of the video"
@@ -16626,15 +16619,15 @@ msgstr ""
 "一个积极值意味这\n"
 "音频在视频的头部"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1314
+#: modules/gui/qt4/components/extended_panels.cpp:1311
 msgid "Subtitles/Video"
 msgstr "字幕/视频"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1330
+#: modules/gui/qt4/components/extended_panels.cpp:1327
 msgid "Advance of subtitles over video:"
 msgstr "通过视频的高级字幕:"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1339
+#: modules/gui/qt4/components/extended_panels.cpp:1336
 msgid ""
 "A positive value means that\n"
 "the subtitles are ahead of the video"
@@ -16642,11 +16635,11 @@ msgstr ""
 "一个积极值意味这\n"
 "字幕在视频的头部"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1358
+#: modules/gui/qt4/components/extended_panels.cpp:1355
 msgid "Speed of the subtitles:"
 msgstr "字幕速度:"
 
-#: modules/gui/qt4/components/extended_panels.cpp:1391
+#: modules/gui/qt4/components/extended_panels.cpp:1388
 msgid "Force update of this dialog's values"
 msgstr "强制更新此对话框的值"
 
@@ -16744,11 +16737,11 @@ msgstr "已播放"
 msgid "buffers"
 msgstr "缓冲器"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:373
+#: modules/gui/qt4/components/interface_widgets.cpp:380
 msgid "Current visualization"
 msgstr "当前的可视化"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:412
+#: modules/gui/qt4/components/interface_widgets.cpp:419
 msgid ""
 "Current playback speed: %1\n"
 "Click to adjust"
@@ -16756,19 +16749,19 @@ msgstr ""
 "当前回放速度: %1\n"
 "点击调整"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:483
+#: modules/gui/qt4/components/interface_widgets.cpp:490
 msgid "Revert to normal play speed"
 msgstr "恢复普通播放速度"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:557
+#: modules/gui/qt4/components/interface_widgets.cpp:564
 msgid "Download cover art"
 msgstr "下载封面"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:599
+#: modules/gui/qt4/components/interface_widgets.cpp:606
 msgid "Click to toggle between elapsed and remaining time"
 msgstr "点击可在已用和剩余时间之间切换"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:601
+#: modules/gui/qt4/components/interface_widgets.cpp:608
 msgid "Double click to jump to a chosen time position"
 msgstr "双击跳到选定时间位置"
 
@@ -17015,38 +17008,38 @@ msgstr ""
 "将为 DVD、VCD 和 CDDA 设置不同的值。\n"
 "您可以在高级参数设置中定义个唯一的或单独的设置它们。"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:524
+#: modules/gui/qt4/components/simple_preferences.cpp:526
 msgid "This is VLC's skinnable interface. You can download other skins at"
 msgstr "这是 VLC 的外观化界面。您可以在此下载皮肤："
 
-#: modules/gui/qt4/components/simple_preferences.cpp:550
+#: modules/gui/qt4/components/simple_preferences.cpp:552
 msgid "System's default"
 msgstr "系统默认"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:648
+#: modules/gui/qt4/components/simple_preferences.cpp:650
 msgid "Configure Hotkeys"
 msgstr "设置热键"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:912
+#: modules/gui/qt4/components/simple_preferences.cpp:914
 #: modules/gui/qt4/dialogs_provider.hpp:51
 msgid "Audio Files"
 msgstr "音频文件"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:913
+#: modules/gui/qt4/components/simple_preferences.cpp:915
 #: modules/gui/qt4/dialogs_provider.hpp:46
 msgid "Video Files"
 msgstr "视频文件"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:914
+#: modules/gui/qt4/components/simple_preferences.cpp:916
 #: modules/gui/qt4/dialogs_provider.hpp:56
 msgid "Playlist Files"
 msgstr "播放列表文件"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:966
+#: modules/gui/qt4/components/simple_preferences.cpp:968
 msgid "&Apply"
 msgstr "应用(&A)"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:967
+#: modules/gui/qt4/components/simple_preferences.cpp:969
 #: modules/gui/qt4/dialogs/convert.cpp:96
 #: modules/gui/qt4/dialogs/gototime.cpp:49
 #: modules/gui/qt4/dialogs/help.cpp:206 modules/gui/qt4/dialogs/open.cpp:110
@@ -17110,55 +17103,55 @@ msgstr "此模块把转码后的串流写入一个文件中。"
 msgid "Filename"
 msgstr "文件名"
 
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:128
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:138
 #: modules/gui/qt4/dialogs/convert.cpp:111
 msgid "Save file..."
 msgstr "保存文件..."
 
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:129
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:139
 #: modules/gui/qt4/dialogs/convert.cpp:113
 msgid "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)"
 msgstr "容器 (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)"
 
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:141
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:151
 msgid "This module outputs the transcoded stream to a network via HTTP."
 msgstr "此模块可将一个转码后的串流通过 HTTP 协议输出到网络中。"
 
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:145
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:242
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:155
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:259
 msgid "Path"
 msgstr "路径"
 
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:193
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:210
 msgid ""
 "This module outputs the transcoded stream to a network  via the mms protocol."
 msgstr "此模块通过 mms 协议向网络输出转码生成的流。"
 
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:238
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:255
 msgid "This module outputs the transcoded stream to a network via RTSP."
 msgstr "此模块可将一个转码后的串流通过 RTSP 协议输出到网络中。"
 
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:288
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:305
 msgid "This module outputs the transcoded stream to a network via UDP."
 msgstr "此模块可将一个转码后的串流通过 UDP 协议输出到网络中。"
 
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:335
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:352
 msgid "This module outputs the transcoded stream to a network via RTP."
 msgstr "此模块可将一个转码后的串流通过 RTP 协议输出到网络中。"
 
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:340
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:357
 msgid "Base port"
 msgstr "基本端口"
 
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:381
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:399
 msgid "This module outputs the transcoded stream to an Icecast server."
 msgstr "此模块向 Icecast 服务器输出转码生成的流。"
 
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:402
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:420
 msgid "Mount Point"
 msgstr "安装点"
 
-#: modules/gui/qt4/components/sout/sout_widgets.cpp:403
+#: modules/gui/qt4/components/sout/sout_widgets.cpp:421
 msgid "Login:pass"
 msgstr "登录:密码"
 
@@ -19864,12 +19857,12 @@ msgid "Bonjour services"
 msgstr "Bonjour 服务"
 
 #: modules/services_discovery/mediadirs.c:71
-#: modules/services_discovery/mediadirs.c:372
+#: modules/services_discovery/mediadirs.c:368
 msgid "My Videos"
 msgstr "我的视频"
 
 #: modules/services_discovery/mediadirs.c:78
-#: modules/services_discovery/mediadirs.c:374
+#: modules/services_discovery/mediadirs.c:370
 msgid "My Music"
 msgstr "我的音乐"
 
@@ -19878,7 +19871,7 @@ msgid "Picture"
 msgstr "图片"
 
 #: modules/services_discovery/mediadirs.c:85
-#: modules/services_discovery/mediadirs.c:376
+#: modules/services_discovery/mediadirs.c:372
 msgid "My Pictures"
 msgstr "我的图片"
 
@@ -21489,11 +21482,11 @@ msgstr "频道 / 通道分配"
 #: modules/video_filter/atmo/atmo.cpp:317
 msgid ""
 "for devices with more than five channels / zones write down here for each "
-"channel the zone number to show and seperate the values with , or ; and use -"
-"1 to not use some channels. For the classic AtmoLight the sequence 4,3,1,0,2 "
-"would set the default channel/zone mapping. Having only two zones on top, "
-"and one zone on left and right and no summary zone the mapping for classic "
-"AtmoLight would be -1,3,2,1,0"
+"channel the zone number to show and seperate the values with , or ; and use "
+"-1 to not use some channels. For the classic AtmoLight the sequence "
+"4,3,1,0,2 would set the default channel/zone mapping. Having only two zones "
+"on top, and one zone on left and right and no summary zone the mapping for "
+"classic AtmoLight would be -1,3,2,1,0"
 msgstr ""
 "对于频道 / 通道多余五个的设备，在此写下各频道要显示的通道号并以 , 或 ; 分隔数"
 "值，使用 -1 禁用特定频道。对经典 AtmoLight 而言，序列 4,3,1,0,2 将设置成默认"
@@ -21664,59 +21657,59 @@ msgstr "音频直方图视频子滤镜"
 msgid "Audio Bar Graph Video"
 msgstr "音频直方图视频"
 
-#: modules/video_filter/ball.c:109
+#: modules/video_filter/ball.c:107
 msgid "Ball color"
 msgstr "球的颜色"
 
-#: modules/video_filter/ball.c:110
+#: modules/video_filter/ball.c:108
 msgid "Ball color, one of \"red\", \"blue\" and \"green\"."
 msgstr "球的颜色，可以是 \"red\", \"blue\" 和 \"green\" 中的一个。"
 
-#: modules/video_filter/ball.c:112
+#: modules/video_filter/ball.c:110
 msgid "Edge visible"
 msgstr "边界可见性"
 
-#: modules/video_filter/ball.c:113
+#: modules/video_filter/ball.c:111
 msgid "Set edge visibility."
 msgstr "设置边界可见度。"
 
-#: modules/video_filter/ball.c:115
+#: modules/video_filter/ball.c:113
 msgid "Ball speed"
 msgstr "球速"
 
-#: modules/video_filter/ball.c:116
+#: modules/video_filter/ball.c:114
 msgid ""
 "Set ball speed, the displacement value                                 in "
 "number of pixels by frame."
 msgstr "设置球速，位移值即每帧移动像素数。"
 
-#: modules/video_filter/ball.c:119
+#: modules/video_filter/ball.c:117
 msgid "Ball size"
 msgstr "球的尺寸"
 
-#: modules/video_filter/ball.c:120
+#: modules/video_filter/ball.c:118
 msgid ""
 "Set ball size giving its radius in number                                 of "
 "pixels"
 msgstr "设置球的尺寸，其半径的像素数"
 
-#: modules/video_filter/ball.c:123
+#: modules/video_filter/ball.c:121
 msgid "Gradient threshold"
 msgstr "梯度阀值"
 
-#: modules/video_filter/ball.c:124
+#: modules/video_filter/ball.c:122
 msgid "Set gradient threshold for edge computation."
 msgstr "设置边界计算的梯度阀值。"
 
-#: modules/video_filter/ball.c:126
+#: modules/video_filter/ball.c:124
 msgid "Augmented reality ball game"
 msgstr "增强现实球游戏"
 
-#: modules/video_filter/ball.c:135
+#: modules/video_filter/ball.c:133
 msgid "Ball video filter"
 msgstr "球视频滤镜"
 
-#: modules/video_filter/ball.c:136
+#: modules/video_filter/ball.c:134
 msgid "Ball"
 msgstr "球"
 
@@ -22294,62 +22287,52 @@ msgid "Gradient video filter"
 msgstr "高斯视频滤镜"
 
 #: modules/video_filter/gradfun.c:47
-#, fuzzy
 msgid "Radius"
-msgstr "dbus"
+msgstr "半径"
 
 #: modules/video_filter/gradfun.c:48
-#, fuzzy
 msgid "Radius in pixels"
-msgstr "以像素为单位的字体大小"
+msgstr "以像素为单位的半径大小"
 
 #: modules/video_filter/gradfun.c:52
-#, fuzzy
 msgid "Strength"
-msgstr "步长度"
+msgstr "强度"
 
 #: modules/video_filter/gradfun.c:53
 msgid "Strength used to modify the value of a pixel"
-msgstr ""
+msgstr "修改像素值所用的强度"
 
 #: modules/video_filter/gradfun.c:56
-#, fuzzy
 msgid "Gradfun video filter"
-msgstr "纹理视频滤镜"
+msgstr "Gradfun 视频滤镜"
 
 #: modules/video_filter/gradfun.c:57
-#, fuzzy
 msgid "Gradfun"
-msgstr "斜度"
+msgstr "Gradfun"
 
 #: modules/video_filter/grain.c:53
-#, fuzzy
 msgid "Variance"
-msgstr "催眠曲"
+msgstr "差量"
 
 #: modules/video_filter/grain.c:54
 msgid "Variance of the gaussian noise"
-msgstr ""
+msgstr "高斯噪点差量"
 
 #: modules/video_filter/grain.c:58
-#, fuzzy
 msgid "Minimal period"
-msgstr "最小视图(&N)"
+msgstr "最小周期"
 
 #: modules/video_filter/grain.c:59
-#, fuzzy
 msgid "Minimal period of the noise grain in pixel"
-msgstr "mosaic 的总计高度，以像素为单位。"
+msgstr "噪点颗粒的最小周期，以像素为单位。"
 
 #: modules/video_filter/grain.c:60
-#, fuzzy
 msgid "Maximal period"
-msgstr "最大位率"
+msgstr "最大周期"
 
 #: modules/video_filter/grain.c:61
-#, fuzzy
 msgid "Maximal period of the noise grain in pixel"
-msgstr "mosaic 的总计高度，以像素为单位。"
+msgstr "噪点颗粒的最大周期，以像素为单位。"
 
 #: modules/video_filter/grain.c:64
 msgid "Grain video filter"
@@ -22361,7 +22344,7 @@ msgstr "纹理"
 
 #: modules/video_filter/grain.c:66
 msgid "Adds filtered gaussian noise"
-msgstr ""
+msgstr "添加经过滤的高斯噪点"
 
 #: modules/video_filter/invert.c:50
 msgid "Invert video filter"
@@ -22465,13 +22448,13 @@ msgid ""
 "position (in %), $R = rate, $S = audio sample rate (in kHz), $T = time, $U = "
 "publisher, $V = volume, $_ = new line) "
 msgstr ""
-"用于显示的文本。(可用的格式字串为: 与时间有关的: %Y = 年, %m = 月, %d = 天, %"
-"H = 小时, %M = 分钟, %S = 秒, ... 与元数据有关: $a = 艺术家, $b = 专辑, $c = "
-"版权, $d = 描述, $e = 编码者, $g = 流派, $l = 语言, $n = 轨道号, $p = 正在播"
-"放, $r = 分级, $s = 字幕语言, $t = 标题, $u = url, $A = 日期, $B = 音频位率 "
-"(以 kb/s), $C = 章节,$D = 持续时间, $F = 带路径的完整名称, $I = 标题e, $L = "
-"剩余时间, $N = 名称, $O = 音频语言, $P = 位置 (以 %), $R = 分级, $S = 音频采"
-"样率 (以 kHz), $T = 时间, $U = 发布商, $V = 音量, $_ = 新行) "
+"用于显示的文本。(可用的格式字串为: 与时间有关的: %Y = 年, %m = 月, %d = 天, "
+"%H = 小时, %M = 分钟, %S = 秒, ... 与元数据有关: $a = 艺术家, $b = 专辑, $c "
+"= 版权, $d = 描述, $e = 编码者, $g = 流派, $l = 语言, $n = 轨道号, $p = 正在"
+"播放, $r = 分级, $s = 字幕语言, $t = 标题, $u = url, $A = 日期, $B = 音频位"
+"率 (以 kb/s), $C = 章节,$D = 持续时间, $F = 带路径的完整名称, $I = 标题e, $L "
+"= 剩余时间, $N = 名称, $O = 音频语言, $P = 位置 (以 %), $R = 分级, $S = 音频"
+"采样率 (以 kHz), $T = 时间, $U = 发布商, $V = 音量, $_ = 新行) "
 
 #: modules/video_filter/marq.c:104 modules/video_filter/rss.c:143
 msgid "X offset, from the left screen edge."
@@ -23971,13 +23954,13 @@ msgstr "无可用视频加速"
 #, c-format
 msgid ""
 "Your video output acceleration driver does not support the required "
-"resolution: %ux%u pixels. The maximum supported resolution is %<PRIu32>x%"
-"<PRIu32>.\n"
+"resolution: %ux%u pixels. The maximum supported resolution is %<PRIu32>x"
+"%<PRIu32>.\n"
 "Video output acceleration will be disabled. However, rendering videos with "
 "overly large resolution may cause severe performance degration."
 msgstr ""
-"您的视频输出加速驱动不支持所要求的分辨率: %ux%u 像素。支持的最大分辨率为 %"
-"<PRIu32>x%<PRIu32>。\n"
+"您的视频输出加速驱动不支持所要求的分辨率: %ux%u 像素。支持的最大分辨率为 "
+"%<PRIu32>x%<PRIu32>。\n"
 "将禁用视频输出加速。然而，渲染分辨率过大的视频将可能引起严重的性能下降。"
 
 #: modules/video_output/yuv.c:41
@@ -24221,6 +24204,13 @@ msgstr "可视化过滤器"
 #: modules/visualization/visual/visual.c:121
 msgid "Spectrum analyser"
 msgstr "光谱分析器"
+
+#~ msgid ""
+#~ "Allows B-frames to be used as references for predicting other frames. "
+#~ "Keeps the middle of 2+ consecutive B-frames as a reference, and reorders "
+#~ "frame appropriately."
+#~ msgstr ""
+#~ "允许 B 帧被用做参考预测其它帧。保持 2+ 连续 B 帧作为参考，并记录帧框架。"
 
 #~ msgid "Random On"
 #~ msgstr "随机开"
