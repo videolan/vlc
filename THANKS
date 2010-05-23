@@ -222,6 +222,7 @@ Mathias Kretschmer <mathias at research.att.com> - IP Multicast support
 Mats Rojestal <mats.rojestal at bredband dot net> - compilation fixes for Solaris 9
 Matthias P. Nowak <mpnowak at broadpark dot no> - ALSA 5.1 fix
 Matthieu Lochegnies <prof at tocard dot org> - MPEG audio emphasis fix
+Mattias Põldaru <mahfiaz gmail com> - Estonian translation
 Max Rudberg <max_08 at mac.com> - Mac OS X controller art (v0.7.0)
 Md. Rezwan Shahid <rezwan at ankur . org . bd> - Bengali translation
 Meelad Zakaria <meelad at farsiweb dot info> - Persian localisation
