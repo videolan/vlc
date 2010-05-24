@@ -322,7 +322,7 @@ void SoundSlider::paintEvent( QPaintEvent *e )
     painter.drawPixmap( boundsO, pixOutside, boundsO );
 
     painter.setPen( palette().color( QPalette::Active, QPalette::Mid ) );
-    QFont font; font.setPixelSize( 9 );
+    QFont font;
     painter.setFont( font );
     const QRect rect( 0, 0, 34, 15 );
     painter.drawText( rect, Qt::AlignRight | Qt::AlignVCenter,
