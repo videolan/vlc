@@ -383,6 +383,7 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
+    stream_Seek( p_demux->s, 0 ); // Workaround, but y4m uses stream_ReadLines
     free( p_sys );
     return VLC_EGENERIC;
 }
