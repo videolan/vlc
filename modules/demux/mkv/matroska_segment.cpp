@@ -88,13 +88,11 @@ matroska_segment_c::~matroska_segment_c()
 
 
 /*****************************************************************************
- * Tools
+ * Tools                                                                     *
+ *****************************************************************************
  *  * LoadCues : load the cues element and update index
- *
  *  * LoadTags : load ... the tags element
- *
  *  * InformationCreate : create all information, load tags if present
- *
  *****************************************************************************/
 void matroska_segment_c::LoadCues( KaxCues *cues )
 {
@@ -384,7 +382,7 @@ bool matroska_segment_c::CompareSegmentUIDs( const matroska_segment_c * p_item_a
     p_tmp = (EbmlBinary *)p_item_a->p_next_segment_uid;
     if ( !p_tmp )
         return false;
- 
+
     if ( p_item_b->p_segment_uid != NULL
           && *p_tmp == *p_item_b->p_segment_uid )
         return true;
@@ -725,7 +723,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
 int matroska_segment_c::BlockFindTrackIndex( size_t *pi_track,
                                              const KaxBlock *p_block, const KaxSimpleBlock *p_simpleblock )
 {
-    size_t          i_track;
+    size_t i_track;
 
     for( i_track = 0; i_track < tracks.size(); i_track++ )
     {
@@ -748,13 +746,11 @@ int matroska_segment_c::BlockFindTrackIndex( size_t *pi_track,
 
 bool matroska_segment_c::Select( mtime_t i_start_time )
 {
-    size_t i_track;
-
     /* add all es */
     msg_Dbg( &sys.demuxer, "found %d es", (int)tracks.size() );
     sys.b_pci_packet_set = false;
 
-    for( i_track = 0; i_track < tracks.size(); i_track++ )
+    for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
     {
         mkv_track_t *p_tk = tracks[i_track];
         es_format_t *p_fmt = &p_tk->fmt;
@@ -952,7 +948,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             static const unsigned int i_sample_rates[] =
             {
                     96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
-                        16000, 12000, 11025, 8000,  7350,  0,     0,     0
+                    16000, 12000, 11025,  8000,  7350,     0,     0,     0
             };
 
             p_tk->fmt.i_codec = VLC_CODEC_MP4A;
@@ -1069,6 +1065,13 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             p_tk->fmt.p_extra = xmalloc( p_tk->i_extra_data );
             memcpy( p_tk->fmt.p_extra,p_tk->p_extra_data, p_tk->i_extra_data );
         }
+        else if( !strcmp( p_tk->psz_codec, "A_REAL/14_4" ) )
+        {
+            p_fmt->i_codec = VLC_CODEC_RA_144;
+            p_fmt->audio.i_channels = 1;
+            p_fmt->audio.i_rate = 8000;
+            p_fmt->audio.i_blockalign = 0x14;
+        }
         /* disabled due to the potential "S_KATE" namespace issue */
         else if( !strcmp( p_tk->psz_codec, "S_KATE" ) )
         {
@@ -1167,13 +1170,6 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         {
             p_tk->fmt.i_cat = NAV_ES;
             continue;
-        }
-        else if( !strcmp( p_tk->psz_codec, "A_REAL/14_4" ) )
-        {
-            p_fmt->i_codec = VLC_CODEC_RA_144;
-            p_fmt->audio.i_channels = 1;
-            p_fmt->audio.i_rate = 8000;
-            p_fmt->audio.i_blockalign = 0x14;
         }
         else
         {
