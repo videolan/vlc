@@ -196,13 +196,22 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
     msg_Dbg( &sys.demuxer, "|   - loading cues done." );
 }
 
+
+#define PARSE_TAG( type ) \
+    do { \
+    msg_Dbg( &sys.demuxer, "|   + " type ); \
+    ep->Down();                             \
+    while( ( el = ep->Get() ) != NULL )     \
+    {                                       \
+        msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid( *el ).name() ); \
+    }                                      \
+    ep->Up(); } while( 0 )
+
 void matroska_segment_c::LoadTags( KaxTags *tags )
 {
-    EbmlParser  *ep;
-    EbmlElement *el;
-
     /* Master elements */
-    ep = new EbmlParser( &es, tags, &sys.demuxer );
+    EbmlParser *ep = new EbmlParser( &es, tags, &sys.demuxer );
+    EbmlElement *el;
 
     while( ( el = ep->Get() ) != NULL )
     {
@@ -213,55 +222,15 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
             while( ( el = ep->Get() ) != NULL )
             {
                 if( MKV_IS_ID( el, KaxTagTargets ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   + Targets" );
-                    ep->Down();
-                    while( ( el = ep->Get() ) != NULL )
-                    {
-                        msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid( *el ).name() );
-                    }
-                    ep->Up();
-                }
+                    PARSE_TAG( "Targets" );
                 else if( MKV_IS_ID( el, KaxTagGeneral ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   + General" );
-                    ep->Down();
-                    while( ( el = ep->Get() ) != NULL )
-                    {
-                        msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid( *el ).name() );
-                    }
-                    ep->Up();
-                }
+                    PARSE_TAG( "General" );
                 else if( MKV_IS_ID( el, KaxTagGenres ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   + Genres" );
-                    ep->Down();
-                    while( ( el = ep->Get() ) != NULL )
-                    {
-                        msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid( *el ).name() );
-                    }
-                    ep->Up();
-                }
+                    PARSE_TAG( "Genres" );
                 else if( MKV_IS_ID( el, KaxTagAudioSpecific ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   + Audio Specific" );
-                    ep->Down();
-                    while( ( el = ep->Get() ) != NULL )
-                    {
-                        msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid( *el ).name() );
-                    }
-                    ep->Up();
-                }
+                    PARSE_TAG( "Audio Specific" );
                 else if( MKV_IS_ID( el, KaxTagImageSpecific ) )
-                {
-                    msg_Dbg( &sys.demuxer, "|   + Images Specific" );
-                    ep->Down();
-                    while( ( el = ep->Get() ) != NULL )
-                    {
-                        msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid( *el ).name() );
-                    }
-                    ep->Up();
-                }
+                    PARSE_TAG( "Images Specific" );
                 else if( MKV_IS_ID( el, KaxTagMultiComment ) )
                 {
                     msg_Dbg( &sys.demuxer, "|   + Multi Comment" );
@@ -306,6 +275,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
 
     msg_Dbg( &sys.demuxer, "loading tags done." );
 }
+#undef PARSE_TAG
 
 /*****************************************************************************
  * InformationCreate:
