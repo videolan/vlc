@@ -744,6 +744,13 @@ int matroska_segment_c::BlockFindTrackIndex( size_t *pi_track,
     return VLC_SUCCESS;
 }
 
+static inline void fill_extra_data( mkv_track_t *p_tk )
+{
+      p_tk->fmt.i_extra = p_tk->i_extra_data;
+      p_tk->fmt.p_extra = xmalloc( p_tk->i_extra_data );
+      memcpy( p_tk->fmt.p_extra, p_tk->p_extra_data, p_tk->i_extra_data );
+}
+
 bool matroska_segment_c::Select( mtime_t i_start_time )
 {
     /* add all es */
@@ -794,9 +801,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         else if( !strncmp( p_tk->psz_codec, "V_THEORA", 8 ) )
         {
             p_tk->fmt.i_codec = VLC_CODEC_THEORA;
-            p_tk->fmt.i_extra = p_tk->i_extra_data;
-            p_tk->fmt.p_extra = xmalloc( p_tk->i_extra_data );
-            memcpy( p_tk->fmt.p_extra,p_tk->p_extra_data, p_tk->i_extra_data );
+            fill_extra_data( p_tk );
             p_tk->b_pts_only = true;
         }
         else if( !strncmp( p_tk->psz_codec, "V_REAL/RV", 9 ) )
@@ -843,9 +848,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                     p_tk->fmt.i_codec = VLC_FOURCC( 'a', 'v', 'c', '1' );
                 else
                     p_tk->fmt.i_codec = VLC_CODEC_MP4V;
-                p_tk->fmt.i_extra = p_tk->i_extra_data;
-                p_tk->fmt.p_extra = xmalloc( p_tk->i_extra_data );
-                memcpy( p_tk->fmt.p_extra,p_tk->p_extra_data, p_tk->i_extra_data );
+                fill_extra_data( p_tk );
             }
         }
         else if( !strcmp( p_tk->psz_codec, "V_QUICKTIME" ) )
@@ -930,16 +933,12 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         else if( !strcmp( p_tk->psz_codec, "A_FLAC" ) )
         {
             p_tk->fmt.i_codec = VLC_CODEC_FLAC;
-            p_tk->fmt.i_extra = p_tk->i_extra_data;
-            p_tk->fmt.p_extra = xmalloc( p_tk->i_extra_data );
-            memcpy( p_tk->fmt.p_extra,p_tk->p_extra_data, p_tk->i_extra_data );
+            fill_extra_data( p_tk );
         }
         else if( !strcmp( p_tk->psz_codec, "A_VORBIS" ) )
         {
             p_tk->fmt.i_codec = VLC_CODEC_VORBIS;
-            p_tk->fmt.i_extra = p_tk->i_extra_data;
-            p_tk->fmt.p_extra = xmalloc( p_tk->i_extra_data );
-            memcpy( p_tk->fmt.p_extra,p_tk->p_extra_data, p_tk->i_extra_data );
+            fill_extra_data( p_tk );
         }
         else if( !strncmp( p_tk->psz_codec, "A_AAC/MPEG2/", strlen( "A_AAC/MPEG2/" ) ) ||
                  !strncmp( p_tk->psz_codec, "A_AAC/MPEG4/", strlen( "A_AAC/MPEG4/" ) ) )
@@ -1004,25 +1003,19 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         else if( !strcmp( p_tk->psz_codec, "A_AAC" ) )
         {
             p_tk->fmt.i_codec = VLC_CODEC_MP4A;
-            p_tk->fmt.i_extra = p_tk->i_extra_data;
-            p_tk->fmt.p_extra = xmalloc( p_tk->i_extra_data );
-            memcpy( p_tk->fmt.p_extra, p_tk->p_extra_data, p_tk->i_extra_data );
+            fill_extra_data( p_tk );
         }
         else if( !strcmp( p_tk->psz_codec, "A_WAVPACK4" ) )
         {
             p_tk->fmt.i_codec = VLC_CODEC_WAVPACK;
-            p_tk->fmt.i_extra = p_tk->i_extra_data;
-            p_tk->fmt.p_extra = xmalloc( p_tk->i_extra_data );
-            memcpy( p_tk->fmt.p_extra, p_tk->p_extra_data, p_tk->i_extra_data );
+            fill_extra_data( p_tk );
         }
         else if( !strcmp( p_tk->psz_codec, "A_TTA1" ) )
         {
             p_fmt->i_codec = VLC_CODEC_TTA;
-            p_fmt->i_extra = p_tk->i_extra_data;
-            if( p_fmt->i_extra > 0 )
+            if( p_tk->i_extra_data > 0 )
             {
-                p_fmt->p_extra = xmalloc( p_tk->i_extra_data );
-                memcpy( p_fmt->p_extra, p_tk->p_extra_data, p_tk->i_extra_data );
+                fill_extra_data( p_tk );
             }
             else
             {
@@ -1061,9 +1054,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             else if( !strcmp( p_tk->psz_codec, "A_REAL/28_8" ) )
                 p_tk->fmt.i_codec = VLC_CODEC_RA_288;
             /* FIXME 14_4, RALF and SIPR */
-            p_tk->fmt.i_extra = p_tk->i_extra_data;
-            p_tk->fmt.p_extra = xmalloc( p_tk->i_extra_data );
-            memcpy( p_tk->fmt.p_extra,p_tk->p_extra_data, p_tk->i_extra_data );
+            fill_extra_data( p_tk );
         }
         else if( !strcmp( p_tk->psz_codec, "A_REAL/14_4" ) )
         {
@@ -1081,9 +1072,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             p_tk->fmt.i_codec = VLC_CODEC_KATE;
             p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
 
-            p_tk->fmt.i_extra = p_tk->i_extra_data;
-            p_tk->fmt.p_extra = xmalloc( p_tk->i_extra_data );
-            memcpy( p_tk->fmt.p_extra,p_tk->p_extra_data, p_tk->i_extra_data );
+            fill_extra_data( p_tk );
         }
         else if( !strcmp( p_tk->psz_codec, "S_TEXT/ASCII" ) )
         {
@@ -1101,9 +1090,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
             if( p_tk->i_extra_data )
             {
-                p_tk->fmt.i_extra = p_tk->i_extra_data;
-                p_tk->fmt.p_extra = xmalloc( p_tk->i_extra_data );
-                memcpy( p_tk->fmt.p_extra, p_tk->p_extra_data, p_tk->i_extra_data );
+                fill_extra_data( p_tk );
             }
         }
         else if( !strcmp( p_tk->psz_codec, "S_TEXT/SSA" ) ||
@@ -1115,9 +1102,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
             if( p_tk->i_extra_data )
             {
-                p_tk->fmt.i_extra = p_tk->i_extra_data;
-                p_tk->fmt.p_extra = xmalloc( p_tk->i_extra_data );
-                memcpy( p_tk->fmt.p_extra, p_tk->p_extra_data, p_tk->i_extra_data );
+                fill_extra_data( p_tk );
             }
         }
         else if( !strcmp( p_tk->psz_codec, "S_VOBSUB" ) )
