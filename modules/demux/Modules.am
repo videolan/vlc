@@ -31,6 +31,7 @@ SOURCES_vc1 = vc1.c
 SOURCES_demux_cdg = cdg.c
 SOURCES_smf = smf.c
 SOURCES_dirac = dirac.c
+SOURCES_image = image.c
 
 libvlc_LTLIBRARIES += \
 	libaiff_plugin.la \
@@ -58,6 +59,7 @@ libvlc_LTLIBRARIES += \
 	libvoc_plugin.la \
 	libwav_plugin.la \
 	libxa_plugin.la \
+	libimage_plugin.la \
 	$(NULL)
 
 BUILT_SOURCES += dummy.cpp
