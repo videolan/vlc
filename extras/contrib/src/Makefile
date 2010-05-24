@@ -1213,6 +1213,7 @@ ifdef SVN
 libdvdnav:
 	$(SVN) co $(LIBDVDNAV_SVN)  libdvdnav
 	patch -d libdvdnav -p0 < Patches/libdvdnav.patch
+	patch -d libdvdnav -p0 < Patches/libdvdnav-resolution.patch
 	(cd $@; ./autogen.sh noconfig)
 else
 libdvdnav-$(LIBDVDNAV_VERSION).tar.gz:

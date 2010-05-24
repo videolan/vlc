@@ -1,0 +1,80 @@
+Index: src/dvdnav/dvdnav.h
+===================================================================
+--- src/dvdnav/dvdnav.h	(revision 1191)
++++ src/dvdnav/dvdnav.h	(working copy)
+@@ -553,6 +553,11 @@
+ uint8_t dvdnav_get_video_aspect(dvdnav_t *self);
+ 
+ /*
++ * Get video resolution.
++ */
++int dvdnav_get_video_resolution(dvdnav_t *self, uint32_t *width, uint32_t *height);
++
++/*
+  * Get video scaling permissions.
+  * The scaling permission does only change on VTS boundaries.
+  * See the DVDNAV_VTS_CHANGE event.
+Index: src/vm/vm.c
+===================================================================
+--- src/vm/vm.c	(revision 1191)
++++ src/vm/vm.c	(working copy)
+@@ -858,8 +858,8 @@
+     break;
+   }
+ }
++#endif
+ 
+-/* currently unused */
+ void vm_get_video_res(vm_t *vm, int *width, int *height) {
+   video_attr_t attr = vm_get_video_attr(vm);
+ 
+@@ -883,7 +883,6 @@
+     break;
+   }
+ }
+-#endif
+ 
+ int vm_get_video_aspect(vm_t *vm) {
+   int aspect = vm_get_video_attr(vm).display_aspect_ratio;
+Index: src/vm/vm.h
+===================================================================
+--- src/vm/vm.h	(revision 1191)
++++ src/vm/vm.h	(working copy)
+@@ -159,8 +159,8 @@
+ /* currently unused */
+ void vm_get_audio_info(vm_t *vm, int *current, int *num_avail);
+ void vm_get_subp_info(vm_t *vm, int *current, int *num_avail);
++#endif
+ void vm_get_video_res(vm_t *vm, int *width, int *height);
+-#endif
+ int  vm_get_video_aspect(vm_t *vm);
+ int  vm_get_video_scale_permission(vm_t *vm);
+ video_attr_t vm_get_video_attr(vm_t *vm);
+Index: src/dvdnav.c
+===================================================================
+--- src/dvdnav.c	(revision 1191)
++++ src/dvdnav.c	(working copy)
+@@ -844,7 +844,23 @@
+ 
+   return retval;
+ }
++int dvdnav_get_video_resolution(dvdnav_t *this, uint32_t *width, uint32_t *height) {
++  int w, h;
+ 
++  if(!this->started) {
++    printerr("Virtual DVD machine not started.");
++    return -1;
++  }
++
++  pthread_mutex_lock(&this->vm_lock);
++  vm_get_video_res(this->vm, &w, &h);
++  pthread_mutex_unlock(&this->vm_lock);
++  
++  *width  = w;
++  *height = h;
++  return 0;
++}
++
+ uint8_t dvdnav_get_video_scale_permission(dvdnav_t *this) {
+   uint8_t         retval;
+ 
