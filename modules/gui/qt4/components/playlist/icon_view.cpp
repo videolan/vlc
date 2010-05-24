@@ -160,7 +160,6 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
         painter->setPen( option.palette.color( QPalette::HighlightedText ) );
 
     QFont font( index.data( Qt::FontRole ).value<QFont>() );
-    font.setPointSize( 7 );
 
     //Draw children indicator
     if( !index.data( PLModel::IsLeafNodeRole ).toBool() )
@@ -206,8 +205,7 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
 QSize PlIconViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-    QFont f;
-    f.setPointSize( 7 );
+    QFont f( index.data( Qt::FontRole ).value<QFont>() );
     f.setBold( true );
     QFontMetrics fm( f );
     int textHeight = fm.height();
