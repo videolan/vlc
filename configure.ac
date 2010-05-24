@@ -1932,6 +1932,9 @@ then
     VLC_ADD_PLUGIN([dvdnav])
     VLC_ADD_CFLAGS([dvdnav],[`${DVDNAV_CONFIG} --cflags`])
     VLC_ADD_LIBS([dvdnav],[`${DVDNAV_CONFIG} --libs`])
+    AC_CHECK_LIB(dvdnav, dvdnav_get_video_resolution,
+		AC_DEFINE(HAVE_DVDNAV_GET_VIDEO_RESOLUTION, 1, [Define if you have dvdnav_get_video_resolution.]),
+		[], [${LIBS_dvdnav}])
   fi
 fi
 

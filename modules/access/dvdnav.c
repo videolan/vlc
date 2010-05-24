@@ -138,6 +138,12 @@ struct demux_sys_t
     uint8_t  palette[4][4];
     bool b_spu_change;
 
+    /* Aspect ration */
+    struct {
+        unsigned i_num;
+        unsigned i_den;
+    } sar;
+
     /* */
     int           i_title;
     input_title_t **title;
@@ -231,6 +237,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_reset_pcr = false;
 
     ps_track_init( p_sys->tk );
+    p_sys->sar.i_num = 0;
+    p_sys->sar.i_den = 0;
     p_sys->i_mux_rate = 0;
     p_sys->i_pgc_length = 0;
     p_sys->b_spu_change = false;
@@ -744,6 +752,28 @@ static int Demux( demux_t *p_demux )
             tk->b_seen = false;
         }
 
+#if defined(HAVE_DVDNAV_GET_VIDEO_RESOLUTION)
+        uint32_t i_width, i_height;
+        if( dvdnav_get_video_resolution( p_sys->dvdnav,
+                                         &i_width, &i_height ) )
+            i_width = i_height = 0;
+        switch( dvdnav_get_video_aspect( p_sys->dvdnav ) )
+        {
+        case 0:
+            p_sys->sar.i_num = 4 * i_height;
+            p_sys->sar.i_den = 3 * i_width;
+            break;
+        case 3:
+            p_sys->sar.i_num = 16 * i_height;
+            p_sys->sar.i_den =  9 * i_width;
+            break;
+        default:
+            p_sys->sar.i_num = 0;
+            p_sys->sar.i_den = 0;
+            break;
+        }
+#endif
+
         if( dvdnav_current_title_info( p_sys->dvdnav, &i_title,
                                        &i_part ) == DVDNAV_STATUS_OK )
         {
@@ -1217,6 +1247,8 @@ static void ESNew( demux_t *p_demux, int i_id )
     /* Add a new ES */
     if( tk->fmt.i_cat == VIDEO_ES )
     {
+        tk->fmt.video.i_sar_num = p_sys->sar.i_num;
+        tk->fmt.video.i_sar_den = p_sys->sar.i_den;
         b_select = true;
     }
     else if( tk->fmt.i_cat == AUDIO_ES )
