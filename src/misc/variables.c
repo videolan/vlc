@@ -36,6 +36,8 @@
 
 #include <search.h>
 #include <assert.h>
+#include <math.h>
+#include <limits.h>
 
 /*****************************************************************************
  * Private types
@@ -1341,6 +1343,57 @@ int var_Inherit( vlc_object_t *p_this, const char *psz_name, int i_type,
     return VLC_SUCCESS;
 }
 
+
+/**
+ * It inherits a string as an unsigned rational number (it also accepts basic
+ * float number).
+ *
+ * It returns an error if the rational number cannot be parsed (0/0 is valid).
+ * The rational is already reduced.
+ */
+int (var_InheritURational)(vlc_object_t *object,
+                           unsigned *num, unsigned *den,
+                           const char *var)
+{
+    /* */
+    *num = 0;
+    *den = 0;
+
+    /* */
+    char *tmp = var_InheritString(object, var);
+    if (!tmp)
+        goto error;
+
+    char *next;
+    unsigned n = strtol(tmp,  &next, 0);
+    unsigned d = strtol(*next ? &next[1] : "0", NULL, 0);
+
+    if (*next == '.') {
+        /* Interpret as a float number */
+        double r = us_atof(tmp);
+        double c = ceil(r);
+        if (c >= UINT_MAX)
+            goto error;
+        unsigned m = c;
+        if (m > 0) {
+            d = UINT_MAX / m;
+            n = r * d;
+        } else {
+            n = 0;
+            d = 0;
+        }
+    }
+
+    if (n > 0 && d > 0)
+        vlc_ureduce(num, den, n, d, 0);
+
+    free(tmp);
+    return VLC_SUCCESS;
+
+error:
+    free(tmp);
+    return VLC_EGENERIC;
+}
 
 /**********************************************************************
  * Trigger the callbacks.

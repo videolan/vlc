@@ -224,10 +224,6 @@ typedef struct {
 } imem_sys_t;
 
 static void ParseMRL(vlc_object_t *, const char *);
-#define var_InheritRational(a,b,c,d) var_InheritRational(VLC_OBJECT(a),b,c,d)
-static int (var_InheritRational)(vlc_object_t *,
-                                 unsigned *num, unsigned *den,
-                                 const char *var);
 
 /**
  * It closes the common part of the access and access_demux
@@ -440,13 +436,13 @@ static int OpenDemux(vlc_object_t *object)
         fmt.video.i_width  = var_InheritInteger(object, "imem-width");
         fmt.video.i_height = var_InheritInteger(object, "imem-height");
         unsigned num, den;
-        if (!var_InheritRational(object, &num, &den, "imem-dar") && num > 0 && den > 0) {
+        if (!var_InheritURational(object, &num, &den, "imem-dar") && num > 0 && den > 0) {
             if (fmt.video.i_width > 0 && fmt.video.i_height > 0) {
                 fmt.video.i_sar_num = num * fmt.video.i_height;
                 fmt.video.i_sar_den = den * fmt.video.i_width;
             }
         }
-        if (!var_InheritRational(object, &num, &den, "imem-fps") && num > 0 && den > 0) {
+        if (!var_InheritURational(object, &num, &den, "imem-fps") && num > 0 && den > 0) {
             fmt.video.i_frame_rate      = num;
             fmt.video.i_frame_rate_base = den;
         }
@@ -608,55 +604,6 @@ static int Demux(demux_t *demux)
     }
     sys->deadline = VLC_TS_INVALID;
     return 1;
-}
-
-/**
- * It parses a rational number (it also accepts basic float number).
- *
- * It returns an error if the rational number cannot be parsed (0/0 is valid).
- */
-static int (var_InheritRational)(vlc_object_t *object,
-                                 unsigned *num, unsigned *den,
-                                 const char *var)
-{
-    /* */
-    *num = 0;
-    *den = 0;
-
-    /* */
-    char *tmp = var_InheritString(object, var);
-    if (!tmp)
-        goto error;
-
-    char *next;
-    unsigned n = strtol(tmp,  &next, 0);
-    unsigned d = strtol(*next ? &next[1] : "0", NULL, 0);
-
-    if (*next == '.') {
-        /* Interpret as a float number */
-        double r = us_atof(tmp);
-        double c = ceil(r);
-        if (c >= UINT_MAX)
-            goto error;
-        unsigned m = c;
-        if (m > 0) {
-            d = UINT_MAX / m;
-            n = r * d;
-        } else {
-            n = 0;
-            d = 0;
-        }
-    }
-
-    if (n > 0 && d > 0)
-        vlc_ureduce(num, den, n, d, 0);
-
-    free(tmp);
-    return VLC_SUCCESS;
-
-error:
-    free(tmp);
-    return VLC_EGENERIC;
 }
 
 /**

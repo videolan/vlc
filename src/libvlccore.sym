@@ -465,6 +465,7 @@ var_SetChecked
 var_TriggerCallback
 var_Type
 var_Inherit
+var_InheritURational
 video_format_FixRgb
 video_format_IsSimilar
 video_format_Setup
