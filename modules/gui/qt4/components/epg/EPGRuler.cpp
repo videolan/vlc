@@ -88,7 +88,6 @@ void EPGRuler::paintEvent( QPaintEvent *event )
 
     for ( ; itemsToDraw >= 0; --itemsToDraw )
     {
-        p.setFont( QFont( "Verdana", 8 ) );
         p.drawLine( posx, 15, posx, 30 );
         p.drawText( posx + 1, 12, 50, 15, Qt::AlignLeft, current.toString( "hh'h'" ) );
         posx += spacing;
