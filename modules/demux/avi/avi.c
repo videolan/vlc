@@ -589,7 +589,10 @@ static int Open( vlc_object_t * p_this )
         if( tk->p_out_muxed == NULL )
             tk->p_es = es_out_Add( p_demux->out, &fmt );
         TAB_APPEND( p_sys->i_track, p_sys->track, tk );
-        es_format_Clean( &fmt );
+        if(!p_sys->b_muxed )
+        {
+            es_format_Clean( &fmt );
+        }
     }
 
     if( p_sys->i_track <= 0 )
