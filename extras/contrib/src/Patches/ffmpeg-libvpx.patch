@@ -1033,10 +1033,33 @@ Index: ffpresets/libvpx-720p.ffpreset
 +altref=1
 +maxrate=24M
 +minrate=100k
-Index: libavformat/matroskaenc.c
+Index: libavformat/Makefile
 ===================================================================
---- libavformat/matroskaenc.c	(revision 23210)
-+++ libavformat/matroskaenc.c	(working copy)
+--- libavformat/Makefile	(revision 23210)
++++ libavformat/Makefile	(working copy)
+@@ -255,6 +255,8 @@ OBJS-$(CONFIG_W64_DEMUXER)              
+ OBJS-$(CONFIG_WAV_DEMUXER)               += wav.o riff.o raw.o
+ OBJS-$(CONFIG_WAV_MUXER)                 += wav.o riff.o
+ OBJS-$(CONFIG_WC3_DEMUXER)               += wc3movie.o
++OBJS-$(CONFIG_WEBM_MUXER)                += matroskaenc.o matroska.o \
++                                            riff.o
+ OBJS-$(CONFIG_WSAUD_DEMUXER)             += westwood.o
+ OBJS-$(CONFIG_WSVQA_DEMUXER)             += westwood.o
+ OBJS-$(CONFIG_WV_DEMUXER)                += wv.o apetag.o id3v1.o
+Index: libavformat/allformats.c
+===================================================================
+--- libavformat/allformats.c	(revision 23210)
++++ libavformat/allformats.c	(working copy)
+@@ -203,6 +203,7 @@ void av_register_all(void)
+     REGISTER_DEMUXER  (W64, w64);
+     REGISTER_MUXDEMUX (WAV, wav);
+     REGISTER_DEMUXER  (WC3, wc3);
++    REGISTER_MUXER    (WEBM, webm);
+     REGISTER_DEMUXER  (WSAUD, wsaud);
+     REGISTER_DEMUXER  (WSVQA, wsvqa);
+     REGISTER_DEMUXER  (WV, wv);
+--- libavformat/matroskaenc.c.orig	2010-05-24 23:47:39.000000000 +0200
++++ libavformat/matroskaenc.c	2010-05-24 23:49:11.000000000 +0200
 @@ -20,15 +20,21 @@
   */
  
@@ -1059,7 +1082,7 @@ Index: libavformat/matroskaenc.c
  
  typedef struct ebml_master {
      int64_t         pos;                ///< absolute offset in the file where the master's elements start
-@@ -81,6 +87,12 @@ typedef struct MatroskaMuxContext {
+@@ -81,6 +87,12 @@
      mkv_track       *tracks;
  
      struct AVMD5    *md5_ctx;
@@ -1072,7 +1095,7 @@ Index: libavformat/matroskaenc.c
  } MatroskaMuxContext;
  
  
-@@ -429,6 +441,7 @@ static int put_xiph_codecpriv(AVFormatCo
+@@ -429,6 +441,7 @@
      return 0;
  }
  
@@ -1080,7 +1103,7 @@ Index: libavformat/matroskaenc.c
  static void get_aac_sample_rates(AVFormatContext *s, AVCodecContext *codec, int *sample_rate, int *output_sample_rate)
  {
      int sri;
-@@ -455,6 +468,7 @@ static void get_aac_sample_rates(AVForma
+@@ -455,6 +468,7 @@
          *output_sample_rate = ff_mpeg4audio_sample_rates[sri];
      }
  }
@@ -1088,7 +1111,7 @@ Index: libavformat/matroskaenc.c
  
  static int mkv_write_codecprivate(AVFormatContext *s, ByteIOContext *pb, AVCodecContext *codec, int native_id, int qt_id)
  {
-@@ -469,12 +483,15 @@ static int mkv_write_codecprivate(AVForm
+@@ -469,12 +483,15 @@
      if (native_id) {
          if (codec->codec_id == CODEC_ID_VORBIS || codec->codec_id == CODEC_ID_THEORA)
              ret = put_xiph_codecpriv(s, dyn_cp, codec);
@@ -1104,7 +1127,7 @@ Index: libavformat/matroskaenc.c
      } else if (codec->codec_type == AVMEDIA_TYPE_VIDEO) {
          if (qt_id) {
              if (!codec->codec_tag)
-@@ -503,6 +520,7 @@ static int mkv_write_codecprivate(AVForm
+@@ -503,6 +520,7 @@
              codec->codec_tag = tag;
  
          ff_put_wav_header(dyn_cp, codec);
@@ -1112,7 +1135,7 @@ Index: libavformat/matroskaenc.c
      }
  
      codecpriv_size = url_close_dyn_buf(dyn_cp, &codecpriv);
-@@ -537,8 +555,10 @@ static int mkv_write_tracks(AVFormatCont
+@@ -537,8 +555,10 @@
          if (!bit_depth)
              bit_depth = av_get_bits_per_sample_format(codec->sample_fmt);
  
@@ -1123,7 +1146,7 @@ Index: libavformat/matroskaenc.c
  
          track = start_ebml_master(pb, MATROSKA_ID_TRACKENTRY, 0);
          put_ebml_uint (pb, MATROSKA_ID_TRACKNUMBER     , i + 1);
-@@ -566,8 +586,16 @@ static int mkv_write_tracks(AVFormatCont
+@@ -565,9 +585,18 @@
  
          switch (codec->codec_type) {
              case AVMEDIA_TYPE_VIDEO:
@@ -1134,13 +1157,15 @@ Index: libavformat/matroskaenc.c
 +                    return -1;
 +                }
 +#endif
++
                  put_ebml_uint(pb, MATROSKA_ID_TRACKTYPE, MATROSKA_TRACK_TYPE_VIDEO);
+                 put_ebml_uint(pb, MATROSKA_ID_TRACKDEFAULTDURATION, av_q2d(codec->time_base)*1E9);
  
 +#if CONFIG_MATROSKA_MUXER
                  if (!native_id &&
                        ff_codec_get_tag(codec_movvideo_tags, codec->codec_id) &&
                      (!ff_codec_get_tag(ff_codec_bmp_tags,   codec->codec_id)
-@@ -583,7 +611,7 @@ static int mkv_write_tracks(AVFormatCont
+@@ -583,7 +612,7 @@
                      put_ebml_string(pb, MATROSKA_ID_CODECID, "V_MS/VFW/FOURCC");
                      mkv->tracks[i].write_dts = 1;
                  }
@@ -1149,7 +1174,7 @@ Index: libavformat/matroskaenc.c
                  subinfo = start_ebml_master(pb, MATROSKA_ID_TRACKVIDEO, 0);
                  // XXX: interlace flag?
                  put_ebml_uint (pb, MATROSKA_ID_VIDEOPIXELWIDTH , codec->width);
-@@ -597,6 +625,13 @@ static int mkv_write_tracks(AVFormatCont
+@@ -597,6 +626,13 @@
                  break;
  
              case AVMEDIA_TYPE_AUDIO:
@@ -1163,7 +1188,7 @@ Index: libavformat/matroskaenc.c
                  put_ebml_uint(pb, MATROSKA_ID_TRACKTYPE, MATROSKA_TRACK_TYPE_AUDIO);
  
                  if (!native_id)
-@@ -693,7 +728,7 @@ static int mkv_write_header(AVFormatCont
+@@ -693,7 +729,7 @@
      put_ebml_uint   (pb, EBML_ID_EBMLREADVERSION    ,           1);
      put_ebml_uint   (pb, EBML_ID_EBMLMAXIDLENGTH    ,           4);
      put_ebml_uint   (pb, EBML_ID_EBMLMAXSIZELENGTH  ,           8);
@@ -1172,7 +1197,7 @@ Index: libavformat/matroskaenc.c
      put_ebml_uint   (pb, EBML_ID_DOCTYPEVERSION     ,           2);
      put_ebml_uint   (pb, EBML_ID_DOCTYPEREADVERSION ,           2);
      end_ebml_master(pb, ebml_header);
-@@ -746,6 +781,20 @@ static int mkv_write_header(AVFormatCont
+@@ -746,6 +782,20 @@
      if (mkv->cues == NULL)
          return AVERROR(ENOMEM);
  
@@ -1193,7 +1218,7 @@ Index: libavformat/matroskaenc.c
      put_flush_packet(pb);
      return 0;
  }
-@@ -831,10 +880,12 @@ static void mkv_write_block(AVFormatCont
+@@ -831,10 +881,12 @@
      av_log(s, AV_LOG_DEBUG, "Writing block at offset %" PRIu64 ", size %d, "
             "pts %" PRId64 ", dts %" PRId64 ", duration %d, flags %d\n",
             url_ftell(pb), pkt->size, pkt->pts, pkt->dts, pkt->duration, flags);
@@ -1206,7 +1231,7 @@ Index: libavformat/matroskaenc.c
          data = pkt->data;
      put_ebml_id(pb, blockid);
      put_ebml_num(pb, size+4, 0);
-@@ -910,9 +961,10 @@ static int mkv_write_packet(AVFormatCont
+@@ -910,9 +962,10 @@
          if (ret < 0) return ret;
      }
  
@@ -1219,7 +1244,7 @@ Index: libavformat/matroskaenc.c
          av_log(s, AV_LOG_DEBUG, "Starting new cluster at offset %" PRIu64
                 " bytes, pts %" PRIu64 "\n", url_ftell(pb), ts);
          end_ebml_master(pb, mkv->cluster);
-@@ -924,7 +976,59 @@ static int mkv_write_packet(AVFormatCont
+@@ -924,7 +977,59 @@
      mkv->duration = FFMAX(mkv->duration, ts + duration);
      return 0;
  }
@@ -1248,10 +1273,10 @@ Index: libavformat/matroskaenc.c
 +    if (codec->codec_type == AVMEDIA_TYPE_VIDEO && keyframe && mkv->cluster_pos) {
 +        // Start a new cluster when we get a key frame
 +        int64_t ts = mkv->tracks[pkt->stream_index].write_dts ? pkt->dts : pkt->pts;
- 
++
 +        av_log(s, AV_LOG_DEBUG, "Starting new cluster at offset %" PRIu64
 +          " bytes, pts %" PRIu64 "\n", url_ftell(pb), ts);
-+
+ 
 +        end_ebml_master(pb, mkv->cluster);
 +        mkv->cluster_pos = 0;
 +        if (mkv->dyn_bc)
@@ -1279,7 +1304,7 @@ Index: libavformat/matroskaenc.c
  static int mkv_write_trailer(AVFormatContext *s)
  {
      MatroskaMuxContext *mkv = s->priv_data;
-@@ -932,6 +1036,18 @@ static int mkv_write_trailer(AVFormatCon
+@@ -932,6 +1037,18 @@
      int64_t currentpos, second_seekhead, cuespos;
      int ret;
  
@@ -1298,7 +1323,7 @@ Index: libavformat/matroskaenc.c
      if (mkv->dyn_bc) {
          end_ebml_master(mkv->dyn_bc, mkv->cluster);
          mkv_flush_dynbuf(s);
-@@ -970,10 +1086,15 @@ static int mkv_write_trailer(AVFormatCon
+@@ -970,10 +1087,15 @@
      end_ebml_master(pb, mkv->segment);
      av_free(mkv->md5_ctx);
      av_free(mkv->tracks);
@@ -1314,7 +1339,7 @@ Index: libavformat/matroskaenc.c
  AVOutputFormat matroska_muxer = {
      "matroska",
      NULL_IF_CONFIG_SMALL("Matroska file format"),
-@@ -989,7 +1110,23 @@ AVOutputFormat matroska_muxer = {
+@@ -989,7 +1111,23 @@
      .codec_tag = (const AVCodecTag* const []){ff_codec_bmp_tags, ff_codec_wav_tags, 0},
      .subtitle_codec = CODEC_ID_TEXT,
  };
@@ -1339,33 +1364,8 @@ Index: libavformat/matroskaenc.c
  AVOutputFormat matroska_audio_muxer = {
      "matroska",
      NULL_IF_CONFIG_SMALL("Matroska file format"),
-@@ -1004,3 +1141,4 @@ AVOutputFormat matroska_audio_muxer = {
+@@ -1004,3 +1142,4 @@
      .flags = AVFMT_GLOBALHEADER,
      .codec_tag = (const AVCodecTag* const []){ff_codec_wav_tags, 0},
  };
 +#endif
-Index: libavformat/Makefile
-===================================================================
---- libavformat/Makefile	(revision 23210)
-+++ libavformat/Makefile	(working copy)
-@@ -255,6 +255,8 @@ OBJS-$(CONFIG_W64_DEMUXER)              
- OBJS-$(CONFIG_WAV_DEMUXER)               += wav.o riff.o raw.o
- OBJS-$(CONFIG_WAV_MUXER)                 += wav.o riff.o
- OBJS-$(CONFIG_WC3_DEMUXER)               += wc3movie.o
-+OBJS-$(CONFIG_WEBM_MUXER)                += matroskaenc.o matroska.o \
-+                                            riff.o
- OBJS-$(CONFIG_WSAUD_DEMUXER)             += westwood.o
- OBJS-$(CONFIG_WSVQA_DEMUXER)             += westwood.o
- OBJS-$(CONFIG_WV_DEMUXER)                += wv.o apetag.o id3v1.o
-Index: libavformat/allformats.c
-===================================================================
---- libavformat/allformats.c	(revision 23210)
-+++ libavformat/allformats.c	(working copy)
-@@ -203,6 +203,7 @@ void av_register_all(void)
-     REGISTER_DEMUXER  (W64, w64);
-     REGISTER_MUXDEMUX (WAV, wav);
-     REGISTER_DEMUXER  (WC3, wc3);
-+    REGISTER_MUXER    (WEBM, webm);
-     REGISTER_DEMUXER  (WSAUD, wsaud);
-     REGISTER_DEMUXER  (WSVQA, wsvqa);
-     REGISTER_DEMUXER  (WV, wv);
