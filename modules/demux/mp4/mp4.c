@@ -937,6 +937,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     SET( vlc_meta_SetEncodedBy );
                     break;
 
+                case FOURCC_0xa9wrt: /* Writer */
+                case FOURCC_0xa9com: /* Composer */
                 case FOURCC_0xa9swr:
                 case FOURCC_0xa9inf: /* Information */
                 case FOURCC_0xa9dir: /* Director */
@@ -949,8 +951,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 case FOURCC_0xa9prf: /* Performers */
                 case FOURCC_0xa9ope: /* Original Performer */
                 case FOURCC_0xa9src: /* Providers Source Content */
-                case FOURCC_0xa9wrt: /* Writer */
-                case FOURCC_0xa9com: /* Composer */
                 case FOURCC_WLOC:    /* Window Location */
                     /* TODO one day, but they aren't really meaningfull */
                     break;

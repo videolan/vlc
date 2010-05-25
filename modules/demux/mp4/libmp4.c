@@ -2768,6 +2768,7 @@ static const struct
     { FOURCC_0xa9url,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9ope,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9com,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9wrt,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9too,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
 
     { FOURCC_chpl,   MP4_ReadBox_chpl,          MP4_FreeBox_chpl },
