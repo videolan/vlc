@@ -361,7 +361,8 @@ int vout_RegisterSubpictureChannel( vout_thread_t *vout )
 }
 void vout_FlushSubpictureChannel( vout_thread_t *vout, int channel )
 {
-    spu_ClearChannel(vout->p->p_spu, channel);
+    vout_control_PushInteger(&vout->p->control, VOUT_CONTROL_FLUSH_SUBPICTURE,
+                             channel);
 }
 
 /* vout_Control* are usable by anyone at anytime */
@@ -758,6 +759,12 @@ static void ThreadDisplaySubpicture(vout_thread_t *vout,
 {
     spu_DisplaySubpicture(vout->p->p_spu, subpicture);
 }
+
+static void ThreadFlushSubpicture(vout_thread_t *vout, int channel)
+{
+    spu_ClearChannel(vout->p->p_spu, channel);
+}
+
 static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
 {
     if (!vout->p->title.show)
@@ -1112,6 +1119,9 @@ static void *Thread(void *object)
             case VOUT_CONTROL_SUBPICTURE:
                 ThreadDisplaySubpicture(vout, cmd.u.subpicture);
                 cmd.u.subpicture = NULL;
+                break;
+            case VOUT_CONTROL_FLUSH_SUBPICTURE:
+                ThreadFlushSubpicture(vout, cmd.u.integer);
                 break;
             case VOUT_CONTROL_OSD_TITLE:
                 ThreadDisplayOsdTitle(vout, cmd.u.string);
