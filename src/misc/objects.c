@@ -90,7 +90,6 @@ static void DumpStructure( vlc_object_internals_t *, unsigned, char * );
 static vlc_list_t   * NewList       ( int );
 
 static void vlc_object_destroy( vlc_object_t *p_this );
-static void vlc_object_detach_unlocked (vlc_object_t *p_this);
 
 /*****************************************************************************
  * Local structure lock
@@ -254,9 +253,6 @@ char *vlc_object_get_name(const vlc_object_t *obj)
 static void vlc_object_destroy( vlc_object_t *p_this )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
-
-    /* Objects are always detached beforehand */
-    assert( !p_this->p_parent );
 
     /* Send a kill to the object's thread if applicable */
     vlc_object_kill( p_this );
@@ -584,10 +580,18 @@ void vlc_object_release( vlc_object_t *p_this )
 
     if( b_should_destroy )
     {
+        /* Detach from parent to protect against FIND_CHILDREN */
         parent = p_this->p_parent;
-        if (parent)
-            /* Detach from parent to protect against FIND_CHILDREN */
-            vlc_object_detach_unlocked (p_this);
+        if (likely(parent))
+        {
+           /* Unlink */
+           if (internals->prev != NULL)
+               internals->prev->next = internals->next;
+           else
+               vlc_internals(parent)->first = internals->next;
+           if (internals->next != NULL)
+               internals->next->prev = internals->prev;
+        }
 
         /* We have no children */
         assert (internals->first == NULL);
@@ -637,25 +641,6 @@ void vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     libvlc_unlock (p_this->p_libvlc);
 }
 
-
-static void vlc_object_detach_unlocked (vlc_object_t *p_this)
-{
-    assert (p_this->p_parent != NULL);
-
-    vlc_object_internals_t *pap = vlc_internals (p_this->p_parent);
-    vlc_object_internals_t *priv = vlc_internals (p_this);
-
-    /* Unlink */
-    if (priv->prev != NULL)
-        priv->prev->next = priv->next;
-    else
-        pap->first = priv->next;
-    if (priv->next != NULL)
-        priv->next->prev = priv->prev;
-
-    /* Remove p_this's parent */
-    p_this->p_parent = NULL;
-}
 
 #undef vlc_list_children
 /**
