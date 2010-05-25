@@ -3644,14 +3644,16 @@ fi
 dnl
 dnl  Pulseaudio module
 dnl
-PKG_ENABLE_MODULES_VLC([PULSE], [], [libpulse >= 0.9.11], [Pulseaudio support], [auto])
-AS_IF([ test "$have_x" = yes],[
-       VLC_ADD_LIBS([pulse], [${X_LIBS} ${X_PRE_LIBS} -lX11])
-     ],[
-        AC_MSG_WARN([The pulse audio output module will be built without X 
-		     support. If you use VLC under X, you will experience 
-		     strange threading problems])
+AS_IF([test "${no_x}" = "yes"], [
+  AS_IF([test "${enable_pulse}" = "yes"], [
+    AC_MSG_ERROR([Xlib is required for VLC PulseAudio support
+(see http://www.pulseaudio.org/ticket/799 for further reference).])
+  ])
+], [
+  PKG_ENABLE_MODULES_VLC([PULSE], [], [libpulse >= 0.9.11], [Pulseaudio support], [auto])
+  VLC_ADD_LIBS([pulse], [${X_LIBS} ${X_PRE_LIBS} -lX11])
 ])
+
 dnl
 dnl  Portaudio module
 dnl

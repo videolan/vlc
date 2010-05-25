@@ -121,7 +121,9 @@ static int Open ( vlc_object_t *p_this )
     struct pa_buffer_attr a;
     struct pa_channel_map map;
 
-#ifdef HAVE_X11_XLIB_H
+#ifdef X_DISPLAY_MISSING
+# error Xlib required due to PulseAudio bug 799!
+#else
     if( !XInitThreads() )
         return VLC_EGENERIC;
 #endif
