@@ -1405,20 +1405,20 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     if( strstr( psz_transport, "MP2T/H2221/UDP" ) )
                     {
                         httpd_MsgAdd( answer, "Transport",
-                                     "MP2T/H2221/UDP;client_port=%d-%d",
+                                     "MP2T/H2221/UDP;unicast;client_port=%d-%d",
                                      p_rtsp_es->i_port, p_rtsp_es->i_port + 1 );
                     }
                     else if( strstr( psz_transport, "RAW/RAW/UDP" ) )
                     {
                         httpd_MsgAdd( answer, "Transport",
-                                     "RAW/RAW/UDP;client_port=%d-%d",
+                                     "RAW/RAW/UDP;unicast;client_port=%d-%d",
                                      p_rtsp_es->i_port, p_rtsp_es->i_port + 1 );
                     }
                 }
                 else
                 {
                     httpd_MsgAdd( answer, "Transport",
-                                  "RTP/AVP/UDP;client_port=%d-%d",
+                                  "RTP/AVP/UDP;unicast;client_port=%d-%d",
                                   p_rtsp_es->i_port, p_rtsp_es->i_port + 1 );
                 }
             }
