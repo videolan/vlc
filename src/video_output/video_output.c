@@ -155,6 +155,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     /* */
     if (vlc_clone(&vout->p->thread, Thread, vout,
                   VLC_THREAD_PRIORITY_OUTPUT)) {
+        spu_Destroy(vout->p->p_spu);
         vlc_object_release(vout);
         return NULL;
     }
@@ -228,12 +229,13 @@ void vout_Close(vout_thread_t *vout)
 
     if (vout->p->input)
         spu_Attach(vout->p->p_spu, vout->p->input, false);
-    vlc_object_detach(vout->p->p_spu);
 
     vout_snapshot_End(&vout->p->snapshot);
 
     vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_CLEAN);
     vlc_join(vout->p->thread, NULL);
+
+    spu_Destroy(vout->p->p_spu);
 }
 
 /* */
@@ -245,9 +247,6 @@ static void VoutDestructor(vlc_object_t *object)
     //assert(!vout->p_module);
 
     free(vout->p->splitter_name);
-
-    /* */
-    spu_Destroy(vout->p->p_spu);
 
     /* Destroy the locks */
     vlc_mutex_destroy(&vout->p->picture_lock);
