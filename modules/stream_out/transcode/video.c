@@ -758,7 +758,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                    if( p_pic2 != NULL )
                    {
                        picture_Copy( p_pic2, p_pic );
-                       p_pic2->date = i_pts + 1;
+                       p_pic2->date = i_pts;
                    }
                }
                else
