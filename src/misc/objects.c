@@ -615,7 +615,7 @@ void vlc_object_release( vlc_object_t *p_this )
  * attach object to a parent object
  *****************************************************************************
  * This function sets p_this as a child of p_parent, and p_parent as a parent
- * of p_this. This link can be undone using vlc_object_detach.
+ * of p_this.
  *****************************************************************************/
 void vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
 {
@@ -682,28 +682,6 @@ static void vlc_object_detach_unlocked (vlc_object_t *p_this)
     priv->old_parent = p_this->p_parent;
 #endif
     p_this->p_parent = NULL;
-}
-
-#undef vlc_object_detach
-/**
- ****************************************************************************
- * detach object from its parent
- *****************************************************************************
- * This function removes all links between an object and its parent.
- *****************************************************************************/
-void vlc_object_detach( vlc_object_t *p_this )
-{
-    vlc_object_t *p_parent;
-    if( !p_this ) return;
-
-    libvlc_lock (p_this->p_libvlc);
-    p_parent = p_this->p_parent;
-    if (p_parent)
-        vlc_object_detach_unlocked( p_this );
-    libvlc_unlock (p_this->p_libvlc);
-
-    if (p_parent)
-        vlc_object_release (p_parent);
 }
 
 #undef vlc_list_children
