@@ -937,27 +937,41 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     SET( vlc_meta_SetEncodedBy );
                     break;
 
-                case FOURCC_0xa9wrt: /* Writer */
-                case FOURCC_0xa9com: /* Composer */
-                case FOURCC_0xa9swr:
-                case FOURCC_0xa9inf: /* Information */
-                case FOURCC_0xa9dir: /* Director */
-                case FOURCC_0xa9dis: /* Disclaimer */
-                case FOURCC_0xa9req: /* Requirements */
-                case FOURCC_0xa9fmt: /* Original Format */
-                case FOURCC_0xa9dsa: /* Display Source As */
-                case FOURCC_0xa9hst: /* Host Computer */
-                case FOURCC_0xa9prd: /* Producer */
-                case FOURCC_0xa9prf: /* Performers */
-                case FOURCC_0xa9ope: /* Original Performer */
-                case FOURCC_0xa9src: /* Providers Source Content */
-                case FOURCC_WLOC:    /* Window Location */
-                    /* TODO one day, but they aren't really meaningfull */
-                    break;
-#undef SET
-
                 default:
                     break;
+                }
+#undef SET
+                static const struct { uint32_t xa9_type; char metadata[25]; } xa9typetoextrameta[] = 
+                {
+                    { FOURCC_0xa9wrt, N_("Writer") },
+                    { FOURCC_0xa9com, N_("Composr") },
+                    { FOURCC_0xa9prd, N_("Producer") },
+                    { FOURCC_0xa9inf, N_("Information") },
+                    { FOURCC_0xa9swr, N_("Software") },
+                    { FOURCC_0xa9dir, N_("Director") },
+                    { FOURCC_0xa9dis, N_("Disclaimer") },
+                    { FOURCC_0xa9req, N_("Requirements") },
+                    { FOURCC_0xa9fmt, N_("Original Format") },
+                    { FOURCC_0xa9dsa, N_("Display Source As") },
+                    { FOURCC_0xa9hst, N_("Host Computer") },
+                    { FOURCC_0xa9prf, N_("Performers") },
+                    { FOURCC_0xa9ope, N_("Original Performer") },
+                    { FOURCC_0xa9src, N_("Providers Source Content") },
+                    { 0, "" },
+                };
+                for( unsigned i = 0; xa9typetoextrameta[i].xa9_type; i++ )
+                {
+                    if( p_0xa9xxx->i_type == xa9typetoextrameta[i].xa9_type )
+                    {
+                        char *psz_utf = strdup( p_0xa9xxx->data.p_0xa9xxx->psz_text ? p_0xa9xxx->data.p_0xa9xxx->psz_text : "" );
+                        if( psz_utf )
+                        {
+                             EnsureUTF8( psz_utf );
+                             vlc_meta_AddExtra( p_meta, _(xa9typetoextrameta[i].metadata), psz_utf );
+                             free( psz_utf );
+                        }
+                        break;
+                    }
                 }
             }
             return VLC_SUCCESS;
