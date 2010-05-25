@@ -23,7 +23,6 @@ SOURCES_dirac = dirac.c
 SOURCES_png = png.c
 SOURCES_svcdsub = svcdsub.c
 SOURCES_cvdsub = cvdsub.c
-SOURCES_fake = fake.c
 SOURCES_invmem = invmem.c
 SOURCES_realvideo = realvideo.c
 SOURCES_sdl_image = sdl_image.c
@@ -45,7 +44,6 @@ libvlc_LTLIBRARIES += \
         libcdg_plugin.la \
 	libcvdsub_plugin.la \
 	libdts_plugin.la \
-	libfake_plugin.la \
 	libdvbsub_plugin.la \
 	liblpcm_plugin.la \
 	libmpeg_audio_plugin.la \
