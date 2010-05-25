@@ -954,8 +954,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     vlc_rand_bytes (&id->i_sequence, sizeof (id->i_sequence));
     vlc_rand_bytes (id->ssrc, sizeof (id->ssrc));
 
-    id->i_seq_sent_next = id->i_sequence;
-
     id->psz_enc    = NULL;
     id->psz_fmtp   = NULL;
     id->i_clock_rate = 90000; /* most common case for video */
@@ -1021,6 +1019,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->i_sequence = 0; /* FIXME: awful hack for libvlc_srtp */
     }
 #endif
+
+    id->i_seq_sent_next = id->i_sequence;
 
     if( p_sys->psz_destination != NULL )
     {
