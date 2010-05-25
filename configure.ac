@@ -3395,9 +3395,9 @@ then
           ])
       ])
    ],[
-     AC_MSG_ERROR([The development package for SDL is not present or too old.
-                   You need 1.2.10. Alternatively you can also configure with
-                   --disable-sdl.])
+     AC_MSG_WARN([The development package for SDL is not present or too old.
+                  You need 1.2.10. Alternatively you can also configure with
+                  --disable-sdl.])
    ])
 fi
 
