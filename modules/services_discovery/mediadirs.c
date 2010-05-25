@@ -312,27 +312,12 @@ void formatSnapshotItem( input_item_t *p_item )
     if( !p_item )
         return;
 
-    char* psz_option = NULL;
     char* psz_uri = input_item_GetURI( p_item );
 
-    if( !psz_uri )
-        goto end;
-
     /* copy the snapshot mrl as a ArtURL */
-    input_item_SetArtURL( p_item, psz_uri );
+    if( psz_uri )
+        input_item_SetArtURL( p_item, psz_uri );
 
-    if( asprintf( &psz_option, "fake-file=%s", psz_uri ) == -1 )
-    {
-        psz_option = NULL;
-        goto end;
-    }
-
-    /* display still image as a video */
-    input_item_SetURI( p_item, "fake://" );
-    input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
-
-end:
-    free( psz_option );
     free( psz_uri );
 }
 

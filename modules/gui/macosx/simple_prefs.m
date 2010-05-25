@@ -596,7 +596,6 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     if( module_exists ("dvdnav") )
         TestCaC( "dvdnav-caching" );
     TestCaC( "tcp-caching" );
-    TestCaC( "fake-caching" );
     TestCaC( "cdda-caching" );
     TestCaC( "screen-caching" );
     TestCaC( "vcd-caching" );
@@ -956,7 +955,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             i = i + config_SaveConfigFile( p_intf, "dvdnav" );
         }
         CaC( "tcp-caching" ); CaC( "vcd-caching" );
-        CaC( "fake-caching" ); CaC( "cdda-caching" ); CaC( "file-caching" );
+        CaC( "cdda-caching" ); CaC( "file-caching" );
         CaC( "screen-caching" );
         CaCi( "rtsp-caching", 4 ); CaCi( "ftp-caching", 2 );
         CaCi( "http-caching", 4 );
@@ -973,7 +972,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         i = i + config_SaveConfigFile( p_intf, "access_http" );
         i = i + config_SaveConfigFile( p_intf, "access_file" );
         i = i + config_SaveConfigFile( p_intf, "access_tcp" );
-        i = i + config_SaveConfigFile( p_intf, "access_fake" );
         i = i + config_SaveConfigFile( p_intf, "cdda" );
         i = i + config_SaveConfigFile( p_intf, "screen" );
         i = i + config_SaveConfigFile( p_intf, "vcd" );

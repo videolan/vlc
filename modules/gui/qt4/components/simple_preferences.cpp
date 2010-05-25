@@ -489,7 +489,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             if (module_exists ("dvdnav"))
                 TestCaC( "dvdnav-caching" );
             TestCaC( "tcp-caching" );
-            TestCaC( "fake-caching" ); TestCaC( "cdda-caching" );
+            TestCaC( "cdda-caching" );
             TestCaC( "screen-caching" ); TestCaC( "vcd-caching" );
             #ifdef WIN32
             TestCaC( "dshow-caching" );
@@ -769,7 +769,7 @@ void SPrefsPanel::apply()
             if (module_exists ("dvdnav" ))
                 CaC( "dvdnav-caching" );
             CaC( "tcp-caching" ); CaC( "vcd-caching" );
-            CaC( "fake-caching" ); CaC( "cdda-caching" ); CaC( "file-caching" );
+            CaC( "cdda-caching" ); CaC( "file-caching" );
             CaC( "screen-caching" ); CaC( "bd-caching" );
             CaCi( "rtsp-caching", 2 ); CaCi( "ftp-caching", 2 );
             CaCi( "http-caching", 2 );
