@@ -536,8 +536,7 @@ void * demux_sys_t::EventThread( vlc_object_t *p_this )
 
         else if( p_vout == NULL )
         {
-            p_vout = (vlc_object_t*) vlc_object_find( p_sys->p_input, VLC_OBJECT_VOUT,
-                                      FIND_CHILD );
+            p_vout = (vlc_object_t*) input_GetVout(p_sys->p_input);
             if( p_vout)
             {
                 var_AddCallback( p_vout, "mouse-moved", EventMouse, p_ev );
