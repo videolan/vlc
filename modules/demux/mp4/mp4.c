@@ -932,6 +932,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     SET( vlc_meta_SetURL );
                     break;
 
+                case FOURCC_0xa9too: /* Encoder Tool */
                 case FOURCC_0xa9enc: /* Encoded By */
                     SET( vlc_meta_SetEncodedBy );
                     break;

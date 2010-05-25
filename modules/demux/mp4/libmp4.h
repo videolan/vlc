@@ -220,6 +220,7 @@
 #define FOURCC_0xa9wrt VLC_FOURCC( 0xa9, 'w', 'r', 't' )
 #define FOURCC_0xa9com VLC_FOURCC( 0xa9, 'c', 'o', 'm' )
 #define FOURCC_0xa9gen VLC_FOURCC( 0xa9, 'g', 'e', 'n' )
+#define FOURCC_0xa9too VLC_FOURCC( 0xa9, 't', 'o', 'o' )
 #define FOURCC_chpl VLC_FOURCC( 'c', 'h', 'p', 'l' )
 #define FOURCC_WLOC VLC_FOURCC( 'W', 'L', 'O', 'C' )
 
