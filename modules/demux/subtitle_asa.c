@@ -117,7 +117,6 @@ static int Open ( vlc_object_t *p_this )
     demux_t        *p_demux = (demux_t*)p_this;
     demux_sys_t    *p_sys;
     es_format_t    fmt;
-    input_thread_t *p_input;
     float          f_fps;
     char           *psz_type;
     int64_t        i_ssize;
@@ -142,16 +141,11 @@ static int Open ( vlc_object_t *p_this )
     p_sys->i_microsecperframe = 40000;
 
     /* Get the FPS */
-    p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( p_input )
-    {
-        f_fps = var_GetFloat( p_input, "sub-original-fps" );
-        if( f_fps >= 1.0 )
-            p_sys->i_microsecperframe = (int64_t)( (float)1000000 / f_fps );
+    f_fps = var_CreateGetFloat( p_demux, "sub-original-fps" );
+    if( f_fps >= 1.0 )
+        p_sys->i_microsecperframe = (int64_t)( (float)1000000 / f_fps );
 
-        msg_Dbg( p_demux, "Movie fps: %f", f_fps );
-        vlc_object_release( p_input );
-    }
+    msg_Dbg( p_demux, "Movie fps: %f", f_fps );
 
     /* Check for override of the fps */
     f_fps = var_CreateGetFloat( p_demux, "sub-fps" );
