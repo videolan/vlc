@@ -134,6 +134,14 @@ void vout_control_PushBool(vout_control_t *ctrl, int type, bool boolean)
     cmd.u.boolean = boolean;
     vout_control_Push(ctrl, &cmd);
 }
+void vout_control_PushInteger(vout_control_t *ctrl, int type, int integer)
+{
+    vout_control_cmd_t cmd;
+
+    vout_control_cmd_Init(&cmd, type);
+    cmd.u.integer = integer;
+    vout_control_Push(ctrl, &cmd);
+}
 void vout_control_PushTime(vout_control_t *ctrl, int type, mtime_t time)
 {
     vout_control_cmd_t cmd;

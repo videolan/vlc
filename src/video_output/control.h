@@ -68,6 +68,7 @@ typedef struct {
         mtime_t time;
         mtime_t *time_ptr;
         char    *string;
+        int     integer;
         struct {
             int a;
             int b;
@@ -123,6 +124,7 @@ void vout_control_WaitEmpty(vout_control_t *);
 void vout_control_Push(vout_control_t *, vout_control_cmd_t *);
 void vout_control_PushVoid(vout_control_t *, int type);
 void vout_control_PushBool(vout_control_t *, int type, bool boolean);
+void vout_control_PushInteger(vout_control_t *, int type, int integer);
 void vout_control_PushTime(vout_control_t *, int type, mtime_t time);
 void vout_control_PushMessage(vout_control_t *, int type, int channel, const char *string);
 void vout_control_PushPair(vout_control_t *, int type, int a, int b);
