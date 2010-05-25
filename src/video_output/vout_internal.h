@@ -68,6 +68,7 @@ struct vout_thread_sys_t
     vout_statistic_t statistic;
 
     /* Subpicture unit */
+    vlc_mutex_t     spu_lock;
     spu_t           *p_spu;
 
     /* Monitor Pixel Aspect Ratio */

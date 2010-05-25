@@ -126,6 +126,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     /* Initialize locks */
     vlc_mutex_init(&vout->p->picture_lock);
     vlc_mutex_init(&vout->p->vfilter_lock);
+    vlc_mutex_init(&vout->p->spu_lock);
 
     /* Attach the new object now so we can use var inheritance below */
     vlc_object_attach(vout, object);
@@ -235,7 +236,10 @@ void vout_Close(vout_thread_t *vout)
     vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_CLEAN);
     vlc_join(vout->p->thread, NULL);
 
+    vlc_mutex_lock(&vout->p->spu_lock);
     spu_Destroy(vout->p->p_spu);
+    vout->p->p_spu = NULL;
+    vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
 /* */
@@ -249,6 +253,7 @@ static void VoutDestructor(vlc_object_t *object)
     free(vout->p->splitter_name);
 
     /* Destroy the locks */
+    vlc_mutex_destroy(&vout->p->spu_lock);
     vlc_mutex_destroy(&vout->p->picture_lock);
     vlc_mutex_destroy(&vout->p->vfilter_lock);
     vout_control_Clean(&vout->p->control);
@@ -356,7 +361,14 @@ void vout_PutSubpicture( vout_thread_t *vout, subpicture_t *subpic )
 }
 int vout_RegisterSubpictureChannel( vout_thread_t *vout )
 {
-    return spu_RegisterChannel(vout->p->p_spu);
+    int channel = SPU_DEFAULT_CHANNEL;
+
+    vlc_mutex_lock(&vout->p->spu_lock);
+    if (vout->p->p_spu)
+        channel = spu_RegisterChannel(vout->p->p_spu);
+    vlc_mutex_unlock(&vout->p->spu_lock);
+
+    return channel;
 }
 void vout_FlushSubpictureChannel( vout_thread_t *vout, int channel )
 {
