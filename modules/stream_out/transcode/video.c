@@ -590,7 +590,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                                     block_t *in, block_t **out )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    int i_duplicate = 1;
+    bool b_need_duplicate = false;
     picture_t *p_pic, *p_pic2 = NULL;
     *out = NULL;
 
@@ -640,7 +640,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                 i_pts = p_pic->date + 1;
             }
             i_video_drift = p_pic->date - i_pts;
-            i_duplicate = 1;
+            b_need_duplicate = false;
 
             /* Set the pts of the frame being encoded */
             p_pic->date = i_pts;
@@ -660,7 +660,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                 msg_Dbg( p_stream, "adding frame (%i)",
                          (int)(i_video_drift - i_master_drift) );
 #endif
-                i_duplicate = 2;
+                b_need_duplicate = true;
             }
         }
 
@@ -748,7 +748,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
             }
             date_Increment( &id->interpolated_pts, 1 );
 
-            if( i_duplicate > 1 )
+            if( unlikely( b_need_duplicate ) )
             {
 
                if( p_sys->i_threads >= 1 )
