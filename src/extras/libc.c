@@ -31,6 +31,8 @@
 
 #include <vlc_common.h>
 
+#include <errno.h>
+
 #undef iconv_t
 #undef iconv_open
 #undef iconv
@@ -47,7 +49,6 @@
 #ifdef HAVE_FORK
 #   include <signal.h>
 #   include <unistd.h>
-#   include <errno.h>
 #   include <sys/wait.h>
 #   include <sys/socket.h>
 #   include <sys/poll.h>
