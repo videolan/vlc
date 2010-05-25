@@ -102,6 +102,8 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
 
     vlc_object_set_destructor( p_aout, aout_Destructor );
 
+    vlc_object_attach( p_aout, p_parent );
+
     return p_aout;
 }
 
