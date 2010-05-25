@@ -1151,7 +1151,6 @@ static int  Open ( vlc_object_t *p_this )
         {
             msg_Dbg( p_enc, "Limiting to main-profile");
             p_sys->param.analyse.b_transform_8x8 = 0;
-            p_sys->param.i_bframe_pyramid = X264_B_PYRAMID_NONE;
         }
         /* high profile don't restrict stuff*/
     }
