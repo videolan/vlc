@@ -186,9 +186,6 @@ vout_thread_t *(vout_Request)(vlc_object_t *object,
 
     /* If a vout is provided, try reusing it */
     if (vout) {
-        vlc_object_detach(vout);
-        vlc_object_attach(vout, object);
-
         if (vout->p->input != cfg->input) {
             if (vout->p->input)
                 spu_Attach(vout->p->p_spu, vout->p->input, false);

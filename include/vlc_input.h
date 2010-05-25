@@ -655,16 +655,15 @@ VLC_EXPORT( void, input_SplitMRL, ( const char **ppsz_access, const char **ppsz_
 VLC_EXPORT( char *, input_CreateFilename, ( vlc_object_t *, const char *psz_path, const char *psz_prefix, const char *psz_extension ) );
 
 /**
- * This function detaches resources from a dead input.
+ * It creates an empty input resource handler.
  *
- * It MUST be called on a dead input (p_input->b_dead true) otherwise
- * it will assert.
- * It does not support concurrent calls.
+ * The given object MUST stay alive as long as the input_resource_t is
+ * not deleted.
  */
-VLC_EXPORT(input_resource_t *, input_DetachResource, ( input_thread_t * ) );
+VLC_EXPORT( input_resource_t *, input_resource_New, ( vlc_object_t * ) );
 
 /**
- * This function releases the input resource.
+ * It deletes an input resource.
  */
 VLC_EXPORT(void, input_resource_Delete, ( input_resource_t * ) );
 

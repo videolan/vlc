@@ -31,21 +31,9 @@
 #include <vlc_common.h>
 
 /**
- * This function creates an empty input_resource_t.
- */
-input_resource_t *input_resource_New( void );
-
-/**
  * This function set the associated input.
  */
 void input_resource_SetInput( input_resource_t *, input_thread_t * );
-
-/**
- * This function return a input_resource_t with all resources detach from the
- * given input_resource_t.
- * It must not be associated to an input.
- */
-input_resource_t *input_resource_Detach( input_resource_t * );
 
 /**
  * This function handles sout request.
@@ -82,6 +70,11 @@ vout_thread_t *input_resource_HoldVout( input_resource_t * );
  * You must call vlc_object_release on all values returned (if non NULL).
  */
 void input_resource_HoldVouts( input_resource_t *, vout_thread_t ***, size_t * );
+
+/**
+ * This function releases all resources (object).
+ */
+void input_resource_Terminate( input_resource_t * );
 
 #endif
 

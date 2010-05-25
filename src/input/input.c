@@ -244,18 +244,6 @@ void input_Stop( input_thread_t *p_input, bool b_abort )
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
 }
 
-input_resource_t *input_DetachResource( input_thread_t *p_input )
-{
-    assert( p_input->b_dead );
-
-    input_resource_SetInput( p_input->p->p_resource, NULL );
-
-    input_resource_t *p_resource = input_resource_Detach( p_input->p->p_resource );
-    p_input->p->p_sout = NULL;
-
-    return p_resource;
-}
-
 /**
  * Get the item from an input thread
  * FIXME it does not increase ref count of the item.
@@ -396,9 +384,15 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* */
     if( p_resource )
+    {
+        p_input->p->p_resource_private = NULL;
         p_input->p->p_resource = p_resource;
+    }
     else
-        p_input->p->p_resource = input_resource_New();
+    {
+        p_input->p->p_resource_private = input_resource_New( VLC_OBJECT( p_input ) );
+        p_input->p->p_resource = p_input->p->p_resource_private;
+    }
     input_resource_SetInput( p_input->p->p_resource, p_input );
 
     /* Init control buffer */
@@ -506,8 +500,8 @@ static void Destructor( input_thread_t * p_input )
     if( p_input->p->p_es_out_display )
         es_out_Delete( p_input->p->p_es_out_display );
 
-    if( p_input->p->p_resource )
-        input_resource_Delete( p_input->p->p_resource );
+    if( p_input->p->p_resource_private )
+        input_resource_Delete( p_input->p->p_resource_private );
 
     vlc_gc_decref( p_input->p->p_item );
 
@@ -1304,6 +1298,8 @@ error:
             input_resource_RequestSout( p_input->p->p_resource,
                                          p_input->p->p_sout, NULL );
         input_resource_SetInput( p_input->p->p_resource, NULL );
+        if( p_input->p->p_resource_private )
+            input_resource_Terminate( p_input->p->p_resource_private );
     }
 
     if( !p_input->b_preparsing && libvlc_stats( p_input ) )
@@ -1423,6 +1419,8 @@ static void End( input_thread_t * p_input )
     input_resource_RequestSout( p_input->p->p_resource,
                                  p_input->p->p_sout, NULL );
     input_resource_SetInput( p_input->p->p_resource, NULL );
+    if( p_input->p->p_resource_private )
+        input_resource_Terminate( p_input->p->p_resource_private );
 }
 
 /*****************************************************************************

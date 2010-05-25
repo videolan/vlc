@@ -44,6 +44,8 @@
 
 struct input_resource_t
 {
+    vlc_object_t   *p_parent;
+
     /* This lock is used to serialize request and protect
      * our variables */
     vlc_mutex_t    lock;
@@ -79,14 +81,6 @@ static void DestroySout( input_resource_t *p_resource )
     p_resource->p_sout = NULL;
 }
 
-static sout_instance_t *DetachSout( input_resource_t *p_resource )
-{
-    sout_instance_t *p_sout = p_resource->p_sout;
-    p_resource->p_sout = NULL;
-
-    return p_sout;
-}
-
 static sout_instance_t *RequestSout( input_resource_t *p_resource,
                                      sout_instance_t *p_sout, const char *psz_sout )
 {
@@ -106,7 +100,7 @@ static sout_instance_t *RequestSout( input_resource_t *p_resource,
     if( p_resource->p_sout &&
         strcmp( p_resource->p_sout->psz_sout, psz_sout ) )
     {
-        msg_Dbg( p_resource->p_input, "destroying unusable sout" );
+        msg_Dbg( p_resource->p_parent, "destroying unusable sout" );
         DestroySout( p_resource );
     }
 
@@ -115,14 +109,13 @@ static sout_instance_t *RequestSout( input_resource_t *p_resource,
         if( p_resource->p_sout )
         {
             /* Reuse it */
-            msg_Dbg( p_resource->p_input, "reusing sout" );
-            msg_Dbg( p_resource->p_input, "you probably want to use gather stream_out" );
-            vlc_object_attach( p_resource->p_sout, p_resource->p_input );
+            msg_Dbg( p_resource->p_parent, "reusing sout" );
+            msg_Dbg( p_resource->p_parent, "you probably want to use gather stream_out" );
         }
         else
         {
             /* Create a new one */
-            p_resource->p_sout = sout_NewInstance( p_resource->p_input, psz_sout );
+            p_resource->p_sout = sout_NewInstance( p_resource->p_parent, psz_sout );
         }
 
         p_sout = p_resource->p_sout;
@@ -132,9 +125,7 @@ static sout_instance_t *RequestSout( input_resource_t *p_resource,
     }
     else
     {
-        vlc_object_detach( p_sout );
         p_resource->p_sout = p_sout;
-
         return NULL;
     }
 #else
@@ -151,15 +142,6 @@ static void DestroyVout( input_resource_t *p_resource )
         vout_CloseAndRelease( p_resource->p_vout_free );
 
     p_resource->p_vout_free = NULL;
-}
-static vout_thread_t *DetachVout( input_resource_t *p_resource )
-{
-    vlc_assert_locked( &p_resource->lock );
-    assert( p_resource->i_vout == 0 );
-    vout_thread_t *p_vout = p_resource->p_vout_free;
-    p_resource->p_vout_free = NULL;
-
-    return p_vout;
 }
 
 static void DisplayVoutTitle( input_resource_t *p_resource,
@@ -228,7 +210,7 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
         /* */
         if( !p_vout && p_resource->p_vout_free )
         {
-            msg_Dbg( p_resource->p_input, "trying to reuse free vout" );
+            msg_Dbg( p_resource->p_parent, "trying to reuse free vout" );
             p_vout = p_resource->p_vout_free;
 
             p_resource->p_vout_free = NULL;
@@ -250,7 +232,7 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
             .fmt        = p_fmt,
             .dpb_size   = dpb_size,
         };
-        p_vout = vout_Request( p_resource->p_input, &cfg );
+        p_vout = vout_Request( p_resource->p_parent, &cfg );
         if( !p_vout )
             return NULL;
 
@@ -274,12 +256,12 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
         if( p_resource->p_vout_free || i_vout_active > 0 || !b_recycle )
         {
             if( b_recycle )
-                msg_Dbg( p_resource->p_input, "detroying vout (already one saved or active)" );
+                msg_Dbg( p_resource->p_parent, "detroying vout (already one saved or active)" );
             vout_CloseAndRelease( p_vout );
         }
         else
         {
-            msg_Dbg( p_resource->p_input, "saving a free vout" );
+            msg_Dbg( p_resource->p_parent, "saving a free vout" );
             vout_Flush( p_vout, 1 );
             vout_FlushSubpictureChannel( p_vout, -1 );
 
@@ -290,7 +272,7 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
                 .fmt        = NULL,
                 .dpb_size   = 0,
             };
-            p_resource->p_vout_free = vout_Request( p_resource->p_input, &cfg );
+            p_resource->p_vout_free = vout_Request( p_resource->p_parent, &cfg );
         }
         return NULL;
     }
@@ -346,19 +328,6 @@ static void DestroyAout( input_resource_t *p_resource )
         vlc_object_release( p_resource->p_aout );
     p_resource->p_aout = NULL;
 }
-static aout_instance_t *DetachAout( input_resource_t *p_resource )
-{
-    vlc_assert_locked( &p_resource->lock );
-    vlc_mutex_lock( &p_resource->lock_hold );
-
-    aout_instance_t *p_aout = p_resource->p_aout;
-    p_resource->p_aout = NULL;
-
-    vlc_mutex_unlock( &p_resource->lock_hold );
-
-    return p_aout;
-}
-
 static aout_instance_t *RequestAout( input_resource_t *p_resource, aout_instance_t *p_aout )
 {
     vlc_assert_locked( &p_resource->lock );
@@ -366,7 +335,7 @@ static aout_instance_t *RequestAout( input_resource_t *p_resource, aout_instance
 
     if( p_aout )
     {
-        msg_Dbg( p_resource->p_input, "releasing aout" );
+        msg_Dbg( p_resource->p_parent, "releasing aout" );
         vlc_object_release( p_aout );
         return NULL;
     }
@@ -375,8 +344,8 @@ static aout_instance_t *RequestAout( input_resource_t *p_resource, aout_instance
         p_aout = p_resource->p_aout;
         if( !p_aout )
         {
-            msg_Dbg( p_resource->p_input, "creating aout" );
-            p_aout = aout_New( p_resource->p_input );
+            msg_Dbg( p_resource->p_parent, "creating aout" );
+            p_aout = aout_New( p_resource->p_parent );
 
             vlc_mutex_lock( &p_resource->lock_hold );
             p_resource->p_aout = p_aout;
@@ -384,14 +353,11 @@ static aout_instance_t *RequestAout( input_resource_t *p_resource, aout_instance
         }
         else
         {
-            msg_Dbg( p_resource->p_input, "reusing aout" );
+            msg_Dbg( p_resource->p_parent, "reusing aout" );
         }
 
         if( !p_aout )
             return NULL;
-
-        vlc_object_detach( p_aout );
-        vlc_object_attach( p_aout, p_resource->p_input );
         vlc_object_hold( p_aout );
         return p_aout;
     }
@@ -408,14 +374,28 @@ static aout_instance_t *HoldAout( input_resource_t *p_resource )
 
     return p_aout;
 }
+static void TerminateAout( input_resource_t *p_resource )
+{
+    vlc_mutex_lock( &p_resource->lock_hold );
+
+    aout_instance_t *p_aout = p_resource->p_aout;
+    p_resource->p_aout = NULL;
+
+    vlc_mutex_unlock( &p_resource->lock_hold );
+
+    if( p_aout )
+        vlc_object_release( p_aout );
+}
+
 
 /* */
-input_resource_t *input_resource_New( void )
+input_resource_t *input_resource_New( vlc_object_t *p_parent )
 {
     input_resource_t *p_resource = calloc( 1, sizeof(*p_resource) );
     if( !p_resource )
         return NULL;
 
+    p_resource->p_parent = p_parent;
     vlc_mutex_init( &p_resource->lock );
     vlc_mutex_init( &p_resource->lock_hold );
     return p_resource;
@@ -437,38 +417,12 @@ void input_resource_SetInput( input_resource_t *p_resource, input_thread_t *p_in
     vlc_mutex_lock( &p_resource->lock );
 
     if( p_resource->p_input && !p_input )
-    {
-        if( p_resource->p_aout )
-            vlc_object_detach( p_resource->p_aout );
-
         assert( p_resource->i_vout == 0 );
-        if( p_resource->p_vout_free )
-            vlc_object_detach( p_resource->p_vout_free );
-
-        if( p_resource->p_sout )
-            vlc_object_detach( p_resource->p_sout );
-    }
 
     /* */
     p_resource->p_input = p_input;
 
     vlc_mutex_unlock( &p_resource->lock );
-}
-
-input_resource_t *input_resource_Detach( input_resource_t *p_resource )
-{
-    input_resource_t *p_ret = input_resource_New();
-    if( !p_ret )
-        return NULL;
-
-    vlc_mutex_lock( &p_resource->lock );
-    assert( !p_resource->p_input );
-    p_ret->p_sout = DetachSout( p_resource );
-    p_ret->p_vout_free = DetachVout( p_resource );
-    p_ret->p_aout = DetachAout( p_resource );
-    vlc_mutex_unlock( &p_resource->lock );
-
-    return p_ret;
 }
 
 vout_thread_t *input_resource_RequestVout( input_resource_t *p_resource,
@@ -520,6 +474,7 @@ aout_instance_t *input_resource_HoldAout( input_resource_t *p_resource )
 {
     return HoldAout( p_resource );
 }
+
 /* */
 sout_instance_t *input_resource_RequestSout( input_resource_t *p_resource, sout_instance_t *p_sout, const char *psz_sout )
 {
@@ -532,5 +487,16 @@ sout_instance_t *input_resource_RequestSout( input_resource_t *p_resource, sout_
 void input_resource_TerminateSout( input_resource_t *p_resource )
 {
     input_resource_RequestSout( p_resource, NULL, NULL );
+}
+
+void input_resource_Terminate( input_resource_t *p_resource )
+{
+    input_resource_TerminateSout( p_resource );
+
+    vlc_mutex_lock( &p_resource->lock );
+    TerminateAout( p_resource );
+    vlc_mutex_unlock( &p_resource->lock );
+
+    input_resource_TerminateVout( p_resource );
 }
 

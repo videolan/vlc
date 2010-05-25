@@ -230,6 +230,8 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     assert( p_sys->p_input == NULL );
 
+    if( !p_sys->p_input_resource )
+        p_sys->p_input_resource = input_resource_New( VLC_OBJECT( p_playlist ) );
     input_thread_t *p_input_thread = input_Create( p_playlist, p_input, NULL, p_sys->p_input_resource );
     if( p_input_thread )
     {
@@ -244,8 +246,6 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
             p_sys->p_input = p_input_thread = NULL;
         }
     }
-
-    p_sys->p_input_resource = NULL;
 
     char *psz_uri = input_item_GetURI( p_item->p_input );
     if( psz_uri && ( !strncmp( psz_uri, "directory:", 10 ) ||
@@ -464,10 +464,6 @@ static int LoopInput( playlist_t *p_playlist )
     if( p_input->b_dead )
     {
         PL_DEBUG( "dead input" );
-
-        assert( p_sys->p_input_resource == NULL );
-
-        p_sys->p_input_resource = input_DetachResource( p_input );
 
         PL_UNLOCK;
         /* We can unlock as we return VLC_EGENERIC (no event will be lost) */

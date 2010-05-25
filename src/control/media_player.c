@@ -127,10 +127,6 @@ static void release_input_thread( libvlc_media_player_t *p_mi, bool b_input_abor
 
     assert( p_input_thread->b_dead );
 
-    /* Store the input resource for future use. */
-    assert( p_mi->input.p_resource == NULL );
-    p_mi->input.p_resource = input_DetachResource( p_input_thread );
-
     p_mi->input.p_thread = NULL;
     vlc_object_release( p_input_thread );
 }
@@ -656,6 +652,8 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
         return -1;
     }
 
+    if( !p_mi->input.p_resource )
+        p_mi->input.p_resource = input_resource_New( VLC_OBJECT( p_mi ) );
     p_input_thread = input_Create( p_mi, p_mi->p_md->p_input_item, NULL,
                                    p_mi->input.p_resource );
     unlock(p_mi);
@@ -665,8 +663,6 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
         libvlc_printerr( "Not enough memory" );
         return -1;
     }
-
-    p_mi->input.p_resource = NULL;
 
     var_AddCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
     var_AddCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
