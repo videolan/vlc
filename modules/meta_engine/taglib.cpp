@@ -63,6 +63,10 @@
 # include <wavfile.h>
 #endif
 
+#ifdef TAGLIB_WITH_MP4
+# include <mp4file.h>
+#endif
+
 #include <speexfile.h>
 #include <trueaudiofile.h>
 #include <vorbisfile.h>
@@ -317,7 +321,25 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_t* p_demux, demux_met
     vlc_meta_SetArtURL( p_meta, "attachment://cover" );
 }
 
+#ifdef TAGLIB_WITH_MP4
+static void ReadMetaFromMP4( MP4::Tag* tag, demux_t *p_demux, demux_meta_t *p_demux_meta, vlc_meta_t* p_meta )
+{
+    if( tag->itemListMap().contains("covr") )
+    {
+        MP4::CoverArtList list = tag->itemListMap()["covr"].toCoverArtList();
+        const char *psz_format = list[0].format() == MP4::CoverArt::PNG ? "image/png" : "image/jpeg";
 
+        TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
+        input_attachment_t *p_attachment =
+                vlc_input_attachment_New( "cover", psz_format, "cover",
+                                          list[0].data().data(), list[0].data().size() );
+        TAB_APPEND_CAST( (input_attachment_t**),
+                         p_demux_meta->i_attachments, p_demux_meta->attachments,
+                         p_attachment );
+        vlc_meta_SetArtURL( p_meta, "attachment://cover" );
+    }
+}
+#endif
 
 /**
  * Get the tags from the file using TagLib
@@ -398,6 +420,13 @@ static int ReadMeta( vlc_object_t* p_this)
         else if( flac->xiphComment() )
             ReadMetaFromXiph( flac->xiphComment(), p_demux, p_demux_meta, p_meta );
     }
+#ifdef TAGLIB_WITH_MP4
+    else if( MP4::File *mp4 = dynamic_cast<MP4::File*>(f.file()) )
+    {
+        if( mp4->tag() )
+            ReadMetaFromMP4( mp4->tag(), p_demux, p_demux_meta, p_meta );
+    }
+#endif
     else if( MPC::File* mpc = dynamic_cast<MPC::File*>(f.file()) )
     {
         if( mpc->APETag() )
