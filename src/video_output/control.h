@@ -39,6 +39,7 @@ enum {
     VOUT_CONTROL_START,
     VOUT_CONTROL_STOP,
 #endif
+    VOUT_CONTROL_SUBPICTURE,            /* subpicture */
     VOUT_CONTROL_OSD_TITLE,             /* string */
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
     VOUT_CONTROL_CHANGE_SUB_FILTERS,    /* string */
@@ -92,6 +93,7 @@ typedef struct {
             unsigned height;
         } window;
         const vout_configuration_t *cfg;
+        subpicture_t *subpicture;
     } u;
 } vout_control_cmd_t;
 

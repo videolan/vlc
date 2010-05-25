@@ -349,7 +349,11 @@ void vout_DisplayTitle(vout_thread_t *vout, const char *title)
 
 void vout_PutSubpicture( vout_thread_t *vout, subpicture_t *subpic )
 {
-    spu_DisplaySubpicture(vout->p->p_spu, subpic);
+    vout_control_cmd_t cmd;
+    vout_control_cmd_Init(&cmd, VOUT_CONTROL_SUBPICTURE);
+    cmd.u.subpicture = subpic;
+
+    vout_control_Push(&vout->p->control, &cmd);
 }
 int vout_RegisterSubpictureChannel( vout_thread_t *vout )
 {
@@ -749,6 +753,11 @@ static void ThreadManage(vout_thread_t *vout,
     vout_ManageWrapper(vout);
 }
 
+static void ThreadDisplaySubpicture(vout_thread_t *vout,
+                                    subpicture_t *subpicture)
+{
+    spu_DisplaySubpicture(vout->p->p_spu, subpicture);
+}
 static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
 {
     if (!vout->p->title.show)
@@ -1099,6 +1108,10 @@ static void *Thread(void *object)
             case VOUT_CONTROL_REINIT:
                 if (ThreadReinit(vout, cmd.u.cfg))
                     return NULL;
+                break;
+            case VOUT_CONTROL_SUBPICTURE:
+                ThreadDisplaySubpicture(vout, cmd.u.subpicture);
+                cmd.u.subpicture = NULL;
                 break;
             case VOUT_CONTROL_OSD_TITLE:
                 ThreadDisplayOsdTitle(vout, cmd.u.string);
