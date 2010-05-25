@@ -181,7 +181,7 @@ void demux_sys_t::StartUiThread()
         b_ui_hooked = true;
         /* FIXME hack hack hack hack FIXME */
         /* Get p_input and create variable */
-        p_input = (input_thread_t *) vlc_object_find( &demuxer, VLC_OBJECT_INPUT, FIND_PARENT );
+        p_input = demux_GetParentInput( &demuxer );
         var_Create( p_input, "x-start", VLC_VAR_INTEGER );
         var_Create( p_input, "y-start", VLC_VAR_INTEGER );
         var_Create( p_input, "x-end", VLC_VAR_INTEGER );
