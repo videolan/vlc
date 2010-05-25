@@ -196,7 +196,6 @@
 
 #define FOURCC_0xa9nam VLC_FOURCC( 0xa9, 'n', 'a', 'm' )
 #define FOURCC_0xa9aut VLC_FOURCC( 0xa9, 'a', 'u', 't' )
-#define FOURCC_0xa9swr VLC_FOURCC( 0xa9, 's', 'w', 'r' )
 #define FOURCC_0xa9cpy VLC_FOURCC( 0xa9, 'c', 'p', 'y' )
 #define FOURCC_0xa9inf VLC_FOURCC( 0xa9, 'i', 'n', 'f' )
 #define FOURCC_0xa9ART VLC_FOURCC( 0xa9, 'A', 'R', 'T' )
@@ -221,6 +220,13 @@
 #define FOURCC_0xa9com VLC_FOURCC( 0xa9, 'c', 'o', 'm' )
 #define FOURCC_0xa9gen VLC_FOURCC( 0xa9, 'g', 'e', 'n' )
 #define FOURCC_0xa9too VLC_FOURCC( 0xa9, 't', 'o', 'o' )
+#define FOURCC_0xa9wrn VLC_FOURCC( 0xa9, 'w', 'r', 'n' )
+#define FOURCC_0xa9swr VLC_FOURCC( 0xa9, 's', 'w', 'r' )
+#define FOURCC_0xa9mak VLC_FOURCC( 0xa9, 'm', 'a', 'k' )
+#define FOURCC_0xa9mod VLC_FOURCC( 0xa9, 'm', 'o', 'd' )
+#define FOURCC_0xa9PRD VLC_FOURCC( 0xa9, 'P', 'R', 'D' )
+#define FOURCC_0xa9grp VLC_FOURCC( 0xa9, 'g', 'r', 'p' )
+#define FOURCC_0xa9lyr VLC_FOURCC( 0xa9, 'g', 'r', 'p' )
 #define FOURCC_chpl VLC_FOURCC( 'c', 'h', 'p', 'l' )
 #define FOURCC_WLOC VLC_FOURCC( 'W', 'L', 'O', 'C' )
 

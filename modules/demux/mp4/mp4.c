@@ -947,7 +947,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     { FOURCC_0xa9com, N_("Composr") },
                     { FOURCC_0xa9prd, N_("Producer") },
                     { FOURCC_0xa9inf, N_("Information") },
-                    { FOURCC_0xa9swr, N_("Software") },
                     { FOURCC_0xa9dir, N_("Director") },
                     { FOURCC_0xa9dis, N_("Disclaimer") },
                     { FOURCC_0xa9req, N_("Requirements") },
@@ -957,6 +956,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     { FOURCC_0xa9prf, N_("Performers") },
                     { FOURCC_0xa9ope, N_("Original Performer") },
                     { FOURCC_0xa9src, N_("Providers Source Content") },
+                    { FOURCC_0xa9wrn, N_("Warning") },
+                    { FOURCC_0xa9swr, N_("Software") },
+                    { FOURCC_0xa9lyr, N_("Lyrics") },
+                    { FOURCC_0xa9mak, N_("Make") },
+                    { FOURCC_0xa9mod, N_("Model") },
+                    { FOURCC_0xa9PRD, N_("Product") },
+                    { FOURCC_0xa9grp, N_("Grouping") },
                     { 0, "" },
                 };
                 for( unsigned i = 0; xa9typetoextrameta[i].xa9_type; i++ )
