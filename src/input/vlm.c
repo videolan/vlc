@@ -227,7 +227,6 @@ static void vlm_Destructor( vlm_t *p_vlm )
     if( p_vlm->p_vod )
     {
         module_unneed( p_vlm->p_vod, p_vlm->p_vod->p_module );
-        vlc_object_detach( p_vlm->p_vod );
         vlc_object_release( p_vlm->p_vod );
     }
 
