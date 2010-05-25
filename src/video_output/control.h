@@ -41,6 +41,7 @@ enum {
 #endif
     VOUT_CONTROL_SUBPICTURE,            /* subpicture */
     VOUT_CONTROL_FLUSH_SUBPICTURE,      /* integer */
+    VOUT_CONTROL_REGISTER_SUBPICTURE,   /* integer_ptr */
     VOUT_CONTROL_OSD_TITLE,             /* string */
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
     VOUT_CONTROL_CHANGE_SUB_FILTERS,    /* string */
@@ -70,6 +71,7 @@ typedef struct {
         mtime_t *time_ptr;
         char    *string;
         int     integer;
+        int     *integer_ptr;
         struct {
             int a;
             int b;
