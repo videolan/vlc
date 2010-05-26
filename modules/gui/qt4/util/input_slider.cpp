@@ -324,7 +324,8 @@ void SoundSlider::paintEvent( QPaintEvent *e )
     painter.setPen( palette().color( QPalette::Active, QPalette::Mid ) );
     QFont font;
     painter.setFont( font );
-    const QRect rect( 0, 0, 34, 15 );
+    QFontMetrics fm = QFontMetrics( font );
+    const QRect rect = fm.boundingRect( QString::number( value() ) + '%' );
     painter.drawText( rect, Qt::AlignRight | Qt::AlignVCenter,
                       QString::number( value() ) + '%' );
 
