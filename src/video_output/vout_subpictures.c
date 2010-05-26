@@ -41,6 +41,7 @@
 #include "../libvlc.h"
 #include "vout_internal.h"
 #include <vlc_image.h>
+#include <vlc_input.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -71,6 +72,7 @@ static void SpuHeapClean( spu_heap_t *p_heap );
 struct spu_private_t
 {
     vlc_mutex_t lock;   /* lock to protect all followings fields */
+    vlc_object_t *p_input;
 
     spu_heap_t heap;
 
@@ -165,6 +167,13 @@ static int MarginCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 
 /* Buffer allocation for SPU filter (blend, scale, ...) */
+struct filter_owner_sys_t
+{
+    spu_t *p_spu;
+    int i_channel;
+};
+static int spu_get_attachments( filter_t *,
+                                input_attachment_t ***, int * );
 static subpicture_t *spu_new_buffer( filter_t * );
 static void spu_del_buffer( filter_t *, subpicture_t * );
 static picture_t *spu_new_video_buffer( filter_t * );
@@ -278,17 +287,27 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_input, bool b_attach )
 {
     if( b_attach )
     {
-        UpdateSPU( p_spu, VLC_OBJECT(p_input) );
+        UpdateSPU( p_spu, p_input );
         var_Create( p_input, "highlight", VLC_VAR_BOOL );
         var_AddCallback( p_input, "highlight", CropCallback, p_spu );
         var_AddCallback( p_input, "sub-margin", MarginCallback, p_spu->p );
 
         vlc_mutex_lock( &p_spu->p->lock );
+        p_spu->p->p_input = p_input;
         p_spu->p->i_margin = var_GetInteger( p_input, "sub-margin" );
+
+        FilterRelease( p_spu->p->p_text );
+        p_spu->p->p_text = NULL;
+        SpuRenderCreateAndLoadText( p_spu );
+
         vlc_mutex_unlock( &p_spu->p->lock );
     }
     else
     {
+        vlc_mutex_lock( &p_spu->p->lock );
+        p_spu->p->p_input = NULL;
+        vlc_mutex_unlock( &p_spu->p->lock );
+
         /* Delete callbacks */
         var_DelCallback( p_input, "sub-margin", MarginCallback, p_spu->p );
         var_DelCallback( p_input, "highlight", CropCallback, p_spu );
@@ -1063,6 +1082,8 @@ static void FilterRelease( filter_t *p_filter )
 {
     if( p_filter->p_module )
         module_unneed( p_filter, p_filter->p_module );
+    if( p_filter->p_owner )
+        free( p_filter->p_owner );
 
     vlc_object_release( p_filter );
 }
@@ -1079,6 +1100,9 @@ static void SpuRenderCreateAndLoadText( spu_t *p_spu )
     if( !p_text )
         return;
 
+    p_text->p_owner = xmalloc( sizeof(*p_text->p_owner) );
+    p_text->p_owner->p_spu = p_spu;
+
     es_format_Init( &p_text->fmt_in, VIDEO_ES, 0 );
 
     es_format_Init( &p_text->fmt_out, VIDEO_ES, 0 );
@@ -1087,8 +1111,9 @@ static void SpuRenderCreateAndLoadText( spu_t *p_spu )
     p_text->fmt_out.video.i_height =
     p_text->fmt_out.video.i_visible_height = 32;
 
-    p_text->pf_sub_buffer_new = spu_new_buffer;
-    p_text->pf_sub_buffer_del = spu_del_buffer;
+    p_text->pf_sub_buffer_new  = spu_new_buffer;
+    p_text->pf_sub_buffer_del  = spu_del_buffer;
+    p_text->pf_get_attachments = spu_get_attachments;
 
     vlc_object_attach( p_text, p_spu );
 
@@ -1850,11 +1875,19 @@ static int MarginCallback( vlc_object_t *p_object, char const *psz_var,
 /*****************************************************************************
  * Buffers allocation callbacks for the filters
  *****************************************************************************/
-struct filter_owner_sys_t
+static int spu_get_attachments( filter_t *p_filter,
+                                input_attachment_t ***ppp_attachment,
+                                int *pi_attachment )
 {
-    spu_t *p_spu;
-    int i_channel;
-};
+    spu_t *p_spu = p_filter->p_owner->p_spu;
+
+    int i_ret = VLC_EGENERIC;
+    if( p_spu->p->p_input )
+        i_ret = input_Control( (input_thread_t*)p_spu->p->p_input,
+                               INPUT_GET_ATTACHMENTS,
+                               ppp_attachment, pi_attachment );
+    return i_ret;
+}
 
 static subpicture_t *sub_new_buffer( filter_t *p_filter )
 {
