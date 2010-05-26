@@ -133,7 +133,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      *  UI and Widgets design
      **************************/
     setVLCWindowsTitle();
-    createMainWidget( settings );
 
     /************
      * Menu Bar *
@@ -142,6 +141,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ),
              this, destroyPopupMenu() );
 
+    createMainWidget( settings );
     /*********************************
      * Create the Systray Management *
      *********************************/
