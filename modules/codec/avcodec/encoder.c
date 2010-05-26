@@ -884,7 +884,9 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         if( !p_sys->p_context->max_b_frames || !p_sys->p_context->delay )
         {
             /* No delay -> output pts == input pts */
-            p_block->i_pts = p_block->i_dts = p_pict->date;
+            if( p_pict )
+                p_block->i_dts = p_pict->date;
+            p_block->i_pts = p_block->i_dts;
         }
         else if( p_sys->p_context->coded_frame->pts != (int64_t)AV_NOPTS_VALUE &&
             p_sys->p_context->coded_frame->pts != 0 &&
