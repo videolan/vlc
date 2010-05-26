@@ -264,6 +264,7 @@ static int Open( vlc_object_t *p_this )
             { "wav", "wav" },
             { "flv", "ffmpeg{mux=flv}" },
             { "mkv", "ffmpeg{mux=matroska}"},
+            { "webm", "ffmpeg{mux=webm}"},
             { "",    "" }
         };
         const char *psz_ext = strrchr( psz_url, '.' ) + 1;
