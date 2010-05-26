@@ -391,8 +391,8 @@ static int Demux( demux_t *p_demux )
             /* The popular VCD/SVCD subtitling WinSubMux does not
              * renumber the SCRs when merging subtitles into the PES */
             if( tk->b_seen &&
-                ( tk->fmt.i_codec == VLC_FOURCC('o','g','t',' ') ||
-                  tk->fmt.i_codec == VLC_FOURCC('c','v','d',' ') ) )
+                ( tk->fmt.i_codec == VLC_CODEC_OGT ||
+                  tk->fmt.i_codec == VLC_CODEC_CVD ) )
             {
                 p_sys->i_scr = -1;
             }

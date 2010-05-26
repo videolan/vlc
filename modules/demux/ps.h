@@ -112,11 +112,11 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
         }
         else if( ( i_id&0xff ) == 0x70 )
         {
-            es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC('o','g','t',' ') );
+            es_format_Init( &tk->fmt, SPU_ES, VLC_CODEC_OGT );
         }
         else if( ( i_id&0xfc ) == 0x00 )
         {
-            es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC('c','v','d',' ') );
+            es_format_Init( &tk->fmt, SPU_ES, VLC_CODEC_CVD );
         }
         else if( ( i_id&0xff ) == 0x10 )
         {
