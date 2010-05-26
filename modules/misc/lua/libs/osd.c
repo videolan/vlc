@@ -40,6 +40,7 @@
 
 #include "../vlc.h"
 #include "../libs.h"
+#include "input.h"
 
 /*****************************************************************************
  * OSD
@@ -72,31 +73,36 @@ static int vlclua_osd_icon( lua_State *L )
     int i_chan = luaL_optint( L, 2, SPU_DEFAULT_CHANNEL );
     if( !i_icon )
         return luaL_error( L, "\"%s\" is not a valid osd icon.", psz_icon );
-    else
+
+    input_thread_t *p_input = vlclua_get_input_internal( L );
+    if( p_input )
     {
-        vlc_object_t *p_this = vlclua_get_this( L );
-        vout_thread_t *p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT,
-                                                 FIND_ANYWHERE );
+        vout_thread_t *p_vout = input_GetVout( p_input );
         if( p_vout )
         {
             vout_OSDIcon( p_vout, i_chan, i_icon );
             vlc_object_release( p_vout );
         }
-        return 0;
+        vlc_object_release( p_input );
     }
+    return 0;
 }
 
 static int vlclua_osd_message( lua_State *L )
 {
     const char *psz_message = luaL_checkstring( L, 1 );
     int i_chan = luaL_optint( L, 2, SPU_DEFAULT_CHANNEL );
-    vlc_object_t *p_this = vlclua_get_this( L );
-    vout_thread_t *p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT,
-                                             FIND_ANYWHERE );
-    if( p_vout )
+
+    input_thread_t *p_input = vlclua_get_input_internal( L );
+    if( p_input )
     {
-        vout_OSDMessage( p_vout, i_chan, "%s", psz_message );
-        vlc_object_release( p_vout );
+        vout_thread_t *p_vout = input_GetVout( p_input );
+        if( p_vout )
+        {
+            vout_OSDMessage( p_vout, i_chan, "%s", psz_message );
+            vlc_object_release( p_vout );
+        }
+        vlc_object_release( p_input );
     }
     return 0;
 }
@@ -129,31 +135,37 @@ static int vlclua_osd_slider( lua_State *L )
     if( !i_type )
         return luaL_error( L, "\"%s\" is not a valid slider type.",
                            psz_type );
-    else
+
+    input_thread_t *p_input = vlclua_get_input_internal( L );
+    if( p_input )
     {
-        vlc_object_t *p_this = vlclua_get_this( L );
-        vout_thread_t *p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT,
-                                                 FIND_ANYWHERE );
+        vout_thread_t *p_vout = input_GetVout( p_input );
         if( p_vout )
         {
             vout_OSDSlider( p_vout, i_chan, i_position, i_type );
             vlc_object_release( p_vout );
         }
-        return 0;
+        vlc_object_release( p_input );
     }
+    return 0;
 }
 
 static int vlclua_spu_channel_register( lua_State *L )
 {
-    int i_chan;
-    vlc_object_t *p_this = vlclua_get_this( L );
-    vout_thread_t *p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT,
-                                             FIND_ANYWHERE );
-    if( !p_vout )
-        return luaL_error( L, "Unable to find vout." );
+    input_thread_t *p_input = vlclua_get_input_internal( L );
+    if( !p_input )
+        return luaL_error( L, "Unable to find input." );
 
-    i_chan = vout_RegisterSubpictureChannel( p_vout );
+    vout_thread_t *p_vout = input_GetVout( p_input );
+    if( !p_vout )
+    {
+        vlc_object_release( p_input );
+        return luaL_error( L, "Unable to find vout." );
+    }
+
+    int i_chan = vout_RegisterSubpictureChannel( p_vout );
     vlc_object_release( p_vout );
+    vlc_object_release( p_input );
     lua_pushinteger( L, i_chan );
     return 1;
 }
@@ -161,14 +173,19 @@ static int vlclua_spu_channel_register( lua_State *L )
 static int vlclua_spu_channel_clear( lua_State *L )
 {
     int i_chan = luaL_checkint( L, 1 );
-    vlc_object_t *p_this = vlclua_get_this( L );
-    vout_thread_t *p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT,
-                                             FIND_ANYWHERE );
+    input_thread_t *p_input = vlclua_get_input_internal( L );
+    if( !p_input )
+        return luaL_error( L, "Unable to find input." );
+    vout_thread_t *p_vout = input_GetVout( p_input );
     if( !p_vout )
+    {
+        vlc_object_release( p_input );
         return luaL_error( L, "Unable to find vout." );
+    }
 
     vout_FlushSubpictureChannel( p_vout, i_chan );
     vlc_object_release( p_vout );
+    vlc_object_release( p_input );
     return 0;
 }
 
