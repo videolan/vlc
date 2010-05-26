@@ -223,7 +223,6 @@ modules/access/dvb/scan.h
 modules/access/dvdnav.c
 modules/access/dvdread.c
 modules/access/eyetv.m
-modules/access/fake.c
 modules/access/file.c
 modules/access/fs.c
 modules/access/ftp.c
@@ -370,7 +369,6 @@ modules/codec/dmo/dmo.h
 modules/codec/dts.c
 modules/codec/dvbsub.c
 modules/codec/faad.c
-modules/codec/fake.c
 modules/codec/flac.c
 modules/codec/fluidsynth.c
 modules/codec/invmem.c
@@ -450,6 +448,7 @@ modules/demux/demuxdump.c
 modules/demux/dirac.c
 modules/demux/flac.c
 modules/demux/gme.cpp
+modules/demux/image.c
 modules/demux/kate_categories.c
 modules/demux/live555.cpp
 modules/demux/mjpeg.c
