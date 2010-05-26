@@ -125,6 +125,11 @@ struct filter_t
 #define pf_render_html     u.render.pf_html
 
     } u;
+
+    /* Input attachments
+     * XXX use filter_GetInputAttachments */
+    int (*pf_get_attachments)( filter_t *, input_attachment_t ***, int * );
+
     /* Private structure for the owner of the decoder */
     filter_owner_sys_t *p_owner;
 };
@@ -203,6 +208,21 @@ static inline block_t *filter_NewAudioBuffer( filter_t *p_filter, int i_size )
     if( !p_block )
         msg_Warn( p_filter, "can't get output block" );
     return p_block;
+}
+
+/**
+ * This function gives all input attachments at once.
+ *
+ * You MUST release the returned values
+ */
+static inline int filter_GetInputAttachments( filter_t *p_filter,
+                                              input_attachment_t ***ppp_attachment,
+                                              int *pi_attachment )
+{
+    if( !p_filter->pf_get_attachments )
+        return VLC_EGENERIC;
+    return p_filter->pf_get_attachments( p_filter,
+                                         ppp_attachment, pi_attachment );
 }
 
 /**
