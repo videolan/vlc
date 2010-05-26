@@ -913,36 +913,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         return NULL;
     }
 
-    /* Choose the port */
-    uint16_t i_port = 0;
-    if( p_fmt == NULL )
-        ;
-    else
-    if( p_fmt->i_cat == AUDIO_ES && p_sys->i_port_audio > 0 )
-        i_port = p_sys->i_port_audio;
-    else
-    if( p_fmt->i_cat == VIDEO_ES && p_sys->i_port_video > 0 )
-        i_port = p_sys->i_port_video;
-
-    /* We do not need the ES lock (p_sys->lock_es) here, because this is the
-     * only one thread that can *modify* the ES table. The ES lock protects
-     * the other threads from our modifications (TAB_APPEND, TAB_REMOVE). */
-    for (int i = 0; i_port && (i < p_sys->i_es); i++)
-         if (i_port == p_sys->es[i]->i_port)
-             i_port = 0; /* Port already in use! */
-    for (uint16_t p = p_sys->i_port; i_port == 0; p += 2)
-    {
-        if (p == 0)
-        {
-            msg_Err (p_stream, "too many RTP elementary streams");
-            return NULL;
-        }
-        i_port = p;
-        for (int i = 0; i_port && (i < p_sys->i_es); i++)
-             if (p == p_sys->es[i]->i_port)
-                 i_port = 0;
-    }
-
     sout_stream_id_t *id = malloc( sizeof( *id ) );
     if( unlikely(id == NULL) )
         return NULL;
@@ -959,7 +929,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->psz_fmtp   = NULL;
     id->i_clock_rate = 90000; /* most common case for video */
     id->i_channels = 0;
-    id->i_port     = i_port;
     if( p_fmt != NULL )
     {
         id->i_cat  = p_fmt->i_cat;
@@ -1025,6 +994,39 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     if( p_sys->psz_destination != NULL )
     {
+        /* Choose the port */
+        uint16_t i_port = 0;
+        if( p_fmt == NULL )
+            ;
+        else
+        if( p_fmt->i_cat == AUDIO_ES && p_sys->i_port_audio > 0 )
+            i_port = p_sys->i_port_audio;
+        else
+        if( p_fmt->i_cat == VIDEO_ES && p_sys->i_port_video > 0 )
+            i_port = p_sys->i_port_video;
+
+        /* We do not need the ES lock (p_sys->lock_es) here, because
+         * this is the only one thread that can *modify* the ES table.
+         * The ES lock protects the other threads from our modifications
+         * (TAB_APPEND, TAB_REMOVE). */
+        for (int i = 0; i_port && (i < p_sys->i_es); i++)
+             if (i_port == p_sys->es[i]->i_port)
+                 i_port = 0; /* Port already in use! */
+        for (uint16_t p = p_sys->i_port; i_port == 0; p += 2)
+        {
+            if (p == 0)
+            {
+                msg_Err (p_stream, "too many RTP elementary streams");
+                goto error;
+            }
+            i_port = p;
+            for (int i = 0; i_port && (i < p_sys->i_es); i++)
+                 if (p == p_sys->es[i]->i_port)
+                     i_port = 0;
+        }
+
+        id->i_port = i_port;
+
         int type = SOCK_STREAM;
 
         switch( p_sys->proto )
