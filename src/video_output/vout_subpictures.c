@@ -216,7 +216,7 @@ spu_t *spu_Create( vlc_object_t *p_this )
     p_sys->i_margin = var_InheritInteger( p_spu, "sub-margin" );
 
     /* Register the default subpicture channel */
-    p_sys->i_channel = 2;
+    p_sys->i_channel = SPU_DEFAULT_CHANNEL + 1;
 
     p_sys->psz_chain_update = NULL;
     vlc_mutex_init( &p_sys->chain_lock );
