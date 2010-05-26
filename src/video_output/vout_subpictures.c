@@ -528,7 +528,6 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_subtitle_date,
                                    bool b_subtitle_only )
 {
     spu_private_t *p_sys = p_spu->p;
-    int i_channel;
     subpicture_t *p_subpic = NULL;
     const mtime_t render_osd_date = mdate();
 
@@ -553,10 +552,31 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_subtitle_date,
 
     vlc_mutex_lock( &p_sys->lock );
 
+    /* Create a list of channels */
+    int pi_channel[VOUT_MAX_SUBPICTURES];
+    int i_channel_count = 0;
+
+    for( int i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
+    {
+        spu_heap_entry_t *p_entry = &p_sys->heap.p_entry[i_index];
+        if( !p_entry->p_subpicture || p_entry->b_reject )
+            continue;
+        const int i_channel = p_entry->p_subpicture->i_channel;
+        int i;
+        for( i = 0; i < i_channel_count; i++ )
+        {
+            if( pi_channel[i] == i_channel )
+                break;
+        }
+        if( i_channel_count <= i )
+            pi_channel[i_channel_count++] = i_channel;
+    }
+
     /* We get an easily parsable chained list of subpictures which
      * ends with NULL since p_subpic was initialized to NULL. */
-    for( i_channel = 0; i_channel < p_sys->i_channel; i_channel++ )
+    for( int i = 0; i < i_channel_count; i++ )
     {
+        const int i_channel = pi_channel[i];
         subpicture_t *p_available_subpic[VOUT_MAX_SUBPICTURES];
         bool         pb_available_late[VOUT_MAX_SUBPICTURES];
         int          i_available = 0;
