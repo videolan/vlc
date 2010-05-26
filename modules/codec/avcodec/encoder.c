@@ -593,6 +593,20 @@ int OpenEncoder( vlc_object_t *p_this )
     /* Misc parameters */
     p_context->bit_rate = p_enc->fmt_out.i_bitrate;
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 68, 2 )
+    /* Set reasonable defaults to VP8, based on
+       libvpx-720p preset from libvpx ffmpeg-patch */
+    if( i_codec_id == CODEC_ID_VP8 )
+    {
+        p_context->bit_rate_tolerance = 2* p_enc->fmt_out.i_bitrate;
+        p_context->lag = 16;
+        p_context->level = 216;
+        p_context->profile = 0;
+        p_context->rc_buffer_aggressivity = 0.95;
+        p_context->token_partitions = 4;
+    }
+#endif
+
     if( i_codec_id == CODEC_ID_RAWVIDEO )
     {
         /* XXX: hack: Force same codec (will be handled by transcode) */
