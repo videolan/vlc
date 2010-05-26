@@ -598,12 +598,18 @@ int OpenEncoder( vlc_object_t *p_this )
        libvpx-720p preset from libvpx ffmpeg-patch */
     if( i_codec_id == CODEC_ID_VP8 )
     {
-        p_context->bit_rate_tolerance = 2* p_enc->fmt_out.i_bitrate;
+        p_context->bit_rate_tolerance = __MAX(2 * p_enc->fmt_out.i_bitrate, p_sys->i_vtolerance );
+        /* I used Harrison-stetson method here to get there values */
+        p_context->rc_max_rate = 3 * p_enc->fmt_out.i_bitrate;
+        p_context->rc_min_rate = p_enc->fmt_out.i_bitrate / 200;
+
+
         p_context->lag = 16;
         p_context->level = 216;
         p_context->profile = 0;
         p_context->rc_buffer_aggressivity = 0.95;
         p_context->token_partitions = 4;
+        p_context->mb_static_threshold = 0;
     }
 #endif
 
