@@ -232,59 +232,43 @@ static void Destroy( vlc_object_t *p_this )
 static int LoadFontsFromAttachments( filter_t *p_filter )
 {
     filter_sys_t         *p_sys = p_filter->p_sys;
-    input_thread_t       *p_input;
     input_attachment_t  **pp_attachments;
     int                   i_attachments_cnt;
-    int                   k;
-    int                   rv = VLC_SUCCESS;
 
-    p_input = (input_thread_t *)vlc_object_find( p_filter, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( ! p_input )
+    if( filter_GetInputAttachments( p_filter, &pp_attachments, &i_attachments_cnt ) )
         return VLC_EGENERIC;
-
-    if( VLC_SUCCESS != input_Control( p_input, INPUT_GET_ATTACHMENTS, &pp_attachments, &i_attachments_cnt ))
-    {
-        vlc_object_release(p_input);
-        return VLC_EGENERIC;
-    }
 
     p_sys->i_fonts = 0;
     p_sys->p_fonts = malloc( i_attachments_cnt * sizeof( ATSFontContainerRef ) );
     if(! p_sys->p_fonts )
-        rv = VLC_ENOMEM;
+        return VLC_ENOMEM;
 
-    for( k = 0; k < i_attachments_cnt; k++ )
+    for( int k = 0; k < i_attachments_cnt; k++ )
     {
         input_attachment_t *p_attach = pp_attachments[k];
 
-        if( p_sys->p_fonts )
+        if( ( !strcmp( p_attach->psz_mime, "application/x-truetype-font" ) || // TTF
+              !strcmp( p_attach->psz_mime, "application/x-font-otf" ) ) &&    // OTF
+            p_attach->i_data > 0 && p_attach->p_data )
         {
-            if(( !strcmp( p_attach->psz_mime, "application/x-truetype-font" ) || // TTF
-                 !strcmp( p_attach->psz_mime, "application/x-font-otf" ) ) &&    // OTF
-               ( p_attach->i_data > 0 ) &&
-               ( p_attach->p_data != NULL ) )
-            {
-                ATSFontContainerRef  container;
+            ATSFontContainerRef  container;
 
-                if( noErr == ATSFontActivateFromMemory( p_attach->p_data,
-                                                        p_attach->i_data,
-                                                        kATSFontContextLocal,
-                                                        kATSFontFormatUnspecified,
-                                                        NULL,
-                                                        kATSOptionFlagsDefault,
-                                                        &container ))
-                {
-                    p_sys->p_fonts[ p_sys->i_fonts++ ] = container;
-                }
+            if( noErr == ATSFontActivateFromMemory( p_attach->p_data,
+                                                    p_attach->i_data,
+                                                    kATSFontContextLocal,
+                                                    kATSFontFormatUnspecified,
+                                                    NULL,
+                                                    kATSOptionFlagsDefault,
+                                                    &container ))
+            {
+                p_sys->p_fonts[ p_sys->i_fonts++ ] = container;
             }
         }
         vlc_input_attachment_Delete( p_attach );
     }
     free( pp_attachments );
 
-    vlc_object_release(p_input);
-
-    return rv;
+    return VLC_SUCCESS;
 }
 
 static char *EliminateCRLF( char *psz_string )
