@@ -450,6 +450,7 @@ static int Open( vlc_object_t * p_this )
                 {
                    msg_Dbg( p_demux, "stream[%d] subtitles", i );
                    es_format_Init( &fmt, SPU_ES, p_vids->p_bih->biCompression );
+                   tk->i_cat = SPU_ES;
                    break;
                 }
                 else if( p_vids->p_bih->biCompression == 0x00 )
@@ -1921,6 +1922,7 @@ static void AVI_ParseStreamHeader( vlc_fourcc_t i_id,
                 SET_PTR( pi_type, VIDEO_ES );
                 break;
             case AVITWOCC_tx:
+            case AVITWOCC_sb:
                 SET_PTR( pi_type, SPU_ES );
                 break;
             default:

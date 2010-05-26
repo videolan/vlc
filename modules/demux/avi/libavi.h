@@ -300,6 +300,8 @@ void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
 #define AVITWOCC_pc            VLC_TWOCC('p','c')
 #define AVITWOCC_AC            VLC_TWOCC('A','C')
 #define AVITWOCC_tx            VLC_TWOCC('t','x')
+#define AVITWOCC_sb            VLC_TWOCC('s','b')
+
     /* *** codex stuff ***  */
 
     /* DV */

@@ -66,6 +66,7 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     /* */
     switch (codec_id) {
     case CODEC_ID_HDMV_PGS_SUBTITLE:
+    case CODEC_ID_XSUB:
         break;
     default:
         msg_Warn(dec, "refusing to decode non validated subtitle codec");
