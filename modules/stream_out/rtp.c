@@ -831,7 +831,8 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
                       id->psz_enc, id->i_clock_rate, id->i_channels,
                       id->psz_fmtp);
 
-        if( !p_sys->rtcp_mux && (id->i_port & 1) ) /* cf RFC4566 §5.14 */
+        /* cf RFC4566 §5.14 */
+        if( inclport && !p_sys->rtcp_mux && (id->i_port & 1) )
             sdp_AddAttribute ( &psz_sdp, "rtcp", "%u", id->i_port + 1 );
 
         if( rtsp_url != NULL )
