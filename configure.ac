@@ -4685,7 +4685,6 @@ AC_CONFIG_FILES([
   projects/activex/Makefile
   projects/activex/axvlc.inf
   doc/Makefile
-  doc/Doxyfile
   extras/package/ipkg/Makefile
   libs/loader/Makefile
   libs/srtp/Makefile
