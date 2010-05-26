@@ -259,6 +259,12 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
     uint16_t i_expected_image;
     uint8_t  i_packet, i_expected_packet;
 
+    if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
+
     if( p_block->i_buffer < SPU_HEADER_LEN )
     {
         msg_Dbg( p_dec, "invalid packet header (size %zu < %u)" ,
@@ -268,34 +274,6 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
     }
 
     p_buffer = p_block->p_buffer;
-
-    /* Attach to our input thread and see if subtitle is selected. */
-    {
-        vlc_object_t * p_input;
-        vlc_value_t val;
-
-        p_input = vlc_object_find( p_dec, VLC_OBJECT_INPUT, FIND_PARENT );
-
-        if( !p_input ) return NULL;
-
-        if( var_Get( p_input, "sub-track", &val ) )
-        {
-            vlc_object_release( p_input );
-            return NULL;
-        }
-
-        vlc_object_release( p_input );
-        dbg_print( (DECODE_DBG_PACKET),
-                   "val.i_int %x p_buffer[i] %x", val.i_int, p_buffer[1]);
-
-        /* The dummy ES that the menu selection uses has an 0x70 at
-           the head which we need to strip off. */
-        if( val.i_int == -1 || (val.i_int & 0x03) != p_buffer[1] )
-        {
-            dbg_print( DECODE_DBG_PACKET, "subtitle not for us.\n");
-            return NULL;
-        }
-    }
 
     if( p_sys->i_state == SUBTITLE_BLOCK_EMPTY )
     {
@@ -308,6 +286,8 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
         i_expected_packet = p_sys->i_packet + 1;
     }
 
+    /* The dummy ES that the menu selection uses has an 0x70 at
+       the head which we need to strip off. */
     p_buffer += 2;
 
     if( *p_buffer & 0x80 )
