@@ -604,12 +604,14 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->rc_min_rate = p_enc->fmt_out.i_bitrate / 200;
 
 
+#if 0 /* enable when/if vp8 encoder is accepted in libavcodec */
         p_context->lag = 16;
         p_context->level = 216;
         p_context->profile = 0;
         p_context->rc_buffer_aggressivity = 0.95;
         p_context->token_partitions = 4;
         p_context->mb_static_threshold = 0;
+#endif
     }
 #endif
 
