@@ -174,8 +174,6 @@ struct filter_owner_sys_t
 };
 static int spu_get_attachments( filter_t *,
                                 input_attachment_t ***, int * );
-static subpicture_t *spu_new_buffer( filter_t * );
-static void spu_del_buffer( filter_t *, subpicture_t * );
 static picture_t *spu_new_video_buffer( filter_t * );
 static void spu_del_video_buffer( filter_t *, picture_t * );
 
@@ -1111,8 +1109,6 @@ static void SpuRenderCreateAndLoadText( spu_t *p_spu )
     p_text->fmt_out.video.i_height =
     p_text->fmt_out.video.i_visible_height = 32;
 
-    p_text->pf_sub_buffer_new  = spu_new_buffer;
-    p_text->pf_sub_buffer_del  = spu_del_buffer;
     p_text->pf_get_attachments = spu_get_attachments;
 
     vlc_object_attach( p_text, p_spu );
@@ -1903,18 +1899,6 @@ static void sub_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
     VLC_UNUSED( p_filter );
     subpicture_Delete( p_subpic );
 }
-
-static subpicture_t *spu_new_buffer( filter_t *p_filter )
-{
-    VLC_UNUSED(p_filter);
-    return subpicture_New( NULL );
-}
-static void spu_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
-{
-    VLC_UNUSED(p_filter);
-    subpicture_Delete( p_subpic );
-}
-
 static picture_t *spu_new_video_buffer( filter_t *p_filter )
 {
     const video_format_t *p_fmt = &p_filter->fmt_out.video;
