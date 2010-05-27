@@ -216,14 +216,6 @@ vout_thread_t *(vout_Request)(vlc_object_t *object,
     return VoutCreate(object, cfg);
 }
 
-/*****************************************************************************
- * vout_Close: Close a vout created by VoutCreate.
- *****************************************************************************
- * You HAVE to call it on vout created by VoutCreate before vlc_object_release.
- * You should NEVER call it on vout not obtained through VoutCreate
- * (like with vout_Request or vlc_object_find.)
- * You can use vout_CloseAndRelease() as a convenience method.
- *****************************************************************************/
 void vout_Close(vout_thread_t *vout)
 {
     assert(vout);
