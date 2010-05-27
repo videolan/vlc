@@ -47,7 +47,6 @@
 #   define O_LARGEFILE 0
 #endif
 
-#define TMP_IDX_SUFFIX ".tmp"
 #define STR_ENDLIST "#EXT-X-ENDLIST\n"
 
 #define MAX_RENAME_RETRIES        10
@@ -60,11 +59,11 @@ static void Close( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-livehttp-"
 #define SEGLEN_TEXT N_("Segment length")
-#define SEGLEN_LONGTEXT N_("Length of ts stream segments")
+#define SEGLEN_LONGTEXT N_("Length of TS stream segments")
 
 #define SPLITANYWHERE_TEXT N_("Split segments anywhere")
 #define SPLITANYWHERE_LONGTEXT N_("Don't require a keyframe before splitting "\
-                                "a segment. Neede for audio only.")
+                                "a segment. Needed for audio only.")
 
 #define NUMSEGS_TEXT N_("Number of segments")
 #define NUMSEGS_LONGTEXT N_("Number of segments to include in index")
@@ -72,7 +71,7 @@ static void Close( vlc_object_t * );
 #define INDEX_TEXT N_("Index file")
 #define INDEX_LONGTEXT N_("Path to the index file to create")
 
-#define INDEXURL_TEXT N_("Full url to put in index file")
+#define INDEXURL_TEXT N_("Full URL to put in index file")
 #define INDEXURL_LONGTEXT N_("Full url to put in index file. "\
                           "Use #'s to represent segment number")
 
@@ -155,9 +154,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_access->pf_write = Write;
-    p_access->pf_seek  = Seek;
-    p_access->pf_control = Control;
     if( !( p_sys = malloc ( sizeof( *p_sys ) ) ) )
         return VLC_ENOMEM;
 
@@ -192,6 +188,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_handle = -1;
     p_sys->i_segment = 0;
     p_sys->psz_cursegPath = NULL;
+
+    p_access->pf_write = Write;
+    p_access->pf_seek  = Seek;
+    p_access->pf_control = Control;
 
     return VLC_SUCCESS;
 }
@@ -247,7 +247,7 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
         int val;
         FILE *fp;
         char *psz_idxTmp;
-        if ( asprintf( &psz_idxTmp, "%s%s", p_sys->psz_indexPath, TMP_IDX_SUFFIX ) < 0)
+        if ( asprintf( &psz_idxTmp, "%s.tmp", p_sys->psz_indexPath ) < 0)
             return -1;
 
         fp = vlc_fopen( psz_idxTmp, "wt");
