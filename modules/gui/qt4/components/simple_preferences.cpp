@@ -524,7 +524,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 //            ui.defaultLabel->setFont( italicFont );
             ui.skinsLabel->setText(
                     qtr( "This is VLC's skinnable interface. You can download other skins at" )
-                    + QString( " <a href=\"http://www.videolan.org/vlc/skins.php\">VLC skins website</a>." ) );
+                    + QString( " <a href=\"http://www.videolan.org/vlc/skins.php\">" )
+                    + qtr( "VLC skins website" )+ QString( "</a>." ) );
             ui.skinsLabel->setFont( italicFont );
 
 #if defined( WIN32 )
