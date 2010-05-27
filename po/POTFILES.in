@@ -627,6 +627,7 @@ modules/gui/qt4/dialogs/extended.cpp
 modules/gui/qt4/dialogs/extended.hpp
 modules/gui/qt4/dialogs/external.cpp
 modules/gui/qt4/dialogs/external.hpp
+modules/gui/qt4/dialogs/firstrun.cpp
 modules/gui/qt4/dialogs/gototime.cpp
 modules/gui/qt4/dialogs/gototime.hpp
 modules/gui/qt4/dialogs/help.cpp
