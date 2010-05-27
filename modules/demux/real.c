@@ -105,6 +105,8 @@ typedef struct
     mtime_t     *p_subpackets_timecode;
     int         i_out_subpacket;
 
+    block_t     *p_sipr_packet;
+    int         i_sipr_subpacket_count;
     mtime_t     i_last_dts;
 } real_track_t;
 
@@ -165,6 +167,7 @@ static int      RLength( const uint8_t **pp_data, int *pi_data );
 static uint8_t  R8( const uint8_t **pp_data, int *pi_data );
 static uint16_t R16( const uint8_t **pp_data, int *pi_data );
 static uint32_t R32( const uint8_t **pp_data, int *pi_data );
+static void     SiprPacketReorder(uint8_t *buf, int sub_packet_h, int framesize);
 
 /*****************************************************************************
  * Open
@@ -254,6 +257,8 @@ static void Close( vlc_object_t *p_this )
             free( tk->p_subpackets );
             free( tk->p_subpackets_timecode );
         }
+        if( tk->p_sipr_packet )
+            block_Release( tk->p_sipr_packet );
         free( tk );
     }
     if( p_sys->i_track > 0 )
@@ -625,8 +630,7 @@ static void DemuxAudioMethod1( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
     }
 
     if( tk->fmt.i_codec == VLC_CODEC_COOK ||
-        tk->fmt.i_codec == VLC_CODEC_ATRAC3 ||
-        tk->fmt.i_codec == VLC_CODEC_SIPR )
+        tk->fmt.i_codec == VLC_CODEC_ATRAC3 )
     {
         const int i_num = tk->i_frame_size / tk->i_subpacket_size;
         const int y = tk->i_subpacket / ( tk->i_frame_size / tk->i_subpacket_size );
@@ -794,18 +798,91 @@ static void DemuxAudioMethod3( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
     es_out_Send( p_demux->out, tk->p_es, p_block );
 }
 
+// Sipr packet re-ordering code and index table borrowed from
+// the MPlayer Realmedia demuxer.
+static const uint8_t sipr_swap_index_table[38][2] = {
+    {  0, 63 }, {  1, 22 }, {  2, 44 }, {  3, 90 },
+    {  5, 81 }, {  7, 31 }, {  8, 86 }, {  9, 58 },
+    { 10, 36 }, { 12, 68 }, { 13, 39 }, { 14, 73 },
+    { 15, 53 }, { 16, 69 }, { 17, 57 }, { 19, 88 },
+    { 20, 34 }, { 21, 71 }, { 24, 46 }, { 25, 94 },
+    { 26, 54 }, { 28, 75 }, { 29, 50 }, { 32, 70 },
+    { 33, 92 }, { 35, 74 }, { 38, 85 }, { 40, 56 },
+    { 42, 87 }, { 43, 65 }, { 45, 59 }, { 48, 79 },
+    { 49, 93 }, { 51, 89 }, { 55, 95 }, { 61, 76 },
+    { 67, 83 }, { 77, 80 }
+};
+
+static void SiprPacketReorder(uint8_t *buf, int sub_packet_h, int framesize)
+{
+    int n, bs = sub_packet_h * framesize * 2 / 96; // nibbles per subpacket
+
+    for (n = 0; n < 38; n++) {
+        int j;
+        int i = bs * sipr_swap_index_table[n][0];
+        int o = bs * sipr_swap_index_table[n][1];
+
+        /* swap 4 bit-nibbles of block 'i' with 'o' */
+        for (j = 0; j < bs; j++, i++, o++) {
+           int x = (buf[i >> 1] >> (4 * (i & 1))) & 0xF,
+                y = (buf[o >> 1] >> (4 * (o & 1))) & 0xF;
+
+            buf[o >> 1] = (x << (4 * (o & 1))) |
+                (buf[o >> 1] & (0xF << (4 * !(o & 1))));
+            buf[i >> 1] = (y << (4 * (i & 1))) |
+                (buf[i >> 1] & (0xF << (4 * !(i & 1))));
+        }
+    }
+}
+
+static void DemuxAudioSipr( demux_t *p_demux, real_track_t *tk, mtime_t i_pts )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    block_t *p_block = tk->p_sipr_packet;
+
+    if( p_sys->i_buffer < tk->i_frame_size )
+        return;
+
+    if( !p_block )
+    {
+        p_block = block_New( p_demux, tk->i_frame_size * tk->i_subpacket_h );
+        if( !p_block )
+            return;
+        tk->p_sipr_packet = p_block;
+    }
+
+    memcpy( p_block->p_buffer + tk->i_sipr_subpacket_count * tk->i_frame_size,
+            p_sys->buffer, tk->i_frame_size );
+    if (!tk->i_sipr_subpacket_count)
+    {
+        p_block->i_dts =
+        p_block->i_pts = i_pts;
+    }
+
+    if( ++tk->i_sipr_subpacket_count < tk->i_subpacket_h )
+        return;
+
+    SiprPacketReorder(p_block->p_buffer, tk->i_subpacket_h, tk->i_frame_size);
+    CheckPcr( p_demux, tk, p_block->i_pts );
+    es_out_Send( p_demux->out, tk->p_es, p_block );
+    tk->i_sipr_subpacket_count = 0;
+    tk->p_sipr_packet = NULL;
+}
+
 static void DemuxAudio( demux_t *p_demux, real_track_t *tk, mtime_t i_pts, unsigned i_flags )
 {
     switch( tk->fmt.i_codec )
     {
     case VLC_CODEC_COOK:
     case VLC_CODEC_ATRAC3:
-    case VLC_CODEC_SIPR:
     case VLC_CODEC_RA_288:
         DemuxAudioMethod1( p_demux, tk, i_pts, i_flags );
         break;
     case VLC_CODEC_MP4A:
         DemuxAudioMethod2( p_demux, tk, i_pts );
+        break;
+    case VLC_CODEC_SIPR:
+        DemuxAudioSipr( p_demux, tk, i_pts );
         break;
     default:
         DemuxAudioMethod3( p_demux, tk, i_pts );
@@ -1349,6 +1426,7 @@ static int CodecVideoParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
     tk->i_frame_size = 0;
     tk->p_frame = NULL;
     tk->i_last_dts = 0;
+    tk->p_sipr_packet = NULL;
     tk->p_es = es_out_Add( p_demux->out, &fmt );
 
     TAB_APPEND( p_sys->i_track, p_sys->track, tk );
@@ -1494,6 +1572,10 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
             return VLC_EGENERIC;
 
         i_subpacket_size = i_subpacket_size_sipr[i_flavor];
+        // The libavcodec sipr decoder requires stream bitrate
+        // to be set during initialization so that the correct mode
+        // can be selected.
+        fmt.i_bitrate = fmt.audio.i_rate;
         msg_Dbg( p_demux, "    - sipr flavor=%i", i_flavor );
 
     case VLC_FOURCC( 'c','o','o','k' ):
@@ -1559,9 +1641,12 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
     tk->i_subpackets = 0;
     tk->p_subpackets = NULL;
     tk->p_subpackets_timecode = NULL;
+
+    tk->p_sipr_packet          = NULL;
+    tk->i_sipr_subpacket_count = 0;
+
     if( fmt.i_codec == VLC_CODEC_COOK ||
-        fmt.i_codec == VLC_CODEC_ATRAC3 ||
-        fmt.i_codec == VLC_CODEC_SIPR )
+        fmt.i_codec == VLC_CODEC_ATRAC3 )
     {
         tk->i_subpackets =
             i_subpacket_h * i_frame_size / tk->i_subpacket_size;
