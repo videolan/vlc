@@ -7,6 +7,14 @@ Codecs
 Video Filter:
  * New gradfun filter for debanding videos using dithering
 
+Stream output:
+ * New livehttp-module for HTTP Live Streamin (iphone-stuff),
+   example: vlc inputfile :sout="#transcode{vcodec=h264,acodec=mp3,
+    venc=x264{profile=baseline},width=320,vb=256,ab=96}:std{
+    access=livehttp{index=public_html/iphonestream.m3u8,
+    index-url=http://url-to-iphonestreamfile-###.ts},mux=ts{use-key-frames},
+    dst=public_html/iphonestreamfile-###.ts}"
+
 
 Changes between 1.0.5 and 1.1.0-pre1:
 ------------------------------------
