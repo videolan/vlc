@@ -68,6 +68,8 @@ int main( int i_argc, const char *ppsz_argv[] )
      * Note: this is NOT an excuse for not protecting against SIGPIPE. If
      * LibVLC runs outside of VLC, we cannot rely on this code snippet. */
     signal (SIGPIPE, SIG_IGN);
+    /* Restore default for SIGCHLD in case parent ignores it. */
+    signal (SIGCHLD, SIG_DFL);
 
 #ifdef HAVE_SETENV
 # ifndef NDEBUG
