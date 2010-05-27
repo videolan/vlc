@@ -85,9 +85,6 @@ struct vout_thread_t {
 #define VOUT_ALIGN_BOTTOM       0x0008
 #define VOUT_ALIGN_VMASK        0x000C
 
-/* scaling factor (applied to i_zoom in vout_thread_t) */
-#define ZOOM_FP_FACTOR          1000
-
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
