@@ -163,8 +163,6 @@ static void SpuRenderRegion( spu_t *,
 static void UpdateSPU   ( spu_t *, vlc_object_t * );
 static int  CropCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
-static int MarginCallback( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
 
 /* Buffer allocation for SPU filter (blend, scale, ...) */
 struct filter_owner_sys_t
@@ -288,11 +286,9 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_input, bool b_attach )
         UpdateSPU( p_spu, p_input );
         var_Create( p_input, "highlight", VLC_VAR_BOOL );
         var_AddCallback( p_input, "highlight", CropCallback, p_spu );
-        var_AddCallback( p_input, "sub-margin", MarginCallback, p_spu->p );
 
         vlc_mutex_lock( &p_spu->p->lock );
         p_spu->p->p_input = p_input;
-        p_spu->p->i_margin = var_GetInteger( p_input, "sub-margin" );
 
         FilterRelease( p_spu->p->p_text );
         p_spu->p->p_text = NULL;
@@ -307,7 +303,6 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_input, bool b_attach )
         vlc_mutex_unlock( &p_spu->p->lock );
 
         /* Delete callbacks */
-        var_DelCallback( p_input, "sub-margin", MarginCallback, p_spu->p );
         var_DelCallback( p_input, "highlight", CropCallback, p_spu );
         var_Destroy( p_input, "highlight" );
     }
@@ -762,6 +757,15 @@ void spu_ChangeFilters( spu_t *p_spu, const char *psz_filters )
     free( p_sys->psz_chain_update );
     p_sys->psz_chain_update = strdup( psz_filters );
 
+    vlc_mutex_unlock( &p_sys->lock );
+}
+
+void spu_ChangeMargin( spu_t *p_spu, int i_margin )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->i_margin = i_margin;
     vlc_mutex_unlock( &p_sys->lock );
 }
 
@@ -1849,22 +1853,6 @@ static int CropCallback( vlc_object_t *p_object, char const *psz_var,
     VLC_UNUSED(oldval); VLC_UNUSED(newval); VLC_UNUSED(psz_var);
 
     UpdateSPU( (spu_t *)p_data, p_object );
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * MarginCallback: called when requested subtitle position has changed         *
- *****************************************************************************/
-
-static int MarginCallback( vlc_object_t *p_object, char const *psz_var,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED( psz_var ); VLC_UNUSED( oldval ); VLC_UNUSED( p_object );
-    spu_private_t *p_sys = ( spu_private_t* ) p_data;
-
-    vlc_mutex_lock( &p_sys->lock );
-    p_sys->i_margin = newval.i_int;
-    vlc_mutex_unlock( &p_sys->lock );
     return VLC_SUCCESS;
 }
 

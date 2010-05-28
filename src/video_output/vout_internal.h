@@ -151,6 +151,7 @@ void vout_ControlChangeCropWindow(vout_thread_t *, int x, int y, int width, int 
 void vout_ControlChangeCropBorder(vout_thread_t *, int left, int top, int right, int bottom);
 void vout_ControlChangeFilters(vout_thread_t *, const char *);
 void vout_ControlChangeSubFilters(vout_thread_t *, const char *);
+void vout_ControlChangeSubMargin(vout_thread_t *, int);
 
 /* */
 void vout_IntfInit( vout_thread_t * );
@@ -167,6 +168,7 @@ void vout_DisplayWrapper(vout_thread_t *, picture_t *);
 /* */
 int spu_ProcessMouse(spu_t *, const vlc_mouse_t *, const video_format_t *);
 void spu_Attach( spu_t *, vlc_object_t *input, bool );
+void spu_ChangeMargin(spu_t *, int);
 
 #endif
 

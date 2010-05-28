@@ -75,7 +75,8 @@ static int VideoSplitterCallback( vlc_object_t *, char const *,
                                   vlc_value_t, vlc_value_t, void * );
 static int SubFilterCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
-
+static int SubMarginCallback( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
 static int TitleShowCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 static int TitleTimeoutCallback( vlc_object_t *, char const *,
@@ -376,6 +377,12 @@ void vout_IntfInit( vout_thread_t *p_vout )
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_vout, "sub-filter", SubFilterCallback, NULL );
     var_TriggerCallback( p_vout, "sub-filter" );
+
+    /* Add sub-margin variable */
+    var_Create( p_vout, "sub-margin",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_vout, "sub-margin", SubMarginCallback, NULL );
+    var_TriggerCallback( p_vout, "sub-margin" );
 
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
@@ -787,6 +794,16 @@ static int SubFilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     vout_ControlChangeSubFilters( p_vout, newval.psz_string );
+    return VLC_SUCCESS;
+}
+
+static int SubMarginCallback( vlc_object_t *p_this, char const *psz_cmd,
+                              vlc_value_t oldval, vlc_value_t newval, void *p_data)
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+
+    vout_ControlChangeSubMargin( p_vout, newval.i_int );
     return VLC_SUCCESS;
 }
 

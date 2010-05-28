@@ -435,6 +435,11 @@ void vout_ControlChangeSubFilters(vout_thread_t *vout, const char *filters)
     vout_control_PushString(&vout->p->control, VOUT_CONTROL_CHANGE_SUB_FILTERS,
                             filters);
 }
+void vout_ControlChangeSubMargin(vout_thread_t *vout, int margin)
+{
+    vout_control_PushInteger(&vout->p->control, VOUT_CONTROL_CHANGE_SUB_MARGIN,
+                             margin);
+}
 
 /* */
 static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, const char *title)
@@ -798,6 +803,10 @@ static void ThreadChangeSubFilters(vout_thread_t *vout, const char *filters)
 {
     spu_ChangeFilters(vout->p->p_spu, filters);
 }
+static void ThreadChangeSubMargin(vout_thread_t *vout, int margin)
+{
+    spu_ChangeMargin(vout->p->p_spu, margin);
+}
 
 static void ThreadChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
 {
@@ -1134,6 +1143,9 @@ static void *Thread(void *object)
                 break;
             case VOUT_CONTROL_CHANGE_SUB_FILTERS:
                 ThreadChangeSubFilters(vout, cmd.u.string);
+                break;
+            case VOUT_CONTROL_CHANGE_SUB_MARGIN:
+                ThreadChangeSubMargin(vout, cmd.u.integer);
                 break;
             case VOUT_CONTROL_PAUSE:
                 ThreadChangePause(vout, cmd.u.pause.is_on, cmd.u.pause.date);
