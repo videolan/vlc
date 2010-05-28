@@ -75,7 +75,7 @@ typedef enum libvlc_meta_t {
 
 /**
  * Note the order of libvlc_state_t enum must match exactly the order of
- * @see mediacontrol_PlayerStatus, @see input_state_e enums,
+ * \see mediacontrol_PlayerStatus, \see input_state_e enums,
  * and VideoLAN.LibVLC.State (at bindings/cil/src/media.cs).
  *
  * Expected states by web plugins are:
@@ -205,7 +205,7 @@ VLC_PUBLIC_API libvlc_media_t *libvlc_media_new_path(
  * \param psz_name the name of the node
  * \return the new empty media or NULL on error
  */
-VLC_PUBLIC_API libvlc_media_t * libvlc_media_new_as_node(
+VLC_PUBLIC_API libvlc_media_t *libvlc_media_new_as_node(
                                    libvlc_instance_t *p_instance,
                                    const char * psz_name );
 
@@ -222,7 +222,7 @@ VLC_PUBLIC_API libvlc_media_t * libvlc_media_new_as_node(
  * \param ppsz_options the options (as a string)
  */
 VLC_PUBLIC_API void libvlc_media_add_option(
-                                   libvlc_media_t * p_md,
+                                   libvlc_media_t *p_md,
                                    const char * ppsz_options );
 
 /**
@@ -239,7 +239,7 @@ VLC_PUBLIC_API void libvlc_media_add_option(
  * \param i_flags the flags for this option
  */
 VLC_PUBLIC_API void libvlc_media_add_option_flag(
-                                   libvlc_media_t * p_md,
+                                   libvlc_media_t *p_md,
                                    const char * ppsz_options,
                                    unsigned i_flags );
 
@@ -271,14 +271,14 @@ VLC_PUBLIC_API void libvlc_media_release( libvlc_media_t *p_md );
  * \param p_md a media descriptor object
  * \return string with mrl of media descriptor object
  */
-VLC_PUBLIC_API char * libvlc_media_get_mrl( libvlc_media_t * p_md );
+VLC_PUBLIC_API char *libvlc_media_get_mrl( libvlc_media_t *p_md );
 
 /**
  * Duplicate a media descriptor object.
  *
  * \param p_md a media descriptor object.
  */
-VLC_PUBLIC_API libvlc_media_t * libvlc_media_duplicate( libvlc_media_t *p_md );
+VLC_PUBLIC_API libvlc_media_t *libvlc_media_duplicate( libvlc_media_t *p_md );
 
 /**
  * Read the meta of the media.
@@ -297,7 +297,7 @@ VLC_PUBLIC_API libvlc_media_t * libvlc_media_duplicate( libvlc_media_t *p_md );
  * \param e_meta the meta to read
  * \return the media's meta
  */
-VLC_PUBLIC_API char * libvlc_media_get_meta( libvlc_media_t *p_md,
+VLC_PUBLIC_API char *libvlc_media_get_meta( libvlc_media_t *p_md,
                                              libvlc_meta_t e_meta );
 
 /**
@@ -329,20 +329,20 @@ VLC_PUBLIC_API int libvlc_media_save_meta( libvlc_media_t *p_md );
  * libvlc_Stopped, libvlc_Ended,
  * libvlc_Error).
  *
- * @see libvlc_state_t
- * \param p_meta_desc a media descriptor object
+ * \see libvlc_state_t
+ * \param p_md a media descriptor object
  * \return state of media descriptor object
  */
 VLC_PUBLIC_API libvlc_state_t libvlc_media_get_state(
-                                   libvlc_media_t *p_meta_desc );
+                                   libvlc_media_t *p_md );
 
 
 /**
- * get the current statistics about the media
- * @param p_md: media descriptor object
- * @param p_stats: structure that contain the statistics about the media
+ * Get the current statistics about the media
+ * \param p_md: media descriptor object
+ * \param p_stats: structure that contain the statistics about the media
  *                 (this structure must be allocated by the caller)
- * @return true if the statistics are available, false otherwise
+ * \return true if the statistics are available, false otherwise
  */
 VLC_PUBLIC_API int libvlc_media_get_stats( libvlc_media_t *p_md,
                                            libvlc_media_stats_t *p_stats );
@@ -371,7 +371,7 @@ libvlc_media_subitems( libvlc_media_t *p_md );
  * \return event manager object
  */
 VLC_PUBLIC_API libvlc_event_manager_t *
-    libvlc_media_event_manager( libvlc_media_t * p_md );
+    libvlc_media_event_manager( libvlc_media_t *p_md );
 
 /**
  * Get duration (in ms) of media descriptor object item.
@@ -380,7 +380,7 @@ VLC_PUBLIC_API libvlc_event_manager_t *
  * \return duration of media item or -1 on error
  */
 VLC_PUBLIC_API libvlc_time_t
-   libvlc_media_get_duration( libvlc_media_t * p_md );
+   libvlc_media_get_duration( libvlc_media_t *p_md );
 
 /**
  * Parse a media.
@@ -392,10 +392,10 @@ VLC_PUBLIC_API libvlc_time_t
  * \see libvlc_media_get_meta
  * \see libvlc_media_get_tracks_info
  *
- * \param media media descriptor object
+ * \param p_md media descriptor object
  */
 VLC_PUBLIC_API void
-libvlc_media_parse(libvlc_media_t *media);
+libvlc_media_parse( libvlc_media_t *p_md );
 
 /**
  * Parse a media.
@@ -412,10 +412,10 @@ libvlc_media_parse(libvlc_media_t *media);
  * \see libvlc_media_get_meta
  * \see libvlc_media_get_tracks_info
  *
- * \param media media descriptor object
+ * \param p_md media descriptor object
  */
 VLC_PUBLIC_API void
-libvlc_media_parse_async(libvlc_media_t *media);
+libvlc_media_parse_async( libvlc_media_t *p_md );
 
 /**
  * Get Parsed status for media descriptor object.
@@ -426,7 +426,7 @@ libvlc_media_parse_async(libvlc_media_t *media);
  * \return true if media object has been parsed otherwise it returns false
  */
 VLC_PUBLIC_API int
-   libvlc_media_is_parsed( libvlc_media_t * p_md );
+   libvlc_media_is_parsed( libvlc_media_t *p_md );
 
 /**
  * Sets media descriptor's user_data. user_data is specialized data
@@ -437,8 +437,7 @@ VLC_PUBLIC_API int
  * \param p_new_user_data pointer to user data
  */
 VLC_PUBLIC_API void
-    libvlc_media_set_user_data( libvlc_media_t * p_md,
-                                           void * p_new_user_data );
+    libvlc_media_set_user_data( libvlc_media_t *p_md, void *p_new_user_data );
 
 /**
  * Get media descriptor's user_data. user_data is specialized data
@@ -447,8 +446,7 @@ VLC_PUBLIC_API void
  *
  * \param p_md media descriptor object
  */
-VLC_PUBLIC_API void *
-    libvlc_media_get_user_data( libvlc_media_t * p_md );
+VLC_PUBLIC_API void *libvlc_media_get_user_data( libvlc_media_t *p_md );
 
 /**
  * Get media descriptor's elementary streams description
@@ -468,15 +466,15 @@ VLC_PUBLIC_API void *
  * This is very likely to change in next release, and be done at the parsing
  * phase.
  *
- * \param media media descriptor object
+ * \param p_md media descriptor object
  * \param tracks address to store an allocated array of Elementary Streams
  * descriptions (must be freed by the caller)
  *
  * return the number of Elementary Streams
  */
 VLC_PUBLIC_API
-int libvlc_media_get_tracks_info(libvlc_media_t *media,
-                                 libvlc_media_track_info_t **tracks );
+int libvlc_media_get_tracks_info( libvlc_media_t *p_md,
+                                  libvlc_media_track_info_t **tracks );
 
 /** @}*/
 

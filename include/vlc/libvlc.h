@@ -96,14 +96,14 @@ VLC_PUBLIC_API void libvlc_clearerr (void);
 /**
  * Sets the LibVLC error status and message for the current thread.
  * Any previous error is overriden.
- * @return a nul terminated string in any case
+ * \return a nul terminated string in any case
  */
 const char *libvlc_vprinterr (const char *fmt, va_list ap);
 
 /**
  * Sets the LibVLC error status and message for the current thread.
  * Any previous error is overriden.
- * @return a nul terminated string in any case
+ * \return a nul terminated string in any case
  */
 const char *libvlc_printerr (const char *fmt, ...);
 
