@@ -33,7 +33,7 @@
  *               - dnet is twisted "The byte order of the data is reversed
  *                                  from standard AC3" but ok
  *               - 28_8 is ok.
- *               - sipr doesn't work
+ *               - sipr is ok.
  *               - ralf is unsupported, but hardly any sample exist.
  *               - mp3 is unsupported, one sample exists...
  *
