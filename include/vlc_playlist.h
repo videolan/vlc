@@ -146,9 +146,9 @@ struct playlist_item_t
 {
     input_item_t           *p_input;    /**< Linked input item */
     /** Number of children, -1 if not a node */
-    int                    i_children;
     playlist_item_t      **pp_children; /**< Children nodes/items */
     playlist_item_t       *p_parent;    /**< Item parent */
+    int                    i_children;
 
     int                    i_id;        /**< Playlist item specific id */
     uint8_t                i_flags;     /**< Flags */
