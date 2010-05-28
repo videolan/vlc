@@ -783,21 +783,15 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                                 _( "Subtitle delay %i ms" ),
                                  (int)(i_delay/1000) );
             }
-            else if( i_action == ACTIONID_SUBPOS_DOWN )
+            else if( i_action == ACTIONID_SUBPOS_DOWN ||
+                     i_action == ACTIONID_SUBPOS_UP )
             {
-                int i_pos = var_GetInteger( p_input, "sub-margin" );
-                --i_pos;
-                var_SetInteger( p_input, "sub-margin", i_pos );
-                ClearChannels( p_intf, p_vout );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                _( "Subtitle position %i px" ),
-                                 (int)(i_pos) );
-            }
-            else if( i_action == ACTIONID_SUBPOS_UP )
-            {
-                int i_pos = var_GetInteger( p_input, "sub-margin" );
-                ++i_pos;
-                var_SetInteger( p_input, "sub-margin", i_pos );
+                int i_pos;
+                if( i_action == ACTIONID_SUBPOS_DOWN )
+                    i_pos = var_DecInteger( p_input, "sub-margin" );
+                else
+                    i_pos = var_IncInteger( p_input, "sub-margin" );
+
                 ClearChannels( p_intf, p_vout );
                 DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
                                 _( "Subtitle position %i px" ),
