@@ -271,16 +271,17 @@ void config_PutPsz( vlc_object_t *p_this,
         return;
     }
 
-    vlc_rwlock_wrlock (&config_lock);
+    char *str;
+    if ((psz_value != NULL) && *psz_value)
+        str = strdup (psz_value);
+    else
+        str = NULL;
 
+    vlc_rwlock_wrlock (&config_lock);
     /* backup old value */
     oldval.psz_string = (char *)p_config->value.psz;
 
-    if ((psz_value != NULL) && *psz_value)
-        p_config->value.psz = strdup (psz_value);
-    else
-        p_config->value.psz = NULL;
-
+    p_config->value.psz = str;
     p_config->b_dirty = true;
 
     val.psz_string = (char *)p_config->value.psz;
