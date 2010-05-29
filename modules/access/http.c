@@ -350,7 +350,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     for( char *p = p_sys->psz_user_agent; *p; p++ )
     {
         uint8_t c = *p;
-        if( c < 32 || strchr( "()<>@,;:\\\"/[]?={}", c ) )
+        if( c < 32 || strchr( "()<>@,;:\\\"[]?={}", c ) )
             *p = '_'; /* remove potentially harmful characters */
     }
 
