@@ -32,7 +32,7 @@ end
 function main()
     fd = vlc.stream( "http://trailers.apple.com/trailers/home/feeds/just_hd.json" )
     if not fd then return nil end
-    options = {":http-user-agent=QuickTime/7.2 vlc edition",":demux=avformat,ffmpeg",":play-and-pause"}
+    options = {":http-user-agent=QuickTime/7.2",":demux=avformat,ffmpeg",":play-and-pause"}
     line = fd:readline()
     while line ~= nil
     do

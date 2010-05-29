@@ -53,7 +53,7 @@ function parse()
             else
                 extraname = ""
             end
-            table.insert( p, { path = path; name = title..extraname; description = description; url = vlc.path; options = ":http-user-agent=\"QuickTime vlc lua edition\"" } )
+            table.insert( p, { path = path; name = title..extraname; description = description; url = vlc.path; options = ":http-user-agent=\"QuickTime\"" } )
         end
         if string.match( line, "<title>" )
         then
