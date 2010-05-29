@@ -84,6 +84,7 @@ vlc_module_begin ()
         add_string ( "http-intf-crl",  NULL, NULL, CRL_TEXT,  CRL_LONGTEXT,  true )
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
+    add_shortcut( "http" )
 vlc_module_end ()
 
 

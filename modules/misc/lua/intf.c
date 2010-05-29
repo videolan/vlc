@@ -78,7 +78,6 @@ static const struct
     { "luatelnet", "telnet" },
     { "telnet", "telnet" },
     { "luahttp", "http" },
-    { "http", "http" },
     { NULL, NULL } };
 
 static const char *WordInList( const char *psz_list, const char *psz_word )
