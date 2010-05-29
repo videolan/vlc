@@ -1004,16 +1004,15 @@ libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
 
 libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p0 < ./Patches/libmatroska-kaxblock.patch
 ifdef HAVE_WIN32
-	(cd $@; patch -p0 < ../Patches/libmatroska-win32.patch)
+	patch -p0 < Patches/libmatroska-win32.patch
 endif
 
 .matroska: libmatroska .ebml
 ifdef HAVE_WIN32
-	(cd $<; make -C make/mingw32 prefix=$(PREFIX) $(HOSTCC2) SHARED=no EBML_DLL=no libmatroska.a && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC2))
+	(cd $<; make -C make/mingw32 prefix=$(PREFIX) $(HOSTCC) SHARED=no EBML_DLL=no libmatroska.a && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC))
 else
-	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
+	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
 	$(RANLIB) $(PREFIX)/lib/libmatroska.a
 endif
 	touch $@
