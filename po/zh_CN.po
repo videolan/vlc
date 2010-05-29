@@ -10,11 +10,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 1.2.x\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-05-20 19:50+0100\n"
+"POT-Creation-Date: 2010-05-29 00:44+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Dean Lee <xslidian@lidian.info>\n"
 "Language-Team: Simplified Chinese <xslidian+vlc@gmail.com>\n"
-"Language: \n"
+"Language: Chinese Simplified\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -879,8 +879,8 @@ msgstr "解码器"
 
 #: src/input/decoder.c:280 src/input/decoder.c:441
 #: modules/codec/avcodec/encoder.c:224 modules/codec/avcodec/encoder.c:232
-#: modules/codec/avcodec/encoder.c:254 modules/codec/avcodec/encoder.c:670
-#: modules/codec/avcodec/encoder.c:679 modules/stream_out/es.c:363
+#: modules/codec/avcodec/encoder.c:254 modules/codec/avcodec/encoder.c:692
+#: modules/codec/avcodec/encoder.c:701 modules/stream_out/es.c:363
 #: modules/stream_out/es.c:378
 msgid "Streaming / Transcoding failed"
 msgstr "流 / 编码转换失败"
@@ -1020,23 +1020,24 @@ msgstr "显示分辨率"
 
 #: src/input/es_out.c:2950 src/input/es_out.c:2953 modules/access/imem.c:98
 #: modules/access/screen/screen.c:44 modules/access/screen/xcb.c:38
+#: modules/demux/image.c:65
 msgid "Frame rate"
 msgstr "帧率"
 
-#: src/input/input.c:2437
+#: src/input/input.c:2435
 msgid "Your input can't be opened"
 msgstr "您的输入无法被打开"
 
-#: src/input/input.c:2438
+#: src/input/input.c:2436
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "VLC 无法打开 MRL '%s'。请检查日志获取详细信息。"
 
-#: src/input/input.c:2557
+#: src/input/input.c:2555
 msgid "VLC can't recognize the input's format"
 msgstr "VLC 无法识别输入格式"
 
-#: src/input/input.c:2558
+#: src/input/input.c:2556
 #, c-format
 msgid ""
 "The format of '%s' cannot be detected. Have a look at the log for details."
@@ -1165,7 +1166,7 @@ msgstr "下一个章节"
 msgid "Previous chapter"
 msgstr "上一个章节"
 
-#: src/input/vlm.c:611 src/input/vlm.c:969
+#: src/input/vlm.c:610 src/input/vlm.c:961
 #, c-format
 msgid "Media: %s"
 msgstr "媒体: %s"
@@ -1335,24 +1336,24 @@ msgstr ""
 "\n"
 "请按回车键继续...\n"
 
-#: src/libvlc.h:173 src/libvlc-module.c:1462 src/libvlc-module.c:1463
+#: src/libvlc.h:166 src/libvlc-module.c:1462 src/libvlc-module.c:1463
 #: src/libvlc-module.c:2635 src/video_output/vout_intf.c:199
 msgid "Zoom"
 msgstr "缩放"
 
-#: src/libvlc.h:174 src/libvlc-module.c:1382 src/video_output/vout_intf.c:94
+#: src/libvlc.h:167 src/libvlc-module.c:1382 src/video_output/vout_intf.c:94
 msgid "1:4 Quarter"
 msgstr "1:4 四分之一"
 
-#: src/libvlc.h:175 src/libvlc-module.c:1383 src/video_output/vout_intf.c:95
+#: src/libvlc.h:168 src/libvlc-module.c:1383 src/video_output/vout_intf.c:95
 msgid "1:2 Half"
 msgstr "1:2 二分之一"
 
-#: src/libvlc.h:176 src/libvlc-module.c:1384 src/video_output/vout_intf.c:96
+#: src/libvlc.h:169 src/libvlc-module.c:1384 src/video_output/vout_intf.c:96
 msgid "1:1 Original"
 msgstr "1:1 原始"
 
-#: src/libvlc.h:177 src/libvlc-module.c:1385 src/video_output/vout_intf.c:97
+#: src/libvlc.h:170 src/libvlc-module.c:1385 src/video_output/vout_intf.c:97
 msgid "2:1 Double"
 msgstr "2:1 双倍"
 
@@ -1730,8 +1731,7 @@ msgid ""
 msgstr ""
 "您可以完整的关闭视频输出。视频解码步骤将被跳过，这将节省一些处理器资源。"
 
-#: src/libvlc-module.c:380 modules/codec/fake.c:58
-#: modules/stream_out/mosaic_bridge.c:109
+#: src/libvlc-module.c:380 modules/stream_out/mosaic_bridge.c:109
 #: modules/stream_out/transcode/transcode.c:66
 #: modules/visualization/projectm.cpp:60
 #: modules/visualization/visual/visual.c:48
@@ -1744,8 +1744,7 @@ msgid ""
 "characteristics."
 msgstr "您可以强制指定视频宽度。按默认 (-1) VLC 将自动适应视频的参数。"
 
-#: src/libvlc-module.c:385 modules/codec/fake.c:61
-#: modules/stream_out/mosaic_bridge.c:112
+#: src/libvlc-module.c:385 modules/stream_out/mosaic_bridge.c:112
 #: modules/stream_out/transcode/transcode.c:69
 #: modules/visualization/projectm.cpp:63
 #: modules/visualization/visual/visual.c:52
@@ -2307,7 +2306,7 @@ msgstr ""
 #: modules/audio_output/alsa.c:107 modules/gui/fbosd.c:171
 #: modules/gui/macosx/prefs_widgets.m:1297
 #: modules/gui/macosx/simple_prefs.m:415 modules/gui/macosx/simple_prefs.m:536
-#: modules/gui/macosx/simple_prefs.m:770 modules/gui/macosx/vout.m:212
+#: modules/gui/macosx/simple_prefs.m:769 modules/gui/macosx/vout.m:212
 #: modules/gui/qt4/components/preferences_widgets.cpp:619
 #: modules/video_filter/marq.c:59 modules/video_filter/rss.c:71
 #: modules/video_filter/rss.c:184 modules/video_output/msw/directx.c:95
@@ -4444,13 +4443,13 @@ msgid "Downloading ..."
 msgstr "正在下载..."
 
 #: src/misc/update.c:606 src/misc/update.c:736 modules/access/dvb/scan.c:327
-#: modules/demux/avi/avi.c:652 modules/demux/avi/avi.c:2353
+#: modules/demux/avi/avi.c:656 modules/demux/avi/avi.c:2358
 #: modules/gui/macosx/bookmarks.m:102 modules/gui/macosx/controls.m:60
 #: modules/gui/macosx/coredialogs.m:66 modules/gui/macosx/coredialogs.m:68
 #: modules/gui/macosx/coredialogs.m:186 modules/gui/macosx/open.m:176
 #: modules/gui/macosx/open.m:206 modules/gui/macosx/prefs.m:204
 #: modules/gui/macosx/prefs.m:225 modules/gui/macosx/simple_prefs.m:244
-#: modules/gui/macosx/simple_prefs.m:308 modules/gui/macosx/simple_prefs.m:696
+#: modules/gui/macosx/simple_prefs.m:308 modules/gui/macosx/simple_prefs.m:695
 #: modules/gui/macosx/wizard.m:320
 #: modules/gui/qt4/components/open_panels.cpp:1265
 #: modules/gui/qt4/components/preferences_widgets.cpp:1427
@@ -5249,9 +5248,8 @@ msgstr "以 Hz 为单位的捕获音频采样率 (例如: 11025, 22050, 44100, 4
 #: modules/access/dshow/dshow.cpp:99 modules/access/dv.c:59
 #: modules/access/dvb/access.c:83 modules/access/dvdnav.c:73
 #: modules/access/dvdread.c:74 modules/access/eyetv.m:61
-#: modules/access/fake.c:44 modules/access/ftp.c:58
-#: modules/access/gnomevfs.c:48 modules/access/http.c:81
-#: modules/access/imem.c:49 modules/access/jack.c:59
+#: modules/access/ftp.c:58 modules/access/gnomevfs.c:48
+#: modules/access/http.c:81 modules/access/imem.c:49 modules/access/jack.c:59
 #: modules/access/mms/mms.c:49 modules/access/mtp.c:63 modules/access/oss.c:70
 #: modules/access/pvr.c:60 modules/access/rtmp/access.c:43
 #: modules/access/screen/screen.c:40 modules/access/screen/xcb.c:33
@@ -6159,12 +6157,12 @@ msgstr "有菜单的 DVD"
 msgid "DVDnav Input"
 msgstr "DVD 导航输入"
 
-#: modules/access/dvdnav.c:319 modules/access/dvdread.c:205
+#: modules/access/dvdnav.c:327 modules/access/dvdread.c:205
 #: modules/access/dvdread.c:465 modules/access/dvdread.c:527
 msgid "Playback failure"
 msgstr "播放失败"
 
-#: modules/access/dvdnav.c:320
+#: modules/access/dvdnav.c:328
 msgid ""
 "VLC cannot set the DVD's title. It possibly cannot decrypt the entire disc."
 msgstr "VLC 无法设置 DVD 标题。可能无法解密整张光盘。"
@@ -6211,53 +6209,6 @@ msgstr "EyeTV 捕获的缓存值。此值应该以毫秒为单位设置。"
 #: modules/access/eyetv.m:68
 msgid "EyeTV input"
 msgstr "EyeTV 输入"
-
-#: modules/access/fake.c:46
-msgid ""
-"Caching value for fake streams. This value should be set in milliseconds."
-msgstr "伪装流缓存值。此值应该以毫秒为单位设置。"
-
-#: modules/access/fake.c:48 modules/access/pvr.c:86 modules/access/v4l.c:130
-#: modules/access/v4l2.c:95
-msgid "Framerate"
-msgstr "帧率"
-
-#: modules/access/fake.c:50
-msgid "Number of frames per second (eg. 24, 25, 29.97, 30)."
-msgstr "每秒的帧数 (例如 24, 25, 29.97, 30)。"
-
-#: modules/access/fake.c:51 modules/access/imem.c:54
-#: modules/gui/qt4/components/playlist/sorting.h:49
-#: modules/stream_out/bridge.c:41 modules/stream_out/mosaic_bridge.c:105
-msgid "ID"
-msgstr "ID"
-
-#: modules/access/fake.c:53
-msgid ""
-"Set the ID of the fake elementary stream for use in #duplicate{} constructs "
-"(default 0)."
-msgstr "设置在 #duplicate{} 结构中使用的伪装通量流的 ID (默认 0)。"
-
-#: modules/access/fake.c:55
-msgid "Duration in ms"
-msgstr "以毫秒为单位的持续时间"
-
-#: modules/access/fake.c:57
-msgid ""
-"Duration of the fake streaming before faking an end-of-file (default is -1 "
-"meaning that the stream is unlimited when fake is forced, or lasts for 10 "
-"seconds otherwise. 0, means that the stream is unlimited)."
-msgstr ""
-"伪造 end-of-file 标记前伪装流化的时长 (默认为 -1 即强制伪装时进行无限的流式处"
-"理，其他情况则持续 10 秒钟。0 即进行无限的流式处理)。"
-
-#: modules/access/fake.c:63 modules/codec/fake.c:88
-msgid "Fake"
-msgstr "伪装"
-
-#: modules/access/fake.c:64
-msgid "Fake video input"
-msgstr "伪装视频输入"
 
 #: modules/access/file.c:169 modules/access/file.c:302
 #: modules/access/mmap.c:228 modules/access/mtp.c:221 modules/access/mtp.c:309
@@ -6532,15 +6483,20 @@ msgid ""
 "Caching value for imem streams. This value should be set in milliseconds."
 msgstr "imem 流缓存值。此值应该以毫秒为单位设置。"
 
-#: modules/access/imem.c:56
+#: modules/access/imem.c:54 modules/gui/qt4/components/playlist/sorting.h:49
+#: modules/stream_out/bridge.c:41 modules/stream_out/mosaic_bridge.c:105
+msgid "ID"
+msgstr "ID"
+
+#: modules/access/imem.c:56 modules/demux/image.c:45
 msgid "Set the ID of the elementary stream"
 msgstr "设置通量流的 ID"
 
-#: modules/access/imem.c:58
+#: modules/access/imem.c:58 modules/demux/image.c:47
 msgid "Group"
 msgstr "组"
 
-#: modules/access/imem.c:60
+#: modules/access/imem.c:60 modules/demux/image.c:49
 msgid "Set the group of the elementary stream"
 msgstr "设置通量流所属的组"
 
@@ -6818,6 +6774,10 @@ msgstr "频率"
 #: modules/access/pvr.c:84 modules/access/v4l.c:91
 msgid "Frequency to capture (in kHz), if applicable."
 msgstr "捕获频率 (单位 kHz)，如果可应用。"
+
+#: modules/access/pvr.c:86 modules/access/v4l.c:130 modules/access/v4l2.c:95
+msgid "Framerate"
+msgstr "帧率"
 
 #: modules/access/pvr.c:87 modules/access/v4l.c:131
 msgid "Framerate to capture, if applicable (-1 for autodetect)."
@@ -7798,7 +7758,7 @@ msgid "Segments"
 msgstr "片段"
 
 #: modules/access/vcdx/access.c:416 modules/access/vcdx/access.c:695
-#: modules/access/vcdx/info.c:232 modules/demux/mkv/demux.cpp:628
+#: modules/access/vcdx/info.c:232 modules/demux/mkv/demux.cpp:627
 msgid "Segment"
 msgstr "片段"
 
@@ -9619,7 +9579,7 @@ msgstr ""
 "这不是一个 VLC media player 内部的错误。\n"
 "请不要向 VideoLAN 项目报告此问题。\n"
 
-#: modules/codec/avcodec/encoder.c:671 modules/codec/avcodec/encoder.c:680
+#: modules/codec/avcodec/encoder.c:693 modules/codec/avcodec/encoder.c:702
 msgid "VLC could not open the encoder."
 msgstr "VLC 无法打开编码器。"
 
@@ -9931,76 +9891,6 @@ msgstr "AAC 音频解码器 (使用 libfaad2)"
 #: modules/codec/faad.c:388
 msgid "AAC extension"
 msgstr "AAC 扩展"
-
-#: modules/codec/fake.c:52 modules/gui/fbosd.c:109
-msgid "Image file"
-msgstr "图像文件"
-
-#: modules/codec/fake.c:54
-msgid "Path of the image file for fake input."
-msgstr "用于伪装输入的图片文件路径。"
-
-#: modules/codec/fake.c:55
-msgid "Reload image file"
-msgstr "重新载入图像文件"
-
-#: modules/codec/fake.c:57
-msgid "Reload image file every n seconds."
-msgstr "每 n 秒重新载入图像文件。"
-
-#: modules/codec/fake.c:60 modules/stream_out/mosaic_bridge.c:111
-#: modules/stream_out/transcode/transcode.c:68
-msgid "Output video width."
-msgstr "输出视频宽度。"
-
-#: modules/codec/fake.c:63 modules/stream_out/mosaic_bridge.c:114
-#: modules/stream_out/transcode/transcode.c:71
-msgid "Output video height."
-msgstr "输出视频高度。"
-
-#: modules/codec/fake.c:64 modules/video_filter/mosaic.c:135
-msgid "Keep aspect ratio"
-msgstr "保持高宽比"
-
-#: modules/codec/fake.c:66
-msgid "Consider width and height as maximum values."
-msgstr "将宽度和高度作为最大值。"
-
-#: modules/codec/fake.c:67
-msgid "Background aspect ratio"
-msgstr "背景高宽比"
-
-#: modules/codec/fake.c:69
-msgid "Aspect ratio of the image file (4:3, 16:9). Default is square pixels."
-msgstr "图像文件的高宽比 (4:3、16:9)。默认是方块像素。"
-
-#: modules/codec/fake.c:70 modules/stream_out/transcode/transcode.c:60
-msgid "Deinterlace video"
-msgstr "反交错视频"
-
-#: modules/codec/fake.c:72
-msgid "Deinterlace the image after loading it."
-msgstr "在载入它之前反交错图像。"
-
-#: modules/codec/fake.c:73 modules/stream_out/transcode/transcode.c:63
-msgid "Deinterlace module"
-msgstr "反交错模块"
-
-#: modules/codec/fake.c:75
-msgid "Deinterlace module to use."
-msgstr "要使用的反交错模块。"
-
-#: modules/codec/fake.c:76 modules/video_output/yuv.c:44
-msgid "Chroma used"
-msgstr "使用了色度"
-
-#: modules/codec/fake.c:78 modules/video_output/yuv.c:46
-msgid "Force use of a specific chroma for output. Default is I420."
-msgstr "强制为输出使用指定的色度。默认是 I420。"
-
-#: modules/codec/fake.c:89
-msgid "Fake video decoder"
-msgstr "伪视频解码器"
 
 #: modules/codec/flac.c:134
 msgid "Flac audio decoder"
@@ -10703,7 +10593,7 @@ msgstr "繁体中文 Unix (EUC-TW)"
 
 #: modules/codec/subtitles/subsdec.c:154
 msgid "Hong-Kong Supplementary (HKSCS)"
-msgstr "香港补充 (HKSCS)"
+msgstr "香港增补 (HKSCS)"
 
 #: modules/codec/subtitles/subsdec.c:156
 msgid "Vietnamese (VISCII)"
@@ -10743,7 +10633,7 @@ msgid ""
 "Some subtitle formats allow for text formatting. VLC partly implements this, "
 "but you can choose to disable all formatting."
 msgstr ""
-"某些字幕格式允许文本格式。VLC 将部分处理它，但是您可以选择关闭所有格式。"
+"有些字幕格式允许格式化文本。VLC 将部分处理它，但是您可以选择关闭所有格式。"
 
 #: modules/codec/subtitles/subsdec.c:203
 msgid "Text subtitles decoder"
@@ -10762,7 +10652,7 @@ msgstr "文本字幕解码器"
 #: modules/codec/subtitles/subsdec.c:296
 msgctxt "GetACP"
 msgid "CP1252"
-msgstr "CP1252"
+msgstr "GB18030"
 
 #: modules/codec/subtitles/subsusf.c:52
 msgid "USFSubs"
@@ -11091,15 +10981,15 @@ msgid "H.264 level"
 msgstr "H.264 等级"
 
 #: modules/codec/x264.c:125
-#, fuzzy
 msgid ""
 "Specify H.264 level (as defined by Annex A of the standard). Levels are not "
 "enforced; it's up to the user to select a level compatible with the rest of "
 "the encoding options. Range 1 to 5.1 (10 to 51 is also allowed). Set to 0 "
 "for letting x264 set level."
 msgstr ""
-"指定 H.264 等级 (由 AnnexA 定义标准)。等级不是强制的; 它将服从用户选择的其它"
-"编码选项。范围是 1 到 5.1 (10 到 51 也被允许)。"
+"指定 H.264 等级 (如 Annex A 标准所定)。等级不是强制的；而是取决于用户所选的与"
+"其它编码选项相兼容的等级。范围从 1 到 5.1 (10 到 51 也允许使用)。设为 0 可以"
+"让 x264 自行设置等级。"
 
 #: modules/codec/x264.c:130
 msgid "H.264 profile"
@@ -12798,11 +12688,11 @@ msgstr "不修复"
 msgid "AVI demuxer"
 msgstr "AVI 去复用器"
 
-#: modules/demux/avi/avi.c:648
+#: modules/demux/avi/avi.c:652
 msgid "AVI Index"
 msgstr "AVI 缩影"
 
-#: modules/demux/avi/avi.c:649
+#: modules/demux/avi/avi.c:653
 msgid ""
 "This AVI file is broken. Seeking will not work correctly.\n"
 "Do you want to try to fix it?\n"
@@ -12814,15 +12704,15 @@ msgstr ""
 "\n"
 "这可能需要很长的时间。"
 
-#: modules/demux/avi/avi.c:652
+#: modules/demux/avi/avi.c:656
 msgid "Repair"
 msgstr "修复"
 
-#: modules/demux/avi/avi.c:652
+#: modules/demux/avi/avi.c:656
 msgid "Don't repair"
 msgstr "不修复"
 
-#: modules/demux/avi/avi.c:2352
+#: modules/demux/avi/avi.c:2357
 msgid "Fixing AVI Index..."
 msgstr "正在修复 AVI 索引..."
 
@@ -12866,6 +12756,63 @@ msgstr "FLAC 去复用器"
 msgid "GME demuxer (Game_Music_Emu)"
 msgstr "GME 去复用器 (Game_Music_Emu)"
 
+#: modules/demux/image.c:43
+#, fuzzy
+msgid "ES ID"
+msgstr "TS ID"
+
+#: modules/demux/image.c:51
+#, fuzzy
+msgid "Decode"
+msgstr "已解码"
+
+#: modules/demux/image.c:53
+msgid "Decode at the demuxer stage"
+msgstr ""
+
+#: modules/demux/image.c:55
+#, fuzzy
+msgid "Forced chroma"
+msgstr "图像色度"
+
+#: modules/demux/image.c:57
+msgid ""
+"If non empty and image-decode is true, the image will be converted to the "
+"specified chroma."
+msgstr ""
+
+#: modules/demux/image.c:60
+#, fuzzy
+msgid "Duration in second"
+msgstr "以毫秒为单位的持续时间"
+
+#: modules/demux/image.c:62
+msgid ""
+"Duration in second before simulating an end of file. A negative value means "
+"an unlimited play time."
+msgstr ""
+
+#: modules/demux/image.c:67
+#, fuzzy
+msgid "Frame rate of the elementary stream produced."
+msgstr "视频通量流的帧率"
+
+#: modules/demux/image.c:69
+#, fuzzy
+msgid "Real-time"
+msgstr "延迟时间"
+
+#: modules/demux/image.c:71
+msgid ""
+"Use real-time mode suitable for being used as a master input and real-time "
+"input slaves."
+msgstr ""
+
+#: modules/demux/image.c:75
+#, fuzzy
+msgid "Image demuxer"
+msgstr "AVI 去复用器"
+
 #: modules/demux/kate_categories.c:40
 msgid "Closed captions"
 msgstr "封闭字幕"
@@ -12895,6 +12842,7 @@ msgid "Transcript"
 msgstr "抄本"
 
 #: modules/demux/kate_categories.c:49 modules/demux/kate_categories.c:56
+#: modules/demux/mp4/mp4.c:961
 msgid "Lyrics"
 msgstr "歌词"
 
@@ -13185,6 +13133,95 @@ msgstr "MP4 流去复用器"
 #: modules/demux/mp4/mp4.c:56
 msgid "MP4"
 msgstr "MP4"
+
+#: modules/demux/mp4/mp4.c:946
+msgid "Writer"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:947
+msgid "Composr"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:948
+msgid "Producer"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:949 modules/gui/macosx/playlistinfo.m:421
+#: modules/gui/qt4/components/controller.hpp:109
+#: modules/gui/qt4/components/controller.hpp:119
+msgid "Information"
+msgstr "信息"
+
+#: modules/demux/mp4/mp4.c:950
+#, fuzzy
+msgid "Director"
+msgstr "目录"
+
+#: modules/demux/mp4/mp4.c:951
+#, fuzzy
+msgid "Disclaimer"
+msgstr "放弃"
+
+#: modules/demux/mp4/mp4.c:952
+#, fuzzy
+msgid "Requirements"
+msgstr "片段"
+
+#: modules/demux/mp4/mp4.c:953
+#, fuzzy
+msgid "Original Format"
+msgstr "原始 ID"
+
+#: modules/demux/mp4/mp4.c:954
+#, fuzzy
+msgid "Display Source As"
+msgstr "显示模式"
+
+#: modules/demux/mp4/mp4.c:955
+#, fuzzy
+msgid "Host Computer"
+msgstr "我的电脑"
+
+#: modules/demux/mp4/mp4.c:956
+#, fuzzy
+msgid "Performers"
+msgstr "性能选项"
+
+#: modules/demux/mp4/mp4.c:957
+#, fuzzy
+msgid "Original Performer"
+msgstr "原始大小"
+
+#: modules/demux/mp4/mp4.c:958
+msgid "Providers Source Content"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:959
+msgid "Warning"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:960
+#, fuzzy
+msgid "Software"
+msgstr "AtmoWin 软件"
+
+#: modules/demux/mp4/mp4.c:962
+msgid "Make"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:963
+#, fuzzy
+msgid "Model"
+msgstr "模式"
+
+#: modules/demux/mp4/mp4.c:964
+msgid "Product"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:965
+#, fuzzy
+msgid "Grouping"
+msgstr "组"
 
 #: modules/demux/mpc.c:62
 msgid "MusePack demuxer"
@@ -13758,6 +13795,10 @@ msgstr "视频高宽比"
 msgid "Aspect ratio of the video image (4:3, 16:9). Default is square pixels."
 msgstr "视频图像的高宽比 (4:3, 16:9)。默认是方块像素。"
 
+#: modules/gui/fbosd.c:109
+msgid "Image file"
+msgstr "图像文件"
+
 #: modules/gui/fbosd.c:111
 msgid "Filename of image file to use on the overlay framebuffer."
 msgstr "要勇于覆盖帧缓冲的图像文件的文件名。"
@@ -13966,6 +14007,7 @@ msgstr "时间"
 #: modules/gui/macosx/wizard.m:1878 modules/gui/macosx/wizard.m:1891
 #: modules/gui/qt4/components/open_panels.cpp:1264
 #: modules/gui/qt4/components/preferences_widgets.cpp:1426
+#: modules/gui/qt4/dialogs/firstrun.cpp:100
 msgid "OK"
 msgstr "确定"
 
@@ -14506,7 +14548,7 @@ msgid "No CrashLog found"
 msgstr "找不到崩溃日志"
 
 #: modules/gui/macosx/intf.m:2420 modules/gui/macosx/prefs.m:226
-#: modules/gui/macosx/simple_prefs.m:697
+#: modules/gui/macosx/simple_prefs.m:696
 msgid "Continue"
 msgstr "继续"
 
@@ -15173,12 +15215,6 @@ msgstr "在保存元时发送错误"
 msgid "VLC was unable to save the meta data."
 msgstr "VLC 无法保存元数据。"
 
-#: modules/gui/macosx/playlistinfo.m:421
-#: modules/gui/qt4/components/controller.hpp:109
-#: modules/gui/qt4/components/controller.hpp:119
-msgid "Information"
-msgstr "信息"
-
 #: modules/gui/macosx/prefs.m:202 modules/gui/macosx/simple_prefs.m:311
 #: modules/gui/qt4/dialogs/preferences.cpp:46
 msgid "Preferences"
@@ -15192,12 +15228,12 @@ msgstr "全部重置"
 msgid "Basic"
 msgstr "基础"
 
-#: modules/gui/macosx/prefs.m:225 modules/gui/macosx/simple_prefs.m:696
+#: modules/gui/macosx/prefs.m:225 modules/gui/macosx/simple_prefs.m:695
 #: modules/gui/qt4/dialogs/preferences.cpp:312
 msgid "Reset Preferences"
 msgstr "重置首选项"
 
-#: modules/gui/macosx/prefs.m:228 modules/gui/macosx/simple_prefs.m:699
+#: modules/gui/macosx/prefs.m:228 modules/gui/macosx/simple_prefs.m:698
 msgid ""
 "Beware this will reset the VLC media player preferences.\n"
 "Are you sure you want to continue?"
@@ -15239,7 +15275,7 @@ msgid "Subtitles & OSD"
 msgstr "字幕与 OSD"
 
 #: modules/gui/macosx/simple_prefs.m:192
-#: modules/gui/qt4/components/simple_preferences.cpp:622
+#: modules/gui/qt4/components/simple_preferences.cpp:623
 msgid "Subtitles & On Screen Display Settings"
 msgstr "字幕与屏幕显示设置"
 
@@ -15438,8 +15474,8 @@ msgstr "上次检查于: %@"
 msgid "No check was performed yet."
 msgstr "尚未执行检查。"
 
-#: modules/gui/macosx/simple_prefs.m:572 modules/gui/macosx/simple_prefs.m:616
-#: modules/gui/macosx/simple_prefs.m:1224
+#: modules/gui/macosx/simple_prefs.m:572 modules/gui/macosx/simple_prefs.m:615
+#: modules/gui/macosx/simple_prefs.m:1222
 #: modules/gui/qt4/components/simple_preferences.cpp:467
 msgid "Custom"
 msgstr "自定义"
@@ -15471,47 +15507,47 @@ msgstr "高潜伏时间"
 msgid "Higher latency"
 msgstr "较高潜伏时间"
 
-#: modules/gui/macosx/simple_prefs.m:815
+#: modules/gui/macosx/simple_prefs.m:814
 msgid "Interface Settings not saved"
 msgstr "界面设置未被保存"
 
-#: modules/gui/macosx/simple_prefs.m:816 modules/gui/macosx/simple_prefs.m:890
-#: modules/gui/macosx/simple_prefs.m:923 modules/gui/macosx/simple_prefs.m:989
-#: modules/gui/macosx/simple_prefs.m:1029
-#: modules/gui/macosx/simple_prefs.m:1054
+#: modules/gui/macosx/simple_prefs.m:815 modules/gui/macosx/simple_prefs.m:889
+#: modules/gui/macosx/simple_prefs.m:922 modules/gui/macosx/simple_prefs.m:987
+#: modules/gui/macosx/simple_prefs.m:1027
+#: modules/gui/macosx/simple_prefs.m:1052
 #, c-format
 msgid "An error occured while saving your settings via SimplePrefs (%i)."
 msgstr "在通过 SimplePrefs (%i) 保存您的设置时发生一个错误。"
 
-#: modules/gui/macosx/simple_prefs.m:889
+#: modules/gui/macosx/simple_prefs.m:888
 msgid "Audio Settings not saved"
 msgstr "未保存音频设置"
 
-#: modules/gui/macosx/simple_prefs.m:922
+#: modules/gui/macosx/simple_prefs.m:921
 msgid "Video Settings not saved"
 msgstr "未保存视频设置"
 
-#: modules/gui/macosx/simple_prefs.m:988
+#: modules/gui/macosx/simple_prefs.m:986
 msgid "Input Settings not saved"
 msgstr "未保存输入设置"
 
-#: modules/gui/macosx/simple_prefs.m:1028
+#: modules/gui/macosx/simple_prefs.m:1026
 msgid "On Screen Display/Subtitle Settings not saved"
 msgstr "屏幕显示/字幕设置不保存"
 
-#: modules/gui/macosx/simple_prefs.m:1053
+#: modules/gui/macosx/simple_prefs.m:1051
 msgid "Hotkeys not saved"
 msgstr "热键未保存"
 
-#: modules/gui/macosx/simple_prefs.m:1154
+#: modules/gui/macosx/simple_prefs.m:1152
 msgid "Choose the folder to save your video snapshots to."
 msgstr "选择您的视频截图要保存的文件夹。"
 
-#: modules/gui/macosx/simple_prefs.m:1156
+#: modules/gui/macosx/simple_prefs.m:1154
 msgid "Choose"
 msgstr "选择"
 
-#: modules/gui/macosx/simple_prefs.m:1242
+#: modules/gui/macosx/simple_prefs.m:1240
 msgid ""
 "Press new keys for\n"
 "\"%@\""
@@ -15519,15 +15555,15 @@ msgstr ""
 "请为下述功能按新键\n"
 "\"%@\""
 
-#: modules/gui/macosx/simple_prefs.m:1316
+#: modules/gui/macosx/simple_prefs.m:1314
 msgid "Invalid combination"
 msgstr "无效的组合"
 
-#: modules/gui/macosx/simple_prefs.m:1317
+#: modules/gui/macosx/simple_prefs.m:1315
 msgid "Regrettably, these keys cannot be assigned as hotkey shortcuts."
 msgstr "很遗憾，这些按键无法被分配为热键快捷方式。"
 
-#: modules/gui/macosx/simple_prefs.m:1335
+#: modules/gui/macosx/simple_prefs.m:1333
 msgid "This combination is already taken by \"%@\"."
 msgstr "此组合已经被 \"%@\" 使用。"
 
@@ -17012,34 +17048,38 @@ msgstr ""
 msgid "This is VLC's skinnable interface. You can download other skins at"
 msgstr "这是 VLC 的外观化界面。您可以在此下载皮肤："
 
-#: modules/gui/qt4/components/simple_preferences.cpp:552
+#: modules/gui/qt4/components/simple_preferences.cpp:528
+msgid "VLC skins website"
+msgstr ""
+
+#: modules/gui/qt4/components/simple_preferences.cpp:553
 msgid "System's default"
 msgstr "系统默认"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:650
+#: modules/gui/qt4/components/simple_preferences.cpp:651
 msgid "Configure Hotkeys"
 msgstr "设置热键"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:914
+#: modules/gui/qt4/components/simple_preferences.cpp:915
 #: modules/gui/qt4/dialogs_provider.hpp:51
 msgid "Audio Files"
 msgstr "音频文件"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:915
+#: modules/gui/qt4/components/simple_preferences.cpp:916
 #: modules/gui/qt4/dialogs_provider.hpp:46
 msgid "Video Files"
 msgstr "视频文件"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:916
+#: modules/gui/qt4/components/simple_preferences.cpp:917
 #: modules/gui/qt4/dialogs_provider.hpp:56
 msgid "Playlist Files"
 msgstr "播放列表文件"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:968
+#: modules/gui/qt4/components/simple_preferences.cpp:969
 msgid "&Apply"
 msgstr "应用(&A)"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:969
+#: modules/gui/qt4/components/simple_preferences.cpp:970
 #: modules/gui/qt4/dialogs/convert.cpp:96
 #: modules/gui/qt4/dialogs/gototime.cpp:49
 #: modules/gui/qt4/dialogs/help.cpp:206 modules/gui/qt4/dialogs/open.cpp:110
@@ -17256,6 +17296,41 @@ msgstr "同步"
 #: modules/gui/qt4/dialogs/extended.cpp:80
 msgid "v4l2 controls"
 msgstr "v4l2 控制"
+
+#: modules/gui/qt4/dialogs/firstrun.cpp:61
+msgid "Privacy and Network Policies"
+msgstr "隐私与网络策略"
+
+#: modules/gui/qt4/dialogs/firstrun.cpp:69
+msgid "Privacy and Network Warning"
+msgstr "隐私与网络警告"
+
+#: modules/gui/qt4/dialogs/firstrun.cpp:72
+msgid ""
+"<p><i>VideoLAN</i> prefers when applications request authorization before "
+"accessing Internet.</p>\n"
+"<p><b>VLC media player</b> can get information from the Internet in order to "
+"get <b>media informations</b> or to check for available <b>updates</b>.</p>\n"
+"<p><i>VLC media player</i> <b>doesn't</b> send or collect any information, "
+"even anonymously, about your usage.</p>\n"
+msgstr ""
+"<p><i>VideoLAN</i>希望程序访问 Internet 之前得到您的许可。</p>\n"
+"<p><b>VLC media player</b> 可以从 Internet 获取 <b>媒体信息</b> 或者检查可用 "
+"<b>更新</b>。</p>\n"
+"<p><i>VLC media player</i> <b>不会</b> 发送或收集任何关于您使用的信息，更不用"
+"说匿名信息。</p>\n"
+
+#: modules/gui/qt4/dialogs/firstrun.cpp:83
+msgid "Options"
+msgstr "选项"
+
+#: modules/gui/qt4/dialogs/firstrun.cpp:90
+msgid "Allow fetching media information from Internet"
+msgstr "允许从 Internet 装取媒体信息"
+
+#: modules/gui/qt4/dialogs/firstrun.cpp:95
+msgid "Check for updates"
+msgstr "检查更新"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:42
 msgid "Go to Time"
@@ -19516,7 +19591,7 @@ msgstr ""
 msgid "ASF muxer"
 msgstr "ASF 复用器"
 
-#: modules/mux/asf.c:567
+#: modules/mux/asf.c:566
 msgid "Unknown Video"
 msgstr "未知视频"
 
@@ -19857,12 +19932,12 @@ msgid "Bonjour services"
 msgstr "Bonjour 服务"
 
 #: modules/services_discovery/mediadirs.c:71
-#: modules/services_discovery/mediadirs.c:368
+#: modules/services_discovery/mediadirs.c:353
 msgid "My Videos"
 msgstr "我的视频"
 
 #: modules/services_discovery/mediadirs.c:78
-#: modules/services_discovery/mediadirs.c:370
+#: modules/services_discovery/mediadirs.c:355
 msgid "My Music"
 msgstr "我的音乐"
 
@@ -19871,7 +19946,7 @@ msgid "Picture"
 msgstr "图片"
 
 #: modules/services_discovery/mediadirs.c:85
-#: modules/services_discovery/mediadirs.c:372
+#: modules/services_discovery/mediadirs.c:357
 msgid "My Pictures"
 msgstr "我的图片"
 
@@ -20287,6 +20362,16 @@ msgstr "正在收集流输出"
 #: modules/stream_out/mosaic_bridge.c:107
 msgid "Specify an identifier string for this subpicture"
 msgstr "指定一个用于此子画面的标识符"
+
+#: modules/stream_out/mosaic_bridge.c:111
+#: modules/stream_out/transcode/transcode.c:68
+msgid "Output video width."
+msgstr "输出视频宽度。"
+
+#: modules/stream_out/mosaic_bridge.c:114
+#: modules/stream_out/transcode/transcode.c:71
+msgid "Output video height."
+msgstr "输出视频高度。"
 
 #: modules/stream_out/mosaic_bridge.c:115
 msgid "Sample aspect ratio"
@@ -20779,9 +20864,17 @@ msgstr "视频帧率"
 msgid "Target output frame rate for the video stream."
 msgstr "视频流的目标输出帧率。"
 
+#: modules/stream_out/transcode/transcode.c:60
+msgid "Deinterlace video"
+msgstr "反交错视频"
+
 #: modules/stream_out/transcode/transcode.c:62
 msgid "Deinterlace the video before encoding."
 msgstr "在编码前反交错视频。"
+
+#: modules/stream_out/transcode/transcode.c:63
+msgid "Deinterlace module"
+msgstr "反交错模块"
 
 #: modules/stream_out/transcode/transcode.c:65
 msgid "Specify the deinterlace module to use."
@@ -21184,7 +21277,7 @@ msgstr "暂停时的色彩"
 msgid ""
 "Set the color to show if the user pauses the video. (Have light to get "
 "another beer?)"
-msgstr "在用于暂停时的色彩 (在轻柔的光线下喝杯啤酒?)"
+msgstr "在用于暂停时的色彩 (亮得足够拿瓶啤酒?)"
 
 #: modules/video_filter/atmo/atmo.cpp:195
 msgid "Pause-Red"
@@ -22646,6 +22739,10 @@ msgid ""
 "set to \"fixed\"."
 msgstr "在 mosaic 的图像列数 (仅被用于位置模式被设置为 \"固定\" 的模式下)。"
 
+#: modules/video_filter/mosaic.c:135
+msgid "Keep aspect ratio"
+msgstr "保持高宽比"
+
 #: modules/video_filter/mosaic.c:137
 msgid "Keep the original aspect ratio when resizing mosaic elements."
 msgstr "在调整 mosaic 元素时保持原始高宽比。"
@@ -23971,6 +24068,14 @@ msgstr "设备，先进先出队列或文件名"
 msgid "device, fifo or filename to write yuv frames too."
 msgstr "写入 YUV 帧的目的设备、FIFO 队列或文件名。"
 
+#: modules/video_output/yuv.c:44
+msgid "Chroma used"
+msgstr "使用了色度"
+
+#: modules/video_output/yuv.c:46
+msgid "Force use of a specific chroma for output. Default is I420."
+msgstr "强制为输出使用指定的色度。默认是 I420。"
+
 #: modules/video_output/yuv.c:48
 msgid "YUV4MPEG2 header (default disabled)"
 msgstr "YUV4MPEG2 头部 (默认关闭)"
@@ -24206,6 +24311,60 @@ msgid "Spectrum analyser"
 msgstr "光谱分析器"
 
 #~ msgid ""
+#~ "Caching value for fake streams. This value should be set in milliseconds."
+#~ msgstr "伪装流缓存值。此值应该以毫秒为单位设置。"
+
+#~ msgid "Number of frames per second (eg. 24, 25, 29.97, 30)."
+#~ msgstr "每秒的帧数 (例如 24, 25, 29.97, 30)。"
+
+#~ msgid ""
+#~ "Set the ID of the fake elementary stream for use in #duplicate{} "
+#~ "constructs (default 0)."
+#~ msgstr "设置在 #duplicate{} 结构中使用的伪装通量流的 ID (默认 0)。"
+
+#~ msgid ""
+#~ "Duration of the fake streaming before faking an end-of-file (default is "
+#~ "-1 meaning that the stream is unlimited when fake is forced, or lasts for "
+#~ "10 seconds otherwise. 0, means that the stream is unlimited)."
+#~ msgstr ""
+#~ "伪造 end-of-file 标记前伪装流化的时长 (默认为 -1 即强制伪装时进行无限的流"
+#~ "式处理，其他情况则持续 10 秒钟。0 即进行无限的流式处理)。"
+
+#~ msgid "Fake"
+#~ msgstr "伪装"
+
+#~ msgid "Fake video input"
+#~ msgstr "伪装视频输入"
+
+#~ msgid "Path of the image file for fake input."
+#~ msgstr "用于伪装输入的图片文件路径。"
+
+#~ msgid "Reload image file"
+#~ msgstr "重新载入图像文件"
+
+#~ msgid "Reload image file every n seconds."
+#~ msgstr "每 n 秒重新载入图像文件。"
+
+#~ msgid "Consider width and height as maximum values."
+#~ msgstr "将宽度和高度作为最大值。"
+
+#~ msgid "Background aspect ratio"
+#~ msgstr "背景高宽比"
+
+#~ msgid ""
+#~ "Aspect ratio of the image file (4:3, 16:9). Default is square pixels."
+#~ msgstr "图像文件的高宽比 (4:3、16:9)。默认是方块像素。"
+
+#~ msgid "Deinterlace the image after loading it."
+#~ msgstr "在载入它之前反交错图像。"
+
+#~ msgid "Deinterlace module to use."
+#~ msgstr "要使用的反交错模块。"
+
+#~ msgid "Fake video decoder"
+#~ msgstr "伪视频解码器"
+
+#~ msgid ""
 #~ "Allows B-frames to be used as references for predicting other frames. "
 #~ "Keeps the middle of 2+ consecutive B-frames as a reference, and reorders "
 #~ "frame appropriately."
@@ -24221,9 +24380,6 @@ msgstr "光谱分析器"
 #~ msgid "add grain to image"
 #~ msgstr "向图像中添加噪点"
 
-#~ msgid "My Computer"
-#~ msgstr "我的电脑"
-
 #~ msgid "Devices"
 #~ msgstr "设备"
 
@@ -24232,36 +24388,6 @@ msgstr "光谱分析器"
 
 #~ msgid "Internet"
 #~ msgstr "Internet"
-
-#~ msgid "Privacy and Network Policies"
-#~ msgstr "隐私与网络策略"
-
-#~ msgid "Privacy and Network Warning"
-#~ msgstr "隐私与网络警告"
-
-#~ msgid ""
-#~ "<p><i>VideoLAN</i> prefers when applications request authorization before "
-#~ "accessing Internet.</p>\n"
-#~ "<p><b>VLC media player</b> can get information from the Internet in order "
-#~ "to get <b>media informations</b> or to check for available <b>updates</b>."
-#~ "</p>\n"
-#~ "<p><i>VLC media player</i> <b>doesn't</b> send or collect any "
-#~ "information, even anonymously, about your usage.</p>\n"
-#~ msgstr ""
-#~ "<p><i>VideoLAN</i>希望程序访问 Internet 之前得到您的许可。</p>\n"
-#~ "<p><b>VLC media player</b> 可以从 Internet 获取 <b>媒体信息</b> 或者检查可"
-#~ "用 <b>更新</b>。</p>\n"
-#~ "<p><i>VLC media player</i> <b>不会</b> 发送或收集任何关于您使用的信息，更"
-#~ "不用说匿名信息。</p>\n"
-
-#~ msgid "Options"
-#~ msgstr "选项"
-
-#~ msgid "Allow fetching media information from Internet"
-#~ msgstr "允许从 Internet 装取媒体信息"
-
-#~ msgid "Check for updates"
-#~ msgstr "检查更新"
 
 #~ msgid "Form"
 #~ msgstr "形式"
@@ -26039,9 +26165,6 @@ msgstr "光谱分析器"
 #~ msgid "Native"
 #~ msgstr "原生"
 
-#~ msgid "Display mode"
-#~ msgstr "显示模式"
-
 #~ msgid "Show a controller in fullscreen"
 #~ msgstr "在全屏幕中显示控制器"
 
@@ -26632,7 +26755,7 @@ msgstr "光谱分析器"
 #~ msgstr "2.21:1 听力障碍"
 
 #~ msgid "Compiled by %s, based on Git commit %s"
-#~ msgstr "由 %s 编译, 基于 Git 许可 %s"
+#~ msgstr "由 %s 编译，基于 Git commit %s"
 
 #~ msgid "Quick Open File..."
 #~ msgstr "快速打开文件..."
@@ -26653,7 +26776,7 @@ msgstr "光谱分析器"
 #~ msgstr " 状态     : 正在缓冲 %s"
 
 #~ msgid "Based on Git commit: "
-#~ msgstr "基于 Git 注释:"
+#~ msgstr "基于 Git commit:"
 
 #~ msgid "Login"
 #~ msgstr "登录"
@@ -26747,7 +26870,7 @@ msgstr "光谱分析器"
 #~ msgstr "这将开启用于通过 SAP 宣告发现流的时间位移。"
 
 #~ msgid "Universal Plug'n'Play discovery ( Intel SDK )"
-#~ msgstr "全局插件'n'播放查找 ( Intel SDK )"
+#~ msgstr "全局即插即用发现 (Intel SDK)"
 
 #~ msgid ""
 #~ "This is the hop limit (also known as \"Time-To-Live\" or TTL) of the "
@@ -26792,27 +26915,27 @@ msgstr "光谱分析器"
 
 #~ msgid ""
 #~ "Point of view (X coordinate) of the cube/cylinder effect, if enabled."
-#~ msgstr "立方体/圆柱效果的视图点 (X 坐标),如果开启。"
+#~ msgstr "立方体/圆柱效果的视图点 (X 坐标)，如果开启。"
 
 #~ msgid "Point of view y-coordinate"
 #~ msgstr "视图的 y 坐标"
 
 #~ msgid ""
 #~ "Point of view (Y coordinate) of the cube/cylinder effect, if enabled."
-#~ msgstr "立方体/圆柱效果的视图点 (Y 坐标),如果开启。"
+#~ msgstr "立方体/圆柱效果的视图点 (Y 坐标)，如果开启。"
 
 #~ msgid "Point of view z-coordinate"
 #~ msgstr "视图点的 z 坐标"
 
 #~ msgid ""
 #~ "Point of view (Z coordinate) of the cube/cylinder effect, if enabled."
-#~ msgstr "立方体/圆柱效果的视图点 (X 坐标),如果开启。"
+#~ msgstr "立方体/圆柱效果的视图点 (X 坐标)，如果开启。"
 
 #~ msgid "OpenGL cube rotation speed"
 #~ msgstr "OpenGL 立方体旋转速度"
 
 #~ msgid "Rotation speed of the OpenGL cube effect, if enabled."
-#~ msgstr "OpenGL 立方体效果的旋转速度,如果开启。"
+#~ msgstr "OpenGL 立方体效果的旋转速度，如果开启。"
 
 #~ msgid "Several visual OpenGL effects are available."
 #~ msgstr "有数个 OpenGL 可视化效果可用。"
@@ -26821,7 +26944,7 @@ msgstr "光谱分析器"
 #~ msgstr "波段号"
 
 #~ msgid "Number of bands used by spectrum analyzer, should be 20 or 80."
-#~ msgstr "光谱分析器使用的波段号,应该为 20 或 80。"
+#~ msgstr "光谱分析器使用的波段号，应该为 20 或 80。"
 
 #~ msgid "Number of bands used by the spectrometer, from 20 to 80."
-#~ msgstr "光谱分析器使用的波段号,从 20 到 80。"
+#~ msgstr "光谱分析器使用的波段号，从 20 到 80。"
