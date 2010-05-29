@@ -200,7 +200,7 @@ int main( int i_argc, const char *ppsz_argv[] )
         libvlc_release (vlc);
     }
 
-    for (int i = 1; i < argc; i++)
+    for (int i = 2; i < argc; i++)
         LocaleFree (argv[i]);
 
 #ifdef RTLD_NOLOAD
