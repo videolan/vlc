@@ -1273,7 +1273,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             return VLC_EGENERIC;
     }
 
-    httpd_MsgAdd( answer, "Server", "VLC Server" );
+    httpd_MsgAdd( answer, "Server", "VLC/%s", VERSION );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
     psz_cseq = httpd_MsgGet( query, "Cseq" );
     psz_cseq ? i_cseq = atoi( psz_cseq ) : 0;
@@ -1514,7 +1514,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             break;
     }
 
-    httpd_MsgAdd( answer, "Server", "VLC Server" );
+    httpd_MsgAdd( answer, "Server", "VLC/%s", VERSION );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
     psz_cseq = httpd_MsgGet( query, "Cseq" );
     if (psz_cseq)

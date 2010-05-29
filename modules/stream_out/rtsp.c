@@ -398,7 +398,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
     answer->i_body = 0;
     answer->p_body = NULL;
 
-    httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
+    httpd_MsgAdd( answer, "Server", "VLC/%s", VERSION );
 
     /* Date: is always allowed, and sometimes mandatory with RTSP/2.0. */
     struct tm ut;

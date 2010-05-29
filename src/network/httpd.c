@@ -2144,7 +2144,7 @@ static void* httpd_HostThread( void *data )
                     answer->i_body = 0;
                     answer->p_body = NULL;
 
-                    httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
+                    httpd_MsgAdd( answer, "Server", "VLC/%s", VERSION );
                     httpd_MsgAdd( answer, "Content-Length", "0" );
 
                     switch( query->i_proto )
