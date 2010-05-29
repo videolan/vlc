@@ -253,7 +253,7 @@ void config_PutPsz( vlc_object_t *p_this,
                       const char *psz_name, const char *psz_value )
 {
     module_config_t *p_config;
-    vlc_value_t oldval, val;
+    vlc_value_t oldval;
 
     p_config = config_FindConfig( p_this, psz_name );
 
@@ -283,13 +283,13 @@ void config_PutPsz( vlc_object_t *p_this,
 
     p_config->value.psz = str;
     p_config->b_dirty = true;
-
-    val.psz_string = (char *)p_config->value.psz;
-
     vlc_rwlock_unlock (&config_lock);
 
     if( p_config->pf_callback )
     {
+        vlc_value_t val;
+
+        val.psz_string = (char *)psz_value;
         p_config->pf_callback( p_this, psz_name, oldval, val,
                                p_config->p_callback_data );
     }
