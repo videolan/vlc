@@ -344,8 +344,15 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
             p_sys->url.i_port = 80;
     }
 
-    /* Do user agent */
+    /* Determine the HTTP user agent */
+    /* See RFC2616 §2.2 token definition and §3.8 user-agent header */
     p_sys->psz_user_agent = var_InheritString( p_access, "http-user-agent" );
+    for( char *p = p_sys->psz_user_agent; *p; p++ )
+    {
+        uint8_t c = *p;
+        if( c < 32 || strchr( "()<>@,;:\\\"/[]?={}", c ) )
+            *p = '_'; /* remove potentially harmful characters */
+    }
 
     /* Check proxy */
     psz = var_InheritString( p_access, "http-proxy" );
