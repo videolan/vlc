@@ -247,7 +247,7 @@ static int Open( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
     return OpenWithCookies( p_this, p_access->psz_access, 0,
-                var_CreateGetInteger( p_access, "http-max-redirect" ), NULL );
+                var_InheritInteger( p_access, "http-max-redirect" ), NULL );
 }
 
 /**
@@ -269,7 +269,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     char         *psz, *p;
 
     /* Only forward an store cookies if the corresponding option is activated */
-    bool   b_forward_cookies = var_CreateGetBool( p_access, "http-forward-cookies" );
+    bool   b_forward_cookies = var_InheritBool( p_access, "http-forward-cookies" );
     vlc_array_t * saved_cookies = b_forward_cookies ? (cookies ? cookies : vlc_array_new()) : NULL;
 
     /* Set up p_access */
@@ -345,10 +345,10 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     }
 
     /* Do user agent */
-    p_sys->psz_user_agent = var_CreateGetString( p_access, "http-user-agent" );
+    p_sys->psz_user_agent = var_InheritString( p_access, "http-user-agent" );
 
     /* Check proxy */
-    psz = var_CreateGetNonEmptyString( p_access, "http-proxy" );
+    psz = var_InheritString( p_access, "http-proxy" );
     if( psz )
     {
         p_sys->b_proxy = true;
@@ -391,7 +391,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
 #elif defined( WIN32 )
     else
     {
-        if( var_CreateGetBool( p_access, "http-use-IE-proxy" ) )
+        if( var_InheritBool( p_access, "http-use-IE-proxy" ) )
         {
             /* Try to get the proxy server address from Windows internet settings using registry. */
             HKEY h_key;
@@ -463,7 +463,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
 
     if( psz ) /* No, this is NOT a use-after-free error */
     {
-        psz = var_CreateGetNonEmptyString( p_access, "http-proxy-pwd" );
+        psz = var_InheritString( p_access, "http-proxy-pwd" );
         if( psz )
             p_sys->proxy.psz_password = p_sys->psz_proxy_passbuf = psz;
     }
@@ -494,8 +494,8 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
         msg_Dbg( p_access, "      user='%s'", p_sys->url.psz_username );
     }
 
-    p_sys->b_reconnect = var_CreateGetBool( p_access, "http-reconnect" );
-    p_sys->b_continuous = var_CreateGetBool( p_access, "http-continuous" );
+    p_sys->b_reconnect = var_InheritBool( p_access, "http-reconnect" );
+    p_sys->b_continuous = var_InheritBool( p_access, "http-continuous" );
 
 connect:
     /* Connect */
