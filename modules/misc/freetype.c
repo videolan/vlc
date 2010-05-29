@@ -1221,12 +1221,16 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         }
         p_line->p_glyph_pos[ i ].x = i_pen_x;
         p_line->p_glyph_pos[ i ].y = i_pen_y;
-        i_error = FT_Load_Glyph( face, i_glyph_index, FT_LOAD_DEFAULT );
+        i_error = FT_Load_Glyph( face, i_glyph_index, FT_LOAD_NO_BITMAP | FT_LOAD_DEFAULT );
         if( i_error )
         {
-            msg_Err( p_filter, "unable to render text FT_Load_Glyph returned"
-                               " %d", i_error );
-            goto error;
+	        i_error = FT_Load_Glyph( face, i_glyph_index, FT_LOAD_DEFAULT );
+	        if( i_error )
+	        {
+	            msg_Err( p_filter, "unable to render text FT_Load_Glyph returned"
+	                               " %d", i_error );
+	            goto error;
+	        }
         }
         i_error = FT_Get_Glyph( glyph, &tmp_glyph );
         if( i_error )
@@ -1507,13 +1511,17 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
         p_line->p_glyph_pos[ i ].x = *pi_pen_x;
         p_line->p_glyph_pos[ i ].y = i_pen_y;
 
-        i_error = FT_Load_Glyph( p_face, i_glyph_index, FT_LOAD_DEFAULT );
+        i_error = FT_Load_Glyph( p_face, i_glyph_index, FT_LOAD_NO_BITMAP | FT_LOAD_DEFAULT );
         if( i_error )
         {
-            msg_Err( p_filter,
-                   "unable to render text FT_Load_Glyph returned %d", i_error );
-            p_line->pp_glyphs[ i ] = NULL;
-            return VLC_EGENERIC;
+	        i_error = FT_Load_Glyph( p_face, i_glyph_index, FT_LOAD_DEFAULT );
+	        if( i_error )
+	        {
+	            msg_Err( p_filter,
+	                   "unable to render text FT_Load_Glyph returned %d", i_error );
+	            p_line->pp_glyphs[ i ] = NULL;
+	            return VLC_EGENERIC;
+	        }
         }
 
         /* Do synthetic styling now that Freetype supports it;
