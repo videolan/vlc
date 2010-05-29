@@ -209,7 +209,10 @@ private slots:
 
     void resizeStack( int w, int h ) {
         if( !isFullScreen() && !isMaximized() )
-            resize( size() - stackCentralW->size() + QSize( w, h ) );
+            if( i_visualmode == 1 ) resize( w, h ); /* Oh yes, it shouldn't
+                                   be possible that size() - stackCentralW->size() < 0
+                                   since stackCentralW is contained in the QMW... */
+            else resize( size() - stackCentralW->size() + QSize( w, h ) );
         debug(); }
 
 
