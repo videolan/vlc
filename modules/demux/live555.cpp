@@ -513,7 +513,7 @@ createnew:
 
     if( ( p_sys->rtsp = RTSPClient::createNew( *p_sys->env,
           var_CreateGetInteger( p_demux, "verbose" ) > 1,
-          "VLC media player", i_http_port ) ) == NULL )
+          "LibVLC/"VERSION, i_http_port ) ) == NULL )
     {
         msg_Err( p_demux, "RTSPClient::createNew failed (%s)",
                  p_sys->env->getResultMsg() );
