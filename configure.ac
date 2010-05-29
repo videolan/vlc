@@ -4482,6 +4482,9 @@ then
              ],[
                 AC_MSG_ERROR([Please install the libXpm and libXt development files.])
              ])
+             AS_IF([test "${have_xcb_keysyms}" != "yes"], [
+               AC_MSG_ERROR([Please install xcb-keysyms from xcb-utils.])
+             ])
           ])
         ])
         VLC_ADD_CPPFLAGS([mozilla],[${CPPFLAGS} ${XPM_CFLAGS}])
@@ -4511,6 +4514,9 @@ then
          [[${X_LIBS} ${X_PRE_LIBS} -lX11 -lSM -lICE -lXpm]
         ])
         AC_CHECK_HEADERS(X11/xpm.h,,AC_MSG_ERROR([Please install libXpm-devel library for required X11/xpm.h]))
+        AS_IF([test "${have_xcb_keysyms}" != "yes"], [
+          AC_MSG_ERROR([Please install xcb-keysyms from xcb-utils.])
+        ])
         LDFLAGS="${LDFLAGS_save}"
       fi
 
