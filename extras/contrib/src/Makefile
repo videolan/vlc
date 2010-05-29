@@ -980,16 +980,11 @@ libebml-$(LIBEBML_VERSION).tar.bz2:
 
 libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-ifdef HAVE_WIN32
-	(cd $@; patch -p0 < ../Patches/libebml-svn-win32.patch)
-endif
-ifdef HAVE_WIN64
-	patch -p0 < Patches/libebml-win64.patch
-endif
+	patch -p0 < Patches/libebml-win32.patch
 
 .ebml: libebml
 ifdef HAVE_WIN32
-	(cd $<; make -C make/mingw32 prefix=$(PREFIX) $(HOSTCC2) CFLAGS="$(CFLAGS) -DWIN32" SHARED=no && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC2))
+	(cd $<; make -C make/mingw32 prefix=$(PREFIX) $(HOSTCC) CFLAGS="$(CFLAGS) -DWIN32" SHARED=no && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC))
 else
 	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
 	$(RANLIB) $(PREFIX)/lib/libebml.a
