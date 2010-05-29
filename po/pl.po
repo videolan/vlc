@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: VLC 1.1.x\n"
+"Project-Id-Version: VLC 1.2.x\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-05-20 19:50+0100\n"
-"PO-Revision-Date: 2010-05-19 19:34+0100\n"
+"POT-Creation-Date: 2010-05-29 00:44+0100\n"
+"PO-Revision-Date: 2010-05-27 23:28+0100\n"
 "Last-Translator: Michał Trzebiatowski <hippie_1968@hotmail.com>\n"
 "Language-Team: Polish\n"
 "Language: \n"
@@ -913,8 +913,8 @@ msgstr "dekoder"
 
 #: src/input/decoder.c:280 src/input/decoder.c:441
 #: modules/codec/avcodec/encoder.c:224 modules/codec/avcodec/encoder.c:232
-#: modules/codec/avcodec/encoder.c:254 modules/codec/avcodec/encoder.c:670
-#: modules/codec/avcodec/encoder.c:679 modules/stream_out/es.c:363
+#: modules/codec/avcodec/encoder.c:254 modules/codec/avcodec/encoder.c:692
+#: modules/codec/avcodec/encoder.c:701 modules/stream_out/es.c:363
 #: modules/stream_out/es.c:378
 msgid "Streaming / Transcoding failed"
 msgstr "Strumieniowanie / Transkodowanie nie udało się"
@@ -1056,25 +1056,26 @@ msgstr "Rozdzielczość obrazu"
 
 #: src/input/es_out.c:2950 src/input/es_out.c:2953 modules/access/imem.c:98
 #: modules/access/screen/screen.c:44 modules/access/screen/xcb.c:38
+#: modules/demux/image.c:65
 msgid "Frame rate"
 msgstr "Liczba klatek/s"
 
-#: src/input/input.c:2437
+#: src/input/input.c:2435
 msgid "Your input can't be opened"
 msgstr "Twoje dane wejściowe nie może być otwarte"
 
-#: src/input/input.c:2438
+#: src/input/input.c:2436
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 "Program VLC nie może otworzyć MRL '%s'. Szczegóły błędu można znaleźć w "
 "dzienniku."
 
-#: src/input/input.c:2557
+#: src/input/input.c:2555
 msgid "VLC can't recognize the input's format"
 msgstr "VLC nie rozpoznaje formatu wejścia"
 
-#: src/input/input.c:2558
+#: src/input/input.c:2556
 #, c-format
 msgid ""
 "The format of '%s' cannot be detected. Have a look at the log for details."
@@ -1203,7 +1204,7 @@ msgstr "Następny rozdział"
 msgid "Previous chapter"
 msgstr "Poprzedni rozdział"
 
-#: src/input/vlm.c:611 src/input/vlm.c:969
+#: src/input/vlm.c:610 src/input/vlm.c:961
 #, c-format
 msgid "Media: %s"
 msgstr "Plik/nośnik: %s"
@@ -1385,24 +1386,24 @@ msgstr ""
 "\n"
 "Naciśnij klawisz ENTER aby kontynuować...\n"
 
-#: src/libvlc.h:173 src/libvlc-module.c:1462 src/libvlc-module.c:1463
+#: src/libvlc.h:166 src/libvlc-module.c:1462 src/libvlc-module.c:1463
 #: src/libvlc-module.c:2635 src/video_output/vout_intf.c:199
 msgid "Zoom"
 msgstr "Powiększenie obrazu"
 
-#: src/libvlc.h:174 src/libvlc-module.c:1382 src/video_output/vout_intf.c:94
+#: src/libvlc.h:167 src/libvlc-module.c:1382 src/video_output/vout_intf.c:94
 msgid "1:4 Quarter"
 msgstr "1:4 Ćwiartka"
 
-#: src/libvlc.h:175 src/libvlc-module.c:1383 src/video_output/vout_intf.c:95
+#: src/libvlc.h:168 src/libvlc-module.c:1383 src/video_output/vout_intf.c:95
 msgid "1:2 Half"
 msgstr "1:2 Połówka"
 
-#: src/libvlc.h:176 src/libvlc-module.c:1384 src/video_output/vout_intf.c:96
+#: src/libvlc.h:169 src/libvlc-module.c:1384 src/video_output/vout_intf.c:96
 msgid "1:1 Original"
 msgstr "1:1 Oryginalny"
 
-#: src/libvlc.h:177 src/libvlc-module.c:1385 src/video_output/vout_intf.c:97
+#: src/libvlc.h:170 src/libvlc-module.c:1385 src/video_output/vout_intf.c:97
 msgid "2:1 Double"
 msgstr "2:1 Podwójny"
 
@@ -1824,8 +1825,7 @@ msgstr ""
 "Można zupełnie wyłączyć wyjście obrazu. Dekodowanie obrazu nie będzie "
 "wówczas wykonywane, dzięki czemu zmniejszy się obciążenie procesora."
 
-#: src/libvlc-module.c:380 modules/codec/fake.c:58
-#: modules/stream_out/mosaic_bridge.c:109
+#: src/libvlc-module.c:380 modules/stream_out/mosaic_bridge.c:109
 #: modules/stream_out/transcode/transcode.c:66
 #: modules/visualization/projectm.cpp:60
 #: modules/visualization/visual/visual.c:48
@@ -1840,8 +1840,7 @@ msgstr ""
 "Możesz podać szerokość obrazu. VLC będzie używał domyślnych (-1) właściwości "
 "obrazu."
 
-#: src/libvlc-module.c:385 modules/codec/fake.c:61
-#: modules/stream_out/mosaic_bridge.c:112
+#: src/libvlc-module.c:385 modules/stream_out/mosaic_bridge.c:112
 #: modules/stream_out/transcode/transcode.c:69
 #: modules/visualization/projectm.cpp:63
 #: modules/visualization/visual/visual.c:52
@@ -2446,7 +2445,7 @@ msgstr ""
 #: modules/audio_output/alsa.c:107 modules/gui/fbosd.c:171
 #: modules/gui/macosx/prefs_widgets.m:1297
 #: modules/gui/macosx/simple_prefs.m:415 modules/gui/macosx/simple_prefs.m:536
-#: modules/gui/macosx/simple_prefs.m:770 modules/gui/macosx/vout.m:212
+#: modules/gui/macosx/simple_prefs.m:769 modules/gui/macosx/vout.m:212
 #: modules/gui/qt4/components/preferences_widgets.cpp:619
 #: modules/video_filter/marq.c:59 modules/video_filter/rss.c:71
 #: modules/video_filter/rss.c:184 modules/video_output/msw/directx.c:95
@@ -4699,13 +4698,13 @@ msgid "Downloading ..."
 msgstr "Pobieranie ..."
 
 #: src/misc/update.c:606 src/misc/update.c:736 modules/access/dvb/scan.c:327
-#: modules/demux/avi/avi.c:652 modules/demux/avi/avi.c:2353
+#: modules/demux/avi/avi.c:656 modules/demux/avi/avi.c:2358
 #: modules/gui/macosx/bookmarks.m:102 modules/gui/macosx/controls.m:60
 #: modules/gui/macosx/coredialogs.m:66 modules/gui/macosx/coredialogs.m:68
 #: modules/gui/macosx/coredialogs.m:186 modules/gui/macosx/open.m:176
 #: modules/gui/macosx/open.m:206 modules/gui/macosx/prefs.m:204
 #: modules/gui/macosx/prefs.m:225 modules/gui/macosx/simple_prefs.m:244
-#: modules/gui/macosx/simple_prefs.m:308 modules/gui/macosx/simple_prefs.m:696
+#: modules/gui/macosx/simple_prefs.m:308 modules/gui/macosx/simple_prefs.m:695
 #: modules/gui/macosx/wizard.m:320
 #: modules/gui/qt4/components/open_panels.cpp:1265
 #: modules/gui/qt4/components/preferences_widgets.cpp:1427
@@ -5483,9 +5482,8 @@ msgid "Scale factor"
 msgstr "Czynnik skalowania"
 
 #: src/video_output/vout_intf.c:370
-#, fuzzy
 msgid "Video splitter"
-msgstr "Filtr obrazu"
+msgstr "Rozdzielacz obrazu"
 
 #: modules/3dnow/memcpy.c:46
 msgid "3D Now! memcpy"
@@ -5512,9 +5510,8 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:99 modules/access/dv.c:59
 #: modules/access/dvb/access.c:83 modules/access/dvdnav.c:73
 #: modules/access/dvdread.c:74 modules/access/eyetv.m:61
-#: modules/access/fake.c:44 modules/access/ftp.c:58
-#: modules/access/gnomevfs.c:48 modules/access/http.c:81
-#: modules/access/imem.c:49 modules/access/jack.c:59
+#: modules/access/ftp.c:58 modules/access/gnomevfs.c:48
+#: modules/access/http.c:81 modules/access/imem.c:49 modules/access/jack.c:59
 #: modules/access/mms/mms.c:49 modules/access/mtp.c:63 modules/access/oss.c:70
 #: modules/access/pvr.c:60 modules/access/rtmp/access.c:43
 #: modules/access/screen/screen.c:40 modules/access/screen/xcb.c:33
@@ -5559,12 +5556,11 @@ msgstr "Wejście załącznika"
 
 #: modules/access/avio.h:34
 msgid "Avio"
-msgstr ""
+msgstr "Avio"
 
 #: modules/access/avio.h:35
-#, fuzzy
 msgid "FFmpeg access"
-msgstr "Dostęp Zip"
+msgstr "Dostęp FFmpeg"
 
 #: modules/access/bd/bd.c:54
 msgid "Caching value for BDs. This value should be set in milliseconds."
@@ -6465,12 +6461,12 @@ msgstr "DVD z menu"
 msgid "DVDnav Input"
 msgstr "Wejście DVDnav"
 
-#: modules/access/dvdnav.c:319 modules/access/dvdread.c:205
+#: modules/access/dvdnav.c:327 modules/access/dvdread.c:205
 #: modules/access/dvdread.c:465 modules/access/dvdread.c:527
 msgid "Playback failure"
 msgstr "Niepowodzenie odtwarzania"
 
-#: modules/access/dvdnav.c:320
+#: modules/access/dvdnav.c:328
 msgid ""
 "VLC cannot set the DVD's title. It possibly cannot decrypt the entire disc."
 msgstr ""
@@ -6521,59 +6517,6 @@ msgstr ""
 #: modules/access/eyetv.m:68
 msgid "EyeTV input"
 msgstr "Wejście EyeTV"
-
-#: modules/access/fake.c:46
-msgid ""
-"Caching value for fake streams. This value should be set in milliseconds."
-msgstr ""
-"Liczba buforowania dla fałszywych strumieni. Powinna być podana w "
-"milisekundach."
-
-#: modules/access/fake.c:48 modules/access/pvr.c:86 modules/access/v4l.c:130
-#: modules/access/v4l2.c:95
-msgid "Framerate"
-msgstr "Liczba klatek"
-
-#: modules/access/fake.c:50
-msgid "Number of frames per second (eg. 24, 25, 29.97, 30)."
-msgstr "Ilość klatek na sekundę (np. 24, 25, 29.97, 30)."
-
-#: modules/access/fake.c:51 modules/access/imem.c:54
-#: modules/gui/qt4/components/playlist/sorting.h:49
-#: modules/stream_out/bridge.c:41 modules/stream_out/mosaic_bridge.c:105
-msgid "ID"
-msgstr "ID"
-
-#: modules/access/fake.c:53
-msgid ""
-"Set the ID of the fake elementary stream for use in #duplicate{} constructs "
-"(default 0)."
-msgstr ""
-"Wprowadź identyfikator podstawowego strumienia fałszywego w połączeniu z "
-"#duplicate{} constructs (domyślne: 0)."
-
-#: modules/access/fake.c:55
-msgid "Duration in ms"
-msgstr "Czas trwania w ms"
-
-#: modules/access/fake.c:57
-msgid ""
-"Duration of the fake streaming before faking an end-of-file (default is -1 "
-"meaning that the stream is unlimited when fake is forced, or lasts for 10 "
-"seconds otherwise. 0, means that the stream is unlimited)."
-msgstr ""
-"Czas trwania fałszywego strumienia przed fałszowaniem końca pliku (domyślnie "
-"to -1, co oznacza, że strumień jest nieograniczony przy wymuszonym "
-"fałszowaniu lub trwa przez co najmniej 10 sekund. 0 oznacza, że strumień "
-"jest nieograniczony)."
-
-#: modules/access/fake.c:63 modules/codec/fake.c:88
-msgid "Fake"
-msgstr "Fałszywy"
-
-#: modules/access/fake.c:64
-msgid "Fake video input"
-msgstr "Fałszywe wyjście obrazu"
 
 #: modules/access/file.c:169 modules/access/file.c:302
 #: modules/access/mmap.c:228 modules/access/mtp.c:221 modules/access/mtp.c:309
@@ -6860,15 +6803,20 @@ msgid ""
 msgstr ""
 "Liczba buforowania dla strumieni imem. Powinna być podana w milisekundach."
 
-#: modules/access/imem.c:56
+#: modules/access/imem.c:54 modules/gui/qt4/components/playlist/sorting.h:49
+#: modules/stream_out/bridge.c:41 modules/stream_out/mosaic_bridge.c:105
+msgid "ID"
+msgstr "ID"
+
+#: modules/access/imem.c:56 modules/demux/image.c:45
 msgid "Set the ID of the elementary stream"
 msgstr "Ustaw identyfikator podstawowego strumienia"
 
-#: modules/access/imem.c:58
+#: modules/access/imem.c:58 modules/demux/image.c:47
 msgid "Group"
 msgstr "Grupa"
 
-#: modules/access/imem.c:60
+#: modules/access/imem.c:60 modules/demux/image.c:49
 msgid "Set the group of the elementary stream"
 msgstr "Ustaw grupę podstawowego strumienia"
 
@@ -7156,6 +7104,10 @@ msgstr "Częstotliwość"
 #: modules/access/pvr.c:84 modules/access/v4l.c:91
 msgid "Frequency to capture (in kHz), if applicable."
 msgstr "Frekwencja nagrywania (w kHz), jeśli dostępna."
+
+#: modules/access/pvr.c:86 modules/access/v4l.c:130 modules/access/v4l2.c:95
+msgid "Framerate"
+msgstr "Liczba klatek"
 
 #: modules/access/pvr.c:87 modules/access/v4l.c:131
 msgid "Framerate to capture, if applicable (-1 for autodetect)."
@@ -8206,7 +8158,7 @@ msgid "Segments"
 msgstr "Segmenty"
 
 #: modules/access/vcdx/access.c:416 modules/access/vcdx/access.c:695
-#: modules/access/vcdx/info.c:232 modules/demux/mkv/demux.cpp:628
+#: modules/access/vcdx/info.c:232 modules/demux/mkv/demux.cpp:627
 msgid "Segment"
 msgstr "Segment"
 
@@ -8393,13 +8345,12 @@ msgid "Append to file if it exists instead of replacing it."
 msgstr "Dołącz do pliku jeżeli istnieje zamiast go zastąpić"
 
 #: modules/access_output/file.c:66
-#, fuzzy
 msgid "Synchronous writing"
-msgstr "Synchronizacja"
+msgstr "Synchroniczne zapisywanie"
 
 #: modules/access_output/file.c:67
 msgid "Open the file with synchronous writing."
-msgstr ""
+msgstr "Otwórz plik z zapisem synchronicznym."
 
 #: modules/access_output/file.c:70
 msgid "File stream output"
@@ -9825,14 +9776,12 @@ msgid "This allows hardware decoding when available."
 msgstr "To pozwala na dekodowanie sprzętowe, gdy jest dostępne."
 
 #: modules/codec/avcodec/avcodec.h:141
-#, fuzzy
 msgid "Threads"
-msgstr "Próg"
+msgstr "Wątki"
 
 #: modules/codec/avcodec/avcodec.h:142
-#, fuzzy
 msgid "Number of threads used for decoding, 0 meaning auto"
-msgstr "Ilość wątków używanych do transkodowania."
+msgstr "Ilość wątków używanych do transkodowania, 0 oznacza automatycznie"
 
 #: modules/codec/avcodec/avcodec.h:149
 msgid "Ratio of key frames"
@@ -10123,7 +10072,7 @@ msgstr ""
 "To nie jest błąd wewnątrz VLC media playera.\n"
 "Nie kontaktuj się z projektem VideoLAN na ten temat.\n"
 
-#: modules/codec/avcodec/encoder.c:671 modules/codec/avcodec/encoder.c:680
+#: modules/codec/avcodec/encoder.c:693 modules/codec/avcodec/encoder.c:702
 msgid "VLC could not open the encoder."
 msgstr "VLC nie może otworzyć kodera."
 
@@ -10442,77 +10391,6 @@ msgstr "Dekoder dźwięku AAC (używający libfaad2)"
 #: modules/codec/faad.c:388
 msgid "AAC extension"
 msgstr "Rozszerzenie AAC"
-
-#: modules/codec/fake.c:52 modules/gui/fbosd.c:109
-msgid "Image file"
-msgstr "Plik obrazu"
-
-#: modules/codec/fake.c:54
-msgid "Path of the image file for fake input."
-msgstr "Ścieżka obrazu dla symulowanego wyjścia."
-
-#: modules/codec/fake.c:55
-msgid "Reload image file"
-msgstr "Otwórz ponownie plik obrazu"
-
-#: modules/codec/fake.c:57
-msgid "Reload image file every n seconds."
-msgstr "Odśwież plik obrazka każde n sekund."
-
-#: modules/codec/fake.c:60 modules/stream_out/mosaic_bridge.c:111
-#: modules/stream_out/transcode/transcode.c:68
-msgid "Output video width."
-msgstr "Szerokość wyjścia obrazu."
-
-#: modules/codec/fake.c:63 modules/stream_out/mosaic_bridge.c:114
-#: modules/stream_out/transcode/transcode.c:71
-msgid "Output video height."
-msgstr "Wysokość wyjścia obrazu."
-
-#: modules/codec/fake.c:64 modules/video_filter/mosaic.c:135
-msgid "Keep aspect ratio"
-msgstr "Zachowaj proporcje"
-
-#: modules/codec/fake.c:66
-msgid "Consider width and height as maximum values."
-msgstr "Rozważ szerokość i wysokość jako maksymalne wartości."
-
-#: modules/codec/fake.c:67
-msgid "Background aspect ratio"
-msgstr "Stosunek rozmiaru tła"
-
-#: modules/codec/fake.c:69
-msgid "Aspect ratio of the image file (4:3, 16:9). Default is square pixels."
-msgstr ""
-"Proporcje pliku obrazu (4:3, 16:9). Domyślnie są to kwadratowe piksele."
-
-#: modules/codec/fake.c:70 modules/stream_out/transcode/transcode.c:60
-msgid "Deinterlace video"
-msgstr "Antyprzeplotowy obraz"
-
-#: modules/codec/fake.c:72
-msgid "Deinterlace the image after loading it."
-msgstr "Usuń przeplot obrazu po jego załadowaniu."
-
-#: modules/codec/fake.c:73 modules/stream_out/transcode/transcode.c:63
-msgid "Deinterlace module"
-msgstr "Moduł antyprzeplotowy"
-
-#: modules/codec/fake.c:75
-msgid "Deinterlace module to use."
-msgstr "Używany moduł antyprzeplotowy."
-
-#: modules/codec/fake.c:76 modules/video_output/yuv.c:44
-msgid "Chroma used"
-msgstr "Używana chroma"
-
-#: modules/codec/fake.c:78 modules/video_output/yuv.c:46
-msgid "Force use of a specific chroma for output. Default is I420."
-msgstr "Wymuś używania konkretnej chromy dla wyjścia. Domyślnie jest I420."
-
-#: modules/codec/fake.c:89
-msgid "Fake video decoder"
-msgstr "Folder fałszywego dekodera"
 
 #: modules/codec/flac.c:134
 msgid "Flac audio decoder"
@@ -11652,7 +11530,6 @@ msgid "H.264 level"
 msgstr "Poziom H.264"
 
 #: modules/codec/x264.c:125
-#, fuzzy
 msgid ""
 "Specify H.264 level (as defined by Annex A of the standard). Levels are not "
 "enforced; it's up to the user to select a level compatible with the rest of "
@@ -11660,8 +11537,9 @@ msgid ""
 "for letting x264 set level."
 msgstr ""
 "Określa poziom H.264 (jak określono w standardzie Annex A). Poziomy nie są "
-"wysuszane, zależy to od użytkownika, aby wybrał poziom zgodny z resztą opcji "
-"kodowania. Wartość w zakresie 1 do 5.1 (10 do 51 są również dozwolone)."
+"wysuszane, dlatego musisz wybrać poziom zgodny z resztą opcji kodowania. "
+"Wartość w zakresie 1 do 5.1 (10 do 51 są również dozwolone). Wybierz 0 aby "
+"x264 ustawił poziom."
 
 #: modules/codec/x264.c:130
 msgid "H.264 profile"
@@ -13436,11 +13314,11 @@ msgstr "Nigdy nie naprawiaj"
 msgid "AVI demuxer"
 msgstr "AVI demuxer"
 
-#: modules/demux/avi/avi.c:648
+#: modules/demux/avi/avi.c:652
 msgid "AVI Index"
 msgstr "Indeks AVI"
 
-#: modules/demux/avi/avi.c:649
+#: modules/demux/avi/avi.c:653
 msgid ""
 "This AVI file is broken. Seeking will not work correctly.\n"
 "Do you want to try to fix it?\n"
@@ -13452,15 +13330,15 @@ msgstr ""
 "\n"
 "Może to zająć sporo czasu."
 
-#: modules/demux/avi/avi.c:652
+#: modules/demux/avi/avi.c:656
 msgid "Repair"
 msgstr "Napraw"
 
-#: modules/demux/avi/avi.c:652
+#: modules/demux/avi/avi.c:656
 msgid "Don't repair"
 msgstr "Nie naprawiaj"
 
-#: modules/demux/avi/avi.c:2352
+#: modules/demux/avi/avi.c:2357
 msgid "Fixing AVI Index..."
 msgstr "Naprawiam Indeks AVI..."
 
@@ -13504,6 +13382,63 @@ msgstr "Demuxer FLAC"
 msgid "GME demuxer (Game_Music_Emu)"
 msgstr "demuxer GME (Game_Music_Emu)"
 
+#: modules/demux/image.c:43
+#, fuzzy
+msgid "ES ID"
+msgstr "TS ID"
+
+#: modules/demux/image.c:51
+#, fuzzy
+msgid "Decode"
+msgstr "Zdekodowane"
+
+#: modules/demux/image.c:53
+msgid "Decode at the demuxer stage"
+msgstr ""
+
+#: modules/demux/image.c:55
+#, fuzzy
+msgid "Forced chroma"
+msgstr "Chroma obrazu"
+
+#: modules/demux/image.c:57
+msgid ""
+"If non empty and image-decode is true, the image will be converted to the "
+"specified chroma."
+msgstr ""
+
+#: modules/demux/image.c:60
+#, fuzzy
+msgid "Duration in second"
+msgstr "Czas trwania w ms"
+
+#: modules/demux/image.c:62
+msgid ""
+"Duration in second before simulating an end of file. A negative value means "
+"an unlimited play time."
+msgstr ""
+
+#: modules/demux/image.c:67
+#, fuzzy
+msgid "Frame rate of the elementary stream produced."
+msgstr "Liczba klatek obrazu podstawowego strumienia"
+
+#: modules/demux/image.c:69
+#, fuzzy
+msgid "Real-time"
+msgstr "Opóźnienie czasu"
+
+#: modules/demux/image.c:71
+msgid ""
+"Use real-time mode suitable for being used as a master input and real-time "
+"input slaves."
+msgstr ""
+
+#: modules/demux/image.c:75
+#, fuzzy
+msgid "Image demuxer"
+msgstr "AVI demuxer"
+
 #: modules/demux/kate_categories.c:40
 msgid "Closed captions"
 msgstr "Zamknięte napisy"
@@ -13533,6 +13468,7 @@ msgid "Transcript"
 msgstr "Transkrypcja"
 
 #: modules/demux/kate_categories.c:49 modules/demux/kate_categories.c:56
+#: modules/demux/mp4/mp4.c:961
 msgid "Lyrics"
 msgstr "Tekst"
 
@@ -13835,6 +13771,95 @@ msgstr "Demuxer strumienia MP4"
 #: modules/demux/mp4/mp4.c:56
 msgid "MP4"
 msgstr "MP4"
+
+#: modules/demux/mp4/mp4.c:946
+msgid "Writer"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:947
+msgid "Composr"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:948
+msgid "Producer"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:949 modules/gui/macosx/playlistinfo.m:421
+#: modules/gui/qt4/components/controller.hpp:109
+#: modules/gui/qt4/components/controller.hpp:119
+msgid "Information"
+msgstr "Informacja"
+
+#: modules/demux/mp4/mp4.c:950
+#, fuzzy
+msgid "Director"
+msgstr "Katalog"
+
+#: modules/demux/mp4/mp4.c:951
+#, fuzzy
+msgid "Disclaimer"
+msgstr "Porzuć"
+
+#: modules/demux/mp4/mp4.c:952
+#, fuzzy
+msgid "Requirements"
+msgstr "Segmenty"
+
+#: modules/demux/mp4/mp4.c:953
+#, fuzzy
+msgid "Original Format"
+msgstr "Oryginalny identyfikator"
+
+#: modules/demux/mp4/mp4.c:954
+#, fuzzy
+msgid "Display Source As"
+msgstr "Tryb wyświetlania"
+
+#: modules/demux/mp4/mp4.c:955
+#, fuzzy
+msgid "Host Computer"
+msgstr "Mój komputer"
+
+#: modules/demux/mp4/mp4.c:956
+#, fuzzy
+msgid "Performers"
+msgstr "Opcje wydajności"
+
+#: modules/demux/mp4/mp4.c:957
+#, fuzzy
+msgid "Original Performer"
+msgstr "Oryginalny rozmiar"
+
+#: modules/demux/mp4/mp4.c:958
+msgid "Providers Source Content"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:959
+msgid "Warning"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:960
+#, fuzzy
+msgid "Software"
+msgstr "Oprogramowanie AtmoWin"
+
+#: modules/demux/mp4/mp4.c:962
+msgid "Make"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:963
+#, fuzzy
+msgid "Model"
+msgstr "Tryb"
+
+#: modules/demux/mp4/mp4.c:964
+msgid "Product"
+msgstr ""
+
+#: modules/demux/mp4/mp4.c:965
+#, fuzzy
+msgid "Grouping"
+msgstr "Grupa"
 
 #: modules/demux/mpc.c:62
 msgid "MusePack demuxer"
@@ -14443,6 +14468,10 @@ msgid "Aspect ratio of the video image (4:3, 16:9). Default is square pixels."
 msgstr ""
 "Proporcje obrazu widea (4:3, 16:9). Domyślnie są to kwadratowe piksele."
 
+#: modules/gui/fbosd.c:109
+msgid "Image file"
+msgstr "Plik obrazu"
+
 #: modules/gui/fbosd.c:111
 msgid "Filename of image file to use on the overlay framebuffer."
 msgstr "Nazwa pliku obrazu do użycia na nakładce bufora klatek."
@@ -14661,6 +14690,7 @@ msgstr "Czas"
 #: modules/gui/macosx/wizard.m:1878 modules/gui/macosx/wizard.m:1891
 #: modules/gui/qt4/components/open_panels.cpp:1264
 #: modules/gui/qt4/components/preferences_widgets.cpp:1426
+#: modules/gui/qt4/dialogs/firstrun.cpp:100
 msgid "OK"
 msgstr "OK"
 
@@ -15211,7 +15241,7 @@ msgid "No CrashLog found"
 msgstr "Nie można znaleźć dziennika awarii"
 
 #: modules/gui/macosx/intf.m:2420 modules/gui/macosx/prefs.m:226
-#: modules/gui/macosx/simple_prefs.m:697
+#: modules/gui/macosx/simple_prefs.m:696
 msgid "Continue"
 msgstr "Kontynuuj"
 
@@ -15901,12 +15931,6 @@ msgstr "Błąd podczas zapisywania meta"
 msgid "VLC was unable to save the meta data."
 msgstr "VLC nie mógł zapisać meta danych."
 
-#: modules/gui/macosx/playlistinfo.m:421
-#: modules/gui/qt4/components/controller.hpp:109
-#: modules/gui/qt4/components/controller.hpp:119
-msgid "Information"
-msgstr "Informacja"
-
 #: modules/gui/macosx/prefs.m:202 modules/gui/macosx/simple_prefs.m:311
 #: modules/gui/qt4/dialogs/preferences.cpp:46
 msgid "Preferences"
@@ -15920,12 +15944,12 @@ msgstr "Resetuj"
 msgid "Basic"
 msgstr "Podstawowe"
 
-#: modules/gui/macosx/prefs.m:225 modules/gui/macosx/simple_prefs.m:696
+#: modules/gui/macosx/prefs.m:225 modules/gui/macosx/simple_prefs.m:695
 #: modules/gui/qt4/dialogs/preferences.cpp:312
 msgid "Reset Preferences"
 msgstr "Resetuj preferencje"
 
-#: modules/gui/macosx/prefs.m:228 modules/gui/macosx/simple_prefs.m:699
+#: modules/gui/macosx/prefs.m:228 modules/gui/macosx/simple_prefs.m:698
 msgid ""
 "Beware this will reset the VLC media player preferences.\n"
 "Are you sure you want to continue?"
@@ -15965,7 +15989,7 @@ msgid "Subtitles & OSD"
 msgstr "Napisy i OSD"
 
 #: modules/gui/macosx/simple_prefs.m:192
-#: modules/gui/qt4/components/simple_preferences.cpp:622
+#: modules/gui/qt4/components/simple_preferences.cpp:623
 msgid "Subtitles & On Screen Display Settings"
 msgstr "Ustawienia napisów i informacji na ekranie (OSD)"
 
@@ -16166,8 +16190,8 @@ msgstr "Ostatnie sprawdzenie: %@"
 msgid "No check was performed yet."
 msgstr "Nie przeprowadzono jeszcze sprawdzeń."
 
-#: modules/gui/macosx/simple_prefs.m:572 modules/gui/macosx/simple_prefs.m:616
-#: modules/gui/macosx/simple_prefs.m:1224
+#: modules/gui/macosx/simple_prefs.m:572 modules/gui/macosx/simple_prefs.m:615
+#: modules/gui/macosx/simple_prefs.m:1222
 #: modules/gui/qt4/components/simple_preferences.cpp:467
 msgid "Custom"
 msgstr "Własny"
@@ -16199,47 +16223,47 @@ msgstr "Wysoka częstotliwość"
 msgid "Higher latency"
 msgstr "Najwyższa częstotliwość"
 
-#: modules/gui/macosx/simple_prefs.m:815
+#: modules/gui/macosx/simple_prefs.m:814
 msgid "Interface Settings not saved"
 msgstr "Ustawienia interfejsu nie zapisane"
 
-#: modules/gui/macosx/simple_prefs.m:816 modules/gui/macosx/simple_prefs.m:890
-#: modules/gui/macosx/simple_prefs.m:923 modules/gui/macosx/simple_prefs.m:989
-#: modules/gui/macosx/simple_prefs.m:1029
-#: modules/gui/macosx/simple_prefs.m:1054
+#: modules/gui/macosx/simple_prefs.m:815 modules/gui/macosx/simple_prefs.m:889
+#: modules/gui/macosx/simple_prefs.m:922 modules/gui/macosx/simple_prefs.m:987
+#: modules/gui/macosx/simple_prefs.m:1027
+#: modules/gui/macosx/simple_prefs.m:1052
 #, c-format
 msgid "An error occured while saving your settings via SimplePrefs (%i)."
 msgstr "Wystąpił błąd podczas zapisywania ustawień przez SimplePrefs (%i)."
 
-#: modules/gui/macosx/simple_prefs.m:889
+#: modules/gui/macosx/simple_prefs.m:888
 msgid "Audio Settings not saved"
 msgstr "Ustawienia dźwięku nie zapisane"
 
-#: modules/gui/macosx/simple_prefs.m:922
+#: modules/gui/macosx/simple_prefs.m:921
 msgid "Video Settings not saved"
 msgstr "Ustawienia obrazu nie zapisane"
 
-#: modules/gui/macosx/simple_prefs.m:988
+#: modules/gui/macosx/simple_prefs.m:986
 msgid "Input Settings not saved"
 msgstr "Ustawienia wejścia nie zapisane"
 
-#: modules/gui/macosx/simple_prefs.m:1028
+#: modules/gui/macosx/simple_prefs.m:1026
 msgid "On Screen Display/Subtitle Settings not saved"
 msgstr "Ustawienia napisów/informacji na ekranie (OSD) nie zostały zapisane"
 
-#: modules/gui/macosx/simple_prefs.m:1053
+#: modules/gui/macosx/simple_prefs.m:1051
 msgid "Hotkeys not saved"
 msgstr "Ustawienia skrótów klawiszowych nie zapisane"
 
-#: modules/gui/macosx/simple_prefs.m:1154
+#: modules/gui/macosx/simple_prefs.m:1152
 msgid "Choose the folder to save your video snapshots to."
 msgstr "Wybierz folder, gdzie zapisać zrzuty ekranu."
 
-#: modules/gui/macosx/simple_prefs.m:1156
+#: modules/gui/macosx/simple_prefs.m:1154
 msgid "Choose"
 msgstr "Wybierz"
 
-#: modules/gui/macosx/simple_prefs.m:1242
+#: modules/gui/macosx/simple_prefs.m:1240
 msgid ""
 "Press new keys for\n"
 "\"%@\""
@@ -16247,15 +16271,15 @@ msgstr ""
 "Naciśnij nowy klawisz dla\n"
 "\"%@\""
 
-#: modules/gui/macosx/simple_prefs.m:1316
+#: modules/gui/macosx/simple_prefs.m:1314
 msgid "Invalid combination"
 msgstr "Nie właściwa kombinacja"
 
-#: modules/gui/macosx/simple_prefs.m:1317
+#: modules/gui/macosx/simple_prefs.m:1315
 msgid "Regrettably, these keys cannot be assigned as hotkey shortcuts."
 msgstr "Niestety, te klawisze nie mogą być użyte jako skrót klawisza."
 
-#: modules/gui/macosx/simple_prefs.m:1335
+#: modules/gui/macosx/simple_prefs.m:1333
 msgid "This combination is already taken by \"%@\"."
 msgstr "To połączenie jest już zajęte przez \"%@\"."
 
@@ -17802,34 +17826,38 @@ msgstr ""
 "To jest interfejs VLC któremu można zmieniać skóry. Można pobrać inne skóry "
 "na"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:552
+#: modules/gui/qt4/components/simple_preferences.cpp:528
+msgid "VLC skins website"
+msgstr ""
+
+#: modules/gui/qt4/components/simple_preferences.cpp:553
 msgid "System's default"
 msgstr "Domyślny systemowy"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:650
+#: modules/gui/qt4/components/simple_preferences.cpp:651
 msgid "Configure Hotkeys"
 msgstr "Ustaw skróty klawiszowe"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:914
+#: modules/gui/qt4/components/simple_preferences.cpp:915
 #: modules/gui/qt4/dialogs_provider.hpp:51
 msgid "Audio Files"
 msgstr "Pliki audio"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:915
+#: modules/gui/qt4/components/simple_preferences.cpp:916
 #: modules/gui/qt4/dialogs_provider.hpp:46
 msgid "Video Files"
 msgstr "Pliki wideo"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:916
+#: modules/gui/qt4/components/simple_preferences.cpp:917
 #: modules/gui/qt4/dialogs_provider.hpp:56
 msgid "Playlist Files"
 msgstr "Pliki listy odtwarzania"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:968
+#: modules/gui/qt4/components/simple_preferences.cpp:969
 msgid "&Apply"
 msgstr "&Zastosuj"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:969
+#: modules/gui/qt4/components/simple_preferences.cpp:970
 #: modules/gui/qt4/dialogs/convert.cpp:96
 #: modules/gui/qt4/dialogs/gototime.cpp:49
 #: modules/gui/qt4/dialogs/help.cpp:206 modules/gui/qt4/dialogs/open.cpp:110
@@ -18051,6 +18079,42 @@ msgstr "Synchronizacja"
 #: modules/gui/qt4/dialogs/extended.cpp:80
 msgid "v4l2 controls"
 msgstr "kontrole v4l2"
+
+#: modules/gui/qt4/dialogs/firstrun.cpp:61
+msgid "Privacy and Network Policies"
+msgstr "Polityka sieci i prywatności"
+
+#: modules/gui/qt4/dialogs/firstrun.cpp:69
+msgid "Privacy and Network Warning"
+msgstr "Ochrona prywatności i ostrzenie sieci"
+
+#: modules/gui/qt4/dialogs/firstrun.cpp:72
+msgid ""
+"<p><i>VideoLAN</i> prefers when applications request authorization before "
+"accessing Internet.</p>\n"
+"<p><b>VLC media player</b> can get information from the Internet in order to "
+"get <b>media informations</b> or to check for available <b>updates</b>.</p>\n"
+"<p><i>VLC media player</i> <b>doesn't</b> send or collect any information, "
+"even anonymously, about your usage.</p>\n"
+msgstr ""
+"<p><i>Zespól VideoLAN</i> uważna, że aplikacja nie powinna łączyć się z "
+"internetem bez zezwolenia.</p>\n"
+"<p><b>VLC media player</b> może żądać danych z internetu, aby uzyskać "
+"<b>informacje pliku</b> lub sprawdzić dostępne <b>aktualizacje</b>.</p>\n"
+"<p><i>VLC media player</i> <b>nie</b> wysyła lub pobiera żądnych informacji, "
+"nawet anonimowo, o twoim używaniu.</p>\n"
+
+#: modules/gui/qt4/dialogs/firstrun.cpp:83
+msgid "Options"
+msgstr "Opcje"
+
+#: modules/gui/qt4/dialogs/firstrun.cpp:90
+msgid "Allow fetching media information from Internet"
+msgstr "Pozwól na pobieranie informacji o multimediach z Internetu"
+
+#: modules/gui/qt4/dialogs/firstrun.cpp:95
+msgid "Check for updates"
+msgstr "Sprawdź uaktualnienia"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:42
 msgid "Go to Time"
@@ -20375,7 +20439,7 @@ msgstr ""
 msgid "ASF muxer"
 msgstr "Muxer ASF"
 
-#: modules/mux/asf.c:567
+#: modules/mux/asf.c:566
 msgid "Unknown Video"
 msgstr "Nieznane wideo"
 
@@ -20737,12 +20801,12 @@ msgid "Bonjour services"
 msgstr "Usługi Bonjour"
 
 #: modules/services_discovery/mediadirs.c:71
-#: modules/services_discovery/mediadirs.c:368
+#: modules/services_discovery/mediadirs.c:353
 msgid "My Videos"
 msgstr "Moje wideo"
 
 #: modules/services_discovery/mediadirs.c:78
-#: modules/services_discovery/mediadirs.c:370
+#: modules/services_discovery/mediadirs.c:355
 msgid "My Music"
 msgstr "Moja muzyka"
 
@@ -20751,7 +20815,7 @@ msgid "Picture"
 msgstr "Obraz"
 
 #: modules/services_discovery/mediadirs.c:85
-#: modules/services_discovery/mediadirs.c:372
+#: modules/services_discovery/mediadirs.c:357
 msgid "My Pictures"
 msgstr "Moje obrazy"
 
@@ -21193,6 +21257,16 @@ msgstr "Zgromadzone wyjście strumienia"
 #: modules/stream_out/mosaic_bridge.c:107
 msgid "Specify an identifier string for this subpicture"
 msgstr "Określ identyfikator stringera dla tego pod-obrazu"
+
+#: modules/stream_out/mosaic_bridge.c:111
+#: modules/stream_out/transcode/transcode.c:68
+msgid "Output video width."
+msgstr "Szerokość wyjścia obrazu."
+
+#: modules/stream_out/mosaic_bridge.c:114
+#: modules/stream_out/transcode/transcode.c:71
+msgid "Output video height."
+msgstr "Wysokość wyjścia obrazu."
 
 #: modules/stream_out/mosaic_bridge.c:115
 msgid "Sample aspect ratio"
@@ -21724,9 +21798,17 @@ msgstr "Liczba klatek obrazu"
 msgid "Target output frame rate for the video stream."
 msgstr "Docelowa liczba klatek wyjścia dla strumienia obrazu."
 
+#: modules/stream_out/transcode/transcode.c:60
+msgid "Deinterlace video"
+msgstr "Antyprzeplotowy obraz"
+
 #: modules/stream_out/transcode/transcode.c:62
 msgid "Deinterlace the video before encoding."
 msgstr "Usuń przeplot z widea przed kodowaniem."
+
+#: modules/stream_out/transcode/transcode.c:63
+msgid "Deinterlace module"
+msgstr "Moduł antyprzeplotowy"
 
 #: modules/stream_out/transcode/transcode.c:65
 msgid "Specify the deinterlace module to use."
@@ -23320,60 +23402,51 @@ msgstr "Filtr gradientu obrazu"
 
 #: modules/video_filter/gradfun.c:47
 msgid "Radius"
-msgstr ""
+msgstr "Promień"
 
 #: modules/video_filter/gradfun.c:48
-#, fuzzy
 msgid "Radius in pixels"
-msgstr "Rozmiar czcionki w pikselach"
+msgstr "Rozmiar promienia w pikselach"
 
 #: modules/video_filter/gradfun.c:52
-#, fuzzy
 msgid "Strength"
-msgstr "Długość kroku"
+msgstr "# Siła"
 
 #: modules/video_filter/gradfun.c:53
 msgid "Strength used to modify the value of a pixel"
-msgstr ""
+msgstr "Używana siła do modyfikowania wartości piksela"
 
 #: modules/video_filter/gradfun.c:56
-#, fuzzy
 msgid "Gradfun video filter"
-msgstr "Filtr ziarna obrazu"
+msgstr "Filtr obrazu Gradfun"
 
 #: modules/video_filter/gradfun.c:57
-#, fuzzy
 msgid "Gradfun"
-msgstr "Gradient"
+msgstr "Gradfun"
 
 #: modules/video_filter/grain.c:53
-#, fuzzy
 msgid "Variance"
-msgstr "Trance"
+msgstr "Wariancja"
 
 #: modules/video_filter/grain.c:54
 msgid "Variance of the gaussian noise"
-msgstr ""
+msgstr "Wariancja szumu Gaussa"
 
 #: modules/video_filter/grain.c:58
-#, fuzzy
 msgid "Minimal period"
-msgstr "Mi&nimalny widok"
+msgstr "Minimalny okres"
 
 #: modules/video_filter/grain.c:59
-#, fuzzy
 msgid "Minimal period of the noise grain in pixel"
-msgstr "Całkowita szerokość mozaiki, w pikselach."
+msgstr "Minimalny okres szumu ziarna w pikselu"
 
 #: modules/video_filter/grain.c:60
-#, fuzzy
 msgid "Maximal period"
-msgstr "Maksymalna przepływność"
+msgstr "Maksymalny okres"
 
 #: modules/video_filter/grain.c:61
-#, fuzzy
 msgid "Maximal period of the noise grain in pixel"
-msgstr "Całkowita szerokość mozaiki, w pikselach."
+msgstr "Maksymalny okres szumu ziarna w pikselu"
 
 #: modules/video_filter/grain.c:64
 msgid "Grain video filter"
@@ -23385,7 +23458,7 @@ msgstr "Ziarno"
 
 #: modules/video_filter/grain.c:66
 msgid "Adds filtered gaussian noise"
-msgstr ""
+msgstr "Dodaje filtrowany szum Gaussa"
 
 #: modules/video_filter/invert.c:50
 msgid "Invert video filter"
@@ -23708,6 +23781,10 @@ msgid ""
 msgstr ""
 "Ilość kolumn obrazu w mozaice (tylko w użytku jeśli metoda pozycjonowania "
 "ustawiona jest na \"stałe\")."
+
+#: modules/video_filter/mosaic.c:135
+msgid "Keep aspect ratio"
+msgstr "Zachowaj proporcje"
 
 #: modules/video_filter/mosaic.c:137
 msgid "Keep the original aspect ratio when resizing mosaic elements."
@@ -24826,9 +24903,8 @@ msgid "Direct3D video output"
 msgstr "Wyjście obrazu Direct3D"
 
 #: modules/video_output/msw/direct3d.c:80
-#, fuzzy
 msgid "Direct3D video output (XP)"
-msgstr "Wyjście obrazu Direct3D"
+msgstr "Wyjście obrazu Direct3D (XP)"
 
 #: modules/video_output/msw/directx.c:68
 msgid "Use hardware YUV->RGB conversions"
@@ -25098,6 +25174,14 @@ msgstr "urządzenie, FIFO lub nazwa pliku"
 msgid "device, fifo or filename to write yuv frames too."
 msgstr "urządzenie, fifo lub nazwa pliku do zapisu także ramek yuv."
 
+#: modules/video_output/yuv.c:44
+msgid "Chroma used"
+msgstr "Używana chroma"
+
+#: modules/video_output/yuv.c:46
+msgid "Force use of a specific chroma for output. Default is I420."
+msgstr "Wymuś używania konkretnej chromy dla wyjścia. Domyślnie jest I420."
+
 #: modules/video_output/yuv.c:48
 msgid "YUV4MPEG2 header (default disabled)"
 msgstr "Nagłówek YUV4MPEG2 (domyślnie wyłączone)"
@@ -25335,6 +25419,67 @@ msgid "Spectrum analyser"
 msgstr "Analizator widma"
 
 #~ msgid ""
+#~ "Caching value for fake streams. This value should be set in milliseconds."
+#~ msgstr ""
+#~ "Liczba buforowania dla fałszywych strumieni. Powinna być podana w "
+#~ "milisekundach."
+
+#~ msgid "Number of frames per second (eg. 24, 25, 29.97, 30)."
+#~ msgstr "Ilość klatek na sekundę (np. 24, 25, 29.97, 30)."
+
+#~ msgid ""
+#~ "Set the ID of the fake elementary stream for use in #duplicate{} "
+#~ "constructs (default 0)."
+#~ msgstr ""
+#~ "Wprowadź identyfikator podstawowego strumienia fałszywego w połączeniu z "
+#~ "#duplicate{} constructs (domyślne: 0)."
+
+#~ msgid ""
+#~ "Duration of the fake streaming before faking an end-of-file (default is "
+#~ "-1 meaning that the stream is unlimited when fake is forced, or lasts for "
+#~ "10 seconds otherwise. 0, means that the stream is unlimited)."
+#~ msgstr ""
+#~ "Czas trwania fałszywego strumienia przed fałszowaniem końca pliku "
+#~ "(domyślnie to -1, co oznacza, że strumień jest nieograniczony przy "
+#~ "wymuszonym fałszowaniu lub trwa przez co najmniej 10 sekund. 0 oznacza, "
+#~ "że strumień jest nieograniczony)."
+
+#~ msgid "Fake"
+#~ msgstr "Fałszywy"
+
+#~ msgid "Fake video input"
+#~ msgstr "Fałszywe wyjście obrazu"
+
+#~ msgid "Path of the image file for fake input."
+#~ msgstr "Ścieżka obrazu dla symulowanego wyjścia."
+
+#~ msgid "Reload image file"
+#~ msgstr "Otwórz ponownie plik obrazu"
+
+#~ msgid "Reload image file every n seconds."
+#~ msgstr "Odśwież plik obrazka każde n sekund."
+
+#~ msgid "Consider width and height as maximum values."
+#~ msgstr "Rozważ szerokość i wysokość jako maksymalne wartości."
+
+#~ msgid "Background aspect ratio"
+#~ msgstr "Stosunek rozmiaru tła"
+
+#~ msgid ""
+#~ "Aspect ratio of the image file (4:3, 16:9). Default is square pixels."
+#~ msgstr ""
+#~ "Proporcje pliku obrazu (4:3, 16:9). Domyślnie są to kwadratowe piksele."
+
+#~ msgid "Deinterlace the image after loading it."
+#~ msgstr "Usuń przeplot obrazu po jego załadowaniu."
+
+#~ msgid "Deinterlace module to use."
+#~ msgstr "Używany moduł antyprzeplotowy."
+
+#~ msgid "Fake video decoder"
+#~ msgstr "Folder fałszywego dekodera"
+
+#~ msgid ""
 #~ "Allows B-frames to be used as references for predicting other frames. "
 #~ "Keeps the middle of 2+ consecutive B-frames as a reference, and reorders "
 #~ "frame appropriately."
@@ -25349,9 +25494,6 @@ msgstr "Analizator widma"
 #~ msgid "Repeat Off"
 #~ msgstr "Powtarzanie wyłączone"
 
-#~ msgid "My Computer"
-#~ msgstr "Mój komputer"
-
 #~ msgid "Devices"
 #~ msgstr "Urządzenia"
 
@@ -25360,37 +25502,6 @@ msgstr "Analizator widma"
 
 #~ msgid "Internet"
 #~ msgstr "Internet"
-
-#~ msgid "Privacy and Network Policies"
-#~ msgstr "Polityka sieci i prywatności"
-
-#~ msgid "Privacy and Network Warning"
-#~ msgstr "Ochrona prywatności i ostrzenie sieci"
-
-#~ msgid ""
-#~ "<p><i>VideoLAN</i> prefers when applications request authorization before "
-#~ "accessing Internet.</p>\n"
-#~ "<p><b>VLC media player</b> can get information from the Internet in order "
-#~ "to get <b>media informations</b> or to check for available <b>updates</b>."
-#~ "</p>\n"
-#~ "<p><i>VLC media player</i> <b>doesn't</b> send or collect any "
-#~ "information, even anonymously, about your usage.</p>\n"
-#~ msgstr ""
-#~ "<p><i>Zespól VideoLAN</i> uważna, że aplikacja nie powinna łączyć się z "
-#~ "internetem bez zezwolenia.</p>\n"
-#~ "<p><b>VLC media player</b> może żądać danych z internetu, aby uzyskać "
-#~ "<b>informacje pliku</b> lub sprawdzić dostępne <b>aktualizacje</b>.</p>\n"
-#~ "<p><i>VLC media player</i> <b>nie</b> wysyła lub pobiera żądnych "
-#~ "informacji, nawet anonimowo, o twoim używaniu.</p>\n"
-
-#~ msgid "Options"
-#~ msgstr "Opcje"
-
-#~ msgid "Allow fetching media information from Internet"
-#~ msgstr "Pozwól na pobieranie informacji o multimediach z Internetu"
-
-#~ msgid "Check for updates"
-#~ msgstr "Sprawdź uaktualnienia"
 
 #~ msgid "Form"
 #~ msgstr "Formularz"
@@ -26991,9 +27102,6 @@ msgstr "Analizator widma"
 
 #~ msgid "Native"
 #~ msgstr "Rodowity"
-
-#~ msgid "Display mode"
-#~ msgstr "Tryb wyświetlania"
 
 #~ msgid "Show a controller in fullscreen"
 #~ msgstr "Pokaż kontrolera w trybie pełnoekranowym"
