@@ -72,7 +72,7 @@ static void Close( vlc_object_t * );
 #define INDEX_LONGTEXT N_("Path to the index file to create")
 
 #define INDEXURL_TEXT N_("Full URL to put in index file")
-#define INDEXURL_LONGTEXT N_("Full url to put in index file. "\
+#define INDEXURL_LONGTEXT N_("Full URL to put in index file. "\
                           "Use #'s to represent segment number")
 
 #define DELSEGS_TEXT N_("Delete segments")
