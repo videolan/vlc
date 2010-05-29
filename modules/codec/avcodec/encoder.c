@@ -500,7 +500,8 @@ int OpenEncoder( vlc_object_t *p_this )
         if ( p_sys->i_qmin > 0 && p_sys->i_qmin == p_sys->i_qmax )
             p_context->flags |= CODEC_FLAG_QSCALE;
         /* These codecs cause libavcodec to exit if thread_count is > 1.
-           See libavcodec/mpegvideo_enc.c:MPV_encode_init
+           See libavcodec/mpegvideo_enc.c:MPV_encode_init and
+           libavcodec/svq3.c , WMV2 calls MPV_encode_init also.
          */
         if ( i_codec_id == CODEC_ID_FLV1 ||
              i_codec_id == CODEC_ID_H261 ||
@@ -512,6 +513,7 @@ int OpenEncoder( vlc_object_t *p_this )
              i_codec_id == CODEC_ID_MSMPEG4V2 ||
              i_codec_id == CODEC_ID_MSMPEG4V3 ||
              i_codec_id == CODEC_ID_WMV1 ||
+             i_codec_id == CODEC_ID_WMV2 ||
              i_codec_id == CODEC_ID_RV10 ||
              i_codec_id == CODEC_ID_RV20 ||
              i_codec_id == CODEC_ID_SVQ3 )
