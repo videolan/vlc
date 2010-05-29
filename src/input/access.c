@@ -66,9 +66,13 @@ access_t *__access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     p_access->psz_location = strdup( psz_location );
     p_access->psz_filepath = get_path( psz_location );
     p_access->psz_demux  = strdup( psz_demux );
+    if( p_access->psz_access == NULL || p_access->psz_location == NULL
+     || p_access->psz_demux == NULL )
+        goto error;
 
     msg_Dbg( p_obj, "creating access '%s' location='%s', path='%s'",
-             psz_access, psz_location, p_access->psz_filepath );
+             psz_access, psz_location,
+             p_access->psz_filepath ? p_access->psz_filepath : "(null)" );
 
     p_access->pf_read    = NULL;
     p_access->pf_block   = NULL;
@@ -82,18 +86,18 @@ access_t *__access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     vlc_object_attach( p_access, p_obj );
 
     p_access->p_module = module_need( p_access, "access", psz_access, true );
-
     if( p_access->p_module == NULL )
-    {
-        free( p_access->psz_access );
-        free( p_access->psz_location );
-        free( p_access->psz_filepath );
-        free( p_access->psz_demux );
-        vlc_object_release( p_access );
-        return NULL;
-    }
+        goto error;
 
     return p_access;
+
+error:
+    free( p_access->psz_access );
+    free( p_access->psz_location );
+    free( p_access->psz_filepath );
+    free( p_access->psz_demux );
+    vlc_object_release( p_access );
+    return NULL;
 }
 
 /*****************************************************************************
