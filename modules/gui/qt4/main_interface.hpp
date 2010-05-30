@@ -214,6 +214,7 @@ private slots:
             else resize( size() - stackCentralW->size() + QSize( w, h ) );
         debug(); }
 
+    void setVideoSize( unsigned int, unsigned int );
     void setVideoOnTop( bool );
 
 signals:

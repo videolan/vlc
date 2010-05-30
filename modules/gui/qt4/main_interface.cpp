@@ -211,7 +211,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         if( b_autoresize )
         {
             CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
-                     videoWidget, SetSizing( unsigned int, unsigned int ) );
+                     this, setVideoSize( unsigned int, unsigned int ) );
             CONNECT( videoWidget, sizeChanged( int, int ),
                      this, resizeStack( int,  int ) );
         }
@@ -589,6 +589,13 @@ void MainInterface::releaseVideoSlot( void )
     stackCentralOldWidget = bgWidget;
 }
 
+void MainInterface::setVideoSize( unsigned int w, unsigned int h )
+{
+    if( isFullScreen() || isMaximized() )
+        showNormal();
+    videoWidget->SetSizing( w, h );
+}
+
 /* Slot to change the video always-on-top flag.
  * Emit askVideoOnTop() to invoke this from other thread. */
 void MainInterface::setVideoOnTop( bool on_top )
@@ -616,8 +623,7 @@ int MainInterface::controlVideo( int i_query, va_list args )
     {
         unsigned int i_width  = va_arg( args, unsigned int );
         unsigned int i_height = va_arg( args, unsigned int );
-        if( isFullScreen() || isMaximized() )
-            showNormal();
+
         emit askVideoToResize( i_width, i_height );
         return VLC_SUCCESS;
     }
