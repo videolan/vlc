@@ -227,6 +227,12 @@ void VideoWidget::SetFullScreen( bool b_fs )
         }
         reparentable->setParent( NULL, newflags );
         reparentable->setWindowState( newstate );
+
+        /* FIXME: inherit from the vout window, not the interface */
+        char *title = var_InheritString( p_intf, "video-title" );
+        reparentable->setWindowTitle( qfu(title ? title : _("Video")) );
+        free( title );
+
         reparentable->show();
     }
     else
