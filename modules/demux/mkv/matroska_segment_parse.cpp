@@ -248,34 +248,39 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
             msg_Dbg( &sys.demuxer, "|   |   |   + Track Type=%s", psz_type );
         }
-//        else  if( EbmlId( *l ) == KaxTrackFlagEnabled::ClassInfos.GlobalId )
-//        {
-//            KaxTrackFlagEnabled &fenb = *(KaxTrackFlagEnabled*)l;
+        else  if( MKV_IS_ID( l, KaxTrackFlagEnabled ) ) // UNUSED
+        {
+            KaxTrackFlagEnabled &fenb = *(KaxTrackFlagEnabled*)l;
 
-//            tk->b_enabled = uint32( fenb );
-//            msg_Dbg( &sys.demuxer, "|   |   |   + Track Enabled=%u",
-//                     uint32( fenb )  );
-//        }
+            // tk->b_enabled = uint32( fenb );
+            msg_Dbg( &sys.demuxer, "|   |   |   + Track Enabled=%u", uint32( fenb ) );
+        }
         else  if( MKV_IS_ID( l, KaxTrackFlagDefault ) )
         {
             KaxTrackFlagDefault &fdef = *(KaxTrackFlagDefault*)l;
 
             tk->b_default = uint32( fdef );
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Default=%u", uint32( fdef )  );
+            msg_Dbg( &sys.demuxer, "|   |   |   + Track Default=%u", uint32( fdef ) );
         }
-        else  if( MKV_IS_ID( l, KaxTrackFlagLacing ) )
+        else  if( MKV_IS_ID( l, KaxTrackFlagForced ) ) // UNUSED
+        {
+            KaxTrackFlagForced &ffor = *(KaxTrackFlagForced*)l;
+
+            msg_Dbg( &sys.demuxer, "|   |   |   + Track Forced=%u", uint32( ffor ) );
+        }
+        else  if( MKV_IS_ID( l, KaxTrackFlagLacing ) ) // UNUSED
         {
             KaxTrackFlagLacing &lac = *(KaxTrackFlagLacing*)l;
 
             msg_Dbg( &sys.demuxer, "|   |   |   + Track Lacing=%d", uint32( lac ) );
         }
-        else  if( MKV_IS_ID( l, KaxTrackMinCache ) )
+        else  if( MKV_IS_ID( l, KaxTrackMinCache ) ) // UNUSED
         {
             KaxTrackMinCache &cmin = *(KaxTrackMinCache*)l;
 
             msg_Dbg( &sys.demuxer, "|   |   |   + Track MinCache=%d", uint32( cmin ) );
         }
-        else  if( MKV_IS_ID( l, KaxTrackMaxCache ) )
+        else  if( MKV_IS_ID( l, KaxTrackMaxCache ) ) // UNUSED
         {
             KaxTrackMaxCache &cmax = *(KaxTrackMaxCache*)l;
 
@@ -294,6 +299,12 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
             tk->f_timecodescale = float( ttcs );
             msg_Dbg( &sys.demuxer, "|   |   |   + Track TimeCodeScale=%f", tk->f_timecodescale );
+        }
+        else  if( MKV_IS_ID( l, KaxMaxBlockAdditionID ) ) // UNUSED
+        {
+            KaxMaxBlockAdditionID &mbl = *(KaxMaxBlockAdditionID*)l;
+
+            msg_Dbg( &sys.demuxer, "|   |   |   + Track Max BlockAdditionID=%d", uint32( mbl ) );
         }
         else if( MKV_IS_ID( l, KaxTrackName ) )
         {
@@ -336,6 +347,19 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
             tk->psz_codec_name = ToUTF8( UTFstring( cname ) );
             msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Name=%s", tk->psz_codec_name );
+        }
+        //AttachmentLink
+        else if( MKV_IS_ID( l, KaxCodecDecodeAll ) ) // UNUSED
+        {
+            KaxCodecDecodeAll &cdall = *(KaxCodecDecodeAll*)l;
+
+            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Decode All=%u", uint8( cdall ) );
+        }
+        else if( MKV_IS_ID( l, KaxTrackOverlay ) ) // UNUSED
+        {
+            KaxTrackOverlay &tovr = *(KaxTrackOverlay*)l;
+
+            msg_Dbg( &sys.demuxer, "|   |   |   + Track Overlay=%u", uint32( tovr ) );
         }
         else if( MKV_IS_ID( l, KaxContentEncodings ) )
         {
@@ -400,6 +424,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                                 }
                             }
                         }
+                        // ContentEncryption Unsupported
                         else
                         {
                             MkvTree( sys.demuxer, 5, "Unknown (%s)", typeid(*l3).name() );
@@ -412,38 +437,26 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                 }
             }
         }
-//        else if( EbmlId( *l ) == KaxCodecSettings::ClassInfos.GlobalId )
+//        else if( EbmlId( *l ) == KaxCodecSettings::ClassInfos.GlobalId ) DEPRECATED by matroska
 //        {
 //            KaxCodecSettings &cset = *(KaxCodecSettings*)l;
 
 //            tk->psz_codec_settings = ToUTF8( UTFstring( cset ) );
 //            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Settings=%s", tk->psz_codec_settings );
 //        }
-//        else if( EbmlId( *l ) == KaxCodecInfoURL::ClassInfos.GlobalId )
+//        else if( EbmlId( *l ) == KaxCodecInfoURL::ClassInfos.GlobalId ) DEPRECATED by matroska
 //        {
 //            KaxCodecInfoURL &ciurl = *(KaxCodecInfoURL*)l;
 
 //            tk->psz_codec_info_url = strdup( string( ciurl ).c_str() );
 //            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Info URL=%s", tk->psz_codec_info_url );
 //        }
-//        else if( EbmlId( *l ) == KaxCodecDownloadURL::ClassInfos.GlobalId )
+//        else if( EbmlId( *l ) == KaxCodecDownloadURL::ClassInfos.GlobalId ) DEPRECATED by matroska
 //        {
 //            KaxCodecDownloadURL &cdurl = *(KaxCodecDownloadURL*)l;
 
 //            tk->psz_codec_download_url = strdup( string( cdurl ).c_str() );
 //            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Info URL=%s", tk->psz_codec_download_url );
-//        }
-//        else if( EbmlId( *l ) == KaxCodecDecodeAll::ClassInfos.GlobalId )
-//        {
-//            KaxCodecDecodeAll &cdall = *(KaxCodecDecodeAll*)l;
-
-//            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Decode All=%u <== UNUSED", uint8( cdall ) );
-//        }
-//        else if( EbmlId( *l ) == KaxTrackOverlay::ClassInfos.GlobalId )
-//        {
-//            KaxTrackOverlay &tovr = *(KaxTrackOverlay*)l;
-
-//            msg_Dbg( &sys.demuxer, "|   |   |   + Track Overlay=%u <== UNUSED", uint32( tovr ) );
 //        }
         else  if( MKV_IS_ID( l, KaxTrackVideo ) )
         {
@@ -461,20 +474,19 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             for( j = 0; j < tkv->ListSize(); j++ )
             {
                 EbmlElement *l = (*tkv)[j];
-//                if( EbmlId( *el4 ) == KaxVideoFlagInterlaced::ClassInfos.GlobalId )
-//                {
-//                    KaxVideoFlagInterlaced &fint = *(KaxVideoFlagInterlaced*)el4;
+                if( MKV_IS_ID( l, KaxVideoFlagInterlaced ) ) // UNUSED
+                {
+                    KaxVideoFlagInterlaced &fint = *(KaxVideoFlagInterlaced*)l;
 
-//                    msg_Dbg( &sys.demuxer, "|   |   |   |   + Track Video Interlaced=%u", uint8( fint ) );
-//                }
-//                else if( EbmlId( *el4 ) == KaxVideoStereoMode::ClassInfos.GlobalId )
-//                {
-//                    KaxVideoStereoMode &stereo = *(KaxVideoStereoMode*)el4;
+                    msg_Dbg( &sys.demuxer, "|   |   |   |   + Track Video Interlaced=%u", uint8( fint ) );
+                }
+                else if( MKV_IS_ID( l, KaxVideoStereoMode ) ) // UNUSED
+                {
+                    KaxVideoStereoMode &stereo = *(KaxVideoStereoMode*)l;
 
-//                    msg_Dbg( &sys.demuxer, "|   |   |   |   + Track Video Stereo Mode=%u", uint8( stereo ) );
-//                }
-//                else
-                if( MKV_IS_ID( l, KaxVideoPixelWidth ) )
+                    msg_Dbg( &sys.demuxer, "|   |   |   |   + Track Video Stereo Mode=%u", uint8( stereo ) );
+                }
+                else if( MKV_IS_ID( l, KaxVideoPixelWidth ) )
                 {
                     KaxVideoPixelWidth &vwidth = *(KaxVideoPixelWidth*)l;
 
@@ -530,14 +542,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                     i_crop_left = uint16( cropval );
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + crop pixel left=%d", uint16( cropval ) );
                 }
-                else if( MKV_IS_ID( l, KaxVideoFrameRate ) )
-                {
-                    KaxVideoFrameRate &vfps = *(KaxVideoFrameRate*)l;
-
-                    tk->f_fps = float( vfps );
-                    msg_Dbg( &sys.demuxer, "   |   |   |   + fps=%f", float( vfps ) );
-                }
-                else if( EbmlId( *l ) == KaxVideoDisplayUnit::ClassInfos.GlobalId )
+                else if( MKV_IS_ID( l, KaxVideoDisplayUnit ) )
                 {
                     KaxVideoDisplayUnit &vdmode = *(KaxVideoDisplayUnit*)l;
 
@@ -545,13 +550,21 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + Track Video Display Unit=%s",
                              uint8( vdmode ) == 0 ? "pixels" : ( uint8( vdmode ) == 1 ? "centimeters": "inches" ) );
                 }
-//                else if( EbmlId( *l ) == KaxVideoAspectRatio::ClassInfos.GlobalId )
-//                {
-//                    KaxVideoAspectRatio &ratio = *(KaxVideoAspectRatio*)l;
+                else if( MKV_IS_ID( l, KaxVideoAspectRatio ) ) // UNUSED
+                {
+                    KaxVideoAspectRatio &ratio = *(KaxVideoAspectRatio*)l;
 
-//                    msg_Dbg( &sys.demuxer, "   |   |   |   + Track Video Aspect Ratio Type=%u", uint8( ratio ) );
-//                }
-//                else if( EbmlId( *l ) == KaxVideoGamma::ClassInfos.GlobalId )
+                    msg_Dbg( &sys.demuxer, "   |   |   |   + Track Video Aspect Ratio Type=%u", uint8( ratio ) );
+                }
+                // ColourSpace UNUSED
+                else if( MKV_IS_ID( l, KaxVideoFrameRate ) )
+                {
+                    KaxVideoFrameRate &vfps = *(KaxVideoFrameRate*)l;
+
+                    tk->f_fps = float( vfps );
+                    msg_Dbg( &sys.demuxer, "   |   |   |   + fps=%f", float( vfps ) );
+                }
+//                else if( EbmlId( *l ) == KaxVideoGamma::ClassInfos.GlobalId ) //DEPRECATED by Matroska
 //                {
 //                    KaxVideoGamma &gamma = *(KaxVideoGamma*)l;
 
@@ -1015,9 +1028,8 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
             chapter_edition_c *p_edition = new chapter_edition_c();
  
             EbmlMaster *E = static_cast<EbmlMaster *>(l );
-            size_t j;
             msg_Dbg( &sys.demuxer, "|   |   + EditionEntry" );
-            for( j = 0; j < E->ListSize(); j++ )
+            for( size_t j = 0; j < E->ListSize(); j++ )
             {
                 EbmlElement *l = (*E)[j];
 
@@ -1039,6 +1051,10 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
                 {
                     if (uint8(*static_cast<KaxEditionFlagDefault *>( l )) != 0)
                         i_default_edition = stored_editions.size();
+                }
+                else if( MKV_IS_ID( l, KaxEditionFlagHidden ) )
+                {
+                    // FIXME to implement
                 }
                 else
                 {

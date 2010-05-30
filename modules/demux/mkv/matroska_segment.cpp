@@ -478,6 +478,8 @@ bool matroska_segment_c::Preload( )
                 ;//LoadTags( static_cast<KaxTags*>( el ) );
             i_tags_position = (int64_t) es.I_O().getFilePointer();
         }
+        else if( MKV_IS_ID( el, EbmlVoid ) )
+            msg_Dbg( &sys.demuxer, "|   + Void" );
         else
             msg_Dbg( &sys.demuxer, "|   + Preload Unknown (%s)", typeid(*el).name() );
     }
