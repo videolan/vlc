@@ -161,7 +161,6 @@ static void MkvTree( demux_t & demuxer, int i_level, const char *psz_format, ...
  *****************************************************************************/
 void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 {
-    size_t i, j, k, n;
     bool bSupported = true;
 
     mkv_track_t *tk;
@@ -196,11 +195,11 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     tk->psz_codec_settings = NULL;
     tk->psz_codec_info_url = NULL;
     tk->psz_codec_download_url = NULL;
- 
+
     tk->i_compression_type = MATROSKA_COMPRESSION_NONE;
     tk->p_compression_data = NULL;
 
-    for( i = 0; i < m->ListSize(); i++ )
+    for( size_t i = 0; i < m->ListSize(); i++ )
     {
         EbmlElement *l = (*m)[i];
 
@@ -370,14 +369,14 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                 msg_Err( &sys.demuxer, "Multiple Compression method not supported" );
                 bSupported = false;
             }
-            for( j = 0; j < cencs->ListSize(); j++ )
+            for( size_t j = 0; j < cencs->ListSize(); j++ )
             {
                 EbmlElement *l2 = (*cencs)[j];
                 if( MKV_IS_ID( l2, KaxContentEncoding ) )
                 {
                     MkvTree( sys.demuxer, 4, "Content Encoding" );
                     EbmlMaster *cenc = static_cast<EbmlMaster*>(l2);
-                    for( k = 0; k < cenc->ListSize(); k++ )
+                    for( size_t k = 0; k < cenc->ListSize(); k++ )
                     {
                         EbmlElement *l3 = (*cenc)[k];
                         if( MKV_IS_ID( l3, KaxContentEncodingOrder ) )
@@ -399,7 +398,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                         {
                             EbmlMaster *compr = static_cast<EbmlMaster*>(l3);
                             MkvTree( sys.demuxer, 5, "Content Compression" );
-                            for( n = 0; n < compr->ListSize(); n++ )
+                            for( size_t n = 0; n < compr->ListSize(); n++ )
                             {
                                 EbmlElement *l4 = (*compr)[n];
                                 if( MKV_IS_ID( l4, KaxContentCompAlgo ) )
@@ -461,7 +460,6 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         else  if( MKV_IS_ID( l, KaxTrackVideo ) )
         {
             EbmlMaster *tkv = static_cast<EbmlMaster*>(l);
-            unsigned int j;
             unsigned int i_crop_right = 0, i_crop_left = 0, i_crop_top = 0, i_crop_bottom = 0;
             unsigned int i_display_unit = 0, i_display_width = 0, i_display_height = 0;
 
@@ -470,8 +468,8 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
             tk->fmt.video.i_frame_rate_base = (unsigned int)(tk->i_default_duration / 1000);
             tk->fmt.video.i_frame_rate = 1000000;
- 
-            for( j = 0; j < tkv->ListSize(); j++ )
+
+            for( unsigned int j = 0; j < tkv->ListSize(); j++ )
             {
                 EbmlElement *l = (*tkv)[j];
                 if( MKV_IS_ID( l, KaxVideoFlagInterlaced ) ) // UNUSED
@@ -595,11 +593,10 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         else  if( MKV_IS_ID( l, KaxTrackAudio ) )
         {
             EbmlMaster *tka = static_cast<EbmlMaster*>(l);
-            unsigned int j;
 
             msg_Dbg( &sys.demuxer, "|   |   |   + Track Audio" );
 
-            for( j = 0; j < tka->ListSize(); j++ )
+            for( unsigned int j = 0; j < tka->ListSize(); j++ )
             {
                 EbmlElement *l = (*tka)[j];
 
@@ -661,13 +658,12 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 void matroska_segment_c::ParseTracks( KaxTracks *tracks )
 {
     EbmlElement *el;
-    unsigned int i;
     int i_upper_level = 0;
 
     /* Master elements */
     tracks->Read( es, tracks->Generic().Context, i_upper_level, el, true );
 
-    for( i = 0; i < tracks->ListSize(); i++ )
+    for( size_t i = 0; i < tracks->ListSize(); i++ )
     {
         EbmlElement *l = (*tracks)[i];
 
@@ -689,14 +685,13 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
 {
     EbmlElement *el;
     EbmlMaster  *m;
-    size_t i, j;
     int i_upper_level = 0;
 
     /* Master elements */
     m = static_cast<EbmlMaster *>(info);
     m->Read( es, info->Generic().Context, i_upper_level, el, true );
 
-    for( i = 0; i < m->ListSize(); i++ )
+    for( size_t i = 0; i < m->ListSize(); i++ )
     {
         EbmlElement *l = (*m)[i];
 
@@ -804,7 +799,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
             chapter_translation_c *p_translate = new chapter_translation_c();
 
             p_trans->Read( es, p_trans->Generic().Context, i_upper_level, el, true );
-            for( j = 0; j < p_trans->ListSize(); j++ )
+            for( size_t j = 0; j < p_trans->ListSize(); j++ )
             {
                 EbmlElement *l = (*p_trans)[j];
 
@@ -840,10 +835,8 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
  *****************************************************************************/
 void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_c & chapters )
 {
-    size_t i, j;
-
     msg_Dbg( &sys.demuxer, "|   |   |   + ChapterAtom (level=%d)", i_level );
-    for( i = 0; i < ca->ListSize(); i++ )
+    for( size_t i = 0; i < ca->ListSize(); i++ )
     {
         EbmlElement *l = (*ca)[i];
 
@@ -878,16 +871,14 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
             EbmlMaster *cd = static_cast<EbmlMaster *>(l);
 
             msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterDisplay" );
-            for( j = 0; j < cd->ListSize(); j++ )
+            for( size_t j = 0; j < cd->ListSize(); j++ )
             {
                 EbmlElement *l= (*cd)[j];
 
                 if( MKV_IS_ID( l, KaxChapterString ) )
                 {
-                    int k;
-
                     KaxChapterString &name =*(KaxChapterString*)l;
-                    for (k = 0; k < i_level; k++)
+                    for ( int k = 0; k < i_level; k++)
                         chapters.psz_name += '+';
                     chapters.psz_name += ' ';
                     char *psz_tmp_utf8 = ToUTF8( UTFstring( name ) );
@@ -920,7 +911,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
             KaxChapterProcess *cp = static_cast<KaxChapterProcess *>(l);
             chapter_codec_cmds_c *p_ccodec = NULL;
 
-            for( j = 0; j < cp->ListSize(); j++ )
+            for( size_t j = 0; j < cp->ListSize(); j++ )
             {
                 EbmlElement *k= (*cp)[j];
 
@@ -937,7 +928,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
 
             if ( p_ccodec != NULL )
             {
-                for( j = 0; j < cp->ListSize(); j++ )
+                for( size_t j = 0; j < cp->ListSize(); j++ )
                 {
                     EbmlElement *k= (*cp)[j];
 
@@ -1012,21 +1003,20 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
 void matroska_segment_c::ParseChapters( KaxChapters *chapters )
 {
     EbmlElement *el;
-    size_t i;
     int i_upper_level = 0;
     mtime_t i_dur;
 
     /* Master elements */
     chapters->Read( es, chapters->Generic().Context, i_upper_level, el, true );
 
-    for( i = 0; i < chapters->ListSize(); i++ )
+    for( size_t i = 0; i < chapters->ListSize(); i++ )
     {
         EbmlElement *l = (*chapters)[i];
 
         if( MKV_IS_ID( l, KaxEditionEntry ) )
         {
             chapter_edition_c *p_edition = new chapter_edition_c();
- 
+
             EbmlMaster *E = static_cast<EbmlMaster *>(l );
             msg_Dbg( &sys.demuxer, "|   |   + EditionEntry" );
             for( size_t j = 0; j < E->ListSize(); j++ )
@@ -1069,11 +1059,11 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
         }
     }
 
-    for( i = 0; i < stored_editions.size(); i++ )
+    for( size_t i = 0; i < stored_editions.size(); i++ )
     {
         stored_editions[i]->RefreshChapters( );
     }
- 
+
     if ( stored_editions.size() != 0 && stored_editions[i_default_edition]->b_ordered )
     {
         /* update the duration of the segment according to the sum of all sub chapters */
@@ -1087,14 +1077,13 @@ void matroska_segment_c::ParseCluster( )
 {
     EbmlElement *el;
     EbmlMaster  *m;
-    unsigned int i;
     int i_upper_level = 0;
 
     /* Master elements */
     m = static_cast<EbmlMaster *>( cluster );
     m->Read( es, cluster->Generic().Context, i_upper_level, el, true );
 
-    for( i = 0; i < m->ListSize(); i++ )
+    for( unsigned int i = 0; i < m->ListSize(); i++ )
     {
         EbmlElement *l = (*m)[i];
 
@@ -1109,5 +1098,4 @@ void matroska_segment_c::ParseCluster( )
 
     i_start_time = cluster->GlobalTimecode() / 1000;
 }
-
 
