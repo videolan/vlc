@@ -1035,8 +1035,8 @@ function update_sout()
     if( ( transcode || output ) && checked( 'sout_all' ) )
         input_options.push( ":sout-all" );
 
-    /*var mrl = document.getElementById( 'sout_mrl' );
-    mrl.value = input_options.join( " " )*/
+    var mrl = document.getElementById( 'sout_mrl' );
+    mrl.value = option;
 
     refresh_input_options_list();
 }
