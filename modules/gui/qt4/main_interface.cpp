@@ -1039,11 +1039,17 @@ void MainInterface::customEvent( QEvent *event )
     if ( event->type() == (int)SetVideoOnTopEvent_Type )
     {
         SetVideoOnTopQtEvent* p_event = (SetVideoOnTopQtEvent*)event;
+        Qt::WindowFlags oldflags = windowFlags(), newflags;
+
         if( p_event->OnTop() )
-            setWindowFlags( windowFlags() | Qt::WindowStaysOnTopHint );
+            newflags = oldflags | Qt::WindowStaysOnTopHint;
         else
-            setWindowFlags( windowFlags() & ~Qt::WindowStaysOnTopHint );
-        show(); /* necessary to apply window flags */
+            newflags = oldflags & ~Qt::WindowStaysOnTopHint;
+        if( newflags != oldflags )
+        {
+            setWindowFlags( newflags );
+            show(); /* necessary to apply window flags */
+        }
     }
 }
 
