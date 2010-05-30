@@ -240,7 +240,7 @@ static void FindLength( demux_t *p_demux )
     int64_t i_current_pos = -1, i_size = 0, i_end = 0;
     int i;
 
-    if( !var_CreateGetInteger( p_demux, "ps-trust-timestamps" ) )
+    if( !var_CreateGetBool( p_demux, "ps-trust-timestamps" ) )
         return;
 
     if( p_sys->i_length == -1 ) /* First time */

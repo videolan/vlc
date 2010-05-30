@@ -261,7 +261,7 @@ static int Open( vlc_object_t *p_this )
 
     free( psz_src );
 
-    if( var_InheritInteger( p_intf, "http-album-art" ) )
+    if( var_InheritBool( p_intf, "http-album-art" ) )
     {
         /* FIXME: we're leaking h */
         httpd_handler_sys_t *h = malloc( sizeof( httpd_handler_sys_t ) );

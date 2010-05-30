@@ -319,11 +319,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->pi_fd = NULL;
     p_sys->i_fd = 0;
 
-    p_sys->b_strict = var_CreateGetInteger( p_sd, "sap-strict");
-    p_sys->b_parse = var_CreateGetInteger( p_sd, "sap-parse" );
+    p_sys->b_strict = var_CreateGetBool( p_sd, "sap-strict");
+    p_sys->b_parse = var_CreateGetBool( p_sd, "sap-parse" );
 
 #if 0
-    if( var_CreateGetInteger( p_sd, "sap-cache" ) )
+    if( var_CreateGetBool( p_sd, "sap-cache" ) )
     {
         CacheLoad( p_sd );
     }
@@ -353,7 +353,7 @@ static int OpenDemux( vlc_object_t *p_this )
     int errval = VLC_EGENERIC;
     size_t i_len;
 
-    if( !var_CreateGetInteger( p_demux, "sap-parse" ) )
+    if( !var_CreateGetBool( p_demux, "sap-parse" ) )
     {
         /* We want livedotcom module to parse this SDP file */
         return VLC_EGENERIC;
@@ -495,14 +495,14 @@ static void *Run( void *data )
      * Winsock 1.1 from Windows 95, if not Windows 3.1.
      * Anyway, to avoid a 30 seconds delay for failed IPv6 socket creation,
      * we have to open sockets in Run() rather than Open(). */
-    if( var_CreateGetInteger( p_sd, "sap-ipv4" ) )
+    if( var_CreateGetBool( p_sd, "sap-ipv4" ) )
     {
         InitSocket( p_sd, SAP_V4_GLOBAL_ADDRESS, SAP_PORT );
         InitSocket( p_sd, SAP_V4_ORG_ADDRESS, SAP_PORT );
         InitSocket( p_sd, SAP_V4_LOCAL_ADDRESS, SAP_PORT );
         InitSocket( p_sd, SAP_V4_LINK_ADDRESS, SAP_PORT );
     }
-    if( var_CreateGetInteger( p_sd, "sap-ipv6" ) )
+    if( var_CreateGetBool( p_sd, "sap-ipv6" ) )
     {
         char psz_address[NI_MAXNUMERICHOST] = "ff02::2:7ffe%";
 
