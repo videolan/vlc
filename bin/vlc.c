@@ -32,7 +32,13 @@
 #include <vlc/vlc.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <locale.h>
+#include <signal.h>
+#include <time.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <dlfcn.h>
 
 #ifdef __APPLE__
 #include <string.h>
@@ -44,18 +50,30 @@ extern void LocaleFree (const char *);
 extern char *FromLocale (const char *);
 extern void vlc_enable_override (void);
 
-#include <signal.h>
-#include <time.h>
-#include <pthread.h>
-#include <unistd.h>
-#include <dlfcn.h>
-
 #ifdef HAVE_MAEMO
 static void dummy_handler (int signum)
 {
     (void) signum;
 }
 #endif
+
+static bool signal_ignored (int signum)
+{
+    struct sigaction sa;
+
+    if (sigaction (signum, NULL, &sa))
+        return false;
+    return ((sa.sa_flags & SA_SIGINFO)
+            ? (void *)sa.sa_sigaction : (void *)sa.sa_handler) == SIG_IGN;
+}
+
+static void vlc_kill (void *data)
+{
+    pthread_t *ps = data;
+
+    pthread_kill (*ps, SIGTERM);
+}
+
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
@@ -109,6 +127,9 @@ int main( int i_argc, const char *ppsz_argv[] )
              libvlc_get_version(), libvlc_get_changeset() );
 #endif
 
+    sigset_t set;
+
+    sigemptyset (&set);
     /* Synchronously intercepted POSIX signals.
      *
      * In a threaded program such as VLC, the only sane way to handle signals
@@ -123,23 +144,21 @@ int main( int i_argc, const char *ppsz_argv[] )
      *
      * Signal that request a clean shutdown, and force an unclean shutdown
      * if they are triggered again 2+ seconds later.
-     * We have to handle SIGTERM cleanly because of daemon mode.
-     * Note that we set the signals after the vlc_create call. */
-    static const int sigs[] = {
-        SIGINT, SIGHUP, SIGQUIT, SIGTERM,
+     * We have to handle SIGTERM cleanly because of daemon mode. */
+    sigaddset (&set, SIGINT);
+    sigaddset (&set, SIGHUP);
+    sigaddset (&set, SIGQUIT);
+    sigaddset (&set, SIGTERM);
+
     /* Signals that cause a no-op:
      * - SIGPIPE might happen with sockets and would crash VLC. It MUST be
      *   blocked by any LibVLC-dependent application, not just VLC.
      * - SIGCHLD comes after exec*() (such as httpd CGI support) and must
      *   be dequeued to cleanup zombie processes.
      */
-        SIGPIPE, SIGCHLD
-    };
+    sigaddset (&set, SIGPIPE);
+    sigaddset (&set, SIGCHLD);
 
-    sigset_t set;
-    sigemptyset (&set);
-    for (unsigned i = 0; i < sizeof (sigs) / sizeof (sigs[0]); i++)
-        sigaddset (&set, sigs[i]);
 #ifdef HAVE_MAEMO
     sigaddset (&set, SIGRTMIN);
     {
@@ -147,11 +166,8 @@ int main( int i_argc, const char *ppsz_argv[] )
         sigaction (SIGRTMIN, &act, NULL);
     }
 #endif
-
     /* Block all these signals */
     pthread_sigmask (SIG_BLOCK, &set, NULL);
-    sigdelset (&set, SIGPIPE);
-    sigdelset (&set, SIGCHLD);
 
     /* Note that FromLocale() can be used before libvlc is initialized */
     const char *argv[i_argc + 4];
@@ -184,22 +200,34 @@ int main( int i_argc, const char *ppsz_argv[] )
 
     /* Initialize libvlc */
     libvlc_instance_t *vlc = libvlc_new (argc, argv);
+    if (vlc == NULL)
+        goto out;
 
-    if (vlc != NULL)
-    {
-        if (libvlc_add_intf (vlc, "signals"))
-            pthread_sigmask (SIG_UNBLOCK, &set, NULL);
 #if !defined (HAVE_MAEMO)
-        libvlc_add_intf (vlc, "globalhotkeys,none");
+    libvlc_add_intf (vlc, "globalhotkeys,none");
 #endif
-        if (libvlc_add_intf (vlc, NULL) == 0)
-        {
-            libvlc_playlist_play (vlc, -1, 0, NULL);
-            libvlc_wait (vlc);
-        }
-        libvlc_release (vlc);
-    }
+    if (libvlc_add_intf (vlc, NULL))
+        goto out;
 
+    libvlc_playlist_play (vlc, -1, 0, NULL);
+
+    /* Wait for a termination signal */
+    pthread_t self = pthread_self ();
+    libvlc_set_exit_handler (vlc, vlc_kill, &self);
+
+    if (signal_ignored (SIGHUP)) /* <- needed to handle nohup properly */
+        sigdelset (&set, SIGHUP);
+    sigdelset (&set, SIGPIPE);
+
+    int signum;
+    do
+        sigwait (&set, &signum);
+    while (signum == SIGCHLD);
+
+    /* Cleanup */
+out:
+    if (vlc != NULL)
+        libvlc_release (vlc);
     for (int i = 2; i < argc; i++)
         LocaleFree (argv[i]);
 
