@@ -233,7 +233,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             label = new QLabel( qfu( p_widget->psz_text ), this );
             p_widget->p_sys_intf = label;
             label->setTextFormat( Qt::RichText );
-            //label->setFixedHeight( label->sizeHint().height );
+            label->setOpenExternalLinks( true );
             return label;
 
         case EXTENSION_WIDGET_BUTTON:
