@@ -2272,7 +2272,7 @@ ifdef HAVE_CYGWIN
 endif
 
 .tag: taglib
-	(cd $<; $(HOSTCC)  ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC)  ./configure $(HOSTCONF) --enable-mp4 --enable-asf --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
