@@ -33,6 +33,7 @@
 #include <vlc_video_splitter.h>
 #include <vlc_vout_display.h>
 #include <vlc_vout.h>
+#include <vlc_block.h>
 
 #include <libvlc.h>
 
@@ -112,6 +113,7 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
     vd->info.has_double_click = false;
     vd->info.has_hide_mouse = false;
     vd->info.has_pictures_invalid = false;
+    vd->info.has_event_thread = false;
 
     vd->cfg = cfg;
     vd->pool = NULL;
@@ -356,6 +358,11 @@ struct vout_display_owner_sys_t {
 
     int  fit_window;
 
+    struct {
+        vlc_thread_t thread;
+        block_fifo_t *fifo;
+    } event;
+
 #ifdef ALLOW_DUMMY_VOUT
     vlc_mouse_t vout_mouse;
 #endif
@@ -537,6 +544,45 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
     vlc_mutex_unlock(&osys->lock);
 }
 
+static void *VoutDisplayEventKeyDispatch(void *data)
+{
+    vout_display_t *vd = data;
+    vout_display_owner_sys_t *osys = vd->owner.sys;
+
+    for (;;) {
+        block_t *event = block_FifoGet(osys->event.fifo);
+        if (!event)
+            return NULL;
+
+        int key;
+        memcpy(&key, event->p_buffer, sizeof(key));
+        vout_SendEventKey(osys->vout, key);
+        block_Release(event);
+    }
+}
+
+static void VoutDisplayEventKey(vout_display_t *vd, int key)
+{
+    vout_display_owner_sys_t *osys = vd->owner.sys;
+
+    if (!osys->event.fifo) {
+        osys->event.fifo = block_FifoNew();
+        if (!osys->event.fifo)
+            return;
+        if (vlc_clone(&osys->event.thread, VoutDisplayEventKeyDispatch,
+                      vd, VLC_THREAD_PRIORITY_LOW)) {
+            block_FifoRelease(osys->event.fifo);
+            osys->event.fifo = NULL;
+            return;
+        }
+    }
+    block_t *event = block_Alloc(sizeof(key));
+    if (event) {
+        memcpy(event->p_buffer, &key, sizeof(key));
+        block_FifoPut(osys->event.fifo, event);
+    }
+}
+
 static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
@@ -550,7 +596,10 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
     case VOUT_DISPLAY_EVENT_KEY: {
         const int key = (int)va_arg(args, int);
         msg_Dbg(vd, "VoutDisplayEvent 'key' 0x%2.2x", key);
-        vout_SendEventKey(osys->vout, key);
+        if (vd->info.has_event_thread)
+            vout_SendEventKey(osys->vout, key);
+        else
+            VoutDisplayEventKey(vd, key);
         break;
     }
     case VOUT_DISPLAY_EVENT_MOUSE_STATE:
@@ -1151,6 +1200,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->zoom.den = cfg->zoom.den;
     osys->wm_state = state->wm_state;
     osys->fit_window = 0;
+    osys->event.fifo = NULL;
 
     osys->source = *source_org;
 
@@ -1227,6 +1277,11 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
     if (osys->is_wrapper)
         SplitterClose(vd);
     vout_display_Delete(vd);
+    if (osys->event.fifo) {
+        block_FifoWake(osys->event.fifo);
+        vlc_join(osys->event.thread, NULL);
+        block_FifoRelease(osys->event.fifo);
+    }
     vlc_mutex_destroy(&osys->lock);
     free(osys);
 }
