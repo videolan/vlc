@@ -551,13 +551,15 @@ static void *VoutDisplayEventKeyDispatch(void *data)
 
     for (;;) {
         block_t *event = block_FifoGet(osys->event.fifo);
-        if (!event)
-            return NULL;
+
+        int cancel = vlc_savecancel();
 
         int key;
         memcpy(&key, event->p_buffer, sizeof(key));
         vout_SendEventKey(osys->vout, key);
         block_Release(event);
+
+        vlc_restorecancel(cancel);
     }
 }
 
@@ -1278,8 +1280,7 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
         SplitterClose(vd);
     vout_display_Delete(vd);
     if (osys->event.fifo) {
-        block_FifoWake(osys->event.fifo);
-        vlc_join(osys->event.thread, NULL);
+        vlc_cancel(osys->event.thread);
         block_FifoRelease(osys->event.fifo);
     }
     vlc_mutex_destroy(&osys->lock);
