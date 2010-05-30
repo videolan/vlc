@@ -4,7 +4,7 @@ SUBDIRS = msw
 # obviously does not. Here is a fix for that.
 LIBTOOL=@LIBTOOL@ --tag=CC
 
-SOURCES_aa = aa.c
+SOURCES_aa = aa.c keythread.h keythread.c
 SOURCES_caca = caca.c keythread.h keythread.c
 SOURCES_fb = fb.c
 SOURCES_vout_sdl = sdl.c keythread.h keythread.c

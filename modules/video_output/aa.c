@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
+#include "keythread.h"
 
 #include <assert.h>
 #include <aalib.h>
@@ -73,6 +74,7 @@ struct vout_display_sys_t {
 
     vout_display_cfg_t  state;
     picture_pool_t      *pool;
+    key_thread_t        *keys;
 };
 
 /**
@@ -129,6 +131,7 @@ static int Open(vlc_object_t *object)
     vout_display_SendEventFullscreen(vd, false);
     vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height, false);
 
+    sys->keys = vlc_CreateKeyThread(vd);
     return VLC_SUCCESS;
 
 error:
@@ -146,6 +149,7 @@ static void Close(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
 
+    vlc_DestroyKeyTread(sys->keys);
     if (sys->pool)
         picture_pool_Delete(sys->pool);
     aa_close(sys->aa_context);
@@ -288,26 +292,26 @@ static void Manage(vout_display_t *vd)
 
         /* TODO keys support to complete */
         case AA_UP:
-            vout_display_SendEventKey(vd, KEY_UP);
+            vlc_EmitKey(sys->keys, KEY_UP);
             break;
         case AA_DOWN:
-            vout_display_SendEventKey(vd, KEY_DOWN);
+            vlc_EmitKey(sys->keys, KEY_DOWN);
             break;
         case AA_RIGHT:
-            vout_display_SendEventKey(vd, KEY_RIGHT);
+            vlc_EmitKey(sys->keys, KEY_RIGHT);
             break;
         case AA_LEFT:
-            vout_display_SendEventKey(vd, KEY_LEFT);
+            vlc_EmitKey(sys->keys, KEY_LEFT);
             break;
         case AA_BACKSPACE:
-            vout_display_SendEventKey(vd, KEY_BACKSPACE);
+            vlc_EmitKey(sys->keys, KEY_BACKSPACE);
             break;
         case AA_ESC:
-            vout_display_SendEventKey(vd, KEY_ESC);
+            vlc_EmitKey(sys->keys, KEY_ESC);
             break;
         default:
             if (event >= 0x20 && event <= 0x7f)
-                vout_display_SendEventKey(vd, event);
+                vlc_EmitKey(sys->keys, event);
             break;
         }
     }
