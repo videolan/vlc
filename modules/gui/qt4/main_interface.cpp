@@ -588,6 +588,7 @@ void MainInterface::getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
 void MainInterface::releaseVideo( void )
 {
     emit askReleaseVideo();
+    QApplication::postEvent( this, new SetVideoOnTopQtEvent( false ) );
 }
 
 /* Function that is CONNECTED to the previous emit */
