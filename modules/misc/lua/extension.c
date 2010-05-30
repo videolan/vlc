@@ -195,6 +195,18 @@ static int ScanExtensions( extensions_manager_t *p_mgr )
 }
 
 /**
+ * Dummy Lua function: does nothing
+ * @note This function can be used to replace "require" while scanning for
+ * extensions
+ * Even the built-in libraries are not loaded when calling descriptor()
+ **/
+static int vlclua_dummy_require( lua_State *L )
+{
+    (void) L;
+    return 0;
+}
+
+/**
  * Batch scan all Lua files in folder "extensions": callback
  * @param p_this This extensions_manager_t object
  * @param psz_script Name of the script to run
@@ -236,8 +248,11 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
     vlc_mutex_init( &p_ext->p_sys->running_lock );
     vlc_cond_init( &p_ext->p_sys->wait );
 
-    /* Load and run the script(s) */
+    /* Prepare Lua state */
     lua_State *L = luaL_newstate();
+    lua_register( L, "require", &vlclua_dummy_require );
+
+    /* Let's run it */
     if( luaL_dofile( L, psz_script ) )
     {
         msg_Warn( p_mgr, "Error loading script %s: %s", psz_script,
@@ -776,13 +791,6 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
             p_ext->p_sys->L = L;
         }
     }
-#ifndef NDEBUG
-    else
-    {
-        msg_Dbg( p_mgr, "Reusing old Lua state for extension '%s'",
-                 p_ext->psz_name );
-    }
-#endif
 
     return L;
 }
