@@ -35,7 +35,6 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
-#include "keythread.h"
 
 #include <assert.h>
 
@@ -100,7 +99,6 @@ struct vout_display_sys_t {
 
     /* */
     picture_pool_t       *pool;
-    key_thread_t         *keys;
 };
 
 /**
@@ -334,8 +332,6 @@ static int Open(vlc_object_t *object)
 
     /* */
     vout_display_SendEventDisplaySize(vd, display_width, display_height, vd->cfg->is_fullscreen);
-
-    sys->keys = vlc_CreateKeyThread (vd);
     return VLC_SUCCESS;
 
 error:
@@ -361,8 +357,6 @@ static void Close(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
-
-    vlc_DestroyKeyThread(sys->keys);
 
     if (sys->pool)
         picture_pool_Delete(sys->pool);
@@ -602,7 +596,7 @@ static void Manage(vout_display_t *vd)
                 key |= KEY_MODIFIER_CTRL;
             if (event.key.keysym.mod & KMOD_ALT)
                 key |= KEY_MODIFIER_ALT;
-            vlc_EmitKey(sys->keys, key);
+            vout_display_SendEventKey(vd, key);
             break;
         }
 
@@ -708,3 +702,4 @@ static int ConvertKey(SDLKey sdl_key)
     }
     return 0;
 }
+
