@@ -7,7 +7,6 @@ SOURCES_hotkeys = hotkeys.c
 SOURCES_lirc = lirc.c
 SOURCES_oldrc = rc.c
 SOURCES_dbus = dbus.c dbus.h
-SOURCES_signals = signals.c
 if HAVE_DARWIN
 motion_extra = unimotion.c unimotion.h
 else
@@ -27,7 +26,6 @@ libvlc_LTLIBRARIES += \
 	liboldrc_plugin.la
 if !HAVE_WIN32
 libvlc_LTLIBRARIES += \
-	libsignals_plugin.la \
 	libmotion_plugin.la
 else
 libvlc_LTLIBRARIES += \
