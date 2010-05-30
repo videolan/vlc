@@ -150,6 +150,8 @@ private:
     bool                 b_notificationEnabled; /// Systray Notifications
     bool                 b_autoresize;          ///< persistent resizeable window
     bool                 b_videoEmbedded;       ///< Want an external Video Window
+    bool                 b_videoFullScreen;     ///< --fullscreen
+    bool                 b_videoOnTop;          ///< --video-on-top
     bool                 b_hideAfterCreation;
     int                  i_visualmode;          ///< Visual Mode
 
@@ -215,6 +217,7 @@ private slots:
         debug(); }
 
     void setVideoSize( unsigned int, unsigned int );
+    void setVideoFullScreen( bool );
     void setVideoOnTop( bool );
 
 signals:

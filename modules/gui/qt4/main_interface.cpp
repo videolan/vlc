@@ -198,6 +198,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* END CONNECTS ON IM */
 
     /* VideoWidget connects for asynchronous calls */
+    b_videoFullScreen = false;
+    b_videoOnTop = false;
     connect( this, SIGNAL(askGetVideo(WId*,int*,int*,unsigned*,unsigned *)),
              this, SLOT(getVideoSlot(WId*,int*,int*,unsigned*,unsigned*)),
              Qt::BlockingQueuedConnection );
@@ -216,7 +218,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
                      this, resizeStack( int,  int ) );
         }
         CONNECT( this, askVideoSetFullScreen( bool ),
-                 videoWidget, SetFullScreen( bool ) );
+                 this, setVideoFullScreen( bool ) );
         CONNECT( videoWidget, keyPressed( QKeyEvent * ),
                  this, handleKeyPress( QKeyEvent * ) );
     }
@@ -596,10 +598,24 @@ void MainInterface::setVideoSize( unsigned int w, unsigned int h )
     videoWidget->SetSizing( w, h );
 }
 
+void MainInterface::setVideoFullScreen( bool fs )
+{
+    b_videoFullScreen = fs;
+    /* refresh main interface on-top status if needed */
+    setVideoOnTop( b_videoOnTop );
+    videoWidget->SetFullScreen( fs );
+}
+
 /* Slot to change the video always-on-top flag.
  * Emit askVideoOnTop() to invoke this from other thread. */
 void MainInterface::setVideoOnTop( bool on_top )
 {
+    b_videoOnTop = on_top;
+    /* The main interface is not always-on-top if it does not contain
+     * the video (which is to say in fullscreen mode). */
+    if( b_videoFullScreen )
+        on_top = false;
+
     Qt::WindowFlags oldflags = windowFlags(), newflags;
 
     if( on_top )
@@ -638,6 +654,7 @@ int MainInterface::controlVideo( int i_query, va_list args )
     case VOUT_WINDOW_SET_FULLSCREEN:
     {
         bool b_fs = va_arg( args, int );
+
         emit askVideoSetFullScreen( b_fs );
         return VLC_SUCCESS;
     }
