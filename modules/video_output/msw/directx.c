@@ -222,6 +222,7 @@ static int Open(vlc_object_t *object)
     info.has_double_click = true;
     info.has_hide_mouse = true;
     info.has_pictures_invalid = true;
+    info.has_event_thread = true;
 
     /* Interaction TODO support starting with wallpaper mode */
     vlc_mutex_init(&sys->lock);

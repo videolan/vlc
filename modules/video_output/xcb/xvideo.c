@@ -520,6 +520,7 @@ static int Open (vlc_object_t *obj)
     /* */
     vout_display_info_t info = vd->info;
     info.has_pictures_invalid = false;
+    info.has_event_thread = true;
 
     /* Setup vout_display_t once everything is fine */
     vd->fmt = fmt;
