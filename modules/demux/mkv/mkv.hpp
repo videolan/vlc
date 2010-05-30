@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mkv.cpp : matroska demuxer
  *****************************************************************************
- * Copyright (C) 2003-2004 the VideoLAN team
+ * Copyright (C) 2003-2005, 2008 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

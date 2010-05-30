@@ -24,13 +24,10 @@
 
 #include "chapter_command.hpp"
 
-
 void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command )
 {
-    size_t i;
-
     uint32 codec_time = uint32(-1);
-    for( i = 0; i < command.ListSize(); i++ )
+    for( size_t i = 0; i < command.ListSize(); i++ )
     {
         const EbmlElement *k = command[i];
 
@@ -41,7 +38,7 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
         }
     }
 
-    for( i = 0; i < command.ListSize(); i++ )
+    for( size_t i = 0; i < command.ListSize(); i++ )
     {
         const EbmlElement *k = command[i];
 
@@ -286,10 +283,10 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         if ( !b_test_positive )
             return false;
     }
- 
+
     // strip the test command
     i_command &= 0xFF0F;
- 
+
     switch ( i_command )
     {
     case CMD_DVD_NOP:
@@ -519,7 +516,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     case CMD_DVD_SET_GPRMMD:
         {
             msg_Dbg( &sys.demuxer, "Set GPRMMD [%d]=%d", (p_command[4] << 8) + p_command[5], (p_command[2] << 8) + p_command[3]);
- 
+
             if ( !SetGPRM( (p_command[4] << 8) + p_command[5], (p_command[2] << 8) + p_command[3] ) )
                 msg_Dbg( &sys.demuxer, "Set GPRMMD failed" );
             break;
@@ -527,7 +524,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     case CMD_DVD_LINKPGCN:
         {
             uint16 i_pgcn = (p_command[6] << 8) + p_command[7];
- 
+
             msg_Dbg( &sys.demuxer, "Link PGCN(%d)", i_pgcn );
             p_chapter = sys.p_current_segment->BrowseCodecPrivate( 1, MatchPgcNumber, &i_pgcn, 2 );
             if ( p_chapter != NULL )
@@ -543,7 +540,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     case CMD_DVD_LINKCN:
         {
             uint8 i_cn = p_command[7];
- 
+
             p_chapter = sys.p_current_segment->CurrentChapter();
 
             msg_Dbg( &sys.demuxer, "LinkCN (cell %d)", i_cn );
@@ -607,7 +604,7 @@ bool dvd_command_interpretor_c::MatchVTSNumber( const chapter_codec_cmds_c &data
 {
     if ( i_cookie_size != 2 || data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
         return false;
- 
+
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_SS || data.p_private_data->GetBuffer()[1] != 0x80 )
         return false;
 
@@ -621,7 +618,7 @@ bool dvd_command_interpretor_c::MatchVTSMNumber( const chapter_codec_cmds_c &dat
 {
     if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
         return false;
- 
+
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_SS || data.p_private_data->GetBuffer()[1] != 0x40 )
         return false;
 
@@ -635,7 +632,7 @@ bool dvd_command_interpretor_c::MatchTitleNumber( const chapter_codec_cmds_c &da
 {
     if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
         return false;
- 
+
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_TT )
         return false;
 
@@ -649,7 +646,7 @@ bool dvd_command_interpretor_c::MatchPgcType( const chapter_codec_cmds_c &data, 
 {
     if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 8 )
         return false;
- 
+
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
         return false;
 
@@ -663,7 +660,7 @@ bool dvd_command_interpretor_c::MatchPgcNumber( const chapter_codec_cmds_c &data
 {
     if ( i_cookie_size != 2 || data.p_private_data == NULL || data.p_private_data->GetSize() < 8 )
         return false;
- 
+
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
         return false;
 
@@ -677,7 +674,7 @@ bool dvd_command_interpretor_c::MatchChapterNumber( const chapter_codec_cmds_c &
 {
     if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 2 )
         return false;
- 
+
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PTT )
         return false;
 
@@ -691,7 +688,7 @@ bool dvd_command_interpretor_c::MatchCellNumber( const chapter_codec_cmds_c &dat
 {
     if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 5 )
         return false;
- 
+
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_CN )
         return false;
 

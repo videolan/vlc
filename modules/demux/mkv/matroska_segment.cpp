@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mkv.cpp : matroska demuxer
  *****************************************************************************
- * Copyright (C) 2003-2004 the VideoLAN team
+ * Copyright (C) 2003-2010 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -348,7 +348,6 @@ void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
     }
 #undef idx
 }
-
 
 bool matroska_segment_c::PreloadFamily( const matroska_segment_c & of_segment )
 {
@@ -721,12 +720,10 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     }
 }
 
-
 int matroska_segment_c::BlockFindTrackIndex( size_t *pi_track,
                                              const KaxBlock *p_block, const KaxSimpleBlock *p_simpleblock )
 {
     size_t i_track;
-
     for( i_track = 0; i_track < tracks.size(); i_track++ )
     {
         const mkv_track_t *tk = tracks[i_track];
@@ -1183,7 +1180,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         }
     }
     es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_start_time );
- 
+
     sys.i_start_pts = i_start_time;
     // reset the stream reading to the first cluster of the segment used
     es.I_O().setFilePointer( i_start_pos );
@@ -1196,9 +1193,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
 
 void matroska_segment_c::UnSelect( )
 {
-    size_t i_track;
-
-    for( i_track = 0; i_track < tracks.size(); i_track++ )
+    for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
     {
         if ( tracks[i_track]->p_es != NULL )
         {

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mkv.cpp : matroska demuxer
  *****************************************************************************
- * Copyright (C) 2003-2004 the VideoLAN team
+ * Copyright (C) 2003-2010 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -140,7 +140,7 @@ static void MkvTree( demux_t & demuxer, int i_level, const char *psz_format, ...
     va_list args;
     if( i_level > 9 )
     {
-        msg_Err( &demuxer, "too deep tree" );
+        msg_Err( &demuxer, "MKV tree is too deep" );
         return;
     }
     va_start( args, psz_format );
@@ -163,41 +163,38 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 {
     bool bSupported = true;
 
-    mkv_track_t *tk;
-
-    msg_Dbg( &sys.demuxer, "|   |   + Track Entry" );
-
-    tk = new mkv_track_t();
-
     /* Init the track */
+    mkv_track_t *tk = new mkv_track_t();
     memset( tk, 0, sizeof( mkv_track_t ) );
 
     es_format_Init( &tk->fmt, UNKNOWN_ES, 0 );
-    tk->fmt.psz_language = strdup("English");
-    tk->fmt.psz_description = NULL;
+    tk->fmt.psz_language       = strdup("English");
+    tk->fmt.psz_description    = NULL;
 
-    tk->b_default = true;
-    tk->b_enabled = true;
-    tk->b_silent = false;
-    tk->i_number = tracks.size() - 1;
-    tk->i_extra_data = 0;
-    tk->p_extra_data = NULL;
-    tk->psz_codec = NULL;
-    tk->b_dts_only = false;
-    tk->i_default_duration = 0;
-    tk->f_timecodescale = 1.0;
+    tk->b_default              = true;
+    tk->b_enabled              = true;
+    tk->b_silent               = false;
+    tk->i_number               = tracks.size() - 1;
+    tk->i_extra_data           = 0;
+    tk->p_extra_data           = NULL;
+    tk->psz_codec              = NULL;
+    tk->b_dts_only             = false;
+    tk->i_default_duration     = 0;
+    tk->f_timecodescale        = 1.0;
 
-    tk->b_inited = false;
-    tk->i_data_init = 0;
-    tk->p_data_init = NULL;
+    tk->b_inited               = false;
+    tk->i_data_init            = 0;
+    tk->p_data_init            = NULL;
 
-    tk->psz_codec_name = NULL;
-    tk->psz_codec_settings = NULL;
-    tk->psz_codec_info_url = NULL;
+    tk->psz_codec_name         = NULL;
+    tk->psz_codec_settings     = NULL;
+    tk->psz_codec_info_url     = NULL;
     tk->psz_codec_download_url = NULL;
 
-    tk->i_compression_type = MATROSKA_COMPRESSION_NONE;
-    tk->p_compression_data = NULL;
+    tk->i_compression_type     = MATROSKA_COMPRESSION_NONE;
+    tk->p_compression_data     = NULL;
+
+    msg_Dbg( &sys.demuxer, "|   |   + Track Entry" );
 
     for( size_t i = 0; i < m->ListSize(); i++ )
     {
@@ -580,11 +577,11 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             }
             if( i_crop_left || i_crop_right || i_crop_top || i_crop_bottom )
             {
-                tk->fmt.video.i_visible_width = tk->fmt.video.i_width;
-                tk->fmt.video.i_visible_height = tk->fmt.video.i_height;
-                tk->fmt.video.i_x_offset = i_crop_left;
-                tk->fmt.video.i_y_offset = i_crop_top;
-                tk->fmt.video.i_visible_width -= i_crop_left + i_crop_right;
+                tk->fmt.video.i_visible_width   = tk->fmt.video.i_width;
+                tk->fmt.video.i_visible_height  = tk->fmt.video.i_height;
+                tk->fmt.video.i_x_offset        = i_crop_left;
+                tk->fmt.video.i_y_offset        = i_crop_top;
+                tk->fmt.video.i_visible_width  -= i_crop_left + i_crop_right;
                 tk->fmt.video.i_visible_height -= i_crop_top + i_crop_bottom;
             }
             /* FIXME: i_display_* allows you to not only set DAR, but also a zoom factor.
