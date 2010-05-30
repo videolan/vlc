@@ -273,6 +273,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     /* Initialize mutexes */
     vlc_mutex_init( &priv->timer_lock );
+    vlc_ExitInit( &priv->exit );
 
     return p_libvlc;
 error:
@@ -1073,6 +1074,7 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
     msg_Destroy (priv->msg_bank);
 
     /* Destroy mutexes */
+    vlc_ExitDestroy( &priv->exit );
     vlc_mutex_destroy( &priv->timer_lock );
 
 #ifndef NDEBUG /* Hack to dump leaked objects tree */
@@ -1119,40 +1121,6 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
         msg_Err( p_libvlc, "interface \"%s\" initialization failed",
                  psz_module ? psz_module : "default" );
     return ret;
-}
-
-#ifndef WIN32
-static vlc_mutex_t exit_lock = VLC_STATIC_MUTEX;
-static vlc_cond_t  exiting = VLC_STATIC_COND;
-#else
-extern vlc_mutex_t super_mutex;
-extern vlc_cond_t  super_variable;
-# define exit_lock super_mutex
-# define exiting   super_variable
-#endif
-
-/**
- * Waits until the LibVLC instance gets an exit signal. Normally, this happens
- * when the user "exits" an interface plugin.
- */
-void libvlc_InternalWait( libvlc_int_t *p_libvlc )
-{
-    vlc_mutex_lock( &exit_lock );
-    while( vlc_object_alive( p_libvlc ) )
-        vlc_cond_wait( &exiting, &exit_lock );
-    vlc_mutex_unlock( &exit_lock );
-}
-
-/**
- * Posts an exit signal to LibVLC instance. This will normally initiate the
- * cleanup and destroy process. It should only be called on behalf of the user.
- */
-void libvlc_Quit( libvlc_int_t *p_libvlc )
-{
-    vlc_mutex_lock( &exit_lock );
-    vlc_object_kill( p_libvlc );
-    vlc_cond_broadcast( &exiting );
-    vlc_mutex_unlock( &exit_lock );
 }
 
 #if defined( ENABLE_NLS ) && (defined (__APPLE__) || defined (WIN32)) && \

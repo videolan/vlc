@@ -50,6 +50,7 @@ VLC_EXPORT (void, libvlc_InternalDestroy, ( libvlc_int_t * ) );
 
 VLC_EXPORT (int, libvlc_InternalAddIntf, ( libvlc_int_t *, const char * ) );
 VLC_EXPORT (void, libvlc_InternalWait, ( libvlc_int_t * ) );
+VLC_EXPORT (void, libvlc_SetExitHandler, ( libvlc_int_t *, void (*) (void *), void * ) );
 
 typedef void (*libvlc_vlm_release_func_t)( libvlc_instance_t * ) ;
 

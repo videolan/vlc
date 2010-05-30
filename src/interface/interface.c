@@ -182,8 +182,6 @@ void intf_DestroyAll( libvlc_int_t *p_libvlc )
 {
     intf_thread_t *p_first;
 
-    assert( !vlc_object_alive( p_libvlc ) );
-
     vlc_mutex_lock( &lock );
     p_first = libvlc_priv( p_libvlc )->p_intf;
 #ifndef NDEBUG

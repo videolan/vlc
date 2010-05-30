@@ -94,6 +94,20 @@ const char* msg_StackMsg ( void );
 char *vlc_fix_readdir (const char *);
 
 /*
+ * LibVLC exit event handling
+ */
+typedef struct vlc_exit
+{
+    vlc_mutex_t lock;
+    void (*handler) (void *);
+    void *opaque;
+    bool killed;
+} vlc_exit_t;
+
+void vlc_ExitInit( vlc_exit_t * );
+void vlc_ExitDestroy( vlc_exit_t * );
+
+/*
  * LibVLC objects stuff
  */
 
@@ -210,6 +224,9 @@ typedef struct libvlc_priv_t
 
     /* Objects tree */
     vlc_mutex_t        structure_lock;
+
+    /* Exit callback */
+    vlc_exit_t       exit;
 } libvlc_priv_t;
 
 static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)
