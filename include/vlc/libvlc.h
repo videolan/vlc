@@ -146,6 +146,22 @@ VLC_PUBLIC_API
 int libvlc_add_intf( libvlc_instance_t *p_instance, const char *name );
 
 /**
+ * Registers a callback for the LibVLC exit event. This is mostly useful if
+ * you have started at least one interface with libvlc_add_intf().
+ * Typically, this function will wake up your application main loop (from
+ * another thread).
+ *
+ * \param p_instance LibVLC instance
+ * \param cb callback to invoke when LibVLC wants to exit
+ * \param opaque data pointer for the callback
+ * \warning This function and libvlc_wait() cannot be used at the same time.
+ * Use either or none of them but not both.
+ */
+VLC_PUBLIC_API
+void libvlc_set_exit_handler( libvlc_instance_t *p_instance,
+                              void (*cb) (void *), void *opaque );
+
+/**
  * Waits until an interface causes the instance to exit.
  * You should start at least one interface first, using libvlc_add_intf().
  *

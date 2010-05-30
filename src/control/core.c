@@ -114,6 +114,13 @@ int libvlc_add_intf( libvlc_instance_t *p_i, const char *name )
     return libvlc_InternalAddIntf( p_i->p_libvlc_int, name ) ? -1 : 0;
 }
 
+void libvlc_set_exit_handler( libvlc_instance_t *p_i, void (*cb) (void *),
+                              void *data )
+{
+    libvlc_int_t *p_libvlc = p_i->p_libvlc_int;
+    libvlc_SetExitHandler( p_libvlc, cb, data );
+}
+
 void libvlc_wait( libvlc_instance_t *p_i )
 {
     libvlc_int_t *p_libvlc = p_i->p_libvlc_int;
