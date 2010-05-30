@@ -34,7 +34,6 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
-#include "keythread.h"
 
 #include <caca.h>
 
@@ -73,7 +72,6 @@ struct vout_display_sys_t {
     cucul_dither_t *dither;
 
     picture_pool_t *pool;
-    key_thread_t   *keys;
 };
 
 /**
@@ -190,7 +188,6 @@ static int Open(vlc_object_t *object)
     vout_display_SendEventFullscreen(vd, false);
     Refresh(vd);
 
-    sys->keys = vlc_CreateKeyThread(vd);
     return VLC_SUCCESS;
 
 error:
@@ -220,7 +217,6 @@ static void Close(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
 
-    vlc_DestroyKeyThread(sys->keys);
     if (sys->pool)
         picture_pool_Delete(sys->pool);
     if (sys->dither)
@@ -481,7 +477,7 @@ static void Manage(vout_display_t *vd)
                     const int vlc = keys[i].vlc;
 
                     if (vlc >= 0)
-                        vlc_EmitKey(sys->keys, vlc);
+                        vout_display_SendEventKey(vd, vlc);
                     return;
                 }
             }

@@ -5,7 +5,7 @@ SUBDIRS = msw
 LIBTOOL=@LIBTOOL@ --tag=CC
 
 SOURCES_aa = aa.c
-SOURCES_caca = caca.c keythread.h keythread.c
+SOURCES_caca = caca.c
 SOURCES_fb = fb.c
 SOURCES_vout_sdl = sdl.c keythread.h keythread.c
 SOURCES_snapshot = snapshot.c
