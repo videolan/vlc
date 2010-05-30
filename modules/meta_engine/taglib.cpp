@@ -329,6 +329,9 @@ static void ReadMetaFromMP4( MP4::Tag* tag, demux_t *p_demux, demux_meta_t *p_de
         MP4::CoverArtList list = tag->itemListMap()["covr"].toCoverArtList();
         const char *psz_format = list[0].format() == MP4::CoverArt::PNG ? "image/png" : "image/jpeg";
 
+        msg_Dbg( p_demux_meta, "Found embedded art (%s) is %i bytes",
+                 psz_format, list[0].data().size() );
+
         TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
         input_attachment_t *p_attachment =
                 vlc_input_attachment_New( "cover", psz_format, "cover",
