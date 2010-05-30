@@ -97,7 +97,6 @@ protected:
     virtual void dragMoveEvent( QDragMoveEvent * );
     virtual void dragLeaveEvent( QDragLeaveEvent * );
     virtual void closeEvent( QCloseEvent *);
-    virtual void customEvent( QEvent *);
     virtual void keyPressEvent( QKeyEvent *);
     virtual void wheelEvent( QWheelEvent * );
 
@@ -215,6 +214,7 @@ private slots:
             else resize( size() - stackCentralW->size() + QSize( w, h ) );
         debug(); }
 
+    void setVideoOnTop( bool );
 
 signals:
     void askGetVideo( WId *p_id, int *pi_x, int *pi_y,
@@ -222,6 +222,7 @@ signals:
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoSetFullScreen( bool );
+    void askVideoOnTop( bool );
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );
 

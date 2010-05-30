@@ -204,6 +204,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     connect( this, SIGNAL(askReleaseVideo( void )),
              this, SLOT(releaseVideoSlot( void )),
              Qt::BlockingQueuedConnection );
+    CONNECT( this, askVideoOnTop(bool), this, setVideoOnTop(bool));
 
     if( videoWidget )
     {
@@ -531,21 +532,6 @@ void MainInterface::toggleFSC()
  * Video Handling
  ****************************************************************************/
 
-/* This event is used to deal with the fullscreen and always on top
-   issue conflict (bug in wx) */
-class SetVideoOnTopQtEvent : public QEvent
-{
-public:
-    SetVideoOnTopQtEvent( bool _onTop ) :
-      QEvent( (QEvent::Type)SetVideoOnTopEvent_Type ), onTop( _onTop)
-    {}
-
-    bool OnTop() const { return onTop; }
-
-private:
-    bool onTop;
-};
-
 /**
  * NOTE:
  * You must not change the state of this object or other Qt4 UI objects,
@@ -588,19 +574,37 @@ void MainInterface::getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
 void MainInterface::releaseVideo( void )
 {
     emit askReleaseVideo();
-    QApplication::postEvent( this, new SetVideoOnTopQtEvent( false ) );
 }
 
 /* Function that is CONNECTED to the previous emit */
 void MainInterface::releaseVideoSlot( void )
 {
     videoWidget->release();
+    setVideoOnTop( false );
 
     if( stackCentralW->currentWidget() == videoWidget )
         restoreStackOldWidget();
 
     /* We don't want to have a blank video to popup */
     stackCentralOldWidget = bgWidget;
+}
+
+/* Slot to change the video always-on-top flag.
+ * Emit askVideoOnTop() to invoke this from other thread. */
+void MainInterface::setVideoOnTop( bool on_top )
+{
+    Qt::WindowFlags oldflags = windowFlags(), newflags;
+
+    if( on_top )
+        newflags = oldflags | Qt::WindowStaysOnTopHint;
+    else
+        newflags = oldflags & ~Qt::WindowStaysOnTopHint;
+
+    if( newflags != oldflags )
+    {
+        setWindowFlags( newflags );
+        show(); /* necessary to apply window flags */
+    }
 }
 
 /* Asynchronous call from WindowControl function */
@@ -621,7 +625,8 @@ int MainInterface::controlVideo( int i_query, va_list args )
     {
         unsigned i_arg = va_arg( args, unsigned );
         unsigned on_top = i_arg & VOUT_WINDOW_STATE_ABOVE;
-        QApplication::postEvent( this, new SetVideoOnTopQtEvent( on_top ) );
+
+        emit askVideoOnTop( on_top != 0 );
         return VLC_SUCCESS;
     }
     case VOUT_WINDOW_SET_FULLSCREEN:
@@ -1035,25 +1040,6 @@ void MainInterface::dragLeaveEvent(QDragLeaveEvent *event)
 /************************************************************************
  * Events stuff
  ************************************************************************/
-void MainInterface::customEvent( QEvent *event )
-{
-    if ( event->type() == (int)SetVideoOnTopEvent_Type )
-    {
-        SetVideoOnTopQtEvent* p_event = (SetVideoOnTopQtEvent*)event;
-        Qt::WindowFlags oldflags = windowFlags(), newflags;
-
-        if( p_event->OnTop() )
-            newflags = oldflags | Qt::WindowStaysOnTopHint;
-        else
-            newflags = oldflags & ~Qt::WindowStaysOnTopHint;
-        if( newflags != oldflags )
-        {
-            setWindowFlags( newflags );
-            show(); /* necessary to apply window flags */
-        }
-    }
-}
-
 void MainInterface::keyPressEvent( QKeyEvent *e )
 {
     handleKeyPress( e );
