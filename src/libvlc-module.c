@@ -2783,8 +2783,6 @@ vlc_module_begin ()
         change_volatile ()
     add_string( "config", NULL, NULL, CONFIG_TEXT, "", false )
         change_volatile ()
-    add_bool( "version", false, NULL, VERSION_TEXT, "", false )
-        change_volatile ()
 
    /* Usage (mainly useful for cmd line stuff) */
     /* add_usage_hint( PLAYLIST_USAGE ) */
