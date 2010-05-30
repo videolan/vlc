@@ -464,7 +464,7 @@ static void FilterPlanar( vout_thread_t *p_vout,
             }
             break;
 
-        case TRANSFORM_MODE_HFLIP:
+        case TRANSFORM_MODE_VFLIP:
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
                 uint8_t *p_in = p_pic->p[i_index].p_pixels;
@@ -483,7 +483,7 @@ static void FilterPlanar( vout_thread_t *p_vout,
             }
             break;
 
-        case TRANSFORM_MODE_VFLIP:
+        case TRANSFORM_MODE_HFLIP:
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
                 uint8_t *p_in = p_pic->p[i_index].p_pixels;
@@ -675,7 +675,7 @@ static void FilterYUYV( vout_thread_t *p_vout,
 
     switch( p_vout->p_sys->i_mode )
     {
-        case TRANSFORM_MODE_HFLIP:
+        case TRANSFORM_MODE_VFLIP:
             /* Fall back on the default implementation */
             FilterPlanar( p_vout, p_pic, p_outpic );
             return;
@@ -802,7 +802,7 @@ static void FilterYUYV( vout_thread_t *p_vout,
             }
             break;
 
-        case TRANSFORM_MODE_VFLIP:
+        case TRANSFORM_MODE_HFLIP:
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
                 uint8_t *p_in = p_pic->p[i_index].p_pixels;
