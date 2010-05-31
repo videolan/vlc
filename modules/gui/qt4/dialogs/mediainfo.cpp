@@ -29,6 +29,8 @@
 #include "dialogs/mediainfo.hpp"
 #include "input_manager.hpp"
 
+#include <vlc_url.h>
+
 #include <QTabWidget>
 #include <QGridLayout>
 #include <QLineEdit>
@@ -73,7 +75,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     closeButton->setDefault( true );
 
     QLabel *uriLabel = new QLabel( qtr( "Location:" ) );
-    QLineEdit *uriLine = new QLineEdit;
+    uriLine = new QLineEdit;
 
     layout->addWidget( infoTabW, 0, 0, 1, 8 );
     layout->addWidget( uriLabel, 1, 0, 1, 1 );
@@ -87,7 +89,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     BUTTONACT( saveMetaButton, saveMeta() );
 
     /* Let the MetaData Panel update the URI */
-    CONNECT( MP, uriSet( const QString& ), uriLine, setText( const QString& ) );
+    CONNECT( MP, uriSet( const QString& ), this, updateURI( const QString& ) );
     CONNECT( MP, editing(), saveMetaButton, show() );
 
     /* Display the buttonBar according to the Tab selected */
@@ -181,3 +183,19 @@ void MediaInfoDialog::updateButtons( int i_tab )
         saveMetaButton->hide();
 }
 
+void MediaInfoDialog::updateURI( const QString& uri )
+{
+    QString location;
+
+    /* If URI points to a local file, show the path instead of the URI */
+    char *path = make_path( qtu( uri ) );
+    if( path != NULL )
+    {
+        location = qfu( path );
+        free( path );
+    }
+    else
+        location = uri;
+
+    uriLine->setText( location );
+}

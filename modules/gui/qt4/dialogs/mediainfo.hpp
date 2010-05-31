@@ -56,6 +56,7 @@ private:
     ExtraMetaPanel *EMP;
 
     QPushButton *saveMetaButton;
+    QLineEdit   *uriLine;
 
 private slots:
     void updateAllTabs( input_item_t * );
@@ -65,6 +66,7 @@ private slots:
 
     void saveMeta();
     void updateButtons( int i_tab );
+    void updateURI( const QString& );
 
     friend class    Singleton<MediaInfoDialog>;
 };
