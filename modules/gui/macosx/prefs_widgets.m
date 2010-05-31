@@ -1074,9 +1074,13 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             -2, 0, o_textfieldTooltip )
         [o_combo setAutoresizingMask:NSViewWidthSizable ];
         for( i_index = 0; i_index < p_item->i_list; i_index++ )
-            if( p_item->value.psz && p_item->ppsz_list[i_index] &&
+        {
+            if( !p_item->value.psz && !p_item->ppsz_list[i_index] )
+                [o_combo selectItemAtIndex: i_index];
+            else if( p_item->value.psz && p_item->ppsz_list[i_index] &&
                 !strcmp( p_item->value.psz, p_item->ppsz_list[i_index] ) )
                 [o_combo selectItemAtIndex: i_index];
+       }
         [self addSubview: o_combo];
     }
     return self;
@@ -1118,9 +1122,13 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     char *psz_value = config_GetPsz( VLCIntf, p_item->psz_name );
 
     for( i_index = 0; i_index < p_item->i_list; i_index++ )
-        if( psz_value && p_item->ppsz_list[i_index] &&
+    {
+        if( !psz_value && !p_item->ppsz_list[i_index] )
+            [o_combo selectItemAtIndex: i_index];
+        else if( psz_value && p_item->ppsz_list[i_index] &&
             !strcmp( psz_value, p_item->ppsz_list[i_index] ) )
             [o_combo selectItemAtIndex: i_index];
+    }
 
     free( psz_value );
     [super resetValues];
