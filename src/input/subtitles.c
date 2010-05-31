@@ -218,11 +218,9 @@ static char **paths_to_list( const char *psz_dir, char *psz_path )
         if( *psz_subdir == '\0' )
             continue;
 
-        if( asprintf( &subdirs[i++], "%s%s%c",
+        if( asprintf( &subdirs[i++], "%s%s",
                   psz_subdir[0] == '.' ? psz_dir : "",
-                  psz_subdir,
-                  psz_subdir[strlen(psz_subdir) - 1] == DIR_SEP_CHAR ?
-                                           '\0' : DIR_SEP_CHAR ) == -1 )
+                  psz_subdir ) == -1 )
             break;
     }
     subdirs[i] = NULL;
@@ -251,8 +249,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 {
     int i_fuzzy;
     int j, i_result2, i_sub_count, i_fname_len;
-    char *f_dir = NULL, *f_fname = NULL, *f_fname_noext = NULL, *f_fname_trim = NULL;
-    char *tmp = NULL;
+    char *f_fname_noext = NULL, *f_fname_trim = NULL;
 
     char **subdirs; /* list of subdirectories to look in */
 
@@ -267,39 +264,21 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
         return NULL;
 
     /* extract filename & dirname from psz_fname */
-    tmp = strrchr( psz_fname, DIR_SEP_CHAR );
-    if( tmp )
+    char *f_dir = strdup( psz_fname );
+    if( f_dir == NULL )
     {
-        const int i_dirlen = strlen(psz_fname)-strlen(tmp)+1; /* include the separator */
-        f_fname = strdup( &tmp[1] );    /* skip the separator */
-        f_dir = strndup( psz_fname, i_dirlen );
+        free( psz_fname );
+        return NULL;
     }
-    else
-    {
-#if defined (HAVE_UNISTD_H) && !defined (UNDER_CE)
-        /* Get the current working directory */
-        char *psz_cwd = getcwd( NULL, 0 );
-#else
-        char *psz_cwd = NULL;
-#endif
-        if( !psz_cwd )
-        {
-            free( psz_fname );
-            return NULL;
-        }
 
-        f_fname = strdup( psz_fname );
-        if( asprintf( &f_dir, "%s%c", psz_cwd, DIR_SEP_CHAR ) == -1 )
-            f_dir = NULL; /* Assure that function will return in next test */
-        free( psz_cwd );
-    }
-    if( !f_fname || !f_dir )
+    char *f_fname = strrchr( f_dir, DIR_SEP_CHAR );
+    if( !f_fname )
     {
-        free( f_fname );
         free( f_dir );
         free( psz_fname );
         return NULL;
     }
+    *(f_fname++) = 0; /* skip dir separator */
 
     i_fname_len = strlen( f_fname );
 
@@ -307,7 +286,6 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     f_fname_trim = malloc(i_fname_len + 1 );
     if( !f_fname_noext || !f_fname_trim )
     {
-        free( f_fname );
         free( f_dir );
         free( f_fname_noext );
         free( f_fname_trim );
@@ -344,6 +322,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             char tmp_fname_noext[strlen( psz_name ) + 1];
             char tmp_fname_trim[strlen( psz_name ) + 1];
             char tmp_fname_ext[strlen( psz_name ) + 1];
+            char *tmp;
 
             int i_prio;
 
@@ -386,10 +365,10 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             }
             if( i_prio >= i_fuzzy )
             {
-                char psz_path[strlen( psz_dir ) + strlen( psz_name ) + 1];
+                char psz_path[strlen( psz_dir ) + strlen( psz_name ) + 2];
                 struct stat st;
 
-                sprintf( psz_path, "%s%s", psz_dir, psz_name );
+                sprintf( psz_path, "%s"DIR_SEP"%s", psz_dir, psz_name );
                 if( !strcmp( psz_path, psz_fname ) )
                     continue;
 
@@ -423,7 +402,6 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             free( subdirs[j] );
         free( subdirs );
     }
-    free( f_fname );
     free( f_dir );
     free( f_fname_trim );
     free( f_fname_noext );
