@@ -172,6 +172,18 @@ int StreamOpen( vlc_object_t *p_this )
     stream_t *s = (stream_t*) p_this;
     stream_sys_t *p_sys;
 
+    /* Verify file extension: discard .vlt files (skins) */
+    char *psz_ext = strrchr( s->psz_path, '.' );
+    if( psz_ext )
+    {
+        if( !strncasecmp( psz_ext, ".vlt", 4 ) ||
+            !strncasecmp( psz_ext, ".wsz", 4 ) )
+        {
+            msg_Dbg( s, "skipping skins package (*.vlt, *.wsz)" );
+            return VLC_EGENERIC;
+        }
+    }
+
     /* Verify file format */
     const uint8_t *p_peek;
     if( stream_Peek( s->p_source, &p_peek, i_zip_marker ) < i_zip_marker )
