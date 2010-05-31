@@ -195,6 +195,12 @@ VLC_EXPORT( void,  subpicture_Delete, ( subpicture_t *p_subpic ) );
  */
 VLC_EXPORT( subpicture_t *, subpicture_NewFromPicture, ( vlc_object_t *, picture_t *, vlc_fourcc_t i_chroma ) );
 
+/**
+ * This function will update the content of a subpicture created with
+ * a non NULL subpicture_updater_t.
+ */
+VLC_EXPORT( void, subpicture_Update, ( subpicture_t *, const video_format_t *src, const video_format_t *, mtime_t ) );
+
 /**@}*/
 
 #endif /* _VLC_VIDEO_H */
