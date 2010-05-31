@@ -693,7 +693,7 @@ libogg-$(OGG_VERSION).tar.gz:
 
 libogg: libogg-$(OGG_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p0 < Patches/ogg.patch
+	patch -p0 < Patches/libogg-inttypes.patch
 	patch -p0 < Patches/libogg-1.1.patch
 ifdef HAVE_WINCE
 	patch -p0 < Patches/libogg-wince.patch
@@ -1405,19 +1405,11 @@ x264:
 ifdef HAVE_WIN32
 	(cd x264; patch -p0 < ../Patches/x264-svn-win32.patch )
 endif
-
 else
+x264:
+	echo "x264 snapshot is too old, you MUST use Git !"
+	exit -1
 
-x264: x264-$(X264_VERSION).tar.gz
-	$(EXTRACT_GZ)
-ifdef HAVE_WIN32
-  ifndef HAVE_CYGWIN
-	(cd x264;patch -p0 <../Patches/x264-20050624-win32.patch)
-  endif
-else
-	patch -p0 < Patches/x264.patch
-	rm x264/x264.c
-endif
 endif
 
 ifdef HAVE_WIN32
