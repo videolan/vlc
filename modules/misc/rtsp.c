@@ -334,8 +334,6 @@ static void Close( vlc_object_t * p_this )
 {
     vod_t *p_vod = (vod_t *)p_this;
     vod_sys_t *p_sys = p_vod->p_sys;
-    block_t *p_block_cmd;
-    rtsp_cmd_t cmd;
 
     /* Stop command thread */
     vlc_object_kill( p_vod );
@@ -344,7 +342,8 @@ static void Close( vlc_object_t * p_this )
 
     while( block_FifoCount( p_sys->p_fifo_cmd ) > 0 )
     {
-        p_block_cmd = block_FifoGet( p_sys->p_fifo_cmd );
+        rtsp_cmd_t cmd;
+        block_t *p_block_cmd = block_FifoGet( p_sys->p_fifo_cmd );
         memcpy( &cmd, p_block_cmd->p_buffer, sizeof(cmd) );
         block_Release( p_block_cmd );
         if ( cmd.i_type == RTSP_CMD_TYPE_DEL )
