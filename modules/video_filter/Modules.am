@@ -71,6 +71,7 @@ SOURCES_atmo = atmo/atmo.cpp \
 	atmo/DmxTools.cpp atmo/DmxTools.h \
 	atmo/AtmoMultiConnection.cpp atmo/AtmoMultiConnection.h \
 	atmo/MoMoConnection.cpp atmo/MoMoConnection.h \
+	atmo/FnordlichtConnection.cpp atmo/FnordlichtConnection.h \
 	atmo/AtmoPacketQueue.cpp atmo/AtmoPacketQueue.h
 SOURCES_gradfun = gradfun.c gradfun.h
 noinst_HEADERS = filter_picture.h
