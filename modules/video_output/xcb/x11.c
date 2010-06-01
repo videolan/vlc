@@ -249,9 +249,24 @@ static int Open (vlc_object_t *obj)
 
     p_sys->window = xcb_generate_id (p_sys->conn);
     p_sys->gc = xcb_generate_id (p_sys->conn);
+    xcb_pixmap_t pixmap = xcb_generate_id (p_sys->conn);
     {
-        const uint32_t mask = XCB_CW_EVENT_MASK | XCB_CW_COLORMAP;
+        const uint32_t mask =
+            XCB_CW_BACK_PIXMAP |
+            XCB_CW_BACK_PIXEL |
+            XCB_CW_BORDER_PIXMAP |
+            XCB_CW_BORDER_PIXEL |
+            XCB_CW_EVENT_MASK |
+            XCB_CW_COLORMAP;
         const uint32_t values[] = {
+            /* XCB_CW_BACK_PIXMAP */
+            pixmap,
+            /* XCB_CW_BACK_PIXEL */
+            scr->black_pixel,
+            /* XCB_CW_BORDER_PIXMAP */
+            pixmap,
+            /* XCB_CW_BORDER_PIXEL */
+            scr->black_pixel,
             /* XCB_CW_EVENT_MASK */
             XCB_EVENT_MASK_VISIBILITY_CHANGE,
             /* XCB_CW_COLORMAP */
@@ -259,6 +274,7 @@ static int Open (vlc_object_t *obj)
         };
         xcb_void_cookie_t c;
 
+        xcb_create_pixmap (p_sys->conn, p_sys->depth, pixmap, scr->root, 1, 1);
         c = xcb_create_window_checked (p_sys->conn, p_sys->depth,
                                        p_sys->window,
                                        p_sys->embed->handle.xid, 0, 0,
