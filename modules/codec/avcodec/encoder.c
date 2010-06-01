@@ -600,10 +600,36 @@ int OpenEncoder( vlc_object_t *p_this )
        libvpx-720p preset from libvpx ffmpeg-patch */
     if( i_codec_id == CODEC_ID_VP8 )
     {
+        /* Lets give bitrate tolerance */
         p_context->bit_rate_tolerance = __MAX(2 * p_enc->fmt_out.i_bitrate, p_sys->i_vtolerance );
-        /* I used Harrison-stetson method here to get there values */
-        p_context->rc_max_rate = 3 * p_enc->fmt_out.i_bitrate;
-        p_context->rc_min_rate = p_enc->fmt_out.i_bitrate / 200;
+        /* seems that ffmpeg presets have 720p as divider for buffers */
+        if( p_enc->fmt_out.video.i_width >= 720 )
+        {
+           /* Check that we don't overrun users qmin/qmax values */
+           if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmin" ) )
+           {
+              p_context->mb_qmin = p_context->qmin = 10 * FF_QP2LAMBDA;
+              p_context->mb_lmin = p_context->lmin = 10 * FF_QP2LAMBDA;
+           }
+
+           if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmax" ) )
+           {
+              p_context->mb_qmax = p_context->qmax = 42 * FF_QP2LAMBDA;
+              p_context->mb_lmax = p_context->lmax = 42 * FF_QP2LAMBDA;
+           }
+
+           p_context->rc_max_rate = 24 * 1000 * 1000; //24M
+           p_context->rc_min_rate = 100 * 1000; // 100k
+        } else {
+           if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmin" ) )
+           {
+              p_context->mb_qmin = p_context->qmin = FF_QP2LAMBDA;
+              p_context->mb_lmin = p_context->lmin = FF_QP2LAMBDA;
+           }
+
+           p_context->rc_max_rate = 1.5 * 1000 * 1000; //1.5M
+           p_context->rc_min_rate = 40 * 1000; // 40k
+        }
 
 
 #if 0 /* enable when/if vp8 encoder is accepted in libavcodec */
