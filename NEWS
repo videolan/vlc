@@ -16,8 +16,8 @@ Stream output:
     dst=public_html/iphonestreamfile-###.ts}"
 
 
-Changes between 1.0.5 and 1.1.0-pre1:
-------------------------------------
+Changes between 1.0.5 and 1.1.0:
+--------------------------------
 Important changes for users:
  * On Linux, known bugs in the ALSA library might prevent audio output.
    Update to alsa-lib 1.0.24 or later, or use the PulseAudio output instead.
@@ -55,12 +55,12 @@ Decoders:
  * Invmem module improvements
  * Support for Atrac1 audio codec
  * Support for SSE3 and SSE4 capabilities in some codecs
- * Multiple improvements for subtitles styles .SRT and .SSA
- * Support for Indeo5 video codec
+ * Multiple improvements for subtitles styles in .SRT and .SSA
  * Support for Windows Media Speech (Voice) audio codec natively on all platforms
  * Support for AMR-NB audio codec on the Windows and Mac port
+ * Support for Indeo5 video codec
  * Improvements on the FLAC format (7.1 channels and 88.2/176.4/192 kHz support)
- * Direct rendering is always used with H.264 in avcodec module
+ * Direct rendering is used more often with H.264 in avcodec module
  * Support for MPEG-4 ALS lossless audio codec
  * Support for VP8 codec (source code version only)
 
@@ -70,7 +70,8 @@ Demuxers:
  * Support for TwinVQ (.vqf) and AMV (.amv) files
  * Various EGP improvements
  * Support for embedded subtitles in OpenDML and legacy .avi files
- * Many fixes on Matroska support and support for webm format
+ * Many fixes on Matroska support and support for Webm format
+ * Metadata and cover art improvements
 
 Playlist:
  * WPL and ZPL playlist support
@@ -93,7 +94,6 @@ Video Output:
 
 Extensions:
  * New content extensions lua framework
- * IMDb extension
 
 Audio filters:
  * Chorus/Flanger audio filter
@@ -143,7 +143,7 @@ Mac OS X Port:
 
 Windows port:
  * Integration in Windows 7 taskbar
- * Experimental playback of .Midi files is supported through fluidsynth's module
+ * Playback of .Midi files is supported through fluidsynth's module
 
 Maemo port:
  * Multiple improvements for N900 compliance and efficiency
@@ -157,7 +157,7 @@ Misc:
 
 Bindings:
  * new C++ wrapper around libVLC: libVLCpp
- * phonon bindings are now usable
+ * phonon-VLC backend is now usable
 
 Removed modules:
  * csri codec: use the libass module instead.
@@ -178,6 +178,40 @@ Removed modules:
  * realaudio codecs: use libavcodec
  * access_file removed in favor of filesystem
  * RTMP input and output: use avio module
+
+
+Changes between 1.0.5 and 1.0.6:
+--------------------------------
+
+Access:
+ * Fix crash on FTP URI with no file path
+
+Decoders/Packetizers:
+ * Fix overflows in A/52, DTS, MPEG Audio and subtitles support
+
+Demuxers:
+ * Update LUA script for Youtube pages
+ * Fix crashes in AVI, ASF and Matroska files
+ * Fix crashes on malformatted ZIP archives
+ * Fix crashes and leaks in the FFmpeg/avformat plugin
+ * Fix crash on invalid XSPF playlist
+
+X11 port:
+ * Partial Xlib threading fixes
+   More complete fixes are available in VLC 1.1.0. Please update!
+
+Interfaces:
+ * Fix crash (use after free) in Qt4 bookmarks
+ * Fix a few crashes in Qt4 playlist
+
+Translations:
+ * Simplified Chinese, Estonian, French, Japanese, Korean, Spanish, Swedish
+   and Walloon translations updated
+ * Sinhala translation started
+
+Removed modules:
+ * RTMP input and output are removed due to security problems. Please update
+   to VLC 1.1.0 which provides an FFmpeg-based RTMP input if needed.
 
 
 Changes between 1.0.4 and 1.0.5:
