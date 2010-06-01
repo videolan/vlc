@@ -92,6 +92,22 @@ static void Manage (vout_display_t *);
 
 static void ResetPictures (vout_display_t *);
 
+static const xcb_depth_t *FindDepth (const xcb_screen_t *scr,
+                                     uint_fast8_t depth)
+{
+    xcb_depth_t *d = NULL;
+    for (xcb_depth_iterator_t it = xcb_screen_allowed_depths_iterator (scr);
+         it.rem > 0 && d == NULL;
+         xcb_depth_next (&it))
+    {
+        if (it.data->depth == depth)
+            d = it.data;
+    }
+
+    return d;
+}
+
+
 /**
  * Probe the X server.
  */
@@ -107,7 +123,7 @@ static int Open (vlc_object_t *obj)
 
     /* Get window, connect to X server */
     const xcb_screen_t *scr;
-    p_sys->embed = GetWindow (vd, &p_sys->conn, &scr, &p_sys->depth);
+    p_sys->embed = GetWindow (vd, &p_sys->conn, &scr, &(uint8_t){ 0 });
     if (p_sys->embed == NULL)
     {
         free (p_sys);
@@ -117,60 +133,19 @@ static int Open (vlc_object_t *obj)
     const xcb_setup_t *setup = xcb_get_setup (p_sys->conn);
     p_sys->byte_order = setup->image_byte_order;
 
-    /* */
-    video_format_t fmt_pic = vd->fmt;
-
-    /* Check that the selected screen supports this depth */
-    xcb_depth_t *d = NULL;
-    for (xcb_depth_iterator_t it = xcb_screen_allowed_depths_iterator (scr);
-         it.rem > 0 && d == NULL;
-         xcb_depth_next (&it))
-        if (it.data->depth == p_sys->depth)
-            d = it.data;
-    if (d == NULL)
-    {
-        msg_Err (obj, "unexpected color depth msimatch");
-        goto error; /* WTH? depth not supported on screen */
-    }
-
-    /* Find a visual type for the selected depth */
-    xcb_visualid_t vid = 0;
-    bool gray = true;
-    const xcb_visualtype_t *vt = xcb_depth_visuals (d);
-    for (int i = xcb_depth_visuals_length (d); i > 0; i--)
-    {
-        if (vt->_class == XCB_VISUAL_CLASS_TRUE_COLOR)
-        {
-            vid = vt->visual_id;
-            fmt_pic.i_rmask = vt->red_mask;
-            fmt_pic.i_gmask = vt->green_mask;
-            fmt_pic.i_bmask = vt->blue_mask;
-            gray = false;
-            break;
-        }
-        if (p_sys->depth == 8 && vt->_class == XCB_VISUAL_CLASS_STATIC_GRAY
-         && vid == 0)
-        {
-            vid = vt->visual_id;
-        }
-    }
-
-    if (!vid)
-    {
-        msg_Err (obj, "unexpected visual type mismatch");
-        goto error;
-    }
-    msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32" (depth: %"PRIu8")", vid,
-             p_sys->depth);
-
     /* Determine our pixel format */
-    p_sys->bpp = 0;
+    xcb_visualid_t vid = 0;
+    p_sys->depth = 0;
+
     for (const xcb_format_t *fmt = xcb_setup_pixmap_formats (setup),
              *end = fmt + xcb_setup_pixmap_formats_length (setup);
-         fmt < end && !p_sys->bpp; fmt++)
+         fmt < end;
+         fmt++)
     {
-        if (fmt->depth != p_sys->depth)
-            continue; /* Wrong depth! */
+        if (fmt->depth <= p_sys->depth)
+            continue; /* no better than earlier format */
+
+        video_format_t fmt_pic = vd->fmt;
 
         /* Check that the pixmap format is supported by VLC. */
         switch (fmt->depth)
@@ -206,30 +181,72 @@ static int Open (vlc_object_t *obj)
           case 8:
             if (fmt->bits_per_pixel != 8)
                 continue;
-            fmt_pic.i_chroma = gray ? VLC_CODEC_GREY : VLC_CODEC_RGB8;
+            fmt_pic.i_chroma = VLC_CODEC_RGB8;
             break;
           default:
             continue;
         }
+
+        /* VLC pads lines to 16 pixels internally */
         if ((fmt->bits_per_pixel << 4) % fmt->scanline_pad)
-            continue; /* VLC pads lines to 16 pixels internally */
+            continue;
 
         /* Byte sex is a non-issue for 8-bits. It can be worked around with
          * RGB masks for 24-bits. Too bad for 15-bits and 16-bits. */
         if (fmt->bits_per_pixel == 16 && setup->image_byte_order != ORDER)
             continue;
 
+        /* Check that the selected screen supports this depth */
+        const xcb_depth_t *d = FindDepth (scr, fmt->depth);
+        if (d == NULL)
+            continue;
+
+        /* Find a visual type for the selected depth */
+        const xcb_visualtype_t *vt = xcb_depth_visuals (d);
+
+        /* First try True Color class */
+        for (int i = xcb_depth_visuals_length (d); i > 0; i--)
+        {
+            if (vt->_class == XCB_VISUAL_CLASS_TRUE_COLOR)
+            {
+                fmt_pic.i_rmask = vt->red_mask;
+                fmt_pic.i_gmask = vt->green_mask;
+                fmt_pic.i_bmask = vt->blue_mask;
+                goto found_visual;
+            }
+            vt++;
+        }
+        /* Then try Static Gray class */
+        if (fmt->depth == 8)
+            for (int i = xcb_depth_visuals_length (d); i > 0 && !vid; i--)
+            {
+                if (vt->_class == XCB_VISUAL_CLASS_STATIC_GRAY)
+                    goto found_grey;
+                vt++;
+            }
+
+        continue; /* Fail: unusable pixel format */
+
+    found_grey:
+       fmt_pic.i_chroma = VLC_CODEC_GREY;
+    found_visual:
         p_sys->bpp = fmt->bits_per_pixel;
         p_sys->pad = fmt->scanline_pad;
-        msg_Dbg (vd, " %"PRIu8" bits per pixels, %"PRIu8" bits line pad",
-                 p_sys->bpp, p_sys->pad);
+        p_sys->depth = fmt->depth;
+        vd->fmt = fmt_pic;
+        vid = vt->visual_id;
     }
 
-    if (!p_sys->bpp)
+    if (!vid)
     {
-        msg_Err (vd, "no supported pixmap formats");
+        msg_Err (obj, "no supported pixel format & visual");
         goto error;
     }
+
+    msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32, vid);
+    msg_Dbg (vd, " %"PRIu8" bits depth", p_sys->depth);
+    msg_Dbg (vd, " %"PRIu8" bits per pixel", p_sys->bpp);
+    msg_Dbg (vd, " %"PRIu8" bits line pad", p_sys->pad);
 
     /* Create colormap (needed to select non-default visual) */
     xcb_colormap_t cmap;
@@ -302,7 +319,6 @@ static int Open (vlc_object_t *obj)
     info.has_event_thread = true;
 
     /* Setup vout_display_t once everything is fine */
-    vd->fmt = fmt_pic;
     vd->info = info;
 
     vd->pool = Pool;
