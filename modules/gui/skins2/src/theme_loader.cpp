@@ -30,8 +30,6 @@
 #include "../src/vlcproc.hpp"
 #include "../src/window_manager.hpp"
 
-#include <vlc_url.h>
-
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
 #endif
@@ -73,12 +71,8 @@ int makedir( const char *newdir );
 #define ZIP_BUFFER_SIZE 4096
 
 
-bool ThemeLoader::load( const string &fullFileName )
+bool ThemeLoader::load( const string &fileName )
 {
-    char *decodedName = decode_URI_duplicate( fullFileName.c_str() );
-    string fileName = decodedName ? string(decodedName) : fullFileName;
-    free( decodedName );
-
     string path = getFilePath( fileName );
 
     //Before all, let's see if the file is present

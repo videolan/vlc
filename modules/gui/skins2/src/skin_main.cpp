@@ -594,6 +594,5 @@ vlc_module_begin ()
         set_capability( "access_demux", 5 )
         set_callbacks( DemuxOpen, NULL )
         add_shortcut( "skins" )
-        add_shortcut( "file" )
 
 vlc_module_end ()
