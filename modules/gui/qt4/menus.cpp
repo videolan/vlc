@@ -972,9 +972,12 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 
             b_isFullscreen = !( !val.b_bool );
             if( b_isFullscreen )
+            {
+                val.b_bool = false;
                 CreateAndConnect( menu, "fullscreen",
                         qtr( "Leave Fullscreen" ),"" , ITEM_NORMAL,
                         VLC_OBJECT(p_vout), val, VLC_VAR_BOOL, b_isFullscreen );
+            }
             vlc_object_release( p_vout );
 
             menu->addSeparator();
