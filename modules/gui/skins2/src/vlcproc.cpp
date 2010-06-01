@@ -172,8 +172,6 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     // Called when a playlist item changed
     var_AddCallback( pIntf->p_sys->p_playlist, "item-change",
                      onItemChange, this );
-    // Called when our skins2 demux wants us to load a new skin
-    var_AddCallback( pIntf, "skin-to-load", onSkinToLoad, this );
 
     // Called when we have an interaction dialog to display
     var_Create( pIntf, "interaction", VLC_VAR_ADDRESS );
@@ -225,7 +223,6 @@ VlcProc::~VlcProc()
                      onInputNew, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-change",
                      onItemChange, this );
-    var_DelCallback( getIntf(), "skin-to-load", onSkinToLoad, this );
     var_DelCallback( getIntf(), "interaction", onInteraction, this );
 }
 
@@ -320,24 +317,6 @@ int VlcProc::onItemDelete( vlc_object_t *pObj, const char *pVariable,
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->push( ptrTree , false );
-
-    return VLC_SUCCESS;
-}
-
-
-int VlcProc::onSkinToLoad( vlc_object_t *pObj, const char *pVariable,
-                           vlc_value_t oldVal, vlc_value_t newVal,
-                           void *pParam )
-{
-    VlcProc *pThis = (VlcProc*)pParam;
-
-    // Create a playlist notify command
-    CmdChangeSkin *pCmd =
-        new CmdChangeSkin( pThis->getIntf(), newVal.psz_string );
-
-    // Push the command in the asynchronous command queue
-    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-    pQueue->push( CmdGenericPtr( pCmd ) );
 
     return VLC_SUCCESS;
 }

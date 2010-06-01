@@ -204,11 +204,6 @@ private:
                              vlc_value_t oldVal, vlc_value_t newVal,
                              void *pParam );
 
-    /// Callback for skins2-to-load variable
-    static int onSkinToLoad( vlc_object_t *pObj, const char *pVariable,
-                             vlc_value_t oldVal, vlc_value_t newVal,
-                             void *pParam );
-
     static int onInteraction( vlc_object_t *pObj, const char *pVariable,
                               vlc_value_t oldVal, vlc_value_t newVal,
                               void *pParam );

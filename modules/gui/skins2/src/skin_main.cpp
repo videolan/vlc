@@ -29,7 +29,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_input.h>
-#include <vlc_demux.h>
 #include <vlc_playlist.h>
 #include <vlc_threads.h>
 #include <vlc_vout_window.h>
@@ -66,10 +65,6 @@ extern "C" __declspec( dllexport )
 static int  Open  ( vlc_object_t * );
 static void Close ( vlc_object_t * );
 static void *Run  ( void * );
-
-static int DemuxOpen( vlc_object_t * );
-static int Demux( demux_t * );
-static int DemuxControl( demux_t *, int, va_list );
 
 //---------------------------------------------------------------------------
 // Prototypes for configuration callbacks
@@ -121,9 +116,6 @@ static int Open( vlc_object_t *p_this )
 
     // No theme yet
     p_intf->p_sys->p_theme = NULL;
-
-    // Create a variable to be notified of skins to be loaded
-    var_Create( p_intf, "skin-to-load", VLC_VAR_STRING );
 
     vlc_mutex_init( &p_intf->p_sys->vout_lock );
     vlc_cond_init( &p_intf->p_sys->vout_wait );
@@ -377,83 +369,6 @@ static void WindowClose( vlc_object_t *p_this )
     vlc_object_release( pIntf );
 }
 
-//---------------------------------------------------------------------------
-// DemuxOpen: initialize demux
-//---------------------------------------------------------------------------
-static int DemuxOpen( vlc_object_t *p_this )
-{
-    demux_t *p_demux = (demux_t*)p_this;
-    intf_thread_t *p_intf;
-    char *ext;
-
-    // Needed callbacks
-    p_demux->pf_demux   = Demux;
-    p_demux->pf_control = DemuxControl;
-
-    // Test that we have a valid .vlt or .wsz file, based on the extension
-    if( ( ext = strrchr( p_demux->psz_path, '.' ) ) == NULL ||
-        ( strcasecmp( ext, ".vlt" ) && strcasecmp( ext, ".wsz" ) ) )
-    {
-        return VLC_EGENERIC;
-    }
-
-    vlc_mutex_lock( &skin_load.mutex );
-    p_intf = skin_load.intf;
-    if( p_intf )
-        vlc_object_hold( p_intf );
-    vlc_mutex_unlock( &skin_load.mutex );
-
-    if( p_intf != NULL )
-    {
-        playlist_t *p_playlist = pl_Get( p_this );
-
-        PL_LOCK;
-        // Make sure the item is deleted afterwards
-        /// \bug does not always work
-        playlist_CurrentPlayingItem( p_playlist )->i_flags |= PLAYLIST_REMOVE_FLAG;
-        PL_UNLOCK;
-
-        var_SetString( p_intf, "skin-to-load", p_demux->psz_path );
-        vlc_object_release( p_intf );
-    }
-    else
-    {
-        msg_Warn( p_this,
-                  "skin could not be loaded (not using skins2 intf)" );
-    }
-
-    return VLC_SUCCESS;
-}
-
-
-//---------------------------------------------------------------------------
-// Demux: return EOF
-//---------------------------------------------------------------------------
-static int Demux( demux_t *p_demux )
-{
-    return 0;
-}
-
-
-//---------------------------------------------------------------------------
-// DemuxControl
-//---------------------------------------------------------------------------
-static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
-{
-    switch( i_query )
-    {
-    case DEMUX_GET_PTS_DELAY:
-    {
-        int64_t *pi_pts_delay = va_arg( args, int64_t * );
-        *pi_pts_delay = 10;
-        return VLC_SUCCESS;
-    }
-    default:
-        return VLC_EGENERIC;
-    }
-
-}
-
 
 //---------------------------------------------------------------------------
 // Callbacks
@@ -588,11 +503,5 @@ vlc_module_begin ()
         set_capability( "vout window xid", 51 )
 #endif
         set_callbacks( WindowOpen, WindowClose )
-
-    add_submodule ()
-        set_description( N_("Skins loader demux") )
-        set_capability( "access_demux", 5 )
-        set_callbacks( DemuxOpen, NULL )
-        add_shortcut( "skins" )
 
 vlc_module_end ()
