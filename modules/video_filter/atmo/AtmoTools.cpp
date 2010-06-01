@@ -13,7 +13,6 @@
 #include "AtmoDmxSerialConnection.h"
 #include "AtmoMultiConnection.h"
 #include "MoMoConnection.h"
-#include "FnordlichtConnection.h"
 #include "AtmoExternalCaptureInput.h"
 #include <math.h>
 
@@ -28,6 +27,7 @@
 #   include "AtmoGdiDisplayCaptureInput.h"
 #endif
 
+
 CAtmoTools::CAtmoTools(void)
 {
 }
@@ -39,6 +39,7 @@ CAtmoTools::~CAtmoTools(void)
 void CAtmoTools::ShowShutdownColor(CAtmoDynData *pDynData)
 {
     pDynData->LockCriticalSection();
+
 
     CAtmoConnection *atmoConnection = pDynData->getAtmoConnection();
     CAtmoConfig *atmoConfig = pDynData->getAtmoConfig();
@@ -386,24 +387,6 @@ ATMO_BOOL CAtmoTools::RecreateConnection(CAtmoDynData *pDynData)
 #endif
            case actMoMoLight: {
                CMoMoConnection *tempConnection = new CMoMoConnection( atmoConfig );
-               if(tempConnection->OpenConnection() == ATMO_FALSE) {
-                  pDynData->setAtmoConnection(tempConnection);
-                  pDynData->UnLockCriticalSection();
-                  return ATMO_FALSE;
-               }
-               pDynData->setAtmoConnection(tempConnection);
-               pDynData->ReloadZoneDefinitionBitmaps();
-
-               tempConnection->CreateDefaultMapping( atmoConfig->getChannelAssignment(0) );
-
-               CAtmoTools::SetChannelAssignment(pDynData, atmoConfig->getCurrentChannelAssignment() );
-
-               pDynData->UnLockCriticalSection();
-               return ATMO_TRUE;
-           }
-
-           case actFnordlicht: {
-               CFnordlichtConnection *tempConnection = new CFnordlichtConnection( atmoConfig );
                if(tempConnection->OpenConnection() == ATMO_FALSE) {
                   pDynData->setAtmoConnection(tempConnection);
                   pDynData->UnLockCriticalSection();

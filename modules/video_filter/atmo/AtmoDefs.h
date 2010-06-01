@@ -114,8 +114,7 @@ enum AtmoConnectionType
       actNUL = 3,
       actMultiAtmo = 4,
       actMondolight = 5,
-      actMoMoLight = 6,
-      actFnordlicht = 7
+      actMoMoLight  = 6
 };
 static const char *AtmoDeviceTypes[] = {
       "Atmo-Classic",
@@ -124,10 +123,10 @@ static const char *AtmoDeviceTypes[] = {
       "Nul-Device",
       "Multi-Atmo",
       "Mondolight",
-      "MoMoLight",
-      "Fnordlicht"
+      "MoMoLight"
+
   };
-#define ATMO_DEVICE_COUNT 8
+#define ATMO_DEVICE_COUNT 7
 
 #if defined(_ATMO_VLC_PLUGIN_)
 enum EffectMode {
