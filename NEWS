@@ -19,6 +19,8 @@ Stream output:
 Changes between 1.0.5 and 1.1.0-pre1:
 ------------------------------------
 Important changes for users:
+ * On Linux, known bugs in the ALSA library might prevent audio output.
+   Update to alsa-lib 1.0.24 or later, or use the PulseAudio output instead.
 
 Important changes for packagers:
  * The module cache has moved to ${libdir}/vlc/. The module cache can now be
@@ -27,6 +29,13 @@ Important changes for packagers:
    by invoking 'vlc-cache-gen'. If the module cache is not present and vlc
    can't write in ${libdir}/vlc/, it will result it vlc taking a long time to
    launch each time.
+ * Most X11-related plugins now use XCB instead of Xlib. VLC now uses
+   - xproto,
+   - xcb, xcb-shm, xcb-xv, xcb-randr (from libxcb),
+   - xcb-keysyms (from xcb-utils),
+   - x11-xcb (from libx11) - only for GLX support.
+ * On X11 platforms, a _working_ version of xdg-screensaver is typically
+   required to inhibit the screensaver during video playback.
 
 Access:
  * Support for the sftp protocol
@@ -53,6 +62,7 @@ Decoders:
  * Improvements on the FLAC format (7.1 channels and 88.2/176.4/192 kHz support)
  * Direct rendering is always used with H.264 in avcodec module
  * Support for MPEG-4 ALS lossless audio codec
+ * Support for VP8 codec (source code version only)
 
 Demuxers:
  * Support for .aob files from DVD-Audio (MLP and LPCM) (Full disc support is NOT present yet)
@@ -60,6 +70,7 @@ Demuxers:
  * Support for TwinVQ (.vqf) and AMV (.amv) files
  * Various EGP improvements
  * Support for embedded subtitles in OpenDML and legacy .avi files
+ * Many fixes on Matroska support and support for webm format
 
 Playlist:
  * WPL and ZPL playlist support
