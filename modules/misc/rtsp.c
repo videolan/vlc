@@ -344,13 +344,13 @@ static void Close( vlc_object_t * p_this )
 
     while( block_FifoCount( p_sys->p_fifo_cmd ) > 0 )
     {
-         p_block_cmd = block_FifoGet( p_sys->p_fifo_cmd );
-         memcpy( &cmd, p_block_cmd->p_buffer, sizeof(cmd) );
-         block_Release( p_block_cmd );
-         if ( cmd.i_type == RTSP_CMD_TYPE_DEL )
-             MediaDel(p_vod, cmd.p_media);
-         free( cmd.psz_session );
-         free( cmd.psz_arg );
+        p_block_cmd = block_FifoGet( p_sys->p_fifo_cmd );
+        memcpy( &cmd, p_block_cmd->p_buffer, sizeof(cmd) );
+        block_Release( p_block_cmd );
+        if ( cmd.i_type == RTSP_CMD_TYPE_DEL )
+            MediaDel(p_vod, cmd.p_media);
+        free( cmd.psz_session );
+        free( cmd.psz_arg );
     }
     block_FifoRelease( p_sys->p_fifo_cmd );
 
@@ -921,23 +921,23 @@ static void RtspClientDel( vod_media_t *p_media, rtsp_client_t *p_rtsp )
 
 static float ParseNPT (const char *str)
 {
-     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
-     locale_t oldloc = uselocale (loc);
-     unsigned hour, min;
-     float sec;
+    locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
+    locale_t oldloc = uselocale (loc);
+    unsigned hour, min;
+    float sec;
 
-     if (sscanf (str, "%u:%u:%f", &hour, &min, &sec) == 3)
-         sec += ((hour * 60) + min) * 60;
-     else
-     if (sscanf (str, "%f", &sec) != 1)
-         sec = 0.;
+    if (sscanf (str, "%u:%u:%f", &hour, &min, &sec) == 3)
+        sec += ((hour * 60) + min) * 60;
+    else
+    if (sscanf (str, "%f", &sec) != 1)
+        sec = 0.;
 
-     if (loc != (locale_t)0)
-     {
-         uselocale (oldloc);
-         freelocale (loc);
-     }
-     return sec;
+    if (loc != (locale_t)0)
+    {
+        uselocale (oldloc);
+        freelocale (loc);
+    }
+    return sec;
 }
 
 
