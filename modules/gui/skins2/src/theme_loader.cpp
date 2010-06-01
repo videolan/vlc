@@ -77,7 +77,7 @@ bool ThemeLoader::load( const string &fileName )
 
     //Before all, let's see if the file is present
     struct stat p_stat;
-    if( vlc_stat( path.c_str(), &p_stat ) )
+    if( vlc_stat( fileName.c_str(), &p_stat ) )
         return false;
 
     // First, we try to un-targz the file, and if it fails we hope it's a XML
