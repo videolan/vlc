@@ -267,18 +267,6 @@ static int Control (stream_t *stream, int query, va_list args)
  */
 static int Open (stream_t *stream, const char *path)
 {
-    /* Verify file extension: discard .vlt files (skins) */
-    char *psz_ext = strrchr (stream->psz_path, '.');
-    if (psz_ext)
-    {
-        if (!strncasecmp(psz_ext, ".vlt", 4) ||
-            !strncasecmp(psz_ext, ".wsz", 4))
-        {
-            msg_Dbg (stream, "skipping skins package (*.vlt, *.wsz)");
-            return VLC_EGENERIC;
-        }
-    }
-
     stream_sys_t *p_sys = stream->p_sys = malloc (sizeof (*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
