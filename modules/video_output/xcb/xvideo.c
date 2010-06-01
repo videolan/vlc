@@ -329,6 +329,7 @@ static int Open (vlc_object_t *obj)
     }
 
     p_sys->window = xcb_generate_id (conn);
+    xcb_pixmap_t pixmap = xcb_generate_id (conn);
 
     /* Cache adaptors infos */
     xcb_xv_query_adaptors_reply_t *adaptors =
@@ -451,18 +452,37 @@ static int Open (vlc_object_t *obj)
         xcb_xv_format_t *f = xcb_xv_adaptor_info_formats (a);
         for (uint_fast16_t i = a->num_formats; i > 0; i--, f++)
         {
-            if (f->depth != depth)
+            if (f->depth != screen->root_depth)
                 continue; /* this would fail anyway */
 
-            const uint32_t mask =
+            uint32_t mask =
+                XCB_CW_BACK_PIXMAP |
+                XCB_CW_BACK_PIXEL |
+                XCB_CW_BORDER_PIXMAP |
+                XCB_CW_BORDER_PIXEL |
+                XCB_CW_EVENT_MASK |
+                XCB_CW_COLORMAP;
+            const uint32_t list[] = {
+                /* XCB_CW_BACK_PIXMAP */
+                pixmap,
+                /* XCB_CW_BACK_PIXEL */
+                screen->black_pixel,
+                /* XCB_CW_BORDER_PIXMAP */
+                pixmap,
+                /* XCB_CW_BORDER_PIXEL */
+                screen->black_pixel,
                 /* XCB_CW_EVENT_MASK */
-                XCB_EVENT_MASK_VISIBILITY_CHANGE;
+                XCB_EVENT_MASK_VISIBILITY_CHANGE,
+                /* XCB_CW_COLORMAP */
+                screen->default_colormap,
+            };
+
             xcb_void_cookie_t c;
 
+            xcb_create_pixmap (conn, f->depth, pixmap, screen->root, 1, 1);
             c = xcb_create_window_checked (conn, f->depth, p_sys->window,
                  p_sys->embed->handle.xid, 0, 0, 1, 1, 0,
-                 XCB_WINDOW_CLASS_INPUT_OUTPUT, f->visual,
-                 XCB_CW_EVENT_MASK, &mask);
+                 XCB_WINDOW_CLASS_INPUT_OUTPUT, f->visual, mask, list);
 
             if (!CheckError (vd, conn, "cannot create X11 window", c))
             {
