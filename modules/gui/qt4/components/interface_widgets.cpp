@@ -593,7 +593,8 @@ void CoverArtLabel::showArtUpdate( const QString& url )
     if( !url.isEmpty() && pix.load( url ) )
     {
         pix = pix.scaled( maximumWidth(), maximumHeight(),
-                          Qt::KeepAspectRatioByExpanding );
+                          Qt::KeepAspectRatioByExpanding,
+                          Qt::SmoothTransformation );
     }
     else
     {
