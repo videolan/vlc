@@ -86,7 +86,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
                             p_parent ? p_parent->i_id : -1,
                             !( i_flags & PLAYLIST_NO_REBUILD ));
 
-    p_item->i_flags |= i_flags
+    p_item->i_flags |= i_flags;
 
     return p_item;
 }
