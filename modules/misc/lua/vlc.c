@@ -58,6 +58,16 @@
 
 #define CONFIG_TEXT N_("Lua interface configuration")
 #define CONFIG_LONGTEXT N_("Lua interface configuration string. Format is: '[\"<interface module name>\"] = { <option> = <value>, ...}, ...'.")
+#define HOST_TEXT N_( "Host address" )
+#define HOST_LONGTEXT N_( \
+    "Address and port the HTTP interface will listen on. It defaults to " \
+    "all network interfaces (0.0.0.0)." \
+    " If you want the HTTP interface to be available only on the local " \
+    "machine, enter 127.0.0.1" )
+#define SRC_TEXT N_( "Source directory" )
+#define SRC_LONGTEXT N_( "Source directory" )
+#define INDEX_TEXT N_( "Directory index" )
+#define INDEX_LONGTEXT N_( "Allow to build directory index" )
 
 static int vlc_sd_probe_Open( vlc_object_t * );
 
@@ -78,6 +88,10 @@ vlc_module_begin ()
                     INTF_TEXT, INTF_LONGTEXT, false )
         add_string( "lua-config", "", NULL,
                     CONFIG_TEXT, CONFIG_LONGTEXT, false )
+        set_section( N_("Lua HTTP" ), 0 )
+            add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, true )
+            add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  true )
+            add_bool   ( "http-index", false, NULL, INDEX_TEXT, INDEX_LONGTEXT, true )
         set_callbacks( Open_LuaIntf, Close_LuaIntf )
 
     add_submodule ()

@@ -212,8 +212,50 @@ int Open_LuaIntf( vlc_object_t *p_this )
         goto error;
     }
 
-    psz_config = var_CreateGetString( p_intf, "lua-config" );
-    if( psz_config && *psz_config )
+    /*
+     * Get the lua-config string.
+     * If the string is empty, try with the old http-* options and build the righr line
+     */
+    psz_config = var_CreateGetNonEmptyString( p_intf, "lua-config" );
+    if( !psz_config && !strcmp( psz_name, "http" ) )
+    {
+        char *psz_http_host = var_CreateGetNonEmptyString( p_intf, "http-host" );
+        char *psz_http_src = var_CreateGetNonEmptyString( p_intf, "http-src" );
+        bool b_http_index = var_CreateGetBool( p_intf, "http-index" );
+        if( psz_http_host )
+        {
+            char *psz_esc = config_StringEscape( psz_http_host );
+            asprintf( &psz_config, "http={host='%s'", psz_esc );
+            free( psz_esc );
+            free( psz_http_host );
+        }
+        if( psz_http_src )
+        {
+            char *psz_esc = config_StringEscape( psz_http_src );
+            if( psz_config )
+            {
+                char *psz_tmp;
+                asprintf( &psz_tmp, "%s,dir='%s'", psz_config, psz_esc );
+                free( psz_config );
+                psz_config = psz_tmp;
+            }
+            else
+                asprintf( &psz_config, "http={dir='%s'", psz_esc );
+            free( psz_esc );
+            free( psz_http_src );
+        }
+        if( psz_config )
+        {
+            char *psz_tmp;
+            asprintf( &psz_tmp, "%s,no_index=%s}", psz_config, b_http_index ? "true" : "false" );
+            free( psz_config );
+            psz_config = psz_tmp;
+        }
+        else
+            asprintf( &psz_config, "http={no_index=%s}", b_http_index ? "true" : "false" );
+    }
+
+    if( psz_config )
     {
         char *psz_buffer;
         if( asprintf( &psz_buffer, "config={%s}", psz_config ) != -1 )
@@ -233,8 +275,8 @@ int Open_LuaIntf( vlc_object_t *p_this )
                 }
             }
         }
+        free( psz_config );
     }
-    free( psz_config );
 
     if( b_config_set == false )
     {
