@@ -1269,7 +1269,11 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     int i_nal=0, i_out=0, i=0;
 
     /* init pic */
+#if X264_BUILD >= 98
+    x264_picture_init( &pic );
+#else
     memset( &pic, 0, sizeof( x264_picture_t ) );
+#endif
     if( likely(p_pict) ) {
        pic.i_pts = p_pict->date;
        pic.img.i_csp = X264_CSP_I420;
