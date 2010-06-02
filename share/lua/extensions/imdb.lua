@@ -20,11 +20,25 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
 
-dlg = nil
-txt = nil
+-- TODO: Use simplexml module to simplify parsing
+
+-- Global variables
+url = nil          -- string
+title = nil        -- string
+titles = {}        -- table, see code below
+
+-- Some global variables: widgets
+dlg = nil          -- dialog
+txt = nil          -- text field
+list = nil         -- list widget
+button_open = nil  -- button widget
+html = nil         -- rich text (HTML) widget
+waitlbl = nil      -- text label widget
+
+-- Script descriptor, called when the extensions are scanned
 function descriptor()
     return { title = "IMDb - The Internet Movie Database" ;
-             version = "0.1" ;
+             version = "1.0" ;
              author = "Jean-Philippe André" ;
              url = 'http://www.imdb.org/';
              shortdesc = "The Internet Movie Database";
@@ -36,38 +50,47 @@ function descriptor()
              capabilities = { "input-listener" } }
 end
 
+-- Remove trailing & leading spaces
+function trim(str)
+    if not str then return "" end
+    return string.gsub(str, "^%s*(.*)+%s$", "%1")
+end
+
 -- Update title text field. Removes file extensions.
 function update_title()
     local item = vlc.input.item()
-    local title = item and item:name()
-    if title ~= nil then
-        title = string.gsub(title, "(.*)(%.%w+)$", "%1")
+    local name = item and item:name()
+    if name ~= nil then
+        name = string.gsub(name, "(.*)(%.%w+)$", "%1")
     end
-    if title ~= nil then
-        txt:set_text(title)
+    if name ~= nil then
+        txt:set_text(trim(name))
     end
 end
 
+-- Function called when the input (media being read) changes
 function input_changed()
     update_title()
 end
 
-function create_dialog()
-    dlg = vlc.dialog("IMDb Search")
-    dlg:add_label("The Internet Movie Database", 1, 1, 4, 1)
-    dlg:add_label("<b>Movie Title</b>", 1, 2, 1, 1)
-    local item = vlc.input.item()
-    txt = dlg:add_text_input(item and item:name() or "", 2, 2, 1, 1)
-    dlg:add_button("Okay", click_okay, 3, 2, 1, 1)
-    dlg:add_button("*", update_title, 4, 2, 1, 1)
-    dlg:show() -- Show, if not already visible
-end
-
+-- First function to be called when the extension is activated
 function activate()
     create_dialog()
 end
 
+-- This function is called when the extension is disabled
 function deactivate()
+end
+
+-- Create the main dialog with a simple search bar
+function create_dialog()
+    dlg = vlc.dialog("IMDb")
+    dlg:add_label("<b>Movie Title:</b>", 1, 1, 1, 1)
+    local item = vlc.input.item()
+    txt = dlg:add_text_input(item and item:name() or "", 2, 1, 1, 1)
+    dlg:add_button("Search", click_okay, 3, 1, 1, 1)
+    -- Show, if not already visible
+    dlg:show()
 end
 
 -- Dialog closed
@@ -76,53 +99,125 @@ function close()
     vlc.deactivate()
 end
 
--- Some global variables: widgets
-list = nil
-button_open = nil
-titles = nil
-html = nil
-
+-- Called when the user presses the "Search" button
 function click_okay()
-    vlc.msg.dbg("Searching for " .. txt:get_text() .. " on IMDb")
+    vlc.msg.dbg("[IMDb] Searching for " .. txt:get_text())
 
+    -- Search IMDb: build URL
+    title = string.gsub(string.gsub(txt:get_text(), "[%p%s%c]", "+"), "%++", " ")
+    url = "http://www.imdb.com/find?s=all&q=" .. string.gsub(title, " ", "+")
+
+    -- Recreate dialog structure: delete useless widgets
     if html then
         dlg:del_widget(html)
         html = nil
     end
 
-    if not list then
-        list = dlg:add_list(1, 3, 4, 1)
-        button_open = dlg:add_button("Open", click_open, 1, 4, 4, 1)
+    if list then
+        dlg:del_widget(list)
+        dlg:del_widget(button_open)
+        list = nil
+        button_open = nil
     end
 
-    -- Clear previous results
-    list:clear()
+    -- Ask the user to wait some time...
+    local waitmsg = 'Searching for <a href="' .. url .. '">' .. title .. "</a> on IMDb..."
+    if not waitlbl then
+        waitlbl = dlg:add_label(waitmsg, 1, 2, 3, 1)
+    else
+        waitlbl:set_text(waitmsg)
+    end
+    dlg:update()
 
-    -- Search IMDb
-    local url = "http://www.imdb.com/find?s=all&q="
-    local title = string.gsub(txt:get_text(), " ", "+")
-    local s, msg = vlc.stream(url .. title)
+    -- Download the data
+    local s, msg = vlc.stream(url)
     if not s then
-        vlc.msg.warn(msg)
+        vlc.msg.warn("[IMDb] " .. msg)
+        waitlbl:set_text('Sorry, an error occured while searching for <a href="'
+                         .. url .. '">' .. title .. "</a>.<br />Please try again later.")
         return
     end
 
     -- Fetch HTML data
     local data = s:read(65000)
+    if not data then
+        vlc.msg.warn("[IMDb] Not data received!")
+        waitlbl:set_text('Sorry, an error occured while searching for <a href="'
+                         .. url .. '">' .. title .. "</a>.<br />Please try again later.")
+        return
+    end
+
+    -- Probe result & parse it
+    if string.find(data, "<h6>Overview</h6>") then
+        -- We found a direct match
+        parse_moviepage(data)
+    else
+        -- We have a list of results to parse
+        parse_resultspage(data)
+    end
+end
+
+-- Called when clicked on the "Open" button
+function click_open()
+    -- Get user selection
+    selection = list:get_selection()
+    if not selection then return end
+
+    local sel = nil
+    for idx, selectedItem in pairs(selection) do
+        sel = idx
+        break
+    end
+    if not sel then return end
+    local imdbID = titles[sel].id
+
+    -- Update information message
+    url = "http://www.imdb.org/title/" .. imdbID .. "/"
+    title = titles[sel].title
+
+    dlg:del_widget(list)
+    dlg:del_widget(button_open)
+    list = nil
+    button_open = nil
+    waitlbl:set_text("Loading IMDb page for <a href=\"" .. url .. "\">" .. title .. "</a>.")
+    dlg:update()
+
+    local s, msg = vlc.stream(url)
+    if not s then
+        waitlbl:set_text('Sorry, an error occured while looking for <a href="'
+                         .. url .. '">' .. title .. "</a>.")
+        vlc.msg.warn("[IMDb] " .. msg)
+        return
+    end
+
+    data = s:read(65000)
+    if data and string.find(data, "<h6>Overview</h6>") then
+        parse_moviepage(data)
+    else
+        waitlbl:set_text('Sorry, no results found for <a href="'
+                         .. url .. '">' .. title .. "</a>.")
+    end
+end
+
+-- Parse the results page and find titles, years & URL's
+function parse_resultspage(data)
+    vlc.msg.dbg("[IMDb] Analysing results page")
 
     -- Find titles
     titles = {}
     local count = 0
 
-    idxEnd = 1
+    local idxEnd = 1
     while idxEnd ~= nil do
         -- Find title types
+        local titleType = nil
         _, idxEnd, titleType = string.find(data, "<b>([^<]*Titles[^<]*)</b>", idxEnd)
-        _, _, nextTitle = string.find(data, "<b>([^<]*Titles[^<]*)</b>", idxEnd)
+        local _, _, nextTitle = string.find(data, "<b>([^<]*Titles[^<]*)</b>", idxEnd)
         if not titleType then
             break
         else
             -- Find current scope
+            local table = nil
             if not nextTitle then
                 _, _, table = string.find(data, "<table>(.*)</table>", idxEnd)
             else
@@ -130,62 +225,58 @@ function click_okay()
                 nextTitle = string.gsub(nextTitle, "%)", "%%)")
                 _, _, table = string.find(data, "<table>(.*)</table>.*"..nextTitle, idxEnd)
             end
-            -- Find all titles in this scope
+
             if not table then break end
-            pos = 0
+            local pos = 0
+            local thistitle = nil
+
+            -- Find all titles in this scope
             while pos ~= nil do
-                _, _, link = string.find(table, "<a href=\"([^\"]+title[^\"]+)\"", pos)
+                local _, _, link = string.find(table, "<a href=\"([^\"]+title[^\"]+)\"", pos)
                 if not link then break end -- this would not be normal behavior...
-                _, pos, title = string.find(table, "<a href=\"" .. link .. "\"[^>]*>([^<]+)</a>", pos)
-                if not title then break end -- this would not be normal behavior...
-                _, _, year = string.find(table, "\((%d+)\)", pos)
+                _, pos, thistitle = string.find(table, "<a href=\"" .. link .. "\"[^>]*>([^<]+)</a>", pos)
+                if not thistitle then break end -- this would not be normal behavior...
+                local _, _, year = string.find(table, "\((%d+)\)", pos)
                 -- Add this title to the list
                 count = count + 1
-                _, _, imdbID = string.find(link, "/([^/]+)/$")
-                title = replace_html_chars(title)
-                titles[count] = { id = imdbID ; title = title ; year = year ; link = link }
+                local _, _, imdbID = string.find(link, "/([^/]+)/$")
+                thistitle = replace_html_chars(thistitle)
+                titles[count] = { id = imdbID ; title = thistitle ; year = year ; link = link }
             end
         end
     end
 
-    for idx, title in ipairs(titles) do
-        list:add_value("[" .. title.id .. "] " .. title.title .. " (" .. title.year .. ")", idx)
-    end
-end
-
-function click_open()
-    selection = list:get_selection()
-    if not selection then return 1 end
-    if not html then
-        html = dlg:add_html("Loading IMDb page...", 1, 3, 4, 1)
-        -- userLink = dlg:add_label("", 1, 4, 5, 1)
-    end
-
-    dlg:del_widget(list)
-    dlg:del_widget(button_open)
-    list = nil
-    button_open = nil
-
-    local sel = nil
-    for idx, selectedItem in pairs(selection) do
-        sel = idx
-        break
-    end
-    imdbID = titles[sel].id
-    url = "http://www.imdb.org/title/" .. imdbID .. "/"
-
-    -- userLink:set_text("<a href=\"url\">" .. url .. "</a>")
-
-    local s, msg = vlc.stream(url)
-    if not s then
-        vlc.msg.warn(msg)
+    -- Did we find anything at all?
+    if not count or count == 0 then
+        waitlbl:set_text('Sorry, no results found for <a href="'
+                         .. url .. '">' .. title .. "</a>.")
         return
     end
 
-    data = s:read(65000)
+    -- Sounds good, we found some results, let's display them
+    waitlbl:set_text(count .. " results found for <a href=\"" .. url .. "\">" .. title .. "</a>.")
+    list = dlg:add_list(1, 3, 3, 1)
+    button_open = dlg:add_button("Open", click_open, 3, 4, 1, 1)
 
-    text = "<h1>" .. titles[sel].title .. " (" .. titles[sel].year .. ")</h1>"
+    for idx, title in ipairs(titles) do
+        --list:add_value("[" .. title.id .. "] " .. title.title .. " (" .. title.year .. ")", idx)
+        list:add_value(title.title .. " (" .. title.year .. ")", idx)
+    end
+end
+
+-- Parse a movie description page
+function parse_moviepage(data)
+    -- Title & year
+    title = string.gsub(data, "^.*<title>(.*)</title>.*$", "%1")
+    local text = "<h1>" .. title .. "</h1>"
     text = text .. "<h2>Overview</h2><table>"
+
+    -- Real URL
+    url = string.gsub(data, "^.*<link rel=\"canonical\" href=\"([^\"]+)\".*$", "%1")
+    local imdbID = string.gsub(url, "^.*/title/([^/]+)/.*$", "%1")
+    if imdbID then
+        url = "http://www.imdb.org/title/" .. imdbID .. "/"
+    end
 
     -- Director
     local director = nil
@@ -213,7 +304,7 @@ function click_open()
 
     -- List main actors
     local actors = "<tr><td><b>Cast</b></td>"
-    first = true
+    local first = true
     for nm, char in string.gmatch(data, "<td class=\"nm\"><a[^>]+>([%w%s]+)</a></td><td class=\"ddd\"> ... </td><td class=\"char\"><a[^>]+>([%w%s]+)</a>") do
         if not first then
             actors = actors .. "<tr><td />"
@@ -223,13 +314,21 @@ function click_open()
     end
     text = text .. actors .. "</table>"
 
+    waitlbl:set_text("<center><a href=\"" .. url .. "\">" .. title .. "</a></center>")
+    if list then
+        dlg:del_widget(list)
+        dlg:del_widget(button_open)
+    end
+    html = dlg:add_html(text .. "<br />Loading summary...", 1, 3, 3, 1)
+    dlg:update()
+
     text = text .. "<h2>Plot Summary</h2>"
-    s, msg = vlc.stream(url .. "plotsummary")
+    local s, msg = vlc.stream(url .. "plotsummary")
     if not s then
-        vlc.msg.warn(msg)
+        vlc.msg.warn("[IMDb] " .. msg)
         return
     end
-    data = s:read(65000)
+    local data = s:read(65000)
 
     -- We read only the first summary
     _, _, summary = string.find(data, "<p class=\"plotpar\">([^<]+)")
