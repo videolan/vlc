@@ -1640,6 +1640,7 @@ vlc_module_begin ()
     add_string( "x11-display", NULL, NULL,
                 DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
         add_deprecated_alias( "xvideo-display" ) /* deprecated since 1.1.0 */
+        add_deprecated_alias( "glx-display" )
     add_bool( "drop-late-frames", 1, NULL, DROP_LATE_FRAMES_TEXT,
               DROP_LATE_FRAMES_LONGTEXT, true )
     /* Used in vout_synchro */
