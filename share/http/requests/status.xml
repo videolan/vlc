@@ -101,7 +101,7 @@
     <vlc id="rpn" param1="val value vlc_seek" />
   <vlc id="end"/>
   <vlc id="if" param1="command value 'key' strcmp 0 =" />
-    <vlc id="rpn" param1="'key-' val value strcat 'VLC_OBJECT_VLC' vlc_var_get key-pressed 'VLC_OBJECT_VLC' vlc_var_set" />
+    <vlc id="rpn" param1="'key-' val value strcat 'VLC_OBJECT_LIBVLC' vlc_var_get key-pressed 'VLC_OBJECT_LIBVLC' vlc_var_set" />
   <vlc id="end"/>
 
 <vlc id="end" />
