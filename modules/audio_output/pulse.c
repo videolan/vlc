@@ -124,7 +124,7 @@ static int Open ( vlc_object_t *p_this )
 #ifdef X_DISPLAY_MISSING
 # error Xlib required due to PulseAudio bug 799!
 #else
-    if( !XInitThreads() )
+    if( !var_InheritBool( p_this, "xlib" ) || !XInitThreads() )
         return VLC_EGENERIC;
 #endif
     /* Allocate structures */

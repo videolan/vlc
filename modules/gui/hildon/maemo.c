@@ -80,7 +80,7 @@ static int Open( vlc_object_t *p_this )
     intf_sys_t *p_sys;
     vlc_value_t val;
 
-    if( !XInitThreads() )
+    if( !var_InheritBool( p_this, "xlib" ) || !XInitThreads() )
         return VLC_EGENERIC;
 
     /* Allocate instance and initialize some members */

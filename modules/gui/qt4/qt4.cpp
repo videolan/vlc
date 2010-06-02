@@ -283,7 +283,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
 #ifdef Q_WS_X11
-    if( !XInitThreads() )
+    if( !var_InheritBool( p_this, "xlib" ) || !XInitThreads() )
         return VLC_EGENERIC;
 
     char *display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
