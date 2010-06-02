@@ -61,8 +61,14 @@ protected:
     int             m_scaleFactor;
     int             m_duration;
 
+private:
+    QGraphicsRectItem* m_overlay;
+
 public slots:
     void eventFocused( EPGEvent * );
+private slots:
+    void updateOverlayPosition( int value );
+    void sceneRectChanged( const QRectF& rect );
 };
 
 #endif // EPGVIEW_H

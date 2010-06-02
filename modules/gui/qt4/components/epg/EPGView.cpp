@@ -26,19 +26,41 @@
 
 #include <QDateTime>
 #include <QMatrix>
+#include <QPaintEvent>
+#include <QScrollBar>
 #include <QtDebug>
+#include <QGraphicsTextItem>
 
 EPGView::EPGView( QWidget *parent ) : QGraphicsView( parent )
 {
     setContentsMargins( 0, 0, 0, 0 );
     setFrameStyle( QFrame::NoFrame );
     setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
 
     m_startTime = QDateTime::currentDateTime();
 
     QGraphicsScene *EPGscene = new QGraphicsScene( this );
 
     setScene( EPGscene );
+
+    connect( horizontalScrollBar(), SIGNAL( valueChanged(int) ),
+             this, SLOT( updateOverlayPosition(int) ) );
+
+    m_overlay = EPGscene->addRect( 0, 0, 100, 1, QPen(), QBrush( QColor( 40, 86, 255, 220 ) ) );
+    m_overlay->setFlag( QGraphicsItem::ItemIgnoresTransformations );
+    m_overlay->setZValue( 100 );
+
+    sceneRectChanged( scene()->sceneRect() );
+
+    connect( scene(), SIGNAL( sceneRectChanged(QRectF) ),
+             this, SLOT( sceneRectChanged(QRectF) ) );
+}
+
+void EPGView::updateOverlayPosition( int value )
+{
+    int pos = value * matrix().inverted().m11();
+    m_overlay->setPos( pos, 0 );
 }
 
 void EPGView::setScale( double scaleFactor )
@@ -57,7 +79,8 @@ void EPGView::setStartTime( const QDateTime& startTime )
 
     for ( int i = 0; i < itemList.count(); ++i )
     {
-        EPGItem* item = static_cast<EPGItem*>( itemList.at( i ) );
+        EPGItem* item = dynamic_cast<EPGItem*>( itemList.at( i ) );
+        if ( !item ) continue;
         item->setStart( item->start().addSecs( diff ) );
     }
 
@@ -75,7 +98,13 @@ const QDateTime& EPGView::startTime()
 void EPGView::addEvent( EPGEvent* event )
 {
     if ( !m_channels.contains( event->channelName ) )
+    {
         m_channels.append( event->channelName );
+        QGraphicsTextItem* channelTitle = new QGraphicsTextItem( event->channelName, m_overlay );
+        channelTitle->setZValue( 101 );
+        channelTitle->setPos( 0, m_channels.indexOf( event->channelName ) * TRACKS_HEIGHT );
+        channelTitle->setTextWidth( 100 );
+    }
 
     EPGItem* item = new EPGItem( this );
     item->setChannel( m_channels.indexOf( event->channelName ) );
@@ -123,7 +152,8 @@ void EPGView::updateDuration()
 
     for ( int i = 0; i < list.count(); ++i )
     {
-        EPGItem* item = static_cast<EPGItem*>( list.at( i ) );
+        EPGItem* item = dynamic_cast<EPGItem*>( list.at( i ) );
+        if ( !item ) continue;
         QDateTime itemEnd = item->start().addSecs( item->duration() );
 
         if ( itemEnd > lastItem )
@@ -136,4 +166,9 @@ void EPGView::updateDuration()
 void EPGView::eventFocused( EPGEvent *ev )
 {
     emit eventFocusedChanged( ev );
+}
+
+void EPGView::sceneRectChanged( const QRectF& rect )
+{
+    m_overlay->setRect( 0, 0, m_overlay->rect().width(), rect.height() );
 }
