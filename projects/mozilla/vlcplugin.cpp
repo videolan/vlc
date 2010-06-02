@@ -361,7 +361,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     ppsz_argv[ppsz_argc++] = "--no-media-library";
     ppsz_argv[ppsz_argc++] = "--intf=dummy";
     ppsz_argv[ppsz_argc++] = "--no-video-title-show";
-    ppsz_argv[ppsz_args++] = "--no-xlib";
+    ppsz_argv[ppsz_argc++] = "--no-xlib";
 
     const char *progid = NULL;
 
