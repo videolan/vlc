@@ -118,11 +118,10 @@ void ExtensionsManager::unloadExtensions()
     if( !p_extensions_manager )
         return;
     b_unloading = true;
+    ExtensionsDialogProvider::killInstance();
     module_unneed( p_extensions_manager, p_extensions_manager->p_module );
     vlc_object_release( p_extensions_manager );
     p_extensions_manager = NULL;
-    emit extensionsUpdated();
-    ExtensionsDialogProvider::killInstance();
 }
 
 void ExtensionsManager::reloadExtensions()

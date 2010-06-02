@@ -121,8 +121,8 @@ ExtensionDialog* ExtensionsDialogProvider::UpdateExtDialog(
         dialog->has_lock = true;
         dialog->UpdateWidgets();
         if( strcmp( qtu( dialog->windowTitle() ),
-	            p_dialog->psz_title ) != 0 )
-	    dialog->setWindowTitle( qfu( p_dialog->psz_title ) );
+                    p_dialog->psz_title ) != 0 )
+            dialog->setWindowTitle( qfu( p_dialog->psz_title ) );
         dialog->has_lock = false;
         dialog->setVisible( !p_dialog->b_hide );
     }
@@ -207,11 +207,6 @@ ExtensionDialog::ExtensionDialog( intf_thread_t *_p_intf,
 ExtensionDialog::~ExtensionDialog()
 {
     msg_Dbg( p_intf, "Deleting extension dialog '%s'", qtu(windowTitle()) );
-    /* Delete all widgets */
-    extension_widget_t *p_widget;
-    p_dialog->b_kill = true;
-    p_dialog->p_sys_intf = NULL;
-    vlc_cond_signal( &p_dialog->cond );
 }
 
 QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
