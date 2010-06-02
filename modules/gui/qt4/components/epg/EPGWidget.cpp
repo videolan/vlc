@@ -27,35 +27,23 @@
 
 #include "EPGWidget.hpp"
 
-#include <QGridLayout>
+#include <QVBoxLayout>
 #include <QScrollBar>
 #include <QDebug>
 #include <QLabel>
 #include "qt4.hpp"
 
-ChannelsWidget::ChannelsWidget( QWidget *parent ) : QWidget( parent )
-{
-    setContentsMargins( 0, 0, 0, 0 );
-    setMaximumWidth( 50 );
-    setFocusPolicy( Qt::ClickFocus );
-}
-
 EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
 {
-    QGridLayout* layout = new QGridLayout( this );
-
     m_rulerWidget = new EPGRuler( this );
-    m_channelsWidget = new ChannelsWidget( this );
     m_epgView = new EPGView( this );
-
-    m_channelsWidget->setMinimumWidth( 40 );
 
     m_epgView->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
     setZoom( 1 );
 
-    layout->addWidget( m_rulerWidget,       0, 1 );
-    layout->addWidget( m_channelsWidget,    1, 0 );
-    layout->addWidget( m_epgView,           1, 1 );
+    QVBoxLayout* layout = new QVBoxLayout( this );
+    layout->addWidget( m_rulerWidget );
+    layout->addWidget( m_epgView );
     layout->setSpacing( 0 );
     setLayout( layout );
 

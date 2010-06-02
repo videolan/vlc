@@ -36,13 +36,6 @@
 
 class QDateTime;
 
-class ChannelsWidget : public QWidget
-{
-    Q_OBJECT
-public:
-    explicit ChannelsWidget( QWidget* parent = 0 );
-};
-
 class EPGWidget : public QWidget
 {
     Q_OBJECT
@@ -54,7 +47,6 @@ public slots:
     void updateEPG( vlc_epg_t **pp_epg, int i_epg );
 
 private:
-    ChannelsWidget* m_channelsWidget;
     EPGRuler* m_rulerWidget;
     EPGView* m_epgView;
 
