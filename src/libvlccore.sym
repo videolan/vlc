@@ -473,7 +473,6 @@ video_format_Setup
 video_format_Print
 video_splitter_Delete
 video_splitter_New
-vlc_avcodec_mutex
 vlc_b64_decode
 vlc_b64_decode_binary
 vlc_b64_decode_binary_to_buffer
