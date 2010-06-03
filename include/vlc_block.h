@@ -48,7 +48,7 @@
  * - p_buffer: pointer over datas. You should never overwrite it, you can
  *   only incremment it to skip datas, in others cases use block_Realloc
  *   (don't duplicate yourself in a bigger buffer, block_Realloc is
- *   optimised for prehader/postdatas increase)
+ *   optimised for preheader/postdatas increase)
  ****************************************************************************/
 typedef struct block_sys_t block_sys_t;
 
