@@ -233,3 +233,24 @@ void vlc_thread_cancel (vlc_object_t *obj)
     if (priv->b_thread)
         vlc_cancel (priv->thread_id);
 }
+
+/*** Global locks ***/
+
+void vlc_global_mutex (unsigned n, bool acquire)
+{
+    static vlc_mutex_t locks[] = {
+        VLC_STATIC_MUTEX,
+        VLC_STATIC_MUTEX,
+    };
+    assert (n < (sizeof (locks) / sizeof (locks[0])));
+    vlc_mutex_t *lock = locks + n;
+
+    if (acquire)
+        vlc_mutex_lock (lock);
+    else
+        vlc_mutex_unlock (lock);
+
+    /* Compile-time assertion ;-) */
+    char enough_locks[(sizeof (locks) / sizeof (locks[0])) - VLC_MAX_MUTEX];
+    (void) enough_locks;
+}
