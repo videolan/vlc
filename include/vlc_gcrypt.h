@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_gcrypt.h: VLC thread support for gcrypt
  *****************************************************************************
- * Copyright (C) 2004-2008 Rémi Denis-Courmont
+ * Copyright (C) 2004-2010 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,14 +90,13 @@ static inline void vlc_gcrypt_init (void)
      * plugins linking with gcrypt, and some underlying libraries may use it
      * behind our back. Only way is to always link gcrypt statically (ouch!) or
      * have upstream gcrypt provide one shared object per threading system. */
-    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
     static bool done = false;
 
-    vlc_mutex_lock (&lock);
+    vlc_global_lock (VLC_GCRYPT_MUTEX);
     if (!done)
     {
         gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_vlc);
         done = true;
     }
-    vlc_mutex_unlock (&lock);
+    vlc_global_unlock (VLC_GCRYPT_MUTEX);
 }
