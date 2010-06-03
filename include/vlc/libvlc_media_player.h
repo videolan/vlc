@@ -551,7 +551,7 @@ VLC_PUBLIC_API int libvlc_get_fullscreen( libvlc_media_player_t *p_mi );
  * for the X window ID of the video widget, then LibVLC will not be able to
  * handle key presses and mouse clicks in any case.
  *
- * \warning This function is only implemented for X11 at the moment.
+ * \warning This function is only implemented for X11 and Win32 at the moment.
  *
  * \param p_mi the media player
  * \param on true to handle key press events, false to ignore them.
@@ -566,7 +566,7 @@ void libvlc_video_set_key_input( libvlc_media_player_t *p_mi, unsigned on );
  *
  * \note See also libvlc_video_set_key_input().
  *
- * \warning This function is only implemented for X11 at the moment.
+ * \warning This function is only implemented for X11 and Win32 at the moment.
  *
  * \param p_mi the media player
  * \param on true to handle mouse click events, false to ignore them.
