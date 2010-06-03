@@ -128,6 +128,7 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
         goto error;
     }
 
+    vlc_mutex_lock( &lock );
 #if defined( __APPLE__ ) || defined( WIN32 )
     /* Hack to get Mac OS X Cocoa runtime running
      * (it needs access to the main thread) */
