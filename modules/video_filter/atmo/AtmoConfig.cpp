@@ -44,6 +44,10 @@ CAtmoConfig::CAtmoConfig()
   m_AtmoZoneDefCount = -1;
   m_DMX_BaseChannels = NULL;
 
+  m_chWhiteAdj_Red   = NULL;
+  m_chWhiteAdj_Green = NULL;
+  m_chWhiteAdj_Blue  = NULL;
+
   LoadDefaults();
 }
 
@@ -58,6 +62,10 @@ CAtmoConfig::~CAtmoConfig() {
      delete m_ZoneDefinitions;
      m_ZoneDefinitions = NULL;
    }
+
+   delete []m_chWhiteAdj_Red;
+   delete []m_chWhiteAdj_Green;
+   delete []m_chWhiteAdj_Blue;
 
    free( m_DMX_BaseChannels );
 
@@ -99,8 +107,6 @@ void CAtmoConfig::LoadDefaults() {
 
     m_UpdateEdgeWeightningFlag = 0;
 
-
-
     m_Software_gamma_mode = agcNone;
     m_Software_gamma_red    = 10;
     m_Software_gamma_green  = 10;
@@ -110,18 +116,29 @@ void CAtmoConfig::LoadDefaults() {
     m_WhiteAdjustment_Red    = 255;
     m_WhiteAdjustment_Green  = 255;
     m_WhiteAdjustment_Blue   = 255;
-	m_UseSoftwareWhiteAdj    = 1;
+    m_UseSoftwareWhiteAdj    = 1;
 
-	m_ColorChanger_iSteps    = 50;
-	m_ColorChanger_iDelay    = 25;
+    m_WhiteAdjPerChannel = ATMO_FALSE;
+    m_chWhiteAdj_Count = 0;
 
-	m_LrColorChanger_iSteps  = 50;
-	m_LrColorChanger_iDelay  = 25;
+    delete []m_chWhiteAdj_Red;
+    delete []m_chWhiteAdj_Green;
+    delete []m_chWhiteAdj_Blue;
+
+    m_chWhiteAdj_Red   = NULL;
+    m_chWhiteAdj_Green = NULL;
+    m_chWhiteAdj_Blue  = NULL;
+
+    m_ColorChanger_iSteps    = 50;
+    m_ColorChanger_iDelay    = 25;
+
+    m_LrColorChanger_iSteps  = 50;
+    m_LrColorChanger_iDelay  = 25;
 
     m_IsSetShutdownColor     = 1;
-	m_ShutdownColor_Red      = 0;
-	m_ShutdownColor_Green    = 0;
-	m_ShutdownColor_Blue     = 0;
+    m_ShutdownColor_Red      = 0;
+    m_ShutdownColor_Green    = 0;
+    m_ShutdownColor_Blue     = 0;
 
     m_StaticColor_Red        = 127; // ??
     m_StaticColor_Green      = 192;
@@ -145,6 +162,7 @@ void CAtmoConfig::LoadDefaults() {
     m_LiveView_DisplayNr        = 0;
     m_LiveView_FrameDelay       = 30;
     m_LiveView_GDI_FrameRate    = 25;
+    m_LiveView_RowsPerFrame     = 0;
 
 
     m_Hardware_global_gamma    = 128;
@@ -161,13 +179,13 @@ void CAtmoConfig::LoadDefaults() {
     m_DMX_RGB_Channels        = 5; // so wie atmolight
 
     m_MoMo_Channels           = 3; // default momo, there exists also a 4 ch version!
+    m_Fnordlicht_Amount       = 2; // default fnordlicht, there are 2 fnordlicht's!
 
     m_ZonesTopCount            = 1;
     m_ZonesBottomCount         = 1;
     m_ZonesLRCount             = 1;
     m_ZoneSummary              = ATMO_FALSE;
     UpdateZoneCount();
-
 
     clearAllChannelMappings();
     m_CurrentChannelAssignment = 0;
@@ -201,6 +219,25 @@ void CAtmoConfig::Assign(CAtmoConfig *pAtmoConfigSrc) {
     this->m_WhiteAdjustment_Blue     = pAtmoConfigSrc->m_WhiteAdjustment_Blue;
     this->m_UseSoftwareWhiteAdj      = pAtmoConfigSrc->m_UseSoftwareWhiteAdj;
 
+    this->m_WhiteAdjPerChannel       = pAtmoConfigSrc->m_WhiteAdjPerChannel;
+    this->m_chWhiteAdj_Count         = pAtmoConfigSrc->m_chWhiteAdj_Count;
+    delete []m_chWhiteAdj_Red;
+    delete []m_chWhiteAdj_Green;
+    delete []m_chWhiteAdj_Blue;
+    if(m_chWhiteAdj_Count > 0)
+    {
+       m_chWhiteAdj_Red   = new int[ m_chWhiteAdj_Count ];
+       m_chWhiteAdj_Green = new int[ m_chWhiteAdj_Count ];
+       m_chWhiteAdj_Blue  = new int[ m_chWhiteAdj_Count ];
+       memcpy(m_chWhiteAdj_Red, pAtmoConfigSrc->m_chWhiteAdj_Red, sizeof(int) * m_chWhiteAdj_Count);
+       memcpy(m_chWhiteAdj_Green, pAtmoConfigSrc->m_chWhiteAdj_Green, sizeof(int) * m_chWhiteAdj_Count);
+       memcpy(m_chWhiteAdj_Blue, pAtmoConfigSrc->m_chWhiteAdj_Blue, sizeof(int) * m_chWhiteAdj_Count);
+    } else {
+       m_chWhiteAdj_Red   = NULL;
+       m_chWhiteAdj_Green = NULL;
+       m_chWhiteAdj_Blue  = NULL;
+    }
+
     this->m_IsSetShutdownColor       = pAtmoConfigSrc->m_IsSetShutdownColor;
     this->m_ShutdownColor_Red        = pAtmoConfigSrc->m_ShutdownColor_Red;
     this->m_ShutdownColor_Green      = pAtmoConfigSrc->m_ShutdownColor_Green;
@@ -223,7 +260,6 @@ void CAtmoConfig::Assign(CAtmoConfig *pAtmoConfigSrc) {
 
     this->m_show_statistics               = pAtmoConfigSrc->m_show_statistics;
 
-
     this->m_LiveView_EdgeWeighting  =  pAtmoConfigSrc->m_LiveView_EdgeWeighting;
     this->m_LiveView_BrightCorrect  =  pAtmoConfigSrc->m_LiveView_BrightCorrect;
     this->m_LiveView_DarknessLimit  =  pAtmoConfigSrc->m_LiveView_DarknessLimit;
@@ -236,6 +272,7 @@ void CAtmoConfig::Assign(CAtmoConfig *pAtmoConfigSrc) {
     this->m_LiveView_DisplayNr        = pAtmoConfigSrc->m_LiveView_DisplayNr;
     this->m_LiveView_FrameDelay       = pAtmoConfigSrc->m_LiveView_FrameDelay;
     this->m_LiveView_GDI_FrameRate    = pAtmoConfigSrc->m_LiveView_GDI_FrameRate;
+    this->m_LiveView_RowsPerFrame   =  pAtmoConfigSrc->m_LiveView_RowsPerFrame;
 
     this->m_ZonesTopCount             = pAtmoConfigSrc->m_ZonesTopCount;
     this->m_ZonesBottomCount          = pAtmoConfigSrc->m_ZonesBottomCount;
@@ -254,6 +291,8 @@ void CAtmoConfig::Assign(CAtmoConfig *pAtmoConfigSrc) {
     this->m_DMX_RGB_Channels         = pAtmoConfigSrc->m_DMX_RGB_Channels;
 
     this->m_MoMo_Channels            = pAtmoConfigSrc->m_MoMo_Channels;
+
+    this->m_Fnordlicht_Amount        = pAtmoConfigSrc->m_Fnordlicht_Amount;
 
     this->m_CurrentChannelAssignment = pAtmoConfigSrc->m_CurrentChannelAssignment;
 
@@ -277,8 +316,6 @@ void CAtmoConfig::Assign(CAtmoConfig *pAtmoConfigSrc) {
 
     UpdateZoneDefinitionCount();
 }
-
-
 
 int CAtmoConfig::getNumChannelAssignments() {
     int z=0;
@@ -335,8 +372,6 @@ void CAtmoConfig::UpdateZoneCount()
   if(m_ZoneSummary)
      m_computed_zones_count++;
 }
-
-
 
 int CAtmoConfig::getZoneCount()
 {
@@ -423,3 +458,50 @@ void CAtmoConfig::setDMX_BaseChannels(char *channels)
      m_DMX_BaseChannels = strdup(channels);
 }
 
+void CAtmoConfig::getChannelWhiteAdj(int channel,int &red,int &green,int &blue)
+{
+  if(channel >= m_chWhiteAdj_Count)
+  {
+     red = 256;
+     green = 256;
+     blue = 256;
+
+  } else {
+
+    red   = m_chWhiteAdj_Red[ channel ];
+    green = m_chWhiteAdj_Green[ channel ];
+    blue  = m_chWhiteAdj_Blue[ channel ];
+
+  }
+}
+
+void CAtmoConfig::setChannelWhiteAdj(int channel,int red,int green,int blue)
+{
+    if(channel >= m_chWhiteAdj_Count)
+    {
+       int *tmp = new int[channel+1];
+       if(m_chWhiteAdj_Red)
+          memcpy( tmp, m_chWhiteAdj_Red, m_chWhiteAdj_Count * sizeof(int) );
+       delete []m_chWhiteAdj_Red;
+       m_chWhiteAdj_Red = tmp;
+
+       tmp = new int[channel + 1];
+       if(m_chWhiteAdj_Green)
+          memcpy( tmp, m_chWhiteAdj_Green, m_chWhiteAdj_Count * sizeof(int) );
+       delete []m_chWhiteAdj_Green;
+       m_chWhiteAdj_Green = tmp;
+
+       tmp = new int[channel + 1];
+       if(m_chWhiteAdj_Blue)
+          memcpy( tmp, m_chWhiteAdj_Blue, m_chWhiteAdj_Count * sizeof(int) );
+       delete []m_chWhiteAdj_Blue;
+       m_chWhiteAdj_Blue = tmp;
+
+       m_chWhiteAdj_Count = channel + 1;
+   }
+
+   m_chWhiteAdj_Red[channel]   = red;
+   m_chWhiteAdj_Green[channel] = green;
+   m_chWhiteAdj_Blue[channel]  = blue;
+
+}

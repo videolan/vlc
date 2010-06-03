@@ -19,16 +19,15 @@
 #   include <string.h>
 #endif
 
-
 class CAtmoConfig {
 
     protected:
-	   int m_IsShowConfigDialog;	
+       int m_IsShowConfigDialog;
 #if defined(_ATMO_VLC_PLUGIN_)
        char *m_devicename;
        char *m_devicenames[3]; // additional Devices ?
 #else
-	   int m_Comport;
+       int m_Comport;
        int m_Comports[3]; // additional Comports
 #endif
        enum AtmoConnectionType m_eAtmoConnectionType;
@@ -42,11 +41,17 @@ class CAtmoConfig {
        int m_WhiteAdjustment_Green;
        int m_WhiteAdjustment_Blue;
 
+       ATMO_BOOL m_WhiteAdjPerChannel;
+       int  m_chWhiteAdj_Count;
+       int *m_chWhiteAdj_Red;
+       int *m_chWhiteAdj_Green;
+       int *m_chWhiteAdj_Blue;
+
     protected:
        int m_IsSetShutdownColor;
-	   int m_ShutdownColor_Red;
-	   int m_ShutdownColor_Green;
-	   int m_ShutdownColor_Blue;
+       int m_ShutdownColor_Red;
+       int m_ShutdownColor_Green;
+       int m_ShutdownColor_Blue;
 
     protected:
        /* Config Values for Color Changer */
@@ -76,7 +81,6 @@ class CAtmoConfig {
         CAtmoZoneDefinition **m_ZoneDefinitions;
         int m_AtmoZoneDefCount;
 
-
         /*
           zone layout description for generating the default Zone weightning
         */
@@ -94,7 +98,6 @@ class CAtmoConfig {
     public:
         int getZoneCount();
 
-
     protected:
         /* Live View Parameters (most interesting) */
         AtmoFilterMode m_LiveViewFilterMode;
@@ -103,6 +106,9 @@ class CAtmoConfig {
         int m_LiveViewFilter_MeanThreshold;
 
         ATMO_BOOL m_show_statistics;
+
+        // number of rows to process each frame
+        int m_LiveView_RowsPerFrame;
 
         // weighting of distance to edge
         int m_LiveView_EdgeWeighting; //  = 8;
@@ -155,6 +161,9 @@ class CAtmoConfig {
          int m_MoMo_Channels;
 
     protected:
+         int m_Fnordlicht_Amount;
+
+    protected:
          AtmoGammaCorrect m_Software_gamma_mode;
 
          int m_Software_gamma_red;
@@ -164,7 +173,6 @@ class CAtmoConfig {
          int m_Software_gamma_global;
     public:
         volatile int m_UpdateEdgeWeightningFlag;
-
 
     public:
        CAtmoConfig();
@@ -210,6 +218,13 @@ class CAtmoConfig {
         ATMO_BOOL isUseSoftwareWhiteAdj() { return m_UseSoftwareWhiteAdj; }
         void setUseSoftwareWhiteAdj(ATMO_BOOL value) { m_UseSoftwareWhiteAdj = value; }
 
+/* White ADJ per Channel settings */
+        ATMO_BOOL isWhiteAdjPerChannel() { return  m_WhiteAdjPerChannel; }
+        void setWhiteAdjPerChannel( ATMO_BOOL value) { m_WhiteAdjPerChannel = value; }
+
+        void setChannelWhiteAdj(int channel,int red,int green,int blue);
+        void getChannelWhiteAdj(int channel,int &red,int &green,int &blue);
+
         int isSetShutdownColor()     { return m_IsSetShutdownColor; }
         void SetSetShutdownColor(int value) { m_IsSetShutdownColor = value; }
         int getShutdownColor_Red()   { return m_ShutdownColor_Red; }
@@ -236,7 +251,6 @@ class CAtmoConfig {
         int getStaticColor_Blue()  { return m_StaticColor_Blue;  }
         void  setStaticColor_Blue(int value) { m_StaticColor_Blue=value; }
 
-
         AtmoConnectionType getConnectionType() { return m_eAtmoConnectionType; }
         void setConnectionType(AtmoConnectionType value) { m_eAtmoConnectionType = value; }
 
@@ -257,6 +271,9 @@ class CAtmoConfig {
 
         int getLiveView_EdgeWeighting() { return m_LiveView_EdgeWeighting; }
         void setLiveView_EdgeWeighting(int value) { m_LiveView_EdgeWeighting=value; }
+
+        int getLiveView_RowsPerFrame() { return m_LiveView_RowsPerFrame; }
+        void setLiveView_RowsPerFrame(int value) { m_LiveView_RowsPerFrame=value; }
 
         int getLiveView_BrightCorrect() { return m_LiveView_BrightCorrect; }
         void setLiveView_BrightCorrect(int value) { m_LiveView_BrightCorrect=value; }
@@ -312,7 +329,6 @@ class CAtmoConfig {
         int getHardware_gamma_blue() { return m_Hardware_gamma_blue; }
         void setHardware_gamma_blue(int value) { m_Hardware_gamma_blue=value; }
 
-
         AtmoGammaCorrect getSoftware_gamma_mode() { return m_Software_gamma_mode; }
         int getSoftware_gamma_red() { return m_Software_gamma_red; }
         int getSoftware_gamma_green() { return m_Software_gamma_green; }
@@ -358,6 +374,9 @@ class CAtmoConfig {
 
         int getMoMo_Channels() { return m_MoMo_Channels; }
         void setMoMo_Channels(int chCount) { m_MoMo_Channels = chCount; }
+
+        int getFnordlicht_Amount() { return m_Fnordlicht_Amount; }
+        void setFnordlicht_Amount(int fnordlichtAmount) { m_Fnordlicht_Amount = fnordlichtAmount; }
 
 };
 

@@ -139,7 +139,8 @@ static const int pi_device_type_values[] = {
      1, /* AtmoLight classic */
      2, /* Quattro AtmoLight */
      3, /* DMX Device */
-     4  /* MoMoLight device */
+     4, /* MoMoLight device */
+     5  /* fnordlicht */
 };
 static const char *const ppsz_device_type_descriptions[] = {
 #if defined( WIN32 )
@@ -148,7 +149,8 @@ static const char *const ppsz_device_type_descriptions[] = {
         N_("Classic AtmoLight"),
         N_("Quattro AtmoLight"),
         N_("DMX"),
-        N_("MoMoLight")
+        N_("MoMoLight"),
+        N_("fnordlicht")
 };
 
 #define DMX_CHANNELS_TEXT      N_("Count of AtmoLight channels")
@@ -161,6 +163,11 @@ static const char *const ppsz_device_type_descriptions[] = {
 #define MOMO_CHANNELS_TEXT      N_("Count of channels")
 #define MOMO_CHANNELS_LONGTEXT  N_("Depending on your MoMoLight hardware " \
                                    "choose 3 or 4 channels")
+
+#define FNORDLICHT_AMOUNT_TEXT      N_("Count of fnordlicht's")
+#define FNORDLICHT_AMOUNT_LONGTEXT  N_("Depending on the amount your " \
+                                   "fnordlicht hardware " \
+                                   "choose 1 to 4 channels")
 
 #if defined( WIN32 )
 #  define DEFAULT_DEVICE   0
@@ -376,7 +383,7 @@ add_string(CFG_PREFIX "serialdev", "COM1", NULL,
 add_file(CFG_PREFIX "atmowinexe", NULL, NULL,
          ATMOWINEXE_TEXT, ATMOWINEXE_LONGTEXT, false )
 #else
-add_string(CFG_PREFIX "serialdev", "/dev/ttyS01", NULL,
+add_string(CFG_PREFIX "serialdev", "/dev/ttyUSB0", NULL,
            SERIALDEV_TEXT, SERIALDEV_LONGTEXT, false )
 #endif
 
@@ -421,6 +428,13 @@ set_section( N_("MoMoLight options" ), 0 )
 add_integer_with_range(CFG_PREFIX "momo-channels",   3, 3, 4, NULL,
                        MOMO_CHANNELS_TEXT, MOMO_CHANNELS_LONGTEXT, false)
 
+/* 2,2,4 means 2 is the default value, 1 minimum amount,
+   4 maximum amount
+*/
+set_section( N_("fnordlicht options" ), 0 )
+add_integer_with_range(CFG_PREFIX "fnordlicht-amount",   2, 1, 4, NULL,
+                       FNORDLICHT_AMOUNT_TEXT,
+                       FNORDLICHT_AMOUNT_LONGTEXT, false)
 
 
 /*
@@ -652,6 +666,7 @@ static const char *const ppsz_filter_options[] = {
         "dmx-channels",
         "dmx-chbase",
         "momo-channels",
+        "fnordlicht-amount",
 
 #if defined(WIN32 )
         "atmowinexe",
@@ -1523,6 +1538,14 @@ static void Atmo_SetupConfig(filter_t *p_filter, CAtmoConfig *p_atmo_config)
     p_atmo_config->setMoMo_Channels(
         var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "momo-channels")
        );
+
+    /*
+      fnordlicht options
+    */
+    p_atmo_config->setFnordlicht_Amount(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "fnordlicht-amount")
+       );
+
 }
 
 
@@ -1603,55 +1626,64 @@ static void Atmo_SetupParameters(filter_t *p_filter)
 
             /* importing all required functions I hope*/
             p_sys->pf_ctrl_atmo_initialize =
-                (int32_t (*)(void))GetProcAddress(p_sys->h_AtmoCtrl,"AtmoInitialize");
+                (int32_t (*)(void))GetProcAddress(p_sys->h_AtmoCtrl,
+                            "AtmoInitialize");
             if(!p_sys->pf_ctrl_atmo_initialize)
                 msg_Err( p_filter, "export AtmoInitialize missing.");
 
             p_sys->pf_ctrl_atmo_finalize =
-                (void (*)(int32_t))GetProcAddress(p_sys->h_AtmoCtrl,"AtmoFinalize");
+                (void (*)(int32_t))GetProcAddress(p_sys->h_AtmoCtrl,
+                            "AtmoFinalize");
             if(!p_sys->pf_ctrl_atmo_finalize)
                 msg_Err( p_filter, "export AtmoFinalize missing.");
 
             p_sys->pf_ctrl_atmo_switch_effect =
-                (int32_t(*)(int32_t))GetProcAddress(p_sys->h_AtmoCtrl,"AtmoSwitchEffect");
+                (int32_t(*)(int32_t))GetProcAddress(p_sys->h_AtmoCtrl,
+                            "AtmoSwitchEffect");
             if(!p_sys->pf_ctrl_atmo_switch_effect)
                 msg_Err( p_filter, "export AtmoSwitchEffect missing.");
 
             p_sys->pf_ctrl_atmo_set_live_source =
-                (int32_t(*)(int32_t))GetProcAddress(p_sys->h_AtmoCtrl,"AtmoSetLiveSource");
+                (int32_t(*)(int32_t))GetProcAddress(p_sys->h_AtmoCtrl,
+                            "AtmoSetLiveSource");
             if(!p_sys->pf_ctrl_atmo_set_live_source)
                 msg_Err( p_filter, "export AtmoSetLiveSource missing.");
 
             p_sys->pf_ctrl_atmo_create_transfer_buffers =
-                (void (*)(int32_t, int32_t, int32_t , int32_t))GetProcAddress(p_sys->h_AtmoCtrl,"AtmoCreateTransferBuffers");
+                (void (*)(int32_t, int32_t, int32_t , int32_t))
+                    GetProcAddress(p_sys->h_AtmoCtrl,"AtmoCreateTransferBuffers");
             if(!p_sys->pf_ctrl_atmo_create_transfer_buffers)
                 msg_Err( p_filter, "export AtmoCreateTransferBuffers missing.");
 
             p_sys->pf_ctrl_atmo_lock_transfer_buffer=
-                (uint8_t*(*) (void))GetProcAddress(p_sys->h_AtmoCtrl,"AtmoLockTransferBuffer");
+                (uint8_t*(*) (void))GetProcAddress(p_sys->h_AtmoCtrl,
+                            "AtmoLockTransferBuffer");
             if(!p_sys->pf_ctrl_atmo_lock_transfer_buffer)
                 msg_Err( p_filter, "export AtmoLockTransferBuffer missing.");
 
             p_sys->pf_ctrl_atmo_send_pixel_data =
-                (void (*)(void))GetProcAddress(p_sys->h_AtmoCtrl,"AtmoSendPixelData");
+                (void (*)(void))GetProcAddress(p_sys->h_AtmoCtrl,
+                            "AtmoSendPixelData");
             if(!p_sys->pf_ctrl_atmo_send_pixel_data)
                 msg_Err( p_filter, "export AtmoSendPixelData missing.");
 
             p_sys->pf_ctrl_atmo_get_image_size =
-                (void (*)(int32_t*,int32_t*))GetProcAddress(p_sys->h_AtmoCtrl,"AtmoWinGetImageSize");
+                (void (*)(int32_t*,int32_t*))GetProcAddress(p_sys->h_AtmoCtrl,
+                            "AtmoWinGetImageSize");
             if(!p_sys->pf_ctrl_atmo_get_image_size)
                 msg_Err( p_filter, "export AtmoWinGetImageSize missing.");
 
         } else {
             /* the DLL is missing try internal filter ...*/
-            msg_Warn( p_filter, "AtmoCtrlLib.dll missing fallback to internal atmo classic driver");
+            msg_Warn( p_filter,
+                "AtmoCtrlLib.dll missing fallback to internal atmo classic driver");
             p_sys->i_device_type = 1;
         }
     }
 #endif
 
     if(p_sys->i_device_type >= 1) {
-        msg_Dbg( p_filter, "try use buildin driver %d ", p_sys->i_device_type );
+        msg_Dbg( p_filter, "try use buildin driver %d ", p_sys->i_device_type);
         /*
         now we have to read a lof of options from the config dialog
         most important the serial device if not set ... we can skip
@@ -1682,6 +1714,10 @@ static void Atmo_SetupParameters(filter_t *p_filter)
 
             case 4:
                 p_sys->p_atmo_config->setConnectionType( actMoMoLight );
+                break;
+
+            case 5:
+                p_sys->p_atmo_config->setConnectionType( actFnordlicht );
                 break;
 
             default:
@@ -2227,7 +2263,8 @@ static void CreateMiniImage( filter_t *p_filter, picture_t *p_inpic)
         }
     }
 
-    msg_Dbg( p_filter, "AtmoFrame %u Time: %d ms", p_sys->ui_frame_counter, mdate() / 1000);
+    msg_Dbg( p_filter, "AtmoFrame %u Time: %d ms", p_sys->ui_frame_counter,
+                mdate() / 1000);
     p_sys->ui_frame_counter++;
 #endif
 
@@ -2762,10 +2799,14 @@ static void atmo_parse_crop(char *psz_cropconfig,
             i_crop_bottom = strtol( psz_end, &psz_end, 10 );
             if( *psz_end != '\0' ) return;
 
-            i_width = fmt_render.i_visible_width - i_crop_left - i_crop_right;
+            i_width = fmt_render.i_visible_width -
+                        i_crop_left -
+                        i_crop_right;
             i_visible_width = i_width;
 
-            i_height = fmt_render.i_visible_height - i_crop_top - i_crop_bottom;
+            i_height = fmt_render.i_visible_height -
+                        i_crop_top -
+                        i_crop_bottom;
             i_visible_height = i_height;
 
             i_x_offset = i_crop_left;
