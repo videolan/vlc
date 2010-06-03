@@ -546,8 +546,7 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
 
 static void *VoutDisplayEventKeyDispatch(void *data)
 {
-    vout_display_t *vd = data;
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_owner_sys_t *osys = data;
 
     for (;;) {
         block_t *event = block_FifoGet(osys->event.fifo);
@@ -572,7 +571,7 @@ static void VoutDisplayEventKey(vout_display_t *vd, int key)
         if (!osys->event.fifo)
             return;
         if (vlc_clone(&osys->event.thread, VoutDisplayEventKeyDispatch,
-                      vd, VLC_THREAD_PRIORITY_LOW)) {
+                      osys, VLC_THREAD_PRIORITY_LOW)) {
             block_FifoRelease(osys->event.fifo);
             osys->event.fifo = NULL;
             return;
@@ -1281,6 +1280,7 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
     vout_display_Delete(vd);
     if (osys->event.fifo) {
         vlc_cancel(osys->event.thread);
+        vlc_join(osys->event.thread, NULL);
         block_FifoRelease(osys->event.fifo);
     }
     vlc_mutex_destroy(&osys->lock);
