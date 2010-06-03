@@ -72,6 +72,7 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     layout->addWidget( splitter );
 
     CONNECT( epg, itemSelectionChanged( EPGEvent *), this, showEvent( EPGEvent *) );
+    CONNECT( THEMIM->getIM(), epgChanged(), this, updateInfos() );
 
     QPushButton *update = new QPushButton( qtr( "Update" ) ); //Temporary to test
     layout->addWidget( update, 0, Qt::AlignRight );

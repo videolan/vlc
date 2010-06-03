@@ -257,6 +257,9 @@ void InputManager::customEvent( QEvent *event )
     case ProgramChanged_Type:
         UpdateProgramEvent();
         break;
+    case EPGEvent_Type:
+        UpdateEPG();
+        break;
     default:
         msg_Warn( p_intf, "This shouldn't happen: %i", i_type );
         assert(0);
@@ -359,6 +362,11 @@ static int InputEvent( vlc_object_t *p_this, const char *,
     case INPUT_EVENT_PROGRAM:
         /* This is for PID changes */
         event = new IMEvent( ProgramChanged_Type );
+        break;
+
+    case INPUT_EVENT_ITEM_EPG:
+        /* EPG data changed */
+        event = new IMEvent( EPGEvent_Type );
         break;
 
     case INPUT_EVENT_SIGNAL:
@@ -544,6 +552,14 @@ void InputManager::UpdateTeletext()
     {
         emit teletextActivated( false );
         emit teletextPossible( false );
+    }
+}
+
+void InputManager::UpdateEPG()
+{
+    if( hasInput() )
+    {
+       emit epgChanged();
     }
 }
 

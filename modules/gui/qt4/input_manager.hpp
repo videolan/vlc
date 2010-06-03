@@ -62,6 +62,7 @@ enum {
     LoopChanged_Type,
     RepeatChanged_Type,
     LeafToParent_Type,
+    EPGEvent_Type,
 /*    SignalChanged_Type, */
 
     FullscreenControlToggle_Type = QEvent::User + IMEventType + 20,
@@ -170,6 +171,7 @@ private:
     void UpdateCaching();
     void UpdateRecord();
     void UpdateProgramEvent();
+    void UpdateEPG();
 
 public slots:
     void setInput( input_thread_t * ); ///< Our controlled input changed
@@ -234,6 +236,7 @@ signals:
     void cachingChanged( float );
     /// Program Event changes
     void encryptionChanged( bool );
+    void epgChanged();
 };
 
 class MainInputManager : public QObject
