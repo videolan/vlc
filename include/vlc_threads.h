@@ -445,6 +445,8 @@ class vlc_mutex_locker
 enum {
    VLC_AVCODEC_MUTEX = 0,
    VLC_GCRYPT_MUTEX,
+   VLC_XLIB_MUTEX,
+   /* Insert new entry HERE */
    VLC_MAX_MUTEX
 };
 

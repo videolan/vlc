@@ -28,6 +28,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <X11/Xlib.h>
+#include <vlc_xlib.h>
 
 #include "x11_factory.hpp"
 #include "x11_display.hpp"
@@ -57,7 +58,7 @@ X11Factory::~X11Factory()
 bool X11Factory::init()
 {
     // make sure xlib is safe-thread
-    if( !var_InheritBool( getIntf(), "xlib" ) || !XInitThreads() )
+    if( !vlc_xlib_init( getIntf() ) )
     {
         msg_Err( getIntf(), "initializing xlib for multi-threading failed" );
         return false;

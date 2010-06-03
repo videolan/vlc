@@ -30,6 +30,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_vout_window.h>
+#include <vlc_xlib.h>
 
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-banner.h>
@@ -80,7 +81,7 @@ static int Open( vlc_object_t *p_this )
     intf_sys_t *p_sys;
     vlc_value_t val;
 
-    if( !var_InheritBool( p_this, "xlib" ) || !XInitThreads() )
+    if( !vlc_xlib_init( p_this ) )
         return VLC_EGENERIC;
 
     /* Allocate instance and initialize some members */

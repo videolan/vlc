@@ -107,6 +107,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_vout_osd.h \
 	../include/vlc_vout_window.h \
 	../include/vlc_xml.h \
+	../include/vlc_xlib.h \
 	$(NULL)
 
 noinst_HEADERS = \

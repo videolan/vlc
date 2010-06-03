@@ -464,7 +464,12 @@ static void Delete( vlc_va_t *p_external )
 /* */
 vlc_va_t *vlc_va_NewVaapi( int i_codec_id )
 {
-    if( !XInitThreads() )
+    bool fail;
+
+    vlc_global_lock( VLC_XLIB_MUTEX );
+    fail = !XInitThreads();
+    vlc_global_unlock( VLC_XLIB_MUTEX )
+    if( unlikely(fail) )
         return NULL;
 
     vlc_va_vaapi_t *p_va = calloc( 1, sizeof(*p_va) );

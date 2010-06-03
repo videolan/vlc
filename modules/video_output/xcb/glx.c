@@ -34,6 +34,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_xlib.h>
 #include <vlc_vout_display.h>
 #include <vlc_vout_opengl.h>
 #include "../opengl.h"
@@ -203,7 +204,7 @@ static int CreateWindow (vout_display_t *vd, xcb_connection_t *conn,
  */
 static int Open (vlc_object_t *obj)
 {
-    if (!var_InheritBool (obj, "xlib") || !XInitThreads ())
+    if (!vlc_xlib_init (obj))
         return VLC_EGENERIC;
 
     vout_display_t *vd = (vout_display_t *)obj;

@@ -39,7 +39,7 @@
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
 
 #ifdef Q_WS_X11
- #include <X11/Xlib.h>
+ #include <vlc_xlib.h>
 #endif
 
 #include "../../../share/vlc32x32.xpm"
@@ -283,7 +283,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
 #ifdef Q_WS_X11
-    if( !var_InheritBool( p_this, "xlib" ) || !XInitThreads() )
+    if( !vlc_xlib_init( p_this ) )
         return VLC_EGENERIC;
 
     char *display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
