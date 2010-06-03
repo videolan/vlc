@@ -130,6 +130,9 @@ static int Open( vlc_va_vaapi_t *p_va, int i_codec_id )
     memset( p_va, 0, sizeof(*p_va) );
 
     /* Create a VA display */
+    if( !XInitThreads() )
+        return VLC_EGENERIC;
+
     p_va->p_display_x11 = XOpenDisplay(NULL);
     if( !p_va->p_display_x11 )
         goto error;
@@ -467,7 +470,6 @@ vlc_va_t *vlc_va_NewVaapi( int i_codec_id )
     vlc_va_vaapi_t *p_va = calloc( 1, sizeof(*p_va) );
     if( !p_va )
         return NULL;
-
     if( Open( p_va, i_codec_id ) )
     {
         free( p_va );
