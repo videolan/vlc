@@ -27,7 +27,7 @@ Amir Gouini <a.gouini at qiplay dot com> - VLC mozilla plugin event listerners.
 Andrea Guzzo <xant at xant dot net> - dc1394 firewire support
 André de Barros Martins Ribeiro <andrerib at ajato.com.br> - Brazilian portuguese localization
 Andre Pang <adre.pang at csiro dot au> - Annodex support
-André Weber <WeberAndre at gmx d0t de> - Qt4, AAC ordering, Win32 threads patches, video filter module for thehomebrewAmbiLight (AtmoLight)
+André Weber <WeberAndre at gmx d0t de> - Qt4, AAC ordering, Win32 threads patches, video filter module for the homebrew AmbiLight (AtmoLight)
 Andres Krapf <dae at via.ecp.fr> - FreeBSD port and tests, KDE interface
 Andrew Zaikin <andrew dot zaikin at gmail dot com> - Config saving fixes
 Andrey Brilevskiy <director at macwest.ru> - Russian translation
@@ -185,6 +185,7 @@ Julien Plissonneau Duquène - JACK audio input module 
 Julien Robert <jul at mac.com> - DTS to SPDIF fixes.
 K. Staring <qdk at quickdekay dot net> - RTSP rewind and fast-forward support
 Kai Hermann <kai.uwe.hermann@gmail.com> - German translation
+Kai Lauterbach <lauterbach.kai at web d0t de> - added atmo Fnordlicht support
 Kang Jeong-Hee <keizie at gmail dot com> - Korean translation
 Kenneth Ostby <kenneo -at- idi -dot- ntnu -dot- no> - Audioscrobbler plugin
 Kenneth Self <kens at campoz DoT. fslife _dOt co dOT- uk> - BDA capture plugin

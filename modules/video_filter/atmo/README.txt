@@ -242,6 +242,10 @@ MoMoLight options
 (its required to set the correct number of channels to get this device working,
  because the serial protocol isn't the same!)
 
+Fnordlicht options
+------------------
+"Count of fnordlicht's" - defines the number of devices connected to the bus
+
 
 
 VideoLan Options and Devices - the buildin version of AtmoLight supports a subset of the
@@ -267,7 +271,10 @@ devices that AtmoWin supports.
    http://lx.divxstation.com/article.asp?aId=151
    http://www.the-boss.dk/pages/momolight.htm
 
-
+- Fnordlicht - is a serial device bus, where up 254 lights could be connected
+  for more information about the device look here:
+   http://wiki.lochraster.org/wiki/Fnordlicht
+   http://github.com/fd0/fnordlicht/raw/master/doc/PROTOCOL
 
 
 
