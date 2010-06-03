@@ -468,7 +468,7 @@ vlc_va_t *vlc_va_NewVaapi( int i_codec_id )
 
     vlc_global_lock( VLC_XLIB_MUTEX );
     fail = !XInitThreads();
-    vlc_global_unlock( VLC_XLIB_MUTEX )
+    vlc_global_unlock( VLC_XLIB_MUTEX );
     if( unlikely(fail) )
         return NULL;
 
