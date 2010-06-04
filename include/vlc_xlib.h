@@ -21,6 +21,7 @@
 #ifndef VLC_XLIB_H
 # define VLC_XLIB_H 1
 
+# include <vlc_common.h>
 # include <X11/Xlib.h>
 
 static inline bool vlc_xlib_init (vlc_object_t *obj)
