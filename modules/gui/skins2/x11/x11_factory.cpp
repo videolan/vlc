@@ -58,7 +58,7 @@ X11Factory::~X11Factory()
 bool X11Factory::init()
 {
     // make sure xlib is safe-thread
-    if( !vlc_xlib_init( getIntf() ) )
+    if( !vlc_xlib_init( VLC_OBJECT( getIntf() ) ) )
     {
         msg_Err( getIntf(), "initializing xlib for multi-threading failed" );
         return false;
