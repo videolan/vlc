@@ -37,7 +37,7 @@ films = {}
 function descriptor()
     return { title = "Allociné (France)" ;
              version = "1.0" ;
-             author = "Jean-Philippe André" ;
+             author = "VideoLAN" ;
              url = 'http://www.allocine.fr/';
              shortdesc = "Allocine.com";
              description = "<center><b>ALLOCINE.COM</b></center>"
@@ -171,9 +171,6 @@ function click_chercher()
         if category == "Films" or category == "Séries TV" then
             -- Read <table> tag as xml
             local substring = string.sub(data, first, last or -1)
-            print("\n")
-            print(substring)
-            print("\n")
 
             local xml = simplexml.parse_string(substring)
             for _, tr in ipairs(xml.children) do
@@ -254,13 +251,9 @@ function click_okay()
     local selection = list:get_selection()
     if not selection then return end
 
-    local sel = nil
-    for idx, selectedItem in pairs(selection) do
-        sel = idx
-        break
-    end
-
+    local sel, _ = next(selection, nil)
     if not sel then return end
+
     message_text = "<center><a href=\"" .. films[sel].url .. "\">" .. films[sel].title .. "</a></center>"
     message:set_text(message_text)
     dlg:update()
@@ -287,14 +280,72 @@ function open_fiche(url)
     local s = vlc.stream(url)
     local data = s:read(65535)
 
-    -- HACK: use directly HTML data from webpage
-    local first, _ = string.find(data, '<div class="rubric">')
+    -- Buffer & temp variables
+    local first = nil
+    local last = nil
+    local page = nil
+    local sub = nil
+    local name = nil
+
+    first, _ = string.find(data, '<div class="rubric">')
+
+    if not first then
+        message:set_text("<h2>Erreur !</h2>Désolé, une erreur est survenue pendant le chargement de la fiche.<br />"
+                      .. "<a href=\"" .. url .. "\">Cliquez ici pour consulter la page sur Allociné.fr</a>.")
+        dlg:del_widget(html)
+        return
+    end
+
+    -- Extract information
     local last, _ = string.find(data, '<ul id="link_open"')
     if not last then
         last, _ = string.find(data, 'notationbar')
     end
-    local subdata = string.sub(data, first, (last or 0)-1)
-    subdata = string.gsub(subdata, "%s+", " ")
-    subdata = string.gsub(subdata, "href=([\"'])/", "href=%1http://www.allocine.fr/")
-    html:set_text(subdata)
+    sub = string.sub(data, first, last-1)
+
+    -- Clean data
+    sub = string.gsub(sub, "%s+", " ")
+    sub = string.gsub(sub, "</?p>", "<br/>")
+    sub = string.gsub(sub, "</?div[^>]*>", "")
+    sub = string.gsub(sub, "</?span[^>]*>", "")
+    sub = string.gsub(sub, "<%!%-%-[^%-]+%-%->", "")
+    sub = string.gsub(sub, "<br%s*/>%s*<br%s*/>", "<br/>")
+    page = string.gsub(sub, "Synopsis :.*$", "")
+
+    -- Style
+    local synopsis = string.gsub(sub, ".*Synopsis :(.*)", "<h2>Synposis</h2>%1")
+
+    -- Note
+    first, _ = string.find(data, "Note Moyenne:")
+    if first then
+        local _, note = string.find(data, "span class=\"lighten\">%(", first)
+        if note then
+            note = string.sub(data, note+1, note+3)
+            note = string.gsub(note, "%).*$", "")
+            page = page .. "Note moyenne: <b>" .. note .. " / 4</b>"
+            local nbpeople = string.gsub(data, ".*pour (%d+) notes.*", "%1")
+            if nbpeople then
+                page = page .. " (" .. nbpeople .. " votes)"
+            end
+        end
+    end
+
+    -- Synopsis
+    page = page .. synopsis
+
+    -- Movie title
+    if string.find(data, '<h1>.*</h1>') then
+        name = string.gsub(data, '^.*<h1>%s*(.*)%s*</h1>.*$', '%1')
+        name = trim(name)
+    end
+
+    page = page .. "<h2>Source</h2>"
+    if name then
+        page = page .. name .. " sur <a href='" .. url .. "'>Allociné</a>"
+    else
+        page = page .. "<a href='" .. url .. "'>Allociné</a>"
+    end
+
+    page = string.gsub(page, "href=([\"'])/", "href=%1http://www.allocine.fr/")
+    html:set_text(page)
 end
