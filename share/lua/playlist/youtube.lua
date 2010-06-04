@@ -100,6 +100,21 @@ function parse()
             -- Also available on non-HTML5 pages: var swfHTML = (isIE) ? "<object [...]><param name=\"flashvars\" value=\"rv.2.thumbnailUrl=http%3A%2F%2Fi4.ytimg.com%2Fvi%2F3MLp7YNTznE%2Fdefault.jpg&rv.7.length_seconds=384 [...] &video_id=OHVvVmUNBFc [...] &t=OEgsToPDskK3zO44y0QN8Fr5ZSAZwCQp [...]
             elseif string.match( line, "swfHTML" ) and string.match( line, "video_id" ) then
                 _,_,t = string.find( line, "&t=(.-)&" )
+            -- Also available in HTML5 pages: videoPlayer.setAvailableFormat("http://v6.lscache4.c.youtube.com/videoplayback?ip=82.0.0.0&sparams=id%2Cexpire%2Cip%2Cipbits%2Citag%2Calgorithm%2Cburst%2Cfactor&algorithm=throttle-factor&itag=45&ipbits=8&burst=40&sver=3&expire=1275688800&key=yt1&signature=6ED860441298D1157FF3013A5D72727F25831F09.4C196BEA9F8F9B83CE678D79AD918B83D5E98B46&factor=1.25&id=7117715cf57d18d4", "video/webm; codecs=&quot;vp8.0, vorbis&quot;", "hd720");
+            elseif string.match( line, "videoPlayer%.setAvailableFormat" ) then
+                url,itag = string.match( line, "videoPlayer%.setAvailableFormat%(\"(.-itag=(%d+).-)\",.+%)" )
+                if url then
+                    -- For now, WebM formats are listed only in the HTML5
+                    -- section, that is also only when HTML5 is enabled.
+                    -- Format 45 is 720p, and 43 is lower resolution.
+                    if tonumber( itag ) == 45  or ( tonumber( itag ) == 43 and not webm_path ) then
+                        webm_path = url
+                    end
+                    -- Grab something if fmt_url_map failed
+                    if not path and ( not fmt or tonumber( itag ) == tonumber( fmt ) ) then
+                        path = url
+                    end
+                end
             end
             if name and description and artist --[[and video_id]] then break end
         end
@@ -108,6 +123,14 @@ function parse()
             video_id = get_url_param( vlc.path, "v" )
         end
         arturl = get_arturl( vlc.path, video_id )
+
+        if not fmt then
+            -- Prefer WebM formats if this is an &html5=True URL
+            html5 = get_url_param( vlc.path, "html5" )
+            if html5 == "True" and webm_path then
+                path = webm_path
+            end
+        end
 
         if not path then
             if not base_yt_url then
