@@ -73,7 +73,6 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem*, QWidget
 
     // Setup the font
     QFont f = painter->font();
-    f.setPointSize( 9 );
     f.setBold( true );
     painter->setFont( f );
 
@@ -89,7 +88,6 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem*, QWidget
 
     f.setBold( false );
     f.setItalic( true );
-    f.setPointSize( 8 );
     painter->setFont( f );
 
     QTextOption textoption;
