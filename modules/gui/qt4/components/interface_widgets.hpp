@@ -61,6 +61,7 @@ public:
     WId request( int *, int *, unsigned int *, unsigned int *, bool );
     void  release( void );
     int   control( void *, int, va_list );
+    void SetFullScreen( bool, bool );
 
 protected:
     virtual QPaintEngine *paintEngine() const
@@ -80,7 +81,6 @@ signals:
 
 public slots:
     void SetSizing( unsigned int, unsigned int );
-    void SetFullScreen( bool );
 };
 
 /******************** Background Widget ****************/

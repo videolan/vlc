@@ -187,7 +187,7 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
     videoSync();
 }
 
-void VideoWidget::SetFullScreen( bool b_fs )
+void VideoWidget::SetFullScreen( bool b_fs, bool b_ontop )
 {
     const Qt::WindowStates curstate = reparentable->windowState();
     Qt::WindowStates newstate = curstate;
@@ -197,7 +197,8 @@ void VideoWidget::SetFullScreen( bool b_fs )
     if( b_fs )
     {
         newstate |= Qt::WindowFullScreen;
-        newflags |= Qt::WindowStaysOnTopHint;
+        if( b_ontop )
+            newflags |= Qt::WindowStaysOnTopHint;
     }
     else
     {

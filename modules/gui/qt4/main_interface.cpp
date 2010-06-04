@@ -603,7 +603,7 @@ void MainInterface::setVideoFullScreen( bool fs )
     b_videoFullScreen = fs;
     /* refresh main interface on-top status if needed */
     setVideoOnTop( b_videoOnTop );
-    videoWidget->SetFullScreen( fs );
+    videoWidget->SetFullScreen( fs, b_videoOnTop );
 }
 
 /* Slot to change the video always-on-top flag.
