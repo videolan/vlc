@@ -59,6 +59,8 @@ end
 function parse()
     if string.match( vlc.path, "watch%?v=" )
     then -- This is the HTML page's URL
+        -- fmt is the format of the video: 18 is HQ (mp4)
+        fmt = get_url_param( vlc.path, "fmt" )
         while true do
             -- Try to find the video's title
             line = vlc.readline()
@@ -84,32 +86,47 @@ function parse()
                 _,_,t = string.find( line, "\"t\": \"(.-)\"" )
                 -- vlc.msg.err( t )
                 -- video_id = string.gsub( line, ".*&video_id:'([^']*)'.*", "%1" )
+                fmt_url_map = string.match( line, "\"fmt_url_map\": \"(.-)\"" )
+                if fmt_url_map then
+                    for itag,url in string.gmatch( fmt_url_map, "(%d+)|([^,]+)" ) do
+                        -- Apparently formats are listed in quality order,
+                        -- so we can afford to simply take the first one
+                        if not fmt or tonumber( itag ) == tonumber( fmt ) then
+                            path = url
+                            break
+                        end
+                    end
+                end
             -- Also available on non-HTML5 pages: var swfHTML = (isIE) ? "<object [...]><param name=\"flashvars\" value=\"rv.2.thumbnailUrl=http%3A%2F%2Fi4.ytimg.com%2Fvi%2F3MLp7YNTznE%2Fdefault.jpg&rv.7.length_seconds=384 [...] &video_id=OHVvVmUNBFc [...] &t=OEgsToPDskK3zO44y0QN8Fr5ZSAZwCQp [...]
             elseif string.match( line, "swfHTML" ) and string.match( line, "video_id" ) then
                 _,_,t = string.find( line, "&t=(.-)&" )
             end
             if name and description and artist --[[and video_id]] then break end
         end
+
         if not video_id then
             video_id = get_url_param( vlc.path, "v" )
         end
-        if not base_yt_url then
-            base_yt_url = "http://youtube.com/"
-        end
         arturl = get_arturl( vlc.path, video_id )
-        -- fmt is the format of the video: 18 is HQ (mp4)
-        fmt = get_url_param( vlc.path, "fmt" )
-        if fmt then
-            format = "&fmt=" .. fmt
-        else
-            format = ""
+
+        if not path then
+            if not base_yt_url then
+                base_yt_url = "http://youtube.com/"
+            end
+            if fmt then
+                format = "&fmt=" .. fmt
+            else
+                format = ""
+            end
+
+            if t then
+                path = base_yt_url .. "get_video?video_id="..video_id.."&t="..t..format
+            else
+                -- This shouldn't happen ... but keep it as a backup.
+                path = "http://www.youtube.com/v/"..video_id
+            end
         end
-        if t then
-            return { { path = base_yt_url .. "get_video?video_id="..video_id.."&t="..t..format; name = name; description = description; artist = artist; arturl = arturl; options = options } }
-        else
-            -- This shouldn't happen ... but keep it as a backup.
-            return { { path = "http://www.youtube.com/v/"..video_id; name = name; description = description; artist = artist; arturl = arturl; options=options } }
-        end
+        return { { path = path; name = name; description = description; artist = artist; arturl = arturl; options = options } }
     else -- This is the flash player's URL
         if string.match( vlc.path, "title=" ) then
             name = get_url_param( vlc.path, "title" )
