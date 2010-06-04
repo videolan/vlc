@@ -116,7 +116,6 @@ function parse()
                     end
                 end
             end
-            if name and description and artist --[[and video_id]] then break end
         end
 
         if not video_id then
