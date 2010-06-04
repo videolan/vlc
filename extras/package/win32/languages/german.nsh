@@ -1,56 +1,56 @@
-StrCpy $Name_Section01 "Media Player (erforderlich)"
-StrCpy $Name_Section02a "Verknüpfung im Startmenü"
-StrCpy $Name_Section02b "Verknüpfung auf Desktop"
+StrCpy $Name_Section01 "Media-Player (benötigt)"
+StrCpy $Name_Section02a "Startmenü-Verknüpfung"
+StrCpy $Name_Section02b "Desktop-Verknüpfung"
 StrCpy $Name_Section03 "Mozilla-Plugin"
 StrCpy $Name_Section04 "ActiveX-Plugin"
-StrCpy $Name_Section05 "Wiedergabe von Datenträgern"
+StrCpy $Name_Section05 "CD abspielen"
 StrCpy $Name_Section06 "Dateitypzuordnungen"
-StrCpy $Name_SectionGroupAudio "Audio Dateien"
-StrCpy $Name_SectionGroupVideo "Video Dateien"
+StrCpy $Name_SectionGroupAudio "Audiodateien"
+StrCpy $Name_SectionGroupVideo "Videodateien"
 StrCpy $Name_SectionGroupOther "Andere"
-StrCpy $Name_Section07 "Kontextmenüs"
-StrCpy $Name_Section08 "Löschen von Einstellungen und Cache"
+StrCpy $Name_Section07 "Kontextmenü"
+StrCpy $Name_Section08 "Lösche die Einstellungen und den Cache"
 
 StrCpy $Desc_Section01 \
-    "Der Media Player selbst"
+    "Der Media-Player"
 StrCpy $Desc_Section02a \
-    "Erstellt eine Verknüpfung in Ihrem Startmenü für einen einfachen Zugang"
+    "Fügt Symbole im Startmenü für leichten Zugang hinzu"
 StrCpy $Desc_Section02b \
-    "Erstellt eine Verknüpfung auf Ihrem Desktop für einen einfachen Zugang"
+    "Fügt ein Desktopsymbol für leichten Zugang ein"
 StrCpy $Desc_Section03 \
-    "Das VLC Mozilla und Mozilla Firefox-Plugin"
+    "Das VLC Mozilla und Mozilla-Firefox Plugin"
 StrCpy $Desc_Section04 \
     "Das VLC ActiveX-Plugin"
 StrCpy $Desc_Section05 \
-    "DVD und CD-Wiedergabe Registrierung"
+    "DVD und CD Wiedergabe Registrierung"
 StrCpy $Desc_Section06 \
-    "Legt den VLC media player als Standard-Anwendung für die angegebenen Dateitypen fest"
+    "Setzt den VLC Media-Player als Standard-Anwendung für die ausgewählten Dateitypen"
 StrCpy $Desc_Section07 \
-    "Fügt Kontextmenü-Elemente ein ('Wiedergabe mit VLC' und 'Zur VLC's Wiedergabeliste hinzufügen')"
+    "Fügt Kontextmenü-Einträge hinzu ('Abspielen mit VLC' und 'Zur VLC-Wiedergabeliste hinzufügen')"
 StrCpy $Desc_Section08 \
-    "Löscht übergebliebene Einstellungen und Cache-Dateien des VLC media players aus früheren Installationen."
+    "Löscht die VLC media player Einstellungen und Ÿbergebliebene Cache-Dateien der alten Installation"
 
 StrCpy $Message_AlreadyInstalled  \
-"VLC media player ist bereits installiert. $\nMöchten Sie die vorherige Version entfernen, \
-bevor Sie $(^Name) installieren?"
+"Der VLC media player ist schon installiert. $\nWollen Sie vor \
+dem Installieren des $(^Name) die alte Version entfernen?"
 
 StrCpy $Name_Section91 "Deinstallieren"
-StrCpy $Name_Section92 "Löschen von Einstellungen und Cache"
+StrCpy $Name_Section92 "Einstellungen und Cache löschen"
 
 StrCpy $Desc_Section91 \
-"Deinstalliere den VLC media player und alle seine Komponenten"
+"VLC media player und alle Komponenten löschen"
 StrCpy $Desc_Section92 \
-"Lösche Einstellungen und Cache-Dateien vom VLC media player"
+"VLC media player Einstellungen und Cache-Dateien löschen"
 
-StrCpy $ShellAssociation_Play "Wiedergabe"
-StrCpy $ContextMenuEntry_PlayWith "Wiedergabe mit VLC"
-StrCpy $ContextMenuEntry_AddToPlaylist "Zur VLC's Wiedergabeliste hinzufügen"
+StrCpy $ShellAssociation_Play "Abspielen"
+StrCpy $ContextMenuEntry_PlayWith "Mit VLC media player abspielen"
+StrCpy $ContextMenuEntry_AddToPlaylist "Zur VLC media player Wiedergabeliste hinzufügen"
 
-StrCpy $Link_VisitWebsite "Besuchen Sie die VideoLAN VLC media player Website"
+StrCpy $Link_VisitWebsite "Besuchen Sie die VideoLAN VLC media player Webseite"
 
 StrCpy $Name_InstTypeRecommended "Empfohlen"
 StrCpy $Name_InstTypeMinimum "Minimal"
 StrCpy $Name_InstTypeFull "Voll"
 
-StrCpy $Action_OnArrivalDVD "DVD Video Wiedergabe"
-StrCpy $Action_OnArrivalAudioCD "Audio CD Wiedergabe"
+StrCpy $Action_OnArrivalDVD "DVD Video abspielen"
+StrCpy $Action_OnArrivalAudioCD "Audio CD abspielen"
