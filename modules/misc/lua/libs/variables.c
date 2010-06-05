@@ -320,7 +320,7 @@ static int vlclua_callback( vlc_object_t *p_this, char const *psz_var,
     {
         /* errormessage */
         const char *psz_err = lua_tostring( L, -1 );
-        msg_Err( p_this, "Error while runing lua interface callback: %s",
+        msg_Err( p_this, "Error while running lua interface callback: %s",
                  psz_err );
         /* empty the stack (should only contain the error message) */
         lua_settop( L, 0 );

@@ -164,7 +164,7 @@ static void* Run( void *data )
     lua_getglobal( L, "main" );
     if( !lua_isfunction( L, lua_gettop( L ) ) || lua_pcall( L, 0, 1, 0 ) )
     {
-        msg_Err( p_sd, "Error while runing script %s, "
+        msg_Err( p_sd, "Error while running script %s, "
                   "function main(): %s", p_sys->psz_filename,
                   lua_tostring( L, lua_gettop( L ) ) );
         lua_pop( L, 1 );

@@ -145,7 +145,7 @@ static int vlclua_httpd_handler_callback(
         /* function data err */
         vlc_object_t *p_this = vlclua_get_this( L );
         const char *psz_err = lua_tostring( L, -1 );
-        msg_Err( p_this, "Error while runing the lua HTTPd handler "
+        msg_Err( p_this, "Error while running the lua HTTPd handler "
                  "callback: %s", psz_err );
         lua_settop( L, 2 );
         /* function data */
@@ -237,7 +237,7 @@ static int vlclua_httpd_file_callback(
         /* function data err */
         vlc_object_t *p_this = vlclua_get_this( L );
         const char *psz_err = lua_tostring( L, -1 );
-        msg_Err( p_this, "Error while runing the lua HTTPd file callback: %s",
+        msg_Err( p_this, "Error while running the lua HTTPd file callback: %s",
                  psz_err );
         lua_settop( L, 2 );
         /* function data */

@@ -111,14 +111,14 @@ static int run( vlc_object_t *p_this, const char * psz_filename,
 
     if( !lua_isfunction( L, lua_gettop( L ) ) )
     {
-        msg_Warn( p_this, "Error while runing script %s, "
+        msg_Warn( p_this, "Error while running script %s, "
                  "function %s() not found", psz_filename, luafunction );
         goto error;
     }
 
     if( lua_pcall( L, 0, 1, 0 ) )
     {
-        msg_Warn( p_this, "Error while runing script %s, "
+        msg_Warn( p_this, "Error while running script %s, "
                  "function %s(): %s", psz_filename, luafunction,
                  lua_tostring( L, lua_gettop( L ) ) );
         goto error;

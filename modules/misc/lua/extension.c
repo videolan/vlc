@@ -266,14 +266,14 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
 
     if( !lua_isfunction( L, -1 ) )
     {
-        msg_Warn( p_mgr, "Error while runing script %s, "
+        msg_Warn( p_mgr, "Error while running script %s, "
                   "function descriptor() not found", psz_script );
         goto exit;
     }
 
     if( lua_pcall( L, 0, 1, 0 ) )
     {
-        msg_Warn( p_mgr, "Error while runing script %s, "
+        msg_Warn( p_mgr, "Error while running script %s, "
                   "function descriptor(): %s", psz_script,
                   lua_tostring( L, lua_gettop( L ) ) );
         goto exit;
@@ -656,14 +656,14 @@ static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
 
     if( !lua_isfunction( L, -1 ) )
     {
-        msg_Warn( p_mgr, "Error while runing script %s, "
+        msg_Warn( p_mgr, "Error while running script %s, "
                   "function menu() not found", p_ext->psz_name );
         goto exit;
     }
 
     if( lua_pcall( L, 0, 1, 0 ) )
     {
-        msg_Warn( p_mgr, "Error while runing script %s, "
+        msg_Warn( p_mgr, "Error while running script %s, "
                   "function menu(): %s", p_ext->psz_name,
                   lua_tostring( L, lua_gettop( L ) ) );
         goto exit;
@@ -828,7 +828,7 @@ int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
 
     if( !lua_isfunction( L, -1 ) )
     {
-        msg_Warn( p_mgr, "Error while runing script %s, "
+        msg_Warn( p_mgr, "Error while running script %s, "
                   "function %s() not found", p_ext->psz_name, psz_function );
         goto exit;
     }
@@ -854,7 +854,7 @@ int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
     }
     if( lua_pcall( L, i_args, 1, 0 ) )
     {
-        msg_Warn( p_mgr, "Error while runing script %s, "
+        msg_Warn( p_mgr, "Error while running script %s, "
                   "function %s(): %s", p_ext->psz_name, psz_function,
                   lua_tostring( L, lua_gettop( L ) ) );
         goto exit;
@@ -885,7 +885,7 @@ int lua_ExtensionTriggerMenu( extensions_manager_t *p_mgr,
     lua_getglobal( L, "trigger_menu" );
     if( !lua_isfunction( L, -1 ) )
     {
-        msg_Warn( p_mgr, "Error while runing script %s, "
+        msg_Warn( p_mgr, "Error while running script %s, "
                   "function trigger_menu() not found", p_ext->psz_name );
         return VLC_EGENERIC;
     }
@@ -895,7 +895,7 @@ int lua_ExtensionTriggerMenu( extensions_manager_t *p_mgr,
 
     if( lua_pcall( L, 1, 1, 0 ) != 0 )
     {
-        msg_Warn( p_mgr, "Error while runing script %s, "
+        msg_Warn( p_mgr, "Error while running script %s, "
                   "function trigger_menu(): %s", p_ext->psz_name,
                   lua_tostring( L, lua_gettop( L ) ) );
         return VLC_EGENERIC;
