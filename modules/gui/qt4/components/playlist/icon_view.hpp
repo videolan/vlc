@@ -82,6 +82,7 @@ public:
 private:
     void startDrag ( Qt::DropActions supportedActions );
     void dragMoveEvent ( QDragMoveEvent * event );
+    void keyPressEvent( QKeyEvent *event );
 };
 
 class PlTreeView : public QTreeView
@@ -91,6 +92,7 @@ class PlTreeView : public QTreeView
 private:
     void startDrag ( Qt::DropActions supportedActions );
     void dragMoveEvent ( QDragMoveEvent * event );
+    void keyPressEvent( QKeyEvent *event );
 };
 
 #endif

@@ -385,6 +385,17 @@ void PlListView::dragMoveEvent ( QDragMoveEvent * event )
     QAbstractItemView::dragMoveEvent( event );
 }
 
+void PlListView::keyPressEvent( QKeyEvent *event )
+{
+    //If the space key is pressed, override the standard list behaviour to allow pausing
+    //to proceed.
+    if ( event->modifiers() == Qt::NoModifier && event->key() == Qt::Key_Space )
+        QWidget::keyPressEvent( event );
+    //Otherwise, just do as usual.
+    else
+        QListView::keyPressEvent( event );
+}
+
 void PlTreeView::startDrag ( Qt::DropActions supportedActions )
 {
     plViewStartDrag( this, supportedActions );
@@ -394,4 +405,15 @@ void PlTreeView::dragMoveEvent ( QDragMoveEvent * event )
 {
     plViewDragMoveEvent( this, event );
     QAbstractItemView::dragMoveEvent( event );
+}
+
+void PlTreeView::keyPressEvent( QKeyEvent *event )
+{
+    //If the space key is pressed, override the standard list behaviour to allow pausing
+    //to proceed.
+    if ( event->modifiers() == Qt::NoModifier && event->key() == Qt::Key_Space )
+        QWidget::keyPressEvent( event );
+    //Otherwise, just do as usual.
+    else
+        QTreeView::keyPressEvent( event );
 }
