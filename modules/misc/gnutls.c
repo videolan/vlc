@@ -239,7 +239,7 @@ gnutls_Recv( void *p_session, void *buf, int i_length )
 /**
  * Starts or continues the TLS handshake.
  *
- * @return -1 on fatal error, 0 on succesful handshake completion,
+ * @return -1 on fatal error, 0 on successful handshake completion,
  * 1 if more would-be blocking recv is needed,
  * 2 if more would-be blocking send is required.
  */

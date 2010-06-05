@@ -167,8 +167,8 @@ protected slots:
     virtual void setStatus( int );
 
 signals:
-    void inputExists( bool ); /// This might be usefull in the IM ?
-    void inputPlaying( bool ); /// This might be usefull in the IM ?
+    void inputExists( bool ); /// This might be useful in the IM ?
+    void inputPlaying( bool ); /// This might be useful in the IM ?
     void inputIsRecordable( bool ); /// same ?
     void inputIsTrickPlayable( bool ); /// same ?
 };

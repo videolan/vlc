@@ -1541,7 +1541,7 @@ AS_IF([test "x${enable_debug}" = "xno"], [
 ])
 
 dnl
-dnl Allow runing as root (usefull for people runing on embedded platforms)
+dnl Allow runing as root (useful for people runing on embedded platforms)
 dnl
 AC_ARG_ENABLE(run-as-root,
 [  --enable-run-as-root    allow runing VLC as root (default disabled)])

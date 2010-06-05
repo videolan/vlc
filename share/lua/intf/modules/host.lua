@@ -27,7 +27,7 @@ Example use:
     require "host"
     h = host.host()
 
-    -- Bypass any authentification
+    -- Bypass any authentication
     function on_password( client )
         client:switch_status( host.status.read )
     end

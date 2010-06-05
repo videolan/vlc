@@ -426,7 +426,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
                         {
                             /* Get the proxy URL :
                             Proxy server value in the registry can be something like "address:port"
-                            or "ftp=adress1:port1;http=adress2:port2 ..." depending of the
+                            or "ftp=address1:port1;http=address2:port2 ..." depending of the
                             confirguration. */
                             char *psz_proxy;
                             psz_proxy = strstr( psz_key, "http=" );

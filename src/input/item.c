@@ -216,7 +216,7 @@ void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const cha
 }
 
 /* FIXME GRRRRRRRRRR args should be in the reverse order to be
- * consistant with (nearly?) all or copy funcs */
+ * consistent with (nearly?) all or copy funcs */
 void input_item_CopyOptions( input_item_t *p_parent,
                              input_item_t *p_child )
 {

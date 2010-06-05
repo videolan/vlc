@@ -221,7 +221,7 @@ static inline void picture_CopyProperties( picture_t *p_dst, const picture_t *p_
 
 /**
  * This function will reset a picture informations (properties and quantizers).
- * It is sometimes usefull for reusing pictures (like from a pool).
+ * It is sometimes useful for reusing pictures (like from a pool).
  */
 VLC_EXPORT( void, picture_Reset, ( picture_t * ) );
 
@@ -275,7 +275,7 @@ VLC_EXPORT( int, picture_Export, ( vlc_object_t *p_obj, block_t **pp_image, vide
  * It will return VLC_EGENERIC if the core does not understand the requested
  * format.
  *
- * It can be usefull to get the properties of planes.
+ * It can be useful to get the properties of planes.
  */
 VLC_EXPORT( int, picture_Setup, ( picture_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) );
 

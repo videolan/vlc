@@ -675,7 +675,7 @@ rm -rf $RPM_BUILD_ROOT __doc
 - Add BR directfb-devel (wip)
 - Add BR libnotify-devel
 - Enabled --enable-speex
-- Testing --enable-portaudio not usefull (oss is deprecated)
+- Testing --enable-portaudio not useful (oss is deprecated)
 - Enabled --enable-pda
 - Testing --enable-directfb (wip)
 - Removed patch5 (was format.c)
@@ -683,7 +683,7 @@ rm -rf $RPM_BUILD_ROOT __doc
 * Thu Apr  5 2007 kwizart < kwizart at gmail.com > - 0.8.6a-5
 - Use system ffmpeg lib (pth and libtool seems to be incompatible with it)
 - Dirac seem to compile fine but testing usability for now.
-- Cache isn't usefull for now (and won't be since using system libs)
+- Cache isn't useful for now (and won't be since using system libs)
 - Exclude %%{_bindir}/vlcwrapper.py? since this is the guideline about python for now.
 
 * Mon Apr  2 2007 kwizart < kwizart at gmail.com > - 0.8.6a-4.6
@@ -698,7 +698,7 @@ rm -rf $RPM_BUILD_ROOT __doc
 - Clean up svn to release changes
 
 * Tue Mar 22 2007 kwizart < kwizart at gmail.com > - 0.8.6a-4.4
-- WIP changes - ld.conf is unusefull...
+- WIP changes - ld.conf is unuseful...
 
 * Wed Mar 21 2007 kwizart < kwizart at gmail.com > - 0.8.6a-4.3
 - Revert back to the static vlc version 

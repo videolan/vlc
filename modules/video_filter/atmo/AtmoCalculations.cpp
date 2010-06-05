@@ -250,7 +250,7 @@ pColorPacket CAtmoColorCalculator::AnalyzeHSV(tHSVColor *HSV_Img)
     // windowing from -hue_windowsize -> +hue_windowsize
     for (int mywin = -hue_windowsize; mywin < hue_windowsize+1; mywin++)
     {
-      // adressed histogram candlestick
+      // addressed histogram candlestick
       int myidx = i + mywin;
 
       // handle beginning of windowing -> roll back
@@ -374,7 +374,7 @@ pColorPacket CAtmoColorCalculator::AnalyzeHSV(tHSVColor *HSV_Img)
      // windowing from -hue_windowsize -> +hue_windowsize
      for (int mywin = -sat_windowsize; mywin < sat_windowsize+1; mywin++)
      {
-       // adressed histogram candlestick
+       // addressed histogram candlestick
        int myidx = i + mywin;
 
        // handle beginning of windowing -> roll back

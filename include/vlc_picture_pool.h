@@ -53,7 +53,7 @@ typedef struct {
 /**
  * It creates a picture_pool_t wrapping the given configuration.
  *
- * It is usefull to avoid useless picture creations/destructions.
+ * It avoids useless picture creations/destructions.
  * The given picture must not have a reference count greater than 1.
  * The pool takes ownership of the picture and MUST not be used directly.
  * When deleted, the pool will release the pictures using picture_Release.

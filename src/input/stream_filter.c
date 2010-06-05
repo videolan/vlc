@@ -108,7 +108,7 @@ stream_t *stream_FilterChainNew( stream_t *p_source,
     }
     free( psz_tmp );
 
-    /* Add record filter if usefull */
+    /* Add record filter if useful */
     if( b_record )
     {
         stream_t *p_filter = stream_FilterNew( p_source,

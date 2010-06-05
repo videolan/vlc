@@ -410,7 +410,7 @@ int vlc_loaddir( DIR *dir, char ***namelist,
  * Selects file entries from a directory, as GNU C scandir().
  *
  * @param dirname UTF-8 diretory path
- * @param pointer [OUT] pointer set, on succesful completion, to the address
+ * @param pointer [OUT] pointer set, on successful completion, to the address
  * of a table of UTF-8 filenames. All filenames must be freed with free().
  * The table itself must be freed with free() as well.
  *

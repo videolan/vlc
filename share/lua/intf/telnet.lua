@@ -58,7 +58,7 @@ function on_password( client )
     if client.type == host.client_type.net then
         client:send( "Password: " ..IAC..WILL..ECHO )
     else
-        -- no authentification needed on stdin
+        -- no authentication needed on stdin
         client:switch_status( host.status.read )
     end
 end

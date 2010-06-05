@@ -67,7 +67,7 @@ function table_print(t,prefix)
 end
 
 -- print the list of callbacks registered in lua
--- usefull for debug purposes
+-- useful for debug purposes
 function print_callbacks()
     print "callbacks:"
     table_print(vlc.callbacks)

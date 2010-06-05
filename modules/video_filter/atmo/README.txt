@@ -227,7 +227,7 @@ like the group says only for the DMX device
 "Count of AtmoLight Channels" - defines how many RGB Channels should be simulated
 with this DMX device (each RGB channel needs three DMX channels!)
 
-"DMX adress for each channel" - defines the DMX Startadress for each AtmoLight
+"DMX address for each channel" - defines the DMX Startadress for each AtmoLight
 channel as "," or ";" separated list. (starting with 0 up to 252) it is assumed
 that the f.e. of the DMX-AtmoLight channel starts at DMX-Channel 5 - that
 DMX-Channel 5: is red

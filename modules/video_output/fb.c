@@ -144,7 +144,7 @@ struct vout_display_sys_t {
     int      bytes_per_pixel;
 
     /* Video memory */
-    uint8_t     *video_ptr;                                  /* base adress */
+    uint8_t     *video_ptr;                                 /* base address */
     size_t      video_size;                                    /* page size */
 
     picture_t       *picture;

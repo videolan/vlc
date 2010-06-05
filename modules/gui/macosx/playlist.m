@@ -707,7 +707,7 @@
     [self isItem:p_item inNode:p_node checkItemExistence:b_check locked:NO];
 }
 
-/* This method is usefull for instance to remove the selected children of an
+/* This method is useful for instance to remove the selected children of an
    already selected node */
 - (void)removeItemsFrom:(id)o_items ifChildrenOf:(id)o_nodes
 {

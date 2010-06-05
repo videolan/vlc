@@ -495,7 +495,7 @@ static int Open( vlc_object_t * p_this )
             p_sys->p_tref_chap = p_chap;
     }
 
-    /* now process each track and extract all usefull information */
+    /* now process each track and extract all useful information */
     for( i = 0; i < p_sys->i_tracks; i++ )
     {
         p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%d]", i );

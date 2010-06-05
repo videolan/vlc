@@ -326,7 +326,7 @@ function parse_vlm_cmd()
             }
             else
             {
-                vlme.appendChild( document.createTextNode( 'Command succesful (' + value( 'vlm_command' ) + ') ' ) );
+                vlme.appendChild( document.createTextNode( 'Command successful (' + value( 'vlm_command' ) + ') ' ) );
                 vlme.style.color = "#0f0";
                 clear_vlm_add();
             }
