@@ -602,6 +602,9 @@ int OpenEncoder( vlc_object_t *p_this )
     {
         /* Lets give bitrate tolerance */
         p_context->bit_rate_tolerance = __MAX(2 * p_enc->fmt_out.i_bitrate, p_sys->i_vtolerance );
+        /* default to 120 frames between keyframe */
+        if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "keyint" ) )
+           p_context->gop_size = 120;
         /* seems that ffmpeg presets have 720p as divider for buffers */
         if( p_enc->fmt_out.video.i_width >= 720 )
         {
