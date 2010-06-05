@@ -136,7 +136,7 @@ QString FileDestBox::getMRL( const QString& mux )
 void FileDestBox::fileBrowse()
 {
     QString fileName = QFileDialog::getSaveFileName( this, qtr( "Save file..." ),
-            "", qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)" ) );
+            "", qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)" ) );
     fileEdit->setText( toNativeSeparators( fileName ) );
     emit mrlUpdated();
 }
