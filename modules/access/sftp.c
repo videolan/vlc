@@ -134,7 +134,7 @@ static int Open( vlc_object_t* p_this )
     else
     {
         dialog_Login( p_access, &psz_username, &psz_password,
-                      _("SFTP authentification"),
+                      _("SFTP authentication"),
                       _("Please enter a valid login and password for the sftp "
                         "connexion to %s"), url.psz_host );
         if( EMPTY_STR(psz_username) || !psz_password )

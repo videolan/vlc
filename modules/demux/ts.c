@@ -157,7 +157,7 @@ static void Close ( vlc_object_t * );
 
 #define SPLIT_ES_TEXT N_("Separate sub-streams")
 #define SPLIT_ES_LONGTEXT N_( \
-    "Separate teletex/dvbs pages into independant ES. " \
+    "Separate teletex/dvbs pages into independent ES. " \
     "It can be useful to turn off this option when using stream output." )
 
 vlc_module_begin ()
