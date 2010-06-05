@@ -137,6 +137,7 @@ vlc_module_begin ()
             change_safe()
         add_bool(   "rtsp-kasenna", false, NULL, KASENNA_TEXT,
                     KASENNA_LONGTEXT, true )
+            change_safe()
         add_bool(   "rtsp-wmserver", false, NULL, WMSERVER_TEXT,
                     WMSERVER_LONGTEXT, true)
             change_safe()
