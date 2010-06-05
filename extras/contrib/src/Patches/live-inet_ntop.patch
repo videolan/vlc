@@ -1,8 +1,8 @@
 Copyright (C) 2010 Rémi Denis-Courmont.
 Licensed under GNU General Public License version 2 or higher.
-diff -ru live.orig//groupsock/Groupsock.cpp live//groupsock/Groupsock.cpp
---- live.orig//groupsock/Groupsock.cpp	2010-04-09 22:27:39.000000000 +0300
-+++ live//groupsock/Groupsock.cpp	2010-04-17 19:51:07.000000000 +0300
+diff -ru live.orig/groupsock/Groupsock.cpp live/groupsock/Groupsock.cpp
+--- live.orig/groupsock/Groupsock.cpp	2010-05-30 01:20:31.000000000 +0300
++++ live/groupsock/Groupsock.cpp	2010-06-06 00:34:03.000000000 +0300
 @@ -331,8 +331,10 @@
      }
    }
@@ -32,9 +32,9 @@ diff -ru live.orig//groupsock/Groupsock.cpp live//groupsock/Groupsock.cpp
    } else {
      return s1 << (unsigned)(g.ttl()) << ")";
    }
-diff -ru live.orig//groupsock/include/GroupsockHelper.hh live//groupsock/include/GroupsockHelper.hh
---- live.orig//groupsock/include/GroupsockHelper.hh	2010-04-09 22:27:39.000000000 +0300
-+++ live//groupsock/include/GroupsockHelper.hh	2010-04-17 19:43:44.000000000 +0300
+diff -ru live.orig/groupsock/include/GroupsockHelper.hh live/groupsock/include/GroupsockHelper.hh
+--- live.orig/groupsock/include/GroupsockHelper.hh	2010-05-30 01:20:31.000000000 +0300
++++ live/groupsock/include/GroupsockHelper.hh	2010-06-06 00:34:03.000000000 +0300
 @@ -124,7 +124,7 @@
  
  // The following are implemented in inet.c:
@@ -44,10 +44,10 @@ diff -ru live.orig//groupsock/include/GroupsockHelper.hh live//groupsock/include
  extern "C" struct hostent* our_gethostbyname(char* name);
  extern "C" void our_srandom(int x);
  extern "C" long our_random();
-diff -ru live.orig//groupsock/inet.c live//groupsock/inet.c
---- live.orig//groupsock/inet.c	2010-04-09 22:27:39.000000000 +0300
-+++ live//groupsock/inet.c	2010-04-17 19:42:52.000000000 +0300
-@@ -21,26 +21,18 @@
+diff -ru live.orig/groupsock/inet.c live/groupsock/inet.c
+--- live.orig/groupsock/inet.c	2010-05-30 01:20:31.000000000 +0300
++++ live/groupsock/inet.c	2010-06-06 00:39:12.000000000 +0300
+@@ -21,26 +21,19 @@
  }
  
  char *
@@ -65,7 +65,8 @@ diff -ru live.orig//groupsock/inet.c live//groupsock/inet.c
 +     strncpy(result, ret, 16);
 +  return ret;
 +#elif !defined (VXWORKS)
-+  return inet_ntop(AF_INET, &in, result, 16);
++  inet_ntop(AF_INET, &in, result, 16);
++  return(result);
  #else
 -  /* according the man pages of inet_ntoa :
 -
@@ -84,9 +85,9 @@ diff -ru live.orig//groupsock/inet.c live//groupsock/inet.c
    inet_ntoa_b(in, result);
    return(result);
  #endif
-diff -ru live.orig//liveMedia/DarwinInjector.cpp live//liveMedia/DarwinInjector.cpp
---- live.orig//liveMedia/DarwinInjector.cpp	2010-04-09 22:27:39.000000000 +0300
-+++ live//liveMedia/DarwinInjector.cpp	2010-04-17 19:45:19.000000000 +0300
+diff -ru live.orig/liveMedia/DarwinInjector.cpp live/liveMedia/DarwinInjector.cpp
+--- live.orig/liveMedia/DarwinInjector.cpp	2010-05-30 01:20:31.000000000 +0300
++++ live/liveMedia/DarwinInjector.cpp	2010-06-06 00:34:03.000000000 +0300
 @@ -128,7 +128,8 @@
        NetAddress const* address = addresses.firstAddress();
        addr.s_addr = *(unsigned*)(address->data());
@@ -97,9 +98,9 @@ diff -ru live.orig//liveMedia/DarwinInjector.cpp live//liveMedia/DarwinInjector.
  
      // Construct a SDP description for the session that we'll be streaming:
      char const* const sdpFmt =
-diff -ru live.orig//liveMedia/OnDemandServerMediaSubsession.cpp live//liveMedia/OnDemandServerMediaSubsession.cpp
---- live.orig//liveMedia/OnDemandServerMediaSubsession.cpp	2010-04-09 22:27:39.000000000 +0300
-+++ live//liveMedia/OnDemandServerMediaSubsession.cpp	2010-04-17 19:50:05.000000000 +0300
+diff -ru live.orig/liveMedia/OnDemandServerMediaSubsession.cpp live/liveMedia/OnDemandServerMediaSubsession.cpp
+--- live.orig/liveMedia/OnDemandServerMediaSubsession.cpp	2010-05-30 01:20:31.000000000 +0300
++++ live/liveMedia/OnDemandServerMediaSubsession.cpp	2010-06-06 00:34:03.000000000 +0300
 @@ -365,7 +365,8 @@
    char const* mediaType = rtpSink->sdpMediaType();
    unsigned char rtpPayloadType = rtpSink->rtpPayloadType();
@@ -119,9 +120,9 @@ diff -ru live.orig//liveMedia/OnDemandServerMediaSubsession.cpp live//liveMedia/
  
    fSDPLines = strDup(sdpLines);
    delete[] sdpLines;
-diff -ru live.orig//liveMedia/PassiveServerMediaSubsession.cpp live//liveMedia/PassiveServerMediaSubsession.cpp
---- live.orig//liveMedia/PassiveServerMediaSubsession.cpp	2010-04-09 22:27:39.000000000 +0300
-+++ live//liveMedia/PassiveServerMediaSubsession.cpp	2010-04-17 19:46:28.000000000 +0300
+diff -ru live.orig/liveMedia/PassiveServerMediaSubsession.cpp live/liveMedia/PassiveServerMediaSubsession.cpp
+--- live.orig/liveMedia/PassiveServerMediaSubsession.cpp	2010-05-30 01:20:31.000000000 +0300
++++ live/liveMedia/PassiveServerMediaSubsession.cpp	2010-06-06 00:34:03.000000000 +0300
 @@ -54,7 +54,8 @@
      char const* auxSDPLine = fRTPSink.auxSDPLine();
      if (auxSDPLine == NULL) auxSDPLine = "";
@@ -141,9 +142,9 @@ diff -ru live.orig//liveMedia/PassiveServerMediaSubsession.cpp live//liveMedia/P
  
      fSDPLines = strDup(sdpLines);
      delete[] sdpLines;
-diff -ru live.orig//liveMedia/RTCP.cpp live//liveMedia/RTCP.cpp
---- live.orig//liveMedia/RTCP.cpp	2010-04-09 22:27:39.000000000 +0300
-+++ live//liveMedia/RTCP.cpp	2010-04-17 19:46:44.000000000 +0300
+diff -ru live.orig/liveMedia/RTCP.cpp live/liveMedia/RTCP.cpp
+--- live.orig/liveMedia/RTCP.cpp	2010-05-30 01:20:31.000000000 +0300
++++ live/liveMedia/RTCP.cpp	2010-06-06 00:34:03.000000000 +0300
 @@ -359,7 +359,8 @@
      }
  
@@ -154,9 +155,22 @@ diff -ru live.orig//liveMedia/RTCP.cpp live//liveMedia/RTCP.cpp
      unsigned char* p = pkt;
      for (unsigned i = 0; i < packetSize; ++i) {
        if (i%4 == 0) fprintf(stderr, " ");
-diff -ru live.orig//liveMedia/RTSPOverHTTPServer.cpp live//liveMedia/RTSPOverHTTPServer.cpp
---- live.orig//liveMedia/RTSPOverHTTPServer.cpp	2010-04-09 22:27:39.000000000 +0300
-+++ live//liveMedia/RTSPOverHTTPServer.cpp	2010-04-17 19:50:41.000000000 +0300
+diff -ru live.orig/liveMedia/RTSPClient.cpp live/liveMedia/RTSPClient.cpp
+--- live.orig/liveMedia/RTSPClient.cpp	2010-05-30 01:20:31.000000000 +0300
++++ live/liveMedia/RTSPClient.cpp	2010-06-06 00:39:08.000000000 +0300
+@@ -415,7 +415,8 @@
+ int RTSPClient::connectToServer(int socketNum, portNumBits remotePortNum) {
+   MAKE_SOCKADDR_IN(remoteName, fServerAddress, htons(remotePortNum));
+   if (fVerbosityLevel >= 1) {
+-    envir() << "Opening connection to " << our_inet_ntoa(remoteName.sin_addr) << ", port " << remotePortNum << "...\n";
++    char buf[16];
++    envir() << "Opening connection to " << our_inet_ntoa(remoteName.sin_addr, buf) << ", port " << remotePortNum << "...\n";
+   }
+   if (connect(socketNum, (struct sockaddr*) &remoteName, sizeof remoteName) != 0) {
+     if (envir().getErrno() == EINPROGRESS) {
+diff -ru live.orig/liveMedia/RTSPOverHTTPServer.cpp live/liveMedia/RTSPOverHTTPServer.cpp
+--- live.orig/liveMedia/RTSPOverHTTPServer.cpp	2010-05-30 01:20:31.000000000 +0300
++++ live/liveMedia/RTSPOverHTTPServer.cpp	2010-06-06 00:34:03.000000000 +0300
 @@ -128,7 +128,8 @@
    makeSocketNonBlocking(clientSocket);
    increaseSendBufferTo(envir(), clientSocket, 50*1024);
@@ -167,9 +181,9 @@ diff -ru live.orig//liveMedia/RTSPOverHTTPServer.cpp live//liveMedia/RTSPOverHTT
  #endif
  
    // Create a new object for handling this HTTP connection:
-diff -ru live.orig//liveMedia/RTSPServer.cpp live//liveMedia/RTSPServer.cpp
---- live.orig//liveMedia/RTSPServer.cpp	2010-04-09 22:27:39.000000000 +0300
-+++ live//liveMedia/RTSPServer.cpp	2010-04-17 19:49:32.000000000 +0300
+diff -ru live.orig/liveMedia/RTSPServer.cpp live/liveMedia/RTSPServer.cpp
+--- live.orig/liveMedia/RTSPServer.cpp	2010-05-30 01:20:31.000000000 +0300
++++ live/liveMedia/RTSPServer.cpp	2010-06-06 00:34:03.000000000 +0300
 @@ -112,11 +112,12 @@
    char urlBuffer[100]; // more than big enough for "rtsp://<ip-address>:<port>/"
  
@@ -229,9 +243,9 @@ diff -ru live.orig//liveMedia/RTSPServer.cpp live//liveMedia/RTSPServer.cpp
  #endif
    delete clientSession;
  }
-diff -ru live.orig//liveMedia/ServerMediaSession.cpp live//liveMedia/ServerMediaSession.cpp
---- live.orig//liveMedia/ServerMediaSession.cpp	2010-04-09 22:27:39.000000000 +0300
-+++ live//liveMedia/ServerMediaSession.cpp	2010-04-17 19:50:31.000000000 +0300
+diff -ru live.orig/liveMedia/ServerMediaSession.cpp live/liveMedia/ServerMediaSession.cpp
+--- live.orig/liveMedia/ServerMediaSession.cpp	2010-05-30 01:20:31.000000000 +0300
++++ live/liveMedia/ServerMediaSession.cpp	2010-06-06 00:34:03.000000000 +0300
 @@ -185,7 +185,8 @@
  char* ServerMediaSession::generateSDPDescription() {
    struct in_addr ipAddress;
@@ -251,9 +265,9 @@ diff -ru live.orig//liveMedia/ServerMediaSession.cpp live//liveMedia/ServerMedia
    return sdp;
  }
  
-diff -ru live.orig//liveMedia/SIPClient.cpp live//liveMedia/SIPClient.cpp
---- live.orig//liveMedia/SIPClient.cpp	2010-04-09 22:27:39.000000000 +0300
-+++ live//liveMedia/SIPClient.cpp	2010-04-17 19:47:42.000000000 +0300
+diff -ru live.orig/liveMedia/SIPClient.cpp live/liveMedia/SIPClient.cpp
+--- live.orig/liveMedia/SIPClient.cpp	2010-05-30 01:20:31.000000000 +0300
++++ live/liveMedia/SIPClient.cpp	2010-06-06 00:34:03.000000000 +0300
 @@ -60,13 +60,14 @@
  
    struct in_addr ourAddress;
@@ -280,9 +294,9 @@ diff -ru live.orig//liveMedia/SIPClient.cpp live//liveMedia/SIPClient.cpp
  	  << fOurPortNum << ": "
  	  << env.getResultMsg() << "\n";
      }
-diff -ru live.orig//testProgs/sapWatch.cpp live//testProgs/sapWatch.cpp
---- live.orig//testProgs/sapWatch.cpp	2010-04-09 22:27:39.000000000 +0300
-+++ live//testProgs/sapWatch.cpp	2010-04-17 19:51:29.000000000 +0300
+diff -ru live.orig/testProgs/sapWatch.cpp live/testProgs/sapWatch.cpp
+--- live.orig/testProgs/sapWatch.cpp	2010-05-30 01:20:31.000000000 +0300
++++ live/testProgs/sapWatch.cpp	2010-06-06 00:34:03.000000000 +0300
 @@ -49,13 +49,14 @@
    struct sockaddr_in fromAddress;
    while (inputGroupsock.handleRead(packet, maxPacketSize,
