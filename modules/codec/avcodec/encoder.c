@@ -606,7 +606,7 @@ int OpenEncoder( vlc_object_t *p_this )
         if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "keyint" ) )
            p_context->gop_size = 120;
         /* seems that ffmpeg presets have 720p as divider for buffers */
-        if( p_enc->fmt_out.video.i_width >= 720 )
+        if( p_enc->fmt_out.video.i_height >= 720 )
         {
            /* Check that we don't overrun users qmin/qmax values */
            if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmin" ) )
@@ -626,7 +626,7 @@ int OpenEncoder( vlc_object_t *p_this )
         } else {
            if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmin" ) )
            {
-              p_context->mb_qmin = p_context->qmin = FF_QP2LAMBDA;
+              p_context->mb_qmin = p_context->qmin = 1;
               p_context->mb_lmin = p_context->lmin = FF_QP2LAMBDA;
            }
 
