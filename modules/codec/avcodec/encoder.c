@@ -608,13 +608,13 @@ int OpenEncoder( vlc_object_t *p_this )
            /* Check that we don't overrun users qmin/qmax values */
            if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmin" ) )
            {
-              p_context->mb_qmin = p_context->qmin = 10 * FF_QP2LAMBDA;
+              p_context->mb_qmin = p_context->qmin = 10;
               p_context->mb_lmin = p_context->lmin = 10 * FF_QP2LAMBDA;
            }
 
            if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmax" ) )
            {
-              p_context->mb_qmax = p_context->qmax = 42 * FF_QP2LAMBDA;
+              p_context->mb_qmax = p_context->qmax = 42;
               p_context->mb_lmax = p_context->lmax = 42 * FF_QP2LAMBDA;
            }
 
