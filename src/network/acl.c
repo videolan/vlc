@@ -84,9 +84,7 @@ static int ACL_Resolve( vlc_object_t *p_this, uint8_t *p_bytes,
             break;
         }
 
-#if defined (HAVE_GETADDRINFO) || defined (WIN32)
-        /* unfortunately many people define AF_INET6
-           though they don't have struct sockaddr_in6 */
+#ifdef AF_INET6
         case AF_INET6:
         {
             struct sockaddr_in6 *addr;
