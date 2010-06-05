@@ -215,7 +215,7 @@ static int Activate( vlc_object_t *p_this )
 #ifndef WIN32
 #if defined(HAVE_ISATTY)
     /* Check that stdin is a TTY */
-    if( !var_InheritInteger( p_intf, "rc-fake-tty" ) && !isatty( 0 ) )
+    if( !var_InheritBool( p_intf, "rc-fake-tty" ) && !isatty( 0 ) )
     {
         msg_Warn( p_intf, "fd 0 is not a TTY" );
         return VLC_EGENERIC;
@@ -329,7 +329,7 @@ static int Activate( vlc_object_t *p_this )
     p_intf->pf_run = Run;
 
 #ifdef WIN32
-    p_intf->p_sys->b_quiet = var_InheritInteger( p_intf, "rc-quiet" );
+    p_intf->p_sys->b_quiet = var_InheritBool( p_intf, "rc-quiet" );
     if( !p_intf->p_sys->b_quiet ) { CONSOLE_INTRO_MSG; }
 #else
     CONSOLE_INTRO_MSG;
@@ -442,7 +442,7 @@ static void Run( intf_thread_t *p_intf )
     playlist_t *     p_playlist = pl_Get( p_intf );
 
     char p_buffer[ MAX_LINE_LENGTH + 1 ];
-    bool b_showpos = var_InheritInteger( p_intf, "rc-show-pos" );
+    bool b_showpos = var_InheritBool( p_intf, "rc-show-pos" );
     bool b_longhelp = false;
 
     int  i_size = 0;
