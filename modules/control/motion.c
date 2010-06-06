@@ -157,7 +157,7 @@ int Open ( vlc_object_t *p_this )
     p_intf->pf_run = RunIntf;
 
     p_intf->p_sys->b_use_rotate =
-        var_InheritInteger( p_intf, "motion-use-rotate" );
+        var_InheritBool( p_intf, "motion-use-rotate" );
 
     return VLC_SUCCESS;
 }

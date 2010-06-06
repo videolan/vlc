@@ -679,7 +679,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     ParseMRL( p_sys, p_demux->psz_path, (vlc_object_t *) p_demux );
 
 #ifdef HAVE_LIBV4L2
-    if( !var_InheritInteger( p_this, CFG_PREFIX "use-libv4l2" ) )
+    if( !var_InheritBool( p_this, CFG_PREFIX "use-libv4l2" ) )
     {
         msg_Dbg( p_this, "Trying direct kernel v4l2" );
         use_kernel_v4l2( p_sys );
@@ -1134,7 +1134,7 @@ static int AccessOpen( vlc_object_t * p_this )
     ParseMRL( p_sys, p_access->psz_location, (vlc_object_t *) p_access );
 
 #ifdef HAVE_LIBV4L2
-    if( !var_InheritInteger( p_this, CFG_PREFIX "use-libv4l2" ) )
+    if( !var_InheritBool( p_this, CFG_PREFIX "use-libv4l2" ) )
     {
         msg_Dbg( p_this, "Trying direct kernel v4l2" );
         use_kernel_v4l2( p_sys );

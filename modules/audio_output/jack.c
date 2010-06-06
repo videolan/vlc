@@ -186,7 +186,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Auto connect ports if we were asked to */
-    if( var_InheritInteger( p_aout, AUTO_CONNECT_OPTION ) )
+    if( var_InheritBool( p_aout, AUTO_CONNECT_OPTION ) )
     {
         unsigned int i_in_ports;
         char *psz_regex = var_InheritString( p_aout, CONNECT_REGEX_OPTION );

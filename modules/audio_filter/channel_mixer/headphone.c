@@ -197,7 +197,7 @@ static int Init( vlc_object_t *p_this, struct filter_sys_t * p_data
     int i_source_channel_offset;
     unsigned int i;
 
-    if( var_InheritInteger( p_this, "headphone-compensate" ) )
+    if( var_InheritBool( p_this, "headphone-compensate" ) )
     {
         /* minimal distance to any speaker */
         if( i_physical_channels & AOUT_CHAN_REARCENTER )
@@ -473,7 +473,7 @@ static int OpenFilter( vlc_object_t *p_this )
     }
     if( p_filter->fmt_in.audio.i_physical_channels == (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT)
           && ( p_filter->fmt_in.audio.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
-          && !var_InheritInteger( p_filter, "headphone-dolby" ) )
+          && !var_InheritBool( p_filter, "headphone-dolby" ) )
     {
         b_fit = false;
         p_filter->fmt_in.audio.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |

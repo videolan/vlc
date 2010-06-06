@@ -283,7 +283,7 @@ static int Open( vlc_object_t * p_this )
 
     /* For unseekable stream, automaticaly use Demux_UnSeekable */
     if( !p_sys->b_seekable
-     || var_InheritInteger( p_demux, "avi-interleaved" ) )
+     || var_InheritBool( p_demux, "avi-interleaved" ) )
     {
         p_demux->pf_demux = Demux_UnSeekable;
     }

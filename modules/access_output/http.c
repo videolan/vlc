@@ -279,7 +279,7 @@ static int Open( vlc_object_t *p_this )
     }
 
 #if 0 //def HAVE_AVAHI_CLIENT
-    if( var_InheritInteger(p_this, SOUT_CFG_PREFIX "bonjour") )
+    if( var_InheritBool(p_this, SOUT_CFG_PREFIX "bonjour") )
     {
         char                *psz_txt, *psz_name;
         playlist_t          *p_playlist = pl_Get( p_access );

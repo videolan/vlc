@@ -538,7 +538,7 @@ static int OpenBlending( intf_thread_t *p_intf )
             p_intf->p_sys->fmt_out.i_sar_den;
     p_intf->p_sys->p_blend->fmt_out.video.i_chroma =
             p_intf->p_sys->fmt_out.i_chroma;
-    if( var_InheritInteger( p_intf, "freetype-yuvp" ) )
+    if( var_InheritBool( p_intf, "freetype-yuvp" ) )
         p_intf->p_sys->p_blend->fmt_in.video.i_chroma =
                 VLC_CODEC_YUVP;
     else

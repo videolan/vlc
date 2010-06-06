@@ -138,13 +138,13 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->psz_service = p_intf->p_sys->psz_service ?
         p_intf->p_sys->psz_service : strdup(VLCSERVICENAME);
 
-    if( var_InheritInteger( p_intf, "ntservice-install" ) )
+    if( var_InheritBool( p_intf, "ntservice-install" ) )
     {
         NTServiceInstall( p_intf );
         return;
     }
 
-    if( var_InheritInteger( p_intf, "ntservice-uninstall" ) )
+    if( var_InheritBool( p_intf, "ntservice-uninstall" ) )
     {
         NTServiceUninstall( p_intf );
         return;

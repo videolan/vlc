@@ -509,7 +509,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_aout->output.p_sys->b_workaround_buggy_driver =
-        var_InheritInteger( p_aout, "oss-buggy" );
+        var_InheritBool( p_aout, "oss-buggy" );
 
     /* Create OSS thread and wait for its readiness. */
     if( vlc_thread_create( p_aout, "aout", OSSThread,

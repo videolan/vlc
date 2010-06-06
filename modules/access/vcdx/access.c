@@ -546,7 +546,7 @@ VCDParse( access_t * p_access, /*out*/ vcdinfo_itemid_t * p_itemid,
     char        *psz_source;
     char        *psz_next;
 
-    if( var_InheritInteger( p_access, MODULE_STRING "-PBC" ) ) {
+    if( var_InheritBool( p_access, MODULE_STRING "-PBC" ) ) {
       p_itemid->type = VCDINFO_ITEM_TYPE_LID;
       p_itemid->num = 1;
       *play_single_item = false;
