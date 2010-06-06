@@ -39,9 +39,12 @@ function main()
          if string.match( line, "title" ) then 
             title = vlc.strings.resolve_xml_special_chars( find( line, "title\":\"(.-)\""))
             art = find( line, "poster\":\"(.-)\"")
-            art = "http://trailers.apple.com"..art
+            if string.match( art, "http://" ) then
+            else
+                art = "http://trailers.apple.com"..art
+            end
 
-            url = find( line, "url\":\"(.-)\"")
+            url = find( line, "location\":\"(.-)\"")
             playlist = vlc.stream( "http://trailers.apple.com"..url.."includes/playlists/web.inc" )
             if not playlist then 
                 vlc.msg.info("Didn't get playlist...")
