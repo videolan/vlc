@@ -278,7 +278,8 @@ function open_fiche(url)
 
     -- Open stream
     local s = vlc.stream(url)
-    local data = s:read(65535)
+    -- Read max 500k (Note: 65k is not enough for the average note)
+    local data = s:read(500000)
 
     -- Buffer & temp variables
     local first = nil
