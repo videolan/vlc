@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 1.1.0\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2010-05-29 00:44+0100\n"
-"PO-Revision-Date: 2010-05-27 19:55+0300\n"
+"POT-Creation-Date: 2010-06-06 23:34+0100\n"
+"PO-Revision-Date: 2010-06-04 21:43+0300\n"
 "Last-Translator: Oleksandr Natalenko <pfactum@gmail.com>\n"
 "Language-Team: Ukrainian <kde-i18n-doc@kde.org>\n"
 "Language: uk\n"
@@ -41,7 +41,7 @@ msgstr "Натисніть  «Додаткові параметри», щоб п
 
 #: include/vlc_config_cat.h:37 modules/gui/macosx/simple_prefs.m:180
 #: modules/gui/qt4/components/simple_preferences.cpp:81
-#: modules/gui/qt4/menus.cpp:1013 modules/misc/dummy/dummy.c:69
+#: modules/gui/qt4/menus.cpp:1016 modules/misc/dummy/dummy.c:69
 msgid "Interface"
 msgstr "Інтерфейс"
 
@@ -119,7 +119,7 @@ msgstr "Модулі виводу"
 msgid "General settings for audio output modules."
 msgstr "Загальні параметри модулів виведення звуку."
 
-#: include/vlc_config_cat.h:66 src/libvlc-module.c:2039
+#: include/vlc_config_cat.h:66 src/libvlc-module.c:2042
 #: modules/stream_out/transcode/transcode.c:226
 msgid "Miscellaneous"
 msgstr "Інше"
@@ -134,6 +134,7 @@ msgstr "Інші налаштування звуку та модулі."
 #: modules/gui/macosx/playlistinfo.m:103 modules/gui/macosx/simple_prefs.m:188
 #: modules/gui/macosx/wizard.m:381
 #: modules/gui/qt4/components/info_panels.cpp:508
+#: modules/gui/qt4/components/interface_widgets.cpp:234
 #: modules/gui/qt4/components/simple_preferences.cpp:85
 #: modules/misc/dummy/dummy.c:106 modules/services_discovery/mediadirs.c:70
 #: modules/stream_out/es.c:101 modules/stream_out/transcode/transcode.c:161
@@ -238,7 +239,7 @@ msgstr "Загальний ввід"
 msgid "General input settings. Use with care..."
 msgstr "Загальні налаштування вводу. Використовуйте обережно…"
 
-#: include/vlc_config_cat.h:124 src/libvlc-module.c:1959
+#: include/vlc_config_cat.h:124 src/libvlc-module.c:1962
 msgid "Stream output"
 msgstr "Виведення потоку"
 
@@ -349,7 +350,7 @@ msgstr "VOD"
 msgid "VLC's implementation of Video On Demand"
 msgstr "VLC-реалізація відео-за-вимогою"
 
-#: include/vlc_config_cat.h:175 src/libvlc-module.c:2101
+#: include/vlc_config_cat.h:175 src/libvlc-module.c:2108
 #: src/playlist/engine.c:131 modules/demux/playlist/playlist.c:69
 #: modules/demux/playlist/playlist.c:70 modules/gui/macosx/embeddedwindow.m:75
 #: modules/gui/macosx/intf.m:608 modules/gui/qt4/components/controller.hpp:106
@@ -383,7 +384,7 @@ msgid ""
 msgstr ""
 "Модулі пошуку служб автоматично додають елементи до списку відтворення."
 
-#: include/vlc_config_cat.h:186 src/libvlc-module.c:1906
+#: include/vlc_config_cat.h:186 src/libvlc-module.c:1909
 msgid "Advanced"
 msgstr "Додатково"
 
@@ -877,15 +878,15 @@ msgstr "ключ"
 msgid "boolean"
 msgstr "булеве"
 
-#: src/config/file.c:630 src/libvlc.c:1581
+#: src/config/file.c:630 src/libvlc.c:1549
 msgid "integer"
 msgstr "ціле"
 
-#: src/config/file.c:639 src/libvlc.c:1611
+#: src/config/file.c:639 src/libvlc.c:1579
 msgid "float"
 msgstr "десяткове"
 
-#: src/config/file.c:662 src/libvlc.c:1559
+#: src/config/file.c:662 src/libvlc.c:1527
 msgid "string"
 msgstr "рядок"
 
@@ -909,8 +910,8 @@ msgstr "декодер"
 
 #: src/input/decoder.c:280 src/input/decoder.c:441
 #: modules/codec/avcodec/encoder.c:224 modules/codec/avcodec/encoder.c:232
-#: modules/codec/avcodec/encoder.c:254 modules/codec/avcodec/encoder.c:692
-#: modules/codec/avcodec/encoder.c:701 modules/stream_out/es.c:363
+#: modules/codec/avcodec/encoder.c:254 modules/codec/avcodec/encoder.c:723
+#: modules/codec/avcodec/encoder.c:732 modules/stream_out/es.c:363
 #: modules/stream_out/es.c:378
 msgid "Streaming / Transcoding failed"
 msgstr "Помилка потокового виводу чи перекодування"
@@ -1172,29 +1173,29 @@ msgstr "Аудіодоріжка"
 msgid "Subtitles Track"
 msgstr "Доріжка субтитрів"
 
-#: src/input/var.c:285
+#: src/input/var.c:283
 msgid "Next title"
 msgstr "Наступний розділ"
 
-#: src/input/var.c:290
+#: src/input/var.c:288
 msgid "Previous title"
 msgstr "Попередній розділ"
 
-#: src/input/var.c:316
+#: src/input/var.c:314
 #, c-format
 msgid "Title %i"
 msgstr "Розділ %i"
 
-#: src/input/var.c:340 src/input/var.c:399
+#: src/input/var.c:338 src/input/var.c:397
 #, c-format
 msgid "Chapter %i"
 msgstr "Розділ %i"
 
-#: src/input/var.c:378
+#: src/input/var.c:376
 msgid "Next chapter"
 msgstr "Наступний розділ"
 
-#: src/input/var.c:383
+#: src/input/var.c:381
 msgid "Previous chapter"
 msgstr "Попередній розділ"
 
@@ -1229,11 +1230,11 @@ msgid "Mouse Gestures"
 msgstr "Жести мишою"
 
 #. xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
-#: src/libvlc.c:337 src/libvlc.c:441
+#: src/libvlc.c:338 src/libvlc.c:442
 msgid "C"
 msgstr "C"
 
-#: src/libvlc.c:1109
+#: src/libvlc.c:1111
 msgid ""
 "Running vlc with the default interface. Use 'cvlc' to use vlc without "
 "interface."
@@ -1241,11 +1242,11 @@ msgstr ""
 "Запуск vlc з інтерфейсом за змовчуванням. Використовуйте 'cvlc' для "
 "використання vlc без інтерфейсу."
 
-#: src/libvlc.c:1233
+#: src/libvlc.c:1201
 msgid "To get exhaustive help, use '-H'."
 msgstr "Для отримання вичерпної допомоги використовуйте '-H'."
 
-#: src/libvlc.c:1237 src/libvlc-module.c:1515
+#: src/libvlc.c:1205 src/libvlc-module.c:1515
 #, c-format
 msgid ""
 "Usage: %s [options] [stream] ...\n"
@@ -1317,32 +1318,32 @@ msgstr ""
 "відтворення на певний час\n"
 "  vlc:quit                           Спеціальний пункт для виходу з VLC\n"
 
-#: src/libvlc.c:1627
+#: src/libvlc.c:1595
 msgid " (default enabled)"
 msgstr " (за змовчуванням увімкнено)"
 
-#: src/libvlc.c:1628
+#: src/libvlc.c:1596
 msgid " (default disabled)"
 msgstr " (за змовчуванням вимкнено)"
 
-#: src/libvlc.c:1791 src/libvlc.c:1794 src/libvlc.c:1802 src/libvlc.c:1807
+#: src/libvlc.c:1759 src/libvlc.c:1762 src/libvlc.c:1770 src/libvlc.c:1775
 msgid "Note:"
 msgstr "Примітка:"
 
-#: src/libvlc.c:1792 src/libvlc.c:1795
+#: src/libvlc.c:1760 src/libvlc.c:1763
 msgid "add --advanced to your command line to see advanced options."
 msgstr ""
 "додайте --advanced у командному рядку для того, аби бачити додаткові "
 "параметри."
 
-#: src/libvlc.c:1803 src/libvlc.c:1808
+#: src/libvlc.c:1771 src/libvlc.c:1776
 #, c-format
 msgid ""
 "%d module(s) were not displayed because they only have advanced options.\n"
 msgstr ""
 "%d модуль(і) не були відображені, бо вони мають лише додаткові параметри.\n"
 
-#: src/libvlc.c:1815 src/libvlc.c:1819
+#: src/libvlc.c:1783 src/libvlc.c:1787
 msgid ""
 "No matching module found. Use --list or --list-verbose to list available "
 "modules."
@@ -1350,22 +1351,22 @@ msgstr ""
 "Не знайдено підходящого модуля. Використовуйте --list або --list-verbose для "
 "перегляду доступних модулів."
 
-#: src/libvlc.c:1908
+#: src/libvlc.c:1876
 #, c-format
 msgid "VLC version %s (%s)\n"
 msgstr "Версія VLC %s (%s)\n"
 
-#: src/libvlc.c:1910
+#: src/libvlc.c:1878
 #, c-format
 msgid "Compiled by %s on %s (%s)\n"
 msgstr "Скомпільовано %s на %s (%s)\n"
 
-#: src/libvlc.c:1912
+#: src/libvlc.c:1880
 #, c-format
 msgid "Compiler: %s\n"
 msgstr "Компілятор: %s\n"
 
-#: src/libvlc.c:1947
+#: src/libvlc.c:1915
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
@@ -1373,7 +1374,7 @@ msgstr ""
 "\n"
 "Вміст збережено до файлу vlc-help.txt .\n"
 
-#: src/libvlc.c:1967
+#: src/libvlc.c:1935
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -1381,24 +1382,24 @@ msgstr ""
 "\n"
 "Для продовження натисніть ENTER…\n"
 
-#: src/libvlc.h:166 src/libvlc-module.c:1462 src/libvlc-module.c:1463
-#: src/libvlc-module.c:2635 src/video_output/vout_intf.c:199
+#: src/libvlc.h:180 src/libvlc-module.c:1462 src/libvlc-module.c:1463
+#: src/libvlc-module.c:2642 src/video_output/vout_intf.c:200
 msgid "Zoom"
 msgstr "Масштаб"
 
-#: src/libvlc.h:167 src/libvlc-module.c:1382 src/video_output/vout_intf.c:94
+#: src/libvlc.h:181 src/libvlc-module.c:1382 src/video_output/vout_intf.c:95
 msgid "1:4 Quarter"
 msgstr "1:4 Чверть"
 
-#: src/libvlc.h:168 src/libvlc-module.c:1383 src/video_output/vout_intf.c:95
+#: src/libvlc.h:182 src/libvlc-module.c:1383 src/video_output/vout_intf.c:96
 msgid "1:2 Half"
 msgstr "1:2 Половина"
 
-#: src/libvlc.h:169 src/libvlc-module.c:1384 src/video_output/vout_intf.c:96
+#: src/libvlc.h:183 src/libvlc-module.c:1384 src/video_output/vout_intf.c:97
 msgid "1:1 Original"
 msgstr "1:1 Оригінал"
 
-#: src/libvlc.h:170 src/libvlc-module.c:1385 src/video_output/vout_intf.c:97
+#: src/libvlc.h:184 src/libvlc-module.c:1385 src/video_output/vout_intf.c:98
 msgid "2:1 Double"
 msgstr "2:1 Подвійний"
 
@@ -1770,7 +1771,7 @@ msgstr ""
 #: src/libvlc-module.c:356 modules/access/dshow/dshow.cpp:82
 #: modules/access/dshow/dshow.cpp:84 modules/codec/avcodec/avcodec.c:74
 #: modules/codec/kate.c:202
-#: modules/gui/qt4/components/interface_widgets.cpp:382
+#: modules/gui/qt4/components/interface_widgets.cpp:395
 msgid "None"
 msgstr "Немає"
 
@@ -2010,7 +2011,7 @@ msgstr ""
 "Оверлейне виведення — це вбудована у відеокарту здатність виводити "
 "відеопотік напряму. VLC буде намагатися використовувати це за змовчуванням."
 
-#: src/libvlc-module.c:442 src/video_output/vout_intf.c:339
+#: src/libvlc-module.c:442 src/video_output/vout_intf.c:340
 #: modules/gui/macosx/simple_prefs.m:295
 msgid "Always on top"
 msgstr "Зверху всіх вікон"
@@ -2437,12 +2438,12 @@ msgstr ""
 "Дозволяє віддалено синхронізувати годинник сервера й клієнта. Детальні "
 "налаштування доступні в розділі «Додатково / Мережева синхронізація»."
 
-#: src/libvlc-module.c:653 src/video_output/vout_intf.c:105
-#: src/video_output/vout_intf.c:123 modules/access/dshow/dshow.cpp:82
+#: src/libvlc-module.c:653 src/video_output/vout_intf.c:106
+#: src/video_output/vout_intf.c:124 modules/access/dshow/dshow.cpp:82
 #: modules/access/dshow/dshow.cpp:84 modules/access/dshow/dshow.cpp:87
 #: modules/access/dshow/dshow.cpp:93 modules/access/v4l2.c:232
 #: modules/audio_output/alsa.c:107 modules/gui/fbosd.c:171
-#: modules/gui/macosx/prefs_widgets.m:1297
+#: modules/gui/macosx/prefs_widgets.m:1305
 #: modules/gui/macosx/simple_prefs.m:415 modules/gui/macosx/simple_prefs.m:536
 #: modules/gui/macosx/simple_prefs.m:769 modules/gui/macosx/vout.m:212
 #: modules/gui/qt4/components/preferences_widgets.cpp:619
@@ -2762,7 +2763,7 @@ msgstr "Увімкнути «шари»"
 msgid "You can completely disable the sub-picture processing."
 msgstr "Можна повністю вимкнути обробку шарів."
 
-#: src/libvlc-module.c:805 src/libvlc-module.c:1758 src/text/iso-639_def.h:143
+#: src/libvlc-module.c:805 src/libvlc-module.c:1761 src/text/iso-639_def.h:143
 #: modules/gui/macosx/simple_prefs.m:286
 #: modules/stream_out/transcode/transcode.c:222
 msgid "On Screen Display"
@@ -3716,7 +3717,7 @@ msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
 msgstr ""
 "Ці параметри налаштовують глобальні комбінації клавіш («гарячі клавіші»)."
 
-#: src/libvlc-module.c:1274 src/video_output/vout_intf.c:350
+#: src/libvlc-module.c:1274 src/video_output/vout_intf.c:351
 #: modules/gui/macosx/controls.m:454 modules/gui/macosx/controls.m:510
 #: modules/gui/macosx/controls.m:1087 modules/gui/macosx/controls.m:1120
 #: modules/gui/macosx/embeddedwindow.m:68 modules/gui/macosx/intf.m:605
@@ -4503,7 +4504,7 @@ msgstr "Циклічно перемикати аудіопристрої"
 msgid "Cycle through available audio devices"
 msgstr "Циклічно перемикати доступні аудіопристрої"
 
-#: src/libvlc-module.c:1683 src/video_output/vout_intf.c:356
+#: src/libvlc-module.c:1686 src/video_output/vout_intf.c:357
 #: modules/gui/macosx/controls.m:494 modules/gui/macosx/controls.m:1086
 #: modules/gui/macosx/intf.m:687 modules/gui/macosx/intf.m:751
 #: modules/gui/qt4/components/controller.hpp:106
@@ -4511,95 +4512,95 @@ msgstr "Циклічно перемикати доступні аудіопри�
 msgid "Snapshot"
 msgstr "Стоп-кадр"
 
-#: src/libvlc-module.c:1700
+#: src/libvlc-module.c:1703
 msgid "Window properties"
 msgstr "Налаштування вікна"
 
-#: src/libvlc-module.c:1759
+#: src/libvlc-module.c:1762
 msgid "Subpictures"
 msgstr "Шари"
 
-#: src/libvlc-module.c:1767 modules/codec/subtitles/subsdec.c:202
+#: src/libvlc-module.c:1770 modules/codec/subtitles/subsdec.c:202
 #: modules/demux/kate_categories.c:41 modules/demux/kate_categories.c:54
 #: modules/demux/subtitle.c:73
 msgid "Subtitles"
 msgstr "Субтитри"
 
-#: src/libvlc-module.c:1785 modules/stream_out/transcode/transcode.c:115
+#: src/libvlc-module.c:1788 modules/stream_out/transcode/transcode.c:115
 msgid "Overlays"
 msgstr "Накладення"
 
-#: src/libvlc-module.c:1793
+#: src/libvlc-module.c:1796
 msgid "Track settings"
 msgstr "Налаштування доріжки"
 
-#: src/libvlc-module.c:1823
+#: src/libvlc-module.c:1826
 msgid "Playback control"
 msgstr "Керування відтворенням"
 
-#: src/libvlc-module.c:1850
+#: src/libvlc-module.c:1853
 msgid "Default devices"
 msgstr "Пристрої за змовчуванням"
 
-#: src/libvlc-module.c:1859
+#: src/libvlc-module.c:1862
 msgid "Network settings"
 msgstr "Налаштування мережі"
 
-#: src/libvlc-module.c:1871
+#: src/libvlc-module.c:1874
 msgid "Socks proxy"
 msgstr "Проксі-сервер Socks"
 
-#: src/libvlc-module.c:1880 modules/demux/kate_categories.c:47
+#: src/libvlc-module.c:1883 modules/demux/kate_categories.c:47
 msgid "Metadata"
 msgstr "Метадані"
 
-#: src/libvlc-module.c:1931
+#: src/libvlc-module.c:1934
 msgid "Decoders"
 msgstr "Декодери"
 
-#: src/libvlc-module.c:1938 modules/access/v4l2.c:80
+#: src/libvlc-module.c:1941 modules/access/v4l2.c:80
 #: modules/gui/macosx/playlistinfo.m:97
 msgid "Input"
 msgstr "Ввід"
 
-#: src/libvlc-module.c:1977
+#: src/libvlc-module.c:1980
 msgid "VLM"
 msgstr "VLM"
 
-#: src/libvlc-module.c:2009
+#: src/libvlc-module.c:2012
 msgid "CPU"
 msgstr "ЦП"
 
-#: src/libvlc-module.c:2038
+#: src/libvlc-module.c:2041
 msgid "Special modules"
 msgstr "Спеціальні модулі"
 
-#: src/libvlc-module.c:2044 modules/gui/qt4/dialogs/plugins.cpp:66
+#: src/libvlc-module.c:2047 modules/gui/qt4/dialogs/plugins.cpp:66
 msgid "Plugins"
 msgstr "Плагіни"
 
-#: src/libvlc-module.c:2055
+#: src/libvlc-module.c:2062
 msgid "Performance options"
 msgstr "Налаштування швидкодії"
 
-#: src/libvlc-module.c:2203
+#: src/libvlc-module.c:2210
 msgid "Hot keys"
 msgstr "Гарячі клавіші"
 
-#: src/libvlc-module.c:2645
+#: src/libvlc-module.c:2652
 msgid "Jump sizes"
 msgstr "Розміри переходів"
 
-#: src/libvlc-module.c:2722
+#: src/libvlc-module.c:2729
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr ""
 "друкувати допомогу по VLC (може бути разом з --advanced та --help-verbose)"
 
-#: src/libvlc-module.c:2725
+#: src/libvlc-module.c:2732
 msgid "Exhaustive help for VLC and its modules"
 msgstr "Вичерпна допомога по VLC та його модулям"
 
-#: src/libvlc-module.c:2727
+#: src/libvlc-module.c:2734
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
@@ -4607,19 +4608,19 @@ msgstr ""
 "друкувати допомогу по VLC та усіх його модулях (може бути разом з -advanced "
 "та --help-verbose)"
 
-#: src/libvlc-module.c:2730
+#: src/libvlc-module.c:2737
 msgid "ask for extra verbosity when displaying help"
 msgstr "запитувати про додаткові подробиці під час показу довідки"
 
-#: src/libvlc-module.c:2732
+#: src/libvlc-module.c:2739
 msgid "print a list of available modules"
 msgstr "показати список доступних модулів"
 
-#: src/libvlc-module.c:2734
+#: src/libvlc-module.c:2741
 msgid "print a list of available modules with extra detail"
 msgstr "показати список доступних модулів із додатковими деталями"
 
-#: src/libvlc-module.c:2736
+#: src/libvlc-module.c:2743
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose). Prefix the module name with = for strict matches."
@@ -4628,29 +4629,29 @@ msgstr ""
 "help-verbose). Для чіткої відповідності поставте префікс «=» перед іменем "
 "модуля."
 
-#: src/libvlc-module.c:2740
+#: src/libvlc-module.c:2747
 msgid "no configuration option will be loaded nor saved to config file"
 msgstr ""
 "параметри конфігурації не будуть завантажені та збережені до "
 "конфігураційного файлу"
 
-#: src/libvlc-module.c:2742
+#: src/libvlc-module.c:2749
 msgid "reset the current config to the default values"
 msgstr "скинути поточну конфігурацію до параметрів за змовчуванням"
 
-#: src/libvlc-module.c:2744
+#: src/libvlc-module.c:2751
 msgid "use alternate config file"
 msgstr "використовувати альтернативний файл конфігурації"
 
-#: src/libvlc-module.c:2746
+#: src/libvlc-module.c:2753
 msgid "resets the current plugins cache"
 msgstr "очистити поточний кеш розширень"
 
-#: src/libvlc-module.c:2748
+#: src/libvlc-module.c:2755
 msgid "print version information"
 msgstr "показати інформацію про версію"
 
-#: src/libvlc-module.c:2788
+#: src/libvlc-module.c:2793
 msgid "main program"
 msgstr "головна програма"
 
@@ -5461,29 +5462,28 @@ msgstr "Чжуан"
 msgid "Zulu"
 msgstr "Зулуська"
 
-#: src/video_output/vout_intf.c:232 modules/gui/macosx/intf.m:692
+#: src/video_output/vout_intf.c:233 modules/gui/macosx/intf.m:692
 #: modules/gui/macosx/intf.m:693 modules/video_filter/crop.c:105
 #: modules/video_filter/croppadd.c:86
 msgid "Crop"
 msgstr "Обрізати"
 
-#: src/video_output/vout_intf.c:296 modules/gui/macosx/controls.m:810
+#: src/video_output/vout_intf.c:297 modules/gui/macosx/controls.m:810
 #: modules/gui/macosx/intf.m:690 modules/gui/macosx/intf.m:691
 msgid "Aspect-ratio"
 msgstr "Співвідношення сторін"
 
-#: src/video_output/vout_intf.c:326
+#: src/video_output/vout_intf.c:327
 msgid "Autoscale video"
 msgstr "Автомасштабування відео"
 
-#: src/video_output/vout_intf.c:332
+#: src/video_output/vout_intf.c:333
 msgid "Scale factor"
 msgstr "Множник масштабування"
 
-#: src/video_output/vout_intf.c:370
-#, fuzzy
+#: src/video_output/vout_intf.c:371
 msgid "Video splitter"
-msgstr "Відеофільтр"
+msgstr "Відеоспліттер"
 
 #: modules/3dnow/memcpy.c:46
 msgid "3D Now! memcpy"
@@ -5555,12 +5555,11 @@ msgstr "Ввід вкладення"
 
 #: modules/access/avio.h:34
 msgid "Avio"
-msgstr ""
+msgstr "Avio"
 
 #: modules/access/avio.h:35
-#, fuzzy
 msgid "FFmpeg access"
-msgstr "Доступ до Zip"
+msgstr "Доступ FFmpeg"
 
 #: modules/access/bd/bd.c:54
 msgid "Caching value for BDs. This value should be set in milliseconds."
@@ -6765,11 +6764,11 @@ msgstr "Ввід з HTTP"
 msgid "HTTP(S)"
 msgstr "HTTP(S)"
 
-#: modules/access/http.c:539
+#: modules/access/http.c:546
 msgid "HTTP authentication"
 msgstr "Аутентифікація HTTP"
 
-#: modules/access/http.c:540
+#: modules/access/http.c:547
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "Будь ласка, введіть правильний логін та пароль для гілки %s."
@@ -7505,7 +7504,8 @@ msgid "SFTP input"
 msgstr "Ввід з SFTP"
 
 #: modules/access/sftp.c:137
-msgid "SFTP authentification"
+#, fuzzy
+msgid "SFTP authentication"
 msgstr "Аутентифікація SFTP"
 
 #: modules/access/sftp.c:138
@@ -7611,7 +7611,7 @@ msgid "Height of the stream to capture (-1 for autodetect)."
 msgstr "Висота потоку для захоплення (-1 для автовизначення)."
 
 #: modules/access/v4l.c:108 modules/access/v4l2.c:108
-#: modules/gui/macosx/extended.m:98 modules/video_filter/atmo/atmo.cpp:251
+#: modules/gui/macosx/extended.m:98 modules/video_filter/atmo/atmo.cpp:258
 msgid "Brightness"
 msgstr "Яскравість"
 
@@ -8286,13 +8286,12 @@ msgid "Append to file if it exists instead of replacing it."
 msgstr "Дописувати до файлу замість того, щоб замінювати його."
 
 #: modules/access_output/file.c:66
-#, fuzzy
 msgid "Synchronous writing"
-msgstr "Синхронізація"
+msgstr "Синхронний запис"
 
 #: modules/access_output/file.c:67
 msgid "Open the file with synchronous writing."
-msgstr ""
+msgstr "Відкрити файл із синхронним записом."
 
 #: modules/access_output/file.c:70
 msgid "File stream output"
@@ -9408,22 +9407,22 @@ msgstr "Вивід звуку через PORTAUDIO"
 msgid "5.1"
 msgstr "5.1"
 
-#: modules/audio_output/pulse.c:65 modules/gui/macosx/embeddedwindow.m:76
+#: modules/audio_output/pulse.c:66 modules/gui/macosx/embeddedwindow.m:76
 #: modules/gui/macosx/intf.m:595 modules/gui/macosx/intf.m:596
 #: modules/gui/macosx/intf.m:1992 modules/gui/qt4/dialogs/help.cpp:99
-#: modules/gui/qt4/main_interface.cpp:808
-#: modules/gui/qt4/main_interface.cpp:812
-#: modules/gui/qt4/main_interface.cpp:852
-#: modules/gui/qt4/main_interface.cpp:854
-#: modules/gui/qt4/main_interface.cpp:922
-#: modules/gui/qt4/main_interface.cpp:939
-#: modules/gui/qt4/main_interface.cpp:946
-#: modules/gui/qt4/main_interface.cpp:969
+#: modules/gui/qt4/main_interface.cpp:837
+#: modules/gui/qt4/main_interface.cpp:841
+#: modules/gui/qt4/main_interface.cpp:881
+#: modules/gui/qt4/main_interface.cpp:883
+#: modules/gui/qt4/main_interface.cpp:951
+#: modules/gui/qt4/main_interface.cpp:968
+#: modules/gui/qt4/main_interface.cpp:975
+#: modules/gui/qt4/main_interface.cpp:998
 #: modules/video_output/xcb/window.c:319
 msgid "VLC media player"
 msgstr "Медіаплеєр VLC"
 
-#: modules/audio_output/pulse.c:103
+#: modules/audio_output/pulse.c:104
 msgid "Pulseaudio audio output"
 msgstr "Вивід звуку через Pulseaudio"
 
@@ -9721,14 +9720,14 @@ msgid "This allows hardware decoding when available."
 msgstr "Дозволяє апаратне декодування, якщо воно доступне."
 
 #: modules/codec/avcodec/avcodec.h:141
-#, fuzzy
 msgid "Threads"
-msgstr "Поріг"
+msgstr "Потоки"
 
 #: modules/codec/avcodec/avcodec.h:142
-#, fuzzy
 msgid "Number of threads used for decoding, 0 meaning auto"
-msgstr "Кількість потоків, використовуваних для перекодування."
+msgstr ""
+"Кількість потоків, використовуваних для перекодування, 0 значить обирати "
+"автоматично"
 
 #: modules/codec/avcodec/avcodec.h:149
 msgid "Ratio of key frames"
@@ -10021,7 +10020,7 @@ msgstr ""
 "Це не внутрішня помилка медіаплеєру VLC.\n"
 "Не зв’язуйтеся з проектом VideoLAN з приводу цієї проблеми.\n"
 
-#: modules/codec/avcodec/encoder.c:693 modules/codec/avcodec/encoder.c:702
+#: modules/codec/avcodec/encoder.c:724 modules/codec/avcodec/encoder.c:733
 msgid "VLC could not open the encoder."
 msgstr "VLC не зміг відкрити кодер."
 
@@ -11480,7 +11479,6 @@ msgid "H.264 level"
 msgstr "Рівень H.264"
 
 #: modules/codec/x264.c:125
-#, fuzzy
 msgid ""
 "Specify H.264 level (as defined by Annex A of the standard). Levels are not "
 "enforced; it's up to the user to select a level compatible with the rest of "
@@ -11488,8 +11486,9 @@ msgid ""
 "for letting x264 set level."
 msgstr ""
 "Вкажіть рівень H.264 (як визначено доповненням A стандарту). Рівні не є "
-"вимушеними: користувачу надається право обрати рівень, сумісний з іншими "
-"параметрами кодування. Значення від 1 до 51 (також дозволено від 10 до 51)."
+"вимушеними; користувачу надається право обрати рівень, сумісний з іншими "
+"параметрами кодування. Значення від 1 до 51 (також дозволено від 10 до 51). "
+"Значення 0 дозволяє x264 самому встановити рівень"
 
 #: modules/codec/x264.c:130
 msgid "H.264 profile"
@@ -12371,39 +12370,39 @@ msgstr "1.00x"
 msgid "Subtitle delay %i ms"
 msgstr "Затримка субтитрів %i мс"
 
-#: modules/control/hotkeys.c:793 modules/control/hotkeys.c:803
+#: modules/control/hotkeys.c:797
 #, c-format
 msgid "Subtitle position %i px"
 msgstr "Позиція субтитрів %i px"
 
-#: modules/control/hotkeys.c:813 modules/control/hotkeys.c:823
+#: modules/control/hotkeys.c:807 modules/control/hotkeys.c:817
 #, c-format
 msgid "Audio delay %i ms"
 msgstr "Затримка звуку %i мс"
 
-#: modules/control/hotkeys.c:861
+#: modules/control/hotkeys.c:855
 msgid "Recording"
 msgstr "Запис"
 
-#: modules/control/hotkeys.c:863
+#: modules/control/hotkeys.c:857
 msgid "Recording done"
 msgstr "Запис завершено"
 
-#: modules/control/hotkeys.c:1043
+#: modules/control/hotkeys.c:1037
 #, c-format
 msgid "Volume %d%%"
 msgstr "Гучність %d%%"
 
-#: modules/control/hotkeys.c:1050
+#: modules/control/hotkeys.c:1044
 #, c-format
 msgid "Speed: %.2fx"
 msgstr "Швидкість: %.2fx"
 
-#: modules/control/http/http.c:41
+#: modules/control/http/http.c:41 modules/misc/lua/vlc.c:61
 msgid "Host address"
 msgstr "Адреса хоста"
 
-#: modules/control/http/http.c:43
+#: modules/control/http/http.c:43 modules/misc/lua/vlc.c:63
 msgid ""
 "Address and port the HTTP interface will listen on. It defaults to all "
 "network interfaces (0.0.0.0). If you want the HTTP interface to be available "
@@ -12414,6 +12413,7 @@ msgstr ""
 "був доступний тільки на локальній машині, введіть 127.0.0.1"
 
 #: modules/control/http/http.c:47 modules/control/http/http.c:48
+#: modules/misc/lua/vlc.c:67 modules/misc/lua/vlc.c:68
 msgid "Source directory"
 msgstr "Вихідний каталог"
 
@@ -13137,14 +13137,6 @@ msgstr "| відправлено байтів       : %8.0f КіБ"
 msgid "| sending bitrate  :   %6.0f kb/s"
 msgstr "| бітрейт надсилання  :   %6.0f кб/с"
 
-#: modules/control/signals.c:37
-msgid "Signals"
-msgstr "Сигнали"
-
-#: modules/control/signals.c:40
-msgid "POSIX signals handling interface"
-msgstr "Інтерфейс обробки POSIX-сигналів"
-
 #: modules/control/telnet.c:72 modules/stream_out/raop.c:147
 msgid "Host"
 msgstr "Адреса"
@@ -13335,61 +13327,60 @@ msgid "GME demuxer (Game_Music_Emu)"
 msgstr "Демультиплексор GME (Game_Music_Emu)"
 
 #: modules/demux/image.c:43
-#, fuzzy
 msgid "ES ID"
-msgstr "TS ID"
+msgstr "ES ID"
 
 #: modules/demux/image.c:51
-#, fuzzy
 msgid "Decode"
-msgstr "Декодовано"
+msgstr "Декодувати"
 
 #: modules/demux/image.c:53
 msgid "Decode at the demuxer stage"
-msgstr ""
+msgstr "Декодувати на стадії демультиплексування"
 
 #: modules/demux/image.c:55
-#, fuzzy
 msgid "Forced chroma"
-msgstr "Кольоровість зображення"
+msgstr "Вимушена кольоровість"
 
 #: modules/demux/image.c:57
 msgid ""
 "If non empty and image-decode is true, the image will be converted to the "
 "specified chroma."
 msgstr ""
+"Якщо не порожнє та встановлено декодування зображення, то зображення буде "
+"конвертовано у обрану кольоровість."
 
 #: modules/demux/image.c:60
-#, fuzzy
 msgid "Duration in second"
-msgstr "Тривалість у мс"
+msgstr "Тривалість у секундах"
 
 #: modules/demux/image.c:62
 msgid ""
 "Duration in second before simulating an end of file. A negative value means "
 "an unlimited play time."
 msgstr ""
+"Тривалість у секундах перед симуляцією кінця файлу. Негативне значення "
+"означає нескінченний час відтворення."
 
 #: modules/demux/image.c:67
-#, fuzzy
 msgid "Frame rate of the elementary stream produced."
-msgstr "Частота кадрів відео елементарного потоку"
+msgstr "Частота кадрів відео продукованого елементарного потоку."
 
 #: modules/demux/image.c:69
-#, fuzzy
 msgid "Real-time"
-msgstr "Час затримки"
+msgstr "Реальний час"
 
 #: modules/demux/image.c:71
 msgid ""
 "Use real-time mode suitable for being used as a master input and real-time "
 "input slaves."
 msgstr ""
+"Використання режиму реального часу підходить для використання головним "
+"вводом та допоміжними вводами реального часу."
 
 #: modules/demux/image.c:75
-#, fuzzy
 msgid "Image demuxer"
-msgstr "Демультиплексор AVI"
+msgstr "Демультиплексор зображення"
 
 #: modules/demux/kate_categories.c:40
 msgid "Closed captions"
@@ -13541,11 +13532,11 @@ msgstr "Порт тунелю HTTP"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "Порт для тунелювання RTSP/RTP по HTTP."
 
-#: modules/demux/live555.cpp:602
+#: modules/demux/live555.cpp:603
 msgid "RTSP authentication"
 msgstr "Аутентифікація RTSP"
 
-#: modules/demux/live555.cpp:603
+#: modules/demux/live555.cpp:604
 msgid "Please enter a valid login name and a password."
 msgstr "Будь ласка, введіть правильний логін та пароль."
 
@@ -13567,19 +13558,19 @@ msgstr ""
 msgid "M-JPEG camera demuxer"
 msgstr "Демультиплексор M-JPEG"
 
-#: modules/demux/mkv/chapter_command.cpp:146
+#: modules/demux/mkv/chapter_command.cpp:143
 msgid "---  DVD Menu"
 msgstr "--- DVD Меню"
 
-#: modules/demux/mkv/chapter_command.cpp:152
+#: modules/demux/mkv/chapter_command.cpp:149
 msgid "First Played"
 msgstr "Перші відтворені"
 
-#: modules/demux/mkv/chapter_command.cpp:154
+#: modules/demux/mkv/chapter_command.cpp:151
 msgid "Video Manager"
 msgstr "Менеджер відео"
 
-#: modules/demux/mkv/chapter_command.cpp:160
+#: modules/demux/mkv/chapter_command.cpp:157
 msgid "----- Title"
 msgstr "----- Назва"
 
@@ -13724,15 +13715,15 @@ msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:946
 msgid "Writer"
-msgstr ""
+msgstr "Сценарист"
 
 #: modules/demux/mp4/mp4.c:947
 msgid "Composr"
-msgstr ""
+msgstr "Композитор"
 
 #: modules/demux/mp4/mp4.c:948
 msgid "Producer"
-msgstr ""
+msgstr "Виробник"
 
 #: modules/demux/mp4/mp4.c:949 modules/gui/macosx/playlistinfo.m:421
 #: modules/gui/qt4/components/controller.hpp:109
@@ -13741,75 +13732,64 @@ msgid "Information"
 msgstr "Інформація"
 
 #: modules/demux/mp4/mp4.c:950
-#, fuzzy
 msgid "Director"
-msgstr "Каталог"
+msgstr "Продюсер"
 
 #: modules/demux/mp4/mp4.c:951
-#, fuzzy
 msgid "Disclaimer"
-msgstr "Відкидання"
+msgstr "Відмова від відповідальності"
 
 #: modules/demux/mp4/mp4.c:952
-#, fuzzy
 msgid "Requirements"
-msgstr "Сегменти"
+msgstr "Вимоги"
 
 #: modules/demux/mp4/mp4.c:953
-#, fuzzy
 msgid "Original Format"
-msgstr "Оригінальний ID"
+msgstr "Оригінальний формат"
 
 #: modules/demux/mp4/mp4.c:954
-#, fuzzy
 msgid "Display Source As"
-msgstr "Режим відображення"
+msgstr "Показувати джерело як"
 
 #: modules/demux/mp4/mp4.c:955
-#, fuzzy
 msgid "Host Computer"
-msgstr "Мій комп’ютер"
+msgstr "Головний комп’ютер"
 
 #: modules/demux/mp4/mp4.c:956
-#, fuzzy
 msgid "Performers"
-msgstr "Налаштування швидкодії"
+msgstr "Актори"
 
 #: modules/demux/mp4/mp4.c:957
-#, fuzzy
 msgid "Original Performer"
-msgstr "Оригінальний розмір"
+msgstr "Початковий виконавець"
 
 #: modules/demux/mp4/mp4.c:958
 msgid "Providers Source Content"
-msgstr ""
+msgstr "Постачальники вихідного вмісту"
 
 #: modules/demux/mp4/mp4.c:959
 msgid "Warning"
-msgstr ""
+msgstr "Попередження"
 
 #: modules/demux/mp4/mp4.c:960
-#, fuzzy
 msgid "Software"
-msgstr "AtmoWin Software"
+msgstr "Програмне забезпечення"
 
 #: modules/demux/mp4/mp4.c:962
 msgid "Make"
-msgstr ""
+msgstr "Зробити"
 
 #: modules/demux/mp4/mp4.c:963
-#, fuzzy
 msgid "Model"
-msgstr "Режим"
+msgstr "Модель"
 
 #: modules/demux/mp4/mp4.c:964
 msgid "Product"
-msgstr ""
+msgstr "Продукт"
 
 #: modules/demux/mp4/mp4.c:965
-#, fuzzy
 msgid "Grouping"
-msgstr "Група"
+msgstr "Групування"
 
 #: modules/demux/mpc.c:62
 msgid "MusePack demuxer"
@@ -14301,8 +14281,9 @@ msgid "Separate sub-streams"
 msgstr "Окремі підпотоки"
 
 #: modules/demux/ts.c:160
+#, fuzzy
 msgid ""
-"Separate teletex/dvbs pages into independant ES. It can be usefull to turn "
+"Separate teletex/dvbs pages into independent ES. It can be useful to turn "
 "off this option when using stream output."
 msgstr ""
 "Розділяє сторінки телетексту/DVB у незалежні ES. Може бути корисним "
@@ -15387,7 +15368,7 @@ msgstr "Заголовок"
 
 #: modules/gui/macosx/open.m:183 modules/gui/macosx/open.m:192
 #: modules/gui/macosx/open.m:308 modules/gui/macosx/output.m:145
-#: modules/gui/macosx/prefs_widgets.m:1181
+#: modules/gui/macosx/prefs_widgets.m:1189
 #: modules/gui/macosx/simple_prefs.m:299
 #: modules/gui/qt4/components/preferences_widgets.cpp:299
 #: modules/gui/qt4/components/simple_preferences.cpp:276
@@ -15799,7 +15780,7 @@ msgid "Empty Folder"
 msgstr "Порожній каталог"
 
 #: modules/gui/macosx/playlistinfo.m:74
-#: modules/gui/qt4/dialogs/mediainfo.cpp:49
+#: modules/gui/qt4/dialogs/mediainfo.cpp:51
 msgid "Media Information"
 msgstr "Медіаінформація"
 
@@ -15908,15 +15889,15 @@ msgstr ""
 "Це скине всі налаштування медіаплеєру VLC.\n"
 "Ви впевнені у продовженні?"
 
-#: modules/gui/macosx/prefs_widgets.m:1216
+#: modules/gui/macosx/prefs_widgets.m:1224
 msgid "Select a directory"
 msgstr "Виберіть каталог"
 
-#: modules/gui/macosx/prefs_widgets.m:1216
+#: modules/gui/macosx/prefs_widgets.m:1224
 msgid "Select a file"
 msgstr "Виберіть файл"
 
-#: modules/gui/macosx/prefs_widgets.m:1217
+#: modules/gui/macosx/prefs_widgets.m:1225
 msgid "Select"
 msgstr "Вибрати"
 
@@ -16858,7 +16839,7 @@ msgstr ""
 "Не відображувати діалоги, які не вимагають реакції користувача (панель "
 "критичних повідомлень та помилок)."
 
-#: modules/gui/hildon/maemo.c:62
+#: modules/gui/hildon/maemo.c:63
 msgid "Maemo hildon interface"
 msgstr "Інтерфейс Maemo hildon"
 
@@ -17499,11 +17480,11 @@ msgstr "Відтворено"
 msgid "buffers"
 msgstr "буферів"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:380
+#: modules/gui/qt4/components/interface_widgets.cpp:393
 msgid "Current visualization"
 msgstr "Поточна візуалізація"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:419
+#: modules/gui/qt4/components/interface_widgets.cpp:432
 msgid ""
 "Current playback speed: %1\n"
 "Click to adjust"
@@ -17511,19 +17492,19 @@ msgstr ""
 "Швидкість поточного відтворювання: %1\n"
 "Клікніть для налаштування"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:490
+#: modules/gui/qt4/components/interface_widgets.cpp:503
 msgid "Revert to normal play speed"
 msgstr "Повернути нормальну швидкість відтворення"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:564
+#: modules/gui/qt4/components/interface_widgets.cpp:577
 msgid "Download cover art"
 msgstr "Завантажити обкладинку альбому"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:606
+#: modules/gui/qt4/components/interface_widgets.cpp:620
 msgid "Click to toggle between elapsed and remaining time"
 msgstr "Натисніть для перемикання між часом відтворення та часом, що лишився"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:608
+#: modules/gui/qt4/components/interface_widgets.cpp:622
 msgid "Double click to jump to a chosen time position"
 msgstr "Двічі клацніть для переходу на обрану часову позицію"
 
@@ -17614,9 +17595,8 @@ msgid "Advanced Options"
 msgstr "Додаткові параметри"
 
 #: modules/gui/qt4/components/playlist/playlist.cpp:54
-#, fuzzy
 msgid "Media Browser"
-msgstr " Огляд "
+msgstr "Медіаоглядач"
 
 #: modules/gui/qt4/components/playlist/playlist.cpp:80
 msgid "Double click to get media information"
@@ -17779,7 +17759,7 @@ msgstr "Це змінний інтерфейс VLC. Ви можете заван
 
 #: modules/gui/qt4/components/simple_preferences.cpp:528
 msgid "VLC skins website"
-msgstr ""
+msgstr "Веб-сайт обкладинок VLC"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:553
 msgid "System's default"
@@ -17836,11 +17816,11 @@ msgstr "Видалити обраний профіль"
 msgid "Create a new profile"
 msgstr "Створити новий профіль"
 
-#: modules/gui/qt4/components/sout/profile_selector.cpp:400
+#: modules/gui/qt4/components/sout/profile_selector.cpp:402
 msgid " Profile Name Missing"
 msgstr " Не вистачає імені профілю"
 
-#: modules/gui/qt4/components/sout/profile_selector.cpp:401
+#: modules/gui/qt4/components/sout/profile_selector.cpp:403
 msgid "You must set a name for the profile."
 msgstr "Ви маєте встановити ім’я для профілю."
 
@@ -17878,8 +17858,9 @@ msgid "Save file..."
 msgstr "Зберегти файл…"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:139
-#: modules/gui/qt4/dialogs/convert.cpp:113
-msgid "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)"
+#, fuzzy
+msgid ""
+"Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 msgstr "Контейнери (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:151
@@ -17948,7 +17929,7 @@ msgstr "Видалити всі закладки"
 #: modules/gui/qt4/dialogs/errors.cpp:47
 #: modules/gui/qt4/dialogs/extended.cpp:85 modules/gui/qt4/dialogs/help.cpp:62
 #: modules/gui/qt4/dialogs/help.cpp:94
-#: modules/gui/qt4/dialogs/mediainfo.cpp:72
+#: modules/gui/qt4/dialogs/mediainfo.cpp:74
 #: modules/gui/qt4/dialogs/messages.cpp:110
 #: modules/gui/qt4/dialogs/plugins.cpp:70
 #: modules/gui/qt4/dialogs/plugins.cpp:527
@@ -17989,12 +17970,16 @@ msgstr "Налаштування"
 msgid "&Start"
 msgstr "Старт"
 
+#: modules/gui/qt4/dialogs/convert.cpp:113
+msgid "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)"
+msgstr "Контейнери (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)"
+
 #: modules/gui/qt4/dialogs/errors.cpp:40
 msgid "Errors"
 msgstr "Помилки"
 
 #: modules/gui/qt4/dialogs/errors.cpp:48
-#: modules/gui/qt4/dialogs/messages.cpp:188 modules/gui/qt4/menus.cpp:1507
+#: modules/gui/qt4/dialogs/messages.cpp:188 modules/gui/qt4/menus.cpp:1510
 msgid "&Clear"
 msgstr "Очистити"
 
@@ -18184,27 +18169,27 @@ msgstr "У вас остання версія медіаплеєру VLC."
 msgid "An error occurred while checking for updates..."
 msgstr "Сталася помилка під час перевірки поновлення…"
 
-#: modules/gui/qt4/dialogs/mediainfo.cpp:56
+#: modules/gui/qt4/dialogs/mediainfo.cpp:58
 msgid "&General"
 msgstr "Загальне"
 
-#: modules/gui/qt4/dialogs/mediainfo.cpp:58
+#: modules/gui/qt4/dialogs/mediainfo.cpp:60
 msgid "&Extra Metadata"
 msgstr "Додаткові метадані"
 
-#: modules/gui/qt4/dialogs/mediainfo.cpp:60
+#: modules/gui/qt4/dialogs/mediainfo.cpp:62
 msgid "&Codec Details"
 msgstr "Деталі кодеку"
 
-#: modules/gui/qt4/dialogs/mediainfo.cpp:64
+#: modules/gui/qt4/dialogs/mediainfo.cpp:66
 msgid "&Statistics"
 msgstr "Статистика"
 
-#: modules/gui/qt4/dialogs/mediainfo.cpp:70
+#: modules/gui/qt4/dialogs/mediainfo.cpp:72
 msgid "&Save Metadata"
 msgstr "Зберегти метадані"
 
-#: modules/gui/qt4/dialogs/mediainfo.cpp:75
+#: modules/gui/qt4/dialogs/mediainfo.cpp:77
 msgid "Location:"
 msgstr "Місцезнаходження:"
 
@@ -18639,11 +18624,11 @@ msgstr "Файли субтитрів"
 msgid "All Files"
 msgstr "Усі файли"
 
-#: modules/gui/qt4/main_interface.cpp:923
+#: modules/gui/qt4/main_interface.cpp:952
 msgid "Control menu for the player"
 msgstr "Меню керування плеєра"
 
-#: modules/gui/qt4/main_interface.cpp:966
+#: modules/gui/qt4/main_interface.cpp:995
 msgid "Paused"
 msgstr "Призупинено"
 
@@ -18655,11 +18640,11 @@ msgstr "Медіа"
 msgid "P&layback"
 msgstr "Відтворення"
 
-#: modules/gui/qt4/menus.cpp:293 modules/gui/qt4/menus.cpp:989
+#: modules/gui/qt4/menus.cpp:293 modules/gui/qt4/menus.cpp:992
 msgid "&Audio"
 msgstr "Аудіо"
 
-#: modules/gui/qt4/menus.cpp:294 modules/gui/qt4/menus.cpp:996
+#: modules/gui/qt4/menus.cpp:294 modules/gui/qt4/menus.cpp:999
 msgid "&Video"
 msgstr "Відео"
 
@@ -18667,7 +18652,7 @@ msgstr "Відео"
 msgid "&Tools"
 msgstr "Інструменти"
 
-#: modules/gui/qt4/menus.cpp:298 modules/gui/qt4/menus.cpp:1039
+#: modules/gui/qt4/menus.cpp:298 modules/gui/qt4/menus.cpp:1042
 msgid "V&iew"
 msgstr "Вигляд"
 
@@ -18707,7 +18692,7 @@ msgstr "Конвертувати/зберегти…"
 msgid "&Streaming..."
 msgstr "Мовлення…"
 
-#: modules/gui/qt4/menus.cpp:354 modules/gui/qt4/menus.cpp:1099
+#: modules/gui/qt4/menus.cpp:354 modules/gui/qt4/menus.cpp:1102
 msgid "&Quit"
 msgstr "Вихід"
 
@@ -18911,27 +18896,27 @@ msgstr "Наступний"
 msgid "Open &Network..."
 msgstr "Відкрити мережу…"
 
-#: modules/gui/qt4/menus.cpp:976
+#: modules/gui/qt4/menus.cpp:978
 msgid "Leave Fullscreen"
 msgstr "Залишити повноекранний режим"
 
-#: modules/gui/qt4/menus.cpp:1003
+#: modules/gui/qt4/menus.cpp:1006
 msgid "&Playback"
 msgstr "Відтворення"
 
-#: modules/gui/qt4/menus.cpp:1081
+#: modules/gui/qt4/menus.cpp:1084
 msgid "Hide VLC media player in taskbar"
 msgstr "Сховати медіаплеєр VLC у треї"
 
-#: modules/gui/qt4/menus.cpp:1087
+#: modules/gui/qt4/menus.cpp:1090
 msgid "Show VLC media player"
 msgstr "Показати медіаплеєр VLC"
 
-#: modules/gui/qt4/menus.cpp:1097
+#: modules/gui/qt4/menus.cpp:1100
 msgid "&Open Media"
 msgstr "Відкрити медіа"
 
-#: modules/gui/qt4/menus.cpp:1492
+#: modules/gui/qt4/menus.cpp:1495
 msgid " - Empty - "
 msgstr " - Порожньо - "
 
@@ -18947,7 +18932,7 @@ msgstr ""
 "Показувати додаткові параметри замість простих при відкритті діалогу "
 "налаштування."
 
-#: modules/gui/qt4/qt4.cpp:75 modules/gui/skins2/src/skin_main.cpp:540
+#: modules/gui/qt4/qt4.cpp:75 modules/gui/skins2/src/skin_main.cpp:455
 msgid "Systray icon"
 msgstr "Значок в області сповіщень"
 
@@ -19190,19 +19175,19 @@ msgid "XSPF playlist|*.xspf|M3U file|*.m3u|HTML playlist|*.html"
 msgstr ""
 "Список відтворення XSPF|*.xspf|M3U file|*.m3u|Список відтворення HTML|*.html"
 
-#: modules/gui/skins2/src/skin_main.cpp:535
+#: modules/gui/skins2/src/skin_main.cpp:450
 msgid "Skin to use"
 msgstr "Використовуваний скін"
 
-#: modules/gui/skins2/src/skin_main.cpp:536
+#: modules/gui/skins2/src/skin_main.cpp:451
 msgid "Path to the skin to use."
 msgstr "Шлях до використовуваного скіна."
 
-#: modules/gui/skins2/src/skin_main.cpp:537
+#: modules/gui/skins2/src/skin_main.cpp:452
 msgid "Config of last used skin"
 msgstr "Конфігурація останнього скіна"
 
-#: modules/gui/skins2/src/skin_main.cpp:538
+#: modules/gui/skins2/src/skin_main.cpp:453
 msgid ""
 "Windows configuration of the last skin used. This option is updated "
 "automatically, do not touch it."
@@ -19210,20 +19195,20 @@ msgstr ""
 "Конфігурація Windows для останнього використовуваного скіна. Цей параметр "
 "оновлюється автоматично."
 
-#: modules/gui/skins2/src/skin_main.cpp:541
+#: modules/gui/skins2/src/skin_main.cpp:456
 msgid "Show a systray icon for VLC"
 msgstr "Показувати значок VLC ні панелі сповіщень"
 
-#: modules/gui/skins2/src/skin_main.cpp:542
-#: modules/gui/skins2/src/skin_main.cpp:543
+#: modules/gui/skins2/src/skin_main.cpp:457
+#: modules/gui/skins2/src/skin_main.cpp:458
 msgid "Show VLC on the taskbar"
 msgstr "Показувати VLC на панелі завдань"
 
-#: modules/gui/skins2/src/skin_main.cpp:544
+#: modules/gui/skins2/src/skin_main.cpp:459
 msgid "Enable transparency effects"
 msgstr "Увімкнути ефекти прозорості"
 
-#: modules/gui/skins2/src/skin_main.cpp:545
+#: modules/gui/skins2/src/skin_main.cpp:460
 msgid ""
 "You can disable all transparency effects if you want. This is mainly useful "
 "when moving windows does not behave correctly."
@@ -19231,16 +19216,16 @@ msgstr ""
 "Ви можете заборонити усі ефекти прозорості, що може бути корисним, якщо при "
 "переміщенні вікна некоректно промальовуються."
 
-#: modules/gui/skins2/src/skin_main.cpp:548
-#: modules/gui/skins2/src/skin_main.cpp:549
+#: modules/gui/skins2/src/skin_main.cpp:463
+#: modules/gui/skins2/src/skin_main.cpp:464
 msgid "Use a skinned playlist"
 msgstr "Використовувати оформлений список відтворення"
 
-#: modules/gui/skins2/src/skin_main.cpp:550
+#: modules/gui/skins2/src/skin_main.cpp:465
 msgid "Display video in a skinned window if any"
 msgstr "Відображувати відео у оздобленому вікні, якщо таке є"
 
-#: modules/gui/skins2/src/skin_main.cpp:552
+#: modules/gui/skins2/src/skin_main.cpp:467
 msgid ""
 "When set to 'no', this parameter is intended to give old skins a chance to "
 "play back video even though no video tag is implemented"
@@ -19248,17 +19233,13 @@ msgstr ""
 "Якщо встановлено «ні», цей параметр дає старим обкладинкам шанс відтворювати "
 "відео навіть без реалізованого тега відео"
 
-#: modules/gui/skins2/src/skin_main.cpp:578
+#: modules/gui/skins2/src/skin_main.cpp:493
 msgid "Skins"
 msgstr "Скіни"
 
-#: modules/gui/skins2/src/skin_main.cpp:579
+#: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skinnable Interface"
 msgstr "Інтерфейс зі скінами"
-
-#: modules/gui/skins2/src/skin_main.cpp:593
-msgid "Skins loader demux"
-msgstr "Демультиплексор завантажника скінів"
 
 #: modules/gui/skins2/src/theme_repository.cpp:65
 msgid "Select skin"
@@ -19980,63 +19961,77 @@ msgstr ""
 "Конфігураційний рядок інтерфейсу Lua. Формат: '[\"<ім’я модулю інтерфейсу>"
 "\"] = { <параметр> = <значення>, ...}, ...'."
 
-#: modules/misc/lua/vlc.c:65
+#: modules/misc/lua/vlc.c:69
+#, fuzzy
+msgid "Directory index"
+msgstr "Ввід із каталогу"
+
+#: modules/misc/lua/vlc.c:70
+msgid "Allow to build directory index"
+msgstr ""
+
+#: modules/misc/lua/vlc.c:75
 msgid "Lua Interface Module"
 msgstr "Модуль інтерфейсу Lua"
 
-#: modules/misc/lua/vlc.c:66
+#: modules/misc/lua/vlc.c:76
 msgid "Interfaces implemented using lua scripts"
 msgstr "Інтерфейси, реалізовані скриптами Lua"
 
-#: modules/misc/lua/vlc.c:84
+#: modules/misc/lua/vlc.c:91
+#, fuzzy
+msgid "Lua HTTP"
+msgstr "HTTP"
+
+#: modules/misc/lua/vlc.c:98
 msgid "Lua Meta Fetcher"
 msgstr "Отримувач метаінформації Lua"
 
-#: modules/misc/lua/vlc.c:85
+#: modules/misc/lua/vlc.c:99
 msgid "Fetch meta data using lua scripts"
 msgstr "Отримувати метадані за допомогою скриптів Lua"
 
-#: modules/misc/lua/vlc.c:90
+#: modules/misc/lua/vlc.c:104
 msgid "Lua Meta Reader"
 msgstr "Читач метаінформації Lua"
 
-#: modules/misc/lua/vlc.c:91
+#: modules/misc/lua/vlc.c:105
 msgid "Read meta data using lua scripts"
 msgstr "Читати метадані за допомогою скриптів Lua"
 
-#: modules/misc/lua/vlc.c:97
+#: modules/misc/lua/vlc.c:111
 msgid "Lua Playlist"
 msgstr "Список відтворення Lua"
 
-#: modules/misc/lua/vlc.c:98
+#: modules/misc/lua/vlc.c:112
 msgid "Lua Playlist Parser Interface"
 msgstr "Інтерфейс парсера списку відтворення Lua"
 
-#: modules/misc/lua/vlc.c:103
+#: modules/misc/lua/vlc.c:117
 msgid "Lua Interface Module (shortcuts)"
 msgstr "Модуль інтерфейсу Lua (швидкі клавіші)"
 
-#: modules/misc/lua/vlc.c:110
+#: modules/misc/lua/vlc.c:124
 msgid "Lua Art"
 msgstr "Мистецтво Lua"
 
-#: modules/misc/lua/vlc.c:111
+#: modules/misc/lua/vlc.c:125
 msgid "Fetch artwork using lua scripts"
 msgstr "Отримувати мистецькі роботи за допомогою скриптів lua"
 
-#: modules/misc/lua/vlc.c:116
+#: modules/misc/lua/vlc.c:130
 msgid "Lua Extension"
 msgstr "Розширення Lua"
 
-#: modules/misc/lua/vlc.c:122
+#: modules/misc/lua/vlc.c:136
 msgid "Lua SD Module"
 msgstr "Модуль SD Lua"
 
-#: modules/misc/lua/vlc.c:132
+#: modules/misc/lua/vlc.c:146
 msgid "Freebox TV"
 msgstr "ТБ Freebox"
 
-#: modules/misc/lua/vlc.c:138
+#: modules/misc/lua/vlc.c:152
 msgid "French TV"
 msgstr "Французьке ТБ"
 
@@ -20933,7 +20928,7 @@ msgid "Applications"
 msgstr "Програми"
 
 #: modules/services_discovery/xcb_apps.c:348
-#: modules/video_output/msw/direct3d.c:177
+#: modules/video_output/msw/direct3d.c:178
 msgid "Desktop"
 msgstr "Робочий стіл"
 
@@ -22052,39 +22047,43 @@ msgstr ""
 "Оберіть бажані пристрої зі списку або оберіть AtmoWin Software для "
 "делегування обробки зовнішньому процесу з більшою кількістю опцій"
 
-#: modules/video_filter/atmo/atmo.cpp:146
+#: modules/video_filter/atmo/atmo.cpp:147
 msgid "AtmoWin Software"
 msgstr "AtmoWin Software"
 
-#: modules/video_filter/atmo/atmo.cpp:148
+#: modules/video_filter/atmo/atmo.cpp:149
 msgid "Classic AtmoLight"
 msgstr "Класичний AtmoLight"
 
-#: modules/video_filter/atmo/atmo.cpp:149
+#: modules/video_filter/atmo/atmo.cpp:150
 msgid "Quattro AtmoLight"
 msgstr "Quattro AtmoLight"
 
-#: modules/video_filter/atmo/atmo.cpp:150
+#: modules/video_filter/atmo/atmo.cpp:151
 msgid "DMX"
 msgstr "DMX"
 
-#: modules/video_filter/atmo/atmo.cpp:151
+#: modules/video_filter/atmo/atmo.cpp:152
 msgid "MoMoLight"
 msgstr "MoMoLight"
 
-#: modules/video_filter/atmo/atmo.cpp:154
+#: modules/video_filter/atmo/atmo.cpp:153
+msgid "fnordlicht"
+msgstr ""
+
+#: modules/video_filter/atmo/atmo.cpp:156
 msgid "Count of AtmoLight channels"
 msgstr "Кількість каналів AtmoLight"
 
-#: modules/video_filter/atmo/atmo.cpp:155
+#: modules/video_filter/atmo/atmo.cpp:157
 msgid "How many AtmoLight channels, should be emulated with that DMX device"
 msgstr "Скільки каналів AtmoLight буде емульовано пристроєм DMX"
 
-#: modules/video_filter/atmo/atmo.cpp:157
+#: modules/video_filter/atmo/atmo.cpp:159
 msgid "DMX address for each channel"
 msgstr "Адреса DMX для кожного каналу"
 
-#: modules/video_filter/atmo/atmo.cpp:158
+#: modules/video_filter/atmo/atmo.cpp:160
 msgid ""
 "Define here the DMX base address for each channel use , or ; to seperate the "
 "values"
@@ -22092,128 +22091,138 @@ msgstr ""
 "Зазначте тут базову адресу DMX для кожного каналу, використовуючи «,» або "
 "«;» для розділення значень"
 
-#: modules/video_filter/atmo/atmo.cpp:161
+#: modules/video_filter/atmo/atmo.cpp:163
 msgid "Count of channels"
 msgstr "Кількість каналів"
 
-#: modules/video_filter/atmo/atmo.cpp:162
+#: modules/video_filter/atmo/atmo.cpp:164
 msgid "Depending on your MoMoLight hardware choose 3 or 4 channels"
 msgstr "Залежно від вашого обладнання MoMoLight оберіть 3 або 4 канали"
 
-#: modules/video_filter/atmo/atmo.cpp:172
+#: modules/video_filter/atmo/atmo.cpp:167
+#, fuzzy
+msgid "Count of fnordlicht's"
+msgstr "Кількість каналів"
+
+#: modules/video_filter/atmo/atmo.cpp:168
+#, fuzzy
+msgid "Depending on the amount your fnordlicht hardware choose 1 to 4 channels"
+msgstr "Залежно від вашого обладнання MoMoLight оберіть 3 або 4 канали"
+
+#: modules/video_filter/atmo/atmo.cpp:179
 msgid "Save Debug Frames"
 msgstr "Зберегти відлагоджувальні кадри"
 
-#: modules/video_filter/atmo/atmo.cpp:173
+#: modules/video_filter/atmo/atmo.cpp:180
 msgid "Write every 128th miniframe to a folder."
 msgstr "Писати кожен 128-й мінікадр до каталогу."
 
-#: modules/video_filter/atmo/atmo.cpp:174
+#: modules/video_filter/atmo/atmo.cpp:181
 msgid "Debug Frame Folder"
 msgstr "Каталог кадрів відлагоджування"
 
-#: modules/video_filter/atmo/atmo.cpp:175
+#: modules/video_filter/atmo/atmo.cpp:182
 msgid "The path where the debugframes should be saved"
 msgstr "Шлях, куди будуть збережені кадри відлагоджування"
 
-#: modules/video_filter/atmo/atmo.cpp:179
+#: modules/video_filter/atmo/atmo.cpp:186
 msgid "Extracted Image Width"
 msgstr "Ширина видобутого зображення"
 
-#: modules/video_filter/atmo/atmo.cpp:180
+#: modules/video_filter/atmo/atmo.cpp:187
 msgid "The width of the mini image for further processing (64 is default)"
 msgstr "Ширина мінізображення для подальшої обробки (за змовчуванням — 64)"
 
-#: modules/video_filter/atmo/atmo.cpp:183
+#: modules/video_filter/atmo/atmo.cpp:190
 msgid "Extracted Image Height"
 msgstr "Висота видобутого зображення"
 
-#: modules/video_filter/atmo/atmo.cpp:184
+#: modules/video_filter/atmo/atmo.cpp:191
 msgid "The height of the mini image for further processing (48 is default)"
 msgstr "Висота мінізображення для подальшої обробки (за змовчуванням — 48)"
 
-#: modules/video_filter/atmo/atmo.cpp:187
+#: modules/video_filter/atmo/atmo.cpp:194
 msgid "Mark analyzed pixels"
 msgstr "Помічати проаналізовані пікселі"
 
-#: modules/video_filter/atmo/atmo.cpp:188
+#: modules/video_filter/atmo/atmo.cpp:195
 msgid "makes the sample grid visible on screen as white pixels"
 msgstr "робить для прикладу сітку білими пікселями видимою на екрані"
 
-#: modules/video_filter/atmo/atmo.cpp:191
+#: modules/video_filter/atmo/atmo.cpp:198
 msgid "Color when paused"
 msgstr "Колір на паузі"
 
-#: modules/video_filter/atmo/atmo.cpp:192
+#: modules/video_filter/atmo/atmo.cpp:199
 msgid ""
 "Set the color to show if the user pauses the video. (Have light to get "
 "another beer?)"
 msgstr "Встановити відображуваний колір, коли користувач призупиняє відео."
 
-#: modules/video_filter/atmo/atmo.cpp:195
+#: modules/video_filter/atmo/atmo.cpp:202
 msgid "Pause-Red"
 msgstr "Пауза-червоний"
 
-#: modules/video_filter/atmo/atmo.cpp:196
+#: modules/video_filter/atmo/atmo.cpp:203
 msgid "Red component of the pause color"
 msgstr "Червона компонента кольору паузи"
 
-#: modules/video_filter/atmo/atmo.cpp:197
+#: modules/video_filter/atmo/atmo.cpp:204
 msgid "Pause-Green"
 msgstr "Пауза-зелений"
 
-#: modules/video_filter/atmo/atmo.cpp:198
+#: modules/video_filter/atmo/atmo.cpp:205
 msgid "Green component of the pause color"
 msgstr "Зелена компонента кольору паузи"
 
-#: modules/video_filter/atmo/atmo.cpp:199
+#: modules/video_filter/atmo/atmo.cpp:206
 msgid "Pause-Blue"
 msgstr "Пауза-синій"
 
-#: modules/video_filter/atmo/atmo.cpp:200
+#: modules/video_filter/atmo/atmo.cpp:207
 msgid "Blue component of the pause color"
 msgstr "Синя компонента кольору паузи"
 
-#: modules/video_filter/atmo/atmo.cpp:201
+#: modules/video_filter/atmo/atmo.cpp:208
 msgid "Pause-Fadesteps"
 msgstr "Пауза-кроки переходу"
 
-#: modules/video_filter/atmo/atmo.cpp:202
+#: modules/video_filter/atmo/atmo.cpp:209
 msgid ""
 "Number of steps to change current color to pause color (each step takes 40ms)"
 msgstr ""
 "Кількість кроків для зміни поточного кольору на колір паузи (кожен крок "
 "займає 40 мс)"
 
-#: modules/video_filter/atmo/atmo.cpp:205
+#: modules/video_filter/atmo/atmo.cpp:212
 msgid "End-Red"
 msgstr "Кінець-червоний"
 
-#: modules/video_filter/atmo/atmo.cpp:206
+#: modules/video_filter/atmo/atmo.cpp:213
 msgid "Red component of the shutdown color"
 msgstr "Червона компонента кольору закінчення"
 
-#: modules/video_filter/atmo/atmo.cpp:207
+#: modules/video_filter/atmo/atmo.cpp:214
 msgid "End-Green"
 msgstr "Кінець-зелений"
 
-#: modules/video_filter/atmo/atmo.cpp:208
+#: modules/video_filter/atmo/atmo.cpp:215
 msgid "Green component of the shutdown color"
 msgstr "Зелена компонента кольору закінчення"
 
-#: modules/video_filter/atmo/atmo.cpp:209
+#: modules/video_filter/atmo/atmo.cpp:216
 msgid "End-Blue"
 msgstr "Кінець-синій"
 
-#: modules/video_filter/atmo/atmo.cpp:210
+#: modules/video_filter/atmo/atmo.cpp:217
 msgid "Blue component of the shutdown color"
 msgstr "Синя компонента кольору закінчення"
 
-#: modules/video_filter/atmo/atmo.cpp:211
+#: modules/video_filter/atmo/atmo.cpp:218
 msgid "End-Fadesteps"
 msgstr "Кінець-кроки переходу"
 
-#: modules/video_filter/atmo/atmo.cpp:212
+#: modules/video_filter/atmo/atmo.cpp:219
 msgid ""
 "Number of steps to change current color to end color for dimming up the "
 "light in cinema style... (each step takes 40ms)"
@@ -22221,35 +22230,35 @@ msgstr ""
 "Кількість кроків для зміни поточного кольору на колір кінця відео для "
 "затемненя світла у стилі фільму… (кожен крок займає 40 мс)"
 
-#: modules/video_filter/atmo/atmo.cpp:216
+#: modules/video_filter/atmo/atmo.cpp:223
 msgid "Number of zones on top"
 msgstr "Кількість зон зверху"
 
-#: modules/video_filter/atmo/atmo.cpp:217
+#: modules/video_filter/atmo/atmo.cpp:224
 msgid "Number of zones on the top of the screen"
 msgstr "Кількість зон зверху екрану"
 
-#: modules/video_filter/atmo/atmo.cpp:218
+#: modules/video_filter/atmo/atmo.cpp:225
 msgid "Number of zones on bottom"
 msgstr "Кількість зон знизу"
 
-#: modules/video_filter/atmo/atmo.cpp:219
+#: modules/video_filter/atmo/atmo.cpp:226
 msgid "Number of zones on the bottom of the screen"
 msgstr "Кількість зон знизу екрану"
 
-#: modules/video_filter/atmo/atmo.cpp:220
+#: modules/video_filter/atmo/atmo.cpp:227
 msgid "Zones on left / right side"
 msgstr "Зони на лівій/правій стороні"
 
-#: modules/video_filter/atmo/atmo.cpp:221
+#: modules/video_filter/atmo/atmo.cpp:228
 msgid "left and right side having allways the same number of zones"
 msgstr "ліва та права сторона мають завжди однакову кількість зон"
 
-#: modules/video_filter/atmo/atmo.cpp:223
+#: modules/video_filter/atmo/atmo.cpp:230
 msgid "Calculate a average zone"
 msgstr "Обчислити середню зону"
 
-#: modules/video_filter/atmo/atmo.cpp:224
+#: modules/video_filter/atmo/atmo.cpp:231
 msgid ""
 "it contains the average of all pixels in the sample image (only useful for "
 "single channel AtmoLight)"
@@ -22257,46 +22266,46 @@ msgstr ""
 "містить середнє з усіх пікселів у зображенні (корисне лише для "
 "одноканального AtmoLight)"
 
-#: modules/video_filter/atmo/atmo.cpp:229
+#: modules/video_filter/atmo/atmo.cpp:236
 msgid "Use Software White adjust"
 msgstr "Використовувати програмне налаштування білого"
 
-#: modules/video_filter/atmo/atmo.cpp:230
+#: modules/video_filter/atmo/atmo.cpp:237
 msgid ""
 "Should the buildin driver do a white adjust or your LED stripes? recommend."
 msgstr ""
 "Чи повинен вбудований драйвер налаштовувати білий чи Ваші приведені LED? "
 "Рекомендовано."
 
-#: modules/video_filter/atmo/atmo.cpp:232
+#: modules/video_filter/atmo/atmo.cpp:239
 msgid "White Red"
 msgstr "Червоний білого"
 
-#: modules/video_filter/atmo/atmo.cpp:233
+#: modules/video_filter/atmo/atmo.cpp:240
 msgid "Red value of a pure white on your LED stripes."
 msgstr "Червоне значення чистого білого на Вашому LED."
 
-#: modules/video_filter/atmo/atmo.cpp:235
+#: modules/video_filter/atmo/atmo.cpp:242
 msgid "White Green"
 msgstr "Зелений білого"
 
-#: modules/video_filter/atmo/atmo.cpp:236
+#: modules/video_filter/atmo/atmo.cpp:243
 msgid "Green value of a pure white on your LED stripes."
 msgstr "Зелене значення чистого білого на Вашому LED."
 
-#: modules/video_filter/atmo/atmo.cpp:238
+#: modules/video_filter/atmo/atmo.cpp:245
 msgid "White Blue"
 msgstr "Синій білого"
 
-#: modules/video_filter/atmo/atmo.cpp:239
+#: modules/video_filter/atmo/atmo.cpp:246
 msgid "Blue value of a pure white on your LED stripes."
 msgstr "Синє значення чистого білого на Вашому LED."
 
-#: modules/video_filter/atmo/atmo.cpp:242
+#: modules/video_filter/atmo/atmo.cpp:249
 msgid "Serial Port/Device"
 msgstr "Послідовний порт/пристрій"
 
-#: modules/video_filter/atmo/atmo.cpp:243
+#: modules/video_filter/atmo/atmo.cpp:250
 msgid ""
 "Name of the serial port where the AtmoLight controller is attached to.\n"
 "On Windows usually something like COM1 or COM2. On Linux /dev/ttyS01 f.e."
@@ -22304,11 +22313,11 @@ msgstr ""
 "Ім’я послідовного порту, куди під’єднано контролер AtmoLight.\n"
 "На Windows, зазвичай, COM1 чи COM2. В Лінуксі — /dev/ttyS01…"
 
-#: modules/video_filter/atmo/atmo.cpp:248
+#: modules/video_filter/atmo/atmo.cpp:255
 msgid "Edge Weightning"
 msgstr "Вага краю"
 
-#: modules/video_filter/atmo/atmo.cpp:249
+#: modules/video_filter/atmo/atmo.cpp:256
 msgid ""
 "Increasing this value will result in color more depending on the border of "
 "the frame."
@@ -22316,15 +22325,15 @@ msgstr ""
 "Збільшення цього значення позначиться на режимі кольору залежно від краю "
 "фрейму."
 
-#: modules/video_filter/atmo/atmo.cpp:252
+#: modules/video_filter/atmo/atmo.cpp:259
 msgid "Overall brightness of your LED stripes"
 msgstr "Загальна яскравість Вашого LED"
 
-#: modules/video_filter/atmo/atmo.cpp:253
+#: modules/video_filter/atmo/atmo.cpp:260
 msgid "Darkness Limit"
 msgstr "Ліміт темноти"
 
-#: modules/video_filter/atmo/atmo.cpp:254
+#: modules/video_filter/atmo/atmo.cpp:261
 msgid ""
 "Pixels with a saturation lower than this will be ignored. Should be greater "
 "than one for letterboxed videos."
@@ -22332,72 +22341,72 @@ msgstr ""
 "Пікселі із насиченістю, нижчою, ніж ця, будуть ігноровані. Має бути більше "
 "одиниці для відео поштових скриньок."
 
-#: modules/video_filter/atmo/atmo.cpp:257
+#: modules/video_filter/atmo/atmo.cpp:264
 msgid "Hue windowing"
 msgstr "Кадрування відтінку"
 
-#: modules/video_filter/atmo/atmo.cpp:258
-#: modules/video_filter/atmo/atmo.cpp:260
+#: modules/video_filter/atmo/atmo.cpp:265
+#: modules/video_filter/atmo/atmo.cpp:267
 msgid "Used for statistics."
 msgstr "Використовується для статистики."
 
-#: modules/video_filter/atmo/atmo.cpp:259
+#: modules/video_filter/atmo/atmo.cpp:266
 msgid "Sat windowing"
 msgstr "Кадрування Sat"
 
-#: modules/video_filter/atmo/atmo.cpp:262
+#: modules/video_filter/atmo/atmo.cpp:269
 msgid "Filter length (ms)"
 msgstr "Довжина фільтру (мс)"
 
-#: modules/video_filter/atmo/atmo.cpp:263
+#: modules/video_filter/atmo/atmo.cpp:270
 msgid ""
 "Time it takes until a color is completely changed. This prevents flickering."
 msgstr "Час, доки колір повністю зміниться. Запобігає миготінню."
 
-#: modules/video_filter/atmo/atmo.cpp:265
+#: modules/video_filter/atmo/atmo.cpp:272
 msgid "Filter threshold"
 msgstr "Поріг фільру"
 
-#: modules/video_filter/atmo/atmo.cpp:266
+#: modules/video_filter/atmo/atmo.cpp:273
 msgid "How much a color has to be changed for an immediate color change."
 msgstr "Наскільки колір має змінитися для негайної зміни кольору."
 
-#: modules/video_filter/atmo/atmo.cpp:268
+#: modules/video_filter/atmo/atmo.cpp:275
 msgid "Filter Smoothness (in %)"
 msgstr "Гладкість фільтру (у %)"
 
-#: modules/video_filter/atmo/atmo.cpp:269
+#: modules/video_filter/atmo/atmo.cpp:276
 msgid "Filter Smoothness"
 msgstr "Гладкість фільтру"
 
-#: modules/video_filter/atmo/atmo.cpp:271
+#: modules/video_filter/atmo/atmo.cpp:278
 msgid "Output Color filter mode"
 msgstr "Режим вихідного фільтру кольору"
 
-#: modules/video_filter/atmo/atmo.cpp:272
+#: modules/video_filter/atmo/atmo.cpp:279
 msgid ""
 "defines the how the output color should be calculated based on previous color"
 msgstr ""
 "визначає, як має обчислюватися вихідний колір з урахуванням попереднього "
 "кольору"
 
-#: modules/video_filter/atmo/atmo.cpp:281
+#: modules/video_filter/atmo/atmo.cpp:288
 msgid "No Filtering"
 msgstr "Без фільтрування"
 
-#: modules/video_filter/atmo/atmo.cpp:282
+#: modules/video_filter/atmo/atmo.cpp:289
 msgid "Combined"
 msgstr "Комбіновано"
 
-#: modules/video_filter/atmo/atmo.cpp:283
+#: modules/video_filter/atmo/atmo.cpp:290
 msgid "Percent"
 msgstr "Відсоток"
 
-#: modules/video_filter/atmo/atmo.cpp:286
+#: modules/video_filter/atmo/atmo.cpp:293
 msgid "Frame delay (ms)"
 msgstr "Затримка кадру (мс)"
 
-#: modules/video_filter/atmo/atmo.cpp:287
+#: modules/video_filter/atmo/atmo.cpp:294
 msgid ""
 "Helps to get the video output and the light effects in sync. Values around "
 "20ms should do the trick."
@@ -22405,61 +22414,61 @@ msgstr ""
 "Допомагає тримати синхронізованими відеовивід та світлові ефекти. Повинно "
 "вистачити значення близько 20 мс."
 
-#: modules/video_filter/atmo/atmo.cpp:292
+#: modules/video_filter/atmo/atmo.cpp:299
 msgid "Channel 0: summary"
 msgstr "Канал 0: загалом"
 
-#: modules/video_filter/atmo/atmo.cpp:293
+#: modules/video_filter/atmo/atmo.cpp:300
 msgid "Channel 1: left"
 msgstr "Канал 1: лівий"
 
-#: modules/video_filter/atmo/atmo.cpp:294
+#: modules/video_filter/atmo/atmo.cpp:301
 msgid "Channel 2: right"
 msgstr "Канал 2: правий"
 
-#: modules/video_filter/atmo/atmo.cpp:295
+#: modules/video_filter/atmo/atmo.cpp:302
 msgid "Channel 3: top"
 msgstr "Канал 3: верхній"
 
-#: modules/video_filter/atmo/atmo.cpp:296
+#: modules/video_filter/atmo/atmo.cpp:303
 msgid "Channel 4: bottom"
 msgstr "Канал 4: нижній"
 
-#: modules/video_filter/atmo/atmo.cpp:298
+#: modules/video_filter/atmo/atmo.cpp:305
 msgid "Maps the hardware channel X to logical zone Y to fix wrong wiring :-)"
 msgstr ""
 "Відображує апаратний канал X на логічний канал Y для виправлення невірного "
 "підключення :-)"
 
-#: modules/video_filter/atmo/atmo.cpp:309
+#: modules/video_filter/atmo/atmo.cpp:316
 msgid "disabled"
 msgstr "вимкнено"
 
-#: modules/video_filter/atmo/atmo.cpp:310
+#: modules/video_filter/atmo/atmo.cpp:317
 msgid "Zone 4:summary"
 msgstr "Зона 4:загалом"
 
-#: modules/video_filter/atmo/atmo.cpp:311
+#: modules/video_filter/atmo/atmo.cpp:318
 msgid "Zone 3:left"
 msgstr "Зона 3:зліва"
 
-#: modules/video_filter/atmo/atmo.cpp:312
+#: modules/video_filter/atmo/atmo.cpp:319
 msgid "Zone 1:right"
 msgstr "Зона 1:справа"
 
-#: modules/video_filter/atmo/atmo.cpp:313
+#: modules/video_filter/atmo/atmo.cpp:320
 msgid "Zone 0:top"
 msgstr "Зона 0:зверху"
 
-#: modules/video_filter/atmo/atmo.cpp:314
+#: modules/video_filter/atmo/atmo.cpp:321
 msgid "Zone 2:bottom"
 msgstr "Зона 2:знизу"
 
-#: modules/video_filter/atmo/atmo.cpp:316
+#: modules/video_filter/atmo/atmo.cpp:323
 msgid "Channel / Zone Assignment"
 msgstr "Присвоєння каналу/зони"
 
-#: modules/video_filter/atmo/atmo.cpp:317
+#: modules/video_filter/atmo/atmo.cpp:324
 msgid ""
 "for devices with more than five channels / zones write down here for each "
 "channel the zone number to show and seperate the values with , or ; and use "
@@ -22476,38 +22485,38 @@ msgstr ""
 "зліва та справа без загальної зони, відображення для класичного AtmoLight "
 "буде -1,3,2,1,0"
 
-#: modules/video_filter/atmo/atmo.cpp:327
+#: modules/video_filter/atmo/atmo.cpp:334
 msgid "Zone 0: Top gradient"
 msgstr "Зона 0: Верхній градієнт"
 
-#: modules/video_filter/atmo/atmo.cpp:328
+#: modules/video_filter/atmo/atmo.cpp:335
 msgid "Zone 1: Right gradient"
 msgstr "Зона 1: Правий градієнт"
 
-#: modules/video_filter/atmo/atmo.cpp:329
+#: modules/video_filter/atmo/atmo.cpp:336
 msgid "Zone 2: Bottom gradient"
 msgstr "Зона 2: Нижній градієнт"
 
-#: modules/video_filter/atmo/atmo.cpp:330
+#: modules/video_filter/atmo/atmo.cpp:337
 msgid "Zone 3: Left gradient"
 msgstr "Зона 3: Лівий градієнт"
 
-#: modules/video_filter/atmo/atmo.cpp:331
+#: modules/video_filter/atmo/atmo.cpp:338
 msgid "Zone 4: Summary gradient"
 msgstr "Зона 4: Загальний градієнт"
 
-#: modules/video_filter/atmo/atmo.cpp:332
+#: modules/video_filter/atmo/atmo.cpp:339
 msgid ""
 "Defines a small bitmap with 64x48 pixels, containing a grayscale gradient"
 msgstr ""
 "Визначає маленьку бітову карту розміром 64x48 пікселів, яка містить сірий "
 "градієнт"
 
-#: modules/video_filter/atmo/atmo.cpp:335
+#: modules/video_filter/atmo/atmo.cpp:342
 msgid "Gradient bitmap searchpath"
 msgstr "Шлях пошуку бітової карти градієнту"
 
-#: modules/video_filter/atmo/atmo.cpp:336
+#: modules/video_filter/atmo/atmo.cpp:343
 msgid ""
 "Now prefered option to assign gradient bitmaps, put them as zone_0.bmp, "
 "zone_1.bmp etc. into one folder and set the foldername here"
@@ -22515,11 +22524,11 @@ msgstr ""
 "Зараз віддається перевага присвоєнню бітових карт градієнту, помістіть їх "
 "як  zone_0.bmp, zone_1.bmp і т. п. у один каталог та задайте його ім’я тут"
 
-#: modules/video_filter/atmo/atmo.cpp:341
+#: modules/video_filter/atmo/atmo.cpp:348
 msgid "Filename of AtmoWin*.exe"
 msgstr "Ім'я файлу AtmoWin*.exe"
 
-#: modules/video_filter/atmo/atmo.cpp:342
+#: modules/video_filter/atmo/atmo.cpp:349
 msgid ""
 "if you want the AtmoLight control software to be launched by VLC, enter the "
 "complete path of AtmoWinA.exe here."
@@ -22527,51 +22536,56 @@ msgstr ""
 "Якщо Ви хочете, щоб VLC запускав керівне програмне забезпечення AtmoLight, "
 "введіть тут повний шлях до AtmoWinA.exe."
 
-#: modules/video_filter/atmo/atmo.cpp:353
+#: modules/video_filter/atmo/atmo.cpp:360
 msgid "AtmoLight Filter"
 msgstr "Фільтр AtmoLight"
 
-#: modules/video_filter/atmo/atmo.cpp:355
+#: modules/video_filter/atmo/atmo.cpp:362
 msgid "AtmoLight"
 msgstr "AtmoLight"
 
-#: modules/video_filter/atmo/atmo.cpp:362
+#: modules/video_filter/atmo/atmo.cpp:369
 msgid "Choose Devicetype and Connection"
 msgstr "Оберіть тип пристрою та з’єднання"
 
-#: modules/video_filter/atmo/atmo.cpp:387
+#: modules/video_filter/atmo/atmo.cpp:394
 msgid "Illuminate the room with this color on pause"
 msgstr "Освітлювати кімнату цим кольором, коли на паузі"
 
-#: modules/video_filter/atmo/atmo.cpp:403
+#: modules/video_filter/atmo/atmo.cpp:410
 msgid "Illuminate the room with this color on shutdown"
 msgstr "Освітлювати кімнату цим кольором по закінченні"
 
-#: modules/video_filter/atmo/atmo.cpp:414
+#: modules/video_filter/atmo/atmo.cpp:421
 msgid "DMX options"
 msgstr "Параметри DMX"
 
-#: modules/video_filter/atmo/atmo.cpp:420
+#: modules/video_filter/atmo/atmo.cpp:427
 msgid "MoMoLight options"
 msgstr "Параметри MoMoLight"
 
-#: modules/video_filter/atmo/atmo.cpp:462
+#: modules/video_filter/atmo/atmo.cpp:434
+#, fuzzy
+msgid "fnordlicht options"
+msgstr "Параметри MoMoLight"
+
+#: modules/video_filter/atmo/atmo.cpp:476
 msgid "Zone Layout for the build-in Atmo"
 msgstr "Зоновий шар для вбудованого Atmo"
 
-#: modules/video_filter/atmo/atmo.cpp:478
+#: modules/video_filter/atmo/atmo.cpp:492
 msgid "Settings for the built-in Live Video Processor only"
 msgstr "Налаштування вбудованого процесора живого відео"
 
-#: modules/video_filter/atmo/atmo.cpp:515
+#: modules/video_filter/atmo/atmo.cpp:529
 msgid "Change channel assignment (fixes wrong wiring)"
 msgstr "Змінити прив’язку каналів (виправляє неправильне підключення)"
 
-#: modules/video_filter/atmo/atmo.cpp:548
+#: modules/video_filter/atmo/atmo.cpp:562
 msgid "Adjust the white light to your LED stripes"
 msgstr "Налаштувати біле світло на Вашому LED"
 
-#: modules/video_filter/atmo/atmo.cpp:570
+#: modules/video_filter/atmo/atmo.cpp:584
 msgid "Change gradients"
 msgstr "Змінити градієнти"
 
@@ -23310,60 +23324,51 @@ msgstr "Відеофільтр градієнту"
 
 #: modules/video_filter/gradfun.c:47
 msgid "Radius"
-msgstr ""
+msgstr "Радіус"
 
 #: modules/video_filter/gradfun.c:48
-#, fuzzy
 msgid "Radius in pixels"
-msgstr "Розмір шрифту в пікселях"
+msgstr "Радіус у пікселях"
 
 #: modules/video_filter/gradfun.c:52
-#, fuzzy
 msgid "Strength"
-msgstr "Довжина кроку"
+msgstr "Довжина"
 
 #: modules/video_filter/gradfun.c:53
 msgid "Strength used to modify the value of a pixel"
-msgstr ""
+msgstr "Довжина, використовувана для зміни значення пікселя"
 
 #: modules/video_filter/gradfun.c:56
-#, fuzzy
 msgid "Gradfun video filter"
-msgstr "Відеофільтр зернистості"
+msgstr "Відеофільтр Gradfun"
 
 #: modules/video_filter/gradfun.c:57
-#, fuzzy
 msgid "Gradfun"
-msgstr "Градієнт"
+msgstr "Gradfun"
 
 #: modules/video_filter/grain.c:53
-#, fuzzy
 msgid "Variance"
-msgstr "Транс"
+msgstr "Зміна"
 
 #: modules/video_filter/grain.c:54
 msgid "Variance of the gaussian noise"
-msgstr ""
+msgstr "Зміна гаусового шуму"
 
 #: modules/video_filter/grain.c:58
-#, fuzzy
 msgid "Minimal period"
-msgstr "Мінімальний вигляд"
+msgstr "Мінімальний період"
 
 #: modules/video_filter/grain.c:59
-#, fuzzy
 msgid "Minimal period of the noise grain in pixel"
-msgstr "Загальна ширина мозаїки, у пікселях."
+msgstr "Мінімальний період зерна шуму у пікселях"
 
 #: modules/video_filter/grain.c:60
-#, fuzzy
 msgid "Maximal period"
-msgstr "Максимальний бітрейт"
+msgstr "Максимальний період"
 
 #: modules/video_filter/grain.c:61
-#, fuzzy
 msgid "Maximal period of the noise grain in pixel"
-msgstr "Загальна ширина мозаїки, у пікселях."
+msgstr "Максимальний період зерна шуму у пікселях"
 
 #: modules/video_filter/grain.c:64
 msgid "Grain video filter"
@@ -23375,7 +23380,7 @@ msgstr "Зернистість"
 
 #: modules/video_filter/grain.c:66
 msgid "Adds filtered gaussian noise"
-msgstr ""
+msgstr "Додає фільтрований гаусів шум"
 
 #: modules/video_filter/invert.c:50
 msgid "Invert video filter"
@@ -24817,9 +24822,8 @@ msgid "Direct3D video output"
 msgstr "Відеовивід через Direct3D"
 
 #: modules/video_output/msw/direct3d.c:80
-#, fuzzy
 msgid "Direct3D video output (XP)"
-msgstr "Відеовивід через Direct3D"
+msgstr "Відеовивід через Direct3D (XP)"
 
 #: modules/video_output/msw/directx.c:68
 msgid "Use hardware YUV->RGB conversions"
@@ -24886,7 +24890,7 @@ msgstr ""
 msgid "DirectX (DirectDraw) video output"
 msgstr "Відеовивід через DirectX (DirectDraw)"
 
-#: modules/video_output/msw/directx.c:233
+#: modules/video_output/msw/directx.c:234
 msgid "Wallpaper"
 msgstr "Шпалери"
 
@@ -24976,11 +24980,11 @@ msgstr "Вивід відеопам’яті"
 msgid "Video memory"
 msgstr "Відеопам’ять"
 
-#: modules/video_output/xcb/glx.c:50
+#: modules/video_output/xcb/glx.c:51
 msgid "GLX"
 msgstr "GLX"
 
-#: modules/video_output/xcb/glx.c:51
+#: modules/video_output/xcb/glx.c:52
 msgid "GLX video output (XCB)"
 msgstr "Вивід відео через GLX (XCB)"
 
@@ -25332,6 +25336,15 @@ msgstr "Фільтр візуалізатора"
 #: modules/visualization/visual/visual.c:121
 msgid "Spectrum analyser"
 msgstr "Аналізатор спектра"
+
+#~ msgid "Signals"
+#~ msgstr "Сигнали"
+
+#~ msgid "POSIX signals handling interface"
+#~ msgstr "Інтерфейс обробки POSIX-сигналів"
+
+#~ msgid "Skins loader demux"
+#~ msgstr "Демультиплексор завантажника скінів"
 
 #~ msgid ""
 #~ "Caching value for fake streams. This value should be set in milliseconds."
