@@ -76,7 +76,7 @@ vlc_module_begin ()
         set_description( N_("Interfaces implemented using lua scripts") )
         add_shortcut( "luaintf" )
         add_shortcut( "luahttp" )
-        add_shortcut( "http" )
+        /* add_shortcut( "http" ) */
         add_shortcut( "luatelnet" )
         add_shortcut( "telnet" )
         add_shortcut( "luahotkeys" )
