@@ -23,6 +23,7 @@
 #endif
 
 #include <stdbool.h>
+#define MAX_ERRORS 5
 
 void vlc_enable_override (void);
 
@@ -56,32 +57,37 @@ void vlc_enable_override (void)
     pthread_atfork (NULL, NULL, vlc_reset_override);
 }
 
-static void vlogbug (const char *level, const char *func, const char *fmt,
-                     va_list ap)
+static void vlogbug (unsigned *pc, const char *level, const char *func,
+                     const char *fmt, va_list ap)
 {
 #ifdef HAVE_BACKTRACE
-    const size_t framec = 4;
+    const size_t framec = 5;
     void *framev[framec];
 
     backtrace (framev, framec);
 #endif
     flockfile (stderr);
-    fprintf (stderr, "%s: call to %s(", level, func);
-    vfprintf (stderr, fmt, ap);
-    fputs (")\n", stderr);
-    fflush (stderr);
+    if (*pc < MAX_ERRORS)
+    {
+        (*pc)++;
+        fprintf (stderr, "%s: call to %s(", level, func);
+        vfprintf (stderr, fmt, ap);
+        fputs (")\n", stderr);
+        fflush (stderr);
 #ifdef HAVE_BACKTRACE
-    backtrace_symbols_fd (framev + 2, framec - 2, fileno (stderr));
+        backtrace_symbols_fd (framev + 2, framec - 2, fileno (stderr));
 #endif
+    }
     funlockfile (stderr);
 }
 
-static void logbug (const char *level, const char *func, const char *fmt, ...)
+static void logbug (unsigned *pc, const char *level, const char *func,
+                    const char *fmt, ...)
 {
     va_list ap;
 
     va_start (ap, fmt);
-    vlogbug (level, func, fmt, ap);
+    vlogbug (pc, level, func, fmt, ap);
     va_end (ap);
 }
 
@@ -97,7 +103,12 @@ static void *getsym (const char *name)
     return sym;
 }
 
-#define LOG(level, ...) logbug(level, __func__, __VA_ARGS__)
+#define LOG(level, ...) \
+    do { \
+        static unsigned counter = 0; \
+        logbug(&counter, level, __func__, __VA_ARGS__); \
+    } while (0)
+
 /* Evil non-standard GNU C macro ;)
  *  typeof keyword,
  *  statement-expression,
