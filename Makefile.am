@@ -51,8 +51,30 @@ EXTRA_DIST = \
 	extras/package/win32/UAC.nsh \
 	extras/package/win32/UAC.dll \
 	extras/package/win32/languages/declaration.nsh \
+	extras/package/win32/languages/bengali.nsh \
+	extras/package/win32/languages/brazilian_portuguese.nsh \
+	extras/package/win32/languages/bulgarian.nsh \
+	extras/package/win32/languages/catalan.nsh \
+	extras/package/win32/languages/declaration.nsh \
+	extras/package/win32/languages/dutch.nsh \
 	extras/package/win32/languages/english.nsh \
-	extras/package/win32/languages/french.nsh
+	extras/package/win32/languages/estonian.nsh \
+	extras/package/win32/languages/finnish.nsh \
+	extras/package/win32/languages/french.nsh \
+	extras/package/win32/languages/german.nsh \
+	extras/package/win32/languages/hungarian.nsh \
+	extras/package/win32/languages/italian.nsh \
+	extras/package/win32/languages/japanese.nsh \
+	extras/package/win32/languages/occitan.nsh \
+	extras/package/win32/languages/polish.nsh \
+	extras/package/win32/languages/punjabi.nsh \
+	extras/package/win32/languages/romanian.nsh \
+	extras/package/win32/languages/schinese.nsh \
+	extras/package/win32/languages/slovak.nsh \
+	extras/package/win32/languages/slovenian.nsh \
+	extras/package/win32/languages/sorani.nsh \
+	extras/package/win32/languages/spanish.nsh \
+	extras/package/win32/languages/vlc-chinese_simp.nsh
 
 dist_noinst_SCRIPTS = bootstrap toolbox
 nodist_noinst_SCRIPTS = compile
