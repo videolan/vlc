@@ -911,18 +911,18 @@ DISTCLEAN_PKG += faad2-$(FAAD2_VERSION).tar.gz
 # libvp8
 # ***************************************************************************
 
-libvpx-$(VPX_VERSION).tar.bz2:
-	$(WGET) $(VPX_URL)
+#ibvpx-$(VPX_VERSION).tar.bz2:
+#$(WGET) $(VPX_URL)
 
-vpx: libvpx-$(VPX_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
-	patch -p0 < Patches/libvpx-cross.patch
+libvpx: 
+	$(GIT) clone git://review.webmproject.org/libvpx.git
 ifdef HAVE_DARWIN_OS
 	patch -p0 < Patches/libvpx-darwin.patch
 endif
 
 ifdef HAVE_WIN32
 VPX_TARGET=x86-win32-gcc
+CROSS=
 else
 ifdef HAVE_DARWIN_OS
 ifdef HAVE_DARWIN_64
@@ -939,16 +939,16 @@ VPX_TARGET=FIXME
 endif
 endif
 
-.vpx: vpx
-	(cd $<; ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-examples && XCC=$(CC) XNM=$(NM) XSTRIP=$(STRIP) make && make install)
-	(cd $<; cp vp8/*.h vpx_codec/*.h vpx_ports/*.h $(PREFIX)/include) # Of course, why the hell would one expect it to be listed or in make install?
-	rm $(PREFIX)/include/config.h
+.libvpx: libvpx
+	(cd $<; CROSS=$(HOST)- ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-examples && make && make install)
+	(rm -rf $(PREFIX)/include/vpx/ && mkdir $(PREFIX)/include/vpx/; cd $< && cp vpx/*.h vpx_ports/*.h $(PREFIX)/include/vpx/) # Of course, why the hell would one expect it to be listed or in make install?
+	rm $(PREFIX)/include/vpx/config.h
 	(cd $<; $(RANLIB) libvpx.a && cp libvpx.a $(PREFIX)/lib) # Of course, why the hell would one expect it to be listed or in make install?
 	touch $@
 
-CLEAN_FILE += .vpx
-CLEAN_PKG += vpx
-DISTCLEAN_PKG += libvpx-$(VPX_VERSION).tar.bz2
+CLEAN_FILE += .libvpx
+CLEAN_PKG += libvpx
+#DISTCLEAN_PKG += libvpx-$(VPX_VERSION).tar.bz2
 
 # ***************************************************************************
 # lame
@@ -1068,7 +1068,6 @@ else
 ffmpeg: 
 endif
 	$(SVN) co $(FFMPEG_SVN) ffmpeg
-	(cd ffmpeg; patch -p0 < ../Patches/ffmpeg-libvpx.patch;)
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
 endif
@@ -1117,10 +1116,10 @@ else
 ifdef HAVE_UCLIBC
 .ffmpeg: ffmpeg
 else
-.ffmpeg: ffmpeg .lame .gsm
+.ffmpeg: ffmpeg .lame .gsm .libvpx
 endif
 endif
-	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS)" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
+	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DHAVE_STDINT_H" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
 	touch $@
 
 ifdef SVN
@@ -1323,7 +1322,7 @@ goom$(GOOM2k4_VERSION).tar.gz:
 goom: goom$(GOOM2k4_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_WIN32
-	(cd $@; dos2unix configure.in)
+	(cd $@; fromdos configure.in)
 	patch -p0 < Patches/goom2k4-0-win32.patch
 else
 	patch -p0 < Patches/goom2k4-0-mmx.patch
