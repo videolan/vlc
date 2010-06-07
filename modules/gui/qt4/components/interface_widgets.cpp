@@ -141,7 +141,11 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
     /* Indicates that the widget wants to draw directly onto the screen.
        Widgets with this attribute set do not participate in composition
        management */
+    /* This is currently disabled on X11 as it does not seem to improve
+     * performance, but causes the video widget to be transparent... */
+#ifndef Q_WS_X11
     stable->setAttribute( Qt::WA_PaintOnScreen, true );
+#endif
 
     innerLayout->addWidget( stable );
 
