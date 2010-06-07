@@ -239,6 +239,8 @@ void VideoWidget::SetFullScreen( bool b_fs, bool b_ontop )
         free( title );
 
         reparentable->show();
+        reparentable->activateWindow();
+        reparentable->raise();
     }
     else
     {   /* Go windowed */
