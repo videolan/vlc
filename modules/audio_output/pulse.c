@@ -63,8 +63,6 @@ struct aout_sys_t
     mtime_t start_date;
 };
 
-#define    PULSE_CLIENT_NAME N_("VLC media player")
-
 #if 0
 #define PULSE_DEBUG( ...) \
     msg_Dbg( p_aout, __VA_ARGS__ )
@@ -121,6 +119,7 @@ static int Open ( vlc_object_t *p_this )
     const struct pa_buffer_attr *buffer_attr;
     struct pa_buffer_attr a;
     struct pa_channel_map map;
+    char * p_client_name = NULL;
 
     if( !vlc_xlib_init( p_this ) )
         return VLC_EGENERIC;
@@ -210,7 +209,12 @@ static int Open ( vlc_object_t *p_this )
         goto fail;
     }
 
-    if (!(p_sys->context = pa_context_new(pa_threaded_mainloop_get_api(p_sys->mainloop), _( PULSE_CLIENT_NAME )))) {
+    if ((p_client_name = var_InheritString(p_aout, "user-agent")) == NULL) {
+        msg_Err(p_aout, "No user-agent string available.");
+        goto fail;
+    }
+
+    if (!(p_sys->context = pa_context_new(pa_threaded_mainloop_get_api(p_sys->mainloop), p_client_name))) {
         msg_Err(p_aout, "Failed to allocate context");
         goto fail;
     }
@@ -303,6 +307,8 @@ unlock_and_fail:
     if (p_sys->mainloop)
         pa_threaded_mainloop_unlock(p_sys->mainloop);
 fail:
+    if (p_client_name)
+        free(p_client_name);
     msg_Dbg(p_aout, "Pulse initialization failed");
     uninit(p_aout);
     return VLC_EGENERIC;
