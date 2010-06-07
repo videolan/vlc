@@ -61,6 +61,12 @@ static VLAboutBox *_o_sharedInstance = nil;
     return _o_sharedInstance;
 }
 
+- (void) dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [super dealloc];
+}
+
 /*****************************************************************************
 * VLC About Window
 *****************************************************************************/
