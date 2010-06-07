@@ -27,7 +27,6 @@
 
 /*
   \TODO: Debug messages: "__FILE__, __LINE__" ok ???, Wrn/Err ???
-  \TODO: Change names to VLC standard ???
 */
 #undef PACKAGE_NAME
 #ifdef HAVE_CONFIG_H
@@ -148,12 +147,12 @@ static void Close( vlc_object_t *p_this )
 
 // Returns the value of a child element, or 0 on error
 const char* xml_getChildElementValue( IXML_Element* p_parent,
-                                      const char*   _psz_tag_name )
+                                      const char*   psz_tag_name_ )
 {
     if ( !p_parent ) return 0;
-    if ( !_psz_tag_name ) return 0;
+    if ( !psz_tag_name_ ) return 0;
 
-    char* psz_tag_name = strdup( _psz_tag_name );
+    char* psz_tag_name = strdup( psz_tag_name_ );
     IXML_NodeList* p_node_list = ixmlElement_getElementsByTagName( p_parent, psz_tag_name );
     free( psz_tag_name );
     if ( !p_node_list ) return 0;
@@ -535,12 +534,12 @@ void MediaServer::subscribeToContentDirectory()
     }
 }
 
-IXML_Document* MediaServer::_browseAction( const char* pObjectID,
-                                           const char* pBrowseFlag,
-                                           const char* pFilter,
-                                           const char* pStartingIndex,
-                                           const char* pRequestedCount,
-                                           const char* pSortCriteria )
+IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
+                                           const char* psz_browser_flag_,
+                                           const char* psz_filter_,
+                                           const char* psz_starting_index_,
+                                           const char* psz_requested_count_,
+                                           const char* psz_sort_criteria_ )
 {
     IXML_Document* p_action = 0;
     IXML_Document* p_response = 0;
@@ -552,12 +551,12 @@ IXML_Document* MediaServer::_browseAction( const char* pObjectID,
         return 0;
     }
 
-    char* psz_object_id = strdup( pObjectID );
-    char* psz_browse_flag = strdup( pBrowseFlag );
-    char* psz_filter = strdup( pFilter );
-    char* psz_starting_index = strdup( pStartingIndex );
-    char* psz_requested_count = strdup( pRequestedCount );
-    char* psz_sort_criteria = strdup( pSortCriteria );
+    char* psz_object_id = strdup( psz_object_id_ );
+    char* psz_browse_flag = strdup( psz_browser_flag_ );
+    char* psz_filter = strdup( psz_filter_ );
+    char* psz_starting_index = strdup( psz_starting_index_ );
+    char* psz_requested_count = strdup( psz_requested_count_ );
+    char* psz_sort_criteria = strdup( psz_sort_criteria_ );
     char* psz_service_type = strdup( CONTENT_DIRECTORY_SERVICE_TYPE );
 
     int i_res;
@@ -930,13 +929,14 @@ void MediaServerList::removeServer( const char* psz_udn )
 
 // Item...
 
-Item::Item( Container* p_parent, const char* objectID, const char* title, const char* resource )
+Item::Item( Container* p_parent, const char* psz_object_id, const char* psz_title,
+	   const char* psz_resource )
 {
     _parent = p_parent;
 
-    _objectID = objectID;
-    _title = title;
-    _resource = resource;
+    _objectID = psz_object_id;
+    _title = psz_title;
+    _resource = psz_resource;
 
     _inputItem = NULL;
 }
@@ -983,13 +983,13 @@ input_item_t* Item::getInputItem() const
 // Container...
 
 Container::Container( Container*  p_parent,
-                      const char* objectID,
-                      const char* title )
+                      const char* psz_object_id,
+                      const char* psz_title )
 {
     _parent = p_parent;
 
-    _objectID = objectID;
-    _title = title;
+    _objectID = psz_object_id;
+    _title = psz_title;
 
     _inputItem = NULL;
 }
@@ -1015,9 +1015,9 @@ void Container::addItem( Item* item )
     _items.push_back( item );
 }
 
-void Container::addContainer( Container* container )
+void Container::addContainer( Container* p_container )
 {
-    _containers.push_back( container );
+    _containers.push_back( p_container );
 }
 
 const char* Container::getObjectID() const
@@ -1040,15 +1040,15 @@ unsigned int Container::getNumContainers() const
     return _containers.size();
 }
 
-Item* Container::getItem( unsigned int i ) const
+Item* Container::getItem( unsigned int i_index ) const
 {
-    if ( i < _items.size() ) return _items[i];
+    if ( i_index < _items.size() ) return _items[i_index];
     return 0;
 }
 
-Container* Container::getContainer( unsigned int i ) const
+Container* Container::getContainer( unsigned int i_index ) const
 {
-    if ( i < _containers.size() ) return _containers[i];
+    if ( i_index < _containers.size() ) return _containers[i_index];
     return 0;
 }
 
