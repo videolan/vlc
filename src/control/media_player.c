@@ -738,6 +738,9 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi )
         event.type = libvlc_MediaPlayerStopped;
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
+
+    if( p_mi->input.p_resource != NULL )
+        input_resource_TerminateVout( p_mi->input.p_resource );
     unlock_input(p_mi);
 }
 
