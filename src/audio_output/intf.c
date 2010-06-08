@@ -122,6 +122,17 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
                         ( action == TOGGLE_MUTE )
                     ));
 
+    /* If muting or unmuting when play hasn't started */
+    if ( action == SET_MUTE && !b_unmute_condition && !b_mute_condition )
+    {
+        if ( p_aout )
+        {
+            aout_unlock_volume( p_aout );
+            vlc_object_release( p_aout );
+        }
+        return i_result;
+    }
+
     /* On UnMute */
     if ( b_unmute_condition )
     {
