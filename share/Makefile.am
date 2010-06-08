@@ -206,14 +206,16 @@ luac_verbose_0 = @echo "  LUAC   $@";
 
 if BUILD_LUA
 nobase_vlclib_DATA = \
-	lua/intf/luac.luac \
-	lua/intf/rc.luac \
-	lua/intf/hotkeys.luac \
-	lua/intf/modules/common.luac \
-	lua/intf/modules/host.luac \
-	lua/intf/telnet.luac \
+	lua/extensions/allocine-fr.luac \
+	lua/extensions/imdb.luac \
 	lua/intf/dummy.luac \
 	lua/intf/dumpmeta.luac \
+	lua/intf/hotkeys.luac \
+	lua/intf/luac.luac \
+	lua/intf/modules/common.luac \
+	lua/intf/modules/host.luac \
+	lua/intf/rc.luac \
+	lua/intf/telnet.luac \
 	lua/meta/art/01_musicbrainz.luac \
 	lua/meta/art/02_frenchtv.luac \
 	lua/meta/art/03_lastfm.luac \
@@ -223,8 +225,11 @@ nobase_vlclib_DATA = \
 	lua/modules/sandbox.luac \
 	lua/modules/simplexml.luac \
 	lua/playlist/anevia_streams.luac \
+	lua/playlist/anevia_xml.luac \
 	lua/playlist/appletrailers.luac \
+	lua/playlist/bbc_co_uk.luac \
 	lua/playlist/break.luac \
+	lua/playlist/canalplus.luac \
 	lua/playlist/cue.luac \
 	lua/playlist/dailymotion.luac \
 	lua/playlist/france2.luac \
@@ -232,19 +237,22 @@ nobase_vlclib_DATA = \
 	lua/playlist/jamendo.luac \
 	lua/playlist/joox.luac \
 	lua/playlist/katsomo.luac \
+	lua/playlist/koreus.luac \
 	lua/playlist/lelombrik.luac \
 	lua/playlist/megavideo.luac \
 	lua/playlist/metacafe.luac \
 	lua/playlist/mpora.luac \
+	lua/playlist/pinkbike.luac \
+	lua/playlist/rockbox_fm_presets.luac \
 	lua/playlist/vimeo.luac \
 	lua/playlist/youtube.luac \
 	lua/playlist/youtube_homepage.luac \
+	lua/sd/appletrailers.luac \
 	lua/sd/fmc.luac \
 	lua/sd/freebox.luac \
 	lua/sd/frenchtv.luac \
 	lua/sd/icecast.luac \
 	lua/sd/jamendo.luac \
-	lua/sd/appletrailers.luac \
 	$(NULL)
 if BUILD_HTTPD
 nobase_vlclib_DATA += \
@@ -257,6 +265,19 @@ MOSTLYCLEANFILES += $(nobase_vlclib_DATA)
 
 EXTRA_DIST += \
 	lua/README.txt \
+	lua/extensions/README.txt \
+	lua/extensions/allocine-fr.lua \
+	lua/extensions/imdb.lua \
+	lua/intf/README.txt \
+	lua/intf/dummy.lua \
+	lua/intf/dumpmeta.lua \
+	lua/intf/hotkeys.lua \
+	lua/intf/http.lua \
+	lua/intf/luac.lua \
+	lua/intf/modules/common.lua \
+	lua/intf/modules/host.lua \
+	lua/intf/rc.lua \
+	lua/intf/telnet.lua \
 	lua/meta/art/README.txt \
 	lua/meta/art/01_musicbrainz.lua \
 	lua/meta/art/02_frenchtv.lua \
@@ -266,42 +287,38 @@ EXTRA_DIST += \
 	lua/meta/fetcher/tvrage.lua \
 	lua/meta/reader/README.txt \
 	lua/meta/reader/filename.lua \
+	lua/modules/sandbox.lua \
+	lua/modules/simplexml.lua \
 	lua/playlist/README.txt \
 	lua/playlist/anevia_streams.lua \
+	lua/playlist/anevia_xml.lua \
 	lua/playlist/appletrailers.lua \
+	lua/playlist/bbc_co_uk.lua \
 	lua/playlist/break.lua \
+	lua/playlist/canalplus.lua \
 	lua/playlist/cue.lua \
 	lua/playlist/dailymotion.lua \
 	lua/playlist/france2.lua \
+	lua/playlist/googlevideo.lua \
 	lua/playlist/jamendo.lua \
 	lua/playlist/joox.lua \
 	lua/playlist/katsomo.lua \
+	lua/playlist/koreus.lua \
 	lua/playlist/lelombrik.lua \
-	lua/playlist/youtube.lua \
-	lua/playlist/youtube_homepage.lua \
 	lua/playlist/megavideo.lua \
 	lua/playlist/metacafe.lua \
-	lua/playlist/googlevideo.lua \
 	lua/playlist/mpora.lua \
+	lua/playlist/pinkbike.lua \
+	lua/playlist/rockbox_fm_presets.lua \
 	lua/playlist/vimeo.lua \
-	lua/intf/README.txt \
-	lua/intf/http.lua \
-	lua/intf/rc.lua \
-	lua/intf/luac.lua \
-	lua/intf/hotkeys.lua \
-	lua/intf/modules/common.lua \
-	lua/intf/modules/host.lua \
-	lua/intf/telnet.lua \
-	lua/intf/dummy.lua \
-	lua/intf/dumpmeta.lua \
-	lua/modules/sandbox.lua \
-	lua/modules/simplexml.lua \
+	lua/playlist/youtube.lua \
+	lua/playlist/youtube_homepage.lua \
 	lua/sd/README.txt \
+	lua/sd/appletrailers.lua \
 	lua/sd/fmc.lua \
 	lua/sd/freebox.lua \
 	lua/sd/frenchtv.lua \
 	lua/sd/icecast.lua \
-	lua/sd/appletrailers.lua \
 	lua/sd/jamendo.lua
 
 DIST_http_lua = \
