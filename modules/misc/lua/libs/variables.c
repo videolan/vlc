@@ -81,16 +81,16 @@ int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val )
     return 1;
 }
 
-static int vlclua_pushlist( lua_State *L, vlc_list_t *list )
+static int vlclua_pushlist( lua_State *L, vlc_list_t *p_list )
 {
-    int i_count = val.p_list->i_count;
+    int i_count = p_list->i_count;
 
     lua_createtable( L, i_count, 0 );
     for( int i = 0; i < i_count; i++ )
     {
         lua_pushinteger( L, i+1 );
-        if( !vlclua_pushvalue( L, val.p_list->pi_types[i],
-                               val.p_list->p_values[i] ) )
+        if( !vlclua_pushvalue( L, p_list->pi_types[i],
+                               p_list->p_values[i] ) )
              lua_pushnil( L );
         lua_settable( L, -3 );
     }
