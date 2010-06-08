@@ -307,8 +307,7 @@ unlock_and_fail:
     if (p_sys->mainloop)
         pa_threaded_mainloop_unlock(p_sys->mainloop);
 fail:
-    if (p_client_name)
-        free(p_client_name);
+    free(p_client_name);
     msg_Dbg(p_aout, "Pulse initialization failed");
     uninit(p_aout);
     return VLC_EGENERIC;
