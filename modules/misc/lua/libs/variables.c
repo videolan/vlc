@@ -75,23 +75,24 @@ int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val )
         case VLC_VAR_MUTEX:
             vlclua_error( L );
             break;
-        case VLC_VAR_LIST:
-            {
-                int i_count = val.p_list->i_count;
-                int i;
-                lua_createtable( L, i_count, 0 );
-                for( i = 0; i < i_count; i++ )
-                {
-                    lua_pushinteger( L, i+1 );
-                    if( !vlclua_pushvalue( L, val.p_list->pi_types[i],
-                                           val.p_list->p_values[i] ) )
-                        lua_pushnil( L );
-                    lua_settable( L, -3 );
-                }
-            }
-            break;
         default:
             vlclua_error( L );
+    }
+    return 1;
+}
+
+static int vlclua_pushlist( lua_State *L, vlc_list_t *list )
+{
+    int i_count = val.p_list->i_count;
+
+    lua_createtable( L, i_count, 0 );
+    for( int i = 0; i < i_count; i++ )
+    {
+        lua_pushinteger( L, i+1 );
+        if( !vlclua_pushvalue( L, val.p_list->pi_types[i],
+                               val.p_list->p_values[i] ) )
+             lua_pushnil( L );
+        lua_settable( L, -3 );
     }
     return 1;
 }
@@ -124,9 +125,6 @@ static int vlclua_tovalue( lua_State *L, int i_type, vlc_value_t *val )
             vlclua_error( L );
             break;
         case VLC_VAR_MUTEX:
-            vlclua_error( L );
-            break;
-        case VLC_VAR_LIST:
             vlclua_error( L );
             break;
         default:
@@ -198,8 +196,8 @@ static int vlclua_var_get_list( lua_State *L )
     const char *psz_var = luaL_checkstring( L, 2 );
     int i_ret = var_Change( *pp_obj, psz_var, VLC_VAR_GETLIST, &val, &text );
     if( i_ret < 0 ) return vlclua_push_ret( L, i_ret );
-    vlclua_pushvalue( L, VLC_VAR_LIST, val );
-    vlclua_pushvalue( L, VLC_VAR_LIST, text );
+    vlclua_pushlist( L, val.p_list );
+    vlclua_pushlist( L, text.p_list );
     var_FreeList( &val, &text );
     return 2;
 }
@@ -358,7 +356,6 @@ static int vlclua_add_callback( lua_State *L )
         case VLC_VAR_ADDRESS:
         case VLC_VAR_VOID:
         case VLC_VAR_MUTEX:
-        case VLC_VAR_LIST:
         default:
             return vlclua_error( L );
     }

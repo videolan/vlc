@@ -453,7 +453,6 @@ struct vlc_list_t
 #define VLC_VAR_TIME      0x0060
 #define VLC_VAR_ADDRESS   0x0070
 #define VLC_VAR_MUTEX     0x0080
-#define VLC_VAR_LIST      0x0090
 #define VLC_VAR_COORDS    0x00A0
 /**@}*/
 

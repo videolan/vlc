@@ -85,41 +85,6 @@ static void DupString( vlc_value_t *p_val )
     p_val->psz_string = strdup( p_val->psz_string ? p_val->psz_string :  "" );
 }
 
-static void DupList( vlc_value_t *p_val )
-{
-    int i;
-    vlc_list_t *p_list = malloc( sizeof(vlc_list_t) );
-
-    p_list->i_count = p_val->p_list->i_count;
-    if( p_val->p_list->i_count )
-    {
-        p_list->p_values = malloc( p_list->i_count * sizeof(vlc_value_t) );
-        p_list->pi_types = malloc( p_list->i_count * sizeof(int) );
-    }
-    else
-    {
-        p_list->p_values = NULL;
-        p_list->pi_types = NULL;
-    }
-
-    for( i = 0; i < p_list->i_count; i++ )
-    {
-        p_list->p_values[i] = p_val->p_list->p_values[i];
-        p_list->pi_types[i] = p_val->p_list->pi_types[i];
-        switch( p_val->p_list->pi_types[i] & VLC_VAR_CLASS )
-        {
-        case VLC_VAR_STRING:
-
-            DupString( &p_list->p_values[i] );
-            break;
-        default:
-            break;
-        }
-    }
-
-    p_val->p_list = p_list;
-}
-
 static void FreeDummy( vlc_value_t *p_val ) { (void)p_val; /* unused */ }
 static void FreeString( vlc_value_t *p_val ) { free( p_val->psz_string ); }
 static void FreeMutex( vlc_value_t *p_val ) { vlc_mutex_destroy( (vlc_mutex_t*)p_val->p_address ); free( p_val->p_address ); }
@@ -156,7 +121,6 @@ addr_ops   = { CmpAddress, DupDummy,  FreeDummy,  },
 bool_ops   = { CmpBool,    DupDummy,  FreeDummy,  },
 float_ops  = { CmpFloat,   DupDummy,  FreeDummy,  },
 int_ops    = { CmpInt,     DupDummy,  FreeDummy,  },
-list_ops   = { CmpAddress, DupList,   FreeList,   },
 mutex_ops  = { CmpAddress, DupDummy,  FreeMutex,  },
 string_ops = { CmpString,  DupString, FreeString, },
 time_ops   = { CmpTime,    DupDummy,  FreeDummy,  },
@@ -225,7 +189,6 @@ static void Destroy( variable_t *p_var )
  */
 int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 {
-    static vlc_list_t dummy_null_list = {0, NULL, NULL};
     assert( p_this );
 
     variable_t *p_var = calloc( 1, sizeof( *p_var ) );
@@ -286,10 +249,6 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             p_var->ops = &mutex_ops;
             p_var->val.p_address = malloc( sizeof(vlc_mutex_t) );
             vlc_mutex_init( (vlc_mutex_t*)p_var->val.p_address );
-            break;
-        case VLC_VAR_LIST:
-            p_var->ops = &list_ops;
-            p_var->val.p_list = &dummy_null_list;
             break;
         default:
             p_var->ops = &void_ops;
@@ -1109,45 +1068,11 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
         val.psz_string = psz_value;
         break;
 
-    case VLC_VAR_LIST:
-    {
-        char *psz_orig, *psz_var;
-        vlc_list_t *p_list = malloc(sizeof(vlc_list_t));
-        val.p_list = p_list;
-        p_list->i_count = 0;
-
-        psz_var = psz_orig = strdup(psz_value);
-        while( psz_var && *psz_var )
-        {
-            char *psz_item = psz_var;
-            vlc_value_t val2;
-            while( *psz_var && *psz_var != ',' ) psz_var++;
-            if( *psz_var == ',' )
-            {
-                *psz_var = '\0';
-                psz_var++;
-            }
-            val2.i_int = strtol( psz_item, NULL, 0 );
-            INSERT_ELEM( p_list->p_values, p_list->i_count,
-                         p_list->i_count, val2 );
-            /* p_list->i_count is incremented twice by INSERT_ELEM */
-            p_list->i_count--;
-            INSERT_ELEM( p_list->pi_types, p_list->i_count,
-                         p_list->i_count, VLC_VAR_INTEGER );
-        }
-        free( psz_orig );
-        break;
-    }
-
     default:
         goto cleanup;
     }
 
     var_Set( p_obj, psz_name, val );
-
-    /* If that's a list, remove all elements allocated */
-    if( i_type == VLC_VAR_LIST )
-        FreeList( &val );
 
 cleanup:
     free( psz_name );
@@ -1300,35 +1225,6 @@ int var_Inherit( vlc_object_t *p_this, const char *psz_name, int i_type,
         case VLC_VAR_BOOL:
             p_val->b_bool = config_GetInt( p_this, psz_name );
             break;
-        case VLC_VAR_LIST:
-        {
-            char *psz_orig, *psz_var;
-            vlc_list_t *p_list = malloc(sizeof(vlc_list_t));
-            p_val->p_list = p_list;
-            p_list->i_count = 0;
-
-            psz_var = psz_orig = config_GetPsz( p_this, psz_name );
-            while( psz_var && *psz_var )
-            {
-                char *psz_item = psz_var;
-                vlc_value_t val;
-                while( *psz_var && *psz_var != ',' ) psz_var++;
-                if( *psz_var == ',' )
-                {
-                    *psz_var = '\0';
-                    psz_var++;
-                }
-                val.i_int = strtol( psz_item, NULL, 0 );
-                INSERT_ELEM( p_list->p_values, p_list->i_count,
-                             p_list->i_count, val );
-                /* p_list->i_count is incremented twice by INSERT_ELEM */
-                p_list->i_count--;
-                INSERT_ELEM( p_list->pi_types, p_list->i_count,
-                             p_list->i_count, VLC_VAR_INTEGER );
-            }
-            free( psz_orig );
-            break;
-        }
         default:
             msg_Warn( p_this, "Could not inherit value for var %s "
                               "from config. Invalid Type", psz_name );

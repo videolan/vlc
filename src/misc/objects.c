@@ -698,7 +698,6 @@ static void DumpVariable (const void *data, const VISIT which, const int depth)
         MYCASE( COORDS, "coords" );
         MYCASE( ADDRESS, "address" );
         MYCASE( MUTEX, "mutex" );
-        MYCASE( LIST, "list" );
 #undef MYCASE
     }
     printf( " *-o \"%s\" (%s", p_var->psz_name, psz_type );
@@ -737,9 +736,6 @@ static void DumpVariable (const void *data, const VISIT which, const int depth)
             break;
         case VLC_VAR_ADDRESS:
             printf( ": %p", p_var->val.p_address );
-            break;
-        case VLC_VAR_LIST:
-            fputs( ": TODO", stdout );
             break;
     }
     fputc( '\n', stdout );
