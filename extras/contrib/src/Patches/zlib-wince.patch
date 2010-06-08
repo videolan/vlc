@@ -1,0 +1,13 @@
+--- zlib/zutil.h	2010-04-18 21:29:24.000000000 +0200
++++ zlib.new/zutil.h	2010-06-08 13:53:03.000000000 +0200
+@@ -153,6 +153,10 @@
+ #  endif
+ #endif
+ 
++#if defined(_WIN32_WCE)
++#    define fdopen(fd,mode) NULL /* No fdopen() */
++#endif
++
+ #if defined(__BORLANDC__)
+   #pragma warn -8004
+   #pragma warn -8008

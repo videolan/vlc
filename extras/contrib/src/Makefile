@@ -1112,7 +1112,7 @@ else
 ifdef HAVE_UCLIBC
 .ffmpeg: ffmpeg
 else
-.ffmpeg: ffmpeg .lame .gsm .libvpx
+.ffmpeg: ffmpeg .lame .gsm .libvpx .zlib
 endif
 endif
 	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DHAVE_STDINT_H" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
@@ -1614,10 +1614,11 @@ zlib-$(ZLIB_VERSION).tar.gz:
 
 zlib: zlib-$(ZLIB_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p0 < Patches/zlib.patch
+	patch -p0 < Patches/zlib-wince.patch
+	patch -p0 < Patches/zlib-static.patch
 
 .zlib: zlib
-	(cd zlib; $(HOSTCC2) ./configure --prefix=$(PREFIX) && make install)
+	(cd zlib; $(HOSTCC) ./configure --prefix=$(PREFIX) --static && make install)
 	$(INSTALL_NAME)
 	touch $@
 
