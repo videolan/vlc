@@ -220,6 +220,7 @@ input_item_WriteMeta
 input_Read
 input_resource_New
 input_resource_Delete
+input_resource_TerminateVout
 input_SplitMRL
 input_Start
 input_Stop

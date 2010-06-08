@@ -52,11 +52,6 @@ input_stats_t *stats_NewInputStats( input_thread_t *p_input );
 void input_resource_TerminateSout( input_resource_t *p_resource );
 
 /**
- * This function deletes the current vout in the resources.
- */
-void input_resource_TerminateVout( input_resource_t *p_resource );
-
-/**
  * This function return true if there is at least one vout in the resources.
  *
  * It can only be called on detached resources.

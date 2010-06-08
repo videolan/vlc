@@ -667,4 +667,9 @@ VLC_EXPORT( input_resource_t *, input_resource_New, ( vlc_object_t * ) );
  */
 VLC_EXPORT(void, input_resource_Delete, ( input_resource_t * ) );
 
+/**
+ * Forcefully destroys the video output (e.g. when the playlist is stopped).
+ */
+VLC_EXPORT(void, input_resource_TerminateVout, ( input_resource_t * ) );
+
 #endif
