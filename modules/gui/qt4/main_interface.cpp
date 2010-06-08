@@ -110,7 +110,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     b_autoresize = var_InheritBool( p_intf, "qt-video-autoresize" );
 
     /* Are we in the enhanced always-video mode or not ? */
-    i_visualmode = var_InheritBool( p_intf, "qt-minimal-view" );
+    b_minimalView = var_InheritBool( p_intf, "qt-minimal-view" );
 
     /* Do we want anoying popups or not */
     b_notificationEnabled = var_InheritBool( p_intf, "qt-notification" );
@@ -219,8 +219,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         }
         CONNECT( this, askVideoSetFullScreen( bool ),
                  this, setVideoFullScreen( bool ) );
-        CONNECT( videoWidget, keyPressed( QKeyEvent * ),
-                 this, handleKeyPress( QKeyEvent * ) );
     }
 
     CONNECT( THEDP, toolBarConfUpdated(), this, recreateToolbars() );
@@ -246,6 +244,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     QVLCTools::restoreWidgetPosition( settings, this, QSize(400, 100) );
     settings->endGroup();
 
+    b_interfaceFullScreen = isFullScreen();
+
     /* Final sizing and showing */
     setVisible( !b_hideAfterCreation );
 
@@ -253,7 +253,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
                             menuBar()->sizeHint().width() ) + 30 );
 
     /* Switch to minimal view if needed, must be called after the show() */
-    if( i_visualmode )
+    if( b_minimalView )
         toggleMinimalView( true );
 }
 
@@ -583,6 +583,7 @@ void MainInterface::releaseVideoSlot( void )
 {
     videoWidget->release();
     setVideoOnTop( false );
+    setVideoFullScreen( false );
 
     if( stackCentralW->currentWidget() == videoWidget )
         restoreStackOldWidget();
@@ -593,17 +594,42 @@ void MainInterface::releaseVideoSlot( void )
 
 void MainInterface::setVideoSize( unsigned int w, unsigned int h )
 {
-    if( isFullScreen() || isMaximized() )
-        showNormal();
-    videoWidget->SetSizing( w, h );
+    if( !isFullScreen() && !isMaximized() )
+        videoWidget->SetSizing( w, h );
 }
 
 void MainInterface::setVideoFullScreen( bool fs )
 {
     b_videoFullScreen = fs;
-    /* refresh main interface on-top status if needed */
-    setVideoOnTop( b_videoOnTop );
-    videoWidget->SetFullScreen( fs, b_videoOnTop );
+    if( fs )
+    {
+        int numscreen = var_InheritInteger( p_intf, "qt-fullscreen-screennumber" );
+        /* if user hasn't defined screennumber, or screennumber that is bigger
+         * than current number of screens, take screennumber where current interface
+         * is
+         */
+        if( numscreen == -1 || numscreen > QApplication::desktop()->numScreens() )
+            numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+
+        QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
+
+        /* To be sure window is on proper-screen in xinerama */
+        if( !screenres.contains( pos() ) )
+        {
+            msg_Dbg( p_intf, "Moving video to correct screen");
+            move( QPoint( screenres.x(), screenres.y() ) );
+        }
+        setMinimalView( true );
+        setInterfaceFullScreen( true );
+    }
+    else
+    {
+        /* TODO do we want to restore screen and position ? (when
+         * qt-fullscreen-screennumber is forced) */
+        setMinimalView( b_minimalView );
+        setInterfaceFullScreen( b_interfaceFullScreen );
+    }
+    videoWidget->sync();
 }
 
 /* Slot to change the video always-on-top flag.
@@ -611,14 +637,10 @@ void MainInterface::setVideoFullScreen( bool fs )
 void MainInterface::setVideoOnTop( bool on_top )
 {
     b_videoOnTop = on_top;
-    /* The main interface is not always-on-top if it does not contain
-     * the video (which is to say in fullscreen mode). */
-    if( b_videoFullScreen )
-        on_top = false;
 
     Qt::WindowFlags oldflags = windowFlags(), newflags;
 
-    if( on_top )
+    if( b_videoOnTop )
         newflags = oldflags | Qt::WindowStaysOnTopHint;
     else
         newflags = oldflags & ~Qt::WindowStaysOnTopHint;
@@ -754,12 +776,20 @@ void MainInterface::dockPlaylist( bool p_docked )
     playlistVisible = true;
 }
 
-/*
-  If b_switch is false, then we are normalView
- */
-void MainInterface::toggleMinimalView( bool b_switch )
+void MainInterface::setMinimalView( bool b_minimal )
 {
-    if( i_visualmode == 0 && b_autoresize ) /* Normal mode */
+    menuBar()->setVisible( !b_minimal );
+    controls->setVisible( !b_minimal );
+    statusBar()->setVisible( !b_minimal );
+    inputC->setVisible( !b_minimal );
+}
+
+/*
+  If b_minimal is false, then we are normalView
+ */
+void MainInterface::toggleMinimalView( bool b_minimal )
+{
+    if( !b_minimalView && b_autoresize ) /* Normal mode */
     {
         if( stackCentralW->currentWidget() == bgWidget )
         {
@@ -769,13 +799,11 @@ void MainInterface::toggleMinimalView( bool b_switch )
             }
         }
     }
+    b_minimalView = b_minimal;
+    if( !b_videoFullScreen )
+        setMinimalView( b_minimalView );
 
-    menuBar()->setVisible( !b_switch );
-    controls->setVisible( !b_switch );
-    statusBar()->setVisible( !b_switch );
-    inputC->setVisible( !b_switch );
-
-    emit minimalViewToggled( b_switch );
+    emit minimalViewToggled( b_minimalView );
 }
 
 /* toggling advanced controls buttons */
@@ -1070,10 +1098,9 @@ void MainInterface::keyPressEvent( QKeyEvent *e )
 
 void MainInterface::handleKeyPress( QKeyEvent *e )
 {
-    if( ( e->modifiers() &  Qt::ControlModifier ) && ( e->key() == Qt::Key_H )
-          && !menuBar()->isVisible() )
+    if( ( e->modifiers() &  Qt::ControlModifier ) && ( e->key() == Qt::Key_H ) )
     {
-        toggleMinimalView( false );
+        toggleMinimalView( !b_minimalView );
         e->accept();
     }
 
@@ -1101,18 +1128,19 @@ void MainInterface::closeEvent( QCloseEvent *e )
     THEDP->quit();
 }
 
-void MainInterface::toggleFullScreen()
+void MainInterface::setInterfaceFullScreen( bool fs )
 {
-    if( isFullScreen() )
-    {
-        showNormal();
-        emit fullscreenInterfaceToggled( false );
-    }
-    else
-    {
+    if( fs )
         showFullScreen();
-        emit fullscreenInterfaceToggled( true );
-    }
+    else
+        showNormal();
+}
+void MainInterface::toggleInterfaceFullScreen()
+{
+    b_interfaceFullScreen = !b_interfaceFullScreen;
+    if( !b_videoFullScreen )
+        setInterfaceFullScreen( b_interfaceFullScreen );
+    emit fullscreenInterfaceToggled( b_interfaceFullScreen );
 }
 
 /*****************************************************************************

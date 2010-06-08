@@ -465,9 +465,9 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
 
     /* FullScreen View */
     action = menu->addAction( qtr( "&Fullscreen Interface" ), mi,
-            SLOT( toggleFullScreen() ), QString( "F11" ) );
+            SLOT( toggleInterfaceFullScreen() ), QString( "F11" ) );
     action->setCheckable( true );
-    action->setChecked( mi->isFullScreen() );
+    action->setChecked( mi->isInterfaceFullScreen() );
     CONNECT( mi, fullscreenInterfaceToggled( bool ),
              action, setChecked( bool ) );
 

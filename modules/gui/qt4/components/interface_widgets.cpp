@@ -51,30 +51,12 @@
 #include <QBitmap>
 
 #ifdef Q_WS_X11
-# include <X11/Xlib.h>
-# include <qx11info_x11.h>
-static void videoSync( void )
-{
-    /* Make sure the X server has processed all requests.
-     * This protects other threads using distinct connections from getting
-     * the video widget window in an inconsistent states. */
-    XSync( QX11Info::display(), False );
-}
-#else
-# define videoSync() (void)0
+#   include <X11/Xlib.h>
+#   include <qx11info_x11.h>
 #endif
 
 #include <math.h>
 #include <assert.h>
-
-class ReparentableWidget : public QWidget
-{
-private:
-    VideoWidget *owner;
-public:
-    ReparentableWidget( VideoWidget *owner ) : owner( owner )
-    {}
-};
 
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
@@ -84,7 +66,6 @@ public:
 VideoWidget::VideoWidget( intf_thread_t *_p_i )
     : QFrame( NULL )
       , p_intf( _p_i )
-      , reparentable( NULL )
 {
     /* Set the policy to expand in both directions */
     // setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
@@ -92,12 +73,23 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i )
     layout = new QHBoxLayout( this );
     layout->setContentsMargins( 0, 0, 0, 0 );
     setLayout( layout );
+    stable = NULL;
 }
 
 VideoWidget::~VideoWidget()
 {
     /* Ensure we are not leaking the video output. This would crash. */
-    assert( reparentable == NULL );
+    assert( !stable );
+}
+
+void VideoWidget::sync( void )
+{
+#ifdef Q_WS_X11
+    /* Make sure the X server has processed all requests.
+     * This protects other threads using distinct connections from getting
+     * the video widget window in an inconsistent states. */
+    XSync( QX11Info::display(), False );
+#endif
 }
 
 /**
@@ -109,7 +101,7 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
 {
     msg_Dbg( p_intf, "Video was requested %i, %i", *pi_x, *pi_y );
 
-    if( reparentable != NULL )
+    if( stable )
     {
         msg_Dbg( p_intf, "embedded video already in use" );
         return NULL;
@@ -120,20 +112,10 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
         *pi_height = size().height();
     }
 
-    /* The Qt4 UI needs a fixed a widget ("this"), so that the parent layout is
-     * not messed up when we the video is reparented. Hence, we create an extra
-     * reparentable widget, that will be within the VideoWidget in windowed
-     * mode, and within the root window (NULL parent) in full-screen mode.
-     */
-    reparentable = new ReparentableWidget( this );
-    reparentable->installEventFilter(this );
-    QLayout *innerLayout = new QHBoxLayout( reparentable );
-    innerLayout->setContentsMargins( 0, 0, 0, 0 );
-
     /* The owner of the video window needs a stable handle (WinId). Reparenting
      * in Qt4-X11 changes the WinId of the widget, so we need to create another
      * dummy widget that stays within the reparentable widget. */
-    QWidget *stable = new QWidget();
+    stable = new QWidget();
     QPalette plt = palette();
     plt.setColor( QPalette::Window, Qt::black );
     stable->setPalette( plt );
@@ -147,9 +129,7 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
     stable->setAttribute( Qt::WA_PaintOnScreen, true );
 #endif
 
-    innerLayout->addWidget( stable );
-
-    layout->addWidget( reparentable );
+    layout->addWidget( stable );
 
 #ifdef Q_WS_X11
     /* HACK: Only one X11 client can subscribe to mouse button press events.
@@ -163,7 +143,7 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
     attr.your_event_mask &= ~(ButtonPressMask|ButtonReleaseMask);
     XSelectInput( dpy, w, attr.your_event_mask );
 #endif
-    videoSync();
+    sync();
 #ifndef NDEBUG
     msg_Dbg( p_intf, "embedded video ready (handle %p)",
              (void *)stable->winId() );
@@ -176,8 +156,6 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
    Parent has to care about resizing itself */
 void VideoWidget::SetSizing( unsigned int w, unsigned int h )
 {
-    if (reparentable->windowState() & Qt::WindowFullScreen )
-        return;
     if( !isVisible() ) show();
     resize( w, h );
     emit sizeChanged( w, h );
@@ -188,103 +166,20 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
      */
     if( size().width() == w && size().height() == h )
         updateGeometry();
-    videoSync();
-}
-
-void VideoWidget::SetFullScreen( bool b_fs, bool b_ontop )
-{
-    const Qt::WindowStates curstate = reparentable->windowState();
-    Qt::WindowStates newstate = curstate;
-    Qt::WindowFlags  newflags = reparentable->windowFlags();
-
-
-    if( b_fs )
-    {
-        newstate |= Qt::WindowFullScreen;
-        if( b_ontop )
-            newflags |= Qt::WindowStaysOnTopHint;
-    }
-    else
-    {
-        newstate &= ~Qt::WindowFullScreen;
-        newflags &= ~Qt::WindowStaysOnTopHint;
-    }
-    if( newstate == curstate )
-        return; /* no changes needed */
-
-    if( b_fs )
-    {   /* Go full-screen */
-        int numscreen = var_InheritInteger( p_intf, "qt-fullscreen-screennumber" );
-        /* if user hasn't defined screennumber, or screennumber that is bigger
-         * than current number of screens, take screennumber where current interface
-         * is
-         */
-        if( numscreen == -1 || numscreen > QApplication::desktop()->numScreens() )
-            numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
-
-        QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
-
-        /* To be sure window is on proper-screen in xinerama */
-        if( !screenres.contains( reparentable->pos() ) )
-        {
-            msg_Dbg( p_intf, "Moving video to correct screen");
-            reparentable->move( QPoint( screenres.x(), screenres.y() ) );
-        }
-        reparentable->setParent( NULL, newflags );
-        reparentable->setWindowState( newstate );
-
-        /* FIXME: inherit from the vout window, not the interface */
-        char *title = var_InheritString( p_intf, "video-title" );
-        reparentable->setWindowTitle( qfu(title ? title : _("Video")) );
-        free( title );
-
-        reparentable->show();
-        reparentable->activateWindow();
-        reparentable->raise();
-    }
-    else
-    {   /* Go windowed */
-        reparentable->setWindowFlags( newflags );
-        reparentable->setWindowState( newstate );
-        layout->addWidget( reparentable );
-    }
-    videoSync();
+    sync();
 }
 
 void VideoWidget::release( void )
 {
     msg_Dbg( p_intf, "Video is not needed anymore" );
-    //layout->removeWidget( reparentable );
 
-    reparentable->deleteLater();
-    reparentable = NULL;
+    assert( stable );
+    layout->removeWidget( stable );
+    stable->deleteLater();
+    stable = NULL;
+
     updateGeometry();
     hide();
-}
-
-#undef KeyPress
-bool VideoWidget::eventFilter(QObject *obj, QEvent *event)
-{
-    if( obj == reparentable )
-    {
-        if (event->type() == QEvent::Close)
-        {
-            THEDP->quit();
-            return true;
-        }
-        else if( event->type() == QEvent::KeyPress )
-        {
-            emit keyPressed( static_cast<QKeyEvent *>(event) );
-            return true;
-        }
-        else if( event->type() == QEvent::Wheel )
-        {
-            int i_vlckey = qtWheelEventToVLCKey( static_cast<QWheelEvent *>(event) );
-            var_SetInteger( p_intf->p_libvlc, "key-pressed", i_vlckey );
-            return true;
-        }
-    }
-    return false;
 }
 
 /**********************************************************************

@@ -86,6 +86,7 @@ public:
 #endif
     int getControlsVisibilityStatus();
     bool isPlDocked() { return ( b_plDocked != false ); }
+    bool isInterfaceFullScreen() { return b_interfaceFullScreen; }
 
 protected:
     void dropEventPlay( QDropEvent *, bool);
@@ -115,6 +116,10 @@ private:
     void showTab( QWidget *);
     void showVideo();
     void restoreStackOldWidget();
+
+    /* */
+    void setMinimalView( bool );
+    void setInterfaceFullScreen( bool );
 
     /* */
     QSettings           *settings;
@@ -153,7 +158,8 @@ private:
     bool                 b_videoFullScreen;     ///< --fullscreen
     bool                 b_videoOnTop;          ///< --video-on-top
     bool                 b_hideAfterCreation;
-    int                  i_visualmode;          ///< Visual Mode
+    bool                 b_minimalView;         ///< Minimal video
+    bool                 b_interfaceFullScreen;
 
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?
@@ -177,7 +183,7 @@ public slots:
     void toggleUpdateSystrayMenu();
 #endif
     void toggleAdvancedButtons();
-    void toggleFullScreen();
+    void toggleInterfaceFullScreen();
     void toggleFSC();
 
     void popupMenu( const QPoint& );
@@ -210,7 +216,7 @@ private slots:
 
     void resizeStack( int w, int h ) {
         if( !isFullScreen() && !isMaximized() )
-            if( i_visualmode == 1 ) resize( w, h ); /* Oh yes, it shouldn't
+            if( b_minimalView ) resize( w, h ); /* Oh yes, it shouldn't
                                    be possible that size() - stackCentralW->size() < 0
                                    since stackCentralW is contained in the QMW... */
             else resize( size() - stackCentralW->size() + QSize( w, h ) );
