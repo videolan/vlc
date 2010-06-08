@@ -24,6 +24,7 @@ SOURCES_activex = \
     persiststorage.h \
     persiststreaminit.cpp \
     persiststreaminit.h \
+    position.h \
     provideclassinfo.cpp \
     provideclassinfo.h \
     connectioncontainer.cpp \
