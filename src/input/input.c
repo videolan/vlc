@@ -1139,7 +1139,7 @@ static void UpdatePtsDelay( input_thread_t *p_input )
 static void InitPrograms( input_thread_t * p_input )
 {
     int i_es_out_mode;
-    vlc_value_t val;
+    vlc_list_t list;
 
     /* Compute correct pts_delay */
     UpdatePtsDelay( p_input );
@@ -1148,22 +1148,31 @@ static void InitPrograms( input_thread_t * p_input )
     i_es_out_mode = ES_OUT_MODE_AUTO;
     if( p_input->p->p_sout )
     {
+        char *prgms;
+
         if( var_GetBool( p_input, "sout-all" ) )
         {
             i_es_out_mode = ES_OUT_MODE_ALL;
         }
         else
+        if( (prgms = var_GetNonEmptyString( p_input, "programs" )) != NULL )
         {
-            var_Get( p_input, "programs", &val );
-            if( val.p_list && val.p_list->i_count )
+            char *buf;
+
+            TAB_INIT( list.i_count, list.p_values );
+            for( const char *prgm = strtok_r( prgms, ",", &buf );
+                 prgm != NULL;
+                 prgm = strtok_r( NULL, ",", &buf ) )
             {
+                vlc_value_t val = { .i_int = atoi( prgm ) };
+                TAB_APPEND( list.i_count, list.p_values, val );
+            }
+
+            if( list.i_count > 0 )
                 i_es_out_mode = ES_OUT_MODE_PARTIAL;
                 /* Note : we should remove the "program" callback. */
-            }
-            else
-            {
-                var_FreeList( &val, NULL );
-            }
+
+            free( prgms );
         }
     }
     es_out_SetMode( p_input->p->p_es_out, i_es_out_mode );
@@ -1176,7 +1185,8 @@ static void InitPrograms( input_thread_t * p_input )
     else if( i_es_out_mode == ES_OUT_MODE_PARTIAL )
     {
         demux_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP, -1,
-                        val.p_list );
+                       &list );
+        TAB_CLEAN( list.i_count, list.p_values );
     }
     else
     {

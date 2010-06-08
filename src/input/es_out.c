@@ -1747,19 +1747,24 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
     }
     else if( p_sys->i_mode == ES_OUT_MODE_PARTIAL )
     {
-        vlc_value_t val;
-        int i;
-        var_Get( p_sys->p_input, "programs", &val );
-        for ( i = 0; i < val.p_list->i_count; i++ )
+        char *prgms = var_GetNonEmptyString( p_sys->p_input, "programs" );
+        if( prgms != NULL )
         {
-            if ( val.p_list->p_values[i].i_int == es->p_pgrm->i_id || b_force )
+            char *buf;
+
+            for ( const char *prgm = strtok_r( prgms, ",", &buf );
+                  prgm != NULL;
+                  prgm = strtok_r( NULL, ",", &buf ) )
             {
-                if( !EsIsSelected( es ) )
-                    EsSelect( out, es );
-                break;
+                if( atoi( prgm ) == es->p_pgrm->i_id || b_force )
+                {
+                    if( !EsIsSelected( es ) )
+                        EsSelect( out, es );
+                    break;
+                }
             }
+            free( prgms );
         }
-        var_FreeList( &val, NULL );
     }
     else if( p_sys->i_mode == ES_OUT_MODE_AUTO )
     {
