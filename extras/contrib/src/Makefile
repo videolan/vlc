@@ -977,7 +977,6 @@ libebml-$(LIBEBML_VERSION).tar.bz2:
 
 libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p0 < Patches/libebml-win32.patch
 
 .ebml: libebml
 ifdef HAVE_WIN32
@@ -1001,9 +1000,6 @@ libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
 
 libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-ifdef HAVE_WIN32
-	patch -p0 < Patches/libmatroska-win32.patch
-endif
 
 .matroska: libmatroska .ebml
 ifdef HAVE_WIN32
