@@ -55,7 +55,6 @@ EXTRA_DIST = \
 	extras/package/win32/languages/brazilian_portuguese.nsh \
 	extras/package/win32/languages/bulgarian.nsh \
 	extras/package/win32/languages/catalan.nsh \
-	extras/package/win32/languages/declaration.nsh \
 	extras/package/win32/languages/dutch.nsh \
 	extras/package/win32/languages/english.nsh \
 	extras/package/win32/languages/estonian.nsh \
@@ -73,8 +72,7 @@ EXTRA_DIST = \
 	extras/package/win32/languages/slovak.nsh \
 	extras/package/win32/languages/slovenian.nsh \
 	extras/package/win32/languages/sorani.nsh \
-	extras/package/win32/languages/spanish.nsh \
-	extras/package/win32/languages/vlc-chinese_simp.nsh
+	extras/package/win32/languages/spanish.nsh
 
 dist_noinst_SCRIPTS = bootstrap toolbox
 nodist_noinst_SCRIPTS = compile
