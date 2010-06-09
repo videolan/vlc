@@ -319,7 +319,6 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
     }
 
     // Get devices
-
     IXML_NodeList* p_device_list =
                 ixmlDocument_getElementsByTagName( p_doc, "device" );
 
@@ -351,8 +350,13 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                 continue;
             }
 
+	    // Check if server is already added
             if ( p_sd->p_sys->p_server_list->getServer( psz_udn ) != 0 )
+	    {
+		msg_Dbg( p_sd, "%s:%d: server already exists.",
+                        __FILE__, __LINE__ );
                 continue;
+	    }
 
             const char* psz_friendly_name =
                        xml_getChildElementValue( p_device_element,
@@ -368,7 +372,6 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
 
             if ( !p_sd->p_sys->p_server_list->addServer( p_server ) )
             {
-
                 delete p_server;
                 p_server = 0;
                 continue;
@@ -464,54 +467,51 @@ MediaServer::MediaServer( const char* psz_udn,
     _p_sd = p_sd;
 
     _UDN = psz_udn;
-    _friendlyName = psz_friendly_name;
+    _friendly_name = psz_friendly_name;
 
-    _contents = NULL;
-    _inputItem = NULL;
+    _p_contents = NULL;
+    _p_input_item = NULL;
 }
 
 MediaServer::~MediaServer()
 {
-    delete _contents;
+    delete _p_contents;
 }
 
 const char* MediaServer::getUDN() const
 {
-  const char* s = _UDN.c_str();
-  return s;
+  return _UDN.c_str();
 }
 
 const char* MediaServer::getFriendlyName() const
 {
-    const char* s = _friendlyName.c_str();
-    return s;
+    return _friendly_name.c_str();
 }
 
 void MediaServer::setContentDirectoryEventURL( const char* psz_url )
 {
-    _contentDirectoryEventURL = psz_url;
+    _content_directory_event_url = psz_url;
 }
 
 const char* MediaServer::getContentDirectoryEventURL() const
 {
-    const char* s =  _contentDirectoryEventURL.c_str();
-    return s;
+    return _content_directory_event_url.c_str();
 }
 
 void MediaServer::setContentDirectoryControlURL( const char* psz_url )
 {
-    _contentDirectoryControlURL = psz_url;
+    _content_directory_control_url = psz_url;
 }
 
 const char* MediaServer::getContentDirectoryControlURL() const
 {
-    return _contentDirectoryControlURL.c_str();
+    return _content_directory_control_url.c_str();
 }
 
 void MediaServer::subscribeToContentDirectory()
 {
     const char* psz_url = getContentDirectoryEventURL();
-    if ( !psz_url || strcmp( psz_url, "" ) == 0 )
+    if ( !psz_url )
     {
         msg_Dbg( _p_sd, "No subscription url set!" );
         return;
@@ -524,8 +524,8 @@ void MediaServer::subscribeToContentDirectory()
 
     if ( i_res == UPNP_E_SUCCESS )
     {
-        _subscriptionTimeOut = i_timeout;
-        memcpy( _subscriptionID, sid, sizeof( Upnp_SID ) );
+        _i_subscription_timeout = i_timeout;
+        memcpy( _subscription_id, sid, sizeof( Upnp_SID ) );
     }
     else
     {
@@ -546,7 +546,7 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     IXML_Document* p_response = 0;
     const char* psz_url = getContentDirectoryControlURL();
 
-    if ( !psz_url || strcmp( psz_url, "" ) == 0 )
+    if ( !psz_url )
     {
         msg_Dbg( _p_sd, "No subscription url set!" );
         return 0;
@@ -661,13 +661,22 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
 
 void MediaServer::fetchContents()
 {
+    // Delete previous contents to prevent duplicate entries
+    if ( _p_contents )
+    {
+	delete _p_contents;
+	services_discovery_RemoveItem( _p_sd, _p_input_item );
+	services_discovery_AddItem( _p_sd, _p_input_item, NULL );
+    }
+
     Container* root = new Container( 0, "0", getFriendlyName() );
+    
     _fetchContents( root );
 
-    _contents = root;
-    _contents->setInputItem( _inputItem );
+    _p_contents = root;
+    _p_contents->setInputItem( _p_input_item );
 
-    _buildPlaylist( _contents, NULL );
+    _buildPlaylist( _p_contents, NULL );
 }
 
 bool MediaServer::_fetchContents( Container* p_parent )
@@ -690,19 +699,18 @@ bool MediaServer::_fetchContents( Container* p_parent )
         return false;
     }
 
-    IXML_Document* result = parseBrowseResult( p_response );
+    IXML_Document* p_result = parseBrowseResult( p_response );
     ixmlDocument_free( p_response );
 
-    if ( !result )
+    if ( !p_result )
     {
-        msg_Dbg( _p_sd,
-                "%s:%d: ERROR! browse() response parsing failed",
+        msg_Dbg( _p_sd, "%s:%d: ERROR! browse() response parsing failed",
                 __FILE__, __LINE__ );
         return false;
     }
 
     IXML_NodeList* containerNodeList =
-                ixmlDocument_getElementsByTagName( result, "container" );
+                ixmlDocument_getElementsByTagName( p_result, "container" );
 
     if ( containerNodeList )
     {
@@ -751,7 +759,7 @@ bool MediaServer::_fetchContents( Container* p_parent )
         ixmlNodeList_free( containerNodeList );
     }
 
-    IXML_NodeList* itemNodeList = ixmlDocument_getElementsByTagName( result,
+    IXML_NodeList* itemNodeList = ixmlDocument_getElementsByTagName( p_result,
                                                                      "item" );
     if ( itemNodeList )
     {
@@ -784,59 +792,60 @@ bool MediaServer::_fetchContents( Container* p_parent )
         ixmlNodeList_free( itemNodeList );
     }
 
-    ixmlDocument_free( result );
+    ixmlDocument_free( p_result );
     return true;
 }
 
 void MediaServer::_buildPlaylist( Container* p_parent, input_item_node_t *p_input_node )
 {
-    bool send = p_input_node == NULL;
-    if( send )
+    bool b_send = p_input_node == NULL;
+    if( b_send )
         p_input_node = input_item_node_Create( p_parent->getInputItem() );
 
     for ( unsigned int i = 0; i < p_parent->getNumContainers(); i++ )
     {
-        Container* container = p_parent->getContainer( i );
+        Container* p_container = p_parent->getContainer( i );
 
-        input_item_t* p_input_item = input_item_New( _p_sd, "vlc://nop", container->getTitle() );
+        input_item_t* p_input_item = input_item_New( _p_sd, "vlc://nop",
+						    p_container->getTitle() );
         input_item_node_t *p_new_node =
             input_item_node_AppendItem( p_input_node, p_input_item );
 
-        container->setInputItem( p_input_item );
-        _buildPlaylist( container, p_new_node );
+        p_container->setInputItem( p_input_item );
+        _buildPlaylist( p_container, p_new_node );
     }
 
     for ( unsigned int i = 0; i < p_parent->getNumItems(); i++ )
     {
-        Item* item = p_parent->getItem( i );
+        Item* p_item = p_parent->getItem( i );
 
         input_item_t* p_input_item = input_item_New( _p_sd,
-                                               item->getResource(),
-                                               item->getTitle() );
+                                               p_item->getResource(),
+                                               p_item->getTitle() );
         assert( p_input_item );
         input_item_node_AppendItem( p_input_node, p_input_item );
-        item->setInputItem( p_input_item );
+        p_item->setInputItem( p_input_item );
     }
 
-    if( send )
+    if( b_send )
         input_item_node_PostAndDelete( p_input_node );
 }
 
 void MediaServer::setInputItem( input_item_t* p_input_item )
 {
-    if(_inputItem == p_input_item)
+    if(_p_input_item == p_input_item)
         return;
 
-    if(_inputItem)
-        vlc_gc_decref( _inputItem );
+    if(_p_input_item)
+        vlc_gc_decref( _p_input_item );
 
     vlc_gc_incref( p_input_item );
-    _inputItem = p_input_item;
+    _p_input_item = p_input_item;
 }
 
-bool MediaServer::compareSID( const char* sid )
+bool MediaServer::compareSID( const char* psz_sid )
 {
-    return ( strncmp( _subscriptionID, sid, sizeof( Upnp_SID ) ) == 0 );
+    return ( strncmp( _subscription_id, psz_sid, sizeof( Upnp_SID ) ) == 0 );
 }
 
 
@@ -855,49 +864,47 @@ MediaServerList::~MediaServerList()
     }
 }
 
-bool MediaServerList::addServer( MediaServer* s )
+bool MediaServerList::addServer( MediaServer* p_server )
 {
     input_item_t* p_input_item = NULL;
-    if ( getServer( s->getUDN() ) != 0 ) return false;
+    if ( getServer( p_server->getUDN() ) != 0 ) return false;
+    
+    msg_Dbg( _p_sd, "Adding server '%s'", p_server->getFriendlyName() );
 
-    msg_Dbg( _p_sd, "Adding server '%s'",
-            s->getFriendlyName() );
+    p_input_item = input_item_New( _p_sd, "vlc://nop",
+				  p_server->getFriendlyName() );
+    p_server->setInputItem( p_input_item );
 
-    services_discovery_t* p_sd = _p_sd;
+    services_discovery_AddItem( _p_sd, p_input_item, NULL );
 
-    p_input_item = input_item_New( p_sd, "vlc://nop", s->getFriendlyName() );
-    s->setInputItem( p_input_item );
-
-    services_discovery_AddItem( p_sd, p_input_item, NULL );
-
-    _list.push_back( s );
+    _list.push_back( p_server );
 
     return true;
 }
 
 MediaServer* MediaServerList::getServer( const char* psz_udn )
 {
-    MediaServer* result = 0;
+    MediaServer* p_result = 0;
 
     for ( unsigned int i = 0; i < _list.size(); i++ )
     {
         if( strcmp( psz_udn, _list[i]->getUDN() ) == 0 )
         {
-            result = _list[i];
+            p_result = _list[i];
             break;
         }
     }
 
-    return result;
+    return p_result;
 }
 
-MediaServer* MediaServerList::getServerBySID( const char* sid )
+MediaServer* MediaServerList::getServerBySID( const char* psz_sid )
 {
     MediaServer* p_server = 0;
 
     for ( unsigned int i = 0; i < _list.size(); i++ )
     {
-        if ( _list[i]->compareSID( sid ) )
+        if ( _list[i]->compareSID( psz_sid ) )
         {
             p_server = _list[i];
             break;
@@ -939,13 +946,13 @@ Item::Item( Container* p_parent, const char* psz_object_id, const char* psz_titl
     _title = psz_title;
     _resource = psz_resource;
 
-    _inputItem = NULL;
+    _p_input_item = NULL;
 }
 
 Item::~Item()
 {
-    if(_inputItem)
-        vlc_gc_decref( _inputItem );
+    if(_p_input_item)
+        vlc_gc_decref( _p_input_item );
 }
 
 const char* Item::getObjectID() const
@@ -965,19 +972,19 @@ const char* Item::getResource() const
 
 void Item::setInputItem( input_item_t* p_input_item )
 {
-    if(_inputItem == p_input_item)
+    if(_p_input_item == p_input_item)
         return;
 
-    if(_inputItem)
-        vlc_gc_decref( _inputItem );
+    if(_p_input_item)
+        vlc_gc_decref( _p_input_item );
 
     vlc_gc_incref( p_input_item );
-    _inputItem = p_input_item;
+    _p_input_item = p_input_item;
 }
 
 input_item_t* Item::getInputItem() const
 {
-    return _inputItem;
+    return _p_input_item;
 }
 
 
@@ -992,7 +999,7 @@ Container::Container( Container*  p_parent,
     _objectID = psz_object_id;
     _title = psz_title;
 
-    _inputItem = NULL;
+    _p_input_item = NULL;
 }
 
 Container::~Container()
@@ -1007,8 +1014,8 @@ Container::~Container()
         delete _items[i];
     }
 
-    if(_inputItem )
-        vlc_gc_decref( _inputItem );
+    if(_p_input_item )
+        vlc_gc_decref( _p_input_item );
 }
 
 void Container::addItem( Item* item )
@@ -1060,17 +1067,17 @@ Container* Container::getParent()
 
 void Container::setInputItem( input_item_t* p_input_item )
 {
-    if(_inputItem == p_input_item)
+    if(_p_input_item == p_input_item)
         return;
 
-    if(_inputItem)
-        vlc_gc_decref( _inputItem );
+    if(_p_input_item)
+        vlc_gc_decref( _p_input_item );
 
     vlc_gc_incref( p_input_item );
-    _inputItem = p_input_item;
+    _p_input_item = p_input_item;
 }
 
 input_item_t* Container::getInputItem() const
 {
-    return _inputItem;
+    return _p_input_item;
 }

@@ -40,12 +40,12 @@ class MediaServer
 {
 public:
 
-    static void parseDeviceDescription( IXML_Document* doc,
-                                        const char*    location,
+    static void parseDeviceDescription( IXML_Document* p_doc,
+                                        const char*    psz_location,
                                         services_discovery_t* p_sd );
 
-    MediaServer( const char* UDN,
-                 const char* friendlyName,
+    MediaServer( const char* psz_udn,
+                 const char* psz_friendly_name,
                  services_discovery_t* p_sd );
 
     ~MediaServer();
@@ -53,10 +53,10 @@ public:
     const char* getUDN() const;
     const char* getFriendlyName() const;
 
-    void setContentDirectoryEventURL( const char* url );
+    void setContentDirectoryEventURL( const char* psz_url );
     const char* getContentDirectoryEventURL() const;
 
-    void setContentDirectoryControlURL( const char* url );
+    void setContentDirectoryControlURL( const char* psz_url );
     const char* getContentDirectoryControlURL() const;
 
     void subscribeToContentDirectory();
@@ -64,29 +64,29 @@ public:
 
     void setInputItem( input_item_t* p_input_item );
 
-    bool compareSID( const char* sid );
+    bool compareSID( const char* psz_sid );
 
 private:
 
-    bool _fetchContents( Container* parent );
-    void _buildPlaylist( Container* container, input_item_node_t * );
+    bool _fetchContents( Container* p_parent );
+    void _buildPlaylist( Container* p_container, input_item_node_t *p_item_node );
 
     IXML_Document* _browseAction( const char*, const char*,
             const char*, const char*, const char*, const char* );
 
     services_discovery_t* _p_sd;
 
-    Container* _contents;
-    input_item_t* _inputItem;
+    Container* _p_contents;
+    input_item_t* _p_input_item;
 
     std::string _UDN;
-    std::string _friendlyName;
+    std::string _friendly_name;
 
-    std::string _contentDirectoryEventURL;
-    std::string _contentDirectoryControlURL;
+    std::string _content_directory_event_url;
+    std::string _content_directory_control_url;
 
-    int _subscriptionTimeOut;
-    Upnp_SID _subscriptionID;
+    int _i_subscription_timeout;
+    Upnp_SID _subscription_id;
 };
 
 
@@ -97,11 +97,11 @@ public:
     MediaServerList( services_discovery_t* p_sd );
     ~MediaServerList();
 
-    bool addServer( MediaServer* s );
-    void removeServer( const char* UDN );
+    bool addServer( MediaServer* p_server );
+    void removeServer( const char* psz_udn );
 
-    MediaServer* getServer( const char* UDN );
-    MediaServer* getServerBySID( const char* );
+    MediaServer* getServer( const char* psz_udn );
+    MediaServer* getServerBySID( const char* psz_sid );
 
 private:
 
@@ -130,7 +130,7 @@ public:
 
 private:
 
-    input_item_t* _inputItem;
+    input_item_t* _p_input_item;
 
     Container* _parent;
     std::string _objectID;
@@ -164,7 +164,7 @@ public:
 
 private:
 
-    input_item_t* _inputItem;
+    input_item_t* _p_input_item;
 
     Container* _parent;
 
