@@ -56,23 +56,8 @@ TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t)
  * item is refcounted and is automatically destroyed when it is not used
  * anymore.
  *
- * In the playlist itself, there are two trees, that should always be kept
- * in sync. The "category" tree contains the whole tree structure with
- * several levels, while the onelevel tree contains only one level :), ie
- * it only contains "real" items, not nodes
- * For example, if you open a directory, you will have
- *\verbatim
- * Category tree:               Onelevel tree:
- * Playlist                     Playlist
- *  - Dir                         - item1
- *    - Subdir                    - item2
- *      - item1
- *      - item2
- *\endverbatim
- * The top-level items of both tree are the same, and they are reproduced
- * in the left-part of the playlist GUIs, they are the "sources" from the
- * source selectors. Top-level items include: playlist, media library, SAP,
- * Shoutcast, devices, ...
+ * The top-level items are the main media sources and include:
+ * playlist, media library, SAP, Shoutcast, devices, ...
  *
  * It is envisioned that a third tree will appear: VLM, but it's not done yet
  *
@@ -86,45 +71,48 @@ TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t)
  *  - input 1 -> name = foo 1 uri = ...
  *  - input 2 -> name = foo 2 uri = ...
  *
- * Category tree                        Onelevel tree
- * - playlist (id 1)                    - playlist (id 3)
- *    - category 1 (id 2)                - foo 2 (id 8 - input 2)
- *      - foo 2 (id 6 - input 2)       - media library (id 4)
- * - media library (id 2)                - foo 1 (id6 - input 1)
+ * Playlist items tree
+ * - playlist (id 1)
+ *    - category 1 (id 2)
+ *      - foo 2 (id 6 - input 2)
+ * - media library (id 2)
  *    - foo 1 (id 5 - input 1)
  * \endverbatim
- * Sometimes, an item must be transformed to a node. This happens for the
- * directory access for example. In that case, the item is removed from
- * the onelevel tree, as it is not a real item anymore.
+ *
+ * Sometimes, an item creates subitems. This happens for the directory access
+ * for example. In that case, if the item is under the "playlist" top-level item
+ * and playlist is configured to be flat then the item will be deleted and
+ * replaced with new subitems. If the item is under another top-level item, it
+ * will be transformed to a node and removed from the list of all items without
+ * nodes.
  *
  * For "standard" item addition, you can use playlist_Add, playlist_AddExt
  * (more options) or playlist_AddInput if you already created your input
  * item. This will add the item at the root of "Playlist" or of "Media library"
  * in each of the two trees.
  *
- * If you want more control (like, adding the item as the child of a given
- * node in the category tree, use playlist_BothAddInput. You'll have to provide
- * the node in the category tree. The item will be added as a child of
- * this node in the category tree, and as a child of the matching top-level
- * node in the onelevel tree. (Nodes are created with playlist_NodeCreate)
- *
- * Generally speaking, playlist_NodeAddInput should not be used in newer code, it
- * will maybe become useful again when we merge VLM;
+ * You can create nodes with playlist_NodeCreate and can create items from
+ * existing input items to be placed under any node with playlist_NodeAddInput.
  *
  * To delete an item, use playlist_DeleteFromInput( p_item ) which will
- * remove all occurrences of the input in both trees
+ * remove all occurrences of the input.
  *
  *
  * The playlist defines the following event variables:
  *
- * - "item-change": It will contains the input_item_t->i_id of a changed input
+ * - "item-change": It will contain the input_item_t->i_id of a changed input
  * item monitored by the playlist.
- * * - "item-current": It will contains a input_item_t->i_id of the current
+ * - "item-current": It will contain a input_item_t->i_id of the current
  * item being played.
  *
- * - "playlist-item-append": It will contains a pointer to a playlist_add_t.
- * - "playlist-item-deleted": It will contains the playlist_item_t->i_id of a deleted
- * playlist_item_t.
+ * - "playlist-item-append": It will contain a pointer to a playlist_add_t.
+ * - "playlist-item-deleted": It will contain the playlist_item_t->i_id of a
+ * deleted playlist_item_t.
+ *
+ * - "leaf-to-parent": Set when an item gets subitems and is transformed to a
+ * node. It will contain a pointer to the input_item_t bound to the transformed
+ * playlist item.
+ *
  *
  * XXX Be really carefull, playlist_item_t->i_id and input_item_t->i_id are not
  * the same. Yes, the situation is pretty bad.
