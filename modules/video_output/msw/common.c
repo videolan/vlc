@@ -618,7 +618,10 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
     }
     case VOUT_DISPLAY_CHANGE_FULLSCREEN: {   /* const vout_display_cfg_t *p_cfg */
         const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-        return CommonControlSetFullscreen(vd, cfg->is_fullscreen);
+        if (CommonControlSetFullscreen(vd, cfg->is_fullscreen))
+            return VLC_EGENERIC;
+        UpdateRects(vd, NULL, NULL, false);
+        return VLC_SUCCESS;
     }
 
     case VOUT_DISPLAY_HIDE_MOUSE:
