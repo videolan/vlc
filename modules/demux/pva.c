@@ -99,9 +99,11 @@ static int Open( vlc_object_t *p_this )
 
     /* Register one audio and one video stream */
     es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_MPGA );
+    fmt.b_packetized = false;
     p_sys->p_audio = es_out_Add( p_demux->out, &fmt );
 
     es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_MPGV );
+    fmt.b_packetized = false;
     p_sys->p_video = es_out_Add( p_demux->out, &fmt );
 
     p_sys->i_vc    = -1;
