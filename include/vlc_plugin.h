@@ -195,9 +195,9 @@ enum vlc_module_properties
     if (vlc_plugin_set (p_module, NULL, VLC_SUBMODULE_CREATE, &p_submodule)) \
         goto error;
 
-#define add_shortcut( shortcut ) \
+#define add_shortcut( ... ) \
     if (vlc_module_set (p_submodule, VLC_MODULE_SHORTCUT, \
-        (const char *)(shortcut))) \
+        sizeof((const char*[]){__VA_ARGS__})/sizeof(const char*), __VA_ARGS__)) \
         goto error;
 
 #define set_shortname( shortname ) \

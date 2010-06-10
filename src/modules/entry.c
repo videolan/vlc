@@ -181,9 +181,16 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
 
         case VLC_MODULE_SHORTCUT:
         {
-            const char *psz_new = va_arg (ap, char*);
-            module->pp_shortcuts = realloc (module->pp_shortcuts, sizeof( char ** ) * (module->i_shortcuts + 1));
-            module->pp_shortcuts[module->i_shortcuts++] = psz_new;
+            unsigned i_shortcuts = va_arg (ap, unsigned);
+            unsigned index = module->i_shortcuts;
+            module->i_shortcuts += i_shortcuts;
+
+            module->pp_shortcuts = realloc (module->pp_shortcuts, sizeof( char ** ) * module->i_shortcuts);
+            for (; index < module->i_shortcuts; index++)
+            {
+                const char *psz_new = va_arg (ap, const char*);
+                module->pp_shortcuts[index] = psz_new;
+            }
             break;
         }
 
