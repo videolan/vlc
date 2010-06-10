@@ -1040,8 +1040,9 @@ void MainInterface::dropEvent(QDropEvent *event)
 
 void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
 {
-    event->setDropAction( Qt::CopyAction );
-    if( !event->possibleActions() & Qt::CopyAction )
+    if( event->possibleActions() & Qt::CopyAction )
+       event->setDropAction( Qt::CopyAction );
+    else
         return;
 
     const QMimeData *mimeData = event->mimeData();
@@ -1061,17 +1062,29 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
     bool first = b_play;
     foreach( const QUrl &url, mimeData->urls() )
     {
-        QString s = toNativeSeparators( url.toLocalFile() );
-
-        if( s.length() > 0 ) {
-            char* psz_uri = make_URI( qtu(s) );
+        if( url.isValid() )
+        {
+            char* psz_uri = make_URI( qtu( url.toString() ) );
             playlist_Add( THEPL, psz_uri, NULL,
                           PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
                           PLAYLIST_END, true, pl_Unlocked );
             free( psz_uri );
             first = false;
-            RecentsMRL::getInstance( p_intf )->addRecent( s );
+            RecentsMRL::getInstance( p_intf )->addRecent( url.toString() );
         }
+    }
+
+    /* Browsers give content as text if you dnd the addressbar,
+       so check if mimedata has valid url in text and use it
+       if we didn't get any normal Urls()*/
+    if( !mimeData->hasUrls() && mimeData->hasText() &&
+        QUrl(mimeData->text()).isValid() )
+    {
+        char *psz_uri = make_URI( qtu( mimeData->text() ) );
+        playlist_Add( THEPL, psz_uri, NULL,
+                      PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
+                      PLAYLIST_END, true, pl_Unlocked );
+        free( psz_uri );
     }
     event->accept();
 }
