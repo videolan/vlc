@@ -255,7 +255,7 @@ void vout_display_PlacePicture(vout_display_place_t *place,
         place->x = cfg->display.width - place->width;
         break;
     default:
-        place->x = (cfg->display.width - place->width) / 2;
+        place->x = ((int)cfg->display.width - (int)place->width) / 2;
         break;
     }
 
@@ -267,7 +267,7 @@ void vout_display_PlacePicture(vout_display_place_t *place,
         place->y = cfg->display.height - place->height;
         break;
     default:
-        place->y = (cfg->display.height - place->height) / 2;
+        place->y = ((int)cfg->display.height - (int)place->height) / 2;
         break;
     }
 }
