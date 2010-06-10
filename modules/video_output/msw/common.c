@@ -161,6 +161,7 @@ void CommonManage(vout_display_t *vd)
         RECT rect_parent;
         POINT point;
 
+        /* Check if the parent window has resized or moved */
         GetClientRect(sys->hparent, &rect_parent);
         point.x = point.y = 0;
         ClientToScreen(sys->hparent, &point);
@@ -169,30 +170,25 @@ void CommonManage(vout_display_t *vd)
         if (!EqualRect(&rect_parent, &sys->rect_parent)) {
             sys->rect_parent = rect_parent;
 
-            /* FIXME I find such #ifdef quite weirds. Are they really needed ? */
-
-#if defined(MODULE_NAME_IS_direct3d) || defined(MODULE_NAME_IS_wingdi) || defined(MODULE_NAME_IS_wingapi)
+            /* This code deals with both resize and move
+             *
+             * For most drivers(direct3d, gdi, opengl), move is never
+             * an issue. The surface automatically gets moved together
+             * with the associated window (hvideownd)
+             *
+             * For directx, it is still important to call UpdateRects
+             * on a move of the parent window, even if no resize occured
+             */
             SetWindowPos(sys->hwnd, 0, 0, 0,
                          rect_parent.right - rect_parent.left,
                          rect_parent.bottom - rect_parent.top,
                          SWP_NOZORDER);
+
             UpdateRects(vd, NULL, NULL, true);
-#else
-            /* This one is to force the update even if only
-             * the position has changed */
-            SetWindowPos(sys->hwnd, 0, 1, 1,
-                         rect_parent.right - rect_parent.left,
-                         rect_parent.bottom - rect_parent.top, 0);
-
-            SetWindowPos(sys->hwnd, 0, 0, 0,
-                         rect_parent.right - rect_parent.left,
-                         rect_parent.bottom - rect_parent.top, 0);
-
-#endif
         }
     }
 
-    /* */
+    /* HasMoved means here resize or move */
     if (EventThreadGetAndResetHasMoved(sys->event))
         UpdateRects(vd, NULL, NULL, false);
 
