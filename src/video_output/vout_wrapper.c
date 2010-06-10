@@ -132,7 +132,7 @@ int vout_InitWrapper(vout_thread_t *vout)
                                                reserved_picture + decoder_picture) : 3);
     if (allow_dr &&
         picture_pool_GetSize(display_pool) >= reserved_picture + decoder_picture) {
-        sys->dpb_size     = picture_pool_GetSize(display_pool) - reserved_picture - kept_picture;
+        sys->dpb_size     = picture_pool_GetSize(display_pool) - reserved_picture;
         sys->decoder_pool = display_pool;
         sys->display_pool = display_pool;
         sys->is_decoder_pool_slow = vd->info.is_slow;
@@ -140,12 +140,12 @@ int vout_InitWrapper(vout_thread_t *vout)
         sys->decoder_pool =
             picture_pool_NewFromFormat(&source,
                                        __MAX(VOUT_MAX_PICTURES,
-                                             private_picture + kept_picture + decoder_picture));
+                                             reserved_picture + decoder_picture));
         if (allow_dr) {
             msg_Warn(vout, "Not enough direct buffers, using system memory");
             sys->dpb_size = 0;
         } else {
-            sys->dpb_size = picture_pool_GetSize(display_pool) - private_picture - kept_picture;
+            sys->dpb_size = picture_pool_GetSize(sys->decoder_pool) - reserved_picture;
         }
         if (sys->display.use_dr)
             sys->display_pool = display_pool;
