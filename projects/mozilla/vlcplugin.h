@@ -418,6 +418,9 @@ private:
     "application/xspf+xml:xspf:Playlist xspf;" \
     /* Webm */ \
     "video/webm:webm:WebM video;" \
-    "audio/webm:webm:WebM audio;"
+    "audio/webm:webm:WebM audio;" \
+    /* Real Media */ \
+    "application/vnd.rn-realmedia:rm:Real Media File;" \
+    "audio/x-realaudio:ra:Real Media Audio;"
 
 #endif
