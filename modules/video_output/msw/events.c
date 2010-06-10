@@ -81,8 +81,7 @@ UINT GetMenuState(HMENU hMenu, UINT id, UINT flags)
  * Local prototypes.
  *****************************************************************************/
 #define WM_VLC_HIDE_MOUSE   (WM_APP + 0)
-#define WM_VLC_SHOW_MOUSE   (WM_APP + 1)
-#define WM_VLC_CHANGE_TEXT  (WM_APP + 2)
+#define WM_VLC_CHANGE_TEXT  (WM_APP + 1)
 
 struct event_thread_t
 {
@@ -101,9 +100,9 @@ struct event_thread_t
     bool use_overlay;
 
     /* Mouse */
-    volatile bool    b_cursor_hidden;
-    volatile mtime_t i_lastmoved;
-    mtime_t          i_mouse_hide_timeout;
+    bool is_cursor_hidden;
+    HCURSOR cursor_arrow;
+    HCURSOR cursor_empty;
 
     /* Title */
     char *psz_title;
@@ -113,6 +112,8 @@ struct event_thread_t
 
     /* */
     vout_window_t *parent_window;
+    TCHAR class_main[256];
+    TCHAR class_video[256];
     HWND hparent;
     HWND hwnd;
     HWND hvideownd;
@@ -139,6 +140,48 @@ static inline bool isKeyEvent( WPARAM type )
 {
     return type >= WM_KEYFIRST &&
            type <= WM_KEYLAST;
+}
+
+static void UpdateCursor( event_thread_t *p_event, bool b_show )
+{
+    if( p_event->is_cursor_hidden == !b_show )
+        return;
+    p_event->is_cursor_hidden = !b_show;
+
+#if 1
+    HCURSOR cursor = b_show ? p_event->cursor_arrow : p_event->cursor_empty;
+    if( p_event->hvideownd )
+        SetClassLongPtr( p_event->hvideownd, GCLP_HCURSOR, (LONG_PTR)cursor );
+    if( p_event->hwnd )
+        SetClassLongPtr( p_event->hwnd, GCLP_HCURSOR, (LONG_PTR)cursor );
+#endif
+
+    /* FIXME I failed to find a cleaner way to force a redraw of the cursor */
+    POINT p;
+    GetCursorPos(&p);
+    HWND hwnd = WindowFromPoint(p);
+    if( hwnd == p_event->hvideownd || hwnd == p_event->hwnd )
+        SetCursorPos(p.x, p.y);
+}
+
+static HCURSOR EmptyCursor( HINSTANCE instance )
+{
+    const int cw = GetSystemMetrics(SM_CXCURSOR);
+    const int ch = GetSystemMetrics(SM_CYCURSOR);
+
+    HCURSOR cursor = NULL;
+    uint8_t *and = malloc(cw * ch);
+    uint8_t *xor = malloc(cw * ch);
+    if( and && xor )
+    {
+        memset(and, 0xff, cw * ch );
+        memset(xor, 0x00, cw * ch );
+        cursor = CreateCursor( instance, 0, 0, cw, ch, and, xor);
+    }
+    free( and );
+    free( xor );
+
+    return cursor;
 }
 
 /*****************************************************************************
@@ -225,6 +268,28 @@ static void *EventThread( void *p_this )
         if( !b_key_support && isKeyEvent( msg.message ) )
             continue;
 
+        /* Handle mouse state */
+        if( msg.message == WM_MOUSEMOVE ||
+            msg.message == WM_NCMOUSEMOVE )
+        {
+            GetCursorPos( &mouse_pos );
+            /* FIXME, why this >2 limits ? */
+            if( (abs(mouse_pos.x - old_mouse_pos.x) > 2 ||
+                (abs(mouse_pos.y - old_mouse_pos.y)) > 2 ) )
+            {
+                old_mouse_pos = mouse_pos;
+                UpdateCursor( p_event, true );
+            }
+        }
+        else if( isMouseEvent( msg.message ) )
+        {
+            UpdateCursor( p_event, true );
+        }
+        else if( msg.message == WM_VLC_HIDE_MOUSE )
+        {
+            UpdateCursor( p_event, false );
+        }
+
         /* */
         switch( msg.message )
         {
@@ -248,38 +313,11 @@ static void *EventThread( void *p_this )
                     (int64_t)(GET_Y_LPARAM(msg.lParam) - place.y) * source.i_height / place.height;
                 vout_display_SendEventMouseMoved(vd, x, y);
             }
-            /* Fall through */
+            break;
         case WM_NCMOUSEMOVE:
-            GetCursorPos( &mouse_pos );
-            /* FIXME, why this >2 limits ? */
-            if( (abs(mouse_pos.x - old_mouse_pos.x) > 2 ||
-                (abs(mouse_pos.y - old_mouse_pos.y)) > 2 ) )
-            {
-                GetCursorPos( &old_mouse_pos );
-                p_event->i_lastmoved = mdate();
-
-                if( p_event->b_cursor_hidden )
-                {
-                    p_event->b_cursor_hidden = false;
-                    ShowCursor( TRUE );
-                }
-            }
             break;
 
         case WM_VLC_HIDE_MOUSE:
-            if( p_event->b_cursor_hidden )
-                break;
-            p_event->b_cursor_hidden = true;
-            GetCursorPos( &old_mouse_pos );
-            ShowCursor( FALSE );
-            break;
-
-        case WM_VLC_SHOW_MOUSE:
-            if( !p_event->b_cursor_hidden )
-                break;
-            p_event->b_cursor_hidden = false;
-            GetCursorPos( &old_mouse_pos );
-            ShowCursor( TRUE );
             break;
 
         case WM_LBUTTONDOWN:
@@ -470,6 +508,8 @@ static int DirectXCreateWindow( event_thread_t *p_event )
         p_event->hparent = hwnd;
     }
     #endif
+    p_event->cursor_arrow = LoadCursor(NULL, IDC_ARROW);
+    p_event->cursor_empty = EmptyCursor(hInstance);
 
     /* Get the Icon from the main app */
     vlc_icon = NULL;
@@ -487,41 +527,30 @@ static int DirectXCreateWindow( event_thread_t *p_event )
     wc.cbWndExtra    = 0;                        /* no extra window data */
     wc.hInstance     = hInstance;                            /* instance */
     wc.hIcon         = vlc_icon;                /* load the vlc big icon */
-    wc.hCursor       = LoadCursor(NULL, IDC_ARROW);    /* default cursor */
+    wc.hCursor       = p_event->is_cursor_hidden ? p_event->cursor_empty :
+                                                   p_event->cursor_arrow;
     wc.hbrBackground = GetStockObject(BLACK_BRUSH);  /* background color */
     wc.lpszMenuName  = NULL;                                  /* no menu */
-    wc.lpszClassName = _T("VLC DirectX");         /* use a special class */
+    wc.lpszClassName = p_event->class_main;       /* use a special class */
 
     /* Register the window class */
     if( !RegisterClass(&wc) )
     {
-        WNDCLASS wndclass;
+        if( vlc_icon )
+            DestroyIcon( vlc_icon );
 
-        if( vlc_icon ) DestroyIcon( vlc_icon );
-
-        /* Check why it failed. If it's because one already exists
-         * then fine, otherwise return with an error. */
-        if( !GetClassInfo( hInstance, _T("VLC DirectX"), &wndclass ) )
-        {
-            msg_Err( vd, "DirectXCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
-            return VLC_EGENERIC;
-        }
+        msg_Err( vd, "DirectXCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
+        return VLC_EGENERIC;
     }
 
     /* Register the video sub-window class */
-    wc.lpszClassName = _T("VLC DirectX video"); wc.hIcon = 0;
+    wc.lpszClassName = p_event->class_video;
+    wc.hIcon = 0;
     wc.hbrBackground = NULL; /* no background color */
     if( !RegisterClass(&wc) )
     {
-        WNDCLASS wndclass;
-
-        /* Check why it failed. If it's because one already exists
-         * then fine, otherwise return with an error. */
-        if( !GetClassInfo( hInstance, _T("VLC DirectX video"), &wndclass ) )
-        {
-            msg_Err( vd, "DirectXCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
-            return VLC_EGENERIC;
-        }
+        msg_Err( vd, "DirectXCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
+        return VLC_EGENERIC;
     }
 
     /* When you create a window you give the dimensions you wish it to
@@ -560,7 +589,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
     /* Create the window */
     p_event->hwnd =
         CreateWindowEx( WS_EX_NOPARENTNOTIFY | i_stylex,
-                    _T("VLC DirectX"),               /* name of window class */
+                    p_event->class_main,             /* name of window class */
                     _T(VOUT_TITLE) _T(" (DirectX Output)"),  /* window title */
                     i_style,                                 /* window style */
                     (!p_event->wnd_cfg.x) ? CW_USEDEFAULT :
@@ -594,7 +623,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
 
         /* Create our fullscreen window */
         p_event->hfswnd =
-            CreateWindowEx( WS_EX_APPWINDOW, _T("VLC DirectX"),
+            CreateWindowEx( WS_EX_APPWINDOW, p_event->class_main,
                             _T(VOUT_TITLE) _T(" (DirectX Output)"),
                             WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN|WS_SIZEBOX,
                             CW_USEDEFAULT, CW_USEDEFAULT,
@@ -617,7 +646,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
      * without having them shown outside of the video area. */
     /* FIXME vd->source.i_width/i_height seems wrong */
     p_event->hvideownd =
-    CreateWindow( _T("VLC DirectX video"), _T(""),   /* window class */
+    CreateWindow( p_event->class_video, _T(""),   /* window class */
         WS_CHILD,                   /* window style, not visible initially */
         0, 0,
         vd->source.i_width,          /* default width */
@@ -657,9 +686,11 @@ static void DirectXCloseWindow( event_thread_t *p_event )
         vout_display_DeleteWindow( vd, p_event->parent_window );
     p_event->hwnd = NULL;
 
-    /* We don't unregister the Window Class because it could lead to race
-     * conditions and it will be done anyway by the system when the app will
-     * exit */
+    HINSTANCE hInstance = GetModuleHandle(NULL);
+    UnregisterClass( p_event->class_video, hInstance );
+    UnregisterClass( p_event->class_main, hInstance );
+
+    DestroyCursor( p_event->cursor_empty );
 }
 
 /*****************************************************************************
@@ -707,7 +738,14 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         return 0; /* this stops them from happening */
     }
 #endif
-
+#if 0
+    if( message == WM_SETCURSOR )
+    {
+        msg_Err(vd, "WM_SETCURSOR: %d (t2)", p_event->is_cursor_hidden);
+        SetCursor( p_event->is_cursor_hidden ? p_event->cursor_empty : p_event->cursor_arrow );
+        return 1;
+    }
+#endif
     if( hwnd == p_event->hvideownd )
     {
 #ifdef MODULE_NAME_IS_directx
@@ -915,30 +953,11 @@ static int DirectXConvertKey( int i_key )
     return 0;
 }
 
-void EventThreadMouseAutoHide( event_thread_t *p_event )
+void EventThreadMouseHide( event_thread_t *p_event )
 {
-    if (!p_event->b_cursor_hidden &&
-        (mdate() - p_event->i_lastmoved) > p_event->i_mouse_hide_timeout )
-    {
-        /* Hide the cursor only if it is inside our window */
-        POINT point;
-        GetCursorPos( &point );
+    PostMessage( p_event->hwnd, WM_VLC_HIDE_MOUSE, 0, 0 );
+}
 
-        HWND hwnd = WindowFromPoint(point);
-        if( hwnd == p_event->hwnd || hwnd == p_event->hvideownd )
-        {
-            PostMessage( p_event->hwnd, WM_VLC_HIDE_MOUSE, 0, 0 );
-        }
-        else
-        {
-            p_event->i_lastmoved = mdate();
-        }
-    }
-}
-void EventThreadMouseShow( event_thread_t *p_event )
-{
-    PostMessage( p_event->hwnd, WM_VLC_SHOW_MOUSE, 0, 0 );
-}
 void EventThreadUpdateTitle( event_thread_t *p_event, const char *psz_fallback )
 {
     char *psz_title = var_GetNonEmptyString( p_event->vd, "video-title" );
@@ -1021,14 +1040,15 @@ event_thread_t *EventThreadCreate( vout_display_t *vd)
     vlc_mutex_init( &p_event->lock );
     vlc_cond_init( &p_event->wait );
 
-    p_event->b_cursor_hidden      = false;
-    p_event->i_lastmoved          = mdate();
-    p_event->i_mouse_hide_timeout =
-        var_GetInteger(vd, "mouse-hide-timeout") * 1000;
+    p_event->is_cursor_hidden = false;
     p_event->psz_title = NULL;
     p_event->source = vd->source;
     vout_display_PlacePicture(&p_event->place, &vd->source, vd->cfg, false);
 
+    _snprintf( p_event->class_main, sizeof(p_event->class_main)/sizeof(*p_event->class_main),
+               _T("VLC MSW %p"), p_event );
+    _snprintf( p_event->class_video, sizeof(p_event->class_video)/sizeof(*p_event->class_video),
+               _T("VLC MSW video %p"), p_event );
     return p_event;
 }
 

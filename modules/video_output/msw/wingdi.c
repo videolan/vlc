@@ -134,7 +134,7 @@ static int Open(vlc_object_t *object)
     vout_display_info_t info = vd->info;
     info.is_slow              = false;
     info.has_double_click     = true;
-    info.has_hide_mouse       = true;
+    info.has_hide_mouse       = false;
     info.has_pictures_invalid = true;
 
     /* */

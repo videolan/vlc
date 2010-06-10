@@ -84,9 +84,6 @@ int CommonInit(vout_display_t *vd)
     var_Create(vd, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     var_Create(vd, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
-    /* FIXME remove mouse hide from msw */
-    var_Create(vd, "mouse-hide-timeout", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-
     /* */
     sys->event = EventThreadCreate(vd);
     if (!sys->event)
@@ -191,9 +188,6 @@ void CommonManage(vout_display_t *vd)
     /* HasMoved means here resize or move */
     if (EventThreadGetAndResetHasMoved(sys->event))
         UpdateRects(vd, NULL, NULL, false);
-
-    /* Pointer change */
-    EventThreadMouseAutoHide(sys->event);
 }
 
 /**
@@ -551,9 +545,6 @@ static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
             SetWindowPlacement(hwnd, &window_placement);
             ShowWindow(hwnd, SW_SHOWNORMAL);
         }
-
-        /* Make sure the mouse cursor is displayed */
-        EventThreadMouseShow(sys->event);
     }
     return VLC_SUCCESS;
 }
@@ -630,8 +621,10 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
         return CommonControlSetFullscreen(vd, cfg->is_fullscreen);
     }
 
-    case VOUT_DISPLAY_RESET_PICTURES:
     case VOUT_DISPLAY_HIDE_MOUSE:
+        EventThreadMouseHide(sys->event);
+        return VLC_SUCCESS;
+    case VOUT_DISPLAY_RESET_PICTURES:
         assert(0);
     default:
         return VLC_EGENERIC;

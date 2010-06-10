@@ -73,9 +73,6 @@ vlc_module_begin ()
     add_shortcut("direct3d")
     set_callbacks(OpenVideoVista, Close)
 
-    /* FIXME: Hack to avoid unregistering our window class */
-    cannot_unload_broken_library()
-
     add_submodule()
         set_description(N_("Direct3D video output (XP)"))
         set_capability("vout display", 70)
@@ -83,14 +80,6 @@ vlc_module_begin ()
         set_callbacks(OpenVideoXP, Close)
 
 vlc_module_end ()
-
-#if 0 /* FIXME */
-    /* check if we registered a window class because we need to
-     * unregister it */
-    WNDCLASS wndclass;
-    if (GetClassInfo(GetModuleHandle(NULL), "VLC DirectX", &wndclass))
-        UnregisterClass("VLC DirectX", GetModuleHandle(NULL));
-#endif
 
 /*****************************************************************************
  * Local prototypes.
@@ -165,7 +154,7 @@ static int Open(vlc_object_t *object)
     vout_display_info_t info = vd->info;
     info.is_slow = true;
     info.has_double_click = true;
-    info.has_hide_mouse = true;
+    info.has_hide_mouse = false;
     info.has_pictures_invalid = true;
     info.has_event_thread = true;
 

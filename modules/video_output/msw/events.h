@@ -49,8 +49,7 @@ void            EventThreadDestroy( event_thread_t * );
 int             EventThreadStart( event_thread_t *, event_hwnd_t *, const event_cfg_t * );
 void            EventThreadStop( event_thread_t * );
 
-void            EventThreadMouseAutoHide( event_thread_t * );
-void            EventThreadMouseShow( event_thread_t * );
+void            EventThreadMouseHide( event_thread_t * );
 void            EventThreadUpdateTitle( event_thread_t *, const char *psz_fallback );
 int             EventThreadGetWindowStyle( event_thread_t * );
 void            EventThreadUpdateWindowPosition( event_thread_t *, bool *pb_moved, bool *pb_resized,
