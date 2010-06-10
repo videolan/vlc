@@ -62,7 +62,7 @@ Decoders:
  * Improvements on the FLAC format (7.1 channels and 88.2/176.4/192 kHz support)
  * Direct rendering is used more often with H.264 in avcodec module
  * Support for MPEG-4 ALS lossless audio codec
- * Support for VP8 codec (source code version only)
+ * Support for VP8 codec
 
 Demuxers:
  * Support for .aob files from DVD-Audio (MLP and LPCM) (Full disc support is NOT present yet)
@@ -155,6 +155,7 @@ Misc:
  * new sqlite module
  * --save-config command line option not supported anymore.
  * Fixed and reenabled netsync module.
+ * Improved Solaris port
 
 Bindings:
  * new C++ wrapper around libVLC: libVLCpp
