@@ -1027,7 +1027,7 @@ event_thread_t *EventThreadCreate( vout_display_t *vd)
         var_GetInteger(vd, "mouse-hide-timeout") * 1000;
     p_event->psz_title = NULL;
     p_event->source = vd->source;
-    vout_display_PlacePicture(&p_event->place, &vd->source, vd->cfg, true);
+    vout_display_PlacePicture(&p_event->place, &vd->source, vd->cfg, false);
 
     return p_event;
 }

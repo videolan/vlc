@@ -326,7 +326,7 @@ void UpdateRects(vout_display_t *vd,
     place_cfg.display.height = rect.bottom;
 
     vout_display_place_t place;
-    vout_display_PlacePicture(&place, source, &place_cfg, true);
+    vout_display_PlacePicture(&place, source, &place_cfg, false);
 
     EventThreadUpdateSourceAndPlace(sys->event, source, &place);
 #if defined(MODULE_NAME_IS_wingapi)
