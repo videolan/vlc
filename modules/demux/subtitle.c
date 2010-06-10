@@ -226,7 +226,7 @@ static const struct
 static int Demux( demux_t * );
 static int Control( demux_t *, int, va_list );
 
-/*static void Fix( demux_t * );*/
+static void Fix( demux_t * );
 
 /*****************************************************************************
  * Module initializer
@@ -518,6 +518,7 @@ static int Open ( vlc_object_t *p_this )
              p_sys->i_type == SUB_TYPE_SSA2_4 ||
              p_sys->i_type == SUB_TYPE_ASS )
     {
+        Fix( p_demux );
         es_format_Init( &fmt, SPU_ES, VLC_CODEC_SSA );
     }
     else
@@ -708,12 +709,10 @@ static int Demux( demux_t *p_demux )
 /*****************************************************************************
  * Fix: fix time stamp and order of subtitle
  *****************************************************************************/
-#ifdef USE_THIS_UNUSED_PIECE_OF_CODE
 static void Fix( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     bool b_done;
-    int     i_index;
 
     /* *** fix order (to be sure...) *** */
     /* We suppose that there are near in order and this durty bubble sort
@@ -722,10 +721,10 @@ static void Fix( demux_t *p_demux )
     do
     {
         b_done = true;
-        for( i_index = 1; i_index < p_sys->i_subtitles; i_index++ )
+        for( int i_index = 1; i_index < p_sys->i_subtitles; i_index++ )
         {
             if( p_sys->subtitle[i_index].i_start <
-                    p_sys->subtitle[i_index - 1].i_start )
+                p_sys->subtitle[i_index - 1].i_start )
             {
                 subtitle_t sub_xch;
                 memcpy( &sub_xch,
@@ -742,7 +741,6 @@ static void Fix( demux_t *p_demux )
         }
     } while( !b_done );
 }
-#endif
 
 static int TextLoad( text_t *txt, stream_t *s )
 {
