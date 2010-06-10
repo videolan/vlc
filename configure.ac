@@ -4312,7 +4312,7 @@ AC_SUBST(DEFS_BIGENDIAN)
 dnl
 dnl Where to install KDE solid .desktop
 dnl
-AC_ARG_VAR([KDE4_CONFIG], [path to kde4-config utility])
+AC_ARG_VAR([KDE4_CONFIG], [kde4-config utility])
 AS_IF([test "x$KDE4_CONFIG" = "x"], [
   KDE4_CONFIG="kde4-config"
 ])
