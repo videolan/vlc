@@ -928,8 +928,10 @@ DBUS_SIGNAL( TrackListChangeSignal )
     SIGNAL_INIT( MPRIS_DBUS_TRACKLIST_PATH, "TrackListChange");
     OUT_ARGUMENTS;
 
-    /* XXX: locking */
-    dbus_int32_t i_elements = ((intf_thread_t*)p_data)->p_sys->p_playlist->current.i_size;
+    playlist_t *p_playlist = ((intf_thread_t*)p_data)->p_sys->p_playlist;
+    PL_LOCK;
+    dbus_int32_t i_elements = p_playlist->current.i_size;
+    PL_UNLOCK;
 
     ADD_INT32( &i_elements );
     SIGNAL_SEND;
