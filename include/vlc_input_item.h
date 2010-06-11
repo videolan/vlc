@@ -32,6 +32,7 @@
 
 #include <vlc_meta.h>
 #include <vlc_epg.h>
+#include <vlc_events.h>
 
 #include <string.h>
 
