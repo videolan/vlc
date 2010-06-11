@@ -143,6 +143,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
 {
     intf_thread_t  *p_intf = p_args->p_intf;
     intf_sys_t     *p_sys = p_args->p_intf->p_sys;
+    playlist_t     *p_playlist = p_sys->p_playlist;
     char control[512];
 
 #define ALLOC( l ) \
@@ -199,9 +200,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         msg_Dbg( p_intf, "requested playlist play" );
                         break;
                     }
-                    //TODO: really locked here ?
                     playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
-                                      true, NULL,
+                                      pl_Unlocked, NULL,
                                       playlist_ItemGetById( p_sys->p_playlist,
                                       i_item ) );
                     msg_Dbg( p_intf, "requested playlist item: %i", i_item );
@@ -209,22 +209,22 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 }
                 case MVLC_STOP:
                     playlist_Control( p_sys->p_playlist, PLAYLIST_STOP,
-                                      true );
+                                      pl_Unlocked );
                     msg_Dbg( p_intf, "requested playlist stop" );
                     break;
                 case MVLC_PAUSE:
                     playlist_Control( p_sys->p_playlist, PLAYLIST_PAUSE,
-                                      true );
+                                      pl_Unlocked );
                     msg_Dbg( p_intf, "requested playlist pause" );
                     break;
                 case MVLC_NEXT:
                     playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP,
-                                      true, 1 );
+                                      pl_Unlocked, 1 );
                     msg_Dbg( p_intf, "requested playlist next" );
                     break;
                 case MVLC_PREVIOUS:
                     playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP,
-                                      true, -1 );
+                                      pl_Unlocked, -1 );
                     msg_Dbg( p_intf, "requested playlist previous" );
                     break;
                 case MVLC_FULLSCREEN:
@@ -342,7 +342,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     if( psz_uri && *psz_uri &&
                         playlist_AddInput( p_sys->p_playlist, p_input,
                                            PLAYLIST_APPEND, PLAYLIST_END,
-                                           true, false) == VLC_SUCCESS )
+                                           true, pl_Unlocked) == VLC_SUCCESS )
                         msg_Dbg( p_intf, "requested mrl add: %s", mrl );
                     else
                         msg_Warn( p_intf, "adding mrl failed: %s", mrl );
@@ -373,6 +373,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
                     for( size_t i = 0; i < i_nb_items; i++ )
                     {
+                        PL_LOCK;
                         playlist_item_t *p_item;
 
                         msg_Dbg( p_intf, "requested playlist delete: %d",
@@ -383,6 +384,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                             playlist_DeleteFromInput( p_sys->p_playlist,
                                                       p_item->p_input,
                                                       false );
+                        PL_UNLOCK;
                     }
 
                     free( p_items );
@@ -408,6 +410,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         i_nb_items++;
                     }
 
+                    PL_LOCK;
                     size_t size = p_sys->p_playlist->items.i_size;
                     for( i = 0; i < size; i++ )
                     {
@@ -429,13 +432,14 @@ static void MacroDo( httpd_file_sys_t *p_args,
                                                       false );
                         }
                     }
+                    PL_UNLOCK;
 
                     free( p_items );
                     break;
                 }
                 case MVLC_EMPTY:
                 {
-                    playlist_Clear( p_sys->p_playlist, false );
+                    playlist_Clear( p_sys->p_playlist, pl_Unlocked );
                     msg_Dbg( p_intf, "requested playlist empty" );
                     break;
                 }
@@ -457,27 +461,33 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
                     if( !strcmp( type , "title" ) )
                     {
+                        PL_LOCK;
                         playlist_RecursiveNodeSort( p_sys->p_playlist,
                                                     /* Ugly hack,but not worse than before ... */
                                                     p_sys->p_playlist->p_root_onelevel,
                                                     SORT_TITLE_NODES_FIRST,
                                                     ( i_order == 0 ) ? ORDER_NORMAL : ORDER_REVERSE );
+                        PL_UNLOCK;
                         msg_Dbg( p_intf, "requested playlist sort by title (%d)" , i_order );
                     }
                     else if( !strcmp( type , "author" ) )
                     {
+                        PL_LOCK;
                         playlist_RecursiveNodeSort( p_sys->p_playlist, /*playlist_ItemGetById( p_sys->p_playlist, i_item ),*/
                                                     p_sys->p_playlist->p_root_onelevel,
                                                     SORT_ARTIST,
                                                     ( i_order == 0 ) ? ORDER_NORMAL : ORDER_REVERSE );
+                        PL_UNLOCK;
                         msg_Dbg( p_intf, "requested playlist sort by author (%d)" , i_order );
                     }
                     else if( !strcmp( type , "shuffle" ) )
                     {
+                        PL_LOCK;
                         playlist_RecursiveNodeSort( p_sys->p_playlist, /*playlist_ItemGetById( p_sys->p_playlist, i_item ),*/
                                                     p_sys->p_playlist->p_root_onelevel,
                                                     SORT_RANDOM,
                                                     ( i_order == 0 ) ? ORDER_NORMAL : ORDER_REVERSE );
+                        PL_UNLOCK;
                         msg_Dbg( p_intf, "requested playlist shuffle");
                     }
 
