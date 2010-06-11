@@ -29,12 +29,13 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_playlist.h>
 #include <vlc_meta.h>
 #include <vlc_demux.h>
 #include <vlc_strings.h>
 #include <vlc_charset.h>
 #include <vlc_url.h>
+#include <vlc_input_item.h>
+#include <vlc_input.h> /* for attachment_new */
 
 #ifdef WIN32
 # include <io.h>
