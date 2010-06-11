@@ -395,6 +395,8 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                         {
                             EbmlMaster *compr = static_cast<EbmlMaster*>(l3);
                             MkvTree( sys.demuxer, 5, "Content Compression" );
+                            //Default compression type is 0 (Zlib)
+                            tk->i_compression_type = MATROSKA_COMPRESSION_ZLIB;
                             for( size_t n = 0; n < compr->ListSize(); n++ )
                             {
                                 EbmlElement *l4 = (*compr)[n];
