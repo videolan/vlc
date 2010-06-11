@@ -29,6 +29,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_playlist.h>
 #include <vlc_meta.h>
 #include <vlc_demux.h>
 #include <vlc_strings.h>

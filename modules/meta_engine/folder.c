@@ -31,10 +31,10 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_playlist.h>
 #include <vlc_art_finder.h>
 #include <vlc_fs.h>
 #include <vlc_url.h>
-#include <vlc_input_item.h>
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
