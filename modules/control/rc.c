@@ -512,10 +512,8 @@ static void Run( intf_thread_t *p_intf )
 
             if( p_playlist )
             {
-                PL_LOCK;
                 p_intf->p_sys->i_last_state = (int) PLAYLIST_STOPPED;
                 msg_rc( STATUS_CHANGE "( stop state: 0 )" );
-                PL_UNLOCK;
             }
         }
 
@@ -524,6 +522,8 @@ static void Run( intf_thread_t *p_intf )
         {
             PL_LOCK;
             int status = playlist_Status( p_playlist );
+            PL_UNLOCK;
+
             if( p_intf->p_sys->i_last_state != status )
             {
                 if( status == PLAYLIST_STOPPED )
@@ -542,7 +542,6 @@ static void Run( intf_thread_t *p_intf )
                     msg_rc( STATUS_CHANGE "( pause state: 4 )" );
                 }
             }
-            PL_UNLOCK;
         }
 
         if( p_input && b_showpos )
@@ -1325,6 +1324,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if (!strcmp( psz_cmd, "goto" ) )
     {
+        PL_LOCK;
         int i_pos = atoi( newval.psz_string );
         /* The playlist stores 2 times the same item: onelevel & category */
         int i_size = p_playlist->items.i_size / 2;
@@ -1337,11 +1337,12 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             p_item = p_parent = p_playlist->items.p_elems[i_pos*2-1];
             while( p_parent->p_parent )
                 p_parent = p_parent->p_parent;
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Unlocked,
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked,
                     p_parent, p_item );
         }
         else
             msg_rc( _("Playlist has only %d elements"), i_size );
+        PL_UNLOCK;
     }
     else if( !strcmp( psz_cmd, "stop" ) )
     {
@@ -1395,8 +1396,10 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
 
     else if( !strcmp( psz_cmd, "sort" ))
     {
+        PL_LOCK;
         playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root_onelevel,
                                     SORT_ARTIST, ORDER_NORMAL );
+        PL_UNLOCK;
     }
     else if( !strcmp( psz_cmd, "status" ) )
     {
@@ -1412,7 +1415,9 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
                     config_GetInt( p_intf, "volume" ));
 
             PL_LOCK;
-            switch( playlist_Status(p_playlist) )
+            int status = playlist_Status(p_playlist);
+            PL_UNLOCK;
+            switch( status )
             {
                 case PLAYLIST_STOPPED:
                     msg_rc( STATUS_CHANGE "( stop state: 5 )" );
@@ -1427,7 +1432,6 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
                     msg_rc( STATUS_CHANGE "( unknown state: -1 )" );
                     break;
             }
-            PL_UNLOCK;
             vlc_object_release( p_input );
         }
     }
