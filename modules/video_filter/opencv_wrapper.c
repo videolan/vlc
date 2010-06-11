@@ -38,7 +38,6 @@
 #include <vlc_filter.h>
 #include <vlc_image.h>
 #include <vlc_input.h>
-#include <vlc_playlist.h>
 
 #include <cxcore.h>
 #include <cv.h>

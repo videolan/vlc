@@ -31,7 +31,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_playlist.h>
 #include <vlc_services_discovery.h>
 
 #include <vlc_network.h>

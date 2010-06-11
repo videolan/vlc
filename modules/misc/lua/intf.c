@@ -36,7 +36,6 @@
 #include <vlc_meta.h>
 
 #include <vlc_interface.h>
-#include <vlc_playlist.h>
 #include <vlc_aout.h>
 #include <sys/types.h>
 #include <sys/stat.h>
