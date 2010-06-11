@@ -206,7 +206,8 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
 /** This function creates a set variable representing the VLM streams */
 mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm );
 
-/** This function converts the listing of a playlist node into a mvar set */
+/** This function converts the listing of a playlist node into a mvar set.
+ *  It must be entered WITH playlist lock! */
 void PlaylistListNode( intf_thread_t *p_intf, playlist_t *p_pl,
                            playlist_item_t *p_node, char *name, mvar_t *s,
                            int i_depth );
