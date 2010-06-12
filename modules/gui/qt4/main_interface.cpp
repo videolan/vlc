@@ -1144,9 +1144,9 @@ void MainInterface::closeEvent( QCloseEvent *e )
 void MainInterface::setInterfaceFullScreen( bool fs )
 {
     if( fs )
-        showFullScreen();
+        setWindowState( windowState() | Qt::WindowFullScreen );
     else
-        showNormal();
+        setWindowState( windowState() & ~Qt::WindowFullScreen );
 }
 void MainInterface::toggleInterfaceFullScreen()
 {
