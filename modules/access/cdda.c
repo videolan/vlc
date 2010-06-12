@@ -90,8 +90,7 @@ vlc_module_begin ()
             N_( "CDDB Server port to use." ), true )
 #endif
 
-    add_shortcut( "cdda" )
-    add_shortcut( "cddasimple" )
+    add_shortcut( "cdda", "cddasimple" )
 vlc_module_end ()
 
 

@@ -223,8 +223,7 @@ vlc_module_begin ()
         change_integer_list( pi_title_modes, ppsz_title_modes, NULL )
 
     set_description( N_("RSS and Atom feed display") )
-    add_shortcut( "rss" )
-    add_shortcut( "atom" )
+    add_shortcut( "rss", "atom" )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {

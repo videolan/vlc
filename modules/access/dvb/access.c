@@ -266,19 +266,11 @@ vlc_module_begin ()
 #endif
 
     set_capability( "access", 0 )
-    add_shortcut( "dvb" )      /* Generic name */
-
-    add_shortcut( "dvb-s" )    /* Satellite */
-    add_shortcut( "qpsk" )
-    add_shortcut( "satellite" )
-
-    add_shortcut( "dvb-c" )    /* Cable */
-    add_shortcut( "cable" )
-
-    add_shortcut( "dvb-t" )    /* Terrestrial */
-    add_shortcut( "terrestrial" )
-
-    add_shortcut( "atsc" )     /* Atsc */
+    add_shortcut( "dvb",                        /* Generic name */
+                  "dvb-s", "qpsk", "satellite", /* Satellite */
+                  "dvb-c", "cable",             /* Cable */
+                  "dvb-t", "terrestrial",       /* Terrestrial */
+                  "atsc" )                      /* Atsc */
     add_shortcut( "usdigital" )
 
     set_callbacks( Open, Close )

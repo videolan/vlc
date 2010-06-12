@@ -91,8 +91,7 @@ vlc_module_begin ()
     add_bool ("screen-follow-mouse", false, NULL, FOLLOW_MOUSE_TEXT,
               FOLLOW_MOUSE_LONGTEXT, true)
 
-    add_shortcut ("screen")
-    add_shortcut ("window")
+    add_shortcut ("screen", "window")
 vlc_module_end ()
 
 /*

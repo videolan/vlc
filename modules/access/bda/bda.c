@@ -293,25 +293,11 @@ vlc_module_begin ()
         change_integer_list( i_hierarchy_list, ppsz_hierarchy_text, NULL )
 
     set_capability( "access", 0 )
-    add_shortcut( "dvb" )      /* Generic name */
-
-    add_shortcut( "dvb-s" )    /* Satellite */
-    add_shortcut( "dvbs" )
-    add_shortcut( "qpsk" )
-    add_shortcut( "satellite" )
-
-    add_shortcut( "dvb-c" )    /* Cable */
-    add_shortcut( "dvbc" )
-    add_shortcut( "qam" )
-    add_shortcut( "cable" )
-
-    add_shortcut( "dvbt" )    /* Terrestrial */
-    add_shortcut( "dvb-t" )
-    add_shortcut( "ofdm" )
-    add_shortcut( "terrestrial" )
-
-    add_shortcut( "atsc" )     /* Atsc */
-    add_shortcut( "usdigital" )
+    add_shortcut( "dvb",                                    /* Generic name */
+                  "dvb-s", "dvbs", "qpsk", "satellite",     /* Satellite */
+                  "dvb-c", "dvbc", "qam", "cable",          /* Cable */
+                  "dvbt", "dvb-t", "ofdm", "terrestrial",   /* Terrestrial */
+                  "atsc", "usdigital" )                     /* Atsc */
 
     set_callbacks( Open, Close )
 vlc_module_end ()

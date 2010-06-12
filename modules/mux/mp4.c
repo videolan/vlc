@@ -64,9 +64,7 @@ vlc_module_begin ()
               FASTSTART_TEXT, FASTSTART_LONGTEXT,
               true )
     set_capability( "sout mux", 5 )
-    add_shortcut( "mp4" )
-    add_shortcut( "mov" )
-    add_shortcut( "3gp" )
+    add_shortcut( "mp4", "mov", "3gp" )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

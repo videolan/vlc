@@ -58,9 +58,7 @@ vlc_module_begin ()
         change_safe()
     set_capability( "access", 10 )
     set_callbacks( Open, Close )
-    add_shortcut( "realrtsp" )
-    add_shortcut( "rtsp" )
-    add_shortcut( "pnm" )
+    add_shortcut( "realrtsp", "rtsp", "pnm" )
 vlc_module_end ()
 
 

@@ -96,9 +96,7 @@ vlc_module_begin ()
     add_bool( "dvdnav-menu", true, NULL,
         MENU_TEXT, MENU_LONGTEXT, false )
     set_capability( "access_demux", 5 )
-    add_shortcut( "dvd" )
-    add_shortcut( "dvdnav" )
-    add_shortcut( "file" )
+    add_shortcut( "dvd", "dvdnav", "file" )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

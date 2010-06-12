@@ -69,9 +69,7 @@ vlc_module_begin ()
         change_safe()
     add_obsolete_string( "file-cat" )
     set_capability( "access", 50 )
-    add_shortcut( "file" )
-    add_shortcut( "fd" )
-    add_shortcut( "stream" )
+    add_shortcut( "file", "fd", "stream" )
     set_callbacks( Open, Close )
 
     add_submodule()
@@ -84,9 +82,9 @@ vlc_module_begin ()
     add_string( "ignore-filetypes", "m3u,db,nfo,ini,jpg,jpeg,ljpg,gif,png,pgm,pgmyuv,pbm,pam,tga,bmp,pnm,xpm,xcf,pcx,tif,tiff,lbm,sfv,txt,sub,idx,srt,cue,ssa",
                 NULL, IGNORE_TEXT, IGNORE_LONGTEXT, false )
 #ifndef HAVE_FDOPENDIR
-    add_shortcut( "file" )
+    add_shortcut( "file", "directory", "dir" )
+#else
+    add_shortcut( "directory", "dir" )
 #endif
-    add_shortcut( "directory" )
-    add_shortcut( "dir" )
     set_callbacks( DirOpen, DirClose )
 vlc_module_end ()

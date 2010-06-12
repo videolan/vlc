@@ -66,9 +66,7 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_MUX )
     set_capability( "sout mux", 50 )
-    add_shortcut( "ps" )
-    add_shortcut( "mpeg1" )
-    add_shortcut( "dvd" )
+    add_shortcut( "ps", "mpeg1", "dvd" )
     set_callbacks( Open, Close )
 
     add_integer( SOUT_CFG_PREFIX "dts-delay", 200, NULL, DTS_TEXT,

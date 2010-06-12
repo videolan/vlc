@@ -57,22 +57,12 @@ vlc_module_begin ()
     set_capability( "demux", 155 )
     set_callbacks( OpenAudio, Close )
 
-    add_shortcut( "mpga" )
-    add_shortcut( "mp3" )
-
-    add_shortcut( "m4a" )
-    add_shortcut( "mp4a" )
-    add_shortcut( "aac" )
-
-    add_shortcut( "ac3" )
-    add_shortcut( "a52" )
-
-    add_shortcut( "eac3" )
-
-    add_shortcut( "dts" )
-
-    add_shortcut( "mlp" )
-    add_shortcut( "thd" )
+    add_shortcut( "mpga", "mp3",
+                  "m4a", "mp4a", "aac",
+                  "ac3", "a52",
+                  "eac3",
+                  "dts",
+                  "mlp", "thd" )
 
     add_submodule()
     set_description( N_("MPEG-4 video" ) )

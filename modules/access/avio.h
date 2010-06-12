@@ -36,7 +36,6 @@ void CloseAvio(vlc_object_t *);
     set_category(CAT_INPUT)                 \
     set_subcategory(SUBCAT_INPUT_ACCESS)    \
     set_capability("access", -1)            \
-    add_shortcut("avio")                    \
-    add_shortcut("rtmp")                    \
+    add_shortcut("avio", "rtmp")            \
     set_callbacks(OpenAvio, CloseAvio)
 

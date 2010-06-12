@@ -141,11 +141,8 @@ vlc_module_begin ()
 #endif
     add_obsolete_string("http-user")
     add_obsolete_string("http-pwd")
-    add_shortcut( "http" )
-    add_shortcut( "https" )
-    add_shortcut( "unsv" )
-    add_shortcut( "itpc" ) /* iTunes Podcast */
-    add_shortcut( "icyx" )
+    /* 'itpc' = iTunes Podcast */
+    add_shortcut( "http", "https", "unsv", "itpc", "icyx" )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

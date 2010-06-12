@@ -123,8 +123,7 @@ vlc_module_begin ()
     add_bool( "audiofile-wav", true, NULL, WAV_TEXT, WAV_LONGTEXT, true )
 
     set_capability( "audio output", 0 )
-    add_shortcut( "file" )
-    add_shortcut( "audiofile" )
+    add_shortcut( "file", "audiofile" )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

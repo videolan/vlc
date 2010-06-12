@@ -72,8 +72,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_callbacks( Open, Close )
-    add_shortcut( "real" )
-    add_shortcut( "rm" )
+    add_shortcut( "real", "rm" )
 vlc_module_end ()
 
 /*****************************************************************************

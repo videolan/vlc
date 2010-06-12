@@ -76,8 +76,7 @@ vlc_module_begin ()
     set_shortname( "ASF" )
 
     set_capability( "sout mux", 5 )
-    add_shortcut( "asf" )
-    add_shortcut( "asfh" )
+    add_shortcut( "asf", "asfh" )
     set_callbacks( Open, Close )
 
     add_string( SOUT_CFG_PREFIX "title", "", NULL, TITLE_TEXT, TITLE_LONGTEXT,

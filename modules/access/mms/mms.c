@@ -88,11 +88,7 @@ vlc_module_begin ()
     add_string( "mmsh-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT,
                     false )
 
-    add_shortcut( "mms" )
-    add_shortcut( "mmsu" )
-    add_shortcut( "mmst" )
-    add_shortcut( "mmsh" )
-    add_shortcut( "http" )
+    add_shortcut( "mms", "mmsu", "mmst", "mmsh", "http" )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

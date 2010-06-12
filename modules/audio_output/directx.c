@@ -130,8 +130,7 @@ vlc_module_begin ()
     set_capability( "audio output", 100 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
-    add_shortcut( "directx" )
-    add_shortcut( "directsound" )
+    add_shortcut( "directx", "directsound" )
 
     add_string( "directx-audio-device-name", "default", NULL,
              DEVICE_TEXT, DEVICE_LONGTEXT, false )

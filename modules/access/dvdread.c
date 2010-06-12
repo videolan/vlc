@@ -90,9 +90,7 @@ vlc_module_begin ()
         CACHING_TEXT, CACHING_LONGTEXT, true )
     add_obsolete_string( "dvdread-css-method" ) /* obsolete since 1.1.0 */
     set_capability( "access_demux", 0 )
-    add_shortcut( "dvd" )
-    add_shortcut( "dvdread" )
-    add_shortcut( "dvdsimple" )
+    add_shortcut( "dvd", "dvdread", "dvdsimple" )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

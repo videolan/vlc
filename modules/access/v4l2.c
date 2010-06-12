@@ -375,8 +375,7 @@ vlc_module_begin ()
     set_callbacks( DemuxOpen, DemuxClose )
 
     add_submodule ()
-    add_shortcut( "v4l2" )
-    add_shortcut( "v4l2c" )
+    add_shortcut( "v4l2", "v4l2c" )
     set_description( N_("Video4Linux2 Compressed A/V") )
     set_capability( "access", 0 )
     /* use these when open as access_demux fails; VLC will use another demux */

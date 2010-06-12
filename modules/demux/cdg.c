@@ -45,8 +45,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_capability( "demux", 3 )
     set_callbacks( Open, Close )
-    add_shortcut( "cdg" )
-    add_shortcut( "subtitle" )
+    add_shortcut( "cdg", "subtitle" )
 vlc_module_end ()
 
 /*****************************************************************************

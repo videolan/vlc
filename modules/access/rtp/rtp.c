@@ -115,11 +115,9 @@ vlc_module_begin ()
                  RTP_MAX_MISORDER_LONGTEXT, true)
         change_integer_range (0, 32767)
 
-    add_shortcut ("dccp")
     /*add_shortcut ("sctp")*/
-    add_shortcut ("rtptcp") /* "tcp" is already taken :( */
-    add_shortcut ("rtp")
-    add_shortcut ("udplite")
+    add_shortcut ("dccp", "rtptcp", /* "tcp" is already taken :( */
+                  "rtp", "udplite")
 vlc_module_end ()
 
 /*

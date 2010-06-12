@@ -69,8 +69,7 @@ vlc_module_begin ()
             N_("Dummy Elements"),
             N_("Read and discard unknown EBML elements (not good for broken files)."), true );
 
-    add_shortcut( "mka" )
-    add_shortcut( "mkv" )
+    add_shortcut( "mka", "mkv" )
 vlc_module_end ()
 
 class demux_sys_t;

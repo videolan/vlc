@@ -66,8 +66,7 @@ vlc_module_begin ()
      * Something must be wrong.
      */
     set_callbacks( Open, Close )
-    add_shortcut("ty")
-    add_shortcut("tivo")
+    add_shortcut("ty", "tivo")
 vlc_module_end ()
 
 /*****************************************************************************

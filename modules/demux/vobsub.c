@@ -56,8 +56,7 @@ vlc_module_begin ()
 
     set_callbacks( Open, Close )
 
-    add_shortcut( "vobsub" )
-    add_shortcut( "subtitle" )
+    add_shortcut( "vobsub", "subtitle" )
 vlc_module_end ()
 
 /*****************************************************************************
