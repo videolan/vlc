@@ -699,7 +699,7 @@ struct encoder_sys_t
     x264_t          *h;
     x264_param_t    param;
 
-    int  i_initial_delay;
+    int64_t  i_initial_delay;
 
     char *psz_stat_name;
 };
