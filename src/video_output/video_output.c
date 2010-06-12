@@ -467,9 +467,9 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
     else if (align_mask & 0x2)
         cfg->align.horizontal = VOUT_DISPLAY_ALIGN_RIGHT;
     if (align_mask & 0x4)
-        cfg->align.horizontal = VOUT_DISPLAY_ALIGN_TOP;
+        cfg->align.vertical = VOUT_DISPLAY_ALIGN_TOP;
     else if (align_mask & 0x8)
-        cfg->align.horizontal = VOUT_DISPLAY_ALIGN_BOTTOM;
+        cfg->align.vertical = VOUT_DISPLAY_ALIGN_BOTTOM;
 }
 
 vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout, vout_display_t *vd,
