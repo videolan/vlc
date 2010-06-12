@@ -795,7 +795,10 @@ void EndVideoDec( decoder_t *p_dec )
     if( p_sys->p_ff_pic ) av_free( p_sys->p_ff_pic );
 
     if( p_sys->p_va )
+    {
         vlc_va_Delete( p_sys->p_va );
+        p_sys->p_va = NULL;
+    }
     vlc_sem_destroy( &p_sys->sem_mt );
 }
 
@@ -1120,25 +1123,24 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
     if( p_sys->p_va )
     {
         vlc_va_Release( p_sys->p_va, p_ff_pic );
-
-        /* */
-        for( int i = 0; i < 4; i++ )
-            p_ff_pic->data[i] = NULL;
     }
     else if( !p_ff_pic->opaque )
     {
-        avcodec_default_release_buffer( p_context, p_ff_pic );
+        /* We can end up here without the AVFrame being allocated by
+         * avcodec_default_get_buffer() if VA is used and the frame is
+         * released when the decoder is closed
+         */
+        if( p_ff_pic->type == FF_BUFFER_TYPE_INTERNAL )
+            avcodec_default_release_buffer( p_context, p_ff_pic );
     }
     else
     {
         picture_t *p_pic = (picture_t*)p_ff_pic->opaque;
 
         decoder_UnlinkPicture( p_dec, p_pic );
-
-        /* */
-        for( int i = 0; i < 4; i++ )
-            p_ff_pic->data[i] = NULL;
     }
+    for( int i = 0; i < 4; i++ )
+        p_ff_pic->data[i] = NULL;
 }
 
 #ifdef HAVE_AVCODEC_VA
