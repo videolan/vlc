@@ -47,7 +47,6 @@ void EPGChannels::paintEvent( QPaintEvent *event )
 
     /* Draw the top and the bottom lines. */
     p.drawLine( 0, 0, width() - 1, 0 );
-    p.drawLine( 0, height() - 1, width(), height() - 1 );
 
     p.setFont( QFont( "Verdana", 8 ) );
 
