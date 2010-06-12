@@ -517,7 +517,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         if( p_sys->p_seq &&
             p_sys->i_seq_old > p_sys->i_frame_rate/p_sys->i_frame_rate_base )
         {
-            /* Usefull for mpeg1: repeat sequence header every second */
+            /* Useful for mpeg1: repeat sequence header every second */
             block_ChainLastAppend( &p_sys->pp_last, block_Duplicate( p_sys->p_seq ) );
             if( p_sys->p_ext )
             {

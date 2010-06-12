@@ -1018,7 +1018,7 @@ void MP4_BoxFree( stream_t *, MP4_Box_t *p_box );
 /*****************************************************************************
  * MP4_DumpBoxStructure: print the structure of the p_box
  *****************************************************************************
- * Usefull while debugging
+ * Useful while debugging
  *****************************************************************************/
 void MP4_BoxDumpStructure( stream_t *p_input, MP4_Box_t *p_box );
 
