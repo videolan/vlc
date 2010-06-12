@@ -160,7 +160,7 @@ static inline void vlc_input_title_Delete( input_title_t *t )
     free( t );
 }
 
-static inline input_title_t *vlc_input_title_Duplicate( input_title_t *t )
+static inline input_title_t *vlc_input_title_Duplicate( const input_title_t *t )
 {
     input_title_t *dup = vlc_input_title_New( );
     int i;
