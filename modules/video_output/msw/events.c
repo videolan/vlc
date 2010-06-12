@@ -103,6 +103,7 @@ struct event_thread_t
     bool is_cursor_hidden;
     HCURSOR cursor_arrow;
     HCURSOR cursor_empty;
+    unsigned button_pressed;
 
     /* Title */
     char *psz_title;
@@ -161,7 +162,12 @@ static void UpdateCursor( event_thread_t *p_event, bool b_show )
     GetCursorPos(&p);
     HWND hwnd = WindowFromPoint(p);
     if( hwnd == p_event->hvideownd || hwnd == p_event->hwnd )
-        SetCursorPos(p.x, p.y);
+    {
+        if( b_show )
+            SetCursor( cursor );
+        else
+            SetCursorPos( p.x, p.y );
+    }
 }
 
 static HCURSOR EmptyCursor( HINSTANCE instance )
@@ -184,6 +190,21 @@ static HCURSOR EmptyCursor( HINSTANCE instance )
     return cursor;
 }
 
+static void MousePressed( event_thread_t *p_event, HWND hwnd, unsigned button )
+{
+    if( !p_event->button_pressed )
+        SetCapture( hwnd );
+    p_event->button_pressed |= 1 << button;
+    vout_display_SendEventMousePressed( p_event->vd, button );
+}
+
+static void MouseReleased( event_thread_t *p_event, unsigned button )
+{
+    p_event->button_pressed &= ~(1 << button);
+    if( !p_event->button_pressed )
+        ReleaseCapture();
+    vout_display_SendEventMouseReleased( p_event->vd, button );
+}
 /*****************************************************************************
  * EventThread: Create video window & handle its messages
  *****************************************************************************
@@ -321,27 +342,27 @@ static void *EventThread( void *p_this )
             break;
 
         case WM_LBUTTONDOWN:
-            vout_display_SendEventMousePressed(vd, MOUSE_BUTTON_LEFT);
+            MousePressed( p_event, msg.hwnd, MOUSE_BUTTON_LEFT );
             break;
         case WM_LBUTTONUP:
-            vout_display_SendEventMouseReleased(vd, MOUSE_BUTTON_LEFT);
+            MouseReleased( p_event, MOUSE_BUTTON_LEFT );
             break;
         case WM_LBUTTONDBLCLK:
             vout_display_SendEventMouseDoubleClick(vd);
             break;
 
         case WM_MBUTTONDOWN:
-            vout_display_SendEventMousePressed(vd, MOUSE_BUTTON_CENTER);
+            MousePressed( p_event, msg.hwnd, MOUSE_BUTTON_CENTER );
             break;
         case WM_MBUTTONUP:
-            vout_display_SendEventMouseReleased(vd, MOUSE_BUTTON_CENTER);
+            MouseReleased( p_event, MOUSE_BUTTON_CENTER );
             break;
 
         case WM_RBUTTONDOWN:
-            vout_display_SendEventMousePressed(vd, MOUSE_BUTTON_RIGHT);
+            MousePressed( p_event, msg.hwnd, MOUSE_BUTTON_RIGHT );
             break;
         case WM_RBUTTONUP:
-            vout_display_SendEventMouseReleased(vd, MOUSE_BUTTON_RIGHT);
+            MouseReleased( p_event, MOUSE_BUTTON_RIGHT );
             break;
 
         case WM_KEYDOWN:
@@ -746,6 +767,19 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         return 1;
     }
 #endif
+    if( message == WM_CAPTURECHANGED )
+    {
+        for( int button = 0; p_event->button_pressed; button++ )
+        {
+            unsigned m = 1 << button;
+            if( p_event->button_pressed & m )
+                vout_display_SendEventMouseReleased( p_event->vd, button );
+            p_event->button_pressed &= ~m;
+        }
+        p_event->button_pressed = 0;
+        return 0;
+    }
+
     if( hwnd == p_event->hvideownd )
     {
 #ifdef MODULE_NAME_IS_directx
@@ -1041,6 +1075,7 @@ event_thread_t *EventThreadCreate( vout_display_t *vd)
     vlc_cond_init( &p_event->wait );
 
     p_event->is_cursor_hidden = false;
+    p_event->button_pressed = 0;
     p_event->psz_title = NULL;
     p_event->source = vd->source;
     vout_display_PlacePicture(&p_event->place, &vd->source, vd->cfg, false);
