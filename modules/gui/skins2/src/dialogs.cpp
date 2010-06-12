@@ -115,11 +115,11 @@ Dialogs::~Dialogs()
         // Detach the dialogs provider from its parent interface
         module_unneed( m_pProvider, m_pModule );
         vlc_object_release( m_pProvider );
-    }
 
-    /* Unregister callbacks */
-    var_DelCallback( getIntf()->p_libvlc, "intf-popupmenu",
-                     PopupMenuCB, this );
+        /* Unregister callbacks */
+        var_DelCallback( getIntf()->p_libvlc, "intf-popupmenu",
+                         PopupMenuCB, this );
+    }
 }
 
 
