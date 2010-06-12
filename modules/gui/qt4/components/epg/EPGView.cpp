@@ -34,33 +34,14 @@
 EPGView::EPGView( QWidget *parent ) : QGraphicsView( parent )
 {
     setContentsMargins( 0, 0, 0, 0 );
-    setFrameStyle( QFrame::NoFrame );
+    setFrameStyle( QFrame::Box );
     setAlignment( Qt::AlignLeft | Qt::AlignTop );
-    setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
 
     m_startTime = QDateTime::currentDateTime();
 
     QGraphicsScene *EPGscene = new QGraphicsScene( this );
 
     setScene( EPGscene );
-
-    connect( horizontalScrollBar(), SIGNAL( valueChanged(int) ),
-             this, SLOT( updateOverlayPosition(int) ) );
-
-    m_overlay = EPGscene->addRect( 0, 0, 100, 1, QPen(), QBrush( QColor( 40, 86, 255, 220 ) ) );
-    m_overlay->setFlag( QGraphicsItem::ItemIgnoresTransformations );
-    m_overlay->setZValue( 100 );
-
-    sceneRectChanged( scene()->sceneRect() );
-
-    connect( scene(), SIGNAL( sceneRectChanged(QRectF) ),
-             this, SLOT( sceneRectChanged(QRectF) ) );
-}
-
-void EPGView::updateOverlayPosition( int value )
-{
-    int pos = value * matrix().inverted().m11();
-    m_overlay->setPos( pos, 0 );
 }
 
 void EPGView::setScale( double scaleFactor )
@@ -98,13 +79,7 @@ const QDateTime& EPGView::startTime()
 void EPGView::addEvent( EPGEvent* event )
 {
     if ( !m_channels.contains( event->channelName ) )
-    {
         m_channels.append( event->channelName );
-        QGraphicsTextItem* channelTitle = new QGraphicsTextItem( event->channelName, m_overlay );
-        channelTitle->setZValue( 101 );
-        channelTitle->setPos( 0, m_channels.indexOf( event->channelName ) * TRACKS_HEIGHT );
-        channelTitle->setTextWidth( 100 );
-    }
 
     EPGItem* item = new EPGItem( this );
     item->setChannel( m_channels.indexOf( event->channelName ) );
@@ -134,14 +109,10 @@ void EPGView::drawBackground( QPainter *painter, const QRectF &rect )
 
     QPointF p = mapToScene( width(), 0 );
 
-    int y = 0;
-    for ( int i = 0; i < m_channels.count() + 1; ++i )
+    for ( int i = 0; i < m_channels.count(); ++i )
     {
-        painter->drawLine( 0,
-                           y * TRACKS_HEIGHT,
-                           p.x(),
-                           y * TRACKS_HEIGHT );
-        ++y;
+        painter->drawLine( 0, ( i + 1 ) * TRACKS_HEIGHT,
+                           p.x(), ( i + 1 ) * TRACKS_HEIGHT );
     }
 }
 
@@ -163,12 +134,12 @@ void EPGView::updateDuration()
     emit durationChanged( m_duration );
 }
 
+QList<QString> EPGView::getChannelList()
+{
+    return m_channels;
+}
+
 void EPGView::eventFocused( EPGEvent *ev )
 {
     emit eventFocusedChanged( ev );
-}
-
-void EPGView::sceneRectChanged( const QRectF& rect )
-{
-    m_overlay->setRect( 0, 0, m_overlay->rect().width(), rect.height() );
 }

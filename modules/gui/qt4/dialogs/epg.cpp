@@ -33,6 +33,7 @@
 #include <QLabel>
 #include <QGroupBox>
 #include <QPushButton>
+#include <QTextEdit>
 
 #include "qt4.hpp"
 #include "input_manager.hpp"
@@ -43,20 +44,18 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 
     QVBoxLayout *layout = new QVBoxLayout( this );
     layout->setMargin( 0 );
-    QSplitter *splitter = new QSplitter( this );
     epg = new EPGWidget( this );
-    splitter->addWidget( epg );
-    splitter->setOrientation(Qt::Vertical);
 
     QGroupBox *descBox = new QGroupBox( qtr( "Description" ), this );
 
     QVBoxLayout *boxLayout = new QVBoxLayout( descBox );
 
-    description = new QLabel( this );
+    description = new QTextEdit( this );
+    description->setReadOnly( true );
     description->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel );
     description->setAutoFillBackground( true );
-    description->setWordWrap( true );
     description->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    description->setFixedHeight( 100 );
 
     QPalette palette;
     palette.setBrush(QPalette::Active, QPalette::Window, palette.brush( QPalette::Base ) );
@@ -65,11 +64,10 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     title = new QLabel( qtr( "Title" ), this );
 
     boxLayout->addWidget( title );
-    boxLayout->addWidget( description, 10 );
+    boxLayout->addWidget( description );
 
-    splitter->addWidget( epg );
-    splitter->addWidget( descBox );
-    layout->addWidget( splitter );
+    layout->addWidget( epg, 10 );
+    layout->addWidget( descBox );
 
     CONNECT( epg, itemSelectionChanged( EPGEvent *), this, showEvent( EPGEvent *) );
     CONNECT( THEMIM->getIM(), epgChanged(), this, updateInfos() );

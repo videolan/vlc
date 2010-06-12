@@ -49,6 +49,8 @@ public:
     void            delEvent( EPGEvent* event );
     void            updateDuration();
 
+    QList<QString>  getChannelList();
+
 signals:
     void            startTimeChanged( const QDateTime& startTime );
     void            durationChanged( int seconds );
@@ -61,14 +63,8 @@ protected:
     int             m_scaleFactor;
     int             m_duration;
 
-private:
-    QGraphicsRectItem* m_overlay;
-
 public slots:
     void eventFocused( EPGEvent * );
-private slots:
-    void updateOverlayPosition( int value );
-    void sceneRectChanged( const QRectF& rect );
 };
 
 #endif // EPGVIEW_H

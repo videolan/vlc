@@ -28,8 +28,10 @@
 #include "util/singleton.hpp"
 
 class QLabel;
+class QTextEdit;
 class EPGEvent;
 class EPGWidget;
+
 class EpgDialog : public QVLCFrame, public Singleton<EpgDialog>
 {
     Q_OBJECT
@@ -38,7 +40,7 @@ private:
     virtual ~EpgDialog();
 
     EPGWidget *epg;
-    QLabel *description;
+    QTextEdit *description;
     QLabel *title;
 
     friend class    Singleton<EpgDialog>;

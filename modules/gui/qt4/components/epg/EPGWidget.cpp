@@ -37,13 +37,17 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
 {
     m_rulerWidget = new EPGRuler( this );
     m_epgView = new EPGView( this );
+    m_channelsWidget = new EPGChannels( this, m_epgView );
+
+    m_channelsWidget->setMinimumWidth( 100 );
 
     m_epgView->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
     setZoom( 1 );
 
-    QVBoxLayout* layout = new QVBoxLayout( this );
-    layout->addWidget( m_rulerWidget );
-    layout->addWidget( m_epgView );
+    QGridLayout* layout = new QGridLayout( this );
+    layout->addWidget( m_rulerWidget, 0, 1 );
+    layout->addWidget( m_channelsWidget, 1, 0 );
+    layout->addWidget( m_epgView, 1, 1 );
     layout->setSpacing( 0 );
     setLayout( layout );
 
@@ -53,6 +57,8 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
              m_rulerWidget, SLOT( setDuration(int) ) );
     connect( m_epgView->horizontalScrollBar(), SIGNAL( valueChanged(int) ),
              m_rulerWidget, SLOT( setOffset(int) ) );
+    connect( m_epgView->verticalScrollBar(), SIGNAL( valueChanged(int) ),
+             m_channelsWidget, SLOT( setOffset(int) ) );
     connect( m_epgView, SIGNAL( eventFocusedChanged(EPGEvent*)),
              this, SIGNAL(itemSelectionChanged(EPGEvent*)) );
 }

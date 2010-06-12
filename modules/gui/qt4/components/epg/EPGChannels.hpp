@@ -1,10 +1,9 @@
 /*****************************************************************************
- * EPGWidget.h : EPGWidget
+ * EPGChannels.hpp : EPGChannels
  ****************************************************************************
  * Copyright © 2009-2010 VideoLAN
- * $Id$
  *
- * Authors: Ludovic Fauvet <etix@l0cal.com>
+ * Authors: Adrien Maglo <magsoft@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,41 +20,29 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef EPGWIDGET_H
-#define EPGWIDGET_H
-
-#include "EPGView.hpp"
-#include "EPGEvent.hpp"
-#include "EPGRuler.hpp"
-#include "EPGChannels.hpp"
-
-#include <vlc_common.h>
-#include <vlc_epg.h>
+#ifndef EPGCHANNELS_HPP
+#define EPGCHANNELS_HPP
 
 #include <QWidget>
-#include <QMultiMap>
 
-class QDateTime;
+class EPGView;
 
-class EPGWidget : public QWidget
+class EPGChannels : public QWidget
 {
     Q_OBJECT
 public:
-    explicit EPGWidget( QWidget* parent = 0 );
+    EPGChannels( QWidget *parent, EPGView *m_epgView );
+    virtual ~EPGChannels() { }
 
 public slots:
-    void setZoom( int level );
-    void updateEPG( vlc_epg_t **pp_epg, int i_epg );
+    void setOffset( int offset );
+
+protected:
+    virtual void paintEvent( QPaintEvent *event );
 
 private:
-    EPGRuler* m_rulerWidget;
-    EPGView* m_epgView;
-    EPGChannels *m_channelsWidget;
-
-    QMultiMap<QString, EPGEvent*> m_events;
-
-signals:
-    void itemSelectionChanged( EPGEvent * );
+    EPGView *m_epgView;
+    int m_offset;
 };
 
-#endif // EPGWIDGET_H
+#endif // EPGCHANNELS_HPP
