@@ -208,6 +208,7 @@ int playlist_NodeInsert( playlist_t *p_playlist,
    (void)p_playlist;
    assert( p_parent && p_parent->i_children != -1 );
    if( i_position == -1 ) i_position = p_parent->i_children ;
+   assert( i_position <= p_parent->i_children);
 
    INSERT_ELEM( p_parent->pp_children,
                 p_parent->i_children,
