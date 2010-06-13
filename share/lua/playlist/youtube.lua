@@ -67,6 +67,7 @@ function parse()
             if not line then break end
             if string.match( line, "<meta name=\"title\"" ) then
                 _,_,name = string.find( line, "content=\"(.-)\"" )
+                name = vlc.strings.resolve_xml_special_chars( name )
             end
             if string.match( line, "<meta name=\"description\"" ) then
                -- Don't ask me why they double encode ...
@@ -151,7 +152,7 @@ function parse()
         return { { path = path; name = name; description = description; artist = artist; arturl = arturl; options = options } }
     else -- This is the flash player's URL
         if string.match( vlc.path, "title=" ) then
-            name = get_url_param( vlc.path, "title" )
+            name = vlc.strings.decode_uri(get_url_param( vlc.path, "title" ))
         end
         video_id = get_url_param( vlc.path, "video_id" )
         arturl = get_arturl( vlc.path, video_id )
