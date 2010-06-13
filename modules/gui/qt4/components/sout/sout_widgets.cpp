@@ -117,11 +117,11 @@ QString FileDestBox::getMRL( const QString& mux )
     QString outputfile = fileEdit->text();
     if( !mux.isEmpty() )
     {
-        if( outputfile.contains( QRegExp("\\..{2,3}$")) &&
+        if( outputfile.contains( QRegExp("\\..{2,4}$")) &&
             !outputfile.endsWith(mux) )
         {
            /* Replace the extension according to muxer */
-           outputfile.replace(QRegExp("\\..{2,3}$"),"."+mux);
+           outputfile.replace(QRegExp("\\..{2,4}$"),"."+mux);
         } else if (!outputfile.endsWith( mux ) )
         {
            m.option( "mux", mux );
