@@ -605,6 +605,10 @@ int OpenEncoder( vlc_object_t *p_this )
         /* default to 120 frames between keyframe */
         if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "keyint" ) )
            p_context->gop_size = 120;
+        /* Don't set rc-values atm, they were from time before
+           libvpx was officially in ffmpeg */
+        //p_context->rc_max_rate = 24 * 1000 * 1000; //24M
+        //p_context->rc_min_rate = 40 * 1000; // 40k
         /* seems that ffmpeg presets have 720p as divider for buffers */
         if( p_enc->fmt_out.video.i_height >= 720 )
         {
@@ -621,17 +625,12 @@ int OpenEncoder( vlc_object_t *p_this )
               p_context->mb_lmax = p_context->lmax = 42 * FF_QP2LAMBDA;
            }
 
-           p_context->rc_max_rate = 24 * 1000 * 1000; //24M
-           p_context->rc_min_rate = 100 * 1000; // 100k
         } else {
            if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmin" ) )
            {
               p_context->mb_qmin = p_context->qmin = 1;
               p_context->mb_lmin = p_context->lmin = FF_QP2LAMBDA;
            }
-
-           p_context->rc_max_rate = 1.5 * 1000 * 1000; //1.5M
-           p_context->rc_min_rate = 40 * 1000; // 40k
         }
 
 
