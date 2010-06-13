@@ -56,7 +56,6 @@ signals:
     void            durationChanged( int seconds );
     void            eventFocusedChanged( EPGEvent * );
 protected:
-    virtual void    drawBackground( QPainter *painter, const QRectF &rect );
 
     QList<QString>  m_channels;
     QDateTime       m_startTime;

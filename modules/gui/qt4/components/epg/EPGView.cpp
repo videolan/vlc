@@ -103,19 +103,6 @@ void EPGView::delEvent( EPGEvent* event )
     //qDebug() << "Del event: " << event->name;
 }
 
-void EPGView::drawBackground( QPainter *painter, const QRectF &rect )
-{
-    painter->setPen( QPen( QColor( 72, 72, 72 ) ) );
-
-    QPointF p = mapToScene( width(), 0 );
-
-    for ( int i = 0; i < m_channels.count(); ++i )
-    {
-        painter->drawLine( 0, ( i + 1 ) * TRACKS_HEIGHT,
-                           p.x(), ( i + 1 ) * TRACKS_HEIGHT );
-    }
-}
-
 void EPGView::updateDuration()
 {
     QDateTime lastItem;
