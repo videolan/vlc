@@ -564,7 +564,7 @@ again:
         }
 
         /* update */
-        p_stream->i_duration += p_data->i_length;
+        p_stream->i_duration = p_stream->i_last_dts - p_stream->i_dts_start + p_data->i_length;
         p_sys->i_pos += p_data->i_buffer;
 
         /* Save the DTS */
