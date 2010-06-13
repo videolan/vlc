@@ -699,9 +699,9 @@ struct encoder_sys_t
     x264_t          *h;
     x264_param_t    param;
 
-    int64_t  i_initial_delay;
+    mtime_t         i_initial_delay;
 
-    char *psz_stat_name;
+    char            *psz_stat_name;
 };
 
 #ifdef PTW32_STATIC_LIB
@@ -1276,6 +1276,12 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 #endif
     if( likely(p_pict) ) {
        pic.i_pts = p_pict->date;
+       /* scale pts starting from 0 as libx264 seems to return dts values
+          assume that
+        */
+       if( unlikely( p_sys->i_initial_delay == 0 ) )
+           p_sys->i_initial_delay = p_pict->date;
+       pic.i_pts -= p_sys->i_initial_delay;
        pic.img.i_csp = X264_CSP_I420;
        pic.img.i_plane = p_pict->i_planes;
        for( i = 0; i < p_pict->i_planes; i++ )
@@ -1322,16 +1328,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
         p_enc->fmt_in.video.i_frame_rate_base /
             p_enc->fmt_in.video.i_frame_rate;
 
-    /* libx264 gives pts/dts values from >= 83 onward,
-     * also pts starts from 0 so dts can be negative,
-     * but vlc doesn't handle if dts is < VLC_TS_0 so we
-     * use that offset to get it right for vlc.
-     */
-    if( p_sys->i_initial_delay == 0 && pic.i_dts < VLC_TS_0 )
-    {
-        p_sys->i_initial_delay = -1* pic.i_dts;
-        msg_Dbg( p_enc, "Initial delay is set to %d", p_sys->i_initial_delay );
-    }
+    /* scale pts-values back*/
     p_block->i_pts = pic.i_pts + p_sys->i_initial_delay;
     p_block->i_dts = pic.i_dts + p_sys->i_initial_delay;
 
