@@ -204,11 +204,13 @@ static int Open( vlc_object_t *p_this )
     {
         /* Now add ftyp header */
         box = box_new( "ftyp" );
-        if( p_sys->b_3gp ) bo_add_fourcc( box, "3gp4" );
+        if( p_sys->b_3gp ) bo_add_fourcc( box, "3gp6" );
         else bo_add_fourcc( box, "isom" );
         bo_add_32be  ( box, 0 );
         if( p_sys->b_3gp ) bo_add_fourcc( box, "3gp4" );
         else bo_add_fourcc( box, "mp41" );
+        bo_add_fourcc( box, "avc1" );
+        bo_add_fourcc( box, "qt  " );
         box_fix( box );
 
         p_sys->i_pos += box->i_buffer;
