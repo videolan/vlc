@@ -48,8 +48,6 @@ void EPGChannels::paintEvent( QPaintEvent *event )
     /* Draw the top and the bottom lines. */
     p.drawLine( 0, 0, width() - 1, 0 );
 
-    p.setFont( QFont( "Verdana", 8 ) );
-
     QList<QString> channels = m_epgView->getChannelList();
 
     for( int i = 0; i < channels.count(); ++i )
