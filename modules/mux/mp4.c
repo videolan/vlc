@@ -1515,6 +1515,7 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
 
     uint32_t        i_movie_timescale = 90000;
     int64_t         i_movie_duration  = 0;
+    int64_t         i_timestamp = get_timestamp();
 
     moov = box_new( "moov" );
 
@@ -1533,16 +1534,16 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
     if( !p_sys->b_64_ext )
     {
         mvhd = box_full_new( "mvhd", 0, 0 );
-        bo_add_32be( mvhd, get_timestamp() );   // creation time
-        bo_add_32be( mvhd, get_timestamp() );   // modification time
+        bo_add_32be( mvhd, i_timestamp );   // creation time
+        bo_add_32be( mvhd, i_timestamp );   // modification time
         bo_add_32be( mvhd, i_movie_timescale);  // timescale
         bo_add_32be( mvhd, i_movie_duration );  // duration
     }
     else
     {
         mvhd = box_full_new( "mvhd", 1, 0 );
-        bo_add_64be( mvhd, get_timestamp() );   // creation time
-        bo_add_64be( mvhd, get_timestamp() );   // modification time
+        bo_add_64be( mvhd, i_timestamp );   // creation time
+        bo_add_64be( mvhd, i_timestamp );   // modification time
         bo_add_32be( mvhd, i_movie_timescale);  // timescale
         bo_add_64be( mvhd, i_movie_duration );  // duration
     }
@@ -1594,8 +1595,8 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
             else
                 tkhd = box_full_new( "tkhd", 0, 1 );
 
-            bo_add_32be( tkhd, get_timestamp() );       // creation time
-            bo_add_32be( tkhd, get_timestamp() );       // modification time
+            bo_add_32be( tkhd, i_timestamp );       // creation time
+            bo_add_32be( tkhd, i_timestamp );       // modification time
             bo_add_32be( tkhd, p_stream->i_track_id );
             bo_add_32be( tkhd, 0 );                     // reserved 0
             bo_add_32be( tkhd, p_stream->i_duration *
@@ -1609,8 +1610,8 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
             else
                 tkhd = box_full_new( "tkhd", 1, 1 );
 
-            bo_add_64be( tkhd, get_timestamp() );       // creation time
-            bo_add_64be( tkhd, get_timestamp() );       // modification time
+            bo_add_64be( tkhd, i_timestamp );       // creation time
+            bo_add_64be( tkhd, i_timestamp );       // modification time
             bo_add_32be( tkhd, p_stream->i_track_id );
             bo_add_32be( tkhd, 0 );                     // reserved 0
             bo_add_64be( tkhd, p_stream->i_duration *
@@ -1732,8 +1733,8 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
         if( !p_sys->b_64_ext )
         {
             mdhd = box_full_new( "mdhd", 0, 0 );
-            bo_add_32be( mdhd, get_timestamp() );   // creation time
-            bo_add_32be( mdhd, get_timestamp() );   // modification time
+            bo_add_32be( mdhd, i_timestamp );   // creation time
+            bo_add_32be( mdhd, i_timestamp );   // modification time
             bo_add_32be( mdhd, i_timescale);        // timescale
             bo_add_32be( mdhd, p_stream->i_duration * (int64_t)i_timescale /
                                (mtime_t)1000000 );  // duration
@@ -1741,8 +1742,8 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
         else
         {
             mdhd = box_full_new( "mdhd", 1, 0 );
-            bo_add_64be( mdhd, get_timestamp() );   // creation time
-            bo_add_64be( mdhd, get_timestamp() );   // modification time
+            bo_add_64be( mdhd, i_timestamp );   // creation time
+            bo_add_64be( mdhd, i_timestamp );   // modification time
             bo_add_32be( mdhd, i_timescale);        // timescale
             bo_add_64be( mdhd, p_stream->i_duration * (int64_t)i_timescale /
                                (mtime_t)1000000 );  // duration
