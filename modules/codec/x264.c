@@ -1226,6 +1226,9 @@ static int  Open ( vlc_object_t *p_this )
      * difference that well yet*/
     p_sys->param.rc.i_lookahead= var_GetInteger( p_enc, SOUT_CFG_PREFIX "lookahead" );
 
+    /* We don't want repeated headers, we repeat p_extra ourself if needed */
+    p_sys->param.b_repeat_headers = 0;
+
     /* Open the encoder */
     p_sys->h = x264_encoder_open( &p_sys->param );
 
