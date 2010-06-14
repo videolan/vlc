@@ -109,4 +109,10 @@
         <file alias="sout" >pixmaps/prefs/advprefs_sout.png</file>
         <file alias="video" >pixmaps/prefs/advprefs_video.png</file>
     </qresource>
+    <qresource prefix="/win7" >
+        <file alias="pause" >pixmaps/win7/win7thumbnail_pause.png</file>
+        <file alias="prev" >pixmaps/win7/win7thumbnail_prev.png</file>
+        <file alias="play" >pixmaps/win7/win7thumbnail_play.png</file>
+        <file alias="next" >pixmaps/win7/win7thumbnail_next.png</file>
+    </qresource>
 </RCC>

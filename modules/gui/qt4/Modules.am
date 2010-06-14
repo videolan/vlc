@@ -183,6 +183,10 @@ DEPS_res = \
 	pixmaps/types/type_node.png \
 	pixmaps/types/type_playlist.png \
 	pixmaps/types/type_unknown.xpm \
+	pixmaps/win7/win7thumbnail_pause.png \
+	pixmaps/win7/win7thumbnail_prev.png \
+	pixmaps/win7/win7thumbnail_next.png \
+	pixmaps/win7/win7thumbnail_stop.png \
 	pixmaps/update.png \
 	pixmaps/lock.png
 
