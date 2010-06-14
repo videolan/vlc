@@ -62,6 +62,7 @@ class QWidget;
 class QLineEdit;
 class QString;
 class QStringListModel;
+class QEvent;
 
 class OpenPanel: public QWidget
 {
@@ -114,6 +115,10 @@ protected:
         }
         return false;
     }
+    virtual void dropEvent( QDropEvent *);
+    virtual void dragEnterEvent( QDragEnterEvent * );
+    virtual void dragMoveEvent( QDragMoveEvent * );
+    virtual void dragLeaveEvent( QDragLeaveEvent * );
 private:
     Ui::OpenFile ui;
     FileOpenBox *dialogBox;

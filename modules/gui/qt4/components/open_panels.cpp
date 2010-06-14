@@ -47,6 +47,7 @@
 #include <QScrollArea>
 #include <QUrl>
 #include <QStringListModel>
+#include <QDropEvent>
 
 
 #define I_DEVICE_TOOLTIP \
@@ -64,6 +65,8 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 {
     /* Classic UI Setup */
     ui.setupUi( this );
+
+    setAcceptDrops( true );
 
     /* Set Filters for file selection */
 /*    QString fileTypes = "";
@@ -164,6 +167,45 @@ FileOpenPanel::~FileOpenPanel()
 {
     if( dialogBox )
         getSettings()->setValue( "file-dialog-state", dialogBox->saveState() );
+}
+
+void FileOpenPanel::dragEnterEvent( QDragEnterEvent *event )
+{
+    event->acceptProposedAction();
+}
+
+void FileOpenPanel::dragMoveEvent( QDragMoveEvent *event )
+{
+    event->acceptProposedAction();
+}
+
+void FileOpenPanel::dragLeaveEvent( QDragLeaveEvent *event )
+{
+    event->accept();
+}
+
+void FileOpenPanel::dropEvent( QDropEvent *event )
+{
+    if( event->possibleActions() & Qt::CopyAction )
+       event->setDropAction( Qt::CopyAction );
+    else
+        return;
+
+    const QMimeData *mimeData = event->mimeData();
+    foreach( const QUrl &url, mimeData->urls() )
+    {
+        if( url.isValid() )
+        {
+            QListWidgetItem *item = new QListWidgetItem(
+                                         toNativeSeparators( url.toLocalFile() ),
+                                         ui.fileListWidg );
+            item->setFlags( Qt::ItemIsEditable | Qt::ItemIsEnabled );
+            ui.fileListWidg->addItem( item );
+        }
+    }
+    updateMRL();
+    updateButtons();
+    event->accept();
 }
 
 void FileOpenPanel::browseFile()
