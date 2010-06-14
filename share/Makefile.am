@@ -12,12 +12,13 @@ icons256dir = $(iconsdatadir)/256x256/apps/
 
 dist_appdata_DATA = vlc.desktop
 
-dist_vlcdata_DATA = vlc.ico
-dist_icons16_DATA = vlc16x16.png vlc16x16.xpm
-dist_icons32_DATA = vlc32x32.png vlc32x32.xpm vlc32x32-christmas.xpm
-dist_icons48_DATA = vlc48x48.png vlc48x48-christmas.png
-dist_icons128_DATA = vlc128x128.png vlc128x128-christmas.png
-dist_icons256_DATA = vlc256x256.png
+dist_vlcdata_DATA = icons/vlc.ico
+dist_icons16_DATA = icons/16x16/vlc.png icons/16x16/vlc.xpm
+dist_icons32_DATA = icons/32x32/vlc.png icons/32x32/vlc.xpm \
+		    icons/32x32/vlc-christmas.xpm
+dist_icons48_DATA = icons/48x48/vlc.png icons/48x48/vlc-christmas.png
+dist_icons128_DATA = icons/128x128/vlc.png icons/128x128/vlc-christmas.png
+dist_icons256_DATA = icons/256x256/vlc.png
 
 nobase_dist_vlcdata_SCRIPTS = \
 	utils/gnome-vlc-default.sh \

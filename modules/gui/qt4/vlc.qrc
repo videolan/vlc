@@ -1,10 +1,10 @@
 <RCC>
     <qresource prefix="/logo" >
-        <file alias="vlc128.png" >../../../share/vlc128x128.png</file>
-        <file alias="vlc16.png" >../../../share/vlc16x16.png</file>
-        <file alias="vlc48.png" >../../../share/vlc48x48.png</file>
-        <file alias="vlc128-christmas.png" >../../../share/vlc128x128-christmas.png</file>
-        <file alias="vlc48-christmas.png" >../../../share/vlc48x48-christmas.png</file>
+        <file alias="vlc128.png" >../../../share/icons/128x128/vlc.png</file>
+        <file alias="vlc16.png" >../../../share/icons/16x16/vlc.png</file>
+        <file alias="vlc48.png" >../../../share/icons/48x48/vlc.png</file>
+        <file alias="vlc128-christmas.png" >../../../share/icons/128x128/vlc-christmas.png</file>
+        <file alias="vlc48-christmas.png" >../../../share/icons/48x48/vlc-christmas.png</file>
     </qresource>
     <qresource prefix="/menu" >
         <file alias="help" >pixmaps/menus/help_16px.png</file>

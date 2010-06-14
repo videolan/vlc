@@ -735,7 +735,7 @@ package-win-common:
 	$(U2D) "$(win32_destdir)/"*.txt || echo "WARNING: this shouldn't happen"
 
 # Necessary icons
-	cp $(srcdir)/share/vlc.ico $(win32_destdir)/
+	cp $(srcdir)/share/icons/vlc.ico $(win32_destdir)/
 
 # Copy the locales
 	mkdir -p $(win32_destdir)/locale

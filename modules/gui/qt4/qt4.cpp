@@ -42,8 +42,8 @@
  #include <vlc_xlib.h>
 #endif
 
-#include "../../../share/vlc32x32.xpm"
-#include "../../../share/vlc32x32-christmas.xpm"
+#include "../../../share/icons/32x32/vlc.xpm"
+#include "../../../share/icons/32x32/vlc-christmas.xpm"
 #include <vlc_plugin.h>
 
 #ifdef WIN32 /* For static builds */
