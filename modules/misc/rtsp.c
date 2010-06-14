@@ -616,7 +616,8 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
                     {
                         free( p_64_sps );
                         p_64_sps = vlc_b64_encode_binary( p_buffer, i_size );
-                        sprintf_hexa( hexa, &p_buffer[5], 3 );
+                        /* XXX: nothing ensures that i_size >= 4 ?? */
+                        sprintf_hexa( hexa, &p_buffer[1], 3 );
                     }
                     else if( i_nal_type == 8 )
                     {
