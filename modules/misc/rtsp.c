@@ -570,34 +570,58 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
                 char    *p_64_pps = NULL;
                 char    hexa[6+1];
 
-                while( i_buffer > 4 &&
-                       p_buffer[0] == 0 && p_buffer[1] == 0 &&
-                       p_buffer[2] == 0 && p_buffer[3] == 1 )
+                while( i_buffer > 4 )
                 {
-                    const int i_nal_type = p_buffer[4]&0x1f;
-                    int i_offset;
+                    int i_offset    = 0;
                     int i_size      = 0;
 
-                    i_size = i_buffer;
-                    for( i_offset = 4; i_offset+3 < i_buffer ; i_offset++)
+                    while( p_buffer[0] != 0 || p_buffer[1] != 0 ||
+                           p_buffer[2] != 1 )
                     {
-                        if( !memcmp (p_buffer + i_offset, "\x00\x00\x00\x01", 4 ) )
+                        p_buffer++;
+                        i_buffer--;
+                        if( i_buffer == 0 ) break;
+                    }
+
+                    if( i_buffer < 4 || memcmp(p_buffer, "\x00\x00\x01", 3 ) )
+                    {
+                        /* No startcode found.. */
+                        break;
+                    }
+                    p_buffer += 3;
+                    i_buffer -= 3;
+
+                    const int i_nal_type = p_buffer[0]&0x1f;
+
+                    i_size = i_buffer;
+                    for( i_offset = 0; i_offset+2 < i_buffer ; i_offset++)
+                    {
+                        if( !memcmp(p_buffer + i_offset, "\x00\x00\x01", 3 ) )
                         {
                             /* we found another startcode */
+                            while( i_offset > 0 && 0 == p_buffer[ i_offset - 1 ] )
+                                i_offset--;
                             i_size = i_offset;
                             break;
                         }
                     }
+
+                    if( i_size == 0 )
+                    {
+                        /* No-info found in nal */
+                        continue;
+                    }
+
                     if( i_nal_type == 7 )
                     {
                         free( p_64_sps );
-                        p_64_sps = vlc_b64_encode_binary( &p_buffer[4], i_size - 4 );
+                        p_64_sps = vlc_b64_encode_binary( p_buffer, i_size );
                         sprintf_hexa( hexa, &p_buffer[5], 3 );
                     }
                     else if( i_nal_type == 8 )
                     {
                         free( p_64_pps );
-                        p_64_pps = vlc_b64_encode_binary( &p_buffer[4], i_size - 4 );
+                        p_64_pps = vlc_b64_encode_binary( p_buffer, i_size );
                     }
                     i_buffer -= i_size;
                     p_buffer += i_size;
