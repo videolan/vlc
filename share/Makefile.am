@@ -4,26 +4,20 @@ MOSTLYCLEANFILES =
 appdatadir = $(datadir)/applications/
 
 iconsdatadir = $(datadir)/icons/hicolor/
+icons16dir = $(iconsdatadir)/16x16/apps/
+icons32dir = $(iconsdatadir)/32x32/apps/
+icons48dir = $(iconsdatadir)/48x48/apps/
+icons128dir = $(iconsdatadir)/128x128/apps/
+icons256dir = $(iconsdatadir)/256x256/apps/
 
 dist_appdata_DATA = vlc.desktop
 
 dist_vlcdata_DATA = vlc.ico
-
-DIST_icons = \
-	vlc16x16.png vlc16x16.xpm \
-	vlc32x32.png vlc32x32.xpm vlc32x32-christmas.xpm \
-	vlc48x48.png vlc48x48-christmas.png \
-	vlc128x128.png vlc128x128-christmas.png \
-	vlc256x256.png
-
-install-data-local: $(DIST_icons)
-	for i in $^; do \
-	  dir=$$( basename $$i|sed -e 's/vlc\([0-9]*x[0-9]*\).*/\1/' ) ; \
-	  name=vlc$$( basename $$i|sed -e 's/vlc[0-9]*x[0-9]*\(.*\)/\1/' ) ; \
-	  $(INSTALL) -d $(DESTDIR)$(iconsdatadir)/$${dir}/apps ; \
-	  $(INSTALL_DATA) $$i $(DESTDIR)$(iconsdatadir)/$${dir}/apps/$${name} ; \
-	done
-
+dist_icons16_DATA = vlc16x16.png vlc16x16.xpm
+dist_icons32_DATA = vlc32x32.png vlc32x32.xpm vlc32x32-christmas.xpm
+dist_icons48_DATA = vlc48x48.png vlc48x48-christmas.png
+dist_icons128_DATA = vlc128x128.png vlc128x128-christmas.png
+dist_icons256_DATA = vlc256x256.png
 
 nobase_dist_vlcdata_SCRIPTS = \
 	utils/gnome-vlc-default.sh \
@@ -41,7 +35,6 @@ EXTRA_DIST = \
 	$(DIST_osdmenu_default) \
 	$(DIST_mozilla) \
 	$(DIST_maemo) \
-	$(DIST_icons) \
 	$(DIST_solid)
 
 nobase_vlcdata_DATA =
