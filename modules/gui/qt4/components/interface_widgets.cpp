@@ -426,7 +426,7 @@ void SpeedControlWidget::updateControls( float rate )
         return;
     }
 
-    double value = 17 * log( rate ) / log( 2 );
+    double value = 17 * log( rate ) / log( 2. );
     int sliderValue = (int) ( ( value > 0 ) ? value + .5 : value - .5 );
 
     if( sliderValue < speedSlider->minimum() )
