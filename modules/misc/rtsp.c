@@ -581,7 +581,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
                     i_size = i_buffer;
                     for( i_offset = 4; i_offset+3 < i_buffer ; i_offset++)
                     {
-                        if( p_buffer[i_offset] == 0 && p_buffer[i_offset+1] == 0 && p_buffer[i_offset+2] == 0 && p_buffer[i_offset+3] == 1 )
+                        if( !memcmp (p_buffer + i_offset, "\x00\x00\x00\x01", 4 ) )
                         {
                             /* we found another startcode */
                             i_size = i_offset;
