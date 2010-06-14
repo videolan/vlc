@@ -87,17 +87,17 @@ void MainInterface::createTaskBarButtons()
     {
         p_taskbl->vt->HrInit(p_taskbl);
 
-        if(himl = ImageList_Create( 15, //cx
-                        18, //cy
+        if(himl = ImageList_Create( 20, //cx
+                        20, //cy
                         ILC_COLOR,//flags
                         4,//initial nb of images
                         0//nb of images that can be added
                         ))
         {
-            QPixmap img   = QPixmap(":/toolbar/previous_b");
-            QPixmap img2  = QPixmap(":/toolbar/pause_b");
-            QPixmap img3  = QPixmap(":/toolbar/play_b");
-            QPixmap img4  = QPixmap(":/toolbar/next_b");
+            QPixmap img   = QPixmap(":/win7/prev");
+            QPixmap img2  = QPixmap(":/win7/pause");
+            QPixmap img3  = QPixmap(":/win7/play");
+            QPixmap img4  = QPixmap(":/win7/next");
             QBitmap mask  = img.createMaskFromColor(Qt::transparent);
             QBitmap mask2 = img2.createMaskFromColor(Qt::transparent);
             QBitmap mask3 = img3.createMaskFromColor(Qt::transparent);
