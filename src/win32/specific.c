@@ -1,7 +1,7 @@
 /*****************************************************************************
  * specific.c: Win32 specific initilization
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2004, 2010 the VideoLAN team
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@videolan.org>
@@ -29,6 +29,7 @@
 #include <vlc_common.h>
 #include "../libvlc.h"
 #include <vlc_playlist.h>
+#include <vlc_url.h>
 
 #include "../config/vlc_getopt.h"
 
@@ -344,18 +345,18 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
 
                 /* Count the input options */
                 while( i_opt + i_options + 1 < i_argc &&
-                       *ppsz_argv[ i_opt + i_options + 1 ] == ':' )
+                        *ppsz_argv[ i_opt + i_options + 1 ] == ':' )
                 {
                     i_options++;
                 }
-                playlist_AddExt( p_playlist, ppsz_argv[i_opt],
-                  NULL, PLAYLIST_APPEND |
+                playlist_AddExt( p_playlist, make_URI( ppsz_argv[i_opt] ),
+                        NULL, PLAYLIST_APPEND |
                         ( ( i_opt || p_data->enqueue ) ? 0 : PLAYLIST_GO ),
-                  PLAYLIST_END, -1,
-                  i_options,
-                  (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
-                  VLC_INPUT_OPTION_TRUSTED,
-                  true, pl_Unlocked );
+                        PLAYLIST_END, -1,
+                        i_options,
+                        (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
+                        VLC_INPUT_OPTION_TRUSTED,
+                        true, pl_Unlocked );
 
                 i_opt += i_options;
             }
