@@ -194,7 +194,7 @@ vlc_module_begin ()
                 AENC_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "acodec", NULL, NULL, ACODEC_TEXT,
                 ACODEC_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX "ab", 0, NULL, AB_TEXT,
+    add_integer( SOUT_CFG_PREFIX "ab", 96, NULL, AB_TEXT,
                  AB_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "alang", NULL, NULL, ALANG_TEXT,
                 ALANG_LONGTEXT, true )
