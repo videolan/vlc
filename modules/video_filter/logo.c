@@ -94,8 +94,8 @@ vlc_module_begin ()
     add_shortcut( "logo" )
 
     add_file( CFG_PREFIX "file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, false )
-    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true )
-    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, true )
+    add_integer( CFG_PREFIX "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, true )
+    add_integer( CFG_PREFIX "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, true )
     /* default to 1000 ms per image, continuously cycle through them */
     add_integer( CFG_PREFIX "delay", 1000, NULL, DELAY_TEXT, DELAY_LONGTEXT, true )
     add_integer( CFG_PREFIX "repeat", -1, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, true )
