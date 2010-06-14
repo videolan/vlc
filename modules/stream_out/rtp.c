@@ -1244,7 +1244,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                     if( i_nal_type == 7 )
                     {
                         p_64_sps = vlc_b64_encode_binary( p_buffer, i_size );
-                        sprintf_hexa( hexa, &p_buffer[5], 3 );
+                        /* XXX: nothing ensures that i_size >= 4 ?? */
+                        sprintf_hexa( hexa, &p_buffer[1], 3 );
                     }
                     else if( i_nal_type == 8 )
                     {
