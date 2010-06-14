@@ -34,6 +34,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include <vlc_url.h>
 
 #include <vlc_image.h>
 
@@ -614,7 +615,9 @@ static picture_t *LoadImage( vlc_object_t *p_this, const char *psz_filename )
     if( !p_image )
         return NULL;
 
-    picture_t *p_pic = image_ReadUrl( p_image, psz_filename, &fmt_in, &fmt_out );
+    char *psz_url = make_URI( psz_filename );
+    picture_t *p_pic = image_ReadUrl( p_image, psz_url, &fmt_in, &fmt_out );
+    free( psz_url );
     image_HandlerDelete( p_image );
 
     return p_pic;

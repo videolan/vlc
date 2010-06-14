@@ -35,6 +35,7 @@
 #include <vlc_image.h>
 
 #include <vlc_filter.h>
+#include <vlc_url.h>
 #include "filter_picture.h"
 
 /*****************************************************************************
@@ -104,8 +105,10 @@ static void LoadMask( filter_t *p_filter, const char *psz_filename )
     memset( &fmt_out, 0, sizeof( video_format_t ) );
     fmt_out.i_chroma = VLC_CODEC_YUVA;
     p_image = image_HandlerCreate( p_filter );
+    char *psz_url = make_URI( psz_filename );
     p_filter->p_sys->p_mask =
-        image_ReadUrl( p_image, psz_filename, &fmt_in, &fmt_out );
+        image_ReadUrl( p_image, psz_url, &fmt_in, &fmt_out );
+    free( psz_url );
     if( p_filter->p_sys->p_mask )
     {
         if( p_old_mask )
