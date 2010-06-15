@@ -733,7 +733,7 @@ static VLCExtended *_o_sharedInstance = nil;
     }
     else
     {
-        aout_EnableFilter( p_aout, psz_string, false );
+        aout_EnableFilter( pl_Get( p_intf ), psz_string, b_add );
     }
     free( psz_string );
 

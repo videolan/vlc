@@ -98,7 +98,7 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
          }
     }
 
-    aout_EnableFilter( p_object, psz_string, false);
+    aout_EnableFilter( pl_Get( p_intf ), psz_string, b_add);
 
     if( (BOOL)config_GetInt( p_object, "macosx-eq-keep" ) == YES )
     {
