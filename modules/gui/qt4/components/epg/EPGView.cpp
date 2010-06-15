@@ -60,7 +60,11 @@ void EPGView::setStartTime( const QDateTime& startTime )
 
     for ( int i = 0; i < itemList.count(); ++i )
     {
+#ifndef WIN32
         EPGItem* item = dynamic_cast<EPGItem*>( itemList.at( i ) );
+#else
+        EPGItem *item = NULL;
+#endif
         if ( !item ) continue;
         item->setStart( item->start().addSecs( diff ) );
     }
@@ -110,7 +114,11 @@ void EPGView::updateDuration()
 
     for ( int i = 0; i < list.count(); ++i )
     {
+#ifndef WIN32
         EPGItem* item = dynamic_cast<EPGItem*>( list.at( i ) );
+#else
+        EPGItem *item = NULL;
+#endif
         if ( !item ) continue;
         QDateTime itemEnd = item->start().addSecs( item->duration() );
 
