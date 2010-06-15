@@ -68,8 +68,6 @@ class QVLCProgressDialog : public QProgressDialog
 public:
     QVLCProgressDialog (DialogHandler *parent,
                         struct dialog_progress_bar_t *);
-    virtual ~QVLCProgressDialog (void);
-
 private:
     DialogHandler *handler;
     bool cancelled;

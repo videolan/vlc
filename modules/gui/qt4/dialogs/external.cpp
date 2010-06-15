@@ -183,11 +183,15 @@ void DialogHandler::requestAnswer (vlc_object_t *, void *value)
 
 QVLCProgressDialog::QVLCProgressDialog (DialogHandler *parent,
                                         struct dialog_progress_bar_t *data)
-    : QProgressDialog (qfu(data->message),
-                       data->cancel ? ("&" + qfu(data->cancel)) : 0, 0, 1000),
+    : QProgressDialog ( ),
       handler (parent),
       cancelled (false)
 {
+    setLabelText( qfu(data->message) );
+    setRange( 0, 0 );
+
+    if( data->cancel )
+        setCancelButton( new QPushButton( "&" + qfu(data->cancel) ) );
     if (data->title != NULL)
         setWindowTitle (qfu(data->title));
     setWindowRole ("vlc-progress");
@@ -205,14 +209,12 @@ QVLCProgressDialog::QVLCProgressDialog (DialogHandler *parent,
     data->p_sys = this;
 }
 
-QVLCProgressDialog::~QVLCProgressDialog (void)
-{
-}
 
 void QVLCProgressDialog::update (void *priv, const char *text, float value)
 {
     QVLCProgressDialog *self = static_cast<QVLCProgressDialog *>(priv);
-
+    if( value > 0 )
+        self->setRange( 0, 1000 );
     if (text != NULL)
         emit self->described (qfu(text));
     emit self->progressed ((int)(value * 1000.));
