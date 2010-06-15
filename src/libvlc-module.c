@@ -2057,7 +2057,7 @@ vlc_module_begin ()
                    DATA_PATH_LONGTEXT, true )
         change_need_restart ()
 
-    add_string( "user-agent", "(LibVLC "VERSION")", NULL, "", "", true )
+    add_string( "user-agent", "(LibVLC "VERSION")", NULL, NULL, NULL, true )
         change_safe ()
         change_private ()
 
