@@ -821,9 +821,6 @@ static int RecursiveAddIntoParent (
           if( !p_new_item ) return i_pos;
 
           i_pos++;
-
-          //Swap parent for new item, if we will recurse
-          if( b_children ) p_parent = p_new_item;
       }
       //Recurse if any children
       if( b_children )
@@ -831,7 +828,9 @@ static int RecursiveAddIntoParent (
           //Substitute p_new_item for first child leaf
           //(If flat, continue counting from current position)
           int i_last_pos = RecursiveAddIntoParent(
-                                      p_playlist, p_parent, p_child_node,
+                                      p_playlist,
+                                      p_new_item ? p_new_item : p_parent,
+                                      p_child_node,
                                       ( b_flat ? i_pos : 0 ),
                                       b_flat,
                                       &p_new_item );
