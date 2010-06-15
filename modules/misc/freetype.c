@@ -358,8 +358,8 @@ static int Create( vlc_object_t *p_this )
             _("Please wait while your font cache is rebuilt.\n"
                 "This should take less than a few minutes."), NULL );
 
-    if( p_dialog )
-        dialog_ProgressSet( p_dialog, NULL, 0.5 );
+/*    if( p_dialog )
+        dialog_ProgressSet( p_dialog, NULL, 0.5 ); */
 
     FcConfigBuildFonts( fcConfig );
     t2 = mdate();
@@ -367,7 +367,7 @@ static int Create( vlc_object_t *p_this )
 
     if( p_dialog )
     {
-        dialog_ProgressSet( p_dialog, NULL, 1.0 );
+//        dialog_ProgressSet( p_dialog, NULL, 1.0 );
         dialog_ProgressDestroy( p_dialog );
         p_dialog = NULL;
     }
