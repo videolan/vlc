@@ -55,6 +55,7 @@
     [_cancelButton setBordered:YES];
     [_cancelButton setTarget:self];
     [_cancelButton setAction:@selector(buttonAction:)];
+    [_cancelButton setKeyEquivalent:@"\e"] ; // escape key
     [ourContentView addSubview:_cancelButton];
 
     s_rc.origin.x = 383;
@@ -68,6 +69,7 @@
     [_okayButton setBordered:YES];
     [_okayButton setTarget:self];
     [_okayButton setAction:@selector(buttonAction:)];
+    [_okayButton setKeyEquivalent:@"\r"] ; // enter key
     [ourContentView addSubview:_okayButton];
     
     s_rc.origin.x = 94;

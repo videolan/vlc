@@ -55,6 +55,7 @@
     [_cancelButton setBordered:YES];
     [_cancelButton setTarget:self];
     [_cancelButton setAction:@selector(cancelDialog:)];
+    [_cancelButton setKeyEquivalent:@"\e"] ; // escape key
     [ourContentView addSubview:_cancelButton];
 
     s_rc.origin.x = 89;
