@@ -89,7 +89,7 @@ void MainInterface::createTaskBarButtons()
 
         if(himl = ImageList_Create( 20, //cx
                         20, //cy
-                        ILC_COLOR,//flags
+                        ILC_COLOR32,//flags
                         4,//initial nb of images
                         0//nb of images that can be added
                         ))
