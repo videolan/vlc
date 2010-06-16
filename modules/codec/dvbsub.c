@@ -840,8 +840,7 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
     int i_segment_length, i_processed_length, i_id, i_version;
     int i_width, i_height, i_level_comp, i_depth, i_clut;
     int i_8_bg, i_4_bg, i_2_bg;
-    bool b_region_fill, b_fill = false;
-    dvbsub_page_t *p_page = p_sys->p_page;
+    bool b_fill;
 
     i_segment_length = bs_read( s, 16 );
     i_id = bs_read( s, 8 );
@@ -878,7 +877,7 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
     /* Region attributes */
     p_region->i_id = i_id;
     p_region->i_version = i_version;
-    b_region_fill = bs_read( s, 1 );
+    b_fill = bs_read( s, 1 );
     bs_skip( s, 3 ); /* Reserved */
 
     i_width = bs_read( s, 16 );
@@ -918,10 +917,6 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
         p_region->i_depth = 0;
         b_fill = true;
     }
-    else
-        if (b_region_fill && p_page->i_state != 0)
-            b_fill = true;
-
     if( p_region->i_depth &&
         ( ( p_region->i_depth != i_depth ) ||
           ( p_region->i_level_comp != i_level_comp ) ||
