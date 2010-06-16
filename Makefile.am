@@ -55,6 +55,7 @@ EXTRA_DIST = \
 	extras/package/win32/languages/brazilian_portuguese.nsh \
 	extras/package/win32/languages/bulgarian.nsh \
 	extras/package/win32/languages/catalan.nsh \
+	extras/package/win32/languages/danish.nsh \
 	extras/package/win32/languages/dutch.nsh \
 	extras/package/win32/languages/english.nsh \
 	extras/package/win32/languages/estonian.nsh \

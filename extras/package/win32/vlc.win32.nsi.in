@@ -797,6 +797,7 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_SLOVAK} Slovak 0
   StrCmp $LANGUAGE ${LANG_POLISH} Polish 0
   StrCmp $LANGUAGE ${LANG_DUTCH} Dutch 0
+  StrCmp $LANGUAGE ${LANG_DANISH} Danish 0
   StrCmp $LANGUAGE ${LANG_SIMPCHINESE} SChinese 0
   StrCmp $LANGUAGE ${LANG_FINNISH} Finnish 0
   StrCmp $LANGUAGE ${LANG_JAPANESE} Japanese 0
@@ -1131,6 +1132,7 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_SLOVAK} Slovak 0
   StrCmp $LANGUAGE ${LANG_POLISH} Polish 0
   StrCmp $LANGUAGE ${LANG_DUTCH} Dutch 0
+  StrCmp $LANGUAGE ${LANG_DANISH} Danish 0
   StrCmp $LANGUAGE ${LANG_SIMPCHINESE} SChinese 0
   StrCmp $LANGUAGE ${LANG_FINNISH} Finnish 0
   StrCmp $LANGUAGE ${LANG_JAPANESE} Japanese 0
@@ -1169,6 +1171,9 @@ UAC_Success:
   Goto EndLanguageCmp
   Dutch:
   !include "languages\dutch.nsh"
+  Goto EndLanguageCmp
+  Danish:
+  !include "languages\danish.nsh"
   Goto EndLanguageCmp
   Schinese:
   !include "languages\schinese.nsh"
