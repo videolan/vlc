@@ -138,6 +138,14 @@ C: reno
 D: AC3 decoder
 S: France
 
+N: Rémi Duraffort
+E: ivoire -at- videolan.org
+C: ivoire
+D: sftp access
+D: Improvement of SDL vout and taglib
+D: QA (memory leaks, race conditions)
+S: France
+
 N: Cyril Deguet
 E: asmax@via.ecp.fr
 C: asmax
@@ -194,11 +202,6 @@ D: MPEG TS input
 D: Decoder modularization
 S: USA
 
-N: Andrew Flintham
-E: amf@cus.org.uk
-D: text subtitler and font scripts
-S: United Kingdom
-
 N: Damien Fouilleul
 E: Damien.Fouilleul@laposte.net
 C: Quovodis
@@ -208,28 +211,6 @@ D: Direct3D Video output
 D: SSE2 chroma converters
 D: improved MMX chroma converters
 S: Ireland
-
-N: Alexis Guillard
-E: alexis.guillard@bt.com
-D: IPv6 support
-S: United Kingdom
-
-N: Gerald Hansink
-E: gerald.hansink@ordina.nl
-D: Qt Embedded Video Output
-S: Netherlands
-
-N: Shane Harper
-E: shanegh@optusnet.com.au
-D: SDL plugin fixes and enhancements
-D: XVideo video output
-D: Gnome and Gtk+ interface enhancements
-S: United Kingdom
-
-N: Dugal Harris
-E: dugalh (at) protoclea .dot co dot. za
-D: OpenCV video filter
-S: South Africa
 
 N: Derk-Jan Hartman
 E: hartman@videolan.org
@@ -368,16 +349,6 @@ C: fgp
 D: MacOS X port
 S: Austria
 
-N: Heiko Panther
-E: heiko.panther@web.de
-D: Mac OS X audio device selection framework
-S: Germany
-
-N: Vincent Penne
-E: ziggy at sashipa dot com
-D: teletext decoder
-S: France
-
 N: Eric Petit
 E: titer@videolan.org
 C: titer
@@ -398,11 +369,6 @@ N: Emmanuel Puig
 E: karibu@videolan.org
 C: karibu
 D: skins module (core and win32 port)
-S: France
-
-N: Frédéric Ruget
-E: frederic.ruget@free.fr
-D: Portaudio audio output
 S: France
 
 N: Jean-Paul Saman
@@ -433,7 +399,7 @@ D: YUV transforms
 D: X11 and GGI video outputs
 S: France
 
-N: Ken Self
+N: Kenneth Self
 E: kens@campoz.fslife.co.uk
 C: kenS
 D: BDA module
@@ -454,11 +420,6 @@ D: Announce system
 D: visualisation, volume normalizer
 S: France
 
-N: Peter Surda
-E: shurdeek@panorama.sth.ac.at
-D: rc plugin for VLC control through /dev/stdin
-S: Austria
-
 N: Olivier Teulière
 E: ipkiss@via.ecp.fr
 C: ipkiss
@@ -466,14 +427,3 @@ D: Win32 interface
 D: skins module (core and win32 port)
 D: skins2 module (core and win32 port)
 S: France
-
-N: Yuehua Zhao
-E: zhao908@hotmail.com
-D: real video codec
-S: China
-
-N: Bo Wang
-E: silencewang@msn.com
-D: real file/rtsp pause and seek support
-S: China
-
