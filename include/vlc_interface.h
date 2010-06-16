@@ -172,10 +172,15 @@ typedef enum vlc_dialog {
     "*.a52;" \
     "*.aac;" \
     "*.ac3;" \
+    "*.adt;" \
+    "*.adts;" \
+    "*.aif;"\
+    "*.aifc;"\
     "*.aiff;"\
     "*.amr;" \
     "*.aob;" \
     "*.ape;" \
+    "*.cda;" \
     "*.dts;" \
     "*.flac;"\
     "*.it;"  \
@@ -205,11 +210,11 @@ typedef enum vlc_dialog {
     "*.xa;"  \
     "*.xm"
 
-#define EXTENSIONS_VIDEO "*.3gp;*.amv;*.asf;*.avi;*.divx;*.dv;*.flv;*.gxf;*.iso;*.m1v;*.m2v;" \
-                         "*.m2t;*.m2ts;*.m4v;*.mkv;*.mov;*.mp2;*.mp4;*.mpeg;*.mpeg1;" \
-                         "*.mpeg2;*.mpeg4;*.mpg;*.mts;*.mxf;*.nsv;*.nuv;" \
+#define EXTENSIONS_VIDEO "*.3g2;*.3gp;*.3gp2;*.3gpp;*.amv;*.asf;*.avi;*.bin;*.cue;*.divx;*.dv;*.flv;*.gxf;*.iso;*.m1v;*.m2v;" \
+                         "*.m2t;*.m2ts;*.m4v;*.mkv;*.mov;*.mp2;*.mp2v;*.mp4;*.mp4v;*.mpa;*.mpe;*.mpeg;*.mpeg1;" \
+                         "*.mpeg2;*.mpeg4;*.mpg;*.mpv2;*.mts;*.mxf;*.nsv;*.nuv;" \
                          "*.ogg;*.ogm;*.ogv;*.ogx;*.ps;" \
-                         "*.rec;*.rm;*.rmvb;*.tod;*.ts;*.vob;*.vro;*.webm;*.wmv"
+                         "*.rec;*.rm;*.rmvb;*.tod;*.ts;*.tts;*.vob;*.vro;*.webm;*.wmv"
 
 #define EXTENSIONS_PLAYLIST "*.asx;*.b4s;*.ifo;*.m3u;*.m3u8;*.pls;*.ram;*.rar;*.sdp;*.vlc;*.xspf;*.zip"
 
