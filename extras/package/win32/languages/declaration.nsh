@@ -40,3 +40,8 @@ Var Name_InstTypeFull
 
 Var Action_OnArrivalDVD
 Var Action_OnArrivalAudioCD
+Var Action_OnArrivalVCDMovie
+Var Action_OnArrivalSVCDMovie
+Var Action_OnArrivalVideoFiles
+Var Action_OnArrivalMusicFiles
+Var Action_OnArrivalDVDAudio

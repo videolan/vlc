@@ -54,3 +54,8 @@ StrCpy $Name_InstTypeFull "Full"
 
 StrCpy $Action_OnArrivalDVD "Play DVD movie"
 StrCpy $Action_OnArrivalAudioCD "Play audio CD"
+StrCpy $Action_OnArrivalVCDMovie "Play VCD movie"
+StrCpy $Action_OnArrivalSVCDMovie "Play SVCD movie"
+StrCpy $Action_OnArrivalVideoFiles "Play video files"
+StrCpy $Action_OnArrivalMusicFiles "Play audio files"
+StrCpy $Action_OnArrivalDVDAudio "Play audio DVD"
