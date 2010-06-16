@@ -356,6 +356,12 @@ D: win32 binary contribs
 D: Varios fixes (configure.ac, wxWidgets, M3U, ...)
 S: England
 
+N: Ilkka Ollakka
+E: ileoo at videolan org
+C: ileoo
+D: x264,qt4 enhancements and fixes
+S: Finland
+
 N: Florian G. Pflug
 E: fgp@phlo.org
 C: fgp
