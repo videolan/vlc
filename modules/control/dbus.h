@@ -29,8 +29,12 @@
 /* DBUS IDENTIFIERS */
 
 /* name registered on the session bus */
-#define VLC_MPRIS_DBUS_SERVICE      "org.mpris.vlc"
-#define MPRIS_DBUS_INTERFACE        "org.freedesktop.MediaPlayer"
+#define VLC_MPRIS_DBUS_SERVICE         "org.mpris.vlc"
+
+#define MPRIS_DBUS_ROOT_INTERFACE      "org.freedesktop.MediaPlayer"
+#define MPRIS_DBUS_PLAYER_INTERFACE    "org.freedesktop.MediaPlayer"
+#define MPRIS_DBUS_TRACKLIST_INTERFACE "org.freedesktop.MediaPlayer"
+
 #define MPRIS_DBUS_ROOT_PATH        "/"
 #define MPRIS_DBUS_PLAYER_PATH      "/Player"
 #define MPRIS_DBUS_TRACKLIST_PATH   "/TrackList"
@@ -56,9 +60,9 @@
     dbus_message_unref( p_msg ); \
     return DBUS_HANDLER_RESULT_HANDLED
 
-#define SIGNAL_INIT( path, signal ) \
+#define SIGNAL_INIT( interface, path, signal ) \
     DBusMessage *p_msg = dbus_message_new_signal( path, \
-        MPRIS_DBUS_INTERFACE, signal ); \
+        interface, signal ); \
     if( !p_msg ) return DBUS_HANDLER_RESULT_NEED_MEMORY; \
 
 #define SIGNAL_SEND \
