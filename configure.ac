@@ -2375,7 +2375,7 @@ dnl  ogg demux plugin
 dnl
 PKG_ENABLE_MODULES_VLC([OGG], [], [ogg >= 1.0], [Ogg demux support], [auto])
 if test "${enable_sout}" != "no"; then
-    PKG_ENABLE_MODULES_VLC([MUX_OGG], [], [ogg >= 1.0], [Ogg demux support], [auto])
+    PKG_ENABLE_MODULES_VLC([MUX_OGG], [], [ogg >= 1.0], [Ogg mux support], [auto])
 fi
 
 if test "${enable_sout}" != "no"; then
