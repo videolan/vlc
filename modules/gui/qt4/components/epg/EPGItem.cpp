@@ -86,8 +86,7 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem*, QWidget
 
     mapped.adjust( 0, 20, 0, 0 );
 
-    QDateTime m_end = m_start;
-    m_end.addSecs( m_duration );
+    QDateTime m_end = m_start.addSecs( m_duration );
     f.setPixelSize( 10 );
     f.setItalic( true );
     painter->setFont( f );
