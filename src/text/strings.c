@@ -601,6 +601,18 @@ char *str_format_time( const char *tformat )
     assert (0);
 }
 
+static void format_duration (char *buf, size_t len, int64_t duration)
+{
+    lldiv_t d;
+    int sec;
+
+    duration /= CLOCK_FREQ;
+    d = lldiv (duration, 60);
+    sec = d.rem;
+    d = lldiv (d.quot, 60);
+    snprintf (buf, len, "%02lld:%02d:%02d", d.quot, (int)d.rem, sec);
+}
+
 #define INSERT_STRING( string )                                     \
                     if( string != NULL )                            \
                     {                                               \
@@ -779,10 +791,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                     if( p_item )
                     {
                         mtime_t i_duration = input_item_GetDuration( p_item );
-                        snprintf( buf, 10, "%02d:%02d:%02d",
-                                 (int)(i_duration/(3600000000)),
-                                 (int)((i_duration/(60000000))%60),
-                                 (int)((i_duration/1000000)%60) );
+                        format_duration (buf, sizeof (buf), i_duration);
                     }
                     else
                     {
@@ -813,10 +822,8 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         mtime_t i_duration = input_item_GetDuration( p_item );
                         int64_t i_time = var_GetTime( p_input, "time" );
-                        snprintf( buf, 10, "%02d:%02d:%02d",
-                     (int)( ( i_duration - i_time ) / 3600000000 ),
-                     (int)( ( ( i_duration - i_time ) / 60000000 ) % 60 ),
-                     (int)( ( ( i_duration - i_time ) / 1000000 ) % 60 ) );
+                        format_duration( buf, sizeof(buf),
+                                         i_duration - i_time );
                     }
                     else
                     {
@@ -881,10 +888,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                     if( p_input )
                     {
                         int64_t i_time = var_GetTime( p_input, "time" );
-                        snprintf( buf, 10, "%02d:%02d:%02d",
-                            (int)( i_time / ( 3600000000 ) ),
-                            (int)( ( i_time / ( 60000000 ) ) % 60 ),
-                            (int)( ( i_time / 1000000 ) % 60 ) );
+                        format_duration( buf, sizeof(buf), i_time );
                     }
                     else
                     {
