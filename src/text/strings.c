@@ -700,9 +700,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                         vlc_mutex_unlock( &p_item->p_stats->lock );
                     }
                     else
-                    {
-                        sprintf( buf, b_empty_if_na ? "" : "-" );
-                    }
+                        strcpy( buf, b_empty_if_na ? "" : "-" );
                     INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'g':
@@ -770,9 +768,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                                   var_GetInteger( p_input, "bit-rate" )/1000 );
                     }
                     else
-                    {
-                        sprintf( buf, b_empty_if_na ? "" : "-" );
-                    }
+                        strcpy( buf, b_empty_if_na ? "" : "-" );
                     INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'C':
@@ -782,9 +778,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                                   var_GetInteger( p_input, "chapter" ) );
                     }
                     else
-                    {
-                        sprintf( buf, b_empty_if_na ? "" : "-" );
-                    }
+                        strcpy( buf, b_empty_if_na ? "" : "-" );
                     INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'D':
@@ -794,9 +788,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                         format_duration (buf, sizeof (buf), i_duration);
                     }
                     else
-                    {
-                        snprintf( buf, 10, b_empty_if_na ? "" : "--:--:--" );
-                    }
+                        strcpy( buf, b_empty_if_na ? "" : "--:--:--" );
                     INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'F':
@@ -812,9 +804,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                                   var_GetInteger( p_input, "title" ) );
                     }
                     else
-                    {
-                        sprintf( buf, b_empty_if_na ? "" : "-" );
-                    }
+                        strcpy( buf, b_empty_if_na ? "" : "-" );
                     INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'L':
@@ -826,9 +816,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                                          i_duration - i_time );
                     }
                     else
-                    {
-                        snprintf( buf, 10, b_empty_if_na ? "" : "--:--:--" );
-                    }
+                        strcpy( buf, b_empty_if_na ? "" : "--:--:--" );
                     INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'N':
@@ -867,9 +855,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                         snprintf( buf, 10, "%.3f", f );
                     }
                     else
-                    {
-                        sprintf( buf, b_empty_if_na ? "" : "-" );
-                    }
+                        strcpy( buf, b_empty_if_na ? "" : "-" );
                     INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'S':
@@ -879,9 +865,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                         snprintf( buf, 10, "%d.%d", r/1000, (r/100)%10 );
                     }
                     else
-                    {
-                        sprintf( buf, b_empty_if_na ? "" : "-" );
-                    }
+                        strcpy( buf, b_empty_if_na ? "" : "-" );
                     INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'T':
@@ -891,9 +875,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                         format_duration( buf, sizeof(buf), i_time );
                     }
                     else
-                    {
-                        snprintf( buf, 10, b_empty_if_na ? "" :  "--:--:--" );
-                    }
+                        strcpy( buf, b_empty_if_na ? "" :  "--:--:--" );
                     INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'U':

@@ -1472,7 +1472,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
     memset( psz_title, ' ', mid );
     if( p_sys->b_color )
         wcolor_set( p_sys->w, C_TITLE, NULL );
-    snprintf( &psz_title[mid], i_size, "VLC media player "PACKAGE_VERSION );
+    strlcpy( &psz_title[mid], "VLC media player "PACKAGE_VERSION, i_size );
     mvnprintw( y, 0, COLS, "%s", psz_title );
     attroff( A_REVERSE );
     y += 2;

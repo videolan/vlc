@@ -251,7 +251,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         }
         else
         {
-            snprintf( &psz_notify[i_notify], 6, "&amp;" );
+            strcpy( &psz_notify[i_notify], "&amp;" );
             i_notify += 4;
         }
         i_notify++;
