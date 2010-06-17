@@ -238,6 +238,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         codec->channels = p_input->p_fmt->audio.i_channels;
         codec->sample_rate = p_input->p_fmt->audio.i_rate;
         codec->time_base = (AVRational){1, codec->sample_rate};
+        codec->frame_size = p_input->p_fmt->audio.i_frame_length;
         break;
 
     case VIDEO_ES:
