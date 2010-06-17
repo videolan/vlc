@@ -153,5 +153,7 @@ void EPGItem::focusInEvent( QFocusEvent * event )
     EPGEvent *evEPG = new EPGEvent( m_name );
     evEPG->description = m_description;
     evEPG->shortDescription = m_shortDescription;
+    evEPG->start = m_start;
+    evEPG->duration = m_duration;
     m_view->eventFocused( evEPG );
 }

@@ -93,7 +93,11 @@ void EpgDialog::showEvent( EPGEvent *event )
 {
     if( !event ) return;
 
-    title->setText( event->name );
+    QDateTime end = event->start.addSecs( event->duration );
+    title->setText( event->start.toString( "hh:mm" ) + " - "
+                    + end.toString( "hh:mm" ) + " : "
+                    + event->name );
+
     if( !event->description.isEmpty() )
         description->setText( event->description );
     else
