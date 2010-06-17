@@ -214,45 +214,65 @@ int Open_LuaIntf( vlc_object_t *p_this )
 
     /*
      * Get the lua-config string.
-     * If the string is empty, try with the old http-* options and build the righr line
+     * If the string is empty, try with the old http-* or telnet-* options
+     * and build the right configuration line
      */
     psz_config = var_CreateGetNonEmptyString( p_intf, "lua-config" );
-    if( !psz_config && !strcmp( psz_name, "http" ) )
+    if( !psz_config )
     {
-        char *psz_http_host = var_CreateGetNonEmptyString( p_intf, "http-host" );
-        char *psz_http_src = var_CreateGetNonEmptyString( p_intf, "http-src" );
-        bool b_http_index = var_CreateGetBool( p_intf, "http-index" );
-        if( psz_http_host )
+        if( !strcmp( psz_name, "http" ) )
         {
-            char *psz_esc = config_StringEscape( psz_http_host );
-            asprintf( &psz_config, "http={host='%s'", psz_esc );
-            free( psz_esc );
-            free( psz_http_host );
-        }
-        if( psz_http_src )
-        {
-            char *psz_esc = config_StringEscape( psz_http_src );
+            char *psz_http_host = var_CreateGetNonEmptyString( p_intf, "http-host" );
+            char *psz_http_src = var_CreateGetNonEmptyString( p_intf, "http-src" );
+            bool b_http_index = var_CreateGetBool( p_intf, "http-index" );
+            if( psz_http_host )
+            {
+                char *psz_esc = config_StringEscape( psz_http_host );
+                asprintf( &psz_config, "http={host='%s'", psz_esc );
+                free( psz_esc );
+                free( psz_http_host );
+            }
+            if( psz_http_src )
+            {
+                char *psz_esc = config_StringEscape( psz_http_src );
+                if( psz_config )
+                {
+                    char *psz_tmp;
+                    asprintf( &psz_tmp, "%s,dir='%s'", psz_config, psz_esc );
+                    free( psz_config );
+                    psz_config = psz_tmp;
+                }
+                else
+                    asprintf( &psz_config, "http={dir='%s'", psz_esc );
+                free( psz_esc );
+                free( psz_http_src );
+            }
             if( psz_config )
             {
                 char *psz_tmp;
-                asprintf( &psz_tmp, "%s,dir='%s'", psz_config, psz_esc );
+                asprintf( &psz_tmp, "%s,no_index=%s}", psz_config, b_http_index ? "true" : "false" );
                 free( psz_config );
                 psz_config = psz_tmp;
             }
             else
-                asprintf( &psz_config, "http={dir='%s'", psz_esc );
-            free( psz_esc );
-            free( psz_http_src );
+                asprintf( &psz_config, "http={no_index=%s}", b_http_index ? "true" : "false" );
         }
-        if( psz_config )
+        else if( !strcmp( psz_name, "telnet" ) )
         {
-            char *psz_tmp;
-            asprintf( &psz_tmp, "%s,no_index=%s}", psz_config, b_http_index ? "true" : "false" );
-            free( psz_config );
-            psz_config = psz_tmp;
+            char *psz_telnet_host = var_CreateGetString( p_intf, "telnet-host" );
+            int i_telnet_port = var_CreateGetInteger( p_intf, "telnet-port" );
+            char *psz_telnet_passwd = var_CreateGetString( p_intf, "telnet-password" );
+
+            char *psz_esc_host = config_StringEscape( psz_telnet_host );
+            char *psz_esc_passwd = config_StringEscape( psz_telnet_passwd );
+
+            asprintf( &psz_config, "telnet={host='%s:%d',password='%s'}", psz_esc_host ? psz_esc_host : "", i_telnet_port, psz_esc_passwd );
+
+            free( psz_esc_host );
+            free( psz_esc_passwd );
+            free( psz_telnet_passwd );
+            free( psz_telnet_host );
         }
-        else
-            asprintf( &psz_config, "http={no_index=%s}", b_http_index ? "true" : "false" );
     }
 
     if( psz_config )

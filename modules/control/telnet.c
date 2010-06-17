@@ -87,7 +87,7 @@ vlc_module_begin ()
     set_shortname( "Telnet" )
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_CONTROL )
-    add_string( "telnet-host", "", NULL, TELNETHOST_TEXT,
+    add_string( "telnet-host", "localhost", NULL, TELNETHOST_TEXT,
                  TELNETHOST_LONGTEXT, true )
     add_integer( "telnet-port", TELNETPORT_DEFAULT, NULL, TELNETPORT_TEXT,
                  TELNETPORT_LONGTEXT, true )

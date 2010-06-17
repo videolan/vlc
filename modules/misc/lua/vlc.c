@@ -69,6 +69,20 @@
 #define INDEX_TEXT N_( "Directory index" )
 #define INDEX_LONGTEXT N_( "Allow to build directory index" )
 
+#define TELNETHOST_TEXT N_( "Host" )
+#define TELNETHOST_LONGTEXT N_( "This is the host on which the " \
+    "interface will listen. It defaults to all network interfaces (0.0.0.0)." \
+    " If you want this interface to be available only on the local " \
+    "machine, enter \"127.0.0.1\"." )
+#define TELNETPORT_TEXT N_( "Port" )
+#define TELNETPORT_LONGTEXT N_( "This is the TCP port on which this " \
+    "interface will listen. It defaults to 4212." )
+#define TELNETPORT_DEFAULT 4212
+#define TELNETPWD_TEXT N_( "Password" )
+#define TELNETPWD_LONGTEXT N_( "A single administration password is used " \
+    "to protect this interface. The default value is \"admin\"." )
+#define TELNETPWD_DEFAULT "admin"
+
 static int vlc_sd_probe_Open( vlc_object_t * );
 
 vlc_module_begin ()
@@ -88,10 +102,18 @@ vlc_module_begin ()
                     INTF_TEXT, INTF_LONGTEXT, false )
         add_string( "lua-config", "", NULL,
                     CONFIG_TEXT, CONFIG_LONGTEXT, false )
-        set_section( N_("Lua HTTP" ), 0 )
+        set_section( N_("Lua HTTP"), 0 )
             add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, true )
             add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  true )
             add_bool   ( "http-index", false, NULL, INDEX_TEXT, INDEX_LONGTEXT, true )
+        set_section( N_("Lua Telnet"), 0 )
+            add_string( "telnet-host", "localhost", NULL, TELNETHOST_TEXT,
+                        TELNETHOST_LONGTEXT, true )
+            add_integer( "telnet-port", TELNETPORT_DEFAULT, NULL, TELNETPORT_TEXT,
+                         TELNETPORT_LONGTEXT, true )
+            add_password( "telnet-password", TELNETPWD_DEFAULT, NULL, TELNETPWD_TEXT,
+                          TELNETPWD_LONGTEXT, true )
+
         set_callbacks( Open_LuaIntf, Close_LuaIntf )
 
     add_submodule ()
