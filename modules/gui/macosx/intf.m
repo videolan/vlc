@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_keys.h>
 #include <vlc_dialog.h>
+#include <vlc_url.h>
 #include <unistd.h> /* execl() */
 
 #import "intf.h"
@@ -1044,7 +1045,14 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename
 {
     BOOL b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
-    NSDictionary *o_dic = [NSDictionary dictionaryWithObjectsAndKeys: o_filename, @"ITEM_URL", nil];
+    char *psz_uri = make_URI([o_filename UTF8String]);
+    if( !psz_uri )
+        return( FALSE );
+
+    NSDictionary *o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
+
+    free( psz_uri );
+
     if( b_autoplay )
         [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue: NO];
     else
