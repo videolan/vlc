@@ -161,10 +161,11 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
         int i;
         for ( i = p_in_buf->i_nb_samples; i--; )
         {
-            *p_dest = p_src[1];
-            p_dest++;
-            *p_dest = p_src[0];
-            p_dest++;
+            int32_t i_tmp = p_src[0];
+            p_dest[0] = p_src[1];
+            p_dest[1] = i_tmp;
+
+            p_dest += 2;
             p_src += 2;
         }
     }
