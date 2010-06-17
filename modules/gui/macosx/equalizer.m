@@ -296,7 +296,9 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 
 - (IBAction)enable:(id)sender
 {
-    ChangeFiltersString( VLCIntf, (char *)"equalizer", [sender state] );
+//    ChangeFiltersString( VLCIntf, (char *)"equalizer", [sender state] );
+    // to fix #3718
+    aout_EnableFilter( pl_Get( VLCIntf ), (char *)"equalizer", [sender state]);
 }
 
 - (IBAction)preampSliderUpdated:(id)sender
