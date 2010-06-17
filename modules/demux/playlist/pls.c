@@ -147,7 +147,7 @@ static int Demux( demux_t *p_demux )
                 input_item_node_AppendItem( p_subitems, p_input );
                 vlc_gc_decref( p_input );
                 free( psz_mrl_orig );
-                psz_mrl_orig = NULL;
+                psz_mrl_orig = psz_mrl = NULL;
             }
             else
             {
@@ -204,7 +204,6 @@ static int Demux( demux_t *p_demux )
         input_item_node_AppendItem( p_subitems, p_input );
         vlc_gc_decref( p_input );
         free( psz_mrl_orig );
-        psz_mrl = NULL;
     }
     else
     {
