@@ -1,6 +1,5 @@
 SUBDIRS = http globalhotkeys
 SOURCES_gestures = gestures.c
-SOURCES_oldtelnet = telnet.c
 SOURCES_netsync = netsync.c
 SOURCES_ntservice = ntservice.c
 SOURCES_hotkeys = hotkeys.c

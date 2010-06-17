@@ -332,7 +332,7 @@ case "${host_os}" in
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([activex mozilla win32text],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx sdl_image aout_sdl vout_sdl],[-lwinmm])
-        VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap oldhttp stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldtelnet oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[-lws2_32])
+        VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap oldhttp stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[-lws2_32])
         VLC_ADD_LIBS([filesystem], [-lshlwapi])
         dnl
         dnl DEP and ASLR options
@@ -347,7 +347,7 @@ case "${host_os}" in
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
-        VLC_ADD_LIBS([libvlccore access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_rtmp sap oldhttp netsync audioscrobbler growl rtp stream_out_standard stream_out_rtp remoteosd ts oldtelnet audiobargraph_a netsync],[-lws2])
+        VLC_ADD_LIBS([libvlccore access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_rtmp sap oldhttp netsync audioscrobbler growl rtp stream_out_standard stream_out_rtp remoteosd ts audiobargraph_a netsync],[-lws2])
         VLC_ADD_LIBS([libvlccore],[-lmmtimer])
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
    fi
@@ -372,9 +372,9 @@ case "${host_os}" in
     LDFLAGS_save="${LDFLAGS_save} -lintl"; LDFLAGS="${LDFLAGS_save}"
     dnl Check for BONE
     if test -f /boot/beos/system/lib/libbind.so; then
-        VLC_ADD_LIBS([filesystem access_ftp access_mms access_output_udp oldtelnet netsync sap libvlccore growl_udp],[-lbind -lsocket])
+        VLC_ADD_LIBS([filesystem access_ftp access_mms access_output_udp netsync sap libvlccore growl_udp],[-lbind -lsocket])
     else
-        VLC_ADD_LIBS([filesystem access_ftp access_mms access_output_udp oldtelnet netsync sap libvlccore growl_udp],[-lnet])
+        VLC_ADD_LIBS([filesystem access_ftp access_mms access_output_udp netsync sap libvlccore growl_udp],[-lnet])
     fi
     ;;
   *)
@@ -1660,7 +1660,6 @@ AS_IF([test "${enable_vlm}" != "no"], [
     AC_MSG_ERROR([VLM requires the stream output. Do not use --disable-sout.])
   ])
   AC_DEFINE(ENABLE_VLM, 1, [Define if you want the VideoLAN manager support])
-  VLC_ADD_PLUGIN([oldtelnet])
 ])
 AM_CONDITIONAL([ENABLE_VLM], [test "${enable_vlm}" != "no"])
 

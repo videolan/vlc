@@ -218,7 +218,6 @@ $Id$
  * ogg: input module for OGG decapsulation
  * oldhttp: old HTTP remote control webinterface
  * oldrc: old interface module using stdio
- * oldtelnet: oled Telnet control interface
  * omapfb: omap framebuffer video output
  * omxil: OpenMAX IL audio/video decoder
  * opencv_example: OpenCV example (face identification)
