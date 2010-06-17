@@ -26,6 +26,9 @@
  * Preamble
  *****************************************************************************/
 
+/* workaround libflac overriding assert.h system header */
+#define assert(x) do {} while(0)
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
