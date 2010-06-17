@@ -44,6 +44,8 @@
 
 struct input_resource_t
 {
+    VLC_GC_MEMBERS
+
     vlc_object_t   *p_parent;
 
     /* This lock is used to serialize request and protect
@@ -387,6 +389,18 @@ static void TerminateAout( input_resource_t *p_resource )
         vlc_object_release( p_aout );
 }
 
+static void Destructor( gc_object_t *p_gc )
+{
+    input_resource_t *p_resource = vlc_priv( p_gc, input_resource_t );
+
+    DestroySout( p_resource );
+    DestroyVout( p_resource );
+    DestroyAout( p_resource );
+
+    vlc_mutex_destroy( &p_resource->lock_hold );
+    vlc_mutex_destroy( &p_resource->lock );
+    free( p_resource );
+}
 
 /* */
 input_resource_t *input_resource_New( vlc_object_t *p_parent )
@@ -395,21 +409,22 @@ input_resource_t *input_resource_New( vlc_object_t *p_parent )
     if( !p_resource )
         return NULL;
 
+    vlc_gc_init( p_resource, Destructor );
     p_resource->p_parent = p_parent;
     vlc_mutex_init( &p_resource->lock );
     vlc_mutex_init( &p_resource->lock_hold );
     return p_resource;
 }
 
-void input_resource_Delete( input_resource_t *p_resource )
+void input_resource_Release( input_resource_t *p_resource )
 {
-    DestroySout( p_resource );
-    DestroyVout( p_resource );
-    DestroyAout( p_resource );
+    vlc_gc_decref( p_resource );
+}
 
-    vlc_mutex_destroy( &p_resource->lock_hold );
-    vlc_mutex_destroy( &p_resource->lock );
-    free( p_resource );
+input_resource_t *input_resource_Hold( input_resource_t *p_resource )
+{
+    vlc_gc_incref( p_resource );
+    return p_resource;
 }
 
 void input_resource_SetInput( input_resource_t *p_resource, input_thread_t *p_input )

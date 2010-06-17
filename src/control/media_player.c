@@ -506,7 +506,8 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
         release_input_thread(p_mi, true);
     if( p_mi->input.p_resource )
     {
-        input_resource_Delete( p_mi->input.p_resource );
+        input_resource_Terminate( p_mi->input.p_resource );
+        input_resource_Release( p_mi->input.p_resource );
         p_mi->input.p_resource = NULL;
     }
     vlc_mutex_destroy( &p_mi->input.lock );

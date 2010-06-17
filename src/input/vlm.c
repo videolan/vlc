@@ -867,7 +867,10 @@ static void vlm_MediaInstanceDelete( vlm_t *p_vlm, int64_t id, vlm_media_instanc
         vlm_SendEventMediaInstanceStopped( p_vlm, id, p_media->cfg.psz_name );
     }
     if( p_instance->p_input_resource )
-        input_resource_Delete( p_instance->p_input_resource );
+    {
+        input_resource_Terminate( p_instance->p_input_resource );
+        input_resource_Release( p_instance->p_input_resource );
+    }
 
     TAB_REMOVE( p_media->i_instance, p_media->instance, p_instance );
     vlc_gc_decref( p_instance->p_item );

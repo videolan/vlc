@@ -76,5 +76,10 @@ void input_resource_HoldVouts( input_resource_t *, vout_thread_t ***, size_t * )
  */
 void input_resource_Terminate( input_resource_t * );
 
+/**
+ * This function holds the input_resource_t itself
+ */
+input_resource_t *input_resource_Hold( input_resource_t * );
+
 #endif
 

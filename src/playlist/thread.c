@@ -84,7 +84,10 @@ void playlist_Deactivate( playlist_t *p_playlist )
 
     /* release input resources */
     if( p_sys->p_input_resource )
-        input_resource_Delete( p_sys->p_input_resource );
+    {
+        input_resource_Terminate( p_sys->p_input_resource );
+        input_resource_Release( p_sys->p_input_resource );
+    }
     p_sys->p_input_resource = NULL;
 
     if( var_InheritBool( p_playlist, "media-library" ) )

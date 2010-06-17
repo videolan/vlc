@@ -386,12 +386,12 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     if( p_resource )
     {
         p_input->p->p_resource_private = NULL;
-        p_input->p->p_resource = p_resource;
+        p_input->p->p_resource = input_resource_Hold( p_resource );
     }
     else
     {
         p_input->p->p_resource_private = input_resource_New( VLC_OBJECT( p_input ) );
-        p_input->p->p_resource = p_input->p->p_resource_private;
+        p_input->p->p_resource = input_resource_Hold( p_input->p->p_resource_private );
     }
     input_resource_SetInput( p_input->p->p_resource, p_input );
 
@@ -500,8 +500,10 @@ static void Destructor( input_thread_t * p_input )
     if( p_input->p->p_es_out_display )
         es_out_Delete( p_input->p->p_es_out_display );
 
+    if( p_input->p->p_resource )
+        input_resource_Release( p_input->p->p_resource );
     if( p_input->p->p_resource_private )
-        input_resource_Delete( p_input->p->p_resource_private );
+        input_resource_Release( p_input->p->p_resource_private );
 
     vlc_gc_decref( p_input->p->p_item );
 
