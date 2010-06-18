@@ -80,52 +80,42 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
 
         for ( int j = 0; j < p_epg->i_event; ++j )
         {
-            EPGEvent *item = NULL;
             vlc_epg_event_t *p_event = p_epg->pp_event[j];
             QString eventName = qfu( p_event->psz_name );
             QDateTime eventStart = QDateTime::fromTime_t( p_event->i_start );
 
             QList<EPGEvent*> events = m_events.values( channelName );
 
+            EPGEvent *item = new EPGEvent( eventName );
+            item->description = qfu( p_event->psz_description );
+            item->shortDescription = qfu( p_event->psz_short_description );
+            item->start = eventStart;
+            item->duration = p_event->i_duration;
+            item->channelName = channelName;
+            item->current = ( p_epg->p_current == p_event ) ? true : false;
+
+            bool alreadyIn = false;
+
             for ( int k = 0; k < events.count(); ++k )
             {
-                if ( events.at( k )->name == eventName &&
-                     events.at( k )->channelName == channelName &&
-                     events.at( k )->start == eventStart )
+                if ( *events.at( k ) == *item )
                 {
-                    /* Update the event. */
-                    item = events.at( k );
-                    item->updated = true;
-                    item->description = qfu( p_event->psz_description );
-                    item->shortDescription = qfu( p_event->psz_short_description );
-                    item->start = eventStart;
-                    item->duration = p_event->i_duration;
-                    item->current = ( p_epg->p_current == p_event ) ? true : false;
-
-                    if ( item->start < m_epgView->startTime() )
-                        m_epgView->setStartTime( item->start );
-
-                    m_epgView->updateEvent( item );
+                    alreadyIn = true;
+                    events.at( k )->updated = true;
                     break;
                 }
             }
 
-            if ( !item )
+            if ( !alreadyIn )
             {
-                item = new EPGEvent( eventName );
-                item->description = qfu( p_event->psz_description );
-                item->shortDescription = qfu( p_event->psz_short_description );
-                item->start = eventStart;
-                item->duration = p_event->i_duration;
-                item->channelName = channelName;
-                item->current = ( p_epg->p_current == p_event ) ? true : false;
                 m_events.insert( channelName, item );
-
                 if ( item->start < m_epgView->startTime() )
                     m_epgView->setStartTime( item->start );
 
                 m_epgView->addEvent( item );
             }
+            else
+                delete item;
         }
     }
 

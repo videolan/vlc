@@ -45,7 +45,6 @@ public:
     const QDateTime& startTime();
 
     void            addEvent( EPGEvent* event );
-    void            updateEvent( EPGEvent* event );
     void            delEvent( EPGEvent* event );
     void            updateDuration();
 

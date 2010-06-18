@@ -88,17 +88,16 @@ void EPGView::addEvent( EPGEvent* event )
     item->setShortDescription( event->shortDescription );
     item->setCurrent( event->current );
 
-    scene()->addItem( item );
-}
+    event->item = item;
 
-void EPGView::updateEvent( EPGEvent* event )
-{
-    //qDebug() << "Update event: " << event->name;
+    scene()->addItem( item );
 }
 
 void EPGView::delEvent( EPGEvent* event )
 {
-    //qDebug() << "Del event: " << event->name;
+    if( event->item != NULL )
+        scene()->removeItem( event->item );
+    event->item = NULL;
 }
 
 void EPGView::updateDuration()
