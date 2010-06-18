@@ -59,15 +59,19 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem*, QWidget
     QTransform viewPortTransform = m_view->viewportTransform();
     QRectF mapped = deviceTransform( viewPortTransform ).mapRect( boundingRect() );
 
-    painter->setPen( QPen( Qt::black ) );
-
     if ( m_current )
-        painter->setBrush( QBrush( QColor( 100, 100, 100 ) ) );
+    {
+        painter->setBrush( QBrush( QColor( 244, 102, 146 ) ) );
+        painter->setPen( QPen( QColor( 244, 102, 146 ) ) );
+    }
     else
-        painter->setBrush( QBrush( QColor( 150, 150, 150 ) ) );
+    {
+        painter->setBrush( QBrush( QColor( 201, 217, 242 ) ) );
+        painter->setPen( QPen( QColor( 201, 217, 242 ) ) );
+    }
 
-    painter->drawRect( mapped );
-
+    mapped.adjust( 1, 2, -1, -2 );
+    painter->drawRoundedRect( mapped, 10, 10 );
 
     /* Draw text */
 
@@ -80,7 +84,7 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem*, QWidget
     // Adjust the drawing rect
     mapped.adjust( 6, 6, -6, -6 );
 
-    painter->setPen( Qt::white );
+    painter->setPen( Qt::black );
     /* Draw the title. */
     painter->drawText( mapped, Qt::AlignTop | Qt::AlignLeft, fm.elidedText( m_name, Qt::ElideRight, mapped.width() ) );
 

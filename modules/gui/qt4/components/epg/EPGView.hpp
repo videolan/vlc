@@ -29,7 +29,7 @@
 #include <QGraphicsView>
 #include <QList>
 
-#define TRACKS_HEIGHT 75
+#define TRACKS_HEIGHT 60
 
 class QDateTime;
 class EPGView : public QGraphicsView
