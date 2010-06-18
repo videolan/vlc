@@ -159,6 +159,7 @@ void StandardPLPanel::gotoPlayingItem()
 void StandardPLPanel::handleExpansion( const QModelIndex& index )
 {
     assert( currentView );
+    browseInto( index.parent() );
     currentView->scrollTo( index );
 }
 
