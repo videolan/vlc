@@ -62,7 +62,7 @@ void EPGView::setStartTime( const QDateTime& startTime )
     {
         EPGItem* item = qgraphicsitem_cast<EPGItem*>( itemList.at( i ) );
         if ( !item ) continue;
-        item->setStart( item->start() );
+        item->updatePos();
     }
 
     // Our start time has changed
