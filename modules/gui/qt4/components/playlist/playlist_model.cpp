@@ -779,10 +779,8 @@ void PLModel::updateTreeItem( PLItem *item )
 /************************* Actions ******************************/
 
 /**
- * Deletion, here we have to do a ugly slow hack as we retrieve the full
- * list of indexes to delete at once: when we delete a node and all of
- * its children, we need to update the list.
- * Todo: investigate whethere we can use ranges to be sure to delete all items?
+ * Lets not worry about nodes children, we do refersh anyway when
+ * core tells that playlist has changed, should give some more speed
  */
 void PLModel::doDelete( QModelIndexList selected )
 {
@@ -796,8 +794,6 @@ void PLModel::doDelete( QModelIndexList selected )
         if( index.column() != 0 ) continue;
 
         PLItem *item = getItem( index );
-        if( item->children.size() )
-            recurseDelete( item->children, &selected );
 
         PL_LOCK;
         playlist_DeleteFromInput( p_playlist, item->p_input, pl_Locked );
