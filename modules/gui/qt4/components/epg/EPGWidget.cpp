@@ -72,7 +72,6 @@ void EPGWidget::setZoom( int level )
 
 void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
 {
-    m_epgView->setStartTime( QDateTime::currentDateTime() );
     for ( int i = 0; i < i_epg; ++i )
     {
         vlc_epg_t *p_epg = pp_epg[i];
