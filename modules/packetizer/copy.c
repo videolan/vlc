@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_block.h>
+#include <vlc_bits.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -55,10 +56,13 @@ vlc_module_end ()
 struct decoder_sys_t
 {
     block_t *p_block;
+    void (*pf_parse)( decoder_t *, block_t * );
 };
 
 static block_t *Packetize   ( decoder_t *, block_t ** );
 static block_t *PacketizeSub( decoder_t *, block_t ** );
+
+static void ParseWMV3( decoder_t *, block_t * );
 
 /*****************************************************************************
  * Open: probe the packetizer and return score
@@ -101,6 +105,15 @@ static int Open( vlc_object_t *p_this )
 
     p_dec->p_sys = p_sys = malloc( sizeof(*p_sys) );
     p_sys->p_block    = NULL;
+    switch( p_dec->fmt_in.i_codec )
+    {
+    case VLC_CODEC_WMV3:
+        p_sys->pf_parse = ParseWMV3;
+        break;
+    default:
+        p_sys->pf_parse = NULL;
+        break;
+    }
 
     return VLC_SUCCESS;
 }
@@ -158,6 +171,8 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
     }
     p_dec->p_sys->p_block = p_block;
 
+    if( p_ret && p_dec->p_sys->pf_parse )
+        p_dec->p_sys->pf_parse( p_dec, p_ret );
     return p_ret;
 }
 
@@ -193,3 +208,36 @@ static block_t *PacketizeSub( decoder_t *p_dec, block_t **pp_block )
 
     return p_block;
 }
+
+/* Parse WMV3 packet and extract frame type informations */
+static void ParseWMV3( decoder_t *p_dec, block_t *p_block )
+{
+    bs_t s;
+
+    /* Parse Sequence header */
+    bs_init( &s, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
+    if( bs_read( &s, 2 ) == 3 )
+        return;
+    bs_skip( &s, 22 );
+    const bool b_range_reduction = bs_read( &s, 1 );
+    const bool b_has_frames = bs_read( &s, 3 ) > 0;
+    bs_skip( &s, 2 );
+    const bool b_frame_interpolation = bs_read( &s, 1 );
+    if( bs_eof( &s ) )
+        return;
+
+    /* Parse frame type */
+    bs_init( &s, p_block->p_buffer, p_block->i_buffer );
+    bs_skip( &s, b_frame_interpolation +
+                 2 +
+                 b_range_reduction );
+
+    p_block->i_flags &= ~BLOCK_FLAG_TYPE_MASK;
+    if( bs_read( &s, 1 ) )
+        p_block->i_flags |= BLOCK_FLAG_TYPE_P;
+    else if( !b_has_frames || bs_read( &s, 1 ) )
+        p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+    else
+        p_block->i_flags |= BLOCK_FLAG_TYPE_B;
+}
+
