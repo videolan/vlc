@@ -96,12 +96,11 @@ void EpgDialog::showEvent( EPGEvent *event )
     QDateTime end = event->start.addSecs( event->duration );
     title->setText( event->start.toString( "hh:mm" ) + " - "
                     + end.toString( "hh:mm" ) + " : "
-                    + event->name );
+                    + event->name
+                    + ( event->shortDescription.isEmpty()
+                        ? "" : " - " + event->shortDescription ) );
 
-    if( !event->description.isEmpty() )
-        description->setText( event->description );
-    else
-        description->setText( event->shortDescription );
+    description->setText( event->description );
 }
 
 void EpgDialog::updateInfos()
