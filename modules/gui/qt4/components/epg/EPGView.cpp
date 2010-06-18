@@ -56,16 +56,14 @@ void EPGView::setStartTime( const QDateTime& startTime )
 {
     QList<QGraphicsItem*> itemList = items();
 
-    int diff = startTime.secsTo( m_startTime );
+    m_startTime = startTime;
 
     for ( int i = 0; i < itemList.count(); ++i )
     {
         EPGItem* item = qgraphicsitem_cast<EPGItem*>( itemList.at( i ) );
         if ( !item ) continue;
-        item->setStart( item->start().addSecs( diff ) );
+        item->setStart( item->start() );
     }
-
-    m_startTime = startTime;
 
     // Our start time has changed
     emit startTimeChanged( startTime );

@@ -52,6 +52,7 @@ public:
     void setDescription( const QString& description );
     void setShortDescription( const QString& shortDescription );
     void setCurrent( bool current );
+    void updatePos();
 
 protected:
     virtual void focusInEvent( QFocusEvent * event );

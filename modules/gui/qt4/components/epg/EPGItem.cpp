@@ -112,14 +112,13 @@ void EPGItem::setChannel( int channelNb )
 {
     //qDebug() << "Channel" << channelNb;
     m_channelNb = channelNb;
-    setPos( pos().x(), m_channelNb * TRACKS_HEIGHT );
+    updatePos();
 }
 
 void EPGItem::setStart( const QDateTime& start )
 {
     m_start = start;
-    int x = m_view->startTime().secsTo( start );
-    setPos( x, pos().y() );
+    updatePos();
 }
 
 void EPGItem::setDuration( int duration )
@@ -146,6 +145,12 @@ void EPGItem::setShortDescription( const QString& shortDescription )
 void EPGItem::setCurrent( bool current )
 {
     m_current = current;
+}
+
+void EPGItem::updatePos()
+{
+    int x = m_view->startTime().secsTo( m_start );
+    setPos( x, m_channelNb * TRACKS_HEIGHT );
 }
 
 void EPGItem::focusInEvent( QFocusEvent * event )
