@@ -120,8 +120,8 @@ enum vlc_module_properties
 /**
  * Current plugin ABI version
  */
-# define MODULE_SYMBOL 1_2_0b
-# define MODULE_SUFFIX "__1_2_0b"
+# define MODULE_SYMBOL 1_2_0c
+# define MODULE_SUFFIX "__1_2_0c"
 
 /*****************************************************************************
  * Add a few defines. You do not want to read this section. Really.
@@ -196,9 +196,12 @@ enum vlc_module_properties
         goto error;
 
 #define add_shortcut( ... ) \
+{ \
+    const char *shortcuts[] = { __VA_ARGS__ }; \
     if (vlc_module_set (p_submodule, VLC_MODULE_SHORTCUT, \
-        sizeof((const char*[]){__VA_ARGS__})/sizeof(const char*), __VA_ARGS__)) \
-        goto error;
+                        sizeof(shortcuts)/sizeof(shortcuts[0]), shortcuts)) \
+        goto error; \
+}
 
 #define set_shortname( shortname ) \
     if (vlc_module_set (p_submodule, VLC_MODULE_SHORTNAME, \

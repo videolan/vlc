@@ -183,14 +183,17 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
         {
             unsigned i_shortcuts = va_arg (ap, unsigned);
             unsigned index = module->i_shortcuts;
-            module->i_shortcuts += i_shortcuts;
-
-            module->pp_shortcuts = realloc (module->pp_shortcuts, sizeof( char ** ) * module->i_shortcuts);
-            for (; index < module->i_shortcuts; index++)
+            const char *const *tab = va_arg (ap, const char *const *);
+            const char **pp = realloc (module->pp_shortcuts,
+                                       sizeof (pp[0]) * (index + i_shortcuts));
+            if (unlikely(pp == NULL))
             {
-                const char *psz_new = va_arg (ap, const char*);
-                module->pp_shortcuts[index] = psz_new;
+                ret = -1;
+                break;
             }
+            module->pp_shortcuts = pp;
+            module->i_shortcuts = index + i_shortcuts;
+            memcpy (pp + index, tab, sizeof (pp[0]) * i_shortcuts);
             break;
         }
 
