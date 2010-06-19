@@ -806,7 +806,7 @@ UAC_Success:
 ;  StrCmp $LANGUAGE ${LANG_PUNJABI} Punjabi 0
 ;  StrCmp $LANGUAGE ${LANG_SLOVENIAN} Slovenian 0
   StrCmp $LANGUAGE ${LANG_SPANISH} Spanish 0
-  StrCmp $LANGUAGE ${LANG_SPANISH} Estonian 0
+  StrCmp $LANGUAGE ${LANG_ESTONIAN} Estonian 0
   StrCmp $LANGUAGE ${LANG_LITHUANIAN} Lithuanian 0
   StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
   French:
