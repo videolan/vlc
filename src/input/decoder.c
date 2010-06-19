@@ -2265,7 +2265,11 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
     if( p_owner->p_vout == NULL ||
         p_dec->fmt_out.video.i_width != p_owner->video.i_width ||
         p_dec->fmt_out.video.i_height != p_owner->video.i_height ||
-        p_dec->fmt_out.video.i_chroma != p_owner->video.i_chroma ||
+        p_dec->fmt_out.video.i_visible_width != p_owner->video.i_visible_width ||
+        p_dec->fmt_out.video.i_visible_height != p_owner->video.i_visible_height ||
+        p_dec->fmt_out.video.i_x_offset != p_owner->video.i_x_offset  ||
+        p_dec->fmt_out.video.i_y_offset != p_owner->video.i_y_offset  ||
+        p_dec->fmt_out.i_codec != p_owner->video.i_chroma ||
         (int64_t)p_dec->fmt_out.video.i_sar_num * p_owner->video.i_sar_den !=
         (int64_t)p_dec->fmt_out.video.i_sar_den * p_owner->video.i_sar_num )
     {
@@ -2278,52 +2282,45 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             return NULL;
         }
 
-        if( !p_dec->fmt_out.video.i_visible_width ||
-            !p_dec->fmt_out.video.i_visible_height )
+        video_format_t fmt = p_dec->fmt_out.video;
+        fmt.i_chroma = p_dec->fmt_out.i_codec;
+        p_owner->video = fmt;
+
+        if( !fmt.i_visible_width || !fmt.i_visible_height )
         {
             if( p_dec->fmt_in.video.i_visible_width &&
                 p_dec->fmt_in.video.i_visible_height )
             {
-                p_dec->fmt_out.video.i_visible_width =
-                    p_dec->fmt_in.video.i_visible_width;
-                p_dec->fmt_out.video.i_visible_height =
-                    p_dec->fmt_in.video.i_visible_height;
+                fmt.i_visible_width  = p_dec->fmt_in.video.i_visible_width;
+                fmt.i_visible_height = p_dec->fmt_in.video.i_visible_height;
             }
             else
             {
-                p_dec->fmt_out.video.i_visible_width =
-                    p_dec->fmt_out.video.i_width;
-                p_dec->fmt_out.video.i_visible_height =
-                    p_dec->fmt_out.video.i_height;
+                fmt.i_visible_width  = fmt.i_width;
+                fmt.i_visible_height = fmt.i_height;
             }
         }
 
-        if( p_dec->fmt_out.video.i_visible_height == 1088 &&
+        if( fmt.i_visible_height == 1088 &&
             var_CreateGetBool( p_dec, "hdtv-fix" ) )
         {
-            p_dec->fmt_out.video.i_visible_height = 1080;
-            if( !(p_dec->fmt_out.video.i_sar_num % 136))
+            fmt.i_visible_height = 1080;
+            if( !(fmt.i_sar_num % 136))
             {
-                p_dec->fmt_out.video.i_sar_num *= 135;
-                p_dec->fmt_out.video.i_sar_den *= 136;
+                fmt.i_sar_num *= 135;
+                fmt.i_sar_den *= 136;
             }
             msg_Warn( p_dec, "Fixing broken HDTV stream (display_height=1088)");
         }
 
-        if( !p_dec->fmt_out.video.i_sar_num ||
-            !p_dec->fmt_out.video.i_sar_den )
+        if( !fmt.i_sar_num || !fmt.i_sar_den )
         {
-            p_dec->fmt_out.video.i_sar_num = 1;
-            p_dec->fmt_out.video.i_sar_den = 1;
+            fmt.i_sar_num = 1;
+            fmt.i_sar_den = 1;
         }
 
-        vlc_ureduce( &p_dec->fmt_out.video.i_sar_num,
-                     &p_dec->fmt_out.video.i_sar_den,
-                     p_dec->fmt_out.video.i_sar_num,
-                     p_dec->fmt_out.video.i_sar_den, 50000 );
-
-        p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
-        p_owner->video = p_dec->fmt_out.video;
+        vlc_ureduce( &fmt.i_sar_num, &fmt.i_sar_den,
+                     fmt.i_sar_num, fmt.i_sar_den, 50000 );
 
         vlc_mutex_lock( &p_owner->lock );
 
@@ -2351,7 +2348,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             break;
         }
         p_vout = input_resource_RequestVout( p_owner->p_input->p->p_resource,
-                                             p_vout, &p_dec->fmt_out.video,
+                                             p_vout, &fmt,
                                              dpb_size + 1 + DECODER_MAX_BUFFERING_COUNT,
                                              true );
         vlc_mutex_lock( &p_owner->lock );
