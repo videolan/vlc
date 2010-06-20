@@ -779,10 +779,8 @@ void PLModel::updateTreeItem( PLItem *item )
 /************************* Actions ******************************/
 
 /**
- * Deletion, here we have to do a ugly slow hack as we retrieve the full
- * list of indexes to delete at once: when we delete a node and all of
- * its children, we need to update the list.
- * Todo: investigate whethere we can use ranges to be sure to delete all items?
+ * Deletion, don't delete items childrens if item is going to be
+ * delete allready, so we remove childrens from selection-list.
  */
 void PLModel::doDelete( QModelIndexList selected )
 {
