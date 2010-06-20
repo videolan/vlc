@@ -744,6 +744,9 @@ static void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item )
 int playlist_DeleteItem( playlist_t * p_playlist, playlist_item_t *p_item,
                         bool b_stop )
 {
+    assert( b_stop );
+    return playlist_NodeDelete( p_playlist, p_item, true, false );
+#if 0
     int i;
     int i_id = p_item->i_id;
     PL_ASSERT_LOCKED;
@@ -790,6 +793,7 @@ int playlist_DeleteItem( playlist_t * p_playlist, playlist_item_t *p_item,
     playlist_ItemRelease( p_item );
 
     return VLC_SUCCESS;
+#endif
 }
 
 static int RecursiveAddIntoParent (
