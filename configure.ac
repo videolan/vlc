@@ -549,14 +549,14 @@ dnl Check for system libs needed
 need_libc=false
 
 dnl Check for usual libc functions
-AC_CHECK_FUNCS([ctime_r daemon fcntl fdopendir fork getenv getpwuid_r gettimeofday isatty lstat memalign openat posix_fadvise posix_madvise posix_memalign setenv setlocale stricmp strnicmp tdestroy uselocale])
+AC_CHECK_FUNCS([ctime_r daemon fcntl fdopendir fstatvfs fork getenv getpwuid_r gettimeofday isatty lstat memalign openat posix_fadvise posix_madvise posix_memalign setenv setlocale stricmp strnicmp tdestroy uselocale])
 AC_REPLACE_FUNCS([asprintf atof atoll getcwd getdelim getpid gmtime_r lldiv localtime_r nrand48 rewind strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtok_r strtoll swab vasprintf])
 AC_CHECK_FUNCS(fdatasync,,
   [AC_DEFINE(fdatasync, fsync, [Alias fdatasync() to fsync() if missing.])
 ])
 
 dnl Check for non-standard system calls
-AC_CHECK_FUNCS([accept4 dup3 eventfd fstatfs vmsplice sched_getaffinity])
+AC_CHECK_FUNCS([accept4 dup3 eventfd vmsplice sched_getaffinity])
 
 AH_BOTTOM([#include <vlc_fixups.h>])
 
