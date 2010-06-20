@@ -108,9 +108,6 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
             if ( !alreadyIn )
             {
                 m_events.insert( channelName, item );
-                if ( item->start < m_epgView->startTime() )
-                    m_epgView->setStartTime( item->start );
-
                 m_epgView->addEvent( item );
             }
             else
@@ -135,7 +132,8 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
         ++i;
     }
 
-    // Update the global duration
+    // Update the global duration and start time.
     m_epgView->updateDuration();
+    m_epgView->updateStartTime();
 }
 

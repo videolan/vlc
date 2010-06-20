@@ -41,7 +41,7 @@ public:
 
     void            setScale( double scaleFactor );
 
-    void            setStartTime( const QDateTime& startTime );
+    void            updateStartTime();
     const QDateTime& startTime();
 
     void            addEvent( EPGEvent* event );

@@ -52,21 +52,33 @@ void EPGView::setScale( double scaleFactor )
     setMatrix( matrix );
 }
 
-void EPGView::setStartTime( const QDateTime& startTime )
+void EPGView::updateStartTime()
 {
     QList<QGraphicsItem*> itemList = items();
 
-    m_startTime = startTime;
-
+    /* Set the new start time. */
     for ( int i = 0; i < itemList.count(); ++i )
     {
         EPGItem* item = qgraphicsitem_cast<EPGItem*>( itemList.at( i ) );
-        if ( !item ) continue;
+        if ( !item )
+            continue;
+        if( i == 0 )
+            m_startTime = item->start();
+        if ( item->start() < m_startTime )
+            m_startTime = item->start();
+    }
+
+    /* Update the position of all items. */
+    for ( int i = 0; i < itemList.count(); ++i )
+    {
+        EPGItem* item = qgraphicsitem_cast<EPGItem*>( itemList.at( i ) );
+        if ( !item )
+            continue;
         item->updatePos();
     }
 
-    // Our start time has changed
-    emit startTimeChanged( startTime );
+    // Our start time may have changed.
+    emit startTimeChanged( m_startTime );
 }
 
 const QDateTime& EPGView::startTime()
