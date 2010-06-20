@@ -220,17 +220,17 @@ int playlist_NodeInsert( playlist_t *p_playlist,
                          int i_position )
 {
     PL_ASSERT_LOCKED;
-   (void)p_playlist;
-   assert( p_parent && p_parent->i_children != -1 );
-   if( i_position == -1 ) i_position = p_parent->i_children ;
-   assert( i_position <= p_parent->i_children);
+    (void)p_playlist;
+    assert( p_parent && p_parent->i_children != -1 );
+    if( i_position == -1 ) i_position = p_parent->i_children ;
+    assert( i_position <= p_parent->i_children);
 
-   INSERT_ELEM( p_parent->pp_children,
-                p_parent->i_children,
-                i_position,
-                p_item );
-   p_item->p_parent = p_parent;
-   return VLC_SUCCESS;
+    INSERT_ELEM( p_parent->pp_children,
+                 p_parent->i_children,
+                 i_position,
+                 p_item );
+    p_item->p_parent = p_parent;
+    return VLC_SUCCESS;
 }
 
 /**
@@ -246,18 +246,18 @@ int playlist_NodeRemoveItem( playlist_t *p_playlist,
                         playlist_item_t *p_parent )
 {
     PL_ASSERT_LOCKED;
-   (void)p_playlist;
+    (void)p_playlist;
 
-   int ret = VLC_EGENERIC;
+    int ret = VLC_EGENERIC;
 
-   for(int i= 0; i< p_parent->i_children ; i++ )
-   {
-       if( p_parent->pp_children[i] == p_item )
-       {
-           REMOVE_ELEM( p_parent->pp_children, p_parent->i_children, i );
-           ret = VLC_SUCCESS;
-       }
-   }
+    for(int i= 0; i< p_parent->i_children ; i++ )
+    {
+        if( p_parent->pp_children[i] == p_item )
+        {
+            REMOVE_ELEM( p_parent->pp_children, p_parent->i_children, i );
+            ret = VLC_SUCCESS;
+        }
+    }
 
     if( ret == VLC_SUCCESS ) {
         assert( p_item->p_parent == p_parent );
