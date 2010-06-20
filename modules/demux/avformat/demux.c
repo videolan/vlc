@@ -281,6 +281,8 @@ int OpenDemux( vlc_object_t *p_this )
                 *fmt.video.p_palette = *(video_palette_t *)cc->palctrl;
             }
             psz_type = "video";
+            fmt.video.i_frame_rate = cc->time_base.den;
+            fmt.video.i_frame_rate_base = cc->time_base.num;
             break;
 
         case CODEC_TYPE_SUBTITLE:
