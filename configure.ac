@@ -2164,7 +2164,7 @@ then
   fi
 
   CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_v4l2}"
-  AC_CHECK_HEADERS(linux/videodev2.h, [
+  AC_CHECK_HEADERS(linux/videodev2.h sys/videoio.h, [
     VLC_ADD_PLUGIN([v4l2])
   ],[])
   CPPFLAGS="${CPPFLAGS_save}"

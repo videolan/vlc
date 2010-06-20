@@ -51,7 +51,13 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 
-#include <linux/videodev2.h>
+#if defined(HAVE_LINUX_VIDEODEV2_H)
+#   include <linux/videodev2.h>
+#elif defined(HAVE_SYS_VIDEOIO_H)
+#   include <sys/videoio.h>
+#else
+#   error "No Video4Linux2 headers found."
+#endif
 
 #include <poll.h>
 
