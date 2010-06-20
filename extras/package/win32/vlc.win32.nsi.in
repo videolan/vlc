@@ -839,6 +839,9 @@ UAC_Success:
   Dutch:
   !include "languages\dutch.nsh"
   Goto EndLanguageCmp
+  Danish:
+  !include "languages\danish.nsh"
+  Goto EndLanguageCmp
   Schinese:
   !include "languages\schinese.nsh"
   Goto EndLanguageCmp
