@@ -224,7 +224,7 @@ void StandardPLPanel::browseInto( const QModelIndex &index )
 {
     if( currentView == iconView || currentView == listView )
     {
-        currentRootIndexId = model->itemId( index );;
+        currentRootIndexId = model->itemId( index );
         currentView->setRootIndex( index );
     }
 
