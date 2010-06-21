@@ -395,3 +395,60 @@ vlm_t *vlm_New (vlc_object_t *obj)
      return NULL;
 }
 #endif /* !ENABLE_VLM */
+
+#ifndef MEDIA_LIBRARY
+#include<vlc_media_library.h>
+
+media_library_t* __ml_Hold ( vlc_object_t* p_this )
+{
+    return NULL;
+}
+
+void __ml_Release ( vlc_object_t* p_this )
+{
+    assert( 0 );
+}
+
+media_library_t* __ml_Create ( vlc_object_t *p_this, char* psz_name )
+{
+    return NULL;
+}
+
+void __ml_Destroy( vlc_object_t * p_this )
+{
+    assert( 0 );
+}
+
+ml_media_t* media_New( media_library_t* p_ml, int id, ml_select_e select, bool reload )
+{
+    assert( 0 );
+}
+
+int __ml_UpdateSimple( media_library_t *p_media_library, ml_select_e selected_type,
+                                     const char* psz_lvalue, int id, ... )
+{
+    assert( 0 );
+}
+
+ml_ftree_t* ml_OpConnectChilds( ml_op_e op, ml_ftree_t* left, ml_ftree_t* right )
+{
+    assert( 0 );
+}
+
+ml_ftree_t* __ml_FtreeSpec( ml_ftree_t* tree, ml_select_e crit, int limit,
+                                          char* sort )
+{
+    assert( 0 );
+}
+
+void ml_PlaySmartPlaylistBasedOn( media_library_t* p_ml,
+                                                ml_ftree_t* p_tree )
+{
+    assert( 0 );
+}
+
+void ml_DeletePersonTypeFromMedia( ml_media_t* p_media, const char *psz_role )
+{
+    assert( 0 );
+}
+#endif /* !MEDIA_LIBRARY */

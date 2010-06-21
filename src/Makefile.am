@@ -77,6 +77,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_md5.h \
 	../include/vlc_messages.h \
 	../include/vlc_meta.h \
+	../include/vlc_media_library.h \
 	../include/vlc_modules.h \
 	../include/vlc_mouse.h \
 	../include/vlc_mtime.h \
@@ -452,6 +453,7 @@ SOURCES_libvlc_common = \
 	misc/update.c \
 	misc/update_crypto.c \
 	misc/xml.c \
+	misc/media_library.c \
 	extras/libc.c \
 	extras/tdestroy.c \
 	misc/filter.c \

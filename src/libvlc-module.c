@@ -1259,6 +1259,10 @@ static const char *const ppsz_albumart_descriptions[] =
     "The media library is automatically saved and reloaded each time you " \
     "start VLC." )
 
+#define LOAD_ML_TEXT N_( "Load Media Library" )
+#define LOAD_ML_LONGTEXT N_( \
+    "Enable this option to load the SQL-based Media Library at VLC startup" )
+
 #define PLTREE_TEXT N_("Display playlist tree")
 #define PLTREE_LONGTEXT N_( \
     "The playlist can use a tree to categorize some items, like the " \
@@ -2123,6 +2127,10 @@ vlc_module_begin ()
     add_bool( "play-and-pause", 0, NULL, PAP_TEXT, PAP_LONGTEXT, true )
         change_safe()
     add_bool( "media-library", 1, NULL, ML_TEXT, ML_LONGTEXT, false )
+#if defined( MEDIA_LIBRARY )
+    add_bool( "load-media-library-on-startup", 1, NULL, LOAD_ML_TEXT,
+            LOAD_ML_LONGTEXT, false )
+#endif
     add_bool( "playlist-tree", 0, NULL, PLTREE_TEXT, PLTREE_LONGTEXT, false )
 
     add_string( "open", "", NULL, OPEN_TEXT, OPEN_LONGTEXT, false )

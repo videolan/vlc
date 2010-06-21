@@ -68,6 +68,8 @@
 #   include <dbus/dbus.h>
 #endif
 
+
+#include <vlc_media_library.h>
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 
@@ -251,6 +253,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     priv = libvlc_priv (p_libvlc);
     priv->p_playlist = NULL;
+    priv->p_ml = NULL;
     priv->p_dialog_provider = NULL;
     priv->p_vlm = NULL;
 
@@ -819,6 +822,23 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* System specific configuration */
     system_Configure( p_libvlc, i_argc - vlc_optind, ppsz_argv + vlc_optind );
 
+#if defined(MEDIA_LIBRARY)
+    /* Get the ML */
+    if( var_GetBool( p_libvlc, "load-media-library-on-startup" ) == true )
+    {
+        priv->p_ml = __ml_Create( VLC_OBJECT( p_libvlc ), NULL );
+        if( !priv->p_ml )
+        {
+            msg_Err( p_libvlc, "ML initialization failed" );
+            return VLC_EGENERIC;
+        }
+    }
+    else
+    {
+        priv->p_ml = NULL;
+    }
+#endif
+
     /* Add service discovery modules */
     psz_modules = var_InheritString( p_libvlc, "services-discovery" );
     if( psz_modules )
@@ -1013,6 +1033,22 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     /* Free playlist now, all threads are gone */
     playlist_Destroy( p_playlist );
+
+    /* Free playlist now */
+#if defined(MEDIA_LIBRARY)
+    media_library_t* p_ml = priv->p_ml;
+    if( p_ml )
+    {
+        __ml_Destroy( VLC_OBJECT( p_ml ) );
+        vlc_object_release( p_ml );
+        libvlc_priv(p_playlist->p_libvlc)->p_ml = NULL;
+    }
+#endif
+
+    /* Free playlist */
+    /* Any thread still running must not assume pl_Hold() succeeds. */
+    msg_Dbg( p_libvlc, "removing playlist" );
+    vlc_object_release( p_playlist );
 
     stats_TimersDumpAll( p_libvlc );
     stats_TimersCleanAll( p_libvlc );
