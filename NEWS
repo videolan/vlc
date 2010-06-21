@@ -19,7 +19,7 @@ Stream output:
     dst=public_html/iphonestreamfile-###.ts}"
 
 
-Changes between 1.0.5 and 1.1.0:
+Changes between 1.0.6 and 1.1.0:
 --------------------------------
 Important changes for users:
  * On Linux, known bugs in the ALSA library might prevent audio output.
