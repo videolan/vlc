@@ -359,6 +359,8 @@ strings.resolve_xml_special_chars( [str1, [str2, [...]]] ): Resolve XML
   variables as it had arguments.
 strings.convert_xml_special_chars( [str1, [str2, [...]]] ): Do the inverse
   operation.
+strings.iconv( str1 to, str2 from, str ): use vlc_iconv to convert string
+  from encoding to another
 
 Variables
 ---------
