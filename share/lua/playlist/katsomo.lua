@@ -42,6 +42,8 @@ function parse()
        table.insert(p, { path = path; } )
        return p
     end
+    title=""
+    arturl="http://www.katsomo.fi/multimedia/template/logos/katsomo_logo_2.gif"
     while true
     do
         line = vlc.readline()
@@ -49,11 +51,23 @@ function parse()
         if string.match( line, "<title>" )
         then
             title = vlc.strings.decode_uri( find( line, "<title>(.-)<" ) )
+            title = vlc.strings.iconv( "UTF-8", "ISO_8859-1", title )
         end
-        for programid in string.gmatch( line, "<li class=\"program\" id=\"program(%d+)\"" ) do
-            description = vlc.strings.resolve_xml_special_chars( find( line, "title=\"(.+)\"" ) )
-            path = "http://www.katsomo.fi/metafile.asx?p="..programid.."&bw=800"
-            table.insert( p, { path = path; name = title; description = description; url = vlc.path;} )
+        if( find( line, "img class=\"pngImg\" src=\"/multimedia/template/logos" ) )
+        then
+            arturl = "http://www.katsomo.fi"..find( line, " src=\"(.-)\" alt=" )
+        end
+        for treeid,name in string.gmatch( line, "/\?treeId=(%d+)\">([^<]+)</a") do
+            name = vlc.strings.resolve_xml_special_chars( name )
+            name = vlc.strings.iconv( "UTF-8", "ISO_8859-1", name )
+            path = "http://www.katsomo.fi/?treeId="..treeid
+            table.insert( p, { path = path; name = name; url = vlc.path; arturl=arturl; } )
+        end
+        for programid in string.gmatch( line, "<li class=\"program.*\" id=\"program(%d+)\" title=\".+\"" ) do
+           description = vlc.strings.resolve_xml_special_chars( find( line, "title=\"(.+)\"" ) )
+           description = vlc.strings.iconv( "UTF-8", "ISO_8859-1", description )
+           path = "http://www.katsomo.fi/metafile.asx?p="..programid.."&bw=800"
+           table.insert( p, { path = path; name = description; url = vlc.path; arturl=arturl; } )
         end
     end
     return p
