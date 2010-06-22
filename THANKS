@@ -180,6 +180,7 @@ John Paul Lorenti <jpl31 at columbia.edu> - ALSA device selection patch
 Jon Stødle <jonstodle at gmail.com> - Norwegian Nynorsk translation
 Jonas Larsen <jonas at vrt.dk> - Danish translation
 Jörg <vlc-ml at aab.noctis dot de> - VLM seek/show media functions
+Joseph S. Atkinson - FreeBSD port / patches
 Joseph Tulou <brezhoneg1 at yahoo.fr> - small dc1394 patch, image demuxer
 Jouni Kähkönen - Finnish translation
 Julien Blache <jb at technologeek.org> - disc ejection code

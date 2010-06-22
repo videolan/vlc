@@ -96,7 +96,7 @@ static bool IsRemote (int fd)
     if (fstatvfs (fd, &stf))
         return false;
     /* fstatvfs() is in POSIX, but MNT_LOCAL is not */
-    return !(s.f_flag & MNT_LOCAL);
+    return !(stf.f_flag & MNT_LOCAL);
 
 #elif defined (HAVE_LINUX_MAGIC_H)
     struct statfs stf;
