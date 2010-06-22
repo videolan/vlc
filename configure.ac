@@ -1613,7 +1613,7 @@ then
   fi
   AC_ARG_VAR([LUAC], [LUA byte compiler])
   AC_PATH_PROGS(LUAC,[${LUAC} luac], [false])
-  AS_IF([test "${ac_cv_path_LUAC}" = "false"], [
+  AS_IF([test "${LUAC}" = "false"], [
     AC_MSG_ERROR([Could not find the LUA byte compiler.])
   ])
 fi
