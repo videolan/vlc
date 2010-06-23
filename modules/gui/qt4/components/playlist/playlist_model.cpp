@@ -391,7 +391,7 @@ bool PLModel::isParent( const QModelIndex &index, const QModelIndex &current ) c
     if( index == current )
         return true;
 
-    if( !current.parent().isValid() )
+    if( !current.isValid() || !current.parent().isValid() )
         return false;
 
     return isParent( index, current.parent() );
