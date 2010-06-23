@@ -164,7 +164,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         /* 1. Integer function */
         if( !strcmp( s, "!" ) )
         {
-            SSPushN( st, ~SSPopN( st, vars ) );
+            SSPushN( st, !SSPopN( st, vars ) );
         }
         else if( !strcmp( s, "^" ) )
         {
