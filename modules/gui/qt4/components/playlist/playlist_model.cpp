@@ -73,6 +73,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     i_cached_input_id = -1;
     i_popup_item      = i_popup_parent = -1;
     sortingMenu       = NULL;
+    current_index     = QModelIndex();
 
     rootItem          = NULL; /* PLItem rootItem, will be set in rebuild( ) */
 
@@ -98,6 +99,8 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
              this, processItemAppend( int, int ) );
     CONNECT( THEMIM, playlistItemRemoved( int ),
              this, processItemRemoval( int ) );
+    CONNECT( this, currentChanged( const QModelIndex &) ,
+             this, cacheCurrent( const QModelIndex &) );
 }
 
 PLModel::~PLModel()
@@ -380,7 +383,7 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
 
 bool PLModel::isCurrent( const QModelIndex &index ) const
 {
-    return getItem( index )->p_input == THEMIM->currentInputItem();
+    return index == current_index;
 }
 
 int PLModel::itemId( const QModelIndex &index ) const
@@ -429,12 +432,14 @@ QModelIndex PLModel::index( PLItem *item, int column ) const
     return QModelIndex();
 }
 
+void PLModel::cacheCurrent( const QModelIndex &current )
+{
+    current_index = current;
+}
+
 QModelIndex PLModel::currentIndex()
 {
-    input_thread_t *p_input_thread = THEMIM->getInput();
-    if( !p_input_thread ) return QModelIndex();
-    PLItem *item = findByInput( rootItem, input_GetItem( p_input_thread )->i_id );
-    return index( item, 0 );
+    return current_index;
 }
 
 QModelIndex PLModel::parent( const QModelIndex &index ) const

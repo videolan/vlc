@@ -161,6 +161,7 @@ private:
     PLItem *p_cached_item_bi;
     int i_cached_id;
     int i_cached_input_id;
+    QModelIndex current_index;
 
 private slots:
     void popupPlay();
@@ -175,6 +176,7 @@ private slots:
     void processInputItemUpdate( input_thread_t* p_input );
     void processItemRemoval( int i_id );
     void processItemAppend( int item, int parent );
+    void cacheCurrent( const QModelIndex & );
 };
 
 class PlMimeData : public QMimeData
