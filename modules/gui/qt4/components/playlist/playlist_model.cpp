@@ -477,8 +477,7 @@ QModelIndex PLModel::parent( const QModelIndex &index ) const
         msg_Err( p_playlist, "----- PLEASE REPORT THIS ------" );
         return createIndex( 0, 0, parentItem );
     }
-    QModelIndex ind = createIndex(parentItem->row(), 0, parentItem);
-    return ind;
+    return createIndex(parentItem->row(), 0, parentItem);
 }
 
 int PLModel::columnCount( const QModelIndex &i) const
