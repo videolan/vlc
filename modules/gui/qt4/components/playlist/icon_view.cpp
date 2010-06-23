@@ -168,7 +168,10 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
         QRect r( option.rect );
         r.setSize( QSize( 25, 25 ) );
         r.translate( 5, 5 );
-        painter->fillRect( r, option.palette.color( QPalette::Mid ) );
+        if( index.data( PLModel::IsCurrentsParentNodeRole ).toBool() )
+            painter->fillRect( r, option.palette.color( QPalette::Highlight ) );
+        else
+            painter->fillRect( r, option.palette.color( QPalette::Mid ) );
         painter->setOpacity( 1.0 );
         QPixmap dirPix( ":/type/node" );
         QRect r2( dirPix.rect() );

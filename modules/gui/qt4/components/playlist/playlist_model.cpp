@@ -378,7 +378,23 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
         PL_UNLOCK;
         return isLeaf;
     }
+    else if( role == IsCurrentsParentNodeRole )
+    {
+        return QVariant( isParent( index, current_index ) );
+    }
     return QVariant();
+}
+
+/* Seek from current index toward the top and see if index is one of parent nodes */
+bool PLModel::isParent( const QModelIndex &index, const QModelIndex &current ) const
+{
+    if( index == current )
+        return true;
+
+    if( !current.parent().isValid() )
+        return false;
+
+    return isParent( index, current.parent() );
 }
 
 bool PLModel::isCurrent( const QModelIndex &index ) const

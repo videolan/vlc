@@ -59,7 +59,8 @@ friend class PLSelector;
 public:
     enum {
       IsCurrentRole = Qt::UserRole,
-      IsLeafNodeRole
+      IsLeafNodeRole,
+      IsCurrentsParentNodeRole
     };
 
     PLModel( playlist_t *, intf_thread_t *,
@@ -92,6 +93,7 @@ public:
     QModelIndex index( PLItem *, int c ) const;
     QModelIndex index( int i_id, int c );
     QModelIndex currentIndex();
+    bool isParent( const QModelIndex &index, const QModelIndex &current) const;
     bool isCurrent( const QModelIndex &index ) const;
     int itemId( const QModelIndex &index ) const;
     static int columnFromMeta( int meta_column );
