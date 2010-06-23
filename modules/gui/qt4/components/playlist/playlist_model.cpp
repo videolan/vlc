@@ -700,6 +700,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
 
     /* Invalidate cache */
     i_cached_id = i_cached_input_id = -1;
+    current_index = QModelIndex();
 
     if( rootItem ) rootItem->removeChildren();
 
@@ -752,6 +753,7 @@ void PLModel::removeItem( PLItem *item )
 
     i_cached_id = -1;
     i_cached_input_id = -1;
+    current_index = QModelIndex();
 
     if( item->parentItem ) {
         int i = item->parentItem->children.indexOf( item );
@@ -874,6 +876,7 @@ void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
     }
 
     i_cached_id = i_cached_input_id = -1;
+    current_index = QModelIndex();
 
     if( count )
     {
