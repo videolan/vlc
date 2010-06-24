@@ -893,7 +893,7 @@ void CaptureOpenPanel::initialize()
     jackPropLayout->addWidget( jackPace, 2, 1 );
 
     /* Auto Connect */
-    jackConnect = new QCheckBox( qtr( "Auto connnection" ));
+    jackConnect = new QCheckBox( qtr( "Auto connection" ));
     jackPropLayout->addWidget( jackConnect, 2, 2 );
 
     /* Jack CONNECTs */
