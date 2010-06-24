@@ -130,6 +130,10 @@ static const GUID DXVA2_ModeVC1_D = {
     0x1b81beA3, 0xa0c7,0x11d3, {0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5}
 };
 
+static const GUID DXVA_NoEncrypt = {
+    0x1b81bed0, 0xa0c7,0x11d3, {0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5}
+};
+
 /* */
 typedef struct {
     const char   *name;
@@ -899,7 +903,7 @@ static int DxCreateVideoDecoder(vlc_va_dxva2_t *va,
     msg_Dbg(va->log, "we got %d decoder configurations", cfg_count);
 
     /* Select the best decoder configuration */
-    bool has_cfg = false;
+    int cfg_score = 0;
     for (unsigned i = 0; i < cfg_count; i++) {
         const DXVA2_ConfigPictureDecode *cfg = &cfg_list[i];
 
@@ -908,14 +912,23 @@ static int DxCreateVideoDecoder(vlc_va_dxva2_t *va,
                 i, cfg->ConfigBitstreamRaw);
 
         /* */
-        if ((!has_cfg && cfg->ConfigBitstreamRaw == 1) ||
-            (codec_id == CODEC_ID_H264 && cfg->ConfigBitstreamRaw == 2)) {
+        int score;
+        if (cfg->ConfigBitstreamRaw == 1)
+            score = 1;
+        else if (codec_id == CODEC_ID_H264 && cfg->ConfigBitstreamRaw == 2)
+            score = 2;
+        else
+            continue;
+        if (IsEqualGUID(&cfg->guidConfigBitstreamEncryption, &DXVA_NoEncrypt))
+            score += 16;
+
+        if (cfg_score < score) {
             va->cfg = *cfg;
-            has_cfg = true;
+            cfg_score = score;
         }
     }
     CoTaskMemFree(cfg_list);
-    if (!has_cfg) {
+    if (cfg_score <= 0) {
         msg_Err(va->log, "Failed to find a supported decoder configuration");
         return VLC_EGENERIC;
     }
