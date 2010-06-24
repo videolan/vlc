@@ -73,7 +73,6 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     i_cached_input_id = -1;
     i_popup_item      = i_popup_parent = -1;
     sortingMenu       = NULL;
-    current_index     = QModelIndex();
 
     rootItem          = NULL; /* PLItem rootItem, will be set in rebuild( ) */
 
@@ -99,8 +98,6 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
              this, processItemAppend( int, int ) );
     CONNECT( THEMIM, playlistItemRemoved( int ),
              this, processItemRemoval( int ) );
-    CONNECT( this, currentChanged( const QModelIndex &) ,
-             this, cacheCurrent( const QModelIndex &) );
 }
 
 PLModel::~PLModel()
@@ -380,7 +377,7 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
     }
     else if( role == IsCurrentsParentNodeRole )
     {
-        return QVariant( isParent( index, current_index ) );
+        return QVariant( isParent( index, currentIndex() ) );
     }
     return QVariant();
 }
@@ -402,7 +399,7 @@ bool PLModel::isParent( const QModelIndex &index, const QModelIndex &current ) c
 
 bool PLModel::isCurrent( const QModelIndex &index ) const
 {
-    return index == current_index;
+    return getItem( index )->p_input == THEMIM->currentInputItem();
 }
 
 int PLModel::itemId( const QModelIndex &index ) const
@@ -451,14 +448,12 @@ QModelIndex PLModel::index( PLItem *item, int column ) const
     return QModelIndex();
 }
 
-void PLModel::cacheCurrent( const QModelIndex &current )
+QModelIndex PLModel::currentIndex() const
 {
-    current_index = current;
-}
-
-QModelIndex PLModel::currentIndex()
-{
-    return current_index;
+    input_thread_t *p_input_thread = THEMIM->getInput();
+    if( !p_input_thread ) return QModelIndex();
+    PLItem *item = findByInput( rootItem, input_GetItem( p_input_thread )->i_id );
+    return index( item, 0 );
 }
 
 QModelIndex PLModel::parent( const QModelIndex &index ) const
@@ -703,7 +698,6 @@ void PLModel::rebuild( playlist_item_t *p_root )
 
     /* Invalidate cache */
     i_cached_id = i_cached_input_id = -1;
-    current_index = QModelIndex();
 
     if( rootItem ) rootItem->removeChildren();
 
@@ -756,7 +750,6 @@ void PLModel::removeItem( PLItem *item )
 
     i_cached_id = -1;
     i_cached_input_id = -1;
-    current_index = QModelIndex();
 
     if( item->parentItem ) {
         int i = item->parentItem->children.indexOf( item );
@@ -879,7 +872,6 @@ void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
     }
 
     i_cached_id = i_cached_input_id = -1;
-    current_index = QModelIndex();
 
     if( count )
     {
