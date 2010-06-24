@@ -768,7 +768,7 @@ marq_option_bynumber(unsigned option)
     };
     enum { num_opts = sizeof(optlist) / sizeof(*optlist) };
 
-    opt_t *r = option < num_opts ? optlist+option : NULL;
+    const opt_t *r = option < num_opts ? optlist+option : NULL;
     if( !r )
         libvlc_printerr( "Unknown marquee option" );
     return r;
@@ -816,7 +816,7 @@ void libvlc_video_set_marquee_string( libvlc_media_player_t *p_mi,
 /* logo module support */
 
 
-static opt_t *
+static const opt_t *
 logo_option_bynumber( unsigned option )
 {
     static const opt_t vlogo_optlist[] =
@@ -833,7 +833,7 @@ logo_option_bynumber( unsigned option )
     };
     enum { num_vlogo_opts = sizeof(vlogo_optlist) / sizeof(*vlogo_optlist) };
 
-    opt_t *r = option < num_vlogo_opts ? vlogo_optlist+option : NULL;
+    const opt_t *r = option < num_vlogo_opts ? vlogo_optlist+option : NULL;
     if( !r )
         libvlc_printerr( "Unknown logo option" );
     return r;
@@ -864,7 +864,7 @@ int libvlc_video_get_logo_int( libvlc_media_player_t *p_mi,
 /* adjust module support */
 
 
-static opt_t *
+static const opt_t *
 adjust_option_bynumber( unsigned option )
 {
     static const opt_t optlist[] =
@@ -878,7 +878,7 @@ adjust_option_bynumber( unsigned option )
     };
     enum { num_opts = sizeof(optlist) / sizeof(*optlist) };
 
-    opt_t *r = option < num_opts ? optlist+option : NULL;
+    const opt_t *r = option < num_opts ? optlist+option : NULL;
     if( !r )
         libvlc_printerr( "Unknown adjust option" );
     return r;
