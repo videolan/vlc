@@ -115,7 +115,7 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
 {
     Qt::ItemFlags flags = QAbstractItemModel::flags( index );
 
-    PLItem *item = index.isValid() ? getItem( index ) : rootItem;
+    const PLItem *item = index.isValid() ? getItem( index ) : rootItem;
 
     if( canEdit() )
     {
@@ -301,7 +301,7 @@ void PLModel::removeItem( int i_id )
 void PLModel::activateItem( const QModelIndex &index )
 {
     assert( index.isValid() );
-    PLItem *item = getItem( index );
+    const PLItem *item = getItem( index );
     assert( item );
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
@@ -325,10 +325,10 @@ void PLModel::activateItem( playlist_item_t *p_item )
 }
 
 /****************** Base model mandatory implementations *****************/
-QVariant PLModel::data( const QModelIndex &index, int role ) const
+QVariant PLModel::data( const QModelIndex &index, const int role ) const
 {
     if( !index.isValid() ) return QVariant();
-    PLItem *item = getItem( index );
+    const PLItem *item = getItem( index );
     if( role == Qt::DisplayRole )
     {
         int metadata = columnToMeta( index.column() );
@@ -420,7 +420,7 @@ QVariant PLModel::headerData( int section, Qt::Orientation orientation,
     return QVariant( qfu( psz_column_title( meta_col ) ) );
 }
 
-QModelIndex PLModel::index( int row, int column, const QModelIndex &parent )
+QModelIndex PLModel::index( const int row, const int column, const QModelIndex &parent )
                   const
 {
     PLItem *parentItem = parent.isValid() ? getItem( parent ) : rootItem;
@@ -432,7 +432,7 @@ QModelIndex PLModel::index( int row, int column, const QModelIndex &parent )
         return QModelIndex();
 }
 
-QModelIndex PLModel::index( int i_id, int c )
+QModelIndex PLModel::index( const int i_id, const int c )
 {
   return index( findById( rootItem, i_id ), c );
 }
@@ -485,7 +485,7 @@ int PLModel::columnCount( const QModelIndex &i) const
 
 int PLModel::rowCount( const QModelIndex &parent ) const
 {
-    PLItem *parentItem = parent.isValid() ? getItem( parent ) : rootItem;
+    const PLItem *parentItem = parent.isValid() ? getItem( parent ) : rootItem;
     return parentItem->childCount();
 }
 
@@ -494,7 +494,7 @@ QStringList PLModel::selectedURIs()
     QStringList lst;
     for( int i = 0; i < current_selection.size(); i++ )
     {
-        PLItem *item = getItem( current_selection[i] );
+        const PLItem *item = getItem( current_selection[i] );
         if( item )
         {
             PL_LOCK;
@@ -637,7 +637,7 @@ void PLModel::processItemAppend( int i_item, int i_parent )
     PLItem *nodeItem = findById( rootItem, i_parent );
     if( !nodeItem ) return;
 
-    foreach( PLItem *existing, nodeItem->children )
+    foreach( const PLItem *existing, nodeItem->children )
       if( existing->i_id == i_item ) return;
 
     PL_LOCK;
@@ -810,12 +810,12 @@ void PLModel::recurseDelete( QList<PLItem*> children, QModelIndexList *fullList 
 }
 
 /******* Volume III: Sorting and searching ********/
-void PLModel::sort( int column, Qt::SortOrder order )
+void PLModel::sort( const int column, Qt::SortOrder order )
 {
     sort( rootItem->i_id, column, order );
 }
 
-void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
+void PLModel::sort( const int i_root_id, const int column, Qt::SortOrder order )
 {
     msg_Dbg( p_intf, "Sorting by column %i, order %i", column, order );
 

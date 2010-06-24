@@ -70,13 +70,13 @@ public:
     /*** QModel subclassing ***/
 
     /* Data structure */
-    QVariant data( const QModelIndex &index, int role ) const;
+    QVariant data( const QModelIndex &index, const int role ) const;
     QVariant headerData( int section, Qt::Orientation orientation,
                          int role = Qt::DisplayRole ) const;
     int rowCount( const QModelIndex &parent = QModelIndex() ) const;
     int columnCount( const QModelIndex &parent = QModelIndex() ) const;
     Qt::ItemFlags flags( const QModelIndex &index ) const;
-    QModelIndex index( int r, int c, const QModelIndex &parent ) const;
+    QModelIndex index( const int r, const int c, const QModelIndex &parent ) const;
     QModelIndex parent( const QModelIndex &index ) const;
 
     /* Drag and Drop */
@@ -90,8 +90,8 @@ public:
 
     /* Lookups */
     QStringList selectedURIs();
-    QModelIndex index( PLItem *, int c ) const;
-    QModelIndex index( int i_id, int c );
+    QModelIndex index( PLItem *, const int c ) const;
+    QModelIndex index( const int i_id, const int c );
     QModelIndex currentIndex() const;
     bool isParent( const QModelIndex &index, const QModelIndex &current) const;
     bool isCurrent( const QModelIndex &index ) const;
@@ -103,8 +103,8 @@ public:
     bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
     void doDelete( QModelIndexList selected );
     void search( const QString& search_text, const QModelIndex & root, bool b_recursive );
-    void sort( int column, Qt::SortOrder order );
-    void sort( int i_root_id, int column, Qt::SortOrder order );
+    void sort( const int column, Qt::SortOrder order );
+    void sort( const int i_root_id, const int column, Qt::SortOrder order );
     void rebuild();
     void rebuild( playlist_item_t * );
 
