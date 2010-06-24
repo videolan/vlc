@@ -680,9 +680,12 @@ static void SDPHandleUrl( sout_stream_t *p_stream, const char *psz_url )
         if( p_sys->p_mux != NULL )
         {
             sout_stream_id_t *id = p_sys->es[0];
-            id->rtsp_id = RtspAddId( p_sys->rtsp, id, GetDWBE( id->ssrc ),
-                                     p_sys->psz_destination, p_sys->i_ttl,
-                                     id->i_port, id->i_port + 1 );
+            rtsp_stream_id_t *rtsp_id = RtspAddId( p_sys->rtsp, id, GetDWBE( id->ssrc ),
+                                                   p_sys->psz_destination, p_sys->i_ttl,
+                                                   id->i_port, id->i_port + 1 );
+            vlc_mutex_lock( &p_sys->lock_es );
+            id->rtsp_id = rtsp_id;
+            vlc_mutex_unlock( &p_sys->lock_es );
         }
     }
     else if( ( url.psz_protocol && !strcasecmp( url.psz_protocol, "sap" ) ) ||
@@ -742,7 +745,7 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
     int inclport;
 
     vlc_mutex_lock( &p_sys->lock_es );
-    if( unlikely(p_sys->i_es == 0) )
+    if( unlikely(p_sys->i_es == 0 || (rtsp_url != NULL && !p_sys->es[0]->rtsp_id)) )
         goto out; /* hmm... */
 
     if( p_sys->psz_destination != NULL )
