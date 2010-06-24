@@ -388,6 +388,9 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
 /* Seek from current index toward the top and see if index is one of parent nodes */
 bool PLModel::isParent( const QModelIndex &index, const QModelIndex &current ) const
 {
+    if( !index.isValid() )
+        return false;
+
     if( index == current )
         return true;
 
