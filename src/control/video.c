@@ -672,6 +672,46 @@ get_int( libvlc_media_player_t *p_mi, const char *restrict name,
 
 
 static void
+set_float( libvlc_media_player_t *p_mi, const char *restrict name,
+            const opt_t *restrict opt, float value )
+{
+    if( !opt ) return;
+
+    if( opt->type != VLC_VAR_FLOAT )
+    {
+        libvlc_printerr( "Invalid argument to %s in %s", name, "set float" );
+        return;
+    }
+
+    var_SetFloat( p_mi, opt->name, value );
+
+    vlc_object_t *object = get_object( p_mi, name );
+    if( object )
+    {
+        var_SetFloat(object, opt->name, value );
+        vlc_object_release( object );
+    }
+}
+
+
+static float
+get_float( libvlc_media_player_t *p_mi, const char *restrict name,
+            const opt_t *restrict opt )
+{
+    if( !opt ) return 0.0;
+
+
+    if( opt->type != VLC_VAR_FLOAT )
+    {
+        libvlc_printerr( "Invalid argument to %s in %s", name, "get float" );
+        return 0.0;
+    }
+
+    return var_GetFloat( p_mi, opt->name );
+}
+
+
+static void
 set_string( libvlc_media_player_t *p_mi, const char *restrict name,
             const opt_t *restrict opt, const char *restrict psz_value )
 {
@@ -821,3 +861,53 @@ int libvlc_video_get_logo_int( libvlc_media_player_t *p_mi,
 }
 
 
+/* adjust module support */
+
+
+static opt_t *
+adjust_option_bynumber( unsigned option )
+{
+    static const opt_t optlist[] =
+    {
+        { "adjust",               0 },
+        { "contrast",             VLC_VAR_FLOAT },
+        { "brightness",           VLC_VAR_FLOAT },
+        { "hue",                  VLC_VAR_INTEGER },
+        { "saturation",           VLC_VAR_FLOAT },
+        { "gamma",                VLC_VAR_FLOAT },
+    };
+    enum { num_opts = sizeof(optlist) / sizeof(*optlist) };
+
+    opt_t *r = option < num_opts ? optlist+option : NULL;
+    if( !r )
+        libvlc_printerr( "Unknown adjust option" );
+    return r;
+}
+
+
+void libvlc_video_set_adjust_int( libvlc_media_player_t *p_mi,
+                                  unsigned option, int value )
+{
+    set_int( p_mi, "adjust", adjust_option_bynumber(option), value );
+}
+
+
+int libvlc_video_get_adjust_int( libvlc_media_player_t *p_mi,
+                                 unsigned option )
+{
+    return get_int( p_mi, "adjust", adjust_option_bynumber(option) );
+}
+
+
+void libvlc_video_set_adjust_float( libvlc_media_player_t *p_mi,
+                                    unsigned option, float value )
+{
+    set_float( p_mi, "adjust", adjust_option_bynumber(option), value );
+}
+
+
+float libvlc_video_get_adjust_float( libvlc_media_player_t *p_mi,
+                                     unsigned option )
+{
+    return get_float( p_mi, "adjust", adjust_option_bynumber(option) );
+}
