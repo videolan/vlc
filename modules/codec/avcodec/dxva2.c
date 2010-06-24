@@ -58,9 +58,6 @@
 #include <shlwapi.h>
 #include <d3d9.h>
 
-/* FIXME */
-#define CoTaskMemFree(x)
-
 /* */
 #define DXVA2_E_NOT_INITIALIZED     MAKE_HRESULT(1, 4, 4096)
 #define DXVA2_E_NEW_VIDEO_DEVICE    MAKE_HRESULT(1, 4, 4097)
