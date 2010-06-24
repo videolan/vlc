@@ -92,7 +92,7 @@ public:
     QStringList selectedURIs();
     QModelIndex index( PLItem *, int c ) const;
     QModelIndex index( int i_id, int c );
-    QModelIndex currentIndex();
+    QModelIndex currentIndex() const;
     bool isParent( const QModelIndex &index, const QModelIndex &current) const;
     bool isCurrent( const QModelIndex &index ) const;
     int itemId( const QModelIndex &index ) const;
@@ -154,9 +154,9 @@ private:
     QSignalMapper *sortingMapper;
 
     /* Lookups */
-    PLItem *findById( PLItem *, int );
-    PLItem *findByInput( PLItem *, int );
-    PLItem *findInner( PLItem *, int , bool );
+    PLItem *findById( PLItem *, int ) const;
+    PLItem *findByInput( PLItem *, int ) const;
+    PLItem *findInner(PLItem *, int , bool ) const;
     bool canEdit() const;
 
     PLItem *p_cached_item;

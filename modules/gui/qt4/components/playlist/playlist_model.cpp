@@ -517,71 +517,46 @@ QStringList PLModel::selectedURIs()
 
 /************************* Lookups *****************************/
 
-PLItem *PLModel::findById( PLItem *root, int i_id )
+PLItem *PLModel::findById( PLItem *root, int i_id ) const
 {
     return findInner( root, i_id, false );
 }
 
-PLItem *PLModel::findByInput( PLItem *root, int i_id )
+PLItem *PLModel::findByInput( PLItem *root, int i_id ) const
 {
     PLItem *result = findInner( root, i_id, true );
     return result;
 }
 
-#define CACHE( i, p ) { i_cached_id = i; p_cached_item = p; }
-#define ICACHE( i, p ) { i_cached_input_id = i; p_cached_item_bi = p; }
-
-PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_input )
+PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_input ) const
 {
     if( !root ) return NULL;
-    if( ( !b_input && i_cached_id == i_id) ||
-        ( b_input && i_cached_input_id ==i_id ) )
-    {
-        return b_input ? p_cached_item_bi : p_cached_item;
-    }
 
     if( !b_input && root->i_id == i_id )
-    {
-        CACHE( i_id, root );
         return root;
-    }
+
     else if( b_input && root->p_input->i_id == i_id )
-    {
-        ICACHE( i_id, root );
         return root;
-    }
 
     QList<PLItem *>::iterator it = root->children.begin();
     while ( it != root->children.end() )
     {
         if( !b_input && (*it)->i_id == i_id )
-        {
-            CACHE( i_id, (*it) );
-            return p_cached_item;
-        }
+             return (*it);
+
         else if( b_input && (*it)->p_input->i_id == i_id )
-        {
-            ICACHE( i_id, (*it) );
-            return p_cached_item_bi;
-        }
+             return (*it);
+
         if( (*it)->children.size() )
         {
             PLItem *childFound = findInner( (*it), i_id, b_input );
             if( childFound )
-            {
-                if( b_input )
-                    ICACHE( i_id, childFound )
-                else
-                    CACHE( i_id, childFound )
-                return childFound;
-            }
+               return childFound;
         }
         it++;
     }
     return NULL;
 }
-#undef CACHE
-#undef ICACHE
 
 int PLModel::columnToMeta( int _column )
 {
