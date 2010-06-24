@@ -103,13 +103,13 @@ static const char *const enc_chromafmt_list_text[] =
 #define ENC_CODINGMODE "coding-mode"
 #define ENC_CODINGMODE_TEXT N_("Picture coding mode")
 #define ENC_CODINGMODE_LONGTEXT N_("Field coding is where interlaced fields are coded" \
-                                   " seperately as opposed to a pseudo-progressive frame")
+                                   " separately as opposed to a pseudo-progressive frame")
 static const char *const enc_codingmode_list[] =
   { "auto", "progressive", "field" };
 static const char *const enc_codingmode_list_text[] =
   { N_("auto - let encoder decide based upon input (Best)"),
     N_("force coding frame as single picture"),
-    N_("force coding frame as seperate interlaced fields"),
+    N_("force coding frame as separate interlaced fields"),
   };
 
 #define ENC_MCBLK_WIDTH "mc-blk-width"

@@ -1,5 +1,5 @@
 /*
- * DmxTools.cpp: functions to convert , or ; seperatered numbers into an integer array
+ * DmxTools.cpp: functions to convert , or ; separated numbers into an integer array
  *
  * See the README.txt file for copyright information and how to reach the author(s).
  *

@@ -821,7 +821,7 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
         /* chroma_format_idc */
         const int i_chroma_format_idc = bs_read_ue( &s );
         if( i_chroma_format_idc == 3 )
-            bs_skip( &s, 1 ); /* seperate_colour_plane_flag */
+            bs_skip( &s, 1 ); /* separate_colour_plane_flag */
         /* bit_depth_luma_minus8 */
         bs_read_ue( &s );
         /* bit_depth_chroma_minus8 */

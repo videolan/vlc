@@ -195,7 +195,7 @@ struct osd_button_t
  *
  * The images that make up an OSD menu can be created in such away that
  * they contain all buttons in the same picture, with the selected one
- * highlighted or being a concatenation of all the seperate images. The
+ * highlighted or being a concatenation of all the separate images. The
  * first case is the default.
  *
  * To change the default style the keyword 'style' should be set to 'concat'.
