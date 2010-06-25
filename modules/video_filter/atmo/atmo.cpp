@@ -127,7 +127,7 @@ strings for settings menus and hints
  "in live action.")
 
 #define DRIVER_TEXT            N_("Device type")
-#define DRIVER_LONGTEXT        N_("Choose your prefered hardware from " \
+#define DRIVER_LONGTEXT        N_("Choose your preferred hardware from " \
                                   "the list, or choose AtmoWin Software " \
                                   "to delegate processing to the external " \
                                   "process - with more options")
@@ -340,7 +340,7 @@ static const char *const ppsz_zone_assignment_descriptions[] = {
                                      "pixels, containing a grayscale gradient")
 
 #define GRADIENT_PATH_TEXT      N_("Gradient bitmap searchpath")
-#define GRADIENT_PATH_LONGTEXT  N_("Now prefered option to assign gradient "\
+#define GRADIENT_PATH_LONGTEXT  N_("Now preferred option to assign gradient "\
     "bitmaps, put them as zone_0.bmp, zone_1.bmp etc. into one folder and "\
     "set the foldername here")
 

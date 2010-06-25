@@ -200,7 +200,7 @@ AtmoLight Channel 4: gets zone 0 (top)
 Also the settings for Gradient images change for the new devices, its no longer
 sufficient to speficy only 5 image name - because the number of zones is no longer
 fixed to five.
-So its prefered to set a path ("Gradient Bitmap searchpath"), where files 
+So its preferred to set a path ("Gradient Bitmap searchpath"), where files 
 like "zone_0.bmp" "zone_1.bmp" etc. exists. (with the same rules as defined for 
 the old zone bitmaps.)
 --> I think in most cases its no longer required to use this option,

@@ -374,7 +374,7 @@ static void OutputStart( sout_stream_t *p_stream )
     const char *psz_muxer = NULL;
     const char *psz_extension = NULL;
 
-    /* Look for prefered muxer
+    /* Look for preferred muxer
      * TODO we could insert transcode in a few cases like
      * s16l <-> s16b
      */

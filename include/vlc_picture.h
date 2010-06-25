@@ -119,7 +119,7 @@ VLC_EXPORT( picture_t *, picture_New, ( vlc_fourcc_t i_chroma, int i_width, int 
 /**
  * This function will create a new picture using the given format.
  *
- * When possible, it is prefered to use this function over picture_New
+ * When possible, it is preferred to use this function over picture_New
  * as more information about the format is kept.
  */
 VLC_EXPORT( picture_t *, picture_NewFromFormat, ( const video_format_t *p_fmt ) );
