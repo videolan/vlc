@@ -128,8 +128,8 @@ static int vlclua_iconv( lua_State *L )
 
     if( iconv_handle == (vlc_iconv_t)-1 )
        return vlclua_error( L );
-    psz_output = psz_original = malloc( 4 * i_in_bytes );
     i_out_bytes = 4 * i_in_bytes;
+    psz_output = psz_original = malloc( i_out_bytes + 1 );
     i_ret = vlc_iconv( iconv_handle, &psz_input ,
                        &i_in_bytes, &psz_output, &i_out_bytes );
     *psz_output = '\0';
