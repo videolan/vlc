@@ -341,10 +341,12 @@ int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
         i_max_pes_size = PES_PAYLOAD_SIZE_MAX;
     }
 
-    if( p_fmt->i_codec == VLC_CODEC_MP4V &&
+    if( ( p_fmt->i_codec == VLC_CODEC_MP4V ||
+          p_fmt->i_codec == VLC_CODEC_H264 ) &&
         p_es->i_flags & BLOCK_FLAG_TYPE_I )
     {
-        /* For MPEG4 video, add VOL before I-frames */
+        /* For MPEG4 video, add VOL before I-frames,
+           for H264 add SPS/PPS before keyframes*/
         p_es = block_Realloc( p_es, p_fmt->i_extra, p_es->i_buffer );
 
         memcpy( p_es->p_buffer, p_fmt->p_extra, p_fmt->i_extra );
