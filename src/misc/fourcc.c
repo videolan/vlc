@@ -787,7 +787,10 @@ static const entry_t p_list_video[] = {
         A("pcx "),
 
     B(VLC_CODEC_JPEG2000, "JPEG 2000 Image"),
+        A("JP2K"),
         A("mjp2"),
+        A("MJP2"),
+        A("MJ2C"),
 
     B(0, "")
 };
