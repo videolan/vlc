@@ -114,6 +114,7 @@
 #define VLC_CODEC_AMV       VLC_FOURCC('A','M','V',' ')
 #define VLC_CODEC_INDEO5    VLC_FOURCC('I','V','5','0')
 #define VLC_CODEC_VP8       VLC_FOURCC('V','P','8','0')
+#define VLC_CODEC_JPEG2000  VLC_FOURCC('J','P','2','K')
 
 
 /* Planar YUV 4:1:0 Y:V:U */

@@ -261,6 +261,7 @@ static const struct
     { VLC_CODEC_GIF, CODEC_ID_GIF, VIDEO_ES },
     { VLC_CODEC_TARGA, CODEC_ID_TARGA, VIDEO_ES },
     { VLC_CODEC_SGI, CODEC_ID_SGI, VIDEO_ES },
+    { VLC_CODEC_JPEG2000, CODEC_ID_JPEG2000, VIDEO_ES },
 
     /*
      *  Audio Codecs
