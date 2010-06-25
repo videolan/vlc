@@ -62,6 +62,7 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     description->setPalette( palette );
 
     title = new QLabel( qtr( "Title" ), this );
+    title->setWordWrap( true );
 
     boxLayout->addWidget( title );
     boxLayout->addWidget( description );
