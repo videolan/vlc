@@ -282,15 +282,6 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
     i_fname_len = strlen( f_fname );
 
-    /* HACK: do not look for subtitles for Transport Streams */
-    /* This breaks the clock synchronization */
-    if( i_fname_len > 3 && !strcasecmp( f_fname + i_fname_len - 3, ".ts" ) )
-    {
-        free( f_dir );
-        free( psz_fname );
-        return NULL;
-    }
-
     f_fname_noext = malloc(i_fname_len + 1);
     f_fname_trim = malloc(i_fname_len + 1 );
     if( !f_fname_noext || !f_fname_trim )
