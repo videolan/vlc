@@ -199,7 +199,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     if (vlc == NULL)
         goto out;
 
-#if !defined (HAVE_MAEMO)
+#if !defined (HAVE_MAEMO) && !defined __APPLE__
     libvlc_add_intf (vlc, "globalhotkeys,none");
 #endif
     if (libvlc_add_intf (vlc, NULL))
