@@ -401,54 +401,82 @@ vlm_t *vlm_New (vlc_object_t *obj)
 
 media_library_t* __ml_Hold ( vlc_object_t* p_this )
 {
+    VLC_UNUSED( p_this );
     return NULL;
 }
 
 void __ml_Release ( vlc_object_t* p_this )
 {
+    VLC_UNUSED( p_this );
     assert( 0 );
 }
 
 media_library_t* __ml_Create ( vlc_object_t *p_this, char* psz_name )
 {
+    VLC_UNUSED( p_this );
+    VLC_UNUSED( psz_name );
     return NULL;
 }
 
 void __ml_Destroy( vlc_object_t * p_this )
 {
+    VLC_UNUSED( p_this );
     assert( 0 );
 }
 
 ml_media_t* media_New( media_library_t* p_ml, int id, ml_select_e select, bool reload )
 {
+    VLC_UNUSED( p_ml );
+    VLC_UNUSED( id );
+    VLC_UNUSED( select );
+    VLC_UNUSED( reload );
     assert( 0 );
+    return NULL;
 }
 
 int __ml_UpdateSimple( media_library_t *p_media_library, ml_select_e selected_type,
                                      const char* psz_lvalue, int id, ... )
 {
+    VLC_UNUSED( p_media_library );
+    VLC_UNUSED( selected_type );
+    VLC_UNUSED( psz_lvalue );
+    VLC_UNUSED( id );
     assert( 0 );
+    return 0;
 }
 
 ml_ftree_t* ml_OpConnectChilds( ml_op_e op, ml_ftree_t* left, ml_ftree_t* right )
 {
+    VLC_UNUSED( op );
+    VLC_UNUSED( left );
+    VLC_UNUSED( right );
     assert( 0 );
+    return NULL;
 }
 
 ml_ftree_t* __ml_FtreeSpec( ml_ftree_t* tree, ml_select_e crit, int limit,
                                           char* sort )
 {
+    VLC_UNUSED( tree );
+    VLC_UNUSED( crit );
+    VLC_UNUSED( limit );
+    VLC_UNUSED( sort );
     assert( 0 );
+    return NULL;
 }
 
 void ml_PlaySmartPlaylistBasedOn( media_library_t* p_ml,
                                                 ml_ftree_t* p_tree )
 {
+    VLC_UNUSED( p_ml );
+    VLC_UNUSED( p_tree );
     assert( 0 );
 }
 
 void ml_DeletePersonTypeFromMedia( ml_media_t* p_media, const char *psz_role )
 {
+    VLC_UNUSED( p_media );
+    VLC_UNUSED( psz_role );
     assert( 0 );
 }
 
@@ -456,6 +484,10 @@ ml_person_t*  ml_GetPersonsFromMedia( media_library_t* p_ml,
                                                     ml_media_t* p_media,
                                                     const char *psz_role )
 {
+    VLC_UNUSED( p_ml );
+    VLC_UNUSED( p_media );
+    VLC_UNUSED( psz_role );
     assert( 0 );
+    return NULL;
 }
 #endif /* !MEDIA_LIBRARY */
