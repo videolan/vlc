@@ -867,6 +867,7 @@ static void ALSAFill( aout_instance_t * p_aout )
     if( p_buffer == NULL )
         goto error;
 
+    block_cleanup_push( p_buffer );
     for (;;)
     {
         int n = snd_pcm_poll_descriptors_count(p_pcm);
@@ -912,7 +913,7 @@ static void ALSAFill( aout_instance_t * p_aout )
         msg_Err( p_aout, "cannot write: %s", snd_strerror( i_snd_rc ) );
 
     vlc_restorecancel(canc);
-    block_Release( p_buffer );
+    vlc_cleanup_run();
     return;
 
 error:
