@@ -204,8 +204,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                  p_sys->i_channel_mask, (int)p_sys->b_chan_reorder );
     }
 
-    i_format = p_input->p_fmt->i_codec == VLC_CODEC_FL32 ?
-        WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM;
+    fourcc_to_wf_tag( p_input->p_fmt->i_codec, &i_format );
     b_ext = p_sys->b_ext = p_input->p_fmt->audio.i_channels > 2;
 
     /* Build a WAV header for the output data */

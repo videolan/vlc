@@ -309,8 +309,14 @@ static const struct
 wave_format_tag_to_fourcc[] =
 {
     { WAVE_FORMAT_PCM,        VLC_FOURCC( 'a', 'r', 'a', 'w' ), "Raw audio" },
+    { WAVE_FORMAT_PCM,        VLC_CODEC_S8,                     "PCM S8 audio" },
+    { WAVE_FORMAT_PCM,        VLC_CODEC_S16L,                   "PCM S16L audio" },
+    { WAVE_FORMAT_PCM,        VLC_CODEC_S24L,                   "PCM S24L audio" },
+    { WAVE_FORMAT_PCM,        VLC_CODEC_S32L,                   "PCM S32L audio" },
     { WAVE_FORMAT_ADPCM,      VLC_CODEC_ADPCM_MS,               "ADPCM" },
     { WAVE_FORMAT_IEEE_FLOAT, VLC_FOURCC( 'a', 'f', 'l', 't' ), "IEEE Float audio" },
+    { WAVE_FORMAT_IEEE_FLOAT, VLC_CODEC_F32L,                   "PCM 32 (Float) audio" },
+    { WAVE_FORMAT_IEEE_FLOAT, VLC_CODEC_F64L,                   "PCM 64 (Float) audio" },
     { WAVE_FORMAT_ALAW,       VLC_CODEC_ALAW,                   "A-Law" },
     { WAVE_FORMAT_MULAW,      VLC_CODEC_MULAW,                  "Mu-Law" },
     { WAVE_FORMAT_IMA_ADPCM,  VLC_CODEC_ADPCM_IMA_WAV,          "Ima-ADPCM" },
