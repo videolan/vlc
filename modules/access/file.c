@@ -134,7 +134,6 @@ static bool IsRemote (int fd)
 int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
-    const char   *path = p_access->psz_filepath;
 #ifdef WIN32
     bool is_remote = false;
 #endif
@@ -145,11 +144,11 @@ int Open( vlc_object_t *p_this )
     if (!strcasecmp (p_access->psz_access, "fd"))
     {
         char *end;
-        int oldfd = strtol (path, &end, 10);
+        int oldfd = strtol (p_access->psz_location, &end, 10);
 
         if (*end == '\0')
             fd = vlc_dup (oldfd);
-        else if (*end == '/' && end > path)
+        else if (*end == '/' && end > p_access->psz_location)
         {
             char *name = decode_URI_duplicate (end - 1);
             if (name != NULL)
@@ -162,6 +161,8 @@ int Open( vlc_object_t *p_this )
     }
     else
     {
+        const char *path = p_access->psz_filepath;
+
         msg_Dbg (p_access, "opening file `%s'", path);
         fd = vlc_open (path, O_RDONLY | O_NONBLOCK);
         if (fd == -1)
