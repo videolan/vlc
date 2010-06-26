@@ -451,4 +451,11 @@ void ml_DeletePersonTypeFromMedia( ml_media_t* p_media, const char *psz_role )
 {
     assert( 0 );
 }
+
+ml_person_t*  ml_GetPersonsFromMedia( media_library_t* p_ml,
+                                                    ml_media_t* p_media,
+                                                    const char *psz_role )
+{
+    assert( 0 );
+}
 #endif /* !MEDIA_LIBRARY */
