@@ -245,7 +245,6 @@ __ml_Create
 __ml_Destroy
 __ml_Hold
 __ml_Release
-media_Destroy
 media_New
 ml_OpConnectChilds
 __ml_FtreeSpec
@@ -253,8 +252,6 @@ __ml_UpdateSimple
 ml_GetPersonsFromMedia
 ml_DeletePersonTypeFromMedia
 ml_PlaySmartPlaylistBasedOn
-ml_gc_decref
-ml_gc_incref
 module_config_free
 module_config_get
 module_exists
