@@ -1034,7 +1034,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     /* Free playlist now, all threads are gone */
     playlist_Destroy( p_playlist );
 
-    /* Free playlist now */
 #if defined(MEDIA_LIBRARY)
     media_library_t* p_ml = priv->p_ml;
     if( p_ml )
@@ -1044,11 +1043,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         libvlc_priv(p_playlist->p_libvlc)->p_ml = NULL;
     }
 #endif
-
-    /* Free playlist */
-    /* Any thread still running must not assume pl_Hold() succeeds. */
-    msg_Dbg( p_libvlc, "removing playlist" );
-    vlc_object_release( p_playlist );
 
     stats_TimersDumpAll( p_libvlc );
     stats_TimersCleanAll( p_libvlc );
