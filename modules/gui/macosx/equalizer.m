@@ -113,7 +113,7 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
 static bool GetFiltersStatus( intf_thread_t *p_intf,
                                  char *psz_name )
 {
-    char *psz_parser, *psz_string;
+    char *psz_parser, *psz_string = NULL;
     vlc_object_t *p_object = VLC_OBJECT(getAout());
     if( p_object == NULL )
         p_object = vlc_object_hold(pl_Get( p_intf ));
