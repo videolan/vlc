@@ -164,7 +164,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     GUID subformat_guid = {0, 0, 0x10,{0x80, 0, 0, 0xaa, 0, 0x38, 0x9b, 0x71}};
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     WAVEFORMATEX *p_waveformat = &p_sys->waveformat.Format;
-    int i_bytes_per_sample, i_format;
+    int i_bytes_per_sample;
+    uint16_t i_format;
     bool b_ext;
 
     if( p_input->p_fmt->i_cat != AUDIO_ES )
