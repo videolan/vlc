@@ -359,6 +359,7 @@ struct demux_sys_t
     bool        b_user_pmt;
     int         i_pmt;
     ts_pid_t    **pmt;
+    int         i_pmt_es;
 
     /* */
     bool        b_es_id_pid;
@@ -400,7 +401,7 @@ static int DemuxFile( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
 static void PIDInit ( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner );
-static void PIDClean( es_out_t *out, ts_pid_t *pid );
+static void PIDClean( demux_t *, ts_pid_t *pid );
 static int  PIDFillFormat( ts_pid_t *pid, int i_stream_type );
 
 static void PATCallBack( demux_t *, dvbpsi_pat_t * );
@@ -708,6 +709,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Init PMT array */
     TAB_INIT( p_sys->i_pmt, p_sys->pmt );
+    p_sys->i_pmt_es = 0;
 
     /* Read config */
     p_sys->b_es_id_pid = var_CreateGetBool( p_demux, "ts-es-id-pid" );
@@ -804,6 +806,14 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_silent = var_CreateGetBool( p_demux, "ts-silent" );
     p_sys->b_split_es = var_InheritBool( p_demux, "ts-split-es" );
 
+    while( !p_sys->b_file_out && p_sys->i_pmt_es <= 0 &&
+           vlc_object_alive( p_demux ) )
+    {
+        if( p_demux->pf_demux( p_demux ) != 1 )
+            break;
+    }
+
+
     return VLC_SUCCESS;
 }
 
@@ -840,14 +850,14 @@ static void Close( vlc_object_t *p_this )
                 }
                 else
                 {
-                    PIDClean( p_demux->out, pid );
+                    PIDClean( p_demux, pid );
                 }
                 break;
             }
         }
         else if( pid->b_valid && pid->es )
         {
-            PIDClean( p_demux->out, pid );
+            PIDClean( p_demux, pid );
         }
 
         if( pid->b_seen )
@@ -1036,6 +1046,7 @@ static int DemuxFile( demux_t *p_demux )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    bool b_wait_es = p_sys->i_pmt_es <= 0;
 
     /* We read at most 100 TS packet or until a frame is completed */
     for( int i_pkt = 0; i_pkt < p_sys->i_ts_read; i_pkt++ )
@@ -1151,7 +1162,7 @@ static int Demux( demux_t *p_demux )
         }
         p_pid->b_seen = true;
 
-        if( b_frame )
+        if( b_frame || ( b_wait_es && p_sys->i_pmt_es > 0 ) )
             break;
     }
 
@@ -1522,6 +1533,7 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
                          (char*)&pid->es->fmt.i_codec );
                 pid->es->id = es_out_Add( p_demux->out,
                                           &pid->es->fmt );
+                p_sys->i_pmt_es++;
             }
         }
 
@@ -1603,8 +1615,11 @@ static void PIDInit( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner )
     }
 }
 
-static void PIDClean( es_out_t *out, ts_pid_t *pid )
+static void PIDClean( demux_t *p_demux, ts_pid_t *pid )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
+    es_out_t *out = p_demux->out;
+
     if( pid->psi )
     {
         if( pid->psi->handle )
@@ -1623,7 +1638,10 @@ static void PIDClean( es_out_t *out, ts_pid_t *pid )
     else
     {
         if( pid->es->id )
+        {
             es_out_Del( out, pid->es->id );
+            p_sys->i_pmt_es--;
+        }
 
         if( pid->es->p_pes )
             block_ChainRelease( pid->es->p_pes );
@@ -1635,7 +1653,10 @@ static void PIDClean( es_out_t *out, ts_pid_t *pid )
         for( int i = 0; i < pid->i_extra_es; i++ )
         {
             if( pid->extra_es[i]->id )
+            {
                 es_out_Del( out, pid->extra_es[i]->id );
+                p_sys->i_pmt_es--;
+            }
 
             if( pid->extra_es[i]->p_pes )
                 block_ChainRelease( pid->extra_es[i]->p_pes );
@@ -1868,6 +1889,9 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 {
     demux_sys_t   *p_sys = p_demux->p_sys;
     const uint8_t *p = p_bk->p_buffer;
+
+    if( p_sys->i_pmt_es <= 0 )
+        return;
 
     if( ( p[3]&0x20 ) && /* adaptation */
         ( p[5]&0x10 ) &&
@@ -4156,7 +4180,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             {
                 if( old_pid )
                 {
-                    PIDClean( p_demux->out, old_pid );
+                    PIDClean( p_demux, old_pid );
                     TAB_REMOVE( i_clean, pp_clean, old_pid );
                     old_pid = 0;
                 }
@@ -4167,13 +4191,14 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     pid->extra_es[i]->id =
                         es_out_Add( p_demux->out, &pid->extra_es[i]->fmt );
                 }
+                p_sys->i_pmt_es += 1 + pid->i_extra_es;
             }
         }
 
         /* Add ES to the list */
         if( old_pid )
         {
-            PIDClean( p_demux->out, old_pid );
+            PIDClean( p_demux, old_pid );
             TAB_REMOVE( i_clean, pp_clean, old_pid );
         }
         p_sys->pid[p_es->i_pid] = *pid;
@@ -4211,7 +4236,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                             false );
         }
 
-        PIDClean( p_demux->out, pp_clean[i] );
+        PIDClean( p_demux, pp_clean[i] );
     }
     if( i_clean )
         free( pp_clean );
@@ -4298,7 +4323,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                             p_sys->b_access_control = false;
                     }
 
-                    PIDClean( p_demux->out, pid );
+                    PIDClean( p_demux, pid );
                     break;
                 }
             }
@@ -4321,7 +4346,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                 es_out_Control( p_demux->out, ES_OUT_DEL_GROUP, i_number );
             }
 
-            PIDClean( p_demux->out, &p_sys->pid[pmt_rm[i]->i_pid] );
+            PIDClean( p_demux, &p_sys->pid[pmt_rm[i]->i_pid] );
             TAB_REMOVE( p_sys->i_pmt, p_sys->pmt, pmt_rm[i] );
         }
 
