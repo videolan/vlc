@@ -697,8 +697,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_subtitle setTitle: _NS("Subtitles Track")];
     [o_mu_subtitle setTitle: _NS("Subtitles Track")];
     [o_mi_addSub setTitle: _NS("Open File...")];
-    [o_mi_deinterlace setTitle: _NS("Deinterlace")];
-    [o_mu_deinterlace setTitle: _NS("Deinterlace")];
+    [o_mi_deinterlace_mode setTitle: _NS("Deinterlace Mode")];
+    [o_mu_deinterlace_mode setTitle: _NS("Deinterlace Mode")];
     [o_mi_ffmpeg_pp setTitle: _NS("Post processing")];
     [o_mu_ffmpeg_pp setTitle: _NS("Post processing")];
     [o_mi_teletext setTitle: _NS("Teletext")];
@@ -1926,7 +1926,7 @@ end:
             [o_controls setupVarMenuItem: o_mi_screen target: (vlc_object_t *)p_vout
                 var: "video-device" selector: @selector(toggleVar:)];
 
-            [o_controls setupVarMenuItem: o_mi_deinterlace target: (vlc_object_t *)p_vout
+            [o_controls setupVarMenuItem: o_mi_deinterlace_mode target: (vlc_object_t *)p_vout
                 var: "deinterlace-mode" selector: @selector(toggleVar:)];
 
 #if 1
@@ -2034,7 +2034,7 @@ end:
     [o_mi_videotrack setEnabled: b_enabled];
     [o_mi_subtitle setEnabled: b_enabled];
     [o_mi_channels setEnabled: b_enabled];
-    [o_mi_deinterlace setEnabled: b_enabled];
+    [o_mi_deinterlace_mode setEnabled: b_enabled];
     [o_mi_ffmpeg_pp setEnabled: b_enabled];
     [o_mi_device setEnabled: b_enabled];
     [o_mi_screen setEnabled: b_enabled];
