@@ -47,7 +47,10 @@ static vout_thread_t **GetVouts( libvlc_media_player_t *p_mi, size_t *n )
 {
     input_thread_t *p_input = libvlc_get_input_thread( p_mi );
     if( !p_input )
+    {
+        *n = 0;
         return NULL;
+    }
 
     vout_thread_t **pp_vouts;
     if (input_Control( p_input, INPUT_GET_VOUTS, &pp_vouts, n))
