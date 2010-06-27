@@ -67,8 +67,9 @@ extern "C" {
  * You can create one (or more) instance(s) of LibVLC in a given process,
  * with libvlc_new() and destroy them with libvlc_release().
  *
- * \version This documents LibVLC version 1.1.
- * Earlier versions (0.9 and 1.0) are <b>not</b> compatible.
+ * \version Unless otherwise stated, these functions are available
+ * from LibVLC versions numbered 1.1.0 or more.
+ * Earlier versions (0.9.x and 1.0.x) are <b>not</b> compatible.
  * @{
  */
 

@@ -181,6 +181,7 @@ VLC_PUBLIC_API int libvlc_media_player_play ( libvlc_media_player_t *p_mi );
  *
  * \param mp the Media Player
  * \param do_pause play/resume if zero, pause if non-zero
+ * \version LibVLC 1.1.1 or later
  */
 VLC_PUBLIC_API void libvlc_media_player_set_pause ( libvlc_media_player_t *mp,
                                                     int do_pause );
@@ -949,6 +950,7 @@ enum libvlc_video_adjust_option_t {
  *
  * \param p_mi libvlc media player instance
  * \param option adjust option to get, values of libvlc_video_adjust_option_t
+ * \version LibVLC 1.1.1 and later.
  */
 VLC_PUBLIC_API int libvlc_video_get_adjust_int( libvlc_media_player_t *p_mi,
                                                 unsigned option );
@@ -962,6 +964,7 @@ VLC_PUBLIC_API int libvlc_video_get_adjust_int( libvlc_media_player_t *p_mi,
  * \param p_mi libvlc media player instance
  * \param option adust option to set, values of libvlc_video_adjust_option_t
  * \param value adjust option value
+ * \version LibVLC 1.1.1 and later.
  */
 VLC_PUBLIC_API void libvlc_video_set_adjust_int( libvlc_media_player_t *p_mi,
                                                  unsigned option, int value );
@@ -971,6 +974,7 @@ VLC_PUBLIC_API void libvlc_video_set_adjust_int( libvlc_media_player_t *p_mi,
  *
  * \param p_mi libvlc media player instance
  * \param option adjust option to get, values of libvlc_video_adjust_option_t
+ * \version LibVLC 1.1.1 and later.
  */
 VLC_PUBLIC_API float libvlc_video_get_adjust_float( libvlc_media_player_t *p_mi,
                                                     unsigned option );
@@ -982,6 +986,7 @@ VLC_PUBLIC_API float libvlc_video_get_adjust_float( libvlc_media_player_t *p_mi,
  * \param p_mi libvlc media player instance
  * \param option adust option to set, values of libvlc_video_adjust_option_t
  * \param value adjust option value
+ * \version LibVLC 1.1.1 and later.
  */
 VLC_PUBLIC_API void libvlc_video_set_adjust_float( libvlc_media_player_t *p_mi,
                                                    unsigned option, float value );
