@@ -558,10 +558,10 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 # define VLC_OBJECT( x ) ((vlc_object_t *)(x))
 #endif
 
+#include <vlc_atomic.h>
 typedef struct gc_object_t
 {
-    vlc_spinlock_t spin;
-    uintptr_t      refs;
+    vlc_atomic_t    refs;
     void          (*pf_destructor) (struct gc_object_t *);
 } gc_object_t;
 

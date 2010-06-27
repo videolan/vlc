@@ -80,6 +80,7 @@
 #include <vlc_fs.h>
 #include <vlc_cpu.h>
 #include <vlc_url.h>
+#include <vlc_atomic.h>
 
 #include "libvlc.h"
 
@@ -118,18 +119,7 @@ void *vlc_gc_init (gc_object_t *p_gc, void (*pf_destruct) (gc_object_t *))
     assert (pf_destruct);
     p_gc->pf_destructor = pf_destruct;
 
-    p_gc->refs = 1;
-#if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
-    __sync_synchronize ();
-#elif defined (WIN32) && defined (__GNUC__)
-#elif defined(__APPLE__)
-    OSMemoryBarrier ();
-#else
-    /* Nobody else can possibly lock the spin - it's there as a barrier */
-    vlc_spin_init (&p_gc->spin);
-    vlc_spin_lock (&p_gc->spin);
-    vlc_spin_unlock (&p_gc->spin);
-#endif
+    vlc_atomic_set (&p_gc->refs, 1);
     return p_gc;
 }
 
@@ -141,22 +131,9 @@ void *vlc_gc_init (gc_object_t *p_gc, void (*pf_destruct) (gc_object_t *))
 void *vlc_hold (gc_object_t * p_gc)
 {
     uintptr_t refs;
-    assert( p_gc );
-    assert ((((uintptr_t)&p_gc->refs) & (sizeof (void *) - 1)) == 0); /* alignment */
 
-#if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
-    refs = __sync_add_and_fetch (&p_gc->refs, 1);
-#elif defined (WIN64)
-    refs = InterlockedIncrement64 (&p_gc->refs);
-#elif defined (WIN32)
-    refs = InterlockedIncrement (&p_gc->refs);
-#elif defined(__APPLE__)
-    refs = OSAtomicIncrement32Barrier((int*)&p_gc->refs);
-#else
-    vlc_spin_lock (&p_gc->spin);
-    refs = ++p_gc->refs;
-    vlc_spin_unlock (&p_gc->spin);
-#endif
+    assert( p_gc );
+    refs = vlc_atomic_inc (&p_gc->refs);
     assert (refs != 1); /* there had to be a reference already */
     return p_gc;
 }
@@ -170,33 +147,10 @@ void vlc_release (gc_object_t *p_gc)
     unsigned refs;
 
     assert( p_gc );
-    assert ((((uintptr_t)&p_gc->refs) & (sizeof (void *) - 1)) == 0); /* alignment */
-
-#if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
-    refs = __sync_sub_and_fetch (&p_gc->refs, 1);
-#elif defined (WIN64)
-    refs = InterlockedDecrement64 (&p_gc->refs);
-#elif defined (WIN32)
-    refs = InterlockedDecrement (&p_gc->refs);
-#elif defined(__APPLE__)
-    refs = OSAtomicDecrement32Barrier((int*)&p_gc->refs);
-#else
-    vlc_spin_lock (&p_gc->spin);
-    refs = --p_gc->refs;
-    vlc_spin_unlock (&p_gc->spin);
-#endif
-
+    refs = vlc_atomic_dec (&p_gc->refs);
     assert (refs != (uintptr_t)(-1)); /* reference underflow?! */
     if (refs == 0)
-    {
-#if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
-#elif defined (WIN32) && defined (__GNUC__)
-#elif defined(__APPLE__)
-#else
-        vlc_spin_destroy (&p_gc->spin);
-#endif
         p_gc->pf_destructor (p_gc);
-    }
 }
 
 /*****************************************************************************
