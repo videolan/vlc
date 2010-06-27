@@ -384,7 +384,7 @@ struct demux_sys_t
 
     /* */
     int         i_current_program;
-    vlc_list_t  *p_programs_list;
+    vlc_list_t  programs_list;
 
     /* TS dump */
     char        *psz_file;  /* file to dump data in */
@@ -643,6 +643,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_dvb_meta = true;
     p_sys->b_access_control = true;
     p_sys->i_current_program = 0;
+    p_sys->programs_list.i_count = 0;
+    p_sys->programs_list.p_values = NULL;
     p_sys->i_tdt_delta = 0;
     p_sys->i_dvb_start = 0;
     p_sys->i_dvb_length = 0;
@@ -885,12 +887,7 @@ static void Close( vlc_object_t *p_this )
 
     TAB_CLEAN( p_sys->i_pmt, p_sys->pmt );
 
-    if( p_sys->p_programs_list )
-    {
-        vlc_value_t val;
-        val.p_list = p_sys->p_programs_list;
-        var_FreeList( &val, NULL );
-    }
+    free( p_sys->programs_list.p_values );
 
     /* If in dump mode, then close the file */
     if( p_sys->b_file_out )
@@ -1400,7 +1397,21 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         else
         {
             p_sys->i_current_program = -1;
-            p_sys->p_programs_list = p_list;
+            p_sys->programs_list.i_count = 0;
+            if( p_list )
+            {
+                vlc_list_t *p_dst = &p_sys->programs_list;
+                free( p_dst->p_values );
+
+                p_dst->p_values = calloc( p_list->i_count,
+                                          sizeof(*p_dst->p_values) );
+                if( p_dst->p_values )
+                {
+                    p_dst->i_count = p_list->i_count;
+                    for( int i = 0; i < p_list->i_count; i++ )
+                        p_dst->p_values[i] = p_list->p_values[i];
+                }
+            }
         }
         return VLC_SUCCESS;
     }
@@ -2587,17 +2598,17 @@ static bool ProgramIsSelected( demux_t *p_demux, uint16_t i_pgrm )
 
     if( !p_sys->b_access_control )
         return false;
-    if( ( p_sys->i_current_program == -1 && p_sys->p_programs_list == NULL ) ||
+    if( ( p_sys->i_current_program == -1 && p_sys->programs_list.i_count == 0 ) ||
         p_sys->i_current_program == 0 )
         return true;
     if( p_sys->i_current_program == i_pgrm )
         return true;
 
-    if( p_sys->p_programs_list != NULL )
+    if( p_sys->programs_list.i_count != 0 )
     {
-        for( int i = 0; i < p_sys->p_programs_list->i_count; i++ )
+        for( int i = 0; i < p_sys->programs_list.i_count; i++ )
         {
-            if( i_pgrm == p_sys->p_programs_list->p_values[i].i_int )
+            if( i_pgrm == p_sys->programs_list.p_values[i].i_int )
                 return true;
         }
     }
