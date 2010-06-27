@@ -1282,17 +1282,26 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         p_list = (vlc_list_t *)va_arg( args, vlc_list_t * );
         msg_Dbg( p_demux, "DEMUX_SET_GROUP %d %p", i_int, p_list );
 
+        if( i_int == 0 && p_sys->i_current_program > 0 )
+            i_int = p_sys->i_current_program;
+
+        if( p_sys->i_current_program > 0 )
+        {
+            if( p_sys->i_current_program != i_int )
+                SetPrgFilter( p_demux, p_sys->i_current_program, false );
+        }
+        else if( p_sys->i_current_program < 0 )
+        {
+            for( int i = 0; i < p_sys->programs_list.i_count; i++ )
+                SetPrgFilter( p_demux, p_sys->programs_list.p_values[i].i_int, false );
+        }
+
         if( i_int > 0 )
         {
-            if( i_int != p_sys->i_current_program )
-            {
-                SetPrgFilter( p_demux, p_sys->i_current_program, false );
-
-                p_sys->i_current_program = i_int;
-                SetPrgFilter( p_demux, p_sys->i_current_program, true );
-            }
+            p_sys->i_current_program = i_int;
+            SetPrgFilter( p_demux, p_sys->i_current_program, true );
         }
-        else
+        else if( i_int < 0 )
         {
             p_sys->i_current_program = -1;
             p_sys->programs_list.i_count = 0;
@@ -1307,7 +1316,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     p_dst->i_count = p_list->i_count;
                     for( int i = 0; i < p_list->i_count; i++ )
+                    {
                         p_dst->p_values[i] = p_list->p_values[i];
+                        SetPrgFilter( p_demux, p_dst->p_values[i].i_int, true );
+                    }
                 }
             }
         }
