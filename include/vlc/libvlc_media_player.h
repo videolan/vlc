@@ -177,6 +177,15 @@ VLC_PUBLIC_API int libvlc_media_player_is_playing ( libvlc_media_player_t *p_mi 
 VLC_PUBLIC_API int libvlc_media_player_play ( libvlc_media_player_t *p_mi );
 
 /**
+ * Pause or resume (no effect if there is no media)
+ *
+ * \param mp the Media Player
+ * \param do_pause play/resume if zero, pause if non-zero
+ */
+VLC_PUBLIC_API void libvlc_media_player_set_pause ( libvlc_media_player_t *mp,
+                                                    int do_pause );
+
+/**
  * Toggle pause (no effect if there is no media)
  *
  * \param p_mi the Media Player
