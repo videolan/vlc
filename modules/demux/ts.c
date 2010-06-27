@@ -2786,9 +2786,6 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
                  p_srv->b_eit_present, p_srv->i_running_status,
                  p_srv->b_free_ca );
 
-        if( p_sys->i_current_program != -1 && p_sys->i_current_program != p_srv->i_service_id )
-            continue;
-
         p_meta = vlc_meta_New();
         for( p_dr = p_srv->p_first_descriptor; p_dr; p_dr = p_dr->p_next )
         {
@@ -2965,7 +2962,7 @@ static void EITCallBack( demux_t *p_demux,
     vlc_epg_t *p_epg;
 
     msg_Dbg( p_demux, "EITCallBack called" );
-    if( !p_eit->b_current_next || ( p_sys->i_current_program != -1 && p_sys->i_current_program != p_eit->i_service_id ) )
+    if( !p_eit->b_current_next )
     {
         dvbpsi_DeleteEIT( p_eit );
         return;
