@@ -48,6 +48,31 @@ static void wait_paused(libvlc_media_player_t *mp)
     assert(state == libvlc_Paused || state == libvlc_Ended);
 }
 
+/* Test a bunch of A/V properties. This most does nothing since the current
+ * test file contains a dummy audio track. This is a smoke test. */
+static void test_audio_video(libvlc_media_player_t *mp)
+{
+    bool fs = libvlc_get_fullscreen(mp);
+    libvlc_set_fullscreen(mp, true);
+    assert(libvlc_get_fullscreen(mp));
+    libvlc_set_fullscreen(mp, false);
+    assert(!libvlc_get_fullscreen(mp));
+    libvlc_toggle_fullscreen(mp);
+    assert(libvlc_get_fullscreen(mp));
+    libvlc_toggle_fullscreen(mp);
+    assert(!libvlc_get_fullscreen(mp));
+    libvlc_set_fullscreen(mp, fs);
+    assert(libvlc_get_fullscreen(mp) == fs);
+
+    assert(libvlc_video_get_scale(mp) == 0.); /* default */
+    libvlc_video_set_scale(mp, 0.); /* no-op */
+    libvlc_video_set_scale(mp, 2.5);
+    assert(libvlc_video_get_scale(mp) == 2.5);
+    libvlc_video_set_scale(mp, 0.);
+    libvlc_video_set_scale(mp, 0.); /* no-op */
+    assert(libvlc_video_get_scale(mp) == 0.);
+}
+
 static void test_media_player_set_media(const char** argv, int argc)
 {
     const char * file = test_default_sample;
