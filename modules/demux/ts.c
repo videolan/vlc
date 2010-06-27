@@ -1400,7 +1400,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
             }
         }
-        else
+        else if( i_int <= 0 )
         {
             p_sys->i_current_program = -1;
             p_sys->programs_list.i_count = 0;
