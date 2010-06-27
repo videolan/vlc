@@ -1280,7 +1280,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 #endif
     case DEMUX_SET_GROUP:
     {
-        uint16_t i_vpid = 0, i_apid1 = 0, i_apid2 = 0, i_apid3 = 0;
         ts_prg_psi_t *p_prg;
         vlc_list_t *p_list;
 
@@ -1381,15 +1380,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     {
                         if( pid->p_owner->prg[i_prg]->i_pid_pmt == i_pmt_pid && pid->es->id )
                         {
-                            if ( pid->es->fmt.i_cat == VIDEO_ES && !i_vpid )
-                                i_vpid = i;
-                            if ( pid->es->fmt.i_cat == AUDIO_ES && !i_apid1 )
-                                i_apid1 = i;
-                            else if ( pid->es->fmt.i_cat == AUDIO_ES && !i_apid2 )
-                                i_apid2 = i;
-                            else if ( pid->es->fmt.i_cat == AUDIO_ES && !i_apid3 )
-                                i_apid3 = i;
-
                             stream_Control( p_demux->s,
                                             STREAM_CONTROL_ACCESS,
                                             ACCESS_SET_PRIVATE_ID_STATE,
