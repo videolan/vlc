@@ -740,7 +740,6 @@ static inline void save_string_list( intf_thread_t * p_intf, id object, const ch
     if( p_stringobject )
     {
         config_PutPsz( p_intf, name, [p_stringobject UTF8String] );
-        [p_stringobject release];
     }
 }
 
