@@ -427,7 +427,8 @@ static void              IODFree( iod_descriptor_t * );
 #define TS_USER_PMT_NUMBER (0)
 static int UserPmt( demux_t *p_demux, const char * );
 
-static int SetPIDFilter( demux_t *, int i_pid, bool b_selected );
+static int  SetPIDFilter( demux_t *, int i_pid, bool b_selected );
+static void SetPrgFilter( demux_t *, int i_prg, bool b_selected );
 
 #define TS_PACKET_SIZE_188 188
 #define TS_PACKET_SIZE_192 192
@@ -1275,7 +1276,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 #endif
     case DEMUX_SET_GROUP:
     {
-        ts_prg_psi_t *p_prg;
         vlc_list_t *p_list;
 
         i_int = (int)va_arg( args, int );
@@ -1284,93 +1284,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( p_sys->b_access_control && i_int > 0 && i_int != p_sys->i_current_program )
         {
-            int i_pmt_pid = -1;
-
-            /* Search pmt to be unselected */
-            for( int i = 0; i < p_sys->i_pmt; i++ )
-            {
-                ts_pid_t *pmt = p_sys->pmt[i];
-
-                for( int i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
-                {
-                    if( pmt->psi->prg[i_prg]->i_number == p_sys->i_current_program )
-                    {
-                        i_pmt_pid = p_sys->pmt[i]->i_pid;
-                        p_prg = p_sys->pmt[i]->psi->prg[i_prg];
-                        break;
-                    }
-                }
-                if( i_pmt_pid > 0 ) break;
-            }
-
-            if( i_pmt_pid > 0 )
-            {
-                SetPIDFilter( p_demux, i_pmt_pid, false );
-                if( p_prg->i_pid_pcr > 0 )
-                    SetPIDFilter( p_demux, p_prg->i_pid_pcr, false );
-
-                /* All ES */
-                for( int i = 2; i < 8192; i++ )
-                {
-                    ts_pid_t *pid = &p_sys->pid[i];
-
-                    if( !pid->b_valid || pid->psi )
-                        continue;
-
-                    for( int i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
-                    {
-                        if( pid->p_owner->prg[i_prg]->i_pid_pmt == i_pmt_pid && pid->es->id )
-                        {
-                            /* We only remove es that aren't defined by extra pmt */
-                            SetPIDFilter( p_demux, i, false );
-                            break;
-                        }
-                    }
-                }
-            }
+            SetPrgFilter( p_demux, p_sys->i_current_program, false );
 
             /* select new program */
             p_sys->i_current_program = i_int;
-            i_pmt_pid = -1;
-            for( int i = 0; i < p_sys->i_pmt; i++ )
-            {
-                ts_pid_t *pmt = p_sys->pmt[i];
-
-                for( int i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
-                {
-                    if( pmt->psi->prg[i_prg]->i_number == i_int )
-                    {
-                        i_pmt_pid = p_sys->pmt[i]->i_pid;
-                        p_prg = p_sys->pmt[i]->psi->prg[i_prg];
-                        break;
-                    }
-                }
-                if( i_pmt_pid > 0 )
-                    break;
-            }
-            if( i_pmt_pid > 0 )
-            {
-                SetPIDFilter( p_demux, i_pmt_pid, true );
-                if( p_prg->i_pid_pcr > 0 )
-                    SetPIDFilter( p_demux, p_prg->i_pid_pcr, true );
-
-                for( int i = 2; i < 8192; i++ )
-                {
-                    ts_pid_t *pid = &p_sys->pid[i];
-
-                    if( !pid->b_valid || pid->psi )
-                        continue;
-
-                    for( int i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
-                    {
-                        if( pid->p_owner->prg[i_prg]->i_pid_pmt == i_pmt_pid && pid->es->id )
-                        {
-                            SetPIDFilter( p_demux, i, true );
-                            break;
-                        }
-                    }
-                }
-            }
+            SetPrgFilter( p_demux, p_sys->i_current_program, true );
         }
         else if( i_int <= 0 )
         {
@@ -1549,6 +1467,57 @@ static int SetPIDFilter( demux_t *p_demux, int i_pid, bool b_selected )
 
     return stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                            ACCESS_SET_PRIVATE_ID_STATE, i_pid, b_selected );
+}
+
+static void SetPrgFilter( demux_t *p_demux, int i_prg_id, bool b_selected )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    ts_prg_psi_t *p_prg = NULL;
+    int i_pmt_pid = -1;
+
+    /* Search pmt to be unselected */
+    for( int i = 0; i < p_sys->i_pmt; i++ )
+    {
+        ts_pid_t *pmt = p_sys->pmt[i];
+
+        for( int i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
+        {
+            if( pmt->psi->prg[i_prg]->i_number == i_prg_id )
+            {
+                i_pmt_pid = p_sys->pmt[i]->i_pid;
+                p_prg = p_sys->pmt[i]->psi->prg[i_prg];
+                break;
+            }
+        }
+        if( i_pmt_pid > 0 )
+            break;
+    }
+    if( i_pmt_pid <= 0 )
+        return;
+    assert( p_prg );
+
+    SetPIDFilter( p_demux, i_pmt_pid, b_selected );
+    if( p_prg->i_pid_pcr > 0 )
+        SetPIDFilter( p_demux, p_prg->i_pid_pcr, b_selected );
+
+    /* All ES */
+    for( int i = 2; i < 8192; i++ )
+    {
+        ts_pid_t *pid = &p_sys->pid[i];
+
+        if( !pid->b_valid || pid->psi )
+            continue;
+
+        for( int i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
+        {
+            if( pid->p_owner->prg[i_prg]->i_pid_pmt == i_pmt_pid && pid->es->id )
+            {
+                /* We only remove/select es that aren't defined by extra pmt */
+                SetPIDFilter( p_demux, i, b_selected );
+                break;
+            }
+        }
+    }
 }
 
 static void PIDInit( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner )
