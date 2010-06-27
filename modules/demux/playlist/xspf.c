@@ -738,11 +738,28 @@ static bool parse_extension_node COMPLEX_INTERFACE
             msg_Warn( p_demux, "<extension> requires \"application\" attribute" );
             return false;
         }
+        /* Skip the extension if the application is not vlc
+           This will skip all children of the current node */
         else if( strcmp( psz_application, "http://www.videolan.org/vlc/playlist/0" ) )
         {
             msg_Dbg( p_demux, "Skipping \"%s\" extension tag", psz_application );
             free( psz_application );
-            return false;
+            /* Skip all children */
+            while( xml_ReaderRead( p_xml_reader ) == 1 )
+            {
+                if( xml_ReaderNodeType( p_xml_reader ) == XML_READER_ENDELEM )
+                {
+                    char *psz_name = xml_ReaderName( p_xml_reader );
+                    if( !strcmp( psz_name, "extension" ) )
+                    {
+                        free( psz_name );
+                        break;
+                    }
+                    msg_Dbg( p_demux, "\tskipping \"%s\" extension child", psz_name );
+                    free( psz_name );
+                }
+            }
+            return true;
         }
     }
     free( psz_application );
