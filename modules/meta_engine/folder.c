@@ -125,6 +125,7 @@ static int FindMeta( vlc_object_t *p_this )
             }
         }
     }
+    free( psz_path );
 
     return b_have_art ? VLC_SUCCESS : VLC_EGENERIC;
 }
