@@ -1281,7 +1281,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     case DEMUX_SET_GROUP:
     {
         uint16_t i_vpid = 0, i_apid1 = 0, i_apid2 = 0, i_apid3 = 0;
-        ts_prg_psi_t *p_prg = NULL;
+        ts_prg_psi_t *p_prg;
         vlc_list_t *p_list;
 
         i_int = (int)va_arg( args, int );
@@ -1302,6 +1302,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     if( pmt->psi->prg[i_prg]->i_number == p_sys->i_current_program )
                     {
                         i_pmt_pid = p_sys->pmt[i]->i_pid;
+                        p_prg = p_sys->pmt[i]->psi->prg[i_prg];
                         break;
                     }
                 }
@@ -1313,6 +1314,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                 ACCESS_SET_PRIVATE_ID_STATE, i_pmt_pid,
                                 false );
+                if( p_prg->i_pid_pcr > 0 )
+                    stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                                    ACCESS_SET_PRIVATE_ID_STATE, p_prg->i_pid_pcr,
+                                    false );
                 /* All ES */
                 for( int i = 2; i < 8192; i++ )
                 {
@@ -1360,9 +1365,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                 ACCESS_SET_PRIVATE_ID_STATE, i_pmt_pid,
                                 true );
-                stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                                ACCESS_SET_PRIVATE_ID_STATE, p_prg->i_pid_pcr,
-                                true );
+                if( p_prg->i_pid_pcr > 0 )
+                    stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                                    ACCESS_SET_PRIVATE_ID_STATE, p_prg->i_pid_pcr,
+                                    true );
 
                 for( int i = 2; i < 8192; i++ )
                 {
