@@ -1282,15 +1282,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         p_list = (vlc_list_t *)va_arg( args, vlc_list_t * );
         msg_Dbg( p_demux, "DEMUX_SET_GROUP %d %p", i_int, p_list );
 
-        if( p_sys->b_access_control && i_int > 0 && i_int != p_sys->i_current_program )
+        if( i_int > 0 )
         {
-            SetPrgFilter( p_demux, p_sys->i_current_program, false );
+            if( i_int != p_sys->i_current_program )
+            {
+                SetPrgFilter( p_demux, p_sys->i_current_program, false );
 
-            /* select new program */
-            p_sys->i_current_program = i_int;
-            SetPrgFilter( p_demux, p_sys->i_current_program, true );
+                p_sys->i_current_program = i_int;
+                SetPrgFilter( p_demux, p_sys->i_current_program, true );
+            }
         }
-        else if( i_int <= 0 )
+        else
         {
             p_sys->i_current_program = -1;
             p_sys->programs_list.i_count = 0;
@@ -2554,8 +2556,6 @@ static bool ProgramIsSelected( demux_t *p_demux, uint16_t i_pgrm )
 {
     demux_sys_t          *p_sys = p_demux->p_sys;
 
-    if( !p_sys->b_access_control )
-        return false;
     if( ( p_sys->i_current_program == -1 && p_sys->programs_list.i_count == 0 ) ||
         p_sys->i_current_program == 0 )
         return true;
@@ -3984,7 +3984,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         /* Set demux filter */
         SetPIDFilter( p_demux, prg->i_pid_pcr, true );
     }
-    else if ( p_sys->b_access_control )
+    else
     {
         msg_Warn( p_demux, "skipping program (not selected)" );
         dvbpsi_DeletePMT(p_pmt);
@@ -4345,16 +4345,13 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                     p_program->i_pid;
 
                 /* Now select PID at access level */
-                if( p_sys->b_access_control )
+                if( ProgramIsSelected( p_demux, p_program->i_number ) )
                 {
-                    if( ProgramIsSelected( p_demux, p_program->i_number ) )
-                    {
-                        if( p_sys->i_current_program == 0 )
-                            p_sys->i_current_program = p_program->i_number;
+                    if( p_sys->i_current_program == 0 )
+                        p_sys->i_current_program = p_program->i_number;
 
-                        if( SetPIDFilter( p_demux, p_program->i_pid, true ) )
-                            p_sys->b_access_control = false;
-                    }
+                    if( SetPIDFilter( p_demux, p_program->i_pid, true ) )
+                        p_sys->b_access_control = false;
                 }
             }
         }
