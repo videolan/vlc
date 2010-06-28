@@ -25,6 +25,8 @@
 #include <vlc_common.h>
 #include <vlc_atomic.h>
 
+#include <windows.h>
+
 uintptr_t vlc_atomic_get (const vlc_atomic_t *atom)
 {
     return atom->u;
@@ -39,8 +41,8 @@ uintptr_t vlc_atomic_set (vlc_atomic_t *atom, uintptr_t v)
 uintptr_t vlc_atomic_add (vlc_atomic_t *atom, uintptr_t v)
 {
 #if defined (WIN64)
-    return InterlockedAdd64 (&atom->s, v);
+    return InterlockedExchangeAdd64 (&atom->s, v);
 #else
-    return InterlockedAdd (&atom->s, v);
+    return InterlockedExchangeAdd (&atom->s, v);
 #endif
 }
