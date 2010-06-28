@@ -184,9 +184,12 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     delete[] hostname;
 
     // initialize EWMH pid
-    pid_t pid = getpid();
-    XChangeProperty( XDISPLAY, m_wnd, NET_WM_PID, XA_CARDINAL, 32,
-                     PropModeReplace, (unsigned char *)&pid, 1 );
+    if( NET_WM_PID != None )
+    {
+        pid_t pid = getpid();
+        XChangeProperty( XDISPLAY, m_wnd, NET_WM_PID, XA_CARDINAL, 32,
+                         PropModeReplace, (unsigned char *)&pid, 1 );
+    }
 
 }
 
