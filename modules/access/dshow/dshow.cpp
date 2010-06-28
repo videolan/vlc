@@ -115,6 +115,8 @@ static const char *const ppsz_amtuner_mode_text[] = { N_("Default"),
     "Size of the video that will be displayed by the " \
     "DirectShow plugin. If you don't specify anything the default size for " \
     "your device will be used. You can specify a standard size (cif, d1, ...) or <width>x<height>.")
+#define ASPECT_TEXT N_("Picture aspect-ratio n:m")
+#define ASPECT_LONGTEXT N_("Define input picture aspect-ratio to use. Default is 4:3" )
 #define CHROMA_TEXT N_("Video input chroma format")
 #define CHROMA_LONGTEXT N_( \
     "Force the DirectShow video input to use a specific chroma format " \
@@ -202,6 +204,8 @@ vlc_module_begin ()
         change_action_add( ConfigDevicesCallback, N_("Configure") )
 
     add_string( "dshow-size", NULL, NULL, SIZE_TEXT, SIZE_LONGTEXT, false)
+
+    add_string( "dshow-aspect-ratio", "4:3", NULL, ASPECT_TEXT, ASPECT_LONGTEXT, false)
 
     add_string( "dshow-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
 
@@ -437,6 +441,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     var_Create( p_this, "dshow-video-output", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_this, "dshow-audio-output", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
+
     /* Initialize some data */
     p_sys->i_streams = 0;
     p_sys->pp_streams = NULL;
@@ -643,12 +648,25 @@ static int DemuxOpen( vlc_object_t *p_this )
 
         if( p_stream->mt.majortype == MEDIATYPE_Video )
         {
+            char *psz_aspect = var_CreateGetString( p_this, "dshow-aspect-ratio" );
+            char *psz_delim = !EMPTY_STR( psz_aspect ) ? strchr( psz_aspect, ':' ) : NULL;
+
             es_format_Init( &fmt, VIDEO_ES, p_stream->i_fourcc );
 
             fmt.video.i_width  = p_stream->header.video.bmiHeader.biWidth;
             fmt.video.i_height = p_stream->header.video.bmiHeader.biHeight;
-            fmt.video.i_sar_num = 4 * fmt.video.i_height;
-            fmt.video.i_sar_den = 4 * fmt.video.i_width;
+
+            if( psz_delim )
+            {
+                fmt.video.i_sar_num = atoi( psz_aspect ) * fmt.video.i_height;
+                fmt.video.i_sar_den = atoi( psz_delim + 1 ) * fmt.video.i_width;
+            }
+            else
+            {
+                fmt.video.i_sar_num = 4 * fmt.video.i_height;
+                fmt.video.i_sar_den = 3 * fmt.video.i_width;
+            }
+            free( psz_aspect );
 
             if( !p_stream->header.video.bmiHeader.biCompression )
             {
