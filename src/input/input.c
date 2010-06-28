@@ -1193,7 +1193,7 @@ static void InitPrograms( input_thread_t * p_input )
     else
     {
         demux_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP,
-                       (int) var_GetInteger( p_input, "program" ), NULL );
+                       es_out_GetGroupForced( p_input->p->p_es_out ), NULL );
     }
 }
 

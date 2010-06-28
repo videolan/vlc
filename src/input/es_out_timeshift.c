@@ -633,7 +633,6 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
         }
         return es_out_Control( p_sys->p_out, ES_OUT_GET_ES_STATE, p_es->p_es, pb_enabled );
     }
-
     /* Special internal input control */
     case ES_OUT_GET_EMPTY:
     {
@@ -694,6 +693,13 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
 
         return es_out_ControlModifyPcrSystem( p_sys->p_out, b_absolute, i_system );
     }
+    case ES_OUT_GET_GROUP_FORCED:
+    {
+        int *pi_group = va_arg( args, int * );
+        return es_out_Control( p_sys->p_out, ES_OUT_GET_GROUP_FORCED, pi_group );
+    }
+
+
     default:
         msg_Err( p_sys->p_input, "Unknown es_out_Control query !" );
         assert(0);
