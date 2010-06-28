@@ -1161,7 +1161,7 @@
     }
 
     /* Recent documents menu */
-    o_true_file = [NSURL fileURLWithPath: o_uri];
+    o_true_file = [NSURL URLWithString: o_uri];
     if( o_true_file != nil && (BOOL)config_GetInt( p_playlist, "macosx-recentitems" ) == YES )
     {
         [[NSDocumentController sharedDocumentController]
