@@ -213,7 +213,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         i_accel |= MPEG2_ACCEL_PPC_ALTIVEC;
     }
 
-#elif defined(__arm__)
+#elif defined(__arm__) && defined(MPEG2_ACCEL_ARM)
     i_accel |= MPEG2_ACCEL_ARM;
 
 # ifdef MPEG2_ACCEL_ARM_NEON
