@@ -24,11 +24,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import <Foundation/Foundation.h>
+#if TARGET_OS_IPHONE
+# import <CoreGraphics/CoreGraphics.h>
+#endif
 #import "VLCMedia.h"
-#import "VLCVideoView.h"
-#import "VLCVideoLayer.h"
 #import "VLCTime.h"
 #import "VLCAudio.h"
+
+#if !TARGET_OS_IPHONE
+@class VLCVideoView;
+@class VLCVideoLayer;
+#endif
 
 /* Notification Messages */
 extern NSString * VLCMediaPlayerTimeChanged;
@@ -75,6 +82,7 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 - (void)mediaPlayerStateChanged:(NSNotification *)aNotification;
 @end
 
+
 // TODO: Should we use medialist_player or our own flavor of media player?
 @interface VLCMediaPlayer : NSObject
 {
@@ -89,9 +97,11 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
     VLCAudio *audio;
 }
 
+#if !TARGET_OS_IPHONE
 /* Initializers */
 - (id)initWithVideoView:(VLCVideoView *)aVideoView;
 - (id)initWithVideoLayer:(VLCVideoLayer *)aVideoLayer;
+#endif
 
 /* Properties */
 - (void)setDelegate:(id)value;
@@ -100,8 +110,10 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 /* Video View Options */
 // TODO: Should be it's own object?
 
+#if !TARGET_OS_IPHONE
 - (void)setVideoView:(VLCVideoView *)aVideoView;
 - (void)setVideoLayer:(VLCVideoLayer *)aVideoLayer;
+#endif
 
 @property (retain) id drawable; /* The videoView or videoLayer */
 
@@ -135,7 +147,7 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 @property (readonly) VLCAudio * audio;
 
 /* Video Information */
-- (NSSize)videoSize;
+- (CGSize)videoSize;
 - (BOOL)hasVideoOut;
 - (float)framesPerSecond;
 

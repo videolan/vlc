@@ -29,16 +29,20 @@
 #import "VLCMediaPlayer.h"
 #import "VLCEventManager.h"
 #import "VLCLibVLCBridging.h"
-#import "VLCVideoView.h"
+#if !TARGET_OS_IPHONE
+# import "VLCVideoView.h"
+#endif
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
+#if !TARGET_OS_IPHONE
 /* prevent system sleep */
-#import <CoreServices/CoreServices.h>
+# import <CoreServices/CoreServices.h>
 /* FIXME: Ugly hack! */
-#ifdef __x86_64__
-#import <CoreServices/../Frameworks/OSServices.framework/Headers/Power.h>
+# ifdef __x86_64__
+#  import <CoreServices/../Frameworks/OSServices.framework/Headers/Power.h>
+# endif
 #endif
 
 #include <vlc/vlc.h>
@@ -180,6 +184,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     return [self initWithDrawable:nil];
 }
 
+#if !TARGET_OS_IPHONE
 - (id)initWithVideoView:(VLCVideoView *)aVideoView
 {
     return [self initWithDrawable: aVideoView];
@@ -189,25 +194,14 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 {
     return [self initWithDrawable: aVideoLayer];
 }
-
-- (void)release
-{
-    @synchronized(self)
-    {
-        if([self retainCount] <= 1)
-        {
-            /* We must make sure we won't receive new event after an upcoming dealloc
-             * We also may receive a -retain in some event callback that may occcur
-             * Before libvlc_event_detach. So this can't happen in dealloc */
-            [self unregisterObservers];
-        }
-        [super release];
-    }
-}
+#endif
 
 - (void)dealloc
 {
     NSAssert(libvlc_media_player_get_state(instance) == libvlc_Stopped, @"You released the media player before ensuring that it is stopped");
+
+    [self unregisterObservers];
+    [[VLCEventManager sharedManager] cancelCallToObject:self];
 
     // Always get rid of the delegate first so we can stop sending messages to it
     // TODO: Should we tell the delegate that we're shutting down?
@@ -240,6 +234,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     return delegate;
 }
 
+#if !TARGET_OS_IPHONE
 - (void)setVideoView:(VLCVideoView *)aVideoView
 {
     [self setDrawable: aVideoView];
@@ -249,6 +244,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 {
     [self setDrawable: aVideoLayer];
 }
+#endif
 
 - (void)setDrawable:(id)aDrawable
 {
@@ -352,13 +348,13 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     return libvlc_media_player_get_rate(instance);
 }
 
-- (NSSize)videoSize
+- (CGSize)videoSize
 {
     unsigned height = 0, width = 0;
     int failure = libvlc_video_get_size(instance, 0, &width, &height);
     if (failure)
         [[NSException exceptionWithName:@"Can't get video size" reason:@"No video output" userInfo:nil] raise];
-    return NSMakeSize(width, height);
+    return CGSizeMake(width, height);
 }
 
 - (BOOL)hasVideoOut
@@ -773,15 +769,19 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     [self didChangeValueForKey:@"time"];
 }
 
+#if !TARGET_OS_IPHONE
 - (void)delaySleep
 {
     UpdateSystemActivity(UsrActivity);
 }
+#endif
 
 - (void)mediaPlayerPositionChanged:(NSNumber *)newPosition
 {
+#if !TARGET_OS_IPHONE
     // This seems to be the most relevant place to delay sleeping and screen saver.
     [self delaySleep];
+#endif
 
     [self willChangeValueForKey:@"position"];
     position = [newPosition floatValue];

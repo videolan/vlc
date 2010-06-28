@@ -25,6 +25,10 @@
 #import "VLCLibrary.h"
 #import "VLCLibVLCBridging.h"
 
+#if TARGET_OS_IPHONE
+# include "vlc-plugins.h"
+#endif
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -49,19 +53,24 @@ static VLCLibrary * sharedLibrary = nil;
 {
     if (self = [super init])
     {
-
         NSArray *vlcParams = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"VLCParams"];
         if (!vlcParams) {
             NSMutableArray *defaultParams = [NSMutableArray array];
+            [defaultParams addObject:@"--play-and-pause"];                          // We want every movie to pause instead of stopping at eof
+            [defaultParams addObject:@"--no-color"];                                // Don't use color in output (Xcode doesn't show it)
+            [defaultParams addObject:@"--no-media-library"];                        // We don't need the media library
             [defaultParams addObject:@"--no-video-title-show"];                     // Don't show the title on overlay when starting to play
+            [defaultParams addObject:@"--verbose=-1"];                               // Let's not wreck the logs
+#if TARGET_OS_IPHONE
+            [defaultParams addObject:@"--ignore-config"];                           // We don't need the config
+//            [defaultParams addObject:@"--ffmpeg-fast"];                             // Let's disable this as it is error-prone
+            [defaultParams addObject:@"--ffmpeg-skiploopfilter=all"];
+#else
             [defaultParams addObject:@"--no-sout-keep"];
             [defaultParams addObject:@"--vout=macosx"];                             // Select Mac OS X video output
             [defaultParams addObject:@"--text-renderer=quartztext"];                // our CoreText-based renderer
-            [defaultParams addObject:@"--verbose=-1"];                              // Don't polute the stdio log
-            [defaultParams addObject:@"--no-color"];                                // Don't use color in output (Xcode doesn't show it)
-            [defaultParams addObject:@"--no-media-library"];                        // We don't need the media library
-            [defaultParams addObject:@"--play-and-pause"];                          // We want every movie to pause instead of stopping at eof
             [defaultParams addObject:@"--extraintf=macosx_dialog_provider"];        // Some extra dialog (login, progress) may come up from here
+#endif
             vlcParams = defaultParams;
         }
 
@@ -73,7 +82,12 @@ static VLCLibrary * sharedLibrary = nil;
             lib_vlc_params[paramNum] = [vlcParam cStringUsingEncoding:NSASCIIStringEncoding];
             paramNum++;
         }
-        instance = (void *)libvlc_new( sizeof(lib_vlc_params)/sizeof(lib_vlc_params[0]), lib_vlc_params);
+        unsigned argc = sizeof(lib_vlc_params)/sizeof(lib_vlc_params[0]);
+#if TARGET_OS_IPHONE
+        instance = libvlc_new_with_builtins(argc, lib_vlc_params, vlc_builtins_modules);
+#else
+        instance = libvlc_new(argc, lib_vlc_params);
+#endif
         NSAssert(instance, @"libvlc failed to initialize");
     }
     return self;

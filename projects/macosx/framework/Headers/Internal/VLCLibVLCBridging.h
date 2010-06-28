@@ -23,7 +23,9 @@
 *****************************************************************************/
 
 #import "VLCLibrary.h"
+#if !TARGET_OS_IPHONE
 #import "VLCStreamOutput.h"
+#endif
 #import "VLCMediaPlayer.h"
 
 /**
@@ -147,6 +149,8 @@
 /**
  * TODO: Documentation
  */
+#if !TARGET_OS_IPHONE
 @interface VLCStreamOutput (LibVLCBridge)
 - (NSString *)representedLibVLCOptions;
 @end
+#endif

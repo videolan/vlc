@@ -22,7 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
 #import "VLCMediaDiscoverer.h"
 #import "VLCLibrary.h"
 #import "VLCLibVLCBridging.h"
@@ -101,25 +100,13 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
     return self;
 }
 
-- (void)release
-{
-    @synchronized(self)
-    {
-        if([self retainCount] <= 1)
-        {
-            /* We must make sure we won't receive new event after an upcoming dealloc
-             * We also may receive a -retain in some event callback that may occcur
-             * Before libvlc_event_detach. So this can't happen in dealloc */
-            libvlc_event_manager_t * p_em = libvlc_media_list_event_manager(mdis);
-            libvlc_event_detach(p_em, libvlc_MediaDiscovererStarted, HandleMediaDiscovererStarted, self);
-            libvlc_event_detach(p_em, libvlc_MediaDiscovererEnded,   HandleMediaDiscovererEnded,   self);
-        }
-        [super release];
-    }
-}
-
 - (void)dealloc
 {
+    libvlc_event_manager_t *em = libvlc_media_list_event_manager(mdis);
+    libvlc_event_detach(em, libvlc_MediaDiscovererStarted, HandleMediaDiscovererStarted, self);
+    libvlc_event_detach(em, libvlc_MediaDiscovererEnded,   HandleMediaDiscovererEnded,   self);
+    [[VLCEventManager sharedManager] cancelCallToObject:self];
+
     [localizedName release];
     [discoveredMedia release];
     libvlc_media_discoverer_release( mdis );

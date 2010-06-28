@@ -73,10 +73,15 @@ NSString * VLCMediaMetaChanged              = @"VLCMediaMetaChanged";
 
 /* Operations */
 - (void)fetchMetaInformationFromLibVLCWithType:(NSString*)metaType;
+#if !TARGET_OS_IPHONE
 - (void)fetchMetaInformationForArtWorkWithURL:(NSString *)anURL;
 - (void)setArtwork:(NSImage *)art;
+#endif
+
+- (void)parseIfNeeded;
 
 /* Callback Methods */
+- (void)parsedChanged:(NSNumber *)isParsedAsNumber;
 - (void)metaChanged:(NSString *)metaType;
 - (void)subItemAdded;
 - (void)setStateAsNumber:(NSNumber *)newStateAsNumber;
@@ -149,6 +154,16 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     [pool drain];
 }
 
+static void HandleMediaParsedChanged(const libvlc_event_t * event, void * self)
+{
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self
+                                                 withMethod:@selector(parsedChanged:)
+                                       withArgumentAsObject:[NSNumber numberWithBool:event->u.media_parsed_changed.new_status]];
+    [pool release];
+}
+
+
 /******************************************************************************
  * Implementation
  */
@@ -218,27 +233,16 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     libvlc_media_set_meta(p_md, metaName, [value UTF8String]);
 }
 
-- (void)release
-{
-    @synchronized(self)
-    {
-        if([self retainCount] <= 1)
-        {
-            /* We must make sure we won't receive new event after an upcoming dealloc
-             * We also may receive a -retain in some event callback that may occcur
-             * Before libvlc_event_detach. So this can't happen in dealloc */
-            libvlc_event_manager_t * p_em = libvlc_media_event_manager(p_md);
-            libvlc_event_detach(p_em, libvlc_MediaMetaChanged,     HandleMediaMetaChanged,     self);
-            libvlc_event_detach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self);
-            libvlc_event_detach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self);
-            libvlc_event_detach(p_em, libvlc_MediaSubItemAdded,    HandleMediaSubItemAdded,    self);
-        }
-        [super release];
-    }
-}
-
 - (void)dealloc
 {
+    libvlc_event_manager_t * p_em = libvlc_media_event_manager(p_md);
+    libvlc_event_detach(p_em, libvlc_MediaMetaChanged,     HandleMediaMetaChanged,     self);
+    libvlc_event_detach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self);
+    libvlc_event_detach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self);
+    libvlc_event_detach(p_em, libvlc_MediaSubItemAdded,    HandleMediaSubItemAdded,    self);
+    libvlc_event_detach(p_em, libvlc_MediaParsedChanged,   HandleMediaParsedChanged,    self);
+    [[VLCEventManager sharedManager] cancelCallToObject:self];
+
     // Testing to see if the pointer exists is not required, if the pointer is null
     // then the release message is not sent to it.
     delegate = nil;
@@ -255,7 +259,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 - (NSString *)description
 {
     NSString * result = [metaDictionary objectForKey:VLCMetaInformationTitle];
-    return [NSString stringWithFormat:@"<%@ %p> %@", [self className], self, (result ? result : [url absoluteString])];
+    return [NSString stringWithFormat:@"<%@ %p> %@", [self class], self, (result ? result : [url absoluteString])];
 }
 
 - (NSComparisonResult)compare:(VLCMedia *)media
@@ -291,11 +295,11 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
     if (!length)
     {
-        // Force preparsing of this item.
-        [self length];
+        // Force parsing of this item.
+        [self parseIfNeeded];
 
         // wait until we are preparsed
-        while (!length && ![self isParsed] && [aDate timeIntervalSinceNow] > 0)
+        while (!length && !libvlc_media_is_parsed(p_md) && [aDate timeIntervalSinceNow] > 0)
         {
             usleep( thread_sleep );
         }
@@ -312,8 +316,81 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
 - (BOOL)isParsed
 {
-    return libvlc_media_is_parsed( p_md );
+    return isParsed;
 }
+
+- (void)parse
+{
+    libvlc_media_parse_async(p_md);
+}
+
+NSString *VLCMediaTracksInformationCodec = @"codec"; // NSNumber
+NSString *VLCMediaTracksInformationId    = @"id";    // NSNumber
+NSString *VLCMediaTracksInformationType  = @"type";  // NSString
+
+NSString *VLCMediaTracksInformationTypeAudio    = @"audio";
+NSString *VLCMediaTracksInformationTypeVideo    = @"video";
+NSString *VLCMediaTracksInformationTypeText     = @"text";
+NSString *VLCMediaTracksInformationTypeUnknown  = @"unknown";
+
+NSString *VLCMediaTracksInformationCodecProfile  = @"profile"; // NSNumber
+NSString *VLCMediaTracksInformationCodecLevel    = @"level";   // NSNumber
+
+NSString *VLCMediaTracksInformationAudioChannelsNumber = @"channelsNumber"; // NSNumber
+NSString *VLCMediaTracksInformationAudioRate           = @"rate";           // NSNumber
+
+NSString *VLCMediaTracksInformationVideoHeight = @"height"; // NSNumber
+NSString *VLCMediaTracksInformationVideoWidth  = @"width";  // NSNumber
+
+- (NSArray *)tracksInformation
+{
+    // Trigger parsing if needed
+    [self parseIfNeeded];
+
+    libvlc_media_track_info_t *tracksInfo;
+    int count = libvlc_media_get_tracks_info(p_md, &tracksInfo);
+    NSMutableArray *array = [NSMutableArray array];
+    for (int i = 0; i < count; i++) {
+        NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                           [NSNumber numberWithUnsignedInt:tracksInfo[i].i_codec], VLCMediaTracksInformationCodec,
+                                           [NSNumber numberWithInt:tracksInfo[i].i_id],            VLCMediaTracksInformationId,
+                                           [NSNumber numberWithInt:tracksInfo[i].i_profile],       VLCMediaTracksInformationCodecProfile,
+                                           [NSNumber numberWithInt:tracksInfo[i].i_level],         VLCMediaTracksInformationCodecLevel,
+                                           nil];
+
+        NSString *type;
+        switch (tracksInfo[i].i_type) {
+            case libvlc_track_audio:
+                type = VLCMediaTracksInformationTypeAudio;
+                NSNumber *level = [NSNumber numberWithUnsignedInt:tracksInfo[i].u.audio.i_channels];
+                NSNumber *rate =  [NSNumber numberWithUnsignedInt:tracksInfo[i].u.audio.i_rate];
+                [dictionary setObject:level forKey:VLCMediaTracksInformationAudioChannelsNumber];
+                [dictionary setObject:rate  forKey:VLCMediaTracksInformationAudioRate];
+                break;
+            case libvlc_track_video:
+                type = VLCMediaTracksInformationTypeVideo;
+                NSNumber *width =  [NSNumber numberWithUnsignedInt:tracksInfo[i].u.video.i_width];
+                NSNumber *height = [NSNumber numberWithUnsignedInt:tracksInfo[i].u.video.i_height];
+                [dictionary setObject:width  forKey:VLCMediaTracksInformationVideoWidth];
+                [dictionary setObject:height forKey:VLCMediaTracksInformationVideoHeight];
+                break;
+            case libvlc_track_text:
+                type = VLCMediaTracksInformationTypeText;
+                [dictionary setObject:VLCMediaTracksInformationTypeText forKey:VLCMediaTracksInformationType];
+                break;
+            case libvlc_track_unknown:
+            default:
+                type = VLCMediaTracksInformationTypeUnknown;
+                break;
+        }
+        [dictionary setValue:type forKey:VLCMediaTracksInformationType];
+
+        [array addObject:dictionary];
+    }
+    free(tracksInfo);
+    return array;
+}
+
 
 @synthesize url;
 @synthesize subitems;
@@ -444,6 +521,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     libvlc_event_attach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self);
     libvlc_event_attach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self);
     libvlc_event_attach(p_em, libvlc_MediaSubItemAdded,    HandleMediaSubItemAdded,    self);
+    libvlc_event_attach(p_em, libvlc_MediaParsedChanged,   HandleMediaParsedChanged,   self);
 
     libvlc_media_list_t * p_mlist = libvlc_media_subitems( p_md );
 
@@ -455,6 +533,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
         libvlc_media_list_release( p_mlist );
     }
 
+    isParsed = libvlc_media_is_parsed(p_md);
     state = LibVLCStateToMediaState(libvlc_media_get_state( p_md ));
 }
 
@@ -479,6 +558,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     }
 }
 
+#if !TARGET_OS_IPHONE
 - (void)fetchMetaInformationForArtWorkWithURL:(NSString *)anURL
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
@@ -488,7 +568,6 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     {
         // Go ahead and load up the art work
         NSURL * artUrl = [NSURL URLWithString:[anURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-
         // Don't attempt to fetch artwork from remote. Core will do that alone
         if ([artUrl isFileURL])
             art  = [[[NSImage alloc] initWithContentsOfURL:artUrl] autorelease];
@@ -509,6 +588,13 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     }
 
     [metaDictionary setObject:art forKey:@"artwork"];
+}
+#endif
+
+- (void)parseIfNeeded
+{
+    if (![self isParsed])
+        [self parse];
 }
 
 - (void)metaChanged:(NSString *)metaType
@@ -531,10 +617,47 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     libvlc_media_list_release( p_mlist );
 }
 
+- (void)parsedChanged:(NSNumber *)isParsedAsNumber
+{
+    [self willChangeValueForKey:@"parsed"];
+    isParsed = [isParsedAsNumber boolValue];
+    [self didChangeValueForKey:@"parsed"];
+
+    // FIXME: Probably don't even call this if there is no delegate.
+    if (!delegate || !isParsed)
+        return;
+
+    if ([delegate respondsToSelector:@selector(mediaDidFinishParsing:)]) {
+        [delegate mediaDidFinishParsing:self];
+    }
+}
+
 - (void)setStateAsNumber:(NSNumber *)newStateAsNumber
 {
     [self setState: [newStateAsNumber intValue]];
 }
+
+#if TARGET_OS_IPHONE
+- (NSDictionary *)metaDictionary
+{
+    if (!areOthersMetaFetched) {
+        areOthersMetaFetched = YES;
+        /* Force VLCMetaInformationTitle, that will trigger preparsing
+         * And all the other meta will be added through the libvlc event system */
+        [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationTitle];
+
+    }
+    if (!isArtURLFetched)
+    {
+        isArtURLFetched = YES;
+        /* Force isArtURLFetched, that will trigger artwork download eventually
+         * And all the other meta will be added through the libvlc event system */
+        [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationArtworkURL];
+    }
+    return metaDictionary;
+}
+
+#else
 
 - (id)valueForKeyPath:(NSString *)keyPath
 {
@@ -559,9 +682,9 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
          * And all the other meta will be added through the libvlc event system */
         [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationArtworkURL];
     }
-
     return [super valueForKeyPath:keyPath];
 }
+#endif
 @end
 
 /******************************************************************************

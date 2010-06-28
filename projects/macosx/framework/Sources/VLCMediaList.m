@@ -97,25 +97,13 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     return self;
 }
 
-- (void)release
-{
-    @synchronized(self)
-    {
-        if([self retainCount] <= 1)
-        {
-            /* We must make sure we won't receive new event after an upcoming dealloc
-             * We also may receive a -retain in some event callback that may occcur
-             * Before libvlc_event_detach. So this can't happen in dealloc */
-            libvlc_event_manager_t * p_em = libvlc_media_list_event_manager(p_mlist);
-            libvlc_event_detach(p_em, libvlc_MediaListItemDeleted, HandleMediaListItemDeleted, self);
-            libvlc_event_detach(p_em, libvlc_MediaListItemAdded,   HandleMediaListItemAdded,   self);
-        }
-        [super release];
-    }
-}
-
 - (void)dealloc
 {
+    libvlc_event_manager_t *em = libvlc_media_list_event_manager(p_mlist);
+    libvlc_event_detach(em, libvlc_MediaListItemDeleted, HandleMediaListItemDeleted, self);
+    libvlc_event_detach(em, libvlc_MediaListItemAdded,   HandleMediaListItemAdded,   self);
+    [[VLCEventManager sharedManager] cancelCallToObject:self];
+
     // Release allocated memory
     delegate = nil;
 
@@ -132,7 +120,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     {
         [content appendFormat:@"%@\n", [self mediaAtIndex: i]];
     }
-    return [NSString stringWithFormat:@"<%@ %p> {\n%@}", [self className], self, content];
+    return [NSString stringWithFormat:@"<%@ %p> {\n%@}", [self class], self, content];
 }
 
 - (void)lock

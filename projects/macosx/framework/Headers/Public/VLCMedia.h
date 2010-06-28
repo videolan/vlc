@@ -22,6 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import <Foundation/Foundation.h>
 #import "VLCMediaList.h"
 #import "VLCTime.h"
 
@@ -95,6 +96,13 @@ typedef enum VLCMediaState
  * \param key The key of the value that was changed.
  */
 - (void)media:(VLCMedia *)aMedia metaValueChangedFrom:(id)oldValue forKey:(NSString *)key;
+
+/**
+ * Delegate method called whenever the media was parsed.
+ * \param aMedia The media resource whose meta data has been changed.
+ */
+
+- (void)mediaDidFinishParsing:(VLCMedia *)aMedia;
 @end
 
 /**
@@ -116,6 +124,7 @@ typedef enum VLCMediaState
     BOOL                  areOthersMetaFetched; //< Value used to determine of the other meta has been parsed
     BOOL                  isArtURLFetched;   //< Value used to determine of the other meta has been preparsed
     VLCMediaState         state;             //< Current state of the media
+    BOOL                  isParsed;
 }
 
 /* Factories */
@@ -229,5 +238,98 @@ typedef enum VLCMediaState
  * Sets a value of the metaDictionary
  */
 - (void)setValue:(id)value forMeta:(NSString *)VLCMetaInformation;
+
+
+/**
+ * Tracks information NSDictionary Possible Keys
+ */
+
+/**
+ * \returns a NSNumber
+ */
+extern NSString *VLCMediaTracksInformationCodec;
+
+/**
+ * \returns a NSNumber
+ */
+extern NSString *VLCMediaTracksInformationId;
+/**
+ * \returns a NSString
+ * \see VLCMediaTracksInformationTypeAudio
+ * \see VLCMediaTracksInformationTypeVideo
+ * \see VLCMediaTracksInformationTypeText
+ * \see VLCMediaTracksInformationTypeUnknown
+ */
+extern NSString *VLCMediaTracksInformationType;
+
+/**
+ * \returns a NSNumber
+ */
+extern NSString *VLCMediaTracksInformationCodecProfile;
+/**
+ * \returns a NSNumber
+ */
+extern NSString *VLCMediaTracksInformationCodecLevel;
+
+/**
+ * \returns the audio channels number as NSNumber
+ */
+extern NSString *VLCMediaTracksInformationAudioChannelsNumber;
+/**
+ * \returns the audio rate as NSNumber
+ */
+extern NSString *VLCMediaTracksInformationAudioRate;
+
+/**
+ * \returns the height as NSNumber
+ */
+extern NSString *VLCMediaTracksInformationVideoHeight;
+/**
+ * \returns the width as NSNumber
+ */
+extern NSString *VLCMediaTracksInformationVideoWidth;
+
+/**
+ * Tracks information NSDictionary values for
+ * VLCMediaTracksInformationType
+ */
+extern NSString *VLCMediaTracksInformationTypeAudio;
+extern NSString *VLCMediaTracksInformationTypeVideo;
+extern NSString *VLCMediaTracksInformationTypeText;
+extern NSString *VLCMediaTracksInformationTypeUnknown;
+
+
+/**
+ * Returns the tracks information.
+ *
+ * This is an array of NSDictionary representing each track.
+ * It can contains the following keys:
+ *
+ * \see VLCMediaTracksInformationCodec
+ * \see VLCMediaTracksInformationId
+ * \see VLCMediaTracksInformationType
+ *
+ * \see VLCMediaTracksInformationCodecProfile
+ * \see VLCMediaTracksInformationCodecLevel
+ *
+ * \see VLCMediaTracksInformationAudioChannelsNumber
+ * \see VLCMediaTracksInformationAudioRate
+ *
+ * \see VLCMediaTracksInformationVideoHeight
+ * \see VLCMediaTracksInformationVideoWidth
+ */
+
+- (NSArray *)tracksInformation;
+
+/**
+ * Start asynchronously to parse the media.
+ * This will attempt to fetch the meta data and tracks information.
+ *
+ * This is automatically done when an accessor requiring parsing
+ * is called.
+ *
+ * \see -[VLCMediaDelegate mediaDidFinishParsing:]
+ */
+- (void)parse;
 
 @end
