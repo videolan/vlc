@@ -76,6 +76,7 @@ typedef struct
 } rar_file_t;
 
 static void RarFileDelete( rar_file_t * );
+static int  RarParse( stream_t *, int *pi_count, rar_file_t ***ppp_file );
 
 struct stream_sys_t
 {
@@ -96,8 +97,6 @@ struct stream_sys_t
 static int  Read   ( stream_t *, void *p_read, unsigned int i_read );
 static int  Peek   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
 static int  Control( stream_t *, int i_query, va_list );
-
-static int  Parse  ( stream_t * );
 static int  Seek   ( stream_t *s, uint64_t i_position );
 
 /****************************************************************************
@@ -134,7 +133,29 @@ static int Open ( vlc_object_t *p_this )
     p_sys->i_peek = 0;
 
     /* */
-    if( Parse( s ) || !p_sys->p_file || p_sys->p_file->i_chunk <= 0 )
+    int i_count;
+    rar_file_t **pp_file;
+    if( RarParse( s, &i_count, &pp_file ) )
+    {
+        i_count = 0;
+        pp_file = NULL;
+    }
+
+    /* Select the longest file */
+    p_sys->p_file = NULL;
+    for( int i = 0; i < i_count; i++ )
+    {
+        if( !p_sys->p_file || p_sys->p_file->i_size < pp_file[i]->i_size )
+            p_sys->p_file = pp_file[i];
+    }
+    for( int i = 0; i < i_count; i++ )
+    {
+        if( pp_file[i] != p_sys->p_file )
+            RarFileDelete( pp_file[i] );
+    }
+    free( pp_file );
+
+    if( !p_sys->p_file || p_sys->p_file->i_chunk <= 0 || p_sys->p_file->i_size <= 0 )
     {
         msg_Err( s, "Invalid or unsupported RAR archive" );
         if( p_sys->p_file )
@@ -317,6 +338,7 @@ static int Seek( stream_t *s, uint64_t i_position )
     return stream_Seek( s->p_source, i_seek );
 }
 
+/* Rar parser */
 static void RarFileDelete( rar_file_t *p_file )
 {
     for( int i = 0; i < p_file->i_chunk; i++ )
@@ -434,9 +456,8 @@ static int SkipEnd( stream_t *s, const rar_block_t *p_hdr )
     return VLC_SUCCESS;
 }
 
-static int SkipFile( stream_t *s,const rar_block_t *p_hdr )
+static int SkipFile( stream_t *s, int *pi_count, rar_file_t ***ppp_file, const rar_block_t *p_hdr )
 {
-    stream_sys_t *p_sys = s->p_sys;
     const uint8_t *p_peek;
 
     int i_min_size = 7+21;
@@ -455,6 +476,7 @@ static int SkipFile( stream_t *s,const rar_block_t *p_hdr )
     uint32_t i_file_size_high = 0;
     if( p_hdr->i_flags & RAR_BLOCK_FILE_HAS_HIGH )
         i_file_size_high = GetDWLE( &p_peek[7+25] );
+    const uint64_t i_file_size = ((uint64_t)i_file_size_high << 32) | i_file_size_low;
 
     char *psz_name = calloc( 1, i_name_size + 1 );
     if( !psz_name )
@@ -478,23 +500,22 @@ static int SkipFile( stream_t *s,const rar_block_t *p_hdr )
         goto exit;
     }
 
-    /* Ignore smaller files */
-    const uint64_t i_file_size = ((uint64_t)i_file_size_high << 32) | i_file_size_low;
-    if( p_sys->p_file &&
-        p_sys->p_file->i_size < i_file_size )
-    {
-        RarFileDelete( p_sys->p_file );
-        p_sys->p_file = NULL;
-    }
     /* */
-    rar_file_t *p_current = p_sys->p_file;
+    rar_file_t *p_current = *pi_count > 0 ? (*ppp_file)[*pi_count - 1] : NULL;
+    if( p_current &&
+        ( p_current->b_complete ||
+          p_current->i_size != i_file_size ||
+          strcmp( p_current->psz_name, psz_name ) ||
+          ( p_hdr->i_flags & RAR_BLOCK_FILE_HAS_PREVIOUS ) == 0 ) )
+        p_current = NULL;
+
     if( !p_current )
     {
-        p_sys->p_file = p_current = malloc( sizeof( *p_sys->p_file ) );
+        p_current = malloc( sizeof( *p_current ) );
         if( !p_current )
             goto exit;
+        TAB_APPEND( *pi_count, *ppp_file, p_current );
 
-        /* */
         p_current->psz_name = psz_name;
         p_current->i_size = i_file_size;
         p_current->b_complete = false;
@@ -505,50 +526,33 @@ static int SkipFile( stream_t *s,const rar_block_t *p_hdr )
     }
 
     /* Append chunks */
-    if( !p_current->b_complete )
+    rar_file_chunk_t *p_chunk = malloc( sizeof( *p_chunk ) );
+    if( p_chunk )
     {
-        bool b_append = false;
-        /* Append if first chunk */
-        if( p_current->i_chunk <= 0 )
-            b_append = true;
-        /* Append if it is really a continuous chunck */
-        if( p_current->i_size == i_file_size &&
-            ( !psz_name || !strcmp( p_current->psz_name, psz_name ) ) &&
-            ( p_hdr->i_flags & RAR_BLOCK_FILE_HAS_PREVIOUS ) )
-            b_append = true;
-
-        if( b_append )
+        p_chunk->i_offset = stream_Tell( s->p_source ) + p_hdr->i_size;
+        p_chunk->i_size = p_hdr->i_add_size;
+        p_chunk->i_cummulated_size = 0;
+        if( p_current->i_chunk > 0 )
         {
-            rar_file_chunk_t *p_chunk = malloc( sizeof( *p_chunk ) );
-            if( p_chunk )
-            {
-                p_chunk->i_offset = stream_Tell( s->p_source ) + p_hdr->i_size;
-                p_chunk->i_size = p_hdr->i_add_size;
-                p_chunk->i_cummulated_size = 0;
-                if( p_current->i_chunk > 0 )
-                {
-                    rar_file_chunk_t *p_previous = p_current->pp_chunk[p_current->i_chunk-1];
+            rar_file_chunk_t *p_previous = p_current->pp_chunk[p_current->i_chunk-1];
 
-                    p_chunk->i_cummulated_size += p_previous->i_cummulated_size +
-                                                  p_previous->i_size;
-                }
-
-                TAB_APPEND( p_current->i_chunk, p_current->pp_chunk, p_chunk );
-
-                p_current->i_real_size += p_hdr->i_add_size;
-            }
+            p_chunk->i_cummulated_size += p_previous->i_cummulated_size +
+                                          p_previous->i_size;
         }
 
-        if( !(p_hdr->i_flags & RAR_BLOCK_FILE_HAS_NEXT ) )
-            p_current->b_complete = true;
+        TAB_APPEND( p_current->i_chunk, p_current->pp_chunk, p_chunk );
+
+        p_current->i_real_size += p_hdr->i_add_size;
     }
+    if( ( p_hdr->i_flags & RAR_BLOCK_FILE_HAS_NEXT ) == 0 )
+        p_current->b_complete = true;
 
 exit:
     /* */
     free( psz_name );
 
     /* We stop on the first non empty file if we cannot seek */
-    if( p_sys->p_file )
+    if( p_current )
     {
         bool b_can_seek = false;
         stream_Control( s->p_source, STREAM_CAN_SEEK, &b_can_seek );
@@ -561,8 +565,11 @@ exit:
     return VLC_SUCCESS;
 }
 
-static int Parse( stream_t *s )
+static int RarParse( stream_t *s, int *pi_count, rar_file_t ***ppp_file )
 {
+    *pi_count = 0;
+    *ppp_file = NULL;
+
     /* Skip marker */
     if( IgnoreBlock( s, RAR_BLOCK_MARKER ) )
         return VLC_EGENERIC;
@@ -586,7 +593,7 @@ static int Parse( stream_t *s )
             i_ret = SkipEnd( s, &bk );
             break;
         case RAR_BLOCK_FILE:
-            i_ret = SkipFile( s, &bk );
+            i_ret = SkipFile( s, pi_count, ppp_file, &bk );
             break;
         default:
             i_ret = SkipBlock( s, &bk );
@@ -598,3 +605,4 @@ static int Parse( stream_t *s )
 
     return VLC_SUCCESS;
 }
+
