@@ -169,6 +169,7 @@ FFMPEGCONF+= --enable-libamr-nb --enable-libamr-wb --enable-nonfree
 endif
 
 ifdef HAVE_LINUX
+FFMPEGCONF+= --target-os=linux
 ifdef HAVE_MAEMO
 ifneq ($(filter -m%=cortex-a8, $(EXTRA_CFLAGS)),)
 FFMPEGCONF += --disable-runtime-cpudetect --enable-neon --cpu=cortex-a8
@@ -1112,7 +1113,11 @@ else
 ifdef HAVE_UCLIBC
 .ffmpeg: ffmpeg
 else
+ifeq ($(ARCH),armel)
+.ffmpeg: ffmpeg .lame .gsm .zlib
+else
 .ffmpeg: ffmpeg .lame .gsm .libvpx .zlib
+endif
 endif
 endif
 	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DHAVE_STDINT_H" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
