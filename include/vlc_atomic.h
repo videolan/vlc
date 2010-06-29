@@ -26,15 +26,6 @@
  * Atomic operations do not require locking, but they are not very powerful.
  */
 
-/**
- * Memory storage space for an atom. Never access it directly.
- */
-typedef union
-{
-    volatile uintptr_t u;
-    volatile intptr_t  s;
-} vlc_atomic_t;
-
 /* All functions return the atom value _after_ the operation. */
 
 VLC_EXPORT(uintptr_t, vlc_atomic_get, (const vlc_atomic_t *));

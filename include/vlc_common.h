@@ -516,6 +516,15 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #include "vlc_mtime.h"
 #include "vlc_threads.h"
 
+/**
+ * Memory storage space for an atom. Never access it directly.
+ */
+typedef union
+{
+    volatile uintptr_t u;
+    volatile intptr_t  s;
+} vlc_atomic_t;
+
 /*****************************************************************************
  * Common structure members
  *****************************************************************************/
@@ -558,7 +567,6 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 # define VLC_OBJECT( x ) ((vlc_object_t *)(x))
 #endif
 
-#include <vlc_atomic.h>
 typedef struct gc_object_t
 {
     vlc_atomic_t    refs;
