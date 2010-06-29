@@ -31,8 +31,8 @@
  */
 typedef union
 {
-    uintptr_t u;
-    intptr_t  s;
+    volatile uintptr_t u;
+    volatile intptr_t  s;
 } vlc_atomic_t;
 
 /* All functions return the atom value _after_ the operation. */
