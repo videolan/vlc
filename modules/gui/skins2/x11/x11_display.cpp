@@ -253,6 +253,9 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
         // test EWMH capabilities
         testEWMH();
+
+        // Force _NET_WM_PID whatever the WM _NET_SUPPORTED says
+        m_net_wm_pid = XInternAtom( m_pDisplay, "_NET_WM_PID" , False );
     }
 }
 

@@ -34,6 +34,7 @@
 #include "x11_dragdrop.hpp"
 #include "x11_factory.hpp"
 
+#include <assert.h>
 
 X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                       X11Display &rDisplay, bool dragDrop, bool playOnDrop,
@@ -184,12 +185,10 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     delete[] hostname;
 
     // initialize EWMH pid
-    if( NET_WM_PID != None )
-    {
-        pid_t pid = getpid();
-        XChangeProperty( XDISPLAY, m_wnd, NET_WM_PID, XA_CARDINAL, 32,
-                         PropModeReplace, (unsigned char *)&pid, 1 );
-    }
+    pid_t pid = getpid();
+    assert(  NET_WM_PID != None );
+    XChangeProperty( XDISPLAY, m_wnd, NET_WM_PID, XA_CARDINAL, 32,
+                     PropModeReplace, (unsigned char *)&pid, 1 );
 
 }
 
