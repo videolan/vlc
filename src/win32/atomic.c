@@ -41,8 +41,8 @@ uintptr_t vlc_atomic_set (vlc_atomic_t *atom, uintptr_t v)
 uintptr_t vlc_atomic_add (vlc_atomic_t *atom, uintptr_t v)
 {
 #if defined (WIN64)
-    return InterlockedExchangeAdd64 (&atom->s, v);
+    return InterlockedExchangeAdd64 (&atom->s, v) + v;
 #else
-    return InterlockedExchangeAdd (&atom->s, v);
+    return InterlockedExchangeAdd (&atom->s, v) + v;
 #endif
 }
