@@ -12,6 +12,7 @@ Access
  * BDA: experimental support for ClearQam devices
  * DVB-S scanning support
  * DShow: support for freq and video standard selection
+ * Support for VDR recordings
 
 Codecs
  * You can now use ffmpeg-mt in conjunction with vlc

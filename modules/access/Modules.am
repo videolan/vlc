@@ -50,6 +50,7 @@ SOURCES_access_sftp = sftp.c
 SOURCES_access_imem = imem.c
 SOURCES_access_avio = avio.c avio.h
 SOURCES_access_attachment = attachment.c
+SOURCES_access_vdr = vdr.c
 
 SOURCES_access_rar = rar/rar.c rar/rar.h rar/access.c
 SOURCES_stream_filter_rar = rar/rar.c rar/rar.h rar/stream.c
@@ -74,6 +75,7 @@ libvlc_LTLIBRARIES += \
 	libaccess_attachment_plugin.la \
 	libaccess_rar_plugin.la \
 	libstream_filter_rar_plugin.la \
+	libaccess_vdr_plugin.la \
 	$(NULL)
 
 libaccess_alsa_plugin_la_SOURCES = alsa.c

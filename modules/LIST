@@ -34,6 +34,7 @@ $Id$
  * access_smb: SMB shares access module
  * access_tcp: TCP Network access module
  * access_udp: UDP Network access module
+ * access_vdr: VDR access module
  * adjust: Contrast/Hue/saturation/Brightness adjust module
  * adpcm: ADPCM audio decoder
  * aes3: aes3 decoder/packetizer
