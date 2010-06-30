@@ -38,18 +38,13 @@ function try_query(query)
     local page = s:read( 65653 )
 
     -- FIXME: multiple results may be available
-    _,_,asin = string.find( page, "<asin>(.-)</asin>" )
+    asin = string.find( page, "<asin>(%w+)</asin>" )
     if asin then
+        vlc.msg.dbg( asin )
         return "http://images.amazon.com/images/P/"..asin..".01._SCLZZZZZZZ_.jpg"
     else
         return nil
     end
-end
-
-function fuzzy(query)
-    -- http://musicbrainz.org/doc/TextSearchSyntax#Fuzzy_searches
-    -- we could even tweak the fuzziness
-    return string.gsub(query, "([^%s]+)", "%1~")
 end
 
 -- Return the artwork
@@ -59,8 +54,8 @@ function fetch_art()
         return nil
     end
 
-    local query1 = "http://musicbrainz.org/ws/1/release/?type=xml&artist="..vlc.strings.encode_uri_component(meta["artist"]).."&title="..vlc.strings.encode_uri_component(meta["album"])
-    local query2 = "http://musicbrainz.org/ws/1/release/?type=xml&query="..vlc.strings.encode_uri_component(meta["album"].." AND ".."artist:"..meta["artist"])
-    local query3 = "http://musicbrainz.org/ws/1/release/?type=xml&query="..vlc.strings.encode_uri_component(fuzzy(meta["album"]).." AND ".."artist:"..fuzzy(meta["artist"]))
+    local query1 = "http://musicbrainz.org/ws/1/release/?type=xml&artist="..vlc.strings.encode_uri_component(meta["artist"]).."&title=\""..vlc.strings.encode_uri_component(meta["album"].."\"")
+    local query2 = "http://musicbrainz.org/ws/1/release/?type=xml&query=\""..vlc.strings.encode_uri_component(meta["album"].."\" AND ".."artist:"..meta["artist"])
+    local query3 = "http://musicbrainz.org/ws/1/release/?type=xml&query=\""..vlc.strings.encode_uri_component(meta["album"].."\"~ AND ".."artist:"..meta["artist"].."~")
     return try_query(query1) or try_query(query2) or try_query(query3)
 end
