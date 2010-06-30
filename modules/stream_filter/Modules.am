@@ -1,10 +1,8 @@
 SOURCES_decomp = decomp.c
 SOURCES_stream_filter_record = record.c
-SOURCES_stream_filter_rar = rar.c
 
 libvlc_LTLIBRARIES += \
    libstream_filter_record_plugin.la \
-   libstream_filter_rar_plugin.la \
    $(NULL)
 if !HAVE_WIN32
 if !HAVE_WINCE
