@@ -1745,7 +1745,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             for( i=0; i<VLC_META_TYPE_COUNT; i++ )
             {
                 if( y >= y_end ) break;
-                char *psz_meta = vlc_meta_Get( p_item->p_meta, i );
+                const char *psz_meta = vlc_meta_Get( p_item->p_meta, i );
                 if( psz_meta && *psz_meta )
                 {
                     const char *psz_meta_title;
