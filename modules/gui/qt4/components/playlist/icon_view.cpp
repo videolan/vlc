@@ -37,8 +37,8 @@
 
 #include "assert.h"
 
-#define ART_SIZE_W          110
-#define ART_SIZE_H          80
+/* ICON_SCALER comes currently from harrison-stetson method, so good value */
+#define ICON_SCALER         16
 #define ART_RADIUS          5
 #define SPACER              5
 
@@ -131,14 +131,22 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QString title = getMeta( index, COLUMN_TITLE );
     QString artist = getMeta( index, COLUMN_ARTIST );
 
-    QPixmap artPix = getArtPixmap( index, QSize( ART_SIZE_W, ART_SIZE_H ) );
+    QFont font( index.data( Qt::FontRole ).value<QFont>() );
+    painter->setFont( font );
+    QFontMetrics fm = painter->fontMetrics();
+
+    int averagewidth = fm.averageCharWidth();
+    int art_width = averagewidth * ICON_SCALER;
+    int art_height = averagewidth * ICON_SCALER;
+
+    QPixmap artPix = getArtPixmap( index, QSize( art_width, art_height) );
 
     paintBackground( painter, option, index );
 
     painter->save();
 
-    QRect artRect( option.rect.x() + 5 + ( ART_SIZE_W - artPix.width() ) / 2,
-                   option.rect.y() + 5 + ( ART_SIZE_H - artPix.height() ) / 2,
+    QRect artRect( option.rect.x() + averagewidth*2 + ( art_width - artPix.width() ) / 2,
+                   option.rect.y() + averagewidth + ( art_height - artPix.height() ) / 2,
                    artPix.width(), artPix.height() );
 
     // Draw the drop shadow
@@ -159,7 +167,6 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     if( option.state & QStyle::State_Selected )
         painter->setPen( option.palette.color( QPalette::HighlightedText ) );
 
-    QFont font( index.data( Qt::FontRole ).value<QFont>() );
 
     //Draw children indicator
     if( !index.data( PLModel::IsLeafNodeRole ).toBool() )
@@ -183,10 +190,9 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
     // Draw title
     font.setItalic( true );
-    painter->setFont( font );
 
-    QFontMetrics fm = painter->fontMetrics();
-    QRect textRect = option.rect.adjusted( 1, ART_SIZE_H + 10, 0, -1 );
+    fm = painter->fontMetrics();
+    QRect textRect = option.rect.adjusted( 1, art_height + 10, 0, -1 );
     textRect.setHeight( fm.height() );
 
     painter->drawText( textRect,
@@ -214,8 +220,9 @@ QSize PlIconViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, co
     f.setBold( true );
     QFontMetrics fm( f );
     int textHeight = fm.height();
-    QSize sz ( ART_SIZE_W + 2 * SPACER,
-               ART_SIZE_H + 3 * SPACER + 2 * textHeight + 1 );
+    int averagewidth = fm.averageCharWidth();
+    QSize sz ( averagewidth * ICON_SCALER + 4 * SPACER,
+               averagewidth * ICON_SCALER + 4 * SPACER + 2 * textHeight + 1 );
     return sz;
 }
 
@@ -341,7 +348,6 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
     setViewMode( QListView::IconMode );
     setMovement( QListView::Static );
     setResizeMode( QListView::Adjust );
-    setGridSize( delegate->sizeHint() );
     setWrapping( true );
     setUniformItemSizes( true );
     setSelectionMode( QAbstractItemView::ExtendedSelection );
