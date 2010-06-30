@@ -352,10 +352,11 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
     }
     else if( role == Qt::FontRole )
     {
+        QFont f;
+        f.setPointSize( f.pointSize() - 2 );
         if( isCurrent( index ) )
-        {
-            QFont f; f.setBold( true ); return QVariant( f );
-        }
+            f.setBold( true );
+        return QVariant( f );
     }
     else if( role == Qt::BackgroundRole && isCurrent( index ) )
     {
