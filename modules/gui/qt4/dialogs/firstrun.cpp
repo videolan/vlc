@@ -72,7 +72,7 @@ void FirstRun::buildPrivDialog()
         "<p><i>VideoLAN</i> prefers when applications request authorization "
         "before accessing Internet.</p>\n"
         "<p><b>VLC media player</b> can get information from the Internet "
-        "in order to get <b>media informations</b> or to check for available <b>updates</b>.</p>\n"
+        "in order to get <b>medias information</b> or to check for available <b>updates</b>.</p>\n"
         "<p><i>VLC media player</i> <b>doesn't</b> send or collect any "
         "information, even anonymously, about your usage.</p>\n" ) );
     text->setWordWrap( true );
