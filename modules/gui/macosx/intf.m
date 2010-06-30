@@ -2925,4 +2925,14 @@ end:
     b_justJumped = NO;
 }
 
+// when user selects the quit menu from dock it sends a terminate:
+// but we need to send a stop: to properly exits libvlc.
+// However, we are not able to change the action-method sent by this standard menu item.
+// thus we override terminat: to send a stop:
+// see [af97f24d528acab89969d6541d83f17ce1ecd580] that introduced the removal of setjmp() and longjmp() 
+- (void)terminate:(id)sender
+{
+    [self stop:sender];
+}
+
 @end
