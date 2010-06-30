@@ -349,6 +349,13 @@
            </property>
           </widget>
          </item>
+         <item row="9" column="0">
+          <widget class="QCheckBox" name="treePlaylist">
+           <property name="text">
+            <string>Display playlist tree</string>
+           </property>
+          </widget>
+         </item>
          <item row="8" column="1">
           <widget class="QComboBox" name="stylesCombo"/>
          </item>
