@@ -41,7 +41,7 @@ CtrlRadialSlider::CtrlRadialSlider( intf_thread_t *pIntf,
     CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ), m_numImg( numImg ),
     m_rVariable( rVariable ), m_minAngle( minAngle ), m_maxAngle( maxAngle ),
     m_cmdUpDown( this ), m_cmdDownUp( this ),
-    m_cmdMove( this )
+    m_cmdMove( this ), m_position( 0 )
 {
     // Build the images of the sequence
     m_pImgSeq = OSFactory::instance( getIntf() )->createOSGraphics(

@@ -460,8 +460,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 attr["lefttop"], attr["rightbottom"],
                 convertBoolean( attr["xkeepratio"] ),
                 convertBoolean( attr["ykeepratio"] ), attr["sequence"],
-                atoi( attr["nbImages"] ), atof( attr["minAngle"] ) * M_PI /180,
-                atof( attr["maxAngle"] ) * M_PI / 180, attr["value"],
+                atoi( attr["nbimages"] ), atof( attr["minangle"] ) * M_PI /180,
+                atof( attr["maxangle"] ) * M_PI / 180, attr["value"],
                 attr["tooltiptext"], attr["help"], m_curLayer, m_curWindowId,
                 m_curLayoutId, m_panelStack.back() );
         m_curLayer++;
