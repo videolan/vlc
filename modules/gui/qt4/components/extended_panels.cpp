@@ -1297,8 +1297,8 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     AVSpin = new QDoubleSpinBox;
     AVSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
     AVSpin->setDecimals( 3 );
-    AVSpin->setMinimum( -100.0 );
-    AVSpin->setMaximum( 100.0 );
+    AVSpin->setMinimum( -600.0 );
+    AVSpin->setMaximum( 600.0 );
     AVSpin->setSingleStep( 0.1 );
     AVSpin->setToolTip( qtr( "A positive value means that\n"
                              "the audio is ahead of the video" ) );
@@ -1330,8 +1330,8 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subsSpin = new QDoubleSpinBox;
     subsSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
     subsSpin->setDecimals( 3 );
-    subsSpin->setMinimum( -100.0 );
-    subsSpin->setMaximum( 100.0 );
+    subsSpin->setMinimum( -600.0 );
+    subsSpin->setMaximum( 600.0 );
     subsSpin->setSingleStep( 0.1 );
     subsSpin->setToolTip( qtr( "A positive value means that\n"
                              "the subtitles are ahead of the video" ) );
