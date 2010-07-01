@@ -142,7 +142,7 @@ void CtrlRadialSlider::setCursor( int posX, int posY, bool blocking )
 
     // Compute the position relative to the center
     int x = posX - pPos->getLeft() - m_width / 2;
-    int y = posY - pPos->getTop() - m_width / 2;
+    int y = posY - pPos->getTop() - m_height / 2;
 
     // Compute the polar coordinates. angle is -(-j,OM)
     float r = sqrt((float)(x*x + y*y));
