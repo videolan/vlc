@@ -1,5 +1,6 @@
 SUBDIRS = channel_mixer converter resampler spatializer
 SOURCES_equalizer = equalizer.c equalizer_presets.h
+SOURCES_compressor = compressor.c
 SOURCES_normvol = normvol.c
 SOURCES_audiobargraph_a = audiobargraph_a.c
 SOURCES_param_eq = param_eq.c
@@ -9,6 +10,7 @@ SOURCES_chorus_flanger = chorus_flanger.c
 libvlc_LTLIBRARIES += \
 	libaudiobargraph_a_plugin.la \
 	libchorus_flanger_plugin.la \
+	libcompressor_plugin.la \
 	libequalizer_plugin.la \
 	libnormvol_plugin.la \
 	libparam_eq_plugin.la \

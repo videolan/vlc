@@ -659,7 +659,7 @@ AC_CHECK_LIB(m,pow,[
   VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc ffmpegaltivec i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realvideo qt4],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
-  VLC_ADD_LIBS([headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball],[-lm])
+  VLC_ADD_LIBS([compressor headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball],[-lm])
 ])
 AC_CHECK_LIB(m,ceil,[
   VLC_ADD_LIBS([access_imem hotkeys mosaic swscale_omap],[-lm])

@@ -72,6 +72,7 @@ $Id$
  * chorus_flanger: variable delay audio filter
  * clone: Clone video filter
  * colorthres:  Theshold color based on similarity to reference color Video filter
+ * compressor: Dynamic range compressor
  * converter_fixed: Fixed-point audio format conversions
  * crop: Crop video filter
  * croppadd: Crop/Padd image filter
