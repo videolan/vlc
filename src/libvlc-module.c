@@ -1617,7 +1617,7 @@ vlc_module_begin ()
                          NULL, AUDIO_FILTER_TEXT,
                          AUDIO_FILTER_LONGTEXT, false )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
-    add_module( "audio-visual", "visualization",NULL, NULL,AUDIO_VISUAL_TEXT,
+    add_module( "audio-visual", "visualization2",NULL, NULL,AUDIO_VISUAL_TEXT,
                 AUDIO_VISUAL_LONGTEXT, false )
 
 /* Video options */
