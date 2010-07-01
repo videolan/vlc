@@ -34,7 +34,11 @@ uintptr_t vlc_atomic_get (const vlc_atomic_t *atom)
 
 uintptr_t vlc_atomic_set (vlc_atomic_t *atom, uintptr_t v)
 {
-    atom->u = v;
+#if defined (WIN64)
+    InterlockedExchange64 (&atom->u, v);
+#else
+    InterlockedExchange (&atom->u, v);
+#endif
     return v;
 }
 
