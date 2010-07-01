@@ -53,8 +53,8 @@ SOURCES_access_imem = imem.c
 SOURCES_access_avio = avio.c avio.h
 SOURCES_access_attachment = attachment.c
 
-libstream_filter_rar_plugin_la_SOURCES = rar/rar.c rar/rar.h rar/stream.c
-libaccess_rar_plugin_la_SOURCES = rar/rar.c rar/rar.h rar/access.c
+SOURCES_access_rar = rar/rar.c rar/rar.h rar/access.c
+SOURCES_stream_filter_rar = rar/rar.c rar/rar.h rar/stream.c
 
 libaccess_rtmp_plugin_la_SOURCES = \
         rtmp/access.c \
