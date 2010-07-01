@@ -100,7 +100,7 @@ void CtrlRadialSlider::draw( OSGraphics &rImage, int xDest, int yDest )
 void CtrlRadialSlider::onUpdate( Subject<VarPercent> &rVariable,
                                  void *arg  )
 {
-    m_position = (int)( m_rVariable.get() * m_numImg );
+    m_position = (int)( m_rVariable.get() * ( m_numImg - 1 ) );
     notifyLayout( m_width, m_height );
 }
 
