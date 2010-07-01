@@ -284,6 +284,7 @@ Sašo Kiselkov <skiselkov _at_ gmail dot com> - RTSP session timeout fix for som
 Scott Caudle <dorkmanzcot at gmail dot com> - Visualization, WX improvements
 Sebastian Jenny <jenny - sebastian &t gmail - com > - AAC decoding channel ordering fix.
 Sebastien Chaumat <Sebastien.Chaumat at ens-lyon.fr> - YOPY port tests
+Sebastien Zwickert (aka dilaroga) <dilaroga chez free> - Multiple Mac OS fixes and improvements
 Сергей Дарьичев <charnabog at rambler dot ru> - Belarusian translation
 Shane Harper <shanegh@optusnet.com.au> - SDL fixes, XVideo video output and Gtk+ interface enhancements
 Sidney Doria <ssdoria qt gmail.com> - Brazilian Portuguese localisation
