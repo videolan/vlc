@@ -275,7 +275,19 @@ static const vlc_qt_key_t keys[] =
     // Qt::Key_CapsLock
     // Qt::Key_NumLock
     // Qt::Key_ScrollLock
-    /* F1 - F35 */
+    /* F1 - F35 - Qt goes to F35, VLC stops at F12 */
+    { Qt::Key_F1,                    KEY_F1 },
+    { Qt::Key_F2,                    KEY_F2 },
+    { Qt::Key_F3,                    KEY_F3 },
+    { Qt::Key_F4,                    KEY_F4 },
+    { Qt::Key_F5,                    KEY_F5 },
+    { Qt::Key_F6,                    KEY_F6 },
+    { Qt::Key_F7,                    KEY_F7 },
+    { Qt::Key_F8,                    KEY_F8 },
+    { Qt::Key_F9,                    KEY_F9 },
+    { Qt::Key_F10,                   KEY_F10 },
+    { Qt::Key_F11,                   KEY_F11 },
+    { Qt::Key_F12,                   KEY_F12 },
     // Qt::Key_Super_L
     // Qt::Key_Super_R
     { Qt::Key_Menu,                  KEY_MENU },
@@ -385,9 +397,6 @@ int qtEventToVLCKey( QKeyEvent *e )
 #else
 # error FIXME
 #endif
-    else /* Qt and X11 go to F35, but VLC stops at F12 */
-    if( qtk >= Qt::Key_F1 && qtk <= Qt::Key_F12 )
-        i_vlck = qtk - Qt::Key_F1 + KEY_F1;
     else
     {
         const vlc_qt_key_t *map;
