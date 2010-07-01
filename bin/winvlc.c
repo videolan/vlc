@@ -121,6 +121,20 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     int argc;
 #ifndef UNDER_CE
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
+
+    HINSTANCE h_Kernel32 = LoadLibraryW(L"kernel32.dll");
+    if(h_Kernel32)
+    {
+        BOOL (WINAPI * mySetProcessDEPPolicy)( DWORD dwFlags);
+# define PROCESS_DEP_ENABLE 1
+
+        mySetProcessDEPPolicy = (BOOL WINAPI (*)(DWORD))
+                            GetProcAddress(h_Kernel32, "SetProcessDEPPolicy");
+        if(mySetProcessDEPPolicy)
+            mySetProcessDEPPolicy(PROCESS_DEP_ENABLE);
+        FreeLibrary(h_Kernel32);
+    }
+
     wchar_t **wargv = CommandLineToArgvW (GetCommandLine (), &argc);
     if (wargv == NULL)
         return 1;
