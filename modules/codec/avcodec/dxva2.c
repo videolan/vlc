@@ -142,32 +142,32 @@ typedef struct {
 } dxva2_mode_t;
 /* XXX Prefered modes must come first */
 static const dxva2_mode_t dxva2_modes[] = {
-    { "DXVA2_ModeMPEG2_VLD",    &DXVA2_ModeMPEG2_VLD,     CODEC_ID_MPEG2VIDEO },
-    { "DXVA2_ModeMPEG2_MoComp", &DXVA2_ModeMPEG2_MoComp,  0 },
-    { "DXVA2_ModeMPEG2_IDCT",   &DXVA2_ModeMPEG2_IDCT,    0 },
+    { "MPEG-2 variable-length decoder",            &DXVA2_ModeMPEG2_VLD,     CODEC_ID_MPEG2VIDEO },
+    { "MPEG-2 motion compensation",                &DXVA2_ModeMPEG2_MoComp,  0 },
+    { "MPEG-2 inverse discrete cosine transform",  &DXVA2_ModeMPEG2_IDCT,    0 },
 
-    { "H.264 variable-length decoder (VLD), FGT",               &DXVA2_ModeH264_F,         CODEC_ID_H264 },
-    { "H.264 VLD, no FGT",                                      &DXVA2_ModeH264_E,         CODEC_ID_H264 },
-    { "H.264 VLD, no FGT (Intel)",                              &DXVADDI_Intel_ModeH264_E, CODEC_ID_H264 },
-    { "H.264 IDCT, FGT",                                        &DXVA2_ModeH264_D,         0             },
-    { "H.264 inverse discrete cosine transform (IDCT), no FGT", &DXVA2_ModeH264_C,         0             },
-    { "H.264 inverse discrete cosine transform (IDCT), no FGT (Intel)", &DXVADDI_Intel_ModeH264_C, 0     },
-    { "H.264 MoComp, FGT",                                      &DXVA2_ModeH264_B,         0             },
-    { "H.264 motion compensation (MoComp), no FGT",             &DXVA2_ModeH264_A,         0             },
-    { "H.264 motion compensation (MoComp), no FGT (Intel)",     &DXVADDI_Intel_ModeH264_A, 0             },
+    { "H.264 variable-length decoder, film grain technology",                      &DXVA2_ModeH264_F,         CODEC_ID_H264 },
+    { "H.264 variable-length decoder, no film grain technology",                   &DXVA2_ModeH264_E,         CODEC_ID_H264 },
+    { "H.264 variable-length decoder, no film grain technology (Intel)",           &DXVADDI_Intel_ModeH264_E, CODEC_ID_H264 },
+    { "H.264 inverse discrete cosine transform, film grain technology",            &DXVA2_ModeH264_D,         0             },
+    { "H.264 inverse discrete cosine transform, no film grain technology",         &DXVA2_ModeH264_C,         0             },
+    { "H.264 inverse discrete cosine transform, no film grain technology (Intel)", &DXVADDI_Intel_ModeH264_C, 0             },
+    { "H.264 motion compensation, film grain technology",                          &DXVA2_ModeH264_B,         0             },
+    { "H.264 motion compensation, no film grain technology",                       &DXVA2_ModeH264_A,         0             },
+    { "H.264 motion compensation, no film grain technology (Intel)",               &DXVADDI_Intel_ModeH264_A, 0             },
 
-    { "Windows Media Video 8 MoComp",           &DXVA2_ModeWMV8_B, 0 },
-    { "Windows Media Video 8 post processing",  &DXVA2_ModeWMV8_A, 0 },
+    { "Windows Media Video 8 motion compensation", &DXVA2_ModeWMV8_B, 0 },
+    { "Windows Media Video 8 post processing",     &DXVA2_ModeWMV8_A, 0 },
 
-    {  "Windows Media Video 9 IDCT",            &DXVA2_ModeWMV9_C, 0 },
-    {  "Windows Media Video 9 MoComp",          &DXVA2_ModeWMV9_B, 0 },
-    {  "Windows Media Video 9 post processing", &DXVA2_ModeWMV9_A, 0 },
+    { "Windows Media Video 9 IDCT",                &DXVA2_ModeWMV9_C, 0 },
+    { "Windows Media Video 9 motion compensation", &DXVA2_ModeWMV9_B, 0 },
+    { "Windows Media Video 9 post processing",     &DXVA2_ModeWMV9_A, 0 },
 
-    { "VC-1 VLD",             &DXVA2_ModeVC1_D, CODEC_ID_VC1 },
-    { "VC-1 VLD",             &DXVA2_ModeVC1_D, CODEC_ID_WMV3 },
-    { "VC-1 IDCT",            &DXVA2_ModeVC1_C, 0 },
-    { "VC-1 MoComp",          &DXVA2_ModeVC1_B, 0 },
-    { "VC-1 post processing", &DXVA2_ModeVC1_A, 0 },
+    { "VC-1 variable-length decoder",              &DXVA2_ModeVC1_D, CODEC_ID_VC1 },
+    { "VC-1 variable-length decoder",              &DXVA2_ModeVC1_D, CODEC_ID_WMV3 },
+    { "VC-1 inverse discrete cosine transform",    &DXVA2_ModeVC1_C, 0 },
+    { "VC-1 motion compensation",                  &DXVA2_ModeVC1_B, 0 },
+    { "VC-1 post processing",                      &DXVA2_ModeVC1_A, 0 },
 
     { NULL, NULL, 0 }
 };
