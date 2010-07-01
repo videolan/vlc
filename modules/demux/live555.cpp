@@ -908,6 +908,7 @@ static int SessionsSetup( demux_t *p_demux )
                 if( !strcmp( sub->codecName(), "MPV" ) )
                 {
                     tk->fmt.i_codec = VLC_CODEC_MPGV;
+                    tk->fmt.b_packetized = false;
                 }
                 else if( !strcmp( sub->codecName(), "H263" ) ||
                          !strcmp( sub->codecName(), "H263-1998" ) ||
