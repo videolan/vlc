@@ -796,6 +796,8 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                  !strcmp( p_tk->psz_codec, "V_MPEG2" ) )
         {
             p_tk->fmt.i_codec = VLC_CODEC_MPGV;
+            if( p_tk->i_extra_data )
+                fill_extra_data( p_tk );
         }
         else if( !strncmp( p_tk->psz_codec, "V_THEORA", 8 ) )
         {
