@@ -231,7 +231,7 @@ typedef struct
     int          height;
 
     /* DLL */
-	HINSTANCE             hd3d9_dll;
+    HINSTANCE             hd3d9_dll;
     HINSTANCE             hdxva2_dll;
 
     /* Direct3D */
