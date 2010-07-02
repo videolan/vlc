@@ -1,4 +1,4 @@
-List of vlc plugins (346)
+List of vlc plugins (363)
 $Id$
  * a52: A/52 basic parser/packetizer
  * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
@@ -11,7 +11,6 @@ $Id$
  * access_directory: Access module to read files in a directory
  * access_dv: Raw1394 Digital Video (Firewire/IEEE1394/I-Link) access module
  * access_eyetv: Access module to connect to our plugin running within EyeTV
- * access_fake: Fake access to use for mosaic and other special streaming setups
  * access_ftp: FTP Network access module
  * access_gnomevfs: GnomeVFS access
  * access_http: HTTP Network access module
@@ -24,9 +23,11 @@ $Id$
  * access_output_dummy: dummy access_output module
  * access_output_file: File access_output module
  * access_output_http: HTTP Network access module
+ * access_output_livehttp: Live HTTP stream output
  * access_output_rtmp: RTMP stream output
  * access_output_shout: Shoutcast access output
  * access_output_udp: UDP Network access_output module
+ * access_rar: RAR access
  * access_realrtsp: Real RTSP access
  * access_rtmp: RTMP network access
  * access_sftp: SFTP network access module
@@ -108,7 +109,6 @@ $Id$
  * export: playlist export module
  * extract: Extract RGB components video filter
  * faad: AAC decoder using libfaad2
- * fake: fake codec to be used in advanced streaming setups
  * fb: video output module for the Linux framebuffer
  * fbosd: framebuffer osd plugin
  * filesystem: Filesystem access module
@@ -122,12 +122,12 @@ $Id$
  * gapi: PocketPC Video output
  * gaussianblur: gaussian blur video filter
  * gestures: mouse gestures control plugin
- * ggi: video output module using the GGI API
  * globalhotkeys: module to catch hotkeys when application doesn't have the focus
  * glwin32: a opengl provider using DirectX OpenGL
  * gme: game music files demuxer
  * gnutls: GNU TLS encryption/decryption module
  * goom: visualisation plugin based on goom
+ * gradfun: Gradfun video effects filter
  * gradient: Gradient and edge detection video effects filter
  * grain: Grain Video filter
  * grey_yuv: grayscale to others conversion module
@@ -136,7 +136,6 @@ $Id$
  * h264: H264 decoder
  * hal: Linux HAL services discovery module
  * hd1000a: audio output module for the Roku HD1000 Set-Top-Box
- * hd1000v: video output module for the Roku HD1000 Set-Top-Box
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
  * hildon: Maemo interface based on Hildon
  * hotkeys: hotkeys control module
@@ -218,11 +217,9 @@ $Id$
  * ogg: input module for OGG decapsulation
  * oldhttp: old HTTP remote control webinterface
  * oldrc: old interface module using stdio
- * omapfb: omap framebuffer video output
  * omxil: OpenMAX IL audio/video decoder
  * opencv_example: OpenCV example (face identification)
  * opencv_wrapper: OpenCV wrapper video filter
- * opengl: a opengl video output that uses opengl provider modules
  * osd_parser: OSD import module
  * osdmenu: video_filter for displaying and streaming a On Screen Display menu
  * oss: audio output module using the OSS /dev/dsp interface
@@ -277,7 +274,6 @@ $Id$
  * sharpen: Sharpen video filter
  * shine: MP3 encoder using Shine, a fixed point implementation
  * shout: Shoutcast services discovery
- * signals: POSIX signals handling interface
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation
  * smf: Standard MIDI file demuxer
@@ -311,13 +307,11 @@ $Id$
  * subtitle: a demuxer for subtitle files
  * svcdsub: SVCD subtitles decoder
  * svg: a svg renderer module
- * svgalib: SGVAlib output plugin
  * swscale: Video scaling filter
  * swscale_omap: Video scaling filter for maemo/omap platform
  * t140: T.140 text encoder
  * taglib: Taglib tags parser and writer
  * telepathy: Telepathy Presence information using MissionControl notification
- * telnet: Telnet control interface for VideoLAN Media Manager
  * telx: teletext subtitles decoder
  * theora: a theora video decoder/packetizer/encoder using the libtheora library
  * time: Overlays the current time
