@@ -339,17 +339,20 @@ case "${host_os}" in
         dnl
         AC_ARG_ENABLE(peflags,
           [  --enable-peflags        peflags use (default enabled on Windows)])
-        if test "${enable_peflags}" != "no"
-        then
+        if test "${enable_peflags}" != "no" ; then
           AC_CHECK_TOOL(PEFLAGS, peflags, :)
         fi
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
+        ac_default_prefix="`pwd`/_win32"
+        DESTDIR="`pwd`/_win32/"
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
         VLC_ADD_LIBS([libvlccore access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_rtmp sap oldhttp netsync audioscrobbler growl rtp stream_out_standard stream_out_rtp remoteosd ts audiobargraph_a netsync],[-lws2])
         VLC_ADD_LIBS([libvlccore],[-lmmtimer])
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
+        ac_default_prefix="`pwd`/_wince"
+        DESTDIR="`pwd`/_wince/"
    fi
     ;;
   *nto*)
@@ -4319,7 +4322,10 @@ AS_IF([test "x$KDE4_CONFIG" = "x"], [
 AC_ARG_WITH(kde-solid,
   AS_HELP_STRING([--with-kde-solid=PATH],
                  [KDE Solid actions directory (auto)]),, [
+
+if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ; then
   with_kde_solid="yes"
+fi
 ])
 soliddatadir=""
 AS_IF([test "${with_kde_solid}" != "no"], [

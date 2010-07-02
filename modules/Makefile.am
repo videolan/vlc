@@ -70,7 +70,7 @@ stamp-cache:
 	$(AM_V_at)touch stamp-cache
 
 install-exec-hook:
-	if test -z "$(DESTDIR)"; then \
+	if test -z "$(DESTDIR)" -a "$(build)" = "$(host)"; then \
 		../bin/vlc-cache-gen$(EXEEXT) "$(vlclibdir)/plugins" ; \
 	else \
 		echo "Staged installation: cache generation skipped!" ; \
