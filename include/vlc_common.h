@@ -419,9 +419,6 @@ typedef union
     mtime_t         i_time;
     struct { int32_t x; int32_t y; } coords;
 
-    /* Make sure the structure is at least 64bits */
-    uint8_t padding[8];
-
 } vlc_value_t;
 
 /**
