@@ -102,7 +102,7 @@ int stats_Get( vlc_object_t *p_this, counter_t *p_counter, vlc_value_t *val )
 {
     if( !libvlc_stats (p_this) || !p_counter || p_counter->i_samples == 0 )
     {
-        val->i_int = val->f_float = 0.0;
+        val->i_int = 0;
         return VLC_EGENERIC;
     }
 
@@ -118,7 +118,7 @@ int stats_Get( vlc_object_t *p_this, counter_t *p_counter, vlc_value_t *val )
         /* Not ready yet */
         if( p_counter->i_samples < 2 )
         {
-            val->i_int = 0; val->f_float = 0.0;
+            val->i_int = 0;
             return VLC_EGENERIC;
         }
         if( p_counter->i_type == VLC_VAR_INTEGER )
