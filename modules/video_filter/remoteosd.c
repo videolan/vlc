@@ -1385,11 +1385,11 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     if( !p_sys->b_vnc_key_events )
         return VLC_SUCCESS;
 
-    msg_Dbg( p_this, "key pressed (%d) ", newval.i_int );
+    msg_Dbg( p_this, "key pressed (%"PRId64") ", newval.i_int );
 
     if ( !newval.i_int )
     {
-        msg_Err( p_this, "Received invalid key event %d", newval.i_int );
+        msg_Err( p_this, "Received invalid key event 0" );
         return VLC_EGENERIC;
     }
 

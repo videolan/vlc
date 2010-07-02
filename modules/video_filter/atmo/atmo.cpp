@@ -2562,7 +2562,7 @@ static int AtmoSettingsCallback( vlc_object_t *p_this, char const *psz_var,
     if(p_atmo_config)
     {
 
-       msg_Dbg(p_filter, "apply AtmoSettingsCallback %s (int: %d -> %d)",
+       msg_Dbg(p_filter, "apply AtmoSettingsCallback %s (int: %"PRId64" -> %"PRId64")",
              psz_var,
              oldval.i_int,
              newval.i_int

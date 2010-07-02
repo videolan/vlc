@@ -857,7 +857,7 @@
 
              o_title = text_list.p_list->p_values[i].psz_string ?
                                  [[VLCMain sharedInstance] localizedString: text_list.p_list->p_values[i].psz_string] :
-                                 [NSString stringWithFormat: @"%d",
+                                 [NSString stringWithFormat: @"%"PRId64,
                                  val_list.p_list->p_values[i].i_int];
 
             o_lmi = [o_menu addItemWithTitle: o_title action: pf_callback keyEquivalent: @""];

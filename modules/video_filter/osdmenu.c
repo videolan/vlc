@@ -603,7 +603,7 @@ static int OSDMenuCallback( vlc_object_t *p_this, char const *psz_var,
         }
     }
     else if( !strncmp( psz_var, OSD_CFG"update", 14) )
-        p_sys->i_update =  (mtime_t)(newval.i_int * 1000);
+        p_sys->i_update =  newval.i_int * INT64_C(1000);
     else if( !strncmp( psz_var, OSD_CFG"timeout", 15) )
         p_sys->i_update = newval.i_int % 1000;
     else if( !strncmp( psz_var, OSD_CFG"alpha", 13) )

@@ -409,7 +409,7 @@ struct stat;
  */
 typedef union
 {
-    int             i_int;
+    int64_t         i_int;
     bool            b_bool;
     float           f_float;
     char *          psz_string;

@@ -438,7 +438,8 @@ static int Open( vlc_object_t *p_this )
     else if( val.i_int != AOUT_VAR_SPDIF )
     {
         /* This should not happen ! */
-        msg_Err( p_aout, "internal: can't find audio-device (%i)", val.i_int );
+        msg_Err( p_aout, "internal: can't find audio-device (%"PRId64")",
+                 val.i_int );
         free( p_sys );
         free( psz_device );
         return VLC_EGENERIC;

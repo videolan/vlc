@@ -62,7 +62,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     vlc_value_t val;
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    msg_Dbg( p_vout, "set %d", new_val.i_int );
+    msg_Dbg( p_vout, "set %"PRId64, new_val.i_int );
     var_Create( p_vout->p_libvlc, "video-device", VLC_VAR_INTEGER );
     var_Set( p_vout->p_libvlc, "video-device", new_val );
 

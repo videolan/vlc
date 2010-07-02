@@ -1184,10 +1184,12 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             for ( i = 0; i < val.p_list->i_count; i++ )
             {
                 if ( i_value == val.p_list->p_values[i].i_int )
-                    msg_rc( "| %i - %s *", val.p_list->p_values[i].i_int,
+                    msg_rc( "| %"PRId64" - %s *",
+                            val.p_list->p_values[i].i_int,
                             text.p_list->p_values[i].psz_string );
                 else
-                    msg_rc( "| %i - %s", val.p_list->p_values[i].i_int,
+                    msg_rc( "| %"PRId64" - %s",
+                            val.p_list->p_values[i].i_int,
                             text.p_list->p_values[i].psz_string );
             }
             var_FreeList( &val, &text );
@@ -1761,10 +1763,10 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
         for ( i = 0; i < val.p_list->i_count; i++ )
         {
             if ( i_value == val.p_list->p_values[i].i_int )
-                msg_rc( "| %i - %s *", val.p_list->p_values[i].i_int,
+                msg_rc( "| %"PRId64" - %s *", val.p_list->p_values[i].i_int,
                         text.p_list->p_values[i].psz_string );
             else
-                msg_rc( "| %i - %s", val.p_list->p_values[i].i_int,
+                msg_rc( "| %"PRId64" - %s", val.p_list->p_values[i].i_int,
                         text.p_list->p_values[i].psz_string );
         }
         var_FreeList( &val, &text );

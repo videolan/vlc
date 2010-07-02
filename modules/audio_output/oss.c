@@ -353,7 +353,8 @@ static int Open( vlc_object_t *p_this )
     else
     {
         /* This should not happen ! */
-        msg_Err( p_aout, "internal: can't find audio-device (%i)", val.i_int );
+        msg_Err( p_aout, "internal: can't find audio-device (%"PRId64")",
+                 val.i_int );
         close( p_sys->i_fd );
         free( p_sys );
         return VLC_EGENERIC;

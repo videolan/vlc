@@ -951,12 +951,12 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id,
     {
         if( psz_language && *psz_language )
         {
-            if( asprintf( &text.psz_string, "%s %i - [%s]", _( "Track" ), val.i_int, psz_language ) == -1 )
+            if( asprintf( &text.psz_string, "%s %"PRId64" - [%s]", _( "Track" ), val.i_int, psz_language ) == -1 )
                 text.psz_string = NULL;
         }
         else
         {
-            if( asprintf( &text.psz_string, "%s %i", _( "Track" ), val.i_int ) == -1 )
+            if( asprintf( &text.psz_string, "%s %"PRId64, _( "Track" ), val.i_int ) == -1 )
                 text.psz_string = NULL;
         }
     }

@@ -623,7 +623,7 @@ static int CreateChoicesMenu( intf_thread_t *p_intf, GtkMenu *submenu, const cha
             case VLC_VAR_INTEGER:
                 var_Get( p_object, psz_var, &val );
                 if( CURTEXT ) menutext = CURTEXT;
-                else snprintf( menutext, sizeof(string)-1, "%d", CURVAL.i_int );
+                else snprintf( menutext, sizeof(string)-1, "%"PRId64, CURVAL.i_int );
                 CreateAndConnect( p_intf, submenu, psz_var, menutext, "",
                                   ITEM_RADIO, p_object, CURVAL, i_type,
                         ( CURVAL.i_int == val.i_int )

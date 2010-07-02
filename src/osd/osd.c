@@ -550,7 +550,7 @@ void osd_MenuUp( vlc_object_t *p_this )
             osd_SetKeyPressed( VLC_OBJECT(p_osd->p_libvlc),
                                var_InheritInteger(p_osd, p_button->psz_action) );
 #if defined(OSD_MENU_DEBUG)
-            msg_Dbg( p_osd, "select (%d, %s)", val.i_int, p_button->psz_action );
+            msg_Dbg( p_osd, "select (%"PRId64", %s)", val.i_int, p_button->psz_action );
 #endif
         }
     }
@@ -617,7 +617,7 @@ void osd_MenuDown( vlc_object_t *p_this )
             osd_SetKeyPressed( VLC_OBJECT(p_osd->p_libvlc),
                                var_InheritInteger(p_osd, p_button->psz_action_down) );
 #if defined(OSD_MENU_DEBUG)
-            msg_Dbg( p_osd, "select (%d, %s)", val.i_int, p_button->psz_action_down );
+            msg_Dbg( p_osd, "select (%"PRId64", %s)", val.i_int, p_button->psz_action_down );
 #endif
         }
     }

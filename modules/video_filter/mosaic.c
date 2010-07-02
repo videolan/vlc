@@ -749,7 +749,7 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     {
         vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "changing alpha from %d/255 to %d/255",
-                         p_sys->i_alpha, newval.i_int);
+                         p_sys->i_alpha, (int)newval.i_int);
         p_sys->i_alpha = __MIN( __MAX( newval.i_int, 0 ), 255 );
         vlc_mutex_unlock( &p_sys->lock );
     }
@@ -757,7 +757,7 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     {
         vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "changing height from %dpx to %dpx",
-                          p_sys->i_height, newval.i_int );
+                          p_sys->i_height, (int)newval.i_int );
         p_sys->i_height = __MAX( newval.i_int, 0 );
         vlc_mutex_unlock( &p_sys->lock );
     }
@@ -765,15 +765,15 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     {
         vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "changing width from %dpx to %dpx",
-                         p_sys->i_width, newval.i_int );
+                         p_sys->i_width, (int)newval.i_int );
         p_sys->i_width = __MAX( newval.i_int, 0 );
         vlc_mutex_unlock( &p_sys->lock );
     }
     else if( VAR_IS( "xoffset" ) )
     {
         vlc_mutex_lock( &p_sys->lock );
-        msg_Dbg( p_this, "changing x offset from %dpx to %dpx",
-                         p_sys->i_xoffset, newval.i_int );
+        msg_Dbg( p_this, "changing x offset from %dpx to %px",
+                         p_sys->i_xoffset, (int)newval.i_int );
         p_sys->i_xoffset = __MAX( newval.i_int, 0 );
         vlc_mutex_unlock( &p_sys->lock );
     }
@@ -781,7 +781,7 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     {
         vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "changing y offset from %dpx to %dpx",
-                         p_sys->i_yoffset, newval.i_int );
+                         p_sys->i_yoffset, (int)newval.i_int );
         p_sys->i_yoffset = __MAX( newval.i_int, 0 );
         vlc_mutex_unlock( &p_sys->lock );
     }
@@ -796,7 +796,7 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
         while( pi_align_values[i_new] != newval.i_int ) i_new++;
         msg_Dbg( p_this, "changing alignment from %d (%s) to %d (%s)",
                      p_sys->i_align, ppsz_align_descriptions[i_old],
-                     newval.i_int, ppsz_align_descriptions[i_new] );
+                     (int)newval.i_int, ppsz_align_descriptions[i_new] );
         p_sys->i_align = newval.i_int;
         vlc_mutex_unlock( &p_sys->lock );
     }
@@ -804,7 +804,7 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     {
         vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "changing border width from %dpx to %dpx",
-                         p_sys->i_borderw, newval.i_int );
+                         p_sys->i_borderw, (int)newval.i_int );
         p_sys->i_borderw = __MAX( newval.i_int, 0 );
         vlc_mutex_unlock( &p_sys->lock );
     }
@@ -812,7 +812,7 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     {
         vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "changing border height from %dpx to %dpx",
-                         p_sys->i_borderh, newval.i_int );
+                         p_sys->i_borderh, (int)newval.i_int );
         p_sys->i_borderh = __MAX( newval.i_int, 0 );
         vlc_mutex_unlock( &p_sys->lock );
     }
@@ -831,7 +831,7 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
             vlc_mutex_lock( &p_sys->lock );
             msg_Dbg( p_this, "changing position method from %d (%s) to %d (%s)",
                     p_sys->i_position, ppsz_pos_descriptions[p_sys->i_position],
-                    newval.i_int, ppsz_pos_descriptions[newval.i_int]);
+                     (int)newval.i_int, ppsz_pos_descriptions[newval.i_int]);
             p_sys->i_position = newval.i_int;
             vlc_mutex_unlock( &p_sys->lock );
         }
@@ -840,7 +840,7 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     {
         vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "changing number of rows from %d to %d",
-                         p_sys->i_rows, newval.i_int );
+                         p_sys->i_rows, (int)newval.i_int );
         p_sys->i_rows = __MAX( newval.i_int, 1 );
         vlc_mutex_unlock( &p_sys->lock );
     }
@@ -848,7 +848,7 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     {
         vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "changing number of columns from %d to %d",
-                         p_sys->i_cols, newval.i_int );
+                         p_sys->i_cols, (int)newval.i_int );
         p_sys->i_cols = __MAX( newval.i_int, 1 );
         vlc_mutex_unlock( &p_sys->lock );
     }

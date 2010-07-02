@@ -2135,7 +2135,7 @@ static bool Control( input_thread_t *p_input,
 
             if( bookmark.i_time_offset < 0 && bookmark.i_byte_offset < 0 )
             {
-                msg_Err( p_input, "invalid bookmark %d", val.i_int );
+                msg_Err( p_input, "invalid bookmark %"PRId64, val.i_int );
                 break;
             }
 

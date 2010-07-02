@@ -830,7 +830,8 @@ static int Open( vlc_object_t *p_this )
             var_Get( p_mux, SOUT_CFG_PREFIX "csa-pkt", &pkt_val );
             if( pkt_val.i_int < 12 || pkt_val.i_int > 188 )
             {
-                msg_Err( p_mux, "wrong packet size %d specified.", pkt_val.i_int );
+                msg_Err( p_mux, "wrong packet size %"PRId64" specified.",
+                         pkt_val.i_int );
                 msg_Warn( p_mux, "using default packet size of 188 bytes" );
                 p_sys->i_csa_pkt_size = 188;
             }

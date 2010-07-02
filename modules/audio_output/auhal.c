@@ -1492,7 +1492,7 @@ static int AudioDeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     var_Set( p_aout->p_libvlc, "macosx-audio-device", new_val );
-    msg_Dbg( p_aout, "Set Device: %#x", new_val.i_int );
+    msg_Dbg( p_aout, "Set Device: %#"PRIx64, new_val.i_int );
     return aout_ChannelsRestart( p_this, psz_variable, old_val, new_val, param );
 }
 

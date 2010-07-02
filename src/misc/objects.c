@@ -719,7 +719,7 @@ static void DumpVariable (const void *data, const VISIT which, const int depth)
             printf( ": %s", p_var->val.b_bool ? "true" : "false" );
             break;
         case VLC_VAR_INTEGER:
-            printf( ": %d", p_var->val.i_int );
+            printf( ": %"PRId64, p_var->val.i_int );
             break;
         case VLC_VAR_STRING:
             printf( ": \"%s\"", p_var->val.psz_string );

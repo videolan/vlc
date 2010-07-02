@@ -188,7 +188,8 @@ VLC_EXPORT( int, var_TriggerCallback, ( vlc_object_t *, const char * ) );
  * \param psz_name The name of the variable
  * \param i The new integer value of this variable
  */
-static inline int var_SetInteger( vlc_object_t *p_obj, const char *psz_name, int i )
+static inline int var_SetInteger( vlc_object_t *p_obj, const char *psz_name,
+                                  int64_t i )
 {
     vlc_value_t val;
     val.i_int = i;

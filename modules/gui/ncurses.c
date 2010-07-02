@@ -1536,7 +1536,8 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             {
                 int i_title_count = var_CountChoices( p_input, "title" );
                 if( i_title_count > 0 )
-                    mvnprintw( y++, 0, COLS, _(" Title    : %d/%d"), val.i_int, i_title_count );
+                    mvnprintw( y++, 0, COLS, _(" Title    : %"PRId64"/%d"),
+                               val.i_int, i_title_count );
             }
 
             /* Chapter */
@@ -1544,7 +1545,8 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             {
                 int i_chapter_count = var_CountChoices( p_input, "chapter" );
                 if( i_chapter_count > 0 )
-                    mvnprintw( y++, 0, COLS, _(" Chapter  : %d/%d"), val.i_int, i_chapter_count );
+                    mvnprintw( y++, 0, COLS, _(" Chapter  : %"PRId64"/%d"),
+                               val.i_int, i_chapter_count );
             }
         }
         else

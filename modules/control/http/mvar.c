@@ -418,7 +418,7 @@ mvar_t *mvar_InputVarSetNew( intf_thread_t *p_intf, char *name,
 
     for( i = 0; i < val_list.p_list->i_count; i++ )
     {
-        char psz_int[16];
+        char psz_int[21];
         mvar_t *itm;
 
         switch( i_type & VLC_VAR_TYPE )
@@ -438,7 +438,7 @@ mvar_t *mvar_InputVarSetNew( intf_thread_t *p_intf, char *name,
         case VLC_VAR_INTEGER:
             itm = mvar_New( name, "set" );
             mvar_AppendNewVar( itm, "name", text_list.p_list->p_values[i].psz_string );
-            snprintf( psz_int, sizeof(psz_int), "%d",
+            snprintf( psz_int, sizeof(psz_int), "%"PRId64,
                       val_list.p_list->p_values[i].i_int );
             mvar_AppendNewVar( itm, "id", psz_int );
             snprintf( psz_int, sizeof(psz_int), "%d",
