@@ -111,6 +111,7 @@ media_library_t *ml_Create( vlc_object_t *p_this, char *psz_name )
 media_library_t* ml_Hold( vlc_object_t* p_this )
 {
     media_library_t* p_ml;
+    vlc_mutex_lock( &( libvlc_priv( p_this->p_libvlc )->ml_lock ) );
     p_ml = libvlc_priv (p_this->p_libvlc)->p_ml;
     assert( VLC_OBJECT( p_ml ) != p_this );
     if( p_ml == NULL &&
@@ -122,6 +123,7 @@ media_library_t* ml_Hold( vlc_object_t* p_this )
     }
     if( p_ml )
         vlc_object_hold( p_ml );
+    vlc_mutex_unlock( &( libvlc_priv( p_this->p_libvlc )->ml_lock ) );
     return p_ml;
 }
 
