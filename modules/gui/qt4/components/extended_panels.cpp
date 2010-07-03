@@ -711,7 +711,7 @@ void ExtV4l2::Refresh( void )
                         {
                             combobox->addItem(
                                        text2.p_list->p_values[j].psz_string,
-                                       val2.p_list->p_values[j].i_int );
+                                       qlonglong( val2.p_list->p_values[j].i_int) );
                             if( i_val == val2.p_list->p_values[j].i_int )
                                 combobox->setCurrentIndex( j );
                         }
