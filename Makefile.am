@@ -809,27 +809,13 @@ package-win32-base-debug: package-win-common
 
 #Enable DEP and ASLR for all the binaries
 if USE_PEFLAGS
-	find $(win32_destdir) -type f -name '*.dll' -print -o -name '*.exe' -print | while read i; do \
-	$(PEFLAGS) --dynamicbase=true --nxcompat=true "$$i" ; \
-	done
+	find $(win32_destdir) -type f -name '*dll' -print -o -name '*exe' -print -exec $(PEFLAGS) --dynamicbase=true --nxcompat=true {} \;
 endif
 
 if BUILD_LUA
 # Copy the lua scripts (HTTP)
-	mkdir -p "$(win32_lua_destdir)/http/images"
-	mkdir -p "$(win32_lua_destdir)/http/requests"
-	mkdir -p "$(win32_lua_destdir)/http/js"
-	mkdir -p "$(win32_lua_destdir)/http/dialogs"
-	cp $(srcdir)/share/lua/http/*.html $(win32_lua_destdir)/http/
-	cp $(srcdir)/share/lua/http/.hosts $(win32_lua_destdir)/http/
-	cp $(srcdir)/share/lua/http/*.css $(win32_lua_destdir)/http/
-	cp $(srcdir)/share/lua/http/js/*.js $(win32_lua_destdir)/http/js/
-	cp $(srcdir)/share/lua/http/*.lua $(win32_lua_destdir)/http/
-	cp $(srcdir)/share/lua/http/dialogs/* $(win32_lua_destdir)/http/dialogs/
-	cp $(srcdir)/share/lua/http/dialogs/.hosts $(win32_lua_destdir)/http/dialogs/
-	cp $(srcdir)/share/lua/http/*.ico $(win32_lua_destdir)/http/
-	cp $(srcdir)/share/lua/http/images/*.png $(win32_lua_destdir)/http/images/
-	cp $(srcdir)/share/lua/http/requests/*.xml $(win32_lua_destdir)/http/requests/
+	mkdir -p $(win32_lua_destdir)
+	cp -r $(destdir)/share/vlc/lua/http "$(win32_lua_destdir)/http"
 
 #Lua Scripts
 	$(INSTALL) -d $(win32_lua_destdir)
@@ -878,21 +864,12 @@ endif
 if BUILD_HTTPD
 	cp -r $(destdir)/share/vlc/http $(win32_http_destdir)
 endif
-
 if BUILD_SKINS
 	cp -r $(destdir)/share/vlc/skins2 $(win32_destdir)/skins
 endif
-
 if BUILD_OSDMENU
 #OSD Menu
-	mkdir -p "$(win32_destdir)/osdmenu"
-	cp $(srcdir)/share/osdmenu/*.* "$(win32_destdir)/osdmenu"
-	for dir in default default/selected default/selection default/volume ;do \
-		mkdir -p "$(win32_destdir)/osdmenu/$$dir"; \
-		for file in $(srcdir)/share/osdmenu/$${dir}/*.png;do \
-			 cp -- "$$file" "$(win32_destdir)/osdmenu/$$dir"; \
-		done; \
-	done
+	cp -r $(destdir)/share/vlc/osdmenu "$(win32_destdir)/osdmenu"
 	for file in $(win32_destdir)/osdmenu/*.cfg; do \
 		sed 's%share/osdmenu%osdmenu%g' "$$file" > "$$file.tmp" || exit $$? ; \
 		sed 's%/%\\%g' "$$file.tmp" > "$$file" || exit$$? ; \
