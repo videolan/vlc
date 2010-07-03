@@ -151,7 +151,7 @@ void PlaylistWidget::closeEvent( QCloseEvent *event )
 {
     if( THEDP->isDying() )
     {
-        /* FIXME is it needed ? */
+        p_intf->p_sys->p_mi->playlistVisible = true;
         event->accept();
     }
     else

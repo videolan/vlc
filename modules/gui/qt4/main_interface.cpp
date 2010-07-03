@@ -286,12 +286,7 @@ MainInterface::~MainInterface()
     settings->setValue( "pl-dock-status", b_plDocked );
     /* Save playlist state */
     if( playlistWidget )
-    {
-        settings->setValue( "playlist-visible",
-                            isPlDocked() ?
-                            playlistVisible :
-                            playlistWidget->isVisible() /* FIXME */ );
-    }
+        settings->setValue( "playlist-visible", playlistVisible );
 
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
