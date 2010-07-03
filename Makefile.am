@@ -704,7 +704,7 @@ win32_lua_destdir=$(win32_destdir)/lua
 win32_http_destdir=$(win32_destdir)/http
 destdir=_win32
 
-#Win-common if for win32 and wince
+#Win-common is for win32 and wince
 package-win-common:
 # Check that tmp isn't in the way
 	@if test -e "$(win32_destdir)"; then \
@@ -718,106 +718,34 @@ package-win-common:
 	    echo "OK."; mkdir -p "$(win32_destdir)"; \
 	fi
 
-# Copy relevant files
-# Copy executables, major libs+manifests
+# Executables, major libs+manifests
 	for file in $(destdir)/bin/vlc$(EXEEXT) $(destdir)/bin/libvlc$(LIBEXT) \
                 $(destdir)/bin/libvlccore$(LIBEXT) $(destdir)/lib/vlc/vlc-cache-gen$(EXEEXT) \
                 $(top_srcdir)/extras/package/win32/vlc$(EXEEXT).manifest \
                 $(top_srcdir)/extras/package/win32/libvlc$(LIBEXT).manifest; \
 	    do cp $$file "$(win32_destdir)/" ; done;
 
-# Copy Text files
+# Text files and clean them
 	for file in AUTHORS THANKS ; \
 	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(win32_destdir)/$${file}.txt" ; done;
 	for file in NEWS COPYING README; \
 	  do cp "$(srcdir)/$$file" "$(win32_destdir)/$${file}.txt"; done
-	$(U2D) "$(win32_destdir)/"*.txt || echo "WARNING: this shouldn't happen"
-# Necessary icons
+
+# Necessary icon
 	cp $(srcdir)/share/icons/vlc.ico $(win32_destdir)/
-# Copy the locales
+
+# Locales
 	cp -r $(destdir)/share/locale $(win32_destdir)
 
-#  Mozilla plugin
-if BUILD_MOZILLA
-	mkdir -p "$(win32_destdir)/mozilla"
-	cp $(top_builddir)/projects/mozilla/.libs/npvlc$(LIBEXT) $(win32_destdir)/mozilla/
-	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest $(win32_destdir)/mozilla/
-endif
-
-# ActiveX plugin
-if BUILD_ACTIVEX
-	mkdir -p "$(win32_destdir)/activex"
-	cp $(srcdir)/projects/activex/README.TXT  $(win32_destdir)/activex/
-	cp $(srcdir)/projects/activex/test.html  $(win32_destdir)/activex/
-	$(U2D) $(win32_destdir)/activex/*
-	cp $(top_builddir)/projects/activex/.libs/axvlc$(LIBEXT) $(win32_destdir)/activex/
-	cp $(top_srcdir)/projects/activex/axvlc.dll.manifest $(win32_destdir)/activex/
-endif
-
-# Rebase all those DLLs to speed up loading (need cygwin rebase)
-	if rebase -b 0x42 /dev/null >/dev/null 2>&1; then \
-		find $(win32_destdir) -type f -name '*.dll' -print | rebase -b 0x70000000 -T -; \
-	fi
-
-# Copy the UAC NSIS plugin
-	mkdir -p "$(win32_destdir)/NSIS"
-	cp "$(top_srcdir)/extras/package/win32/UAC.nsh" "$(win32_destdir)/NSIS"
-	cp "$(top_srcdir)/extras/package/win32/UAC.dll" "$(win32_destdir)/NSIS"
-
-prepare-win32-web-plugin: package-win-common-strip
-	mkdir -p "$(win32_xpi_destdir)/plugins"
-	cp $(win32_destdir)/mozilla/npvlc$(LIBEXT) \
-		"$(win32_xpi_destdir)/plugins"
-	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest \
-		"$(win32_xpi_destdir)/plugins"
-	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" \
-		"$(win32_xpi_destdir)/plugins"
-	cp "$(win32_destdir)/libvlccore$(LIBEXT)" \
-		"$(win32_xpi_destdir)/plugins"
-	cp "$(win32_destdir)/libvlc$(LIBEXT)" \
-		"$(win32_xpi_destdir)/plugins"
-	mkdir -p "$(win32_xpi_destdir)/plugins/plugins"
-	cp $(win32_destdir)/plugins/*$(LIBEXT) \
-		"$(win32_xpi_destdir)/plugins/plugins"
-	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*qt*"
-	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*skins*"
-package-win32-xpi: prepare-win32-web-plugin
-	cp $(top_builddir)/projects/mozilla/install.rdf "$(win32_xpi_destdir)"
-	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" \
-					install.rdf plugins
-
-package-win32-crx: prepare-win32-web-plugin
-	cp $(top_builddir)/projects/mozilla/manifest.json "$(win32_xpi_destdir)"
-	crxmake --pack-extension "$(win32_xpi_destdir)" \
-		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" \
-		--ignore-file install.rdf
-
-package-win32-base-debug: package-win-common
-# Copy relevant files
-# Script installer
-	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(win32_destdir)/"
-	cp "$(top_builddir)/extras/package/win32/spad.nsi" "$(win32_destdir)/"
-	mkdir "$(win32_destdir)/languages"
-	cp $(srcdir)/extras/package/win32/languages/*.nsh "$(win32_destdir)/languages/"
-
 # Plugins
-	mkdir -p "$(win32_destdir)/plugins"
-	find modules/ -name '*_plugin$(LIBEXT)' | while read i; do \
-	  if test -n "$$i" ; then \
-	    $(INSTALL) "$$i" "vlc-$(VERSION)/plugins/" ; \
-	  fi ; done
-
-#Enable DEP and ASLR for all the binaries
-if USE_PEFLAGS
-	find $(win32_destdir) -type f -name '*dll' -print -o -name '*exe' -print -exec $(PEFLAGS) --dynamicbase=true --nxcompat=true {} \;
-endif
+	cp -r $(destdir)/lib/vlc/plugins $(win32_destdir)
 
 if BUILD_LUA
 # Copy the lua scripts (HTTP)
 	mkdir -p $(win32_lua_destdir)
 	cp -r $(destdir)/share/vlc/lua/http "$(win32_lua_destdir)/http"
 
-#Lua Scripts
+# Lua Scripts - cannot be simplified yet, because make install doesn't install READMEs
 	$(INSTALL) -d $(win32_lua_destdir)
 	for i in $(srcdir)/share/lua/*.* ; do \
 	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/`basename $${i}` ; \
@@ -860,7 +788,6 @@ if BUILD_LUA
 	done
 endif
 
-# Copy the http files
 if BUILD_HTTPD
 	cp -r $(destdir)/share/vlc/http $(win32_http_destdir)
 endif
@@ -868,13 +795,24 @@ if BUILD_SKINS
 	cp -r $(destdir)/share/vlc/skins2 $(win32_destdir)/skins
 endif
 if BUILD_OSDMENU
-#OSD Menu
 	cp -r $(destdir)/share/vlc/osdmenu "$(win32_destdir)/osdmenu"
 	for file in $(win32_destdir)/osdmenu/*.cfg; do \
 		sed 's%share/osdmenu%osdmenu%g' "$$file" > "$$file.tmp" || exit $$? ; \
 		sed 's%/%\\%g' "$$file.tmp" > "$$file" || exit$$? ; \
 		rm -f -- "$$file.tmp"; \
 	done
+endif
+if BUILD_MOZILLA
+	mkdir -p "$(win32_destdir)/mozilla"
+	cp $(top_builddir)/projects/mozilla/.libs/npvlc$(LIBEXT) $(win32_destdir)/mozilla/
+	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest $(win32_destdir)/mozilla/
+endif
+if BUILD_ACTIVEX
+	mkdir -p "$(win32_destdir)/activex"
+	cp $(srcdir)/projects/activex/README.TXT  $(win32_destdir)/activex/
+	cp $(srcdir)/projects/activex/test.html  $(win32_destdir)/activex/
+	cp $(top_builddir)/projects/activex/.libs/axvlc$(LIBEXT) $(win32_destdir)/activex/
+	cp $(top_srcdir)/projects/activex/axvlc.dll.manifest $(win32_destdir)/activex/
 endif
 
 # SDK
@@ -887,14 +825,20 @@ endif
 
 	find $(win32_destdir) -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*lua' -exec unix2dos {} \;
 
+#Enable DEP and ASLR for all the binaries
+if USE_PEFLAGS
+	find $(win32_destdir) -type f -name '*dll' -print -o -name '*exe' -print -exec $(PEFLAGS) --dynamicbase=true --nxcompat=true {} \;
+endif
+
+# Rebase all those DLLs to speed up loading (needs cygwin rebase)
+	if rebase -b 0x42 /dev/null >/dev/null 2>&1; then \
+		find $(win32_destdir) -type f -name '*.dll' -print | rebase -b 0x70000000 -T -; \
+	fi
+
 # Strip DLLs
-package-win-common-strip: package-win32-base-debug
-	for i in "" $(win32_destdir)/*$(LIBEXT) \
-	            $(win32_destdir)/*$(EXEEXT) \
-	            $(win32_destdir)/activex/*$(LIBEXT) \
-	            $(win32_destdir)/mozilla/*$(LIBEXT) \
-	            $(win32_destdir)/plugins/*$(LIBEXT) \
-	; do \
+package-win-common-strip: package-win-common
+	find $(win32_destdir) -name '*$(LIBEXT)' -or -name "*$(EXEEXT) | while read i; \
+	do \
 	  if test -n "$$i" ; then \
 	    $(OBJCOPY) --only-keep-debug "$$i" "$$i.dbg"; \
 	    $(OBJCOPY) --strip-all "$$i" ; \
@@ -903,11 +847,49 @@ package-win-common-strip: package-win32-base-debug
 	  fi ; \
 	done
 
+package-win32-webplugin-common: package-win-common-strip
+	mkdir -p "$(win32_xpi_destdir)/plugins"
+	cp $(win32_destdir)/mozilla/npvlc$(LIBEXT) \
+		"$(win32_xpi_destdir)/plugins"
+	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest \
+		"$(win32_xpi_destdir)/plugins"
+	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" \
+		"$(win32_xpi_destdir)/plugins"
+	cp "$(win32_destdir)/libvlccore$(LIBEXT)" \
+		"$(win32_xpi_destdir)/plugins"
+	cp "$(win32_destdir)/libvlc$(LIBEXT)" \
+		"$(win32_xpi_destdir)/plugins"
+	mkdir -p "$(win32_xpi_destdir)/plugins/plugins"
+	cp $(win32_destdir)/plugins/*$(LIBEXT) \
+		"$(win32_xpi_destdir)/plugins/plugins"
+	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*qt*"
+	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*skins*"
+
+package-win32-xpi: package-win32-webplugin-common
+	cp $(top_builddir)/projects/mozilla/install.rdf "$(win32_xpi_destdir)"
+	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" \
+					install.rdf plugins
+
+package-win32-crx: package-win32-webplugin-common
+	cp $(top_builddir)/projects/mozilla/manifest.json "$(win32_xpi_destdir)"
+	crxmake --pack-extension "$(win32_xpi_destdir)" \
+		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" \
+		--ignore-file install.rdf
+
 package-win32-base: package-win-common-strip
 
 package-win32-base-exe: package-win32-base
+# Script installer
+	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(win32_destdir)/"
+	cp "$(top_builddir)/extras/package/win32/spad.nsi" "$(win32_destdir)/"
+	mkdir "$(win32_destdir)/languages"
+	cp $(srcdir)/extras/package/win32/languages/*.nsh "$(win32_destdir)/languages/"
+# Copy the UAC NSIS plugin
+	mkdir -p "$(win32_destdir)/NSIS"
+	cp "$(top_srcdir)/extras/package/win32/UAC.nsh" "$(win32_destdir)/NSIS"
+	cp "$(top_srcdir)/extras/package/win32/UAC.dll" "$(win32_destdir)/NSIS"
+
 # Create package
-	rm -Rf $(win32_destdir)/sdk
 	if makensis -VERSION >/dev/null 2>&1; then \
 	    MAKENSIS="makensis"; \
 	elif [ -x "/cygdrive/c/Program Files/NSIS/makensis" ]; then \
@@ -941,8 +923,7 @@ package-win32-base-debug-7zip: package-win32-base-debug
 	7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on vlc-$(VERSION)-win32-debug.7z vlc-$(VERSION)
 
 package-win32-cleanup:
-	rm -Rf $(win32_destdir)
-	rm -Rf $(win32_debugdir)
+	rm -Rf $(win32_destdir) $(win32_debugdir)
 
 package-win32-exe: package-win32-base package-win32-base-exe package-win32-cleanup
 
@@ -954,7 +935,7 @@ package-win32-7zip: package-win32-base-7zip package-win32-cleanup
 
 package-win32-debug-7zip: package-win32-base-debug-7zip package-win32-cleanup
 
-package-win32-no-clean: package-win32-base-zip package-win32-base-7zip package-win32-base-exe 
+package-win32-no-clean: package-win32-base-zip package-win32-base-7zip package-win32-base-exe
 
 package-win32: package-win32-no-clean package-win32-cleanup
 
