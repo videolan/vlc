@@ -937,44 +937,6 @@ package-wince-base-zip: package-wince-base
 package-wince: package-wince-base-zip package-win32-cleanup
 
 
-#####################################################################
-##   BeOS                                                          ##
-#####################################################################
-package-beos:
-# Check that tmp isn't in the way
-	@if test -e $(srcdir)/tmp; then \
-	  echo "Error: please remove $(srcdir)/tmp, it is in the way"; \
-	  false ; \
-	else \
-	  echo "OK." ; mkdir $(srcdir)/tmp ; \
-	fi
-
-# Copy relevant files
-	mkdir -p $(srcdir)/tmp/vlc
-	cd $(srcdir) && cp -R vlc-bundle/* AUTHORS COPYING ChangeLog README \
-	  THANKS NEWS tmp/vlc/
-
-# Create debug package
-	xres -o $(srcdir)/tmp/vlc/vlc $(srcdir)/share/vlc_beos.rsrc
-	find $(srcdir)/tmp/vlc -exec mimeset -f {} \;
-	mv $(srcdir)/tmp/vlc $(srcdir)/tmp/vlc-$(VERSION)
-	(cd $(srcdir)/tmp && zip -9 -r vlc-$(VERSION)-BeOS-debug.zip vlc-$(VERSION) )
-	mv $(srcdir)/tmp/vlc-$(VERSION)-BeOS-debug.zip $(srcdir)/
-	mv $(srcdir)/tmp/vlc-$(VERSION) $(srcdir)/tmp/vlc
-
-# Create normal package
-	$(STRIP) --strip-debug --strip-unneeded $(srcdir)/tmp/vlc/vlc
-	find $(srcdir)/tmp/vlc -name 'lib*.so' -exec $(STRIP) \
-	  --strip-debug --strip-unneeded "{}" \;
-	xres -o $(srcdir)/tmp/vlc/vlc $(srcdir)/share/vlc_beos.rsrc
-	find $(srcdir)/tmp/vlc -exec mimeset -f {} \;
-	mv $(srcdir)/tmp/vlc $(srcdir)/tmp/vlc-$(VERSION)
-	(cd $(srcdir)/tmp &&  zip -9 -r vlc-$(VERSION)-BeOS.zip vlc-$(VERSION) )
-	mv $(srcdir)/tmp/vlc-$(VERSION)-BeOS.zip $(srcdir)/
-
-# Clean up
-	rm -Rf $(srcdir)/tmp
-
 #########################################################################
 ## MacOS X                                                             ##
 #########################################################################
