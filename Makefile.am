@@ -705,7 +705,7 @@ win32_http_destdir=$(win32_destdir)/http
 destdir=_win32
 
 #Win-common is for win32 and wince
-package-win-common:
+package-win-common: install
 # Check that tmp isn't in the way
 	@if test -e "$(win32_destdir)"; then \
 	    echo "Error: please remove $(win32_destdir), it is in the way"; \
@@ -837,9 +837,8 @@ endif
 
 # Strip DLLs
 package-win-common-strip: package-win-common
-	find $(win32_destdir) -name '*$(LIBEXT)' -or -name "*$(EXEEXT) | while read i; \
-	do \
-	  if test -n "$$i" ; then \
+	find $(win32_destdir) -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' | while read i; \
+	do if test -n "$$i" ; then \
 	    $(OBJCOPY) --only-keep-debug "$$i" "$$i.dbg"; \
 	    $(OBJCOPY) --strip-all "$$i" ; \
 	    $(OBJCOPY) --add-gnu-debuglink="$$i.dbg" "$$i" ; \
