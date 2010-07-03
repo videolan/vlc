@@ -553,7 +553,7 @@ VLC-release.app: vlc
 	for i in $(srcdir)/share/lua/http/requests/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/requests/`basename $${i}` ; \
 	done
-	$(INSTALL) -m 644 $(srcdir)/share/lua/http/requests/readme $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/requests/readme.txt
+	$(INSTALL) -m 644 $(srcdir)/share/lua/http/requests/README.txt $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/requests/README.txt
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/dialogs
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/js
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/images
@@ -574,7 +574,7 @@ VLC-release.app: vlc
 	for i in $(srcdir)/share/http/requests/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests/`basename $${i}` ; \
 	done
-	$(INSTALL) -m 644 $(srcdir)/share/http/requests/readme $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests/readme.txt
+	$(INSTALL) -m 644 $(srcdir)/share/http/requests/README.txt $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests/README.txt
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  $(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/locale/$${i}/LC_MESSAGES ; \
@@ -838,8 +838,7 @@ if BUILD_LUA
 	cp $(srcdir)/share/lua/http/images/*.png $(win32_lua_destdir)/http/images/
 	cp $(srcdir)/share/lua/http/requests/*.xml $(win32_lua_destdir)/http/requests/
 	$(U2D) $(win32_lua_destdir)/http/requests/*.xml
-	cp $(srcdir)/share/lua/http/requests/readme $(win32_lua_destdir)/http/requests/readme.txt
-	$(U2D) $(win32_lua_destdir)/http/requests/readme.txt
+	$(U2D) $(win32_lua_destdir)/http/requests/README.txt
 
 #Lua Scripts
 	$(INSTALL) -d $(win32_lua_destdir)
@@ -903,8 +902,8 @@ if BUILD_HTTPD
 	$(U2D) $(win32_http_destdir)/dialogs/*
 	$(U2D) $(win32_http_destdir)/dialogs/.hosts
 	$(U2D) $(win32_http_destdir)/requests/*.xml
-	mv $(win32_http_destdir)/requests/readme $(win32_http_destdir)/requests/readme.txt
-	$(U2D) $(win32_http_destdir)/requests/readme.txt
+	mv $(win32_http_destdir)/requests/README.txt $(win32_http_destdir)/requests/README.txt
+	$(U2D) $(win32_http_destdir)/requests/README.txt
 endif
 
 if BUILD_SKINS
