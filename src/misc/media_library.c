@@ -78,7 +78,7 @@ static void *ml_gc_init (ml_gc_object_t *p_gc, void (*pf_destruct) (ml_gc_object
  */
 media_library_t *ml_Create( vlc_object_t *p_this, char *psz_name )
 {
-    media_library_t *p_ml = NULL;
+    media_library_t *p_ml;
 
     p_ml = ( media_library_t * ) vlc_custom_create(
                                 p_this, sizeof( media_library_t ),
@@ -110,7 +110,7 @@ media_library_t *ml_Create( vlc_object_t *p_this, char *psz_name )
  */
 media_library_t* ml_Hold( vlc_object_t* p_this )
 {
-    media_library_t* p_ml = NULL;
+    media_library_t* p_ml;
     p_ml = libvlc_priv (p_this->p_libvlc)->p_ml;
     assert( VLC_OBJECT( p_ml ) != p_this );
     if( p_ml == NULL &&
@@ -191,7 +191,7 @@ int ml_UpdateSimple( media_library_t *p_media_library,
                                      const char* psz_lvalue,
                                      int id, ... )
 {
-    ml_element_t *update = NULL;
+    ml_element_t *update;
     vlc_array_t *array = vlc_array_new();
     int i_ret = VLC_SUCCESS;
 
