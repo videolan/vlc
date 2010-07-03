@@ -245,6 +245,10 @@ modules/access/mtp.c
 modules/access/oss.c
 modules/access/pvr.c
 modules/access/qtcapture.m
+modules/access/rar/access.c
+modules/access/rar/rar.c
+modules/access/rar/rar.h
+modules/access/rar/stream.c
 modules/access/rtmp/access.c
 modules/access/rtmp/rtmp_amf_flv.c
 modules/access/rtmp/rtmp_amf_flv.h
@@ -1012,7 +1016,6 @@ modules/services_discovery/upnp_cc.cpp
 modules/services_discovery/upnp_intel.cpp
 modules/services_discovery/xcb_apps.c
 modules/stream_filter/decomp.c
-modules/stream_filter/rar.c
 modules/stream_filter/record.c
 modules/stream_out/autodel.c
 modules/stream_out/bridge.c
