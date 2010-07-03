@@ -821,24 +821,15 @@ if BUILD_LUA
 	mkdir -p "$(win32_lua_destdir)/http/js"
 	mkdir -p "$(win32_lua_destdir)/http/dialogs"
 	cp $(srcdir)/share/lua/http/*.html $(win32_lua_destdir)/http/
-	$(U2D) $(win32_lua_destdir)/http/*.html
 	cp $(srcdir)/share/lua/http/.hosts $(win32_lua_destdir)/http/
-	$(U2D) $(win32_lua_destdir)/http/.hosts
 	cp $(srcdir)/share/lua/http/*.css $(win32_lua_destdir)/http/
-	$(U2D) $(win32_lua_destdir)/http/*.css
 	cp $(srcdir)/share/lua/http/js/*.js $(win32_lua_destdir)/http/js/
-	$(U2D) $(win32_lua_destdir)/http/js/*.js
 	cp $(srcdir)/share/lua/http/*.lua $(win32_lua_destdir)/http/
-	$(U2D) $(win32_lua_destdir)/http/*.lua
 	cp $(srcdir)/share/lua/http/dialogs/* $(win32_lua_destdir)/http/dialogs/
-	$(U2D) $(win32_lua_destdir)/http/dialogs/*
 	cp $(srcdir)/share/lua/http/dialogs/.hosts $(win32_lua_destdir)/http/dialogs/
-	$(U2D) $(win32_lua_destdir)/http/dialogs/.hosts
 	cp $(srcdir)/share/lua/http/*.ico $(win32_lua_destdir)/http/
 	cp $(srcdir)/share/lua/http/images/*.png $(win32_lua_destdir)/http/images/
 	cp $(srcdir)/share/lua/http/requests/*.xml $(win32_lua_destdir)/http/requests/
-	$(U2D) $(win32_lua_destdir)/http/requests/*.xml
-	$(U2D) $(win32_lua_destdir)/http/requests/README.txt
 
 #Lua Scripts
 	$(INSTALL) -d $(win32_lua_destdir)
@@ -881,29 +872,11 @@ if BUILD_LUA
 	for i in $(srcdir)/share/lua/sd/*.* ; do \
 	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/sd/`basename $${i}` ; \
 	done
-
-	$(U2D) $(win32_lua_destdir)/README.txt
-	$(U2D) $(win32_lua_destdir)/extensions/README.txt
-	$(U2D) $(win32_lua_destdir)/intf/README.txt
-	$(U2D) $(win32_lua_destdir)/meta/art/README.txt
-	$(U2D) $(win32_lua_destdir)/meta/fetcher/README.txt
-	$(U2D) $(win32_lua_destdir)/meta/reader/README.txt
-	$(U2D) $(win32_lua_destdir)/playlist/README.txt
-	$(U2D) $(win32_lua_destdir)/sd/README.txt
 endif
 
 # Copy the http files
 if BUILD_HTTPD
 	cp -r $(destdir)/share/vlc/http $(win32_http_destdir)
-	$(U2D) $(win32_http_destdir)/*.html
-	$(U2D) $(win32_http_destdir)/.hosts
-	$(U2D) $(win32_http_destdir)/*.css
-	$(U2D) $(win32_http_destdir)/js/*.js
-	$(U2D) $(win32_http_destdir)/dialogs/*
-	$(U2D) $(win32_http_destdir)/dialogs/.hosts
-	$(U2D) $(win32_http_destdir)/requests/*.xml
-	mv $(win32_http_destdir)/requests/README.txt $(win32_http_destdir)/requests/README.txt
-	$(U2D) $(win32_http_destdir)/requests/README.txt
 endif
 
 if BUILD_SKINS
@@ -920,7 +893,6 @@ if BUILD_OSDMENU
 			 cp -- "$$file" "$(win32_destdir)/osdmenu/$$dir"; \
 		done; \
 	done
-	$(U2D) $(win32_destdir)/osdmenu/*.cfg;
 	for file in $(win32_destdir)/osdmenu/*.cfg; do \
 		sed 's%share/osdmenu%osdmenu%g' "$$file" > "$$file.tmp" || exit $$? ; \
 		sed 's%/%\\%g' "$$file.tmp" > "$$file" || exit$$? ; \
@@ -935,6 +907,8 @@ endif
 	cp -r $(destdir)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
 	for file in libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la; do \
         cp -r $(destdir)/lib/$$file "$(win32_destdir)/sdk/lib"; done
+
+	find $(win32_destdir) -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*lua' -exec unix2dos {} \;
 
 # Strip DLLs
 package-win-common-strip: package-win32-base-debug
