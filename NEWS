@@ -1,6 +1,9 @@
 Changes between 1.1.0 and 1.2.0-git:
 ------------------------------------
 
+Access
+ * Multiple files are supported from RAR files
+
 Codecs
  * You can now use ffmpeg-mt in conjunction with vlc
 
