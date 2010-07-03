@@ -608,8 +608,8 @@ Section /o $Name_Section03 SEC03
 
   SetOutPath "$INSTDIR"
   !insertmacro OpenUninstallLog
-  !insertmacro InstallFile mozilla\npvlc.dll
-  !insertmacro InstallFile mozilla\npvlc.dll.manifest
+  !insertmacro InstallFile npvlc.dll
+  !insertmacro InstallFile npvlc.dll.manifest
   !insertmacro CloseUninstallLog
 
   !define Moz "SOFTWARE\MozillaPlugins\@videolan.org/vlc,version=${VERSION}"
@@ -627,8 +627,8 @@ Section $Name_Section04 SEC04
 
   SetOutPath "$INSTDIR"
   !insertmacro OpenUninstallLog
-  !insertmacro InstallFile activex\axvlc.dll
-  !insertmacro InstallFile activex\axvlc.dll.manifest
+  !insertmacro InstallFile axvlc.dll
+  !insertmacro InstallFile axvlc.dll.manifest
   !insertmacro CloseUninstallLog
   RegDLL "$INSTDIR\axvlc.dll"
 SectionEnd

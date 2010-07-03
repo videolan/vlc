@@ -803,16 +803,12 @@ if BUILD_OSDMENU
 	done
 endif
 if BUILD_MOZILLA
-	mkdir -p "$(win32_destdir)/mozilla"
-	cp $(top_builddir)/projects/mozilla/.libs/npvlc$(LIBEXT) $(win32_destdir)/mozilla/
-	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest $(win32_destdir)/mozilla/
+	cp $(top_builddir)/projects/mozilla/.libs/npvlc$(LIBEXT) $(win32_destdir)
+	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest $(win32_destdir)
 endif
 if BUILD_ACTIVEX
-	mkdir -p "$(win32_destdir)/activex"
-	cp $(srcdir)/projects/activex/README.TXT  $(win32_destdir)/activex/
-	cp $(srcdir)/projects/activex/test.html  $(win32_destdir)/activex/
-	cp $(top_builddir)/projects/activex/.libs/axvlc$(LIBEXT) $(win32_destdir)/activex/
-	cp $(top_srcdir)/projects/activex/axvlc.dll.manifest $(win32_destdir)/activex/
+	cp $(top_builddir)/projects/activex/.libs/axvlc$(LIBEXT) $(win32_destdir)
+	cp $(top_srcdir)/projects/activex/axvlc.dll.manifest $(win32_destdir)
 endif
 
 # SDK
@@ -822,6 +818,10 @@ endif
 	cp -r $(destdir)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
 	for file in libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la; do \
         cp -r $(destdir)/lib/$$file "$(win32_destdir)/sdk/lib"; done
+if BUILD_ACTIVEX
+	cp $(srcdir)/projects/activex/README.TXT $(win32_destdir)/sdk/
+	cp $(srcdir)/projects/activex/test.html $(win32_destdir)/sdk/
+endif
 
 	find $(win32_destdir) -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*lua' -exec unix2dos {} \;
 
