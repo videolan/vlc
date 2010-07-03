@@ -39,7 +39,7 @@
  * @brief Destroy the medialibrary object
  * @param Parent object that holds the media library object
  */
-void __ml_Destroy( vlc_object_t * p_this )
+void ml_Destroy( vlc_object_t * p_this )
 {
     media_library_t* p_ml = ( media_library_t* )p_this;
     module_unneed( p_ml, p_ml->p_module );
@@ -76,7 +76,7 @@ static void *ml_gc_init (ml_gc_object_t *p_gc, void (*pf_destruct) (ml_gc_object
  * @return p_ml created and attached, module loaded. NULL if
  * not able to load
  */
-media_library_t *__ml_Create( vlc_object_t *p_this, char *psz_name )
+media_library_t *ml_Create( vlc_object_t *p_this, char *psz_name )
 {
     media_library_t *p_ml = NULL;
 
@@ -101,13 +101,14 @@ media_library_t *__ml_Create( vlc_object_t *p_this, char *psz_name )
     return p_ml;
 }
 
+#undef ml_Hold
 /**
  * @brief Acquire a reference to the media library singleton
  * @param p_this Object that holds the reference
  * @return media_library_t The ml object. NULL if not compiled with
  * media library or if unable to load
  */
-media_library_t* __ml_Hold( vlc_object_t* p_this )
+media_library_t* ml_Hold( vlc_object_t* p_this )
 {
     media_library_t* p_ml = NULL;
     p_ml = libvlc_priv (p_this->p_libvlc)->p_ml;
@@ -116,7 +117,7 @@ media_library_t* __ml_Hold( vlc_object_t* p_this )
             var_GetBool( p_this->p_libvlc, "load-media-library-on-startup" ) == false )
     {
         libvlc_priv (p_this->p_libvlc)->p_ml
-            = __ml_Create( VLC_OBJECT( p_this->p_libvlc ), NULL );
+            = ml_Create( VLC_OBJECT( p_this->p_libvlc ), NULL );
         p_ml = libvlc_priv (p_this->p_libvlc)->p_ml;
     }
     if( p_ml )
@@ -124,11 +125,12 @@ media_library_t* __ml_Hold( vlc_object_t* p_this )
     return p_ml;
 }
 
+#undef ml_Release
 /**
  * @brief Release a reference to the media library singleton
  * @param p_this Object that holds the reference
  */
-void __ml_Release( vlc_object_t* p_this )
+void ml_Release( vlc_object_t* p_this )
 {
     media_library_t* p_ml;
     p_ml = libvlc_priv (p_this->p_libvlc)->p_ml;
@@ -175,6 +177,7 @@ ml_media_t* media_New( media_library_t* p_ml, int id,
         return p_ml->functions.pf_GetMedia( p_ml, id, select, reload );
 }
 
+#undef ml_UpdateSimple
 /**
  * @brief Update a given table
  * @param p_media_library The media library object
@@ -183,7 +186,7 @@ ml_media_t* media_New( media_library_t* p_ml, int id,
  * @param id The id of the row to update
  * @param ... The update data. [SelectType [RoleType] Value] ... ML_END
  */
-int __ml_UpdateSimple( media_library_t *p_media_library,
+int ml_UpdateSimple( media_library_t *p_media_library,
                                      ml_select_e selected_type,
                                      const char* psz_lvalue,
                                      int id, ... )
@@ -280,7 +283,7 @@ int __ml_UpdateSimple( media_library_t *p_media_library,
  * If op = ML_OP_NONE, then you are connecting to a tree consisting of
  * only SPECIAL nodes.
  * If op = ML_OP_NOT, then right MUST be NULL
- * op must not be ML_OP_SPECIAL, @see __ml_FtreeSpec
+ * op must not be ML_OP_SPECIAL, @see ml_FtreeSpec
  * @param left part of the tree
  * @param right part of the tree
  * @return Pointer to new tree
@@ -329,6 +332,7 @@ ml_ftree_t* ml_OpConnectChilds( ml_op_e op, ml_ftree_t* left,
     return p_parent;
 }
 
+#undef ml_FtreeSpec
 /**
  * @brief Attaches a special node to a tree
  * @param tree Tree to attach special node to
@@ -338,7 +342,7 @@ ml_ftree_t* ml_OpConnectChilds( ml_op_e op, ml_ftree_t* left,
  * @return Pointer to new tree
  * @note Use the helpers
  */
-ml_ftree_t* __ml_FtreeSpec( ml_ftree_t* tree,
+ml_ftree_t* ml_FtreeSpec( ml_ftree_t* tree,
                                           ml_select_e crit,
                                           int limit,
                                           char* sort )

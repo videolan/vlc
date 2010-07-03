@@ -780,7 +780,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Get the ML */
     if( var_GetBool( p_libvlc, "load-media-library-on-startup" ) == true )
     {
-        priv->p_ml = __ml_Create( VLC_OBJECT( p_libvlc ), NULL );
+        priv->p_ml = ml_Create( VLC_OBJECT( p_libvlc ), NULL );
         if( !priv->p_ml )
         {
             msg_Err( p_libvlc, "ML initialization failed" );
@@ -992,7 +992,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     media_library_t* p_ml = priv->p_ml;
     if( p_ml )
     {
-        __ml_Destroy( VLC_OBJECT( p_ml ) );
+        ml_Destroy( VLC_OBJECT( p_ml ) );
         vlc_object_release( p_ml );
         libvlc_priv(p_playlist->p_libvlc)->p_ml = NULL;
     }

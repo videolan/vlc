@@ -397,15 +397,15 @@ struct ml_person_t
  * @return The media library object. NULL if the media library
  * object could not be loaded
  */
-VLC_EXPORT( media_library_t*, __ml_Hold, ( vlc_object_t* p_this ) );
-#define ml_Hold( a ) __ml_Hold( VLC_OBJECT(a) )
+VLC_EXPORT( media_library_t*, ml_Hold, ( vlc_object_t* p_this ) );
+#define ml_Hold( a ) ml_Hold( VLC_OBJECT(a) )
 
 /**
  * @brief Discard your ref to media library
  * @param p_this The object holding the media library
  */
-VLC_EXPORT( void, __ml_Release, ( vlc_object_t* p_this ) );
-#define ml_Release(a) __ml_Release( VLC_OBJECT(a))
+VLC_EXPORT( void, ml_Release, ( vlc_object_t* p_this ) );
+#define ml_Release(a) ml_Release( VLC_OBJECT(a) )
 
 /**
  * @brief Create a Media Library VLC object.
@@ -413,13 +413,13 @@ VLC_EXPORT( void, __ml_Release, ( vlc_object_t* p_this ) );
  * @param psz_name Name for the module
  * @return The ML object.
  */
-VLC_EXPORT( media_library_t*, __ml_Create, ( vlc_object_t *p_this, char* psz_name ) );
+VLC_EXPORT( media_library_t*, ml_Create, ( vlc_object_t *p_this, char* psz_name ) );
 
 /**
  * @brief Destructor for the Media library singleton
  * @param p_this Parent the ML object is attached to
  */
-VLC_EXPORT( void, __ml_Destroy, ( vlc_object_t* p_this ) );
+VLC_EXPORT( void, ml_Destroy, ( vlc_object_t* p_this ) );
 
 /**
  * @brief Control the Media Library
@@ -821,7 +821,7 @@ static inline int ml_FtreeHasOp( ml_ftree_t* tree )
  * If op = ML_OP_NONE, then you are connecting to a tree consisting of
  * only SPECIAL nodes.
  * If op = ML_OP_NOT, then right MUST be NULL
- * op must not be ML_OP_SPECIAL, @see __ml_FtreeSpec
+ * op must not be ML_OP_SPECIAL, @see ml_FtreeSpec
  * @param left part of the tree
  * @param right part of the tree
  * @return Pointer to new tree
@@ -839,7 +839,7 @@ VLC_EXPORT( ml_ftree_t*, ml_OpConnectChilds, ( ml_op_e op, ml_ftree_t* left,
  * @return Pointer to new tree
  * @note Use the helpers
  */
-VLC_EXPORT( ml_ftree_t*, __ml_FtreeSpec, ( ml_ftree_t* tree,
+VLC_EXPORT( ml_ftree_t*, ml_FtreeSpec, ( ml_ftree_t* tree,
                                           ml_select_e crit,
                                           int limit,
                                           char* sort ) );
@@ -865,10 +865,10 @@ static inline ml_ftree_t* ml_FtreeFastAnd( ml_ftree_t* left,
 #define ml_FtreeOr( left, right )  ml_OpConnectChilds( ML_OP_OR, left, right )
 #define ml_FtreeNot( left )        ml_OpConnectChilds( ML_OP_NOT, left, NULL )
 
-#define ml_FtreeSpecAsc( tree, str )        __ml_FtreeSpec( tree, ML_SORT_ASC, 0, str )
-#define ml_FtreeSpecDesc( tree, str )       __ml_FtreeSpec( tree, ML_SORT_DESC, 0, str )
-#define ml_FtreeSpecLimit( tree, limit )    __ml_FtreeSpec( tree, ML_LIMIT, limit, NULL )
-#define ml_FtreeSpecDistinct( tree )        __ml_FtreeSpec( tree, ML_DISTINCT, 0, NULL )
+#define ml_FtreeSpecAsc( tree, str )        ml_FtreeSpec( tree, ML_SORT_ASC, 0, str )
+#define ml_FtreeSpecDesc( tree, str )       ml_FtreeSpec( tree, ML_SORT_DESC, 0, str )
+#define ml_FtreeSpecLimit( tree, limit )    ml_FtreeSpec( tree, ML_LIMIT, limit, NULL )
+#define ml_FtreeSpecDistinct( tree )        ml_FtreeSpec( tree, ML_DISTINCT, 0, NULL )
 
 
 /*****************************************************************************
@@ -1038,12 +1038,12 @@ static inline int ml_Update( media_library_t *p_media_library,
  * @param id The id of the row to update
  * @param ... The update data. [SelectType [RoleType] Value]
  */
-#define ml_UpdateSimple( ml, sel, lval, id, ... ) \
-        __ml_UpdateSimple( ml, sel, lval, id, __VA_ARGS__, ML_END )
-VLC_EXPORT( int, __ml_UpdateSimple, ( media_library_t *p_media_library,
+VLC_EXPORT( int, ml_UpdateSimple, ( media_library_t *p_media_library,
                                      ml_select_e selected_type,
                                      const char* psz_lvalue,
                                      int id, ... ) );
+#define ml_UpdateSimple( ml, sel, lval, id, ... ) \
+        ml_UpdateSimple( ml, sel, lval, id, __VA_ARGS__, ML_END )
 
 /**
  * @brief Generic DELETE function
