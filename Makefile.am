@@ -819,13 +819,12 @@ if BUILD_ACTIVEX
 	cp $(srcdir)/projects/activex/test.html $(win32_destdir)/sdk/
 endif
 
-	find $(win32_destdir) -type f -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*lua' -exec unix2dos {} \;
+	find $(win32_destdir) -type f -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*lua' -exec $(U2D) {} \;
 
 #Enable DEP and ASLR for all the binaries
 if USE_PEFLAGS
 	find $(win32_destdir) -type f -name '*$(LIBEXT)' -print -o -name '*$(EXEEXT)' -print -exec $(PEFLAGS) --dynamicbase=true --nxcompat=true {} \;
 endif
-
 # Rebase all those DLLs to speed up loading (needs cygwin rebase)
 	if rebase -b 0x42 /dev/null >/dev/null 2>&1; then \
 		find $(win32_destdir) -type f -name '*$(LIBEXT)' -print | rebase -b 0x70000000 -T -; \
@@ -853,14 +852,12 @@ package-win32-webplugin-common: package-win-common-strip
 
 package-win32-xpi: package-win32-webplugin-common
 	cp $(top_builddir)/projects/mozilla/install.rdf "$(win32_xpi_destdir)"
-	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" \
-					install.rdf plugins
+	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" install.rdf plugins
 
 package-win32-crx: package-win32-webplugin-common
 	cp $(top_builddir)/projects/mozilla/manifest.json "$(win32_xpi_destdir)"
 	crxmake --pack-extension "$(win32_xpi_destdir)" \
-		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" \
-		--ignore-file install.rdf
+		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
 
 package-win32-base: package-win-common-strip
 
