@@ -702,32 +702,29 @@ npvlc=vlc-$(VERSION)/mozilla/npvlc$(LIBEXT)
 axvlc=vlc-$(VERSION)/activex/axvlc$(LIBEXT)
 win32_lua_destdir=$(win32_destdir)/lua
 win32_http_destdir=$(win32_destdir)/http
+destdir=_win32
 
 #Win-common if for win32 and wince
 package-win-common:
 # Check that tmp isn't in the way
 	@if test -e "$(win32_destdir)"; then \
-	  echo "Error: please remove $(win32_destdir), it is in the way"; \
-	  false; \
+	    echo "Error: please remove $(win32_destdir), it is in the way"; \
+	    false; \
+	elif test -e "$(win32_debugdir)"; then \
+	    echo "Error: please remove $(win32_debugdir), it is in the way"; \
+	    false; \
 	else \
-	  echo "OK."; mkdir -p "$(win32_destdir)"; \
-	fi
-# Same for debug symbols dir
-	@if test -e "$(win32_debugdir)"; then \
-	  echo "Error: please remove $(win32_debugdir), it is in the way"; \
-	  false; \
-	else \
-	  echo "OK."; mkdir -p "$(win32_debugdir)"; \
+	    echo "OK."; mkdir -p "$(win32_debugdir)"; \
+	    echo "OK."; mkdir -p "$(win32_destdir)"; \
 	fi
 
 # Copy relevant files
 # Copy executables, major libs+manifests
-	cp "$(top_builddir)/bin/.libs/vlc$(EXEEXT)" "$(win32_destdir)/"
-	cp "$(top_builddir)/bin/.libs/vlc-cache-gen$(EXEEXT)" "$(win32_destdir)/"
-	cp "$(top_srcdir)/extras/package/win32/vlc.exe.manifest" "$(win32_destdir)/"
-	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_destdir)/"
-	cp "$(top_builddir)/src/.libs/libvlccore$(LIBEXT)" "$(win32_destdir)/"
-	cp "$(top_builddir)/src/.libs/libvlc$(LIBEXT)" "$(win32_destdir)/"
+	for file in $(destdir)/bin/vlc$(EXEEXT) $(destdir)/bin/libvlc$(LIBEXT) \
+                $(destdir)/bin/libvlccore$(LIBEXT) $(destdir)/lib/vlc/vlc-cache-gen$(EXEEXT) \
+                $(top_srcdir)/extras/package/win32/vlc$(EXEEXT).manifest \
+                $(top_srcdir)/extras/package/win32/libvlc$(LIBEXT).manifest; \
+	    do cp $$file "$(win32_destdir)/" ; done;
 
 # Copy Text files
 	for file in AUTHORS THANKS ; \
@@ -735,19 +732,10 @@ package-win-common:
 	for file in NEWS COPYING README; \
 	  do cp "$(srcdir)/$$file" "$(win32_destdir)/$${file}.txt"; done
 	$(U2D) "$(win32_destdir)/"*.txt || echo "WARNING: this shouldn't happen"
-
 # Necessary icons
 	cp $(srcdir)/share/icons/vlc.ico $(win32_destdir)/
-
 # Copy the locales
-	mkdir -p $(win32_destdir)/locale
-	cat $(top_srcdir)/po/LINGUAS | while read i; do \
-	  mkdir -p "$(win32_destdir)/locale/$${i}/LC_MESSAGES" ; \
-	  cp "$(srcdir)/po/$${i}.gmo" \
-	    "$(win32_destdir)/locale/$${i}/LC_MESSAGES/vlc.mo" || true ; \
-	done
-	mkdir -p $(win32_destdir)/locale/qt4/
-	cp $(QT4LOCALEDIR)/*.qm $(win32_destdir)/locale/qt4/ || true
+	cp -r $(destdir)/share/locale $(win32_destdir)
 
 #  Mozilla plugin
 if BUILD_MOZILLA
@@ -907,42 +895,20 @@ endif
 
 # Copy the http files
 if BUILD_HTTPD
-	mkdir -p "$(win32_http_destdir)/images"
-	mkdir -p "$(win32_http_destdir)/requests"
-	mkdir -p "$(win32_http_destdir)/js"
-	mkdir -p "$(win32_http_destdir)/dialogs"
-	cp $(srcdir)/share/http/*.html $(win32_http_destdir)/
+	cp -r $(destdir)/share/vlc/http $(win32_http_destdir)
 	$(U2D) $(win32_http_destdir)/*.html
-	cp $(srcdir)/share/http/.hosts $(win32_http_destdir)/
 	$(U2D) $(win32_http_destdir)/.hosts
-	cp $(srcdir)/share/http/*.css $(win32_http_destdir)/
 	$(U2D) $(win32_http_destdir)/*.css
-	cp $(srcdir)/share/http/js/*.js $(win32_http_destdir)/js/
 	$(U2D) $(win32_http_destdir)/js/*.js
-	cp $(srcdir)/share/http/dialogs/* $(win32_http_destdir)/dialogs/
 	$(U2D) $(win32_http_destdir)/dialogs/*
-	cp $(srcdir)/share/http/dialogs/.hosts $(win32_http_destdir)/dialogs/
 	$(U2D) $(win32_http_destdir)/dialogs/.hosts
-	cp $(srcdir)/share/http/*.ico $(win32_http_destdir)/
-	cp $(srcdir)/share/http/images/*.png $(win32_http_destdir)/images/
-	cp $(srcdir)/share/http/requests/*.xml $(win32_http_destdir)/requests/
 	$(U2D) $(win32_http_destdir)/requests/*.xml
-	cp $(srcdir)/share/http/requests/readme $(win32_http_destdir)/requests/readme.txt
+	mv $(win32_http_destdir)/requests/readme $(win32_http_destdir)/requests/readme.txt
 	$(U2D) $(win32_http_destdir)/requests/readme.txt
-
 endif
 
 if BUILD_SKINS
-# Skins
-	mkdir -p $(win32_destdir)/skins/fonts
-	for i in $(srcdir)/share/skins2/fonts/*.*; do \
-	  cp -- "$$i" $(win32_destdir)/skins/fonts/ || true ; \
-	done
-	for i in $(top_builddir)/share/skins2/*.*; do \
-	  cp -- "$$i" $(win32_destdir)/skins/ || true ; \
-	done
-	cp -- $(srcdir)/share/skins2/skin.catalog $(win32_destdir)/skins/ || true ;
-	cp -- $(srcdir)/share/skins2/skin.dtd $(win32_destdir)/skins/ || true ;
+	cp -r $(destdir)/share/vlc/skins2 $(win32_destdir)/skins
 endif
 
 if BUILD_OSDMENU
@@ -964,14 +930,12 @@ if BUILD_OSDMENU
 endif
 
 # SDK
-	mkdir -p "$(win32_destdir)/sdk.tmp"
 	mkdir -p "$(win32_destdir)/sdk"
-	d=$$(pwd) && \
-	cd src && \
-	make install DESTDIR="$$d/vlc-$(VERSION)/sdk.tmp"
-	cd vlc-$(VERSION) && mv sdk.tmp/$(prefix)/* sdk/
-	find vlc-$(VERSION)/sdk.tmp -type d | sort -r | xargs rmdir
-	rm -Rf vlc-$(VERSION)/sdk/bin
+	mkdir -p "$(win32_destdir)/sdk/lib" 
+	cp -r $(destdir)/include "$(win32_destdir)/sdk"
+	cp -r $(destdir)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
+	for file in libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la; do \
+        cp -r $(destdir)/lib/$$file "$(win32_destdir)/sdk/lib"; done
 
 # Strip DLLs
 package-win-common-strip: package-win32-base-debug
