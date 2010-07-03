@@ -148,7 +148,7 @@ DIST_http = \
 	http/requests/status.xml \
 	http/requests/vlm.xml \
 	http/requests/vlm_cmd.xml \
-	http/requests/readme \
+	http/requests/README.txt \
 	http/style.css \
 	http/iehacks.css \
 	http/vlm.html \
@@ -382,7 +382,7 @@ DIST_http_lua = \
 	lua/http/requests/status.xml \
 	lua/http/requests/vlm.xml \
 	lua/http/requests/vlm_cmd.xml \
-	lua/http/requests/readme \
+	lua/http/requests/README.txt \
 	lua/http/style.css \
 	lua/http/iehacks.css \
 	lua/http/vlm.html \
