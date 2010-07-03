@@ -33,7 +33,6 @@ extern "C" {
 # endif
 
 #include <vlc_common.h>
-#include <assert.h>
 #include <vlc_playlist.h>
 
 /*****************************************************************************
@@ -520,12 +519,12 @@ static inline void ml_gc_incref( ml_media_t* p_media )
 {
     unsigned refs;
     ml_gc_object_t* p_gc = &p_media->ml_gc_data;
-    assert( p_gc );
+    if( p_gc == NULL )
+        return;
 
     vlc_spin_lock (&p_gc->spin);
     refs = ++p_gc->refs;
     vlc_spin_unlock (&p_gc->spin);
-    assert (refs != 1); /* there had to be a reference already */
 }
 
 /**
@@ -538,13 +537,12 @@ static inline void ml_gc_decref( ml_media_t* p_media )
     unsigned refs;
     bool pool;
     ml_gc_object_t* p_gc = &p_media->ml_gc_data;
-    assert( p_gc );
+    if( p_gc == NULL )
+        return;
 
     vlc_spin_lock (&p_gc->spin);
-    assert( p_gc->refs != 0 );
     refs = --p_gc->refs;
     pool = p_gc->pool;
-    assert( ( refs != 0 && p_gc->pool == true ) || ( refs == 0 && p_gc->pool == false )  );
     vlc_spin_unlock (&p_gc->spin);
 
     if( refs == 0 && pool == false )
@@ -708,7 +706,7 @@ static inline int ml_CopyPersons( ml_person_t** a, ml_person_t* b );
 static inline int ml_CopyMedia( ml_media_t *b, ml_media_t *a )
 {
     if( !a || !b ) return VLC_EGENERIC;
-    assert( a != b );
+    if( a == b ) return VLC_SUCCESS;
     ml_LockMedia( a );
     ml_LockMedia( b );
     b->b_sparse = a->b_sparse;
@@ -1100,7 +1098,8 @@ ml_Delete( media_library_t *p_media_library, vlc_array_t* p_array )
 static inline int ml_CreateAppendPersonAdv( ml_person_t **pp_person,
         const char* psz_role, const char* psz_name, int i_id )
 {
-    assert( i_id || ( psz_name && *psz_name && psz_role && *psz_role ) );
+    if( i_id == 0 || !( psz_name && *psz_name && psz_role && *psz_role ) )
+        return VLC_SUCCESS;
     if( !pp_person )
         return VLC_EGENERIC;
     if( *pp_person != NULL )
