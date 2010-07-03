@@ -719,9 +719,8 @@ package-win-common: install
 	fi
 
 # Executables, major libs+manifests
-	for file in $(destdir)/bin/vlc$(EXEEXT) $(destdir)/bin/libvlc$(LIBEXT) \
-                $(destdir)/bin/libvlccore$(LIBEXT) $(destdir)/lib/vlc/vlc-cache-gen$(EXEEXT) \
-                $(top_srcdir)/extras/package/win32/vlc$(EXEEXT).manifest \
+	find $(destdir) -maxdepth 4 -name "*$(LIBEXT)" -o -name "*$(EXEEXT)" -exec cp {} "$(win32_destdir)/" \;
+	for file in $(top_srcdir)/extras/package/win32/vlc$(EXEEXT).manifest \
                 $(top_srcdir)/extras/package/win32/libvlc$(LIBEXT).manifest; \
 	    do cp $$file "$(win32_destdir)/" ; done;
 
@@ -803,17 +802,14 @@ if BUILD_OSDMENU
 	done
 endif
 if BUILD_MOZILLA
-	cp $(top_builddir)/projects/mozilla/.libs/npvlc$(LIBEXT) $(win32_destdir)
 	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest $(win32_destdir)
 endif
 if BUILD_ACTIVEX
-	cp $(top_builddir)/projects/activex/.libs/axvlc$(LIBEXT) $(win32_destdir)
 	cp $(top_srcdir)/projects/activex/axvlc.dll.manifest $(win32_destdir)
 endif
 
 # SDK
-	mkdir -p "$(win32_destdir)/sdk"
-	mkdir -p "$(win32_destdir)/sdk/lib" 
+	mkdir -p "$(win32_destdir)/sdk/lib"
 	cp -r $(destdir)/include "$(win32_destdir)/sdk"
 	cp -r $(destdir)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
 	for file in libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la; do \
@@ -823,16 +819,16 @@ if BUILD_ACTIVEX
 	cp $(srcdir)/projects/activex/test.html $(win32_destdir)/sdk/
 endif
 
-	find $(win32_destdir) -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*lua' -exec unix2dos {} \;
+	find $(win32_destdir) -type f -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*lua' -exec unix2dos {} \;
 
 #Enable DEP and ASLR for all the binaries
 if USE_PEFLAGS
-	find $(win32_destdir) -type f -name '*dll' -print -o -name '*exe' -print -exec $(PEFLAGS) --dynamicbase=true --nxcompat=true {} \;
+	find $(win32_destdir) -type f -name '*$(LIBEXT)' -print -o -name '*$(EXEEXT)' -print -exec $(PEFLAGS) --dynamicbase=true --nxcompat=true {} \;
 endif
 
 # Rebase all those DLLs to speed up loading (needs cygwin rebase)
 	if rebase -b 0x42 /dev/null >/dev/null 2>&1; then \
-		find $(win32_destdir) -type f -name '*.dll' -print | rebase -b 0x70000000 -T -; \
+		find $(win32_destdir) -type f -name '*$(LIBEXT)' -print | rebase -b 0x70000000 -T -; \
 	fi
 
 # Strip DLLs
@@ -848,19 +844,10 @@ package-win-common-strip: package-win-common
 
 package-win32-webplugin-common: package-win-common-strip
 	mkdir -p "$(win32_xpi_destdir)/plugins"
-	cp $(win32_destdir)/mozilla/npvlc$(LIBEXT) \
-		"$(win32_xpi_destdir)/plugins"
-	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest \
-		"$(win32_xpi_destdir)/plugins"
-	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" \
-		"$(win32_xpi_destdir)/plugins"
-	cp "$(win32_destdir)/libvlccore$(LIBEXT)" \
-		"$(win32_xpi_destdir)/plugins"
-	cp "$(win32_destdir)/libvlc$(LIBEXT)" \
-		"$(win32_xpi_destdir)/plugins"
-	mkdir -p "$(win32_xpi_destdir)/plugins/plugins"
-	cp $(win32_destdir)/plugins/*$(LIBEXT) \
-		"$(win32_xpi_destdir)/plugins/plugins"
+	find $(destdir) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
+	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins"
+	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_xpi_destdir)/plugins"
+	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/plugins"
 	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*qt*"
 	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*skins*"
 
