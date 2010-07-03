@@ -371,7 +371,7 @@ void ml_PlaySmartPlaylistBasedOn( media_library_t* p_ml,
     assert( p_tree );
     vlc_array_t* p_results = vlc_array_new();
     ml_FindAdv( p_ml, p_results, ML_ID, NULL, p_tree );
-    playlist_t* p_pl = pl_Hold( p_ml );
+    playlist_t* p_pl = pl_Get( p_ml );
     playlist_Lock( p_pl );
     playlist_Clear( p_pl, true );
     for( int i = 0; i < vlc_array_count( p_results ); i++ )
