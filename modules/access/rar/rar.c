@@ -189,13 +189,16 @@ static int SkipFile(stream_t *s, int *count, rar_file_t ***file, const rar_block
         memcpy(name, &peek[name_offset], name_size);
     }
 
+    rar_file_t *current = NULL;
     if (method != 0x30) {
         msg_Warn(s, "Ignoring compressed file %s (method=0x%2.2x)", name, method);
         goto exit;
     }
 
     /* */
-    rar_file_t *current = *count > 0 ? (*file)[*count - 1] : NULL;
+    if( *count > 0 )
+        current = (*file)[*count - 1];
+
     if (current &&
         (current->is_complete ||
           current->size != file_size ||
