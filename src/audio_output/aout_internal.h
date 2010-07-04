@@ -266,7 +266,7 @@ static inline void AoutInputsMarkToRestart( aout_instance_t *p_aout )
     aout_unlock_mixer( p_aout );
 }
 
-/* This function will add or remove a a module from a string list (comma
+/* This function will add or remove a a module from a string list (colon
  * separated). It will return true if there is a modification
  * In case p_aout is NULL, we will use configuration instead of variable */
 static inline bool AoutChangeFilterString( vlc_object_t *p_obj, aout_instance_t * p_aout,
