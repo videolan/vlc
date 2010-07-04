@@ -825,10 +825,6 @@ endif
 if USE_PEFLAGS
 	find $(win32_destdir) -type f -name '*$(LIBEXT)' -print -o -name '*$(EXEEXT)' -print -exec $(PEFLAGS) --dynamicbase=true --nxcompat=true {} \;
 endif
-# Rebase all those DLLs to speed up loading (needs cygwin rebase)
-	if rebase -b 0x42 /dev/null >/dev/null 2>&1; then \
-		find $(win32_destdir) -type f -name '*$(LIBEXT)' -print | rebase -b 0x70000000 -T -; \
-	fi
 
 # Strip DLLs
 package-win-common-strip: package-win-common
