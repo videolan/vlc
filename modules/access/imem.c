@@ -115,6 +115,10 @@ static const char *cat_texts[] = {
 #define RELEASE_LONGTEXT N_(\
     "Address of the release callback function")
 
+#define SIZE_TEXT N_("Size")
+#define SIZE_LONGTEXT N_(\
+    "Size of stream in bytes")
+
 vlc_module_begin()
     set_shortname(N_("Memory input"))
     set_description(N_("Memory input"))
@@ -167,6 +171,10 @@ vlc_module_begin()
         change_private()
         change_safe()
     add_string ("imem-fps", NULL, NULL, FPS_TEXT, FPS_LONGTEXT, true)
+        change_private()
+        change_safe()
+
+    add_integer ("imem-size", 0, NULL, SIZE_TEXT, SIZE_LONGTEXT, true)
         change_private()
         change_safe()
 
@@ -311,6 +319,7 @@ static int OpenAccess(vlc_object_t *object)
     access->pf_block   = Block;
     access->pf_seek    = NULL;
     access->p_sys      = (access_sys_t*)sys;
+    access->info.i_size = var_InheritInteger(object, "imem-size");
 
     return VLC_SUCCESS;
 }
