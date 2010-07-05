@@ -73,7 +73,7 @@ VLC_EXPORT(void, vlc_epg_AddEvent, (vlc_epg_t *p_epg, int64_t i_start, int i_dur
  *
  * You must call vlc_epg_Delete to release the associated resource.
  */
-VLC_EXPORT(vlc_epg_t *, vlc_epg_New, (const char *psz_name));
+VLC_EXPORT(vlc_epg_t *, vlc_epg_New, (const char *psz_name) LIBVLC_USED);
 
 /**
  * It releases a vlc_epg_t*.

@@ -190,7 +190,7 @@ static inline bool demux_IsForced( demux_t *p_demux, const char *psz_name )
  * The provided es_format_t will be cleaned on error or by
  * demux_PacketizerDestroy.
  */
-VLC_EXPORT( decoder_t *,demux_PacketizerNew, ( demux_t *p_demux, es_format_t *p_fmt, const char *psz_msg ) );
+VLC_EXPORT( decoder_t *,demux_PacketizerNew, ( demux_t *p_demux, es_format_t *p_fmt, const char *psz_msg ) LIBVLC_USED );
 
 /**
  * This function will destroy a packetizer create by demux_PacketizerNew.
@@ -201,7 +201,7 @@ VLC_EXPORT( void, demux_PacketizerDestroy, ( decoder_t *p_packetizer ) );
  * This function will return the parent input of this demux.
  * It is retained. Can return NULL.
  */
-VLC_EXPORT( input_thread_t *, demux_GetParentInput, ( demux_t *p_demux ) );
+VLC_EXPORT( input_thread_t *, demux_GetParentInput, ( demux_t *p_demux ) LIBVLC_USED );
 
 /* */
 #define DEMUX_INIT_COMMON() do {            \

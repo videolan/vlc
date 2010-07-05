@@ -50,7 +50,7 @@ struct xml_t
                                const char * );
 };
 
-VLC_EXPORT( xml_t *, xml_Create, ( vlc_object_t * ) );
+VLC_EXPORT( xml_t *, xml_Create, ( vlc_object_t * ) LIBVLC_USED );
 #define xml_Create( a ) xml_Create( VLC_OBJECT(a) )
 VLC_EXPORT( void, xml_Delete, ( xml_t * ) );
 

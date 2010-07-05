@@ -332,7 +332,7 @@ VLC_EXPORT( void, aout_EnableFilter, (vlc_object_t *, const char *, bool ));
         aout_EnableFilter( VLC_OBJECT(o), n, b )
 
 /* */
-VLC_EXPORT( vout_thread_t *, aout_filter_RequestVout, ( filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt ) );
+VLC_EXPORT( vout_thread_t *, aout_filter_RequestVout, ( filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt ) LIBVLC_USED );
 
 # ifdef __cplusplus
 }

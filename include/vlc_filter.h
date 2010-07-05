@@ -231,7 +231,7 @@ static inline int filter_GetInputAttachments( filter_t *p_filter,
  * Only the chroma properties of the dest format is used (chroma
  * type, rgb masks and shifts)
  */
-VLC_EXPORT( filter_t *, filter_NewBlend, ( vlc_object_t *, const video_format_t *p_dst_chroma ) );
+VLC_EXPORT( filter_t *, filter_NewBlend, ( vlc_object_t *, const video_format_t *p_dst_chroma ) LIBVLC_USED );
 
 /**
  * It configures blend filter parameters that are allowed to changed
@@ -290,7 +290,7 @@ typedef struct filter_chain_t filter_chain_t;
  * \param p_buffer_allocation_data pointer to private allocation data
  * \return pointer to a filter chain
  */
-VLC_EXPORT( filter_chain_t *, filter_chain_New, ( vlc_object_t *, const char *, bool, int (*)( filter_t *, void * ), void (*)( filter_t * ), void *  ) );
+VLC_EXPORT( filter_chain_t *, filter_chain_New, ( vlc_object_t *, const char *, bool, int (*)( filter_t *, void * ), void (*)( filter_t * ), void *  ) LIBVLC_USED );
 #define filter_chain_New( a, b, c, d, e, f ) filter_chain_New( VLC_OBJECT( a ), b, c, d, e, f )
 
 /**

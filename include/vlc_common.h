@@ -833,7 +833,7 @@ static inline uint64_t ntoh64 (uint64_t ll)
 
 VLC_EXPORT( bool, vlc_ureduce, ( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t ) );
 
-VLC_EXPORT( void *, vlc_memalign, ( void **base, size_t alignment, size_t size ) );
+VLC_EXPORT( void *, vlc_memalign, ( void **base, size_t alignment, size_t size ) LIBVLC_USED );
 
 /* iconv wrappers (defined in src/extras/libc.c) */
 typedef void *vlc_iconv_t;

@@ -151,7 +151,7 @@ static inline void access_InitFields( access_t *p_a )
  * This function will return the parent input of this access.
  * It is retained. It can return NULL.
  */
-VLC_EXPORT( input_thread_t *, access_GetParentInput, ( access_t *p_access ) );
+VLC_EXPORT( input_thread_t *, access_GetParentInput, ( access_t *p_access ) LIBVLC_USED );
 
 #define ACCESS_SET_CALLBACKS( read, block, control, seek )              \
     p_access->pf_read = read;                                           \

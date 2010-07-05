@@ -107,7 +107,7 @@ typedef struct dialog_progress_bar_t
     void *p_sys;
 } dialog_progress_bar_t;
 
-VLC_EXPORT( dialog_progress_bar_t *, dialog_ProgressCreate, (vlc_object_t *, const char *, const char *, const char *) );
+VLC_EXPORT( dialog_progress_bar_t *, dialog_ProgressCreate, (vlc_object_t *, const char *, const char *, const char *) LIBVLC_USED );
 #define dialog_ProgressCreate(o, t, m, c) \
         dialog_ProgressCreate(VLC_OBJECT(o), t, m, c)
 VLC_EXPORT( void, dialog_ProgressDestroy, (dialog_progress_bar_t *) );
