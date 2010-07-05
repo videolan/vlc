@@ -319,21 +319,15 @@ static void Play( aout_instance_t * p_aout )
 {
     struct aout_sys_t * p_sys = (struct aout_sys_t *) p_aout->output.p_sys;
 
-    pa_operation *o;
-
     if(!p_sys->started){
         msg_Dbg(p_aout, "Pulse stream started");
+        pa_threaded_mainloop_lock(p_sys->mainloop);
         p_sys->start_date =
             aout_FifoFirstDate( p_aout, &p_aout->output.fifo );
         p_sys->started = 1;
 
-        pa_threaded_mainloop_lock(p_sys->mainloop);
-        if((o = pa_stream_flush(p_sys->stream, success_cb, p_aout))){
-            pa_operation_unref(o);
-        }
-        pa_threaded_mainloop_unlock(p_sys->mainloop);
-
         pa_threaded_mainloop_signal(p_sys->mainloop, 0);
+        pa_threaded_mainloop_unlock(p_sys->mainloop);
     }
 }
 
@@ -351,23 +345,18 @@ static void Close ( vlc_object_t *p_this )
         pa_threaded_mainloop_lock(p_sys->mainloop);
         pa_stream_set_write_callback(p_sys->stream, NULL, NULL);
 
-/* I didn't find any explanation why we need to do pa_stream_drain on close
- * as we don't really care if we lose 20ms buffer in this point anyway?
- * And disabling this speeds up closing pulseaudio quite a lot (atleast for me).
- */
-#if 0
-        pa_operation *o = pa_stream_drain(p_sys->stream, success_cb, p_aout);
-        if(o){
-            while (pa_operation_get_state(o) != PA_OPERATION_DONE) {
-                CHECK_DEAD_GOTO(fail);
-                pa_threaded_mainloop_wait(p_sys->mainloop);
-            }
+        pa_operation *o;
 
-        fail:
+        o = pa_stream_flush(p_sys->stream, success_cb, p_aout);
+        while( pa_operation_get_state(o) == PA_OPERATION_RUNNING )
+            pa_threaded_mainloop_wait(p_sys->mainloop);
+        pa_operation_unref(o);
 
-            pa_operation_unref(o);
-        }
-#endif
+        o = pa_stream_drain(p_sys->stream, success_cb, p_aout);
+        while( pa_operation_get_state(o) == PA_OPERATION_RUNNING )
+            pa_threaded_mainloop_wait(p_sys->mainloop);
+        pa_operation_unref(o);
+
         pa_threaded_mainloop_unlock(p_sys->mainloop);
     }
     uninit(p_aout);
