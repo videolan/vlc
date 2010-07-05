@@ -4746,6 +4746,7 @@ AC_CONFIG_FILES([
   modules/codec/wmafixed/Makefile
   modules/control/Makefile
   modules/control/http/Makefile
+  modules/control/dbus/Makefile
   modules/control/globalhotkeys/Makefile
   modules/demux/Makefile
   modules/demux/asf/Makefile

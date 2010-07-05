@@ -1,11 +1,10 @@
-SUBDIRS = http globalhotkeys
+SUBDIRS = http globalhotkeys dbus
 SOURCES_gestures = gestures.c
 SOURCES_netsync = netsync.c
 SOURCES_ntservice = ntservice.c
 SOURCES_hotkeys = hotkeys.c
 SOURCES_lirc = lirc.c
 SOURCES_oldrc = rc.c
-SOURCES_dbus = dbus.c dbus.h
 if HAVE_DARWIN
 motion_extra = unimotion.c unimotion.h
 else
