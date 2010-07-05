@@ -827,7 +827,7 @@ if USE_PEFLAGS
 endif
 
 # Strip DLLs
-package-win-common-strip: package-win-common
+package-win-base: package-win-common
 	find $(win32_destdir) -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' | while read i; \
 	do if test -n "$$i" ; then \
 	    $(OBJCOPY) --only-keep-debug "$$i" "$$i.dbg"; \
@@ -837,7 +837,7 @@ package-win-common-strip: package-win-common
 	  fi ; \
 	done
 
-package-win32-webplugin-common: package-win-common-strip
+package-win32-webplugin-common: package-win-base
 	mkdir -p "$(win32_xpi_destdir)/plugins"
 	find $(destdir) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
 	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins"
@@ -855,9 +855,7 @@ package-win32-crx: package-win32-webplugin-common
 	crxmake --pack-extension "$(win32_xpi_destdir)" \
 		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
 
-package-win32-base: package-win-common-strip
-
-package-win32-base-exe: package-win32-base
+package-win32-base-exe: package-win-base
 # Script installer
 	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(win32_destdir)/"
 	cp "$(top_builddir)/extras/package/win32/spad.nsi" "$(win32_destdir)/"
@@ -883,28 +881,28 @@ package-win32-base-exe: package-win32-base
 	eval "$$MAKENSIS $(win32_destdir)/spad.nsi"; \
 	eval "$$MAKENSIS $(win32_destdir)/vlc.win32.nsi"
 
-package-win32-base-zip: package-win32-base
+package-win32-base-zip: package-win-base
 # Create package 
 	rm -f -- vlc-$(VERSION)-win32.zip
 	zip -r -9 vlc-$(VERSION)-win32.zip vlc-$(VERSION)
 
-package-win32-base-debug-zip: package-win32-base-debug
+package-win32-base-debug-zip: package-win-common
 # Create package
 	rm -f -- vlc-$(VERSION)-win32-debug.zip
 	zip -r -9 vlc-$(VERSION)-win32-debug.zip vlc-$(VERSION)
 
-package-win32-base-7zip: package-win32-base
+package-win32-base-7zip: package-win-base
 # Create package 
 	7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on vlc-$(VERSION)-win32.7z vlc-$(VERSION)
 
-package-win32-base-debug-7zip: package-win32-base-debug
+package-win32-base-debug-7zip: package-win-common
 # Create package
 	7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on vlc-$(VERSION)-win32-debug.7z vlc-$(VERSION)
 
 package-win32-cleanup:
 	rm -Rf $(win32_destdir) $(win32_debugdir)
 
-package-win32-exe: package-win32-base package-win32-base-exe package-win32-cleanup
+package-win32-exe: package-win-base package-win32-base-exe package-win32-cleanup
 
 package-win32-zip: package-win32-base-zip package-win32-cleanup
 
@@ -923,7 +921,7 @@ package-win32-debug: package-win32-base-debug-zip package-win32-base-debug-7zip 
 #######
 # WinCE
 #######
-package-wince-base: package-win-common-strip
+package-wince-base: package-win-base
 
 package-wince-base-zip: package-wince-base
 # Create package 
