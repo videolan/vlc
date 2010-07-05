@@ -455,11 +455,11 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
  *****************************************************************************/
 static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 {
-#   define COL(x)  "\033[" #x ";1m"
-#   define RED     COL(31)
-#   define GREEN   COL(32)
-#   define YELLOW  COL(33)
-#   define WHITE   COL(0)
+#   define COL(x,y)  "\033[" #x ";" #y "m"
+#   define RED     COL(31,1)
+#   define GREEN   COL(32,1)
+#   define YELLOW  COL(0,33)
+#   define WHITE   COL(0,1)
 #   define GRAY    "\033[0m"
 
     static const char ppsz_type[4][9] = { "", " error", " warning", " debug" };
