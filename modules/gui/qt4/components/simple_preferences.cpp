@@ -533,7 +533,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             BUTTONACT( ui.assoButton, assoDialog() );
 #else
             ui.languageBox->hide();
-            ui.assoBox->hide();
+            ui.assoButton->hide();
+            ui.assocLabel->hide();
 #endif
             /* interface */
             char *psz_intf = config_GetPsz( p_intf, "intf" );
