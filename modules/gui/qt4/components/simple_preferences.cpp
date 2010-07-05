@@ -216,7 +216,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_BOOL( "overlay", overlay );
             CONFIG_BOOL( "video-on-top", alwaysOnTop );
             CONFIG_BOOL( "video-deco", windowDecorations );
-            CONFIG_BOOL( "skip-frames", skipFrames );
             CONFIG_GENERIC( "vout", Module, ui.voutLabel, outputModule );
 
             CONFIG_BOOL( "video-wallpaper", wallpaperMode );
@@ -455,6 +454,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets.append( ui.DVDDevice );
             optionWidgets.append( ui.cachingCombo );
             CONFIG_GENERIC( "ffmpeg-skiploopfilter", IntegerList, ui.filterLabel, loopFilterBox );
+            CONFIG_BOOL( "skip-frames", skipFrames );
             CONFIG_GENERIC( "sout-x264-tune", StringList, ui.x264Label, tuneBox );
             CONFIG_GENERIC( "sout-x264-preset", StringList, ui.x264Label, presetBox );
             CONFIG_GENERIC( "sout-x264-profile", StringList, ui.x264profileLabel, profileBox );

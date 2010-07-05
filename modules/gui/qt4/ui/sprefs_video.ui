@@ -7,7 +7,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>820</width>
+    <width>816</width>
     <height>626</height>
    </rect>
   </property>
@@ -57,14 +57,14 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="1" colspan="2">
+      <item row="7" column="1" colspan="2">
        <widget class="QComboBox" name="outputModule">
         <property name="maxVisibleItems">
          <number>15</number>
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
+      <item row="7" column="0">
        <widget class="QLabel" name="voutLabel">
         <property name="text">
          <string>Output</string>
@@ -84,30 +84,20 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="QCheckBox" name="skipFrames">
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="hwYUVBox">
         <property name="text">
-         <string>Skip frames</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
+         <string>Use hardware YUV-&gt;RGB conversions</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="2">
+      <item row="2" column="2">
        <widget class="QCheckBox" name="windowDecorations">
         <property name="text">
          <string>Window decorations</string>
         </property>
         <property name="checked">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QCheckBox" name="hwYUVBox">
-        <property name="text">
-         <string>Use hardware YUV-&gt;RGB conversions</string>
         </property>
        </widget>
       </item>
@@ -303,10 +293,14 @@
   <tabstop>fullscreen</tabstop>
   <tabstop>overlay</tabstop>
   <tabstop>alwaysOnTop</tabstop>
-  <tabstop>skipFrames</tabstop>
+  <tabstop>windowDecorations</tabstop>
+  <tabstop>hwYUVBox</tabstop>
   <tabstop>outputModule</tabstop>
   <tabstop>wallpaperMode</tabstop>
   <tabstop>dXdisplayDevice</tabstop>
+  <tabstop>deinterlaceBox</tabstop>
+  <tabstop>deinterlaceModeBox</tabstop>
+  <tabstop>arLine</tabstop>
   <tabstop>snapshotsDirectory</tabstop>
   <tabstop>snapshotsDirectoryBrowse</tabstop>
   <tabstop>snapshotsPrefix</tabstop>
