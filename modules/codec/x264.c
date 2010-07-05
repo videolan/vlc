@@ -424,9 +424,11 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "min-keyint", 25, NULL, MIN_KEYINT_TEXT,
                  MIN_KEYINT_LONGTEXT, false )
 
+#if X264_BUILD >= 102
     add_string( SOUT_CFG_PREFIX "opengop", "none", NULL, OPENGOP_TEXT,
                OPENGOP_LONGTEXT,false )
         change_string_list( x264_open_gop_names, x264_open_gop_names, 0 );
+#endif
 
     add_integer( SOUT_CFG_PREFIX "scenecut", 40, NULL, SCENE_TEXT,
                  SCENE_LONGTEXT, false )
