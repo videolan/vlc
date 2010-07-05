@@ -772,7 +772,7 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     else if( VAR_IS( "xoffset" ) )
     {
         vlc_mutex_lock( &p_sys->lock );
-        msg_Dbg( p_this, "changing x offset from %dpx to %px",
+        msg_Dbg( p_this, "changing x offset from %dpx to %dpx",
                          p_sys->i_xoffset, (int)newval.i_int );
         p_sys->i_xoffset = __MAX( newval.i_int, 0 );
         vlc_mutex_unlock( &p_sys->lock );

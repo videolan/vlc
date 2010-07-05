@@ -614,7 +614,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 case VLC_VAR_INTEGER:
                 case VLC_VAR_HOTKEY:
                     val.i_int = SSPopN( st, vars );
-                    msg_Dbg( p_intf, "requested %s var change: %s->%d",
+                    msg_Dbg( p_intf, "requested %s var change: %s->%"PRIu64,
                              psz_object, psz_variable, val.i_int );
                     break;
                 case VLC_VAR_STRING:
