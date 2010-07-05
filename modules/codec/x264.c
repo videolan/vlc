@@ -67,6 +67,11 @@ static void Close( vlc_object_t * );
     "If scenecuts appear within this interval, they are still encoded as " \
     "I-frames, but do not start a new GOP." )
 
+#define OPENGOP_TEXT N_("Use recovery points to close GOPs")
+#define OPENGOP_LONGTEXT N_("none: use closed GOPs only\n"\
+    "normal: use standard open GOPs\n" \
+    "bluray: use Blu-ray compatible open GOPs" )
+
 #define SCENE_TEXT N_("Extra I-frames aggressivity" )
 #define SCENE_LONGTEXT N_( "Scene-cut detection. Controls how " \
     "aggressively to insert extra I-frames. With small values of " \
@@ -419,6 +424,10 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "min-keyint", 25, NULL, MIN_KEYINT_TEXT,
                  MIN_KEYINT_LONGTEXT, false )
 
+    add_string( SOUT_CFG_PREFIX "opengop", "none", NULL, OPENGOP_TEXT,
+               OPENGOP_LONGTEXT,false )
+        change_string_list( x264_open_gop_names, x264_open_gop_names, 0 );
+
     add_integer( SOUT_CFG_PREFIX "scenecut", 40, NULL, SCENE_TEXT,
                  SCENE_LONGTEXT, false )
         change_integer_range( -1, 100 )
@@ -689,7 +698,7 @@ static const char *const ppsz_sout_options[] = {
     "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "weightp",
     "aq-mode", "aq-strength", "psy-rd", "psy", "profile", "lookahead", "slices",
     "slice-max-size", "slice-max-mbs", "intra-refresh", "mbtree", "hrd",
-    "tune","preset", NULL
+    "tune","preset", "opengop", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -900,6 +909,15 @@ static int  Open ( vlc_object_t *p_this )
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "min-keyint" );
     if( i_val > 0 && i_val != 25 ) p_sys->param.i_keyint_min = i_val;
 
+#if X264_BUILD >= 102
+    psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "opengop" );
+    if( !strcmp( psz_val, "none" ) )
+        p_sys->param.i_open_gop = X264_OPEN_GOP_NONE;
+    else if( !strcmp( psz_val, "normal" ) )
+        p_sys->param.i_open_gop = X264_OPEN_GOP_NORMAL;
+    else if( !strcmp( psz_val, "bluray" ) )
+        p_sys->param.i_open_gop = X264_OPEN_GOP_BLURAY;
+#endif
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "bframes" );
     if( i_val >= 0 && i_val <= 16 && i_val != 3 )
         p_sys->param.i_bframe = i_val;
