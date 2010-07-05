@@ -1751,6 +1751,7 @@ static int GetiPodID( int64_t *p_ipod_id )
             CFDictionarySetValue( match_dic,
                                   CFSTR(kIOPropertyMatchKey),
                                   smatch_dic );
+            CFRelease( smatch_dic );
 
             if( IOServiceGetMatchingServices( port, match_dic,
                                               &iterator ) == KERN_SUCCESS )
@@ -1782,8 +1783,15 @@ static int GetiPodID( int64_t *p_ipod_id )
 
                 IOObjectRelease( iterator );
             }
-            CFRelease( match_dic );
         }
+        else
+        {
+            if( match_dic )
+                CFRelease( match_dic );
+            if( smatch_dic )
+                CFRelease( smatch_dic );
+        }
+
 
         mach_port_deallocate( mach_task_self(), port );
     }
