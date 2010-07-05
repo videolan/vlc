@@ -116,8 +116,8 @@ struct decoder_synchro_t
 
     /* */
     int             i_frame_rate;
-    bool      b_no_skip;
-    bool      b_quiet;
+    bool            b_no_skip;
+    bool            b_quiet;
 
     /* date of the beginning of the decoding of the current picture */
     mtime_t         decoding_start;
@@ -130,7 +130,7 @@ struct decoder_synchro_t
     unsigned int    pi_meaningful[4];            /* number of durations read */
 
     /* render_time filled by SynchroChoose() */
-    int i_render_time;
+    int             i_render_time;
 
     /* stream context */
     int             i_nb_ref;                /* Number of reference pictures */
