@@ -919,6 +919,7 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_open_gop = X264_OPEN_GOP_NORMAL;
     else if( !strcmp( psz_val, "bluray" ) )
         p_sys->param.i_open_gop = X264_OPEN_GOP_BLURAY;
+    free( psz_val );
 #endif
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "bframes" );
     if( i_val >= 0 && i_val <= 16 && i_val != 3 )
