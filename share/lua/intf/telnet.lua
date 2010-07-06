@@ -243,7 +243,6 @@ while not vlc.misc.should_die() do
                 returned_values = returned_values .. client.buffer
                 client.buffer = commands
             end
-            vlc.msg.err("end of loop")
             client.buffer = returned_values
         end
     end
