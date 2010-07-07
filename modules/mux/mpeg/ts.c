@@ -1604,7 +1604,8 @@ static int Mux( sout_mux_t *p_mux )
                         }
 
                         /* Convert to pes */
-                        if( p_stream->i_stream_id == 0xa0 &&
+                        if( (p_stream->i_stream_id == 0xa0 ||
+                             p_stream->i_stream_type == 0x1b ) && /*Workaroud for bug #3306 */
                             p_data->i_pts <= 0 )
                         {
                             /* XXX yes I know, it's awful, but it's needed,
