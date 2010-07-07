@@ -350,7 +350,7 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                     i_options++;
                 }
 
-                char *psz_URI = make_URI( ppsz_argv[i_opt] );
+                char *psz_URI = make_URI( ppsz_argv[i_opt], NULL );
                 playlist_AddExt( p_playlist, psz_URI,
                         NULL, PLAYLIST_APPEND |
                         ( ( i_opt || p_data->enqueue ) ? 0 : PLAYLIST_GO ),

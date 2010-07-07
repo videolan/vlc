@@ -1034,15 +1034,16 @@ void path_sanitize( char *str )
 /**
  * Convert a file path to an URI.
  * If already an URI, return a copy of the string.
- * @path path path to convert (or URI to copy)
+ * @param path path to convert (or URI to copy)
+ * @param scheme URI scheme to use (default is auto: "file", "fd" or "smb")
  * @return a nul-terminated URI string (use free() to release it),
  * or NULL in case of error
  */
-char *make_URI (const char *path)
+char *make_URI (const char *path, const char *scheme)
 {
     if (path == NULL)
         return NULL;
-    if (!strcmp (path, "-"))
+    if (scheme == NULL && !strcmp (path, "-"))
         return strdup ("fd://0"); // standard input
     if (strstr (path, "://") != NULL)
         return strdup (path); /* Already an URI */
@@ -1053,7 +1054,7 @@ char *make_URI (const char *path)
 #ifdef WIN32
     if (isalpha (path[0]) && (path[1] == ':'))
     {
-        if (asprintf (&buf, "file:///%c:", path[0]) == -1)
+        if (asprintf (&buf, "%s:///%c:", scheme, path[0]) == -1)
             buf = NULL;
         path += 2;
     }
@@ -1062,6 +1063,9 @@ char *make_URI (const char *path)
     if (!strncmp (path, "\\\\", 2))
     {   /* Windows UNC paths */
 #ifndef WIN32
+        if (scheme != NULL)
+            return NULL; /* remote files not supported */
+
         /* \\host\share\path -> smb://host/share/path */
         if (strchr (path + 2, '\\') != NULL)
         {   /* Convert backslashes to slashes */
@@ -1072,7 +1076,7 @@ char *make_URI (const char *path)
                 if (dup[i] == '\\')
                     dup[i] = DIR_SEP_CHAR;
 
-            char *ret = make_URI (dup);
+            char *ret = make_URI (dup, scheme);
             free (dup);
             return ret;
         }
@@ -1098,12 +1102,13 @@ char *make_URI (const char *path)
             return NULL;
         if (asprintf (&buf, "%s/%s", cwd, path) == -1)
             return NULL;
-        char *ret = make_URI (buf);
+        char *ret = make_URI (buf, scheme);
         free (buf);
         return ret;
     }
     else
-        buf = strdup ("file://");
+    if (asprintf (&buf, "%s://", scheme ? scheme : "file") == -1)
+        buf = NULL;
     if (buf == NULL)
         return NULL;
 

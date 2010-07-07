@@ -55,7 +55,7 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
     // }
     LoadCatalog();
 
-    char* psz_uri = make_URI( rFileName.c_str() );
+    char* psz_uri = make_URI( rFileName.c_str(), NULL );
     m_pStream = stream_UrlNew( pIntf, psz_uri );
     free( psz_uri );
 

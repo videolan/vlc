@@ -436,7 +436,7 @@ void DialogsProvider::addFromSimple( bool pl, bool go)
     files.sort();
     foreach( const QString &file, files )
     {
-        char* psz_uri = make_URI( qtu( toNativeSeparators(file) ) );
+        char* psz_uri = make_URI( qtu( toNativeSeparators(file) ), NULL );
         playlist_Add( THEPL, psz_uri, NULL,
                       go ? ( PLAYLIST_APPEND | ( i ? PLAYLIST_PREPARSE : PLAYLIST_GO ) )
                          : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
@@ -719,7 +719,7 @@ void DialogsProvider::SDMenuAction( const QString& data )
  **/
 void DialogsProvider::playMRL( const QString &mrl )
 {
-    char* psz_uri = make_URI( qtu(mrl) );
+    char* psz_uri = make_URI( qtu(mrl), NULL );
     playlist_Add( THEPL, psz_uri, NULL,
            PLAYLIST_APPEND | PLAYLIST_GO , PLAYLIST_END, true, false );
     free( psz_uri );

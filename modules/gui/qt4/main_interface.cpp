@@ -1059,7 +1059,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
     {
         if( url.isValid() )
         {
-            char* psz_uri = make_URI( qtu( url.toString() ) );
+            char* psz_uri = make_URI( qtu( url.toString() ), NULL );
             playlist_Add( THEPL, psz_uri, NULL,
                           PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
                           PLAYLIST_END, true, pl_Unlocked );
@@ -1075,7 +1075,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
     if( !mimeData->hasUrls() && mimeData->hasText() &&
         QUrl(mimeData->text()).isValid() )
     {
-        char *psz_uri = make_URI( qtu( mimeData->text() ) );
+        char *psz_uri = make_URI( qtu( mimeData->text() ), NULL );
         playlist_Add( THEPL, psz_uri, NULL,
                       PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
                       PLAYLIST_END, true, pl_Unlocked );

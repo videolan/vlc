@@ -238,5 +238,5 @@ char *ProcessMRL( const char *psz_mrl, const char *psz_prefix )
     return ret;
 
 uri:
-    return make_URI( psz_mrl );
+    return make_URI( psz_mrl, NULL );
 }

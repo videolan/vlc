@@ -178,7 +178,7 @@ int playlist_FindArtInCache( input_item_t *p_item )
             if( asprintf( &psz_file, "%s" DIR_SEP "%s",
                           psz_path, psz_filename ) != -1 )
             {
-                char *psz_uri = make_URI( psz_file );
+                char *psz_uri = make_URI( psz_file, "file" );
                 if( psz_uri )
                 {
                     input_item_SetArtURL( p_item, psz_uri );
@@ -208,7 +208,7 @@ int playlist_SaveArt( playlist_t *p_playlist, input_item_t *p_item,
     if( !psz_filename )
         return VLC_EGENERIC;
 
-    char *psz_uri = make_URI( psz_filename );
+    char *psz_uri = make_URI( psz_filename, "file" );
     if( !psz_uri )
     {
         free( psz_filename );

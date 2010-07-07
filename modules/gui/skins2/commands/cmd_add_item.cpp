@@ -37,7 +37,7 @@ void CmdAddItem::execute()
     if( !pPlaylist )
         return;
 
-    char* psz_uri = make_URI(  m_name.c_str() );
+    char* psz_uri = make_URI(  m_name.c_str(), NULL );
     if( !psz_uri )
         return;
 

@@ -42,7 +42,7 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
 
     fmt_out.i_chroma = VLC_CODEC_RGBA;
 
-    char* psz_uri = make_URI( fileName.c_str() );
+    char* psz_uri = make_URI( fileName.c_str(), NULL );
     pPic = image_ReadUrl( pImageHandler, psz_uri, &fmt_in, &fmt_out );
     free( psz_uri );
 

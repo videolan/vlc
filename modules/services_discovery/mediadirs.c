@@ -190,7 +190,7 @@ static void *Run( void *data )
             !S_ISDIR( st.st_mode ) )
             continue;
 
-        char* psz_uri = make_URI( psz_dir );
+        char* psz_uri = make_URI( psz_dir, "file" );
 
         input_item_t* p_root = input_item_New( p_sd, psz_uri, NULL );
         if( p_sys->i_type == Picture )
@@ -268,7 +268,7 @@ static int onNewFileAdded( vlc_object_t *p_this, char const *psz_var,
     if( !psz_file || !*psz_file )
         return VLC_EGENERIC;
 
-    char* psz_uri = make_URI( psz_file );
+    char* psz_uri = make_URI( psz_file, "file" );
     input_item_t* p_item = input_item_New( p_sd, psz_uri, NULL );
 
     if( p_sys->i_type == Picture )

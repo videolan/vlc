@@ -3167,7 +3167,7 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
         free( psz_path );
     }
 
-    char *url = make_URI( psz_subtitle );
+    char *url = make_URI( psz_subtitle, "file" );
 
     var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
 

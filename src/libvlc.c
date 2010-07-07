@@ -1163,9 +1163,7 @@ static void GetFilenames( libvlc_int_t *p_vlc, unsigned n,
             }
         }
 
-        /* TODO: write an internal function of this one, to avoid
-         *       unnecessary lookups. */
-        char *mrl = make_URI( args[n] );
+        char *mrl = make_URI( args[n], NULL );
         if( !mrl )
             continue;
 

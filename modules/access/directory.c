@@ -122,7 +122,7 @@ int DirInit (access_t *p_access, DIR *handle)
             uri = NULL;
     }
     else
-        uri = make_URI (p_access->psz_filepath);
+        uri = make_URI (p_access->psz_filepath, "file");
     if (unlikely(uri == NULL))
         goto error;
 

@@ -86,7 +86,7 @@ int playlist_Import( playlist_t *p_playlist, const char *psz_file )
 {
     input_item_t *p_input;
     const char *const psz_option = "meta-file";
-    char *psz_uri = make_URI( psz_file );
+    char *psz_uri = make_URI( psz_file, NULL );
 
     if( psz_uri == NULL )
         return VLC_EGENERIC;
@@ -118,41 +118,31 @@ static void input_item_subitem_tree_added( const vlc_event_t * p_event,
 
 int playlist_MLLoad( playlist_t *p_playlist )
 {
-    char *psz_datadir;
-    char *psz_uri = NULL;
     input_item_t *p_input;
 
-    psz_datadir = config_GetUserDir( VLC_DATA_DIR );
-
+    char *psz_datadir = config_GetUserDir( VLC_DATA_DIR );
     if( !psz_datadir ) /* XXX: This should never happen */
     {
         msg_Err( p_playlist, "no data directory, cannot load media library") ;
         return VLC_EGENERIC;
     }
 
-    if( asprintf( &psz_uri, "%s" DIR_SEP "ml.xspf", psz_datadir ) != -1 )
-    {   /* loosy check for media library file */
-        struct stat st;
-        int ret = vlc_stat( psz_uri , &st );
-        free( psz_uri );
-        if( ret )
-        {
-            free( psz_datadir );
-            return VLC_EGENERIC;
-        }
-    }
-
-    psz_uri = make_URI( psz_datadir );
+    char *psz_file;
+    if( asprintf( &psz_file, "%s" DIR_SEP "ml.xspf", psz_datadir ) != -1 )
+        psz_file = NULL;
     free( psz_datadir );
-    psz_datadir = psz_uri;
-    if( psz_datadir == NULL )
+    if( psz_file == NULL )
+        return VLC_ENOMEM;
+
+    /* loosy check for media library file */
+    struct stat st;
+    int ret = vlc_stat( psz_file, &st );
+    free( psz_file );
+    if( ret )
         return VLC_EGENERIC;
 
-    /* Force XSPF demux (psz_datadir was a path, now it is a file URI) */
-    if( asprintf( &psz_uri, "file/xspf-open%s/ml.xspf", psz_datadir+4 ) == -1 )
-        psz_uri = NULL;
-    free( psz_datadir );
-    psz_datadir = NULL;
+    char *psz_uri = make_URI( psz_file, "file/xspf-open" );
+    free( psz_file );
     if( psz_uri == NULL )
         return VLC_ENOMEM;
 

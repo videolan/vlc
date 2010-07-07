@@ -338,7 +338,7 @@ void OpenDialog::finish( bool b_enqueue = false )
         bool b_start = !i && !b_enqueue;
 
         input_item_t *p_input;
-        char* psz_uri = make_URI( qtu( itemsMRL[i] ) );
+        char* psz_uri = make_URI( qtu( itemsMRL[i] ), "file" );
         p_input = input_item_New( p_intf, psz_uri, NULL );
         free( psz_uri );
 

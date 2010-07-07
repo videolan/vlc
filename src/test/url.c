@@ -68,9 +68,14 @@ static inline void test_b64 (const char *in, const char *out)
     test (vlc_b64_encode, in, out);
 }
 
+static char *make_URI_def (const char *in)
+{
+    return make_URI (in, NULL);
+}
+
 static inline void test_path (const char *in, const char *out)
 {
-    test (make_URI, in, out);
+    test (make_URI_def, in, out);
 }
 
 static inline void test_current_directory_path (const char *in, const char *cwd, const char *out)
@@ -79,7 +84,7 @@ static inline void test_current_directory_path (const char *in, const char *cwd,
     int val = asprintf(&expected_result, "file://%s/%s", cwd, out);
     assert (val != -1);
     
-    test (make_URI, in, expected_result);
+    test (make_URI_def, in, expected_result);
 }
 
 int main (void)
