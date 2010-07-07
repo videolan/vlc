@@ -1,9 +1,9 @@
 StrCpy $Name_Section01 "Media-Player (benötigt)"
-StrCpy $Name_Section02a "Startmenü-Verknüpfung"
-StrCpy $Name_Section02b "Desktop-Verknüpfung"
+StrCpy $Name_Section02a "Symbole im Startmenü"
+StrCpy $Name_Section02b "Desktopsymbol"
 StrCpy $Name_Section03 "Mozilla-Plugin"
 StrCpy $Name_Section04 "ActiveX-Plugin"
-StrCpy $Name_Section05 "CD abspielen"
+StrCpy $Name_Section05 "DVD- und CD-Wiedergabe"
 StrCpy $Name_Section06 "Dateitypzuordnungen"
 StrCpy $Name_SectionGroupAudio "Audiodateien"
 StrCpy $Name_SectionGroupVideo "Videodateien"
@@ -26,9 +26,9 @@ StrCpy $Desc_Section05 \
 StrCpy $Desc_Section06 \
     "Setzt den VLC Media-Player als Standard-Anwendung für die ausgewählten Dateitypen"
 StrCpy $Desc_Section07 \
-    "Fügt Kontextmenü-Einträge hinzu ('Abspielen mit VLC' und 'Zur VLC-Wiedergabeliste hinzufügen')"
+    "Fügt Kontextmenü-Einträge hinzu ('Wiedergabe mit VLC' und 'Zur VLC-Wiedergabeliste hinzufügen')"
 StrCpy $Desc_Section08 \
-    "Löscht die VLC media player Einstellungen und Ÿbergebliebene Cache-Dateien der alten Installation"
+    "Löscht die VLC media player Einstellungen und übergebliebenen Cache-Dateien der alten Installation"
 
 StrCpy $Message_AlreadyInstalled  \
 "Der VLC media player ist schon installiert. $\nWollen Sie vor \
@@ -38,12 +38,12 @@ StrCpy $Name_Section91 "Deinstallieren"
 StrCpy $Name_Section92 "Einstellungen und Cache löschen"
 
 StrCpy $Desc_Section91 \
-"VLC media player und alle Komponenten löschen"
+"VLC media player und alle Komponenten deinstallieren"
 StrCpy $Desc_Section92 \
 "VLC media player Einstellungen und Cache-Dateien löschen"
 
-StrCpy $ShellAssociation_Play "Abspielen"
-StrCpy $ContextMenuEntry_PlayWith "Mit VLC media player abspielen"
+StrCpy $ShellAssociation_Play "Wiedergabe"
+StrCpy $ContextMenuEntry_PlayWith "Mit VLC media player wiedergeben"
 StrCpy $ContextMenuEntry_AddToPlaylist "Zur VLC media player Wiedergabeliste hinzufügen"
 
 StrCpy $Link_VisitWebsite "Besuchen Sie die VideoLAN VLC media player Webseite"
@@ -52,5 +52,10 @@ StrCpy $Name_InstTypeRecommended "Empfohlen"
 StrCpy $Name_InstTypeMinimum "Minimal"
 StrCpy $Name_InstTypeFull "Voll"
 
-StrCpy $Action_OnArrivalDVD "DVD Video abspielen"
-StrCpy $Action_OnArrivalAudioCD "Audio CD abspielen"
+StrCpy $Action_OnArrivalDVD "DVD-Video wiedergeben"
+StrCpy $Action_OnArrivalAudioCD "Audio-CD wiedergeben"
+StrCpy $Action_OnArrivalVCDMovie "VCD-Video wiedergeben"
+StrCpy $Action_OnArrivalSVCDMovie "SVCD-Video wiedergeben"
+StrCpy $Action_OnArrivalVideoFiles "Videodateien wiedergeben"
+StrCpy $Action_OnArrivalMusicFiles "Audiodateien wiedergeben"
+StrCpy $Action_OnArrivalDVDAudio "Audio-DVD wiedergeben"
