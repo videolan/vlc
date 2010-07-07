@@ -31,11 +31,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-/* This is from mozilla java, do we really need it? */
-#if 0
-#include <jri.h>
-#endif
-
 #include "vlcplugin.h"
 #include "vlcshell.h"
 
