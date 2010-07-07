@@ -9,7 +9,7 @@ StrCpy $Name_SectionGroupAudio "Pliki audio"
 StrCpy $Name_SectionGroupVideo "Pliki wideo"
 StrCpy $Name_SectionGroupOther "Inne"
 StrCpy $Name_Section07 "Menu kontekstowe"
-StrCpy $Name_Section08 "Usuñ preferencje i cache"
+StrCpy $Name_Section08 "Wyczy¶ciæ pamiêæ podrêczn± i ustawienia"
 
 StrCpy $Desc_Section01 \
     "Pliki samego odtwarzacza"
@@ -22,40 +22,39 @@ StrCpy $Desc_Section03 \
 StrCpy $Desc_Section04 \
     "Wtyczka VLC ActiveX"
 StrCpy $Desc_Section05 \
-    "Rejestracja odtwarzania p³yt DVD i CD"
+    "Rejestracja VLC do odtwarzania p³yt DVD i CD"
 StrCpy $Desc_Section06 \
-    "Ustawia VLC media playera jako domyœln¹ aplikacjê dla poszczególnych typów pliku"
+    "Ustawia VLC media player jako domy¶ln± aplikacjê dla poszczególnych typów pliku"
 StrCpy $Desc_Section07 \
-    "Dodaje pozycje do menu kontekstowego ('Odtwórz w VLC' i 'Dodaj do listy odtwarzania VLC')"
+    "Dodaje nowe pozycje do menu kontekstowego ('Odtwórz w VLC' i 'Dodaj do listy odtwarzania VLC')"
 StrCpy $Desc_Section08 \
-    "Usuwa preferencje i pliki cacheu VLC media playera pozostawione przez poprzednie instalacje"
-
+    "Usuwa ustawienia odtwarzacza VLC media player i pamiêci podrêcznej poprzednich instalacji"
 StrCpy $Message_AlreadyInstalled  \
-"VLC media player zosta³ ju¿ zainstalowany. $\nCzy chcesz usun¹æ \
-poprzedni¹ wersjê przed zainstalowaniem $(^Name) ?"
+"VLC media player zosta³ ju¿ zainstalowany. $\nCzy chcesz usun±æ \
+poprzedni± wersjê przed zainstalowaniem $(^Name) ?"
 
 StrCpy $Name_Section91 "Odinstaluj"
-StrCpy $Name_Section92 "Usuñ preferencje i cache"
+StrCpy $Name_Section92 "Wyczy¶ciæ pamiêæ podrêczn± i ustawienia"
 
 StrCpy $Desc_Section91 \
-"Odinstaluj VLC media playera i wszystkie jego sk³adniki"
+"Odinstaluj VLC media player i wszystkie jego sk³adniki"
 StrCpy $Desc_Section92 \
-"Usuwa preferencje i pliki cacheu VLC media playera"
+"Usuwa ustawienia odtwarzacza VLC media player i pamiêci podrêcznej"
 
 StrCpy $ShellAssociation_Play "Odtwórz"
-StrCpy $ContextMenuEntry_PlayWith "Odtwórz w VLC media playerze"
-StrCpy $ContextMenuEntry_AddToPlaylist "Dodaj do listy odtwarzania VLC media playera"
+StrCpy $ContextMenuEntry_PlayWith "Odtwórz w VLC media player"
+StrCpy $ContextMenuEntry_AddToPlaylist "Dodaj do listy odtwarzania VLC media player"
 
-StrCpy $Link_VisitWebsite "OdwieŸ witrynê VideoLAN VLC media player"
+StrCpy $Link_VisitWebsite "Odwied¼ witrynê VideoLAN VLC media player"
 
 StrCpy $Name_InstTypeRecommended "Zalecana"
 StrCpy $Name_InstTypeMinimum "Minimalna"
 StrCpy $Name_InstTypeFull "Pe³na"
 
-StrCpy $Action_OnArrivalDVD "Odtwórz film DVD" 
-StrCpy $Action_OnArrivalAudioCD "Odtwórz audio CD"
-StrCpy $Action_OnArrivalVCDMovie "Odtwórz film VCD"
-StrCpy $Action_OnArrivalSVCDMovie "Odtwórz film SVCD"
-StrCpy $Action_OnArrivalVideoFiles "Odtwórz pliki wideo"
-StrCpy $Action_OnArrivalMusicFiles "Odtwórz pliki audio"
-StrCpy $Action_OnArrivalDVDAudio "Odtwórz audio DVD"
+StrCpy $Action_OnArrivalDVD "Odtwarzaj film na DVD" 
+StrCpy $Action_OnArrivalAudioCD "Odtwarzaj audio CD"
+StrCpy $Action_OnArrivalVCDMovie "Odtwarzaj film na VCD"
+StrCpy $Action_OnArrivalSVCDMovie "Odtwarzaj film na SVCD"
+StrCpy $Action_OnArrivalVideoFiles "Odtwarzaj pliki wideo"
+StrCpy $Action_OnArrivalMusicFiles "Odtwarzaj pliki audio"
+StrCpy $Action_OnArrivalDVDAudio "Odtwarzaj audio DVD"
