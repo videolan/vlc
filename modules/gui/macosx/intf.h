@@ -260,6 +260,8 @@ struct intf_sys_t
     IBOutlet NSMenuItem * o_mi_addSub;
     IBOutlet NSMenuItem * o_mi_deinterlace;
     IBOutlet NSMenu * o_mu_deinterlace;
+    IBOutlet NSMenuItem * o_mi_deinterlace_mode;
+    IBOutlet NSMenu * o_mu_deinterlace_mode;
     IBOutlet NSMenuItem * o_mi_ffmpeg_pp;
     IBOutlet NSMenu * o_mu_ffmpeg_pp;
     IBOutlet NSMenuItem * o_mi_teletext;
