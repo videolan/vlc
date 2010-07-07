@@ -352,6 +352,33 @@ int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
         memcpy( p_es->p_buffer, p_fmt->p_extra, p_fmt->i_extra );
     }
 
+    if( p_fmt->i_codec == VLC_CODEC_H264 )
+    {
+        int offset=2;
+        while(offset < p_es->i_buffer )
+        {
+            if( p_es->p_buffer[offset-2] == 0 &&
+                p_es->p_buffer[offset-1] == 0 &&
+                p_es->p_buffer[offset] == 1 )
+                break;
+            offset++;
+        }
+        offset++;
+        if( offset <= p_es->i_buffer-4 &&
+            ((p_es->p_buffer[offset] & 0x1f) != 9) ) /* Not AUD */
+        {
+            /* Make similar AUD as libavformat does */
+            p_es = block_Realloc( p_es, 6, p_es->i_buffer );
+            p_es->p_buffer[0] = 0x00;
+            p_es->p_buffer[1] = 0x00;
+            p_es->p_buffer[2] = 0x00;
+            p_es->p_buffer[3] = 0x01;
+            p_es->p_buffer[4] = 0x09;
+            p_es->p_buffer[5] = 0xe0;
+        }
+
+    }
+
     i_pts = p_es->i_pts <= 0 ? 0 : p_es->i_pts * 9 / 100; // 90000 units clock
     i_dts = p_es->i_dts <= 0 ? 0 : p_es->i_dts * 9 / 100; // 90000 units clock
 
