@@ -551,6 +551,8 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     }
     else
         mrlList = NULL;
+
+    ui.urlText->setValidator( new UrlValidator( this ) );
 }
 
 NetOpenPanel::~NetOpenPanel()
@@ -622,6 +624,20 @@ void NetOpenPanel::updateCompleter()
     if( !tempL.contains( ui.urlText->text() ) )
         tempL.append( ui.urlText->text() );
     mrlList->setStringList( tempL );
+}
+
+void UrlValidator::fixup( QString& str ) const
+{
+    str = str.trimmed();
+}
+
+QValidator::State UrlValidator::validate( QString& str, int& pos ) const
+{
+    if( str.contains( ' ' ) )
+        return QValidator::Invalid;
+    if( !str.contains( "://" ) )
+        return QValidator::Intermediate;
+    return QValidator::Acceptable;
 }
 
 /**************************************************************************
