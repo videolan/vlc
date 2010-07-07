@@ -3,16 +3,12 @@
 # reference about classical DCT and DFT algorithms.
 
 
-import math
-import cmath
-
-pi = math.pi
-sin = math.sin
-cos = math.cos
-sqrt = math.sqrt
+from random import random
+from math import pi, sin, cos, sqrt
+from cmath import exp
 
 def exp_j (alpha):
-    return cmath.exp (alpha * 1j)
+    return exp (alpha * 1j)
 
 def conjugate (c):
     c = c + 0j
@@ -1067,15 +1063,13 @@ def dump (vector):
 	str = str + realstr #+ imagstr
     return "[%s]" % str
 
-import whrandom
-
 def test(N):
     input = vector(N)
     output = vector(N)
     verify = vector(N)
 
     for i in range(N):
-	input[i] = whrandom.random() + 1j * whrandom.random()
+	input[i] = random() + 1j * random()
 
     unscaled_DFT (N, input, output)
     unscaled_DFT (N, input, verify)
