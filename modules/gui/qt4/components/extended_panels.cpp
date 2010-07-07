@@ -1201,8 +1201,7 @@ Spatializer::~Spatializer()
 void Spatializer::enable()
 {
     bool en = enableCheck->isChecked();
-    aout_EnableFilter( VLC_OBJECT( p_intf ), "spatializer",
-            en ? true : false );
+    aout_EnableFilter( THEPL, "spatializer", en );
     enable( en );
 }
 
