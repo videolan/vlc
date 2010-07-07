@@ -497,22 +497,34 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
 {
     QString dir = QFileDialog::getExistingDirectory( NULL, qtr( I_OP_DIR_WINTITLE ), p_intf->p_sys->filepath );
 
-    if (!dir.isEmpty() )
-    {
-        QString mrl = (dir.endsWith( "VIDEO_TS", Qt::CaseInsensitive ) ?
-                       "dvd://" : "directory://")
-                    + toNativeSeparators( dir );
-        input_item_t *p_input = input_item_New( THEPL, qtu( mrl ), NULL );
+    if( dir.isEmpty() )
+        return;
 
-        /* FIXME: playlist_AddInput() can fail */
-        playlist_AddInput( THEPL, p_input,
-                       go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
-                       PLAYLIST_END, pl, pl_Unlocked );
-        RecentsMRL::getInstance( p_intf )->addRecent( mrl );
-        if( !go )
-            input_Read( THEPL, p_input );
-        vlc_gc_decref( p_input );
+    QString mrl;
+
+    if( dir.endsWith( "/VIDEO_TS", Qt::CaseInsensitive ) )
+        mrl = qfu("dvd://") + toNativeSeparators( dir );
+    else
+    {
+        char *uri = make_URI( qtu( dir ), "directory" );
+        if( unlikely(uri == NULL) )
+            return;
+        mrl = qfu(uri);
+        free( uri );
     }
+
+    input_item_t *p_input = input_item_New( THEPL, qtu( mrl ), NULL );
+    if( unlikely( p_input == NULL ) )
+        return;
+
+    /* FIXME: playlist_AddInput() can fail */
+    playlist_AddInput( THEPL, p_input,
+                      go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
+                       PLAYLIST_END, pl, pl_Unlocked );
+    RecentsMRL::getInstance( p_intf )->addRecent( mrl );
+    if( !go )
+        input_Read( THEPL, p_input );
+    vlc_gc_decref( p_input );
 }
 
 void DialogsProvider::PLOpenDir()
