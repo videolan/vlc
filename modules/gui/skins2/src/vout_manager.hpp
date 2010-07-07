@@ -28,10 +28,12 @@
 
 #include <vlc_vout.h>
 #include <vlc_vout_window.h>
+#include <vlc_keys.h>
 #include "../utils/position.hpp"
 #include "../commands/cmd_generic.hpp"
 #include "../controls/ctrl_video.hpp"
 #include "../events/evt_key.hpp"
+#include "../events/evt_scroll.hpp"
 
 class VarBool;
 class GenericWindow;
@@ -73,6 +75,17 @@ public:
         if( rEvtKey.getKeyState() == EvtKey::kDown )
             var_SetInteger( getIntf()->p_libvlc, "key-pressed",
                              rEvtKey.getModKey() );
+    }
+
+    virtual void processEvent( EvtScroll &rEvtScroll )
+    {
+        // scroll events sent to core as hotkeys
+        int i_vlck = 0;
+        i_vlck |= rEvtScroll.getMod();
+        i_vlck |= ( rEvtScroll.getDirection() == EvtScroll::kUp ) ?
+                  KEY_MOUSEWHEELUP : KEY_MOUSEWHEELDOWN;
+
+        var_SetInteger( getIntf()->p_libvlc, "key-pressed", i_vlck );
     }
 };
 
