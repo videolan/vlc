@@ -125,7 +125,7 @@ static int ControlPause( demux_t *demux, int query, va_list args )
 int OpenDemux ( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t*)p_this;
-    char * psz_name = p_demux->psz_path;
+    char * psz_name = p_demux->psz_location;
 
     p_demux->p_sys = NULL;
 

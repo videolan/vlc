@@ -402,7 +402,7 @@ static int Open( vlc_object_t * p_this )
                 else
                 {
                     char *psz_absolute;
-                    char *psz_path = strdup( p_demux->psz_path );
+                    char *psz_path = strdup( p_demux->psz_location );
                     char *end = strrchr( psz_path, '/' );
                     if( end ) end[1] = '\0';
                     else *psz_path = '\0';

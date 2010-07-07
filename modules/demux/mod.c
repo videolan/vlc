@@ -149,7 +149,9 @@ static int Open( vlc_object_t *p_this )
     /* We accept file based on extension match */
     if( !p_demux->b_force )
     {
-        const char *psz_ext = strrchr( p_demux->psz_path, '.' );
+        if( !p_demux->psz_file )
+            return VLC_EGENERIC;
+        const char *psz_ext = strrchr( p_demux->psz_file, '.' );
         int i;
 
         if( !psz_ext )

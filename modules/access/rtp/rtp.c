@@ -165,7 +165,7 @@ static int Open (vlc_object_t *obj)
     else
         return VLC_EGENERIC;
 
-    char *tmp = strdup (demux->psz_path);
+    char *tmp = strdup (demux->psz_location);
     if (tmp == NULL)
         return VLC_ENOMEM;
 

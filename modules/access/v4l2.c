@@ -681,7 +681,7 @@ static int DemuxOpen( vlc_object_t *p_this )
 
     GetV4L2Params(p_sys, (vlc_object_t *) p_demux);
 
-    ParseMRL( p_sys, p_demux->psz_path, (vlc_object_t *) p_demux );
+    ParseMRL( p_sys, p_demux->psz_location, (vlc_object_t *) p_demux );
 
 #ifdef HAVE_LIBV4L2
     if( !var_InheritBool( p_this, CFG_PREFIX "use-libv4l2" ) )

@@ -142,7 +142,7 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
     luaopen_stream( L );
     luaopen_xml( L );
     luaopen_md5( L );
-    lua_pushstring( L, p_demux->psz_path );
+    lua_pushstring( L, p_demux->psz_location );
     lua_setfield( L, -2, "path" );
     lua_pushstring( L, p_demux->psz_access );
     lua_setfield( L, -2, "access" );

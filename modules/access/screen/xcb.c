@@ -170,10 +170,10 @@ static int Open (vlc_object_t *obj)
     if (!strcmp (demux->psz_access, "window"))
     {
         char *end;
-        unsigned long ul = strtoul (demux->psz_path, &end, 0);
+        unsigned long ul = strtoul (demux->psz_location, &end, 0);
         if (*end || ul > 0xffffffff)
         {
-            msg_Err (obj, "bad X11 drawable %s", demux->psz_path);
+            msg_Err (obj, "bad X11 drawable %s", demux->psz_location);
             goto error;
         }
         p_sys->window = ul;

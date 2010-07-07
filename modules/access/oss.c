@@ -178,8 +178,8 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_sys->p_block = NULL;
     p_sys->i_next_demux_date = -1;
 
-    if( p_demux->psz_path && *p_demux->psz_path )
-        p_sys->psz_device = p_demux->psz_path;
+    if( p_demux->psz_location && *p_demux->psz_location )
+        p_sys->psz_device = p_demux->psz_location;
     else
         p_sys->psz_device = OSS_DEFAULT;
 

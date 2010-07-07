@@ -130,13 +130,11 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t *p_sys;
     int i_width=-1, i_height=-1;
     unsigned u_fps_num=0, u_fps_den=1;
-    char *psz_ext;
     vlc_fourcc_t i_chroma;
     unsigned int i_sar_num = 0;
     unsigned int i_sar_den = 0;
     const struct preset_t *p_preset = NULL;
     const uint8_t *p_peek;
-    bool b_valid = false;
     bool b_y4m = false;
 
     if( stream_Peek( p_demux->s, &p_peek, 9 ) == 9 )
@@ -144,29 +142,33 @@ static int Open( vlc_object_t * p_this )
         /* http://wiki.multimedia.cx/index.php?title=YUV4MPEG2 */
         if( !strncmp( (char *)p_peek, "YUV4MPEG2", 9 ) )
         {
-            b_valid = true;
             b_y4m = true;
+            goto valid;
         }
     }
 
-    /* guess preset based on file extension */
-    psz_ext = strrchr( p_demux->psz_path, '.' );
-    if( psz_ext )
+    if( !p_demux->b_force )
     {
+        /* guess preset based on file extension */
+        if( !p_demux->psz_file )
+            return VLC_EGENERIC;
+
+        const char *psz_ext = strrchr( p_demux->psz_file, '.' );
+        if( !psz_ext )
+            return VLC_EGENERIC;
         psz_ext++;
-        for( int i = 0; p_presets[i].psz_ext ; i++ )
+
+        for( unsigned i = 0; p_presets[i].psz_ext ; i++ )
         {
             if( !strcasecmp( psz_ext, p_presets[i].psz_ext ) )
             {
                 p_preset = &p_presets[i];
-                b_valid = true;
-                break;
+                goto valid;
             }
         }
-    }
-    if( !b_valid && !p_demux->b_force )
         return VLC_EGENERIC;
-
+    }
+valid:
     /* Set p_input field */
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;

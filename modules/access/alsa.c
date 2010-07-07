@@ -255,14 +255,14 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_sys->i_next_demux_date = -1;
 
     const char *psz_device = NULL;
-    if( p_demux->psz_path && *p_demux->psz_path )
-        psz_device = p_demux->psz_path;
+    if( p_demux->psz_location && *p_demux->psz_location )
+        psz_device = p_demux->psz_location;
     else
         ListAvailableDevices( p_demux, false );
 
     if( FindMainDevice( p_demux, psz_device ) != VLC_SUCCESS )
     {
-        if( p_demux->psz_path && *p_demux->psz_path )
+        if( p_demux->psz_location && *p_demux->psz_location )
             ListAvailableDevices( p_demux, false );
         DemuxClose( p_this );
         return VLC_EGENERIC;

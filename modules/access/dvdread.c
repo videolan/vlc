@@ -176,7 +176,7 @@ static int Open( vlc_object_t *p_this )
     dvd_reader_t *p_dvdread;
     ifo_handle_t *p_vmg_file;
 
-    if( !p_demux->psz_path || !*p_demux->psz_path )
+    if( !p_demux->psz_file || !*p_demux->psz_file )
     {
         /* Only when selected */
         if( !p_demux->psz_access || !*p_demux->psz_access )
@@ -189,7 +189,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
     else
-        psz_name = ToLocaleDup( p_demux->psz_path );
+        psz_name = ToLocaleDup( p_demux->psz_file );
 
 #ifdef WIN32
     if( psz_name[0] && psz_name[1] == ':' &&

@@ -119,7 +119,7 @@ int OpenDemux( vlc_object_t *p_this )
     bool          b_can_seek;
 
     /* Init Probe data */
-    pd.filename = p_demux->psz_path;
+    pd.filename = p_demux->psz_file;
     if( ( pd.buf_size = stream_Peek( p_demux->s, &pd.buf, 2048 + 213 ) ) <= 0 )
     {
         msg_Warn( p_demux, "cannot peek" );
@@ -155,14 +155,14 @@ int OpenDemux( vlc_object_t *p_this )
     {
         int i_len;
 
-        if( !p_demux->psz_path ) return VLC_EGENERIC;
+        if( !p_demux->psz_file ) return VLC_EGENERIC;
 
-        i_len = strlen( p_demux->psz_path );
+        i_len = strlen( p_demux->psz_file );
         if( i_len < 4 ) return VLC_EGENERIC;
 
-        if( strcasecmp( &p_demux->psz_path[i_len - 4], ".str" ) &&
-            strcasecmp( &p_demux->psz_path[i_len - 4], ".xai" ) &&
-            strcasecmp( &p_demux->psz_path[i_len - 3], ".xa" ) )
+        if( strcasecmp( &p_demux->psz_file[i_len - 4], ".str" ) &&
+            strcasecmp( &p_demux->psz_file[i_len - 4], ".xai" ) &&
+            strcasecmp( &p_demux->psz_file[i_len - 3], ".xa" ) )
         {
             return VLC_EGENERIC;
         }
@@ -214,7 +214,7 @@ int OpenDemux( vlc_object_t *p_this )
 
 
     /* Open it */
-    if( av_open_input_stream( &p_sys->ic, &p_sys->io, p_demux->psz_path,
+    if( av_open_input_stream( &p_sys->ic, &p_sys->io, p_demux->psz_file,
                               p_sys->fmt, NULL ) )
     {
         msg_Err( p_demux, "av_open_input_stream failed" );

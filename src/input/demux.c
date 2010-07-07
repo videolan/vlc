@@ -29,9 +29,28 @@
 #include <libvlc.h>
 #include <vlc_codec.h>
 #include <vlc_meta.h>
+#include <vlc_url.h>
 
 static bool SkipID3Tag( demux_t * );
 static bool SkipAPETag( demux_t *p_demux );
+
+/* Decode URL (which has had its scheme stripped earlier) to a file path. */
+/* XXX: evil code duplication from access.c */
+static char *get_path(const char *location)
+{
+    char *url, *path;
+
+    /* Prepending "file://" is a bit hackish. But then again, we do not want
+     * to hard-code the list of schemes that use file paths in make_path().
+     */
+    if (asprintf(&url, "file://%s", location) == -1)
+        return NULL;
+
+    path = make_path (url);
+    free (url);
+    return path;
+}
+
 
 /*****************************************************************************
  * demux_New:
@@ -39,7 +58,7 @@ static bool SkipAPETag( demux_t *p_demux );
  *****************************************************************************/
 demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
                        const char *psz_access, const char *psz_demux,
-                       const char *psz_path,
+                       const char *psz_location,
                        stream_t *s, es_out_t *out, bool b_quick )
 {
     static const char typename[] = "demux";
@@ -54,7 +73,8 @@ demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     /* Parse URL */
     p_demux->psz_access = strdup( psz_access );
     p_demux->psz_demux  = strdup( psz_demux );
-    p_demux->psz_path   = strdup( psz_path );
+    p_demux->psz_location = strdup( psz_location );
+    p_demux->psz_file = get_path( psz_location );
 
     /* Take into account "demux" to be able to do :demux=dump */
     if( p_demux->psz_demux && *p_demux->psz_demux == '\0' )
@@ -66,10 +86,10 @@ demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     }
 
     if( !b_quick )
-    {
-        msg_Dbg( p_obj, "creating demux: access='%s' demux='%s' path='%s'",
-                 p_demux->psz_access, p_demux->psz_demux, p_demux->psz_path );
-    }
+        msg_Dbg( p_obj, "creating demux: access='%s' demux='%s' "
+                 "location='%s' file='%s'",
+                 p_demux->psz_access, p_demux->psz_demux,
+                 p_demux->psz_location, p_demux->psz_file );
 
     p_demux->s          = s;
     p_demux->out        = out;
@@ -84,7 +104,11 @@ demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     if( s ) psz_module = p_demux->psz_demux;
     else psz_module = p_demux->psz_access;
 
-    if( s && *psz_module == '\0' && strrchr( p_demux->psz_path, '.' ) )
+    const char *psz_ext;
+
+    if( s && *psz_module == '\0'
+     && p_demux->psz_file != NULL
+     && (psz_ext = strrchr( p_demux->psz_file, '.' )) )
     {
        /* XXX: add only file without any problem here and with strong detection.
         *  - no .mp3, .a52, ... (aac is added as it works only by file ext
@@ -126,12 +150,11 @@ demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
             { "", "" }
         };
 
-        const char *psz_ext = strrchr( p_demux->psz_path, '.' ) + 1;
-        int  i;
+        psz_ext++; // skip '.'
 
         if( !b_quick )
         {
-            for( i = 0; exttodemux[i].ext[0]; i++ )
+            for( unsigned i = 0; exttodemux[i].ext[0]; i++ )
             {
                 if( !strcasecmp( psz_ext, exttodemux[i].ext ) )
                 {
@@ -142,7 +165,7 @@ demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
         }
         else
         {
-            for( i = 0; exttodemux_quick[i].ext[0]; i++ )
+            for( unsigned i = 0; exttodemux_quick[i].ext[0]; i++ )
             {
                 if( !strcasecmp( psz_ext, exttodemux_quick[i].ext ) )
                 {
@@ -178,7 +201,8 @@ demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
 
     if( p_demux->p_module == NULL )
     {
-        free( p_demux->psz_path );
+        free( p_demux->psz_file );
+        free( p_demux->psz_location );
         free( p_demux->psz_demux );
         free( p_demux->psz_access );
         vlc_object_release( p_demux );
@@ -195,7 +219,8 @@ void demux_Delete( demux_t *p_demux )
 {
     module_unneed( p_demux, p_demux->p_module );
 
-    free( p_demux->psz_path );
+    free( p_demux->psz_file );
+    free( p_demux->psz_location );
     free( p_demux->psz_demux );
     free( p_demux->psz_access );
 

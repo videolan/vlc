@@ -152,6 +152,8 @@ static int Open( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
+    if( p_demux->psz_file == NULL )
+        return VLC_EGENERIC;
     if( *p_demux->psz_access &&
         strcmp( p_demux->psz_access, "bd" ) &&
         strcmp( p_demux->psz_access, "file" ) )
@@ -159,7 +161,7 @@ static int Open( vlc_object_t *p_this )
 
     /* */
     bool b_shortname;
-    char *psz_base = FindPathBase( p_demux->psz_path, &b_shortname );
+    char *psz_base = FindPathBase( p_demux->psz_file, &b_shortname );
     if( !psz_base )
         return VLC_EGENERIC;
 

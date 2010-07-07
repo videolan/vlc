@@ -232,7 +232,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_demux, "Bad MRL, please check the option line "
                           "(MRL was: %s)",
-                          p_demux->psz_path );
+                          p_demux->psz_location );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -715,7 +715,7 @@ static int process_options( demux_t *p_demux )
     const char *in_fmt = NULL;
     float rate_f;
 
-    psz_dup = strdup( p_demux->psz_path );
+    psz_dup = strdup( p_demux->psz_location );
     psz_parser = psz_dup;
     for( token = strtok_r( psz_parser,":",&state); token;
          token = strtok_r( NULL, ":", &state ) )

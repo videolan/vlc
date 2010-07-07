@@ -188,7 +188,8 @@ static int Open ( vlc_object_t *p_this )
         }
     }
 
-    if( asprintf( &psz_vobname, "%s://%s", p_demux->psz_access, p_demux->psz_path ) == -1 )
+    if( asprintf( &psz_vobname, "%s://%s", p_demux->psz_access,
+                  p_demux->psz_location ) == -1 )
     {
         free( p_sys );
         return VLC_EGENERIC;

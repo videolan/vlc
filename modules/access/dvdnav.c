@@ -189,7 +189,7 @@ static int Open( vlc_object_t *p_this )
     char        *psz_name;
     char        *psz_code;
 
-    if( !p_demux->psz_path || !*p_demux->psz_path )
+    if( !p_demux->psz_file || !*p_demux->psz_file )
     {
         /* Only when selected */
         if( !p_demux->psz_access || !*p_demux->psz_access )
@@ -202,7 +202,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
     else
-        psz_name = ToLocaleDup( p_demux->psz_path );
+        psz_name = ToLocaleDup( p_demux->psz_file );
 
 #ifdef WIN32
     /* Remove trailing backslash, otherwise dvdnav_open will fail */

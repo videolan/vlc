@@ -141,11 +141,11 @@ static int Open( vlc_object_t * p_this )
     if (var_InheritBool( p_demux, "mkv-preload-local-dir" ))
     {
         /* get the files from the same dir from the same family (based on p_demux->psz_path) */
-        if (p_demux->psz_path[0] != '\0' && !strcmp(p_demux->psz_access, ""))
+        if (p_demux->psz_file && !strcmp(p_demux->psz_access, ""))
         {
             // assume it's a regular file
             // get the directory path
-            s_path = p_demux->psz_path;
+            s_path = p_demux->psz_file;
             if (s_path.at(s_path.length() - 1) == DIR_SEP_CHAR)
             {
                 s_path = s_path.substr(0,s_path.length()-1);
@@ -170,9 +170,9 @@ static int Open( vlc_object_t * p_this )
                         s_filename = s_path + DIR_SEP_CHAR + psz_file;
 
 #ifdef WIN32
-                        if (!strcasecmp(s_filename.c_str(), p_demux->psz_path))
+                        if (!strcasecmp(s_filename.c_str(), p_demux->psz_file))
 #else
-                        if (!s_filename.compare(p_demux->psz_path))
+                        if (!s_filename.compare(p_demux->psz_file))
 #endif
                         {
                             free (psz_file);

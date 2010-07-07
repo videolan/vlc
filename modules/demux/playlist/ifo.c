@@ -47,9 +47,12 @@ int Import_IFO( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
-    size_t len = strlen( p_demux->psz_path );
+    if( !p_demux->psz_file )
+        return VLC_EGENERIC;
 
-    char *psz_file = p_demux->psz_path + len - strlen( "VIDEO_TS.IFO" );
+    size_t len = strlen( p_demux->psz_file );
+
+    char *psz_file = p_demux->psz_file + len - strlen( "VIDEO_TS.IFO" );
     /* Valid filenames are :
      *  - VIDEO_TS.IFO
      *  - VTS_XX_X.IFO where X are digits
@@ -69,7 +72,7 @@ int Import_IFO( vlc_object_t *p_this )
         p_demux->pf_demux = Demux;
     }
     /* Valid filename for DVD-VR is VR_MANGR.IFO */
-    else if( len >= 12 && !strcmp( &p_demux->psz_path[len-12], "VR_MANGR.IFO" ) )
+    else if( len >= 12 && !strcmp( &p_demux->psz_file[len-12], "VR_MANGR.IFO" ) )
     {
         int i_peek;
         const uint8_t *p_peek;
@@ -99,14 +102,14 @@ void Close_IFO( vlc_object_t *p_this )
 
 static int Demux( demux_t *p_demux )
 {
-    size_t len = strlen( "dvd://" ) + strlen( p_demux->psz_path )
+    size_t len = strlen( "dvd://" ) + strlen( p_demux->psz_file )
                - strlen( "VIDEO_TS.IFO" );
     char *psz_url;
 
     psz_url = malloc( len+1 );
     if( !psz_url )
         return 0;
-    snprintf( psz_url, len+1, "dvd://%s", p_demux->psz_path );
+    snprintf( psz_url, len+1, "dvd://%s", p_demux->psz_file );
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
     input_item_t *p_input = input_item_New( p_demux, psz_url, psz_url );
@@ -121,7 +124,7 @@ static int Demux( demux_t *p_demux )
 
 static int DemuxDVD_VR( demux_t *p_demux )
 {
-    char *psz_url = strdup( p_demux->psz_path );
+    char *psz_url = strdup( p_demux->psz_file );
 
     if( !psz_url )
         return 0;

@@ -121,7 +121,8 @@ static int Open( vlc_object_t *p_this )
     /* We accept file based on extention match */
     if( !p_demux->b_force )
     {
-        if( ( ext = strrchr( p_demux->psz_path, '.' ) ) == NULL ||
+        if( p_demux->psz_file == NULL
+         || ( ext = strrchr( p_demux->psz_file, '.' ) ) == NULL ||
             stream_Size( p_demux->s ) == 0 ) return VLC_EGENERIC;
 
         ext++;  /* skip . */

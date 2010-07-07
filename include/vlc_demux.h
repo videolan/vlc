@@ -48,7 +48,8 @@ struct demux_t
     /* eg informative but needed (we can have access+demux) */
     char        *psz_access;
     char        *psz_demux;
-    char        *psz_path;
+    char        *psz_location;
+    char        *psz_file;
 
     /* input stream */
     stream_t    *s;     /* NULL in case of a access+demux in one */
@@ -169,7 +170,10 @@ VLC_EXPORT( int,       demux_vaControlHelper, ( stream_t *, int64_t i_start, int
 LIBVLC_USED
 static inline bool demux_IsPathExtension( demux_t *p_demux, const char *psz_extension )
 {
-    const char *psz_ext = strrchr ( p_demux->psz_path, '.' );
+    if( !p_demux->psz_file )
+        return false;
+
+    const char *psz_ext = strrchr ( p_demux->psz_file, '.' );
     if( !psz_ext || strcasecmp( psz_ext, psz_extension ) )
         return false;
     return true;

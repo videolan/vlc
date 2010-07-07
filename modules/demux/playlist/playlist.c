@@ -172,12 +172,12 @@ char *FindPrefix( demux_t *p_demux )
     char *psz_path;
     if( p_demux->psz_access )
     {
-        if( asprintf( &psz_path,"%s://%s", p_demux->psz_access, p_demux->psz_path ) == -1 )
+        if( asprintf( &psz_path,"%s://%s", p_demux->psz_access, p_demux->psz_location ) == -1 )
             return NULL;
     }
     else
     {
-        psz_path = strdup( p_demux->psz_path );
+        psz_path = strdup( p_demux->psz_location );
         if( psz_path == NULL )
             return NULL;
     }

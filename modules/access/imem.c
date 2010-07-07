@@ -404,7 +404,7 @@ static int OpenDemux(vlc_object_t *object)
     demux_t    *demux = (demux_t *)object;
     imem_sys_t *sys;
 
-    if (OpenCommon(object, &sys, demux->psz_path))
+    if (OpenCommon(object, &sys, demux->psz_location))
         return VLC_EGENERIC;
 
     /* ES format */
