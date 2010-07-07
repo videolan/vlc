@@ -370,6 +370,8 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
                               const video_format_t *p_fmt_dst,
                               mtime_t i_ts )
 {
+    VLC_UNUSED( p_fmt_src ); VLC_UNUSED( p_fmt_dst ); VLC_UNUSED( i_ts );
+
     decoder_sys_t *p_sys = p_subpic->updater.p_sys->p_dec_sys;
     ass_handle_t *p_ass = p_sys->p_ass;
 
