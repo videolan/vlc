@@ -826,7 +826,7 @@ void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
                                       uint32_t drawable )
 {
     assert (p_mi != NULL);
-    var_SetString (p_mi, "window", "embed-xid,any");
+    var_SetString (p_mi, "window", drawable ? "embed-xid,any" : "any");
     var_SetInteger (p_mi, "drawable-xid", drawable);
 }
 
@@ -846,7 +846,8 @@ void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
 {
     assert (p_mi != NULL);
 #ifdef WIN32
-    var_SetString (p_mi, "window", "embed-hwnd,any");
+    var_SetString (p_mi, "window",
+                   (drawable != NULL) ? "embed-hwnd,any" : "");
     var_SetAddress (p_mi, "drawable-hwnd", drawable);
 #else
     (void) p_mi; (void) drawable;
