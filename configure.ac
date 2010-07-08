@@ -2471,11 +2471,16 @@ then
       AC_MSG_ERROR([cannot find ${real_mod_tree}/src/.libs/libmodplug.a, make sure you compiled mod in ${with_mod_tree}])
     fi
   else
-    PKG_CHECK_MODULES(LIBMODPLUG, libmodplug >= 0.8,
-        [ VLC_ADD_PLUGIN([mod])
-          VLC_ADD_CXXFLAGS([mod],[$LIBMODPLUG_CFLAGS])
-          VLC_ADD_LIBS([mod],[$LIBMODPLUG_LIBS])
-        ],[AC_MSG_WARN([libmodplug not found!])])
+    PKG_CHECK_MODULES(LIBMODPLUG, [libmodplug >= 0.8], [
+      PKG_CHECK_MODULES(WORKING_LIBMODPLUG, [libmodplug != 0.8.8],, [
+        AC_MSG_ERROR([libmodplug version 0.8.8 will not work. Please upgrade to 0.8.8.1 or later (or downgrade to 0.8.7)!])
+      ])
+      VLC_ADD_PLUGIN([mod])
+      VLC_ADD_CXXFLAGS([mod],[$LIBMODPLUG_CFLAGS])
+      VLC_ADD_LIBS([mod],[$LIBMODPLUG_LIBS])
+    ], [
+      AC_MSG_WARN([libmodplug not found!])
+    ])
   fi
 fi
 
