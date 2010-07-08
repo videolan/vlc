@@ -66,7 +66,7 @@ vlc_module_begin ()
                  ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true)
     add_bool ("x11-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true)
         add_deprecated_alias ("xvideo-shm")
-    add_shortcut ("xcb-xv", "xv", "xvideo")
+    add_shortcut ("xcb-xv", "xv", "xvideo", "xid")
 vlc_module_end ()
 
 #define MAX_PICTURES (128)

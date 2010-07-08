@@ -367,6 +367,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "rate", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT);
 
     /* Video */
+    var_Create (mp, "vout", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
     var_Create (mp, "window", VLC_VAR_STRING);
     var_Create (mp, "drawable-xid", VLC_VAR_INTEGER);
 #ifdef WIN32
@@ -826,6 +827,8 @@ void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
                                       uint32_t drawable )
 {
     assert (p_mi != NULL);
+
+    var_SetString (p_mi, "vout", drawable ? "xid" : "any");
     var_SetString (p_mi, "window", drawable ? "embed-xid,any" : "any");
     var_SetInteger (p_mi, "drawable-xid", drawable);
 }

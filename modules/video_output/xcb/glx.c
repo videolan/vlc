@@ -55,7 +55,7 @@ vlc_module_begin ()
     set_capability ("vout display", 50)
     set_callbacks (Open, Close)
 
-    add_shortcut ("xcb-glx", "glx", "opengl")
+    add_shortcut ("xcb-glx", "glx", "opengl", "xid")
 vlc_module_end ()
 
 struct vout_display_sys_t
