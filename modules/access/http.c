@@ -126,6 +126,7 @@ vlc_module_begin ()
     add_string( "http-user-agent", PACKAGE_NAME"/"PACKAGE_VERSION, NULL,
                 AGENT_TEXT, AGENT_LONGTEXT, true )
         change_safe()
+        change_need_restart()
     add_bool( "http-reconnect", false, NULL, RECONNECT_TEXT,
               RECONNECT_LONGTEXT, true )
     add_bool( "http-continuous", false, NULL, CONTINUOUS_TEXT,
