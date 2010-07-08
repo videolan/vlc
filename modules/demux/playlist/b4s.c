@@ -37,7 +37,6 @@
 
 struct demux_sys_t
 {
-    char *psz_prefix;
 };
 
 /*****************************************************************************
@@ -54,7 +53,6 @@ int Import_B4S( vlc_object_t *p_this )
 {
     DEMUX_BY_EXTENSION_OR_FORCED_MSG( ".b4s", "b4s-open",
                                       "using B4S playlist reader" );
-    p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
     return VLC_SUCCESS;
 }
 
@@ -66,7 +64,6 @@ void Close_B4S( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    free( p_sys->psz_prefix );
     free( p_sys );
 }
 
