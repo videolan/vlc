@@ -761,8 +761,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_Create( p_libvlc, "snapshot-file", VLC_VAR_STRING );
     var_Create( p_libvlc, "record-file", VLC_VAR_STRING );
 
-    /* vout window provider */
+    /* some default internal settings */
     var_Create( p_libvlc, "window", VLC_VAR_STRING );
+    var_Create( p_libvlc, "user-agent", VLC_VAR_STRING );
+    var_SetString( p_libvlc, "user-agent", "(LibVLC "VERSION")" );
 
     /* Initialize playlist and get commandline files */
     p_playlist = playlist_Create( VLC_OBJECT(p_libvlc) );

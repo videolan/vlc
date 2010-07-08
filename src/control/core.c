@@ -69,6 +69,8 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
     p_new->verbosity = 1;
     p_new->p_callback_list = NULL;
     vlc_mutex_init(&p_new->instance_lock);
+    var_Create( p_libvlc_int, "http-user-agent",
+                VLC_VAR_STRING|VLC_VAR_DOINHERIT );
     return p_new;
 
 error:
@@ -125,6 +127,16 @@ void libvlc_wait( libvlc_instance_t *p_i )
 {
     libvlc_int_t *p_libvlc = p_i->p_libvlc_int;
     libvlc_InternalWait( p_libvlc );
+}
+
+void libvlc_set_user_agent (libvlc_instance_t *p_i,
+                            const char *name, const char *http)
+{
+    libvlc_int_t *p_libvlc = p_i->p_libvlc_int;
+
+    var_SetString (p_libvlc, "user-agent", name);
+    if (http != NULL)
+        var_SetString (p_libvlc, "http-user-agent", http);
 }
 
 const char * libvlc_get_version(void)

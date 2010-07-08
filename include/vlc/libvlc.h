@@ -172,6 +172,19 @@ VLC_PUBLIC_API
 void libvlc_wait( libvlc_instance_t *p_instance );
 
 /**
+ * Sets the application name. LibVLC passes this as the user agent string
+ * when a protocol requires it.
+ *
+ * \param p_instance LibVLC instance
+ * \param name human-readable application name, e.g. "FooBar player 1.2.3"
+ * \param http HTTP User Agent, e.g. "FooBar/1.2.3 Python/2.6.0"
+ * \version LibVLC 1.1.1 or later
+ */
+VLC_PUBLIC_API
+void libvlc_set_user_agent( libvlc_instance_t *p_instance,
+                            const char *name, const char *http );
+
+/**
  * Retrieve libvlc version.
  *
  * Example: "1.1.0-git The Luggage"
