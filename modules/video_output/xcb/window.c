@@ -74,6 +74,7 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout window xid", 70)
     set_callbacks (EmOpen, EmClose)
+    add_shortcut ("embed-xid")
 
     add_integer ("drawable-xid", 0, NULL, XID_TEXT, XID_LONGTEXT, true)
         change_volatile ()

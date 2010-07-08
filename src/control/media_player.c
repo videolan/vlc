@@ -826,6 +826,7 @@ void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
                                       uint32_t drawable )
 {
     assert (p_mi != NULL);
+    var_SetString (p_mi, "window", "embed-xid,any");
     var_SetInteger (p_mi, "drawable-xid", drawable);
 }
 
