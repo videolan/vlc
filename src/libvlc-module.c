@@ -2061,10 +2061,6 @@ vlc_module_begin ()
                    DATA_PATH_LONGTEXT, true )
         change_need_restart ()
 
-    add_string( "user-agent", "(LibVLC "VERSION")", NULL, NULL, NULL, true )
-        change_safe ()
-        change_private ()
-
     set_section( N_("Performance options"), NULL )
     add_obsolete_bool( "minimize-threads" )
 

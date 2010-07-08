@@ -166,11 +166,10 @@ int main( int i_argc, const char *ppsz_argv[] )
     pthread_sigmask (SIG_BLOCK, &set, NULL);
 
     /* Note that FromLocale() can be used before libvlc is initialized */
-    const char *argv[i_argc + 4];
+    const char *argv[i_argc + 3];
     int argc = 0;
 
     argv[argc++] = "--no-ignore-config";
-    argv[argc++] = "--user-agent=\"VLC media player\"";
 #ifdef TOP_BUILDDIR
     argv[argc++] = FromLocale ("--plugin-path="TOP_BUILDDIR"/modules");
 #endif
@@ -224,7 +223,7 @@ int main( int i_argc, const char *ppsz_argv[] )
 out:
     if (vlc != NULL)
         libvlc_release (vlc);
-    for (int i = 2; i < argc; i++)
+    for (int i = 1; i < argc; i++)
         LocaleFree (argv[i]);
 
 #ifdef RTLD_NOLOAD
