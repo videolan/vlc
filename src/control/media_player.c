@@ -367,6 +367,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "rate", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT);
 
     /* Video */
+    var_Create (mp, "window", VLC_VAR_STRING);
     var_Create (mp, "drawable-xid", VLC_VAR_INTEGER);
 #ifdef WIN32
     var_Create (mp, "drawable-hwnd", VLC_VAR_ADDRESS);

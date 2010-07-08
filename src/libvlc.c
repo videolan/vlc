@@ -761,6 +761,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_Create( p_libvlc, "snapshot-file", VLC_VAR_STRING );
     var_Create( p_libvlc, "record-file", VLC_VAR_STRING );
 
+    /* vout window provider */
+    var_Create( p_libvlc, "window", VLC_VAR_STRING );
+
     /* Initialize playlist and get commandline files */
     p_playlist = playlist_Create( VLC_OBJECT(p_libvlc) );
     if( !p_playlist )

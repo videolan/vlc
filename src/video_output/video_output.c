@@ -502,7 +502,7 @@ vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout, vout_display_t *vd,
         vout->p->window.object    = NULL;
     }
 
-    vout_window_t *window = vout_window_New(VLC_OBJECT(vout), NULL,
+    vout_window_t *window = vout_window_New(VLC_OBJECT(vout), "$window",
                                             &cfg_override);
     if (!window)
         return NULL;
