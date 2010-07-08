@@ -923,6 +923,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 #endif
 
+#ifdef __APPLE__
     var_Create( p_libvlc, "drawable-view-top", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "drawable-view-left", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "drawable-view-bottom", VLC_VAR_INTEGER );
@@ -931,6 +932,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_Create( p_libvlc, "drawable-clip-left", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "drawable-clip-bottom", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "drawable-clip-right", VLC_VAR_INTEGER );
+#endif
 #ifdef WIN32
     var_Create( p_libvlc, "drawable-hwnd", VLC_VAR_ADDRESS );
 #endif
