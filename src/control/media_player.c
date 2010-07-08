@@ -845,6 +845,7 @@ void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
 {
     assert (p_mi != NULL);
 #ifdef WIN32
+    var_SetString (p_mi, "window", "embed-hwnd,any");
     var_SetAddress (p_mi, "drawable-hwnd", drawable);
 #else
     (void) p_mi; (void) drawable;

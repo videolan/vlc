@@ -42,8 +42,9 @@ vlc_module_begin ()
     set_description (N_("Embedded window video"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout window hwnd", 70)
+    set_capability ("vout window hwnd", 0)
     set_callbacks (Open, Close)
+    add_shortcut ("embed-hwnd")
 vlc_module_end ()
 
 static int Control (vout_window_t *, int, va_list);
