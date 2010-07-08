@@ -45,9 +45,8 @@ class ClickLineEdit : public QLineEdit
     Q_PROPERTY( QString clickMessage READ clickMessage WRITE setClickMessage )
 public:
     ClickLineEdit( const QString &msg, QWidget *parent );
-    virtual ~ClickLineEdit() {};
     void setClickMessage( const QString &msg );
-    QString clickMessage() const { return mClickMessage; }
+    const QString& clickMessage() const { return mClickMessage; }
     virtual void setText( const QString& txt );
 protected:
     virtual void paintEvent( QPaintEvent *e );
@@ -83,7 +82,6 @@ private:
     void setMessageVisible( bool on );
     QVLCFramelessButton   *clearButton;
     bool message;
-    QLabel *msg;
 
 public slots:
     void clear();

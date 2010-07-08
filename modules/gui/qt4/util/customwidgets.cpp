@@ -109,7 +109,7 @@ QVLCFramelessButton::QVLCFramelessButton( QWidget *parent )
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 }
 
-void QVLCFramelessButton::paintEvent( QPaintEvent * event )
+void QVLCFramelessButton::paintEvent( QPaintEvent * )
 {
     QPainter painter( this );
     QPixmap pix = icon().pixmap( size() );
