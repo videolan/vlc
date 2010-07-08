@@ -35,6 +35,7 @@
 #ifdef WIN32
 # include <ctype.h>
 #endif
+#include <assert.h>
 
 #include "playlist.h"
 
@@ -167,34 +168,17 @@ input_item_t * GetCurrentItem(demux_t *p_demux)
  */
 char *FindPrefix( demux_t *p_demux )
 {
-    char *psz_file;
-    char *psz_prefix;
-    char *psz_path;
-    if( p_demux->psz_access )
-    {
-        if( asprintf( &psz_path,"%s://%s", p_demux->psz_access, p_demux->psz_location ) == -1 )
-            return NULL;
-    }
-    else
-    {
-        psz_path = strdup( p_demux->psz_location );
-        if( psz_path == NULL )
-            return NULL;
-    }
+    char *psz_url;
 
-#ifdef WIN32
-    psz_file = strrchr( psz_path, '\\' );
-    if( !psz_file )
-#endif
-    psz_file = strrchr( psz_path, '/' );
+    if( asprintf( &psz_url, "%s://%s", p_demux->psz_access,
+                  p_demux->psz_location ) == -1 )
+        return NULL;
 
-    if( psz_file )
-        psz_prefix = strndup( psz_path, psz_file - psz_path + 1 );
-    else
-        psz_prefix = strdup( "" );
-    free( psz_path );
+    char *psz_file = strrchr( psz_url, '/' );
+    assert( psz_file != NULL );
+    psz_file[1] = '\0';
 
-    return psz_prefix;
+    return psz_url;
 }
 
 /**
