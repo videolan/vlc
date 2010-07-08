@@ -361,20 +361,26 @@ static int ReadMeta( vlc_object_t* p_this)
     if( strcmp( p_demux->psz_access, "file" ) )
         return VLC_EGENERIC;
 
-    char *psz_path = decode_URI_duplicate( p_demux->psz_file );
+    char *psz_path = strdup( p_demux->psz_file );
     if( !psz_path )
         return VLC_ENOMEM;
 
 #if defined(WIN32) || defined (UNDER_CE)
     wchar_t wpath[MAX_PATH + 1];
     if( !MultiByteToWideChar( CP_UTF8, 0, psz_path, -1, wpath, MAX_PATH) )
+    {
+        free( psz_path );
         return VLC_EGENERIC;
+    }
     wpath[MAX_PATH] = L'\0';
     f = FileRef( wpath );
 #else
     const char* local_name = ToLocale( psz_path );
     if( !local_name )
+    {
+        free( psz_path );
         return VLC_EGENERIC;
+    }
     f = FileRef( local_name );
     LocaleFree( local_name );
 #endif
