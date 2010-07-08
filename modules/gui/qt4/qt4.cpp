@@ -251,9 +251,9 @@ vlc_module_begin ()
 #if defined(Q_WS_X11) || defined(Q_WS_WIN)
     add_submodule ()
 #if defined(Q_WS_X11)
-        set_capability( "vout window xid", 50 )
+        set_capability( "vout window xid", 0 )
 #elif defined(Q_WS_WIN)
-        set_capability( "vout window hwnd", 50 )
+        set_capability( "vout window hwnd", 0 )
 #endif
         set_callbacks( WindowOpen, WindowClose )
 #endif
@@ -341,6 +341,8 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
         playlist_t *pl = pl_Get(p_this);
         var_Create (pl, "qt4-iface", VLC_VAR_ADDRESS);
         var_SetAddress (pl, "qt4-iface", p_this);
+        var_Create (pl, "window", VLC_VAR_STRING);
+        var_SetString (pl, "window", "qt4,any");
     }
     return VLC_SUCCESS;
 }
@@ -363,7 +365,10 @@ static void Close( vlc_object_t *p_this )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     if( !p_sys->b_isDialogProvider )
+    {
+        var_Destroy (pl_Get(p_this), "window");
         var_Destroy (pl_Get(p_this), "qt4-iface");
+    }
 
     QVLCApp::triggerQuit();
 
