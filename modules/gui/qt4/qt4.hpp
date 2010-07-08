@@ -121,7 +121,7 @@ static inline QString QVLCUserDir( vlc_userdir_t type )
 {
     char *dir = config_GetUserDir( type );
     if( !dir )
-        abort();
+        return "";
     QString res = qfu( dir );
     free( dir );
     return res;
