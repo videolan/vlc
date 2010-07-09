@@ -713,6 +713,16 @@ static inline mtime_t var_InheritTime( vlc_object_t *obj, const char *name )
 }
 #define var_InheritTime(o, n) var_InheritTime(VLC_OBJECT(o), n)
 
+static inline void *var_InheritAddress( vlc_object_t *obj, const char *name )
+{
+    vlc_value_t val;
+
+    if( var_Inherit( obj, name, VLC_VAR_ADDRESS, &val ) )
+        val.p_address = NULL;
+    return val.p_address;
+}
+#define var_InheritAddress(o, n) var_InheritAddress(VLC_OBECT(o), n)
+
 VLC_EXPORT( int, var_InheritURational, ( vlc_object_t *, unsigned *num, unsigned *den, const char *var ) );
 #define var_InheritURational(a,b,c,d) var_InheritURational(VLC_OBJECT(a), b, c, d)
 
