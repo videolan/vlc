@@ -197,6 +197,9 @@ void MessagesDialog::updateConfig()
 
     if( !vbobjectsEdit->text().isEmpty() )
     {
+        /* if user sets filter, go with the idea that user just wants that to be shown,
+           so disable all by default and enable those that user wants */
+        msg_DisableObjectPrinting( p_intf, "all");
         char * psz_verbose_objects = strdup(qtu(vbobjectsEdit->text()));
         char * psz_object, * iter =  psz_verbose_objects;
         while( (psz_object = strsep( &iter, "," )) )
@@ -206,6 +209,8 @@ void MessagesDialog::updateConfig()
                 printf("%s\n", psz_object+1);
                 case '+': msg_EnableObjectPrinting(p_intf, psz_object+1); break;
                 case '-': msg_DisableObjectPrinting(p_intf, psz_object+1); break;
+                /* user can but just 'lua,playlist' on filter */
+                default: msg_EnableObjectPrinting(p_intf, psz_object); break;
              }
         }
         free( psz_verbose_objects );
