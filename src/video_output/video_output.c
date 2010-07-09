@@ -736,7 +736,7 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
 
         /* Wait the real date (for rendering jitter) */
         if (!is_forced)
-            mwait(decoded->date);
+            mwait(direct->date);
 
         /* Display the direct buffer returned by vout_RenderPicture */
         vout->p->displayed.date = mdate();
