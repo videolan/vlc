@@ -123,7 +123,7 @@ static int Open(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
 
     /* */
-    char *chroma_format = var_CreateGetString(vd, "vmem-chroma");
+    char *chroma_format = var_InheritString(vd, "vmem-chroma");
     const vlc_fourcc_t chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, chroma_format);
     free(chroma_format);
     if (!chroma) {
@@ -157,8 +157,8 @@ static int Open(vlc_object_t *object)
     video_format_t fmt = vd->fmt;
 
     fmt.i_chroma = chroma;
-    fmt.i_width  = var_CreateGetInteger(vd, "vmem-width");
-    fmt.i_height = var_CreateGetInteger(vd, "vmem-height");
+    fmt.i_width  = var_InheritInteger(vd, "vmem-width");
+    fmt.i_height = var_InheritInteger(vd, "vmem-height");
 
     /* Define the bitmasks */
     switch (chroma)
@@ -197,7 +197,7 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
 
     /* */
-    const int pitch = var_CreateGetInteger(vd, "vmem-pitch");
+    const int pitch = var_InheritInteger(vd, "vmem-pitch");
     picture_resource_t rsc;
     rsc.p_sys = malloc(sizeof(*rsc.p_sys));
     *rsc.p_sys = cfg;
