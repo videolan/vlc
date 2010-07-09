@@ -442,6 +442,20 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
     for (int i = 0; i < bank->i_sub; i++)
     {
         msg_subscription_t *sub = bank->pp_sub[i];
+        libvlc_priv_t *priv = libvlc_priv( sub->instance );
+        msg_bank_t *bank = priv->msg_bank;
+        void *val = vlc_dictionary_value_for_key( &bank->enabled_objects,
+                                                  p_item->psz_module );
+        if( val == kObjectPrintingDisabled ) continue;
+        if( val != kObjectPrintingEnabled  ) /*if not allowed */
+        {
+            val = vlc_dictionary_value_for_key( &bank->enabled_objects,
+                                                 p_item->psz_object_type );
+            if( val == kObjectPrintingDisabled ) continue;
+            if( val == kObjectPrintingEnabled  ); /* Allowed */
+            else if( !bank->all_objects_enabled ) continue;
+        }
+
         sub->func (sub->opaque, p_item, 0);
     }
     vlc_rwlock_unlock (&bank->lock);
