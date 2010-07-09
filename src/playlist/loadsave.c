@@ -128,7 +128,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     }
 
     char *psz_file;
-    if( asprintf( &psz_file, "%s" DIR_SEP "ml.xspf", psz_datadir ) != -1 )
+    if( asprintf( &psz_file, "%s" DIR_SEP "ml.xspf", psz_datadir ) == -1 )
         psz_file = NULL;
     free( psz_datadir );
     if( psz_file == NULL )
@@ -136,10 +136,11 @@ int playlist_MLLoad( playlist_t *p_playlist )
 
     /* loosy check for media library file */
     struct stat st;
-    int ret = vlc_stat( psz_file, &st );
-    free( psz_file );
-    if( ret )
+    if( vlc_stat( psz_file, &st ) )
+    {
+        free( psz_file );
         return VLC_EGENERIC;
+    }
 
     char *psz_uri = make_URI( psz_file, "file/xspf-open" );
     free( psz_file );
