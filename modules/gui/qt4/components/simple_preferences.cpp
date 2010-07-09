@@ -310,7 +310,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #undef audioCommon
 
             /* Audio Options */
-            CONFIG_GENERIC_NO_BOOL( "volume" , IntegerRangeSlider, NULL,
+            CONFIG_GENERIC_NO_BOOL( "qt-startvolume" , IntegerRangeSlider, NULL,
                                      defaultVolume );
             CONNECT( ui.defaultVolume, valueChanged( int ),
                      this, updateAudioVolume( int ) );

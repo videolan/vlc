@@ -128,6 +128,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                                  "software amplification." )
 
 #define SAVEVOL_TEXT N_( "Automatically save the volume on exit" )
+#define STARTVOL_TEXT N_( "Default start volume" )
 
 #define PRIVACY_TEXT N_( "Ask for network policy at start" )
 
@@ -200,6 +201,8 @@ vlc_module_begin ()
               COMPLETEVOL_LONGTEXT, true )
     add_bool( "qt-autosave-volume", false, NULL, SAVEVOL_TEXT,
               SAVEVOL_TEXT, true )
+    add_integer_with_range( "qt-startvolume", QT_VOLUME_DEFAULT, 0,
+               QT_VOLUME_MAX, NULL, STARTVOL_TEXT, STARTVOL_TEXT, true )
 
     add_bool( "qt-embedded-open", false, NULL, QT_NATIVEOPEN_TEXT,
                QT_NATIVEOPEN_TEXT, false )

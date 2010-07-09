@@ -32,6 +32,7 @@
 #include <vlc_common.h>    /* VLC_COMMON_MEMBERS for vlc_interface.h */
 #include <vlc_interface.h> /* intf_thread_t */
 #include <vlc_playlist.h>  /* playlist_t */
+#include <vlc_aout.h>      /* AOUT_VOLUME_ */
 
 #define QT_NO_CAST_TO_ASCII
 #include <QString>
@@ -116,6 +117,9 @@ struct intf_sys_t
             else  x->show(); }
 
 #define getSettings() p_intf->p_sys->mainSettings
+
+#define QT_VOLUME_DEFAULT AOUT_VOLUME_DEFAULT
+#define QT_VOLUME_MAX (AOUT_VOLUME_DEFAULT * 2)
 
 static inline QString QVLCUserDir( vlc_userdir_t type )
 {
