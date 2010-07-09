@@ -549,6 +549,89 @@ static int VoutVideoFilterAllocationSetup(filter_t *filter, void *data)
 }
 
 /* */
+static picture_t *ThreadDisplayGetDecodedPicture(vout_thread_t *vout,
+                                                 int *lost_count, bool *is_forced,
+                                                 bool now, mtime_t *deadline)
+{
+    vout_display_t *vd = vout->p->display.vd;
+
+    const mtime_t date = mdate();
+    const bool is_paused = vout->p->pause.is_on;
+    bool redisplay = is_paused && !now && vout->p->displayed.decoded;
+
+    /* FIXME/XXX we must redisplay the last decoded picture (because
+     * of potential vout updated, or filters update or SPU update)
+     * For now a high update period is needed but it coulmd be removed
+     * if and only if:
+     * - vout module emits events from theselves.
+     * - *and* SPU is modified to emit an event or a deadline when needed.
+     *
+     * So it will be done latter.
+     */
+    if (!redisplay) {
+        picture_t *peek = picture_fifo_Peek(vout->p->decoder_fifo);
+        if (peek) {
+            *is_forced = peek->b_force || is_paused || now;
+            *deadline = (*is_forced ? date : peek->date) - vout_chrono_GetHigh(&vout->p->render);
+            picture_Release(peek);
+        } else {
+            redisplay = true;
+        }
+    }
+    if (redisplay) {
+         /* FIXME a better way for this delay is needed */
+        const mtime_t date_update = vout->p->displayed.date + VOUT_REDISPLAY_DELAY;
+        if (date_update > date || !vout->p->displayed.decoded) {
+            *deadline = vout->p->displayed.decoded ? date_update : VLC_TS_INVALID;
+            return NULL;
+        }
+        /* */
+        *is_forced = true;
+        *deadline = date - vout_chrono_GetHigh(&vout->p->render);
+    }
+    if (*deadline > VOUT_MWAIT_TOLERANCE)
+        *deadline -= VOUT_MWAIT_TOLERANCE;
+
+    /* If we are too early and can wait, do it */
+    if (date < *deadline && !now)
+        return NULL;
+
+    picture_t *decoded;
+    if (redisplay) {
+        decoded = vout->p->displayed.decoded;
+        vout->p->displayed.decoded = NULL;
+    } else {
+        decoded = picture_fifo_Pop(vout->p->decoder_fifo);
+        assert(decoded);
+        if (!*is_forced && !vout->p->is_late_dropped) {
+            const mtime_t predicted = date + vout_chrono_GetLow(&vout->p->render);
+            const mtime_t late = predicted - decoded->date;
+            if (late > 0) {
+                msg_Dbg(vout, "picture might be displayed late (missing %d ms)", (int)(late/1000));
+                if (late > VOUT_DISPLAY_LATE_THRESHOLD) {
+                    msg_Warn(vout, "rejected picture because of render time");
+                    /* TODO */
+                    picture_Release(decoded);
+                    (*lost_count)++;
+                    return NULL;
+                }
+            }
+        }
+
+        vout->p->displayed.is_interlaced = !decoded->b_progressive;
+        vout->p->displayed.qtype         = decoded->i_qtype;
+    }
+    vout->p->displayed.timestamp = decoded->date;
+
+    /* */
+    if (vout->p->displayed.decoded)
+        picture_Release(vout->p->displayed.decoded);
+    picture_Hold(decoded);
+    vout->p->displayed.decoded = decoded;
+
+    return decoded;
+}
+
 static int ThreadDisplayPicture(vout_thread_t *vout,
                                 bool now, mtime_t *deadline)
 {
@@ -557,80 +640,12 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
     int lost_count = 0;
 
     for (;;) {
-        const mtime_t date = mdate();
-        const bool is_paused = vout->p->pause.is_on;
-        bool redisplay = is_paused && !now && vout->p->displayed.decoded;
         bool is_forced;
-
-        /* FIXME/XXX we must redisplay the last decoded picture (because
-         * of potential vout updated, or filters update or SPU update)
-         * For now a high update period is needed but it coulmd be removed
-         * if and only if:
-         * - vout module emits events from theselves.
-         * - *and* SPU is modified to emit an event or a deadline when needed.
-         *
-         * So it will be done latter.
-         */
-        if (!redisplay) {
-            picture_t *peek = picture_fifo_Peek(vout->p->decoder_fifo);
-            if (peek) {
-                is_forced = peek->b_force || is_paused || now;
-                *deadline = (is_forced ? date : peek->date) - vout_chrono_GetHigh(&vout->p->render);
-                picture_Release(peek);
-            } else {
-                redisplay = true;
-            }
-        }
-        if (redisplay) {
-             /* FIXME a better way for this delay is needed */
-            const mtime_t date_update = vout->p->displayed.date + VOUT_REDISPLAY_DELAY;
-            if (date_update > date || !vout->p->displayed.decoded) {
-                *deadline = vout->p->displayed.decoded ? date_update : VLC_TS_INVALID;
-                break;
-            }
-            /* */
-            is_forced = true;
-            *deadline = date - vout_chrono_GetHigh(&vout->p->render);
-        }
-        if (*deadline > VOUT_MWAIT_TOLERANCE)
-            *deadline -= VOUT_MWAIT_TOLERANCE;
-
-        /* If we are too early and can wait, do it */
-        if (date < *deadline && !now)
+        picture_t *decoded = ThreadDisplayGetDecodedPicture(vout,
+                                                            &lost_count, &is_forced,
+                                                            now, deadline);
+        if (!decoded)
             break;
-
-        picture_t *decoded;
-        if (redisplay) {
-            decoded = vout->p->displayed.decoded;
-            vout->p->displayed.decoded = NULL;
-        } else {
-            decoded = picture_fifo_Pop(vout->p->decoder_fifo);
-            assert(decoded);
-            if (!is_forced && !vout->p->is_late_dropped) {
-                const mtime_t predicted = date + vout_chrono_GetLow(&vout->p->render);
-                const mtime_t late = predicted - decoded->date;
-                if (late > 0) {
-                    msg_Dbg(vout, "picture might be displayed late (missing %d ms)", (int)(late/1000));
-                    if (late > VOUT_DISPLAY_LATE_THRESHOLD) {
-                        msg_Warn(vout, "rejected picture because of render time");
-                        /* TODO */
-                        picture_Release(decoded);
-                        lost_count++;
-                        break;
-                    }
-                }
-            }
-
-            vout->p->displayed.is_interlaced = !decoded->b_progressive;
-            vout->p->displayed.qtype         = decoded->i_qtype;
-        }
-        vout->p->displayed.timestamp = decoded->date;
-
-        /* */
-        if (vout->p->displayed.decoded)
-            picture_Release(vout->p->displayed.decoded);
-        picture_Hold(decoded);
-        vout->p->displayed.decoded = decoded;
 
         /* */
         vout_chrono_Start(&vout->p->render);
