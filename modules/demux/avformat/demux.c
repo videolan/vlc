@@ -117,11 +117,21 @@ int OpenDemux( vlc_object_t *p_this )
     unsigned int  i;
     int64_t       i_start_time = -1;
     bool          b_can_seek;
+    char         *psz_url;
 
+    if( p_demux->psz_file )
+        psz_url = strdup( p_demux->psz_file );
+    else
+    {
+        if( asprintf( &psz_url, "%s://%s", p_demux->psz_access, p_demux->psz_location ) == -1)
+            return VLC_ENOMEM;
+    }
+    msg_Dbg( p_demux, "trying url: %s", psz_url );
     /* Init Probe data */
-    pd.filename = p_demux->psz_file;
+    pd.filename = psz_url;
     if( ( pd.buf_size = stream_Peek( p_demux->s, &pd.buf, 2048 + 213 ) ) <= 0 )
     {
+        free( psz_url );
         msg_Warn( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
@@ -134,6 +144,7 @@ int OpenDemux( vlc_object_t *p_this )
     if( !( fmt = av_probe_input_format( &pd, 1 ) ) )
     {
         msg_Dbg( p_demux, "couldn't guess format" );
+        free( psz_url );
         return VLC_EGENERIC;
     }
 
@@ -147,6 +158,7 @@ int OpenDemux( vlc_object_t *p_this )
           !strcmp( fmt->name, "redir" ) ||
           !strcmp( fmt->name, "sdp" ) ) )
     {
+        free( psz_url );
         return VLC_EGENERIC;
     }
 
@@ -155,15 +167,24 @@ int OpenDemux( vlc_object_t *p_this )
     {
         int i_len;
 
-        if( !p_demux->psz_file ) return VLC_EGENERIC;
+        if( !p_demux->psz_file )
+        {
+            free( psz_url );
+            return VLC_EGENERIC;
+        }
 
         i_len = strlen( p_demux->psz_file );
-        if( i_len < 4 ) return VLC_EGENERIC;
+        if( i_len < 4 )
+        {
+            free( psz_url );
+            return VLC_EGENERIC;
+        }
 
         if( strcasecmp( &p_demux->psz_file[i_len - 4], ".str" ) &&
             strcasecmp( &p_demux->psz_file[i_len - 4], ".xai" ) &&
             strcasecmp( &p_demux->psz_file[i_len - 3], ".xa" ) )
         {
+            free( psz_url );
             return VLC_EGENERIC;
         }
     }
@@ -214,13 +235,16 @@ int OpenDemux( vlc_object_t *p_this )
 
 
     /* Open it */
-    if( av_open_input_stream( &p_sys->ic, &p_sys->io, p_demux->psz_file,
+    if( av_open_input_stream( &p_sys->ic, &p_sys->io, psz_url,
                               p_sys->fmt, NULL ) )
     {
         msg_Err( p_demux, "av_open_input_stream failed" );
+        free( psz_url );
         CloseDemux( p_this );
         return VLC_EGENERIC;
     }
+    free( psz_url );
+    psz_url = NULL;
 
     vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
     if( av_find_stream_info( p_sys->ic ) < 0 )
