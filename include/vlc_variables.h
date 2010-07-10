@@ -721,7 +721,7 @@ static inline void *var_InheritAddress( vlc_object_t *obj, const char *name )
         val.p_address = NULL;
     return val.p_address;
 }
-#define var_InheritAddress(o, n) var_InheritAddress(VLC_OBECT(o), n)
+#define var_InheritAddress(o, n) var_InheritAddress(VLC_OBJECT(o), n)
 
 VLC_EXPORT( int, var_InheritURational, ( vlc_object_t *, unsigned *num, unsigned *den, const char *var ) );
 #define var_InheritURational(a,b,c,d) var_InheritURational(VLC_OBJECT(a), b, c, d)
