@@ -159,6 +159,7 @@ function host()
                          wfd = wfd or fd,
                          status = status.init,
                          buffer = "",
+                         cmds = "",
                          type = t,
                          -- methods
                          fd = fd_client,
