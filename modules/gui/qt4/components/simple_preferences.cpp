@@ -310,6 +310,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #undef audioCommon
 
             /* Audio Options */
+            ui.volumeValue->setMaximum( QT_VOLUME_MAX / QT_VOLUME_DEFAULT * 100 );
             CONFIG_GENERIC_NO_BOOL( "qt-startvolume" , IntegerRangeSlider, NULL,
                                      defaultVolume );
             CONNECT( ui.defaultVolume, valueChanged( int ),
@@ -729,7 +730,7 @@ SPrefsPanel::~SPrefsPanel()
 void SPrefsPanel::updateAudioVolume( int volume )
 {
     qobject_cast<QSpinBox *>(optionWidgets[volLW])
-        ->setValue( volume * 100 / 256 );
+        ->setValue( volume * 100 / QT_VOLUME_DEFAULT );
 }
 
 
