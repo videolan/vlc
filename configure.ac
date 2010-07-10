@@ -3314,7 +3314,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
   dnl libxcb
   PKG_CHECK_MODULES(XCB, [xcb])
   PKG_CHECK_MODULES(XCB_SHM, [xcb-shm])
-  VLC_ADD_PLUGIN([screensaver xcb_x11 xcb_screen xcb_apps])
+  VLC_ADD_PLUGIN([screensaver xcb_x11 xcb_window xcb_screen xcb_apps])
 
   AS_IF([test "${enable_xvideo}" != "no"], [
     PKG_CHECK_MODULES(XCB_XV, [xcb-xv >= 1.1.90.1], [
@@ -3348,9 +3348,10 @@ AS_IF([test "${enable_xcb}" != "no"], [
 
   AS_IF([test "${have_xcb_keysyms}" = "yes"], [
     PKG_CHECK_MODULES(XPROTO, [xproto])
-    VLC_ADD_PLUGIN([xcb_window globalhotkeys])
+    VLC_ADD_PLUGIN([globalhotkeys])
     VLC_ADD_CFLAGS([globalhotkeys], [${XCB_KEYSYMS_CFLAGS} ${XCB_CFLAGS}])
     VLC_ADD_LIBS([globalhotkeys], [${XCB_KEYSYMS_LIBS} ${XCB_LIBS}])
+    VLC_ADD_CFLAGS([xcb_window], [-DHAVE_XCB_KEYSYMS])
   ])
   VLC_ADD_PLUGIN([xdg_screensaver])
 ])

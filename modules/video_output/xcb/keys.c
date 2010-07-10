@@ -29,14 +29,14 @@
 #include <assert.h>
 
 #include <xcb/xcb.h>
+#include <vlc_common.h>
+#include "xcb_vlc.h"
+
+#ifdef HAVE_XCB_KEYSYMS
 #include <xcb/xcb_keysyms.h>
 #include <X11/keysym.h>
 #include <X11/XF86keysym.h>
-
-#include <vlc_common.h>
 #include <vlc_keys.h>
-
-#include "xcb_vlc.h"
 
 struct key_handler_t
 {
@@ -164,3 +164,27 @@ int ProcessKeyEvent (key_handler_t *ctx, xcb_generic_event_t *ev)
     free (ev);
     return 0;
 }
+
+#else /* HAVE_XCB_KEYSYMS */
+
+key_handler_t *CreateKeyHandler (vlc_object_t *obj, xcb_connection_t *conn)
+{
+    msg_Err (obj, "X11 key press support not compiled-in");
+    (void) conn;
+    return NULL;
+}
+
+void DestroyKeyHandler (key_handler_t *ctx)
+{
+    (void) ctx;
+    abort ();
+}
+
+int ProcessKeyEvent (key_handler_t *ctx, xcb_generic_event_t *ev)
+{
+    (void) ctx;
+    (void) ev;
+    abort ();
+}
+
+#endif /* HAVE_XCB_KEYSYMS */
