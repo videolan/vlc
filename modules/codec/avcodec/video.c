@@ -306,9 +306,11 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
        (p_sys->p_codec->capabilities & CODEC_CAP_DR1) &&
         /* No idea why ... but this fixes flickering on some TSCC streams */
         p_sys->i_codec_id != CODEC_ID_TSCC &&
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 68, 2 )
         /* avcodec native vp8 decode doesn't handle EMU_EDGE flag, and I
            don't have idea howto implement fallback to libvpx decoder */
         p_sys->i_codec_id != CODEC_ID_VP8 &&
+#endif
         !p_sys->p_context->debug_mv )
     {
         /* Some codecs set pix_fmt only after the 1st frame has been decoded,
