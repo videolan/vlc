@@ -183,68 +183,39 @@ while not vlc.misc.should_die() do
 
     -- Handle reads
     for _, client in pairs(r) do
-        local str = string.gsub(client:recv(1000),"\r","\n")
+        local str = client:recv(1000)
         local done = false
-
-        -- the telnet client program has leave
-        if not str then
+        if not str then -- the telnet client program has leave
             client.buffer = "quit"
             done = true
-
-        -- Caught a ^D
+        elseif string.match(str,"\n$") then
+            client.buffer = string.gsub(client.buffer..str,"\r?\n$","")
+            done = true
         elseif client.buffer == ""
            and ((client.type == host.client_type.stdio and str == "")
            or  (client.type == host.client_type.net and str == "\004")) then
+            -- Caught a ^D
             client.buffer = "quit"
             done = true
-
-        -- '\n' found: a command was sent
-        elseif string.match(str,"\n") then
-            client.buffer = client.buffer .. str
-            done = true
-
-        -- The command is not finished yet
         else
             client.buffer = client.buffer .. str
         end
-
-        -- Some cleaning for telnet
         if client.type == host.client_type.net then
             telnet_commands( client )
         end
-
-        -- If a command must be parsed
         if done then
-            -- loop on all commands (might have more than one commands seperated by '\n'
-            local returned_values = ""
-            while not (client.buffer == "") do
-                -- pick the first command
-                local commands = ""
-                if string.find(client.buffer, "\n") then
-                    commands = string.sub(client.buffer, string.find(client.buffer, "\n") + 1)
-                    client.buffer = string.sub(client.buffer, 0, string.find(client.buffer, "\n") - 1)
-                end
-                local cmd = client.buffer
-
-                if client.status == host.status.password then
-                    if client.buffer == password then
-                        client:send( IAC..WONT..ECHO.."\r\nWelcome, Master\r\n" )
-                        client.buffer = ""
-                        client:switch_status( host.status.write )
-                    else
-                        client:send( "\r\nWrong password\r\nPassword: " )
-                        client.buffer = ""
-                    end
-                elseif client_command( client ) then
+            if client.status == host.status.password then
+                if client.buffer == password then
+                    client:send( IAC..WONT..ECHO.."\r\nWelcome, Master\r\n" )
+                    client.buffer = ""
                     client:switch_status( host.status.write )
-                    -- special case to exit the loop
-                    if cmd == "quit" or cmd == "shutdown" then break end
+                else
+                    client:send( "\r\nWrong password\r\nPassword: " )
+                    client.buffer = ""
                 end
-                returned_values = returned_values .. client.buffer
-                client.buffer = commands
+            elseif client_command( client ) then
+                client:switch_status( host.status.write )
             end
-            vlc.msg.err("end of loop")
-            client.buffer = returned_values
         end
     end
 end
