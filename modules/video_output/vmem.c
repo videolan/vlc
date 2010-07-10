@@ -52,17 +52,6 @@
 #define LT_CHROMA N_("Output chroma for the memory image as a 4-character " \
                       "string, eg. \"RV32\".")
 
-#define T_LOCK N_("Lock function")
-#define LT_LOCK N_("Address of the locking callback function. This " \
-                    "function must fill in valid plane memory address " \
-                    "information for use by the video renderer.")
-
-#define T_UNLOCK N_("Unlock function")
-#define LT_UNLOCK N_("Address of the unlocking callback function")
-
-#define T_DATA N_("Callback data")
-#define LT_DATA N_("Data for the locking and unlocking functions")
-
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
 
@@ -82,12 +71,9 @@ vlc_module_begin()
         change_private()
     add_string("vmem-chroma", "RV16", NULL, T_CHROMA, LT_CHROMA, true)
         change_private()
-    add_string("vmem-lock", "0", NULL, T_LOCK, LT_LOCK, true)
-        change_volatile()
-    add_string("vmem-unlock", "0", NULL, T_UNLOCK, LT_UNLOCK, true)
-        change_volatile()
-    add_string("vmem-data", "0", NULL, T_DATA, LT_DATA, true)
-        change_volatile()
+    add_obsolete_string("vmem-lock") /* obsoleted since 1.1.1 */
+    add_obsolete_string("vmem-unlock") /* obsoleted since 1.1.1 */
+    add_obsolete_string("vmem-data") /* obsoleted since 1.1.1 */
 
     set_callbacks(Open, Close)
 vlc_module_end()
@@ -96,13 +82,16 @@ vlc_module_end()
  * Local prototypes
  *****************************************************************************/
 struct picture_sys_t {
-    void (*lock)(void *sys, void **plane);
-    void (*unlock)(void *sys);
-    void *sys;
+    vout_display_sys_t *sys;
+    void *id;
 };
 
 struct vout_display_sys_t {
     picture_pool_t *pool;
+    void *(*lock)(void *sys, void **plane);
+    void (*unlock)(void *sys, void *id, void *const *plane);
+    void (*display)(void *sys, void *id);
+    void *opaque;
 };
 
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
@@ -128,28 +117,6 @@ static int Open(vlc_object_t *object)
     free(chroma_format);
     if (!chroma) {
         msg_Err(vd, "vmem-chroma should be 4 characters long");
-        return VLC_EGENERIC;
-    }
-
-    /* */
-    picture_sys_t cfg;
-
-    char *tmp;
-    tmp = var_CreateGetString(vd, "vmem-lock");
-    cfg.lock = (void (*)(void *, void **))(intptr_t)atoll(tmp);
-    free(tmp);
-
-    tmp = var_CreateGetString(vd, "vmem-unlock");
-    cfg.unlock = (void (*)(void *))(intptr_t)atoll(tmp);
-    free(tmp);
-
-    tmp = var_CreateGetString(vd, "vmem-data");
-    cfg.sys = (void *)(intptr_t)atoll(tmp);
-    free(tmp);
-
-    /* lock and unlock are mandatory */
-    if (!cfg.lock || !cfg.unlock) {
-        msg_Err(vd, "Invalid lock or unlock callbacks");
         return VLC_EGENERIC;
     }
 
@@ -193,14 +160,29 @@ static int Open(vlc_object_t *object)
     /* */
     vout_display_sys_t *sys;
     vd->sys = sys = calloc(1, sizeof(*sys));
-    if (!sys)
+    if (unlikely(!sys))
+        return VLC_ENOMEM;
+
+    sys->lock = var_InheritAddress(vd, "vmem-lock");
+    if (sys->lock == NULL) {
+        msg_Err(vd, "Invalid lock callback");
+        free(sys);
         return VLC_EGENERIC;
+    }
+    sys->unlock = var_InheritAddress(vd, "vmem-unlock");
+    sys->display = var_InheritAddress(vd, "vmem-display");
+    sys->opaque = var_InheritAddress(vd, "vmem-data");
 
     /* */
     const int pitch = var_InheritInteger(vd, "vmem-pitch");
     picture_resource_t rsc;
     rsc.p_sys = malloc(sizeof(*rsc.p_sys));
-    *rsc.p_sys = cfg;
+    if(unlikely(!rsc.p_sys)) {
+        free(sys);
+        return VLC_ENOMEM;
+    }
+    rsc.p_sys->sys = sys;
+    rsc.p_sys->id = NULL;
     for (int i = 0; i < PICTURE_PLANE_MAX; i++) {
         /* vmem-lock is responsible for the allocation */
         rsc.p[i].p_pixels = NULL;
@@ -265,10 +247,14 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 
 static void Display(vout_display_t *vd, picture_t *picture)
 {
-    VLC_UNUSED(vd);
+    vout_display_sys_t *sys = vd->sys;
+
     assert(!picture_IsReferenced(picture));
+    if (sys->display != NULL)
+        sys->display(sys->opaque, picture->p_sys->id);
     picture_Release(picture);
 }
+
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     switch (query) {
@@ -294,20 +280,28 @@ static void Manage(vout_display_t *vd)
 /* */
 static int Lock(picture_t *picture)
 {
-    picture_sys_t *sys = picture->p_sys;
-
+    picture_sys_t *picsys = picture->p_sys;
+    vout_display_sys_t *sys = picsys->sys;
     void *planes[PICTURE_PLANE_MAX];
-    sys->lock(sys->sys, planes);
+
+    picsys->id = sys->lock(sys->opaque, planes);
 
     for (int i = 0; i < picture->i_planes; i++)
         picture->p[i].p_pixels = planes[i];
 
     return VLC_SUCCESS;
 }
+
 static void Unlock(picture_t *picture)
 {
-    picture_sys_t *sys = picture->p_sys;
+    picture_sys_t *picsys = picture->p_sys;
+    vout_display_sys_t *sys = picsys->sys;
 
-    sys->unlock(sys->sys);
+    void *planes[PICTURE_PLANE_MAX];
+
+    for (int i = 0; i < picture->i_planes; i++)
+        planes[i] = picture->p[i].p_pixels;
+
+    if (sys->unlock != NULL)
+        sys->unlock(sys->opaque, picsys->id, planes);
 }
-
