@@ -1884,7 +1884,7 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
     /* */
     case ACCESS_GET_PTS_DELAY:
         pi_64 = (int64_t*)va_arg( args, int64_t * );
-        *pi_64 = (int64_t)var_GetInteger( p_access, "dshow-caching" ) * 1000;
+        *pi_64 = var_GetInteger( p_access, "dshow-caching" ) * 1000;
         break;
 
     /* */
@@ -1924,7 +1924,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_GET_PTS_DELAY:
         pi64 = (int64_t*)va_arg( args, int64_t * );
-        *pi64 = (int64_t)var_GetInteger( p_demux, "dshow-caching" ) * 1000;
+        *pi64 = var_GetInteger( p_demux, "dshow-caching" ) * 1000;
         return VLC_SUCCESS;
 
     case DEMUX_GET_TIME:

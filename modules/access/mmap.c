@@ -290,7 +290,7 @@ static int Control (access_t *p_access, int query, va_list args)
 
         case ACCESS_GET_PTS_DELAY:
         {
-            int delay_ms = var_CreateGetInteger (p_access, "file-caching");
+            int64_t delay_ms = var_CreateGetInteger (p_access, "file-caching");
             *va_arg(args, int64_t *) = delay_ms * INT64_C (1000);
             return VLC_SUCCESS;
         }
