@@ -132,7 +132,7 @@ static int Open (vlc_object_t *obj)
     demux->p_sys = p_sys;
 
     /* Connect to X server */
-    char *display = var_CreateGetNonEmptyString (obj, "x11-display");
+    char *display = var_InheritString (obj, "x11-display");
     int snum;
     xcb_connection_t *conn = xcb_connect (display, &snum);
     free (display);
@@ -182,14 +182,14 @@ static int Open (vlc_object_t *obj)
         goto error;
 
     /* Window properties */
-    p_sys->x = var_CreateGetInteger (obj, "screen-left");
-    p_sys->y = var_CreateGetInteger (obj, "screen-top");
-    p_sys->w = var_CreateGetInteger (obj, "screen-width");
-    p_sys->h = var_CreateGetInteger (obj, "screen-height");
-    p_sys->follow_mouse = var_CreateGetBool (obj, "screen-follow-mouse");
+    p_sys->x = var_InheritInteger (obj, "screen-left");
+    p_sys->y = var_InheritInteger (obj, "screen-top");
+    p_sys->w = var_InheritInteger (obj, "screen-width");
+    p_sys->h = var_InheritInteger (obj, "screen-height");
+    p_sys->follow_mouse = var_InheritBool (obj, "screen-follow-mouse");
 
     /* Initializes format */
-    p_sys->rate = var_CreateGetFloat (obj, "screen-fps");
+    p_sys->rate = var_InheritFloat (obj, "screen-fps");
     if (!p_sys->rate)
         goto error;
     p_sys->interval = (float)CLOCK_FREQ / p_sys->rate;

@@ -297,7 +297,7 @@ static int Open (vlc_object_t *obj)
     vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *p_sys = malloc (sizeof (*p_sys));
 
-    if (!var_CreateGetBool (obj, "overlay"))
+    if (!var_InheritBool (obj, "overlay"))
         return VLC_EGENERIC;
     if (p_sys == NULL)
         return VLC_ENOMEM;
@@ -336,7 +336,7 @@ static int Open (vlc_object_t *obj)
     if (adaptors == NULL)
         goto error;
 
-    int forced_adaptor = var_CreateGetInteger (obj, "xvideo-adaptor");
+    int forced_adaptor = var_InheritInteger (obj, "xvideo-adaptor");
 
     /* */
     video_format_t fmt = vd->fmt;

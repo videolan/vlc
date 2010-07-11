@@ -74,7 +74,7 @@ static int vlc_sd_probe_Open (vlc_object_t *obj)
 {
     vlc_probe_t *probe = (vlc_probe_t *)obj;
 
-    char *display = var_CreateGetNonEmptyString (obj, "x11-display");
+    char *display = var_InheritString (obj, "x11-display");
     xcb_connection_t *conn = xcb_connect (display, NULL);
     free (display);
     if (xcb_connection_has_error (conn))
@@ -97,7 +97,7 @@ static int Open (vlc_object_t *obj)
     sd->p_sys = p_sys;
 
     /* Connect to X server */
-    char *display = var_CreateGetNonEmptyString (obj, "x11-display");
+    char *display = var_InheritString (obj, "x11-display");
     int snum;
     xcb_connection_t *conn = xcb_connect (display, &snum);
     free (display);

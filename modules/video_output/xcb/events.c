@@ -100,7 +100,7 @@ void RegisterMouseEvents (vlc_object_t *obj, xcb_connection_t *conn,
     xcb_change_window_attributes (conn, wnd, XCB_CW_EVENT_MASK, &value);
     /* Try to subscribe to click events */
     /* (only one X11 client can get them, so might not work) */
-    if (var_CreateGetBool (obj, "mouse-events"))
+    if (var_InheritBool (obj, "mouse-events"))
     {
         value |= XCB_EVENT_MASK_BUTTON_PRESS
                | XCB_EVENT_MASK_BUTTON_RELEASE;

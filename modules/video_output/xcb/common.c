@@ -160,7 +160,7 @@ error:
 /** Check MIT-SHM shared memory support */
 void CheckSHM (vlc_object_t *obj, xcb_connection_t *conn, bool *restrict pshm)
 {
-    bool shm = var_CreateGetBool (obj, "x11-shm") > 0;
+    bool shm = var_InheritBool (obj, "x11-shm") > 0;
     if (shm)
     {
         xcb_shm_query_version_cookie_t ck;
