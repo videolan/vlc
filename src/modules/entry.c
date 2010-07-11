@@ -28,6 +28,7 @@
 #include <vlc_memory.h>
 #include <assert.h>
 #include <stdarg.h>
+#include <limits.h>
 
 #include "modules/modules.h"
 #include "config/configuration.h"
@@ -136,6 +137,11 @@ static module_config_t *vlc_config_create (module_t *module, int type)
     }
 
     memset (tab + confsize, 0, sizeof (tab[confsize]));
+    if (IsConfigIntegerType (type))
+    {
+        tab[confsize].max.i = INT_MAX;
+        tab[confsize].min.i = INT_MIN;
+    }
     tab[confsize].i_type = type;
 
     if (type & CONFIG_ITEM)
@@ -263,7 +269,7 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             if (IsConfigIntegerType (item->i_type))
             {
                 item->orig.i = item->saved.i =
-                item->value.i = va_arg (ap, int);
+                item->value.i = va_arg (ap, int64_t);
             }
             else
             if (IsConfigFloatType (item->i_type))
@@ -288,8 +294,8 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
              || item->i_type == CONFIG_ITEM_MODULE_LIST_CAT
              || item->i_type == CONFIG_ITEM_MODULE_CAT)
             {
-                item->min.i = va_arg (ap, int);
-                item->max.i = va_arg (ap, int);
+                item->min.i = va_arg (ap, int64_t);
+                item->max.i = va_arg (ap, int64_t);
             }
             else
             if (IsConfigFloatType (item->i_type))

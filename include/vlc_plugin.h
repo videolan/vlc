@@ -120,8 +120,8 @@ enum vlc_module_properties
 /**
  * Current plugin ABI version
  */
-# define MODULE_SYMBOL 1_2_0c
-# define MODULE_SUFFIX "__1_2_0c"
+# define MODULE_SYMBOL 1_2_0d
+# define MODULE_SUFFIX "__1_2_0d"
 
 /*****************************************************************************
  * Add a few defines. You do not want to read this section. Really.
@@ -273,16 +273,16 @@ enum vlc_module_properties
 
 #define add_int_inner( type, name, text, longtext, advc, cb, v ) \
     add_typename_inner( type, name, text, longtext, advc, cb ) \
-    vlc_config_set (p_config, VLC_CONFIG_VALUE, (int)(v));
+    vlc_config_set (p_config, VLC_CONFIG_VALUE, (int64_t)(v));
 
 
 #define set_category( i_id ) \
     add_type_inner( CONFIG_CATEGORY ) \
-    vlc_config_set (p_config, VLC_CONFIG_VALUE, (int)(i_id));
+    vlc_config_set (p_config, VLC_CONFIG_VALUE, (int64_t)(i_id));
 
 #define set_subcategory( i_id ) \
     add_type_inner( CONFIG_SUBCATEGORY ) \
-    vlc_config_set (p_config, VLC_CONFIG_VALUE, (int)(i_id));
+    vlc_config_set (p_config, VLC_CONFIG_VALUE, (int64_t)(i_id));
 
 #define set_section( text, longtext ) \
     add_typedesc_inner( CONFIG_SECTION, text, longtext )
@@ -366,7 +366,7 @@ enum vlc_module_properties
 #define add_bool( name, v, p_callback, text, longtext, advc ) \
     add_typename_inner( CONFIG_ITEM_BOOL, name, text, longtext, advc, \
                         p_callback ) \
-    if (v) vlc_config_set (p_config, VLC_CONFIG_VALUE, (int)true);
+    if (v) vlc_config_set (p_config, VLC_CONFIG_VALUE, (int64_t)true);
 
 /* For removed option */
 #define add_obsolete_inner( name, type ) \
@@ -410,7 +410,8 @@ enum vlc_module_properties
                     (vlc_callback_t)(list_update_func));
 
 #define change_integer_range( minv, maxv ) \
-    vlc_config_set (p_config, VLC_CONFIG_RANGE, (int)(minv), (int)(maxv));
+    vlc_config_set (p_config, VLC_CONFIG_RANGE, \
+                    (int64_t)(minv), (int64_t)(maxv));
 
 #define change_float_range( minv, maxv ) \
     vlc_config_set (p_config, VLC_CONFIG_RANGE, \

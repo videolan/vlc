@@ -327,12 +327,9 @@ void config_PutInt( vlc_object_t *p_this, const char *psz_name,
         return;
     }
 
-    /* if i_min == i_max == 0, then do not use them */
-    if ((p_config->min.i == 0) && (p_config->max.i == 0))
-        ;
-    else if (i_value < p_config->min.i)
+    if (i_value < p_config->min.i)
         i_value = p_config->min.i;
-    else if (i_value > p_config->max.i)
+    if (i_value > p_config->max.i)
         i_value = p_config->max.i;
 
     vlc_rwlock_wrlock (&config_lock);
