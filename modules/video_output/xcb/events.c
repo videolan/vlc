@@ -107,7 +107,6 @@ void RegisterMouseEvents (vlc_object_t *obj, xcb_connection_t *conn,
         xcb_change_window_attributes (conn, wnd,
                                       XCB_CW_EVENT_MASK, &value);
     }
-    var_Destroy (obj, "mouse-events");
 }
 
 /* NOTE: we assume no other thread will be _setting_ our video output events

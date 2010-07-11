@@ -608,7 +608,6 @@ static int EmOpen (vlc_object_t *obj)
     xcb_window_t window = var_InheritInteger (obj, "drawable-xid");
     if (window == 0)
         return VLC_EGENERIC;
-    var_Destroy (obj, "drawable-xid");
 
     if (AcquireDrawable (obj, window))
         return VLC_EGENERIC;
