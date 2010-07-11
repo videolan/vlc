@@ -1567,9 +1567,7 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             RenderLinear( p_filter, pp_outpic[1], p_pic, p_pic->b_top_field_first );
 #endif
             msg_Err( p_filter, "doubling the frame rate is not supported yet" );
-            picture_Release( p_pic_dst );
-            picture_Release( p_pic );
-            return NULL;
+            goto drop;
 
         case DEINTERLACE_MEAN:
             RenderMean( p_filter, p_pic_dst, p_pic );
@@ -1585,26 +1583,25 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
 
         case DEINTERLACE_YADIF:
             if( RenderYadif( p_filter, p_pic_dst, p_pic, 0, 0 ) )
-            {
-                picture_Release( p_pic_dst );
-                picture_Release( p_pic );
-                return NULL;
-            }
+                goto drop;
             break;
 
         case DEINTERLACE_YADIF2X:
             msg_Err( p_filter, "doubling the frame rate is not supported yet" );
             //RenderYadif( p_vout, pp_outpic[0], p_pic, 0, !p_pic->b_top_field_first );
             //RenderYadif( p_vout, pp_outpic[1], p_pic, 1, p_pic->b_top_field_first );
-            picture_Release( p_pic_dst );
-            picture_Release( p_pic );
-            return NULL;
+            goto drop;
     }
 
     p_pic_dst->b_progressive = true;
 
     picture_Release( p_pic );
     return p_pic_dst;
+
+drop:
+    picture_Release( p_pic_dst );
+    picture_Release( p_pic );
+    return NULL;
 }
 
 static void Flush( filter_t *p_filter )
