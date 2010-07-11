@@ -208,10 +208,18 @@ xspfexportitem_end:
 
     for( int i = 0; i < p_item->p_input->i_options; i++ )
     {
-        fprintf( p_file, "\t\t\t\t<vlc:option>%s</vlc:option>\n",
-                 p_item->p_input->ppsz_options[i][0] == ':' ?
-                 p_item->p_input->ppsz_options[i] + 1 :
-                 p_item->p_input->ppsz_options[i] );
+        char* psz_src = p_item->p_input->ppsz_options[i];
+        char* psz_ret = NULL;
+
+        if ( psz_src[0] == ':' )
+            psz_src++;
+
+        psz_ret = convert_xml_special_chars( psz_src );
+        if ( psz_ret == NULL )
+            continue;
+
+        fprintf( p_file, "\t\t\t\t<vlc:option>%s</vlc:option>\n", psz_ret );
+        free( psz_ret );
     }
     fputs( "\t\t\t</extension>\n", p_file );
     fputs( "\t\t</track>\n", p_file );
