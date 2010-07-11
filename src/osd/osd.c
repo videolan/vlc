@@ -399,7 +399,7 @@ void osd_MenuActivate( vlc_object_t *p_this )
                            var_InheritInteger( p_osd, p_button->psz_action ) );
 #if defined(OSD_MENU_DEBUG)
         msg_Dbg( p_osd, "select (%d, %s)",
-                 var_InheritInteger( p_osd, p_button->psz_action ),
+                 (int)var_InheritInteger( p_osd, p_button->psz_action ),
                  p_button->psz_action );
 #endif
     }

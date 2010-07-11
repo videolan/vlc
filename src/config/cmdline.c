@@ -257,7 +257,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                     case CONFIG_ITEM_INTEGER:
                         var_Create( p_this, psz_name, VLC_VAR_INTEGER );
                         var_SetInteger( p_this, psz_name,
-                                        strtol(state.optarg, NULL, 0));
+                                        strtoll(state.optarg, NULL, 0));
                         break;
                     case CONFIG_ITEM_FLOAT:
                         var_Create( p_this, psz_name, VLC_VAR_FLOAT );
@@ -304,7 +304,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                     else
                     {
                         var_SetInteger( p_this, name,
-                                        strtol(state.optarg, NULL, 0) );
+                                        strtoll(state.optarg, NULL, 0) );
                     }
                     break;
                 case CONFIG_ITEM_BOOL:

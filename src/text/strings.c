@@ -764,7 +764,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                 case 'B':
                     if( p_input )
                     {
-                        snprintf( buf, 10, "%d",
+                        snprintf( buf, 10, "%"PRId64,
                                   var_GetInteger( p_input, "bit-rate" )/1000 );
                     }
                     else
@@ -774,7 +774,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                 case 'C':
                     if( p_input )
                     {
-                        snprintf( buf, 10, "%d",
+                        snprintf( buf, 10, "%"PRId64,
                                   var_GetInteger( p_input, "chapter" ) );
                     }
                     else
@@ -800,7 +800,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                 case 'I':
                     if( p_input )
                     {
-                        snprintf( buf, 10, "%d",
+                        snprintf( buf, 10, "%"PRId64,
                                   var_GetInteger( p_input, "title" ) );
                     }
                     else

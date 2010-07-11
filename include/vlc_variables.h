@@ -292,7 +292,7 @@ int var_SetAddress( vlc_object_t *p_obj, const char *psz_name, void *ptr )
  * \param psz_name The name of the variable
  */
 LIBVLC_USED
-static inline int var_GetInteger( vlc_object_t *p_obj, const char *psz_name )
+static inline int64_t var_GetInteger( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;
     if( !var_GetChecked( p_obj, psz_name, VLC_VAR_INTEGER, &val ) )
@@ -408,7 +408,7 @@ static inline void *var_GetAddress( vlc_object_t *p_obj, const char *psz_name )
  * \param p_obj the object that holds the variable
  * \param psz_name the name of the variable
  */
-static inline int var_IncInteger( vlc_object_t *p_obj, const char *psz_name )
+static inline int64_t var_IncInteger( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;
     val.i_int = 1;
@@ -422,7 +422,7 @@ static inline int var_IncInteger( vlc_object_t *p_obj, const char *psz_name )
  * \param p_obj the object that holds the variable
  * \param psz_name the name of the variable
  */
-static inline int var_DecInteger( vlc_object_t *p_obj, const char *psz_name )
+static inline int64_t var_DecInteger( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;
     val.i_int = -1;
@@ -431,7 +431,7 @@ static inline int var_DecInteger( vlc_object_t *p_obj, const char *psz_name )
 }
 #define var_DecInteger(a,b) var_DecInteger( VLC_OBJECT(a), b )
 
-static inline unsigned var_OrInteger( vlc_object_t *obj, const char *name,
+static inline uint64_t var_OrInteger( vlc_object_t *obj, const char *name,
                                       unsigned v )
 {
     vlc_value_t val;
@@ -441,7 +441,7 @@ static inline unsigned var_OrInteger( vlc_object_t *obj, const char *name,
 }
 #define var_OrInteger(a,b,c) var_OrInteger(VLC_OBJECT(a),b,c)
 
-static inline unsigned var_NAndInteger( vlc_object_t *obj, const char *name,
+static inline uint64_t var_NAndInteger( vlc_object_t *obj, const char *name,
                                         unsigned v )
 {
     vlc_value_t val;
@@ -458,7 +458,7 @@ static inline unsigned var_NAndInteger( vlc_object_t *obj, const char *name,
  * \param psz_name The name of the variable
  */
 LIBVLC_USED
-static inline int var_CreateGetInteger( vlc_object_t *p_obj, const char *psz_name )
+static inline int64_t var_CreateGetInteger( vlc_object_t *p_obj, const char *psz_name )
 {
     var_Create( p_obj, psz_name, VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     return var_GetInteger( p_obj, psz_name );
@@ -554,7 +554,7 @@ static inline void *var_CreateGetAddress( vlc_object_t *p_obj,
  * \param psz_name The name of the variable
  */
 LIBVLC_USED
-static inline int var_CreateGetIntegerCommand( vlc_object_t *p_obj, const char *psz_name )
+static inline int64_t var_CreateGetIntegerCommand( vlc_object_t *p_obj, const char *psz_name )
 {
     var_Create( p_obj, psz_name, VLC_VAR_INTEGER | VLC_VAR_DOINHERIT
                                    | VLC_VAR_ISCOMMAND );
@@ -666,7 +666,7 @@ static inline bool var_InheritBool( vlc_object_t *obj, const char *name )
 #define var_InheritBool(o, n) var_InheritBool(VLC_OBJECT(o), n)
 
 LIBVLC_USED
-static inline int var_InheritInteger( vlc_object_t *obj, const char *name )
+static inline int64_t var_InheritInteger( vlc_object_t *obj, const char *name )
 {
     vlc_value_t val;
 

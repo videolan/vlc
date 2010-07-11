@@ -1054,7 +1054,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
         break;
 
     case VLC_VAR_INTEGER:
-        val.i_int = strtol( psz_value, NULL, 0 );
+        val.i_int = strtoll( psz_value, NULL, 0 );
         break;
 
     case VLC_VAR_FLOAT:
