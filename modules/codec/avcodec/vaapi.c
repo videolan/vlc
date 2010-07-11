@@ -239,7 +239,7 @@ static int CreateSurfaces( vlc_va_vaapi_t *p_va, void **pp_hw_ctx, vlc_fourcc_t 
         goto error;
     }
 
-    /* Find a supported image chroma */
+    /* Find and create a supported image chroma */
     int i_fmt_count = vaMaxNumImageFormats( p_va->p_display );
     VAImageFormat *p_fmt = calloc( i_fmt_count, sizeof(*p_fmt) );
     if( !p_fmt )
@@ -259,6 +259,21 @@ static int CreateSurfaces( vlc_va_vaapi_t *p_va, void **pp_hw_ctx, vlc_fourcc_t 
             p_fmt[i].fourcc == VA_FOURCC( 'I', '4', '2', '0' ) ||
             p_fmt[i].fourcc == VA_FOURCC( 'N', 'V', '1', '2' ) )
         {
+            if( vaCreateImage(  p_va->p_display, &p_fmt[i], i_width, i_height, &p_va->image ) )
+            {
+                p_va->image.image_id = 0;
+                continue;
+            }
+            /* Validate that vaGetImage works with this format */
+            if( vaGetImage( p_va->p_display, pi_surface_id[0],
+                            0, 0, i_width, i_height,
+                            p_va->image.image_id) )
+            {
+                vaDestroyImage( p_va->p_display, p_va->image.image_id );
+                p_va->image.image_id = 0;
+                continue;
+            }
+
             i_chroma = VLC_CODEC_YV12;
             fmt = p_fmt[i];
             break;
@@ -269,12 +284,6 @@ static int CreateSurfaces( vlc_va_vaapi_t *p_va, void **pp_hw_ctx, vlc_fourcc_t 
         goto error;
     *pi_chroma = i_chroma;
 
-    /* Create an image for surface extraction */
-    if( vaCreateImage(  p_va->p_display, &fmt, i_width, i_height, &p_va->image ) )
-    {
-        p_va->image.image_id = 0;
-        goto error;
-    }
     CopyInitCache( &p_va->image_cache, i_width );
 
     /* Setup the ffmpeg hardware context */
