@@ -24,7 +24,7 @@
 -- Probe function.
 function probe()
     return vlc.access == "http"
-        and string.match( vlc.path, "dailymotion." ) 
+        and string.match( vlc.path, "dailymotion." )
         and string.match( vlc.peek( 2048 ), "<!DOCTYPE.*video_type" )
 end
 
@@ -36,58 +36,39 @@ end
 -- Parse function.
 function parse()
     while true
-    do 
+    do
         line = vlc.readline()
-        if not line then break end
-        if string.match( line, "param name=\"flashvars\" value=\".*video=" )
+        if not line
         then
-            arturl = find( line, "param name=\"flashvars\" value=\".*preview=([^&]*)" )
-            videos = vlc.strings.decode_uri( find( line, "param name=\"flashvars\" value=\".*video=([^&]*)" ) )
-       --[[ we get a list of different streams available, at various codecs
-            and resolutions:
-            /A@@spark||/B@@spark-mini||/C@@vp6-hd||/D@@vp6||/E@@h264
-            Not everybody can decode HD, not everybody has a 80x60 screen,
-            H264/MP4 is buggy , so i choose VP6 as the highest priority
+            vlc.msg.err("Couldn't extract the video URL from dailymotion")
+            return { }
+        end
+        if string.match( line, "\"sequence\",")
+        then
+            line = vlc.strings.decode_uri(line):gsub("\\/", "/")
 
-            Ideally, VLC would propose the different streams available, codecs
-            and resolutions (the resolutions are part of the URL)
+            arturl = find( line, "\"videoPreviewURL\":\"([^\"]*)\"")
+            name = find( line, "\"videoTitle\":\"([^\"]*)\"")
+            description = find( line, "\"videoDescription\":\"([^\"]*)\"")
 
-            For now we just built a list of preferred codecs : lowest value
-            means highest priority
-         ]]
-            local pref = { ["vp6"]=0, ["spark"]=1, ["h264"]=2, ["vp6-hd"]=3, ["spark-mini"]=4 }
-            local available = {}
-            for n in string.gmatch(videos, "[^|]+") do
-                i = string.find(n, "@@")
-                if i then
-                    available[string.sub(n, i+2)] = string.sub(n, 0, i-1)
-                end
-            end
-            local score = 666
-            local bestcodec
-            for codec,_ in pairs(available) do
-                if pref[codec] == nil then
-                    vlc.msg.warn( "Unknown codec: " .. codec )
-                    pref[codec] = 42 -- try the 1st unknown codec if other fail
-                end
-                if pref[codec] < score then
-                    bestcodec = codec
-                    score = pref[codec]
-                end
-            end
-            if bestcodec then
-                path = "http://dailymotion.com" .. available[bestcodec]
-            end
+           --[[ we get a list of different streams available, at various codecs
+                and resolutions:
+
+                Ideally, VLC would propose the different streams available,
+                codecs and resolutions (the resolutions are part of the URL)
+
+                For now we just built a list of preferred codecs : lowest value
+                means highest priority
+             ]]--
+
+            -- FIXME: the hd/hq versions (in mp4) cause a lot of seeks,
+            -- for now we only get the sd (in flv) URL
+
+            -- if not path then path = find( line, "\"hqURL\":\"([^\"]*)\"") end
+            -- if not path then path = find( line, "\"hdURL\":\"([^\"]*)\"") end
+            if not path then path = find( line, "\"sdURL\":\"([^\"]*)\"") end
+
+            return { { path = path; name = name; description = description; url = vlc.path; arturl = arturl } }
         end
-        if string.match( line, "<meta name=\"title\"" )
-        then
-            name = vlc.strings.resolve_xml_special_chars( find( line, "name=\"title\" content=\"(.-)\"" ) )
-        end
-        if string.match( line, "<meta name=\"description\"" )
-        then
-            description = vlc.strings.resolve_xml_special_chars( vlc.strings.resolve_xml_special_chars( find( line, "name=\"description\" lang=\".-\" content=\"(.-)\"" ) ) )
-        end
-        if path and name and description and arturl then break end
     end
-    return { { path = path; name = name; description = description; url = vlc.path; arturl = arturl } }
 end
