@@ -130,6 +130,7 @@ static int Open( vlc_va_vaapi_t *p_va, int i_codec_id )
     memset( p_va, 0, sizeof(*p_va) );
     p_va->i_config_id  = VA_INVALID_ID;
     p_va->i_context_id = VA_INVALID_ID;
+    p_va->image.image_id = VA_INVALID_ID;
 
     /* Create a VA display */
     if( !XInitThreads() )
@@ -178,7 +179,7 @@ error:
 
 static void DestroySurfaces( vlc_va_vaapi_t *p_va )
 {
-    if( p_va->image.image_id != VA_INVALID_SURFACE )
+    if( p_va->image.image_id != VA_INVALID_ID )
     {
         CopyCleanCache( &p_va->image_cache );
         vaDestroyImage( p_va->p_display, p_va->image.image_id );
@@ -197,7 +198,7 @@ static void DestroySurfaces( vlc_va_vaapi_t *p_va )
     free( p_va->p_surface );
 
     /* */
-    p_va->image.image_id = VA_INVALID_SURFACE;
+    p_va->image.image_id = VA_INVALID_ID;
     p_va->i_context_id = VA_INVALID_ID;
     p_va->p_surface = NULL;
     p_va->i_surface_width = 0;
@@ -212,7 +213,7 @@ static int CreateSurfaces( vlc_va_vaapi_t *p_va, void **pp_hw_ctx, vlc_fourcc_t 
     p_va->p_surface = calloc( p_va->i_surface_count, sizeof(*p_va->p_surface) );
     if( !p_va->p_surface )
         return VLC_EGENERIC;
-    p_va->image.image_id = VA_INVALID_SURFACE;
+    p_va->image.image_id = VA_INVALID_ID;
     p_va->i_context_id   = VA_INVALID_ID;
 
     /* Create surfaces */
@@ -265,7 +266,7 @@ static int CreateSurfaces( vlc_va_vaapi_t *p_va, void **pp_hw_ctx, vlc_fourcc_t 
         {
             if( vaCreateImage(  p_va->p_display, &p_fmt[i], i_width, i_height, &p_va->image ) )
             {
-                p_va->image.image_id = VA_INVALID_SURFACE;
+                p_va->image.image_id = VA_INVALID_ID;
                 continue;
             }
             /* Validate that vaGetImage works with this format */
@@ -274,7 +275,7 @@ static int CreateSurfaces( vlc_va_vaapi_t *p_va, void **pp_hw_ctx, vlc_fourcc_t 
                             p_va->image.image_id) )
             {
                 vaDestroyImage( p_va->p_display, p_va->image.image_id );
-                p_va->image.image_id = VA_INVALID_SURFACE;
+                p_va->image.image_id = VA_INVALID_ID;
                 continue;
             }
 
