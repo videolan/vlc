@@ -65,6 +65,7 @@ struct filter_t
         struct
         {
             picture_t * (*pf_filter) ( filter_t *, picture_t * );
+            void        (*pf_flush)( filter_t * );
             picture_t * (*pf_buffer_new) ( filter_t * );
             void        (*pf_buffer_del) ( filter_t *, picture_t * );
             /* Filter mouse state.
@@ -80,6 +81,7 @@ struct filter_t
                                      const vlc_mouse_t *p_new );
         } video;
 #define pf_video_filter     u.video.pf_filter
+#define pf_video_flush      u.video.pf_flush
 #define pf_video_mouse      u.video.pf_mouse
 #define pf_video_buffer_new u.video.pf_buffer_new
 #define pf_video_buffer_del u.video.pf_buffer_del
@@ -161,6 +163,15 @@ static inline picture_t *filter_NewPicture( filter_t *p_filter )
 static inline void filter_DeletePicture( filter_t *p_filter, picture_t *p_picture )
 {
     p_filter->pf_video_buffer_del( p_filter, p_picture );
+}
+
+/**
+ * This function will flush the state of a video filter.
+ */
+static inline void filter_FlushPictures( filter_t *p_filter )
+{
+    if( p_filter->pf_video_flush )
+        p_filter->pf_video_flush( p_filter );
 }
 
 /**
@@ -367,6 +378,11 @@ VLC_EXPORT( const es_format_t *, filter_chain_GetFmtOut, ( filter_chain_t * ) );
  * \return modified picture after applying all video filters
  */
 VLC_EXPORT( picture_t *, filter_chain_VideoFilter, ( filter_chain_t *, picture_t * ) );
+
+/**
+ * Flush a video filter chain.
+ */
+VLC_EXPORT( void, filter_chain_VideoFlush, ( filter_chain_t * ) );
 
 /**
  * Apply the filter chain to a audio block.

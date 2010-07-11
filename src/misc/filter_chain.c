@@ -233,6 +233,17 @@ picture_t *filter_chain_VideoFilter( filter_chain_t *p_chain, picture_t *p_pic )
     return p_pic;
 }
 
+void filter_chain_VideoFlush( filter_chain_t *p_chain )
+{
+    for( chained_filter_t *f = p_chain->first; f != NULL; f = f->next )
+    {
+        filter_t *p_filter = &f->filter;
+
+        filter_FlushPictures( p_filter );
+    }
+}
+
+
 block_t *filter_chain_AudioFilter( filter_chain_t *p_chain, block_t *p_block )
 {
     for( chained_filter_t *f = p_chain->first; f != NULL; f = f->next )
