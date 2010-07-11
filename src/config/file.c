@@ -145,13 +145,15 @@ static int64_t strtoi (const char *str)
 
     if (!errno)
     {
-        if ((l > INT64_C(0x7fffffffffffffff))
-         || (l < INT64_C(-0x8000000000000000)))
+#if (LLONG_MAX > 0x7fffffffffffffffLL)
+        if (l > 0x7fffffffffffffffLL
+         || l < -0x8000000000000000LL)
             errno = ERANGE;
+#endif
         if (*end)
             errno = EINVAL;
     }
-    return (int)l;
+    return l;
 }
 
 #undef config_LoadConfigFile
