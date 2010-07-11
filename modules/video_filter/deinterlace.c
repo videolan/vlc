@@ -98,7 +98,7 @@ static void RenderMean   ( filter_t *, picture_t *, picture_t * );
 static void RenderBlend  ( filter_t *, picture_t *, picture_t * );
 static void RenderLinear ( filter_t *, picture_t *, picture_t *, int );
 static void RenderX      ( picture_t *, picture_t * );
-static void RenderYadif  ( filter_t *, picture_t *, picture_t *, int, int );
+static int  RenderYadif  ( filter_t *, picture_t *, picture_t *, int, int );
 
 static void MergeGeneric ( void *, const void *, const void *, size_t );
 #if defined(CAN_COMPILE_C_ALTIVEC)
@@ -1434,7 +1434,7 @@ typedef intptr_t x86_reg;
 /* yadif.h comes from vf_yadif.c of mplayer project */
 #include "yadif.h"
 
-static void RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src, int i_order, int i_field )
+static int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src, int i_order, int i_field )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -1517,12 +1517,16 @@ static void RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
 
         /* */
         p_dst->date = (p_next->date - p_cur->date) * i_order / 2 + p_cur->date;
+        return VLC_SUCCESS;
+    }
+    else if( !p_prev && !p_cur && p_next )
+    {
+        RenderX( p_dst, p_next );
+        return VLC_SUCCESS;
     }
     else
     {
-        /* Fallback to something simple
-         * XXX it is wrong when we have 2 pictures, we should not output a picture */
-        RenderX( p_dst, p_src );
+        return VLC_EGENERIC;
     }
 }
 
@@ -1541,6 +1545,8 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
         picture_Release( p_pic );
         return NULL;
     }
+
+    picture_CopyProperties( p_pic_dst, p_pic );
 
     switch( p_sys->i_mode )
     {
@@ -1578,11 +1584,13 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             break;
 
         case DEINTERLACE_YADIF:
-            msg_Err( p_filter, "delaying frames is not supported yet" );
-            //RenderYadif( p_vout, pp_outpic[0], p_pic, 0, 0 );
-            picture_Release( p_pic_dst );
-            picture_Release( p_pic );
-            return NULL;
+            if( RenderYadif( p_filter, p_pic_dst, p_pic, 0, 0 ) )
+            {
+                picture_Release( p_pic_dst );
+                picture_Release( p_pic );
+                return NULL;
+            }
+            break;
 
         case DEINTERLACE_YADIF2X:
             msg_Err( p_filter, "doubling the frame rate is not supported yet" );
@@ -1593,11 +1601,22 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             return NULL;
     }
 
-    picture_CopyProperties( p_pic_dst, p_pic );
     p_pic_dst->b_progressive = true;
 
     picture_Release( p_pic );
     return p_pic_dst;
+}
+
+static void Flush( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    for( int i = 0; i < HISTORY_SIZE; i++ )
+    {
+        if( p_sys->pp_history[i] )
+            picture_Release( p_sys->pp_history[i] );
+        p_sys->pp_history[i] = NULL;
+    }
 }
 
 static int Mouse( filter_t *p_filter,
@@ -1629,6 +1648,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_mode = DEINTERLACE_BLEND;
     p_sys->b_double_rate = false;
     p_sys->b_half_height = true;
+    for( int i = 0; i < HISTORY_SIZE; i++ )
+        p_sys->pp_history[i] = NULL;
 
 #if defined(CAN_COMPILE_C_ALTIVEC)
     if( vlc_CPU() & CPU_CAPABILITY_ALTIVEC )
@@ -1696,6 +1717,7 @@ static int Open( vlc_object_t *p_this )
     p_filter->fmt_out.video = fmt;
     p_filter->fmt_out.i_codec = fmt.i_chroma;
     p_filter->pf_video_filter = Deinterlace;
+    p_filter->pf_video_flush  = Flush;
     p_filter->pf_video_mouse  = Mouse;
 
     msg_Dbg( p_filter, "deinterlacing" );
@@ -1710,6 +1732,7 @@ static void Close( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
 
+    Flush( p_filter );
     free( p_filter->p_sys );
 }
 
