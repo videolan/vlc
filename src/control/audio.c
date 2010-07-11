@@ -478,3 +478,37 @@ int libvlc_audio_set_channel( libvlc_media_player_t *mp, int channel )
     vlc_object_release( p_aout );
     return ret;
 }
+
+/*****************************************************************************
+ * libvlc_audio_get_delay : Get the current audio delay
+ *****************************************************************************/
+int64_t libvlc_audio_get_delay( libvlc_media_player_t *p_mi )
+{
+    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi );
+    int64_t val = 0;
+    if( p_input_thread != NULL )
+    {
+      val = var_GetTime( p_input_thread, "audio-delay" );
+      vlc_object_release( p_input_thread );
+    }
+    return val;
+}
+
+/*****************************************************************************
+ * libvlc_audio_set_delay : Set the current audio delay
+ *****************************************************************************/
+int libvlc_audio_set_delay( libvlc_media_player_t *p_mi, int64_t i_delay )
+{
+    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi );
+    int ret = 0;
+    if( p_input_thread != NULL )
+    {
+      var_SetTime( p_input_thread, "audio-delay", i_delay );
+      vlc_object_release( p_input_thread );
+    }
+    else
+    {
+      ret = -1;
+    }
+    return ret;
+}

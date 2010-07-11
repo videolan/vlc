@@ -1259,6 +1259,25 @@ VLC_PUBLIC_API int libvlc_audio_get_channel( libvlc_media_player_t *p_mi );
  */
 VLC_PUBLIC_API int libvlc_audio_set_channel( libvlc_media_player_t *p_mi, int channel );
 
+/**
+ * Get current audio delay.
+ *
+ * \param p_mi media player
+ * \return the audio delay (microseconds)
+ * \version LibVLC 1.1.1 or later
+ */
+VLC_PUBLIC_API int64_t libvlc_audio_get_delay( libvlc_media_player_t *p_mi );
+
+/**
+ * Set current audio delay. The audio delay will be reset to zero each time the media changes.
+ *
+ * \param p_mi media player
+ * \param i_delay the audio delay (microseconds)
+ * \return 0 on success, -1 on error
+ * \version LibVLC 1.1.1 or later
+ */
+VLC_PUBLIC_API int libvlc_audio_set_delay( libvlc_media_player_t *p_mi, int64_t i_delay );
+
 /** @} audio */
 
 /** @} media_player */
