@@ -1257,14 +1257,14 @@ void KeySelectorControl::finish()
                 - QString text in column 0
                 - QString name in data of column 0
                 - KeyValue in String in column 1
-                - KeyValue in int in column 1
+                - KeyValue in int64_t in column 1
              */
             QTreeWidgetItem *treeItem = new QTreeWidgetItem();
             treeItem->setText( 0, qtr( p_item->psz_text ) );
             treeItem->setData( 0, Qt::UserRole,
                                QVariant( qfu( p_item->psz_name ) ) );
             treeItem->setText( 1, VLCKeyToString( p_item->value.i ) );
-            treeItem->setData( 1, Qt::UserRole, QVariant( p_item->value.i ) );
+            treeItem->setData( 1, Qt::UserRole, QVariant( qlonglong( p_item->value.i ) ) );
             table->addTopLevelItem( treeItem );
             continue;
         }
@@ -1279,7 +1279,7 @@ void KeySelectorControl::finish()
             {
                 list[0]->setText( 2, VLCKeyToString( p_item->value.i ) );
                 list[0]->setData( 2, Qt::UserRole,
-                                  QVariant( p_item->value.i ) );
+                                  QVariant( qlonglong( p_item->value.i ) ) );
             }
             if( list.count() >= 2 )
                 msg_Dbg( p_this, "This is probably wrong, %s", p_item->psz_text );
