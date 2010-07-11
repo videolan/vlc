@@ -176,7 +176,7 @@ error:
 
 static void DestroySurfaces( vlc_va_vaapi_t *p_va )
 {
-    if( p_va->image.image_id )
+    if( p_va->image.image_id != VA_INVALID_SURFACE )
     {
         CopyCleanCache( &p_va->image_cache );
         vaDestroyImage( p_va->p_display, p_va->image.image_id );
@@ -195,7 +195,7 @@ static void DestroySurfaces( vlc_va_vaapi_t *p_va )
     free( p_va->p_surface );
 
     /* */
-    p_va->image.image_id = 0;
+    p_va->image.image_id = VA_INVALID_SURFACE;
     p_va->i_context_id = 0;
     p_va->p_surface = NULL;
     p_va->i_surface_width = 0;
@@ -210,6 +210,7 @@ static int CreateSurfaces( vlc_va_vaapi_t *p_va, void **pp_hw_ctx, vlc_fourcc_t 
     p_va->p_surface = calloc( p_va->i_surface_count, sizeof(*p_va->p_surface) );
     if( !p_va->p_surface )
         return VLC_EGENERIC;
+    p_va->image.image_id = VA_INVALID_SURFACE;
 
     /* Create surfaces */
     VASurfaceID pi_surface_id[p_va->i_surface_count];
@@ -261,7 +262,7 @@ static int CreateSurfaces( vlc_va_vaapi_t *p_va, void **pp_hw_ctx, vlc_fourcc_t 
         {
             if( vaCreateImage(  p_va->p_display, &p_fmt[i], i_width, i_height, &p_va->image ) )
             {
-                p_va->image.image_id = 0;
+                p_va->image.image_id = VA_INVALID_SURFACE;
                 continue;
             }
             /* Validate that vaGetImage works with this format */
@@ -270,7 +271,7 @@ static int CreateSurfaces( vlc_va_vaapi_t *p_va, void **pp_hw_ctx, vlc_fourcc_t 
                             p_va->image.image_id) )
             {
                 vaDestroyImage( p_va->p_display, p_va->image.image_id );
-                p_va->image.image_id = 0;
+                p_va->image.image_id = VA_INVALID_SURFACE;
                 continue;
             }
 
