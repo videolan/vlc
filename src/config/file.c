@@ -274,6 +274,8 @@ int config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                 case CONFIG_ITEM_INTEGER:
                 {
                     int64_t l = strtoi (psz_option_value);
+                    if ((l > p_item->max.i) || (l < p_item->min.i))
+                        errno = ERANGE;
                     if (errno)
                         msg_Warn (p_this, "Integer value (%s) for %s: %m",
                                   psz_option_value, psz_option_name);
