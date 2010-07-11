@@ -559,6 +559,10 @@ static picture_t *ThreadDisplayGetDecodedPicture(vout_thread_t *vout,
     const bool is_paused = vout->p->pause.is_on;
     bool redisplay = is_paused && !now && vout->p->displayed.decoded;
 
+    mtime_t vfilter_delay = 0;
+    for (int i = 0; i < VOUT_FILTER_DELAYS; i++)
+        vfilter_delay = __MAX(vfilter_delay, vout->p->vfilter_delay[i]);
+
     /* FIXME/XXX we must redisplay the last decoded picture (because
      * of potential vout updated, or filters update or SPU update)
      * For now a high update period is needed but it coulmd be removed
@@ -572,7 +576,9 @@ static picture_t *ThreadDisplayGetDecodedPicture(vout_thread_t *vout,
         picture_t *peek = picture_fifo_Peek(vout->p->decoder_fifo);
         if (peek) {
             *is_forced = peek->b_force || is_paused || now;
-            *deadline = (*is_forced ? date : peek->date) - vout_chrono_GetHigh(&vout->p->render);
+            *deadline = (*is_forced ? date : peek->date) -
+                        vout_chrono_GetHigh(&vout->p->render) -
+                        vfilter_delay;
             picture_Release(peek);
         } else {
             redisplay = true;
@@ -587,7 +593,7 @@ static picture_t *ThreadDisplayGetDecodedPicture(vout_thread_t *vout,
         }
         /* */
         *is_forced = true;
-        *deadline = date - vout_chrono_GetHigh(&vout->p->render);
+        *deadline = date - vout_chrono_GetHigh(&vout->p->render) - vfilter_delay;
     }
     if (*deadline > VOUT_MWAIT_TOLERANCE)
         *deadline -= VOUT_MWAIT_TOLERANCE;
@@ -658,6 +664,8 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
             vlc_mutex_unlock(&vout->p->vfilter_lock);
             if (!filtered)
                 continue;
+            vout->p->vfilter_delay[vout->p->vfilter_delay_index] = decoded->date - filtered->date;
+            vout->p->vfilter_delay_index = (vout->p->vfilter_delay_index + 1) % VOUT_FILTER_DELAYS;
         }
 
         /*
@@ -812,6 +820,10 @@ static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
         msg_Err(vout, "Video filter chain creation failed");
 
     vlc_mutex_unlock(&vout->p->vfilter_lock);
+
+    vout->p->vfilter_delay_index = 0;
+    for (int i = 0; i < VOUT_FILTER_DELAYS; i++)
+        vout->p->vfilter_delay[i] = 0;
 }
 
 static void ThreadChangeSubFilters(vout_thread_t *vout, const char *filters)
@@ -821,6 +833,13 @@ static void ThreadChangeSubFilters(vout_thread_t *vout, const char *filters)
 static void ThreadChangeSubMargin(vout_thread_t *vout, int margin)
 {
     spu_ChangeMargin(vout->p->p_spu, margin);
+}
+
+static void ThreadFilterFlush(vout_thread_t *vout)
+{
+    vlc_mutex_lock(&vout->p->vfilter_lock);
+    filter_chain_VideoFlush(vout->p->vfilter_chain);
+    vlc_mutex_unlock(&vout->p->vfilter_lock);
 }
 
 static void ThreadChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
@@ -839,6 +858,8 @@ static void ThreadChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
             vout->p->displayed.decoded->date += duration;
 
         spu_OffsetSubtitleDate(vout->p->p_spu, duration);
+
+        ThreadFilterFlush(vout);
     } else {
         vout->p->step.timestamp = VLC_TS_INVALID;
         vout->p->step.last      = VLC_TS_INVALID;
@@ -863,6 +884,8 @@ static void ThreadFlush(vout_thread_t *vout, bool below, mtime_t date)
             vout->p->displayed.timestamp = VLC_TS_INVALID;
         }
     }
+    ThreadFilterFlush(vout);
+
     picture_fifo_Flush(vout->p->decoder_fifo, date, below);
 }
 
@@ -988,6 +1011,9 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
     vout->p->vfilter_chain =
         filter_chain_New( vout, "video filter2", false,
                           VoutVideoFilterAllocationSetup, NULL, vout);
+    vout->p->vfilter_delay_index = 0;
+    for (int i = 0; i < VOUT_FILTER_DELAYS; i++)
+        vout->p->vfilter_delay[i] = 0;
 
     vout_display_state_t state_default;
     if (!state) {
