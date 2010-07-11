@@ -193,7 +193,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     QLabel *panel_label = new QLabel;
     QFont labelFont = QApplication::font( static_cast<QWidget*>(0) );
     labelFont.setPointSize( labelFont.pointSize() + 6 );
-    labelFont.setFamily( "Verdana" );
     panel_label->setFont( labelFont );
 
     // Title <hr>

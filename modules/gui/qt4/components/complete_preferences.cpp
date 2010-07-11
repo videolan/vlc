@@ -406,7 +406,6 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     QLabel *titleLabel = new QLabel( head );
     QFont titleFont = QApplication::font( static_cast<QWidget*>(0) );
     titleFont.setPointSize( titleFont.pointSize() + 6 );
-    titleFont.setFamily( "Verdana" );
     titleLabel->setFont( titleFont );
 
     // Title <hr>
