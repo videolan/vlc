@@ -3343,6 +3343,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
     ], [
       have_xcb_keysyms="no"
       need_xid_provider="yes"
+      AC_MSG_WARN([libxcb-keysyms not found. Hotkeys will not be supported.])
     ])
   ])
 
