@@ -46,7 +46,7 @@ static const char *deinterlace_modes[] = {
     //"bob",
     //"linear",
     "x",
-    //"yadif",
+    "yadif",
     //"yadif2x",
     NULL
 };
