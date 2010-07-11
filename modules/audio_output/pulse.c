@@ -118,7 +118,7 @@ static int Open ( vlc_object_t *p_this )
     const struct pa_buffer_attr *buffer_attr;
     struct pa_buffer_attr a;
     struct pa_channel_map map;
-    char * p_client_name = NULL;
+    char * p_client_name;
 
     if( !vlc_xlib_init( p_this ) )
         return VLC_EGENERIC;
@@ -213,7 +213,10 @@ static int Open ( vlc_object_t *p_this )
         goto fail;
     }
 
-    if (!(p_sys->context = pa_context_new(pa_threaded_mainloop_get_api(p_sys->mainloop), p_client_name))) {
+    p_sys->context = pa_context_new(pa_threaded_mainloop_get_api(p_sys->mainloop), p_client_name);
+    free(p_client_name);
+    if(!p_sys->context)
+    {
         msg_Err(p_aout, "Failed to allocate context");
         goto fail;
     }
@@ -306,7 +309,6 @@ unlock_and_fail:
     if (p_sys->mainloop)
         pa_threaded_mainloop_unlock(p_sys->mainloop);
 fail:
-    free(p_client_name);
     msg_Dbg(p_aout, "Pulse initialization failed");
     uninit(p_aout);
     return VLC_EGENERIC;
