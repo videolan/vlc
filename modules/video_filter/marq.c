@@ -188,6 +188,7 @@ vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "marquee", "x", "y", "position", "color", "size", "timeout", "refresh",
+    "opacity",
     NULL
 };
 
