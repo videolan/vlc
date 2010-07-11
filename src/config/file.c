@@ -135,17 +135,18 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
 }
 
 
-static int strtoi (const char *str)
+static int64_t strtoi (const char *str)
 {
     char *end;
-    long l;
+    long long l;
 
     errno = 0;
-    l = strtol (str, &end, 0);
+    l = strtoll (str, &end, 0);
 
     if (!errno)
     {
-        if ((l > INT_MAX) || (l < INT_MIN))
+        if ((l > INT64_C(0x7fffffffffffffff))
+         || (l < INT64_C(-0x8000000000000000)))
             errno = ERANGE;
         if (*end)
             errno = EINVAL;
@@ -270,12 +271,12 @@ int config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                 case CONFIG_ITEM_BOOL:
                 case CONFIG_ITEM_INTEGER:
                 {
-                    long l = strtoi (psz_option_value);
+                    int64_t l = strtoi (psz_option_value);
                     if (errno)
                         msg_Warn (p_this, "Integer value (%s) for %s: %m",
                                   psz_option_value, psz_option_name);
                     else
-                        p_item->saved.i = p_item->value.i = (int)l;
+                        p_item->saved.i = p_item->value.i = l;
                     break;
                 }
 
@@ -614,7 +615,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
             if (IsConfigIntegerType (p_item->i_type))
             {
-                int val = b_retain ? p_item->saved.i : p_item->value.i;
+                int64_t val = b_retain ? p_item->saved.i : p_item->value.i;
                 if (p_item->i_type == CONFIG_ITEM_KEY)
                 {
                     char *psz_key = ConfigKeyToString (val);
@@ -629,7 +630,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                                   (p_item->i_type == CONFIG_ITEM_BOOL)
                                       ? N_("boolean") : N_("integer"),
                                   val == p_item->orig.i,
-                                  p_item->psz_name, "%d", val);
+                                  p_item->psz_name, "%"PRId64, val);
                 p_item->saved.i = val;
             }
             else
