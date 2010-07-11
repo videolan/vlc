@@ -181,6 +181,7 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     /* */
     char *psz_old = var_CreateGetString( p_vout, "sout-deinterlace-mode" );
+    var_SetString( p_vout, "sout-deinterlace-mode", psz_mode );
 
     msg_Dbg( p_vout, "deinterlace %d, mode %s, is_needed %d", i_deinterlace, psz_mode, is_needed );
     if( i_deinterlace == 0 || ( i_deinterlace == -1 && !is_needed ) )
