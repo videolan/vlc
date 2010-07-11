@@ -141,7 +141,7 @@ int config_GetType( vlc_object_t *p_this, const char *psz_name )
  * represented by an integer (CONFIG_ITEM_INTEGER and
  * CONFIG_ITEM_BOOL).
  *****************************************************************************/
-int config_GetInt( vlc_object_t *p_this, const char *psz_name )
+int64_t config_GetInt( vlc_object_t *p_this, const char *psz_name )
 {
     module_config_t *p_config;
 
@@ -160,7 +160,7 @@ int config_GetInt( vlc_object_t *p_this, const char *psz_name )
         return -1;
     }
 
-    int val;
+    int64_t val;
 
     vlc_rwlock_rdlock (&config_lock);
     val = p_config->value.i;
@@ -306,7 +306,8 @@ void config_PutPsz( vlc_object_t *p_this,
  * represented by an integer (CONFIG_ITEM_INTEGER and
  * CONFIG_ITEM_BOOL).
  *****************************************************************************/
-void config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
+void config_PutInt( vlc_object_t *p_this, const char *psz_name,
+                    int64_t i_value )
 {
     module_config_t *p_config;
     vlc_value_t oldval;

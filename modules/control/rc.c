@@ -499,7 +499,7 @@ static void Run( intf_thread_t *p_intf )
                     msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
                     free( psz_uri );
                     msg_rc( STATUS_CHANGE "( audio volume: %d )",
-                            config_GetInt( p_intf, "volume" ));
+                            (int)config_GetInt( p_intf, "volume" ));
                 }
                 var_AddCallback( p_input, "intf-event", InputEvent, p_intf );
             }
@@ -900,7 +900,7 @@ static int VolumeChanged( vlc_object_t *p_this, char const *psz_cmd,
 
     vlc_mutex_lock( &p_intf->p_sys->status_lock );
     msg_rc( STATUS_CHANGE "( audio volume: %d )",
-            config_GetInt( p_this, "volume") );
+            (int)config_GetInt( p_this, "volume") );
     vlc_mutex_unlock( &p_intf->p_sys->status_lock );
     return VLC_SUCCESS;
 }
@@ -1414,7 +1414,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
             free( psz_uri );
             msg_rc( STATUS_CHANGE "( audio volume: %d )",
-                    config_GetInt( p_intf, "volume" ));
+                    (int)config_GetInt( p_intf, "volume" ));
 
             PL_LOCK;
             int status = playlist_Status(p_playlist);

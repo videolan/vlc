@@ -137,15 +137,9 @@ struct config_category_t
 typedef union
 {
     char       *psz;
-    int         i;
+    int64_t     i;
     float       f;
 } module_value_t;
-
-typedef union
-{
-    int         i;
-    float       f;
-} module_nvalue_t;
 
 struct module_config_t
 {
@@ -156,8 +150,8 @@ struct module_config_t
     module_value_t value;                                    /* Option value */
     module_value_t orig;
     module_value_t saved;
-    module_nvalue_t min;
-    module_nvalue_t max;
+    module_value_t min;
+    module_value_t max;
 
     /* Function to call when commiting a change */
     vlc_callback_t pf_callback;
@@ -199,8 +193,8 @@ struct module_config_t
  * data.
  *****************************************************************************/
 VLC_EXPORT( int,    config_GetType,  (vlc_object_t *, const char *) LIBVLC_USED );
-VLC_EXPORT( int,    config_GetInt,   (vlc_object_t *, const char *) LIBVLC_USED );
-VLC_EXPORT( void,   config_PutInt,   (vlc_object_t *, const char *, int) );
+VLC_EXPORT( int64_t, config_GetInt,  (vlc_object_t *, const char *) LIBVLC_USED );
+VLC_EXPORT( void,   config_PutInt,   (vlc_object_t *, const char *, int64_t) );
 VLC_EXPORT( float,  config_GetFloat, (vlc_object_t *, const char *) LIBVLC_USED );
 VLC_EXPORT( void,   config_PutFloat, (vlc_object_t *, const char *, float) );
 VLC_EXPORT( char *, config_GetPsz,   (vlc_object_t *, const char *) LIBVLC_USED );

@@ -1542,8 +1542,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
 
                 if( p_item->min.i || p_item->max.i )
                 {
-                    sprintf( psz_buffer, "%s [%i .. %i]", psz_type,
-                             p_item->min.i, p_item->max.i );
+                    sprintf( psz_buffer, "%s [%"PRId64" .. %"PRId64"]",
+                             psz_type, p_item->min.i, p_item->max.i );
                     psz_type = psz_buffer;
                 }
 
