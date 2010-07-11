@@ -254,7 +254,7 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
-    vlc_value_t       val;
+    char              *psz_string;
 
     p_sys = vlc_object_create( p_this, sizeof( sout_stream_sys_t ) );
 
@@ -271,39 +271,36 @@ static int Open( vlc_object_t *p_this )
                    p_stream->p_cfg );
 
     /* Audio transcoding parameters */
-    var_Get( p_stream, SOUT_CFG_PREFIX "aenc", &val );
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "aenc" );
     p_sys->psz_aenc = NULL;
     p_sys->p_audio_cfg = NULL;
-    if( val.psz_string && *val.psz_string )
+    if( psz_string && *psz_string )
     {
         char *psz_next;
         psz_next = config_ChainCreate( &p_sys->psz_aenc, &p_sys->p_audio_cfg,
-                                       val.psz_string );
+                                       psz_string );
         free( psz_next );
     }
-    free( val.psz_string );
+    free( psz_string );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "acodec", &val );
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "acodec" );
     p_sys->i_acodec = 0;
-    if( val.psz_string && *val.psz_string )
+    if( psz_string && *psz_string )
     {
         char fcc[4] = "    ";
-        memcpy( fcc, val.psz_string, __MIN( strlen( val.psz_string ), 4 ) );
+        memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
         p_sys->i_acodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
     }
-    free( val.psz_string );
+    free( psz_string );
 
     p_sys->psz_alang = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "alang" );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "ab", &val );
-    p_sys->i_abitrate = val.i_int;
+    p_sys->i_abitrate = var_GetInteger( p_stream, SOUT_CFG_PREFIX "ab" );
     if( p_sys->i_abitrate < 4000 ) p_sys->i_abitrate *= 1000;
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "samplerate", &val );
-    p_sys->i_sample_rate = val.i_int;
+    p_sys->i_sample_rate = var_GetInteger( p_stream, SOUT_CFG_PREFIX "samplerate" );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "channels", &val );
-    p_sys->i_channels = val.i_int;
+    p_sys->i_channels = var_GetInteger( p_stream, SOUT_CFG_PREFIX "channels" );
 
     if( p_sys->i_acodec )
     {
@@ -319,92 +316,77 @@ static int Open( vlc_object_t *p_this )
                  p_sys->i_channels, p_sys->i_abitrate / 1000 );
     }
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "afilter", &val );
-    if( val.psz_string && *val.psz_string )
-        p_sys->psz_af = val.psz_string;
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "afilter" );
+    if( psz_string && *psz_string )
+        p_sys->psz_af = strdup( psz_string );
     else
-    {
-        free( val.psz_string );
         p_sys->psz_af = NULL;
-    }
+    free( psz_string );
 
     /* Video transcoding parameters */
-    var_Get( p_stream, SOUT_CFG_PREFIX "venc", &val );
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "venc" );
     p_sys->psz_venc = NULL;
     p_sys->p_video_cfg = NULL;
-    if( val.psz_string && *val.psz_string )
+    if( psz_string && *psz_string )
     {
         char *psz_next;
         psz_next = config_ChainCreate( &p_sys->psz_venc, &p_sys->p_video_cfg,
-                                   val.psz_string );
+                                   psz_string );
         free( psz_next );
     }
-    free( val.psz_string );
+    free( psz_string );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "vcodec", &val );
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "vcodec" );
     p_sys->i_vcodec = 0;
-    if( val.psz_string && *val.psz_string )
+    if( psz_string && *psz_string )
     {
         char fcc[4] = "    ";
-        memcpy( fcc, val.psz_string, __MIN( strlen( val.psz_string ), 4 ) );
+        memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
         p_sys->i_vcodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
     }
-    free( val.psz_string );
+    free( psz_string );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "vb", &val );
-    p_sys->i_vbitrate = val.i_int;
+    p_sys->i_vbitrate = var_GetInteger( p_stream, SOUT_CFG_PREFIX "vb" );
     if( p_sys->i_vbitrate < 16000 ) p_sys->i_vbitrate *= 1000;
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "scale", &val );
-    p_sys->f_scale = val.f_float;
+    p_sys->f_scale = var_GetFloat( p_stream, SOUT_CFG_PREFIX "scale" );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "fps", &val );
-    p_sys->f_fps = val.f_float;
+    p_sys->f_fps = var_GetFloat( p_stream, SOUT_CFG_PREFIX "fps" );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "hurry-up", &val );
-    p_sys->b_hurry_up = val.b_bool;
+    p_sys->b_hurry_up = var_GetBool( p_stream, SOUT_CFG_PREFIX "hurry-up" );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "width", &val );
-    p_sys->i_width = val.i_int;
+    p_sys->i_width = var_GetInteger( p_stream, SOUT_CFG_PREFIX "width" );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "height", &val );
-    p_sys->i_height = val.i_int;
+    p_sys->i_height = var_GetInteger( p_stream, SOUT_CFG_PREFIX "height" );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "maxwidth", &val );
-    p_sys->i_maxwidth = val.i_int;
+    p_sys->i_maxwidth = var_GetInteger( p_stream, SOUT_CFG_PREFIX "maxwidth" );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "maxheight", &val );
-    p_sys->i_maxheight = val.i_int;
+    p_sys->i_maxheight = var_GetInteger( p_stream, SOUT_CFG_PREFIX "maxheight" );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "vfilter", &val );
-    if( val.psz_string && *val.psz_string )
-        p_sys->psz_vf2 = val.psz_string;
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "vfilter" );
+    if( psz_string && *psz_string )
+        p_sys->psz_vf2 = strdup(psz_string );
     else
-    {
-        free( val.psz_string );
         p_sys->psz_vf2 = NULL;
-    }
+    free( psz_string );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "deinterlace", &val );
-    p_sys->b_deinterlace = val.b_bool;
+    p_sys->b_deinterlace = var_GetBool( p_stream, SOUT_CFG_PREFIX "deinterlace" );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "deinterlace-module", &val );
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "deinterlace-module" );
     p_sys->psz_deinterlace = NULL;
     p_sys->p_deinterlace_cfg = NULL;
-    if( val.psz_string && *val.psz_string )
+    if( psz_string && *psz_string )
     {
         char *psz_next;
         psz_next = config_ChainCreate( &p_sys->psz_deinterlace,
                                    &p_sys->p_deinterlace_cfg,
-                                   val.psz_string );
+                                   psz_string );
         free( psz_next );
     }
-    free( val.psz_string );
+    free( psz_string );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "threads", &val );
-    p_sys->i_threads = val.i_int;
-    var_Get( p_stream, SOUT_CFG_PREFIX "high-priority", &val );
-    p_sys->b_high_priority = val.b_bool;
+    p_sys->i_threads = var_GetInteger( p_stream, SOUT_CFG_PREFIX "threads" );
+    p_sys->b_high_priority = var_GetBool( p_stream, SOUT_CFG_PREFIX "high-priority" );
 
     if( p_sys->i_vcodec )
     {
@@ -419,50 +401,48 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_spu_cfg = NULL;
     p_sys->i_scodec = 0;
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "senc", &val );
-    if( val.psz_string && *val.psz_string )
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "senc" );
+    if( psz_string && *psz_string )
     {
         char *psz_next;
         psz_next = config_ChainCreate( &p_sys->psz_senc, &p_sys->p_spu_cfg,
-                                   val.psz_string );
+                                   psz_string );
         free( psz_next );
     }
-    free( val.psz_string );
+    free( psz_string );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "scodec", &val );
-    if( val.psz_string && *val.psz_string )
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "scodec" );
+    if( psz_string && *psz_string )
     {
         char fcc[4] = "    ";
-        memcpy( fcc, val.psz_string, __MIN( strlen( val.psz_string ), 4 ) );
+        memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
         p_sys->i_scodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
     }
-    free( val.psz_string );
+    free( psz_string );
 
     if( p_sys->i_scodec )
     {
         msg_Dbg( p_stream, "codec spu=%4.4s", (char *)&p_sys->i_scodec );
     }
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "soverlay", &val );
-    p_sys->b_soverlay = val.b_bool;
+    p_sys->b_soverlay = var_GetBool( p_stream, SOUT_CFG_PREFIX "soverlay" );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "sfilter", &val );
-    if( val.psz_string && *val.psz_string )
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "sfilter" );
+    if( psz_string && *psz_string )
     {
         p_sys->p_spu = spu_Create( p_stream );
         if( p_sys->p_spu )
-            spu_ChangeFilters( p_sys->p_spu, val.psz_string );
+            spu_ChangeFilters( p_sys->p_spu, psz_string );
     }
-    free( val.psz_string );
+    free( psz_string );
 
     /* OSD menu transcoding parameters */
     p_sys->psz_osdenc = NULL;
     p_sys->p_osd_cfg  = NULL;
     p_sys->i_osdcodec = 0;
-    p_sys->b_osd   = false;
+    p_sys->b_osd   = var_GetBool( p_stream, SOUT_CFG_PREFIX "osd" );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "osd", &val );
-    if( val.b_bool )
+    if( p_sys->b_osd )
     {
         char *psz_next;
 
@@ -487,8 +467,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Audio settings */
-    var_Get( p_stream, SOUT_CFG_PREFIX "audio-sync", &val );
-    p_sys->b_master_sync = val.b_bool;
+    p_sys->b_master_sync = var_GetBool( p_stream, SOUT_CFG_PREFIX "audio-sync" );
     if( p_sys->f_fps > 0 ) p_sys->b_master_sync = true;
 
     p_stream->pf_add    = Add;
