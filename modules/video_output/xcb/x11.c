@@ -433,6 +433,8 @@ static void Display (vout_display_t *vd, picture_t *pic)
 
     if (!p_sys->visible)
         goto out;
+    xcb_force_screen_saver (p_sys->conn, XCB_SCREEN_SAVER_RESET);
+
     if (segment != 0)
         ck = xcb_shm_put_image_checked (p_sys->conn, p_sys->window, p_sys->gc,
           /* real width */ pic->p->i_pitch / pic->p->i_pixel_pitch,
