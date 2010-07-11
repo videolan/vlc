@@ -458,7 +458,7 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 
 static void PictureRender (vout_display_t *vd, picture_t *pic)
 {
-   vout_display_sys_t *sys = vd->sys;
+    vout_display_sys_t *sys = vd->sys;
 
     vout_display_opengl_Prepare (&sys->vgl, pic);
 }
