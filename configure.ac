@@ -3390,6 +3390,9 @@ then
       if test "${SYS}" != "darwin"; then
         VLC_ADD_PLUGIN([vout_sdl aout_sdl])
       fi
+      if test "${SYS}" != "mingw32"; then
+        VLC_ADD_LIBS([vout_sdl],[${X_LIBS} ${X_PRE_LIBS} -lX11])
+      fi
       VLC_ADD_CFLAGS([vout_sdl aout_sdl],[${SDL_CFLAGS}])
       VLC_ADD_LIBS([vout_sdl aout_sdl],[${SDL_LIBS}])
 
