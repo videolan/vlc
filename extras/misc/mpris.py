@@ -76,7 +76,7 @@ def NameOwnerChanged(name, new, old):
 
 # Callback for when "TrackChange" signal is emitted
 def TrackChange(Track):
-    # the only mandatory metadata is "URI"
+    # the only mandatory metadata is "location"
     try:
         a = Track["artist"]
     except:
@@ -84,7 +84,7 @@ def TrackChange(Track):
     try:
         t = Track["title"]
     except:
-        t = Track["URI"]
+        t = Track["location"]
     try:
         length = Track["length"]
     except:
@@ -194,7 +194,7 @@ def update(widget):
         t = ""
     if t == "":
         try:
-            t = Track["URI"]
+            t = Track["location"]
         except:
             t = ""
     l_artist.set_text(a)
