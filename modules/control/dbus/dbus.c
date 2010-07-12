@@ -67,7 +67,7 @@ static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Run     ( intf_thread_t * );
 
-static int StateChange( intf_thread_t *, int );
+static int StateChange( intf_thread_t * );
 static int TrackChange( intf_thread_t * );
 static int AllCallback( vlc_object_t*, const char*, vlc_value_t, vlc_value_t, void* );
 
@@ -75,7 +75,6 @@ typedef struct
 {
     int signal;
     int i_node;
-    int i_input_state;
 } callback_info_t;
 
 /*****************************************************************************
@@ -117,6 +116,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_caps = CAPS_NONE;
     p_sys->b_dead = false;
     p_sys->p_input = NULL;
+    p_sys->i_playing_state = -1;
 
     p_sys->b_unique = var_CreateGetBool( p_intf, "dbus-unique-service-id" );
     if( p_sys->b_unique )
@@ -212,7 +212,7 @@ static void Close   ( vlc_object_t *p_this )
 
     if( p_sys->p_input )
     {
-        var_DelCallback( p_sys->p_input, "state", AllCallback, p_intf );
+        var_DelCallback( p_sys->p_input, "intf-event", AllCallback, p_intf );
         vlc_object_release( p_sys->p_input );
     }
 
@@ -280,7 +280,7 @@ static void Run          ( intf_thread_t *p_intf )
                 StatusChangeEmit( p_intf );
                 break;
             case SIGNAL_STATE:
-                StateChange( p_intf, info[i]->i_input_state );
+                StateChange( p_intf );
                 break;
             default:
                 assert(0);
@@ -342,6 +342,8 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
     if( !info )
         return VLC_ENOMEM;
 
+    vlc_mutex_lock( &p_intf->p_sys->lock );
+
     // Wich event is it ?
     if( !strcmp( "item-current", psz_var ) )
         info->signal = SIGNAL_ITEM_CURRENT;
@@ -360,17 +362,24 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
         info->signal = SIGNAL_REPEAT;
     else if( !strcmp( "loop", psz_var ) )
         info->signal = SIGNAL_LOOP;
-    else if( !strcmp( "state", psz_var ) )
+    else if( !strcmp( "intf-event", psz_var ) )
     {
+        dbus_int32_t state;
+        state = (var_GetInteger(p_this, "state") == PAUSE_S) ? 1 : 0;
+
+        if( state == p_intf->p_sys->i_playing_state )
+            goto end;
+
+        p_intf->p_sys->i_playing_state = state;
         info->signal = SIGNAL_STATE;
-        info->i_input_state = newval.i_int;
     }
     else
         assert(0);
 
     // Append the event
-    vlc_mutex_lock( &p_intf->p_sys->lock );
     vlc_array_append( p_intf->p_sys->p_events, info );
+
+end:
     vlc_mutex_unlock( &p_intf->p_sys->lock );
     return VLC_SUCCESS;
 }
@@ -378,9 +387,7 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
 /*****************************************************************************
  * StateChange: callback on input "state"
  *****************************************************************************/
-//static int StateChange( vlc_object_t *p_this, const char* psz_var,
-//            vlc_value_t oldval, vlc_value_t newval, void *p_data )
-static int StateChange( intf_thread_t *p_intf, int i_input_state )
+static int StateChange( intf_thread_t *p_intf )
 {
     intf_sys_t          *p_sys      = p_intf->p_sys;
     playlist_t          *p_playlist = p_sys->p_playlist;
@@ -392,7 +399,7 @@ static int StateChange( intf_thread_t *p_intf, int i_input_state )
 
     UpdateCaps( p_intf );
 
-    if( !p_sys->b_meta_read && i_input_state == PLAYING_S )
+    if( !p_sys->b_meta_read && p_sys->i_playing_state == 0)
     {
         p_input = playlist_CurrentInput( p_playlist );
         if( p_input )
@@ -407,11 +414,7 @@ static int StateChange( intf_thread_t *p_intf, int i_input_state )
         }
     }
 
-    if( i_input_state == PLAYING_S || i_input_state == PAUSE_S ||
-        i_input_state == END_S )
-    {
-        StatusChangeEmit( p_intf );
-    }
+    StatusChangeEmit( p_intf );
 
     return VLC_SUCCESS;
 }
@@ -431,7 +434,7 @@ static int TrackChange( intf_thread_t *p_intf )
 
     if( p_sys->p_input )
     {
-        var_DelCallback( p_sys->p_input, "state", AllCallback, p_intf );
+        var_DelCallback( p_sys->p_input, "intf-event", AllCallback, p_intf );
         vlc_object_release( p_sys->p_input );
         p_sys->p_input = NULL;
     }
@@ -458,7 +461,7 @@ static int TrackChange( intf_thread_t *p_intf )
     }
 
     p_sys->p_input = p_input;
-    var_AddCallback( p_input, "state", AllCallback, p_intf );
+    var_AddCallback( p_input, "intf-event", AllCallback, p_intf );
 
     return VLC_SUCCESS;
 }

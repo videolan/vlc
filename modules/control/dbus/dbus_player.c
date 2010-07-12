@@ -446,24 +446,11 @@ static int MarshalStatus( intf_thread_t* p_intf, DBusMessageIter* args )
 
     DBusMessageIter status;
     dbus_int32_t i_state, i_random, i_repeat, i_loop;
-    int i_val;
     playlist_t* p_playlist = p_intf->p_sys->p_playlist;
-    input_thread_t* p_input = NULL;
 
-    i_state = 2;
-
-    p_input = playlist_CurrentInput( p_playlist );
-    if( p_input )
-    {
-        i_val = var_GetInteger( p_input, "state" );
-        if( i_val >= END_S )
-            i_state = 2;
-        else if( i_val == PAUSE_S )
-            i_state = 1;
-        else if( i_val <= PLAYING_S )
-            i_state = 0;
-        vlc_object_release( p_input );
-    }
+    vlc_mutex_lock( &p_intf->p_sys->lock );
+    i_state = p_intf->p_sys->i_playing_state;
+    vlc_mutex_unlock( &p_intf->p_sys->lock );
 
     i_random = var_CreateGetBool( p_playlist, "random" );
 

@@ -85,6 +85,7 @@ struct intf_sys_t
     playlist_t     *p_playlist;
     bool            b_meta_read;
     dbus_int32_t    i_caps;
+    dbus_int32_t    i_playing_state;
     bool            b_dead;
     vlc_array_t    *p_events;
     vlc_mutex_t     lock;
