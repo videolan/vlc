@@ -250,7 +250,7 @@
                         <property name="can_focus">True</property>
                         <property name="tooltip" translatable="yes">Volume in %</property>
                         <property name="editable">False</property>
-                        <property name="adjustment">100 0 100 1 10 10</property>
+                        <property name="adjustment">100 0 100 1 10 0</property>
                         <property name="snap_to_ticks">True</property>
                         <property name="numeric">True</property>
                         <property name="update_policy">GTK_UPDATE_IF_VALID</property>
