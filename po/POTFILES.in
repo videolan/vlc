@@ -410,8 +410,15 @@ modules/codec/vorbis.c
 modules/codec/wmafixed/wma.c
 modules/codec/x264.c
 modules/codec/zvbi.c
-modules/control/dbus.c
-modules/control/dbus.h
+modules/control/dbus/dbus.c
+modules/control/dbus/dbus.h
+modules/control/dbus/dbus_common.h
+modules/control/dbus/dbus_player.c
+modules/control/dbus/dbus_player.h
+modules/control/dbus/dbus_root.c
+modules/control/dbus/dbus_root.h
+modules/control/dbus/dbus_tracklist.c
+modules/control/dbus/dbus_tracklist.h
 modules/control/gestures.c
 modules/control/globalhotkeys/win32.c
 modules/control/globalhotkeys/xcb.c
