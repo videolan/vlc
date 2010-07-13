@@ -114,6 +114,7 @@ typedef void (*msg_callback_t) (msg_cb_data_t *, msg_item_t *, unsigned);
 
 VLC_EXPORT( msg_subscription_t*, msg_Subscribe, ( libvlc_int_t *, msg_callback_t, msg_cb_data_t * ) );
 VLC_EXPORT( void, msg_Unsubscribe, ( msg_subscription_t * ) );
+VLC_EXPORT( void, msg_SubscriptionSetVerbosity, ( msg_subscription_t *, const int) );
 
 /* Enable or disable a certain object debug messages */
 VLC_EXPORT( void, msg_EnableObjectPrinting, ( vlc_object_t *, const char * psz_object ) );

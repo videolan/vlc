@@ -142,6 +142,7 @@ msg_bank_t *msg_Create (void)
 static void const * kObjectPrintingEnabled = &kObjectPrintingEnabled;
 static void const * kObjectPrintingDisabled = &kObjectPrintingDisabled;
 
+
 #undef msg_EnableObjectPrinting
 void msg_EnableObjectPrinting (vlc_object_t *obj, const char * psz_object)
 {
@@ -202,6 +203,7 @@ struct msg_subscription_t
     libvlc_int_t   *instance;
     msg_callback_t  func;
     msg_cb_data_t  *opaque;
+    int             verbosity;
 };
 
 /**
@@ -224,6 +226,7 @@ msg_subscription_t *msg_Subscribe (libvlc_int_t *instance, msg_callback_t cb,
     sub->instance = instance;
     sub->func = cb;
     sub->opaque = opaque;
+    sub->verbosity = 2; /* by default, give all the messages */
 
     msg_bank_t *bank = libvlc_bank (instance);
     vlc_rwlock_wrlock (&bank->lock);
@@ -247,6 +250,18 @@ void msg_Unsubscribe (msg_subscription_t *sub)
     free (sub);
 }
 
+void msg_SubscriptionSetVerbosity( msg_subscription_t *sub, const int i_verbosity )
+{
+    if( i_verbosity < 0 || i_verbosity > 2 ) return;
+
+    msg_bank_t *bank = libvlc_bank ( sub->instance );
+
+    vlc_rwlock_wrlock (&bank->lock);
+
+    sub->verbosity = i_verbosity;
+
+    vlc_rwlock_unlock (&bank->lock);
+}
 /*****************************************************************************
  * msg_*: print a message
  *****************************************************************************
@@ -454,6 +469,19 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
             if( val == kObjectPrintingDisabled ) continue;
             if( val == kObjectPrintingEnabled  ); /* Allowed */
             else if( !bank->all_objects_enabled ) continue;
+        }
+        switch( p_item->i_type )
+        {
+            case VLC_MSG_INFO:
+            case VLC_MSG_ERR:
+                if( sub->verbosity < 0 ) continue;
+                break;
+            case VLC_MSG_WARN:
+                if( sub->verbosity < 1 ) continue;
+                break;
+            case VLC_MSG_DBG:
+                if( sub->verbosity < 2 ) continue;
+                break;
         }
 
         sub->func (sub->opaque, p_item, 0);
