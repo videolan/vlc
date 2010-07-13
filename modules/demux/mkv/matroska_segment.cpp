@@ -205,6 +205,67 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
     }                                      \
     ep->Up(); } while( 0 )
 
+static const struct {
+    vlc_meta_type_t type;
+    const char *key;
+} metadata_map[] = { {vlc_meta_Title,       "TITLE"},
+                     {vlc_meta_Artist,      "ARTIST"},
+                     {vlc_meta_Genre,       "GENRE"},
+                     {vlc_meta_Copyright,   "COPYRIGHT"},
+                     {vlc_meta_Description, "DESCRIPTION"},
+                     {vlc_meta_Publisher,   "PUBLISHER"},
+                     {vlc_meta_URL,         "URL"},
+                     {vlc_meta_Title,       NULL},
+};
+
+void matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag )
+{
+    EbmlElement *el;
+    EbmlParser *ep = new EbmlParser( &es, tag, &sys.demuxer );
+    char *k = NULL, *v = NULL;
+
+    if( !sys.meta )
+        sys.meta = vlc_meta_New();
+
+    msg_Dbg( &sys.demuxer, "|   + Simple Tag ");
+    while( ( el = ep->Get() ) != NULL )
+    {
+        if( MKV_IS_ID( el, KaxTagName ) )
+        {
+            KaxTagName &key = *(KaxTagName*)el;
+            key.ReadData( es.I_O(), SCOPE_ALL_DATA );
+            k = strdup( UTFstring( key ).GetUTF8().c_str() );
+        }
+        if( MKV_IS_ID( el, KaxTagString ) )
+        {
+            KaxTagString &value = *(KaxTagString*)el;
+            value.ReadData( es.I_O(), SCOPE_ALL_DATA );
+            v = strdup( UTFstring( value ).GetUTF8().c_str() );
+        }
+    }
+    delete ep;
+
+    if( !k || !v )
+    {
+        msg_Warn( &sys.demuxer, "Invalid MKV SimpleTag found.");
+        return;
+    }
+
+    for( int i = 0; metadata_map[i].key; i++ )
+    {
+        if( !strcmp( k, metadata_map[i].key ) )
+        {
+            vlc_meta_Set( sys.meta, metadata_map[i].type, v );
+            goto done;
+        }
+    }
+    vlc_meta_AddExtra( sys.meta, k, v );
+done:
+    free( k );
+    free( v );
+    return;
+}
+
 void matroska_segment_c::LoadTags( KaxTags *tags )
 {
     /* Master elements */
@@ -257,6 +318,8 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                 {
                     msg_Dbg( &sys.demuxer, "|   + Multi Title" );
                 }
+                else if( MKV_IS_ID( el, KaxTagSimple ) )
+                    ParseSimpleTags( static_cast<KaxTagSimple*>( el ) );
                 else
                 {
                     msg_Dbg( &sys.demuxer, "|   + LoadTag Unknown (%s)", typeid( *el ).name() );
@@ -280,6 +343,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
  *****************************************************************************/
 void matroska_segment_c::InformationCreate( )
 {
+#if 0
     sys.meta = vlc_meta_New();
 
     if( psz_title )
@@ -290,7 +354,7 @@ void matroska_segment_c::InformationCreate( )
     {
         vlc_meta_SetDate( sys.meta, psz_date_utc );
     }
-#if 0
+
     if( psz_segment_filename )
     {
         fprintf( stderr, "***** WARNING: Unhandled meta - Use custom\n" );
@@ -558,11 +622,11 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
             ParseChapters( static_cast<KaxChapters*>( el ) );
         i_chapters_position = i_element_position;
     }
-    else if( MKV_IS_ID( el, KaxTag ) ) // FIXME
+    else if( MKV_IS_ID( el, KaxTags ) )
     {
         msg_Dbg( &sys.demuxer, "|   + Tags" );
         if( i_tags_position < 0 )
-            ;//LoadTags( static_cast<KaxTags*>( el ) );
+            LoadTags( static_cast<KaxTags*>( el ) );
         i_tags_position = i_element_position;
     }
     else

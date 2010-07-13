@@ -146,6 +146,7 @@ public:
     void IndexAppendCluster( KaxCluster *cluster );
     void LoadCues( KaxCues *cues );
     void LoadTags( KaxTags *tags );
+    void ParseSimpleTags( KaxTagSimple *tag );
     void InformationCreate( );
     void Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_global_position );
     int BlockGet( KaxBlock * &, KaxSimpleBlock * &, bool *, bool *, int64_t *);
