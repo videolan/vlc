@@ -147,6 +147,8 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     CONNECT( mainTab, currentChanged( int ),
              this, updateTab( int ) );
     CONNECT(vbobjectsEdit, editingFinished(), this, updateConfig());
+    CONNECT( verbosityBox, valueChanged( int ),
+             this, changeVerbosity( int ) );
 
     /* General action */
     readSettings( "Messages", QSize( 600, 450 ) );
@@ -156,6 +158,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     cbData = new msg_cb_data_t;
     cbData->self = this;
     sub = msg_Subscribe( p_intf->p_libvlc, MsgCallback, cbData );
+    changeVerbosity( verbosityBox->value() );
 }
 
 MessagesDialog::~MessagesDialog()
@@ -164,6 +167,11 @@ MessagesDialog::~MessagesDialog()
     msg_Unsubscribe( sub );
     delete cbData;
 };
+
+void MessagesDialog::changeVerbosity( int verbosity )
+{
+    msg_SubscriptionSetVerbosity( sub , verbosity );
+}
 
 void MessagesDialog::updateTab( int index )
 {
@@ -223,10 +231,6 @@ void MessagesDialog::updateConfig()
 
 void MessagesDialog::sinkMessage( msg_item_t *item )
 {
-    if ((item->i_type == VLC_MSG_WARN && verbosityBox->value() < 1)
-     || (item->i_type == VLC_MSG_DBG && verbosityBox->value() < 2 ))
-        return;
-
     /* Copy selected text to the clipboard */
     if( messages->textCursor().hasSelection() )
         messages->copy();

@@ -64,6 +64,7 @@ private slots:
     void clearOrUpdate();
     bool save();
     void updateConfig();
+    void changeVerbosity( int );
 private:
     void clear();
     void updateTree();
