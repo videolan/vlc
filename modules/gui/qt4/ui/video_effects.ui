@@ -1100,40 +1100,64 @@
       <layout class="QGridLayout">
        <item row="3" column="0">
         <widget class="QLabel" name="label_22">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Transparency</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2">
+       <item row="2" column="0">
         <widget class="QLabel" name="label_21">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Left</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2">
+       <item row="1" column="0">
         <widget class="QLabel" name="label_20">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Top</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1" colspan="2">
-        <widget class="QSlider" name="logoOpacitySlider">
-         <property name="maximum">
-          <number>255</number>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_19">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
          </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="tickPosition">
-          <enum>QSlider::TicksBothSides</enum>
-         </property>
-         <property name="tickInterval">
-          <number>32</number>
+         <property name="text">
+          <string>Logo</string>
          </property>
         </widget>
+       </item>
+       <item row="0" column="2" colspan="2">
+        <widget class="QLineEdit" name="logoFileText"/>
        </item>
        <item row="2" column="2">
         <widget class="QSpinBox" name="logoXSpin"/>
@@ -1141,15 +1165,66 @@
        <item row="1" column="2">
         <widget class="QSpinBox" name="logoYSpin"/>
        </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_19">
+       <item row="1" column="3">
+        <widget class="QLabel" name="label_45">
          <property name="text">
-          <string>Logo</string>
+          <string>pixels</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="2">
-        <widget class="QLineEdit" name="logoFileText"/>
+       <item row="2" column="3">
+        <widget class="QLabel" name="label_44">
+         <property name="text">
+          <string>pixels</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2" colspan="2">
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0" colspan="2">
+          <widget class="QSlider" name="logoOpacitySlider">
+           <property name="maximum">
+            <number>255</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="tickPosition">
+            <enum>QSlider::TicksBothSides</enum>
+           </property>
+           <property name="tickInterval">
+            <number>32</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_48">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>none</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="label_49">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>full</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -1168,6 +1243,12 @@
       <layout class="QGridLayout">
        <item row="1" column="0">
         <widget class="QLabel" name="label_16">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Top</string>
          </property>
@@ -1175,6 +1256,12 @@
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_17">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Left</string>
          </property>
@@ -1186,15 +1273,51 @@
        <item row="1" column="1">
         <widget class="QSpinBox" name="eraseYSpin"/>
        </item>
-       <item row="0" column="1">
+       <item row="0" column="1" colspan="2">
         <widget class="QLineEdit" name="eraseMaskText"/>
        </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label_15">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Mask</string>
          </property>
         </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="label_46">
+         <property name="text">
+          <string>pixels</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QLabel" name="label_47">
+         <property name="text">
+          <string>pixels</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="3">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -1254,16 +1377,16 @@
   </widget>
  </widget>
  <tabstops>
+  <tabstop>logoEnable</tabstop>
+  <tabstop>logoFileText</tabstop>
+  <tabstop>logoYSpin</tabstop>
+  <tabstop>logoXSpin</tabstop>
+  <tabstop>logoOpacitySlider</tabstop>
   <tabstop>eraseEnable</tabstop>
   <tabstop>eraseMaskText</tabstop>
   <tabstop>eraseYSpin</tabstop>
   <tabstop>eraseXSpin</tabstop>
-  <tabstop>saturationSlider</tabstop>
-  <tabstop>gammaSlider</tabstop>
-  <tabstop>brightnessThresholdCheck</tabstop>
   <tabstop>sharpenEnable</tabstop>
-  <tabstop>sharpenSigmaSlider</tabstop>
-  <tabstop>transformEnable</tabstop>
   <tabstop>transformTypeCombo</tabstop>
   <tabstop>cropTopPx</tabstop>
   <tabstop>cropLeftPx</tabstop>
@@ -1325,11 +1448,11 @@
   <tabstop>subpictureFilterText</tabstop>
   <tabstop>voutFilterText</tabstop>
   <tabstop>adjustEnable</tabstop>
-  <tabstop>logoEnable</tabstop>
-  <tabstop>logoFileText</tabstop>
-  <tabstop>logoYSpin</tabstop>
-  <tabstop>logoXSpin</tabstop>
-  <tabstop>logoOpacitySlider</tabstop>
+  <tabstop>transformEnable</tabstop>
+  <tabstop>brightnessThresholdCheck</tabstop>
+  <tabstop>gammaSlider</tabstop>
+  <tabstop>sharpenSigmaSlider</tabstop>
+  <tabstop>saturationSlider</tabstop>
  </tabstops>
  <resources/>
  <connections/>
