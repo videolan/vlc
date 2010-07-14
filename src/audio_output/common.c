@@ -28,6 +28,7 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
 #include <assert.h>
 
 #include <vlc_common.h>
@@ -775,6 +776,22 @@ aout_buffer_t *aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
     return block_Alloc( i_alloc_size );
 }
 
+/* Return the order in which filters should be inserted */
+static int FilterOrder( const char *psz_name )
+{
+    static const struct {
+        const char *psz_name;
+        int        i_order;
+    } filter[] = {
+        { NULL,         INT_MAX },
+    };
+    for( int i = 0; filter[i].psz_name; i++ )
+    {
+        if( !strcmp( filter[i].psz_name, psz_name ) )
+            return filter[i].i_order;
+    }
+    return INT_MAX;
+}
 
 /* This function will add or remove a a module from a string list (colon
  * separated). It will return true if there is a modification
@@ -783,60 +800,102 @@ bool aout_ChangeFilterString( vlc_object_t *p_obj, aout_instance_t *p_aout,
                               const char *psz_variable,
                               const char *psz_name, bool b_add )
 {
-    char *psz_val;
-    char *psz_parser;
-
     if( *psz_name == '\0' )
         return false;
 
+    char *psz_list;
     if( p_aout )
-        psz_val = var_GetString( p_aout, psz_variable );
+    {
+        psz_list = var_GetString( p_aout, psz_variable );
+    }
     else
     {
-        psz_val = var_CreateGetString( p_obj->p_libvlc, psz_variable );
+        psz_list = var_CreateGetString( p_obj->p_libvlc, psz_variable );
         var_Destroy( p_obj->p_libvlc, psz_variable );
     }
 
-    if( !psz_val )
-        psz_val = strdup( "" );
+    /* Split the string into an array of filters */
+    int i_count = 1;
+    for( char *p = psz_list; p && *p; p++ )
+        i_count += *p == ':';
+    i_count += b_add;
 
-    psz_parser = strstr( psz_val, psz_name );
-
-    if( ( b_add && psz_parser ) || ( !b_add && !psz_parser ) )
+    const char **ppsz_filter = calloc( i_count, sizeof(*ppsz_filter) );
+    if( !ppsz_filter )
     {
-        /* Nothing to do */
-        free( psz_val );
+        free( psz_list );
+        return false;
+    }
+    bool b_present = false;
+    i_count = 0;
+    for( char *p = psz_list; p && *p; )
+    {
+        char *psz_end = strchr(p, ':');
+        if( psz_end )
+            *psz_end++ = '\0';
+        else
+            psz_end = p + strlen(p);
+        if( *p )
+        {
+            b_present |= !strcmp( p, psz_name );
+            ppsz_filter[i_count++] = p;
+        }
+        p = psz_end;
+    }
+    if( b_present == b_add )
+    {
+        free( ppsz_filter );
+        free( psz_list );
         return false;
     }
 
     if( b_add )
     {
-        char *psz_old = psz_val;
-        if( *psz_old )
+        int i_order = FilterOrder( psz_name );
+        int i;
+        for( i = 0; i < i_count; i++ )
         {
-            if( asprintf( &psz_val, "%s:%s", psz_old, psz_name ) == -1 )
-                psz_val = NULL;
+            if( FilterOrder( ppsz_filter[i] ) > i_order )
+                break;
         }
-        else
-            psz_val = strdup( psz_name );
-        free( psz_old );
+        if( i < i_count )
+            memmove( &ppsz_filter[i+1], &ppsz_filter[i], (i_count - i) * sizeof(*ppsz_filter) );
+        ppsz_filter[i] = psz_name;
+        i_count++;
     }
     else
     {
-        const int i_name = strlen( psz_name );
-        const char *psz_next;
-
-        psz_next = &psz_parser[i_name];
-        if( *psz_next == ':' )
-            psz_next++;
-
-        memmove( psz_parser, psz_next, strlen(psz_next)+1 );
+        for( int i = 0; i < i_count; i++ )
+        {
+            if( !strcmp( ppsz_filter[i], psz_name ) )
+                ppsz_filter[i] = "";
+        }
     }
+    size_t i_length = 0;
+    for( int i = 0; i < i_count; i++ )
+        i_length += 1 + strlen( ppsz_filter[i] );
+
+    char *psz_new = malloc( i_length + 1 );
+    *psz_new = '\0';
+    for( int i = 0; i < i_count; i++ )
+    {
+        if( *ppsz_filter[i] == '\0' )
+            continue;
+        if( *psz_new )
+            strcat( psz_new, ":" );
+        strcat( psz_new, ppsz_filter[i] );
+    }
+    free( ppsz_filter );
+    free( psz_list );
 
     if( p_aout )
-        var_SetString( p_aout, psz_variable, psz_val );
+        var_SetString( p_aout, psz_variable, psz_new );
     else
-        config_PutPsz( p_obj, psz_variable, psz_val );
-    free( psz_val );
+        config_PutPsz( p_obj, psz_variable, psz_new );
+    free( psz_new );
+
     return true;
 }
+
+
+
