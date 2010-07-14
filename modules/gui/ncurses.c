@@ -1995,13 +1995,13 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                 MainBoxWrite( p_intf, l, 1, _("+-[Video Decoding]"));
                 SHOW_ACS( 1, ACS_LTEE );  SHOW_ACS( 2, ACS_HLINE ); l++;
                 if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
-                MainBoxWrite( p_intf, l, 1, _("| video decoded    :    %5i"),
+                MainBoxWrite( p_intf, l, 1, _("| video decoded    :    %"PRId64),
                         p_item->p_stats->i_decoded_video );
                 SHOW_ACS( 1, ACS_VLINE ); l++;
-                MainBoxWrite( p_intf, l, 1, _("| frames displayed :    %5i"),
+                MainBoxWrite( p_intf, l, 1, _("| frames displayed :    %"PRId64),
                         p_item->p_stats->i_displayed_pictures );
                 SHOW_ACS( 1, ACS_VLINE ); l++;
-                MainBoxWrite( p_intf, l, 1, _("| frames lost      :    %5i"),
+                MainBoxWrite( p_intf, l, 1, _("| frames lost      :    %"PRId64),
                         p_item->p_stats->i_lost_pictures );
                 SHOW_ACS( 1, ACS_VLINE ); l++;
                 DrawEmptyLine( p_sys->w, p_sys->i_box_y + l - p_sys->i_box_start, 1, COLS - 2 );
@@ -2014,13 +2014,13 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                 MainBoxWrite( p_intf, l, 1, _("+-[Audio Decoding]"));
                 SHOW_ACS( 1, ACS_LTEE );  SHOW_ACS( 2, ACS_HLINE ); l++;
                 if( p_sys->b_color ) wcolor_set( p_sys->w, C_DEFAULT, NULL );
-                MainBoxWrite( p_intf, l, 1, _("| audio decoded    :    %5i"),
+                MainBoxWrite( p_intf, l, 1, _("| audio decoded    :    %"PRId64),
                         p_item->p_stats->i_decoded_audio );
                 SHOW_ACS( 1, ACS_VLINE ); l++;
-                MainBoxWrite( p_intf, l, 1, _("| buffers played   :    %5i"),
+                MainBoxWrite( p_intf, l, 1, _("| buffers played   :    %"PRId64),
                         p_item->p_stats->i_played_abuffers );
                 SHOW_ACS( 1, ACS_VLINE ); l++;
-                MainBoxWrite( p_intf, l, 1, _("| buffers lost     :    %5i"),
+                MainBoxWrite( p_intf, l, 1, _("| buffers lost     :    %"PRId64),
                         p_item->p_stats->i_lost_abuffers );
                 SHOW_ACS( 1, ACS_VLINE ); l++;
                 DrawEmptyLine( p_sys->w, p_sys->i_box_y + l - p_sys->i_box_start, 1, COLS - 2 );

@@ -23,6 +23,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#define __STDC_FORMAT_MACROS 1
+#define __STDC_CONSTANT_MACROS 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -566,33 +569,33 @@ void InputStatsPanel::update( input_item_t *p_item )
 #define UPDATE( widget, format, calc... ) \
     { QString str; widget->setText( 1 , str.sprintf( format, ## calc ) );  }
 
-    UPDATE( read_media_stat, "%8.0f",
-            (float)(p_item->p_stats->i_read_bytes)/1024);
+    UPDATE( read_media_stat, "%"PRId64,
+            (p_item->p_stats->i_read_bytes / 1024 ) );
     UPDATE( input_bitrate_stat, "%6.0f",
-                    (float)(p_item->p_stats->f_input_bitrate * 8000 ));
-    UPDATE( demuxed_stat, "%8.0f",
-                    (float)(p_item->p_stats->i_demux_read_bytes)/1024 );
+                    (float)(p_item->p_stats->f_input_bitrate *  8000  ));
+    UPDATE( demuxed_stat, "%"PRId64,
+                    (p_item->p_stats->i_demux_read_bytes / 1024 ) );
     UPDATE( stream_bitrate_stat, "%6.0f",
-                    (float)(p_item->p_stats->f_demux_bitrate * 8000 ));
-    UPDATE( corrupted_stat, "%5i", p_item->p_stats->i_demux_corrupted );
-    UPDATE( discontinuity_stat, "%5i", p_item->p_stats->i_demux_discontinuity );
+                    (float)(p_item->p_stats->f_demux_bitrate *  8000  ));
+    UPDATE( corrupted_stat, "%"PRId64, p_item->p_stats->i_demux_corrupted );
+    UPDATE( discontinuity_stat, "%"PRId64, p_item->p_stats->i_demux_discontinuity );
 
     /* Video */
-    UPDATE( vdecoded_stat, "%5i", p_item->p_stats->i_decoded_video );
-    UPDATE( vdisplayed_stat, "%5i", p_item->p_stats->i_displayed_pictures );
-    UPDATE( vlost_frames_stat, "%5i", p_item->p_stats->i_lost_pictures );
+    UPDATE( vdecoded_stat, "%"PRId64, p_item->p_stats->i_decoded_video );
+    UPDATE( vdisplayed_stat, "%"PRId64, p_item->p_stats->i_displayed_pictures );
+    UPDATE( vlost_frames_stat, "%"PRId64, p_item->p_stats->i_lost_pictures );
 
     /* Sout */
-    UPDATE( send_stat, "%5i", p_item->p_stats->i_sent_packets );
-    UPDATE( send_bytes_stat, "%8.0f",
-            (float)(p_item->p_stats->i_sent_bytes)/1024 );
+    UPDATE( send_stat, "%"PRId64, p_item->p_stats->i_sent_packets );
+    UPDATE( send_bytes_stat, "%"PRId64,
+            (p_item->p_stats->i_sent_bytes)/ 1024 );
     UPDATE( send_bitrate_stat, "%6.0f",
-            (float)(p_item->p_stats->f_send_bitrate*8)*1000 );
+            (float)(p_item->p_stats->f_send_bitrate * 8000 ) );
 
     /* Audio*/
-    UPDATE( adecoded_stat, "%5i", p_item->p_stats->i_decoded_audio );
-    UPDATE( aplayed_stat, "%5i", p_item->p_stats->i_played_abuffers );
-    UPDATE( alost_stat, "%5i", p_item->p_stats->i_lost_abuffers );
+    UPDATE( adecoded_stat, "%"PRId64, p_item->p_stats->i_decoded_audio );
+    UPDATE( aplayed_stat, "%"PRId64, p_item->p_stats->i_played_abuffers );
+    UPDATE( alost_stat, "%"PRId64, p_item->p_stats->i_lost_abuffers );
 
 #undef UPDATE
 

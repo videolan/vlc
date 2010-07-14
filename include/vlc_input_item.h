@@ -277,35 +277,35 @@ struct input_stats_t
     vlc_mutex_t         lock;
 
     /* Input */
-    int i_read_packets;
-    int i_read_bytes;
+    int64_t i_read_packets;
+    int64_t i_read_bytes;
     float f_input_bitrate;
     float f_average_input_bitrate;
 
     /* Demux */
-    int i_demux_read_packets;
-    int i_demux_read_bytes;
+    int64_t i_demux_read_packets;
+    int64_t i_demux_read_bytes;
     float f_demux_bitrate;
     float f_average_demux_bitrate;
-    int i_demux_corrupted;
-    int i_demux_discontinuity;
+    int64_t i_demux_corrupted;
+    int64_t i_demux_discontinuity;
 
     /* Decoders */
-    int i_decoded_audio;
-    int i_decoded_video;
+    int64_t i_decoded_audio;
+    int64_t i_decoded_video;
 
     /* Vout */
-    int i_displayed_pictures;
-    int i_lost_pictures;
+    int64_t i_displayed_pictures;
+    int64_t i_lost_pictures;
 
     /* Sout */
-    int i_sent_packets;
-    int i_sent_bytes;
+    int64_t i_sent_packets;
+    int64_t i_sent_bytes;
     float f_send_bitrate;
 
     /* Aout */
-    int i_played_abuffers;
-    int i_lost_abuffers;
+    int64_t i_played_abuffers;
+    int64_t i_lost_abuffers;
 };
 
 #endif

@@ -127,7 +127,7 @@ int stats_Get( vlc_object_t *p_this, counter_t *p_counter, vlc_value_t *val )
                         p_counter->pp_samples[1]->value.i_int ) /
                     (float)(  p_counter->pp_samples[0]->date -
                               p_counter->pp_samples[1]->date );
-            val->i_int = (int)f;
+            val->i_int = (int64_t)f;
         }
         else
         {
@@ -232,9 +232,9 @@ void stats_DumpInputStats( input_stats_t *p_stats  )
     vlc_mutex_lock( &p_stats->lock );
     /* f_bitrate is in bytes / microsecond
      * *1000 => bytes / millisecond => kbytes / seconds */
-    fprintf( stderr, "Input : %i (%i bytes) - %f kB/s - "
-                     "Demux : %i (%i bytes) - %f kB/s\n"
-                     " - Vout : %i/%i - Aout : %i/%i - Sout : %f\n",
+    fprintf( stderr, "Input : %"PRId64" (%"PRId64" bytes) - %f kB/s - "
+                     "Demux : %"PRId64" (%"PRId64" bytes) - %f kB/s\n"
+                     " - Vout : %"PRId64"/%"PRId64" - Aout : %"PRId64"/%"PRId64" - Sout : %f\n",
                     p_stats->i_read_packets, p_stats->i_read_bytes,
                     p_stats->f_input_bitrate * 1000,
                     p_stats->i_demux_read_packets, p_stats->i_demux_read_bytes,
@@ -560,7 +560,7 @@ static void TimerDump( vlc_object_t *p_obj, counter_t *p_counter,
         return;
 
     mtime_t last, total;
-    int i_total;
+    int64_t i_total;
     if( p_counter->i_samples != 2 )
     {
         msg_Err( p_obj, "timer %s does not exist", p_counter->psz_name );
@@ -581,14 +581,14 @@ static void TimerDump( vlc_object_t *p_obj, counter_t *p_counter,
     if( b_total )
     {
         msg_Dbg( p_obj,
-             "TIMER %s : %.3f ms - Total %.3f ms / %i intvls (Avg %.3f ms)",
+             "TIMER %s : %.3f ms - Total %.3f ms / %"PRId64" intvls (Avg %.3f ms)",
              p_counter->psz_name, (float)last/1000, (float)total/1000, i_total,
              (float)(total)/(1000*(float)i_total ) );
     }
     else
     {
         msg_Dbg( p_obj,
-             "TIMER %s : Total %.3f ms / %i intvls (Avg %.3f ms)",
+             "TIMER %s : Total %.3f ms / %"PRId64" intvls (Avg %.3f ms)",
              p_counter->psz_name, (float)total/1000, i_total,
              (float)(total)/(1000*(float)i_total ) );
     }
