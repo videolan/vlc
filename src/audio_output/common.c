@@ -793,8 +793,8 @@ bool aout_ChangeFilterString( vlc_object_t *p_obj, aout_instance_t *p_aout,
         psz_val = var_GetString( p_aout, psz_variable );
     else
     {
-        psz_val = var_CreateGetString( p_obj->p_libvlc, "audio-filter" );
-        var_Destroy( p_obj->p_libvlc, "audio-filter" );
+        psz_val = var_CreateGetString( p_obj->p_libvlc, psz_variable );
+        var_Destroy( p_obj->p_libvlc, psz_variable );
     }
 
     if( !psz_val )
