@@ -60,8 +60,14 @@
       <string>Codecs</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="7" column="0">
+      <item row="8" column="0">
        <widget class="QLabel" name="filterLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Skip H.264 in-loop deblocking filter</string>
         </property>
@@ -70,11 +76,17 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="1" colspan="2">
+      <item row="8" column="1" colspan="2">
        <widget class="QComboBox" name="loopFilterBox"/>
       </item>
-      <item row="13" column="0">
+      <item row="14" column="0">
        <widget class="QLabel" name="x264Label">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>x264 profile and level selection</string>
         </property>
@@ -83,14 +95,14 @@
         </property>
        </widget>
       </item>
-      <item row="13" column="1">
-       <widget class="QComboBox" name="profileBox"/>
-      </item>
-      <item row="13" column="2">
-       <widget class="QLineEdit" name="levelBox"/>
-      </item>
-      <item row="12" column="0">
+      <item row="13" column="0">
        <widget class="QLabel" name="x264profileLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>x264 preset and tuning selection</string>
         </property>
@@ -99,10 +111,17 @@
         </property>
        </widget>
       </item>
-      <item row="12" column="1">
-       <widget class="QComboBox" name="presetBox"/>
+      <item row="13" column="1">
+       <widget class="QComboBox" name="presetBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
-      <item row="12" column="2">
+      <item row="13" column="2">
        <widget class="QComboBox" name="tuneBox"/>
       </item>
       <item row="2" column="0">
@@ -121,14 +140,14 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0" colspan="2">
        <widget class="QCheckBox" name="hwAccelBox">
         <property name="text">
          <string>Use GPU acceleration (experimental)</string>
         </property>
        </widget>
       </item>
-      <item row="8" column="0" colspan="3">
+      <item row="9" column="0" colspan="3">
        <widget class="QCheckBox" name="skipFrames">
         <property name="text">
          <string>Skip frames</string>
@@ -140,6 +159,12 @@
       </item>
       <item row="2" column="1">
        <widget class="QSpinBox" name="PostProcLevel">
+        <property name="maximumSize">
+         <size>
+          <width>50</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="alignment">
          <set>Qt::AlignRight</set>
         </property>
@@ -154,17 +179,30 @@
         </property>
        </widget>
       </item>
-      <item row="10" column="0">
+      <item row="11" column="0" colspan="2">
        <widget class="QCheckBox" name="systemCodecBox">
         <property name="text">
          <string>Use system codecs if available (better quality, but dangerous)</string>
         </property>
        </widget>
       </item>
-      <item row="11" column="0" colspan="3">
+      <item row="12" column="0" colspan="3">
        <widget class="Line" name="line">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="14" column="2">
+       <widget class="QLineEdit" name="levelBox"/>
+      </item>
+      <item row="14" column="1">
+       <widget class="QComboBox" name="profileBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>
