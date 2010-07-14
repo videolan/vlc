@@ -28,10 +28,6 @@
 #ifndef LIBVLC_MODULES_H
 # define LIBVLC_MODULES_H 1
 
-
-/* Number of tries before we unload an unused module */
-#define MODULE_HIDE_DELAY 50
-
 /*****************************************************************************
  * module_bank_t: the module bank
  *****************************************************************************

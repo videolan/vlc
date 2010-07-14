@@ -189,6 +189,9 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
         {
             unsigned i_shortcuts = va_arg (ap, unsigned);
             unsigned index = module->i_shortcuts;
+            /* The cache loader accept only a small number of shortcuts */
+            assert(i_shortcuts + index <= MODULE_SHORTCUT_MAX);
+
             const char *const *tab = va_arg (ap, const char *const *);
             const char **pp = realloc (module->pp_shortcuts,
                                        sizeof (pp[0]) * (index + i_shortcuts));
