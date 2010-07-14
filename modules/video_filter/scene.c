@@ -319,6 +319,9 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
     else
     {
         /* switch to the final destination */
+#if defined (WIN32)
+        vlc_unlink( psz_filename );
+#endif
         i_ret = vlc_rename( psz_temp, psz_filename );
         if( i_ret == -1 )
         {
