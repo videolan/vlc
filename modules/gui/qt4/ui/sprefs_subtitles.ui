@@ -55,6 +55,12 @@
      <layout class="QGridLayout">
       <item row="0" column="0">
        <widget class="QLabel" name="subLangLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Preferred subtitles language</string>
         </property>
@@ -75,6 +81,12 @@
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="encodLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Default encoding</string>
         </property>
@@ -97,6 +109,12 @@
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="fontEffectLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Effect</string>
         </property>
@@ -110,6 +128,12 @@
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="fontColorLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Font color</string>
         </property>
@@ -123,6 +147,12 @@
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="fontSizeLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Font size</string>
         </property>
@@ -136,6 +166,12 @@
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="fontLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Font</string>
         </property>
@@ -162,6 +198,12 @@
       </item>
       <item row="4" column="0">
        <widget class="QLabel" name="subsPosLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Force subtitle position</string>
         </property>
