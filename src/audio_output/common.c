@@ -774,3 +774,69 @@ aout_buffer_t *aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
 
     return block_Alloc( i_alloc_size );
 }
+
+
+/* This function will add or remove a a module from a string list (colon
+ * separated). It will return true if there is a modification
+ * In case p_aout is NULL, we will use configuration instead of variable */
+bool aout_ChangeFilterString( vlc_object_t *p_obj, aout_instance_t *p_aout,
+                              const char *psz_variable,
+                              const char *psz_name, bool b_add )
+{
+    char *psz_val;
+    char *psz_parser;
+
+    if( *psz_name == '\0' )
+        return false;
+
+    if( p_aout )
+        psz_val = var_GetString( p_aout, psz_variable );
+    else
+    {
+        psz_val = var_CreateGetString( p_obj->p_libvlc, "audio-filter" );
+        var_Destroy( p_obj->p_libvlc, "audio-filter" );
+    }
+
+    if( !psz_val )
+        psz_val = strdup( "" );
+
+    psz_parser = strstr( psz_val, psz_name );
+
+    if( ( b_add && psz_parser ) || ( !b_add && !psz_parser ) )
+    {
+        /* Nothing to do */
+        free( psz_val );
+        return false;
+    }
+
+    if( b_add )
+    {
+        char *psz_old = psz_val;
+        if( *psz_old )
+        {
+            if( asprintf( &psz_val, "%s:%s", psz_old, psz_name ) == -1 )
+                psz_val = NULL;
+        }
+        else
+            psz_val = strdup( psz_name );
+        free( psz_old );
+    }
+    else
+    {
+        const int i_name = strlen( psz_name );
+        const char *psz_next;
+
+        psz_next = &psz_parser[i_name];
+        if( *psz_next == ':' )
+            psz_next++;
+
+        memmove( psz_parser, psz_next, strlen(psz_next)+1 );
+    }
+
+    if( p_aout )
+        var_SetString( p_aout, psz_variable, psz_val );
+    else
+        config_PutPsz( p_obj, psz_variable, psz_val );
+    free( psz_val );
+    return true;
+}

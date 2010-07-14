@@ -843,8 +843,8 @@ vout_thread_t *aout_filter_RequestVout( filter_t *p_filter,
 static int ChangeFiltersString( aout_instance_t * p_aout, const char* psz_variable,
                                  const char *psz_name, bool b_add )
 {
-    return AoutChangeFilterString( VLC_OBJECT(p_aout), p_aout,
-                                   psz_variable, psz_name, b_add ) ? 1 : 0;
+    return aout_ChangeFilterString( VLC_OBJECT(p_aout), p_aout,
+                                    psz_variable, psz_name, b_add ) ? 1 : 0;
 }
 
 static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
