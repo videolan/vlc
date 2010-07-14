@@ -55,7 +55,7 @@ body { font-family: 'sans'; font-size: 8pt; font-weight: 400; }
 p > span { color: #838383; }
 &lt;/style&gt;&lt;/head&gt;&lt;body&gt;
 &lt;p&gt;&lt;span&gt;http://www.example.com/stream.avi&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;&lt;span&gt;rtp://@1234&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span&gt;rtp://@:1234&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;&lt;span&gt;mms://mms.examples.com/stream.asx&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;&lt;span&gt;rtsp://server.example.org:8080/test.sdp&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;&lt;span&gt;http://www.yourtube.com/watch?v=gg64x&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
