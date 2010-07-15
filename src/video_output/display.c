@@ -286,8 +286,8 @@ struct vout_display_owner_sys_t {
     } sar_initial;
 
     /* */
-    int  width_saved;
-    int  height_saved;
+    unsigned width_saved;
+    unsigned height_saved;
 
     struct {
         unsigned num;
