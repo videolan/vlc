@@ -3623,6 +3623,9 @@ then
   then
     VLC_ADD_PLUGIN([aa])
     VLC_ADD_LIBS([aa],[-laa])
+    if test "${SYS}" != "mingw32"; then
+      VLC_ADD_LIBS([aa],[${X_LIBS} ${X_PRE_LIBS} -lX11])
+    fi
   fi
 fi
 
