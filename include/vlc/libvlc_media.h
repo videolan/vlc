@@ -401,7 +401,7 @@ libvlc_media_parse( libvlc_media_t *p_md );
  * Parse a media.
  *
  * This fetches (local) meta data and tracks information.
- * The method is the asynchronous of libvlc_media_parse_async().
+ * The method is the asynchronous of libvlc_media_parse().
  *
  * To track when this is over you can listen to libvlc_MediaParsedChanged
  * event. However if the media was already parsed you will not receive this
