@@ -322,7 +322,7 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_t* p_demux, demux_met
     vlc_meta_SetArtURL( p_meta, "attachment://cover" );
 }
 
-#ifdef TAGLIB_WITH_MP4
+#if defined(TAGLIB_WITH_MP4) && defined(HAVE_TAGLIB_MP4COVERART_H)
 static void ReadMetaFromMP4( MP4::Tag* tag, demux_t *p_demux, demux_meta_t *p_demux_meta, vlc_meta_t* p_meta )
 {
     if( tag->itemListMap().contains("covr") )
@@ -430,7 +430,7 @@ static int ReadMeta( vlc_object_t* p_this)
         else if( flac->xiphComment() )
             ReadMetaFromXiph( flac->xiphComment(), p_demux, p_demux_meta, p_meta );
     }
-#ifdef TAGLIB_WITH_MP4
+#if defined(TAGLIB_WITH_MP4) && defined(HAVE_TAGLIB_MP4COVERART_H)
     else if( MP4::File *mp4 = dynamic_cast<MP4::File*>(f.file()) )
     {
         if( mp4->tag() )

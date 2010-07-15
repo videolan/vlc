@@ -1696,7 +1696,11 @@ AC_ARG_ENABLE(taglib,
     PKG_CHECK_MODULES(TAGLIB, taglib >= 1.5,
       [ VLC_ADD_PLUGIN([taglib])
         VLC_ADD_LIBS([taglib],[$TAGLIB_LIBS -lz])
-       VLC_ADD_CXXFLAGS([taglib],[$TAGLIB_CFLAGS]) ],
+        VLC_ADD_CXXFLAGS([taglib],[$TAGLIB_CFLAGS])
+        AC_LANG_PUSH(C++)
+        AC_CHECK_HEADERS(taglib/mp4coverart.h)
+        AC_LANG_POP(C++)
+      ],
       [AC_MSG_WARN(TagLib library not found)])
   ])
 
