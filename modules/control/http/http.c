@@ -438,7 +438,7 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
         if( p_item )
         {
             vlc_mutex_lock( &p_item->p_stats->lock );
-#define STATS_INT( n ) sprintf( stats, "%d", p_item->p_stats->i_ ## n ); \
+#define STATS_INT( n ) sprintf( stats, "%"PRIi64, p_item->p_stats->i_ ## n ); \
                        mvar_AppendNewVar( p_args->vars, #n, stats );
 #define STATS_FLOAT( n ) sprintf( stats, "%f", p_item->p_stats->f_ ## n ); \
                        mvar_AppendNewVar( p_args->vars, #n, stats );
