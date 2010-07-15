@@ -267,7 +267,7 @@ int stats_Get (vlc_object_t*, counter_t *, vlc_value_t*);
 void stats_CounterClean (counter_t * );
 
 static inline int stats_GetInteger( vlc_object_t *p_obj, counter_t *p_counter,
-                                    int *value )
+                                    int64_t *value )
 {
     int i_ret;
     vlc_value_t val; val.i_int = 0;
