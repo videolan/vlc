@@ -2636,7 +2636,7 @@ dnl
 dnl   libid3tag support (FIXME!!! doesn't work with new input)
 dnl
 AC_ARG_ENABLE( id3tag,
-[  --disable-id3tag        id3tag metadata reader plugin (default disabled)])
+[  --enable-id3tag         id3tag metadata reader plugin (default disabled)])
 AS_IF([test "${enable_id3tag}" = "yes"], [
   AC_CHECK_HEADERS(id3tag.h, [
       AS_IF([test "${have_zlib}" = "yes"],[
