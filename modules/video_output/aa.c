@@ -67,7 +67,7 @@ vlc_module_end()
  *****************************************************************************/
 static picture_pool_t *Pool   (vout_display_t *, unsigned);
 static void            Prepare(vout_display_t *, picture_t *);
-static void            Display(vout_display_t *, picture_t *);
+static void            PictureDisplay(vout_display_t *, picture_t *);
 static int             Control(vout_display_t *, int, va_list);
 
 /* */
@@ -130,7 +130,7 @@ static int Open(vlc_object_t *object)
 
     vd->pool    = Pool;
     vd->prepare = Prepare;
-    vd->display = Display;
+    vd->display = PictureDisplay;
     vd->control = Control;
     vd->manage  = Manage;
 
@@ -216,7 +216,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture)
 /**
  * Display a picture
  */
-static void Display(vout_display_t *vd, picture_t *picture)
+static void PictureDisplay(vout_display_t *vd, picture_t *picture)
 {
     vout_display_sys_t *sys = vd->sys;
 
