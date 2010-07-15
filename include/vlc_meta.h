@@ -63,7 +63,7 @@ typedef enum vlc_meta_type_t
  */
 struct vlc_meta_t;
 
-VLC_EXPORT(vlc_meta_t *, vlc_meta_New, ( void ));
+VLC_EXPORT(vlc_meta_t *, vlc_meta_New, ( void ) LIBVLC_USED );
 VLC_EXPORT(void,         vlc_meta_Delete, ( vlc_meta_t *m ));
 VLC_EXPORT(void,         vlc_meta_Set, ( vlc_meta_t *p_meta, vlc_meta_type_t meta_type, const char *psz_val ));
 VLC_EXPORT(const char *, vlc_meta_Get, ( const vlc_meta_t *p_meta, vlc_meta_type_t meta_type ));
@@ -76,7 +76,7 @@ VLC_EXPORT(unsigned,     vlc_meta_GetExtraCount, ( const vlc_meta_t *m ));
  * Allocate a copy of all extra meta names and a table with it.
  * Be sure to free both the returned pointers and its name.
  */
-VLC_EXPORT(char **,      vlc_meta_CopyExtraNames, ( const vlc_meta_t *m ));
+VLC_EXPORT(char **,      vlc_meta_CopyExtraNames, ( const vlc_meta_t *m ) LIBVLC_USED );
 
 VLC_EXPORT(void,         vlc_meta_Merge, ( vlc_meta_t *dst, const vlc_meta_t *src ));
 

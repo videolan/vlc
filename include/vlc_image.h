@@ -59,7 +59,7 @@ struct image_handler_t
     filter_t  *p_filter;
 };
 
-VLC_EXPORT( image_handler_t *, image_HandlerCreate, ( vlc_object_t * ) );
+VLC_EXPORT( image_handler_t *, image_HandlerCreate, ( vlc_object_t * ) LIBVLC_USED );
 #define image_HandlerCreate( a ) image_HandlerCreate( VLC_OBJECT(a) )
 VLC_EXPORT( void, image_HandlerDelete, ( image_handler_t * ) );
 

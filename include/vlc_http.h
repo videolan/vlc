@@ -62,6 +62,6 @@ VLC_EXPORT( int, http_auth_ParseAuthenticationInfoHeader,
 VLC_EXPORT( char *, http_auth_FormatAuthorizationHeader,
             ( vlc_object_t *, http_auth_t *,
               const char *, const char *,
-              const char *, const char * ) );
+              const char *, const char * ) LIBVLC_USED );
 
 #endif /* VLC_HTTP_H */

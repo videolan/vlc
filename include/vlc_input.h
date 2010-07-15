@@ -526,10 +526,10 @@ enum input_query_e
  * Prototypes
  *****************************************************************************/
 
-VLC_EXPORT( input_thread_t *, input_Create, ( vlc_object_t *p_parent, input_item_t *, const char *psz_log, input_resource_t * ) );
+VLC_EXPORT( input_thread_t *, input_Create, ( vlc_object_t *p_parent, input_item_t *, const char *psz_log, input_resource_t * ) LIBVLC_USED );
 #define input_Create(a,b,c,d) input_Create(VLC_OBJECT(a),b,c,d)
 
-VLC_EXPORT( input_thread_t *, input_CreateAndStart, ( vlc_object_t *p_parent, input_item_t *, const char *psz_log ) );
+VLC_EXPORT( input_thread_t *, input_CreateAndStart, ( vlc_object_t *p_parent, input_item_t *, const char *psz_log ) LIBVLC_USED );
 #define input_CreateAndStart(a,b,c) input_CreateAndStart(VLC_OBJECT(a),b,c)
 
 VLC_EXPORT( int,  input_Start, ( input_thread_t * ) );
@@ -549,7 +549,7 @@ VLC_EXPORT( int, input_Control,  ( input_thread_t *, int i_query, ...  ) );
  * You have to keep a reference to the input or to the input_item_t until
  * you do not need it anymore.
  */
-VLC_EXPORT( input_item_t*, input_GetItem, ( input_thread_t * ) );
+VLC_EXPORT( input_item_t*, input_GetItem, ( input_thread_t * ) LIBVLC_USED );
 
 /**
  * It will return the current state of the input.
@@ -636,7 +636,7 @@ static inline int input_ModifyPcrSystem( input_thread_t *p_input, bool b_absolut
 
 /* */
 typedef struct input_clock_t input_clock_t;
-VLC_EXPORT( decoder_t *, input_DecoderNew, ( input_thread_t *, es_format_t *, input_clock_t *, sout_instance_t * ) );
+VLC_EXPORT( decoder_t *, input_DecoderNew, ( input_thread_t *, es_format_t *, input_clock_t *, sout_instance_t * ) LIBVLC_USED );
 VLC_EXPORT( void, input_DecoderDelete, ( decoder_t * ) );
 VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t *, bool b_do_pace ) );
 
@@ -652,7 +652,7 @@ VLC_EXPORT( void, input_SplitMRL, ( const char **ppsz_access, const char **ppsz_
 /**
  * This function creates a sane filename path.
  */
-VLC_EXPORT( char *, input_CreateFilename, ( vlc_object_t *, const char *psz_path, const char *psz_prefix, const char *psz_extension ) );
+VLC_EXPORT( char *, input_CreateFilename, ( vlc_object_t *, const char *psz_path, const char *psz_prefix, const char *psz_extension ) LIBVLC_USED );
 
 /**
  * It creates an empty input resource handler.
@@ -660,7 +660,7 @@ VLC_EXPORT( char *, input_CreateFilename, ( vlc_object_t *, const char *psz_path
  * The given object MUST stay alive as long as the input_resource_t is
  * not deleted.
  */
-VLC_EXPORT( input_resource_t *, input_resource_New, ( vlc_object_t * ) );
+VLC_EXPORT( input_resource_t *, input_resource_New, ( vlc_object_t * ) LIBVLC_USED );
 
 /**
  * It releases an input resource.
