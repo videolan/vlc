@@ -271,7 +271,11 @@ void FileOpenPanel::updateMRL()
                 fileList << ui.fileListWidg->item( i )->text();
         }
     else
+    {
         fileList = dialogBox->selectedFiles();
+        for( int i = 0; i < fileList.count(); i++ )
+            fileList[i] = toNativeSeparators( fileList[i] );
+    }
 
     /* Options */
     if( ui.subCheckBox->isChecked() &&  !ui.subInput->text().isEmpty() ) {
