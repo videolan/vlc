@@ -702,7 +702,7 @@ npvlc=vlc-$(VERSION)/mozilla/npvlc$(LIBEXT)
 axvlc=vlc-$(VERSION)/activex/axvlc$(LIBEXT)
 win32_lua_destdir=$(win32_destdir)/lua
 win32_http_destdir=$(win32_destdir)/http
-destdir=_win32
+destdir=$(prefix)
 
 #Win-common is for win32 and wince
 package-win-common: install
