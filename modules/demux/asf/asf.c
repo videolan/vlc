@@ -466,11 +466,17 @@ static int DemuxPacket( demux_t *p_demux )
         goto loop_error_recovery;
     }
 
+    if( i_packet_length < i_data_packet_min )
+    {
+        /* if packet length too short, there is extra padding */
+        i_packet_padding_length += i_data_packet_min - i_packet_length;
+        i_packet_length = i_data_packet_min;
+    }
+
     i_packet_send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
     i_packet_duration  = GetWLE( p_peek + i_skip ); i_skip += 2;
 
-    /* FIXME I have to do that for some file, I don't known why */
-    i_packet_size_left = i_data_packet_min /*i_packet_length*/ ;
+    i_packet_size_left = i_packet_length;
 
     if( b_packet_multiple_payload )
     {
