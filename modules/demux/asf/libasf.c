@@ -654,7 +654,7 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
        return VLC_EGENERIC;
 
     ASF_GetGUID( &p_cl->i_reserved, p_peek + 24 );
-    p_cl->i_codec_entries_count = GetWLE( p_peek + 40 );
+    p_cl->i_codec_entries_count = GetDWLE( p_peek + 40 );
 
     p_data = p_peek + 44;
 
