@@ -734,7 +734,7 @@ package-win-common: install
 	cp $(srcdir)/share/icons/vlc.ico $(win32_destdir)/
 
 # Locales
-	cp -r $(destdir)/share/locale $(win32_destdir) || true
+	-cp -r $(destdir)/share/locale $(win32_destdir)/
 
 # Plugins
 	cp -r $(destdir)/lib/vlc/plugins $(win32_destdir)
