@@ -719,7 +719,7 @@ package-win-common: install
 	fi
 
 # Executables, major libs+manifests
-	find $(destdir) -maxdepth 4 -name "*$(LIBEXT)" -o -name "*$(EXEEXT)" -exec cp {} "$(win32_destdir)/" \;
+	find $(destdir) -maxdepth 4 \( -name "*$(LIBEXT)" -o -name "*$(EXEEXT)" \) -exec cp {} "$(win32_destdir)/" \;
 	for file in $(top_srcdir)/extras/package/win32/vlc$(EXEEXT).manifest \
                 $(top_srcdir)/extras/package/win32/libvlc$(LIBEXT).manifest; \
 	    do cp $$file "$(win32_destdir)/" ; done;
@@ -819,16 +819,16 @@ if BUILD_ACTIVEX
 	cp $(srcdir)/projects/activex/test.html $(win32_destdir)/sdk/
 endif
 
-	find $(win32_destdir) -type f -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*lua' -exec $(U2D) {} \;
+	find $(win32_destdir) -type f \( -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*.lua' \) -exec $(U2D) {} \;
 
 #Enable DEP and ASLR for all the binaries
 if USE_PEFLAGS
-	find $(win32_destdir) -type f -name '*$(LIBEXT)' -print -o -name '*$(EXEEXT)' -print -exec $(PEFLAGS) --dynamicbase=true --nxcompat=true {} \;
+	find $(win32_destdir) -type f \( -name '*$(LIBEXT)' -print -o -name '*$(EXEEXT)' -print \) -exec $(PEFLAGS) --dynamicbase=true --nxcompat=true {} \;
 endif
 
 # Strip DLLs
 package-win-base: package-win-common
-	find $(win32_destdir) -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' | while read i; \
+	find $(win32_destdir) -type f \( -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' \) | while read i; \
 	do if test -n "$$i" ; then \
 	    $(OBJCOPY) --only-keep-debug "$$i" "$$i.dbg"; \
 	    $(OBJCOPY) --strip-all "$$i" ; \
