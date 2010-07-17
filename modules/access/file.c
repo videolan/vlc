@@ -104,7 +104,7 @@ static bool IsRemote (int fd)
     if (fstatfs (fd, &stf))
         return false;
 
-    switch (stf.f_type)
+    switch ((unsigned long)stf.f_type)
     {
         case AFS_SUPER_MAGIC:
         case CODA_SUPER_MAGIC:
