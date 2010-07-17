@@ -3648,7 +3648,7 @@ dnl
 dnl  OSS /dev/dsp module (enabled by default except on win32)
 dnl
 AC_ARG_ENABLE(oss,
-  [  --enable-oss            Linux OSS /dev/dsp support (enabled on Linux)])
+  [  --enable-oss            Open Sound System OSS support (default enabled)])
 
 if test "${enable_oss}" != "no" &&
   (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
