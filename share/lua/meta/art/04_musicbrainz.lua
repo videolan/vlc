@@ -23,9 +23,9 @@ function try_query(query)
     local l = vlc.object.libvlc()
     local t = vlc.var.get( l, "musicbrainz-previousdate" )
     if t ~= nil then
-        if t + 1000000. > vlc.misc.mdate() then
-            vlc.msg.warn( "We must wait 1 second between requests unless we want to be blacklisted from the musicbrainz server." )
-            vlc.misc.mwait( t + 1000000. )
+        if t + 2000000. > vlc.misc.mdate() then
+            vlc.msg.warn( "We must wait 2 second between requests unless we want to be blacklisted from the musicbrainz server." )
+            vlc.misc.mwait( t + 2000000. )
         end
         vlc.var.set( l, "musicbrainz-previousdate", vlc.misc.mdate() )
     else
@@ -55,7 +55,5 @@ function fetch_art()
     end
 
     local query1 = "http://musicbrainz.org/ws/1/release/?type=xml&artist="..vlc.strings.encode_uri_component(meta["artist"]).."&title=\""..vlc.strings.encode_uri_component(meta["album"].."\"")
-    local query2 = "http://musicbrainz.org/ws/1/release/?type=xml&query=\""..vlc.strings.encode_uri_component(meta["album"].."\" AND ".."artist:"..meta["artist"])
-    local query3 = "http://musicbrainz.org/ws/1/release/?type=xml&query=\""..vlc.strings.encode_uri_component(meta["album"].."\"~ AND ".."artist:"..meta["artist"].."~")
-    return try_query(query1) or try_query(query2) or try_query(query3)
+    return try_query(query1)
 end

@@ -19,40 +19,23 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
 
--- Replace non alphanumeric char by +
-function get_query( title )
-    -- If we have a .EXT remove the extension.
-    str = string.gsub( title, "(.*)%....$", "%1" )
-    return string.gsub( str, "([^%w ])",
-         function (c) return string.format ("%%%02X", string.byte(c)) end)
-end
-
 -- Return the artwork
 function fetch_art()
-    -- This is disabled because we have too much false positive by the inherent nature of this script.
-    if true then vlc.msg.dbg("10_googleimage.lua is disabled") return nil end
+    if vlc.item == nil then return nil end
 
-    if vlc.input == nil then return nil end
-
-    local item = vlc.input.item()
-    local meta = item:metas()
+    local meta = vlc.item:metas()
     if meta["artist"] and meta["album"] then
         title = meta["artist"].." "..meta["album"]
     elseif meta["artist"] and meta["title"] then
         title = meta["artist"].." "..meta["title"]
-    elseif meta["title"] then
-        title = meta["title"]
-    elseif meta["filename"] then
-        title = meta["filename"]
     else
-        vlc.msg.err("No filename")
         return nil
     end
-    fd = vlc.stream( "http://images.google.com/images?q=" .. get_query( title ) )
+    fd = vlc.stream( "http://images.google.com/images?q="..vlc.strings.encode_uri_component( title.." cover" ) )
     if not fd then return nil end
 
     page = fd:read( 65653 )
     fd = nil
-    _, _, arturl = string.find( page, "imgurl=([^&]+)" )
+    _, _, arturl = string.find( page, "imgurl=([^&]*)" )
     return arturl
 end

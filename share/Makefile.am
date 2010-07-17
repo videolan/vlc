@@ -217,10 +217,10 @@ nobase_vlclib_DATA = \
 	lua/intf/modules/host.luac \
 	lua/intf/rc.luac \
 	lua/intf/telnet.luac \
-	lua/meta/art/01_musicbrainz.luac \
+	lua/meta/art/04_musicbrainz.luac \
 	lua/meta/art/02_frenchtv.luac \
 	lua/meta/art/03_lastfm.luac \
-	lua/meta/art/10_googleimage.luac \
+	lua/meta/art/01_googleimage.luac \
 	lua/meta/fetcher/tvrage.luac \
 	lua/meta/reader/filename.luac \
 	lua/modules/sandbox.luac \
@@ -280,10 +280,10 @@ EXTRA_DIST += \
 	lua/intf/rc.lua \
 	lua/intf/telnet.lua \
 	lua/meta/art/README.txt \
-	lua/meta/art/01_musicbrainz.lua \
+	lua/meta/art/04_musicbrainz.lua \
 	lua/meta/art/02_frenchtv.lua \
 	lua/meta/art/03_lastfm.lua \
-	lua/meta/art/10_googleimage.lua \
+	lua/meta/art/01_googleimage.lua \
 	lua/meta/fetcher/README.txt \
 	lua/meta/fetcher/tvrage.lua \
 	lua/meta/reader/README.txt \
