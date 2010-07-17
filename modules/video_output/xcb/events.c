@@ -84,7 +84,7 @@ xcb_cursor_t CreateBlankCursor (xcb_connection_t *conn,
     xcb_pixmap_t pix = xcb_generate_id (conn);
 
     xcb_create_pixmap (conn, 1, pix, scr->root, 1, 1);
-    xcb_create_cursor (conn, cur, pix, pix, 0, 0, 0, 1, 1, 1, 0, 0);
+    xcb_create_cursor (conn, cur, pix, pix, 0, 0, 0, 0, 0, 0, 1, 1);
     return cur;
 }
 
