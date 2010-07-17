@@ -45,7 +45,6 @@ SOURCES_cdda = \
         vcd/cdrom_internals.h \
         $(NULL)
 SOURCES_access_jack = jack.c
-SOURCES_access_alsa = alsa.c
 SOURCES_access_oss = oss.c
 SOURCES_access_mtp = mtp.c
 SOURCES_access_sftp = sftp.c
@@ -77,6 +76,14 @@ libvlc_LTLIBRARIES += \
 	libaccess_rar_plugin.la \
 	libstream_filter_rar_plugin.la \
 	$(NULL)
+
+libaccess_alsa_plugin_la_SOURCES = alsa.c
+libaccess_alsa_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALSA_CFLAGS)
+libaccess_alsa_plugin_la_LIBADD = $(AM_LIBADD) $(ALSA_LIBS)
+libaccess_alsa_plugin_la_DEPENDENCIES =
+if HAVE_ALSA
+libvlc_LTLIBRARIES += libaccess_alsa_plugin.la
+endif
 
 libxcb_screen_plugin_la_SOURCES = screen/xcb.c
 libxcb_screen_plugin_la_CFLAGS = $(AM_CFLAGS) \

@@ -3681,7 +3681,19 @@ PKG_ENABLE_MODULES_VLC([PORTAUDIO], [], [portaudio-2.0], [Portaudio library supp
 dnl
 dnl  ALSA module
 dnl
-PKG_ENABLE_MODULES_VLC([ALSA], [alsa access_alsa], [alsa >= 1.0.0], [Alsa sound support for linux], [auto])
+AC_ARG_ENABLE(alsa,
+  [  --enable-alsa           Advanced Linux Sound Architecture (default auto)])
+have_alsa="no"
+AS_IF([test "${enable_alsa}" != "no"], [
+  PKG_CHECK_MODULES([ALSA], [alsa >= 1.0.0], [
+    have_alsa="yes"
+  ], [
+    AS_IF([test "x${enable_alsa}" != "x"], [
+      AC_MSG_ERROR([alsa-lib not found])
+    ])
+  ])
+])
+AM_CONDITIONAL([HAVE_ALSA], [test "${have_alsa}" = "yes"])
 
 dnl
 dnl  win32 waveOut plugin

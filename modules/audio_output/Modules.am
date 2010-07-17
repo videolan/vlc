@@ -1,4 +1,3 @@
-SOURCES_alsa = alsa.c
 SOURCES_aout_directx = directx.c windows_audio_common.h
 SOURCES_aout_file = file.c
 SOURCES_oss = oss.c
@@ -11,3 +10,11 @@ SOURCES_jack = jack.c
 SOURCES_pulse = pulse.c
 
 libvlc_LTLIBRARIES += libaout_file_plugin.la
+
+libalsa_plugin_la_SOURCES = alsa.c
+libalsa_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALSA_CFLAGS)
+libalsa_plugin_la_LIBADD = $(AM_LIBADD) $(ALSA_LIBS)
+libalsa_plugin_la_DEPENDENCIES =
+if HAVE_ALSA
+libvlc_LTLIBRARIES += libalsa_plugin.la
+endif
