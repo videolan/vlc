@@ -126,7 +126,7 @@ struct intf_sys_t
 
     /* status changes */
     vlc_mutex_t       status_lock;
-    playlist_status_t i_last_state;
+    int               i_last_state;
     playlist_t        *p_playlist;
     bool              b_input_buffering;
 
@@ -512,7 +512,7 @@ static void Run( intf_thread_t *p_intf )
 
             if( p_playlist )
             {
-                p_intf->p_sys->i_last_state = (int) PLAYLIST_STOPPED;
+                p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
                 msg_rc( STATUS_CHANGE "( stop state: 0 )" );
             }
         }
