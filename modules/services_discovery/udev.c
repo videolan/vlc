@@ -435,7 +435,10 @@ int OpenV4L (vlc_object_t *obj)
 }
 
 
+#ifdef HAVE_ALSA
 /*** Advanced Linux Sound Architecture support ***/
+#include <alsa/asoundlib.h>
+
 static int alsa_get_device (struct udev_device *dev, unsigned *restrict pcard,
                             unsigned *restrict pdevice)
 {
@@ -469,22 +472,30 @@ static char *alsa_get_mrl (struct udev_device *dev)
 
 static char *alsa_get_name (struct udev_device *dev)
 {
-    const char *model = NULL;
-    char *name;
+    char *name = NULL;
     unsigned card, device;
 
     if (alsa_get_device (dev, &card, &device))
         return NULL;
 
-    dev = udev_device_get_parent (dev);
-    if (dev != NULL)
-        model = udev_device_get_property_value (dev,
-                                                "ID_MODEL_FROM_DATABASE");
-    if (model == NULL)
-        model = _("Device");
+    char card_name[4 + 3 * sizeof (int)];
+    snprintf (card_name, sizeof (card_name), "hw:%u", card);
 
-    if (asprintf (&name, "%s (%u)", model, device) == -1)
-        name = NULL;
+    snd_ctl_t *ctl;
+    if (snd_ctl_open (&ctl, card_name, 0))
+        return NULL;
+
+    snd_pcm_info_t *pcm_info;
+    snd_pcm_info_alloca (&pcm_info);
+    snd_pcm_info_set_device (pcm_info, device);
+    snd_pcm_info_set_subdevice (pcm_info, 0);
+    snd_pcm_info_set_stream (pcm_info, SND_PCM_STREAM_CAPTURE);
+    if (snd_ctl_pcm_info (ctl, pcm_info))
+        goto out;
+
+    name = strdup (snd_pcm_info_get_name (pcm_info));
+out:
+    snd_ctl_close (ctl);
     return name;
 }
 
@@ -511,6 +522,7 @@ int OpenALSA (vlc_object_t *obj)
 
     return Open (obj, &subsys);
 }
+#endif /* HAVE_ALSA */
 
 
 /*** Discs support ***/

@@ -5,7 +5,15 @@ SOURCES_bonjour = bonjour.c
 SOURCES_podcast = podcast.c
 SOURCES_mtp = mtp.c
 SOURCES_mediadirs = mediadirs.c
-SOURCES_udev = udev.c
+
+libudev_plugin_la_SOURCES = udev.c
+libudev_plugin_la_CFLAGS = $(AM_CFLAGS) $(UDEV_CFLAGS)
+libudev_plugin_la_LIBADD = $(AM_LIBADD) $(UDEV_LIBS)
+libudev_plugin_la_DEPENDENCIES =
+if HAVE_ALSA
+libudev_plugin_la_CFLAGS += $(ALSA_CFLAGS) -DHAVE_ALSA
+libudev_plugin_la_LIBADD += $(ALSA_LIBS)
+endif
 
 libxcb_apps_plugin_la_SOURCES = xcb_apps.c
 libxcb_apps_plugin_la_CFLAGS = $(AM_CFLAGS) \
@@ -15,9 +23,11 @@ libxcb_apps_plugin_la_LIBADD = $(AM_LIBADD) \
 libxcb_apps_plugin_la_DEPENDENCIES =
 
 EXTRA_LTLIBRARIES += \
+	libudev_plugin.la \
 	libxcb_apps_plugin.la
 libvlc_LTLIBRARIES += \
 	libmediadirs_plugin.la \
 	libpodcast_plugin.la \
 	libsap_plugin.la \
+	$(LTLIBudev) \
 	$(LTLIBxcb_apps)
