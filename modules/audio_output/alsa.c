@@ -645,8 +645,6 @@ retry:
     /* Get Initial software parameters */
     snd_pcm_sw_params_current( p_sys->p_snd_pcm, p_sw );
 
-    snd_pcm_sw_params_set_sleep_min( p_sys->p_snd_pcm, p_sw, 0 );
-
     snd_pcm_sw_params_set_avail_min( p_sys->p_snd_pcm, p_sw,
                                      p_aout->output.i_nb_samples );
     /* start playing when one period has been written */
