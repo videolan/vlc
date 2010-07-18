@@ -2460,42 +2460,17 @@ dnl
 dnl  modplug demux plugin
 dnl
 AC_ARG_ENABLE(mod,
-  [  --enable-mod            Mod demux support (default enabled)])
-if test "${enable_mod}" != "no"
-then
-  AC_ARG_WITH(mod-tree,
-  [  --with-mod-tree=PATH    mod tree for static linking])
-  if test -n "${with_mod_tree}"
-  then
-    AC_MSG_CHECKING(for libmodplug.a in ${with_mod_tree})
-    real_mod_tree="`cd ${with_mod_tree} 2>/dev/null && pwd`"
-    if test -z "${real_mod_tree}"
-    then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_mod_tree}])
-    fi
-    if test -f "${real_mod_tree}/src/.libs/libmodplug.a"
-    then
-      dnl  Use a custom mod
-      AC_MSG_RESULT(${real_mod_tree}/src/.libs/libmodplug.a)
-      VLC_ADD_PLUGIN([mod])
-      VLC_ADD_LIBS([mod],[${real_mod_tree}/src/.libs/libmodplug.a -lstdc++])
-      VLC_ADD_CXXFLAGS([mod],[-I${real_mod_tree}/include])
-    else
-      dnl  The given mod wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_mod_tree}/src/.libs/libmodplug.a, make sure you compiled mod in ${with_mod_tree}])
-    fi
-  else
-    PKG_CHECK_MODULES(LIBMODPLUG, [libmodplug >= 0.8 libmodplug != 0.8.8], [
+  [  --enable-mod            Mod demux support (default auto)])
+if test "${enable_mod}" != "no" ; then
+    PKG_CHECK_MODULES(LIBMODPLUG, [libmodplug >= 0.8.4 libmodplug != 0.8.8], [
           VLC_ADD_PLUGIN([mod])
           VLC_ADD_CXXFLAGS([mod],[$LIBMODPLUG_CFLAGS])
           VLC_ADD_LIBS([mod],[$LIBMODPLUG_LIBS])
-    ], [
-      AC_MSG_WARN([libmodplug not found or a broken version (0.8.8.0) was found!])
+    ],[
+       AS_IF([test x"${enable_mod}" = "xyes"],
+         [AC_MSG_ERROR(libmodplug not found or a broken version (0.8.8.0) was found!)],
+         [AC_MSG_WARN(libmodplug not found or a broken version (0.8.8.0) was found!)])
     ])
-  fi
 fi
 
 dnl
