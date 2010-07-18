@@ -77,7 +77,7 @@
     sfm.mChannelsPerFrame, sfm.mBitsPerChannel
 
 #define FRAMESIZE 2048
-#define BUFSIZE (FRAMESIZE * 8)
+#define BUFSIZE (FRAMESIZE * 8) * 8
 #define AOUT_VAR_SPDIF_FLAG 0xf00000
 
 /*
