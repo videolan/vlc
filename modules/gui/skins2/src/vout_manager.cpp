@@ -69,11 +69,17 @@ VoutManager::VoutManager( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
     m_pVoutMainWindow->move( 0, 0 );
     m_pVoutMainWindow->resize( width, height );
+
+    VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
+    rFullscreen.addObserver( this );
 }
 
 
 VoutManager::~VoutManager( )
 {
+    VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
+    rFullscreen.delObserver( this );
+
     delete m_pVoutMainWindow;
 }
 
@@ -249,6 +255,9 @@ void VoutManager::releaseWnd( vout_window_t *pWnd )
             break;
         }
     }
+
+    // force fullscreen to false so that user regains control
+    VlcProc::instance( getIntf() )->setFullscreenVar( false );
 }
 
 
@@ -277,22 +286,28 @@ void VoutManager::setSizeWnd( vout_window_t *pWnd, int width, int height )
    }
 }
 
+
 void VoutManager::setFullscreenWnd( vout_window_t *pWnd, bool b_fullscreen )
 {
-    msg_Dbg( pWnd, "setFullscreen (%d) received from vout thread",
-                    b_fullscreen ? 1 : 0 );
+    msg_Dbg( pWnd, "setFullscreen (%i) received from vout thread",
+                   b_fullscreen );
 
     VlcProc::instance( getIntf() )->setFullscreenVar( b_fullscreen );
+}
 
-    if( b_fullscreen )
+
+void VoutManager::onUpdate( Subject<VarBool> &rVariable, void *arg  )
+{
+    VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
+    if( &rVariable == &rFullscreen )
     {
-        m_pVoutMainWindow->show();
-    }
-    else
-    {
-        m_pVoutMainWindow->hide();
+        if( rFullscreen.get() )
+            m_pVoutMainWindow->show();
+        else
+            m_pVoutMainWindow->hide();
     }
 }
+
 
 // Functions called by window provider
 // ///////////////////////////////////

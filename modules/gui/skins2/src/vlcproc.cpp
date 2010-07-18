@@ -486,11 +486,7 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
             vout_thread_t* pVout = input_GetVout( pInput );
             SET_BOOL( m_cVarHasVout, pVout != NULL );
             if( pVout )
-            {
-                SET_BOOL( m_cVarFullscreen,
-                                         var_GetBool( pVout, "fullscreen" ) );
                 vlc_object_release( pVout );
-            }
             break;
         }
 
@@ -700,7 +696,6 @@ void VlcProc::reset_input()
     SET_BOOL( m_cVarRecordable, false );
     SET_BOOL( m_cVarRecording, false );
     SET_BOOL( m_cVarDvdActive, false );
-    SET_BOOL( m_cVarFullscreen, false );
     SET_BOOL( m_cVarHasAudio, false );
     SET_BOOL( m_cVarHasVout, false );
     SET_BOOL( m_cVarStopped, true );

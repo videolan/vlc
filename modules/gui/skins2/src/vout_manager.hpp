@@ -91,7 +91,7 @@ public:
 
 
 /// Singleton object handling VLC internal state and playlist
-class VoutManager: public SkinObject
+class VoutManager: public SkinObject, public Observer<VarBool>
 {
 public:
     /// Get the instance of VoutManager
@@ -145,6 +145,9 @@ public:
 
     // test if vout are running
     bool hasVout() { return ( m_SavedWndVec.size() != 0 ) ; }
+
+    /// called when fullscreen variable changed
+    virtual void onUpdate( Subject<VarBool> &rVariable , void* );
 
 protected:
     // Protected because it is a singleton
