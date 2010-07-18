@@ -1047,7 +1047,7 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename
 {
     BOOL b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
-    char *psz_uri = make_URI([o_filename UTF8String]);
+    char *psz_uri = make_URI([o_filename UTF8String], "file" );
     if( !psz_uri )
         return( FALSE );
 
