@@ -28,7 +28,7 @@ typedef struct vlc_getopt_s
    When `getopt' finds an option that takes an argument,
    the argument value is returned here.  */
 
-    char *optarg;
+    char *arg;
 
 /* Index in ARGV of the next element to be scanned.
    This is used for communication to and from the caller
@@ -42,11 +42,11 @@ typedef struct vlc_getopt_s
    Otherwise, `optind' communicates from one call to the next
    how much of ARGV has been scanned so far.  */
 
-    int optind;
+    int ind;
 
 /* Set to an option character which was unrecognized.  */
 
-    int optopt;
+    int opt;
 
 /* The next char to be scanned in the option-element
    in which the last option character we returned was found.
