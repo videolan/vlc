@@ -212,8 +212,12 @@ static int utf8_vasprintf( char **str, const char *fmt, va_list ap )
     if( res == -1 )
         return -1;
 
+#ifdef ASSUME_UTF8
+    *str = utf8;
+#else
     *str = ToLocaleDup( utf8 );
     free( utf8 );
+#endif
     return res;
 }
 
