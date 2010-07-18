@@ -103,7 +103,7 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
     if( stable )
     {
         msg_Dbg( p_intf, "embedded video already in use" );
-        return NULL;
+        return 0;
     }
     if( b_keep_size )
     {
