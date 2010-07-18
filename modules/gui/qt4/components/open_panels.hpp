@@ -161,6 +161,13 @@ public:
 class DiscOpenPanel: public OpenPanel
 {
     Q_OBJECT
+    enum    DiscType
+    {
+        None,
+        Dvd,
+        Vcd,
+        Cdda
+    };
 public:
     DiscOpenPanel( QWidget *, intf_thread_t * );
     virtual ~DiscOpenPanel();
@@ -169,7 +176,7 @@ public:
 private:
     Ui::OpenDisk ui;
     char *psz_dvddiscpath, *psz_vcddiscpath, *psz_cddadiscpath;
-    bool b_firstdvd, b_firstvcd, b_firstcdda;
+    DiscType    m_discType;
 public slots:
     virtual void updateMRL() ;
 private slots:

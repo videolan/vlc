@@ -329,9 +329,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     psz_cddadiscpath = var_InheritString( p_intf, "cd-audio" );
 
     /* State to avoid overwritting the users changes with the configuration */
-    b_firstdvd = true;
-    b_firstvcd = true;
-    b_firstcdda = true;
+    m_discType = None;
 
     ui.browseDiscButton->setToolTip( qtr( I_DEVICE_TOOLTIP ));
     ui.deviceCombo->setToolTip( qtr(I_DEVICE_TOOLTIP) );
@@ -391,9 +389,7 @@ void DiscOpenPanel::clear()
     ui.chapterSpin->setValue( 0 );
     ui.subtitlesSpin->setValue( -1 );
     ui.audioSpin->setValue( -1 );
-    b_firstcdda = true;
-    b_firstdvd = true;
-    b_firstvcd = true;
+    m_discType = None;
 }
 
 #ifdef WIN32
@@ -410,10 +406,10 @@ void DiscOpenPanel::updateButtons()
 {
     if ( ui.dvdRadioButton->isChecked() )
     {
-        if( b_firstdvd )
+        if( m_discType != Dvd )
         {
             setDrive( psz_dvddiscpath );
-            b_firstdvd = false;
+            m_discType = Dvd;
         }
         ui.titleLabel->setText( qtr("Title") );
         ui.chapterLabel->show();
@@ -423,10 +419,10 @@ void DiscOpenPanel::updateButtons()
     }
     else if ( ui.vcdRadioButton->isChecked() )
     {
-        if( b_firstvcd )
+        if( m_discType != Vcd )
         {
             setDrive( psz_vcddiscpath );
-            b_firstvcd = false;
+            m_discType = Vcd;
         }
         ui.titleLabel->setText( qtr("Entry") );
         ui.chapterLabel->hide();
@@ -436,10 +432,10 @@ void DiscOpenPanel::updateButtons()
     }
     else /* CDDA */
     {
-        if( b_firstcdda )
+        if( m_discType != Cdda )
         {
             setDrive( psz_cddadiscpath );
-            b_firstcdda = false;
+            m_discType = Cdda;
         }
         ui.titleLabel->setText( qtr("Track") );
         ui.chapterLabel->hide();
