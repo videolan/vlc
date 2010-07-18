@@ -333,7 +333,6 @@ $Id$
  * vc1: VC-1 Video demuxer
  * vcd: input module for accessing Video CDs
  * vcdx: input module for accessing Video CDs with navigation & stills
- * video_filter_wrapper: a "video filter2/splitter" with mouse to "video filter" wrapper
  * visual: visualisation system
  * vmem: memory video driver
  * vobsub: VobSUB subtitles demuxer
