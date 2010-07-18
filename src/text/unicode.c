@@ -42,11 +42,6 @@
 #endif
 #include <errno.h>
 
-#if defined (__APPLE__) || defined (HAVE_MAEMO)
-/* Define this if the OS always use UTF-8 internally */
-# define ASSUME_UTF8 1
-#endif
-
 #if defined (ASSUME_UTF8)
 /* Cool */
 

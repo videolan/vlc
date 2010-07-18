@@ -1,6 +1,11 @@
 Changes between 1.1.0 and 1.2.0-git:
 ------------------------------------
 
+Important changes for packagers:
+ * The default builds now assume that the operating system uses UTF-8 for
+   its file systems and files content (except the Windows port). If this is
+   not acceptable, pass --enable-non-utf8 to the configure script.
+
 Access
  * Multiple files are supported from RAR files
 
