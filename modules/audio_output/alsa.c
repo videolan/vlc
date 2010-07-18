@@ -345,14 +345,15 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Get device name */
-    if( (psz_device = var_InheritString( p_aout, "alsa-audio-device" )) == NULL )
+    psz_device = var_InheritString( p_aout, "alsa-audio-device" );
+    if( unlikely(psz_device == NULL) )
     {
-        msg_Err( p_aout, "no audio device given (maybe \"default\" ?)" );
-        dialog_Fatal( p_aout, _("No Audio Device"), "%s",
-                        _("No audio device name was given. You might want to " \
-                          "enter \"default\".") );
-        free( p_sys );
-        return VLC_EGENERIC;
+        psz_device = strdup( DEFAULT_ALSA_DEVICE );
+        if( unlikely(psz_device == NULL) )
+        {
+            free( p_sys );
+            return VLC_ENOMEM;
+        }
     }
 
     /* Choose the IEC device for S/PDIF output:
