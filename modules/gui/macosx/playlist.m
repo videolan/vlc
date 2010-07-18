@@ -1781,7 +1781,7 @@
         for( i = 0; i < (int)[o_values count]; i++)
         {
             NSDictionary *o_dic;
-            char *psz_uri = make_URI([[o_values objectAtIndex:i] UTF8String]);
+            char *psz_uri = make_URI([[o_values objectAtIndex:i] UTF8String], NULL);
             if( !psz_uri )
                 continue;
 
