@@ -121,7 +121,6 @@ Visualization:
 Service discovery:
  * Service discoveries can now be written in lua
  * Service discovery for Picture/Music/Video user directories
- * Service discovery based on libudev
  * Shoutcast Service discoveries are now removed
 
 Encoders:
