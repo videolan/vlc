@@ -766,13 +766,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
 
-            if( !p_sys->ic->title[0] || !p_sys->ic->author[0] ||
-                !p_sys->ic->copyright[0] || !p_sys->ic->comment[0] ||
-                /*!p_sys->ic->album[0] ||*/ !p_sys->ic->genre[0] )
-            {
-                return VLC_EGENERIC;
-            }
-
             if( p_sys->ic->title[0] )
                 vlc_meta_SetTitle( p_meta, p_sys->ic->title );
             if( p_sys->ic->author[0] )
