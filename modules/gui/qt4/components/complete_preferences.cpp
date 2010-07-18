@@ -53,9 +53,8 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                             QTreeWidget( _parent ), p_intf( _p_intf )
 {
     /* General Qt options */
-    setColumnCount( 1 );
     setAlternatingRowColors( true );
-    header()->hide();
+    setHeaderHidden( true );
 
     setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
     setTextElideMode( Qt::ElideNone );
@@ -125,7 +124,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             current_item = new QTreeWidgetItem();
             current_item->setText( 0, data->name );
             current_item->setIcon( 0 , icon );
-            current_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
+            //current_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
             current_item->setData( 0, Qt::UserRole,
                                    qVariantFromValue( data ) );
             addTopLevelItem( current_item );
@@ -177,7 +176,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             subcat_item->setText( 0, data_sub->name );
             subcat_item->setData( 0, Qt::UserRole,
                                   qVariantFromValue( data_sub ) );
-            subcat_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
+            //subcat_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
 
             /* Add it to the parent */
             assert( current_item );
@@ -271,7 +270,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         module_item->setText( 0, qtr( module_get_name( p_module, false ) ) );
         module_item->setData( 0, Qt::UserRole,
                               QVariant::fromValue( module_data) );
-        module_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
+        //module_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
         subcat_item->addChild( module_item );
     }
 
@@ -279,6 +278,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     sortItems( 0, Qt::AscendingOrder );
 
     module_list_free( p_list );
+    resizeColumnToContents( 0 );
 }
 
 PrefsTree::~PrefsTree() {}
