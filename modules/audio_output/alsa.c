@@ -972,10 +972,10 @@ static void GetDevicesForCard( vlc_object_t *obj, module_config_t *p_item,
     int i_err = 0;
     snd_pcm_info_t *p_pcm_info;
     snd_ctl_t *p_ctl;
-    char psz_dev[64];
+    char psz_dev[4 + 3 * sizeof(int)];
     char *psz_card_name;
 
-    sprintf( psz_dev, "hw:%i", i_card );
+    snprintf( psz_dev, sizeof (psz_dev), "hw:%u", i_card );
 
     if( ( i_err = snd_ctl_open( &p_ctl, psz_dev, 0 ) ) < 0 )
         return;
