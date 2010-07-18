@@ -200,7 +200,7 @@ private:
     QString advMRL;
     QDialog *adv;
 #ifdef WIN32
-    QRadioButton *bdas, *bdat, *bdac, *bdaa;
+    QRadioButton *bdas, *bdat, *bdac, *bdaa, *bdaq;
     QSpinBox *bdaCard, *bdaFreq, *bdaSrate;
     QLabel *bdaSrateLabel, *bdaBandLabel;
     QComboBox *bdaBandBox;

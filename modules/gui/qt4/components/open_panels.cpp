@@ -730,12 +730,14 @@ void CaptureOpenPanel::initialize()
     bdac = new QRadioButton( "DVB-C" );
     bdat = new QRadioButton( "DVB-T" );
     bdaa = new QRadioButton( "ATSC" );
+    bdaq = new QRadioButton( "Clear QAM" );
 
     bdaDevLayout->addWidget( bdaTypeLabel, 0, 0 );
     bdaDevLayout->addWidget( bdas, 0, 1 );
     bdaDevLayout->addWidget( bdac, 0, 2 );
     bdaDevLayout->addWidget( bdat, 0, 3 );
     bdaDevLayout->addWidget( bdaa, 0, 4 );
+    bdaDevLayout->addWidget( bdaq, 0, 5 );
 
     /* bda Props */
     QLabel *bdaFreqLabel =
@@ -778,10 +780,12 @@ void CaptureOpenPanel::initialize()
     BUTTONACT( bdat, updateButtons() );
     BUTTONACT( bdac, updateButtons() );
     BUTTONACT( bdaa, updateButtons() );
+    BUTTONACT( bdaq, updateButtons() );
     BUTTONACT( bdas, updateMRL() );
     BUTTONACT( bdat, updateMRL() );
     BUTTONACT( bdac, updateMRL() );
     BUTTONACT( bdaa, updateMRL() );
+    BUTTONACT( bdaq, updateMRL() );
     }
 
 #else /* WIN32 */
@@ -1120,6 +1124,7 @@ void CaptureOpenPanel::updateMRL()
         else if(  bdat->isChecked() ) mrl = "dvb-t://";
         else if(  bdac->isChecked() ) mrl = "dvb-c://";
         else if(  bdaa->isChecked() ) mrl = "atsc://";
+        else if(  bdaq->isChecked() ) mrl = "cqam://";
         else return;
         mrl += "frequency=" + QString::number( bdaFreq->value() );
         if( bdac->isChecked() || bdat->isChecked() || bdaa->isChecked() )
@@ -1242,6 +1247,13 @@ void CaptureOpenPanel::updateButtons()
             bdaSrateLabel->hide();
             bdaBandBox->show();
             bdaBandLabel->show();
+        }
+        else if( bdaq->isChecked() )
+        {
+            bdaSrate->hide();
+            bdaSrateLabel->hide();
+            bdaBandBox->hide();
+            bdaBandLabel->hide();
         }
         break;
 #else
