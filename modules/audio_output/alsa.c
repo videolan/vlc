@@ -1005,13 +1005,13 @@ static void GetDevicesForCard( vlc_object_t *obj, module_config_t *p_item,
             continue;
         }
 
-        if( asprintf( &psz_device, "hw:%d,%d", i_card, i_pcm_device ) == -1 )
-            break;
+        if( asprintf( &psz_device, "plughw:%u,%u", i_card, i_pcm_device ) == -1 )
+            continue;
         if( asprintf( &psz_descr, "%s: %s (%s)", psz_card_name,
                   snd_pcm_info_get_name(p_pcm_info), psz_device ) == -1 )
         {
             free( psz_device );
-            break;
+            continue;
         }
 
         msg_Dbg( obj, "  %s", psz_descr );
