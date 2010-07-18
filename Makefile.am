@@ -698,6 +698,7 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 destdir=$(prefix)
 win32_destdir=$(top_builddir)/vlc-$(VERSION)
 win32_debugdir=$(top_builddir)/symbols-$(VERSION)
+win32_lua_destdir=$(win32_destdir)/lua
 win32_xpi_destdir=$(win32_destdir)/vlc-plugin
 
 #Win-common is for win32 and wince
