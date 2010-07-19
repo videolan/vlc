@@ -12,6 +12,9 @@ Access
 Codecs
  * You can now use ffmpeg-mt in conjunction with vlc
 
+Demuxers:
+ * id3tag plugin is removed (superseded by taglib).
+
 Interfaces
  * The telnet interface has been removed in the favour of the lua one
 
