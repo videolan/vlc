@@ -214,6 +214,39 @@ void CommonDisplay(vout_display_t *vd)
     sys->is_first_display = false;
 }
 
+/**
+ * It updates a picture data/pitches.
+ */
+void CommonUpdatePicture(picture_t *picture,
+                         uint8_t *data, unsigned pitch)
+{
+    /* fill in buffer info in first plane */
+    picture->p->p_pixels = data;
+    picture->p->i_pitch  = pitch;
+    picture->p->i_lines  = picture->format.i_height;
+
+    /*  Fill chroma planes for planar YUV */
+    if (picture->format.i_chroma == VLC_CODEC_I420 ||
+        picture->format.i_chroma == VLC_CODEC_J420 ||
+        picture->format.i_chroma == VLC_CODEC_YV12) {
+
+        for (int n = 1; n < picture->i_planes; n++) {
+            const plane_t *o = &picture->p[n-1];
+            plane_t *p = &picture->p[n];
+
+            p->p_pixels = o->p_pixels + o->i_lines * o->i_pitch;
+            p->i_pitch  = pitch / 2;
+            p->i_lines  = picture->format.i_height / 2;
+        }
+        /* The dx/d3d buffer is always allocated as YV12 */
+        if (vlc_fourcc_AreUVPlanesSwapped(picture->format.i_chroma, VLC_CODEC_YV12)) {
+            uint8_t *p_tmp = picture->p[1].p_pixels;
+            picture->p[1].p_pixels = picture->p[2].p_pixels;
+            picture->p[2].p_pixels = p_tmp;
+        }
+    }
+}
+
 void AlignRect(RECT *r, int align_boundary, int align_size)
 {
     if (align_boundary)
