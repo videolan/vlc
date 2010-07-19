@@ -193,6 +193,7 @@ static int Open(vlc_object_t *object)
     sys->use_wallpaper = var_CreateGetBool(vd, "video-wallpaper");
     /* FIXME */
     sys->use_overlay = false;//var_CreateGetBool(vd, "overlay"); /* FIXME */
+    sys->restore_overlay = false;
     var_Create(vd, "directx-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
     /* Initialisation */
@@ -285,6 +286,8 @@ static void Display(vout_display_t *vd, picture_t *picture)
                 DirectXUpdateOverlay(vd, NULL);
         }
     }
+    if (sys->restore_overlay)
+        DirectXUpdateOverlay(vd, NULL);
 
     /* */
     DirectXUnlock(picture);
@@ -379,6 +382,10 @@ static void Manage(vout_display_t *vd)
 
     if (ch_wallpaper)
         WallpaperChange(vd, wallpaper_requested);
+
+    /* */
+    if (sys->restore_overlay)
+        DirectXUpdateOverlay(vd, NULL);
 }
 
 /* */
@@ -1355,6 +1362,8 @@ static int DirectXUpdateOverlay(vout_display_t *vd, LPDIRECTDRAWSURFACE2 surface
     HRESULT hr = IDirectDrawSurface2_UpdateOverlay(surface,
                                                    &src, sys->display, &dst,
                                                    DDOVER_SHOW | DDOVER_KEYDESTOVERRIDE, &ddofx);
+    sys->restore_overlay = hr != DD_OK;
+
     if (hr != DD_OK) {
         msg_Warn(vd, "DirectDrawUpdateOverlay cannot move/resize overlay");
         return VLC_EGENERIC;
