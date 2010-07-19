@@ -38,7 +38,8 @@ CtrlImage::CtrlImage( intf_thread_t *pIntf, GenericBitmap &rBitmap,
                       const UString &rHelp, VarBool *pVisible, bool art ):
     CtrlFlat( pIntf, rHelp, pVisible ),
     m_pBitmap( &rBitmap ), m_pOriginalBitmap( &rBitmap ),
-    m_rCommand( rCommand ), m_resizeMethod( resizeMethod ), m_art( art )
+    m_rCommand( rCommand ), m_resizeMethod( resizeMethod ), m_art( art ),
+    m_x( 0 ), m_y( 0 )
 {
     // Create an initial unscaled image in the buffer
     m_pImage = OSFactory::instance( pIntf )->createOSGraphics(
@@ -94,102 +95,121 @@ void CtrlImage::handleEvent( EvtGeneric &rEvent )
 
 bool CtrlImage::mouseOver( int x, int y ) const
 {
-    if( m_resizeMethod == kMosaic &&
-        x >= 0 && x < getPosition()->getWidth() &&
+    if( x >= 0 && x < getPosition()->getWidth() &&
         y >= 0 && y < getPosition()->getHeight() )
     {
-        // In mosaic mode, convert the coordinates to make them fit to the
-        // size of the original image
-        x %= m_pImage->getWidth();
-        y %= m_pImage->getHeight();
+        // convert the coordinates to make them fit to the
+        // size of the original image if needed
+        switch( m_resizeMethod )
+        {
+        case kMosaic:
+            x %= m_pImage->getWidth();
+            y %= m_pImage->getHeight();
+            break;
+
+        case kScaleAndRatioPreserved:
+            x -= m_x;
+            y -= m_y;
+            break;
+
+        case kScale:
+            break;
+        }
+        return m_pImage->hit( x, y );
     }
-    return m_pImage->hit( x, y );
+
+    return false;
 }
 
 
 void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest )
 {
     const Position *pPos = getPosition();
-    if( pPos )
+    if( !pPos )
+        return;
+
+    int width = pPos->getWidth();
+    int height = pPos->getHeight();
+    if( width <= 0 || height <= 0 )
+        return;
+
+    if( m_resizeMethod == kScale )
     {
-        int width = pPos->getWidth();
-        int height = pPos->getHeight();
-
-        if( m_resizeMethod == kScale )
+        // Use scaling method
+        if( width != m_pImage->getWidth() ||
+            height != m_pImage->getHeight() )
         {
-            // Use scaling method
-            if( width > 0 && height > 0 )
-            {
-                if( width != m_pImage->getWidth() ||
-                    height != m_pImage->getHeight() )
-                {
-                    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
-                    // Rescale the image with the actual size of the control
-                    ScaledBitmap bmp( getIntf(), *m_pBitmap, width, height );
-                    delete m_pImage;
-                    m_pImage = pOsFactory->createOSGraphics( width, height );
-                    m_pImage->drawBitmap( bmp, 0, 0 );
-                }
-                rImage.drawGraphics( *m_pImage, 0, 0, xDest, yDest );
-            }
-        }
-        else if( m_resizeMethod == kMosaic )
-        {
-            // Use mosaic method
-            while( width > 0 )
-            {
-                int curWidth = __MIN( width, m_pImage->getWidth() );
-                height = pPos->getHeight();
-                int curYDest = yDest;
-                while( height > 0 )
-                {
-                    int curHeight = __MIN( height, m_pImage->getHeight() );
-                    rImage.drawGraphics( *m_pImage, 0, 0, xDest, curYDest,
-                                         curWidth, curHeight );
-                    curYDest += curHeight;
-                    height -= m_pImage->getHeight();
-                }
-                xDest += curWidth;
-                width -= m_pImage->getWidth();
-            }
-        }
-        else if( m_resizeMethod == kScaleAndRatioPreserved )
-        {
-            int width = pPos->getWidth();
-            int height = pPos->getHeight();
-
-            int w = m_pBitmap->getWidth();
-            int h = m_pBitmap->getHeight();
-
-            int scaled_height = width * h / w;
-            int scaled_width  = height * w / h;
-
-            int x, y;
-
-            if( scaled_height > height )
-            {
-                width = scaled_width;
-                x = ( pPos->getWidth() - width ) / 2;
-                y = 0;
-            }
-            else
-            {
-                height = scaled_height;
-                x =  0;
-                y = ( pPos->getHeight() - height ) / 2;
-            }
-
             OSFactory *pOsFactory = OSFactory::instance( getIntf() );
             // Rescale the image with the actual size of the control
             ScaledBitmap bmp( getIntf(), *m_pBitmap, width, height );
             delete m_pImage;
             m_pImage = pOsFactory->createOSGraphics( width, height );
             m_pImage->drawBitmap( bmp, 0, 0 );
-
-            rImage.drawGraphics( *m_pImage, 0, 0, xDest + x, yDest + y );
+        }
+        rImage.drawGraphics( *m_pImage, 0, 0, xDest, yDest );
+    }
+    else if( m_resizeMethod == kMosaic )
+    {
+        // Use mosaic method
+        while( width > 0 )
+        {
+            int curWidth = __MIN( width, m_pImage->getWidth() );
+            height = pPos->getHeight();
+            int curYDest = yDest;
+            while( height > 0 )
+            {
+                int curHeight = __MIN( height, m_pImage->getHeight() );
+                rImage.drawGraphics( *m_pImage, 0, 0, xDest, curYDest,
+                                     curWidth, curHeight );
+                curYDest += curHeight;
+                height -= m_pImage->getHeight();
+            }
+            xDest += curWidth;
+            width -= m_pImage->getWidth();
         }
     }
+    else if( m_resizeMethod == kScaleAndRatioPreserved )
+    {
+        int w0 = m_pBitmap->getWidth();
+        int h0 = m_pBitmap->getHeight();
+
+        int scaled_height = width * h0 / w0;
+        int scaled_width  = height * w0 / h0;
+
+        // new image scaled with aspect ratio preserved
+        // and centered inside the control boundaries
+        int w, h;
+        if( scaled_height > height )
+        {
+            w = scaled_width;
+            h = height;
+            m_x = ( width - w ) / 2;
+            m_y = 0;
+        }
+        else
+        {
+            w = width;
+            h = scaled_height;
+            m_x = 0;
+            m_y = ( height - h ) / 2;
+        }
+
+        // rescale the image if size changed
+        if( w != m_pImage->getWidth() ||
+            h != m_pImage->getHeight() )
+        {
+            OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+            ScaledBitmap bmp( getIntf(), *m_pBitmap, w, h );
+            delete m_pImage;
+            m_pImage = pOsFactory->createOSGraphics( w, h );
+            m_pImage->drawBitmap( bmp, 0, 0 );
+        }
+
+        // draw the scaled image at offset (m_x, m_y) from control origin
+        rImage.drawGraphics( *m_pImage, 0, 0, xDest + m_x, yDest + m_y );
+    }
 }
+
 
 void CtrlImage::onUpdate( Subject<VarString> &rVariable, void* arg )
 {

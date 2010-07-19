@@ -78,6 +78,9 @@ private:
     resize_t m_resizeMethod;
     /// does the image get updated as art
     bool m_art;
+    /// offset for image inside the control
+    int m_x;
+    int m_y;
 
     /// Method called when the observed variable is modified
     virtual void onUpdate( Subject<VarString> &rVariable, void* );
