@@ -417,7 +417,7 @@ static VLCExtended *_o_sharedInstance = nil;
 
     if( p_vout != NULL )
     {
-        p_real_vout = [VLCVoutView realVout: p_vout];
+        p_real_vout = NULL; // [VLCVoutView realVout: p_vout];
         var_Set( p_real_vout, "macosx-opaqueness", val );
 
         while ((o_window = [o_enumerator nextObject]))

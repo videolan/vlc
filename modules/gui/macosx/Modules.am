@@ -35,9 +35,6 @@ SOURCES_macosx = \
 	simple_prefs.m \
 	output.h \
 	output.m \
-	vout.m \
-	voutgl.m \
-	vout.h \
 	wizard.h \
 	wizard.m \
 	extended.h \

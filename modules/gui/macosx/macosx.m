@@ -8,7 +8,7 @@
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
  *          Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
- *          
+ *
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,8 +44,10 @@
 int  OpenIntf     ( vlc_object_t * );
 void CloseIntf    ( vlc_object_t * );
 
+#if 0
 int  OpenVideoGL  ( vlc_object_t * );
 void CloseVideoGL ( vlc_object_t * );
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -121,6 +123,7 @@ vlc_module_begin ()
     add_bool( "macosx-mediakeys-background", true, NULL, USE_MEDIAKEYS_BACKGROUND_TEXT, USE_MEDIAKEYS_BACKGROUND_LONGTEXT,
              false )
 
+#if 0
     add_submodule ()
         set_description( "Mac OS X OpenGL" )
         set_capability( "opengl provider", 100 )
@@ -138,5 +141,6 @@ vlc_module_begin ()
                   false )
         add_bool( "macosx-background", false, NULL, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
                   false )
+#endif
 vlc_module_end ()
 
