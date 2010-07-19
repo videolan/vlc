@@ -916,7 +916,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( psz_codecs )
         {
             char *psz_morecodecs;
-            if( asprintf(&psz_morecodecs, "%s,dmo,quicktime", psz_codecs) != -1 )
+            if( asprintf(&psz_morecodecs, "%s,dmo", psz_codecs) != -1 )
             {
                 var_SetString( p_libvlc, "codec", psz_morecodecs);
                 free( psz_morecodecs );
@@ -924,7 +924,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             free( psz_codecs );
         }
         else
-            var_SetString( p_libvlc, "codec", "dmo,quicktime");
+            var_SetString( p_libvlc, "codec", "dmo");
     }
 #endif
 
