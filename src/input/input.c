@@ -1167,7 +1167,7 @@ static void InitPrograms( input_thread_t * p_input )
                  prgm = strtok_r( NULL, ",", &buf ) )
             {
                 vlc_value_t val = { .i_int = atoi( prgm ) };
-                TAB_APPEND( list.i_count, list.p_values, val );
+                INSERT_ELEM( list.p_values, list.i_count, list.i_count, val );
             }
 
             if( list.i_count > 0 )
