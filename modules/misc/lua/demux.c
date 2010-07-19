@@ -257,6 +257,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Warn( p_demux, "Error while running script %s, "
                   "function parse() not found", psz_filename );
+        vlc_object_release( p_input_thread );
         return VLC_EGENERIC;
     }
 
@@ -265,6 +266,7 @@ static int Demux( demux_t *p_demux )
         msg_Warn( p_demux, "Error while running script %s, "
                   "function parse(): %s", psz_filename,
                   lua_tostring( L, lua_gettop( L ) ) );
+        vlc_object_release( p_input_thread );
         return VLC_EGENERIC;
     }
 
