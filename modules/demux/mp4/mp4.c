@@ -41,7 +41,7 @@
 
 #include "libmp4.h"
 #include "drms.h"
-#include "../../meta_engine/id3genres.h"
+#include "id3genres.h"
 
 /*****************************************************************************
  * Module descriptor

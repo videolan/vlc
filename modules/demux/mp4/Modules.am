@@ -5,6 +5,7 @@ SOURCES_mp4 = \
 	drms.c \
 	drms.h \
 	drmstables.h \
+	id3genres.h \
 	$(NULL)
 
 libvlc_LTLIBRARIES += libmp4_plugin.la
