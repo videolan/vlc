@@ -245,6 +245,7 @@ static int Open( vlc_object_t *p_this )
             { "avi", "avi" },
             { "ogg", "ogg" },
             { "ogm", "ogg" },
+            { "ogv", "ogg" },
             { "mp3", "raw" },
             { "mp4", "mp4" },
             { "mov", "mov" },
