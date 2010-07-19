@@ -2621,19 +2621,6 @@ then
   fi
 fi
 
-dnl
-dnl   libid3tag support (FIXME!!! doesn't work with new input)
-dnl
-AC_ARG_ENABLE( id3tag,
-[  --enable-id3tag         id3tag metadata reader plugin (default disabled)])
-AS_IF([test "${enable_id3tag}" = "yes"], [
-  AC_CHECK_HEADERS(id3tag.h, [
-      AS_IF([test "${have_zlib}" = "yes"],[
-          VLC_ADD_LIBS([id3tag],[-lid3tag -lz])
-          VLC_ADD_PLUGIN([id3tag])
-       ])
-    ])
-])
 
 AC_ARG_ENABLE(merge-ffmpeg,
 [  --enable-merge-ffmpeg   merge FFmpeg-based plugins (default disabled)],, [
