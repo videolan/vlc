@@ -2,7 +2,7 @@ DIST_SUBDIRS = macosx hildon minimal_macosx qt4 skins2 macosx_dialog_provider
 SUBDIRS =
 
 if HAVE_DARWIN
-SUBDIRS += macosx minimal_macosx macosx_dialog_provider 
+SUBDIRS += macosx macosx_dialog_provider
 endif
 if BUILD_HILDON
 SUBDIRS += hildon
