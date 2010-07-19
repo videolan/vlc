@@ -87,6 +87,7 @@ vlc_module_end ()
 struct picture_sys_t
 {
     LPDIRECT3DSURFACE9 surface;
+    picture_t          *fallback;
 };
 
 static int  Open(vlc_object_t *);
@@ -758,10 +759,10 @@ static int Direct3DLockSurface(picture_t *picture)
     HRESULT hr = IDirect3DSurface9_LockRect(picture->p_sys->surface, &d3drect, NULL, 0);
     if (FAILED(hr)) {
         //msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
-        return VLC_EGENERIC;
+        return CommonUpdatePicture(picture, &picture->p_sys->fallback, NULL, 0);
     }
 
-    CommonUpdatePicture(picture, d3drect.pBits, d3drect.Pitch);
+    CommonUpdatePicture(picture, NULL, d3drect.pBits, d3drect.Pitch);
     return VLC_SUCCESS;
 }
 /**
@@ -832,6 +833,7 @@ static int Direct3DCreatePool(vout_display_t *vd, video_format_t *fmt)
         return VLC_ENOMEM;
     }
     rsc->p_sys->surface = surface;
+    rsc->p_sys->fallback = NULL;
     for (int i = 0; i < PICTURE_PLANE_MAX; i++) {
         rsc->p[i].p_pixels = NULL;
         rsc->p[i].i_pitch = 0;
@@ -870,7 +872,8 @@ static void Direct3DDestroyPool(vout_display_t *vd)
     if (sys->pool) {
         picture_resource_t *rsc = &sys->resource;
         IDirect3DSurface9_Release(rsc->p_sys->surface);
-
+        if (rsc->p_sys->fallback)
+            picture_Release(rsc->p_sys->fallback);
         picture_pool_Delete(sys->pool);
     }
     sys->pool = NULL;

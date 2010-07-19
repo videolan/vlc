@@ -127,6 +127,7 @@ vlc_module_end()
 struct picture_sys_t {
     LPDIRECTDRAWSURFACE2 surface;
     LPDIRECTDRAWSURFACE2 front_surface;
+    picture_t            *fallback;
 };
 
 /*****************************************************************************
@@ -1046,6 +1047,7 @@ static int DirectXCreatePictureResourceYuvOverlay(vout_display_t *vd,
     picture_resource_t *rsc = &sys->resource;
     rsc->p_sys->front_surface = front_surface;
     rsc->p_sys->surface       = surface;
+    rsc->p_sys->fallback      = NULL;
     return VLC_SUCCESS;
 }
 static int DirectXCreatePictureResourceYuv(vout_display_t *vd,
@@ -1101,6 +1103,7 @@ static int DirectXCreatePictureResourceYuv(vout_display_t *vd,
     picture_resource_t *rsc = &sys->resource;
     rsc->p_sys->front_surface = surface;
     rsc->p_sys->surface       = surface;
+    rsc->p_sys->fallback      = NULL;
     return VLC_SUCCESS;
 }
 static int DirectXCreatePictureResourceRgb(vout_display_t *vd,
@@ -1160,6 +1163,7 @@ static int DirectXCreatePictureResourceRgb(vout_display_t *vd,
     picture_resource_t *rsc = &sys->resource;
     rsc->p_sys->front_surface = surface;
     rsc->p_sys->surface       = surface;
+    rsc->p_sys->fallback      = NULL;
     return VLC_SUCCESS;
 }
 
@@ -1214,6 +1218,8 @@ static void DirectXDestroyPictureResource(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     DirectXDestroySurface(sys->resource.p_sys->front_surface);
+    if (sys->resource.p_sys->fallback)
+        picture_Release(sys->resource.p_sys->fallback);
 }
 
 static int DirectXLock(picture_t *picture)
@@ -1221,9 +1227,9 @@ static int DirectXLock(picture_t *picture)
     DDSURFACEDESC ddsd;
     if (DirectXLockSurface(picture->p_sys->front_surface,
                            picture->p_sys->surface, &ddsd))
-        return VLC_EGENERIC;
+        return CommonUpdatePicture(picture, &picture->p_sys->fallback, NULL, 0);
 
-    CommonUpdatePicture(picture, ddsd.lpSurface, ddsd.lPitch);
+    CommonUpdatePicture(picture, NULL, ddsd.lpSurface, ddsd.lPitch);
     return VLC_SUCCESS;
 }
 static void DirectXUnlock(picture_t *picture)
