@@ -456,10 +456,10 @@ void Builder::addButton( const BuilderData::Button &rData )
     const GenericRect *pRect;
     GET_BOX( pRect, rData.m_panelId , pLayout);
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,
-                                       rData.m_xPos, rData.m_yPos,
-                                       pBmpUp->getWidth(),
-                                       pBmpUp->getHeight(), *pRect,
-                                       rData.m_xKeepRatio, rData.m_yKeepRatio );
+                             rData.m_xPos, rData.m_yPos,
+                             pBmpUp->getWidth(),
+                             pBmpUp->getHeight() / pBmpUp->getNbFrames(),
+                             *pRect, rData.m_xKeepRatio, rData.m_yKeepRatio );
 
     pLayout->addControl( pButton, pos, rData.m_layer );
 }
@@ -533,10 +533,10 @@ void Builder::addCheckbox( const BuilderData::Checkbox &rData )
     const GenericRect *pRect;
     GET_BOX( pRect, rData.m_panelId , pLayout);
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,
-                                       rData.m_xPos, rData.m_yPos,
-                                       pBmpUp1->getWidth(),
-                                       pBmpUp1->getHeight(), *pRect,
-                                       rData.m_xKeepRatio, rData.m_yKeepRatio );
+                            rData.m_xPos, rData.m_yPos,
+                            pBmpUp1->getWidth(),
+                            pBmpUp1->getHeight() / pBmpUp1->getNbFrames(),
+                            *pRect, rData.m_xKeepRatio, rData.m_yKeepRatio );
 
     pLayout->addControl( pCheckbox, pos, rData.m_layer );
 }
