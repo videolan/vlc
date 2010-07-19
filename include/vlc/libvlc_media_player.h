@@ -316,9 +316,6 @@ VLC_PUBLIC_API uint32_t libvlc_media_player_get_agl ( libvlc_media_player_t *p_m
  * X11 window. Pixmaps are <b>not</b> supported. The caller shall ensure that
  * the X11 server is the same as the one the VLC instance has been configured
  * with.
- * If XVideo is <b>not</b> used, it is assumed that the drawable has the
- * following properties in common with the default X11 screen: depth, scan line
- * pad, black pixel. This is a bug.
  *
  * \param p_mi the Media Player
  * \param drawable the ID of the X window
