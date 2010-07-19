@@ -266,10 +266,9 @@ static int Open( vlc_object_t *p_this )
             { "",    "" }
         };
         const char *psz_ext = strrchr( psz_url, '.' ) + 1;
-        int  i;
 
         msg_Dbg( p_this, "extension is %s", psz_ext );
-        for( i = 0; exttomux[i].ext[0]; i++ )
+        for( int i = 0; exttomux[i].ext[0]; i++ )
         {
             if( !strcasecmp( psz_ext, exttomux[i].ext ) )
             {
