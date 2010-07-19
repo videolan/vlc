@@ -574,29 +574,6 @@ CLEAN_PKG += libmpeg2
 DISTCLEAN_PKG += libmpeg2-$(LIBMPEG2_VERSION).tar.gz
 
 # ***************************************************************************
-# libid3tag
-# ***************************************************************************
-
-libid3tag-$(LIBID3TAG_VERSION).tar.gz:
-	$(WGET) $(LIBID3TAG_URL)
-
-libid3tag: libid3tag-$(LIBID3TAG_VERSION).tar.gz
-	$(EXTRACT_GZ)
-	patch -d libid3tag -p0 < Patches/libid3tag-0.15.1b-fix-CVE-2008-2109.patch
-ifdef HAVE_DARWIN_OS
-	( cd $@; sed -e 's%-dynamiclib%-dynamiclib -arch $(ARCH)%' -i.orig  configure )
-endif
-
-.id3tag: libid3tag
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
-	$(INSTALL_NAME)
-	touch $@
-
-CLEAN_FILE += .id3tag
-CLEAN_PKG += libid3tag
-DISTCLEAN_PKG += libid3tag-$(LIBID3TAG_VERSION).tar.gz
-
-# ***************************************************************************
 # pcre
 # ***************************************************************************
 
