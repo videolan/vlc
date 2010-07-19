@@ -236,7 +236,11 @@ static int Open(vlc_object_t *object)
     return VLC_SUCCESS;
 
 error:
-    Close(VLC_OBJECT(vd));
+    DirectXClose(vd);
+    CommonClean(vd);
+    if (sys->hddraw_dll)
+        FreeLibrary(sys->hddraw_dll);
+    free(sys);
     return VLC_EGENERIC;
 }
 

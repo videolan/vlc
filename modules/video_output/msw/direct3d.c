@@ -184,7 +184,10 @@ static int Open(vlc_object_t *object)
 
     return VLC_SUCCESS;
 error:
-    Close(VLC_OBJECT(vd));
+    Direct3DClose(vd);
+    CommonClean(vd);
+    Direct3DDestroy(vd);
+    free(vd->sys);
     return VLC_EGENERIC;
 }
 
