@@ -34,7 +34,7 @@ class VarString;
 class VarString: public Variable, public Subject<VarString>
 {
 public:
-    VarString( intf_thread_t *pIntf ): Variable( pIntf ), m_value( string("tit") ) { }
+    VarString( intf_thread_t *pIntf ): Variable( pIntf ) { }
     virtual ~VarString() { }
 
     /// Get the variable type
