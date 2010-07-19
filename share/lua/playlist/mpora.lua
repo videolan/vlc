@@ -42,11 +42,34 @@ function parse()
 
         if string.match( line, "filmID" ) then
             _,_,video = string.find( line, "var filmID = \'(.*)\';")
-            table.insert( p, { path = "http://cdn0.mpora.com/play/video/"..video.."/mp4/"; name = name; arturl = arturl } )
         end
-        if string.match( line, "definitionLink hd" ) then
-            table.insert( p, { path = "http://cdn0.mpora.com/play/video/"..video.."_hd/mp4/"; name = name.." (HD)", arturl = arturl } )
-        end
+
     end
+
+    if not name or not arturl or not video then return nil end
+
+    -- Try and get URL for SD video.
+    sd = vlc.stream("http://api.mpora.com/tv/player/playlist/vid/"..video.."/")
+    if not sd then return nil end
+    page = sd:read( 65653 )
+    sdurl = string.match( page, "url=\"(.*)\" />")
+    page = nil
+
+    table.insert( p, { path = sdurl; name = name; arturl = arturl; } )
+
+    -- Try and check if HD video is available.
+    checkhd = vlc.stream("http://api.mpora.com/tv/player/load/vid/"..video.."/platform/video/domain/video.mpora.com/" )
+    if not checkhd then return nil end
+    page = checkhd:read( 65653 )
+    hashd = tonumber( string.match( page, "<has_hd>(%d)</has_hd>" ) )
+    page = nil
+
+    if hashd then
+        hd = vlc.stream("http://api.mpora.com/tv/player/playlist/vid/"..video.."/hd/true/")
+        page = hd:read( 65653 )
+        hdurl = string.match( page, "url=\"(.*)\" />")
+        table.insert( p, { path = hdurl; name = name.." (HD)"; arturl = arturl } )
+    end
+
     return p
 end
