@@ -570,7 +570,7 @@ void InputManager::UpdateVout()
     if( hasInput() )
     {
         /* Get current vout lists from input */
-        int i_vout;
+        size_t i_vout;
         vout_thread_t **pp_vout;
         if( input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
         {
