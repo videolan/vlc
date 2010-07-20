@@ -151,11 +151,7 @@ int OpenMux( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-#if LIBAVFORMAT_VERSION_INT >= ((52<<16)+(0<<8)+0)
     p_sys->oc->pb = &p_sys->io;
-#else
-    p_sys->oc->pb = p_sys->io;
-#endif
     p_sys->oc->nb_streams = 0;
 
     p_sys->b_write_header = true;

@@ -59,10 +59,6 @@
 #   define HAVE_FFMPEG_CODEC_ATTACHMENT 1
 #endif
 
-#if (LIBAVFORMAT_VERSION_INT >= ((52<<16)+(15<<8)+0) )
-#   define HAVE_FFMPEG_CHAPTERS 1
-#endif
-
 /*****************************************************************************
  * demux_sys_t: demux descriptor
  *****************************************************************************/
@@ -273,11 +269,7 @@ int OpenDemux( vlc_object_t *p_this )
             fmt.i_bitrate = cc->bit_rate;
             fmt.audio.i_channels = cc->channels;
             fmt.audio.i_rate = cc->sample_rate;
-#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
-            fmt.audio.i_bitspersample = cc->bits_per_sample;
-#else
             fmt.audio.i_bitspersample = cc->bits_per_coded_sample;
-#endif
             fmt.audio.i_blockalign = cc->block_align;
             psz_type = "audio";
             break;
@@ -472,7 +464,6 @@ int OpenDemux( vlc_object_t *p_this )
              ( p_sys->ic->duration != (int64_t)AV_NOPTS_VALUE ) ?
              p_sys->ic->duration * 1000000 / AV_TIME_BASE : -1 );
 
-#ifdef HAVE_FFMPEG_CHAPTERS
     if( p_sys->ic->nb_chapters > 0 )
         p_sys->p_title = vlc_input_title_New();
     for( i = 0; i < p_sys->ic->nb_chapters; i++ )
@@ -491,7 +482,6 @@ int OpenDemux( vlc_object_t *p_this )
             (i_start_time != -1 ? i_start_time : 0 );
         TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
     }
-#endif
 
     return VLC_SUCCESS;
 }

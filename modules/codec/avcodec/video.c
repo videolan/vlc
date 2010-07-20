@@ -658,13 +658,9 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             }
             else if( p_context->time_base.den > 0 )
             {
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
                 int i_tick = p_context->ticks_per_frame;
                 if( i_tick <= 0 )
                     i_tick = 1;
-#else
-                int i_tick = 1;
-#endif
 
                 p_sys->i_pts += INT64_C(1000000) *
                     (2 + p_sys->p_ff_pic->repeat_pict) *
