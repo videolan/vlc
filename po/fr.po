@@ -15859,7 +15859,7 @@ msgstr "Durée"
 
 #: modules/gui/macosx/playlist.m:463
 msgid "Save Playlist..."
-msgstr "&Enregistrer la liste de lecture…"
+msgstr "Enregistrer la liste de lecture…"
 
 #: modules/gui/macosx/playlist.m:465 modules/gui/qt4/dialogs/bookmarks.cpp:45
 #: modules/gui/qt4/ui/podcast_configuration.h:105
