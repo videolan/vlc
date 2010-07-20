@@ -1054,7 +1054,7 @@ char *make_URI (const char *path, const char *scheme)
 #ifdef WIN32
     if (isalpha (path[0]) && (path[1] == ':'))
     {
-        if (asprintf (&buf, "%s:///%c:", scheme, path[0]) == -1)
+        if (asprintf (&buf, "%s:///%c:", scheme ? scheme : "file", path[0]) == -1)
             buf = NULL;
         path += 2;
     }
