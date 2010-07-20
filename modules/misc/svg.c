@@ -48,7 +48,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib-object.h>                                  /* g_object_unref( ) */
-#include <librsvg-2/librsvg/rsvg.h>
+#include <librsvg/rsvg.h>
 
 typedef struct svg_rendition_t svg_rendition_t;
 
