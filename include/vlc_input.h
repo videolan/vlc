@@ -512,7 +512,7 @@ enum input_query_e
     /* Input ressources
      * XXX You must call vlc_object_release as soon as possible */
     INPUT_GET_AOUT,         /* arg1=aout_instance_t **              res=can fail */
-    INPUT_GET_VOUTS,        /* arg1=vout_thread_t ***, int *        res=can fail */
+    INPUT_GET_VOUTS,        /* arg1=vout_thread_t ***, size_t *        res=can fail */
     INPUT_GET_ES_OBJECTS,   /* arg1=int id, vlc_object_t **dec, vout_thread_t **, aout_instance_t ** */
 
     /* External clock managments */
