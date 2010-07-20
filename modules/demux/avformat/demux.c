@@ -302,7 +302,7 @@ int OpenDemux( vlc_object_t *p_this )
             }
             psz_type = "video";
             fmt.video.i_frame_rate = cc->time_base.den;
-            fmt.video.i_frame_rate_base = cc->time_base.num;
+            fmt.video.i_frame_rate_base = cc->time_base.num * __MAX( cc->ticks_per_frame, 1 );
             break;
 
         case CODEC_TYPE_SUBTITLE:
