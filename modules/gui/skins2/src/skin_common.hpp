@@ -46,6 +46,7 @@ class OSLoop;
 class VarManager;
 class VlcProc;
 class VoutManager;
+class ArtManager;
 class Theme;
 class ThemeRepository;
 
@@ -124,6 +125,8 @@ struct intf_sys_t
     VlcProc *p_vlcProc;
     /// Vout manager
     VoutManager *p_voutManager;
+    /// Art manager
+    ArtManager *p_artManager;
     /// Theme repository
     ThemeRepository *p_repository;
 

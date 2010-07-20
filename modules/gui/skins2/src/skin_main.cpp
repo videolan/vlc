@@ -43,6 +43,7 @@
 #include "theme_repository.hpp"
 #include "vout_window.hpp"
 #include "vout_manager.hpp"
+#include "art_manager.hpp"
 #include "../parser/interpreter.hpp"
 #include "../commands/async_queue.hpp"
 #include "../commands/cmd_quit.hpp"
@@ -212,13 +213,13 @@ static void *Run( void * p_obj )
     }
     if( Interpreter::instance( p_intf ) == NULL )
     {
-        msg_Err( p_intf, "cannot instanciate Interpreter" );
+        msg_Err( p_intf, "cannot instantiate Interpreter" );
         b_error = true;
         goto end;
     }
     if( VarManager::instance( p_intf ) == NULL )
     {
-        msg_Err( p_intf, "cannot instanciate VarManager" );
+        msg_Err( p_intf, "cannot instantiate VarManager" );
         b_error = true;
         goto end;
     }
@@ -230,19 +231,25 @@ static void *Run( void * p_obj )
     }
     if( VoutManager::instance( p_intf ) == NULL )
     {
-        msg_Err( p_intf, "cannot instanciate VoutManager" );
+        msg_Err( p_intf, "cannot instantiate VoutManager" );
+        b_error = true;
+        goto end;
+    }
+    if( ArtManager::instance( p_intf ) == NULL )
+    {
+        msg_Err( p_intf, "cannot instantiate ArtManager" );
         b_error = true;
         goto end;
     }
     if( ThemeRepository::instance( p_intf ) == NULL )
     {
-        msg_Err( p_intf, "cannot instanciate ThemeRepository" );
+        msg_Err( p_intf, "cannot instantiate ThemeRepository" );
         b_error = true;
         goto end;
     }
     if( Dialogs::instance( p_intf ) == NULL )
     {
-        msg_Err( p_intf, "cannot instanciate qt4 dialogs provider" );
+        msg_Err( p_intf, "cannot instantiate qt4 dialogs provider" );
         b_error = true;
         goto end;
     }
@@ -295,6 +302,7 @@ end:
     // Destroy "singleton" objects
     Dialogs::destroy( p_intf );
     ThemeRepository::destroy( p_intf );
+    ArtManager::destroy( p_intf );
     VoutManager::destroy( p_intf );
     VlcProc::destroy( p_intf );
     VarManager::destroy( p_intf );

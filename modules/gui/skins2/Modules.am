@@ -107,8 +107,8 @@ SOURCES_skins2 = \
 	src/dialogs.hpp \
 	src/file_bitmap.cpp \
 	src/file_bitmap.hpp \
-	src/art_bitmap.cpp \
-	src/art_bitmap.hpp \
+	src/art_manager.cpp \
+	src/art_manager.hpp \
 	src/ft2_bitmap.cpp \
 	src/ft2_bitmap.hpp \
 	src/ft2_font.cpp \

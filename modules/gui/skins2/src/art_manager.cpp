@@ -1,5 +1,5 @@
 /*****************************************************************************
- * art_bitmap.cpp
+ * art_manager.cpp
  *****************************************************************************
  * Copyright (C) 2010 the VideoLAN team
  * $Id$
@@ -25,38 +25,60 @@
 # include "config.h"
 #endif
 
-#include "art_bitmap.hpp"
+#include "art_manager.hpp"
 #include <vlc_image.h>
 
+#define MAX_ART_CACHED    2
 
-// static variables
-intf_thread_t*    ArtBitmap::m_pIntf = NULL;
-image_handler_t*  ArtBitmap::m_pImageHandler = NULL;
-list<ArtBitmap*>  ArtBitmap::m_listBitmap;
 
-ArtBitmap::ArtBitmap( string uriName ):
-    FileBitmap( m_pIntf, m_pImageHandler, uriName, -1 ), m_uriName( uriName )
+ArtManager *ArtManager::instance( intf_thread_t *pIntf )
 {
+    if( pIntf->p_sys->p_artManager == NULL )
+    {
+        pIntf->p_sys->p_artManager = new ArtManager( pIntf );
+    }
+
+    return pIntf->p_sys->p_artManager;
 }
 
-void ArtBitmap::initArtBitmap( intf_thread_t* pIntf )
+
+void ArtManager::destroy( intf_thread_t *pIntf )
 {
-    if( m_pIntf )
-        return;
+    delete pIntf->p_sys->p_artManager;
+    pIntf->p_sys->p_artManager = NULL;
+}
 
-    // retain reference to skins interface
-    m_pIntf = pIntf;
 
+ArtManager::ArtManager( intf_thread_t* pIntf ) : SkinObject( pIntf )
+{
     // initialize handler
     m_pImageHandler = image_HandlerCreate( pIntf );
 
     if( !m_pImageHandler )
-        msg_Err( m_pIntf, "initialization of art bitmaps failed" );
+        msg_Err( getIntf(), "initialization of art manager failed" );
 }
 
 
-ArtBitmap* ArtBitmap::getArtBitmap( string uriName )
+ArtManager::~ArtManager( )
 {
+    if( m_pImageHandler )
+    {
+        image_HandlerDelete( m_pImageHandler );
+        m_pImageHandler = NULL;
+    }
+
+    list<ArtBitmap*>::const_iterator it;
+    for( it = m_listBitmap.begin(); it != m_listBitmap.end(); ++it )
+        delete *it;
+    m_listBitmap.clear();
+}
+
+
+ArtBitmap* ArtManager::getArtBitmap( string uriName )
+{
+    if( !uriName.size() )
+        return NULL;
+
     if( !m_pImageHandler )
         return NULL;
 
@@ -68,10 +90,16 @@ ArtBitmap* ArtBitmap::getArtBitmap( string uriName )
             return *it;
     }
 
-    // create and retain a new ArtBitmap since uri if not yet known
-    ArtBitmap* pArt = new ArtBitmap( uriName );
+    // create and retain a new ArtBitmap since uri is not yet known
+    ArtBitmap* pArt = new ArtBitmap( getIntf(), m_pImageHandler, uriName );
     if( pArt && pArt->getWidth() && pArt->getHeight() )
     {
+        if( m_listBitmap.size() == MAX_ART_CACHED )
+        {
+            ArtBitmap* pOldest = *(m_listBitmap.begin());
+            delete pOldest;
+            m_listBitmap.pop_front();
+        }
         m_listBitmap.push_back( pArt );
         return pArt;
     }
@@ -80,17 +108,4 @@ ArtBitmap* ArtBitmap::getArtBitmap( string uriName )
         delete pArt;
         return NULL;
     }
-}
-
-void ArtBitmap::freeArtBitmap( )
-{
-    m_pIntf = NULL;
-
-    if( m_pImageHandler )
-    {
-        image_HandlerDelete( m_pImageHandler );
-        m_pImageHandler = NULL;
-    }
-
-    m_listBitmap.clear();
 }

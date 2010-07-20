@@ -1,5 +1,5 @@
 /*****************************************************************************
- * art_bitmap.hpp
+ * art_manager.hpp
  *****************************************************************************
  * Copyright (C) 2010 the VideoLAN team
  * $Id$
@@ -21,8 +21,8 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef ART_BITMAP_HPP
-#define ART_BITMAP_HPP
+#ifndef ART_MANAGER_HPP
+#define ART_MANAGER_HPP
 
 #include "file_bitmap.hpp"
 #include <string>
@@ -34,33 +34,46 @@ class ArtBitmap: public FileBitmap
 {
 public:
 
-    static ArtBitmap* getArtBitmap( string uriName );
-    static void initArtBitmap( intf_thread_t* pIntf );
-    static void freeArtBitmap( );
-
     string getUriName() { return m_uriName; }
 
-protected:
-
     /// Constructor/destructor
-    ArtBitmap( string uriName );
+    ArtBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
+               string uriName ) :
+        FileBitmap( pIntf, pImageHandler, uriName, -1 ),
+        m_uriName( uriName ) {}
     virtual ~ArtBitmap() {}
 
-    /// skins2 interface
-    static intf_thread_t *m_pIntf;
-
-    /// Image handler (used to load art files)
-    static image_handler_t *m_pImageHandler;
-
-    // keep a cache of art already open
-    static list<ArtBitmap*> m_listBitmap;
-
 private:
-
-    // uriName
+    /// uriName
     string m_uriName;
-
 };
 
+
+/// Singleton object for handling art
+class ArtManager: public SkinObject
+{
+public:
+    /// Get the instance of ArtManager
+    /// Returns NULL if the initialization of the object failed
+    static ArtManager *instance( intf_thread_t *pIntf );
+
+    /// Delete the instance of ArtManager
+    static void destroy( intf_thread_t *pIntf );
+
+    /// Retrieve for the art file from uri name
+    ArtBitmap* getArtBitmap( string uriName );
+
+protected:
+    // Protected because it is a singleton
+    ArtManager( intf_thread_t *pIntf );
+    virtual ~ArtManager();
+
+private:
+    /// Image handler (used to load art files)
+    image_handler_t *m_pImageHandler;
+
+    // keep a cache of art already open
+    list<ArtBitmap*> m_listBitmap;
+};
 
 #endif

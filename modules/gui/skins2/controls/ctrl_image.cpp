@@ -29,7 +29,7 @@
 #include "../src/os_graphics.hpp"
 #include "../src/vlcproc.hpp"
 #include "../src/scaled_bitmap.hpp"
-#include "../src/art_bitmap.hpp"
+#include "../src/art_manager.hpp"
 #include "../utils/position.hpp"
 
 
@@ -51,8 +51,6 @@ CtrlImage::CtrlImage( intf_thread_t *pIntf, GenericBitmap &rBitmap,
     {
         VlcProc *pVlcProc = VlcProc::instance( getIntf() );
         pVlcProc->getStreamArtVar().addObserver( this );
-
-        ArtBitmap::initArtBitmap( getIntf() );
     }
 
 }
@@ -66,8 +64,6 @@ CtrlImage::~CtrlImage()
     {
         VlcProc *pVlcProc = VlcProc::instance( getIntf() );
         pVlcProc->getStreamArtVar().delObserver( this );
-
-        ArtBitmap::freeArtBitmap( );
     }
 }
 
@@ -218,7 +214,8 @@ void CtrlImage::onUpdate( Subject<VarString> &rVariable, void* arg )
     if( &rVariable == &pVlcProc->getStreamArtVar() )
     {
         string str = ((VarString&)rVariable).get();
-        GenericBitmap* pArt = (GenericBitmap*) ArtBitmap::getArtBitmap( str );
+        ArtManager* pArtManager = ArtManager::instance( getIntf() );
+        GenericBitmap* pArt = (GenericBitmap*) pArtManager->getArtBitmap( str );
 
         m_pBitmap = pArt ? pArt : m_pOriginalBitmap;
 
