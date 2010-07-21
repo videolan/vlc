@@ -131,6 +131,7 @@ static int Open( vlc_object_t *p_this )
     if( ( p_sys->hfaad = faacDecOpen() ) == NULL )
     {
         msg_Err( p_dec, "cannot initialize faad" );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -158,6 +159,8 @@ static int Open( vlc_object_t *p_this )
                           &i_rate, &i_channels ) < 0 )
         {
             msg_Err( p_dec, "Failed to initialize faad using extra data" );
+            faacDecClose( p_sys->hfaad );
+            free( p_sys );
             return VLC_EGENERIC;
         }
 
