@@ -1204,44 +1204,28 @@ HRESULT BDAGraph::Build()
     }
 
     /* First filter in the graph is the Network Provider and
-     * its Scanning Tuner which takes the Tune Request*/
-    hr = ::CoCreateInstance( guid_network_type, NULL, CLSCTX_INPROC_SERVER,
+     * its Scanning Tuner which takes the Tune Request
+     * Try to build the Win 7 Universal Network Provider first*/
+    hr = ::CoCreateInstance( CLSID_NetworkProvider, NULL, CLSCTX_INPROC_SERVER,
         IID_IBaseFilter, (void**)&p_network_provider);
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
-            "Cannot CoCreate Network Provider: hr=0x%8lx", hr );
-        return hr;
+            "Cannot CoCreate the Universal Network Provider, trying the old way...");
+        hr = ::CoCreateInstance( guid_network_type, NULL, CLSCTX_INPROC_SERVER,
+            IID_IBaseFilter, (void**)&p_network_provider);
+        if( FAILED( hr ) )
+        {
+            msg_Warn( p_access, "Build: "\
+                "Cannot CoCreate Network Provider: hr=0x%8lx", hr );
+            return hr;
+        }
     }
     hr = p_filter_graph->AddFilter( p_network_provider, L"Network Provider" );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
             "Cannot load network provider: hr=0x%8lx", hr );
-        return hr;
-    }
-
-    hr = p_network_provider->QueryInterface( IID_IScanningTuner,
-        (void**)&p_scanning_tuner );
-    if( FAILED( hr ) )
-    {
-        msg_Warn( p_access, "Build: "\
-            "Cannot QI Network Provider for Scanning Tuner: hr=0x%8lx", hr );
-        return hr;
-    }
-
-    hr = p_scanning_tuner->Validate( p_tune_request );
-    if( FAILED( hr ) )
-    {
-        msg_Warn( p_access, "Build: "\
-            "Tune Request is invalid: hr=0x%8lx", hr );
-        return hr;
-    }
-    hr = p_scanning_tuner->put_TuneRequest( p_tune_request );
-    if( FAILED( hr ) )
-    {
-        msg_Warn( p_access, "Build: "\
-            "Cannot submit the tune request: hr=0x%8lx", hr );
         return hr;
     }
 
@@ -1290,6 +1274,31 @@ HRESULT BDAGraph::Build()
         msg_Warn( p_access, "Build: "\
             "Cannot find Capture device. Connecting to tuner: hr=0x%8lx", hr );
     }
+
+    hr = p_network_provider->QueryInterface( IID_IScanningTuner,
+        (void**)&p_scanning_tuner );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "Build: "\
+            "Cannot QI Network Provider for Scanning Tuner: hr=0x%8lx", hr );
+        return hr;
+    }
+
+    hr = p_scanning_tuner->Validate( p_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "Build: "\
+            "Tune Request is invalid: hr=0x%8lx", hr );
+        //return hr; it is not mandatory to validate. Validate fails, but the request is successfully accepted
+    }
+    hr = p_scanning_tuner->put_TuneRequest( p_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "Build: "\
+            "Cannot submit the tune request: hr=0x%8lx", hr );
+        return hr;
+    }
+
     if( p_sample_grabber )
          p_sample_grabber->Release();
     p_sample_grabber = NULL;

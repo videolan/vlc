@@ -914,6 +914,11 @@ public:
 };
 
 extern "C" {
+/* Following GUIDs are for the new windows 7 interfaces  */
+/* windows 7 universal provider applies to all networks */
+const CLSID CLSID_NetworkProvider =
+    {0xB2F3A67C,0x29DA,0x4C78,{0x88,0x31,0x09,0x1E,0xD5,0x09,0xA4,0x75}};
+
 extern const CLSID CLSID_ATSCLocator;
 extern const CLSID CLSID_ATSCNetworkProvider;
 extern const CLSID CLSID_ATSCTuningSpace;
