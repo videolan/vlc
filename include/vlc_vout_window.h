@@ -43,6 +43,7 @@ typedef struct vout_window_sys_t vout_window_sys_t;
 enum {
     VOUT_WINDOW_TYPE_XID,
     VOUT_WINDOW_TYPE_HWND,
+    VOUT_WINDOW_TYPE_NSOBJECT,
 };
 
 /**
@@ -88,8 +89,9 @@ struct vout_window_t {
      * It must be filled in the open function.
      */
     union {
-        void     *hwnd;   /* Win32 window handle */
-        uint32_t xid;     /* X11 windows ID */
+        void     *hwnd;     /* Win32 window handle */
+        uint32_t xid;       /* X11 windows ID */
+        void     *nsobject; /* Mac OSX view object */
     } handle;
 
     /* display server (mandatory) */

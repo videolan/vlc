@@ -14,7 +14,6 @@ CONFIGURE_LINE="`echo "$0 $ac_configure_args" | sed -e 's/\\\/\\\\\\\/g'`"
 CODENAME="Twoflower"
 COPYRIGHT_YEARS="1996-2010"
 
-AC_PREREQ(2.59c)
 AC_CONFIG_SRCDIR(src/libvlc.c)
 AC_CONFIG_AUX_DIR(autotools)
 AC_CONFIG_MACRO_DIR(m4)
@@ -27,13 +26,7 @@ AM_INIT_AUTOMAKE(tar-ustar)
 AM_CONFIG_HEADER(config.h)
 
 # Disable with "./configure --disable-silent-rules" or "make V=1"
-m4_ifdef([AM_SILENT_RULES], [
-  AM_SILENT_RULES([yes])
-], [
-  AM_DEFAULT_VERBOSITY=1
-  AC_SUBST(AM_DEFAULT_VERBOSITY)
-])
-
+AM_SILENT_RULES([yes])
 
 dnl Too many people are not aware of maintainer mode:
 dnl If you want to use it, you definitely know what you are doing, so
@@ -2633,8 +2626,7 @@ dnl  avcodec decoder/encoder plugin
 dnl
 AC_ARG_ENABLE(avcodec,
 [  --enable-avcodec        libavcodec codec (default enabled)])
-if test "${enable_avcodec}" != "no"
-then
+AS_IF([test "${enable_avcodec}" != "no"], [
   PKG_CHECK_MODULES(AVCODEC,[libavcodec >= 52.25.0 libavutil],
     [
       VLC_SAVE_FLAGS
@@ -2650,7 +2642,9 @@ then
     ],[
       AC_MSG_ERROR([Could not find libavcodec or libavutil. Use --disable-avcodec to ignore this error.])
   ])
-fi
+], [
+  have_avcodec="no"
+])
 
 dnl
 dnl libva needs avcodec
@@ -2742,7 +2736,9 @@ dnl  avformat demuxer/muxer plugin
 dnl
 
 AC_ARG_ENABLE(avformat,
-[  --enable-avformat       libavformat containers (default enabled)])
+[  --enable-avformat       libavformat containers (default enabled)],, [
+  enable_avformat="${have_avcodec}"
+])
 if test "${enable_avformat}" != "no"
 then
   PKG_CHECK_MODULES(AVFORMAT,[libavformat > 52.30.0 libavutil],
