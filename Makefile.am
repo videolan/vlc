@@ -8,7 +8,7 @@
 #  - src (libvlc) is nedeed by modules, mozilla and bindings
 #  - libs/* are needed by modules
 BASE_SUBDIRS = po compat src bin modules share doc test
-EXTRA_SUBDIRS = m4 extras/package/ipkg \
+EXTRA_SUBDIRS = m4 \
 	libs/loader libs/srtp libs/unzip \
 	projects/mozilla projects/activex
 DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)

@@ -4708,7 +4708,6 @@ AC_CONFIG_FILES([
   Makefile
   projects/activex/Makefile
   doc/Makefile
-  extras/package/ipkg/Makefile
   libs/loader/Makefile
   libs/srtp/Makefile
   libs/unzip/Makefile
