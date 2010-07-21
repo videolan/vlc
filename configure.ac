@@ -3885,14 +3885,34 @@ AC_ARG_ENABLE(qt4,
 AS_IF([test "${enable_qt4}" != "no"], [
   PKG_CHECK_MODULES(QT4, [QtCore QtGui >= 4.4.0], [
     VLC_ADD_PLUGIN([qt4])
+    VLC_ADD_LIBS([qt4],[${QT4_LIBS}])
+    VLC_ADD_CXXFLAGS([qt4],[${QT4_CFLAGS}])
     ALIASES="${ALIASES} qvlc"
-    AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "darwin"], [
-        VLC_ADD_LIBS([qt4],[$QT4_LIBS ${X_LIBS} ${X_PRE_LIBS} -lX11])
-        need_xid_provider="no"
-        VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS ${X_CFLAGS}])
+
+    AC_LANG_PUSH([C++])
+    CPPFLAGS_save="${CXXFLAGS}"
+
+    AC_MSG_CHECKING([whether Qt uses X11])
+    CPPFLAGS="${CXXFLAGS} ${QT4_CFLAGS}"
+    AC_PREPROC_IFELSE([
+#include <QWidget>
+#if !defined (Q_WS_X11)
+# error Fail
+#endif
     ], [
-        VLC_ADD_LIBS([qt4],[$QT4_LIBS -lole32])
-        VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS])
+      AC_MSG_RESULT([yes])
+      VLC_ADD_LIBS([qt4],[${X_LIBS} ${X_PRE_LIBS} -lX11])
+      need_xid_provider="no"
+      VLC_ADD_CXXFLAGS([qt4],[${X_CFLAGS}])
+    ], [
+      AC_MSG_RESULT([no])
+    ])
+
+    CPPFLAGS="${CPPFLAGS_save}"
+    AC_LANG_POP([C++])
+
+    AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
+        VLC_ADD_LIBS([qt4],[-lole32])
     ])
     AC_PATH_PROGS(MOC, [moc-qt4 moc], moc,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
     AC_PATH_PROG(RCC, rcc, rcc,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
