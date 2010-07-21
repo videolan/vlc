@@ -20,6 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+class IDigitalCableTuneRequest;
+class IDigitalCableLocator;
 class IATSCChannelTuneRequest;
 class IATSCLocator;
 class IBDA_DeviceControl;
@@ -391,6 +393,15 @@ public:
     virtual HRESULT __stdcall put_MinorChannel( long l_minor_channel )=0;
 };
 
+class IDigitalCableTuneRequest : public IATSCChannelTuneRequest
+{
+public:
+    virtual HRESULT __stdcall get_MajorChannel( long* pl_major_channel )=0;
+    virtual HRESULT __stdcall put_MajorChannel( long l_major_channel )=0;
+    virtual HRESULT __stdcall get_SourceID( long* pl_source_id )=0;
+    virtual HRESULT __stdcall put_SourceID( long l_source_id )=0;
+};
+
 class IDVBTuneRequest : public ITuneRequest
 {
 public:
@@ -433,6 +444,18 @@ public:
     virtual HRESULT __stdcall put_PhysicalChannel( long l_phys_channel )=0;
     virtual HRESULT __stdcall get_TSID( long* pl_tsid )=0;
     virtual HRESULT __stdcall put_TSID( long l_tsid )=0;
+};
+
+class IATSCLocator2 : public IATSCLocator
+{
+public:
+    virtual HRESULT __stdcall get_ProgramNumber( long* pl_prog_number )=0;
+    virtual HRESULT __stdcall put_ProgramNumber( long l_prog_number )=0;
+};
+
+class IDigitalCableLocator : public IATSCLocator2
+{
+public:
 };
 
 class IDVBCLocator : public ILocator
@@ -918,6 +941,18 @@ extern "C" {
 /* windows 7 universal provider applies to all networks */
 const CLSID CLSID_NetworkProvider =
     {0xB2F3A67C,0x29DA,0x4C78,{0x88,0x31,0x09,0x1E,0xD5,0x09,0xA4,0x75}};
+
+/* Win 7 - Digital Cable - North America Clear QAM */
+const CLSID CLSID_DigitalCableTuningSpace =
+    {0xD9BB4CEE,0xB87A,0x47F1,{0xAC,0xF1,0xB0,0x8D,0x9C,0x78,0x13,0xFC}};
+const CLSID CLSID_DigitalCableLocator =
+    {0x03C06416,0xD127,0x407A,{0xAB,0x4C,0xFD,0xD2,0x79,0xAB,0xBE,0x5D}};
+const CLSID CLSID_DigitalCableNetworkType =
+    {0x143827AB,0xF77B,0x498d,{0x81,0xCA,0x5A,0x00,0x7A,0xEC,0x28,0xBF}};
+const IID IID_IDigitalCableTuneRequest =
+    {0xBAD7753B,0x6B37,0x4810,{0xAE,0x57,0x3C,0xE0,0xC4,0xA9,0xE6,0xCB}};
+const IID IID_IDigitalCableLocator =
+    {0x48F66A11,0x171A,0x419A,{0x95,0x25,0xBE,0xEE,0xCD,0x51,0x58,0x4C}};
 
 extern const CLSID CLSID_ATSCLocator;
 extern const CLSID CLSID_ATSCNetworkProvider;

@@ -41,6 +41,13 @@ extern "C" {
         delete p_access->p_sys->p_bda_module;
     };
 
+    int dvb_SubmitCQAMTuneRequest( access_t* p_access )
+    {
+        if( p_access->p_sys->p_bda_module )
+            return p_access->p_sys->p_bda_module->SubmitCQAMTuneRequest();
+        return VLC_EGENERIC;
+    };
+
     int dvb_SubmitATSCTuneRequest( access_t* p_access )
     {
         if( p_access->p_sys->p_bda_module )
@@ -155,6 +162,99 @@ BDAGraph::~BDAGraph()
 {
     Destroy();
     CoUninitialize();
+}
+
+/*****************************************************************************
+* Submit an Clear QAM Tune Request (US Cable Shit)
+*****************************************************************************/
+int BDAGraph::SubmitCQAMTuneRequest()
+{
+    HRESULT hr = S_OK;
+    class localComPtr
+    {
+        public:
+        IDigitalCableTuneRequest* p_cqam_tune_request;
+        IDigitalCableLocator* p_cqam_locator;
+        localComPtr(): p_cqam_tune_request(NULL), p_cqam_locator(NULL) {};
+        ~localComPtr()
+        {
+            if( p_cqam_tune_request )
+                p_cqam_tune_request->Release();
+            if( p_cqam_locator )
+                p_cqam_locator->Release();
+        }
+    } l;
+    long l_minor_channel, l_physical_channel, l_frequency;
+
+    l_physical_channel = var_GetInteger( p_access, "dvb-physical-channel" );
+    l_minor_channel    = var_GetInteger( p_access, "dvb-minor-channel" );
+    l_frequency        = var_GetInteger( p_access, "dvb-frequency" );
+
+    guid_network_type = CLSID_DigitalCableNetworkType;
+    hr = CreateTuneRequest();
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
+            "Cannot create Tuning Space: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    hr = p_tune_request->QueryInterface( IID_IDigitalCableTuneRequest,
+        (void**)&l.p_cqam_tune_request );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
+            "Cannot QI for IDigitalCableTuneRequest: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+    hr = ::CoCreateInstance( CLSID_DigitalCableLocator, 0, CLSCTX_INPROC,
+                             IID_IDigitalCableLocator, (void**)&l.p_cqam_locator );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
+            "Cannot create the CQAM locator: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    hr = S_OK;
+    if( SUCCEEDED( hr ) && l_physical_channel > 0 )
+        hr = l.p_cqam_locator->put_PhysicalChannel( l_physical_channel );
+    if( SUCCEEDED( hr ) && l_frequency > 0 )
+        hr = l.p_cqam_locator->put_CarrierFrequency( l_frequency );
+    if( SUCCEEDED( hr ) && l_minor_channel > 0 )
+        hr = l.p_cqam_tune_request->put_MinorChannel( l_minor_channel );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
+            "Cannot set tuning parameters: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    hr = p_tune_request->put_Locator( l.p_cqam_locator );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
+            "Cannot put the locator: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
+    /* Build and Run the Graph. If a Tuner device is in use the graph will
+     * fail to run. Repeated calls to build will check successive tuner
+     * devices */
+    do
+    {
+        hr = Build();
+        if( FAILED( hr ) )
+        {
+            msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
+                "Cannot Build the Graph: hr=0x%8lx", hr );
+            return VLC_EGENERIC;
+        }
+        hr = Start();
+    }
+    while( hr != S_OK );
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

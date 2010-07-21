@@ -63,6 +63,7 @@ typedef struct BDAGraph BDAGraph;
 
 void dvb_newBDAGraph( access_t* p_access );
 void dvb_deleteBDAGraph( access_t* p_access );
+int dvb_SubmitCQAMTuneRequest( access_t* p_access );
 int dvb_SubmitATSCTuneRequest( access_t* p_access );
 int dvb_SubmitDVBTTuneRequest( access_t* p_access );
 int dvb_SubmitDVBCTuneRequest( access_t* p_access );

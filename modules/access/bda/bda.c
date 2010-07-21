@@ -297,7 +297,8 @@ vlc_module_begin ()
                   "dvb-s", "dvbs",        /* Satellite */
                   "dvb-c", "dvbc",        /* Cable */
                   "dvb-t", "dvbt",        /* Terrestrial */
-                  "atsc" )                /* Atsc */
+                  "atsc",                 /* Atsc */
+                  "cqam",)                /* Clear QAM */
 
     set_callbacks( Open, Close )
 vlc_module_end ()
@@ -387,6 +388,10 @@ static int Open( vlc_object_t *p_this )
     {
         i_ret = dvb_SubmitATSCTuneRequest( p_access );
     }
+    if( strncmp( p_access->psz_access, "cqam", 4 ) == 0 )
+    {
+        i_ret = dvb_SubmitCQAMTuneRequest( p_access );
+    }
     if( !strcmp( p_access->psz_access, "dvb" ) )
     {
         /* Try to auto detect */
@@ -398,6 +403,8 @@ static int Open( vlc_object_t *p_this )
             i_ret = dvb_SubmitDVBTTuneRequest( p_access );
         if( i_ret )
             i_ret = dvb_SubmitATSCTuneRequest( p_access );
+        if( i_ret )
+            i_ret = dvb_SubmitCQAMTuneRequest( p_access );
     }
 
     if( !i_ret )

@@ -78,6 +78,7 @@ public:
     virtual ~BDAGraph();
 
     /* */
+    int SubmitCQAMTuneRequest();
     int SubmitATSCTuneRequest();
     int SubmitDVBTTuneRequest();
     int SubmitDVBCTuneRequest();
