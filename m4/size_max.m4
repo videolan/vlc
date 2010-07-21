@@ -1,5 +1,5 @@
-# size_max.m4 serial 6
-dnl Copyright (C) 2003, 2005-2006 Free Software Foundation, Inc.
+# size_max.m4 serial 9
+dnl Copyright (C) 2003, 2005-2006, 2008-2010 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -8,10 +8,9 @@ dnl From Bruno Haible.
 
 AC_DEFUN([gl_SIZE_MAX],
 [
-  AC_CHECK_HEADERS(stdint.h)
+  AC_CHECK_HEADERS([stdint.h])
   dnl First test whether the system already has SIZE_MAX.
-  AC_MSG_CHECKING([for SIZE_MAX])
-  AC_CACHE_VAL([gl_cv_size_max], [
+  AC_CACHE_CHECK([for SIZE_MAX], [gl_cv_size_max], [
     gl_cv_size_max=
     AC_EGREP_CPP([Found it], [
 #include <limits.h>
@@ -21,16 +20,16 @@ AC_DEFUN([gl_SIZE_MAX],
 #ifdef SIZE_MAX
 Found it
 #endif
-], gl_cv_size_max=yes)
+], [gl_cv_size_max=yes])
     if test -z "$gl_cv_size_max"; then
       dnl Define it ourselves. Here we assume that the type 'size_t' is not wider
       dnl than the type 'unsigned long'. Try hard to find a definition that can
       dnl be used in a preprocessor #if, i.e. doesn't contain a cast.
       AC_COMPUTE_INT([size_t_bits_minus_1], [sizeof (size_t) * CHAR_BIT - 1],
         [#include <stddef.h>
-#include <limits.h>], size_t_bits_minus_1=)
+#include <limits.h>], [size_t_bits_minus_1=])
       AC_COMPUTE_INT([fits_in_uint], [sizeof (size_t) <= sizeof (unsigned int)],
-        [#include <stddef.h>], fits_in_uint=)
+        [#include <stddef.h>], [fits_in_uint=])
       if test -n "$size_t_bits_minus_1" && test -n "$fits_in_uint"; then
         if test $fits_in_uint = 1; then
           dnl Even though SIZE_MAX fits in an unsigned int, it must be of type
@@ -38,7 +37,7 @@ Found it
           AC_TRY_COMPILE([#include <stddef.h>
             extern size_t foo;
             extern unsigned long foo;
-            ], [], fits_in_uint=0)
+            ], [], [fits_in_uint=0])
         fi
         dnl We cannot use 'expr' to simplify this expression, because 'expr'
         dnl works only with 'long' integers in the host environment, while we
@@ -54,11 +53,19 @@ Found it
       fi
     fi
   ])
-  AC_MSG_RESULT([$gl_cv_size_max])
   if test "$gl_cv_size_max" != yes; then
     AC_DEFINE_UNQUOTED([SIZE_MAX], [$gl_cv_size_max],
       [Define as the maximum value of type 'size_t', if the system doesn't define it.])
   fi
+  dnl Don't redefine SIZE_MAX in config.h if config.h is re-included after
+  dnl <stdint.h>. Remember that the #undef in AH_VERBATIM gets replaced with
+  dnl #define by AC_DEFINE_UNQUOTED.
+  AH_VERBATIM([SIZE_MAX],
+[/* Define as the maximum value of type 'size_t', if the system doesn't define
+   it. */
+#ifndef SIZE_MAX
+# undef SIZE_MAX
+#endif])
 ])
 
 dnl Autoconf >= 2.61 has AC_COMPUTE_INT built-in.

@@ -2,7 +2,7 @@
 # Output a system dependent set of variables, describing how to set the
 # run time search path of shared libraries in an executable.
 #
-#   Copyright 1996-2007 Free Software Foundation, Inc.
+#   Copyright 1996-2010 Free Software Foundation, Inc.
 #   Taken from GNU libtool, 2001
 #   Originally by Gordon Matzigkeit <gord@gnu.ai.mit.edu>, 1996
 #
@@ -47,7 +47,7 @@ for cc_temp in $CC""; do
 done
 cc_basename=`echo "$cc_temp" | sed -e 's%^.*/%%'`
 
-# Code taken from libtool.m4's AC_LIBTOOL_PROG_COMPILER_PIC.
+# Code taken from libtool.m4's _LT_COMPILER_PIC.
 
 wl=
 if test "$GCC" = yes; then
@@ -64,7 +64,7 @@ else
           ;;
       esac
       ;;
-    mingw* | cygwin* | pw32* | os2*)
+    mingw* | cygwin* | pw32* | os2* | cegcc*)
       ;;
     hpux9* | hpux10* | hpux11*)
       wl='-Wl,'
@@ -76,7 +76,13 @@ else
       ;;
     linux* | k*bsd*-gnu)
       case $cc_basename in
-        icc* | ecc*)
+        ecc*)
+          wl='-Wl,'
+          ;;
+        icc* | ifort*)
+          wl='-Wl,'
+          ;;
+        lf95*)
           wl='-Wl,'
           ;;
         pgcc | pgf77 | pgf90)
@@ -124,7 +130,7 @@ else
   esac
 fi
 
-# Code taken from libtool.m4's AC_LIBTOOL_PROG_LD_SHLIBS.
+# Code taken from libtool.m4's _LT_LINKER_SHLIBS.
 
 hardcode_libdir_flag_spec=
 hardcode_libdir_separator=
@@ -132,7 +138,7 @@ hardcode_direct=no
 hardcode_minus_L=no
 
 case "$host_os" in
-  cygwin* | mingw* | pw32*)
+  cygwin* | mingw* | pw32* | cegcc*)
     # FIXME: the MSVC++ port hasn't been tested in a loooong time
     # When not using gcc, we currently assume that we are using
     # Microsoft Visual C++.
@@ -158,7 +164,7 @@ if test "$with_gnu_ld" = yes; then
   # option of GNU ld is called -rpath, not --rpath.
   hardcode_libdir_flag_spec='${wl}-rpath ${wl}$libdir'
   case "$host_os" in
-    aix3* | aix4* | aix5*)
+    aix[3-9]*)
       # On AIX/PPC, the GNU linker is very broken
       if test "$host_cpu" != ia64; then
         ld_shlibs=no
@@ -182,7 +188,7 @@ if test "$with_gnu_ld" = yes; then
         ld_shlibs=no
       fi
       ;;
-    cygwin* | mingw* | pw32*)
+    cygwin* | mingw* | pw32* | cegcc*)
       # hardcode_libdir_flag_spec is actually meaningless, as there is
       # no search path for DLLs.
       hardcode_libdir_flag_spec='-L$libdir'
@@ -254,7 +260,7 @@ else
         hardcode_direct=unsupported
       fi
       ;;
-    aix4* | aix5*)
+    aix[4-9]*)
       if test "$host_cpu" = ia64; then
         # On IA64, the linker does run time linking by default, so we don't
         # have to do anything special.
@@ -264,7 +270,7 @@ else
         # Test if we are trying to use run time linking or normal
         # AIX style linking. If -brtl is somewhere in LDFLAGS, we
         # need to do runtime linking.
-        case $host_os in aix4.[23]|aix4.[23].*|aix5*)
+        case $host_os in aix4.[23]|aix4.[23].*|aix[5-9]*)
           for ld_flag in $LDFLAGS; do
             if (test $ld_flag = "-brtl" || test $ld_flag = "-Wl,-brtl"); then
               aix_use_runtimelinking=yes
@@ -326,7 +332,7 @@ else
       ;;
     bsdi[45]*)
       ;;
-    cygwin* | mingw* | pw32*)
+    cygwin* | mingw* | pw32* | cegcc*)
       # When not using gcc, we currently assume that we are using
       # Microsoft Visual C++.
       # hardcode_libdir_flag_spec is actually meaningless, as there is
@@ -494,7 +500,7 @@ else
 fi
 
 # Check dynamic linker characteristics
-# Code taken from libtool.m4's AC_LIBTOOL_SYS_DYNAMIC_LINKER.
+# Code taken from libtool.m4's _LT_SYS_DYNAMIC_LINKER.
 # Unlike libtool.m4, here we don't care about _all_ names of the library, but
 # only about the one the linker finds when passed -lNAME. This is the last
 # element of library_names_spec in libtool.m4, or possibly two of them if the
@@ -505,7 +511,7 @@ case "$host_os" in
   aix3*)
     library_names_spec='$libname.a'
     ;;
-  aix4* | aix5*)
+  aix[4-9]*)
     library_names_spec='$libname$shrext'
     ;;
   amigaos*)
@@ -517,7 +523,7 @@ case "$host_os" in
   bsdi[45]*)
     library_names_spec='$libname$shrext'
     ;;
-  cygwin* | mingw* | pw32*)
+  cygwin* | mingw* | pw32* | cegcc*)
     shrext=.dll
     library_names_spec='$libname.dll.a $libname.lib'
     ;;

@@ -1,5 +1,6 @@
-# lcmessage.m4 serial 4 (gettext-0.14.2)
-dnl Copyright (C) 1995-2002, 2004-2005 Free Software Foundation, Inc.
+# lcmessage.m4 serial 6 (gettext-0.18)
+dnl Copyright (C) 1995-2002, 2004-2005, 2008-2010 Free Software Foundation,
+dnl Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -20,11 +21,11 @@ dnl   Ulrich Drepper <drepper@cygnus.com>, 1995.
 
 AC_DEFUN([gt_LC_MESSAGES],
 [
-  AC_CACHE_CHECK([for LC_MESSAGES], gt_cv_val_LC_MESSAGES,
+  AC_CACHE_CHECK([for LC_MESSAGES], [gt_cv_val_LC_MESSAGES],
     [AC_TRY_LINK([#include <locale.h>], [return LC_MESSAGES],
-       gt_cv_val_LC_MESSAGES=yes, gt_cv_val_LC_MESSAGES=no)])
+       [gt_cv_val_LC_MESSAGES=yes], [gt_cv_val_LC_MESSAGES=no])])
   if test $gt_cv_val_LC_MESSAGES = yes; then
-    AC_DEFINE(HAVE_LC_MESSAGES, 1,
+    AC_DEFINE([HAVE_LC_MESSAGES], [1],
       [Define if your <locale.h> file defines LC_MESSAGES.])
   fi
 ])

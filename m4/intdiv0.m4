@@ -1,5 +1,5 @@
-# intdiv0.m4 serial 2 (gettext-0.17)
-dnl Copyright (C) 2002, 2007 Free Software Foundation, Inc.
+# intdiv0.m4 serial 3 (gettext-0.18)
+dnl Copyright (C) 2002, 2007-2010 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -61,7 +61,7 @@ int main ()
   nan = y / y;
   exit (1);
 }
-], gt_cv_int_divbyzero_sigfpe=yes, gt_cv_int_divbyzero_sigfpe=no,
+], [gt_cv_int_divbyzero_sigfpe=yes], [gt_cv_int_divbyzero_sigfpe=no],
           [
             # Guess based on the CPU.
 changequote(,)dnl
@@ -79,6 +79,6 @@ changequote([,])dnl
     *yes) value=1;;
     *) value=0;;
   esac
-  AC_DEFINE_UNQUOTED(INTDIV0_RAISES_SIGFPE, $value,
+  AC_DEFINE_UNQUOTED([INTDIV0_RAISES_SIGFPE], [$value],
     [Define if integer division by zero raises signal SIGFPE.])
 ])

@@ -1,5 +1,5 @@
-# printf-posix.m4 serial 3 (gettext-0.17)
-dnl Copyright (C) 2003, 2007 Free Software Foundation, Inc.
+# printf-posix.m4 serial 5 (gettext-0.18)
+dnl Copyright (C) 2003, 2007, 2009-2010 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -27,17 +27,18 @@ int main ()
   return (strcmp (buf, "55 33") != 0);
 }], gt_cv_func_printf_posix=yes, gt_cv_func_printf_posix=no,
       [
-        AC_EGREP_CPP(notposix, [
+        AC_EGREP_CPP([notposix], [
 #if defined __NetBSD__ || defined __BEOS__ || defined _MSC_VER || defined __MINGW32__ || defined __CYGWIN__
   notposix
 #endif
-        ], gt_cv_func_printf_posix="guessing no",
-           gt_cv_func_printf_posix="guessing yes")
+          ],
+          [gt_cv_func_printf_posix="guessing no"],
+          [gt_cv_func_printf_posix="guessing yes"])
       ])
     ])
   case $gt_cv_func_printf_posix in
     *yes)
-      AC_DEFINE(HAVE_POSIX_PRINTF, 1,
+      AC_DEFINE([HAVE_POSIX_PRINTF], [1],
         [Define if your printf() function supports format strings with positions.])
       ;;
   esac
