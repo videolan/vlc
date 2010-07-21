@@ -716,9 +716,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
             else
                 fmt = id->p_decoder->fmt_out.video;
 
-            /* FIXME the mdate() seems highly suspicious */
             spu_RenderSubpictures( p_sys->p_spu, p_pic, &fmt,
-                                   p_subpic, &id->p_decoder->fmt_out.video, mdate() );
+                                   p_subpic, &id->p_decoder->fmt_out.video, p_pic->date );
         }
 
         /* Run user specified filter chain */
