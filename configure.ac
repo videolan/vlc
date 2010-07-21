@@ -14,7 +14,6 @@ CONFIGURE_LINE="`echo "$0 $ac_configure_args" | sed -e 's/\\\/\\\\\\\/g'`"
 CODENAME="Twoflower"
 COPYRIGHT_YEARS="1996-2010"
 
-AC_PREREQ(2.59c)
 AC_CONFIG_SRCDIR(src/libvlc.c)
 AC_CONFIG_AUX_DIR(autotools)
 AC_CONFIG_MACRO_DIR(m4)
@@ -27,13 +26,7 @@ AM_INIT_AUTOMAKE(tar-ustar)
 AM_CONFIG_HEADER(config.h)
 
 # Disable with "./configure --disable-silent-rules" or "make V=1"
-m4_ifdef([AM_SILENT_RULES], [
-  AM_SILENT_RULES([yes])
-], [
-  AM_DEFAULT_VERBOSITY=1
-  AC_SUBST(AM_DEFAULT_VERBOSITY)
-])
-
+AM_SILENT_RULES([yes])
 
 dnl Too many people are not aware of maintainer mode:
 dnl If you want to use it, you definitely know what you are doing, so

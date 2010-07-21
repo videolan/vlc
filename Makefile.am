@@ -103,7 +103,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = \
-	1.9 \
+	1.11 \
 	-Wall \
 	check-news \
 	dist-bzip2 \
