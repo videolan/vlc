@@ -3993,12 +3993,6 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         /* Set demux filter */
         SetPIDFilter( p_demux, prg->i_pid_pcr, true );
     }
-    else
-    {
-        msg_Warn( p_demux, "skipping program (not selected)" );
-        dvbpsi_DeletePMT(p_pmt);
-        return;
-    }
 
     /* Parse descriptor */
     for( p_dr = p_pmt->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
