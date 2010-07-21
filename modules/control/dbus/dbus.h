@@ -7,7 +7,7 @@
  * $Id$
  *
  * Authors:    Rafaël Carré <funman at videolanorg>
- *             Mirsal ENNAIME <mirsal dot ennaime at gmail dot com>
+ *             Mirsal Ennaime <mirsal at mirsal fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

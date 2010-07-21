@@ -6,7 +6,8 @@
  * Copyright © 2009-2010 The VideoLAN team
  * $Id$
  *
- * Authors:    Mirsal ENNAIME <mirsal dot ennaime at gmail dot com>
+ * Authors:    Mirsal Ennaime <mirsal dot ennaime at gmailcom>
+ *             Rafaël Carré <funman at videolanorg>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,6 +89,9 @@ struct intf_sys_t
     dbus_int32_t    i_playing_state;
     bool            b_dead;
     vlc_array_t    *p_events;
+    vlc_array_t    *p_timeouts;
+    vlc_array_t    *p_watches;
+    int             p_pipe_fds[2];
     vlc_mutex_t     lock;
     input_thread_t *p_input;
     bool            b_unique;
@@ -99,10 +103,19 @@ enum
     SIGNAL_INTF_CHANGE,
     SIGNAL_PLAYLIST_ITEM_APPEND,
     SIGNAL_PLAYLIST_ITEM_DELETED,
+    SIGNAL_INPUT_METADATA,
     SIGNAL_RANDOM,
     SIGNAL_REPEAT,
     SIGNAL_LOOP,
     SIGNAL_STATE
+};
+
+enum
+{
+    PLAYBACK_STATE_INVALID = -1,
+    PLAYBACK_STATE_PLAYING = 0,
+    PLAYBACK_STATE_PAUSED  = 1,
+    PLAYBACK_STATE_STOPPED = 2
 };
 
 int GetInputMeta  ( input_item_t* p_input, DBusMessageIter *args );
