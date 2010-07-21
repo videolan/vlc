@@ -643,7 +643,10 @@ const QString InputManager::decodeArtURL( input_item_t *p_item )
     /* Taglib seems to define a attachment://, It won't work yet */
     url = url.replace( "attachment://", "" );
 #endif
-    return qfu( psz_art ? psz_art : "" );
+
+    QString path = qfu( psz_art ? psz_art : "" );
+    free( psz_art );
+    return path;
 }
 
 void InputManager::UpdateArt()
