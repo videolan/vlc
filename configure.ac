@@ -2768,7 +2768,9 @@ dnl
 
 AC_ARG_ENABLE(swscale,
   AS_HELP_STRING([--enable-swscale],[libswscale image scaling and conversion
-		  (default enabled)]))
+		  (default enabled)]),, [
+  enable_swscale="${have_avcodec}"
+])
 if test "${enable_swscale}" != "no"
 then
   PKG_CHECK_MODULES(SWSCALE,[libswscale],
