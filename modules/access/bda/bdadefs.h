@@ -914,62 +914,62 @@ public:
 };
 
 extern "C" {
-extern const GUID CLSID_ATSCLocator;
-extern const GUID CLSID_ATSCNetworkProvider;
-extern const GUID CLSID_ATSCTuningSpace;
-extern const GUID CLSID_DVBCLocator;
-extern const GUID CLSID_DVBCNetworkProvider;
-extern const GUID CLSID_DVBSLocator;
-extern const GUID CLSID_DVBSNetworkProvider;
-extern const GUID CLSID_DVBSTuningSpace;
-extern const GUID CLSID_DVBTuningSpace;
-extern const GUID CLSID_DVBTLocator;
-extern const GUID CLSID_DVBTNetworkProvider;
-extern const GUID CLSID_FilterGraph;
-extern const GUID CLSID_InfTee;
-extern const GUID CLSID_MPEG2Demultiplexer;
-extern const GUID CLSID_NullRenderer;
-extern const GUID CLSID_SampleGrabber;
-extern const GUID CLSID_SystemDeviceEnum;
-extern const GUID CLSID_SystemTuningSpaces;
+extern const CLSID CLSID_ATSCLocator;
+extern const CLSID CLSID_ATSCNetworkProvider;
+extern const CLSID CLSID_ATSCTuningSpace;
+extern const CLSID CLSID_DVBCLocator;
+extern const CLSID CLSID_DVBCNetworkProvider;
+extern const CLSID CLSID_DVBSLocator;
+extern const CLSID CLSID_DVBSNetworkProvider;
+extern const CLSID CLSID_DVBSTuningSpace;
+extern const CLSID CLSID_DVBTuningSpace;
+extern const CLSID CLSID_DVBTLocator;
+extern const CLSID CLSID_DVBTNetworkProvider;
+extern const CLSID CLSID_FilterGraph;
+extern const CLSID CLSID_InfTee;
+extern const CLSID CLSID_MPEG2Demultiplexer;
+extern const CLSID CLSID_NullRenderer;
+extern const CLSID CLSID_SampleGrabber;
+extern const CLSID CLSID_SystemDeviceEnum;
+extern const CLSID CLSID_SystemTuningSpaces;
 
-extern const GUID IID_IATSCChannelTuneRequest;
-extern const GUID IID_IATSCLocator;
-extern const GUID IID_IBaseFilter;
-extern const GUID IID_IBDA_DeviceControl;
-extern const GUID IID_IBDA_FrequencyFilter;
-extern const GUID IID_IBDA_SignalStatistics;
+extern const IID IID_IATSCChannelTuneRequest;
+extern const IID IID_IATSCLocator;
+extern const IID IID_IBaseFilter;
+extern const IID IID_IBDA_DeviceControl;
+extern const IID IID_IBDA_FrequencyFilter;
+extern const IID IID_IBDA_SignalStatistics;
 /* Following symbol does not exist in library
-extern const GUID IID_IBDA_Topology; */
-const GUID IID_IBDA_Topology =
+extern const IID IID_IBDA_Topology; */
+const IID IID_IBDA_Topology =
     {0x79B56888,0x7FEA,0x4690,{0xB4,0x5D,0x38,0xFD,0x3C,0x78,0x49,0xBE}};
-extern const GUID IID_ICreateDevEnum;
-extern const GUID IID_IDVBTLocator;
-extern const GUID IID_IDVBCLocator;
-extern const GUID IID_IDVBSLocator;
-extern const GUID IID_IDVBSTuningSpace;
-extern const GUID IID_IDVBTuneRequest;
-extern const GUID IID_IDVBTuningSpace;
-extern const GUID IID_IDVBTuningSpace2;
-extern const GUID IID_IGraphBuilder;
-extern const GUID IID_IMediaControl;
-extern const GUID IID_IMpeg2Demultiplexer;
-extern const GUID IID_ISampleGrabber;
-extern const GUID IID_IScanningTuner;
-extern const GUID IID_ITuner;
-extern const GUID IID_ITuningSpace;
-extern const GUID IID_ITuningSpaceContainer;
+extern const IID IID_ICreateDevEnum;
+extern const IID IID_IDVBTLocator;
+extern const IID IID_IDVBCLocator;
+extern const IID IID_IDVBSLocator;
+extern const IID IID_IDVBSTuningSpace;
+extern const IID IID_IDVBTuneRequest;
+extern const IID IID_IDVBTuningSpace;
+extern const IID IID_IDVBTuningSpace2;
+extern const IID IID_IGraphBuilder;
+extern const IID IID_IMediaControl;
+extern const IID IID_IMpeg2Demultiplexer;
+extern const IID IID_ISampleGrabber;
+extern const IID IID_IScanningTuner;
+extern const IID IID_ITuner;
+extern const IID IID_ITuningSpace;
+extern const IID IID_ITuningSpaceContainer;
 /* Following symbol does not exist in library
-extern const GUID IID_IMpeg2Data; */
-const GUID IID_IMpeg2Data =
+extern const IID IID_IMpeg2Data; */
+const IID IID_IMpeg2Data =
     {0x9B396D40,0xF380,0x4e3c,{0xA5,0x14,0x1A,0x82,0xBF,0x6E,0xBF,0xE6}};
-extern const GUID IID_IGuideData;
-extern const GUID IID_ISectionList;
-extern const GUID IID_IEnumTuneRequests;
-extern const GUID IID_IEnumGuideDataProperties;
-extern const GUID IID_IGuideDataProperty;
-extern const GUID IID_IMpeg2Stream;
-extern const GUID IID_IGuideDataEvent;
+extern const IID IID_IGuideData;
+extern const IID IID_ISectionList;
+extern const IID IID_IEnumTuneRequests;
+extern const IID IID_IEnumGuideDataProperties;
+extern const IID IID_IGuideDataProperty;
+extern const IID IID_IMpeg2Stream;
+extern const IID IID_IGuideDataEvent;
 
 extern const GUID MEDIATYPE_MPEG2_SECTIONS;
 extern const GUID MEDIASUBTYPE_None;
