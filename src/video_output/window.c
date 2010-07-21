@@ -64,6 +64,12 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
         window->handle.hwnd = NULL;
         break;
 #endif
+#ifdef __APPLE__
+    case VOUT_WINDOW_TYPE_NSOBJECT:
+        type = "vout window nsobject";
+        window->handle.nsobject = NULL;
+        break;
+#endif
     case VOUT_WINDOW_TYPE_XID:
         type = "vout window xid";
         window->handle.xid = 0;
