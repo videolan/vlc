@@ -232,7 +232,7 @@ static int Demux( demux_t *p_demux )
             LocaleFree( psz_parse );
             free( psz_mrl );
 
-            if ( psz_artist && *psz_artist )
+            if ( !EMPTY_STR(psz_artist) )
                 input_item_SetArtist( p_input, psz_artist );
             if( psz_name ) input_item_SetTitle( p_input, psz_name );
             if( !EMPTY_STR(psz_album_art) )
@@ -253,14 +253,11 @@ static int Demux( demux_t *p_demux )
         {
             /* Cleanup state */
             while( i_options-- ) free( (char*)ppsz_options[i_options] );
-            free( ppsz_options );
-            ppsz_options = NULL; i_options = 0;
-            free( psz_name );
-            psz_name = NULL;
-            free( psz_artist );
-            psz_artist = NULL;
-            free( psz_album_art );
-            psz_album_art = NULL;
+            FREENULL( ppsz_options );
+            i_options = 0;
+            FREENULL( psz_name );
+            FREENULL( psz_artist );
+            FREENULL( psz_album_art );
             i_parsed_duration = 0;
             i_duration = -1;
 
