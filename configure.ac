@@ -4705,15 +4705,8 @@ dnl Create vlc-config.in
 VLC_OUTPUT_VLC_CONFIG_IN
 
 AC_CONFIG_FILES([
-  extras/package/win32/spad.nsi
-  extras/package/win32/vlc.win32.nsi
-  extras/package/macosx/Info.plist
-  extras/package/macosx/Resources/English.lproj/InfoPlist.strings
-  extras/package/macosx/plugin/Info.plist
-  extras/package/macosx/plugin/InstallerInfo.plist
   Makefile
   projects/activex/Makefile
-  projects/activex/axvlc.inf
   doc/Makefile
   extras/package/ipkg/Makefile
   libs/loader/Makefile
@@ -4723,12 +4716,6 @@ AC_CONFIG_FILES([
   projects/mozilla/Makefile
   m4/Makefile
   po/Makefile.in
-  projects/activex/axvlc_rc.rc
-  projects/mozilla/npvlc_rc.rc
-  projects/mozilla/vlc.r
-  projects/mozilla/install.js
-  projects/mozilla/install.rdf
-  projects/mozilla/manifest.json
   share/Makefile
   compat/Makefile
   src/Makefile
@@ -4811,6 +4798,46 @@ AC_CONFIG_FILES([
   modules/sse2/Makefile
   modules/altivec/Makefile
   modules/arm_neon/Makefile
+])
+
+AM_COND_IF([BUILD_MOZILLA], [
+  AC_CONFIG_FILES([
+    projects/mozilla/install.js
+    projects/mozilla/install.rdf
+    projects/mozilla/manifest.json
+  ])
+])
+
+AM_COND_IF([HAVE_WIN32], [
+  AC_CONFIG_FILES([
+    extras/package/win32/spad.nsi
+    extras/package/win32/vlc.win32.nsi
+  ])
+  AM_COND_IF([BUILD_ACTIVEX], [
+    AC_CONFIG_FILES([
+      projects/activex/axvlc.inf
+      projects/activex/axvlc_rc.rc
+    ])
+  ])
+  AM_COND_IF([BUILD_MOZILLA], [
+    AC_CONFIG_FILES([
+      projects/mozilla/npvlc_rc.rc
+    ])
+  ])
+])
+
+AM_COND_IF([HAVE_DARWIN], [
+  AC_CONFIG_FILES([
+    extras/package/macosx/Info.plist
+    extras/package/macosx/Resources/English.lproj/InfoPlist.strings
+    extras/package/macosx/plugin/Info.plist
+    extras/package/macosx/plugin/InstallerInfo.plist
+  ])
+  AM_COND_IF([BUILD_MOZILLA], [
+    AC_CONFIG_FILES([
+      projects/mozilla/vlc.r
+    ])
+  ])
 ])
 
 dnl Generate makefiles
