@@ -3890,10 +3890,10 @@ AS_IF([test "${enable_qt4}" != "no"], [
     ALIASES="${ALIASES} qvlc"
 
     AC_LANG_PUSH([C++])
-    CPPFLAGS_save="${CXXFLAGS}"
+    CPPFLAGS_save="${CPPFLAGS}"
 
     AC_MSG_CHECKING([whether Qt uses X11])
-    CPPFLAGS="${CXXFLAGS} ${QT4_CFLAGS}"
+    CPPFLAGS="${CPPFLAGS} ${QT4_CFLAGS}"
     AC_PREPROC_IFELSE([
 #include <QWidget>
 #if !defined (Q_WS_X11)
