@@ -8,6 +8,7 @@ Important changes for packagers:
 
 Access
  * Multiple files are supported from RAR files
+ * BDA: experimental support for ClearQam devices
 
 Codecs
  * You can now use ffmpeg-mt in conjunction with vlc
@@ -28,6 +29,63 @@ Stream output:
     access=livehttp{index=public_html/iphonestream.m3u8,
     index-url=http://url-to-iphonestreamfile-###.ts},mux=ts{use-key-frames},
     dst=public_html/iphonestreamfile-###.ts}"
+
+
+Changes between 1.1.0 and 1.1.1:
+--------------------------------
+
+libVLC:
+ * New capabilities for libVLC:
+   * Adjust video filter control: libvlc_adjust_Enable,
+     libvlc_adjust_Contrast, libvlc_adjust_Brightness, libvlc_adjust_Hue,
+     libvlc_adjust_Saturation, libvlc_adjust_Gamma
+   * libvlc_media_player_set_pause() can force the pause state, whereas
+     libvlc_media_player_pause() would only toggle it.
+   * libvlc_set_user_agent() configures the "user agent" strings used for some
+     protocols (HTTP, PulseAudio...). This replaces the --http-user-agent and
+     the former --user-agent libvlc_new() parameters.
+   * libvlc_video_set_callbacks() and libvlc_video_set_format() allow grabbing
+     video frames from a chosen memory location in real-time. This replace the
+     ugly --vmem-* libvlc_new() parameters in previous versions.
+     See http://wiki.videolan.org/LibVLC_SampleCode_SDL as an example.
+   * libvlc_audio_get_delay() and libvlc_audio_set_delay() configure the delay
+     between audio and video/subpictures for the current input.
+ * Various fixes and crash preventions, especially when video functions were
+   called early
+
+Decoders/Demuxers:
+ * Fix performance issues with GPU decoding using DxVA2 using ATI graphic cards
+   You NEED ATI Catalyst 10.7
+ * Fix :program selection in TS and DVB-T
+ * Fixes and improvements for MKV, Avformat and Avcodec modules
+ * Fix mod (.xm, .s3m, .it) files support on Windows and Mac builds
+
+Stream output:
+ * Fix h264 streaming in ts
+
+Interfaces:
+ * Qt: fix preferences, hotkeys, messages and some fulscreen behaviour
+ * Skins: support for mousewheel in fullscreen, fix radialsliders
+ * Http: fix fullscreen toggle
+
+Linux:
+ * Fix pulse closing
+ * VAAPI small improvements, notably for extraction mode selection
+
+MacOS:
+ * Multiple interface and crash fixes
+ * Deinterlace selection is repaired
+ * Crashes when playing multi-channel tracks fixes
+
+Windows:
+ * Activation of DEP on XP SP3
+ * Fix opening of .m3u and .pls playlists
+ * Fix crash when My Document isn't available
+ * Fix crash when Windows was getting into standby while playing video
+
+Translations:
+ * Update translations for Spanish, Polish, German, Sinhala, Hungarian, Khmer,
+   Brazilian Portuguese, Chinese, Hebrew, Slovak, Galician
 
 
 Changes between 1.0.6 and 1.1.0:
