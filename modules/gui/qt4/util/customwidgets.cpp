@@ -392,7 +392,7 @@ int qtEventToVLCKey( QKeyEvent *e )
 
     if( qtk <= 0xff )
         /* VLC and X11 use lowercase whereas Qt uses uppercase */
-#if defined( __STDC_ISO_10646__ ) || defined( _WIN32 )
+#if defined( __STDC_ISO_10646__ ) || defined( _WIN32 ) || defined( __APPLE__ )
         i_vlck = towlower( qtk );
 #else
 # error FIXME
