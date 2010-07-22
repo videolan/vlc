@@ -1536,22 +1536,21 @@ static int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src, 
 static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    picture_t *p_pic_dst;
+    picture_t *p_dst[2];
 
     /* Request output picture */
-    p_pic_dst = filter_NewPicture( p_filter );
-    if( p_pic_dst == NULL )
+    p_dst[0] = filter_NewPicture( p_filter );
+    if( p_dst[0] == NULL )
     {
         picture_Release( p_pic );
         return NULL;
     }
-
-    picture_CopyProperties( p_pic_dst, p_pic );
+    picture_CopyProperties( p_dst[0], p_pic );
 
     switch( p_sys->i_mode )
     {
         case DEINTERLACE_DISCARD:
-            RenderDiscard( p_filter, p_pic_dst, p_pic, 0 );
+            RenderDiscard( p_filter, p_dst[0], p_pic, 0 );
             break;
 
         case DEINTERLACE_BOB:
@@ -1570,19 +1569,19 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             goto drop;
 
         case DEINTERLACE_MEAN:
-            RenderMean( p_filter, p_pic_dst, p_pic );
+            RenderMean( p_filter, p_dst[0], p_pic );
             break;
 
         case DEINTERLACE_BLEND:
-            RenderBlend( p_filter, p_pic_dst, p_pic );
+            RenderBlend( p_filter, p_dst[0], p_pic );
             break;
 
         case DEINTERLACE_X:
-            RenderX( p_pic_dst, p_pic );
+            RenderX( p_dst[0], p_pic );
             break;
 
         case DEINTERLACE_YADIF:
-            if( RenderYadif( p_filter, p_pic_dst, p_pic, 0, 0 ) )
+            if( RenderYadif( p_filter, p_dst[0], p_pic, 0, 0 ) )
                 goto drop;
             break;
 
@@ -1593,13 +1592,13 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             goto drop;
     }
 
-    p_pic_dst->b_progressive = true;
+    p_dst[0]->b_progressive = true;
 
     picture_Release( p_pic );
-    return p_pic_dst;
+    return p_dst[0];
 
 drop:
-    picture_Release( p_pic_dst );
+    picture_Release( p_dst[0] );
     picture_Release( p_pic );
     return NULL;
 }
