@@ -47,6 +47,7 @@
 
 #include "avcodec.h"
 #include "avutil.h"
+#include "chroma.h"
 
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 25, 0 )
 #   error You must update libavcodec to a version >= 52.25.0

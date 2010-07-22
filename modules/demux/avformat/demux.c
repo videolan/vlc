@@ -46,6 +46,7 @@
 #endif
 
 #include "../../codec/avcodec/avcodec.h"
+#include "../../codec/avcodec/chroma.h"
 #include "avformat.h"
 #include "../xiph.h"
 #include "../vobsub.h"

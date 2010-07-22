@@ -37,16 +37,14 @@
 
 #ifdef HAVE_LIBSWSCALE_SWSCALE_H
 #   include <libswscale/swscale.h>
-#   include <libavcodec/avcodec.h>
 #elif defined(HAVE_FFMPEG_SWSCALE_H)
 #   include <ffmpeg/swscale.h>
-#   include <ffmpeg/avcodec.h>
 #endif
 
-/* Gruikkkkkkkkkk!!!!! */
-#include "../codec/avcodec/avcodec.h"
-#undef AVPALETTE_SIZE
+#include "../codec/avcodec/chroma.h" // Chroma Avutil <-> VLC conversion
 
+/* Gruikkkkkkkkkk!!!!! */
+#undef AVPALETTE_SIZE
 #define AVPALETTE_SIZE (256 * sizeof(uint32_t))
 
 /*****************************************************************************
