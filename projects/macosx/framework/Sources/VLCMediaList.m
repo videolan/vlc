@@ -58,7 +58,7 @@ static void HandleMediaListItemAdded(const libvlc_event_t * event, void * user_d
                                                           [VLCMedia mediaWithLibVLCMediaDescriptor:event->u.media_list_item_added.item], @"media",
                                                           [NSNumber numberWithInt:event->u.media_list_item_added.index], @"index",
                                                           nil]]];
-    [pool release];
+    [pool drain];
 }
 
 static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * user_data)
@@ -68,7 +68,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     [[VLCEventManager sharedManager] callOnMainThreadObject:self
                                                  withMethod:@selector(mediaListItemRemoved:)
                                        withArgumentAsObject:[NSNumber numberWithInt:event->u.media_list_item_deleted.index]];
-    [pool release];
+    [pool drain];
 }
 
 @implementation VLCMediaList
