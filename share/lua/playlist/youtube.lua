@@ -93,6 +93,8 @@ function parse()
                         -- Apparently formats are listed in quality order,
                         -- so we can afford to simply take the first one
                         if not fmt or tonumber( itag ) == tonumber( fmt ) then
+                            -- do unescaping of /
+                            url = string.gsub( url, '\\/','/' )
                             path = url
                             break
                         end
