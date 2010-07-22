@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_fs.h>
+#include <vlc_charset.h>
 
 #include <assert.h>
 
@@ -405,8 +406,8 @@ static const char ppsz_type[4][11] = {
 
 static void TextPrint( const msg_item_t *p_msg, FILE *p_file )
 {
-    fprintf( p_file, "%s%s%s\n", p_msg->psz_module, ppsz_type[p_msg->i_type],
-             p_msg->psz_msg );
+    utf8_fprintf( p_file, "%s%s%s\n", p_msg->psz_module,
+                  ppsz_type[p_msg->i_type], p_msg->psz_msg );
 }
 
 #ifdef HAVE_SYSLOG_H
