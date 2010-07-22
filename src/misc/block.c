@@ -288,7 +288,7 @@ static void block_heap_Release (block_t *self)
  *
  * @param ptr base address of the heap allocation (will be free()'d)
  * @param addr base address of the useful buffer data
- * @param length bytes length of the useful buffer datan
+ * @param length bytes length of the useful buffer data
  * @return NULL in case of error (ptr free()'d in that case), or a valid
  * block_t pointer.
  */
