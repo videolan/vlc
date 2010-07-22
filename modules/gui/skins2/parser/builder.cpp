@@ -57,6 +57,7 @@
 #include "../utils/var_text.hpp"
 
 #include <vlc_image.h>
+#include <fstream>
 
 
 Builder::Builder( intf_thread_t *pIntf, const BuilderData &rData,
@@ -181,16 +182,24 @@ void Builder::addTheme( const BuilderData::Theme &rData )
 void Builder::addIniFile( const BuilderData::IniFile &rData )
 {
     // Parse the INI file
-    IniFile iniFile( getIntf(), rData.m_id, getFilePath( rData.m_file ) );
+    string full_path = getFilePath( rData.m_file );
+    if( !full_path.size() )
+        return;
+
+    IniFile iniFile( getIntf(), rData.m_id, full_path );
     iniFile.parseFile();
 }
 
 
 void Builder::addBitmap( const BuilderData::Bitmap &rData )
 {
+    string full_path = getFilePath( rData.m_fileName );
+    if( !full_path.size() )
+        return;
+
     GenericBitmap *pBmp =
         new FileBitmap( getIntf(), m_pImageHandler,
-                        getFilePath( rData.m_fileName ), rData.m_alphaColor,
+                        full_path, rData.m_alphaColor,
                         rData.m_nbFrames, rData.m_fps, rData.m_nbLoops );
     if( !pBmp->getData() )
     {
@@ -239,9 +248,12 @@ void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
         return;
     }
 
+    string full_path = getFilePath( rData.m_file );
+    if( !full_path.size() )
+        return;
+
     GenericBitmap *pBmp =
-        new FileBitmap( getIntf(), m_pImageHandler,
-                        getFilePath( rData.m_file ), 0 );
+        new FileBitmap( getIntf(), m_pImageHandler, full_path, 0 );
     if( !pBmp->getData() )
     {
         // Invalid bitmap
@@ -265,10 +277,12 @@ void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
 
 void Builder::addFont( const BuilderData::Font &rData )
 {
+    string full_path = getFilePath( rData.m_fontFile );
+    if( !full_path.size() )
+        return;
+
     // Try to load the font from the theme directory
-    GenericFont *pFont = new FT2Font( getIntf(),
-                                      getFilePath( rData.m_fontFile ),
-                                      rData.m_size );
+    GenericFont *pFont = new FT2Font( getIntf(), full_path, rData.m_size );
     if( pFont->init() )
     {
         m_pTheme->m_fonts[rData.m_id] = GenericFontPtr( pFont );
@@ -1177,7 +1191,16 @@ string Builder::getFilePath( const string &rFileName ) const
        file.replace( pos, 1, sep );
 #endif
 
-    return m_path + sep + sFromLocale( file );
+    string full_path = m_path + sep + sFromLocale( file );
+
+    // check that the file exists and can be read
+    if( ifstream( full_path.c_str() ).fail() )
+    {
+        msg_Err( getIntf(), "missing file: %s", file.c_str() );
+        full_path = "";
+    }
+
+    return full_path;
 }
 
 
