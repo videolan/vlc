@@ -25,7 +25,7 @@
 #define QVLC_PLAYLIST_DIALOG_H_ 1
 
 #include "util/qvlcframe.hpp"
-#include "../components/playlist/playlist.hpp"
+#include "components/playlist/playlist.hpp"
 #include "util/singleton.hpp"
 
 #include <QModelIndex>

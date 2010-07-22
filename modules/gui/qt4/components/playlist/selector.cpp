@@ -31,7 +31,7 @@
 #include "components/playlist/selector.hpp"
 #include "playlist_model.hpp"
 #include "qt4.hpp"
-#include "../../dialogs_provider.hpp"
+#include "dialogs_provider.hpp"
 #include "playlist.hpp"
 #include "util/customwidgets.hpp"
 

@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #include "extensions.hpp"
-#include "../extensions_manager.hpp" // for isUnloading()
+#include "extensions_manager.hpp" // for isUnloading()
 
 #include <vlc_dialog.h>
 
