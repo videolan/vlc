@@ -54,8 +54,22 @@ static inline char *FromWide (const wchar_t *wide)
 
     char *out = (char *)malloc (len);
 
-    if (out)
+    if (likely(out))
         WideCharToMultiByte (CP_UTF8, 0, wide, -1, out, len, NULL, NULL);
+    return out;
+}
+
+LIBVLC_USED
+static inline wchar_t *ToWide (const char *utf8)
+{
+    int len = MultiByteToWideChar (CP_UTF8, 0, utf8, -1, NULL, 0);
+    if (len == 0)
+        return NULL;
+
+    wchar_t *out = (wchar_t *)malloc (len * sizeof (wchar_t));
+
+    if (likely(out))
+        MultiByteToWideChar (CP_UTF8, 0, utf8, -1, out, len);
     return out;
 }
 #endif
