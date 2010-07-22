@@ -223,8 +223,45 @@ static int utf8_vasprintf( char **str, const char *fmt, va_list ap )
 int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
 {
     char *str;
-    int res = utf8_vasprintf( &str, fmt, ap );
-    if( res == -1 )
+    int res;
+
+#ifdef WIN32
+    /* Writing to the console is a lot of fun on Microsoft Windows.
+     * If you use the standard I/O functions, you must use the OEM code page,
+     * which is different from the usual ANSI code page. Or maybe not, if the
+     * user called "chcp". Anyway, we prefer Unicode. */
+    int fd = _fileno (stream);
+    if (likely(fd != -1) && _isatty (fd))
+    {
+        res = vasprintf (&str, fmt, ap);
+        if (unlikely(res == -1))
+            return -1;
+
+        size_t wlen = 2 * (res + 1);
+        wchar_t *wide = malloc (wlen);
+        if (likely(wide != NULL))
+        {
+            wlen = MultiByteToWideChar (CP_UTF8, 0, str, res + 1, wide, wlen);
+            if (wlen > 0)
+            {
+                HANDLE h = (HANDLE)(intptr_t)_get_osfhandle (fd);
+                DWORD out;
+
+                WriteConsoleW (h, wide, wlen - 1, &out, NULL);
+            }
+            else
+                res = -1;
+            free (wide);
+        }
+        else
+            res = -1;
+        free (str);
+        return res;
+    }
+#endif
+
+    res = utf8_vasprintf (&str, fmt, ap);
+    if (unlikely(res == -1))
         return -1;
 
     fputs( str, stream );
