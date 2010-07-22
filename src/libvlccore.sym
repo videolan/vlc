@@ -32,6 +32,7 @@ block_FilePath
 block_heap_Alloc
 block_Init
 block_mmap_Alloc
+block_shm_Alloc
 block_Realloc
 config_AddIntf
 config_ChainCreate
