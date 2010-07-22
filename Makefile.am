@@ -78,7 +78,11 @@ EXTRA_DIST = \
 dist_noinst_SCRIPTS = bootstrap toolbox
 nodist_noinst_SCRIPTS = compile
 
-BUILT_SOURCES_distclean = vlc-config extras/package/win32/vlc.win32.nsi extras/package/win32/spad.nsi
+BUILT_SOURCES_distclean = vlc-config
+if HAVE_WIN32
+BUILT_SOURCES_distclean += \
+	extras/package/win32/vlc.win32.nsi extras/package/win32/spad.nsi
+endif
 if HAVE_DARWIN
 BUILT_SOURCES_clean = macosx-sdk
 else
