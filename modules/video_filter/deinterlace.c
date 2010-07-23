@@ -137,6 +137,8 @@ struct filter_sys_t
     void (*pf_merge) ( void *, const void *, const void *, size_t );
     void (*pf_end_merge) ( void );
 
+    mtime_t i_last_date;
+
     /* Yadif */
     picture_t *pp_history[HISTORY_SIZE];
 };
@@ -1521,6 +1523,7 @@ static int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src, 
     }
     else if( !p_prev && !p_cur && p_next )
     {
+        /* FIXME not good as it does not use i_order/i_field */
         RenderX( p_dst, p_next );
         return VLC_SUCCESS;
     }
@@ -1547,6 +1550,25 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     }
     picture_CopyProperties( p_dst[0], p_pic );
 
+    if( p_sys->b_double_rate )
+    {
+        p_dst[0]->p_next =
+        p_dst[1]         = filter_NewPicture( p_filter );
+        if( p_dst[1] )
+        {
+            picture_CopyProperties( p_dst[1], p_pic );
+            /* XXX it's not really good especially for the first picture, but
+             * I don't think that delaying by one frame is worth it */
+            if( p_sys->i_last_date > VLC_TS_INVALID && p_pic->date > VLC_TS_INVALID )
+                p_dst[1]->date = p_pic->date + (p_pic->date - p_sys->i_last_date) / 2;
+        }
+        p_sys->i_last_date = p_pic->date;
+    }
+    else
+    {
+        p_dst[1] = NULL;
+    }
+
     switch( p_sys->i_mode )
     {
         case DEINTERLACE_DISCARD:
@@ -1554,19 +1576,16 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             break;
 
         case DEINTERLACE_BOB:
-#if 0
-            RenderBob( p_filter, pp_outpic[0], p_pic, !p_pic->b_top_field_first );
-            RenderBob( p_filter, pp_outpic[1], p_pic, p_pic->b_top_field_first );
-            break;
-#endif
+            RenderBob( p_filter, p_dst[0], p_pic, !p_pic->b_top_field_first );
+            if( p_dst[1] )
+                RenderBob( p_filter, p_dst[1], p_pic, p_pic->b_top_field_first );
+            break;;
 
         case DEINTERLACE_LINEAR:
-#if 0
-            RenderLinear( p_filter, pp_outpic[0], p_pic, !p_pic->b_top_field_first );
-            RenderLinear( p_filter, pp_outpic[1], p_pic, p_pic->b_top_field_first );
-#endif
-            msg_Err( p_filter, "doubling the frame rate is not supported yet" );
-            goto drop;
+            RenderLinear( p_filter, p_dst[0], p_pic, !p_pic->b_top_field_first );
+            if( p_dst[1] )
+                RenderLinear( p_filter, p_dst[1], p_pic, p_pic->b_top_field_first );
+            break;
 
         case DEINTERLACE_MEAN:
             RenderMean( p_filter, p_dst[0], p_pic );
@@ -1586,19 +1605,24 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             break;
 
         case DEINTERLACE_YADIF2X:
-            msg_Err( p_filter, "doubling the frame rate is not supported yet" );
-            //RenderYadif( p_vout, pp_outpic[0], p_pic, 0, !p_pic->b_top_field_first );
-            //RenderYadif( p_vout, pp_outpic[1], p_pic, 1, p_pic->b_top_field_first );
-            goto drop;
+            if( RenderYadif( p_filter, p_dst[0], p_pic, 0, !p_pic->b_top_field_first ) )
+                goto drop;
+            if( p_dst[1] )
+                RenderYadif( p_filter, p_dst[1], p_pic, 1, p_pic->b_top_field_first );
+            break;
     }
 
     p_dst[0]->b_progressive = true;
+    if( p_dst[1] )
+        p_dst[1]->b_progressive = true;
 
     picture_Release( p_pic );
     return p_dst[0];
 
 drop:
     picture_Release( p_dst[0] );
+    if( p_dst[1] )
+        picture_Release( p_dst[1] );
     picture_Release( p_pic );
     return NULL;
 }
@@ -1607,6 +1631,7 @@ static void Flush( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
+    p_sys->i_last_date = VLC_TS_INVALID;
     for( int i = 0; i < HISTORY_SIZE; i++ )
     {
         if( p_sys->pp_history[i] )
@@ -1644,6 +1669,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_mode = DEINTERLACE_BLEND;
     p_sys->b_double_rate = false;
     p_sys->b_half_height = true;
+    p_sys->i_last_date = VLC_TS_INVALID;
     for( int i = 0; i < HISTORY_SIZE; i++ )
         p_sys->pp_history[i] = NULL;
 
