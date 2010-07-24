@@ -168,7 +168,10 @@ OpenDialog::OpenDialog( QWidget *parent,
 
     /* Hide the advancedPanel */
     if( !var_InheritBool( p_intf, "qt-adv-options" ) )
+    {
         ui.advancedFrame->hide();
+        ui.advancedFrame->setEnabled( false );
+    }
     else
         ui.advancedCheckBox->setChecked( true );
 
@@ -183,7 +186,9 @@ OpenDialog::OpenDialog( QWidget *parent,
 
 OpenDialog::~OpenDialog()
 {
-    getSettings()->setValue( "opendialog-size", size() );
+    getSettings()->setValue( "opendialog-size", size() -
+                 ( ui.advancedFrame->isEnabled() ?
+                   QSize(0, ui.advancedFrame->height()) : QSize(0, 0) ) );
 }
 
 /* Used by VLM dialog and inputSlave selection */
@@ -246,6 +251,7 @@ void OpenDialog::toggleAdvancedPanel()
     if( ui.advancedFrame->isVisible() )
     {
         ui.advancedFrame->hide();
+        ui.advancedFrame->setEnabled( false );
         if( size().isValid() )
             resize( size().width(), size().height()
                     - ui.advancedFrame->height() );
@@ -253,6 +259,7 @@ void OpenDialog::toggleAdvancedPanel()
     else
     {
         ui.advancedFrame->show();
+        ui.advancedFrame->setEnabled( true );
         if( size().isValid() )
             resize( size().width(), size().height()
                     + ui.advancedFrame->height() );
