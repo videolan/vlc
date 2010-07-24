@@ -404,7 +404,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
 
     QLabel *titleLabel = new QLabel( head );
-    QFont titleFont = QApplication::font( static_cast<QWidget*>(0) );
+    QFont titleFont = QApplication::font();
     titleFont.setPointSize( titleFont.pointSize() + 6 );
     titleLabel->setFont( titleFont );
 

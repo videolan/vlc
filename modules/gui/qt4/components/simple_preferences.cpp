@@ -191,7 +191,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
     // Title Label
     QLabel *panel_label = new QLabel;
-    QFont labelFont = QApplication::font( static_cast<QWidget*>(0) );
+    QFont labelFont = QApplication::font();
     labelFont.setPointSize( labelFont.pointSize() + 6 );
     panel_label->setFont( labelFont );
 
@@ -200,7 +200,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     title_line->setFrameShape(QFrame::HLine);
     title_line->setFrameShadow(QFrame::Sunken);
 
-    QFont italicFont = QApplication::font( static_cast<QWidget*>(0) );
+    QFont italicFont = QApplication::font();
     italicFont.setItalic( true );
 
     switch( number )
