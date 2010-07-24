@@ -74,6 +74,11 @@ static void vlc_kill (void *data)
     pthread_kill (*ps, SIGTERM);
 }
 
+static void exit_timeout (int signum)
+{
+    (void) signum;
+    signal (SIGINT, SIG_DFL);
+}
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
@@ -220,6 +225,15 @@ int main( int i_argc, const char *ppsz_argv[] )
     do
         sigwait (&set, &signum);
     while (signum == SIGCHLD);
+
+    /* Restore default signal behaviour after 3 seconds */
+    sigemptyset (&set);
+    sigaddset (&set, SIGINT);
+    sigaddset (&set, SIGALRM);
+    signal (SIGINT, SIG_IGN);
+    signal (SIGALRM, exit_timeout);
+    pthread_sigmask (SIG_UNBLOCK, &set, NULL);
+    alarm (3);
 
     /* Cleanup */
 out:
