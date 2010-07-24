@@ -201,6 +201,7 @@ int rand (void)
 }
 
 
+#if 0
 /** Signals **/
 #include <signal.h>
 
@@ -252,6 +253,7 @@ error:
     LOG("Blocked", "%d, %p, %p", signum, act, old);
     return -1;
 }
+#endif
 
 
 /*** Locales ***
