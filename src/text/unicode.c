@@ -225,7 +225,7 @@ int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
     char *str;
     int res;
 
-#ifdef WIN32
+#ifdef WIN32 && !defined( UNDER_CE )
     /* Writing to the console is a lot of fun on Microsoft Windows.
      * If you use the standard I/O functions, you must use the OEM code page,
      * which is different from the usual ANSI code page. Or maybe not, if the
