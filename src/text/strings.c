@@ -95,10 +95,6 @@ char *decode_URI( char *psz )
                 break;
             }
 
-            case '+': /* This is HTTP forms, not URI decoding... */
-                *out++ = ' ';
-                break;
-
             default:
                 /* Inserting non-ASCII or non-printable characters is unsafe,
                  * and no sane browser will send these unencoded */

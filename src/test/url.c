@@ -95,9 +95,6 @@ int main (void)
     test_decode ("this_should_not_be_modified_1234",
                  "this_should_not_be_modified_1234");
 
-    test_decode ("This+should+be+modified+1234!",
-                 "This should be modified 1234!");
-
     test_decode ("This%20should%20be%20modified%201234!",
                  "This should be modified 1234!");
 
@@ -109,7 +106,7 @@ int main (void)
     test_decode ("%0000", "");
 
     /* Non-ASCII tests */
-    test_decode ("T%C3%a9l%c3%A9vision+%e2%82%Ac", "Télévision €");
+    test_decode ("T%C3%a9l%c3%A9vision %e2%82%Ac", "Télévision €");
     test_decode ("T%E9l%E9vision", "T\xe9l\xe9vision");
 
     /* Base 64 tests */
