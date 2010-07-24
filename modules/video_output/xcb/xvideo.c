@@ -431,7 +431,8 @@ static int Open (vlc_object_t *obj)
                  p_sys->port = port;
                  goto grabbed_port;
              }
-             msg_Dbg (vd, "cannot grab port %"PRIu32, port);
+             msg_Dbg (vd, "cannot grab port %"PRIu32": Xv error %"PRIu8, port,
+                      result);
         }
         continue; /* No usable port */
 
