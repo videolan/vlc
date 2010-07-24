@@ -98,6 +98,7 @@ struct vout_display_sys_t
     VLCOpenGLVideoView *glView;
     id<VLCOpenGLVideoViewEmbedding> container;
 
+    vout_window_t *embed;
     vout_opengl_t gl;
     vout_display_opengl_t vgl;
 
@@ -118,15 +119,35 @@ static int Open(vlc_object_t *this)
     vd->sys = sys;
     sys->pool = NULL;
     sys->gl.sys = NULL;
+    sys->embed = NULL;
 
     /* Get the drawable object */
     id container = var_CreateGetAddress(vd, "drawable-nsobject");
-    if (!container)
+    if (container)
     {
-        msg_Dbg(vd, "No drawable-nsobject, passing over.");
-        goto error;
+        vout_display_DeleteWindow(vd, NULL);
     }
-    vout_display_DeleteWindow(vd, NULL);
+    else
+    {
+        vout_window_cfg_t wnd_cfg;
+
+        memset (&wnd_cfg, 0, sizeof (wnd_cfg));
+        wnd_cfg.type = VOUT_WINDOW_TYPE_NSOBJECT;
+        wnd_cfg.x = var_InheritInteger (vd, "video-x");
+        wnd_cfg.y = var_InheritInteger (vd, "video-y");
+        wnd_cfg.width  = vd->cfg->display.width;
+        wnd_cfg.height = vd->cfg->display.height;
+
+        sys->embed = vout_display_NewWindow (vd, &wnd_cfg);
+        if (sys->embed)
+            container = sys->embed->handle.nsobject;
+
+        if (!container)
+        {
+            msg_Dbg(vd, "No drawable-nsobject nor vout_window_t found, passing over.");
+            goto error;
+        }
+    }
 
     /* This will be released in Close(), on
      * main thread, after we are done using it. */
@@ -220,6 +241,8 @@ void Close(vlc_object_t *this)
     if (sys->gl.sys != NULL)
         vout_display_opengl_Clean(&sys->vgl);
 
+    if (sys->embed)
+        vout_display_DeleteWindow(vd, sys->embed);
     free (sys);
 }
 
