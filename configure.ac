@@ -2660,8 +2660,8 @@ AS_IF([test "${enable_libva}" != "no"], [
         CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
         CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
         AC_CHECK_HEADERS(libavcodec/vaapi.h, [
-           VLC_ADD_LIBS([avcodec],[$LIBVA_LIBS])
-           VLC_ADD_CFLAGS([avcodec],[$LIBVA_CFLAGS])
+           VLC_ADD_LIBS([avcodec],[$LIBVA_LIBS ${X_LIBS} ${X_PRE_LIBS} -lX11])
+           VLC_ADD_CFLAGS([avcodec],[$LIBVA_CFLAGS ${X_CFLAGS}])
            AC_DEFINE(HAVE_AVCODEC_VAAPI, 1, [Define if avcodec has to be built with VAAPI support.])
            echo "VAAPI acceleration activated"
         ],[
