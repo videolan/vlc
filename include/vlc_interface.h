@@ -53,7 +53,7 @@ typedef struct intf_thread_t
 
     struct intf_thread_t *p_next; /** LibVLC interfaces book keeping */
     /* Thread properties and locks */
-#if defined( __APPLE__ ) || defined( WIN32 )
+#if defined( __APPLE__ )
     bool          b_should_run_on_first_thread;
 #endif
 
