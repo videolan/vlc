@@ -103,9 +103,16 @@
      <property name="title">
       <string>Display Settings</string>
      </property>
-     <layout class="QGridLayout">
-      <item row="3" column="1" colspan="2">
-       <widget class="QComboBox" name="effect"/>
+     <layout class="QGridLayout" rowstretch="0,0,0,0,0" columnstretch="0,0">
+      <item row="3" column="1">
+       <widget class="QComboBox" name="effect">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="fontEffectLabel">
@@ -123,8 +130,15 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1" colspan="2">
-       <widget class="QComboBox" name="fontColor"/>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="fontColor">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="fontColorLabel">
@@ -142,8 +156,15 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="2">
-       <widget class="QComboBox" name="fontSize"/>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="fontSize">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="fontSizeLabel">
@@ -161,9 +182,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QFontComboBox" name="font"/>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="fontLabel">
         <property name="minimumSize">
@@ -180,22 +198,6 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="1" colspan="2">
-       <widget class="QSpinBox" name="subsPosition">
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-        <property name="suffix">
-         <string> px</string>
-        </property>
-        <property name="minimum">
-         <number>-1024</number>
-        </property>
-        <property name="maximum">
-         <number>1024</number>
-        </property>
-       </widget>
-      </item>
       <item row="4" column="0">
        <widget class="QLabel" name="subsPosLabel">
         <property name="minimumSize">
@@ -209,6 +211,31 @@
         </property>
         <property name="buddy">
          <cstring>subsPosition</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QFontComboBox" name="font"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QSpinBox" name="subsPosition">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="suffix">
+         <string> px</string>
+        </property>
+        <property name="minimum">
+         <number>-1024</number>
+        </property>
+        <property name="maximum">
+         <number>1024</number>
         </property>
        </widget>
       </item>
