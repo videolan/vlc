@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>793</width>
-    <height>589</height>
+    <height>625</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -232,7 +232,7 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="text">
-         <string/>
+         <string notr="true">-This is the skinsLabel place-</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
@@ -406,6 +406,9 @@
           <height>100</height>
          </size>
         </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(192, 192, 192);</string>
+        </property>
         <property name="alignment">
          <set>Qt::AlignHCenter|Qt::AlignTop</set>
         </property>
@@ -413,6 +416,9 @@
       </item>
       <item row="8" column="0" colspan="2">
        <widget class="InterfacePreviewWidget" name="skinsPreview">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(192, 192, 192);</string>
+        </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
