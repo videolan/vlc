@@ -144,7 +144,7 @@ noinst_HEADERS = \
 		"$(top_srcdir)/THANKS" && \
 	echo ";" && \
 	echo "static const char psz_authors[] =" && \
-	sed -n '/^N: /{;s///;s/"/\\"/g;s/^.*$$/\"&\\n\"/;p;}' \
+	sed '/\$$Id:/d;s/"/\\"/g;s/<.*.> //;s/^.*$$/\"&\\n\"/' \
 		"$(top_srcdir)/AUTHORS" && \
 	echo ";") >> "$@.tmp"
 	$(AM_V_at)mv -f -- "$@.tmp" "$@"
