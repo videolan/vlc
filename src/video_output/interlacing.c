@@ -43,11 +43,11 @@ static const char *deinterlace_modes[] = {
     //"discard",
     "blend",
     //"mean",
-    //"bob",
-    //"linear",
+    "bob",
+    "linear",
     "x",
     "yadif",
-    //"yadif2x",
+    "yadif2x",
     NULL
 };
 static bool DeinterlaceIsModeValid(const char *mode)
