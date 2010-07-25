@@ -125,7 +125,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
 
     /* Initialize locks */
     vlc_mutex_init(&vout->p->picture_lock);
-    vlc_mutex_init(&vout->p->vfilter_lock);
+    vlc_mutex_init(&vout->p->filter.lock);
     vlc_mutex_init(&vout->p->spu_lock);
 
     /* Attach the new object now so we can use var inheritance below */
@@ -247,7 +247,7 @@ static void VoutDestructor(vlc_object_t *object)
     /* Destroy the locks */
     vlc_mutex_destroy(&vout->p->spu_lock);
     vlc_mutex_destroy(&vout->p->picture_lock);
-    vlc_mutex_destroy(&vout->p->vfilter_lock);
+    vlc_mutex_destroy(&vout->p->filter.lock);
     vout_control_Clean(&vout->p->control);
 
     /* */
@@ -559,9 +559,9 @@ static picture_t *ThreadDisplayGetDecodedPicture(vout_thread_t *vout,
     const bool is_paused = vout->p->pause.is_on;
     bool redisplay = is_paused && !now && vout->p->displayed.decoded;
 
-    mtime_t vfilter_delay = 0;
+    mtime_t filter_delay = 0;
     for (int i = 0; i < VOUT_FILTER_DELAYS; i++)
-        vfilter_delay = __MAX(vfilter_delay, vout->p->vfilter_delay[i]);
+        filter_delay = __MAX(filter_delay, vout->p->filter.delay[i]);
 
     /* FIXME/XXX we must redisplay the last decoded picture (because
      * of potential vout updated, or filters update or SPU update)
@@ -578,7 +578,7 @@ static picture_t *ThreadDisplayGetDecodedPicture(vout_thread_t *vout,
             *is_forced = peek->b_force || is_paused || now;
             *deadline = (*is_forced ? date : peek->date) -
                         vout_chrono_GetHigh(&vout->p->render) -
-                        vfilter_delay;
+                        filter_delay;
             picture_Release(peek);
         } else {
             redisplay = true;
@@ -593,7 +593,7 @@ static picture_t *ThreadDisplayGetDecodedPicture(vout_thread_t *vout,
         }
         /* */
         *is_forced = true;
-        *deadline = date - vout_chrono_GetHigh(&vout->p->render) - vfilter_delay;
+        *deadline = date - vout_chrono_GetHigh(&vout->p->render) - filter_delay;
     }
     if (*deadline > VOUT_MWAIT_TOLERANCE)
         *deadline -= VOUT_MWAIT_TOLERANCE;
@@ -658,14 +658,14 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
 
         picture_t *filtered = NULL;
         if (decoded) {
-            vlc_mutex_lock(&vout->p->vfilter_lock);
-            filtered = filter_chain_VideoFilter(vout->p->vfilter_chain, decoded);
+            vlc_mutex_lock(&vout->p->filter.lock);
+            filtered = filter_chain_VideoFilter(vout->p->filter.chain, decoded);
             //assert(filtered == decoded); // TODO implement
-            vlc_mutex_unlock(&vout->p->vfilter_lock);
+            vlc_mutex_unlock(&vout->p->filter.lock);
             if (!filtered)
                 continue;
-            vout->p->vfilter_delay[vout->p->vfilter_delay_index] = decoded->date - filtered->date;
-            vout->p->vfilter_delay_index = (vout->p->vfilter_delay_index + 1) % VOUT_FILTER_DELAYS;
+            vout->p->filter.delay[vout->p->filter.delay_index] = decoded->date - filtered->date;
+            vout->p->filter.delay_index = (vout->p->filter.delay_index + 1) % VOUT_FILTER_DELAYS;
         }
 
         /*
@@ -812,18 +812,18 @@ static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
     es_format_Init(&fmt, VIDEO_ES, vout->p->original.i_chroma);
     fmt.video = vout->p->original;
 
-    vlc_mutex_lock(&vout->p->vfilter_lock);
+    vlc_mutex_lock(&vout->p->filter.lock);
 
-    filter_chain_Reset(vout->p->vfilter_chain, &fmt, &fmt);
-    if (filter_chain_AppendFromString(vout->p->vfilter_chain,
+    filter_chain_Reset(vout->p->filter.chain, &fmt, &fmt);
+    if (filter_chain_AppendFromString(vout->p->filter.chain,
                                       filters) < 0)
         msg_Err(vout, "Video filter chain creation failed");
 
-    vlc_mutex_unlock(&vout->p->vfilter_lock);
+    vlc_mutex_unlock(&vout->p->filter.lock);
 
-    vout->p->vfilter_delay_index = 0;
+    vout->p->filter.delay_index = 0;
     for (int i = 0; i < VOUT_FILTER_DELAYS; i++)
-        vout->p->vfilter_delay[i] = 0;
+        vout->p->filter.delay[i] = 0;
 }
 
 static void ThreadChangeSubFilters(vout_thread_t *vout, const char *filters)
@@ -837,9 +837,9 @@ static void ThreadChangeSubMargin(vout_thread_t *vout, int margin)
 
 static void ThreadFilterFlush(vout_thread_t *vout)
 {
-    vlc_mutex_lock(&vout->p->vfilter_lock);
-    filter_chain_VideoFlush(vout->p->vfilter_chain);
-    vlc_mutex_unlock(&vout->p->vfilter_lock);
+    vlc_mutex_lock(&vout->p->filter.lock);
+    filter_chain_VideoFlush(vout->p->filter.chain);
+    vlc_mutex_unlock(&vout->p->filter.lock);
 }
 
 static void ThreadChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
@@ -1008,12 +1008,12 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
     vout->p->display_pool = NULL;
     vout->p->private_pool = NULL;
 
-    vout->p->vfilter_chain =
+    vout->p->filter.chain =
         filter_chain_New( vout, "video filter2", false,
                           VoutVideoFilterAllocationSetup, NULL, vout);
-    vout->p->vfilter_delay_index = 0;
+    vout->p->filter.delay_index = 0;
     for (int i = 0; i < VOUT_FILTER_DELAYS; i++)
-        vout->p->vfilter_delay[i] = 0;
+        vout->p->filter.delay[i] = 0;
 
     vout_display_state_t state_default;
     if (!state) {
@@ -1049,7 +1049,7 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
 static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
 {
     /* Destroy the video filters2 */
-    filter_chain_Delete(vout->p->vfilter_chain);
+    filter_chain_Delete(vout->p->filter.chain);
 
     /* Destroy translation tables */
     if (vout->p->display.vd) {

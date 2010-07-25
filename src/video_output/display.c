@@ -1567,12 +1567,12 @@ void vout_SendDisplayEventMouse(vout_thread_t *vout, const vlc_mouse_t *m)
     if (vout->p->p_spu && spu_ProcessMouse( vout->p->p_spu, m, &vout->p->display.vd->source))
         return;
 
-    vlc_mutex_lock( &vout->p->vfilter_lock );
-    if (vout->p->vfilter_chain) {
-        if (!filter_chain_MouseFilter(vout->p->vfilter_chain, &tmp, m))
+    vlc_mutex_lock( &vout->p->filter.lock );
+    if (vout->p->filter.chain) {
+        if (!filter_chain_MouseFilter(vout->p->filter.chain, &tmp, m))
             m = &tmp;
     }
-    vlc_mutex_unlock( &vout->p->vfilter_lock );
+    vlc_mutex_unlock( &vout->p->filter.lock );
 
     if (vlc_mouse_HasMoved(&vout->p->mouse, m)) {
         vout_SendEventMouseMoved(vout, m->i_x, m->i_y);
@@ -1605,14 +1605,14 @@ static void DummyVoutSendDisplayEventMouse(vout_thread_t *vout, vlc_mouse_t *fal
 
     if (!vout->p) {
         p.mouse = *fallback;
-        vlc_mutex_init(&p.vfilter_lock);
-        p.vfilter_chain = NULL;
+        vlc_mutex_init(&p.filter.lock);
+        p.filter.chain = NULL;
         p.p_spu = NULL;
         vout->p = &p;
     }
     vout_SendDisplayEventMouse(vout, m);
     if (vout->p == &p) {
-        vlc_mutex_destroy(&p.vfilter_lock);
+        vlc_mutex_destroy(&p.filter.lock);
         *fallback = p.mouse;
         vout->p = NULL;
     }

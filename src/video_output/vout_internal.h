@@ -130,10 +130,12 @@ struct vout_thread_sys_t
     bool            is_late_dropped;
 
     /* Video filter2 chain */
-    vlc_mutex_t     vfilter_lock;
-    filter_chain_t *vfilter_chain;
-    unsigned        vfilter_delay_index;
-    mtime_t         vfilter_delay[VOUT_FILTER_DELAYS];
+    struct {
+        vlc_mutex_t     lock;
+        filter_chain_t *chain;
+        unsigned        delay_index;
+        mtime_t         delay[VOUT_FILTER_DELAYS];
+    } filter;
 
     /* */
     vlc_mouse_t     mouse;
