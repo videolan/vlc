@@ -108,15 +108,7 @@ void I420_RGB16_dither( filter_t *p_filter, picture_t *p_src,
     }
 
     i_right_margin = p_dest->p->i_pitch - p_dest->p->i_visible_pitch;
-
-    if( p_filter->fmt_in.video.i_width & 7 )
-    {
-        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 7;
 
     /* Rule: when a picture of size (x1,y1) with aspect ratio r1 is rendered
      * on a picture of size (x2,y2) with aspect ratio r2, if x1 grows to x1'
@@ -247,15 +239,7 @@ void I420_RGB16( filter_t *p_filter, picture_t *p_src,
                                  - p_src->p[1].i_visible_pitch;
 
     i_right_margin = p_dest->p->i_pitch - p_dest->p->i_visible_pitch;
-
-    if( p_filter->fmt_in.video.i_width & 7 )
-    {
-        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 7;
 
     /* Rule: when a picture of size (x1,y1) with aspect ratio r1 is rendered
      * on a picture of size (x2,y2) with aspect ratio r2, if x1 grows to x1'
@@ -366,14 +350,7 @@ void I420_R5G5B5( filter_t *p_filter, picture_t *p_src,
 
 #if defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-    if( p_filter->fmt_in.video.i_width & 15 )
-    {
-        i_rewind = 16 - ( p_filter->fmt_in.video.i_width & 15 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 15;
 
     /*
     ** SSE2 128 bits fetch/store instructions are faster
@@ -493,14 +470,7 @@ void I420_R5G5B5( filter_t *p_filter, picture_t *p_src,
 
 #else // defined (MODULE_NAME_IS_i420_rgb_mmx)
 
-    if( p_filter->fmt_in.video.i_width & 7 )
-    {
-        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 7;
 
     for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
@@ -610,14 +580,7 @@ void I420_R5G6B5( filter_t *p_filter, picture_t *p_src,
 
 #if defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-    if( p_filter->fmt_in.video.i_width & 15 )
-    {
-        i_rewind = 16 - ( p_filter->fmt_in.video.i_width & 15 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 15;
 
     /*
     ** SSE2 128 bits fetch/store instructions are faster
@@ -737,14 +700,7 @@ void I420_R5G6B5( filter_t *p_filter, picture_t *p_src,
 
 #else // defined (MODULE_NAME_IS_i420_rgb_mmx)
 
-    if( p_filter->fmt_in.video.i_width & 7 )
-    {
-        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 7;
 
     for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
@@ -853,15 +809,7 @@ void I420_RGB32( filter_t *p_filter, picture_t *p_src,
                                  - p_src->p[1].i_visible_pitch;
 
     i_right_margin = p_dest->p->i_pitch - p_dest->p->i_visible_pitch;
-
-    if( p_filter->fmt_in.video.i_width & 7 )
-    {
-        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 7;
 
     /* Rule: when a picture of size (x1,y1) with aspect ratio r1 is rendered
      * on a picture of size (x2,y2) with aspect ratio r2, if x1 grows to x1'
@@ -969,14 +917,7 @@ void I420_A8R8G8B8( filter_t *p_filter, picture_t *p_src,
 
 #if defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-    if( p_filter->fmt_in.video.i_width & 15 )
-    {
-        i_rewind = 16 - ( p_filter->fmt_in.video.i_width & 15 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 15;
 
     /*
     ** SSE2 128 bits fetch/store instructions are faster
@@ -1096,14 +1037,7 @@ void I420_A8R8G8B8( filter_t *p_filter, picture_t *p_src,
 
 #else // defined (MODULE_NAME_IS_i420_rgb_mmx)
 
-    if( p_filter->fmt_in.video.i_width & 7 )
-    {
-        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 7;
 
     for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
@@ -1211,14 +1145,7 @@ void I420_R8G8B8A8( filter_t *p_filter, picture_t *p_src,
 
 #if defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-    if( p_filter->fmt_in.video.i_width & 15 )
-    {
-        i_rewind = 16 - ( p_filter->fmt_in.video.i_width & 15 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 15;
 
     /*
     ** SSE2 128 bits fetch/store instructions are faster
@@ -1338,14 +1265,7 @@ void I420_R8G8B8A8( filter_t *p_filter, picture_t *p_src,
 
 #else // defined (MODULE_NAME_IS_i420_rgb_mmx)
 
-    if( p_filter->fmt_in.video.i_width & 7 )
-    {
-        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 7;
 
     for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
@@ -1453,14 +1373,7 @@ void I420_B8G8R8A8( filter_t *p_filter, picture_t *p_src,
 
 #if defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-    if( p_filter->fmt_in.video.i_width & 15 )
-    {
-        i_rewind = 16 - ( p_filter->fmt_in.video.i_width & 15 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 15;
 
     /*
     ** SSE2 128 bits fetch/store instructions are faster
@@ -1577,14 +1490,7 @@ void I420_B8G8R8A8( filter_t *p_filter, picture_t *p_src,
 
 #else
 
-    if( p_filter->fmt_in.video.i_width & 7 )
-    {
-        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 7;
 
     for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
@@ -1692,14 +1598,7 @@ void I420_A8B8G8R8( filter_t *p_filter, picture_t *p_src,
 
 #if defined (MODULE_NAME_IS_i420_rgb_sse2)
 
-    if( p_filter->fmt_in.video.i_width & 15 )
-    {
-        i_rewind = 16 - ( p_filter->fmt_in.video.i_width & 15 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 15;
 
     /*
     ** SSE2 128 bits fetch/store instructions are faster
@@ -1816,14 +1715,7 @@ void I420_A8B8G8R8( filter_t *p_filter, picture_t *p_src,
 
 #else
 
-    if( p_filter->fmt_in.video.i_width & 7 )
-    {
-        i_rewind = 8 - ( p_filter->fmt_in.video.i_width & 7 );
-    }
-    else
-    {
-        i_rewind = 0;
-    }
+    i_rewind = (-p_filter->fmt_in.video.i_width) & 7;
 
     for( i_y = 0; i_y < p_filter->fmt_in.video.i_height; i_y++ )
     {
