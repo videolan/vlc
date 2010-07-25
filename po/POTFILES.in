@@ -276,7 +276,6 @@ modules/access/sftp.c
 modules/access/smb.c
 modules/access/tcp.c
 modules/access/udp.c
-modules/access/v4l.c
 modules/access/v4l2.c
 modules/access/vcd/cdrom.c
 modules/access/vcd/cdrom.h
@@ -290,7 +289,6 @@ modules/access/vcdx/vcd.h
 modules/access/vcdx/vcdplayer.c
 modules/access/vcdx/vcdplayer.h
 modules/access/videodev2.h
-modules/access/videodev_mjpeg.h
 modules/access/zip/zipstream.c
 modules/access_output/bonjour.c
 modules/access_output/bonjour.h

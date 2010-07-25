@@ -2127,42 +2127,6 @@ then
 fi
 
 dnl
-dnl  Video4Linux plugin
-dnl
-AC_ARG_ENABLE(v4l,
-  [  --enable-v4l            Video4Linux input support (default disabled)])
-if test "${enable_v4l}" = "yes"
-then
-  AC_ARG_WITH(v4l,
-    [  --with-v4l=PATH         path to a v4l-enabled kernel tree],[],[])
-  if test "${with_v4l}" != "no" -a -n "${with_v4l}"
-  then
-    VLC_ADD_CPPFLAGS([v4l],[-I${with_v4l}/include])
-  fi
-
-  CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_v4l}"
-  AC_CHECK_HEADERS(linux/videodev.h, [
-    VLC_ADD_PLUGIN([v4l])
-  ],[])
-  CPPFLAGS="${CPPFLAGS_save}"
-fi
-
-dnl
-dnl libv4l1 support for video4linux.
-dnl
-AC_ARG_ENABLE( libv4l,
-  [  --enable-libv4l         Libv4l Video4Linux support (default enabled)])
-if test "${enable_libv4l}" != "no" -a "${enable_v4l}" != "no"
-then
-    PKG_CHECK_MODULES( LIBV4L, libv4l1, [
-      VLC_ADD_LDFLAGS([v4l],[${LIBV4L_LIBS}])
-      VLC_ADD_CFLAGS([v4l],[${LIBV4L_CFLAGS}])
-      AC_DEFINE(HAVE_LIBV4L1, 1, Define if libv4l is available)],
-      AC_MSG_WARN([LibV4L support disabled because libv4l development headers were not found])
-    )
-fi
-
-dnl
 dnl  Video4Linux2 plugin
 dnl
 AC_ARG_ENABLE(v4l2,
