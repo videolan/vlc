@@ -340,11 +340,11 @@ static int Open (vlc_object_t *obj)
 
     /* */
     video_format_t fmt = vd->fmt;
-    bool found_adaptor = false;
+    p_sys->port = 0;
 
     xcb_xv_adaptor_info_iterator_t it;
     for (it = xcb_xv_query_adaptors_info_iterator (adaptors);
-         it.rem > 0 && !found_adaptor;
+         it.rem > 0;
          xcb_xv_adaptor_info_next (&it))
     {
         const xcb_xv_adaptor_info_t *a = it.data;
@@ -492,15 +492,15 @@ static int Open (vlc_object_t *obj)
             }
         }
         xcb_xv_ungrab_port (conn, p_sys->port, XCB_CURRENT_TIME);
+        p_sys->port = 0;
         msg_Dbg (vd, "no usable X11 visual");
         continue; /* No workable XVideo format (visual/depth) */
 
     created_window:
-        found_adaptor = true;
         break;
     }
     free (adaptors);
-    if (!found_adaptor)
+    if (!p_sys->port)
     {
         msg_Err (vd, "no available XVideo adaptor");
         goto error;
