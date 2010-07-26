@@ -227,22 +227,17 @@ void VLMDialog::addVLMItem()
         typeShortName = "Bcast";
         vlmAwidget = new VLMBroadcast( name, inputText, outputText,
                                        b_checked, b_looped, this );
-        VLMWrapper::AddBroadcast( name, inputText, outputText, b_checked,
-                                  b_looped );
     break;
     case QVLM_VOD:
         typeShortName = "VOD";
         vlmAwidget = new VLMVod( name, inputText, outputText,
                                  b_checked, ui.muxLedit->text(), this );
-        VLMWrapper::AddVod( name, inputText, outputText, b_checked );
         break;
     case QVLM_Schedule:
         typeShortName = "Sched";
         vlmAwidget = new VLMSchedule( name, inputText, outputText,
                                       schetime, schedate, repeatnum,
                                       repeatdays, b_checked, this );
-        VLMWrapper::AddSchedule( name, inputText, outputText, schetime,
-                                 schedate, repeatnum, repeatdays, b_checked);
         break;
     default:
         msg_Warn( p_intf, "Something bad happened" );
