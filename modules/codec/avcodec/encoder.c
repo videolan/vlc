@@ -436,13 +436,7 @@ int OpenEncoder( vlc_object_t *p_this )
                    p_enc->fmt_in.video.i_sar_num,
                    p_enc->fmt_in.video.i_sar_den, 1 << 30 );
 
-        p_sys->i_buffer_out = p_context->height * p_context->width
-            * 3     /* Assume 24bpp maximum */
-            + 200;  /* some room for potential headers (such as BMP) */
-
-        if( p_sys->i_buffer_out < FF_MIN_BUFFER_SIZE )
-            p_sys->i_buffer_out = FF_MIN_BUFFER_SIZE;
-        p_sys->p_buffer_out = malloc( p_sys->i_buffer_out );
+        p_sys->p_buffer_out = NULL;
 
         p_enc->fmt_in.i_codec = VLC_CODEC_I420;
         p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
@@ -805,6 +799,22 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     AVFrame frame;
     int i_out, i_plane;
 
+    /* Initialize the video output buffer the first time.
+     * This is done here instead of OpenEncoder() because we need the actual
+     * bits_per_pixel value, without having to assume anything.
+     */
+    if ( p_sys->p_buffer_out == NULL )
+    {
+        int bytesPerPixel = p_enc->fmt_out.video.i_bits_per_pixel ?
+                            p_enc->fmt_out.video.i_bits_per_pixel / 8 : 3;
+
+        p_sys->i_buffer_out = p_sys->p_context->height * p_sys->p_context->width
+            * bytesPerPixel + 200;  /* some room for potential headers (such as BMP) */
+
+        if( p_sys->i_buffer_out < FF_MIN_BUFFER_SIZE )
+            p_sys->i_buffer_out = FF_MIN_BUFFER_SIZE;
+        p_sys->p_buffer_out = malloc( p_sys->i_buffer_out );
+    }
 
     memset( &frame, 0, sizeof( AVFrame ) );
     if( likely(p_pict) ) {
