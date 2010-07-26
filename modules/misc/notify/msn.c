@@ -35,6 +35,7 @@
 #include <vlc_meta.h>
 #include <vlc_playlist.h>
 #include <vlc_strings.h>
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * intf_sys_t: description and status of log interface
@@ -181,20 +182,18 @@ static int SendToMSN( const char *psz_msg )
     COPYDATASTRUCT msndata;
     HWND msnui = NULL;
 
-    wchar_t buffer[MSN_MAX_LENGTH];
-
-    //mbstowcs( buffer, psz_msg, MSN_MAX_LENGTH );
-    int nLen = MultiByteToWideChar(CP_ACP, 0, psz_msg, -1, NULL, 0);
-    MultiByteToWideChar(CP_ACP, 0, psz_msg, -1, &buffer, nLen);
+    wchar_t *wmsg = ToWide( psz_msg );
+    if( unlikely(wmsg == NULL) )
+        return VLC_ENOMEM;
 
     msndata.dwData = 0x547;
-    msndata.lpData = &buffer;
-    msndata.cbData = (lstrlenW(buffer)*2)+2;
+    msndata.lpData = wmsg;
+    msndata.cbData = (wcslen(wmsg) + 1) * 2;
 
     while( ( msnui = FindWindowEx( NULL, msnui, "MsnMsgrUIManager", NULL ) ) )
     {
         SendMessage(msnui, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&msndata);
     }
-
+    free( wmsg );
     return VLC_SUCCESS;
 }
