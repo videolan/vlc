@@ -672,9 +672,23 @@ void VLMWrapper::EditBroadcast( const QString& name, const QString& input,
     command = "setup \"" + name + "\" inputdel all";
     vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
     vlm_MessageDelete( message );
-    command = "setup \"" + name + "\" input \"" + input + "\"";
-    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
-    vlm_MessageDelete( message );
+
+    if(!input.isEmpty())
+    {
+        QStringList inputs = input.split(":", QString::SkipEmptyParts);
+
+        command = "setup \"" + name + "\" input \"" + inputs[0].trimmed() + "\"";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+
+        for( int i = 1; i < inputs.size(); i++ )
+        {
+            command = "setup \"" + name + "\" option \"" + inputs[i].trimmed() + "\"";
+            vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+            vlm_MessageDelete( message );
+        }
+    }
+
     if( !output.isEmpty() )
     {
         command = "setup \"" + name + "\" output \"" + output + "\"";
@@ -745,9 +759,23 @@ void VLMWrapper::EditVod( const QString& name, const QString& input,
                           const QString& mux )
 {
     vlm_message_t *message;
-    QString command = "setup \"" + name + "\" input \"" + input + "\"";
-    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
-    vlm_MessageDelete( message );
+    QString command;
+
+    if(!input.isEmpty())
+    {
+        QStringList inputs = input.split(":", QString::SkipEmptyParts);
+
+        command = "setup \"" + name + "\" input \"" + inputs[0].trimmed() + "\"";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+
+        for( int i = 1; i < inputs.size(); i++ )
+        {
+            command = "setup \"" + name + "\" option \"" + inputs[i].trimmed() + "\"";
+            vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+            vlm_MessageDelete( message );
+        }
+    }
 
     if( !output.isEmpty() )
     {
@@ -791,9 +819,23 @@ void VLMWrapper::EditSchedule( const QString& name, const QString& input,
                                const QString& mux )
 {
     vlm_message_t *message;
-    QString command = "setup \"" + name + "\" input \"" + input + "\"";
-    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
-    vlm_MessageDelete( message );
+    QString command;
+
+    if(!input.isEmpty())
+    {
+        QStringList inputs = input.split(":", QString::SkipEmptyParts);
+
+        command = "setup \"" + name + "\" input \"" + inputs[0].trimmed() + "\"";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+
+        for( int i = 1; i < inputs.size(); i++ )
+        {
+            command = "setup \"" + name + "\" option \"" + inputs[i].trimmed() + "\"";
+            vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+            vlm_MessageDelete( message );
+        }
+    }
 
     if( !output.isEmpty() )
     {
