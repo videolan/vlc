@@ -235,6 +235,7 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
 
         /* Finalize aout buffer */
         p_out_buf->i_nb_samples = i_out;
+        p_out_buf->i_dts =
         p_out_buf->i_pts = date_Get( &p_sys->end_date );
         p_out_buf->i_length = date_Increment( &p_sys->end_date,
                                       p_out_buf->i_nb_samples ) - p_out_buf->i_pts;

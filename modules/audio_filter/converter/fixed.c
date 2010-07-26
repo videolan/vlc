@@ -204,6 +204,7 @@ static block_t *Do_S16ToF32( filter_t * p_filter, block_t * p_in_buf )
         p_in++; p_out++;
     }
 
+    p_out_buf->i_dts = p_in_buf->i_dts;
     p_out_buf->i_pts = p_in_buf->i_pts;
     p_out_buf->i_length = p_in_buf->i_length;
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
@@ -233,6 +234,7 @@ static block_t *Do_U8ToF32( filter_t * p_filter, block_t * p_in_buf )
         *p_out = (vlc_fixed_t)( (int32_t)(*p_in - 128) * (FIXED32_ONE / 128) );
         p_in++; p_out++;
     }
+    p_out_buf->i_dts = p_in_buf->i_dts;
     p_out_buf->i_pts = p_in_buf->i_pts;
     p_out_buf->i_length = p_in_buf->i_length;
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;

@@ -115,6 +115,9 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
         if( !p_out_buf )
             goto out;
         p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+        p_out_buf->i_dts        = p_in_buf->i_dts;
+        p_out_buf->i_pts        = p_in_buf->i_pts;
+        p_out_buf->i_length     = p_in_buf->i_length;
     }
 
     int32_t * p_dest = (int32_t *)p_out_buf->p_buffer;

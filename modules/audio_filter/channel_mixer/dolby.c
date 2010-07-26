@@ -177,6 +177,10 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
 
     float * p_out = (float*) p_out_buf->p_buffer;
     p_out_buf->i_nb_samples = i_nb_samples;
+    p_out_buf->i_dts        = p_in_buf->i_dts;
+    p_out_buf->i_pts        = p_in_buf->i_pts;
+    p_out_buf->i_length     = p_in_buf->i_length;
+
     memset( p_out, 0, p_out_buf->i_buffer );
 
     if( p_sys->i_rear_left >= 0 )
