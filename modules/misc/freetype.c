@@ -265,7 +265,7 @@ struct filter_sys_t
     int            i_display_height;
 #ifdef HAVE_FONTCONFIG
     char*          psz_fontfamily;
-    xml_t         *p_xml;
+    xml_reader_t  *p_xml;
 #endif
 
     input_attachment_t **pp_font_attachments;
@@ -304,7 +304,7 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
- #ifdef HAVE_FONTCONFIG
+#ifdef HAVE_FONTCONFIG
     p_sys->psz_fontfamily = NULL;
     p_sys->p_xml = NULL;
 #endif
@@ -514,7 +514,7 @@ static void Destroy( vlc_object_t *p_this )
     }
 
 #ifdef HAVE_FONTCONFIG
-    if( p_sys->p_xml ) xml_Delete( p_sys->p_xml );
+    if( p_sys->p_xml ) xml_ReaderDelete( p_sys->p_xml );
     free( p_sys->psz_fontfamily );
 #endif
 
@@ -2190,7 +2190,6 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
 {
     int          rv = VLC_SUCCESS;
     stream_t     *p_sub = NULL;
-    xml_reader_t *p_xml_reader = NULL;
 
     if( !p_region_in || !p_region_in->psz_html )
         return VLC_EGENERIC;
@@ -2202,114 +2201,106 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                               (uint8_t *) p_region_in->psz_html,
                               strlen( p_region_in->psz_html ),
                               true );
-    if( p_sub )
+    if( unlikely(p_sub == NULL) )
+        return VLC_SUCCESS;
+
+    xml_reader_t *p_xml_reader = p_filter->p_sys->p_xml;
+    bool b_karaoke = false;
+
+    if( !p_xml_reader )
+        p_xml_reader = xml_ReaderCreate( p_filter, p_sub );
+    else
+        p_xml_reader = xml_ReaderReset( p_xml_reader, p_sub );
+
+    p_filter->p_sys->p_xml = p_xml_reader;
+    if( p_xml_reader )
     {
-        if( !p_filter->p_sys->p_xml ) p_filter->p_sys->p_xml = xml_Create( p_filter );
-        if( p_filter->p_sys->p_xml )
+        /* Look for Root Node */
+        if( xml_ReaderRead( p_xml_reader ) == 1 )
         {
-            bool b_karaoke = false;
+            char *psz_node = xml_ReaderName( p_xml_reader );
 
-            p_xml_reader = xml_ReaderCreate( p_filter->p_sys->p_xml, p_sub );
-            if( p_xml_reader )
+            if( !strcasecmp( "karaoke", psz_node ) )
             {
-                /* Look for Root Node */
-                if( xml_ReaderRead( p_xml_reader ) == 1 )
-                {
-                    char *psz_node = xml_ReaderName( p_xml_reader );
-
-                    if( !strcasecmp( "karaoke", psz_node ) )
-                    {
-                        /* We're going to have to render the text a number
-                         * of times to show the progress marker on the text.
-                         */
-                        var_SetBool( p_filter, "text-rerender", true );
-                        b_karaoke = true;
-                    }
-                    else if( !strcasecmp( "text", psz_node ) )
-                    {
-                        b_karaoke = false;
-                    }
-                    else
-                    {
-                        /* Only text and karaoke tags are supported */
-                        msg_Dbg( p_filter, "Unsupported top-level tag '%s' ignored.", psz_node );
-                        xml_ReaderDelete( p_xml_reader );
-                        p_xml_reader = NULL;
-                        rv = VLC_EGENERIC;
-                    }
-
-                    free( psz_node );
-                }
+                /* We're going to have to render the text a number
+                 * of times to show the progress marker on the text.
+                 */
+                var_SetBool( p_filter, "text-rerender", true );
+                b_karaoke = true;
             }
-
-            if( p_xml_reader )
+            else if( !strcasecmp( "text", psz_node ) )
             {
-                uint32_t   *psz_text;
-                int         i_len = 0;
-                uint32_t    i_runs = 0;
-                uint32_t    i_k_runs = 0;
-                uint32_t   *pi_run_lengths = NULL;
-                uint32_t   *pi_k_run_lengths = NULL;
-                uint32_t   *pi_k_durations = NULL;
-                ft_style_t  **pp_styles = NULL;
-                FT_Vector    result;
-                line_desc_t  *p_lines = NULL;
-
-                psz_text = (uint32_t *)malloc( strlen( p_region_in->psz_html ) *
-                                                sizeof( uint32_t ) );
-                if( psz_text )
-                {
-                    uint32_t k;
-
-                    rv = ProcessNodes( p_filter, p_xml_reader,
-                                  p_region_in->p_style, psz_text, &i_len,
-                                  &i_runs, &pi_run_lengths, &pp_styles,
-
-                                  b_karaoke, &i_k_runs, &pi_k_run_lengths,
-                                  &pi_k_durations );
-
-                    p_region_out->i_x = p_region_in->i_x;
-                    p_region_out->i_y = p_region_in->i_y;
-
-                    if(( rv == VLC_SUCCESS ) && ( i_len > 0 ))
-                    {
-                        rv = ProcessLines( p_filter, psz_text, i_len, i_runs,
-                                pi_run_lengths, pp_styles, &p_lines, &result,
-                                b_karaoke, i_k_runs, pi_k_run_lengths,
-                                pi_k_durations );
-                    }
-
-                    for( k=0; k<i_runs; k++)
-                        DeleteStyle( pp_styles[k] );
-                    free( pp_styles );
-                    free( pi_run_lengths );
-                    free( psz_text );
-
-                    /* Don't attempt to render text that couldn't be layed out
-                     * properly.
-                     */
-                    if(( rv == VLC_SUCCESS ) && ( i_len > 0 ))
-                    {
-                        if( var_InheritBool( p_filter, "freetype-yuvp" ) )
-                        {
-                            Render( p_filter, p_region_out, p_lines,
-                                    result.x, result.y );
-                        }
-                        else
-                        {
-                            RenderYUVA( p_filter, p_region_out, p_lines,
-                                    result.x, result.y );
-                        }
-                    }
-                }
-                FreeLines( p_lines );
-
+                b_karaoke = false;
+            }
+            else
+            {
+                /* Only text and karaoke tags are supported */
+                msg_Dbg( p_filter, "Unsupported top-level tag '%s' ignored.", psz_node );
                 xml_ReaderDelete( p_xml_reader );
+                p_xml_reader = NULL;
+                rv = VLC_EGENERIC;
             }
+
+            free( psz_node );
         }
-        stream_Delete( p_sub );
     }
 
+    if( p_xml_reader )
+    {
+        uint32_t   *psz_text;
+        int         i_len = 0;
+        uint32_t    i_runs = 0;
+        uint32_t    i_k_runs = 0;
+        uint32_t   *pi_run_lengths = NULL;
+        uint32_t   *pi_k_run_lengths = NULL;
+        uint32_t   *pi_k_durations = NULL;
+        ft_style_t  **pp_styles = NULL;
+        FT_Vector    result;
+        line_desc_t  *p_lines = NULL;
+
+        psz_text = (uint32_t *)malloc( strlen( p_region_in->psz_html ) *
+                                       sizeof( uint32_t ) );
+        if( psz_text )
+        {
+            rv = ProcessNodes( p_filter, p_xml_reader,
+                               p_region_in->p_style, psz_text, &i_len,
+                               &i_runs, &pi_run_lengths, &pp_styles,
+                               b_karaoke, &i_k_runs, &pi_k_run_lengths,
+                               &pi_k_durations );
+
+            p_region_out->i_x = p_region_in->i_x;
+            p_region_out->i_y = p_region_in->i_y;
+
+            if(( rv == VLC_SUCCESS ) && ( i_len > 0 ))
+            {
+                rv = ProcessLines( p_filter, psz_text, i_len, i_runs,
+                                   pi_run_lengths, pp_styles, &p_lines,
+                                   &result, b_karaoke, i_k_runs,
+                                   pi_k_run_lengths, pi_k_durations );
+            }
+
+            for( uint_fast32_t k=0; k<i_runs; k++)
+                 DeleteStyle( pp_styles[k] );
+            free( pp_styles );
+            free( pi_run_lengths );
+            free( psz_text );
+
+            /* Don't attempt to render text that couldn't be layed out
+             * properly. */
+            if(( rv == VLC_SUCCESS ) && ( i_len > 0 ))
+            {
+                if( var_InheritBool( p_filter, "freetype-yuvp" ) )
+                    Render( p_filter, p_region_out, p_lines,
+                            result.x, result.y );
+                else
+                    RenderYUVA( p_filter, p_region_out, p_lines,
+                                result.x, result.y );
+            }
+        }
+        xml_ReaderReset( p_xml_reader, NULL );
+        FreeLines( p_lines );
+    }
+    stream_Delete( p_sub );
     return rv;
 }
 
