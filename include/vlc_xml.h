@@ -73,6 +73,7 @@ struct xml_reader_t
 VLC_EXPORT( xml_reader_t *, xml_ReaderCreate, (vlc_object_t *, stream_t *) LIBVLC_USED );
 #define xml_ReaderCreate( a, s ) xml_ReaderCreate(VLC_OBJECT(a), s)
 VLC_EXPORT( void, xml_ReaderDelete, (xml_reader_t *) );
+VLC_EXPORT( xml_reader_t *, xml_ReaderReset, (xml_reader_t *, stream_t *) LIBVLC_USED );
 
 #define xml_ReaderRead( a ) a->pf_read( a )
 #define xml_ReaderNodeType( a ) a->pf_node_type( a )

@@ -101,3 +101,26 @@ void xml_ReaderDelete(xml_reader_t *reader)
     module_unneed(reader, reader->p_module);
     vlc_object_release(reader);
 }
+
+
+/**
+ * Resets an existing XML reader.
+ * If you need to parse several XML files, this function is much faster than
+ * xml_ReaderCreate() and xml_ReaderDelete() combined.
+ * @param reader XML reader to reinitialize
+ * @param stream new stream to read XML data from
+ * @return reader on success, NULL on error (in that case, the reader is
+ * destroyed).
+ */
+xml_reader_t *xml_ReaderReset(xml_reader_t *reader, stream_t *stream)
+{
+    module_stop(reader, reader->p_module);
+
+    reader->p_stream = stream;
+    if (module_start(reader, reader->p_module))
+    {
+        vlc_object_release(reader);
+        return NULL;
+    }
+    return reader;
+}

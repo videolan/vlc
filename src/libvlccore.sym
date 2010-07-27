@@ -673,5 +673,6 @@ text_style_New
 xml_Delete
 xml_ReaderCreate
 xml_ReaderDelete
+xml_ReaderReset
 KeyToString
 StringToKey
