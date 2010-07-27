@@ -967,7 +967,7 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
         }
 
         msg_Dbg( p_filter, "done with %s RSS/Atom feed", p_feed->psz_url );
-        xml_ReaderDelete( p_xml, p_xml_reader );
+        xml_ReaderDelete( p_xml_reader );
         stream_Delete( p_stream );
     }
 
@@ -977,7 +977,7 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
 error:
     FreeRSS( p_feeds, i_feed + 1 );
     if( p_xml_reader )
-        xml_ReaderDelete( p_xml, p_xml_reader );
+        xml_ReaderDelete( p_xml_reader );
     if( p_stream )
         stream_Delete( p_stream );
     if( p_xml )

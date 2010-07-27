@@ -365,7 +365,7 @@ static int Demux( demux_t *p_demux )
 
     free( psz_art_url );
     free( psz_elname );
-    xml_ReaderDelete( p_xml, p_xml_reader );
+    xml_ReaderDelete( p_xml_reader );
     xml_Delete( p_xml );
 
     input_item_node_PostAndDelete( p_subitems );
@@ -388,7 +388,7 @@ error:
     free( psz_elname );
 
     if( p_xml_reader )
-        xml_ReaderDelete( p_xml, p_xml_reader );
+        xml_ReaderDelete( p_xml_reader );
     if( p_xml )
         xml_Delete( p_xml );
     if( p_subitems )

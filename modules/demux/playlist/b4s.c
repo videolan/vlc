@@ -295,7 +295,7 @@ end:
 
     vlc_gc_decref( p_current_input );
     if( p_xml_reader )
-        xml_ReaderDelete( p_xml, p_xml_reader );
+        xml_ReaderDelete( p_xml_reader );
     if( p_xml )
         xml_Delete( p_xml );
     return i_ret;

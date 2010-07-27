@@ -1016,7 +1016,7 @@ static void ParseUSFHeader( decoder_t *p_dec )
                 free( psz_node );
             }
 
-            xml_ReaderDelete( p_xml, p_xml_reader );
+            xml_ReaderDelete( p_xml_reader );
         }
         xml_Delete( p_xml );
     }

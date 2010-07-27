@@ -55,7 +55,7 @@ VLC_EXPORT( xml_t *, xml_Create, ( vlc_object_t * ) LIBVLC_USED );
 VLC_EXPORT( void, xml_Delete, ( xml_t * ) );
 
 #define xml_ReaderCreate( a, b ) a->pf_reader_create( a, b )
-#define xml_ReaderDelete( a, b ) a->pf_reader_delete( b )
+#define xml_ReaderDelete( a ) a->p_xml->pf_reader_delete( a )
 #define xml_CatalogLoad( a, b ) a->pf_catalog_load( a, b )
 #define xml_CatalogAdd( a, b, c, d ) a->pf_catalog_add( a, b, c, d )
 

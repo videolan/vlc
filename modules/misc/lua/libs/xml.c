@@ -125,7 +125,7 @@ static const luaL_Reg vlclua_xml_reader_reg[] = {
 static int vlclua_xml_reader_delete( lua_State *L )
 {
     xml_reader_t *p_reader = *(xml_reader_t**)luaL_checkudata( L, 1, "xml_reader" );
-    xml_ReaderDelete( p_reader->p_xml, p_reader );
+    xml_ReaderDelete( p_reader );
     return 0;
 }
 

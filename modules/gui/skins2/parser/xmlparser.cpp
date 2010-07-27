@@ -79,7 +79,7 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
 
 XMLParser::~XMLParser()
 {
-    if( m_pReader && m_pXML ) xml_ReaderDelete( m_pXML, m_pReader );
+    if( m_pReader ) xml_ReaderDelete( m_pReader );
     if( m_pXML ) xml_Delete( m_pXML );
     if( m_pStream ) stream_Delete( m_pStream );
 }

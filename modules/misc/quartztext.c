@@ -827,7 +827,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                     else
                     {
                         /* Only text and karaoke tags are supported */
-                        xml_ReaderDelete( p_xml, p_xml_reader );
+                        xml_ReaderDelete( p_xml_reader );
                         p_xml_reader = NULL;
                         rv = VLC_EGENERIC;
                     }
@@ -855,7 +855,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                 }
                 CFRelease(p_attrString);
 
-                xml_ReaderDelete( p_xml, p_xml_reader );
+                xml_ReaderDelete( p_xml_reader );
             }
             xml_Delete( p_xml );
         }
