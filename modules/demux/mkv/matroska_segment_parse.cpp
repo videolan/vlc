@@ -60,7 +60,9 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
             EbmlId id = EbmlVoid::ClassInfos.GlobalId;
             int64_t i_pos = -1;
 
+#ifdef MKV_DEBUG
             msg_Dbg( &sys.demuxer, "|   |   + Seek" );
+#endif
             ep->Down();
             while( ( l = ep->Get() ) != NULL )
             {
@@ -121,8 +123,10 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
                     msg_Dbg( &sys.demuxer, "|   - attachments at %"PRId64, i_pos );
                     LoadSeekHeadItem( KaxAttachments::ClassInfos, i_pos );
                 }
+#ifdef MKV_DEBUG
                 else
                     msg_Dbg( &sys.demuxer, "|   - unknown seekhead reference at %"PRId64, i_pos );
+#endif
             }
         }
         else

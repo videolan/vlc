@@ -110,6 +110,8 @@ extern "C" {
 #   include <zlib.h>
 #endif
 
+#define MKV_DEBUG 0
+
 #define MATROSKA_COMPRESSION_NONE  -1
 #define MATROSKA_COMPRESSION_ZLIB   0
 #define MATROSKA_COMPRESSION_BLIB   1
