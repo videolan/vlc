@@ -80,7 +80,6 @@ void Close_xspf( vlc_object_t *p_this )
 int Demux( demux_t *p_demux )
 {
     int i_ret = -1;
-    xml_t *p_xml = NULL;
     xml_reader_t *p_xml_reader = NULL;
     char *psz_name = NULL;
     input_item_t *p_current_input = GetCurrentItem(p_demux);
@@ -90,11 +89,7 @@ int Demux( demux_t *p_demux )
     p_demux->p_sys->psz_base = NULL;
 
     /* create new xml parser from stream */
-    p_xml = xml_Create( p_demux );
-    if( !p_xml )
-        goto end;
-
-    p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
+    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
     if( !p_xml_reader )
         goto end;
 
@@ -139,8 +134,6 @@ end:
     vlc_gc_decref(p_current_input);
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
-    if( p_xml )
-        xml_Delete( p_xml );
     return i_ret; /* Needed for correct operation of go back */
 }
 

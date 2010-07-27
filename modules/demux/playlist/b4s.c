@@ -71,7 +71,6 @@ static int Demux( demux_t *p_demux )
 {
     int i_ret = -1;
 
-    xml_t *p_xml;
     xml_reader_t *p_xml_reader = NULL;
     char *psz_elname = NULL;
     input_item_t *p_input;
@@ -81,15 +80,11 @@ static int Demux( demux_t *p_demux )
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
-    p_xml = xml_Create( p_demux );
-    if( !p_xml )
-        goto end;
-
     psz_elname = stream_ReadLine( p_demux->s );
     free( psz_elname );
     psz_elname = NULL;
 
-    p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
+    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
     if( !p_xml_reader )
         goto end;
 
@@ -296,8 +291,6 @@ end:
     vlc_gc_decref( p_current_input );
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
-    if( p_xml )
-        xml_Delete( p_xml );
     return i_ret;
 }
 

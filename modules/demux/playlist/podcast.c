@@ -73,8 +73,7 @@ static int Demux( demux_t *p_demux )
     bool b_image = false;
     int i_ret;
 
-    xml_t *p_xml;
-    xml_reader_t *p_xml_reader = NULL;
+    xml_reader_t *p_xml_reader;
     char *psz_elname = NULL;
     char *psz_item_mrl = NULL;
     char *psz_item_size = NULL;
@@ -94,11 +93,7 @@ static int Demux( demux_t *p_demux )
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
-    p_xml = xml_Create( p_demux );
-    if( !p_xml )
-        goto error;
-
-    p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
+    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
     if( !p_xml_reader )
         goto error;
 
@@ -366,7 +361,6 @@ static int Demux( demux_t *p_demux )
     free( psz_art_url );
     free( psz_elname );
     xml_ReaderDelete( p_xml_reader );
-    xml_Delete( p_xml );
 
     input_item_node_PostAndDelete( p_subitems );
     vlc_gc_decref(p_current_input);
@@ -389,8 +383,6 @@ error:
 
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
-    if( p_xml )
-        xml_Delete( p_xml );
     if( p_subitems )
         input_item_node_Delete( p_subitems );
 

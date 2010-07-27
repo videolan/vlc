@@ -989,7 +989,6 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
 static void ParseUSFHeader( decoder_t *p_dec )
 {
     stream_t      *p_sub = NULL;
-    xml_t         *p_xml = NULL;
     xml_reader_t  *p_xml_reader = NULL;
 
     p_sub = stream_MemoryNew( VLC_OBJECT(p_dec),
@@ -999,26 +998,20 @@ static void ParseUSFHeader( decoder_t *p_dec )
     if( !p_sub )
         return;
 
-    p_xml = xml_Create( p_dec );
-    if( p_xml )
+    p_xml_reader = xml_ReaderCreate( p_dec, p_sub );
+    if( p_xml_reader )
     {
-        p_xml_reader = xml_ReaderCreate( p_xml, p_sub );
-        if( p_xml_reader )
+        /* Look for Root Node */
+        if( xml_ReaderRead( p_xml_reader ) == 1 )
         {
-            /* Look for Root Node */
-            if( xml_ReaderRead( p_xml_reader ) == 1 )
-            {
-                char *psz_node = xml_ReaderName( p_xml_reader );
+            char *psz_node = xml_ReaderName( p_xml_reader );
 
-                if( !strcasecmp( "usfsubtitles", psz_node ) )
-                    ParseUSFHeaderTags( p_dec, p_xml_reader );
+            if( !strcasecmp( "usfsubtitles", psz_node ) )
+                ParseUSFHeaderTags( p_dec, p_xml_reader );
 
-                free( psz_node );
-            }
-
-            xml_ReaderDelete( p_xml_reader );
+            free( psz_node );
         }
-        xml_Delete( p_xml );
+        xml_ReaderDelete( p_xml_reader );
     }
     stream_Delete( p_sub );
 }

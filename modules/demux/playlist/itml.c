@@ -67,19 +67,14 @@ void Close_iTML( vlc_object_t *p_this )
  */
 int Demux( demux_t *p_demux )
 {
-    xml_t *p_xml;
-    xml_reader_t *p_xml_reader = NULL;
+    xml_reader_t *p_xml_reader;
     char *psz_name = NULL;
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
     p_demux->p_sys->i_ntracks = 0;
 
     /* create new xml parser from stream */
-    p_xml = xml_Create( p_demux );
-    if( !p_xml )
-        goto end;
-
-    p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
+    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
     if( !p_xml_reader )
         goto end;
 
@@ -114,8 +109,6 @@ end:
     free( psz_name );
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
-    if( p_xml )
-        xml_Delete( p_xml );
 
     /* Needed for correct operation of go back */
     return 0;

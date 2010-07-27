@@ -102,8 +102,7 @@ void Close_QTL( vlc_object_t *p_this )
 
 static int Demux( demux_t *p_demux )
 {
-    xml_t *p_xml;
-    xml_reader_t *p_xml_reader = NULL;
+    xml_reader_t *p_xml_reader;
     char *psz_eltname = NULL;
     input_item_t *p_input;
     int i_ret = -1;
@@ -126,11 +125,7 @@ static int Demux( demux_t *p_demux )
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
-    p_xml = xml_Create( p_demux );
-    if( !p_xml )
-        goto error;
-
-    p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
+    p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
     if( !p_xml_reader )
         goto error;
 
@@ -326,8 +321,6 @@ static int Demux( demux_t *p_demux )
 error:
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
-    if( p_xml )
-        xml_Delete( p_xml );
 
     vlc_gc_decref(p_current_input);
 
