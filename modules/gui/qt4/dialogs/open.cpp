@@ -199,6 +199,11 @@ QString OpenDialog::getMRL( bool b_all )
                  : itemsMRL[0];
 }
 
+QString OpenDialog::getOptions()
+{
+    return ui.advancedLineInput->text();
+}
+
 /* Finish the dialog and decide if you open another one after */
 void OpenDialog::setMenuAction()
 {
