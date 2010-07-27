@@ -323,6 +323,19 @@ void module_release (module_t *m)
     vlc_release (&m->vlc_gc_data);
 }
 
+#undef module_start
+int module_start (vlc_object_t *obj, module_t *m)
+{
+   return m->pf_activate ? (m->pf_activate (obj)) : VLC_SUCCESS;
+}
+
+#undef module_stop
+void module_stop (vlc_object_t *obj, module_t *m)
+{
+    if (m->pf_deactivate)
+        m->pf_deactivate (obj);
+}
+
 /**
  * Frees the flat list of VLC modules.
  * @param list list obtained by module_list_get()
@@ -555,10 +568,7 @@ found_shortcut:
 
         p_this->b_force = p_list[i].b_force;
 
-        int ret = VLC_SUCCESS;
-        if( p_cand->pf_activate )
-            ret = p_cand->pf_activate( p_this );
-        switch( ret )
+        switch( module_start( p_this, p_cand ) )
         {
         case VLC_SUCCESS:
             /* good module! */
@@ -620,14 +630,8 @@ found_shortcut:
  */
 void module_unneed( vlc_object_t * p_this, module_t * p_module )
 {
-    /* Use the close method */
-    if( p_module->pf_deactivate )
-    {
-        p_module->pf_deactivate( p_this );
-    }
-
     msg_Dbg( p_this, "removing module \"%s\"", p_module->psz_object_name );
-
+    module_stop( p_this, p_module );
     module_release( p_module );
 }
 
