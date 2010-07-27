@@ -757,6 +757,10 @@ int OpenEncoder( vlc_object_t *p_this )
         if( p_enc->fmt_out.i_extra )
         {
             p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
+            if ( p_enc->fmt_out.p_extra == NULL )
+            {
+                goto error;
+            }
             memcpy( p_enc->fmt_out.p_extra, p_context->extradata,
                     p_enc->fmt_out.i_extra );
         }
@@ -775,6 +779,10 @@ int OpenEncoder( vlc_object_t *p_this )
                                     p_context->frame_size :
                                     RAW_AUDIO_FRAME_SIZE;
         p_sys->p_buffer = malloc( p_sys->i_frame_size * p_sys->i_sample_bytes );
+        if ( p_sys->p_buffer == NULL )
+        {
+            goto error;
+        }
         p_enc->fmt_out.audio.i_blockalign = p_context->block_align;
         p_enc->fmt_out.audio.i_bitspersample = aout_BitsPerSample( vlc_fourcc_GetCodec( AUDIO_ES, p_enc->fmt_out.i_codec ) );
 
@@ -783,11 +791,21 @@ int OpenEncoder( vlc_object_t *p_this )
         else
             p_sys->i_buffer_out = p_sys->i_frame_size * p_sys->i_sample_bytes;
         p_sys->p_buffer_out = malloc( p_sys->i_buffer_out );
+        if ( p_sys->p_buffer_out == NULL )
+        {
+            goto error;
+        }
     }
 
     msg_Dbg( p_enc, "found encoder %s", psz_namecodec );
 
     return VLC_SUCCESS;
+error:
+    free( p_enc->fmt_out.p_extra );
+    free( p_sys->p_buffer );
+    free( p_sys->p_buffer_out );
+    free( p_sys );
+    return VLC_ENOMEM;
 }
 
 /****************************************************************************
@@ -814,6 +832,8 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         if( p_sys->i_buffer_out < FF_MIN_BUFFER_SIZE )
             p_sys->i_buffer_out = FF_MIN_BUFFER_SIZE;
         p_sys->p_buffer_out = malloc( p_sys->i_buffer_out );
+        if ( p_sys->p_buffer_out == NULL )
+            return NULL;
     }
 
     memset( &frame, 0, sizeof( AVFrame ) );
