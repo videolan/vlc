@@ -39,11 +39,9 @@
 
 #include <assert.h>
 #include <vlc_common.h>
+#include <vlc_modules.h>
+#include <vlc_interface.h>
 
-#include <vlc_aout.h>
-#include <vlc_vout.h>
-
-#include "vlc_interface.h"
 #if defined( __APPLE__ ) || defined( WIN32 )
 #include "../control/libvlc_internal.h"
 #endif

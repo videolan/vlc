@@ -23,6 +23,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_modules.h>
 #include "inhibit.h"
 #include <libvlc.h>
 #include <assert.h>

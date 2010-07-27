@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_cpu.h>
+#include <vlc_modules.h>
 
 #include "aout_internal.h"
 

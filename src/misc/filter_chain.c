@@ -27,6 +27,7 @@
 
 #include <vlc_filter.h>
 #include <vlc_osd.h>
+#include <vlc_modules.h>
 #include <libvlc.h>
 #include <assert.h>
 

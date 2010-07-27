@@ -40,6 +40,7 @@
 #include <vlc_interface.h>
 #include <vlc_block.h>
 #include <vlc_playlist.h>
+#include <vlc_modules.h>
 
 #include <vlc_vout.h>
 #include <vlc_image.h>

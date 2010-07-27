@@ -30,6 +30,7 @@
 #include <vlc_playlist.h>
 #include <vlc_url.h>
 #include <vlc_arrays.h>
+#include <vlc_modules.h>
 
 #include "input_internal.h"
 #include "../playlist/art.h"

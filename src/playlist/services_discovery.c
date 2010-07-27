@@ -30,6 +30,7 @@
 #include "vlc_events.h"
 #include <vlc_services_discovery.h>
 #include <vlc_probe.h>
+#include <vlc_modules.h>
 #include "playlist_internal.h"
 #include "../libvlc.h"
 

@@ -42,6 +42,7 @@
 #include "vout_internal.h"
 #include <vlc_image.h>
 #include <vlc_input.h>
+#include <vlc_modules.h>
 #include "../misc/subpicture.h"
 
 /*****************************************************************************

@@ -33,6 +33,7 @@
 #include <vlc_keys.h>
 #include <vlc_osd.h>
 #include <vlc_image.h>
+#include <vlc_modules.h>
 
 #include "libvlc.h"
 

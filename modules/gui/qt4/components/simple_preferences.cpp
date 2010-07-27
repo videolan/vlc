@@ -49,6 +49,7 @@
 #ifdef WIN32
 # include <vlc_windows_interfaces.h>
 #endif
+#include <vlc_modules.h>
 
 /*********************************************************************
  * The List of categories

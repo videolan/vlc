@@ -31,6 +31,7 @@
 #include "config/configuration.h"
 #include <vlc_fs.h>
 #include <vlc_url.h>
+#include <vlc_modules.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>

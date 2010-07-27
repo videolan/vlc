@@ -81,6 +81,7 @@
 #include <vlc_cpu.h>
 #include <vlc_url.h>
 #include <vlc_atomic.h>
+#include <vlc_modules.h>
 
 #include "libvlc.h"
 

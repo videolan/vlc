@@ -34,6 +34,7 @@
 #include <vlc_art_finder.h>
 #include <vlc_memory.h>
 #include <vlc_demux.h>
+#include <vlc_modules.h>
 
 #include "art.h"
 #include "fetcher.h"

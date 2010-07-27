@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_fs.h>
+#include <vlc_modules.h>
 
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */

@@ -39,6 +39,7 @@
 #include "util/qt_dirs.hpp"
 #include <vlc_keys.h>
 #include <vlc_intf_strings.h>
+#include <vlc_modules.h>
 
 #include <QString>
 #include <QVariant>

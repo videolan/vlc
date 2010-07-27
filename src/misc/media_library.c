@@ -33,6 +33,7 @@
 
 #include <assert.h>
 #include <vlc_media_library.h>
+#include <vlc_modules.h>
 #include "../libvlc.h"
 
 /**

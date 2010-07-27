@@ -37,6 +37,7 @@
 #include <assert.h>
 
 #include <vlc_vlm.h>
+#include <vlc_modules.h>
 
 #ifndef WIN32
 #   include <sys/time.h>                                   /* gettimeofday() */

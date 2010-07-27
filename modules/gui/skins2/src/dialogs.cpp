@@ -29,6 +29,7 @@
 #include "../commands/cmd_playlist.hpp"
 #include "../commands/cmd_playtree.hpp"
 #include <vlc_playlist.h>
+#include <vlc_modules.h>
 
 /// Callback called when a new skin is chosen
 void Dialogs::showChangeSkinCB( intf_dialog_args_t *pArg )

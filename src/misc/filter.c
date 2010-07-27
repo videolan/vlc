@@ -28,6 +28,7 @@
 #include <vlc_common.h>
 #include <libvlc.h>
 #include <vlc_filter.h>
+#include <vlc_modules.h>
 
 filter_t *filter_NewBlend( vlc_object_t *p_this,
                            const video_format_t *p_dst_chroma )

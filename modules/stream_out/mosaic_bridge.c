@@ -39,6 +39,7 @@
 
 #include <vlc_image.h>
 #include <vlc_filter.h>
+#include <vlc_modules.h>
 
 #include "../video_filter/mosaic.h"
 

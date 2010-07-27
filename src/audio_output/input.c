@@ -40,6 +40,7 @@
 
 #include <vlc_input.h>
 #include <vlc_vout.h>                  /* for vout_Request */
+#include <vlc_modules.h>
 
 #include <vlc_aout.h>
 #include <vlc_filter.h>

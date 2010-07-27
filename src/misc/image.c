@@ -46,6 +46,7 @@
 #include <vlc_fs.h>
 #include <vlc_sout.h>
 #include <libvlc.h>
+#include <vlc_modules.h>
 
 static picture_t *ImageRead( image_handler_t *, block_t *,
                              video_format_t *, video_format_t * );

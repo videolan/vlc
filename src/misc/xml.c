@@ -26,7 +26,8 @@
 #endif
 
 #include <vlc_common.h>
-#include "vlc_xml.h"
+#include <vlc_xml.h>
+#include <vlc_modules.h>
 #include "../libvlc.h"
 
 #undef xml_Create

@@ -12,6 +12,7 @@
 #import "VLCLibVLCBridging.h"
 #import <vlc_extensions.h>
 #import <vlc_input.h>
+#include <vlc_modules.h>
 
 // Here comes the nasty hack.
 #define MODULE_STRING "VLCKit"

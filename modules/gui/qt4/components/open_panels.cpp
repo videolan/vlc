@@ -36,6 +36,7 @@
 #include "dialogs_provider.hpp" /* Open Subtitle file */
 #include "util/qt_dirs.hpp"
 #include <vlc_intf_strings.h>
+#include <vlc_modules.h>
 
 #include <QFileDialog>
 #include <QDialogButtonBox>

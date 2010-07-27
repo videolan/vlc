@@ -27,6 +27,7 @@
 
 #include <vlc_common.h>
 #include <vlc_stream.h>
+#include <vlc_modules.h>
 #include <libvlc.h>
 
 #include <assert.h>

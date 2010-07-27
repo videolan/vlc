@@ -30,6 +30,7 @@
 #include <vlc_codec.h>
 #include <vlc_meta.h>
 #include <vlc_url.h>
+#include <vlc_modules.h>
 
 static bool SkipID3Tag( demux_t * );
 static bool SkipAPETag( demux_t *p_demux );

@@ -41,6 +41,7 @@
 #include <vlc_spu.h>
 #include <vlc_meta.h>
 #include <vlc_dialog.h>
+#include <vlc_modules.h>
 
 #include "audio_output/aout_internal.h"
 #include "stream_output/stream_output.h"

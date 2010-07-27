@@ -34,6 +34,7 @@
 #include "libvlc.h"
 
 #include <vlc_tls.h>
+#include <vlc_modules.h>
 
 /**
  * Allocates a whole server's TLS credentials.

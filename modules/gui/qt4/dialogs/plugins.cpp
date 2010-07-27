@@ -33,7 +33,7 @@
 
 #include <assert.h>
 
-//#include <vlc_modules.h>
+#include <vlc_modules.h>
 
 #include <QTreeWidget>
 #include <QStringList>

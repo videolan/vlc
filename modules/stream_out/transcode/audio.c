@@ -32,6 +32,7 @@
 
 #include <vlc_aout.h>
 #include <vlc_meta.h>
+#include <vlc_modules.h>
 
 static const int pi_channels_maps[6] =
 {

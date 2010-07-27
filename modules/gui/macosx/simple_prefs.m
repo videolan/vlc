@@ -26,6 +26,7 @@
 #import <vlc_keys.h>
 #import <vlc_interface.h>
 #import <vlc_dialog.h>
+#import <vlc_modules.h>
 #import "misc.h"
 #import "intf.h"
 #import "AppleRemote.h"

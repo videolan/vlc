@@ -25,6 +25,7 @@
 #include "input_manager.hpp"
 #include "dialogs/extensions.hpp"
 
+#include <vlc_modules.h>
 #include "assert.h"
 
 #include <QMenu>

@@ -36,6 +36,7 @@
 #import <vlc_plugin.h>
 #import <vlc_dialog.h>
 #import <vlc_extensions.h>
+#import <vlc_modules.h>
 
 #import "dialogProvider.h"
 #import "VLCUIWidgets.h"

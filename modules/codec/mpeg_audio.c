@@ -35,6 +35,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_aout.h>
+#include <vlc_modules.h>
 #include <assert.h>
 
 #include <vlc_block_helper.h>

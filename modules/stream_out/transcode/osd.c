@@ -31,6 +31,7 @@
 #include "transcode.h"
 
 #include <vlc_spu.h>
+#include <vlc_modules.h>
 
 /*
  * OSD menu

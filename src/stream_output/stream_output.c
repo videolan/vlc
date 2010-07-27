@@ -46,6 +46,7 @@
 #include <vlc_meta.h>
 #include <vlc_block.h>
 #include <vlc_codec.h>
+#include <vlc_modules.h>
 
 #include "input/input_interface.h"
 

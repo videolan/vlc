@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_vout_window.h>
+#include <vlc_modules.h>
 #include "inhibit.h"
 #include <libvlc.h>
 
