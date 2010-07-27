@@ -85,11 +85,17 @@ typedef struct _XTagParser
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
+static int ReaderOpen( vlc_object_t * );
+static void ReaderClose( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("Simple XML Parser") )
     set_capability( "xml", 5 )
     set_callbacks( Open, Close )
+
+    add_submodule()
+    set_capability( "xml reader", 5 )
+    set_callbacks( ReaderOpen, ReaderClose )
 vlc_module_end ()
 
 struct xml_reader_sys_t
@@ -100,8 +106,6 @@ struct xml_reader_sys_t
     bool b_endtag;
 };
 
-static xml_reader_t *ReaderCreate( xml_t *, stream_t * );
-static void ReaderDelete( xml_reader_t * );
 static int ReaderRead( xml_reader_t * );
 static int ReaderNodeType( xml_reader_t * );
 static char *ReaderName( xml_reader_t * );
@@ -132,9 +136,6 @@ static int xtag_snprint( char *, int, XTag * );
 static int Open( vlc_object_t *p_this )
 {
     xml_t *p_xml = (xml_t *)p_this;
-
-    p_xml->pf_reader_create = ReaderCreate;
-    p_xml->pf_reader_delete = ReaderDelete;
 
     p_xml->pf_catalog_load = CatalogLoad;
     p_xml->pf_catalog_add  = CatalogAdd;
@@ -170,9 +171,10 @@ static void CatalogAdd( xml_t *p_xml, const char *psz_arg1,
 /*****************************************************************************
  * Reader functions
  *****************************************************************************/
-static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
+static int ReaderOpen( vlc_object_t *p_this )
 {
-    xml_reader_t *p_reader;
+    xml_reader_t *p_reader = (xml_reader_t *)p_this;
+    stream_t *s = p_reader->p_stream;
     char *p_buffer;
     int i_size, i_pos = 0, i_buffer = 2048;
     XTag *p_root;
@@ -180,7 +182,7 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
     /* Open and read file */
     p_buffer = malloc( i_buffer );
     if( p_buffer == NULL )
-        return NULL;
+        return VLC_ENOMEM;
 
     while( ( i_size = stream_Read( s, &p_buffer[i_pos], 2048 ) ) == 2048 )
     {
@@ -188,39 +190,34 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
         i_buffer += i_size;
         p_buffer = realloc_or_free( p_buffer, i_buffer );
         if( !p_buffer )
-            return NULL;
+            return VLC_ENOMEM;
     }
     if( i_pos + i_size == 0 )
     {
-        msg_Dbg( p_xml, "empty XML" );
+        msg_Dbg( p_this, "empty XML" );
         free( p_buffer );
-        return NULL;
+        return VLC_ENOMEM;
     }
     p_buffer[ i_pos + i_size ] = '\0'; /* 0 terminated string */
 
     p_root = xtag_new_parse( p_buffer, i_buffer );
+    free( p_buffer );
     if( !p_root )
     {
-        msg_Warn( p_xml, "couldn't parse XML" );
-        free( p_buffer );
-        return NULL;
+        msg_Warn( p_this, "couldn't parse XML" );
+        return VLC_ENOMEM;
     }
 
-    free( p_buffer );
-    p_reader = malloc( sizeof(xml_reader_t) );
-    if( !p_reader )
-        return NULL;
     p_reader->p_sys = malloc( sizeof(xml_reader_sys_t) );
     if( !p_reader->p_sys )
     {
-        free( p_reader );
-        return NULL;
+        xtag_free( p_root );
+        return VLC_ENOMEM;
     }
     p_reader->p_sys->p_root = p_root;
     p_reader->p_sys->p_curtag = NULL;
     p_reader->p_sys->p_curattr = NULL;
     p_reader->p_sys->b_endtag = false;
-    p_reader->p_xml = p_xml;
 
     p_reader->pf_read = ReaderRead;
     p_reader->pf_node_type = ReaderNodeType;
@@ -229,14 +226,15 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
     p_reader->pf_next_attr = ReaderNextAttr;
     p_reader->pf_use_dtd = ReaderUseDTD;
 
-    return p_reader;
+    return VLC_SUCCESS;
 }
 
-static void ReaderDelete( xml_reader_t *p_reader )
+static void ReaderClose( vlc_object_t *p_this )
 {
+    xml_reader_t *p_reader = (vlc_object_t *)p_this;
+
     xtag_free( p_reader->p_sys->p_root );
     free( p_reader->p_sys );
-    free( p_reader );
 }
 
 static int ReaderUseDTD ( xml_reader_t *p_reader, bool b_use )

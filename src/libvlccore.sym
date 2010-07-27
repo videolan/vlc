@@ -671,5 +671,7 @@ text_style_Delete
 text_style_Duplicate
 text_style_New
 xml_Delete
+xml_ReaderCreate
+xml_ReaderDelete
 KeyToString
 StringToKey

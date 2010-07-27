@@ -1,34 +1,33 @@
 /*****************************************************************************
- * xml.h: XML abstraction layer
- *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
- * $Id$
- *
- * Author: Gildas Bazin <gbazin@videolan.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
- *****************************************************************************/
+* xml.h: XML abstraction layer
+*****************************************************************************
+* Copyright (C) 2004-2010 the VideoLAN team
+*
+* Author: Gildas Bazin <gbazin@videolan.org>
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+*****************************************************************************/
 
 #ifndef VLC_XML_H
 #define VLC_XML_H
 
 /**
- * \file
- * This file defines functions and structures to handle xml tags in vlc
- *
- */
+* \file
+* This file defines functions and structures to handle xml tags in vlc
+*
+*/
 
 # ifdef __cplusplus
 extern "C" {
@@ -36,33 +35,31 @@ extern "C" {
 
 struct xml_t
 {
-    VLC_COMMON_MEMBERS
+VLC_COMMON_MEMBERS
 
-    /* Module properties */
-    module_t  *p_module;
-    xml_sys_t *p_sys;
+/* Module properties */
+module_t  *p_module;
+xml_sys_t *p_sys;
 
-    xml_reader_t * (*pf_reader_create) ( xml_t *, stream_t * );
-    void (*pf_reader_delete) ( xml_reader_t * );
-
-    void (*pf_catalog_load) ( xml_t *, const char * );
-    void (*pf_catalog_add) ( xml_t *, const char *, const char *,
-                               const char * );
+void (*pf_catalog_load) ( xml_t *, const char * );
+void (*pf_catalog_add) ( xml_t *, const char *, const char *,
+		       const char * );
 };
 
 VLC_EXPORT( xml_t *, xml_Create, ( vlc_object_t * ) LIBVLC_USED );
 #define xml_Create( a ) xml_Create( VLC_OBJECT(a) )
 VLC_EXPORT( void, xml_Delete, ( xml_t * ) );
 
-#define xml_ReaderCreate( a, b ) a->pf_reader_create( a, b )
-#define xml_ReaderDelete( a ) a->p_xml->pf_reader_delete( a )
 #define xml_CatalogLoad( a, b ) a->pf_catalog_load( a, b )
 #define xml_CatalogAdd( a, b, c, d ) a->pf_catalog_add( a, b, c, d )
 
 struct xml_reader_t
 {
-    xml_t *p_xml;
+    VLC_COMMON_MEMBERS
+
     xml_reader_sys_t *p_sys;
+    stream_t *p_stream;
+    module_t *p_module;
 
     int (*pf_read) ( xml_reader_t * );
     int (*pf_node_type) ( xml_reader_t * );
@@ -72,6 +69,10 @@ struct xml_reader_t
 
     int (*pf_use_dtd) ( xml_reader_t *, bool );
 };
+
+VLC_EXPORT( xml_reader_t *, xml_ReaderCreate, (vlc_object_t *, stream_t *) LIBVLC_USED );
+#define xml_ReaderCreate( a, s ) xml_ReaderCreate(VLC_OBJECT(a), s)
+VLC_EXPORT( void, xml_ReaderDelete, (xml_reader_t *) );
 
 #define xml_ReaderRead( a ) a->pf_read( a )
 #define xml_ReaderNodeType( a ) a->pf_node_type( a )

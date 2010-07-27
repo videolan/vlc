@@ -1,8 +1,7 @@
 /*****************************************************************************
  * xml.c: XML parser wrapper for XML modules
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
- * $Id$
+ * Copyright (C) 2004-2010 the VideoLAN team
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -63,4 +62,42 @@ void xml_Delete( xml_t *p_xml )
 {
     module_unneed( p_xml, p_xml->p_module );
     vlc_object_release( p_xml );
+}
+
+
+#undef xml_ReaderCreate
+/**
+ * Creates an XML reader.
+ * @param obj parent VLC object
+ * @param stream stream to read XML from
+ * @return NULL on error.
+ */
+xml_reader_t *xml_ReaderCreate(vlc_object_t *obj, stream_t *stream)
+{
+    xml_reader_t *reader;
+
+    reader = vlc_custom_create(obj, sizeof(*reader), VLC_OBJECT_GENERIC,
+                               "xml reader");
+    vlc_object_attach(reader, obj);
+
+    reader->p_stream = stream;
+    reader->p_module = module_need(reader, "xml reader", NULL, false);
+    if (unlikely(reader->p_module == NULL))
+    {
+        msg_Err(reader, "XML reader not found");
+        vlc_object_release(reader);
+        return NULL;
+    }
+    return reader;
+}
+
+
+/**
+ * Deletes an XML reader.
+ * @param reader XML reader created with xml_RaederCreate().
+ */
+void xml_ReaderDelete(xml_reader_t *reader)
+{
+    module_unneed(reader, reader->p_module);
+    vlc_object_release(reader);
 }
