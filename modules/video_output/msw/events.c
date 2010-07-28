@@ -49,6 +49,9 @@
 #ifdef MODULE_NAME_IS_glwin32
 #include "../opengl.h"
 #endif
+#ifdef MODULE_NAME_IS_direct2d
+#include <d2d1.h>
+#endif
 
 #include <vlc_keys.h>
 #include "common.h"

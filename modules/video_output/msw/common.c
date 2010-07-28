@@ -48,6 +48,9 @@
 #ifdef MODULE_NAME_IS_glwin32
 #include "../opengl.h"
 #endif
+#ifdef MODULE_NAME_IS_direct2d
+#include <d2d1.h>
+#endif
 
 #include "common.h"
 
@@ -379,7 +382,7 @@ void UpdateRects(vout_display_t *vd,
                      SWP_NOCOPYBITS|SWP_NOZORDER|SWP_ASYNCWINDOWPOS);
 
     /* Destination image position and dimensions */
-#if defined(MODULE_NAME_IS_direct3d)
+#if defined(MODULE_NAME_IS_direct3d) || defined(MODULE_NAME_IS_direct2d)
     rect_dest.left   = 0;
     rect_dest.right  = place.width;
     rect_dest.top    = 0;
@@ -398,7 +401,7 @@ void UpdateRects(vout_display_t *vd,
 
 #endif
 
-#if defined(MODULE_NAME_IS_directx) || defined(MODULE_NAME_IS_direct3d)
+#if defined(MODULE_NAME_IS_directx) || defined(MODULE_NAME_IS_direct3d) || defined(MODULE_NAME_IS_direct2d)
     /* UpdateOverlay directdraw function doesn't automatically clip to the
      * display size so we need to do it otherwise it will fail
      * It is also needed for d3d to avoid exceding our surface size */
@@ -457,7 +460,7 @@ void UpdateRects(vout_display_t *vd,
     /* Apply overlay hardware constraints */
     if (sys->use_overlay)
         AlignRect(&rect_src_clipped, sys->i_align_src_boundary, sys->i_align_src_size);
-#elif defined(MODULE_NAME_IS_direct3d)
+#elif defined(MODULE_NAME_IS_direct3d) || defined(MODULE_NAME_IS_direct2d)
     /* Needed at least with YUV content */
     rect_src_clipped.left &= ~1;
     rect_src_clipped.right &= ~1;

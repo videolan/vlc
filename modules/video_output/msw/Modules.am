@@ -1,3 +1,11 @@
+SOURCES_direct2d = \
+        direct2d.c \
+        common.h \
+        events.h \
+        events.c \
+        common.c \
+        $(NULL)
+
 SOURCES_directx = \
 	directx.c \
 	common.h \

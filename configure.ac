@@ -3450,6 +3450,23 @@ then
 fi
 
 dnl
+dnl  Windows Direct2D plugin
+dnl
+AC_ARG_ENABLE(direct2d,
+  [  --enable-direct2d         Win7/VistaPU Direct2D support (default auto on Win32)])
+if test "${enable_direct2d}" != "no"; then
+  if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"
+  then
+    AC_CHECK_HEADERS(d2d1.h,
+      [
+        VLC_ADD_PLUGIN([direct2d])
+        VLC_ADD_LIBS([direct2d],[-lgdi32 -lole32])
+      ], [AC_MSG_WARN([Cannot find Direct2D headers!])]
+    )
+  fi
+fi
+
+dnl
 dnl  win32 GDI plugin
 dnl
 AC_ARG_ENABLE(wingdi,
