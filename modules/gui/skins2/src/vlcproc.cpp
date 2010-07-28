@@ -254,7 +254,7 @@ int VlcProc::onInputNew( vlc_object_t *pObj, const char *pVariable,
     VlcProc *pThis = (VlcProc*)pParam;
     input_thread_t *pInput = static_cast<input_thread_t*>(newval.p_address);
 
-    var_AddCallback( pInput, "intf-event", onGenericCallback, pThis );
+    var_AddCallback( pInput, "intf-event", onGenericCallback2, pThis );
     var_AddCallback( pInput, "bit-rate", onGenericCallback, pThis );
     var_AddCallback( pInput, "sample-rate", onGenericCallback, pThis );
     var_AddCallback( pInput, "can-record", onGenericCallback, pThis );
@@ -375,39 +375,91 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     VlcProc *pThis = (VlcProc*)pParam;
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
 
-    CmdGeneric *pCmd = NULL;
-
-#define ADD_CALLBACK_ENTRY( var, label ) \
+#define ADD_CALLBACK_ENTRY( var, func, remove ) \
     { \
     if( strcmp( pVariable, var ) == 0 ) \
-        pCmd = new Cmd_##label( pThis->getIntf(), pObj, newVal ); \
+    { \
+        string label = var; \
+        CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal, \
+                                            &VlcProc::func, label ); \
+        if( pCmd ) \
+            pQueue->push( CmdGenericPtr( pCmd ), remove ); \
+        return VLC_SUCCESS; \
+    } \
     }
 
-    ADD_CALLBACK_ENTRY( "item-current", item_current_changed )
-    ADD_CALLBACK_ENTRY( "volume-change", volume_changed )
+    ADD_CALLBACK_ENTRY( "item-current", on_item_current_changed, false )
+    ADD_CALLBACK_ENTRY( "volume-change", on_volume_changed, true )
 
-    ADD_CALLBACK_ENTRY( "intf-event", intf_event_changed )
-    ADD_CALLBACK_ENTRY( "bit-rate", bit_rate_changed )
-    ADD_CALLBACK_ENTRY( "sample-rate", sample_rate_changed )
-    ADD_CALLBACK_ENTRY( "can-record", can_record_changed )
+    ADD_CALLBACK_ENTRY( "bit-rate", on_bit_rate_changed, false )
+    ADD_CALLBACK_ENTRY( "sample-rate", on_sample_rate_changed, false )
+    ADD_CALLBACK_ENTRY( "can-record", on_can_record_changed, false )
 
-    ADD_CALLBACK_ENTRY( "random", random_changed )
-    ADD_CALLBACK_ENTRY( "loop", loop_changed )
-    ADD_CALLBACK_ENTRY( "repeat", repeat_changed )
+    ADD_CALLBACK_ENTRY( "random", on_random_changed, false )
+    ADD_CALLBACK_ENTRY( "loop", on_loop_changed, false )
+    ADD_CALLBACK_ENTRY( "repeat", on_repeat_changed, false )
 
-    ADD_CALLBACK_ENTRY( "audio-filter", audio_filter_changed )
+    ADD_CALLBACK_ENTRY( "audio-filter", on_audio_filter_changed, false )
 
-    ADD_CALLBACK_ENTRY( "intf-show", intf_show_changed )
+    ADD_CALLBACK_ENTRY( "intf-show", on_intf_show_changed, false )
 
 #undef ADD_CALLBACK_ENTRY
 
-    if( pCmd )
-        pQueue->push( CmdGenericPtr( pCmd ), false );
-    else
-        msg_Err( pObj, "no Callback entry provided for %s", pVariable );
-
-    return VLC_SUCCESS;
+    msg_Err( pThis->getIntf(), "no callback entry for %s", pVariable );
+    return VLC_EGENERIC;
 }
+
+
+int VlcProc::onGenericCallback2( vlc_object_t *pObj, const char *pVariable,
+                                 vlc_value_t oldVal, vlc_value_t newVal,
+                                 void *pParam )
+{
+    VlcProc *pThis = (VlcProc*)pParam;
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+
+    /**
+     * For intf-event, commands are labeled based on the value of newVal.
+     *
+     * For some values (e.g position), only keep the latest command
+     * when there are multiple pending commands (remove=true).
+     *
+     * for others, don't discard commands (remove=false)
+     **/
+    if( strcmp( pVariable, "intf-event" ) == 0 )
+    {
+        stringstream label;
+        bool b_remove;
+        switch( newVal.i_int )
+        {
+            case INPUT_EVENT_STATE:
+            case INPUT_EVENT_POSITION:
+            case INPUT_EVENT_ES:
+            case INPUT_EVENT_CHAPTER:
+            case INPUT_EVENT_RECORD:
+                b_remove = true;
+                break;
+            case INPUT_EVENT_VOUT:
+            case INPUT_EVENT_AOUT:
+            case INPUT_EVENT_DEAD:
+                b_remove = false;
+                break;
+            default:
+                return VLC_SUCCESS;
+        }
+        label <<  pVariable << "_" << newVal.i_int;
+        CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal,
+                                            &VlcProc::on_intf_event_changed,
+                                            label.str() );
+        if( pCmd )
+            pQueue->push( CmdGenericPtr( pCmd ), b_remove );
+
+        return VLC_SUCCESS;
+    }
+
+    msg_Err( pThis->getIntf(), "no callback entry for %s", pVariable );
+    return VLC_EGENERIC;
+}
+
 
 #define SET_BOOL(m,v)         ((VarBoolImpl*)(m).get())->set(v)
 #define SET_STREAMTIME(m,v,b) ((StreamTime*)(m).get())->set(v,b)
@@ -554,7 +606,7 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
         case INPUT_EVENT_DEAD:
             msg_Dbg( getIntf(), "end of input detected for %p", pInput );
 
-            var_DelCallback( pInput, "intf-event", onGenericCallback, this );
+            var_DelCallback( pInput, "intf-event", onGenericCallback2, this );
             var_DelCallback( pInput, "bit-rate", onGenericCallback, this );
             var_DelCallback( pInput, "sample-rate", onGenericCallback, this );
             var_DelCallback( pInput, "can-record" , onGenericCallback, this );

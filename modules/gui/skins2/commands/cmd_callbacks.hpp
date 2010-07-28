@@ -28,60 +28,41 @@
 #include "cmd_generic.hpp"
 #include "../src/vlcproc.hpp"
 
-class CmdLabeled : public CmdGeneric
+
+class CmdCallback : public CmdGeneric
 {
-private:
-    vlc_object_t *m_pObj;
-    vlc_value_t   m_newVal;
-protected:
-    void execute_on( void (VlcProc::*on_label)(vlc_object_t *,vlc_value_t) )
-    {
-        if( !m_pObj )
-            return;
-
-        (VlcProc::instance( getIntf() )->*on_label)( m_pObj, m_newVal );
-
-        vlc_object_release( m_pObj );
-        m_pObj =  NULL;
-    }
-    CmdLabeled( intf_thread_t *pIntf, vlc_object_t *pObj, vlc_value_t newVal )
-              : CmdGeneric( pIntf ), m_pObj( pObj ), m_newVal( newVal )
+public:
+    CmdCallback( intf_thread_t *pIntf, vlc_object_t *pObj, vlc_value_t newVal,
+                 void (VlcProc::*func)(vlc_object_t *,vlc_value_t),
+                 string label )
+        : CmdGeneric( pIntf ), m_pObj( pObj ), m_newVal( newVal ),
+          m_pfExecute( func ), m_label( label )
     {
         if( m_pObj )
             vlc_object_hold( m_pObj );
     }
-public:
-    virtual ~CmdLabeled() {
+    virtual ~CmdCallback()
+    {
         if( m_pObj )
             vlc_object_release( m_pObj );
     }
+    virtual void execute()
+    {
+        if( !m_pObj || !m_pfExecute )
+            return;
+
+        (VlcProc::instance( getIntf() )->*m_pfExecute)( m_pObj, m_newVal );
+
+        vlc_object_release( m_pObj );
+        m_pObj = NULL;
+    }
+    virtual string getType() const { return m_label; }
+
+private:
+    vlc_object_t* m_pObj;
+    vlc_value_t   m_newVal;
+    string        m_label;
+    void (VlcProc::*m_pfExecute)(vlc_object_t *,vlc_value_t);
 };
-
-#define ADD_COMMAND( label )                                            \
-    class Cmd_##label : public CmdLabeled                               \
-    {   public:                                                         \
-        Cmd_##label( intf_thread_t *I, vlc_object_t *O, vlc_value_t V ) \
-                   : CmdLabeled (I, O, V) { }                           \
-        virtual string getType() const { return #label; }               \
-        virtual void execute() { execute_on( &VlcProc::on_##label ); }  \
-    };
-
-ADD_COMMAND( item_current_changed )
-ADD_COMMAND( intf_event_changed )
-ADD_COMMAND( bit_rate_changed )
-ADD_COMMAND( sample_rate_changed )
-ADD_COMMAND( can_record_changed )
-
-ADD_COMMAND( random_changed )
-ADD_COMMAND( loop_changed )
-ADD_COMMAND( repeat_changed )
-
-ADD_COMMAND( volume_changed )
-
-ADD_COMMAND( audio_filter_changed )
-
-ADD_COMMAND( intf_show_changed )
-
-#undef ADD_COMMAND
 
 #endif
