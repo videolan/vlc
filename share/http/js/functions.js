@@ -28,6 +28,7 @@
 var old_time = 0;
 var pl_cur_id;
 var albumart_id = -1;
+var req = null;
 
 /**********************************************************************
  * Slider functions
@@ -389,7 +390,10 @@ function hotkey( str )
 }
 function update_status()
 {
-    loadXMLDoc( 'requests/status.xml', parse_status );
+    if( req == null || req.readyState == 0 || req.readyState == 4 )
+    {
+        loadXMLDoc( 'requests/status.xml', parse_status );
+    }
 }
 function update_playlist()
 {
@@ -540,6 +544,8 @@ function parse_playlist()
             var answer = req.responseXML.documentElement;
             var playtree = document.getElementById( 'playtree' );
             var pos = document.createElement( "div" );
+            pos.style.height = document.body.clientHeight - 100 + "px";
+            pos.style.overflow = "auto";
             var pos_top = pos;
             var elt = answer.firstChild;
             
