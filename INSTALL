@@ -53,9 +53,9 @@ Building packages
 =================
 
 To build a Debian package, you need to get the packaging info
-   svn co svn://svn.debian.org/pkg-multimedia/videolan/vlc/debian debian 
+   git clone git://git.debian.org/pkg-multimedia/vlc.git debian
 and then
-   dpkg-buildpackage -rfakeroot -us -uc
+   git-buildpackage
 
 
 To build RPM packages, copy a spec file from extra/package/rpm and:
