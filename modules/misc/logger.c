@@ -373,8 +373,20 @@ static void Overflow (msg_cb_data_t *p_sys, msg_item_t *p_item, unsigned overrun
     if (verbosity == -1)
         verbosity = var_CreateGetInteger( p_sys->p_intf, "verbose" );
 
-    if (verbosity < p_item->i_type)
-        return;
+    switch( p_item->i_type )
+    {
+        case VLC_MSG_INFO:
+        case VLC_MSG_ERR:
+            if( verbosity < 0 ) return;
+            break;
+        case VLC_MSG_WARN:
+            if( verbosity < 1 ) return;
+            break;
+        case VLC_MSG_DBG:
+            if( verbosity < 2 ) return;
+            break;
+    }
+
 
     int canc = vlc_savecancel();
 
