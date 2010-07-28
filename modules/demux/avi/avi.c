@@ -437,9 +437,12 @@ static int Open( vlc_object_t * p_this )
 
                 fmt.i_extra = __MIN( p_auds->p_wf->cbSize,
                     p_auds->i_chunk_size - sizeof(WAVEFORMATEX) );
-                fmt.p_extra = malloc( fmt.i_extra );
-                if( !fmt.p_extra ) goto error;
-                memcpy( fmt.p_extra, &p_auds->p_wf[1], fmt.i_extra );
+                if( fmt.i_extra > 0 )
+                {
+                    fmt.p_extra = malloc( fmt.i_extra );
+                    if( !fmt.p_extra ) goto error;
+                    memcpy( fmt.p_extra, &p_auds->p_wf[1], fmt.i_extra );
+                }
                 break;
 
             case( AVIFOURCC_vids ):
@@ -512,9 +515,12 @@ static int Open( vlc_object_t * p_this )
                 fmt.i_extra =
                     __MIN( p_vids->p_bih->biSize - sizeof( BITMAPINFOHEADER ),
                            p_vids->i_chunk_size - sizeof(BITMAPINFOHEADER) );
-                fmt.p_extra = malloc( fmt.i_extra );
-                if( !fmt.p_extra ) goto error;
-                memcpy( fmt.p_extra, &p_vids->p_bih[1], fmt.i_extra );
+                if( fmt.i_extra > 0 )
+                {
+                    fmt.p_extra = malloc( fmt.i_extra );
+                    if( !fmt.p_extra ) goto error;
+                    memcpy( fmt.p_extra, &p_vids->p_bih[1], fmt.i_extra );
+                }
 
                 msg_Dbg( p_demux, "stream[%d] video(%4.4s) %"PRIu32"x%"PRIu32" %dbpp %ffps",
                          i, (char*)&p_vids->p_bih->biCompression,
