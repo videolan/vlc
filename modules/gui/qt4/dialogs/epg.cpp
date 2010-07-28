@@ -94,14 +94,22 @@ void EpgDialog::showEvent( EPGEvent *event )
 {
     if( !event ) return;
 
+    QString titleDescription, textDescription;
+    if( event->description.isEmpty() )
+        textDescription = event->shortDescription;
+    else
+    {
+        textDescription = event->description;
+        if( !event->shortDescription.isEmpty() )
+            titleDescription = " - " + event->shortDescription;
+    }
+
     QDateTime end = event->start.addSecs( event->duration );
     title->setText( event->start.toString( "hh:mm" ) + " - "
                     + end.toString( "hh:mm" ) + " : "
-                    + event->name
-                    + ( event->shortDescription.isEmpty()
-                        ? "" : " - " + event->shortDescription ) );
+                    + event->name + titleDescription );
 
-    description->setText( event->description );
+    description->setText( textDescription );
 }
 
 void EpgDialog::updateInfos()
