@@ -241,7 +241,7 @@ VLC_EXPORT( void, input_item_ReplaceInfos, ( input_item_t *, info_category_t * )
 VLC_EXPORT( void, input_item_MergeInfos, ( input_item_t *, info_category_t * ) );
 
 /**
- * This function creates a new input_item_t with the provided informations.
+ * This function creates a new input_item_t with the provided information.
  *
  * XXX You may also use input_item_New or input_item_NewExt as they need
  * less arguments.
@@ -249,7 +249,7 @@ VLC_EXPORT( void, input_item_MergeInfos, ( input_item_t *, info_category_t * ) )
 VLC_EXPORT( input_item_t *, input_item_NewWithType, ( vlc_object_t *, const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration, int i_type ) LIBVLC_USED );
 
 /**
- * This function creates a new input_item_t with the provided informations.
+ * This function creates a new input_item_t with the provided information.
  *
  * Provided for convenience.
  */
@@ -257,7 +257,7 @@ VLC_EXPORT( input_item_t *, input_item_NewExt, (vlc_object_t *, const char *psz_
 #define input_item_NewExt(a,b,c,d,e,f,g) input_item_NewExt( VLC_OBJECT(a),b,c,d,e,f,g)
 
 /**
- * This function creates a new input_item_t with the provided informations.
+ * This function creates a new input_item_t with the provided information.
  *
  * Provided for convenience.
  */

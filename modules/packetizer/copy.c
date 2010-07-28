@@ -209,7 +209,7 @@ static block_t *PacketizeSub( decoder_t *p_dec, block_t **pp_block )
     return p_block;
 }
 
-/* Parse WMV3 packet and extract frame type informations */
+/* Parse WMV3 packet and extract frame type information */
 static void ParseWMV3( decoder_t *p_dec, block_t *p_block )
 {
     bs_t s;

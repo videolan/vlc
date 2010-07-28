@@ -220,7 +220,7 @@ static inline void picture_CopyProperties( picture_t *p_dst, const picture_t *p_
 }
 
 /**
- * This function will reset a picture informations (properties and quantizers).
+ * This function will reset a picture information (properties and quantizers).
  * It is sometimes useful for reusing pictures (like from a pool).
  */
 VLC_EXPORT( void, picture_Reset, ( picture_t * ) );

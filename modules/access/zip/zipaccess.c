@@ -165,7 +165,7 @@ int AccessOpen( vlc_object_t *p_this )
     unz_file_info z_info;
     unzGetCurrentFileInfo( file, &z_info, NULL, 0, NULL, 0, NULL, 0 );
 
-    /* Set access informations: size is needed for AccessSeek */
+    /* Set access information: size is needed for AccessSeek */
     p_access->info.i_size = z_info.uncompressed_size;
     p_access->info.i_pos  = 0;
     p_access->info.b_eof  = false;

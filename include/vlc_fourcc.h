@@ -403,7 +403,7 @@ VLC_EXPORT( bool, vlc_fourcc_IsYUV, ( vlc_fourcc_t ) );
 VLC_EXPORT( bool, vlc_fourcc_AreUVPlanesSwapped, (vlc_fourcc_t , vlc_fourcc_t ) );
 
 /**
- * Chroma related informations.
+ * Chroma related information.
  */
 typedef struct {
     unsigned plane_count;

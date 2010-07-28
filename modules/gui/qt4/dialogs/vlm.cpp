@@ -289,7 +289,7 @@ void VLMDialog::mediasPopulator()
         int vlmItemCount;
         vlm_media_t ***ppp_dsc = (vlm_media_t ***)malloc( sizeof( vlm_media_t ) );
 
-        /* Get medias informations and numbers */
+        /* Get medias information and numbers */
         vlm_Control( p_vlm, VLM_GET_MEDIAS, ppp_dsc, &i_nMedias );
 
         /* Loop on all of them */
@@ -305,7 +305,7 @@ void VLMDialog::mediasPopulator()
 
             QString outputText = qfu( (*ppp_dsc)[i]->psz_output );
 
-            /* Schedule media is a quite especial, maybe there is another way to grab informations */
+            /* Schedule media is a quite especial, maybe there is another way to grab information */
             if( (*ppp_dsc)[i]->b_vod )
             {
                 typeShortName = "VOD";

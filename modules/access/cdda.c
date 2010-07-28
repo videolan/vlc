@@ -400,7 +400,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 /* If the given string is NULL or empty, fill it by the return value of 'code' */
 #define ON_EMPTY( psz, code ) do { if( !NONEMPTY( psz) ) { (psz) = code; } } while(0)
 
-    /* Retreive CDDB informations */
+    /* Retreive CDDB information */
 #ifdef HAVE_LIBCDDB
     char psz_year_buffer[4+1];
     msg_Dbg( p_access, "fetching infos with CDDB" );
@@ -447,7 +447,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         pp_cd_text = NULL;
     }
 
-    /* Retrieve CD-TEXT informations but prefer CDDB */
+    /* Retrieve CD-TEXT information but prefer CDDB */
     if( i_cd_text > 0 && pp_cd_text[0] )
     {
         const vlc_meta_t *p_disc = pp_cd_text[0];
@@ -522,7 +522,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         const char *psz_track_description = NULL;
 
 #ifdef HAVE_LIBCDDB
-        /* Retreive CDDB informations */
+        /* Retreive CDDB information */
         if( p_disc )
         {
             cddb_track_t *t = cddb_disc_get_track( p_disc, i );
@@ -534,7 +534,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         }
 #endif
 
-        /* Retreive CD-TEXT informations but prefer CDDB */
+        /* Retreive CD-TEXT information but prefer CDDB */
         if( i+1 < i_cd_text && pp_cd_text[i+1] )
         {
             const vlc_meta_t *t = pp_cd_text[i+1];

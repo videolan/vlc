@@ -3324,7 +3324,7 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
     ts_teletext_page_t p_page[2 * 64 + 20];
     unsigned i_page = 0;
 
-    /* Gather pages informations */
+    /* Gather pages information */
 #if defined _DVBPSI_DR_56_H_ && \
     defined DVBPSI_VERSION && DVBPSI_VERSION_INT > ((0<<16)+(1<<8)+5)
     for( unsigned i_tag_idx = 0; i_tag_idx < 2; i_tag_idx++ )

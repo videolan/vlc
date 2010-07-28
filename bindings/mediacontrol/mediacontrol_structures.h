@@ -125,7 +125,7 @@ typedef struct {
 
 /**
  * Stream information
- * This structure allows to quickly get various informations about the stream.
+ * This structure allows to quickly get various information about the stream.
  */
 typedef struct {
     mediacontrol_PlayerStatus streamstatus;

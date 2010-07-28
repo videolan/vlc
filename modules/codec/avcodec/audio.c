@@ -215,7 +215,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     /* */
     p_dec->fmt_out.i_cat = AUDIO_ES;
-    /* Try to set as much informations as possible but do not trust it */
+    /* Try to set as much information as possible but do not trust it */
     SetupOutputFormat( p_dec, false );
 
     date_Set( &p_sys->end_date, 0 );

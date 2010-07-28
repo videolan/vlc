@@ -114,7 +114,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     leftSplitter->setMaximumWidth( 250 );
     setCollapsible( 1, false );
 
-    /* In case we want to keep the splitter informations */
+    /* In case we want to keep the splitter information */
     // components shall never write there setting to a fixed location, may infer
     // with other uses of the same component...
     getSettings()->beginGroup("Playlist");

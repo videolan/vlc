@@ -113,7 +113,7 @@ typedef struct {
 } vout_display_cfg_t;
 
 /**
- * Informations from a vout_display_t to configure
+ * Information from a vout_display_t to configure
  * the core behaviour.
  *
  * By default they are all false.
@@ -271,7 +271,7 @@ struct vout_display_t {
      */
     video_format_t fmt;
 
-    /* Informations
+    /* Information
      *
      * You can only set them in the open function.
      */

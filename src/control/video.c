@@ -286,7 +286,7 @@ int libvlc_video_get_spu( libvlc_media_player_t *p_mi )
     if( i_ret < 0 )
     {
         vlc_object_release( p_input_thread );
-        libvlc_printerr( "Subtitle informations not found" );
+        libvlc_printerr( "Subtitle information not found" );
         return -1;
     }
 

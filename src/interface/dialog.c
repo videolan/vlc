@@ -131,7 +131,7 @@ void dialog_VFatal (vlc_object_t *obj, bool modal, const char *title,
 #undef dialog_Login
 /**
  * Requests a username and password through the user interface.
- * @param obj the VLC object requesting credential informations
+ * @param obj the VLC object requesting credential information
  * @param username a pointer to the specified username [OUT]
  * @param password a pointer to the specified password [OUT]
  * @param title title for the dialog

@@ -266,7 +266,7 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
 {
     video_format_t fmt = *p_fmt;
 
-    /* It is needed to be sure all informations are filled */
+    /* It is needed to be sure all information are filled */
     video_format_Setup( &fmt, p_fmt->i_chroma,
                               p_fmt->i_width, p_fmt->i_height,
                               p_fmt->i_sar_num, p_fmt->i_sar_den );

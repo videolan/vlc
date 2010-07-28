@@ -459,7 +459,7 @@ static int vlc_statEx( const char *filename, struct stat *buf,
 }
 
 /**
- * Finds file/inode informations, as stat().
+ * Finds file/inode information, as stat().
  * Consider using fstat() instead, if possible.
  *
  * @param filename UTF-8 file path
@@ -470,7 +470,7 @@ int vlc_stat( const char *filename, struct stat *buf)
 }
 
 /**
- * Finds file/inode informations, as lstat().
+ * Finds file/inode information, as lstat().
  * Consider using fstat() instead, if possible.
  *
  * @param filename UTF-8 file path

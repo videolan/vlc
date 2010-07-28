@@ -198,11 +198,11 @@ static int Open( vlc_object_t* p_this )
         goto error;
     }
 
-    /* Get some informations */
+    /* Get some information */
     LIBSSH2_SFTP_ATTRIBUTES attributes;
     if( libssh2_sftp_stat( p_sys->sftp_session, url.psz_path, &attributes ) )
     {
-        msg_Err( p_access, "Impossible to get informations about the remote file %s", url.psz_path );
+        msg_Err( p_access, "Impossible to get information about the remote file %s", url.psz_path );
         goto error;
     }
     p_access->info.i_size = attributes.filesize;

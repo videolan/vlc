@@ -94,7 +94,7 @@ using namespace TagLib;
 
 
 /**
- * Read meta informations from APE tags
+ * Read meta information from APE tags
  * @param tag: the APE tag
  * @param p_demux; the demux object
  * @param p_demux_meta: the demuxer meta
@@ -156,7 +156,7 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
                            p_txxx->fieldList().toString().toCString( true ) );
     }
 
-    // Get some more informations
+    // Get some more information
 #define SET( tagName, metaName )                                               \
     list = tag->frameListMap()[tagName];                                       \
     if( !list.isEmpty() )                                                      \
@@ -271,7 +271,7 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
 
 
 /**
- * Read the meta informations from XiphComments
+ * Read the meta information from XiphComments
  * @param tag: the Xiph Comment
  * @param p_demux; the demux object
  * @param p_demux_meta: the demuxer meta
@@ -484,7 +484,7 @@ static int ReadMeta( vlc_object_t* p_this)
 
 
 /**
- * Write meta informations to APE tags
+ * Write meta information to APE tags
  * @param tag: the APE tag
  * @param p_item: the input item
  */
@@ -542,7 +542,7 @@ static void WriteMetaToId3v2( ID3v2::Tag* tag, input_item_t* p_item )
 
 
 /**
- * Write the meta informations to XiphComments
+ * Write the meta information to XiphComments
  * @param tag: the Xiph Comment
  * @param p_input: the input item
  */

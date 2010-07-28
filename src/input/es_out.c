@@ -2862,7 +2862,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
     if( !p_cat )
         return;
 
-    /* Add informations */
+    /* Add information */
     const char *psz_type;
     switch( fmt->i_cat )
     {
