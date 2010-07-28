@@ -116,7 +116,7 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
     }
 
     // Remove old items
-    QMap<QString, EPGEvent*>::iterator i = m_events.begin();
+    QMultiMap<QString, EPGEvent*>::iterator i = m_events.begin();
     while ( i != m_events.end() )
     {
         EPGEvent* item = i.value();
@@ -124,7 +124,8 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
         {
             m_epgView->delEvent( item );
             delete item;
-            i = m_events.erase( i );
+            i--;
+            m_events.erase( i + 1 );
         }
         else
             item->updated = false;
@@ -135,5 +136,7 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
     // Update the global duration and start time.
     m_epgView->updateDuration();
     m_epgView->updateStartTime();
+    // Udate the channel list.
+    m_channelsWidget->update();
 }
 
