@@ -507,15 +507,6 @@ static void *Thread( void *obj )
     /* Save the path */
     getSettings()->setValue( "filedialog-path", p_intf->p_sys->filepath );
 
-    /* Save volume on exit */
-    audio_volume_t i_volume;
-    if ( var_InheritBool( p_intf, "qt-autosave-volume" ) )
-        aout_VolumeGet( p_intf, &i_volume );
-    else
-        i_volume = config_GetInt( p_intf, "qt-startvolume" );
-    config_PutInt( p_intf, "volume", i_volume );
-    config_SaveConfigFile( p_intf, NULL );
-
     /* Delete the configuration. Application has to be deleted after that. */
     delete p_intf->p_sys->mainSettings;
 
