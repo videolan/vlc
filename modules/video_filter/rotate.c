@@ -187,21 +187,17 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     for( int i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
-        const int i_visible_lines = p_pic->p[i_plane].i_visible_lines;
-        const int i_visible_pitch = p_pic->p[i_plane].i_visible_pitch;
-        const int i_pitch         = p_pic->p[i_plane].i_pitch;
-        const int i_hidden_pitch  = i_pitch - i_visible_pitch;
+        plane_t *p_srcp = &p_pic->p[i_plane];
+        plane_t *p_dstp = &p_outpic->p[i_plane];
+
+        const int i_visible_lines = p_srcp->i_visible_lines;
+        const int i_visible_pitch = p_srcp->i_visible_pitch;
 
         const int i_aspect = __MAX( 1, ( i_visible_lines * p_pic->p[Y_PLANE].i_visible_pitch ) / ( p_pic->p[Y_PLANE].i_visible_lines * i_visible_pitch ));
         /* = 2 for U and V planes in YUV 4:2:2, = 1 otherwise */
 
         const int i_line_center = i_visible_lines>>1;
         const int i_col_center  = i_visible_pitch>>1;
-
-        const uint8_t *p_in = p_pic->p[i_plane].p_pixels;
-        uint8_t *p_out = p_outpic->p[i_plane].p_pixels;
-        uint8_t *p_outendline = p_out + i_visible_pitch;
-        const uint8_t *p_outend = p_out + i_visible_lines * i_pitch;
 
         const uint8_t black_pixel = ( i_plane == Y_PLANE ) ? 0x00 : 0x80;
 
@@ -211,17 +207,15 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                              - i_sin * i_col_center + (1<<11) );
         int i_col_orig0 =    i_sin * i_line_center / i_aspect
                            - i_cos * i_col_center + (1<<11);
-        for( ; p_outendline < p_outend;
-             p_out += i_hidden_pitch, p_outendline += i_pitch,
-             i_line_orig0 += i_line_next, i_col_orig0 += i_col_next )
+        for( int y = 0; y < i_visible_lines; y++)
         {
-            for( ; p_out < p_outendline;
-                 p_out++, i_line_orig0 += i_sin, i_col_orig0 += i_cos )
+            uint8_t *p_out = &p_dstp->p_pixels[y * p_dstp->i_pitch];
+
+            for( int x = 0; x < i_visible_pitch; x++, p_out++ )
             {
                 const int i_line_orig = (i_line_orig0>>12)*i_aspect + i_line_center;
                 const int i_col_orig  = (i_col_orig0>>12)  + i_col_center;
-                const uint8_t* p_orig_offset = p_in + i_line_orig * i_pitch
-                                                + i_col_orig;
+                const uint8_t *p_orig_offset = &p_srcp->p_pixels[i_line_orig * p_srcp->i_pitch + i_col_orig];
                 const uint8_t i_line_percent = (i_line_orig0>>4) & 255;
                 const uint8_t i_col_percent  = (i_col_orig0 >>4) & 255;
 
@@ -246,7 +240,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                              && ( i_line_orig >= 0 ) )
                             i_colpix = *p_orig_offset;
 
-                        p_orig_offset+=i_pitch;
+                        p_orig_offset += p_srcp->i_pitch;
                         if( ( i_line_orig < i_visible_lines - 1)
                             && ( i_col_orig  < i_visible_pitch - 1) )
                             i_nexpix = *p_orig_offset;
@@ -280,7 +274,13 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 {
                     *p_out = black_pixel;
                 }
+
+                i_line_orig0 += i_sin;
+                i_col_orig0 += i_cos;
             }
+
+            i_line_orig0 += i_line_next;
+            i_col_orig0 += i_col_next;
         }
     }
 
@@ -315,17 +315,18 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
+    const int i_visible_pitch = p_pic->p->i_visible_pitch>>1; /* In fact it's i_visible_pixels */
+    const int i_visible_lines = p_pic->p->i_visible_lines;
+
     const uint8_t *p_in   = p_pic->p->p_pixels+i_y_offset;
     const uint8_t *p_in_u = p_pic->p->p_pixels+i_u_offset;
     const uint8_t *p_in_v = p_pic->p->p_pixels+i_v_offset;
-
-    const int i_pitch         = p_pic->p->i_pitch;
-    const int i_visible_pitch = p_pic->p->i_visible_pitch>>1; /* In fact it's i_visible_pixels */
-    const int i_visible_lines = p_pic->p->i_visible_lines;
+    const int i_in_pitch  = p_pic->p->i_pitch;
 
     uint8_t *p_out   = p_outpic->p->p_pixels+i_y_offset;
     uint8_t *p_out_u = p_outpic->p->p_pixels+i_u_offset;
     uint8_t *p_out_v = p_outpic->p->p_pixels+i_v_offset;
+    const int i_out_pitch = p_outpic->p->i_pitch;
 
     const int i_line_center = i_visible_lines>>1;
     const int i_col_center  = i_visible_pitch>>1;
@@ -352,16 +353,16 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
             if( 0 <= i_col_orig && i_col_orig < i_visible_pitch
              && 0 <= i_line_orig && i_line_orig < i_visible_lines )
             {
-                p_out[i_line*i_pitch+2*i_col] = p_in[i_line_orig*i_pitch+2*i_col_orig];
+                p_out[i_line*i_out_pitch+2*i_col] = p_in[i_line_orig*i_in_pitch+2*i_col_orig];
                 i_col_orig /= 2;
-                p_out_u[i_line*i_pitch+2*i_col] = p_in_u[i_line_orig*i_pitch+4*i_col_orig];
-                p_out_v[i_line*i_pitch+2*i_col] = p_in_v[i_line_orig*i_pitch+4*i_col_orig];
+                p_out_u[i_line*i_out_pitch+2*i_col] = p_in_u[i_line_orig*i_in_pitch+4*i_col_orig];
+                p_out_v[i_line*i_out_pitch+2*i_col] = p_in_v[i_line_orig*i_in_pitch+4*i_col_orig];
             }
             else
             {
-                p_out[i_line*i_pitch+2*i_col] = 0x00;
-                p_out_u[i_line*i_pitch+2*i_col] = 0x80;
-                p_out_v[i_line*i_pitch+2*i_col] = 0x80;
+                p_out[i_line*i_out_pitch+2*i_col] = 0x00;
+                p_out_u[i_line*i_out_pitch+2*i_col] = 0x80;
+                p_out_v[i_line*i_out_pitch+2*i_col] = 0x80;
             }
 
             /* Handle "2nd Y" */
@@ -378,11 +379,11 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
             if( 0 <= i_col_orig && i_col_orig < i_visible_pitch
              && 0 <= i_line_orig && i_line_orig < i_visible_lines )
             {
-                p_out[i_line*i_pitch+2*i_col] = p_in[i_line_orig*i_pitch+2*i_col_orig];
+                p_out[i_line*i_out_pitch+2*i_col] = p_in[i_line_orig*i_in_pitch+2*i_col_orig];
             }
             else
             {
-                p_out[i_line*i_pitch+2*i_col] = 0x00;
+                p_out[i_line*i_out_pitch+2*i_col] = 0x00;
             }
         }
     }
