@@ -195,7 +195,7 @@ static void ResetCurrentlyPlaying( playlist_t *p_playlist,
         /* Shuffle the array */
         for( unsigned j = p_playlist->current.i_size - 1; j > 0; j-- )
         {
-            unsigned i = ((unsigned)vlc_mrand48()) % (j+1); /* between 0 and j */
+            unsigned i = vlc_lrand48() % (j+1); /* between 0 and j */
             playlist_item_t *p_tmp;
             /* swap the two items */
             p_tmp = ARRAY_VAL(p_playlist->current, i);
