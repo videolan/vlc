@@ -1285,7 +1285,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
     }
     /* User Agent */
     net_Printf( p_access, p_sys->fd, pvs,
-                "User-Agent: %s LibVLC/"VERSION"\r\n",
+                "User-Agent: %s\r\n",
                 p_sys->psz_user_agent );
     /* Offset */
     if( p_sys->i_version == 1 && ! p_sys->b_continuous )
