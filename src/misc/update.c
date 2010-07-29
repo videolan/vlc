@@ -78,12 +78,6 @@
 #   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-ce"
 #elif defined( WIN32 )
 #   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-win-x86"
-#elif defined( __APPLE__ )
-#   if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
-#       define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-mac-ppc"
-#   else
-#       define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-mac-x86"
-#   endif
 #elif defined( SYS_BEOS )
 #       define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-beos-x86"
 #else
