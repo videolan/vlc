@@ -34,6 +34,27 @@ Stream output:
     dst=public_html/iphonestreamfile-###.ts}"
 
 
+Changes between 1.1.1 and 1.1.2
+-------------------------------
+
+Demuxers:
+ * Avformat fps displaying fix
+ * TS, fix an issue where some programs would get dropped (fixes DVB issues too)
+
+Audio filters:
+ * fix timestamps handling on some filters that provoqued issues when playback
+   of mono streams, especially on Windows
+
+Windows:
+ * fix a bug in direct3d video output with old nVidia drivers that broke video
+   playback with overlay (YUV->RGB)
+ * fix console output encoding
+
+Interface and extensions:
+ * Youtube and other scripts updates
+ * Misc fixes in Qt4 (especially VLM and EPG dialogs) and MacOS interface
+
+
 Changes between 1.1.0 and 1.1.1:
 --------------------------------
 
