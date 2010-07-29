@@ -564,12 +564,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.stylesCombo->hide();
             optionWidgets.append( NULL );
 #endif
-
-            ui.skins_zone->setEnabled( ui.skins->isChecked() );
-            CONNECT( ui.skins, toggled( bool ), ui.skins_zone, setEnabled( bool ) );
-
-            ui.native_zone->setEnabled( ui.qt4->isChecked() );
-            CONNECT( ui.qt4, toggled( bool ), ui.native_zone, setEnabled( bool ) );
+            radioGroup = new QButtonGroup(this);
+            radioGroup->addButton( ui.qt4, 0 );
+            radioGroup->addButton( ui.skins, 1 );
+            CONNECT( radioGroup, buttonClicked( int ),
+                     ui.styleStackedWidget, setCurrentIndex( int ) );
+            ui.styleStackedWidget->setCurrentIndex( radioGroup->checkedId() );
 
             CONNECT( ui.minimalviewBox, toggled( bool ),
                      ui.mainPreview, setNormalPreview( bool ) );
@@ -598,8 +598,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.updatesBox, toggled( bool ),
                      ui.updatesDays, setEnabled( bool ) );
 #else
-            ui.updatesBox->hide();
-            ui.updatesDays->hide();
+            ui.updateNotifierZone->hide();
 #endif
             /* ONE INSTANCE options */
 #if defined( WIN32 ) || defined( HAVE_DBUS ) || defined(__APPLE__)

@@ -121,6 +121,7 @@ private:
 
     QList<QWidget *> optionWidgets;
     QStringList qs_filter;
+    QButtonGroup *radioGroup;
 
 #ifdef WIN32
     QList<QTreeWidgetItem *> listAsso;
