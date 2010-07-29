@@ -19,6 +19,9 @@ Demuxers:
 Interfaces
  * The telnet interface has been removed in the favour of the lua one
 
+Video Output:
+ * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
+
 Video Filter:
  * New gradfun filter for debanding videos using dithering
 
