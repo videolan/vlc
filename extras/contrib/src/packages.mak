@@ -240,5 +240,6 @@ PEFLAGS_URL=$(CONTRIB_VIDEOLAN)
 SQLITE_VERSION=3.6.20
 SQLITE_URL=http://www.sqlite.org/sqlite-amalgamation-$(SQLITE_VERSION).tar.gz
 DXVA2_URL=$(CONTRIB_VIDEOLAN)/dxva2api.h
+D2D_URL=http://nodeload.github.com/2of1/d2d1headers/tarball/master
 VPX_VERSION=0.9.0
 VPX_URL=http://webm.googlecode.com/files/libvpx-$(VPX_VERSION).tar.bz2
