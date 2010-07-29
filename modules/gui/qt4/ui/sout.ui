@@ -26,7 +26,7 @@
         <x>0</x>
         <y>0</y>
         <width>690</width>
-        <height>469</height>
+        <height>472</height>
        </rect>
       </property>
       <attribute name="label">
@@ -133,11 +133,11 @@
         <x>0</x>
         <y>0</y>
         <width>690</width>
-        <height>469</height>
+        <height>319</height>
        </rect>
       </property>
       <attribute name="label">
-       <string>Destinations</string>
+       <string>Destination Setup</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_6">
        <item row="0" column="0" colspan="3">
@@ -280,7 +280,7 @@
        </rect>
       </property>
       <attribute name="label">
-       <string>Options</string>
+       <string>Option Setup</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0" colspan="2">
