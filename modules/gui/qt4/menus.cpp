@@ -1096,7 +1096,6 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     PopupMenuPlaylistControlEntries( sysMenu, p_intf);
     PopupMenuControlEntries( sysMenu, p_intf);
 
-    sysMenu->addSeparator();
     addDPStaticEntry( sysMenu, qtr( "&Open Media" ),
             ":/type/file-wide", SLOT( openFileDialog() ) );
     addDPStaticEntry( sysMenu, qtr( "&Quit" ) ,
