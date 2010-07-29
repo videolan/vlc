@@ -436,7 +436,11 @@ void CtrlSliderBg::associateCursor( CtrlSliderCursor &rCursor )
 
 void CtrlSliderBg::onUpdate( Subject<VarPercent> &rVariable, void*arg )
 {
-    m_position = (int)( m_rVariable.get() * (m_nbHoriz * m_nbVert - 1) );
+    int position = (int)( m_rVariable.get() * (m_nbHoriz * m_nbVert - 1) );
+    if( position == m_position )
+        return;
+
+    m_position = position;
     notifyLayout( m_bgWidth, m_bgHeight );
 }
 
