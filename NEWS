@@ -114,6 +114,7 @@ Translations:
 
 Changes between 1.0.6 and 1.1.0:
 --------------------------------
+
 Important changes for users:
  * On Linux, known bugs in the ALSA library might prevent audio output.
    Update to alsa-lib 1.0.24 or later, or use the PulseAudio output instead.
@@ -144,29 +145,30 @@ Access:
 Decoders:
  * Support for DxVA2 for H.264 decoding on GPU on Windows Vista and 7
  * Support for VAAPI for H.264 decoding on GPU on GNU/Linux
- * Audio/Video decoders and encoders using OpenMAX IL components for DSP usage
+ * Support for Audio/Video decoders and encoders using OpenMAX IL components for DSP
 
- * Support for HD-DVB subtitles - Display Definition Segment
  * Support PGS subtitles for Blu-Ray
+ * Support for HD-DVB subtitles - Display Definition Segment
  * Invmem module improvements
  * Support for Atrac1 audio codec
  * Support for SSE3 and SSE4 capabilities in some codecs
  * Multiple improvements for subtitles styles in .SRT and .SSA
- * Support for Windows Media Speech (Voice) audio codec natively on all platforms
+ * Support for native decoding of Windows Media Speech (Voice) audio codec
  * Support for AMR-NB audio codec on the Windows and Mac port
  * Support for Indeo5 video codec
  * Improvements on the FLAC format (7.1 channels and 88.2/176.4/192 kHz support)
  * Direct rendering is used more often with H.264 in avcodec module
  * Support for MPEG-4 ALS lossless audio codec
  * Support for VP8 codec
+ * Support for 7.1 channels in vorbis audio
 
 Demuxers:
+ * Many fixes on Matroska support (notably seeking) and support for Webm format
  * Support for .aob files from DVD-Audio (MLP and LPCM) (Full disc support is NOT present yet)
  * Support for ADPCM in .flv streams
  * Support for TwinVQ (.vqf) and AMV (.amv) files
  * Various EGP improvements
  * Support for embedded subtitles in OpenDML and legacy .avi files
- * Many fixes on Matroska support and support for Webm format
  * Metadata and cover art improvements
 
 Playlist:
@@ -200,12 +202,10 @@ Audio filters:
  * NEON assembly audio converter module
  * Converter filters have been rewritten and extended to support s32 as input
 
-Visualization:
- * Support of .milk visualization files using projectM libraries
-
 Service discovery:
  * Service discoveries can now be written in lua
  * Service discovery for Picture/Music/Video user directories
+ * Service discovery based on libudev
  * Shoutcast Service discoveries are now removed
 
 Encoders:
@@ -227,6 +227,9 @@ Interfaces:
    and oldhttp.
  * rc, telnet and http are now implemented using the lua interface system.
  * qt4 interface contains new iconview and listview mode for playlist
+
+Visualization:
+ * Support of .milk visualization files using projectM libraries
 
 Mac OS X Port:
  * Vastly improved VLCKit framework
