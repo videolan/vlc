@@ -36,7 +36,7 @@ public:
     CmdNewVoutWindow( intf_thread_t *pIntf, vout_window_t *pWnd );
     virtual ~CmdNewVoutWindow() { }
     virtual void execute();
-    virtual string getType() const { return "new vout window"; }
+    virtual string getType() const { return "wnd_new"; }
 
 private:
     vout_window_t* m_pWnd;
@@ -51,7 +51,7 @@ public:
     CmdReleaseVoutWindow( intf_thread_t *pIntf, vout_window_t *pWnd );
     virtual ~CmdReleaseVoutWindow() { }
     virtual void execute();
-    virtual string getType() const { return "new vout window"; }
+    virtual string getType() const { return "wnd_release"; }
 
 private:
     vout_window_t* m_pWnd;
