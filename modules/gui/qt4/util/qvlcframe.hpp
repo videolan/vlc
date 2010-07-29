@@ -101,11 +101,7 @@ class QVLCTools
 class QVLCFrame : public QWidget
 {
 public:
-#ifdef __APPLE__
-    QVLCFrame( intf_thread_t *_p_intf ) : QWidget( NULL, Qt::Window ), p_intf( _p_intf )
-#else
     QVLCFrame( intf_thread_t *_p_intf ) : QWidget( NULL ), p_intf( _p_intf )
-#endif
     {};
     virtual ~QVLCFrame()   {};
 
