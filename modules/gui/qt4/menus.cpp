@@ -1077,6 +1077,7 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     QMenu *sysMenu = mi->getSysTrayMenu();
     sysMenu->clear();
 
+#ifndef Q_WS_MAC
     /* Hide / Show VLC and cone */
     if( mi->isVisible() || b_force_visible )
     {
@@ -1090,8 +1091,9 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
                             qtr( "Show VLC media player" ), mi,
                             SLOT( toggleUpdateSystrayMenu() ) );
     }
-
     sysMenu->addSeparator();
+#endif
+
     PopupPlayEntries( sysMenu, p_intf, p_input );
     PopupMenuPlaylistControlEntries( sysMenu, p_intf);
     PopupMenuControlEntries( sysMenu, p_intf);
