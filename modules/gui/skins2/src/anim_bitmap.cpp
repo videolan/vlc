@@ -69,7 +69,8 @@ void AnimBitmap::stopAnim()
 }
 
 
-void AnimBitmap::draw( OSGraphics &rImage, int xDest, int yDest )
+void AnimBitmap::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h,
+                       int xOffset, int yOffset )
 {
     // Draw the current frame
     int height = m_pImage->getHeight() / m_nbFrames;
@@ -79,9 +80,9 @@ void AnimBitmap::draw( OSGraphics &rImage, int xDest, int yDest )
     // rImage.drawGraphics( *m_pImage, 0, ySrc, xDest, yDest,
     //                      m_pImage->getWidth(), height );
 
-    // A new way .... needs to be tested thoroughly
-    rImage.drawBitmap( m_rBitmap, 0, ySrc, xDest, yDest,
-                       m_pImage->getWidth(), height, true );
+    rImage.drawBitmap( m_rBitmap,
+                       xOffset, ySrc + yOffset,
+                       xDest, yDest, w, h, true );
 }
 
 

@@ -349,11 +349,19 @@ bool CtrlList::mouseOver( int x, int y ) const
 }
 
 
-void CtrlList::draw( OSGraphics &rImage, int xDest, int yDest )
+void CtrlList::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h )
 {
-    if( m_pImage )
+    const Position *pPos = getPosition();
+    rect region( pPos->getLeft(), pPos->getTop(),
+                 pPos->getWidth(), pPos->getHeight() );
+    rect clip( xDest, yDest, w, h );
+    rect inter;
+    if( rect::intersect( region, clip, &inter ) && m_pImage )
     {
-        rImage.drawGraphics( *m_pImage, 0, 0, xDest, yDest );
+        rImage.drawGraphics( *m_pImage,
+                      inter.x - pPos->getLeft(),
+                      inter.y - pPos->getTop(),
+                      inter.x, inter.y, inter.width, inter.height );
     }
 }
 

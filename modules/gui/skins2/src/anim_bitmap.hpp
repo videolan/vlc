@@ -49,7 +49,7 @@ public:
     void stopAnim();
 
     /// Draw the current frame on another graphics
-    void draw( OSGraphics &rImage, int xDest, int yDest );
+    void draw( OSGraphics &rImage, int xDest, int yDest, int w, int h, int xOffset = 0, int yOffset = 0 );
 
     /// Tell whether the pixel at the given position is visible
     bool hit( int x, int y ) const;

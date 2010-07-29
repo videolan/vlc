@@ -118,7 +118,7 @@ bool CtrlImage::mouseOver( int x, int y ) const
 }
 
 
-void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest )
+void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h )
 {
     const Position *pPos = getPosition();
     if( !pPos )
@@ -127,6 +127,13 @@ void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest )
     int width = pPos->getWidth();
     int height = pPos->getHeight();
     if( width <= 0 || height <= 0 )
+        return;
+
+    rect region( pPos->getLeft(), pPos->getTop(),
+                 pPos->getWidth(), pPos->getHeight() );
+    rect clip( xDest, yDest, w, h );
+    rect inter;
+    if( !rect::intersect( region, clip, &inter ) )
         return;
 
     if( m_resizeMethod == kScale )
@@ -142,25 +149,40 @@ void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest )
             m_pImage = pOsFactory->createOSGraphics( width, height );
             m_pImage->drawBitmap( bmp, 0, 0 );
         }
-        rImage.drawGraphics( *m_pImage, 0, 0, xDest, yDest );
+        rImage.drawGraphics( *m_pImage,
+                             inter.x - pPos->getLeft(),
+                             inter.y - pPos->getTop(),
+                             inter.x, inter.y,
+                             inter.width, inter.height );
     }
     else if( m_resizeMethod == kMosaic )
     {
+        int xDest0 = pPos->getLeft();
+        int yDest0 = pPos->getTop();
+
         // Use mosaic method
         while( width > 0 )
         {
             int curWidth = __MIN( width, m_pImage->getWidth() );
             height = pPos->getHeight();
-            int curYDest = yDest;
+            int curYDest = yDest0;
             while( height > 0 )
             {
                 int curHeight = __MIN( height, m_pImage->getHeight() );
-                rImage.drawGraphics( *m_pImage, 0, 0, xDest, curYDest,
-                                     curWidth, curHeight );
+                rect region1( xDest0, curYDest, curWidth, curHeight );
+                rect inter1;
+                if( rect::intersect( region1, clip, &inter1 ) )
+                {
+                    rImage.drawGraphics( *m_pImage,
+                                   inter1.x - region1.x,
+                                   inter1.y - region1.y,
+                                   inter1.x, inter1.y,
+                                   inter1.width, inter1.height );
+                }
                 curYDest += curHeight;
                 height -= m_pImage->getHeight();
             }
-            xDest += curWidth;
+            xDest0 += curWidth;
             width -= m_pImage->getWidth();
         }
     }
@@ -202,7 +224,16 @@ void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest )
         }
 
         // draw the scaled image at offset (m_x, m_y) from control origin
-        rImage.drawGraphics( *m_pImage, 0, 0, xDest + m_x, yDest + m_y );
+        rect region1( pPos->getLeft() + m_x, pPos->getTop() + m_y, w, h );
+        rect inter1;
+        if( rect::intersect( region1, inter, &inter1 ) )
+        {
+            rImage.drawGraphics( *m_pImage,
+                                 inter1.x - pPos->getLeft() - m_x,
+                                 inter1.y - pPos->getTop() - m_y,
+                                 inter1.x, inter1.y,
+                                 inter1.width, inter1.height );
+        }
     }
 }
 

@@ -134,12 +134,25 @@ bool CtrlCheckbox::mouseOver( int x, int y ) const
 }
 
 
-void CtrlCheckbox::draw( OSGraphics &rImage, int xDest, int yDest )
+void CtrlCheckbox::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h )
 {
-    if( m_pImgCurrent )
+    if( !m_pImgCurrent )
+        return;
+
+    const Position *pPos = getPosition();
+    // rect region( pPos->getLeft(), pPos->getTop(),
+    //              pPos->getWidth(), pPos->getHeight() );
+    rect region( pPos->getLeft(), pPos->getTop(),
+                 m_pImgCurrent->getWidth(), m_pImgCurrent->getHeight() );
+    rect clip( xDest, yDest, w, h );
+    rect inter;
+    if( rect::intersect( region, clip, &inter ) )
     {
         // Draw the current image
-        m_pImgCurrent->draw( rImage, xDest, yDest );
+        m_pImgCurrent->draw( rImage,
+                      inter.x, inter.y, inter.width, inter.height,
+                      inter.x - pPos->getLeft(),
+                      inter.y - pPos->getTop() );
     }
 }
 
@@ -248,7 +261,7 @@ void CtrlCheckbox::onVarBoolUpdate( VarBool &rVariable )
 
 void CtrlCheckbox::onUpdate( Subject<AnimBitmap> &rBitmap, void *arg )
 {
-    notifyLayout();
+    notifyLayout( m_pImgCurrent->getWidth(), m_pImgCurrent->getHeight() );
 }
 
 

@@ -32,6 +32,7 @@
 
 
 class GenericBitmap;
+class ScaledBitmap;
 class OSGraphics;
 class VarPercent;
 
@@ -58,7 +59,18 @@ public:
     virtual bool mouseOver( int x, int y ) const;
 
     /// Draw the control on the given graphics
-    virtual void draw( OSGraphics &rImage, int xDest, int yDest );
+    virtual void draw( OSGraphics &rImage, int xDest, int yDest, int w, int h );
+
+    /// Called when the position is set
+    virtual void onPositionChange();
+
+    /// Method called when the control is resized
+    virtual void onResize();
+
+    /// Method called to notify are to be updated
+    virtual void notifyLayout( int witdh = -1, int height = -1,
+                               int xOffSet = 0, int yOffSet = 0 );
+
 
     /// Get the text of the tooltip
     virtual UString getTooltipText() const { return m_tooltip; }
@@ -77,6 +89,7 @@ private:
     int m_width, m_height;
     /// Position of the cursor
     int m_xPosition, m_yPosition;
+    rect m_currentCursorRect;
     /// Callback objects
     DEFINE_CALLBACK( CtrlSliderCursor, OverDown )
     DEFINE_CALLBACK( CtrlSliderCursor, DownOver )
@@ -104,7 +117,7 @@ private:
     void getResizeFactors( float &rFactorX, float &rFactorY ) const;
 
     /// Call notifyLayout
-    void refreshLayout();
+    void refreshLayout( bool force = true );
 };
 
 
@@ -123,7 +136,7 @@ public:
     virtual bool mouseOver( int x, int y ) const;
 
     /// Draw the control on the given graphics
-    virtual void draw( OSGraphics &rImage, int xDest, int yDest );
+    virtual void draw( OSGraphics &rImage, int xDest, int yDest, int w, int h );
 
     /// Handle an event
     virtual void handleEvent( EvtGeneric &rEvent );
@@ -150,6 +163,8 @@ private:
     int m_width, m_height;
     /// Background image sequence (optional)
     GenericBitmap *m_pImgSeq;
+    /// Scaled bitmap if needed
+    ScaledBitmap *m_pScaledBmp;
     /// Number of images in the background bitmap
     int m_nbHoriz, m_nbVert;
     /// Number of pixels between two images

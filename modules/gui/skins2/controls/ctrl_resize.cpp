@@ -75,9 +75,9 @@ bool CtrlResize::mouseOver( int x, int y ) const
 }
 
 
-void CtrlResize::draw( OSGraphics &rImage, int xDest, int yDest )
+void CtrlResize::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h )
 {
-    m_rCtrl.draw( rImage, xDest, yDest );
+    m_rCtrl.draw( rImage, xDest, yDest, w, h );
 }
 
 

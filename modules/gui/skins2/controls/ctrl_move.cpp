@@ -66,9 +66,9 @@ bool CtrlMove::mouseOver( int x, int y ) const
 }
 
 
-void CtrlMove::draw( OSGraphics &rImage, int xDest, int yDest )
+void CtrlMove::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h )
 {
-    m_rCtrl.draw( rImage, xDest, yDest );
+    m_rCtrl.draw( rImage, xDest, yDest, w, h );
 }
 
 

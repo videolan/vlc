@@ -85,14 +85,25 @@ void CtrlVideo::onPositionChange()
 }
 
 
-void CtrlVideo::draw( OSGraphics &rImage, int xDest, int yDest )
+void CtrlVideo::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h)
 {
     const Position *pPos = getPosition();
-    if( pPos )
+    rect region( pPos->getLeft(), pPos->getTop(),
+                 pPos->getWidth(), pPos->getHeight() );
+    rect clip( xDest, yDest, w, h );
+    rect inter;
+
+    if( rect::intersect( region, clip, &inter ) )
     {
         // Draw a black rectangle under the video to avoid transparency
-        rImage.fillRect( pPos->getLeft(), pPos->getTop(), pPos->getWidth(),
-                         pPos->getHeight(), 0 );
+        rImage.fillRect( inter.x, inter.y, inter.width, inter.height, 0 );
+    }
+
+    if( m_pVoutWindow )
+    {
+        m_pVoutWindow->move( pPos->getLeft(), pPos->getTop() );
+        m_pVoutWindow->resize( pPos->getWidth(), pPos->getHeight() );
+        m_pVoutWindow->show();
     }
 }
 

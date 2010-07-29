@@ -109,10 +109,6 @@ void GenericLayout::addControl( CtrlGeneric *pControl,
         // Associate this layout to the control
         pControl->setLayout( this, rPosition );
 
-        // Draw the control
-        if( pControl->isVisible() )
-            pControl->draw( *m_pImage, rPosition.getLeft(), rPosition.getTop() );
-
         // Add the control in the list.
         // This list must remain sorted by layer order
         list<LayeredControl>::iterator it;
@@ -153,19 +149,23 @@ void GenericLayout::onControlUpdate( const CtrlGeneric &rCtrl,
                                      int width, int height,
                                      int xOffSet, int yOffSet )
 {
-    // The size is not valid, refresh the whole layout
-    if( width <= 0 || height <= 0 )
-    {
-        refreshAll();
+    // Do nothing if the layout or control is hidden
+    if( !m_visible )
         return;
-    }
 
     const Position *pPos = rCtrl.getPosition();
-    if( pPos )
+    if( width > 0 && height > 0 )
     {
-        refreshRect( pPos->getLeft() + xOffSet,
+        // make sure region is within the layout
+        rect region( pPos->getLeft() + xOffSet,
                      pPos->getTop() + yOffSet,
                      width, height );
+        rect layout( 0, 0, m_rect.getWidth(), m_rect.getHeight() );
+        rect inter;
+        if( rect::intersect( layout, region, &inter ) )
+        {
+            refreshRect( inter.x, inter.y, inter.width, inter.height );
+        }
     }
 }
 
@@ -223,10 +223,9 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
     for( iter = m_controlList.begin(); iter != m_controlList.end(); iter++ )
     {
         CtrlGeneric *pCtrl = (*iter).m_pControl;
-        const Position *pPos = pCtrl->getPosition();
-        if( pPos && pCtrl->isVisible() )
+        if( pCtrl->isVisible() )
         {
-            pCtrl->draw( *m_pImage, pPos->getLeft(), pPos->getTop() );
+            pCtrl->draw( *m_pImage, x, y, width, height );
         }
     }
 
@@ -236,16 +235,6 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
     {
         // first apply new shape to the window
         pWindow->updateShape();
-
-        // Check boundaries
-        if( x < 0 )
-            x = 0;
-        if( y < 0)
-            y = 0;
-        if( x + width > m_rect.getWidth() )
-            width = m_rect.getWidth() - x;
-        if( y + height > m_rect.getHeight() )
-            height = m_rect.getHeight() - y;
 
         pWindow->refresh( x, y, width, height );
     }

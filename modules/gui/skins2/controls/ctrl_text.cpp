@@ -150,8 +150,10 @@ bool CtrlText::mouseOver( int x, int y ) const
 }
 
 
-void CtrlText::draw( OSGraphics &rImage, int xDest, int yDest )
+void CtrlText::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h )
 {
+    rect clip( xDest, yDest, w, h );
+    const Position *pPos = getPosition();
     if( m_pCurrImg )
     {
         // Compute the dimensions to draw
@@ -178,12 +180,18 @@ void CtrlText::draw( OSGraphics &rImage, int xDest, int yDest )
             else if( m_alignment == kCenter &&
                      width < getPosition()->getWidth() )
             {
-                    // The text is shorter than the width of the control, so we
-                    // can center it
+                // The text is shorter than the width of the control, so we
+                // can center it
                 offset = (getPosition()->getWidth() - width) / 2;
             }
-            rImage.drawBitmap( *m_pCurrImg, -m_xPos, 0, xDest + offset,
-                               yDest, width, height, true );
+            rect region( pPos->getLeft() + offset,
+                         pPos->getTop(), width, height );
+            rect inter;
+            if( rect::intersect( region, clip, &inter ) )
+                rImage.drawBitmap( *m_pCurrImg, -m_xPos + inter.x - region.x,
+                                   inter.y - region.y,
+                                   inter.x, inter.y,
+                                   inter.width, inter.height, true );
         }
     }
 }

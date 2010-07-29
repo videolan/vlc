@@ -114,15 +114,21 @@ bool CtrlButton::mouseOver( int x, int y ) const
 }
 
 
-void CtrlButton::draw( OSGraphics &rImage, int xDest, int yDest )
+void CtrlButton::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h )
 {
-    if( m_pImg )
+    const Position *pPos = getPosition();
+    rect region( pPos->getLeft(), pPos->getTop(),
+                 pPos->getWidth(), pPos->getHeight() );
+    rect clip( xDest, yDest, w, h );
+    rect inter;
+    if( rect::intersect( region, clip, &inter ) && m_pImg )
     {
         // Draw the current image
-        m_pImg->draw( rImage, xDest, yDest );
+        m_pImg->draw( rImage, inter.x, inter.y, inter.width, inter.height,
+                      inter.x - pPos->getLeft(),
+                      inter.y - pPos->getTop() );
     }
 }
-
 
 void CtrlButton::setImage( AnimBitmap *pImg )
 {
@@ -147,7 +153,7 @@ void CtrlButton::setImage( AnimBitmap *pImg )
 
 void CtrlButton::onUpdate( Subject<AnimBitmap> &rBitmap, void *arg )
 {
-    notifyLayout();
+    notifyLayout( m_pImg->getWidth(), m_pImg->getHeight() );
 }
 
 

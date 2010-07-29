@@ -636,10 +636,19 @@ bool CtrlTree::mouseOver( int x, int y ) const
         x >= 0 && x <= pPos->getWidth() && y >= 0 && y <= pPos->getHeight();
 }
 
-void CtrlTree::draw( OSGraphics &rImage, int xDest, int yDest )
+void CtrlTree::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h)
 {
-    if( m_pImage )
-        rImage.drawGraphics( *m_pImage, 0, 0, xDest, yDest );
+    const Position *pPos = getPosition();
+    rect region( pPos->getLeft(), pPos->getTop(),
+                 pPos->getWidth(), pPos->getHeight() );
+    rect clip( xDest, yDest, w, h );
+    rect inter;
+
+    if( rect::intersect( region, clip, &inter ) && m_pImage )
+        rImage.drawGraphics( *m_pImage,
+                      inter.x - pPos->getLeft(),
+                      inter.y - pPos->getTop(),
+                      inter.x, inter.y, inter.width, inter.height );
 }
 
 bool CtrlTree::ensureVisible( VarTree::Iterator item )

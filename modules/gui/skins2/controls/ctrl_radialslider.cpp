@@ -90,18 +90,33 @@ bool CtrlRadialSlider::mouseOver( int x, int y ) const
 }
 
 
-void CtrlRadialSlider::draw( OSGraphics &rImage, int xDest, int yDest )
+void CtrlRadialSlider::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h )
 {
-    rImage.drawGraphics( *m_pImgSeq, 0, m_position * m_height, xDest, yDest,
-                         m_width, m_height );
+    const Position *pPos = getPosition();
+    rect region( pPos->getLeft(), pPos->getTop(), m_width, m_height );
+    rect clip( xDest, yDest, w ,h );
+    rect inter;
+    if( rect::intersect( region, clip, &inter ) )
+        rImage.drawGraphics( *m_pImgSeq,
+                              inter.x - region.x,
+                              inter.y - region.y + m_position * m_height,
+                              inter.x, inter.y,
+                              inter.width, inter.height );
 }
 
 
 void CtrlRadialSlider::onUpdate( Subject<VarPercent> &rVariable,
                                  void *arg  )
 {
-    m_position = (int)( m_rVariable.get() * ( m_numImg - 1 ) );
-    notifyLayout( m_width, m_height );
+    if( &rVariable == &m_rVariable )
+    {
+        int position = (int)( m_rVariable.get() * ( m_numImg - 1 ) );
+        if( position == m_position )
+            return;
+
+        m_position = position;
+        notifyLayout( m_width, m_height );
+    }
 }
 
 

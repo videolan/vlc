@@ -53,7 +53,7 @@ public:
     virtual bool mouseOver( int x, int y ) const { return false; }
 
     /// Draw the control on the given graphics
-    virtual void draw( OSGraphics &rImage, int xDest, int yDest ) { }
+    virtual void draw( OSGraphics &rImage, int xDest, int yDest, int w, int h ) { }
 
     /// Set the position and the associated layout of the control
     virtual void setLayout( GenericLayout *pLayout,
@@ -96,7 +96,7 @@ protected:
      * Use the default values to repaint the whole window
      */
     virtual void notifyLayout( int witdh = -1, int height = -1,
-                               int xOffSet = 0, int yOffSet = 0 ) const;
+                               int xOffSet = 0, int yOffSet = 0 );
 
     /**
      * Same as notifyLayout(), but takes optional images as parameters.

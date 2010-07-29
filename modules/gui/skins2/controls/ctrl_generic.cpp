@@ -74,8 +74,11 @@ void CtrlGeneric::unsetLayout()
 }
 
 void CtrlGeneric::notifyLayout( int width, int height,
-                                int xOffSet, int yOffSet ) const
+                                int xOffSet, int yOffSet )
 {
+    width = ( width > 0 ) ? width : m_pPosition->getWidth();
+    height = ( height > 0 ) ? height : m_pPosition->getHeight();
+
     // Notify the layout
     if( m_pLayout )
     {
