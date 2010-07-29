@@ -28,6 +28,7 @@
 #include <vlc_common.h>
 #include <assert.h>
 #include <vlc_playlist.h>
+#include <vlc_rand.h>
 #include "playlist_internal.h"
 
 static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
@@ -61,60 +62,110 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
         playlist_ItemGetByInput( p_playlist, p_input );
 
     assert( p_item != NULL );
-    playlist_item_t *p_parent = p_item->p_parent;
-    assert( p_parent != NULL );
 
     bool b_current = get_current_status_item( p_playlist ) == p_item;
     bool b_autostart = var_CreateGetBool( p_playlist, "playlist-autostart" );
     bool b_stop = p_item->i_flags & PLAYLIST_SUBITEM_STOP_FLAG;
+    bool b_flat = false;
+
     p_item->i_flags &= ~PLAYLIST_SUBITEM_STOP_FLAG;
 
-    int pos = 0;
-    for( int i = 0; i < p_parent->i_children; i++ )
-    {
-        if( p_parent->pp_children[i] == p_item )
+    /* We will have to flatten the tree out if we are in "the playlist" node and
+    the user setting demands flat playlist */
+
+    if( !pl_priv(p_playlist)->b_tree ) {
+        playlist_item_t *p_up = p_item;
+        while( p_up->p_parent )
         {
-            pos = i;
-            break;
+            if( p_up->p_parent == p_playlist->p_playing )
+            {
+                b_flat = true;
+                break;
+            }
+            p_up = p_up->p_parent;
         }
     }
 
-    bool b_flat = false;
-    playlist_item_t *p_up = p_item;
-    while( p_up->p_parent )
-    {
-        if( p_up->p_parent == p_playlist->p_playing )
-        {
-            if( !pl_priv(p_playlist)->b_tree ) b_flat = true;
-            break;
-        }
-        p_up = p_up->p_parent;
-    }
+    int pos = 0;
+
+    /* If we have to flatten out, then take the item's position in the parent as
+    insertion point and delete the item */
 
     if( b_flat )
+    {
+        playlist_item_t *p_parent = p_item->p_parent;
+        assert( p_parent != NULL );
+
+        int i;
+        for( i = 0; i < p_parent->i_children; i++ )
+        {
+            if( p_parent->pp_children[i] == p_item )
+            {
+                pos = i;
+                break;
+            }
+        }
+        assert( i < p_parent->i_children );
+
         playlist_DeleteItem( p_playlist, p_item, true );
 
-    p_item = playlist_InsertInputItemTree( p_playlist,
-                                           b_flat ? p_parent : p_item,
-                                           p_new_root,
-                                           b_flat ? pos: PLAYLIST_END,
-                                           b_flat );
+        p_item = p_parent;
+    }
+    else
+    {
+        pos = p_item->i_children >= 0 ? p_item->i_children : 0;
+    }
+
+    /* At this point:
+    "p_item" is the node where sub-items should be inserted,
+    "pos" is the insertion position in that node */
+
+    int last_pos = playlist_InsertInputItemTree( p_playlist,
+                                                 p_item,
+                                                 p_new_root,
+                                                 pos,
+                                                 b_flat );
 
     if( !b_flat ) var_SetAddress( p_playlist, "leaf-to-parent", p_input );
 
     //control playback only if it was the current playing item that got subitems
     if( b_current )
     {
-        if( !p_item || ( b_stop && !b_flat ) || !b_autostart )
+        if( last_pos == pos || ( b_stop && !b_flat ) || !b_autostart )
         {
+            /* We stop, either because no sub-item was actually created, or some
+            flags/settings want us to do so at this point */
             PL_UNLOCK;
             playlist_Stop( p_playlist );
             return;
         }
         else
         {
+            /* Continue to play, either random or the first new item */
+            playlist_item_t *p_play_item;
+
+            if( var_GetBool( p_playlist, "random" ) )
+            {
+                unsigned rand_pos =
+                    ((unsigned)vlc_mrand48()) % (last_pos - pos);
+                rand_pos += pos;
+                p_play_item = p_item->pp_children[rand_pos];
+            }
+            else
+            {
+                p_play_item = playlist_GetNextLeaf( p_playlist,
+                                                    p_item,
+                                                    NULL,
+                                                    true,
+                                                    false );
+                char *psz_name = input_item_GetName(p_play_item->p_input);
+                free(psz_name);
+            }
+
             playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                pl_Locked, get_current_status_node( p_playlist ), p_item );
+                                  pl_Locked,
+                                  get_current_status_node( p_playlist ),
+                                  p_play_item );
         }
     }
 
@@ -508,13 +559,13 @@ int playlist_NodeAddCopy (
  * \param b_flat TRUE if the new tree contents should be flattened into a list
  * \return the first new leaf inserted (in playing order)
  */
-playlist_item_t *playlist_InsertInputItemTree (
+int playlist_InsertInputItemTree (
     playlist_t *p_playlist, playlist_item_t *p_parent,
     input_item_node_t *p_node, int i_pos, bool b_flat )
 {
   playlist_item_t *p_first_leaf = NULL;
-  RecursiveAddIntoParent ( p_playlist, p_parent, p_node, i_pos, b_flat, &p_first_leaf );
-  return p_first_leaf;
+  int i = RecursiveAddIntoParent ( p_playlist, p_parent, p_node, i_pos, b_flat, &p_first_leaf );
+  return i;
 }
 
 
