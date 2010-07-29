@@ -722,6 +722,10 @@ void Builder::addText( const BuilderData::Text &rData )
     VarText *pVar = new VarText( getIntf() );
     m_pTheme->m_vars.push_back( VariablePtr( pVar ) );
 
+    // Set the text of the control
+    UString msg( getIntf(), rData.m_text.c_str() );
+    pVar->set( msg );
+
     // Get the visibility variable
     // XXX check when it is null
     Interpreter *pInterpreter = Interpreter::instance( getIntf() );
@@ -744,9 +748,6 @@ void Builder::addText( const BuilderData::Text &rData )
 
     pLayout->addControl( pText, pos, rData.m_layer );
 
-    // Set the text of the control
-    UString msg( getIntf(), rData.m_text.c_str() );
-    pVar->set( msg );
 }
 
 

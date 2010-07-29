@@ -207,6 +207,7 @@ void CtrlText::onUpdate( Subject<VarText> &rVariable, void* arg )
     if( isVisible() )
     {
         displayText( m_rVariable.get() );
+        notifyLayout( getPosition()->getWidth(), getPosition()->getHeight() );
     }
 }
 
@@ -219,6 +220,7 @@ void CtrlText::onUpdate( Subject<VarBool> &rVariable, void *arg  )
         if( isVisible() )
         {
             displayText( m_rVariable.get() );
+            notifyLayout( getPosition()->getWidth(), getPosition()->getHeight() );
         }
         else
         {
@@ -278,7 +280,6 @@ void CtrlText::displayText( const UString &rText )
                 m_pTimer->stop();
             }
         }
-        notifyLayout( getPosition()->getWidth(), getPosition()->getHeight() );
     }
 }
 
