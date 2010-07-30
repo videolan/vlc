@@ -600,6 +600,67 @@ static void Close (vlc_object_t *obj)
     free (p_sys);
 }
 
+static void PoolAlloc (vout_display_t *vd, unsigned requested_count)
+{
+    vout_display_sys_t *p_sys = vd->sys;
+
+    memset (p_sys->resource, 0, sizeof(p_sys->resource));
+
+    const uint32_t *pitches= xcb_xv_query_image_attributes_pitches (p_sys->att);
+    const uint32_t *offsets= xcb_xv_query_image_attributes_offsets (p_sys->att);
+    const unsigned num_planes= __MIN(p_sys->att->num_planes, PICTURE_PLANE_MAX);
+    p_sys->data_size = p_sys->att->data_size;
+
+    picture_t *pic_array[MAX_PICTURES];
+    requested_count = __MIN(requested_count, MAX_PICTURES);
+
+    unsigned count;
+    for (count = 0; count < requested_count; count++)
+    {
+        picture_resource_t *res = &p_sys->resource[count];
+
+        for (unsigned i = 0; i < num_planes; i++)
+        {
+            uint32_t data_size;
+            data_size = (i < num_planes - 1) ? offsets[i+1] : p_sys->data_size;
+
+            res->p[i].i_lines = (data_size - offsets[i]) / pitches[i];
+            res->p[i].i_pitch = pitches[i];
+        }
+
+        if (PictureResourceAlloc (vd, res, p_sys->att->data_size,
+                                  p_sys->conn, p_sys->shm))
+            break;
+
+        /* Allocate further planes as specified by XVideo */
+        /* We assume that offsets[0] is zero */
+        for (unsigned i = 1; i < num_planes; i++)
+            res->p[i].p_pixels = res->p[0].p_pixels + offsets[i];
+
+        if (p_sys->swap_uv)
+        {   /* YVU: swap U and V planes */
+            uint8_t *buf = res->p[2].p_pixels;
+            res->p[2].p_pixels = res->p[1].p_pixels;
+            res->p[1].p_pixels = buf;
+        }
+
+        pic_array[count] = picture_NewFromResource (&vd->fmt, res);
+        if (!pic_array[count])
+        {
+            PictureResourceFree (res, p_sys->conn);
+            memset (res, 0, sizeof(*res));
+            break;
+        }
+    }
+
+    if (count == 0)
+        return;
+
+    p_sys->pool = picture_pool_New (count, pic_array);
+    /* TODO release picture resources if NULL */
+    xcb_flush (p_sys->conn);
+}
+
 /**
  * Return a direct buffer
  */
@@ -608,61 +669,7 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
     vout_display_sys_t *p_sys = vd->sys;
 
     if (!p_sys->pool)
-    {
-        memset (p_sys->resource, 0, sizeof(p_sys->resource));
-
-        const uint32_t *pitches =
-            xcb_xv_query_image_attributes_pitches (p_sys->att);
-        const uint32_t *offsets =
-            xcb_xv_query_image_attributes_offsets (p_sys->att);
-        p_sys->data_size = p_sys->att->data_size;
-
-        unsigned count;
-        picture_t *pic_array[MAX_PICTURES];
-        for (count = 0; count < requested_count; count++)
-        {
-            if (count >= MAX_PICTURES)
-                break;
-            picture_resource_t *res = &p_sys->resource[count];
-
-            for (int i = 0; i < __MIN (p_sys->att->num_planes, PICTURE_PLANE_MAX); i++)
-            {
-                res->p[i].i_lines =
-                    ((i + 1 < p_sys->att->num_planes ? offsets[i+1] :
-                                                       p_sys->data_size) - offsets[i]) / pitches[i];
-                res->p[i].i_pitch = pitches[i];
-            }
-            if (PictureResourceAlloc (vd, res, p_sys->att->data_size,
-                                      p_sys->conn, p_sys->shm))
-                break;
-
-            /* Allocate further planes as specified by XVideo */
-            /* We assume that offsets[0] is zero */
-            for (int i = 1; i < __MIN (p_sys->att->num_planes, PICTURE_PLANE_MAX); i++)
-                res->p[i].p_pixels = res->p[0].p_pixels + offsets[i];
-            if (p_sys->swap_uv)
-            {   /* YVU: swap U and V planes */
-                uint8_t *buf = res->p[2].p_pixels;
-                res->p[2].p_pixels = res->p[1].p_pixels;
-                res->p[1].p_pixels = buf;
-            }
-
-            pic_array[count] = picture_NewFromResource (&vd->fmt, res);
-            if (!pic_array[count])
-            {
-                PictureResourceFree (res, p_sys->conn);
-                memset (res, 0, sizeof(*res));
-                break;
-            }
-        }
-
-        if (count == 0)
-            return NULL;
-
-        p_sys->pool = picture_pool_New (count, pic_array);
-        /* TODO release picture resources if NULL */
-        xcb_flush (p_sys->conn);
-    }
+        PoolAlloc (vd, requested_count);
 
     return p_sys->pool;
 }
