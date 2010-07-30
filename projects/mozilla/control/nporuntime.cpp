@@ -125,4 +125,3 @@ RuntimeNPObject::invokeResultString(const char *psz, NPVariant &result)
     }
     return INVOKERESULT_NO_ERROR;
 }
-

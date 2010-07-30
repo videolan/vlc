@@ -1,7 +1,7 @@
 /*****************************************************************************
- * vlcshell.hp:
+ * vlcshell.h:
  *****************************************************************************
- * Copyright (C) 2009 the VideoLAN team
+ * Copyright (C) 2009-2010 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>

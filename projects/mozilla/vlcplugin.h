@@ -78,11 +78,13 @@
 #   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+
 #include <npapi.h>
 #include <vector>
+#include <assert.h>
 
 #include "control/nporuntime.h"
-
 
 typedef struct {
 #if defined(XP_UNIX)
@@ -93,7 +95,6 @@ typedef struct {
 #warning "locking not implemented in this platform"
 #endif
 } plugin_lock_t;
-
 
 typedef enum vlc_toolbar_clicked_e {
     clicked_Unknown = 0,
@@ -107,81 +108,79 @@ typedef enum vlc_toolbar_clicked_e {
     clicked_Unmute
 } vlc_toolbar_clicked_t;
 
+typedef struct {
+    const char *name;                      /* event name */
+    const libvlc_event_type_t libvlc_type; /* libvlc event type */
+    libvlc_callback_t libvlc_callback;     /* libvlc callback function */
+} vlcplugin_event_t;
 
-// Note that the accessor functions are unsafe, but this is handled in
-// the next layer up. 64bit uints can be substituted to taste (shift=6).
-template<size_t M> class bitmap
+class EventObj
 {
 private:
-    typedef uint32_t bitu_t; enum { shift=5 };
-    enum { bmax=M, bpu=1<<shift, mask=bpu-1, units=(bmax+bpu-1)/bpu };
-    bitu_t bits[units];
-public:
-    bool get(size_t idx) const { return bits[idx>>shift]&(1<<(idx&mask)); }
-    void set(size_t idx)       { bits[idx>>shift]|=  1<<(idx&mask);  }
-    void reset(size_t idx)     { bits[idx>>shift]&=~(1<<(idx&mask)); }
-    void toggle(size_t idx)    { bits[idx>>shift]^=  1<<(idx&mask);  }
-    size_t maxbit() const      { return bmax; }
-    void clear()               { memset(bits,0,sizeof(bits)); }
-    bitmap() { clear(); }
-    ~bitmap() { }
-    bool empty() const { // naive invert() will break this
-        for(size_t i=0;i<units;++i)
-            if(bits[i]) return false;
-        return true;
-    }
-};
 
-typedef bitmap<libvlc_VlmMediaInstanceStatusError+1> eventtypes_bitmap_t;
-
-
-class EventObj: private eventtypes_bitmap_t
-{
-private:
-    typedef libvlc_event_type_t event_t;
-    bool have_event(event_t e) const { return e<maxbit()?get(e):false; }
-
-    class Listener: public eventtypes_bitmap_t
+    class Listener
     {
     public:
-        Listener(event_t e,NPObject *o,bool b): _l(o), _b(b)
-            { NPN_RetainObject(o); set(e); }
-        Listener(): _l(NULL), _b(false) { }
-        ~Listener() { if(_l) NPN_ReleaseObject(_l); }
-        NPObject *listener() const { return _l; }
-        bool bubble() const { return _b; }
+        Listener(vlcplugin_event_t *event, NPObject *p_object, bool b_bubble):
+            _event(event), _listener(p_object), _bubble(b_bubble)
+            {
+                assert(event);
+                assert(p_object);
+            }
+        Listener(): _event(NULL), _listener(NULL), _bubble(false) { }
+        ~Listener()
+            {
+            }
+        const libvlc_event_type_t event_type() const { return _event->libvlc_type; }
+        NPObject *listener() const { return _listener; }
+        bool bubble() const { return _bubble; }
     private:
-        NPObject *_l;
-        bool _b;
+        vlcplugin_event_t *_event;
+        NPObject *_listener;
+        bool _bubble;
     };
 
-    libvlc_event_manager_t *_em;
-    libvlc_callback_t _cb;
-    void *_ud;
+    class VLCEvent
+    {
+    public:
+        VLCEvent(libvlc_event_type_t libvlc_event_type, NPVariant *npparams, uint32_t npcount):
+            _libvlc_event_type(libvlc_event_type), _npparams(npparams), _npcount(npcount)
+            {
+            }
+        VLCEvent(): _libvlc_event_type(0), _npparams(NULL), _npcount(0) { }
+        ~VLCEvent()
+            {
+            }
+        const libvlc_event_type_t event_type() { return _libvlc_event_type; }
+        NPVariant *params() const { return _npparams; }
+        const uint32_t count() { return _npcount; }
+    private:
+        libvlc_event_type_t _libvlc_event_type;
+        NPVariant *_npparams;
+        uint32_t _npcount;
+    };
+    libvlc_event_manager_t *_em; /* libvlc media_player event manager */
 public:
     EventObj(): _em(NULL)  { /* deferred to init() */ }
     bool init();
     ~EventObj();
 
     void deliver(NPP browser);
-    void callback(const libvlc_event_t*);
-    bool insert(const NPString &, NPObject *, bool);
-    bool remove(const NPString &, NPObject *, bool);
-    void unhook_manager();
-    void hook_manager(libvlc_event_manager_t *,libvlc_callback_t, void *);
+    void callback(const libvlc_event_t *event, NPVariant *npparams, uint32_t count);
+    bool insert(const NPString &name, NPObject *listener, bool bubble);
+    bool remove(const NPString &name, NPObject *listener, bool bubble);
+    void unhook_manager(void *);
+    void hook_manager(libvlc_event_manager_t *, void *);
 private:
-    event_t find_event(const char *s) const;
+    vlcplugin_event_t *find_event(const char *s) const;
+    const char *find_name(const libvlc_event_t *event);
     typedef std::vector<Listener> lr_l;
-    typedef std::vector<libvlc_event_type_t> ev_l;
-    lr_l _llist;
-    ev_l _elist;
+    typedef std::vector<VLCEvent> ev_l;
+    lr_l _llist; /* list of registered listeners with 'addEventListener' method */
+    ev_l _elist; /* scheduled events list for delivery to browser */
 
     plugin_lock_t lock;
-
-    bool ask_for_event(event_t e);
-    void unask_for_event(event_t e);
 };
-
 
 class VlcPlugin
 {
@@ -314,6 +313,7 @@ public:
     static bool canUseEventListener();
 
     EventObj events;
+    static void event_callback(const libvlc_event_t *, NPVariant *, uint32_t, void *);
 private:
     bool playlist_select(int);
     void set_player_window();
@@ -352,7 +352,6 @@ private:
 #endif
 
     static void eventAsync(void *);
-    static void event_callback(const libvlc_event_t *, void *);
 };
 
 /*******************************************************************************

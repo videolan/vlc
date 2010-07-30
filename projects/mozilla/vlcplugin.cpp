@@ -29,6 +29,7 @@
 #include "config.h"
 
 #include "vlcplugin.h"
+
 #include "control/npolibvlc.h"
 
 #include <ctype.h>
@@ -102,6 +103,236 @@ static void plugin_unlock(plugin_lock_t *lock)
 }
 
 /*****************************************************************************
+ * Event Object
+ *****************************************************************************/
+static void handle_input_event(const libvlc_event_t* event, void *param);
+static void handle_changed_event(const libvlc_event_t* event, void *param);
+
+static vlcplugin_event_t vlcevents[] = {
+    { "MediaPlayerMediaChanged", libvlc_MediaPlayerMediaChanged, handle_input_event },
+    { "MediaPlayerNothingSpecial", libvlc_MediaPlayerNothingSpecial, handle_input_event },
+    { "MediaPlayerOpening", libvlc_MediaPlayerOpening, handle_input_event },
+    { "MediaPlayerBuffering", libvlc_MediaPlayerBuffering, handle_input_event },
+    { "MediaPlayerPlaying", libvlc_MediaPlayerPlaying, handle_input_event },
+    { "MediaPlayerPaused", libvlc_MediaPlayerPaused, handle_input_event },
+    { "MediaPlayerStopped", libvlc_MediaPlayerStopped, handle_input_event },
+    { "MediaPlayerForward", libvlc_MediaPlayerForward, handle_input_event },
+    { "MediaPlayerBackward", libvlc_MediaPlayerBackward, handle_input_event },
+    { "MediaPlayerEndReached", libvlc_MediaPlayerEndReached, handle_input_event },
+    { "MediaPlayerEncounteredError", libvlc_MediaPlayerEncounteredError, handle_input_event },
+    { "MediaPlayerTimeChanged", libvlc_MediaPlayerTimeChanged, handle_changed_event },
+    { "MediaPlayerPositionChanged", libvlc_MediaPlayerPositionChanged, handle_changed_event },
+    { "MediaPlayerSeekableChanged", libvlc_MediaPlayerSeekableChanged, handle_changed_event },
+    { "MediaPlayerPausableChanged", libvlc_MediaPlayerPausableChanged, handle_changed_event },
+    { "MediaPlayerTitleChanged", libvlc_MediaPlayerTitleChanged, handle_changed_event },
+    { "MediaPlayerLengthChanged", libvlc_MediaPlayerLengthChanged, handle_changed_event },
+};
+
+static void handle_input_event(const libvlc_event_t* event, void *param)
+{
+    VlcPlugin *plugin = (VlcPlugin*)param;
+    switch( event->type )
+    {
+        case libvlc_MediaPlayerNothingSpecial:
+        case libvlc_MediaPlayerOpening:
+        case libvlc_MediaPlayerBuffering:
+        case libvlc_MediaPlayerPlaying:
+        case libvlc_MediaPlayerPaused:
+        case libvlc_MediaPlayerStopped:
+        case libvlc_MediaPlayerForward:
+        case libvlc_MediaPlayerBackward:
+        case libvlc_MediaPlayerEndReached:
+        case libvlc_MediaPlayerEncounteredError:
+            plugin->event_callback(event, NULL, 0, param);
+            break;
+        default: /* ignore all other libvlc_event_type_t */
+            break;
+    }
+}
+
+static void handle_changed_event(const libvlc_event_t* event, void *param)
+{
+    uint32_t   npcount = 1;
+    NPVariant *npparam = (NPVariant *) NPN_MemAlloc( sizeof(NPVariant) * npcount );
+
+    VlcPlugin *plugin = (VlcPlugin*)param;
+    switch( event->type )
+    {
+        case libvlc_MediaPlayerTimeChanged:
+            DOUBLE_TO_NPVARIANT(event->u.media_player_time_changed.new_time, npparam[0]);
+            break;
+        case libvlc_MediaPlayerPositionChanged:
+            DOUBLE_TO_NPVARIANT(event->u.media_player_position_changed.new_position, npparam[0]);
+            break;
+        case libvlc_MediaPlayerSeekableChanged:
+            BOOLEAN_TO_NPVARIANT(event->u.media_player_seekable_changed.new_seekable, npparam[0]);
+            break;
+        case libvlc_MediaPlayerPausableChanged:
+            BOOLEAN_TO_NPVARIANT(event->u.media_player_pausable_changed.new_pausable, npparam[0]);
+            break;
+        case libvlc_MediaPlayerTitleChanged:
+            BOOLEAN_TO_NPVARIANT(event->u.media_player_title_changed.new_title, npparam[0]);
+            break;
+        case libvlc_MediaPlayerLengthChanged:
+            DOUBLE_TO_NPVARIANT(event->u.media_player_length_changed.new_length, npparam[0]);
+            break;
+        default: /* ignore all other libvlc_event_type_t */
+            NPN_MemFree( npparam );
+            return;
+    }
+    plugin->event_callback(event, npparam, npcount, param);
+}
+
+bool EventObj::init()
+{
+    plugin_lock_init(&lock);
+    return true;
+}
+
+EventObj::~EventObj()
+{
+    plugin_lock_destroy(&lock);
+}
+
+void EventObj::deliver(NPP browser)
+{
+    plugin_lock(&lock);
+
+    for( ev_l::iterator iter = _elist.begin(); iter != _elist.end(); ++iter )
+    {
+        for( lr_l::iterator j = _llist.begin(); j != _llist.end(); ++j )
+        {
+            if( j->event_type() == iter->event_type() )
+            {
+                NPVariant result;
+                NPVariant *params = iter->params();
+                uint32_t   count  = iter->count();
+                assert( params );
+
+                NPObject *listener = j->listener();
+                assert( listener );
+
+                NPN_InvokeDefault( browser, listener, params, count, &result );
+                NPN_ReleaseVariantValue( &result );
+
+                for( uint32_t n = 0; n < count; n++ )
+                {
+                    if( NPVARIANT_IS_STRING(params[n]) )
+                        NPN_MemFree( (void*) NPVARIANT_TO_STRING(params[n]).UTF8Characters );
+                    else if( NPVARIANT_IS_OBJECT(params[n]) )
+                    {
+                        NPN_ReleaseObject( NPVARIANT_TO_OBJECT(params[n]) );
+                        NPN_MemFree( (void*)NPVARIANT_TO_OBJECT(params[n]) );
+                    }
+                }
+                NPN_MemFree( params );
+            }
+        }
+    }
+    _elist.clear();
+
+    plugin_unlock(&lock);
+}
+
+void EventObj::callback(const libvlc_event_t* event,
+                        NPVariant *npparams, uint32_t count)
+{
+    plugin_lock(&lock);
+    _elist.push_back(VLCEvent(event->type, npparams, count));
+    plugin_unlock(&lock);
+}
+
+vlcplugin_event_t *EventObj::find_event(const char *s) const
+{
+    for( int i = 0; i < ARRAY_SIZE(vlcevents); i++ )
+    {
+        if( strncmp(vlcevents[i].name, s, strlen(vlcevents[i].name)) == 0 )
+            return &vlcevents[i];
+    }
+    return NULL;
+}
+
+const char *EventObj::find_name(const libvlc_event_t *event)
+{
+    for( int i = 0; i < ARRAY_SIZE(vlcevents); i++ )
+    {
+        if( vlcevents[i].libvlc_type == event->type )
+            return vlcevents[i].name;
+    }
+    return NULL;
+}
+
+bool EventObj::insert(const NPString &name, NPObject *listener, bool bubble)
+{
+    vlcplugin_event_t *event = find_event(name.UTF8Characters);
+    if( !event )
+        return false;
+
+    lr_l::iterator iter;
+    for( iter = _llist.begin(); iter != _llist.end(); ++iter )
+        if( iter->listener() == listener && iter->bubble() == bubble )
+            break;
+
+    if( iter == _llist.end() )
+    {
+        _llist.push_back(Listener(event, listener, bubble));
+        return true;
+    }
+
+    return false;
+}
+
+bool EventObj::remove(const NPString &name, NPObject *listener, bool bubble)
+{
+    vlcplugin_event_t *event = find_event(name.UTF8Characters);
+    if( !event )
+        return false;
+
+    for( lr_l::iterator iter = _llist.begin(); iter !=_llist.end(); iter++ )
+    {
+        if( iter->event_type() == event->libvlc_type &&
+            iter->listener() == listener &&
+            iter->bubble() == bubble )
+        {
+            iter = _llist.erase(iter);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void EventObj::hook_manager( libvlc_event_manager_t *em, void *userdata )
+{
+    _em = em;
+
+    if( _em )
+    {
+        /* attach all libvlc events we care about */
+        for( int i = 0; i < ARRAY_SIZE(vlcevents); i++ )
+        {
+            libvlc_event_attach( _em, vlcevents[i].libvlc_type,
+                                      vlcevents[i].libvlc_callback,
+                                      userdata );
+        }
+    }
+}
+
+void EventObj::unhook_manager( void *userdata )
+{
+    if( _em )
+    {
+		/* detach all libvlc events we cared about */
+        for( int i = 0; i < ARRAY_SIZE(vlcevents); i++ )
+        {
+            libvlc_event_detach( _em, vlcevents[i].libvlc_type,
+                                      vlcevents[i].libvlc_callback,
+                                      userdata );
+        }
+    }
+}
+
+/*****************************************************************************
  * VlcPlugin constructor and destructor
  *****************************************************************************/
 #if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) < 20)
@@ -154,169 +385,24 @@ static bool boolValue(const char *value) {
              !strcasecmp(value, "yes") );
 }
 
-bool EventObj::init()
-{
-    plugin_lock_init(&lock);
-    return true;
-}
-
-EventObj::~EventObj()
-{
-    plugin_lock_destroy(&lock);
-}
-
-void EventObj::deliver(NPP browser)
-{
-    NPVariant result;
-    NPVariant params[1];
-
-    plugin_lock(&lock);
-
-    for( ev_l::iterator i=_elist.begin();i!=_elist.end();++i )
-    {
-        libvlc_event_type_t event = *i;
-        STRINGZ_TO_NPVARIANT(libvlc_event_type_name(event), params[0]);
-
-        // Invalid events aren't supposed to be queued up.
-        // if( !have_event(event) ) continue;
-
-        for( lr_l::iterator j=_llist.begin();j!=_llist.end();++j )
-        {
-            if (j->get(event))
-            {
-                NPN_InvokeDefault(browser, j->listener(), params, 1, &result);
-                NPN_ReleaseVariantValue(&result);
-            }
-        }
-    }
-    _elist.clear();
-
-    plugin_unlock(&lock);
-}
-
 void VlcPlugin::eventAsync(void *param)
 {
     VlcPlugin *plugin = (VlcPlugin*)param;
     plugin->events.deliver(plugin->getBrowser());
 }
 
-void EventObj::callback(const libvlc_event_t* event)
+void VlcPlugin::event_callback(const libvlc_event_t* event,
+                NPVariant *npparams, uint32_t npcount, void *userdata)
 {
-    plugin_lock(&lock);
-
-    if( have_event(event->type) )
-        _elist.push_back(event->type);
-
-    plugin_unlock(&lock);
-}
-
-void VlcPlugin::event_callback(const libvlc_event_t* event, void *param)
-{
-    VlcPlugin *plugin = (VlcPlugin*)param;
+    VlcPlugin *plugin = (VlcPlugin*)userdata;
 #if defined(XP_UNIX)
-    plugin->events.callback(event);
+    plugin->events.callback(event, npparams, npcount);
     NPN_PluginThreadAsyncCall(plugin->getBrowser(), eventAsync, plugin);
 #else
 #warning NPN_PluginThreadAsyncCall not implemented yet.
-    printf("No NPN_PluginThreadAsyncCall(), doing nothing.");
+    printf("No NPN_PluginThreadAsyncCall(), doing nothing.\n");
 #endif
 }
-
-inline EventObj::event_t EventObj::find_event(const char *s) const
-{
-    event_t i;
-    for(i=0;i<maxbit();++i)
-        if(!strcmp(s,libvlc_event_type_name(i)))
-            break;
-    return i;
-}
-
-bool EventObj::insert(const NPString &s, NPObject *l, bool b)
-{
-    event_t e = find_event(s.UTF8Characters);
-    if( e>=maxbit() )
-        return false;
-
-    if( !have_event(e) && !ask_for_event(e) )
-        return false;
-
-    lr_l::iterator i;
-    for(i=_llist.begin();i!=_llist.end();++i)
-        if(i->listener()==l && i->bubble()==b)
-            break;
-
-    if( i == _llist.end() ) {
-        _llist.push_back(Listener(e,l,b));
-    } else {
-        if( i->get(e) )
-            return false;
-        i->get(e);
-    }
-    return true;
-}
-
-
-bool EventObj::remove(const NPString &s, NPObject *l, bool b)
-{
-    event_t e = find_event(s.UTF8Characters);
-    if( e>=maxbit() || !get(e) )
-        return false;
-
-    bool any=false;
-    for(lr_l::iterator i=_llist.begin();i!=_llist.end();)
-    {
-        if(i->listener()!=l || i->bubble()!=b)
-            any|=i->get(e);
-        else
-        {
-            i->reset(e);
-            if(i->empty())
-            {
-                i=_llist.erase(i);
-                continue;
-            }
-        }
-        ++i;
-    }
-    if(!any)
-        unask_for_event(e);
-
-    return true;
-}
-
-
-void EventObj::hook_manager(libvlc_event_manager_t *em,
-                            libvlc_callback_t cb, void *udata)
-{
-    _em = em; _cb = cb; _ud = udata;
-    if( !_em )
-        return;
-    for(size_t i=0;i<maxbit();++i)
-        if(get(i))
-            libvlc_event_attach(_em, i, _cb, _ud);
-}
-
-void EventObj::unhook_manager()
-{
-    if( !_em )
-    return;
-    for(size_t i=0;i<maxbit();++i)
-        if(get(i))
-            libvlc_event_detach(_em, i, _cb, _ud);
-}
-
-
-bool EventObj::ask_for_event(event_t e)
-{
-    return _em?0==libvlc_event_attach(_em, e, _cb, _ud):false;
-}
-
-
-void EventObj::unask_for_event(event_t e)
-{
-    if(_em) libvlc_event_detach(_em, e, _cb, _ud);
-}
-
 
 NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
 {
@@ -501,13 +587,13 @@ VlcPlugin::~VlcPlugin()
     {
         if( playlist_isplaying() )
             playlist_stop();
-        events.unhook_manager();
+        events.unhook_manager( this );
         libvlc_media_player_release( libvlc_media_player );
     }
     if( libvlc_media_list )
         libvlc_media_list_release( libvlc_media_list );
     if( libvlc_instance )
-        libvlc_release(libvlc_instance);
+        libvlc_release( libvlc_instance );
 }
 
 /*****************************************************************************
@@ -593,25 +679,26 @@ bool VlcPlugin::playlist_select( int idx )
     {
         if( playlist_isplaying() )
             playlist_stop();
-        events.unhook_manager();
+        events.unhook_manager( this );
         libvlc_media_player_release( libvlc_media_player );
         libvlc_media_player = NULL;
     }
 
-    libvlc_media_player = libvlc_media_player_new_from_media(p_m);
+    libvlc_media_player = libvlc_media_player_new_from_media( p_m );
     if( libvlc_media_player )
     {
         set_player_window();
-        events.hook_manager(
-                      libvlc_media_player_event_manager(libvlc_media_player),
-                      event_callback, this);
+
+        libvlc_event_manager_t *p_em;
+        p_em = libvlc_media_player_event_manager( libvlc_media_player );
+        events.hook_manager( p_em, this );
     }
 
     libvlc_media_release( p_m );
     return true;
 
 bad_unlock:
-    libvlc_media_list_unlock(libvlc_media_list);
+    libvlc_media_list_unlock( libvlc_media_list );
     return false;
 }
 

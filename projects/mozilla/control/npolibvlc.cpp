@@ -194,17 +194,26 @@ RuntimeNPObject::InvokeResult LibvlcRootNPObject::invoke(int index,
             return INVOKERESULT_GENERIC_ERROR;
         }
 
-        NPObject *listener = NPVARIANT_TO_OBJECT(args[1]);
         VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
 
         bool b;
-        if(ID_root_removeeventlistener!=index)
-            b = p_plugin->events.insert(NPVARIANT_TO_STRING(args[0]),
-                                     listener, NPVARIANT_TO_BOOLEAN(args[2]));
+        if( ID_root_addeventlistener == index )
+        {
+            NPN_RetainObject( NPVARIANT_TO_OBJECT(args[1]) );
+            b = p_plugin->events.insert( NPVARIANT_TO_STRING(args[0]),
+                                         NPVARIANT_TO_OBJECT(args[1]),
+                                         NPVARIANT_TO_BOOLEAN(args[2]) );
+            if( !b )
+                NPN_ReleaseObject( NPVARIANT_TO_OBJECT(args[1]) );
+        }
         else
-            b = p_plugin->events.remove(NPVARIANT_TO_STRING(args[0]),
-                                     listener, NPVARIANT_TO_BOOLEAN(args[2]));
-
+        {
+            b = p_plugin->events.remove( NPVARIANT_TO_STRING(args[0]),
+                                         NPVARIANT_TO_OBJECT(args[1]),
+                                         NPVARIANT_TO_BOOLEAN(args[2]) );
+            if( b )
+                NPN_ReleaseObject( NPVARIANT_TO_OBJECT(args[1]) );
+        }
         VOID_TO_NPVARIANT(result);
 
         return b ? INVOKERESULT_NO_ERROR : INVOKERESULT_GENERIC_ERROR;
@@ -1927,4 +1936,3 @@ LibvlcDeinterlaceNPObject::invoke(int index, const NPVariant *args,
     }
     return INVOKERESULT_NO_ERROR;
 }
-
