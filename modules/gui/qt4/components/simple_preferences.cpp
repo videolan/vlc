@@ -665,7 +665,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             p_config = config_FindConfig( VLC_OBJECT(p_intf), "hotkeys-mousewheel-mode" );
             control = new IntegerListConfigControl( VLC_OBJECT(p_intf),
-                    p_config, false, this, gLayout, line );
+                    p_config, this, false, gLayout, line );
             controls.append( control );
 
             break;
