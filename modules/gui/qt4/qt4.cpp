@@ -423,10 +423,12 @@ static void *Thread( void *obj )
             QSettings::UserScope, "vlc", "vlc-qt-interface" );
 
     /* Icon setting */
+#ifndef Q_WS_MAC
     if( QDate::currentDate().dayOfYear() >= 352 ) /* One Week before Xmas */
         app.setWindowIcon( QIcon(vlc_christmas_xpm) );
     else
         app.setWindowIcon( QIcon(vlc_xpm) );
+#endif
 
     /* Initialize timers and the Dialog Provider */
     DialogsProvider::getInstance( p_intf );
