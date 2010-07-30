@@ -31,6 +31,7 @@
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 #include <vlc_playlist.h>
+#include <vlc_url.h>
 
 #include "vlcproc.hpp"
 #include "os_factory.hpp"
@@ -476,9 +477,12 @@ void VlcProc::on_item_current_changed( vlc_object_t* p_obj, vlc_value_t newVal )
     SET_TEXT( m_cVarStreamName, UString( getIntf(), psz_name ) );
     free( psz_name );
 
-    // Update full uri
+    // Update local path (if possible) or full uri
     char *psz_uri = input_item_GetURI( p_item );
-    SET_TEXT( m_cVarStreamURI, UString( getIntf(), psz_uri ) );
+    char *psz_path = make_path( psz_uri );
+    char *psz_save = psz_path ? psz_path : psz_uri;
+    SET_TEXT( m_cVarStreamURI, UString( getIntf(), psz_save ) );
+    free( psz_path );
     free( psz_uri );
 
     // Update art uri
