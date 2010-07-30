@@ -971,7 +971,7 @@ void MainInterface::handleSystrayClick(
     {
         case QSystemTrayIcon::Trigger:
         case QSystemTrayIcon::DoubleClick:
-#ifdef Q_WS_MAC:
+#ifdef Q_WS_MAC
             QVLCMenu::updateSystrayMenu( this, p_intf );
 #else
             toggleUpdateSystrayMenu();
