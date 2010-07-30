@@ -846,7 +846,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
         if( MKV_IS_ID( l, KaxChapterUID ) )
         {
             chapters.i_uid = uint64_t(*(KaxChapterUID*)l);
-            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterUID: %"PRId64"", chapters.i_uid );
+            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterUID: %"PRIu64"", chapters.i_uid );
         }
         else if( MKV_IS_ID( l, KaxChapterFlagHidden ) )
         {
