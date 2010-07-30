@@ -517,13 +517,12 @@ static inline int ml_AttributeIsString( ml_select_e meta )
  */
 static inline void ml_gc_incref( ml_media_t* p_media )
 {
-    unsigned refs;
     ml_gc_object_t* p_gc = &p_media->ml_gc_data;
     if( p_gc == NULL )
         return;
 
     vlc_spin_lock (&p_gc->spin);
-    refs = ++p_gc->refs;
+    ++p_gc->refs;
     vlc_spin_unlock (&p_gc->spin);
 }
 
