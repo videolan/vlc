@@ -1048,11 +1048,16 @@ char *make_URI (const char *path, const char *scheme)
 
     char *buf;
 #ifdef WIN32
+    /* Drive letter */
     if (isalpha (path[0]) && (path[1] == ':'))
     {
-        if (asprintf (&buf, "%s:///%c:", scheme ? scheme : "file", path[0]) == -1)
+        if (asprintf (&buf, "%s:///%c:", scheme ? scheme : "file",
+                      path[0]) == -1)
             buf = NULL;
         path += 2;
+# warning Drive letter-relative path not implemented!
+        if (path[0] != DIR_SEP_CHAR)
+            return NULL;
     }
     else
 #endif
@@ -1088,6 +1093,9 @@ char *make_URI (const char *path, const char *scheme)
             snprintf (buf, sizeof (SMB_SCHEME) + 3 + hostlen,
                       SMB_SCHEME"://%s", path + 2);
         path += 2 + hostlen;
+
+        if (path[0] == '\0')
+            return buf; /* Hostname without path */
     }
     else
     if (path[0] != DIR_SEP_CHAR)

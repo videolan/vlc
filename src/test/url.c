@@ -127,6 +127,7 @@ int main (void)
     test_path ("/home/john/music.ogg", "file:///home/john/music.ogg");
     test_path ("\\\\server/pub/music.ogg", "smb://server/pub/music.ogg");
     test_path ("\\\\server\\pub\\music.ogg", "smb://server/pub/music.ogg");
+    test_path ("\\\\server", "smb://server");
 
     /*int fd = open (".", O_RDONLY);
     assert (fd != -1);*/
