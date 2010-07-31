@@ -45,44 +45,30 @@ void Theme::loadConfig()
 {
     msg_Dbg( getIntf(), "loading theme configuration");
 
-    // Get config from vlcrc file
-    char *save = config_GetPsz( getIntf(), "skins2-config" );
-    if( !save ) return;
-
-    // Is there an existing config?
-    if( !strcmp( save, "" ) )
+    if( readConfig() == VLC_SUCCESS )
     {
-        // Show the windows as indicated by the XML file
-        m_windowManager.showAll( true );
-        free( save );
-        return;
+        applyConfig();
     }
-
-    istringstream inStream(save);
-    free( save );
-
-    char sep;
-    string winId, layId;
-    int x, y, width, height, visible;
-    bool somethingVisible = false;
-    while( !inStream.eof() )
+    else
     {
-        inStream >> sep;
-        if( sep != '[' ) goto invalid;
-        inStream >> winId >> layId >> x >> y >> width >> height >> visible >> sep >> ws;
-        if( sep != ']' ) goto invalid;
+        getWindowManager().showAll( true );
+    }
+}
 
-        // Try to find the window and the layout
-        map<string, TopWindowPtr>::const_iterator itWin;
-        map<string, GenericLayoutPtr>::const_iterator itLay;
-        itWin = m_windows.find( winId );
-        itLay = m_layouts.find( layId );
-        if( itWin == m_windows.end() || itLay == m_layouts.end() )
-        {
-            goto invalid;
-        }
-        TopWindow *pWin = itWin->second.get();
-        GenericLayout *pLayout = itLay->second.get();
+
+void Theme::applyConfig()
+{
+    msg_Dbg( getIntf(), "Apply saved configuration");
+
+    list<save_t>::const_iterator it;
+    for( it = m_saved.begin(); it!= m_saved.end(); ++it )
+    {
+        TopWindow *pWin = (*it).win;
+        GenericLayout *pLayout = (*it).layout;
+        int x = (*it).x;
+        int y = (*it).y;
+        int width = (*it).width;
+        int height = (*it).height;
 
         // Restore the layout
         m_windowManager.setActiveLayout( *pWin, *pLayout );
@@ -97,23 +83,93 @@ void Theme::loadConfig()
         m_windowManager.startMove( *pWin );
         m_windowManager.move( *pWin, x, y );
         m_windowManager.stopMove();
+    }
+
+    for( it = m_saved.begin(); it != m_saved.end(); ++it )
+    {
+       if( (*it).visible )
+            m_windowManager.show( *((*it).win) );
+    }
+}
+
+
+int Theme::readConfig()
+{
+    msg_Dbg( getIntf(), "reading theme configuration");
+
+    // Get config from vlcrc file
+    char *save = config_GetPsz( getIntf(), "skins2-config" );
+    if( !save || !*save )
+    {
+        free( save );
+        return VLC_EGENERIC;
+    }
+
+    istringstream inStream( save );
+    free( save );
+
+    char sep;
+    string winId, layId;
+    int x, y, width, height, visible;
+    bool somethingVisible = false;
+    while( !inStream.eof() )
+    {
+        stringbuf buf, buf2;
+
+        inStream >> sep;
+        if( sep != '[' )
+            goto invalid;
+
+        inStream >> sep;
+        if( sep != '"' )
+            goto invalid;
+        inStream.get( buf, '"' );
+        winId = buf.str();
+        inStream >> sep;
+
+        inStream >> sep;
+        if( sep != '"' )
+            goto invalid;
+        inStream.get( buf2, '"' );
+        layId = buf2.str();
+        inStream >> sep;
+
+        inStream >> x >> y >> width >> height >> visible >> sep >> ws;
+        if( sep != ']' )
+            goto invalid;
+
+        // Try to find the window and the layout
+        map<string, TopWindowPtr>::const_iterator itWin;
+        map<string, GenericLayoutPtr>::const_iterator itLay;
+        itWin = m_windows.find( winId );
+        itLay = m_layouts.find( layId );
+        if( itWin == m_windows.end() || itLay == m_layouts.end() )
+            goto invalid;
+
+        save_t save;
+        save.win = itWin->second.get();
+        save.layout = itLay->second.get();
+        save.x = x;
+        save.y = y;
+        save.width = width;
+        save.height = height;
+        save.visible = visible;
+
+        m_saved.push_back( save );
+
         if( visible )
-        {
             somethingVisible = true;
-            m_windowManager.show( *pWin );
-        }
     }
 
     if( !somethingVisible )
-    {
         goto invalid;
-    }
-    return;
+
+    return VLC_SUCCESS;
 
 invalid:
-    msg_Warn( getIntf(), "invalid config: %s", inStream.str().c_str() );
-    // Restore the visibility defined in the theme
-    m_windowManager.showAll( true );
+    msg_Dbg( getIntf(), "invalid config: %s", inStream.str().c_str() );
+    m_saved.clear();
+    return VLC_EGENERIC;
 }
 
 
@@ -139,7 +195,9 @@ void Theme::saveConfig()
             }
         }
 
-        outStream << '[' << itWin->first << ' ' << layoutId << ' '
+        outStream << '['
+            << '"' << itWin->first << '"' << ' '
+            << '"' << layoutId << '"' << ' '
             << pWin->getLeft() << ' ' << pWin->getTop() << ' '
             << pLayout->getWidth() << ' ' << pLayout->getHeight() << ' '
             << (pWin->getVisibleVar().get() ? 1 : 0) << ']';

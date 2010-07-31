@@ -93,26 +93,13 @@ bool ThemeLoader::load( const string &fileName )
 
     Theme *pNewTheme = getIntf()->p_sys->p_theme;
     if( !pNewTheme )
-    {
         return false;
-    }
 
-    // Check if the skin to load is in the config file, to load its config
-    char *skin_last = config_GetPsz( getIntf(), "skins2-last" );
-    if( skin_last != NULL && fileName == (string)skin_last )
-    {
-        // Restore the theme configuration
-        getIntf()->p_sys->p_theme->loadConfig();
-        // Used to anchor the windows at the beginning
-        pNewTheme->getWindowManager().stopMove();
-    }
-    else
-    {
-        config_PutPsz( getIntf(), "skins2-last", fileName.c_str() );
-        // Show the windows
-        pNewTheme->getWindowManager().showAll( true );
-    }
-    free( skin_last );
+    // Restore the theme configuration
+    getIntf()->p_sys->p_theme->loadConfig();
+
+    // Retain new loaded skins in config
+    config_PutPsz( getIntf(), "skins2-last", fileName.c_str() );
 
     return true;
 }

@@ -54,7 +54,9 @@ public:
     virtual ~Theme();
 
     void loadConfig();
+    int readConfig();
     void saveConfig();
+    void applyConfig();
 
     GenericBitmap *getBitmapById( const string &id ) const;
     GenericFont *getFontById( const string &id ) const;
@@ -82,6 +84,17 @@ private:
         }
         typename T::pointer find_first_object(const string &id) const;
     };
+
+    struct save_t {
+        TopWindow* win;
+        GenericLayout* layout;
+        int x;
+        int y;
+        int width;
+        int height;
+        int visible;
+    };
+
     /// Store the bitmaps by ID
     IDmap<GenericBitmapPtr> m_bitmaps;
     /// Store the fonts by ID
@@ -102,6 +115,8 @@ private:
     list<BezierPtr> m_curves;
     /// Store the variables
     list<VariablePtr> m_vars;
+    /// List saved windows/layouts
+    list<save_t> m_saved;
 
     WindowManager m_windowManager;
 };
