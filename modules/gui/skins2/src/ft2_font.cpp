@@ -90,9 +90,13 @@ bool FT2Font::init()
         return false;
     }
 
-    fread( m_buffer, size, 1, file );
+    if( fread( m_buffer, size, 1, file ) != 1 )
+    {
+        msg_Err( getIntf(), "unexpected result for read" );
+        fclose( file );
+        return false;
+    }
     fclose( file );
-
 
     err = FT_New_Memory_Face( m_lib, (const FT_Byte*)m_buffer, size, 0,
                               &m_face );
