@@ -35,15 +35,15 @@ extern "C" {
 
 struct xml_t
 {
-VLC_COMMON_MEMBERS
+    VLC_COMMON_MEMBERS
 
-/* Module properties */
-module_t  *p_module;
-xml_sys_t *p_sys;
+    /* Module properties */
+    module_t  *p_module;
+    xml_sys_t *p_sys;
 
-void (*pf_catalog_load) ( xml_t *, const char * );
-void (*pf_catalog_add) ( xml_t *, const char *, const char *,
-		       const char * );
+    void (*pf_catalog_load) ( xml_t *, const char * );
+    void (*pf_catalog_add) ( xml_t *, const char *, const char *,
+                            const char * );
 };
 
 VLC_EXPORT( xml_t *, xml_Create, ( vlc_object_t * ) LIBVLC_USED );
