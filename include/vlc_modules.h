@@ -38,7 +38,9 @@ VLC_EXPORT( bool,  module_exists, (const char *) );
 VLC_EXPORT( module_t *, module_find, (const char *) );
 
 int module_start(vlc_object_t *, module_t *);
+#define module_start(o, m) module_start(VLC_OBJECT(o),m)
 void module_stop(vlc_object_t *, module_t *);
+#define module_stop(o, m) module_stop(VLC_OBJECT(o),m)
 
 VLC_EXPORT( module_config_t *, module_config_get, ( const module_t *, unsigned * ) );
 VLC_EXPORT( void, module_config_free, ( module_config_t * ) );
