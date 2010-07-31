@@ -96,6 +96,7 @@ void addDPStaticEntry( QMenu *menu,
                        const char *shortcut = NULL )
 {
     QAction *action = NULL;
+#ifndef __APPLE__ /* We don't set icons in menus in MacOS X */
     if( !EMPTY_STR( icon ) )
     {
         if( !EMPTY_STR( shortcut ) )
@@ -105,6 +106,7 @@ void addDPStaticEntry( QMenu *menu,
             action = menu->addAction( QIcon( icon ), text, THEDP, member );
     }
     else
+#endif
     {
         if( !EMPTY_STR( shortcut ) )
             action = menu->addAction( text, THEDP, member, qtr( shortcut ) );
@@ -125,12 +127,14 @@ QAction* addMIMStaticEntry( intf_thread_t *p_intf,
                             bool bStatic = false )
 {
     QAction *action;
+#ifndef __APPLE__ /* We don't set icons in menus in MacOS X */
     if( !EMPTY_STR( icon ) )
     {
         action = menu->addAction( text, THEMIM,  member );
         action->setIcon( QIcon( icon ) );
     }
     else
+#endif
     {
         action = menu->addAction( text, THEMIM, member );
     }
@@ -448,7 +452,10 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
         }
     }
 
-    menu->addAction( QIcon( ":/menu/playlist_menu" ),
+    menu->addAction(
+#ifndef __APPLE__
+            QIcon( ":/menu/playlist_menu" ),
+#endif
             qtr( "Play&list" ), mi,
             SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
 
@@ -789,7 +796,9 @@ void QVLCMenu::PopupPlayEntries( QMenu *menu,
     {
         action = menu->addAction( qtr( "Play" ),
                 ActionsManager::getInstance( p_intf ), SLOT( play() ) );
+#ifndef __APPLE__ /* No icons in menus in Mac */
         action->setIcon( QIcon( ":/menu/play" ) );
+#endif
     }
     else
     {
@@ -805,7 +814,9 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf )
     /* Faster/Slower */
     action = menu->addAction( qtr( "&Faster" ), THEMIM->getIM(),
                               SLOT( faster() ) );
+#ifndef __APPLE__ /* No icons in menus in Mac */
     action->setIcon( QIcon( ":/toolbar/faster") );
+#endif
     action->setData( STATIC_ENTRY );
 
     action = menu->addAction( qtr( "Faster (fine)" ), THEMIM->getIM(),
@@ -822,19 +833,25 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf )
 
     action = menu->addAction( qtr( "Slo&wer" ), THEMIM->getIM(),
                               SLOT( slower() ) );
+#ifndef __APPLE__ /* No icons in menus in Mac */
     action->setIcon( QIcon( ":/toolbar/slower") );
+#endif
     action->setData( STATIC_ENTRY );
 
     menu->addSeparator();
 
     action = menu->addAction( qtr( "&Jump Forward" ), THEMIM->getIM(),
              SLOT( jumpFwd() ) );
+#ifndef __APPLE__ /* No icons in menus in Mac */
     action->setIcon( QIcon( ":/toolbar/skip_fw") );
+#endif
     action->setData( STATIC_ENTRY );
 
     action = menu->addAction( qtr( "Jump Bac&kward" ), THEMIM->getIM(),
              SLOT( jumpBwd() ) );
+#ifndef __APPLE__ /* No icons in menus in Mac */
     action->setIcon( QIcon( ":/toolbar/skip_back") );
+#endif
     action->setData( STATIC_ENTRY );
     addDPStaticEntry( menu, qtr( I_MENU_GOTOTIME ),"",
                       SLOT( gotoTimeDialog() ), "Ctrl+T" );
