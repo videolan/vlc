@@ -50,8 +50,17 @@ VLC_EXPORT( xml_t *, xml_Create, ( vlc_object_t * ) LIBVLC_USED );
 #define xml_Create( a ) xml_Create( VLC_OBJECT(a) )
 VLC_EXPORT( void, xml_Delete, ( xml_t * ) );
 
-#define xml_CatalogLoad( a, b ) a->pf_catalog_load( a, b )
-#define xml_CatalogAdd( a, b, c, d ) a->pf_catalog_add( a, b, c, d )
+static inline void xml_CatalogLoad( xml_t *xml, const char *catalog )
+{
+    xml->pf_catalog_load( xml, catalog );
+}
+
+static inline void xml_CatalogAdd( xml_t *xml, const char *type,
+                                   const char *orig, const char *value )
+{
+    xml->pf_catalog_add( xml, type, orig, value );
+}
+
 
 struct xml_reader_t
 {
@@ -75,17 +84,42 @@ VLC_EXPORT( xml_reader_t *, xml_ReaderCreate, (vlc_object_t *, stream_t *) LIBVL
 VLC_EXPORT( void, xml_ReaderDelete, (xml_reader_t *) );
 VLC_EXPORT( xml_reader_t *, xml_ReaderReset, (xml_reader_t *, stream_t *) LIBVLC_USED );
 
-#define xml_ReaderRead( a ) a->pf_read( a )
-#define xml_ReaderNodeType( a ) a->pf_node_type( a )
-#define xml_ReaderName( a ) a->pf_name( a )
-#define xml_ReaderValue( a ) a->pf_value( a )
-#define xml_ReaderNextAttr( a ) a->pf_next_attr( a )
-#define xml_ReaderUseDTD( a, b ) a->pf_use_dtd( a, b )
+static inline int xml_ReaderRead( xml_reader_t *reader )
+{
+  return reader->pf_read( reader );
+}
 
-#define XML_READER_NONE 0
-#define XML_READER_STARTELEM 1
-#define XML_READER_ENDELEM 2
-#define XML_READER_TEXT 3
+static inline int xml_ReaderNodeType( xml_reader_t *reader )
+{
+  return reader->pf_node_type( reader );
+}
+
+static inline char *xml_ReaderName( xml_reader_t *reader )
+{
+  return reader->pf_name( reader );
+}
+
+static inline char *xml_ReaderValue( xml_reader_t *reader )
+{
+  return reader->pf_value( reader );
+}
+
+static inline int xml_ReaderNextAttr( xml_reader_t *reader )
+{
+  return reader->pf_next_attr( reader );
+}
+
+static inline int xml_ReaderUseDTD( xml_reader_t *reader, bool use )
+{
+  return reader->pf_use_dtd( reader, use );
+}
+
+enum {
+    XML_READER_NONE=0,
+    XML_READER_STARTELEM,
+    XML_READER_ENDELEM,
+    XML_READER_TEXT,
+};
 
 # ifdef __cplusplus
 }
