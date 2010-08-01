@@ -206,7 +206,7 @@ resources.cpp: vlc.qrc $(DEPS_res)
 	$(AM_V_GEN)$(RCC) -name vlc -o $@ $<
 
 .hpp.moc.cpp:
-	$(moc_verbose)$(MOC) $(DEFS) $(CPPFLAGS) -I$(top_builddir) `$(VLC_CONFIG) --cppflags plugin qt4` -o $@ $<
+	$(moc_verbose)$(MOC) $(DEFS) -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) `$(VLC_CONFIG) --cppflags plugin qt4` -o $@ $<
 
 .ui.h:
 	$(AM_V_at)mkdir -p -- ui
