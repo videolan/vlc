@@ -1573,10 +1573,10 @@ DISTCLEAN_PKG += qt-win-opensource-$(QT4T_VERSION)-mingw.exe
 # qt4 (source-code compilation for Mac)
 # ***************************************************************************
 
-qt-mac-opensource-src-$(QT4_MAC_VERSION).tar.gz:
+qt-everywhere-opensource-src-$(QT4_MAC_VERSION).tar.gz:
 	$(WGET) $(QT4_MAC_URL)
 
-qt4_mac: qt-mac-opensource-src-$(QT4_MAC_VERSION).tar.gz
+qt4_mac: qt-everywhere-opensource-src-$(QT4_MAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .qt4_mac: qt4_mac
