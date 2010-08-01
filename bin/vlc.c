@@ -203,6 +203,8 @@ int main( int i_argc, const char *ppsz_argv[] )
     if (vlc == NULL)
         goto out;
 
+    pthread_t self = pthread_self ();
+    libvlc_set_exit_handler (vlc, vlc_kill, &self);
     libvlc_set_user_agent (vlc, "VLC media player", NULL);
 
 #if !defined (HAVE_MAEMO) && !defined __APPLE__
@@ -212,10 +214,6 @@ int main( int i_argc, const char *ppsz_argv[] )
         goto out;
 
     libvlc_playlist_play (vlc, -1, 0, NULL);
-
-    /* Wait for a termination signal */
-    pthread_t self = pthread_self ();
-    libvlc_set_exit_handler (vlc, vlc_kill, &self);
 
     if (signal_ignored (SIGHUP)) /* <- needed to handle nohup properly */
         sigdelset (&set, SIGHUP);
