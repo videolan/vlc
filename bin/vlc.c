@@ -203,7 +203,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     if (vlc == NULL)
         goto out;
 
-     libvlc_set_user_agent (vlc, "VLC media player", NULL);
+    libvlc_set_user_agent (vlc, "VLC media player", NULL);
 
 #if !defined (HAVE_MAEMO) && !defined __APPLE__
     libvlc_add_intf (vlc, "globalhotkeys,none");
