@@ -236,8 +236,6 @@ case "${host_os}" in
         build_dir=`pwd`
         echo "  Assuming --prefix=${build_dir}/vlc_install_dir"
         ac_default_prefix="${build_dir}/vlc_install_dir"
-        enable_macosx="yes"
-        echo "  Assuming --enable-macosx"
         enable_faad="yes"
         echo "  Assuming --enable-faad"
         enable_flac="yes"
