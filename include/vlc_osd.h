@@ -265,7 +265,7 @@ struct osd_menu_t
  * functions. It creates the osd_menu object and holds a pointer to it
  * during its lifetime.
  */
-VLC_EXPORT( osd_menu_t *, osd_MenuCreate, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( osd_menu_t *, osd_MenuCreate, ( vlc_object_t *, const char * ) LIBVLC_USED );
 
 /**
  * Delete the osd_menu_t object
@@ -283,7 +283,7 @@ VLC_EXPORT( void, osd_MenuDelete, ( vlc_object_t *, osd_menu_t * ) );
  * Find OSD Menu button at position x,y
  */
 VLC_EXPORT( osd_button_t *, osd_ButtonFind, ( vlc_object_t *p_this,
-     int, int, int, int, int, int ) );
+     int, int, int, int, int, int ) LIBVLC_USED );
 
 #define osd_ButtonFind(object,x,y,h,w,sh,sw)  osd_ButtonFind(object,x,y,h,w,sh,sw)
 
@@ -378,6 +378,7 @@ VLC_EXPORT( void, osd_Volume, ( vlc_object_t * ) );
  * Retrieve a non modifyable pointer to the OSD Menu state
  *
  */
+LIBVLC_USED
 static inline const osd_menu_state_t *osd_GetMenuState( osd_menu_t *p_osd )
 {
     return( p_osd->p_state );
@@ -388,6 +389,7 @@ static inline const osd_menu_state_t *osd_GetMenuState( osd_menu_t *p_osd )
  *
  * Returns 0 when no key has been pressed or the value of the key pressed.
  */
+LIBVLC_USED
 static inline bool osd_GetKeyPressed( osd_menu_t *p_osd )
 {
     return( p_osd->p_state->b_update );

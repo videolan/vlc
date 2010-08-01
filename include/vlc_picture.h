@@ -114,7 +114,7 @@ struct picture_t
  * with picture_Hold and picture_Release. This default management will release
  * p_sys, p_q, p_data_orig fields if non NULL.
  */
-VLC_EXPORT( picture_t *, picture_New, ( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) );
+VLC_EXPORT( picture_t *, picture_New, ( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) LIBVLC_USED );
 
 /**
  * This function will create a new picture using the given format.
@@ -122,7 +122,7 @@ VLC_EXPORT( picture_t *, picture_New, ( vlc_fourcc_t i_chroma, int i_width, int 
  * When possible, it is preferred to use this function over picture_New
  * as more information about the format is kept.
  */
-VLC_EXPORT( picture_t *, picture_NewFromFormat, ( const video_format_t *p_fmt ) );
+VLC_EXPORT( picture_t *, picture_NewFromFormat, ( const video_format_t *p_fmt ) LIBVLC_USED );
 
 /**
  * Resource for a picture.
@@ -148,7 +148,7 @@ typedef struct
  *
  * If the resource is NULL then a plain picture_NewFromFormat is returned.
  */
-VLC_EXPORT( picture_t *, picture_NewFromResource, ( const video_format_t *, const picture_resource_t * ) );
+VLC_EXPORT( picture_t *, picture_NewFromResource, ( const video_format_t *, const picture_resource_t * ) LIBVLC_USED );
 
 /**
  * This function will force the destruction a picture.
