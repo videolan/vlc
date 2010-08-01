@@ -214,13 +214,13 @@ mtime_t mdate( void )
 #elif defined( USE_APPLE_MACH )
     pthread_once(&mtime_timebase_info_once, mtime_init_timebase);
     uint64_t date = mach_absolute_time();
+    mach_timebase_info_data_t tb = mtime_timebase_info;
 
-    /* Convert to nanoseconds */
-    date *= mtime_timebase_info.numer;
-    date /= mtime_timebase_info.denom;
-
+    /* Get the ssystem dependent factor. Switch to double to prevent overflow */
+    double factor = (double) tb.numer / (double) tb.denom;
     /* Convert to microseconds */
-    res = date / 1000;
+    double d = (double) date * factor / 1000;
+    res = d;
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
     /* We don't need the real date, just the value of a high precision timer */
