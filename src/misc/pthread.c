@@ -380,22 +380,28 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
                         mtime_t deadline)
 {
 #if defined(__APPLE__) && !defined(__powerpc__) && !defined( __ppc__ ) && !defined( __ppc64__ )
-    /* mdate() is mac_absolute_time on OSX, which we must convert to do
-     * the same base than gettimeofday() which pthread_cond_timedwait
-     * relies on. */
-    mtime_t oldbase = mdate();
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    mtime_t newbase = (mtime_t)tv.tv_sec * 1000000 + (mtime_t) tv.tv_usec;
-    deadline = deadline - oldbase + newbase;
-#endif
+    /* mdate() is the monotonic clock, timedwait origin is gettimeofday() which
+     * isn't monotonic. Use imedwait_relative_np() instead
+    */
+    mtime_t base = mdate();
+    deadline -= base;
+    if (deadline < 0)
+        deadline = 0;
     lldiv_t d = lldiv( deadline, CLOCK_FREQ );
     struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
 
+    int val = pthread_cond_timedwait_relative_np(p_condvar, p_mutex, &ts);
+    if (val != ETIMEDOUT)
+        VLC_THREAD_ASSERT ("timed-waiting on condition");
+    return val;
+#else
+    lldiv_t d = lldiv( deadline, CLOCK_FREQ );
+    struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
     int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
     if (val != ETIMEDOUT)
         VLC_THREAD_ASSERT ("timed-waiting on condition");
     return val;
+#endif
 }
 
 /**
