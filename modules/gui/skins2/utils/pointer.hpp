@@ -105,7 +105,7 @@ public:
     int height;
 
     // rect2 fully included in rect1
-    static bool isIncluded( rect& rect2, rect& rect1 )
+    static bool isIncluded( const rect& rect2, const rect& rect1 )
     {
         int x1 = rect1.x;
         int y1 = rect1.y;
@@ -117,13 +117,11 @@ public:
         int w2 = rect2.width;
         int h2 = rect2.height;
 
-        return     x2 >= x1 && x2 < x1 + w1
-               &&  y2 >= y1 && y2 < y1 + h1
-               &&  w2 <= w1
-               &&  h2 <= h1;
+        return     x2 >= x1 && x2 + w2 <= x1 + w1
+               &&  y2 >= y1 && y2 + h2 <= y1 + h1;
     }
 
-    static bool areDisjunct( rect& rect2, rect& rect1 )
+    static bool areDisjunct( const rect& rect2, const rect& rect1 )
     {
         int x1 = rect1.x;
         int y1 = rect1.y;
@@ -141,7 +139,7 @@ public:
                || x2 + w2 - 1 < x1; // rect2 left of rect1
     }
 
-    static bool intersect( rect& rect1, rect& rect2, rect* pRect )
+    static bool intersect( const rect& rect1, const rect& rect2, rect* pRect )
     {
         int x1 = rect1.x;
         int y1 = rect1.y;
@@ -170,7 +168,7 @@ public:
         }
     }
 
-    static bool join( rect& rect1, rect& rect2, rect* pRect )
+    static bool join( const rect& rect1, const rect& rect2, rect* pRect )
     {
         int x1 = rect1.x;
         int y1 = rect1.y;
