@@ -1855,6 +1855,7 @@ vlc_module_begin ()
 
     add_string( "bookmarks", NULL, NULL,
                  BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, true )
+        change_safe ()
 
     set_section( N_( "Default devices") , NULL )
 
