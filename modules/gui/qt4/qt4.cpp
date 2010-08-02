@@ -407,9 +407,9 @@ static void Close( vlc_object_t *p_this )
     x11_display = NULL;
 #endif
     delete p_sys;
-    vlc_mutex_lock (&one.lock);
+
+    vlc_mutex_locker locker (&one.lock);
     one.busy = false;
-    vlc_mutex_unlock (&one.lock);
 }
 
 static void *Thread( void *obj )
