@@ -235,12 +235,6 @@ mtime_t mdate( void )
 
     res = (d.quot * 1000000) + ((d.rem * 1000000) / freq.QuadPart);
 
-#elif defined(USE_APPLE_MACH)
-    /* The version that should be used, if it was cancelable */
-    pthread_once(&mtime_timebase_info_once, mtime_init_timebase);
-    uint64_t mach_time = date * 1000 * mtime_timebase_info.denom / mtime_timebase_info.numer;
-    mach_wait_until(mach_time);
-
 #else
     struct timeval tv_date;
 
