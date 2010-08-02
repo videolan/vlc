@@ -291,9 +291,9 @@ static block_t *BlockScan( access_t * );
 #define DVB_READ_ONCE_SCAN 1
 #define TS_PACKET_SIZE 188
 
-#define DVB_SCAN_MAX_SIGNAL_TIME (300*1000)
+#define DVB_SCAN_MAX_SIGNAL_TIME (1000*1000)
 #define DVB_SCAN_MAX_LOCK_TIME (5000*1000)
-#define DVB_SCAN_MAX_PROBE_TIME (30000*1000)
+#define DVB_SCAN_MAX_PROBE_TIME (45000*1000)
 
 static void FilterUnset( access_t *, int i_max );
 static void FilterUnsetPID( access_t *, int i_pid );
