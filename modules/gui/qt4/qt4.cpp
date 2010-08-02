@@ -338,7 +338,6 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     intf_sys_t *p_sys = p_intf->p_sys = new intf_sys_t;
     p_intf->p_sys->b_isDialogProvider = isDialogProvider;
     p_sys->p_mi = NULL;
-    p_sys->p_playlist = pl_Get( p_intf );
 
     /* */
 #ifdef Q_WS_X11
@@ -496,7 +495,7 @@ static void *Thread( void *obj )
     if( !p_intf->p_sys->b_isDialogProvider )
     {
         RegisterIntf( (vlc_object_t *)p_intf );
-        playlist_Play( p_intf->p_sys->p_playlist );
+        playlist_Play( THEPL );
     }
 #endif
 

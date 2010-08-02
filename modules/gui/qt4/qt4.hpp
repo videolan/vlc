@@ -71,13 +71,11 @@ struct intf_sys_t
 
     int  i_screenHeight;     /* Detection of Small screens */
 
-    playlist_t *p_playlist;  /* Core Playlist discussion */
-
     QString filepath;        /* Last path used in dialogs */
 
 };
 
-#define THEPL p_intf->p_sys->p_playlist
+#define THEPL pl_Get(p_intf)
 #define QPL_LOCK playlist_Lock( THEPL );
 #define QPL_UNLOCK playlist_Unlock( THEPL );
 
