@@ -177,7 +177,7 @@ static int ScanDvbCNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
     return VLC_EGENERIC;
 }
 
-static int ScanDvbTNextExhaustive( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
+static int ScanDvbNextExhaustive( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
 {
     if( p_scan->i_index > p_scan->parameter.frequency.i_count * p_scan->parameter.bandwidth.i_count )
         return VLC_EGENERIC;
@@ -267,7 +267,7 @@ static int ScanDvbTNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
 static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
 {
     if( p_scan->parameter.b_exhaustive )
-        return ScanDvbTNextExhaustive( p_scan, p_cfg, pf_pos );
+        return ScanDvbNextExhaustive( p_scan, p_cfg, pf_pos );
     else
         return ScanDvbCNextFast( p_scan, p_cfg, pf_pos );
 }
@@ -275,7 +275,7 @@ static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
 static int ScanDvbTNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
 {
     if( p_scan->parameter.b_exhaustive )
-        return ScanDvbTNextExhaustive( p_scan, p_cfg, pf_pos );
+        return ScanDvbNextExhaustive( p_scan, p_cfg, pf_pos );
     else
         return ScanDvbTNextFast( p_scan, p_cfg, pf_pos );
 }

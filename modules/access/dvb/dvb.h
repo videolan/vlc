@@ -182,7 +182,7 @@ struct access_sys_t
     vlc_mutex_t         httpd_mutex;
     vlc_cond_t          httpd_cond;
     mtime_t             i_httpd_timeout;
-    bool          b_request_frontend_info, b_request_mmi_info;
+    bool                b_request_frontend_info, b_request_mmi_info;
     char                *psz_frontend_info, *psz_mmi_info;
     char                *psz_request;
 #endif

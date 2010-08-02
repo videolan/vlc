@@ -759,7 +759,7 @@ static fe_spectral_inversion_t DecodeInversion( access_t *p_access )
 
 static fe_code_rate_t DecodeFEC( access_t *p_access, int i_val )
 {
-    fe_code_rate_t      fe_fec = FEC_NONE;
+    fe_code_rate_t fe_fec = FEC_NONE;
 
     msg_Dbg( p_access, "using fec=%d", i_val );
 
