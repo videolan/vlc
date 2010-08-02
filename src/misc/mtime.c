@@ -221,112 +221,20 @@ mtime_t mdate( void )
 
     /* Convert to microseconds */
     res = date / 1000;
+
 #elif defined( WIN32 ) || defined( UNDER_CE )
     /* We don't need the real date, just the value of a high precision timer */
-    static mtime_t freq = INT64_C(-1);
+    LARGE_INTEGER counter, freq;
+    if (!QueryPerformanceCounter (&counter)
+     || !QueryPerformanceFrequency (&freq))
+        abort();
 
-    if( freq == INT64_C(-1) )
-    {
-        /* Extract from the Tcl source code:
-         * (http://www.cs.man.ac.uk/fellowsd-bin/TIP/7.html)
-         *
-         * Some hardware abstraction layers use the CPU clock
-         * in place of the real-time clock as a performance counter
-         * reference.  This results in:
-         *    - inconsistent results among the processors on
-         *      multi-processor systems.
-         *    - unpredictable changes in performance counter frequency
-         *      on "gearshift" processors such as Transmeta and
-         *      SpeedStep.
-         * There seems to be no way to test whether the performance
-         * counter is reliable, but a useful heuristic is that
-         * if its frequency is 1.193182 MHz or 3.579545 MHz, it's
-         * derived from a colorburst crystal and is therefore
-         * the RTC rather than the TSC.  If it's anything else, we
-         * presume that the performance counter is unreliable.
-         */
-        LARGE_INTEGER buf;
+    /* Convert to from (1/freq) to microsecond resolution */
+    /* We need to split the division to avoid 63-bits overflow */
+    lldiv_t d = lldiv (counter.QuadPart, freq.QuadPart);
 
-        freq = ( QueryPerformanceFrequency( &buf ) &&
-                 (buf.QuadPart == INT64_C(1193182) || buf.QuadPart == INT64_C(3579545) ) )
-               ? buf.QuadPart : 0;
+    res = (d.quot * 1000000) + ((d.rem * 1000000) / freq.QuadPart);
 
-#if defined( WIN32 )
-        /* on windows 2000, XP and Vista detect if there are two
-           cores there - that makes QueryPerformanceFrequency in
-           any case not trustable?
-           (may also be true, for single cores with adaptive
-            CPU frequency and active power management?)
-        */
-        HINSTANCE h_Kernel32 = LoadLibrary(_T("kernel32.dll"));
-        if(h_Kernel32)
-        {
-            void WINAPI (*pf_GetSystemInfo)(LPSYSTEM_INFO);
-            pf_GetSystemInfo = (void WINAPI (*)(LPSYSTEM_INFO))
-                                GetProcAddress(h_Kernel32, _T("GetSystemInfo"));
-            if(pf_GetSystemInfo)
-            {
-               SYSTEM_INFO system_info;
-               pf_GetSystemInfo(&system_info);
-               if(system_info.dwNumberOfProcessors > 1)
-                  freq = 0;
-            }
-            FreeLibrary(h_Kernel32);
-        }
-#endif
-    }
-
-    if( freq != 0 )
-    {
-        LARGE_INTEGER counter;
-        QueryPerformanceCounter (&counter);
-
-        /* Convert to from (1/freq) to microsecond resolution */
-        /* We need to split the division to avoid 63-bits overflow */
-        lldiv_t d = lldiv (counter.QuadPart, freq);
-
-        res = (d.quot * 1000000) + ((d.rem * 1000000) / freq);
-    }
-    else
-    {
-        /* Fallback on timeGetTime() which has a millisecond resolution
-         * (actually, best case is about 5 ms resolution)
-         * timeGetTime() only returns a DWORD thus will wrap after
-         * about 49.7 days so we try to detect the wrapping. */
-
-        static CRITICAL_SECTION date_lock;
-        static mtime_t i_previous_time = INT64_C(-1);
-        static int i_wrap_counts = -1;
-
-        if( i_wrap_counts == -1 )
-        {
-            /* Initialization */
-#if defined( WIN32 )
-            i_previous_time = INT64_C(1000) * timeGetTime();
-#else
-            i_previous_time = INT64_C(1000) * GetTickCount();
-#endif
-            InitializeCriticalSection( &date_lock );
-            i_wrap_counts = 0;
-        }
-
-        EnterCriticalSection( &date_lock );
-#if defined( WIN32 )
-        res = INT64_C(1000) *
-            (i_wrap_counts * INT64_C(0x100000000) + timeGetTime());
-#else
-        res = INT64_C(1000) *
-            (i_wrap_counts * INT64_C(0x100000000) + GetTickCount());
-#endif
-        if( i_previous_time > res )
-        {
-            /* Counter wrapped */
-            i_wrap_counts++;
-            res += INT64_C(0x100000000) * 1000;
-        }
-        i_previous_time = res;
-        LeaveCriticalSection( &date_lock );
-    }
 #elif defined(USE_APPLE_MACH)
     /* The version that should be used, if it was cancelable */
     pthread_once(&mtime_timebase_info_once, mtime_init_timebase);
