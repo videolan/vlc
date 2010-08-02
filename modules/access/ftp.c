@@ -303,11 +303,16 @@ static int parseURL( vlc_url_t *url, const char *path )
     if( url->i_port <= 0 )
         url->i_port = IPPORT_FTP; /* default port */
 
+    if( url->psz_path == NULL )
+        return VLC_SUCCESS;
     /* FTP URLs are relative to user's default directory (RFC1738 §3.2)
     For absolute path use ftp://foo.bar//usr/local/etc/filename */
     /* FIXME: we should issue a series of CWD, one per slash */
-    if( url->psz_path == NULL )
-        return VLC_SUCCESS;
+    if( url->psz_path )
+    {
+        assert( url->psz_path[0] == '/' );
+        url->psz_path++;
+    }
 
     char *type = strstr( url->psz_path, ";type=" );
     if( type )
