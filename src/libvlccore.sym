@@ -615,7 +615,6 @@ vlc_timer_getoverrun
 vlc_timer_schedule
 vlc_ureduce
 VLC_Version
-vlc_wclosedir
 vlc_epg_Init
 vlc_epg_Clean
 vlc_epg_New

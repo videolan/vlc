@@ -330,7 +330,7 @@ VLC_EXPORT( void, stats_DumpInputStats, (input_stats_t *) );
 #if defined (WIN32)
 #   include <dirent.h>
 void *vlc_wopendir (const wchar_t *);
-/* void *vlc_wclosedir (void *); in vlc's exported symbols */
+void *vlc_wclosedir (void *);
 struct _wdirent *vlc_wreaddir (void *);
 void vlc_rewinddir (void *);
 #   define _wopendir vlc_wopendir

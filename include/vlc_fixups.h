@@ -197,13 +197,6 @@ static inline locale_t newlocale(int mask, const char * locale, locale_t base)
 }
 #endif
 
-#ifdef WIN32
-# include <dirent.h>
-# define opendir Use_vlc_opendir_or_vlc_wopendir_instead!
-# define readdir Use_vlc_readdir_or_vlc_wreaddir_instead!
-# define closedir vlc_wclosedir
-#endif
-
 /* libintl support */
 #define _(str)            vlc_gettext (str)
 #define N_(str)           gettext_noop (str)

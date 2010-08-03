@@ -47,6 +47,7 @@
 
 #elif defined (WIN32) || defined (UNDER_CE)
 # define USE_MB2MB 1
+# include <io.h>
 
 static char *locale_dup (const char *string, bool from)
 {

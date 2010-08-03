@@ -1026,6 +1026,9 @@ void path_sanitize( char *str )
 }
 
 #include <vlc_url.h>
+#ifdef WIN32
+# include <io.h>
+#endif
 
 /**
  * Convert a file path to an URI.

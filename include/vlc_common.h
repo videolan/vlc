@@ -845,9 +845,6 @@ VLC_EXPORT( int, vlc_iconv_close, ( vlc_iconv_t ) );
 VLC_EXPORT( int, vlc_execve, ( vlc_object_t *p_object, int i_argc, char *const *pp_argv, char *const *pp_env, const char *psz_cwd, const char *p_in, size_t i_in, char **pp_data, size_t *pi_data ) LIBVLC_USED );
 #define vlc_execve(a,b,c,d,e,f,g,h,i) vlc_execve(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 
-/* dir wrappers (defined in src/extras/libc.c) */
-VLC_EXPORT(int, vlc_wclosedir, ( void *_p_dir ));
-
 VLC_EXPORT( void, vlc_tdestroy, ( void *, void (*)(void *) ) );
 
 /* Fast large memory copy and memory set */
