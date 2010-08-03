@@ -273,7 +273,7 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
     if( p_scan->i_index < *pi_count )
     {
         /* setup params for scan */
-        p_cfg->i_bandwidth = p_scan->parameter.sat_info.p_transponders[p_scan->i_index].i_symbol_rate / 1000;
+        p_cfg->i_symbol_rate = p_scan->parameter.sat_info.p_transponders[p_scan->i_index].i_symbol_rate / 1000;
         p_cfg->i_frequency = p_scan->parameter.sat_info.p_transponders[p_scan->i_index].i_frequency;
         p_cfg->i_fec = p_scan->parameter.sat_info.p_transponders[p_scan->i_index].i_fec;
         p_cfg->c_polarization = p_scan->parameter.sat_info.p_transponders[p_scan->i_index].c_polarization;
@@ -283,7 +283,7 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
                  p_scan->i_index + 1,
                  *pi_count,
                  p_cfg->i_frequency,
-                 p_cfg->i_bandwidth,
+                 p_cfg->i_symbol_rate,
                  p_cfg->i_fec,
                  p_cfg->c_polarization );
 
@@ -486,12 +486,12 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
             i_service++;
     }
 
-    if( asprintf( &psz_text, _("%.1f MHz (%d services)"), 
-                  (double)p_cfg->i_frequency / 1000000, i_service ) >= 0 )
-    {
-        const mtime_t i_eta = f_position > 0.005 ? (mdate() - p_scan->i_time_start) * ( 1.0 / f_position - 1.0 ) : -1;
-        char psz_eta[MSTRTIME_MAX_SIZE];
+    const mtime_t i_eta = f_position > 0.005 ? (mdate() - p_scan->i_time_start) * ( 1.0 / f_position - 1.0 ) : -1;
+    char psz_eta[MSTRTIME_MAX_SIZE];
 
+    if( asprintf( &psz_text, _("%.1f MHz (%d services)\n~%s remaining"),
+                  (double)p_cfg->i_frequency / 1000000, i_service, secstotimestr( psz_eta, i_eta/1000000 ) ) >= 0 )
+    {
         if( i_eta >= 0 )
             msg_Info( p_scan->p_obj, "Scan ETA %s | %f", secstotimestr( psz_eta, i_eta/1000000 ), f_position * 100 );
 
