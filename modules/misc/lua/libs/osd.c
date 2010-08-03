@@ -88,10 +88,38 @@ static int vlclua_osd_icon( lua_State *L )
     return 0;
 }
 
+static int vlc_osd_position_from_string( const char *psz_name )
+{
+    static const struct
+    {
+        int i_position;
+        const char *psz_name;
+    } pp_icons[] =
+        { { SUBPICTURE_ALIGN_MASK,                          "center"       },
+          { SUBPICTURE_ALIGN_LEFT,                          "left"         },
+          { SUBPICTURE_ALIGN_RIGHT,                         "rigth"        },
+          { SUBPICTURE_ALIGN_TOP,                           "top"          },
+          { SUBPICTURE_ALIGN_BOTTOM,                        "bottom"       },
+          { SUBPICTURE_ALIGN_TOP   |SUBPICTURE_ALIGN_LEFT,  "top-left"     },
+          { SUBPICTURE_ALIGN_TOP   |SUBPICTURE_ALIGN_RIGHT, "top-right"    },
+          { SUBPICTURE_ALIGN_BOTTOM|SUBPICTURE_ALIGN_LEFT,  "bottom-left"  },
+          { SUBPICTURE_ALIGN_BOTTOM|SUBPICTURE_ALIGN_RIGHT, "bottom-right" },
+          { 0, NULL } };
+    int i;
+    for( i = 0; pp_icons[i].psz_name; i++ )
+    {
+        if( !strcmp( psz_name, pp_icons[i].psz_name ) )
+            return pp_icons[i].i_position;
+    }
+    return 0;
+}
+
 static int vlclua_osd_message( lua_State *L )
 {
     const char *psz_message = luaL_checkstring( L, 1 );
     int i_chan = luaL_optint( L, 2, SPU_DEFAULT_CHANNEL );
+    const char *psz_position = luaL_optstring( L, 3, "top-right" );
+    mtime_t duration = luaL_optint( L, 4, 1000000 );
 
     input_thread_t *p_input = vlclua_get_input_internal( L );
     if( p_input )
@@ -99,7 +127,8 @@ static int vlclua_osd_message( lua_State *L )
         vout_thread_t *p_vout = input_GetVout( p_input );
         if( p_vout )
         {
-            vout_OSDMessage( p_vout, i_chan, "%s", psz_message );
+            vout_OSDText( p_vout, i_chan, vlc_osd_position_from_string( psz_position ),
+                          duration, psz_message );
             vlc_object_release( p_vout );
         }
         vlc_object_release( p_input );
