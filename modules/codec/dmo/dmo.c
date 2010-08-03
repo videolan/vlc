@@ -38,6 +38,7 @@
 #    define LOADER
 #else
 #   include <objbase.h>
+#   include <vlc_charset.h>
 #endif
 
 #ifdef LOADER
@@ -728,8 +729,7 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     while( ( S_OK == p_enum_dmo->vt->Next( p_enum_dmo, 1, &clsid_dmo,
                      &psz_dmo_name, &i_dummy /* NULL doesn't work */ ) ) )
     {
-        char psz_temp[MAX_PATH];
-        wcstombs( psz_temp, psz_dmo_name, MAX_PATH );
+        char *psz_temp = FromWide( psz_dmo_name );
         msg_Dbg( p_this, "found DMO: %s", psz_temp );
         CoTaskMemFree( psz_dmo_name );
 
@@ -738,9 +738,14 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
                               &IID_IMediaObject, (void **)pp_dmo ) )
         {
             msg_Warn( p_this, "can't create DMO: %s", psz_temp );
+            free( psz_temp );
             *pp_dmo = 0;
         }
-        else break;
+        else
+        {
+            free( psz_temp );
+            break;
+        }
     }
 
     p_enum_dmo->vt->Release( (IUnknown *)p_enum_dmo );
