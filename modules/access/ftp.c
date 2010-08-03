@@ -525,7 +525,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         }
         else
         {
-            snprintf( (char*)p_buffer, i_len, "ftp://%s:%d%s/%s\n",
+            snprintf( (char*)p_buffer, i_len, "ftp://%s:%d/%s/%s\n",
                       p_sys->url.psz_host, p_sys->url.i_port,
                       p_sys->url.psz_path, psz_line );
             free( psz_line );
