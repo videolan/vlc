@@ -353,54 +353,59 @@ int vlc_loaddir( DIR *dir, char ***namelist,
                   int (*select)( const char * ),
                   int (*compar)( const char **, const char ** ) )
 {
-    if( select == NULL )
+    assert (dir);
+
+    if (select == NULL)
         select = dummy_select;
 
-    if( dir == NULL )
-        return -1;
-    else
+    char **tab = NULL;
+    unsigned num = 0;
+
+    rewinddir (dir);
+
+    for (unsigned size = 0;;)
     {
-        char **tab = NULL;
-        char *entry;
-        unsigned num = 0;
-
-        rewinddir( dir );
-
-        while( ( entry = vlc_readdir( dir ) ) != NULL )
+        errno = 0;
+        char *entry = vlc_readdir (dir);
+        if (entry == NULL)
         {
-            char **newtab;
+            if (errno)
+                goto error;
+            break;
+        }
 
-            if( !select( entry ) )
-            {
-                free( entry );
-                continue;
-            }
+        if (!select (entry))
+        {
+            free (entry);
+            continue;
+        }
 
-            newtab = realloc( tab, sizeof( char * ) * (num + 1) );
-            if( newtab == NULL )
+        if (num >= size)
+        {
+            size = size ? (2 * size) : 16;
+            char **newtab = realloc (tab, sizeof (*tab) * (size));
+
+            if (unlikely(newtab == NULL))
             {
-                free( entry );
+                free (entry);
                 goto error;
             }
             tab = newtab;
-            tab[num++] = entry;
         }
 
-        if( compar != NULL )
-            qsort( tab, num, sizeof( tab[0] ),
-                   (int (*)( const void *, const void *))compar );
-
-        *namelist = tab;
-        return num;
-
-    error:{
-        unsigned i;
-
-        for( i = 0; i < num; i++ )
-            free( tab[i] );
-        free( tab );
-        }
+        tab[num++] = entry;
     }
+
+    if (compar != NULL)
+        qsort (tab, num, sizeof (*tab),
+               (int (*)( const void *, const void *))compar);
+    *namelist = tab;
+    return num;
+
+error:
+    for (unsigned i = 0; i < num; i++)
+        free (tab[i]);
+    free (tab);
     return -1;
 }
 
