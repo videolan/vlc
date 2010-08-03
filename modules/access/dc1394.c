@@ -156,7 +156,7 @@ static int FindCamera( demux_sys_t *sys, demux_t *p_demux )
         }
         if( !found )
         {
-            msg_Err( p_demux, "Can't find camera with uid : 0x%llx.",
+            msg_Err( p_demux, "Can't find camera with uid : 0x%"PRIx64".",
                      sys->selected_uid );
             goto end;
         }

@@ -27,6 +27,9 @@
  * - Remove static currentGroup
  */
 
+#define __STDC_FORMAT_MACROS 1
+#define __STDC_CONSTANT_MACROS 1
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -122,7 +125,7 @@ QAction* addMIMStaticEntry( intf_thread_t *p_intf,
                             bool bStatic = false )
 {
     QAction *action;
-    if( strlen( icon ) > 0 )
+    if( !EMPTY_STR( icon ) )
     {
         action = menu->addAction( text, THEMIM,  member );
         action->setIcon( QIcon( icon ) );
@@ -1390,7 +1393,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
             case VLC_VAR_INTEGER:
                 var_Get( p_object, psz_var, &val );
                 if( CURTEXT ) menutext = qfu( CURTEXT );
-                else menutext.sprintf( "%d", CURVAL.i_int );
+                else menutext.sprintf( "%"PRId64, CURVAL.i_int );
                 CreateAndConnect( submenu, psz_var, menutext, "", ITEM_RADIO,
                         p_object, CURVAL, i_type,
                         ( CURVAL.i_int == val.i_int )

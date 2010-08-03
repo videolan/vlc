@@ -1626,7 +1626,7 @@ static block_t *StreamParseAsf( demux_t *p_demux, live_track_t *tk,
         else
         {
             /* Reset on broken stream */
-            msg_Err( p_demux, "Broken packet detected (%d vs %d or %d + %d vs %d)",
+            msg_Err( p_demux, "Broken packet detected (%d vs %zu or %d + %d vs %d)",
                      i_offset, tk->p_asf_block->i_buffer, i_offset, i_payload, i_packet_size);
             tk->p_asf_block->i_buffer = 0;
         }
