@@ -39,7 +39,7 @@ bindings = {
 
 function quit()
     print("Bye-bye!")
-    vlc.quit()
+    vlc.misc.quit()
 end
 
 function demo()
@@ -74,22 +74,16 @@ function action_trigger( action )
     print("action_trigger:",tostring(action))
     local a = actions[action]
     if a then
-        local date = vlc.misc.mdate()
-        if a.delta and date > a.last + a.delta then
-            a.times = 0
-        else
-            a.times = a.times + 1
+        local ok, msg = pcall( a.func )
+        if not ok then
+            vlc.msg.err("Error while executing action `".. tostring(action) .."': "..msg)
         end
-        a.last = date
-        table.insert(queue,action)
-        vlc.misc.signal()
     else
         vlc.msg.err("Key `"..key.."' points to unknown action `"..bindings[key].."'.")
     end
 end
 
-function key_press( var, old, new, data )
-    local key = new
+function key_press( var, old, key, data )
     print("key_press:",tostring(key))
     if bindings[key] then
         action_trigger(bindings[key])
@@ -101,17 +95,7 @@ end
 vlc.var.add_callback( vlc.object.libvlc(), "key-pressed", key_press )
 --vlc.var.add_callback( vlc.object.libvlc(), "action-triggered", action_trigger )
 
-while not die do
-    if #queue ~= 0 then
-        local action = actions[queue[1]]
-        local ok, msg = pcall( action.func )
-        if not ok then
-            vlc.msg.err("Error while executing action `"..queue[1].."': "..msg)
-        end
-        table.remove(queue,1)
-    else
-        die = vlc.misc.lock_and_wait()
-    end
+while not vlc.misc.lock_and_wait() do
 end
 
 -- Clean up
