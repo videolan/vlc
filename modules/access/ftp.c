@@ -584,7 +584,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_CAN_SEEK:
             pb_bool = (bool*)va_arg( args, bool* );
-            *pb_bool = true;
+            *pb_bool = !p_access->p_sys->directory;
             break;
         case ACCESS_CAN_FASTSEEK:
             pb_bool = (bool*)va_arg( args, bool* );
