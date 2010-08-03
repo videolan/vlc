@@ -1,9 +1,10 @@
 /*****************************************************************************
  * scan.h : functions to ease DVB scanning
  *****************************************************************************
- * Copyright (C) 2008 the VideoLAN team
+ * Copyright (C) 2008,2010 the VideoLAN team
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
+ *          David Kaplan <david@2of1.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,8 +47,19 @@ typedef enum
 
 typedef struct
 {
+    int i_frequency;
+    int i_symbol_rate;
+    int i_fec;
+    char c_polarization;
+} scan_dvbs_transponder_t;
+
+typedef struct
+{
     scan_type_t type;
     bool b_exhaustive;
+    bool b_use_nit;
+    bool b_free_only;
+
     struct
     {
         int i_min;
@@ -67,12 +79,27 @@ typedef struct
         int i_count;
     } bandwidth;
 
+    struct
+    {
+        char *psz_name;         /* satellite name */
+        char *psz_path;         /* config file path */
+
+        scan_dvbs_transponder_t *p_transponders;
+        int i_count;
+    } sat_info;
+
 } scan_parameter_t;
 
 typedef struct
 {
     int i_frequency;
-    int i_bandwidth;
+    union
+    {
+        int i_bandwidth;
+        int i_symbol_rate;
+    };
+    int i_fec;
+    char c_polarization;
 } scan_configuration_t;
 
 typedef enum
@@ -94,7 +121,6 @@ typedef struct
     char *psz_name;     /* channel name in utf8 or NULL */
     int  i_channel;     /* -1 if unknown */
     bool b_crypted;     /* True if potentially crypted */
-
 
     int i_network_id;
 

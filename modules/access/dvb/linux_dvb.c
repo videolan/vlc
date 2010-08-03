@@ -1,13 +1,14 @@
 /*****************************************************************************
  * linux_dvb.c : functions to control a DVB card under Linux with v4l2
  *****************************************************************************
- * Copyright (C) 1998-2005 the VideoLAN team
+ * Copyright (C) 1998-2010 the VideoLAN team
  *
  * Authors: Damien Lucas <nitrox@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman _at_ videolan _dot_ org>
  *          Christopher Ross <chris@tebibyte.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
+ *          David Kaplan <david@of1.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -374,6 +375,7 @@ void FrontendPoll( access_t *p_access )
 #undef IF_UP
     }
 }
+
 int FrontendGetStatistic( access_t *p_access, frontend_statistic_t *p_stat )
 {
     access_sys_t *p_sys = p_access->p_sys;
@@ -392,6 +394,7 @@ int FrontendGetStatistic( access_t *p_access, frontend_statistic_t *p_stat )
 
     return VLC_SUCCESS;
 }
+
 void FrontendGetStatus( access_t *p_access, frontend_status_t *p_status )
 {
     access_sys_t *p_sys = p_access->p_sys;
@@ -401,6 +404,20 @@ void FrontendGetStatus( access_t *p_access, frontend_status_t *p_status )
     p_status->b_has_carrier = (p_frontend->i_last_status & FE_HAS_CARRIER) != 0;
     p_status->b_has_lock = (p_frontend->i_last_status & FE_HAS_LOCK) != 0;
 }
+
+static int ScanParametersDvbS( access_t *p_access, scan_parameter_t *p_scan )
+{
+    const frontend_t *p_frontend = p_access->p_sys->p_frontend;
+
+    memset( p_scan, 0, sizeof(*p_scan) );
+    p_scan->type = SCAN_DVB_S;
+
+    p_scan->frequency.i_min = p_frontend->info.frequency_min;
+    p_scan->frequency.i_max = p_frontend->info.frequency_max;
+
+    return VLC_SUCCESS;
+}
+
 static int ScanParametersDvbC( access_t *p_access, scan_parameter_t *p_scan )
 {
     const frontend_t *p_frontend = p_access->p_sys->p_frontend;
@@ -424,6 +441,7 @@ static int ScanParametersDvbC( access_t *p_access, scan_parameter_t *p_scan )
     p_scan->bandwidth.i_count = 3;
     return VLC_SUCCESS;
 }
+
 static int ScanParametersDvbT( access_t *p_access, scan_parameter_t *p_scan )
 {
     const frontend_t *p_frontend = p_access->p_sys->p_frontend;
@@ -447,15 +465,18 @@ static int ScanParametersDvbT( access_t *p_access, scan_parameter_t *p_scan )
     p_scan->bandwidth.i_count = 3;
     return VLC_SUCCESS;
 }
+
 int  FrontendGetScanParameter( access_t *p_access, scan_parameter_t *p_scan )
 {
     access_sys_t *p_sys = p_access->p_sys;
     const frontend_t *p_frontend = p_sys->p_frontend;
 
-    if( p_frontend->info.type == FE_OFDM )  // DVB-T
+    if( p_frontend->info.type == FE_OFDM )              /* DVB-T */
         return ScanParametersDvbT( p_access, p_scan );
-    else if( p_frontend->info.type == FE_QAM )  // DVB-C
+    else if( p_frontend->info.type == FE_QAM )          /* DVB-C */
         return ScanParametersDvbC( p_access, p_scan );
+    else if( p_frontend->info.type == FE_QPSK )
+        return ScanParametersDvbS( p_access, p_scan );  /* DVB-S */
 
     msg_Err( p_access, "Frontend type not supported for scanning" );
     return VLC_EGENERIC;
@@ -815,6 +836,7 @@ static fe_modulation_t DecodeModulationOFDM( access_t *p_access )
             return QAM_AUTO;
     }
 }
+
 static fe_modulation_t DecodeModulationATSC( access_t *p_access )
 {
     switch( var_GetInteger( p_access, "dvb-modulation" ) )

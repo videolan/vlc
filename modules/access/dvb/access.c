@@ -1,12 +1,13 @@
 /*****************************************************************************
  * access.c: DVB card input v4l2 only
  *****************************************************************************
- * Copyright (C) 1998-2005 the VideoLAN team
+ * Copyright (C) 1998-2010 the VideoLAN team
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman _at_ videolan _dot_ org>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
+ *          David Kaplan <david@2of1.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +38,7 @@
 #include <vlc_input.h>
 #include <vlc_interface.h>
 #include <vlc_dialog.h>
+#include <vlc_fs.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -104,6 +106,9 @@ static void Close( vlc_object_t *p_this );
 #define BUDGET_LONGTEXT N_("This allows you to stream an entire transponder with a \"budget\" card.")
 
 /* Satellite */
+#define SATELLITE_TEXT N_("Satellite scanning config")
+#define SATELLITE_LONGTEXT N_("filename of config file in share/dvb/dvb-s")
+
 #define SATNO_TEXT N_("Satellite number in the Diseqc system")
 #define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=satellite number].")
 
@@ -211,6 +216,8 @@ vlc_module_begin ()
     add_bool( "dvb-budget-mode", false, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
               true )
     /* DVB-S (satellite) */
+    add_string( "dvb-satellite", NULL, NULL, SATELLITE_TEXT, SATELLITE_LONGTEXT,
+                true )
     add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
                  true )
     add_integer( "dvb-voltage", 13, NULL, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
@@ -564,6 +571,10 @@ static block_t *BlockScan( access_t *p_access )
     scan_configuration_t cfg;
     scan_session_t session;
 
+    /* set satellite config file path */
+    if( p_scan->parameter.type == SCAN_DVB_S )
+        p_scan->parameter.sat_info.psz_name = var_GetString( p_access, "dvb-satellite" );
+
     /* */
     if( scan_Next( p_scan, &cfg ) )
     {
@@ -583,9 +594,25 @@ static block_t *BlockScan( access_t *p_access )
         return NULL;
 
     /* */
-    msg_Dbg( p_access, "Scanning frequency %d", cfg.i_frequency );
+    if( p_scan->parameter.type == SCAN_DVB_S )
+    {
+        msg_Dbg( p_access,
+                 "Scanning frequency %d, symbol rate = %d, fec = %d",
+                 cfg.i_frequency,
+                 cfg.i_bandwidth,
+                 cfg.i_fec );
+    }
+    else
+        msg_Dbg( p_access, "Scanning frequency %d, bandwidth = %d",
+                 cfg.i_frequency,
+                 cfg.i_bandwidth );
+
     var_SetInteger( p_access, "dvb-frequency", cfg.i_frequency );
     var_SetInteger( p_access, "dvb-bandwidth", cfg.i_bandwidth );
+    if ( cfg.i_fec )
+        var_SetInteger( p_access, "dvb-fec", cfg.i_fec );
+    if ( cfg.c_polarization )
+        var_SetInteger( p_access, "dvb-voltage", cfg.c_polarization == 'H' ? 18 : 13 );
 
     /* Setting frontend parameters for tuning the hardware */
     if( FrontendSet( p_access ) < 0 )
@@ -869,6 +896,7 @@ static void VarInit( access_t *p_access )
     var_Create( p_access, "dvb-budget-mode", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* */
+    var_Create( p_access, "dvb-satellite", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-satno", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-voltage", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-high-voltage", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -926,6 +954,18 @@ static int ParseMRL( access_t *p_access )
         var_Set( p_access, "dvb-" option, val );                            \
     }
 
+#define GET_OPTION_STRING( option )                                         \
+    if ( !strncmp( psz_parser, option "=", strlen( option "=" ) ) )         \
+    {                                                                       \
+        psz_parser += strlen( option "=" );                                 \
+        val.psz_string = psz_parser;                                        \
+        char *p_save;                                                       \
+        char *tok = strtok_r(val.psz_string, ":", &p_save);                 \
+        val.psz_string[tok - val.psz_string - 1] = 0;                       \
+        var_Set( p_access, "dvb-" option, val );                            \
+        psz_parser += strlen( val.psz_string );                             \
+    }
+
     /* Test for old syntax */
     strtol( psz_parser, &psz_next, 10 );
     if( psz_next != psz_parser )
@@ -948,6 +988,7 @@ static int ParseMRL( access_t *p_access )
         else GET_OPTION_BOOL("probe")
         else GET_OPTION_BOOL("budget-mode")
 
+        else GET_OPTION_STRING("satellite")
         else GET_OPTION_INT("voltage")
         else GET_OPTION_BOOL("high-voltage")
         else GET_OPTION_INT("tone")
@@ -999,6 +1040,7 @@ static int ParseMRL( access_t *p_access )
     }
 #undef GET_OPTION_INT
 #undef GET_OPTION_BOOL
+#undef GET_OPTION_STRING
 
     free( psz_dup );
     return VLC_SUCCESS;
