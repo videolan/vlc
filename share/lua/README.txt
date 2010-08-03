@@ -162,8 +162,8 @@ misc.cachedir(): Get the user's VLC cache directory.
 misc.datadir_list( name ): FIXME: write description ... or ditch function
   if it isn't useful anymore, we have datadir and userdatadir :)
 
-misc.mdate(): Get the current date (in milliseconds).
-misc.mwait(): Wait for the given date (in milliseconds).
+misc.mdate(): Get the current date (in microseconds).
+misc.mwait(): Wait for the given date (in microseconds).
 
 misc.lock_and_wait(): Lock our object thread and wait for a wake up signal.
 
