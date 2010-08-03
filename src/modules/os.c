@@ -291,43 +291,23 @@ static void *module_Lookup( module_handle_t handle, const char *psz_function )
 }
 
 #if defined(HAVE_DL_WINDOWS)
+# include <wchar.h>
+
 static char * GetWindowsError( void )
 {
-#if defined(UNDER_CE)
-    wchar_t psz_tmp[MAX_PATH];
-    char * psz_buffer = malloc( MAX_PATH );
-#else
-    char * psz_tmp = malloc( MAX_PATH );
-#endif
+    wchar_t wmsg[256];
     int i = 0, i_error = GetLastError();
 
-    FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                   NULL, i_error, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-                   (LPTSTR)psz_tmp, MAX_PATH, NULL );
+    FormatMessageW( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                    NULL, i_error, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+                    wmsg, 256, NULL );
 
     /* Go to the end of the string */
-    while( psz_tmp[i] && psz_tmp[i] != _T('\r') && psz_tmp[i] != _T('\n') )
-    {
+    while( !wmemchr( L"\r\n\0", wmsg[i], 3 ) )
         i++;
-    }
 
-    if( psz_tmp[i] )
-    {
-#if defined(UNDER_CE)
-        swprintf( psz_tmp + i, L" (error %i)", i_error );
-        psz_tmp[ 255 ] = L'\0';
-#else
-        snprintf( psz_tmp + i, 256 - i, " (error %i)", i_error );
-        psz_tmp[ 255 ] = '\0';
-#endif
-    }
-
-#if defined(UNDER_CE)
-    wcstombs( psz_buffer, psz_tmp, MAX_PATH );
-    return psz_buffer;
-#else
-    return psz_tmp;
-#endif
+    snwprintf( wmsg + i, 256 - i, L" (error %i)", i_error );
+    return FromWide( wmsg );
 }
 #endif /* HAVE_DL_WINDOWS */
 #endif /* HAVE_DYNAMIC_PLUGINS */
