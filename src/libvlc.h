@@ -327,28 +327,6 @@ VLC_EXPORT( void, stats_DumpInputStats, (input_stats_t *) );
 /*
  * Replacement functions
  */
-# ifndef HAVE_DIRENT_H
-typedef void DIR;
-#  ifndef FILENAME_MAX
-#      define FILENAME_MAX (260)
-#  endif
-struct dirent
-{
-    long            d_ino;          /* Always zero. */
-    unsigned short  d_reclen;       /* Always zero. */
-    unsigned short  d_namlen;       /* Length of name in d_name. */
-    char            d_name[FILENAME_MAX]; /* File name. */
-};
-#  define opendir vlc_opendir
-#  define readdir vlc_readdir
-#  define closedir vlc_closedir
-#  define rewinddir vlc_rewindir
-void *vlc_opendir (const char *);
-void *vlc_readdir (void *);
-int   vlc_closedir(void *);
-void  vlc_rewinddir(void *);
-# endif
-
 #if defined (WIN32)
 #   include <dirent.h>
 void *vlc_wopendir (const wchar_t *);

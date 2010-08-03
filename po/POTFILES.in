@@ -94,7 +94,6 @@ src/control/media_player.c
 src/control/playlist.c
 src/control/video.c
 src/control/vlm.c
-src/extras/dirent.c
 src/extras/libc.c
 src/extras/tdestroy.c
 src/input/access.c

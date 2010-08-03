@@ -828,9 +828,7 @@ fi
 ])
 
 dnl Check for dirent
-need_dirent=false
-AC_CHECK_HEADERS(dirent.h,,[need_dirent=:])
-AM_CONDITIONAL(BUILD_DIRENT, ${need_dirent})
+AC_CHECK_HEADERS(dirent.h)
 
 dnl Mac OS X and other OSes don't have declaration for nanosleep
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then

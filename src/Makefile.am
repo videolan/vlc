@@ -232,7 +232,6 @@ EXTRA_libvlccore_la_SOURCES = \
 	$(SOURCES_libvlc_linux) \
 	$(SOURCES_libvlc_win32) \
 	$(SOURCES_libvlc_other) \
-	$(SOURCES_libvlc_dirent) \
 	$(SOURCES_libvlc_httpd) \
 	$(SOURCES_libvlc_sout) \
 	$(SOURCES_libvlc_vlm) \
@@ -257,9 +256,6 @@ endif
 endif
 endif
 endif
-endif
-if BUILD_DIRENT
-libvlccore_la_SOURCES += $(SOURCES_libvlc_dirent)
 endif
 if BUILD_HTTPD
 libvlccore_la_SOURCES += $(SOURCES_libvlc_httpd)
@@ -303,10 +299,6 @@ SOURCES_libvlc_other = \
 	misc/atomic.c \
 	misc/pthread.c \
 	misc/not_specific.c
-
-SOURCES_libvlc_dirent = \
-	extras/dirent.c \
-	$(NULL)
 
 SOURCES_libvlc_common = \
 	libvlc.c \
@@ -494,7 +486,6 @@ SOURCES_libvlc = \
 	$(OPT_SOURCES_libvlc_beos) \
 	$(OPT_SOURCES_libvlc_darwin) \
 	$(OPT_SOURCES_libvlc_win32) \
-	$(OPT_SOURCES_libvlc_dirent) \
 	$(NULL)
 
 SOURCES_libvlc_control = \
