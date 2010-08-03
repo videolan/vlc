@@ -214,13 +214,19 @@ private slots:
 
     void showBuffering( float );
 
-    void resizeStack( int w, int h ) {
+    void resizeStack( int w, int h )
+    {
         if( !isFullScreen() && !isMaximized() )
-            if( b_minimalView ) resize( w, h ); /* Oh yes, it shouldn't
+        {
+            if( b_minimalView )
+                resize( w, h ); /* Oh yes, it shouldn't
                                    be possible that size() - stackCentralW->size() < 0
                                    since stackCentralW is contained in the QMW... */
-            else resize( size() - stackCentralW->size() + QSize( w, h ) );
-        debug(); }
+            else
+                resize( size() - stackCentralW->size() + QSize( w, h ) );
+        }
+        debug();
+    }
 
     void setVideoSize( unsigned int, unsigned int );
     void setVideoFullScreen( bool );
