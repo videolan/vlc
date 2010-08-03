@@ -827,9 +827,6 @@ then
 fi
 ])
 
-dnl Check for dirent
-AC_CHECK_HEADERS(dirent.h)
-
 dnl Mac OS X and other OSes don't have declaration for nanosleep
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_MSG_CHECKING(for nanosleep in time.h)

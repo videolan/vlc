@@ -62,10 +62,6 @@
 #include <vector>
 #include <algorithm>
 
-#ifdef HAVE_DIRENT_H
-#   include <dirent.h>
-#endif
-
 /* libebml and matroska */
 #include "ebml/EbmlHead.h"
 #include "ebml/EbmlSubHead.h"

@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 
 #include <errno.h>
+#include <dirent.h>
 
 #undef iconv_t
 #undef iconv_open
@@ -40,10 +41,6 @@
 
 #if defined(HAVE_ICONV)
 #   include <iconv.h>
-#endif
-
-#ifdef HAVE_DIRENT_H
-#   include <dirent.h>
 #endif
 
 #ifdef HAVE_FORK

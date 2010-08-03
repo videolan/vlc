@@ -30,9 +30,6 @@
 #elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <direct.h>
 #endif
-#ifdef HAVE_DIRENT_H
-#   include <dirent.h>
-#endif
 
 #include <fstream>
 

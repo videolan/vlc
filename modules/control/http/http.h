@@ -49,10 +49,6 @@
 #   include <io.h>
 #endif
 
-#ifdef HAVE_DIRENT_H
-#   include <dirent.h>
-#endif
-
 /* stat() support for large files on win32 */
 #if defined( WIN32 ) && !defined( UNDER_CE )
 #   define stat _stati64

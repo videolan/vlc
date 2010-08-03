@@ -46,9 +46,6 @@
 #   include <io.h>
 #endif
 
-#ifdef HAVE_DIRENT_H
-#   include <dirent.h>
-#endif
 #ifdef __sun__
 static inline int dirfd (DIR *dir)
 {

@@ -35,10 +35,6 @@
 #include <vlc_fs.h>
 #include <vlc_url.h>
 
-#ifdef HAVE_DIRENT_H
-#   include <dirent.h>
-#endif
-
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif

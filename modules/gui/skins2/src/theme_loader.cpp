@@ -42,11 +42,6 @@
 #   include <direct.h>
 #endif
 
-#ifdef HAVE_DIRENT_H
-#   include <dirent.h>
-#endif
-
-
 #if defined( HAVE_ZLIB_H )
 #   include <zlib.h>
 #   include <errno.h>
