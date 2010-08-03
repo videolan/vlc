@@ -173,7 +173,7 @@ char *ToLocale (const char *utf8)
 #ifdef ASSUME_UTF8
     return (char *)utf8;
 #else
-    return utf8 ? locale_fast (utf8, false) : NULL
+    return utf8 ? locale_dup (utf8, false) : NULL;
 #endif
 }
 

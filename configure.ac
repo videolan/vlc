@@ -903,8 +903,8 @@ AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
 
 dnl Manual switch for UTF-8
 AC_ARG_ENABLE(non-utf8,
-  [  --enable-non-utf8       Legacy non-UTF-8 systems support (default disabled)], [
-  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
+  [  --enable-non-utf8       Legacy non-UTF-8 systems support (default disabled)],, [
+  AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
     enable_non_utf8="no"
   ])
 ])
