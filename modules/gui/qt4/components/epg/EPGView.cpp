@@ -92,7 +92,7 @@ void EPGView::addEvent( EPGEvent* event )
         m_channels.append( event->channelName );
 
     EPGItem* item = new EPGItem( this );
-    item->setChannel( m_channels.indexOf( event->channelName ) );
+    item->setChannelNb( m_channels.indexOf( event->channelName ) );
     item->setStart( event->start );
     item->setDuration( event->duration );
     item->setName( event->name );
@@ -107,9 +107,45 @@ void EPGView::addEvent( EPGEvent* event )
 
 void EPGView::delEvent( EPGEvent* event )
 {
-    if( event->item != NULL )
-        scene()->removeItem( event->item );
+    if( event->item == NULL )
+        return;
+
+    int channelNb = event->item->getChannelNb();
+
+    // Remove the item.
+    scene()->removeItem( event->item );
     event->item = NULL;
+
+    // Look if the channel is still used by other events.
+    QList<QGraphicsItem*> itemList = items();
+    bool b_used = false;
+    for( int i = 0; i < itemList.count(); ++i )
+    {
+        EPGItem* item = qgraphicsitem_cast<EPGItem*>( itemList.at( i ) );
+        if ( !item )
+            continue;
+        if( item->getChannelNb() == channelNb )
+        {
+            b_used = true;
+            break;
+        }
+    }
+
+    // If the channel is no more used, then we remove it from the list
+    // and decrease the channel number of the concerned items.
+    if( !b_used )
+    {
+        m_channels.removeAt( channelNb );
+        for( int i = 0; i < itemList.count(); ++i )
+        {
+            EPGItem* item = qgraphicsitem_cast<EPGItem*>( itemList.at( i ) );
+            if ( !item )
+                continue;
+            int itemChannelNb = item->getChannelNb();
+            if( itemChannelNb > channelNb )
+                item->setChannelNb( itemChannelNb - 1 );
+        }
+    }
 }
 
 void EPGView::updateDuration()

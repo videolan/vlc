@@ -112,7 +112,12 @@ int EPGItem::duration() const
     return m_duration;
 }
 
-void EPGItem::setChannel( int channelNb )
+int EPGItem::getChannelNb() const
+{
+    return m_channelNb;
+}
+
+void EPGItem::setChannelNb( int channelNb )
 {
     //qDebug() << "Channel" << channelNb;
     m_channelNb = channelNb;

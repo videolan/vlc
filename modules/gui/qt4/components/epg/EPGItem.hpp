@@ -44,8 +44,9 @@ public:
     const QDateTime& start() const;
 
     int duration() const;
+    int getChannelNb() const;
 
-    void setChannel( int channelNb );
+    void setChannelNb( int channelNb );
     void setStart( const QDateTime& start );
     void setDuration( int duration );
     void setName( const QString& name );
