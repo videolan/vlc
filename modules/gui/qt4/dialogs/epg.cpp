@@ -73,12 +73,14 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     CONNECT( epg, itemSelectionChanged( EPGEvent *), this, showEvent( EPGEvent *) );
     CONNECT( THEMIM->getIM(), epgChanged(), this, updateInfos() );
 
-    QPushButton *update = new QPushButton( qtr( "Update" ) ); //Temporary to test
-    layout->addWidget( update, 0, Qt::AlignRight );
+#if 0
+    QPushButton *update = new QPushButton( qtr( "Update" ) ); // Temporary to test
+    boxLayout->addWidget( update, 0, Qt::AlignRight );
     BUTTONACT( update, updateInfos() );
+#endif
 
     QPushButton *close = new QPushButton( qtr( "&Close" ) );
-    layout->addWidget( close, 0, Qt::AlignRight );
+    boxLayout->addWidget( close, 0, Qt::AlignRight );
     BUTTONACT( close, close() );
 
     updateInfos();
