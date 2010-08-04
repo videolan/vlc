@@ -302,10 +302,10 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* I need to seek */
-    stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_seekable );
+    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
     if( !b_seekable )
     {
-        msg_Warn( p_demux, "MP4 plugin discarded (unseekable)" );
+        msg_Warn( p_demux, "MP4 plugin discarded (not fastseekable)" );
         return VLC_EGENERIC;
     }
 
