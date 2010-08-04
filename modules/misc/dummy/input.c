@@ -44,6 +44,13 @@ static int DemuxNoOp( demux_t *demux )
     return 0;
 }
 
+static int DemuxHold( demux_t *demux )
+{
+    (void) demux;
+    msleep( 10000 ); /* FIXME!!! */
+    return 1;
+}
+
 struct demux_sys_t
 {
     mtime_t end;
@@ -146,6 +153,15 @@ nop:
         p_demux->pf_demux = DemuxNoOp;
         p_demux->pf_control = DemuxControl;
         libvlc_Quit( p_demux->p_libvlc );
+        return VLC_SUCCESS;
+    }
+
+    if( !strcasecmp( psz_name, "pause" ) )
+    {
+        msg_Info( p_demux, "command `pause'" );
+
+        p_demux->pf_demux = DemuxHold;
+        p_demux->pf_control = DemuxControl;
         return VLC_SUCCESS;
     }
 
