@@ -65,13 +65,7 @@ static int Create( vlc_object_t *p_this )
     /* Use the trivial mixer when we can */
     if ( p_mixer->input_count == 1 && p_mixer->multiplier == 1.0 )
     {
-        int i;
-        for( i = 0; i < p_mixer->input_count; i++ )
-        {
-            if( p_mixer->input[i]->multiplier != 1.0 )
-                break;
-        }
-        if( i >= p_mixer->input_count )
+        if( p_mixer->input[0]->multiplier == 1.0 )
             return -1;
     }
 
