@@ -100,6 +100,8 @@ struct vout_window_sys_t
 #ifdef MATCHBOX_HACK
     xcb_atom_t mb_current_app_window;
 #endif
+
+    bool embedded;
 };
 
 /** Set an X window property from a nul-terminated string */
@@ -215,6 +217,7 @@ static int Open (vlc_object_t *obj)
     vout_window_sys_t *p_sys = malloc (sizeof (*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
+    p_sys->embedded = false;
 
     /* Connect to X */
     char *display = var_InheritString (wnd, "x11-display");
@@ -487,6 +490,9 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
     {
         case VOUT_WINDOW_SET_SIZE:
         {
+            if (p_sys->embedded)
+                return VLC_EGENERIC;
+
             unsigned width = va_arg (ap, unsigned);
             unsigned height = va_arg (ap, unsigned);
             const uint32_t values[] = { width, height, };
@@ -617,6 +623,7 @@ static int EmOpen (vlc_object_t *obj)
     if (p_sys == NULL || xcb_connection_has_error (conn))
         goto error;
 
+    p_sys->embedded = true;
     p_sys->keys = NULL;
     wnd->handle.xid = window;
     wnd->control = Control;
