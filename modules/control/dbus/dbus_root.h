@@ -29,22 +29,47 @@
 
 #include "dbus_common.h"
 
-/* MPRIS VERSION */
-#define DBUS_MPRIS_VERSION_MAJOR     2
-#define DBUS_MPRIS_VERSION_MINOR     0
+#define VLC_IDENTITY _("VLC media player")
 
 /* DBUS IDENTIFIERS */
-#define DBUS_MPRIS_ROOT_INTERFACE    "org.freedesktop.MediaPlayer"
-#define DBUS_MPRIS_ROOT_PATH         "/"
+#define DBUS_MPRIS_ROOT_INTERFACE    "org.mpris.MediaPlayer2"
 
 /* Handle incoming dbus messages */
 DBusHandlerResult handle_root ( DBusConnection *p_conn,
                                 DBusMessage *p_from,
                                 void *p_this );
 
-static const DBusObjectPathVTable dbus_mpris_root_vtable = {
-        NULL, handle_root, /* handler function */
-        NULL, NULL, NULL, NULL
+static const char* ppsz_supported_uri_schemes[] = {
+    "file", "http", "https", "rtsp", "realrtsp", "pnm", "ftp", "mtp", "smb",
+    "mms", "mmsu", "mmst", "mmsh", "unsv", "itpc", "icyx", "rtmp", "rtp",
+    "dccp", "dvd", "vcd", "vcdx"
 };
+
+static const char* ppsz_supported_mime_types[] = {
+    "audio/mpeg", "audio/x-mpeg",
+    "video/mpeg", "video/x-mpeg",
+    "video/mpeg-system", "video/x-mpeg-system",
+    "video/mp4",
+    "audio/mp4",
+    "video/x-msvideo",
+    "video/quicktime",
+    "application/ogg", "application/x-ogg",
+    "video/x-ms-asf",  "video/x-ms-asf-plugin",
+    "application/x-mplayer2",
+    "video/x-ms-wmv",
+    "video/x-google-vlc-plugin",
+    "audio/wav", "audio/x-wav",
+    "audio/3gpp",
+    "video/3gpp",
+    "audio/3gpp2",
+    "video/3gpp2",
+    "video/divx",
+    "video/flv", "video/x-flv",
+    "video/x-matroska",
+    "audio/x-matroska",
+    "application/xspf+xml"
+};
+
+void UpdateRootCaps( intf_thread_t *p_intf );
 
 #endif //dbus-root.h

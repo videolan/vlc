@@ -31,75 +31,153 @@
 #include <vlc_common.h>
 #include <vlc_interface.h>
 
+#include <unistd.h>
+#include <limits.h>
+
 #include "dbus_root.h"
 #include "dbus_common.h"
-
-/* XML data to answer org.freedesktop.DBus.Introspectable.Introspect requests */
-static const char* psz_root_introspection_xml =
-"<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN\"\n"
-"\"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd\">\n"
-"<node>\n"
-"  <node name=\"Player\"/>\n"
-"  <node name=\"TrackList\"/>\n"
-"  <interface name=\"org.freedesktop.DBus.Introspectable\">\n"
-"    <method name=\"Introspect\">\n"
-"      <arg name=\"data\" direction=\"out\" type=\"s\"/>\n"
-"    </method>\n"
-"  </interface>\n"
-"  <interface name=\"org.freedesktop.MediaPlayer\">\n"
-"    <method name=\"Identity\">\n"
-"      <arg type=\"s\" direction=\"out\" />\n"
-"    </method>\n"
-"    <method name=\"MprisVersion\">\n"
-"      <arg type=\"(qq)\" direction=\"out\" />\n"
-"    </method>\n"
-"    <method name=\"Quit\">\n"
-"    </method>\n"
-"  </interface>\n"
-"</node>\n"
-;
 
 DBUS_METHOD( Identity )
 {
     VLC_UNUSED(p_this);
     REPLY_INIT;
     OUT_ARGUMENTS;
-    char *psz_identity;
 
-    if( asprintf( &psz_identity, "%s %s", PACKAGE, VERSION ) != -1 )
-    {
-        ADD_STRING( &psz_identity );
-        free( psz_identity );
-    }
-    else
+    char *psz_identity = VLC_IDENTITY;
+
+    DBusMessageIter v;
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
+    dbus_message_iter_append_basic( &v, DBUS_TYPE_STRING, &psz_identity );
+
+    if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     REPLY_SEND;
 }
 
-DBUS_METHOD( MprisVersion )
-{ /*implemented version of the mpris spec */
+DBUS_METHOD( CanQuit )
+{
+    VLC_UNUSED( p_this );
     REPLY_INIT;
     OUT_ARGUMENTS;
+
+    const dbus_bool_t b_ret = TRUE;
+
+    DBusMessageIter v;
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
+    dbus_message_iter_append_basic( &v, DBUS_TYPE_BOOLEAN, &b_ret );
+
+    if( !dbus_message_iter_close_container( &args, &v ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    REPLY_SEND;
+}
+
+DBUS_METHOD( CanRaise )
+{
     VLC_UNUSED( p_this );
-    dbus_uint16_t i_major = DBUS_MPRIS_VERSION_MAJOR;
-    dbus_uint16_t i_minor = DBUS_MPRIS_VERSION_MINOR;
-    DBusMessageIter version;
+    REPLY_INIT;
+    OUT_ARGUMENTS;
 
-    if( !dbus_message_iter_open_container( &args, DBUS_TYPE_STRUCT, NULL,
-            &version ) )
+    const dbus_bool_t b_ret = FALSE;
+
+    DBusMessageIter v;
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
+    dbus_message_iter_append_basic( &v, DBUS_TYPE_BOOLEAN, &b_ret );
+
+    if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
-    if( !dbus_message_iter_append_basic( &version, DBUS_TYPE_UINT16,
-            &i_major ) )
+    REPLY_SEND;
+}
+
+DBUS_METHOD( HasTrackList )
+{
+    VLC_UNUSED( p_this );
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+
+    const dbus_bool_t b_ret = FALSE;
+
+    DBusMessageIter v;
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
+    dbus_message_iter_append_basic( &v, DBUS_TYPE_BOOLEAN, &b_ret );
+
+    if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
-    if( !dbus_message_iter_append_basic( &version, DBUS_TYPE_UINT16,
-            &i_minor ) )
+    REPLY_SEND;
+}
+
+DBUS_METHOD( DesktopEntry )
+{
+    VLC_UNUSED( p_this );
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+
+    const char* psz_ret = PACKAGE;
+
+    DBusMessageIter v;
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
+    dbus_message_iter_append_basic( &v, DBUS_TYPE_STRING, &psz_ret );
+
+    if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
-    if( !dbus_message_iter_close_container( &args, &version ) )
+    REPLY_SEND;
+}
+
+DBUS_METHOD( SupportedMimeTypes )
+{
+    VLC_UNUSED( p_this );
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+
+    DBusMessageIter ret, v;
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
+    size_t i_len = sizeof( ppsz_supported_mime_types ) / sizeof( char* );
+
+    if( !dbus_message_iter_open_container( &v, DBUS_TYPE_ARRAY, "s", &ret ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    for( size_t i = 0; i < i_len; ++i )
+        if( !dbus_message_iter_append_basic( &ret, DBUS_TYPE_STRING,
+                                             &ppsz_supported_mime_types[i] ) )
+            return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    if( !dbus_message_iter_close_container( &v, &ret ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    if( !dbus_message_iter_close_container( &args, &v ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    REPLY_SEND;
+}
+
+DBUS_METHOD( SupportedUriSchemes )
+{
+    VLC_UNUSED( p_this );
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+
+    DBusMessageIter ret, v;
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
+    size_t i_len = sizeof( ppsz_supported_uri_schemes ) / sizeof( char* );
+
+    if( !dbus_message_iter_open_container( &v, DBUS_TYPE_ARRAY, "s", &ret ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    for( size_t i = 0; i < i_len; ++i )
+        if( !dbus_message_iter_append_basic( &ret, DBUS_TYPE_STRING,
+                                             &ppsz_supported_uri_schemes[i] ) )
+            return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    if( !dbus_message_iter_close_container( &v, &ret ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
+    if( !dbus_message_iter_close_container( &args, &v ) )
+        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+
     REPLY_SEND;
 }
 
@@ -110,33 +188,67 @@ DBUS_METHOD( Quit )
     REPLY_SEND;
 }
 
-DBUS_METHOD( handle_introspect_root )
-{ /* handles introspection of root object */
-    VLC_UNUSED(p_this);
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-    ADD_STRING( &psz_root_introspection_xml );
-    REPLY_SEND;
+#define PROPERTY_MAPPING_BEGIN if( 0 ) {}
+#define PROPERTY_FUNC( interface, property, function ) \
+    else if( !strcmp( psz_interface_name, interface ) && \
+             !strcmp( psz_property_name,  property ) ) \
+        return function( p_conn, p_from, p_this );
+#define PROPERTY_MAPPING_END return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+
+DBUS_METHOD( GetProperty )
+{
+    DBusError error;
+
+    char *psz_interface_name = NULL;
+    char *psz_property_name  = NULL;
+
+    dbus_error_init( &error );
+    dbus_message_get_args( p_from, &error,
+            DBUS_TYPE_STRING, &psz_interface_name,
+            DBUS_TYPE_STRING, &psz_property_name,
+            DBUS_TYPE_INVALID );
+
+    if( dbus_error_is_set( &error ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
+                                         error.message );
+        dbus_error_free( &error );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+    msg_Dbg( (vlc_object_t*) p_this, "Getting property %s",
+                                     psz_property_name );
+
+    PROPERTY_MAPPING_BEGIN
+    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "Identity",            Identity )
+    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "DesktopEntry",        DesktopEntry )
+    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "SupportedMimeTypes",  SupportedMimeTypes )
+    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "SupportedUriSchemes", SupportedUriSchemes )
+    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "HasTrackList",        HasTrackList )
+    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "CanQuit",             CanQuit )
+    PROPERTY_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "CanRaise",            CanRaise )
+    PROPERTY_MAPPING_END
 }
 
+#undef PROPERTY_MAPPING_BEGIN
+#undef PROPERTY_GET_FUNC
+#undef PROPERTY_MAPPING_END
+
+#define METHOD_MAPPING_BEGIN if( 0 ) {}
 #define METHOD_FUNC( interface, method, function ) \
     else if( dbus_message_is_method_call( p_from, interface, method ) )\
         return function( p_conn, p_from, p_this )
+#define METHOD_MAPPING_END return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
 DBusHandlerResult
 handle_root ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
 {
-    if( dbus_message_is_method_call( p_from,
-                DBUS_INTERFACE_INTROSPECTABLE, "Introspect" ) )
-        return handle_introspect_root( p_conn, p_from, p_this );
-
-    /* here D-Bus method names are associated to an handler */
-
-    METHOD_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "Identity",      Identity );
-    METHOD_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "MprisVersion",  MprisVersion );
-    METHOD_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "Quit",          Quit );
-
-    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    METHOD_MAPPING_BEGIN
+    METHOD_FUNC( DBUS_INTERFACE_PROPERTIES, "Get",          GetProperty );
+    METHOD_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "Quit",         Quit );
+    METHOD_MAPPING_END
 }
 
+#undef METHOD_MAPPING_BEGIN
 #undef METHOD_FUNC
+#undef METHOD_MAPPING_END

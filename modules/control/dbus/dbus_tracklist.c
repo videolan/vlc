@@ -36,48 +36,6 @@
 #include "dbus_tracklist.h"
 #include "dbus_common.h"
 
-
-const char* psz_tracklist_introspection_xml =
-"<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN\"\n"
-"\"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd\">\n"
-"<node>"
-"  <interface name=\"org.freedesktop.DBus.Introspectable\">\n"
-"    <method name=\"Introspect\">\n"
-"      <arg name=\"data\" direction=\"out\" type=\"s\"/>\n"
-"    </method>\n"
-"  </interface>\n"
-"  <interface name=\"org.freedesktop.MediaPlayer\">\n"
-"    <method name=\"AddTrack\">\n"
-"      <arg type=\"s\" direction=\"in\" />\n"
-"      <arg type=\"b\" direction=\"in\" />\n"
-"      <arg type=\"i\" direction=\"out\" />\n"
-"    </method>\n"
-"    <method name=\"DelTrack\">\n"
-"      <arg type=\"i\" direction=\"in\" />\n"
-"    </method>\n"
-"    <method name=\"GetMetadata\">\n"
-"      <arg type=\"i\" direction=\"in\" />\n"
-"      <arg type=\"a{sv}\" direction=\"out\" />\n"
-"    </method>\n"
-"    <method name=\"GetCurrentTrack\">\n"
-"      <arg type=\"i\" direction=\"out\" />\n"
-"    </method>\n"
-"    <method name=\"GetLength\">\n"
-"      <arg type=#include <vlc_common.h>\"i\" direction=\"out\" />\n"
-"    </method>\n"
-"    <method name=\"SetLoop\">\n"
-"      <arg type=\"b\" direction=\"in\" />\n"
-"    </method>\n"
-"    <method name=\"SetRandom\">\n"
-"      <arg type=\"b\" direction=\"in\" />\n"
-"    </method>\n"
-"    <signal name=\"TrackListChange\">\n"
-"      <arg type=\"i\" />\n"
-"    </signal>\n"
-"  </interface>\n"
-"</node>\n"
-;
-
 DBUS_METHOD( AddTrack )
 { /* add the string to the playlist, and play it if the boolean is true */
     REPLY_INIT;
@@ -279,15 +237,6 @@ DBUS_SIGNAL( TrackListChangeSignal )
     SIGNAL_SEND;
 }
 
-DBUS_METHOD( handle_introspect_tracklist )
-{
-    VLC_UNUSED(p_this);
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-    ADD_STRING( &psz_tracklist_introspection_xml );
-    REPLY_SEND;
-}
-
 #define METHOD_FUNC( interface, method, function ) \
     else if( dbus_message_is_method_call( p_from, interface, method ) )\
         return function( p_conn, p_from, p_this )
@@ -295,9 +244,11 @@ DBUS_METHOD( handle_introspect_tracklist )
 DBusHandlerResult
 handle_tracklist ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
 {
-    if( dbus_message_is_method_call( p_from,
-                DBUS_INTERFACE_INTROSPECTABLE, "Introspect" ) )
-    return handle_introspect_tracklist( p_conn, p_from, p_this );
+    if(0);
+
+/*  METHOD_FUNC( DBUS_INTERFACE_PROPERTIES, "Get",    GetProperty );
+    METHOD_FUNC( DBUS_INTERFACE_PROPERTIES, "Set",    SetProperty );
+    METHOD_FUNC( DBUS_INTERFACE_PROPERTIES, "GetAll", GetAllProperties ); */
 
     /* here D-Bus method names are associated to an handler */
 
@@ -339,7 +290,6 @@ int TrackListChangeEmit( intf_thread_t *p_intf, int signal, int i_node )
     if( p_intf->p_sys->b_dead )
         return VLC_SUCCESS;
 
-    UpdateCaps( p_intf );
     TrackListChangeSignal( p_intf->p_sys->p_conn, p_intf );
     return VLC_SUCCESS;
 }

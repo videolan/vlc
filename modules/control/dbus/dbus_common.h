@@ -29,7 +29,10 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
+#include <vlc_aout.h>
 #include <dbus/dbus.h>
+
+#define DBUS_MPRIS_OBJECT_PATH "/org/mpris/MediaPlayer2"
 
 /* MACROS */
 
@@ -76,17 +79,22 @@
         return DBUS_HANDLER_RESULT_NEED_MEMORY
 
 #define ADD_STRING( s ) DBUS_ADD( DBUS_TYPE_STRING, s )
+#define ADD_DOUBLE( d ) DBUS_ADD( DBUS_TYPE_DOUBLE, d )
 #define ADD_BOOL( b ) DBUS_ADD( DBUS_TYPE_BOOLEAN, b )
 #define ADD_INT32( i ) DBUS_ADD( DBUS_TYPE_INT32, i )
+#define ADD_INT64( i ) DBUS_ADD( DBUS_TYPE_INT64, i )
 #define ADD_BYTE( b ) DBUS_ADD( DBUS_TYPE_BYTE, b )
+
+#define MPRIS_TRACKID_FORMAT "/org/videolan/vlc/playlist/%d"
 
 struct intf_sys_t
 {
     DBusConnection *p_conn;
     playlist_t     *p_playlist;
     bool            b_meta_read;
-    dbus_int32_t    i_caps;
+    dbus_int32_t    i_player_caps;
     dbus_int32_t    i_playing_state;
+    bool            b_can_play;
     bool            b_dead;
     vlc_array_t    *p_events;
     vlc_array_t    *p_timeouts;
@@ -94,6 +102,8 @@ struct intf_sys_t
     int             p_pipe_fds[2];
     vlc_mutex_t     lock;
     input_thread_t *p_input;
+    mtime_t         i_last_input_pos; /* Only access it from the input thread */
+    mtime_t         i_last_input_pos_event; /* idem */
     bool            b_unique;
 };
 
@@ -107,7 +117,13 @@ enum
     SIGNAL_RANDOM,
     SIGNAL_REPEAT,
     SIGNAL_LOOP,
-    SIGNAL_STATE
+    SIGNAL_STATE,
+    SIGNAL_RATE,
+    SIGNAL_SEEK,
+    SIGNAL_CAN_SEEK,
+    SIGNAL_CAN_PAUSE,
+    SIGNAL_VOLUME_CHANGE,
+    SIGNAL_VOLUME_MUTED
 };
 
 enum
@@ -118,7 +134,7 @@ enum
     PLAYBACK_STATE_STOPPED = 2
 };
 
+int DemarshalSetPropertyValue( DBusMessage *p_msg, void *p_arg );
 int GetInputMeta  ( input_item_t* p_input, DBusMessageIter *args );
-int UpdateCaps    ( intf_thread_t* );
 
 #endif //dbus-common.h

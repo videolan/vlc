@@ -27,6 +27,17 @@
 #ifndef _VLC_DBUS_H
 #define _VLC_DBUS_H
 
-#define DBUS_MPRIS_BUS_NAME "org.mpris.vlc"
+#define DBUS_MPRIS_BUS_NAME "org.mpris.MediaPlayer2.vlc"
+
+static DBusHandlerResult
+MPRISEntryPoint ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this );
+
+static const DBusObjectPathVTable dbus_mpris_vtable = {
+        NULL, MPRISEntryPoint, /* handler function */
+        NULL, NULL, NULL, NULL
+};
+
+#define ABS(x) ( ( x ) > 0 ? ( x ) : ( -1 * ( x ) ) )
+#define SEEK_THRESHOLD 1000 /* µsec */
 
 #endif //dbus.h
