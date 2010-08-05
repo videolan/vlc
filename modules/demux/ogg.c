@@ -215,7 +215,6 @@ static void Close( vlc_object_t *p_this )
 static int Demux( demux_t * p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    ogg_page    oggpage;
     ogg_packet  oggpacket;
     int         i_stream;
     bool b_skipping = false;
@@ -263,11 +262,11 @@ static int Demux( demux_t * p_demux )
         /*
          * Demux an ogg page from the stream
          */
-        if( Ogg_ReadPage( p_demux, &oggpage ) != VLC_SUCCESS )
+        if( Ogg_ReadPage( p_demux, &p_sys->current_page ) != VLC_SUCCESS )
             return 0; /* EOF */
 
         /* Test for End of Stream */
-        if( ogg_page_eos( &oggpage ) )
+        if( ogg_page_eos( &p_sys->current_page ) )
             p_sys->i_eos++;
     }
 
@@ -280,10 +279,10 @@ static int Demux( demux_t * p_demux )
         if( !p_sys->b_page_waiting )
         {
             if( p_sys->i_streams == 1 &&
-                ogg_page_serialno( &oggpage ) != p_stream->os.serialno )
+                ogg_page_serialno( &p_sys->current_page ) != p_stream->os.serialno )
             {
                 msg_Err( p_demux, "Broken Ogg stream (serialno) mismatch" );
-                ogg_stream_reset_serialno( &p_stream->os, ogg_page_serialno( &oggpage ) );
+                ogg_stream_reset_serialno( &p_stream->os, ogg_page_serialno( &p_sys->current_page ) );
 
                 p_stream->b_reinit = true;
                 p_stream->i_pcr = -1;
@@ -291,7 +290,7 @@ static int Demux( demux_t * p_demux )
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             }
 
-            if( ogg_stream_pagein( &p_stream->os, &oggpage ) != 0 )
+            if( ogg_stream_pagein( &p_stream->os, &p_sys->current_page ) != 0 )
             {
                 continue;
             }
@@ -864,21 +863,21 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
 {
     demux_sys_t *p_ogg = p_demux->p_sys  ;
     ogg_packet oggpacket;
-    ogg_page oggpage;
     int i_stream;
 
     p_ogg->i_total_length = stream_Size ( p_demux->s );
     msg_Dbg( p_demux, "File length is %"PRId64" bytes", p_ogg->i_total_length );
 
 
-    while( Ogg_ReadPage( p_demux, &oggpage ) == VLC_SUCCESS )
+    while( Ogg_ReadPage( p_demux, &p_ogg->current_page ) == VLC_SUCCESS )
     {
-        if( ogg_page_bos( &oggpage ) )
+
+        if( ogg_page_bos( &p_ogg->current_page ) )
         {
 
             /* All is wonderful in our fine fine little world.
              * We found the beginning of our first logical stream. */
-            while( ogg_page_bos( &oggpage ) )
+            while( ogg_page_bos( &p_ogg->current_page ) )
             {
                 logical_stream_t *p_stream;
 
@@ -901,12 +900,12 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 es_format_Init( &p_stream->fmt_old, 0, 0 );
 
                 /* Setup the logical stream */
-                p_stream->i_serial_no = ogg_page_serialno( &oggpage );
+                p_stream->i_serial_no = ogg_page_serialno( &p_ogg->current_page );
                 ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
 
                 /* Extract the initial header from the first page and verify
                  * the codec type of this Ogg bitstream */
-                if( ogg_stream_pagein( &p_stream->os, &oggpage ) < 0 )
+                if( ogg_stream_pagein( &p_stream->os, &p_ogg->current_page ) < 0 )
                 {
                     /* error. stream version mismatch perhaps */
                     msg_Err( p_demux, "error reading first page of "
@@ -1286,7 +1285,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     p_ogg->i_streams--;
                 }
 
-                if( Ogg_ReadPage( p_demux, &oggpage ) != VLC_SUCCESS )
+                if( Ogg_ReadPage( p_demux, &p_ogg->current_page ) != VLC_SUCCESS )
                     return VLC_EGENERIC;
             }
 
@@ -1306,7 +1305,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
             for( i_stream = 0; i_stream < p_ogg->i_streams; i_stream++ )
             {
                 if( ogg_stream_pagein( &p_ogg->pp_stream[i_stream]->os,
-                                       &oggpage ) == 0 )
+                                       &p_ogg->current_page ) == 0 )
                 {
                     p_ogg->b_page_waiting = true;
                     break;
