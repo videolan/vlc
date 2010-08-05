@@ -184,7 +184,7 @@ static int ReaderOpen( vlc_object_t *p_this )
 
 static void ReaderClose( vlc_object_t *p_this )
 {
-    xml_reader_t *p_reader = (vlc_object_t *)p_this;
+    xml_reader_t *p_reader = (xml_reader_t *)p_this;
 
     xtag_free( p_reader->p_sys->p_root );
     free( p_reader->p_sys );
