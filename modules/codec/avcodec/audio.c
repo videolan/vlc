@@ -164,28 +164,14 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     // Initialize decoder extradata
     InitDecoderConfig( p_dec, p_context);
 
-    /* ***** Fill p_context with init values ***** */
-    p_sys->p_context->sample_rate = p_dec->fmt_in.audio.i_rate;
-    p_sys->p_context->channels = p_dec->fmt_in.audio.i_channels;
-
-    p_sys->p_context->block_align = p_dec->fmt_in.audio.i_blockalign;
-    p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
-    p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.audio.i_bitspersample;
-
     /* ***** Open the codec ***** */
-    int ret;
-    vlc_avcodec_lock();
-    ret = avcodec_open( p_sys->p_context, p_sys->p_codec );
-    vlc_avcodec_unlock();
-    if( ret < 0 )
+    if( ffmpeg_OpenCodec( p_dec ) < 0 )
     {
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
         free( p_sys->p_context->extradata );
         free( p_sys );
         return VLC_EGENERIC;
     }
-
-    msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
 
     switch( i_codec_id )
     {

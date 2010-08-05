@@ -416,10 +416,21 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
             return 1;
         }
     }
-    p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
-    p_sys->p_context->height = p_dec->fmt_in.video.i_height;
-    p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
+    if( p_dec->fmt_in.i_cat == VIDEO_ES )
+    {
+        p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
+        p_sys->p_context->height = p_dec->fmt_in.video.i_height;
+        p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
+    }
+    else if( p_dec->fmt_in.i_cat == AUDIO_ES )
+    {
+        p_sys->p_context->sample_rate = p_dec->fmt_in.audio.i_rate;
+        p_sys->p_context->channels = p_dec->fmt_in.audio.i_channels;
 
+        p_sys->p_context->block_align = p_dec->fmt_in.audio.i_blockalign;
+        p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
+        p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.audio.i_bitspersample;
+    }
     int ret;
     vlc_avcodec_lock();
     ret = avcodec_open( p_sys->p_context, p_sys->p_codec );
@@ -429,24 +440,27 @@ int ffmpeg_OpenCodec( decoder_t *p_dec )
     msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
 
 #ifdef HAVE_AVCODEC_MT
-    switch( p_sys->p_context->active_thread_type )
+    if( p_dec->fmt_in.i_cat == VIDEO_ES )
     {
-    case FF_THREAD_FRAME:
-        msg_Dbg( p_dec, "using frame thread mode with %d threads",
-                 p_sys->p_context->thread_count );
-        break;
-    case FF_THREAD_SLICE:
-        msg_Dbg( p_dec, "using slice thread mode with %d threads",
-                 p_sys->p_context->thread_count );
-        break;
-    case 0:
-        if( p_sys->p_context->thread_count > 1 )
-            msg_Warn( p_dec, "failed to enable threaded decoding" );
-        break;
-    default:
-        msg_Warn( p_dec, "using unknown thread mode with %d threads",
-                  p_sys->p_context->thread_count );
-        break;
+        switch( p_sys->p_context->active_thread_type )
+        {
+            case FF_THREAD_FRAME:
+                msg_Dbg( p_dec, "using frame thread mode with %d threads",
+                         p_sys->p_context->thread_count );
+                break;
+            case FF_THREAD_SLICE:
+                msg_Dbg( p_dec, "using slice thread mode with %d threads",
+                         p_sys->p_context->thread_count );
+                break;
+            case 0:
+                if( p_sys->p_context->thread_count > 1 )
+                    msg_Warn( p_dec, "failed to enable threaded decoding" );
+                break;
+            default:
+                msg_Warn( p_dec, "using unknown thread mode with %d threads",
+                          p_sys->p_context->thread_count );
+                break;
+        }
     }
 #endif
 
