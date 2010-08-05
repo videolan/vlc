@@ -397,3 +397,60 @@ void InitLibavcodec( vlc_object_t *p_object )
 
     vlc_avcodec_unlock();
 }
+
+/*****************************************************************************
+ * ffmpeg_OpenCodec:
+ *****************************************************************************/
+int ffmpeg_OpenCodec( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->p_context->extradata_size <= 0 )
+    {
+        if( p_sys->i_codec_id == CODEC_ID_VC1 ||
+            p_sys->i_codec_id == CODEC_ID_VORBIS ||
+            p_sys->i_codec_id == CODEC_ID_THEORA )
+        {
+            msg_Warn( p_dec, "waiting for extra data for codec %s",
+                      p_sys->psz_namecodec );
+            return 1;
+        }
+    }
+    p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
+    p_sys->p_context->height = p_dec->fmt_in.video.i_height;
+    p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
+
+    int ret;
+    vlc_avcodec_lock();
+    ret = avcodec_open( p_sys->p_context, p_sys->p_codec );
+    vlc_avcodec_unlock();
+    if( ret < 0 )
+        return VLC_EGENERIC;
+    msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
+
+#ifdef HAVE_AVCODEC_MT
+    switch( p_sys->p_context->active_thread_type )
+    {
+    case FF_THREAD_FRAME:
+        msg_Dbg( p_dec, "using frame thread mode with %d threads",
+                 p_sys->p_context->thread_count );
+        break;
+    case FF_THREAD_SLICE:
+        msg_Dbg( p_dec, "using slice thread mode with %d threads",
+                 p_sys->p_context->thread_count );
+        break;
+    case 0:
+        if( p_sys->p_context->thread_count > 1 )
+            msg_Warn( p_dec, "failed to enable threaded decoding" );
+        break;
+    default:
+        msg_Warn( p_dec, "using unknown thread mode with %d threads",
+                  p_sys->p_context->thread_count );
+        break;
+    }
+#endif
+
+    p_sys->b_delayed_open = false;
+
+    return VLC_SUCCESS;
+}
