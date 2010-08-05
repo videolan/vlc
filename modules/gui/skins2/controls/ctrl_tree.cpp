@@ -726,20 +726,19 @@ void CtrlTree::autoScroll()
            break;
         }
     }
+
     for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
          it != m_rTree.end();
          it = m_flat ? m_rTree.getNextLeaf( it )
                      : m_rTree.getNextVisibleItem( it ) )
     {
         if( it->m_playing )
+        {
+           ensureVisible( playIndex );
            break;
+        }
         playIndex++;
     }
-
-    if( it == m_rTree.end() ) return;
-
-
-    ensureVisible( playIndex );
 }
 
 
