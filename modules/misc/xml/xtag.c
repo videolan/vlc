@@ -83,17 +83,11 @@ typedef struct _XTagParser
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
 static int ReaderOpen( vlc_object_t * );
 static void ReaderClose( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("Simple XML Parser") )
-    set_capability( "xml", 5 )
-    set_callbacks( Open, Close )
-
-    add_submodule()
     set_capability( "xml reader", 5 )
     set_callbacks( ReaderOpen, ReaderClose )
 vlc_module_end ()
@@ -114,9 +108,6 @@ static int ReaderNextAttr( xml_reader_t * );
 
 static int ReaderUseDTD ( xml_reader_t *, bool );
 
-static void CatalogLoad( xml_t *, const char * );
-static void CatalogAdd( xml_t *, const char *, const char *, const char * );
-
 static XTag *xtag_new_parse( const char *, int );
 static char *xtag_get_name( XTag * );
 #if 0
@@ -129,44 +120,6 @@ static void  xtag_free( XTag * );
 #if 0
 static int xtag_snprint( char *, int, XTag * );
 #endif
-
-/*****************************************************************************
- * Module initialization
- *****************************************************************************/
-static int Open( vlc_object_t *p_this )
-{
-    xml_t *p_xml = (xml_t *)p_this;
-
-    p_xml->pf_catalog_load = CatalogLoad;
-    p_xml->pf_catalog_add  = CatalogAdd;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Module deinitialization
- *****************************************************************************/
-static void Close( vlc_object_t *p_this )
-{
-    VLC_UNUSED(p_this);
-    return;
-}
-
-/*****************************************************************************
- * Catalogue functions
- *****************************************************************************/
-static void CatalogLoad( xml_t *p_xml, const char *psz_filename )
-{
-    VLC_UNUSED(psz_filename);
-    msg_Dbg( p_xml, "catalog support not implemented" );
-}
-
-static void CatalogAdd( xml_t *p_xml, const char *psz_arg1,
-                          const char *psz_arg2, const char *psz_filename )
-{
-    VLC_UNUSED(p_xml); VLC_UNUSED(psz_arg1); VLC_UNUSED(psz_arg2);
-    VLC_UNUSED(psz_filename);
-}
 
 /*****************************************************************************
  * Reader functions
