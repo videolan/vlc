@@ -627,7 +627,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             }
         }
         iFirst += maxItems();
-        if( iFirst >= m_flat ? m_rTree.countLeafs() : m_rTree.visibleItems() )
+        if( iFirst >= (m_flat ? m_rTree.countLeafs() : m_rTree.visibleItems()) )
             iFirst = m_flat ? m_rTree.countLeafs() : m_rTree.visibleItems();
         float f_new = (float)iFirst / (float)( m_flat ? m_rTree.countLeafs()
                                                       :m_rTree.visibleItems() );
