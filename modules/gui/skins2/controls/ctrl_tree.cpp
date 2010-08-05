@@ -697,13 +697,13 @@ bool CtrlTree::ensureVisible( int focusItemIndex )
 
     if( it != m_rTree.end()
         && ( focusItemIndex < firstPosIndex
-           || focusItemIndex > firstPosIndex + maxItems() ) )
+           || focusItemIndex > firstPosIndex + maxItems() - 1 ) )
     {
         // Scroll to have the wanted stream visible
         VarPercent &rVarPos = m_rTree.getPositionVar();
-        rVarPos.set( 1.0 - (double)focusItemIndex /
-                           (double)( m_flat ? m_rTree.countLeafs()
-                                            : m_rTree.visibleItems() ) );
+        int indexMax = ( m_flat ? m_rTree.countLeafs()
+                                : m_rTree.visibleItems() ) - 1;
+        rVarPos.set( 1.0 - (double)focusItemIndex / (double)indexMax );
         return true;
     }
     return false;
