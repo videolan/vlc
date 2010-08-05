@@ -45,13 +45,9 @@
  * XML
  *****************************************************************************/
 static int vlclua_xml_create_reader( lua_State * );
-static int vlclua_xml_load_catalog( lua_State * );
-static int vlclua_xml_add_catalog( lua_State * );
 
 static const luaL_Reg vlclua_xml_reg[] = {
     { "create_reader", vlclua_xml_create_reader },
-    { "load_catalog", vlclua_xml_load_catalog },
-    { "add_catalog", vlclua_xml_add_catalog },
     { NULL, NULL }
 };
 
@@ -84,24 +80,6 @@ static int vlclua_xml_create( lua_State *L )
     return 1;
 }
 
-static int vlclua_xml_load_catalog( lua_State *L )
-{
-    xml_t *p_xml = *(xml_t**)luaL_checkudata( L, 1, "xml" );
-    const char *psz_catalog = luaL_checkstring( L, 2 );
-    xml_CatalogLoad( p_xml, psz_catalog );
-    return 0;
-}
-
-static int vlclua_xml_add_catalog( lua_State *L )
-{
-    xml_t *p_xml = *(xml_t**)luaL_checkudata( L, 1, "xml" );
-    const char *psz_str1 = luaL_checkstring( L, 2 );
-    const char *psz_str2 = luaL_checkstring( L, 3 );
-    const char *psz_str3 = luaL_checkstring( L, 4 );
-    xml_CatalogAdd( p_xml, psz_str1, psz_str2, psz_str3 );
-    return 0;
-}
-
 /*****************************************************************************
  * XML Reader
  *****************************************************************************/
@@ -110,7 +88,6 @@ static int vlclua_xml_reader_node_type( lua_State * );
 static int vlclua_xml_reader_name( lua_State * );
 static int vlclua_xml_reader_value( lua_State * );
 static int vlclua_xml_reader_next_attr( lua_State * );
-static int vlclua_xml_reader_use_dtd( lua_State * );
 
 static const luaL_Reg vlclua_xml_reader_reg[] = {
     { "read", vlclua_xml_reader_read },
@@ -118,7 +95,6 @@ static const luaL_Reg vlclua_xml_reader_reg[] = {
     { "name", vlclua_xml_reader_name },
     { "value", vlclua_xml_reader_value },
     { "next_attr", vlclua_xml_reader_next_attr },
-    { "use_dtd", vlclua_xml_reader_use_dtd },
     { NULL, NULL }
 };
 
@@ -187,14 +163,6 @@ static int vlclua_xml_reader_next_attr( lua_State *L )
 {
     xml_reader_t *p_reader = *(xml_reader_t**)luaL_checkudata( L, 1, "xml_reader" );
     lua_pushinteger( L, xml_ReaderNextAttr( p_reader ) );
-    return 1;
-}
-
-static int vlclua_xml_reader_use_dtd( lua_State *L )
-{
-    xml_reader_t *p_reader = *(xml_reader_t**)luaL_checkudata( L, 1, "xml_reader" );
-    bool b_value = lua_toboolean( L, 2 );
-    lua_pushinteger( L, xml_ReaderUseDTD( p_reader, b_value ) );
     return 1;
 }
 
