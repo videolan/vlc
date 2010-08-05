@@ -39,21 +39,19 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
     m_pReader = NULL;
     m_pStream = NULL;
 
-    m_pXML = xml_Create( pIntf );
-    if( !m_pXML )
+    if( useDTD )
     {
-        msg_Err( getIntf(), "failed to open XML parser" );
-        return;
+        m_pXML = xml_Create( pIntf );
+        if( m_pXML )
+            LoadCatalog();
+        else
+        {
+            msg_Err( getIntf(), "DTD not supported" );
+            useDTD = false;
+        }
     }
-
-    // Avoid duplicate initialization (mutex needed ?) -> doesn't work
-    // Reinitialization required for a new XMLParser
-    // if( !m_initialized )
-    // {
-    //    LoadCatalog();
-    //    m_initialized = true;
-    // }
-    LoadCatalog();
+    else
+        m_pXML = NULL;
 
     char* psz_uri = make_URI( rFileName.c_str(), NULL );
     m_pStream = stream_UrlNew( pIntf, psz_uri );
