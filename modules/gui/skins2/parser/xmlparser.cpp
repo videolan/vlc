@@ -58,6 +58,7 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
     {
         msg_Err( getIntf(), "failed to open %s for reading",
                  rFileName.c_str() );
+        m_pReader = NULL;
         return;
     }
     m_pReader = xml_ReaderCreate( m_pXML, m_pStream );
