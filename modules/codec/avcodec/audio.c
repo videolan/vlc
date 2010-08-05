@@ -159,7 +159,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_codec = p_codec;
     p_sys->i_codec_id = i_codec_id;
     p_sys->psz_namecodec = psz_namecodec;
-    p_sys->b_delayed_open = false;
+    p_sys->b_delayed_open = true;
 
     // Initialize decoder extradata
     InitDecoderConfig( p_dec, p_context);
@@ -264,6 +264,19 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     if( !pp_block || !*pp_block ) return NULL;
 
     p_block = *pp_block;
+
+    if( !p_sys->p_context->extradata_size && p_dec->fmt_in.i_extra &&
+        p_sys->b_delayed_open)
+    {
+        InitDecoderConfig( p_dec, p_sys->p_context);
+        if( ffmpeg_OpenCodec( p_dec ) )
+            msg_Err( p_dec, "Cannot open decoder %s", p_sys->psz_namecodec );
+    }
+    if( p_sys->b_delayed_open )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
 
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
