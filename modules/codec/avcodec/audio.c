@@ -82,39 +82,8 @@ struct decoder_sys_t
 
 static void SetupOutputFormat( decoder_t *p_dec, bool b_trust );
 
-/*****************************************************************************
- * InitAudioDec: initialize audio decoder
- *****************************************************************************
- * The ffmpeg codec will be opened, some memory allocated.
- *****************************************************************************/
-int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
-                      AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
+static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
 {
-    decoder_sys_t *p_sys;
-
-    /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys = malloc(sizeof(*p_sys)) ) == NULL )
-    {
-        return VLC_ENOMEM;
-    }
-
-    p_codec->type = CODEC_TYPE_AUDIO;
-    p_context->codec_type = CODEC_TYPE_AUDIO;
-    p_context->codec_id = i_codec_id;
-    p_sys->p_context = p_context;
-    p_sys->p_codec = p_codec;
-    p_sys->i_codec_id = i_codec_id;
-    p_sys->psz_namecodec = psz_namecodec;
-    p_sys->b_delayed_open = false;
-
-    /* ***** Fill p_context with init values ***** */
-    p_sys->p_context->sample_rate = p_dec->fmt_in.audio.i_rate;
-    p_sys->p_context->channels = p_dec->fmt_in.audio.i_channels;
-
-    p_sys->p_context->block_align = p_dec->fmt_in.audio.i_blockalign;
-    p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
-    p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.audio.i_bitspersample;
-
     if( p_dec->fmt_in.i_extra > 0 )
     {
         const uint8_t * const p_src = p_dec->fmt_in.p_extra;
@@ -147,13 +116,13 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
 
         if( i_size > 0 )
         {
-            p_sys->p_context->extradata =
+            p_context->extradata =
                 malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
-            if( p_sys->p_context->extradata )
+            if( p_context->extradata )
             {
-                uint8_t *p_dst = p_sys->p_context->extradata;
+                uint8_t *p_dst = p_context->extradata;
 
-                p_sys->p_context->extradata_size = i_size;
+                p_context->extradata_size = i_size;
 
                 memcpy( &p_dst[0],            &p_src[i_offset], i_size );
                 memset( &p_dst[i_size], 0, FF_INPUT_BUFFER_PADDING_SIZE );
@@ -162,9 +131,46 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     }
     else
     {
-        p_sys->p_context->extradata_size = 0;
-        p_sys->p_context->extradata = NULL;
+        p_context->extradata_size = 0;
+        p_context->extradata = NULL;
     }
+}
+
+/*****************************************************************************
+ * InitAudioDec: initialize audio decoder
+ *****************************************************************************
+ * The ffmpeg codec will be opened, some memory allocated.
+ *****************************************************************************/
+int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
+                      AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
+{
+    decoder_sys_t *p_sys;
+
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_dec->p_sys = p_sys = malloc(sizeof(*p_sys)) ) == NULL )
+    {
+        return VLC_ENOMEM;
+    }
+
+    p_codec->type = CODEC_TYPE_AUDIO;
+    p_context->codec_type = CODEC_TYPE_AUDIO;
+    p_context->codec_id = i_codec_id;
+    p_sys->p_context = p_context;
+    p_sys->p_codec = p_codec;
+    p_sys->i_codec_id = i_codec_id;
+    p_sys->psz_namecodec = psz_namecodec;
+    p_sys->b_delayed_open = false;
+
+    // Initialize decoder extradata
+    InitDecoderConfig( p_dec, p_context);
+
+    /* ***** Fill p_context with init values ***** */
+    p_sys->p_context->sample_rate = p_dec->fmt_in.audio.i_rate;
+    p_sys->p_context->channels = p_dec->fmt_in.audio.i_channels;
+
+    p_sys->p_context->block_align = p_dec->fmt_in.audio.i_blockalign;
+    p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
+    p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.audio.i_bitspersample;
 
     /* ***** Open the codec ***** */
     int ret;
