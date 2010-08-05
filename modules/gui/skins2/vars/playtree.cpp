@@ -73,18 +73,15 @@ void Playtree::delSelected()
             {
                 playlist_DeleteFromInput( getIntf()->p_sys->p_playlist,
                                           p_item->p_input, pl_Locked );
-                it2 = getNextVisibleItem( it ) ;
-                it->parent()->removeChild( it );
-                it = it2;
             }
             else
             {
                 playlist_NodeDelete( getIntf()->p_sys->p_playlist, p_item,
                                      true, false );
-                it2 = getNextSibling( it );
-                it->parent()->removeChild( it );
-                it = it2;
             }
+            it2 = getNextVisibleItem( it ) ;
+            it->parent()->removeChild( it );
+            it = it2;
         }
         else
         {
