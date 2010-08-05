@@ -43,6 +43,7 @@
 #include "vorbis.h"
 #include "kate_categories.h"
 #include "ogg.h"
+#include "oggseek.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -217,6 +218,7 @@ static int Demux( demux_t * p_demux )
     ogg_page    oggpage;
     ogg_packet  oggpacket;
     int         i_stream;
+    bool b_skipping = false;
 
 
     if( p_sys->i_eos == p_sys->i_streams )
@@ -290,7 +292,10 @@ static int Demux( demux_t * p_demux )
             }
 
             if( ogg_stream_pagein( &p_stream->os, &oggpage ) != 0 )
+            {
                 continue;
+            }
+
         }
 
         while( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
@@ -316,7 +321,16 @@ static int Demux( demux_t * p_demux )
                 {
                     p_stream->i_secondary_header_packets = 0;
                 }
+
+                /* update start of data pointer */
+                p_stream->i_data_start = stream_Tell( p_demux->s );
+
             }
+
+            /* If any streams have i_skip_frames, only decode (pre-roll)
+             *  for those streams */
+            if ( b_skipping && p_stream->i_skip_frames == 0 ) continue;
+
 
             if( p_stream->b_reinit )
             {
@@ -376,7 +390,7 @@ static int Demux( demux_t * p_demux )
             p_sys->i_pcr = p_stream->i_interpolated_pcr;
     }
 
-    if( p_sys->i_pcr >= 0 )
+    if( p_sys->i_pcr >= 0 && ! b_skipping )
         es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
 
     return 1;
@@ -729,6 +743,15 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
     if( !( p_block = block_New( p_demux, p_oggpacket->bytes ) ) ) return;
 
+
+    /* may need to preroll video frames after a seek */
+    if ( p_stream->i_skip_frames > 0 )
+    {
+        p_block->i_flags |= BLOCK_FLAG_PREROLL;
+        p_stream->i_skip_frames--;
+    }
+
+
     /* Normalize PTS */
     if( i_pts == 0 ) i_pts = VLC_TS_0;
     else if( i_pts == -1 && i_interpolated_pts == 0 ) i_pts = VLC_TS_0;
@@ -759,6 +782,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_block->i_dts = p_stream->i_pcr;
         p_block->i_pts = VLC_TS_INVALID;
         /* NB, OggDirac granulepos values are in units of 2*picturerate */
+
+        /* granulepos for dirac is possibly broken, this value should be ignored */
         if( -1 != p_oggpacket->granulepos )
             p_block->i_pts = u_pnum * INT64_C(1000000) / p_stream->f_rate / 2;
     }
@@ -842,6 +867,10 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
     ogg_page oggpage;
     int i_stream;
 
+    p_ogg->i_total_length = stream_Size ( p_demux->s );
+    msg_Dbg( p_demux, "File length is %"PRId64" bytes", p_ogg->i_total_length );
+
+
     while( Ogg_ReadPage( p_demux, &oggpage ) == VLC_SUCCESS )
     {
         if( ogg_page_bos( &oggpage ) )
@@ -864,6 +893,9 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 p_stream->i_secondary_header_packets = 0;
 
                 p_stream->i_keyframe_offset = 0;
+                p_stream->i_skip_frames = 0;
+
+                p_stream->i_data_start = 0;
 
                 es_format_Init( &p_stream->fmt, 0, 0 );
                 es_format_Init( &p_stream->fmt_old, 0, 0 );
@@ -1314,6 +1346,9 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
 
         p_stream->p_es = NULL;
 
+        /* initialise kframe index */
+        p_stream->idx=NULL;
+
         /* Try first to reuse an old ES */
         if( p_old_stream &&
             p_old_stream->fmt.i_cat == p_stream->fmt.i_cat &&
@@ -1359,6 +1394,11 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
         Ogg_LogicalStreamDelete( p_demux, p_ogg->p_old_stream );
         p_ogg->p_old_stream = NULL;
     }
+
+
+    /* get total frame count for video stream; we will need this for seeking */
+    p_ogg->i_total_frames = 0;
+
     return VLC_SUCCESS;
 }
 
@@ -1398,6 +1438,11 @@ static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_strea
 
     es_format_Clean( &p_stream->fmt_old );
     es_format_Clean( &p_stream->fmt );
+
+    if ( p_stream->idx != NULL)
+    {
+        oggseek_index_entries_free( p_stream->idx );
+    }
 
     free( p_stream );
 }

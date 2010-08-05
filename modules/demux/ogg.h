@@ -69,6 +69,15 @@ typedef struct logical_stream_s
     /* offset of first keyframe for theora; can be 0 or 1 depending on version number */
     int64_t i_keyframe_offset;
 
+    /* keyframe index for seeking, created as we discover keyframes */
+    demux_index_entry_t *idx;
+
+    /* skip some frames after a seek */
+    int i_skip_frames;
+
+    /* data start offset (absolute) in bytes */
+    int64_t i_data_start;
+
     /* kate streams have the number of headers in the ID header */
     int i_kate_num_headers;
 
@@ -104,6 +113,18 @@ struct demux_sys_t
 
     /* after reading all headers, the first data page is stuffed into the relevant stream, ready to use */
     bool    b_page_waiting;
+
+    /* count of total frames in video stream */
+    int64_t i_total_frames;
+
+    /* length of file in bytes */
+    int64_t i_total_length;
+
+    /* offset position in file (for reading) */
+    int64_t i_input_position;
+
+    /* current page being parsed */
+    ogg_page current_page;
 
     mtime_t i_st_pts;
 
