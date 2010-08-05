@@ -121,6 +121,7 @@ VarTree::Iterator VarTree::getNextSibling( VarTree::Iterator current )
         if( it != p_parent->end() )
         {
             it++;
+            return it;
         }
         return root()->end();
     }
