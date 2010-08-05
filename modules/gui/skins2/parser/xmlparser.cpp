@@ -29,9 +29,6 @@
 #   include <sys/stat.h>
 #endif
 
-// Static variable to avoid initializing catalogs twice
-static bool m_initialized = false;
-
 XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
                       bool useDTD ):
     SkinObject( pIntf )
