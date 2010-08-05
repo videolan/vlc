@@ -105,7 +105,6 @@ typedef struct
     } sh;
 } stream_header_t;
 
-#define OGG_BLOCK_SIZE 4096
 
 /* Some defines from OggDS */
 #define PACKET_TYPE_HEADER   0x01
@@ -470,9 +469,9 @@ static int Ogg_ReadPage( demux_t *p_demux, ogg_page *p_oggpage )
 
     while( ogg_sync_pageout( &p_ogg->oy, p_oggpage ) != 1 )
     {
-        p_buffer = ogg_sync_buffer( &p_ogg->oy, OGG_BLOCK_SIZE );
+        p_buffer = ogg_sync_buffer( &p_ogg->oy, OGGSEEK_BYTES_TO_READ );
 
-        i_read = stream_Read( p_demux->s, p_buffer, OGG_BLOCK_SIZE );
+        i_read = stream_Read( p_demux->s, p_buffer, OGGSEEK_BYTES_TO_READ );
         if( i_read <= 0 )
             return VLC_EGENERIC;
 
