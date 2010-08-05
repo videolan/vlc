@@ -283,6 +283,10 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             /* Select it_sel */
             it_sel->m_selected = true;
             m_pLastSelected = &*it_sel;
+
+            // Redraw the control
+            makeImage();
+            notifyLayout();
         }
         else if( key == KEY_PAGEDOWN )
         {
@@ -307,7 +311,6 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                 ensureVisible( it );
                 makeImage();
                 notifyLayout();
-                return;
             }
         }
         else if (key == KEY_PAGEUP )
@@ -328,7 +331,126 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             ensureVisible( it );
             makeImage();
             notifyLayout();
-            return;
+        }
+        else if ( key == KEY_UP ||
+                  key == KEY_DOWN ||
+                  key == KEY_LEFT ||
+                  key == KEY_RIGHT ||
+                  key == KEY_ENTER ||
+                  key == ' ' )
+        {
+            for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+                 it != m_rTree.end();
+                 it = m_flat ? m_rTree.getNextLeaf( it )
+                             : m_rTree.getNextVisibleItem( it ) )
+            {
+                VarTree::Iterator next = m_flat ?
+                                         m_rTree.getNextLeaf( it ) :
+                                         m_rTree.getNextVisibleItem( it );
+                if( key == KEY_UP )
+                {
+                    // Scroll up one item
+                    if( ( it->parent()
+                          && it != it->parent()->begin() )
+                        || &*it != m_pLastSelected )
+                    {
+                        bool nextWasSelected = ( &*next == m_pLastSelected );
+                        it->m_selected = nextWasSelected;
+                        if( nextWasSelected )
+                        {
+                            m_pLastSelected = &*it;
+                            needShow = true; toShow = it;
+                        }
+                    }
+                }
+                else if( key == KEY_DOWN )
+                {
+                    // Scroll down one item
+                    if( ( it->parent()
+                          && next != it->parent()->end() )
+                        || &*it != m_pLastSelected )
+                    {
+                        (*it).m_selected = previousWasSelected;
+                    }
+                    if( previousWasSelected )
+                    {
+                        m_pLastSelected = &*it;
+                        needShow = true; toShow = it;
+                        previousWasSelected = false;
+                    }
+                    else
+                    {
+                        previousWasSelected = ( &*it == m_pLastSelected );
+                    }
+
+                    // Fix last tree item selection
+                    if( ( m_flat ? m_rTree.getNextLeaf( it )
+                        : m_rTree.getNextVisibleItem( it ) ) == m_rTree.end()
+                     && &*it == m_pLastSelected )
+                    {
+                        (*it).m_selected = true;
+                    }
+                }
+                else if( key == KEY_RIGHT )
+                {
+                    // Go down one level (and expand node)
+                    if( &*it == m_pLastSelected )
+                    {
+                        if( it->m_expanded )
+                        {
+                            if( it->size() )
+                            {
+                                it->m_selected = false;
+                                it->begin()->m_selected = true;
+                                m_pLastSelected = &*(it->begin());
+                            }
+                            else
+                            {
+                                m_rTree.action( &*it );
+                            }
+                        }
+                        else
+                        {
+                            it->m_expanded = true;
+                            bChangedPosition = true;
+                        }
+                    }
+                }
+                else if( key == KEY_LEFT )
+                {
+                    // Go up one level (and close node)
+                    if( &*it == m_pLastSelected )
+                    {
+                        if( it->m_expanded && it->size() )
+                        {
+                            it->m_expanded = false;
+                            bChangedPosition = true;
+                        }
+                        else
+                        {
+                            if( it->parent() && it->parent() != &m_rTree)
+                            {
+                                it->m_selected = false;
+                                m_pLastSelected = it->parent();
+                                m_pLastSelected->m_selected = true;
+                            }
+                        }
+                    }
+                }
+                else if( key == KEY_ENTER || key == ' ' )
+                {
+                    // Go up one level (and close node)
+                    if( &*it == m_pLastSelected )
+                    {
+                        m_rTree.action( &*it );
+                    }
+                }
+            }
+            if( needShow )
+                ensureVisible( toShow );
+            // Redraw the control
+            makeImage();
+            notifyLayout();
         }
         else
         {
@@ -336,122 +458,8 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             EvtKey& rEvtKey = (EvtKey&)rEvent;
             var_SetInteger( getIntf()->p_libvlc, "key-pressed",
                             rEvtKey.getModKey() );
-            return;
         }
 
-
-        for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
-             it != m_rTree.end();
-             it = m_flat ? m_rTree.getNextLeaf( it )
-                         : m_rTree.getNextVisibleItem( it ) )
-        {
-            VarTree::Iterator next = m_flat ? m_rTree.getNextLeaf( it )
-                                            : m_rTree.getNextVisibleItem( it );
-            if( key == KEY_UP )
-            {
-                // Scroll up one item
-                if( ( it->parent()
-                      && it != it->parent()->begin() )
-                    || &*it != m_pLastSelected )
-                {
-                    bool nextWasSelected = ( &*next == m_pLastSelected );
-                    it->m_selected = nextWasSelected;
-                    if( nextWasSelected )
-                    {
-                        m_pLastSelected = &*it;
-                        needShow = true; toShow = it;
-                    }
-                }
-            }
-            else if( key == KEY_DOWN )
-            {
-                // Scroll down one item
-                if( ( it->parent()
-                      && next != it->parent()->end() )
-                    || &*it != m_pLastSelected )
-                {
-                    (*it).m_selected = previousWasSelected;
-                }
-                if( previousWasSelected )
-                {
-                    m_pLastSelected = &*it;
-                    needShow = true; toShow = it;
-                    previousWasSelected = false;
-                }
-                else
-                {
-                    previousWasSelected = ( &*it == m_pLastSelected );
-                }
-
-                // Fix last tree item selection
-                if( ( m_flat ? m_rTree.getNextLeaf( it )
-                    : m_rTree.getNextVisibleItem( it ) ) == m_rTree.end()
-                 && &*it == m_pLastSelected )
-                {
-                    (*it).m_selected = true;
-                }
-            }
-            else if( key == KEY_RIGHT )
-            {
-                // Go down one level (and expand node)
-                if( &*it == m_pLastSelected )
-                {
-                    if( it->m_expanded )
-                    {
-                        if( it->size() )
-                        {
-                            it->m_selected = false;
-                            it->begin()->m_selected = true;
-                            m_pLastSelected = &*(it->begin());
-                        }
-                        else
-                        {
-                            m_rTree.action( &*it );
-                        }
-                    }
-                    else
-                    {
-                        it->m_expanded = true;
-                        bChangedPosition = true;
-                    }
-                }
-            }
-            else if( key == KEY_LEFT )
-            {
-                // Go up one level (and close node)
-                if( &*it == m_pLastSelected )
-                {
-                    if( it->m_expanded && it->size() )
-                    {
-                        it->m_expanded = false;
-                        bChangedPosition = true;
-                    }
-                    else
-                    {
-                        if( it->parent() && it->parent() != &m_rTree)
-                        {
-                            it->m_selected = false;
-                            m_pLastSelected = it->parent();
-                            m_pLastSelected->m_selected = true;
-                        }
-                    }
-                }
-            }
-            else if( key == KEY_ENTER || key == ' ' )
-            {
-                // Go up one level (and close node)
-                if( &*it == m_pLastSelected )
-                {
-                    m_rTree.action( &*it );
-                }
-            }
-        }
-        if( needShow )
-            ensureVisible( toShow );
-
-        // Redraw the control
-        makeImage();
-        notifyLayout();
     }
 
     else if( rEvent.getAsString().find( "mouse:left" ) != string::npos )
