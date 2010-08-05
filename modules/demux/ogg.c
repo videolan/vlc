@@ -42,6 +42,7 @@
 #include "xiph.h"
 #include "vorbis.h"
 #include "kate_categories.h"
+#include "ogg.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -63,72 +64,6 @@ vlc_module_end ()
 /*****************************************************************************
  * Definitions of structures and functions used by this plugins
  *****************************************************************************/
-typedef struct logical_stream_s
-{
-    ogg_stream_state os;                        /* logical stream of packets */
-
-    es_format_t      fmt;
-    es_format_t      fmt_old;                  /* format of old ES is reused */
-    es_out_id_t      *p_es;
-    double           f_rate;
-
-    int              i_serial_no;
-
-    /* the header of some logical streams (eg vorbis) contain essential
-     * data for the decoder. We back them up here in case we need to re-feed
-     * them to the decoder. */
-    int              b_force_backup;
-    int              i_packets_backup;
-    void             *p_headers;
-    int              i_headers;
-
-    /* program clock reference (in units of 90kHz) derived from the previous
-     * granulepos */
-    mtime_t          i_pcr;
-    mtime_t          i_interpolated_pcr;
-    mtime_t          i_previous_pcr;
-
-    /* Misc */
-    bool b_reinit;
-    int i_granule_shift;
-
-    /* offset of first keyframe for theora; can be 0 or 1 depending on version number */
-    int64_t i_keyframe_offset;
-
-    /* kate streams have the number of headers in the ID header */
-    int i_kate_num_headers;
-
-    /* for Annodex logical bitstreams */
-    int i_secondary_header_packets;
-
-} logical_stream_t;
-
-struct demux_sys_t
-{
-    ogg_sync_state oy;        /* sync and verify incoming physical bitstream */
-
-    int i_streams;                           /* number of logical bitstreams */
-    logical_stream_t **pp_stream;  /* pointer to an array of logical streams */
-
-    logical_stream_t *p_old_stream; /* pointer to a old logical stream to avoid recreating it */
-
-    /* program clock reference (in units of 90kHz) derived from the pcr of
-     * the sub-streams */
-    mtime_t i_pcr;
-
-    /* stream state */
-    int     i_bos;
-    int     i_eos;
-
-    /* bitrate */
-    int     i_bitrate;
-
-    /* after reading all headers, the first data page is stuffed into the relevant stream, ready to use */
-    bool    b_page_waiting;
-
-    /* */
-    vlc_meta_t *p_meta;
-};
 
 /* OggDS headers for the new header format (used in ogm files) */
 typedef struct
