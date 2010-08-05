@@ -42,10 +42,7 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
         if( m_pXML )
             LoadCatalog();
         else
-        {
             msg_Err( getIntf(), "DTD not supported" );
-            useDTD = false;
-        }
     }
     else
         m_pXML = NULL;
@@ -69,7 +66,8 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
         return;
     }
 
-    xml_ReaderUseDTD( m_pReader, useDTD );
+    if( m_pXML )
+        xml_ReaderUseDTD( m_pReader );
 }
 
 

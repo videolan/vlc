@@ -66,7 +66,7 @@ static char *ReaderName( xml_reader_t * );
 static char *ReaderValue( xml_reader_t * );
 static int ReaderNextAttr( xml_reader_t * );
 
-static int ReaderUseDTD ( xml_reader_t *, bool );
+static int ReaderUseDTD ( xml_reader_t * );
 
 static void CatalogLoad( xml_t *, const char * );
 static void CatalogAdd( xml_t *, const char *, const char *, const char * );
@@ -187,13 +187,13 @@ static void ReaderClose( vlc_object_t *p_this )
     xmlFreeTextReader( (void *)p_reader->p_sys );
 }
 
-static int ReaderUseDTD ( xml_reader_t *p_reader, bool b_use )
+static int ReaderUseDTD ( xml_reader_t *p_reader )
 {
     /* Activate DTD validation */
     xmlTextReaderSetParserProp( (void *)p_reader->p_sys,
-                                XML_PARSER_DEFAULTATTRS, b_use );
+                                XML_PARSER_DEFAULTATTRS, true );
     xmlTextReaderSetParserProp( (void *)p_reader->p_sys,
-                                XML_PARSER_VALIDATE, b_use );
+                                XML_PARSER_VALIDATE, true );
 
     return VLC_SUCCESS;
 }

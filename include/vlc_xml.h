@@ -76,7 +76,7 @@ struct xml_reader_t
     char * (*pf_value) ( xml_reader_t * );
     int (*pf_next_attr) ( xml_reader_t * );
 
-    int (*pf_use_dtd) ( xml_reader_t *, bool );
+    int (*pf_use_dtd) ( xml_reader_t * );
 };
 
 VLC_EXPORT( xml_reader_t *, xml_ReaderCreate, (vlc_object_t *, stream_t *) LIBVLC_USED );
@@ -109,9 +109,9 @@ static inline int xml_ReaderNextAttr( xml_reader_t *reader )
   return reader->pf_next_attr( reader );
 }
 
-static inline int xml_ReaderUseDTD( xml_reader_t *reader, bool use )
+static inline int xml_ReaderUseDTD( xml_reader_t *reader )
 {
-  return reader->pf_use_dtd( reader, use );
+  return reader->pf_use_dtd( reader );
 }
 
 enum {

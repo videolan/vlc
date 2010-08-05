@@ -106,7 +106,7 @@ static char *ReaderName( xml_reader_t * );
 static char *ReaderValue( xml_reader_t * );
 static int ReaderNextAttr( xml_reader_t * );
 
-static int ReaderUseDTD ( xml_reader_t *, bool );
+static int ReaderUseDTD ( xml_reader_t * );
 
 static XTag *xtag_new_parse( const char *, int );
 static char *xtag_get_name( XTag * );
@@ -190,9 +190,9 @@ static void ReaderClose( vlc_object_t *p_this )
     free( p_reader->p_sys );
 }
 
-static int ReaderUseDTD ( xml_reader_t *p_reader, bool b_use )
+static int ReaderUseDTD ( xml_reader_t *p_reader )
 {
-    VLC_UNUSED(p_reader); VLC_UNUSED(b_use);
+    VLC_UNUSED(p_reader);
     return VLC_EGENERIC;
 }
 
