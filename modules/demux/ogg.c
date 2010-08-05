@@ -92,6 +92,9 @@ typedef struct logical_stream_s
     bool b_reinit;
     int i_granule_shift;
 
+    /* offset of first keyframe for theora; can be 0 or 1 depending on version number */
+    int64_t i_keyframe_offset;
+
     /* kate streams have the number of headers in the ID header */
     int i_kate_num_headers;
 
@@ -549,8 +552,8 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
             ogg_int64_t pframe = p_oggpacket->granulepos -
               ( iframe << p_stream->i_granule_shift );
 
-            p_stream->i_pcr = ( iframe + pframe ) * INT64_C(1000000)
-                              / p_stream->f_rate;
+            p_stream->i_pcr = ( iframe + pframe - p_stream->i_keyframe_offset )
+	      * INT64_C(1000000) / p_stream->f_rate;
         }
         else if( p_stream->fmt.i_codec == VLC_CODEC_DIRAC )
         {
@@ -673,7 +676,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             p_stream->p_headers = realloc( p_stream->p_headers, p_stream->i_headers );
             if( p_stream->p_headers )
             {
-                memcpy( p_stream->p_headers + p_stream->i_headers - p_oggpacket->bytes,
+                memcpy( (unsigned char *)p_stream->p_headers + p_stream->i_headers - p_oggpacket->bytes,
                         p_oggpacket->packet, p_stream->i_headers );
             }
             else
@@ -925,6 +928,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 p_stream->p_headers = 0;
                 p_stream->i_secondary_header_packets = 0;
 
+                p_stream->i_keyframe_offset = 0;
+
                 es_format_Init( &p_stream->fmt, 0, 0 );
                 es_format_Init( &p_stream->fmt_old, 0, 0 );
 
@@ -1006,11 +1011,13 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                              p_stream->fmt.i_bitrate, p_stream->f_rate );
                 }
                 /* Check for Dirac header */
-                else if( oggpacket.bytes >= 5 &&
-                         ! memcmp( oggpacket.packet, "BBCD\x00", 5 ) )
-                {
-                    if( Ogg_ReadDiracHeader( p_stream, &oggpacket ) )
-                        msg_Dbg( p_demux, "found dirac header" );
+                else if( ( oggpacket.bytes >= 5 &&
+			   ! memcmp( oggpacket.packet, "BBCD\x00", 5 ) ) ||
+			 ( oggpacket.bytes >= 9 &&
+			   ! memcmp( oggpacket.packet, "KW-DIRAC\x00", 9 ) ) )
+		{
+		    if( Ogg_ReadDiracHeader( p_stream, &oggpacket ) )
+		        msg_Dbg( p_demux, "found dirac header" );
                     else
                     {
                         msg_Warn( p_demux, "found dirac header isn't decodable" );
@@ -1571,6 +1578,10 @@ static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     int i_fps_numerator;
     int i_fps_denominator;
     int i_keyframe_frequency_force;
+    int i_major;
+    int i_minor;
+    int i_subminor;
+    int i_version;
 
     p_stream->fmt.i_cat = VIDEO_ES;
     p_stream->fmt.i_codec = VLC_CODEC_THEORA;
@@ -1583,9 +1594,11 @@ static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     /* Cheat and get additionnal info ;) */
     bs_init( &bitstream, p_oggpacket->packet, p_oggpacket->bytes );
     bs_skip( &bitstream, 56 );
-    bs_read( &bitstream, 8 ); /* major version num */
-    bs_read( &bitstream, 8 ); /* minor version num */
-    bs_read( &bitstream, 8 ); /* subminor version num */
+
+    i_major = bs_read( &bitstream, 8 ); /* major version num */
+    i_minor = bs_read( &bitstream, 8 ); /* minor version num */
+    i_subminor = bs_read( &bitstream, 8 ); /* subminor version num */
+
     bs_read( &bitstream, 16 ) /*<< 4*/; /* width */
     bs_read( &bitstream, 16 ) /*<< 4*/; /* height */
     bs_read( &bitstream, 24 ); /* frame width */
@@ -1614,6 +1627,14 @@ static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     {
         p_stream->i_granule_shift++;
         i_keyframe_frequency_force >>= 1;
+    }
+
+    i_version = i_major * 1000000 + i_minor * 1000 + i_subminor;
+    p_stream->i_keyframe_offset = 0;
+
+    if ( i_version >= 3002001 )
+    {
+        p_stream->i_keyframe_offset = 1;
     }
 
     p_stream->f_rate = ((float)i_fps_numerator) / i_fps_denominator;
