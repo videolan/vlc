@@ -608,29 +608,25 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         m_rTree.getPositionVar().set( percentage );
     }
 
-    /* We changed the nodes, let's fix teh position var */
+    /* We changed the nodes, let's fix the position var */
     if( bChangedPosition )
     {
         VarTree::Iterator it;
-        int i = 0;
         int iFirst = 0;
         for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
              it != m_rTree.end();
              it = m_flat ? m_rTree.getNextLeaf( it )
                          : m_rTree.getNextVisibleItem( it ) )
         {
-            i++;
             if( it == m_firstPos )
-            {
-                iFirst = i;
                 break;
-            }
+            iFirst++;
         }
-        iFirst += maxItems();
-        if( iFirst >= (m_flat ? m_rTree.countLeafs() : m_rTree.visibleItems()) )
-            iFirst = m_flat ? m_rTree.countLeafs() : m_rTree.visibleItems();
-        float f_new = (float)iFirst / (float)( m_flat ? m_rTree.countLeafs()
-                                                      :m_rTree.visibleItems() );
+
+        int indexMax = ( m_flat ? m_rTree.countLeafs()
+                                : m_rTree.visibleItems() ) - 1;
+        float f_new = (float)iFirst / (float)indexMax;
+
         m_dontMove = true;
         m_rTree.getPositionVar().set( 1.0 - f_new );
         m_dontMove = false;
