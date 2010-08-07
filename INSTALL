@@ -14,14 +14,14 @@ Configuring VLC
 
 A typical way to configure VLC is:
 
-   ./configure --prefix=/usr
+   ./configure
 
 See `./configure --help' for more information.
 
 If you intend to debug stuff, you may want to compile with debugging
 symbols:
 
-   make distclean ; ./configure --prefix=/usr --enable-debug
+   make distclean ; ./configure --enable-debug
 
 We recommend using GCC to build VLC, though some people reported success
 with the Intel C compiler (version 8) as well. GCC version 3.3 or higher is
