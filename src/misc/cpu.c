@@ -49,6 +49,12 @@
 #include <sys/sysctl.h>
 #endif
 
+#if defined(__OpenBSD__) && defined(__powerpc__)
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#include <machine/cpu.h>
+#endif
+
 #if defined(__SunOS)
 #include <unistd.h>
 #include <sys/types.h>
@@ -266,8 +272,12 @@ out:
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __powerpc64__ ) \
     || defined( __ppc64__ )
 
-#   if defined(__APPLE__)
+#   if defined(__APPLE__) || defined(__OpenBSD__)
+#   if defined(__OpenBSD__)
+    int selectors[2] = { CTL_MACHDEP, CPU_ALTIVEC };
+#   else
     int selectors[2] = { CTL_HW, HW_VECTORUNIT };
+#   endif
     int i_has_altivec = 0;
     size_t i_length = sizeof( i_has_altivec );
     int i_error = sysctl( selectors, 2, &i_has_altivec, &i_length, NULL, 0);
