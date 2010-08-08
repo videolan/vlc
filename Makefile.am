@@ -110,7 +110,7 @@ AUTOMAKE_OPTIONS = \
 	1.11 \
 	-Wall \
 	check-news \
-	dist-bzip2 \
+	dist-xz \
 	no-dist-gzip
 #	std-options
 
