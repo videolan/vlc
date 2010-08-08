@@ -242,15 +242,8 @@ out:
     for (int i = 1; i < argc; i++)
         LocaleFree (argv[i]);
 
-#ifdef RTLD_NOLOAD
-    /* Avoid crash in KIO scheduler cleanup. */
-    /* This is ugly, but we get way too many crash reports due to this. */
-    if (dlopen ("libkio.so.5", RTLD_LAZY|RTLD_LOCAL|RTLD_NOLOAD) != NULL)
-    {
-        fprintf (stderr, "KIO present. Unclean shutdown!\n"
-           " (see http://bugs.kde.org/show_bug.cgi?id=234484 for details)\n");
-        _exit (0);
-    }
-#endif
-    return 0;
+    /* Do not run exit handlers. Some of them are buggy (e.g. KDE IO scheduler)
+     * and crash. Also some will crash because their library may be already
+     * unloaded (dlclose()). */
+    _exit (0);
 }
