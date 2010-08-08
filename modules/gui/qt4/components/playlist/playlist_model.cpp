@@ -911,6 +911,9 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
         return false;
     }
 
+    input_item_t *p_input = p_item->p_input;
+    vlc_gc_incref( p_input );
+
     i_popup_item = index.isValid() ? p_item->i_id : -1;
     i_popup_parent = index.isValid() ?
         ( p_item->p_parent ? p_item->p_parent->i_id : -1 ) :
@@ -932,8 +935,9 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
                         qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
         menu.addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
         menu.addAction( QIcon( ":/menu/info" ), qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
-        menu.addAction( QIcon( ":/type/folder-grey" ),
-                        qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
+        if( !strncasecmp( p_input->psz_uri, "file://", 7 ) )
+            menu.addAction( QIcon( ":/type/folder-grey" ),
+                            qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
         menu.addSeparator();
     }
     if( canEdit() )
@@ -980,6 +984,8 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
         }
         menu.addMenu( sortingMenu );
     }
+    vlc_gc_decref( p_input );
+
     if( !menu.isEmpty() )
     {
         menu.exec( point ); return true;
