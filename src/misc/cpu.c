@@ -49,7 +49,7 @@
 #include <sys/sysctl.h>
 #endif
 
-#if defined(__OpenBSD__) && defined(__powerpc__)
+#if defined(__OpenBSD__)
 #include <sys/param.h>
 #include <sys/sysctl.h>
 #include <machine/cpu.h>
@@ -366,6 +366,13 @@ unsigned vlc_GetCPUCount(void)
     int count;
     size_t size = sizeof(count) ;
     if (sysctlbyname("hw.ncpu", &count, &size, NULL, 0))
+        return 1; /* Failure */
+    return count;
+#elif defined(__OpenBSD__)
+    int selectors[2] = { CTL_HW, HW_NCPU };
+    int count;
+    size_t size = sizeof(count) ;
+    if (sysctl(selectors, 2, &count, &size, NULL, 0))
         return 1; /* Failure */
     return count;
 #elif defined(__SunOS)
