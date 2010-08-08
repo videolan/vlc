@@ -1129,17 +1129,17 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *pkt, int i_pkt )
     demux_sys_t *p_sys = p_demux->p_sys;
     const uint8_t     *p = pkt;
 
-    while( p < &pkt[i_pkt] )
+    while( (p - pkt) <= (i_pkt - 6) )
     {
+        /* ps_pkt_size() needs at least 6 bytes */
         int i_size = ps_pkt_size( p, &pkt[i_pkt] - p );
-        block_t *p_pkt;
         if( i_size <= 0 )
         {
             break;
         }
 
         /* Create a block */
-        p_pkt = block_New( p_demux, i_size );
+        block_t *p_pkt = block_New( p_demux, i_size );
         memcpy( p_pkt->p_buffer, p, i_size);
 
         /* Parse it and send it */
