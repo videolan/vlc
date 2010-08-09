@@ -122,7 +122,7 @@ static char *ArtCachePath( input_item_t *p_item )
     psz_album = vlc_meta_Get( p_item->p_meta, vlc_meta_Album );
     psz_arturl = vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL );
 
-    if( (!psz_artist || !psz_album ) && !psz_arturl )
+    if( (EMPTY_STR(psz_artist) || EMPTY_STR(psz_album) ) && !psz_arturl )
         goto end;
 
     psz_path = ArtCacheGetDirPath( psz_arturl, psz_artist, psz_album );
