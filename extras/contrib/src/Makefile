@@ -1211,10 +1211,10 @@ DISTCLEAN_PKG += libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
 # libdvbpsi
 # ***************************************************************************
 
-libdvbpsi5-$(LIBDVBPSI_VERSION).tar.gz:
+libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz:
 	$(WGET) $(LIBDVBPSI_URL)
 
-libdvbpsi: libdvbpsi5-$(LIBDVBPSI_VERSION).tar.gz
+libdvbpsi: libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .dvbpsi: libdvbpsi
@@ -1224,7 +1224,7 @@ libdvbpsi: libdvbpsi5-$(LIBDVBPSI_VERSION).tar.gz
 
 CLEAN_FILE += .dvbpsi
 CLEAN_PKG += libdvbpsi
-DISTCLEAN_PKG += libdvbpsi5-$(LIBDVBPSI_VERSION).tar.gz
+DISTCLEAN_PKG += libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz
 
 # ***************************************************************************
 # live
