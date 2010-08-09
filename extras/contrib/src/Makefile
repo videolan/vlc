@@ -884,6 +884,53 @@ CLEAN_FILE += .faad
 CLEAN_PKG += faad2
 DISTCLEAN_PKG += faad2-$(FAAD2_VERSION).tar.gz
 
+# ***************************************************************************
+# libebml
+# ***************************************************************************
+
+libebml-$(LIBEBML_VERSION).tar.bz2:
+	$(WGET) $(LIBEBML_URL)
+
+libebml: libebml-$(LIBEBML_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.ebml: libebml
+ifdef HAVE_WIN32
+	(cd $<; make -C make/mingw32 prefix=$(PREFIX) $(HOSTCC) SHARED=no && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC))
+else
+	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
+	$(RANLIB) $(PREFIX)/lib/libebml.a
+endif
+	touch $@
+
+CLEAN_FILE += .ebml
+CLEAN_PKG += libebml
+DISTCLEAN_PKG += libebml-$(LIBEBML_VERSION).tar.bz2
+
+# ***************************************************************************
+# libmatroska
+# ***************************************************************************
+
+libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
+	$(WGET) $(LIBMATROSKA_URL)
+
+libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.matroska: libmatroska .ebml
+ifdef HAVE_WIN32
+	(cd $<; make -C make/mingw32 prefix=$(PREFIX) $(HOSTCC) SHARED=no EBML_DLL=no libmatroska.a && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC))
+else
+	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
+	$(RANLIB) $(PREFIX)/lib/libmatroska.a
+endif
+	touch $@
+
+
+CLEAN_FILE += .matroska
+CLEAN_PKG += libmatroska
+DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
+
 
 # ***************************************************************************
 # libvp8
@@ -946,52 +993,6 @@ CLEAN_FILE += .lame
 CLEAN_PKG += lame
 DISTCLEAN_PKG += lame-$(LAME_VERSION).tar.gz
 
-# ***************************************************************************
-# libebml
-# ***************************************************************************
-
-libebml-$(LIBEBML_VERSION).tar.bz2:
-	$(WGET) $(LIBEBML_URL)
-
-libebml: libebml-$(LIBEBML_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
-
-.ebml: libebml
-ifdef HAVE_WIN32
-	(cd $<; make -C make/mingw32 prefix=$(PREFIX) $(HOSTCC) SHARED=no && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC))
-else
-	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
-	$(RANLIB) $(PREFIX)/lib/libebml.a
-endif
-	touch $@
-
-CLEAN_FILE += .ebml
-CLEAN_PKG += libebml
-DISTCLEAN_PKG += libebml-$(LIBEBML_VERSION).tar.bz2
-
-# ***************************************************************************
-# libmatroska
-# ***************************************************************************
-
-libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
-	$(WGET) $(LIBMATROSKA_URL)
-
-libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
-
-.matroska: libmatroska .ebml
-ifdef HAVE_WIN32
-	(cd $<; make -C make/mingw32 prefix=$(PREFIX) $(HOSTCC) SHARED=no EBML_DLL=no libmatroska.a && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC))
-else
-	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
-	$(RANLIB) $(PREFIX)/lib/libmatroska.a
-endif
-	touch $@
-
-
-CLEAN_FILE += .matroska
-CLEAN_PKG += libmatroska
-DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 
 # ***************************************************************************
 # libamrnb
@@ -1142,15 +1143,6 @@ libdvdcss: libdvdcss-$(LIBDVDCSS_VERSION).tar.bz2
 CLEAN_FILE += .dvdcss
 CLEAN_PKG += libdvdcss
 DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.bz2
-
-# ***************************************************************************
-# dummy dvdread to trigger the INSTALL_NAME script
-# ***************************************************************************
-# .dvdread: .dvdnav
-# 	$(INSTALL_NAME)
-# 	touch $@
-#
-# CLEAN_FILE += .dvdread
 
 # ***************************************************************************
 # libdvdread: We use dvdnav's dvdread
@@ -1420,10 +1412,6 @@ libmodplug-$(MODPLUG_VERSION).tar.gz:
 
 libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_WIN32
-	patch -p0 < Patches/libmodplug-win32.patch
-	(cd $@; autoreconf -ivf )
-endif
 
 .mod: libmodplug
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
