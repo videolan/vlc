@@ -2468,15 +2468,15 @@ DISTCLEAN_PKG += glew-$(GLEW_VERSION)-src.tgz
 # ***************************************************************************
 # projectM
 # ***************************************************************************
-libprojectM-$(LIBPROJECTM_VERSION)-Source.tar.gz:
+projectM-$(LIBPROJECTM_VERSION)-Source.tar.gz:
 	$(WGET) $(LIBPROJECTM_URL)
 
-libprojectM: libprojectM-$(LIBPROJECTM_VERSION)-Source.tar.gz
+libprojectM: projectM-$(LIBPROJECTM_VERSION)-Source.tar.gz
 	rm -rf $@ || true
 	gunzip -c $< | tar xf - --exclude='[*?:<>\|]'
 	mv projectM-$(LIBPROJECTM_VERSION)-Source $@ || true
 	patch -p0 < Patches/libprojectM-win32.patch
-	cd $@; rm CMakeCache.txt
+	-cd $@; rm CMakeCache.txt
 
 .libprojectM: libprojectM .glew
 	(cd $<; $(HOSTCC) CPPFLAGS="$(CPPFLAGS)" cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DINCLUDE-PROJECTM-LIBVISUAL:BOOL=OFF -DDISABLE_NATIVE_PRESETS:BOOL=ON -DUSE_FTGL:BOOL=OFF -DINCLUDE-PROJECTM-PULSEAUDIO:BOOL=OFF -DINCLUDE-PROJECTM-QT:BOOL=OFF -DBUILD_PROJECTM_STATIC:BOOL=ON -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make install)
