@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dshow.cpp : DirectShow access module for vlc
+ * dshow.cpp : DirectShow access and access_demux module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2004, 2006, 2008, 2010 the VideoLAN team
  * $Id$
@@ -36,11 +36,11 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_input.h>
 #include <vlc_access.h>
 #include <vlc_demux.h>
-#include <vlc_dialog.h>
-#include <vlc_charset.h>
+
+#include <vlc_dialog.h>      /* dialog_Fatal */
+#include <vlc_charset.h>     /* FromWide */
 
 #include "common.h"
 #include "filter.h"
@@ -80,21 +80,49 @@ static void ConfigTuner( vlc_object_t *, ICaptureGraphBuilder2 *,
  *****************************************************************************/
 static const char *const ppsz_vdev[] = { "", "none" };
 static const char *const ppsz_vdev_text[] = { N_("Default"), N_("None") };
+
 static const char *const ppsz_adev[] = { "", "none" };
 static const char *const ppsz_adev_text[] = { N_("Default"), N_("None") };
+
 static const int pi_tuner_input[] = { 0, 1, 2 };
 static const char *const ppsz_tuner_input_text[] =
     {N_("Default"), N_("Cable"), N_("Antenna")};
+
 static const int pi_amtuner_mode[]  = { AMTUNER_MODE_DEFAULT,
-                                 AMTUNER_MODE_TV,
-                                 AMTUNER_MODE_FM_RADIO,
-                                 AMTUNER_MODE_AM_RADIO,
-                                 AMTUNER_MODE_DSS };
+                                        AMTUNER_MODE_TV,
+                                        AMTUNER_MODE_FM_RADIO,
+                                        AMTUNER_MODE_AM_RADIO,
+                                        AMTUNER_MODE_DSS };
 static const char *const ppsz_amtuner_mode_text[] = { N_("Default"),
                                           N_("TV"),
                                           N_("FM radio"),
                                           N_("AM radio"),
                                           N_("DSS") };
+
+static const int i_standards_list[] =
+    {
+        KS_AnalogVideo_None,
+        KS_AnalogVideo_NTSC_M, KS_AnalogVideo_NTSC_M_J, KS_AnalogVideo_NTSC_433,
+        KS_AnalogVideo_PAL_B, KS_AnalogVideo_PAL_D, KS_AnalogVideo_PAL_G,
+        KS_AnalogVideo_PAL_H, KS_AnalogVideo_PAL_I, KS_AnalogVideo_PAL_M,
+        KS_AnalogVideo_PAL_N, KS_AnalogVideo_PAL_60,
+        KS_AnalogVideo_SECAM_B, KS_AnalogVideo_SECAM_D, KS_AnalogVideo_SECAM_G,
+        KS_AnalogVideo_SECAM_H, KS_AnalogVideo_SECAM_K, KS_AnalogVideo_SECAM_K1,
+        KS_AnalogVideo_SECAM_L, KS_AnalogVideo_SECAM_L1,
+        KS_AnalogVideo_PAL_N_COMBO
+    };
+static const char *const ppsz_standards_list_text[] =
+    {
+        N_("Default"),
+        "NTSC_M", "NTSC_M_J", "NTSC_443",
+        "PAL_B", "PAL_D", "PAL_G",
+        "PAL_H", "PAL_I", "PAL_M",
+        "PAL_N", "PAL_60",
+        "SECAM_B", "SECAM_D", "SECAM_G",
+        "SECAM_H", "SECAM_K", "SECAM_K1",
+        "SECAM_L", "SECAM_L1",
+        "PAL_N_COMBO"
+    };
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
@@ -179,31 +207,6 @@ static const char *const ppsz_amtuner_mode_text[] = { N_("Default"),
 #define AUDIO_BITSPERSAMPLE_TEXT N_("Audio bits per sample")
 #define AUDIO_BITSPERSAMPLE_LONGTEXT N_( \
     "Select audio input format with the given bits/sample (if non 0)" )
-
-static const int i_standards_list[] =
-    {
-        KS_AnalogVideo_None,
-        KS_AnalogVideo_NTSC_M, KS_AnalogVideo_NTSC_M_J, KS_AnalogVideo_NTSC_433,
-        KS_AnalogVideo_PAL_B, KS_AnalogVideo_PAL_D, KS_AnalogVideo_PAL_G,
-        KS_AnalogVideo_PAL_H, KS_AnalogVideo_PAL_I, KS_AnalogVideo_PAL_M,
-        KS_AnalogVideo_PAL_N, KS_AnalogVideo_PAL_60,
-        KS_AnalogVideo_SECAM_B, KS_AnalogVideo_SECAM_D, KS_AnalogVideo_SECAM_G,
-        KS_AnalogVideo_SECAM_H, KS_AnalogVideo_SECAM_K, KS_AnalogVideo_SECAM_K1,
-        KS_AnalogVideo_SECAM_L, KS_AnalogVideo_SECAM_L1,
-        KS_AnalogVideo_PAL_N_COMBO
-    };
-static const char *const ppsz_standards_list_text[] =
-    {
-        N_("Default"),
-        "NTSC_M", "NTSC_M_J", "NTSC_443",
-        "PAL_B", "PAL_D", "PAL_G",
-        "PAL_H", "PAL_I", "PAL_M",
-        "PAL_N", "PAL_60",
-        "SECAM_B", "SECAM_D", "SECAM_G",
-        "SECAM_H", "SECAM_K", "SECAM_K1",
-        "SECAM_L", "SECAM_L1",
-        "PAL_N_COMBO"
-    };
 
 static int  CommonOpen ( vlc_object_t *, access_sys_t *, bool );
 static void CommonClose( vlc_object_t *, access_sys_t * );
@@ -385,7 +388,6 @@ static void DeleteDirectShowGraph( access_sys_t *p_sys )
 static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
                        bool b_access_demux )
 {
-    int i;
     char *psz_val;
 
     /* Get/parse options and open device(s) */
@@ -424,15 +426,25 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     }
     free( psz_val );
 
-    static struct {const char *psz_size; int  i_width; int  i_height;} size_table[] =
-    { { "subqcif", 128, 96 }, { "qsif", 160, 120 }, { "qcif", 176, 144 },
-      { "sif", 320, 240 }, { "cif", 352, 288 }, { "d1", 640, 480 },
+    /* DShow Size */
+    static struct {
+        const char *psz_size;
+        int  i_width;
+        int  i_height;
+    } size_table[] =
+    { { "subqcif", 128, 96  },
+      {    "qsif", 160, 120 },
+      {    "qcif", 176, 144 },
+      {     "sif", 320, 240 },
+      {     "cif", 352, 288 },
+      {      "d1", 640, 480 },
       { 0, 0, 0 },
     };
 
     psz_val = var_CreateGetString( p_this, "dshow-size" );
     if( !EMPTY_STR(psz_val) )
     {
+        int i;
         for( i = 0; size_table[i].psz_size; i++ )
         {
             if( !strcmp( psz_val, size_table[i].psz_size ) )
@@ -455,6 +467,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     }
     free( psz_val );
 
+    /* Chroma */
     psz_val = var_CreateGetString( p_this, "dshow-chroma" );
     i_chroma = vlc_fourcc_GetCodecFromString( UNKNOWN_ES, psz_val );
     p_sys->b_chroma = i_chroma != 0;
@@ -582,7 +595,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
         return VLC_EGENERIC ;
     }
 
-    for( i = p_sys->i_crossbar_route_depth-1; i >= 0 ; --i )
+    for( int i = p_sys->i_crossbar_route_depth-1; i >= 0 ; --i )
     {
         int i_val = var_GetInteger( p_this, "dshow-video-input" );
         if( i_val >= 0 )
@@ -630,7 +643,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     */
     if( var_GetBool( p_this, "dshow-config" ) )
     {
-        for( i = p_sys->i_crossbar_route_depth-1; i >= 0 ; --i )
+        for( int i = p_sys->i_crossbar_route_depth-1; i >= 0 ; --i )
         {
             IAMCrossbar *pXbar = p_sys->crossbar_routes[i].pXbar;
             IBaseFilter *p_XF;
@@ -659,7 +672,6 @@ static int DemuxOpen( vlc_object_t *p_this )
 {
     demux_t      *p_demux = (demux_t *)p_this;
     access_sys_t *p_sys;
-    int i;
 
     p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) );
     if( !p_sys )
@@ -682,7 +694,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_demux->info.i_title = 0;
     p_demux->info.i_seekpoint = 0;
 
-    for( i = 0; i < p_sys->i_streams; i++ )
+    for( int i = 0; i < p_sys->i_streams; i++ )
     {
         dshow_stream_t *p_stream = p_sys->pp_streams[i];
         es_format_t fmt;
@@ -1304,8 +1316,8 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
     p_class_enum->Release();
 
     if( p_listdevices ) {
-    devicelist.sort();
-    *p_listdevices = devicelist;
+        devicelist.sort();
+        *p_listdevices = devicelist;
     }
     return NULL;
 }
@@ -1520,7 +1532,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                         continue;
                                     }
                                     pWfx->nSamplesPerSec = val;
- 
+
                                     val = i_bitspersample;
                                     if( ! val )
                                     {
@@ -1532,7 +1544,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
 
                                     if( (   !pASCC->BitsPerSampleGranularity
                                             && (unsigned int)val != pASCC->MinimumBitsPerSample
-                                            &&	(unsigned int)val != pASCC->MaximumBitsPerSample )
+                                            && (unsigned int)val != pASCC->MaximumBitsPerSample )
                                         ||
                                         (   pASCC->BitsPerSampleGranularity
                                             && ((val % pASCC->BitsPerSampleGranularity)
@@ -1707,7 +1719,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                         // return alternative media type
                         AM_MEDIA_TYPE mtr;
                         VIDEOINFOHEADER vh;
- 
+
                         mtr.majortype            = MEDIATYPE_Video;
                         mtr.subtype              = MEDIASUBTYPE_I420;
                         mtr.bFixedSizeSamples    = TRUE;
@@ -1716,9 +1728,9 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                         mtr.formattype           = FORMAT_VideoInfo;
                         mtr.cbFormat             = sizeof(vh);
                         mtr.pbFormat             = (BYTE *)&vh;
- 
+
                         memset(&vh, 0, sizeof(vh));
- 
+
                         vh.bmiHeader.biSize   = sizeof(vh.bmiHeader);
                         vh.bmiHeader.biWidth  = i_width > 0 ? i_width :
                             ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biWidth;
@@ -1730,7 +1742,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                         vh.bmiHeader.biSizeImage   = vh.bmiHeader.biWidth * 12 *
                             vh.bmiHeader.biHeight / 8;
                         mtr.lSampleSize            = vh.bmiHeader.biSizeImage;
- 
+
                         msg_Dbg( p_this, "EnumDeviceCaps: input pin media: using 'I420' in place of unsupported format 'HCW2'");
 
                         if( SUCCEEDED(CopyMediaType(mt+mt_count, &mtr)) )
@@ -1815,7 +1827,6 @@ static block_t *ReadCompressed( access_t *p_access )
 static int Demux( demux_t *p_demux )
 {
     access_sys_t *p_sys = (access_sys_t *)p_demux->p_sys;
-    int i_stream;
     int i_found_samples;
 
     i_found_samples = 0;
@@ -1824,7 +1835,7 @@ static int Demux( demux_t *p_demux )
     while ( !i_found_samples )
     {
         /* Try to grab samples from all streams */
-        for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+        for( int i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
         {
             dshow_stream_t *p_stream = p_sys->pp_streams[i_stream];
             if( p_stream->p_capture_filter &&
@@ -1848,7 +1859,7 @@ static int Demux( demux_t *p_demux )
 
     vlc_mutex_unlock( &p_sys->lock );
 
-    for ( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+    for ( int i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
         int i_samples;
         dshow_stream_t *p_stream = p_sys->pp_streams[i_stream];
