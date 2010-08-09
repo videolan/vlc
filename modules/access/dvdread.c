@@ -271,6 +271,11 @@ static void Close( vlc_object_t *p_this )
         }
     }
 
+    /* Free the array of titles */
+    for( int i = 0; i < p_sys->i_titles; i++ )
+        vlc_input_title_Delete( p_sys->titles[i] );
+    TAB_CLEAN( p_sys->i_title, p_sys->titles );
+
     /* Close libdvdread */
     if( p_sys->p_title ) DVDCloseFile( p_sys->p_title );
     if( p_sys->p_vts_file ) ifoClose( p_sys->p_vts_file );
