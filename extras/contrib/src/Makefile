@@ -1040,7 +1040,7 @@ ifdef SVN
 ifdef HAVE_WIN32
 ffmpeg: .dshow_headers
 else
-ffmpeg: 
+ffmpeg:
 endif
 	$(SVN) co $(FFMPEG_SVN) ffmpeg
 ifdef HAVE_ISA_THUMB
@@ -1053,6 +1053,9 @@ ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
 	patch -p0 < Patches/ffmpeg-svn-internal-define.patch
 	patch -p0 < Patches/ffmpeg-svn-libavformat.patch
+endif
+ifdef HAVE_WIN32
+	sed -i "s/std=c99/std=gnu99/" ffmpeg/configure
 endif
 else
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
@@ -1073,7 +1076,7 @@ FFMPEGCONF += \
 	--disable-ffplay \
 	--disable-devices \
 	--disable-protocols \
-	--disable-filters \
+	--disable-avfilter \
 	--disable-network
 ifdef HAVE_WIN64
 FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --disable-dxva2 --disable-bsfs 
@@ -1083,6 +1086,7 @@ FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --e
 else
 FFMPEGCONF += --enable-pthreads
 endif
+FFMPEG_CFLAGS += --std=gnu99
 endif
 
 ifdef HAVE_WINCE
@@ -1098,7 +1102,7 @@ else
 endif
 endif
 endif
-	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DHAVE_STDINT_H" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
+	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --extra-cflags="$(FFMPEG_CFLAGS) -DHAVE_STDINT_H" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
 	touch $@
 
 ifdef SVN
