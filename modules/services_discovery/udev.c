@@ -538,7 +538,7 @@ static char *disc_get_mrl (struct udev_device *dev)
     if (val && !strcmp (val, "blank"))
         return NULL; /* ignore empty drives and virgin recordable discs */
 
-    const char *scheme = "invalid";
+    const char *scheme = NULL;
     val = udev_device_get_property_value (dev,
                                           "ID_CDROM_MEDIA_TRACK_COUNT_AUDIO");
     if (val && atoi (val))
@@ -558,7 +558,7 @@ static char *disc_get_mrl (struct udev_device *dev)
 
     /* We didn't get any property that could tell we have optical disc
        that we can play */
-    if( !strcmp( scheme, "invalid" ) )
+    if (scheme == NULL)
         return NULL;
 
     val = udev_device_get_devnode (dev);
