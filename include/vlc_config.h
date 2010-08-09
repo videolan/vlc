@@ -80,8 +80,13 @@
 
 /* DVD and VCD devices */
 #if !defined( WIN32 ) && !defined( UNDER_CE )
+#if defined(__OpenBSD__)
+#   define CD_DEVICE      "/dev/cd0c"
+#   define DVD_DEVICE     "/dev/cd0c"
+#else
 #   define CD_DEVICE      "/dev/cdrom"
 #   define DVD_DEVICE     "/dev/dvd"
+#endif
 #else
 #   define CD_DEVICE      "D:"
 #   define DVD_DEVICE     NULL
