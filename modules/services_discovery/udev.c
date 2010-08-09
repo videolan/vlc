@@ -545,7 +545,7 @@ static char *disc_get_mrl (struct udev_device *dev)
         scheme = "cdda"; /* Audio CD rather than file system */
     val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_DVD");
     if (val && atoi (val))
-        scheme = "file";
+        scheme = "dvd";
 
     val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_BD");
     if (val && atoi (val))
