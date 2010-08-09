@@ -32,6 +32,10 @@
 # include "config.h"
 #endif
 
+#ifdef WIN32
+#include <io.h>
+#endif
+
 #include <vlc_common.h>
 #include <vlc_network.h>
 #include <vlc_url.h>
@@ -43,6 +47,7 @@
 #ifdef HAVE_POLL
 #include <poll.h>       /* poll structures and defines */
 #endif
+
 #include <sys/stat.h>
 
 #include<errno.h>
