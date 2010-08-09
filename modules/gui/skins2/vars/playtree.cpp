@@ -183,19 +183,23 @@ void Playtree::onUpdateCurrent( bool b_active )
 //  already removed it
 void Playtree::onDelete( int i_id )
 {
-    tree_update descr;
-    descr.i_id = i_id;
-    descr.i_type = 3;
     Iterator item = findById( i_id ) ;
     if( item != end() )
     {
         VarTree* parent = item->parent();
-        if( parent )
-            parent->removeChild( item );
 
+        item->m_deleted = true;
+
+        tree_update descr;
+        descr.i_id = i_id;
+        descr.i_type = 3;
         descr.b_visible = parent ? parent->m_expanded : true;
         notify( &descr );
+
+        if( parent )
+            parent->removeChild( item );
     }
+
 }
 
 void Playtree::onAppend( playlist_add_t *p_add )
