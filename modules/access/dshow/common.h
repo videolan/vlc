@@ -105,7 +105,7 @@ struct access_sys_t
 /*****************************************************************************
  * DirectShow GUIDs.
  *****************************************************************************/
-const GUID PROPSETID_TUNER = {0x6a2e0605, 0x28e4, 0x11d0, {0xa1, 0x8c, 0x00, 0xa0, 0xc9, 0x11, 0x89, 0x56}};
+static const GUID PROPSETID_TUNER = {0x6a2e0605, 0x28e4, 0x11d0, {0xa1, 0x8c, 0x00, 0xa0, 0xc9, 0x11, 0x89, 0x56}};
 
 /****************************************************************************
  * The following should be in ks.h and ksmedia.h, but since they are not in

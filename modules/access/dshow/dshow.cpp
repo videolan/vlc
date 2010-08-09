@@ -2326,6 +2326,7 @@ static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
         if (FAILED(hr))
         {
             msg_Dbg( p_this, "Couldn't QI for IKsPropertySet" );
+            p_TV->Release();
             return;
         }
 
@@ -2349,7 +2350,7 @@ static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
         else
         {
             msg_Dbg( p_this, "KSPROPERTY_TUNER_MODE_CAPS not supported!" );
-            return;
+            goto free_on_error;
         }
 
         msg_Dbg( p_this, "Frequency range supproted from %d to %d.", ModeCaps.MinFrequency, ModeCaps.MaxFrequency);
@@ -2378,13 +2379,13 @@ static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
                 if(FAILED(hr))
                 {
                     msg_Dbg( p_this, "Couldn't set KSPROPERTY_TUNER_FREQUENCY!" );
-                    return;
+                    goto free_on_error;
                 }
             }
             else
             {
                 msg_Dbg( p_this, "Requested frequency exceeds the supported range!" );
-                return;
+                goto free_on_error;
             }
         }
 
@@ -2401,15 +2402,16 @@ static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
                 if(FAILED(hr))
                 {
                     msg_Dbg( p_this, "Couldn't set KSPROPERTY_TUNER_STANDARD!" );
-                    return;
+                    goto free_on_error;
                 }
             }
             else
             {
                 msg_Dbg( p_this, "Requested video standard is not supported by the tuner!" );
-                return;
+                goto free_on_error;
             }
         }
+free_on_error:
         pKs->Release();
     }
 
