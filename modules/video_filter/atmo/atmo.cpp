@@ -2452,7 +2452,7 @@ static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if((p_sys->b_usepausecolor == true) && (p_sys->b_enabled == true))
     {
-        msg_Dbg(p_filter, "state change from: %d to %d", oldval.i_int,
+        msg_Dbg(p_filter, "state change from: %"PRId64" to %"PRId64, oldval.i_int,
             newval.i_int);
 
         if((newval.i_int == PAUSE_S) && (oldval.i_int == PLAYING_S))
