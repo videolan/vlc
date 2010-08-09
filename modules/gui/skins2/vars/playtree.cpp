@@ -149,7 +149,8 @@ void Playtree::onUpdateCurrent( bool b_active )
             return;
 
         Iterator it = findById( m_currentItem->i_id );
-        it->m_playing = false;
+        if( it != end() )
+            it->m_playing = false;
         m_currentItem = NULL;
     }
     else
@@ -164,7 +165,8 @@ void Playtree::onUpdateCurrent( bool b_active )
         }
 
         Iterator it = findById( current->i_id );
-        it->m_playing = true;
+        if( it != end() )
+            it->m_playing = true;
         m_currentItem = current;
 
         playlist_Unlock( m_pPlaylist );
@@ -187,9 +189,11 @@ void Playtree::onDelete( int i_id )
     Iterator item = findById( i_id ) ;
     if( item != end() )
     {
-        if( item->parent() )
-            item->parent()->removeChild( item );
-        descr.b_visible = item->parent() ? item->parent()->m_expanded : true;
+        VarTree* parent = item->parent();
+        if( parent )
+            parent->removeChild( item );
+
+        descr.b_visible = parent ? parent->m_expanded : true;
         notify( &descr );
     }
 }
