@@ -28,6 +28,7 @@
 #include <vlc_common.h>
 #include <vlc_services_discovery.h>
 #include <vlc_plugin.h>
+#include <vlc_url.h>
 #include <search.h>
 #include <poll.h>
 #include <errno.h>
@@ -562,11 +563,7 @@ static char *disc_get_mrl (struct udev_device *dev)
         return NULL;
 
     val = udev_device_get_devnode (dev);
-    char *mrl;
-
-    if (asprintf (&mrl, "%s://%s", scheme, val) == -1)
-        mrl = NULL;
-    return mrl;
+    return make_URI (val, scheme);
 }
 
 static char *disc_get_name (struct udev_device *dev)
