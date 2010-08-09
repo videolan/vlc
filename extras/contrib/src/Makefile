@@ -1326,18 +1326,13 @@ libcaca-$(LIBCACA_VERSION).tar.gz:
 
 libcaca: libcaca-$(LIBCACA_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p0 < Patches/libcaca-static.patch
 ifdef HAVE_DARWIN_OS
 	patch -p0 < Patches/libcaca-osx-sdkofourchoice.patch
 	(cd $@; sed -e 's%/Developer/SDKs/MacOSX10.4u.sdk%$(MACOSX_SDK)%' -i.orig  configure)
 endif
 
 .caca: libcaca
-ifdef HAVE_WIN32
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-win32 --disable-x11 --disable-imlib2 --disable-doc --disable-ruby --disable-csharp --disable-cxx && make && make install)
-else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-imlib2 --disable-doc --disable-ruby --disable-csharp --disable-cxx && make && make install)
-endif
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-imlib2 --disable-doc --disable-ruby --disable-csharp --disable-cxx && cd caca && make && make install)
 	touch $@
 
 CLEAN_FILE += .caca
