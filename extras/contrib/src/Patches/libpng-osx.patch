@@ -1,37 +1,6 @@
 diff -urN libpng-1.2.41/scripts/makefile.darwin libpng/scripts/makefile.darwin
 --- libpng-1.2.41/scripts/makefile.darwin       2009-12-03 04:46:02 +0300
 +++ libpng/scripts/makefile.darwin       2009-12-04 14:37:52 +0300
-@@ -10,14 +10,14 @@
- # and license in png.h
-
- # where "make install" puts libpng.a, libpng12.dylib, png.h and pngconf.h
--prefix=/usr/local
-+prefix=??PREFIX??
- exec_prefix=$(prefix)
-
- # Where the zlib library and include files are located
--#ZLIBLIB=/usr/local/lib
--#ZLIBINC=/usr/local/include
--ZLIBLIB=../zlib
--ZLIBINC=../zlib
-+ZLIBLIB=/usr/lib
-+ZLIBINC=/usr/include
-+#ZLIBLIB=../zlib
-+#ZLIBINC=../zlib
-
- # Library name:
- LIBNAME = libpng12
-@@ -42,8 +42,8 @@
- RM_F=/bin/rm -f
-
- # CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops -DPNG_NO_MMX_CODE
--CFLAGS=-I$(ZLIBINC) -W -Wall -O -funroll-loops
--LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
-+CFLAGS=-DPNG_CONFIGURE_LIBPNG ??EXTRA_CFLAGS?? -I$(ZLIBINC) -W -Wall -O -funroll-loops
-+LDFLAGS=??EXTRA_LDFLAGS?? -L. -L$(ZLIBLIB) -lpng12 -lz
-
- INCPATH=$(prefix)/include
- LIBPATH=$(exec_prefix)/lib
 @@ -76,7 +76,7 @@
  .c.pic.o:
         $(CC) -c $(CFLAGS) -fno-common -o $@ $*.c

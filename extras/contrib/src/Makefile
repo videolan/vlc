@@ -941,9 +941,6 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 
 libvpx: 
 	$(GIT) clone git://review.webmproject.org/libvpx.git
-ifdef HAVE_DARWIN_OS
-	patch -p0 < Patches/libvpx-darwin.patch
-endif
 
 ifdef HAVE_WIN32
 VPX_TARGET=x86-win32-gcc
@@ -965,7 +962,8 @@ endif
 endif
 
 .libvpx: libvpx
-	(cd $<; CROSS=$(HOST)- ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-examples && make && make install)
+	(cd $<; CROSS=$(HOST)- ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-examples && make && make 
+install)
 	(rm -rf $(PREFIX)/include/vpx/ && mkdir $(PREFIX)/include/vpx/; cd $< && cp vpx/*.h vpx_ports/*.h $(PREFIX)/include/vpx/) # Of course, why the hell would one expect it to be listed or in make install?
 	rm $(PREFIX)/include/vpx/config.h
 	(cd $<; $(RANLIB) libvpx.a && cp libvpx.a $(PREFIX)/lib) # Of course, why the hell would one expect it to be listed or in make install?
@@ -1684,9 +1682,6 @@ else
 	(cat Patches/libpng-osx.patch | sed -e 's%??PREFIX??%$(PREFIX)%' -e 's%??EXTRA_CFLAGS??%$(EXTRA_CFLAGS)%' -e 's%??EXTRA_LDFLAGS??%$(EXTRA_LDFLAGS)%' | patch -p0)
 endif
 	(patch -p0 < Patches/libpng-makefile.patch)
-ifdef HAVE_DARWIN_OS_ON_INTEL
-	(patch -p0 < Patches/libpng-darwin-mactel.patch)
-endif
 
 .png: libpng .zlib
 ifdef HAVE_DARWIN_OS
