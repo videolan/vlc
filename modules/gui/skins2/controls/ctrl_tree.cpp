@@ -138,8 +138,6 @@ int CtrlTree::maxItems()
 void CtrlTree::onUpdate( Subject<VarTree, tree_update> &rTree,
                          tree_update *arg )
 {
-    m_firstPos = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
-
     if( arg->i_type == 0 ) // Item update
     {
         if( arg->b_active_item )
@@ -152,6 +150,8 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update> &rTree,
     /// \todo handle delete in a more clever way
     else if ( arg->i_type == 1 ) // Global change or deletion
     {
+        m_firstPos = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+
         makeImage();
     }
     else if ( arg->i_type == 2 ) // Item-append
@@ -168,14 +168,15 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update> &rTree,
     else if( arg->i_type == 3 ) // item-del
     {
         /* Make sure firstPos and lastSelected are still valid */
-        while( m_firstPos->m_deleted && m_firstPos != m_rTree.root()->begin() )
+        while( m_firstPos->m_deleted &&
+               m_firstPos != (m_flat ? m_rTree.firstLeaf()
+                                     : m_rTree.begin()) )
         {
             m_firstPos = m_flat ? m_rTree.getPrevLeaf( m_firstPos )
                                 : m_rTree.getPrevVisibleItem( m_firstPos );
         }
         if( m_firstPos->m_deleted )
-            m_firstPos = m_flat ? m_rTree.firstLeaf()
-                                : m_rTree.root()->begin();
+            m_firstPos = m_rTree.begin();
 
         if( arg->b_visible == true )
         {
