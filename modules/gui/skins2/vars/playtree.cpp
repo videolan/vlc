@@ -56,6 +56,7 @@ void Playtree::delSelected()
         if( (*it).m_selected && !(*it).isReadonly() )
         {
             (*it).m_deleted = true;
+            (*it).m_expanded = false;
         }
     }
     /// \todo Do this better (handle item-deleted)
@@ -79,13 +80,13 @@ void Playtree::delSelected()
                 playlist_NodeDelete( getIntf()->p_sys->p_playlist, p_item,
                                      true, false );
             }
-            it2 = getNextVisibleItem( it ) ;
+            it2 = getNextItem( it ) ;
             it->parent()->removeChild( it );
             it = it2;
         }
         else
         {
-            it = getNextVisibleItem( it );
+            it = getNextItem( it );
         }
     }
     playlist_Unlock( getIntf()->p_sys->p_playlist );
