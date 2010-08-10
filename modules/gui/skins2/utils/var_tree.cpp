@@ -111,21 +111,29 @@ VarTree::ConstIterator VarTree::operator[]( int n ) const
     return it;
 }
 
-VarTree::Iterator VarTree::getNextSibling( VarTree::Iterator current )
+VarTree::Iterator VarTree::getNextSiblingOrUncle()
 {
-    VarTree *p_parent = current->parent();
-    if( p_parent  && current != p_parent->end() )
+    VarTree *p_parent = parent();
+    if( p_parent )
     {
-        Iterator it = current->parent()->begin();
-        while( it != p_parent->end() && it != current ) it++;
+        Iterator it = p_parent->begin();
+        while( it != p_parent->end() && &(*it) != this ) ++it;
         if( it != p_parent->end() )
         {
-            it++;
-            return it;
+            Iterator current = it;
+            ++it;
+            if( it != p_parent->end() )
+                return it;
+            else
+                return current->next_uncle();
         }
-        return root()->end();
+        else
+        {
+            msg_Err( getIntf(), "should never occur" );
+            return end();
+        }
     }
-    return root()->end();
+    return end();
 }
 
 /* find iterator to next ancestor

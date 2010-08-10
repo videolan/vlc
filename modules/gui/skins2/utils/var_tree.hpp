@@ -105,7 +105,7 @@ public:
     VarTree *parent() { return m_pParent; }
 
     /// Get next sibling
-    Iterator getNextSibling( Iterator );
+    Iterator getNextSiblingOrUncle();
 
     Iterator next_uncle();
     Iterator prev_uncle();
