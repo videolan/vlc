@@ -112,9 +112,24 @@ const char *libvlc_printerr (const char *fmt, ...);
 
 /**
  * Create and initialize a libvlc instance.
+ * This functions accept a list of "command line" arguments similar to the
+ * main(). These arguments affect the LibVLC instance default configuration.
  *
- * \param argc the number of arguments
- * \param argv command-line-type arguments
+ * \version
+ * Arguments are meant to be passed from the command line to LibVLC, just like
+ * VLC media player does. The list of valid arguments depends on the LibVLC
+ * version, the operating system and platform, and set of available LibVLC
+ * plugins. Invalid or unsupported arguments will cause the function to fail
+ * (i.e. return NULL). Also, some arguments may alter the behaviour or
+ * otherwise interfere with other LibVLC functions.
+ *
+ * \warning
+ * There is absolutely no warranty or promise of forward, backward and
+ * cross-platform compatibility with regards to libvlc_new() arguments.
+ * We recommend that you do not use them, other than when debugging.
+ *
+ * \param argc the number of arguments (should be 0)
+ * \param argv list of arguments (should be NULL)
  * \return the libvlc instance or NULL in case of error
  */
 VLC_PUBLIC_API libvlc_instance_t *
