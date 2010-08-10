@@ -103,7 +103,6 @@ public:
 
     /// Parent node
     VarTree *parent() { return m_pParent; }
-    void checkParents( VarTree *pParent );
 
     /// Get next sibling
     Iterator getNextSibling( Iterator );

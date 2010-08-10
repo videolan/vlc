@@ -194,18 +194,6 @@ VarTree::Iterator VarTree::prev_uncle()
     return root()->begin();
 }
 
-
-void VarTree::checkParents( VarTree *pParent )
-{
-    m_pParent = pParent;
-    Iterator it = begin();
-    while( it != end() )
-    {
-        it->checkParents( this );
-        it++;
-    }
-}
-
 int VarTree::visibleItems()
 {
     int i_count = size();

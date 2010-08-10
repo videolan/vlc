@@ -274,7 +274,5 @@ void Playtree::buildTree()
     buildNode( m_pPlaylist->p_root_category, *this );
 
     playlist_Unlock( m_pPlaylist );
-//  What is it ?
-//    checkParents( NULL );
 }
 
