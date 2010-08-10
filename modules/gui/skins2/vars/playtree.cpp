@@ -51,12 +51,11 @@ void Playtree::delSelected()
 {
     Iterator it = begin();
     playlist_Lock( getIntf()->p_sys->p_playlist );
-    for( it = begin(); it != end(); it = getNextVisibleItem( it ) )
+    for( it = begin(); it != end(); it = getNextItem( it ) )
     {
-        if( (*it).m_selected && !(*it).isReadonly() )
+        if( it->m_selected && !it->isReadonly() )
         {
-            (*it).m_deleted = true;
-            (*it).m_expanded = false;
+            it->cascadeDelete();
         }
     }
     /// \todo Do this better (handle item-deleted)
@@ -66,7 +65,7 @@ void Playtree::delSelected()
     it = begin();
     while( it != end() )
     {
-        if( (*it).m_deleted )
+        if( it->m_deleted )
         {
             VarTree::Iterator it2;
             playlist_item_t *p_item = (playlist_item_t *)(it->m_pData);
@@ -74,13 +73,14 @@ void Playtree::delSelected()
             {
                 playlist_DeleteFromInput( getIntf()->p_sys->p_playlist,
                                           p_item->p_input, pl_Locked );
+                it2 = getNextItem( it ) ;
             }
             else
             {
                 playlist_NodeDelete( getIntf()->p_sys->p_playlist, p_item,
                                      true, false );
+                it2 = it->getNextSiblingOrUncle();
             }
-            it2 = getNextItem( it ) ;
             it->parent()->removeChild( it );
             it = it2;
         }
