@@ -167,7 +167,7 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update> &rTree,
     }
     else if( arg->i_type == 3 ) // item-del
     {
-        /* Make sure firstPos and lastSelected are still valid */
+        /* Make sure firstPos is valid */
         while( m_firstPos->m_deleted &&
                m_firstPos != (m_flat ? m_rTree.firstLeaf()
                                      : m_rTree.begin()) )
@@ -269,10 +269,10 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             /* Find first non selected item before m_pLastSelected */
             VarTree::Iterator it_sel = m_flat ? m_rTree.firstLeaf()
                                               : m_rTree.begin();
-            for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+            for( it = (m_flat ? m_rTree.firstLeaf() : m_rTree.begin());
                  it != m_rTree.end();
-                 it = m_flat ? m_rTree.getNextLeaf( it )
-                             : m_rTree.getNextVisibleItem( it ) )
+                 it = (m_flat ? m_rTree.getNextLeaf( it )
+                              : m_rTree.getNextVisibleItem( it )) )
             {
                 if( &*it == m_pLastSelected ) break;
                 if( !it->m_selected ) it_sel = it;
@@ -281,9 +281,23 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             /* Delete selected stuff */
             m_rTree.delSelected();
 
-            /* Select it_sel */
-            it_sel->m_selected = true;
-            m_pLastSelected = &*it_sel;
+            /* Verify if there is still sthg selected (e.g read-only items) */
+            m_pLastSelected = NULL;
+            for( it = (m_flat ? m_rTree.firstLeaf() : m_rTree.begin());
+                 it != m_rTree.end();
+                 it = (m_flat ? m_rTree.getNextLeaf( it )
+                              : m_rTree.getNextVisibleItem( it )) )
+            {
+                if( it->m_selected )
+                    m_pLastSelected = &*it;
+            }
+
+            /* if everything was deleted, use it_sel as last selection */
+            if( !m_pLastSelected )
+            {
+                it_sel->m_selected = true;
+                m_pLastSelected = &*it_sel;
+            }
 
             // Redraw the control
             makeImage();
