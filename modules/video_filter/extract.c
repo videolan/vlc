@@ -330,19 +330,19 @@ static void get_custom_from_yuv420( picture_t *p_inpic, picture_t *p_outpic,
     uint8_t *uout  = p_outpic->p[up].p_pixels;
     uint8_t *vout  = p_outpic->p[vp].p_pixels;
 
-    const int i_pitch = p_inpic->p[yp].i_pitch;
+    const int i_in_pitch  = p_inpic->p[yp].i_pitch;
+    const int i_out_pitch = p_outpic->p[yp].i_pitch;
+
     const int i_visible_pitch = p_inpic->p[yp].i_visible_pitch;
     const int i_visible_lines = p_inpic->p[yp].i_visible_lines;
-
-    const int i_uv_pitch = p_inpic->p[up].i_pitch;
     const int i_uv_visible_pitch = p_inpic->p[up].i_visible_pitch;
 
-    const uint8_t *yend = y1in + i_visible_lines * i_pitch;
+    const uint8_t *yend = y1in + i_visible_lines * i_in_pitch;
     while( y1in < yend )
     {
         const uint8_t *y1end = y1in + i_visible_pitch;
-        y2in  = y1in + i_pitch;
-        y2out = y1out + i_pitch;
+        y2in  = y1in + i_in_pitch;
+        y2out = y1out + i_out_pitch;
         while( y1in < y1end )
         {
             *uout++ = crop( (*y1in * m[3] + (*uin-U) * m[4] + (*vin-V) * m[5])
@@ -358,12 +358,12 @@ static void get_custom_from_yuv420( picture_t *p_inpic, picture_t *p_outpic,
             *y2out++ = crop( (*y2in++ * m[0] + (*uin++ - U) * m[1] + (*vin++ -V) * m[2])
                        / 65536 );
         }
-        y1in  += 2*i_pitch - i_visible_pitch;
-        y1out += 2*i_pitch - i_visible_pitch;
-        uin   += i_uv_pitch - i_uv_visible_pitch;
-        uout  += i_uv_pitch - i_uv_visible_pitch;
-        vin   += i_uv_pitch - i_uv_visible_pitch;
-        vout  += i_uv_pitch - i_uv_visible_pitch;
+        y1in  += 2*i_in_pitch  - i_visible_pitch;
+        y1out += 2*i_out_pitch - i_visible_pitch;
+        uin   += p_inpic->p[up].i_pitch  - i_uv_visible_pitch;
+        uout  += p_outpic->p[up].i_pitch - i_uv_visible_pitch;
+        vin   += p_inpic->p[vp].i_pitch  - i_uv_visible_pitch;
+        vout  += p_outpic->p[vp].i_pitch - i_uv_visible_pitch;
     }
 }
 static void get_custom_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
@@ -377,14 +377,14 @@ static void get_custom_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
     uint8_t *uout  = p_outpic->p[up].p_pixels;
     uint8_t *vout  = p_outpic->p[vp].p_pixels;
 
-    const int i_pitch = p_inpic->p[yp].i_pitch;
+    const int i_in_pitch  = p_inpic->p[yp].i_pitch;
+    const int i_out_pitch = p_outpic->p[yp].i_pitch;
+
     const int i_visible_pitch = p_inpic->p[yp].i_visible_pitch;
     const int i_visible_lines = p_inpic->p[yp].i_visible_lines;
-
-    const int i_uv_pitch = p_inpic->p[up].i_pitch;
     const int i_uv_visible_pitch = p_inpic->p[up].i_visible_pitch;
 
-    const uint8_t *yend = y1in + i_visible_lines * i_pitch;
+    const uint8_t *yend = y1in + i_visible_lines * i_in_pitch;
     while( y1in < yend )
     {
         const uint8_t *y1end = y1in + i_visible_pitch;
@@ -399,12 +399,12 @@ static void get_custom_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
             *y1out++ = crop( (*y1in++ * m[0] + (*uin++ -U) * m[1] + (*vin++ -V) * m[2])
                        / 65536 );
         }
-        y1in  += i_pitch - i_visible_pitch;
-        y1out += i_pitch - i_visible_pitch;
-        uin   += i_uv_pitch - i_uv_visible_pitch;
-        uout  += i_uv_pitch - i_uv_visible_pitch;
-        vin   += i_uv_pitch - i_uv_visible_pitch;
-        vout  += i_uv_pitch - i_uv_visible_pitch;
+        y1in  += i_in_pitch  - i_visible_pitch;
+        y1out += i_out_pitch - i_visible_pitch;
+        uin   += p_inpic->p[up].i_pitch  - i_uv_visible_pitch;
+        uout  += p_outpic->p[up].i_pitch - i_uv_visible_pitch;
+        vin   += p_inpic->p[vp].i_pitch  - i_uv_visible_pitch;
+        vout  += p_outpic->p[vp].i_pitch - i_uv_visible_pitch;
     }
 }
 
@@ -425,11 +425,12 @@ static void get_custom_from_packedyuv422( picture_t *p_inpic,
     uint8_t *uout = p_outpic->p->p_pixels + i_u_offset;
     uint8_t *vout = p_outpic->p->p_pixels + i_v_offset;
 
-    const int i_pitch = p_inpic->p->i_pitch;
+    const int i_in_pitch  = p_inpic->p->i_pitch;
+    const int i_out_pitch = p_outpic->p->i_pitch;
     const int i_visible_pitch = p_inpic->p->i_visible_pitch;
     const int i_visible_lines = p_inpic->p->i_visible_lines;
 
-    const uint8_t *yend = yin + i_visible_lines * i_pitch;
+    const uint8_t *yend = yin + i_visible_lines * i_in_pitch;
     while( yin < yend )
     {
         const uint8_t *ylend = yin + i_visible_pitch;
@@ -452,12 +453,12 @@ static void get_custom_from_packedyuv422( picture_t *p_inpic,
             uin  += 4;
             vin  += 4;
         }
-        yin  += i_pitch - i_visible_pitch;
-        yout += i_pitch - i_visible_pitch;
-        uin  += i_pitch - i_visible_pitch;
-        uout += i_pitch - i_visible_pitch;
-        vin  += i_pitch - i_visible_pitch;
-        vout += i_pitch - i_visible_pitch;
+        yin  += i_in_pitch  - i_visible_pitch;
+        yout += i_out_pitch - i_visible_pitch;
+        uin  += i_in_pitch  - i_visible_pitch;
+        uout += i_out_pitch - i_visible_pitch;
+        vin  += i_in_pitch  - i_visible_pitch;
+        vout += i_out_pitch - i_visible_pitch;
     }
 }
 
@@ -473,19 +474,19 @@ static void get_red_from_yuv420( picture_t *p_inpic, picture_t *p_outpic,
     uint8_t *uout  = p_outpic->p[up].p_pixels;
     uint8_t *vout  = p_outpic->p[vp].p_pixels;
 
-    const int i_pitch = p_inpic->p[yp].i_pitch;
+    const int i_in_pitch  = p_inpic->p[yp].i_pitch;
+    const int i_out_pitch = p_outpic->p[yp].i_pitch;
+
     const int i_visible_pitch = p_inpic->p[yp].i_visible_pitch;
     const int i_visible_lines = p_inpic->p[yp].i_visible_lines;
-
-    const int i_uv_pitch = p_inpic->p[up].i_pitch;
     const int i_uv_visible_pitch = p_inpic->p[up].i_visible_pitch;
 
-    const uint8_t *yend = y1in + i_visible_lines * i_pitch;
+    const uint8_t *yend = y1in + i_visible_lines * i_in_pitch;
     while( y1in < yend )
     {
         const uint8_t *y1end = y1in + i_visible_pitch;
-        y2in  = y1in + i_pitch;
-        y2out = y1out + i_pitch;
+        y2in  = y1in + i_in_pitch;
+        y2out = y1out + i_out_pitch;
         while( y1in < y1end )
         {
 /*
@@ -506,11 +507,11 @@ static void get_red_from_yuv420( picture_t *p_inpic, picture_t *p_outpic,
             *y2out++ = crop( (*y2in++ * 19594 + (*vin++ - V) * 27473)
                        / 65536 );
         }
-        y1in  += 2*i_pitch - i_visible_pitch;
-        y1out += 2*i_pitch - i_visible_pitch;
-        uout  += i_uv_pitch - i_uv_visible_pitch;
-        vin   += i_uv_pitch - i_uv_visible_pitch;
-        vout  += i_uv_pitch - i_uv_visible_pitch;
+        y1in  += 2*i_in_pitch  - i_visible_pitch;
+        y1out += 2*i_out_pitch - i_visible_pitch;
+        uout  += p_outpic->p[up].i_pitch - i_uv_visible_pitch;
+        vin   += p_inpic->p[vp].i_pitch  - i_uv_visible_pitch;
+        vout  += p_outpic->p[vp].i_pitch - i_uv_visible_pitch;
     }
 }
 
@@ -527,19 +528,20 @@ static void get_green_from_yuv420( picture_t *p_inpic, picture_t *p_outpic,
     uint8_t *uout  = p_outpic->p[up].p_pixels;
     uint8_t *vout  = p_outpic->p[vp].p_pixels;
 
-    const int i_pitch = p_inpic->p[yp].i_pitch;
+    const int i_in_pitch  = p_inpic->p[yp].i_pitch;
+    const int i_out_pitch = p_outpic->p[yp].i_pitch;
+
     const int i_visible_pitch = p_inpic->p[yp].i_visible_pitch;
     const int i_visible_lines = p_inpic->p[yp].i_visible_lines;
 
-    const int i_uv_pitch = p_inpic->p[up].i_pitch;
     const int i_uv_visible_pitch = p_inpic->p[up].i_visible_pitch;
 
-    const uint8_t *yend = y1in + i_visible_lines * i_pitch;
+    const uint8_t *yend = y1in + i_visible_lines * i_in_pitch;
     while( y1in < yend )
     {
         const uint8_t *y1end = y1in + i_visible_pitch;
-        y2in  = y1in + i_pitch;
-        y2out = y1out + i_pitch;
+        y2in  = y1in + i_in_pitch;
+        y2out = y1out + i_out_pitch;
         while( y1in < y1end )
         {
 /*
@@ -560,12 +562,12 @@ static void get_green_from_yuv420( picture_t *p_inpic, picture_t *p_outpic,
             *y2out++ = crop( (*y2in++ * 38470 + (*uin++ - U) * -13239 + (*vin++ -V) * -27473)
                        / 65536 );
         }
-        y1in  += 2*i_pitch - i_visible_pitch;
-        y1out += 2*i_pitch - i_visible_pitch;
-        uin   += i_uv_pitch - i_uv_visible_pitch;
-        uout  += i_uv_pitch - i_uv_visible_pitch;
-        vin   += i_uv_pitch - i_uv_visible_pitch;
-        vout  += i_uv_pitch - i_uv_visible_pitch;
+        y1in  += 2*i_in_pitch  - i_visible_pitch;
+        y1out += 2*i_out_pitch - i_visible_pitch;
+        uin   += p_inpic->p[up].i_pitch  - i_uv_visible_pitch;
+        uout  += p_outpic->p[up].i_pitch - i_uv_visible_pitch;
+        vin   += p_inpic->p[vp].i_pitch  - i_uv_visible_pitch;
+        vout  += p_outpic->p[vp].i_pitch - i_uv_visible_pitch;
     }
 }
 
@@ -581,19 +583,19 @@ static void get_blue_from_yuv420( picture_t *p_inpic, picture_t *p_outpic,
     uint8_t *uout  = p_outpic->p[up].p_pixels;
     uint8_t *vout  = p_outpic->p[vp].p_pixels;
 
-    const int i_pitch = p_inpic->p[yp].i_pitch;
+    const int i_in_pitch  = p_inpic->p[yp].i_pitch;
+    const int i_out_pitch = p_outpic->p[yp].i_pitch;
+
     const int i_visible_pitch = p_inpic->p[yp].i_visible_pitch;
     const int i_visible_lines = p_inpic->p[yp].i_visible_lines;
-
-    const int i_uv_pitch = p_inpic->p[up].i_pitch;
     const int i_uv_visible_pitch = p_inpic->p[up].i_visible_pitch;
 
-    const uint8_t *yend = y1in + i_visible_lines * i_pitch;
+    const uint8_t *yend = y1in + i_visible_lines * i_in_pitch;
     while( y1in < yend )
     {
         const uint8_t *y1end = y1in + i_visible_pitch;
-        y2in  = y1in + i_pitch;
-        y2out = y1out + i_pitch;
+        y2in  = y1in + i_in_pitch;
+        y2out = y1out + i_out_pitch;
         while( y1in < y1end )
         {
 /*
@@ -614,11 +616,11 @@ static void get_blue_from_yuv420( picture_t *p_inpic, picture_t *p_outpic,
             *y2out++ = crop( (*y2in++ * 7471 + (*uin++ - U) * 13239 )
                        / 65536 );
         }
-        y1in  += 2*i_pitch - i_visible_pitch;
-        y1out += 2*i_pitch - i_visible_pitch;
-        uin   += i_uv_pitch - i_uv_visible_pitch;
-        uout  += i_uv_pitch - i_uv_visible_pitch;
-        vout  += i_uv_pitch - i_uv_visible_pitch;
+        y1in  += 2*i_in_pitch  - i_visible_pitch;
+        y1out += 2*i_out_pitch - i_visible_pitch;
+        uin   += p_inpic->p[up].i_pitch  - i_uv_visible_pitch;
+        uout  += p_outpic->p[up].i_pitch - i_uv_visible_pitch;
+        vout  += p_inpic->p[vp].i_pitch  - i_uv_visible_pitch;
     }
 }
 
@@ -632,14 +634,14 @@ static void get_red_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
     uint8_t *uout  = p_outpic->p[up].p_pixels;
     uint8_t *vout  = p_outpic->p[vp].p_pixels;
 
-    const int i_pitch = p_inpic->p[yp].i_pitch;
+    const int i_in_pitch = p_inpic->p[yp].i_pitch;
+    const int i_out_pitch = p_inpic->p[yp].i_pitch;
+
     const int i_visible_pitch = p_inpic->p[yp].i_visible_pitch;
     const int i_visible_lines = p_inpic->p[yp].i_visible_lines;
-
-    const int i_uv_pitch = p_inpic->p[up].i_pitch;
     const int i_uv_visible_pitch = p_inpic->p[up].i_visible_pitch;
 
-    const uint8_t *yend = y1in + i_visible_lines * i_pitch;
+    const uint8_t *yend = y1in + i_visible_lines * i_in_pitch;
     while( y1in < yend )
     {
         const uint8_t *y1end = y1in + i_visible_pitch;
@@ -659,11 +661,11 @@ static void get_red_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
             *y1out++ = crop( (*y1in++ * 19595 + (*vin++ - V) * 27473)
                        / 65536 );
         }
-        y1in  += i_pitch - i_visible_pitch;
-        y1out += i_pitch - i_visible_pitch;
-        uout  += i_uv_pitch - i_uv_visible_pitch;
-        vin   += i_uv_pitch - i_uv_visible_pitch;
-        vout  += i_uv_pitch - i_uv_visible_pitch;
+        y1in  += i_in_pitch  - i_visible_pitch;
+        y1out += i_out_pitch - i_visible_pitch;
+        uout  += p_outpic->p[up].i_pitch - i_uv_visible_pitch;
+        vin   += p_inpic->p[vp].i_pitch  - i_uv_visible_pitch;
+        vout  += p_outpic->p[vp].i_pitch - i_uv_visible_pitch;
     }
 }
 
@@ -678,14 +680,14 @@ static void get_green_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
     uint8_t *uout  = p_outpic->p[up].p_pixels;
     uint8_t *vout  = p_outpic->p[vp].p_pixels;
 
-    const int i_pitch = p_inpic->p[yp].i_pitch;
+    const int i_in_pitch  = p_inpic->p[yp].i_pitch;
+    const int i_out_pitch = p_outpic->p[yp].i_pitch;
+
     const int i_visible_pitch = p_inpic->p[yp].i_visible_pitch;
     const int i_visible_lines = p_inpic->p[yp].i_visible_lines;
-
-    const int i_uv_pitch = p_inpic->p[up].i_pitch;
     const int i_uv_visible_pitch = p_inpic->p[up].i_visible_pitch;
 
-    const uint8_t *yend = y1in + i_visible_lines * i_pitch;
+    const uint8_t *yend = y1in + i_visible_lines * i_in_pitch;
     while( y1in < yend )
     {
         const uint8_t *y1end = y1in + i_visible_pitch;
@@ -705,12 +707,12 @@ static void get_green_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
             *y1out++ = crop( (*y1in++ * 38470 + (*uin++-U) * -13239 + (*vin++-V) * -27473)
                        / 65536 );
         }
-        y1in  += i_pitch - i_visible_pitch;
-        y1out += i_pitch - i_visible_pitch;
-        uin   += i_uv_pitch - i_uv_visible_pitch;
-        uout  += i_uv_pitch - i_uv_visible_pitch;
-        vin   += i_uv_pitch - i_uv_visible_pitch;
-        vout  += i_uv_pitch - i_uv_visible_pitch;
+        y1in  += i_in_pitch  - i_visible_pitch;
+        y1out += i_out_pitch - i_visible_pitch;
+        uin   += p_inpic->p[up].i_pitch  - i_uv_visible_pitch;
+        uout  += p_outpic->p[up].i_pitch - i_uv_visible_pitch;
+        vin   += p_inpic->p[vp].i_pitch  - i_uv_visible_pitch;
+        vout  += p_outpic->p[vp].i_pitch - i_uv_visible_pitch;
     }
 }
 
@@ -724,14 +726,14 @@ static void get_blue_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
     uint8_t *uout  = p_outpic->p[up].p_pixels;
     uint8_t *vout  = p_outpic->p[vp].p_pixels;
 
-    const int i_pitch = p_inpic->p[yp].i_pitch;
+    const int i_in_pitch  = p_inpic->p[yp].i_pitch;
+    const int i_out_pitch = p_outpic->p[yp].i_pitch;
+
     const int i_visible_pitch = p_inpic->p[yp].i_visible_pitch;
     const int i_visible_lines = p_inpic->p[yp].i_visible_lines;
-
-    const int i_uv_pitch = p_inpic->p[up].i_pitch;
     const int i_uv_visible_pitch = p_inpic->p[up].i_visible_pitch;
 
-    const uint8_t *yend = y1in + i_visible_lines * i_pitch;
+    const uint8_t *yend = y1in + i_visible_lines * i_in_pitch;
     while( y1in < yend )
     {
         const uint8_t *y1end = y1in + i_visible_pitch;
@@ -751,11 +753,11 @@ static void get_blue_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
             *y1out++ = crop( (*y1in++ * 7471 + (*uin++ - U) * 13239 )
                        / 65536 );
         }
-        y1in  += i_pitch - i_visible_pitch;
-        y1out += i_pitch - i_visible_pitch;
-        uin   += i_uv_pitch - i_uv_visible_pitch;
-        uout  += i_uv_pitch - i_uv_visible_pitch;
-        vout  += i_uv_pitch - i_uv_visible_pitch;
+        y1in  += i_in_pitch  - i_visible_pitch;
+        y1out += i_out_pitch - i_visible_pitch;
+        uin   += p_inpic->p[up].i_pitch - i_uv_visible_pitch;
+        uout  += p_outpic->p[up].i_pitch - i_uv_visible_pitch;
+        vout  += p_outpic->p[vp].i_pitch - i_uv_visible_pitch;
     }
 }
 

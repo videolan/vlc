@@ -43,7 +43,6 @@ static int  Create       ( vlc_object_t * );
 static void Destroy      ( vlc_object_t * );
 static picture_t *Filter ( filter_t *, picture_t * );
 static void RenderBlur   ( filter_sys_t *, picture_t *, picture_t * );
-static void Copy         ( filter_t *, picture_t * );
 static int MotionBlurCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 
@@ -79,11 +78,11 @@ static const char *const ppsz_filter_options[] = {
  *****************************************************************************/
 struct filter_sys_t
 {
+    picture_t *p_tmp;
+    bool      b_first;
+
     vlc_spinlock_t lock;
     int        i_factor;
-
-    uint8_t  **pp_planes;
-    int        i_planes;
 };
 
 /*****************************************************************************
@@ -98,6 +97,14 @@ static int Create( vlc_object_t *p_this )
     if( p_filter->p_sys == NULL )
         return VLC_ENOMEM;
 
+    p_filter->p_sys->p_tmp = picture_NewFromFormat( &p_filter->fmt_in.video );
+    if( !p_filter->p_sys->p_tmp )
+    {
+        free( p_filter->p_sys );
+        return VLC_ENOMEM;
+    }
+    p_filter->p_sys->b_first = true;
+
     p_filter->pf_video_filter = Filter;
 
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
@@ -109,8 +116,6 @@ static int Create( vlc_object_t *p_this )
     var_AddCallback( p_filter, FILTER_PREFIX "factor",
                      MotionBlurCallback, p_filter->p_sys );
 
-    p_filter->p_sys->pp_planes = NULL;
-    p_filter->p_sys->i_planes = 0;
 
     return VLC_SUCCESS;
 }
@@ -126,9 +131,7 @@ static void Destroy( vlc_object_t *p_this )
                      MotionBlurCallback, p_filter->p_sys );
     vlc_spin_destroy( &p_filter->p_sys->lock );
 
-    while( p_filter->p_sys->i_planes-- )
-        free( p_filter->p_sys->pp_planes[p_filter->p_sys->i_planes] );
-    free( p_filter->p_sys->pp_planes );
+    picture_Release( p_filter->p_sys->p_tmp );
     free( p_filter->p_sys );
 }
 
@@ -149,24 +152,16 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    if( !p_sys->pp_planes )
+    if( p_sys->b_first )
     {
-        /* initialise our picture buffer */
-        int i_plane;
-        p_sys->i_planes = p_pic->i_planes;
-        p_sys->pp_planes =
-            (uint8_t**)malloc( p_sys->i_planes * sizeof( uint8_t * ) );
-        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
-        {
-            p_sys->pp_planes[i_plane] = (uint8_t*)malloc(
-                p_pic->p[i_plane].i_pitch * p_pic->p[i_plane].i_visible_lines );
-        }
-        Copy( p_filter, p_pic );
+        picture_CopyPixels( p_sys->p_tmp, p_pic );
+        p_sys->b_first = false;
     }
 
     /* Get a new picture */
     RenderBlur( p_sys, p_pic, p_outpic );
-    Copy( p_filter, p_outpic );
+
+    picture_CopyPixels( p_sys->p_tmp, p_outpic );
 
     return CopyInfoAndRelease( p_outpic, p_pic );
 }
@@ -186,14 +181,13 @@ static void RenderBlur( filter_sys_t *p_sys, picture_t *p_newpic,
     for( i_plane = 0; i_plane < p_outpic->i_planes; i_plane++ )
     {
         uint8_t *p_old, *p_new, *p_out, *p_out_end, *p_out_line_end;
-        const int i_pitch = p_outpic->p[i_plane].i_pitch;
         const int i_visible_pitch = p_outpic->p[i_plane].i_visible_pitch;
         const int i_visible_lines = p_outpic->p[i_plane].i_visible_lines;
 
         p_out = p_outpic->p[i_plane].p_pixels;
         p_new = p_newpic->p[i_plane].p_pixels;
-        p_old = p_sys->pp_planes[i_plane];
-        p_out_end = p_out + i_pitch * i_visible_lines;
+        p_old = p_sys->p_tmp->p[i_plane].p_pixels;
+        p_out_end = p_out + p_outpic->p[i_plane].i_pitch * i_visible_lines;
         while ( p_out < p_out_end )
         {
             p_out_line_end = p_out + i_visible_pitch;
@@ -204,21 +198,10 @@ static void RenderBlur( filter_sys_t *p_sys, picture_t *p_newpic,
                             ((*p_new++) * i_newfactor)) >> 7;
             }
 
-            p_old += i_pitch - i_visible_pitch;
-            p_new += i_pitch - i_visible_pitch;
-            p_out += i_pitch - i_visible_pitch;
+            p_old += p_sys->p_tmp->p[i_plane].i_pitch - i_visible_pitch;
+            p_new += p_newpic->p[i_plane].i_pitch     - i_visible_pitch;
+            p_out += p_outpic->p[i_plane].i_pitch     - i_visible_pitch;
         }
-    }
-}
-
-static void Copy( filter_t *p_filter, picture_t *p_pic )
-{
-    int i_plane;
-    for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
-    {
-        vlc_memcpy(
-            p_filter->p_sys->pp_planes[i_plane], p_pic->p[i_plane].p_pixels,
-            p_pic->p[i_plane].i_pitch * p_pic->p[i_plane].i_visible_lines );
     }
 }
 

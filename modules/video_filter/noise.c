@@ -100,7 +100,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         const int i_num_lines = p_pic->p[i_index].i_visible_lines;
         const int i_num_cols = p_pic->p[i_index].i_visible_pitch;
-        const int i_pitch = p_pic->p[i_index].i_pitch;
+        const int i_in_pitch = p_pic->p[i_index].i_pitch;
+        const int i_out_pitch = p_outpic->p[i_index].i_pitch;
 
         int i_line, i_col;
 
@@ -109,7 +110,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             if( vlc_mrand48()&7 )
             {
                 /* line isn't noisy */
-                vlc_memcpy( p_out+i_line*i_pitch, p_in+i_line*i_pitch,
+                vlc_memcpy( p_out+i_line*i_out_pitch, p_in+i_line*i_in_pitch,
                             i_num_cols );
             }
             else
@@ -120,12 +121,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 {
                     if( ((unsigned)vlc_mrand48())%noise_level )
                     {
-                        p_out[i_line*i_pitch+i_col] =
-                            p_in[i_line*i_pitch+i_col];
+                        p_out[i_line*i_out_pitch+i_col] =
+                            p_in[i_line*i_in_pitch+i_col];
                     }
                     else
                     {
-                        p_out[i_line*i_pitch+i_col] = (vlc_mrand48()&3)*0x7f;
+                        p_out[i_line*i_out_pitch+i_col] = (vlc_mrand48()&3)*0x7f;
                     }
                 }
             }

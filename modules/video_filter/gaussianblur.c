@@ -252,7 +252,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         const int i_visible_lines = p_pic->p[i_plane].i_visible_lines;
         const int i_visible_pitch = p_pic->p[i_plane].i_visible_pitch;
-        const int i_pitch = p_pic->p[i_plane].i_pitch;
+        const int i_in_pitch = p_pic->p[i_plane].i_pitch;
 
         int i_line, i_col;
         const int x_factor = p_pic->p[Y_PLANE].i_visible_pitch/i_visible_pitch-1;
@@ -264,7 +264,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             {
                 type_t t_value = 0;
                 int x;
-                const int c = i_line*i_pitch+i_col;
+                const int c = i_line*i_in_pitch+i_col;
                 for( x = __MAX( -i_dim, -i_col*(x_factor+1) );
                      x <= __MIN( i_dim, (i_visible_pitch - i_col)*(x_factor+1) + 1 );
                      x++ )
@@ -281,17 +281,17 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             {
                 type_t t_value = 0;
                 int y;
-                const int c = i_line*i_pitch+i_col;
+                const int c = i_line*i_in_pitch+i_col;
                 for( y = __MAX( -i_dim, (-i_line)*(y_factor+1) );
                      y <= __MIN( i_dim, (i_visible_lines - i_line)*(y_factor+1) - 1 );
                      y++ )
                 {
                     t_value += pt_distribution[y+i_dim] *
-                               pt_buffer[c+(y>>y_factor)*i_pitch];
+                               pt_buffer[c+(y>>y_factor)*i_in_pitch];
                 }
 
-                const type_t t_scale = pt_scale[(i_line<<y_factor)*(i_pitch<<x_factor)+(i_col<<x_factor)];
-                p_out[c] = (uint8_t)(t_value / t_scale); // FIXME wouldn't it be better to round instead of trunc ?
+                const type_t t_scale = pt_scale[(i_line<<y_factor)*(i_in_pitch<<x_factor)+(i_col<<x_factor)];
+                p_out[i_line * p_outpic->p[i_plane].i_pitch + i_col] = (uint8_t)(t_value / t_scale); // FIXME wouldn't it be better to round instead of trunc ?
             }
         }
     }

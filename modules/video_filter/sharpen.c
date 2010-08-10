@@ -184,8 +184,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     /* process the Y plane */
     p_src = p_pic->p[Y_PLANE].p_pixels;
     p_out = p_outpic->p[Y_PLANE].p_pixels;
-    i_src_pitch = p_pic->p[Y_PLANE].i_visible_pitch;
-    i_out_pitch = p_outpic->p[Y_PLANE].i_visible_pitch;
+    i_src_pitch = p_pic->p[Y_PLANE].i_pitch;
+    i_out_pitch = p_outpic->p[Y_PLANE].i_pitch;
 
     /* perform convolution only on Y plane. Avoid border line. */
     vlc_mutex_lock( &p_filter->p_sys->lock );

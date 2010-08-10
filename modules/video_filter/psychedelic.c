@@ -174,8 +174,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
 
     /* luminance */
-    vlc_memcpy( p_outpic->p[Y_PLANE].p_pixels, p_pic->p[Y_PLANE].p_pixels,
-                p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
+    plane_CopyPixels( &p_outpic->p[Y_PLANE], &p_pic->p[Y_PLANE] );
 
     /* image visualization */
     fmt_out = p_filter->fmt_out.video;

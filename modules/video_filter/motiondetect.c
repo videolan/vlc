@@ -168,13 +168,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
     const uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
     const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
 
-    if( !p_sys->b_old )
-    {
-        picture_Copy( p_sys->p_old, p_inpic );
-        p_sys->b_old = true;
-        return p_inpic;
-    }
-
     p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
     {
@@ -182,6 +175,14 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
         return NULL;
     }
     picture_Copy( p_outpic, p_inpic );
+
+    if( !p_sys->b_old )
+    {
+        picture_Copy( p_sys->p_old, p_inpic );
+        picture_Release( p_inpic );
+        p_sys->b_old = true;
+        return p_outpic;
+    }
 
     /**
      * Substract Y planes

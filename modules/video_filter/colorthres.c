@@ -186,8 +186,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
-    uint8_t *p_in_y, *p_in_u, *p_in_v, *p_in_end_u;
-    uint8_t *p_out_y, *p_out_u, *p_out_v;
 
     vlc_mutex_lock( &p_sys->lock );
     int i_simthres = p_sys->i_simthres;
@@ -204,23 +202,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    p_in_u = p_pic->p[U_PLANE].p_pixels;
-    p_in_v = p_pic->p[V_PLANE].p_pixels;
-    p_in_y = p_pic->p[Y_PLANE].p_pixels;
-    p_in_end_u = p_in_u + p_pic->p[U_PLANE].i_visible_lines
-                        * p_pic->p[U_PLANE].i_pitch - 8;
-
-    p_out_y = p_outpic->p[Y_PLANE].p_pixels;
-    p_out_u = p_outpic->p[U_PLANE].p_pixels;
-    p_out_v = p_outpic->p[V_PLANE].p_pixels;
-
-    /* Create grayscale version of input */
-    vlc_memcpy( p_out_y, p_in_y, p_pic->p[Y_PLANE].i_visible_lines
-               * p_pic->p[Y_PLANE].i_pitch - 8 );
-    vlc_memset( p_out_u, 0x80, p_pic->p[U_PLANE].i_visible_lines
-               * p_pic->p[U_PLANE].i_pitch - 8 );
-    vlc_memset( p_out_v, 0x80, p_pic->p[U_PLANE].i_visible_lines
-               * p_pic->p[U_PLANE].i_pitch - 8 );
+    /* Copy the Y plane */
+    plane_CopyPixels( &p_outpic->p[Y_PLANE], &p_pic->p[Y_PLANE] );
 
     /*
      * Do the U and V planes
@@ -232,31 +215,44 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                      112 * i_blue + 128) >> 8) + 128;
     int i_v = (int8_t)(( 112 * i_red  -  94 * i_green -
                       18 * i_blue + 128) >> 8) + 128;
+
     int refu = i_u - 0x80;         /*bright red*/
     int refv = i_v - 0x80;
     int reflength = sqrt(refu*refu+refv*refv);
 
-    while( p_in_u < p_in_end_u ) {
-        /* Length of color vector */
-        int inu = (*p_in_u) - 0x80;
-        int inv = (*p_in_v) - 0x80;
-        int length = sqrt(inu*inu+inv*inv);
+    for( int y = 0; y < p_pic->p[U_PLANE].i_visible_lines; y++ )
+    {
+        uint8_t *p_src_u = &p_pic->p[U_PLANE].p_pixels[y * p_pic->p[U_PLANE].i_pitch];
+        uint8_t *p_src_v = &p_pic->p[V_PLANE].p_pixels[y * p_pic->p[V_PLANE].i_pitch];
+        uint8_t *p_dst_u = &p_outpic->p[U_PLANE].p_pixels[y * p_outpic->p[U_PLANE].i_pitch];
+        uint8_t *p_dst_v = &p_outpic->p[V_PLANE].p_pixels[y * p_outpic->p[V_PLANE].i_pitch];
 
-        int diffu = refu * length - inu *reflength;
-        int diffv = refv * length - inv *reflength;
-        long long int difflen2=diffu*diffu;
-        difflen2 +=diffv*diffv;
-        long long int thres = length*reflength;
-        thres *= thres;
-        if( length > i_satthres && (difflen2*i_simthres< thres ) ) {
-            *p_out_u = *p_in_u;
-            *p_out_v = *p_in_v;
-//        fprintf(stderr,"keeping color %d %d\n", length, difflen2);
+        for( int x = 0; x < p_pic->p[U_PLANE].i_visible_pitch; x++ )
+        {
+            /* Length of color vector */
+            int inu = *p_src_u - 0x80;
+            int inv = *p_src_v - 0x80;
+            int length = sqrt(inu*inu+inv*inv);
+
+            int diffu = refu * length - inu *reflength;
+            int diffv = refv * length - inv *reflength;
+            long long int difflen2=diffu*diffu;
+            difflen2 +=diffv*diffv;
+            long long int thres = length*reflength;
+            thres *= thres;
+            if( length > i_satthres && (difflen2*i_simthres< thres ) )
+            {
+                *p_dst_u++ = *p_src_u;
+                *p_dst_v++ = *p_src_v;
+            }
+            else
+            {
+                *p_dst_u++ = 0x80;
+                *p_dst_v++ = 0x80;
+            }
+            p_src_u++;
+            p_src_v++;
         }
-        p_in_u++;
-        p_in_v++;
-        p_out_u++;
-        p_out_v++;
     }
 
     return CopyInfoAndRelease( p_outpic, p_pic );
@@ -266,8 +262,6 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
-    uint8_t *p_in_y, *p_in_u, *p_in_v, *p_in_end_u;
-    uint8_t *p_out_y, *p_out_u, *p_out_v;
 
     vlc_mutex_lock( &p_sys->lock );
     int i_simthres = p_sys->i_simthres;
@@ -287,22 +281,9 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     int i_y_offset, i_u_offset, i_v_offset;
     GetPackedYuvOffsets( p_filter->fmt_in.video.i_chroma,
                          &i_y_offset, &i_u_offset, &i_v_offset );
-    p_in_y = p_pic->p->p_pixels+i_y_offset;
-    p_in_u = p_pic->p->p_pixels+i_u_offset;
-    p_in_v = p_pic->p->p_pixels+i_v_offset;
-    p_in_end_u = p_in_u + p_pic->p->i_visible_lines
-                        * p_pic->p->i_pitch - 8;
-
-    p_out_y = p_outpic->p->p_pixels+i_y_offset;
-    p_out_u = p_outpic->p->p_pixels+i_u_offset;
-    p_out_v = p_outpic->p->p_pixels+i_v_offset;
-
-    /* Create grayscale version of input */
-    vlc_memcpy( p_outpic->p->p_pixels, p_pic->p->p_pixels,
-                p_pic->p->i_visible_lines * p_pic->p->i_pitch - 8 );
 
     /*
-     * Do the U and V planes
+     * Copy Y and do the U and V planes
      */
     int i_red = ( i_color & 0xFF0000 ) >> 16;
     int i_green = ( i_color & 0xFF00 ) >> 8;
@@ -315,32 +296,41 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     int refv = i_v - 0x80;
     int reflength = sqrt(refu*refu+refv*refv);
 
-    while( p_in_u < p_in_end_u ) {
-        /* Length of color vector */
-        int inu = (*p_in_u) - 0x80;
-        int inv = (*p_in_v) - 0x80;
-        int length = sqrt(inu*inu+inv*inv);
+    for( int y = 0; y < p_pic->p->i_visible_lines; y++ )
+    {
+        uint8_t *p_src = &p_pic->p->p_pixels[y * p_pic->p->i_pitch];
+        uint8_t *p_dst = &p_outpic->p->p_pixels[y * p_outpic->p->i_pitch];
 
-        int diffu = refu * length - inu *reflength;
-        int diffv = refv * length - inv *reflength;
-        long long int difflen2=diffu*diffu;
-        difflen2 +=diffv*diffv;
-        long long int thres = length*reflength;
-        thres *= thres;
-        if( length > i_satthres && (difflen2*i_simthres< thres ) ) {
-            *p_out_u = *p_in_u;
-            *p_out_v = *p_in_v;
-//        fprintf(stderr,"keeping color %d %d\n", length, difflen2);
-        }
-        else
+        for( int x = 0; x < p_pic->p->i_visible_pitch / 4; x++ )
         {
-            *p_out_u = 0x80;
-            *p_out_v = 0x80;
+            p_dst[i_y_offset + 0] = p_src[i_y_offset + 0];
+            p_dst[i_y_offset + 2] = p_src[i_y_offset + 2];
+
+            /* Length of color vector */
+            int inu = p_src[i_u_offset] - 0x80;
+            int inv = p_src[i_v_offset] - 0x80;
+            int length = sqrt(inu*inu+inv*inv);
+
+            int diffu = refu * length - inu *reflength;
+            int diffv = refv * length - inv *reflength;
+            long long int difflen2=diffu*diffu;
+            difflen2 +=diffv*diffv;
+            long long int thres = length*reflength;
+            thres *= thres;
+            if( length > i_satthres && (difflen2*i_simthres< thres ) )
+            {
+                p_dst[i_u_offset] = p_src[i_u_offset];
+                p_dst[i_v_offset] = p_src[i_v_offset];
+            }
+            else
+            {
+                p_dst[i_u_offset] = 0x80;
+                p_dst[i_v_offset] = 0x80;
+            }
+
+            p_dst += 4;
+            p_src += 4;
         }
-        p_in_u+=4;
-        p_in_v+=4;
-        p_out_u+=4;
-        p_out_v+=4;
     }
 
     return CopyInfoAndRelease( p_outpic, p_pic );

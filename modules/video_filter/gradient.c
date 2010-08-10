@@ -360,12 +360,8 @@ static void FilterGradient( filter_t *p_filter, picture_t *p_inpic,
 
     if( p_filter->p_sys->b_cartoon )
     {
-        vlc_memcpy( p_outpic->p[U_PLANE].p_pixels,
-            p_inpic->p[U_PLANE].p_pixels,
-            p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-        vlc_memcpy( p_outpic->p[V_PLANE].p_pixels,
-            p_inpic->p[V_PLANE].p_pixels,
-            p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
+        plane_CopyPixels( &p_outpic->p[U_PLANE], &p_inpic->p[U_PLANE] );
+        plane_CopyPixels( &p_outpic->p[V_PLANE], &p_inpic->p[V_PLANE] );
     }
     else
     {
@@ -504,12 +500,8 @@ static void FilterEdge( filter_t *p_filter, picture_t *p_inpic,
 
     if( p_filter->p_sys->b_cartoon )
     {
-        vlc_memcpy( p_outpic->p[U_PLANE].p_pixels,
-            p_inpic->p[U_PLANE].p_pixels,
-            p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-        vlc_memcpy( p_outpic->p[V_PLANE].p_pixels,
-            p_inpic->p[V_PLANE].p_pixels,
-            p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
+        plane_CopyPixels( &p_outpic->p[U_PLANE], &p_inpic->p[U_PLANE] );
+        plane_CopyPixels( &p_outpic->p[V_PLANE], &p_inpic->p[V_PLANE] );
     }
     else
     {
@@ -687,15 +679,9 @@ static void FilterHough( filter_t *p_filter, picture_t *p_inpic,
 
     vlc_memset( p_hough, 0, i_diag * i_nb_steps * sizeof(int) );
 
-    vlc_memcpy(
-        p_outpic->p[Y_PLANE].p_pixels, p_inpic->p[Y_PLANE].p_pixels,
-        p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
-    vlc_memcpy(
-        p_outpic->p[U_PLANE].p_pixels, p_inpic->p[U_PLANE].p_pixels,
-        p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-    vlc_memcpy(
-        p_outpic->p[V_PLANE].p_pixels, p_inpic->p[V_PLANE].p_pixels,
-        p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
+    plane_CopyPixels( &p_outpic->p[Y_PLANE], &p_inpic->p[Y_PLANE] );
+    plane_CopyPixels( &p_outpic->p[U_PLANE], &p_inpic->p[U_PLANE] );
+    plane_CopyPixels( &p_outpic->p[V_PLANE], &p_inpic->p[V_PLANE] );
 
     GaussianConvolution( p_inpic, p_smooth );
 
