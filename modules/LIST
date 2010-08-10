@@ -326,7 +326,6 @@ $Id$
  * udev: udev probing module
  * ugly_resampler: Ugly audio resampler
  * upnp: Universal Plug'n play discovery module
- * upnp_cc: Cyberlink UPNP discovery
  * upnp_intel: Intel SDL UPNP discovery
  * v4l2: Video 4 Linux 2 input module
  * v4l: Video 4 Linux input module
