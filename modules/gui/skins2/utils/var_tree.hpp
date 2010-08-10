@@ -111,15 +111,6 @@ public:
     Iterator next_uncle();
     Iterator prev_uncle();
 
-    /// Get root node
-    VarTree *root()
-    {
-        VarTree *parent = this;
-        while( parent->parent() != NULL )
-            parent = parent->parent();
-        return parent;
-    }
-
     /// Get first leaf
     Iterator firstLeaf();
 
@@ -187,6 +178,16 @@ public:
 
 
 private:
+
+    /// Get root node
+    VarTree *root()
+    {
+        VarTree *parent = this;
+        while( parent->parent() != NULL )
+            parent = parent->parent();
+        return parent;
+    }
+
     /// List of children
     list<VarTree> m_children;
 
