@@ -175,6 +175,32 @@ static void Destroy( vlc_object_t *p_this )
     free( p_filter->p_sys );
 }
 
+static void GetReference( int *refu, int *refv, int *reflength,
+                          uint32_t i_color )
+{
+    int i_red   = ( i_color & 0xFF0000 ) >> 16;
+    int i_green = ( i_color & 0x00FF00 ) >> 8;
+    int i_blue  = ( i_color & 0x0000FF );
+    int i_u = (int8_t)(( -38 * i_red - 74 * i_green + 112 * i_blue + 128) >> 8) + 128;
+    int i_v = (int8_t)(( 112 * i_red - 94 * i_green -  18 * i_blue + 128) >> 8) + 128;
+    *refu = i_u - 0x80;
+    *refv = i_v - 0x80;
+    *reflength = sqrt(*refu * *refu + *refv * *refv);
+}
+
+static bool IsSimilar( int u, int v,
+                       int refu, int refv, int reflength,
+                       int i_satthres, int i_simthres )
+{
+    int length = sqrt(u * u + v * v);
+
+    int diffu = refu * length - u * reflength;
+    int diffv = refv * length - v * reflength;
+    int64_t difflen2 = diffu * diffu + diffv * diffv;
+    int64_t thres = length * reflength;
+    thres *= thres;
+    return length > i_satthres && (difflen2 * i_simthres < thres);
+}
 /*****************************************************************************
  * Render: displays previously rendered output
  *****************************************************************************
@@ -208,17 +234,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     /*
      * Do the U and V planes
      */
-    int i_red = ( i_color & 0xFF0000 ) >> 16;
-    int i_green = ( i_color & 0xFF00 ) >> 8;
-    int i_blue = i_color & 0xFF;
-    int i_u = (int8_t)(( -38 * i_red - 74 * i_green +
-                     112 * i_blue + 128) >> 8) + 128;
-    int i_v = (int8_t)(( 112 * i_red  -  94 * i_green -
-                      18 * i_blue + 128) >> 8) + 128;
-
-    int refu = i_u - 0x80;         /*bright red*/
-    int refv = i_v - 0x80;
-    int reflength = sqrt(refu*refu+refv*refv);
+    int refu, refv, reflength;
+    GetReference( &refu, &refv, &reflength, i_color );
 
     for( int y = 0; y < p_pic->p[U_PLANE].i_visible_lines; y++ )
     {
@@ -229,18 +246,10 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         for( int x = 0; x < p_pic->p[U_PLANE].i_visible_pitch; x++ )
         {
-            /* Length of color vector */
-            int inu = *p_src_u - 0x80;
-            int inv = *p_src_v - 0x80;
-            int length = sqrt(inu*inu+inv*inv);
+            if( IsSimilar( *p_src_u - 0x80, *p_src_v - 0x80,
+                           refu, refv, reflength,
+                           i_satthres, i_simthres ) )
 
-            int diffu = refu * length - inu *reflength;
-            int diffv = refv * length - inv *reflength;
-            long long int difflen2=diffu*diffu;
-            difflen2 +=diffv*diffv;
-            long long int thres = length*reflength;
-            thres *= thres;
-            if( length > i_satthres && (difflen2*i_simthres< thres ) )
             {
                 *p_dst_u++ = *p_src_u;
                 *p_dst_v++ = *p_src_v;
@@ -285,16 +294,8 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     /*
      * Copy Y and do the U and V planes
      */
-    int i_red = ( i_color & 0xFF0000 ) >> 16;
-    int i_green = ( i_color & 0xFF00 ) >> 8;
-    int i_blue = i_color & 0xFF;
-    int i_u = (int8_t)(( -38 * i_red - 74 * i_green +
-                     112 * i_blue + 128) >> 8) + 128;
-    int i_v = (int8_t)(( 112 * i_red  -  94 * i_green -
-                      18 * i_blue + 128) >> 8) + 128;
-    int refu = i_u - 0x80;         /*bright red*/
-    int refv = i_v - 0x80;
-    int reflength = sqrt(refu*refu+refv*refv);
+    int refu, refv, reflength;
+    GetReference( &refu, &refv, &reflength, i_color );
 
     for( int y = 0; y < p_pic->p->i_visible_lines; y++ )
     {
@@ -306,18 +307,9 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
             p_dst[i_y_offset + 0] = p_src[i_y_offset + 0];
             p_dst[i_y_offset + 2] = p_src[i_y_offset + 2];
 
-            /* Length of color vector */
-            int inu = p_src[i_u_offset] - 0x80;
-            int inv = p_src[i_v_offset] - 0x80;
-            int length = sqrt(inu*inu+inv*inv);
-
-            int diffu = refu * length - inu *reflength;
-            int diffv = refv * length - inv *reflength;
-            long long int difflen2=diffu*diffu;
-            difflen2 +=diffv*diffv;
-            long long int thres = length*reflength;
-            thres *= thres;
-            if( length > i_satthres && (difflen2*i_simthres< thres ) )
+            if( IsSimilar( p_src[i_u_offset] - 0x80, p_src[i_v_offset] - 0x80,
+                           refu, refv, reflength,
+                           i_satthres, i_simthres ) )
             {
                 p_dst[i_u_offset] = p_src[i_u_offset];
                 p_dst[i_v_offset] = p_src[i_v_offset];
