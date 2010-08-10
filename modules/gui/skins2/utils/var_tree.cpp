@@ -405,3 +405,11 @@ VarTree::Iterator VarTree::firstLeaf()
     return b;
 }
 
+void VarTree::cascadeDelete()
+{
+    m_deleted = true;
+    for( Iterator it = begin(); it != end(); ++it )
+    {
+        it->cascadeDelete();
+    }
+}

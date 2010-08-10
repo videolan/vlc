@@ -165,6 +165,9 @@ public:
     /// Ensure an item is expanded
     void ensureExpanded( VarTree::Iterator );
 
+    /// flag a whole subtree for deletion
+    void cascadeDelete();
+
     /// Get depth (root depth is 0)
     int depth()
     {
