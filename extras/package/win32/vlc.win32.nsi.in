@@ -339,7 +339,6 @@ FunctionEnd
   !insertmacro ${_action} ".ogm"
   !insertmacro ${_action} ".ogx"
   !insertmacro ${_action} ".ogv"
-  !insertmacro ${_action} ".ps"
   !insertmacro ${_action} ".rec"
   !insertmacro ${_action} ".rm"
   !insertmacro ${_action} ".rmvb"
