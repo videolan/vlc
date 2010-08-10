@@ -32,6 +32,7 @@
 
 #define __STDC_CONSTANT_MACROS 1
 #define __STDC_FORMAT_MACROS 1
+#define CFG_PREFIX "dshow-"
 #include <inttypes.h>
 
 #include <vlc_common.h>
@@ -222,69 +223,69 @@ vlc_module_begin ()
     set_description( N_("DirectShow input") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( "dshow-caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000, NULL,
+    add_integer( CFG_PREFIX "caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
 
-    add_string( "dshow-vdev", NULL, NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
+    add_string( CFG_PREFIX "vdev", NULL, NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
         change_string_list( ppsz_vdev, ppsz_vdev_text, FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
         change_action_add( ConfigDevicesCallback, N_("Configure") )
 
-    add_string( "dshow-adev", NULL, NULL, ADEV_TEXT, ADEV_LONGTEXT, false)
+    add_string( CFG_PREFIX "adev", NULL, NULL, ADEV_TEXT, ADEV_LONGTEXT, false)
         change_string_list( ppsz_adev, ppsz_adev_text, FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
         change_action_add( ConfigDevicesCallback, N_("Configure") )
 
-    add_string( "dshow-size", NULL, NULL, SIZE_TEXT, SIZE_LONGTEXT, false)
+    add_string( CFG_PREFIX "size", NULL, NULL, SIZE_TEXT, SIZE_LONGTEXT, false)
 
-    add_string( "dshow-aspect-ratio", "4:3", NULL, ASPECT_TEXT, ASPECT_LONGTEXT, false)
+    add_string( CFG_PREFIX "aspect-ratio", "4:3", NULL, ASPECT_TEXT, ASPECT_LONGTEXT, false)
 
-    add_string( "dshow-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
+    add_string( CFG_PREFIX "chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
 
-    add_float( "dshow-fps", 0.0f, NULL, FPS_TEXT, FPS_LONGTEXT, true )
+    add_float( CFG_PREFIX "fps", 0.0f, NULL, FPS_TEXT, FPS_LONGTEXT, true )
 
-    add_bool( "dshow-config", false, NULL, CONFIG_TEXT, CONFIG_LONGTEXT, true )
+    add_bool( CFG_PREFIX "config", false, NULL, CONFIG_TEXT, CONFIG_LONGTEXT, true )
 
-    add_bool( "dshow-tuner", false, NULL, TUNER_TEXT, TUNER_LONGTEXT, true )
+    add_bool( CFG_PREFIX "tuner", false, NULL, TUNER_TEXT, TUNER_LONGTEXT, true )
 
-    add_integer( "dshow-tuner-channel", 0, NULL, CHANNEL_TEXT, CHANNEL_LONGTEXT,
+    add_integer( CFG_PREFIX "tuner-channel", 0, NULL, CHANNEL_TEXT, CHANNEL_LONGTEXT,
                 true )
 
-    add_integer( "dshow-tuner-frequency", 0, NULL, TVFREQ_TEXT, TVFREQ_LONGTEXT,
+    add_integer( CFG_PREFIX "tuner-frequency", 0, NULL, TVFREQ_TEXT, TVFREQ_LONGTEXT,
                 true )
 
-    add_integer( "dshow-tuner-country", 0, NULL, COUNTRY_TEXT, COUNTRY_LONGTEXT,
+    add_integer( CFG_PREFIX "tuner-country", 0, NULL, COUNTRY_TEXT, COUNTRY_LONGTEXT,
                 true )
 
-    add_integer( "dshow-tuner-standard", 0, NULL, STANDARD_TEXT, STANDARD_LONGTEXT,
+    add_integer( CFG_PREFIX "tuner-standard", 0, NULL, STANDARD_TEXT, STANDARD_LONGTEXT,
                 false )
         change_integer_list( i_standards_list, ppsz_standards_list_text, NULL )
 
-    add_integer( "dshow-tuner-input", 0, NULL, TUNER_INPUT_TEXT,
+    add_integer( CFG_PREFIX "tuner-input", 0, NULL, TUNER_INPUT_TEXT,
                  TUNER_INPUT_LONGTEXT, true )
         change_integer_list( pi_tuner_input, ppsz_tuner_input_text, NULL )
 
-    add_integer( "dshow-video-input",  -1, NULL, VIDEO_IN_TEXT,
+    add_integer( CFG_PREFIX "video-input",  -1, NULL, VIDEO_IN_TEXT,
                  VIDEO_IN_LONGTEXT, true )
 
-    add_integer( "dshow-video-output", -1, NULL, VIDEO_OUT_TEXT,
+    add_integer( CFG_PREFIX "video-output", -1, NULL, VIDEO_OUT_TEXT,
                  VIDEO_OUT_LONGTEXT, true )
 
-    add_integer( "dshow-audio-input",  -1, NULL, AUDIO_IN_TEXT,
+    add_integer( CFG_PREFIX "audio-input",  -1, NULL, AUDIO_IN_TEXT,
                  AUDIO_IN_LONGTEXT, true )
 
-    add_integer( "dshow-audio-output", -1, NULL, AUDIO_OUT_TEXT,
+    add_integer( CFG_PREFIX "audio-output", -1, NULL, AUDIO_OUT_TEXT,
                  AUDIO_OUT_LONGTEXT, true )
 
-    add_integer( "dshow-amtuner-mode", AMTUNER_MODE_TV, NULL,
+    add_integer( CFG_PREFIX "amtuner-mode", AMTUNER_MODE_TV, NULL,
                 AMTUNER_MODE_TEXT, AMTUNER_MODE_LONGTEXT, false)
         change_integer_list( pi_amtuner_mode, ppsz_amtuner_mode_text, NULL )
 
-    add_integer( "dshow-audio-channels", 0, NULL, AUDIO_CHANNELS_TEXT,
+    add_integer( CFG_PREFIX "audio-channels", 0, NULL, AUDIO_CHANNELS_TEXT,
                  AUDIO_CHANNELS_LONGTEXT, true )
-    add_integer( "dshow-audio-samplerate", 0, NULL, AUDIO_SAMPLERATE_TEXT,
+    add_integer( CFG_PREFIX "audio-samplerate", 0, NULL, AUDIO_SAMPLERATE_TEXT,
                  AUDIO_SAMPLERATE_LONGTEXT, true )
-    add_integer( "dshow-audio-bitspersample", 0, NULL, AUDIO_BITSPERSAMPLE_TEXT,
+    add_integer( CFG_PREFIX "audio-bitspersample", 0, NULL, AUDIO_BITSPERSAMPLE_TEXT,
                  AUDIO_BITSPERSAMPLE_LONGTEXT, true )
 
     add_shortcut( "dshow" )
@@ -400,9 +401,9 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     /* Initialize OLE/COM */
     CoInitialize( 0 );
 
-    var_Create( p_this, "dshow-config", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_this, "dshow-tuner", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    psz_val = var_CreateGetString( p_this, "dshow-vdev" );
+    var_Create( p_this,  CFG_PREFIX "config", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_this,  CFG_PREFIX "tuner", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    psz_val = var_CreateGetString( p_this, CFG_PREFIX "vdev" );
     if( psz_val )
     {
         msg_Dbg( p_this, "dshow-vdev: %s", psz_val ) ;
@@ -414,7 +415,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     }
     free( psz_val );
 
-    psz_val = var_CreateGetString( p_this, "dshow-adev" );
+    psz_val = var_CreateGetString( p_this, CFG_PREFIX "adev" );
     if( psz_val )
     {
         msg_Dbg( p_this, "dshow-adev: %s", psz_val ) ;
@@ -441,7 +442,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
       { 0, 0, 0 },
     };
 
-    psz_val = var_CreateGetString( p_this, "dshow-size" );
+    psz_val = var_CreateGetString( p_this, CFG_PREFIX "size" );
     if( !EMPTY_STR(psz_val) )
     {
         int i;
@@ -468,32 +469,32 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     free( psz_val );
 
     /* Chroma */
-    psz_val = var_CreateGetString( p_this, "dshow-chroma" );
+    psz_val = var_CreateGetString( p_this, CFG_PREFIX "chroma" );
     i_chroma = vlc_fourcc_GetCodecFromString( UNKNOWN_ES, psz_val );
     p_sys->b_chroma = i_chroma != 0;
     free( psz_val );
 
-    var_Create( p_this, "dshow-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Create( p_this, "dshow-tuner-channel",
+    var_Create( p_this, CFG_PREFIX "fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Create( p_this, CFG_PREFIX "tuner-channel",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_this, "dshow-tuner-frequency",
+    var_Create( p_this, CFG_PREFIX "tuner-frequency",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_this, "dshow-tuner-standard",
+    var_Create( p_this, CFG_PREFIX "tuner-standard",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_this, "dshow-tuner-country",
+    var_Create( p_this, CFG_PREFIX "tuner-country",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_this, "dshow-tuner-input",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
-    var_Create( p_this, "dshow-amtuner-mode",
+    var_Create( p_this, CFG_PREFIX "tuner-input",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
-    var_Create( p_this, "dshow-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, CFG_PREFIX "amtuner-mode",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
-    var_Create( p_this, "dshow-video-input", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_this, "dshow-audio-input", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_this, "dshow-video-output", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_this, "dshow-audio-output", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, CFG_PREFIX "caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
+    var_Create( p_this, CFG_PREFIX "video-input", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, CFG_PREFIX "audio-input", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, CFG_PREFIX "video-output", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, CFG_PREFIX "audio-output", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
 
     /* Initialize some data */
@@ -563,7 +564,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
                 return VLC_EGENERIC;
             }
 
-            if( var_GetBool( p_this, "dshow-tuner" ) )
+            if( var_GetBool( p_this, CFG_PREFIX "tuner" ) )
             {
                 /* FIXME: we do MEDIATYPE_Stream here so we don't do
                  * it twice. */
@@ -597,16 +598,16 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     for( int i = p_sys->i_crossbar_route_depth-1; i >= 0 ; --i )
     {
-        int i_val = var_GetInteger( p_this, "dshow-video-input" );
+        int i_val = var_GetInteger( p_this, CFG_PREFIX "video-input" );
         if( i_val >= 0 )
             p_sys->crossbar_routes[i].VideoInputIndex = i_val;
-        i_val = var_GetInteger( p_this, "dshow-video-output" );
+        i_val = var_GetInteger( p_this, CFG_PREFIX "video-output" );
         if( i_val >= 0 )
             p_sys->crossbar_routes[i].VideoOutputIndex = i_val;
-        i_val = var_GetInteger( p_this, "dshow-audio-input" );
+        i_val = var_GetInteger( p_this, CFG_PREFIX "audio-input" );
         if( i_val >= 0 )
             p_sys->crossbar_routes[i].AudioInputIndex = i_val;
-        i_val = var_GetInteger( p_this, "dshow-audio-output" );
+        i_val = var_GetInteger( p_this, CFG_PREFIX "audio-output" );
         if( i_val >= 0 )
             p_sys->crossbar_routes[i].AudioOutputIndex = i_val;
 
@@ -641,7 +642,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     /*
     ** Show properties pages from other filters in graph
     */
-    if( var_GetBool( p_this, "dshow-config" ) )
+    if( var_GetBool( p_this, CFG_PREFIX "config" ) )
     {
         for( int i = p_sys->i_crossbar_route_depth-1; i >= 0 ; --i )
         {
@@ -701,7 +702,7 @@ static int DemuxOpen( vlc_object_t *p_this )
 
         if( p_stream->mt.majortype == MEDIATYPE_Video )
         {
-            char *psz_aspect = var_CreateGetString( p_this, "dshow-aspect-ratio" );
+            char *psz_aspect = var_CreateGetString( p_this, CFG_PREFIX "aspect-ratio" );
             char *psz_delim = !EMPTY_STR( psz_aspect ) ? strchr( psz_aspect, ':' ) : NULL;
 
             es_format_Init( &fmt, VIDEO_ES, p_stream->i_fourcc );
@@ -1047,9 +1048,9 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
     size_t media_count =
         EnumDeviceCaps( p_this, p_device_filter, b_audio ? 0 : p_sys->i_chroma,
                         p_sys->i_width, p_sys->i_height,
-      b_audio ? var_CreateGetInteger( p_this, "dshow-audio-channels" ) : 0,
-      b_audio ? var_CreateGetInteger( p_this, "dshow-audio-samplerate" ) : 0,
-      b_audio ? var_CreateGetInteger( p_this, "dshow-audio-bitspersample" ) : 0,
+      b_audio ? var_CreateGetInteger( p_this, CFG_PREFIX "audio-channels" ) : 0,
+      b_audio ? var_CreateGetInteger( p_this, CFG_PREFIX "audio-samplerate" ) : 0,
+      b_audio ? var_CreateGetInteger( p_this, CFG_PREFIX "audio-bitspersample" ) : 0,
       media_types, MAX_MEDIA_TYPES );
 
     AM_MEDIA_TYPE *mt = NULL;
@@ -1120,7 +1121,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
 
         /* Show Device properties. Done here so the VLC stream is setup with
          * the proper parameters. */
-        if( var_GetBool( p_this, "dshow-config" ) )
+        if( var_GetBool( p_this, CFG_PREFIX "config" ) )
         {
             ShowDeviceProperties( p_this, p_sys->p_capture_graph_builder2,
                                   p_device_filter, b_audio );
@@ -1129,7 +1130,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         ConfigTuner( p_this, p_sys->p_capture_graph_builder2,
                      p_device_filter );
 
-        if( var_GetBool( p_this, "dshow-tuner" ) &&
+        if( var_GetBool( p_this, CFG_PREFIX "tuner" ) &&
             dshow_stream.mt.majortype != MEDIATYPE_Stream )
         {
             /* FIXME: we do MEDIATYPE_Stream later so we don't do it twice. */
@@ -1334,7 +1335,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
     size_t mt_count = 0;
 
     LONGLONG i_AvgTimePerFrame = 0;
-    float r_fps = var_GetFloat( p_this, "dshow-fps" );
+    float r_fps = var_GetFloat( p_this, CFG_PREFIX "fps" );
     if( r_fps )
         i_AvgTimePerFrame = 10000000000LL/(LONGLONG)(r_fps*1000.0f);
 
@@ -1936,7 +1937,7 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
     /* */
     case ACCESS_GET_PTS_DELAY:
         pi_64 = (int64_t*)va_arg( args, int64_t * );
-        *pi_64 = var_GetInteger( p_access, "dshow-caching" ) * 1000;
+        *pi_64 = var_GetInteger( p_access, CFG_PREFIX "caching" ) * 1000;
         break;
 
     /* */
@@ -1976,7 +1977,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_GET_PTS_DELAY:
         pi64 = (int64_t*)va_arg( args, int64_t * );
-        *pi64 = var_GetInteger( p_demux, "dshow-caching" ) * 1000;
+        *pi64 = var_GetInteger( p_demux, CFG_PREFIX "caching" ) * 1000;
         return VLC_SUCCESS;
 
     case DEMUX_GET_TIME:
@@ -2005,7 +2006,7 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     p_item = config_FindConfig( p_this, psz_name );
     if( !p_item ) return VLC_SUCCESS;
 
-    if( !strcmp( psz_name, "dshow-adev" ) ) b_audio = true;
+    if( !strcmp( psz_name, CFG_PREFIX "adev" ) ) b_audio = true;
 
     /* Clear-up the current list */
     if( p_item->i_list )
@@ -2080,7 +2081,7 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
         return VLC_SUCCESS;
     }
 
-    if( !strcmp( psz_name, "dshow-adev" ) ) b_audio = true;
+    if( !strcmp( psz_name, CFG_PREFIX "adev" ) ) b_audio = true;
 
     string devicename;
 
@@ -2275,13 +2276,12 @@ static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
 
     if( !p_graph ) return;
 
-    i_channel = var_GetInteger( p_this, "dshow-tuner-channel" );
-    i_country = var_GetInteger( p_this, "dshow-tuner-country" );
-    i_input = var_GetInteger( p_this, "dshow-tuner-input" );
-    i_amtuner_mode = var_GetInteger( p_this, "dshow-amtuner-mode" );
-    i_frequency = var_GetInteger( p_this, "dshow-tuner-frequency" );
-    i_standard =
-        i_standards_list[var_CreateGetInteger( p_this, "dshow-tuner-standard" )];
+    i_channel =      var_GetInteger( p_this, CFG_PREFIX "tuner-channel" );
+    i_country =      var_GetInteger( p_this, CFG_PREFIX "tuner-country" );
+    i_input =        var_GetInteger( p_this, CFG_PREFIX "tuner-input" );
+    i_amtuner_mode = var_GetInteger( p_this, CFG_PREFIX "amtuner-mode" );
+    i_frequency =    var_GetInteger( p_this, CFG_PREFIX "tuner-frequency" );
+    i_standard =     var_GetInteger( p_this, CFG_PREFIX "tuner-standard" );
 
     if( !i_channel && !i_frequency && !i_country && !i_input ) return; /* Nothing to do */
 
