@@ -1342,7 +1342,6 @@ static vlm_message_t *vlm_ShowMedia( vlm_media_sys_t *p_media )
         vlm_media_instance_sys_t *p_instance = p_media->instance[i];
         vlc_value_t val;
         vlm_message_t *p_msg_instance;
-        char *psz_tmp;
 
         val.i_int = END_S;
         if( p_instance->p_input )
@@ -1361,14 +1360,9 @@ static vlm_message_t *vlm_ShowMedia( vlm_media_sys_t *p_media )
         /* FIXME should not do that this way */
         if( p_instance->p_input )
         {
-#define APPEND_INPUT_INFO( a, format, type ) \
-            if( asprintf( &psz_tmp, format, \
-                      var_Get ## type( p_instance->p_input, a ) ) != -1 ) \
-            { \
-                vlm_MessageAdd( p_msg_instance, vlm_MessageNew( a, \
-                                "%s", psz_tmp ) ); \
-                free( psz_tmp ); \
-            }
+#define APPEND_INPUT_INFO( key, format, type ) \
+            vlm_MessageAdd( p_msg_instance, vlm_MessageNew( key, format, \
+                            var_Get ## type( p_instance->p_input, key ) ) )
             APPEND_INPUT_INFO( "position", "%f", Float );
             APPEND_INPUT_INFO( "time", "%"PRIi64, Time );
             APPEND_INPUT_INFO( "length", "%"PRIi64, Time );
@@ -1378,12 +1372,8 @@ static vlm_message_t *vlm_ShowMedia( vlm_media_sys_t *p_media )
             APPEND_INPUT_INFO( "can-seek", "%d", Bool );
         }
 #undef APPEND_INPUT_INFO
-        if( asprintf( &psz_tmp, "%d", p_instance->i_index + 1 ) != -1 )
-        {
-            vlm_MessageAdd( p_msg_instance, vlm_MessageNew( "playlistindex",
-                            "%s", psz_tmp ) );
-            free( psz_tmp );
-        }
+        vlm_MessageAdd( p_msg_instance, vlm_MessageNew( "playlistindex",
+                        "%d", p_instance->i_index + 1 ) );
     }
     return p_msg;
 }
@@ -1422,17 +1412,13 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
         {
             struct tm date;
             time_t i_time = (time_t)( schedule->i_date / 1000000 );
-            char *psz_date;
 
             localtime_r( &i_time, &date);
-            if( asprintf( &psz_date, "%d/%d/%d-%d:%d:%d",
-                          date.tm_year + 1900, date.tm_mon + 1, date.tm_mday,
-                          date.tm_hour, date.tm_min, date.tm_sec ) != -1 )
-            {
-                 vlm_MessageAdd( msg_schedule,
-                                 vlm_MessageNew( "date", "%s", psz_date ) );
-                 free( psz_date );
-            }
+            vlm_MessageAdd( msg_schedule,
+                            vlm_MessageNew( "date", "%d/%d/%d-%d:%d:%d",
+                                            date.tm_year + 1900, date.tm_mon + 1,
+                                            date.tm_mday, date.tm_hour, date.tm_min,
+                                            date.tm_sec ) );
         }
         else
             vlm_MessageAdd( msg_schedule, vlm_MessageNew("date", "now") );
@@ -1484,10 +1470,8 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
         vlm_message_t *p_msg;
         vlm_message_t *p_msg_child;
         int i_vod = 0, i_broadcast = 0;
-        int i;
-        char *psz_count;
 
-        for( i = 0; i < vlm->i_media; i++ )
+        for( int i = 0; i < vlm->i_media; i++ )
         {
             if( vlm->media[i]->cfg.b_vod )
                 i_vod++;
@@ -1495,15 +1479,12 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
                 i_broadcast++;
         }
 
-        if( asprintf( &psz_count, "( %d broadcast - %d vod )", i_broadcast,
-                      i_vod) == -1 )
-            return NULL;
         p_msg = vlm_MessageSimpleNew( "show" );
-        p_msg_child = vlm_MessageAdd( p_msg, vlm_MessageNew( "media", "%s",
-                                                             psz_count ) );
-        free( psz_count );
+        p_msg_child = vlm_MessageAdd( p_msg, vlm_MessageNew( "media",
+                                      "( %d broadcast - %d vod )", i_broadcast,
+                                      i_vod ) );
 
-        for( i = 0; i < vlm->i_media; i++ )
+        for( int i = 0; i < vlm->i_media; i++ )
             vlm_MessageAdd( p_msg_child, vlm_ShowMedia( vlm->media[i] ) );
 
         return p_msg;
