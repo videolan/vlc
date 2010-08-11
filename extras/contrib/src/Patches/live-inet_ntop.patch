@@ -142,19 +142,6 @@ diff -ru live.orig/liveMedia/PassiveServerMediaSubsession.cpp live/liveMedia/Pas
  
      fSDPLines = strDup(sdpLines);
      delete[] sdpLines;
-diff -ru live.orig/liveMedia/RTCP.cpp live/liveMedia/RTCP.cpp
---- live.orig/liveMedia/RTCP.cpp	2010-05-30 01:20:31.000000000 +0300
-+++ live/liveMedia/RTCP.cpp	2010-06-06 00:34:03.000000000 +0300
-@@ -359,7 +359,8 @@
-     }
- 
- #ifdef DEBUG
--    fprintf(stderr, "[%p]saw incoming RTCP packet (from address %s, port %d)\n", this, our_inet_ntoa(fromAddress.sin_addr), ntohs(fromAddress.sin_port));
-+    char buf[16];
-+    fprintf(stderr, "[%p]saw incoming RTCP packet (from address %s, port %d)\n", this, our_inet_ntoa(fromAddress.sin_addr, buf), ntohs(fromAddress.sin_port));
-     unsigned char* p = pkt;
-     for (unsigned i = 0; i < packetSize; ++i) {
-       if (i%4 == 0) fprintf(stderr, " ");
 diff -ru live.orig/liveMedia/RTSPClient.cpp live/liveMedia/RTSPClient.cpp
 --- live.orig/liveMedia/RTSPClient.cpp	2010-05-30 01:20:31.000000000 +0300
 +++ live/liveMedia/RTSPClient.cpp	2010-06-06 00:39:08.000000000 +0300
