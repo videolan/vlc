@@ -308,16 +308,26 @@ void input_ControlVarNavigation( input_thread_t *p_input )
         var_AddCallback( p_input, val.psz_string,
                          NavigationCallback, (void *)(intptr_t)i );
 
+        char psz_length[MSTRTIME_MAX_SIZE + sizeof(" []")] = "";
+        if( p_input->p->title[i]->i_length > 0 )
+        {
+            strcpy( psz_length, " [" );
+            secstotimestr( &psz_length[2], p_input->p->title[i]->i_length / CLOCK_FREQ );
+            strcat( psz_length, "]" );
+        }
+
         if( p_input->p->title[i]->psz_name == NULL ||
             *p_input->p->title[i]->psz_name == '\0' )
         {
-            if( asprintf( &text.psz_string, _("Title %i"),
-                      i + p_input->p->i_title_offset ) == -1 )
+            if( asprintf( &text.psz_string, _("Title %i%s"),
+                          i + p_input->p->i_title_offset, psz_length ) == -1 )
                 continue;
         }
         else
         {
-            text.psz_string = strdup( p_input->p->title[i]->psz_name );
+            if( asprintf( &text.psz_string, "%s%s",
+                          p_input->p->title[i]->psz_name, psz_length ) == -1 )
+                continue;
         }
         var_Change( p_input, "navigation", VLC_VAR_ADDCHOICE, &val, &text );
 
