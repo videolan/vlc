@@ -1048,9 +1048,6 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
 
 static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
 {
-    /* Destroy the video filters2 */
-    filter_chain_Delete(vout->p->filter.chain);
-
     /* Destroy translation tables */
     if (vout->p->display.vd) {
         if (vout->p->decoder_pool) {
@@ -1059,6 +1056,9 @@ static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
         }
         vout_CloseWrapper(vout, state);
     }
+
+    /* Destroy the video filters2 */
+    filter_chain_Delete(vout->p->filter.chain);
 
     if (vout->p->decoder_fifo)
         picture_fifo_Delete(vout->p->decoder_fifo);
