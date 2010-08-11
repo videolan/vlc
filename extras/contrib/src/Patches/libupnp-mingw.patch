@@ -1,0 +1,40 @@
+--- libupnp.old/upnp/inc/upnp.h	2008-03-09 01:54:58.000000000 +0100
++++ libupnp/upnp/inc/upnp.h	2010-08-11 12:40:37.000000000 +0200
+@@ -74,14 +74,16 @@
+ 		typedef __int64 int64_t;
+ 		#define PRId64 "I64d"
+ 		#define PRIzu "lu"
+-	#endif
+-	#ifdef UPNP_USE_BCBPP
++	#elif defined UPNP_USE_BCBPP
+ 		/* define some things Borland Builder doesn't know */
+ 		#define UPNP_INLINE inline
+ 		typedef __int64 int64_t;
+ #warning The Borland C compiler is probably broken on PRId64, please someone provide a proper fix here
+ 		#define PRId64 "I64d"
+ 		#define PRIzu "zu"
++	#else
++		#define UPNP_INLINE inline
++		#define PRIzu "zu"
+ 	#endif
+ #else
+ 	#define EXPORT_SPEC
+--- libupnp.old/upnp/src/inc/unixutil.h	2008-02-10 02:55:34.000000000 +0100
++++ libupnp/upnp/src/inc/unixutil.h	2010-08-11 12:48:37.000000000 +0200
+@@ -38,7 +38,15 @@
+ #ifndef WIN32
+ 	#include <sys/socket.h>
+ #else
+-	typedef int socklen_t;
++	//typedef int socklen_t;
++	#if !defined(UNDER_CE)
++	#    define _NO_OLDNAMES 1
++	#    include <io.h>
++	#endif
++	#include <winsock2.h>
++	#include <ws2tcpip.h>
++	#define ENETUNREACH WSAENETUNREACH
++	#define net_errno (WSAGetLastError())
+ 	#define EAFNOSUPPORT 97
+ #endif
+ 

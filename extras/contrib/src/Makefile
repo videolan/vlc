@@ -2407,9 +2407,18 @@ libupnp-$(UPNP_VERSION).tar.bz2:
 
 libupnp: libupnp-$(UPNP_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
+	patch -p0 < Patches/libupnp-mingw.patch
+ifdef HAVE_WIN32
+	patch -p0 < Patches/libupnp-configure.patch
+	cd $@; libtoolize&& autoreconf
+endif
+
+ifdef HAVE_WIN32
+LIBUPNP_ECFLAGS=-DPTW32_STATIC_LIB
+endif
 
 .libupnp: libupnp
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-samples --without-documentation --disable-webserver CFLAGS="$(CFLAGS) -O3" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-samples --without-documentation --enable-static --disable-webserver CFLAGS="$(CFLAGS) -O3 -DUPNP_STATIC_LIB $(LIBUPNP_ECFLAGS)" && make && make install)
 	touch $@
 
 CLEAN_FILE += .libupnp
