@@ -279,7 +279,7 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
         p_cfg->c_polarization = p_scan->parameter.sat_info.p_transponders[p_scan->i_index].c_polarization;
 
         msg_Dbg( p_scan->p_obj,
-                 "transponder [%d/%d]: frequency=%d, symbolrate=%d, fec=%d, polarization=%c",
+                 "transponder [%"PRId64"/%d]: frequency=%d, symbolrate=%d, fec=%d, polarization=%c",
                  p_scan->i_index + 1,
                  *pi_count,
                  p_cfg->i_frequency,
