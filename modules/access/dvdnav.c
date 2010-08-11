@@ -998,13 +998,26 @@ static void DemuxTitles( demux_t *p_demux )
     dvdnav_get_number_of_titles( p_sys->dvdnav, &i_titles );
     for( i = 1; i <= i_titles; i++ )
     {
-        int32_t i_chapters = 0;
-        int j;
+        int32_t i_chapters;
+        uint64_t i_title_length;
 
-        dvdnav_get_number_of_parts( p_sys->dvdnav, i, &i_chapters );
-
+#if defined(HAVE_DVDNAV_DESCRIBE_TITLE_CHAPTERS)
+        uint64_t *p_chapters_time;
+        i_chapters = dvdnav_describe_title_chapters( p_sys->dvdnav, i,
+                                                     &p_chapters_time,
+                                                     &i_title_length );
+        if( i_chapters > 0 )
+            free( p_chapters_time );
+        else
+            i_title_length = 0;
+#else
+        if( dvdnav_get_number_of_parts( p_sys->dvdnav, i, &i_chapters ) != DVDNAV_STATUS_OK )
+            i_chapters = 0;
+        i_title_length = 0;
+#endif
         t = vlc_input_title_New();
-        for( j = 0; j < __MAX( i_chapters, 1 ); j++ )
+        t->i_length = i_title_length * 1000 / 90;
+        for( int j = 0; j < __MAX( i_chapters, 1 ); j++ )
         {
             s = vlc_seekpoint_New();
             TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
