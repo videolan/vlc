@@ -100,7 +100,7 @@ static void push_message( lua_State *L, vlm_message_t *message )
         }
         lua_setfield( L, -2, "children" );
     }
-    else
+    if ( message->psz_value )
     {
         lua_pushstring( L, message->psz_value );
         lua_setfield( L, -2, "value" );

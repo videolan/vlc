@@ -78,15 +78,13 @@ function vlm_message_to_string(client,message,prefix)
     local prefix = prefix or ""
     if message.value then
         client:append(prefix .. message.name .. " : " .. message.value)
-        return
     else
         client:append(prefix .. message.name)
-        if message.children then
-            for i,c in ipairs(message.children) do
-                vlm_message_to_string(client,c,prefix.."    ")
-            end
+    end
+    if message.children then
+        for i,c in ipairs(message.children) do
+            vlm_message_to_string(client,c,prefix.."    ")
         end
-        return
     end
 end
 
