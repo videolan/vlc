@@ -78,22 +78,6 @@
  * mark it to be presented */
 #define DEFAULT_PTS_DELAY               (3*CLOCK_FREQ/10)
 
-/* DVD and VCD devices */
-#if !defined( WIN32 ) && !defined( UNDER_CE )
-#if defined(__OpenBSD__)
-#   define CD_DEVICE      "/dev/cd0c"
-#   define DVD_DEVICE     "/dev/cd0c"
-#else
-#   define CD_DEVICE      "/dev/cdrom"
-#   define DVD_DEVICE     "/dev/dvd"
-#endif
-#else
-#   define CD_DEVICE      "D:"
-#   define DVD_DEVICE     NULL
-#endif
-#define VCD_DEVICE        CD_DEVICE
-#define CDAUDIO_DEVICE    CD_DEVICE
-
 /*****************************************************************************
  * Audio configuration
  *****************************************************************************/

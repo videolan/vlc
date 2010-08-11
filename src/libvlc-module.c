@@ -843,23 +843,43 @@ static const char *const ppsz_clock_descriptions[] =
     "Load this subtitle file. To be used when autodetect cannot detect " \
     "your subtitle file.")
 
+/* DVD and VCD devices */
 #define DVD_DEV_TEXT N_("DVD device")
+#define VCD_DEV_TEXT N_("VCD device")
+#define CDAUDIO_DEV_TEXT N_("Audio CD device")
+
 #ifdef WIN32
-#define DVD_DEV_LONGTEXT N_( \
+# define DVD_DEV_LONGTEXT N_( \
     "This is the default DVD drive (or file) to use. Don't forget the colon " \
-    "after the drive letter (eg. D:)")
+    "after the drive letter (e.g. D:)")
+# define VCD_DEV_LONGTEXT N_( \
+    "This is the default VCD drive (or file) to use. Don't forget the colon " \
+    "after the drive letter (e.g. D:)")
+# define CDAUDIO_DEV_LONGTEXT N_( \
+    "This is the default Audio CD drive (or file) to use. Don't forget the " \
+    "colon after the drive letter (e.g. D:)")
+# define DVD_DEVICE     NULL
+# define CD_DEVICE      "D:"
+
 #else
-#define DVD_DEV_LONGTEXT N_( \
+# define DVD_DEV_LONGTEXT N_( \
     "This is the default DVD device to use.")
+# define VCD_DEV_LONGTEXT N_( \
+    "This is the default VCD device to use." )
+# define CDAUDIO_DEV_LONGTEXT N_( \
+    "This is the default Audio CD device to use." )
+
+# if defined(__OpenBSD__)
+#  define DVD_DEVICE     "/dev/cd0c"
+#  define CD_DEVICE      "/dev/cd0c"
+# else
+#  define DVD_DEVICE     "/dev/dvd"
+#  define CD_DEVICE      "/dev/cdrom"
+# endif
 #endif
 
-#define VCD_DEV_TEXT N_("VCD device")
-#define VCD_DEV_LONGTEXT N_( \
-    "This is the default VCD device to use." )
-
-#define CDAUDIO_DEV_TEXT N_("Audio CD device")
-#define CDAUDIO_DEV_LONGTEXT N_( \
-    "This is the default Audio CD device to use." )
+#define VCD_DEVICE       CD_DEVICE
+#define CDAUDIO_DEVICE   CD_DEVICE
 
 #define IPV6_TEXT N_("Force IPv6")
 #define IPV6_LONGTEXT N_( \
