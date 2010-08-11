@@ -80,7 +80,11 @@
 #     define LIBVLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
 #   endif
 #   define LIBVLC_FORMAT_ARG(x) __attribute__ ((format_arg(x)))
-#   define LIBVLC_USED __attribute__ ((warn_unused_result))
+#   if __GNUC__ > 3 || (__GNUC__ == 3 && (__GNUC_MINOR__ >= 4))
+#     define LIBVLC_USED __attribute__ ((warn_unused_result))
+#   else
+#     define LIBVLC_USED
+#   endif
 #   define LIBVLC_MALLOC __attribute__ ((malloc))
 #else
 #   define LIBVLC_FORMAT(x,y)
