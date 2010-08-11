@@ -5,19 +5,25 @@ Important changes for packagers:
  * The default builds now assume that the operating system uses UTF-8 for
    its file systems and files content (except the Windows port). If this is
    not acceptable, pass --enable-non-utf8 to the configure script.
+ * The default tarballs are now .tar.xz
 
 Access
  * Multiple files are supported from RAR files
  * BDA: experimental support for ClearQam devices
+ * DVB-S scanning support
+ * DShow: support for freq and video standard selection
 
 Codecs
  * You can now use ffmpeg-mt in conjunction with vlc
 
 Demuxers:
  * id3tag plugin is removed (superseded by taglib).
+ * Ogg seeking improvements
 
 Interfaces
  * The telnet interface has been removed in the favour of the lua one
+ * Skins2 / Qt: misc improvements
+ * Qt: port to Mac platform
 
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
