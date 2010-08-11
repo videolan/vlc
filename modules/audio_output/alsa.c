@@ -463,7 +463,7 @@ static int Open( vlc_object_t *p_this )
           the time it returns, probe if the device is available in loop for 1s.
           We cannot use blocking mode since the we would wait indefinitely when
           switching from a dmx device to surround51. */
-        if( i == 0 )
+        if( i == 1 )
         {
             msg_Err( p_aout, "audio device %s is already in use",
                      psz_device );
