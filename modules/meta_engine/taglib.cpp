@@ -132,6 +132,8 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
     {
         ID3v2::UniqueFileIdentifierFrame* p_ufid =
                 dynamic_cast<ID3v2::UniqueFileIdentifierFrame*>(*iter);
+        if( !p_ufid )
+            continue;
         const char *owner = p_ufid->owner().toCString();
         if (!strcmp( owner, "http://musicbrainz.org" ))
         {
@@ -152,6 +154,8 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
     {
         ID3v2::UserTextIdentificationFrame* p_txxx =
                 dynamic_cast<ID3v2::UserTextIdentificationFrame*>(*iter);
+        if( !p_txxx )
+            continue;
         vlc_meta_AddExtra( p_meta, p_txxx->description().toCString( true ),
                            p_txxx->fieldList().toString().toCString( true ) );
     }
@@ -208,6 +212,8 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
     {
         ID3v2::AttachedPictureFrame* p_apic =
             dynamic_cast<ID3v2::AttachedPictureFrame*>(*iter);
+        if( !p_apic )
+            continue;
         input_attachment_t *p_attachment;
 
         const char *psz_mime;
