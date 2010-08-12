@@ -435,9 +435,6 @@ modules/control/rc.c
 modules/control/unimotion.c
 modules/control/unimotion.h
 modules/demux/aiff.c
-modules/demux/asademux.c
-modules/demux/asademux.h
-modules/demux/asademux_defs.h
 modules/demux/asf/asf.c
 modules/demux/asf/libasf.c
 modules/demux/asf/libasf.h
@@ -519,7 +516,6 @@ modules/demux/rawvid.c
 modules/demux/real.c
 modules/demux/smf.c
 modules/demux/subtitle.c
-modules/demux/subtitle_asa.c
 modules/demux/ts.c
 modules/demux/tta.c
 modules/demux/ty.c

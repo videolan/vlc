@@ -44,7 +44,6 @@ $Id$
  * aout_file: Audio output to write to a file
  * aout_sdl: audio output module using the SDL library
  * araw: Pseudo audio decoder for raw PCM
- * asademux: ASS/SSA subtitles demuxer
  * asf: ASF demuxer
  * atmo: Ambilight-like video-output
  * au: AU file demuxer

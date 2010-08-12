@@ -18,7 +18,6 @@ SOURCES_pva = pva.c
 SOURCES_aiff = aiff.c
 SOURCES_mjpeg = mjpeg.c
 SOURCES_subtitle = subtitle.c
-SOURCES_asademux = subtitle_asa.c asademux.c asademux_defs.h asademux.h
 SOURCES_ty = ty.c ../codec/cc.h
 SOURCES_vobsub = vobsub.c vobsub.h
 SOURCES_voc = voc.c
