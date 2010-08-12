@@ -425,3 +425,14 @@ volume.set( level ): Set volume to an absolute level between 0 and 1024.
 volume.up( [n] ): Increment volume by n steps of 32. n defaults to 1.
 volume.down( [n] ): Decrement volume by n steps of 32. n defaults to 1.
 
+XML
+---
+xml = vlc.xml(): Create an xml object.
+reader = xml:create_reader( stream ): create an xml reader that use the given stream.
+reader:read(): read some data
+reader:node_type(): return the type of the curret node: 'none', 'startelem', 'endelem' or 'text'.
+reader:name(): name of the element
+reader:value(): value of the element
+reader:next_attr(): next attribute of the element
+
+The simplexml module can also be used to parse XML documents easily.
