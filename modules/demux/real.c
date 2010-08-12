@@ -86,10 +86,10 @@ typedef struct
 
     es_out_id_t *p_es;
 
-    int         i_frame_size;
+    unsigned    i_frame_size;
 
     int         i_frame_num;
-    int         i_frame_pos;
+    unsigned    i_frame_pos;
     int         i_frame_slice;
     int         i_frame_slice_count;
     block_t     *p_frame;
