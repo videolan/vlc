@@ -55,8 +55,9 @@ local d = vlc.dialog( "My VLC Extension" ): Create a new UI dialog, with a human
 d:show(): Show this dialog.
 d:hide(): Hide (but not close) this dialog.
 d:delete(): Close and delete this dialog.
-d:del_widget( widget ): Delete 'widget'. It disappears from the dialog and repositioning may occur.
+d:set_title( title ): set the title of this dialog.
 d:update(): Update the dialog immediately (don't wait for the current function to return)
+d:del_widget( widget ): Delete 'widget'. It disappears from the dialog and repositioning may occur.
 
 In the following functions, you can always add some optional parameters: col, row, col_span, row_span, width, height.
 They define the position of a widget in the dialog:
@@ -162,6 +163,8 @@ misc.cachedir(): Get the user's VLC cache directory.
 misc.datadir_list( name ): FIXME: write description ... or ditch function
   if it isn't useful anymore, we have datadir and userdatadir :)
 
+misc.action_id( name ): get the id of the given action.
+
 misc.mdate(): Get the current date (in microseconds).
 misc.mwait(): Wait for the given date (in microseconds).
 
@@ -188,6 +191,7 @@ while true do
     net.close( fd )
   end
 end
+net.connect_tcp( host, port ): open a connection to the given host:port (TCP).
 net.close( fd ): Close file descriptor.
 net.send( fd, string, [length] ): Send data on fd.
 net.recv( fd, [max length] ): Receive data from fd.
@@ -195,8 +199,8 @@ net.poll( { fd = events }, [timeout in seconds] ): Implement poll function.
   Returns the numbers of file descriptors with a non 0 revent. The function
   modifies the input table to { fd = revents }. See "man poll".
 net.POLLIN/POLLPRI/POLLOUT/POLLRDHUP/POLLERR/POLLHUP/POLLNVAL: poll event flags
-net.fd_read( fd, [max length] ): Read data from fd.
-net.fd_write( fd, string, [length] ): Write data to fd.
+net.read( fd, [max length] ): Read data from fd.
+net.write( fd, string, [length] ): Write data to fd.
 net.stat( path ): Stat a file. Returns a table with the following fields:
     .type
     .mode
@@ -317,6 +321,13 @@ playlist.get( [what, [tree]] ): Get the playlist.
       .duration: (-1 if unknown)
       .nb_played:
       .children: A table of children playlist items.
+playlist.search( name ): filter the playlist items with the given string
+playlist.current(): return the current input item
+playlist.sort( key ): sort the playlist according to the key.
+  Key must be one of the followings values: 'id', 'title', 'title nodes first',
+                                            'artist', 'genre', 'random', 'duration',
+                                            'title numeric' or 'album'.
+playlist.status(): return the playlist status: 'stopped', 'playing', 'paused' or 'unknown'.
 
 FIXME: add methods to get an item's meta, options, es ...
 
@@ -327,13 +338,14 @@ sd.get_services_names(): Get a table of all available service discovery
 sd.add( name ): Add service discovery.
 sd.remove( name ): Remove service discovery.
 sd.is_loaded( name ): Check if service discovery is loaded.
-sd.add_item( ... ): Add an item to the service discovery.
-  The item object has the same members as the one in playlist.add().
-  Returns the input item.
 sd.add_node( ... ): Add a node to the service discovery.
   The node object has the following members:
       .title: the node's name
       .arturl: the node's ArtURL (OPTIONAL)
+sd.add_item( ... ): Add an item to the service discovery.
+  The item object has the same members as the one in playlist.add().
+  Returns the input item.
+sd.remove_item( item ): remove the item.
 
 n = vlc.sd.add_node( {title="Node"} )
 n:add_subitem( ... ): Same as sd.add_item(), but as a subitem of n.
@@ -368,9 +380,9 @@ strings.iconv( str1 to, str2 from, str ): use vlc_iconv to convert string
 Variables
 ---------
 var.get( object, name ): Get the object's variable "name"'s value.
-var.set( object, name, value ): Set the object's variable "name" to "value".
 var.get_list( object, name ): Get the object's variable "name"'s value list.
   1st return value is the value list, 2nd return value is the text list.
+var.set( object, name, value ): Set the object's variable "name" to "value".
 var.create( object, name, value ): Create and set the object's variable "name"
   to "value". Created vars can be of type float, string or bool.
 
@@ -407,9 +419,9 @@ a reference to it, all VLM items will be deleted.
 
 Volume
 ------
+volume.get(): Get volume.
 volume.set( level ): Set volume to an absolute level between 0 and 1024.
   256 is 100%.
-volume.get(): Get volume.
 volume.up( [n] ): Increment volume by n steps of 32. n defaults to 1.
 volume.down( [n] ): Decrement volume by n steps of 32. n defaults to 1.
 
