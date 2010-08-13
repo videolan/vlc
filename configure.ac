@@ -3694,84 +3694,10 @@ dnl  JACK modules
 dnl
 PKG_ENABLE_MODULES_VLC([JACK], [jack access_jack], [jack], [JACK audio I/O modules],[auto])
 
-
-dnl
-dnl  CyberLink for C++ UPnP stack
-dnl
-AC_ARG_ENABLE(cyberlink,
-  [  --enable-cyberlink      CyberLink for C++ UPnP stack (default disabled)])
-  AS_IF([test "${enable_cyberlink}" = "yes" ], [
-  AC_ARG_WITH(cyberlink-tree,
-    [  --with-cyberlink-tree=PATH CyberLink for C++ tree for static linking])
-
-  dnl
-  dnl test for --with-cyberlink-tree
-  dnl
-  AS_IF([test ! -z "${with_cyberlink_tree}" -a "${CXX}" != ""], [
-    AC_LANG_PUSH(C++)
-    real_cyberlink_tree="`cd ${with_cyberlink_tree} 2>/dev/null && pwd`"
-    AS_IF([test -z "${real_cyberlink_tree}"], [
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_cyberlink_tree}])
-    ])
-    CPPFLAGS_save="${CPPFLAGS}"
-    CPPFLAGS_cyberlink="-I${real_cyberlink_tree}/include"
-    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_cyberlink}"
-    AC_CHECK_HEADERS([cybergarage/upnp/MediaServer.h],
-      [ VLC_ADD_CXXFLAGS([upnp_cc], [${CPPFLAGS_cyberlink}])
-        VLC_ADD_PLUGIN([upnp_cc])
-      ],[
-        AC_MSG_ERROR([cannot find CyberLink for C++ headers])
-      ])
-    AC_MSG_CHECKING(for libclink.a in ${with_cyberlink_tree})
-    AS_IF([test -f "${real_cyberlink_tree}/lib/unix/libclink.a"], [
-      AC_MSG_RESULT(${real_cyberlink_tree}/lib/unix/libclink.a)
-      dnl The mere fact that we have to make such an ugly check sucks
-      AC_MSG_CHECKING(for XML parser to link CyberLink with)
-      LIBS_save="$LIBS"
-      LIBS_cclink="no"
-      for l in "`xml2-config --libs`" -lexpat -lxerces-c; do
-        LIBS="$LIBS_save ${real_cyberlink_tree}/lib/unix/libclink.a -lpthread $l"
-        AC_LINK_IFELSE([AC_LANG_PROGRAM([
-#include <cybergarage/upnp/media/player/MediaPlayer.h>
-using namespace CyberLink;
-
-class testclass : public SearchResponseListener, public MediaPlayer
-{
-    virtual void deviceSearchResponseReceived( SSDPPacket *)
-    {
-    }
-
-    public:
-      testclass (void)
-      {
-        addSearchResponseListener (this);
-	start ();
-      }
-};
-],[testclass l;])],[LIBS_cclink="$l"])
-      done
-      LIBS="${LIBS_save}"
-      dnl should not happen - otherwise this needs fixing - hence FAILURE
-      AS_IF([test "${LIBS_cclink}" = "no"],
-        [AC_MSG_FAILURE([cannot find XML parser for CyberLink])])
-      AC_MSG_RESULT([${LIBS_cclink}])
-      VLC_ADD_LIBS([upnp_cc], [${real_cyberlink_tree}/lib/unix/libclink.a -lpthread ${LIBS_cclink}])
-    ], [
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_cyberlink_tree}/lib/unix/libclink.a, make sure you compiled CyberLink for C++ in ${with_cyberlink_tree}])
-    ])
-    CPPFLAGS="${CPPFLAGS_save}"
-    AC_LANG_POP([C++])
-  ])
-])
-
 dnl
 dnl UPnP Plugin (Intel SDK)
 dnl
 PKG_ENABLE_MODULES_VLC([UPNP], [upnp_intel], [libupnp], [Intel UPnp SDK],[auto])
-
 
 dnl
 dnl  Interface plugins
