@@ -165,8 +165,6 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
     /* if there are no transponders in mem, laod from config file */
     if( !*pi_count )
     {
-        scan_dvbs_transponder_t *p_transponders = malloc( sizeof( scan_dvbs_transponder_t ) );
-
         DIR *p_dir;
 
         char *psz_dir = NULL;
@@ -223,6 +221,7 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
         /* parse file */
         if( f )
         {
+            scan_dvbs_transponder_t *p_transponders = malloc( sizeof( scan_dvbs_transponder_t ) );
             char type;
             char psz_fec[3];
 
@@ -256,6 +255,7 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
             msg_Dbg( p_scan->p_obj, "parsed %d transponders from config", *pi_count);
 
             fclose( f );
+            p_scan->parameter.sat_info.p_transponders = p_transponders;
         }
         else
         {
@@ -266,8 +266,6 @@ static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
         }
         free( p_scan->parameter.sat_info.psz_name );
         free( p_scan->parameter.sat_info.psz_path );
-
-        p_scan->parameter.sat_info.p_transponders = p_transponders;
     }
 
     if( p_scan->i_index < *pi_count )
