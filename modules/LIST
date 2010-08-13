@@ -1,4 +1,4 @@
-List of vlc plugins (363)
+List of vlc plugins (362)
 $Id$
  * a52: A/52 basic parser/packetizer
  * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
@@ -83,6 +83,7 @@ $Id$
  * demux_cdg: Demuxer for CD-G files (Karaoke)
  * demuxdump: Pseudo-demuxer that dumps the stream
  * dirac: BBC Dirac codec
+ * direct2d: video output module using the Direct2D API
  * direct3d: video output module using the Direct3D API
  * directfb: Direct Framebuffer video output
  * directory : input module to read files in a directory
@@ -151,8 +152,6 @@ $Id$
  * i422_yuy2: planar 4:2:2 YUV to packed YUV conversion functions
  * i422_yuy2_mmx: MMX accelerated version of i422_yuy2
  * i422_yuy2_sse2: sse2 accelerated version of i422_yuy2
- * id3: ID3 tag skipper
- * id3tag: ID3 tag parser/skipper using libid3tag
  * image: Image file video output
  * inhibit: preventing the computer from suspending
  * invert: inverse video filter
