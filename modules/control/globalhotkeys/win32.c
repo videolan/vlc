@@ -168,7 +168,7 @@ static void *Thread( void *p_data )
             (LONG_PTR)p_intf );
 
     /* Registering of Hotkeys */
-    for( struct hotkey *p_hotkey = p_intf->p_libvlc->p_hotkeys;
+    for( const struct hotkey *p_hotkey = p_intf->p_libvlc->p_hotkeys;
             p_hotkey->psz_action != NULL;
             p_hotkey++ )
     {
@@ -262,7 +262,7 @@ static void *Thread( void *p_data )
         DispatchMessage( &message );
 
     /* Unregistering of Hotkeys */
-    for( struct hotkey *p_hotkey = p_intf->p_libvlc->p_hotkeys;
+    for( const struct hotkey *p_hotkey = p_intf->p_libvlc->p_hotkeys;
             p_hotkey->psz_action != NULL;
             p_hotkey++ )
     {
@@ -296,7 +296,7 @@ LRESULT CALLBACK WMHOTKEYPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
 
                 LONG_PTR ret = GetWindowLongPtr( hwnd, GWLP_USERDATA );
                 intf_thread_t *p_intf = (intf_thread_t*)ret;
-                struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
+                const struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
 
                 if( !GlobalGetAtomNameA(
                         wParam, psz_atomName, sizeof( psz_atomName ) ) )
