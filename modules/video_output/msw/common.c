@@ -66,8 +66,10 @@
 static void CommonChangeThumbnailClip(vout_display_t *, bool show);
 static int CommonControlSetFullscreen(vout_display_t *, bool is_fullscreen);
 
+#if !defined(UNDER_CE) && !defined(MODULE_NAME_IS_glwin32)
 static void DisableScreensaver(vout_display_t *);
 static void RestoreScreensaver(vout_display_t *);
+#endif
 
 /* */
 int CommonInit(vout_display_t *vd)
@@ -686,7 +688,7 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
     }
 }
 
-#ifndef UNDER_CE
+#if !defined(UNDER_CE) && !defined(MODULE_NAME_IS_glwin32)
 static void DisableScreensaver(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
