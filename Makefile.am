@@ -75,7 +75,7 @@ EXTRA_DIST = \
 	extras/package/win32/languages/sorani.nsh \
 	extras/package/win32/languages/spanish.nsh
 
-dist_noinst_SCRIPTS = bootstrap toolbox
+dist_noinst_SCRIPTS = bootstrap
 nodist_noinst_SCRIPTS = compile
 
 BUILT_SOURCES_distclean = vlc-config
