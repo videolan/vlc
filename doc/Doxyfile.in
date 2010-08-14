@@ -663,7 +663,7 @@ IMAGE_PATH             =
 # If FILTER_PATTERNS is specified, this tag will be
 # ignored.
 
-INPUT_FILTER           = "@top_srcdir@/toolbox --add-include"
+INPUT_FILTER           = "@top_srcdir@/doc/doc_helper.sh"
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern
 # basis.
