@@ -133,6 +133,9 @@ void CtrlVideo::unsetLayout()
 
 void CtrlVideo::resizeControl( int width, int height )
 {
+    if( !m_bAutoResize )
+        return;
+
     WindowManager &rWindowManager =
         getIntf()->p_sys->p_theme->getWindowManager();
 
