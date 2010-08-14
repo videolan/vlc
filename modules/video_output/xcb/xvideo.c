@@ -64,6 +64,8 @@ vlc_module_begin ()
 
     add_integer ("xvideo-adaptor", -1, NULL,
                  ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true)
+    add_integer ("xvideo-format-id", -1, NULL,
+                 ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true)
     add_bool ("x11-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true)
         add_deprecated_alias ("xvideo-shm")
     add_shortcut ("xcb-xv", "xv", "xvideo", "xid")
@@ -381,8 +383,10 @@ static int Open (vlc_object_t *obj)
         else
             chromas = chromas_default;
 
-        vlc_fourcc_t chroma;
-        for (size_t i = 0; chromas[i]; i++)
+        int forced_format_id = var_CreateGetInteger (obj, "xvideo-format-id");
+        vlc_fourcc_t chroma = forced_format_id;
+        xfmt = FindFormat (vd, chroma, &fmt, a->base_id, r, &p_sys->att);
+        for (size_t i = 0; !xfmt && chromas[i]; i++)
         {
             chroma = chromas[i];
 
@@ -396,25 +400,22 @@ static int Open (vlc_object_t *obj)
             }
 
             xfmt = FindFormat (vd, chroma, &fmt, a->base_id, r, &p_sys->att);
-            if (xfmt != NULL)
-            {
-                p_sys->id = xfmt->id;
-                p_sys->swap_uv = vlc_fourcc_AreUVPlanesSwapped (fmt.i_chroma,
-                                                                chroma);
-                if (!p_sys->swap_uv)
-                    fmt.i_chroma = chroma;
-                if (xfmt->type == XCB_XV_IMAGE_FORMAT_INFO_TYPE_RGB)
-                {
-                    fmt.i_rmask = xfmt->red_mask;
-                    fmt.i_gmask = xfmt->green_mask;
-                    fmt.i_bmask = xfmt->blue_mask;
-                }
-                break;
-            }
+            if (xfmt != NULL) break;
         }
         free (r);
         if (xfmt == NULL) /* No acceptable image formats */
             continue;
+
+        p_sys->id = xfmt->id;
+        p_sys->swap_uv = vlc_fourcc_AreUVPlanesSwapped (fmt.i_chroma, chroma);
+        if (!p_sys->swap_uv)
+            fmt.i_chroma = chroma;
+        if (xfmt->type == XCB_XV_IMAGE_FORMAT_INFO_TYPE_RGB)
+        {
+            fmt.i_rmask = xfmt->red_mask;
+            fmt.i_gmask = xfmt->green_mask;
+            fmt.i_bmask = xfmt->blue_mask;
+        }
 
         /* Grab a port */
         for (unsigned i = 0; i < a->num_ports; i++)
