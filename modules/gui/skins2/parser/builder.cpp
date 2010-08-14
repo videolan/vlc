@@ -1028,12 +1028,19 @@ void Builder::addVideo( const BuilderData::Video &rData )
         pVisible );
     m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pVideo );
 
-    // if autoresize is true, force the control to resize
     BuilderData::Video Data = rData;
-    if( rData.m_autoResize )
+    if( Data.m_autoResize )
     {
-        Data.m_leftTop = "lefttop";
-        Data.m_rightBottom = "rightbottom";
+        // force autoresize to false if the control is not able to
+        // freely resize within its container
+        if( Data.m_xKeepRatio || Data.m_yKeepRatio ||
+            !( Data.m_leftTop == "lefttop" &&
+               Data.m_rightBottom == "rightbottom" ) )
+        {
+            msg_Err( getIntf(),
+                "video: resize policy and autoresize are not compatible" );
+            Data.m_autoResize = false;
+        }
     }
 
     // Compute the position of the control
