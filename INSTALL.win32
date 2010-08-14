@@ -1,4 +1,4 @@
-INSTALL file for the Windows 2k/XP/Vista/Seven version of the VLC media player
+INSTALL file for the Windows XP/Vista/Seven version of VLC media player
 
 
 Running VLC
@@ -28,9 +28,7 @@ If you want to build VLC from sources, you can do it in several ways:
 
 - natively on Windows, using MSYS+MINGW (www.mingw.org)
   (MSYS is a minimal build environment to compile Unixish projects under
-  windoze. It provides all the common Unix tools like sh, gmake...)
-  Please note that the gettext utilities are not included in the default
-  MSYS/MINGW packages so you won't be able to build VLC with i18n support.
+  windows. It provides all the common Unix tools like sh, gmake...)
 
 UNSUPPORTED METHODS
 -------------------
@@ -41,19 +39,21 @@ UNSUPPORTED METHODS
 
 - natively on Windows, using Microsoft Visual Studio. This will not work.
 
+
 Getting the right compiler tools
 ================================
 
 - cross-compiling with mingw32:
 You first need to download a GNU/Linux cross-compiler version of mingw32.
 
-For Debian GNU/Linux users, you can use the mingw32, mingw32-binutils and
+For Debian GNU/Linux users, you can use the gcc-mingw32, mingw32-binutils and
 mingw32-runtime packages.
 For Fedora users, you can use mingw-binutils, mingw-gcc-core, mingw-gcc-g++
 
 For MingW and Cygwin, please refer to our Wiki:
 - http://wiki.videolan.org/Win32CompileMSYS
 - http://wiki.videolan.org/Win32CompileCygwin
+
 
 Getting the additional libraries
 =================================
@@ -117,7 +117,7 @@ Once the compilation is done, you can either run VLC directly from the source
 tree or you can build self-contained VLC packages with the following
 'make' rules:
 
-  make package-win32-base
+  make package-win-base
    will create a subdirectory named vlc-x.x.x with all the binaries
    'stripped' (ie. without any debugging symbols).
 
