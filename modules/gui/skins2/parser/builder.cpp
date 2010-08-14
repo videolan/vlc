@@ -1018,16 +1018,6 @@ void Builder::addVideo( const BuilderData::Video &rData )
         return;
     }
 
-    // Get the visibility variable
-    // XXX check when it is null
-    Interpreter *pInterpreter = Interpreter::instance( getIntf() );
-    VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
-
-    CtrlVideo *pVideo = new CtrlVideo( getIntf(), *pLayout,
-        rData.m_autoResize, UString( getIntf(), rData.m_help.c_str() ),
-        pVisible );
-    m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pVideo );
-
     BuilderData::Video Data = rData;
     if( Data.m_autoResize )
     {
@@ -1043,6 +1033,16 @@ void Builder::addVideo( const BuilderData::Video &rData )
         }
     }
 
+    // Get the visibility variable
+    // XXX check when it is null
+    Interpreter *pInterpreter = Interpreter::instance( getIntf() );
+    VarBool *pVisible = pInterpreter->getVarBool( Data.m_visible, m_pTheme );
+
+    CtrlVideo *pVideo = new CtrlVideo( getIntf(), *pLayout,
+        Data.m_autoResize, UString( getIntf(), Data.m_help.c_str() ),
+        pVisible );
+    m_pTheme->m_controls[Data.m_id] = CtrlGenericPtr( pVideo );
+
     // Compute the position of the control
     const GenericRect *pRect;
     GET_BOX( pRect, rData.m_panelId , pLayout);
@@ -1052,7 +1052,7 @@ void Builder::addVideo( const BuilderData::Video &rData )
                                        *pRect,
                                        Data.m_xKeepRatio, Data.m_yKeepRatio );
 
-    pLayout->addControl( pVideo, pos, rData.m_layer );
+    pLayout->addControl( pVideo, pos, Data.m_layer );
 }
 
 
