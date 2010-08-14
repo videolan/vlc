@@ -514,9 +514,9 @@ static int Direct3DFillPresentationParameters(vout_display_t *vd)
     d3dpp->Flags                  = D3DPRESENTFLAG_VIDEO;
     d3dpp->Windowed               = TRUE;
     d3dpp->hDeviceWindow          = vd->sys->hvideownd;
-    d3dpp->BackBufferWidth        = __MAX(GetSystemMetrics(SM_CXVIRTUALSCREEN),
+    d3dpp->BackBufferWidth        = __MAX((unsigned int)GetSystemMetrics(SM_CXVIRTUALSCREEN),
                                           d3ddm.Width);
-    d3dpp->BackBufferHeight       = __MAX(GetSystemMetrics(SM_CYVIRTUALSCREEN),
+    d3dpp->BackBufferHeight       = __MAX((unsigned int)GetSystemMetrics(SM_CYVIRTUALSCREEN),
                                           d3ddm.Height);
     d3dpp->SwapEffect             = D3DSWAPEFFECT_COPY;
     d3dpp->MultiSampleType        = D3DMULTISAMPLE_NONE;
@@ -1069,7 +1069,7 @@ static void Direct3DRenderScene(vout_display_t *vd, LPDIRECT3DSURFACE9 surface)
 
     /* Update the vertex buffer */
     CUSTOMVERTEX *vertices;
-    hr = IDirect3DVertexBuffer9_Lock(d3dvtc, 0, 0, &vertices, D3DLOCK_DISCARD);
+    hr = IDirect3DVertexBuffer9_Lock(d3dvtc, 0, 0, (void **)&vertices, D3DLOCK_DISCARD);
     if (FAILED(hr)) {
         msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
         return;
