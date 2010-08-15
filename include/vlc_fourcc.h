@@ -148,7 +148,7 @@
 /* Palettized RGB with palette element R:G:B */
 #define VLC_CODEC_RGBP      VLC_FOURCC('R','G','B','P')
 /* 8 bits RGB */
-#define VLC_CODEC_RGB8      VLC_FOURCC('R','G','B','2')
+#define VLC_CODEC_RGB8      VLC_FOURCC('R','G','B','8')
 /* 15 bits RGB stored on 16 bits */
 #define VLC_CODEC_RGB15     VLC_FOURCC('R','V','1','5')
 /* 16 bits RGB store on a 16 bits */
