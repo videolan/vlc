@@ -25,6 +25,7 @@
 #ifdef X11_SKINS
 
 #include <X11/Xatom.h>
+#include <limits.h>
 
 #include "../src/generic_window.hpp"
 #include "../src/vlcproc.hpp"
