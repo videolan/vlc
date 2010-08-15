@@ -552,8 +552,27 @@ static int Direct3DOpen(vout_display_t *vd, video_format_t *fmt)
 
     // Create the D3DDevice
     LPDIRECT3DDEVICE9 d3ddev;
-    HRESULT hr = IDirect3D9_CreateDevice(d3dobj, D3DADAPTER_DEFAULT,
-                                         D3DDEVTYPE_HAL, sys->hvideownd,
+
+    UINT AdapterToUse = D3DADAPTER_DEFAULT;
+    D3DDEVTYPE DeviceType = D3DDEVTYPE_HAL;
+
+#ifndef NDEBUG
+    // Look for 'NVIDIA PerfHUD' adapter
+    // If it is present, override default settings
+    for (UINT Adapter=0; Adapter< IDirect3D9_GetAdapterCount(d3dobj); ++Adapter) {
+        D3DADAPTER_IDENTIFIER9 Identifier;
+        HRESULT Res;
+        Res = IDirect3D9_GetAdapterIdentifier(d3dobj,Adapter,0,&Identifier);
+        if (strstr(Identifier.Description,"PerfHUD") != 0) {
+            AdapterToUse = Adapter;
+            DeviceType = D3DDEVTYPE_REF;
+            break;
+        }
+    }
+#endif
+
+    HRESULT hr = IDirect3D9_CreateDevice(d3dobj, AdapterToUse,
+                                         DeviceType, sys->hvideownd,
                                          D3DCREATE_SOFTWARE_VERTEXPROCESSING|
                                          D3DCREATE_MULTITHREADED,
                                          &sys->d3dpp, &d3ddev);
