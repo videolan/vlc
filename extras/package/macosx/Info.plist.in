@@ -845,6 +845,7 @@
 				<string>ts</string>
 				<string>m2ts</string>
 				<string>mts</string>
+				<string>mt2s</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>mpeg.icns</string>
