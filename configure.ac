@@ -1351,7 +1351,10 @@ AS_IF([test "${enable_neon}" != "no"], [
   AC_CACHE_CHECK([if $CC groks NEON inline assembly], [ac_cv_neon_inline], [
     CFLAGS="${CFLAGS_save} -mfpu=neon"
     AC_COMPILE_IFELSE([
-      AC_LANG_PROGRAM(,[[asm volatile("vqmovun.s64 d0, q1":::"d0");]])
+      AC_LANG_PROGRAM(,[[
+asm volatile("vqmovun.s64 d0, q1":::"d0");
+asm volatile("qadd r0, r0, r0":::"r0"); /* assume ARMv6 */
+]])
     ], [
       ac_cv_neon_inline="-mfpu=neon"
     ], [
