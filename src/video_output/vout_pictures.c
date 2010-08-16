@@ -412,13 +412,13 @@ int picture_Export( vlc_object_t *p_obj,
     unsigned int i_original_height;
     if( fmt_in.i_sar_num >= fmt_in.i_sar_den )
     {
-        i_original_width = fmt_in.i_width * fmt_in.i_sar_num / fmt_in.i_sar_den;
+        i_original_width = (int64_t)fmt_in.i_width * fmt_in.i_sar_num / fmt_in.i_sar_den;
         i_original_height = fmt_in.i_height;
     }
     else
     {
         i_original_width =  fmt_in.i_width;
-        i_original_height = fmt_in.i_height * fmt_in.i_sar_den / fmt_in.i_sar_num;
+        i_original_height = (int64_t)fmt_in.i_height * fmt_in.i_sar_den / fmt_in.i_sar_num;
     }
 
     /* */
