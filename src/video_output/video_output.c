@@ -530,19 +530,37 @@ void vout_DeleteDisplayWindow(vout_thread_t *vout, vout_display_t *vd,
 }
 
 /* */
-static picture_t *VoutVideoFilterNewPicture(filter_t *filter)
+
+static picture_t *VoutVideoFilterInteractiveNewPicture(filter_t *filter)
 {
     vout_thread_t *vout = (vout_thread_t*)filter->p_owner;
+
     return picture_pool_Get(vout->p->private_pool);
+}
+static picture_t *VoutVideoFilterStaticNewPicture(filter_t *filter)
+{
+    vout_thread_t *vout = (vout_thread_t*)filter->p_owner;
+
+    vlc_assert_locked(&vout->p->filter.lock);
+    if (filter_chain_GetLength(vout->p->filter.chain_interactive) == 0)
+        return VoutVideoFilterInteractiveNewPicture(filter);
+    return picture_NewFromFormat(&filter->fmt_out.video);
 }
 static void VoutVideoFilterDelPicture(filter_t *filter, picture_t *picture)
 {
     VLC_UNUSED(filter);
     picture_Release(picture);
 }
-static int VoutVideoFilterAllocationSetup(filter_t *filter, void *data)
+static int VoutVideoFilterStaticAllocationSetup(filter_t *filter, void *data)
 {
-    filter->pf_video_buffer_new = VoutVideoFilterNewPicture;
+    filter->pf_video_buffer_new = VoutVideoFilterStaticNewPicture;
+    filter->pf_video_buffer_del = VoutVideoFilterDelPicture;
+    filter->p_owner             = data; /* vout */
+    return VLC_SUCCESS;
+}
+static int VoutVideoFilterInteractiveAllocationSetup(filter_t *filter, void *data)
+{
+    filter->pf_video_buffer_new = VoutVideoFilterInteractiveNewPicture;
     filter->pf_video_buffer_del = VoutVideoFilterDelPicture;
     filter->p_owner             = data; /* vout */
     return VLC_SUCCESS;
@@ -659,8 +677,9 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
         picture_t *filtered = NULL;
         if (decoded) {
             vlc_mutex_lock(&vout->p->filter.lock);
-            filtered = filter_chain_VideoFilter(vout->p->filter.chain, decoded);
-            //assert(filtered == decoded); // TODO implement
+            filtered = filter_chain_VideoFilter(vout->p->filter.chain_static, decoded);
+            if (filtered)
+                filtered = filter_chain_VideoFilter(vout->p->filter.chain_interactive, filtered);
             vlc_mutex_unlock(&vout->p->filter.lock);
             if (!filtered)
                 continue;
@@ -806,18 +825,70 @@ static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
                  string);
 }
 
+typedef struct {
+    char           *name;
+    config_chain_t *cfg;
+} vout_filter_t;
+
 static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
 {
+    vlc_array_t array_static;
+    vlc_array_t array_interactive;
+
+    vlc_array_init(&array_static);
+    vlc_array_init(&array_interactive);
+    char *current = filters ? strdup(filters) : NULL;
+    while (current) {
+        config_chain_t *cfg;
+        char *name;
+        char *next = config_ChainCreate(&name, &cfg, current);
+
+        if (name && *name) {
+            vout_filter_t *e = xmalloc(sizeof(*e));
+            e->name = name;
+            e->cfg  = cfg;
+            if (!strcmp(e->name, "deinterlace") ||
+                !strcmp(e->name, "postproc")) {
+                vlc_array_append(&array_static, e);
+            } else {
+                vlc_array_append(&array_interactive, e);
+            }
+        } else {
+            if (cfg)
+                config_ChainDestroy(cfg);
+            free(name);
+        }
+        free(current);
+        current = next;
+    }
+
     es_format_t fmt;
     es_format_Init(&fmt, VIDEO_ES, vout->p->original.i_chroma);
     fmt.video = vout->p->original;
 
     vlc_mutex_lock(&vout->p->filter.lock);
 
-    filter_chain_Reset(vout->p->filter.chain, &fmt, &fmt);
-    if (filter_chain_AppendFromString(vout->p->filter.chain,
-                                      filters) < 0)
-        msg_Err(vout, "Video filter chain creation failed");
+    filter_chain_Reset(vout->p->filter.chain_static,      &fmt, &fmt);
+    filter_chain_Reset(vout->p->filter.chain_interactive, &fmt, &fmt);
+
+    for (int a = 0; a < 2; a++) {
+        vlc_array_t    *array = a == 0 ? &array_static :
+                                         &array_interactive;
+        filter_chain_t *chain = a == 0 ? vout->p->filter.chain_static :
+                                         vout->p->filter.chain_interactive;
+
+        for (int i = 0; i < vlc_array_count(array); i++) {
+            vout_filter_t *e = vlc_array_item_at_index(array, i);
+            msg_Dbg(vout, "Adding '%s' as %s", e->name, a == 0 ? "static" : "interactive");
+            if (!filter_chain_AppendFilter(chain, e->name, e->cfg, NULL, NULL)) {
+                msg_Err(vout, "Failed to add filter '%s'", e->name);
+                config_ChainDestroy(e->cfg);
+            }
+            free(e->name);
+            free(e);
+        }
+        vlc_array_clear(array);
+    }
 
     vlc_mutex_unlock(&vout->p->filter.lock);
 
@@ -838,7 +909,8 @@ static void ThreadChangeSubMargin(vout_thread_t *vout, int margin)
 static void ThreadFilterFlush(vout_thread_t *vout)
 {
     vlc_mutex_lock(&vout->p->filter.lock);
-    filter_chain_VideoFlush(vout->p->filter.chain);
+    filter_chain_VideoFlush(vout->p->filter.chain_static);
+    filter_chain_VideoFlush(vout->p->filter.chain_interactive);
     vlc_mutex_unlock(&vout->p->filter.lock);
 }
 
@@ -1008,9 +1080,13 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
     vout->p->display_pool = NULL;
     vout->p->private_pool = NULL;
 
-    vout->p->filter.chain =
+    vout->p->filter.chain_static =
         filter_chain_New( vout, "video filter2", false,
-                          VoutVideoFilterAllocationSetup, NULL, vout);
+                          VoutVideoFilterStaticAllocationSetup, NULL, vout);
+    vout->p->filter.chain_interactive =
+        filter_chain_New( vout, "video filter2", false,
+                          VoutVideoFilterInteractiveAllocationSetup, NULL, vout);
+
     vout->p->filter.delay_index = 0;
     for (int i = 0; i < VOUT_FILTER_DELAYS; i++)
         vout->p->filter.delay[i] = 0;
@@ -1058,7 +1134,8 @@ static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
     }
 
     /* Destroy the video filters2 */
-    filter_chain_Delete(vout->p->filter.chain);
+    filter_chain_Delete(vout->p->filter.chain_interactive);
+    filter_chain_Delete(vout->p->filter.chain_static);
 
     if (vout->p->decoder_fifo)
         picture_fifo_Delete(vout->p->decoder_fifo);

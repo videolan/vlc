@@ -132,7 +132,8 @@ struct vout_thread_sys_t
     /* Video filter2 chain */
     struct {
         vlc_mutex_t     lock;
-        filter_chain_t *chain;
+        filter_chain_t  *chain_static;
+        filter_chain_t  *chain_interactive;
         unsigned        delay_index;
         mtime_t         delay[VOUT_FILTER_DELAYS];
     } filter;
