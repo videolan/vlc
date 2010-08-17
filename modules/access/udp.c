@@ -63,14 +63,9 @@ vlc_module_begin ()
     add_integer( "udp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true )
         change_safe()
-    add_obsolete_integer( "rtp-late" )
-    add_obsolete_bool( "udp-auto-mtu" )
 
     set_capability( "access", 0 )
-    add_shortcut( "udp" )
-    add_shortcut( "udpstream" )
-    add_shortcut( "udp4" )
-    add_shortcut( "udp6" )
+    add_shortcut( "udp", "udpstream", "udp4", "udp6" )
 
     set_callbacks( Open, Close )
 vlc_module_end ()
