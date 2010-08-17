@@ -560,21 +560,21 @@ static int Open( vlc_object_t * p_this )
     /* defaults values */
     var_Create( p_access, "pvr-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
-    p_sys->psz_videodev = var_CreateGetString( p_access, "pvr-device" );
-    p_sys->psz_radiodev = var_CreateGetString( p_access, "pvr-radio-device" );
-    p_sys->i_standard   = var_CreateGetInteger( p_access, "pvr-norm" );
-    p_sys->i_width      = var_CreateGetInteger( p_access, "pvr-width" );
-    p_sys->i_height     = var_CreateGetInteger( p_access, "pvr-height" );
-    p_sys->i_frequency  = var_CreateGetInteger( p_access, "pvr-frequency" );
-    p_sys->i_framerate  = var_CreateGetInteger( p_access, "pvr-framerate" );
-    p_sys->i_keyint     = var_CreateGetInteger( p_access, "pvr-keyint" );
-    p_sys->i_bframes    = var_CreateGetInteger( p_access, "pvr-bframes" );
-    p_sys->i_bitrate    = var_CreateGetInteger( p_access, "pvr-bitrate" );
-    p_sys->i_bitrate_peak  = var_CreateGetInteger( p_access, "pvr-bitrate-peak" );
-    p_sys->i_bitrate_mode  = var_CreateGetInteger( p_access, "pvr-bitrate-mode" );
-    p_sys->i_audio_bitmask = var_CreateGetInteger( p_access, "pvr-audio-bitmask" );
-    p_sys->i_volume     = var_CreateGetInteger( p_access, "pvr-audio-volume" );
-    p_sys->i_input      = var_CreateGetInteger( p_access, "pvr-channel" );
+    p_sys->psz_videodev = var_InheritString( p_access, "pvr-device" );
+    p_sys->psz_radiodev = var_InheritString( p_access, "pvr-radio-device" );
+    p_sys->i_standard   = var_InheritInteger( p_access, "pvr-norm" );
+    p_sys->i_width      = var_InheritInteger( p_access, "pvr-width" );
+    p_sys->i_height     = var_InheritInteger( p_access, "pvr-height" );
+    p_sys->i_frequency  = var_InheritInteger( p_access, "pvr-frequency" );
+    p_sys->i_framerate  = var_InheritInteger( p_access, "pvr-framerate" );
+    p_sys->i_keyint     = var_InheritInteger( p_access, "pvr-keyint" );
+    p_sys->i_bframes    = var_InheritInteger( p_access, "pvr-bframes" );
+    p_sys->i_bitrate    = var_InheritInteger( p_access, "pvr-bitrate" );
+    p_sys->i_bitrate_peak  = var_InheritInteger( p_access, "pvr-bitrate-peak" );
+    p_sys->i_bitrate_mode  = var_InheritInteger( p_access, "pvr-bitrate-mode" );
+    p_sys->i_audio_bitmask = var_InheritInteger( p_access, "pvr-audio-bitmask" );
+    p_sys->i_volume     = var_InheritInteger( p_access, "pvr-audio-volume" );
+    p_sys->i_input      = var_InheritInteger( p_access, "pvr-channel" );
 
     /* parse command line options */
     psz_tofree = strdup( p_access->psz_location );

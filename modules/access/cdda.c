@@ -144,7 +144,7 @@ static int Open( vlc_object_t *p_this )
         if( !p_access->psz_access || !*p_access->psz_access )
             return VLC_EGENERIC;
 
-        psz_name = var_CreateGetString( p_this, "cd-audio" );
+        psz_name = var_InheritString( p_this, "cd-audio" );
         if( !psz_name || !*psz_name )
         {
             free( psz_name );
@@ -172,7 +172,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->vcddev = vcddev;
 
    /* Do we play a single track ? */
-   p_sys->i_track = var_CreateGetInteger( p_access, "cdda-track" ) - 1;
+   p_sys->i_track = var_InheritInteger( p_access, "cdda-track" ) - 1;
 
    if( p_sys->i_track < 0 )
    {
@@ -211,10 +211,10 @@ static int Open( vlc_object_t *p_this )
         p_sys->waveheader.DataChunkID = VLC_FOURCC('d', 'a', 't', 'a');
         p_sys->waveheader.DataLength = 0;           /* we just don't know */
 
-        p_sys->i_first_sector = var_CreateGetInteger( p_access,
-                                                      "cdda-first-sector" );
-        p_sys->i_last_sector  = var_CreateGetInteger( p_access,
-                                                      "cdda-last-sector" );
+        p_sys->i_first_sector = var_InheritInteger( p_access,
+                                                    "cdda-first-sector" );
+        p_sys->i_last_sector  = var_InheritInteger( p_access,
+                                                    "cdda-last-sector" );
         /* Tracknumber in MRL */
         if( p_sys->i_first_sector < 0 || p_sys->i_last_sector < 0 )
         {
@@ -606,7 +606,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 #ifdef HAVE_LIBCDDB
 static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
 {
-    if( var_CreateGetInteger( p_access, "album-art" ) == ALBUM_ART_WHEN_ASKED )
+    if( var_InheritInteger( p_access, "album-art" ) == ALBUM_ART_WHEN_ASKED )
         return NULL;
 
     /* */

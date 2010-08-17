@@ -156,7 +156,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
     if( p_sys->url.psz_username && *p_sys->url.psz_username )
         psz = strdup( p_sys->url.psz_username );
     else
-        psz = var_CreateGetString( p_access, "ftp-user" );
+        psz = var_InheritString( p_access, "ftp-user" );
     if( !psz )
         return -1;
 
@@ -178,7 +178,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
             if( p_sys->url.psz_password && *p_sys->url.psz_password )
                 psz = strdup( p_sys->url.psz_password );
             else
-                psz = var_CreateGetString( p_access, "ftp-pwd" );
+                psz = var_InheritString( p_access, "ftp-pwd" );
             if( !psz )
                 return -1;
 
@@ -197,7 +197,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
                     break;
                 case 3:
                     msg_Dbg( p_access, "account needed" );
-                    psz = var_CreateGetString( p_access, "ftp-account" );
+                    psz = var_InheritString( p_access, "ftp-account" );
                     if( ftp_SendCommand( p_access, p_sys, "ACCT %s",
                                          psz ) < 0 ||
                         ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) < 0 )

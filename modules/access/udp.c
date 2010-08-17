@@ -110,7 +110,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    i_bind_port = var_CreateGetInteger( p_access, "server-port" );
+    i_bind_port = var_InheritInteger( p_access, "server-port" );
 
     /* Parse psz_name syntax :
      * [serveraddr[:serverport]][@[bindaddr]:[bindport]] */

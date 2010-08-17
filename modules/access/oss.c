@@ -170,9 +170,9 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
     if( p_sys == NULL ) return VLC_ENOMEM;
 
-    p_sys->i_sample_rate = var_CreateGetInteger( p_demux, CFG_PREFIX "samplerate" );
-    p_sys->b_stereo = var_CreateGetBool( p_demux, CFG_PREFIX "stereo" );
-    p_sys->i_cache = var_CreateGetInteger( p_demux, CFG_PREFIX "caching" );
+    p_sys->i_sample_rate = var_InheritInteger( p_demux, CFG_PREFIX "samplerate" );
+    p_sys->b_stereo = var_InheritBool( p_demux, CFG_PREFIX "stereo" );
+    p_sys->i_cache = var_InheritInteger( p_demux, CFG_PREFIX "caching" );
     p_sys->i_fd = -1;
     p_sys->p_es = NULL;
     p_sys->p_block = NULL;

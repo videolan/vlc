@@ -88,7 +88,7 @@ static int Open (vlc_object_t *p_this)
 
     assert ((INT64_C(1) << 63) == ((off_t)(INT64_C(1) << 63)));
 
-    if (!var_CreateGetBool (p_this, "file-mmap"))
+    if (!var_InheritBool (p_this, "file-mmap"))
         return VLC_EGENERIC; /* disabled */
 
     STANDARD_BLOCK_ACCESS_INIT;

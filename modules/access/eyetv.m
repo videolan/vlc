@@ -167,13 +167,10 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->i_pts_delay = var_CreateGetInteger( p_access, "eyetv-caching" );
-
-    int val = var_CreateGetInteger( p_access, "eyetv-channel" );
+    p_sys->i_pts_delay = var_InheritInteger( p_access, "eyetv-caching" );
 
     msg_Dbg( p_access, "coming up" );
-
-    selectChannel( p_this, val );
+    selectChannel( p_this, var_InheritInteger( p_access, "eyetv-channel" ) );
 
     /* socket */
     memset(&publicAddr, 0, sizeof(publicAddr));

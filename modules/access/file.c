@@ -216,9 +216,9 @@ int Open( vlc_object_t *p_this )
     p_access->p_sys = p_sys;
     p_sys->i_nb_reads = 0;
     p_sys->fd = fd;
-    p_sys->caching = var_CreateGetInteger (p_access, "file-caching");
+    p_sys->caching = var_InheritInteger (p_access, "file-caching");
     if (IsRemote(fd))
-        p_sys->caching += var_CreateGetInteger (p_access, "network-caching");
+        p_sys->caching += var_InheritInteger (p_access, "network-caching");
     p_sys->b_pace_control = true;
 
     if (S_ISREG (st.st_mode))

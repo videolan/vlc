@@ -142,7 +142,7 @@ static int Open( vlc_object_t* p_this )
     }
 
     if( url.i_port <= 0 )
-        i_port = var_CreateGetInteger( p_access, "sftp-port" );
+        i_port = var_InheritInteger( p_access, "sftp-port" );
     else
         i_port = url.i_port;
 
@@ -209,7 +209,7 @@ static int Open( vlc_object_t* p_this )
 
     /* Create the two variables */
     var_Create( p_access, "sftp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    p_sys->i_read_size = var_CreateGetInteger( p_access, "sftp-readsize" );
+    p_sys->i_read_size = var_InheritInteger( p_access, "sftp-readsize" );
 
     free( psz_password );
     free( psz_username );
