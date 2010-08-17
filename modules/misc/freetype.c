@@ -2236,7 +2236,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
             {
                 /* Only text and karaoke tags are supported */
                 msg_Dbg( p_filter, "Unsupported top-level tag '%s' ignored.", psz_node );
-                xml_ReaderDelete( p_xml_reader );
+                p_filter->p_sys->p_xml = xml_ReaderReset( p_xml_reader, NULL );
                 p_xml_reader = NULL;
                 rv = VLC_EGENERIC;
             }
@@ -2297,7 +2297,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                                 result.x, result.y );
             }
         }
-        xml_ReaderReset( p_xml_reader, NULL );
+        p_filter->p_sys->p_xml = xml_ReaderReset( p_xml_reader, NULL );
         FreeLines( p_lines );
     }
     stream_Delete( p_sub );
