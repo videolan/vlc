@@ -468,6 +468,14 @@ inline void MainInterface::createStatusBar()
 
     CONNECT( THEMIM->getIM(), seekRequested( float ),
              timeLabel, setDisplayPosition( float ) );
+
+    /* This shouldn't be necessary, but for somehow reason, the statusBarr
+       starts at height of 20px and when a text is shown it needs more space.
+       But, as the QMainWindow policy doesn't allow statusBar to change QMW's
+       geometry, we need to force a height. If you have a better idea, please
+       tell me -- jb
+     */
+    statusBarr->setFixedHeight( statusBarr->sizeHint().height() + 2 );
 }
 
 /**********************************************************************
