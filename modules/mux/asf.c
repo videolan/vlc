@@ -255,7 +255,6 @@ static void Close( vlc_object_t * p_this )
     sout_mux_t     *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     block_t  *out;
-    int i;
 
     msg_Dbg( p_mux, "Asf muxer closed" );
 
@@ -278,7 +277,7 @@ static void Close( vlc_object_t * p_this )
     }
 
 
-    for( i = 0; i < vlc_array_count( p_sys->p_tracks ); i++ )
+    for( int i = 0; i < vlc_array_count( p_sys->p_tracks ); i++ )
     {
         asf_track_t *track = (asf_track_t *)vlc_array_item_at_index( p_sys->p_tracks, i );
         free( track->p_extra );
@@ -817,11 +816,10 @@ static void bo_addle_str16_nosize( bo_t *bo, const char *str )
  ****************************************************************************/
 static void bo_add_guid( bo_t *p_bo, const guid_t *id )
 {
-    int i;
     bo_addle_u32( p_bo, id->Data1 );
     bo_addle_u16( p_bo, id->Data2 );
     bo_addle_u16( p_bo, id->Data3 );
-    for( i = 0; i < 8; i++ )
+    for( int i = 0; i < 8; i++ )
     {
         bo_add_u8( p_bo, id->Data4[i] );
     }
