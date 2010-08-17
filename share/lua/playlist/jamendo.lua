@@ -25,15 +25,12 @@ require "simplexml"
 -- Probe function.
 function probe()
     return vlc.access == "http"
-        and string.match( vlc.path, "jamendo.com" )
+        and string.match( vlc.path, "jamendo.com/get2/" )
+        and string.match( vlc.path, "/track/xml/" )
 end
 
 -- Parse function.
 function parse()
-    if not ( string.match( vlc.path, "jamendo.com/get2/" ) and string.match( vlc.path, "/track/xml/" ) ) then
-        vlc.msg.err( "Jamendo URL not supported yet..." )
-        return {}
-    end
     local page = ""
     while true do
         local line = vlc.readline()
