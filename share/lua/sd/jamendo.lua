@@ -62,7 +62,7 @@ function add_top_albums( album_order, tag, max_results )
     for _, album in ipairs( tree.children ) do
         simplexml.add_name_maps( album )
         local album_node = node:add_subitem(
-                { path     = 'http://api.jamendo.com/get2/id+name+duration+album_name+album_genre+album_dates+album_image/track/xml/?album_id=' .. album.children_map["id"][1].children[1],
+                { path     = 'http://api.jamendo.com/get2/id+name+duration+artist_name+album_name+album_genre+album_dates+album_image/track/xml/track_album+album_artist/?album_id=' .. album.children_map["id"][1].children[1],
                   title    = album.children_map["artist_name"][1].children[1] .. ' - ' .. album.children_map["name"][1].children[1],
                   arturl   = album.children_map["album_image"][1].children[1] })
     end
