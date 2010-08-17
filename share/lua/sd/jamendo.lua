@@ -4,6 +4,7 @@
  Copyright © 2010 VideoLAN and AUTHORS
 
  Authors: Fabio Ritrovato <sephiroth87 at videolan dot org>
+          Rémi Duraffort  <ivoire at videolan dot org>
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -38,7 +39,7 @@ function main()
 end
 
 function add_top_albums( album_order, tag, max_results )
-    local url = "http://api.jamendo.com/get2/id+name+artist_name+image/album/xml/?imagesize=500&order=" .. album_order .. "&n=" .. max_results
+    local url = "http://api.jamendo.com/get2/id+name+artist_name+album_image/album/xml/?imagesize=500&order=" .. album_order .. "&n=" .. max_results
     if tag ~= nil then
         url = url .. "&tag_idstr=" .. tag
     end
@@ -60,24 +61,15 @@ function add_top_albums( album_order, tag, max_results )
     local node = vlc.sd.add_node( {title=node_name} )
     for _, album in ipairs( tree.children ) do
         simplexml.add_name_maps( album )
-        local album_node = node:add_node( {title=album.children_map["artist_name"][1].children[1] .. " - " .. album.children_map["name"][1].children[1],
-                                           arturl=album.children_map["image"][1].children[1]} )
-        local tracks = get_tracks_from_album( album.children_map["id"][1].children[1] )
-        for _, track in ipairs( tracks ) do
-            album_node:add_subitem( {path="http://api.jamendo.com/get2/stream/track/redirect/?id=" .. track.id,
-                                     arturl=album.children_map["image"][1].children[1],
-                                     title=track.title,
-                                     artist=album.children_map["artist_name"][1].children[1],
-                                     album=album.children_map["name"][1].children[1],
-                                     genre=track.genre,
-                                     duration=track.duration,
-                                     date=track.date,} ) 
-        end
+        local album_node = node:add_subitem(
+                { path     = 'http://api.jamendo.com/get2/id+name+duration+album_name+album_genre+album_dates+album_image/track/xml/?album_id=' .. album.children_map["id"][1].children[1],
+                  title    = album.children_map["artist_name"][1].children[1] .. ' - ' .. album.children_map["name"][1].children[1],
+                  arturl   = album.children_map["album_image"][1].children[1] })
     end
 end
 
 function add_top_tracks( track_order, tag, max_results )
-    local url = "http://api.jamendo.com/get2/id+name+artist_name+album_name+album_id+duration+album_genre+album_image+album_dates/track/xml/track_album+album_artist/?imagesize=500&order=" .. track_order .. "&n=" .. max_results
+    local url = "http://api.jamendo.com/get2/id+name+duration+artist_name+album_name+album_genre+album_image+album_dates/track/xml/track_album+album_artist/?imagesize=500&order=" .. track_order .. "&n=" .. max_results
     if tag ~= nil then
         url = url .. "&tag_idstr=" .. tag
     end
@@ -108,20 +100,6 @@ function add_top_tracks( track_order, tag, max_results )
                            arturl=track.children_map["album_image"][1].children[1],
                            duration=track.children_map["duration"][1].children[1]} )
     end
-end
-
-function get_tracks_from_album( album )
-    local tree = simplexml.parse_url( "http://api.jamendo.com/get2/id+name+duration+album_genre+album_dates/track/xml/?album_id=" .. album )
-    local tracks = {}
-    for _, track in ipairs( tree.children ) do
-        simplexml.add_name_maps( track )
-        table.insert( tracks, {title=track.children_map["name"][1].children[1],
-                               genre=track.children_map["album_genre"][1].children[1],
-                               duration=track.children_map["duration"][1].children[1],
-                               id=track.children_map["id"][1].children[1],
-                               date=track.children_map["album_dates"][1].children_map["year"][1].children[1]} )
-    end
-    return tracks
 end
 
 function add_radio_from_id( id, max_results )
