@@ -1353,7 +1353,7 @@ AS_IF([test "${enable_neon}" != "no"], [
     AC_COMPILE_IFELSE([
       AC_LANG_PROGRAM(,[[
 asm volatile("vqmovun.s64 d0, q1":::"d0");
-asm volatile("qadd r0, r0, r0":::"r0"); /* assume ARMv6 */
+asm volatile("ssat r0, #1, r0":::"r0"); /* assume ARMv6 */
 ]])
     ], [
       ac_cv_neon_inline="-mfpu=neon"
