@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vistaext.h : "Vista file associations support"
+ * vlc_windows_interfaces.h : Vista/7 helpers
  ****************************************************************************
- * Copyright (C) 2009 the VideoLAN team
- * $Id$
+ *
+ * Copyright (C) 2009-2010 VideoLAN
  *
  * Authors: Geoffroy Couprie <geal@videolan.org>
  *
@@ -67,30 +67,30 @@ struct _IApplicationAssociationRegistrationUI { IApplicationAssociationRegistrat
 typedef IApplicationAssociationRegistrationUI *LPAPPASSOCREGUI, *PAPPASSOCREGUI;
 
 typedef enum TBPFLAG
-{	
-    TBPF_NOPROGRESS	= 0,
-    TBPF_INDETERMINATE	= 0x1,
-    TBPF_NORMAL	= 0x2,
-    TBPF_ERROR	= 0x4,
-    TBPF_PAUSED	= 0x8
-} 	TBPFLAG;
+{
+    TBPF_NOPROGRESS    = 0,
+    TBPF_INDETERMINATE = 0x1,
+    TBPF_NORMAL        = 0x2,
+    TBPF_ERROR         = 0x4,
+    TBPF_PAUSED        = 0x8
+} TBPFLAG;
 
 typedef enum TBATFLAG
-{	
-    TBATF_USEMDITHUMBNAIL	= 0x1,
-    TBATF_USEMDILIVEPREVIEW	= 0x2
-} 	TBATFLAG;
+{
+    TBATF_USEMDITHUMBNAIL   = 0x1,
+    TBATF_USEMDILIVEPREVIEW = 0x2
+} TBATFLAG;
 
 typedef struct tagTHUMBBUTTON
-    {
+{
     DWORD dwMask;
     UINT iId;
     UINT iBitmap;
     HICON hIcon;
-//    WCHAR pszTip[ 260 ];
+    //    WCHAR pszTip[ 260 ];
     wchar_t pszTip[ 260 ];
     DWORD dwFlags;
-    } 	THUMBBUTTON;
+} THUMBBUTTON;
 
 typedef struct tagTHUMBBUTTON *LPTHUMBBUTTON;
 
@@ -100,6 +100,7 @@ typedef struct tagTHUMBBUTTON *LPTHUMBBUTTON;
 #define THBF_DISMISSONCLICK      0x0002
 #define THBF_NOBACKGROUND        0x0004
 #define THBF_HIDDEN              0x0008
+
 // THUMBBUTTON mask
 #define THB_BITMAP          0x0001
 #define THB_ICON            0x0002
@@ -109,57 +110,57 @@ typedef struct tagTHUMBBUTTON *LPTHUMBBUTTON;
 
 typedef struct ITaskbarList3Vtbl
 {
-    
+
     long ( STDCALL *QueryInterface )(ITaskbarList3 * This, REFIID riid, void **ppvObject);
-    
+
     long ( STDCALL *AddRef )( ITaskbarList3 * This);
-    
+
     long ( STDCALL *Release )( ITaskbarList3 * This);
-    
+
     long ( STDCALL *HrInit )( ITaskbarList3 * This);
-    
+
     long ( STDCALL *AddTab )( ITaskbarList3 * This, HWND hwnd);
-    
+
     long ( STDCALL *DeleteTab )( ITaskbarList3 * This, HWND hwnd);
-    
+
     long ( STDCALL *ActivateTab )( ITaskbarList3 * This, HWND hwnd);
-    
+
     long ( STDCALL *SetActiveAlt )( ITaskbarList3 * This, HWND hwnd);
-    
+
     long ( STDCALL *MarkFullscreenWindow )( ITaskbarList3 * This, HWND hwnd,
         BOOL fFullscreen);
-    
+
     long ( STDCALL *SetProgressValue )( ITaskbarList3 * This, HWND hwnd,
         ULONGLONG ullCompleted, ULONGLONG ullTotal);
-    
+
     long ( STDCALL *SetProgressState )( ITaskbarList3 * This, HWND hwnd,
         TBPFLAG tbpFlags);
-    
+
     long ( STDCALL *RegisterTab )(  ITaskbarList3 * This, HWND hwndTab, HWND hwndMDI);
-    
+
     long ( STDCALL *UnregisterTab )( ITaskbarList3 * This, HWND hwndTab);
-    
+
     long ( STDCALL *SetTabOrder )( ITaskbarList3 * This, HWND hwndTab,
         HWND hwndInsertBefore);
-    
+
     long ( STDCALL *SetTabActive )( ITaskbarList3 * This, HWND hwndTab,
         HWND hwndMDI, TBATFLAG tbatFlags);
-    
+
     long ( STDCALL *ThumbBarAddButtons )( ITaskbarList3 * This, HWND hwnd,
         UINT cButtons, LPTHUMBBUTTON pButton);
-    
+
     long ( STDCALL *ThumbBarUpdateButtons )( ITaskbarList3 * This, HWND hwnd,
         UINT cButtons, LPTHUMBBUTTON pButton);
-    
+
     long ( STDCALL *ThumbBarSetImageList )( ITaskbarList3 * This, HWND hwnd,
         HIMAGELIST himl);
-    
+
     long ( STDCALL *SetOverlayIcon )( ITaskbarList3 * This, HWND hwnd,
         HICON hIcon, LPCWSTR pszDescription);
-    
+
     long ( STDCALL *SetThumbnailTooltip )( ITaskbarList3 * This, HWND hwnd,
         LPCWSTR pszTip);
-    
+
     long ( STDCALL *SetThumbnailClip )( ITaskbarList3 * This, HWND hwnd,
         RECT *prcClip);
 
