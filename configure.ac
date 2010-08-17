@@ -1849,80 +1849,10 @@ PKG_ENABLE_MODULES_VLC([DV], [access_dv], [libraw1394 >= 2.0.1 libavc1394 >= 0.5
 dnl
 dnl dvdread module: check for libdvdread
 dnl
-AC_ARG_ENABLE(dvdread,
-[  --enable-dvdread        dvdread input module (default enabled)])
-if test "${enable_dvdread}" != "no"
-then
-  AC_ARG_WITH(dvdread,
-  [  --with-dvdread=PATH     libdvdread headers and libraries])
-  AC_ARG_WITH(dvdread-tree,
-  [  --with-dvdread-tree=PATH libdvdread tree for static linking])
-
-  dnl prepend -ldvdcss on OS that need it
-  AS_CASE(["${SYS}"], [mingw32|darwin|beos], [VLC_ADD_LIBS([dvdread], [-ldvdcss])])
-
-  if test -z "${with_dvdread}"
-  then
-    if test -z "${with_dvdread_tree}"
-    then
-      AC_CHECK_HEADERS(dvdread/dvd_reader.h,
-        [ VLC_ADD_PLUGIN([dvdread])
-          VLC_ADD_LIBS([dvdread],[-ldvdread])
-        ],[
-	  AC_CHECK_HEADERS(libdvdread/dvd_reader.h,
-            [ VLC_ADD_PLUGIN([dvdread])
-	      VLC_ADD_LIBS([dvdread],[-ldvdread])
-	    ],[
-	      if test -n "${enable_dvdread}"
-	      then
-	      AC_MSG_ERROR([cannot find libdvdread headers])
-	     fi
-	   ])
-	])
-    else
-      AC_MSG_CHECKING(for libdvdread.a in ${with_dvdread_tree})
-      real_dvdread_tree="`cd ${with_dvdread_tree} 2>/dev/null && pwd`"
-      if test -z "${real_dvdread_tree}"
-      then
-        dnl  The given directory can't be found
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot cd to ${with_dvdread_tree}])
-      fi
-      if test -f "${real_dvdread_tree}/dvdread/.libs/libdvdread.a"
-      then
-        dnl  Use a custom libdvdread
-        AC_MSG_RESULT(${real_dvdread_tree}/dvdread/.libs/libdvdread.a)
-        VLC_ADD_PLUGIN([dvdread])
-        VLC_ADD_LIBS([dvdread],[-L${real_dvdread_tree}/dvdread/.libs -ldvdread])
-        VLC_ADD_CPPFLAGS([dvdread],[-I${real_dvdread_tree}])
-      else
-        dnl  The given libdvdread wasn't built
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot find ${real_dvdread_tree}/dvdread/.libs/libdvdread.a, make sure you compiled libdvdread in ${with_dvdread_tree}])
-      fi
-    fi
-  else
-    AC_MSG_CHECKING(for dvdread headers in ${with_dvdread})
-    if test -f ${with_dvdread}/include/dvdread/dvd_reader.h
-    then
-      dnl  Use ${with_dvdread}/include/dvdread/dvd_reader.h
-      AC_MSG_RESULT(yes)
-      VLC_ADD_PLUGIN([dvdread])
-      VLC_ADD_LIBS([dvdread],[-L${with_dvdread}/lib -ldvdread])
-      VLC_ADD_CPPFLAGS([dvdread],[-I${with_dvdread}/include])
-    else
-      dnl  No libdvdread could be found, sorry
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${with_dvdread}/include/dvdread/dvd_reader.h])
-    fi
-  fi
-
-  dnl append -ldvd on OS that need it
-  AS_CASE(["${SYS}"], [bsdi], [VLC_ADD_LIBS([dvdread], [-ldvd])])
-fi
+PKG_ENABLE_MODULES_VLC([DVDREAD], [], [dvdread], [dvdread input module], [auto])
 
 dnl
-dnl  libdvdnav plugin
+dnl libdvdnav plugin
 dnl
 AC_ARG_ENABLE(dvdnav,
   [  --enable-dvdnav         dvdnav input module (default enabled)])
