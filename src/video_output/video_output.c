@@ -68,7 +68,7 @@ static void VoutDestructor(vlc_object_t *);
 #define VOUT_DISPLAY_LATE_THRESHOLD (INT64_C(20000))
 
 /* Better be in advance when awakening than late... */
-#define VOUT_MWAIT_TOLERANCE (INT64_C(1000))
+#define VOUT_MWAIT_TOLERANCE (INT64_C(4000))
 
 /* */
 static int VoutValidateFormat(video_format_t *dst,
@@ -567,19 +567,194 @@ static int VoutVideoFilterInteractiveAllocationSetup(filter_t *filter, void *dat
 }
 
 /* */
-static picture_t *ThreadDisplayGetDecodedPicture(vout_thread_t *vout,
-                                                 int *lost_count, bool *is_forced,
-                                                 bool now, mtime_t *deadline)
+static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse)
+{
+    int lost_count = 0;
+
+    vlc_mutex_lock(&vout->p->filter.lock);
+
+    picture_t *picture = filter_chain_VideoFilter(vout->p->filter.chain_static, NULL);
+    assert(!reuse || !picture);
+
+    while (!picture) {
+        picture_t *decoded;
+        if (reuse && vout->p->displayed.decoded) {
+            decoded = picture_Hold(vout->p->displayed.decoded);
+        } else {
+            decoded = picture_fifo_Pop(vout->p->decoder_fifo);
+            if (vout->p->is_late_dropped && decoded && !decoded->b_force) {
+                const mtime_t predicted = mdate() + 0; /* TODO improve */
+                const mtime_t late = predicted - decoded->date;
+                if (late > VOUT_DISPLAY_LATE_THRESHOLD) {
+                    msg_Warn(vout, "picture is too late to be displayed (missing %d ms)", (int)(late/1000));
+                    picture_Release(decoded);
+                    lost_count++;
+                    continue;
+                } else if (late > 0) {
+                    msg_Dbg(vout, "picture might be displayed late (missing %d ms)", (int)(late/1000));
+                }
+            }
+        }
+        if (!decoded)
+            break;
+        reuse = false;
+
+        if (vout->p->displayed.decoded)
+            picture_Release(vout->p->displayed.decoded);
+
+        vout->p->displayed.decoded       = picture_Hold(decoded);
+        vout->p->displayed.timestamp     = decoded->date;
+        vout->p->displayed.is_interlaced = !decoded->b_progressive;
+        vout->p->displayed.qtype         = decoded->i_qtype;
+
+        picture = filter_chain_VideoFilter(vout->p->filter.chain_static, decoded);
+    }
+
+    vlc_mutex_unlock(&vout->p->filter.lock);
+
+    vout_statistic_Update(&vout->p->statistic, 0, lost_count);
+    if (!picture)
+        return VLC_EGENERIC;
+
+    assert(!vout->p->displayed.next);
+    if (!vout->p->displayed.current)
+        vout->p->displayed.current = picture;
+    else
+        vout->p->displayed.next    = picture;
+    return VLC_SUCCESS;
+}
+
+static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 {
     vout_display_t *vd = vout->p->display.vd;
 
-    const mtime_t date = mdate();
-    const bool is_paused = vout->p->pause.is_on;
-    bool redisplay = is_paused && !now && vout->p->displayed.decoded;
+    picture_t *torender = picture_Hold(vout->p->displayed.current);
 
-    mtime_t filter_delay = 0;
-    for (int i = 0; i < VOUT_FILTER_DELAYS; i++)
-        filter_delay = __MAX(filter_delay, vout->p->filter.delay[i]);
+    vout_chrono_Start(&vout->p->render);
+
+    vlc_mutex_lock(&vout->p->filter.lock);
+    picture_t *filtered = filter_chain_VideoFilter(vout->p->filter.chain_interactive, torender);
+    vlc_mutex_unlock(&vout->p->filter.lock);
+
+    if (!filtered)
+        return VLC_EGENERIC;
+
+    if (filtered->date != vout->p->displayed.current->date)
+        msg_Warn(vout, "Unsupported timestamp modifications done by chain_interactive");
+
+    /*
+     * Check for subpictures to display
+     */
+    const bool do_snapshot = vout_snapshot_IsRequested(&vout->p->snapshot);
+    mtime_t spu_render_time = is_forced ? mdate() : filtered->date;
+    if (vout->p->pause.is_on)
+        spu_render_time = vout->p->pause.date;
+    else
+        spu_render_time = filtered->date > 1 ? filtered->date : mdate();
+
+    subpicture_t *subpic = spu_SortSubpictures(vout->p->p_spu,
+                                               spu_render_time,
+                                               do_snapshot);
+    /*
+     * Perform rendering
+     *
+     * We have to:
+     * - be sure to end up with a direct buffer.
+     * - blend subtitles, and in a fast access buffer
+     */
+    picture_t *direct = NULL;
+    if (filtered &&
+        (vout->p->decoder_pool != vout->p->display_pool || subpic)) {
+        picture_t *render;
+        if (vout->p->is_decoder_pool_slow)
+            render = picture_NewFromFormat(&vd->source);
+        else if (vout->p->decoder_pool != vout->p->display_pool)
+            render = picture_pool_Get(vout->p->display_pool);
+        else
+            render = picture_pool_Get(vout->p->private_pool);
+
+        if (render) {
+            picture_Copy(render, filtered);
+
+            spu_RenderSubpictures(vout->p->p_spu,
+                                  render, &vd->source,
+                                  subpic, &vd->source, spu_render_time);
+        }
+        if (vout->p->is_decoder_pool_slow) {
+            direct = picture_pool_Get(vout->p->display_pool);
+            if (direct)
+                picture_Copy(direct, render);
+            picture_Release(render);
+
+        } else {
+            direct = render;
+        }
+        picture_Release(filtered);
+        filtered = NULL;
+    } else {
+        direct = filtered;
+    }
+
+    if (!direct)
+        return VLC_EGENERIC;
+
+    /*
+     * Take a snapshot if requested
+     */
+    if (do_snapshot)
+        vout_snapshot_Set(&vout->p->snapshot, &vd->source, direct);
+
+    /* Render the direct buffer returned by vout_RenderPicture */
+    vout_RenderWrapper(vout, direct);
+
+    vout_chrono_Stop(&vout->p->render);
+#if 0
+        {
+        static int i = 0;
+        if (((i++)%10) == 0)
+            msg_Info(vout, "render: avg %d ms var %d ms",
+                     (int)(vout->p->render.avg/1000), (int)(vout->p->render.var/1000));
+        }
+#endif
+
+    /* Wait the real date (for rendering jitter) */
+#if 0
+    mtime_t delay = direct->date - mdate();
+    if (delay < 1000)
+        msg_Warn(vout, "picture is late (%lld ms)", delay / 1000);
+#endif
+    if (!is_forced)
+        mwait(direct->date);
+
+    /* Display the direct buffer returned by vout_RenderPicture */
+    vout->p->displayed.date = mdate();
+
+    vout_DisplayWrapper(vout, direct);
+
+    vout_statistic_Update(&vout->p->statistic, 1, 0);
+
+    return VLC_SUCCESS;
+}
+
+static int ThreadDisplayPicture(vout_thread_t *vout,
+                                bool now, mtime_t *deadline)
+{
+    bool first = !vout->p->displayed.current;
+    if (first && ThreadDisplayPreparePicture(vout, true)) /* FIXME not sure it is ok */
+        return VLC_EGENERIC;
+    if (!vout->p->pause.is_on || now) {
+        while (!vout->p->displayed.next) {
+            if (ThreadDisplayPreparePicture(vout, false))
+                break;
+        }
+    }
+
+    const mtime_t date = mdate();
+    const mtime_t render_delay = vout_chrono_GetHigh(&vout->p->render) + VOUT_MWAIT_TOLERANCE;
+
+    mtime_t date_next = VLC_TS_INVALID;
+    if (!vout->p->pause.is_on && vout->p->displayed.next)
+        date_next = vout->p->displayed.next->date - render_delay;
 
     /* FIXME/XXX we must redisplay the last decoded picture (because
      * of potential vout updated, or filters update or SPU update)
@@ -590,194 +765,37 @@ static picture_t *ThreadDisplayGetDecodedPicture(vout_thread_t *vout,
      *
      * So it will be done latter.
      */
-    if (!redisplay) {
-        picture_t *peek = picture_fifo_Peek(vout->p->decoder_fifo);
-        if (peek) {
-            *is_forced = peek->b_force || is_paused || now;
-            *deadline = (*is_forced ? date : peek->date) -
-                        vout_chrono_GetHigh(&vout->p->render) -
-                        filter_delay;
-            picture_Release(peek);
-        } else {
-            redisplay = true;
-        }
-    }
-    if (redisplay) {
-         /* FIXME a better way for this delay is needed */
-        const mtime_t date_update = vout->p->displayed.date + VOUT_REDISPLAY_DELAY;
-        if (date_update > date || !vout->p->displayed.decoded) {
-            *deadline = vout->p->displayed.decoded ? date_update : VLC_TS_INVALID;
-            return NULL;
-        }
-        /* */
-        *is_forced = true;
-        *deadline = date - vout_chrono_GetHigh(&vout->p->render) - filter_delay;
-    }
-    if (*deadline > VOUT_MWAIT_TOLERANCE)
-        *deadline -= VOUT_MWAIT_TOLERANCE;
+    mtime_t date_refresh = VLC_TS_INVALID;
+    if (vout->p->displayed.date > VLC_TS_INVALID)
+        date_refresh = vout->p->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
 
-    /* If we are too early and can wait, do it */
-    if (date < *deadline && !now)
-        return NULL;
+    bool drop = now;
+    if (date_next != VLC_TS_INVALID)
+        drop |= date_next + 0 <= date;
 
-    picture_t *decoded;
-    if (redisplay) {
-        decoded = vout->p->displayed.decoded;
-        vout->p->displayed.decoded = NULL;
-    } else {
-        decoded = picture_fifo_Pop(vout->p->decoder_fifo);
-        assert(decoded);
-        if (!*is_forced && !vout->p->is_late_dropped) {
-            const mtime_t predicted = date + vout_chrono_GetLow(&vout->p->render);
-            const mtime_t late = predicted - decoded->date;
-            if (late > 0) {
-                msg_Dbg(vout, "picture might be displayed late (missing %d ms)", (int)(late/1000));
-                if (late > VOUT_DISPLAY_LATE_THRESHOLD) {
-                    msg_Warn(vout, "rejected picture because of render time");
-                    /* TODO */
-                    picture_Release(decoded);
-                    (*lost_count)++;
-                    return NULL;
-                }
-            }
-        }
+    bool refresh = false;
+    if (date_refresh > VLC_TS_INVALID)
+        refresh = date_refresh <= date;
 
-        vout->p->displayed.is_interlaced = !decoded->b_progressive;
-        vout->p->displayed.qtype         = decoded->i_qtype;
-    }
-    vout->p->displayed.timestamp = decoded->date;
-
-    /* */
-    if (vout->p->displayed.decoded)
-        picture_Release(vout->p->displayed.decoded);
-    picture_Hold(decoded);
-    vout->p->displayed.decoded = decoded;
-
-    return decoded;
-}
-
-static int ThreadDisplayPicture(vout_thread_t *vout,
-                                bool now, mtime_t *deadline)
-{
-    vout_display_t *vd = vout->p->display.vd;
-    int displayed_count = 0;
-    int lost_count = 0;
-
-    for (;;) {
-        bool is_forced;
-        picture_t *decoded = ThreadDisplayGetDecodedPicture(vout,
-                                                            &lost_count, &is_forced,
-                                                            now, deadline);
-        if (!decoded)
-            break;
-
-        /* */
-        vout_chrono_Start(&vout->p->render);
-
-        picture_t *filtered = NULL;
-        if (decoded) {
-            vlc_mutex_lock(&vout->p->filter.lock);
-            filtered = filter_chain_VideoFilter(vout->p->filter.chain_static, decoded);
-            if (filtered)
-                filtered = filter_chain_VideoFilter(vout->p->filter.chain_interactive, filtered);
-            vlc_mutex_unlock(&vout->p->filter.lock);
-            if (!filtered)
-                continue;
-            vout->p->filter.delay[vout->p->filter.delay_index] = decoded->date - filtered->date;
-            vout->p->filter.delay_index = (vout->p->filter.delay_index + 1) % VOUT_FILTER_DELAYS;
-        }
-
-        /*
-         * Check for subpictures to display
-         */
-        const bool do_snapshot = vout_snapshot_IsRequested(&vout->p->snapshot);
-        mtime_t spu_render_time = is_forced ? mdate() : filtered->date;
-        if (vout->p->pause.is_on)
-            spu_render_time = vout->p->pause.date;
-        else
-            spu_render_time = filtered->date > 1 ? filtered->date : mdate();
-
-        subpicture_t *subpic = spu_SortSubpictures(vout->p->p_spu,
-                                                   spu_render_time,
-                                                   do_snapshot);
-        /*
-         * Perform rendering
-         *
-         * We have to:
-         * - be sure to end up with a direct buffer.
-         * - blend subtitles, and in a fast access buffer
-         */
-        picture_t *direct = NULL;
-        if (filtered &&
-            (vout->p->decoder_pool != vout->p->display_pool || subpic)) {
-            picture_t *render;
-            if (vout->p->is_decoder_pool_slow)
-                render = picture_NewFromFormat(&vd->source);
-            else if (vout->p->decoder_pool != vout->p->display_pool)
-                render = picture_pool_Get(vout->p->display_pool);
-            else
-                render = picture_pool_Get(vout->p->private_pool);
-
-            if (render) {
-                picture_Copy(render, filtered);
-
-                spu_RenderSubpictures(vout->p->p_spu,
-                                      render, &vd->source,
-                                      subpic, &vd->source, spu_render_time);
-            }
-            if (vout->p->is_decoder_pool_slow) {
-                direct = picture_pool_Get(vout->p->display_pool);
-                if (direct)
-                    picture_Copy(direct, render);
-                picture_Release(render);
-
-            } else {
-                direct = render;
-            }
-            picture_Release(filtered);
-            filtered = NULL;
-        } else {
-            direct = filtered;
-        }
-
-        /*
-         * Take a snapshot if requested
-         */
-        if (direct && do_snapshot)
-            vout_snapshot_Set(&vout->p->snapshot, &vd->source, direct);
-
-        /* Render the direct buffer returned by vout_RenderPicture */
-        if (direct) {
-            vout_RenderWrapper(vout, direct);
-
-            vout_chrono_Stop(&vout->p->render);
-#if 0
-            {
-            static int i = 0;
-            if (((i++)%10) == 0)
-                msg_Info(vout, "render: avg %d ms var %d ms",
-                         (int)(vout->p->render.avg/1000), (int)(vout->p->render.var/1000));
-            }
-#endif
-        }
-
-        /* Wait the real date (for rendering jitter) */
-        if (!is_forced)
-            mwait(direct->date);
-
-        /* Display the direct buffer returned by vout_RenderPicture */
-        vout->p->displayed.date = mdate();
-        if (direct)
-            vout_DisplayWrapper(vout, direct);
-
-        displayed_count++;
-        break;
-    }
-
-    vout_statistic_Update(&vout->p->statistic, displayed_count, lost_count);
-    if (displayed_count <= 0)
+    if (!first && !refresh && !drop) {
+        if (date_next != VLC_TS_INVALID && date_refresh != VLC_TS_INVALID)
+            *deadline = __MIN(date_next, date_refresh);
+        else if (date_next != VLC_TS_INVALID)
+            *deadline = date_next;
+        else if (date_refresh != VLC_TS_INVALID)
+            *deadline = date_refresh;
         return VLC_EGENERIC;
-    return VLC_SUCCESS;
+    }
+
+    if (drop) {
+        picture_Release(vout->p->displayed.current);
+        vout->p->displayed.current = vout->p->displayed.next;
+        vout->p->displayed.next    = NULL;
+    }
+    assert(vout->p->displayed.current);
+
+    bool is_forced = now || (!drop && refresh) || vout->p->displayed.current->b_force;
+    return ThreadDisplayRenderPicture(vout, is_forced);
 }
 
 static void ThreadManage(vout_thread_t *vout,
@@ -788,7 +806,10 @@ static void ThreadManage(vout_thread_t *vout,
     vlc_mutex_lock(&vout->p->picture_lock);
 
     *deadline = VLC_TS_INVALID;
-    ThreadDisplayPicture(vout, false, deadline);
+    for (;;) {
+        if (ThreadDisplayPicture(vout, false, deadline))
+            break;
+    }
 
     const int  picture_qtype      = vout->p->displayed.qtype;
     const bool picture_interlaced = vout->p->displayed.is_interlaced;
@@ -825,6 +846,22 @@ static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
                  string);
 }
 
+static void ThreadFilterFlush(vout_thread_t *vout)
+{
+    if (vout->p->displayed.current)
+        picture_Release( vout->p->displayed.current );
+    vout->p->displayed.current = NULL;
+
+    if (vout->p->displayed.next)
+        picture_Release( vout->p->displayed.next );
+    vout->p->displayed.next = NULL;
+
+    vlc_mutex_lock(&vout->p->filter.lock);
+    filter_chain_VideoFlush(vout->p->filter.chain_static);
+    filter_chain_VideoFlush(vout->p->filter.chain_interactive);
+    vlc_mutex_unlock(&vout->p->filter.lock);
+}
+
 typedef struct {
     char           *name;
     config_chain_t *cfg;
@@ -832,6 +869,8 @@ typedef struct {
 
 static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
 {
+    ThreadFilterFlush(vout);
+
     vlc_array_t array_static;
     vlc_array_t array_interactive;
 
@@ -891,10 +930,6 @@ static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
     }
 
     vlc_mutex_unlock(&vout->p->filter.lock);
-
-    vout->p->filter.delay_index = 0;
-    for (int i = 0; i < VOUT_FILTER_DELAYS; i++)
-        vout->p->filter.delay[i] = 0;
 }
 
 static void ThreadChangeSubFilters(vout_thread_t *vout, const char *filters)
@@ -904,14 +939,6 @@ static void ThreadChangeSubFilters(vout_thread_t *vout, const char *filters)
 static void ThreadChangeSubMargin(vout_thread_t *vout, int margin)
 {
     spu_ChangeMargin(vout->p->p_spu, margin);
-}
-
-static void ThreadFilterFlush(vout_thread_t *vout)
-{
-    vlc_mutex_lock(&vout->p->filter.lock);
-    filter_chain_VideoFlush(vout->p->filter.chain_static);
-    filter_chain_VideoFlush(vout->p->filter.chain_interactive);
-    vlc_mutex_unlock(&vout->p->filter.lock);
 }
 
 static void ThreadChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
@@ -928,7 +955,6 @@ static void ThreadChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
         picture_fifo_OffsetDate(vout->p->decoder_fifo, duration);
         if (vout->p->displayed.decoded)
             vout->p->displayed.decoded->date += duration;
-
         spu_OffsetSubtitleDate(vout->p->p_spu, duration);
 
         ThreadFilterFlush(vout);
@@ -945,6 +971,8 @@ static void ThreadFlush(vout_thread_t *vout, bool below, mtime_t date)
     vout->p->step.timestamp = VLC_TS_INVALID;
     vout->p->step.last      = VLC_TS_INVALID;
 
+    ThreadFilterFlush(vout); /* FIXME too much */
+
     picture_t *last = vout->p->displayed.decoded;
     if (last) {
         if (( below && last->date <= date) ||
@@ -956,7 +984,6 @@ static void ThreadFlush(vout_thread_t *vout, bool below, mtime_t date)
             vout->p->displayed.timestamp = VLC_TS_INVALID;
         }
     }
-    ThreadFilterFlush(vout);
 
     picture_fifo_Flush(vout->p->decoder_fifo, date, below);
 }
@@ -1087,10 +1114,6 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
         filter_chain_New( vout, "video filter2", false,
                           VoutVideoFilterInteractiveAllocationSetup, NULL, vout);
 
-    vout->p->filter.delay_index = 0;
-    for (int i = 0; i < VOUT_FILTER_DELAYS; i++)
-        vout->p->filter.delay[i] = 0;
-
     vout_display_state_t state_default;
     if (!state) {
         VoutGetDisplayCfg(vout, &state_default.cfg, vout->p->display.title);
@@ -1108,9 +1131,10 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
         return VLC_EGENERIC;
     assert(vout->p->decoder_pool);
 
+    vout->p->displayed.current       = NULL;
+    vout->p->displayed.next          = NULL;
     vout->p->displayed.decoded       = NULL;
     vout->p->displayed.date          = VLC_TS_INVALID;
-    vout->p->displayed.decoded       = NULL;
     vout->p->displayed.timestamp     = VLC_TS_INVALID;
     vout->p->displayed.qtype         = QTYPE_NONE;
     vout->p->displayed.is_interlaced = false;

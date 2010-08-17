@@ -48,12 +48,6 @@
  */
 #define VOUT_MAX_PICTURES (20)
 
-/**
- * Number of frames used to estimate the maximum filter chain latency.
- * For performance, it is best to use a power of 2
- */
-#define VOUT_FILTER_DELAYS (8)
-
 /* */
 struct vout_thread_sys_t
 {
@@ -107,6 +101,8 @@ struct vout_thread_sys_t
         int         qtype;
         bool        is_interlaced;
         picture_t   *decoded;
+        picture_t   *current;
+        picture_t   *next;
     } displayed;
 
     struct {
@@ -134,8 +130,6 @@ struct vout_thread_sys_t
         vlc_mutex_t     lock;
         filter_chain_t  *chain_static;
         filter_chain_t  *chain_interactive;
-        unsigned        delay_index;
-        mtime_t         delay[VOUT_FILTER_DELAYS];
     } filter;
 
     /* */
