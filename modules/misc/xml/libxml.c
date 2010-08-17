@@ -179,12 +179,12 @@ static void ReaderClose( vlc_object_t *p_this )
 {
     xml_reader_t *p_reader = (xml_reader_t *)p_this;
 
+    xmlFreeTextReader( (void *)p_reader->p_sys );
 #ifdef LIBXML_GETS_A_CLUE_ABOUT_REENTRANCY_AND_MEMORY_LEAKS
     vlc_mutex_lock( &lock );
     xmlCleanupParser();
     vlc_mutex_unlock( &lock );
 #endif
-    xmlFreeTextReader( (void *)p_reader->p_sys );
 }
 
 static int ReaderUseDTD ( xml_reader_t *p_reader )
