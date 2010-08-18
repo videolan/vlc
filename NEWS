@@ -40,15 +40,47 @@ Stream output:
     dst=public_html/iphonestreamfile-###.ts}"
 
 
-Changes between 1.1.1 and 1.1.2
--------------------------------
+Changes between 1.1.2 and 1.1.3:
+--------------------------------
+
+Access and demuxers:
+ * fixes for FTP relatives path and FTP directory support
+ * fix for podcasts parsing
+ * DVD: fix an assert error and various memory leaks
+
+Taglib:
+ * fix NULL dereferences, as reported by FortiGuard Lab,
+   CVE-2010-2937 / VideoLAN-SA-1004
+
+Playlist:
+ * fix a regression where the wrong entry was played
+ * fix m3u playlists exports
+
+Skins2:
+ * fix video autoresize behaviour
+
+Translations:
+ * Update translations for Dutch, Sinhala, Hebrew, Estonian, Spanish and Bengali
+
+Windows and Mac:
+ * Update of many codecs libraries, fixing bugs and improving speed
+
+Mac:
+ * architecture-specific installations will now be replaced by specific updates
+
+BSD:
+ * Add AltiVec detetion for OpenBSD/powerpc
+
+
+Changes between 1.1.1 and 1.1.2:
+--------------------------------
 
 Demuxers:
  * Avformat fps displaying fix
  * TS, fix an issue where some programs would get dropped (fixes DVB issues too)
 
 Audio filters:
- * fix timestamps handling on some filters that provoqued issues when playback
+ * fix timestamps handling on some filters that provoked issues when playback
    of mono streams, especially on Windows
 
 Windows:
