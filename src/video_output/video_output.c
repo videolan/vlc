@@ -567,7 +567,7 @@ static int VoutVideoFilterInteractiveAllocationSetup(filter_t *filter, void *dat
 }
 
 /* */
-static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse)
+static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool is_late_dropped)
 {
     int lost_count = 0;
 
@@ -582,7 +582,7 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse)
             decoded = picture_Hold(vout->p->displayed.decoded);
         } else {
             decoded = picture_fifo_Pop(vout->p->decoder_fifo);
-            if (vout->p->is_late_dropped && decoded && !decoded->b_force) {
+            if (is_late_dropped && decoded && !decoded->b_force) {
                 const mtime_t predicted = mdate() + 0; /* TODO improve */
                 const mtime_t late = predicted - decoded->date;
                 if (late > VOUT_DISPLAY_LATE_THRESHOLD) {
@@ -739,13 +739,15 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 static int ThreadDisplayPicture(vout_thread_t *vout,
                                 bool now, mtime_t *deadline)
 {
+    bool is_late_dropped = vout->p->is_late_dropped && !vout->p->pause.is_on && !now;
     bool first = !vout->p->displayed.current;
-    if (first && ThreadDisplayPreparePicture(vout, true)) /* FIXME not sure it is ok */
+    if (first && ThreadDisplayPreparePicture(vout, true, is_late_dropped)) /* FIXME not sure it is ok */
         return VLC_EGENERIC;
     if (!vout->p->pause.is_on || now) {
         while (!vout->p->displayed.next) {
-            if (ThreadDisplayPreparePicture(vout, false))
+            if (ThreadDisplayPreparePicture(vout, false, is_late_dropped)) {
                 break;
+            }
         }
     }
 
@@ -792,7 +794,8 @@ static int ThreadDisplayPicture(vout_thread_t *vout,
         vout->p->displayed.current = vout->p->displayed.next;
         vout->p->displayed.next    = NULL;
     }
-    assert(vout->p->displayed.current);
+    if (!vout->p->displayed.current)
+        return VLC_EGENERIC;
 
     bool is_forced = now || (!drop && refresh) || vout->p->displayed.current->b_force;
     return ThreadDisplayRenderPicture(vout, is_forced);
