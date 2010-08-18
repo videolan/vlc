@@ -1850,6 +1850,11 @@ dnl
 dnl dvdread module: check for libdvdread
 dnl
 PKG_ENABLE_MODULES_VLC([DVDREAD], [], [dvdread], [dvdread input module], [auto])
+if test "${enable_dvdread}" != "no"
+then
+  dnl prepend -ldvdcss on OS that need it
+  AS_CASE(["${SYS}"], [mingw32|darwin|beos], [VLC_ADD_LIBS([dvdread], [-ldvdcss])])
+fi
 
 dnl
 dnl libdvdnav plugin
