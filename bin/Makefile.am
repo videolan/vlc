@@ -50,7 +50,7 @@ else
 vlc_LDADD += $(LIBDL)
 endif
 
-.rc.in.rc: $(top_builddir)/config.status
+vlc_win32_rc.rc: $(top_builddir)/config.status
 	cd "$(top_builddir)" && \
 	$(SHELL) ./config.status --file="bin/$@"
 
