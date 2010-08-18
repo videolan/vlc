@@ -504,7 +504,7 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
     if( dir.endsWith( "/VIDEO_TS", Qt::CaseInsensitive ) )
         scheme = "dvd";
 
-    char *uri = make_URI( qtu( dir ), scheme );
+    char *uri = make_URI( qtu( toNativeSeparators( dir ) ), scheme );
     if( unlikely(uri == NULL) )
         return;
 
