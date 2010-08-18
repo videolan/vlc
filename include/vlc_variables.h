@@ -371,7 +371,7 @@ static inline float var_GetFloat( vlc_object_t *p_obj, const char *psz_name )
  * \param p_obj The object that holds the variable
  * \param psz_name The name of the variable
  */
-LIBVLC_USED
+LIBVLC_USED LIBVLC_MALLOC
 static inline char *var_GetString( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val; val.psz_string = NULL;
@@ -381,7 +381,7 @@ static inline char *var_GetString( vlc_object_t *p_obj, const char *psz_name )
         return val.psz_string;
 }
 
-LIBVLC_USED
+LIBVLC_USED LIBVLC_MALLOC
 static inline char *var_GetNonEmptyString( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;
@@ -509,7 +509,7 @@ static inline float var_CreateGetFloat( vlc_object_t *p_obj, const char *psz_nam
  * \param p_obj The object that holds the variable
  * \param psz_name The name of the variable
  */
-LIBVLC_USED
+LIBVLC_USED LIBVLC_MALLOC
 static inline char *var_CreateGetString( vlc_object_t *p_obj,
                                            const char *psz_name )
 {
@@ -517,7 +517,7 @@ static inline char *var_CreateGetString( vlc_object_t *p_obj,
     return var_GetString( p_obj, psz_name );
 }
 
-LIBVLC_USED
+LIBVLC_USED LIBVLC_MALLOC
 static inline char *var_CreateGetNonEmptyString( vlc_object_t *p_obj,
                                                    const char *psz_name )
 {
@@ -609,7 +609,7 @@ static inline float var_CreateGetFloatCommand( vlc_object_t *p_obj, const char *
  * \param p_obj The object that holds the variable
  * \param psz_name The name of the variable
  */
-LIBVLC_USED
+LIBVLC_USED LIBVLC_MALLOC
 static inline char *var_CreateGetStringCommand( vlc_object_t *p_obj,
                                            const char *psz_name )
 {
@@ -618,7 +618,7 @@ static inline char *var_CreateGetStringCommand( vlc_object_t *p_obj,
     return var_GetString( p_obj, psz_name );
 }
 
-LIBVLC_USED
+LIBVLC_USED LIBVLC_MALLOC
 static inline char *var_CreateGetNonEmptyStringCommand( vlc_object_t *p_obj,
                                                    const char *psz_name )
 {
@@ -703,6 +703,7 @@ static inline char *var_InheritString( vlc_object_t *obj, const char *name )
 }
 #define var_InheritString(o, n) var_InheritString(VLC_OBJECT(o), n)
 
+LIBVLC_USED
 static inline mtime_t var_InheritTime( vlc_object_t *obj, const char *name )
 {
     vlc_value_t val;
@@ -713,6 +714,7 @@ static inline mtime_t var_InheritTime( vlc_object_t *obj, const char *name )
 }
 #define var_InheritTime(o, n) var_InheritTime(VLC_OBJECT(o), n)
 
+LIBVLC_USED
 static inline void *var_InheritAddress( vlc_object_t *obj, const char *name )
 {
     vlc_value_t val;
