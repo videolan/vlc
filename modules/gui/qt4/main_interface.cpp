@@ -1074,7 +1074,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
     {
         if( url.isValid() )
         {
-            char* psz_uri = make_URI( qtu( url.toString() ), NULL );
+            char* psz_uri = make_URI( url.toEncoded().constData(), NULL );
             playlist_Add( THEPL, psz_uri, NULL,
                           PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
                           PLAYLIST_END, true, pl_Unlocked );
