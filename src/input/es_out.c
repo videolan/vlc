@@ -2712,7 +2712,7 @@ static char *LanguageGetName( const char *psz_code )
 {
     const iso639_lang_t *pl;
 
-    if( psz_code == NULL )
+    if( psz_code == NULL || !strcmp( psz_code, "und" ) )
     {
         return strdup( "" );
     }
