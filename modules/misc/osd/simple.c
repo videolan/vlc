@@ -504,7 +504,7 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
-    msg_Err( p_menu, "parsing file failed (returned %d)", result );
+    msg_Err( p_this, "parsing file failed (returned %d)", result );
     if( p_menu )
         osd_MenuFree( p_menu );
     fclose( fd );
