@@ -49,7 +49,6 @@
 #   include <time.h>                                               /* time() */
 #endif
 
-#include <vlc_iso_lang.h>
 #include <vlc_meta.h>
 #include <vlc_charset.h>
 #include <vlc_input.h>
