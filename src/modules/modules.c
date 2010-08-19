@@ -301,7 +301,7 @@ const char *module_gettext (const module_t *m, const char *str)
 {
 #ifdef ENABLE_NLS
     const char *domain = m->domain ? m->domain : PACKAGE_NAME;
-    if (unlikely(!*str))
+    if (unlikely(str == NULL || *str == '\0'))
         return "";
     return dgettext (domain, str);
 #else
