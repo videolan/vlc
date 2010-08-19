@@ -1282,7 +1282,7 @@ print_help_section( const module_t *m, const module_config_t *p_item,
     {
         utf8_fprintf( stdout, RED"   %s:\n"GRAY,
                       module_gettext( m, p_item->psz_text ) );
-        if( b_description && p_item->psz_longtext && *p_item->psz_longtext )
+        if( b_description && p_item->psz_longtext )
             utf8_fprintf( stdout, MAGENTA"   %s\n"GRAY,
                           module_gettext( m, p_item->psz_longtext ) );
     }
@@ -1290,7 +1290,7 @@ print_help_section( const module_t *m, const module_config_t *p_item,
     {
         utf8_fprintf( stdout, "   %s:\n",
                       module_gettext( m, p_item->psz_text ) );
-        if( b_description && p_item->psz_longtext && *p_item->psz_longtext )
+        if( b_description && p_item->psz_longtext )
             utf8_fprintf( stdout, "   %s\n",
                           module_gettext(m, p_item->psz_longtext ) );
     }
@@ -1484,8 +1484,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                         utf8_fprintf( stdout, "\n %s\n",
                                       module_gettext( p_parser, p_item->psz_text ) );
                 }
-                if( b_description && p_item->psz_longtext
-                 && *p_item->psz_longtext )
+                if( b_description && p_item->psz_longtext )
                 {
                     if( b_color )
                         utf8_fprintf( stdout, CYAN " %s\n" GRAY,
@@ -1731,8 +1730,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                 }
             }
 
-            if( b_description_hack && p_item->psz_longtext
-             && *p_item->psz_longtext )
+            if( b_description_hack && p_item->psz_longtext )
             {
                 sprintf( psz_buffer, "%s%s",
                          module_gettext( p_parser, p_item->psz_longtext ),
