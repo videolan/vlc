@@ -53,7 +53,7 @@ fi
 export LD_LIBRARY_PATH=$BUILDDIR/src/.libs
 
 if [ -e ../../extras/contrib/config.mak -a ! "`grep HOST ../../extras/contrib/config.mak 2>/dev/null|awk '{print $3}'`" != "$HOST" ]; then
-    CPPFLAGS="-I../../extras/contrib/include"
+    CXXFLAGS="-I../../extras/contrib/include"
 fi
 
 [ -z "$CXX" ] && CXX=g++
