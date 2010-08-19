@@ -526,7 +526,7 @@ void StringListConfigControl::finish(module_config_t *p_module_config, bool byca
         }
         combo->addItem( qfu((p_module_config->ppsz_list_text &&
                             p_module_config->ppsz_list_text[i_index])?
-                            p_module_config->ppsz_list_text[i_index] :
+                            _(p_module_config->ppsz_list_text[i_index]) :
                             p_module_config->ppsz_list[i_index] ),
                    QVariant( qfu(p_module_config->ppsz_list[i_index] )) );
         if( p_item->value.psz && !strcmp( p_module_config->value.psz,
@@ -566,7 +566,7 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
 
         for ( int i_index = 0; i_index < p_config->i_list; i_index++ )
         {
-            combo->addItem( qfu( p_config->ppsz_list_text[i_index] ),
+            combo->addItem( qtr(p_config->ppsz_list_text[i_index]),
                     QVariant( p_config->pi_list[i_index] ) );
             if( p_config->value.i == p_config->pi_list[i_index] )
             {
