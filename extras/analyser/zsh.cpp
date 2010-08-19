@@ -39,6 +39,7 @@ typedef std::pair<int, std::string> mcpair;
 
 #include <vlc_common.h>
 #include <vlc/vlc.h>
+#include <vlc_modules.h>
 
 /* evil hack */
 #undef __PLUGIN__
@@ -145,7 +146,7 @@ void ParseModules( mumap &mods, mcmap &mods2 )
             if( p_item->i_type & CONFIG_ITEM )
                 ParseOption( p_item, mods, mods2 );
         }
-        while( i_items++ < p_module->i_config_items && p_item++ );
+        while( ++i_items < p_module->confsize && p_item++ );
 
     }
     module_list_free( p_list );
@@ -268,7 +269,7 @@ void ParseOption( module_config_t *p_item, mumap &mods, mcmap &mods2 )
             int i = p_item->i_list -1;
             char *psz_list;
             if( p_item->ppsz_list_text )
-                asprintf( &psz_list, "%s\\:%s", p_item->ppsz_list[i],
+                asprintf( &psz_list, "%s\\:\\\"%s\\\"", p_item->ppsz_list[i],
                           p_item->ppsz_list_text[i] );
             else
                 psz_list = strdup(p_item->ppsz_list[i]);
@@ -276,10 +277,10 @@ void ParseOption( module_config_t *p_item, mumap &mods, mcmap &mods2 )
             while( i>1 )
             {
                 if( p_item->ppsz_list_text )
-                    asprintf( &psz_list2, "%s\\:%s %s", p_item->ppsz_list[i-1],
+                    asprintf( &psz_list2, "%s\\:\\\"%s\\\" %s", p_item->ppsz_list[i-1],
                               p_item->ppsz_list_text[i-1], psz_list );
                 else
-                    asprintf( &psz_list2, "%s %s", p_item->ppsz_list[i-1],
+                    asprintf( &psz_list2, "\\\"%s\\\" %s", p_item->ppsz_list[i-1],
                               psz_list );
 
                 free( psz_list );
@@ -308,18 +309,18 @@ void ParseOption( module_config_t *p_item, mumap &mods, mcmap &mods2 )
             int i = p_item->i_list -1;
             char *psz_list;
             if( p_item->ppsz_list_text )
-                asprintf( &psz_list, "%d\\:%s", p_item->pi_list[i],
+                asprintf( &psz_list, "%d\\:\\\"%s\\\"", p_item->pi_list[i],
                           p_item->ppsz_list_text[i] );
             else
                 psz_list = strdup(p_item->ppsz_list[i]);
             char *psz_list2;
-            while( i>1 )
+            while( i > 0 )
             {
                 if( p_item->ppsz_list_text )
-                    asprintf( &psz_list2, "%d\\:%s %s", p_item->pi_list[i-1],
+                    asprintf( &psz_list2, "%d\\:\\\"%s\\\" %s", p_item->pi_list[i-1],
                               p_item->ppsz_list_text[i-1], psz_list );
                 else
-                    asprintf( &psz_list2, "%s %s", p_item->ppsz_list[i-1],
+                    asprintf( &psz_list2, "\\\"%s\\\" %s", p_item->ppsz_list[i-1],
                               psz_list );
 
                 free( psz_list );
