@@ -279,7 +279,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Second, try configured encoding */
     if (psz_charset == NULL)
     {
-        psz_charset = var_CreateGetNonEmptyString (p_dec, "subsdec-encoding");
+        psz_charset = var_InheritString (p_dec, "subsdec-encoding");
         msg_Dbg (p_dec, "trying configured character encoding: %s",
                  psz_charset ? psz_charset : "not specified");
     }
@@ -303,7 +303,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         msg_Dbg (p_dec, "trying default character encoding: %s",
                  psz_charset ? psz_charset : "not specified");
 
-        if (var_CreateGetBool (p_dec, "subsdec-autodetect-utf8"))
+        if (var_InheritBool (p_dec, "subsdec-autodetect-utf8"))
         {
             msg_Dbg (p_dec, "using automatic UTF-8 detection");
             p_sys->b_autodetect_utf8 = true;
@@ -327,10 +327,10 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
     free (psz_charset);
 
-    p_sys->i_align = var_CreateGetInteger( p_dec, "subsdec-align" );
+    p_sys->i_align = var_InheritInteger( p_dec, "subsdec-align" );
 
     if( p_dec->fmt_in.i_codec == VLC_CODEC_SSA
-     && var_CreateGetBool( p_dec, "subsdec-formatted" ) )
+     && var_InheritBool( p_dec, "subsdec-formatted" ) )
     {
         if( p_dec->fmt_in.i_extra > 0 )
             ParseSSAHeader( p_dec );
@@ -532,7 +532,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         /* Remove formatting from string */
 
         p_spu->p_region->psz_text = StripTags( psz_subtitle );
-        if( var_CreateGetBool( p_dec, "subsdec-formatted" ) )
+        if( var_InheritBool( p_dec, "subsdec-formatted" ) )
         {
             p_spu->p_region->psz_html = CreateHtmlSubtitle( &p_spu->p_region->i_align, psz_subtitle );
         }
