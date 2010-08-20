@@ -23,7 +23,7 @@
 -- Probe function.
 function probe()
     return vlc.access == "http"
-        and string.match( vlc.path, "www.apple.com/trailers" ) 
+        and string.match( vlc.path, "trailers.apple.com" )
 end
 
 function find( haystack, needle )
@@ -33,36 +33,37 @@ end
 
 -- Parse function.
 function parse()
-    p = {}
+    local playlist = {}
+    local description = ''
+    local art_url = ''
+
     while true
     do 
         line = vlc.readline()
         if not line then break end
-        for path in string.gmatch( line, "http://movies.apple.com/movies/.-%.mov" ) do
-            path = vlc.strings.decode_uri( path )
-            if string.match( path, "320" ) then
-                extraname = " (320p)"
-            elseif string.match( path, "480" ) then
-                extraname = " (480p)"
-            elseif string.match( path, "640" ) then
-                extraname = " (640p)"
-            elseif string.match( path, "720" ) then
-                extraname = " (720p)"
-            elseif string.match( path, "1080" ) then
-                extraname = " (1080p)"
-            else
-                extraname = ""
+
+        if string.match( line, "class=\".-first" ) then
+            description = find( line, "h%d.->(.-)</h%d")
+        end
+        if string.match( line, 'img src=') then
+            for img in string.gmatch(line, '<img src="(http://.*\.jpg)" ') do
+                art_url = img
             end
-            table.insert( p, { path = path; name = title..extraname; description = description; url = vlc.path; options = ":http-user-agent=\"QuickTime\"" } )
+            for i,value in pairs(playlist) do
+                if value.arturl == '' then
+                    playlist[i].arturl = art_url
+                else break end
+            end
         end
-        if string.match( line, "<title>" )
-        then
-            title = vlc.strings.decode_uri( find( line, "<title>(.-)<" ) )
-        end
-        if string.match( line, "<meta name=\"Description\"" )
-        then
-            description = vlc.strings.resolve_xml_special_chars( find( line, "name=\"Description\" content=\"(.-)\"" ) )
+        if string.match( line, "class=\"hd\".-\.mov") then
+            for urlline,resolution in string.gmatch(line, "class=\"hd\".-href=\"(.-.mov)\".-(%d+.-p)") do
+                urlline = string.gsub( urlline, "_"..resolution, "_h"..resolution )
+                table.insert( playlist, { path = urlline,
+                                          name = description .. " (" .. resolution .. ")",
+                                          arturl = art_url,
+                                          options = {":http-user-agent=QuickTime/7.2", ":demux=avformat,ffmpeg",":play-and-pause"} } )
+            end
         end
     end
-    return p
+    return playlist
 end

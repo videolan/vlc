@@ -32,7 +32,6 @@ end
 function main()
     fd = vlc.stream( "http://trailers.apple.com/trailers/home/feeds/just_hd.json" )
     if not fd then return nil end
-    options = {":http-user-agent=QuickTime/7.2",":demux=avformat,ffmpeg",":play-and-pause"}
     line = fd:readline()
     while line ~= nil
     do
@@ -45,31 +44,10 @@ function main()
             end
 
             url = find( line, "location\":\"(.-)\"")
-            playlist = vlc.stream( "http://trailers.apple.com"..url.."includes/playlists/web.inc" )
-            if not playlist then 
-                vlc.msg.info("Didn't get playlist...")
-            end
+            node = vlc.sd.add_item( {title  = title,
+                                     path   = "http://trailers.apple.com"..url.."includes/playlists/web.inc",
+                                     arturl = art})
 
-            node = vlc.sd.add_node( {title=title,arturl=art} )
-
-            playlistline = playlist:readline()
-            description =""
-            if not playlistline then vlc.msg.info("Empty playlists-file") end
-            while playlistline ~= nil
-            do
-                if string.match( playlistline, "class=\".-first" ) then
-                    description = find( playlistline, "h%d.->(.-)</h%d")
-                end
-                if string.match( playlistline, "class=\"hd\".-\.mov") then
-                    for urlline,resolution in string.gmatch(playlistline, "class=\"hd\".-href=\"(.-.mov)\".-(%d+.-p)") do
-                        urlline = string.gsub( urlline, "_"..resolution, "_h"..resolution )
-                        node:add_subitem( {path = urlline,
-                                  title=title.." "..description.." ("..resolution..")",
-                                  options=options, arturl=art })
-                    end
-                end
-                playlistline = playlist:readline()
-            end
          end
          line = fd:readline()
     end
