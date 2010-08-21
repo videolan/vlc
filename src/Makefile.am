@@ -13,7 +13,9 @@ EXTRA_DIST = extras/COPYING \
 	libvlc.sym \
 	libvlccore.sym
 
-BUILT_SOURCES = ../include/vlc_about.h
+BUILT_SOURCES = \
+	$(nodist_pkginclude_HEADERS) \
+	../include/vlc_about.h
 CLEANFILES = $(BUILT_SOURCES)
 
 SUFFIXES = .pc.in .pc .rc.in .rc
@@ -38,6 +40,7 @@ pkginclude_HEADERS = \
 	../include/vlc/libvlc_structures.h \
 	../include/vlc/libvlc_vlm.h \
 	$(NULL)
+nodist_pkginclude_HEADERS = ../include/vlc/libvlc_version.h
 
 pluginsinclude_HEADERS = \
 	../include/vlc_access.h \
@@ -131,6 +134,9 @@ noinst_HEADERS = \
 	../include/vlc_vout_wrapper.h \
 	../include/vlc_windows_interfaces.h \
 	$(NULL)
+
+../include/vlc/libvlc_version.h: ../include/vlc/libvlc_version.h.in $(top_builddir)/config.status
+	$(SHELL) $(top_builddir)/config.status --file=$@
 
 ../include/vlc_about.h: Makefile.am $(top_srcdir)/COPYING $(top_srcdir)/THANKS $(top_srcdir)/AUTHORS
 	$(AM_V_at)rm -f -- "$@.tmp"
