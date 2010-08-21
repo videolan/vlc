@@ -15,7 +15,7 @@ EXTRA_DIST = extras/COPYING \
 
 BUILT_SOURCES = \
 	$(nodist_pkginclude_HEADERS) \
-	../include/vlc_about.h
+	$(nodist_pluginsinclude_HEADERS)
 CLEANFILES = $(BUILT_SOURCES)
 
 SUFFIXES = .pc.in .pc .rc.in .rc
@@ -114,6 +114,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_xml.h \
 	../include/vlc_xlib.h \
 	$(NULL)
+nodist_pluginsinclude_HEADERS = ../include/vlc_about.h
 
 noinst_HEADERS = \
 	../include/vlc_codec_synchro.h \
