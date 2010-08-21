@@ -11,7 +11,8 @@ EXTRA_DIST = extras/COPYING \
 	libvlc.pc.in \
 	vlc-plugin.pc.in \
 	libvlc.sym \
-	libvlccore.sym
+	libvlccore.sym \
+	../include/vlc/libvlc_version.h.in
 
 BUILT_SOURCES = \
 	$(nodist_pkginclude_HEADERS) \
