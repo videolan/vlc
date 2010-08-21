@@ -51,6 +51,7 @@ static char           *CreateHtmlSubtitle( int *pi_align, char * );
  *****************************************************************************/
 static const char *const ppsz_encodings[] = {
     "",
+    "system",
     "UTF-8",
     "UTF-16",
     "UTF-16BE",
@@ -99,6 +100,7 @@ static const char *const ppsz_encoding_names[] = {
       the GetACP translation. "Windows-1252" applies to Western European
       languages using the Latin alphabet. */
     N_("Default (Windows-1252)"),
+    N_("System codeset"),
     N_("Universal (UTF-8)"),
     N_("Universal (UTF-16)"),
     N_("Universal (big endian UTF-16)"),
@@ -282,6 +284,12 @@ static int OpenDecoder( vlc_object_t *p_this )
         psz_charset = var_InheritString (p_dec, "subsdec-encoding");
         msg_Dbg (p_dec, "trying configured character encoding: %s",
                  psz_charset ? psz_charset : "not specified");
+        if (!strcmp (psz_charset, "system"))
+        {
+            free (psz_charset);
+            psz_charset = strdup ("");
+            /* ^ iconv() treats "" as nl_langinfo(CODESET) */
+        }
     }
 
     /* Third, try "local" encoding with optional UTF-8 autodetection */
