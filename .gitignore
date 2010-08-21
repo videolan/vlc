@@ -39,7 +39,6 @@ qvlc
 mvlc
 nvlc
 wxvlc
-vlc
 vlc_install_dir/*
 plugins-*.dat
 
