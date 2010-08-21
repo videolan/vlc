@@ -198,35 +198,18 @@ char *ToLocaleDup (const char *utf8)
 }
 
 /**
- * Formats an UTF-8 string as vasprintf(), then print it to stdout, with
- * appropriate conversion to local encoding.
- */
-static int utf8_vasprintf( char **str, const char *fmt, va_list ap )
-{
-    char *utf8;
-    int res = vasprintf( &utf8, fmt, ap );
-    if( res == -1 )
-        return -1;
-
-#ifdef ASSUME_UTF8
-    *str = utf8;
-#else
-    *str = ToLocaleDup( utf8 );
-    free( utf8 );
-#endif
-    return res;
-}
-
-/**
  * Formats an UTF-8 string as vfprintf(), then print it, with
  * appropriate conversion to local encoding.
  */
 int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
 {
+#ifdef ASSUME_UTF8
+    return vfprintf (stream, fmt, ap);
+#else
     char *str;
     int res;
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
+# if defined( WIN32 ) && !defined( UNDER_CE )
     /* Writing to the console is a lot of fun on Microsoft Windows.
      * If you use the standard I/O functions, you must use the OEM code page,
      * which is different from the usual ANSI code page. Or maybe not, if the
@@ -259,15 +242,19 @@ int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
         free (str);
         return res;
     }
-#endif
+# endif
 
-    res = utf8_vasprintf (&str, fmt, ap);
+    res = vasprintf (&str, fmt, ap);
     if (unlikely(res == -1))
         return -1;
 
-    fputs( str, stream );
-    free( str );
+    char *ansi = ToLocaleDup (str);
+    free (str);
+
+    fputs (ansi, stream);
+    free (ansi);
     return res;
+#endif
 }
 
 /**
