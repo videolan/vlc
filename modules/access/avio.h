@@ -31,7 +31,7 @@ int  OpenAvio (vlc_object_t *);
 void CloseAvio(vlc_object_t *);
 
 #define AVIO_MODULE \
-    set_shortname(N_("Avio"))               \
+    set_shortname(N_("FFmpeg"))             \
     set_description(N_("FFmpeg access") )   \
     set_category(CAT_INPUT)                 \
     set_subcategory(SUBCAT_INPUT_ACCESS)    \

@@ -642,8 +642,8 @@ static const char *const ppsz_pos_descriptions[] =
 
 #define CLOCK_JITTER_TEXT N_("Clock jitter")
 #define CLOCK_JITTER_LONGTEXT N_( \
-    "It tells the clock algorithms what is the maximal input jitter that " \
-    "is considered valid and can be compensated (in milliseconds)" )
+    "This defines the maximum input delay jitter that the synchronization " \
+    "algorithms should try to compensate (in milliseconds)." )
 
 #define NETSYNC_TEXT N_("Network synchronisation" )
 #define NETSYNC_LONGTEXT N_( "This allows you to remotely " \

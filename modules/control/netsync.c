@@ -1,5 +1,5 @@
 /*****************************************************************************
- * netsync.c: synchronisation between several network clients.
+ * netsync.c: synchronization between several network clients.
  *****************************************************************************
  * Copyright (C) 2004-2009 the VideoLAN team
  * $Id$
@@ -56,20 +56,20 @@ static void Close(vlc_object_t *);
 
 #define NETSYNC_TEXT N_("Network master clock")
 #define NETSYNC_LONGTEXT N_("When set then " \
-  "this vlc instance shall dictate its clock for synchronisation" \
+  "This VLC instance shall dictate its clock for synchronization " \
   "over clients listening on the masters network ip address")
 
 #define MIP_TEXT N_("Master server ip address")
 #define MIP_LONGTEXT N_("The IP address of " \
-  "the network master clock to use for clock synchronisation.")
+  "The network master clock to use for clock synchronization.")
 
 #define NETSYNC_TIMEOUT_TEXT N_("UDP timeout (in ms)")
-#define NETSYNC_TIMEOUT_LONGTEXT N_("Amount of time (in ms) " \
-  "to wait before aborting network reception of data.")
+#define NETSYNC_TIMEOUT_LONGTEXT N_("Length of time (in ms) " \
+  "until aborting data reception.")
 
 vlc_module_begin()
     set_shortname(N_("Network Sync"))
-    set_description(N_("Network synchronisation"))
+    set_description(N_("Network synchronization"))
     set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
 

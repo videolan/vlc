@@ -86,8 +86,8 @@ static void DemuxClose( vlc_object_t * );
 #define CFG_PREFIX "alsa-"
 
 vlc_module_begin()
-    set_shortname( N_("Alsa") )
-    set_description( N_("Alsa audio capture input") )
+    set_shortname( N_("ALSA") )
+    set_description( N_("ALSA audio capture input") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_help( HELP_TEXT )
