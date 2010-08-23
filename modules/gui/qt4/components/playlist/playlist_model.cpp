@@ -1047,35 +1047,35 @@ void PLModel::popupExplore()
 {
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                                    i_popup_item );
+            i_popup_item );
     if( p_item )
     {
-       input_item_t *p_input = p_item->p_input;
-       char *psz_meta = input_item_GetURI( p_input );
-       PL_UNLOCK;
-       if( psz_meta )
-       {
-           const char *psz_access;
-           const char *psz_demux;
-           char  *psz_path;
-           input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_meta );
+        input_item_t *p_input = p_item->p_input;
+        char *psz_meta = input_item_GetURI( p_input );
+        PL_UNLOCK;
+        if( psz_meta )
+        {
+            const char *psz_access;
+            const char *psz_demux;
+            char  *psz_path;
+            input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_meta );
 
-           if( !EMPTY_STR( psz_access ) && (
+            if( !EMPTY_STR( psz_access ) && (
                    !strncasecmp( psz_access, "file", 4 ) ||
                    !strncasecmp( psz_access, "dire", 4 ) ))
-           {
+            {
 #ifdef WIN32
-           /* Qt openURL doesn't know to open files that starts with a / or \ */
-               if( psz_path[0] == '/' || psz_path[0] == '\\'  )
-                   psz_path++;
+                /* Qt openURL doesn't know to open files that starts with a / or \ */
+                if( psz_path[0] == '/' || psz_path[0] == '\\'  )
+                    psz_path++;
 #endif
 
-               QFileInfo info( qfu( decode_URI( psz_path ) ) );
-               QDesktopServices::openUrl(
-                               QUrl::fromLocalFile( info.absolutePath() ) );
-           }
-           free( psz_meta );
-       }
+                QFileInfo info( qfu( decode_URI( psz_path ) ) );
+                QDesktopServices::openUrl(
+                        QUrl::fromLocalFile( info.absolutePath() ) );
+            }
+            free( psz_meta );
+        }
     }
     else
         PL_UNLOCK;
@@ -1088,13 +1088,12 @@ void PLModel::popupAddNode()
         qtr( I_NEW_DIR ), qtr( I_NEW_DIR_NAME ),
         QLineEdit::Normal, QString(), &ok);
     if( !ok || name.isEmpty() ) return;
+
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
                                                     i_popup_parent );
     if( p_item )
-    {
         playlist_NodeCreate( p_playlist, qtu( name ), p_item, PLAYLIST_END, 0, NULL );
-    }
     PL_UNLOCK;
 }
 
