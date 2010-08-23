@@ -40,7 +40,7 @@ public:
     void addError( const QString&, const QString& );
     /*void addWarning( QString, QString );*/
 private:
-    virtual ~ErrorsDialog() {};
+    virtual ~ErrorsDialog() {}
     ErrorsDialog( intf_thread_t * );
     void add( bool, const QString&, const QString& );
 

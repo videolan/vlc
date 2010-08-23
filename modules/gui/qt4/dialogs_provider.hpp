@@ -209,8 +209,8 @@ public:
         i_dialog = _i_dialog;
         i_arg = _i_arg;
         p_arg = _p_arg;
-    };
-    virtual ~DialogEvent() { };
+    }
+    virtual ~DialogEvent() { }
 
     int i_arg, i_dialog;
     intf_dialog_args_t *p_arg;
