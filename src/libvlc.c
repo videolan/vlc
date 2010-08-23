@@ -1257,6 +1257,7 @@ static void Help( libvlc_int_t *p_this, char const *psz_help_name )
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
     PauseConsole();
 #endif
+    fflush( stdout );
 }
 
 /*****************************************************************************
