@@ -28,6 +28,7 @@
 
 #include "dialogs/preferences.hpp"
 #include "util/qvlcframe.hpp"
+#include "dialogs/errors.hpp"
 
 #include "components/complete_preferences.hpp"
 #include "components/simple_preferences.hpp"
@@ -294,7 +295,11 @@ void PrefsDialog::save()
     }
 
     /* Save to file */
-    config_SaveConfigFile( p_intf, NULL );
+    if( config_SaveConfigFile( p_intf, NULL ) != 0 )
+    {
+        ErrorsDialog::getInstance (p_intf)->addError( qtr( "Cannot save Configuration" ),
+            qtr("Preferences file could not be saved") );
+    }
     accept();
 }
 
