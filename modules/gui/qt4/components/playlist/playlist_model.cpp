@@ -1064,6 +1064,12 @@ void PLModel::popupExplore()
                    !strncasecmp( psz_access, "file", 4 ) ||
                    !strncasecmp( psz_access, "dire", 4 ) ))
            {
+#ifdef WIN32
+           /* Qt openURL doesn't know to open files that starts with a / or \ */
+               if( psz_path[0] == '/' || psz_path[0] == '\\'  )
+                   psz_path++;
+#endif
+
                QFileInfo info( qfu( decode_URI( psz_path ) ) );
                QDesktopServices::openUrl(
                                QUrl::fromLocalFile( info.absolutePath() ) );
