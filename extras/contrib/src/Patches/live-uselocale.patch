@@ -91,23 +91,25 @@ diff -urN live.orig/liveMedia/Locale.cpp live/liveMedia/Locale.cpp
      sprintf(buf, "Range: npt=%.3f-%.3f\r\n", start, end);
    }
  
-@@ -2328,7 +2328,7 @@
-   if (_strncasecmp(line, "Scale: ", 7) != 0) return False;
-   line += 7;
- 
--  Locale l("C", LC_NUMERIC);
-+  Locale l("C", LC_NUMERIC_MASK);
-   return sscanf(line, "%f", &scale) == 1;
+--- live/liveMedia/RTSPClient.cpp	2010-08-24 17:05:46.000000000 +0200
++++ live.new/liveMedia/RTSPClient.cpp	2010-08-24 17:04:50.000000000 +0200
+@@ -935,7 +935,7 @@
  }
  
---- live.orig/liveMedia/RTSPCommon.cpp	2010-03-16 03:09:46.000000000 +0100
-+++ live/liveMedia/RTSPCommon.cpp	2010-08-24 15:04:44.000000000 +0200
-@@ -146,7 +146,7 @@
-   char const* fields = buf + 7;
-   while (*fields == ' ') ++fields;
+ Boolean RTSPClient::parseScaleParam(char const* paramStr, float& scale) {
+-  Locale l("C", LC_NUMERIC);
++  Locale l("C", LC_NUMERIC_MASK);
+   return sscanf(paramStr, "%f", &scale) == 1;
+ }
+ 
+--- live/liveMedia/RTSPCommon.cpp.orig	2010-08-22 03:25:03.000000000 +0200
++++ live/liveMedia/RTSPCommon.cpp	2010-08-24 17:06:36.000000000 +0200
+@@ -136,7 +136,7 @@
+ 
+ Boolean parseRangeParam(char const* paramStr, double& rangeStart, double& rangeEnd) {
    double start, end;
 -  Locale l("C", LC_NUMERIC);
 +  Locale l("C", LC_NUMERIC_MASK);
-   if (sscanf(fields, "npt = %lf - %lf", &start, &end) == 2) {
+   if (sscanf(paramStr, "npt = %lf - %lf", &start, &end) == 2) {
      rangeStart = start;
      rangeEnd = end;

@@ -142,6 +142,19 @@ diff -ru live.orig/liveMedia/PassiveServerMediaSubsession.cpp live/liveMedia/Pas
  
      fSDPLines = strDup(sdpLines);
      delete[] sdpLines;
+diff -ru live.orig/liveMedia/RTSPClient.cpp live/liveMedia/RTSPClient.cpp
+--- live.orig/liveMedia/RTSPClient.cpp 2010-05-30 01:20:31.000000000 +0300
++++ live/liveMedia/RTSPClient.cpp      2010-06-06 00:39:08.000000000 +0300
+@@ -415,7 +415,8 @@
+ int RTSPClient::connectToServer(int socketNum, portNumBits remotePortNum) {
+   MAKE_SOCKADDR_IN(remoteName, fServerAddress, htons(remotePortNum));
+   if (fVerbosityLevel >= 1) {
+-    envir() << "Opening connection to " << our_inet_ntoa(remoteName.sin_addr) << ", port " << remotePortNum << "...\n";
++    char buf[16];
++    envir() << "Opening connection to " << our_inet_ntoa(remoteName.sin_addr, buf) << ", port " << remotePortNum << "...\n";
+   }
+   if (connect(socketNum, (struct sockaddr*) &remoteName, sizeof remoteName) != 0) {
+     if (envir().getErrno() == EINPROGRESS) {
 diff -ru live.orig/liveMedia/RTSPOverHTTPServer.cpp live/liveMedia/RTSPOverHTTPServer.cpp
 --- live.orig/liveMedia/RTSPOverHTTPServer.cpp	2010-05-30 01:20:31.000000000 +0300
 +++ live/liveMedia/RTSPOverHTTPServer.cpp	2010-06-06 00:34:03.000000000 +0300
