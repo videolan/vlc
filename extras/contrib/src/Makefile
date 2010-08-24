@@ -1201,6 +1201,22 @@ CLEAN_PKG += libdvdnav
 DISTCLEAN_PKG += libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
 
 # ***************************************************************************
+# libbluray
+# ***************************************************************************
+
+libbluray:
+	$(GIT) clone git://git.videolan.org/libbluray.git
+
+.libbluray: libbluray
+	(cd $<; ./bootstrap; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	$(INSTALL_NAME)
+	touch $@
+
+CLEAN_FILE += .libbluray
+CLEAN_PKG += libbluray
+
+
+# ***************************************************************************
 # libdvbpsi
 # ***************************************************************************
 
