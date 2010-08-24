@@ -66,27 +66,48 @@ diff -urN live.orig/liveMedia/Locale.cpp live/liveMedia/Locale.cpp
    }
  #endif
  }
-diff -ru live/liveMedia/RTSPClient.cpp live_fixed/liveMedia/RTSPClient.cpp
---- live/liveMedia/RTSPClient.cpp	2010-06-04 21:16:00.000000000 +0200
-+++ live_fixed/liveMedia/RTSPClient.cpp	2010-06-04 21:15:19.000000000 +0200
-@@ -923,7 +923,7 @@
- }
+--- live.orig/liveMedia/RTSPClient.cpp	2010-03-16 03:09:46.000000000 +0100
++++ live/liveMedia/RTSPClient.cpp	2010-08-24 15:04:31.000000000 +0200
+@@ -1019,7 +1019,7 @@
+     // This is the default value; we don't need a "Scale:" header:
+     buf[0] = '\0';
+   } else {
+-    Locale l("C", LC_NUMERIC);
++    Locale l("C", LC_NUMERIC_MASK);
+     sprintf(buf, "Scale: %f\r\n", scale);
+   }
  
- Boolean RTSPClient::parseScaleParam(char const* paramStr, float& scale) {
+@@ -1033,11 +1033,11 @@
+     buf[0] = '\0';
+   } else if (end < 0) {
+     // There's no end time:
+-    Locale l("C", LC_NUMERIC);
++    Locale l("C", LC_NUMERIC_MASK);
+     sprintf(buf, "Range: npt=%.3f-\r\n", start);
+   } else {
+     // There's both a start and an end time; include them both in the "Range:" hdr
+-    Locale l("C", LC_NUMERIC);
++    Locale l("C", LC_NUMERIC_MASK);
+     sprintf(buf, "Range: npt=%.3f-%.3f\r\n", start, end);
+   }
+ 
+@@ -2328,7 +2328,7 @@
+   if (_strncasecmp(line, "Scale: ", 7) != 0) return False;
+   line += 7;
+ 
 -  Locale l("C", LC_NUMERIC);
 +  Locale l("C", LC_NUMERIC_MASK);
-   return sscanf(paramStr, "%f", &scale) == 1;
+   return sscanf(line, "%f", &scale) == 1;
  }
  
-diff -ru live/liveMedia/RTSPCommon.cpp live_fixed/liveMedia/RTSPCommon.cpp
---- live/liveMedia/RTSPCommon.cpp	2010-06-04 21:16:00.000000000 +0200
-+++ live_fixed/liveMedia/RTSPCommon.cpp	2010-06-04 21:15:45.000000000 +0200
-@@ -136,7 +136,7 @@
- 
- Boolean parseRangeParam(char const* paramStr, double& rangeStart, double& rangeEnd) {
+--- live.orig/liveMedia/RTSPCommon.cpp	2010-03-16 03:09:46.000000000 +0100
++++ live/liveMedia/RTSPCommon.cpp	2010-08-24 15:04:44.000000000 +0200
+@@ -146,7 +146,7 @@
+   char const* fields = buf + 7;
+   while (*fields == ' ') ++fields;
    double start, end;
 -  Locale l("C", LC_NUMERIC);
 +  Locale l("C", LC_NUMERIC_MASK);
-   if (sscanf(paramStr, "npt = %lf - %lf", &start, &end) == 2) {
+   if (sscanf(fields, "npt = %lf - %lf", &start, &end) == 2) {
      rangeStart = start;
      rangeEnd = end;
