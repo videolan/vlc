@@ -2409,6 +2409,7 @@ libupnp: libupnp-$(UPNP_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch -p0 < Patches/libupnp-mingw.patch
 ifdef HAVE_WIN32
+	patch -p0 < Patches/libupnp-win32.patch
 	patch -p0 < Patches/libupnp-configure.patch
 	cd $@; libtoolize&& autoreconf
 endif

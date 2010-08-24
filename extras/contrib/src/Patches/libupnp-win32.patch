@@ -1,0 +1,227 @@
+--- libupnp/upnp/Makefile.am	2008-02-10 02:55:34.000000000 +0100
++++ libupnp.new/upnp/Makefile.am	2010-08-24 18:40:58.000000000 +0200
+@@ -123,6 +123,7 @@
+ libupnp_la_SOURCES += \
+ 	src/uuid/md5.c \
+ 	src/uuid/sysdep.c \
++	src/inet_pton.c \
+ 	src/uuid/uuid.c
+ 
+ 
+diff -ruN libupnp/upnp/src/genlib/miniserver/miniserver.c libupnp.new/upnp/src/genlib/miniserver/miniserver.c
+--- libupnp/upnp/src/genlib/miniserver/miniserver.c	2008-03-21 00:07:50.000000000 +0100
++++ libupnp.new/upnp/src/genlib/miniserver/miniserver.c	2010-08-24 18:34:44.000000000 +0200
+@@ -419,9 +419,8 @@
+ 
+         ret = select( maxMiniSock, &rdSet, NULL, &expSet, NULL );
+         if ( ret == -1 ) {
+-            strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+             UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+-                "Error in select(): %s\n", errorBuffer );
++                "Error in select(): %i\n", errno );
+ 	    /* Avoid 100% CPU in case of repeated error in select() */
+ 	    isleep( 1 );
+             continue;
+@@ -431,9 +430,8 @@
+                 connectHnd = accept( miniServSock,
+                     ( struct sockaddr * )&clientAddr, &clientLen );
+                 if( connectHnd == -1 ) {
+-                    strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+                     UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+-                        "miniserver: Error in accept(): %s\n", errorBuffer );
++                        "miniserver: Error in accept(): %i\n", errno );
+                     continue;
+                 }
+                 schedule_request_job( connectHnd, &clientAddr );
+@@ -616,9 +614,8 @@
+     }
+ 
+     if ( sockError == -1 ) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+-            "mserv start: Error in bind(): %s\n", errorBuffer );
++            "mserv start: Error in bind(): %i\n", errno );
+         shutdown( listenfd, SD_BOTH );
+         UpnpCloseSocket( listenfd );
+ 
+@@ -630,9 +627,8 @@
+ 
+     success = listen( listenfd, SOMAXCONN );
+     if ( success == -1 ) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+-            "mserv start: Error in listen(): %s\n", errorBuffer );
++            "mserv start: Error in listen(): %i\n", errno );
+         shutdown( listenfd, SD_BOTH );
+         UpnpCloseSocket( listenfd );
+ 
+@@ -651,9 +647,8 @@
+ 
+     miniServerStopSock = socket( AF_INET, SOCK_DGRAM, 0 );
+     if ( miniServerStopSock == -1 ) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_CRITICAL, MSERV, __FILE__, __LINE__,
+-            "Error in socket(): %s\n", errorBuffer );
++            "Error in socket(): %i\n", errno );
+         shutdown( listenfd, SD_BOTH );
+         UpnpCloseSocket( listenfd );
+ 
+@@ -827,9 +822,8 @@
+ 
+     sock = socket( AF_INET, SOCK_DGRAM, 0 );
+     if ( sock == -1 ) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+-            "SSDP_SERVER: StopSSDPServer: Error in socket() %s\n", errorBuffer );
++            "SSDP_SERVER: StopSSDPServer: Error in socket() %i\n", errno );
+         return 0;
+     }
+ 
+diff -ruN libupnp/upnp/src/inet_pton.c libupnp.new/upnp/src/inet_pton.c
+--- libupnp/upnp/src/inet_pton.c	2008-02-10 02:55:34.000000000 +0100
++++ libupnp.new/upnp/src/inet_pton.c	2010-08-24 18:41:08.000000000 +0200
+@@ -35,7 +35,6 @@
+  * sizeof(int) < 4.  sizeof(int) 4 is fine; all the world's not a VAX.
+  */
+ 
+-
+ /* const char *
+  * inet_ntop4(src, dst, size)
+  *	format an IPv4 address
+@@ -386,4 +385,4 @@
+ 	}
+ 	/* NOTREACHED */
+ }
+-#endif
+\ Pas de fin de ligne à la fin du fichier.
++#endif
+diff -ruN libupnp/upnp/src/ssdp/ssdp_ctrlpt.c libupnp.new/upnp/src/ssdp/ssdp_ctrlpt.c
+--- libupnp/upnp/src/ssdp/ssdp_ctrlpt.c	2008-03-22 17:36:03.000000000 +0100
++++ libupnp.new/upnp/src/ssdp/ssdp_ctrlpt.c	2010-08-24 18:32:47.000000000 +0200
+@@ -595,10 +595,9 @@
+ 
+     ret = select( gSsdpReqSocket + 1, NULL, &wrSet, NULL, NULL );
+     if( ret == -1 ) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+-            "SSDP_LIB: Error in select(): %s\n",
+-            errorBuffer );
++            "SSDP_LIB: Error in select(): %i\n",
++            errno );
+ 	shutdown( gSsdpReqSocket, SD_BOTH );
+         UpnpCloseSocket( gSsdpReqSocket );
+         free( ReqBuf );
+diff -ruN libupnp/upnp/src/ssdp/ssdp_device.c libupnp.new/upnp/src/ssdp/ssdp_device.c
+--- libupnp/upnp/src/ssdp/ssdp_device.c	2008-03-21 00:27:26.000000000 +0100
++++ libupnp.new/upnp/src/ssdp/ssdp_device.c	2010-08-24 18:36:22.000000000 +0200
+@@ -227,10 +227,9 @@
+ 
+     ReplySock = socket( AF_INET, SOCK_DGRAM, 0 );
+     if ( ReplySock == -1 ) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+             "SSDP_LIB: New Request Handler:"
+-            "Error in socket(): %s\n", errorBuffer );
++            "Error in socket(): %i\n", errno );
+ 
+         return UPNP_E_OUTOF_SOCKET;
+     }
+diff -ruN libupnp/upnp/src/ssdp/ssdp_server.c libupnp.new/upnp/src/ssdp/ssdp_server.c
+--- libupnp/upnp/src/ssdp/ssdp_server.c	2008-03-21 00:08:25.000000000 +0100
++++ libupnp.new/upnp/src/ssdp/ssdp_server.c	2010-08-24 18:30:28.000000000 +0200
+@@ -876,9 +876,8 @@
+ 
+     ssdpReqSock = socket( AF_INET, SOCK_DGRAM, 0 );
+     if ( ssdpReqSock == -1 ) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+-            "Error in socket(): %s\n", errorBuffer );
++            "Error in socket(): %i\n", errno );
+ 
+             return UPNP_E_OUTOF_SOCKET;
+     }
+@@ -891,9 +890,8 @@
+ 
+     ssdpSock = socket( AF_INET, SOCK_DGRAM, 0 );
+     if ( ssdpSock == -1 ) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+-            "Error in socket(): %s\n", errorBuffer );
++            "Error in socket(): %i\n", errno );
+         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
+         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
+ 
+@@ -904,9 +902,8 @@
+     ret = setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEADDR,
+         (char *)&onOff, sizeof(onOff) );
+     if ( ret == -1) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+-            "Error in setsockopt() SO_REUSEADDR: %s\n", errorBuffer );
++            "Error in setsockopt() SO_REUSEADDR: %i\n", errno );
+         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
+         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
+         shutdown( ssdpSock, SD_BOTH );
+@@ -919,9 +916,8 @@
+     ret = setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEPORT,
+         (char *)&onOff, sizeof (onOff) );
+     if ( ret == -1 ) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+-            "Error in setsockopt() SO_REUSEPORT: %s\n", errorBuffer );
++            "Error in setsockopt() SO_REUSEPORT: %i\n", errno );
+         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
+         CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
+         shutdown( ssdpSock, SD_BOTH );
+@@ -938,10 +934,9 @@
+     ssdpAddr.sin_port = htons( SSDP_PORT );
+     ret = bind( ssdpSock, (struct sockaddr *)&ssdpAddr, sizeof (ssdpAddr) );
+     if ( ret == -1 ) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+-            "Error in bind(), addr=0x%08X, port=%d: %s\n",
+-            INADDR_ANY, SSDP_PORT, errorBuffer );
++            "Error in bind(), addr=0x%08X, port=%d: %i\n",
++            INADDR_ANY, SSDP_PORT, errno );
+             shutdown( ssdpSock, SD_BOTH );
+         UpnpCloseSocket( ssdpSock );
+         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
+@@ -956,10 +950,9 @@
+     ret = setsockopt( ssdpSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+         (char *)&ssdpMcastAddr, sizeof (struct ip_mreq) );
+     if ( ret == -1 ) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+-            "Error in setsockopt() IP_ADD_MEMBERSHIP (join multicast group): %s\n",
+-            errorBuffer );
++            "Error in setsockopt() IP_ADD_MEMBERSHIP (join multicast group): %i\n",
++            errno );
+         shutdown( ssdpSock, SD_BOTH );
+         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
+         UpnpCloseSocket( ssdpSock );
+@@ -974,10 +967,9 @@
+     ret = setsockopt(ssdpSock, IPPROTO_IP, IP_MULTICAST_IF,
+         (char *)&addr, sizeof addr);
+     if ( ret == -1 ) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+-            "Error in setsockopt() IP_MULTICAST_IF (set multicast interface): %s\n",
+-            errorBuffer );
++            "Error in setsockopt() IP_MULTICAST_IF (set multicast interface): %i\n",
++            errno );
+         /* This is probably not a critical error, so let's continue. */
+     }
+ 
+@@ -988,10 +980,9 @@
+     ret = setsockopt( ssdpSock, SOL_SOCKET, SO_BROADCAST,
+         (char *)&option, sizeof (option) );
+     if( ret == -1) {
+-        strerror_r(errno, errorBuffer, ERROR_BUFFER_LEN);
+         UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+-            "Error in setsockopt() SO_BROADCAST (set broadcast): %s\n",
+-            errorBuffer );
++            "Error in setsockopt() SO_BROADCAST (set broadcast): %i\n",
++            errno );
+         shutdown( ssdpSock, SD_BOTH );
+         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
+         UpnpCloseSocket( ssdpSock );
