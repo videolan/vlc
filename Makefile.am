@@ -327,9 +327,6 @@ EXTRA_DIST += \
 	extras/misc/mpris.py \
 	extras/misc/mpris.glade
 
-dist-hook:
-	distdir=$(distdir) srcdir=$(srcdir) $(SHELL) $(srcdir)/toolbox --dist-contrib
-
 ###############################################################################
 # Building libvlc
 ###############################################################################
