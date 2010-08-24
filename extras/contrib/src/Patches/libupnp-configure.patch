@@ -48,7 +48,7 @@
 +#	[],
 +#	[AC_MSG_ERROR([POSIX threads are required to build this program])])
  #
-+PTHREAD_LIBS=" -lpthreadGC2"
++PTHREAD_LIBS=" -lpthreadGC2 -lws2_32"
 +PTHREAD_CFLAGS=" -DPTW32_STATIC_LIB -DUPNP_STATIC_LIB"
  # Update environment variables for pthreads
  #
@@ -109,3 +109,13 @@
  
  
  AC_CONFIG_FILES([
+--- libupnp/libupnp.pc.in	2008-02-10 02:55:39.000000000 +0100
++++ libupnp.new/libupnp.pc.in	2010-08-24 18:08:41.000000000 +0200
+@@ -6,6 +6,6 @@
+ Name: libupnp
+ Description: Linux SDK for UPnP Devices
+ Version: @VERSION@
+-Libs: @PTHREAD_LIBS@ -L${libdir} -lupnp -lthreadutil -lixml 
++Libs: -L${libdir} -lupnp -lthreadutil -lixml @PTHREAD_LIBS@ 
+ Cflags: @PTHREAD_CFLAGS@ -I${includedir}/upnp
+ 
