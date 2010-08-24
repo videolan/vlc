@@ -3633,6 +3633,7 @@ dnl
 dnl UPnP Plugin (Intel SDK)
 dnl
 PKG_ENABLE_MODULES_VLC([UPNP], [upnp_intel], [libupnp], [Intel UPnp SDK],[auto])
+VLC_ADD_CXXFLAGS([upnp_intel],[${UPNP_CFLAGS}])
 
 dnl
 dnl  Interface plugins
