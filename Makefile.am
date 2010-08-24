@@ -39,7 +39,6 @@ endif
 EXTRA_DIST = \
 	HACKING \
 	INSTALL.win32 \
-	INSTALL.wince \
 	extras/package/win32/vlc.exe.manifest \
 	extras/package/win32/libvlc.dll.manifest \
 	extras/package/macosx/README.MacOSX.rtf \
