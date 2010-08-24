@@ -1323,6 +1323,10 @@ ifdef HAVE_DARWIN_OS
 	patch -p0 < Patches/libcaca-osx-sdkofourchoice.patch
 	(cd $@; sed -e 's%/Developer/SDKs/MacOSX10.4u.sdk%$(MACOSX_SDK)%' -i.orig  configure)
 endif
+ifdef HAVE_WIN32
+	patch -p0 < Patches/libcaca-win32-static.patch
+endif
+
 
 .caca: libcaca
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-imlib2 --disable-doc --disable-ruby --disable-csharp --disable-cxx && cd caca && make && make install)
