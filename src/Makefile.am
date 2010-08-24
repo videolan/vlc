@@ -138,7 +138,7 @@ noinst_HEADERS = \
 	$(NULL)
 
 ../include/vlc/libvlc_version.h: ../include/vlc/libvlc_version.h.in $(top_builddir)/config.status
-	$(SHELL) $(top_builddir)/config.status --file=$@
+	$(SHELL) $(top_builddir)/config.status --file=$(srcdir)/$@
 
 ../include/vlc_about.h: Makefile.am $(top_srcdir)/COPYING $(top_srcdir)/THANKS $(top_srcdir)/AUTHORS
 	$(AM_V_at)rm -f -- "$@.tmp"
