@@ -2118,31 +2118,6 @@ CLEAN_PKG += expat
 DISTCLEAN_PKG += expat-$(EXPAT_VERSION).tar.gz
 
 # ***************************************************************************
-# CyberLink C++ UPnP library
-# ***************************************************************************
-
-clinkcc$(CLINKCC_VERSION).tar.gz:
-	$(WGET) $(CLINKCC_URL)
-
-clinkcc: clinkcc$(CLINKCC_VERSION).tar.gz
-	tar xzf $<
-	mv $(patsubst %.tar.gz,Cyberlink,$(patsubst %.tgz,Cyberlink,$(notdir $<))) $@ || true
-	touch $@
-	patch -p0 < Patches/clinkcc.patch
-ifdef HAVE_DARWIN_OS
-	patch -p0 < Patches/clinkcc_osx.patch
-endif
-	(cd $@; ./bootstrap)
-
-.clinkcc: clinkcc
-	(cd $<;./configure --prefix=$(PREFIX) --enable-expat && make && chmod 755 config/install-sh && make install )
-	touch $@
-
-CLEAN_FILE += .clinkcc
-CLEAN_PKG += clinkcc
-DISTCLEAN_PKG += clinkcc$(CLINKCC_VERSION).tar.gz
-
-# ***************************************************************************
 # YASM assembler
 # ***************************************************************************
 
