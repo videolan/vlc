@@ -56,8 +56,7 @@ SUBDIRS += .
 
 dist_noinst_SCRIPTS = genmf list.sh
 dist_noinst_DATA = LIST
-noinst_DATA = stamp-cache
-MOSTLYCLEANFILES = stamp-cache plugins-*-*.dat
+MOSTLYCLEANFILES = plugins-*-*.dat
 
 .PHONY: stamp-cache
 
@@ -67,7 +66,6 @@ stamp-cache:
 	else \
 		echo "Cross-compilation: cache generation skipped!" ; \
 	fi
-	$(AM_V_at)touch stamp-cache
 
 install-exec-hook:
 	if test -z "$(DESTDIR)" -a "$(build)" = "$(host)"; then \
