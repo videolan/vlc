@@ -37,6 +37,7 @@ SOURCES_subsdec = subsdec.c substext.h
 SOURCES_subsusf = subsusf.c
 SOURCES_t140 = t140.c
 SOURCES_crystalhd = crystalhd.c
+SOURCES_stl = stl.c
 
 libvlc_LTLIBRARIES += \
 	liba52_plugin.la \
@@ -55,4 +56,5 @@ libvlc_LTLIBRARIES += \
 	libsubsdec_plugin.la \
 	libsubsusf_plugin.la \
 	libt140_plugin.la \
+	libstl_plugin.la \
 	$(NULL)

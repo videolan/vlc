@@ -32,6 +32,7 @@ SOURCES_gme = gme.c dummy.cpp
 SOURCES_sid = sid.cpp
 SOURCES_dirac = dirac.c
 SOURCES_image = image.c
+SOURCES_demux_stl = stl.c
 
 libvlc_LTLIBRARIES += \
 	libaiff_plugin.la \
@@ -60,6 +61,7 @@ libvlc_LTLIBRARIES += \
 	libwav_plugin.la \
 	libxa_plugin.la \
 	libimage_plugin.la \
+	libdemux_stl_plugin.la \
 	$(NULL)
 
 libts_plugin_la_SOURCES = ts.c ../mux/mpeg/csa.c dvb-text.h
