@@ -40,7 +40,6 @@ args="--enable-vcdx $args"
 args="--enable-twolame $args"
 args="--enable-realrtsp $args"
 args="--enable-libass $args"
-args="--enable-asademux $args"
 
 # disabled stuff
 args="--disable-ncurses $args"

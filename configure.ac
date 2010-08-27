@@ -256,8 +256,6 @@ case "${host_os}" in
         echo "  Assuming --enable-realrtsp"
         enable_libass="yes"
         echo "  Assuming --enable-libass"
-        enable_asademux="yes"
-        echo "  Assuming --enable-asademux"
 
         enable_skins2="no"
         echo "  Assuming --disable-skins2"
@@ -3080,26 +3078,6 @@ AS_IF( [test "${enable_libass}" != "no"], [
        ])
       ],[
         AC_MSG_WARN([LIBASS library not found])
-      ])
-  ])
-
-dnl
-dnl asa demuxer
-dnl
-AC_ARG_ENABLE(asademux,
-  [  --enable-asademux       asa subtitle demuxing (default disabled)])
-AS_IF( [test "${enable_asademux}" = "yes"], [
-  PKG_CHECK_MODULES(PCRE,
-      libpcre >= 6.5,
-      [
-        VLC_ADD_LDFLAGS([asademux],[$PCRE_LIBS])
-        VLC_ADD_CFLAGS([asademux],[$PCRE_CFLAGS])
-        if test "${SYS}" = "mingw32"; then
-            VLC_ADD_CPPFLAGS([asademux],[-DPCRE_STATIC])
-        fi
-        VLC_ADD_PLUGIN([asademux])
-      ],[
-        AC_MSG_WARN([PCRE library not found (required for asademux)])
       ])
   ])
 
