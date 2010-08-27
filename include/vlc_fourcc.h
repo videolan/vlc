@@ -309,6 +309,8 @@
 #define VLC_CODEC_CVD       VLC_FOURCC('c','v','d',' ')
 /* Blu-ray Presentation Graphics */
 #define VLC_CODEC_BD_PG     VLC_FOURCC('b','d','p','g')
+/* EBU STL (TECH. 3264-E) */
+#define VLC_CODEC_EBU_STL   VLC_FOURCC('S','T','L',' ')
 
 
 /* Special endian dependant values
