@@ -72,6 +72,7 @@ void Win32Graphics::clear( int xDest, int yDest, int width, int height )
         HRGN mask = CreateRectRgn( xDest, yDest,
                                    xDest + width, yDest + height );
         CombineRgn( m_mask, m_mask, mask, RGN_DIFF );
+        DeleteObject( mask );
     }
 }
 
