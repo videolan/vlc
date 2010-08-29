@@ -280,12 +280,15 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
 void StringConfigControl::finish()
 {
     text->setText( qfu(p_item->value.psz) );
-    text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    if( label )
+    if( p_item->psz_longtext )
     {
-        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-        label->setBuddy( text );
+        QString tipText = qtr(p_item->psz_longtext);
+        text->setToolTip( formatTooltip(tipText) );
+        if( label )
+            label->setToolTip( formatTooltip(tipText) );
     }
+    if( label )
+        label->setBuddy( text );
 }
 
 /*********** File **************/
@@ -350,12 +353,15 @@ void FileConfigControl::updateField()
 void FileConfigControl::finish()
 {
     text->setText( qfu(p_item->value.psz) );
-    text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    if( label )
+    if( p_item->psz_longtext )
     {
-        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-        label->setBuddy( text );
+        QString tipText = qtr(p_item->psz_longtext);
+        text->setToolTip( formatTooltip(tipText) );
+        if( label )
+            label->setToolTip( formatTooltip(tipText) );
     }
+    if( label )
+        label->setBuddy( text );
 }
 
 /********* String / Directory **********/
@@ -533,12 +539,16 @@ void StringListConfigControl::finish(module_config_t *p_module_config, bool byca
                                           p_module_config->ppsz_list[i_index] ) )
             combo->setCurrentIndex( combo->count() - 1 );
     }
-    combo->setToolTip( formatTooltip(qtr(p_module_config->psz_longtext)) );
-    if( label )
+
+    if( p_module_config->psz_longtext  )
     {
-        label->setToolTip( formatTooltip(qtr(p_module_config->psz_longtext)) );
-        label->setBuddy( combo );
+        QString tipText = qtr(p_module_config->psz_longtext);
+        combo->setToolTip( formatTooltip(tipText) );
+        if( label )
+            label->setToolTip( formatTooltip(tipText) );
     }
+    if( label )
+        label->setBuddy( combo );
 }
 
 QString StringListConfigControl::getValue()
@@ -573,7 +583,9 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
                 combo->setCurrentIndex( i_index );
             }
         }
-        combo->setToolTip( qfu( p_config->psz_longtext ) );
+
+        if( p_config->psz_longtext )
+            combo->setToolTip( qfu( p_config->psz_longtext ) );
     }
 }
 
@@ -652,12 +664,16 @@ void ModuleConfigControl::finish( bool bycat )
         }
     }
     module_list_free( p_list );
-    combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    if( label )
+
+    if( p_item->psz_longtext )
     {
-        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-        label->setBuddy( combo );
+        QString tipText = qtr(p_item->psz_longtext);
+        combo->setToolTip( formatTooltip(tipText) );
+        if( label )
+            label->setToolTip( formatTooltip(tipText) );
     }
+    if( label )
+        label->setBuddy( combo );
 }
 
 QString ModuleConfigControl::getValue()
@@ -700,7 +716,8 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
         l->addWidget( groupBox, line, 0, 1, -1 );
     }
 
-    text->setToolTip( formatTooltip( qtr( p_item->psz_longtext) ) );
+    if( p_item->psz_longtext )
+        text->setToolTip( formatTooltip( qtr( p_item->psz_longtext) ) );
 }
 
 ModuleListConfigControl::~ModuleListConfigControl()
@@ -763,9 +780,15 @@ void ModuleListConfigControl::finish( bool bycat )
         }
     }
     module_list_free( p_list );
-    text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    assert( groupBox );
-    groupBox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+
+    if( p_item->psz_longtext )
+    {
+        QString tipText = qtr(p_item->psz_longtext);
+
+        text->setToolTip( formatTooltip(tipText) );
+        assert( groupBox );
+        groupBox->setToolTip( formatTooltip(tipText) );
+   }
 }
 #undef CHECKBOX_LISTS
 
@@ -863,12 +886,16 @@ void IntegerConfigControl::finish()
     spin->setMaximum( 2000000000 );
     spin->setMinimum( -2000000000 );
     spin->setValue( p_item->value.i );
-    spin->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    if( label )
+
+    if( p_item->psz_longtext )
     {
-        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-        label->setBuddy( spin );
+        QString tipText = qtr(p_item->psz_longtext);
+        spin->setToolTip( formatTooltip(tipText) );
+        if( label )
+            label->setToolTip( formatTooltip(tipText) );
     }
+    if( label )
+        label->setBuddy( spin );
 }
 
 int IntegerConfigControl::getValue()
@@ -911,12 +938,15 @@ IntegerRangeSliderConfigControl::IntegerRangeSliderConfigControl(
     slider->setMaximum( p_item->max.i );
     slider->setMinimum( p_item->min.i );
     slider->setValue( p_item->value.i );
-    slider->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    if( label )
+    if( p_item->psz_longtext )
     {
-        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-        label->setBuddy( slider );
+        QString tipText = qtr(p_item->psz_longtext);
+        slider->setToolTip( formatTooltip(tipText) );
+        if( label )
+            label->setToolTip( formatTooltip(tipText) );
     }
+    if( label )
+        label->setBuddy( slider );
 }
 
 int IntegerRangeSliderConfigControl::getValue()
@@ -1007,12 +1037,15 @@ void IntegerListConfigControl::finish(module_config_t *p_module_config, bool byc
         if( p_module_config->value.i == p_module_config->pi_list[i_index] )
             combo->setCurrentIndex( combo->count() - 1 );
     }
-    combo->setToolTip( formatTooltip(qtr(p_module_config->psz_longtext)) );
-    if( label )
+    if( p_item->psz_longtext )
     {
-        label->setToolTip( formatTooltip(qtr(p_module_config->psz_longtext)) );
-        label->setBuddy( combo );
+        QString tipText = qtr(p_item->psz_longtext );
+        combo->setToolTip( formatTooltip(tipText) );
+        if( label )
+            label->setToolTip( formatTooltip(tipText) );
     }
+    if( label )
+        label->setBuddy( combo );
 }
 
 void IntegerListConfigControl::actionRequested( int i_action )
@@ -1079,7 +1112,8 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
 void BoolConfigControl::finish()
 {
     checkbox->setChecked( p_item->value.i == true );
-    checkbox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    if( p_item->psz_longtext )
+        checkbox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
 int BoolConfigControl::getValue()
@@ -1135,12 +1169,15 @@ void FloatConfigControl::finish()
     spin->setMinimum( -2000000000. );
     spin->setSingleStep( 0.1 );
     spin->setValue( (double)p_item->value.f );
-    spin->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-    if( label )
+    if( p_item->psz_longtext )
     {
-        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
-        label->setBuddy( spin );
+        QString tipText = qtr(p_item->psz_longtext);
+        spin->setToolTip( formatTooltip(tipText) );
+        if( label )
+            label->setToolTip( formatTooltip(tipText) );
     }
+    if( label )
+        label->setBuddy( spin );
 }
 
 float FloatConfigControl::getValue()
@@ -1228,7 +1265,7 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
 
 void KeySelectorControl::finish()
 {
-    if( label )
+    if( label && p_item->psz_longtext )
         label->setToolTip( formatTooltip( qtr( p_item->psz_longtext ) ) );
 
     /* Fill the table */
