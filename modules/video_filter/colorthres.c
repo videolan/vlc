@@ -287,7 +287,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    int i_y_offset, i_u_offset, i_v_offset;
+    int i_y_offset = 0, i_u_offset = 0, i_v_offset = 0;
     GetPackedYuvOffsets( p_filter->fmt_in.video.i_chroma,
                          &i_y_offset, &i_u_offset, &i_v_offset );
 
