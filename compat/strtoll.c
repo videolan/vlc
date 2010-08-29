@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-long long int strtof( const char *nptr, char **endptr, int base )
+long long int strtoll( const char *nptr, char **endptr, int base )
 {
     long long i_value = 0;
     int sign = 1, newbase = base ? base : 10;
