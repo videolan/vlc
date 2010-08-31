@@ -783,6 +783,7 @@ static int FilterOrder( const char *psz_name )
         const char *psz_name;
         int        i_order;
     } filter[] = {
+        { "equalizer",  0 },
         { NULL,         INT_MAX },
     };
     for( int i = 0; filter[i].psz_name; i++ )
