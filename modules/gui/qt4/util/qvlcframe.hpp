@@ -42,7 +42,7 @@ class QVLCTools
        /*
         use this function to save a widgets screen position
         only for windows / dialogs which are floating, if a
-        window is docked into an other - don't all this function
+        window is docked into another - don't all this function
         or it may write garbage to position info!
        */
        static void saveWidgetPosition( QSettings *settings, QWidget *widget)

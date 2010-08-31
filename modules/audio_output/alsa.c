@@ -338,7 +338,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Choose the IEC device for S/PDIF output:
-       if the device is overriden by the user then it will be the one
+       if the device is overridden by the user then it will be the one
        otherwise we compute the default device based on the output format. */
     char *psz_iec_device = NULL;
     if( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )

@@ -82,7 +82,7 @@ static void setFontAttibutes( char *psz_fontname, int i_font_size, uint32_t i_fo
 #define FONTSIZER_TEXT N_("Relative font size")
 #define FONTSIZER_LONGTEXT N_("This is the relative default size of the " \
     "fonts that will be rendered on the video. If absolute font size is set, "\
-    "relative size will be overriden." )
+    "relative size will be overridden." )
 #define COLOR_TEXT N_("Text default color")
 #define COLOR_LONGTEXT N_("The color of the text that will be rendered on "\
     "the video. This must be an hexadecimal (like HTML colors). The first two "\

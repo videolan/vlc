@@ -435,7 +435,7 @@
     /* Only create the o_fullscreen_window if we are not in the middle of the zooming animation */
     if (!o_fullscreen_window)
     {
-        /* We can't change the styleMask of an already created NSWindow, so we create an other window, and do eye catching stuff */
+        /* We can't change the styleMask of an already created NSWindow, so we create another window, and do eye catching stuff */
 
         rect = [[o_view superview] convertRect: [o_view frame] toView: nil]; /* Convert to Window base coord */
         rect.origin.x += [self frame].origin.x;

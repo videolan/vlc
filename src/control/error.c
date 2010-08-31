@@ -86,7 +86,7 @@ const char *libvlc_errmsg (void)
 
 /**
  * Clears the LibVLC error status for the current thread. This is optional.
- * By default, the error status is automatically overriden when a new error
+ * By default, the error status is automatically overridden when a new error
  * occurs, and destroyed when the thread exits.
  */
 void libvlc_clearerr (void)
@@ -97,7 +97,7 @@ void libvlc_clearerr (void)
 
 /**
  * Sets the LibVLC error status and message for the current thread.
- * Any previous error is overriden.
+ * Any previous error is overridden.
  * @return a nul terminated string (always)
  */
 const char *libvlc_vprinterr (const char *fmt, va_list ap)
@@ -115,7 +115,7 @@ const char *libvlc_vprinterr (const char *fmt, va_list ap)
 
 /**
  * Sets the LibVLC error status and message for the current thread.
- * Any previous error is overriden.
+ * Any previous error is overridden.
  * @return a nul terminated string (always)
  */
 const char *libvlc_printerr (const char *fmt, ...)

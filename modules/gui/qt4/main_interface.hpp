@@ -153,7 +153,7 @@ private:
 
     /* Flags */
     bool                 b_notificationEnabled; /// Systray Notifications
-    bool                 b_autoresize;          ///< persistent resizeable window
+    bool                 b_autoresize;          ///< persistent resizable window
     bool                 b_videoEmbedded;       ///< Want an external Video Window
     bool                 b_videoFullScreen;     ///< --fullscreen
     bool                 b_videoOnTop;          ///< --video-on-top

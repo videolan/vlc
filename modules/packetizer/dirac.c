@@ -23,7 +23,7 @@
 
 /* Dirac packetizer, formed of three parts:
  *  1) Bitstream synchroniser (dirac_DoSync)
- *      - Given an arbitary sequence of bytes, extract whole Dirac Data Units
+ *      - Given an arbitrary sequence of bytes, extract whole Dirac Data Units
  *      - Maps timestamps in supplied block_t's to the extracted Data Unit
  *        A time stamp applies to the next Data Unit to commence at, or after
  *        the first byte of the block_t with the timestamp.
