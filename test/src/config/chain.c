@@ -76,4 +76,6 @@ int main( void )
     test_config_StringEscape();
     log( "Testing config chain un-escaping\n" );
     test_config_StringUnEscape();
+
+    return 0;
 }
