@@ -284,7 +284,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         psz_charset = var_InheritString (p_dec, "subsdec-encoding");
         msg_Dbg (p_dec, "trying configured character encoding: %s",
                  psz_charset ? psz_charset : "not specified");
-        if (!strcmp (psz_charset, "system"))
+        if (psz_charset != NULL && !strcmp (psz_charset, "system"))
         {
             free (psz_charset);
             psz_charset = strdup ("");
