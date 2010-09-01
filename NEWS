@@ -1,4 +1,4 @@
-Changes between 1.1.0 and 1.2.0-git:
+Changes between 1.1.4 and 1.2.0-git:
 ------------------------------------
 
 Important changes for packagers:
@@ -38,6 +38,19 @@ Stream output:
     access=livehttp{index=public_html/iphonestream.m3u8,
     index-url=http://url-to-iphonestreamfile-###.ts},mux=ts{use-key-frames},
     dst=public_html/iphonestreamfile-###.ts}"
+
+
+Changes between 1.1.3 and 1.1.4:
+--------------------------------
+
+Win32:
+ * Fix a security issue when loading DLLs, especially in Qt4 and dmo modules,
+   See VideoLAN-SA-1005
+ * Fix folders opening from the interface
+
+Translations:
+ * Update translations for Lithuanian, Bengali, Slovak, French, Dutch, Ukranian
+   Polish, Simplified Chinese, German and Galician
 
 
 Changes between 1.1.2 and 1.1.3:
