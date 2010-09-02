@@ -170,9 +170,6 @@
 		CC62B9610FC600E90077BB8C /* play_big.png in Resources */ = {isa = PBXBuildFile; fileRef = CC62B9590FC600E90077BB8C /* play_big.png */; };
 		CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = CC8062631021F8790021EB9A /* dsa_pub.pem */; };
 		CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBE999E0F922C51000705F8 /* CoreServices.framework */; };
-		CCD90F4E0E87C86D0034564A /* add_schedule.png in Resources */ = {isa = PBXBuildFile; fileRef = CCD90F4B0E87C86D0034564A /* add_schedule.png */; };
-		CCD90F4F0E87C86D0034564A /* add_vod.png in Resources */ = {isa = PBXBuildFile; fileRef = CCD90F4C0E87C86D0034564A /* add_vod.png */; };
-		CCD90F500E87C86D0034564A /* add_broadcast.png in Resources */ = {isa = PBXBuildFile; fileRef = CCD90F4D0E87C86D0034564A /* add_broadcast.png */; };
 		CCF11B540F8BFB520088542D /* ErrorPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCF11B520F8BFB520088542D /* ErrorPanel.nib */; };
 /* End PBXBuildFile section */
 
@@ -410,9 +407,6 @@
 		CCD590F110E5B73200D39094 /* dialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dialogProvider.m; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.m; sourceTree = SOURCE_ROOT; };
 		CCD590F210E5B76300D39094 /* VLCLoginPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCLoginPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.h; sourceTree = SOURCE_ROOT; };
 		CCD590F310E5B76300D39094 /* VLCLoginPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCLoginPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.m; sourceTree = SOURCE_ROOT; };
-		CCD90F4B0E87C86D0034564A /* add_schedule.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_schedule.png; path = Resources/add_schedule.png; sourceTree = "<group>"; };
-		CCD90F4C0E87C86D0034564A /* add_vod.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_vod.png; path = Resources/add_vod.png; sourceTree = "<group>"; };
-		CCD90F4D0E87C86D0034564A /* add_broadcast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_broadcast.png; path = Resources/add_broadcast.png; sourceTree = "<group>"; };
 		CCF11B530F8BFB520088542D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/ErrorPanel.nib; sourceTree = "<group>"; };
 		DC769AB7085DF0DB001A838D /* wizard.m */ = {isa = PBXFileReference; fileEncoding = 5; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; name = wizard.m; path = ../../../modules/gui/macosx/wizard.m; sourceTree = SOURCE_ROOT; tabWidth = 4; usesTabs = 0; };
 		DC769AB8085DF0DB001A838D /* wizard.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = wizard.h; path = ../../../modules/gui/macosx/wizard.h; sourceTree = SOURCE_ROOT; };
@@ -486,7 +480,6 @@
 				8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */,
 				CC8062631021F8790021EB9A /* dsa_pub.pem */,
 				CC1C41D00D9BAD7F002728FA /* noart.png */,
-				CCD90F4A0E87C82D0034564A /* VLM */,
 				CC0B71E00D54F0DD00448E00 /* simple prefs (taken from qt4) */,
 				8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */,
 				8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */,
@@ -832,16 +825,6 @@
 			name = "Minimal Dialog Provider";
 			sourceTree = "<group>";
 		};
-		CCD90F4A0E87C82D0034564A /* VLM */ = {
-			isa = PBXGroup;
-			children = (
-				CCD90F4B0E87C86D0034564A /* add_schedule.png */,
-				CCD90F4C0E87C86D0034564A /* add_vod.png */,
-				CCD90F4D0E87C86D0034564A /* add_broadcast.png */,
-			);
-			name = VLM;
-			sourceTree = "<group>";
-		};
 		DCF358BC077F1236007DB450 /* nibs */ = {
 			isa = PBXGroup;
 			children = (
@@ -1058,9 +1041,6 @@
 				CC402F3D0E00ABBB006A4BA4 /* display_middle.png in Resources */,
 				CC402F3E0E00ABBB006A4BA4 /* display_left.png in Resources */,
 				CC402F3F0E00ABBB006A4BA4 /* display_right.png in Resources */,
-				CCD90F4E0E87C86D0034564A /* add_schedule.png in Resources */,
-				CCD90F4F0E87C86D0034564A /* add_vod.png in Resources */,
-				CCD90F500E87C86D0034564A /* add_broadcast.png in Resources */,
 				CC0FB34C0F8BED1100F057F7 /* CoreDialogs.nib in Resources */,
 				CCF11B540F8BFB520088542D /* ErrorPanel.nib in Resources */,
 			);
