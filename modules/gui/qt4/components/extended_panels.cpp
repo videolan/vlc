@@ -396,6 +396,7 @@ void ExtVideo::initComboBoxItems( QObject *widget )
 {
     QComboBox *combobox = qobject_cast<QComboBox*>( widget );
     if( !combobox ) return;
+
     QString option = OptionFromWidgetName( widget );
     module_config_t *p_item = config_FindConfig( VLC_OBJECT( p_intf ),
                                                  qtu( option ) );
@@ -505,11 +506,12 @@ void ExtVideo::setWidgetValue( QObject *widget )
         free( val.psz_string );
     }
     else
-        msg_Err( p_intf,
-                 "Module %s's %s variable is of an unsupported type ( %d )",
-                 qtu( module ),
-                 qtu( option ),
-                 i_type );
+        if( p_obj )
+            msg_Err( p_intf,
+                     "Module %s's %s variable is of an unsupported type ( %d )",
+                     qtu( module ),
+                     qtu( option ),
+                     i_type );
 }
 
 void ExtVideo::updateFilterOptions()
