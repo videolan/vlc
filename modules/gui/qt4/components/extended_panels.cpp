@@ -1120,6 +1120,176 @@ void Equalizer::addCallbacks( aout_instance_t *p_aout )
  **********************************************************************/
 
 /**********************************************************************
+ * Dynamic range compressor
+ **********************************************************************/
+static const char *psz_comp_control_names[] =
+{
+    "compressor-rms-peak", "compressor-attack", "compressor-release",
+    "compressor-threshold", "compressor-ratio", "compressor-knee",
+    "compressor-makeup-gain"
+};
+
+static const char *psz_comp_control_descs[] =
+{
+    "RMS/peak", "Attack",
+    "Release", "Threshold", "Ratio", "Knee\nradius", "Makeup\ngain"
+};
+
+static const char *psz_comp_control_units[] =
+{
+    "", " ms", " ms", " dB", ":1", " dB", " dB"
+};
+
+static const float f_comp_min_max_val_res_data[] =
+{
+    // min     max   value  resolution
+    //----  ------  ------  ----------
+      0.0f,   1.0f,   0.00f, 0.001f,  // RMS/peak
+      1.5f, 400.0f,  25.00f, 0.100f,  // Attack
+      2.0f, 800.0f, 100.00f, 0.100f,  // Release
+    -30.0f,   0.0f, -11.00f, 0.010f,  // Threshold
+      1.0f,  20.0f,   8.00f, 0.010f,  // Ratio
+      1.0f,  10.0f,   2.50f, 0.010f,  // Knee radius
+      0.0f,  24.0f,   7.00f, 0.010f   // Makeup gain
+};
+
+Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent ) :
+    QWidget( _parent ) , p_intf( _p_intf )
+{
+    QFont smallFont = QApplication::font( static_cast<QWidget*>( 0 ) );
+    smallFont.setPointSize( smallFont.pointSize() - 3 );
+
+    QGridLayout *layout = new QGridLayout( this );
+    layout->setMargin( 0 );
+
+    enableCheck = new QCheckBox( qtr( "Enable dynamic range compressor" ) );
+    layout->addWidget( enableCheck, 0, 0, 1, NUM_CP_CTRL );
+
+    for( int i = 0 ; i < NUM_CP_CTRL ; i++ )
+    {
+        compCtrl[i] = new QSlider( Qt::Vertical );
+
+        const int i_min = (int)( f_comp_min_max_val_res_data[4 * i + 0]
+                               / f_comp_min_max_val_res_data[4 * i + 3] );
+        const int i_max = (int)( f_comp_min_max_val_res_data[4 * i + 1]
+                               / f_comp_min_max_val_res_data[4 * i + 3] );
+        const int i_val = (int)( f_comp_min_max_val_res_data[4 * i + 2]
+                               / f_comp_min_max_val_res_data[4 * i + 3] );
+
+        compCtrl[i]->setMinimum( i_min );
+        compCtrl[i]->setMaximum( i_max );
+        compCtrl[i]->setValue(   i_val );
+        oldControlVars[i] = f_comp_min_max_val_res_data[4 * i + 2];
+        CONNECT( compCtrl[i], valueChanged( int ), this, setInitValues() );
+        ctrl_texts[i] = new QLabel( qtr( psz_comp_control_descs[i] )
+                                  + qtr( "\n" ) );
+        ctrl_texts[i]->setFont( smallFont );
+        ctrl_texts[i]->setAlignment( Qt::AlignHCenter );
+        ctrl_readout[i] = new QLabel( qtr( "" ) );
+        ctrl_readout[i]->setFont( smallFont );
+        ctrl_readout[i]->setAlignment( Qt::AlignHCenter );
+        layout->addWidget( compCtrl[i], 1, i, Qt::AlignHCenter );
+        layout->addWidget( ctrl_readout[i], 2, i, Qt::AlignHCenter );
+        layout->addWidget( ctrl_texts[i], 3, i, Qt::AlignHCenter );
+    }
+
+    BUTTONACT( enableCheck, enable() );
+
+    /* Write down initial values */
+    aout_instance_t *p_aout = THEMIM->getAout();
+    char *psz_af;
+
+    if( p_aout )
+    {
+        psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
+        for( int i = 0; i < NUM_CP_CTRL; i++ )
+        {
+            controlVars[i] = var_GetFloat( p_aout,
+                                           psz_comp_control_names[i] );
+        }
+        vlc_object_release( p_aout );
+    }
+    else
+    {
+        psz_af = config_GetPsz( p_intf, "audio-filter" );
+        for( int i = 0; i < NUM_CP_CTRL; i++ )
+        {
+            controlVars[i] = config_GetFloat( p_intf,
+                                              psz_comp_control_names[i] );
+        }
+    }
+    if( psz_af && strstr( psz_af, "compressor" ) != NULL )
+    {
+        enableCheck->setChecked( true );
+    }
+    free( psz_af );
+    enable( enableCheck->isChecked() );
+    updateSliders( controlVars );
+    setValues( controlVars );
+}
+
+void Compressor::enable()
+{
+    bool en = enableCheck->isChecked();
+    aout_EnableFilter( THEPL, "compressor", en );
+    enable( en );
+}
+
+void Compressor::enable( bool en )
+{
+    for( int i = 0 ; i < NUM_CP_CTRL ; i++ )
+    {
+        compCtrl[i]->setEnabled( en );
+        ctrl_texts[i]->setEnabled( en );
+        ctrl_readout[i]->setEnabled( en );
+    }
+}
+
+void Compressor::updateSliders( float * controlVars )
+{
+    for( int i = 0 ; i < NUM_CP_CTRL ; i++ )
+    {
+        if( oldControlVars[i] != controlVars[i] )
+        {
+            const int i_val = (int)( controlVars[i]
+                                   / f_comp_min_max_val_res_data[4 * i + 3] );
+            compCtrl[i]->setValue( i_val );
+        }
+    }
+}
+
+void Compressor::setInitValues()
+{
+    setValues( controlVars );
+}
+
+void Compressor::setValues( float * controlVars )
+{
+    aout_instance_t *p_aout = THEMIM->getAout();
+
+    for( int i = 0 ; i < NUM_CP_CTRL ; i++ )
+    {
+        float f = (float)( compCtrl[i]->value() )
+                * ( f_comp_min_max_val_res_data[4 * i + 3] );
+        ctrl_readout[i]->setText( QString::number( f, 'f', 1 )
+                                + qtr( psz_comp_control_units[i] ) );
+        if( oldControlVars[i] != f )
+        {
+            if( p_aout )
+            {
+                var_SetFloat( p_aout, psz_comp_control_names[i], f );
+            }
+            config_PutFloat( p_intf, psz_comp_control_names[i], f );
+            oldControlVars[i] = f;
+        }
+    }
+    if( p_aout )
+    {
+        vlc_object_release( p_aout );
+    }
+}
+
+/**********************************************************************
  * Spatializer
  **********************************************************************/
 static const char *psz_control_names[] =

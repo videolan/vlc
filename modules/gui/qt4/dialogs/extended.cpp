@@ -55,6 +55,9 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     equal = new Equalizer( p_intf, audioTab );
     audioTab->addTab( equal, qtr( "Graphic Equalizer" ) );
 
+    Compressor *compres = new Compressor( p_intf, audioTab );
+    audioTab->addTab( compres, qtr( "Compressor" ) );
+
     Spatializer *spatial = new Spatializer( p_intf, audioTab );
     audioTab->addTab( spatial, qtr( "Spatializer" ) );
     audioLayout->addWidget( audioTab );

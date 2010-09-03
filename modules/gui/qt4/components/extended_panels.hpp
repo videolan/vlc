@@ -38,6 +38,7 @@
 #include <QTabWidget>
 
 #define BANDS 10
+#define NUM_CP_CTRL 7
 #define NUM_SP_CTRL 5
 
 class QSignalMapper;
@@ -113,6 +114,32 @@ private slots:
     void setPreamp();
     void setCoreBands();
     void setCorePreset(int);
+};
+
+class Compressor: public QWidget
+{
+    Q_OBJECT
+public:
+    Compressor( intf_thread_t *, QWidget * );
+
+private:
+    QSlider *compCtrl[NUM_CP_CTRL];
+    QLabel *ctrl_texts[NUM_CP_CTRL];
+    QLabel *ctrl_readout[NUM_CP_CTRL];
+    float controlVars[NUM_CP_CTRL];
+    float oldControlVars[NUM_CP_CTRL];
+
+    QCheckBox *enableCheck;
+
+    void delCallbacks( aout_instance_t * );
+    void addCallbacks( aout_instance_t * );
+    intf_thread_t *p_intf;
+private slots:
+    void enable(bool);
+    void enable();
+    void updateSliders(float *);
+    void setValues(float *);
+    void setInitValues();
 };
 
 class Spatializer: public QWidget
