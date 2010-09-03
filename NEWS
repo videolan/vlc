@@ -28,8 +28,12 @@ Interfaces
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
 
+Audio Filter:
+ * New Compressor filter, a dynamic range compressor
+
 Video Filter:
  * New gradfun filter for debanding videos using dithering
+ * Rewrite of the grain filter, faster and with better quality
 
 Stream output:
  * New livehttp-module for HTTP Live Streamin (iphone-stuff),
