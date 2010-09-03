@@ -1122,35 +1122,27 @@ void Equalizer::addCallbacks( aout_instance_t *p_aout )
 /**********************************************************************
  * Dynamic range compressor
  **********************************************************************/
-static const char *psz_comp_control_names[] =
-{
-    "compressor-rms-peak", "compressor-attack", "compressor-release",
-    "compressor-threshold", "compressor-ratio", "compressor-knee",
-    "compressor-makeup-gain"
-};
 
-static const char *psz_comp_control_descs[] =
+typedef struct
 {
-    "RMS/peak", "Attack",
-    "Release", "Threshold", "Ratio", "Knee\nradius", "Makeup\ngain"
-};
+    const char *psz_name;
+    const char *psz_descs;
+    const char *psz_units;
+    const float f_min;      // min
+    const float f_max;      // max
+    const float f_value;    // value
+    const float f_resolution; // resolution
+} comp_controls_t;
 
-static const char *psz_comp_control_units[] =
+static const comp_controls_t controls[] =
 {
-    "", " ms", " ms", " dB", ":1", " dB", " dB"
-};
-
-static const float f_comp_min_max_val_res_data[] =
-{
-    // min     max   value  resolution
-    //----  ------  ------  ----------
-      0.0f,   1.0f,   0.00f, 0.001f,  // RMS/peak
-      1.5f, 400.0f,  25.00f, 0.100f,  // Attack
-      2.0f, 800.0f, 100.00f, 0.100f,  // Release
-    -30.0f,   0.0f, -11.00f, 0.010f,  // Threshold
-      1.0f,  20.0f,   8.00f, 0.010f,  // Ratio
-      1.0f,  10.0f,   2.50f, 0.010f,  // Knee radius
-      0.0f,  24.0f,   7.00f, 0.010f   // Makeup gain
+    { "compressor-rms-peak",    _("RMS/peak"),       "",       0.0f,   1.0f,   0.00f, 0.001f },
+    { "compressor-attack",      _("Attack"),       _(" ms"),   1.5f, 400.0f,  25.00f, 0.100f },
+    { "compressor-release",     _("Release"),      _(" ms"),   2.0f, 800.0f, 100.00f, 0.100f },
+    { "compressor-threshold",   _("Threshold"),    _(" dB"), -30.0f,   0.0f, -11.00f, 0.010f },
+    { "compressor-ratio",       _("Ratio"),          ":1",     1.0f,  20.0f,   8.00f, 0.010f },
+    { "compressor-knee",        _("Knee\nradius"), _(" dB"),   1.0f,  10.0f,   2.50f, 0.010f },
+    { "compressor-makeup-gain", _("Makeup\ngain"), _(" dB"),   0.0f,  24.0f,   7.00f, 0.010f },
 };
 
 Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent ) :
@@ -1169,19 +1161,19 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent ) :
     {
         compCtrl[i] = new QSlider( Qt::Vertical );
 
-        const int i_min = (int)( f_comp_min_max_val_res_data[4 * i + 0]
-                               / f_comp_min_max_val_res_data[4 * i + 3] );
-        const int i_max = (int)( f_comp_min_max_val_res_data[4 * i + 1]
-                               / f_comp_min_max_val_res_data[4 * i + 3] );
-        const int i_val = (int)( f_comp_min_max_val_res_data[4 * i + 2]
-                               / f_comp_min_max_val_res_data[4 * i + 3] );
+        const int i_min = (int)( controls[i].f_min
+                               / controls[i].f_resolution );
+        const int i_max = (int)( controls[i].f_max
+                               / controls[i].f_resolution );
+        const int i_val = (int)( controls[i].f_value
+                               / controls[i].f_resolution );
 
         compCtrl[i]->setMinimum( i_min );
         compCtrl[i]->setMaximum( i_max );
         compCtrl[i]->setValue(   i_val );
-        oldControlVars[i] = f_comp_min_max_val_res_data[4 * i + 2];
+        oldControlVars[i] = controls[i].f_value;
         CONNECT( compCtrl[i], valueChanged( int ), this, setInitValues() );
-        ctrl_texts[i] = new QLabel( qtr( psz_comp_control_descs[i] )
+        ctrl_texts[i] = new QLabel( qtr( controls[i].psz_descs )
                                   + qtr( "\n" ) );
         ctrl_texts[i]->setFont( smallFont );
         ctrl_texts[i]->setAlignment( Qt::AlignHCenter );
@@ -1205,7 +1197,7 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent ) :
         for( int i = 0; i < NUM_CP_CTRL; i++ )
         {
             controlVars[i] = var_GetFloat( p_aout,
-                                           psz_comp_control_names[i] );
+                                           controls[i].psz_name );
         }
         vlc_object_release( p_aout );
     }
@@ -1215,7 +1207,7 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent ) :
         for( int i = 0; i < NUM_CP_CTRL; i++ )
         {
             controlVars[i] = config_GetFloat( p_intf,
-                                              psz_comp_control_names[i] );
+                                              controls[i].psz_name );
         }
     }
     if( psz_af && strstr( psz_af, "compressor" ) != NULL )
@@ -1252,7 +1244,7 @@ void Compressor::updateSliders( float * controlVars )
         if( oldControlVars[i] != controlVars[i] )
         {
             const int i_val = (int)( controlVars[i]
-                                   / f_comp_min_max_val_res_data[4 * i + 3] );
+                                   / controls[i].f_resolution );
             compCtrl[i]->setValue( i_val );
         }
     }
@@ -1270,16 +1262,16 @@ void Compressor::setValues( float * controlVars )
     for( int i = 0 ; i < NUM_CP_CTRL ; i++ )
     {
         float f = (float)( compCtrl[i]->value() )
-                * ( f_comp_min_max_val_res_data[4 * i + 3] );
+                * ( controls[i].f_resolution );
         ctrl_readout[i]->setText( QString::number( f, 'f', 1 )
-                                + qtr( psz_comp_control_units[i] ) );
+                                + qtr( controls[i].psz_units ) );
         if( oldControlVars[i] != f )
         {
             if( p_aout )
             {
-                var_SetFloat( p_aout, psz_comp_control_names[i], f );
+                var_SetFloat( p_aout, controls[i].psz_name, f );
             }
-            config_PutFloat( p_intf, psz_comp_control_names[i], f );
+            config_PutFloat( p_intf, controls[i].psz_name, f );
             oldControlVars[i] = f;
         }
     }
