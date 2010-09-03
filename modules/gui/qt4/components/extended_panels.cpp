@@ -887,14 +887,6 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
     updateUIFromCore();
 }
 
-Equalizer::~Equalizer()
-{
-}
-
-void Equalizer::clean()
-{
-    enable();
-}
 /* Write down initial values */
 void Equalizer::updateUIFromCore()
 {
@@ -934,7 +926,7 @@ void Equalizer::updateUIFromCore()
 
     if( psz_bands && strlen( psz_bands ) > 1 )
     {
-    	char *psz_bands_orig = psz_bands;
+        char *psz_bands_orig = psz_bands;
         for( int i = 0; i < BANDS; i++ )
         {
             const float f = us_strtod(psz_bands, &psz_bands );
@@ -1134,7 +1126,7 @@ typedef struct
     const float f_resolution; // resolution
 } comp_controls_t;
 
-static const comp_controls_t controls[] =
+static const comp_controls_t comp_controls[] =
 {
     { "compressor-rms-peak",    _("RMS/peak"),       "",       0.0f,   1.0f,   0.00f, 0.001f },
     { "compressor-attack",      _("Attack"),       _(" ms"),   1.5f, 400.0f,  25.00f, 0.100f },
@@ -1145,10 +1137,10 @@ static const comp_controls_t controls[] =
     { "compressor-makeup-gain", _("Makeup\ngain"), _(" dB"),   0.0f,  24.0f,   7.00f, 0.010f },
 };
 
-Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent ) :
-    QWidget( _parent ) , p_intf( _p_intf )
+Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
+           : QWidget( _parent ) , p_intf( _p_intf )
 {
-    QFont smallFont = QApplication::font( static_cast<QWidget*>( 0 ) );
+    QFont smallFont = QApplication::font();
     smallFont.setPointSize( smallFont.pointSize() - 3 );
 
     QGridLayout *layout = new QGridLayout( this );
@@ -1159,30 +1151,33 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     for( int i = 0 ; i < NUM_CP_CTRL ; i++ )
     {
+        const int i_min = (int)( comp_controls[i].f_min
+                               / comp_controls[i].f_resolution );
+        const int i_max = (int)( comp_controls[i].f_max
+                               / comp_controls[i].f_resolution );
+        const int i_val = (int)( comp_controls[i].f_value
+                               / comp_controls[i].f_resolution );
+
         compCtrl[i] = new QSlider( Qt::Vertical );
-
-        const int i_min = (int)( controls[i].f_min
-                               / controls[i].f_resolution );
-        const int i_max = (int)( controls[i].f_max
-                               / controls[i].f_resolution );
-        const int i_val = (int)( controls[i].f_value
-                               / controls[i].f_resolution );
-
         compCtrl[i]->setMinimum( i_min );
         compCtrl[i]->setMaximum( i_max );
         compCtrl[i]->setValue(   i_val );
-        oldControlVars[i] = controls[i].f_value;
+
+        oldControlVars[i] = comp_controls[i].f_value;
+
         CONNECT( compCtrl[i], valueChanged( int ), this, setInitValues() );
-        ctrl_texts[i] = new QLabel( qtr( controls[i].psz_descs )
-                                  + qtr( "\n" ) );
+
+        ctrl_texts[i] = new QLabel( qtr( comp_controls[i].psz_descs ) + "\n" );
         ctrl_texts[i]->setFont( smallFont );
         ctrl_texts[i]->setAlignment( Qt::AlignHCenter );
-        ctrl_readout[i] = new QLabel( qtr( "" ) );
+
+        ctrl_readout[i] = new QLabel;
         ctrl_readout[i]->setFont( smallFont );
         ctrl_readout[i]->setAlignment( Qt::AlignHCenter );
-        layout->addWidget( compCtrl[i], 1, i, Qt::AlignHCenter );
+
+        layout->addWidget( compCtrl[i],     1, i, Qt::AlignHCenter );
         layout->addWidget( ctrl_readout[i], 2, i, Qt::AlignHCenter );
-        layout->addWidget( ctrl_texts[i], 3, i, Qt::AlignHCenter );
+        layout->addWidget( ctrl_texts[i],   3, i, Qt::AlignHCenter );
     }
 
     BUTTONACT( enableCheck, enable() );
@@ -1197,7 +1192,7 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent ) :
         for( int i = 0; i < NUM_CP_CTRL; i++ )
         {
             controlVars[i] = var_GetFloat( p_aout,
-                                           controls[i].psz_name );
+                                           comp_controls[i].psz_name );
         }
         vlc_object_release( p_aout );
     }
@@ -1207,7 +1202,7 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent ) :
         for( int i = 0; i < NUM_CP_CTRL; i++ )
         {
             controlVars[i] = config_GetFloat( p_intf,
-                                              controls[i].psz_name );
+                                              comp_controls[i].psz_name );
         }
     }
     if( psz_af && strstr( psz_af, "compressor" ) != NULL )
@@ -1243,9 +1238,8 @@ void Compressor::updateSliders( float * controlVars )
     {
         if( oldControlVars[i] != controlVars[i] )
         {
-            const int i_val = (int)( controlVars[i]
-                                   / controls[i].f_resolution );
-            compCtrl[i]->setValue( i_val );
+            compCtrl[i]->setValue(
+                    (int)( controlVars[i] / comp_controls[i].f_resolution ) );
         }
     }
 }
@@ -1261,17 +1255,16 @@ void Compressor::setValues( float * controlVars )
 
     for( int i = 0 ; i < NUM_CP_CTRL ; i++ )
     {
-        float f = (float)( compCtrl[i]->value() )
-                * ( controls[i].f_resolution );
+        float f = (float)( compCtrl[i]->value() ) * ( comp_controls[i].f_resolution );
         ctrl_readout[i]->setText( QString::number( f, 'f', 1 )
-                                + qtr( controls[i].psz_units ) );
+                                + qtr( comp_controls[i].psz_units ) );
         if( oldControlVars[i] != f )
         {
             if( p_aout )
             {
-                var_SetFloat( p_aout, controls[i].psz_name, f );
+                var_SetFloat( p_aout, comp_controls[i].psz_name, f );
             }
-            config_PutFloat( p_intf, controls[i].psz_name, f );
+            config_PutFloat( p_intf, comp_controls[i].psz_name, f );
             oldControlVars[i] = f;
         }
     }
@@ -1284,14 +1277,23 @@ void Compressor::setValues( float * controlVars )
 /**********************************************************************
  * Spatializer
  **********************************************************************/
-static const char *psz_control_names[] =
+typedef struct
 {
-    "spatializer-roomsize", "spatializer-width",
-    "spatializer-wet", "spatializer-dry", "spatializer-damp"
+    const char *psz_name;
+    const char *psz_desc;
+} spat_controls_t;
+
+static const spat_controls_t spat_controls[] =
+{
+    { "spatializer-roomsize", _("Size") },
+    { "spatializer-width",    _("Width") },
+    { "spatializer-wet",      _("Wet") },
+    { "spatializer-dry",      _("Dry") },
+    { "spatializer-damp",     _("Damp") },
 };
 
-Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent ) :
-    QWidget( _parent ) , p_intf( _p_intf )
+Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
+            : QWidget( _parent ) , p_intf( _p_intf )
 {
     QFont smallFont = QApplication::font();
     smallFont.setPointSize( smallFont.pointSize() - 3 );
@@ -1316,15 +1318,20 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent ) :
             spatCtrl[i]->setValue( 0 );
             spatCtrl[i]->setMinimum( -10 );
         }
+
         oldControlVars[i] = spatCtrl[i]->value();
+
         CONNECT( spatCtrl[i], valueChanged( int ), this, setInitValues() );
-        ctrl_texts[i] = new QLabel( qfu( psz_control_names[i] ) + "\n" );
+
+        ctrl_texts[i] = new QLabel( qtr( spat_controls[i].psz_desc ) + "\n" );
         ctrl_texts[i]->setFont( smallFont );
-        ctrl_readout[i] = new QLabel( "" );
+
+        ctrl_readout[i] = new QLabel;
         ctrl_readout[i]->setFont( smallFont );
-        layout->addWidget( spatCtrl[i], 1, i );
-        layout->addWidget( ctrl_readout[i], 2, i );
-        layout->addWidget( ctrl_texts[i], 3, i );
+
+        layout->addWidget( spatCtrl[i],     1, i, Qt::AlignHCenter );
+        layout->addWidget( ctrl_readout[i], 2, i, Qt::AlignHCenter );
+        layout->addWidget( ctrl_texts[i],   3, i, Qt::AlignHCenter );
     }
 
     BUTTONACT( enableCheck, enable() );
@@ -1338,7 +1345,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent ) :
         psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
         for( int i = 0; i < NUM_SP_CTRL ; i++ )
         {
-            controlVars[i] = var_GetFloat( p_aout, psz_control_names[i] );
+            controlVars[i] = var_GetFloat( p_aout, spat_controls[i].psz_name );
         }
         vlc_object_release( p_aout );
     }
@@ -1347,7 +1354,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent ) :
         psz_af = config_GetPsz( p_intf, "audio-filter" );
         for( int i = 0; i < NUM_SP_CTRL ; i++ )
         {
-            controlVars[i] = config_GetFloat( p_intf, psz_control_names[i] );
+            controlVars[i] = config_GetFloat( p_intf, spat_controls[i].psz_name );
         }
     }
     if( psz_af && strstr( psz_af, "spatializer" ) != NULL )
@@ -1355,10 +1362,6 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent ) :
     free( psz_af );
     enable( enableCheck->isChecked() );
     setValues( controlVars );
-}
-
-Spatializer::~Spatializer()
-{
 }
 
 void Spatializer::enable()
@@ -1397,9 +1400,9 @@ void Spatializer::setValues( float *controlVars )
         {
             if( oldControlVars[i] != spatCtrl[i]->value() )
             {
-                var_SetFloat( p_aout, psz_control_names[i],
+                var_SetFloat( p_aout, spat_controls[i].psz_name,
                         ( float )spatCtrl[i]->value() );
-                config_PutFloat( p_intf, psz_control_names[i],
+                config_PutFloat( p_intf, spat_controls[i].psz_name,
                         ( float ) spatCtrl[i]->value() );
                 oldControlVars[i] = ( float ) spatCtrl[i]->value();
             }

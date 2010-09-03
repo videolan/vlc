@@ -92,7 +92,6 @@ class Equalizer: public QWidget
     friend class ExtendedDialog;
 public:
     Equalizer( intf_thread_t *, QWidget * );
-    virtual ~Equalizer();
     QComboBox *presetsComboBox;
 
     char * createValuesFromPreset( int i_preset );
@@ -106,7 +105,7 @@ private:
     void addCallbacks( aout_instance_t * );
 
     intf_thread_t *p_intf;
-    void clean();
+    void clean() { enable(); }
 private slots:
     void enable(bool);
     void enable();
@@ -131,14 +130,17 @@ private:
 
     QCheckBox *enableCheck;
 
+    intf_thread_t *p_intf;
+
     void delCallbacks( aout_instance_t * );
     void addCallbacks( aout_instance_t * );
-    intf_thread_t *p_intf;
+
+    void updateSliders(float *);
+    void setValues(float *);
+
 private slots:
     void enable(bool);
     void enable();
-    void updateSliders(float *);
-    void setValues(float *);
     void setInitValues();
 };
 
@@ -147,7 +149,6 @@ class Spatializer: public QWidget
     Q_OBJECT
 public:
     Spatializer( intf_thread_t *, QWidget * );
-    virtual ~Spatializer();
 
 private:
     QSlider *spatCtrl[NUM_SP_CTRL];
@@ -161,10 +162,12 @@ private:
     void delCallbacks( aout_instance_t * );
     void addCallbacks( aout_instance_t * );
     intf_thread_t *p_intf;
+
+    void setValues(float *);
+
 private slots:
     void enable(bool);
     void enable();
-    void setValues(float *);
     void setInitValues();
 };
 
