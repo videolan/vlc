@@ -73,7 +73,7 @@ private:
 };
 #endif
 
-QString ModuleFromWidgetName( QObject *obj )
+const QString ModuleFromWidgetName( QObject *obj )
 {
     return obj->objectName().replace( "Enable","" );
 }
@@ -240,10 +240,6 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
              ui.cropRightPx, setDisabled( bool ) );
 }
 
-ExtVideo::~ExtVideo()
-{
-}
-
 void ExtVideo::cropChange()
 {
     if( ui.topBotCropSync->isChecked() )
@@ -362,12 +358,6 @@ void ExtVideo::ChangeVFiltersString( const char *psz_name, bool b_add )
     }
     /* Vout is not kept, so put that in the config */
     config_PutPsz( p_intf, psz_filter_type, psz_string );
-    if( !strcmp( psz_filter_type, "video-filter" ) )
-        ui.videoFilterText->setText( psz_string );
-    else if( !strcmp( psz_filter_type, "vout-filter" ) )
-        ui.voutFilterText->setText( psz_string );
-    else if( !strcmp( psz_filter_type, "sub-filter" ) )
-        ui.subpictureFilterText->setText( psz_string );
 
     /* Try to set on the fly */
     p_vout = THEMIM->getVout();
@@ -644,11 +634,6 @@ ExtV4l2::ExtV4l2( intf_thread_t *_p_intf, QWidget *_parent )
     BUTTONACT( ui.refresh, Refresh() );
 
     box = NULL;
-}
-
-ExtV4l2::~ExtV4l2()
-{
-    delete box;
 }
 
 void ExtV4l2::showEvent( QShowEvent *event )

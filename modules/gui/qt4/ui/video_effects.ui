@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>619</width>
-    <height>280</height>
+    <height>308</height>
    </rect>
   </property>
   <property name="currentIndex">
@@ -1324,57 +1324,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="tab_6">
-   <attribute name="title">
-    <string>Advanced video filter controls</string>
-   </attribute>
-   <layout class="QGridLayout">
-    <item row="2" column="1" colspan="2">
-     <widget class="QLineEdit" name="subpictureFilterText"/>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_34">
-      <property name="text">
-       <string>Subpicture filters</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1" colspan="2">
-     <widget class="QLineEdit" name="videoFilterText"/>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_33">
-      <property name="text">
-       <string>Video filters</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_32">
-      <property name="text">
-       <string>Vout filters</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0" colspan="2">
-     <widget class="QPushButton" name="filtersResetButton">
-      <property name="text">
-       <string>Reset</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="2">
-     <widget class="QPushButton" name="filtersUpdateButton">
-      <property name="text">
-       <string>Update</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1" colspan="2">
-     <widget class="QLineEdit" name="voutFilterText"/>
-    </item>
-   </layout>
-  </widget>
  </widget>
  <tabstops>
   <tabstop>logoEnable</tabstop>
@@ -1442,11 +1391,6 @@
   <tabstop>brightnessSlider</tabstop>
   <tabstop>contrastSlider</tabstop>
   <tabstop>hueSlider</tabstop>
-  <tabstop>filtersResetButton</tabstop>
-  <tabstop>videoFilterText</tabstop>
-  <tabstop>filtersUpdateButton</tabstop>
-  <tabstop>subpictureFilterText</tabstop>
-  <tabstop>voutFilterText</tabstop>
   <tabstop>adjustEnable</tabstop>
   <tabstop>transformEnable</tabstop>
   <tabstop>brightnessThresholdCheck</tabstop>
