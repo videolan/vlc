@@ -18,24 +18,6 @@
     <string>Basic</string>
    </attribute>
    <layout class="QGridLayout">
-    <item row="1" column="1">
-     <widget class="QGroupBox" name="transformEnable">
-      <property name="title">
-       <string>Transform</string>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-      <layout class="QGridLayout">
-       <item row="0" column="0">
-        <widget class="QComboBox" name="transformTypeCombo"/>
-       </item>
-      </layout>
-     </widget>
-    </item>
     <item row="0" column="1">
      <widget class="QGroupBox" name="sharpenEnable">
       <property name="title">
@@ -60,9 +42,6 @@
          <property name="maximum">
           <number>200</number>
          </property>
-         <property name="singleStep">
-          <number>1</number>
-         </property>
          <property name="pageStep">
           <number>10</number>
          </property>
@@ -70,7 +49,7 @@
           <enum>Qt::Horizontal</enum>
          </property>
          <property name="tickPosition">
-          <enum>QSlider::TicksBothSides</enum>
+          <enum>QSlider::TicksBelow</enum>
          </property>
          <property name="tickInterval">
           <number>100</number>
@@ -80,7 +59,7 @@
       </layout>
      </widget>
     </item>
-    <item row="0" column="0" rowspan="2">
+    <item row="0" column="0" rowspan="3">
      <widget class="QGroupBox" name="adjustEnable">
       <property name="enabled">
        <bool>true</bool>
@@ -217,6 +196,68 @@
         <widget class="QCheckBox" name="brightnessThresholdCheck">
          <property name="text">
           <string>Brightness threshold</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QGroupBox" name="transformEnable">
+      <property name="title">
+       <string>Transform</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+      <layout class="QGridLayout">
+       <item row="0" column="0">
+        <widget class="QComboBox" name="transformTypeCombo"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QGroupBox" name="gradfunEnable">
+      <property name="title">
+       <string>Gradient</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_32">
+         <property name="text">
+          <string>Radius</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QSlider" name="gradfunRadiusSlider">
+         <property name="minimum">
+          <number>4</number>
+         </property>
+         <property name="maximum">
+          <number>32</number>
+         </property>
+         <property name="pageStep">
+          <number>4</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksBelow</enum>
+         </property>
+         <property name="tickInterval">
+          <number>4</number>
          </property>
         </widget>
        </item>
@@ -1392,7 +1433,6 @@
   <tabstop>contrastSlider</tabstop>
   <tabstop>hueSlider</tabstop>
   <tabstop>adjustEnable</tabstop>
-  <tabstop>transformEnable</tabstop>
   <tabstop>brightnessThresholdCheck</tabstop>
   <tabstop>gammaSlider</tabstop>
   <tabstop>sharpenSigmaSlider</tabstop>
