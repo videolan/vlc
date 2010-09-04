@@ -1530,18 +1530,13 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
             if( i_next_date > i_time )
             {
                 time_t i_date = (time_t) (i_next_date / 1000000) ;
+                struct tm tm;
+                char psz_date[32];
 
-#if !defined( UNDER_CE )
-#ifdef HAVE_CTIME_R
-                char psz_date[500];
-                ctime_r( &i_date, psz_date );
-#else
-                char *psz_date = ctime( &i_date );
-#endif
-
+                strftime( psz_date, sizeof(psz_date), "%F %H:%M:%S (%a)",
+                          localtime_r( &i_date, &tm ) );
                 vlm_MessageAdd( msg_schedule,
                                 vlm_MessageNew( "next launch", "%s", psz_date ) );
-#endif
             }
         }
 
