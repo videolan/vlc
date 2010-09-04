@@ -33,8 +33,20 @@
 #include <QSignalMapper>
 
 #ifdef WIN32
-#include <shlobj.h>
+    #include <shlobj.h>
+    /* typedef enum  {
+        SHARD_PIDL              = 0x00000001,
+        SHARD_PATHA             = 0x00000002,
+        SHARD_PATHW             = 0x00000003,
+        SHARD_APPIDINFO         = 0x00000004,
+        SHARD_APPIDINFOIDLIST   = 0x00000005,
+        SHARD_LINK              = 0x00000006,
+        SHARD_APPIDINFOLINK     = 0x00000007,
+        SHARD_SHELLITEM         = 0x00000008 
+    } SHARD; */
+    #define SHARD_PATHW 0x00000003
 #endif
+
 
 RecentsMRL* RecentsMRL::instance = NULL;
 
@@ -76,7 +88,7 @@ void RecentsMRL::addRecent( const QString &mrl )
 
 #ifdef WIN32
     /* Add to the Windows 7 default list in taskbar */
-    SHAddToRecentDocs( 0x00000002 , qtu( mrl ) );
+    SHAddToRecentDocs( SHARD_PATHW, qtu( mrl ) );
 #endif
 
     int i_index = stack->indexOf( mrl );
