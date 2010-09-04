@@ -45,7 +45,7 @@ echo "--------------------------------------"
 
 for module in `awk -F'[ :]' '/ \* /{print $3}' $LISTFILE`
 do
- if ! grep -q $module $TEMPFILE
+ if ! grep -wq $module $TEMPFILE
  then
   i=1
   echo "$module is listed but does not exist"
