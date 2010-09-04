@@ -34,6 +34,7 @@
 #include <QString>
 #include <QFileDialog>
 #include <QToolButton>
+#include <QSpinBox>
 #include <assert.h>
 
 SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& inputMRL )
@@ -260,8 +261,8 @@ void SoutDialog::updateMRL()
 
         /* FIXME: This sucks. We should really return a QStringList instead of
          * (mis)quoting, concatainating and split input item paramters. */
-        name = name.replace( " ", " " );
-        group = group.replace( " ", " " );
+        name = name.replace( " ", " " );
+        group = group.replace( " ", " " );
 
         /* We need to add options for both standard and rtp targets */
         /* This is inelegant but simple and functional */
@@ -277,7 +278,9 @@ void SoutDialog::updateMRL()
         mrl.append( qfu( " :no-sout-standard-sap" ) );
     }
 
-    if( ui.soutAll->isChecked() )  mrl.append( " :sout-all" );
+    if( ui.soutAll->isChecked() ) mrl.append( " :sout-all" );
+
+    if( ui.ttl->value() != 1 ) mrl.append( " :ttl=" + ui.ttl->value() );
 
     mrl.append( " :sout-keep" );
 
