@@ -379,6 +379,10 @@ function volume_up()
 {
     loadXMLDoc( 'requests/status.xml?command=volume&val=%2B20', parse_status );
 }
+function volume_mute()
+{
+    loadXMLDoc( 'requests/status.xml?command=volume&val=0', parse_status );
+}
 function seek( pos )
 {
     loadXMLDoc( 'requests/status.xml?command=seek&val='+pos, parse_status );
