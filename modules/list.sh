@@ -66,6 +66,6 @@ grep " \* " $LISTFILE | LC_CTYPE=C sort -c && echo "OK"
 
 
 echo ""
-echo "`cat $TEMPFILE| wc -l` modules listed in Modules.am files"
+echo "`wc -l < $TEMPFILE` modules listed in Modules.am files"
 
 rm -f $TEMPFILE
