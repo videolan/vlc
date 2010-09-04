@@ -224,9 +224,12 @@ void SoutDialog::updateMRL()
     for( int i = 1; i < ui.destTab->count(); i++ )
     {
         VirtualDestBox *vdb = qobject_cast<VirtualDestBox *>(ui.destTab->widget( i ));
-        QString tempMRL = vdb->getMRL( qs_mux );
+        if( !vdb )
+            continue;
 
+        QString tempMRL = vdb->getMRL( qs_mux );
         if( tempMRL.isEmpty() ) continue;
+
         if( multi )
             smrl.option( "dst", tempMRL );
         else
