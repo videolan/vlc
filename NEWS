@@ -43,6 +43,8 @@ Stream output:
     index-url=http://url-to-iphonestreamfile-###.ts},mux=ts{use-key-frames},
     dst=public_html/iphonestreamfile-###.ts}"
 
+Translations:
+ * New Armenian translation
 
 Changes between 1.1.3 and 1.1.4:
 --------------------------------
