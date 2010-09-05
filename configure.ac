@@ -3202,7 +3202,9 @@ AS_IF([test "${enable_xcb}" != "no"], [
     VLC_ADD_PLUGIN([panoramix])
     VLC_ADD_LIBS([panoramix],[${XCB_RANDR_LIBS} ${XCB_LIBS}])
     VLC_ADD_CFLAGS([panoramix],[${XCB_RANDR_CFLAGS} ${XCB_CFLAGS}])
-  ], [true])
+  ], [
+    AC_MSG_WARN([libxcb-randr not found. Panoramix filter will not be supported.])
+  ])
 
   dnl xcb-utils
   PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms >= 0.3.4], [
