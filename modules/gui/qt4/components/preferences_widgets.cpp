@@ -736,7 +736,9 @@ ModuleListConfigControl::~ModuleListConfigControl()
        checkBoxListItem *cbl = new checkBoxListItem; \
 \
        CONNECT( cb, stateChanged( int ), this, onUpdate() );\
-       cb->setToolTip( formatTooltip( qtr( module_get_help( p_parser ))));\
+       const char *help = module_get_help( p_parser ); \
+       if( help != NULL ) \
+           cb->setToolTip( formatTooltip( qtr( help ) ) ); \
        cbl->checkBox = cb; \
 \
        cbl->psz_module = strdup( module_get_object( p_parser ) ); \
