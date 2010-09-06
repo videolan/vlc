@@ -137,12 +137,14 @@ function handle_MediaPlayerBuffering(val)
 
 function handle_MediaPlayerPlaying()
 {
+	alert(" Playing ");
     onPlay();
 }
 
 function handle_MediaPlayerPaused()
 {
-    onPause();
+	alert(" Paused ");
+	onPause();
 }
 
 function handle_MediaPlayerStopped()
@@ -235,10 +237,6 @@ function onVLCPluginReady()
 
 function close()
 {
-    unregisterVLCEvent('MediaPlayerMouseGrab', handleMouseGrab);
-    unregisterVLCEvent('MediaPlayerMouseRelease', handleMouseRelease);
-    unregisterVLCEvent('MediaPlayerMouseClick', handleMouseClick);
-
     unregisterVLCEvent("MediaPlayerMediaChanged", handleMediaPlayerMediaChanged);
     unregisterVLCEvent("MediaPlayerNothingSpecial", handle_MediaPlayerNothingSpecial);
     unregisterVLCEvent("MediaPlayerOpening", handle_MediaPlayerOpening);
@@ -432,7 +430,6 @@ Insert Slider widget
 
 var rate = 0;
 var prevState = 0;
-var monitorTimerId = 0;
 var inputTracker;
 var inputTrackerScrolling = false;
 var inputTrackerIgnoreChange = false;
@@ -647,71 +644,6 @@ function doState()
     }
 }
 
-function monitor()
-{
-    var vlc = getVLC("vlc");
-    var newState = 0;
-
-    if( vlc )
-    {
-        newState = vlc.input.state;
-    }
-
-    if( prevState != newState )
-    {
-        if( newState == 0 )
-        {
-            // current media has stopped
-            onEnd();
-        }
-        else if( newState == 1 )
-        {
-            // current media is openning/connecting
-            onOpen();
-        }
-        else if( newState == 2 )
-        {
-            // current media is buffering data
-            onBuffer();
-        }
-        else if( newState == 3 )
-        {
-            // current media is now playing
-            onPlay();
-        }
-        else if( newState == 4 )
-        {
-            // current media is now paused
-            onPause();
-        }
-        else if( newState == 5 )
-        {
-            // current media has stopped
-            onStop();
-        }
-        else if( newState == 6 )
-        {
-            // current media has ended
-            onEnd();
-        }
-        else if( newState == 7 )
-        {
-            // current media encountered error
-            onError();
-        }
-        prevState = newState;
-    }
-    else if( newState == 3 )
-    {
-        // current media is playing
-        onPlaying();
-    }
-    if( monitorTimerId == 0 )
-    {
-        monitorTimerId = setInterval("monitor()", 1000);
-    }
-};
-
 /* actions */
 
 function doGo(targetURL)
@@ -733,10 +665,6 @@ function doGo(targetURL)
         {
             // play MRL
             vlc.playlist.playItem(itemId);
-            if( monitorTimerId == 0 )
-            {
-                monitor();
-            }
         }
         else
         {
@@ -766,12 +694,10 @@ function doPlayOrPause()
         if( vlc.playlist.isPlaying && canPause )
         {
             vlc.playlist.togglePause();
-            //monitor();
         }
         else if( vlc.playlist.items.count > 0 )
         {
             vlc.playlist.play();
-            //monitor();
         }
         else
         {
@@ -783,16 +709,8 @@ function doPlayOrPause()
 function doStop()
 {
     var vlc = getVLC("vlc");
-
     if( vlc )
         vlc.playlist.stop();
-
-    if( monitorTimerId != 0 )
-    {
-        clearInterval(monitorTimerId);
-        monitorTimerId = 0;
-    }
-    onStop();
 }
 
 function doPlaySlower()
