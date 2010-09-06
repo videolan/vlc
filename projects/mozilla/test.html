@@ -10,36 +10,9 @@
   }
 </STYLE>
 
-<SCRIPT type="text/javascript" src="blueshoes-4.5/javascript/lib/LibCrossBrowser.js"></SCRIPT>
-<SCRIPT type="text/javascript" src="blueshoes-4.5/javascript/lib/EventHandler.js"></SCRIPT>
-<SCRIPT type="text/javascript" src="blueshoes-4.5/javascript/core/form/Bs_FormUtil.lib.js"></SCRIPT>
-<SCRIPT type="text/javascript" src="blueshoes-4.5/javascript/components/slider/Bs_Slider.class.js"></SCRIPT>
-
 <SCRIPT language="JavaScript"><!--
 function init()
 {
-    inputTracker = new Bs_Slider();
-    if (inputTracker)
-    {
-        inputTracker.attachOnChange(onInputTrackerChange);
-        inputTracker.attachOnSlideStart(onInputTrackerScrollStart);
-        inputTracker.attachOnSlideEnd(onInputTrackerScrollEnd);
-        inputTracker.width         = 530;
-        inputTracker.height        = 15;
-        inputTracker.minVal        = 0;
-        inputTracker.maxVal        = 1.0;
-        inputTracker.valueDefault  = 0;
-        inputTracker.valueInterval = 1/530;
-        inputTracker.setDisabled(true);
-        inputTracker.imgDir   = 'blueshoes-4.5/javascript/components/slider/img/';
-        inputTracker.setBackgroundImage('aluminumalloyvolcanic/horizontal_background.gif', 'repeat');
-        inputTracker.setArrowIconLeft('aluminumalloyvolcanic/horizontal_backgroundLeft.gif', 2, 19);
-        inputTracker.setArrowIconRight('aluminumalloyvolcanic/horizontal_backgroundRight.gif', 2, 19);
-        inputTracker.setSliderIcon('aluminumalloyvolcanic/horizontal_knob.gif', 15, 19);
-        inputTracker.useInputField = 0;
-        inputTracker.draw('inputTrackerDiv');
-    }
-
     if( navigator.appName.indexOf("Microsoft Internet")==-1 )
     {
         onVLCPluginReady()
@@ -137,13 +110,11 @@ function handle_MediaPlayerBuffering(val)
 
 function handle_MediaPlayerPlaying()
 {
-	alert(" Playing ");
     onPlay();
 }
 
 function handle_MediaPlayerPaused()
 {
-	alert(" Paused ");
 	onPause();
 }
 
@@ -216,23 +187,23 @@ function handle_MediaPlayerLengthChanged(val)
 // VLC Plugin
 function onVLCPluginReady()
 {
-    registerVLCEvent("MediaPlayerMediaChanged", handleMediaPlayerMediaChanged);
-    registerVLCEvent("MediaPlayerNothingSpecial", handle_MediaPlayerNothingSpecial);
-    registerVLCEvent("MediaPlayerOpening", handle_MediaPlayerOpening);
-    registerVLCEvent("MediaPlayerBuffering", handle_MediaPlayerBuffering);
-    registerVLCEvent("MediaPlayerPlaying", handle_MediaPlayerPlaying);
-    registerVLCEvent("MediaPlayerPaused", handle_MediaPlayerPaused);
-    registerVLCEvent("MediaPlayerStopped", handle_MediaPlayerStopped);
-    registerVLCEvent("MediaPlayerForward", handle_MediaPlayerForward);
-    registerVLCEvent("MediaPlayerBackward", handle_MediaPlayerBackward);
-    registerVLCEvent("MediaPlayerEndReached", handle_MediaPlayerEndReached);
-    registerVLCEvent("MediaPlayerEncounteredError", handle_MediaPlayerEncounteredError);
-    registerVLCEvent("MediaPlayerTimeChanged", handle_MediaPlayerTimeChanged);
-    registerVLCEvent("MediaPlayerPositionChanged", handle_MediaPlayerPositionChanged);
-    registerVLCEvent("MediaPlayerSeekableChanged", handle_MediaPlayerSeekableChanged);
-    registerVLCEvent("MediaPlayerPausableChanged", handle_MediaPlayerPausableChanged);
-    registerVLCEvent("MediaPlayerTitleChanged", handle_MediaPlayerTitleChanged);
-    registerVLCEvent("MediaPlayerLengthChanged", handle_MediaPlayerLengthChanged);
+	registerVLCEvent("MediaPlayerMediaChanged", handleMediaPlayerMediaChanged);
+	registerVLCEvent("MediaPlayerNothingSpecial", handle_MediaPlayerNothingSpecial);
+	registerVLCEvent("MediaPlayerOpening", handle_MediaPlayerOpening);
+	registerVLCEvent("MediaPlayerBuffering", handle_MediaPlayerBuffering);
+	registerVLCEvent("MediaPlayerPlaying", handle_MediaPlayerPlaying);
+	registerVLCEvent("MediaPlayerPaused", handle_MediaPlayerPaused);
+	registerVLCEvent("MediaPlayerStopped", handle_MediaPlayerStopped);
+	registerVLCEvent("MediaPlayerForward", handle_MediaPlayerForward);
+	registerVLCEvent("MediaPlayerBackward", handle_MediaPlayerBackward);
+	registerVLCEvent("MediaPlayerEndReached", handle_MediaPlayerEndReached);
+	registerVLCEvent("MediaPlayerEncounteredError", handle_MediaPlayerEncounteredError);
+	registerVLCEvent("MediaPlayerTimeChanged", handle_MediaPlayerTimeChanged);
+	registerVLCEvent("MediaPlayerPositionChanged", handle_MediaPlayerPositionChanged);
+	registerVLCEvent("MediaPlayerSeekableChanged", handle_MediaPlayerSeekableChanged);
+	registerVLCEvent("MediaPlayerPausableChanged", handle_MediaPlayerPausableChanged);
+	registerVLCEvent("MediaPlayerTitleChanged", handle_MediaPlayerTitleChanged);
+	registerVLCEvent("MediaPlayerLengthChanged", handle_MediaPlayerLengthChanged);
 }
 
 function close()
@@ -430,9 +401,6 @@ Insert Slider widget
 
 var rate = 0;
 var prevState = 0;
-var inputTracker;
-var inputTrackerScrolling = false;
-var inputTrackerIgnoreChange = false;
 var telxState = false;
 var canPause = true;
 var canSeek = true;
@@ -594,6 +562,8 @@ function formatTime(timeVal)
         return timeMin+":"+timeSec;
 }
 
+// Old method of querying current state
+// function doState() - depreceated
 function doState()
 {
     var vlc = getVLC("vlc");
@@ -808,46 +778,23 @@ var liveFeedRoll = 0;
 
 function onPlaying()
 {
-    if( !inputTrackerScrolling )
-    {
         var vlc = getVLC("vlc");
         var info = document.getElementById("info");
         if( vlc )
         {
             var mediaLen = vlc.input.length;
-            inputTrackerIgnoreChange = true;
             if( mediaLen > 0 )
             {
                 // seekable media
-                if( inputTracker )
-                {
-                    if( inputTracker.maxVal == 1.0 )
-                    {
-                        inputTracker.setDisabled(false);
-                        inputTracker.maxVal = 1.0;
-                    }
-                    inputTracker.setValue(vlc.input.position);
-                }
                 info.innerHTML = formatTime(vlc.input.time)+"/"+formatTime(mediaLen);
             }
             else
             {
                 // non-seekable "live" media
-                if( inputTracker )
-                {
-                    if( inputTracker.maxVal != 0.0 )
-                    {
-                        inputTracker.maxVal = 0.0;
-                        inputTracker.setValue(0.0);
-                        inputTracker.setDisabled(true);
-                    }
-                }
                 liveFeedRoll = liveFeedRoll & 3;
                 info.innerHTML = liveFeedText[liveFeedRoll++];
             }
-            inputTrackerIgnoreChange  = false;
         }
-    }
 }
 
 function onPause()
@@ -860,15 +807,6 @@ function onStop()
 {
     var vlc = getVLC("vlc");
 
-    if( inputTracker )
-    {
-        if( !inputTracker.disabled )
-        {
-            inputTracker.setValue(inputTracker.minVal);
-            inputTracker.setDisabled(true);
-        }
-    }
-
     document.getElementById("info").innerHTML = "-:--:--/-:--:--";
     document.getElementById("state").innerHTML = "Stopped...";
     document.getElementById("PlayOrPause").value = " Play ";
@@ -879,33 +817,6 @@ function onError()
     var vlc = getVLC("vlc");
 
     document.getElementById("state").innerHTML = "Error...";
-}
-
-function onInputTrackerScrollStart()
-{
-    inputTrackerScrolling = true;
-}
-
-function onInputTrackerScrollEnd(inputTracker, value, pos)
-{
-    inputTrackerScrolling = false;
-}
-
-function onInputTrackerChange(inputTracker, value, pos)
-{
-    if( !inputTrackerIgnoreChange )
-    {
-        var vlc = getVLC("vlc");
-        if( vlc )
-        {
-            if( (vlc.input.state == 3) && (vlc.input.position != value) )
-            {
-                var info = document.getElementById("info");
-                vlc.input.position = value;
-                info.innerHTML = formatTime(vlc.input.time)+"/"+formatTime(vlc.input.length);
-            }
-        }
-    }
 }
 
 //-->
