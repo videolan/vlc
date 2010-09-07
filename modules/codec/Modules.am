@@ -1,4 +1,4 @@
-SUBDIRS = dmo avcodec shine subtitles spudec wmafixed omxil
+SUBDIRS = dmo avcodec shine spudec wmafixed omxil
 SOURCES_a52 = a52.c a52.h
 SOURCES_dts = dts.c
 SOURCES_flac = flac.c
@@ -34,6 +34,9 @@ SOURCES_kate = kate.c
 SOURCES_schroedinger = schroedinger.c
 SOURCES_libass = libass.c
 SOURCES_aes3 = aes3.c
+SOURCES_subsdec = subsass.c subsdec.c subsdec.h
+SOURCES_subsusf = subsusf.c subsdec.h
+SOURCES_t140 = t140.c
 
 libvlc_LTLIBRARIES += \
 	liba52_plugin.la \
@@ -50,4 +53,7 @@ libvlc_LTLIBRARIES += \
 	librawvideo_plugin.la \
 	libsvcdsub_plugin.la \
 	libinvmem_plugin.la \
+	libsubsdec_plugin.la \
+	libsubsusf_plugin.la \
+	libt140_plugin.la \
 	$(NULL)

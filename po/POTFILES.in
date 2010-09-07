@@ -394,11 +394,11 @@ modules/codec/speex.c
 modules/codec/spudec/parse.c
 modules/codec/spudec/spudec.c
 modules/codec/spudec/spudec.h
-modules/codec/subtitles/subsass.c
-modules/codec/subtitles/subsdec.c
-modules/codec/subtitles/subsdec.h
-modules/codec/subtitles/subsusf.c
-modules/codec/subtitles/t140.c
+modules/codec/subsass.c
+modules/codec/subsdec.c
+modules/codec/subsdec.h
+modules/codec/subsusf.c
+modules/codec/t140.c
 modules/codec/svcdsub.c
 modules/codec/telx.c
 modules/codec/theora.c

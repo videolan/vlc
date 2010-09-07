@@ -4567,7 +4567,6 @@ AC_CONFIG_FILES([
   modules/codec/dmo/Makefile
   modules/codec/omxil/Makefile
   modules/codec/shine/Makefile
-  modules/codec/subtitles/Makefile
   modules/codec/spudec/Makefile
   modules/codec/wmafixed/Makefile
   modules/control/Makefile
