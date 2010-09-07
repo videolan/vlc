@@ -118,19 +118,19 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     verbosityBox->setRange( 0, 2 );
     verbosityBox->setValue( var_InheritInteger( p_intf, "verbose" ) );
     verbosityBox->setWrapping( true );
-    verbosityBox->setMaximumWidth( 50 );
+    verbosityBox->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
 
     verbosityLabel = new QLabel( qtr( "Verbosity Level" ) );
 
     vbobjectsEdit = new QLineEdit();
 
-    vbobjectsEdit->setMaximumWidth( 100 );
+    vbobjectsEdit->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Fixed );
     vbobjectsEdit->setText(config_GetPsz( p_intf, "verbose-objects"));
     vbobjectsEdit->setToolTip( "verbose-objects usage: \n"
                             "--verbose-objects=+printthatobject,-dontprintthatone\n"
                             "(keyword 'all' to applies to all objects)");
 
-    vbobjectsLabel =  new QLabel( qtr( "Message filter" ) );
+    vbobjectsLabel =  new QLabel( qtr( "Filter:" ) );
 
     mainLayout->addWidget( mainTab, 0, 0, 1, 0 );
     mainLayout->addWidget( verbosityLabel, 1, 0, 1, 1 );
