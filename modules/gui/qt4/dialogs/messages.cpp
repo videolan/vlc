@@ -40,6 +40,7 @@
 #include <QMutex>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QScrollBar>
 
 #include <assert.h>
 
@@ -231,6 +232,12 @@ void MessagesDialog::updateConfig()
 
 void MessagesDialog::sinkMessage( msg_item_t *item )
 {
+    /* Only scroll if the viewport is at the end.
+       Don't bug user by auto-changing/loosing viewport on insert(). */
+    bool b_autoscroll = ( messages->verticalScrollBar()->value()
+                          + messages->verticalScrollBar()->pageStep()
+                          >= messages->verticalScrollBar()->maximum() );
+
     /* Copy selected text to the clipboard */
     if( messages->textCursor().hasSelection() )
         messages->copy();
@@ -270,7 +277,7 @@ void MessagesDialog::sinkMessage( msg_item_t *item )
     messages->setTextColor( "black" );
     messages->insertPlainText( qfu(item->psz_msg) );
     messages->insertPlainText( "\n" );
-    messages->ensureCursorVisible();
+    if ( b_autoscroll ) messages->ensureCursorVisible();
 }
 
 void MessagesDialog::customEvent( QEvent *event )
