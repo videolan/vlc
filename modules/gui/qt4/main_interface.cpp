@@ -782,6 +782,10 @@ void MainInterface::dockPlaylist( bool p_docked )
     playlistVisible = true;
 }
 
+/*
+ * setMinimalView is the private function used by
+ * the SLOT toggleMinimalView and setVideoFullScreen
+ */
 void MainInterface::setMinimalView( bool b_minimal )
 {
     menuBar()->setVisible( !b_minimal );
@@ -791,7 +795,9 @@ void MainInterface::setMinimalView( bool b_minimal )
 }
 
 /*
-  If b_minimal is false, then we are normalView
+ * This public SLOT is used for moving to minimal View Mode
+ *
+ * If b_minimal is false, then we are normalView
  */
 void MainInterface::toggleMinimalView( bool b_minimal )
 {
