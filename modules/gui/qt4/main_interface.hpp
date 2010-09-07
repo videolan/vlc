@@ -120,6 +120,7 @@ private:
     /* */
     void setMinimalView( bool );
     void setInterfaceFullScreen( bool );
+    void computeMinimumSize();
 
     /* */
     QSettings           *settings;

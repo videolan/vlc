@@ -252,8 +252,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Final sizing and showing */
     setVisible( !b_hideAfterCreation );
 
-    setMinimumWidth( __MAX( controls->sizeHint().width(),
-                            menuBar()->sizeHint().width() ) + 30 );
+    computeMinimumSize();
 
     /* Switch to minimal view if needed, must be called after the show() */
     if( b_minimalView )
@@ -316,6 +315,15 @@ MainInterface::~MainInterface()
     var_DelCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
     p_intf->p_sys->p_mi = NULL;
+}
+
+void MainInterface::computeMinimumSize()
+{
+    int minWidth = 30;
+    if( menuBar()->isVisible() )
+        minWidth += __MAX( controls->sizeHint().width(), menuBar()->sizeHint().width() );
+
+    setMinimumWidth( minWidth );
 }
 
 /*****************************
@@ -813,7 +821,10 @@ void MainInterface::toggleMinimalView( bool b_minimal )
     }
     b_minimalView = b_minimal;
     if( !b_videoFullScreen )
+    {
         setMinimalView( b_minimalView );
+        computeMinimumSize();
+    }
 
     emit minimalViewToggled( b_minimalView );
 }
