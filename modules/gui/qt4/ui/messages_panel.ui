@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>messagesPanelWidget</class>
+ <widget class="QWidget" name="messagesPanelWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>570</width>
+    <height>440</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Messages</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QTabWidget" name="mainTab">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Messages</string>
+      </attribute>
+      <layout class="QGridLayout" name="msgLayout">
+       <item row="0" column="0" colspan="6">
+        <widget class="QTextEdit" name="messages">
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Verbosity:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="5">
+        <widget class="QPushButton" name="clearButton">
+         <property name="text">
+          <string>&amp;Clear</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QSpinBox" name="verbosityBox">
+         <property name="wrapping">
+          <bool>true</bool>
+         </property>
+         <property name="maximum">
+          <number>2</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Filter:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <widget class="QLineEdit" name="vbobjectsEdit"/>
+       </item>
+       <item row="1" column="4">
+        <widget class="QPushButton" name="saveLogButton">
+         <property name="text">
+          <string>&amp;Save as...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Modules Tree</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QTreeWidget" name="modulesTree">
+         <column>
+          <property name="text">
+           <string notr="true">1</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QPushButton" name="updateButton">
+         <property name="text">
+          <string>&amp;Update</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="bottomButtonsBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

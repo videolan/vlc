@@ -26,6 +26,7 @@
 
 #include "util/qvlcframe.hpp"
 #include "util/singleton.hpp"
+#include "ui/messages_panel.h"
 
 class QTabWidget;
 class QPushButton;
@@ -44,15 +45,7 @@ private:
     MessagesDialog( intf_thread_t * );
     virtual ~MessagesDialog();
 
-    QTabWidget *mainTab;
-    QSpinBox *verbosityBox;
-    QLabel *verbosityLabel;
-    QTextEdit *messages;
-    QTreeWidget *modulesTree;
-    QPushButton *clearUpdateButton;
-    QPushButton *saveLogButton;
-    QLineEdit *vbobjectsEdit;
-    QLabel *vbobjectsLabel;
+    Ui::messagesPanelWidget ui;
     msg_subscription_t *sub;
     msg_cb_data_t *cbData;
     static void sinkMessage( msg_cb_data_t *, msg_item_t *, unsigned );
@@ -60,14 +53,12 @@ private:
     void sinkMessage( msg_item_t *item );
 
 private slots:
-    void updateTab( int );
-    void clearOrUpdate();
     bool save();
     void updateConfig();
     void changeVerbosity( int );
-private:
     void clear();
     void updateTree();
+private:
     void buildTree( QTreeWidgetItem *, vlc_object_t * );
 
     friend class    Singleton<MessagesDialog>;
