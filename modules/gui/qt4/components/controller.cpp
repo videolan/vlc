@@ -802,7 +802,7 @@ void FullscreenControllerWidget::slowHideFSC()
 
 /**
  * event handling
- * events: show, hide, start timer for hidding
+ * events: show, hide, start timer for hiding
  */
 void FullscreenControllerWidget::customEvent( QEvent *event )
 {
@@ -1037,7 +1037,7 @@ void FullscreenControllerWidget::fullscreenChanged( vout_thread_t *p_vout,
         var_DelCallback( p_vout, "mouse-moved",
                 FullscreenControllerWidgetMouseMoved, this );
 
-        /* Force fs hidding */
+        /* Force fs hiding */
         IMEvent *eHide = new IMEvent( FullscreenControlHide_Type, 0 );
         QApplication::postEvent( this, eHide );
     }
