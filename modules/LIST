@@ -1,4 +1,4 @@
-List of vlc plugins (362)
+List of vlc plugins (355)
 $Id$
  * a52: A/52 basic parser/packetizer
  * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
