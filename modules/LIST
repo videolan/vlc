@@ -88,7 +88,6 @@ $Id$
  * direct2d: video output module using the Direct2D API
  * direct3d: video output module using the Direct3D API
  * directfb: Direct Framebuffer video output
- * directory : input module to read files in a directory
  * directx: video output module using the DirectX API
  * dmo: a DirectMediaObject decoder that uses DirectMedia to decode video (WMV3)
  * dolby_surround_decoder: simple decoder for dolby surround encoded streams
@@ -98,10 +97,8 @@ $Id$
  * dtstofloat32: DTS Audio converter
  * dtstospdif: Audio converter that encapsulates DTS into S/PDIF
  * dummy: dummy audio output, video output, interface and input modules
- * dv: DV video decoder
  * dvb: input module for DVB-S/C/T streaming using v4l2 API
  * dvbsub: decoder module for subs in dvb streams
- * dvd: input module for accessing DVDs
  * dvdnav: access module for DVDs with libdvdnav
  * dvdread: input module for accessing DVDs, uses libdvdread
  * dynamicoverlay: subpicture filter using shared memory that can be written to by external applications
@@ -120,8 +117,6 @@ $Id$
  * fluidsynth: Software MIDI synthetizer using libfluidsynth
  * folder: folder meta data and art finder
  * freetype: Utility to put text on video using freetype2
- * ftp : FTP input module
- * gapi: PocketPC Video output
  * gaussianblur: gaussian blur video filter
  * gestures: mouse gestures control plugin
  * globalhotkeys: module to catch hotkeys when application doesn't have the focus
@@ -136,12 +131,10 @@ $Id$
  * growl: announce currently playing stream to growl
  * growl_udp: growl UDP notification plugin
  * h264: H264 decoder
- * hal: Linux HAL services discovery module
  * hd1000a: audio output module for the Roku HD1000 Set-Top-Box
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
  * hildon: Maemo interface based on Hildon
  * hotkeys: hotkeys control module
- * http: HTTP remote control webinterface
  * i420_rgb: planar YUV to packed RGB conversion functions
  * i420_rgb_mmx: MMX accelerated version of i420_rgb
  * i420_rgb_sse2: sse2 accelerated version of i420_rgb
@@ -191,7 +184,6 @@ $Id$
  * mp4: MP4 file input module
  * mpc: Musepack decoder
  * mpeg_audio: MPEG audio parser/packetizer
- * mpga: MPEG-I/II Audio demuxer
  * mpgatofixed32: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
  * mpgv: MPEG-I/II Video demuxer
  * msn: announce currently playing stream to MSN
@@ -255,7 +247,6 @@ $Id$
  * rawdv: Raw DV demuxer
  * rawvid: raw video input module for vlc
  * rawvideo: Pseudo audio-decoder for raw video
- * rc: interface module using stdio
  * real: partial Real audio/video demuxer
  * realvideo: Real video decoder
  * remoteosd: Remote-OSD over VNC
@@ -273,7 +264,6 @@ $Id$
  * sdl_image: SDL-based image decoder
  * sharpen: Sharpen video filter
  * shine: MP3 encoder using Shine, a fixed point implementation
- * shout: Shoutcast services discovery
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation
  * smf: Standard MIDI file demuxer
@@ -314,7 +304,6 @@ $Id$
  * telepathy: Telepathy Presence information using MissionControl notification
  * telx: teletext subtitles decoder
  * theora: a theora video decoder/packetizer/encoder using the libtheora library
- * time: Overlays the current time
  * transform: filter for horizontal and vertical image flips and 90° rotations
  * tremor: a vorbis audio decoder using the libvorbisidec (aka tremor) library
  * trivial_channel_mixer: Simple channel mixer plugin
@@ -325,10 +314,8 @@ $Id$
  * ty: TY demuxer
  * udev: udev probing module
  * ugly_resampler: Ugly audio resampler
- * upnp: Universal Plug'n play discovery module
  * upnp_intel: Intel SDL UPNP discovery
  * v4l2: Video 4 Linux 2 input module
- * v4l: Video 4 Linux input module
  * vc1: VC-1 Video demuxer
  * vcd: input module for accessing Video CDs
  * vcdx: input module for accessing Video CDs with navigation & stills
