@@ -687,6 +687,7 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
             lua_getglobal( L, "descriptor" );
             if( !lua_isfunction( L, lua_gettop( L ) ) || lua_pcall( L, 0, 1, 0 ) )
             {
+                msg_Warn( probe, "No 'descriptor' function in '%s'", psz_filename );
                 lua_pop( L, 1 );
                 if( !( psz_longname = strdup( *ppsz_file ) ) )
                 {
