@@ -55,7 +55,7 @@ bool FT2Font::init()
 {
     unsigned err;
 
-    if( err = FT_Init_FreeType( &m_lib ) )
+    if( ( err = FT_Init_FreeType( &m_lib ) ) )
     {
         msg_Err( getIntf(), "failed to initialize freetype (%s)",
                  ft2_strerror( err ) );
@@ -113,7 +113,7 @@ bool FT2Font::init()
     }
 
     // Select the charset
-    if( err = FT_Select_Charmap( m_face, ft_encoding_unicode ) )
+    if( ( err = FT_Select_Charmap( m_face, ft_encoding_unicode ) ) )
     {
         msg_Err( getIntf(), "font %s has no UNICODE table (%s)",
                  m_name.c_str(), ft2_strerror(err) );
@@ -121,7 +121,7 @@ bool FT2Font::init()
     }
 
     // Set the pixel size
-    if( err = FT_Set_Pixel_Sizes( m_face, 0, m_size ) )
+    if( ( err = FT_Set_Pixel_Sizes( m_face, 0, m_size ) ) )
     {
         msg_Warn( getIntf(), "cannot set a pixel size of %d for %s (%s)",
                   m_size, m_name.c_str(), ft2_strerror(err) );
