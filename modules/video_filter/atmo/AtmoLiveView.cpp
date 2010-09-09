@@ -7,6 +7,9 @@
  *
  * $Id$
  */
+
+#define __STDC_FORMAT_MACROS 1
+
 #include "AtmoDefs.h"
 #include "AtmoLiveView.h"
 #include "AtmoOutputFilter.h"
@@ -19,8 +22,6 @@
 #endif
 
 #include "AtmoExternalCaptureInput.h"
-
-
 
 #if defined(_ATMO_VLC_PLUGIN_)
 
@@ -92,7 +93,7 @@ DWORD CAtmoLiveView::Execute(void)
         if( frameDelay > 0 )
             do_sleep( frameDelay );
 #if defined(_ATMO_VLC_PLUGIN_)
-        msg_Dbg( m_pAtmoThread, "First Packet got %d ms", (get_time - t) / 1000  );
+        msg_Dbg( m_pAtmoThread, "First Packet got %"PRId64" ms", (get_time - t) / 1000  );
 #endif
     }
 
@@ -133,7 +134,7 @@ DWORD CAtmoLiveView::Execute(void)
                     if( frameDelay > 0 )
                         do_sleep( frameDelay );
 #if defined(_ATMO_VLC_PLUGIN_)
-                    msg_Dbg( m_pAtmoThread, "got delayed packet %d ms", (mdate() - t) / 1000  );
+                    msg_Dbg( m_pAtmoThread, "got delayed packet %"PRId64" ms", (mdate() - t) / 1000  );
 #endif
                     continue;
                 }
