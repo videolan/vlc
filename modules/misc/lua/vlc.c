@@ -82,6 +82,9 @@
 #define TELNETPWD_LONGTEXT N_( "A single administration password is used " \
     "to protect this interface. The default value is \"admin\"." )
 #define TELNETPWD_DEFAULT "admin"
+#define RCHOST_TEXT N_("TCP command input")
+#define RCHOST_LONGTEXT N_("Accept commands over a socket rather than stdin. " \
+            "You can set the address and port the interface will bind to." )
 
 static int vlc_sd_probe_Open( vlc_object_t * );
 
@@ -106,6 +109,8 @@ vlc_module_begin ()
             add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, true )
             add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  true )
             add_bool   ( "http-index", false, NULL, INDEX_TEXT, INDEX_LONGTEXT, true )
+        set_section( N_("Lua RC"), 0 )
+            add_string( "rc-host", NULL, NULL, RCHOST_TEXT, RCHOST_LONGTEXT, true )
         set_section( N_("Lua Telnet"), 0 )
             add_string( "telnet-host", "localhost", NULL, TELNETHOST_TEXT,
                         TELNETHOST_LONGTEXT, true )

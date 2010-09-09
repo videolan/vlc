@@ -273,6 +273,18 @@ int Open_LuaIntf( vlc_object_t *p_this )
             free( psz_telnet_passwd );
             free( psz_telnet_host );
         }
+        else if( !strcmp( psz_name, "rc" ) )
+        {
+            char *psz_rc_host = var_CreateGetNonEmptyString( p_intf, "rc-host" );
+            if( psz_rc_host )
+            {
+                char *psz_esc_host = config_StringEscape( psz_rc_host );
+                asprintf( &psz_config, "rc={host='%s'}", psz_esc_host );
+
+                free( psz_esc_host );
+                free( psz_rc_host );
+            }
+        }
     }
 
     if( psz_config )
