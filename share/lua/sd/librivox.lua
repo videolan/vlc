@@ -26,6 +26,7 @@ function descriptor()
     return { title = 'librivox' }
 end
 
+-- Transform a duration 'mm:ss' or 'hh::mm::ss' into an integer
 function string_2_duration(str)
     local index = string.find( str, ':' )
     if( index == nil ) then return str
@@ -41,27 +42,32 @@ end
 
 function main()
     local podcast = simplexml.parse_url( 'http://librivox.org/podcast.xml' )
-
     simplexml.add_name_maps( podcast )
+
     local channel = podcast.children_map['channel'][1]
     local arturl = ''
     local books = {}
 
     for _, item in ipairs( channel.children ) do
-        if( item.name == 'item' )
-        then
+        if( item.name == 'item' ) then
             simplexml.add_name_maps( item )
+
+            -- If the book title is unknown, create a node for it in the sd
             local book_title = item.children_map['itunes:subtitle'][1].children[1]
-            if(books[book_title] == nil) then
-                books[book_title] = vlc.sd.add_node( { title = book_title } )
+            if( books[book_title] == nil ) then
+                books[book_title] = vlc.sd.add_node( { title = book_title,
+                                                       arturl = arturl } )
             end
+
+            -- Add the new chapter to the book
             books[book_title]:add_subitem( { path = item.children_map['link'][1].children[1],
                                              title = item.children_map['title'][1].children[1],
                                              album = item.children_map['itunes:subtitle'][1].children[1],
+                                             artist = item.children_map['itunes:author'][1].children[1],
                                              duration = string_2_duration( item.children_map['itunes:duration'][1].children[1] ),
                                              arturl = arturl } )
-        elseif( item.name == 'itunes:image' )
-        then
+
+        elseif( item.name == 'itunes:image' ) then
             arturl = item.attributes['href']
         end
     end
