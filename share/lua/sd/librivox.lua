@@ -45,16 +45,21 @@ function main()
     simplexml.add_name_maps( podcast )
     local channel = podcast.children_map['channel'][1]
     local arturl = ''
+    local books = {}
 
     for _, item in ipairs( channel.children ) do
         if( item.name == 'item' )
         then
             simplexml.add_name_maps( item )
-            local new_item = vlc.sd.add_item( { path = item.children_map['link'][1].children[1],
-                                                title = item.children_map['title'][1].children[1],
-                                                album = item.children_map['itunes:subtitle'][1].children[1],
-                                                duration = string_2_duration( item.children_map['itunes:duration'][1].children[1] ),
-                                                arturl = arturl } )
+            local book_title = item.children_map['itunes:subtitle'][1].children[1]
+            if(books[book_title] == nil) then
+                books[book_title] = vlc.sd.add_node( { title = book_title } )
+            end
+            books[book_title]:add_subitem( { path = item.children_map['link'][1].children[1],
+                                             title = item.children_map['title'][1].children[1],
+                                             album = item.children_map['itunes:subtitle'][1].children[1],
+                                             duration = string_2_duration( item.children_map['itunes:duration'][1].children[1] ),
+                                             arturl = arturl } )
         elseif( item.name == 'itunes:image' )
         then
             arturl = item.attributes['href']
