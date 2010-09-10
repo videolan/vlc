@@ -28,7 +28,6 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <X11/Xlib.h>
-#include <limits.h>
 
 #include "x11_factory.hpp"
 #include "x11_display.hpp"
