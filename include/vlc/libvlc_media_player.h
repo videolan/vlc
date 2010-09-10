@@ -96,6 +96,18 @@ typedef enum libvlc_video_marquee_option_t {
 } libvlc_video_marquee_option_t;
 
 /**
+ * Navigation mode
+ */
+typedef enum libvlc_navigate_mode_t
+{
+    libvlc_navigate_activate = 0,
+    libvlc_navigate_up,
+    libvlc_navigate_down,
+    libvlc_navigate_left,
+    libvlc_navigate_right,
+} libvlc_navigate_mode_t;
+
+/**
  * Create an empty Media Player object
  *
  * \param p_libvlc_instance the libvlc instance in which the Media Player
@@ -549,7 +561,15 @@ VLC_PUBLIC_API int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi );
  */
 VLC_PUBLIC_API void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi );
 
-
+/**
+ * Navigate through DVD Menu
+ *
+ * \param p_mi the Media Player
+ * \param navigate the Navigation mode
+ * \version libVLC 1.2.0 or later
+ */
+VLC_PUBLIC_API void libvlc_media_player_navigate( libvlc_media_player_t* p_mi,
+						  unsigned navigate );
 
 /**
  * Release (free) libvlc_track_description_t
