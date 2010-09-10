@@ -208,11 +208,6 @@ void X11Factory::getMousePos( int &rXPos, int &rYPos ) const
 
 void X11Factory::rmDir( const string &rPath )
 {
-    struct
-    {
-        struct dirent ent;
-        char buf[NAME_MAX + 1];
-    } buf;
     struct dirent *file;
     DIR *dir;
 
@@ -220,7 +215,7 @@ void X11Factory::rmDir( const string &rPath )
     if( !dir ) return;
 
     // Parse the directory and remove everything it contains
-    while( readdir_r( dir, &buf.ent, &file ) == 0 && file != NULL )
+    while( (file = readdir( dir )) )
     {
         struct stat statbuf;
         string filename = file->d_name;
@@ -233,7 +228,7 @@ void X11Factory::rmDir( const string &rPath )
 
         filename = rPath + "/" + filename;
 
-        if( !stat( filename.c_str(), &statbuf ) && S_ISDIR(statbuf.st_mode) )
+        if( !stat( filename.c_str(), &statbuf ) && statbuf.st_mode & S_IFDIR )
         {
             rmDir( filename );
         }
