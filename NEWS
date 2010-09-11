@@ -38,6 +38,7 @@ Audio Filter:
 Video Filter:
  * New gradfun filter for debanding videos using dithering
  * Rewrite of the grain filter, faster and with better quality
+ * New posterize filter for lowering the number of colors
 
 Stream output:
  * New livehttp-module for HTTP Live Streamin (iphone-stuff),

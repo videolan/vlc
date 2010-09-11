@@ -1113,6 +1113,7 @@ modules/video_filter/opencv_example.c
 modules/video_filter/opencv_wrapper.c
 modules/video_filter/osdmenu.c
 modules/video_filter/panoramix.c
+modules/video_filter/posterize.c
 modules/video_filter/postproc.c
 modules/video_filter/psychedelic.c
 modules/video_filter/puzzle.c

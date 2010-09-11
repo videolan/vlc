@@ -22,6 +22,7 @@ SOURCES_remoteosd = remoteosd.c remoteosd_rfbproto.h
 SOURCES_magnify = magnify.c
 SOURCES_wave = wave.c
 SOURCES_ripple = ripple.c
+SOURCES_posterize = posterize.c
 SOURCES_psychedelic = psychedelic.c
 SOURCES_gradient = gradient.c
 SOURCES_ball = ball.c
@@ -104,6 +105,7 @@ libvlc_LTLIBRARIES += \
 	libmotionblur_plugin.la \
 	libmotiondetect_plugin.la \
 	libnoise_plugin.la \
+	libposterize_plugin.la \
 	libpsychedelic_plugin.la \
 	libpuzzle_plugin.la \
 	libripple_plugin.la \
