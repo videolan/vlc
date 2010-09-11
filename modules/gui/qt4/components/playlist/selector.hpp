@@ -29,20 +29,16 @@
 # include "config.h"
 #endif
 
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
-#include <QStyledItemDelegate>
-#include <QPainter>
-#include <QPushButton>
-#include <QLabel>
-#include <QHBoxLayout>
-#include "util/customwidgets.hpp"
-
-#include <vlc_playlist.h>
-
 #include "qt4.hpp"
+#include "util/customwidgets.hpp" /* QVLCFramelessButton */
 
+#include <QTreeWidget>
+
+class QHBoxLayout;
+class QPainter;
+class QTreeWidgetItem;
 class PlaylistWidget;
+class QLabel;
 
 enum SelectorItemType {
     CATEGORY_TYPE,
@@ -57,13 +53,13 @@ enum SpecialData {
 };
 
 enum {
-    TYPE_ROLE = Qt::UserRole,
-    NAME_ROLE, //QString
-    LONGNAME_ROLE, //QString
-    PL_ITEM_ROLE, //playlist_item_t*
-    PL_ITEM_ID_ROLE, //playlist_item_t->i_id
-    IN_ITEM_ROLE, //input_item_t->i_id
-    SPECIAL_ROLE //SpecialData
+    TYPE_ROLE = Qt::UserRole + 1,
+    NAME_ROLE,           //QString
+    LONGNAME_ROLE,       //QString
+    PL_ITEM_ROLE,        //playlist_item_t*
+    PL_ITEM_ID_ROLE,     //playlist_item_t->i_id
+    IN_ITEM_ROLE,        //input_item_t->i_id
+    SPECIAL_ROLE         //SpecialData
 };
 
 enum ItemAction {
@@ -74,11 +70,8 @@ enum ItemAction {
 
 class SelectorActionButton : public QVLCFramelessButton
 {
-public:
-    SelectorActionButton( QWidget *parent = NULL )
-        : QVLCFramelessButton( parent ) {}
-private:
-    void paintEvent( QPaintEvent * );
+protected:
+    virtual void paintEvent( QPaintEvent * );
 };
 
 class PLSelItem : public QWidget
@@ -86,20 +79,27 @@ class PLSelItem : public QWidget
     Q_OBJECT
 public:
     PLSelItem( QTreeWidgetItem*, const QString& );
-    void setText( const QString& );
+
+    void setText( const QString& text ) { lbl->setText( text ); }
+    const QString text() { return lbl->text(); }
+
     void addAction( ItemAction, const QString& toolTip = 0 );
     QTreeWidgetItem *treeItem() { return qitem; }
-    QString text() { return lbl->text(); }
+
 public slots:
-    void showAction();
-    void hideAction();
+    void showAction() { if( lblAction ) lblAction->show();  }
+    void hideAction() { if( lblAction ) lblAction->hide(); }
+
 private slots:
     void triggerAction() { emit action( this ); }
+
 signals:
     void action( PLSelItem* );
+
 private:
-    void enterEvent( QEvent* );
-    void leaveEvent( QEvent* );
+    inline void enterEvent( QEvent* ){ showAction(); }
+    inline void leaveEvent( QEvent* ){ hideAction(); }
+
     QTreeWidgetItem* qitem;
     QVLCFramelessButton *lblAction;
     QLabel *lbl;
@@ -116,20 +116,24 @@ public:
     virtual ~PLSelector();
 protected:
     friend class PlaylistWidget;
+
 private:
+    void createItems();
+    PLSelItem * addItem ( SelectorItemType type, const char* str,
+            bool drop = false, QTreeWidgetItem* parentItem = 0 );
+    PLSelItem * addPodcastItem( playlist_item_t *p_item );
+
+    inline PLSelItem * itemWidget( QTreeWidgetItem * );
+    void drawBranches ( QPainter *, const QRect &, const QModelIndex & ) const;
+
     QStringList mimeTypes () const;
     bool dropMimeData ( QTreeWidgetItem *, int, const QMimeData *, Qt::DropAction );
     void dragMoveEvent ( QDragMoveEvent * event );
-    void createItems();
-    void drawBranches ( QPainter *, const QRect &, const QModelIndex & ) const;
-    PLSelItem * addItem (
-        SelectorItemType type, const char* str, bool drop,
-        QTreeWidgetItem* parentItem = 0 );
-    PLSelItem * addPodcastItem( playlist_item_t *p_item );
-    inline PLSelItem * itemWidget( QTreeWidgetItem * );
-    intf_thread_t *p_intf;
-    QTreeWidgetItem *podcastsParent;
-    int podcastsParentId;
+
+    intf_thread_t    *p_intf;
+    QTreeWidgetItem  *podcastsParent;
+    int               podcastsParentId;
+
 private slots:
     void setSource( QTreeWidgetItem *item );
     void plItemAdded( int, int );

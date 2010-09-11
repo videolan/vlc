@@ -26,20 +26,18 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
-#include "components/playlist/selector.hpp"
-#include "playlist_model.hpp"
 #include "qt4.hpp"
-#include "dialogs_provider.hpp"
-#include "playlist.hpp"
-#include "util/customwidgets.hpp"
+#include "components/playlist/selector.hpp"
+#include "playlist_model.hpp"                /* plMimeData */
+#include "input_manager.hpp"                 /* MainInputManager, for podcast */
 
-#include <QVBoxLayout>
-#include <QHeaderView>
-#include <QMimeData>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QMimeData>
+#include <QDragMoveEvent>
+#include <QTreeWidgetItem>
+#include <QHBoxLayout>
+#include <QPainter>
 
 #include <vlc_playlist.h>
 #include <vlc_services_discovery.h>
@@ -61,15 +59,12 @@ void SelectorActionButton::paintEvent( QPaintEvent *event )
 PLSelItem::PLSelItem ( QTreeWidgetItem *i, const QString& text )
     : qitem(i), lblAction( NULL)
 {
-    layout = new QHBoxLayout();
+    layout = new QHBoxLayout( this );
     layout->setContentsMargins(0,0,0,0);
     layout->addSpacing( 3 );
 
     lbl = new QVLCElidingLabel( text );
-
     layout->addWidget(lbl, 1);
-
-    setLayout( layout );
 
     int height = qMax( 22, fontMetrics().height() + 8 );
     setMinimumHeight( height );
@@ -101,33 +96,29 @@ void PLSelItem::addAction( ItemAction act, const QString& tooltip )
     CONNECT( lblAction, clicked(), this, triggerAction() );
 }
 
-void PLSelItem::showAction() { if( lblAction ) lblAction->show(); }
-
-void PLSelItem::hideAction() { if( lblAction ) lblAction->hide(); }
-
-void PLSelItem::setText( const QString& text ) { lbl->setText( text ); }
-
-void PLSelItem::enterEvent( QEvent *ev ){ showAction(); }
-
-void PLSelItem::leaveEvent( QEvent *ev ){ hideAction(); }
 
 PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
            : QTreeWidget( p ), p_intf(_p_intf)
 {
+    /* Properties */
     setFrameStyle( QFrame::NoFrame );
     viewport()->setAutoFillBackground( false );
     setIconSize( QSize( 24,24 ) );
     setIndentation( 12 );
-    header()->hide();
+    setHeaderHidden( true );
     setRootIsDecorated( true );
     setAlternatingRowColors( false );
-    podcastsParent = NULL;
-    podcastsParentId = -1;
 
+    /* drops */
     viewport()->setAcceptDrops(true);
     setDropIndicatorShown(true);
     invisibleRootItem()->setFlags( invisibleRootItem()->flags() & ~Qt::ItemIsDropEnabled );
 
+    /* Podcasts */
+    podcastsParent = NULL;
+    podcastsParentId = -1;
+
+    /* Podcast connects */
     CONNECT( THEMIM, playlistItemAppended( int, int ),
              this, plItemAdded( int, int ) );
     CONNECT( THEMIM, playlistItemRemoved( int ),
@@ -164,6 +155,94 @@ PLSelector::~PLSelector()
     }
 }
 
+PLSelItem * putSDData( PLSelItem* item, const char* name, const char* longname )
+{
+    item->treeItem()->setData( 0, NAME_ROLE, qfu( name ) );
+    item->treeItem()->setData( 0, LONGNAME_ROLE, qfu( longname ) );
+    return item;
+}
+
+PLSelItem * putPLData( PLSelItem* item, playlist_item_t* plItem )
+{
+    item->treeItem()->setData( 0, PL_ITEM_ROLE, QVariant::fromValue( plItem ) );
+/*    item->setData( 0, PL_ITEM_ID_ROLE, plItem->i_id );
+    item->setData( 0, IN_ITEM_ROLE, QVariant::fromValue( (void*) plItem->p_input ) ); );*/
+    return item;
+}
+
+void PLSelector::createItems()
+{
+    /* PL */
+    PLSelItem *pl = putPLData( addItem( PL_ITEM_TYPE, "Playlist", true ),
+                              THEPL->p_playing );
+    pl->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PL ) );
+
+    /* ML */
+    PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, "Media Library", true ),
+                              THEPL->p_media_library );
+    ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
+
+    /* SD nodes */
+    QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, "My Computer" )->treeItem();
+    QTreeWidgetItem *devices = addItem( CATEGORY_TYPE, "Devices" )->treeItem();
+    QTreeWidgetItem *lan = addItem( CATEGORY_TYPE, "Local Network" )->treeItem();
+    QTreeWidgetItem *internet = addItem( CATEGORY_TYPE, "Internet" )->treeItem();
+
+    /* SD subnodes */
+    char **ppsz_longnames;
+    int *p_categories;
+    char **ppsz_names = vlc_sd_GetNames( THEPL, &ppsz_longnames, &p_categories );
+    if( !ppsz_names )
+        return;
+
+    char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
+    int *p_category = p_categories;
+    for( ; *ppsz_name; ppsz_name++, ppsz_longname++, p_category++ )
+    {
+        //msg_Dbg( p_intf, "Adding a SD item: %s", *ppsz_longname );
+
+        PLSelItem *selItem;
+        switch( *p_category )
+        {
+        case SD_CAT_INTERNET:
+            {
+            selItem = addItem( SD_TYPE, *ppsz_longname, false, internet );
+            if( !strncmp( *ppsz_name, "podcast", 7 ) )
+            {
+                selItem->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PODCAST ) );
+                selItem->addAction( ADD_ACTION, qtr( "Subscribe to a podcast" ) );
+                CONNECT( selItem, action( PLSelItem* ), this, podcastAdd( PLSelItem* ) );
+                podcastsParent = selItem->treeItem();
+            }
+            }
+            break;
+        case SD_CAT_DEVICES:
+            selItem = addItem( SD_TYPE, *ppsz_longname, false, devices );
+            break;
+        case SD_CAT_LAN:
+            selItem = addItem( SD_TYPE, *ppsz_longname, false, lan );
+            break;
+        case SD_CAT_MYCOMPUTER:
+            selItem = addItem( SD_TYPE, *ppsz_longname, false, mycomp );
+            break;
+        default:
+            selItem = addItem( SD_TYPE, *ppsz_longname );
+        }
+
+        putSDData( selItem, *ppsz_name, *ppsz_longname );
+        free( *ppsz_name );
+        free( *ppsz_longname );
+    }
+    free( ppsz_names );
+    free( ppsz_longnames );
+    free( p_categories );
+
+    if( mycomp->childCount() == 0 ) delete mycomp;
+    if( devices->childCount() == 0 ) delete devices;
+    if( lan->childCount() == 0 ) delete lan;
+    if( internet->childCount() == 0 ) delete internet;
+}
+
 void PLSelector::setSource( QTreeWidgetItem *item )
 {
     if( !item )
@@ -183,13 +262,17 @@ void PLSelector::setSource( QTreeWidgetItem *item )
             playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) );
     }
 
+    /* */
     playlist_Lock( THEPL );
-
     playlist_item_t *pl_item = NULL;
 
     if( i_type == SD_TYPE )
     {
-        pl_item = playlist_ChildSearchName( THEPL->p_root, qtu( item->data(0, LONGNAME_ROLE ).toString() ) );
+        /* Find the right item for the SD */
+        pl_item = playlist_ChildSearchName( THEPL->p_root,
+                      qtu( item->data(0, LONGNAME_ROLE ).toString() ) );
+
+        /* Podcasts */
         if( item->data( 0, SPECIAL_ROLE ).toInt() == IS_PODCAST )
         {
             if( pl_item && !sd_loaded )
@@ -206,16 +289,18 @@ void PLSelector::setSource( QTreeWidgetItem *item )
 
     playlist_Unlock( THEPL );
 
+    /* */
     if( pl_item )
-       emit activated( pl_item );
+        emit activated( pl_item );
 }
 
 PLSelItem * PLSelector::addItem (
-  SelectorItemType type, const char* str, bool drop,
-  QTreeWidgetItem* parentItem )
+    SelectorItemType type, const char* str, bool drop,
+    QTreeWidgetItem* parentItem )
 {
   QTreeWidgetItem *item = parentItem ?
       new QTreeWidgetItem( parentItem ) : new QTreeWidgetItem( this );
+
   PLSelItem *selItem = new PLSelItem( item, qtr( str ) );
   setItemWidget( item, 0, selItem );
   item->setData( 0, TYPE_ROLE, (int)type );
@@ -224,111 +309,20 @@ PLSelItem * PLSelector::addItem (
   return selItem;
 }
 
-PLSelItem * putSDData( PLSelItem* item, const char* name, const char* longname )
-{
-    item->treeItem()->setData( 0, NAME_ROLE, qfu( name ) );
-    item->treeItem()->setData( 0, LONGNAME_ROLE, qfu( longname ) );
-    return item;
-}
-
-PLSelItem * putPLData( PLSelItem* item, playlist_item_t* plItem )
-{
-    item->treeItem()->setData( 0, PL_ITEM_ROLE, QVariant::fromValue( plItem ) );
-/*    item->setData( 0, PL_ITEM_ID_ROLE, plItem->i_id );
-    item->setData( 0, IN_ITEM_ROLE, QVariant::fromValue( (void*) plItem->p_input ) ); );*/
-    return item;
-}
-
 PLSelItem *PLSelector::addPodcastItem( playlist_item_t *p_item )
 {
     vlc_gc_incref( p_item->p_input );
+
     char *psz_name = input_item_GetName( p_item->p_input );
-    PLSelItem *item = addItem(
-            PL_ITEM_TYPE,  psz_name, false, podcastsParent );
+    PLSelItem *item = addItem( PL_ITEM_TYPE,  psz_name, false, podcastsParent );
+    free( psz_name );
+
     item->addAction( RM_ACTION, qtr( "Remove this podcast subscription" ) );
     item->treeItem()->setData( 0, PL_ITEM_ROLE, QVariant::fromValue( p_item ) );
     item->treeItem()->setData( 0, PL_ITEM_ID_ROLE, QVariant(p_item->i_id) );
     item->treeItem()->setData( 0, IN_ITEM_ROLE, QVariant::fromValue( p_item->p_input ) );
     CONNECT( item, action( PLSelItem* ), this, podcastRemove( PLSelItem* ) );
-    free( psz_name );
     return item;
-}
-
-void PLSelector::createItems()
-{
-    PLSelItem *pl = putPLData( addItem( PL_ITEM_TYPE, "Playlist", true ),
-                              THEPL->p_playing );
-    pl->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PL ) );
-
-    PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, "Media Library", true ),
-                              THEPL->p_media_library );
-    ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
-
-    QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, "My Computer",
-                                        false )->treeItem();
-    QTreeWidgetItem *devices = addItem( CATEGORY_TYPE, "Devices",
-                                        false )->treeItem();
-    QTreeWidgetItem *lan = addItem( CATEGORY_TYPE, "Local Network",
-                                    false )->treeItem();
-    QTreeWidgetItem *internet = addItem( CATEGORY_TYPE, "Internet",
-                                          false )->treeItem();;
-
-    char **ppsz_longnames;
-    int *p_categories;
-    char **ppsz_names = vlc_sd_GetNames( THEPL, &ppsz_longnames, &p_categories );
-    if( !ppsz_names )
-        return;
-
-    char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
-    int *p_category = p_categories;
-    for( ; *ppsz_name; ppsz_name++, ppsz_longname++, p_category++ )
-    {
-        //msg_Dbg( p_intf, "Adding a SD item: %s", *ppsz_longname );
-
-        if( *p_category == SD_CAT_INTERNET )
-        {
-            PLSelItem *selItem = addItem( SD_TYPE, *ppsz_longname, false, internet );
-            putSDData( selItem, *ppsz_name, *ppsz_longname );
-            if( !strncmp( *ppsz_name, "podcast", 7 ) )
-            {
-                selItem->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PODCAST ) );
-                selItem->addAction( ADD_ACTION, qtr( "Subscribe to a podcast" ) );
-                CONNECT( selItem, action( PLSelItem* ), this, podcastAdd( PLSelItem* ) );
-                podcastsParent = selItem->treeItem();
-            }
-        }
-        else if( *p_category == SD_CAT_DEVICES )
-        {
-            putSDData( addItem( SD_TYPE, *ppsz_longname, false, devices ),
-                       *ppsz_name, *ppsz_longname );
-        }
-        else if( *p_category == SD_CAT_LAN )
-        {
-            putSDData( addItem( SD_TYPE, *ppsz_longname, false, lan ),
-                       *ppsz_name, *ppsz_longname );
-        }
-        else if( *p_category == SD_CAT_MYCOMPUTER )
-        {
-            putSDData( addItem( SD_TYPE, *ppsz_longname, false, mycomp ),
-                       *ppsz_name, *ppsz_longname );
-        }
-        else
-        {
-            putSDData( addItem( SD_TYPE, *ppsz_longname, false ),
-                       *ppsz_name, *ppsz_longname );
-        }
-
-        free( *ppsz_name );
-        free( *ppsz_longname );
-    }
-    free( ppsz_names );
-    free( ppsz_longnames );
-    free( p_categories );
-
-    if( mycomp->childCount() == 0 ) delete mycomp;
-    if( devices->childCount() == 0 ) delete devices;
-    if( lan->childCount() == 0 ) delete lan;
-    if( internet->childCount() == 0 ) delete internet;
 }
 
 QStringList PLSelector::mimeTypes() const
@@ -339,15 +333,16 @@ QStringList PLSelector::mimeTypes() const
 }
 
 bool PLSelector::dropMimeData ( QTreeWidgetItem * parent, int index,
-  const QMimeData * data, Qt::DropAction action )
+    const QMimeData * data, Qt::DropAction action )
 {
     if( !parent ) return false;
 
     QVariant type = parent->data( 0, TYPE_ROLE );
     if( type == QVariant() ) return false;
-    int i_truth = parent->data( 0, SPECIAL_ROLE ).toInt();
 
+    int i_truth = parent->data( 0, SPECIAL_ROLE ).toInt();
     if( i_truth != IS_PL && i_truth != IS_ML ) return false;
+
     bool to_pl = ( i_truth == IS_PL );
 
     const PlMimeData *plMimeData = qobject_cast<const PlMimeData*>( data );
