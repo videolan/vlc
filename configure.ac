@@ -3589,6 +3589,17 @@ then
 fi
 
 dnl
+dnl  AudioQueue plugin
+dnl
+AC_ARG_ENABLE(audioqueue,
+  [  --enable-audioqueue       AudioQueue audio module (default disabled)])
+if test "${enable_audioqueue}" = "yes"
+then
+  VLC_ADD_PLUGIN([audioqueue])
+  VLC_ADD_LDFLAGS([audioqueue], [-Wl,-framework,AudioToolbox,-framework,CoreFoundation])
+fi
+
+dnl
 dnl  Roku HD1000 audio
 dnl
 AC_ARG_ENABLE(hd1000a,
