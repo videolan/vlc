@@ -201,7 +201,7 @@ static int vlclua_dialog_create( lua_State *L )
     lua_setfield( L, -2, "__dialog" );
     lua_pop( L, 1 );
 
-    extension_dialog_t **pp_dlg = lua_newuserdata( L, sizeof( void* ) );
+    extension_dialog_t **pp_dlg = lua_newuserdata( L, sizeof( extension_dialog_t* ) );
     *pp_dlg = p_dlg;
 
     if( luaL_newmetatable( L, "dialog" ) )
@@ -577,7 +577,7 @@ end_of_args:
     vlc_mutex_unlock( &p_dlg->lock );
 
     /* Create meta table */
-    extension_widget_t **pp_widget = lua_newuserdata( L, sizeof( void* ) );
+    extension_widget_t **pp_widget = lua_newuserdata( L, sizeof( extension_widget_t* ) );
     *pp_widget = p_widget;
     if( luaL_newmetatable( L, "widget" ) )
     {

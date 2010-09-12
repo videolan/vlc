@@ -246,7 +246,7 @@ static int vlclua_input_item_delete( lua_State *L )
 static int vlclua_input_item_get( lua_State *L, input_item_t *p_item )
 {
     vlc_gc_incref( p_item );
-    input_item_t **pp = lua_newuserdata( L, sizeof( void* ) );
+    input_item_t **pp = lua_newuserdata( L, sizeof( input_item_t* ) );
     *pp = p_item;
 
     if( luaL_newmetatable( L, "input_item" ) )
