@@ -241,6 +241,8 @@ static void I420_YUY2( filter_t *p_filter, picture_t *p_source,
             }
         }
     }
+#warning FIXME: converting widths % 16 but !widths % 32 is broken on altivec
+#if 0
     else if( !( ( p_filter->fmt_in.video.i_width % 16 ) |
                 ( p_filter->fmt_in.video.i_height % 4 ) ) )
     {
@@ -273,6 +275,7 @@ static void I420_YUY2( filter_t *p_filter, picture_t *p_source,
             }
         }
     }
+#endif
     else
     {
         /* Crap, use the C version */
