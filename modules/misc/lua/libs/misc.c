@@ -248,10 +248,12 @@ static int vlclua_action_id( lua_State *L )
  * Timer functions
  *****************************************************************************/
 static int vlclua_timer_schedule( lua_State *L );
+static int vlclua_timer_getoverrun( lua_State *L);
 
 static const luaL_Reg vlclua_timer_reg[] = {
-    { "schedule",   vlclua_timer_schedule },
-    { NULL,         NULL                  }
+    { "schedule",   vlclua_timer_schedule   },
+    { "getoverrun", vlclua_timer_getoverrun },
+    { NULL,         NULL                    }
 };
 
 typedef struct
@@ -273,6 +275,16 @@ static int vlclua_timer_schedule( lua_State *L )
 
     vlc_timer_schedule( (*pp_timer)->timer, b_relative, i_value, i_interval );
     return 0;
+}
+
+static int vlclua_timer_getoverrun( lua_State *L )
+{
+    vlclua_timer_t **pp_timer = (vlclua_timer_t**)luaL_checkudata(L, 1, "timer" );
+    if( !pp_timer || !*pp_timer )
+        luaL_error( L, "Can't get pointer to timer" );
+
+    lua_pushinteger( L, vlc_timer_getoverrun( (*pp_timer)->timer ) );
+    return 1;
 }
 
 static void vlclua_timer_callback( void *data )
