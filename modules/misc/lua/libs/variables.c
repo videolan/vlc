@@ -1,7 +1,7 @@
 /*****************************************************************************
  * variables.c: Generic lua<->vlc variables interface
  *****************************************************************************
- * Copyright (C) 2007-2008 the VideoLAN team
+ * Copyright (C) 2007-2010 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
@@ -257,7 +257,7 @@ int __vlclua_var_toggle_or_set( lua_State *L, vlc_object_t *p_obj,
         b_bool = !var_GetBool( p_obj, psz_name );
     else /* lua_gettop( L ) == 1 */
     {
-        b_bool = luaL_checkboolean( L, -1 )?true:false;
+        b_bool = luaL_checkboolean( L, -1 );
         lua_pop( L, 1 );
     }
 

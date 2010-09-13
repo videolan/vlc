@@ -1,7 +1,7 @@
 /*****************************************************************************
  * acl.c: Access list related functions
  *****************************************************************************
- * Copyright (C) 2007-2008 the VideoLAN team
+ * Copyright (C) 2007-2010 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
@@ -64,7 +64,7 @@ static const luaL_Reg vlclua_acl_reg[] = {
 static int vlclua_acl_create( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
-    bool b_allow = luaL_checkboolean( L, 1 ) ? true : false;
+    bool b_allow = luaL_checkboolean( L, 1 );
     vlc_acl_t *p_acl = ACL_Create( p_this, b_allow );
     return vlclua_acl_create_inner( L, p_acl );
 }
@@ -117,7 +117,7 @@ static int vlclua_acl_add_host( lua_State *L )
 {
     vlc_acl_t **pp_acl = (vlc_acl_t**)luaL_checkudata( L, 1, "acl" );
     const char *psz_ip = luaL_checkstring( L, 2 );
-    bool b_allow = luaL_checkboolean( L, 3 ) ? true : false;
+    bool b_allow = luaL_checkboolean( L, 3 );
     lua_pushinteger( L, ACL_AddHost( *pp_acl, psz_ip, b_allow ) );
     return 1;
 }
@@ -127,7 +127,7 @@ static int vlclua_acl_add_net( lua_State *L )
     vlc_acl_t **pp_acl = (vlc_acl_t**)luaL_checkudata( L, 1, "acl" );
     const char *psz_ip = luaL_checkstring( L, 2 );
     int i_len = luaL_checkint( L, 3 );
-    bool b_allow = luaL_checkboolean( L, 4 ) ? true : false;
+    bool b_allow = luaL_checkboolean( L, 4 );
     lua_pushinteger( L, ACL_AddNet( *pp_acl, psz_ip, i_len, b_allow ) );
     return 1;
 }
