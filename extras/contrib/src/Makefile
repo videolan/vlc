@@ -1329,7 +1329,11 @@ endif
 
 
 .caca: libcaca
+ifdef HAVE_DARWIN_OS
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-imlib2 --disable-doc --disable-ruby --disable-csharp --disable-cxx --disable-x11 && cd caca && make && make install)
+else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-imlib2 --disable-doc --disable-ruby --disable-csharp --disable-cxx && cd caca && make && make install)
+endif
 	touch $@
 
 CLEAN_FILE += .caca
