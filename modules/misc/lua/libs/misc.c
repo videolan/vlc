@@ -296,7 +296,7 @@ static void vlclua_timer_callback( void *data )
     if( lua_pcall( L, 0, 0, 0 ) )
     {
         const char *psz_err = lua_tostring( L, -1 );
-        fprintf( stderr, "Error while running the timer callback: %s\n", psz_err );
+        msg_Err( vlclua_get_this( L ), "Error while running the timer callback: '%s'", psz_err );
         lua_settop( L, 0 );
     }
 }
