@@ -200,6 +200,7 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
         3,  /* Logo of the band or performer. */
         2   /* Logo of the publisher (record company). */
     };
+    #define PI_COVER_SCORE_SIZE (sizeof (pi_cover_score) / sizeof (pi_cover_score[0]))
     int i_score = -1;
 
     // Try now to get embedded art
@@ -261,9 +262,13 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
                              p_attachment );
         free( psz_description );
 
-        if( pi_cover_score[p_apic->type()] > i_score )
+        unsigned i_pic_type = p_apic->type();
+        if( i_pic_type >= PI_COVER_SCORE_SIZE )
+            i_pic_type = 0; // Defaults to "Other"
+
+        if( pi_cover_score[i_pic_type] > i_score )
         {
-            i_score = pi_cover_score[p_apic->type()];
+            i_score = pi_cover_score[i_pic_type];
             char *psz_url;
             if( asprintf( &psz_url, "attachment://%s",
                           p_attachment->psz_name ) == -1 )
