@@ -531,7 +531,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     long int l_size;
     long int l_downloaded = 0;
     float f_progress;
-    char *psz_status = NULL;
+    char *psz_status;
     char *psz_downloaded = NULL;
     char *psz_size = NULL;
     char *psz_destfile = NULL;
@@ -632,13 +632,8 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     if( vlc_object_alive( p_udt ) &&
         !dialog_ProgressCancelled( p_progress ) )
     {
-        if( asprintf( &psz_status, _("%s\nDone %s (100.0%%)"),
-            p_update->release.psz_url, psz_size ) != -1 )
-        {
-            dialog_ProgressDestroy( p_progress );
-            p_progress = NULL;
-            free( psz_status );
-        }
+        dialog_ProgressDestroy( p_progress );
+        p_progress = NULL;
     }
     else
     {
