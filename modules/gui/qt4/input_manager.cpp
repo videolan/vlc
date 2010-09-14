@@ -81,7 +81,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
     artUrl       = "";
     p_input      = NULL;
     p_input_vbi  = NULL;
-    f_rate       = 1.;
+    f_rate       = 0.;
     p_item       = NULL;
     b_video      = false;
     timeA        = 0;
@@ -114,9 +114,7 @@ void InputManager::setInput( input_thread_t *_p_input )
         UpdateVout();
 
         p_item = input_GetItem( p_input );
-
-        var_SetFloat( p_input, "rate", f_rate );
-        emit rateChanged( f_rate );
+        emit rateChanged( var_GetFloat( p_input, "rate" ) );
     }
     else
     {
@@ -143,6 +141,7 @@ void InputManager::delInput()
     b_video              = false;
     timeA                = 0;
     timeB                = 0;
+    f_rate               = 0. ;
 
     if( p_input_vbi )
     {
