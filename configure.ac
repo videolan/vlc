@@ -2518,6 +2518,13 @@ AC_ARG_ENABLE(merge-ffmpeg,
 ])
 AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
 
+AC_CACHE_CHECK([if linker supports -Bsymbolic],
+  [ac_cv_ld_bsymbolic],
+  [LDFLAGS="${LDFLAGS_vlc} -Wl,-Bsymbolic"
+    AC_TRY_LINK([],,ac_cv_ld_bsymbolic=yes,ac_cv_ld_bsymbolic=no)
+    LDFLAGS="${LDFLAGS_save}"
+  ])
+
 dnl
 dnl  avcodec decoder/encoder plugin
 dnl
@@ -2533,6 +2540,9 @@ AS_IF([test "${enable_avcodec}" != "no"], [
       AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
       VLC_ADD_PLUGIN([avcodec])
       VLC_ADD_LIBS([avcodec],[$AVCODEC_LIBS])
+      AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
+        VLC_ADD_LDFLAGS([avcodec],[-Wl,-Bsymbolic])
+      ])
       VLC_ADD_CFLAGS([avcodec],[$AVCODEC_CFLAGS])
       VLC_RESTORE_FLAGS
       have_avcodec="yes"
@@ -2649,6 +2659,9 @@ then
         VLC_ADD_PLUGIN([avformat access_avio])
         VLC_ADD_LIBS([avformat access_avio],[$AVFORMAT_LIBS $AVUTIL_LIBS])
         VLC_ADD_CFLAGS([avformat access_avio],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
+        AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
+          VLC_ADD_LDFLAGS([avformat access_avio],[-Wl,-Bsymbolic])
+        ])
       ], [
         VLC_ADD_LIBS([avcodec],[$AVFORMAT_LIBS $AVUTIL_LIBS])
         VLC_ADD_CFLAGS([avcodec],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
@@ -2677,6 +2690,9 @@ then
       VLC_ADD_PLUGIN([swscale])
       VLC_ADD_LIBS([swscale],[$SWSCALE_LIBS])
       VLC_ADD_CFLAGS([swscale],[$SWSCALE_CFLAGS])
+      AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
+        VLC_ADD_LDFLAGS([swscale],[-Wl,-Bsymbolic])
+      ])
       VLC_RESTORE_FLAGS
     ],[
       AC_MSG_ERROR([Could not find libswscale. Use --disable-swscale to ignore this error. Proper software scaling and some video chroma conversion will be missing.])
@@ -2996,12 +3012,6 @@ if test "${enable_x264}" != "no"; then
         VLC_ADD_PLUGIN([x264])
         VLC_ADD_LDFLAGS([x264],[${X264_LIBS}])
 
-        AC_CACHE_CHECK([if linker supports -Bsymbolic],
-          [ac_cv_ld_bsymbolic],
-          [LDFLAGS="${LDFLAGS_vlc} -Wl,-Bsymbolic"
-            AC_TRY_LINK([],,ac_cv_ld_bsymbolic=yes,ac_cv_ld_bsymbolic=no)
-            LDFLAGS="${LDFLAGS_save}"
-          ])
         AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
           VLC_ADD_LDFLAGS([x264],[-Wl,-Bsymbolic])
         ])
