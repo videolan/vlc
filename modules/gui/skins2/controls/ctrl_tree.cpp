@@ -512,6 +512,9 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                 it->m_selected = (*it).m_selected || select;
                 select = nextSelect;
             }
+            // Redraw the control
+            makeImage();
+            notifyLayout();
         }
         else if( rEvent.getAsString().find( "mouse:left:down:ctrl" ) !=
                  string::npos )
@@ -523,6 +526,9 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                 it->m_selected = !it->m_selected;
                 m_pLastSelected = &*it;
             }
+            // Redraw the control
+            makeImage();
+            notifyLayout();
         }
         else if( rEvent.getAsString().find( "mouse:left:down:shift" ) !=
                  string::npos )
@@ -551,6 +557,9 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                 it->m_selected = select;
                 select = nextSelect;
             }
+            // Redraw the control
+            makeImage();
+            notifyLayout();
         }
         else if( rEvent.getAsString().find( "mouse:left:down" ) !=
                  string::npos )
@@ -585,8 +594,10 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                     }
                 }
             }
+            // Redraw the control
+            makeImage();
+            notifyLayout();
         }
-
         else if( rEvent.getAsString().find( "mouse:left:dblclick" ) !=
                  string::npos )
         {
@@ -596,10 +607,10 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                // Execute the action associated to this item
                m_rTree.action( &*it );
             }
+            // Redraw the control
+            makeImage();
+            notifyLayout();
         }
-        // Redraw the control
-        makeImage();
-        notifyLayout();
     }
 
     else if( rEvent.getAsString().find( "scroll" ) != string::npos )
