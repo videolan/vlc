@@ -52,6 +52,7 @@ $Id$
  * audio_format_neon: helper module for audio transcoding using NEON assembly
  * audiobargraph_a: audiobargraph audio plugin
  * audiobargraph_v: audiobargraph video plugin
+ * audioqueue: Audio Output based on AudioQueue API for iOS
  * audioscrobbler: AudioScrobbler/Last.fm submission plugin
  * auhal: Audio output for MacOS X based on the AUHAL API
  * avcodec: FFmpeg audio/video decoder

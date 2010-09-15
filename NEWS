@@ -29,6 +29,9 @@ Interfaces
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
 
+Audio Output:
+ * New audio output based on AudioQueue API for iOS
+
 Audio Filter:
  * New Compressor filter, a dynamic range compressor
 
