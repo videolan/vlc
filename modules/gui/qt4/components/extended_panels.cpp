@@ -138,6 +138,9 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER( extract )
     SETUP_VFILTER_OPTION( extractComponentText, textChanged( const QString& ) )
 
+    SETUP_VFILTER( posterize )
+    SETUP_VFILTER_OPTION( posterizeLevelSpin, valueChanged( int ) )
+
     SETUP_VFILTER( colorthres )
     SETUP_VFILTER_OPTION( colorthresColorText, textChanged( const QString& ) )
     SETUP_VFILTER_OPTION( colorthresSaturationthresSlider, valueChanged( int ) )
