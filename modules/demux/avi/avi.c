@@ -655,11 +655,11 @@ aviindex:
                 b_index = true;
                 goto aviindex;
             }
-            switch( dialog_Question( p_demux, _("AVI Index") ,
-               _( "This AVI file is broken. Seeking will not work correctly.\n"
-                  "Do you want to try to fix it?\n\n"
-                  "This might take a long time." ),
-                  _( "Repair" ), _( "Don't repair" ), _( "Cancel") ) )
+            switch( dialog_Question( p_demux, _("Broken AVI Index") ,
+               _( "Because this AVI file is broken, seeking will not work correctly.\n"
+                  "It can be fixed, but this step might take a long time.\n"
+                  "What do you want to do ?" ),
+                  _( "Repair and play" ), _( "Play as is" ), _( "Do not play") ) )
             {
                 case 1:
                     b_index = true;
