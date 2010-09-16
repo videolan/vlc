@@ -500,7 +500,7 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
               ( iframe << p_stream->i_granule_shift );
 
             p_stream->i_pcr = ( iframe + pframe - p_stream->i_keyframe_offset )
-	      * INT64_C(1000000) / p_stream->f_rate;
+              * INT64_C(1000000) / p_stream->f_rate;
         }
         else if( p_stream->fmt.i_codec == VLC_CODEC_DIRAC )
         {
@@ -977,12 +977,12 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 }
                 /* Check for Dirac header */
                 else if( ( oggpacket.bytes >= 5 &&
-			   ! memcmp( oggpacket.packet, "BBCD\x00", 5 ) ) ||
-			 ( oggpacket.bytes >= 9 &&
-			   ! memcmp( oggpacket.packet, "KW-DIRAC\x00", 9 ) ) )
-		{
-		    if( Ogg_ReadDiracHeader( p_stream, &oggpacket ) )
-		        msg_Dbg( p_demux, "found dirac header" );
+                           ! memcmp( oggpacket.packet, "BBCD\x00", 5 ) ) ||
+                         ( oggpacket.bytes >= 9 &&
+                           ! memcmp( oggpacket.packet, "KW-DIRAC\x00", 9 ) ) )
+                {
+                    if( Ogg_ReadDiracHeader( p_stream, &oggpacket ) )
+                        msg_Dbg( p_demux, "found dirac header" );
                     else
                     {
                         msg_Warn( p_demux, "found dirac header isn't decodable" );
