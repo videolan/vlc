@@ -230,7 +230,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
         p_object = vlc_object_hold(pl_Get( p_intf ));
 
     const char *psz_values;
-    NSString *preset = [NSString stringWithFormat:@"%.1f", [o_slider_band1 floatValue] ];
+    NSString *preset = [NSString stringWithFormat:@"%.1f ", [o_slider_band1 floatValue] ];
     preset = [preset stringByAppendingFormat:@"%.1f ", [o_slider_band2 floatValue] ];
     preset = [preset stringByAppendingFormat:@"%.1f ", [o_slider_band3 floatValue] ];
     preset = [preset stringByAppendingFormat:@"%.1f ", [o_slider_band4 floatValue] ];
