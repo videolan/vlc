@@ -311,8 +311,9 @@ DIR *vlc_opendir( const char *dirname )
  *
  * @param dir The directory that is being read
  *
- * @return a UTF-8 string of the directory entry.
- * Use free() to free this memory.
+ * @return a UTF-8 string of the directory entry. Use free() to release it.
+ * If there are no more entries in the directory, NULL is returned.
+ * If an error occurs, errno is set and NULL is returned.
  */
 char *vlc_readdir( DIR *dir )
 {
