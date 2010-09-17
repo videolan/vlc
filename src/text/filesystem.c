@@ -38,9 +38,6 @@
 
 #include <stdio.h>
 #include <limits.h> /* NAME_MAX */
-#if !defined(NAME_MAX) && defined(_POSIX_NAME_MAX)
-# define NAME_MAX _POSIX_NAME_MAX
-#endif
 #include <errno.h>
 #include <sys/types.h>
 #include <dirent.h>
@@ -324,19 +321,35 @@ char *vlc_readdir( DIR *dir )
 
     return FromWide (ent->d_name);
 #else
+    /* Beware that readdir_r() assumes <buf> is large enough to hold the result
+     * dirent including the file name. A buffer overflow could occur otherwise.
+     * In particular, pathconf() and _POSIX_NAME_MAX cannot be used here. */
     struct dirent *ent;
-    struct
+    char *path = NULL;
+
+    long len = fpathconf (dirfd (dir), _PC_NAME_MAX);
+    if (len == -1)
     {
-        struct dirent ent;
-        char buf[NAME_MAX + 1];
-    } buf;
-    int val = readdir_r (dir, &buf.ent, &ent);
-    if (val)
-    {
-        errno = val;
-        return NULL;
+#ifdef NAME_MAX
+        len = NAME_MAX;
+#else
+        errno = ENOMEM;
+        return NULL; // OS is broken. There is no sane way to fix this.
+#endif
     }
-    return ent ? vlc_fix_readdir( ent->d_name ) : NULL;
+    len += offsetof (struct dirent, d_name) + 1;
+
+    struct dirent *buf = malloc (len);
+    if (unlikely(buf == NULL))
+        return NULL;
+
+    int val = readdir_r (dir, buf, &ent);
+    if (val != 0)
+        errno = val;
+    else if (ent != NULL)
+        path = vlc_fix_readdir (ent->d_name);
+    free (buf);
+    return path;
 #endif
 }
 
