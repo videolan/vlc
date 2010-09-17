@@ -133,10 +133,15 @@ void libvlc_set_user_agent (libvlc_instance_t *p_i,
                             const char *name, const char *http)
 {
     libvlc_int_t *p_libvlc = p_i->p_libvlc_int;
+    char *str;
 
     var_SetString (p_libvlc, "user-agent", name);
-    if (http != NULL)
-        var_SetString (p_libvlc, "http-user-agent", http);
+    if ((http != NULL)
+     && (asprintf (&str, "%s LibVLC/"PACKAGE_VERSION, http) != -1))
+    {
+        var_SetString (p_libvlc, "http-user-agent", str);
+        free (str);
+    }
 }
 
 const char * libvlc_get_version(void)

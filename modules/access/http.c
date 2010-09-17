@@ -123,7 +123,7 @@ vlc_module_begin ()
     add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_safe()
-    add_string( "http-user-agent", PACKAGE_NAME"/"PACKAGE_VERSION, NULL,
+    add_string( "http-user-agent", NULL, NULL,
                 AGENT_TEXT, AGENT_LONGTEXT, true )
         change_safe()
         change_need_restart()
