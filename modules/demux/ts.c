@@ -3842,6 +3842,7 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pid_t *pid,
     switch( p_decoded->code[0].i_audio_type )
     {
     case 0:
+        pid->es->fmt.i_priority = 1; // prioritize normal audio tracks
         pid->es->fmt.psz_description = NULL;
         break;
     case 1:
