@@ -83,10 +83,6 @@ static void Close( vlc_object_t * );
     "Caching value for HTTP streams. This " \
     "value should be set in milliseconds." )
 
-#define AGENT_TEXT N_("HTTP user agent")
-#define AGENT_LONGTEXT N_("User agent that will be " \
-    "used for the connection.")
-
 #define RECONNECT_TEXT N_("Auto re-connect")
 #define RECONNECT_LONGTEXT N_( \
     "Automatically try to reconnect to the stream in case of a sudden " \
@@ -123,10 +119,9 @@ vlc_module_begin ()
     add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_safe()
-    add_string( "http-user-agent", NULL, NULL,
-                AGENT_TEXT, AGENT_LONGTEXT, true )
+    add_string( "http-user-agent", NULL, NULL, NULL, NULL, false )
         change_safe()
-        change_need_restart()
+        change_private()
     add_bool( "http-reconnect", false, NULL, RECONNECT_TEXT,
               RECONNECT_LONGTEXT, true )
     add_bool( "http-continuous", false, NULL, CONTINUOUS_TEXT,
