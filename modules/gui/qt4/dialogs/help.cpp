@@ -82,35 +82,28 @@ void HelpDialog::close()
 AboutDialog::AboutDialog( intf_thread_t *_p_intf)
             : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf )
 {
+    /* Build UI */
+    ui.setupUi( this );
+
     setWindowTitle( qtr( "About" ) );
     setWindowRole( "vlc-about" );
     resize( 600, 500 );
     setMinimumSize( 600, 500 );
     setWindowModality( Qt::WindowModal );
 
-    QGridLayout *layout = new QGridLayout( this );
-    QTabWidget *tab = new QTabWidget( this );
+    CONNECT( ui.closeButtonBox, rejected(), this, close() );
+    ui.closeButtonBox->setFocus();
 
-    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
-    closeButton->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
-    closeButton->setDefault( true );
-
-    QLabel *introduction = new QLabel(
+    ui.introduction->setText(
             qtr( "VLC media player" ) + qfu( " " VERSION_MESSAGE ) );
-    QLabel *iconVLC = new QLabel;
+
     if( QDate::currentDate().dayOfYear() >= 354 )
-        iconVLC->setPixmap( QPixmap( ":/logo/vlc48-christmas.png" ) );
+        ui.iconVLC->setPixmap( QPixmap( ":/logo/vlc128-christmas.png" ) );
     else
-        iconVLC->setPixmap( QPixmap( ":/logo/vlc48.png" ) );
-    layout->addWidget( iconVLC, 0, 0, 1, 1 );
-    layout->addWidget( introduction, 0, 1, 1, 7 );
-    layout->addWidget( tab, 1, 0, 1, 8 );
-    layout->addWidget( closeButton, 2, 6, 1, 2 );
+        ui.iconVLC->setPixmap( QPixmap( ":/logo/vlc128.png" ) );
 
     /* Main Introduction */
-    QWidget *infoWidget = new QWidget( this );
-    QHBoxLayout *infoLayout = new QHBoxLayout( infoWidget );
-    QLabel *infoLabel = new QLabel(
+    ui.infoLabel->setText(
             qtr( "VLC media player is a free media player, "
                 "encoder and streamer that can read from files, "
                 "CDs, DVDs, network streams, capture cards and even more!\n"
@@ -124,48 +117,15 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
             + qtr( "Copyright (C) " ) + COPYRIGHT_YEARS
             + qtr( " by the VideoLAN Team.\n" )
             + "vlc@videolan.org, http://www.videolan.org" );
-    infoLabel->setWordWrap( infoLabel );
-
-    QLabel *iconVLC2 = new QLabel;
-    if( QDate::currentDate().dayOfYear() >= 354 )
-        iconVLC2->setPixmap( QPixmap( ":/logo/vlc128-christmas.png" ) );
-    else
-        iconVLC2->setPixmap( QPixmap( ":/logo/vlc128.png" ) );
-    infoLayout->addWidget( iconVLC2 );
-    infoLayout->addWidget( infoLabel );
 
     /* GPL License */
-    QTextEdit *licenseEdit = new QTextEdit( this );
-    licenseEdit->setText( qfu( psz_license ) );
-    licenseEdit->setReadOnly( true );
+    ui.licenseEdit->setText( qfu( psz_license ) );
 
     /* People who helped */
-    QWidget *thanksWidget = new QWidget( this );
-    QVBoxLayout *thanksLayout = new QVBoxLayout( thanksWidget );
-
-    QLabel *thanksLabel = new QLabel( qtr( "We would like to thank the whole "
-                "VLC community, the testers, our users and the following people "
-                "(and the missing ones...) for their collaboration to "
-                "create the best free software." ) );
-    thanksLabel->setWordWrap( true );
-    thanksLayout->addWidget( thanksLabel );
-    QTextEdit *thanksEdit = new QTextEdit( this );
-    thanksEdit->setText( qfu( psz_thanks ) );
-    thanksEdit->setReadOnly( true );
-    thanksLayout->addWidget( thanksEdit );
+    ui.thanksEdit->setText( qfu( psz_thanks ) );
 
     /* People who wrote the software */
-    QTextEdit *authorsEdit = new QTextEdit( this );
-    authorsEdit->setText( qfu( psz_authors ) );
-    authorsEdit->setReadOnly( true );
-
-    /* add the tabs to the Tabwidget */
-    tab->addTab( infoWidget, qtr( "About" ) );
-    tab->addTab( authorsEdit, qtr( "Authors" ) );
-    tab->addTab( thanksWidget, qtr("Thanks") );
-    tab->addTab( licenseEdit, qtr("License") );
-
-    BUTTONACT( closeButton, close() );
+    ui.authorsEdit->setText( qfu( psz_authors ) );
 }
 
 AboutDialog::~AboutDialog()

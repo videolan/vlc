@@ -32,6 +32,7 @@
 
 #include "util/qvlcframe.hpp"
 #include "util/singleton.hpp"
+#include "ui/about.h"
 
 class QPushButton;
 class QTextBrowser;
@@ -61,6 +62,7 @@ class AboutDialog : public QVLCDialog, public Singleton<AboutDialog>
 private:
     AboutDialog( intf_thread_t * );
     virtual ~AboutDialog();
+    Ui::aboutWidget ui;
 
 public slots:
     void close();
