@@ -275,7 +275,7 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
                 fclose( fp );
                 return -1;
             }
-            val = fprintf( fp, "#EXTINF:%zu\n%s\n", p_sys->i_seglen, psz_name );
+            val = fprintf( fp, "#EXTINF:%zu,\n%s\n", p_sys->i_seglen, psz_name );
             free( psz_name );
             if ( val < 0 )
             {
