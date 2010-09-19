@@ -7,7 +7,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>772</width>
+    <width>758</width>
     <height>446</height>
    </rect>
   </property>
@@ -101,7 +101,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Display Settings</string>
+      <string>Subtitles effects</string>
      </property>
      <layout class="QGridLayout" rowstretch="0,0,0,0,0" columnstretch="0,0">
       <item row="3" column="1">

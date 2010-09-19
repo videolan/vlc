@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>816</width>
-    <height>626</height>
+    <width>699</width>
+    <height>615</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -57,14 +57,14 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="1" colspan="2">
+      <item row="8" column="1" colspan="2">
        <widget class="QComboBox" name="outputModule">
         <property name="maxVisibleItems">
          <number>15</number>
         </property>
        </widget>
       </item>
-      <item row="7" column="0">
+      <item row="8" column="0">
        <widget class="QLabel" name="voutLabel">
         <property name="text">
          <string>Output</string>
@@ -74,30 +74,24 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QCheckBox" name="overlay">
-        <property name="text">
-         <string>Accelerated video output (Overlay)</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="hwYUVBox">
-        <property name="text">
-         <string>Use hardware YUV-&gt;RGB conversions</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="2">
        <widget class="QCheckBox" name="windowDecorations">
         <property name="text">
          <string>Window decorations</string>
         </property>
-        <property name="checked">
-         <bool>true</bool>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QCheckBox" name="overlay">
+        <property name="text">
+         <string>Accelerated video output (Overlay)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QCheckBox" name="hwYUVBox">
+        <property name="text">
+         <string>Use hardware YUV-&gt;RGB conversions</string>
         </property>
        </widget>
       </item>
@@ -129,7 +123,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0" colspan="2">
+      <item row="0" column="0" colspan="3">
        <widget class="QCheckBox" name="wallpaperMode">
         <property name="text">
          <string>Enable wallpaper mode</string>
@@ -257,9 +251,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="2" colspan="3">
-       <widget class="QComboBox" name="snapshotsFormat"/>
-      </item>
       <item row="1" column="3" colspan="2">
        <widget class="QCheckBox" name="snapshotsSequentialNumbering">
         <property name="text">
@@ -283,6 +274,9 @@
         </property>
        </spacer>
       </item>
+      <item row="2" column="2">
+       <widget class="QComboBox" name="snapshotsFormat"/>
+      </item>
      </layout>
     </widget>
    </item>
@@ -291,10 +285,8 @@
  <tabstops>
   <tabstop>enableVideo</tabstop>
   <tabstop>fullscreen</tabstop>
-  <tabstop>overlay</tabstop>
   <tabstop>alwaysOnTop</tabstop>
   <tabstop>windowDecorations</tabstop>
-  <tabstop>hwYUVBox</tabstop>
   <tabstop>outputModule</tabstop>
   <tabstop>wallpaperMode</tabstop>
   <tabstop>dXdisplayDevice</tabstop>
@@ -305,8 +297,6 @@
   <tabstop>snapshotsDirectoryBrowse</tabstop>
   <tabstop>snapshotsPrefix</tabstop>
   <tabstop>snapshotsSequentialNumbering</tabstop>
-  <tabstop>snapshotsFormat</tabstop>
-  <tabstop>overlay</tabstop>
  </tabstops>
  <resources/>
  <connections/>
