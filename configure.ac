@@ -1920,6 +1920,11 @@ fi
 
 
 dnl
+dnl  Blu-ray Disc Support with libbluray
+dnl
+PKG_ENABLE_MODULES_VLC([BLURAY], [libbluray], [libbluray], (libbluray for Blu-ray disc support ) )
+
+dnl
 dnl  OpenCV wrapper and example filters
 dnl
 PKG_ENABLE_MODULES_VLC([OPENCV], [opencv_example], [opencv], (OpenCV (computer vision) filter), [off])
