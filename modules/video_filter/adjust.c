@@ -256,7 +256,7 @@ static picture_t *FilterPlanar( filter_t *p_filter, picture_t *p_pic )
         /* Fill the gamma lookup table */
         for( i = 0 ; i < 256 ; i++ )
         {
-          pi_gamma[ i ] = clip_uint8_vlc( pow(i / 255.0, f_gamma) * 255.0);
+            pi_gamma[ i ] = clip_uint8_vlc( pow(i / 255.0, f_gamma) * 255.0);
         }
 
         /* Fill the luma lookup table */
