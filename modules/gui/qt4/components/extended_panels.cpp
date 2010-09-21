@@ -1137,7 +1137,6 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
     smallFont.setPointSize( smallFont.pointSize() - 3 );
 
     QGridLayout *layout = new QGridLayout( this );
-    layout->setMargin( 0 );
 
     enableCheck = new QCheckBox( qtr( "Enable dynamic range compressor" ) );
     layout->addWidget( enableCheck, 0, 0, 1, NUM_CP_CTRL );
@@ -1292,7 +1291,6 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
     smallFont.setPointSize( smallFont.pointSize() - 3 );
 
     QGridLayout *layout = new QGridLayout( this );
-    layout->setMargin( 0 );
 
     enableCheck = new QCheckBox( qtr( "Enable spatializer" ) );
     layout->addWidget( enableCheck, 0, 0, 1, NUM_SP_CTRL );
