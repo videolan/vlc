@@ -616,7 +616,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
             if( p_sys->b_osd )
                 transcode_osd_close( p_stream, id );
             else
-                transcode_spu_close( id );
+                transcode_spu_close( p_stream, id );
             break;
         }
     }

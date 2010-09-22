@@ -107,7 +107,7 @@ bool transcode_osd_add    ( sout_stream_t *, es_format_t *, sout_stream_id_t *);
 /* SPU */
 
 int  transcode_spu_new    ( sout_stream_t *, sout_stream_id_t * );
-void transcode_spu_close  ( sout_stream_id_t * );
+void transcode_spu_close  ( sout_stream_t *, sout_stream_id_t * );
 int  transcode_spu_process( sout_stream_t *, sout_stream_id_t *,
                                    block_t *, block_t ** );
 bool transcode_spu_add    ( sout_stream_t *, es_format_t *, sout_stream_id_t *);
