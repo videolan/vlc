@@ -655,11 +655,14 @@ aviindex:
                 b_index = true;
                 goto aviindex;
             }
-            switch( dialog_Question( p_demux, _("Broken AVI Index") ,
-               _( "Because this AVI file is broken, seeking will not work correctly.\n"
-                  "It can be fixed, but this step might take a long time.\n"
+            switch( dialog_Question( p_demux, _("Broken or missing AVI Index") ,
+               _( "Because this AVI file index is broken or missing, "
+                  "seeking will not work correctly.\n"
+                  "VLC won't repair your file but can temporary fix this "
+                  "problem by building an index in memory.\n"
+                  "This step might take a long time on a large file.\n"
                   "What do you want to do ?" ),
-                  _( "Repair and play" ), _( "Play as is" ), _( "Do not play") ) )
+                  _( "Build index then play" ), _( "Play as is" ), _( "Do not play") ) )
             {
                 case 1:
                     b_index = true;
