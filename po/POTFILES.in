@@ -205,6 +205,7 @@ modules/access/bda/bdagraph.cpp
 modules/access/bda/bdagraph.h
 modules/access/cdda.c
 modules/access/dc1394.c
+modules/access/decklink.cpp
 modules/access/directory.c
 modules/access/dshow/common.h
 modules/access/dshow/crossbar.cpp

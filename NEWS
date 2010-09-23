@@ -17,6 +17,7 @@ Access
  * Support for VDR recordings
  * Blu-Ray integration with libbluray
  * HTTP Live Streaming (IETF draft) playback support
+ * Blackmagic DeckLink SDI card input support (Linux only currently)
 
 Codecs
  * You can now use ffmpeg-mt in conjunction with vlc

@@ -52,6 +52,7 @@ SOURCES_access_avio = avio.c avio.h
 SOURCES_access_attachment = attachment.c
 SOURCES_access_vdr = vdr.c
 SOURCES_libbluray = bluray.c
+SOURCES_decklink = decklink.cpp
 
 SOURCES_access_rar = rar/rar.c rar/rar.h rar/access.c
 SOURCES_stream_filter_rar = rar/rar.c rar/rar.h rar/stream.c

@@ -81,6 +81,7 @@ $Id$
  * cvdsub: CVD subtitles decoder
  * dbus: D-Bus control interface
  * dc1394: firewire input module
+ * decklink: input module to read from a Blackmagic SDI card
  * decomp: Decompression module
  * deinterlace: naive deinterlacing filter
  * demux_cdg: Demuxer for CD-G files (Karaoke)

@@ -2145,6 +2145,29 @@ then
 fi
 
 dnl
+dnl special access module for Blackmagic SDI cards
+dnl
+AC_ARG_ENABLE(decklink,
+  [  --enable-decklink       Blackmagic DeckLink SDI access module (default enabled)])
+if test "${enable_decklink}" != "no"
+then
+  AC_ARG_WITH(decklink_sdk,
+    [  --with-decklink-sdk=DIR      Location of Blackmagic DeckLink SDI SDK],[],[])
+  if test "${with_decklink_sdk}" != "no" -a -n "${with_decklink_sdk}"
+  then
+    VLC_ADD_CPPFLAGS([decklink],[-I${with_decklink_sdk}/include])
+  fi
+  CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_decklink}"
+  AC_LANG_PUSH(C++)
+  AC_CHECK_HEADERS(DeckLinkAPIDispatch.cpp, [
+    VLC_ADD_PLUGIN([decklink])
+  ],[AC_MSG_WARN(Blackmagic DeckLink SDI include files not found, decklink disabled)])
+  AC_LANG_POP(C++)
+  CPPFLAGS="${CPPFLAGS_save}"
+fi
+
+
+dnl
 dnl  gnomeVFS access module
 dnl
 PKG_ENABLE_MODULES_VLC([GNOMEVFS], [access_gnomevfs], [gnome-vfs-2.0], [GnomeVFS access module], [auto])
