@@ -33,6 +33,7 @@
 #include "util/qvlcframe.hpp"
 #include "util/singleton.hpp"
 #include "ui/about.h"
+#include "ui/update.h"
 
 class QPushButton;
 class QTextBrowser;
@@ -85,11 +86,8 @@ private:
     UpdateDialog( intf_thread_t * );
     virtual ~UpdateDialog();
 
+    Ui::updateWidget ui;
     update_t *p_update;
-    QPushButton *updateButton;
-    QLabel *updateLabelTop;
-    QLabel *updateLabelDown;
-    QTextEdit *updateText;
     void customEvent( QEvent * );
     bool b_checked;
 

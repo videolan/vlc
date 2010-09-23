@@ -158,40 +158,29 @@ static void UpdateCallback( void *data, bool b_ret )
 
 UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
+    /* build Ui */
+    ui.setupUi( this );
     setWindowTitle( qtr( "VLC media player updates" ) );
     setWindowRole( "vlc-update" );
 
-    QGridLayout *layout = new QGridLayout( this );
+    QList<QAbstractButton *> buttonsList = ui.updateDialogButtonBox->buttons();
+    QAbstractButton *currentButton;
+    for ( int i = 0; i < buttonsList.size() ; ++i )
+    {
+        currentButton = buttonsList.at( i );
+        if ( ui.updateDialogButtonBox->standardButton( currentButton )
+            == QDialogButtonBox::Retry )
+        {
+            currentButton->setText( qtr( "&Recheck version" ) );
+            qobject_cast<QPushButton *>(currentButton)->setDefault( true );
+        }
+    }
 
-    QPushButton *closeButton = new QPushButton( qtr( "&Cancel" ) );
-    updateButton = new QPushButton( qtr( "&Recheck version" ) );
-    updateButton->setDefault( true );
+    CONNECT( ui.updateDialogButtonBox, accepted(), this, UpdateOrDownload() );
+    CONNECT( ui.updateDialogButtonBox, rejected(), this, close() );
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox( Qt::Horizontal );
-    buttonBox->addButton( updateButton, QDialogButtonBox::ActionRole );
-    buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
-
-    updateLabelTop = new QLabel( qtr( "Checking for an update..." ) );
-    updateLabelTop->setWordWrap( true );
-    updateLabelTop->setMargin( 8 );
-
-    updateLabelDown = new QLabel( qtr( "\nDo you want to download it?\n" ) );
-    updateLabelDown->setWordWrap( true );
-    updateLabelDown->hide();
-
-    updateText = new QTextEdit( this );
-    updateText->setAcceptRichText(false);
-    updateText->setTextInteractionFlags( Qt::TextSelectableByKeyboard|
-                                         Qt::TextSelectableByMouse);
-    updateText->setEnabled( false );
-
-    layout->addWidget( updateLabelTop, 0, 0 );
-    layout->addWidget( updateText, 1, 0 );
-    layout->addWidget( updateLabelDown, 2, 0 );
-    layout->addWidget( buttonBox, 3, 0 );
-
-    BUTTONACT( updateButton, UpdateOrDownload() );
-    BUTTONACT( closeButton, close() );
+    CONNECT( ui.updateNotifyButtonBox, accepted(), this, UpdateOrDownload() );
+    CONNECT( ui.updateNotifyButtonBox, rejected(), this, close() );
 
     /* Create the update structure */
     p_update = update_New( p_intf );
@@ -222,8 +211,7 @@ void UpdateDialog::UpdateOrDownload()
 {
     if( !b_checked )
     {
-        updateButton->setEnabled( false );
-        updateLabelTop->setText( qtr( "Launching an update request..." ) );
+        ui.stackedWidget->setCurrentWidget( ui.updateRequestPage );
         update_Check( p_update, UpdateCallback, this );
     }
     else
@@ -238,6 +226,7 @@ void UpdateDialog::UpdateOrDownload()
             msg_Dbg( p_intf, "Downloading to folder: %s", qtu( dest_dir ) );
             toggleVisible();
             update_Download( p_update, qtu( dest_dir ) );
+            /* FIXME: We should trigger a change to another dialog here ! */
         }
     }
 }
@@ -259,36 +248,36 @@ void UpdateDialog::updateNotify( bool b_result )
     {
         if( update_NeedUpgrade( p_update ) )
         {
+            ui.stackedWidget->setCurrentWidget( ui.updateNotifyPage );
             update_release_t *p_release = update_GetRelease( p_update );
             assert( p_release );
             b_checked = true;
-            updateButton->setText( qtr( "&Yes" ) );
-            QString message = qtr( "A new version of VLC(" )
-                              + QString::number( p_release->i_major ) + "."
-                              + QString::number( p_release->i_minor ) + "."
-                              + QString::number( p_release->i_revision );
-            if( p_release->extra )
-                message += p_release->extra;
-            message += qtr( ") is available.");
-            updateLabelTop->setText( message );
+            QString message = QString(
+                    qtr( "A new version of VLC (%1.%2.%3%4) is available." ) )
+                .arg( QString::number( p_release->i_major ) )
+                .arg( QString::number( p_release->i_minor ) )
+                .arg( QString::number( p_release->i_revision ) )
+                .arg( ( p_release->extra )?QString( p_release->extra ):"" );
 
-            updateText->setText( qfu( p_release->psz_desc ) );
-            updateText->setEnabled( true );
-
-            updateLabelDown->show();
+            ui.updateNotifyLabel->setText( message );
+            ui.updateNotifyTextEdit->setText( qfu( p_release->psz_desc ) );
 
             /* Force the dialog to be shown */
             this->show();
         }
         else
-            updateLabelTop->setText(
+        {
+            ui.stackedWidget->setCurrentWidget( ui.updateDialogPage );
+            ui.updateDialogLabel->setText(
                     qtr( "You have the latest version of VLC media player." ) );
+        }
     }
     else
-        updateLabelTop->setText(
+    {
+        ui.stackedWidget->setCurrentWidget( ui.updateDialogPage );
+        ui.updateDialogLabel->setText(
                     qtr( "An error occurred while checking for updates..." ) );
-
-    updateButton->setEnabled( true );
+    }
 }
 
 #endif
