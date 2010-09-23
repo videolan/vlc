@@ -112,6 +112,7 @@ private:
     };
     QRubberBand *rubberband;
     QList <doubleInt *> widgetList;
+    int i_dragIndex;
 
     int getParentPosInLayout( QPoint point);
 

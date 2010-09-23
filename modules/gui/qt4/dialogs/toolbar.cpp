@@ -672,6 +672,11 @@ void DroppingController::dropEvent( QDropEvent *event )
 {
     int i = getParentPosInLayout( event->pos() );
 
+    /* Workaround: do not let the item move to its current
+       position + 1 as it breaks the widgetList */
+    if ( i - 1 == i_dragIndex )
+        --i;
+
     QByteArray data = event->mimeData()->data( "vlc/button-bar" );
     QDataStream dataStream(&data, QIODevice::ReadOnly);
 
@@ -727,6 +732,8 @@ bool DroppingController::eventFilter( QObject *obj, QEvent *event )
             }
 
             if( i == -1 ) return true;
+            i_dragIndex = i;
+
             doubleInt *dI = widgetList.at( i );
 
             int i_type = dI->i_type;
