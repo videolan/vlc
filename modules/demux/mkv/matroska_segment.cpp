@@ -807,11 +807,13 @@ int matroska_segment_c::BlockFindTrackIndex( size_t *pi_track,
     return VLC_SUCCESS;
 }
 
-static inline void fill_extra_data( mkv_track_t *p_tk )
+static inline void fill_extra_data( mkv_track_t *p_tk, unsigned int offset )
 {
-      p_tk->fmt.i_extra = p_tk->i_extra_data;
-      p_tk->fmt.p_extra = xmalloc( p_tk->i_extra_data );
-      memcpy( p_tk->fmt.p_extra, p_tk->p_extra_data, p_tk->i_extra_data );
+    if(p_tk->i_extra_data <= offset) return;
+    p_tk->fmt.i_extra = p_tk->i_extra_data - offset;
+    p_tk->fmt.p_extra = xmalloc( p_tk->fmt.i_extra );
+    if(!p_tk->fmt.p_extra) { p_tk->fmt.i_extra = 0; return; };
+    memcpy( p_tk->fmt.p_extra, p_tk->p_extra_data + offset, p_tk->fmt.i_extra );
 }
 
 bool matroska_segment_c::Select( mtime_t i_start_time )
@@ -861,16 +863,18 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         {
             p_tk->fmt.i_codec = VLC_CODEC_MPGV;
             if( p_tk->i_extra_data )
-                fill_extra_data( p_tk );
+                fill_extra_data( p_tk, 0 );
         }
         else if( !strncmp( p_tk->psz_codec, "V_THEORA", 8 ) )
         {
             p_tk->fmt.i_codec = VLC_CODEC_THEORA;
-            fill_extra_data( p_tk );
+            fill_extra_data( p_tk, 0 );
             p_tk->b_pts_only = true;
         }
         else if( !strncmp( p_tk->psz_codec, "V_REAL/RV", 9 ) )
         {
+            uint8_t *p = p_tk->p_extra_data;
+
             if( !strcmp( p_tk->psz_codec, "V_REAL/RV10" ) )
                 p_fmt->i_codec = VLC_CODEC_RV10;
             else if( !strcmp( p_tk->psz_codec, "V_REAL/RV20" ) )
@@ -880,15 +884,18 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             else if( !strcmp( p_tk->psz_codec, "V_REAL/RV40" ) )
                 p_fmt->i_codec = VLC_CODEC_RV40;
 
-            if( p_tk->i_extra_data > 26 )
+            /* Extract the framerate from the header */
+            if( p_tk->i_extra_data >= 26 &&
+                p[4] == 'V' && p[5] == 'I' && p[6] == 'D' && p[7] == 'O' &&
+                p[8] == 'R' && p[9] == 'V' &&
+                (p[10] == '3' || p[10] == '4') && p[11] == '0' )
             {
-                p_fmt->p_extra = malloc( p_tk->i_extra_data - 26 );
-                if( p_fmt->p_extra )
-                {
-                    p_fmt->i_extra = p_tk->i_extra_data - 26;
-                    memcpy( p_fmt->p_extra, &p_tk->p_extra_data[26], p_fmt->i_extra );
-                }
+                p_tk->fmt.video.i_frame_rate = 
+                    p[22] << 24 | p[23] << 16 | p[24] << 8 | p[25] << 0;
+                p_tk->fmt.video.i_frame_rate_base = 65536;
             }
+
+            fill_extra_data( p_tk, 26 );
             p_tk->b_dts_only = true;
         }
         else if( !strncmp( p_tk->psz_codec, "V_DIRAC", 7 ) )
@@ -913,7 +920,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                     p_tk->fmt.i_codec = VLC_FOURCC( 'a', 'v', 'c', '1' );
                 else
                     p_tk->fmt.i_codec = VLC_CODEC_MP4V;
-                fill_extra_data( p_tk );
+                fill_extra_data( p_tk, 0 );
             }
         }
         else if( !strcmp( p_tk->psz_codec, "V_QUICKTIME" ) )
@@ -1002,12 +1009,12 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         else if( !strcmp( p_tk->psz_codec, "A_FLAC" ) )
         {
             p_tk->fmt.i_codec = VLC_CODEC_FLAC;
-            fill_extra_data( p_tk );
+            fill_extra_data( p_tk, 0 );
         }
         else if( !strcmp( p_tk->psz_codec, "A_VORBIS" ) )
         {
             p_tk->fmt.i_codec = VLC_CODEC_VORBIS;
-            fill_extra_data( p_tk );
+            fill_extra_data( p_tk, 0 );
         }
         else if( !strncmp( p_tk->psz_codec, "A_AAC/MPEG2/", strlen( "A_AAC/MPEG2/" ) ) ||
                  !strncmp( p_tk->psz_codec, "A_AAC/MPEG4/", strlen( "A_AAC/MPEG4/" ) ) )
@@ -1072,19 +1079,19 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         else if( !strcmp( p_tk->psz_codec, "A_AAC" ) )
         {
             p_tk->fmt.i_codec = VLC_CODEC_MP4A;
-            fill_extra_data( p_tk );
+            fill_extra_data( p_tk, 0 );
         }
         else if( !strcmp( p_tk->psz_codec, "A_WAVPACK4" ) )
         {
             p_tk->fmt.i_codec = VLC_CODEC_WAVPACK;
-            fill_extra_data( p_tk );
+            fill_extra_data( p_tk, 0 );
         }
         else if( !strcmp( p_tk->psz_codec, "A_TTA1" ) )
         {
             p_fmt->i_codec = VLC_CODEC_TTA;
             if( p_tk->i_extra_data > 0 )
             {
-                fill_extra_data( p_tk );
+	      fill_extra_data( p_tk, 0 );
             }
             else
             {
@@ -1123,7 +1130,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             else if( !strcmp( p_tk->psz_codec, "A_REAL/28_8" ) )
                 p_tk->fmt.i_codec = VLC_CODEC_RA_288;
             /* FIXME 14_4, RALF and SIPR */
-            fill_extra_data( p_tk );
+            fill_extra_data( p_tk, p_tk->fmt.i_codec == VLC_CODEC_RA_288 ? 0 : 0 /*78 - FIXME need to implement reading support for cook */ );
         }
         else if( !strcmp( p_tk->psz_codec, "A_REAL/14_4" ) )
         {
@@ -1141,7 +1148,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             p_tk->fmt.i_codec = VLC_CODEC_KATE;
             p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
 
-            fill_extra_data( p_tk );
+            fill_extra_data( p_tk, 0 );
         }
         else if( !strcmp( p_tk->psz_codec, "S_TEXT/ASCII" ) )
         {
@@ -1158,9 +1165,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             p_tk->fmt.i_codec = VLC_FOURCC( 'u', 's', 'f', ' ' );
             p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
             if( p_tk->i_extra_data )
-            {
-                fill_extra_data( p_tk );
-            }
+                fill_extra_data( p_tk, 0 );
         }
         else if( !strcmp( p_tk->psz_codec, "S_TEXT/SSA" ) ||
                  !strcmp( p_tk->psz_codec, "S_TEXT/ASS" ) ||
@@ -1170,9 +1175,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             p_tk->fmt.i_codec = VLC_CODEC_SSA;
             p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
             if( p_tk->i_extra_data )
-            {
-                fill_extra_data( p_tk );
-            }
+                fill_extra_data( p_tk, 0 );
         }
         else if( !strcmp( p_tk->psz_codec, "S_VOBSUB" ) )
         {
