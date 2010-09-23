@@ -459,43 +459,6 @@ static int ExecuteControl( vlm_t *p_vlm, const char *psz_name, const int i_arg, 
             i_result = VLC_EGENERIC;
         }
     }
-    else if( !strcmp( psz_control, "rewind" ) )
-    {
-        if( psz_argument )
-        {
-            const double d_scale = us_atof( psz_argument );
-            double d_position;
-
-            vlm_ControlInternal( p_vlm, VLM_GET_MEDIA_INSTANCE_POSITION, p_media->cfg.id, psz_instance, &d_position );
-            d_position -= (d_scale / 1000.0);
-            if( d_position < 0.0 )
-                d_position = 0.0;
-            i_result = vlm_ControlInternal( p_vlm, VLM_SET_MEDIA_INSTANCE_POSITION, p_media->cfg.id, psz_instance, d_position );
-        }
-        else
-        {
-            i_result = VLC_EGENERIC;
-        }
-    }
-    else if( !strcmp( psz_control, "forward" ) )
-    {
-        if( psz_argument )
-        {
-            const double d_scale = us_atof( psz_argument );
-            double d_position;
-
-            vlm_ControlInternal( p_vlm, VLM_GET_MEDIA_INSTANCE_POSITION, p_media->cfg.id, psz_instance, &d_position );
-            d_position += (d_scale / 1000.0);
-            if( d_position > 1.0 )
-                d_position = 1.0;
-            i_result = vlm_ControlInternal( p_vlm, VLM_SET_MEDIA_INSTANCE_POSITION, p_media->cfg.id, psz_instance, d_position );
-
-        }
-        else
-        {
-            i_result = VLC_EGENERIC;
-        }
-    }
     else if( !strcmp( psz_control, "stop" ) )
     {
         i_result = vlm_ControlInternal( p_vlm, VLM_STOP_MEDIA_INSTANCE, p_media->cfg.id, psz_instance );
