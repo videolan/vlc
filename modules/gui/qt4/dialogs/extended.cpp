@@ -32,6 +32,7 @@
 
 #include <QTabWidget>
 #include <QGridLayout>
+#include <QDialogButtonBox>
 #include <vlc_modules.h>
 
 ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
@@ -41,7 +42,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     setWindowTitle( qtr( "Adjustments and Effects" ) );
     setWindowRole( "vlc-extended" );
 
-    QGridLayout *layout = new QGridLayout( this );
+    QVBoxLayout *layout = new QVBoxLayout( this );
     layout->setContentsMargins( 0, 2, 0, 1 );
     layout->setSpacing( 3 );
 
@@ -84,11 +85,12 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
         mainTabW->addTab( v4l2, qtr( "v4l2 controls" ) );
     }
 
-    layout->addWidget( mainTabW, 0, 0, 1, 5 );
+    layout->addWidget( mainTabW );
 
-    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
-    layout->addWidget( closeButton, 1, 4, 1, 1 );
-    CONNECT( closeButton, clicked(), this, close() );
+    QDialogButtonBox *closeButtonBox =
+        new QDialogButtonBox( QDialogButtonBox::Close, Qt::Horizontal, this );
+    layout->addWidget( closeButtonBox );
+    CONNECT( closeButtonBox, rejected(), this, close() );
 
     /* Restore geometry or move this dialog on the left pane of the MI */
     if( !restoreGeometry( getSettings()->value("EPanel/geometry").toByteArray() ) )
