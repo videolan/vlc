@@ -619,6 +619,12 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             continue;
         }
 
+        /* Sanity check (seems to be needed for some streams) */
+        if( p_sys->p_ff_pic->pict_type == FF_B_TYPE )
+        {
+            p_sys->b_has_b_frames = true;
+        }
+
         /* Compute the PTS */
         mtime_t i_pts = VLC_TS_INVALID;
         if( p_sys->p_ff_pic->reordered_opaque != INT64_MIN )
@@ -632,6 +638,15 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                     !p_sys->p_ff_pic->reference ||
                     p_sys->i_pts <= VLC_TS_INVALID )
                     i_pts = i_ts;
+
+                /* Guess what ? The rules are different for Real Video :( */
+                if( (p_dec->fmt_in.i_codec == VLC_CODEC_RV30 ||
+                     p_dec->fmt_in.i_codec == VLC_CODEC_RV40) &&
+                    p_sys->b_has_b_frames )
+                {
+                    i_pts = VLC_TS_INVALID;
+                    if(p_sys->p_ff_pic->reference) i_pts = i_ts;
+                }
             }
             else
             {
@@ -705,12 +720,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         {
             p_pic = (picture_t *)p_sys->p_ff_pic->opaque;
             decoder_LinkPicture( p_dec, p_pic );
-        }
-
-        /* Sanity check (seems to be needed for some streams) */
-        if( p_sys->p_ff_pic->pict_type == FF_B_TYPE )
-        {
-            p_sys->b_has_b_frames = true;
         }
 
         if( !p_dec->fmt_in.video.i_sar_num || !p_dec->fmt_in.video.i_sar_den )
