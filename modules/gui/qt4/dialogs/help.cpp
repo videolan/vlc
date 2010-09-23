@@ -55,17 +55,18 @@ HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     setWindowRole( "vlc-help" );
     setMinimumSize( 350, 300 );
 
-    QGridLayout *layout = new QGridLayout( this );
+    QVBoxLayout *layout = new QVBoxLayout( this );
     QTextBrowser *helpBrowser = new QTextBrowser( this );
     helpBrowser->setOpenExternalLinks( true );
     helpBrowser->setHtml( qtr(I_LONGHELP) );
-    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
-    closeButton->setDefault( true );
+    QDialogButtonBox *closeButtonBox =
+         new QDialogButtonBox( QDialogButtonBox::Close, Qt::Horizontal, this );
+    closeButtonBox->setFocus();
 
-    layout->addWidget( helpBrowser, 0, 0, 1, 0 );
-    layout->addWidget( closeButton, 1, 3 );
+    layout->addWidget( helpBrowser );
+    layout->addWidget( closeButtonBox );
 
-    BUTTONACT( closeButton, close() );
+    CONNECT( closeButtonBox, rejected(), this, close() );
     readSettings( "Help", QSize( 500, 450 ) );
 }
 
