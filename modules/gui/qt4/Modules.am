@@ -69,7 +69,6 @@ nodist_SOURCES_qt4 = \
 		util/qvlcapp.moc.cpp \
 		resources.cpp \
 		ui/equalizer.h \
-		ui/v4l2.h \
 		ui/video_effects.h \
 		ui/open_file.h \
 		ui/open_disk.h \
@@ -344,7 +343,6 @@ noinst_HEADERS = \
 EXTRA_DIST += \
 	vlc.qrc \
 	ui/equalizer.ui \
-	ui/v4l2.ui \
 	ui/video_effects.ui \
 	ui/open_file.ui \
 	ui/open_disk.ui \

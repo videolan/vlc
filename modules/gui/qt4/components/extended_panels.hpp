@@ -33,7 +33,6 @@
 
 #include "ui/equalizer.h"
 #include "ui/video_effects.h"
-#include "ui/v4l2.h"
 
 #include <QTabWidget>
 
@@ -75,8 +74,8 @@ public:
 
 private:
     intf_thread_t *p_intf;
-    Ui::ExtV4l2Widget ui;
     QGroupBox *box;
+    QLabel *help;
 
 private slots:
     void Refresh( void );

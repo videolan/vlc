@@ -35,6 +35,7 @@
 #include <QGridLayout>
 #include <QSignalMapper>
 #include <QComboBox>
+#include <QTimer>
 
 #include "components/extended_panels.hpp"
 #include "dialogs/preferences.hpp"
@@ -633,13 +634,16 @@ void ExtVideo::gotoConf( QObject* src )
  **********************************************************************/
 
 ExtV4l2::ExtV4l2( intf_thread_t *_p_intf, QWidget *_parent )
-    : QWidget( _parent ), p_intf( _p_intf )
+    : QWidget( _parent ), p_intf( _p_intf ), box( NULL )
 {
-    ui.setupUi( this );
-
-    BUTTONACT( ui.refresh, Refresh() );
-
-    box = NULL;
+    QVBoxLayout *layout = new QVBoxLayout( this );
+    help = new QLabel( qtr("No v4l2 instance found.\n"
+      "Please check that the device has been opened with VLC and is playing.\n\n"
+      "Controls will automatically appear here.")
+      , this );
+    help->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
+    layout->addWidget( help );
+    setLayout( layout );
 }
 
 void ExtV4l2::showEvent( QShowEvent *event )
@@ -651,10 +655,10 @@ void ExtV4l2::showEvent( QShowEvent *event )
 void ExtV4l2::Refresh( void )
 {
     vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( p_intf, "v4l2", FIND_ANYWHERE );
-    ui.help->hide();
+    help->hide();
     if( box )
     {
-        ui.vboxLayout->removeWidget( box );
+        layout()->removeWidget( box );
         delete box;
         box = NULL;
     }
@@ -666,13 +670,13 @@ void ExtV4l2::Refresh( void )
         if( i_ret < 0 )
         {
             msg_Err( p_intf, "Oops, v4l2 object doesn't have a 'controls' variable." );
-            ui.help->show();
+            help->show();
             vlc_object_release( p_obj );
             return;
         }
 
         box = new QGroupBox( this );
-        ui.vboxLayout->addWidget( box );
+        layout()->addWidget( box );
         QVBoxLayout *layout = new QVBoxLayout( box );
         box->setLayout( layout );
 
@@ -780,7 +784,9 @@ void ExtV4l2::Refresh( void )
     else
     {
         msg_Dbg( p_intf, "Couldn't find v4l2 instance" );
-        ui.help->show();
+        help->show();
+        if ( isVisible() )
+            QTimer::singleShot( 2000, this, SLOT(Refresh()) );
     }
 }
 
