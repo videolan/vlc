@@ -44,6 +44,11 @@
     "XVideo hardware adaptor to use. By default, VLC will " \
     "use the first functional adaptor.")
 
+#define FORMAT_TEXT N_("XVideo format id")
+#define FORMAT_LONGTEXT N_( \
+    "XVideo image format id to use. By default, VLC will " \
+    "try to use the best match for the video being played.")
+
 #define SHM_TEXT N_("Use shared memory")
 #define SHM_LONGTEXT N_( \
     "Use shared memory to communicate between VLC and the X server.")
@@ -64,8 +69,8 @@ vlc_module_begin ()
 
     add_integer ("xvideo-adaptor", -1, NULL,
                  ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true)
-    add_integer ("xvideo-format-id", -1, NULL,
-                 ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true)
+    add_integer ("xvideo-format-id", 0, NULL,
+                 FORMAT_TEXT, FORMAT_LONGTEXT, true)
     add_bool ("x11-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true)
         add_deprecated_alias ("xvideo-shm")
     add_shortcut ("xcb-xv", "xv", "xvideo", "xid")
