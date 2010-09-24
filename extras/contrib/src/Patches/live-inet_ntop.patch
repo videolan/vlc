@@ -169,8 +169,8 @@ diff -ru live.orig/liveMedia/RTSPOverHTTPServer.cpp live/liveMedia/RTSPOverHTTPS
  
    // Create a new object for handling this HTTP connection:
 diff -ru live.orig/liveMedia/RTSPServer.cpp live/liveMedia/RTSPServer.cpp
---- live.orig/liveMedia/RTSPServer.cpp	2010-05-30 01:20:31.000000000 +0300
-+++ live/liveMedia/RTSPServer.cpp	2010-06-06 00:34:03.000000000 +0300
+--- live.orig/liveMedia/RTSPServer.cpp	2010-09-23 17:15:48.000000000 +0200
++++ live/liveMedia/RTSPServer.cpp	2010-09-24 12:49:57.000000000 +0200
 @@ -112,11 +112,12 @@
    char urlBuffer[100]; // more than big enough for "rtsp://<ip-address>:<port>/"
  
@@ -196,22 +196,20 @@ diff -ru live.orig/liveMedia/RTSPServer.cpp live/liveMedia/RTSPServer.cpp
  #endif
  
    // Create a new object for this RTSP session.
-@@ -747,10 +749,12 @@
- 				  serverRTPPort, serverRTCPPort,
- 				  fStreamStates[streamNum].streamToken);
+@@ -761,8 +763,10 @@
+   ReceivingInterfaceAddr = origReceivingInterfaceAddr;
+ 
    struct in_addr destinationAddr; destinationAddr.s_addr = destinationAddress;
 -  char* destAddrStr = strDup(our_inet_ntoa(destinationAddr));
+-  char* sourceAddrStr = strDup(our_inet_ntoa(sourceAddr.sin_addr));
 +  char destAddrStr[16];
 +  our_inet_ntoa(destinationAddr, destAddrStr);
-   struct sockaddr_in sourceAddr; SOCKLEN_T namelen = sizeof sourceAddr;
-   getsockname(fClientSocket, (struct sockaddr*)&sourceAddr, &namelen);
--  char* sourceAddrStr = strDup(our_inet_ntoa(sourceAddr.sin_addr));
 +  char sourceAddrStr[16];
 +  our_inet_ntoa(sourceAddr.sin_addr, sourceAddrStr);
    if (fIsMulticast) {
      switch (streamingMode) {
      case RTP_UDP:
-@@ -825,7 +829,7 @@
+@@ -837,7 +841,7 @@
      }
      }
    }
@@ -220,7 +218,7 @@ diff -ru live.orig/liveMedia/RTSPServer.cpp live/liveMedia/RTSPServer.cpp
  }
  
  void RTSPServer::RTSPClientSession
-@@ -1226,7 +1230,8 @@
+@@ -1238,7 +1242,8 @@
    // If this gets called, the client session is assumed to have timed out,
    // so delete it:
  #ifdef DEBUG
