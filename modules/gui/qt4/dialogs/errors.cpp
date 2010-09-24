@@ -43,10 +43,9 @@ ErrorsDialog::ErrorsDialog( intf_thread_t *_p_intf )
 
     QGridLayout *layout = new QGridLayout( this );
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox;
-    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
+    QDialogButtonBox *buttonBox =
+        new QDialogButtonBox( QDialogButtonBox::Close, Qt::Horizontal, this );
     QPushButton *clearButton = new QPushButton( qtr( "&Clear" ) );
-    buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
     buttonBox->addButton( clearButton, QDialogButtonBox::ActionRole );
 
     messages = new QTextEdit();
@@ -56,10 +55,9 @@ ErrorsDialog::ErrorsDialog( intf_thread_t *_p_intf )
 
     layout->addWidget( messages, 0, 0, 1, 3 );
     layout->addWidget( stopShowing, 1, 0 );
-    layout->addItem( new QSpacerItem( 200, 20, QSizePolicy::Expanding ), 2,0 );
-    layout->addWidget( buttonBox, 2, 2 );
+    layout->addWidget( buttonBox, 1, 2 );
 
-    CONNECT( buttonBox, accepted(), this, close() );
+    CONNECT( buttonBox, rejected(), this, close() );
     BUTTONACT( clearButton, clear() );
     BUTTONACT( stopShowing, dontShow() );
 }
