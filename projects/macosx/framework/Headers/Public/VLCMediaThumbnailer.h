@@ -21,9 +21,12 @@
     CGImageRef _thumbnail;
     void *_data;
     NSTimer *_parsingTimeoutTimer;
+    NSTimer *_thumbnailingTimeoutTimer;
 
     CGFloat _thumbnailHeight,_thumbnailWidth;
     CGFloat _effectiveThumbnailHeight,_effectiveThumbnailWidth;
+    int _numberOfReceivedFrames;
+    BOOL _shouldRejectFrames;
 }
 
 + (VLCMediaThumbnailer *)thumbnailerWithMedia:(VLCMedia *)media andDelegate:(id<VLCMediaThumbnailerDelegate>)delegate;
@@ -52,5 +55,6 @@
 
 @protocol VLCMediaThumbnailerDelegate
 @required
+- (void)mediaThumbnailerDidTimeOut:(VLCMediaThumbnailer *)mediaThumbnailer;
 - (void)mediaThumbnailer:(VLCMediaThumbnailer *)mediaThumbnailer didFinishThumbnail:(CGImageRef)thumbnail;
 @end

@@ -18,6 +18,7 @@
 - (void)fetchThumbnail;
 - (void)startFetchingThumbnail;
 @property (readonly, assign) void *dataPointer;
+@property (readonly, assign) BOOL shouldRejectFrames;
 @end
 
 static void *lock(void *opaque, void **pixels)
@@ -42,7 +43,7 @@ void unlock(void *opaque, void *picture, void *const *p_pixels)
 
     // We may already have a thumbnail if we are receiving picture after the first one.
     // Just ignore.
-    if ([thumbnailer thumbnail])
+    if ([thumbnailer thumbnail] || [thumbnailer shouldRejectFrames])
         return;
 
     [thumbnailer performSelectorOnMainThread:@selector(didFetchThumbnail) withObject:nil waitUntilDone:YES];
@@ -59,6 +60,7 @@ void display(void *opaque, void *picture)
 @synthesize dataPointer=_data;
 @synthesize thumbnailWidth=_thumbnailWidth;
 @synthesize thumbnailHeight=_thumbnailHeight;
+@synthesize shouldRejectFrames=_shouldRejectFrames;
 
 + (VLCMediaThumbnailer *)thumbnailerWithMedia:(VLCMedia *)media andDelegate:(id<VLCMediaThumbnailerDelegate>)delegate
 {
@@ -70,6 +72,8 @@ void display(void *opaque, void *picture)
 
 - (void)dealloc
 {
+    NSAssert(!_thumbnailingTimeoutTimer, @"Timer not released");
+    NSAssert(!_parsingTimeoutTimer, @"Timer not released");
     NSAssert(!_data, @"Data not released");
     NSAssert(!_mp, @"Not properly retained");
     if (_thumbnail)
@@ -101,6 +105,7 @@ void display(void *opaque, void *picture)
 {
     NSArray *tracks = [_media tracksInformation];
 
+
     // Find the video track
     NSDictionary *videoTrack = nil;
     for (NSDictionary *track in tracks) {
@@ -129,10 +134,13 @@ void display(void *opaque, void *picture)
 
         int newWidth = round(videoWidth * ratio);
         int newHeight = round(videoHeight * ratio);
-        NSLog(@"video %dx%d from %dx%d or %dx%d", newWidth, newHeight, videoWidth, videoHeight, imageWidth, imageHeight);
+
         imageWidth = newWidth > 0 ? newWidth : imageWidth;
         imageHeight = newHeight > 0 ? newHeight : imageHeight;
     }
+
+    _numberOfReceivedFrames = 0;
+    NSAssert(!_shouldRejectFrames, @"Are we still running?");
 
     _effectiveThumbnailHeight = imageHeight;
     _effectiveThumbnailWidth = imageWidth;
@@ -150,6 +158,9 @@ void display(void *opaque, void *picture)
     libvlc_video_set_callbacks(_mp, lock, unlock, display, self);
     libvlc_media_player_play(_mp);
     libvlc_media_player_set_position(_mp, kSnapshotPosition);
+
+    NSAssert(!_thumbnailingTimeoutTimer, @"We already have a timer around");
+    _thumbnailingTimeoutTimer = [[NSTimer scheduledTimerWithTimeInterval:10 target:self selector:@selector(mediaThumbnailingTimedOut) userInfo:nil repeats:NO] retain];
 }
 
 - (void)mediaParsingTimedOut
@@ -177,13 +188,21 @@ void display(void *opaque, void *picture)
 
 - (void)didFetchThumbnail
 {
+    if (_shouldRejectFrames)
+        return;
+
     // The video thread is blocking on us. Beware not to do too much work.
 
+    _numberOfReceivedFrames++;
+
     // Make sure we are getting the right frame
-    if (libvlc_media_player_get_position(_mp) < kSnapshotPosition &&
+    if (libvlc_media_player_get_position(_mp) < kSnapshotPosition / 2 &&
         // Arbitrary choice to work around broken files.
-        libvlc_media_player_get_length(_mp) > 1000)
+        libvlc_media_player_get_length(_mp) > 1000 &&
+        _numberOfReceivedFrames < 10)
+    {
         return;
+    }
 
     NSAssert(_data, @"We have no data");
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
@@ -214,10 +233,8 @@ void display(void *opaque, void *picture)
     [self performSelector:@selector(notifyDelegate) withObject:nil afterDelay:0];
 }
 
-- (void)notifyDelegate
+- (void)stopAsync
 {
-    // Stop the media player
-    NSAssert(_mp, @"We have already destroyed mp");
     libvlc_media_player_stop(_mp);
     libvlc_media_player_release(_mp);
     _mp = NULL;
@@ -226,10 +243,39 @@ void display(void *opaque, void *picture)
     free(_data);
     _data = NULL;
 
+    _shouldRejectFrames = NO;
+}
+
+- (void)endThumbnailing
+{
+    _shouldRejectFrames = YES;
+
+    [_thumbnailingTimeoutTimer invalidate];
+    [_thumbnailingTimeoutTimer release];
+    _thumbnailingTimeoutTimer = nil;
+
+    // Stop the media player
+    NSAssert(_mp, @"We have already destroyed mp");
+
+    [self performSelectorInBackground:@selector(stopAsync) withObject:nil];
+
+    [self autorelease]; // Balancing -fetchThumbnail
+}
+
+- (void)notifyDelegate
+{
+    [self endThumbnailing];
+
     // Call delegate
     [_delegate mediaThumbnailer:self didFinishThumbnail:_thumbnail];
 
-    [self release]; // Balancing -fetchThumbnail
 }
 
+- (void)mediaThumbnailingTimedOut
+{
+    [self endThumbnailing];
+
+    // Call delegate
+    [_delegate mediaThumbnailerDidTimeOut:self];
+}
 @end
