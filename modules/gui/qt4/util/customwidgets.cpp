@@ -227,6 +227,30 @@ void QVLCElidingLabel::paintEvent( QPaintEvent * event )
     p.drawText( r, fontMetrics().elidedText( text(), elideMode, r.width() ), alignment() );
 }
 
+QString DebugLevelSpinBox::textFromValue( int v ) const
+{
+    QString const texts[] = {
+    /* Note that min level 0 is 'errors' in Qt Ui
+       FIXME: fix debug levels accordingly to documentation */
+    /*  qtr("infos"),*/
+        qtr("errors"),
+        qtr("warnings"),
+        qtr("debug")
+    };
+    if ( v < 0 ) v = 0;
+    if ( v >= 2 ) v = 2;
+
+    return QString( "%1 (%2)" ).arg( v ).arg( texts[v] );
+}
+
+int DebugLevelSpinBox::mapTextToValue ( bool *ok )
+{
+    int parsedvalue = cleanText().toInt();
+    /* fix range */
+    *ok = ( parsedvalue < 0 || parsedvalue > 2 )? FALSE : TRUE;
+    return parsedvalue;
+}
+
 /***************************************************************************
  * Hotkeys converters
  ***************************************************************************/

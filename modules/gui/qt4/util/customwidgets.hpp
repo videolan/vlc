@@ -31,6 +31,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QStackedWidget>
+#include <QSpinBox>
 
 /**
   This class provides a QLineEdit which contains a greyed-out hinting
@@ -110,6 +111,16 @@ public:
     {
         return currentWidget() ? currentWidget()->minimumSizeHint() : QSize();
     }
+};
+
+class DebugLevelSpinBox : public QSpinBox
+{
+    Q_OBJECT
+public:
+    DebugLevelSpinBox( QWidget *parent ) : QSpinBox( parent ) { };
+protected:
+    QString textFromValue( int ) const;
+    int mapTextToValue ( bool * );
 };
 
 /* VLC Key/Wheel hotkeys interactions */

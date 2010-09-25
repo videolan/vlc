@@ -49,12 +49,18 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QSpinBox" name="verbosityBox">
+        <widget class="DebugLevelSpinBox" name="verbosityBox">
          <property name="wrapping">
           <bool>true</bool>
          </property>
+         <property name="minimum">
+          <number>0</number>
+         </property>
          <property name="maximum">
           <number>2</number>
+         </property>
+         <property name="value">
+          <number>0</number>
          </property>
         </widget>
        </item>
@@ -111,6 +117,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DebugLevelSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>util/customwidgets.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
