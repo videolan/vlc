@@ -1068,6 +1068,7 @@ FFMPEGCONF += \
 	--disable-debug \
 	--enable-gpl \
 	--enable-postproc \
+	--disable-ffprobe \
 	--disable-ffserver \
 	--disable-ffmpeg \
 	--disable-ffplay \
