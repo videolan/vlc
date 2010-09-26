@@ -180,7 +180,7 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
 }
 
 /*****************************************************************************
- * Called through lua_scripts_batch_execute to call 'fetch_art' on the script
+ * Called through lua_scripts_batch_execute to call 'read_meta' on the script
  * pointed by psz_filename.
  *****************************************************************************/
 static int read_meta( vlc_object_t *p_this, const char * psz_filename,
@@ -192,15 +192,10 @@ static int read_meta( vlc_object_t *p_this, const char * psz_filename,
         return VLC_EGENERIC;
 
     int i_ret = run(p_this, psz_filename, L, "read_meta");
-    if(i_ret != VLC_SUCCESS)
-    {
-        lua_close( L );
-        return i_ret;
-    }
-
-    // Continue, all "meta reader" are always run.
     lua_close( L );
-    return 1;
+
+    // Continue even if an error occured: all "meta reader" are always run.
+    return i_ret == VLC_SUCCESS ? VLC_EGENERIC : i_ret;
 }
 
 
