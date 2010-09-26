@@ -113,6 +113,8 @@ TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t)
  * node. It will contain a pointer to the input_item_t bound to the transformed
  * playlist item.
  *
+ * The playlist contains rate-variable which is propagated to current input if available
+ * also rate-slower/rate-faster is in use
  *
  * XXX Be really carefull, playlist_item_t->i_id and input_item_t->i_id are not
  * the same. Yes, the situation is pretty bad.

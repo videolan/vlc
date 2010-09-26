@@ -19,6 +19,9 @@ Codecs
  * You can now use ffmpeg-mt in conjunction with vlc
  * Important fixes for RealVideo 3.0 and 4.0 playback
 
+Core:
+ * Playback rate doesn't get resetted to 1 between items anymore
+
 Demuxers:
  * id3tag plugin is removed (superseded by taglib).
  * Ogg seeking improvements

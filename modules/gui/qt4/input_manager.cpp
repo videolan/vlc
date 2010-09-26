@@ -828,14 +828,12 @@ void InputManager::reverse()
 
 void InputManager::slower()
 {
-    if( hasInput() )
-        var_TriggerCallback( p_input, "rate-slower" );
+    var_TriggerCallback( THEPL, "rate-slower" );
 }
 
 void InputManager::faster()
 {
-    if( hasInput() )
-        var_TriggerCallback( p_input, "rate-faster" );
+    var_TriggerCallback( THEPL, "rate-faster" );
 }
 
 void InputManager::littlefaster()
@@ -850,15 +848,13 @@ void InputManager::littleslower()
 
 void InputManager::normalRate()
 {
-    if( hasInput() )
-        var_SetFloat( p_input, "rate", 1. );
+    var_SetFloat( THEPL, "rate", 1. );
 }
 
 void InputManager::setRate( int new_rate )
 {
-    if( hasInput() )
-        var_SetFloat( p_input, "rate",
-                      (float)INPUT_RATE_DEFAULT / (float)new_rate );
+    var_SetFloat( THEPL, "rate",
+                 (float)INPUT_RATE_DEFAULT / (float)new_rate );
 }
 
 void InputManager::jumpFwd()

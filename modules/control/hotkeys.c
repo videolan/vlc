@@ -713,18 +713,18 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             }
             else if( i_action == ACTIONID_RATE_NORMAL )
             {
-                var_SetFloat( p_input, "rate", 1. );
+                var_SetFloat( p_playlist, "rate", 1. );
                 DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
                                 "%s", _("1.00x") );
             }
             else if( i_action == ACTIONID_FASTER )
             {
-                var_TriggerCallback( p_input, "rate-faster" );
+                var_TriggerCallback( p_playlist, "rate-faster" );
                 DisplayRate( p_vout, var_GetFloat( p_input, "rate" ) );
             }
             else if( i_action == ACTIONID_SLOWER )
             {
-                var_TriggerCallback( p_input, "rate-slower" );
+                var_TriggerCallback( p_playlist, "rate-slower" );
                 DisplayRate( p_vout, var_GetFloat( p_input, "rate" ) );
             }
             else if( i_action == ACTIONID_RATE_FASTER_FINE ||
@@ -733,7 +733,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 const int i_dir = i_action == ACTIONID_RATE_FASTER_FINE ? 1 : -1;
                 float f_newrate = AdjustRateFine( p_input, i_dir );
 
-                var_SetFloat( p_input, "rate", f_newrate );
+                var_SetFloat( p_playlist, "rate", f_newrate );
                 DisplayRate( p_vout, f_newrate );
             }
             else if( i_action == ACTIONID_POSITION )

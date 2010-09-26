@@ -238,22 +238,12 @@ static void RunIntf( intf_thread_t *p_intf )
 
             case GESTURE(LEFT,UP,NONE,NONE):
                 msg_Dbg( p_intf, "Going slower." );
-                p_input = playlist_CurrentInput( p_playlist );
-                if( p_input )
-                {
-                    var_TriggerCallback( p_input, "rate-slower" );
-                    vlc_object_release( p_input );
-                }
+                var_TriggerCallback( p_playlist, "rate-slower" );
                 break;
 
             case GESTURE(RIGHT,UP,NONE,NONE):
                 msg_Dbg( p_intf, "Going faster." );
-                p_input = playlist_CurrentInput( p_playlist );
-                if( p_input )
-                {
-                    var_TriggerCallback( p_input, "rate-faster" );
-                    vlc_object_release( p_input );
-                }
+                var_TriggerCallback( p_playlist, "rate-faster" );
                 break;
 
             case GESTURE(LEFT,RIGHT,NONE,NONE):

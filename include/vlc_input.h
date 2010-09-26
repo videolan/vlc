@@ -310,7 +310,7 @@ struct input_thread_t
  *
  * The read-write variables are:
  *  - state (\see input_state_e)
- *  - rate, rate-slower, rate-faster
+ *  - rate
  *  - position, position-offset
  *  - time, time-offset
  *  - title, next-title, prev-title
