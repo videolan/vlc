@@ -73,7 +73,7 @@ static inline void lua_Dbg( vlc_object_t * p_this, const char * ppz_fmt, ... )
 /*****************************************************************************
  * Functions that should be in lua ... but aren't for some obscure reason
  *****************************************************************************/
-static inline int luaL_checkboolean( lua_State *L, int narg )
+static inline bool luaL_checkboolean( lua_State *L, int narg )
 {
     luaL_checktype( L, narg, LUA_TBOOLEAN ); /* can raise an error */
     return lua_toboolean( L, narg );
