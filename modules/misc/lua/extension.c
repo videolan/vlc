@@ -56,7 +56,7 @@ const char* const ppsz_capabilities[] = {
 
 static int ScanExtensions( extensions_manager_t *p_this );
 static int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
-                            void *pb_continue );
+                            void *dummy );
 static int Control( extensions_manager_t *, int, va_list );
 static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
                     char ***pppsz_titles, uint16_t **ppi_ids );
@@ -181,12 +181,11 @@ void Close_Extension( vlc_object_t *p_this )
  **/
 static int ScanExtensions( extensions_manager_t *p_mgr )
 {
-    bool b_true = true;
     int i_ret =
         vlclua_scripts_batch_execute( VLC_OBJECT( p_mgr ),
                                       "extensions",
                                       &ScanLuaCallback,
-                                      &b_true );
+                                      NULL );
 
     if( !i_ret )
         return VLC_EGENERIC;
@@ -211,11 +210,12 @@ static int vlclua_dummy_require( lua_State *L )
  * @param p_this This extensions_manager_t object
  * @param psz_script Name of the script to run
  * @param L Lua State, common to all scripts here
- * @param pb_continue bool* that indicates whether to continue batch or not
+ * @param dummy: unused
  **/
 int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
-                     void *pb_continue )
+                     void *dummy )
 {
+    VLC_UNUSED(dummy);
     extensions_manager_t *p_mgr = ( extensions_manager_t* ) p_this;
     bool b_ok = false;
 
@@ -411,7 +411,7 @@ exit:
 
     vlc_mutex_unlock( &p_mgr->lock );
     /* Continue batch execution */
-    return pb_continue ? ( (* (bool*)pb_continue) ? -1 : 0 ) : -1;
+    return VLC_EGENERIC;
 }
 
 static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
