@@ -43,10 +43,10 @@ ErrorsDialog::ErrorsDialog( intf_thread_t *_p_intf )
 
     QGridLayout *layout = new QGridLayout( this );
 
-    QDialogButtonBox *buttonBox =
-        new QDialogButtonBox( QDialogButtonBox::Close, Qt::Horizontal, this );
-    QPushButton *clearButton = new QPushButton( qtr( "&Clear" ) );
+    QDialogButtonBox *buttonBox = new QDialogButtonBox( Qt::Horizontal, this );
+    QPushButton *clearButton = new QPushButton( qtr( "Cl&ear" ), this );
     buttonBox->addButton( clearButton, QDialogButtonBox::ActionRole );
+    buttonBox->addButton( new QPushButton( qtr("&Close"), this ), QDialogButtonBox::RejectRole );
 
     messages = new QTextEdit();
     messages->setReadOnly( true );

@@ -59,8 +59,9 @@ HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     QTextBrowser *helpBrowser = new QTextBrowser( this );
     helpBrowser->setOpenExternalLinks( true );
     helpBrowser->setHtml( qtr(I_LONGHELP) );
-    QDialogButtonBox *closeButtonBox =
-         new QDialogButtonBox( QDialogButtonBox::Close, Qt::Horizontal, this );
+    QDialogButtonBox *closeButtonBox = new QDialogButtonBox( Qt::Horizontal, this );
+    closeButtonBox->addButton(
+        new QPushButton( qtr("&Close"), this ), QDialogButtonBox::RejectRole );
     closeButtonBox->setFocus();
 
     layout->addWidget( helpBrowser );
@@ -85,6 +86,8 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
 {
     /* Build UI */
     ui.setupUi( this );
+    ui.closeButtonBox->addButton(
+        new QPushButton( qtr("&Close"), this ), QDialogButtonBox::RejectRole );
 
     setWindowTitle( qtr( "About" ) );
     setWindowRole( "vlc-about" );
@@ -161,23 +164,20 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     /* build Ui */
     ui.setupUi( this );
+    ui.updateDialogButtonBox->addButton( new QPushButton( qtr("&Close"), this ),
+                                         QDialogButtonBox::RejectRole );
+    QPushButton *recheckButton = new QPushButton( qtr("&Recheck version"), this );
+    ui.updateDialogButtonBox->addButton( recheckButton, QDialogButtonBox::ActionRole );
+
+    ui.updateNotifyButtonBox->addButton( new QPushButton( qtr("&Yes"), this ),
+                                         QDialogButtonBox::AcceptRole );
+    ui.updateNotifyButtonBox->addButton( new QPushButton( qtr("&No"), this ),
+                                         QDialogButtonBox::RejectRole );
+
     setWindowTitle( qtr( "VLC media player updates" ) );
     setWindowRole( "vlc-update" );
 
-    QList<QAbstractButton *> buttonsList = ui.updateDialogButtonBox->buttons();
-    QAbstractButton *currentButton;
-    for ( int i = 0; i < buttonsList.size() ; ++i )
-    {
-        currentButton = buttonsList.at( i );
-        if ( ui.updateDialogButtonBox->standardButton( currentButton )
-            == QDialogButtonBox::Retry )
-        {
-            currentButton->setText( qtr( "&Recheck version" ) );
-            qobject_cast<QPushButton *>(currentButton)->setDefault( true );
-        }
-    }
-
-    CONNECT( ui.updateDialogButtonBox, accepted(), this, UpdateOrDownload() );
+    BUTTONACT( recheckButton, UpdateOrDownload() );
     CONNECT( ui.updateDialogButtonBox, rejected(), this, close() );
 
     CONNECT( ui.updateNotifyButtonBox, accepted(), this, UpdateOrDownload() );

@@ -34,7 +34,7 @@
        <item>
         <widget class="QDialogButtonBox" name="updateDialogButtonBox">
          <property name="standardButtons">
-          <set>QDialogButtonBox::Close|QDialogButtonBox::Retry</set>
+          <set>QDialogButtonBox::NoButton</set>
          </property>
         </widget>
        </item>
@@ -122,7 +122,7 @@
        <item>
         <widget class="QDialogButtonBox" name="updateNotifyButtonBox">
          <property name="standardButtons">
-          <set>QDialogButtonBox::No|QDialogButtonBox::Yes</set>
+          <set>QDialogButtonBox::NoButton</set>
          </property>
         </widget>
        </item>

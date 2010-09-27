@@ -33,6 +33,7 @@
 #include <QTabWidget>
 #include <QGridLayout>
 #include <QDialogButtonBox>
+#include <QPushButton>
 #include <vlc_modules.h>
 
 ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
@@ -87,8 +88,9 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 
     layout->addWidget( mainTabW );
 
-    QDialogButtonBox *closeButtonBox =
-        new QDialogButtonBox( QDialogButtonBox::Close, Qt::Horizontal, this );
+    QDialogButtonBox *closeButtonBox = new QDialogButtonBox( Qt::Horizontal, this );
+    closeButtonBox->addButton(
+        new QPushButton( qtr("&Close"), this ), QDialogButtonBox::RejectRole );
     layout->addWidget( closeButtonBox );
     CONNECT( closeButtonBox, rejected(), this, close() );
 
