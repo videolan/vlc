@@ -17,6 +17,7 @@ Access
 
 Codecs
  * You can now use ffmpeg-mt in conjunction with vlc
+ * Important fixes for RealVideo 3.0 and 4.0 playback
 
 Demuxers:
  * id3tag plugin is removed (superseded by taglib).
@@ -24,8 +25,9 @@ Demuxers:
 
 Interfaces
  * The telnet interface has been removed in the favour of the lua one
- * Skins2 / Qt: misc improvements
- * Qt: port to Mac platform
+ * Skins2 / Qt: misc improvements and usability fixes
+ * Qt: effects dialogs reordering
+ * Qt: port to MacOS X platform
 
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
@@ -49,12 +51,30 @@ Stream output:
     index-url=http://url-to-iphonestreamfile-###.ts},mux=ts{use-key-frames},
     dst=public_html/iphonestreamfile-###.ts}"
 
-Translations:
- * New Armenian translation
-
 libVLC:
  * New capabilities for libVLC:
   ** libvlc_media_player_navigate for DVD navigation
+
+
+Changes between 1.1.4 and 1.1.4.1:
+----------------------------------
+
+Mac OS X:
+ * Fixed video output on PowerPC-based Macs for videos with widths divisible
+   by 16
+ * Fixed an issue with the Equalizer's 170Hz slider
+
+Demuxer:
+ * Fix crash when closing rtsp streams
+
+Qt interface:
+ * Fix Windows 7 jumplists with Unicode files
+ * Various fixes for Windows
+
+Translations:
+ * New Armenian translation
+ * Update translations for Dutch, Estonian, Lithuanian, Japanese, Nynorsk,
+   Brazillian Portuguese, Armenian, Wallon
 
 
 Changes between 1.1.3 and 1.1.4:
