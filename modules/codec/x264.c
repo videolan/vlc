@@ -378,8 +378,7 @@ static void Close( vlc_object_t * );
 
 #define LOOKAHEAD_TEXT N_("Framecount to use on frametype lookahead")
 #define LOOKAHEAD_LONGTEXT N_("Framecount to use on frametype lookahead. " \
-    "Currently default is lower than x264 default because unmuxable output" \
-    "doesn't handle larger values that well yet" )
+    "Currently default can cause sync-issues on unmuxable output, like rtsp-output without ts-mux" )
 
 #define HRD_TEXT N_("HRD-timing information")
 #define HRD_LONGTEXT N_("HRD-timing information")
@@ -618,7 +617,7 @@ vlc_module_begin ()
                  TRELLIS_LONGTEXT, false )
         change_integer_range( 0, 2 )
 
-    add_integer( SOUT_CFG_PREFIX "lookahead", 5, NULL, LOOKAHEAD_TEXT,
+    add_integer( SOUT_CFG_PREFIX "lookahead", 40, NULL, LOOKAHEAD_TEXT,
                  LOOKAHEAD_LONGTEXT, false )
         change_integer_range( 0, 60 )
 
@@ -1242,10 +1241,10 @@ static int  Open ( vlc_object_t *p_this )
     vlc_mutex_unlock( &pthread_win32_mutex );
 #endif
 
-    /* Set lookahead value to lower than default,
-     * as rtp-output without mux doesn't handle
-     * difference that well yet*/
-    p_sys->param.rc.i_lookahead= var_GetInteger( p_enc, SOUT_CFG_PREFIX "lookahead" );
+    if( var_GetInteger( p_enc, SOUT_CFG_PREFIX "lookahead" ) != 40 )
+    {
+       p_sys->param.rc.i_lookahead = var_GetInteger( p_enc, SOUT_CFG_PREFIX "lookahead" );
+    }
 
     /* We don't want repeated headers, we repeat p_extra ourself if needed */
     p_sys->param.b_repeat_headers = 0;
