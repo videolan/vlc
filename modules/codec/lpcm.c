@@ -81,15 +81,17 @@ struct decoder_sys_t
 
 /*
  * LPCM DVD header :
- * - frame number (8 bits)
- * - unknown (16 bits) == 0x0003 ?
- * - unknown (4 bits)
- * - current frame (4 bits)
- * - unknown (2 bits)
- * - frequency (2 bits) 0 == 48 kHz, 1 == 32 kHz, 2 == ?, 3 == ?
- * - unknown (1 bit)
+ * - number of frames in this packet (8 bits)
+ * - first access unit (16 bits) == 0x0003 ?
+ * - emphasis (1 bit)
+ * - mute (1 bit)
+ * - reserved (1 bit)
+ * - current frame (5 bits)
+ * - quantisation (2 bits) 0 == 16bps, 1 == 20bps, 2 == 24bps, 3 == illegal
+ * - frequency (2 bits) 0 == 48 kHz, 1 == 96 kHz, 2 == 44.1 kHz, 3 == 32 kHz
+ * - reserved (1 bit)
  * - number of channels - 1 (3 bits) 1 == 2 channels
- * - start code (8 bits) == 0x80
+ * - dynamic range (8 bits) 0x80 == neutral
  *
  * LPCM DVD-A header (http://dvd-audio.sourceforge.net/spec/aob.shtml)
  * - continuity counter (8 bits, clipped to 0x00-0x1f)
