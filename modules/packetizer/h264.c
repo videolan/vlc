@@ -101,6 +101,7 @@ struct decoder_sys_t
     bool   b_pps;
     block_t *pp_sps[SPS_MAX];
     block_t *pp_pps[PPS_MAX];
+    int    i_recovery_frames;  /* -1 = no recovery */
 
     /* avcC data */
     int i_avcC_length_size;
@@ -217,6 +218,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->pp_sps[i] = NULL;
     for( i = 0; i < PPS_MAX; i++ )
         p_sys->pp_pps[i] = NULL;
+    p_sys->i_recovery_frames = -1;
 
     p_sys->slice.i_nal_type = -1;
     p_sys->slice.i_nal_ref_idc = -1;
@@ -714,7 +716,18 @@ static block_t *OutputPicture( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic;
 
-    if( !p_sys->b_header && p_sys->slice.i_frame_type != BLOCK_FLAG_TYPE_I)
+    if ( !p_sys->b_header && p_sys->i_recovery_frames != -1 )
+    {
+        if( p_sys->i_recovery_frames == 0 )
+        {
+            msg_Dbg( p_dec, "Recovery from SEI recovery point complete" );
+            p_sys->b_header = true;
+        }
+        --p_sys->i_recovery_frames;
+    }
+
+    if( !p_sys->b_header && p_sys->i_recovery_frames == -1 &&
+         p_sys->slice.i_frame_type != BLOCK_FLAG_TYPE_I)
         return NULL;
 
     const bool b_sps_pps_i = p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I &&
@@ -760,6 +773,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_pic->i_length = 0;    /* FIXME */
     p_pic->i_flags |= p_sys->slice.i_frame_type;
     p_pic->i_flags &= ~BLOCK_FLAG_PRIVATE_AUD;
+    if( !p_sys->b_header )
+        p_pic->i_flags |= BLOCK_FLAG_PREROLL;
 
     p_sys->slice.i_frame_type = 0;
     p_sys->p_frame = NULL;
@@ -1176,6 +1191,27 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
                 cc_Extract( &p_sys->cc_next, true, &p_t35[3], i_t35 - 3 );
             }
         }
+
+        /* Look for SEI recovery point */
+        if( i_type == 6 )
+        {
+            bs_t s;
+            const int      i_rec = i_size;
+            const uint8_t *p_rec = &pb_dec[i_used];
+    
+            bs_init( &s, p_rec, i_rec );
+            int i_recovery_frames = bs_read_ue( &s );
+            //bool b_exact_match = bs_read( &s, 1 );
+            //bool b_broken_link = bs_read( &s, 1 );
+            //int i_changing_slice_group = bs_read( &s, 2 );
+            if( !p_sys->b_header )
+            {
+                msg_Dbg( p_dec, "Seen SEI recovery point, %d recovery frames", i_recovery_frames );
+                if ( p_sys->i_recovery_frames == -1 || i_recovery_frames < p_sys->i_recovery_frames )
+                    p_sys->i_recovery_frames = i_recovery_frames;
+            }
+        }
+
         i_used += i_size;
     }
 
