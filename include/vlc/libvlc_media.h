@@ -457,7 +457,7 @@ VLC_PUBLIC_API void *libvlc_media_get_user_data( libvlc_media_t *p_md );
  *
  * @begincode
  * libvlc_media_player_t *player = libvlc_media_player_new_from_media(media);
- * libvlc_media_add_option_flag(media, "sout=\"#description\"");
+ * libvlc_media_add_option_flag(media, "sout=#description");
  * libvlc_media_player_play(player);
  * // ... wait until playing
  * libvlc_media_player_release(player);
