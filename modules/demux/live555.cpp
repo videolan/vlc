@@ -7,6 +7,7 @@
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan. org>
  *          Derk-Jan Hartman <djhartman at m2x .dot. nl> for M2X
+ *          Sébastien Escudier <sebastien-devel celeos eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,6 +182,8 @@ struct timeout_thread_t
     bool         b_handle_keep_alive;
 };
 
+class RTSPClientVlc;
+
 struct demux_sys_t
 {
     char            *p_sdp;    /* XXX mallocated */
@@ -190,7 +193,7 @@ struct demux_sys_t
     MediaSession     *ms;
     TaskScheduler    *scheduler;
     UsageEnvironment *env ;
-    RTSPClient       *rtsp;
+    RTSPClientVlc    *rtsp;
 
     /* */
     int              i_track;
@@ -223,8 +226,24 @@ struct demux_sys_t
     bool             b_get_param;   /* Does the server support GET_PARAMETER */
     bool             b_paused;      /* Are we paused? */
     bool             b_error;
+    int              i_live555_ret; /* live555 callback return code */
 
     float            f_seek_request;/* In case we receive a seek request while paused*/
+};
+
+
+class RTSPClientVlc : public RTSPClient
+{
+public:
+    RTSPClientVlc( UsageEnvironment& env, char const* rtspURL, int verbosityLevel,
+                   char const* applicationName, portNumBits tunnelOverHTTPPortNum,
+                   demux_sys_t *p_sys) :
+                   RTSPClient( env, rtspURL, verbosityLevel, applicationName,
+                   tunnelOverHTTPPortNum )
+    {
+        this->p_sys = p_sys;
+    }
+    demux_sys_t *p_sys;
 };
 
 static int Demux  ( demux_t * );
@@ -298,11 +317,12 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->b_multicast = false;
     p_sys->b_real = false;
     p_sys->psz_path = strdup( p_demux->psz_location );
-    p_sys->b_force_mcast = var_CreateGetBool( p_demux, "rtsp-mcast" );
+    p_sys->b_force_mcast = var_InheritBool( p_demux, "rtsp-mcast" );
     p_sys->b_get_param = false;
     p_sys->b_paused = false;
     p_sys->f_seek_request = -1;
     p_sys->b_error = false;
+    p_sys->i_live555_ret = 0;
 
     /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
     vlc_UrlParse( &p_sys->url, p_sys->psz_path, 0 );
@@ -423,7 +443,7 @@ static void Close( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( p_sys->rtsp && p_sys->ms ) p_sys->rtsp->teardownMediaSession( *p_sys->ms );
+    if( p_sys->rtsp && p_sys->ms ) p_sys->rtsp->sendTeardownCommand( *p_sys->ms, NULL );
     if( p_sys->ms ) Medium::close( p_sys->ms );
     if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
     if( p_sys->env ) p_sys->env->reclaim();
@@ -458,6 +478,83 @@ static void Close( vlc_object_t *p_this )
 static inline const char *strempty( const char *s ) { return s?s:""; }
 static inline Boolean toBool( bool b ) { return b?True:False; } // silly, no?
 
+static void default_live555_callback( RTSPClient* client, int result_code, char* result_string )
+{
+    RTSPClientVlc *client_vlc = static_cast<RTSPClientVlc *> ( client );
+    demux_sys_t *p_sys = client_vlc->p_sys;
+    delete []result_string;
+    p_sys->i_live555_ret = result_code;
+    p_sys->b_error = p_sys->i_live555_ret != 0;
+    p_sys->event = 1;
+}
+
+/* return true if the RTSP command succeeded */
+static bool wait_Live555_response( demux_t *p_demux, int i_timeout = 0 /* ms */ )
+{
+    TaskToken task;
+    demux_sys_t * p_sys = p_demux->p_sys;
+    p_sys->event = 0;
+    if( i_timeout > 0 )
+    {
+        /* Create a task that will be called if we wait more than timeout ms */
+        task = p_sys->scheduler->scheduleDelayedTask( i_timeout*1000, TaskInterrupt,
+                                                      p_demux );
+    }
+    p_sys->event = 0;
+    p_sys->b_error = true;
+    p_sys->i_live555_ret = 0;
+    p_sys->scheduler->doEventLoop( &p_sys->event );
+    //here, if b_error is true and i_live555_ret = 0 we didn't receive a response
+    if( i_timeout > 0 )
+    {
+        /* remove the task */
+        p_sys->scheduler->unscheduleDelayedTask( task );
+    }
+    return !p_sys->b_error;
+}
+
+static void continueAfterDESCRIBE( RTSPClient* client, int result_code,
+                                   char* result_string )
+{
+    RTSPClientVlc *client_vlc = static_cast<RTSPClientVlc *> ( client );
+    demux_sys_t *p_sys = client_vlc->p_sys;
+    char* sdpDescription = result_string;
+    p_sys->i_live555_ret = result_code;
+    if ( result_code != 0 )
+    {
+        delete[] sdpDescription;
+        return;
+    }
+    free( p_sys->p_sdp );
+    p_sys->p_sdp = NULL;
+    if( sdpDescription )
+    {
+        p_sys->p_sdp = strdup( sdpDescription );
+        delete[] sdpDescription;
+    }
+    p_sys->b_error = false;
+    p_sys->event = 1;
+}
+
+static void continueAfterOPTIONS( RTSPClient* client, int result_code,
+                                  char* result_string )
+{
+    RTSPClientVlc *client_vlc = static_cast<RTSPClientVlc *> (client);
+    demux_sys_t *p_sys = client_vlc->p_sys;
+    p_sys->i_live555_ret = result_code;
+    if ( result_code != 0 )
+    {
+        p_sys->b_error = true;
+        p_sys->event = 1;
+    }
+    else
+    {
+        p_sys->b_get_param = (bool)strstr( result_string, "GET_PARAMETER" );
+        client->sendDescribeCommand( continueAfterDESCRIBE );
+    }
+    delete[] result_string;
+}
+
 /*****************************************************************************
  * Connect: connects to the RTSP server to setup the session DESCRIBE
  *****************************************************************************/
@@ -472,6 +569,7 @@ static int Connect( demux_t *p_demux )
     char *p_sdp       = NULL;
     int  i_http_port  = 0;
     int  i_ret        = VLC_SUCCESS;
+    const int i_timeout = var_InheritInteger( p_demux, "ipv4-timeout" );
 
     /* Get the user name and password */
     if( p_sys->url.psz_username || p_sys->url.psz_password )
@@ -493,8 +591,8 @@ static int Connect( demux_t *p_demux )
         if( asprintf( &psz_url, "rtsp://%s", p_sys->psz_path ) == -1 )
             return VLC_ENOMEM;
 
-        psz_user = var_CreateGetString( p_demux, "rtsp-user" );
-        psz_pwd  = var_CreateGetString( p_demux, "rtsp-pwd" );
+        psz_user = var_InheritString( p_demux, "rtsp-user" );
+        psz_pwd  = var_InheritString( p_demux, "rtsp-pwd" );
     }
 
 createnew:
@@ -504,12 +602,13 @@ createnew:
         goto bailout;
     }
 
-    if( var_CreateGetBool( p_demux, "rtsp-http" ) )
-        i_http_port = var_CreateGetInteger( p_demux, "rtsp-http-port" );
+    if( var_InheritBool( p_demux, "rtsp-http" ) )
+        i_http_port = var_InheritInteger( p_demux, "rtsp-http-port" );
 
-    if( ( p_sys->rtsp = RTSPClient::createNew( *p_sys->env,
-          var_CreateGetInteger( p_demux, "verbose" ) > 1,
-          "LibVLC/"VERSION, i_http_port ) ) == NULL )
+    p_sys->rtsp = new RTSPClientVlc( *p_sys->env, psz_url,
+                                     var_InheritInteger( p_demux, "verbose" ) > 1 ? 1 : 0,
+                                     "LibVLC/"VERSION, i_http_port, p_sys );
+    if( !p_sys->rtsp )
     {
         msg_Err( p_demux, "RTSPClient::createNew failed (%s)",
                  p_sys->env->getResultMsg() );
@@ -524,7 +623,7 @@ createnew:
      * to spaces in the string or the string being too long. Here we override
      * the default string with a more compact version.
      */
-    if( var_CreateGetBool( p_demux, "rtsp-kasenna" ))
+    if( var_InheritBool( p_demux, "rtsp-kasenna" ))
     {
         p_sys->rtsp->setUserAgentString( "VLC_MEDIA_PLAYER_KA" );
     }
@@ -532,62 +631,11 @@ createnew:
 describe:
     authenticator.setUsernameAndPassword( psz_user, psz_pwd );
 
-    /* */
-    { /* i_timeout hack scope */
-#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
-    const int i_timeout = var_CreateGetInteger(p_demux, "ipv4-timeout") / 1000;
-    psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
-                                               &authenticator, i_timeout );
-#else
-    psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
-                                               &authenticator );
-#endif
-    if( psz_options == NULL && authenticator.realm() != NULL )
+    p_sys->rtsp->sendOptionsCommand( &continueAfterOPTIONS, &authenticator );
+
+    if( !wait_Live555_response( p_demux, i_timeout ) )
     {
-        // try again, with the realm set this time
-#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
-        psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
-                                               &authenticator, i_timeout );
-#else
-        psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
-                                               &authenticator );
-#endif
-    }
-    if( psz_options )
-        p_sys->b_get_param = (bool)strstr( psz_options, "GET_PARAMETER" );
-    delete [] psz_options;
-
-    if( var_CreateGetBool( p_demux, "rtsp-wmserver" ) )
-       p_sys->b_get_param = true;
-
-#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
-    p_sdp = p_sys->rtsp->describeWithPassword( psz_url, psz_user, psz_pwd,
-                          var_GetBool( p_demux, "rtsp-kasenna" ), i_timeout );
-#else
-    p_sdp = p_sys->rtsp->describeWithPassword( psz_url, psz_user, psz_pwd,
-                                     var_GetBool( p_demux, "rtsp-kasenna" ) );
-#endif
-    } /* i_timeout scope end */
-
-    if( p_sdp == NULL )
-    {
-        /* failure occurred */
-        int i_code = 0;
-        const char *psz_error = p_sys->env->getResultMsg();
-
-        if( var_GetBool( p_demux, "rtsp-http" ) )
-            sscanf( psz_error, "%*s %*s HTTP GET %*s HTTP/%*u.%*u %3u %*s",
-                    &i_code );
-        else
-        {
-            const char *psz_tmp = strstr( psz_error, "RTSP" );
-            if( psz_tmp )
-                sscanf( psz_tmp, "RTSP/%*s%3u", &i_code );
-            else
-                i_code = 0;
-        }
-        msg_Dbg( p_demux, "DESCRIBE failed with %d: %s", i_code, psz_error );
-
+        int i_code = p_sys->i_live555_ret;
         if( i_code == 401 )
         {
             msg_Dbg( p_demux, "authentication failed" );
@@ -603,7 +651,7 @@ describe:
                 goto describe;
             }
         }
-        else if( (i_code != 0) && !var_GetBool( p_demux, "rtsp-http" ) )
+        else if( (i_code > 0) && !var_GetBool( p_demux, "rtsp-http" ) )
         {
             /* Perhaps a firewall is being annoying. Try HTTP tunneling mode */
             msg_Dbg( p_demux, "we will now try HTTP tunneling mode" );
@@ -614,17 +662,13 @@ describe:
         }
         else
         {
-            msg_Dbg( p_demux, "connection timeout" );
+            if( i_code == 0 )
+                msg_Dbg( p_demux, "connection timeout" );
             if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
             p_sys->rtsp = NULL;
         }
         i_ret = VLC_EGENERIC;
     }
-
-    free( p_sys->p_sdp );
-    p_sys->p_sdp = NULL;
-    if( p_sdp ) p_sys->p_sdp = strdup( (char*)p_sdp );
-    delete[] p_sdp;
 
 bailout:
     /* malloc-ated copy */
@@ -650,9 +694,9 @@ static int SessionsSetup( demux_t *p_demux )
     unsigned int   i_buffer = 0;
     unsigned const thresh = 200000; /* RTP reorder threshold .2 second (default .1) */
 
-    b_rtsp_tcp    = var_CreateGetBool( p_demux, "rtsp-tcp" ) ||
-                    var_GetBool( p_demux, "rtsp-http" );
-    i_client_port = var_CreateGetInteger( p_demux, "rtp-client-port" );
+    b_rtsp_tcp    = var_InheritBool( p_demux, "rtsp-tcp" ) ||
+                    var_InheritBool( p_demux, "rtsp-http" );
+    i_client_port = var_InheritInteger( p_demux, "rtp-client-port" );
 
     /* Create the session from the SDP */
     if( !( p_sys->ms = MediaSession::createNew( *p_sys->env, p_sys->p_sdp ) ) )
@@ -727,16 +771,17 @@ static int SessionsSetup( demux_t *p_demux )
             /* Issue the SETUP */
             if( p_sys->rtsp )
             {
-                if( !p_sys->rtsp->setupMediaSubsession( *sub, False,
-                                                        toBool( b_rtsp_tcp ),
-                             toBool( p_sys->b_force_mcast && !b_rtsp_tcp ) ) )
+                p_sys->rtsp->sendSetupCommand( *sub, default_live555_callback, False,
+                                               toBool( b_rtsp_tcp ),
+                                               toBool( p_sys->b_force_mcast && !b_rtsp_tcp ) );
+                if( !wait_Live555_response( p_demux ) )
                 {
                     /* if we get an unsupported transport error, toggle TCP
                      * use and try again */
-                    if( !strstr(p_sys->env->getResultMsg(),
-                                "461 Unsupported Transport")
-                        || !p_sys->rtsp->setupMediaSubsession( *sub, False,
-                                               toBool( b_rtsp_tcp ), False ) )
+                    if( p_sys->i_live555_ret == 461 )
+                        p_sys->rtsp->sendSetupCommand( *sub, default_live555_callback, False,
+                                                       toBool( b_rtsp_tcp ), False );
+                    if( p_sys->i_live555_ret != 461 || !wait_Live555_response( p_demux ) )
                     {
                         msg_Err( p_demux, "SETUP of'%s/%s' failed %s",
                                  sub->mediumName(), sub->codecName(),
@@ -1058,7 +1103,9 @@ static int Play( demux_t *p_demux )
     if( p_sys->rtsp )
     {
         /* The PLAY */
-        if( !p_sys->rtsp->playMediaSession( *p_sys->ms, p_sys->i_npt_start, -1, 1 ) )
+        p_sys->rtsp->sendPlayCommand( *p_sys->ms, default_live555_callback, p_sys->i_npt_start, -1, 1 );
+
+        if( !wait_Live555_response(p_demux) )
         {
             msg_Err( p_demux, "RTSP PLAY failed %s", p_sys->env->getResultMsg() );
             return VLC_EGENERIC;
@@ -1120,7 +1167,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->b_timeout_call && p_sys->rtsp && p_sys->ms )
     {
         char *psz_bye = NULL;
-        p_sys->rtsp->getMediaSessionParameter( *p_sys->ms, NULL, psz_bye );
+        p_sys->rtsp->sendGetParameterCommand( *p_sys->ms, NULL, psz_bye );
         p_sys->b_timeout_call = false;
     }
 
@@ -1293,13 +1340,18 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     return VLC_SUCCESS;
                 }
 
-                if( !p_sys->rtsp->pauseMediaSession( *p_sys->ms ) )
+                p_sys->rtsp->sendPauseCommand( *p_sys->ms, default_live555_callback );
+
+                if( !wait_Live555_response( p_demux ) )
                 {
                     msg_Err( p_demux, "PAUSE before seek failed %s",
                         p_sys->env->getResultMsg() );
                     return VLC_EGENERIC;
                 }
-                if( !p_sys->rtsp->playMediaSession( *p_sys->ms, time, -1, 1 ) )
+
+                p_sys->rtsp->sendPlayCommand( *p_sys->ms, default_live555_callback, time, -1, 1 );
+
+                if( !wait_Live555_response( p_demux ) )
                 {
                     msg_Err( p_demux, "seek PLAY failed %s",
                         p_sys->env->getResultMsg() );
@@ -1389,7 +1441,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             /* Passing -1 for the start and end time will mean liveMedia won't
              * create a Range: section for the RTSP message. The server should
              * pick up from the current position */
-            if( !p_sys->rtsp->playMediaSession( *p_sys->ms, -1, -1, f_scale ) )
+            p_sys->rtsp->sendPlayCommand( *p_sys->ms, default_live555_callback, -1, -1, f_scale );
+
+            if( !wait_Live555_response( p_demux ) )
             {
                 msg_Err( p_demux, "PLAY with Scale %0.2f failed %s", f_scale,
                         p_sys->env->getResultMsg() );
@@ -1421,12 +1475,16 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             if( b_pause == p_sys->b_paused )
                 return VLC_SUCCESS;
-            if( ( b_pause && !p_sys->rtsp->pauseMediaSession( *p_sys->ms ) ) ||
-                    ( !b_pause && !p_sys->rtsp->playMediaSession( *p_sys->ms,
-                       p_sys->f_seek_request, -1.0f, p_sys->ms->scale() ) ) )
+            if( b_pause )
+                p_sys->rtsp->sendPauseCommand( *p_sys->ms, default_live555_callback );
+            else
+                p_sys->rtsp->sendPlayCommand( *p_sys->ms, default_live555_callback, p_sys->f_seek_request,
+                                              -1.0f, p_sys->ms->scale() );
+
+            if( !wait_Live555_response( p_demux ) )
             {
-                    msg_Err( p_demux, "PLAY or PAUSE failed %s", p_sys->env->getResultMsg() );
-                    return VLC_EGENERIC;
+                msg_Err( p_demux, "PLAY or PAUSE failed %s", p_sys->env->getResultMsg() );
+                return VLC_EGENERIC;
             }
             p_sys->f_seek_request = -1;
             p_sys->b_paused = b_pause;
@@ -1511,7 +1569,7 @@ static int RollOverTcp( demux_t *p_demux )
     if( p_sys->i_track ) free( p_sys->track );
     if( p_sys->p_out_asf ) stream_Delete( p_sys->p_out_asf );
 
-    p_sys->rtsp->teardownMediaSession( *p_sys->ms );
+    p_sys->rtsp->sendTeardownCommand( *p_sys->ms, NULL );
     Medium::close( p_sys->ms );
     RTSPClient::close( p_sys->rtsp );
 
@@ -1887,7 +1945,7 @@ static void* TimeoutPrevention( void *p_data )
             char *psz_bye = NULL;
             int canc = vlc_savecancel ();
 
-            p_timeout->p_sys->rtsp->getMediaSessionParameter( *p_timeout->p_sys->ms, NULL, psz_bye );
+            p_timeout->p_sys->rtsp->sendGetParameterCommand( *p_timeout->p_sys->ms, NULL, psz_bye );
             vlc_restorecancel (canc);
         }
         p_timeout->p_sys->b_timeout_call = !p_timeout->b_handle_keep_alive;

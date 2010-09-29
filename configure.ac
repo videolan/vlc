@@ -1739,11 +1739,11 @@ if test "${enable_live555}" != "no"; then
     CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_live555}"
 
     AC_CHECK_HEADERS(liveMedia_version.hh, [
-      AC_MSG_CHECKING(for liveMedia version >= 1214895600 )
+      AC_MSG_CHECKING(for liveMedia version >= 1275091200 )
       AC_EGREP_CPP(yes,
         [#include <liveMedia_version.hh>
          #ifdef LIVEMEDIA_LIBRARY_VERSION_INT
-         #if LIVEMEDIA_LIBRARY_VERSION_INT < 1214895600
+         #if LIVEMEDIA_LIBRARY_VERSION_INT < 1275091200
          yes
          #endif
          #endif],
@@ -1792,11 +1792,11 @@ lternatively you can use --disable-live555 to disable the liveMedia plugin.])
       AC_MSG_RESULT(${real_live555_tree}/liveMedia/libliveMedia.a)
 
       AC_CHECK_HEADERS(${real_live555_tree}/liveMedia/include/liveMedia_version.hh,[
-        AC_MSG_CHECKING(for liveMedia version >= 1214895600 )
+        AC_MSG_CHECKING(for liveMedia version >= 1275091200 )
         AC_EGREP_CPP(yes,
           [#include "${real_live555_tree}/liveMedia/include/liveMedia_version.hh"
            #ifdef LIVEMEDIA_LIBRARY_VERSION_INT
-           #if LIVEMEDIA_LIBRARY_VERSION_INT < 1214895600
+           #if LIVEMEDIA_LIBRARY_VERSION_INT < 1275091200
            yes
            #endif
            #endif],
