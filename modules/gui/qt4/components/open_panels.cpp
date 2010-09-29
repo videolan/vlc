@@ -50,7 +50,6 @@
 #include <QStringListModel>
 #include <QDropEvent>
 
-
 #define I_DEVICE_TOOLTIP \
     I_DIR_OR_FOLDER( N_("Select a device or a VIDEO_TS directory"), \
                      N_("Select a device or a VIDEO_TS folder") )
@@ -797,17 +796,43 @@ void CaptureOpenPanel::initialize()
     if( module_exists( "v4l2" ) ){
     addModuleAndLayouts( V4L2_DEVICE, v4l2, "Video for Linux 2", QGridLayout );
 
+    char const * const ppsz_v4lvdevices[] = {
+        "video*"
+    };
+
+    char const * const ppsz_v4ladevices[] = {
+        "dsp*",
+        "radio*"
+    };
+
+    #define POPULATE_WITH_DEVS(ppsz_devlist, targetCombo) \
+    QStringList targetCombo ## StringList = QStringList(); \
+    for ( int i = 0; i< sizeof(ppsz_devlist) / sizeof(*ppsz_devlist); i++ ) \
+        targetCombo ## StringList << QString( ppsz_devlist[ i ] ); \
+    QDir targetCombo ## Dir = QDir( "/dev/" ); \
+    targetCombo->addItems( \
+        targetCombo ## Dir\
+        .entryList( targetCombo ## StringList, QDir::System )\
+        .replaceInStrings( QRegExp("^"), "/dev/" ) \
+    );
+
     /* V4l Main panel */
     QLabel *v4l2VideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
     v4l2DevLayout->addWidget( v4l2VideoDeviceLabel, 0, 0 );
 
-    v4l2VideoDevice = new QLineEdit;
+    v4l2VideoDevice = new QComboBox( this );
+    v4l2VideoDevice->setEditable( true );
+    POPULATE_WITH_DEVS( ppsz_v4lvdevices, v4l2VideoDevice );
+    v4l2VideoDevice->clearEditText();
     v4l2DevLayout->addWidget( v4l2VideoDevice, 0, 1 );
 
     QLabel *v4l2AudioDeviceLabel = new QLabel( qtr( "Audio device name" ) );
     v4l2DevLayout->addWidget( v4l2AudioDeviceLabel, 1, 0 );
 
-    v4l2AudioDevice = new QLineEdit;
+    v4l2AudioDevice = new QComboBox( this );
+    v4l2AudioDevice->setEditable( true );
+    POPULATE_WITH_DEVS( ppsz_v4ladevices, v4l2AudioDevice );
+    v4l2AudioDevice->clearEditText();
     v4l2DevLayout->addWidget( v4l2AudioDevice, 1, 1 );
 
     /* v4l2 Props panel */
@@ -821,9 +846,12 @@ void CaptureOpenPanel::initialize()
             1, 0, 3, 1 );
 
     /* v4l2 CONNECTs */
-    CuMRL( v4l2VideoDevice, textChanged( const QString& ) );
-    CuMRL( v4l2AudioDevice, textChanged( const QString& ) );
+    CuMRL( v4l2VideoDevice->lineEdit(), textChanged( const QString& ) );
+    CuMRL( v4l2VideoDevice,  currentIndexChanged ( int ) );
+    CuMRL( v4l2AudioDevice->lineEdit(), textChanged( const QString& ) );
+    CuMRL( v4l2AudioDevice,  currentIndexChanged ( int ) );
     CuMRL( v4l2StdBox,  currentIndexChanged ( int ) );
+    #undef POPULATE_WITH_DEVS
     }
 
     /*******
@@ -1159,8 +1187,8 @@ void CaptureOpenPanel::updateMRL()
         mrl += " :v4l-frequency=" + QString::number( v4lFreq->value() );
         break;
     case V4L2_DEVICE:
-        fileList << "v4l2://" + v4l2VideoDevice->text();
-        mrl += " :input-slave=alsa://" + v4l2AudioDevice->text();
+        fileList << "v4l2://" + v4l2VideoDevice->currentText();
+        mrl += " :input-slave=alsa://" + v4l2AudioDevice->currentText();
         mrl += " :v4l2-standard=" + QString::number( v4l2StdBox->currentIndex() );
         break;
     case JACK_DEVICE:

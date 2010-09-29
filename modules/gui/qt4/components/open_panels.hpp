@@ -211,7 +211,7 @@ private:
     QLabel *dvbBandLabel, *dvbSrateLabel;
     QSpinBox  *v4lFreq, *pvrFreq, *pvrBitr;
     QLineEdit *v4lVideoDevice, *v4lAudioDevice;
-    QLineEdit *v4l2VideoDevice, *v4l2AudioDevice;
+    QComboBox *v4l2VideoDevice, *v4l2AudioDevice;
     QLineEdit *pvrDevice, *pvrRadioDevice;
     QComboBox *v4lNormBox, *v4l2StdBox, *pvrNormBox, *dvbBandBox;
     QSpinBox *dvbCard, *dvbFreq, *dvbSrate;
