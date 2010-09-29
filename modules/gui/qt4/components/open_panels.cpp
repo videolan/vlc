@@ -836,14 +836,14 @@ void CaptureOpenPanel::initialize()
     v4l2DevLayout->addWidget( v4l2AudioDevice, 1, 1 );
 
     /* v4l2 Props panel */
-    QLabel *v4l2StdLabel = new QLabel( qtr( "Standard" ) );
+    QLabel *v4l2StdLabel = new QLabel( qtr( "Video standard" ) );
     v4l2PropLayout->addWidget( v4l2StdLabel, 0 , 0 );
 
     v4l2StdBox = new QComboBox;
     setfillVLCConfigCombo( "v4l2-standard", p_intf, v4l2StdBox );
     v4l2PropLayout->addWidget( v4l2StdBox, 0 , 1 );
     v4l2PropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
-            1, 0, 3, 1 );
+            1, 0, 3, 2 );
 
     /* v4l2 CONNECTs */
     CuMRL( v4l2VideoDevice->lineEdit(), textChanged( const QString& ) );
