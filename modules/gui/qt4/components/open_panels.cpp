@@ -539,21 +539,22 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.setupUi( this );
 
     /* CONNECTs */
-    CONNECT( ui.urlText, textChanged( const QString& ), this, updateMRL());
+    CONNECT( ui.urlComboBox->lineEdit(), textChanged( const QString& ), this, updateMRL());
+    CONNECT( ui.urlComboBox, currentIndexChanged( const QString& ), this, updateMRL());
 
     if( var_InheritBool( p_intf, "qt-recentplay" ) )
     {
         mrlList = new QStringListModel(
                 getSettings()->value( "Open/netMRL" ).toStringList() );
-        QCompleter *completer = new QCompleter( mrlList, this );
-        ui.urlText->setCompleter( completer );
-
-        CONNECT( ui.urlText, editingFinished(), this, updateCompleter() );
+        ui.urlComboBox->setModel( mrlList );
+        ui.urlComboBox->clearEditText();
+        CONNECT( ui.urlComboBox->lineEdit(), editingFinished(), this, updateModel() );
     }
     else
         mrlList = NULL;
 
-    ui.urlText->setValidator( new UrlValidator( this ) );
+    ui.urlComboBox->setValidator( new UrlValidator( this ) );
+    ui.urlComboBox->setFocus();
 }
 
 NetOpenPanel::~NetOpenPanel()
@@ -601,7 +602,7 @@ void NetOpenPanel::updateMRL()
         { "udp",   "udp"   },
     };
 
-    QString url = ui.urlText->text();
+    QString url = ui.urlComboBox->lineEdit()->text();
     if( !url.contains( "://") )
         return; /* nothing to do this far */
 
@@ -618,12 +619,12 @@ void NetOpenPanel::updateMRL()
     emit mrlUpdated( qsl, "" );
 }
 
-void NetOpenPanel::updateCompleter()
+void NetOpenPanel::updateModel()
 {
     assert( mrlList );
     QStringList tempL = mrlList->stringList();
-    if( !tempL.contains( ui.urlText->text() ) )
-        tempL.append( ui.urlText->text() );
+    if( !tempL.contains( ui.urlComboBox->lineEdit()->text() ) )
+        tempL.append( ui.urlComboBox->lineEdit()->text() );
     mrlList->setStringList( tempL );
 }
 

@@ -146,7 +146,7 @@ private:
 public slots:
     virtual void updateMRL();
 private slots:
-    void updateCompleter();
+    void updateModel();
 };
 
 class UrlValidator : public QValidator
