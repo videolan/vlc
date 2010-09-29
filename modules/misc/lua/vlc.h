@@ -91,6 +91,13 @@ static inline const char *luaL_nilorcheckstring( lua_State *L, int narg )
     return luaL_checkstring( L, narg );
 }
 
+static inline char *luaL_strdupornull( lua_State *L, int narg )
+{
+    if( lua_isstring( L, narg ) )
+        return strdup( luaL_checkstring( L, narg ) );
+    return NULL;
+}
+
 void vlclua_set_this( lua_State *, vlc_object_t * );
 #define vlclua_set_this(a, b) vlclua_set_this(a, VLC_OBJECT(b))
 vlc_object_t * vlclua_get_this( lua_State * );
