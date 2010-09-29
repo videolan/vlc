@@ -342,31 +342,61 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
             /* Get author */
             lua_getfield( L, -1, "author" );
             if( lua_isstring( L, -1 ) )
-                p_ext->psz_author = strdup( luaL_optstring( L, -1, NULL ) );
+            {
+                p_ext->psz_author = strdup( luaL_checkstring( L, -1 ) );
+            }
+            else
+            {
+                p_ext->psz_author = NULL;
+            }
             lua_pop( L, 1 );
 
             /* Get description */
             lua_getfield( L, -1, "description" );
             if( lua_isstring( L, -1 ) )
-                p_ext->psz_description = strdup( luaL_optstring( L, -1, NULL ) );
+            {
+                p_ext->psz_description = strdup( luaL_checkstring( L, -1 ) );
+            }
+            else
+            {
+                p_ext->psz_description = NULL;
+            }
             lua_pop( L, 1 );
 
             /* Get short description */
             lua_getfield( L, -1, "shortdesc" );
             if( lua_isstring( L, -1 ) )
-                p_ext->psz_shortdescription = strdup( luaL_optstring( L, -1, NULL ) );
+            {
+                p_ext->psz_shortdescription = strdup( luaL_checkstring( L, -1 ) );
+            }
+            else
+            {
+                p_ext->psz_shortdescription = NULL;
+            }
             lua_pop( L, 1 );
 
             /* Get URL */
             lua_getfield( L, -1, "url" );
             if( lua_isstring( L, -1 ) )
-                p_ext->psz_url = strdup( luaL_optstring( L, -1, NULL ) );
+            {
+                p_ext->psz_url = strdup( luaL_checkstring( L, -1 ) );
+            }
+            else
+            {
+                p_ext->psz_url = NULL;
+            }
             lua_pop( L, 1 );
 
             /* Get version */
             lua_getfield( L, -1, "version" );
             if( lua_isstring( L, -1 ) )
-                p_ext->psz_version = strdup( luaL_optstring( L, -1, NULL ) );
+            {
+                p_ext->psz_version = strdup( luaL_checkstring( L, -1 ) );
+            }
+            else
+            {
+                p_ext->psz_version = NULL;
+            }
             lua_pop( L, 1 );
         }
         else
