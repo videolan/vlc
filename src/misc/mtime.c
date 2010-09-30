@@ -216,11 +216,16 @@ mtime_t mdate( void )
     uint64_t date = mach_absolute_time();
     mach_timebase_info_data_t tb = mtime_timebase_info;
 
-    /* Get the ssystem dependent factor. Switch to double to prevent overflow */
-    double factor = (double) tb.numer / (double) tb.denom;
-    /* Convert to microseconds */
-    double d = (double) date * factor / 1000;
-    res = d;
+    /* tb.denom is uint32_t, switch to 64 bits to prevent overflow. */
+    uint64_t denom = tb.denom;
+
+    /* Switch to microsecs */
+    denom *= 1000LL;
+
+    /* Split the division to prevent overflow */
+    lldiv_t d = lldiv (tb.numer, denom);
+
+    res = (d.quot * date) + ((d.rem * date) / denom);
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
     /* We don't need the real date, just the value of a high precision timer */
