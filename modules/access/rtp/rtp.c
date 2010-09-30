@@ -431,7 +431,6 @@ static void codec_decode (demux_t *demux, void *data, block_t *block)
         block_Release (block);
 }
 
-
 static void *stream_init (demux_t *demux, const char *name)
 {
     return stream_DemuxNew (demux, name, demux->out);
@@ -452,6 +451,11 @@ static void stream_decode (demux_t *demux, void *data, block_t *block)
     else
         block_Release (block);
     (void)demux;
+}
+
+static void *demux_init (demux_t *demux)
+{
+    return stream_init (demux, demux->psz_demux);
 }
 
 /*
@@ -679,7 +683,22 @@ int rtp_autodetect (demux_t *demux, rtp_session_t *session,
         break;
 
       default:
-        return -1;
+        /*
+         * If the rtp payload type is unknown then check demux if it is specified
+         */
+        if ((strcmp(demux->psz_demux, "h264") == 0) || (strcmp(demux->psz_demux, "ts") == 0))
+        {
+          msg_Dbg (demux, "rtp autodetect specified demux=%s", demux->psz_demux);
+          pt.init = demux_init;
+          pt.destroy = stream_destroy;
+          pt.decode = stream_decode;
+          pt.frequency = 90000;
+          break;
+        }
+        else
+        {
+          return -1;
+        }
     }
     rtp_add_type (demux, session, &pt);
     return 0;
