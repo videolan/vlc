@@ -316,12 +316,12 @@ static int Create( vlc_object_t *p_this )
     var_Create( p_filter, "freetype-rel-fontsize",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
-    psz_fontfamily = var_CreateGetString( p_filter, "freetype-font" );
-    p_sys->i_default_font_size = var_CreateGetInteger( p_filter, "freetype-fontsize" );
-    p_sys->i_effect = var_CreateGetInteger( p_filter, "freetype-effect" );
-    p_sys->i_font_opacity = var_CreateGetInteger( p_filter,"freetype-opacity" );
+    psz_fontfamily = var_InheritString( p_filter, "freetype-font" );
+    p_sys->i_default_font_size = var_InheritInteger( p_filter, "freetype-fontsize" );
+    p_sys->i_effect = var_InheritInteger( p_filter, "freetype-effect" );
+    p_sys->i_font_opacity = var_InheritInteger( p_filter,"freetype-opacity" );
     p_sys->i_font_opacity = __MAX( __MIN( p_sys->i_font_opacity, 255 ), 0 );
-    p_sys->i_font_color = var_CreateGetInteger( p_filter, "freetype-color" );
+    p_sys->i_font_color = var_InheritInteger( p_filter, "freetype-color" );
     p_sys->i_font_color = __MAX( __MIN( p_sys->i_font_color , 0xFFFFFF ), 0 );
 
     fontindex=0;
