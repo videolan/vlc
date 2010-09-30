@@ -479,11 +479,11 @@ error:
 #ifdef HAVE_FONTCONFIG
     if( fontmatch ) FcPatternDestroy( fontmatch );
     if( fontpattern ) FcPatternDestroy( fontpattern );
-#endif
 
 #ifdef WIN32
     if( p_dialog )
         dialog_ProgressDestroy( p_dialog );
+#endif
 #endif
 
     if( p_sys->p_face ) FT_Done_Face( p_sys->p_face );
