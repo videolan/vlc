@@ -701,7 +701,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_fr
         block_ChainAppend( &p_sys->p_frame, p_frag );
 
     *pb_used_ts = false;
-    if( p_sys->i_frame_dts <= VLC_TS_INVALID && 
+    if( p_sys->i_frame_dts <= VLC_TS_INVALID &&
         p_sys->i_frame_pts <= VLC_TS_INVALID )
     {
         p_sys->i_frame_dts = i_frag_dts;
@@ -1198,7 +1198,7 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
             bs_t s;
             const int      i_rec = i_size;
             const uint8_t *p_rec = &pb_dec[i_used];
-    
+
             bs_init( &s, p_rec, i_rec );
             int i_recovery_frames = bs_read_ue( &s );
             //bool b_exact_match = bs_read( &s, 1 );
