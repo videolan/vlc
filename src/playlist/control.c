@@ -158,9 +158,10 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
 
     case PLAYLIST_PAUSE:
         if( !pl_priv(p_playlist)->p_input )
-        {    /* FIXME: is this really useful without input? */
-             pl_priv(p_playlist)->status.i_status = PLAYLIST_PAUSED;
-             break;
+        {   /* FIXME: is this really useful without input? */
+            pl_priv(p_playlist)->status.i_status = PLAYLIST_PAUSED;
+            /* return without notifying the playlist thread as there is nothing to do */
+            return VLC_SUCCESS;
         }
 
         if( var_GetInteger( pl_priv(p_playlist)->p_input, "state" ) == PAUSE_S )
