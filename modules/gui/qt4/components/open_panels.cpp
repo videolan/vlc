@@ -54,6 +54,17 @@
     I_DIR_OR_FOLDER( N_("Select a device or a VIDEO_TS directory"), \
                      N_("Select a device or a VIDEO_TS folder") )
 
+/* Populate a combobox with the devices matching a pattern.
+   Combobox will automatically do autocompletion on the edit zone */
+#define POPULATE_WITH_DEVS(ppsz_devlist, targetCombo) \
+    QStringList targetCombo ## StringList = QStringList(); \
+    for ( int i = 0; i< sizeof(ppsz_devlist) / sizeof(*ppsz_devlist); i++ ) \
+        targetCombo ## StringList << QString( ppsz_devlist[ i ] ); \
+    targetCombo->addItems( QDir( "/dev/" )\
+        .entryList( targetCombo ## StringList, QDir::System )\
+        .replaceInStrings( QRegExp("^"), "/dev/" ) \
+    );
+
 static const char *psz_devModule[] = { "v4l", "v4l2", "pvr", "dvb", "bda",
                                        "dshow", "screen", "jack" };
 
@@ -351,10 +362,16 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
         }
         SetErrorMode(oldMode);
     }
-#else /* Use a Completer under Linux */
-    QCompleter *discCompleter = new QCompleter( this );
-    discCompleter->setModel( new QDirModel( discCompleter ) );
-    ui.deviceCombo->setCompleter( discCompleter );
+#else /* Linux */
+    char const * const ppsz_discdevices[] = {
+        "sr*",
+        "sg*",
+        "scd*",
+        "dvd*",
+        "cd*"
+    };
+    QComboBox *discCombo = ui.deviceCombo; /* avoid namespacing in macro */
+    POPULATE_WITH_DEVS( ppsz_discdevices, discCombo );
 #endif
 
     /* CONNECTs */
@@ -805,17 +822,6 @@ void CaptureOpenPanel::initialize()
         "radio*"
     };
 
-    #define POPULATE_WITH_DEVS(ppsz_devlist, targetCombo) \
-    QStringList targetCombo ## StringList = QStringList(); \
-    for ( int i = 0; i< sizeof(ppsz_devlist) / sizeof(*ppsz_devlist); i++ ) \
-        targetCombo ## StringList << QString( ppsz_devlist[ i ] ); \
-    QDir targetCombo ## Dir = QDir( "/dev/" ); \
-    targetCombo->addItems( \
-        targetCombo ## Dir\
-        .entryList( targetCombo ## StringList, QDir::System )\
-        .replaceInStrings( QRegExp("^"), "/dev/" ) \
-    );
-
     /* V4l Main panel */
     QLabel *v4l2VideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
     v4l2DevLayout->addWidget( v4l2VideoDeviceLabel, 0, 0 );
@@ -851,7 +857,6 @@ void CaptureOpenPanel::initialize()
     CuMRL( v4l2AudioDevice->lineEdit(), textChanged( const QString& ) );
     CuMRL( v4l2AudioDevice,  currentIndexChanged ( int ) );
     CuMRL( v4l2StdBox,  currentIndexChanged ( int ) );
-    #undef POPULATE_WITH_DEVS
     }
 
     /*******
