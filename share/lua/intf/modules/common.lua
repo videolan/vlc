@@ -86,13 +86,56 @@ function realpath(path)
     return string.gsub(string.gsub(string.gsub(string.gsub(path,"/%.%./[^/]+","/"),"/[^/]+/%.%./","/"),"/%./","/"),"//","/")
 end
 
+-- parse the time from a string and return the seconds
+-- time format: [+ or -][<int><H or h>:][<int><M or m or '>:][<int><nothing or S or s or ">]
+function parsetime(timestring)
+    local seconds = 0
+    local hourspattern = "(%d+)[hH]"
+    local minutespattern = "(%d+)[mM']"
+    local secondspattern = "(%d+)[sS\"]?$"
+
+    local _, _, hoursmatch = string.find(timestring, hourspattern)
+    if hoursmatch ~= nil then
+        seconds = seconds + tonumber(hoursmatch) * 3600
+    end
+    local _, _, minutesmatch = string.find(timestring, minutespattern)
+    if minutesmatch ~= nil then
+        seconds = seconds + tonumber(minutesmatch) * 60
+    end
+    local _, _, secondsmatch = string.find(timestring, secondspattern)
+    if secondsmatch ~= nil then
+        seconds = seconds + tonumber(secondsmatch)
+    end
+
+    if string.sub(timestring,1,1) == "-" then
+        seconds = seconds * -1
+    end
+
+    return seconds
+end
+
 -- seek
 function seek(value)
     local input = vlc.object.input()
-    if string.sub(value,#value)=="%" then
-        vlc.var.set(input,"position",tonumber(string.sub(value,1,#value-1))/100.)
-    else
-        vlc.var.set(input,"time",tonumber(value))
+    if input ~= nil and value ~= nil then
+        if string.sub(value,-1) == "%" then
+            local number = tonumber(string.sub(value,1,-2))
+            if number ~= nil then
+                local posPercent = tonumber( string.sub(value,1,-2))/100.
+                if string.sub(value,1,1) == "+" or string.sub(value,1,1) == "-" then
+                    vlc.var.set(input,"position",vlc.var.get(input,"position") + posPercent)
+                else
+                    vlc.var.set(input,"position",posPercent)
+                end
+            end
+        else
+            local posTime = parsetime(value)
+            if string.sub(value,1,1) == "+" or string.sub(value,1,1) == "-" then
+                vlc.var.set(input,"time",vlc.var.get(input,"time") + posTime)
+            else
+                vlc.var.set(input,"time",posTime)
+            end
+        end
     end
 end
 
