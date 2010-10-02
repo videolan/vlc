@@ -43,6 +43,7 @@
 #include <QStyleFactory>
 #include <QSettings>
 #include <QtAlgorithms>
+#include <QDir>
 
 #define ICON_HEIGHT 64
 
@@ -407,7 +408,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             /* Disk Devices */
             {
-                ui.DVDDevice->setToolTip(
+                ui.DVDDeviceComboBox->setToolTip(
                     qtr( "If this property is blank, different values\n"
                          "for DVD, VCD, and CDDA are set.\n"
                          "You can define a unique one or configure them \n"
@@ -419,14 +420,23 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 if( !strcmp( psz_cddadiscpath, psz_dvddiscpath ) &&
                     !strcmp( psz_dvddiscpath, psz_vcddiscpath ) )
                 {
-                    ui.DVDDevice->setText( qfu( psz_dvddiscpath ) );
+                    ui.DVDDeviceComboBox->setEditText( qfu( psz_dvddiscpath ) );
                 }
                 free( psz_cddadiscpath );
                 free( psz_dvddiscpath );
                 free( psz_vcddiscpath );
             }
-            CONFIG_GENERIC_FILE( "dvd", File, ui.DVDLabel,
-                                 ui.DVDDevice, ui.DVDBrowse );
+#ifndef WIN32
+            QStringList DVDDeviceComboBoxStringList = QStringList();
+            DVDDeviceComboBoxStringList
+                    << "dvd*" << "scd*" << "sr*" << "sg*" << "cd*";
+            ui.DVDDeviceComboBox->addItems( QDir( "/dev/" )
+                    .entryList( DVDDeviceComboBoxStringList, QDir::System )
+                    .replaceInStrings( QRegExp("^"), "/dev/" )
+            );
+#endif
+            CONFIG_GENERIC( "dvd", String, ui.DVDLabel,
+                            DVDDeviceComboBox->lineEdit() );
             CONFIG_GENERIC_FILE( "input-record-path", Directory, ui.recordLabel,
                                  ui.recordPath, ui.recordBrowse );
 
@@ -455,7 +465,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #else
             ui.systemCodecBox->hide();
 #endif
-            optionWidgets.append( ui.DVDDevice );
+            optionWidgets.append( ui.DVDDeviceComboBox );
             optionWidgets.append( ui.cachingCombo );
             CONFIG_GENERIC( "ffmpeg-skiploopfilter", IntegerList, ui.filterLabel, loopFilterBox );
             CONFIG_GENERIC( "sout-x264-tune", StringList, ui.x264Label, tuneBox );
@@ -752,7 +762,7 @@ void SPrefsPanel::apply()
     {
         /* Device default selection */
         char *psz_devicepath =
-            strdup( qtu( qobject_cast<QLineEdit *>(optionWidgets[inputLE] )->text() ) );
+            strdup( qtu( qobject_cast<QComboBox *>(optionWidgets[inputLE])->currentText() ) );
         if( !EMPTY_STR( psz_devicepath ) )
         {
             config_PutPsz( p_intf, "dvd", psz_devicepath );
