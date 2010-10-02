@@ -55,7 +55,11 @@ if command == "in_play" then
 elseif command == "in_enqueue" then
   vlc.playlist.enqueue({{path=stripslashes(input),options=options}})
 elseif command == "pl_play" then
-  vlc.playlist.goto(id)
+  if id == -1 then
+    vlc.playlist.play()
+  else
+    vlc.playlist.goto(id)
+  end
 elseif command == "pl_pause" then
   vlc.playlist.pause()
 elseif command == "pl_stop" then

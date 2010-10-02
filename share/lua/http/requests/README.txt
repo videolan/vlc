@@ -23,7 +23,7 @@ status.xml:
 > add <mrl> to playlist:
   ?command=in_enqueue&input=<mrl>
 
-> play playlist item <id>:
+> play playlist item <id>. If <id> is omitted, play last active item:
   ?command=pl_play&id=<id>
 
 > toggle pause. If current state was 'stop', play item <id>:
