@@ -91,7 +91,8 @@ static int blurayOpen( vlc_object_t *object )
     int i_title = 0;
     char bd_path[PATH_MAX];
 
-    if( !p_access->psz_location || !*p_access->psz_location ) {
+    if( strcmp( p_access->psz_access, "bluray" ) ) {
+        // TODO BDMV support, once we figure out what to do in libbluray
         return VLC_EGENERIC;
     }
 
