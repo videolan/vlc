@@ -1748,38 +1748,44 @@ if test "${enable_live555}" != "no"; then
          #endif
          #endif],
         [AC_MSG_RESULT([no])
-         AC_MSG_ERROR([Your version of liveMedia is too old: you may get a more recent one from http://www.live555.com/liveMedia.
+          if test "${enable_live555}" == "yes"; then
+            AC_MSG_ERROR([Your version of liveMedia is too old: you may get a more recent one from http://www.live555.com/liveMedia.
 lternatively you can use --disable-live555 to disable the liveMedia plugin.])
-      ],[
-	 AC_MSG_RESULT([yes])
-	 ])
-    ])
-     other_libs="-lgroupsock -lBasicUsageEnvironment -lUsageEnvironment"
-     other_libs_pic="-lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic"
-      if test "${SYS}" = "mingw32"; then
-        # add ws2_32 for closesocket, select, recv
-        other_libs="$other_libs -lws2_32"
-      elif test "${SYS}" = "mingwce"; then
-        # add ws2 for closesocket, select, recv
-        other_libs="$other_libs -lws2"
-      fi
-    dnl We need to check for pic because live555 don't provide shared libs
-    dnl and we want to build a plugins so we need -fPIC on some arch.
-    AC_CHECK_HEADERS(liveMedia.hh, [
-      VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
-        AC_CHECK_LIB(liveMedia_pic, main, [
-          VLC_ADD_PLUGIN([live555])
-         VLC_ADD_LIBS([live555], [-lliveMedia_pic ${other_libs_pic}])
-	 ],[
-        AC_CHECK_LIB(liveMedia, main, [
-          VLC_ADD_PLUGIN([live555])
-          VLC_ADD_LIBS([live555], [-lliveMedia ${other_libs}])
-        ],[],[${other_libs}]) ],[${other_libs_pic}])
-    ],[
-       AC_MSG_WARN([The development files for liveMedia (live555) can't be found])
-    ])
-    CPPFLAGS="${CPPFLAGS_save}"
-    AC_LANG_POP(C++)
+          else
+            AC_MSG_WARN([Your version of liveMedia is too old: you may get a more recent one from http://www.live555.com/liveMedia.])
+          fi
+        ],[
+          AC_MSG_RESULT([yes])
+          other_libs="-lgroupsock -lBasicUsageEnvironment -lUsageEnvironment"
+          other_libs_pic="-lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic"
+          if test "${SYS}" = "mingw32"; then
+            # add ws2_32 for closesocket, select, recv
+            other_libs="$other_libs -lws2_32"
+          elif test "${SYS}" = "mingwce"; then
+            # add ws2 for closesocket, select, recv
+            other_libs="$other_libs -lws2"
+          fi
+
+          dnl We need to check for pic because live555 don't provide shared libs
+          dnl and we want to build a plugins so we need -fPIC on some arch.
+          AC_CHECK_HEADERS(liveMedia.hh, [
+            VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
+              AC_CHECK_LIB(liveMedia_pic, main, [
+                VLC_ADD_PLUGIN([live555])
+               VLC_ADD_LIBS([live555], [-lliveMedia_pic ${other_libs_pic}])
+              ],[
+                AC_CHECK_LIB(liveMedia, main, [
+                VLC_ADD_PLUGIN([live555])
+                VLC_ADD_LIBS([live555], [-lliveMedia ${other_libs}])
+              ],[],[${other_libs}]) ],[${other_libs_pic}])
+          ],[
+           AC_MSG_WARN([The development files for liveMedia (live555) can't be found])
+          ])
+
+          CPPFLAGS="${CPPFLAGS_save}"
+          AC_LANG_POP(C++)
+        ])
+      ])
   else
     AC_MSG_CHECKING(for liveMedia/libliveMedia.a in ${with_live555_tree})
     real_live555_tree="`cd ${with_live555_tree} 2>/dev/null && pwd`"
