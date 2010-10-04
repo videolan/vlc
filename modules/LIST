@@ -155,6 +155,7 @@ $Id$
  * jack: jack server audio output
  * kate: kate text bitstream decoder
  * libass: Subtitle renderers using libass
+ * libbluray: Library to access Blu-Ray drives
  * libmpeg2: Mpeg2 video decoder using libmpeg2
  * lirc: Linux infrared control module
  * live555: rtp demux based on liveMedia (live555.com)
