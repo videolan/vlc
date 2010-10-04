@@ -1,10 +1,10 @@
 Index: os.h
 ===================================================================
---- os.h	(révision 12136)
+--- os.h	(révision 17483)
 +++ os.h	(copie de travail)
 @@ -20,6 +20,14 @@
  #include <math.h>
- #include "os_types.h"
+ #include <ogg/os_types.h>
  
 +#ifdef _LOW_ACCURACY_
 +#  define X(n) (((((n)>>22)+1)>>1) - ((((n)>>22)+1)>>9))
@@ -17,87 +17,3 @@ Index: os.h
  #ifndef _V_IFDEFJAIL_H_
  #  define _V_IFDEFJAIL_H_
  
-Index: synthesis.c
-===================================================================
---- synthesis.c	(révision 12136)
-+++ synthesis.c	(copie de travail)
-@@ -34,7 +34,7 @@
-  
-   /* first things first.  Make sure decode is ready */
-   _vorbis_block_ripcord(vb);
--  oggpack_readinit(opb,op->packet);
-+  oggpack_readinit(opb,op->packet,op->bytes);
- 
-   /* Check the packet type */
-   if(oggpack_read(opb,1)!=0){
-@@ -87,7 +87,7 @@
-   oggpack_buffer       opb;
-   int                  mode;
-  
--  oggpack_readinit(&opb,op->packet);
-+  oggpack_readinit(&opb,op->packet,op->bytes);
- 
-   /* Check the packet type */
-   if(oggpack_read(&opb,1)!=0){
-Index: info.c
-===================================================================
---- info.c  (révision 16541)
-+++ info.c  (copie de travail)
-@@ -299,7 +299,7 @@
-   char buffer[6];
- 
-   if(op){
--    oggpack_readinit(&opb,op->packet);
-+    oggpack_readinit(&opb,op->packet,op->bytes);
- 
-     if(!op->b_o_s)
-       return(0); /* Not the initial packet */
-@@ -327,7 +327,7 @@
-   oggpack_buffer opb;
-   
-   if(op){
--    oggpack_readinit(&opb,op->packet);
-+    oggpack_readinit(&opb,op->packet,op->bytes);
- 
-     /* Which of the three types of header is this? */
-     /* Also verify header-ness, vorbis */
-Index: ivorbiscodec.h
-===================================================================
---- ivorbiscodec.h	(révision 12136)
-+++ ivorbiscodec.h	(copie de travail)
-@@ -23,7 +23,7 @@
- {
- #endif /* __cplusplus */
- 
--#include "ogg.h"
-+#include <ogg/ogg.h>
- 
- typedef struct vorbis_info{
-   int version;
-Index: Makefile.am
-===================================================================
---- Makefile.am	(révision 12136)
-+++ Makefile.am	(copie de travail)
-@@ -8,11 +8,11 @@
-                         synthesis.c info.c \
-                         floor1.c floor0.c vorbisfile.c \
-                         res012.c mapping0.c registry.c codebook.c \
--			sharedbook.c framing.c bitwise.c \
-+			sharedbook.c \
-                         codebook.h misc.h mdct_lookup.h\
-                         os.h mdct.h block.h ivorbisfile.h lsp_lookup.h\
-                         registry.h window.h window_lookup.h\
--                        codec_internal.h backends.h ogg.h \
-+                        codec_internal.h backends.h \
- 			asm_arm.h ivorbiscodec.h
- libvorbisidec_la_LDFLAGS = -version-info @V_LIB_CURRENT@:@V_LIB_REVISION@:@V_LIB_AGE@
- 
-@@ -25,7 +25,7 @@
- 
- includedir = $(prefix)/include/tremor
- 
--include_HEADERS = ivorbiscodec.h ivorbisfile.h ogg.h os_types.h config_types.h
-+include_HEADERS = ivorbiscodec.h ivorbisfile.h os_types.h config_types.h
- 
- example:
- 	-ln -fs . vorbis
