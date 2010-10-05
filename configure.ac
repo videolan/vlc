@@ -33,7 +33,6 @@ dnl If you want to use it, you definitely know what you are doing, so
 dnl you can specify "--disable-maintainer-mode". But if you want the default
 dnl automake behavior, you've likely never heard of maintainer mode, so we
 dnl can't expect you to enable it manually.
-
 AS_IF([test "x${enable_maintainer_mode}" != "xno"],
     [enable_maintainer_mode="yes"])
 AM_MAINTAINER_MODE
@@ -88,12 +87,12 @@ AC_DEFUN([EXTEND_HELP_STRING], [m4_divert_once([HELP_ENABLE], [$1])])
 dnl Allow binary package maintainer to pass a custom string to avoid
 dnl cache problem
 AC_ARG_WITH(binary-version,
-	AS_HELP_STRING([--with-binary-version=STRING],
-	     [To avoid plugins cache problem between binary version]),[],[])
+    AS_HELP_STRING([--with-binary-version=STRING],
+         [To avoid plugins cache problem between binary version]),[],[])
 AS_IF([test -n "${with_binary_version}"],[
-      AC_DEFINE_UNQUOTED([DISTRO_VERSION],["${with_binary_version}"],
-			 [Binary specific version])
-      ])
+    AC_DEFINE_UNQUOTED([DISTRO_VERSION],["${with_binary_version}"],
+         [Binary specific version])
+])
 
 
 dnl
@@ -139,9 +138,6 @@ AS_IF([test "${with_contrib}" != "no"],[
     if test -z "$with_mozilla_sdk_path"; then
        with_mozilla_sdk_path="${CONTRIB_DIR}/gecko-sdk"
     fi
-    if test -z "$with_cyberlink_tree"; then
-       with_cyberlink_tree="${CONTRIB_DIR}/src/clinkcc"
-    fi
 
     if test "${SYS}" = "darwin"; then
       export LD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$LD_LIBRARY_PATH"
@@ -155,6 +151,7 @@ AS_IF([test "${with_contrib}" != "no"],[
     CONTRIB_DIR=""
   ])
 ])
+
 dnl
 dnl  Set default values
 dnl
@@ -342,7 +339,7 @@ case "${host_os}" in
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
         ac_default_prefix="`pwd`/_wince"
         DESTDIR="`pwd`/_wince/"
-   fi
+    fi
     ;;
   *nto*)
     SYS=nto
@@ -443,20 +440,19 @@ AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
 #if (__MINGW32_MAJOR_VERSION == 3) && (__MINGW32_MINOR_VERSION < 15)
 # error Attempting to use mingw-runtime with broken vsnprintf support
 #endif
-], [
+    ], [
         AC_MSG_RESULT([ok])
-], [
+    ], [
         AC_MSG_RESULT([present])
         AC_MSG_ERROR([LibVLC requires mingw-runtime version 3.15 or higher!])
-])
+    ])
     dnl force use of mingw provided c99 *printf over msvcrt
     CPPFLAGS="${CPPFLAGS} -D__USE_MINGW_ANSI_STDIO=1"
     CPPFLAGS_save="${CPPFLAGS_save} -D__USE_MINGW_ANSI_STDIO=1"
 ])
 
 dnl Check for the need to include the mingwex lib for mingw32
-if test "${SYS}" = "mingw32"
-then
+if test "${SYS}" = "mingw32" ; then
     AC_CHECK_LIB(mingwex,opendir,
         AC_CHECK_LIB(mingw32,opendir,,
             [VLC_ADD_LIBS([libvlccore],[-lmingwex])])
@@ -464,8 +460,7 @@ then
 fi
 
 dnl Check for fnative-struct or mms-bitfields support for mingw32
-if test "${SYS}" = "mingw32"
-then
+if test "${SYS}" = "mingw32" ; then
     AC_CACHE_CHECK([if \$CC accepts -mms-bitfields],
         [ac_cv_c_mms_bitfields],
         [CFLAGS="${CFLAGS_save} -mms-bitfields"
@@ -488,9 +483,8 @@ then
 fi
 
 dnl Check for fvtable-thunks support for mingw32
-if test "${SYS}" = "mingw32" -a "${CXX}" != ""
-then
-AC_LANG_PUSH(C++)
+if test "${SYS}" = "mingw32" -a "${CXX}" != "" ; then
+    AC_LANG_PUSH(C++)
     AC_CACHE_CHECK([if \$CXX accepts -fvtable-thunks],
         [ac_cv_cxx_fvtable_thunks],
         [CXXFLAGS="${CXXFLAGS_save} -Wall -Werror -fvtable-thunks"
@@ -501,7 +495,7 @@ AC_LANG_PUSH(C++)
     fi
 
     CXXFLAGS_save="${CXXFLAGS_save} ${CXXFLAGS_mingw32_special}"; CXXFLAGS="${CXXFLAGS_save}"
-AC_LANG_POP(C++)
+    AC_LANG_POP(C++)
 fi
 
 dnl
@@ -749,43 +743,43 @@ fi
 AC_SUBST(LIBDL)
 
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-dnl Check for pthreads - borrowed from XMMS
-THREAD_LIB=error
-if test "${THREAD_LIB}" = "error"; then
-  AC_CHECK_LIB(pthread,main,THREAD_LIB="-lpthread")
-fi
-if test "${THREAD_LIB}" = "error"; then
-  AC_CHECK_LIB(pthreads,main,THREAD_LIB="-lpthreads")
-fi
-if test "${THREAD_LIB}" = "error"; then
-  AC_CHECK_LIB(c_r,main,THREAD_LIB="-lc_r")
-fi
-if test "${THREAD_LIB}" = "error"; then
-  AC_CHECK_FUNCS(pthread_mutex_lock)
-  THREAD_LIB=""
-fi
+  dnl Check for pthreads - borrowed from XMMS
+  THREAD_LIB=error
+  if test "${THREAD_LIB}" = "error"; then
+    AC_CHECK_LIB(pthread,main,THREAD_LIB="-lpthread")
+  fi
+  if test "${THREAD_LIB}" = "error"; then
+    AC_CHECK_LIB(pthreads,main,THREAD_LIB="-lpthreads")
+  fi
+  if test "${THREAD_LIB}" = "error"; then
+    AC_CHECK_LIB(c_r,main,THREAD_LIB="-lc_r")
+  fi
+  if test "${THREAD_LIB}" = "error"; then
+    AC_CHECK_FUNCS(pthread_mutex_lock)
+    THREAD_LIB=""
+  fi
 
-VLC_ADD_LIBS([libvlccore libvlc vlc plugin],[${THREAD_LIB}])
+  VLC_ADD_LIBS([libvlccore libvlc vlc plugin],[${THREAD_LIB}])
 
-AC_CHECK_LIB(rt, clock_nanosleep, [
-  VLC_ADD_LIBS([libvlccore],[-lrt])
-  AC_DEFINE(HAVE_CLOCK_NANOSLEEP, 1, [Define to 1 if you have clock_nanosleep.])
-], [
-  dnl HP/UX port
-  AC_CHECK_LIB(rt,sem_init, [VLC_ADD_LIBS([libvlccore],[-lrt])])
-])
+  AC_CHECK_LIB(rt, clock_nanosleep, [
+    VLC_ADD_LIBS([libvlccore],[-lrt])
+    AC_DEFINE(HAVE_CLOCK_NANOSLEEP, 1, [Define to 1 if you have clock_nanosleep.])
+  ], [
+    dnl HP/UX port
+    AC_CHECK_LIB(rt,sem_init, [VLC_ADD_LIBS([libvlccore],[-lrt])])
+  ])
 
-have_nanosleep=false
-AC_CHECK_FUNCS(nanosleep,have_nanosleep=:,[
-  AC_CHECK_LIB(rt,nanosleep,
-    [VLC_ADD_LIBS([libvlccore],[-lrt]) have_nanosleep=:],
-    [AC_CHECK_LIB(posix4,nanosleep,
-        [VLC_ADD_LIBS([libvlccore],[-lposix4]) have_nanosleep=:])]
-  )
-])
-if ${have_nanosleep}; then
-  AC_DEFINE(HAVE_NANOSLEEP, 1, [Define if nanosleep is available.])
-fi
+  have_nanosleep=false
+  AC_CHECK_FUNCS(nanosleep,have_nanosleep=:,[
+    AC_CHECK_LIB(rt,nanosleep,
+      [VLC_ADD_LIBS([libvlccore],[-lrt]) have_nanosleep=:],
+      [AC_CHECK_LIB(posix4,nanosleep,
+          [VLC_ADD_LIBS([libvlccore],[-lposix4]) have_nanosleep=:])]
+    )
+  ])
+  if ${have_nanosleep}; then
+    AC_DEFINE(HAVE_NANOSLEEP, 1, [Define if nanosleep is available.])
+  fi
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 dnl Check for misc headers
@@ -809,13 +803,14 @@ AC_CHECK_HEADERS([sys/mount.h], [], [],
   [
     #include <sys/param.h>
   ])
+
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-AC_CHECK_HEADERS(machine/param.h sys/shm.h)
-AC_CHECK_HEADERS([linux/version.h linux/dccp.h scsi/scsi.h linux/magic.h])
-AC_CHECK_HEADERS(syslog.h)
+  AC_CHECK_HEADERS(machine/param.h sys/shm.h)
+  AC_CHECK_HEADERS([linux/version.h linux/dccp.h scsi/scsi.h linux/magic.h])
+  AC_CHECK_HEADERS(syslog.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
-dnl LP64 adn LLP64 architectures had better define ssize_t by themselves...
+dnl LP64 and LLP64 architectures had better define ssize_t by themselves...
 AH_TEMPLATE(ssize_t, [Define to `int' if <stddef.h> does not define.])
 AC_CHECK_TYPE(ssize_t,, [
   AC_DEFINE(ssize_t, int)
@@ -831,14 +826,14 @@ fi
 
 dnl Mac OS X and other OSes don't have declaration for nanosleep
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-AC_MSG_CHECKING(for nanosleep in time.h)
-AC_EGREP_HEADER(nanosleep,time.h,[
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(HAVE_DECL_NANOSLEEP, 1,
-            Define if <time.h> defines nanosleep.)
-],[
-  AC_MSG_RESULT(no)
-])
+  AC_MSG_CHECKING(for nanosleep in time.h)
+  AC_EGREP_HEADER(nanosleep,time.h,[
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(HAVE_DECL_NANOSLEEP, 1,
+              Define if <time.h> defines nanosleep.)
+  ],[
+    AC_MSG_RESULT(no)
+  ])
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 dnl Make sure we have timespecs
@@ -853,7 +848,7 @@ AC_EGREP_HEADER(timespec,sys/time.h,[
 
 dnl Check for threads library
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-AC_CHECK_HEADERS(pthread.h)
+  AC_CHECK_HEADERS(pthread.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 dnl It seems that autoconf detects pkg-config only during the first
@@ -861,20 +856,20 @@ dnl PKG_CHECK_MODULES from configure.ac - which makes sense. But in our case,
 dnl it is nested within a conditional block, so it was not working right.
 dnl Make PKG_CONFIG_PATH precious so that it appears in the help and get saved
 AC_ARG_VAR(PKG_CONFIG_PATH,
-	   [Paths where to find .pc not at the default location])
+       [Paths where to find .pc not at the default location])
 PKG_PROG_PKG_CONFIG()
 
 dnl On some OS we need static linking 
-       AS_IF([test -n "${PKG_CONFIG}" ],[
-	      AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce" -o "${SYS}" = "darwin" ],[
-	          PKG_CONFIG="${PKG_CONFIG} --static"
-   	      ])
-       ])
+AS_IF([test -n "${PKG_CONFIG}" ],[
+    AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce" -o "${SYS}" = "darwin" ],[
+        PKG_CONFIG="${PKG_CONFIG} --static"
+    ])
+])
 
 
 dnl
 dnl Check for zlib.h and -lz along with system -lminizip if available
-dnl 
+dnl
 AC_CHECK_HEADERS(zlib.h, [ have_zlib=yes ], [ have_zlib=no ])
 AM_CONDITIONAL(HAVE_ZLIB, [ test "${have_zlib}" = "yes" ])
 if test "${have_zlib}" = "yes"
