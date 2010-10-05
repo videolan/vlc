@@ -33,11 +33,11 @@ typedef struct
 {
     const char *psz_string;
     const char *psz_escaped;
-}sample_t;
+}escape_sample_t;
 
-static const sample_t samples[] =
+static const escape_sample_t escape_samples[] =
 {
-    { "a",          "a" },
+    { "a",          "a"             },
     { "azertyuiop", "azertyuiop"    },
     { "  test    ", "  test    "    },
     { "it's",       "it\\'s"        },
@@ -46,27 +46,91 @@ static const sample_t samples[] =
     { "\"quote\"",  "\\\"quote\\\"" },
     { " az\" ",     " az\\\" "      },
     { "\\test",     "\\\\test"      },
-    { NULL,   NULL }
+    { NULL,         NULL            }
 };
 
 static void test_config_StringEscape()
 {
-    for( int i = 0; samples[i].psz_string; i++ )
+    for( int i = 0; escape_samples[i].psz_string; i++ )
     {
-        char *psz_tmp = config_StringEscape( samples[i].psz_string );
-        assert( !strcmp( psz_tmp, samples[i].psz_escaped ) );
+        char *psz_tmp = config_StringEscape( escape_samples[i].psz_string );
+        assert( !strcmp( psz_tmp, escape_samples[i].psz_escaped ) );
         free( psz_tmp );
     }
 }
 
 static void test_config_StringUnEscape()
 {
-    for( int i =0; samples[i].psz_string; i++ )
+    for( int i = 0; escape_samples[i].psz_string; i++ )
     {
-        char *psz_tmp = strdup( samples[i].psz_escaped );
+        char *psz_tmp = strdup( escape_samples[i].psz_escaped );
         config_StringUnescape( psz_tmp );
-        assert( !strcmp( psz_tmp, samples[i].psz_string ) );
+        assert( !strcmp( psz_tmp, escape_samples[i].psz_string ) );
         free( psz_tmp );
+    }
+}
+
+typedef struct
+{
+    const char *psz_name;
+    const char *psz_value;
+}pair_t;
+
+typedef struct
+{
+    const char *psz_string;
+    const char *psz_module;
+    const char *psz_next;
+    pair_t      config[4];
+}chain_sample_t;
+
+static const chain_sample_t chain_samples[] =
+{
+    { "module1",                         "module1", NULL, { { NULL, NULL } } },
+    { "bla{}",                           "bla",     NULL, { { NULL, NULL } } },
+    { "module{a=b}:module2{name=value}", "module",  "module2{name=value}",
+        { { "a",  "b"  },
+          { NULL, NULL } } },
+    { "éç€{a=b}",                        "éç€",     NULL,
+        { { "a",  "b"  },
+          { NULL, NULL } } },
+    { "module:module2",                  "module",  "module2", { { NULL, NULL } } },
+    { "mod{çé=\"arg'\",bla='bip'}",      "mod",     NULL,
+        { { "çé",  "arg'"  },
+          { "bla", "bip"  },
+          { NULL, NULL } } },
+    { "mod{a=b,  c=d, a_i=f}:mod2{b=c}", "mod",     "mod2{b=c}",
+        { { "a",   "b"  },
+          { "c",   "d"  },
+          { "a_i", "f"  },
+          { NULL,  NULL } } },
+    { NULL,                              NULL,      NULL, { { NULL, NULL } } }
+};
+
+
+static void test_config_ChainCreate()
+{
+    for( int i = 0; chain_samples[i].psz_string; i++ )
+    {
+        config_chain_t *p_cfg;
+        char *psz_module;
+        char *psz_next = config_ChainCreate( &psz_module, &p_cfg, chain_samples[i].psz_string );
+
+        assert( !strcmp( chain_samples[i].psz_module, psz_module ) );
+        assert( (!psz_next && !chain_samples[i].psz_next) || !strcmp( chain_samples[i].psz_next, psz_next ) );
+
+        config_chain_t *p_tmp = p_cfg;
+        for( int j = 0; chain_samples[i].config[j].psz_name; j++)
+        {
+            assert( !strcmp( chain_samples[i].config[j].psz_name,  p_tmp->psz_name ) &&
+                    !strcmp( chain_samples[i].config[j].psz_value, p_tmp->psz_value ) );
+            p_tmp = p_tmp->p_next;
+        }
+        assert( !p_tmp );
+
+        config_ChainDestroy( p_cfg );
+        free( psz_next );
+        free( psz_module );
     }
 }
 
@@ -76,6 +140,8 @@ int main( void )
     test_config_StringEscape();
     log( "Testing config chain un-escaping\n" );
     test_config_StringUnEscape();
+    log( "Testing config_ChainCreate()\n" );
+    test_config_ChainCreate();
 
     return 0;
 }
