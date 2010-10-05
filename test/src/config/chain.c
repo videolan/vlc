@@ -70,6 +70,7 @@ static void test_config_StringUnEscape()
     }
 }
 
+
 typedef struct
 {
     const char *psz_name;
@@ -94,6 +95,9 @@ static const chain_sample_t chain_samples[] =
     { "éç€{a=b}",                        "éç€",     NULL,
         { { "a",  "b"  },
           { NULL, NULL } } },
+    { "mod{listen=127.0.0.1:80}",        "mod",     NULL,
+        { { "listen", "127.0.0.1:80" },
+          { NULL,     NULL           } } },
     { "module:module2",                  "module",  "module2", { { NULL, NULL } } },
     { "mod{çé=\"arg'\",bla='bip'}",      "mod",     NULL,
         { { "çé",  "arg'"  },
@@ -106,7 +110,6 @@ static const chain_sample_t chain_samples[] =
           { NULL,  NULL } } },
     { NULL,                              NULL,      NULL, { { NULL, NULL } } }
 };
-
 
 static void test_config_ChainCreate()
 {
@@ -134,6 +137,48 @@ static void test_config_ChainCreate()
     }
 }
 
+
+static const char *ppsz_string[] =
+{
+    "bla",
+    "module1{a=b, b=c}",
+    "a{re=\"errtetyegzrf\", b=c, vetrjtrjt=erte234tth:12}",
+    "module1{a=b, b=c}:std{lang=C}",
+    NULL
+};
+
+static void check_config_equality( config_chain_t *p_cfg1, config_chain_t *p_cfg2 )
+{
+    while(p_cfg1 && p_cfg2)
+    {
+        assert( !strcmp( p_cfg1->psz_name,  p_cfg2->psz_name ) &&
+                !strcmp( p_cfg1->psz_value, p_cfg2->psz_value ) );
+
+        p_cfg1 = p_cfg1->p_next;
+        p_cfg2 = p_cfg2->p_next;
+    }
+    assert(!p_cfg1 && !p_cfg2);
+}
+
+static void test_config_ChainDuplicate()
+{
+    for( int i = 0; ppsz_string[i]; i++ )
+    {
+        char *psz_module;
+        config_chain_t *p_cfg;
+        char *psz_next = config_ChainCreate( &psz_module, &p_cfg, ppsz_string[i] );
+
+        config_chain_t *p_cfg_copy = config_ChainDuplicate( p_cfg );
+        check_config_equality(p_cfg, p_cfg_copy);
+
+        config_ChainDestroy( p_cfg_copy );
+        config_ChainDestroy( p_cfg );
+        free( psz_next );
+        free( psz_module );
+    }
+}
+
+
 int main( void )
 {
     log( "Testing config chain escaping\n" );
@@ -142,6 +187,8 @@ int main( void )
     test_config_StringUnEscape();
     log( "Testing config_ChainCreate()\n" );
     test_config_ChainCreate();
+    log( "Testing config_ChainDuplicate()\n" );
+    test_config_ChainDuplicate();
 
     return 0;
 }
