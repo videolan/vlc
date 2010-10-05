@@ -57,7 +57,7 @@ void vlc_epg_Clean( vlc_epg_t *p_epg )
 void vlc_epg_AddEvent( vlc_epg_t *p_epg, int64_t i_start, int i_duration,
                        const char *psz_name, const char *psz_short_description, const char *psz_description )
 {
-    vlc_epg_event_t *p_evt = (vlc_epg_event_t*)malloc( sizeof(vlc_epg_event_t) );
+    vlc_epg_event_t *p_evt = malloc( sizeof(vlc_epg_event_t) );
     if( !p_evt )
         return;
     p_evt->i_start = i_start;
@@ -65,12 +65,12 @@ void vlc_epg_AddEvent( vlc_epg_t *p_epg, int64_t i_start, int i_duration,
     p_evt->psz_name = psz_name ? strdup( psz_name ) : NULL;
     p_evt->psz_short_description = psz_short_description ? strdup( psz_short_description ) : NULL;
     p_evt->psz_description = psz_description ? strdup( psz_description ) : NULL;
-    TAB_APPEND_CPP( vlc_epg_event_t, p_epg->i_event, p_epg->pp_event, p_evt );
+    TAB_APPEND( p_epg->i_event, p_epg->pp_event, p_evt );
 }
 
 vlc_epg_t *vlc_epg_New( const char *psz_name )
 {
-    vlc_epg_t *p_epg = (vlc_epg_t*)malloc( sizeof(vlc_epg_t) );
+    vlc_epg_t *p_epg = malloc( sizeof(vlc_epg_t) );
     if( p_epg )
         vlc_epg_Init( p_epg, psz_name );
     return p_epg;
