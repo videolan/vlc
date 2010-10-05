@@ -2311,21 +2311,21 @@ AC_ARG_ENABLE(mkv,
 if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
   AC_LANG_PUSH(C++)
   AC_CHECK_HEADERS(ebml/EbmlVersion.h, [
-    AC_MSG_CHECKING(for libebml version >= 0.7.7)
+    AC_MSG_CHECKING(for libebml version >= 1.0.0)
     AC_EGREP_CPP(yes,
       [#include <ebml/EbmlVersion.h>
        #ifdef LIBEBML_VERSION
-       #if LIBEBML_VERSION >= 0x000706
+       #if LIBEBML_VERSION >= 0x010000
        yes
        #endif
        #endif],
       [AC_MSG_RESULT([yes])
         AC_CHECK_HEADERS(matroska/KaxVersion.h, [
-          AC_MSG_CHECKING(for libmatroska version >= 0.8.0)
+          AC_MSG_CHECKING(for libmatroska version >= 1.0.0)
           AC_EGREP_CPP(yes,
             [#include <matroska/KaxVersion.h>
              #ifdef LIBMATROSKA_VERSION
-             #if LIBMATROSKA_VERSION >= 0x000705
+             #if LIBMATROSKA_VERSION >= 0x010000
              yes
              #endif
              #endif],
@@ -2343,7 +2343,7 @@ if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
                   VLC_ADD_PLUGIN([mkv])
                   VLC_ADD_LIBS([mkv],[-lmatroska -lebml])
                 ])
-	      )
+      )
             ],
             [AC_MSG_RESULT([no])
               AC_MSG_ERROR([Your libmatroska is too old: you may get a more recent one from http://dl.matroska.org/downloads/libmatroska/. Alternatively you can use --disable-mkv to disable the matroska plugin.])
