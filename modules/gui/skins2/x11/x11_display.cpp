@@ -26,10 +26,13 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/xpm.h>
 #include <X11/extensions/shape.h>
 
 #include "x11_display.hpp"
 #include "../src/logger.hpp"
+
+#include "../../../share/icons/32x32/vlc.xpm"
 
 template<class type> type X11Display::putPixel(type r, type g, type b) const
 {
@@ -236,6 +239,28 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
         // Change the window title
         XStoreName( m_pDisplay, m_mainWindow, "VLC Media Player" );
+
+        // Add an icon
+        Pixmap icon_pixmap, shape_pixmap;
+        int ret = XpmCreatePixmapFromData( m_pDisplay, root, (char**)vlc_xpm,
+                                           &icon_pixmap, &shape_pixmap, NULL );
+        if( ret == XpmSuccess )
+        {
+            XWMHints *wm = XAllocWMHints();
+            if( wm )
+            {
+                wm->icon_pixmap = icon_pixmap;
+                wm->icon_mask = shape_pixmap;
+                wm->flags = (IconPixmapHint|IconMaskHint);
+
+                XSetWMHints( m_pDisplay, m_mainWindow, wm );
+                XFree( wm );
+            }
+        }
+        else
+        {
+            msg_Err( getIntf(), "icon failed to be loaded (err=%i)", ret );
+        }
 
         // Receive map notify events
         XSelectInput( m_pDisplay, m_mainWindow, StructureNotifyMask );
@@ -460,6 +485,5 @@ unsigned long X11Display::getPixelValue( uint8_t r, uint8_t g, uint8_t b )
 
     return m_pixelSize==1 ? 255 - value : value;
 }
-
 
 #endif

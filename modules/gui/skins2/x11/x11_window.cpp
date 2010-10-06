@@ -165,6 +165,14 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     classhint.res_class = (char*) "Vlc";
     XSetClassHint( XDISPLAY, m_wnd, &classhint );
 
+    // copies WM_HINTS from the main window
+    XWMHints *wm = XGetWMHints( XDISPLAY, m_rDisplay.getMainWindow() );
+    if( wm )
+    {
+        XSetWMHints( XDISPLAY, m_wnd, wm );
+        XFree( wm );
+    }
+
     // initialize WM_CLIENT_MACHINE
     char* hostname = NULL;
     long host_name_max = sysconf( _SC_HOST_NAME_MAX );

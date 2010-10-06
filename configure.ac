@@ -3688,7 +3688,7 @@ if test "${enable_skins2}" = "yes" ||
     ALIASES="${ALIASES} svlc"
     VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 ${X_CFLAGS} -DX11_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
-    VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} -lXext -lX11])
+    VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} -lXext -lXpm -lX11])
     need_xid_provider="no"
   fi fi fi
 fi
