@@ -57,7 +57,7 @@ void vlc_epg_Clean( vlc_epg_t *p_epg )
 void vlc_epg_AddEvent( vlc_epg_t *p_epg, int64_t i_start, int i_duration,
                        const char *psz_name, const char *psz_short_description, const char *psz_description )
 {
-    vlc_epg_event_t *p_evt = malloc( sizeof(vlc_epg_event_t) );
+    vlc_epg_event_t *p_evt = malloc( sizeof(*p_evt) );
     if( !p_evt )
         return;
     p_evt->i_start = i_start;
@@ -70,7 +70,7 @@ void vlc_epg_AddEvent( vlc_epg_t *p_epg, int64_t i_start, int i_duration,
 
 vlc_epg_t *vlc_epg_New( const char *psz_name )
 {
-    vlc_epg_t *p_epg = malloc( sizeof(vlc_epg_t) );
+    vlc_epg_t *p_epg = malloc( sizeof(*p_epg) );
     if( p_epg )
         vlc_epg_Init( p_epg, psz_name );
     return p_epg;
