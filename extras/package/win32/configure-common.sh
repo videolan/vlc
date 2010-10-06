@@ -26,7 +26,7 @@ fi
       --enable-goom \
       --enable-caca \
       --enable-portaudio \
-      --enable-sdl --with-sdl-config-path=$CONTRIBS/bin \
+      --enable-sdl \
       --enable-qt4 \
       --enable-mozilla --with-mozilla-sdk-path=$CONTRIBS/gecko-sdk \
       --enable-activex \
