@@ -20,7 +20,7 @@ fi
       --enable-x264 \
       --enable-schroedinger \
       --enable-realrtsp \
-      --enable-live555 --with-live555-tree=$CONTRIBS/live.com \
+      --enable-live555 \
       --enable-dvdread --with-dvdnav-config-path=$CONTRIBS/bin \
       --enable-shout \
       --enable-goom \
