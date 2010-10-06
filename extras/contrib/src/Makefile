@@ -543,6 +543,9 @@ a52dec: a52dec-$(A52DEC_VERSION).tar.gz
 ifeq ($(ARCH),armel)
 	(cd $@ ; patch -p0 < ../Patches/liba52-fixed.diff)
 endif
+ifdef HAVE_WIN64
+	(cd $@ ; autoreconf -if)
+endif
 
 .a52: a52dec
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd liba52 && make && make install && cd ../include && make && make install)
@@ -753,6 +756,9 @@ libtheora-$(THEORA_VERSION).tar.bz2:
 libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch -p0 < Patches/libtheora-includes.patch
+ifdef HAVE_WIN64
+	(cd $@ ; autoreconf -if -I m4)
+endif
 
 THEORACONF = --disable-sdltest --disable-oggtest --disable-vorbistest --disable-examples
 
@@ -1628,6 +1634,9 @@ portaudio: pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifneq ($(HOST),$(BUILD))
 	(patch -p0 < Patches/portaudio-cross.patch;cd $@;  autoconf)
+endif
+ifdef HAVE_WIN64
+	(cd $@ ; autoreconf -if)
 endif
 
 .portaudio: portaudio
