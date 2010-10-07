@@ -319,22 +319,22 @@ echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> toolchain.cmake
 fi
 
 if wget --version >/dev/null 2>&1; then
-    echo "WGET = `which wget` -c --passive" >> config.mak
+    echo "WGET = \"`which wget`\" -c --passive" >> config.mak
 elif test -z `curl --version >/dev/null 2>&1`; then
-    echo "WGET = `which curl` -L -O" >> config.mak
+    echo "WGET = \"`which curl`\" -L -O" >> config.mak
 else
     echo "You need at least wget or curl to fetch the packages." >&2
     exit 1
 fi
 
 if svn --version >/dev/null 2>&1; then
-    echo "SVN = `which svn`" >> config.mak
+    echo "SVN = \"`which svn`\"" >> config.mak
 else
     echo "You do not have a subversion client in your PATH." >&2
 fi
 
 if git --version>/dev/null 2>&1; then
-    echo "GIT = `which git`" >> config.mak
+    echo "GIT = \"`which git`\"" >> config.mak
 else
     echo "You do not have a Git client in your PATH." >&2
 fi
