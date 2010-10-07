@@ -651,7 +651,7 @@ describe:
                 goto describe;
             }
         }
-        else if( (i_code > 0) && !var_GetBool( p_demux, "rtsp-http" ) )
+        else if( i_code > 0 && i_code != 404 && !var_GetBool( p_demux, "rtsp-http" ) )
         {
             /* Perhaps a firewall is being annoying. Try HTTP tunneling mode */
             msg_Dbg( p_demux, "we will now try HTTP tunneling mode" );
@@ -664,6 +664,8 @@ describe:
         {
             if( i_code == 0 )
                 msg_Dbg( p_demux, "connection timeout" );
+            else
+                msg_Dbg( p_demux, "connection error %d", i_code );
             if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
             p_sys->rtsp = NULL;
         }
