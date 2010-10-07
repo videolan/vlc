@@ -155,19 +155,6 @@ diff -ru live.orig/liveMedia/RTSPClient.cpp live/liveMedia/RTSPClient.cpp
    }
    if (connect(socketNum, (struct sockaddr*) &remoteName, sizeof remoteName) != 0) {
      if (envir().getErrno() == EINPROGRESS) {
-diff -ru live.orig/liveMedia/RTSPOverHTTPServer.cpp live/liveMedia/RTSPOverHTTPServer.cpp
---- live.orig/liveMedia/RTSPOverHTTPServer.cpp	2010-05-30 01:20:31.000000000 +0300
-+++ live/liveMedia/RTSPOverHTTPServer.cpp	2010-06-06 00:34:03.000000000 +0300
-@@ -128,7 +128,8 @@
-   makeSocketNonBlocking(clientSocket);
-   increaseSendBufferTo(envir(), clientSocket, 50*1024);
- #if defined(DEBUG) || defined(DEBUG_CONNECTIONS)
--  fprintf(stderr, "accept()ed connection from %s\n", our_inet_ntoa(clientAddr.sin_addr));
-+  char buf[16];
-+  fprintf(stderr, "accept()ed connection from %s\n", our_inet_ntoa(clientAddr.sin_addr, buf));
- #endif
- 
-   // Create a new object for handling this HTTP connection:
 diff -ru live.orig/liveMedia/RTSPServer.cpp live/liveMedia/RTSPServer.cpp
 --- live.orig/liveMedia/RTSPServer.cpp	2010-09-23 17:15:48.000000000 +0200
 +++ live/liveMedia/RTSPServer.cpp	2010-09-24 12:49:57.000000000 +0200
