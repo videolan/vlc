@@ -114,7 +114,7 @@ endif
 # Special target-dependant options
 #
 ifdef HAVE_WIN32
-HOSTCONF+= --without-pic --disable-shared --enable-msw --disable-dependency-tracking
+HOSTCONF+= --without-pic --disable-shared --disable-dependency-tracking
 FFMPEGCONF+= --target-os=mingw32 --arch=x86 --enable-memalign-hack
 ifdef HAVE_WIN64
 FFMPEGCONF+= --cpu=athlon64 --arch=x86_64
