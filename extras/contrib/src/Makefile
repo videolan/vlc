@@ -1046,7 +1046,6 @@ else
 ffmpeg:
 endif
 	$(SVN) co $(FFMPEG_SVN) ffmpeg
-	(cd $@; patch -p1 < ../Patches/ffmpeg-lame.patch)
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
 endif
