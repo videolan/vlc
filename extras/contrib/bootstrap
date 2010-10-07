@@ -380,3 +380,16 @@ if test $HAVE_DARWIN_64; then
     echo "*****************************************************************"
     set -x
 fi
+
+case `uname` in
+    Linux)
+        CPUS=`grep -c ^processor /proc/cpuinfo`
+     ;;
+    *)
+        CPUS=1  # default
+     ;;
+esac
+echo "MAKEJOBS = -j$CPUS" >> config.mak
+
+echo
+echo "Using $CPUS processors"

@@ -263,7 +263,7 @@ autoconf: autoconf-$(AUTOCONF_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .autoconf: autoconf
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .autoconf
@@ -283,7 +283,7 @@ gnumake: make-$(GNUMAKE_VERSION).tar.bz2
 .gnumake: gnumake
 ifdef HAVE_DARWIN_OS
 ifndef HAVE_DARWIN_9
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 endif
 endif
 	touch $@
@@ -302,7 +302,7 @@ cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .cmake: cmake
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .cmake
@@ -320,7 +320,7 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .libtool: libtool
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 	ln -sf libtool $(PREFIX)/bin/glibtool
 	ln -sf libtoolize $(PREFIX)/bin/glibtoolize
 	touch $@
@@ -342,7 +342,7 @@ automake: automake-$(AUTOMAKE_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .automake: automake
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .automake
@@ -361,7 +361,7 @@ pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
 	(cd $@; autoconf)
 
 .pkgcfg: pkgconfig
-	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .pkgcfg
@@ -390,14 +390,14 @@ endif
 ifneq ($(HOST),$(BUILD))
   ifndef HAVE_CYGWIN
     # We'll use the installed gettext and only need to cross-compile libintl, also build autopoint and gettextsize tools need for VLC bootstrap
-	( cd $< && make -C gettext-runtime/intl && make -C gettext-runtime/intl install && make -C gettext-tools/misc install )
+	( cd $< && make $(MAKEJOBS) -C gettext-runtime/intl && make -C gettext-runtime/intl install && make -C gettext-tools/misc install )
   else
     # We are compiling for MinGW on Cygwin -- build the full current gettext
-	( cd $< && make && make install )
+	( cd $< && make $(MAKEJOBS) && make install )
   endif
 else
 # Build and install the whole gettext
-	( cd $< && make && make install )
+	( cd $< && make $(MAKEJOBS) && make install )
 endif
 # Work around another non-sense of autoconf.
 ifdef HAVE_WIN32
@@ -444,7 +444,7 @@ else
 endif
 else
 .iconv: libiconv
-	(cd libiconv; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
+	(cd libiconv; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 endif
@@ -473,15 +473,15 @@ endif
 .fontconfig: fontconfig .xml .freetype
 ifdef HAVE_WIN32
   ifdef HAVE_CYGWIN
-	(cd $<; ./configure --target=$(HOST) --disable-pic --disable-shared --disable-docs --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --disable-libxml2 && make && make install)
+	(cd $<; ./configure --target=$(HOST) --disable-pic --disable-shared --disable-docs --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --disable-libxml2 && make $(MAKEJOBS) && make install)
   else
-	(cd $<; $(HOSTCC)  ./configure $(HOSTCONF) --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --disable-libxml2 --disable-docs && make && make install)
+	(cd $<; $(HOSTCC)  ./configure $(HOSTCONF) --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --disable-libxml2 --disable-docs && make $(MAKEJOBS) && make install)
   endif
 else
   ifdef HAVE_DARWIN_OS
-	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs` ./configure $(HOSTCONF) --with-cache-dir=/usr/X11/var/cache/fontconfig --with-confdir=/usr/X11/lib/X11/fonts --with-default-fonts=/System/Library/Fonts --with-add-fonts=/Library/Fonts,~/Library/Fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --with-arch=$(ARCH) --enable-libxml2 --disable-docs && make && make install-exec && (cd fontconfig ; make install-data) && cp fontconfig.pc $(PKG_CONFIG_LIBDIR))
+	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs` ./configure $(HOSTCONF) --with-cache-dir=/usr/X11/var/cache/fontconfig --with-confdir=/usr/X11/lib/X11/fonts --with-default-fonts=/System/Library/Fonts --with-add-fonts=/Library/Fonts,~/Library/Fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --with-arch=$(ARCH) --enable-libxml2 --disable-docs && make $(MAKEJOBS) && make install-exec && (cd fontconfig ; make install-data) && cp fontconfig.pc $(PKG_CONFIG_LIBDIR))
   else
-	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install)
+	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make $(MAKEJOBS) && make install)
   endif
 endif
 	$(INSTALL_NAME)
@@ -502,7 +502,7 @@ freetype2: freetype-$(FREETYPE2_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .freetype: freetype2
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -523,7 +523,7 @@ fribidi: fribidi-$(FRIBIDI_VERSION).tar.gz
 	( cd $@; rm -f configure; ./bootstrap)
 
 .fribidi: fribidi .iconv
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -548,7 +548,7 @@ ifdef HAVE_WIN64
 endif
 
 .a52: a52dec
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd liba52 && make && make install && cd ../include && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd liba52 && make $(MAKEJOBS) && make install && cd ../include && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .a52
@@ -569,7 +569,7 @@ libmpeg2: libmpeg2-$(LIBMPEG2_VERSION).tar.gz
 	cd libmpeg2 && ./bootstrap
 
 .mpeg2: libmpeg2
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --without-x --disable-sdl && cd libmpeg2 && make && make install && cd ../include && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --without-x --disable-sdl && cd libmpeg2 && make $(MAKEJOBS) && make install && cd ../include && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .mpeg2
@@ -587,7 +587,7 @@ pcre: pcre-$(PCRE_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .pcre: pcre
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make && make install )
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make $(MAKEJOBS) && make install )
 	touch $@
 
 CLEAN_FILE += .pcre
@@ -628,11 +628,11 @@ endif
 .lua: lua
 ifdef HAVE_WIN32
 	( cd $< && sed -i.orig 's/lua luac/lua.exe/' Makefile && cd src && sed -i.orig 's/CC=/#CC=/' Makefile && sed -i 's/strip/$(STRIP)/' Makefile && cd ../..)
-	(cd $<&& $(HOSTCC) make $(LUA_MAKEPLATEFORM)&& cd src&& $(HOSTCC) make liblua.a&& cd ..&&$(HOSTCC) make install INSTALL_TOP=$(PREFIX)&& $(RANLIB) $(PREFIX)/lib/liblua.a)
+	(cd $<&& $(HOSTCC) make $(MAKEJOBS) $(LUA_MAKEPLATEFORM)&& cd src&& $(HOSTCC) make $(MAKEJOBS) liblua.a&& cd ..&&$(HOSTCC) make install INSTALL_TOP=$(PREFIX)&& $(RANLIB) $(PREFIX)/lib/liblua.a)
 	(cd $<&& sed -i.orig 's@prefix= /usr/local@prefix= $(PREFIX)@' etc/lua.pc&& mkdir -p $(PREFIX)/lib/pkgconfig&& cp etc/lua.pc $(PREFIX)/lib/pkgconfig)
 else
 	(cd $<&& patch -p1) < Patches/lua-noreadline.patch
-	(cd $<&& $(HOSTCC) make $(LUA_MAKEPLATEFORM) && make install INSTALL_TOP=$(PREFIX))
+	(cd $<&& $(HOSTCC) make $(MAKEJOBS) $(LUA_MAKEPLATEFORM) && make install INSTALL_TOP=$(PREFIX))
 endif
 	touch $@
 
@@ -654,7 +654,7 @@ ifdef HAVE_DARWIN_OS
 endif
 
 .mad: libmad
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3 $(NOTHUMB)" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3 $(NOTHUMB)" && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -679,7 +679,7 @@ endif
 	(cd $@; autoconf)
 
 .ogg: libogg
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -699,7 +699,7 @@ libvorbis: libvorbis-$(VORBIS_VERSION).tar.gz
 	patch -p0 < Patches/vorbis-noapps.patch
 
 .vorbis: libvorbis .ogg
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 #	$(INSTALL_NAME)
 	touch $@
 
@@ -731,7 +731,7 @@ tremor: tremor-$(TREMOR_VERSION).tar.bz2
 endif
 
 .tremor: tremor .ogg
-	(cd $<; $(HOSTCC) ./autogen.sh $(HOSTCONF) --prefix=$(PREFIX) --disable-shared CFLAGS="$(NOTHUMB)" && make && make install)
+	(cd $<; $(HOSTCC) ./autogen.sh $(HOSTCONF) --prefix=$(PREFIX) --disable-shared CFLAGS="$(NOTHUMB)" && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -771,7 +771,7 @@ endif
 
 .theora: libtheora .ogg
 ifdef HAVE_DARWIN_OS
-	cd $<; ($(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF) && make && make install)
+	cd $<; ($(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF) && make $(MAKEJOBS) && make install)
 else
 ifdef HAVE_WIN32
 	cd $<; $(HOSTCC) ./autogen.sh $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF)
@@ -781,7 +781,7 @@ endif
 		$(HOSTCC) ./configure $(HOSTCONF) \
 			--prefix=$(PREFIX) $(THEORACONF) ; \
 	fi
-	cd $< && make && make install
+	cd $< && make $(MAKEJOBS) && make install
 endif
 	$(INSTALL_NAME)
 	touch $@
@@ -804,7 +804,7 @@ ifdef HAVE_WIN32
 endif
 
 .shout: libshout .theora .ogg .speex .vorbis
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) &&  make && make install )
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) &&  make $(MAKEJOBS) && make install )
 	$(INSTALL_NAME)
 	touch $@
 
@@ -839,7 +839,7 @@ else
 	$(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  $(FLAC_DISABLE_FLAGS)
 endif
 	cd $</src && \
-	make -C libFLAC && \
+	make $(MAKEJOBS) -C libFLAC && \
 	echo 'Requires.private: ogg' >> libFLAC/flac.pc && \
 	make -C libFLAC install
 	cd $< && make -C include install
@@ -862,7 +862,7 @@ speex: speex-$(SPEEX_VERSION).tar.gz
 	patch -p0 < Patches/speex.patch
 
 .speex: speex
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-ogg=no && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-ogg=no && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -883,7 +883,7 @@ faad2: faad2-$(FAAD2_VERSION).tar.gz
 	patch -p0 < Patches/faad-arm-fixed.patch
 
 .faad: faad2
-	(cd $< && $(HOSTCC) ./configure $(HOSTCONF) --disable-shared --prefix=$(PREFIX) CFLAGS="-O3 $(NOTHUMB)" && sed -i.orig "s/shrext_cmds/shrext/g" libtool && make -C libfaad && make -C libfaad install)
+	(cd $< && $(HOSTCC) ./configure $(HOSTCONF) --disable-shared --prefix=$(PREFIX) CFLAGS="-O3 $(NOTHUMB)" && sed -i.orig "s/shrext_cmds/shrext/g" libtool && make $(MAKEJOBS) -C libfaad && make -C libfaad install)
 	touch $@
 
 CLEAN_FILE += .faad
@@ -902,9 +902,9 @@ libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 
 .ebml: libebml
 ifdef HAVE_WIN32
-	(cd $<; make -C make/mingw32 prefix=$(PREFIX) $(HOSTCC) SHARED=no && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC))
+	(cd $<; make $(MAKEJOBS) -C make/mingw32 prefix=$(PREFIX) $(HOSTCC) SHARED=no && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC))
 else
-	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
+	(cd $<; make $(MAKEJOBS) -C make/linux prefix=$(PREFIX) $(HOSTCC2) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
 	$(RANLIB) $(PREFIX)/lib/libebml.a
 endif
 	touch $@
@@ -925,9 +925,9 @@ libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 
 .matroska: libmatroska .ebml
 ifdef HAVE_WIN32
-	(cd $<; make -C make/mingw32 prefix=$(PREFIX) $(HOSTCC) SHARED=no EBML_DLL=no libmatroska.a && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC))
+	(cd $<; make $(MAKEJOBS) -C make/mingw32 prefix=$(PREFIX) $(HOSTCC) SHARED=no EBML_DLL=no libmatroska.a && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC))
 else
-	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
+	(cd $<; make $(MAKEJOBS) -C make/linux prefix=$(PREFIX) $(HOSTCC) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
 	$(RANLIB) $(PREFIX)/lib/libmatroska.a
 endif
 	touch $@
@@ -968,7 +968,7 @@ endif
 endif
 
 .libvpx: libvpx
-	(cd $<; CROSS=$(HOST)- ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-examples && make && make install)
+	(cd $<; CROSS=$(HOST)- ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-examples && make $(MAKEJOBS) && make install)
 	(rm -rf $(PREFIX)/include/vpx/ && mkdir $(PREFIX)/include/vpx/; cd $< && cp vpx/*.h vpx_ports/*.h $(PREFIX)/include/vpx/) # Of course, why the hell would one expect it to be listed or in make install?
 	rm $(PREFIX)/include/vpx/config.h
 	(cd $<; $(RANLIB) libvpx.a && cp libvpx.a $(PREFIX)/lib) # Of course, why the hell would one expect it to be listed or in make install?
@@ -989,7 +989,7 @@ lame: lame-$(LAME_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .lame: lame
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-analyser-hooks --disable-decoder --disable-shared --disable-gtktest --disable-frontend && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-analyser-hooks --disable-decoder --disable-shared --disable-gtktest --disable-frontend && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .lame
@@ -1008,7 +1008,7 @@ libamrnb: amrnb-$(LIBAMR_NB_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .libamrnb: libamrnb
-	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --enable-shared && make && make install)
+	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --enable-shared && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .libamrnb
@@ -1026,7 +1026,7 @@ libamrwb: amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .libamrwb: libamrwb
-	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --enable-shared && make && make install)
+	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --enable-shared && make $(MAKEJOBS) && make install)
 	touch $@
 
 
@@ -1106,7 +1106,7 @@ else
 endif
 endif
 endif
-	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --extra-cflags="$(FFMPEG_CFLAGS) -DHAVE_STDINT_H" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
+	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --extra-cflags="$(FFMPEG_CFLAGS) -DHAVE_STDINT_H" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make $(MAKEJOBS) && make install-libs install-headers)
 	touch $@
 
 ifdef SVN
@@ -1137,7 +1137,7 @@ libdvdcss: libdvdcss-$(LIBDVDCSS_VERSION).tar.bz2
 # endif
 
 .dvdcss: libdvdcss
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --disable-doc --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --disable-doc --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1164,7 +1164,7 @@ endif
 	(cd $@; sh autogen.sh noconfig)
 
 .libdvdread: libdvdread .dvdcss
-	(cd libdvdread; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
+	(cd libdvdread; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1196,9 +1196,9 @@ endif
 
 .dvdnav: libdvdnav .libdvdread
 ifdef HAVE_WIN32
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make $(MAKEJOBS) && make install)
 endif
 	$(INSTALL_NAME)
 	touch $@
@@ -1215,7 +1215,7 @@ libbluray:
 	$(GIT) clone git://git.videolan.org/libbluray.git
 
 .libbluray: libbluray
-	(cd $<; ./bootstrap; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./bootstrap; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1234,7 +1234,7 @@ libdvbpsi: libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .dvbpsi: libdvbpsi
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd src && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd src && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1264,27 +1264,27 @@ endif
 
 .live: live
 ifdef HAVE_WIN32
-	(cd $<;./genMakefiles mingw && make $(HOSTCC))
+	(cd $<;./genMakefiles mingw && make $(MAKEJOBS) $(HOSTCC))
 else
 ifdef HAVE_WINCE
 	(cd $<; sed -e 's/-lws2_32/-lws2/g' -i.orig config.mingw)
-	(cd $<;./genMakefiles mingw && make $(HOSTCC))
+	(cd $<;./genMakefiles mingw && make $(MAKEJOBS) $(HOSTCC))
 else
 ifdef HAVE_DARWIN_OS
 	(cd $<; sed -e 's%-DBSD=1%-DBSD=1\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' -e 's%cc%$(CC)%'  -e 's%c++%$(CXX)\ $(EXTRA_LDFLAGS)%' -i.orig  config.macosx)
-	(cd $<; ./genMakefiles macosx && make)
+	(cd $<; ./genMakefiles macosx && make $(MAKEJOBS))
 else
 	(cd $<; sed -e 's/=/= EXTRA_CPPFLAGS/' -e 's%EXTRA_CPPFLAGS%-I/include%' -i.orig groupsock/Makefile.head)
 ifdef HAVE_UCLIBC
 ifdef HAVE_BIGENDIAN
-	(cd $<; ./genMakefiles armeb-uclibc && make $(HOSTCC))
+	(cd $<; ./genMakefiles armeb-uclibc && make $(MAKEJOBS) $(HOSTCC))
 endif
 else
 ifeq ($(ARCH)$(HAVE_MAEMO),armel)
-	(cd $<; ./genMakefiles armlinux && make $(HOSTCC))
+	(cd $<; ./genMakefiles armlinux && make $(MAKEJOBS) $(HOSTCC))
 else
 	(cd $<; sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux)
-	(cd $<; ./genMakefiles linux && make $(HOSTCC))
+	(cd $<; ./genMakefiles linux && make $(MAKEJOBS) $(HOSTCC))
 endif
 endif
 endif
@@ -1326,7 +1326,7 @@ endif
 	(cd $@; rm -f configure; ACLOCAL="aclocal -I m4/" autoreconf -ivf)
 
 .goom2k4: goom
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .goom2k4
@@ -1353,9 +1353,9 @@ endif
 
 .caca: libcaca
 ifdef HAVE_DARWIN_OS
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-imlib2 --disable-doc --disable-ruby --disable-csharp --disable-cxx --disable-x11 && cd caca && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-imlib2 --disable-doc --disable-ruby --disable-csharp --disable-cxx --disable-x11 && cd caca && make $(MAKEJOBS) && make install)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-imlib2 --disable-doc --disable-ruby --disable-csharp --disable-cxx && cd caca && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-imlib2 --disable-doc --disable-ruby --disable-csharp --disable-cxx && cd caca && make $(MAKEJOBS) && make install)
 endif
 	touch $@
 
@@ -1377,7 +1377,7 @@ ifdef HAVE_DARWIN_9
 endif
 
 .dca: libdca
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1408,17 +1408,17 @@ endif
 ifdef HAVE_WIN32
 .x264: x264 .pthreads
   ifdef HAVE_CYGWIN
-	(cd $<; $(HOSTCC) RANLIB="ranlib" AR="ar" STRIP="strip" ./configure $(X264CONF) --prefix="$(PREFIX)" --extra-cflags="-I$(PREFIX)/include" --extra-ldflags="-L$(PREFIX)/lib" && make && make install)
+	(cd $<; $(HOSTCC) RANLIB="ranlib" AR="ar" STRIP="strip" ./configure $(X264CONF) --prefix="$(PREFIX)" --extra-cflags="-I$(PREFIX)/include" --extra-ldflags="-L$(PREFIX)/lib" && make $(MAKEJOBS) && make install)
   else
-	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" --enable-pthread && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" --enable-pthread && make $(MAKEJOBS) && make install)
   endif
 else
 ifdef HAVE_DARWIN_OS_ON_INTEL
   .x264: x264 .yasm
-	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make $(MAKEJOBS) && make install)
 else
   .x264: x264
-	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make $(MAKEJOBS) && make install)
 endif
 endif
 	touch $@
@@ -1446,7 +1446,7 @@ libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .mod: libmodplug
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .mod
@@ -1470,10 +1470,10 @@ endif
 
 ifdef HAVE_WIN32
 .cddb: libcddb .regex
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --without-iconv CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --without-iconv CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make $(MAKEJOBS) && make install)
 else
 .cddb: libcddb
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" LDFLAGS="$(LDFLAGS) -liconv" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" LDFLAGS="$(LDFLAGS) -liconv" && make $(MAKEJOBS) && make install)
 endif
 	touch $@
 
@@ -1493,11 +1493,11 @@ vcdimager: vcdimager-$(VCDIMAGER_VERSION).tar.gz
 
 ifdef HAVE_DARWIN_OS
 .vcdimager: vcdimager
-	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static LDFLAGS="$(LDFLAGS) -framework CoreFoundation -framework IOKit" && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static LDFLAGS="$(LDFLAGS) -framework CoreFoundation -framework IOKit" && make $(MAKEJOBS) && make install)
 	touch $@
 else
 .vcdimager: vcdimager
-	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make $(MAKEJOBS) && make install)
 	touch $@
 endif
 
@@ -1520,7 +1520,7 @@ ifdef HAVE_DARWIN_OS
 endif
 
 .cdio: libcdio
-	(cd $<; sed -e 's%@ENABLE_CPP_TRUE@SUBDIRS = C++%@ENABLE_CPP_TRUE@SUBDIRS = %' -i.orig example/Makefile.in && autoreconf -fisv && ./configure --prefix=$(PREFIX) --without-vcdinfo --disable-shared && make && make install)
+	(cd $<; sed -e 's%@ENABLE_CPP_TRUE@SUBDIRS = C++%@ENABLE_CPP_TRUE@SUBDIRS = %' -i.orig example/Makefile.in && autoreconf -fisv && ./configure --prefix=$(PREFIX) --without-vcdinfo --disable-shared && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .cdio
@@ -1595,7 +1595,7 @@ qt4_mac: qt-everywhere-opensource-src-$(QT4_MAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .qt4_mac: qt4_mac
-	(cd qt4_mac; ./configure -prefix $(PREFIX) -release -fast -no-qt3support -nomake "examples demos" -sdk $(MACOSX_SDK) -no-framework -arch $(ARCH) && make && make install)
+	(cd qt4_mac; ./configure -prefix $(PREFIX) -release -fast -no-qt3support -nomake "examples demos" -sdk $(MACOSX_SDK) -no-framework -arch $(ARCH) && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .qt4_mac
@@ -1615,7 +1615,7 @@ zlib: zlib-$(ZLIB_VERSION).tar.gz
 	patch -p0 < Patches/zlib-static.patch
 
 .zlib: zlib
-	(cd zlib; $(HOSTCC) ./configure --prefix=$(PREFIX) --static && make install)
+	(cd zlib; $(HOSTCC) ./configure --prefix=$(PREFIX) --static && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1640,7 +1640,7 @@ ifdef HAVE_WIN64
 endif
 
 .portaudio: portaudio
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make  install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make $(MAKEJOBS) && make  install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1665,9 +1665,9 @@ XMLCONF = --with-minimal --with-catalog --with-reader --with-tree --with-push --
 
 .xml: xml
   ifdef HAVE_CYGWIN
-	(cd xml; ac_cv_header_pthread_h="no" CFLAGS="-DLIBXML_STATIC" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(XMLCONF) && make && make install)
+	(cd xml; ac_cv_header_pthread_h="no" CFLAGS="-DLIBXML_STATIC" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(XMLCONF) && make $(MAKEJOBS) && make install)
   else
-	(cd xml; CFLAGS="-DLIBXML_STATIC" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(XMLCONF) && make && make install)
+	(cd xml; CFLAGS="-DLIBXML_STATIC" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(XMLCONF) && make $(MAKEJOBS) && make install)
   endif
 ifndef HAVE_DARWIN_OS
 	$(INSTALL_NAME)
@@ -1692,7 +1692,7 @@ ifdef HAVE_WIN32
 endif
 
 .twolame: twolame
-	(cd twolame; $(HOSTCC) CFLAGS="${CFLAGS}  -DLIBTWOLAME_STATIC" ./configure $(HOSTCONF) --prefix=$(PREFIX) &&  cd libtwolame && make && make install && cd .. && make install-data)
+	(cd twolame; $(HOSTCC) CFLAGS="${CFLAGS}  -DLIBTWOLAME_STATIC" ./configure $(HOSTCONF) --prefix=$(PREFIX) &&  cd libtwolame && make $(MAKEJOBS) && make install && cd .. && make install-data)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1718,15 +1718,15 @@ endif
 
 .png: libpng .zlib
 ifdef HAVE_DARWIN_OS
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 else
 ifdef HAVE_WIN32
-	(cd $<; rm -f INSTALL; cp scripts/makefile.cygwin Makefile && make $(HOSTCC) && make install-static)
+	(cd $<; rm -f INSTALL; cp scripts/makefile.cygwin Makefile && make $(MAKEJOBS) $(HOSTCC) && make install-static)
 else
 ifeq ($(PNG_VERSION),1.2.8)
-	(cd $<; PREFIX=$(PREFIX) DESTDIR=$(PREFIX) cp scripts/makefile.linux Makefile && make && make install)
+	(cd $<; PREFIX=$(PREFIX) DESTDIR=$(PREFIX) cp scripts/makefile.linux Makefile && make $(MAKEJOBS) && make install)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 endif
 endif
 endif
@@ -1756,12 +1756,12 @@ else
 .zvbi: zvbi
 endif
 ifdef HAVE_DARWIN_OS
-	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -fnested-functions" && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -fnested-functions" && make $(MAKEJOBS) && make install)
 else
 ifdef HAVE_WIN32
-	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -DPTW32_STATIC_LIB --std=gnu99"  && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -DPTW32_STATIC_LIB --std=gnu99"  && make $(MAKEJOBS) && make install)
 else
-	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make -C src && make -C src install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make $(MAKEJOBS) -C src && make -C src install)
 endif
 endif
 	$(INSTALL_NAME)
@@ -1782,7 +1782,7 @@ libraw1394: libraw1394-$(LIBRAW1394_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .raw1394: libraw1394
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make DESTDIR=$(PREFIX) install)
+	(cd $<; ./configure --prefix=$(PREFIX) && make $(MAKEJOBS) && make DESTDIR=$(PREFIX) install)
 #	sed 's/^typedef u_int8_t  byte_t;/\/* typedef u_int8_t  byte_t;\*\//'
 	touch $@
 
@@ -1803,7 +1803,7 @@ libdc1394: libdc1394-$(LIBDC1394_VERSION).tar.gz
 .dc1394: libdc1394
 	(cd $<; ./configure --prefix=$(PREFIX) && \
 	 patch -p1 < ../Patches/libdc1394-noexamples.patch && \
-	 make && make DESTDIR=$(PREFIX) install)
+	 make $(MAKEJOBS) && make DESTDIR=$(PREFIX) install)
 	touch $@
 
 CLEAN_FILE += .dc1394
@@ -1828,7 +1828,7 @@ endif
 ifdef HAVE_DARWIN_OS_ON_INTEL
 	(cd $<; ./autogen.sh)
 endif
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls --disable-shared --disable-languages && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls --disable-shared --disable-languages && make $(MAKEJOBS) && make install)
 #	$(INSTALL_NAME)
 	touch $@
 
@@ -1851,9 +1851,9 @@ CIPHDIG= --enable-ciphers=aes,des,rfc2268,arcfour --enable-digests=sha1,md5,rmd1
 
 .gcrypt: libgcrypt .gpg-error
 ifdef HAVE_WIN32
-	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(CIPHDIG) --disable-shared --enable-static --disable-nls && make && make install)
+	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(CIPHDIG) --disable-shared --enable-static --disable-nls && make $(MAKEJOBS) && make install)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS) -lgpg-error" $(CIPHDIG) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS) -lgpg-error" $(CIPHDIG) && make $(MAKEJOBS) && make install)
 endif
 	$(INSTALL_NAME)
 	touch $@
@@ -1873,7 +1873,7 @@ opencdk: opencdk-$(OPENCDK_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .opencdk: opencdk
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(HOSTCC) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(HOSTCC) && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .opencdk
@@ -1896,9 +1896,9 @@ endif
 
 .gnutls: gnutls .gcrypt .gpg-error
 ifdef HAVE_WIN32
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --target=i586-mingw32msvc --disable-cxx -disable-shared --enable-static --disable-nls --with-included-opencdk --with-included-libtasn1 &&  cd gl && make && cd ../lib && make && make install )
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --target=i586-mingw32msvc --disable-cxx -disable-shared --enable-static --disable-nls --with-included-opencdk --with-included-libtasn1 &&  cd gl && make $(MAKEJOBS) && cd ../lib && make $(MAKEJOBS) && make install )
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --disable-cxx --with-included-opencdk --disable-guile && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --disable-cxx --with-included-opencdk --disable-guile && make $(MAKEJOBS) && make install)
 endif
 	$(INSTALL_NAME)
 	touch $@
@@ -1919,7 +1919,7 @@ libopendaap: libopendaap-$(DAAP_VERSION).tar.bz2
 	patch -p0 < Patches/daap.patch
 
 .opendaap: libopendaap
-	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1956,7 +1956,7 @@ jpeg-$(JPEG_VERSION): jpegsrc.v$(JPEG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .jpeg: jpeg-$(JPEG_VERSION)
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(HOSTCC) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(HOSTCC) && make $(MAKEJOBS) && make install)
 	$(RANLIB) $(PREFIX)/lib/libjpeg.a
 	touch $@
 
@@ -1976,9 +1976,9 @@ tiff: tiff-$(TIFF_VERSION).tar.gz
 
 .tiff: tiff
 ifdef HAVE_WIN32
-	(cd $<; ./configure  --target=i586-mingw32msvc --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no --prefix=$(PREFIX) --host=$(HOST) &&make -C port && make -C libtiff && make -C libtiff install)
+	(cd $<; ./configure  --target=i586-mingw32msvc --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no --prefix=$(PREFIX) --host=$(HOST) &&make $(MAKEJOBS) -C port && make $(MAKEJOBS) -C libtiff && make -C libtiff install)
 else
-	(cd $<; ./configure --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no --prefix=$(PREFIX) && make -C port &&make -C libtiff && make -C libtiff install)
+	(cd $<; ./configure --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no --prefix=$(PREFIX) && make $(MAKEJOBS) -C port &&make $(MAKEJOBS) -C libtiff && make -C libtiff install)
 endif
 	$(INSTALL_NAME)
 	touch $@
@@ -2004,7 +2004,7 @@ SDL:
 endif
 
 .SDL: SDL
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-audio --disable-video-x11 --disable-video-aalib --disable-video-dga --disable-video-fbcon --disable-video-directfb --disable-video-ggi --disable-video-svga --disable-directx --enable-joystick --disable-cdrom --disable-threads --disable-sdl-dlopen CFLAGS="$(CFLAGS)" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-audio --disable-video-x11 --disable-video-aalib --disable-video-dga --disable-video-fbcon --disable-video-directfb --disable-video-ggi --disable-video-svga --disable-directx --enable-joystick --disable-cdrom --disable-threads --disable-sdl-dlopen CFLAGS="$(CFLAGS)" && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -2024,7 +2024,7 @@ SDL_image: SDL_image-$(SDL_IMAGE_VERSION).tar.gz
 	patch -p0 < Patches/SDL_image.patch
 
 .SDL_image: SDL_image .SDL .png .jpeg .tiff
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --enable-tif --disable-sdltest && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --enable-tif --disable-sdltest && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -2046,9 +2046,9 @@ mpcdec: libmpcdec-$(MUSE_VERSION).tar.bz2
 
 .mpcdec: mpcdec
 ifdef HAVE_WIN32
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS=-D_PTRDIFF_T=mpc_int32_t && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS=-D_PTRDIFF_T=mpc_int32_t && make $(MAKEJOBS) && make install)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 endif
 ifdef HAVE_DARWIN_OS
 	$(INSTALL_NAME)
@@ -2082,7 +2082,7 @@ DIRAC_SUBDIRS += win32
 endif
 
 .dirac: dirac
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  CFLAGS="$(CFLAGS)" && DOC_DIR="" make $(DIRAC_SUBDIRS) && DOC_DIR="" make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  CFLAGS="$(CFLAGS)" && DOC_DIR="" make $(MAKEJOBS) $(DIRAC_SUBDIRS) && DOC_DIR="" make install)
 	touch $@
 
 # for MacOS X, dirac is split into two libraries, which needs be installed using two targets
@@ -2144,7 +2144,7 @@ expat: expat-$(EXPAT_VERSION).tar.gz
 ifdef HAVE_DARWIN_OS
 	(cd $< aclocal --force && libtoolize --force && autoconf --force && autoheader --force )
 endif
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .expat
@@ -2162,7 +2162,7 @@ yasm: yasm-$(YASM_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .yasm: yasm
-	(cd $< && $(HOSTCC) ./configure --prefix=$(PREFIX) --host=$(HOST) && make && make install)
+	(cd $< && $(HOSTCC) ./configure --prefix=$(PREFIX) --host=$(HOST) && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .yasm
@@ -2180,7 +2180,7 @@ libkate: libkate-$(KATE_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .kate: libkate .ogg
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-valgrind --disable-doc && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-valgrind --disable-doc && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -2199,7 +2199,7 @@ libtiger: libtiger-$(TIGER_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .tiger: libtiger .kate
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -2236,7 +2236,7 @@ ifdef HAVE_CYGWIN
 endif
 
 .tag: taglib
-	(cd $<; $(HOSTCC)  ./configure $(HOSTCONF) --enable-mp4 --enable-asf --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC)  ./configure $(HOSTCONF) --enable-mp4 --enable-asf --prefix=$(PREFIX) && make $(MAKEJOBS) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -2259,7 +2259,7 @@ ifdef HAVE_WIN64
 endif
 
 .pthreads: pthreads
-	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC GC-static && mkdir -p $(PREFIX)/include && cp -v pthread.h sched.h semaphore.h $(PREFIX)/include/ && mkdir -p $(PREFIX)/lib && cp -v *.a *.dll $(PREFIX)/lib/)
+	(cd $<; $(HOSTCC) make $(MAKEJOBS) $(PTHREADSCONF) GC GC-static && mkdir -p $(PREFIX)/include && cp -v pthread.h sched.h semaphore.h $(PREFIX)/include/ && mkdir -p $(PREFIX)/lib && cp -v *.a *.dll $(PREFIX)/lib/)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -2278,7 +2278,7 @@ ncurses: ncurses-$(NCURSES_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .ncurses: ncurses
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=/usr --without-debug --enable-widec --without-develop --without-shared && make -C ncurses && make -C include && make -C ncurses DESTDIR=$(PREFIX) install && make -C include DESTDIR=$(PREFIX) install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=/usr --without-debug --enable-widec --without-develop --without-shared && make $(MAKEJOBS) -C ncurses && make -C include && make -C ncurses DESTDIR=$(PREFIX) install && make -C include DESTDIR=$(PREFIX) install)
 	(cp -R $(PREFIX)/usr/* $(PREFIX) && rm -rf $(PREFIX)/usr)
 	touch $@
 
@@ -2313,7 +2313,7 @@ endif
 		--disable-ladcca \
 		--disable-portaudio-support \
 		--without-readline
-	cd $< && make
+	cd $< && make $(MAKEJOBS)
 	cd $< && make install
 	touch $@
 
@@ -2337,7 +2337,7 @@ ifdef HAVE_DARWIN_OS
 else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX))
 endif
-	(cd $<; make && make install)
+	(cd $<; make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .orc
@@ -2363,7 +2363,7 @@ ORCC="orcc"
 endif
 
 .schroedinger: schroedinger .orc
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --with-thread=none --disable-gtk-doc --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make ORCC=$(ORCC) && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --with-thread=none --disable-gtk-doc --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make $(MAKEJOBS) ORCC=$(ORCC) && make install)
 	touch $@
 
 CLEAN_FILE += .schroedinger
@@ -2382,7 +2382,7 @@ libass: libass-$(ASS_VERSION).tar.bz2
 	(cd $@; autoreconf -ivf)
 
 .libass: libass .freetype
-	(cd $<; $(HOSTCC) ./configure --disable-png --disable-shared $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
+	(cd $<; $(HOSTCC) ./configure --disable-png --disable-shared $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .libass
@@ -2428,7 +2428,7 @@ LIBUPNP_ECFLAGS=-DPTW32_STATIC_LIB
 endif
 
 .libupnp: libupnp
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-samples --without-documentation --enable-static --disable-webserver CFLAGS="$(CFLAGS) -O3 -DUPNP_STATIC_LIB $(LIBUPNP_ECFLAGS)" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-samples --without-documentation --enable-static --disable-webserver CFLAGS="$(CFLAGS) -O3 -DUPNP_STATIC_LIB $(LIBUPNP_ECFLAGS)" && make $(MAKEJOBS) && make install)
 	touch $@
 
 CLEAN_FILE += .libupnp
@@ -2453,7 +2453,7 @@ ifdef HAVE_DARWIN_OS
 endif
 
 .gsm: gsm
-	(cd $<; $(HOSTCC) make && mkdir -p $(PREFIX)/include/gsm && cp inc/gsm.h $(PREFIX)/include/gsm && cp lib/libgsm.a  $(PREFIX)/lib)
+	(cd $<; $(HOSTCC) make $(MAKEJOBS) && mkdir -p $(PREFIX)/include/gsm && cp inc/gsm.h $(PREFIX)/include/gsm && cp lib/libgsm.a  $(PREFIX)/lib)
 	touch $@
 
 CLEAN_FILE += .gsm
@@ -2471,7 +2471,7 @@ glew: glew-$(GLEW_VERSION)-src.tgz
 	(patch -p0 < Patches/glew-win32.patch)
 
 .glew: glew
-	(cd $<; $(HOSTCC) CFLAGS="$(CFLAGS) -DGLEW_STATIC" make && $(HOSTCC) GLEW_DEST=$(PREFIX) make install)
+	(cd $<; $(HOSTCC) CFLAGS="$(CFLAGS) -DGLEW_STATIC" make $(MAKEJOBS) && $(HOSTCC) GLEW_DEST=$(PREFIX) make install)
 ifdef HAVE_WIN32
 	rm -rf $(PREFIX)/lib/libglew32.dll*
 endif
@@ -2496,7 +2496,7 @@ libprojectM: projectM-$(LIBPROJECTM_VERSION)-Source.tar.gz
 	-cd $@; rm CMakeCache.txt
 
 .libprojectM: libprojectM .glew
-	(cd $<; $(HOSTCC) CPPFLAGS="$(CPPFLAGS)" cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DINCLUDE-PROJECTM-LIBVISUAL:BOOL=OFF -DDISABLE_NATIVE_PRESETS:BOOL=ON -DUSE_FTGL:BOOL=OFF -DINCLUDE-PROJECTM-PULSEAUDIO:BOOL=OFF -DINCLUDE-PROJECTM-QT:BOOL=OFF -DBUILD_PROJECTM_STATIC:BOOL=ON -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make install)
+	(cd $<; $(HOSTCC) CPPFLAGS="$(CPPFLAGS)" cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DINCLUDE-PROJECTM-LIBVISUAL:BOOL=OFF -DDISABLE_NATIVE_PRESETS:BOOL=ON -DUSE_FTGL:BOOL=OFF -DINCLUDE-PROJECTM-PULSEAUDIO:BOOL=OFF -DINCLUDE-PROJECTM-QT:BOOL=OFF -DBUILD_PROJECTM_STATIC:BOOL=ON -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make $(MAKEJOBS) && make install)
 ifdef HAVE_WIN32
 	(cd $<;cp Renderer/libRenderer.a MilkdropPresetFactory/libMilkdropPresetFactory.a $(PREFIX)/lib)
 endif
@@ -2545,7 +2545,7 @@ libxcb: libxcb-$(XCB_VERSION).tar.bz2
 		--enable-xv \
 		--disable-xvmc \
 		--disable-build-docs
-	cd $< && make
+	cd $< && make $(MAKEJOBS)
 	cd $< && sed -i -e s,^Requires.private:,Requires:,g xcb.pc
 	cd $< && make install
 	touch $@
@@ -2561,7 +2561,7 @@ xcb-util: xcb-util-$(XCB_UTIL_VERSION).tar.bz2
 
 .xcb-util: xcb-util .xcb
 	cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)
-	cd $< && make install
+	cd $< && make $(MAKEJOBS) && make install
 	touch $@
 
 CLEAN_FILE += .xcb-util .xcb
@@ -2595,7 +2595,7 @@ regex: regex-$(REGEX_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .regex: regex
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make subirs= && $(AR) ru libregex.a regex.o && $(RANLIB) libregex.a && cp -v regex.h $(PREFIX)/include && cp -v libregex.a $(PREFIX)/lib )
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make $(MAKEJOBS) subirs= && $(AR) ru libregex.a regex.o && $(RANLIB) libregex.a && cp -v regex.h $(PREFIX)/include && cp -v libregex.a $(PREFIX)/lib )
 	touch $@
 
 CLEAN_FILE += .regex
@@ -2612,7 +2612,7 @@ sqlite-$(SQLITE_VERSION): sqlite-amalgamation-$(SQLITE_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .sqlite3: sqlite-$(SQLITE_VERSION)
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install )
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make $(MAKEJOBS) && make install )
 	touch $@
 
 CLEAN_FILE += .sqlite3
