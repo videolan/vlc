@@ -518,21 +518,21 @@ static void continueAfterDESCRIBE( RTSPClient* client, int result_code,
 {
     RTSPClientVlc *client_vlc = static_cast<RTSPClientVlc *> ( client );
     demux_sys_t *p_sys = client_vlc->p_sys;
-    char* sdpDescription = result_string;
     p_sys->i_live555_ret = result_code;
-    if ( result_code != 0 )
+    if ( result_code == 0 )
     {
-        delete[] sdpDescription;
-        return;
+        char* sdpDescription = result_string;
+        free( p_sys->p_sdp );
+        p_sys->p_sdp = NULL;
+        if( sdpDescription )
+        {
+            p_sys->p_sdp = strdup( sdpDescription );
+            p_sys->b_error = false;
+        }
     }
-    free( p_sys->p_sdp );
-    p_sys->p_sdp = NULL;
-    if( sdpDescription )
-    {
-        p_sys->p_sdp = strdup( sdpDescription );
-        delete[] sdpDescription;
-    }
-    p_sys->b_error = false;
+    else
+        p_sys->b_error = true;
+    delete[] result_string;
     p_sys->event = 1;
 }
 
