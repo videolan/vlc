@@ -922,3 +922,11 @@ VLC development is NOT about being a sed god.
 <xxcv> (wrong == right is still wrong right ?)
  -- #videolan, Raffarin-attitude
 %
+< funman> is starcraft 1 better than starcraft 2, or much better than starcraft 2?
+< TypX> never tried the first one
+< funman> fuck you then
+< funman> the man who never played starcraft 1 is a virgin!
+< TypX> I'd say the man who is still playing starcraft 1 is still a virgin
+ -- #videolan
+%
+
