@@ -2104,6 +2104,7 @@ DISTCLEAN_PKG += dirac-$(DIRAC_VERSION).tar.gz
 win32-dx7headers.tgz:
 	$(WGET) $(DX_HEADERS_URL)
 .dx_headers: win32-dx7headers.tgz
+	mkdir -p $(PREFIX)/include
 	tar xzf $< -C $(PREFIX)/include
 	touch $@
 CLEAN_FILE += .dx_headers
