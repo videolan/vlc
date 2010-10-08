@@ -41,6 +41,7 @@
 #  include <tchar.h>
 #endif
 #include <errno.h>
+#include <wctype.h>
 
 #if defined (ASSUME_UTF8)
 /* Cool */
@@ -340,6 +341,49 @@ static size_t vlc_towc (const char *str, uint32_t *restrict pwc)
     return charlen;
 }
 
+/**
+ * Look for an UTF-8 string within another one in a case-insensitive fashion.
+ * Beware that this is quite slow. Contrary to strcasestr(), this function
+ * works regardless of the system character encoding, and handles multibyte
+ * code points correctly.
+
+ * @param haystack string to look into
+ * @param needle string to look for
+ * @return a pointer to the first occurence of the needle within the haystack,
+ * or NULL if no occurence were found.
+ */
+char *vlc_strcasestr (const char *haystack, const char *needle)
+{
+    ssize_t s;
+
+    do
+    {
+        const char *h = haystack, *n = needle;
+
+        for (;;)
+        {
+            uint32_t cph, cpn;
+
+            s = vlc_towc (n, &cpn);
+            if (s == 0)
+                return (char *)haystack;
+            if (unlikely(s < 0))
+                return NULL;
+            n += s;
+
+            s = vlc_towc (h, &cph);
+            if (s <= 0 || towlower (cph) != towlower (cpn))
+                break;
+            h += s;
+        }
+
+        s = vlc_towc (haystack, &(uint32_t) { 0 });
+        haystack += s;
+    }
+    while (s != 0);
+
+    return NULL;
+}
 
 /**
  * Replaces invalid/overlong UTF-8 sequences with question marks.

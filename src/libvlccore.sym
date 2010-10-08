@@ -462,6 +462,7 @@ vlc_opendir
 vlc_readdir
 vlc_scandir
 vlc_stat
+vlc_strcasestr
 vlc_unlink
 vlc_rename
 vlc_dup

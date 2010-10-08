@@ -40,6 +40,7 @@ VLC_EXPORT( char *, ToLocaleDup, ( const char * ) LIBVLC_USED );
 
 VLC_EXPORT( int, utf8_vfprintf, ( FILE *stream, const char *fmt, va_list ap ) );
 VLC_EXPORT( int, utf8_fprintf, ( FILE *, const char *, ... ) LIBVLC_FORMAT( 2, 3 ) );
+VLC_EXPORT( char *, vlc_strcasestr, (const char *, const char *) LIBVLC_USED );
 
 VLC_EXPORT( char *, EnsureUTF8, ( char * ) );
 VLC_EXPORT( const char *, IsUTF8, ( const char * ) LIBVLC_USED );
