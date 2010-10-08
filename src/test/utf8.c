@@ -24,11 +24,12 @@
 #endif
 
 #include <vlc_common.h>
-#include "vlc_charset.h"
+#include <vlc_charset.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <locale.h>
 
 static void test (const char *in, const char *out)
 {
@@ -68,8 +69,40 @@ static void test (const char *in, const char *out)
     free (str);
 }
 
+static void test_strcasestr (const char *h, const char *n, size_t offset)
+{
+    printf ("\"%s\" should %sbe found in \"%s\"...\n", n,
+            (offset != -1) ? "" : "not ", h);
+
+    const char *ret = vlc_strcasestr (h, n);
+    if (offset == -1)
+    {
+        if (ret != NULL)
+        {
+            printf ("ERROR: got \"%s\"\n", ret);
+            exit (10);
+        }
+    }
+    else
+    {
+        if (ret == NULL)
+        {
+            printf ("ERROR: not found\n");
+            exit (11);
+        }
+        if ((ret - h) != offset)
+        {
+            printf ("ERROR: got \"%s\" instead of \"%s\"\n",
+                    ret, h + offset);
+            exit (12);
+        }
+    }
+}
+
+
 int main (void)
 {
+    setlocale (LC_CTYPE, "fr_FR");
     (void)setvbuf (stdout, NULL, _IONBF, 0);
     test ("", "");
 
@@ -85,5 +118,19 @@ int main (void)
     test ("\xC1\x94\xC3\xa9l\xC3\xA9vision", "??élévision"); /* overlong */
 
     test ("Hel\xF0\x83\x85\x87lo", "Hel????lo"); /* more overlong */
+
+    test_strcasestr ("", "", 0);
+    test_strcasestr ("", "a", -1);
+    test_strcasestr ("a", "", 0);
+    test_strcasestr ("heLLo", "l", 2);
+    test_strcasestr ("heLLo", "lo", 3);
+    test_strcasestr ("heLLo", "llo", 2);
+    test_strcasestr ("heLLo", "la", -1);
+    test_strcasestr ("heLLo", "oa", -1);
+    test_strcasestr ("Télé", "é", 1);
+    test_strcasestr ("Télé", "É", 1);
+    test_strcasestr ("Télé", "Élé", 1);
+    test_strcasestr ("Télé", "léé", -1);
+
     return 0;
 }
