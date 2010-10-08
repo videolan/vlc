@@ -26,6 +26,10 @@
 
 #include <commctrl.h>
 
+#ifndef STDCALL
+#define STDCALL
+#endif
+
 #define CLSCTX_INPROC_SERVER 1
 typedef GUID IID;
 #define REFIID const IID* const
