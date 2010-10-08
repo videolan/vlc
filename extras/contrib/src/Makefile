@@ -2347,14 +2347,8 @@ schroedinger: schroedinger-$(SCHROED_VERSION).tar.gz
 	patch -p0 < Patches/schroedinger-notests.patch
 	(cd $@; autoreconf -iv)
 
-ifdef HAVE_WIN32
-ORCC="wine $(PREFIX)/bin/orcc.exe"
-else
-ORCC="orcc"
-endif
-
 .schroedinger: schroedinger .orc
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --with-thread=none --disable-gtk-doc --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make ORCC=$(ORCC) && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --with-thread=none --disable-gtk-doc --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
 	touch $@
 
 CLEAN_FILE += .schroedinger
