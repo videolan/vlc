@@ -164,8 +164,7 @@ static int Open( vlc_object_t *p_this )
 {
     demux_t      *p_demux = (demux_t*)p_this;
     demux_sys_t  *p_sys;
-    char         *psz_name;
-    dvd_reader_t *p_dvdread;
+    char         *psz_file;
     ifo_handle_t *p_vmg_file;
 
     if( !p_demux->psz_file || !*p_demux->psz_file )
@@ -174,30 +173,38 @@ static int Open( vlc_object_t *p_this )
         if( !p_demux->psz_access || !*p_demux->psz_access )
             return VLC_EGENERIC;
 
-        psz_name = var_CreateGetString( p_this, "dvd" );
-        if( !psz_name )
-        {
-            psz_name = strdup("");
-        }
+        psz_file = var_InheritString( p_this, "dvd" );
     }
     else
-        psz_name = ToLocaleDup( p_demux->psz_file );
+        psz_file = strdup( p_demux->psz_file );
 
 #ifdef WIN32
-    if( psz_name[0] && psz_name[1] == ':' &&
-        psz_name[2] == '\\' && psz_name[3] == '\0' ) psz_name[2] = '\0';
+    if( psz_file != NULL )
+    {
+        size_t flen = strlen( psz_file );
+        if( flen > 0 && psz_file[flen - 1] == '\\' )
+            psz_file[flen - 1] = '\0';
+    }
+    else
+        psz_file = strdup("");
 #endif
+    if( unlikely(psz_file == NULL) )
+        return VLC_EGENERIC;
 
     /* Open dvdread */
-    if( !(p_dvdread = DVDOpen( psz_name )) )
+    const char *psz_path = ToLocale( psz_file );
+    dvd_reader_t *p_dvdread = DVDOpen( psz_path );
+
+    LocaleFree( psz_path );
+    if( p_dvdread == NULL )
     {
-        msg_Err( p_demux, "DVDRead cannot open source: %s", psz_name );
+        msg_Err( p_demux, "DVDRead cannot open source: %s", psz_file );
         dialog_Fatal( p_demux, _("Playback failure"),
-                        _("DVDRead could not open the disc \"%s\"."), psz_name );
-        free( psz_name );
+                      _("DVDRead could not open the disc \"%s\"."), psz_file );
+        free( psz_file );
         return VLC_EGENERIC;
     }
-    free( psz_name );
+    free( psz_file );
 
     /* Ifo allocation & initialisation */
     if( !( p_vmg_file = ifoOpen( p_dvdread, 0 ) ) )
