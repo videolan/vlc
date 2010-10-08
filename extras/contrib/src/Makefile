@@ -2124,6 +2124,7 @@ d2d_headers.tar.gz:
 	$(WGET) $(D2D_URL) -O $@
 
 .dshow_headers: dshow-headers.tgz dxva2api.h d2d_headers.tar.gz
+	mkdir -p $(PREFIX)/include
 	tar xzf $< -C $(PREFIX)/include
 	tar xzf d2d_headers.tar.gz -C $(PREFIX)/include
 	cp dxva2api.h $(PREFIX)/include
