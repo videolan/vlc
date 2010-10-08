@@ -3,7 +3,7 @@ then
 	CONTRIBS=/usr/win32
 fi
 
-      $CONFIG \
+      $CONFIGURE \
       --without-contrib \
       --enable-update-check \
       --enable-lua \
@@ -35,4 +35,5 @@ fi
       --enable-zvbi --disable-telx \
       --disable-dvb \
       --disable-sqlite \
-      --enable-peflags
+      --enable-peflags \
+      $CONFIGOPTS

@@ -15,6 +15,7 @@ PKG_CONFIG_LIBDIR=$CONTRIBS/lib/pkgconfig \
 CPPFLAGS="-I$CONTRIBS/include -I$CONTRIBS/include/ebml" \
 LDFLAGS="-L$CONTRIBS/lib" \
 CC="gcc -mno-cygwin" CXX="g++ -mno-cygwin" \
-CONFIG="${root}configure --host=i686-pc-mingw32
-       --disable-nls --disable-taglib --disable-mkv --disable-dirac --enable-debug" \
+CONFIGURE="${root}configure" \
+CONFIGOPTS="--host=i686-pc-mingw32
+--disable-nls --disable-taglib --disable-mkv --disable-dirac --enable-debug" \
 sh ${root}extras/package/win32/configure-common.sh
