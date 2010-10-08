@@ -68,7 +68,7 @@ static void test (const char *in, const char *out)
     free (str);
 }
 
-static void test_strcasestr (const char *h, const char *n, size_t offset)
+static void test_strcasestr (const char *h, const char *n, ssize_t offset)
 {
     printf ("\"%s\" should %sbe found in \"%s\"...\n", n,
             (offset != -1) ? "" : "not ", h);
