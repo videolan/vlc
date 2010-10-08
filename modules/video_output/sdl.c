@@ -206,7 +206,7 @@ static int Open(vlc_object_t *object)
 
     /* */
     vlc_fourcc_t forced_chroma = 0;
-    char *psz_chroma = var_CreateGetNonEmptyString(vd, "sdl-chroma");
+    char *psz_chroma = var_InheritString(vd, "sdl-chroma");
     if (psz_chroma) {
         forced_chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, psz_chroma);
         if (forced_chroma)
@@ -217,7 +217,7 @@ static int Open(vlc_object_t *object)
 
     /* Try to open an overlay if requested */
     sys->overlay = NULL;
-    const bool is_overlay = var_CreateGetBool(vd, "overlay");
+    const bool is_overlay = var_InheritBool(vd, "overlay");
     if (is_overlay) {
         static const struct
         {

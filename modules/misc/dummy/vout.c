@@ -60,7 +60,7 @@ static int OpenVideoCommon(vlc_object_t *object, bool display_stat)
 
     /* p_vd->info is not modified */
 
-    char *chroma = var_CreateGetNonEmptyString(vd, "dummy-chroma");
+    char *chroma = var_InheritString(vd, "dummy-chroma");
     if (chroma) {
         vlc_fourcc_t fcc = vlc_fourcc_GetCodecFromString(VIDEO_ES, chroma);
         if (fcc != 0) {

@@ -81,7 +81,7 @@ static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
 #ifndef UNDER_CE
     if( !b_force_dump )
     {
-        b_force_dump = var_CreateGetBool( p_dec, "dummy-save-es" );
+        b_force_dump = var_InheritBool( p_dec, "dummy-save-es" );
     }
     if( b_force_dump )
     {

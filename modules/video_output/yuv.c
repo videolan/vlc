@@ -108,11 +108,11 @@ static int Open(vlc_object_t *object)
         return VLC_ENOMEM;
 
     sys->is_first = false;
-    sys->is_yuv4mpeg2 = var_CreateGetBool(vd, CFG_PREFIX "yuv4mpeg2");
+    sys->is_yuv4mpeg2 = var_InheritBool(vd, CFG_PREFIX "yuv4mpeg2");
     sys->pool = NULL;
 
     /* */
-    char *psz_fcc = var_CreateGetNonEmptyString(vd, CFG_PREFIX "chroma");
+    char *psz_fcc = var_InheritString(vd, CFG_PREFIX "chroma");
     const vlc_fourcc_t requested_chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES,
                                                                         psz_fcc);
     free(psz_fcc);
@@ -135,7 +135,7 @@ static int Open(vlc_object_t *object)
     msg_Dbg(vd, "Using chroma %4.4s", (char *)&chroma);
 
     /* */
-    char *name = var_CreateGetNonEmptyString(vd, CFG_PREFIX "file");
+    char *name = var_InheritString(vd, CFG_PREFIX "file");
     if (!name) {
         msg_Err(vd, "Empty file name");
         free(sys);

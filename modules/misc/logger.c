@@ -203,7 +203,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->msg.p_intf = p_intf;
     p_sys->msg.i_mode = MODE_TEXT;
-    psz_mode = var_CreateGetString( p_intf, "logmode" );
+    psz_mode = var_InheritString( p_intf, "logmode" );
     if( psz_mode )
     {
         if( !strcmp( psz_mode, "text" ) )
@@ -290,7 +290,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->msg.p_file = NULL;
 #ifdef HAVE_SYSLOG_H
         int i_facility;
-        char *psz_facility = var_CreateGetString( p_intf, "syslog-facility" );
+        char *psz_facility = var_InheritString( p_intf, "syslog-facility" );
         if( psz_facility )
         {
             bool b_valid = 0;
