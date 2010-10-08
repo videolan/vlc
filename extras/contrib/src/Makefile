@@ -185,7 +185,7 @@ ifdef HAVE_ISA_THUMB
 NOTHUMB ?= -mno-thumb
 endif
 
-X264CONF+= --disable-avs-input --disable-lavf-input --disable-ffms-input --disable-mp4-output
+X264CONF+= --disable-avs --disable-lavf --disable-ffms --disable-mp4-output
 
 DATE=`date +%Y-%m-%d`
 
@@ -1409,7 +1409,7 @@ ifdef HAVE_WIN32
   ifdef HAVE_CYGWIN
 	(cd $<; $(HOSTCC) RANLIB="ranlib" AR="ar" STRIP="strip" ./configure $(X264CONF) --prefix="$(PREFIX)" --extra-cflags="-I$(PREFIX)/include" --extra-ldflags="-L$(PREFIX)/lib" && make && make install)
   else
-	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" --enable-pthread && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
   endif
 else
 ifdef HAVE_DARWIN_OS_ON_INTEL
