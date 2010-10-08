@@ -1101,7 +1101,11 @@ else
 ifeq ($(ARCH),armel)
 .ffmpeg: ffmpeg .lame .gsm .zlib
 else
+ifdef HAVE_WIN64
+.ffmpeg: ffmpeg .lame .gsm .zlib
+else
 .ffmpeg: ffmpeg .lame .gsm .libvpx .zlib
+endif
 endif
 endif
 endif
@@ -1396,6 +1400,9 @@ x264:
 	$(GIT) clone git://git.videolan.org/x264.git
 ifdef HAVE_WIN32
 	(cd x264; patch -p0 < ../Patches/x264-svn-win32.patch )
+endif
+ifdef HAVE_WIN64
+	(cd x264; patch -p0 < ../Patches/x264-svn-win64.patch )
 endif
 else
 x264:

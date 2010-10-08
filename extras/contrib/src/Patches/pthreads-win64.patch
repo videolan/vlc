@@ -9,3 +9,15 @@
  #define HAVE_STRUCT_TIMESPEC 1
  struct timespec {
          long tv_sec;
+diff -urN pthreads/GNUmakefile pthreads.new/GNUmakefile
+--- pthreads/GNUmakefile	2010-10-08 22:30:43.029264998 +0200
++++ pthreads.new/GNUmakefile	2010-10-08 22:30:55.989265032 +0200
+@@ -63,7 +63,7 @@
+ XOPT	=
+ 
+ RCFLAGS		= --include-dir=.
+-LFLAGS		= -lwsock32
++LFLAGS		= -lws2_32
+ 
+ # ----------------------------------------------------------------------
+ # The library can be built with some alternative behaviour to
