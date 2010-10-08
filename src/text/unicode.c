@@ -2,7 +2,7 @@
  * unicode.c: Unicode <-> locale functions
  *****************************************************************************
  * Copyright (C) 2005-2006 the VideoLAN team
- * Copyright © 2005-2008 Rémi Denis-Courmont
+ * Copyright © 2005-2010 Rémi Denis-Courmont
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org>
  *
@@ -273,72 +273,73 @@ int utf8_fprintf( FILE *stream, const char *fmt, ... )
 }
 
 
-static char *CheckUTF8( char *str, char rep )
+/**
+ * Converts the first character from a UTF-8 sequence into a code point.
+ *
+ * @param str an UTF-8 bytes sequence
+ * @return 0 if str points to an empty string, i.e. the first character is NUL;
+ * number of bytes that the first character occupies (from 1 to 4) otherwise;
+ * -1 if the byte sequence was not a valid UTF-8 sequence.
+ */
+static size_t vlc_towc (const char *str, uint32_t *restrict pwc)
 {
     uint8_t *ptr = (uint8_t *)str;
     assert (str != NULL);
 
-    for (;;)
+    uint8_t c = ptr[0];
+
+    if (unlikely(c == '\0'))
     {
-        uint8_t c = ptr[0];
-
-        if (c == '\0')
-            break;
-
-        if (c > 0xF4)
-            goto error;
-
-        int charlen = clz8 (c ^ 0xFF);
-        switch (charlen)
-        {
-            case 0: // 7-bit ASCII character -> OK
-                ptr++;
-                continue;
-
-            case 1: // continuation byte -> error
-                goto error;
-        }
-
-        assert (charlen >= 2 && charlen <= 4);
-
-        uint32_t cp = c & ~((0xff >> (7 - charlen)) << (7 - charlen));
-        for (int i = 1; i < charlen; i++)
-        {
-            assert (cp < (1 << 26));
-            c = ptr[i];
-
-            if ((c >> 6) != 2) // not a continuation byte
-                goto error;
-
-            cp = (cp << 6) | (ptr[i] & 0x3f);
-        }
-
-        switch (charlen)
-        {
-            case 4:
-                if (cp > 0x10FFFF) // beyond Unicode
-                    goto error;
-            case 3:
-                if (cp >= 0xD800 && cp < 0xC000) // UTF-16 surrogate
-                    goto error;
-            case 2:
-                if (cp < 128) // ASCII overlong
-                    goto error;
-                if (cp < (1u << (5 * charlen - 3))) // overlong
-                    goto error;
-        }
-        ptr += charlen;
-        continue;
-
-    error:
-        if (rep == 0)
-            return NULL;
-        *ptr++ = rep;
-        str = NULL;
+        *pwc = 0;
+        return 0;
     }
 
-    return str;
+    if (unlikely(c > 0xF4))
+        return -1;
+
+    int charlen = clz8 (c ^ 0xFF);
+    switch (charlen)
+    {
+        case 0: // 7-bit ASCII character -> OK
+            *pwc = c;
+            return 1;
+
+        case 1: // continuation byte -> error
+            return -1;
+    }
+
+    assert (charlen >= 2 && charlen <= 4);
+
+    uint32_t cp = c & ~((0xff >> (7 - charlen)) << (7 - charlen));
+    for (int i = 1; i < charlen; i++)
+    {
+        assert (cp < (1 << 26));
+        c = ptr[i];
+
+        if (unlikely((c >> 6) != 2)) // not a continuation byte
+            return -1;
+
+        cp = (cp << 6) | (ptr[i] & 0x3f);
+    }
+
+    switch (charlen)
+    {
+        case 4:
+            if (unlikely(cp > 0x10FFFF)) // beyond Unicode
+                return -1;
+        case 3:
+            if (unlikely(cp >= 0xD800 && cp < 0xC000)) // UTF-16 surrogate
+                return -1;
+        case 2:
+            if (unlikely(cp < 128)) // ASCII overlong
+                return -1;
+            if (unlikely(cp < (1u << (5 * charlen - 3)))) // overlong
+                return -1;
+    }
+    *pwc = cp;
+    return charlen;
 }
+
 
 /**
  * Replaces invalid/overlong UTF-8 sequences with question marks.
@@ -349,7 +350,19 @@ static char *CheckUTF8( char *str, char rep )
  */
 char *EnsureUTF8( char *str )
 {
-    return CheckUTF8( str, '?' );
+    char *ret = str;
+    size_t n;
+    uint32_t cp;
+
+    while ((n = vlc_towc (str, &cp)) != 0)
+        if (likely(n != (size_t)-1))
+            str += n;
+        else
+        {
+            *str++ = '?';
+            ret = NULL;
+        }
+    return ret;
 }
 
 
@@ -362,7 +375,15 @@ char *EnsureUTF8( char *str )
  */
 const char *IsUTF8( const char *str )
 {
-    return CheckUTF8( (char *)str, 0 );
+    size_t n;
+    uint32_t cp;
+
+    while ((n = vlc_towc (str, &cp)) != 0)
+        if (likely(n != (size_t)-1))
+            str += n;
+        else
+            return NULL;
+    return str;
 }
 
 /**
