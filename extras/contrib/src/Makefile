@@ -1961,7 +1961,7 @@ jpeg-$(JPEG_VERSION): jpegsrc.v$(JPEG_VERSION).tar.gz
 	touch $@
 
 CLEAN_FILE += .jpeg
-CLEAN_PKG += jpeg-7
+CLEAN_PKG += jpeg-$(JPEG_VERSION)
 DISTCLEAN_PKG += jpegsrc.v$(JPEG_VERSION).tar.gz
 
 # ***************************************************************************
@@ -2117,6 +2117,8 @@ dshow-headers.tgz:
 
 dxva2api.h:
 	$(WGET) $(DXVA2_URL)
+
+CLEAN_FILE += dxva2api.h
 
 d2d_headers.tar.gz:
 	$(WGET) $(D2D_URL) -O $@
