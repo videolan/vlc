@@ -389,7 +389,7 @@ case `uname` in
         CPUS=1  # default
      ;;
 esac
-echo "MAKEJOBS = -j$CPUS" >> config.mak
+echo "MAKEFLAGS += -j$CPUS" >> config.mak
 
 echo
-echo "Using $CPUS processors"
+echo "Using $CPUS processor(s)"
