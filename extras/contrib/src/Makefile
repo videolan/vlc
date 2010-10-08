@@ -103,10 +103,9 @@ ifneq ($(BUILD),$(HOST))
         # We are REALLY cross compiling
         FFMPEGCONF+=--cross-prefix=$(HOST)- --enable-cross-compile
         X264CONF=--host=$(HOST)
-        PTHREADSCONF="CROSS=$(HOST)-"
+        PTHREADSCONF=CROSS="$(HOST)-"
     else
         # We are compiling for MinGW on Cygwin
-        PTHREADSCONF=$(HOSTCC)
     endif
 endif
 
@@ -2245,12 +2244,13 @@ pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz:
 pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 	$(EXTRACT_GZ)
 	(cd $@; patch -p0 < ../Patches/pthreads-detach.patch)
+	sed -i 's/^CROSS.*=/CROSS ?=/' $@/GNUmakefile
 ifdef HAVE_WIN64
 	(patch -p0 < Patches/pthreads-win64.patch)
 endif
 
 .pthreads: pthreads
-	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC GC-static && mkdir -p $(PREFIX)/include && cp -v pthread.h sched.h semaphore.h $(PREFIX)/include/ && mkdir -p $(PREFIX)/lib && cp -v *.a *.dll $(PREFIX)/lib/)
+	(cd $<; $(HOSTCC) $(PTHREADSCONF) make MAKEFLAGS=-j1 GC GC-static && mkdir -p $(PREFIX)/include && cp -v pthread.h sched.h semaphore.h $(PREFIX)/include/ && mkdir -p $(PREFIX)/lib && cp -v *.a *.dll $(PREFIX)/lib/)
 	$(INSTALL_NAME)
 	touch $@
 
