@@ -26,7 +26,8 @@
 #include <assert.h>
 
 #include <vlc_common.h>
-#include "vlc_playlist.h"
+#include <vlc_playlist.h>
+#include <vlc_charset.h>
 #include "playlist_internal.h"
 
 /***************************************************************************
@@ -134,12 +135,12 @@ static bool playlist_LiveSearchUpdateInternal( playlist_item_t *p_root,
                     psz_title = p_item->p_input->psz_name;
                 const char *psz_album = vlc_meta_Get( p_item->p_input->p_meta, vlc_meta_Album );
                 const char *psz_artist = vlc_meta_Get( p_item->p_input->p_meta, vlc_meta_Artist );
-                b_enable = ( psz_title && strcasestr( psz_title, psz_string ) ) ||
-                           ( psz_album && strcasestr( psz_album, psz_string ) ) ||
-                           ( psz_artist && strcasestr( psz_artist, psz_string ) );
+                b_enable = ( psz_title && vlc_strcasestr( psz_title, psz_string ) ) ||
+                           ( psz_album && vlc_strcasestr( psz_album, psz_string ) ) ||
+                           ( psz_artist && vlc_strcasestr( psz_artist, psz_string ) );
             }
             else
-                b_enable = p_item->p_input->psz_name && strcasestr( p_item->p_input->psz_name, psz_string );
+                b_enable = p_item->p_input->psz_name && vlc_strcasestr( p_item->p_input->psz_name, psz_string );
             vlc_mutex_unlock( &p_item->p_input->lock );
         }
 
