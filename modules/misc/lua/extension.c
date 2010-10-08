@@ -221,15 +221,10 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
 
     msg_Dbg( p_mgr, "Scanning Lua script %s", psz_script );
 
-    vlc_mutex_lock( &p_mgr->lock );
-
     /* Create new script descriptor */
     extension_t *p_ext = ( extension_t* ) calloc( 1, sizeof( extension_t ) );
     if( !p_ext )
-    {
-        vlc_mutex_unlock( &p_mgr->lock );
         return 0;
-    }
 
     p_ext->psz_name = strdup( psz_script );
     p_ext->p_sys = (extension_sys_t*) calloc( 1, sizeof( extension_sys_t ) );
@@ -238,7 +233,6 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
         free( p_ext->psz_name );
         free( p_ext->p_sys );
         free( p_ext );
-        vlc_mutex_unlock( &p_mgr->lock );
         return 0;
     }
     p_ext->p_sys->p_mgr = p_mgr;
@@ -404,7 +398,6 @@ exit:
         ARRAY_APPEND( p_mgr->extensions, p_ext );
     }
 
-    vlc_mutex_unlock( &p_mgr->lock );
     /* Continue batch execution */
     return VLC_EGENERIC;
 }
