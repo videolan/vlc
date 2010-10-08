@@ -2211,18 +2211,6 @@ CLEAN_PKG += libtiger
 DISTCLEAN_PKG += libtiger-$(TIGER_VERSION).tar.gz
 
 # ***************************************************************************
-# Copy aclocal files
-# This is necessary for --missing aclocal to succeed after a
-# configure.ac/Makefile.am change in the vlc root dir
-# **************************************************************************
-
-.aclocal:
-	cp -R $(PREFIX)/share/aclocal/* ../../../m4/
-	touch $@
-
-CLEAN_FILE += .aclocal
-
-# ***************************************************************************
 # TagLib read and editing of tags of popular audio formats
 # ***************************************************************************
 

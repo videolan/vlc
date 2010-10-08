@@ -9,5 +9,5 @@ all: .iconv .intl .freetype .fribidi .zlib \
         .lua .tag .fontconfig .portaudio .kate .libass
 # .pthreads
 #.zvbi \
-#        .fluid .aclocal
+#        .fluid
 #       .daap .cddb .cdio .vcdimager

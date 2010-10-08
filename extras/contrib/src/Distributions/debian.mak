@@ -6,7 +6,6 @@ all: .iconv .intl .freetype .fribidi .zlib \
 	.png .gpg-error .gcrypt .gnutls .mpcdec \
 	.dvdnav .dvbpsi .dirac \
 	.dca .raw1394 .dc1394 .lua .zvbi \
-	.kate .tiger \
-	.aclocal 
+	.kate .tiger
 #	.SDL_image  .daap .cddb .cdio .vcdimager
 

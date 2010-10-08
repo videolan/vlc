@@ -38,6 +38,11 @@ all: $(TARGETALL)
 
 using-src:
 	$(MAKE) -C src
+	#Copy aclocal files
+	# This is necessary for --missing aclocal to succeed after a
+	# configure.ac/Makefile.am change in the vlc root dir
+	cp -R $(PREFIX)/share/aclocal/* ../../m4/
+
 ifdef HAVE_DARWIN_10
 	(cd $(PREFIX)/lib && sed -e 's%/usr/lib/libiconv.la%$(PREFIX)/lib/libiconv.la%g' -i.orig *.la && rm -f *.la.orig)
 endif
