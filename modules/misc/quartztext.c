@@ -366,8 +366,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
                                              CFRangeMake( 0, len ), p_attrString);
 
         RenderYUVA( p_filter, p_region_out, p_attrString );
+        CFRelease( p_attrString );
     }
-    CFRelease(p_attrString);
 
     return VLC_SUCCESS;
 }
