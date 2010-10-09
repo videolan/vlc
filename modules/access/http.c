@@ -984,7 +984,7 @@ static ssize_t ReadCompressed( access_t *p_access, uint8_t *p_buffer,
 
         if( p_sys->inflate.stream.avail_in == 0 )
         {
-            ssize_t i_read = Read( p_access, p_sys->inflate.p_buffer + p_sys->inflate.stream.avail_in, 256 * 1024 );
+            ssize_t i_read = Read( p_access, p_sys->inflate.p_buffer, 256 * 1024 );
             if( i_read <= 0 ) return i_read;
             p_sys->inflate.stream.next_in = p_sys->inflate.p_buffer;
             p_sys->inflate.stream.avail_in = i_read;
