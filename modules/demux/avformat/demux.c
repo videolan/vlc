@@ -652,7 +652,7 @@ static block_t *BuildSsaFrame( const AVPacket *p_pkt, unsigned i_order )
 
     block_t *p_frame = block_heap_Alloc( p, p, strlen(p) + 1 );
     if( p_frame )
-        p_frame->i_length = CLOCK_FREQ * ((h1 - h1) * 3600 +
+        p_frame->i_length = CLOCK_FREQ * ((h1-h0) * 3600 +
                                           (m1-m0) * 60 +
                                           (s1-s0) * 1) +
                             CLOCK_FREQ * (c1-c0) / 100;
