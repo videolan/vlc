@@ -1148,15 +1148,14 @@ static void ESSubtitleUpdate( demux_t *p_demux )
 /*****************************************************************************
  * DemuxBlock: demux a given block
  *****************************************************************************/
-static int DemuxBlock( demux_t *p_demux, const uint8_t *pkt, int i_pkt )
+static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    const uint8_t     *p = pkt;
 
-    while( p < &pkt[i_pkt] )
+    while( len > 0 )
     {
-        int i_size = ps_pkt_size( p, &pkt[i_pkt] - p );
-        if( i_size <= 0 )
+        int i_size = ps_pkt_size( p, len );
+        if( i_size <= 0 || i_size > len )
         {
             break;
         }
@@ -1226,6 +1225,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *pkt, int i_pkt )
         }
 
         p += i_size;
+        len -= i_size;
     }
 
     return VLC_SUCCESS;
