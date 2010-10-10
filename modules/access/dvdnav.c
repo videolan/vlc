@@ -1153,9 +1153,8 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *pkt, int i_pkt )
     demux_sys_t *p_sys = p_demux->p_sys;
     const uint8_t     *p = pkt;
 
-    while( (p - pkt) <= (i_pkt - 6) )
+    while( p < &pkt[i_pkt] )
     {
-        /* ps_pkt_size() needs at least 6 bytes */
         int i_size = ps_pkt_size( p, &pkt[i_pkt] - p );
         if( i_size <= 0 )
         {
