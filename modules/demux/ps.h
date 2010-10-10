@@ -312,11 +312,11 @@ static inline int ps_pkt_size( const uint8_t *p, int i_peek )
     }
     else if( p[3] == 0xba )
     {
-        if( (p[4] >> 6) == 0x01 && i_peek >= 14 )
+        if( i_peek >= 14 && (p[4] >> 6) == 0x01 )
         {
             return 14 + (p[13]&0x07);
         }
-        else if( (p[4] >> 4) == 0x02 && i_peek >= 12 )
+        else if( i_peek >= 12 && (p[4] >> 4) == 0x02 )
         {
             return 12;
         }
