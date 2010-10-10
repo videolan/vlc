@@ -1,4 +1,3 @@
-
 /*****************************************************************************
  * mkv.cpp : matroska demuxer
  *****************************************************************************
@@ -49,5 +48,4 @@ class vlc_stream_io_callback: public IOCallback
     virtual uint64   getFilePointer  ( void );
     virtual void     close           ( void ) { return; }
 };
-
 

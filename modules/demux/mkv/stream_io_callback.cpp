@@ -1,8 +1,7 @@
-
 /*****************************************************************************
  * mkv.cpp : matroska demuxer
  *****************************************************************************
- * Copyright (C) 2003-2004 the VideoLAN team
+ * Copyright (C) 2003-2004, 2010 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -22,32 +21,32 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #include "stream_io_callback.hpp"
 
 #include "matroska_segment.hpp"
 #include "demux.hpp"
+
 /*****************************************************************************
  * Stream managment
  *****************************************************************************/
-vlc_stream_io_callback::vlc_stream_io_callback( stream_t *s_, bool b_owner_ )
+vlc_stream_io_callback::vlc_stream_io_callback( stream_t *s_, bool b_owner_ ),
+                        s( s_), b_owner( b_owner_ )
 {
-    s = s_;
-    b_owner = b_owner_;
     mb_eof = false;
 }
 
 uint32 vlc_stream_io_callback::read( void *p_buffer, size_t i_size )
 {
     if( i_size <= 0 || mb_eof )
-    {
         return 0;
-    }
 
     return stream_Read( s, p_buffer, i_size );
 }
+
 void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
 {
-    int64_t i_pos;
+    int64_t i_pos, i_size;
 
     switch( mode )
     {
@@ -62,7 +61,7 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
             break;
     }
 
-    if( i_pos < 0 || ( stream_Size( s ) != 0  && i_pos >= stream_Size( s ) ) )
+    if( i_pos < 0 || ( ( i_size = stream_Size( s ) ) != 0 && i_pos >= i_size ) )
     {
         mb_eof = true;
         return;
