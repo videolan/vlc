@@ -466,6 +466,12 @@ void DiscOpenPanel::updateButtons()
 
 #undef setDrive
 
+#ifndef WIN32
+# define LOCALHOST ""
+#else
+# define LOCALHOST "/"
+#endif
+
 /* Update the current MRL */
 void DiscOpenPanel::updateMRL()
 {
@@ -476,9 +482,9 @@ void DiscOpenPanel::updateMRL()
     /* DVD */
     if( ui.dvdRadioButton->isChecked() ) {
         if( !ui.dvdsimple->isChecked() )
-            mrl = "dvd://";
+            mrl = "dvd://" LOCALHOST;
         else
-            mrl = "dvdsimple://";
+            mrl = "dvdsimple://" LOCALHOST;
         mrl += ui.deviceCombo->currentText();
         if( !ui.dvdsimple->isChecked() )
             emit methodChanged( "dvdnav-caching" );
@@ -494,7 +500,7 @@ void DiscOpenPanel::updateMRL()
 
     /* VCD */
     } else if ( ui.vcdRadioButton->isChecked() ) {
-        mrl = "vcd://" + ui.deviceCombo->currentText();
+        mrl = "vcd://" LOCALHOST + ui.deviceCombo->currentText();
         emit methodChanged( "vcd-caching" );
 
         if( ui.titleSpin->value() > 0 ) {
@@ -503,7 +509,7 @@ void DiscOpenPanel::updateMRL()
 
     /* CDDA */
     } else {
-        mrl = "cdda://" + ui.deviceCombo->currentText();
+        mrl = "cdda://" LOCALHOST + ui.deviceCombo->currentText();
         emit methodChanged( "cdda-caching" );
     }
 
