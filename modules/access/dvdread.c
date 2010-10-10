@@ -147,7 +147,7 @@ struct demux_sys_t
 
 static int Control   ( demux_t *, int, va_list );
 static int Demux     ( demux_t * );
-static int DemuxBlock( demux_t *, uint8_t *, int );
+static int DemuxBlock( demux_t *, const uint8_t *, int );
 
 static void DemuxTitles( demux_t *, int * );
 static void ESNew( demux_t *, int, int );
@@ -554,22 +554,20 @@ static int Demux( demux_t *p_demux )
 /*****************************************************************************
  * DemuxBlock: demux a given block
  *****************************************************************************/
-static int DemuxBlock( demux_t *p_demux, uint8_t *pkt, int i_pkt )
+static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    uint8_t     *p = pkt;
 
-    while( p < &pkt[i_pkt] )
+    while( len > 0 )
     {
-        int i_size = ps_pkt_size( p, &pkt[i_pkt] - p );
-        block_t *p_pkt;
-        if( i_size <= 0 )
+        int i_size = ps_pkt_size( p, len );
+        if( i_size <= 0 || i_size > len )
         {
             break;
         }
 
         /* Create a block */
-        p_pkt = block_New( p_demux, i_size );
+        block_t *p_pkt = block_New( p_demux, i_size );
         memcpy( p_pkt->p_buffer, p, i_size);
 
         /* Parse it and send it */
@@ -634,6 +632,7 @@ static int DemuxBlock( demux_t *p_demux, uint8_t *pkt, int i_pkt )
         }
 
         p += i_size;
+        len -= i_size;
     }
 
     return VLC_SUCCESS;
