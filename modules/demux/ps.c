@@ -581,16 +581,12 @@ static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code )
 static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
 {
     const uint8_t *p_peek;
-    int      i_peek = stream_Peek( s, &p_peek, 14 );
-    int      i_size;
-    VLC_UNUSED(i_code);
+    int i_peek = stream_Peek( s, &p_peek, 14 );
+    if( i_peek < 4 )
+        return NULL;
 
-    /* Smallest valid packet */
-    if( i_peek < 6 ) return NULL;
-
-    i_size = ps_pkt_size( p_peek, i_peek );
-
-    if( i_size < 0 || ( i_size <= 6 && p_peek[3] > 0xba ) )
+    int i_size = ps_pkt_size( p_peek, i_peek );
+    if( i_size <= 6 && p_peek[3] > 0xba )
     {
         /* Special case, search the next start code */
         i_size = 6;
@@ -618,5 +614,6 @@ static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
         return stream_Block( s, i_size );
     }
 
+    VLC_UNUSED(i_code);
     return NULL;
 }
