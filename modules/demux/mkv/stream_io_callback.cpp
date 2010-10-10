@@ -62,7 +62,7 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
             break;
     }
 
-    if( i_pos < 0 || i_pos >= stream_Size( s ) )
+    if( i_pos < 0 || ( stream_Size( s ) != 0  && i_pos >= stream_Size( s ) ) )
     {
         mb_eof = true;
         return;
