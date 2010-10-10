@@ -145,11 +145,8 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
 
         psz_name = var_InheritString( p_this, "cd-audio" );
-        if( !psz_name || !*psz_name )
-        {
-            free( psz_name );
+        if( !psz_name )
             return VLC_EGENERIC;
-        }
     }
     else psz_name = ToLocaleDup( p_access->psz_filepath );
 
