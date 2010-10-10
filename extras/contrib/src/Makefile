@@ -1642,6 +1642,7 @@ ifneq ($(HOST),$(BUILD))
 	(patch -p0 < Patches/portaudio-cross.patch;cd $@;  autoconf)
 endif
 ifdef HAVE_WIN64
+	patch -p0 < Patches/portaudio-static.patch
 	(cd $@ ; autoreconf -if)
 endif
 
