@@ -283,8 +283,8 @@ static void Close( vlc_object_t * );
     "-1 is automatic, based on number of threads." )
 
 #define PSY_RD_TEXT N_( "Strength of psychovisual optimization, default is \"1.0:0.0\"")
-#define PSY_RD_LONGTEXT N_( "First parameter controls if RD is on (subme>=6) or off"\
-        "second parameter controls if Trellis is used on psychovisual optimization," \
+#define PSY_RD_LONGTEXT N_( "First parameter controls if RD is on (subme>=6) or off.\n"\
+        "Second parameter controls if Trellis is used on psychovisual optimization, " \
         "default off")
 
 #define SUBME_TEXT N_("Subpixel motion estimation and partition decision " \

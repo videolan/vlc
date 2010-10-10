@@ -152,7 +152,7 @@ static void Close ( vlc_object_t * );
 
 #define DUMPSIZE_TEXT N_("Dump buffer size")
 #define DUMPSIZE_LONGTEXT N_( \
-    "Tweak the buffer size for reading and writing an integer number of packets." \
+    "Tweak the buffer size for reading and writing an integer number of packets. " \
     "Specify the size of the buffer here and not the number of packets." )
 
 #define SPLIT_ES_TEXT N_("Separate sub-streams")

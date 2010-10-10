@@ -84,7 +84,7 @@ static int FilterCallback ( vlc_object_t *, char const *,
 #define RATIO_LONGTEXT N_("Force a ratio (0 for automatic). Value is x1000: 1333 means 4/3.")
 
 #define TIME_TEXT N_("Number of images for change")
-#define TIME_LONGTEXT N_("The number of consecutive images with the same detected ratio (different from the previously detected ratio) to consider that ratio chnged and trigger recrop.")
+#define TIME_LONGTEXT N_("The number of consecutive images with the same detected ratio (different from the previously detected ratio) to consider that ratio changed and trigger recrop.")
 
 #define DIFF_TEXT N_("Number of lines for change")
 #define DIFF_LONGTEXT N_("The minimum difference in the number of detected black lines to consider that ratio changed and trigger recrop.")

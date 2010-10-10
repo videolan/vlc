@@ -208,7 +208,7 @@ MMSHDestBox::MMSHDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
 
     QLabel *mmshOutput = new QLabel(
         qtr( "This module outputs the transcoded stream to a network "
-             " via the mms protocol." ), this );
+             "via the mms protocol." ), this );
     layout->addWidget(mmshOutput, 0, 0, 1, -1);
 
     QLabel *MMSHLabel = new QLabel( qtr("Address"), this );
