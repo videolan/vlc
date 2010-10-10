@@ -438,7 +438,9 @@ AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
     AC_PREPROC_IFELSE([
 #include <_mingw.h>
 #if (__MINGW32_MAJOR_VERSION == 3) && (__MINGW32_MINOR_VERSION < 15)
+#ifndef __MINGW64_VERSION_MAJOR
 # error Attempting to use mingw-runtime with broken vsnprintf support
+#endif
 #endif
     ], [
         AC_MSG_RESULT([ok])
