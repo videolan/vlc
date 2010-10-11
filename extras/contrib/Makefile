@@ -136,7 +136,7 @@ package-win%:
 # Remove unused and potentially harmful files (but skip qt4 executables)
 	(cd tmp/$(DISTDIR)/bin && rm -fv `find . -name 'uic.exe' -o -name 'rcc.exe' -o -name 'moc.exe' -o -name '*.exe' -printf '%p '` && chmod a+x * || true)
 # Tar it.
-	(cd tmp; tar cf - $(DISTDIR)) | bzip2 -c > contrib-`date +%Y%m%d`-win$*-bin-gcc-`$(CC) --version|head -n 1|cut -f 3 -d ' '`-runtime-`/bin/echo -e "#include <_mingw.h>\n__MINGW32_VERSION"|$(CC) -E -|grep -v ^#|grep -v ' '`-only.tar.bz2
+	(cd tmp; tar cf - $(DISTDIR)) | bzip2 -c > contrib-`date +%Y%m%d`-win$*-bin-gcc-`$(CC) --version|head -n 1|cut -f 3 -d ' '`-runtime-`/bin/echo -e "#include <_mingw.h>\n#define CONCAT2(a,b) a##b\n#define CONCAT(a,b) CONCAT2(a,b)\n#ifdef __MINGW64_VERSION_MAJOR\nCONCAT(CONCAT(__MINGW64_VERSION_MAJOR,.),__MINGW64_VERSION_MINOR)\n#else\n__MINGW32_VERSION\n#endif"|$(CC) -E -|tail -1`-only.tar.bz2
 	rm -rf tmp
 
 .PHONY: all clean-src clean-bin clean package-macosx
