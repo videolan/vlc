@@ -6,7 +6,7 @@ if [ -n "$1" ]
 then
 	CONTRIBS="$1"
 else
-	CONTRIBS="/usr/win32"
+	CONTRIBS="/usr/win64"
 fi
 export CONTRIBS
 
