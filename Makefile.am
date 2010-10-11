@@ -102,6 +102,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--disable-faad --disable-skins2 \
 	--disable-live555 \
 	--disable-fribidi --disable-glx \
+	--disable-mkv \
 	--with-kde-solid='$${datadir}/kde4/apps'
 
 ACLOCAL_AMFLAGS = -I m4
