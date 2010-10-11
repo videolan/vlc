@@ -1736,7 +1736,7 @@ if test "${enable_live555}" != "no"; then
         [#include <liveMedia_version.hh>
          #ifdef LIVEMEDIA_LIBRARY_VERSION_INT
          #if LIVEMEDIA_LIBRARY_VERSION_INT < 1275091200
-         NO!
+         yes
          #endif
          #endif],
         [AC_MSG_RESULT([no])
