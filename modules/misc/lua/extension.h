@@ -27,19 +27,18 @@
 #include <vlc_extensions.h>
 #include <vlc_arrays.h>
 
-///< Array of extension_t
-TYPEDEF_ARRAY( extension_t, array_extension_t );
-
 /* List of available commands */
-#define CMD_ACTIVATE    1
-#define CMD_DEACTIVATE  2
-#define CMD_TRIGGERMENU 3    /* Arg1 = int*, pointing to id to trigger. free */
-#define CMD_CLICK       4    /* Arg1 = extension_widget_t* */
-#define CMD_CLOSE       5
-#define CMD_SET_INPUT   6    /* No arg. Just signal current input changed */
-#define CMD_UPDATE_META 7    /* No arg. Just signal current input item meta
-                              * changed */
-#define CMD_PLAYING_CHANGED 8 /* Arg1 = int*, New playing status  */
+typedef enum
+{
+    CMD_ACTIVATE = 1,
+    CMD_DEACTIVATE,
+    CMD_TRIGGERMENU,    /* Arg1 = int*, pointing to id to trigger. free */
+    CMD_CLICK,          /* Arg1 = extension_widget_t* */
+    CMD_CLOSE,
+    CMD_SET_INPUT,      /* No arg. Just signal current input changed */
+    CMD_UPDATE_META,    /* No arg. Just signal current input item meta changed */
+    CMD_PLAYING_CHANGED /* Arg1 = int*, New playing status  */
+} command_type_e;
 
 //Data types
 typedef enum
@@ -83,7 +82,7 @@ struct extension_sys_t
     /* Queue of commands to execute */
     struct command_t
     {
-        int i_command;
+        command_type_e i_command;
         void *data[10];         ///< Optional void* arguments
         struct command_t *next; ///< Next command
     } *command;
@@ -96,7 +95,7 @@ int Activate( extensions_manager_t *p_mgr, extension_t * );
 bool IsActivated( extensions_manager_t *p_mgr, extension_t * );
 int Deactivate( extensions_manager_t *p_mgr, extension_t * );
 void WaitForDeactivation( extension_t *p_ext );
-int __PushCommand( extension_t *ext, bool unique, int cmd, va_list options );
+int __PushCommand( extension_t *ext, bool unique, command_type_e cmd, va_list options );
 static inline int PushCommand( extension_t *ext, int cmd, ... )
 {
     va_list args;

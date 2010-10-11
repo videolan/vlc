@@ -207,7 +207,7 @@ void WaitForDeactivation( extension_t *p_ext )
 }
 
 /** Push a UI command */
-int __PushCommand( extension_t *p_ext,  bool b_unique, int i_command,
+int __PushCommand( extension_t *p_ext,  bool b_unique, command_type_e i_command,
                    va_list args )
 {
     vlc_mutex_lock( &p_ext->p_sys->command_lock );
@@ -319,7 +319,7 @@ static void* Run( void *data )
                     {
                         if( lua_ExecuteFunction( p_mgr, p_ext, "activate", LUA_END ) < 0 )
                         {
-                            msg_Dbg( p_mgr, "Could not activate extension!" );
+                            msg_Err( p_mgr, "Could not activate extension!" );
                             Deactivate( p_mgr, p_ext );
                             cmd = NULL;
                         }
