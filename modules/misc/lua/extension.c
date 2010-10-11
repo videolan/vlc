@@ -136,7 +136,7 @@ void Close_Extension( vlc_object_t *p_this )
         if( !p_ext ) break;
         msg_Dbg( p_mgr, "Deactivating '%s'", p_ext->psz_title );
         Deactivate( p_mgr, p_ext );
-        WaitForDeactivation( p_ext );
+        vlc_join( p_ext->p_sys->thread, NULL );
     }
     FOREACH_END()
 

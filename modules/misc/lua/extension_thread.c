@@ -200,12 +200,6 @@ static int RemoveActivated( extensions_manager_t *p_mgr, extension_t *p_ext )
     return (i_idx >= 0) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
-/** Wait for an extension to finish */
-void WaitForDeactivation( extension_t *p_ext )
-{
-    vlc_join( p_ext->p_sys->thread, NULL );
-}
-
 /** Push a UI command */
 int __PushCommand( extension_t *p_ext,  bool b_unique, command_type_e i_command,
                    va_list args )
