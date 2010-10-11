@@ -28,7 +28,6 @@ fi
       --enable-portaudio \
       --enable-sdl \
       --enable-qt4 \
-      --enable-mozilla --with-mozilla-sdk-path=$CONTRIBS/gecko-sdk \
       --enable-activex \
       --enable-sse --enable-mmx \
       --enable-libcddb \

@@ -18,5 +18,5 @@ CC=amd64-mingw32msvc-gcc CXX=amd64-mingw32msvc-g++ \
 CONFIGURE="${root}configure" \
 CONFIGOPTS="--host=amd64-mingw32msvc --build=i386-linux
  --enable-dirac --enable-mkv --enable-taglib --enable-debug --enable-projectm
- --disable-qt4 --disable-skins2 --disable-activex --disable-mozilla" \
+ --disable-qt4 --disable-skins2 --disable-activex" \
 sh ${root}extras/package/win32/configure-common.sh
