@@ -5,12 +5,12 @@
 # SUBDIRS stores the directories where a "make" is required when building
 # something. DIST_SUBDIRS stores the directories where nothing is built but
 # which have makefiles with distribution information.
-#  - src (libvlc) is nedeed by modules, mozilla and bindings
+#  - src (libvlc) is nedeed by modules
 #  - libs/* are needed by modules
 BASE_SUBDIRS = po compat src bin modules share doc test
 EXTRA_SUBDIRS = m4 \
 	libs/loader libs/srtp libs/unzip \
-	projects/mozilla projects/activex
+	projects/activex
 DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 
 SUBDIRS = po compat src
@@ -29,9 +29,6 @@ if BUILD_VLC
 SUBDIRS += bin
 endif
 SUBDIRS += modules share doc test
-if BUILD_MOZILLA
-SUBDIRS += projects/mozilla
-endif
 if BUILD_ACTIVEX
 SUBDIRS += projects/activex
 endif
@@ -301,10 +298,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Delete_Preferences.app/Contents/Resources/applet.icns \
 	extras/package/macosx/Delete_Preferences.app/Contents/Resources/applet.rsrc \
 	extras/package/macosx/Delete_Preferences.app/Contents/Resources/Scripts/main.scpt \
-	extras/package/macosx/plugin/Info.plist.in \
-	extras/package/macosx/plugin/InstallerInfo.plist.in \
-	extras/package/macosx/plugin/InstallerDescription.plist \
-	extras/package/macosx/plugin/pbdevelopment.plist \
 	extras/package/macosx/eyetvplugin/EyeTVPluginDefs.h \
 	extras/package/macosx/eyetvplugin/Info.plist \
 	extras/package/macosx/eyetvplugin/eyetvplugin.c \
@@ -799,9 +792,9 @@ if BUILD_OSDMENU
 		rm -f -- "$$file.tmp"; \
 	done
 endif
-if BUILD_MOZILLA
-	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest $(win32_destdir)
-endif
+#if BUILD_MOZILLA
+#	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest $(win32_destdir)
+#endif
 if BUILD_ACTIVEX
 	cp $(top_srcdir)/projects/activex/axvlc.dll.manifest $(win32_destdir)
 endif
@@ -837,28 +830,28 @@ package-win-base: package-win-common
 	done
 
 package-win32-webplugin-common: package-win-base
-if BUILD_MOZILLA
-	mkdir -p "$(win32_xpi_destdir)/plugins"
-	find $(destdir) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
-	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins"
-	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_xpi_destdir)/plugins"
-	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/plugins"
-	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*qt*"
-	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*skins*"
-endif
+#if BUILD_MOZILLA
+#	mkdir -p "$(win32_xpi_destdir)/plugins"
+#	find $(destdir) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
+#	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins"
+#	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_xpi_destdir)/plugins"
+#	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/plugins"
+#	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*qt*"
+#	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*skins*"
+#endif
 
 package-win32-xpi: package-win32-webplugin-common
-if BUILD_MOZILLA
-	cp $(top_builddir)/projects/mozilla/install.rdf "$(win32_xpi_destdir)"
-	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" install.rdf plugins
-endif
+#if BUILD_MOZILLA
+#	cp $(top_builddir)/projects/mozilla/install.rdf "$(win32_xpi_destdir)"
+#	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" install.rdf plugins
+#endif
 
 package-win32-crx: package-win32-webplugin-common
-if BUILD_MOZILLA
-	cp $(top_builddir)/projects/mozilla/manifest.json "$(win32_xpi_destdir)"
-	crxmake --pack-extension "$(win32_xpi_destdir)" \
-		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
-endif
+#if BUILD_MOZILLA
+#	cp $(top_builddir)/projects/mozilla/manifest.json "$(win32_xpi_destdir)"
+#	crxmake --pack-extension "$(win32_xpi_destdir)" \
+#		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
+#endif
 
 package-win32-base-exe: package-win-base
 # Script installer
@@ -1035,49 +1028,6 @@ package-macosx-framework-zip:
 	done
 	zip -r -y -9 $(top_builddir)/vlckit-$(VERSION).zip $(top_builddir)/vlckit-$(VERSION)
 	rm -Rf $(top_builddir)/vlc-$(VERSION)
-
-package-macosx-plugin:
-if BUILD_MOZILLA
-# Create Installer
-	rm -rf "$(top_builddir)/macosx-plugin-instdata/"; true
-	mkdir -p "$(top_builddir)/macosx-plugin-instdata"
-	rm -f "$(top_builddir)/projects/mozilla/VLC Plugin.plugin/Contents/MacOS/modules/libmacosx_plugin.dylib" 
-	cp -R "$(top_builddir)/projects/mozilla/VLC Plugin.plugin" "$(top_builddir)/macosx-plugin-instdata"
-	rm -rf "$(top_builddir)/VLC Internet Plug-In.pkg"
-	export PACKAGEMAKER=
-	if test -x /Developer/Tools/packagemaker; then \
-	   export PACKAGEMAKER=/Developer/Tools/packagemaker; \
-	fi; \
-	if test -x /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker; then \
-	   export PACKAGEMAKER=/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker; \
-	fi; \
-	$${PACKAGEMAKER} -build -ds -p "$(top_builddir)/VLC Internet Plug-In.pkg" \
-	-f "$(top_builddir)/macosx-plugin-instdata" \
-	-i "$(top_builddir)/extras/package/macosx/plugin/InstallerInfo.plist" \
-	-d "$(top_srcdir)/extras/package/macosx/plugin/InstallerDescription.plist"; true
-	rm -rf "$(top_builddir)/macosx-plugin-instdata/"
-
-# Create disk image 
-	rm -f "$(top_builddir)/vlc-plugin-$(VERSION).dmg"; true
-	rm -rf "$(top_builddir)/vlc-plugin-$(VERSION)/"; true
-	mkdir -p "$(top_builddir)/vlc-plugin-$(VERSION)/"
-	mv "$(top_builddir)/VLC Internet Plug-In.pkg" "$(top_builddir)/vlc-plugin-$(VERSION)/"
-	hdiutil create -srcfolder "$(top_builddir)/vlc-plugin-$(VERSION)" \
-	  "$(top_builddir)/vlc-plugin-$(VERSION).dmg" -format UDBZ \
-	  -scrub -imagekey zlib-level=9
-	echo "Disk image creation completed:"
-	rm -rf "$(top_builddir)/vlc-plugin-$(VERSION)"
-endif
-
-package-macosx-xpi:
-if BUILD_MOZILLA
-	mkdir -p "$(top_builddir)/macosx-xpi/plugins"
-	cp $(top_builddir)/projects/mozilla/install.rdf \
-		"$(top_builddir)/macosx-xpi/"
-	cp -R "$(top_builddir)/projects/mozilla/VLC Plugin.plugin" \
-		"$(top_builddir)/macosx-xpi/plugins"
-	cd "$(top_builddir)/macosx-xpi" && zip -r vlc-$(VERSION).xpi install.rdf plugins
-endif
 
 package-translations:
 	@if test -e "$(srcdir)/vlc-translations-$(VERSION)"; then \

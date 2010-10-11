@@ -34,7 +34,6 @@ EXTRA_DIST = \
 	$(DIST_http_lua) \
 	$(DIST_lua) \
 	$(DIST_osdmenu_default) \
-	$(DIST_mozilla) \
 	$(DIST_maemo) \
 	$(DIST_solid)
 
@@ -49,10 +48,6 @@ endif
 if BUILD_OSDMENU
 nobase_vlcdata_DATA += \
 	$(DIST_osdmenu_default)
-endif
-if BUILD_MOZILLA
-# TODO: move to the mozilla directory
-nobase_vlcdata_DATA += $(DIST_mozilla)
 endif
 if BUILD_HILDON
 nobase_vlcdata_DATA += $(DIST_maemo) $(maemo_FILES)
@@ -386,20 +381,6 @@ DIST_http_lua = \
 	lua/http/vlm.html \
 	lua/http/vlm_export.html \
 	lua/http/flash.html
-
-DIST_mozilla = \
-	mozilla/fullscreen.xpm \
-	mozilla/pause.xpm \
-	mozilla/play.xpm \
-	mozilla/skip_next.xpm \
-	mozilla/skip_previous.xpm \
-	mozilla/stop.xpm \
-	mozilla/time_icon.xpm \
-	mozilla/time_line.xpm \
-	mozilla/volume_knob.xpm \
-	mozilla/volume_max.xpm \
-	mozilla/volume_mute.xpm \
-	mozilla/volume_slider_bar.xpm
 
 DIST_maemo = \
 	maemo/vlc_intf.rc \

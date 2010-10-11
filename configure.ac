@@ -135,10 +135,6 @@ AS_IF([test "${with_contrib}" != "no"],[
     LDFLAGS="${LDFLAGS} -L${CONTRIB_DIR}/lib"
     LDFLAGS_save="${LDFLAGS_save} -L${CONTRIB_DIR}/lib"
 
-    if test -z "$with_mozilla_sdk_path"; then
-       with_mozilla_sdk_path="${CONTRIB_DIR}/gecko-sdk"
-    fi
-
     if test "${SYS}" = "darwin"; then
       export LD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$LD_LIBRARY_PATH"
       export DYLD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$DYLD_LIBRARY_PATH"
@@ -316,7 +312,7 @@ case "${host_os}" in
         # add ws2_32 for closesocket, select, recv
         VLC_ADD_LIBS([libvlccore],[-lws2_32 -lnetapi32 -lwinmm])
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
-        VLC_ADD_LIBS([activex mozilla win32text],[-lgdi32])
+        VLC_ADD_LIBS([activex win32text],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx sdl_image aout_sdl vout_sdl],[-lwinmm])
         VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap oldhttp stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[-lws2_32])
         VLC_ADD_LIBS([filesystem], [-lshlwapi])
@@ -516,11 +512,10 @@ AC_PREPROC_IFELSE([
   AC_MSG_RESULT([not present])
 ], [
   AC_MSG_RESULT([found])
-  AS_IF([test "x${enable_nls}" != "xno" || test "x${enable_mozilla}" != "xno"], [
+  AS_IF([test "x${enable_nls}" != "xno"], [
     AC_MSG_ERROR([Buggy GNU/libc (version 2.5 - 2.7) present. VLC would crash; there is no viable
 work-around for this. Check with your distribution vendor on how to update the
-glibc run-time. Alternatively, build with --disable-nls --disable-mozilla and
-be sure to not use LibVLC from other applications/wrappers.])
+glibc run-time. Alternatively, build with --disable-nls.])
   ], [
     AC_DEFINE(DISABLE_BUGGY_GLIBC_CHECK, 1, [Disables runtime check for buggy glibc.])
   ])
@@ -4281,175 +4276,6 @@ AC_ARG_VAR(WIDL, [Wine IDL compiler (requires Wine SDK)])
 AM_CONDITIONAL(HAS_WIDL_COMPILER, test "${WIDL}" != "no")
 AM_CONDITIONAL(BUILD_ACTIVEX,${activex})
 
-dnl
-dnl  Mozilla plugin
-dnl
-mozilla=false
-AC_ARG_ENABLE(mozilla,
-  AS_HELP_STRING([--enable-mozilla],[build a vlc-based Firefox/Mozilla plugin
-		  (default disabled)]))
-AC_ARG_WITH(mozilla-sdk-path,
-  [  --with-mozilla-sdk-path=PATH path to mozilla sdk])
-AC_ARG_WITH(mozilla-pkg,
-  [  --with-mozilla-pkg=PKG  look for PKG.pc to build the mozilla plugin.])
-AC_LANG_PUSH(C++)
-if test "${enable_mozilla}" = "yes"
-then
-  AS_IF([test "${with_mozilla_sdk_path}" = "" -o "${with_mozilla_sdk_path}" = "no"],
-    [
-    dnl pkg-config
-    dnl As we want to do a loop due to the number of name possible for the .pc
-    dnl we can't use the pkg-config macros.
-
-    AC_ARG_VAR([MOZILLA_CFLAGS], [C compiler flags for Mozilla, overriding pkg-config])
-    AC_ARG_VAR([MOZILLA_LIBS], [linker flags for Mozilla, overriding pkg-config])
-    AC_MSG_NOTICE([Checking for Mozilla])
-    found=0
-    if test -n "$MOZILLA_CFLAGS" -o -n "$MOZILLA_LIBS"
-    then
-      found=1
-    else
-      if test -n "$PKG_CONFIG"; then
-        for i in "${with_mozilla_pkg}" libxul {seamonkey,iceape,xulrunner,firefox,iceweasel,mozilla}-plugin; do
-          if test -n "$i"
-          then
-            echo "Trying to find $i package" >&AS_MESSAGE_LOG_FD
-            AC_MSG_CHECKING([for $i >= 1.9.2])
-            if $PKG_CONFIG --exists --print-errors "$i >= 1.9.2" 2>&AS_MESSAGE_LOG_FD
-            then
-              echo "Using $i pkg-config package." >&AS_MESSAGE_LOG_FD
-              echo "Using $i package." >&AS_MESSAGE_FD
-              found=1
-              MOZILLA_CFLAGS=$(eval $PKG_CONFIG --cflags "$i" )
-              MOZILLA_LIBS=$(eval $PKG_CONFIG --libs "$i" )
-              AC_MSG_RESULT([yes])
-              break
-            fi
-            AC_MSG_RESULT([no])
-          fi
-        done
-      fi
-    fi
-    AS_IF( [test $found = 1],[
-        CPPFLAGS="${CPPFLAGS_save} ${MOZILLA_CFLAGS}"
-        MOZILLA_REQUIRED_HEADERS=1
-        AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
-        AC_CHECK_HEADERS(npruntime.h,,MOZILLA_REQUIRED_HEADERS=0,
-          [#if HAVE_NPAPI_H
-           # include <npapi.h>
-           #endif
-          ])
-        if test "${MOZILLA_REQUIRED_HEADERS}" = "0"; then
-            AC_MSG_ERROR([Please install the Firefox development tools; plugin/npapi.h and/or plugin/npruntime.h were not found.])
-        fi
-        MOZILLA_REQUIRED_HEADERS=
-        mozilla=:
-        AS_IF([ test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"],[
-           VLC_ADD_CPPFLAGS([mozilla],[-DXP_UNIX])
-           AS_IF([ test "${SYS}" != "darwin"],[
-             PKG_CHECK_MODULES(XPM, [xpm xt],[
-                VLC_ADD_CPPFLAGS([mozilla],[-DMOZ_X11])
-             ],[
-                AC_MSG_ERROR([Please install the libXpm and libXt development files.])
-             ])
-             AS_IF([test "${have_xcb_keysyms}" != "yes"], [
-               AC_MSG_ERROR([Please install xcb-keysyms from xcb-utils.])
-             ])
-          ])
-        ])
-        VLC_ADD_CPPFLAGS([mozilla],[${CPPFLAGS} ${XPM_CFLAGS}])
-        VLC_ADD_LIBS([mozilla],[${MOZILLA_LIBS} ${XPM_LIBS}])
-        VLC_ADD_PLUGIN([mozilla])
-        PLUGINS_BINDINGS="${PLUGINS_BINDINGS} mozilla"
-        MOZILLA_CONFIG=
-        CPPFLAGS="${CPPFLAGS_save}"
-          ],
-          [
-            AC_PATH_PROGS(MOZILLA_CONFIG,
-            [mozilla-config seamonkey-config xulrunner-config],
-        [no])
-            test "${MOZILLA_CONFIG}" = "no" && AC_MSG_ERROR([Please install the Mozilla development tools (version 1.9.2 or higher) or use --disable-mozilla.])
-          ]
-        )
-    dnl pkg-config failed but we might have found a mozilla-config
-    AS_IF( [test ! -z "${MOZILLA_CONFIG}"],[
-      if ${MOZILLA_CONFIG} --defines | grep -q 'MOZ_X11=1'; then
-        LDFLAGS="${LDFLAGS_save} ${X_LIBS} ${X_PRE_LIBS}"
-        AC_CHECK_LIB(Xt,XtStrings,
-         [
-           VLC_ADD_CPPFLAGS([mozilla],[${X_CFLAGS}])
-           VLC_ADD_LIBS([mozilla],[${X_LIBS} ${X_PRE_LIBS} -lXt -lX11 -lSM -lICE -lXpm])
-         ],
-         [],
-         [[${X_LIBS} ${X_PRE_LIBS} -lX11 -lSM -lICE -lXpm]
-        ])
-        AC_CHECK_HEADERS(X11/xpm.h,,AC_MSG_ERROR([Please install libXpm-devel library for required X11/xpm.h]))
-        AS_IF([test "${have_xcb_keysyms}" != "yes"], [
-          AC_MSG_ERROR([Please install xcb-keysyms from xcb-utils.])
-        ])
-        LDFLAGS="${LDFLAGS_save}"
-      fi
-
-      mozilla=:
-      PLUGINS_BINDINGS="${PLUGINS_BINDINGS} mozilla"
-      VLC_ADD_CPPFLAGS([mozilla],[[`${MOZILLA_CONFIG} --cflags plugin java`]])
-      VLC_ADD_LIBS([mozilla],[`${MOZILLA_CONFIG} --libs plugin`])
-      CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mozilla}"
-      MOZILLA_REQUIRED_HEADERS=1
-      AC_CHECK_HEADERS(mozilla-config.h,,MOZILLA_REQUIRED_HEADERS=0)
-      AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
-      AC_CHECK_HEADERS(npruntime.h,,MOZILLA_REQUIRED_HEADERS=0,
-        [#if HAVE_NPAPI_H
-         # include <npapi.h>
-         #endif
-        ])
-      if test "${MOZILLA_REQUIRED_HEADERS}" = "0"
-      then
-        AC_MSG_ERROR([Please install the Mozilla development tools, required headers were not found.])
-      fi
-      MOZILLA_REQUIRED_HEADERS=
-      CPPFLAGS="${CPPFLAGS_save}"
-      MOZILLA_SDK_PATH="`${MOZILLA_CONFIG} --prefix`"
-    ])
-    dnl End of moz_sdk = ""
-  ],[
-    dnl special case for mingw32
-    if test "${SYS}" = "mingw32"
-    then
-      AC_CHECK_TOOL(CYGPATH, cygpath, "")
-      dnl latest gecko sdk does not have an xpcom directory
-      if test -d "${with_mozilla_sdk_path}/xpcom"; then
-          mozilla_sdk_xpcom="/xpcom"
-      fi
-    fi
-
-    real_mozilla_sdk="`cd ${with_mozilla_sdk_path} 2>/dev/null && pwd`"
-    CPPFLAGS="${CPPFLAGS_save} -I${real_mozilla_sdk}/include"
-    MOZILLA_REQUIRED_HEADERS=1
-    AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
-    AC_CHECK_HEADERS(npruntime.h,,MOZILLA_REQUIRED_HEADERS=0,
-        [#if HAVE_NPAPI_H
-          #include <npapi.h>
-          #endif
-        ])
-    if test "${MOZILLA_REQUIRED_HEADERS}" = "0"
-    then
-        AC_MSG_ERROR([Please install the Mozilla development tools, required headers were not found.])
-    fi
-    MOZILLA_REQUIRED_HEADERS=
-    mozilla=:
-    PLUGINS_BINDINGS="${PLUGINS_BINDINGS} mozilla"
-    VLC_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -DHAVE_CPP_MODERN_SPECIALIZE_TEMPLATE_SYNTAX -I${real_mozilla_sdk}/include])
-    MOZILLA_SDK_PATH="${real_mozilla_sdk}"
-
-    if test -n "${CYGPATH}"; then
-      real_mozilla_sdk="`${CYGPATH} -w ${real_mozilla_sdk}`"
-    fi
-    CPPFLAGS="${CPPFLAGS_save}"
- ])
-fi
-AC_LANG_POP(C++)
-AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
 dnl
 dnl  Plugin and builtin checks
@@ -4539,7 +4365,6 @@ AC_SUBST(MOC)
 AC_SUBST(RCC)
 AC_SUBST(UIC)
 AC_SUBST(WINDRES)
-AC_SUBST(MOZILLA_SDK_PATH)
 AC_SUBST(WINE_SDK_PATH)
 AC_SUBST(LIBEXT)
 AC_SUBST(AM_CPPFLAGS)
@@ -4558,7 +4383,6 @@ AC_CONFIG_FILES([
   libs/srtp/Makefile
   libs/unzip/Makefile
   modules/Makefile
-  projects/mozilla/Makefile
   m4/Makefile
   po/Makefile.in
   share/Makefile
@@ -4644,14 +4468,6 @@ AC_CONFIG_FILES([
   modules/arm_neon/Makefile
 ])
 
-AM_COND_IF([BUILD_MOZILLA], [
-  AC_CONFIG_FILES([
-    projects/mozilla/install.js
-    projects/mozilla/install.rdf
-    projects/mozilla/manifest.json
-  ])
-])
-
 AM_COND_IF([HAVE_WIN32], [
   AC_CONFIG_FILES([
     extras/package/win32/spad.nsi
@@ -4663,24 +4479,12 @@ AM_COND_IF([HAVE_WIN32], [
       projects/activex/axvlc_rc.rc
     ])
   ])
-  AM_COND_IF([BUILD_MOZILLA], [
-    AC_CONFIG_FILES([
-      projects/mozilla/npvlc_rc.rc
-    ])
-  ])
 ])
 
 AM_COND_IF([HAVE_DARWIN], [
   AC_CONFIG_FILES([
     extras/package/macosx/Info.plist
     extras/package/macosx/Resources/English.lproj/InfoPlist.strings
-    extras/package/macosx/plugin/Info.plist
-    extras/package/macosx/plugin/InstallerInfo.plist
-  ])
-  AM_COND_IF([BUILD_MOZILLA], [
-    AC_CONFIG_FILES([
-      projects/mozilla/vlc.r
-    ])
   ])
 ])
 
