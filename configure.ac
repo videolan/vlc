@@ -1741,16 +1741,16 @@ if test "${enable_live555}" != "no"; then
         [#include <liveMedia_version.hh>
          #ifdef LIVEMEDIA_LIBRARY_VERSION_INT
          #if LIVEMEDIA_LIBRARY_VERSION_INT < 1275091200
-         yes
+         NO!
          #endif
          #endif],
         [AC_MSG_RESULT([no])
-          if test "${enable_live555}" == "yes"; then
-            AC_MSG_ERROR([Your version of liveMedia is too old: you may get a more recent one from http://www.live555.com/liveMedia.
-lternatively you can use --disable-live555 to disable the liveMedia plugin.])
-          else
-            AC_MSG_WARN([Your version of liveMedia is too old: you may get a more recent one from http://www.live555.com/liveMedia.])
-          fi
+          AC_MSG_WARN([The installed liveMedia version is too old:
+Version 2010.05.29 or later is required to proceed.
+You can get an updated one from http://www.live555.com/liveMedia .])
+          AS_IF([test "${enable_live555}" == "yes"], [
+            AC_MSG_ERROR([Update live555 or pass --disable-live555 to disable the plugin.])
+          ])
         ],[
           AC_MSG_RESULT([yes])
           other_libs="-lgroupsock -lBasicUsageEnvironment -lUsageEnvironment"
