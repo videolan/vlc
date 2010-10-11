@@ -1765,19 +1765,15 @@ lternatively you can use --disable-live555 to disable the liveMedia plugin.])
 
           dnl We need to check for pic because live555 don't provide shared libs
           dnl and we want to build a plugins so we need -fPIC on some arch.
-          AC_CHECK_HEADERS(liveMedia.hh, [
-            VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
-              AC_CHECK_LIB(liveMedia_pic, main, [
-                VLC_ADD_PLUGIN([live555])
-               VLC_ADD_LIBS([live555], [-lliveMedia_pic ${other_libs_pic}])
-              ],[
-                AC_CHECK_LIB(liveMedia, main, [
-                VLC_ADD_PLUGIN([live555])
-                VLC_ADD_LIBS([live555], [-lliveMedia ${other_libs}])
-              ],[],[${other_libs}]) ],[${other_libs_pic}])
+          VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
+          AC_CHECK_LIB(liveMedia_pic, main, [
+            VLC_ADD_PLUGIN([live555])
+            VLC_ADD_LIBS([live555], [-lliveMedia_pic ${other_libs_pic}])
           ],[
-           AC_MSG_WARN([The development files for liveMedia (live555) can't be found])
-          ])
+            AC_CHECK_LIB(liveMedia, main, [
+            VLC_ADD_PLUGIN([live555])
+            VLC_ADD_LIBS([live555], [-lliveMedia ${other_libs}])
+          ],[],[${other_libs}]) ],[${other_libs_pic}])
 
           CPPFLAGS="${CPPFLAGS_save}"
           AC_LANG_POP(C++)
