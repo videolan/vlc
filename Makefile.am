@@ -837,6 +837,7 @@ package-win-base: package-win-common
 	done
 
 package-win32-webplugin-common: package-win-base
+if BUILD_MOZILLA
 	mkdir -p "$(win32_xpi_destdir)/plugins"
 	find $(destdir) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
 	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins"
@@ -844,15 +845,20 @@ package-win32-webplugin-common: package-win-base
 	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/plugins"
 	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*qt*"
 	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*skins*"
+endif
 
 package-win32-xpi: package-win32-webplugin-common
+if BUILD_MOZILLA
 	cp $(top_builddir)/projects/mozilla/install.rdf "$(win32_xpi_destdir)"
 	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" install.rdf plugins
+endif
 
 package-win32-crx: package-win32-webplugin-common
+if BUILD_MOZILLA
 	cp $(top_builddir)/projects/mozilla/manifest.json "$(win32_xpi_destdir)"
 	crxmake --pack-extension "$(win32_xpi_destdir)" \
 		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
+endif
 
 package-win32-base-exe: package-win-base
 # Script installer
