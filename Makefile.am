@@ -695,6 +695,10 @@ win32_debugdir=$(top_builddir)/symbols-$(VERSION)
 win32_lua_destdir=$(win32_destdir)/lua
 win32_xpi_destdir=$(win32_destdir)/vlc-plugin
 
+if HAVE_WIN32
+include extras/package/npapi.am
+endif
+
 #Win-common is for win32 and wince
 package-win-common: install
 # Check that tmp isn't in the way
@@ -792,9 +796,7 @@ if BUILD_OSDMENU
 		rm -f -- "$$file.tmp"; \
 	done
 endif
-#if BUILD_MOZILLA
-#	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest $(win32_destdir)
-#endif
+	cp $(top_srcdir)/extras/mozilla/src/npvlc.dll.manifest $(win32_destdir)
 if BUILD_ACTIVEX
 	cp $(top_srcdir)/projects/activex/axvlc.dll.manifest $(win32_destdir)
 endif
@@ -829,29 +831,23 @@ package-win-base: package-win-common
 	  fi ; \
 	done
 
-package-win32-webplugin-common: package-win-base
-#if BUILD_MOZILLA
-#	mkdir -p "$(win32_xpi_destdir)/plugins"
-#	find $(destdir) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
-#	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins"
-#	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_xpi_destdir)/plugins"
-#	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/plugins"
-#	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*qt*"
-#	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*skins*"
-#endif
+package-win32-webplugin-common: package-win-base build-win-npapi
+	mkdir -p "$(win32_xpi_destdir)/plugins"
+	find $(destdir) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
+	cp $(top_srcdir)/extras/mozilla/src/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins"
+	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_xpi_destdir)/plugins"
+	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/plugins"
+	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*qt*"
+	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*skins*"
 
 package-win32-xpi: package-win32-webplugin-common
-#if BUILD_MOZILLA
-#	cp $(top_builddir)/projects/mozilla/install.rdf "$(win32_xpi_destdir)"
-#	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" install.rdf plugins
-#endif
+	cp $(top_builddir)/extras/mozilla/src/install.rdf "$(win32_xpi_destdir)"
+	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" install.rdf plugins
 
 package-win32-crx: package-win32-webplugin-common
-#if BUILD_MOZILLA
-#	cp $(top_builddir)/projects/mozilla/manifest.json "$(win32_xpi_destdir)"
-#	crxmake --pack-extension "$(win32_xpi_destdir)" \
-#		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
-#endif
+	cp $(top_builddir)/extras/mozilla/src/manifest.json "$(win32_xpi_destdir)"
+	crxmake --pack-extension "$(win32_xpi_destdir)" \
+		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
 
 package-win32-base-exe: package-win-base
 # Script installer

@@ -1,0 +1,30 @@
+#! /usr/bin/make -f
+
+build-npapi: stamp-npapi-build
+
+stamp-npapi-fetch:
+	rm -Rf npapi-vlc
+	git clone git://git.videolan.org/npapi-vlc.git npapi-vlc
+	touch $@
+
+stamp-npapi-autogen: stamp-npapi-fetch
+# extras/package/npapi.am
+	cd npapi-vlc && \
+	$(SHELL) ./autogen.sh
+	touch $@
+
+stamp-npapi-configure: stamp-npapi-autogen
+	cd npapi-vlc && \
+	$(SHELL) ./configure \
+		--host=$(host_alias) --build=$(build_alias) \
+		--with-mozilla-sdk-path="../$(srcdir)/extras/contrib/hosts/$(host_alias)/gecko-sdk" \
+		CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" \
+		CC="$(CC)" CFLAGS="$(CFLAGS)" \
+		CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" \
+		LD="$(LD)" LDFLAGS="$(LDFLAGS)" \
+		PKG_CONFIG_LIBDIR="../$(srcdir)/extras/contrib/lib/pkgconfig:../src"
+	touch $@
+
+stamp-npapi-build: stamp-npapi-configure
+	cd npapi-vlc && \
+	$(MAKE) $(MAKEFLAGS) all
