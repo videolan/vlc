@@ -851,6 +851,19 @@ static void *vlc_timer_thread (void *data)
          if (interval == 0)
              return NULL;
 
+         mtime_t now = mdate ();
+         unsigned misses = (now - value) / interval;
+         /* Try to compensate for one miss (mwait() will return immediately)
+          * but no more. Otherwise, we might busy loop, after extended periods
+          * without scheduling (suspend, SIGSTOP, RT preemption, ...). */
+         if (misses > 1)
+         {
+             misses--;
+             vlc_mutex_lock (&timer->lock);
+             timer->overruns += misses;
+             vlc_mutex_unlock (&timer->lock);
+             value += misses * interval;
+         }
          value += interval;
     }
 }
