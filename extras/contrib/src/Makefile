@@ -2134,7 +2134,7 @@ d2d_headers.tar.gz:
 .dshow_headers: dshow-headers.tgz dxva2api.h d2d_headers.tar.gz
 	mkdir -p $(PREFIX)/include
 	tar xzf $< -C $(PREFIX)/include
-	tar xzf d2d_headers.tar.gz -C $(PREFIX)/include
+	tar xzf d2d_headers.tar.gz -C $(PREFIX)/include --wildcards --no-anchored '*.h' --strip-components=1
 	cp dxva2api.h $(PREFIX)/include
 	touch $@
 
