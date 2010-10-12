@@ -1057,6 +1057,7 @@ ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-libavformat.patch
 endif
 ifdef HAVE_WIN32
+	patch -p0 < Patches/ffmpeg-dxva2_h264.patch
 	sed -i "s/std=c99/std=gnu99/" ffmpeg/configure
 endif
 else
