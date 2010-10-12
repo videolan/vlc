@@ -6,6 +6,7 @@ Important changes for packagers:
    its file systems and files content (except the Windows port). If this is
    not acceptable, pass --enable-non-utf8 to the configure script.
  * The default tarballs are now .tar.xz
+ * The NPAPI webplugin has moved to git://git.videolan.org/npapi-vlc.git
 
 Access
  * Multiple files are supported from RAR files
@@ -14,7 +15,7 @@ Access
  * DShow: support for freq and video standard selection
  * Support for VDR recordings
  * Blu-Ray integration with libbluray
- * HTTP Live streaming playback
+ * HTTP Live Streaming (IETF draft) playback support
 
 Codecs
  * You can now use ffmpeg-mt in conjunction with vlc
@@ -48,7 +49,7 @@ Video Filter:
  * New posterize filter for lowering the number of colors
 
 Stream output:
- * New livehttp-module for HTTP Live Streamin (iphone-stuff),
+ * New livehttp-module for HTTP Live Streaming (IETF draft) output
    example: vlc inputfile :sout="#transcode{vcodec=h264,acodec=mp3,
     venc=x264{profile=baseline},width=320,vb=256,ab=96}:std{
     access=livehttp{index=public_html/iphonestream.m3u8,
