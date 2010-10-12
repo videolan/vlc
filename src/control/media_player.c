@@ -794,7 +794,7 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi )
     }
 
     if( p_mi->input.p_resource != NULL )
-        input_resource_TerminateVout( p_mi->input.p_resource );
+        input_resource_Terminate( p_mi->input.p_resource );
     unlock_input(p_mi);
 }
 
