@@ -21,7 +21,6 @@
 !define MUI_LANGDLL_REGISTRY_VALUENAME "Language"
 
 @BUILD_ACTIVEX_TRUE@ !define INSTALL_ACTIVEX
-@BUILD_MOZILLA_TRUE@ !define INSTALL_MOZILLA
 
 @FILE_LIBVLCCORE_DLL@
 @FILE_LIBVLC_DLL@
@@ -601,7 +600,6 @@ Section $Name_Section02b SEC02b
     "$INSTDIR\vlc.exe" ""
 SectionEnd
 
-!ifdef INSTALL_MOZILLA
 Section /o $Name_Section03 SEC03
   SectionIn 3
 
@@ -618,7 +616,6 @@ Section /o $Name_Section03 SEC03
   WriteRegStr HKLM ${Moz} "Vendor" "VideoLAN"
   WriteRegStr HKLM ${Moz} "Version" "${VERSION}"
 SectionEnd
-!endif
 
 !ifdef INSTALL_ACTIVEX
 Section $Name_Section04 SEC04
@@ -753,7 +750,7 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} $Desc_Section01
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC02a} $Desc_Section02a
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC02b} $Desc_Section02b
-@BUILD_MOZILLA_TRUE@ !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} $Desc_Section03
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} $Desc_Section03
 @BUILD_ACTIVEX_TRUE@ !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} $Desc_Section04
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC05} $Desc_Section05
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC06} $Desc_Section06

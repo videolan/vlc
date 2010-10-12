@@ -16,6 +16,7 @@ stamp-npapi-autogen: stamp-npapi-fetch
 stamp-npapi-configure: stamp-npapi-autogen
 	cd npapi-vlc && \
 	$(SHELL) ./configure \
+		--prefix=/ \
 		--host=$(host_alias) --build=$(build_alias) \
 		--with-mozilla-sdk-path="../$(srcdir)/extras/contrib/hosts/$(host_alias)/gecko-sdk" \
 		CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" \
@@ -27,4 +28,6 @@ stamp-npapi-configure: stamp-npapi-autogen
 
 stamp-npapi-build: stamp-npapi-configure
 	cd npapi-vlc && \
-	$(MAKE) $(MAKEFLAGS) all
+	$(MAKE) $(MAKEFLAGS) all && \
+	$(MAKE) $(MAKEFLAGS) DESTDIR="$(abs_builddir)/npapi-vlc/installed" install
+	touch $@
