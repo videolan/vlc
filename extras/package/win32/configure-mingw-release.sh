@@ -2,18 +2,8 @@
 
 root=$(echo $0|sed 's#extras/package/win32/configure-mingw-release.sh##')./
 
-if [ -n "$1" ]
-then
-	CONTRIBS="$1"
-else
-	CONTRIBS="/usr/win32"
-fi
-export CONTRIBS
+export CONTRIB_DIR="$1"
 
-PATH="$CONTRIBS/bin:$PATH" \
-PKG_CONFIG_LIBDIR=$CONTRIBS/lib/pkgconfig \
-CPPFLAGS="-I$CONTRIBS/include -I$CONTRIBS/include/ebml" \
-LDFLAGS="-L$CONTRIBS/lib" \
 CC=i586-mingw32msvc-gcc CXX=i586-mingw32msvc-g++ \
 CONFIGURE="${root}configure" \
 CONFIGOPTS="--host=i586-mingw32msvc --build=i386-linux

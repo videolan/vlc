@@ -4,16 +4,12 @@ root=$(echo $0|sed 's#extras/package/win32/configure-mingw64.sh##')./
 
 if [ -n "$1" ]
 then
-	CONTRIBS="$1"
+	CONTRIB_DIR="$1"
 else
-	CONTRIBS="/usr/win64"
+	CONTRIB_DIR="/usr/win64"
 fi
-export CONTRIBS
+export CONTRIB_DIR
 
-PATH="$CONTRIBS/bin:$PATH" \
-PKG_CONFIG_LIBDIR=$CONTRIBS/lib/pkgconfig \
-CPPFLAGS="-I$CONTRIBS/include -I$CONTRIBS/include/ebml" \
-LDFLAGS="-L$CONTRIBS/lib" \
 CC=amd64-mingw32msvc-gcc CXX=amd64-mingw32msvc-g++ \
 CONFIGURE="${root}configure" \
 CONFIGOPTS="--host=amd64-mingw32msvc --build=i386-linux

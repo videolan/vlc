@@ -1,10 +1,7 @@
-if [ -z $CONTRIBS ]
-then
-	CONTRIBS=/usr/win32
-fi
+[ -z $CONTRIB_DIR ] && export CONTRIB_DIR=/usr/win32
 
-      $CONFIGURE \
-      --without-contrib \
+  $CONFIGURE \
+      --with-contrib \
       --enable-update-check \
       --enable-lua \
       --enable-faad \
@@ -21,7 +18,7 @@ fi
       --enable-schroedinger \
       --enable-realrtsp \
       --enable-live555 \
-      --enable-dvdread --with-dvdnav-config-path=$CONTRIBS/bin \
+      --enable-dvdread --with-dvdnav-config-path=$CONTRIB_DIR/bin \
       --enable-shout \
       --enable-goom \
       --enable-caca \
