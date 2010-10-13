@@ -237,6 +237,7 @@ void stream_CommonDelete( stream_t *s )
             vlc_iconv_close( s->p_text->conv );
         free( s->p_text );
     }
+    free( s->psz_access );
     free( s->psz_path );
     vlc_object_release( s );
 }
@@ -294,9 +295,10 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
         return NULL;
 
     s->p_input = p_access->p_input;
+    s->psz_access = strdup( p_access->psz_access );
     s->psz_path = strdup( p_access->psz_location );
     s->p_sys = p_sys = malloc( sizeof( *p_sys ) );
-    if( !s->psz_path || !s->p_sys )
+    if( !s->psz_access || !s->psz_path || !s->p_sys )
     {
         stream_CommonDelete( s );
         return NULL;

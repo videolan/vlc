@@ -49,6 +49,7 @@ stream_t *stream_FilterNew( stream_t *p_source,
     s->p_input = p_source->p_input;
 
     /* */
+    s->psz_access = strdup( p_source->psz_access );
     s->psz_path = strdup( p_source->psz_path );
     if( !s->psz_path )
     {
@@ -129,4 +130,3 @@ static void StreamDelete( stream_t *s )
 
     stream_CommonDelete( s );
 }
-
