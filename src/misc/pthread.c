@@ -801,27 +801,12 @@ struct vlc_timer
 {
     vlc_thread_t thread;
     vlc_mutex_t  lock;
-    vlc_cond_t   wait;
     void       (*func) (void *);
     void        *data;
     mtime_t      value, interval;
     unsigned     users;
     vlc_atomic_t overruns;
 };
-
-static void *vlc_timer_do (void *data)
-{
-    struct vlc_timer *timer = data;
-
-    timer->func (timer->data);
-
-    vlc_mutex_lock (&timer->lock);
-    assert (timer->users > 0);
-    if (--timer->users == 0)
-        vlc_cond_signal (&timer->wait);
-    vlc_mutex_unlock (&timer->lock);
-    return NULL;
-}
 
 static void *vlc_timer_thread (void *data)
 {
@@ -835,19 +820,11 @@ static void *vlc_timer_thread (void *data)
 
     for (;;)
     {
-         vlc_thread_t th;
-
          mwait (value);
 
-         vlc_mutex_lock (&timer->lock);
-         if (vlc_clone (&th, vlc_timer_do, timer, VLC_THREAD_PRIORITY_INPUT))
-             vlc_atomic_inc(&timer->overruns);
-         else
-         {
-             vlc_detach (th);
-             timer->users++;
-         }
-         vlc_mutex_unlock (&timer->lock);
+         int canc = vlc_savecancel ();
+         timer->func (timer->data);
+         vlc_restorecancel (canc);
 
          if (interval == 0)
              return NULL;
@@ -870,7 +847,8 @@ static void *vlc_timer_thread (void *data)
 /**
  * Initializes an asynchronous timer.
  * @warning Asynchronous timers are processed from an unspecified thread.
- * Also, multiple occurences of an interval timer can run concurrently.
+ * Multiple occurences of a single interval timer are serialized; they cannot
+ * run concurrently.
  *
  * @param id pointer to timer to be initialized
  * @param func function that the timer will call
@@ -884,7 +862,6 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
     if (unlikely(timer == NULL))
         return ENOMEM;
     vlc_mutex_init (&timer->lock);
-    vlc_cond_init (&timer->wait);
     assert (func);
     timer->func = func;
     timer->data = data;
@@ -908,12 +885,6 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 void vlc_timer_destroy (vlc_timer_t timer)
 {
     vlc_timer_schedule (timer, false, 0, 0);
-    vlc_mutex_lock (&timer->lock);
-    while (timer->users != 0)
-        vlc_cond_wait (&timer->wait, &timer->lock);
-    vlc_mutex_unlock (&timer->lock);
-
-    vlc_cond_destroy (&timer->wait);
     vlc_mutex_destroy (&timer->lock);
     free (timer);
 }
