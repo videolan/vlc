@@ -1044,8 +1044,6 @@ static int AccessDownload(stream_t *s, segment_t *segment)
         curlen += length;
     } while (vlc_object_alive(s));
 
-    assert(curlen == (ssize_t)segment->size);
-
     AccessClose(s);
     return VLC_SUCCESS;
 }
