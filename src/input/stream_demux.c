@@ -111,8 +111,7 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
 void stream_DemuxSend( stream_t *s, block_t *p_block )
 {
     stream_sys_t *p_sys = s->p_sys;
-    if( p_block )
-        block_FifoPut( p_sys->p_fifo, p_block );
+    block_FifoPut( p_sys->p_fifo, p_block );
 }
 
 static void DStreamDelete( stream_t *s )
