@@ -36,9 +36,6 @@
 #include <vlc_threads.h>
 #include <vlc_arrays.h>
 #include <vlc_stream.h>
-#include <vlc_input.h>
-#include <vlc_fs.h>
-#include <vlc_network.h>
 #include <vlc_url.h>
 
 #include <vlc_modules.h>
