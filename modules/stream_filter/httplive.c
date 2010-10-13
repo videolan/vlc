@@ -179,6 +179,7 @@ static hls_stream_t *hls_New(vlc_array_t *hls_stream, int id, uint64_t bw, char 
 
     hls->id = id;
     hls->bandwidth = bw;
+    hls->duration = -1;/* unknown */
     hls->sequence = 0; /* default is 0 */
     hls->version = 1;  /* default protocol version */
     hls->segment = 0;
@@ -305,7 +306,6 @@ static char *parse_Attributes(const char *line, const char *attr)
     return NULL;
 }
 
-
 static char *relative_URI(stream_t *s, const char *uri, char *psz_uri)
 {
     char *p = strchr(uri, ':');
@@ -367,9 +367,11 @@ static void parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_rea
     vlc_mutex_unlock(&hls->lock);
 }
 
-static void parse_TargetDuration(stream_t *s, char *p_read)
+static void parse_TargetDuration(stream_t *s, hls_stream_t *hls, char *p_read)
 {
     stream_sys_t *p_sys = s->p_sys;
+
+    assert(hls);
 
     int duration = -1;
     int ret = sscanf(p_read, "#EXT-X-TARGETDURATION:%d", &duration);
@@ -380,8 +382,6 @@ static void parse_TargetDuration(stream_t *s, char *p_read)
         return;
     }
 
-    hls_stream_t *hls = hls_GetLast(p_sys->hls_stream);
-    assert(hls);
     hls->duration = duration; /* seconds */
 }
 
@@ -430,9 +430,11 @@ static void parse_StreamInformation(stream_t *s, char *p_read, char *uri)
         p_sys->b_error = true;
 }
 
-static void parse_MediaSequence(stream_t *s, char *p_read)
+static void parse_MediaSequence(stream_t *s, hls_stream_t *hls, char *p_read)
 {
     stream_sys_t *p_sys = s->p_sys;
+
+    assert(hls);
 
     int sequence;
     int ret = sscanf(p_read, "#EXT-X-MEDIA-SEQUENCE:%d", &sequence);
@@ -443,17 +445,17 @@ static void parse_MediaSequence(stream_t *s, char *p_read)
         return;
     }
 
-    hls_stream_t *hls = hls_GetLast(p_sys->hls_stream);
-    assert(hls);
     if (hls->sequence > 0)
         msg_Err(s, "EXT-X-MEDIA-SEQUENCE already present in playlist");
 
     hls->sequence = sequence;
 }
 
-static void parse_Key(stream_t *s, char *p_read)
+static void parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
 {
     stream_sys_t *p_sys = s->p_sys;
+
+    assert(hls);
 
     /* #EXT-X-KEY:METHOD=<method>[,URI="<URI>"][,IV=<IV>] */
     char *attr;
@@ -484,14 +486,17 @@ static void parse_Key(stream_t *s, char *p_read)
     free(attr);
 }
 
-static void parse_ProgramDateTime(stream_t *s, char *p_read)
+static void parse_ProgramDateTime(stream_t *s, hls_stream_t *hls, char *p_read)
 {
+    VLC_UNUSED(hls);
     msg_Dbg(s, "tag not supported: #EXT-X-PROGRAM-DATE-TIME %s", p_read);
 }
 
-static void parse_AllowCache(stream_t *s, char *p_read)
+static void parse_AllowCache(stream_t *s, hls_stream_t *hls, char *p_read)
 {
     stream_sys_t *p_sys = s->p_sys;
+
+    assert(hls);
 
     char answer[4] = "\0";
     int ret = sscanf(p_read, "#EXT-X-ALLOW-CACHE:%3s", answer);
@@ -502,15 +507,14 @@ static void parse_AllowCache(stream_t *s, char *p_read)
         return;
     }
 
-    hls_stream_t *hls = hls_GetLast(p_sys->hls_stream);
-
-    assert(hls);
     hls->b_cache = (strncmp(answer, "NO", 2) != 0);
 }
 
-static void parse_Version(stream_t *s, char *p_read)
+static void parse_Version(stream_t *s, hls_stream_t *hls, char *p_read)
 {
     stream_sys_t *p_sys = s->p_sys;
+
+    assert(hls);
 
     int version;
     int ret = sscanf(p_read, "#EXT-X-VERSION:%d", &version);
@@ -521,9 +525,6 @@ static void parse_Version(stream_t *s, char *p_read)
         return;
     }
 
-    hls_stream_t *hls = hls_GetLast(p_sys->hls_stream);
-    assert(hls);
-
     /* Check version */
     hls->version = version;
     if (hls->version != 1)
@@ -533,40 +534,44 @@ static void parse_Version(stream_t *s, char *p_read)
     }
 }
 
-static void parse_EndList(stream_t *s)
+static void parse_EndList(stream_t *s, hls_stream_t *hls)
 {
     stream_sys_t *p_sys = s->p_sys;
-    p_sys->b_live = false;
 
+    assert(hls);
+
+    p_sys->b_live = false;
     msg_Info(s, "video on demand (vod) mode");
 }
 
-static void parse_Discontinuity(stream_t *s, char *p_read)
+static void parse_Discontinuity(stream_t *s, hls_stream_t *hls, char *p_read)
 {
+    assert(hls);
+
     /* FIXME: Do we need to act on discontinuity ?? */
     msg_Dbg(s, "#EXT-X-DISCONTINUITY %s", p_read);
 }
 
-static void parse_M3U8ExtLine(stream_t *s, char *line)
+static void parse_M3U8ExtLine(stream_t *s, hls_stream_t *hls, char *line)
 {
     if (*line == '#')
     {
         if (strncmp(line, "#EXT-X-TARGETDURATION", 21) == 0)
-            parse_TargetDuration(s, line);
+            parse_TargetDuration(s, hls, line);
         else if (strncmp(line, "#EXT-X-MEDIA-SEQUENCE", 22) == 0)
-            parse_MediaSequence(s, line);
+            parse_MediaSequence(s, hls, line);
         else if (strncmp(line, "#EXT-X-KEY", 11) == 0)
-            parse_Key(s, line);
+            parse_Key(s, hls, line);
         else if (strncmp(line, "#EXT-X-PROGRAM-DATE-TIME", 25) == 0)
-            parse_ProgramDateTime(s, line);
+            parse_ProgramDateTime(s, hls, line);
         else if (strncmp(line, "#EXT-X-ALLOW-CACHE", 17) == 0)
-            parse_AllowCache(s, line);
+            parse_AllowCache(s, hls, line);
         else if (strncmp(line, "#EXT-X-DISCONTINUITY", 20) == 0)
-            parse_Discontinuity(s, line);
+            parse_Discontinuity(s, hls, line);
         else if (strncmp(line, "#EXT-X-VERSION", 14) == 0)
-            parse_Version(s, line);
+            parse_Version(s, hls, line);
         else if (strncmp(line, "#EXT-X-ENDLIST", 14) == 0)
-            parse_EndList(s);
+            parse_EndList(s, hls);
     }
 }
 
@@ -622,7 +627,7 @@ static int get_HTTPLivePlaylist(stream_t *s, hls_stream_t *hls)
         }
         else
         {
-            parse_M3U8ExtLine(s, line);
+            parse_M3U8ExtLine(s, hls, line);
         }
 
         /* Error during m3u8 parsing abort */
@@ -717,10 +722,10 @@ static int parse_HTTPLiveStreaming(stream_t *s)
         }
         else
         {
-            if (!p_sys->b_meta)
+            hls_stream_t *hls = hls_GetLast(p_sys->hls_stream);
+            if (hls == NULL)
             {
-                hls_stream_t *hls = hls_GetLast(p_sys->hls_stream);
-                if (hls == NULL)
+                if (!p_sys->b_meta)
                 {
                     hls = hls_New(p_sys->hls_stream, -1, -1, NULL);
                     if (hls == NULL)
@@ -731,7 +736,7 @@ static int parse_HTTPLiveStreaming(stream_t *s)
                 }
             }
             /* Parse M3U8 Ext Line */
-            parse_M3U8ExtLine(s, p_read);
+            parse_M3U8ExtLine(s, hls, p_read);
         }
     } while(p_read < p_end);
 
