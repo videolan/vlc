@@ -29,6 +29,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 
 #include "libvlc.h"
 #include <stdarg.h>
@@ -805,7 +806,7 @@ struct vlc_timer
     void        *data;
     mtime_t      value, interval;
     unsigned     users;
-    unsigned     overruns;
+    vlc_atomic_t overruns;
 };
 
 static void *vlc_timer_do (void *data)
@@ -840,7 +841,7 @@ static void *vlc_timer_thread (void *data)
 
          vlc_mutex_lock (&timer->lock);
          if (vlc_clone (&th, vlc_timer_do, timer, VLC_THREAD_PRIORITY_INPUT))
-             timer->overruns++;
+             vlc_atomic_inc(&timer->overruns);
          else
          {
              vlc_detach (th);
@@ -859,9 +860,7 @@ static void *vlc_timer_thread (void *data)
          if (misses > 1)
          {
              misses--;
-             vlc_mutex_lock (&timer->lock);
-             timer->overruns += misses;
-             vlc_mutex_unlock (&timer->lock);
+             vlc_atomic_add (&timer->overruns, misses);
              value += misses * interval;
          }
          value += interval;
@@ -892,7 +891,7 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
     timer->value = 0;
     timer->interval = 0;
     timer->users = 0;
-    timer->overruns = 0;
+    vlc_atomic_set(&timer->overruns, 0);
     *id = timer;
     return 0;
 }
@@ -970,11 +969,5 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
  */
 unsigned vlc_timer_getoverrun (vlc_timer_t timer)
 {
-    unsigned ret;
-
-    vlc_mutex_lock (&timer->lock);
-    ret = timer->overruns;
-    timer->overruns = 0;
-    vlc_mutex_unlock (&timer->lock);
-    return ret;
+    return vlc_atomic_swap (&timer->overruns, 0);
 }
