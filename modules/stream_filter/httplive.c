@@ -72,15 +72,16 @@ typedef struct segment_s
 typedef struct hls_stream_s
 {
     int         id;         /* program id */
-    uint64_t    bandwidth;  /* bandwidth usage of segments (kbps)*/
     int         version;    /* protocol version should be 1 */
     int         sequence;   /* media sequence number */
     int         duration;   /* maximum duration per segment (ms) */
-    int         segment;    /* current segment downloading */
-    vlc_array_t *segments;  /* list of segments */
+    uint64_t    bandwidth;  /* bandwidth usage of segments (kbps)*/
 
-    vlc_mutex_t lock;
+    vlc_array_t *segments;  /* list of segments */
+    int         segment;    /* current segment downloading */
+
     vlc_url_t   url;        /* uri to m3u8 */
+    vlc_mutex_t lock;
     bool        b_cache;    /* allow caching */
 } hls_stream_t;
 
@@ -89,8 +90,8 @@ typedef struct
     VLC_COMMON_MEMBERS
 
     /* */
-    vlc_array_t *hls_stream;/* bandwidth adaptation */
     int         current;    /* current hls_stream  */
+    vlc_array_t *hls_stream;/* bandwidth adaptation */
 
     stream_t    *s;
 } hls_thread_t;
@@ -353,7 +354,8 @@ static void parse_StreamInformation(stream_t *s, char *p_read, char *uri)
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    int id, bw;
+    int id;
+    uint64_t bw;
     char *attr;
 
     attr = parse_Attributes(p_read, "PROGRAM-ID");
@@ -383,7 +385,7 @@ static void parse_StreamInformation(stream_t *s, char *p_read, char *uri)
         return;
     }
 
-    msg_Info(s, "bandwidth adaption detected (program-id=%d, bandwidth=%d).", id, bw);
+    msg_Info(s, "bandwidth adaption detected (program-id=%d, bandwidth=%"PRIu64").", id, bw);
 
     hls_stream_t *hls = hls_New(p_sys->hls_stream, id, bw, uri);
     if (hls == NULL)
@@ -904,40 +906,40 @@ static int AccessOpen(stream_t *s, vlc_url_t *url)
         return VLC_EGENERIC;
 
     p_sys->p_access = vlc_object_create(s, sizeof(access_t));
-    if (p_sys->p_access)
+    if (p_sys->p_access == NULL)
+        return VLC_ENOMEM;
+
+    p_sys->p_access->psz_access = strdup(url->psz_protocol);
+    p_sys->p_access->psz_filepath = strdup(url->psz_path);
+    if (url->psz_password || url->psz_username)
     {
-        p_sys->p_access->psz_access = strdup(url->psz_protocol);
-        p_sys->p_access->psz_filepath = strdup(url->psz_path);
-        if (url->psz_password || url->psz_username)
+        if (asprintf(&p_sys->p_access->psz_location, "%s:%s@%s%s",
+                     url->psz_username, url->psz_password,
+                     url->psz_host, url->psz_path) < 0)
         {
-            if (asprintf(&p_sys->p_access->psz_location, "%s:%s@%s%s",
-                         url->psz_username, url->psz_password,
-                         url->psz_host, url->psz_path) < 0)
-            {
-                msg_Err(s, "creating http access module");
-                goto fail;
-            }
-        }
-        else
-        {
-            if (asprintf(&p_sys->p_access->psz_location, "%s%s",
-                         url->psz_host, url->psz_path) < 0)
-            {
-                msg_Err(s, "creating http access module");
-                goto fail;
-            }
-        }
-        vlc_object_attach(p_sys->p_access, s);
-        p_sys->p_access->p_module =
-            module_need(p_sys->p_access, "access", "http", true);
-        if (p_sys->p_access->p_module == NULL)
-        {
-            msg_Err(s, "could not load http access module");
+            msg_Err(s, "creating http access module");
             goto fail;
         }
-        return VLC_SUCCESS;
     }
-    return VLC_ENOMEM;
+    else
+    {
+        if (asprintf(&p_sys->p_access->psz_location, "%s%s",
+                     url->psz_host, url->psz_path) < 0)
+        {
+            msg_Err(s, "creating http access module");
+            goto fail;
+        }
+    }
+    vlc_object_attach(p_sys->p_access, s);
+    p_sys->p_access->p_module =
+        module_need(p_sys->p_access, "access", "http", true);
+    if (p_sys->p_access->p_module == NULL)
+    {
+        msg_Err(s, "could not load http access module");
+        goto fail;
+    }
+
+    return VLC_SUCCESS;
 
 fail:
     vlc_object_release(p_sys->p_access);
