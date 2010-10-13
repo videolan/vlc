@@ -120,6 +120,7 @@ static void DStreamDelete( stream_t *s )
     block_t *p_empty;
 
     vlc_object_kill( s );
+#warning FIXME: not thread-safe:
     if( p_sys->p_demux )
         vlc_object_kill( p_sys->p_demux );
     p_empty = block_New( s, 1 ); p_empty->i_buffer = 0;
@@ -303,4 +304,3 @@ static void* DStreamThread( vlc_object_t* p_this )
     vlc_object_kill( p_demux );
     return NULL;
 }
-
