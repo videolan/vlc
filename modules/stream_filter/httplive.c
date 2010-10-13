@@ -305,6 +305,38 @@ static char *parse_Attributes(const char *line, const char *attr)
     return NULL;
 }
 
+
+static char *relative_URI(stream_t *s, const char *uri, char *psz_uri)
+{
+    char *p = strchr(uri, ':');
+    if (p != NULL)
+        return NULL;
+
+    char *tmp;
+    if (asprintf(&tmp,"%s://%s", s->psz_access, s->psz_path) < 0)
+    {
+        s->p_sys->b_error = true;
+        return NULL;
+    }
+
+    char *psz_path = strrchr(tmp, '/');
+    if (psz_path) *psz_path = '\0';
+
+    vlc_url_t url;
+    vlc_UrlParse(&url, tmp, 0);
+    if (asprintf(&psz_uri, "%s://%s%s/%s",
+           url.psz_protocol, url.psz_host, url.psz_path, uri) < 0)
+    {
+        free(tmp);
+        vlc_UrlClean(&url);
+        s->p_sys->b_error = true;
+        return NULL;
+    }
+    vlc_UrlClean(&url);
+    free(tmp);
+    return psz_uri;
+}
+
 static void parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_read, char *uri)
 {
     stream_sys_t *p_sys = s->p_sys;
@@ -320,8 +352,11 @@ static void parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_rea
         return;
     }
 
+    char *psz_uri = NULL;
+    psz_uri = relative_URI(s, uri, psz_uri);
+
     vlc_mutex_lock(&hls->lock);
-    segment_t *segment = segment_New(hls, duration, uri);
+    segment_t *segment = segment_New(hls, duration, psz_uri ? psz_uri : uri);
     if (segment)
         segment->sequence = hls->sequence + vlc_array_count(hls->segments);
     if (duration > hls->duration)
@@ -336,7 +371,7 @@ static void parse_TargetDuration(stream_t *s, char *p_read)
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    int duration;
+    int duration = -1;
     int ret = sscanf(p_read, "#EXT-X-TARGETDURATION:%d", &duration);
     if (ret != 1)
     {
@@ -387,7 +422,10 @@ static void parse_StreamInformation(stream_t *s, char *p_read, char *uri)
 
     msg_Info(s, "bandwidth adaption detected (program-id=%d, bandwidth=%"PRIu64").", id, bw);
 
-    hls_stream_t *hls = hls_New(p_sys->hls_stream, id, bw, uri);
+    char *psz_uri = NULL;
+    psz_uri = relative_URI(s, uri, psz_uri);
+
+    hls_stream_t *hls = hls_New(p_sys->hls_stream, id, bw, psz_uri ? psz_uri : uri);
     if (hls == NULL)
         p_sys->b_error = true;
 }
@@ -709,6 +747,7 @@ static int parse_HTTPLiveStreaming(stream_t *s)
         /* Is it a meta playlist? */
         if (p_sys->b_meta)
         {
+            msg_Dbg(s, "parsing %s", hls->url.psz_path);
             if (get_HTTPLivePlaylist(s, hls) != VLC_SUCCESS)
             {
                 msg_Err(s, "could not parse playlist file from meta index." );
