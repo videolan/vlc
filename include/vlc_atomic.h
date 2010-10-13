@@ -47,4 +47,7 @@ static inline uintptr_t vlc_atomic_dec (vlc_atomic_t *atom)
     return vlc_atomic_sub (atom, 1);
 }
 
+VLC_EXPORT(uintptr_t, vlc_atomic_swap, (vlc_atomic_t *, uintptr_t));
+VLC_EXPORT(uintptr_t, vlc_atomic_compare_swap, (vlc_atomic_t *, uintptr_t, uintptr_t));
+
 #endif

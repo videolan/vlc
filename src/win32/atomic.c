@@ -50,3 +50,22 @@ uintptr_t vlc_atomic_add (vlc_atomic_t *atom, uintptr_t v)
     return InterlockedExchangeAdd (&atom->s, v) + v;
 #endif
 }
+
+uintptr_t vlc_atomic_swap (vlc_atomic_t *atom, uintptr_t v)
+{
+#if defined (WIN64)
+    return InterlockedExchange64 (&atom->s, v);
+#else
+    return InterlockedExchange (&atom->s, v);
+#endif
+}
+
+uintptr_t vlc_atomic_compare_swap (vlc_atomic_t *atom,
+                                   uintptr_t oldval, uintptr_t newval)
+{
+#if defined (WIN64)
+    return InterlockedCompareExchange64 (&atom->s, newval, oldval);
+#else
+    return InterlockedCompareExchange (&atom->s, newval, oldval);
+#endif
+}

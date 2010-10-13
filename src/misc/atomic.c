@@ -46,6 +46,24 @@ uintptr_t vlc_atomic_add (vlc_atomic_t *atom, uintptr_t v)
     return __sync_add_and_fetch (&atom->u, v);
 }
 
+uintptr_t vlc_atomic_swap (vlc_atomic_t *atom, uintptr_t v)
+{
+    /* grmbl, gcc does not provide an intrinsic for this! */
+    uintptr_t u;
+
+    do
+        u = vlc_atomic_get (atom);
+    while (vlc_atomic_compare_swap (atom, u, v) != u);
+
+    return u;
+}
+
+uintptr_t vlc_atomic_compare_swap (vlc_atomic_t *atom,
+                                   uintptr_t oldval, uintptr_t newval)
+{
+    return __sync_val_compare_and_swap (&atom->u, oldval, newval);
+}
+
 #else
 /* Worst-case fallback implementation with a mutex */
 
@@ -76,6 +94,32 @@ uintptr_t vlc_atomic_add (vlc_atomic_t *atom, uintptr_t v)
     v = atom->u;
     vlc_mutex_unlock (&lock);
     return v;
+}
+
+uintptr_t vlc_atomic_swap (vlc_atomic_t *atom, uintptr_t v)
+{
+    uintptr_t u;
+
+    vlc_mutex_lock (&lock);
+    u = atom->u;
+    atom->u = v;
+    vlc_mutex_unlock (&lock);
+
+    return u;
+}
+
+uintptr_t vlc_atomic_compare_and_swap (vlc_atomic_t *atom,
+                                       uintptr_t oldval, uintptr_t newval)
+{
+    uintptr_t u;
+
+    vlc_mutex_lock (&lock);
+    u = atom->u;
+    if (u == oldval)
+        atom->u = newval;
+    vlc_mutex_unlock (&lock);
+
+    return u;
 }
 
 #endif
