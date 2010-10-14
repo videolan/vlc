@@ -381,8 +381,8 @@ add_string(CFG_PREFIX "serialdev", "COM1", NULL,
     on win32 the executeable external driver application
     for automatic start if needed
 */
-add_file(CFG_PREFIX "atmowinexe", NULL, NULL,
-         ATMOWINEXE_TEXT, ATMOWINEXE_LONGTEXT, false )
+add_loadfile(CFG_PREFIX "atmowinexe", NULL, NULL,
+             ATMOWINEXE_TEXT, ATMOWINEXE_LONGTEXT, false )
 #else
 add_string(CFG_PREFIX "serialdev", "/dev/ttyUSB0", NULL,
            SERIALDEV_TEXT, SERIALDEV_LONGTEXT, false )
@@ -583,16 +583,16 @@ effects with this...) the images MUST not compressed, should have 24-bit per
 pixel, or a simple 256 color grayscale palette
 */
 set_section( N_("Change gradients" ), 0 )
-add_file(CFG_PREFIX "gradient_zone_0", NULL, NULL,
-         ZONE_0_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
-add_file(CFG_PREFIX "gradient_zone_1", NULL, NULL,
-         ZONE_1_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
-add_file(CFG_PREFIX "gradient_zone_2", NULL, NULL,
-         ZONE_2_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
-add_file(CFG_PREFIX "gradient_zone_3", NULL, NULL,
-         ZONE_3_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
-add_file(CFG_PREFIX "gradient_zone_4", NULL, NULL,
-         ZONE_4_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
+add_loadfile(CFG_PREFIX "gradient_zone_0", NULL, NULL,
+             ZONE_0_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
+add_loadfile(CFG_PREFIX "gradient_zone_1", NULL, NULL,
+             ZONE_1_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
+add_loadfile(CFG_PREFIX "gradient_zone_2", NULL, NULL,
+             ZONE_2_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
+add_loadfile(CFG_PREFIX "gradient_zone_3", NULL, NULL,
+             ZONE_3_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
+add_loadfile(CFG_PREFIX "gradient_zone_4", NULL, NULL,
+             ZONE_4_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
 add_directory(CFG_PREFIX "gradient_path", NULL, NULL,
            GRADIENT_PATH_TEXT, GRADIENT_PATH_LONGTEXT, false )
 

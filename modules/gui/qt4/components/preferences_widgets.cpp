@@ -129,7 +129,8 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
             p_control = new IntegerConfigControl( p_this, p_item, parent,
                                                   l, line );
         break;
-    case CONFIG_ITEM_FILE:
+    case CONFIG_ITEM_LOADFILE:
+    case CONFIG_ITEM_SAVEFILE:
         p_control = new FileConfigControl( p_this, p_item, parent, l, line);
         break;
     case CONFIG_ITEM_DIRECTORY:

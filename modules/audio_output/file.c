@@ -118,8 +118,8 @@ vlc_module_begin ()
         change_string_list( format_list, 0, 0 )
     add_integer( "audiofile-channels", 0, NULL,
                  CHANNELS_TEXT, CHANNELS_LONGTEXT, true )
-    add_file( "audiofile-file", "audiofile.wav", NULL, FILE_TEXT,
-              FILE_LONGTEXT, false )
+    add_savefile( "audiofile-file", "audiofile.wav", NULL, FILE_TEXT,
+                  FILE_LONGTEXT, false )
     add_bool( "audiofile-wav", true, NULL, WAV_TEXT, WAV_LONGTEXT, true )
 
     set_capability( "audio output", 0 )

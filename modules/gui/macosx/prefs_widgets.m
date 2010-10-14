@@ -452,7 +452,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_STRING_LIST:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_LOADFILE:
+        case CONFIG_ITEM_SAVEFILE:
             i_margin = 8;
             break;
         case CONFIG_ITEM_MODULE:
@@ -488,7 +489,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_STRING_LIST:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_LOADFILE:
+        case CONFIG_ITEM_SAVEFILE:
             i_margin = 6;
             break;
         case CONFIG_ITEM_MODULE:
@@ -514,7 +516,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             break;
         }
         break;
-    case CONFIG_ITEM_FILE:
+    case CONFIG_ITEM_LOADFILE:
+    case CONFIG_ITEM_SAVEFILE:
         switch( i_lastItem )
         {
         case CONFIG_ITEM_STRING:
@@ -524,7 +527,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_STRING_LIST:
             i_margin = 10;
             break;
-        case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_LOADFILE:
+        case CONFIG_ITEM_SAVEFILE:
             i_margin = 9;
             break;
         case CONFIG_ITEM_MODULE:
@@ -560,7 +564,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_STRING_LIST:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_LOADFILE:
+        case CONFIG_ITEM_SAVEFILE:
             i_margin = 6;
             break;
         case CONFIG_ITEM_MODULE:
@@ -596,7 +601,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_STRING_LIST:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_LOADFILE:
+        case CONFIG_ITEM_SAVEFILE:
             i_margin = 6;
             break;
         case CONFIG_ITEM_MODULE:
@@ -632,7 +638,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_STRING_LIST:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_LOADFILE:
+        case CONFIG_ITEM_SAVEFILE:
             i_margin = 8;
             break;
         case CONFIG_ITEM_MODULE:
@@ -668,7 +675,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_STRING_LIST:
             i_margin = 9;
             break;
-        case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_LOADFILE:
+        case CONFIG_ITEM_SAVEFILE:
             i_margin = 8;
             break;
         case CONFIG_ITEM_MODULE:
@@ -704,7 +712,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_STRING_LIST:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_LOADFILE:
+        case CONFIG_ITEM_SAVEFILE:
             i_margin = 6;
             break;
         case CONFIG_ITEM_MODULE:
@@ -740,7 +749,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_STRING_LIST:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_LOADFILE:
+        case CONFIG_ITEM_SAVEFILE:
             i_margin = 6;
             break;
         case CONFIG_ITEM_MODULE:
@@ -795,7 +805,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                     withView: o_parent_view];
         }
         break;
-    case CONFIG_ITEM_FILE:
+    case CONFIG_ITEM_LOADFILE:
+    case CONFIG_ITEM_SAVEFILE:
     case CONFIG_ITEM_DIRECTORY:
         p_control = [[FileConfigControl alloc]
                     initWithItem: _p_item
@@ -905,7 +916,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     {
     case CONFIG_ITEM_STRING:
     case CONFIG_ITEM_PASSWORD:
-    case CONFIG_ITEM_FILE:
+    case CONFIG_ITEM_LOADFILE:
+    case CONFIG_ITEM_SAVEFILE:
     case CONFIG_ITEM_DIRECTORY:
     case CONFIG_ITEM_MODULE:
     case CONFIG_ITEM_MODULE_LIST:
@@ -1165,7 +1177,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
-        i_view_type = CONFIG_ITEM_FILE;
+        i_view_type = CONFIG_ITEM_LOADFILE;
 
         o_itemTooltip = [[VLCMain sharedInstance]
                            wrapString: [[VLCMain sharedInstance]

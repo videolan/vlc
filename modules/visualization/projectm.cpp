@@ -70,14 +70,14 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
 #ifndef HAVE_PROJECTM2
-    add_file( "projectm-config", "/usr/share/projectM/config.inp", NULL,
-              CONFIG_TEXT, CONFIG_LONGTEXT, true )
+    add_loadfile( "projectm-config", "/usr/share/projectM/config.inp", NULL,
+                  CONFIG_TEXT, CONFIG_LONGTEXT, true )
 #else
-    add_file( "projectm-preset-path", "/usr/share/projectM/presets", NULL,
-              PRESET_PATH_TXT, PRESET_PATH_LONGTXT, true )
-    add_file( "projectm-title-font", "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf", NULL,
-              TITLE_FONT_TXT, TITLE_FONT_LONGTXT, true )
-    add_file( "projectm-menu-font", "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf", NULL,
+    add_loadfile( "projectm-preset-path", "/usr/share/projectM/presets", NULL,
+                  PRESET_PATH_TXT, PRESET_PATH_LONGTXT, true )
+    add_font( "projectm-title-font", "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf", NULL,
+                  TITLE_FONT_TXT, TITLE_FONT_LONGTXT, true )
+    add_font( "projectm-menu-font", "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf", NULL,
               MENU_FONT_TXT, MENU_FONT_LONGTXT, true )
 #endif
     add_integer( "projectm-width", 800, NULL, WIDTH_TEXT, WIDTH_LONGTEXT,

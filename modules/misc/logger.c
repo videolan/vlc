@@ -165,7 +165,7 @@ vlc_module_begin ()
     set_category( CAT_ADVANCED )
     set_subcategory( SUBCAT_ADVANCED_MISC )
 
-    add_file( "logfile", NULL, NULL,
+    add_savefile( "logfile", NULL, NULL,
              N_("Log filename"), N_("Specify the log filename."), false )
     add_string( "logmode", "text", NULL, LOGMODE_TEXT, LOGMODE_LONGTEXT,
                 false )

@@ -478,8 +478,8 @@ static int onTaskBarChange( vlc_object_t *pObj, const char *pVariable,
 vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
-    add_file( "skins2-last", "", NULL, SKINS2_LAST, SKINS2_LAST_LONG,
-              true )
+    add_loadfile( "skins2-last", "", NULL, SKINS2_LAST, SKINS2_LAST_LONG,
+                  true )
         change_autosave ()
     add_string( "skins2-config", "", NULL, SKINS2_CONFIG, SKINS2_CONFIG_LONG,
                 true )

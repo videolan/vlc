@@ -120,8 +120,8 @@ enum vlc_module_properties
 /**
  * Current plugin ABI version
  */
-# define MODULE_SYMBOL 1_2_0d
-# define MODULE_SUFFIX "__1_2_0d"
+# define MODULE_SYMBOL 1_2_0e
+# define MODULE_SUFFIX "__1_2_0e"
 
 /*****************************************************************************
  * Add a few defines. You do not want to read this section. Really.
@@ -307,8 +307,12 @@ enum vlc_module_properties
     add_string_inner( CONFIG_ITEM_PASSWORD, name, text, longtext, advc, \
                       p_callback, value )
 
-#define add_file( name, value, p_callback, text, longtext, advc ) \
-    add_string_inner( CONFIG_ITEM_FILE, name, text, longtext, advc, \
+#define add_loadfile( name, value, p_callback, text, longtext, advc ) \
+    add_string_inner( CONFIG_ITEM_LOADFILE, name, text, longtext, advc, \
+                      p_callback, value )
+
+#define add_savefile( name, value, p_callback, text, longtext, advc ) \
+    add_string_inner( CONFIG_ITEM_SAVEFILE, name, text, longtext, advc, \
                       p_callback, value )
 
 #define add_directory( name, value, p_callback, text, longtext, advc ) \

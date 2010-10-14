@@ -83,8 +83,8 @@ vlc_module_begin ()
     set_shortname("Framebuffer")
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    add_file(FB_DEV_VAR, "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
-              false)
+    add_loadfile(FB_DEV_VAR, "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
+                 false)
     add_bool("fb-tty", true, NULL, TTY_TEXT, TTY_LONGTEXT, true)
     add_string( "fb-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
     add_obsolete_string("fb-aspect-ratio")

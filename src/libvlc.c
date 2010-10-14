@@ -1504,7 +1504,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                 break;
 
             case CONFIG_ITEM_STRING:
-            case CONFIG_ITEM_FILE:
+            case CONFIG_ITEM_LOADFILE:
+            case CONFIG_ITEM_SAVEFILE:
             case CONFIG_ITEM_DIRECTORY:
             case CONFIG_ITEM_MODULE: /* We could also have "=<" here */
             case CONFIG_ITEM_MODULE_CAT:

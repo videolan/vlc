@@ -296,7 +296,8 @@ void ParseOption( module_config_t *p_item, mumap &mods, mcmap &mods2 )
         }
         break;
 
-    case CONFIG_ITEM_FILE:
+    case CONFIG_ITEM_LOADFILE:
+    case CONFIG_ITEM_SAVEFILE:
         psz_arguments = strdup( "_files" );
         break;
     case CONFIG_ITEM_DIRECTORY:

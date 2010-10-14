@@ -70,10 +70,11 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_capability( "sub filter", 0 )
 
-    add_file( "overlay-input", NULL, NULL, INPUT_TEXT, INPUT_LONGTEXT,
-              false )
-    add_file( "overlay-output", NULL, NULL, OUTPUT_TEXT, OUTPUT_LONGTEXT,
-              false )
+    add_loadfile( "overlay-input", NULL, NULL, INPUT_TEXT, INPUT_LONGTEXT,
+                  false )
+    /* Note: add_loadfile as O_WRONLY w/o O_CREAT, i.e. FIFO must exist */
+    add_loadfile( "overlay-output", NULL, NULL, OUTPUT_TEXT, OUTPUT_LONGTEXT,
+                  false )
 
     add_shortcut( "overlay" )
     set_callbacks( Create, Destroy )

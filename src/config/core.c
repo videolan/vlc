@@ -48,9 +48,10 @@ int IsConfigStringType (int type)
 {
     static const unsigned char config_types[] =
     {
-        CONFIG_ITEM_STRING, CONFIG_ITEM_FILE, CONFIG_ITEM_MODULE,
+        CONFIG_ITEM_STRING, CONFIG_ITEM_MODULE,
         CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_MODULE_CAT, CONFIG_ITEM_PASSWORD,
-        CONFIG_ITEM_MODULE_LIST, CONFIG_ITEM_MODULE_LIST_CAT, CONFIG_ITEM_FONT
+        CONFIG_ITEM_MODULE_LIST, CONFIG_ITEM_MODULE_LIST_CAT,
+        CONFIG_ITEM_FONT, CONFIG_ITEM_LOADFILE, CONFIG_ITEM_SAVEFILE,
     };
 
     /* NOTE: this needs to be changed if we ever get more than 255 types */
@@ -119,7 +120,8 @@ int config_GetType( vlc_object_t *p_this, const char *psz_name )
         i_type = VLC_VAR_STRING;
         break;
 
-    case CONFIG_ITEM_FILE:
+    case CONFIG_ITEM_LOADFILE:
+    case CONFIG_ITEM_SAVEFILE:
         i_type = VLC_VAR_FILE;
         break;
 
@@ -209,7 +211,7 @@ float config_GetFloat( vlc_object_t *p_this, const char *psz_name )
  * config_GetPsz: get the string value of a string variable
  *****************************************************************************
  * This function is used to get the value of variables which are internally
- * represented by a string (CONFIG_ITEM_STRING, CONFIG_ITEM_FILE,
+ * represented by a string (CONFIG_ITEM_STRING, CONFIG_ITEM_*FILE,
  * CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_PASSWORD, and CONFIG_ITEM_MODULE).
  *
  * Important note: remember to free() the returned char* because it's a
@@ -248,7 +250,7 @@ char * config_GetPsz( vlc_object_t *p_this, const char *psz_name )
  * config_PutPsz: set the string value of a string variable
  *****************************************************************************
  * This function is used to set the value of variables which are internally
- * represented by a string (CONFIG_ITEM_STRING, CONFIG_ITEM_FILE,
+ * represented by a string (CONFIG_ITEM_STRING, CONFIG_ITEM_*FILE,
  * CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_PASSWORD, and CONFIG_ITEM_MODULE).
  *****************************************************************************/
 void config_PutPsz( vlc_object_t *p_this,

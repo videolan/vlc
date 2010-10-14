@@ -246,7 +246,8 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                 {
                     case CONFIG_ITEM_STRING:
                     case CONFIG_ITEM_PASSWORD:
-                    case CONFIG_ITEM_FILE:
+                    case CONFIG_ITEM_LOADFILE:
+                    case CONFIG_ITEM_SAVEFILE:
                     case CONFIG_ITEM_DIRECTORY:
                     case CONFIG_ITEM_MODULE:
                     case CONFIG_ITEM_MODULE_LIST:
@@ -286,7 +287,8 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
             {
                 case CONFIG_ITEM_STRING:
                 case CONFIG_ITEM_PASSWORD:
-                case CONFIG_ITEM_FILE:
+                case CONFIG_ITEM_LOADFILE:
+                case CONFIG_ITEM_SAVEFILE:
                 case CONFIG_ITEM_DIRECTORY:
                 case CONFIG_ITEM_MODULE:
                 case CONFIG_ITEM_MODULE_CAT:
