@@ -1328,15 +1328,14 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     {
         PL_LOCK;
         int i_pos = atoi( newval.psz_string );
-        /* The playlist stores 2 times the same item: onelevel & category */
-        int i_size = p_playlist->items.i_size / 2;
+        int i_size = p_playlist->items.i_size;
 
         if( i_pos <= 0 )
             msg_rc( "%s", _("Error: `goto' needs an argument greater than zero.") );
         else if( i_pos <= i_size )
         {
             playlist_item_t *p_item, *p_parent;
-            p_item = p_parent = p_playlist->items.p_elems[i_pos*2-1];
+            p_item = p_parent = p_playlist->items.p_elems[i_pos-1];
             while( p_parent->p_parent )
                 p_parent = p_parent->p_parent;
             playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked,
