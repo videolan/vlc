@@ -28,10 +28,12 @@
  * Format is:( "English name", 639-1-code, 639-2/T-code, 639-2/B-code)
  * If you find something missing or wrong contact <bug-glibc@gnu.org> */
 
-/* Some spellings were converted to pure ASCII:
+/* The following spellings were converted to pure ASCII. They should be
+ * "translated" back to Unicode in the po/en*.po files:
  *  Provençal -> Provencal
- *  Volapk -> Volapuk
- *  Bokm? -> Bokmaal */
+ *  Volapük -> Volapuk
+ *  Bokmål -> Bokmaal
+ */
 
 static const iso639_lang_t p_languages[] =
 {
