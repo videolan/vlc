@@ -989,6 +989,23 @@ void MainInterface::toggleUpdateSystrayMenu()
     QVLCMenu::updateSystrayMenu( this, p_intf );
 }
 
+void MainInterface::showUpdateSystrayMenu()
+{
+    if( isHidden() )
+        show();
+    if( isMinimized() )
+        showNormal();
+    activateWindow();
+
+    QVLCMenu::updateSystrayMenu( this, p_intf );
+}
+
+void MainInterface::hideUpdateSystrayMenu()
+{
+    hide();
+    QVLCMenu::updateSystrayMenu( this, p_intf );
+}
+
 void MainInterface::handleSystrayClick(
                                     QSystemTrayIcon::ActivationReason reason )
 {

@@ -1086,13 +1086,13 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     {
         sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
                             qtr( "Hide VLC media player in taskbar" ), mi,
-                            SLOT( toggleUpdateSystrayMenu() ) );
+                            SLOT( hideUpdateSystrayMenu() ) );
     }
     else
     {
         sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
                             qtr( "Show VLC media player" ), mi,
-                            SLOT( toggleUpdateSystrayMenu() ) );
+                            SLOT( showUpdateSystrayMenu() ) );
     }
     sysMenu->addSeparator();
 #endif

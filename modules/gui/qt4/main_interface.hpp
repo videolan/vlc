@@ -182,6 +182,8 @@ public slots:
     void togglePlaylist();
 #ifndef HAVE_MAEMO
     void toggleUpdateSystrayMenu();
+    void showUpdateSystrayMenu();
+    void hideUpdateSystrayMenu();
 #endif
     void toggleAdvancedButtons();
     void toggleInterfaceFullScreen();
