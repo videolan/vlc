@@ -345,8 +345,15 @@ FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
 
 void FileConfigControl::updateField()
 {
-    QString file = QFileDialog::getSaveFileName( NULL,
-                  qtr( "Select File" ), QVLCUserDir( VLC_HOME_DIR ) );
+    QString file;
+
+    if (p_item->i_type == CONFIG_ITEM_SAVEFILE)
+        file = QFileDialog::getSaveFileName( NULL, qtr( "Save File" ),
+                                             QVLCUserDir( VLC_HOME_DIR ) );
+    else
+        file = QFileDialog::getOpenFileName( NULL, qtr( "Select File" ),
+                                             QVLCUserDir( VLC_HOME_DIR ) );
+
     if( file.isNull() ) return;
     text->setText( toNativeSeparators( file ) );
 }
