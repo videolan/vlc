@@ -10,6 +10,7 @@ BASE_SUBDIRS = \
 	gui \
 	meta_engine \
 	misc \
+	media_library \
 	packetizer \
 	services_discovery \
 	stream_filter \

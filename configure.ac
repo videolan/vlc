@@ -4161,6 +4161,17 @@ else
 fi
 AM_CONDITIONAL([HAVE_SQLITE], [test "${enable_sqlite}" != "no"])
 
+dnl
+dnl media library
+dnl
+AC_ARG_ENABLE(media-library, [--enable-media-library media library (default enabled)])
+if test "${enable_media_library}" != "no"
+then
+  test "${enable_sqlite}" != "yes" && AC_MSG_ERROR([SQLite module is required for the media library])
+  AC_DEFINE([MEDIA_LIBRARY], 1, [Define if you want to use the VLC media library])
+  VLC_ADD_CPPFLAGS([qt4],"-DMEDIA_LIBRARY")
+  VLC_ADD_PLUGIN([media_library])
+fi
 
 dnl
 dnl  Endianness check
@@ -4396,6 +4407,7 @@ AC_CONFIG_FILES([
   modules/misc/osd/Makefile
   modules/misc/stats/Makefile
   modules/misc/xml/Makefile
+  modules/media_library/Makefile
   modules/mux/Makefile
   modules/mux/mpeg/Makefile
   modules/packetizer/Makefile

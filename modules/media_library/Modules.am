@@ -1,0 +1,9 @@
+SOURCES_media_library = sql_media_library.c \
+                        sql_monitor.c \
+                        sql_search.c \
+                        sql_add.c \
+                        sql_update.c \
+                        sql_delete.c \
+                        item_list.c \
+                        ml_watch.c \
+                        media_pool.c
