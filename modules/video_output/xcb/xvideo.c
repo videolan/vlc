@@ -691,8 +691,6 @@ static void Display (vout_display_t *vd, picture_t *pic)
 
     if (!p_sys->visible)
         goto out;
-    xcb_force_screen_saver (p_sys->conn, XCB_SCREEN_SAVER_RESET);
-
     if (segment)
         ck = xcb_xv_shm_put_image_checked (p_sys->conn, p_sys->port,
                               p_sys->window, p_sys->gc, segment, p_sys->id, 0,

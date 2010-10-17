@@ -466,11 +466,8 @@ static void PictureRender (vout_display_t *vd, picture_t *pic)
 static void PictureDisplay (vout_display_t *vd, picture_t *pic)
 {
     vout_display_sys_t *sys = vd->sys;
-    xcb_connection_t *conn = XGetXCBConnection (sys->display);
 
-    xcb_force_screen_saver (conn, XCB_SCREEN_SAVER_RESET);
     vout_display_opengl_Display (&sys->vgl, &vd->source);
-    xcb_flush (conn);
     picture_Release (pic);
 }
 
