@@ -168,6 +168,18 @@ typedef enum vlc_dialog {
 /* Useful text messages shared by interfaces */
 #define INTF_ABOUT_MSG LICENSE_MSG
 
+#define EXTENSIONS_AUDIO_CSV "a52", "aac", "ac3", "ape", "dts", "flac", "it", \
+                         "m4a", "m4p", "mka", "mlp", "mod", "mp1", "mp2", "mp3",\
+                         "oga", "ogg", "oma", "s3m", "spx" \
+                         "wav", "wma", "wv", "xm"
+
+#define EXTENSIONS_VIDEO_CSV "asf", "avi", "divx", "dv", "flv", "gxf", "iso", \
+                             "m1v", "m2v", "m2t", "m2ts", "m4v", "mkv", "mov",\
+                             "mp2", "mp4", "mpeg", "mpeg1", \
+                             "mpeg2", "mpeg4", "mpg", "mts", "mxf", "nuv", \
+                             "ogg", "ogm", "ogv", "ogx", "ps", \
+                             "rec", "rm", "rmvb", "ts", "vob", "wmv"
+
 #define EXTENSIONS_AUDIO \
     "*.a52;" \
     "*.aac;" \
