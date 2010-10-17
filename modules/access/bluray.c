@@ -88,7 +88,7 @@ static int blurayOpen( vlc_object_t *object )
 
     access_sys_t *p_sys;
     char *pos_title;
-    int i_title = 0;
+    int i_title = -1;
     char bd_path[PATH_MAX];
 
     if( strcmp( p_access->psz_access, "bluray" ) ) {
@@ -156,6 +156,20 @@ static void blurayClose( vlc_object_t *object )
 static int bluraySetTitle(access_t *p_access, int i_title)
 {
     access_sys_t *p_sys = p_access->p_sys;
+
+    unsigned int i_nb_titles = bd_get_titles(p_sys->bluray, TITLES_RELEVANT);
+
+    /* Looking for the main title, ie the longest duration */
+    if (i_title == -1) {
+        uint64_t duration=0;
+        for (unsigned int i = 0; i < i_nb_titles; i++) {
+            BLURAY_TITLE_INFO *info = bd_get_title_info(p_sys->bluray, i);
+            if (info->duration > duration) {
+                i_title = i;
+                duration = info->duration;
+            }
+        }
+    }
 
     /* Select Blu-Ray title */
     if ( bd_select_title(p_access->p_sys->bluray, i_title) == 0 ) {
