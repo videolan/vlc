@@ -327,6 +327,20 @@ case "${host_os}" in
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
         ac_default_prefix="`pwd`/_win32"
         DESTDIR="`pwd`/_win32/"
+
+        dnl
+        dnl NSIS Installer prefix
+        dnl
+        case "${host}" in
+            amd64*|i686-w64*|x86_64*)
+                PROGRAMFILES="PROGRAMFILES64"
+            ;;
+            *)
+                PROGRAMFILES="PROGRAMFILES"
+            ;;
+        esac
+        AC_SUBST(PROGRAMFILES)
+
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
