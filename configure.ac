@@ -156,6 +156,7 @@ LDFLAGS_vlc="${LDFLAGS}"
 dnl
 dnl  Check the operating system
 dnl
+HAVE_WIN64="0"
 case "${host_os}" in
   "")
     SYS=unknown
@@ -329,10 +330,11 @@ case "${host_os}" in
         DESTDIR="`pwd`/_win32/"
 
         dnl
-        dnl NSIS Installer prefix
+        dnl NSIS Installer prefix and WIN64
         dnl
         case "${host}" in
             amd64*|i686-w64*|x86_64*)
+                HAVE_WIN64="1"
                 PROGRAMFILES="PROGRAMFILES64"
             ;;
             *)
@@ -384,6 +386,7 @@ AM_CONDITIONAL(HAVE_BEOS, test "${SYS}" = "beos")
 AM_CONDITIONAL(HAVE_DARWIN, test "${SYS}" = "darwin")
 AM_CONDITIONAL(HAVE_LINUX, [test "${SYS}" = "linux"])
 AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
+AM_CONDITIONAL(HAVE_WIN64, test "${HAVE_WIN64}" = "1")
 AM_CONDITIONAL(HAVE_WINCE, test "${SYS}" = "mingwce")
 AM_CONDITIONAL(USE_PEFLAGS, [test "${enable_peflags}" = "yes"])
 

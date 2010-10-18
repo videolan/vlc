@@ -1,6 +1,11 @@
 #! /usr/bin/make -f
 
+if HAVE_WIN64
+build-npapi:
+	touch $@
+else
 build-npapi: stamp-npapi-build
+endif
 
 stamp-npapi-fetch:
 	rm -Rf npapi-vlc

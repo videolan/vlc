@@ -832,25 +832,33 @@ package-win-base: package-win-common
 package-win32-webplugin-common: package-win-base build-npapi
 	mkdir -p "$(win32_xpi_destdir)/plugins"
 	find $(destdir) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
+if !HAVE_WIN64
 	cp $(top_srcdir)/npapi-vlc/src/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins"
+endif
 	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_xpi_destdir)/plugins"
 	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/plugins"
 	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*qt*"
 	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*skins*"
 
 package-win32-xpi: package-win32-webplugin-common build-npapi
+if !HAVE_WIN64
 	cp $(top_builddir)/npapi-vlc/src/install.rdf "$(win32_xpi_destdir)"
 	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" install.rdf plugins
+endif
 
 package-win32-crx: package-win32-webplugin-common build-npapi
+if !HAVE_WIN64
 	cp $(top_builddir)/npapi-vlc/src/manifest.json "$(win32_xpi_destdir)"
 	crxmake --pack-extension "$(win32_xpi_destdir)" \
 		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
+endif
 
 package-win32-base-exe: package-win-base build-npapi
 # Script installer
+if !HAVE_WIN64
 	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/src/npvlc.dll.manifest" "$(win32_destdir)/"
+endif
 	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(win32_destdir)/"
 	cp "$(top_builddir)/extras/package/win32/spad.nsi" "$(win32_destdir)/"
 	mkdir "$(win32_destdir)/languages"
