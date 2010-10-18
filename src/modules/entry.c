@@ -193,8 +193,8 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             assert(i_shortcuts + index <= MODULE_SHORTCUT_MAX);
 
             const char *const *tab = va_arg (ap, const char *const *);
-            const char **pp = realloc (module->pp_shortcuts,
-                                       sizeof (pp[0]) * (index + i_shortcuts));
+            char **pp = realloc (module->pp_shortcuts,
+                                 sizeof (pp[0]) * (index + i_shortcuts));
             if (unlikely(pp == NULL))
             {
                 ret = -1;
