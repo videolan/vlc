@@ -42,6 +42,7 @@ static const char * const ppsz_sd_options[] = { "sd", "longname", NULL };
 /*****************************************************************************
  * Local structures
  *****************************************************************************/
+
 struct services_discovery_sys_t
 {
     lua_State *L;
@@ -67,7 +68,7 @@ int Open_LuaSD( vlc_object_t *p_this )
     lua_State *L = NULL;
     char *psz_name;
 
-    if( !strcmp(p_sd->psz_name, "lua"))
+    if( !strcmp( p_sd->psz_name, "lua" ) )
     {
         // We want to load the module name "lua"
         // This module can be used to load lua script not registered
@@ -139,7 +140,7 @@ int Open_LuaSD( vlc_object_t *p_this )
     p_sys->b_exiting = false;
     TAB_INIT( p_sys->i_query, p_sys->ppsz_query );
 
-    if( vlc_clone (&p_sd->p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW) )
+    if( vlc_clone( &p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW ) )
     {
         TAB_CLEAN( p_sys->i_query, p_sys->ppsz_query );
         vlc_cond_destroy( &p_sys->cond );
@@ -162,23 +163,24 @@ error:
 void Close_LuaSD( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t * )p_this;
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
 
-    vlc_mutex_lock( &p_sd->p_sys->lock );
-    p_sd->p_sys->b_exiting = true;
-    vlc_mutex_unlock( &p_sd->p_sys->lock );
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->b_exiting = true;
+    vlc_mutex_unlock( &p_sys->lock );
 
-    vlc_cancel( p_sd->p_sys->thread );
-    vlc_join (p_sd->p_sys->thread, NULL);
+    vlc_cancel( p_sys->thread );
+    vlc_join( p_sys->thread, NULL );
 
-    for( int i = 0; i < p_sd->p_sys->i_query; i++ )
-        free( p_sd->p_sys->ppsz_query[i] );
-    TAB_CLEAN( p_sd->p_sys->i_query, p_sd->p_sys->ppsz_query );
+    for( int i = 0; i < p_sys->i_query; i++ )
+        free( p_sys->ppsz_query[i] );
+    TAB_CLEAN( p_sys->i_query, p_sys->ppsz_query );
 
-    vlc_cond_destroy( &p_sd->p_sys->cond );
-    vlc_mutex_destroy( &p_sd->p_sys->lock );
-    free( p_sd->p_sys->psz_filename );
-    lua_close( p_sd->p_sys->L );
-    free( p_sd->p_sys );
+    vlc_cond_destroy( &p_sys->cond );
+    vlc_mutex_destroy( &p_sys->lock );
+    free( p_sys->psz_filename );
+    lua_close( p_sys->L );
+    free( p_sys );
 }
 
 /*****************************************************************************
