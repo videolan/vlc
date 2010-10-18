@@ -34,6 +34,8 @@
  * Local prototypes
  *****************************************************************************/
 static void *Run( void * );
+static int   DoSearch( services_discovery_t *p_sd, const char *psz_query );
+static int   Search( services_discovery_t *p_sd, const char *psz_query );
 
 static const char * const ppsz_sd_options[] = { "sd", "longname", NULL };
 
@@ -44,7 +46,14 @@ struct services_discovery_sys_t
 {
     lua_State *L;
     char *psz_filename;
+
     vlc_thread_t thread;
+    vlc_mutex_t lock;
+    vlc_cond_t cond;
+    bool b_exiting;
+
+    char **ppsz_query;
+    int i_query;
 };
 static const luaL_Reg p_reg[] = { { NULL, NULL } };
 
@@ -56,7 +65,7 @@ int Open_LuaSD( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t * )p_this;
     services_discovery_sys_t *p_sys;
     lua_State *L = NULL;
-    char *psz_name = NULL;
+    char *psz_name;
 
     if( !strcmp(p_sd->psz_name, "lua"))
     {
@@ -78,6 +87,7 @@ int Open_LuaSD( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
     p_sd->p_sys = p_sys;
+    p_sd->pf_search = Search;
     p_sys->psz_filename = vlclua_find_file( p_this, "sd", psz_name );
     if( !p_sys->psz_filename )
     {
@@ -118,18 +128,26 @@ int Open_LuaSD( vlc_object_t *p_this )
     }
     if( luaL_dofile( L, p_sys->psz_filename ) )
     {
-
         msg_Err( p_sd, "Error loading script %s: %s", p_sys->psz_filename,
                   lua_tostring( L, lua_gettop( L ) ) );
         lua_pop( L, 1 );
         goto error;
     }
     p_sys->L = L;
+    vlc_mutex_init( &p_sys->lock );
+    vlc_cond_init( &p_sys->cond );
+    p_sys->b_exiting = false;
+    TAB_INIT( p_sys->i_query, p_sys->ppsz_query );
+
     if( vlc_clone (&p_sd->p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW) )
     {
+        TAB_CLEAN( p_sys->i_query, p_sys->ppsz_query );
+        vlc_cond_destroy( &p_sys->cond );
+        vlc_mutex_destroy( &p_sys->lock );
         goto error;
     }
     return VLC_SUCCESS;
+
 error:
     if( L )
         lua_close( L );
@@ -145,7 +163,19 @@ void Close_LuaSD( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t * )p_this;
 
+    vlc_mutex_lock( &p_sd->p_sys->lock );
+    p_sd->p_sys->b_exiting = true;
+    vlc_mutex_unlock( &p_sd->p_sys->lock );
+
+    vlc_cancel( p_sd->p_sys->thread );
     vlc_join (p_sd->p_sys->thread, NULL);
+
+    for( int i = 0; i < p_sd->p_sys->i_query; i++ )
+        free( p_sd->p_sys->ppsz_query[i] );
+    TAB_CLEAN( p_sd->p_sys->i_query, p_sd->p_sys->ppsz_query );
+
+    vlc_cond_destroy( &p_sd->p_sys->cond );
+    vlc_mutex_destroy( &p_sd->p_sys->lock );
     free( p_sd->p_sys->psz_filename );
     lua_close( p_sd->p_sys->L );
     free( p_sd->p_sys );
@@ -160,6 +190,8 @@ static void* Run( void *data )
     services_discovery_sys_t *p_sys = p_sd->p_sys;
     lua_State *L = p_sys->L;
 
+    int cancel = vlc_savecancel();
+
     lua_getglobal( L, "main" );
     if( !lua_isfunction( L, lua_gettop( L ) ) || lua_pcall( L, 0, 1, 0 ) )
     {
@@ -167,6 +199,7 @@ static void* Run( void *data )
                   "function main(): %s", p_sys->psz_filename,
                   lua_tostring( L, lua_gettop( L ) ) );
         lua_pop( L, 1 );
+        vlc_restorecancel( cancel );
         return NULL;
     }
     msg_Dbg( p_sd, "LuaSD script loaded: %s", p_sys->psz_filename );
@@ -175,5 +208,76 @@ static void* Run( void *data )
      * open, but lua will never gc until lua_close(). */
     lua_gc( L, LUA_GCCOLLECT, 0 );
 
+    vlc_restorecancel( cancel );
+
+    /* Main loop to handle search requests */
+    vlc_mutex_lock( &p_sys->lock );
+    mutex_cleanup_push( &p_sys->lock );
+    while( !p_sys->b_exiting )
+    {
+        /* Wait for a request */
+        while( !p_sys->i_query )
+            vlc_cond_wait( &p_sys->cond, &p_sys->lock );
+
+        /* Execute every query each one protected against cancelation */
+        cancel = vlc_savecancel();
+        while( !p_sys->b_exiting && p_sys->i_query )
+        {
+            char *psz_query = p_sys->ppsz_query[p_sys->i_query - 1];
+            REMOVE_ELEM( p_sys->ppsz_query, p_sys->i_query, p_sys->i_query - 1 );
+
+            vlc_mutex_unlock( &p_sys->lock );
+            DoSearch( p_sd, psz_query );
+            free( psz_query );
+            vlc_mutex_lock( &p_sys->lock );
+        }
+        vlc_restorecancel( cancel );
+    }
+    vlc_cleanup_run();
+
     return NULL;
+}
+
+/*****************************************************************************
+ * Search: search for items according to the given query
+ ****************************************************************************/
+static int Search( services_discovery_t *p_sd, const char *psz_query )
+{
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+    vlc_mutex_lock( &p_sys->lock );
+    TAB_APPEND( p_sys->i_query, p_sys->ppsz_query, strdup( psz_query ) );
+    vlc_cond_signal( &p_sys->cond );
+    vlc_mutex_unlock( &p_sys->lock );
+
+    return VLC_SUCCESS;
+}
+
+static int DoSearch( services_discovery_t *p_sd, const char *psz_query )
+{
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+    lua_State *L = p_sys->L;
+
+    /* Lookup for the 'search' function */
+    lua_getglobal( L, "search" );
+    if( !lua_isfunction( L, lua_gettop( L ) ) )
+    {
+        msg_Err( p_sd, "The script '%s' does not define any 'search' function",
+                 p_sys->psz_filename );
+        lua_pop( L, 1 );
+        return VLC_EGENERIC;
+    }
+
+    /* Push the query */
+    lua_pushstring( L, psz_query );
+
+    /* Call the 'search' function */
+    if( lua_pcall( L, 1, 0, 0 ) )
+    {
+        msg_Err( p_sd, "Error while running the script '%s': %s",
+                 p_sys->psz_filename, lua_tostring( L, lua_gettop( L ) ) );
+        lua_pop( L, 1 );
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
 }
