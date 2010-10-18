@@ -323,6 +323,8 @@ VLC_EXPORT( int, playlist_ServicesDiscoveryAdd, (playlist_t *, const char *));
 VLC_EXPORT( int, playlist_ServicesDiscoveryRemove, (playlist_t *, const char *));
 /** Check whether a given SD is loaded */
 VLC_EXPORT( bool, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const char *));
+/** Query a services discovery */
+VLC_EXPORT( int, playlist_QueryServicesDiscovery, ( playlist_t *, const char *, const char * ) );
 
 
 

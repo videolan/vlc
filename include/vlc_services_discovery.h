@@ -51,6 +51,8 @@ struct services_discovery_t
     char *psz_name;
     config_chain_t *p_cfg;
 
+    int ( *pf_search ) ( services_discovery_t *, const char * );
+
     services_discovery_sys_t *p_sys;
 };
 
@@ -65,6 +67,20 @@ enum services_discovery_category_e
 /***********************************************************************
  * Service Discovery
  ***********************************************************************/
+
+/**
+ * Ask for a research in the SD
+ * @param p_sd: the Service Discovery
+ * @param psz_query: the query
+ * @return VLC_SUCCESS in case of success, the error code overwise
+ */
+static inline int vlc_sd_search( services_discovery_t *p_sd, const char *psz_query )
+{
+    if( p_sd->pf_search )
+        return p_sd->pf_search( p_sd, psz_query );
+    else
+        return VLC_EGENERIC;
+}
 
 /* Get the services discovery modules names to use in Create(), in a null
  * terminated string array. Array and string must be freed after use. */
