@@ -1,29 +1,28 @@
 #! /usr/bin/make -f
 
 if HAVE_WIN64
-build-npapi:
+build-activex:
 	touch $@
 else
-build-npapi: stamp-npapi-build
+build-activex: stamp-activex-build
 endif
 
-stamp-npapi-fetch:
-	rm -Rf npapi-vlc
-	git clone git://git.videolan.org/npapi-vlc.git npapi-vlc
+stamp-activex-fetch:
+	rm -Rf activex-vlc
+	git clone git://git.videolan.org/activex-vlc.git activex-vlc
 	touch $@
 
-stamp-npapi-autogen: stamp-npapi-fetch
-# extras/package/npapi.am
-	cd npapi-vlc && \
+stamp-activex-autogen: stamp-activex-fetch
+# extras/package/activex.am
+	cd activex-vlc && \
 	$(SHELL) ./autogen.sh
 	touch $@
 
-stamp-npapi-configure: stamp-npapi-autogen
-	cd npapi-vlc && \
+stamp-activex-configure: stamp-activex-autogen
+	cd activex-vlc && \
 	$(SHELL) ./configure \
 		--prefix=/ \
 		--host=$(host_alias) --build=$(build_alias) \
-		--with-mozilla-sdk-path="$(CONTRIB_DIR)/gecko-sdk" \
 		CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" \
 		CC="$(CC)" CFLAGS="$(CFLAGS)" \
 		CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" \
@@ -32,8 +31,8 @@ stamp-npapi-configure: stamp-npapi-autogen
 		PKG_CONFIG_LIBDIR="../$(srcdir)/extras/contrib/lib/pkgconfig:../src"
 	touch $@
 
-stamp-npapi-build: stamp-npapi-configure
-	cd npapi-vlc && \
+stamp-activex-build: stamp-activex-configure
+	cd activex-vlc && \
 	$(MAKE) $(MAKEFLAGS) all && \
-	$(MAKE) $(MAKEFLAGS) DESTDIR="$(abs_builddir)/npapi-vlc/installed" install
+	$(MAKE) $(MAKEFLAGS) DESTDIR="$(abs_builddir)/activex-vlc/installed" install
 	touch $@

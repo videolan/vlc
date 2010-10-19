@@ -1,7 +1,0 @@
-LIBRARY AXVLC.DLL
-EXPORTS
-    DllMain = DllMain@12
-    DllCanUnloadNow = DllCanUnloadNow@0
-    DllGetClassObject = DllGetClassObject@12
-    DllRegisterServer = DllRegisterServer@0
-    DllUnregisterServer = DllUnregisterServer@0

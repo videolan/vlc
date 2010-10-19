@@ -25,7 +25,6 @@
       --enable-portaudio \
       --enable-sdl \
       --enable-qt4 \
-      --enable-activex \
       --enable-sse --enable-mmx \
       --enable-libcddb \
       --enable-zvbi --disable-telx \

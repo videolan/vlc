@@ -313,7 +313,7 @@ case "${host_os}" in
         # add ws2_32 for closesocket, select, recv
         VLC_ADD_LIBS([libvlccore],[-lws2_32 -lnetapi32 -lwinmm])
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
-        VLC_ADD_LIBS([activex win32text],[-lgdi32])
+        VLC_ADD_LIBS([win32text],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx sdl_image aout_sdl vout_sdl],[-lwinmm])
         VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap oldhttp stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[-lws2_32])
         VLC_ADD_LIBS([filesystem], [-lshlwapi])
@@ -4242,57 +4242,6 @@ AC_ARG_ENABLE(vlc,
   [  --enable-vlc            build the VLC media player (default enabled)])
 AM_CONDITIONAL(BUILD_VLC, [test "${enable_vlc}" != "no"])
 
-dnl
-dnl  Microsoft ActiveX support
-dnl
-activex=false
-AC_ARG_ENABLE(activex,
-  AS_HELP_STRING([--enable-activex],[build a vlc-based ActiveX control
-		  (default enabled on Win32)]))
-AC_ARG_WITH(wine-sdk-path,
-  [  --with-wine-sdk-path=PATH path to wine sdk])
-if test "${enable_activex}" != "no"
-then
-  if test "${SYS}" = "mingw32"
-  then
-    AC_CHECK_PROGS(MIDL, [midl], no)
-    if test "${with_wine_sdk_path}" != ""
-    then
-       WINE_SDK_PATH=${with_wine_sdk_path}
-       AC_PATH_PROG(WIDL, widl, no, [$WINE_SDK_PATH/bin:$WINE_SDK_PATH/tools/widl])
-    else
-       WIDL=no
-    fi
-    AC_LANG_PUSH(C++)
-    AC_CHECK_HEADERS(ole2.h,
-      [AC_CHECK_HEADERS(olectl.h,
-        [ VLC_ADD_CPPFLAGS([activex],[-DUNICODE -D_UNICODE -D_MIDL_USE_GUIDDEF_])
-          VLC_ADD_CXXFLAGS([activex],[-fno-exceptions])
-          VLC_ADD_LIBS([activex],[-lole32 -loleaut32 -luuid -lshlwapi])
-          AC_CHECK_HEADERS(objsafe.h,
-            VLC_ADD_CXXFLAGS([activex],[-DHAVE_OBJSAFE_HEADER]),,
-            [
-             #if HAVE_OLE2_H
-             #   include <ole2.h>
-             #endif
-            ]
-          )
-          activex=:
-          PLUGINS_BINDINGS="${PLUGINS_BINDINGS} activex"
-        ],
-        [ AC_MSG_ERROR([required OLE headers are missing from your system]) ]
-      )],
-      [ AC_MSG_ERROR([required OLE headers are missing from your system]) ]
-    )
-    AC_LANG_POP(C++)
-  fi
-fi
-AC_ARG_VAR(MIDL, [Microsoft IDL compiler (Win32 platform only)])
-AM_CONDITIONAL(HAS_MIDL_COMPILER, test "${MIDL}" != "no")
-AC_ARG_VAR(WIDL, [Wine IDL compiler (requires Wine SDK)])
-AM_CONDITIONAL(HAS_WIDL_COMPILER, test "${WIDL}" != "no")
-AM_CONDITIONAL(BUILD_ACTIVEX,${activex})
-
 
 dnl
 dnl  Plugin and builtin checks
@@ -4394,7 +4343,6 @@ VLC_OUTPUT_VLC_CONFIG_IN
 
 AC_CONFIG_FILES([
   Makefile
-  projects/activex/Makefile
   doc/Makefile
   libs/loader/Makefile
   libs/srtp/Makefile
@@ -4489,12 +4437,6 @@ AM_COND_IF([HAVE_WIN32], [
   AC_CONFIG_FILES([
     extras/package/win32/spad.nsi
     extras/package/win32/vlc.win32.nsi
-  ])
-  AM_COND_IF([BUILD_ACTIVEX], [
-    AC_CONFIG_FILES([
-      projects/activex/axvlc.inf
-      projects/activex/axvlc_rc.rc
-    ])
   ])
 ])
 

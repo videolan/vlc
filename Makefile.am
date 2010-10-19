@@ -9,8 +9,7 @@
 #  - libs/* are needed by modules
 BASE_SUBDIRS = po compat src bin modules share doc test
 EXTRA_SUBDIRS = m4 \
-	libs/loader libs/srtp libs/unzip \
-	projects/activex
+	libs/loader libs/srtp libs/unzip
 DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 
 SUBDIRS = po compat src
@@ -29,9 +28,6 @@ if BUILD_VLC
 SUBDIRS += bin
 endif
 SUBDIRS += modules share doc test
-if BUILD_ACTIVEX
-SUBDIRS += projects/activex
-endif
 
 EXTRA_DIST = \
 	HACKING \
@@ -697,10 +693,11 @@ win32_xpi_destdir=$(win32_destdir)/vlc-plugin
 
 if HAVE_WIN32
 include extras/package/npapi.am
+include extras/package/activex.am
 endif
 
 #Win-common is for win32 and wince
-package-win-common: install
+package-win-common: install build-npapi build-activex
 # Check that tmp isn't in the way
 	@if test -e "$(win32_destdir)"; then \
 	    echo "Error: please remove $(win32_destdir), it is in the way"; \
@@ -796,8 +793,11 @@ if BUILD_OSDMENU
 		rm -f -- "$$file.tmp"; \
 	done
 endif
-if BUILD_ACTIVEX
-	cp $(top_srcdir)/projects/activex/axvlc.dll.manifest $(win32_destdir)
+if !HAVE_WIN64
+	cp "$(top_builddir)/activex-vlc/src/axvlc.dll.manifest" "$(win32_destdir)/"
+	cp "$(top_builddir)/activex-vlc/installed/lib/axvlc.dll" "$(win32_destdir)/"
+	cp "$(top_builddir)/npapi-vlc/src/npvlc.dll.manifest" "$(win32_destdir)/"
+	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
 endif
 
 # SDK
@@ -806,10 +806,10 @@ endif
 	cp -r $(destdir)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
 	for file in libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la; do \
         cp -r $(destdir)/lib/$$file "$(win32_destdir)/sdk/lib"; done
-if BUILD_ACTIVEX
+if !HAVE_WIN64
 	mkdir -p "$(win32_destdir)/sdk/activex"
-	cp $(srcdir)/projects/activex/README.TXT $(win32_destdir)/sdk/activex/
-	cp $(srcdir)/projects/activex/test.html $(win32_destdir)/sdk/activex/
+	cp $(top_builddir)/activex-vlc/README $(win32_destdir)/sdk/activex/README.TXT
+	cp $(top_builddir)/activex-vlc/src/test.html $(win32_destdir)/sdk/activex/
 endif
 
 	find $(win32_destdir) -type f \( -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*.lua' \) -exec $(U2D) {} \;
@@ -829,36 +829,32 @@ package-win-base: package-win-common
 	  fi ; \
 	done
 
-package-win32-webplugin-common: package-win-base build-npapi
+package-win32-webplugin-common: package-win-base
 	mkdir -p "$(win32_xpi_destdir)/plugins"
 	find $(destdir) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
 if !HAVE_WIN64
-	cp $(top_srcdir)/npapi-vlc/src/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins"
+	cp $(top_builddir)/npapi-vlc/src/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins"
 endif
 	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_xpi_destdir)/plugins"
 	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/plugins"
 	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*qt*"
 	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*skins*"
 
-package-win32-xpi: package-win32-webplugin-common build-npapi
+package-win32-xpi: package-win32-webplugin-common
 if !HAVE_WIN64
 	cp $(top_builddir)/npapi-vlc/src/install.rdf "$(win32_xpi_destdir)"
 	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" install.rdf plugins
 endif
 
-package-win32-crx: package-win32-webplugin-common build-npapi
+package-win32-crx: package-win32-webplugin-common
 if !HAVE_WIN64
 	cp $(top_builddir)/npapi-vlc/src/manifest.json "$(win32_xpi_destdir)"
 	crxmake --pack-extension "$(win32_xpi_destdir)" \
 		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
 endif
 
-package-win32-base-exe: package-win-base build-npapi
+package-win32-base-exe: package-win-base
 # Script installer
-if !HAVE_WIN64
-	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
-	cp "$(top_builddir)/npapi-vlc/src/npvlc.dll.manifest" "$(win32_destdir)/"
-endif
 	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(win32_destdir)/"
 	cp "$(top_builddir)/extras/package/win32/spad.nsi" "$(win32_destdir)/"
 	mkdir "$(win32_destdir)/languages"
