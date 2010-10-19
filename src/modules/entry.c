@@ -347,6 +347,7 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
         case VLC_CONFIG_OLDNAME:
         {
             const char *oldname = va_arg (ap, const char *);
+            assert (item->psz_oldname == NULL);
             item->psz_oldname = oldname ? strdup (oldname) : NULL;
             break;
         }
