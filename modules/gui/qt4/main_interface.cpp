@@ -459,6 +459,8 @@ inline void MainInterface::createStatusBar()
             "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
     speedLabel->setStyleSheet(
             "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
+    /* pad both label and its tooltip */
+    nameLabel->setStyleSheet( "padding-left: 5px; padding-right: 5px;" );
 
     /* and adding those */
     statusBarr->addWidget( nameLabel, 8 );
@@ -873,8 +875,8 @@ void MainInterface::setName( const QString& name )
     input_name = name; /* store it for the QSystray use */
     /* Display it in the status bar, but also as a Tooltip in case it doesn't
        fit in the label */
-    nameLabel->setText( " " + name + " " );
-    nameLabel->setToolTip( " " + name +" " );
+    nameLabel->setText( name );
+    nameLabel->setToolTip( name );
 }
 
 /**
