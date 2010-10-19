@@ -7,6 +7,7 @@ Important changes for packagers:
    not acceptable, pass --enable-non-utf8 to the configure script.
  * The default tarballs are now .tar.xz
  * The NPAPI webplugin has moved to git://git.videolan.org/npapi-vlc.git
+ * The ActiveX webplugin has moved to git://git.videolan.org/activex-vlc.git
 
 Access
  * Multiple files are supported from RAR files
