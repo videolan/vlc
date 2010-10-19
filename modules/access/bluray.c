@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_access.h>
 #include <vlc_messages.h>
+#include <vlc_input.h>
 
 #include <libbluray/bluray.h>
 
@@ -71,13 +72,20 @@ vlc_module_end ()
 struct access_sys_t
 {
     BLURAY *bluray; /* */
+
+    /* Titles */
+    unsigned int i_title;
+    unsigned int i_longest_title;
+    input_title_t   **pp_title;
+
     int i_bd_delay;
 };
 
 static ssize_t blurayRead   (access_t *, uint8_t *, size_t);
 static int     bluraySeek   (access_t *, uint64_t);
 static int     blurayControl(access_t *, int, va_list);
-static int     bluraySetTitle(access_t *p_access, int i_tile);
+static int     blurayInitTitles(access_t *p_access );
+static int     bluraySetTitle(access_t *p_access, int i_title);
 
 /*****************************************************************************
  * blurayOpen: module init function
@@ -107,15 +115,11 @@ static int blurayOpen( vlc_object_t *object )
         return VLC_ENOMEM;
     }
 
+    TAB_INIT( p_sys->i_title, p_sys->pp_title );
+
     /* store current bd_path */
     strncpy(bd_path, p_access->psz_location, sizeof(bd_path));
     bd_path[PATH_MAX - 1] = '\0';
-
-    if ( (pos_title = strrchr(bd_path, ':')) ) {
-        /* found character ':' for title information */
-        *(pos_title++) = '\0';
-        i_title = atoi(pos_title);
-    }
 
     p_sys->bluray = bd_open(bd_path, NULL);
     if ( !p_sys->bluray ) {
@@ -123,8 +127,21 @@ static int blurayOpen( vlc_object_t *object )
         return VLC_EGENERIC;
     }
 
+    if (blurayInitTitles(p_access) != VLC_SUCCESS) {
+        blurayClose(object);
+        return VLC_EGENERIC;
+    }
+
+    /* get title request */
+    if ( (pos_title = strrchr(bd_path, ':')) ) {
+        /* found character ':' for title information */
+        *(pos_title++) = '\0';
+        i_title = atoi(pos_title);
+    }
+
     /* set start title number */
     if ( bluraySetTitle(p_access, i_title) != VLC_SUCCESS ) {
+        msg_Err( p_access, "Could not set the title %d", i_title );
         blurayClose(object);
         return VLC_EGENERIC;
     }
@@ -143,12 +160,53 @@ static void blurayClose( vlc_object_t *object )
     access_t *p_access = (access_t*)object;
     access_sys_t *p_sys = p_access->p_sys;
 
+    /* Titles */
+    for (unsigned int i = 0; i < p_sys->i_title; i++)
+        vlc_input_title_Delete(p_sys->pp_title[i]);
+    TAB_CLEAN( p_sys->i_title, p_sys->pp_title );
+
     /* bd_close( NULL ) can crash */
     assert(p_sys->bluray);
     bd_close(p_sys->bluray);
     free(p_sys);
 }
 
+static int blurayInitTitles(access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    /* get and set the titles */
+    unsigned i_title = bd_get_titles(p_sys->bluray, TITLES_RELEVANT);
+    int64_t duration = 0;
+
+    for (unsigned int i = 0; i < i_title; i++) {
+        input_title_t *t = vlc_input_title_New();
+        if (!t)
+            break;
+
+        BLURAY_TITLE_INFO *title_info = bd_get_title_info(p_sys->bluray,i);
+        if (!title_info)
+            break;
+        t->i_length = title_info->duration * CLOCK_FREQ / INT64_C(90000);
+
+        if (t->i_length > duration) {
+            duration = t->i_length;
+            p_sys->i_longest_title = i;
+        }
+
+        for ( unsigned int j = 0; j < title_info->chapter_count; j++) {
+            seekpoint_t *s = vlc_seekpoint_New();
+            if( !s )
+                break;
+            s->i_time_offset = title_info->chapters[j].offset;
+
+            TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
+        }
+        TAB_APPEND( p_sys->i_title, p_sys->pp_title, t );
+        bd_free_title_info(title_info);
+    }
+    return VLC_SUCCESS;
+}
 
 /*****************************************************************************
  * bluraySetTitle: select new BD title
@@ -157,19 +215,11 @@ static int bluraySetTitle(access_t *p_access, int i_title)
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    unsigned int i_nb_titles = bd_get_titles(p_sys->bluray, TITLES_RELEVANT);
-
     /* Looking for the main title, ie the longest duration */
-    if (i_title == -1) {
-        uint64_t duration=0;
-        for (unsigned int i = 0; i < i_nb_titles; i++) {
-            BLURAY_TITLE_INFO *info = bd_get_title_info(p_sys->bluray, i);
-            if (info->duration > duration) {
-                i_title = i;
-                duration = info->duration;
-            }
-        }
-    }
+    if (i_title == -1)
+        i_title = p_sys->i_longest_title;
+
+    msg_Dbg( p_access, "Selecting Title %i", i_title);
 
     /* Select Blu-Ray title */
     if ( bd_select_title(p_access->p_sys->bluray, i_title) == 0 ) {
@@ -228,10 +278,29 @@ static int blurayControl(access_t *p_access, int query, va_list args)
             bd_seek_chapter( p_sys->bluray, i_chapter );
             break;
         }
-        case ACCESS_GET_META:
+
         case ACCESS_GET_TITLE_INFO:
+        {
+            input_title_t ***ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
+            int *pi_int             = (int*)va_arg( args, int* );
+            int *pi_title_offset    = (int*)va_arg( args, int* );
+            int *pi_chapter_offset  = (int*)va_arg( args, int* );
+
+            /* */
+            *pi_title_offset   = 0;
+            *pi_chapter_offset = 0;
+
+            /* Duplicate local title infos */
+            *pi_int = p_sys->i_title;
+            *ppp_title = calloc( p_sys->i_title, sizeof(input_title_t **) );
+            for( unsigned int i = 0; i < p_sys->i_title; i++ )
+                (*ppp_title)[i] = vlc_input_title_Duplicate( p_sys->pp_title[i]);
+
+            return VLC_SUCCESS;
+        }
         case ACCESS_SET_PRIVATE_ID_STATE:
         case ACCESS_GET_CONTENT_TYPE:
+        case ACCESS_GET_META:
             return VLC_EGENERIC;
 
         default:
