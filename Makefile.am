@@ -810,10 +810,12 @@ if BUILD_OSDMENU
 	done
 endif
 if !HAVE_WIN64
+if !HAVE_WINCE
 	cp "$(top_builddir)/activex-vlc/src/axvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/activex-vlc/installed/lib/axvlc.dll" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/src/npvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
+endif
 endif
 
 # SDK
@@ -823,9 +825,11 @@ endif
 	for file in libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la; do \
         cp -r $(destdir)/lib/$$file "$(win32_destdir)/sdk/lib"; done
 if !HAVE_WIN64
+if !HAVE_WINCE
 	mkdir -p "$(win32_destdir)/sdk/activex"
 	cp $(top_builddir)/activex-vlc/README $(win32_destdir)/sdk/activex/README.TXT
 	cp $(top_builddir)/activex-vlc/src/test.html $(win32_destdir)/sdk/activex/
+endif
 endif
 
 	find $(win32_destdir) -type f \( -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*.lua' \) -exec $(U2D) {} \;
