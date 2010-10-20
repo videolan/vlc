@@ -1,11 +1,6 @@
 #! /usr/bin/make -f
 
-if HAVE_WIN64
-build-activex:
-	touch $@
-else
 build-activex: stamp-activex-build
-endif
 
 stamp-activex-fetch:
 	rm -Rf activex-vlc

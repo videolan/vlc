@@ -691,9 +691,25 @@ win32_debugdir=$(top_builddir)/symbols-$(VERSION)
 win32_lua_destdir=$(win32_destdir)/lua
 win32_xpi_destdir=$(win32_destdir)/vlc-plugin
 
+if HAVE_WIN64
+build-npapi:
+	touch $@
+
+build-activex:
+	touch $@
+else
+if HAVE_WINCE
+build-npapi:
+	touch $@
+
+build-activex:
+	touch $@
+else
 if HAVE_WIN32
 include extras/package/npapi.am
 include extras/package/activex.am
+endif
+endif
 endif
 
 #Win-common is for win32 and wince
