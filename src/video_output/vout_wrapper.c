@@ -112,6 +112,26 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_state_t *state)
 /*****************************************************************************
  *
  *****************************************************************************/
+/* Minimum number of display picture */
+#define DISPLAY_PICTURE_COUNT (1)
+
+static void NoDrInit(vout_thread_t *vout)
+{
+    vout_thread_sys_t *sys = vout->p;
+
+    if (sys->display.use_dr)
+        sys->display_pool = vout_display_Pool(sys->display.vd, 3);
+    else
+        //sys->display_pool = picture_pool_Reserve(sys->decoder_pool, DISPLAY_PICTURE_COUNT);
+        sys->display_pool = picture_pool_NewFromFormat(&sys->display.vd->source, DISPLAY_PICTURE_COUNT);
+}
+static void NoDrClean(vout_thread_t *vout)
+{
+    vout_thread_sys_t *sys = vout->p;
+
+    if (!sys->display.use_dr)
+        picture_pool_Delete(sys->display_pool);
+}
 int vout_InitWrapper(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
@@ -121,10 +141,9 @@ int vout_InitWrapper(vout_thread_t *vout)
     sys->display.use_dr = !vout_IsDisplayFiltered(vd);
     const bool allow_dr = !vd->info.has_pictures_invalid && sys->display.use_dr;
     const unsigned private_picture  = 3; /* XXX 2 for filter, 1 for SPU */
-    const unsigned display_picture  = 1; /* Minimum number of display picture */
     const unsigned decoder_picture  = 1 + sys->dpb_size;
     const unsigned kept_picture     = 1; /* last displayed picture */
-    const unsigned reserved_picture = display_picture +
+    const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
                                       private_picture +
                                       kept_picture;
     picture_pool_t *display_pool =
@@ -140,17 +159,14 @@ int vout_InitWrapper(vout_thread_t *vout)
         sys->decoder_pool =
             picture_pool_NewFromFormat(&source,
                                        __MAX(VOUT_MAX_PICTURES,
-                                             reserved_picture + decoder_picture));
+                                             reserved_picture + decoder_picture - DISPLAY_PICTURE_COUNT));
         if (allow_dr) {
             msg_Warn(vout, "Not enough direct buffers, using system memory");
             sys->dpb_size = 0;
         } else {
             sys->dpb_size = picture_pool_GetSize(sys->decoder_pool) - reserved_picture;
         }
-        if (sys->display.use_dr)
-            sys->display_pool = display_pool;
-        else
-            sys->display_pool = picture_pool_Reserve(sys->decoder_pool, display_picture);
+        NoDrInit(vout);
         sys->is_decoder_pool_slow = false;
     }
     sys->private_pool = picture_pool_Reserve(sys->decoder_pool, private_picture);
@@ -170,8 +186,7 @@ void vout_EndWrapper(vout_thread_t *vout)
         picture_pool_Delete(sys->private_pool);
 
     if (sys->decoder_pool != sys->display_pool) {
-        if (!sys->display.use_dr)
-            picture_pool_Delete(sys->display_pool);
+        NoDrClean(vout);
         picture_pool_Delete(sys->decoder_pool);
     }
 }
@@ -187,8 +202,12 @@ void vout_ManageWrapper(vout_thread_t *vout)
     bool reset_display_pool = sys->display.use_dr && vout_AreDisplayPicturesInvalid(vd);
     vout_ManageDisplay(vd, !sys->display.use_dr || reset_display_pool);
 
-    if (reset_display_pool)
-        sys->display_pool = vout_display_Pool(vd, 3);
+    if (reset_display_pool) {
+        NoDrClean(vout);
+
+        sys->display.use_dr = !vout_IsDisplayFiltered(vd);
+        NoDrInit(vout);
+    }
 }
 
 /*****************************************************************************
