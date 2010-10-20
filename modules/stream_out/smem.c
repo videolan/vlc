@@ -342,7 +342,7 @@ static int SendVideo( sout_stream_t *p_stream, sout_stream_id_t *id,
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     int i_line, i_line_size, i_size, i_pixel_pitch;
-    uint8_t* p_pixels;
+    uint8_t* p_pixels = NULL;
 
     if( id->format->video.i_bits_per_pixel > 0 )
     {
@@ -357,6 +357,14 @@ static int SendVideo( sout_stream_t *p_stream, sout_stream_id_t *id,
     }
     /* Calling the prerender callback to get user buffer */
     p_sys->pf_video_prerender_callback( id->p_data, &p_pixels , i_size );
+
+    if (!p_pixels)
+    {
+        msg_Err( p_stream, "No buffer given!" );
+        block_ChainRelease( p_buffer );
+        return VLC_EGENERIC;
+    }
+
     /* Copying data into user buffer */
     if( id->format->video.i_bits_per_pixel > 0 )
     {
@@ -380,13 +388,20 @@ static int SendAudio( sout_stream_t *p_stream, sout_stream_id_t *id,
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     int i_size;
-    uint8_t* p_pcm_buffer;
+    uint8_t* p_pcm_buffer = NULL;
     int i_samples = 0;
 
     i_size = p_buffer->i_buffer;
     i_samples = i_size / ( ( id->format->audio.i_bitspersample / 8 ) * id->format->audio.i_channels );
     /* Calling the prerender callback to get user buffer */
     p_sys->pf_audio_prerender_callback( id->p_data, &p_pcm_buffer, i_size );
+    if (!p_pcm_buffer)
+    {
+        msg_Err( p_stream, "No buffer given!" );
+        block_ChainRelease( p_buffer );
+        return VLC_EGENERIC;
+    }
+
     /* Copying data into user buffer */
     vlc_memcpy( p_pcm_buffer, p_buffer->p_buffer, i_size );
     /* Calling the postrender callback to tell the user his buffer is ready */
