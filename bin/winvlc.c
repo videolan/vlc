@@ -139,10 +139,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     if (wargv == NULL)
         return 1;
 
-    char *argv[argc + 1];
+    char *argv[argc + 2];
     BOOL crash_handling = TRUE;
     int j = 0;
 
+    argv[j++] = FromWide( L"--media-library" );
     argv[j++] = FromWide( L"--no-ignore-config" );
     for (int i = 1; i < argc; i++)
     {
