@@ -610,7 +610,7 @@ static const struct
     { VLC_CODEC_PCX,               "image/pcx" },
     { VLC_CODEC_PNG,               "image/png" },
     { VLC_CODEC_TIFF,              "image/tiff" },
-    { VLC_CODEC_TARGA,             "iamge/x-tga" },
+    { VLC_CODEC_TARGA,             "image/x-tga" },
     { VLC_FOURCC('x','p','m',' '), "image/x-xpixmap" },
     { 0, NULL }
 };
