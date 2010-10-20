@@ -96,12 +96,10 @@ int main (int argc, char *argv[])
         if (asprintf (&arg, "--plugin-path=%s", path) == -1)
             abort ();
 
-        const char *vlc_argv[7];
+        const char *vlc_argv[5];
         int vlc_argc = 0;
 
-        vlc_argv[vlc_argc++] = "--ignore-config";
         vlc_argv[vlc_argc++] = "--quiet";
-        vlc_argv[vlc_argc++] = "--no-media-library";
         if (force)
             vlc_argv[vlc_argc++] = "--reset-plugins-cache";
         vlc_argv[vlc_argc++] = arg;
