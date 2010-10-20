@@ -171,10 +171,11 @@ int main( int i_argc, const char *ppsz_argv[] )
     pthread_sigmask (SIG_BLOCK, &set, NULL);
 
     /* Note that FromLocale() can be used before libvlc is initialized */
-    const char *argv[i_argc + 3];
+    const char *argv[i_argc + 4];
     int argc = 0;
 
     argv[argc++] = "--no-ignore-config";
+    argv[argc++] = "--media-library";
 #ifdef TOP_BUILDDIR
     argv[argc++] = FromLocale ("--plugin-path="TOP_BUILDDIR"/modules");
 #endif

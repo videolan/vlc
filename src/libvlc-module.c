@@ -2142,7 +2142,7 @@ vlc_module_begin ()
         change_safe()
     add_bool( "play-and-pause", 0, NULL, PAP_TEXT, PAP_LONGTEXT, true )
         change_safe()
-    add_bool( "media-library", 1, NULL, ML_TEXT, ML_LONGTEXT, false )
+    add_bool( "media-library", 0, NULL, ML_TEXT, ML_LONGTEXT, false )
 #if defined( MEDIA_LIBRARY )
     add_bool( "load-media-library-on-startup", 1, NULL, LOAD_ML_TEXT,
             LOAD_ML_LONGTEXT, false )
