@@ -99,7 +99,7 @@ enum libvlc_event_e {
     libvlc_VlmMediaInstanceStatusPlaying,
     libvlc_VlmMediaInstanceStatusPause,
     libvlc_VlmMediaInstanceStatusEnd,
-    libvlc_VlmMediaInstanceStatusError,
+    libvlc_VlmMediaInstanceStatusError
 };
 
 /**

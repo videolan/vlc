@@ -67,7 +67,7 @@ typedef enum libvlc_meta_t {
     libvlc_meta_Publisher,
     libvlc_meta_EncodedBy,
     libvlc_meta_ArtworkURL,
-    libvlc_meta_TrackID,
+    libvlc_meta_TrackID
     /* Add new meta types HERE */
 } libvlc_meta_t;
 
@@ -105,7 +105,7 @@ typedef enum libvlc_track_type_t
     libvlc_track_unknown   = -1,
     libvlc_track_audio     = 0,
     libvlc_track_video     = 1,
-    libvlc_track_text      = 2,
+    libvlc_track_text      = 2
 } libvlc_track_type_t;
 
 /** defgroup libvlc_media_stats_t LibVLC media statistics

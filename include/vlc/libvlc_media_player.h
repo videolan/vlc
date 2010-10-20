@@ -104,7 +104,7 @@ typedef enum libvlc_navigate_mode_t
     libvlc_navigate_up,
     libvlc_navigate_down,
     libvlc_navigate_left,
-    libvlc_navigate_right,
+    libvlc_navigate_right
 } libvlc_navigate_mode_t;
 
 /**
@@ -962,7 +962,7 @@ enum libvlc_video_logo_option_t {
     libvlc_logo_delay,
     libvlc_logo_repeat,
     libvlc_logo_opacity,
-    libvlc_logo_position,
+    libvlc_logo_position
 };
 
 /**
@@ -1006,7 +1006,7 @@ enum libvlc_video_adjust_option_t {
     libvlc_adjust_Brightness,
     libvlc_adjust_Hue,
     libvlc_adjust_Saturation,
-    libvlc_adjust_Gamma,
+    libvlc_adjust_Gamma
 };
 
 /**
