@@ -106,7 +106,7 @@ static int Open ( vlc_object_t *p_this )
     // This will be used for boosting the audio without the need of a mixer (floating-point conversion is expensive on ARM)
     // AudioQueueSetParameter(p_sys->audioQueue, kAudioQueueParam_Volume, 12.0); // Defaults to 1.0
 
-    msg_Dbg(p_aout, "New AudioQueue output created (status = %ld)", status);
+    msg_Dbg(p_aout, "New AudioQueue output created (status = %i)", status);
 
     // Allocate buffers for the AudioQueue, and pre-fill them.
     for (int i = 0; i < NUMBER_OF_BUFFERS; ++i) {
@@ -124,7 +124,7 @@ static int Open ( vlc_object_t *p_this )
     p_aout->output.i_nb_samples = FRAME_SIZE;
     p_aout->output.pf_play = Play;
 
-    msg_Dbg(p_aout, "Starting AudioQueue (status = %ld)", status);
+    msg_Dbg(p_aout, "Starting AudioQueue (status = %i)", status);
     status = AudioQueueStart(p_sys->audioQueue, NULL);
 
     return VLC_SUCCESS;
