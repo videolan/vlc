@@ -458,30 +458,6 @@ static int aout_Restart( aout_instance_t * p_aout )
 }
 
 /*****************************************************************************
- * aout_FindAndRestart : find the audio output instance and restart
- *****************************************************************************
- * This is used for callbacks of the configuration variables, and we believe
- * that when those are changed, it is a significant change which implies
- * rebuilding the audio-device and audio-channels variables.
- *****************************************************************************/
-int aout_FindAndRestart( vlc_object_t * p_this, const char *psz_name,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    aout_instance_t * p_aout = findAout( pl_Get(p_this) );
-
-    (void)psz_name; (void)oldval; (void)newval; (void)p_data;
-    if ( p_aout == NULL ) return VLC_SUCCESS;
-
-    var_Destroy( p_aout, "audio-device" );
-    var_Destroy( p_aout, "audio-channels" );
-
-    aout_Restart( p_aout );
-    vlc_object_release( p_aout );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
  * aout_ChannelsRestart : change the audio device or channels and restart
  *****************************************************************************/
 int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,

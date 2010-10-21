@@ -324,7 +324,6 @@ VLC_EXPORT( int, aout_ToggleMute, ( vlc_object_t *, audio_volume_t * ) );
 #define aout_ToggleMute(a, b) aout_ToggleMute(VLC_OBJECT(a), b)
 VLC_EXPORT( int, aout_SetMute, ( vlc_object_t *, audio_volume_t *, bool ) );
 VLC_EXPORT( bool, aout_IsMuted, ( vlc_object_t * ) );
-VLC_EXPORT( int, aout_FindAndRestart, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
 VLC_EXPORT( int, aout_ChannelsRestart, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
 
 VLC_EXPORT( void, aout_EnableFilter, (vlc_object_t *, const char *, bool ));
