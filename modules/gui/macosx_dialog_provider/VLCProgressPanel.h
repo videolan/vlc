@@ -35,10 +35,10 @@
 }
 - (void)createContentView;
 
-- setDialogTitle:(NSString *)title;
-- setDialogMessage:(NSString *)message;
-- setCancelButtonLabel:(NSString *)cancelLabel;
-- setProgressAsDouble:(double)value;
+- (void)setDialogTitle:(NSString *)title;
+- (void)setDialogMessage:(NSString *)message;
+- (void)setCancelButtonLabel:(NSString *)cancelLabel;
+- (void)setProgressAsDouble:(double)value;
 - (BOOL)isCancelled;
 
 - (IBAction)cancelDialog:(id)sender;

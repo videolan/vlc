@@ -106,23 +106,23 @@
     [ourContentView addSubview:_iconView];
 }
 
-- setDialogTitle:(NSString *)title
+- (void)setDialogTitle:(NSString *)title
 {
     [_titleField setStringValue:title];
     [self setTitle:title];
 }
 
-- setDialogMessage:(NSString *)message
+- (void)setDialogMessage:(NSString *)message
 {
     [_messageField setStringValue:message];
 }
 
-- setCancelButtonLabel:(NSString *)cancelLabel
+- (void)setCancelButtonLabel:(NSString *)cancelLabel
 {
     [_cancelButton setTitle:cancelLabel];
 }
 
-- setProgressAsDouble:(double)value
+- (void)setProgressAsDouble:(double)value
 {
     [_progressBar setDoubleValue:value];
 }

@@ -703,6 +703,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             [attrString release];
             break;
         }
+        case EXTENSION_WIDGET_CHECK_BOX:
         case EXTENSION_WIDGET_BUTTON:
         {
             assert([control isKindOfClass:[NSButton class]]);
