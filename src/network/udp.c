@@ -778,6 +778,7 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
         return -1;
     }
 
+    val = -1;
     for (struct addrinfo *ptr = loc; ptr != NULL; ptr = ptr->ai_next)
     {
         int fd = net_Socket (obj, ptr->ai_family, ptr->ai_socktype,
@@ -789,7 +790,6 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
         if( fd == -1 )
             continue;
 
-        val = -1;
         for (struct addrinfo *ptr2 = rem; ptr2 != NULL; ptr2 = ptr2->ai_next)
         {
             if ((ptr2->ai_family != ptr->ai_family)
