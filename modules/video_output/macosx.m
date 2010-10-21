@@ -400,7 +400,7 @@ static void OpenglSwap(vout_opengl_t *gl)
 /**
  * Gets called by the Open() method.
  */
-- setFrameWithValue:(NSValue *)value
+- (void)setFrameWithValue:(NSValue *)value
 {
     [self setFrame:[value rectValue]];
 }
