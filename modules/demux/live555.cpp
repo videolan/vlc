@@ -443,6 +443,13 @@ static void Close( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    if( p_sys->p_timeout )
+    {
+        vlc_cancel( p_sys->p_timeout->handle );
+        vlc_join( p_sys->p_timeout->handle, NULL );
+        free( p_sys->p_timeout );
+    }
+
     if( p_sys->rtsp && p_sys->ms ) p_sys->rtsp->sendTeardownCommand( *p_sys->ms, NULL );
     if( p_sys->ms ) Medium::close( p_sys->ms );
     if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
@@ -460,12 +467,6 @@ static void Close( vlc_object_t *p_this )
 
     if( p_sys->i_track ) free( p_sys->track );
     if( p_sys->p_out_asf ) stream_Delete( p_sys->p_out_asf );
-    if( p_sys->p_timeout )
-    {
-        vlc_cancel( p_sys->p_timeout->handle );
-        vlc_join( p_sys->p_timeout->handle, NULL );
-        free( p_sys->p_timeout );
-    }
     delete p_sys->scheduler;
     free( p_sys->p_sdp );
     free( p_sys->psz_path );
