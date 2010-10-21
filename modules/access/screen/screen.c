@@ -99,7 +99,7 @@ vlc_module_begin ()
 
     add_integer( "screen-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, true )
-    add_float( "screen-fps", SCREEN_FPS, 0, FPS_TEXT, FPS_LONGTEXT, true )
+    add_float( "screen-fps", SCREEN_FPS, NULL, FPS_TEXT, FPS_LONGTEXT, true )
 
 #ifdef SCREEN_SUBSCREEN
     add_integer( "screen-top", 0, NULL, TOP_TEXT, TOP_LONGTEXT, true )
