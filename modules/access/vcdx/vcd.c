@@ -108,7 +108,6 @@ vlc_module_begin ()
               false )
 
     add_bool( MODULE_STRING "-track-length", true,
-          NULL,
               N_("Use track length as maximum unit in seek?"),
               N_("If set, the length of the seek bar is the track rather than "
          "the length of an entry."),
@@ -120,11 +119,11 @@ vlc_module_begin ()
                  "Media Info. Shows for example playback control navigation."),
               false )
 
-    add_string( MODULE_STRING "-author-format", "%v - %F disc %c of %C", NULL,
+    add_string( MODULE_STRING "-author-format", "%v - %F disc %c of %C",
                 N_("Format to use in the playlist's \"author\" field."),
                 VCD_TITLE_FMT_LONGTEXT, true )
 
-    add_string( MODULE_STRING "-title-format", "%I %N %L%S - %M %A %v - disc %c of %C %F", NULL,
+    add_string( MODULE_STRING "-title-format", "%I %N %L%S - %M %A %v - disc %c of %C %F",
                 N_("Format to use in the playlist's \"title\" field."),
                 VCD_TITLE_FMT_LONGTEXT, false )
 
