@@ -151,7 +151,7 @@ vlc_module_begin ()
     add_font( "freetype-font", DEFAULT_FONT, FONT_TEXT, FONT_LONGTEXT,
               false )
 
-    add_integer( "freetype-fontsize", 0, NULL, FONTSIZE_TEXT,
+    add_integer( "freetype-fontsize", 0, FONTSIZE_TEXT,
                  FONTSIZE_LONGTEXT, true )
 
     /* opacity valid on 0..255, with default 255 = fully opaque */
@@ -159,14 +159,14 @@ vlc_module_begin ()
         OPACITY_TEXT, OPACITY_LONGTEXT, true )
 
     /* hook to the color values list, with default 0x00ffffff = white */
-    add_integer( "freetype-color", 0x00FFFFFF, NULL, COLOR_TEXT,
+    add_integer( "freetype-color", 0x00FFFFFF, COLOR_TEXT,
                  COLOR_LONGTEXT, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
 
-    add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZER_TEXT,
+    add_integer( "freetype-rel-fontsize", 16, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, false )
         change_integer_list( pi_sizes, ppsz_sizes_text )
-    add_integer( "freetype-effect", 2, NULL, EFFECT_TEXT,
+    add_integer( "freetype-effect", 2, EFFECT_TEXT,
                  EFFECT_LONGTEXT, false )
         change_integer_list( pi_effects, ppsz_effects_text )
 

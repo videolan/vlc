@@ -98,7 +98,7 @@ vlc_module_begin ()
     /* Only usable with VLM. No category so not in gui preferences
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )*/
-    add_integer( SOUT_CFG_PREFIX_OUT "id", 0, NULL, ID_TEXT, ID_LONGTEXT,
+    add_integer( SOUT_CFG_PREFIX_OUT "id", 0, ID_TEXT, ID_LONGTEXT,
                  false )
     add_string( SOUT_CFG_PREFIX_OUT "in-name", "default",
                 DEST_TEXT, DEST_LONGTEXT, false )
@@ -110,15 +110,15 @@ vlc_module_begin ()
     add_shortcut( "bridge-in" )
     /*set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )*/
-    add_integer( SOUT_CFG_PREFIX_IN "delay", 0, NULL, DELAY_TEXT,
+    add_integer( SOUT_CFG_PREFIX_IN "delay", 0, DELAY_TEXT,
                  DELAY_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX_IN "id-offset", 8192, NULL, ID_OFFSET_TEXT,
+    add_integer( SOUT_CFG_PREFIX_IN "id-offset", 8192, ID_OFFSET_TEXT,
                  ID_OFFSET_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX_IN "name", "default",
                 NAME_TEXT, NAME_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX_IN "placeholder", false, NULL,
               PLACEHOLDER_TEXT, PLACEHOLDER_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX_IN "placeholder-delay", 200, NULL,
+    add_integer( SOUT_CFG_PREFIX_IN "placeholder-delay", 200,
                  PLACEHOLDER_DELAY_TEXT, PLACEHOLDER_DELAY_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX_IN "placeholder-switch-on-iframe", true, NULL,
               PLACEHOLDER_IFRAME_TEXT, PLACEHOLDER_IFRAME_LONGTEXT, false )

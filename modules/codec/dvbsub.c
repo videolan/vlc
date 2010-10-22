@@ -122,10 +122,10 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_SCODEC )
     set_callbacks( Open, Close )
 
-    add_integer( DVBSUB_CFG_PREFIX "position", 8, NULL, POS_TEXT, POS_LONGTEXT, true )
+    add_integer( DVBSUB_CFG_PREFIX "position", 8, POS_TEXT, POS_LONGTEXT, true )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions )
-    add_integer( DVBSUB_CFG_PREFIX "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, false )
-    add_integer( DVBSUB_CFG_PREFIX "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, false )
+    add_integer( DVBSUB_CFG_PREFIX "x", -1, POSX_TEXT, POSX_LONGTEXT, false )
+    add_integer( DVBSUB_CFG_PREFIX "y", -1, POSY_TEXT, POSY_LONGTEXT, false )
 
 #   define ENC_CFG_PREFIX "sout-dvbsub-"
     add_submodule ()
@@ -133,8 +133,8 @@ vlc_module_begin ()
     set_capability( "encoder", 100 )
     set_callbacks( OpenEncoder, CloseEncoder )
 
-    add_integer( ENC_CFG_PREFIX "x", -1, NULL, ENC_POSX_TEXT, ENC_POSX_LONGTEXT, false )
-    add_integer( ENC_CFG_PREFIX "y", -1, NULL, ENC_POSY_TEXT, ENC_POSY_LONGTEXT, false )
+    add_integer( ENC_CFG_PREFIX "x", -1, ENC_POSX_TEXT, ENC_POSX_LONGTEXT, false )
+    add_integer( ENC_CFG_PREFIX "y", -1, ENC_POSY_TEXT, ENC_POSY_LONGTEXT, false )
     add_obsolete_integer( ENC_CFG_PREFIX "timeout" ) /* Suppressed since 0.8.5 */
 vlc_module_end ()
 

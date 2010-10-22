@@ -76,7 +76,7 @@ vlc_module_begin ()
     set_callbacks (EmOpen, EmClose)
     add_shortcut ("embed-xid")
 
-    add_integer ("drawable-xid", 0, NULL, XID_TEXT, XID_LONGTEXT, true)
+    add_integer ("drawable-xid", 0, XID_TEXT, XID_LONGTEXT, true)
         change_volatile ()
 
 vlc_module_end ()

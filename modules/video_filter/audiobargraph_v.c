@@ -89,14 +89,14 @@ vlc_module_begin ()
     add_shortcut( "audiobargraph_v" )
 
     add_string( CFG_PREFIX "i_values", NULL, I_VALUES_TEXT, I_VALUES_LONGTEXT, false )
-    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true )
-    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, true )
+    add_integer( CFG_PREFIX "x", 0, POSX_TEXT, POSX_LONGTEXT, true )
+    add_integer( CFG_PREFIX "y", 0, POSY_TEXT, POSY_LONGTEXT, true )
     add_integer_with_range( CFG_PREFIX "transparency", 255, 0, 255, NULL,
         TRANS_TEXT, TRANS_LONGTEXT, false )
-    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, false )
+    add_integer( CFG_PREFIX "position", -1, POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions )
-    add_integer( CFG_PREFIX "alarm", 0, NULL, ALARM_TEXT, ALARM_LONGTEXT, true )
-    add_integer( CFG_PREFIX "barWidth", 10, NULL, BARWIDTH_TEXT, BARWIDTH_LONGTEXT, true )
+    add_integer( CFG_PREFIX "alarm", 0, ALARM_TEXT, ALARM_LONGTEXT, true )
+    add_integer( CFG_PREFIX "barWidth", 10, BARWIDTH_TEXT, BARWIDTH_LONGTEXT, true )
 
     /* video output filter submodule */
     add_submodule ()

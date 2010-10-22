@@ -200,17 +200,17 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
+    add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT,
                  CACHING_LONGTEXT, true )
         change_safe()
-    add_integer( "dvb-adapter", 0, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
+    add_integer( "dvb-adapter", 0, ADAPTER_TEXT, ADAPTER_LONGTEXT,
                  false )
-    add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
+    add_integer( "dvb-device", 0, DEVICE_TEXT, DEVICE_LONGTEXT,
                  true )
-    add_integer( "dvb-frequency", 0, NULL, FREQ_TEXT, FREQ_LONGTEXT,
+    add_integer( "dvb-frequency", 0, FREQ_TEXT, FREQ_LONGTEXT,
                  false )
         change_safe()
-    add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT, INVERSION_LONGTEXT,
+    add_integer( "dvb-inversion", 2, INVERSION_TEXT, INVERSION_LONGTEXT,
                  true )
     add_bool( "dvb-probe", true, NULL, PROBE_TEXT, PROBE_LONGTEXT, true )
     add_bool( "dvb-budget-mode", false, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
@@ -218,38 +218,38 @@ vlc_module_begin ()
     /* DVB-S (satellite) */
     add_string( "dvb-satellite", NULL, SATELLITE_TEXT, SATELLITE_LONGTEXT,
                 true )
-    add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
+    add_integer( "dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT,
                  true )
-    add_integer( "dvb-voltage", 13, NULL, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
+    add_integer( "dvb-voltage", 13, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
                  true )
     add_bool( "dvb-high-voltage", false, NULL, HIGH_VOLTAGE_TEXT,
               HIGH_VOLTAGE_LONGTEXT, true )
-    add_integer( "dvb-tone", -1, NULL, TONE_TEXT, TONE_LONGTEXT,
+    add_integer( "dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT,
                  true )
-    add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, true )
-    add_integer( "dvb-srate", 27500000, NULL, SRATE_TEXT, SRATE_LONGTEXT,
+    add_integer( "dvb-fec", 9, FEC_TEXT, FEC_LONGTEXT, true )
+    add_integer( "dvb-srate", 27500000, SRATE_TEXT, SRATE_LONGTEXT,
                  false )
-    add_integer( "dvb-lnb-lof1", 0, NULL, LNB_LOF1_TEXT,
+    add_integer( "dvb-lnb-lof1", 0, LNB_LOF1_TEXT,
                  LNB_LOF1_LONGTEXT, true )
-    add_integer( "dvb-lnb-lof2", 0, NULL, LNB_LOF2_TEXT,
+    add_integer( "dvb-lnb-lof2", 0, LNB_LOF2_TEXT,
                  LNB_LOF2_LONGTEXT, true )
-    add_integer( "dvb-lnb-slof", 0, NULL, LNB_SLOF_TEXT,
+    add_integer( "dvb-lnb-slof", 0, LNB_SLOF_TEXT,
                  LNB_SLOF_LONGTEXT, true )
     /* DVB-C (cable) */
-    add_integer( "dvb-modulation", 0, NULL, MODULATION_TEXT,
+    add_integer( "dvb-modulation", 0, MODULATION_TEXT,
                  MODULATION_LONGTEXT, true )
     /* DVB-T (terrestrial) */
-    add_integer( "dvb-code-rate-hp", 9, NULL, CODE_RATE_HP_TEXT,
+    add_integer( "dvb-code-rate-hp", 9, CODE_RATE_HP_TEXT,
                  CODE_RATE_HP_LONGTEXT, true )
-    add_integer( "dvb-code-rate-lp", 9, NULL, CODE_RATE_LP_TEXT,
+    add_integer( "dvb-code-rate-lp", 9, CODE_RATE_LP_TEXT,
                  CODE_RATE_LP_LONGTEXT, true )
-    add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
+    add_integer( "dvb-bandwidth", 0, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
                  true )
         change_safe()
-    add_integer( "dvb-guard", 0, NULL, GUARD_TEXT, GUARD_LONGTEXT, true )
-    add_integer( "dvb-transmission", 0, NULL, TRANSMISSION_TEXT,
+    add_integer( "dvb-guard", 0, GUARD_TEXT, GUARD_LONGTEXT, true )
+    add_integer( "dvb-transmission", 0, TRANSMISSION_TEXT,
                  TRANSMISSION_LONGTEXT, true )
-    add_integer( "dvb-hierarchy", 0, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
+    add_integer( "dvb-hierarchy", 0, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
                  true )
 #ifdef ENABLE_HTTPD
     /* MMI HTTP interface */

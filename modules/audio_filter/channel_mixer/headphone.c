@@ -78,7 +78,7 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
-    add_integer( "headphone-dim", 10, NULL, HEADPHONE_DIM_TEXT,
+    add_integer( "headphone-dim", 10, HEADPHONE_DIM_TEXT,
                  HEADPHONE_DIM_LONGTEXT, false )
     add_bool( "headphone-compensate", false, NULL, HEADPHONE_COMPENSATE_TEXT,
               HEADPHONE_COMPENSATE_LONGTEXT, true )

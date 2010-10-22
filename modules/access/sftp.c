@@ -66,10 +66,10 @@ vlc_module_begin ()
     set_capability( "access", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( "sftp-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
+    add_integer( "sftp-caching", 2 * DEFAULT_PTS_DELAY / 1000,
                      CACHING_TEXT, CACHING_LONGTEXT, true );
-    add_integer( "sftp-readsize", 8192, NULL, MTU_TEXT, MTU_LONGTEXT, true )
-    add_integer( "sftp-port", 22, NULL, PORT_TEXT, PORT_LONGTEXT, true )
+    add_integer( "sftp-readsize", 8192, MTU_TEXT, MTU_LONGTEXT, true )
+    add_integer( "sftp-port", 22, PORT_TEXT, PORT_LONGTEXT, true )
     add_shortcut( "sftp" )
     set_callbacks( Open, Close )
 vlc_module_end ()

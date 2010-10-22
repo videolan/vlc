@@ -55,7 +55,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_capability( "access", 60 )
 
-    add_integer( "bluray-caching", 1000, NULL,
+    add_integer( "bluray-caching", 1000,
         CACHING_TEXT, CACHING_LONGTEXT, true )
 
     add_shortcut( "bluray" )

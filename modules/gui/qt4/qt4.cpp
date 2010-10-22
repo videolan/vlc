@@ -220,7 +220,7 @@ vlc_module_begin ()
 #ifdef UPDATE_CHECK
     add_bool( "qt-updates-notif", true, NULL, UPDATER_TEXT,
               UPDATER_LONGTEXT, false )
-    add_integer( "qt-updates-days", 7, NULL, UPDATER_DAYS_TEXT,
+    add_integer( "qt-updates-days", 7, UPDATER_DAYS_TEXT,
                  UPDATER_DAYS_TEXT, false )
 #endif
     add_string( "qt-slider-colours", "255;255;255;20;210;20;255;199;15;245;39;29",
@@ -230,7 +230,7 @@ vlc_module_begin ()
               false )
         change_private ()
 
-    add_integer( "qt-fullscreen-screennumber", -1, NULL, FULLSCREEN_NUMBER_TEXT,
+    add_integer( "qt-fullscreen-screennumber", -1, FULLSCREEN_NUMBER_TEXT,
                FULLSCREEN_NUMBER_LONGTEXT, false );
 
     add_bool( "qt-autoload-extensions", true, NULL,

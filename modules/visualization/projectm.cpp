@@ -80,9 +80,9 @@ vlc_module_begin ()
     add_font( "projectm-menu-font", "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf",
               MENU_FONT_TXT, MENU_FONT_LONGTXT, true )
 #endif
-    add_integer( "projectm-width", 800, NULL, WIDTH_TEXT, WIDTH_LONGTEXT,
+    add_integer( "projectm-width", 800, WIDTH_TEXT, WIDTH_LONGTEXT,
                  false )
-    add_integer( "projectm-height", 640, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
+    add_integer( "projectm-height", 640, HEIGHT_TEXT, HEIGHT_LONGTEXT,
                  false )
     add_shortcut( "projectm" )
     set_callbacks( Open, Close )

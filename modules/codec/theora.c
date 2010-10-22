@@ -120,7 +120,7 @@ vlc_module_begin ()
     add_shortcut( "theora" )
 
 #   define ENC_CFG_PREFIX "sout-theora-"
-    add_integer( ENC_CFG_PREFIX "quality", 2, NULL, ENC_QUALITY_TEXT,
+    add_integer( ENC_CFG_PREFIX "quality", 2, ENC_QUALITY_TEXT,
                  ENC_QUALITY_LONGTEXT, false )
 vlc_module_end ()
 

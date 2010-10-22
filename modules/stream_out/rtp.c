@@ -197,18 +197,18 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "proto", "udp", PROTO_TEXT,
                 PROTO_LONGTEXT, false )
         change_string_list( ppsz_protos, ppsz_protocols, NULL )
-    add_integer( SOUT_CFG_PREFIX "port", 5004, NULL, PORT_TEXT,
+    add_integer( SOUT_CFG_PREFIX "port", 5004, PORT_TEXT,
                  PORT_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "port-audio", 0, NULL, PORT_AUDIO_TEXT,
+    add_integer( SOUT_CFG_PREFIX "port-audio", 0, PORT_AUDIO_TEXT,
                  PORT_AUDIO_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "port-video", 0, NULL, PORT_VIDEO_TEXT,
+    add_integer( SOUT_CFG_PREFIX "port-video", 0, PORT_VIDEO_TEXT,
                  PORT_VIDEO_LONGTEXT, true )
 
-    add_integer( SOUT_CFG_PREFIX "ttl", -1, NULL, TTL_TEXT,
+    add_integer( SOUT_CFG_PREFIX "ttl", -1, TTL_TEXT,
                  TTL_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "rtcp-mux", false, NULL,
               RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL,
+    add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
 
 #ifdef HAVE_SRTP

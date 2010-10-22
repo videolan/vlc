@@ -53,7 +53,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_description( N_("Dirac video demuxer" ) );
     set_capability( "demux", 50 );
-    add_integer( DEMUX_CFG_PREFIX DEMUX_DTSOFFSET, 0, NULL,
+    add_integer( DEMUX_CFG_PREFIX DEMUX_DTSOFFSET, 0,
                  DEMUX_DTSOFFSET_TEXT, DEMUX_DTSOFFSET_LONGTEXT, false )
     set_callbacks( Open, Close );
 vlc_module_end();

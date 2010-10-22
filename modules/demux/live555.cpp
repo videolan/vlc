@@ -113,7 +113,7 @@ vlc_module_begin ()
                   N_("Use RTP over RTSP (TCP)"),
                   N_("Use RTP over RTSP (TCP)"), true )
             change_safe()
-        add_integer( "rtp-client-port", -1, NULL,
+        add_integer( "rtp-client-port", -1,
                   N_("Client port"),
                   N_("Port to use for the RTP source of the session"), true )
         add_bool( "rtsp-mcast", false, NULL,
@@ -124,11 +124,11 @@ vlc_module_begin ()
                   N_("Tunnel RTSP and RTP over HTTP"),
                   N_("Tunnel RTSP and RTP over HTTP"), true )
             change_safe()
-        add_integer( "rtsp-http-port", 80, NULL,
+        add_integer( "rtsp-http-port", 80,
                   N_("HTTP tunnel port"),
                   N_("Port to use for tunneling the RTSP/RTP over HTTP."),
                   true )
-        add_integer("rtsp-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
+        add_integer("rtsp-caching", 4 * DEFAULT_PTS_DELAY / 1000,
                     CACHING_TEXT, CACHING_LONGTEXT, true )
             change_safe()
         add_bool(   "rtsp-kasenna", false, NULL, KASENNA_TEXT,

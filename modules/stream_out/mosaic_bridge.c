@@ -148,9 +148,9 @@ vlc_module_begin ()
 
     add_string( CFG_PREFIX "id", "Id", ID_TEXT, ID_LONGTEXT,
                 false )
-    add_integer( CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
+    add_integer( CFG_PREFIX "width", 0, WIDTH_TEXT,
                  WIDTH_LONGTEXT, true )
-    add_integer( CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
+    add_integer( CFG_PREFIX "height", 0, HEIGHT_TEXT,
                  HEIGHT_LONGTEXT, true )
     add_string( CFG_PREFIX "sar", "1:1", RATIO_TEXT,
                 RATIO_LONGTEXT, false )
@@ -162,8 +162,8 @@ vlc_module_begin ()
 
     add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255, NULL,
                             ALPHA_TEXT, ALPHA_LONGTEXT, false )
-    add_integer( CFG_PREFIX "x", -1, NULL, X_TEXT, X_LONGTEXT, false )
-    add_integer( CFG_PREFIX "y", -1, NULL, Y_TEXT, Y_LONGTEXT, false )
+    add_integer( CFG_PREFIX "x", -1, X_TEXT, X_LONGTEXT, false )
+    add_integer( CFG_PREFIX "y", -1, Y_TEXT, Y_LONGTEXT, false )
 
     set_callbacks( Open, Close )
 vlc_module_end ()

@@ -198,28 +198,28 @@ vlc_module_begin ()
     add_string( CFG_PREFIX "urls", NULL, MSG_TEXT, MSG_LONGTEXT, false )
 
     set_section( N_("Position"), NULL )
-    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true )
-    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, true )
-    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, false )
+    add_integer( CFG_PREFIX "x", 0, POSX_TEXT, POSX_LONGTEXT, true )
+    add_integer( CFG_PREFIX "y", 0, POSY_TEXT, POSY_LONGTEXT, true )
+    add_integer( CFG_PREFIX "position", -1, POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions )
 
     set_section( N_("Font"), NULL )
     /* 5 sets the default to top [1] left [4] */
     add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255, NULL,
         OPACITY_TEXT, OPACITY_LONGTEXT, false )
-    add_integer( CFG_PREFIX "color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT,
+    add_integer( CFG_PREFIX "color", 0xFFFFFF, COLOR_TEXT, COLOR_LONGTEXT,
                   false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
-    add_integer( CFG_PREFIX "size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT, false )
+    add_integer( CFG_PREFIX "size", -1, SIZE_TEXT, SIZE_LONGTEXT, false )
 
     set_section( N_("Misc"), NULL )
-    add_integer( CFG_PREFIX "speed", 100000, NULL, SPEED_TEXT, SPEED_LONGTEXT,
+    add_integer( CFG_PREFIX "speed", 100000, SPEED_TEXT, SPEED_LONGTEXT,
                  false )
-    add_integer( CFG_PREFIX "length", 60, NULL, LENGTH_TEXT, LENGTH_LONGTEXT,
+    add_integer( CFG_PREFIX "length", 60, LENGTH_TEXT, LENGTH_LONGTEXT,
                  false )
-    add_integer( CFG_PREFIX "ttl", 1800, NULL, TTL_TEXT, TTL_LONGTEXT, false )
+    add_integer( CFG_PREFIX "ttl", 1800, TTL_TEXT, TTL_LONGTEXT, false )
     add_bool( CFG_PREFIX "images", true, NULL, IMAGE_TEXT, IMAGE_LONGTEXT, false )
-    add_integer( CFG_PREFIX "title", default_title, NULL, TITLE_TEXT, TITLE_LONGTEXT, false )
+    add_integer( CFG_PREFIX "title", default_title, TITLE_TEXT, TITLE_LONGTEXT, false )
         change_integer_list( pi_title_modes, ppsz_title_modes )
 
     set_description( N_("RSS and Atom feed display") )

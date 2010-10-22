@@ -100,9 +100,9 @@ vlc_module_begin ()
     /* General options */
     add_string(  CFG_PREFIX "format", "png",
                  FORMAT_TEXT, FORMAT_LONGTEXT, false )
-    add_integer( CFG_PREFIX "width", -1, NULL,
+    add_integer( CFG_PREFIX "width", -1,
                  WIDTH_TEXT, WIDTH_LONGTEXT, true )
-    add_integer( CFG_PREFIX "height", -1, NULL,
+    add_integer( CFG_PREFIX "height", -1,
                  HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
     add_string(  CFG_PREFIX "prefix", "scene",
                  PREFIX_TEXT, PREFIX_LONGTEXT, false )
@@ -112,7 +112,7 @@ vlc_module_begin ()
                  REPLACE_TEXT, REPLACE_LONGTEXT, false )
 
     /* Snapshot method */
-    add_integer( CFG_PREFIX "ratio", 50, NULL,
+    add_integer( CFG_PREFIX "ratio", 50,
                  RATIO_TEXT, RATIO_LONGTEXT, false )
 
     set_callbacks( Create, Destroy )

@@ -95,7 +95,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
-    add_integer( "win32text-fontsize", 0, NULL, FONTSIZE_TEXT,
+    add_integer( "win32text-fontsize", 0, FONTSIZE_TEXT,
                  FONTSIZE_LONGTEXT, true )
 
     /* opacity valid on 0..255, with default 255 = fully opaque */
@@ -103,11 +103,11 @@ vlc_module_begin ()
         OPACITY_TEXT, OPACITY_LONGTEXT, false )
 
     /* hook to the color values list, with default 0x00ffffff = white */
-    add_integer( "win32text-color", 0x00FFFFFF, NULL, COLOR_TEXT,
+    add_integer( "win32text-color", 0x00FFFFFF, COLOR_TEXT,
                  COLOR_LONGTEXT, true )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
 
-    add_integer( "win32text-rel-fontsize", 16, NULL, FONTSIZER_TEXT,
+    add_integer( "win32text-rel-fontsize", 16, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, false )
         change_integer_list( pi_sizes, ppsz_sizes_text )
 

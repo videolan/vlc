@@ -85,7 +85,7 @@ vlc_module_begin ()
                 SERVER_TEXT, SERVER_LONGTEXT, false )
     add_password( "growl-password", PASS_DEFAULT,
                 PASS_TEXT, PASS_LONGTEXT, false )
-    add_integer( "growl-port", 9887, NULL,
+    add_integer( "growl-port", 9887,
                 PORT_TEXT, PORT_LONGTEXT, true )
 
     set_capability( "interface", 0 )

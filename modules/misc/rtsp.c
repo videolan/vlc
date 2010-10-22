@@ -89,9 +89,9 @@ vlc_module_begin ()
     add_string ( "rtsp-host", NULL, HOST_TEXT, HOST_LONGTEXT, true )
     add_string( "rtsp-raw-mux", "ts", RAWMUX_TEXT,
                 RAWMUX_TEXT, true )
-    add_integer( "rtsp-throttle-users", 0, NULL, THROTTLE_TEXT,
+    add_integer( "rtsp-throttle-users", 0, THROTTLE_TEXT,
                  THROTTLE_LONGTEXT, true )
-    add_integer( "rtsp-session-timeout", 5, NULL, SESSION_TIMEOUT_TEXT,
+    add_integer( "rtsp-session-timeout", 5, SESSION_TIMEOUT_TEXT,
                  SESSION_TIMEOUT_LONGTEXT, true )
 vlc_module_end ()
 

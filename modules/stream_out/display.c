@@ -61,7 +61,7 @@ vlc_module_begin ()
               AUDIO_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "video", true, NULL, VIDEO_TEXT,
               VIDEO_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "delay", 100, NULL, DELAY_TEXT,
+    add_integer( SOUT_CFG_PREFIX "delay", 100, DELAY_TEXT,
                  DELAY_LONGTEXT, true )
     set_callbacks( Open, Close )
 vlc_module_end ()

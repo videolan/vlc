@@ -163,7 +163,7 @@ vlc_module_begin ()
                 VENC_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "vcodec", NULL, VCODEC_TEXT,
                 VCODEC_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX "vb", 0, NULL, VB_TEXT,
+    add_integer( SOUT_CFG_PREFIX "vb", 0, VB_TEXT,
                  VB_LONGTEXT, false )
     add_float( SOUT_CFG_PREFIX "scale", 0, SCALE_TEXT,
                SCALE_LONGTEXT, false )
@@ -177,13 +177,13 @@ vlc_module_begin ()
                 DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT,
                 false )
         change_string_list( ppsz_deinterlace_type, 0, 0 )
-    add_integer( SOUT_CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
+    add_integer( SOUT_CFG_PREFIX "width", 0, WIDTH_TEXT,
                  WIDTH_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
+    add_integer( SOUT_CFG_PREFIX "height", 0, HEIGHT_TEXT,
                  HEIGHT_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "maxwidth", 0, NULL, MAXWIDTH_TEXT,
+    add_integer( SOUT_CFG_PREFIX "maxwidth", 0, MAXWIDTH_TEXT,
                  MAXWIDTH_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "maxheight", 0, NULL, MAXHEIGHT_TEXT,
+    add_integer( SOUT_CFG_PREFIX "maxheight", 0, MAXHEIGHT_TEXT,
                  MAXHEIGHT_LONGTEXT, true )
     add_module_list( SOUT_CFG_PREFIX "vfilter", "video filter2",
                      NULL, NULL,
@@ -194,13 +194,13 @@ vlc_module_begin ()
                 AENC_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "acodec", NULL, ACODEC_TEXT,
                 ACODEC_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX "ab", 96, NULL, AB_TEXT,
+    add_integer( SOUT_CFG_PREFIX "ab", 96, AB_TEXT,
                  AB_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "alang", NULL, ALANG_TEXT,
                 ALANG_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "channels", 0, NULL, ACHANS_TEXT,
+    add_integer( SOUT_CFG_PREFIX "channels", 0, ACHANS_TEXT,
                  ACHANS_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX "samplerate", 0, NULL, ARATE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "samplerate", 0, ARATE_TEXT,
                  ARATE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "audio-sync", false, NULL, ASYNC_TEXT,
               ASYNC_LONGTEXT, false )
@@ -224,7 +224,7 @@ vlc_module_begin ()
               OSD_LONGTEXT, false )
 
     set_section( N_("Miscellaneous"), NULL )
-    add_integer( SOUT_CFG_PREFIX "threads", 0, NULL, THREADS_TEXT,
+    add_integer( SOUT_CFG_PREFIX "threads", 0, THREADS_TEXT,
                  THREADS_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "high-priority", false, NULL, HP_TEXT, HP_LONGTEXT,
               true )

@@ -92,12 +92,11 @@ vlc_module_begin ()
     set_callbacks( VCDOpen, VCDClose )
 
     /* Configuration options */
-    add_integer ( MODULE_STRING "-debug", 0, NULL,
+    add_integer ( MODULE_STRING "-debug", 0,
                   N_("If nonzero, this gives additional debug information."),
                   DEBUG_LONGTEXT, true )
 
     add_integer ( MODULE_STRING "-blocks-per-read", 20,
-          NULL,
                   N_("Number of CD blocks to get in a single read."),
                   N_("Number of CD blocks to get in a single read."),
           true )

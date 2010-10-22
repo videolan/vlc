@@ -116,7 +116,7 @@ vlc_module_begin ()
                 false )
     add_password( "http-proxy-pwd", NULL,
                   PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT, false )
-    add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
+    add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_safe()
     add_string( "http-user-agent", NULL, NULL, NULL, false )
@@ -129,7 +129,7 @@ vlc_module_begin ()
         change_safe()
     add_bool( "http-forward-cookies", true, NULL, FORWARD_COOKIES_TEXT,
               FORWARD_COOKIES_LONGTEXT, true )
-    add_integer( "http-max-redirect", 5, NULL, MAX_REDIRECT_TEXT,
+    add_integer( "http-max-redirect", 5, MAX_REDIRECT_TEXT,
                  MAX_REDIRECT_LONGTEXT, true )
 #ifdef WIN32
     add_bool( "http-use-IE-proxy", false, NULL, USE_IE_PROXY_TEXT,

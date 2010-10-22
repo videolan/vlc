@@ -108,11 +108,11 @@ vlc_module_begin ()
     set_capability( "encoder", 100 )
     set_callbacks( OpenEncoder, CloseEncoder )
 
-    add_integer( ENC_CFG_PREFIX "mode", 0, NULL, ENC_MODE_TEXT,
+    add_integer( ENC_CFG_PREFIX "mode", 0, ENC_MODE_TEXT,
                  ENC_MODE_LONGTEXT, false )
         change_integer_list( pi_enc_mode_values, ppsz_enc_mode_descriptions )
 
-    add_integer( ENC_CFG_PREFIX "complexity", 3, NULL, ENC_COMPLEXITY_TEXT,
+    add_integer( ENC_CFG_PREFIX "complexity", 3, ENC_COMPLEXITY_TEXT,
                  ENC_COMPLEXITY_LONGTEXT, false )
         change_integer_range( 1, 10 )
 
@@ -123,7 +123,7 @@ vlc_module_begin ()
                ENC_QUALITY_LONGTEXT, false )
         change_float_range( 0.0, 10.0 )
 
-    add_integer( ENC_CFG_PREFIX "max-bitrate", 0, NULL, ENC_MAXBITRATE_TEXT,
+    add_integer( ENC_CFG_PREFIX "max-bitrate", 0, ENC_MAXBITRATE_TEXT,
                  ENC_MAXBITRATE_LONGTEXT, false )
 
     add_bool( ENC_CFG_PREFIX "vad", true, NULL, ENC_VAD_TEXT,

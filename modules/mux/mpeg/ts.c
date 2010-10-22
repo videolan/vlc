@@ -194,18 +194,18 @@ vlc_module_begin ()
     set_capability( "sout mux", 120 )
     add_shortcut( "ts" )
 
-    add_integer( SOUT_CFG_PREFIX "pid-video", 0, NULL,VPID_TEXT, VPID_LONGTEXT,
+    add_integer( SOUT_CFG_PREFIX "pid-video", 0,VPID_TEXT, VPID_LONGTEXT,
                                   true )
-    add_integer( SOUT_CFG_PREFIX "pid-audio", 0, NULL, APID_TEXT,
+    add_integer( SOUT_CFG_PREFIX "pid-audio", 0, APID_TEXT,
                  APID_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "pid-spu", 0, NULL, SPUPID_TEXT,
+    add_integer( SOUT_CFG_PREFIX "pid-spu", 0, SPUPID_TEXT,
                  SPUPID_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "pid-pmt", 0, NULL, PMTPID_TEXT,
+    add_integer( SOUT_CFG_PREFIX "pid-pmt", 0, PMTPID_TEXT,
                  PMTPID_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "tsid", 0, NULL, TSID_TEXT,
+    add_integer( SOUT_CFG_PREFIX "tsid", 0, TSID_TEXT,
                  TSID_LONGTEXT, true )
 #ifdef HAVE_DVBPSI_SDT
-    add_integer( SOUT_CFG_PREFIX "netid", 0, NULL, NETID_TEXT,
+    add_integer( SOUT_CFG_PREFIX "netid", 0, NETID_TEXT,
                  NETID_LONGTEXT, true )
 #endif
     add_string( SOUT_CFG_PREFIX "program-pmt", NULL, PMTPROG_TEXT,
@@ -219,18 +219,18 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "alignment", true, NULL, ALIGNMENT_TEXT,
               ALIGNMENT_LONGTEXT, true )
 
-    add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL, SHAPING_TEXT,
+    add_integer( SOUT_CFG_PREFIX "shaping", 200, SHAPING_TEXT,
                  SHAPING_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "use-key-frames", false, NULL, KEYF_TEXT,
               KEYF_LONGTEXT, true )
 
-    add_integer( SOUT_CFG_PREFIX "pcr", 70, NULL, PCR_TEXT, PCR_LONGTEXT,
+    add_integer( SOUT_CFG_PREFIX "pcr", 70, PCR_TEXT, PCR_LONGTEXT,
                  true )
-    add_integer( SOUT_CFG_PREFIX "bmin", 0, NULL, BMIN_TEXT, BMIN_LONGTEXT,
+    add_integer( SOUT_CFG_PREFIX "bmin", 0, BMIN_TEXT, BMIN_LONGTEXT,
                  true )
-    add_integer( SOUT_CFG_PREFIX "bmax", 0, NULL, BMAX_TEXT, BMAX_LONGTEXT,
+    add_integer( SOUT_CFG_PREFIX "bmax", 0, BMAX_TEXT, BMAX_LONGTEXT,
                  true )
-    add_integer( SOUT_CFG_PREFIX "dts-delay", 400, NULL, DTS_TEXT,
+    add_integer( SOUT_CFG_PREFIX "dts-delay", 400, DTS_TEXT,
                  DTS_LONGTEXT, true )
 
     add_bool( SOUT_CFG_PREFIX "crypt-audio", true, NULL, ACRYPT_TEXT,
@@ -244,7 +244,7 @@ vlc_module_begin ()
                 true )
     add_string( SOUT_CFG_PREFIX "csa-use", "1", CU_TEXT, CU_LONGTEXT,
                 true )
-    add_integer( SOUT_CFG_PREFIX "csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, true )
+    add_integer( SOUT_CFG_PREFIX "csa-pkt", 188, CPKT_TEXT, CPKT_LONGTEXT, true )
 
     set_callbacks( Open, Close )
 vlc_module_end ()

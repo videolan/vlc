@@ -53,7 +53,7 @@ vlc_module_begin ()
     set_shortname( N_("Real RTSP") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( "realrtsp-caching", 3000, NULL,
+    add_integer( "realrtsp-caching", 3000,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_safe()
     set_capability( "access", 10 )

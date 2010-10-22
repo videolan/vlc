@@ -77,7 +77,7 @@ vlc_module_begin()
               NETSYNC_TEXT, NETSYNC_LONGTEXT, true)
     add_string("netsync-master-ip", NULL, MIP_TEXT, MIP_LONGTEXT,
                 true)
-    add_integer("netsync-timeout", 500, NULL,
+    add_integer("netsync-timeout", 500,
                  NETSYNC_TIMEOUT_TEXT, NETSYNC_TIMEOUT_LONGTEXT, true)
 
     set_capability("interface", 0)

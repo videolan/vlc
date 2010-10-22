@@ -345,7 +345,7 @@ enum vlc_module_properties
     change_integer_range (i_subcategory /* gruik */, 0);
 #endif
 
-#define add_integer( name, value, p_callback, text, longtext, advc ) \
+#define add_integer( name, value, text, longtext, advc ) \
     add_int_inner( CONFIG_ITEM_INTEGER, name, text, longtext, advc, value )
 
 #define add_key( name, value, p_callback, text, longtext, advc ) \
@@ -354,7 +354,7 @@ enum vlc_module_properties
                    KEY_UNSET )
 
 #define add_integer_with_range( name, value, i_min, i_max, p_callback, text, longtext, advc ) \
-    add_integer( name, value, p_callback, text, longtext, advc ) \
+    add_integer( name, value, text, longtext, advc ) \
     change_integer_range( i_min, i_max )
 
 #define add_float( name, v, text, longtext, advc ) \

@@ -70,7 +70,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_callbacks( OpenScaler, CloseScaler )
-    add_integer( "swscale-mode", 2, NULL, SCALEMODE_TEXT, SCALEMODE_LONGTEXT, true )
+    add_integer( "swscale-mode", 2, SCALEMODE_TEXT, SCALEMODE_LONGTEXT, true )
         change_integer_list( pi_mode_values, ppsz_mode_descriptions )
 vlc_module_end ()
 

@@ -58,7 +58,7 @@ vlc_module_begin ()
     set_capability( "decoder", 50 )
     set_callbacks( DecoderOpen, DecoderClose )
 
-    add_integer ( MODULE_STRING "-debug", 0, NULL,
+    add_integer ( MODULE_STRING "-debug", 0,
                   DEBUG_TEXT, DEBUG_LONGTEXT, true )
 
     add_submodule ()

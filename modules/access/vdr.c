@@ -104,9 +104,9 @@ vlc_module_begin ()
     set_help( HELP_TEXT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_description( N_("VDR recordings") )
-    add_integer( "vdr-caching", 5 * DEFAULT_PTS_DELAY / 1000, NULL,
+    add_integer( "vdr-caching", 5 * DEFAULT_PTS_DELAY / 1000,
         CACHING_TEXT, CACHING_LONGTEXT, true )
-    add_integer( "vdr-chapter-offset", 0, NULL,
+    add_integer( "vdr-chapter-offset", 0,
         CHAPTER_OFFSET_TEXT, CHAPTER_OFFSET_LONGTEXT, true )
     add_float_with_range( "vdr-fps", 25, 1, 1000, NULL,
         FPS_TEXT, FPS_LONGTEXT, true )

@@ -119,12 +119,12 @@ vlc_module_begin ()
 
     add_integer_with_range( "crop-ratio", 0, 0, RATIO_MAX, NULL, RATIO_TEXT,
                             RATIO_LONGTEXT, false )
-    add_integer( "autocrop-time", 25, NULL, TIME_TEXT,
+    add_integer( "autocrop-time", 25, TIME_TEXT,
                  TIME_LONGTEXT, true )
-    add_integer( "autocrop-diff", 16, NULL, DIFF_TEXT,
+    add_integer( "autocrop-diff", 16, DIFF_TEXT,
                                             DIFF_LONGTEXT, true )
 
-    add_integer( "autocrop-non-black-pixels", 3, NULL,
+    add_integer( "autocrop-non-black-pixels", 3,
                  NBP_TEXT, NBP_LONGTEXT, true )
 
     add_integer_with_range( "autocrop-skip-percent", 17, 0, 100, NULL,

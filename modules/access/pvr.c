@@ -132,38 +132,38 @@ vlc_module_begin ()
     set_capability( "access", 0 )
     add_shortcut( "pvr" )
 
-    add_integer( "pvr-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
+    add_integer( "pvr-caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT,
                  CACHING_LONGTEXT, true )
     add_string( "pvr-device", "/dev/video0", DEVICE_TEXT,
                  DEVICE_LONGTEXT, false )
     add_string( "pvr-radio-device", "/dev/radio0", RADIO_DEVICE_TEXT,
                  RADIO_DEVICE_LONGTEXT, false )
-    add_integer( "pvr-norm", V4L2_STD_UNKNOWN , NULL, NORM_TEXT,
+    add_integer( "pvr-norm", V4L2_STD_UNKNOWN , NORM_TEXT,
                  NORM_LONGTEXT, false )
        change_integer_list( i_norm_list, psz_norm_list_text )
-    add_integer( "pvr-width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true )
-    add_integer( "pvr-height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
+    add_integer( "pvr-width", -1, WIDTH_TEXT, WIDTH_LONGTEXT, true )
+    add_integer( "pvr-height", -1, HEIGHT_TEXT, HEIGHT_LONGTEXT,
                  true )
-    add_integer( "pvr-frequency", -1, NULL, FREQUENCY_TEXT, FREQUENCY_LONGTEXT,
+    add_integer( "pvr-frequency", -1, FREQUENCY_TEXT, FREQUENCY_LONGTEXT,
                  false )
-    add_integer( "pvr-framerate", -1, NULL, FRAMERATE_TEXT, FRAMERATE_LONGTEXT,
+    add_integer( "pvr-framerate", -1, FRAMERATE_TEXT, FRAMERATE_LONGTEXT,
                  true )
-    add_integer( "pvr-keyint", -1, NULL, KEYINT_TEXT, KEYINT_LONGTEXT,
+    add_integer( "pvr-keyint", -1, KEYINT_TEXT, KEYINT_LONGTEXT,
                  true )
-    add_integer( "pvr-bframes", -1, NULL, FRAMERATE_TEXT, FRAMERATE_LONGTEXT,
+    add_integer( "pvr-bframes", -1, FRAMERATE_TEXT, FRAMERATE_LONGTEXT,
                  true )
-    add_integer( "pvr-bitrate", -1, NULL, BITRATE_TEXT, BITRATE_LONGTEXT,
+    add_integer( "pvr-bitrate", -1, BITRATE_TEXT, BITRATE_LONGTEXT,
                  false )
-    add_integer( "pvr-bitrate-peak", -1, NULL, BITRATE_PEAK_TEXT,
+    add_integer( "pvr-bitrate-peak", -1, BITRATE_PEAK_TEXT,
                  BITRATE_PEAK_LONGTEXT, true )
-    add_integer( "pvr-bitrate-mode", -1, NULL, BITRATE_MODE_TEXT,
+    add_integer( "pvr-bitrate-mode", -1, BITRATE_MODE_TEXT,
                  BITRATE_MODE_LONGTEXT, true )
         change_integer_list( i_bitrates, psz_bitrates_list_text )
-    add_integer( "pvr-audio-bitmask", -1, NULL, BITMASK_TEXT,
+    add_integer( "pvr-audio-bitmask", -1, BITMASK_TEXT,
                  BITMASK_LONGTEXT, true )
-    add_integer( "pvr-audio-volume", -1, NULL, VOLUME_TEXT,
+    add_integer( "pvr-audio-volume", -1, VOLUME_TEXT,
                  VOLUME_LONGTEXT, true )
-    add_integer( "pvr-channel", -1, NULL, CHAN_TEXT, CHAN_LONGTEXT, true )
+    add_integer( "pvr-channel", -1, CHAN_TEXT, CHAN_LONGTEXT, true )
 
     set_callbacks( Open, Close )
 vlc_module_end ()

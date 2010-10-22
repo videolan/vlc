@@ -163,7 +163,7 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
     set_callbacks( Open, Close )
-    add_integer( "macosx-audio-device", 0, NULL, ADEV_TEXT, ADEV_LONGTEXT, false )
+    add_integer( "macosx-audio-device", 0, ADEV_TEXT, ADEV_LONGTEXT, false )
 vlc_module_end ()
 
 /*****************************************************************************

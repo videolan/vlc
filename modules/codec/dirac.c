@@ -212,7 +212,7 @@ vlc_module_begin()
                ENC_QUALITY_FACTOR_TEXT, ENC_QUALITY_FACTOR_LONGTEXT, false )
     change_float_range(0., 10.);
 
-    add_integer( ENC_CFG_PREFIX ENC_TARGETRATE, -1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_TARGETRATE, -1,
                  ENC_TARGETRATE_TEXT, ENC_TARGETRATE_LONGTEXT, false )
     change_integer_range(-1, INT_MAX);
 
@@ -223,7 +223,7 @@ vlc_module_begin()
                 ENC_PREFILTER_TEXT, ENC_PREFILTER_LONGTEXT, false )
     change_string_list( enc_prefilter_list, enc_prefilter_list_text, 0 );
 
-    add_integer( ENC_CFG_PREFIX ENC_PREFILTER_STRENGTH, 1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_PREFILTER_STRENGTH, 1,
                  ENC_PREFILTER_STRENGTH_TEXT, ENC_PREFILTER_STRENGTH_LONGTEXT, false )
     change_integer_range(0, 10);
 
@@ -231,11 +231,11 @@ vlc_module_begin()
                 ENC_CHROMAFMT_TEXT, ENC_CHROMAFMT_LONGTEXT, false )
     change_string_list( enc_chromafmt_list, enc_chromafmt_list_text, 0 );
 
-    add_integer( ENC_CFG_PREFIX ENC_L1SEP, -1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_L1SEP, -1,
                  ENC_L1SEP_TEXT, ENC_L1SEP_LONGTEXT, false )
     change_integer_range(-1, INT_MAX);
 
-    add_integer( ENC_CFG_PREFIX ENC_L1NUM, -1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_L1NUM, -1,
                  ENC_L1NUM_TEXT, ENC_L1NUM_LONGTEXT, false )
     change_integer_range(-1, INT_MAX);
 
@@ -247,24 +247,24 @@ vlc_module_begin()
                 ENC_MVPREC_TEXT, ENC_MVPREC_LONGTEXT, false )
     change_string_list( enc_mvprec_list, enc_mvprec_list, 0 );
 
-    add_integer( ENC_CFG_PREFIX ENC_MCBLK_WIDTH, -1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_MCBLK_WIDTH, -1,
                  ENC_MCBLK_WIDTH_TEXT, ENC_MCBLK_WIDTH_LONGTEXT, false )
     change_integer_range(-1, INT_MAX);
 
-    add_integer( ENC_CFG_PREFIX ENC_MCBLK_HEIGHT, -1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_MCBLK_HEIGHT, -1,
                  ENC_MCBLK_HEIGHT, ENC_MCBLK_HEIGHT_LONGTEXT, false )
     change_integer_range(-1, INT_MAX);
 
-    add_integer( ENC_CFG_PREFIX ENC_MCBLK_OVERLAP, -1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_MCBLK_OVERLAP, -1,
                  ENC_MCBLK_OVERLAP_TEXT, ENC_MCBLK_OVERLAP_LONGTEXT, false )
     change_integer_range(-1, 100);
 
     /* advanced option only */
-    add_integer( ENC_CFG_PREFIX ENC_MCBLK_XBLEN, -1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_MCBLK_XBLEN, -1,
                  ENC_MCBLK_XBLEN_TEXT, ENC_MCBLK_XBLEN_LONGTEXT, true )
     change_integer_range(-1, INT_MAX);
     /* advanced option only */
-    add_integer( ENC_CFG_PREFIX ENC_MCBLK_YBLEN, -1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_MCBLK_YBLEN, -1,
                  ENC_MCBLK_YBLEN_TEXT, ENC_MCBLK_YBLEN_LONGTEXT, true )
     change_integer_range(-1, INT_MAX);
 
@@ -276,27 +276,27 @@ vlc_module_begin()
               ENC_ME_COMBINED_TEXT, ENC_ME_COMBINED_LONGTEXT, false )
 #endif
 
-    add_integer( ENC_CFG_PREFIX ENC_DWTINTRA, -1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_DWTINTRA, -1,
                  ENC_DWTINTRA_TEXT, ENC_DWTINTRA_LONGTEXT, false )
     change_integer_range(-1, 6);
 
-    add_integer( ENC_CFG_PREFIX ENC_DWTINTER, -1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_DWTINTER, -1,
                  ENC_DWTINTER_TEXT, ENC_DWTINTER_LONGTEXT, false )
     change_integer_range(-1, 6);
 
-    add_integer( ENC_CFG_PREFIX ENC_DWTDEPTH, -1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_DWTDEPTH, -1,
                  ENC_DWTDEPTH_TEXT, ENC_DWTDEPTH_LONGTEXT, false )
     change_integer_range(-1, 4);
 
     /* advanced option only */
     /* NB, unforunately vlc doesn't have a concept of 'dont care' */
-    add_integer( ENC_CFG_PREFIX ENC_MULTIQUANT, -1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_MULTIQUANT, -1,
                  ENC_MULTIQUANT_TEXT, ENC_MULTIQUANT_LONGTEXT, true )
     change_integer_range(-1, 1);
 
     /* advanced option only */
     /* NB, unforunately vlc doesn't have a concept of 'dont care' */
-    add_integer( ENC_CFG_PREFIX ENC_SPARTITION, -1, NULL,
+    add_integer( ENC_CFG_PREFIX ENC_SPARTITION, -1,
                  ENC_SPARTITION_TEXT, ENC_SPARTITION_LONGTEXT, true )
     change_integer_range(-1, 1);
 

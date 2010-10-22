@@ -1583,10 +1583,10 @@ const char vlc_usage[] = N_(
  * add_savefile( option_name, psz_value, N_(text), N_(longtext) )
  * add_module( option_name, psz_value, i_capability, p_callback,
  *             N_(text), N_(longtext) )
- * add_integer( option_name, i_value, p_callback, N_(text), N_(longtext),
-                b_advanced_option )
+ * add_integer( option_name, i_value, N_(text), N_(longtext),
+ *              b_advanced_option )
  * add_bool( option_name, b_value, p_callback, N_(text), N_(longtext),
-             b_advanced_option )
+ *           b_advanced_option )
  */
 
 vlc_module_begin ()
@@ -1603,17 +1603,17 @@ vlc_module_begin ()
     add_integer_with_range( "volume-step", AOUT_VOLUME_STEP, AOUT_VOLUME_MIN,
                             AOUT_VOLUME_MAX, NULL, VOLUME_STEP_TEXT,
                             VOLUME_STEP_LONGTEXT, true )
-    add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT,
+    add_integer( "aout-rate", -1, AOUT_RATE_TEXT,
                  AOUT_RATE_LONGTEXT, true )
 #if HAVE_FPU && !defined( __APPLE__ )
     add_bool( "hq-resampling", 1, NULL, AOUT_RESAMP_TEXT,
               AOUT_RESAMP_LONGTEXT, true )
 #endif
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, false )
-    add_integer( "force-dolby-surround", 0, NULL, FORCE_DOLBY_TEXT,
+    add_integer( "force-dolby-surround", 0, FORCE_DOLBY_TEXT,
                  FORCE_DOLBY_LONGTEXT, false )
         change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions )
-    add_integer( "audio-desync", 0, NULL, DESYNC_TEXT,
+    add_integer( "audio-desync", 0, DESYNC_TEXT,
                  DESYNC_LONGTEXT, true )
         change_safe ()
 
@@ -1702,15 +1702,15 @@ vlc_module_begin ()
     add_bool( "video-title-show", 1, NULL, VIDEO_TITLE_SHOW_TEXT,
               VIDEO_TITLE_SHOW_LONGTEXT, false )
         change_safe()
-    add_integer( "video-title-timeout", 5000, NULL, VIDEO_TITLE_TIMEOUT_TEXT,
+    add_integer( "video-title-timeout", 5000, VIDEO_TITLE_TIMEOUT_TEXT,
                  VIDEO_TITLE_TIMEOUT_LONGTEXT, false )
         change_safe()
-    add_integer( "video-title-position", 8, NULL, VIDEO_TITLE_POSITION_TEXT,
+    add_integer( "video-title-position", 8, VIDEO_TITLE_POSITION_TEXT,
                  VIDEO_TITLE_POSITION_LONGTEXT, false )
         change_safe()
         change_integer_list( pi_pos_values, ppsz_pos_descriptions )
     // autohide after 1.5s
-    add_integer( "mouse-hide-timeout", 1500, NULL, MOUSE_HIDE_TIMEOUT_TEXT,
+    add_integer( "mouse-hide-timeout", 1500, MOUSE_HIDE_TIMEOUT_TEXT,
                  MOUSE_HIDE_TIMEOUT_LONGTEXT, false )
     set_section( N_("Snapshot") , NULL )
     add_directory( "snapshot-path", NULL, SNAP_PATH_TEXT,
@@ -1724,19 +1724,19 @@ vlc_module_begin ()
               SNAP_PREVIEW_LONGTEXT, false )
     add_bool( "snapshot-sequential", false, NULL, SNAP_SEQUENTIAL_TEXT,
               SNAP_SEQUENTIAL_LONGTEXT, false )
-    add_integer( "snapshot-width", -1, NULL, SNAP_WIDTH_TEXT,
+    add_integer( "snapshot-width", -1, SNAP_WIDTH_TEXT,
                  SNAP_WIDTH_LONGTEXT, true )
-    add_integer( "snapshot-height", -1, NULL, SNAP_HEIGHT_TEXT,
+    add_integer( "snapshot-height", -1, SNAP_HEIGHT_TEXT,
                  SNAP_HEIGHT_LONGTEXT, true )
 
     set_section( N_("Window properties" ), NULL )
-    add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true )
+    add_integer( "width", -1, WIDTH_TEXT, WIDTH_LONGTEXT, true )
         change_safe ()
-    add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
+    add_integer( "height", -1, HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
         change_safe ()
-    add_integer( "video-x", 0, NULL, VIDEOX_TEXT, VIDEOX_LONGTEXT, true )
+    add_integer( "video-x", 0, VIDEOX_TEXT, VIDEOX_LONGTEXT, true )
         change_safe ()
-    add_integer( "video-y", 0, NULL, VIDEOY_TEXT, VIDEOY_LONGTEXT, true )
+    add_integer( "video-y", 0, VIDEOY_TEXT, VIDEOY_LONGTEXT, true )
         change_safe ()
     add_string( "crop", NULL, CROP_TEXT, CROP_LONGTEXT, false )
         change_safe ()
@@ -1758,10 +1758,10 @@ vlc_module_begin ()
               VIDEO_DECO_LONGTEXT, true )
     add_string( "video-title", NULL, VIDEO_TITLE_TEXT,
                  VIDEO_TITLE_LONGTEXT, true )
-    add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, true )
+    add_integer( "align", 0, ALIGN_TEXT, ALIGN_LONGTEXT, true )
         change_integer_list( pi_align_values, ppsz_align_descriptions )
     add_float( "zoom", 1, ZOOM_TEXT, ZOOM_LONGTEXT, true )
-    add_integer( "deinterlace", 0, NULL,
+    add_integer( "deinterlace", 0,
                  DEINTERLACE_TEXT, DEINTERLACE_LONGTEXT, false )
         change_integer_list( pi_deinterlace, ppsz_deinterlace_text )
         change_safe()
@@ -1801,7 +1801,7 @@ vlc_module_begin ()
         change_safe()
     add_bool( "sub-autodetect-file", true, NULL,
                  SUB_AUTO_TEXT, SUB_AUTO_LONGTEXT, false )
-    add_integer( "sub-autodetect-fuzzy", 3, NULL,
+    add_integer( "sub-autodetect-fuzzy", 3,
                  SUB_FUZZY_TEXT, SUB_FUZZY_LONGTEXT, true )
 #ifdef WIN32
 #   define SUB_PATH ".\\subtitles"
@@ -1810,7 +1810,7 @@ vlc_module_begin ()
 #endif
     add_string( "sub-autodetect-path", SUB_PATH,
                  SUB_PATH_TEXT, SUB_PATH_LONGTEXT, true )
-    add_integer( "sub-margin", 0, NULL, SUB_MARGIN_TEXT,
+    add_integer( "sub-margin", 0, SUB_MARGIN_TEXT,
                  SUB_MARGIN_LONGTEXT, true )
     set_section( N_( "Overlays" ) , NULL )
     add_module_list_cat( "sub-filter", SUBCAT_VIDEO_SUBPIC, NULL, NULL,
@@ -1821,16 +1821,16 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_GENERAL )
 
     set_section( N_( "Track settings" ), NULL )
-    add_integer( "program", 0, NULL,
+    add_integer( "program", 0,
                  INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT, true )
         change_safe ()
     add_string( "programs", "",
                 INPUT_PROGRAMS_TEXT, INPUT_PROGRAMS_LONGTEXT, true )
         change_safe ()
-    add_integer( "audio-track", -1, NULL,
+    add_integer( "audio-track", -1,
                  INPUT_AUDIOTRACK_TEXT, INPUT_AUDIOTRACK_LONGTEXT, true )
         change_safe ()
-    add_integer( "sub-track", -1, NULL,
+    add_integer( "sub-track", -1,
                  INPUT_SUBTRACK_TEXT, INPUT_SUBTRACK_LONGTEXT, true )
         change_safe ()
     add_string( "audio-language", "",
@@ -1841,15 +1841,15 @@ vlc_module_begin ()
                  INPUT_SUBTRACK_LANG_TEXT, INPUT_SUBTRACK_LANG_LONGTEXT,
                   false )
         change_safe ()
-    add_integer( "audio-track-id", -1, NULL, INPUT_AUDIOTRACK_ID_TEXT,
+    add_integer( "audio-track-id", -1, INPUT_AUDIOTRACK_ID_TEXT,
                  INPUT_AUDIOTRACK_ID_LONGTEXT, true )
         change_safe ()
-    add_integer( "sub-track-id", -1, NULL,
+    add_integer( "sub-track-id", -1,
                  INPUT_SUBTRACK_ID_TEXT, INPUT_SUBTRACK_ID_LONGTEXT, true )
         change_safe ()
 
     set_section( N_( "Playback control" ) , NULL)
-    add_integer( "input-repeat", 0, NULL,
+    add_integer( "input-repeat", 0,
                  INPUT_REPEAT_TEXT, INPUT_REPEAT_LONGTEXT, false )
         change_safe ()
     add_float( "start-time", 0,
@@ -1887,14 +1887,14 @@ vlc_module_begin ()
 
     set_section( N_( "Network settings" ), NULL )
 
-    add_integer( "server-port", 1234, NULL,
+    add_integer( "server-port", 1234,
                  SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, false )
-    add_integer( "mtu", MTU_DEFAULT, NULL, MTU_TEXT, MTU_LONGTEXT, true )
+    add_integer( "mtu", MTU_DEFAULT, MTU_TEXT, MTU_LONGTEXT, true )
     add_bool( "ipv6", 0, NULL, IPV6_TEXT, IPV6_LONGTEXT, false )
         change_short('6')
     add_bool( "ipv4", 0, NULL, IPV4_TEXT, IPV4_LONGTEXT, false )
         change_short('4')
-    add_integer( "ipv4-timeout", 5 * 1000, NULL, TIMEOUT_TEXT,
+    add_integer( "ipv4-timeout", 5 * 1000, TIMEOUT_TEXT,
                  TIMEOUT_LONGTEXT, true )
 
     set_section( N_( "Socks proxy") , NULL )
@@ -1934,12 +1934,12 @@ vlc_module_begin ()
 
     set_section( N_( "Advanced" ), NULL )
 
-    add_integer( "cr-average", 40, NULL, CR_AVERAGE_TEXT,
+    add_integer( "cr-average", 40, CR_AVERAGE_TEXT,
                  CR_AVERAGE_LONGTEXT, true )
-    add_integer( "clock-synchro", -1, NULL, CLOCK_SYNCHRO_TEXT,
+    add_integer( "clock-synchro", -1, CLOCK_SYNCHRO_TEXT,
                  CLOCK_SYNCHRO_LONGTEXT, true )
         change_integer_list( pi_clock_values, ppsz_clock_descriptions )
-    add_integer( "clock-jitter", 5 * CLOCK_FREQ/1000, NULL, CLOCK_JITTER_TEXT,
+    add_integer( "clock-jitter", 5 * CLOCK_FREQ/1000, CLOCK_JITTER_TEXT,
               CLOCK_JITTER_LONGTEXT, true )
         change_safe()
 
@@ -1953,7 +1953,7 @@ vlc_module_begin ()
 
     add_string( "input-timeshift-path", NULL, INPUT_TIMESHIFT_PATH_TEXT,
                 INPUT_TIMESHIFT_PATH_LONGTEXT, true )
-    add_integer( "input-timeshift-granularity", -1, NULL, INPUT_TIMESHIFT_GRANULARITY_TEXT,
+    add_integer( "input-timeshift-granularity", -1, INPUT_TIMESHIFT_GRANULARITY_TEXT,
                  INPUT_TIMESHIFT_GRANULARITY_LONGTEXT, true )
 
 /* Decoder options */
@@ -2000,7 +2000,7 @@ vlc_module_begin ()
                                 SOUT_VIDEO_LONGTEXT, true )
     add_bool( "sout-spu", 1, NULL, SOUT_SPU_TEXT,
                                 SOUT_SPU_LONGTEXT, true )
-    add_integer( "sout-mux-caching", 1500, NULL, SOUT_MUX_CACHING_TEXT,
+    add_integer( "sout-mux-caching", 1500, SOUT_MUX_CACHING_TEXT,
                                 SOUT_MUX_CACHING_LONGTEXT, true )
 
     set_section( N_("VLM"), NULL )
@@ -2016,10 +2016,10 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_ACO )
     add_module( "access_output", "sout access", NULL, NULL,
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, true )
-    add_integer( "ttl", -1, NULL, TTL_TEXT, TTL_LONGTEXT, true )
+    add_integer( "ttl", -1, TTL_TEXT, TTL_LONGTEXT, true )
     add_string( "miface", NULL, MIFACE_TEXT, MIFACE_LONGTEXT, true )
     add_string( "miface-addr", NULL, MIFACE_ADDR_TEXT, MIFACE_ADDR_LONGTEXT, true )
-    add_integer( "dscp", 0, NULL, DSCP_TEXT, DSCP_LONGTEXT, true )
+    add_integer( "dscp", 0, DSCP_TEXT, DSCP_LONGTEXT, true )
 
     set_subcategory( SUBCAT_SOUT_PACKETIZER )
     add_module( "packetizer","packetizer", NULL, NULL,
@@ -2027,7 +2027,7 @@ vlc_module_begin ()
 
     set_subcategory( SUBCAT_SOUT_SAP )
     add_obsolete_bool( "sap-flow-control" )
-    add_integer( "sap-interval", 5, NULL, ANN_SAPINTV_TEXT,
+    add_integer( "sap-interval", 5, ANN_SAPINTV_TEXT,
                                ANN_SAPINTV_LONGTEXT, true )
 
     set_subcategory( SUBCAT_SOUT_VOD )
@@ -2095,7 +2095,7 @@ vlc_module_begin ()
 #endif
 
 #if !defined(SYS_BEOS) && defined(LIBVLC_USE_PTHREAD)
-    add_integer( "rt-offset", 0, NULL, RT_OFFSET_TEXT,
+    add_integer( "rt-offset", 0, RT_OFFSET_TEXT,
                  RT_OFFSET_LONGTEXT, true )
         change_need_restart ()
 #endif
@@ -2155,7 +2155,7 @@ vlc_module_begin ()
     add_bool( "auto-preparse", true, NULL, PREPARSE_TEXT,
               PREPARSE_LONGTEXT, false )
 
-    add_integer( "album-art", ALBUM_ART_WHEN_ASKED, NULL, ALBUM_ART_TEXT,
+    add_integer( "album-art", ALBUM_ART_WHEN_ASKED, ALBUM_ART_TEXT,
                  ALBUM_ART_LONGTEXT, false )
         change_integer_list( pi_albumart_values,
                              ppsz_albumart_descriptions )
@@ -2169,7 +2169,7 @@ vlc_module_begin ()
 /* Interface options */
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_GENERAL )
-    add_integer( "verbose", 0, NULL, VERBOSE_TEXT, VERBOSE_LONGTEXT,
+    add_integer( "verbose", 0, VERBOSE_TEXT, VERBOSE_LONGTEXT,
                  false )
         change_short('v')
     add_string( "verbose-objects", 0, VERBOSE_OBJECTS_TEXT, VERBOSE_OBJECTS_LONGTEXT,
@@ -2676,13 +2676,13 @@ vlc_module_begin ()
         ZOOM_DOUBLE_KEY_TEXT,   NULL, false )
 
     set_section ( N_("Jump sizes" ), NULL )
-    add_integer( "extrashort-jump-size", 3, NULL, JIEXTRASHORT_TEXT,
+    add_integer( "extrashort-jump-size", 3, JIEXTRASHORT_TEXT,
                                     JIEXTRASHORT_LONGTEXT, false )
-    add_integer( "short-jump-size", 10, NULL, JISHORT_TEXT,
+    add_integer( "short-jump-size", 10, JISHORT_TEXT,
                                     JISHORT_LONGTEXT, false )
-    add_integer( "medium-jump-size", 60, NULL, JIMEDIUM_TEXT,
+    add_integer( "medium-jump-size", 60, JIMEDIUM_TEXT,
                                     JIMEDIUM_LONGTEXT, false )
-    add_integer( "long-jump-size", 300, NULL, JILONG_TEXT,
+    add_integer( "long-jump-size", 300, JILONG_TEXT,
                                     JILONG_LONGTEXT, false )
 
     /* HACK so these don't get displayed */

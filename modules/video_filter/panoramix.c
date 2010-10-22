@@ -82,8 +82,8 @@ vlc_module_begin()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    add_integer( CFG_PREFIX "cols", -1, NULL, COLS_TEXT, COLS_LONGTEXT, true )
-    add_integer( CFG_PREFIX "rows", -1, NULL, ROWS_TEXT, ROWS_LONGTEXT, true )
+    add_integer( CFG_PREFIX "cols", -1, COLS_TEXT, COLS_LONGTEXT, true )
+    add_integer( CFG_PREFIX "rows", -1, ROWS_TEXT, ROWS_LONGTEXT, true )
 
 #ifdef OVERLAP
 #define LENGTH_TEXT N_("length of the overlapping area (in %)")

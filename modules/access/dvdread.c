@@ -76,9 +76,9 @@ vlc_module_begin ()
     set_description( N_("DVDRead Input (no menu support)") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( "dvdread-angle", 1, NULL, ANGLE_TEXT,
+    add_integer( "dvdread-angle", 1, ANGLE_TEXT,
         ANGLE_LONGTEXT, false )
-    add_integer( "dvdread-caching", DEFAULT_PTS_DELAY / 1000, NULL,
+    add_integer( "dvdread-caching", DEFAULT_PTS_DELAY / 1000,
         CACHING_TEXT, CACHING_LONGTEXT, true )
     add_obsolete_string( "dvdread-css-method" ) /* obsolete since 1.1.0 */
     set_capability( "access_demux", 0 )

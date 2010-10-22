@@ -102,9 +102,9 @@ vlc_module_begin ()
         set_callbacks( OpenServer, CloseServer )
 
         add_obsolete_integer( "gnutls-dh-bits" )
-        add_integer( "gnutls-cache-timeout", CACHE_TIMEOUT, NULL,
+        add_integer( "gnutls-cache-timeout", CACHE_TIMEOUT,
                     CACHE_TIMEOUT_TEXT, CACHE_TIMEOUT_LONGTEXT, true )
-        add_integer( "gnutls-cache-size", CACHE_SIZE, NULL, CACHE_SIZE_TEXT,
+        add_integer( "gnutls-cache-size", CACHE_SIZE, CACHE_SIZE_TEXT,
                     CACHE_SIZE_LONGTEXT, true )
 vlc_module_end ()
 

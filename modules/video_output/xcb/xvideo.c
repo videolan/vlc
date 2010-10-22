@@ -67,9 +67,9 @@ vlc_module_begin ()
     set_capability ("vout display", 155)
     set_callbacks (Open, Close)
 
-    add_integer ("xvideo-adaptor", -1, NULL,
+    add_integer ("xvideo-adaptor", -1,
                  ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true)
-    add_integer ("xvideo-format-id", 0, NULL,
+    add_integer ("xvideo-format-id", 0,
                  FORMAT_TEXT, FORMAT_LONGTEXT, true)
     add_bool ("x11-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true)
         add_deprecated_alias ("xvideo-shm")

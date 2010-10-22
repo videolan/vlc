@@ -100,7 +100,7 @@ vlc_module_begin ()
     set_shortname( N_("Gestures"))
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_CONTROL )
-    add_integer( "gestures-threshold", 30, NULL,
+    add_integer( "gestures-threshold", 30,
                  THRESHOLD_TEXT, THRESHOLD_LONGTEXT, true )
     add_string( "gestures-button", BUTTON_DEFAULT,
                 BUTTON_TEXT, BUTTON_LONGTEXT, false )

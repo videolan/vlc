@@ -417,10 +417,10 @@ vlc_module_begin ()
 
 /* Frame-type options */
 
-    add_integer( SOUT_CFG_PREFIX "keyint", 250, NULL, KEYINT_TEXT,
+    add_integer( SOUT_CFG_PREFIX "keyint", 250, KEYINT_TEXT,
                  KEYINT_LONGTEXT, false )
 
-    add_integer( SOUT_CFG_PREFIX "min-keyint", 25, NULL, MIN_KEYINT_TEXT,
+    add_integer( SOUT_CFG_PREFIX "min-keyint", 25, MIN_KEYINT_TEXT,
                  MIN_KEYINT_LONGTEXT, false )
 
 #if X264_BUILD >= 102
@@ -429,21 +429,21 @@ vlc_module_begin ()
         change_string_list( x264_open_gop_names, x264_open_gop_names, 0 );
 #endif
 
-    add_integer( SOUT_CFG_PREFIX "scenecut", 40, NULL, SCENE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "scenecut", 40, SCENE_TEXT,
                  SCENE_LONGTEXT, false )
         change_integer_range( -1, 100 )
 
     add_obsolete_bool( SOUT_CFG_PREFIX "pre-scenecut" )
 
-    add_integer( SOUT_CFG_PREFIX "bframes", 3, NULL, BFRAMES_TEXT,
+    add_integer( SOUT_CFG_PREFIX "bframes", 3, BFRAMES_TEXT,
                  BFRAMES_LONGTEXT, false )
         change_integer_range( 0, 16 )
 
-    add_integer( SOUT_CFG_PREFIX "b-adapt", 1, NULL, B_ADAPT_TEXT,
+    add_integer( SOUT_CFG_PREFIX "b-adapt", 1, B_ADAPT_TEXT,
                  B_ADAPT_LONGTEXT, false )
         change_integer_range( 0, 2 )
 
-    add_integer( SOUT_CFG_PREFIX "b-bias", 0, NULL, B_BIAS_TEXT,
+    add_integer( SOUT_CFG_PREFIX "b-bias", 0, B_BIAS_TEXT,
                  B_BIAS_LONGTEXT, false )
         change_integer_range( -100, 100 )
 
@@ -459,7 +459,7 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "cabac", true, NULL, CABAC_TEXT, CABAC_LONGTEXT,
               false )
 
-    add_integer( SOUT_CFG_PREFIX "ref", 3, NULL, REF_TEXT,
+    add_integer( SOUT_CFG_PREFIX "ref", 3, REF_TEXT,
                  REF_LONGTEXT, false )
         change_integer_range( 1, 16 )
 
@@ -484,9 +484,9 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "interlaced", false, NULL, INTERLACED_TEXT, INTERLACED_LONGTEXT,
               false )
 
-    add_integer( SOUT_CFG_PREFIX "slices", 0, NULL, SLICE_COUNT, SLICE_COUNT_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX "slice-max-size", 0, NULL, SLICE_MAX_SIZE, SLICE_MAX_SIZE_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX "slice-max-mbs", 0, NULL, SLICE_MAX_MBS, SLICE_MAX_MBS_LONGTEXT, false )
+    add_integer( SOUT_CFG_PREFIX "slices", 0, SLICE_COUNT, SLICE_COUNT_LONGTEXT, false )
+    add_integer( SOUT_CFG_PREFIX "slice-max-size", 0, SLICE_MAX_SIZE, SLICE_MAX_SIZE_LONGTEXT, false )
+    add_integer( SOUT_CFG_PREFIX "slice-max-mbs", 0, SLICE_MAX_MBS, SLICE_MAX_MBS_LONGTEXT, false )
 
 #if X264_BUILD >= 89
     add_string( SOUT_CFG_PREFIX "hrd", "none", HRD_TEXT, HRD_LONGTEXT, false )
@@ -496,23 +496,23 @@ vlc_module_begin ()
 
 /* Ratecontrol */
 
-    add_integer( SOUT_CFG_PREFIX "qp", -1, NULL, QP_TEXT, QP_LONGTEXT,
+    add_integer( SOUT_CFG_PREFIX "qp", -1, QP_TEXT, QP_LONGTEXT,
                  false )
         change_integer_range( -1, 51 ) /* QP 0 -> lossless encoding */
 
-    add_integer( SOUT_CFG_PREFIX "crf", 23, NULL, CRF_TEXT,
+    add_integer( SOUT_CFG_PREFIX "crf", 23, CRF_TEXT,
                  CRF_LONGTEXT, false )
         change_integer_range( 0, 51 )
 
-    add_integer( SOUT_CFG_PREFIX "qpmin", 10, NULL, QPMIN_TEXT,
+    add_integer( SOUT_CFG_PREFIX "qpmin", 10, QPMIN_TEXT,
                  QPMIN_LONGTEXT, false )
         change_integer_range( 0, 51 )
 
-    add_integer( SOUT_CFG_PREFIX "qpmax", 51, NULL, QPMAX_TEXT,
+    add_integer( SOUT_CFG_PREFIX "qpmax", 51, QPMAX_TEXT,
                  QPMAX_LONGTEXT, false )
         change_integer_range( 0, 51 )
 
-    add_integer( SOUT_CFG_PREFIX "qpstep", 4, NULL, QPSTEP_TEXT,
+    add_integer( SOUT_CFG_PREFIX "qpstep", 4, QPSTEP_TEXT,
                  QPSTEP_LONGTEXT, false )
         change_integer_range( 0, 51 )
 
@@ -520,10 +520,10 @@ vlc_module_begin ()
                RATETOL_LONGTEXT, false )
         change_float_range( 0, 100 )
 
-    add_integer( SOUT_CFG_PREFIX "vbv-maxrate", 0, NULL, VBV_MAXRATE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "vbv-maxrate", 0, VBV_MAXRATE_TEXT,
                  VBV_MAXRATE_LONGTEXT, false )
 
-    add_integer( SOUT_CFG_PREFIX "vbv-bufsize", 0, NULL, VBV_BUFSIZE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "vbv-bufsize", 0, VBV_BUFSIZE_TEXT,
                  VBV_BUFSIZE_LONGTEXT, false )
 
     add_float( SOUT_CFG_PREFIX "vbv-init", 0.9, VBV_INIT_TEXT,
@@ -538,10 +538,10 @@ vlc_module_begin ()
                PBRATIO_LONGTEXT, false )
         change_float_range( 1, 2 )
 
-    add_integer( SOUT_CFG_PREFIX "chroma-qp-offset", 0, NULL, CHROMA_QP_OFFSET_TEXT,
+    add_integer( SOUT_CFG_PREFIX "chroma-qp-offset", 0, CHROMA_QP_OFFSET_TEXT,
                  CHROMA_QP_OFFSET_LONGTEXT, false )
 
-    add_integer( SOUT_CFG_PREFIX "pass", 0, NULL, PASS_TEXT,
+    add_integer( SOUT_CFG_PREFIX "pass", 0, PASS_TEXT,
                  PASS_LONGTEXT, false )
         change_integer_range( 0, 3 )
 
@@ -555,7 +555,7 @@ vlc_module_begin ()
     add_float( SOUT_CFG_PREFIX "qblur", 0.5, QBLUR_TEXT,
                QBLUR_LONGTEXT, false )
 
-    add_integer( SOUT_CFG_PREFIX "aq-mode", X264_AQ_VARIANCE, NULL, AQ_MODE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "aq-mode", X264_AQ_VARIANCE, AQ_MODE_TEXT,
                  AQ_MODE_LONGTEXT, false )
          change_integer_range( 0, 2 )
     add_float( SOUT_CFG_PREFIX "aq-strength", 1.0, AQ_STRENGTH_TEXT,
@@ -572,14 +572,14 @@ vlc_module_begin ()
                 DIRECT_PRED_LONGTEXT, false )
         change_string_list( direct_pred_list, direct_pred_list_text, 0 );
 
-    add_integer( SOUT_CFG_PREFIX "direct-8x8", 1, NULL, DIRECT_PRED_SIZE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "direct-8x8", 1, DIRECT_PRED_SIZE_TEXT,
                  DIRECT_PRED_SIZE_LONGTEXT, false )
         change_integer_range( -1, 1 )
 
     add_bool( SOUT_CFG_PREFIX "weightb", true, NULL, WEIGHTB_TEXT,
               WEIGHTB_LONGTEXT, false )
 
-    add_integer( SOUT_CFG_PREFIX "weightp", 2, NULL, WEIGHTP_TEXT,
+    add_integer( SOUT_CFG_PREFIX "weightp", 2, WEIGHTP_TEXT,
               WEIGHTP_LONGTEXT, false )
         change_integer_range( 0, 2 )
 
@@ -587,17 +587,17 @@ vlc_module_begin ()
                 ME_LONGTEXT, false )
         change_string_list( enc_me_list, enc_me_list_text, 0 );
 
-    add_integer( SOUT_CFG_PREFIX "merange", 16, NULL, MERANGE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "merange", 16, MERANGE_TEXT,
                  MERANGE_LONGTEXT, false )
         change_integer_range( 1, 64 )
 
-    add_integer( SOUT_CFG_PREFIX "mvrange", -1, NULL, MVRANGE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "mvrange", -1, MVRANGE_TEXT,
                  MVRANGE_LONGTEXT, false )
 
-    add_integer( SOUT_CFG_PREFIX "mvrange-thread", -1, NULL, MVRANGE_THREAD_TEXT,
+    add_integer( SOUT_CFG_PREFIX "mvrange-thread", -1, MVRANGE_THREAD_TEXT,
                  MVRANGE_THREAD_LONGTEXT, false )
 
-    add_integer( SOUT_CFG_PREFIX "subme", 7, NULL, SUBME_TEXT,
+    add_integer( SOUT_CFG_PREFIX "subme", 7, SUBME_TEXT,
                  SUBME_LONGTEXT, false )
 
     add_obsolete_bool( SOUT_CFG_PREFIX "b-rdo" )
@@ -613,11 +613,11 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "8x8dct", true, NULL, TRANSFORM_8X8DCT_TEXT,
               TRANSFORM_8X8DCT_LONGTEXT, false )
 
-    add_integer( SOUT_CFG_PREFIX "trellis", 1, NULL, TRELLIS_TEXT,
+    add_integer( SOUT_CFG_PREFIX "trellis", 1, TRELLIS_TEXT,
                  TRELLIS_LONGTEXT, false )
         change_integer_range( 0, 2 )
 
-    add_integer( SOUT_CFG_PREFIX "lookahead", 40, NULL, LOOKAHEAD_TEXT,
+    add_integer( SOUT_CFG_PREFIX "lookahead", 40, LOOKAHEAD_TEXT,
                  LOOKAHEAD_LONGTEXT, false )
         change_integer_range( 0, 60 )
 
@@ -632,15 +632,15 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "dct-decimate", true, NULL, DCT_DECIMATE_TEXT,
               DCT_DECIMATE_LONGTEXT, false )
 
-    add_integer( SOUT_CFG_PREFIX "nr", 0, NULL, NR_TEXT,
+    add_integer( SOUT_CFG_PREFIX "nr", 0, NR_TEXT,
                  NR_LONGTEXT, false )
         change_integer_range( 0, 1000 )
 
-    add_integer( SOUT_CFG_PREFIX "deadzone-inter", 21, NULL, DEADZONE_INTER_TEXT,
+    add_integer( SOUT_CFG_PREFIX "deadzone-inter", 21, DEADZONE_INTER_TEXT,
                  DEADZONE_INTRA_LONGTEXT, false )
         change_integer_range( 0, 32 )
 
-    add_integer( SOUT_CFG_PREFIX "deadzone-intra", 11, NULL, DEADZONE_INTRA_TEXT,
+    add_integer( SOUT_CFG_PREFIX "deadzone-intra", 11, DEADZONE_INTRA_TEXT,
                  DEADZONE_INTRA_LONGTEXT, false )
         change_integer_range( 0, 32 )
 
@@ -663,7 +663,7 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "quiet", false, NULL, QUIET_TEXT,
               QUIET_LONGTEXT, false )
 
-    add_integer( SOUT_CFG_PREFIX "sps-id", 0, NULL, SPS_ID_TEXT,
+    add_integer( SOUT_CFG_PREFIX "sps-id", 0, SPS_ID_TEXT,
                  SPS_ID_LONGTEXT, false )
 
     add_bool( SOUT_CFG_PREFIX "aud", false, NULL, AUD_TEXT,

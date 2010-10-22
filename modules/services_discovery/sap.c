@@ -128,7 +128,7 @@ vlc_module_begin ()
                SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, true )
     add_bool( "sap-ipv6", true, NULL,
               SAP_IPV6_TEXT, SAP_IPV6_LONGTEXT, true )
-    add_integer( "sap-timeout", 1800, NULL,
+    add_integer( "sap-timeout", 1800,
                  SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, true )
     add_bool( "sap-parse", true, NULL,
                SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, true )

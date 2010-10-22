@@ -97,15 +97,15 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( "screen-caching", DEFAULT_PTS_DELAY / 1000, NULL,
+    add_integer( "screen-caching", DEFAULT_PTS_DELAY / 1000,
         CACHING_TEXT, CACHING_LONGTEXT, true )
     add_float( "screen-fps", SCREEN_FPS, FPS_TEXT, FPS_LONGTEXT, true )
 
 #ifdef SCREEN_SUBSCREEN
-    add_integer( "screen-top", 0, NULL, TOP_TEXT, TOP_LONGTEXT, true )
-    add_integer( "screen-left", 0, NULL, LEFT_TEXT, LEFT_LONGTEXT, true )
-    add_integer( "screen-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true )
-    add_integer( "screen-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
+    add_integer( "screen-top", 0, TOP_TEXT, TOP_LONGTEXT, true )
+    add_integer( "screen-left", 0, LEFT_TEXT, LEFT_LONGTEXT, true )
+    add_integer( "screen-width", 0, WIDTH_TEXT, WIDTH_LONGTEXT, true )
+    add_integer( "screen-height", 0, HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
     add_bool( "screen-follow-mouse", false, NULL, FOLLOW_MOUSE_TEXT,
               FOLLOW_MOUSE_LONGTEXT, true )
 #endif
@@ -116,7 +116,7 @@ vlc_module_begin ()
 #endif
 
 #ifdef WIN32
-    add_integer( "screen-fragment-size", 0, NULL, FRAGS_TEXT,
+    add_integer( "screen-fragment-size", 0, FRAGS_TEXT,
         FRAGS_LONGTEXT, true )
 #endif
 

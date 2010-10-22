@@ -61,10 +61,10 @@ vlc_module_begin ()
     set_shortname( N_("File") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL,
+    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_safe()
-    add_integer( "network-caching", 3 * DEFAULT_PTS_DELAY / 1000, NULL,
+    add_integer( "network-caching", 3 * DEFAULT_PTS_DELAY / 1000,
                  NETWORK_CACHING_TEXT, NETWORK_CACHING_LONGTEXT, true )
         change_safe()
     add_obsolete_string( "file-cat" )

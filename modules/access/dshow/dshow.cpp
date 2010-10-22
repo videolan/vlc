@@ -223,7 +223,7 @@ vlc_module_begin ()
     set_description( N_("DirectShow input") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( CFG_PREFIX "caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000, NULL,
+    add_integer( CFG_PREFIX "caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
 
     add_string( CFG_PREFIX "vdev", NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
@@ -248,44 +248,44 @@ vlc_module_begin ()
 
     add_bool( CFG_PREFIX "tuner", false, NULL, TUNER_TEXT, TUNER_LONGTEXT, true )
 
-    add_integer( CFG_PREFIX "tuner-channel", 0, NULL, CHANNEL_TEXT, CHANNEL_LONGTEXT,
+    add_integer( CFG_PREFIX "tuner-channel", 0, CHANNEL_TEXT, CHANNEL_LONGTEXT,
                 true )
 
-    add_integer( CFG_PREFIX "tuner-frequency", 0, NULL, TVFREQ_TEXT, TVFREQ_LONGTEXT,
+    add_integer( CFG_PREFIX "tuner-frequency", 0, TVFREQ_TEXT, TVFREQ_LONGTEXT,
                 true )
 
-    add_integer( CFG_PREFIX "tuner-country", 0, NULL, COUNTRY_TEXT, COUNTRY_LONGTEXT,
+    add_integer( CFG_PREFIX "tuner-country", 0, COUNTRY_TEXT, COUNTRY_LONGTEXT,
                 true )
 
-    add_integer( CFG_PREFIX "tuner-standard", 0, NULL, STANDARD_TEXT, STANDARD_LONGTEXT,
+    add_integer( CFG_PREFIX "tuner-standard", 0, STANDARD_TEXT, STANDARD_LONGTEXT,
                 false )
         change_integer_list( i_standards_list, ppsz_standards_list_text )
 
-    add_integer( CFG_PREFIX "tuner-input", 0, NULL, TUNER_INPUT_TEXT,
+    add_integer( CFG_PREFIX "tuner-input", 0, TUNER_INPUT_TEXT,
                  TUNER_INPUT_LONGTEXT, true )
         change_integer_list( pi_tuner_input, ppsz_tuner_input_text )
 
-    add_integer( CFG_PREFIX "video-input",  -1, NULL, VIDEO_IN_TEXT,
+    add_integer( CFG_PREFIX "video-input",  -1, VIDEO_IN_TEXT,
                  VIDEO_IN_LONGTEXT, true )
 
-    add_integer( CFG_PREFIX "video-output", -1, NULL, VIDEO_OUT_TEXT,
+    add_integer( CFG_PREFIX "video-output", -1, VIDEO_OUT_TEXT,
                  VIDEO_OUT_LONGTEXT, true )
 
-    add_integer( CFG_PREFIX "audio-input",  -1, NULL, AUDIO_IN_TEXT,
+    add_integer( CFG_PREFIX "audio-input",  -1, AUDIO_IN_TEXT,
                  AUDIO_IN_LONGTEXT, true )
 
-    add_integer( CFG_PREFIX "audio-output", -1, NULL, AUDIO_OUT_TEXT,
+    add_integer( CFG_PREFIX "audio-output", -1, AUDIO_OUT_TEXT,
                  AUDIO_OUT_LONGTEXT, true )
 
-    add_integer( CFG_PREFIX "amtuner-mode", AMTUNER_MODE_TV, NULL,
+    add_integer( CFG_PREFIX "amtuner-mode", AMTUNER_MODE_TV,
                 AMTUNER_MODE_TEXT, AMTUNER_MODE_LONGTEXT, false)
         change_integer_list( pi_amtuner_mode, ppsz_amtuner_mode_text )
 
-    add_integer( CFG_PREFIX "audio-channels", 0, NULL, AUDIO_CHANNELS_TEXT,
+    add_integer( CFG_PREFIX "audio-channels", 0, AUDIO_CHANNELS_TEXT,
                  AUDIO_CHANNELS_LONGTEXT, true )
-    add_integer( CFG_PREFIX "audio-samplerate", 0, NULL, AUDIO_SAMPLERATE_TEXT,
+    add_integer( CFG_PREFIX "audio-samplerate", 0, AUDIO_SAMPLERATE_TEXT,
                  AUDIO_SAMPLERATE_LONGTEXT, true )
-    add_integer( CFG_PREFIX "audio-bitspersample", 0, NULL, AUDIO_BITSPERSAMPLE_TEXT,
+    add_integer( CFG_PREFIX "audio-bitspersample", 0, AUDIO_BITSPERSAMPLE_TEXT,
                  AUDIO_BITSPERSAMPLE_LONGTEXT, true )
 
     add_shortcut( "dshow" )

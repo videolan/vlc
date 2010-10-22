@@ -184,33 +184,33 @@ vlc_module_begin ()
     add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255, NULL,
                             ALPHA_TEXT, ALPHA_LONGTEXT, false )
 
-    add_integer( CFG_PREFIX "height", 100, NULL,
+    add_integer( CFG_PREFIX "height", 100,
                  HEIGHT_TEXT, HEIGHT_LONGTEXT, false )
-    add_integer( CFG_PREFIX "width", 100, NULL,
+    add_integer( CFG_PREFIX "width", 100,
                  WIDTH_TEXT, WIDTH_LONGTEXT, false )
 
-    add_integer( CFG_PREFIX "align", 5, NULL,
+    add_integer( CFG_PREFIX "align", 5,
                  ALIGN_TEXT, ALIGN_LONGTEXT, true)
         change_integer_list( pi_align_values, ppsz_align_descriptions )
 
-    add_integer( CFG_PREFIX "xoffset", 0, NULL,
+    add_integer( CFG_PREFIX "xoffset", 0,
                  XOFFSET_TEXT, XOFFSET_LONGTEXT, true )
-    add_integer( CFG_PREFIX "yoffset", 0, NULL,
+    add_integer( CFG_PREFIX "yoffset", 0,
                  YOFFSET_TEXT, YOFFSET_LONGTEXT, true )
 
-    add_integer( CFG_PREFIX "borderw", 0, NULL,
+    add_integer( CFG_PREFIX "borderw", 0,
                  BORDERW_TEXT, BORDERW_LONGTEXT, true )
         add_deprecated_alias( CFG_PREFIX "vborder" )
-    add_integer( CFG_PREFIX "borderh", 0, NULL,
+    add_integer( CFG_PREFIX "borderh", 0,
                  BORDERH_TEXT, BORDERH_LONGTEXT, true )
         add_deprecated_alias( CFG_PREFIX "hborder" )
 
-    add_integer( CFG_PREFIX "position", 0, NULL,
+    add_integer( CFG_PREFIX "position", 0,
                  POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions )
-    add_integer( CFG_PREFIX "rows", 2, NULL,
+    add_integer( CFG_PREFIX "rows", 2,
                  ROWS_TEXT, ROWS_LONGTEXT, false )
-    add_integer( CFG_PREFIX "cols", 2, NULL,
+    add_integer( CFG_PREFIX "cols", 2,
                  COLS_TEXT, COLS_LONGTEXT, false )
 
     add_bool( CFG_PREFIX "keep-aspect-ratio", false, NULL,
@@ -224,7 +224,7 @@ vlc_module_begin ()
     add_string( CFG_PREFIX "offsets", "",
                 OFFSETS_TEXT, OFFSETS_LONGTEXT, false )
 
-    add_integer( CFG_PREFIX "delay", 0, NULL, DELAY_TEXT, DELAY_LONGTEXT,
+    add_integer( CFG_PREFIX "delay", 0, DELAY_TEXT, DELAY_LONGTEXT,
                  false )
 vlc_module_end ()
 

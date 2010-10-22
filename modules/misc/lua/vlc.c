@@ -114,7 +114,7 @@ vlc_module_begin ()
         set_section( N_("Lua Telnet"), 0 )
             add_string( "telnet-host", "localhost", TELNETHOST_TEXT,
                         TELNETHOST_LONGTEXT, true )
-            add_integer( "telnet-port", TELNETPORT_DEFAULT, NULL, TELNETPORT_TEXT,
+            add_integer( "telnet-port", TELNETPORT_DEFAULT, TELNETPORT_TEXT,
                          TELNETPORT_LONGTEXT, true )
             add_password( "telnet-password", TELNETPWD_DEFAULT, TELNETPWD_TEXT,
                           TELNETPWD_LONGTEXT, true )

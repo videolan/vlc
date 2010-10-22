@@ -89,9 +89,9 @@ vlc_module_begin ()
                                  COMMENT_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "rating",  "", RATING_TEXT,
                                  RATING_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "packet-size", 4096, NULL, PACKETSIZE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "packet-size", 4096, PACKETSIZE_TEXT,
                                  PACKETSIZE_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "bitrate-override", 0, NULL, BITRATE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "bitrate-override", 0, BITRATE_TEXT,
                                  BITRATE_LONGTEXT, true )
 
 vlc_module_end ()

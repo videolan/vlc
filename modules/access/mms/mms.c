@@ -76,14 +76,14 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( "mms-caching", 19 * DEFAULT_PTS_DELAY / 1000, NULL,
+    add_integer( "mms-caching", 19 * DEFAULT_PTS_DELAY / 1000,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
 
-    add_integer( "mms-timeout", 5000, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
+    add_integer( "mms-timeout", 5000, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
                  true )
 
     add_bool( "mms-all", false, NULL, ALL_TEXT, ALL_LONGTEXT, true )
-    add_integer( "mms-maxbitrate", 0, NULL, BITRATE_TEXT, BITRATE_LONGTEXT ,
+    add_integer( "mms-maxbitrate", 0, BITRATE_TEXT, BITRATE_LONGTEXT ,
                  false )
     add_string( "mmsh-proxy", NULL, PROXY_TEXT, PROXY_LONGTEXT,
                     false )

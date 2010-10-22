@@ -78,7 +78,7 @@ vlc_module_begin ()
     set_capability( "video filter2", 0 )
 
     set_section( N_("Benchmarking"), NULL )
-    add_integer( CFG_PREFIX "loops", 1000, NULL, LOOPS_TEXT,
+    add_integer( CFG_PREFIX "loops", 1000, LOOPS_TEXT,
               LOOPS_LONGTEXT, false )
     add_integer_with_range( CFG_PREFIX "alpha", 128, 0, 255, NULL, ALPHA_TEXT,
               ALPHA_LONGTEXT, false )

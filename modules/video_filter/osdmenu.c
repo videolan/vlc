@@ -124,16 +124,16 @@ vlc_module_begin ()
 
     set_callbacks( CreateFilter, DestroyFilter )
 
-    add_integer( OSD_CFG "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, false )
-    add_integer( OSD_CFG "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, false )
-    add_integer( OSD_CFG "position", 8, NULL, POS_TEXT, POS_LONGTEXT,
+    add_integer( OSD_CFG "x", -1, POSX_TEXT, POSX_LONGTEXT, false )
+    add_integer( OSD_CFG "y", -1, POSY_TEXT, POSY_LONGTEXT, false )
+    add_integer( OSD_CFG "position", 8, POS_TEXT, POS_LONGTEXT,
                  false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions )
     add_string( OSD_CFG "file", OSD_DEFAULT_CFG, OSD_FILE_TEXT,
         OSD_FILE_LONGTEXT, false )
     add_string( OSD_CFG "file-path", NULL, OSD_PATH_TEXT,
         OSD_PATH_LONGTEXT, false )
-    add_integer( OSD_CFG "timeout", 15, NULL, TIMEOUT_TEXT,
+    add_integer( OSD_CFG "timeout", 15, TIMEOUT_TEXT,
         TIMEOUT_LONGTEXT, false )
     add_integer_with_range( OSD_CFG "update", OSD_UPDATE_DEFAULT,
         OSD_UPDATE_MIN, OSD_UPDATE_MAX, NULL, OSD_UPDATE_TEXT,

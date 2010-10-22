@@ -72,21 +72,21 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_usage_hint( N_("[cdda:][device][@[track]]") )
-    add_integer( "cdda-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
+    add_integer( "cdda-caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT,
                  CACHING_LONGTEXT, true )
         change_safe()
 
-    add_integer( "cdda-track", 0 , NULL, NULL, NULL, true )
+    add_integer( "cdda-track", 0 , NULL, NULL, true )
         change_volatile ()
-    add_integer( "cdda-first-sector", -1, NULL, NULL, NULL, true )
+    add_integer( "cdda-first-sector", -1, NULL, NULL, true )
         change_volatile ()
-    add_integer( "cdda-last-sector", -1, NULL, NULL, NULL, true )
+    add_integer( "cdda-last-sector", -1, NULL, NULL, true )
         change_volatile ()
 
 #ifdef HAVE_LIBCDDB
     add_string( "cddb-server", "freedb.freedb.org", N_( "CDDB Server" ),
             N_( "Address of the CDDB server to use." ), true )
-    add_integer( "cddb-port", 8880, NULL, N_( "CDDB port" ),
+    add_integer( "cddb-port", 8880, N_( "CDDB port" ),
             N_( "CDDB Server port to use." ), true )
 #endif
 

@@ -89,11 +89,11 @@ vlc_module_begin ()
     set_capability ("access_demux", 0)
     set_callbacks (Open, Close)
 
-    add_integer ("rtp-caching", 1000, NULL, RTP_CACHING_TEXT,
+    add_integer ("rtp-caching", 1000, RTP_CACHING_TEXT,
                  RTP_CACHING_LONGTEXT, true)
         change_integer_range (0, 65535)
         change_safe ()
-    add_integer ("rtcp-port", 0, NULL, RTCP_PORT_TEXT,
+    add_integer ("rtcp-port", 0, RTCP_PORT_TEXT,
                  RTCP_PORT_LONGTEXT, false)
         change_integer_range (0, 65535)
         change_safe ()
@@ -103,15 +103,15 @@ vlc_module_begin ()
     add_string ("srtp-salt", "",
                 SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false)
 #endif
-    add_integer ("rtp-max-src", 1, NULL, RTP_MAX_SRC_TEXT,
+    add_integer ("rtp-max-src", 1, RTP_MAX_SRC_TEXT,
                  RTP_MAX_SRC_LONGTEXT, true)
         change_integer_range (1, 255)
-    add_integer ("rtp-timeout", 5, NULL, RTP_TIMEOUT_TEXT,
+    add_integer ("rtp-timeout", 5, RTP_TIMEOUT_TEXT,
                  RTP_TIMEOUT_LONGTEXT, true)
-    add_integer ("rtp-max-dropout", 3000, NULL, RTP_MAX_DROPOUT_TEXT,
+    add_integer ("rtp-max-dropout", 3000, RTP_MAX_DROPOUT_TEXT,
                  RTP_MAX_DROPOUT_LONGTEXT, true)
         change_integer_range (0, 32767)
-    add_integer ("rtp-max-misorder", 100, NULL, RTP_MAX_MISORDER_TEXT,
+    add_integer ("rtp-max-misorder", 100, RTP_MAX_MISORDER_TEXT,
                  RTP_MAX_MISORDER_LONGTEXT, true)
         change_integer_range (0, 32767)
 

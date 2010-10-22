@@ -196,10 +196,10 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
+    add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT,
                  CACHING_LONGTEXT, true )
         change_safe()
-    add_integer( "dvb-frequency", 0, NULL, FREQ_TEXT, FREQ_LONGTEXT,
+    add_integer( "dvb-frequency", 0, FREQ_TEXT, FREQ_LONGTEXT,
                  false )
         change_safe()
 #   if defined(WIN32) || defined(WINCE)
@@ -207,11 +207,11 @@ vlc_module_begin ()
                     true )
         add_string( "dvb-create-name", NULL, CREATE_TEXT,
                     CREATE_LONGTEXT, true )
-        add_integer( "dvb-adapter", -1, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
+        add_integer( "dvb-adapter", -1, ADAPTER_TEXT, ADAPTER_LONGTEXT,
                      true )
 #   else
         /* dvb-device refers to a frontend within an adapter */
-        add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
+        add_integer( "dvb-device", 0, DEVICE_TEXT, DEVICE_LONGTEXT,
                      true )
         add_bool( "dvb-probe", true, NULL, PROBE_TEXT, PROBE_LONGTEXT, true )
         add_bool( "dvb-budget-mode", false, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
@@ -219,7 +219,7 @@ vlc_module_begin ()
 #   endif
 
     /* DVB-S (satellite) */
-    add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT,
+    add_integer( "dvb-inversion", 2, INVERSION_TEXT,
         INVERSION_LONGTEXT, true )
         change_integer_list( i_inversion_list, ppsz_inversion_text )
 #   if defined(WIN32) || defined(WINCE)
@@ -227,68 +227,68 @@ vlc_module_begin ()
             POLARISATION_LONGTEXT, false )
             change_string_list( ppsz_polar_list, ppsz_polar_text, 0 )
             /* Note: Polaristion H = voltage 18; V = voltage 13; */
-        add_integer( "dvb-network-id", 0, NULL, NETID_TEXT, NETID_LONGTEXT,
+        add_integer( "dvb-network-id", 0, NETID_TEXT, NETID_LONGTEXT,
             true )
-        add_integer( "dvb-azimuth", 0, NULL, AZIMUTH_TEXT, AZIMUTH_LONGTEXT,
+        add_integer( "dvb-azimuth", 0, AZIMUTH_TEXT, AZIMUTH_LONGTEXT,
             true )
-        add_integer( "dvb-elevation", 0, NULL, ELEVATION_TEXT,
+        add_integer( "dvb-elevation", 0, ELEVATION_TEXT,
             ELEVATION_LONGTEXT, true )
-        add_integer( "dvb-longitude", 0, NULL, LONGITUDE_TEXT,
+        add_integer( "dvb-longitude", 0, LONGITUDE_TEXT,
             LONGITUDE_LONGTEXT, true )
         add_string( "dvb-range", NULL, RANGE_TEXT,
             RANGE_LONGTEXT, true )
         /* dvb-range corresponds to the BDA InputRange parameter which is
          * used by some drivers to control the diseqc */
 #   else
-        add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
+        add_integer( "dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT,
             true )
-        add_integer( "dvb-voltage", 13, NULL, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
+        add_integer( "dvb-voltage", 13, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
             true )
         add_bool( "dvb-high-voltage", false, NULL, HIGH_VOLTAGE_TEXT,
             HIGH_VOLTAGE_LONGTEXT, true )
-        add_integer( "dvb-tone", -1, NULL, TONE_TEXT, TONE_LONGTEXT,
+        add_integer( "dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT,
             true )
-        add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, true )
+        add_integer( "dvb-fec", 9, FEC_TEXT, FEC_LONGTEXT, true )
 #   endif
-    add_integer( "dvb-lnb-lof1", 0, NULL, LNB_LOF1_TEXT,
+    add_integer( "dvb-lnb-lof1", 0, LNB_LOF1_TEXT,
         LNB_LOF1_LONGTEXT, true )
-    add_integer( "dvb-lnb-lof2", 0, NULL, LNB_LOF2_TEXT,
+    add_integer( "dvb-lnb-lof2", 0, LNB_LOF2_TEXT,
         LNB_LOF2_LONGTEXT, true )
-    add_integer( "dvb-lnb-slof", 0, NULL, LNB_SLOF_TEXT,
+    add_integer( "dvb-lnb-slof", 0, LNB_SLOF_TEXT,
         LNB_SLOF_LONGTEXT, true )
-    add_integer( "dvb-srate", 27500, NULL, SRATE_TEXT, SRATE_LONGTEXT,
+    add_integer( "dvb-srate", 27500, SRATE_TEXT, SRATE_LONGTEXT,
         false )
 
     /* DVB-C (cable) */
-    add_integer( "dvb-modulation", -1, NULL, MODULATION_TEXT,
+    add_integer( "dvb-modulation", -1, MODULATION_TEXT,
         MODULATION_LONGTEXT, true )
         change_integer_list( i_mod_list, ppsz_mod_text )
 
     /* ATSC */
-    add_integer( "dvb-major-channel", 0, NULL, MAJOR_CHANNEL_TEXT,
+    add_integer( "dvb-major-channel", 0, MAJOR_CHANNEL_TEXT,
         MAJOR_CHANNEL_LONGTEXT, true )
-     add_integer( "dvb-minor-channel", 0, NULL, MINOR_CHANNEL_TEXT,
+     add_integer( "dvb-minor-channel", 0, MINOR_CHANNEL_TEXT,
         MINOR_CHANNEL_LONGTEXT, true )
-     add_integer( "dvb-physical-channel", 0, NULL, PHYSICAL_CHANNEL_TEXT,
+     add_integer( "dvb-physical-channel", 0, PHYSICAL_CHANNEL_TEXT,
         PHYSICAL_CHANNEL_LONGTEXT, true )
 
     /* DVB-T (terrestrial) */
-    add_integer( "dvb-code-rate-hp", -1, NULL, CODE_RATE_HP_TEXT,
+    add_integer( "dvb-code-rate-hp", -1, CODE_RATE_HP_TEXT,
         CODE_RATE_HP_LONGTEXT, true )
         change_integer_list( i_hp_fec_list, ppsz_hp_fec_text )
-    add_integer( "dvb-code-rate-lp", -1, NULL, CODE_RATE_LP_TEXT,
+    add_integer( "dvb-code-rate-lp", -1, CODE_RATE_LP_TEXT,
         CODE_RATE_LP_LONGTEXT, true )
         change_integer_list( i_lp_fec_list, ppsz_lp_fec_text )
-    add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
+    add_integer( "dvb-bandwidth", 0, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
         false )
         change_integer_list( i_band_list, ppsz_band_text )
         change_safe()
-    add_integer( "dvb-guard", -1, NULL, GUARD_TEXT, GUARD_LONGTEXT, true )
+    add_integer( "dvb-guard", -1, GUARD_TEXT, GUARD_LONGTEXT, true )
         change_integer_list( i_guard_list, ppsz_guard_text )
-    add_integer( "dvb-transmission", -1, NULL, TRANSMISSION_TEXT,
+    add_integer( "dvb-transmission", -1, TRANSMISSION_TEXT,
         TRANSMISSION_LONGTEXT, true )
         change_integer_list( i_transmission_list, ppsz_transmission_text )
-    add_integer( "dvb-hierarchy", -1, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
+    add_integer( "dvb-hierarchy", -1, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
         true )
         change_integer_list( i_hierarchy_list, ppsz_hierarchy_text )
 

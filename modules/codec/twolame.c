@@ -81,12 +81,12 @@ vlc_module_begin ()
 
     add_float( ENC_CFG_PREFIX "quality", 0.0, ENC_QUALITY_TEXT,
                ENC_QUALITY_LONGTEXT, false )
-    add_integer( ENC_CFG_PREFIX "mode", 0, NULL, ENC_MODE_TEXT,
+    add_integer( ENC_CFG_PREFIX "mode", 0, ENC_MODE_TEXT,
                  ENC_MODE_LONGTEXT, false )
         change_integer_list( pi_stereo_values, ppsz_stereo_descriptions );
     add_bool( ENC_CFG_PREFIX "vbr", false, NULL, ENC_VBR_TEXT,
               ENC_VBR_LONGTEXT, false )
-    add_integer( ENC_CFG_PREFIX "psy", 3, NULL, ENC_PSY_TEXT,
+    add_integer( ENC_CFG_PREFIX "psy", 3, ENC_PSY_TEXT,
                  ENC_PSY_LONGTEXT, false )
 vlc_module_end ()
 

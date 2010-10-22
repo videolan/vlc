@@ -88,8 +88,8 @@ vlc_module_begin ()
     set_description( N_("XOSD interface") )
     set_shortname( "XOSD" )
     add_bool( "xosd-position", true, NULL, POSITION_TEXT, POSITION_LONGTEXT, true )
-    add_integer( "xosd-text-offset", 30, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT, true )
-    add_integer( "xosd-shadow-offset", 2, NULL,
+    add_integer( "xosd-text-offset", 30, TXT_OFS_TEXT, TXT_OFS_LONGTEXT, true )
+    add_integer( "xosd-shadow-offset", 2,
                  SHD_OFS_TEXT, SHD_OFS_LONGTEXT, true )
     add_string( "xosd-font", "-adobe-helvetica-bold-r-normal-*-*-160-*-*-p-*-iso8859-1", NULL,
                 FONT_TEXT, FONT_LONGTEXT, true )

@@ -69,9 +69,9 @@ vlc_module_begin ()
     add_shortcut( "ps", "mpeg1", "dvd" )
     set_callbacks( Open, Close )
 
-    add_integer( SOUT_CFG_PREFIX "dts-delay", 200, NULL, DTS_TEXT,
+    add_integer( SOUT_CFG_PREFIX "dts-delay", 200, DTS_TEXT,
                  DTS_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "pes-max-size", PES_PAYLOAD_SIZE_MAX, NULL,
+    add_integer( SOUT_CFG_PREFIX "pes-max-size", PES_PAYLOAD_SIZE_MAX,
                  PES_SIZE_TEXT, PES_SIZE_LONGTEXT, true )
 vlc_module_end ()
 

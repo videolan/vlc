@@ -64,7 +64,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( "rtmp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
+    add_integer( "rtmp-caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT,
                  CACHING_LONGTEXT, true )
     add_string( "rtmp-swfurl", "file:///player.swf", SWFURL_TEXT,
                 SWFURL_LONGTEXT, true )

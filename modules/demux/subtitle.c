@@ -78,7 +78,7 @@ vlc_module_begin ()
     add_float( "sub-fps", 0.0,
                N_("Frames per second"),
                SUB_FPS_LONGTEXT, true )
-    add_integer( "sub-delay", 0, NULL,
+    add_integer( "sub-delay", 0,
                N_("Subtitles delay"),
                SUB_DELAY_LONGTEXT, true )
     add_string( "sub-type", "auto", N_("Subtitles format"),

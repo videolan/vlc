@@ -175,7 +175,7 @@ vlc_module_begin ()
                 SYSLOG_FACILITY_LONGTEXT, true )
         change_string_list( fac_name, fac_name, 0 )
 #endif
-    add_integer( "log-verbose", -1, NULL, LOGVERBOSE_TEXT, LOGVERBOSE_LONGTEXT,
+    add_integer( "log-verbose", -1, LOGVERBOSE_TEXT, LOGVERBOSE_LONGTEXT,
            false )
     
     add_obsolete_string( "rrd-file" )

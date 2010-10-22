@@ -88,7 +88,7 @@ vlc_module_begin ()
     add_bool("fb-tty", true, NULL, TTY_TEXT, TTY_LONGTEXT, true)
     add_string( "fb-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
     add_obsolete_string("fb-aspect-ratio")
-    add_integer("fb-mode", 4, NULL, FB_MODE_TEXT, FB_MODE_LONGTEXT,
+    add_integer("fb-mode", 4, FB_MODE_TEXT, FB_MODE_LONGTEXT,
                  true)
     add_bool("fb-hw-accel", true, NULL, HW_ACCEL_TEXT, HW_ACCEL_LONGTEXT,
               true)

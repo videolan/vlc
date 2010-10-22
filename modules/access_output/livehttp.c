@@ -87,8 +87,8 @@ vlc_module_begin ()
     set_capability( "sout access", 50 )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
-    add_integer( SOUT_CFG_PREFIX "seglen", 10, NULL, SEGLEN_TEXT, SEGLEN_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "numsegs", 0, NULL, NUMSEGS_TEXT, NUMSEGS_LONGTEXT, true )
+    add_integer( SOUT_CFG_PREFIX "seglen", 10, SEGLEN_TEXT, SEGLEN_LONGTEXT, true )
+    add_integer( SOUT_CFG_PREFIX "numsegs", 0, NUMSEGS_TEXT, NUMSEGS_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "splitanywhere", false, NULL,
               SPLITANYWHERE_TEXT, SPLITANYWHERE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "delsegs", true, NULL,

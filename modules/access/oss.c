@@ -88,9 +88,9 @@ vlc_module_begin ()
 
     add_bool( CFG_PREFIX "stereo", true, NULL, STEREO_TEXT, STEREO_LONGTEXT,
                 true )
-    add_integer( CFG_PREFIX "samplerate", 48000, NULL, SAMPLERATE_TEXT,
+    add_integer( CFG_PREFIX "samplerate", 48000, SAMPLERATE_TEXT,
                 SAMPLERATE_LONGTEXT, true )
-    add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL,
+    add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000,
                 CACHING_TEXT, CACHING_LONGTEXT, true )
 vlc_module_end ()
 

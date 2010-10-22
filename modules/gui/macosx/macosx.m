@@ -131,7 +131,7 @@ vlc_module_begin ()
         set_subcategory( SUBCAT_VIDEO_VOUT )
         set_callbacks( OpenVideoGL, CloseVideoGL )
 
-        add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_LONGTEXT,
+        add_integer( "macosx-vdev", 0, VDEV_TEXT, VDEV_LONGTEXT,
                      false )
         add_bool( "macosx-stretch", false, NULL, STRETCH_TEXT, STRETCH_LONGTEXT,
                   false )
