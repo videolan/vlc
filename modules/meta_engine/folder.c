@@ -65,7 +65,7 @@ static int FindMeta( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( N_( "Folder" ) )
     set_description( N_("Folder meta data") )
-    add_loadfile( "album-art-filename", NULL, NULL,
+    add_loadfile( "album-art-filename", NULL,
         N_("Album art filename"), N_("Filename to look for album art in current directory"), false );
     set_capability( "art finder", 90 )
     set_callbacks( FindMeta, NULL )

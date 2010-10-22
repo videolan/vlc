@@ -111,7 +111,7 @@ vlc_module_begin ()
 #endif
 
 #ifdef SCREEN_MOUSE
-    add_loadfile( "screen-mouse-image", "", NULL, MOUSE_TEXT, MOUSE_LONGTEXT,
+    add_loadfile( "screen-mouse-image", "", MOUSE_TEXT, MOUSE_LONGTEXT,
                   true )
 #endif
 

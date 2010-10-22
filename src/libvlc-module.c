@@ -1579,7 +1579,7 @@ const char vlc_usage[] = N_(
  * add_usage_hint( N_(text), b_advanced_option )
  * add_string( option_name, value, N_(text), N_(longtext),
                b_advanced_option )
- * add_loadfile( option_name, psz_value, p_callback, N_(text), N_(longtext) )
+ * add_loadfile( option_name, psz_value, N_(text), N_(longtext) )
  * add_savefile( option_name, psz_value, N_(text), N_(longtext) )
  * add_module( option_name, psz_value, i_capability, p_callback,
  *             N_(text), N_(longtext) )
@@ -1796,7 +1796,7 @@ vlc_module_begin ()
                 TEXTRENDERER_LONGTEXT, true )
 
     set_section( N_("Subtitles") , NULL )
-    add_loadfile( "sub-file", NULL, NULL, SUB_FILE_TEXT,
+    add_loadfile( "sub-file", NULL, SUB_FILE_TEXT,
                   SUB_FILE_LONGTEXT, false )
         change_safe()
     add_bool( "sub-autodetect-file", true, NULL,
@@ -1878,11 +1878,11 @@ vlc_module_begin ()
 
     set_section( N_( "Default devices") , NULL )
 
-    add_loadfile( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT,
+    add_loadfile( "dvd", DVD_DEVICE, DVD_DEV_TEXT, DVD_DEV_LONGTEXT,
                   false )
-    add_loadfile( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT,
+    add_loadfile( "vcd", VCD_DEVICE, VCD_DEV_TEXT, VCD_DEV_LONGTEXT,
                   false )
-    add_loadfile( "cd-audio", CDAUDIO_DEVICE, NULL, CDAUDIO_DEV_TEXT,
+    add_loadfile( "cd-audio", CDAUDIO_DEVICE, CDAUDIO_DEV_TEXT,
                   CDAUDIO_DEV_LONGTEXT, false )
 
     set_section( N_( "Network settings" ), NULL )

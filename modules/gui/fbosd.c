@@ -180,7 +180,7 @@ vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
 
-    add_loadfile( "fbosd-dev", "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
+    add_loadfile( "fbosd-dev", "/dev/fb0", DEVICE_TEXT, DEVICE_LONGTEXT,
                   false )
     add_string( "fbosd-aspect-ratio", "", ASPECT_RATIO_TEXT,
                 ASPECT_RATIO_LONGTEXT, true )

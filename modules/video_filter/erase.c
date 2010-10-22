@@ -72,7 +72,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    add_loadfile( CFG_PREFIX "mask", NULL, NULL,
+    add_loadfile( CFG_PREFIX "mask", NULL,
                   MASK_TEXT, MASK_LONGTEXT, false )
     add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, false )
     add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, false )
