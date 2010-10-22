@@ -126,7 +126,7 @@ vlc_module_begin ()
         RMTOSD_HOST_LONGTEXT, false )
     add_integer_with_range( RMTOSD_CFG "port", 20001, 1, 0xFFFF, NULL,
         RMTOSD_PORT_TEXT, RMTOSD_PORT_LONGTEXT, false )
-    add_password( RMTOSD_CFG "password", "", NULL, RMTOSD_PASSWORD_TEXT,
+    add_password( RMTOSD_CFG "password", "", RMTOSD_PASSWORD_TEXT,
         RMTOSD_PASSWORD_LONGTEXT, false )
     add_integer_with_range( RMTOSD_CFG "update", RMTOSD_UPDATE_DEFAULT,
         RMTOSD_UPDATE_MIN, RMTOSD_UPDATE_MAX, NULL, RMTOSD_UPDATE_TEXT,

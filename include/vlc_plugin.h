@@ -303,7 +303,7 @@ enum vlc_module_properties
     add_string_inner( CONFIG_ITEM_STRING, name, text, longtext, advc, \
                       value )
 
-#define add_password( name, value, p_callback, text, longtext, advc ) \
+#define add_password( name, value, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_PASSWORD, name, text, longtext, advc, \
                       value )
 

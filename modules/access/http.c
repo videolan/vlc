@@ -114,7 +114,7 @@ vlc_module_begin ()
 
     add_string( "http-proxy", NULL, PROXY_TEXT, PROXY_LONGTEXT,
                 false )
-    add_password( "http-proxy-pwd", NULL, NULL,
+    add_password( "http-proxy-pwd", NULL,
                   PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT, false )
     add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
