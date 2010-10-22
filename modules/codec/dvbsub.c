@@ -123,7 +123,7 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_integer( DVBSUB_CFG_PREFIX "position", 8, NULL, POS_TEXT, POS_LONGTEXT, true )
-        change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL )
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions )
     add_integer( DVBSUB_CFG_PREFIX "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, false )
     add_integer( DVBSUB_CFG_PREFIX "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, false )
 

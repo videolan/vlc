@@ -201,7 +201,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true )
     add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, true )
     add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, false )
-        change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL )
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions )
 
     set_section( N_("Font"), NULL )
     /* 5 sets the default to top [1] left [4] */
@@ -209,7 +209,7 @@ vlc_module_begin ()
         OPACITY_TEXT, OPACITY_LONGTEXT, false )
     add_integer( CFG_PREFIX "color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT,
                   false )
-        change_integer_list( pi_color_values, ppsz_color_descriptions, NULL )
+        change_integer_list( pi_color_values, ppsz_color_descriptions )
     add_integer( CFG_PREFIX "size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT, false )
 
     set_section( N_("Misc"), NULL )
@@ -220,7 +220,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "ttl", 1800, NULL, TTL_TEXT, TTL_LONGTEXT, false )
     add_bool( CFG_PREFIX "images", true, NULL, IMAGE_TEXT, IMAGE_LONGTEXT, false )
     add_integer( CFG_PREFIX "title", default_title, NULL, TITLE_TEXT, TITLE_LONGTEXT, false )
-        change_integer_list( pi_title_modes, ppsz_title_modes, NULL )
+        change_integer_list( pi_title_modes, ppsz_title_modes )
 
     set_description( N_("RSS and Atom feed display") )
     add_shortcut( "rss", "atom" )

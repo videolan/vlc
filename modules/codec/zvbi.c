@@ -91,7 +91,7 @@ vlc_module_begin ()
     add_bool( "vbi-opaque", true, NULL,
                  OPAQUE_TEXT, OPAQUE_LONGTEXT, false )
     add_integer( "vbi-position", 4, NULL, POS_TEXT, POS_LONGTEXT, false )
-        change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL );
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions );
     add_bool( "vbi-text", false, NULL,
               TELX_TEXT, TELX_LONGTEXT, false )
 vlc_module_end ()

@@ -283,7 +283,7 @@ vlc_module_begin ()
     set_section( N_( "Video input" ), NULL )
     add_integer( CFG_PREFIX "standard", 0, NULL, STANDARD_TEXT,
                  STANDARD_LONGTEXT, false )
-        change_integer_list( i_standards_list, psz_standards_list_text, NULL )
+        change_integer_list( i_standards_list, psz_standards_list_text )
     add_string( CFG_PREFIX "chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 true )
     add_integer( CFG_PREFIX "input", 0, NULL, INPUT_TEXT, INPUT_LONGTEXT,
@@ -292,7 +292,7 @@ vlc_module_begin ()
                  AUDIO_INPUT_LONGTEXT, true )
     add_integer( CFG_PREFIX "io", IO_METHOD_AUTO, NULL, IOMETHOD_TEXT,
                  IOMETHOD_LONGTEXT, true )
-        change_integer_list( i_iomethod_list, psz_iomethod_list_text, NULL )
+        change_integer_list( i_iomethod_list, psz_iomethod_list_text )
     add_integer( CFG_PREFIX "width", DEFAULT_WIDTH, NULL, WIDTH_TEXT,
                 WIDTH_LONGTEXT, true )
     add_integer( CFG_PREFIX "height", DEFAULT_HEIGHT, NULL, HEIGHT_TEXT,
@@ -314,7 +314,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "tuner-audio-mode", -1, NULL, TUNER_AUDIO_MODE_TEXT,
                  TUNER_AUDIO_MODE_LONGTEXT, true )
         change_integer_list( i_tuner_audio_modes_list,
-                             psz_tuner_audio_modes_list_text, 0 )
+                             psz_tuner_audio_modes_list_text )
 
     set_section( N_( "Controls" ),
                  N_( "v4l2 driver controls, if supported by your v4l2 driver." ) )

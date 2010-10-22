@@ -297,7 +297,7 @@ vlc_module_begin ()
                             0, sizeof(pi_font_effects)/sizeof(pi_font_effects[0])-1, TigerConfigurationCallback,
                             TIGER_DEFAULT_FONT_EFFECT_TEXT, TIGER_DEFAULT_FONT_EFFECT_LONGTEXT,
                             true )
-    change_integer_list( pi_font_effects, ppsz_font_effect_names, NULL );
+    change_integer_list( pi_font_effects, ppsz_font_effect_names );
     add_float_with_range( "kate-tiger-default-font-effect-strength",
               TIGER_DEFAULT_FONT_EFFECT_STRENGTH_DEFAULT, 0.0f, 1.0f, TigerConfigurationCallback,
               TIGER_DEFAULT_FONT_EFFECT_STRENGTH_TEXT, TIGER_DEFAULT_FONT_EFFECT_STRENGTH_LONGTEXT,
@@ -306,7 +306,7 @@ vlc_module_begin ()
                             TIGER_DEFAULT_FONT_COLOR_DEFAULT, 0, 0x00ffffff, TigerConfigurationCallback,
                             TIGER_DEFAULT_FONT_COLOR_TEXT, TIGER_DEFAULT_FONT_COLOR_LONGTEXT,
                             true);
-    change_integer_list( pi_color_values, ppsz_color_descriptions, NULL );
+    change_integer_list( pi_color_values, ppsz_color_descriptions );
     add_integer_with_range( "kate-tiger-default-font-alpha",
                             TIGER_DEFAULT_FONT_ALPHA_DEFAULT, 0, 255, TigerConfigurationCallback,
                             TIGER_DEFAULT_FONT_ALPHA_TEXT, TIGER_DEFAULT_FONT_ALPHA_LONGTEXT,
@@ -315,7 +315,7 @@ vlc_module_begin ()
                             TIGER_DEFAULT_BACKGROUND_COLOR_DEFAULT, 0, 0x00ffffff, TigerConfigurationCallback,
                             TIGER_DEFAULT_BACKGROUND_COLOR_TEXT, TIGER_DEFAULT_BACKGROUND_COLOR_LONGTEXT,
                             true);
-    change_integer_list( pi_color_values, ppsz_color_descriptions, NULL );
+    change_integer_list( pi_color_values, ppsz_color_descriptions );
     add_integer_with_range( "kate-tiger-default-background-alpha",
                             TIGER_DEFAULT_BACKGROUND_ALPHA_DEFAULT, 0, 255, TigerConfigurationCallback,
                             TIGER_DEFAULT_BACKGROUND_ALPHA_TEXT, TIGER_DEFAULT_BACKGROUND_ALPHA_LONGTEXT,

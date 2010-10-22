@@ -75,7 +75,7 @@ vlc_module_begin ()
               INTERLEAVE_TEXT, INTERLEAVE_LONGTEXT, true )
     add_integer( "avi-index", 0, NULL,
               INDEX_TEXT, INDEX_LONGTEXT, false )
-        change_integer_list( pi_index, ppsz_indexes, NULL )
+        change_integer_list( pi_index, ppsz_indexes )
 
     set_callbacks( Open, Close )
 vlc_module_end ()

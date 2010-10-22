@@ -113,10 +113,10 @@ vlc_module_begin ()
               false )
     add_integer( "quartztext-rel-fontsize", DEFAULT_REL_FONT_SIZE, NULL, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, false )
-        change_integer_list( pi_sizes, ppsz_sizes_text, NULL );
+        change_integer_list( pi_sizes, ppsz_sizes_text )
     add_integer( "quartztext-color", 0x00FFFFFF, NULL, COLOR_TEXT,
                  COLOR_LONGTEXT, false )
-        change_integer_list( pi_color_values, ppsz_color_descriptions, NULL );
+        change_integer_list( pi_color_values, ppsz_color_descriptions )
     set_capability( "text renderer", 150 )
     add_shortcut( "text" )
     set_callbacks( Create, Destroy )

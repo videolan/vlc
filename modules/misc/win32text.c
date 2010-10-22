@@ -105,11 +105,11 @@ vlc_module_begin ()
     /* hook to the color values list, with default 0x00ffffff = white */
     add_integer( "win32text-color", 0x00FFFFFF, NULL, COLOR_TEXT,
                  COLOR_LONGTEXT, true )
-        change_integer_list( pi_color_values, ppsz_color_descriptions, NULL );
+        change_integer_list( pi_color_values, ppsz_color_descriptions )
 
     add_integer( "win32text-rel-fontsize", 16, NULL, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, false )
-        change_integer_list( pi_sizes, ppsz_sizes_text, NULL );
+        change_integer_list( pi_sizes, ppsz_sizes_text )
 
     set_capability( "text renderer", 50 )
     add_shortcut( "text" )

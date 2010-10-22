@@ -1612,7 +1612,7 @@ vlc_module_begin ()
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, false )
     add_integer( "force-dolby-surround", 0, NULL, FORCE_DOLBY_TEXT,
                  FORCE_DOLBY_LONGTEXT, false )
-        change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions, NULL )
+        change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions )
     add_integer( "audio-desync", 0, NULL, DESYNC_TEXT,
                  DESYNC_LONGTEXT, true )
         change_safe ()
@@ -1708,7 +1708,7 @@ vlc_module_begin ()
     add_integer( "video-title-position", 8, NULL, VIDEO_TITLE_POSITION_TEXT,
                  VIDEO_TITLE_POSITION_LONGTEXT, false )
         change_safe()
-        change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL )
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions )
     // autohide after 1.5s
     add_integer( "mouse-hide-timeout", 1500, NULL, MOUSE_HIDE_TIMEOUT_TEXT,
                  MOUSE_HIDE_TIMEOUT_LONGTEXT, false )
@@ -1759,11 +1759,11 @@ vlc_module_begin ()
     add_string( "video-title", NULL, NULL, VIDEO_TITLE_TEXT,
                  VIDEO_TITLE_LONGTEXT, true )
     add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, true )
-        change_integer_list( pi_align_values, ppsz_align_descriptions, NULL )
+        change_integer_list( pi_align_values, ppsz_align_descriptions )
     add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, true )
     add_integer( "deinterlace", 0, NULL,
                  DEINTERLACE_TEXT, DEINTERLACE_LONGTEXT, false )
-        change_integer_list( pi_deinterlace, ppsz_deinterlace_text, 0 )
+        change_integer_list( pi_deinterlace, ppsz_deinterlace_text )
         change_safe()
     add_string( "deinterlace-mode", "blend", NULL,
                 DEINTERLACE_MODE_TEXT, DEINTERLACE_MODE_LONGTEXT, false )
@@ -1938,7 +1938,7 @@ vlc_module_begin ()
                  CR_AVERAGE_LONGTEXT, true )
     add_integer( "clock-synchro", -1, NULL, CLOCK_SYNCHRO_TEXT,
                  CLOCK_SYNCHRO_LONGTEXT, true )
-        change_integer_list( pi_clock_values, ppsz_clock_descriptions, NULL )
+        change_integer_list( pi_clock_values, ppsz_clock_descriptions )
     add_integer( "clock-jitter", 5 * CLOCK_FREQ/1000, NULL, CLOCK_JITTER_TEXT,
               CLOCK_JITTER_LONGTEXT, true )
         change_safe()
@@ -2158,7 +2158,7 @@ vlc_module_begin ()
     add_integer( "album-art", ALBUM_ART_WHEN_ASKED, NULL, ALBUM_ART_TEXT,
                  ALBUM_ART_LONGTEXT, false )
         change_integer_list( pi_albumart_values,
-                             ppsz_albumart_descriptions, 0 )
+                             ppsz_albumart_descriptions )
 
     set_subcategory( SUBCAT_PLAYLIST_SD )
     add_module_list_cat( "services-discovery", SUBCAT_PLAYLIST_SD, NULL,

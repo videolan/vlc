@@ -116,7 +116,7 @@ vlc_module_begin ()
               MONO_DOWNMIX_LONGTEXT, false )
     add_integer( MONO_CFG "channel", -1, NULL, MONO_CHANNEL_TEXT,
         MONO_CHANNEL_LONGTEXT, false )
-        change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL )
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions )
 
 vlc_module_end ()
 

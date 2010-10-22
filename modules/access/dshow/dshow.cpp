@@ -259,11 +259,11 @@ vlc_module_begin ()
 
     add_integer( CFG_PREFIX "tuner-standard", 0, NULL, STANDARD_TEXT, STANDARD_LONGTEXT,
                 false )
-        change_integer_list( i_standards_list, ppsz_standards_list_text, NULL )
+        change_integer_list( i_standards_list, ppsz_standards_list_text )
 
     add_integer( CFG_PREFIX "tuner-input", 0, NULL, TUNER_INPUT_TEXT,
                  TUNER_INPUT_LONGTEXT, true )
-        change_integer_list( pi_tuner_input, ppsz_tuner_input_text, NULL )
+        change_integer_list( pi_tuner_input, ppsz_tuner_input_text )
 
     add_integer( CFG_PREFIX "video-input",  -1, NULL, VIDEO_IN_TEXT,
                  VIDEO_IN_LONGTEXT, true )
@@ -279,7 +279,7 @@ vlc_module_begin ()
 
     add_integer( CFG_PREFIX "amtuner-mode", AMTUNER_MODE_TV, NULL,
                 AMTUNER_MODE_TEXT, AMTUNER_MODE_LONGTEXT, false)
-        change_integer_list( pi_amtuner_mode, ppsz_amtuner_mode_text, NULL )
+        change_integer_list( pi_amtuner_mode, ppsz_amtuner_mode_text )
 
     add_integer( CFG_PREFIX "audio-channels", 0, NULL, AUDIO_CHANNELS_TEXT,
                  AUDIO_CHANNELS_LONGTEXT, true )

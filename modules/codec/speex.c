@@ -110,7 +110,7 @@ vlc_module_begin ()
 
     add_integer( ENC_CFG_PREFIX "mode", 0, NULL, ENC_MODE_TEXT,
                  ENC_MODE_LONGTEXT, false )
-        change_integer_list( pi_enc_mode_values, ppsz_enc_mode_descriptions, NULL )
+        change_integer_list( pi_enc_mode_values, ppsz_enc_mode_descriptions )
 
     add_integer( ENC_CFG_PREFIX "complexity", 3, NULL, ENC_COMPLEXITY_TEXT,
                  ENC_COMPLEXITY_LONGTEXT, false )

@@ -108,7 +108,7 @@ vlc_module_begin ()
                  N_("MouseWheel x-axis Control"),
                  N_("MouseWheel x-axis can control volume, position or "
                     "mousewheel event can be ignored"), false )
-            change_integer_list( i_mode_list, psz_mode_list_text, NULL )
+            change_integer_list( i_mode_list, psz_mode_list_text )
 
 vlc_module_end ()
 

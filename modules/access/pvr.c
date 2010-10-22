@@ -140,7 +140,7 @@ vlc_module_begin ()
                  RADIO_DEVICE_LONGTEXT, false )
     add_integer( "pvr-norm", V4L2_STD_UNKNOWN , NULL, NORM_TEXT,
                  NORM_LONGTEXT, false )
-       change_integer_list( i_norm_list, psz_norm_list_text, NULL )
+       change_integer_list( i_norm_list, psz_norm_list_text )
     add_integer( "pvr-width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true )
     add_integer( "pvr-height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
                  true )
@@ -158,7 +158,7 @@ vlc_module_begin ()
                  BITRATE_PEAK_LONGTEXT, true )
     add_integer( "pvr-bitrate-mode", -1, NULL, BITRATE_MODE_TEXT,
                  BITRATE_MODE_LONGTEXT, true )
-        change_integer_list( i_bitrates, psz_bitrates_list_text, NULL )
+        change_integer_list( i_bitrates, psz_bitrates_list_text )
     add_integer( "pvr-audio-bitmask", -1, NULL, BITMASK_TEXT,
                  BITMASK_LONGTEXT, true )
     add_integer( "pvr-audio-volume", -1, NULL, VOLUME_TEXT,

@@ -221,7 +221,7 @@ vlc_module_begin ()
     /* DVB-S (satellite) */
     add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT,
         INVERSION_LONGTEXT, true )
-        change_integer_list( i_inversion_list, ppsz_inversion_text, NULL )
+        change_integer_list( i_inversion_list, ppsz_inversion_text )
 #   if defined(WIN32) || defined(WINCE)
         add_string( "dvb-polarisation", NULL, NULL, POLARISATION_TEXT,
             POLARISATION_LONGTEXT, false )
@@ -262,7 +262,7 @@ vlc_module_begin ()
     /* DVB-C (cable) */
     add_integer( "dvb-modulation", -1, NULL, MODULATION_TEXT,
         MODULATION_LONGTEXT, true )
-        change_integer_list( i_mod_list, ppsz_mod_text, NULL )
+        change_integer_list( i_mod_list, ppsz_mod_text )
 
     /* ATSC */
     add_integer( "dvb-major-channel", 0, NULL, MAJOR_CHANNEL_TEXT,
@@ -275,22 +275,22 @@ vlc_module_begin ()
     /* DVB-T (terrestrial) */
     add_integer( "dvb-code-rate-hp", -1, NULL, CODE_RATE_HP_TEXT,
         CODE_RATE_HP_LONGTEXT, true )
-        change_integer_list( i_hp_fec_list, ppsz_hp_fec_text, NULL )
+        change_integer_list( i_hp_fec_list, ppsz_hp_fec_text )
     add_integer( "dvb-code-rate-lp", -1, NULL, CODE_RATE_LP_TEXT,
         CODE_RATE_LP_LONGTEXT, true )
-        change_integer_list( i_lp_fec_list, ppsz_lp_fec_text, NULL )
+        change_integer_list( i_lp_fec_list, ppsz_lp_fec_text )
     add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
         false )
-        change_integer_list( i_band_list, ppsz_band_text, NULL )
+        change_integer_list( i_band_list, ppsz_band_text )
         change_safe()
     add_integer( "dvb-guard", -1, NULL, GUARD_TEXT, GUARD_LONGTEXT, true )
-        change_integer_list( i_guard_list, ppsz_guard_text, NULL )
+        change_integer_list( i_guard_list, ppsz_guard_text )
     add_integer( "dvb-transmission", -1, NULL, TRANSMISSION_TEXT,
         TRANSMISSION_LONGTEXT, true )
-        change_integer_list( i_transmission_list, ppsz_transmission_text, NULL )
+        change_integer_list( i_transmission_list, ppsz_transmission_text )
     add_integer( "dvb-hierarchy", -1, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
         true )
-        change_integer_list( i_hierarchy_list, ppsz_hierarchy_text, NULL )
+        change_integer_list( i_hierarchy_list, ppsz_hierarchy_text )
 
     set_capability( "access", 0 )
     add_shortcut( "dvb",                  /* Generic name */

@@ -94,7 +94,7 @@ vlc_module_begin ()
     add_integer_with_range( CFG_PREFIX "transparency", 255, 0, 255, NULL,
         TRANS_TEXT, TRANS_LONGTEXT, false )
     add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, false )
-        change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL )
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions )
     add_integer( CFG_PREFIX "alarm", 0, NULL, ALARM_TEXT, ALARM_LONGTEXT, true )
     add_integer( CFG_PREFIX "barWidth", 10, NULL, BARWIDTH_TEXT, BARWIDTH_LONGTEXT, true )
 

@@ -372,7 +372,7 @@ set_section( N_("Choose Devicetype and Connection" ), 0 )
 add_integer( CFG_PREFIX "device", DEFAULT_DEVICE, NULL,
             DRIVER_TEXT, DRIVER_LONGTEXT, false )
 change_integer_list( pi_device_type_values,
-                     ppsz_device_type_descriptions, 0 )
+                     ppsz_device_type_descriptions )
 
 #if defined(WIN32)
 add_string(CFG_PREFIX "serialdev", "COM1", NULL,
@@ -510,7 +510,7 @@ add_integer_with_range(CFG_PREFIX "satwinsize",   3, 0, 5, NULL,
 add_integer(CFG_PREFIX "filtermode", (int)afmCombined, NULL,
             FILTERMODE_TEXT, FILTERMODE_LONGTEXT, false )
 
-change_integer_list(pi_filtermode_values, ppsz_filtermode_descriptions, NULL )
+change_integer_list(pi_filtermode_values, ppsz_filtermode_descriptions )
 
 add_integer_with_range(CFG_PREFIX "meanlength",    300, 300, 5000, NULL,
                        MEANLENGTH_TEXT, MEANLENGTH_LONGTEXT, false)
@@ -531,27 +531,27 @@ set_section( N_("Change channel assignment (fixes wrong wiring)" ), 0 )
 add_integer( CFG_PREFIX "channel_0", 4, NULL,
             CHANNEL_0_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
 change_integer_list( pi_zone_assignment_values,
-                     ppsz_zone_assignment_descriptions, 0 )
+                     ppsz_zone_assignment_descriptions )
 
 add_integer( CFG_PREFIX "channel_1", 3, NULL,
             CHANNEL_1_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
 change_integer_list( pi_zone_assignment_values,
-                     ppsz_zone_assignment_descriptions, 0 )
+                     ppsz_zone_assignment_descriptions )
 
 add_integer( CFG_PREFIX "channel_2", 1, NULL,
             CHANNEL_2_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
 change_integer_list( pi_zone_assignment_values,
-                     ppsz_zone_assignment_descriptions, 0 )
+                     ppsz_zone_assignment_descriptions )
 
 add_integer( CFG_PREFIX "channel_3", 0, NULL,
             CHANNEL_3_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
 change_integer_list( pi_zone_assignment_values,
-                     ppsz_zone_assignment_descriptions, 0 )
+                     ppsz_zone_assignment_descriptions )
 
 add_integer( CFG_PREFIX "channel_4", 2, NULL,
             CHANNEL_4_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
 change_integer_list( pi_zone_assignment_values,
-                     ppsz_zone_assignment_descriptions, 0 )
+                     ppsz_zone_assignment_descriptions )
 
 add_string(CFG_PREFIX "channels", NULL, NULL,
            CHANNELS_ASSIGN_TEXT, CHANNELS_ASSIGN_LONGTEXT, false )

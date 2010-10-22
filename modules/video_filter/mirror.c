@@ -84,11 +84,10 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "split", 0, NULL, ORIENTATION_TEXT,
                 ORIENTATION_LONGTEXT, false )
         change_integer_list( pi_orientation_values,
-                            ppsz_orientation_descriptions, NULL )
+                            ppsz_orientation_descriptions )
     add_integer( CFG_PREFIX "direction", 0, NULL, DIRECTION_TEXT,
                 DIRECTION_LONGTEXT, false )
-        change_integer_list( pi_direction_values, ppsz_direction_descriptions,
-                            NULL )
+        change_integer_list( pi_direction_values, ppsz_direction_descriptions )
     set_callbacks( Create, Destroy )
 vlc_module_end ()
 

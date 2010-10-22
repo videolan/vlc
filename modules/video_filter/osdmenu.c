@@ -128,7 +128,7 @@ vlc_module_begin ()
     add_integer( OSD_CFG "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, false )
     add_integer( OSD_CFG "position", 8, NULL, POS_TEXT, POS_LONGTEXT,
                  false )
-        change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL )
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions )
     add_string( OSD_CFG "file", OSD_DEFAULT_CFG, NULL, OSD_FILE_TEXT,
         OSD_FILE_LONGTEXT, false )
     add_string( OSD_CFG "file-path", NULL, NULL, OSD_PATH_TEXT,
