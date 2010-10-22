@@ -113,7 +113,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     set_callbacks( Open, Close )
     add_shortcut( "curses" )
-    add_directory( "browse-dir", NULL, NULL, BROWSE_TEXT, BROWSE_LONGTEXT, false )
+    add_directory( "browse-dir", NULL, BROWSE_TEXT, BROWSE_LONGTEXT, false )
 vlc_module_end ()
 
 /*****************************************************************************

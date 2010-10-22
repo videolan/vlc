@@ -1713,7 +1713,7 @@ vlc_module_begin ()
     add_integer( "mouse-hide-timeout", 1500, NULL, MOUSE_HIDE_TIMEOUT_TEXT,
                  MOUSE_HIDE_TIMEOUT_LONGTEXT, false )
     set_section( N_("Snapshot") , NULL )
-    add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
+    add_directory( "snapshot-path", NULL, SNAP_PATH_TEXT,
                    SNAP_PATH_LONGTEXT, false )
     add_string( "snapshot-prefix", "vlcsnap-", SNAP_PREFIX_TEXT,
                    SNAP_PREFIX_LONGTEXT, false )
@@ -2074,10 +2074,10 @@ vlc_module_begin ()
     add_bool( "plugins-cache", true, NULL, PLUGINS_CACHE_TEXT,
               PLUGINS_CACHE_LONGTEXT, true )
         change_need_restart ()
-    add_directory( "plugin-path", NULL, NULL, PLUGIN_PATH_TEXT,
+    add_directory( "plugin-path", NULL, PLUGIN_PATH_TEXT,
                    PLUGIN_PATH_LONGTEXT, true )
         change_need_restart ()
-    add_directory( "data-path", NULL, NULL, DATA_PATH_TEXT,
+    add_directory( "data-path", NULL, DATA_PATH_TEXT,
                    DATA_PATH_LONGTEXT, true )
         change_need_restart ()
 

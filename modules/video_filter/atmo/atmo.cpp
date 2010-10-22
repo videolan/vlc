@@ -593,7 +593,7 @@ add_loadfile(CFG_PREFIX "gradient_zone_3", NULL,
              ZONE_3_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
 add_loadfile(CFG_PREFIX "gradient_zone_4", NULL,
              ZONE_4_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
-add_directory(CFG_PREFIX "gradient_path", NULL, NULL,
+add_directory(CFG_PREFIX "gradient_path", NULL,
            GRADIENT_PATH_TEXT, GRADIENT_PATH_LONGTEXT, false )
 
 #if defined(__ATMO_DEBUG__)
