@@ -2502,177 +2502,177 @@ vlc_module_begin ()
 #   define KEY_MENU_SELECT        KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_ENTER
 #endif
 
-    add_key( "key-toggle-fullscreen", KEY_TOGGLE_FULLSCREEN, NULL, TOGGLE_FULLSCREEN_KEY_TEXT,
+    add_key( "key-toggle-fullscreen", KEY_TOGGLE_FULLSCREEN, TOGGLE_FULLSCREEN_KEY_TEXT,
              TOGGLE_FULLSCREEN_KEY_LONGTEXT, false )
        add_deprecated_alias( "key-fullscreen" ) /*deprecated since 0.9.0 */
-    add_key( "key-leave-fullscreen", KEY_LEAVE_FULLSCREEN, NULL, LEAVE_FULLSCREEN_KEY_TEXT,
+    add_key( "key-leave-fullscreen", KEY_LEAVE_FULLSCREEN, LEAVE_FULLSCREEN_KEY_TEXT,
              LEAVE_FULLSCREEN_KEY_LONGTEXT, false )
-    add_key( "key-play-pause", KEY_PLAY_PAUSE, NULL, PLAY_PAUSE_KEY_TEXT,
+    add_key( "key-play-pause", KEY_PLAY_PAUSE, PLAY_PAUSE_KEY_TEXT,
              PLAY_PAUSE_KEY_LONGTEXT, false )
-    add_key( "key-pause", KEY_PAUSE, NULL, PAUSE_KEY_TEXT,
+    add_key( "key-pause", KEY_PAUSE, PAUSE_KEY_TEXT,
              PAUSE_KEY_LONGTEXT, true )
-    add_key( "key-play", KEY_PLAY, NULL, PLAY_KEY_TEXT,
+    add_key( "key-play", KEY_PLAY, PLAY_KEY_TEXT,
              PLAY_KEY_LONGTEXT, true )
-    add_key( "key-faster", KEY_FASTER, NULL, FASTER_KEY_TEXT,
+    add_key( "key-faster", KEY_FASTER, FASTER_KEY_TEXT,
              FASTER_KEY_LONGTEXT, false )
-    add_key( "key-slower", KEY_SLOWER, NULL, SLOWER_KEY_TEXT,
+    add_key( "key-slower", KEY_SLOWER, SLOWER_KEY_TEXT,
              SLOWER_KEY_LONGTEXT, false )
-    add_key( "key-rate-normal", KEY_RATE_NORMAL, NULL, RATE_NORMAL_KEY_TEXT,
+    add_key( "key-rate-normal", KEY_RATE_NORMAL, RATE_NORMAL_KEY_TEXT,
              RATE_NORMAL_KEY_LONGTEXT, false )
-    add_key( "key-rate-faster-fine", KEY_RATE_FASTER_FINE, NULL, RATE_FASTER_FINE_KEY_TEXT,
+    add_key( "key-rate-faster-fine", KEY_RATE_FASTER_FINE, RATE_FASTER_FINE_KEY_TEXT,
              RATE_FASTER_FINE_KEY_LONGTEXT, false )
-    add_key( "key-rate-slower-fine", KEY_RATE_SLOWER_FINE, NULL, RATE_SLOWER_FINE_KEY_TEXT,
+    add_key( "key-rate-slower-fine", KEY_RATE_SLOWER_FINE, RATE_SLOWER_FINE_KEY_TEXT,
              RATE_SLOWER_FINE_KEY_LONGTEXT, false )
-    add_key( "key-next", KEY_NEXT, NULL, NEXT_KEY_TEXT,
+    add_key( "key-next", KEY_NEXT, NEXT_KEY_TEXT,
              NEXT_KEY_LONGTEXT, false )
-    add_key( "key-prev", KEY_PREV, NULL, PREV_KEY_TEXT,
+    add_key( "key-prev", KEY_PREV, PREV_KEY_TEXT,
              PREV_KEY_LONGTEXT, false )
-    add_key( "key-stop", KEY_STOP, NULL, STOP_KEY_TEXT,
+    add_key( "key-stop", KEY_STOP, STOP_KEY_TEXT,
              STOP_KEY_LONGTEXT, false )
-    add_key( "key-position", KEY_POSITION, NULL, POSITION_KEY_TEXT,
+    add_key( "key-position", KEY_POSITION, POSITION_KEY_TEXT,
              POSITION_KEY_LONGTEXT, true )
-    add_key( "key-jump-extrashort", KEY_JUMP_MEXTRASHORT, NULL,
+    add_key( "key-jump-extrashort", KEY_JUMP_MEXTRASHORT,
              JBEXTRASHORT_KEY_TEXT, JBEXTRASHORT_KEY_LONGTEXT, false )
-    add_key( "key-jump+extrashort", KEY_JUMP_PEXTRASHORT, NULL,
+    add_key( "key-jump+extrashort", KEY_JUMP_PEXTRASHORT,
              JFEXTRASHORT_KEY_TEXT, JFEXTRASHORT_KEY_LONGTEXT, false )
-    add_key( "key-jump-short", KEY_JUMP_MSHORT, NULL, JBSHORT_KEY_TEXT,
+    add_key( "key-jump-short", KEY_JUMP_MSHORT, JBSHORT_KEY_TEXT,
              JBSHORT_KEY_LONGTEXT, false )
-    add_key( "key-jump+short", KEY_JUMP_PSHORT, NULL, JFSHORT_KEY_TEXT,
+    add_key( "key-jump+short", KEY_JUMP_PSHORT, JFSHORT_KEY_TEXT,
              JFSHORT_KEY_LONGTEXT, false )
-    add_key( "key-jump-medium", KEY_JUMP_MMEDIUM, NULL, JBMEDIUM_KEY_TEXT,
+    add_key( "key-jump-medium", KEY_JUMP_MMEDIUM, JBMEDIUM_KEY_TEXT,
              JBMEDIUM_KEY_LONGTEXT, false )
-    add_key( "key-jump+medium", KEY_JUMP_PMEDIUM, NULL, JFMEDIUM_KEY_TEXT,
+    add_key( "key-jump+medium", KEY_JUMP_PMEDIUM, JFMEDIUM_KEY_TEXT,
              JFMEDIUM_KEY_LONGTEXT, false )
-    add_key( "key-jump-long", KEY_JUMP_MLONG, NULL, JBLONG_KEY_TEXT,
+    add_key( "key-jump-long", KEY_JUMP_MLONG, JBLONG_KEY_TEXT,
              JBLONG_KEY_LONGTEXT, false )
-    add_key( "key-jump+long", KEY_JUMP_PLONG, NULL, JFLONG_KEY_TEXT,
+    add_key( "key-jump+long", KEY_JUMP_PLONG, JFLONG_KEY_TEXT,
              JFLONG_KEY_LONGTEXT, false )
-    add_key( "key-frame-next", KEY_FRAME_NEXT, NULL, FRAME_NEXT_KEY_TEXT,
+    add_key( "key-frame-next", KEY_FRAME_NEXT, FRAME_NEXT_KEY_TEXT,
              FRAME_NEXT_KEY_LONGTEXT, false )
-    add_key( "key-nav-activate", KEY_NAV_ACTIVATE, NULL, NAV_ACTIVATE_KEY_TEXT,
+    add_key( "key-nav-activate", KEY_NAV_ACTIVATE, NAV_ACTIVATE_KEY_TEXT,
              NAV_ACTIVATE_KEY_LONGTEXT, true )
-    add_key( "key-nav-up", KEY_NAV_UP, NULL, NAV_UP_KEY_TEXT,
+    add_key( "key-nav-up", KEY_NAV_UP, NAV_UP_KEY_TEXT,
              NAV_UP_KEY_LONGTEXT, true )
-    add_key( "key-nav-down", KEY_NAV_DOWN, NULL, NAV_DOWN_KEY_TEXT,
+    add_key( "key-nav-down", KEY_NAV_DOWN, NAV_DOWN_KEY_TEXT,
              NAV_DOWN_KEY_LONGTEXT, true )
-    add_key( "key-nav-left", KEY_NAV_LEFT, NULL, NAV_LEFT_KEY_TEXT,
+    add_key( "key-nav-left", KEY_NAV_LEFT, NAV_LEFT_KEY_TEXT,
              NAV_LEFT_KEY_LONGTEXT, true )
-    add_key( "key-nav-right", KEY_NAV_RIGHT, NULL, NAV_RIGHT_KEY_TEXT,
+    add_key( "key-nav-right", KEY_NAV_RIGHT, NAV_RIGHT_KEY_TEXT,
              NAV_RIGHT_KEY_LONGTEXT, true )
 
-    add_key( "key-disc-menu", KEY_DISC_MENU, NULL, DISC_MENU_TEXT,
+    add_key( "key-disc-menu", KEY_DISC_MENU, DISC_MENU_TEXT,
              DISC_MENU_LONGTEXT, true )
-    add_key( "key-title-prev", KEY_TITLE_PREV, NULL, TITLE_PREV_TEXT,
+    add_key( "key-title-prev", KEY_TITLE_PREV, TITLE_PREV_TEXT,
              TITLE_PREV_LONGTEXT, true )
-    add_key( "key-title-next", KEY_TITLE_NEXT, NULL, TITLE_NEXT_TEXT,
+    add_key( "key-title-next", KEY_TITLE_NEXT, TITLE_NEXT_TEXT,
              TITLE_NEXT_LONGTEXT, true )
-    add_key( "key-chapter-prev", KEY_CHAPTER_PREV, NULL, CHAPTER_PREV_TEXT,
+    add_key( "key-chapter-prev", KEY_CHAPTER_PREV, CHAPTER_PREV_TEXT,
              CHAPTER_PREV_LONGTEXT, true )
-    add_key( "key-chapter-next", KEY_CHAPTER_NEXT, NULL, CHAPTER_NEXT_TEXT,
+    add_key( "key-chapter-next", KEY_CHAPTER_NEXT, CHAPTER_NEXT_TEXT,
              CHAPTER_NEXT_LONGTEXT, true )
-    add_key( "key-quit", KEY_QUIT, NULL, QUIT_KEY_TEXT,
+    add_key( "key-quit", KEY_QUIT, QUIT_KEY_TEXT,
              QUIT_KEY_LONGTEXT, false )
-    add_key( "key-vol-up", KEY_VOL_UP, NULL, VOL_UP_KEY_TEXT,
+    add_key( "key-vol-up", KEY_VOL_UP, VOL_UP_KEY_TEXT,
              VOL_UP_KEY_LONGTEXT, false )
-    add_key( "key-vol-down", KEY_VOL_DOWN, NULL, VOL_DOWN_KEY_TEXT,
+    add_key( "key-vol-down", KEY_VOL_DOWN, VOL_DOWN_KEY_TEXT,
              VOL_DOWN_KEY_LONGTEXT, false )
-    add_key( "key-vol-mute", KEY_VOL_MUTE, NULL, VOL_MUTE_KEY_TEXT,
+    add_key( "key-vol-mute", KEY_VOL_MUTE, VOL_MUTE_KEY_TEXT,
              VOL_MUTE_KEY_LONGTEXT, false )
-    add_key( "key-subdelay-up", KEY_SUBDELAY_UP, NULL,
+    add_key( "key-subdelay-up", KEY_SUBDELAY_UP,
              SUBDELAY_UP_KEY_TEXT, SUBDELAY_UP_KEY_LONGTEXT, true )
-    add_key( "key-subdelay-down", KEY_SUBDELAY_DOWN, NULL,
+    add_key( "key-subdelay-down", KEY_SUBDELAY_DOWN,
              SUBDELAY_DOWN_KEY_TEXT, SUBDELAY_DOWN_KEY_LONGTEXT, true )
-    add_key( "key-subpos-up", KEY_SUBPOS_UP, NULL,
+    add_key( "key-subpos-up", KEY_SUBPOS_UP,
              SUBPOS_UP_KEY_TEXT, SUBPOS_UP_KEY_LONGTEXT, true )
-    add_key( "key-subpos-down", KEY_SUBPOS_DOWN, NULL,
+    add_key( "key-subpos-down", KEY_SUBPOS_DOWN,
              SUBPOS_DOWN_KEY_TEXT, SUBPOS_DOWN_KEY_LONGTEXT, true )
-    add_key( "key-audiodelay-up", KEY_AUDIODELAY_UP, NULL,
+    add_key( "key-audiodelay-up", KEY_AUDIODELAY_UP,
              AUDIODELAY_UP_KEY_TEXT, AUDIODELAY_UP_KEY_LONGTEXT, true )
-    add_key( "key-audiodelay-down", KEY_AUDIODELAY_DOWN, NULL,
+    add_key( "key-audiodelay-down", KEY_AUDIODELAY_DOWN,
              AUDIODELAY_DOWN_KEY_TEXT, AUDIODELAY_DOWN_KEY_LONGTEXT, true )
-    add_key( "key-audio-track", KEY_AUDIO_TRACK, NULL, AUDIO_TRACK_KEY_TEXT,
+    add_key( "key-audio-track", KEY_AUDIO_TRACK, AUDIO_TRACK_KEY_TEXT,
              AUDIO_TRACK_KEY_LONGTEXT, false )
-    add_key( "key-audiodevice-cycle", KEY_AUDIODEVICE_CYCLE, NULL, AUDI_DEVICE_CYCLE_KEY_TEXT,
+    add_key( "key-audiodevice-cycle", KEY_AUDIODEVICE_CYCLE, AUDI_DEVICE_CYCLE_KEY_TEXT,
              AUDI_DEVICE_CYCLE_KEY_LONGTEXT, false )
-    add_key( "key-subtitle-track", KEY_SUBTITLE_TRACK, NULL,
+    add_key( "key-subtitle-track", KEY_SUBTITLE_TRACK,
              SUBTITLE_TRACK_KEY_TEXT, SUBTITLE_TRACK_KEY_LONGTEXT, false )
-    add_key( "key-aspect-ratio", KEY_ASPECT_RATIO, NULL,
+    add_key( "key-aspect-ratio", KEY_ASPECT_RATIO,
              ASPECT_RATIO_KEY_TEXT, ASPECT_RATIO_KEY_LONGTEXT, false )
-    add_key( "key-crop", KEY_CROP, NULL,
+    add_key( "key-crop", KEY_CROP,
              CROP_KEY_TEXT, CROP_KEY_LONGTEXT, false )
-    add_key( "key-toggle-autoscale", KEY_TOGGLE_AUTOSCALE, NULL,
+    add_key( "key-toggle-autoscale", KEY_TOGGLE_AUTOSCALE,
              TOGGLE_AUTOSCALE_KEY_TEXT, TOGGLE_AUTOSCALE_KEY_LONGTEXT, false )
-    add_key( "key-incr-scalefactor", KEY_SCALE_UP, NULL,
+    add_key( "key-incr-scalefactor", KEY_SCALE_UP,
              SCALE_UP_KEY_TEXT, SCALE_UP_KEY_LONGTEXT, false )
-    add_key( "key-decr-scalefactor", KEY_SCALE_DOWN, NULL,
+    add_key( "key-decr-scalefactor", KEY_SCALE_DOWN,
              SCALE_DOWN_KEY_TEXT, SCALE_DOWN_KEY_LONGTEXT, false )
-    add_key( "key-deinterlace", KEY_DEINTERLACE, NULL,
+    add_key( "key-deinterlace", KEY_DEINTERLACE,
              DEINTERLACE_KEY_TEXT, DEINTERLACE_KEY_LONGTEXT, false )
-    add_key( "key-intf-show", KEY_INTF_SHOW, NULL,
+    add_key( "key-intf-show", KEY_INTF_SHOW,
              INTF_SHOW_KEY_TEXT, INTF_SHOW_KEY_LONGTEXT, true )
-    add_key( "key-intf-hide", KEY_INTF_HIDE, NULL,
+    add_key( "key-intf-hide", KEY_INTF_HIDE,
              INTF_HIDE_KEY_TEXT, INTF_HIDE_KEY_LONGTEXT, true )
-    add_key( "key-snapshot", KEY_SNAPSHOT, NULL,
+    add_key( "key-snapshot", KEY_SNAPSHOT,
         SNAP_KEY_TEXT, SNAP_KEY_LONGTEXT, true )
-    add_key( "key-history-back", KEY_HISTORY_BACK, NULL, HISTORY_BACK_TEXT,
+    add_key( "key-history-back", KEY_HISTORY_BACK, HISTORY_BACK_TEXT,
              HISTORY_BACK_LONGTEXT, true )
-    add_key( "key-history-forward", KEY_HISTORY_FORWARD, NULL,
+    add_key( "key-history-forward", KEY_HISTORY_FORWARD,
              HISTORY_FORWARD_TEXT, HISTORY_FORWARD_LONGTEXT, true )
-    add_key( "key-record", KEY_RECORD, NULL,
+    add_key( "key-record", KEY_RECORD,
              RECORD_KEY_TEXT, RECORD_KEY_LONGTEXT, true )
-    add_key( "key-dump", KEY_DUMP, NULL,
+    add_key( "key-dump", KEY_DUMP,
              DUMP_KEY_TEXT, DUMP_KEY_LONGTEXT, true )
-    add_key( "key-zoom", KEY_ZOOM, NULL,
+    add_key( "key-zoom", KEY_ZOOM,
              ZOOM_KEY_TEXT, ZOOM_KEY_LONGTEXT, true )
-    add_key( "key-unzoom", KEY_UNZOOM, NULL,
+    add_key( "key-unzoom", KEY_UNZOOM,
              UNZOOM_KEY_TEXT, UNZOOM_KEY_LONGTEXT, true )
-    add_key( "key-wallpaper", KEY_WALLPAPER, NULL, WALLPAPER_KEY_TEXT,
+    add_key( "key-wallpaper", KEY_WALLPAPER, WALLPAPER_KEY_TEXT,
              WALLPAPER_KEY_LONGTEXT, false )
 
-    add_key( "key-menu-on", KEY_MENU_ON, NULL,
+    add_key( "key-menu-on", KEY_MENU_ON,
              MENU_ON_KEY_TEXT, MENU_ON_KEY_LONGTEXT, true )
-    add_key( "key-menu-off", KEY_MENU_OFF, NULL,
+    add_key( "key-menu-off", KEY_MENU_OFF,
              MENU_OFF_KEY_TEXT, MENU_OFF_KEY_LONGTEXT, true )
-    add_key( "key-menu-right", KEY_MENU_RIGHT, NULL,
+    add_key( "key-menu-right", KEY_MENU_RIGHT,
              MENU_RIGHT_KEY_TEXT, MENU_RIGHT_KEY_LONGTEXT, true )
-    add_key( "key-menu-left", KEY_MENU_LEFT, NULL,
+    add_key( "key-menu-left", KEY_MENU_LEFT,
              MENU_LEFT_KEY_TEXT, MENU_LEFT_KEY_LONGTEXT, true )
-    add_key( "key-menu-up", KEY_MENU_UP, NULL,
+    add_key( "key-menu-up", KEY_MENU_UP,
              MENU_UP_KEY_TEXT, MENU_UP_KEY_LONGTEXT, true )
-    add_key( "key-menu-down", KEY_MENU_DOWN, NULL,
+    add_key( "key-menu-down", KEY_MENU_DOWN,
              MENU_DOWN_KEY_TEXT, MENU_DOWN_KEY_LONGTEXT, true )
-    add_key( "key-menu-select", KEY_MENU_SELECT, NULL,
+    add_key( "key-menu-select", KEY_MENU_SELECT,
              MENU_SELECT_KEY_TEXT, MENU_SELECT_KEY_LONGTEXT, true )
 
-    add_key( "key-crop-top", KEY_CROP_TOP, NULL,
+    add_key( "key-crop-top", KEY_CROP_TOP,
              CROP_TOP_KEY_TEXT, CROP_TOP_KEY_LONGTEXT, true )
-    add_key( "key-uncrop-top", KEY_UNCROP_TOP, NULL,
+    add_key( "key-uncrop-top", KEY_UNCROP_TOP,
              UNCROP_TOP_KEY_TEXT, UNCROP_TOP_KEY_LONGTEXT, true )
-    add_key( "key-crop-left", KEY_CROP_LEFT, NULL,
+    add_key( "key-crop-left", KEY_CROP_LEFT,
              CROP_LEFT_KEY_TEXT, CROP_LEFT_KEY_LONGTEXT, true )
-    add_key( "key-uncrop-left", KEY_UNCROP_LEFT, NULL,
+    add_key( "key-uncrop-left", KEY_UNCROP_LEFT,
              UNCROP_LEFT_KEY_TEXT, UNCROP_LEFT_KEY_LONGTEXT, true )
-    add_key( "key-crop-bottom", KEY_CROP_BOTTOM, NULL,
+    add_key( "key-crop-bottom", KEY_CROP_BOTTOM,
              CROP_BOTTOM_KEY_TEXT, CROP_BOTTOM_KEY_LONGTEXT, true )
-    add_key( "key-uncrop-bottom", KEY_UNCROP_BOTTOM, NULL,
+    add_key( "key-uncrop-bottom", KEY_UNCROP_BOTTOM,
              UNCROP_BOTTOM_KEY_TEXT, UNCROP_BOTTOM_KEY_LONGTEXT, true )
-    add_key( "key-crop-right", KEY_CROP_RIGHT, NULL,
+    add_key( "key-crop-right", KEY_CROP_RIGHT,
              CROP_RIGHT_KEY_TEXT, CROP_RIGHT_KEY_LONGTEXT, true )
-    add_key( "key-uncrop-right", KEY_UNCROP_RIGHT, NULL,
+    add_key( "key-uncrop-right", KEY_UNCROP_RIGHT,
              UNCROP_RIGHT_KEY_TEXT, UNCROP_RIGHT_KEY_LONGTEXT, true )
-    add_key( "key-random", KEY_RANDOM, NULL,
+    add_key( "key-random", KEY_RANDOM,
              RANDOM_KEY_TEXT, RANDOM_KEY_LONGTEXT, false )
-    add_key( "key-loop", KEY_LOOP, NULL,
+    add_key( "key-loop", KEY_LOOP,
              LOOP_KEY_TEXT, LOOP_KEY_LONGTEXT, false )
 
     set_section ( N_("Zoom" ), NULL )
-    add_key( "key-zoom-quarter",  KEY_ZOOM_QUARTER, NULL,
+    add_key( "key-zoom-quarter",  KEY_ZOOM_QUARTER,
         ZOOM_QUARTER_KEY_TEXT,  NULL, false )
-    add_key( "key-zoom-half",     KEY_ZOOM_HALF, NULL,
+    add_key( "key-zoom-half",     KEY_ZOOM_HALF,
         ZOOM_HALF_KEY_TEXT,     NULL, false )
-    add_key( "key-zoom-original", KEY_ZOOM_ORIGINAL, NULL,
+    add_key( "key-zoom-original", KEY_ZOOM_ORIGINAL,
         ZOOM_ORIGINAL_KEY_TEXT, NULL, false )
-    add_key( "key-zoom-double",   KEY_ZOOM_DOUBLE, NULL,
+    add_key( "key-zoom-double",   KEY_ZOOM_DOUBLE,
         ZOOM_DOUBLE_KEY_TEXT,   NULL, false )
 
     set_section ( N_("Jump sizes" ), NULL )
@@ -2688,45 +2688,45 @@ vlc_module_begin ()
     /* HACK so these don't get displayed */
     set_category( -1 )
     set_subcategory( -1 )
-    add_key( "key-set-bookmark1", KEY_SET_BOOKMARK1, NULL,
+    add_key( "key-set-bookmark1", KEY_SET_BOOKMARK1,
              SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-set-bookmark2", KEY_SET_BOOKMARK2, NULL,
+    add_key( "key-set-bookmark2", KEY_SET_BOOKMARK2,
              SET_BOOKMARK2_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-set-bookmark3", KEY_SET_BOOKMARK3, NULL,
+    add_key( "key-set-bookmark3", KEY_SET_BOOKMARK3,
              SET_BOOKMARK3_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-set-bookmark4", KEY_SET_BOOKMARK4, NULL,
+    add_key( "key-set-bookmark4", KEY_SET_BOOKMARK4,
              SET_BOOKMARK4_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-set-bookmark5", KEY_SET_BOOKMARK5, NULL,
+    add_key( "key-set-bookmark5", KEY_SET_BOOKMARK5,
              SET_BOOKMARK5_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-set-bookmark6", KEY_SET_BOOKMARK6, NULL,
+    add_key( "key-set-bookmark6", KEY_SET_BOOKMARK6,
              SET_BOOKMARK6_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-set-bookmark7", KEY_SET_BOOKMARK7, NULL,
+    add_key( "key-set-bookmark7", KEY_SET_BOOKMARK7,
              SET_BOOKMARK7_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-set-bookmark8", KEY_SET_BOOKMARK8, NULL,
+    add_key( "key-set-bookmark8", KEY_SET_BOOKMARK8,
              SET_BOOKMARK8_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-set-bookmark9", KEY_SET_BOOKMARK9, NULL,
+    add_key( "key-set-bookmark9", KEY_SET_BOOKMARK9,
              SET_BOOKMARK9_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-set-bookmark10", KEY_SET_BOOKMARK10, NULL,
+    add_key( "key-set-bookmark10", KEY_SET_BOOKMARK10,
              SET_BOOKMARK10_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-play-bookmark1", KEY_PLAY_BOOKMARK1, NULL,
+    add_key( "key-play-bookmark1", KEY_PLAY_BOOKMARK1,
              PLAY_BOOKMARK1_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-play-bookmark2", KEY_PLAY_BOOKMARK2, NULL,
+    add_key( "key-play-bookmark2", KEY_PLAY_BOOKMARK2,
              PLAY_BOOKMARK2_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-play-bookmark3", KEY_PLAY_BOOKMARK3, NULL,
+    add_key( "key-play-bookmark3", KEY_PLAY_BOOKMARK3,
              PLAY_BOOKMARK3_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-play-bookmark4", KEY_PLAY_BOOKMARK4, NULL,
+    add_key( "key-play-bookmark4", KEY_PLAY_BOOKMARK4,
              PLAY_BOOKMARK4_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-play-bookmark5", KEY_PLAY_BOOKMARK5, NULL,
+    add_key( "key-play-bookmark5", KEY_PLAY_BOOKMARK5,
              PLAY_BOOKMARK5_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-play-bookmark6", KEY_PLAY_BOOKMARK6, NULL,
+    add_key( "key-play-bookmark6", KEY_PLAY_BOOKMARK6,
              PLAY_BOOKMARK6_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-play-bookmark7", KEY_PLAY_BOOKMARK7, NULL,
+    add_key( "key-play-bookmark7", KEY_PLAY_BOOKMARK7,
              PLAY_BOOKMARK7_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-play-bookmark8", KEY_PLAY_BOOKMARK8, NULL,
+    add_key( "key-play-bookmark8", KEY_PLAY_BOOKMARK8,
              PLAY_BOOKMARK8_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-play-bookmark9", KEY_PLAY_BOOKMARK9, NULL,
+    add_key( "key-play-bookmark9", KEY_PLAY_BOOKMARK9,
              PLAY_BOOKMARK9_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, true )
-    add_key( "key-play-bookmark10", KEY_PLAY_BOOKMARK10, NULL,
+    add_key( "key-play-bookmark10", KEY_PLAY_BOOKMARK10,
              PLAY_BOOKMARK10_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, true )
 
 

@@ -348,7 +348,7 @@ enum vlc_module_properties
 #define add_integer( name, value, text, longtext, advc ) \
     add_int_inner( CONFIG_ITEM_INTEGER, name, text, longtext, advc, value )
 
-#define add_key( name, value, p_callback, text, longtext, advc ) \
+#define add_key( name, value, text, longtext, advc ) \
     add_int_inner( CONFIG_ITEM_KEY, name, text, longtext, advc, value ) \
     add_int_inner( CONFIG_ITEM_KEY, "global-" name, text, longtext, advc, \
                    KEY_UNSET )
