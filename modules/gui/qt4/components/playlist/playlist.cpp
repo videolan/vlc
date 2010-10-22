@@ -51,16 +51,9 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     /* Source Selector */
     selector = new PLSelector( this, p_intf );
 
-    QLabel *selLabel = new QLabel( qtr( "Media Browser" ) );
-    QFont font;
-    font.setBold( true );
-    selLabel->setFont( font );
-    selLabel->setMargin( 5 );
-
     QVBoxLayout *selBox = new QVBoxLayout();
     selBox->setContentsMargins(0,0,0,0);
     selBox->setSpacing( 0 );
-    selBox->addWidget( selLabel );
     selBox->addWidget( selector );
 
     QWidget *mediaBrowser = new QWidget();
