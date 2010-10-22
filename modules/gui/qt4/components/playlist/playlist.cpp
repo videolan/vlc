@@ -45,20 +45,13 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 {
     setContentsMargins( 3, 3, 3, 3 );
 
-    /* Left Part and design */
+    /* We use a QSplitter for the left part*/
     leftSplitter = new QSplitter( Qt::Vertical, this );
 
     /* Source Selector */
     selector = new PLSelector( this, p_intf );
 
-    QVBoxLayout *selBox = new QVBoxLayout();
-    selBox->setContentsMargins(0,0,0,0);
-    selBox->setSpacing( 0 );
-    selBox->addWidget( selector );
-
-    QWidget *mediaBrowser = new QWidget();
-    mediaBrowser->setLayout( selBox );
-    leftSplitter->addWidget( mediaBrowser );
+    leftSplitter->addWidget( selector);
 
     /* Create a Container for the Art Label
        in order to have a beautiful resizing for the selector above it */
@@ -83,7 +76,6 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     playlist_t * p_playlist = THEPL;
     PL_LOCK;
     playlist_item_t *p_root = THEPL->p_playing;
-
     PL_UNLOCK;
 
     rightPanel = new StandardPLPanel( this, p_intf, THEPL, p_root, selector );
