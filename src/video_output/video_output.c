@@ -118,8 +118,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_INIT);
 
     vout_statistic_Init(&vout->p->statistic);
-    vout->p->i_par_num =
-    vout->p->i_par_den = 1;
 
     vout_snapshot_Init(&vout->p->snapshot);
 
@@ -526,8 +524,14 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
     cfg->display.width   = display_width > 0  ? display_width  : 0;
     cfg->display.height  = display_height > 0 ? display_height : 0;
     cfg->is_display_filled  = var_CreateGetBool(vout, "autoscale");
-    cfg->display.sar.num = 1; /* TODO monitor AR */
-    cfg->display.sar.den = 1;
+    unsigned msar_num, msar_den;
+    if (var_InheritURational(vout, &msar_num, &msar_den, "monitor-par") ||
+        msar_num <= 0 || msar_den <= 0) {
+        msar_num = 1;
+        msar_den = 1;
+    }
+    cfg->display.sar.num = msar_num;
+    cfg->display.sar.den = msar_den;
     unsigned zoom_den = 1000;
     unsigned zoom_num = zoom_den * var_CreateGetFloat(vout, "scale");
     vlc_ureduce(&zoom_num, &zoom_den, zoom_num, zoom_den, 0);

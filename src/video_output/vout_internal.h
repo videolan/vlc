@@ -71,10 +71,6 @@ struct vout_thread_sys_t
     vlc_mutex_t     spu_lock;
     spu_t           *p_spu;
 
-    /* Monitor Pixel Aspect Ratio */
-    unsigned int    i_par_num;
-    unsigned int    i_par_den;
-
     /* Video output window */
     struct {
         bool              is_unused;

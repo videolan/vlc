@@ -153,7 +153,6 @@ static void AddCustomRatios( vout_thread_t *p_vout, const char *psz_var,
 void vout_IntfInit( vout_thread_t *p_vout )
 {
     vlc_value_t val, text, old_val;
-    bool b_force_par = false;
     char *psz_buf;
     int i;
 
@@ -250,35 +249,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     /* Monitor pixel aspect-ratio */
     var_Create( p_vout, "monitor-par", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_vout, "monitor-par", &val );
-    if( val.psz_string && *val.psz_string )
-    {
-        char *psz_parser = strchr( val.psz_string, ':' );
-        unsigned int i_aspect_num = 0, i_aspect_den = 0;
-        float i_aspect = 0;
-        if( psz_parser )
-        {
-            i_aspect_num = strtol( val.psz_string, 0, 10 );
-            i_aspect_den = strtol( ++psz_parser, 0, 10 );
-        }
-        else
-        {
-            i_aspect = us_atof( val.psz_string );
-            vlc_ureduce( &i_aspect_num, &i_aspect_den,
-                         i_aspect *VOUT_ASPECT_FACTOR, VOUT_ASPECT_FACTOR, 0 );
-        }
-        if( !i_aspect_num || !i_aspect_den ) i_aspect_num = i_aspect_den = 1;
-
-        p_vout->p->i_par_num = i_aspect_num;
-        p_vout->p->i_par_den = i_aspect_den;
-
-        vlc_ureduce( &p_vout->p->i_par_num, &p_vout->p->i_par_den,
-                     p_vout->p->i_par_num, p_vout->p->i_par_den, 0 );
-
-        msg_Dbg( p_vout, "overriding monitor pixel aspect-ratio: %i:%i",
-                 p_vout->p->i_par_num, p_vout->p->i_par_den );
-        b_force_par = true;
-    }
-    free( val.psz_string );
 
     /* Aspect-ratio object var */
     var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING | VLC_VAR_ISCOMMAND |
@@ -307,7 +277,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     var_AddCallback( p_vout, "aspect-ratio", AspectCallback, NULL );
     var_Get( p_vout, "aspect-ratio", &old_val );
-    if( (old_val.psz_string && *old_val.psz_string) || b_force_par )
+    if( (old_val.psz_string && *old_val.psz_string) )
         var_TriggerCallback( p_vout, "aspect-ratio" );
     free( old_val.psz_string );
 
