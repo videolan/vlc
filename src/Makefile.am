@@ -425,6 +425,7 @@ SOURCES_libvlc_common = \
 	misc/block.c \
 	misc/fourcc.c \
 	misc/es_format.c \
+	misc/picture.c \
 	misc/picture_fifo.c \
 	misc/picture_pool.c \
 	modules/modules.h \
