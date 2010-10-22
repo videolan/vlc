@@ -122,17 +122,17 @@ vlc_module_begin ()
     add_string( "http-user-agent", NULL, NULL, NULL, false )
         change_safe()
         change_private()
-    add_bool( "http-reconnect", false, NULL, RECONNECT_TEXT,
+    add_bool( "http-reconnect", false, RECONNECT_TEXT,
               RECONNECT_LONGTEXT, true )
-    add_bool( "http-continuous", false, NULL, CONTINUOUS_TEXT,
+    add_bool( "http-continuous", false, CONTINUOUS_TEXT,
               CONTINUOUS_LONGTEXT, true )
         change_safe()
-    add_bool( "http-forward-cookies", true, NULL, FORWARD_COOKIES_TEXT,
+    add_bool( "http-forward-cookies", true, FORWARD_COOKIES_TEXT,
               FORWARD_COOKIES_LONGTEXT, true )
     add_integer( "http-max-redirect", 5, MAX_REDIRECT_TEXT,
                  MAX_REDIRECT_LONGTEXT, true )
 #ifdef WIN32
-    add_bool( "http-use-IE-proxy", false, NULL, USE_IE_PROXY_TEXT,
+    add_bool( "http-use-IE-proxy", false, USE_IE_PROXY_TEXT,
               USE_IE_PROXY_LONGTEXT, true )
 #endif
     add_obsolete_string("http-user")

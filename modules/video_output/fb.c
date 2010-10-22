@@ -85,12 +85,12 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     add_loadfile(FB_DEV_VAR, "/dev/fb0", DEVICE_TEXT, DEVICE_LONGTEXT,
                  false)
-    add_bool("fb-tty", true, NULL, TTY_TEXT, TTY_LONGTEXT, true)
+    add_bool("fb-tty", true, TTY_TEXT, TTY_LONGTEXT, true)
     add_string( "fb-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
     add_obsolete_string("fb-aspect-ratio")
     add_integer("fb-mode", 4, FB_MODE_TEXT, FB_MODE_LONGTEXT,
                  true)
-    add_bool("fb-hw-accel", true, NULL, HW_ACCEL_TEXT, HW_ACCEL_LONGTEXT,
+    add_bool("fb-hw-accel", true, HW_ACCEL_TEXT, HW_ACCEL_LONGTEXT,
               true)
     set_description(N_("GNU/Linux framebuffer video output"))
     set_capability("vout display", 30)

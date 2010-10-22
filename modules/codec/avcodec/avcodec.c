@@ -110,12 +110,12 @@ vlc_module_begin ()
     set_callbacks( OpenDecoder, CloseDecoder )
 
 
-    add_bool( "ffmpeg-dr", true, NULL, DR_TEXT, DR_TEXT, true )
+    add_bool( "ffmpeg-dr", true, DR_TEXT, DR_TEXT, true )
     add_integer ( "ffmpeg-error-resilience", 1, ERROR_TEXT,
         ERROR_LONGTEXT, true )
     add_integer ( "ffmpeg-workaround-bugs", 1, BUGS_TEXT, BUGS_LONGTEXT,
         false )
-    add_bool( "ffmpeg-hurry-up", true, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT,
+    add_bool( "ffmpeg-hurry-up", true, HURRYUP_TEXT, HURRYUP_LONGTEXT,
         false )
     add_integer( "ffmpeg-skip-frame", 0, SKIP_FRAME_TEXT,
         SKIP_FRAME_LONGTEXT, true )
@@ -128,7 +128,7 @@ vlc_module_begin ()
     add_integer ( "ffmpeg-lowres", 0, LOWRES_TEXT, LOWRES_LONGTEXT,
         true )
         change_integer_range( 0, 2 )
-    add_bool( "ffmpeg-fast", false, NULL, FAST_TEXT, FAST_LONGTEXT, true )
+    add_bool( "ffmpeg-fast", false, FAST_TEXT, FAST_LONGTEXT, true )
     add_integer ( "ffmpeg-skiploopfilter", 0, SKIPLOOPF_TEXT,
                   SKIPLOOPF_LONGTEXT, true )
         change_safe ()
@@ -137,7 +137,7 @@ vlc_module_begin ()
     add_integer( "ffmpeg-debug", 0, DEBUG_TEXT, DEBUG_LONGTEXT,
                  true )
 #if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2)
-    add_bool( "ffmpeg-hw", false, NULL, HW_TEXT, HW_LONGTEXT, true )
+    add_bool( "ffmpeg-hw", false, HW_TEXT, HW_LONGTEXT, true )
 #endif
 #if defined(FF_THREAD_FRAME)
     add_integer( "ffmpeg-threads", 0, THREADS_TEXT, THREADS_LONGTEXT, true );
@@ -160,15 +160,15 @@ vlc_module_begin ()
                  ENC_KEYINT_LONGTEXT, false )
     add_integer( ENC_CFG_PREFIX "bframes", 0, ENC_BFRAMES_TEXT,
                  ENC_BFRAMES_LONGTEXT, false )
-    add_bool( ENC_CFG_PREFIX "hurry-up", false, NULL, ENC_HURRYUP_TEXT,
+    add_bool( ENC_CFG_PREFIX "hurry-up", false, ENC_HURRYUP_TEXT,
               ENC_HURRYUP_LONGTEXT, false )
-    add_bool( ENC_CFG_PREFIX "interlace", false, NULL, ENC_INTERLACE_TEXT,
+    add_bool( ENC_CFG_PREFIX "interlace", false, ENC_INTERLACE_TEXT,
               ENC_INTERLACE_LONGTEXT, true )
-    add_bool( ENC_CFG_PREFIX "interlace-me", true, NULL, ENC_INTERLACE_ME_TEXT,
+    add_bool( ENC_CFG_PREFIX "interlace-me", true, ENC_INTERLACE_ME_TEXT,
               ENC_INTERLACE_ME_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "vt", 0, ENC_VT_TEXT,
                  ENC_VT_LONGTEXT, true )
-    add_bool( ENC_CFG_PREFIX "pre-me", false, NULL, ENC_PRE_ME_TEXT,
+    add_bool( ENC_CFG_PREFIX "pre-me", false, ENC_PRE_ME_TEXT,
               ENC_PRE_ME_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "rc-buffer-size", 224*1024*8,
                  ENC_RC_BUF_TEXT, ENC_RC_BUF_LONGTEXT, true )
@@ -178,13 +178,13 @@ vlc_module_begin ()
                ENC_IQUANT_FACTOR_TEXT, ENC_IQUANT_FACTOR_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "noise-reduction", 0,
                  ENC_NOISE_RED_TEXT, ENC_NOISE_RED_LONGTEXT, true )
-    add_bool( ENC_CFG_PREFIX "mpeg4-matrix", false, NULL,
+    add_bool( ENC_CFG_PREFIX "mpeg4-matrix", false,
               ENC_MPEG4_MATRIX_TEXT, ENC_MPEG4_MATRIX_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "qmin", 0,
                  ENC_QMIN_TEXT, ENC_QMIN_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "qmax", 0,
                  ENC_QMAX_TEXT, ENC_QMAX_LONGTEXT, true )
-    add_bool( ENC_CFG_PREFIX "trellis", false, NULL,
+    add_bool( ENC_CFG_PREFIX "trellis", false,
               ENC_TRELLIS_TEXT, ENC_TRELLIS_LONGTEXT, true )
     add_float( ENC_CFG_PREFIX "qscale", 0,
                ENC_QSCALE_TEXT, ENC_QSCALE_LONGTEXT, true )

@@ -59,7 +59,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_STREAM )
     add_shortcut( "rtmp" )
     set_callbacks( Open, Close )
-    add_bool( "rtmp-connect", false, NULL, RTMP_CONNECT_TEXT,
+    add_bool( "rtmp-connect", false, RTMP_CONNECT_TEXT,
               RTMP_CONNECT_LONGTEXT, false )
 vlc_module_end ()
 

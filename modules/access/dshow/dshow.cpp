@@ -244,9 +244,9 @@ vlc_module_begin ()
 
     add_float( CFG_PREFIX "fps", 0.0f, FPS_TEXT, FPS_LONGTEXT, true )
 
-    add_bool( CFG_PREFIX "config", false, NULL, CONFIG_TEXT, CONFIG_LONGTEXT, true )
+    add_bool( CFG_PREFIX "config", false, CONFIG_TEXT, CONFIG_LONGTEXT, true )
 
-    add_bool( CFG_PREFIX "tuner", false, NULL, TUNER_TEXT, TUNER_LONGTEXT, true )
+    add_bool( CFG_PREFIX "tuner", false, TUNER_TEXT, TUNER_LONGTEXT, true )
 
     add_integer( CFG_PREFIX "tuner-channel", 0, CHANNEL_TEXT, CHANNEL_LONGTEXT,
                 true )

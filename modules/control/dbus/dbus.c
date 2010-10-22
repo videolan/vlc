@@ -92,7 +92,7 @@ vlc_module_begin ()
     set_description( N_("D-Bus control interface") )
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
-    add_bool( "dbus-unique-service-id", false, NULL,
+    add_bool( "dbus-unique-service-id", false,
               DBUS_UNIQUE_TEXT, DBUS_UNIQUE_LONGTEXT, true )
 vlc_module_end ()
 

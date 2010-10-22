@@ -1585,7 +1585,7 @@ const char vlc_usage[] = N_(
  *             N_(text), N_(longtext) )
  * add_integer( option_name, i_value, N_(text), N_(longtext),
  *              b_advanced_option )
- * add_bool( option_name, b_value, p_callback, N_(text), N_(longtext),
+ * add_bool( option_name, b_value, N_(text), N_(longtext),
  *           b_advanced_option )
  */
 
@@ -1595,7 +1595,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_GENERAL )
     add_category_hint( N_("Audio"), AOUT_CAT_LONGTEXT , false )
 
-    add_bool( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, false )
+    add_bool( "audio", 1, AUDIO_TEXT, AUDIO_LONGTEXT, false )
         change_safe ()
     add_integer_with_range( "volume", AOUT_VOLUME_DEFAULT, AOUT_VOLUME_MIN,
                             AOUT_VOLUME_MAX, NULL, VOLUME_TEXT,
@@ -1606,10 +1606,10 @@ vlc_module_begin ()
     add_integer( "aout-rate", -1, AOUT_RATE_TEXT,
                  AOUT_RATE_LONGTEXT, true )
 #if HAVE_FPU && !defined( __APPLE__ )
-    add_bool( "hq-resampling", 1, NULL, AOUT_RESAMP_TEXT,
+    add_bool( "hq-resampling", 1, AOUT_RESAMP_TEXT,
               AOUT_RESAMP_LONGTEXT, true )
 #endif
-    add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, false )
+    add_bool( "spdif", 0, SPDIF_TEXT, SPDIF_LONGTEXT, false )
     add_integer( "force-dolby-surround", 0, FORCE_DOLBY_TEXT,
                  FORCE_DOLBY_LONGTEXT, false )
         change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions )
@@ -1625,10 +1625,10 @@ vlc_module_begin ()
                AUDIO_REPLAY_GAIN_PREAMP_TEXT, AUDIO_REPLAY_GAIN_PREAMP_LONGTEXT, false )
     add_float( "audio-replay-gain-default", -7.0,
                AUDIO_REPLAY_GAIN_DEFAULT_TEXT, AUDIO_REPLAY_GAIN_DEFAULT_LONGTEXT, false )
-    add_bool( "audio-replay-gain-peak-protection", true, NULL,
+    add_bool( "audio-replay-gain-peak-protection", true,
               AUDIO_REPLAY_GAIN_PEAK_PROTECTION_TEXT, AUDIO_REPLAY_GAIN_PEAK_PROTECTION_LONGTEXT, true )
 
-    add_bool( "audio-time-stretch", HAVE_FPU, NULL,
+    add_bool( "audio-time-stretch", HAVE_FPU,
               AUDIO_TIME_STRETCH_TEXT, AUDIO_TIME_STRETCH_LONGTEXT, false )
 
     set_subcategory( SUBCAT_AUDIO_AOUT )
@@ -1648,20 +1648,20 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_GENERAL )
     add_category_hint( N_("Video"), VOUT_CAT_LONGTEXT , false )
 
-    add_bool( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT, true )
+    add_bool( "video", 1, VIDEO_TEXT, VIDEO_LONGTEXT, true )
         change_safe ()
-    add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT,
+    add_bool( "grayscale", 0, GRAYSCALE_TEXT,
               GRAYSCALE_LONGTEXT, true )
 #if defined (HAVE_MAEMO)
 # define FULLSCREEN_DEFAULT true
 #else
 # define FULLSCREEN_DEFAULT false
 #endif
-    add_bool( "fullscreen", FULLSCREEN_DEFAULT, NULL, FULLSCREEN_TEXT,
+    add_bool( "fullscreen", FULLSCREEN_DEFAULT, FULLSCREEN_TEXT,
               FULLSCREEN_LONGTEXT, false )
         change_short('f')
         change_safe ()
-    add_bool( "embedded-video", 1, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
+    add_bool( "embedded-video", 1, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
               true )
 #ifdef __APPLE__
        add_deprecated_alias( "macosx-embedded" ) /*deprecated since 0.9.0 */
@@ -1670,36 +1670,36 @@ vlc_module_begin ()
                 DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
         add_deprecated_alias( "xvideo-display" ) /* deprecated since 1.1.0 */
         //add_deprecated_alias( "glx-display" ) cannot have more than one
-    add_bool( "xlib", true, NULL, "", "", true )
+    add_bool( "xlib", true, "", "", true )
         change_private ()
-    add_bool( "drop-late-frames", 1, NULL, DROP_LATE_FRAMES_TEXT,
+    add_bool( "drop-late-frames", 1, DROP_LATE_FRAMES_TEXT,
               DROP_LATE_FRAMES_LONGTEXT, true )
     /* Used in vout_synchro */
-    add_bool( "skip-frames", 1, NULL, SKIP_FRAMES_TEXT,
+    add_bool( "skip-frames", 1, SKIP_FRAMES_TEXT,
               SKIP_FRAMES_LONGTEXT, true )
-    add_bool( "quiet-synchro", 0, NULL, QUIET_SYNCHRO_TEXT,
+    add_bool( "quiet-synchro", 0, QUIET_SYNCHRO_TEXT,
               QUIET_SYNCHRO_LONGTEXT, true )
-    add_bool( "keyboard-events", true, NULL, KEYBOARD_EVENTS_TEXT,
+    add_bool( "keyboard-events", true, KEYBOARD_EVENTS_TEXT,
               KEYBOARD_EVENTS_LONGTEXT, true )
-    add_bool( "mouse-events", true, NULL, MOUSE_EVENTS_TEXT,
+    add_bool( "mouse-events", true, MOUSE_EVENTS_TEXT,
               MOUSE_EVENTS_LONGTEXT, true )
     add_obsolete_integer( "vout-event" ) /* deprecated since 1.1.0 */
     add_obsolete_integer( "x11-event" ) /* renamed since 1.0.0 */
 #ifndef __APPLE__
-    add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, false )
+    add_bool( "overlay", 1, OVERLAY_TEXT, OVERLAY_LONGTEXT, false )
         change_safe()
 #endif
-    add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT,
+    add_bool( "video-on-top", 0, VIDEO_ON_TOP_TEXT,
               VIDEO_ON_TOP_LONGTEXT, false )
-    add_bool( "video-wallpaper", false, NULL, WALLPAPER_TEXT,
+    add_bool( "video-wallpaper", false, WALLPAPER_TEXT,
               WALLPAPER_LONGTEXT, false )
 #ifdef WIN32
         add_deprecated_alias( "directx-wallpaper" )
 #endif
-    add_bool( "disable-screensaver", true, NULL, SS_TEXT, SS_LONGTEXT,
+    add_bool( "disable-screensaver", true, SS_TEXT, SS_LONGTEXT,
               true )
 
-    add_bool( "video-title-show", 1, NULL, VIDEO_TITLE_SHOW_TEXT,
+    add_bool( "video-title-show", 1, VIDEO_TITLE_SHOW_TEXT,
               VIDEO_TITLE_SHOW_LONGTEXT, false )
         change_safe()
     add_integer( "video-title-timeout", 5000, VIDEO_TITLE_TIMEOUT_TEXT,
@@ -1720,9 +1720,9 @@ vlc_module_begin ()
     add_string( "snapshot-format", "png", SNAP_FORMAT_TEXT,
                    SNAP_FORMAT_LONGTEXT, false )
         change_string_list( ppsz_snap_formats, NULL, 0 )
-    add_bool( "snapshot-preview", true, NULL, SNAP_PREVIEW_TEXT,
+    add_bool( "snapshot-preview", true, SNAP_PREVIEW_TEXT,
               SNAP_PREVIEW_LONGTEXT, false )
-    add_bool( "snapshot-sequential", false, NULL, SNAP_SEQUENTIAL_TEXT,
+    add_bool( "snapshot-sequential", false, SNAP_SEQUENTIAL_TEXT,
               SNAP_SEQUENTIAL_LONGTEXT, false )
     add_integer( "snapshot-width", -1, SNAP_WIDTH_TEXT,
                  SNAP_WIDTH_LONGTEXT, true )
@@ -1745,7 +1745,7 @@ vlc_module_begin ()
     add_string( "aspect-ratio", NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, false )
         change_safe ()
-    add_bool( "autoscale", true, NULL, AUTOSCALE_TEXT, AUTOSCALE_LONGTEXT, false )
+    add_bool( "autoscale", true, AUTOSCALE_TEXT, AUTOSCALE_LONGTEXT, false )
         change_safe ()
     add_float( "scale", 1.0, SCALEFACTOR_TEXT, SCALEFACTOR_LONGTEXT, false )
         change_safe ()
@@ -1753,8 +1753,8 @@ vlc_module_begin ()
                 MASPECT_RATIO_TEXT, MASPECT_RATIO_LONGTEXT, true )
     add_string( "custom-aspect-ratios", NULL, CUSTOM_ASPECT_RATIOS_TEXT,
                 CUSTOM_ASPECT_RATIOS_LONGTEXT, false )
-    add_bool( "hdtv-fix", 1, NULL, HDTV_FIX_TEXT, HDTV_FIX_LONGTEXT, true )
-    add_bool( "video-deco", 1, NULL, VIDEO_DECO_TEXT,
+    add_bool( "hdtv-fix", 1, HDTV_FIX_TEXT, HDTV_FIX_LONGTEXT, true )
+    add_bool( "video-deco", 1, VIDEO_DECO_TEXT,
               VIDEO_DECO_LONGTEXT, true )
     add_string( "video-title", NULL, VIDEO_TITLE_TEXT,
                  VIDEO_TITLE_LONGTEXT, true )
@@ -1789,9 +1789,9 @@ vlc_module_begin ()
     set_section( N_("On Screen Display") , NULL )
     add_category_hint( N_("Subpictures"), SUB_CAT_LONGTEXT , false )
 
-    add_bool( "spu", 1, NULL, SPU_TEXT, SPU_LONGTEXT, true )
+    add_bool( "spu", 1, SPU_TEXT, SPU_LONGTEXT, true )
         change_safe ()
-    add_bool( "osd", 1, NULL, OSD_TEXT, OSD_LONGTEXT, false )
+    add_bool( "osd", 1, OSD_TEXT, OSD_LONGTEXT, false )
     add_module( "text-renderer", "text renderer", NULL, NULL, TEXTRENDERER_TEXT,
                 TEXTRENDERER_LONGTEXT, true )
 
@@ -1799,7 +1799,7 @@ vlc_module_begin ()
     add_loadfile( "sub-file", NULL, SUB_FILE_TEXT,
                   SUB_FILE_LONGTEXT, false )
         change_safe()
-    add_bool( "sub-autodetect-file", true, NULL,
+    add_bool( "sub-autodetect-file", true,
                  SUB_AUTO_TEXT, SUB_AUTO_LONGTEXT, false )
     add_integer( "sub-autodetect-fuzzy", 3,
                  SUB_FUZZY_TEXT, SUB_FUZZY_LONGTEXT, true )
@@ -1861,7 +1861,7 @@ vlc_module_begin ()
     add_float( "run-time", 0,
                RUN_TIME_TEXT, RUN_TIME_LONGTEXT, true )
         change_safe ()
-    add_bool( "input-fast-seek", false, NULL,
+    add_bool( "input-fast-seek", false,
               INPUT_FAST_SEEK_TEXT, INPUT_FAST_SEEK_LONGTEXT, false )
         change_safe ()
     add_float( "rate", 1.,
@@ -1890,9 +1890,9 @@ vlc_module_begin ()
     add_integer( "server-port", 1234,
                  SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, false )
     add_integer( "mtu", MTU_DEFAULT, MTU_TEXT, MTU_LONGTEXT, true )
-    add_bool( "ipv6", 0, NULL, IPV6_TEXT, IPV6_LONGTEXT, false )
+    add_bool( "ipv6", 0, IPV6_TEXT, IPV6_LONGTEXT, false )
         change_short('6')
-    add_bool( "ipv4", 0, NULL, IPV4_TEXT, IPV4_LONGTEXT, false )
+    add_bool( "ipv4", 0, IPV4_TEXT, IPV4_LONGTEXT, false )
         change_short('4')
     add_integer( "ipv4-timeout", 5 * 1000, TIMEOUT_TEXT,
                  TIMEOUT_LONGTEXT, true )
@@ -1943,12 +1943,12 @@ vlc_module_begin ()
               CLOCK_JITTER_LONGTEXT, true )
         change_safe()
 
-    add_bool( "network-synchronisation", false, NULL, NETSYNC_TEXT,
+    add_bool( "network-synchronisation", false, NETSYNC_TEXT,
               NETSYNC_LONGTEXT, true )
 
     add_string( "input-record-path", NULL, INPUT_RECORD_PATH_TEXT,
                 INPUT_RECORD_PATH_LONGTEXT, true )
-    add_bool( "input-record-native", true, NULL, INPUT_RECORD_NATIVE_TEXT,
+    add_bool( "input-record-native", true, INPUT_RECORD_NATIVE_TEXT,
               INPUT_RECORD_NATIVE_LONGTEXT, true )
 
     add_string( "input-timeshift-path", NULL, INPUT_TIMESHIFT_PATH_TEXT,
@@ -1974,7 +1974,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_subcategory( SUBCAT_INPUT_ACODEC )
     set_subcategory( SUBCAT_INPUT_SCODEC )
-    add_bool( "prefer-system-codecs", false, NULL, SYSTEM_CODEC_TEXT,
+    add_bool( "prefer-system-codecs", false, SYSTEM_CODEC_TEXT,
                                 SYSTEM_CODEC_LONGTEXT, false )
 
     set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
@@ -1988,17 +1988,17 @@ vlc_module_begin ()
     add_category_hint( N_("Stream output"), SOUT_CAT_LONGTEXT , true )
 
     add_string( "sout", NULL, SOUT_TEXT, SOUT_LONGTEXT, true )
-    add_bool( "sout-display", false, NULL, SOUT_DISPLAY_TEXT,
+    add_bool( "sout-display", false, SOUT_DISPLAY_TEXT,
                                 SOUT_DISPLAY_LONGTEXT, true )
-    add_bool( "sout-keep", false, NULL, SOUT_KEEP_TEXT,
+    add_bool( "sout-keep", false, SOUT_KEEP_TEXT,
                                 SOUT_KEEP_LONGTEXT, true )
-    add_bool( "sout-all", 0, NULL, SOUT_ALL_TEXT,
+    add_bool( "sout-all", 0, SOUT_ALL_TEXT,
                                 SOUT_ALL_LONGTEXT, true )
-    add_bool( "sout-audio", 1, NULL, SOUT_AUDIO_TEXT,
+    add_bool( "sout-audio", 1, SOUT_AUDIO_TEXT,
                                 SOUT_AUDIO_LONGTEXT, true )
-    add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT,
+    add_bool( "sout-video", 1, SOUT_VIDEO_TEXT,
                                 SOUT_VIDEO_LONGTEXT, true )
-    add_bool( "sout-spu", 1, NULL, SOUT_SPU_TEXT,
+    add_bool( "sout-spu", 1, SOUT_SPU_TEXT,
                                 SOUT_SPU_LONGTEXT, true )
     add_integer( "sout-mux-caching", 1500, SOUT_MUX_CACHING_TEXT,
                                 SOUT_MUX_CACHING_LONGTEXT, true )
@@ -2038,27 +2038,27 @@ vlc_module_begin ()
     add_category_hint( N_("CPU"), CPU_CAT_LONGTEXT, true )
     add_obsolete_bool( "fpu" )
 #if defined( __i386__ ) || defined( __x86_64__ )
-    add_bool( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT, true )
+    add_bool( "mmx", 1, MMX_TEXT, MMX_LONGTEXT, true )
         change_need_restart ()
-    add_bool( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT, true )
+    add_bool( "3dn", 1, THREE_DN_TEXT, THREE_DN_LONGTEXT, true )
         change_need_restart ()
-    add_bool( "mmxext", 1, NULL, MMXEXT_TEXT, MMXEXT_LONGTEXT, true )
+    add_bool( "mmxext", 1, MMXEXT_TEXT, MMXEXT_LONGTEXT, true )
         change_need_restart ()
-    add_bool( "sse", 1, NULL, SSE_TEXT, SSE_LONGTEXT, true )
+    add_bool( "sse", 1, SSE_TEXT, SSE_LONGTEXT, true )
         change_need_restart ()
-    add_bool( "sse2", 1, NULL, SSE2_TEXT, SSE2_LONGTEXT, true )
+    add_bool( "sse2", 1, SSE2_TEXT, SSE2_LONGTEXT, true )
         change_need_restart ()
-    add_bool( "sse3", 1, NULL, SSE3_TEXT, SSE3_LONGTEXT, true )
+    add_bool( "sse3", 1, SSE3_TEXT, SSE3_LONGTEXT, true )
         change_need_restart ()
-    add_bool( "ssse3", 1, NULL, SSSE3_TEXT, SSSE3_LONGTEXT, true )
+    add_bool( "ssse3", 1, SSSE3_TEXT, SSSE3_LONGTEXT, true )
         change_need_restart ()
-    add_bool( "sse41", 1, NULL, SSE4_1_TEXT, SSE4_1_LONGTEXT, true )
+    add_bool( "sse41", 1, SSE4_1_TEXT, SSE4_1_LONGTEXT, true )
         change_need_restart ()
-    add_bool( "sse42", 1, NULL, SSE4_2_TEXT, SSE4_2_LONGTEXT, true )
+    add_bool( "sse42", 1, SSE4_2_TEXT, SSE4_2_LONGTEXT, true )
         change_need_restart ()
 #endif
 #if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
-    add_bool( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT, true )
+    add_bool( "altivec", 1, ALTIVEC_TEXT, ALTIVEC_LONGTEXT, true )
         change_need_restart ()
 #endif
 
@@ -2071,7 +2071,7 @@ vlc_module_begin ()
         change_need_restart ()
 
     set_section( N_("Plugins" ), NULL )
-    add_bool( "plugins-cache", true, NULL, PLUGINS_CACHE_TEXT,
+    add_bool( "plugins-cache", true, PLUGINS_CACHE_TEXT,
               PLUGINS_CACHE_LONGTEXT, true )
         change_need_restart ()
     add_directory( "plugin-path", NULL, PLUGIN_PATH_TEXT,
@@ -2089,7 +2089,7 @@ vlc_module_begin ()
     add_obsolete_bool( "auto-adjust-pts-delay" )
 
 #if !defined(__APPLE__) && !defined(SYS_BEOS) && defined(LIBVLC_USE_PTHREAD)
-    add_bool( "rt-priority", false, NULL, RT_PRIORITY_TEXT,
+    add_bool( "rt-priority", false, RT_PRIORITY_TEXT,
               RT_PRIORITY_LONGTEXT, true )
         change_need_restart ()
 #endif
@@ -2101,25 +2101,25 @@ vlc_module_begin ()
 #endif
 
 #if defined(HAVE_DBUS)
-    add_bool( "inhibit", 1, NULL, INHIBIT_TEXT,
+    add_bool( "inhibit", 1, INHIBIT_TEXT,
               INHIBIT_LONGTEXT, true )
 #endif
 
 #if defined(WIN32) || defined(HAVE_DBUS)
-    add_bool( "one-instance", 0, NULL, ONEINSTANCE_TEXT,
+    add_bool( "one-instance", 0, ONEINSTANCE_TEXT,
               ONEINSTANCE_LONGTEXT, true )
-    add_bool( "started-from-file", 0, NULL, STARTEDFROMFILE_TEXT,
+    add_bool( "started-from-file", 0, STARTEDFROMFILE_TEXT,
               STARTEDFROMFILE_LONGTEXT, true )
         change_volatile ()
-    add_bool( "one-instance-when-started-from-file", 1, NULL,
+    add_bool( "one-instance-when-started-from-file", 1,
               ONEINSTANCEWHENSTARTEDFROMFILE_TEXT,
               ONEINSTANCEWHENSTARTEDFROMFILE_LONGTEXT, true )
-    add_bool( "playlist-enqueue", 0, NULL, PLAYLISTENQUEUE_TEXT,
+    add_bool( "playlist-enqueue", 0, PLAYLISTENQUEUE_TEXT,
               PLAYLISTENQUEUE_LONGTEXT, true )
 #endif
 
 #if defined(WIN32)
-    add_bool( "high-priority", 0, NULL, HPRIORITY_TEXT,
+    add_bool( "high-priority", 0, HPRIORITY_TEXT,
               HPRIORITY_LONGTEXT, false )
         change_need_restart ()
 #endif
@@ -2128,31 +2128,31 @@ vlc_module_begin ()
     set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_GENERAL )
     add_category_hint( N_("Playlist"), PLAYLIST_CAT_LONGTEXT , false )
-    add_bool( "random", 0, NULL, RANDOM_TEXT, RANDOM_LONGTEXT, false )
+    add_bool( "random", 0, RANDOM_TEXT, RANDOM_LONGTEXT, false )
         change_short('Z')
         change_safe()
-    add_bool( "loop", 0, NULL, LOOP_TEXT, LOOP_LONGTEXT, false )
+    add_bool( "loop", 0, LOOP_TEXT, LOOP_LONGTEXT, false )
         change_short('L')
         change_safe()
-    add_bool( "repeat", 0, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, false )
+    add_bool( "repeat", 0, REPEAT_TEXT, REPEAT_LONGTEXT, false )
         change_short('R')
         change_safe()
-    add_bool( "play-and-exit", 0, NULL, PAE_TEXT, PAE_LONGTEXT, false )
-    add_bool( "play-and-stop", 0, NULL, PAS_TEXT, PAS_LONGTEXT, false )
+    add_bool( "play-and-exit", 0, PAE_TEXT, PAE_LONGTEXT, false )
+    add_bool( "play-and-stop", 0, PAS_TEXT, PAS_LONGTEXT, false )
         change_safe()
-    add_bool( "play-and-pause", 0, NULL, PAP_TEXT, PAP_LONGTEXT, true )
+    add_bool( "play-and-pause", 0, PAP_TEXT, PAP_LONGTEXT, true )
         change_safe()
-    add_bool( "media-library", 0, NULL, ML_TEXT, ML_LONGTEXT, false )
+    add_bool( "media-library", 0, ML_TEXT, ML_LONGTEXT, false )
 #if defined( MEDIA_LIBRARY )
-    add_bool( "load-media-library-on-startup", 1, NULL, LOAD_ML_TEXT,
+    add_bool( "load-media-library-on-startup", 1, LOAD_ML_TEXT,
             LOAD_ML_LONGTEXT, false )
 #endif
-    add_bool( "playlist-tree", 0, NULL, PLTREE_TEXT, PLTREE_LONGTEXT, false )
+    add_bool( "playlist-tree", 0, PLTREE_TEXT, PLTREE_LONGTEXT, false )
 
     add_string( "open", "", OPEN_TEXT, OPEN_LONGTEXT, false )
         change_need_restart ()
 
-    add_bool( "auto-preparse", true, NULL, PREPARSE_TEXT,
+    add_bool( "auto-preparse", true, PREPARSE_TEXT,
               PREPARSE_LONGTEXT, false )
 
     add_integer( "album-art", ALBUM_ART_WHEN_ASKED, ALBUM_ART_TEXT,
@@ -2174,11 +2174,11 @@ vlc_module_begin ()
         change_short('v')
     add_string( "verbose-objects", 0, VERBOSE_OBJECTS_TEXT, VERBOSE_OBJECTS_LONGTEXT,
                  false )
-    add_bool( "quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, true )
+    add_bool( "quiet", 0, QUIET_TEXT, QUIET_LONGTEXT, true )
         change_short('q')
 
 #if !defined(WIN32)
-    add_bool( "daemon", 0, NULL, DAEMON_TEXT, DAEMON_LONGTEXT, true )
+    add_bool( "daemon", 0, DAEMON_TEXT, DAEMON_LONGTEXT, true )
         change_short('d')
         change_need_restart ()
 
@@ -2187,11 +2187,11 @@ vlc_module_begin ()
         change_need_restart ()
 #endif
 
-    add_bool( "file-logging", false, NULL, FILE_LOG_TEXT, FILE_LOG_LONGTEXT,
+    add_bool( "file-logging", false, FILE_LOG_TEXT, FILE_LOG_LONGTEXT,
               true )
         change_need_restart ()
 #ifdef HAVE_SYSLOG_H
-    add_bool ( "syslog", false, NULL, SYSLOG_TEXT, SYSLOG_LONGTEXT,
+    add_bool ( "syslog", false, SYSLOG_TEXT, SYSLOG_LONGTEXT,
                true )
         change_need_restart ()
 #endif
@@ -2203,16 +2203,16 @@ vlc_module_begin ()
         change_need_restart ()
 #endif
 
-    add_bool( "color", true, NULL, COLOR_TEXT, COLOR_LONGTEXT, true )
-    add_bool( "advanced", false, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT,
+    add_bool( "color", true, COLOR_TEXT, COLOR_LONGTEXT, true )
+    add_bool( "advanced", false, ADVANCED_TEXT, ADVANCED_LONGTEXT,
                     false )
         change_need_restart ()
-    add_bool( "interact", true, NULL, INTERACTION_TEXT,
+    add_bool( "interact", true, INTERACTION_TEXT,
               INTERACTION_LONGTEXT, false )
 
     add_obsolete_bool( "show-intf" );
 
-    add_bool ( "stats", true, NULL, STATS_TEXT, STATS_LONGTEXT, true )
+    add_bool ( "stats", true, STATS_TEXT, STATS_LONGTEXT, true )
         change_need_restart ()
 
     set_subcategory( SUBCAT_INTERFACE_MAIN )
@@ -2780,35 +2780,35 @@ vlc_module_begin ()
 #define VERSION_TEXT \
     N_("print version information")
 
-    add_bool( "help", false, NULL, HELP_TEXT, "", false )
+    add_bool( "help", false, HELP_TEXT, "", false )
         change_short( 'h' )
         change_volatile ()
-    add_bool( "full-help", false, NULL, FULL_HELP_TEXT, "", false )
+    add_bool( "full-help", false, FULL_HELP_TEXT, "", false )
         change_short( 'H' )
         change_volatile ()
-    add_bool( "longhelp", false, NULL, LONGHELP_TEXT, "", false )
+    add_bool( "longhelp", false, LONGHELP_TEXT, "", false )
         change_volatile ()
-    add_bool( "help-verbose", false, NULL, HELP_VERBOSE_TEXT, "",
+    add_bool( "help-verbose", false, HELP_VERBOSE_TEXT, "",
               false )
         change_volatile ()
-    add_bool( "list", false, NULL, LIST_TEXT, "", false )
+    add_bool( "list", false, LIST_TEXT, "", false )
         change_short( 'l' )
         change_volatile ()
-    add_bool( "list-verbose", false, NULL, LIST_VERBOSE_TEXT, "",
+    add_bool( "list-verbose", false, LIST_VERBOSE_TEXT, "",
               false )
         change_volatile ()
     add_string( "module", NULL, MODULE_TEXT, "", false )
         change_short( 'p' )
         change_volatile ()
-    add_bool( "ignore-config", true, NULL, IGNORE_CONFIG_TEXT, "", false )
+    add_bool( "ignore-config", true, IGNORE_CONFIG_TEXT, "", false )
         change_volatile ()
     add_obsolete_bool( "save-config" )
-    add_bool( "reset-config", false, NULL, RESET_CONFIG_TEXT, "", false )
+    add_bool( "reset-config", false, RESET_CONFIG_TEXT, "", false )
         change_volatile ()
-    add_bool( "reset-plugins-cache", false, NULL,
+    add_bool( "reset-plugins-cache", false,
               RESET_PLUGINS_CACHE_TEXT, "", false )
         change_volatile ()
-    add_bool( "version", false, NULL, VERSION_TEXT, "", false )
+    add_bool( "version", false, VERSION_TEXT, "", false )
         change_volatile ()
     add_string( "config", NULL, CONFIG_TEXT, "", false )
         change_volatile ()

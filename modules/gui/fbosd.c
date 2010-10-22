@@ -211,9 +211,9 @@ vlc_module_begin ()
                  false )
 
     set_section( N_("Commands"), NULL )
-    add_bool( "fbosd-clear", false, NULL, CLEAR_TEXT, CLEAR_LONGTEXT, true )
-    add_bool( "fbosd-render", false, NULL, RENDER_TEXT, RENDER_LONGTEXT, true )
-    add_bool( "fbosd-display", false, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
+    add_bool( "fbosd-clear", false, CLEAR_TEXT, CLEAR_LONGTEXT, true )
+    add_bool( "fbosd-render", false, RENDER_TEXT, RENDER_LONGTEXT, true )
+    add_bool( "fbosd-display", false, DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
 
     set_description( N_("GNU/Linux osd/overlay framebuffer interface") )
     set_capability( "interface", 10 )

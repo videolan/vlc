@@ -88,7 +88,7 @@ vlc_module_begin ()
     add_integer ("screen-height", 0, LEFT_TEXT, LEFT_LONGTEXT, true)
         change_integer_range (0, 65535)
         change_safe ()
-    add_bool ("screen-follow-mouse", false, NULL, FOLLOW_MOUSE_TEXT,
+    add_bool ("screen-follow-mouse", false, FOLLOW_MOUSE_TEXT,
               FOLLOW_MOUSE_LONGTEXT, true)
 
     add_shortcut ("screen", "window")

@@ -213,9 +213,9 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "cols", 2,
                  COLS_TEXT, COLS_LONGTEXT, false )
 
-    add_bool( CFG_PREFIX "keep-aspect-ratio", false, NULL,
+    add_bool( CFG_PREFIX "keep-aspect-ratio", false,
               AR_TEXT, AR_LONGTEXT, false )
-    add_bool( CFG_PREFIX "keep-picture", false, NULL,
+    add_bool( CFG_PREFIX "keep-picture", false,
               KEEP_TEXT, KEEP_LONGTEXT, false )
 
     add_string( CFG_PREFIX "order", "",

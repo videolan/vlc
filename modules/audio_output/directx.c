@@ -138,7 +138,7 @@ vlc_module_begin ()
         change_string_list( ppsz_adev, ppsz_adev_text, ReloadDirectXDevices )
         change_action_add( ReloadDirectXDevices, N_("Refresh list") )
         change_need_restart ()
-    add_bool( "directx-audio-float32", false, NULL, FLOAT_TEXT,
+    add_bool( "directx-audio-float32", false, FLOAT_TEXT,
               FLOAT_LONGTEXT, true )
     add_string( "directx-audio-speaker", "Windows default",
                  SPEAKER_TEXT, SPEAKER_LONGTEXT, true )

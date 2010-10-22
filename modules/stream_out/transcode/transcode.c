@@ -169,9 +169,9 @@ vlc_module_begin ()
                SCALE_LONGTEXT, false )
     add_float( SOUT_CFG_PREFIX "fps", 0, FPS_TEXT,
                FPS_LONGTEXT, false )
-    add_bool( SOUT_CFG_PREFIX "hurry-up", true, NULL, HURRYUP_TEXT,
+    add_bool( SOUT_CFG_PREFIX "hurry-up", true, HURRYUP_TEXT,
                HURRYUP_LONGTEXT, false )
-    add_bool( SOUT_CFG_PREFIX "deinterlace", false, NULL, DEINTERLACE_TEXT,
+    add_bool( SOUT_CFG_PREFIX "deinterlace", false, DEINTERLACE_TEXT,
               DEINTERLACE_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "deinterlace-module", "deinterlace",
                 DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT,
@@ -202,7 +202,7 @@ vlc_module_begin ()
                  ACHANS_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "samplerate", 0, ARATE_TEXT,
                  ARATE_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "audio-sync", false, NULL, ASYNC_TEXT,
+    add_bool( SOUT_CFG_PREFIX "audio-sync", false, ASYNC_TEXT,
               ASYNC_LONGTEXT, false )
     add_module_list( SOUT_CFG_PREFIX "afilter",  "audio filter",
                      NULL, NULL,
@@ -213,20 +213,20 @@ vlc_module_begin ()
                 SENC_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "scodec", NULL, SCODEC_TEXT,
                 SCODEC_LONGTEXT, false )
-    add_bool( SOUT_CFG_PREFIX "soverlay", false, NULL, SCODEC_TEXT,
+    add_bool( SOUT_CFG_PREFIX "soverlay", false, SCODEC_TEXT,
                SCODEC_LONGTEXT, false )
     add_module_list( SOUT_CFG_PREFIX "sfilter", "video filter",
                      NULL, NULL,
                      SFILTER_TEXT, SFILTER_LONGTEXT, false )
 
     set_section( N_("On Screen Display"), NULL )
-    add_bool( SOUT_CFG_PREFIX "osd", false, NULL, OSD_TEXT,
+    add_bool( SOUT_CFG_PREFIX "osd", false, OSD_TEXT,
               OSD_LONGTEXT, false )
 
     set_section( N_("Miscellaneous"), NULL )
     add_integer( SOUT_CFG_PREFIX "threads", 0, THREADS_TEXT,
                  THREADS_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "high-priority", false, NULL, HP_TEXT, HP_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "high-priority", false, HP_TEXT, HP_LONGTEXT,
               true )
 
 vlc_module_end ()

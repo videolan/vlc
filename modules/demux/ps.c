@@ -61,7 +61,7 @@ vlc_module_begin ()
     set_callbacks( OpenForce, Close )
     add_shortcut( "ps" )
 
-    add_bool( "ps-trust-timestamps", true, NULL, TIME_TEXT,
+    add_bool( "ps-trust-timestamps", true, TIME_TEXT,
                  TIME_LONGTEXT, true )
         change_safe ()
 

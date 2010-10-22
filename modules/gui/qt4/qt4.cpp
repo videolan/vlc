@@ -175,10 +175,10 @@ vlc_module_begin ()
 
     add_shortcut("qt")
 
-    add_bool( "qt-minimal-view", false, NULL, QT_MINIMAL_MODE_TEXT,
+    add_bool( "qt-minimal-view", false, QT_MINIMAL_MODE_TEXT,
               QT_MINIMAL_MODE_TEXT, false );
 
-    add_bool( "qt-notification", true, NULL, NOTIFICATION_TEXT,
+    add_bool( "qt-notification", true, NOTIFICATION_TEXT,
               NOTIFICATION_LONGTEXT, false )
 
     add_float_with_range( "qt-opacity", 1., 0.1, 1., NULL, OPACITY_TEXT,
@@ -186,39 +186,39 @@ vlc_module_begin ()
     add_float_with_range( "qt-fs-opacity", 0.8, 0.1, 1., NULL, OPACITY_FS_TEXT,
                           OPACITY_FS_LONGTEXT, false )
 
-    add_bool( "qt-system-tray", true, NULL, SYSTRAY_TEXT,
+    add_bool( "qt-system-tray", true, SYSTRAY_TEXT,
               SYSTRAY_LONGTEXT, false)
-    add_bool( "qt-start-minimized", false, NULL, MINIMIZED_TEXT,
+    add_bool( "qt-start-minimized", false, MINIMIZED_TEXT,
               MINIMIZED_LONGTEXT, true)
-    add_bool( "qt-video-autoresize", true, NULL, KEEPSIZE_TEXT,
+    add_bool( "qt-video-autoresize", true, KEEPSIZE_TEXT,
               KEEPSIZE_LONGTEXT, false )
-    add_bool( "qt-name-in-title", true, NULL, TITLE_TEXT,
+    add_bool( "qt-name-in-title", true, TITLE_TEXT,
               TITLE_LONGTEXT, false )
-    add_bool( "qt-fs-controller", true, NULL, QT_FULLSCREEN_TEXT,
+    add_bool( "qt-fs-controller", true, QT_FULLSCREEN_TEXT,
               QT_FULLSCREEN_TEXT, false )
 
-    add_bool( "qt-volume-complete", false, NULL, COMPLETEVOL_TEXT,
+    add_bool( "qt-volume-complete", false, COMPLETEVOL_TEXT,
               COMPLETEVOL_LONGTEXT, true )
-    add_bool( "qt-autosave-volume", false, NULL, SAVEVOL_TEXT,
+    add_bool( "qt-autosave-volume", false, SAVEVOL_TEXT,
               SAVEVOL_TEXT, true )
     add_integer_with_range( "qt-startvolume", QT_VOLUME_DEFAULT, 0,
                QT_VOLUME_MAX, NULL, STARTVOL_TEXT, STARTVOL_TEXT, true )
 
-    add_bool( "qt-embedded-open", false, NULL, QT_NATIVEOPEN_TEXT,
+    add_bool( "qt-embedded-open", false, QT_NATIVEOPEN_TEXT,
                QT_NATIVEOPEN_TEXT, false )
-    add_bool( "qt-recentplay", true, NULL, RECENTPLAY_TEXT,
+    add_bool( "qt-recentplay", true, RECENTPLAY_TEXT,
               RECENTPLAY_TEXT, false )
     add_string( "qt-recentplay-filter", "",
                 RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT, false )
 
-    add_bool( "qt-adv-options", false, NULL, ADVANCED_OPTIONS_TEXT,
+    add_bool( "qt-adv-options", false, ADVANCED_OPTIONS_TEXT,
               ADVANCED_OPTIONS_LONGTEXT, true )
-    add_bool( "qt-advanced-pref", false, NULL, ADVANCED_PREFS_TEXT,
+    add_bool( "qt-advanced-pref", false, ADVANCED_PREFS_TEXT,
               ADVANCED_PREFS_LONGTEXT, false )
-    add_bool( "qt-error-dialogs", true, NULL, ERROR_TEXT,
+    add_bool( "qt-error-dialogs", true, ERROR_TEXT,
               ERROR_TEXT, false )
 #ifdef UPDATE_CHECK
-    add_bool( "qt-updates-notif", true, NULL, UPDATER_TEXT,
+    add_bool( "qt-updates-notif", true, UPDATER_TEXT,
               UPDATER_LONGTEXT, false )
     add_integer( "qt-updates-days", 7, UPDATER_DAYS_TEXT,
                  UPDATER_DAYS_TEXT, false )
@@ -226,14 +226,14 @@ vlc_module_begin ()
     add_string( "qt-slider-colours", "255;255;255;20;210;20;255;199;15;245;39;29",
                 SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, false )
 
-    add_bool( "qt-privacy-ask", true, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
+    add_bool( "qt-privacy-ask", true, PRIVACY_TEXT, PRIVACY_TEXT,
               false )
         change_private ()
 
     add_integer( "qt-fullscreen-screennumber", -1, FULLSCREEN_NUMBER_TEXT,
                FULLSCREEN_NUMBER_LONGTEXT, false );
 
-    add_bool( "qt-autoload-extensions", true, NULL,
+    add_bool( "qt-autoload-extensions", true,
               QT_AUTOLOAD_EXTENSIONS_TEXT, QT_AUTOLOAD_EXTENSIONS_LONGTEXT,
               false )
 

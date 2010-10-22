@@ -210,18 +210,18 @@ vlc_module_begin ()
 #endif
     add_string( SOUT_CFG_PREFIX "program-pmt", NULL, PMTPROG_TEXT,
                 PMTPROG_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "es-id-pid", false, NULL, PID_TEXT, PID_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "es-id-pid", false, PID_TEXT, PID_LONGTEXT,
               true )
     add_string( SOUT_CFG_PREFIX "muxpmt", NULL, MUXPMT_TEXT, MUXPMT_LONGTEXT, true )
 #ifdef HAVE_DVBPSI_SDT
     add_string( SOUT_CFG_PREFIX "sdtdesc", NULL, SDTDESC_TEXT, SDTDESC_LONGTEXT, true )
 #endif
-    add_bool( SOUT_CFG_PREFIX "alignment", true, NULL, ALIGNMENT_TEXT,
+    add_bool( SOUT_CFG_PREFIX "alignment", true, ALIGNMENT_TEXT,
               ALIGNMENT_LONGTEXT, true )
 
     add_integer( SOUT_CFG_PREFIX "shaping", 200, SHAPING_TEXT,
                  SHAPING_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "use-key-frames", false, NULL, KEYF_TEXT,
+    add_bool( SOUT_CFG_PREFIX "use-key-frames", false, KEYF_TEXT,
               KEYF_LONGTEXT, true )
 
     add_integer( SOUT_CFG_PREFIX "pcr", 70, PCR_TEXT, PCR_LONGTEXT,
@@ -233,9 +233,9 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "dts-delay", 400, DTS_TEXT,
                  DTS_LONGTEXT, true )
 
-    add_bool( SOUT_CFG_PREFIX "crypt-audio", true, NULL, ACRYPT_TEXT,
+    add_bool( SOUT_CFG_PREFIX "crypt-audio", true, ACRYPT_TEXT,
               ACRYPT_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "crypt-video", true, NULL, VCRYPT_TEXT,
+    add_bool( SOUT_CFG_PREFIX "crypt-video", true, VCRYPT_TEXT,
               VCRYPT_LONGTEXT, true )
 
     add_string( SOUT_CFG_PREFIX "csa-ck", NULL, CK_TEXT, CK_LONGTEXT,

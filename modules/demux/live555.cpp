@@ -109,18 +109,18 @@ vlc_module_begin ()
         add_shortcut( "rtsp", "pnm", "sdp", "live", "livedotcom" )
         set_capability( "access_demux", 0 )
         set_callbacks( Open, Close )
-        add_bool( "rtsp-tcp", false, NULL,
+        add_bool( "rtsp-tcp", false,
                   N_("Use RTP over RTSP (TCP)"),
                   N_("Use RTP over RTSP (TCP)"), true )
             change_safe()
         add_integer( "rtp-client-port", -1,
                   N_("Client port"),
                   N_("Port to use for the RTP source of the session"), true )
-        add_bool( "rtsp-mcast", false, NULL,
+        add_bool( "rtsp-mcast", false,
                   N_("Force multicast RTP via RTSP"),
                   N_("Force multicast RTP via RTSP"), true )
             change_safe()
-        add_bool( "rtsp-http", false, NULL,
+        add_bool( "rtsp-http", false,
                   N_("Tunnel RTSP and RTP over HTTP"),
                   N_("Tunnel RTSP and RTP over HTTP"), true )
             change_safe()
@@ -131,10 +131,10 @@ vlc_module_begin ()
         add_integer("rtsp-caching", 4 * DEFAULT_PTS_DELAY / 1000,
                     CACHING_TEXT, CACHING_LONGTEXT, true )
             change_safe()
-        add_bool(   "rtsp-kasenna", false, NULL, KASENNA_TEXT,
+        add_bool(   "rtsp-kasenna", false, KASENNA_TEXT,
                     KASENNA_LONGTEXT, true )
             change_safe()
-        add_bool(   "rtsp-wmserver", false, NULL, WMSERVER_TEXT,
+        add_bool(   "rtsp-wmserver", false, WMSERVER_TEXT,
                     WMSERVER_LONGTEXT, true)
             change_safe()
         add_string( "rtsp-user", NULL, USER_TEXT,

@@ -71,7 +71,7 @@ vlc_module_begin ()
                  ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true)
     add_integer ("xvideo-format-id", 0,
                  FORMAT_TEXT, FORMAT_LONGTEXT, true)
-    add_bool ("x11-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true)
+    add_bool ("x11-shm", true, SHM_TEXT, SHM_LONGTEXT, true)
         add_deprecated_alias ("xvideo-shm")
     add_shortcut ("xcb-xv", "xv", "xvideo", "xid")
 vlc_module_end ()

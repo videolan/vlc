@@ -456,14 +456,14 @@ vlc_module_begin ()
 #endif
         change_string_list( bpyramid_list, bpyramid_list, 0 );
 
-    add_bool( SOUT_CFG_PREFIX "cabac", true, NULL, CABAC_TEXT, CABAC_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "cabac", true, CABAC_TEXT, CABAC_LONGTEXT,
               false )
 
     add_integer( SOUT_CFG_PREFIX "ref", 3, REF_TEXT,
                  REF_LONGTEXT, false )
         change_integer_range( 1, 16 )
 
-    add_bool( SOUT_CFG_PREFIX "nf", false, NULL, NF_TEXT,
+    add_bool( SOUT_CFG_PREFIX "nf", false, NF_TEXT,
               NF_LONGTEXT, false )
 
     add_string( SOUT_CFG_PREFIX "deblock", "0:0", FILTER_TEXT,
@@ -472,7 +472,7 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "psy-rd", "1.0:0.0", PSY_RD_TEXT,
                 PSY_RD_LONGTEXT, false )
 
-    add_bool( SOUT_CFG_PREFIX "psy", true, NULL, PSY_TEXT, PSY_LONGTEXT, false )
+    add_bool( SOUT_CFG_PREFIX "psy", true, PSY_TEXT, PSY_LONGTEXT, false )
 
     add_string( SOUT_CFG_PREFIX "level", "0", LEVEL_TEXT,
                LEVEL_LONGTEXT, false )
@@ -481,7 +481,7 @@ vlc_module_begin ()
                PROFILE_LONGTEXT, false )
         change_string_list( x264_profile_names, x264_profile_names, 0 );
 
-    add_bool( SOUT_CFG_PREFIX "interlaced", false, NULL, INTERLACED_TEXT, INTERLACED_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "interlaced", false, INTERLACED_TEXT, INTERLACED_LONGTEXT,
               false )
 
     add_integer( SOUT_CFG_PREFIX "slices", 0, SLICE_COUNT, SLICE_COUNT_LONGTEXT, false )
@@ -576,7 +576,7 @@ vlc_module_begin ()
                  DIRECT_PRED_SIZE_LONGTEXT, false )
         change_integer_range( -1, 1 )
 
-    add_bool( SOUT_CFG_PREFIX "weightb", true, NULL, WEIGHTB_TEXT,
+    add_bool( SOUT_CFG_PREFIX "weightb", true, WEIGHTB_TEXT,
               WEIGHTB_LONGTEXT, false )
 
     add_integer( SOUT_CFG_PREFIX "weightp", 2, WEIGHTP_TEXT,
@@ -602,15 +602,15 @@ vlc_module_begin ()
 
     add_obsolete_bool( SOUT_CFG_PREFIX "b-rdo" )
 
-    add_bool( SOUT_CFG_PREFIX "mixed-refs", true, NULL, MIXED_REFS_TEXT,
+    add_bool( SOUT_CFG_PREFIX "mixed-refs", true, MIXED_REFS_TEXT,
               MIXED_REFS_LONGTEXT, false )
 
-    add_bool( SOUT_CFG_PREFIX "chroma-me", true, NULL, CHROMA_ME_TEXT,
+    add_bool( SOUT_CFG_PREFIX "chroma-me", true, CHROMA_ME_TEXT,
               CHROMA_ME_LONGTEXT, false )
 
     add_obsolete_bool( SOUT_CFG_PREFIX "bime" )
 
-    add_bool( SOUT_CFG_PREFIX "8x8dct", true, NULL, TRANSFORM_8X8DCT_TEXT,
+    add_bool( SOUT_CFG_PREFIX "8x8dct", true, TRANSFORM_8X8DCT_TEXT,
               TRANSFORM_8X8DCT_LONGTEXT, false )
 
     add_integer( SOUT_CFG_PREFIX "trellis", 1, TRELLIS_TEXT,
@@ -621,15 +621,15 @@ vlc_module_begin ()
                  LOOKAHEAD_LONGTEXT, false )
         change_integer_range( 0, 60 )
 
-    add_bool( SOUT_CFG_PREFIX "intra-refresh", false, NULL, INTRAREFRESH_TEXT,
+    add_bool( SOUT_CFG_PREFIX "intra-refresh", false, INTRAREFRESH_TEXT,
               INTRAREFRESH_LONGTEXT, false )
 
-    add_bool( SOUT_CFG_PREFIX "mbtree", true, NULL, MBTREE_TEXT, MBTREE_LONGTEXT, false )
+    add_bool( SOUT_CFG_PREFIX "mbtree", true, MBTREE_TEXT, MBTREE_LONGTEXT, false )
 
-    add_bool( SOUT_CFG_PREFIX "fast-pskip", true, NULL, FAST_PSKIP_TEXT,
+    add_bool( SOUT_CFG_PREFIX "fast-pskip", true, FAST_PSKIP_TEXT,
               FAST_PSKIP_LONGTEXT, false )
 
-    add_bool( SOUT_CFG_PREFIX "dct-decimate", true, NULL, DCT_DECIMATE_TEXT,
+    add_bool( SOUT_CFG_PREFIX "dct-decimate", true, DCT_DECIMATE_TEXT,
               DCT_DECIMATE_LONGTEXT, false )
 
     add_integer( SOUT_CFG_PREFIX "nr", 0, NR_TEXT,
@@ -646,30 +646,30 @@ vlc_module_begin ()
 
 /* Input/Output */
 
-    add_bool( SOUT_CFG_PREFIX "non-deterministic", false, NULL, NON_DETERMINISTIC_TEXT,
+    add_bool( SOUT_CFG_PREFIX "non-deterministic", false, NON_DETERMINISTIC_TEXT,
               NON_DETERMINISTIC_LONGTEXT, false )
 
-    add_bool( SOUT_CFG_PREFIX "asm", true, NULL, ASM_TEXT,
+    add_bool( SOUT_CFG_PREFIX "asm", true, ASM_TEXT,
               ASM_LONGTEXT, false )
 
     /* x264 psnr = 1 (default). disable PSNR computation for speed. */
-    add_bool( SOUT_CFG_PREFIX "psnr", false, NULL, PSNR_TEXT,
+    add_bool( SOUT_CFG_PREFIX "psnr", false, PSNR_TEXT,
               PSNR_LONGTEXT, false )
 
     /* x264 ssim = 1 (default). disable SSIM computation for speed. */
-    add_bool( SOUT_CFG_PREFIX "ssim", false, NULL, SSIM_TEXT,
+    add_bool( SOUT_CFG_PREFIX "ssim", false, SSIM_TEXT,
               SSIM_LONGTEXT, false )
 
-    add_bool( SOUT_CFG_PREFIX "quiet", false, NULL, QUIET_TEXT,
+    add_bool( SOUT_CFG_PREFIX "quiet", false, QUIET_TEXT,
               QUIET_LONGTEXT, false )
 
     add_integer( SOUT_CFG_PREFIX "sps-id", 0, SPS_ID_TEXT,
                  SPS_ID_LONGTEXT, false )
 
-    add_bool( SOUT_CFG_PREFIX "aud", false, NULL, AUD_TEXT,
+    add_bool( SOUT_CFG_PREFIX "aud", false, AUD_TEXT,
               AUD_LONGTEXT, false )
 
-    add_bool( SOUT_CFG_PREFIX "verbose", false, NULL, VERBOSE_TEXT,
+    add_bool( SOUT_CFG_PREFIX "verbose", false, VERBOSE_TEXT,
               VERBOSE_LONGTEXT, false )
 
     add_string( SOUT_CFG_PREFIX "stats", "x264_2pass.log", STATS_TEXT,

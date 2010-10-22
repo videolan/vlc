@@ -303,7 +303,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "caching", 50 /* ms */,
                 CACHING_TEXT, CACHING_LONGTEXT, true )
 #ifdef HAVE_LIBV4L2
-    add_bool( CFG_PREFIX "use-libv4l2", false, NULL, LIBV4L2_TEXT, LIBV4L2_LONGTEXT, true );
+    add_bool( CFG_PREFIX "use-libv4l2", false, LIBV4L2_TEXT, LIBV4L2_LONGTEXT, true );
 #endif
 
     set_section( N_( "Tuner" ), NULL )
@@ -318,7 +318,7 @@ vlc_module_begin ()
 
     set_section( N_( "Controls" ),
                  N_( "v4l2 driver controls, if supported by your v4l2 driver." ) )
-    add_bool( CFG_PREFIX "controls-reset", false, NULL, CTRL_RESET_TEXT,
+    add_bool( CFG_PREFIX "controls-reset", false, CTRL_RESET_TEXT,
               CTRL_RESET_LONGTEXT, true )
     add_integer( CFG_PREFIX "brightness", -1, BRIGHTNESS_TEXT,
                  BRIGHTNESS_LONGTEXT, true )
@@ -358,7 +358,7 @@ vlc_module_begin ()
                 AUDIO_VOLUME_LONGTEXT, true )
     add_integer( CFG_PREFIX "audio-balance", -1, AUDIO_BALANCE_TEXT,
                 AUDIO_BALANCE_LONGTEXT, true )
-    add_bool( CFG_PREFIX "audio-mute", false, NULL, AUDIO_MUTE_TEXT,
+    add_bool( CFG_PREFIX "audio-mute", false, AUDIO_MUTE_TEXT,
               AUDIO_MUTE_LONGTEXT, true )
     add_integer( CFG_PREFIX "audio-bass", -1, AUDIO_BASS_TEXT,
                 AUDIO_BASS_LONGTEXT, true )

@@ -150,7 +150,7 @@ vlc_module_begin ()
     add_integer_with_range( FILTER_PREFIX "gradient-threshold", 40, 1, 200, NULL,
                             GRAD_THRESH_TEXT, GRAD_THRESH_LONGTEXT, false )
 
-    add_bool( FILTER_PREFIX "edge-visible", true, NULL,
+    add_bool( FILTER_PREFIX "edge-visible", true,
               EDGE_VISIBLE_TEXT, EDGE_VISIBLE_LONGTEXT, true )
 
     add_shortcut( "ball" )

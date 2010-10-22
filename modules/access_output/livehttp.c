@@ -89,11 +89,11 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_ACO )
     add_integer( SOUT_CFG_PREFIX "seglen", 10, SEGLEN_TEXT, SEGLEN_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "numsegs", 0, NUMSEGS_TEXT, NUMSEGS_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "splitanywhere", false, NULL,
+    add_bool( SOUT_CFG_PREFIX "splitanywhere", false,
               SPLITANYWHERE_TEXT, SPLITANYWHERE_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "delsegs", true, NULL,
+    add_bool( SOUT_CFG_PREFIX "delsegs", true,
               DELSEGS_TEXT, DELSEGS_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "ratecontrol", false, NULL,
+    add_bool( SOUT_CFG_PREFIX "ratecontrol", false,
               RATECONTROL_TEXT, RATECONTROL_TEXT, true )
     add_string( SOUT_CFG_PREFIX "index", NULL,
                 INDEX_TEXT, INDEX_LONGTEXT, true )

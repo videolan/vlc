@@ -124,18 +124,18 @@ vlc_module_begin ()
 
     add_string( "sap-addr", NULL,
                 SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, true )
-    add_bool( "sap-ipv4", true, NULL,
+    add_bool( "sap-ipv4", true,
                SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, true )
-    add_bool( "sap-ipv6", true, NULL,
+    add_bool( "sap-ipv6", true,
               SAP_IPV6_TEXT, SAP_IPV6_LONGTEXT, true )
     add_integer( "sap-timeout", 1800,
                  SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, true )
-    add_bool( "sap-parse", true, NULL,
+    add_bool( "sap-parse", true,
                SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, true )
-    add_bool( "sap-strict", false, NULL,
+    add_bool( "sap-strict", false,
                SAP_STRICT_TEXT,SAP_STRICT_LONGTEXT, true )
 #if 0
-    add_bool( "sap-cache", false, NULL,
+    add_bool( "sap-cache", false,
                SAP_CACHE_TEXT,SAP_CACHE_LONGTEXT, true )
 #endif
     add_obsolete_bool( "sap-timeshift" ) /* Redumdant since 1.0.0 */

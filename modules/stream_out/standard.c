@@ -115,7 +115,7 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "path", "", PATH_TEXT,
                 PATH_LONGTEXT, false )
 
-    add_bool( SOUT_CFG_PREFIX "sap", false, NULL, SAP_TEXT, SAP_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "sap", false, SAP_TEXT, SAP_LONGTEXT,
               true )
     add_string( SOUT_CFG_PREFIX "name", "", NAME_TEXT, NAME_LONGTEXT,
                                         true )

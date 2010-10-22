@@ -101,7 +101,7 @@ vlc_module_begin ()
                   N_("Number of CD blocks to get in a single read."),
           true )
 
-    add_bool( MODULE_STRING "-PBC", false, NULL,
+    add_bool( MODULE_STRING "-PBC", false,
               N_("Use playback control?"),
               N_("If VCD is authored with playback control, use it. "
                  "Otherwise we play by tracks."),
@@ -114,7 +114,7 @@ vlc_module_begin ()
          "the length of an entry."),
               false )
 
-    add_bool( MODULE_STRING "-extended-info", false, NULL,
+    add_bool( MODULE_STRING "-extended-info", false,
               N_("Show extended VCD info?"),
               N_("Show the maximum amount of information under Stream and "
                  "Media Info. Shows for example playback control navigation."),

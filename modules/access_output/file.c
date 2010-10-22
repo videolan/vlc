@@ -73,9 +73,9 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
     add_shortcut( "file", "stream" )
-    add_bool( SOUT_CFG_PREFIX "append", false, NULL, APPEND_TEXT,APPEND_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "append", false, APPEND_TEXT,APPEND_LONGTEXT,
               true )
-    add_bool( SOUT_CFG_PREFIX "sync", false, NULL, SYNC_TEXT,SYNC_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "sync", false, SYNC_TEXT,SYNC_LONGTEXT,
               false )
     set_callbacks( Open, Close )
 vlc_module_end ()

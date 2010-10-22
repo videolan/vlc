@@ -66,7 +66,7 @@ vlc_module_begin()
                 YUV_FILE_TEXT, YUV_FILE_LONGTEXT, false)
     add_string(CFG_PREFIX "chroma", NULL,
                 CHROMA_TEXT, CHROMA_LONGTEXT, true)
-    add_bool  (CFG_PREFIX "yuv4mpeg2", false, NULL,
+    add_bool  (CFG_PREFIX "yuv4mpeg2", false,
                 YUV4MPEG2_TEXT, YUV4MPEG2_LONGTEXT, true)
 
     set_callbacks(Open, Close)

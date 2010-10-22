@@ -167,20 +167,20 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
     add_string( "ts-extra-pmt", NULL, PMT_TEXT, PMT_LONGTEXT, true )
-    add_bool( "ts-es-id-pid", true, NULL, PID_TEXT, PID_LONGTEXT, true )
+    add_bool( "ts-es-id-pid", true, PID_TEXT, PID_LONGTEXT, true )
     add_string( "ts-out", NULL, TSOUT_TEXT, TSOUT_LONGTEXT, true )
     add_integer( "ts-out-mtu", 1400, MTUOUT_TEXT,
                  MTUOUT_LONGTEXT, true )
     add_string( "ts-csa-ck", NULL, CSA_TEXT, CSA_LONGTEXT, true )
     add_string( "ts-csa2-ck", NULL, CSA_TEXT, CSA_LONGTEXT, true )
     add_integer( "ts-csa-pkt", 188, CPKT_TEXT, CPKT_LONGTEXT, true )
-    add_bool( "ts-silent", false, NULL, SILENT_TEXT, SILENT_LONGTEXT, true )
+    add_bool( "ts-silent", false, SILENT_TEXT, SILENT_LONGTEXT, true )
 
     add_savefile( "ts-dump-file", NULL, TSDUMP_TEXT, TSDUMP_LONGTEXT, false )
-    add_bool( "ts-dump-append", false, NULL, APPEND_TEXT, APPEND_LONGTEXT, false )
+    add_bool( "ts-dump-append", false, APPEND_TEXT, APPEND_LONGTEXT, false )
     add_integer( "ts-dump-size", 16384, DUMPSIZE_TEXT,
                  DUMPSIZE_LONGTEXT, true )
-    add_bool( "ts-split-es", true, NULL, SPLIT_ES_TEXT, SPLIT_ES_LONGTEXT, false )
+    add_bool( "ts-split-es", true, SPLIT_ES_TEXT, SPLIT_ES_LONGTEXT, false )
 
     set_capability( "demux", 10 )
     set_callbacks( Open, Close )

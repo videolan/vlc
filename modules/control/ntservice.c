@@ -66,9 +66,9 @@ vlc_module_begin ()
     set_description( N_("Windows Service interface") )
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_CONTROL )
-    add_bool( "ntservice-install", false, NULL,
+    add_bool( "ntservice-install", false,
               INSTALL_TEXT, INSTALL_LONGTEXT, true )
-    add_bool( "ntservice-uninstall", false, NULL,
+    add_bool( "ntservice-uninstall", false,
               UNINSTALL_TEXT, UNINSTALL_LONGTEXT, true )
     add_string ( "ntservice-name", VLCSERVICENAME,
                  NAME_TEXT, NAME_LONGTEXT, true )

@@ -180,7 +180,7 @@ vlc_module_begin ()
                 SDP_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "mux", "", MUX_TEXT,
                 MUX_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "sap", false, NULL, SAP_TEXT, SAP_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "sap", false, SAP_TEXT, SAP_LONGTEXT,
               true )
 
     add_string( SOUT_CFG_PREFIX "name", "", NAME_TEXT,
@@ -206,7 +206,7 @@ vlc_module_begin ()
 
     add_integer( SOUT_CFG_PREFIX "ttl", -1, TTL_TEXT,
                  TTL_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "rtcp-mux", false, NULL,
+    add_bool( SOUT_CFG_PREFIX "rtcp-mux", false,
               RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
@@ -218,7 +218,7 @@ vlc_module_begin ()
                 SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false )
 #endif
 
-    add_bool( SOUT_CFG_PREFIX "mp4a-latm", false, NULL, RFC3016_TEXT,
+    add_bool( SOUT_CFG_PREFIX "mp4a-latm", false, RFC3016_TEXT,
                  RFC3016_LONGTEXT, false )
 
     set_callbacks( Open, Close )

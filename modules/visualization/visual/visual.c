@@ -120,16 +120,16 @@ vlc_module_begin ()
              HEIGHT_TEXT, HEIGHT_LONGTEXT, false )
     set_section( N_("Spectrum analyser") , NULL )
     add_obsolete_integer( "visual-nbbands" ) /* Since 1.0.0 */
-    add_bool("visual-80-bands", true, NULL,
+    add_bool("visual-80-bands", true,
              NBBANDS_TEXT, NBBANDS_LONGTEXT, true );
     add_obsolete_integer( "visual-separ" ) /* Since 1.0.0 */
     add_obsolete_integer( "visual-amp" ) /* Since 1.0.0 */
-    add_bool("visual-peaks", true, NULL,
+    add_bool("visual-peaks", true,
              PEAKS_TEXT, PEAKS_LONGTEXT, true )
     set_section( N_("Spectrometer") , NULL )
-    add_bool("spect-show-original", false, NULL,
+    add_bool("spect-show-original", false,
              ORIG_TEXT, ORIG_LONGTEXT, true )
-    add_bool("spect-show-base", true, NULL,
+    add_bool("spect-show-base", true,
              BASE_TEXT, BASE_LONGTEXT, true )
     add_integer("spect-radius", 42,
              RADIUS_TEXT, RADIUS_LONGTEXT, true )
@@ -137,16 +137,16 @@ vlc_module_begin ()
              SSECT_TEXT, SSECT_LONGTEXT, true )
     add_integer("spect-color", 80,
              COLOR1_TEXT, COLOR1_LONGTEXT, true )
-    add_bool("spect-show-bands", true, NULL,
+    add_bool("spect-show-bands", true,
              BANDS_TEXT, BANDS_LONGTEXT, true );
     add_obsolete_integer( "spect-nbbands" ) /* Since 1.0.0 */
-    add_bool("spect-80-bands", true, NULL,
+    add_bool("spect-80-bands", true,
              NBBANDS_TEXT, SPNBBANDS_LONGTEXT, true )
     add_integer("spect-separ", 1,
              SEPAR_TEXT, SEPAR_LONGTEXT, true )
     add_integer("spect-amp", 8,
              AMP_TEXT, AMP_LONGTEXT, true )
-    add_bool("spect-show-peaks", true, NULL,
+    add_bool("spect-show-peaks", true,
              PEAKS_TEXT, PEAKS_LONGTEXT, true )
     add_integer("spect-peak-width", 61,
              PEAK_WIDTH_TEXT, PEAK_WIDTH_LONGTEXT, true )

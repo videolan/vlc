@@ -277,11 +277,11 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_SCODEC )
     add_shortcut( "kate" )
 
-    add_bool( "kate-formatted", true, NULL, FORMAT_TEXT, FORMAT_LONGTEXT,
+    add_bool( "kate-formatted", true, FORMAT_TEXT, FORMAT_LONGTEXT,
               true )
 
 #ifdef HAVE_TIGER
-    add_bool( "kate-use-tiger", true, NULL, TIGER_TEXT, TIGER_LONGTEXT,
+    add_bool( "kate-use-tiger", true, TIGER_TEXT, TIGER_LONGTEXT,
               true )
     add_float_with_range( "kate-tiger-quality",
                           TIGER_QUALITY_DEFAULT, 0.0f, 1.0f, TigerConfigurationCallback,

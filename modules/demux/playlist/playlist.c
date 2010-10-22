@@ -59,12 +59,12 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
-    add_bool( "playlist-autostart", true, NULL,
+    add_bool( "playlist-autostart", true,
               AUTOSTART_TEXT, AUTOSTART_LONGTEXT, false )
 
     add_obsolete_integer( "parent-item" ) /* removed since 1.1.0 */
 
-    add_bool( "playlist-skip-ads", true, NULL,
+    add_bool( "playlist-skip-ads", true,
               SKIP_ADS_TEXT, SKIP_ADS_LONGTEXT, false )
 
     set_shortname( N_("Playlist") )
@@ -109,7 +109,7 @@ vlc_module_begin ()
         add_shortcut( "playlist", "shout-winamp" )
         set_capability( "demux", 10 )
         set_callbacks( Import_Shoutcast, Close_Shoutcast )
-        add_bool( "shoutcast-show-adult", false, NULL,
+        add_bool( "shoutcast-show-adult", false,
                    SHOW_ADULT_TEXT, SHOW_ADULT_LONGTEXT, false )
     add_submodule ()
         set_description( N_("ASX playlist import") )

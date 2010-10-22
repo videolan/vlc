@@ -73,7 +73,7 @@ vlc_module_begin()
     set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
 
-    add_bool("netsync-master", false, NULL,
+    add_bool("netsync-master", false,
               NETSYNC_TEXT, NETSYNC_LONGTEXT, true)
     add_string("netsync-master-ip", NULL, MIP_TEXT, MIP_LONGTEXT,
                 true)

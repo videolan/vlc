@@ -216,7 +216,7 @@ vlc_module_begin()
                  ENC_TARGETRATE_TEXT, ENC_TARGETRATE_LONGTEXT, false )
     change_integer_range(-1, INT_MAX);
 
-    add_bool( ENC_CFG_PREFIX ENC_LOSSLESS, false, NULL,
+    add_bool( ENC_CFG_PREFIX ENC_LOSSLESS, false,
               ENC_LOSSLESS_TEXT, ENC_LOSSLESS_LONGTEXT, false )
 
     add_string( ENC_CFG_PREFIX ENC_PREFILTER, "diaglp",
@@ -272,7 +272,7 @@ vlc_module_begin()
               ENC_ME_SIMPLESEARCH_TEXT, ENC_ME_SIMPLESEARCH_LONGTEXT, false )
 
 #if DIRAC_RESEARCH_VERSION_ATLEAST(1,0,1)
-    add_bool( ENC_CFG_PREFIX ENC_ME_COMBINED, true, NULL,
+    add_bool( ENC_CFG_PREFIX ENC_ME_COMBINED, true,
               ENC_ME_COMBINED_TEXT, ENC_ME_COMBINED_LONGTEXT, false )
 #endif
 
@@ -300,7 +300,7 @@ vlc_module_begin()
                  ENC_SPARTITION_TEXT, ENC_SPARTITION_LONGTEXT, true )
     change_integer_range(-1, 1);
 
-    add_bool( ENC_CFG_PREFIX ENC_NOAC, false, NULL,
+    add_bool( ENC_CFG_PREFIX ENC_NOAC, false,
               ENC_NOAC_TEXT, ENC_NOAC_LONGTEXT, false )
 
     /* advanced option only */

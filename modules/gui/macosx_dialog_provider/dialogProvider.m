@@ -102,7 +102,7 @@ vlc_module_begin()
      * it's almost certain that the client program will display error by
      * itself. Moreover certain action might end up in an error, but
      * the client wants to ignored them completely. */
-    add_bool(prefix "hide-no-user-action-dialogs", true, NULL, T_HIDE_NOACTION, LT_HIDE_NOACTION, false)
+    add_bool(prefix "hide-no-user-action-dialogs", true, T_HIDE_NOACTION, LT_HIDE_NOACTION, false)
 
     set_callbacks(OpenIntf, CloseIntf)
     set_category(CAT_INTERFACE)

@@ -55,7 +55,7 @@ vlc_module_begin ()
     set_capability( "demux", 0 )
     add_savefile( "demuxdump-file", "stream-demux.dump", FILE_TEXT,
                   FILE_LONGTEXT, false )
-    add_bool( "demuxdump-append", false, NULL, APPEND_TEXT, APPEND_LONGTEXT,
+    add_bool( "demuxdump-append", false, APPEND_TEXT, APPEND_LONGTEXT,
               false )
     set_callbacks( Open, Close )
     add_shortcut( "dump" )

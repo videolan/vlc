@@ -116,7 +116,7 @@ vlc_module_begin ()
                  ENC_COMPLEXITY_LONGTEXT, false )
         change_integer_range( 1, 10 )
 
-    add_bool( ENC_CFG_PREFIX "cbr", false, NULL, ENC_CBR_TEXT,
+    add_bool( ENC_CFG_PREFIX "cbr", false, ENC_CBR_TEXT,
                  ENC_CBR_LONGTEXT, false )
 
     add_float( ENC_CFG_PREFIX "quality", 8.0, ENC_QUALITY_TEXT,
@@ -126,10 +126,10 @@ vlc_module_begin ()
     add_integer( ENC_CFG_PREFIX "max-bitrate", 0, ENC_MAXBITRATE_TEXT,
                  ENC_MAXBITRATE_LONGTEXT, false )
 
-    add_bool( ENC_CFG_PREFIX "vad", true, NULL, ENC_VAD_TEXT,
+    add_bool( ENC_CFG_PREFIX "vad", true, ENC_VAD_TEXT,
                  ENC_VAD_LONGTEXT, false )
 
-    add_bool( ENC_CFG_PREFIX "dtx", false, NULL, ENC_DTX_TEXT,
+    add_bool( ENC_CFG_PREFIX "dtx", false, ENC_DTX_TEXT,
                  ENC_DTX_LONGTEXT, false )
 
     /* TODO agc, noise suppression, */

@@ -218,7 +218,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "length", 60, LENGTH_TEXT, LENGTH_LONGTEXT,
                  false )
     add_integer( CFG_PREFIX "ttl", 1800, TTL_TEXT, TTL_LONGTEXT, false )
-    add_bool( CFG_PREFIX "images", true, NULL, IMAGE_TEXT, IMAGE_LONGTEXT, false )
+    add_bool( CFG_PREFIX "images", true, IMAGE_TEXT, IMAGE_LONGTEXT, false )
     add_integer( CFG_PREFIX "title", default_title, TITLE_TEXT, TITLE_LONGTEXT, false )
         change_integer_list( pi_title_modes, ppsz_title_modes )
 

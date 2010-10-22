@@ -116,11 +116,11 @@ vlc_module_begin ()
                  ID_OFFSET_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX_IN "name", "default",
                 NAME_TEXT, NAME_LONGTEXT, false )
-    add_bool( SOUT_CFG_PREFIX_IN "placeholder", false, NULL,
+    add_bool( SOUT_CFG_PREFIX_IN "placeholder", false,
               PLACEHOLDER_TEXT, PLACEHOLDER_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX_IN "placeholder-delay", 200,
                  PLACEHOLDER_DELAY_TEXT, PLACEHOLDER_DELAY_LONGTEXT, false )
-    add_bool( SOUT_CFG_PREFIX_IN "placeholder-switch-on-iframe", true, NULL,
+    add_bool( SOUT_CFG_PREFIX_IN "placeholder-switch-on-iframe", true,
               PLACEHOLDER_IFRAME_TEXT, PLACEHOLDER_IFRAME_LONGTEXT, false )
     set_callbacks( OpenIn, CloseIn )
 

@@ -106,7 +106,7 @@ vlc_module_begin ()
     add_integer( "screen-left", 0, LEFT_TEXT, LEFT_LONGTEXT, true )
     add_integer( "screen-width", 0, WIDTH_TEXT, WIDTH_LONGTEXT, true )
     add_integer( "screen-height", 0, HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
-    add_bool( "screen-follow-mouse", false, NULL, FOLLOW_MOUSE_TEXT,
+    add_bool( "screen-follow-mouse", false, FOLLOW_MOUSE_TEXT,
               FOLLOW_MOUSE_LONGTEXT, true )
 #endif
 

@@ -108,7 +108,7 @@ vlc_module_begin ()
                  PREFIX_TEXT, PREFIX_LONGTEXT, false )
     add_string(  CFG_PREFIX "path", NULL,
                  PATH_TEXT, PATH_LONGTEXT, false )
-    add_bool(    CFG_PREFIX "replace", false, NULL,
+    add_bool(    CFG_PREFIX "replace", false,
                  REPLACE_TEXT, REPLACE_LONGTEXT, false )
 
     /* Snapshot method */

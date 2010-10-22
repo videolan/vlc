@@ -119,7 +119,7 @@ vlc_module_begin ()
     add_string( CFG_PREFIX "aspect", NULL,
                 ASPECT_TEXT, ASPECT_LONGTEXT, false )
 
-    add_bool( CFG_PREFIX "padd", true, NULL,
+    add_bool( CFG_PREFIX "padd", true,
               PADD_TEXT, PADD_LONGTEXT, false )
 vlc_module_end ()
 

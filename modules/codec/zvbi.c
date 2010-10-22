@@ -88,11 +88,11 @@ vlc_module_begin ()
 
     add_integer( "vbi-page", 100,
                  PAGE_TEXT, PAGE_LONGTEXT, false )
-    add_bool( "vbi-opaque", true, NULL,
+    add_bool( "vbi-opaque", true,
                  OPAQUE_TEXT, OPAQUE_LONGTEXT, false )
     add_integer( "vbi-position", 4, POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions );
-    add_bool( "vbi-text", false, NULL,
+    add_bool( "vbi-text", false,
               TELX_TEXT, TELX_LONGTEXT, false )
 vlc_module_end ()
 

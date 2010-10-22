@@ -491,12 +491,12 @@ vlc_module_begin ()
     add_bool( "skins2-taskbar", true, onTaskBarChange, SKINS2_TASKBAR,
               SKINS2_TASKBAR_LONG, false );
 #endif
-    add_bool( "skins2-transparency", false, NULL, SKINS2_TRANSPARENCY,
+    add_bool( "skins2-transparency", false, SKINS2_TRANSPARENCY,
               SKINS2_TRANSPARENCY_LONG, false );
 
-    add_bool( "skinned-playlist", true, NULL, SKINS2_PLAYLIST,
+    add_bool( "skinned-playlist", true, SKINS2_PLAYLIST,
               SKINS2_PLAYLIST_LONG, false );
-    add_bool( "skinned-video", true, NULL, SKINS2_VIDEO,
+    add_bool( "skinned-video", true, SKINS2_VIDEO,
               SKINS2_VIDEO_LONG, false );
     set_shortname( N_("Skins"))
     set_description( N_("Skinnable Interface") )

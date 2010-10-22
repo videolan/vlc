@@ -82,7 +82,7 @@ vlc_module_begin ()
     add_integer( "mms-timeout", 5000, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
                  true )
 
-    add_bool( "mms-all", false, NULL, ALL_TEXT, ALL_LONGTEXT, true )
+    add_bool( "mms-all", false, ALL_TEXT, ALL_LONGTEXT, true )
     add_integer( "mms-maxbitrate", 0, BITRATE_TEXT, BITRATE_LONGTEXT ,
                  false )
     add_string( "mmsh-proxy", NULL, PROXY_TEXT, PROXY_LONGTEXT,

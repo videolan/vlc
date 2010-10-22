@@ -82,7 +82,7 @@ vlc_module_begin ()
     set_help( N_("Use HDAPS, AMS, APPLESMC or UNIMOTION motion sensors " \
                  "to rotate the video") )
 
-    add_bool( "motion-use-rotate", false, NULL,
+    add_bool( "motion-use-rotate", false,
               USE_ROTATE_TEXT, USE_ROTATE_TEXT, false )
 
     set_capability( "interface", 0 )

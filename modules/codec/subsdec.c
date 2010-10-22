@@ -218,9 +218,9 @@ vlc_module_begin ()
     add_string( "subsdec-encoding", "",
                 ENCODING_TEXT, ENCODING_LONGTEXT, false )
         change_string_list( ppsz_encodings, ppsz_encoding_names, 0 )
-    add_bool( "subsdec-autodetect-utf8", true, NULL,
+    add_bool( "subsdec-autodetect-utf8", true,
               AUTODETECT_UTF8_TEXT, AUTODETECT_UTF8_LONGTEXT, false )
-    add_bool( "subsdec-formatted", true, NULL, FORMAT_TEXT, FORMAT_LONGTEXT,
+    add_bool( "subsdec-formatted", true, FORMAT_TEXT, FORMAT_LONGTEXT,
                  false )
 vlc_module_end ()
 

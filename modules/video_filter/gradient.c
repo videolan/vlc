@@ -91,7 +91,7 @@ vlc_module_begin ()
 
     add_integer_with_range( FILTER_PREFIX "type", 0, 0, 1, NULL,
                 GRADIENT_TEXT, GRADIENT_LONGTEXT, false )
-    add_bool( FILTER_PREFIX "cartoon", true, NULL,
+    add_bool( FILTER_PREFIX "cartoon", true,
                 CARTOON_TEXT, CARTOON_LONGTEXT, false )
 
     add_shortcut( "gradient" )

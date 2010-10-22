@@ -57,9 +57,9 @@ vlc_module_begin ()
     add_shortcut( "display" )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
-    add_bool( SOUT_CFG_PREFIX "audio", true, NULL, AUDIO_TEXT,
+    add_bool( SOUT_CFG_PREFIX "audio", true, AUDIO_TEXT,
               AUDIO_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "video", true, NULL, VIDEO_TEXT,
+    add_bool( SOUT_CFG_PREFIX "video", true, VIDEO_TEXT,
               VIDEO_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "delay", 100, DELAY_TEXT,
                  DELAY_LONGTEXT, true )

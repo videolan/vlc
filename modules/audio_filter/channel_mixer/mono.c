@@ -112,7 +112,7 @@ vlc_module_begin ()
     set_callbacks( OpenFilter, CloseFilter )
     set_shortname( "Mono" )
 
-    add_bool( MONO_CFG "downmix", true, NULL, MONO_DOWNMIX_TEXT,
+    add_bool( MONO_CFG "downmix", true, MONO_DOWNMIX_TEXT,
               MONO_DOWNMIX_LONGTEXT, false )
     add_integer( MONO_CFG "channel", -1, MONO_CHANNEL_TEXT,
         MONO_CHANNEL_LONGTEXT, false )

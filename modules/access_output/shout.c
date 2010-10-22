@@ -117,7 +117,7 @@ vlc_module_begin ()
                 NAME_TEXT, NAME_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "description", "Live stream from VLC media player", NULL,
                 DESCRIPTION_TEXT, DESCRIPTION_LONGTEXT, false )
-    add_bool(   SOUT_CFG_PREFIX "mp3", false, NULL,
+    add_bool(   SOUT_CFG_PREFIX "mp3", false,
                 MP3_TEXT, MP3_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "genre", "Alternative",
                 GENRE_TEXT, GENRE_LONGTEXT, false )
@@ -131,7 +131,7 @@ vlc_module_begin ()
                 CHANNELS_TEXT, CHANNELS_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "quality", "",
                 QUALITY_TEXT, QUALITY_LONGTEXT, false )
-    add_bool(   SOUT_CFG_PREFIX "public", false, NULL,
+    add_bool(   SOUT_CFG_PREFIX "public", false,
                 PUBLIC_TEXT, PUBLIC_LONGTEXT, true )
     set_callbacks( Open, Close )
 vlc_module_end ()

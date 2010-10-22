@@ -105,11 +105,11 @@ vlc_module_begin()
     set_help(DX_HELP)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    add_bool("directx-hw-yuv", true, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT,
+    add_bool("directx-hw-yuv", true, HW_YUV_TEXT, HW_YUV_LONGTEXT,
               true)
-    add_bool("directx-use-sysmem", false, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT,
+    add_bool("directx-use-sysmem", false, SYSMEM_TEXT, SYSMEM_LONGTEXT,
               true)
-    add_bool("directx-3buffering", true, NULL, TRIPLEBUF_TEXT,
+    add_bool("directx-3buffering", true, TRIPLEBUF_TEXT,
               TRIPLEBUF_LONGTEXT, true)
     add_string("directx-device", "", DEVICE_TEXT, DEVICE_LONGTEXT, true)
         change_string_list(device, device_text, FindDevicesCallback)

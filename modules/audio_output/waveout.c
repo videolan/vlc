@@ -99,7 +99,7 @@ vlc_module_begin ()
     set_capability( "audio output", 50 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
-    add_bool( "waveout-float32", true, NULL, FLOAT_TEXT, FLOAT_LONGTEXT, true )
+    add_bool( "waveout-float32", true, FLOAT_TEXT, FLOAT_LONGTEXT, true )
 
     add_string( "waveout-audio-device", "wavemapper",
                  DEVICE_TEXT, DEVICE_LONG, false )

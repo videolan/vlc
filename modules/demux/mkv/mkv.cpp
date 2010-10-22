@@ -49,23 +49,23 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
-    add_bool( "mkv-use-ordered-chapters", true, NULL,
+    add_bool( "mkv-use-ordered-chapters", true,
             N_("Ordered chapters"),
             N_("Play ordered chapters as specified in the segment."), true );
 
-    add_bool( "mkv-use-chapter-codec", true, NULL,
+    add_bool( "mkv-use-chapter-codec", true,
             N_("Chapter codecs"),
             N_("Use chapter codecs found in the segment."), true );
 
-    add_bool( "mkv-preload-local-dir", false, NULL,
+    add_bool( "mkv-preload-local-dir", false,
             N_("Preload Directory"),
             N_("Preload matroska files from the same family in the same directory (not good for broken files)."), true );
 
-    add_bool( "mkv-seek-percent", false, NULL,
+    add_bool( "mkv-seek-percent", false,
             N_("Seek based on percent not time"),
             N_("Seek based on percent not time."), true );
 
-    add_bool( "mkv-use-dummy", false, NULL,
+    add_bool( "mkv-use-dummy", false,
             N_("Dummy Elements"),
             N_("Read and discard unknown EBML elements (not good for broken files)."), true );
 

@@ -365,7 +365,7 @@ enum vlc_module_properties
     add_float( name, value, text, longtext, advc ) \
     change_float_range( f_min, f_max )
 
-#define add_bool( name, v, p_callback, text, longtext, advc ) \
+#define add_bool( name, v, text, longtext, advc ) \
     add_typename_inner( CONFIG_ITEM_BOOL, name, text, longtext, advc ) \
     if (v) vlc_config_set (p_config, VLC_CONFIG_VALUE, (int64_t)true);
 

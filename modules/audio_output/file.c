@@ -120,7 +120,7 @@ vlc_module_begin ()
                  CHANNELS_TEXT, CHANNELS_LONGTEXT, true )
     add_savefile( "audiofile-file", "audiofile.wav", FILE_TEXT,
                   FILE_LONGTEXT, false )
-    add_bool( "audiofile-wav", true, NULL, WAV_TEXT, WAV_LONGTEXT, true )
+    add_bool( "audiofile-wav", true, WAV_TEXT, WAV_LONGTEXT, true )
 
     set_capability( "audio output", 0 )
     add_shortcut( "file", "audiofile" )

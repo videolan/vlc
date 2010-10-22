@@ -113,7 +113,7 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "crl", NULL,
                 CRL_TEXT, CRL_LONGTEXT, true )
 #if 0 //def HAVE_AVAHI_CLIENT
-    add_bool( SOUT_CFG_PREFIX "bonjour", false, NULL,
+    add_bool( SOUT_CFG_PREFIX "bonjour", false,
               BONJOUR_TEXT, BONJOUR_LONGTEXT, true);
 #endif
     set_callbacks( Open, Close )

@@ -58,10 +58,10 @@ vlc_module_begin ()
     add_shortcut ("file")
     set_callbacks (Open, Close)
 #ifdef __APPLE__
-    add_bool ("file-mmap", true, NULL,
+    add_bool ("file-mmap", true,
               FILE_MMAP_TEXT, FILE_MMAP_LONGTEXT, true)
 #else
-    add_bool ("file-mmap", false, NULL,
+    add_bool ("file-mmap", false,
               FILE_MMAP_TEXT, FILE_MMAP_LONGTEXT, true)
 #endif
 vlc_module_end ()

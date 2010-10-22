@@ -393,7 +393,7 @@ add_string(CFG_PREFIX "serialdev", "/dev/ttyUSB0",
     your movie ... used for both buildin / external
 */
 set_section( N_("Illuminate the room with this color on pause" ), 0 )
-add_bool(CFG_PREFIX "usepausecolor", false, NULL,
+add_bool(CFG_PREFIX "usepausecolor", false,
          PCOLOR_TEXT, PCOLOR_LONGTEXT, false)
 add_integer_with_range(CFG_PREFIX "pcolor-red",   0, 0, 255, NULL,
                        PCOLOR_RED_TEXT, PCOLOR_RED_LONGTEXT, false)
@@ -481,7 +481,7 @@ add_integer_with_range(CFG_PREFIX "zones-bottom",   1, 0, 16, NULL,
                        ZONE_BOTTOM_TEXT, ZONE_BOTTOM_LONGTEXT, false)
 add_integer_with_range(CFG_PREFIX "zones-lr",   1, 0, 16, NULL,
                        ZONE_LR_TEXT, ZONE_LR_LONGTEXT, false)
-add_bool(CFG_PREFIX "zone-summary", false, NULL,
+add_bool(CFG_PREFIX "zone-summary", false,
          ZONE_SUMMARY_TEXT, ZONE_SUMMARY_LONGTEXT, false)
 
 /*
@@ -561,7 +561,7 @@ add_string(CFG_PREFIX "channels", "",
   LED color white calibration
 */
 set_section( N_("Adjust the white light to your LED stripes" ), 0 )
-add_bool(CFG_PREFIX "whiteadj", true, NULL,
+add_bool(CFG_PREFIX "whiteadj", true,
          USEWHITEADJ_TEXT, USEWHITEADJ_LONGTEXT, false)
 add_integer_with_range(CFG_PREFIX "white-red",   255, 0, 255, NULL,
                        WHITE_RED_TEXT,   WHITE_RED_LONGTEXT,   false)
@@ -597,7 +597,7 @@ add_directory(CFG_PREFIX "gradient_path", NULL,
            GRADIENT_PATH_TEXT, GRADIENT_PATH_LONGTEXT, false )
 
 #if defined(__ATMO_DEBUG__)
-add_bool(CFG_PREFIX "saveframes", false, NULL,
+add_bool(CFG_PREFIX "saveframes", false,
          SAVEFRAMES_TEXT, SAVEFRAMES_LONGTEXT, false)
 add_string(CFG_PREFIX "framepath", "",
            FRAMEPATH_TEXT, FRAMEPATH_LONGTEXT, false )
@@ -610,7 +610,7 @@ add_integer_with_range(CFG_PREFIX "width",  64, 64, 512, NULL,
                        WIDTH_TEXT,  WIDTH_LONGTEXT, true)
 add_integer_with_range(CFG_PREFIX "height", 48, 48, 384, NULL,
                        HEIGHT_TEXT,  HEIGHT_LONGTEXT, true)
-add_bool(CFG_PREFIX "showdots", false, NULL,
+add_bool(CFG_PREFIX "showdots", false,
                    SHOW_DOTS_TEXT, SHOW_DOTS_LONGTEXT, false)
 add_shortcut( "atmo" )
 set_callbacks( CreateFilter, DestroyFilter  )
