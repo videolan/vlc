@@ -78,12 +78,6 @@ static int SubFilterCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 static int SubMarginCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
-static int TitleShowCallback( vlc_object_t *, char const *,
-                              vlc_value_t, vlc_value_t, void * );
-static int TitleTimeoutCallback( vlc_object_t *, char const *,
-                                 vlc_value_t, vlc_value_t, void * );
-static int TitlePositionCallback( vlc_object_t *, char const *,
-                                  vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * vout_IntfInit: called during the vout creation to initialise misc things.
@@ -185,14 +179,9 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "mouse-hide-timeout",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
-    p_vout->p->title.show = var_CreateGetBool( p_vout, "video-title-show" );
-    p_vout->p->title.timeout = var_CreateGetInteger( p_vout,
-                                                     "video-title-timeout" );
-    p_vout->p->title.position = var_CreateGetInteger( p_vout,
-                                                      "video-title-position" );
-    var_AddCallback( p_vout, "video-title-show", TitleShowCallback, NULL );
-    var_AddCallback( p_vout, "video-title-timeout", TitleTimeoutCallback, NULL );
-    var_AddCallback( p_vout, "video-title-position", TitlePositionCallback, NULL );
+    var_Create( p_vout, "video-title-show", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "video-title-timeout", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "video-title-position", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     /* Zoom object var */
     var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_ISCOMMAND |
@@ -808,31 +797,3 @@ static int SubMarginCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static int TitleShowCallback( vlc_object_t *p_this, char const *psz_cmd,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
-    VLC_UNUSED(p_data);
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    p_vout->p->title.show = newval.b_bool;
-    return VLC_SUCCESS;
-}
-
-static int TitleTimeoutCallback( vlc_object_t *p_this, char const *psz_cmd,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    p_vout->p->title.timeout = (mtime_t) newval.i_int;
-    return VLC_SUCCESS;
-}
-
-static int TitlePositionCallback( vlc_object_t *p_this, char const *psz_cmd,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
-    VLC_UNUSED(p_data);
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    p_vout->p->title.position = newval.i_int;
-    return VLC_SUCCESS;
-}
