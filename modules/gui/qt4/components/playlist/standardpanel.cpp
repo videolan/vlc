@@ -31,6 +31,7 @@
 #include "components/playlist/playlist_model.hpp"
 #include "components/playlist/standardpanel.hpp"
 #include "components/playlist/icon_view.hpp"
+#include "components/playlist/selector.hpp"
 #include "util/customwidgets.hpp"
 #include "menus.hpp"
 
@@ -60,8 +61,10 @@ static const QString viewNames[] = { qtr( "Detailed View" ),
 StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   intf_thread_t *_p_intf,
                                   playlist_t *p_playlist,
-                                  playlist_item_t *p_root ):
-                                  QWidget( _parent ), p_intf( _p_intf )
+                                  playlist_item_t *p_root,
+                                  PLSelector *_p_selector ):
+                                  QWidget( _parent ), p_intf( _p_intf ),
+                                  p_selector( _p_selector )
 {
     layout = new QGridLayout( this );
     layout->setSpacing( 0 ); layout->setMargin( 0 );
@@ -208,10 +211,21 @@ void StandardPLPanel::toggleColumnShown( int i )
 /* Search in the playlist */
 void StandardPLPanel::search( const QString& searchText )
 {
-    bool flat = currentView == iconView || currentView == listView;
-    model->search( searchText,
-                   flat ? currentView->rootIndex() : QModelIndex(),
-                   !flat );
+    int type;
+    QString name;
+    p_selector->getCurrentSelectedItem( &type, &name );
+    if( type != SD_TYPE )
+    {
+        bool flat = currentView == iconView || currentView == listView;
+        model->search( searchText,
+                       flat ? currentView->rootIndex() : QModelIndex(),
+                       !flat );
+    }
+    else
+    {
+        if( !name.isEmpty() )
+            playlist_QueryServicesDiscovery( THEPL, qtu(name), qtu(searchText) );
+    }
 }
 
 /* Set the root of the new Playlist */

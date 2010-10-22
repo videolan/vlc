@@ -114,6 +114,8 @@ class PLSelector: public QTreeWidget
 public:
     PLSelector( QWidget *p, intf_thread_t *_p_intf );
     virtual ~PLSelector();
+
+    void getCurrentSelectedItem( int *type, QString *name );
 protected:
     friend class PlaylistWidget;
 

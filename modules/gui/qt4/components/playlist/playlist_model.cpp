@@ -887,7 +887,7 @@ void PLModel::search( const QString& search_text, const QModelIndex & idx, bool 
             endRemoveRows( );
 
             beginInsertRows( idx, 0, searchRoot->children.size() - 1 );
-            updateChildren( searchRoot );
+            updateChildren( searchRoot ); // The PL_LOCK is needed here
             endInsertRows();
 
             PL_UNLOCK;

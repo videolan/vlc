@@ -56,7 +56,7 @@ class StandardPLPanel: public QWidget
 
 public:
     StandardPLPanel( PlaylistWidget *, intf_thread_t *,
-                     playlist_t *,playlist_item_t * );
+                     playlist_t *, playlist_item_t *, PLSelector * );
     virtual ~StandardPLPanel();
 protected:
     friend class PlaylistWidget;
@@ -78,6 +78,7 @@ private:
     QGridLayout *layout;
     LocationBar *locationBar;
     SearchLineEdit *searchEdit;
+    PLSelector  *p_selector;
 
     QTreeView   *treeView;
     PlIconView  *iconView;

@@ -93,7 +93,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 
     PL_UNLOCK;
 
-    rightPanel = new StandardPLPanel( this, p_intf, THEPL, p_root );
+    rightPanel = new StandardPLPanel( this, p_intf, THEPL, p_root, selector );
 
     /* Connect the activation of the selector to a redefining of the PL */
     DCONNECT( selector, activated( playlist_item_t * ),

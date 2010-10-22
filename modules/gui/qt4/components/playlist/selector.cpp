@@ -500,3 +500,9 @@ void PLSelector::drawBranches ( QPainter * painter, const QRect & rect, const QM
                             QStyle::PE_IndicatorArrowDown :
                             QStyle::PE_IndicatorArrowRight, &option, painter );
 }
+
+void PLSelector::getCurrentSelectedItem( int* type, QString *string)
+{
+    *type = currentItem()->data( 0, TYPE_ROLE ).toInt();
+    *string = currentItem()->data( 0, NAME_ROLE ).toString();
+}
