@@ -108,7 +108,7 @@ uintptr_t vlc_atomic_swap (vlc_atomic_t *atom, uintptr_t v)
     return u;
 }
 
-uintptr_t vlc_atomic_compare_and_swap (vlc_atomic_t *atom,
+uintptr_t vlc_atomic_compare_swap (vlc_atomic_t *atom,
                                        uintptr_t oldval, uintptr_t newval)
 {
     uintptr_t u;
