@@ -3664,9 +3664,9 @@ dnl
 AC_ARG_ENABLE(skins2,
   [AS_HELP_STRING([--enable-skins2],[Skins2 interface module (default
    enabled except on MacOSX, BeOS and WinCE)])])
-if test "${enable_skins2}" = "yes" ||
+if test "${enable_skins2}" != "no" ||
   (test "${SYS}" != "darwin" && test "${SYS}" != "beos" &&
-   test "${SYS}" != "mingwce" && test "${enable_skins2}" != "no"); then
+   test "${SYS}" != "mingwce" && test "${enable_skins2}" == "yes"); then
 
   dnl test for the required libraries
   skins2_missing_lib="no"
