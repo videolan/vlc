@@ -368,6 +368,76 @@ void vout_FlushSubpictureChannel( vout_thread_t *vout, int channel )
                              channel);
 }
 
+/**
+ * It retreives a picture from the vout or NULL if no pictures are
+ * available yet.
+ *
+ * You MUST call vout_PutPicture or vout_ReleasePicture on it.
+ *
+ * You may use vout_HoldPicture(paired with vout_ReleasePicture) to keep a
+ * read-only reference.
+ */
+picture_t *vout_GetPicture(vout_thread_t *vout)
+{
+    /* Get lock */
+    vlc_mutex_lock(&vout->p->picture_lock);
+    picture_t *picture = picture_pool_Get(vout->p->decoder_pool);
+    if (picture) {
+        picture_Reset(picture);
+        picture->p_next = NULL;
+    }
+    vlc_mutex_unlock(&vout->p->picture_lock);
+
+    return picture;
+}
+
+/**
+ * It gives to the vout a picture to be displayed.
+ *
+ * The given picture MUST comes from vout_GetPicture.
+ *
+ * Becareful, after vout_PutPicture is called, picture_t::p_next cannot be
+ * read/used.
+ */
+void vout_PutPicture(vout_thread_t *vout, picture_t *picture)
+{
+    vlc_mutex_lock(&vout->p->picture_lock);
+
+    picture->p_next = NULL;
+    picture_fifo_Push(vout->p->decoder_fifo, picture);
+
+    vlc_mutex_unlock(&vout->p->picture_lock);
+
+    vout_control_Wake(&vout->p->control);
+}
+
+/**
+ * It releases a picture retreived by vout_GetPicture.
+ */
+void vout_ReleasePicture(vout_thread_t *vout, picture_t *picture)
+{
+    vlc_mutex_lock(&vout->p->picture_lock);
+
+    picture_Release(picture);
+
+    vlc_mutex_unlock(&vout->p->picture_lock);
+
+    vout_control_Wake(&vout->p->control);
+}
+
+/**
+ * It increment the reference counter of a picture retreived by
+ * vout_GetPicture.
+ */
+void vout_HoldPicture(vout_thread_t *vout, picture_t *picture)
+{
+    vlc_mutex_lock(&vout->p->picture_lock);
+
+    picture_Hold(picture);
+
+    vlc_mutex_unlock(&vout->p->picture_lock);
+}
+
 /* vout_Control* are usable by anyone at anytime */
 void vout_ControlChangeFullscreen(vout_thread_t *vout, bool fullscreen)
 {

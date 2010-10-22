@@ -384,7 +384,6 @@ SOURCES_libvlc_common = \
 	video_output/postprocessing.c \
 	video_output/postprocessing.h \
 	video_output/video_output.c \
-	video_output/vout_pictures.c \
 	video_output/video_text.c \
 	video_output/video_epg.c \
 	video_output/video_widgets.c \
