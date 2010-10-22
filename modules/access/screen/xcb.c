@@ -75,7 +75,7 @@ vlc_module_begin ()
 
     add_integer ("screen-caching", DEFAULT_PTS_DELAY * 1000 / CLOCK_FREQ,
                  NULL, CACHING_TEXT, CACHING_LONGTEXT, true)
-    add_float ("screen-fps", 2.0, NULL, FPS_TEXT, FPS_LONGTEXT, true)
+    add_float ("screen-fps", 2.0, FPS_TEXT, FPS_LONGTEXT, true)
     add_integer ("screen-left", 0, NULL, LEFT_TEXT, LEFT_LONGTEXT, true)
         change_integer_range (-32768, 32767)
         change_safe ()

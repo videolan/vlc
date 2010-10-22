@@ -208,7 +208,7 @@ vlc_module_begin()
     set_capability( "encoder", 100 )
     set_callbacks( OpenEncoder, CloseEncoder )
 
-    add_float( ENC_CFG_PREFIX ENC_QUALITY_FACTOR, 5.5, NULL,
+    add_float( ENC_CFG_PREFIX ENC_QUALITY_FACTOR, 5.5,
                ENC_QUALITY_FACTOR_TEXT, ENC_QUALITY_FACTOR_LONGTEXT, false )
     change_float_range(0., 10.);
 
@@ -304,7 +304,7 @@ vlc_module_begin()
               ENC_NOAC_TEXT, ENC_NOAC_LONGTEXT, false )
 
     /* advanced option only */
-    add_float( ENC_CFG_PREFIX ENC_CPD, -1, NULL,
+    add_float( ENC_CFG_PREFIX ENC_CPD, -1,
                ENC_CPD_TEXT, ENC_CPD_LONGTEXT, true )
     change_integer_range(-1, INT_MAX);
 vlc_module_end()

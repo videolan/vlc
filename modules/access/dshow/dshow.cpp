@@ -242,7 +242,7 @@ vlc_module_begin ()
 
     add_string( CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
 
-    add_float( CFG_PREFIX "fps", 0.0f, NULL, FPS_TEXT, FPS_LONGTEXT, true )
+    add_float( CFG_PREFIX "fps", 0.0f, FPS_TEXT, FPS_LONGTEXT, true )
 
     add_bool( CFG_PREFIX "config", false, NULL, CONFIG_TEXT, CONFIG_LONGTEXT, true )
 

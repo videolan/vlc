@@ -85,7 +85,7 @@ vlc_module_begin ()
                 BANDS_LONGTEXT, true )
     add_bool( "equalizer-2pass", false, NULL, TWOPASS_TEXT,
               TWOPASS_LONGTEXT, true )
-    add_float( "equalizer-preamp", 12.0, NULL, PREAMP_TEXT,
+    add_float( "equalizer-preamp", 12.0, PREAMP_TEXT,
                PREAMP_LONGTEXT, true )
     set_callbacks( Open, Close )
     add_shortcut( "equalizer" )

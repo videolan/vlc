@@ -165,9 +165,9 @@ vlc_module_begin ()
                 VCODEC_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "vb", 0, NULL, VB_TEXT,
                  VB_LONGTEXT, false )
-    add_float( SOUT_CFG_PREFIX "scale", 0, NULL, SCALE_TEXT,
+    add_float( SOUT_CFG_PREFIX "scale", 0, SCALE_TEXT,
                SCALE_LONGTEXT, false )
-    add_float( SOUT_CFG_PREFIX "fps", 0, NULL, FPS_TEXT,
+    add_float( SOUT_CFG_PREFIX "fps", 0, FPS_TEXT,
                FPS_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "hurry-up", true, NULL, HURRYUP_TEXT,
                HURRYUP_LONGTEXT, false )

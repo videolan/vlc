@@ -119,7 +119,7 @@ vlc_module_begin ()
     add_bool( ENC_CFG_PREFIX "cbr", false, NULL, ENC_CBR_TEXT,
                  ENC_CBR_LONGTEXT, false )
 
-    add_float( ENC_CFG_PREFIX "quality", 8.0, NULL, ENC_QUALITY_TEXT,
+    add_float( ENC_CFG_PREFIX "quality", 8.0, ENC_QUALITY_TEXT,
                ENC_QUALITY_LONGTEXT, false )
         change_float_range( 0.0, 10.0 )
 

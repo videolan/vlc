@@ -93,7 +93,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "bargraph_repetition", 4, NULL, BARGRAPH_REPETITION_TEXT, BARGRAPH_REPETITION_LONGTEXT, false )
     add_integer( CFG_PREFIX "silence", 1, NULL, SILENCE_TEXT, SILENCE_LONGTEXT, false )
     add_integer( CFG_PREFIX "time_window", 5000, NULL, TIME_WINDOW_TEXT, TIME_WINDOW_LONGTEXT, false )
-    add_float( CFG_PREFIX "alarm_threshold", 0.1, NULL, ALARM_THRESHOLD_TEXT, ALARM_THRESHOLD_LONGTEXT, false )
+    add_float( CFG_PREFIX "alarm_threshold", 0.1, ALARM_THRESHOLD_TEXT, ALARM_THRESHOLD_LONGTEXT, false )
     add_integer( CFG_PREFIX "repetition_time", 2000, NULL, REPETITION_TIME_TEXT, REPETITION_TIME_LONGTEXT, false )
     add_integer( CFG_PREFIX "connection_reset", 1, NULL, CONNECTION_RESET_TEXT, CONNECTION_RESET_LONGTEXT, false )
     

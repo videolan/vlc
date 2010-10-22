@@ -357,12 +357,12 @@ enum vlc_module_properties
     add_integer( name, value, p_callback, text, longtext, advc ) \
     change_integer_range( i_min, i_max )
 
-#define add_float( name, v, p_callback, text, longtext, advc ) \
+#define add_float( name, v, text, longtext, advc ) \
     add_typename_inner( CONFIG_ITEM_FLOAT, name, text, longtext, advc ) \
     vlc_config_set (p_config, VLC_CONFIG_VALUE, (double)(v));
 
 #define add_float_with_range( name, value, f_min, f_max, p_callback, text, longtext, advc ) \
-    add_float( name, value, p_callback, text, longtext, advc ) \
+    add_float( name, value, text, longtext, advc ) \
     change_float_range( f_min, f_max )
 
 #define add_bool( name, v, p_callback, text, longtext, advc ) \

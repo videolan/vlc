@@ -516,7 +516,7 @@ vlc_module_begin ()
                  QPSTEP_LONGTEXT, false )
         change_integer_range( 0, 51 )
 
-    add_float( SOUT_CFG_PREFIX "ratetol", 1.0, NULL, RATETOL_TEXT,
+    add_float( SOUT_CFG_PREFIX "ratetol", 1.0, RATETOL_TEXT,
                RATETOL_LONGTEXT, false )
         change_float_range( 0, 100 )
 
@@ -526,15 +526,15 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "vbv-bufsize", 0, NULL, VBV_BUFSIZE_TEXT,
                  VBV_BUFSIZE_LONGTEXT, false )
 
-    add_float( SOUT_CFG_PREFIX "vbv-init", 0.9, NULL, VBV_INIT_TEXT,
+    add_float( SOUT_CFG_PREFIX "vbv-init", 0.9, VBV_INIT_TEXT,
                VBV_INIT_LONGTEXT, false )
         change_float_range( 0, 1 )
 
-    add_float( SOUT_CFG_PREFIX "ipratio", 1.40, NULL, IPRATIO_TEXT,
+    add_float( SOUT_CFG_PREFIX "ipratio", 1.40, IPRATIO_TEXT,
                IPRATIO_LONGTEXT, false )
         change_float_range( 1, 2 )
 
-    add_float( SOUT_CFG_PREFIX "pbratio", 1.30, NULL, PBRATIO_TEXT,
+    add_float( SOUT_CFG_PREFIX "pbratio", 1.30, PBRATIO_TEXT,
                PBRATIO_LONGTEXT, false )
         change_float_range( 1, 2 )
 
@@ -545,20 +545,20 @@ vlc_module_begin ()
                  PASS_LONGTEXT, false )
         change_integer_range( 0, 3 )
 
-    add_float( SOUT_CFG_PREFIX "qcomp", 0.60, NULL, QCOMP_TEXT,
+    add_float( SOUT_CFG_PREFIX "qcomp", 0.60, QCOMP_TEXT,
                QCOMP_LONGTEXT, false )
         change_float_range( 0, 1 )
 
-    add_float( SOUT_CFG_PREFIX "cplxblur", 20.0, NULL, CPLXBLUR_TEXT,
+    add_float( SOUT_CFG_PREFIX "cplxblur", 20.0, CPLXBLUR_TEXT,
                CPLXBLUR_LONGTEXT, false )
 
-    add_float( SOUT_CFG_PREFIX "qblur", 0.5, NULL, QBLUR_TEXT,
+    add_float( SOUT_CFG_PREFIX "qblur", 0.5, QBLUR_TEXT,
                QBLUR_LONGTEXT, false )
 
     add_integer( SOUT_CFG_PREFIX "aq-mode", X264_AQ_VARIANCE, NULL, AQ_MODE_TEXT,
                  AQ_MODE_LONGTEXT, false )
          change_integer_range( 0, 2 )
-    add_float( SOUT_CFG_PREFIX "aq-strength", 1.0, NULL, AQ_STRENGTH_TEXT,
+    add_float( SOUT_CFG_PREFIX "aq-strength", 1.0, AQ_STRENGTH_TEXT,
                AQ_STRENGTH_LONGTEXT, false )
 
 /* Analysis */

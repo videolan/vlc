@@ -172,9 +172,9 @@ vlc_module_begin ()
               ENC_PRE_ME_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "rc-buffer-size", 224*1024*8, NULL,
                  ENC_RC_BUF_TEXT, ENC_RC_BUF_LONGTEXT, true )
-    add_float( ENC_CFG_PREFIX "rc-buffer-aggressivity", 1.0, NULL,
+    add_float( ENC_CFG_PREFIX "rc-buffer-aggressivity", 1.0,
                ENC_RC_BUF_AGGR_TEXT, ENC_RC_BUF_AGGR_LONGTEXT, true )
-    add_float( ENC_CFG_PREFIX "i-quant-factor", 0, NULL,
+    add_float( ENC_CFG_PREFIX "i-quant-factor", 0,
                ENC_IQUANT_FACTOR_TEXT, ENC_IQUANT_FACTOR_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "noise-reduction", 0, NULL,
                  ENC_NOISE_RED_TEXT, ENC_NOISE_RED_LONGTEXT, true )
@@ -186,17 +186,17 @@ vlc_module_begin ()
                  ENC_QMAX_TEXT, ENC_QMAX_LONGTEXT, true )
     add_bool( ENC_CFG_PREFIX "trellis", false, NULL,
               ENC_TRELLIS_TEXT, ENC_TRELLIS_LONGTEXT, true )
-    add_float( ENC_CFG_PREFIX "qscale", 0, NULL,
+    add_float( ENC_CFG_PREFIX "qscale", 0,
                ENC_QSCALE_TEXT, ENC_QSCALE_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "strict", 0, NULL,
                  ENC_STRICT_TEXT, ENC_STRICT_LONGTEXT, true )
-    add_float( ENC_CFG_PREFIX "lumi-masking", 0.0, NULL,
+    add_float( ENC_CFG_PREFIX "lumi-masking", 0.0,
                ENC_LUMI_MASKING_TEXT, ENC_LUMI_MASKING_LONGTEXT, true )
-    add_float( ENC_CFG_PREFIX "dark-masking", 0.0, NULL,
+    add_float( ENC_CFG_PREFIX "dark-masking", 0.0,
                ENC_DARK_MASKING_TEXT, ENC_DARK_MASKING_LONGTEXT, true )
-    add_float( ENC_CFG_PREFIX "p-masking", 0.0, NULL,
+    add_float( ENC_CFG_PREFIX "p-masking", 0.0,
                ENC_P_MASKING_TEXT, ENC_P_MASKING_LONGTEXT, true )
-    add_float( ENC_CFG_PREFIX "border-masking", 0.0, NULL,
+    add_float( ENC_CFG_PREFIX "border-masking", 0.0,
                ENC_BORDER_MASKING_TEXT, ENC_BORDER_MASKING_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "luma-elim-threshold", 0, NULL,
                  ENC_LUMA_ELIM_TEXT, ENC_LUMA_ELIM_LONGTEXT, true )

@@ -299,7 +299,7 @@ vlc_module_begin ()
                 HEIGHT_LONGTEXT, true )
     add_string( CFG_PREFIX "aspect-ratio", "4:3", ASPECT_TEXT,
               ASPECT_LONGTEXT, true )
-    add_float( CFG_PREFIX "fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
+    add_float( CFG_PREFIX "fps", 0, FPS_TEXT, FPS_LONGTEXT, true )
     add_integer( CFG_PREFIX "caching", 50 /* ms */, NULL,
                 CACHING_TEXT, CACHING_LONGTEXT, true )
 #ifdef HAVE_LIBV4L2

@@ -79,7 +79,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACODEC )
 
-    add_float( ENC_CFG_PREFIX "quality", 0.0, NULL, ENC_QUALITY_TEXT,
+    add_float( ENC_CFG_PREFIX "quality", 0.0, ENC_QUALITY_TEXT,
                ENC_QUALITY_LONGTEXT, false )
     add_integer( ENC_CFG_PREFIX "mode", 0, NULL, ENC_MODE_TEXT,
                  ENC_MODE_LONGTEXT, false )

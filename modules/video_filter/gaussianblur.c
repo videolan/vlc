@@ -61,7 +61,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    add_float( FILTER_PREFIX "sigma", 2., NULL, SIGMA_TEXT, SIGMA_LONGTEXT,
+    add_float( FILTER_PREFIX "sigma", 2., SIGMA_TEXT, SIGMA_LONGTEXT,
                false )
 
     set_callbacks( Create, Destroy )

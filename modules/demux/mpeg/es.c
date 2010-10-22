@@ -68,7 +68,7 @@ vlc_module_begin ()
     set_description( N_("MPEG-4 video" ) )
     set_capability( "demux", 0 )
     set_callbacks( OpenVideo, Close )
-    add_float( "es-fps", 25, NULL, FPS_TEXT, FPS_LONGTEXT, false )
+    add_float( "es-fps", 25, FPS_TEXT, FPS_LONGTEXT, false )
 
     add_shortcut( "m4v" )
     add_shortcut( "mp4v" )

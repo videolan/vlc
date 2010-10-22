@@ -1621,9 +1621,9 @@ vlc_module_begin ()
     add_string( "audio-replay-gain-mode", ppsz_replay_gain_mode[0], AUDIO_REPLAY_GAIN_MODE_TEXT,
                 AUDIO_REPLAY_GAIN_MODE_LONGTEXT, false )
         change_string_list( ppsz_replay_gain_mode, ppsz_replay_gain_mode_text, 0 )
-    add_float( "audio-replay-gain-preamp", 0.0, NULL,
+    add_float( "audio-replay-gain-preamp", 0.0,
                AUDIO_REPLAY_GAIN_PREAMP_TEXT, AUDIO_REPLAY_GAIN_PREAMP_LONGTEXT, false )
-    add_float( "audio-replay-gain-default", -7.0, NULL,
+    add_float( "audio-replay-gain-default", -7.0,
                AUDIO_REPLAY_GAIN_DEFAULT_TEXT, AUDIO_REPLAY_GAIN_DEFAULT_LONGTEXT, false )
     add_bool( "audio-replay-gain-peak-protection", true, NULL,
               AUDIO_REPLAY_GAIN_PEAK_PROTECTION_TEXT, AUDIO_REPLAY_GAIN_PEAK_PROTECTION_LONGTEXT, true )
@@ -1747,7 +1747,7 @@ vlc_module_begin ()
         change_safe ()
     add_bool( "autoscale", true, NULL, AUTOSCALE_TEXT, AUTOSCALE_LONGTEXT, false )
         change_safe ()
-    add_float( "scale", 1.0, NULL, SCALEFACTOR_TEXT, SCALEFACTOR_LONGTEXT, false )
+    add_float( "scale", 1.0, SCALEFACTOR_TEXT, SCALEFACTOR_LONGTEXT, false )
         change_safe ()
     add_string( "monitor-par", NULL,
                 MASPECT_RATIO_TEXT, MASPECT_RATIO_LONGTEXT, true )
@@ -1760,7 +1760,7 @@ vlc_module_begin ()
                  VIDEO_TITLE_LONGTEXT, true )
     add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, true )
         change_integer_list( pi_align_values, ppsz_align_descriptions )
-    add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, true )
+    add_float( "zoom", 1, ZOOM_TEXT, ZOOM_LONGTEXT, true )
     add_integer( "deinterlace", 0, NULL,
                  DEINTERLACE_TEXT, DEINTERLACE_LONGTEXT, false )
         change_integer_list( pi_deinterlace, ppsz_deinterlace_text )
@@ -1852,19 +1852,19 @@ vlc_module_begin ()
     add_integer( "input-repeat", 0, NULL,
                  INPUT_REPEAT_TEXT, INPUT_REPEAT_LONGTEXT, false )
         change_safe ()
-    add_float( "start-time", 0, NULL,
+    add_float( "start-time", 0,
                START_TIME_TEXT, START_TIME_LONGTEXT, true )
         change_safe ()
-    add_float( "stop-time", 0, NULL,
+    add_float( "stop-time", 0,
                STOP_TIME_TEXT, STOP_TIME_LONGTEXT, true )
         change_safe ()
-    add_float( "run-time", 0, NULL,
+    add_float( "run-time", 0,
                RUN_TIME_TEXT, RUN_TIME_LONGTEXT, true )
         change_safe ()
     add_bool( "input-fast-seek", false, NULL,
               INPUT_FAST_SEEK_TEXT, INPUT_FAST_SEEK_LONGTEXT, false )
         change_safe ()
-    add_float( "rate", 1., NULL,
+    add_float( "rate", 1.,
                INPUT_RATE_TEXT, INPUT_RATE_LONGTEXT, false )
 
     add_string( "input-list", NULL,
