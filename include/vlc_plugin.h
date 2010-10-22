@@ -319,7 +319,7 @@ enum vlc_module_properties
     add_string_inner( CONFIG_ITEM_DIRECTORY, name, text, longtext, advc, \
                       value )
 
-#define add_font( name, value, p_callback, text, longtext, advc )\
+#define add_font( name, value, text, longtext, advc )\
     add_string_inner( CONFIG_ITEM_FONT, name, text, longtext, advc, \
                       value )
 
