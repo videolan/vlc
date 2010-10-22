@@ -257,7 +257,6 @@ void config_PutPsz( vlc_object_t *p_this,
                       const char *psz_name, const char *psz_value )
 {
     module_config_t *p_config;
-    vlc_value_t oldval;
 
     p_config = config_FindConfig( p_this, psz_name );
 
@@ -275,30 +274,19 @@ void config_PutPsz( vlc_object_t *p_this,
         return;
     }
 
-    char *str;
+    char *str, *oldstr;
     if ((psz_value != NULL) && *psz_value)
         str = strdup (psz_value);
     else
         str = NULL;
 
     vlc_rwlock_wrlock (&config_lock);
-    /* backup old value */
-    oldval.psz_string = (char *)p_config->value.psz;
-
+    oldstr = (char *)p_config->value.psz;
     p_config->value.psz = str;
     p_config->b_dirty = true;
     vlc_rwlock_unlock (&config_lock);
 
-    if( p_config->pf_callback )
-    {
-        vlc_value_t val;
-
-        val.psz_string = (char *)psz_value;
-        p_config->pf_callback( p_this, psz_name, oldval, val, NULL );
-    }
-
-    /* free old string */
-    free( oldval.psz_string );
+    free (oldstr);
 }
 
 #undef config_PutInt
@@ -313,7 +301,6 @@ void config_PutInt( vlc_object_t *p_this, const char *psz_name,
                     int64_t i_value )
 {
     module_config_t *p_config;
-    vlc_value_t oldval;
 
     p_config = config_FindConfig( p_this, psz_name );
 
@@ -336,21 +323,9 @@ void config_PutInt( vlc_object_t *p_this, const char *psz_name,
         i_value = p_config->max.i;
 
     vlc_rwlock_wrlock (&config_lock);
-    /* backup old value */
-    oldval.i_int = p_config->value.i;
-
     p_config->value.i = i_value;
     p_config->b_dirty = true;
     vlc_rwlock_unlock (&config_lock);
-
-    if( p_config->pf_callback )
-    {
-        vlc_value_t val;
-
-        val.i_int = i_value;
-        p_config->pf_callback( p_this, psz_name, oldval, val,
-                               p_config->p_callback_data );
-    }
 }
 
 #undef config_PutFloat
@@ -364,7 +339,6 @@ void config_PutFloat( vlc_object_t *p_this,
                       const char *psz_name, float f_value )
 {
     module_config_t *p_config;
-    vlc_value_t oldval;
 
     p_config = config_FindConfig( p_this, psz_name );
 
@@ -390,21 +364,9 @@ void config_PutFloat( vlc_object_t *p_this,
         f_value = p_config->max.f;
 
     vlc_rwlock_wrlock (&config_lock);
-    /* backup old value */
-    oldval.f_float = p_config->value.f;
-
     p_config->value.f = f_value;
     p_config->b_dirty = true;
     vlc_rwlock_unlock (&config_lock);
-
-    if( p_config->pf_callback )
-    {
-        vlc_value_t val;
-
-        val.f_float = f_value;
-        p_config->pf_callback( p_this, psz_name, oldval, val,
-                               p_config->p_callback_data );
-    }
 }
 
 static int confcmp (const void *a, const void *b)

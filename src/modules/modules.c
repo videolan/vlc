@@ -956,7 +956,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
         for( p_item = p_module->p_config, p_end = p_item + p_module->confsize;
              p_item < p_end; p_item++ )
         {
-            if( p_item->pf_callback || p_item->i_action )
+            if( p_item->i_action )
             {
                 p_module = AllocatePlugin( p_this, psz_file );
                 break;

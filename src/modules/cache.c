@@ -59,7 +59,7 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 11
+#define CACHE_SUBVERSION_NUM 12
 
 /* Format string for the cache filename */
 #define CACHENAME_FORMAT \
@@ -326,16 +326,6 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
 }
 
 
-/* This function should never be called.
- * It is only used as a non-NULL vlc_callback_t value for comparison. */
-static int dummy_callback (vlc_object_t *obj, const char *name,
-                           vlc_value_t oldval, vlc_value_t newval, void *data)
-{
-    (void) obj; (void)name; (void)oldval; (void)newval; (void)data;
-    assert (0);
-}
-
-
 static int CacheLoadConfig( module_t *p_module, FILE *file )
 {
     uint32_t i_lines;
@@ -441,11 +431,6 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
                 LOAD_STRING( p_module->p_config[i].ppsz_action_text[j] );
             }
         }
-
-        bool has_callback;
-        LOAD_IMMEDIATE( has_callback );
-        if (has_callback)
-            p_module->p_config[i].pf_callback = dummy_callback;
     }
 
     return VLC_SUCCESS;
@@ -669,9 +654,6 @@ static int CacheSaveConfig (FILE *file, const module_t *p_module)
 
         for (int j = 0; j < p_module->p_config[i].i_action; j++)
             SAVE_STRING( p_module->p_config[i].ppsz_action_text[j] );
-
-        bool has_callback = p_module->p_config[i].pf_callback != NULL;
-        SAVE_IMMEDIATE( has_callback );
     }
     return 0;
 

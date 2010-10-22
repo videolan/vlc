@@ -259,11 +259,9 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
         case VLC_CONFIG_NAME:
         {
             const char *name = va_arg (ap, const char *);
-            vlc_callback_t cb = va_arg (ap, vlc_callback_t);
 
             assert (name != NULL);
             item->psz_name = strdup (name);
-            item->pf_callback = cb;
             break;
         }
 

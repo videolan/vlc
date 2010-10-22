@@ -155,9 +155,6 @@ struct module_config_t
     module_value_t min;
     module_value_t max;
 
-    /* Function to call when commiting a change */
-    vlc_callback_t pf_callback;
-
     /* Values list */
     char **      ppsz_list;       /* List of possible values for the option */
     int         *pi_list;                              /* Idem for integers */

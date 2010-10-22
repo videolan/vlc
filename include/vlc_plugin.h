@@ -58,7 +58,7 @@ enum vlc_module_properties
     /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
      * Append new items at the end ONLY. */
     VLC_CONFIG_NAME=0x1000,
-    /* command line name (args=const char *, vlc_callback_t) */
+    /* command line name (args=const char *) */
 
     VLC_CONFIG_VALUE,
     /* actual value (args=int/double/const char *) */
