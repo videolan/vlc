@@ -77,4 +77,44 @@ protected:
 
 };
 
+class LocationButton : public QPushButton
+{
+public:
+    LocationButton( const QString &, bool bold, bool arrow, QWidget * parent = NULL );
+    QSize sizeHint() const;
+private:
+    void paintEvent ( QPaintEvent * event );
+    QFontMetrics *metrics;
+    bool b_arrow;
+};
+
+class PLModel;
+class LocationBar : public QWidget
+{
+    Q_OBJECT
+public:
+    LocationBar( PLModel * );
+    void setIndex( const QModelIndex & );
+    QSize sizeHint() const;
+signals:
+    void invoked( const QModelIndex & );
+public slots:
+    void setRootIndex();
+private slots:
+    void invoke( int i_item_id );
+private:
+    void layOut( const QSize& size );
+    void resizeEvent ( QResizeEvent * event );
+
+    PLModel *model;
+    QSignalMapper *mapper;
+    QHBoxLayout *box;
+    QList<QWidget*> buttons;
+    QList<QAction*> actions;
+    LocationButton *btnMore;
+    QMenu *menuMore;
+    QList<int> widths;
+};
+
+
 #endif

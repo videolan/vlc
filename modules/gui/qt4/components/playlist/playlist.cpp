@@ -29,6 +29,7 @@
 #include "components/playlist/standardpanel.hpp"
 #include "components/playlist/selector.hpp"
 #include "components/playlist/playlist.hpp"
+#include "components/playlist/playlist_model.hpp"
 
 #include "input_manager.hpp" /* art signal */
 #include "main_interface.hpp" /* DropEvent TODO remove this*/
@@ -160,3 +161,192 @@ void PlaylistWidget::forceShow()
     rightPanel->show();
     updateGeometry();
 }
+
+
+#include <QSignalMapper>
+#include <QMenu>
+#include <QPainter>
+LocationBar::LocationBar( PLModel *m )
+{
+    model = m;
+    mapper = new QSignalMapper( this );
+    CONNECT( mapper, mapped( int ), this, invoke( int ) );
+
+    btnMore = new LocationButton( "...", false, true, this );
+    menuMore = new QMenu( this );
+    btnMore->setMenu( menuMore );
+}
+
+void LocationBar::setIndex( const QModelIndex &index )
+{
+    qDeleteAll( buttons );
+    buttons.clear();
+    qDeleteAll( actions );
+    actions.clear();
+
+    QModelIndex i = index;
+    bool first = true;
+
+    while( true )
+    {
+        PLItem *item = model->getItem( i );
+
+        char *fb_name = input_item_GetTitleFbName( item->inputItem() );
+        QString text = qfu(fb_name);
+        free(fb_name);
+
+        QAbstractButton *btn = new LocationButton( text, first, !first, this );
+        btn->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
+        buttons.append( btn );
+
+        QAction *action = new QAction( text, this );
+        actions.append( action );
+        CONNECT( btn, clicked(), action, trigger() );
+
+        mapper->setMapping( action, item->id() );
+        CONNECT( action, triggered(), mapper, map() );
+
+        first = false;
+
+        if( i.isValid() ) i = i.parent();
+        else break;
+    }
+
+    QString prefix;
+    for( int a = actions.count() - 1; a >= 0 ; a-- )
+    {
+        actions[a]->setText( prefix + actions[a]->text() );
+        prefix += QString("  ");
+    }
+
+    if( isVisible() ) layOut( size() );
+}
+
+void LocationBar::setRootIndex()
+{
+    setIndex( QModelIndex() );
+}
+
+void LocationBar::invoke( int i_id )
+{
+    QModelIndex index = model->index( i_id, 0 );
+    emit invoked ( index );
+}
+
+void LocationBar::layOut( const QSize& size )
+{
+    menuMore->clear();
+    widths.clear();
+
+    int count = buttons.count();
+    int totalWidth = 0;
+    for( int i = 0; i < count; i++ )
+    {
+        int w = buttons[i]->sizeHint().width();
+        widths.append( w );
+        totalWidth += w;
+        if( totalWidth > size.width() ) break;
+    }
+
+    int x = 0;
+    int shown = widths.count();
+
+    if( totalWidth > size.width() && count > 1 )
+    {
+        QSize sz = btnMore->sizeHint();
+        btnMore->setGeometry( 0, 0, sz.width(), size.height() );
+        btnMore->show();
+        x = sz.width();
+        totalWidth += x;
+    }
+    else
+    {
+        btnMore->hide();
+    }
+    for( int i = count - 1; i >= 0; i-- )
+    {
+        if( totalWidth <= size.width() || i == 0)
+        {
+            buttons[i]->setGeometry( x, 0, qMin( size.width() - x, widths[i] ), size.height() );
+            buttons[i]->show();
+            x += widths[i];
+            totalWidth -= widths[i];
+        }
+        else
+        {
+            menuMore->addAction( actions[i] );
+            buttons[i]->hide();
+            if( i < shown ) totalWidth -= widths[i];
+        }
+    }
+}
+
+void LocationBar::resizeEvent ( QResizeEvent * event )
+{
+    layOut( event->size() );
+}
+
+QSize LocationBar::sizeHint() const
+{
+    return btnMore->sizeHint();
+}
+
+LocationButton::LocationButton( const QString &text, bool bold,
+                                bool arrow, QWidget * parent )
+  : b_arrow( arrow ), QPushButton( parent )
+{
+    QFont font;
+    font.setBold( bold );
+    setFont( font );
+    setText( text );
+}
+
+#define PADDING 4
+
+void LocationButton::paintEvent ( QPaintEvent * event )
+{
+    QStyleOptionButton option;
+    option.initFrom( this );
+    option.state |= QStyle::State_Enabled;
+    QPainter p( this );
+
+    if( underMouse() )
+    {
+        p.save();
+        p.setRenderHint( QPainter::Antialiasing, true );
+        QColor c = palette().color( QPalette::Highlight );
+        p.setPen( c );
+        p.setBrush( c.lighter( 150 ) );
+        p.setOpacity( 0.2 );
+        p.drawRoundedRect( option.rect.adjusted( 0, 2, 0, -2 ), 5, 5 );
+        p.restore();
+    }
+
+    QRect r = option.rect.adjusted( PADDING, 0, -PADDING - (b_arrow ? 10 : 0), 0 );
+
+    QString str( text() );
+    /* This check is absurd, but either it is not done properly inside elidedText(),
+       or boundingRect() is wrong */
+    if( r.width() < fontMetrics().boundingRect( text() ).width() )
+        str = fontMetrics().elidedText( text(), Qt::ElideRight, r.width() );
+    p.drawText( r, Qt::AlignVCenter | Qt::AlignLeft, str );
+
+    if( b_arrow )
+    {
+        option.rect.setWidth( 10 );
+        option.rect.moveRight( rect().right() );
+        style()->drawPrimitive( QStyle::PE_IndicatorArrowRight, &option, &p );
+    }
+}
+
+QSize LocationButton::sizeHint() const
+{
+    QSize s( fontMetrics().boundingRect( text() ).size() );
+    /* Add two pixels to width: font metrics are buggy, if you pass text through elidation
+       with exactly the width of its bounding rect, sometimes it still elides */
+    s.setWidth( s.width() + ( 2 * PADDING ) + ( b_arrow ? 10 : 0 ) + 2 );
+    s.setHeight( s.height() + 2 * PADDING );
+    return s;
+}
+
+#undef PADDING
