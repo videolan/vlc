@@ -311,7 +311,7 @@ enum vlc_module_properties
     add_string_inner( CONFIG_ITEM_LOADFILE, name, text, longtext, advc, \
                       value )
 
-#define add_savefile( name, value, p_callback, text, longtext, advc ) \
+#define add_savefile( name, value, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_SAVEFILE, name, text, longtext, advc, \
                       value )
 

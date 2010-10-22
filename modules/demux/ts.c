@@ -176,7 +176,7 @@ vlc_module_begin ()
     add_integer( "ts-csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, true )
     add_bool( "ts-silent", false, NULL, SILENT_TEXT, SILENT_LONGTEXT, true )
 
-    add_savefile( "ts-dump-file", NULL, NULL, TSDUMP_TEXT, TSDUMP_LONGTEXT, false )
+    add_savefile( "ts-dump-file", NULL, TSDUMP_TEXT, TSDUMP_LONGTEXT, false )
     add_bool( "ts-dump-append", false, NULL, APPEND_TEXT, APPEND_LONGTEXT, false )
     add_integer( "ts-dump-size", 16384, NULL, DUMPSIZE_TEXT,
                  DUMPSIZE_LONGTEXT, true )

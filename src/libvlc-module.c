@@ -1580,7 +1580,7 @@ const char vlc_usage[] = N_(
  * add_string( option_name, value, N_(text), N_(longtext),
                b_advanced_option )
  * add_loadfile( option_name, psz_value, p_callback, N_(text), N_(longtext) )
- * add_savefile( option_name, psz_value, p_callback, N_(text), N_(longtext) )
+ * add_savefile( option_name, psz_value, N_(text), N_(longtext) )
  * add_module( option_name, psz_value, i_capability, p_callback,
  *             N_(text), N_(longtext) )
  * add_integer( option_name, i_value, p_callback, N_(text), N_(longtext),
