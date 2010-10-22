@@ -116,7 +116,7 @@ vlc_module_begin ()
     add_integer_with_range( CFG_PREFIX "height", 0, 0, INT_MAX, NULL,
                             HEIGHT_TEXT, HEIGHT_LONGTEXT, false )
 
-    add_string( CFG_PREFIX "aspect", NULL, NULL,
+    add_string( CFG_PREFIX "aspect", NULL,
                 ASPECT_TEXT, ASPECT_LONGTEXT, false )
 
     add_bool( CFG_PREFIX "padd", true, NULL,

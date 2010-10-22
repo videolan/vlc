@@ -98,19 +98,19 @@ vlc_module_begin ()
     add_shortcut( "http", "https", "mmsh" )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
-    add_string( SOUT_CFG_PREFIX "user", "", NULL,
+    add_string( SOUT_CFG_PREFIX "user", "",
                 USER_TEXT, USER_LONGTEXT, true )
     add_password( SOUT_CFG_PREFIX "pwd", "", NULL,
                   PASS_TEXT, PASS_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "mime", "", NULL,
+    add_string( SOUT_CFG_PREFIX "mime", "",
                 MIME_TEXT, MIME_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "cert", "vlc.pem", NULL,
+    add_string( SOUT_CFG_PREFIX "cert", "vlc.pem",
                 CERT_TEXT, CERT_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "key", NULL, NULL,
+    add_string( SOUT_CFG_PREFIX "key", NULL,
                 KEY_TEXT, KEY_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "ca", NULL, NULL,
+    add_string( SOUT_CFG_PREFIX "ca", NULL,
                 CA_TEXT, CA_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "crl", NULL, NULL,
+    add_string( SOUT_CFG_PREFIX "crl", NULL,
                 CRL_TEXT, CRL_LONGTEXT, true )
 #if 0 //def HAVE_AVAHI_CLIENT
     add_bool( SOUT_CFG_PREFIX "bonjour", false, NULL,

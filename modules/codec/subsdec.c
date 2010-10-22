@@ -215,7 +215,7 @@ vlc_module_begin ()
     add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT,
                  false )
         change_integer_list( pi_justification, ppsz_justification_text )
-    add_string( "subsdec-encoding", "", NULL,
+    add_string( "subsdec-encoding", "",
                 ENCODING_TEXT, ENCODING_LONGTEXT, false )
         change_string_list( ppsz_encodings, ppsz_encoding_names, 0 )
     add_bool( "subsdec-autodetect-utf8", true, NULL,

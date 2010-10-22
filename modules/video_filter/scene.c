@@ -98,15 +98,15 @@ vlc_module_begin ()
     set_capability( "video filter2", 0 )
 
     /* General options */
-    add_string(  CFG_PREFIX "format", "png", NULL,
+    add_string(  CFG_PREFIX "format", "png",
                  FORMAT_TEXT, FORMAT_LONGTEXT, false )
     add_integer( CFG_PREFIX "width", -1, NULL,
                  WIDTH_TEXT, WIDTH_LONGTEXT, true )
     add_integer( CFG_PREFIX "height", -1, NULL,
                  HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
-    add_string(  CFG_PREFIX "prefix", "scene", NULL,
+    add_string(  CFG_PREFIX "prefix", "scene",
                  PREFIX_TEXT, PREFIX_LONGTEXT, false )
-    add_string(  CFG_PREFIX "path", NULL, NULL,
+    add_string(  CFG_PREFIX "path", NULL,
                  PATH_TEXT, PATH_LONGTEXT, false )
     add_bool(    CFG_PREFIX "replace", false, NULL,
                  REPLACE_TEXT, REPLACE_LONGTEXT, false )

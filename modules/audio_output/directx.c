@@ -132,7 +132,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_shortcut( "directx", "directsound" )
 
-    add_string( "directx-audio-device-name", "default", NULL,
+    add_string( "directx-audio-device-name", "default",
              DEVICE_TEXT, DEVICE_LONGTEXT, false )
         add_deprecated_alias( "directx-audio-device" ) /* Since 1.1.0 */
         change_string_list( ppsz_adev, ppsz_adev_text, ReloadDirectXDevices )
@@ -140,7 +140,7 @@ vlc_module_begin ()
         change_need_restart ()
     add_bool( "directx-audio-float32", false, NULL, FLOAT_TEXT,
               FLOAT_LONGTEXT, true )
-    add_string( "directx-audio-speaker", "Windows default", NULL,
+    add_string( "directx-audio-speaker", "Windows default",
                  SPEAKER_TEXT, SPEAKER_LONGTEXT, true )
         change_string_list( speaker_list, 0, 0 )
         change_need_restart ()

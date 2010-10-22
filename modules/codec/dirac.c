@@ -219,7 +219,7 @@ vlc_module_begin()
     add_bool( ENC_CFG_PREFIX ENC_LOSSLESS, false, NULL,
               ENC_LOSSLESS_TEXT, ENC_LOSSLESS_LONGTEXT, false )
 
-    add_string( ENC_CFG_PREFIX ENC_PREFILTER, "diaglp", NULL,
+    add_string( ENC_CFG_PREFIX ENC_PREFILTER, "diaglp",
                 ENC_PREFILTER_TEXT, ENC_PREFILTER_LONGTEXT, false )
     change_string_list( enc_prefilter_list, enc_prefilter_list_text, 0 );
 
@@ -227,7 +227,7 @@ vlc_module_begin()
                  ENC_PREFILTER_STRENGTH_TEXT, ENC_PREFILTER_STRENGTH_LONGTEXT, false )
     change_integer_range(0, 10);
 
-    add_string( ENC_CFG_PREFIX ENC_CHROMAFMT, "420", NULL,
+    add_string( ENC_CFG_PREFIX ENC_CHROMAFMT, "420",
                 ENC_CHROMAFMT_TEXT, ENC_CHROMAFMT_LONGTEXT, false )
     change_string_list( enc_chromafmt_list, enc_chromafmt_list_text, 0 );
 
@@ -239,11 +239,11 @@ vlc_module_begin()
                  ENC_L1NUM_TEXT, ENC_L1NUM_LONGTEXT, false )
     change_integer_range(-1, INT_MAX);
 
-    add_string( ENC_CFG_PREFIX ENC_CODINGMODE, "auto", NULL,
+    add_string( ENC_CFG_PREFIX ENC_CODINGMODE, "auto",
                 ENC_CODINGMODE_TEXT, ENC_CODINGMODE_LONGTEXT, false )
     change_string_list( enc_codingmode_list, enc_codingmode_list_text, 0 );
 
-    add_string( ENC_CFG_PREFIX ENC_MVPREC, "1/2", NULL,
+    add_string( ENC_CFG_PREFIX ENC_MVPREC, "1/2",
                 ENC_MVPREC_TEXT, ENC_MVPREC_LONGTEXT, false )
     change_string_list( enc_mvprec_list, enc_mvprec_list, 0 );
 
@@ -268,7 +268,7 @@ vlc_module_begin()
                  ENC_MCBLK_YBLEN_TEXT, ENC_MCBLK_YBLEN_LONGTEXT, true )
     change_integer_range(-1, INT_MAX);
 
-    add_string( ENC_CFG_PREFIX ENC_ME_SIMPLESEARCH, "", NULL,
+    add_string( ENC_CFG_PREFIX ENC_ME_SIMPLESEARCH, "",
               ENC_ME_SIMPLESEARCH_TEXT, ENC_ME_SIMPLESEARCH_LONGTEXT, false )
 
 #if DIRAC_RESEARCH_VERSION_ATLEAST(1,0,1)

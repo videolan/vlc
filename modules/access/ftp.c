@@ -78,11 +78,11 @@ vlc_module_begin ()
     add_integer( "ftp-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_safe()
-    add_string( "ftp-user", "anonymous", NULL, USER_TEXT, USER_LONGTEXT,
+    add_string( "ftp-user", "anonymous", USER_TEXT, USER_LONGTEXT,
                 false )
-    add_string( "ftp-pwd", "anonymous@example.com", NULL, PASS_TEXT,
+    add_string( "ftp-pwd", "anonymous@example.com", PASS_TEXT,
                 PASS_LONGTEXT, false )
-    add_string( "ftp-account", "anonymous", NULL, ACCOUNT_TEXT,
+    add_string( "ftp-account", "anonymous", ACCOUNT_TEXT,
                 ACCOUNT_LONGTEXT, false )
     add_shortcut( "ftp" )
     set_callbacks( InOpen, InClose )

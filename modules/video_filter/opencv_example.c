@@ -72,7 +72,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER2 )
     set_callbacks( OpenFilter, CloseFilter )
 
-    add_string( "opencv-haarcascade-file", "c:\\haarcascade_frontalface_alt.xml", NULL,
+    add_string( "opencv-haarcascade-file", "c:\\haarcascade_frontalface_alt.xml",
                           N_("Haar cascade filename"),
                           N_("Name of XML file containing Haar cascade description"), false);
 vlc_module_end ()

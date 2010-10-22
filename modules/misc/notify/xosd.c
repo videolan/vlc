@@ -91,11 +91,10 @@ vlc_module_begin ()
     add_integer( "xosd-text-offset", 30, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT, true )
     add_integer( "xosd-shadow-offset", 2, NULL,
                  SHD_OFS_TEXT, SHD_OFS_LONGTEXT, true )
-    add_string( "xosd-font",
-                "-adobe-helvetica-bold-r-normal-*-*-160-*-*-p-*-iso8859-1",
-                NULL, FONT_TEXT, FONT_LONGTEXT, true )
-    add_string( "xosd-colour", "LawnGreen",
-                    NULL, COLOUR_TEXT, COLOUR_LONGTEXT, true )
+    add_string( "xosd-font", "-adobe-helvetica-bold-r-normal-*-*-160-*-*-p-*-iso8859-1", NULL,
+                FONT_TEXT, FONT_LONGTEXT, true )
+    add_string( "xosd-colour", "LawnGreen", NULL,
+                COLOUR_TEXT, COLOUR_LONGTEXT, true )
     set_capability( "interface", 10 )
     set_callbacks( Open, Close )
 vlc_module_end ()

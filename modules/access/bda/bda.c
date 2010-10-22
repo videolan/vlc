@@ -203,9 +203,9 @@ vlc_module_begin ()
                  false )
         change_safe()
 #   if defined(WIN32) || defined(WINCE)
-        add_string( "dvb-network-name", NULL, NULL, NAME_TEXT, NAME_LONGTEXT,
+        add_string( "dvb-network-name", NULL, NAME_TEXT, NAME_LONGTEXT,
                     true )
-        add_string( "dvb-create-name", NULL, NULL, CREATE_TEXT,
+        add_string( "dvb-create-name", NULL, CREATE_TEXT,
                     CREATE_LONGTEXT, true )
         add_integer( "dvb-adapter", -1, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
                      true )
@@ -223,7 +223,7 @@ vlc_module_begin ()
         INVERSION_LONGTEXT, true )
         change_integer_list( i_inversion_list, ppsz_inversion_text )
 #   if defined(WIN32) || defined(WINCE)
-        add_string( "dvb-polarisation", NULL, NULL, POLARISATION_TEXT,
+        add_string( "dvb-polarisation", NULL, POLARISATION_TEXT,
             POLARISATION_LONGTEXT, false )
             change_string_list( ppsz_polar_list, ppsz_polar_text, 0 )
             /* Note: Polaristion H = voltage 18; V = voltage 13; */
@@ -235,7 +235,7 @@ vlc_module_begin ()
             ELEVATION_LONGTEXT, true )
         add_integer( "dvb-longitude", 0, NULL, LONGITUDE_TEXT,
             LONGITUDE_LONGTEXT, true )
-        add_string( "dvb-range", NULL, NULL, RANGE_TEXT,
+        add_string( "dvb-range", NULL, RANGE_TEXT,
             RANGE_LONGTEXT, true )
         /* dvb-range corresponds to the BDA InputRange parameter which is
          * used by some drivers to control the diseqc */

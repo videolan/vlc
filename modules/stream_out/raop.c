@@ -164,7 +164,7 @@ vlc_module_begin();
     add_shortcut( "raop" )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
-    add_string( SOUT_CFG_PREFIX "host", "", NULL,
+    add_string( SOUT_CFG_PREFIX "host", "",
                 HOST_TEXT, HOST_LONGTEXT, false )
     add_password( SOUT_CFG_PREFIX "password", NULL, NULL,
                   PASSWORD_TEXT, PASSWORD_LONGTEXT, false )

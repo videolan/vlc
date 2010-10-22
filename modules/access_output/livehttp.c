@@ -95,9 +95,9 @@ vlc_module_begin ()
               DELSEGS_TEXT, DELSEGS_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "ratecontrol", false, NULL,
               RATECONTROL_TEXT, RATECONTROL_TEXT, true )
-    add_string( SOUT_CFG_PREFIX "index", NULL, NULL,
+    add_string( SOUT_CFG_PREFIX "index", NULL,
                 INDEX_TEXT, INDEX_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "index-url", NULL, NULL,
+    add_string( SOUT_CFG_PREFIX "index-url", NULL,
                 INDEXURL_TEXT, INDEXURL_LONGTEXT, true )
     set_callbacks( Open, Close )
 vlc_module_end ()

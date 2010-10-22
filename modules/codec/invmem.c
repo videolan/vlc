@@ -82,10 +82,10 @@ vlc_module_begin()
 
     add_integer( "invmem-width", 0, NULL, T_WIDTH, LT_WIDTH, false )
     add_integer( "invmem-height", 0, NULL, T_HEIGHT, LT_HEIGHT, false )
-    add_string( "invmem-lock", "0", NULL, T_LOCK, LT_LOCK, true )
-    add_string( "invmem-unlock", "0", NULL, T_UNLOCK, LT_UNLOCK, true )
-    add_string( "invmem-data", "0", NULL, T_DATA, LT_DATA, true )
-    add_string( "invmem-chroma", "RV24", NULL, T_CHROMA, LT_CHROMA, true)
+    add_string( "invmem-lock", "0", T_LOCK, LT_LOCK, true )
+    add_string( "invmem-unlock", "0", T_UNLOCK, LT_UNLOCK, true )
+    add_string( "invmem-data", "0", T_DATA, LT_DATA, true )
+    add_string( "invmem-chroma", "RV24", T_CHROMA, LT_CHROMA, true)
 vlc_module_end()
 
 

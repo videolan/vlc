@@ -134,9 +134,9 @@ vlc_module_begin ()
 
     add_integer( "pvr-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true )
-    add_string( "pvr-device", "/dev/video0", NULL, DEVICE_TEXT,
+    add_string( "pvr-device", "/dev/video0", DEVICE_TEXT,
                  DEVICE_LONGTEXT, false )
-    add_string( "pvr-radio-device", "/dev/radio0", NULL, RADIO_DEVICE_TEXT,
+    add_string( "pvr-radio-device", "/dev/radio0", RADIO_DEVICE_TEXT,
                  RADIO_DEVICE_LONGTEXT, false )
     add_integer( "pvr-norm", V4L2_STD_UNKNOWN , NULL, NORM_TEXT,
                  NORM_LONGTEXT, false )

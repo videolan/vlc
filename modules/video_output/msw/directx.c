@@ -111,7 +111,7 @@ vlc_module_begin()
               true)
     add_bool("directx-3buffering", true, NULL, TRIPLEBUF_TEXT,
               TRIPLEBUF_LONGTEXT, true)
-    add_string("directx-device", "", NULL, DEVICE_TEXT, DEVICE_LONGTEXT, true)
+    add_string("directx-device", "", DEVICE_TEXT, DEVICE_LONGTEXT, true)
         change_string_list(device, device_text, FindDevicesCallback)
         change_action_add(FindDevicesCallback, N_("Refresh list"))
 

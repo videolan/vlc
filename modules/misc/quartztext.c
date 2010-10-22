@@ -109,7 +109,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
-    add_string( "quartztext-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT,
+    add_string( "quartztext-font", DEFAULT_FONT, FONT_TEXT, FONT_LONGTEXT,
               false )
     add_integer( "quartztext-rel-fontsize", DEFAULT_REL_FONT_SIZE, NULL, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, false )

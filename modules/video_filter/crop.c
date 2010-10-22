@@ -108,7 +108,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_capability( "video filter", 0 )
 
-    add_string( "crop-geometry", NULL, NULL, GEOMETRY_TEXT,
+    add_string( "crop-geometry", NULL, GEOMETRY_TEXT,
                                              GEOMETRY_LONGTEXT, false )
     add_bool( "autocrop", false, NULL, AUTOCROP_TEXT,
                                    AUTOCROP_LONGTEXT, false )

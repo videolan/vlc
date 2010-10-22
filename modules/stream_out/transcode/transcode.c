@@ -161,7 +161,7 @@ vlc_module_begin ()
     set_section( N_("Video"), NULL )
     add_module( SOUT_CFG_PREFIX "venc", "encoder", NULL, NULL, VENC_TEXT,
                 VENC_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "vcodec", NULL, NULL, VCODEC_TEXT,
+    add_string( SOUT_CFG_PREFIX "vcodec", NULL, VCODEC_TEXT,
                 VCODEC_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "vb", 0, NULL, VB_TEXT,
                  VB_LONGTEXT, false )
@@ -173,7 +173,7 @@ vlc_module_begin ()
                HURRYUP_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "deinterlace", false, NULL, DEINTERLACE_TEXT,
               DEINTERLACE_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "deinterlace-module", "deinterlace", NULL,
+    add_string( SOUT_CFG_PREFIX "deinterlace-module", "deinterlace",
                 DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT,
                 false )
         change_string_list( ppsz_deinterlace_type, 0, 0 )
@@ -192,11 +192,11 @@ vlc_module_begin ()
     set_section( N_("Audio"), NULL )
     add_module( SOUT_CFG_PREFIX "aenc", "encoder", NULL, NULL, AENC_TEXT,
                 AENC_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "acodec", NULL, NULL, ACODEC_TEXT,
+    add_string( SOUT_CFG_PREFIX "acodec", NULL, ACODEC_TEXT,
                 ACODEC_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "ab", 96, NULL, AB_TEXT,
                  AB_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "alang", NULL, NULL, ALANG_TEXT,
+    add_string( SOUT_CFG_PREFIX "alang", NULL, ALANG_TEXT,
                 ALANG_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "channels", 0, NULL, ACHANS_TEXT,
                  ACHANS_LONGTEXT, false )
@@ -211,7 +211,7 @@ vlc_module_begin ()
     set_section( N_("Overlays/Subtitles"), NULL )
     add_module( SOUT_CFG_PREFIX "senc", "encoder", NULL, NULL, SENC_TEXT,
                 SENC_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "scodec", NULL, NULL, SCODEC_TEXT,
+    add_string( SOUT_CFG_PREFIX "scodec", NULL, SCODEC_TEXT,
                 SCODEC_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "soverlay", false, NULL, SCODEC_TEXT,
                SCODEC_LONGTEXT, false )

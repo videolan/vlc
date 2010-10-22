@@ -122,7 +122,7 @@ vlc_module_begin ()
     add_shortcut( "rmtosd" )
     set_callbacks( CreateFilter, DestroyFilter )
 
-    add_string( RMTOSD_CFG "host", "myvdr", NULL, RMTOSD_HOST_TEXT,
+    add_string( RMTOSD_CFG "host", "myvdr", RMTOSD_HOST_TEXT,
         RMTOSD_HOST_LONGTEXT, false )
     add_integer_with_range( RMTOSD_CFG "port", 20001, 1, 0xFFFF, NULL,
         RMTOSD_PORT_TEXT, RMTOSD_PORT_LONGTEXT, false )

@@ -78,10 +78,10 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
-    add_string( "equalizer-preset", "flat", NULL, PRESET_TEXT,
+    add_string( "equalizer-preset", "flat", PRESET_TEXT,
                 PRESET_LONGTEXT, false )
         change_string_list( preset_list, preset_list_text, 0 )
-    add_string( "equalizer-bands", NULL, NULL, BANDS_TEXT,
+    add_string( "equalizer-bands", NULL, BANDS_TEXT,
                 BANDS_LONGTEXT, true )
     add_bool( "equalizer-2pass", false, NULL, TWOPASS_TEXT,
               TWOPASS_LONGTEXT, true )

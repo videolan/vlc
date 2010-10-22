@@ -66,9 +66,9 @@ vlc_module_begin ()
 
     add_integer( "rtmp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true )
-    add_string( "rtmp-swfurl", "file:///player.swf", NULL, SWFURL_TEXT,
+    add_string( "rtmp-swfurl", "file:///player.swf", SWFURL_TEXT,
                 SWFURL_LONGTEXT, true )
-    add_string( "rtmp-pageurl", "file:///player.htm", NULL, PAGEURL_TEXT,
+    add_string( "rtmp-pageurl", "file:///player.htm", PAGEURL_TEXT,
                 PAGEURL_LONGTEXT, true )
 
     set_capability( "access", 0 )

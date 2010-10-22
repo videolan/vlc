@@ -208,7 +208,7 @@ vlc_module_begin ()
                QT_NATIVEOPEN_TEXT, false )
     add_bool( "qt-recentplay", true, NULL, RECENTPLAY_TEXT,
               RECENTPLAY_TEXT, false )
-    add_string( "qt-recentplay-filter", "", NULL,
+    add_string( "qt-recentplay-filter", "",
                 RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT, false )
 
     add_bool( "qt-adv-options", false, NULL, ADVANCED_OPTIONS_TEXT,
@@ -223,9 +223,8 @@ vlc_module_begin ()
     add_integer( "qt-updates-days", 7, NULL, UPDATER_DAYS_TEXT,
                  UPDATER_DAYS_TEXT, false )
 #endif
-    add_string( "qt-slider-colours",
-                "255;255;255;20;210;20;255;199;15;245;39;29",
-                NULL, SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, false )
+    add_string( "qt-slider-colours", "255;255;255;20;210;20;255;199;15;245;39;29",
+                SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, false )
 
     add_bool( "qt-privacy-ask", true, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
               false )

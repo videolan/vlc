@@ -76,11 +76,11 @@ vlc_module_begin ()
     set_shortname( N_("Directory" ) )
     set_description( N_("Directory input") )
     set_capability( "access", 55 )
-    add_string( "recursive", "expand" , NULL, RECURSIVE_TEXT,
+    add_string( "recursive", "expand" , RECURSIVE_TEXT,
                 RECURSIVE_LONGTEXT, false )
       change_string_list( psz_recursive_list, psz_recursive_list_text, 0 )
     add_string( "ignore-filetypes", "m3u,db,nfo,ini,jpg,jpeg,ljpg,gif,png,pgm,pgmyuv,pbm,pam,tga,bmp,pnm,xpm,xcf,pcx,tif,tiff,lbm,sfv,txt,sub,idx,srt,cue,ssa",
-                NULL, IGNORE_TEXT, IGNORE_LONGTEXT, false )
+                IGNORE_TEXT, IGNORE_LONGTEXT, false )
 #ifndef HAVE_FDOPENDIR
     add_shortcut( "file", "directory", "dir" )
 #else

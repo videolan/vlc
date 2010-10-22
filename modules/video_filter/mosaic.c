@@ -218,10 +218,10 @@ vlc_module_begin ()
     add_bool( CFG_PREFIX "keep-picture", false, NULL,
               KEEP_TEXT, KEEP_LONGTEXT, false )
 
-    add_string( CFG_PREFIX "order", "", NULL,
+    add_string( CFG_PREFIX "order", "",
                 ORDER_TEXT, ORDER_LONGTEXT, false )
 
-    add_string( CFG_PREFIX "offsets", "", NULL,
+    add_string( CFG_PREFIX "offsets", "",
                 OFFSETS_TEXT, OFFSETS_LONGTEXT, false )
 
     add_integer( CFG_PREFIX "delay", 0, NULL, DELAY_TEXT, DELAY_LONGTEXT,

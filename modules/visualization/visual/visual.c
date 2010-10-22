@@ -112,7 +112,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_VISUAL )
     set_description( N_("Visualizer filter") )
     set_section( N_( "General") , NULL )
-    add_string("effect-list", "spectrum", NULL,
+    add_string("effect-list", "spectrum",
             ELIST_TEXT, ELIST_LONGTEXT, true )
     add_integer("effect-width",VOUT_WIDTH,NULL,
              WIDTH_TEXT, WIDTH_LONGTEXT, false )

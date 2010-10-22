@@ -98,9 +98,9 @@ vlc_module_begin ()
         change_integer_range (0, 65535)
         change_safe ()
 #ifdef HAVE_SRTP
-    add_string ("srtp-key", "", NULL,
+    add_string ("srtp-key", "",
                 SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT, false)
-    add_string ("srtp-salt", "", NULL,
+    add_string ("srtp-salt", "",
                 SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false)
 #endif
     add_integer ("rtp-max-src", 1, NULL, RTP_MAX_SRC_TEXT,

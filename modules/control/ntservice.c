@@ -70,11 +70,11 @@ vlc_module_begin ()
               INSTALL_TEXT, INSTALL_LONGTEXT, true )
     add_bool( "ntservice-uninstall", false, NULL,
               UNINSTALL_TEXT, UNINSTALL_LONGTEXT, true )
-    add_string ( "ntservice-name", VLCSERVICENAME, NULL,
+    add_string ( "ntservice-name", VLCSERVICENAME,
                  NAME_TEXT, NAME_LONGTEXT, true )
-    add_string ( "ntservice-options", NULL, NULL,
+    add_string ( "ntservice-options", NULL,
                  OPTIONS_TEXT, OPTIONS_LONGTEXT, true )
-    add_string ( "ntservice-extraintf", NULL, NULL,
+    add_string ( "ntservice-extraintf", NULL,
                  EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT, true )
 
     set_capability( "interface", 0 )

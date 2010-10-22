@@ -69,7 +69,7 @@ vlc_module_begin()
         change_private()
     add_integer("vmem-pitch", 640, NULL, T_PITCH, LT_PITCH, false)
         change_private()
-    add_string("vmem-chroma", "RV16", NULL, T_CHROMA, LT_CHROMA, true)
+    add_string("vmem-chroma", "RV16", T_CHROMA, LT_CHROMA, true)
         change_private()
     add_obsolete_string("vmem-lock") /* obsoleted since 1.1.1 */
     add_obsolete_string("vmem-unlock") /* obsoleted since 1.1.1 */

@@ -87,7 +87,7 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
     
-    add_string( CFG_PREFIX "address", "localhost", NULL, ADDRESS_TEXT, ADDRESS_LONGTEXT, false )
+    add_string( CFG_PREFIX "address", "localhost", ADDRESS_TEXT, ADDRESS_LONGTEXT, false )
     add_integer( CFG_PREFIX "port", 12345, NULL, PORT_TEXT, PORT_LONGTEXT, false )
     add_integer( CFG_PREFIX "bargraph", 1, NULL, BARGRAPH_TEXT, BARGRAPH_LONGTEXT, false )
     add_integer( CFG_PREFIX "bargraph_repetition", 4, NULL, BARGRAPH_REPETITION_TEXT, BARGRAPH_REPETITION_LONGTEXT, false )

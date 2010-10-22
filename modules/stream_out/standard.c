@@ -104,30 +104,30 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
 
-    add_string( SOUT_CFG_PREFIX "access", "", NULL, ACCESS_TEXT,
+    add_string( SOUT_CFG_PREFIX "access", "", ACCESS_TEXT,
                 ACCESS_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
+    add_string( SOUT_CFG_PREFIX "mux", "", MUX_TEXT,
                 MUX_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "dst", "", NULL, DEST_TEXT,
+    add_string( SOUT_CFG_PREFIX "dst", "", DEST_TEXT,
                 DEST_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "bind", "", NULL, BIND_TEXT,
+    add_string( SOUT_CFG_PREFIX "bind", "", BIND_TEXT,
                 BIND_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "path", "", NULL, PATH_TEXT,
+    add_string( SOUT_CFG_PREFIX "path", "", PATH_TEXT,
                 PATH_LONGTEXT, false )
 
     add_bool( SOUT_CFG_PREFIX "sap", false, NULL, SAP_TEXT, SAP_LONGTEXT,
               true )
-    add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT, NAME_LONGTEXT,
+    add_string( SOUT_CFG_PREFIX "name", "", NAME_TEXT, NAME_LONGTEXT,
                                         true )
-    add_string( SOUT_CFG_PREFIX "group", "", NULL, GROUP_TEXT, GROUP_LONGTEXT,
+    add_string( SOUT_CFG_PREFIX "group", "", GROUP_TEXT, GROUP_LONGTEXT,
                                         true )
-    add_string( SOUT_CFG_PREFIX "description", "", NULL, DESC_TEXT, DESC_LONGTEXT,
+    add_string( SOUT_CFG_PREFIX "description", "", DESC_TEXT, DESC_LONGTEXT,
                                         true )
-    add_string( SOUT_CFG_PREFIX "url", "", NULL, URL_TEXT, URL_LONGTEXT,
+    add_string( SOUT_CFG_PREFIX "url", "", URL_TEXT, URL_LONGTEXT,
                                         true )
-    add_string( SOUT_CFG_PREFIX "email", "", NULL, EMAIL_TEXT, EMAIL_LONGTEXT,
+    add_string( SOUT_CFG_PREFIX "email", "", EMAIL_TEXT, EMAIL_LONGTEXT,
                                         true )
-    add_string( SOUT_CFG_PREFIX "phone", "", NULL, PHONE_TEXT, PHONE_LONGTEXT,
+    add_string( SOUT_CFG_PREFIX "phone", "", PHONE_TEXT, PHONE_LONGTEXT,
                                         true )
     add_obsolete_bool( SOUT_CFG_PREFIX "sap-ipv6" )
 

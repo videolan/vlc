@@ -86,7 +86,7 @@ vlc_module_begin ()
                             PP_QUALITY_MAX, NULL, Q_TEXT, Q_LONGTEXT, false )
         add_deprecated_alias( "ffmpeg-pp-q" )
         change_safe()
-    add_string( FILTER_PREFIX "name", "default", NULL, NAME_TEXT,
+    add_string( FILTER_PREFIX "name", "default", NAME_TEXT,
                 NAME_LONGTEXT, true )
         add_deprecated_alias( "ffmpeg-pp-name" )
 vlc_module_end ()

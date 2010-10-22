@@ -424,7 +424,7 @@ vlc_module_begin ()
                  MIN_KEYINT_LONGTEXT, false )
 
 #if X264_BUILD >= 102
-    add_string( SOUT_CFG_PREFIX "opengop", "none", NULL, OPENGOP_TEXT,
+    add_string( SOUT_CFG_PREFIX "opengop", "none", OPENGOP_TEXT,
                OPENGOP_LONGTEXT,false )
         change_string_list( x264_open_gop_names, x264_open_gop_names, 0 );
 #endif
@@ -448,10 +448,10 @@ vlc_module_begin ()
         change_integer_range( -100, 100 )
 
 #if X264_BUILD >= 87
-    add_string( SOUT_CFG_PREFIX "bpyramid", "normal", NULL, BPYRAMID_TEXT,
+    add_string( SOUT_CFG_PREFIX "bpyramid", "normal", BPYRAMID_TEXT,
               BPYRAMID_LONGTEXT, false )
 #else
-    add_string( SOUT_CFG_PREFIX "bpyramid", "none", NULL, BPYRAMID_TEXT,
+    add_string( SOUT_CFG_PREFIX "bpyramid", "none", BPYRAMID_TEXT,
               BPYRAMID_LONGTEXT, false )
 #endif
         change_string_list( bpyramid_list, bpyramid_list, 0 );
@@ -466,18 +466,18 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "nf", false, NULL, NF_TEXT,
               NF_LONGTEXT, false )
 
-    add_string( SOUT_CFG_PREFIX "deblock", "0:0", NULL, FILTER_TEXT,
+    add_string( SOUT_CFG_PREFIX "deblock", "0:0", FILTER_TEXT,
                  FILTER_LONGTEXT, false )
 
-    add_string( SOUT_CFG_PREFIX "psy-rd", "1.0:0.0", NULL, PSY_RD_TEXT,
+    add_string( SOUT_CFG_PREFIX "psy-rd", "1.0:0.0", PSY_RD_TEXT,
                 PSY_RD_LONGTEXT, false )
 
     add_bool( SOUT_CFG_PREFIX "psy", true, NULL, PSY_TEXT, PSY_LONGTEXT, false )
 
-    add_string( SOUT_CFG_PREFIX "level", "0", NULL, LEVEL_TEXT,
+    add_string( SOUT_CFG_PREFIX "level", "0", LEVEL_TEXT,
                LEVEL_LONGTEXT, false )
 
-    add_string( SOUT_CFG_PREFIX "profile", "high", NULL, PROFILE_TEXT,
+    add_string( SOUT_CFG_PREFIX "profile", "high", PROFILE_TEXT,
                PROFILE_LONGTEXT, false )
         change_string_list( x264_profile_names, x264_profile_names, 0 );
 
@@ -489,7 +489,7 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "slice-max-mbs", 0, NULL, SLICE_MAX_MBS, SLICE_MAX_MBS_LONGTEXT, false )
 
 #if X264_BUILD >= 89
-    add_string( SOUT_CFG_PREFIX "hrd", "none", NULL, HRD_TEXT, HRD_LONGTEXT, false )
+    add_string( SOUT_CFG_PREFIX "hrd", "none", HRD_TEXT, HRD_LONGTEXT, false )
         change_string_list( x264_nal_hrd_names, x264_nal_hrd_names, 0 );
 #endif
 
@@ -564,11 +564,11 @@ vlc_module_begin ()
 /* Analysis */
 
     /* x264 partitions = none (default). set at least "normal" mode. */
-    add_string( SOUT_CFG_PREFIX "partitions", "normal", NULL, ANALYSE_TEXT,
+    add_string( SOUT_CFG_PREFIX "partitions", "normal", ANALYSE_TEXT,
                 ANALYSE_LONGTEXT, false )
         change_string_list( enc_analyse_list, enc_analyse_list_text, 0 );
 
-    add_string( SOUT_CFG_PREFIX "direct", "spatial", NULL, DIRECT_PRED_TEXT,
+    add_string( SOUT_CFG_PREFIX "direct", "spatial", DIRECT_PRED_TEXT,
                 DIRECT_PRED_LONGTEXT, false )
         change_string_list( direct_pred_list, direct_pred_list_text, 0 );
 
@@ -583,7 +583,7 @@ vlc_module_begin ()
               WEIGHTP_LONGTEXT, false )
         change_integer_range( 0, 2 )
 
-    add_string( SOUT_CFG_PREFIX "me", "hex", NULL, ME_TEXT,
+    add_string( SOUT_CFG_PREFIX "me", "hex", ME_TEXT,
                 ME_LONGTEXT, false )
         change_string_list( enc_me_list, enc_me_list_text, 0 );
 
@@ -672,12 +672,12 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "verbose", false, NULL, VERBOSE_TEXT,
               VERBOSE_LONGTEXT, false )
 
-    add_string( SOUT_CFG_PREFIX "stats", "x264_2pass.log", NULL, STATS_TEXT,
+    add_string( SOUT_CFG_PREFIX "stats", "x264_2pass.log", STATS_TEXT,
                 STATS_LONGTEXT, false )
 
-    add_string( SOUT_CFG_PREFIX "preset", NULL , NULL, PRESET_TEXT , PRESET_TEXT, false )
+    add_string( SOUT_CFG_PREFIX "preset", NULL , PRESET_TEXT , PRESET_TEXT, false )
         change_string_list( x264_preset_names, x264_preset_names, 0 );
-    add_string( SOUT_CFG_PREFIX "tune", NULL , NULL, TUNE_TEXT, TUNE_TEXT, false )
+    add_string( SOUT_CFG_PREFIX "tune", NULL , TUNE_TEXT, TUNE_TEXT, false )
         change_string_list( x264_tune_names, x264_tune_names, 0 );
 
 vlc_module_end ()

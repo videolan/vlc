@@ -85,7 +85,7 @@ vlc_module_begin ()
     add_bool( "mms-all", false, NULL, ALL_TEXT, ALL_LONGTEXT, true )
     add_integer( "mms-maxbitrate", 0, NULL, BITRATE_TEXT, BITRATE_LONGTEXT ,
                  false )
-    add_string( "mmsh-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT,
+    add_string( "mmsh-proxy", NULL, PROXY_TEXT, PROXY_LONGTEXT,
                     false )
 
     add_shortcut( "mms", "mmsu", "mmst", "mmsh", "http" )

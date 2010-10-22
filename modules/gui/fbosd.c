@@ -182,12 +182,12 @@ vlc_module_begin ()
 
     add_loadfile( "fbosd-dev", "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
                   false )
-    add_string( "fbosd-aspect-ratio", "", NULL, ASPECT_RATIO_TEXT,
+    add_string( "fbosd-aspect-ratio", "", ASPECT_RATIO_TEXT,
                 ASPECT_RATIO_LONGTEXT, true )
 
-    add_string( "fbosd-image", NULL, NULL, FBOSD_IMAGE_TEXT,
+    add_string( "fbosd-image", NULL, FBOSD_IMAGE_TEXT,
                 FBOSD_IMAGE_LONGTEXT, true )
-    add_string( "fbosd-text", NULL, NULL, FBOSD_TEXT,
+    add_string( "fbosd-text", NULL, FBOSD_TEXT,
                 FBOSD_LONGTEXT, true )
 
     add_integer_with_range( "fbosd-alpha", 255, 0, 255, NULL, ALPHA_TEXT,

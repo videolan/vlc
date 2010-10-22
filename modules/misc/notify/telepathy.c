@@ -80,7 +80,7 @@ vlc_module_begin ()
     set_shortname( "Telepathy" )
     set_description( N_("Telepathy \"Now Playing\" (MissionControl)") )
 
-    add_string( "telepathy-format", FORMAT_DEFAULT, NULL,
+    add_string( "telepathy-format", FORMAT_DEFAULT,
                 FORMAT_TEXT, FORMAT_LONGTEXT, false )
 
     set_capability( "interface", 0 )

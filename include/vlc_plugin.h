@@ -299,7 +299,7 @@ enum vlc_module_properties
 #define add_usage_hint( text ) \
     add_typedesc_inner( CONFIG_HINT_USAGE, text, NULL )
 
-#define add_string( name, value, p_callback, text, longtext, advc ) \
+#define add_string( name, value, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_STRING, name, text, longtext, advc, \
                       value )
 

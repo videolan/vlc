@@ -226,21 +226,21 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
 
-    add_string( CFG_PREFIX "vdev", NULL, NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
+    add_string( CFG_PREFIX "vdev", NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
         change_string_list( ppsz_vdev, ppsz_vdev_text, FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
         change_action_add( ConfigDevicesCallback, N_("Configure") )
 
-    add_string( CFG_PREFIX "adev", NULL, NULL, ADEV_TEXT, ADEV_LONGTEXT, false)
+    add_string( CFG_PREFIX "adev", NULL, ADEV_TEXT, ADEV_LONGTEXT, false)
         change_string_list( ppsz_adev, ppsz_adev_text, FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
         change_action_add( ConfigDevicesCallback, N_("Configure") )
 
-    add_string( CFG_PREFIX "size", NULL, NULL, SIZE_TEXT, SIZE_LONGTEXT, false)
+    add_string( CFG_PREFIX "size", NULL, SIZE_TEXT, SIZE_LONGTEXT, false)
 
-    add_string( CFG_PREFIX "aspect-ratio", "4:3", NULL, ASPECT_TEXT, ASPECT_LONGTEXT, false)
+    add_string( CFG_PREFIX "aspect-ratio", "4:3", ASPECT_TEXT, ASPECT_LONGTEXT, false)
 
-    add_string( CFG_PREFIX "chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
+    add_string( CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
 
     add_float( CFG_PREFIX "fps", 0.0f, NULL, FPS_TEXT, FPS_LONGTEXT, true )
 

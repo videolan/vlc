@@ -122,7 +122,7 @@ vlc_module_begin ()
     set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_SD )
 
-    add_string( "sap-addr", NULL, NULL,
+    add_string( "sap-addr", NULL,
                 SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, true )
     add_bool( "sap-ipv4", true, NULL,
                SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, true )

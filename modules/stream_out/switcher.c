@@ -118,11 +118,11 @@ vlc_module_begin ()
     add_shortcut( "switcher" )
     set_callbacks( Open, Close )
 
-    add_string( SOUT_CFG_PREFIX "files", "", NULL, FILES_TEXT,
+    add_string( SOUT_CFG_PREFIX "files", "", FILES_TEXT,
                 FILES_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "sizes", "", NULL, SIZES_TEXT,
+    add_string( SOUT_CFG_PREFIX "sizes", "", SIZES_TEXT,
                 SIZES_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "aspect-ratio", "4:3", NULL, RATIO_TEXT,
+    add_string( SOUT_CFG_PREFIX "aspect-ratio", "4:3", RATIO_TEXT,
                 RATIO_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "port", 5001, NULL,
                  PORT_TEXT, PORT_LONGTEXT, true )

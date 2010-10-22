@@ -101,18 +101,18 @@ vlc_module_begin ()
         set_capability( "interface", 0 )
         set_category( CAT_INTERFACE )
         set_subcategory( SUBCAT_INTERFACE_CONTROL )
-        add_string( "lua-intf", "dummy", NULL,
+        add_string( "lua-intf", "dummy",
                     INTF_TEXT, INTF_LONGTEXT, false )
-        add_string( "lua-config", "", NULL,
+        add_string( "lua-config", "",
                     CONFIG_TEXT, CONFIG_LONGTEXT, false )
         set_section( N_("Lua HTTP"), 0 )
-            add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, true )
-            add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  true )
+            add_string ( "http-host", NULL, HOST_TEXT, HOST_LONGTEXT, true )
+            add_string ( "http-src",  NULL, SRC_TEXT,  SRC_LONGTEXT,  true )
             add_bool   ( "http-index", false, NULL, INDEX_TEXT, INDEX_LONGTEXT, true )
         set_section( N_("Lua RC"), 0 )
-            add_string( "rc-host", NULL, NULL, RCHOST_TEXT, RCHOST_LONGTEXT, true )
+            add_string( "rc-host", NULL, RCHOST_TEXT, RCHOST_LONGTEXT, true )
         set_section( N_("Lua Telnet"), 0 )
-            add_string( "telnet-host", "localhost", NULL, TELNETHOST_TEXT,
+            add_string( "telnet-host", "localhost", TELNETHOST_TEXT,
                         TELNETHOST_LONGTEXT, true )
             add_integer( "telnet-port", TELNETPORT_DEFAULT, NULL, TELNETPORT_TEXT,
                          TELNETPORT_LONGTEXT, true )
@@ -163,9 +163,9 @@ vlc_module_begin ()
         set_description( N_("Lua SD Module") )
         add_shortcut( "luasd" )
         set_capability( "services_discovery", 0 )
-        add_string( "lua-sd", "", NULL, NULL, NULL, false )
+        add_string( "lua-sd", "", NULL, NULL, false )
             change_volatile()
-        add_string( "lua-longname", "", NULL, NULL, NULL, false )
+        add_string( "lua-longname", "", NULL, NULL, false )
             change_volatile()
         set_callbacks( Open_LuaSD, Close_LuaSD )
 

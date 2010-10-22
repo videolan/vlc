@@ -78,7 +78,7 @@ vlc_module_begin ()
 
     add_integer("vout-snapshot-width", 320, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, false)
     add_integer("vout-snapshot-height", 200, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, false)
-    add_string("vout-snapshot-chroma", "RV32", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
+    add_string("vout-snapshot-chroma", "RV32", CHROMA_TEXT, CHROMA_LONGTEXT, true)
         add_deprecated_alias("snapshot-chroma")
     add_integer("vout-snapshot-cache-size", 50, NULL, CACHE_TEXT, CACHE_LONGTEXT, true)
         add_deprecated_alias("snapshot-cache-size")

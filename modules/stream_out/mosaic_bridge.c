@@ -146,15 +146,15 @@ vlc_module_begin ()
     set_capability( "sout stream", 0 )
     add_shortcut( "mosaic-bridge" )
 
-    add_string( CFG_PREFIX "id", "Id", NULL, ID_TEXT, ID_LONGTEXT,
+    add_string( CFG_PREFIX "id", "Id", ID_TEXT, ID_LONGTEXT,
                 false )
     add_integer( CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
                  WIDTH_LONGTEXT, true )
     add_integer( CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
                  HEIGHT_LONGTEXT, true )
-    add_string( CFG_PREFIX "sar", "1:1", NULL, RATIO_TEXT,
+    add_string( CFG_PREFIX "sar", "1:1", RATIO_TEXT,
                 RATIO_LONGTEXT, false )
-    add_string( CFG_PREFIX "chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
+    add_string( CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 false )
 
     add_module_list( CFG_PREFIX "vfilter", "video filter2",

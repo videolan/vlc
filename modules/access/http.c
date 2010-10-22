@@ -112,14 +112,14 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_string( "http-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT,
+    add_string( "http-proxy", NULL, PROXY_TEXT, PROXY_LONGTEXT,
                 false )
     add_password( "http-proxy-pwd", NULL, NULL,
                   PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT, false )
     add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_safe()
-    add_string( "http-user-agent", NULL, NULL, NULL, NULL, false )
+    add_string( "http-user-agent", NULL, NULL, NULL, false )
         change_safe()
         change_private()
     add_bool( "http-reconnect", false, NULL, RECONNECT_TEXT,

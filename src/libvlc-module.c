@@ -1577,7 +1577,7 @@ const char vlc_usage[] = N_(
  * add_category_hint( N_(text), N_(longtext), b_advanced_option )
  * add_subcategory_hint( N_(text), N_(longtext), b_advanced_option )
  * add_usage_hint( N_(text), b_advanced_option )
- * add_string( option_name, value, p_callback, N_(text), N_(longtext),
+ * add_string( option_name, value, N_(text), N_(longtext),
                b_advanced_option )
  * add_loadfile( option_name, psz_value, p_callback, N_(text), N_(longtext) )
  * add_savefile( option_name, psz_value, p_callback, N_(text), N_(longtext) )
@@ -1618,7 +1618,7 @@ vlc_module_begin ()
         change_safe ()
 
     /* FIXME TODO create a subcat replay gain ? */
-    add_string( "audio-replay-gain-mode", ppsz_replay_gain_mode[0], NULL, AUDIO_REPLAY_GAIN_MODE_TEXT,
+    add_string( "audio-replay-gain-mode", ppsz_replay_gain_mode[0], AUDIO_REPLAY_GAIN_MODE_TEXT,
                 AUDIO_REPLAY_GAIN_MODE_LONGTEXT, false )
         change_string_list( ppsz_replay_gain_mode, ppsz_replay_gain_mode_text, 0 )
     add_float( "audio-replay-gain-preamp", 0.0, NULL,
@@ -1666,7 +1666,7 @@ vlc_module_begin ()
 #ifdef __APPLE__
        add_deprecated_alias( "macosx-embedded" ) /*deprecated since 0.9.0 */
 #endif
-    add_string( "x11-display", NULL, NULL,
+    add_string( "x11-display", NULL,
                 DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
         add_deprecated_alias( "xvideo-display" ) /* deprecated since 1.1.0 */
         //add_deprecated_alias( "glx-display" ) cannot have more than one
@@ -1715,9 +1715,9 @@ vlc_module_begin ()
     set_section( N_("Snapshot") , NULL )
     add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
                    SNAP_PATH_LONGTEXT, false )
-    add_string( "snapshot-prefix", "vlcsnap-", NULL, SNAP_PREFIX_TEXT,
+    add_string( "snapshot-prefix", "vlcsnap-", SNAP_PREFIX_TEXT,
                    SNAP_PREFIX_LONGTEXT, false )
-    add_string( "snapshot-format", "png", NULL, SNAP_FORMAT_TEXT,
+    add_string( "snapshot-format", "png", SNAP_FORMAT_TEXT,
                    SNAP_FORMAT_LONGTEXT, false )
         change_string_list( ppsz_snap_formats, NULL, 0 )
     add_bool( "snapshot-preview", true, NULL, SNAP_PREVIEW_TEXT,
@@ -1738,25 +1738,25 @@ vlc_module_begin ()
         change_safe ()
     add_integer( "video-y", 0, NULL, VIDEOY_TEXT, VIDEOY_LONGTEXT, true )
         change_safe ()
-    add_string( "crop", NULL, NULL, CROP_TEXT, CROP_LONGTEXT, false )
+    add_string( "crop", NULL, CROP_TEXT, CROP_LONGTEXT, false )
         change_safe ()
-    add_string( "custom-crop-ratios", NULL, NULL, CUSTOM_CROP_RATIOS_TEXT,
+    add_string( "custom-crop-ratios", NULL, CUSTOM_CROP_RATIOS_TEXT,
                 CUSTOM_CROP_RATIOS_LONGTEXT, false )
-    add_string( "aspect-ratio", NULL, NULL,
+    add_string( "aspect-ratio", NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, false )
         change_safe ()
     add_bool( "autoscale", true, NULL, AUTOSCALE_TEXT, AUTOSCALE_LONGTEXT, false )
         change_safe ()
     add_float( "scale", 1.0, NULL, SCALEFACTOR_TEXT, SCALEFACTOR_LONGTEXT, false )
         change_safe ()
-    add_string( "monitor-par", NULL, NULL,
+    add_string( "monitor-par", NULL,
                 MASPECT_RATIO_TEXT, MASPECT_RATIO_LONGTEXT, true )
-    add_string( "custom-aspect-ratios", NULL, NULL, CUSTOM_ASPECT_RATIOS_TEXT,
+    add_string( "custom-aspect-ratios", NULL, CUSTOM_ASPECT_RATIOS_TEXT,
                 CUSTOM_ASPECT_RATIOS_LONGTEXT, false )
     add_bool( "hdtv-fix", 1, NULL, HDTV_FIX_TEXT, HDTV_FIX_LONGTEXT, true )
     add_bool( "video-deco", 1, NULL, VIDEO_DECO_TEXT,
               VIDEO_DECO_LONGTEXT, true )
-    add_string( "video-title", NULL, NULL, VIDEO_TITLE_TEXT,
+    add_string( "video-title", NULL, VIDEO_TITLE_TEXT,
                  VIDEO_TITLE_LONGTEXT, true )
     add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, true )
         change_integer_list( pi_align_values, ppsz_align_descriptions )
@@ -1765,7 +1765,7 @@ vlc_module_begin ()
                  DEINTERLACE_TEXT, DEINTERLACE_LONGTEXT, false )
         change_integer_list( pi_deinterlace, ppsz_deinterlace_text )
         change_safe()
-    add_string( "deinterlace-mode", "blend", NULL,
+    add_string( "deinterlace-mode", "blend",
                 DEINTERLACE_MODE_TEXT, DEINTERLACE_MODE_LONGTEXT, false )
         change_string_list( ppsz_deinterlace_mode, ppsz_deinterlace_mode_text, 0 )
         change_safe()
@@ -1781,7 +1781,7 @@ vlc_module_begin ()
     add_module_list_cat( "vout-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                         VOUT_FILTER_TEXT, VOUT_FILTER_LONGTEXT, false )
 #if 0
-    add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT )
+    add_string( "pixel-ratio", "1", PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT )
 #endif
 
 /* Subpictures options */
@@ -1808,7 +1808,7 @@ vlc_module_begin ()
 #else
 #   define SUB_PATH "./Subtitles, ./subtitles"
 #endif
-    add_string( "sub-autodetect-path", SUB_PATH, NULL,
+    add_string( "sub-autodetect-path", SUB_PATH,
                  SUB_PATH_TEXT, SUB_PATH_LONGTEXT, true )
     add_integer( "sub-margin", 0, NULL, SUB_MARGIN_TEXT,
                  SUB_MARGIN_LONGTEXT, true )
@@ -1824,7 +1824,7 @@ vlc_module_begin ()
     add_integer( "program", 0, NULL,
                  INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT, true )
         change_safe ()
-    add_string( "programs", "", NULL,
+    add_string( "programs", "",
                 INPUT_PROGRAMS_TEXT, INPUT_PROGRAMS_LONGTEXT, true )
         change_safe ()
     add_integer( "audio-track", -1, NULL,
@@ -1833,11 +1833,11 @@ vlc_module_begin ()
     add_integer( "sub-track", -1, NULL,
                  INPUT_SUBTRACK_TEXT, INPUT_SUBTRACK_LONGTEXT, true )
         change_safe ()
-    add_string( "audio-language", "", NULL,
+    add_string( "audio-language", "",
                  INPUT_AUDIOTRACK_LANG_TEXT, INPUT_AUDIOTRACK_LANG_LONGTEXT,
                   false )
         change_safe ()
-    add_string( "sub-language", "", NULL,
+    add_string( "sub-language", "",
                  INPUT_SUBTRACK_LANG_TEXT, INPUT_SUBTRACK_LANG_LONGTEXT,
                   false )
         change_safe ()
@@ -1867,12 +1867,12 @@ vlc_module_begin ()
     add_float( "rate", 1., NULL,
                INPUT_RATE_TEXT, INPUT_RATE_LONGTEXT, false )
 
-    add_string( "input-list", NULL, NULL,
+    add_string( "input-list", NULL,
                  INPUT_LIST_TEXT, INPUT_LIST_LONGTEXT, true )
-    add_string( "input-slave", NULL, NULL,
+    add_string( "input-slave", NULL,
                  INPUT_SLAVE_TEXT, INPUT_SLAVE_LONGTEXT, true )
 
-    add_string( "bookmarks", NULL, NULL,
+    add_string( "bookmarks", NULL,
                  BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, true )
         change_safe ()
 
@@ -1898,37 +1898,37 @@ vlc_module_begin ()
                  TIMEOUT_LONGTEXT, true )
 
     set_section( N_( "Socks proxy") , NULL )
-    add_string( "socks", NULL, NULL,
+    add_string( "socks", NULL,
                  SOCKS_SERVER_TEXT, SOCKS_SERVER_LONGTEXT, true )
-    add_string( "socks-user", NULL, NULL,
+    add_string( "socks-user", NULL,
                  SOCKS_USER_TEXT, SOCKS_USER_LONGTEXT, true )
-    add_string( "socks-pwd", NULL, NULL,
+    add_string( "socks-pwd", NULL,
                  SOCKS_PASS_TEXT, SOCKS_PASS_LONGTEXT, true )
 
 
     set_section( N_("Metadata" ) , NULL )
-    add_string( "meta-title", NULL, NULL, META_TITLE_TEXT,
+    add_string( "meta-title", NULL, META_TITLE_TEXT,
                 META_TITLE_LONGTEXT, true )
         change_safe()
-    add_string( "meta-author", NULL, NULL, META_AUTHOR_TEXT,
+    add_string( "meta-author", NULL, META_AUTHOR_TEXT,
                 META_AUTHOR_LONGTEXT, true )
         change_safe()
-    add_string( "meta-artist", NULL, NULL, META_ARTIST_TEXT,
+    add_string( "meta-artist", NULL, META_ARTIST_TEXT,
                 META_ARTIST_LONGTEXT, true )
         change_safe()
-    add_string( "meta-genre", NULL, NULL, META_GENRE_TEXT,
+    add_string( "meta-genre", NULL, META_GENRE_TEXT,
                 META_GENRE_LONGTEXT, true )
         change_safe()
-    add_string( "meta-copyright", NULL, NULL, META_CPYR_TEXT,
+    add_string( "meta-copyright", NULL, META_CPYR_TEXT,
                 META_CPYR_LONGTEXT, true )
         change_safe()
-    add_string( "meta-description", NULL, NULL, META_DESCR_TEXT,
+    add_string( "meta-description", NULL, META_DESCR_TEXT,
                 META_DESCR_LONGTEXT, true )
         change_safe()
-    add_string( "meta-date", NULL, NULL, META_DATE_TEXT,
+    add_string( "meta-date", NULL, META_DATE_TEXT,
                 META_DATE_LONGTEXT, true )
         change_safe()
-    add_string( "meta-url", NULL, NULL, META_URL_TEXT,
+    add_string( "meta-url", NULL, META_URL_TEXT,
                 META_URL_LONGTEXT, true )
         change_safe()
 
@@ -1946,21 +1946,21 @@ vlc_module_begin ()
     add_bool( "network-synchronisation", false, NULL, NETSYNC_TEXT,
               NETSYNC_LONGTEXT, true )
 
-    add_string( "input-record-path", NULL, NULL, INPUT_RECORD_PATH_TEXT,
+    add_string( "input-record-path", NULL, INPUT_RECORD_PATH_TEXT,
                 INPUT_RECORD_PATH_LONGTEXT, true )
     add_bool( "input-record-native", true, NULL, INPUT_RECORD_NATIVE_TEXT,
               INPUT_RECORD_NATIVE_LONGTEXT, true )
 
-    add_string( "input-timeshift-path", NULL, NULL, INPUT_TIMESHIFT_PATH_TEXT,
+    add_string( "input-timeshift-path", NULL, INPUT_TIMESHIFT_PATH_TEXT,
                 INPUT_TIMESHIFT_PATH_LONGTEXT, true )
     add_integer( "input-timeshift-granularity", -1, NULL, INPUT_TIMESHIFT_GRANULARITY_TEXT,
                  INPUT_TIMESHIFT_GRANULARITY_LONGTEXT, true )
 
 /* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , true )
-    add_string( "codec", NULL, NULL, CODEC_TEXT,
+    add_string( "codec", NULL, CODEC_TEXT,
                 CODEC_LONGTEXT, true )
-    add_string( "encoder",  NULL, NULL, ENCODER_TEXT,
+    add_string( "encoder",  NULL, ENCODER_TEXT,
                 ENCODER_LONGTEXT, true )
 
     set_subcategory( SUBCAT_INPUT_ACCESS )
@@ -1987,7 +1987,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_GENERAL )
     add_category_hint( N_("Stream output"), SOUT_CAT_LONGTEXT , true )
 
-    add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT, true )
+    add_string( "sout", NULL, SOUT_TEXT, SOUT_LONGTEXT, true )
     add_bool( "sout-display", false, NULL, SOUT_DISPLAY_TEXT,
                                 SOUT_DISPLAY_LONGTEXT, true )
     add_bool( "sout-keep", false, NULL, SOUT_KEEP_TEXT,
@@ -2004,7 +2004,7 @@ vlc_module_begin ()
                                 SOUT_MUX_CACHING_LONGTEXT, true )
 
     set_section( N_("VLM"), NULL )
-    add_string( "vlm-conf", NULL, NULL, VLM_CONF_TEXT,
+    add_string( "vlm-conf", NULL, VLM_CONF_TEXT,
                     VLM_CONF_LONGTEXT, true )
 
 
@@ -2017,8 +2017,8 @@ vlc_module_begin ()
     add_module( "access_output", "sout access", NULL, NULL,
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, true )
     add_integer( "ttl", -1, NULL, TTL_TEXT, TTL_LONGTEXT, true )
-    add_string( "miface", NULL, NULL, MIFACE_TEXT, MIFACE_LONGTEXT, true )
-    add_string( "miface-addr", NULL, NULL, MIFACE_ADDR_TEXT, MIFACE_ADDR_LONGTEXT, true )
+    add_string( "miface", NULL, MIFACE_TEXT, MIFACE_LONGTEXT, true )
+    add_string( "miface-addr", NULL, MIFACE_ADDR_TEXT, MIFACE_ADDR_LONGTEXT, true )
     add_integer( "dscp", 0, NULL, DSCP_TEXT, DSCP_LONGTEXT, true )
 
     set_subcategory( SUBCAT_SOUT_PACKETIZER )
@@ -2149,7 +2149,7 @@ vlc_module_begin ()
 #endif
     add_bool( "playlist-tree", 0, NULL, PLTREE_TEXT, PLTREE_LONGTEXT, false )
 
-    add_string( "open", "", NULL, OPEN_TEXT, OPEN_LONGTEXT, false )
+    add_string( "open", "", OPEN_TEXT, OPEN_LONGTEXT, false )
         change_need_restart ()
 
     add_bool( "auto-preparse", true, NULL, PREPARSE_TEXT,
@@ -2172,7 +2172,7 @@ vlc_module_begin ()
     add_integer( "verbose", 0, NULL, VERBOSE_TEXT, VERBOSE_LONGTEXT,
                  false )
         change_short('v')
-    add_string( "verbose-objects", 0, NULL, VERBOSE_OBJECTS_TEXT, VERBOSE_OBJECTS_LONGTEXT,
+    add_string( "verbose-objects", 0, VERBOSE_OBJECTS_TEXT, VERBOSE_OBJECTS_LONGTEXT,
                  false )
     add_bool( "quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, true )
         change_short('q')
@@ -2182,7 +2182,7 @@ vlc_module_begin ()
         change_short('d')
         change_need_restart ()
 
-    add_string( "pidfile", NULL, NULL, PIDFILE_TEXT, PIDFILE_LONGTEXT,
+    add_string( "pidfile", NULL, PIDFILE_TEXT, PIDFILE_LONGTEXT,
                                        false )
         change_need_restart ()
 #endif
@@ -2197,7 +2197,7 @@ vlc_module_begin ()
 #endif
 
 #if defined (WIN32) || defined (__APPLE__)
-    add_string( "language", "auto", NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
+    add_string( "language", "auto", LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
                 false )
         change_string_list( ppsz_language, ppsz_language_text, 0 )
         change_need_restart ()
@@ -2730,25 +2730,25 @@ vlc_module_begin ()
              PLAY_BOOKMARK10_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, true )
 
 
-    add_string( "bookmark1", NULL, NULL,
+    add_string( "bookmark1", NULL,
              BOOKMARK1_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark2", NULL, NULL,
+    add_string( "bookmark2", NULL,
              BOOKMARK2_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark3", NULL, NULL,
+    add_string( "bookmark3", NULL,
              BOOKMARK3_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark4", NULL, NULL,
+    add_string( "bookmark4", NULL,
              BOOKMARK4_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark5", NULL, NULL,
+    add_string( "bookmark5", NULL,
              BOOKMARK5_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark6", NULL, NULL,
+    add_string( "bookmark6", NULL,
              BOOKMARK6_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark7", NULL, NULL,
+    add_string( "bookmark7", NULL,
              BOOKMARK7_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark8", NULL, NULL,
+    add_string( "bookmark8", NULL,
              BOOKMARK8_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark9", NULL, NULL,
+    add_string( "bookmark9", NULL,
              BOOKMARK9_TEXT, BOOKMARK_LONGTEXT, false )
-    add_string( "bookmark10", NULL, NULL,
+    add_string( "bookmark10", NULL,
               BOOKMARK10_TEXT, BOOKMARK_LONGTEXT, false )
 
 #define HELP_TEXT \
@@ -2797,7 +2797,7 @@ vlc_module_begin ()
     add_bool( "list-verbose", false, NULL, LIST_VERBOSE_TEXT, "",
               false )
         change_volatile ()
-    add_string( "module", NULL, NULL, MODULE_TEXT, "", false )
+    add_string( "module", NULL, MODULE_TEXT, "", false )
         change_short( 'p' )
         change_volatile ()
     add_bool( "ignore-config", true, NULL, IGNORE_CONFIG_TEXT, "", false )
@@ -2810,7 +2810,7 @@ vlc_module_begin ()
         change_volatile ()
     add_bool( "version", false, NULL, VERSION_TEXT, "", false )
         change_volatile ()
-    add_string( "config", NULL, NULL, CONFIG_TEXT, "", false )
+    add_string( "config", NULL, CONFIG_TEXT, "", false )
         change_volatile ()
 
    /* Usage (mainly useful for cmd line stuff) */

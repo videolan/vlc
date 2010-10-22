@@ -284,7 +284,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "standard", 0, NULL, STANDARD_TEXT,
                  STANDARD_LONGTEXT, false )
         change_integer_list( i_standards_list, psz_standards_list_text )
-    add_string( CFG_PREFIX "chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
+    add_string( CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 true )
     add_integer( CFG_PREFIX "input", 0, NULL, INPUT_TEXT, INPUT_LONGTEXT,
                 true )
@@ -297,7 +297,7 @@ vlc_module_begin ()
                 WIDTH_LONGTEXT, true )
     add_integer( CFG_PREFIX "height", DEFAULT_HEIGHT, NULL, HEIGHT_TEXT,
                 HEIGHT_LONGTEXT, true )
-    add_string( CFG_PREFIX "aspect-ratio", "4:3", NULL, ASPECT_TEXT,
+    add_string( CFG_PREFIX "aspect-ratio", "4:3", ASPECT_TEXT,
               ASPECT_LONGTEXT, true )
     add_float( CFG_PREFIX "fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
     add_integer( CFG_PREFIX "caching", 50 /* ms */, NULL,
@@ -366,7 +366,7 @@ vlc_module_begin ()
                 AUDIO_TREBLE_LONGTEXT, true )
     add_integer( CFG_PREFIX "audio-loudness", -1, NULL, AUDIO_LOUDNESS_TEXT,
                 AUDIO_LOUDNESS_LONGTEXT, true )
-    add_string( CFG_PREFIX "set-ctrls", NULL, NULL, S_CTRLS_TEXT,
+    add_string( CFG_PREFIX "set-ctrls", NULL, S_CTRLS_TEXT,
               S_CTRLS_LONGTEXT, true )
 
     add_obsolete_string( CFG_PREFIX "dev" )

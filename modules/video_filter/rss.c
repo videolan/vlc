@@ -195,7 +195,7 @@ vlc_module_begin ()
     set_callbacks( CreateFilter, DestroyFilter )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
-    add_string( CFG_PREFIX "urls", NULL, NULL, MSG_TEXT, MSG_LONGTEXT, false )
+    add_string( CFG_PREFIX "urls", NULL, MSG_TEXT, MSG_LONGTEXT, false )
 
     set_section( N_("Position"), NULL )
     add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true )

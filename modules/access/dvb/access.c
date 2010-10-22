@@ -216,7 +216,7 @@ vlc_module_begin ()
     add_bool( "dvb-budget-mode", false, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
               true )
     /* DVB-S (satellite) */
-    add_string( "dvb-satellite", NULL, NULL, SATELLITE_TEXT, SATELLITE_LONGTEXT,
+    add_string( "dvb-satellite", NULL, SATELLITE_TEXT, SATELLITE_LONGTEXT,
                 true )
     add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
                  true )
@@ -254,21 +254,21 @@ vlc_module_begin ()
 #ifdef ENABLE_HTTPD
     /* MMI HTTP interface */
     set_section( N_("HTTP server" ), 0 )
-    add_string( "dvb-http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT,
+    add_string( "dvb-http-host", NULL, HOST_TEXT, HOST_LONGTEXT,
                 true )
-    add_string( "dvb-http-user", NULL, NULL, USER_TEXT, USER_LONGTEXT,
+    add_string( "dvb-http-user", NULL, USER_TEXT, USER_LONGTEXT,
                 true )
     add_password( "dvb-http-password", NULL, NULL, PASSWORD_TEXT,
                   PASSWORD_LONGTEXT, true )
-    add_string( "dvb-http-acl", NULL, NULL, ACL_TEXT, ACL_LONGTEXT,
+    add_string( "dvb-http-acl", NULL, ACL_TEXT, ACL_LONGTEXT,
                 true )
-    add_string( "dvb-http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT,
+    add_string( "dvb-http-intf-cert", NULL, CERT_TEXT, CERT_LONGTEXT,
                 true )
-    add_string( "dvb-http-intf-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,
+    add_string( "dvb-http-intf-key",  NULL, KEY_TEXT,  KEY_LONGTEXT,
                 true )
-    add_string( "dvb-http-intf-ca",   NULL, NULL, CA_TEXT,   CA_LONGTEXT,
+    add_string( "dvb-http-intf-ca",   NULL, CA_TEXT,   CA_LONGTEXT,
                 true )
-    add_string( "dvb-http-intf-crl",  NULL, NULL, CRL_TEXT,  CRL_LONGTEXT,
+    add_string( "dvb-http-intf-crl",  NULL, CRL_TEXT,  CRL_LONGTEXT,
                 true )
 #endif
 

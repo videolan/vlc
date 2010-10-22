@@ -137,7 +137,7 @@ vlc_module_begin ()
         add_bool(   "rtsp-wmserver", false, NULL, WMSERVER_TEXT,
                     WMSERVER_LONGTEXT, true)
             change_safe()
-        add_string( "rtsp-user", NULL, NULL, USER_TEXT,
+        add_string( "rtsp-user", NULL, USER_TEXT,
                     USER_LONGTEXT, true )
             change_safe()
         add_password( "rtsp-pwd", NULL, NULL, PASS_TEXT,

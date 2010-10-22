@@ -208,13 +208,13 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "netid", 0, NULL, NETID_TEXT,
                  NETID_LONGTEXT, true )
 #endif
-    add_string( SOUT_CFG_PREFIX "program-pmt", NULL, NULL, PMTPROG_TEXT,
+    add_string( SOUT_CFG_PREFIX "program-pmt", NULL, PMTPROG_TEXT,
                 PMTPROG_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "es-id-pid", false, NULL, PID_TEXT, PID_LONGTEXT,
               true )
-    add_string( SOUT_CFG_PREFIX "muxpmt", NULL, NULL, MUXPMT_TEXT, MUXPMT_LONGTEXT, true )
+    add_string( SOUT_CFG_PREFIX "muxpmt", NULL, MUXPMT_TEXT, MUXPMT_LONGTEXT, true )
 #ifdef HAVE_DVBPSI_SDT
-    add_string( SOUT_CFG_PREFIX "sdtdesc", NULL, NULL, SDTDESC_TEXT, SDTDESC_LONGTEXT, true )
+    add_string( SOUT_CFG_PREFIX "sdtdesc", NULL, SDTDESC_TEXT, SDTDESC_LONGTEXT, true )
 #endif
     add_bool( SOUT_CFG_PREFIX "alignment", true, NULL, ALIGNMENT_TEXT,
               ALIGNMENT_LONGTEXT, true )
@@ -238,11 +238,11 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "crypt-video", true, NULL, VCRYPT_TEXT,
               VCRYPT_LONGTEXT, true )
 
-    add_string( SOUT_CFG_PREFIX "csa-ck", NULL, NULL, CK_TEXT, CK_LONGTEXT,
+    add_string( SOUT_CFG_PREFIX "csa-ck", NULL, CK_TEXT, CK_LONGTEXT,
                 true )
-    add_string( SOUT_CFG_PREFIX "csa2-ck", NULL, NULL, CK2_TEXT, CK2_LONGTEXT,
+    add_string( SOUT_CFG_PREFIX "csa2-ck", NULL, CK2_TEXT, CK2_LONGTEXT,
                 true )
-    add_string( SOUT_CFG_PREFIX "csa-use", "1", NULL, CU_TEXT, CU_LONGTEXT,
+    add_string( SOUT_CFG_PREFIX "csa-use", "1", CU_TEXT, CU_LONGTEXT,
                 true )
     add_integer( SOUT_CFG_PREFIX "csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, true )
 

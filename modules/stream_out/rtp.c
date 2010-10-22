@@ -174,27 +174,27 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
 
-    add_string( SOUT_CFG_PREFIX "dst", "", NULL, DEST_TEXT,
+    add_string( SOUT_CFG_PREFIX "dst", "", DEST_TEXT,
                 DEST_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "sdp", "", NULL, SDP_TEXT,
+    add_string( SOUT_CFG_PREFIX "sdp", "", SDP_TEXT,
                 SDP_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
+    add_string( SOUT_CFG_PREFIX "mux", "", MUX_TEXT,
                 MUX_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "sap", false, NULL, SAP_TEXT, SAP_LONGTEXT,
               true )
 
-    add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT,
+    add_string( SOUT_CFG_PREFIX "name", "", NAME_TEXT,
                 NAME_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "description", "", NULL, DESC_TEXT,
+    add_string( SOUT_CFG_PREFIX "description", "", DESC_TEXT,
                 DESC_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "url", "", NULL, URL_TEXT,
+    add_string( SOUT_CFG_PREFIX "url", "", URL_TEXT,
                 URL_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "email", "", NULL, EMAIL_TEXT,
+    add_string( SOUT_CFG_PREFIX "email", "", EMAIL_TEXT,
                 EMAIL_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "phone", "", NULL, PHONE_TEXT,
+    add_string( SOUT_CFG_PREFIX "phone", "", PHONE_TEXT,
                 PHONE_LONGTEXT, true )
 
-    add_string( SOUT_CFG_PREFIX "proto", "udp", NULL, PROTO_TEXT,
+    add_string( SOUT_CFG_PREFIX "proto", "udp", PROTO_TEXT,
                 PROTO_LONGTEXT, false )
         change_string_list( ppsz_protos, ppsz_protocols, NULL )
     add_integer( SOUT_CFG_PREFIX "port", 5004, NULL, PORT_TEXT,
@@ -212,9 +212,9 @@ vlc_module_begin ()
                  CACHING_TEXT, CACHING_LONGTEXT, true )
 
 #ifdef HAVE_SRTP
-    add_string( SOUT_CFG_PREFIX "key", "", NULL,
+    add_string( SOUT_CFG_PREFIX "key", "",
                 SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "salt", "", NULL,
+    add_string( SOUT_CFG_PREFIX "salt", "",
                 SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false )
 #endif
 

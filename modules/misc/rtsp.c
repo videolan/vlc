@@ -86,8 +86,8 @@ vlc_module_begin ()
     set_capability( "vod server", 1 )
     set_callbacks( Open, Close )
     add_shortcut( "rtsp" )
-    add_string ( "rtsp-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, true )
-    add_string( "rtsp-raw-mux", "ts", NULL, RAWMUX_TEXT,
+    add_string ( "rtsp-host", NULL, HOST_TEXT, HOST_LONGTEXT, true )
+    add_string( "rtsp-raw-mux", "ts", RAWMUX_TEXT,
                 RAWMUX_TEXT, true )
     add_integer( "rtsp-throttle-users", 0, NULL, THROTTLE_TEXT,
                  THROTTLE_LONGTEXT, true )

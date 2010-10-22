@@ -75,7 +75,7 @@ vlc_module_begin ()
     set_shortname( "MSN" )
     set_description( N_("MSN Now-Playing") )
 
-    add_string( "msn-format", FORMAT_DEFAULT, NULL,
+    add_string( "msn-format", FORMAT_DEFAULT,
                 FORMAT_TEXT, FORMAT_LONGTEXT, false )
 
     set_capability( "interface", 0 )

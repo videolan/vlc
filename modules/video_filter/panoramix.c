@@ -170,7 +170,7 @@ vlc_module_begin()
     add_obsolete_bool( CFG_PREFIX "offset-x" )
 #endif
 
-    add_string( CFG_PREFIX "active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT, true )
+    add_string( CFG_PREFIX "active", NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT, true )
 
     add_shortcut( "panoramix" )
     set_callbacks( Open, Close )

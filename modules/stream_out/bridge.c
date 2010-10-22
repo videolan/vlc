@@ -100,7 +100,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_STREAM )*/
     add_integer( SOUT_CFG_PREFIX_OUT "id", 0, NULL, ID_TEXT, ID_LONGTEXT,
                  false )
-    add_string( SOUT_CFG_PREFIX_OUT "in-name", "default", NULL,
+    add_string( SOUT_CFG_PREFIX_OUT "in-name", "default",
                 DEST_TEXT, DEST_LONGTEXT, false )
     set_callbacks( OpenOut, CloseOut )
 
@@ -114,7 +114,7 @@ vlc_module_begin ()
                  DELAY_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX_IN "id-offset", 8192, NULL, ID_OFFSET_TEXT,
                  ID_OFFSET_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX_IN "name", "default", NULL,
+    add_string( SOUT_CFG_PREFIX_IN "name", "default",
                 NAME_TEXT, NAME_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX_IN "placeholder", false, NULL,
               PLACEHOLDER_TEXT, PLACEHOLDER_LONGTEXT, false )

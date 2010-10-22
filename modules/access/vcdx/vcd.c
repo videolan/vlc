@@ -121,15 +121,11 @@ vlc_module_begin ()
                  "Media Info. Shows for example playback control navigation."),
               false )
 
-    add_string( MODULE_STRING "-author-format",
-                "%v - %F disc %c of %C",
-                NULL,
+    add_string( MODULE_STRING "-author-format", "%v - %F disc %c of %C", NULL,
                 N_("Format to use in the playlist's \"author\" field."),
                 VCD_TITLE_FMT_LONGTEXT, true )
 
-    add_string( MODULE_STRING "-title-format",
-                "%I %N %L%S - %M %A %v - disc %c of %C %F",
-                NULL,
+    add_string( MODULE_STRING "-title-format", "%I %N %L%S - %M %A %v - disc %c of %C %F", NULL,
                 N_("Format to use in the playlist's \"title\" field."),
                 VCD_TITLE_FMT_LONGTEXT, false )
 

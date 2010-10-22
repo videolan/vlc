@@ -88,7 +88,7 @@ vlc_module_begin ()
     set_shortname( N_("Audio Bar Graph Video") )
     add_shortcut( "audiobargraph_v" )
 
-    add_string( CFG_PREFIX "i_values", NULL, NULL, I_VALUES_TEXT, I_VALUES_LONGTEXT, false )
+    add_string( CFG_PREFIX "i_values", NULL, I_VALUES_TEXT, I_VALUES_LONGTEXT, false )
     add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true )
     add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, true )
     add_integer_with_range( CFG_PREFIX "transparency", 255, 0, 255, NULL,

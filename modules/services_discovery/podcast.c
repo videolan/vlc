@@ -64,7 +64,7 @@ vlc_module_begin ()
     set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_SD )
 
-    add_string( "podcast-urls", NULL, NULL,
+    add_string( "podcast-urls", NULL,
                 URLS_TEXT, URLS_LONGTEXT, false )
         change_autosave ()
 

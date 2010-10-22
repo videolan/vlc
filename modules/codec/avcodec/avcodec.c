@@ -153,7 +153,7 @@ vlc_module_begin ()
     set_capability( "encoder", 100 )
     set_callbacks( OpenEncoder, CloseEncoder )
 
-    add_string( ENC_CFG_PREFIX "hq", "simple", NULL, ENC_HQ_TEXT,
+    add_string( ENC_CFG_PREFIX "hq", "simple", ENC_HQ_TEXT,
                 ENC_HQ_LONGTEXT, false )
         change_string_list( enc_hq_list, enc_hq_list_text, 0 )
     add_integer( ENC_CFG_PREFIX "keyint", 0, NULL, ENC_KEYINT_TEXT,
@@ -204,7 +204,7 @@ vlc_module_begin ()
                  ENC_CHROMA_ELIM_TEXT, ENC_CHROMA_ELIM_LONGTEXT, true )
 
     /* Audio AAC encoder profile */
-    add_string( ENC_CFG_PREFIX "aac-profile", "low", NULL,
+    add_string( ENC_CFG_PREFIX "aac-profile", "low",
                 ENC_PROFILE_TEXT, ENC_PROFILE_LONGTEXT, true )
 #endif /* ENABLE_SOUT */
 

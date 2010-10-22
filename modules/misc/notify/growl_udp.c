@@ -81,7 +81,7 @@ vlc_module_begin ()
     set_shortname( "Growl-UDP" )
     set_description( N_("Growl UDP Notification Plugin") )
 
-    add_string( "growl-server", SERVER_DEFAULT, NULL,
+    add_string( "growl-server", SERVER_DEFAULT,
                 SERVER_TEXT, SERVER_LONGTEXT, false )
     add_password( "growl-password", PASS_DEFAULT, NULL,
                 PASS_TEXT, PASS_LONGTEXT, false )

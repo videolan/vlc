@@ -68,12 +68,12 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_callbacks( Open, Close )
     add_shortcut( "rawvideo" )
-    add_string( "rawvid-fps", NULL, NULL, FPS_TEXT, FPS_LONGTEXT, false )
+    add_string( "rawvid-fps", NULL, FPS_TEXT, FPS_LONGTEXT, false )
     add_integer( "rawvid-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, 0 )
     add_integer( "rawvid-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, 0 )
-    add_string( "rawvid-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
+    add_string( "rawvid-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 true )
-    add_string( "rawvid-aspect-ratio", NULL, NULL,
+    add_string( "rawvid-aspect-ratio", NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, true )
 vlc_module_end ()
 

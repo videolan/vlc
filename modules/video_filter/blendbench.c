@@ -86,13 +86,13 @@ vlc_module_begin ()
     set_section( N_("Base image"), NULL )
     add_loadfile( CFG_PREFIX "base-image", NULL, NULL, BASE_IMAGE_TEXT,
                   BASE_IMAGE_LONGTEXT, false )
-    add_string( CFG_PREFIX "base-chroma", "I420", NULL, BASE_CHROMA_TEXT,
+    add_string( CFG_PREFIX "base-chroma", "I420", BASE_CHROMA_TEXT,
               BASE_CHROMA_LONGTEXT, false )
 
     set_section( N_("Blend image"), NULL )
     add_loadfile( CFG_PREFIX "blend-image", NULL, NULL, BLEND_IMAGE_TEXT,
                   BLEND_IMAGE_LONGTEXT, false )
-    add_string( CFG_PREFIX "blend-chroma", "YUVA", NULL, BLEND_CHROMA_TEXT,
+    add_string( CFG_PREFIX "blend-chroma", "YUVA", BLEND_CHROMA_TEXT,
               BLEND_CHROMA_LONGTEXT, false )
 
     set_callbacks( Create, Destroy )

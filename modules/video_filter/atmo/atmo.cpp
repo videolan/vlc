@@ -375,7 +375,7 @@ change_integer_list( pi_device_type_values,
                      ppsz_device_type_descriptions )
 
 #if defined(WIN32)
-add_string(CFG_PREFIX "serialdev", "COM1", NULL,
+add_string(CFG_PREFIX "serialdev", "COM1",
            SERIALDEV_TEXT, SERIALDEV_LONGTEXT, false )
 /*
     on win32 the executeable external driver application
@@ -384,7 +384,7 @@ add_string(CFG_PREFIX "serialdev", "COM1", NULL,
 add_loadfile(CFG_PREFIX "atmowinexe", NULL, NULL,
              ATMOWINEXE_TEXT, ATMOWINEXE_LONGTEXT, false )
 #else
-add_string(CFG_PREFIX "serialdev", "/dev/ttyUSB0", NULL,
+add_string(CFG_PREFIX "serialdev", "/dev/ttyUSB0",
            SERIALDEV_TEXT, SERIALDEV_LONGTEXT, false )
 #endif
 
@@ -422,7 +422,7 @@ add_integer_with_range(CFG_PREFIX "efadesteps",    50, 1, 250, NULL,
 set_section( N_("DMX options" ), 0 )
 add_integer_with_range(CFG_PREFIX "dmx-channels",   5, 1, 64, NULL,
                        DMX_CHANNELS_TEXT, DMX_CHANNELS_LONGTEXT, false)
-add_string(CFG_PREFIX "dmx-chbase", "0,3,6,9,12", NULL,
+add_string(CFG_PREFIX "dmx-chbase", "0,3,6,9,12",
                        DMX_CHBASE_TEXT, DMX_CHBASE_LONGTEXT, false )
 
 set_section( N_("MoMoLight options" ), 0 )
@@ -553,7 +553,7 @@ add_integer( CFG_PREFIX "channel_4", 2, NULL,
 change_integer_list( pi_zone_assignment_values,
                      ppsz_zone_assignment_descriptions )
 
-add_string(CFG_PREFIX "channels", NULL, NULL,
+add_string(CFG_PREFIX "channels", "",
            CHANNELS_ASSIGN_TEXT, CHANNELS_ASSIGN_LONGTEXT, false )
 
 
@@ -599,7 +599,7 @@ add_directory(CFG_PREFIX "gradient_path", NULL, NULL,
 #if defined(__ATMO_DEBUG__)
 add_bool(CFG_PREFIX "saveframes", false, NULL,
          SAVEFRAMES_TEXT, SAVEFRAMES_LONGTEXT, false)
-add_string(CFG_PREFIX "framepath", "", NULL,
+add_string(CFG_PREFIX "framepath", "",
            FRAMEPATH_TEXT, FRAMEPATH_LONGTEXT, false )
 #endif
 /*

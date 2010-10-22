@@ -65,7 +65,7 @@ vlc_module_begin()
     set_description(N_("Simple DirectMedia Layer video output"))
     set_capability("vout display", 60)
     add_shortcut("sdl")
-    add_string("sdl-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
+    add_string("sdl-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
     add_obsolete_string("sdl-video-driver") /* obsolete since 1.1.0 */
     set_callbacks(Open, Close)
 #if defined(__i386__) || defined(__x86_64__)
