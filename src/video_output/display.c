@@ -1563,8 +1563,8 @@ void vout_SendDisplayEventMouse(vout_thread_t *vout, const vlc_mouse_t *m)
 {
     vlc_mouse_t tmp1, tmp2;
 
-    /* The check on p_spu is needed as long as ALLOW_DUMMY_VOUT is defined */
-    if (vout->p->p_spu && spu_ProcessMouse( vout->p->p_spu, m, &vout->p->display.vd->source))
+    /* The check on spu is needed as long as ALLOW_DUMMY_VOUT is defined */
+    if (vout->p->spu && spu_ProcessMouse( vout->p->spu, m, &vout->p->display.vd->source))
         return;
 
     vlc_mutex_lock( &vout->p->filter.lock );
@@ -1610,7 +1610,7 @@ static void DummyVoutSendDisplayEventMouse(vout_thread_t *vout, vlc_mouse_t *fal
         vlc_mutex_init(&p.filter.lock);
         p.filter.chain_static = NULL;
         p.filter.chain_interactive = NULL;
-        p.p_spu = NULL;
+        p.spu = NULL;
         vout->p = &p;
     }
     vout_SendDisplayEventMouse(vout, m);

@@ -69,7 +69,7 @@ struct vout_thread_sys_t
 
     /* Subpicture unit */
     vlc_mutex_t     spu_lock;
-    spu_t           *p_spu;
+    spu_t           *spu;
 
     /* Video output window */
     struct {

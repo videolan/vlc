@@ -131,7 +131,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vlc_object_attach(vout, object);
 
     /* Initialize subpicture unit */
-    vout->p->p_spu = spu_Create(vout);
+    vout->p->spu = spu_Create(vout);
 
     /* Take care of some "interface/control" related initialisations */
     vout_IntfInit(vout);
@@ -159,7 +159,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     /* */
     if (vlc_clone(&vout->p->thread, Thread, vout,
                   VLC_THREAD_PRIORITY_OUTPUT)) {
-        spu_Destroy(vout->p->p_spu);
+        spu_Destroy(vout->p->spu);
         vlc_object_release(vout);
         return NULL;
     }
@@ -174,7 +174,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
 
     vout->p->input = cfg->input;
     if (vout->p->input)
-        spu_Attach(vout->p->p_spu, vout->p->input, true);
+        spu_Attach(vout->p->spu, vout->p->input, true);
 
     return vout;
 }
@@ -193,10 +193,10 @@ vout_thread_t *(vout_Request)(vlc_object_t *object,
     if (vout) {
         if (vout->p->input != cfg->input) {
             if (vout->p->input)
-                spu_Attach(vout->p->p_spu, vout->p->input, false);
+                spu_Attach(vout->p->spu, vout->p->input, false);
             vout->p->input = cfg->input;
             if (vout->p->input)
-                spu_Attach(vout->p->p_spu, vout->p->input, true);
+                spu_Attach(vout->p->spu, vout->p->input, true);
         }
 
         if (cfg->change_fmt) {
@@ -224,7 +224,7 @@ void vout_Close(vout_thread_t *vout)
     assert(vout);
 
     if (vout->p->input)
-        spu_Attach(vout->p->p_spu, vout->p->input, false);
+        spu_Attach(vout->p->spu, vout->p->input, false);
 
     vout_snapshot_End(&vout->p->snapshot);
 
@@ -232,8 +232,8 @@ void vout_Close(vout_thread_t *vout)
     vlc_join(vout->p->thread, NULL);
 
     vlc_mutex_lock(&vout->p->spu_lock);
-    spu_Destroy(vout->p->p_spu);
-    vout->p->p_spu = NULL;
+    spu_Destroy(vout->p->spu);
+    vout->p->spu = NULL;
     vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
@@ -359,8 +359,8 @@ int vout_RegisterSubpictureChannel( vout_thread_t *vout )
     int channel = SPU_DEFAULT_CHANNEL;
 
     vlc_mutex_lock(&vout->p->spu_lock);
-    if (vout->p->p_spu)
-        channel = spu_RegisterChannel(vout->p->p_spu);
+    if (vout->p->spu)
+        channel = spu_RegisterChannel(vout->p->spu);
     vlc_mutex_unlock(&vout->p->spu_lock);
 
     return channel;
@@ -765,7 +765,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     else
         spu_render_time = filtered->date > 1 ? filtered->date : mdate();
 
-    subpicture_t *subpic = spu_SortSubpictures(vout->p->p_spu,
+    subpicture_t *subpic = spu_SortSubpictures(vout->p->spu,
                                                spu_render_time,
                                                do_snapshot);
     /*
@@ -789,7 +789,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         if (render) {
             picture_Copy(render, filtered);
 
-            spu_RenderSubpictures(vout->p->p_spu,
+            spu_RenderSubpictures(vout->p->spu,
                                   render, &vd->source,
                                   subpic, &vd->source, spu_render_time);
         }
@@ -944,12 +944,12 @@ static void ThreadManage(vout_thread_t *vout,
 static void ThreadDisplaySubpicture(vout_thread_t *vout,
                                     subpicture_t *subpicture)
 {
-    spu_DisplaySubpicture(vout->p->p_spu, subpicture);
+    spu_DisplaySubpicture(vout->p->spu, subpicture);
 }
 
 static void ThreadFlushSubpicture(vout_thread_t *vout, int channel)
 {
-    spu_ClearChannel(vout->p->p_spu, channel);
+    spu_ClearChannel(vout->p->spu, channel);
 }
 
 static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
@@ -1050,11 +1050,11 @@ static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
 
 static void ThreadChangeSubFilters(vout_thread_t *vout, const char *filters)
 {
-    spu_ChangeFilters(vout->p->p_spu, filters);
+    spu_ChangeFilters(vout->p->spu, filters);
 }
 static void ThreadChangeSubMargin(vout_thread_t *vout, int margin)
 {
-    spu_ChangeMargin(vout->p->p_spu, margin);
+    spu_ChangeMargin(vout->p->spu, margin);
 }
 
 static void ThreadChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
@@ -1071,7 +1071,7 @@ static void ThreadChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
         picture_fifo_OffsetDate(vout->p->decoder_fifo, duration);
         if (vout->p->displayed.decoded)
             vout->p->displayed.decoded->date += duration;
-        spu_OffsetSubtitleDate(vout->p->p_spu, duration);
+        spu_OffsetSubtitleDate(vout->p->spu, duration);
 
         ThreadFilterFlush(vout);
     } else {
