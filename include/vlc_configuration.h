@@ -157,7 +157,6 @@ struct module_config_t
 
     /* Function to call when commiting a change */
     vlc_callback_t pf_callback;
-    void          *p_callback_data;
 
     /* Values list */
     char **      ppsz_list;       /* List of possible values for the option */

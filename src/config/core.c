@@ -294,8 +294,7 @@ void config_PutPsz( vlc_object_t *p_this,
         vlc_value_t val;
 
         val.psz_string = (char *)psz_value;
-        p_config->pf_callback( p_this, psz_name, oldval, val,
-                               p_config->p_callback_data );
+        p_config->pf_callback( p_this, psz_name, oldval, val, NULL );
     }
 
     /* free old string */
