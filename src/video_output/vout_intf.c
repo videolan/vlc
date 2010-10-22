@@ -32,18 +32,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>                                                /* free() */
-#include <sys/types.h>                                          /* opendir() */
-#include <dirent.h>                                             /* opendir() */
 #include <assert.h>
-#include <time.h>                                           /* strftime */
 
-#include <vlc_interface.h>
 #include <vlc_block.h>
-#include <vlc_playlist.h>
 #include <vlc_modules.h>
 
 #include <vlc_vout.h>
-#include <vlc_image.h>
 #include <vlc_vout_osd.h>
 #include <vlc_strings.h>
 #include <vlc_charset.h>
@@ -394,43 +388,6 @@ static void VoutOsdSnapshot( vout_thread_t *p_vout, picture_t *p_pic, const char
         if( VoutSnapshotPip( p_vout, p_pic ) )
             msg_Warn( p_vout, "Failed to display snapshot" );
     }
-}
-
-/* */
-int vout_GetSnapshot( vout_thread_t *p_vout,
-                      block_t **pp_image, picture_t **pp_picture,
-                      video_format_t *p_fmt,
-                      const char *psz_format, mtime_t i_timeout )
-{
-    picture_t *p_picture = vout_snapshot_Get( &p_vout->p->snapshot, i_timeout );
-    if( !p_picture )
-    {
-        msg_Err( p_vout, "Failed to grab a snapshot" );
-        return VLC_EGENERIC;
-    }
-
-    if( pp_image )
-    {
-        vlc_fourcc_t i_format = VLC_CODEC_PNG;
-        if( psz_format && image_Type2Fourcc( psz_format ) )
-            i_format = image_Type2Fourcc( psz_format );
-
-        const int i_override_width  = var_GetInteger( p_vout, "snapshot-width" );
-        const int i_override_height = var_GetInteger( p_vout, "snapshot-height" );
-
-        if( picture_Export( VLC_OBJECT(p_vout), pp_image, p_fmt,
-                            p_picture, i_format, i_override_width, i_override_height ) )
-        {
-            msg_Err( p_vout, "Failed to convert image for snapshot" );
-            picture_Release( p_picture );
-            return VLC_EGENERIC;
-        }
-    }
-    if( pp_picture )
-        *pp_picture = p_picture;
-    else
-        picture_Release( p_picture );
-    return VLC_SUCCESS;
 }
 
 /**
