@@ -486,10 +486,13 @@ vlc_module_begin ()
         change_autosave ()
         change_private ()
 #ifdef WIN32
+#warning FIXME
+#if 0
     add_bool( "skins2-systray", false, onSystrayChange, SKINS2_SYSTRAY,
               SKINS2_SYSTRAY_LONG, false );
     add_bool( "skins2-taskbar", true, onTaskBarChange, SKINS2_TASKBAR,
               SKINS2_TASKBAR_LONG, false );
+#endif
 #endif
     add_bool( "skins2-transparency", false, SKINS2_TRANSPARENCY,
               SKINS2_TRANSPARENCY_LONG, false );
