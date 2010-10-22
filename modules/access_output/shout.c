@@ -115,7 +115,7 @@ vlc_module_begin ()
     add_shortcut( "shout" )
     add_string( SOUT_CFG_PREFIX "name", "VLC media player - Live stream",
                 NAME_TEXT, NAME_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "description", "Live stream from VLC media player", NULL,
+    add_string( SOUT_CFG_PREFIX "description", "Live stream from VLC media player",
                 DESCRIPTION_TEXT, DESCRIPTION_LONGTEXT, false )
     add_bool(   SOUT_CFG_PREFIX "mp3", false,
                 MP3_TEXT, MP3_LONGTEXT, true )
