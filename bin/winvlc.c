@@ -150,12 +150,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         if(!wcscmp(wargv[i], L"--no-crashdump"))
         {
             crash_handling = FALSE;
+            continue; /* don't give argument to libvlc */
         }
-        else
-        {
-            argv[j] = FromWide (wargv[i]);
-            j++;
-        }
+
+        argv[j++] = FromWide (wargv[i]);
     }
 
     argc = j;
