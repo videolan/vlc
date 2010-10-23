@@ -414,8 +414,8 @@ static void VariablesInit( playlist_t *p_playlist )
     var_AddCallback( p_playlist, "rate-slower", RateOffsetCallback, NULL );
     var_AddCallback( p_playlist, "rate-faster", RateOffsetCallback, NULL );
 
-    var_Create( p_playlist, "vout-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_AddCallback( p_playlist, "vout-filter", VideoSplitterCallback, NULL );
+    var_Create( p_playlist, "video-splitter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_AddCallback( p_playlist, "video-splitter", VideoSplitterCallback, NULL );
 
     var_AddCallback( p_playlist, "random", RandomCallback, NULL );
 

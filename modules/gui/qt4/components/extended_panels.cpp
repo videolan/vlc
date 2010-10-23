@@ -287,7 +287,7 @@ void ExtVideo::ChangeVFiltersString( const char *psz_name, bool b_add )
 
     if( module_provides( p_obj, "video splitter" ) )
     {
-        psz_filter_type = "vout-filter";
+        psz_filter_type = "video-splitter";
     }
     else if( module_provides( p_obj, "video filter2" ) )
     {
@@ -360,7 +360,7 @@ void ExtVideo::ChangeVFiltersString( const char *psz_name, bool b_add )
     config_PutPsz( p_intf, psz_filter_type, psz_string );
 
     /* Try to set on the fly */
-    if( !strcmp( psz_filter_type, "vout-filter" ) )
+    if( !strcmp( psz_filter_type, "video-splitter" ) )
     {
         playlist_t *p_playlist = pl_Get( p_intf );
         var_SetString( p_playlist, psz_filter_type, psz_string );

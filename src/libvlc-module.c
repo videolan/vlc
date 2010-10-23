@@ -509,9 +509,9 @@ static const char *const ppsz_pos_descriptions[] =
     "VLC can avoid creating window caption, frames, etc... around the video" \
     ", giving a \"minimal\" window.")
 
-#define VOUT_FILTER_TEXT N_("Video output filter module")
-#define VOUT_FILTER_LONGTEXT N_( \
-    "This adds video output filters like clone or wall" )
+#define VIDEO_SPLITTER_TEXT N_("Video splitter module")
+#define VIDEO_SPLITTER_LONGTEXT N_( \
+    "This adds video splitters like clone or wall" )
 
 #define VIDEO_FILTER_TEXT N_("Video filter module")
 #define VIDEO_FILTER_LONGTEXT N_( \
@@ -1778,8 +1778,9 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     add_module_list_cat( "video-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                 VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT, false )
-    add_module_list_cat( "vout-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
-                        VOUT_FILTER_TEXT, VOUT_FILTER_LONGTEXT, false )
+    add_module_list_cat( "video-splitter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
+                        VIDEO_SPLITTER_TEXT, VIDEO_SPLITTER_LONGTEXT, false )
+    add_deprecated_alias( "vout-filter" )
 #if 0
     add_string( "pixel-ratio", "1", PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT )
 #endif
