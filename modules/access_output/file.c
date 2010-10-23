@@ -75,8 +75,10 @@ vlc_module_begin ()
     add_shortcut( "file", "stream" )
     add_bool( SOUT_CFG_PREFIX "append", false, APPEND_TEXT,APPEND_LONGTEXT,
               true )
+#ifdef O_SYNC
     add_bool( SOUT_CFG_PREFIX "sync", false, SYNC_TEXT,SYNC_LONGTEXT,
               false )
+#endif
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -85,7 +87,11 @@ vlc_module_end ()
  * Exported prototypes
  *****************************************************************************/
 static const char *const ppsz_sout_options[] = {
-    "append", "sync", NULL
+    "append",
+#ifdef O_SYNC
+    "sync",
+#endif
+    NULL
 };
 
 static ssize_t Write( sout_access_out_t *, block_t * );
@@ -105,7 +111,6 @@ static int Open( vlc_object_t *p_this )
 {
     sout_access_out_t   *p_access = (sout_access_out_t*)p_this;
     int                 fd;
-    bool                sync;
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
@@ -116,7 +121,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     bool append = var_GetBool( p_access, SOUT_CFG_PREFIX "append" );
-    sync = var_GetBool( p_access, SOUT_CFG_PREFIX "sync" );
 
     if( !strcmp( p_access->psz_path, "-" ) )
     {
@@ -138,9 +142,9 @@ static int Open( vlc_object_t *p_this )
 
         fd = vlc_open( psz_tmp, O_RDWR | O_CREAT | O_LARGEFILE |
 #ifdef O_SYNC
-                        (sync ? O_SYNC : 0) |
+                (var_GetBool( p_access, SOUT_CFG_PREFIX "sync" ) ? O_SYNC : 0) |
 #endif
-                        (append ? 0 : O_TRUNC), 0666 );
+                (append ? 0 : O_TRUNC), 0666 );
         free( psz_tmp );
     }
 
