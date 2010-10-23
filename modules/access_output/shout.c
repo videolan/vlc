@@ -232,10 +232,8 @@ static int Open( vlc_object_t *p_this )
     free( psz_genre );
     free( psz_url );
 
-    if( var_GetBool( p_access, SOUT_CFG_PREFIX "mp3" ) )
-        i_ret = shout_set_format( p_shout, SHOUT_FORMAT_MP3 );
-    else
-        i_ret = shout_set_format( p_shout, SHOUT_FORMAT_OGG );
+    i_ret = shout_set_format( p_shout, var_GetBool( p_access, SOUT_CFG_PREFIX "mp3" ) ?
+                                       SHOUT_FORMAT_MP3 : SHOUT_FORMAT_OGG );
 
     if( i_ret != SHOUTERR_SUCCESS )
     {
@@ -410,13 +408,14 @@ error:
 static void Close( vlc_object_t * p_this )
 {
     sout_access_out_t *p_access = (sout_access_out_t*)p_this;
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
 
-    if( p_access->p_sys && p_access->p_sys->p_shout )
+    if( p_sys->p_shout )
     {
-        shout_close( p_access->p_sys->p_shout );
+        shout_close( p_sys->p_shout );
         shout_shutdown();
     }
-    free( p_access->p_sys );
+    free( p_sys );
     msg_Dbg( p_access, "shout access output closed" );
 }
 
@@ -442,15 +441,15 @@ static int Control( sout_access_out_t *p_access, int i_query, va_list args )
  *****************************************************************************/
 static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
     size_t i_write = 0;
 
-    shout_sync( p_access->p_sys->p_shout );
+    shout_sync( p_sys->p_shout );
     while( p_buffer )
     {
         block_t *p_next = p_buffer->p_next;
 
-        if( shout_send( p_access->p_sys->p_shout,
-                        p_buffer->p_buffer, p_buffer->i_buffer )
+        if( shout_send( p_sys->p_shout, p_buffer->p_buffer, p_buffer->i_buffer )
              == SHOUTERR_SUCCESS )
         {
             i_write += p_buffer->i_buffer;
@@ -458,24 +457,24 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
         else
         {
             msg_Err( p_access, "cannot write to stream: %s",
-                     shout_get_error(p_access->p_sys->p_shout) );
+                     shout_get_error( p_sys->p_shout ) );
 
             /* The most common cause seems to be a server disconnect, resulting in a
                Socket Error which can only be fixed by closing and reconnecting.
                Since we already began with a working connection, the most feasable
                approach to get out of this error status is a (timed) reconnect approach. */
-            shout_close( p_access->p_sys->p_shout );
+            shout_close( p_sys->p_shout );
             msg_Warn( p_access, "server unavailable? trying to reconnect..." );
             /* Re-open the connection (protocol params have already been set) and re-sync */
-            if( shout_open( p_access->p_sys->p_shout ) == SHOUTERR_SUCCESS )
+            if( shout_open( p_sys->p_shout ) == SHOUTERR_SUCCESS )
             {
-                shout_sync( p_access->p_sys->p_shout );
+                shout_sync( p_sys->p_shout );
                 msg_Warn( p_access, "reconnected to server" );
             }
             else
             {
                 msg_Err( p_access, "failed to reconnect to server" );
-                block_ChainRelease (p_buffer);
+                block_ChainRelease( p_buffer );
                 return VLC_EGENERIC;
             }
 
