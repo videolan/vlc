@@ -1004,7 +1004,7 @@ void addAsso( QVLCRegistry *qvReg, const char *psz_ext )
     /* Save a backup if already assigned */
     char *psz_value = qvReg->ReadRegistryString( psz_ext, "", ""  );
 
-    if( psz_value && strlen( psz_value ) > 0 )
+    if( !EMPTY_STR(psz_value) )
         qvReg->WriteRegistryString( psz_ext, "VLC.backup", psz_value );
     delete psz_value;
 

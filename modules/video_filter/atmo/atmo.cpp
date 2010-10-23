@@ -1232,7 +1232,7 @@ static void Atmo_SetupBuildZones(filter_t *p_filter)
               p_filter,
               CFG_PREFIX "channels"
             );
-    if( psz_channels && strlen(psz_channels) > 0 )
+    if( !EMPTY_STR(psz_channels) )
     {
         msg_Dbg( p_filter, "deal with new zone mapping %s", psz_channels );
         int channel = 0;
@@ -1316,7 +1316,7 @@ static void Atmo_SetupBuildZones(filter_t *p_filter)
             p_filter,
             psz_gradient_var_name
             );
-        if(psz_gradient_file && strlen(psz_gradient_file)>0)
+        if( !EMPTY_STR(psz_gradient_file) )
         {
             msg_Dbg( p_filter, "loading gradientfile %s for "\
                                 "zone %d", psz_gradient_file, i);
@@ -1348,7 +1348,7 @@ static void Atmo_SetupBuildZones(filter_t *p_filter)
               p_filter,
               CFG_PREFIX "gradient_path"
             );
-    if( psz_gradient_path && strlen(psz_gradient_path) > 0 )
+    if( EMPTY_STR(psz_gradient_path) )
     {
         char *psz_file_name = (char *)malloc( strlen(psz_gradient_path) + 16 );
         assert( psz_file_name );
@@ -1397,7 +1397,7 @@ static void Atmo_SetupConfig(filter_t *p_filter, CAtmoConfig *p_atmo_config)
                                                       CFG_PREFIX "serialdev" );
     char *psz_temp = psz_serialdev;
 
-    if( psz_temp && strlen(psz_temp) > 0 )
+    if( !EMPTY_STR(psz_serialdev) )
     {
         char *psz_token;
         int i_port = 0;
@@ -1528,7 +1528,7 @@ static void Atmo_SetupConfig(filter_t *p_filter, CAtmoConfig *p_atmo_config)
 
     char *psz_chbase = var_CreateGetStringCommand( p_filter,
                                                    CFG_PREFIX "dmx-chbase" );
-    if( psz_chbase && strlen(psz_chbase) > 0 )
+    if( !EMPTY_STR(psz_chbase) )
         p_atmo_config->setDMX_BaseChannels( psz_chbase );
 
     free( psz_chbase );
@@ -1598,7 +1598,7 @@ static void Atmo_SetupParameters(filter_t *p_filter)
             */
             char *psz_path = var_CreateGetStringCommand( p_filter,
                                                CFG_PREFIX "atmowinexe" );
-            if( psz_path && strlen(psz_path) > 0 )
+            if( !EMPTY_STR(psz_path) )
             {
                 char *psz_bs = strrchr( psz_path , '\\');
                 if( psz_bs )

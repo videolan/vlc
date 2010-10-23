@@ -546,7 +546,7 @@ static int Open( vlc_object_t *p_this )
         {
             i_pid = strtoul( psz, &psz_next, 0 );
 
-            if ( strlen(psz_next) > 0 )
+            if ( psz_next[0] != '\0' )
                 psz = &psz_next[1];
             if ( i_pid == 0 )
             {
@@ -665,7 +665,7 @@ static int Open( vlc_object_t *p_this )
         while ( psz != NULL )
         {
             i_pid = strtoul( psz, &psz_next, 0 );
-            if( strlen(psz_next) > 0 )
+            if( psz_next[0] != '\0' )
                 psz = &psz_next[1];
             else
                 psz = NULL;

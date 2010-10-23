@@ -95,7 +95,7 @@ ATMO_BOOL CAtmoMultiConnection::OpenConnection()
 
     for(int c = 0; c < 4; c++ ) {
         char *devName = m_pAtmoConfig->getSerialDevice( c );
-        if( devName && strlen(devName) > 0 )
+        if( !EMPTY_STR( devName ) )
         {
             m_hComports[z] = OpenDevice( devName );
             if(m_hComports[z] == INVALID_HANDLE_VALUE) {
@@ -168,7 +168,7 @@ int CAtmoMultiConnection::getNumChannels()
     char *psz_dev;
     for(int i=0;i<4;i++) {
         psz_dev = m_pAtmoConfig->getSerialDevice( i );
-        if( psz_dev && strlen( psz_dev ) > 0 )
+        if( !EMPTY_STR( psz_dev ) )
             z+=4;
     }
 #else
