@@ -278,21 +278,14 @@ void ExtVideo::ChangeVFiltersString( const char *psz_name, bool b_add )
     char *psz_parser, *psz_string;
     const char *psz_filter_type;
 
-    /* FIXME temporary hack */
-    const char *psz_module_name = psz_name;
-    if( !strcmp( psz_name, "wall" ) ||
-        !strcmp( psz_name, "panoramix" ) ||
-        !strcmp( psz_name, "clone" ) )
-        psz_module_name = "video_filter_wrapper";
-
-    module_t *p_obj = module_find( psz_module_name );
+    module_t *p_obj = module_find( psz_name );
     if( !p_obj )
     {
         msg_Err( p_intf, "Unable to find filter module \"%s\".", psz_name );
         return;
     }
 
-    if( module_provides( p_obj, "video filter" ) )
+    if( module_provides( p_obj, "video splitter" ) )
     {
         psz_filter_type = "vout-filter";
     }
@@ -367,11 +360,19 @@ void ExtVideo::ChangeVFiltersString( const char *psz_name, bool b_add )
     config_PutPsz( p_intf, psz_filter_type, psz_string );
 
     /* Try to set on the fly */
-    p_vout = THEMIM->getVout();
-    if( p_vout )
+    if( !strcmp( psz_filter_type, "vout-filter" ) )
     {
-        var_SetString( p_vout, psz_filter_type, psz_string );
-        vlc_object_release( p_vout );
+        playlist_t *p_playlist = pl_Get( p_intf );
+        var_SetString( p_playlist, psz_filter_type, psz_string );
+    }
+    else
+    {
+        p_vout = THEMIM->getVout();
+        if( p_vout )
+        {
+            var_SetString( p_vout, psz_filter_type, psz_string );
+            vlc_object_release( p_vout );
+        }
     }
 
     free( psz_string );
