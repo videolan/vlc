@@ -218,13 +218,12 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_access, "failed to initialize shout streaming to %s:%i/%s",
                  url.psz_host, url.i_port, url.psz_path );
-        free( p_access->p_sys );
+
         free( psz_name );
         free( psz_description );
         free( psz_genre );
         free( psz_url );
-        vlc_UrlClean( &url );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     free( psz_name );
@@ -397,6 +396,8 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
+    if( p_sys->p_shout )
+        shout_free( p_sys->p_shout );
     vlc_UrlClean( &url );
     free( p_sys );
     return VLC_EGENERIC;
@@ -413,6 +414,7 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->p_shout )
     {
         shout_close( p_sys->p_shout );
+        shout_free( p_sys->p_shout );
         shout_shutdown();
     }
     free( p_sys );
