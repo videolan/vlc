@@ -245,7 +245,7 @@ static void RunIntf( intf_thread_t *p_intf )
             if( p_vout )
             {
                 config_PutPsz( p_vout, "transform-type", psz_type );
-                var_SetString( p_vout, "vout-filter", psz_filter );
+                var_SetString( p_vout, "video-filter", psz_filter );
                 vlc_object_release( p_vout );
 
                 i_oldx = i_x;
