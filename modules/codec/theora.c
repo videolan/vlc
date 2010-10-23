@@ -250,6 +250,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     }
 
     /* Set output properties */
+    if( !p_sys->b_packetizer )
     switch( p_sys->ti.pixelformat )
     {
       case OC_PF_420:
