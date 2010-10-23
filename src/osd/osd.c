@@ -200,8 +200,7 @@ osd_menu_t *osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
         var_SetBool( p_osd, "osd-menu-update", false );
         var_SetBool( p_osd, "osd-menu-visible", false );
 
-        val.p_address = p_osd;
-        var_Set( p_this->p_libvlc, "osd-object", val );
+        var_SetAddress( p_this->p_libvlc, "osd-object", p_osd );
     }
     else
         p_osd = val.p_address;
@@ -227,13 +226,10 @@ void osd_MenuDelete( vlc_object_t *p_this, osd_menu_t *p_osd )
 
     if( vlc_internals( VLC_OBJECT(p_osd) )->i_refcount == 1 )
     {
-        vlc_value_t val;
-
         var_Destroy( p_osd, "osd-menu-visible" );
         var_Destroy( p_osd, "osd-menu-update" );
         osd_ParserUnload( p_osd );
-        val.p_address = NULL;
-        var_Set( p_this->p_libvlc, "osd-object", val );
+        var_SetAddress( p_this->p_libvlc, "osd-object", NULL );
     }
 
     vlc_object_release( p_osd );

@@ -714,10 +714,7 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
     add.i_item = i_item_id;
     add.i_node = i_node_id;
 
-    vlc_value_t val;
-    val.p_address = &add;
-
-    var_Set( p_playlist, "playlist-item-append", val );
+    var_SetAddress( p_playlist, "playlist-item-append", &add );
 }
 
 /***************************************************************************

@@ -112,8 +112,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
         {
             /* Go directly to the left channel. */
             p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
-            val.i_int = AOUT_VAR_CHAN_LEFT;
-            var_Set( p_aout, "audio-channels", val );
+            var_SetInteger( p_aout, "audio-channels", AOUT_VAR_CHAN_LEFT );
         }
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
                          NULL );
@@ -150,14 +149,12 @@ int aout_OutputNew( aout_instance_t * p_aout,
         {
             /* Go directly to the left channel. */
             p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
-            val.i_int = AOUT_VAR_CHAN_LEFT;
-            var_Set( p_aout, "audio-channels", val );
+            var_SetInteger( p_aout, "audio-channels", AOUT_VAR_CHAN_LEFT );
         }
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
                          NULL );
     }
-    val.b_bool = true;
-    var_Set( p_aout, "intf-change", val );
+    var_SetBool( p_aout, "intf-change", true );
 
     aout_FormatPrepare( &p_aout->output.output );
 
