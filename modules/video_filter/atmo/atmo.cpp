@@ -2021,7 +2021,7 @@ static inline void yuv_to_rgb( uint8_t *r, uint8_t *g, uint8_t *b,
 * p_sys is a pointer to
 * p_inpic is the source frame
 * p_transfer_dest is the target buffer for the picture must be big enough!
-* (in win32 enviroment this buffer comes from the external DLL where it is
+* (in win32 environment this buffer comes from the external DLL where it is
 * create as "variant array" and returned through the AtmoLockTransferbuffer
 */
 static void ExtractMiniImage_YUV(filter_sys_t *p_sys,

@@ -291,7 +291,7 @@ Latest version available at: www.edener.de
 See the file COPYING for license information.
 ----------------------------------------------------------------------
 
-for detailed informations visit the VDR-Wiki:
+for detailed information visit the VDR-Wiki:
 http://www.vdr-wiki.de/wiki/index.php/Atmo-plugin
 
 Development:

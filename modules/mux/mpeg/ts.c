@@ -183,8 +183,8 @@ static void    Close  ( vlc_object_t * );
     "encrypting." )
 
 #define SOUT_CFG_PREFIX "sout-ts-"
-#define MAX_PMT 64       /* Maximum number of programs. FIXME: I just chose an arbitary number. Where is the maximum in the spec? */
-#define MAX_PMT_PID 64       /* Maximum pids in each pmt.  FIXME: I just chose an arbitary number. Where is the maximum in the spec? */
+#define MAX_PMT 64       /* Maximum number of programs. FIXME: I just chose an arbitrary number. Where is the maximum in the spec? */
+#define MAX_PMT_PID 64       /* Maximum pids in each pmt.  FIXME: I just chose an arbitrary number. Where is the maximum in the spec? */
 
 vlc_module_begin ()
     set_description( N_("TS muxer (libdvbpsi)") )
