@@ -41,7 +41,6 @@
 #include <vlc_vout_osd.h>
 #include <vlc_strings.h>
 #include <vlc_charset.h>
-#include "../libvlc.h"
 #include "vout_internal.h"
 
 /*****************************************************************************
@@ -66,8 +65,6 @@ static int SnapshotCallback( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
 static int VideoFilterCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
-static int VideoSplitterCallback( vlc_object_t *, char const *,
-                                  vlc_value_t, vlc_value_t, void * );
 static int SubFilterCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 static int SubMarginCallback( vlc_object_t *, char const *,
@@ -318,14 +315,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_AddCallback( p_vout, "video-filter", VideoFilterCallback, NULL );
     var_TriggerCallback( p_vout, "video-filter" );
 
-    /* Add a video-splitter variable
-     * TODO rename vout-filter into vout-splitter */
-    var_Create( p_vout, "vout-filter",
-                VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    text.psz_string = _("Video splitter");
-    var_Change( p_vout, "vout-filter", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_vout, "vout-filter", VideoSplitterCallback, NULL );
-
     /* Add a sub-filter variable */
     var_Create( p_vout, "sub-filter",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
@@ -467,27 +456,14 @@ void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
     char *psz_string;
     const char *psz_filter_type;
 
-    /* FIXME temporary hack */
-    const char *psz_module_name = psz_name;
-    if( !strcmp( psz_name, "magnify" ) ||
-        !strcmp( psz_name, "puzzle" ) ||
-        !strcmp( psz_name, "logo" ) ||
-        !strcmp( psz_name, "wall" ) ||
-        !strcmp( psz_name, "clone" ) )
-        psz_module_name = "video_filter_wrapper";
-
-    module_t *p_obj = module_find( psz_module_name );
+    module_t *p_obj = module_find( psz_name );
     if( !p_obj )
     {
         msg_Err( p_vout, "Unable to find filter module \"%s\".", psz_name );
         return;
     }
 
-    if( module_provides( p_obj, "video filter" ) )
-    {
-        psz_filter_type = "vout-filter";
-    }
-    else if( module_provides( p_obj, "video filter2" ) )
+    if( module_provides( p_obj, "video filter2" ) )
     {
         psz_filter_type = "video-filter";
     }
@@ -675,32 +651,6 @@ static int VideoFilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     vout_ControlChangeFilters( p_vout, newval.psz_string );
-    return VLC_SUCCESS;
-}
-
-static int VideoSplitterCallback( vlc_object_t *p_this, char const *psz_cmd,
-                                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    input_thread_t *p_input;
-    (void)psz_cmd; (void)oldval; (void)p_data;
-
-    p_input = (input_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
-                                                 FIND_PARENT );
-    if (!p_input)
-    {
-        msg_Err( p_vout, "Input not found" );
-        return VLC_EGENERIC;
-    }
-
-    /* Modify input as well because the vout might have to be restarted */
-    var_Create( p_input, "vout-filter", VLC_VAR_STRING );
-    var_SetString( p_input, "vout-filter", newval.psz_string );
-
-    /* Now restart current video stream */
-    input_Control( p_input, INPUT_RESTART_ES, -VIDEO_ES );
-    vlc_object_release( p_input );
-
     return VLC_SUCCESS;
 }
 

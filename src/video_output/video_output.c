@@ -141,14 +141,14 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vout->p->title.position = var_GetInteger(vout, "video-title-position");
 
     /* Get splitter name if present */
-    char *splitter_name = var_GetNonEmptyString(vout, "vout-filter");
-    if (splitter_name) {
+    char *splitter_name = var_InheritString(vout, "vout-filter");
+    if (splitter_name && *splitter_name) {
         if (asprintf(&vout->p->splitter_name, "%s,none", splitter_name) < 0)
             vout->p->splitter_name = NULL;
-        free(splitter_name);
     } else {
         vout->p->splitter_name = NULL;
     }
+    free(splitter_name);
 
     /* */
     vout_InitInterlacingSupport(vout, vout->p->displayed.is_interlaced);

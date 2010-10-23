@@ -130,6 +130,21 @@ static int RateOffsetCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
+static int VideoSplitterCallback( vlc_object_t *p_this, char const *psz_cmd,
+                                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    playlist_t *p_playlist = (playlist_t*)p_this;
+
+    PL_LOCK;
+
+    /* Force the input to restart the video ES to force a vout recreation */
+    input_thread_t *p_input = pl_priv( p_playlist )->p_input;
+    if( p_input )
+        input_Control( p_input, INPUT_RESTART_ES, -VIDEO_ES );
+
+    PL_UNLOCK;
+    return VLC_SUCCESS;
+}
 
 /**
  * Create playlist
@@ -398,6 +413,9 @@ static void VariablesInit( playlist_t *p_playlist )
     var_AddCallback( p_playlist, "rate", RateCallback, NULL );
     var_AddCallback( p_playlist, "rate-slower", RateOffsetCallback, NULL );
     var_AddCallback( p_playlist, "rate-faster", RateOffsetCallback, NULL );
+
+    var_Create( p_playlist, "vout-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_AddCallback( p_playlist, "vout-filter", VideoSplitterCallback, NULL );
 
     var_AddCallback( p_playlist, "random", RandomCallback, NULL );
 
