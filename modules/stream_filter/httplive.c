@@ -540,7 +540,7 @@ static int get_HTTPLivePlaylist(stream_t *s, hls_stream_t *hls)
 
     /* Download new playlist file from server */
     if (AccessOpen(s, &hls->url) != VLC_SUCCESS)
-        goto error;
+        return VLC_EGENERIC;
 
     /* Parse the rest of the reply */
     uint8_t *tmp = calloc(1, HTTPLIVE_MAX_LINE);
