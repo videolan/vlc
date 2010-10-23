@@ -49,6 +49,7 @@
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
+#include <vlc_url.h>
 
 #include <shout/shout.h>
 
@@ -166,20 +167,13 @@ static int Open( vlc_object_t *p_this )
     sout_access_out_sys_t *p_sys;
     shout_t *p_shout;
     long i_ret;
-    unsigned int i_port;
     char *psz_val;
 
-    char *psz_accessname;
-    char *psz_parser;
-    const char *psz_user;
-    char *psz_pass;
-    char *psz_host;
-    char *psz_mount;
-    char *psz_port;
     char *psz_name;
     char *psz_description;
     char *psz_genre;
     char *psz_url;
+    vlc_url_t url;
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
@@ -190,53 +184,14 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    psz_accessname = psz_parser = strdup( p_access->psz_path );
-    if( !psz_parser )
-        return VLC_ENOMEM;
-
-    /* Parse connection data user:pwd@host:port/mountpoint */
-    psz_host = strchr( psz_parser, '@' );
-    if( psz_host )
-    {
-        psz_user = psz_parser;
-        *(psz_host++) = '\0';
-    }
-    else
-        psz_user = "";
-
-    psz_pass = strchr( psz_user, ':' );
-    if( psz_pass )
-        *(psz_pass++) = '\0';
-    else
-        psz_pass = "";
-
-    psz_mount = strchr( psz_host, '/' );
-    if( psz_mount )
-        *(psz_mount++) = '\0';
-    else
-        psz_mount = "";
-
-    if( psz_host[0] == '[' )
-    {
-        psz_port = strstr( psz_host, "]:" );
-        if( psz_port )
-        {
-            *psz_port = '\0';
-            psz_port += 2;
-        }
-    }
-    else
-    {
-        psz_port = strchr( psz_host, ':' );
-        if( psz_port )
-            *(psz_port++) = '\0';
-    }
-    i_port = psz_port ? atoi( psz_port ) : 8000;
+    vlc_UrlParse( &url , p_access->psz_path, 0 );
+    if( url.i_port <= 0 )
+        url.i_port = 8000;
 
     p_sys = p_access->p_sys = malloc( sizeof( sout_access_out_sys_t ) );
     if( !p_sys )
     {
-        free( psz_accessname );
+        vlc_UrlClean( &url );
         return VLC_ENOMEM;
     }
 
@@ -247,12 +202,12 @@ static int Open( vlc_object_t *p_this )
 
     p_shout = p_sys->p_shout = shout_new();
     if( !p_shout
-         || shout_set_host( p_shout, psz_host ) != SHOUTERR_SUCCESS
+         || shout_set_host( p_shout, url.psz_host ) != SHOUTERR_SUCCESS
          || shout_set_protocol( p_shout, SHOUT_PROTOCOL_ICY ) != SHOUTERR_SUCCESS
-         || shout_set_port( p_shout, i_port ) != SHOUTERR_SUCCESS
-         || shout_set_password( p_shout, psz_pass ) != SHOUTERR_SUCCESS
-         || shout_set_mount( p_shout, psz_mount ) != SHOUTERR_SUCCESS
-         || shout_set_user( p_shout, psz_user ) != SHOUTERR_SUCCESS
+         || shout_set_port( p_shout, url.i_port ) != SHOUTERR_SUCCESS
+         || shout_set_password( p_shout, url.psz_password ) != SHOUTERR_SUCCESS
+         || shout_set_mount( p_shout, url.psz_path ) != SHOUTERR_SUCCESS
+         || shout_set_user( p_shout, url.psz_username ) != SHOUTERR_SUCCESS
          || shout_set_agent( p_shout, "VLC media player " VERSION ) != SHOUTERR_SUCCESS
          || shout_set_name( p_shout, psz_name ) != SHOUTERR_SUCCESS
          || shout_set_description( p_shout, psz_description ) != SHOUTERR_SUCCESS
@@ -262,13 +217,13 @@ static int Open( vlc_object_t *p_this )
       )
     {
         msg_Err( p_access, "failed to initialize shout streaming to %s:%i/%s",
-                 psz_host, i_port, psz_mount );
+                 url.psz_host, url.i_port, url.psz_path );
         free( p_access->p_sys );
-        free( psz_accessname );
         free( psz_name );
         free( psz_description );
         free( psz_genre );
         free( psz_url );
+        vlc_UrlClean( &url );
         return VLC_EGENERIC;
     }
 
@@ -429,10 +384,8 @@ static int Open( vlc_object_t *p_this )
     if( i_ret != SHOUTERR_CONNECTED )
     {
         msg_Err( p_access, "failed to open shout stream to %s:%i/%s: %s",
-                 psz_host, i_port, psz_mount, shout_get_error(p_shout) );
-        free( p_access->p_sys );
-        free( psz_accessname );
-        return VLC_EGENERIC;
+                 url.psz_host, url.i_port, url.psz_path, shout_get_error(p_shout) );
+        goto error;
     }
 
     p_access->pf_write = Write;
@@ -440,13 +393,13 @@ static int Open( vlc_object_t *p_this )
     p_access->pf_control = Control;
 
     msg_Dbg( p_access, "shout access output opened (%s@%s:%i/%s)",
-             psz_user, psz_host, i_port, psz_mount );
-    free( psz_accessname );
+             url.psz_username, url.psz_host, url.i_port, url.psz_path );
 
+    vlc_UrlClean( &url );
     return VLC_SUCCESS;
 
 error:
-    free( psz_accessname );
+    vlc_UrlClean( &url );
     free( p_sys );
     return VLC_EGENERIC;
 }
