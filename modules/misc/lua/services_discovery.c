@@ -35,7 +35,7 @@
  *****************************************************************************/
 static void *Run( void * );
 static int   DoSearch( services_discovery_t *p_sd, const char *psz_query );
-static int   Search( services_discovery_t *p_sd, const char *psz_query );
+static int   Control( services_discovery_t *p_sd, int i_command, va_list args );
 
 static const char * const ppsz_sd_options[] = { "sd", "longname", NULL };
 
@@ -88,7 +88,7 @@ int Open_LuaSD( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
     p_sd->p_sys = p_sys;
-    p_sd->pf_search = Search;
+    p_sd->pf_control = Control;
     p_sys->psz_filename = vlclua_find_file( p_this, "sd", psz_name );
     if( !p_sys->psz_filename )
     {
@@ -243,13 +243,25 @@ static void* Run( void *data )
 /*****************************************************************************
  * Search: search for items according to the given query
  ****************************************************************************/
-static int Search( services_discovery_t *p_sd, const char *psz_query )
+static int Control( services_discovery_t *p_sd, int i_command, va_list args )
 {
     services_discovery_sys_t *p_sys = p_sd->p_sys;
-    vlc_mutex_lock( &p_sys->lock );
-    TAB_APPEND( p_sys->i_query, p_sys->ppsz_query, strdup( psz_query ) );
-    vlc_cond_signal( &p_sys->cond );
-    vlc_mutex_unlock( &p_sys->lock );
+
+    switch( i_command )
+    {
+    case SD_CMD_SEARCH:
+    {
+        const char *psz_query = va_arg( args, const char * );
+        vlc_mutex_lock( &p_sys->lock );
+        TAB_APPEND( p_sys->i_query, p_sys->ppsz_query, strdup( psz_query ) );
+        vlc_cond_signal( &p_sys->cond );
+        vlc_mutex_unlock( &p_sys->lock );
+        break;
+    }
+
+    case SD_CMD_CAPABILITIES:
+        return VLC_EGENERIC;
+    }
 
     return VLC_SUCCESS;
 }

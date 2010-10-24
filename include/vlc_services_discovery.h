@@ -51,11 +51,14 @@ struct services_discovery_t
     char *psz_name;
     config_chain_t *p_cfg;
 
-    int ( *pf_search ) ( services_discovery_t *, const char * );
+    int ( *pf_control ) ( services_discovery_t *, int, va_list );
 
     services_discovery_sys_t *p_sys;
 };
 
+/**
+ * Service discovery categories
+ */
 enum services_discovery_category_e
 {
     SD_CAT_DEVICES = 1,
@@ -64,6 +67,34 @@ enum services_discovery_category_e
     SD_CAT_MYCOMPUTER
 };
 
+/**
+ * Service discovery control commands
+ */
+enum services_discovery_command_e
+{
+    SD_CMD_SEARCH = 1,          /**< arg1 = query */
+    SD_CMD_CAPABILITIES         /**< arg1 = services_discovery_descriptor_t* */
+};
+
+/**
+ * Service discovery capabilities
+ */
+enum services_discovery_capability_e
+{
+    SD_CAP_SEARCH = 1
+};
+
+/**
+ * Service discovery descriptor
+ */
+typedef struct
+{
+    char *psz_short_desc;
+    char *psz_icon_url;
+    char *psz_url;
+    int   i_capabilities;
+} services_discovery_descriptor_t;
+
 /***********************************************************************
  * Service Discovery
  ***********************************************************************/
@@ -71,13 +102,14 @@ enum services_discovery_category_e
 /**
  * Ask for a research in the SD
  * @param p_sd: the Service Discovery
- * @param psz_query: the query
+ * @param i_control: the command to issue
+ * @param args: the argument list
  * @return VLC_SUCCESS in case of success, the error code overwise
  */
-static inline int vlc_sd_search( services_discovery_t *p_sd, const char *psz_query )
+static inline int vlc_sd_control( services_discovery_t *p_sd, int i_control, va_list args )
 {
-    if( p_sd->pf_search )
-        return p_sd->pf_search( p_sd, psz_query );
+    if( p_sd->pf_control )
+        return p_sd->pf_control( p_sd, i_control, args );
     else
         return VLC_EGENERIC;
 }

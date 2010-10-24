@@ -361,9 +361,9 @@ playlist_NodeDelete
 playlist_NodeInsert
 playlist_NodeRemoveItem
 playlist_PreparseEnqueue
-playlist_QueryServicesDiscovery
 playlist_RecursiveNodeSort
 playlist_ServicesDiscoveryAdd
+playlist_ServicesDiscoveryControl
 playlist_ServicesDiscoveryRemove
 playlist_Status
 playlist_TreeMove
