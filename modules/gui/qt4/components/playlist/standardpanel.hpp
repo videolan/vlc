@@ -111,6 +111,7 @@ private slots:
     void handleRootChange();
     void gotoPlayingItem();
     void search( const QString& searchText );
+    void searchDelayed();
     void popupSelectColumn( QPoint );
     void popupPlView( const QPoint & );
     void toggleColumnShown( int );

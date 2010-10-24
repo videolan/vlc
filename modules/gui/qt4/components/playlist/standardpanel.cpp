@@ -90,8 +90,10 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     searchEdit->setMaximumWidth( 250 );
     searchEdit->setMinimumWidth( 80 );
     layout->addWidget( searchEdit, 0, 2 );
-    CONNECT( searchEdit, textChanged( const QString& ),
+    CONNECT( searchEdit, textEdited( const QString& ),
              this, search( const QString& ) );
+    CONNECT( searchEdit, editingFinished(),
+             this, searchDelayed() );
     layout->setColumnStretch( 2, 3 );
 
     /* Button to switch views */
@@ -219,10 +221,18 @@ void StandardPLPanel::search( const QString& searchText )
                        flat ? currentView->rootIndex() : QModelIndex(),
                        !flat );
     }
-    else
+}
+
+void StandardPLPanel::searchDelayed()
+{
+    int type;
+    QString name;
+    p_selector->getCurrentSelectedItem( &type, &name );
+
+    if( type == SD_TYPE )
     {
         if( !name.isEmpty() )
-            playlist_QueryServicesDiscovery( THEPL, qtu(name), qtu(searchText) );
+            playlist_QueryServicesDiscovery( THEPL, qtu(name), qtu(searchEdit->text() ) );
     }
 }
 
