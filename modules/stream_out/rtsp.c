@@ -596,6 +596,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         {
                             answer->i_status = 454;
                             vlc_mutex_unlock( &rtsp->lock );
+                            net_Close( track.fd );
                             continue;
                         }
                     }
