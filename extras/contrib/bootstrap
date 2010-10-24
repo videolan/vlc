@@ -385,6 +385,9 @@ case `uname` in
     Linux)
         CPUS=`grep -c ^processor /proc/cpuinfo`
      ;;
+    Darwin)
+        CPUS=`sysctl hw.ncpu|cut -d: -f2`
+    ;;
     *)
         CPUS=1  # default
      ;;
