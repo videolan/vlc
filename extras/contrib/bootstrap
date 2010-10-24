@@ -351,12 +351,9 @@ if test -z "$CONTRIBS_RELEASE"; then
 fi
 
 if test $HAVE_DARWIN_9; then
-    set +x
-    echo
-    echo "*****************************************************************"
-    echo "* We are using GCC-4.2 on OS X, so compilation WILL FAIL if it  *"
-    echo "* is NOT installed. *"
-    echo "*****************************************************************"
+    if ! /Developer/usr/bin/gcc-4.2 --version>/dev/null 2>&1; then
+        echo "You do not have GCC-4.2 instelled, compilation WILL FAIL." >&2
+    fi
 fi
 
 if test $HAVE_DARWIN_32; then
