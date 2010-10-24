@@ -289,7 +289,7 @@ vlc_module_begin ()
                           true )
 
     set_section( N_("Tiger rendering defaults"), NULL );
-    add_string( "kate-tiger-default-font-desc", TIGER_DEFAULT_FONT_DESC_DEFAULT, NULL,
+    add_string( "kate-tiger-default-font-desc", TIGER_DEFAULT_FONT_DESC_DEFAULT,
                 TIGER_DEFAULT_FONT_DESC_TEXT, TIGER_DEFAULT_FONT_DESC_LONGTEXT, true);
     add_integer_with_range( "kate-tiger-default-font-effect",
                             TIGER_DEFAULT_FONT_EFFECT_DEFAULT,
