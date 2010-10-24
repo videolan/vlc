@@ -37,6 +37,7 @@
 #include "input_manager.hpp"
 
 #include <vlc_intf_strings.h>
+#include <vlc_services_discovery.h>
 
 #include <QPushButton>
 #include <QHeaderView>
@@ -187,7 +188,7 @@ void StandardPLPanel::searchDelayed( const QString& searchText )
     if( type == SD_TYPE )
     {
         if( !name.isEmpty() && !searchText.isEmpty() )
-            playlist_QueryServicesDiscovery( THEPL, qtu( name ), qtu( searchText ) );
+            playlist_ServicesDiscoveryControl( THEPL, qtu( name ), SD_CMD_SEARCH );
     }
 }
 
