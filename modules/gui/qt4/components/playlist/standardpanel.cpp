@@ -188,7 +188,7 @@ void StandardPLPanel::searchDelayed( const QString& searchText )
     if( type == SD_TYPE )
     {
         if( !name.isEmpty() && !searchText.isEmpty() )
-            playlist_ServicesDiscoveryControl( THEPL, qtu( name ), SD_CMD_SEARCH );
+            playlist_ServicesDiscoveryControl( THEPL, qtu( name ), SD_CMD_SEARCH, qtu( searchText ) );
     }
 }
 
