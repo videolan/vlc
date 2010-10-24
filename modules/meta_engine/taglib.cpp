@@ -77,6 +77,8 @@
 #include <textidentificationframe.h>
 #include <uniquefileidentifierframe.h>
 
+// taglib is not thread safe
+static vlc_mutex_t taglib_lock = VLC_STATIC_MUTEX;
 
 // Local functions
 static int ReadMeta    ( vlc_object_t * );
@@ -363,6 +365,7 @@ static void ReadMetaFromMP4( MP4::Tag* tag, demux_t *p_demux, demux_meta_t *p_de
  */
 static int ReadMeta( vlc_object_t* p_this)
 {
+    vlc_mutex_locker locker (&taglib_lock);
     demux_meta_t*   p_demux_meta = (demux_meta_t *)p_this;
     demux_t*        p_demux = p_demux_meta->p_demux;
     vlc_meta_t*     p_meta;
@@ -585,6 +588,7 @@ static void WriteMetaToXiph( Ogg::XiphComment* tag, input_item_t* p_item )
 
 static int WriteMeta( vlc_object_t *p_this )
 {
+    vlc_mutex_locker locker (&taglib_lock);
     meta_export_t *p_export = (meta_export_t *)p_this;
     input_item_t *p_item = p_export->p_item;
     FileRef f;
