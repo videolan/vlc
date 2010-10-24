@@ -33,14 +33,22 @@
 #include "qt4.hpp"
 
 #include "dialogs_provider.hpp"              /* Media Info from ArtLabel */
+#include "components/playlist/standardpanel.hpp"  /* CoverArt */
 #include "components/interface_widgets.hpp"  /* CoverArt */
+
+
 //#include <vlc_playlist.h>
 
 #include <QSplitter>
 
 class PLSelector;
-class StandardPLPanel;
+
 class QPushButton;
+class StandardPLPanel;
+
+static const QString viewNames[] = { qtr( "Detailed View" ),
+                                     qtr( "Icon View" ),
+                                     qtr( "List View" ) };
 
 class ArtLabel : public CoverArtLabel
 {
@@ -55,6 +63,7 @@ public:
     }
 };
 
+class LocationBar;
 class PlaylistWidget : public QSplitter
 {
     Q_OBJECT
@@ -66,15 +75,23 @@ public:
 private:
     PLSelector      *selector;
     ArtLabel        *art;
-    StandardPLPanel *rightPanel;
+
     QPushButton     *addButton;
     QSplitter       *leftSplitter;
+    QSignalMapper *viewSelectionMapper;
+    QAction *viewActions[3];
+    StandardPLPanel *mainView;
+
+    LocationBar *locationBar;
+    SearchLineEdit *searchEdit;
 protected:
     intf_thread_t *p_intf;
     virtual void dropEvent( QDropEvent *);
     virtual void dragEnterEvent( QDragEnterEvent * );
     virtual void closeEvent( QCloseEvent * );
 
+private slots:
+    void changeView( const QModelIndex& index );
 };
 
 class LocationButton : public QPushButton

@@ -34,6 +34,7 @@
 #include "components/playlist/selector.hpp"
 #include "util/customwidgets.hpp"
 #include "menus.hpp"
+#include "input_manager.hpp"
 
 #include <vlc_intf_strings.h>
 
@@ -52,9 +53,6 @@
 
 #include "sorting.h"
 
-static const QString viewNames[] = { qtr( "Detailed View" ),
-                                     qtr( "Icon View" ),
-                                     qtr( "List View" ) };
 
 StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   intf_thread_t *_p_intf,
@@ -78,49 +76,6 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     currentRootId = -1;
     currentRootIndexId = -1;
     lastActivatedId = -1;
-
-    locationBar = new LocationBar( model );
-    locationBar->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
-    layout->addWidget( locationBar, 0, 0 );
-    layout->setColumnStretch( 0, 5 );
-    CONNECT( locationBar, invoked( const QModelIndex & ),
-             this, browseInto( const QModelIndex & ) );
-
-    searchEdit = new SearchLineEdit( this );
-    searchEdit->setMaximumWidth( 250 );
-    searchEdit->setMinimumWidth( 80 );
-    layout->addWidget( searchEdit, 0, 2 );
-    CONNECT( searchEdit, textEdited( const QString& ),
-             this, search( const QString& ) );
-    CONNECT( searchEdit, editingFinished(),
-             this, searchDelayed() );
-    layout->setColumnStretch( 2, 3 );
-
-    /* Button to switch views */
-    QToolButton *viewButton = new QToolButton( this );
-    viewButton->setIcon( style()->standardIcon( QStyle::SP_FileDialogDetailedView ) );
-    viewButton->setToolTip( qtr("Change playlistview"));
-    layout->addWidget( viewButton, 0, 1 );
-
-    /* View selection menu */
-    viewSelectionMapper = new QSignalMapper( this );
-    CONNECT( viewSelectionMapper, mapped( int ), this, showView( int ) );
-
-    QActionGroup *actionGroup = new QActionGroup( this );
-
-    for( int i = 0; i < VIEW_COUNT; i++ )
-    {
-        viewActions[i] = actionGroup->addAction( viewNames[i] );
-        viewActions[i]->setCheckable( true );
-        viewSelectionMapper->setMapping( viewActions[i], i );
-        CONNECT( viewActions[i], triggered(), viewSelectionMapper, map() );
-    }
-
-    BUTTONACT( viewButton, cycleViews() );
-    QMenu *viewMenu = new QMenu( this );
-    viewMenu->addActions( actionGroup->actions() );
-
-    viewButton->setMenu( viewMenu );
 
     /* Saved Settings */
     getSettings()->beginGroup("Playlist");
@@ -223,7 +178,7 @@ void StandardPLPanel::search( const QString& searchText )
     }
 }
 
-void StandardPLPanel::searchDelayed()
+void StandardPLPanel::searchDelayed( const QString& searchText )
 {
     int type;
     QString name;
@@ -231,8 +186,8 @@ void StandardPLPanel::searchDelayed()
 
     if( type == SD_TYPE )
     {
-        if( !name.isEmpty() && !searchEdit->text().isEmpty() )
-            playlist_QueryServicesDiscovery( THEPL, qtu(name), qtu(searchEdit->text() ) );
+        if( !name.isEmpty() && !searchText.isEmpty() )
+            playlist_QueryServicesDiscovery( THEPL, qtu( name ), qtu( searchText ) );
     }
 }
 
@@ -251,8 +206,7 @@ void StandardPLPanel::browseInto( const QModelIndex &index )
         currentView->setRootIndex( index );
     }
 
-    locationBar->setIndex( index );
-    searchEdit->clear();
+    emit viewChanged( index );
 }
 
 void StandardPLPanel::browseInto( )
@@ -406,7 +360,7 @@ void StandardPLPanel::showView( int i_view )
     }
 
     viewStack->setCurrentWidget( currentView );
-    viewActions[i_view]->setChecked( true );
+    //viewActions[i_view]->setChecked( true );
     browseInto();
     gotoPlayingItem();
 }
@@ -466,6 +420,4 @@ void StandardPLPanel::browseInto( input_item_t *p_input )
 
     lastActivatedId = -1;
 
-
 }
-

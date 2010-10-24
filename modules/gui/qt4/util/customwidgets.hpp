@@ -89,6 +89,10 @@ public slots:
 
 private slots:
     void updateText( const QString& );
+    void searchEditingFinished();
+
+signals:
+    void searchDelayedChanged( const QString& );
 };
 
 class QVLCElidingLabel : public QLabel

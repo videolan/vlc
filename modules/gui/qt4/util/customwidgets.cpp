@@ -148,6 +148,10 @@ SearchLineEdit::SearchLineEdit( QWidget *parent ) : QLineEdit( parent )
 
     CONNECT( this, textEdited( const QString& ),
              this, updateText( const QString& ) );
+
+    CONNECT( this, editingFinished(),
+             this, searchEditingFinished() );
+
 }
 
 void SearchLineEdit::clear()
@@ -206,6 +210,11 @@ void SearchLineEdit::paintEvent( QPaintEvent *event )
   QPainter painter( this );
   painter.setPen( palette().color( QPalette::Disabled, QPalette::Text ) );
   painter.drawText( rect, Qt::AlignLeft | Qt::AlignVCenter, qtr( I_PL_FILTER ) );
+}
+
+void SearchLineEdit::searchEditingFinished()
+{
+    emit searchDelayedChanged( text() );
 }
 
 

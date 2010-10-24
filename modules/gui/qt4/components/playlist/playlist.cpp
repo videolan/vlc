@@ -35,6 +35,7 @@
 #include "main_interface.hpp" /* DropEvent TODO remove this*/
 
 #include <QGroupBox>
+#include <QMenu>
 
 #include <iostream>
 /**********************************************************************
@@ -46,12 +47,14 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 {
     setContentsMargins( 3, 3, 3, 3 );
 
-    /* We use a QSplitter for the left part*/
+    /*******************
+     * Left            *
+     *******************/
+    /* We use a QSplitter for the left part */
     leftSplitter = new QSplitter( Qt::Vertical, this );
 
     /* Source Selector */
     selector = new PLSelector( this, p_intf );
-
     leftSplitter->addWidget( selector);
 
     /* Create a Container for the Art Label
@@ -65,27 +68,81 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     /* Art label */
     art = new ArtLabel( artContainer, p_intf );
     art->setToolTip( qtr( "Double click to get media information" ) );
+    artContLay->addWidget( art, 1 );
 
     CONNECT( THEMIM->getIM(), artChanged( QString ),
              art, showArtUpdate( const QString& ) );
 
-    artContLay->addWidget( art, 1 );
-
     leftSplitter->addWidget( artContainer );
 
+    /*******************
+     * Right           *
+     *******************/
     /* Initialisation of the playlist */
     playlist_t * p_playlist = THEPL;
     PL_LOCK;
     playlist_item_t *p_root = THEPL->p_playing;
     PL_UNLOCK;
 
-    rightPanel = new StandardPLPanel( this, p_intf, THEPL, p_root, selector );
+    QWidget *rightPanel = new QWidget( this );
+    QGridLayout *layout = new QGridLayout( rightPanel );
+    layout->setSpacing( 0 ); layout->setMargin( 0 );
+    setMinimumWidth( 300 );
+
+    PLModel *model = new PLModel( p_playlist, p_intf, p_root, this );
+    mainView = new StandardPLPanel( this, p_intf, THEPL, p_root, selector );
+
+    /* Location Bar */
+    locationBar = new LocationBar( model );
+    locationBar->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
+    layout->addWidget( locationBar, 0, 0 );
+    layout->setColumnStretch( 0, 5 );
+    CONNECT( locationBar, invoked( const QModelIndex & ),
+             mainView, browseInto( const QModelIndex & ) );
+
+    /* Button to switch views */
+    QToolButton *viewButton = new QToolButton( this );
+    viewButton->setIcon( style()->standardIcon( QStyle::SP_FileDialogDetailedView ) );
+    viewButton->setToolTip( qtr("Change playlistview") );
+    layout->addWidget( viewButton, 0, 1 );
+
+    /* View selection menu */
+    viewSelectionMapper = new QSignalMapper( this );
+    CONNECT( viewSelectionMapper, mapped( int ), mainView, showView( int ) );
+
+    QActionGroup *actionGroup = new QActionGroup( this );
+    for( int i = 0; i < StandardPLPanel::VIEW_COUNT; i++ )
+    {
+        viewActions[i] = actionGroup->addAction( viewNames[i] );
+        viewActions[i]->setCheckable( true );
+        viewSelectionMapper->setMapping( viewActions[i], i );
+        CONNECT( viewActions[i], triggered(), viewSelectionMapper, map() );
+    }
+
+    CONNECT( viewButton, clicked(), mainView, cycleViews() );
+    QMenu *viewMenu = new QMenu( this );
+    viewMenu->addActions( actionGroup->actions() );
+    viewButton->setMenu( viewMenu );
+
+    /* Search */
+    searchEdit = new SearchLineEdit( this );
+    searchEdit->setMaximumWidth( 250 );
+    searchEdit->setMinimumWidth( 80 );
+    layout->addWidget( searchEdit, 0, 2 );
+    CONNECT( searchEdit, textEdited( const QString& ),
+             mainView, search( const QString& ) );
+    CONNECT( searchEdit, searchDelayedChanged( const QString& ),
+             mainView, searchDelayed( const QString & ) );
+    CONNECT( mainView, viewChanged( const QModelIndex& ),
+             this, changeView( const QModelIndex &) );
+    layout->setColumnStretch( 2, 3 );
 
     /* Connect the activation of the selector to a redefining of the PL */
     DCONNECT( selector, activated( playlist_item_t * ),
-              rightPanel, setRoot( playlist_item_t * ) );
+              mainView, setRoot( playlist_item_t * ) );
 
-    rightPanel->setRoot( p_root );
+    mainView->setRoot( p_root );
+    layout->addWidget( mainView, 1, 0, 1, -1 );
 
     /* Add the two sides of the QSplitter */
     addWidget( leftSplitter );
@@ -151,15 +208,21 @@ void PlaylistWidget::closeEvent( QCloseEvent *event )
 void PlaylistWidget::forceHide()
 {
     leftSplitter->hide();
-    rightPanel->hide();
+    mainView->hide();
     updateGeometry();
 }
 
 void PlaylistWidget::forceShow()
 {
     leftSplitter->show();
-    rightPanel->show();
+    mainView->show();
     updateGeometry();
+}
+
+void PlaylistWidget::changeView( const QModelIndex& index )
+{
+    searchEdit->clear();
+    locationBar->setIndex( index );
 }
 
 

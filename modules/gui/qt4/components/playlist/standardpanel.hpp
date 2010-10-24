@@ -49,6 +49,9 @@ class QStackedLayout;
 class PlIconView;
 class PlListView;
 class LocationBar;
+class PLSelector;
+class QAbstractItemView;
+class PlaylistWidget;
 
 class StandardPLPanel: public QWidget
 {
@@ -74,10 +77,7 @@ private:
     intf_thread_t *p_intf;
 
     QWidget     *parent;
-    QLabel      *title;
     QGridLayout *layout;
-    LocationBar *locationBar;
-    SearchLineEdit *searchEdit;
     PLSelector  *p_selector;
 
     QTreeView   *treeView;
@@ -86,11 +86,8 @@ private:
     QAbstractItemView *currentView;
     QStackedLayout *viewStack;
 
-    QAction *viewActions[ VIEW_COUNT ];
-    QAction *iconViewAction, *treeViewAction;
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
-    QSignalMapper *viewSelectionMapper;
 
     int lastActivatedId;
     int currentRootIndexId;
@@ -105,20 +102,28 @@ public slots:
     void setRoot( playlist_item_t * );
     void browseInto( const QModelIndex& );
     void browseInto( );
+
 private slots:
     void deleteSelection();
     void handleExpansion( const QModelIndex& );
     void handleRootChange();
-    void gotoPlayingItem();
-    void search( const QString& searchText );
-    void searchDelayed();
-    void popupSelectColumn( QPoint );
-    void popupPlView( const QPoint & );
-    void toggleColumnShown( int );
-    void showView( int );
-    void cycleViews();
     void activate( const QModelIndex & );
     void browseInto( input_item_t * );
+
+    void gotoPlayingItem();
+
+    void search( const QString& searchText );
+    void searchDelayed( const QString& searchText );
+
+    void popupPlView( const QPoint & );
+    void popupSelectColumn( QPoint );
+    void toggleColumnShown( int );
+
+    void showView( int );
+    void cycleViews();
+
+signals:
+    void viewChanged( const QModelIndex& );
 };
 
 #endif
