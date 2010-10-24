@@ -310,7 +310,7 @@ int filter_chain_MouseFilter( filter_chain_t *p_chain, vlc_mouse_t *p_dst, const
 {
     vlc_mouse_t current = *p_src;
 
-    for( chained_filter_t *f = p_chain->first; f != NULL; f = f->next )
+    for( chained_filter_t *f = p_chain->last; f != NULL; f = f->prev )
     {
         filter_t *p_filter = &f->filter;
         vlc_mouse_t *p_mouse = f->mouse;
