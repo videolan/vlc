@@ -231,7 +231,7 @@ void StandardPLPanel::searchDelayed()
 
     if( type == SD_TYPE )
     {
-        if( !name.isEmpty() )
+        if( !name.isEmpty() && !searchEdit->text().isEmpty() )
             playlist_QueryServicesDiscovery( THEPL, qtu(name), qtu(searchEdit->text() ) );
     }
 }
