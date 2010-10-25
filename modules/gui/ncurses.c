@@ -252,52 +252,36 @@ static void ReadDir(intf_thread_t *p_intf)
         struct stat stat_data;
 #endif
         struct dir_entry_t *p_dir_entry;
-        char *psz_uri;
+        char *psz_uri = NULL;
 
-        if (p_sys->b_show_hidden_files == false &&
-            (strlen(psz_entry) && psz_entry[0] == '.') &&
-            strcmp(psz_entry, ".."))
+        if (!p_sys->b_show_hidden_files)
+            if (*psz_entry == '.' && strcmp(psz_entry, ".."))
+                goto next;
+
+        if (asprintf(&psz_uri, "%s/%s", p_sys->psz_current_dir, psz_entry) == -1)
         {
-            free(psz_entry);
-            continue;
+            psz_uri = NULL;
+            goto next;
         }
 
-        if (asprintf(&psz_uri, "%s/%s", p_sys->psz_current_dir,
-                    psz_entry) == -1)
-        {
-            free(psz_entry);
-            continue;
-        }
+        if (!(p_dir_entry = malloc(sizeof *p_dir_entry)))
+            goto next;
 
-        if (!(p_dir_entry = malloc(sizeof(struct dir_entry_t))))
-        {
-            free(psz_uri);
-            free(psz_entry);
-            continue;
-        }
-
+        p_dir_entry->b_file =
 #if defined(S_ISDIR)
-        if (!vlc_stat(psz_uri, &stat_data)
-         && S_ISDIR(stat_data.st_mode))
+            vlc_stat(psz_uri, &stat_data) || !S_ISDIR(stat_data.st_mode)
 /*#elif defined(DT_DIR)
-        if (p_dir_content->d_type & DT_DIR)*/
+            !(p_dir_content->d_type & DT_DIR)*/
 #else
-        if (0)
+            false
 #endif
-        {
-            p_dir_entry->psz_path = strdup(psz_entry);
-            p_dir_entry->b_file = false;
-            INSERT_ELEM(p_sys->pp_dir_entries, p_sys->i_dir_entries,
-                 p_sys->i_dir_entries, p_dir_entry);
-        }
-        else
-        {
-            p_dir_entry->psz_path = strdup(psz_entry);
-            p_dir_entry->b_file = true;
-            INSERT_ELEM(p_sys->pp_dir_entries, p_sys->i_dir_entries,
-                 p_sys->i_dir_entries, p_dir_entry);
-        }
+        ;
 
+        p_dir_entry->psz_path = strdup(psz_entry);
+        INSERT_ELEM(p_sys->pp_dir_entries, p_sys->i_dir_entries,
+             p_sys->i_dir_entries, p_dir_entry);
+
+next:
         free(psz_uri);
         free(psz_entry);
     }
