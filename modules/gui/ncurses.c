@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ncurses.c : NCurses interface for vlc
  *****************************************************************************
- * Copyright © 2001-2007 the VideoLAN team
+ * Copyright © 2001-2010 the VideoLAN team
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
@@ -72,29 +72,6 @@
  *****************************************************************************/
 static int  Open           ( vlc_object_t * );
 static void Close          ( vlc_object_t * );
-
-static void Run            ( intf_thread_t * );
-static void PlayPause      ( intf_thread_t * );
-static void Eject          ( intf_thread_t * );
-
-static int  HandleKey      ( intf_thread_t *, int );
-static void Redraw         ( intf_thread_t *, time_t * );
-
-static playlist_item_t *PlaylistGetRoot( intf_thread_t * );
-static void PlaylistRebuild( intf_thread_t * );
-static void PlaylistAddNode( intf_thread_t *, playlist_item_t *, int, const char *);
-static void PlaylistDestroy( intf_thread_t * );
-static int  PlaylistChanged( vlc_object_t *, const char *, vlc_value_t,
-                             vlc_value_t, void * );
-static inline bool PlaylistIsPlaying( playlist_t *, playlist_item_t * );
-static void FindIndex      ( intf_thread_t *, playlist_t * );
-static void SearchPlaylist ( intf_thread_t *, char * );
-static int  SubSearchPlaylist( intf_thread_t *, char *, int, int );
-
-static void ManageSlider   ( intf_thread_t * );
-static void ReadDir        ( intf_thread_t * );
-
-static void start_color_and_pairs ( intf_thread_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -213,221 +190,330 @@ struct intf_sys_t
     bool      b_need_update;              /* for playlist view         */
 };
 
-static void DrawBox( WINDOW *win, int y, int x, int h, int w, const char *title, bool b_color );
-static void DrawLine( WINDOW *win, int y, int x, int w );
-static void DrawEmptyLine( WINDOW *win, int y, int x, int w );
-
 /*****************************************************************************
- * Open: initialize and create window
+ * Directories
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+
+static int comp_dir_entries( const void *pp_dir_entry1,
+                             const void *pp_dir_entry2 )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    intf_sys_t    *p_sys;
-
-    /* Allocate instance and initialize some members */
-    p_sys = p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( !p_sys )
-        return VLC_ENOMEM;
-    p_sys->p_node = NULL;
-    p_sys->p_input = NULL;
-    p_sys->f_slider = 0.0;
-    p_sys->f_slider_old = 0.0;
-    p_sys->i_box_type = BOX_PLAYLIST;
-    p_sys->i_box_lines = 0;
-    p_sys->i_box_start= 0;
-    p_sys->i_box_lines_total = 0;
-    p_sys->b_box_plidx_follow = true;
-    p_sys->b_box_cleared = false;
-    p_sys->i_box_plidx = 0;
-    p_sys->i_box_bidx = 0;
-// FIXME    p_sys->p_sub = msg_Subscribe( p_intf );
-    p_sys->b_color = var_CreateGetBool( p_intf, "color" );
-    p_sys->b_color_started = false;
-
-#ifndef HAVE_NCURSESW
-    memset( p_sys->psz_partial_keys, 0, sizeof( p_sys->psz_partial_keys ) );
-#endif
-
-    /* Initialize the curses library */
-    p_sys->w = initscr();
-
-    if( p_sys->b_color )
-        start_color_and_pairs( p_intf );
-
-    keypad( p_sys->w, TRUE );
-    /* Don't do NL -> CR/NL */
-    nonl();
-    /* Take input chars one at a time */
-    cbreak();
-    /* Don't echo */
-    noecho();
-    /* Invisible cursor */
-    curs_set( 0 );
-    /* Non blocking wgetch() */
-    wtimeout( p_sys->w, 0 );
-
-    clear();
-
-    /* exported function */
-    p_intf->pf_run = Run;
-
-    /* Stop printing errors to the console */
-    freopen( "/dev/null", "wb", stderr );
-
-    /* Set defaul playlist view */
-    p_sys->i_current_view = VIEW_CATEGORY;
-    p_sys->pp_plist = NULL;
-    p_sys->i_plist_entries = 0;
-    p_sys->b_need_update = false;
-
-    /* Initialize search chain */
-    p_sys->psz_search_chain = malloc( SEARCH_CHAIN_SIZE + 1 );
-    p_sys->psz_old_search = NULL;
-    p_sys->i_before_search = 0;
-
-    /* Initialize open chain */
-    p_sys->psz_open_chain = malloc( OPEN_CHAIN_SIZE + 1 );
-
-    /* Initialize browser options */
-    char* psz_tmp = var_CreateGetString( p_intf, "browse-dir" );
-    if( psz_tmp && *psz_tmp )
-        p_sys->psz_current_dir = psz_tmp;
+    struct dir_entry_t *p_dir_entry1 = *(struct dir_entry_t**)pp_dir_entry1;
+    struct dir_entry_t *p_dir_entry2 = *(struct dir_entry_t**)pp_dir_entry2;
+    if ( p_dir_entry1->b_file == p_dir_entry2->b_file ) {
+        return strcasecmp( p_dir_entry1->psz_path, p_dir_entry2->psz_path );
+    }
     else
     {
-        p_sys->psz_current_dir = config_GetUserDir( VLC_HOME_DIR );
-        free( psz_tmp );
+        return ( p_dir_entry1->b_file ? 1 : -1 );
     }
+}
 
-    p_sys->i_dir_entries = 0;
-    p_sys->pp_dir_entries = NULL;
-    p_sys->b_show_hidden_files = false;
-    ReadDir( p_intf );
+static void ReadDir( intf_thread_t *p_intf )
+{
+    intf_sys_t *p_sys = p_intf->p_sys;
+    DIR *p_current_dir;
+    int i;
 
+    if( p_sys->psz_current_dir && *p_sys->psz_current_dir )
+    {
+        char *psz_entry;
+
+        /* Open the dir */
+        p_current_dir = vlc_opendir( p_sys->psz_current_dir );
+
+        if( p_current_dir == NULL )
+        {
+            /* something went bad, get out of here ! */
+            msg_Warn( p_intf, "cannot open directory `%s' (%m)",
+                      p_sys->psz_current_dir );
+            return;
+        }
+
+        /* Clean the old shit */
+        for( i = 0; i < p_sys->i_dir_entries; i++ )
+        {
+            struct dir_entry_t *p_dir_entry = p_sys->pp_dir_entries[i];
+            free( p_dir_entry->psz_path );
+            REMOVE_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries, i );
+            free( p_dir_entry );
+        }
+        p_sys->pp_dir_entries = NULL;
+        p_sys->i_dir_entries = 0;
+
+        /* while we still have entries in the directory */
+        while( ( psz_entry = vlc_readdir( p_current_dir ) ) != NULL )
+        {
+#if defined( S_ISDIR )
+            struct stat stat_data;
+#endif
+            struct dir_entry_t *p_dir_entry;
+            char *psz_uri;
+
+            if( p_sys->b_show_hidden_files == false &&
+                ( strlen( psz_entry ) && psz_entry[0] == '.' ) &&
+                strcmp( psz_entry, ".." ) )
+            {
+                free( psz_entry );
+                continue;
+            }
+
+            if( asprintf( &psz_uri, "%s/%s", p_sys->psz_current_dir,
+                        psz_entry ) == -1)
+            {
+                free( psz_entry );
+                continue;
+            }
+
+            if( !( p_dir_entry = malloc( sizeof( struct dir_entry_t) ) ) )
+            {
+                free( psz_uri );
+                free( psz_entry );
+                continue;
+            }
+
+#if defined( S_ISDIR )
+            if( !vlc_stat( psz_uri, &stat_data )
+             && S_ISDIR(stat_data.st_mode) )
+/*#elif defined( DT_DIR )
+            if( p_dir_content->d_type & DT_DIR )*/
+#else
+            if( 0 )
+#endif
+            {
+                p_dir_entry->psz_path = strdup( psz_entry );
+                p_dir_entry->b_file = false;
+                INSERT_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries,
+                     p_sys->i_dir_entries, p_dir_entry );
+            }
+            else
+            {
+                p_dir_entry->psz_path = strdup( psz_entry );
+                p_dir_entry->b_file = true;
+                INSERT_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries,
+                     p_sys->i_dir_entries, p_dir_entry );
+            }
+
+            free( psz_uri );
+            free( psz_entry );
+        }
+
+        /* Sort */
+        qsort( p_sys->pp_dir_entries, p_sys->i_dir_entries,
+               sizeof(struct dir_entry_t*), &comp_dir_entries );
+
+        closedir( p_current_dir );
+        return;
+    }
+    else
+    {
+        msg_Dbg( p_intf, "no current dir set" );
+        return;
+    }
+}
+
+/*****************************************************************************
+ * Playlist
+ *****************************************************************************/
+
+static void PlaylistDestroy( intf_thread_t *p_intf )
+{
+    intf_sys_t *p_sys = p_intf->p_sys;
+
+    while( p_sys->i_plist_entries )
+    {
+        struct pl_item_t *p_pl_item = p_sys->pp_plist[0];
+        free( p_pl_item->psz_display );
+        REMOVE_ELEM( p_sys->pp_plist, p_sys->i_plist_entries, 0 );
+        free( p_pl_item );
+    }
+    p_sys->pp_plist = NULL;
+}
+
+static void PlaylistAddNode( intf_thread_t *p_intf, playlist_item_t *p_node,
+                             int i, const char *c )
+{
+    intf_sys_t *p_sys = p_intf->p_sys;
+    playlist_item_t *p_child;
+    int k;
+
+    for( k = 0; k < p_node->i_children; k++ )
+    {
+        char *psz_display;
+        p_child = p_node->pp_children[k];
+        char *psz_name = input_item_GetTitleFbName( p_child->p_input );
+
+        if( c && *c )
+        {
+            if( asprintf( &psz_display, "%s%c-%s", c,
+                    k == p_node->i_children - 1 ?  '`' : '|', psz_name ) == -1 )
+                return;
+        }
+        else
+        {
+            if( asprintf( &psz_display, " %s", psz_name ) == -1 )
+                return;
+        }
+        free( psz_name );
+        struct pl_item_t *p_pl_item = malloc( sizeof( struct pl_item_t ) );
+        if( !p_pl_item )
+            return;
+        p_pl_item->psz_display = psz_display;
+        p_pl_item->p_item = p_child;
+        INSERT_ELEM( p_sys->pp_plist, p_sys->i_plist_entries,
+                     p_sys->i_plist_entries, p_pl_item );
+        i++;
+
+        if( p_child->i_children > 0 )
+        {
+            char *psz_tmp;
+            if( asprintf( &psz_tmp, "%s%c ", c,
+                     k == p_node->i_children - 1 ? ' ' : '|' ) == -1 )
+                return;
+            PlaylistAddNode( p_intf, p_child, i,
+                             strlen( c ) ? psz_tmp : " " );
+            free( psz_tmp );
+        }
+    }
+}
+
+static playlist_item_t *PlaylistGetRoot( intf_thread_t *p_intf )
+{
+    intf_sys_t *p_sys = p_intf->p_sys;
+    playlist_t *p_playlist = pl_Get( p_intf );
+    playlist_item_t *p_item;
+
+    switch( p_sys->i_current_view )
+    {
+        case VIEW_CATEGORY:
+            p_item = p_playlist->p_root_category;
+            break;
+        default:
+            p_item = p_playlist->p_root_onelevel;
+    }
+    return p_item;
+}
+
+static void PlaylistRebuild( intf_thread_t *p_intf )
+{
+    intf_sys_t *p_sys = p_intf->p_sys;
+    playlist_t *p_playlist = pl_Get( p_intf );
+
+    PL_LOCK;
+
+    /* First clear the old one */
+    PlaylistDestroy( p_intf );
+
+    /* Build the new one */
+    PlaylistAddNode( p_intf, PlaylistGetRoot( p_intf ), 0, "" );
+
+    p_sys->b_need_update = false;
+
+    PL_UNLOCK;
+}
+
+static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
+                            vlc_value_t oval, vlc_value_t nval, void *param )
+{
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_variable);
+    VLC_UNUSED(oval); VLC_UNUSED(nval);
+    intf_thread_t *p_intf = (intf_thread_t *)param;
+    playlist_t *p_playlist = pl_Get( p_intf );
+    p_intf->p_sys->b_need_update = true;
+    p_intf->p_sys->p_node = playlist_CurrentPlayingItem(p_playlist) ? playlist_CurrentPlayingItem(p_playlist)->p_parent : NULL;
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * Close: destroy interface window
- *****************************************************************************/
-static void Close( vlc_object_t *p_this )
+/* Playlist suxx */
+/* This function have to be called with the playlist locked */
+static inline bool PlaylistIsPlaying( playlist_t *p_playlist,
+                                      playlist_item_t *p_item )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    intf_sys_t    *p_sys = p_intf->p_sys;
-
-    PlaylistDestroy( p_intf );
-
-    while( p_sys->i_dir_entries )
-    {
-        struct dir_entry_t *p_dir_entry = p_sys->pp_dir_entries[0];
-        free( p_dir_entry->psz_path );
-        REMOVE_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries, 0 );
-        free( p_dir_entry );
-    }
-    p_sys->pp_dir_entries = NULL;
-
-    free( p_sys->psz_current_dir );
-    free( p_sys->psz_search_chain );
-    free( p_sys->psz_old_search );
-    free( p_sys->psz_open_chain );
-
-    if( p_sys->p_input )
-    {
-        vlc_object_release( p_sys->p_input );
-    }
-
-    /* Close the ncurses interface */
-    endwin();
-
-// FIXME    msg_Unsubscribe( p_intf, p_sys->p_sub );
-
-    /* Destroy structure */
-    free( p_sys );
+    playlist_item_t *p_played_item = playlist_CurrentPlayingItem( p_playlist );
+    return( p_item != NULL && p_played_item != NULL &&
+            p_item->p_input != NULL && p_played_item->p_input != NULL &&
+            p_item->p_input->i_id == p_played_item->p_input->i_id );
 }
 
-/*****************************************************************************
- * Run: ncurses thread
- *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
+static int SubSearchPlaylist( intf_thread_t *p_intf, char *psz_searchstring,
+                              int i_start, int i_stop )
 {
-    intf_sys_t    *p_sys = p_intf->p_sys;
-    playlist_t    *p_playlist = pl_Get( p_intf );
-    p_sys->p_playlist = p_playlist;
+    intf_sys_t *p_sys = p_intf->p_sys;
+    int i, i_item = -1;
 
-    int i_key;
-    time_t t_last_refresh;
-    int canc = vlc_savecancel();
-
-    /*
-     * force drawing the interface for the first time
-     */
-    t_last_refresh = ( time( 0 ) - 1);
-    /*
-     * force building of the playlist array
-     */
-    PlaylistRebuild( p_intf );
-    var_AddCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
-    var_AddCallback( p_playlist, "playlist-item-append", PlaylistChanged, p_intf );
-
-    while( vlc_object_alive( p_intf ) )
+    for( i = i_start + 1; i < i_stop; i++ )
     {
-        msleep( INTF_IDLE_SLEEP );
-
-        /* Update the input */
-        if( p_sys->p_input == NULL )
+        if( strcasestr( p_sys->pp_plist[i]->psz_display,
+                        psz_searchstring ) != NULL )
         {
-            p_sys->p_input = playlist_CurrentInput( p_playlist );
+            i_item = i;
+            break;
         }
-        else if( p_sys->p_input->b_dead )
-        {
-            vlc_object_release( p_sys->p_input );
-            p_sys->p_input = NULL;
-            p_sys->f_slider = p_sys->f_slider_old = 0.0;
-            p_sys->b_box_cleared = false;
-        }
+    }
 
+    return i_item;
+}
+
+static void SearchPlaylist( intf_thread_t *p_intf, char *psz_searchstring )
+{
+    int i_max;
+    int i_first = 0 ;
+    int i_item = -1;
+    intf_sys_t *p_sys = p_intf->p_sys;
+
+    if( p_sys->i_before_search >= 0 )
+    {
+        i_first = p_sys->i_before_search;
+    }
+
+    if( ( ! psz_searchstring ) ||  strlen( psz_searchstring ) <= 0 )
+    {
+        p_sys->i_box_plidx = p_sys->i_before_search;
+        return;
+    }
+
+    i_max = p_sys->i_plist_entries;
+
+    i_item = SubSearchPlaylist( p_intf, psz_searchstring, i_first + 1, i_max );
+    if( i_item < 0 )
+    {
+        i_item = SubSearchPlaylist( p_intf, psz_searchstring, 0, i_first );
+    }
+
+    if( i_item < 0 || i_item >= i_max ) return;
+
+    p_sys->i_box_plidx = i_item;
+}
+
+static void FindIndex( intf_thread_t *p_intf, playlist_t *p_playlist )
+{
+    intf_sys_t *p_sys = p_intf->p_sys;
+    int i;
+
+    if( p_sys->i_box_plidx < p_sys->i_plist_entries && p_sys->i_box_plidx >= 0 )
+    {
+        playlist_item_t *p_item = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
         PL_LOCK;
-        if( p_sys->b_box_plidx_follow && playlist_CurrentPlayingItem(p_playlist) )
+        if( ( p_item->i_children == 0 && p_item == p_sys->p_node ) ||
+                PlaylistIsPlaying( p_playlist, p_item ) )
         {
             PL_UNLOCK;
-            FindIndex( p_intf, p_playlist );
-        }
-        else
-            PL_UNLOCK;
-
-        while( ( i_key = wgetch( p_sys->w ) ) != -1 )
-        {
-            /*
-             * HandleKey returns 1 if the screen needs to be redrawn
-             */
-            if( HandleKey( p_intf, i_key ) )
-            {
-                Redraw( p_intf, &t_last_refresh );
-            }
-        }
-        /* Hack */
-        if( p_sys->f_slider > 0.0001 && !p_sys->b_box_cleared )
-        {
-            clear();
-            Redraw( p_intf, &t_last_refresh );
-            p_sys->b_box_cleared = true;
-        }
-
-        /*
-         * redraw the screen every second
-         */
-        if( (time(0) - t_last_refresh) >= 1 )
-        {
-            ManageSlider( p_intf );
-            Redraw( p_intf, &t_last_refresh );
+            return;
         }
     }
-    var_DelCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
-    var_DelCallback( p_playlist, "playlist-item-append", PlaylistChanged, p_intf );
-    vlc_restorecancel( canc );
+
+    for( i = 0; i < p_sys->i_plist_entries; i++ )
+    {
+        playlist_item_t *p_item = p_sys->pp_plist[i]->p_item;
+        if( ( p_item->i_children == 0 && p_item == p_sys->p_node ) ||
+                PlaylistIsPlaying( p_playlist, p_sys->pp_plist[i]->p_item ) )
+        {
+            p_sys->i_box_plidx = i;
+            break;
+        }
+    }
+    PL_UNLOCK;
 }
 
-/* following functions are local */
 static void start_color_and_pairs( intf_thread_t *p_intf )
 {
     assert( p_intf->p_sys->b_color && !p_intf->p_sys->b_color_started );
@@ -480,804 +566,61 @@ static void start_color_and_pairs( intf_thread_t *p_intf )
     p_intf->p_sys->b_color_started = true;
 }
 
-#ifndef HAVE_NCURSESW
-static char *KeyToUTF8( int i_key, char *psz_part )
+/****************************************************************************
+ * Drawing
+ ****************************************************************************/
+
+static void DrawBox( WINDOW *win, int y, int x, int h, int w, const char *title, bool b_color )
 {
-    char *psz_utf8;
-    int len = strlen( psz_part );
-    if( len == 6 )
+    int i;
+    int i_len;
+
+    if( w > 3 && h > 2 )
     {
-        /* overflow error - should not happen */
-        memset( psz_part, 0, 6 );
-        return NULL;
-    }
+        if( b_color )
+            wcolor_set( win, C_BOX, NULL );
+        if( title == NULL ) title = "";
+        i_len = strlen( title );
 
-    psz_part[len] = (char)i_key;
+        if( i_len > w - 2 ) i_len = w - 2;
 
-    psz_utf8 = FromLocaleDup( psz_part );
+        mvwaddch( win, y, x,    ACS_ULCORNER );
+        mvwhline( win, y, x+1,  ACS_HLINE, ( w-i_len-2)/2 );
+        mvwprintw( win,y, x+1+(w-i_len-2)/2, "%s", title );
+        mvwhline( win, y, x+(w-i_len)/2+i_len,  ACS_HLINE, w - 1 - ((w-i_len)/2+i_len) );
+        mvwaddch( win, y, x+w-1,ACS_URCORNER );
 
-    /* Ugly check for incomplete bytes sequences
-     * (in case of non-UTF8 multibyte local encoding) */
-    char *psz;
-    for( psz = psz_utf8; *psz; psz++ )
-        if( ( *psz == '?' ) && ( *psz_utf8 != '?' ) )
+        for( i = 0; i < h-2; i++ )
         {
-            /* incomplete bytes sequence detected
-             * (VLC core inserted dummy question marks) */
-            free( psz_utf8 );
-            return NULL;
+            mvwaddch( win, y+i+1, x,     ACS_VLINE );
+            mvwaddch( win, y+i+1, x+w-1, ACS_VLINE );
         }
 
-    /* Check for incomplete UTF8 bytes sequence */
-    if( EnsureUTF8( psz_utf8 ) == NULL )
-    {
-        free( psz_utf8 );
-        return NULL;
-    }
-
-    memset( psz_part, 0, 6 );
-    return psz_utf8;
-}
-#endif
-
-static inline int RemoveLastUTF8Entity( char *psz, int len )
-{
-    while( len && ( (psz[--len] & 0xc0) == 0x80 ) );
-                       /* UTF8 continuation byte */
-
-    psz[len] = '\0';
-    return len;
-}
-
-static int HandleKey( intf_thread_t *p_intf, int i_key )
-{
-    intf_sys_t *p_sys = p_intf->p_sys;
-    int i_ret = 1;
-
-    playlist_t *p_playlist = pl_Get( p_intf );
-
-    if( p_sys->i_box_type == BOX_PLAYLIST )
-    {
-        int b_ret = true;
-        bool b_box_plidx_follow = false;
-
-        switch( i_key )
-        {
-            /* Playlist Settings */
-            case 'r':
-                var_ToggleBool( p_playlist, "random" );
-                goto end;
-            case 'l':
-                var_ToggleBool( p_playlist, "loop" );
-                goto end;
-            case 'R':
-                var_ToggleBool( p_playlist, "repeat" );
-                goto end;
-
-            /* Playlist sort */
-            case 'o':
-                playlist_RecursiveNodeSort( p_playlist,
-                                            PlaylistGetRoot( p_intf ),
-                                            SORT_TITLE_NODES_FIRST, ORDER_NORMAL );
-                p_sys->b_need_update = true;
-                goto end;
-            case 'O':
-                playlist_RecursiveNodeSort( p_playlist,
-                                            PlaylistGetRoot( p_intf ),
-                                            SORT_TITLE_NODES_FIRST, ORDER_REVERSE );
-                p_sys->b_need_update = true;
-                goto end;
-
-            /* Playlist view */
-            case 'v':
-                switch( p_sys->i_current_view )
-                {
-                    case VIEW_CATEGORY:
-                        p_sys->i_current_view = VIEW_ONELEVEL;
-                        break;
-                    default:
-                        p_sys->i_current_view = VIEW_CATEGORY;
-                }
-                //p_sys->b_need_update = true;
-                PlaylistRebuild( p_intf );
-                goto end;
-
-            /* Playlist navigation */
-            case 'g':
-                FindIndex( p_intf, p_playlist );
-                break;
-            case KEY_HOME:
-                p_sys->i_box_plidx = 0;
-                break;
-#ifdef __FreeBSD__
-/* workaround for FreeBSD + xterm:
- * see http://www.nabble.com/curses-vs.-xterm-key-mismatch-t3574377.html */
-            case KEY_SELECT:
-#endif
-            case KEY_END:
-                p_sys->i_box_plidx = p_playlist->items.i_size - 1;
-                break;
-            case KEY_UP:
-                p_sys->i_box_plidx--;
-                break;
-            case KEY_DOWN:
-                p_sys->i_box_plidx++;
-                break;
-            case KEY_PPAGE:
-                p_sys->i_box_plidx -= p_sys->i_box_lines;
-                break;
-            case KEY_NPAGE:
-                p_sys->i_box_plidx += p_sys->i_box_lines;
-                break;
-            case 'D':
-            case KEY_BACKSPACE:
-            case 0x7f:
-            case KEY_DC:
-            {
-                playlist_item_t *p_item;
-
-                PL_LOCK;
-                p_item = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
-                if( p_item->i_children == -1 )
-                {
-                    playlist_DeleteFromInput( p_playlist,
-                                              p_item->p_input, pl_Locked );
-                }
-                else
-                {
-                    playlist_NodeDelete( p_playlist, p_item,
-                                         true , false );
-                }
-                PL_UNLOCK;
-                PlaylistRebuild( p_intf );
-                break;
-            }
-
-            case KEY_ENTER:
-            case '\r':
-            case '\n':
-                if( !p_sys->pp_plist[p_sys->i_box_plidx] )
-                {
-                    b_ret = false;
-                    break;
-                }
-                if( p_sys->pp_plist[p_sys->i_box_plidx]->p_item->i_children
-                        == -1 )
-                {
-                    playlist_item_t *p_item, *p_parent;
-                    p_item = p_parent =
-                            p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
-
-                    if( !p_parent )
-                        p_parent = p_playlist->p_root_onelevel;
-                    while( p_parent->p_parent )
-                        p_parent = p_parent->p_parent;
-                    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                                      pl_Unlocked, p_parent, p_item );
-                }
-                else if( p_sys->pp_plist[p_sys->i_box_plidx]->p_item->i_children
-                        == 0 )
-                {   /* We only want to set the current node */
-                    playlist_Stop( p_playlist );
-                    p_sys->p_node = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
-                }
-                else
-                {
-                    p_sys->p_node = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
-                    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Unlocked,
-                        p_sys->pp_plist[p_sys->i_box_plidx]->p_item, NULL );
-                }
-                b_box_plidx_follow = true;
-                break;
-            default:
-                b_ret = false;
-                break;
-        }
-
-        if( b_ret )
-        {
-            int i_max = p_sys->i_plist_entries;
-            if( p_sys->i_box_plidx >= i_max ) p_sys->i_box_plidx = i_max - 1;
-            if( p_sys->i_box_plidx < 0 ) p_sys->i_box_plidx = 0;
-
-            PL_LOCK;
-            if( PlaylistIsPlaying( p_playlist,
-                                   p_sys->pp_plist[p_sys->i_box_plidx]->p_item ) )
-                b_box_plidx_follow = true;
-            PL_UNLOCK;
-            p_sys->b_box_plidx_follow = b_box_plidx_follow;
-            goto end;
-        }
-    }
-    if( p_sys->i_box_type == BOX_BROWSE )
-    {
-        bool b_ret = true;
-        /* Browser navigation */
-        switch( i_key )
-        {
-            case KEY_HOME:
-                p_sys->i_box_bidx = 0;
-                break;
-#ifdef __FreeBSD__
-            case KEY_SELECT:
-#endif
-            case KEY_END:
-                p_sys->i_box_bidx = p_sys->i_dir_entries - 1;
-                break;
-            case KEY_UP:
-                p_sys->i_box_bidx--;
-                break;
-            case KEY_DOWN:
-                p_sys->i_box_bidx++;
-                break;
-            case KEY_PPAGE:
-                p_sys->i_box_bidx -= p_sys->i_box_lines;
-                break;
-            case KEY_NPAGE:
-                p_sys->i_box_bidx += p_sys->i_box_lines;
-                break;
-            case '.': /* Toggle show hidden files */
-                p_sys->b_show_hidden_files = ( p_sys->b_show_hidden_files ==
-                    true ? false : true );
-                ReadDir( p_intf );
-                break;
-
-            case KEY_ENTER:
-            case '\r':
-            case '\n':
-            case ' ':
-                if( p_sys->pp_dir_entries[p_sys->i_box_bidx]->b_file || i_key == ' ' )
-                {
-                    char* psz_uri;
-                    if( asprintf( &psz_uri, "%s://%s/%s",
-                        p_sys->pp_dir_entries[p_sys->i_box_bidx]->b_file ?
-                            "file" : "directory",
-                        p_sys->psz_current_dir,
-                        p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path
-                        ) == -1 )
-                    {
-                        psz_uri = NULL;
-                    }
-
-                    playlist_item_t *p_parent = p_sys->p_node;
-                    if( !p_parent )
-                    {
-                        PL_LOCK;
-                        p_parent = playlist_CurrentPlayingItem(p_playlist) ? playlist_CurrentPlayingItem(p_playlist)->p_parent : NULL;
-                        PL_UNLOCK;
-                        if( !p_parent )
-                            p_parent = p_playlist->p_local_onelevel;
-                    }
-
-                    while( p_parent->p_parent && p_parent->p_parent->p_parent )
-                        p_parent = p_parent->p_parent;
-
-                    playlist_Add( p_playlist, psz_uri, NULL, PLAYLIST_APPEND,
-                                  PLAYLIST_END,
-                                  p_parent->p_input ==
-                                    p_playlist->p_local_onelevel->p_input
-                                  , false );
-
-                    p_sys->i_box_type = BOX_PLAYLIST;
-                    free( psz_uri );
-                }
-                else
-                {
-                    if( asprintf( &(p_sys->psz_current_dir), "%s/%s", p_sys->psz_current_dir,
-                                  p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path ) != -1 )
-                        ReadDir( p_intf );
-                }
-                break;
-            default:
-                b_ret = false;
-                break;
-        }
-        if( b_ret )
-        {
-            if( p_sys->i_box_bidx >= p_sys->i_dir_entries ) p_sys->i_box_bidx = p_sys->i_dir_entries - 1;
-            if( p_sys->i_box_bidx < 0 ) p_sys->i_box_bidx = 0;
-            goto end;
-        }
-    }
-    else if( p_sys->i_box_type == BOX_HELP || p_sys->i_box_type == BOX_INFO ||
-             p_sys->i_box_type == BOX_META || p_sys->i_box_type == BOX_STATS ||
-             p_sys->i_box_type == BOX_OBJECTS )
-    {
-        switch( i_key )
-        {
-            case KEY_HOME:
-                p_sys->i_box_start = 0;
-                goto end;
-#ifdef __FreeBSD__
-            case KEY_SELECT:
-#endif
-            case KEY_END:
-                p_sys->i_box_start = p_sys->i_box_lines_total - 1;
-                goto end;
-            case KEY_UP:
-                if( p_sys->i_box_start > 0 ) p_sys->i_box_start--;
-                goto end;
-            case KEY_DOWN:
-                if( p_sys->i_box_start < p_sys->i_box_lines_total - 1 )
-                {
-                    p_sys->i_box_start++;
-                }
-                goto end;
-            case KEY_PPAGE:
-                p_sys->i_box_start -= p_sys->i_box_lines;
-                if( p_sys->i_box_start < 0 ) p_sys->i_box_start = 0;
-                goto end;
-            case KEY_NPAGE:
-                p_sys->i_box_start += p_sys->i_box_lines;
-                if( p_sys->i_box_start >= p_sys->i_box_lines_total )
-                {
-                    p_sys->i_box_start = p_sys->i_box_lines_total - 1;
-                }
-                goto end;
-            default:
-                break;
-        }
-    }
-    else if( p_sys->i_box_type == BOX_NONE )
-    {
-        switch( i_key )
-        {
-            case KEY_HOME:
-                p_sys->f_slider = 0;
-                ManageSlider( p_intf );
-                goto end;
-#ifdef __FreeBSD__
-            case KEY_SELECT:
-#endif
-            case KEY_END:
-                p_sys->f_slider = 99.9;
-                ManageSlider( p_intf );
-                goto end;
-            case KEY_UP:
-                p_sys->f_slider += 5.0;
-                if( p_sys->f_slider >= 99.0 ) p_sys->f_slider = 99.0;
-                ManageSlider( p_intf );
-                goto end;
-            case KEY_DOWN:
-                p_sys->f_slider -= 5.0;
-                if( p_sys->f_slider < 0.0 ) p_sys->f_slider = 0.0;
-                ManageSlider( p_intf );
-                goto end;
-
-            default:
-                break;
-        }
-    }
-    else if( p_sys->i_box_type == BOX_SEARCH && p_sys->psz_search_chain )
-    {
-        int i_chain_len = strlen( p_sys->psz_search_chain );
-        switch( i_key )
-        {
-            case KEY_CLEAR:
-            case 0x0c:      /* ^l */
-                clear();
-                goto end;
-            case KEY_ENTER:
-            case '\r':
-            case '\n':
-                if( i_chain_len > 0 )
-                {
-                    p_sys->psz_old_search = strdup( p_sys->psz_search_chain );
-                }
-                else if( p_sys->psz_old_search )
-                {
-                    SearchPlaylist( p_intf, p_sys->psz_old_search );
-                }
-                p_sys->i_box_type = BOX_PLAYLIST;
-                goto end;
-            case 0x1b: /* ESC */
-                /* Alt+key combinations return 2 keys in the terminal keyboard:
-                 * ESC, and the 2nd key.
-                 * If some other key is available immediately (where immediately
-                 * means after wgetch() 1 second delay ), that means that the
-                 * ESC key was not pressed.
-                 *
-                 * man 3X curs_getch says:
-                 *
-                 * Use of the escape key by a programmer for a single
-                 * character function is discouraged, as it will cause a delay
-                 * of up to one second while the keypad code looks for a
-                 * following function-key sequence.
-                 *
-                 */
-                if( wgetch( p_sys->w ) != ERR )
-                {
-                    i_ret = 0;
-                    goto end;
-                }
-                p_sys->i_box_plidx = p_sys->i_before_search;
-                p_sys->i_box_type = BOX_PLAYLIST;
-                goto end;
-            case KEY_BACKSPACE:
-            case 0x7f:
-                RemoveLastUTF8Entity( p_sys->psz_search_chain, i_chain_len );
-                break;
-            default:
-            {
-#ifdef HAVE_NCURSESW
-                if( i_chain_len + 1 < SEARCH_CHAIN_SIZE )
-                {
-                    p_sys->psz_search_chain[i_chain_len] = (char) i_key;
-                    p_sys->psz_search_chain[i_chain_len + 1] = '\0';
-                }
-#else
-                char *psz_utf8 = KeyToUTF8( i_key, p_sys->psz_partial_keys );
-
-                if( psz_utf8 != NULL )
-                {
-                    if( i_chain_len + strlen( psz_utf8 ) < SEARCH_CHAIN_SIZE )
-                    {
-                        strcpy( p_sys->psz_search_chain + i_chain_len,
-                                psz_utf8 );
-                    }
-                    free( psz_utf8 );
-                }
-#endif
-                break;
-            }
-        }
-        free( p_sys->psz_old_search );
-        p_sys->psz_old_search = NULL;
-        SearchPlaylist( p_intf, p_sys->psz_search_chain );
-        goto end;
-    }
-    else if( p_sys->i_box_type == BOX_OPEN && p_sys->psz_open_chain )
-    {
-        int i_chain_len = strlen( p_sys->psz_open_chain );
-
-        switch( i_key )
-        {
-            case KEY_CLEAR:
-            case 0x0c:          /* ^l */
-                clear();
-                break;
-            case KEY_ENTER:
-            case '\r':
-            case '\n':
-                if( i_chain_len > 0 )
-                {
-                    playlist_item_t *p_parent = p_sys->p_node;
-
-                    PL_LOCK;
-                    if( !p_parent )
-                    p_parent = playlist_CurrentPlayingItem(p_playlist) ? playlist_CurrentPlayingItem(p_playlist)->p_parent : NULL;
-                    if( !p_parent )
-                        p_parent = p_playlist->p_local_onelevel;
-
-                    while( p_parent->p_parent && p_parent->p_parent->p_parent )
-                        p_parent = p_parent->p_parent;
-                    PL_UNLOCK;
-
-                    playlist_Add( p_playlist, p_sys->psz_open_chain, NULL,
-                                  PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
-                                  p_parent->p_input ==
-                                    p_playlist->p_local_onelevel->p_input
-                                  , false );
-
-                    p_sys->b_box_plidx_follow = true;
-                }
-                p_sys->i_box_type = BOX_PLAYLIST;
-                break;
-            case 0x1b:  /* ESC */
-                if( wgetch( p_sys->w ) != ERR )
-                {
-                    i_ret = 0;
-                    break;
-                }
-                p_sys->i_box_type = BOX_PLAYLIST;
-                break;
-            case KEY_BACKSPACE:
-            case 0x7f:
-                RemoveLastUTF8Entity( p_sys->psz_open_chain, i_chain_len );
-                break;
-            default:
-            {
-#ifdef HAVE_NCURSESW
-                if( i_chain_len + 1 < OPEN_CHAIN_SIZE )
-                {
-                    p_sys->psz_open_chain[i_chain_len] = (char) i_key;
-                    p_sys->psz_open_chain[i_chain_len + 1] = '\0';
-                }
-#else
-                char *psz_utf8 = KeyToUTF8( i_key, p_sys->psz_partial_keys );
-
-                if( psz_utf8 != NULL )
-                {
-                    if( i_chain_len + strlen( psz_utf8 ) < OPEN_CHAIN_SIZE )
-                    {
-                        strcpy( p_sys->psz_open_chain + i_chain_len,
-                                psz_utf8 );
-                    }
-                    free( psz_utf8 );
-                }
-#endif
-            }
-        }
-        goto end;
-    }
-
-
-    /* Common keys */
-    switch( i_key )
-    {
-        case 0x1b:  /* ESC */
-            if( wgetch( p_sys->w ) != ERR )
-            {
-                i_ret = 0;
-                break;
-            }
-        case 'q':
-        case 'Q':
-        case KEY_EXIT:
-            libvlc_Quit( p_intf->p_libvlc );
-            i_ret = 0;
-            break;
-
-        /* Box switching */
-        case 'i':
-            if( p_sys->i_box_type == BOX_INFO )
-                p_sys->i_box_type = BOX_NONE;
-            else
-                p_sys->i_box_type = BOX_INFO;
-            p_sys->i_box_lines_total = 0;
-            break;
-        case 'm':
-            if( p_sys->i_box_type == BOX_META )
-                p_sys->i_box_type = BOX_NONE;
-            else
-                p_sys->i_box_type = BOX_META;
-            p_sys->i_box_lines_total = 0;
-            break;
-        case 'L':
-            if( p_sys->i_box_type == BOX_LOG )
-                p_sys->i_box_type = BOX_NONE;
-            else
-                p_sys->i_box_type = BOX_LOG;
-            break;
-        case 'P':
-            if( p_sys->i_box_type == BOX_PLAYLIST )
-                p_sys->i_box_type = BOX_NONE;
-            else
-                p_sys->i_box_type = BOX_PLAYLIST;
-            break;
-        case 'B':
-            if( p_sys->i_box_type == BOX_BROWSE )
-                p_sys->i_box_type = BOX_NONE;
-            else
-                p_sys->i_box_type = BOX_BROWSE;
-            break;
-        case 'x':
-            if( p_sys->i_box_type == BOX_OBJECTS )
-                p_sys->i_box_type = BOX_NONE;
-            else
-                p_sys->i_box_type = BOX_OBJECTS;
-            break;
-        case 'S':
-            if( p_sys->i_box_type == BOX_STATS )
-                p_sys->i_box_type = BOX_NONE;
-            else
-                p_sys->i_box_type = BOX_STATS;
-            break;
-        case 'c':
-            p_sys->b_color = !p_sys->b_color;
-            if( p_sys->b_color && !p_sys->b_color_started )
-                start_color_and_pairs( p_intf );
-            break;
-        case 'h':
-        case 'H':
-            if( p_sys->i_box_type == BOX_HELP )
-                p_sys->i_box_type = BOX_NONE;
-            else
-                p_sys->i_box_type = BOX_HELP;
-            p_sys->i_box_lines_total = 0;
-            break;
-        case '/':
-            if( p_sys->i_box_type != BOX_SEARCH )
-            {
-                if( p_sys->psz_search_chain )
-                {
-                    p_sys->psz_search_chain[0] = '\0';
-                    p_sys->b_box_plidx_follow = false;
-                    p_sys->i_before_search = p_sys->i_box_plidx;
-                    p_sys->i_box_type = BOX_SEARCH;
-                }
-            }
-            break;
-        case 'A': /* Open */
-            if( p_sys->i_box_type != BOX_OPEN )
-            {
-                if( p_sys->psz_open_chain )
-                {
-                    p_sys->psz_open_chain[0] = '\0';
-                    p_sys->i_box_type = BOX_OPEN;
-                }
-            }
-            break;
-
-        /* Navigation */
-        case KEY_RIGHT:
-            p_sys->f_slider += 1.0;
-            if( p_sys->f_slider > 99.9 ) p_sys->f_slider = 99.9;
-            ManageSlider( p_intf );
-            break;
-
-        case KEY_LEFT:
-            p_sys->f_slider -= 1.0;
-            if( p_sys->f_slider < 0.0 ) p_sys->f_slider = 0.0;
-            ManageSlider( p_intf );
-            break;
-
-        /* Common control */
-        case 'f':
-        {
-            bool fs = var_ToggleBool( p_playlist, "fullscreen" );
-            if( p_intf->p_sys->p_input )
-            {
-                vout_thread_t *p_vout = input_GetVout( p_intf->p_sys->p_input );
-                if( p_vout )
-                {
-                    var_SetBool( p_vout, "fullscreen", fs );
-                    vlc_object_release( p_vout );
-                }
-            }
-            i_ret = 0;
-            break;
-        }
-
-        case ' ':
-            PlayPause( p_intf );
-            break;
-
-        case 's':
-            playlist_Stop( p_playlist );
-            break;
-
-        case 'e':
-            Eject( p_intf );
-            break;
-
-        case '[':
-            if( p_sys->p_input )
-                var_TriggerCallback( p_sys->p_input, "prev-title" );
-            break;
-
-        case ']':
-            if( p_sys->p_input )
-                var_TriggerCallback( p_sys->p_input, "next-title" );
-            break;
-
-        case '<':
-            if( p_sys->p_input )
-                var_TriggerCallback( p_sys->p_input, "prev-chapter" );
-            break;
-
-        case '>':
-            if( p_sys->p_input )
-                var_TriggerCallback( p_sys->p_input, "next-chapter" );
-            break;
-
-        case 'p':
-            playlist_Prev( p_playlist );
-            clear();
-            break;
-
-        case 'n':
-            playlist_Next( p_playlist );
-            clear();
-            break;
-
-        case 'a':
-            aout_VolumeUp( p_playlist, 1, NULL );
-            clear();
-            break;
-
-        case 'z':
-            aout_VolumeDown( p_playlist, 1, NULL );
-            clear();
-            break;
-
-        /*
-         * ^l should clear and redraw the screen
-         */
-        case KEY_CLEAR:
-        case 0x0c:          /* ^l */
-            clear();
-            break;
-
-        default:
-            i_ret = 0;
-    }
-
-end:
-    return i_ret;
-}
-
-static void ManageSlider( intf_thread_t *p_intf )
-{
-    intf_sys_t     *p_sys = p_intf->p_sys;
-    input_thread_t *p_input = p_sys->p_input;
-    vlc_value_t     val;
-
-    if( p_input == NULL )
-    {
-        return;
-    }
-    var_Get( p_input, "state", &val );
-    if( val.i_int != PLAYING_S )
-    {
-        return;
-    }
-
-    var_Get( p_input, "position", &val );
-    if( p_sys->f_slider == p_sys->f_slider_old )
-    {
-        p_sys->f_slider =
-        p_sys->f_slider_old = 100 * val.f_float;
-    }
-    else
-    {
-        p_sys->f_slider_old = p_sys->f_slider;
-
-        val.f_float = p_sys->f_slider / 100.0;
-        var_Set( p_input, "position", val );
+        mvwaddch( win, y+h-1, x,     ACS_LLCORNER );
+        mvwhline( win, y+h-1, x+1,   ACS_HLINE, w - 2 );
+        mvwaddch( win, y+h-1, x+w-1, ACS_LRCORNER );
+        if( b_color )
+            wcolor_set( win, C_DEFAULT, NULL );
     }
 }
 
-static void SearchPlaylist( intf_thread_t *p_intf, char *psz_searchstring )
+static void DrawEmptyLine( WINDOW *win, int y, int x, int w )
 {
-    int i_max;
-    int i_first = 0 ;
-    int i_item = -1;
-    intf_sys_t *p_sys = p_intf->p_sys;
-
-    if( p_sys->i_before_search >= 0 )
+    if( w > 0 )
     {
-        i_first = p_sys->i_before_search;
+        mvwhline( win, y, x, ' ', w );
     }
-
-    if( ( ! psz_searchstring ) ||  strlen( psz_searchstring ) <= 0 )
-    {
-        p_sys->i_box_plidx = p_sys->i_before_search;
-        return;
-    }
-
-    i_max = p_sys->i_plist_entries;
-
-    i_item = SubSearchPlaylist( p_intf, psz_searchstring, i_first + 1, i_max );
-    if( i_item < 0 )
-    {
-        i_item = SubSearchPlaylist( p_intf, psz_searchstring, 0, i_first );
-    }
-
-    if( i_item < 0 || i_item >= i_max ) return;
-
-    p_sys->i_box_plidx = i_item;
 }
 
-static int SubSearchPlaylist( intf_thread_t *p_intf, char *psz_searchstring,
-                              int i_start, int i_stop )
+static void DrawLine( WINDOW *win, int y, int x, int w )
 {
-    intf_sys_t *p_sys = p_intf->p_sys;
-    int i, i_item = -1;
-
-    for( i = i_start + 1; i < i_stop; i++ )
+    if( w > 0 )
     {
-        if( strcasestr( p_sys->pp_plist[i]->psz_display,
-                        psz_searchstring ) != NULL )
-        {
-            i_item = i;
-            break;
-        }
+        attrset( A_REVERSE );
+        mvwhline( win, y, x, ' ', w );
+        attroff( A_REVERSE );
     }
-
-    return i_item;
 }
-
 
 static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
 {
@@ -1408,6 +751,7 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
 #endif
     free( p_buf );
 }
+
 static void MainBoxWrite( intf_thread_t *p_intf, int l, int x, const char *p_fmt, ... )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
@@ -2199,153 +1543,86 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
     *t_last_refresh = time( 0 );
 }
 
-static playlist_item_t *PlaylistGetRoot( intf_thread_t *p_intf )
+static void ManageSlider( intf_thread_t *p_intf )
 {
-    intf_sys_t *p_sys = p_intf->p_sys;
-    playlist_t *p_playlist = pl_Get( p_intf );
-    playlist_item_t *p_item;
+    intf_sys_t     *p_sys = p_intf->p_sys;
+    input_thread_t *p_input = p_sys->p_input;
+    vlc_value_t     val;
 
-    switch( p_sys->i_current_view )
+    if( p_input == NULL )
     {
-        case VIEW_CATEGORY:
-            p_item = p_playlist->p_root_category;
-            break;
-        default:
-            p_item = p_playlist->p_root_onelevel;
+        return;
     }
-    return p_item;
-}
-
-static void PlaylistRebuild( intf_thread_t *p_intf )
-{
-    intf_sys_t *p_sys = p_intf->p_sys;
-    playlist_t *p_playlist = pl_Get( p_intf );
-
-    PL_LOCK;
-
-    /* First clear the old one */
-    PlaylistDestroy( p_intf );
-
-    /* Build the new one */
-    PlaylistAddNode( p_intf, PlaylistGetRoot( p_intf ), 0, "" );
-
-    p_sys->b_need_update = false;
-
-    PL_UNLOCK;
-}
-
-static void PlaylistAddNode( intf_thread_t *p_intf, playlist_item_t *p_node,
-                             int i, const char *c )
-{
-    intf_sys_t *p_sys = p_intf->p_sys;
-    playlist_item_t *p_child;
-    int k;
-
-    for( k = 0; k < p_node->i_children; k++ )
+    var_Get( p_input, "state", &val );
+    if( val.i_int != PLAYING_S )
     {
-        char *psz_display;
-        p_child = p_node->pp_children[k];
-        char *psz_name = input_item_GetTitleFbName( p_child->p_input );
+        return;
+    }
 
-        if( c && *c )
-        {
-            if( asprintf( &psz_display, "%s%c-%s", c,
-                    k == p_node->i_children - 1 ?  '`' : '|', psz_name ) == -1 )
-                return;
-        }
-        else
-        {
-            if( asprintf( &psz_display, " %s", psz_name ) == -1 )
-                return;
-        }
-        free( psz_name );
-        struct pl_item_t *p_pl_item = malloc( sizeof( struct pl_item_t ) );
-        if( !p_pl_item )
-            return;
-        p_pl_item->psz_display = psz_display;
-        p_pl_item->p_item = p_child;
-        INSERT_ELEM( p_sys->pp_plist, p_sys->i_plist_entries,
-                     p_sys->i_plist_entries, p_pl_item );
-        i++;
+    var_Get( p_input, "position", &val );
+    if( p_sys->f_slider == p_sys->f_slider_old )
+    {
+        p_sys->f_slider =
+        p_sys->f_slider_old = 100 * val.f_float;
+    }
+    else
+    {
+        p_sys->f_slider_old = p_sys->f_slider;
 
-        if( p_child->i_children > 0 )
-        {
-            char *psz_tmp;
-            if( asprintf( &psz_tmp, "%s%c ", c,
-                     k == p_node->i_children - 1 ? ' ' : '|' ) == -1 )
-                return;
-            PlaylistAddNode( p_intf, p_child, i,
-                             strlen( c ) ? psz_tmp : " " );
-            free( psz_tmp );
-        }
+        val.f_float = p_sys->f_slider / 100.0;
+        var_Set( p_input, "position", val );
     }
 }
 
-static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
-                            vlc_value_t oval, vlc_value_t nval, void *param )
-{
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_variable);
-    VLC_UNUSED(oval); VLC_UNUSED(nval);
-    intf_thread_t *p_intf = (intf_thread_t *)param;
-    playlist_t *p_playlist = pl_Get( p_intf );
-    p_intf->p_sys->b_need_update = true;
-    p_intf->p_sys->p_node = playlist_CurrentPlayingItem(p_playlist) ? playlist_CurrentPlayingItem(p_playlist)->p_parent : NULL;
-    return VLC_SUCCESS;
-}
 
-/* Playlist suxx */
-/* This function have to be called with the playlist locked */
-static inline bool PlaylistIsPlaying( playlist_t *p_playlist,
-                                      playlist_item_t *p_item )
+/* following functions are local */
+#ifndef HAVE_NCURSESW
+static char *KeyToUTF8( int i_key, char *psz_part )
 {
-    playlist_item_t *p_played_item = playlist_CurrentPlayingItem( p_playlist );
-    return( p_item != NULL && p_played_item != NULL &&
-            p_item->p_input != NULL && p_played_item->p_input != NULL &&
-            p_item->p_input->i_id == p_played_item->p_input->i_id );
-}
-
-static void FindIndex( intf_thread_t *p_intf, playlist_t *p_playlist )
-{
-    intf_sys_t *p_sys = p_intf->p_sys;
-    int i;
-
-    if( p_sys->i_box_plidx < p_sys->i_plist_entries && p_sys->i_box_plidx >= 0 )
+    char *psz_utf8;
+    int len = strlen( psz_part );
+    if( len == 6 )
     {
-        playlist_item_t *p_item = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
-        PL_LOCK;
-        if( ( p_item->i_children == 0 && p_item == p_sys->p_node ) ||
-                PlaylistIsPlaying( p_playlist, p_item ) )
+        /* overflow error - should not happen */
+        memset( psz_part, 0, 6 );
+        return NULL;
+    }
+
+    psz_part[len] = (char)i_key;
+
+    psz_utf8 = FromLocaleDup( psz_part );
+
+    /* Ugly check for incomplete bytes sequences
+     * (in case of non-UTF8 multibyte local encoding) */
+    char *psz;
+    for( psz = psz_utf8; *psz; psz++ )
+        if( ( *psz == '?' ) && ( *psz_utf8 != '?' ) )
         {
-            PL_UNLOCK;
-            return;
+            /* incomplete bytes sequence detected
+             * (VLC core inserted dummy question marks) */
+            free( psz_utf8 );
+            return NULL;
         }
+
+    /* Check for incomplete UTF8 bytes sequence */
+    if( EnsureUTF8( psz_utf8 ) == NULL )
+    {
+        free( psz_utf8 );
+        return NULL;
     }
 
-    for( i = 0; i < p_sys->i_plist_entries; i++ )
-    {
-        playlist_item_t *p_item = p_sys->pp_plist[i]->p_item;
-        if( ( p_item->i_children == 0 && p_item == p_sys->p_node ) ||
-                PlaylistIsPlaying( p_playlist, p_sys->pp_plist[i]->p_item ) )
-        {
-            p_sys->i_box_plidx = i;
-            break;
-        }
-    }
-    PL_UNLOCK;
+    memset( psz_part, 0, 6 );
+    return psz_utf8;
 }
+#endif
 
-static void PlaylistDestroy( intf_thread_t *p_intf )
+static inline int RemoveLastUTF8Entity( char *psz, int len )
 {
-    intf_sys_t *p_sys = p_intf->p_sys;
+    while( len && ( (psz[--len] & 0xc0) == 0x80 ) );
+                       /* UTF8 continuation byte */
 
-    while( p_sys->i_plist_entries )
-    {
-        struct pl_item_t *p_pl_item = p_sys->pp_plist[0];
-        free( p_pl_item->psz_display );
-        REMOVE_ELEM( p_sys->pp_plist, p_sys->i_plist_entries, 0 );
-        free( p_pl_item );
-    }
-    p_sys->pp_plist = NULL;
+    psz[len] = '\0';
+    return len;
 }
 
 static void Eject( intf_thread_t *p_intf )
@@ -2447,123 +1724,6 @@ static void Eject( intf_thread_t *p_intf )
     free( psz_device );
 }
 
-static int comp_dir_entries( const void *pp_dir_entry1,
-                             const void *pp_dir_entry2 )
-{
-    struct dir_entry_t *p_dir_entry1 = *(struct dir_entry_t**)pp_dir_entry1;
-    struct dir_entry_t *p_dir_entry2 = *(struct dir_entry_t**)pp_dir_entry2;
-    if ( p_dir_entry1->b_file == p_dir_entry2->b_file ) {
-        return strcasecmp( p_dir_entry1->psz_path, p_dir_entry2->psz_path );
-    }
-    else
-    {
-        return ( p_dir_entry1->b_file ? 1 : -1 );
-    }
-}
-
-static void ReadDir( intf_thread_t *p_intf )
-{
-    intf_sys_t *p_sys = p_intf->p_sys;
-    DIR *p_current_dir;
-    int i;
-
-    if( p_sys->psz_current_dir && *p_sys->psz_current_dir )
-    {
-        char *psz_entry;
-
-        /* Open the dir */
-        p_current_dir = vlc_opendir( p_sys->psz_current_dir );
-
-        if( p_current_dir == NULL )
-        {
-            /* something went bad, get out of here ! */
-            msg_Warn( p_intf, "cannot open directory `%s' (%m)",
-                      p_sys->psz_current_dir );
-            return;
-        }
-
-        /* Clean the old shit */
-        for( i = 0; i < p_sys->i_dir_entries; i++ )
-        {
-            struct dir_entry_t *p_dir_entry = p_sys->pp_dir_entries[i];
-            free( p_dir_entry->psz_path );
-            REMOVE_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries, i );
-            free( p_dir_entry );
-        }
-        p_sys->pp_dir_entries = NULL;
-        p_sys->i_dir_entries = 0;
-
-        /* while we still have entries in the directory */
-        while( ( psz_entry = vlc_readdir( p_current_dir ) ) != NULL )
-        {
-#if defined( S_ISDIR )
-            struct stat stat_data;
-#endif
-            struct dir_entry_t *p_dir_entry;
-            char *psz_uri;
-
-            if( p_sys->b_show_hidden_files == false &&
-                ( strlen( psz_entry ) && psz_entry[0] == '.' ) &&
-                strcmp( psz_entry, ".." ) )
-            {
-                free( psz_entry );
-                continue;
-            }
-
-            if( asprintf( &psz_uri, "%s/%s", p_sys->psz_current_dir,
-                        psz_entry ) == -1)
-            {
-                free( psz_entry );
-                continue;
-            }
-
-            if( !( p_dir_entry = malloc( sizeof( struct dir_entry_t) ) ) )
-            {
-                free( psz_uri );
-                free( psz_entry );
-                continue;
-            }
-
-#if defined( S_ISDIR )
-            if( !vlc_stat( psz_uri, &stat_data )
-             && S_ISDIR(stat_data.st_mode) )
-/*#elif defined( DT_DIR )
-            if( p_dir_content->d_type & DT_DIR )*/
-#else
-            if( 0 )
-#endif
-            {
-                p_dir_entry->psz_path = strdup( psz_entry );
-                p_dir_entry->b_file = false;
-                INSERT_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries,
-                     p_sys->i_dir_entries, p_dir_entry );
-            }
-            else
-            {
-                p_dir_entry->psz_path = strdup( psz_entry );
-                p_dir_entry->b_file = true;
-                INSERT_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries,
-                     p_sys->i_dir_entries, p_dir_entry );
-            }
-
-            free( psz_uri );
-            free( psz_entry );
-        }
-
-        /* Sort */
-        qsort( p_sys->pp_dir_entries, p_sys->i_dir_entries,
-               sizeof(struct dir_entry_t*), &comp_dir_entries );
-
-        closedir( p_current_dir );
-        return;
-    }
-    else
-    {
-        msg_Dbg( p_intf, "no current dir set" );
-        return;
-    }
-}
-
 static void PlayPause( intf_thread_t *p_intf )
 {
     input_thread_t *p_input = p_intf->p_sys->p_input;
@@ -2587,57 +1747,880 @@ static void PlayPause( intf_thread_t *p_intf )
         playlist_Play( p_playlist );
 }
 
-/****************************************************************************
- *
- ****************************************************************************/
-static void DrawBox( WINDOW *win, int y, int x, int h, int w, const char *title, bool b_color )
+static int HandleKey( intf_thread_t *p_intf, int i_key )
 {
-    int i;
-    int i_len;
+    intf_sys_t *p_sys = p_intf->p_sys;
+    int i_ret = 1;
 
-    if( w > 3 && h > 2 )
+    playlist_t *p_playlist = pl_Get( p_intf );
+
+    if( p_sys->i_box_type == BOX_PLAYLIST )
     {
-        if( b_color )
-            wcolor_set( win, C_BOX, NULL );
-        if( title == NULL ) title = "";
-        i_len = strlen( title );
+        int b_ret = true;
+        bool b_box_plidx_follow = false;
 
-        if( i_len > w - 2 ) i_len = w - 2;
-
-        mvwaddch( win, y, x,    ACS_ULCORNER );
-        mvwhline( win, y, x+1,  ACS_HLINE, ( w-i_len-2)/2 );
-        mvwprintw( win,y, x+1+(w-i_len-2)/2, "%s", title );
-        mvwhline( win, y, x+(w-i_len)/2+i_len,  ACS_HLINE, w - 1 - ((w-i_len)/2+i_len) );
-        mvwaddch( win, y, x+w-1,ACS_URCORNER );
-
-        for( i = 0; i < h-2; i++ )
+        switch( i_key )
         {
-            mvwaddch( win, y+i+1, x,     ACS_VLINE );
-            mvwaddch( win, y+i+1, x+w-1, ACS_VLINE );
+            /* Playlist Settings */
+            case 'r':
+                var_ToggleBool( p_playlist, "random" );
+                goto end;
+            case 'l':
+                var_ToggleBool( p_playlist, "loop" );
+                goto end;
+            case 'R':
+                var_ToggleBool( p_playlist, "repeat" );
+                goto end;
+
+            /* Playlist sort */
+            case 'o':
+                playlist_RecursiveNodeSort( p_playlist,
+                                            PlaylistGetRoot( p_intf ),
+                                            SORT_TITLE_NODES_FIRST, ORDER_NORMAL );
+                p_sys->b_need_update = true;
+                goto end;
+            case 'O':
+                playlist_RecursiveNodeSort( p_playlist,
+                                            PlaylistGetRoot( p_intf ),
+                                            SORT_TITLE_NODES_FIRST, ORDER_REVERSE );
+                p_sys->b_need_update = true;
+                goto end;
+
+            /* Playlist view */
+            case 'v':
+                switch( p_sys->i_current_view )
+                {
+                    case VIEW_CATEGORY:
+                        p_sys->i_current_view = VIEW_ONELEVEL;
+                        break;
+                    default:
+                        p_sys->i_current_view = VIEW_CATEGORY;
+                }
+                //p_sys->b_need_update = true;
+                PlaylistRebuild( p_intf );
+                goto end;
+
+            /* Playlist navigation */
+            case 'g':
+                FindIndex( p_intf, p_playlist );
+                break;
+            case KEY_HOME:
+                p_sys->i_box_plidx = 0;
+                break;
+#ifdef __FreeBSD__
+/* workaround for FreeBSD + xterm:
+ * see http://www.nabble.com/curses-vs.-xterm-key-mismatch-t3574377.html */
+            case KEY_SELECT:
+#endif
+            case KEY_END:
+                p_sys->i_box_plidx = p_playlist->items.i_size - 1;
+                break;
+            case KEY_UP:
+                p_sys->i_box_plidx--;
+                break;
+            case KEY_DOWN:
+                p_sys->i_box_plidx++;
+                break;
+            case KEY_PPAGE:
+                p_sys->i_box_plidx -= p_sys->i_box_lines;
+                break;
+            case KEY_NPAGE:
+                p_sys->i_box_plidx += p_sys->i_box_lines;
+                break;
+            case 'D':
+            case KEY_BACKSPACE:
+            case 0x7f:
+            case KEY_DC:
+            {
+                playlist_item_t *p_item;
+
+                PL_LOCK;
+                p_item = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
+                if( p_item->i_children == -1 )
+                {
+                    playlist_DeleteFromInput( p_playlist,
+                                              p_item->p_input, pl_Locked );
+                }
+                else
+                {
+                    playlist_NodeDelete( p_playlist, p_item,
+                                         true , false );
+                }
+                PL_UNLOCK;
+                PlaylistRebuild( p_intf );
+                break;
+            }
+
+            case KEY_ENTER:
+            case '\r':
+            case '\n':
+                if( !p_sys->pp_plist[p_sys->i_box_plidx] )
+                {
+                    b_ret = false;
+                    break;
+                }
+                if( p_sys->pp_plist[p_sys->i_box_plidx]->p_item->i_children
+                        == -1 )
+                {
+                    playlist_item_t *p_item, *p_parent;
+                    p_item = p_parent =
+                            p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
+
+                    if( !p_parent )
+                        p_parent = p_playlist->p_root_onelevel;
+                    while( p_parent->p_parent )
+                        p_parent = p_parent->p_parent;
+                    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+                                      pl_Unlocked, p_parent, p_item );
+                }
+                else if( p_sys->pp_plist[p_sys->i_box_plidx]->p_item->i_children
+                        == 0 )
+                {   /* We only want to set the current node */
+                    playlist_Stop( p_playlist );
+                    p_sys->p_node = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
+                }
+                else
+                {
+                    p_sys->p_node = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
+                    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Unlocked,
+                        p_sys->pp_plist[p_sys->i_box_plidx]->p_item, NULL );
+                }
+                b_box_plidx_follow = true;
+                break;
+            default:
+                b_ret = false;
+                break;
         }
 
-        mvwaddch( win, y+h-1, x,     ACS_LLCORNER );
-        mvwhline( win, y+h-1, x+1,   ACS_HLINE, w - 2 );
-        mvwaddch( win, y+h-1, x+w-1, ACS_LRCORNER );
-        if( b_color )
-            wcolor_set( win, C_DEFAULT, NULL );
+        if( b_ret )
+        {
+            int i_max = p_sys->i_plist_entries;
+            if( p_sys->i_box_plidx >= i_max ) p_sys->i_box_plidx = i_max - 1;
+            if( p_sys->i_box_plidx < 0 ) p_sys->i_box_plidx = 0;
+
+            PL_LOCK;
+            if( PlaylistIsPlaying( p_playlist,
+                                   p_sys->pp_plist[p_sys->i_box_plidx]->p_item ) )
+                b_box_plidx_follow = true;
+            PL_UNLOCK;
+            p_sys->b_box_plidx_follow = b_box_plidx_follow;
+            goto end;
+        }
     }
+    if( p_sys->i_box_type == BOX_BROWSE )
+    {
+        bool b_ret = true;
+        /* Browser navigation */
+        switch( i_key )
+        {
+            case KEY_HOME:
+                p_sys->i_box_bidx = 0;
+                break;
+#ifdef __FreeBSD__
+            case KEY_SELECT:
+#endif
+            case KEY_END:
+                p_sys->i_box_bidx = p_sys->i_dir_entries - 1;
+                break;
+            case KEY_UP:
+                p_sys->i_box_bidx--;
+                break;
+            case KEY_DOWN:
+                p_sys->i_box_bidx++;
+                break;
+            case KEY_PPAGE:
+                p_sys->i_box_bidx -= p_sys->i_box_lines;
+                break;
+            case KEY_NPAGE:
+                p_sys->i_box_bidx += p_sys->i_box_lines;
+                break;
+            case '.': /* Toggle show hidden files */
+                p_sys->b_show_hidden_files = ( p_sys->b_show_hidden_files ==
+                    true ? false : true );
+                ReadDir( p_intf );
+                break;
+
+            case KEY_ENTER:
+            case '\r':
+            case '\n':
+            case ' ':
+                if( p_sys->pp_dir_entries[p_sys->i_box_bidx]->b_file || i_key == ' ' )
+                {
+                    char* psz_uri;
+                    if( asprintf( &psz_uri, "%s://%s/%s",
+                        p_sys->pp_dir_entries[p_sys->i_box_bidx]->b_file ?
+                            "file" : "directory",
+                        p_sys->psz_current_dir,
+                        p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path
+                        ) == -1 )
+                    {
+                        psz_uri = NULL;
+                    }
+
+                    playlist_item_t *p_parent = p_sys->p_node;
+                    if( !p_parent )
+                    {
+                        PL_LOCK;
+                        p_parent = playlist_CurrentPlayingItem(p_playlist) ? playlist_CurrentPlayingItem(p_playlist)->p_parent : NULL;
+                        PL_UNLOCK;
+                        if( !p_parent )
+                            p_parent = p_playlist->p_local_onelevel;
+                    }
+
+                    while( p_parent->p_parent && p_parent->p_parent->p_parent )
+                        p_parent = p_parent->p_parent;
+
+                    playlist_Add( p_playlist, psz_uri, NULL, PLAYLIST_APPEND,
+                                  PLAYLIST_END,
+                                  p_parent->p_input ==
+                                    p_playlist->p_local_onelevel->p_input
+                                  , false );
+
+                    p_sys->i_box_type = BOX_PLAYLIST;
+                    free( psz_uri );
+                }
+                else
+                {
+                    if( asprintf( &(p_sys->psz_current_dir), "%s/%s", p_sys->psz_current_dir,
+                                  p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path ) != -1 )
+                        ReadDir( p_intf );
+                }
+                break;
+            default:
+                b_ret = false;
+                break;
+        }
+        if( b_ret )
+        {
+            if( p_sys->i_box_bidx >= p_sys->i_dir_entries ) p_sys->i_box_bidx = p_sys->i_dir_entries - 1;
+            if( p_sys->i_box_bidx < 0 ) p_sys->i_box_bidx = 0;
+            goto end;
+        }
+    }
+    else if( p_sys->i_box_type == BOX_HELP || p_sys->i_box_type == BOX_INFO ||
+             p_sys->i_box_type == BOX_META || p_sys->i_box_type == BOX_STATS ||
+             p_sys->i_box_type == BOX_OBJECTS )
+    {
+        switch( i_key )
+        {
+            case KEY_HOME:
+                p_sys->i_box_start = 0;
+                goto end;
+#ifdef __FreeBSD__
+            case KEY_SELECT:
+#endif
+            case KEY_END:
+                p_sys->i_box_start = p_sys->i_box_lines_total - 1;
+                goto end;
+            case KEY_UP:
+                if( p_sys->i_box_start > 0 ) p_sys->i_box_start--;
+                goto end;
+            case KEY_DOWN:
+                if( p_sys->i_box_start < p_sys->i_box_lines_total - 1 )
+                {
+                    p_sys->i_box_start++;
+                }
+                goto end;
+            case KEY_PPAGE:
+                p_sys->i_box_start -= p_sys->i_box_lines;
+                if( p_sys->i_box_start < 0 ) p_sys->i_box_start = 0;
+                goto end;
+            case KEY_NPAGE:
+                p_sys->i_box_start += p_sys->i_box_lines;
+                if( p_sys->i_box_start >= p_sys->i_box_lines_total )
+                {
+                    p_sys->i_box_start = p_sys->i_box_lines_total - 1;
+                }
+                goto end;
+            default:
+                break;
+        }
+    }
+    else if( p_sys->i_box_type == BOX_NONE )
+    {
+        switch( i_key )
+        {
+            case KEY_HOME:
+                p_sys->f_slider = 0;
+                ManageSlider( p_intf );
+                goto end;
+#ifdef __FreeBSD__
+            case KEY_SELECT:
+#endif
+            case KEY_END:
+                p_sys->f_slider = 99.9;
+                ManageSlider( p_intf );
+                goto end;
+            case KEY_UP:
+                p_sys->f_slider += 5.0;
+                if( p_sys->f_slider >= 99.0 ) p_sys->f_slider = 99.0;
+                ManageSlider( p_intf );
+                goto end;
+            case KEY_DOWN:
+                p_sys->f_slider -= 5.0;
+                if( p_sys->f_slider < 0.0 ) p_sys->f_slider = 0.0;
+                ManageSlider( p_intf );
+                goto end;
+
+            default:
+                break;
+        }
+    }
+    else if( p_sys->i_box_type == BOX_SEARCH && p_sys->psz_search_chain )
+    {
+        int i_chain_len = strlen( p_sys->psz_search_chain );
+        switch( i_key )
+        {
+            case KEY_CLEAR:
+            case 0x0c:      /* ^l */
+                clear();
+                goto end;
+            case KEY_ENTER:
+            case '\r':
+            case '\n':
+                if( i_chain_len > 0 )
+                {
+                    p_sys->psz_old_search = strdup( p_sys->psz_search_chain );
+                }
+                else if( p_sys->psz_old_search )
+                {
+                    SearchPlaylist( p_intf, p_sys->psz_old_search );
+                }
+                p_sys->i_box_type = BOX_PLAYLIST;
+                goto end;
+            case 0x1b: /* ESC */
+                /* Alt+key combinations return 2 keys in the terminal keyboard:
+                 * ESC, and the 2nd key.
+                 * If some other key is available immediately (where immediately
+                 * means after wgetch() 1 second delay ), that means that the
+                 * ESC key was not pressed.
+                 *
+                 * man 3X curs_getch says:
+                 *
+                 * Use of the escape key by a programmer for a single
+                 * character function is discouraged, as it will cause a delay
+                 * of up to one second while the keypad code looks for a
+                 * following function-key sequence.
+                 *
+                 */
+                if( wgetch( p_sys->w ) != ERR )
+                {
+                    i_ret = 0;
+                    goto end;
+                }
+                p_sys->i_box_plidx = p_sys->i_before_search;
+                p_sys->i_box_type = BOX_PLAYLIST;
+                goto end;
+            case KEY_BACKSPACE:
+            case 0x7f:
+                RemoveLastUTF8Entity( p_sys->psz_search_chain, i_chain_len );
+                break;
+            default:
+            {
+#ifdef HAVE_NCURSESW
+                if( i_chain_len + 1 < SEARCH_CHAIN_SIZE )
+                {
+                    p_sys->psz_search_chain[i_chain_len] = (char) i_key;
+                    p_sys->psz_search_chain[i_chain_len + 1] = '\0';
+                }
+#else
+                char *psz_utf8 = KeyToUTF8( i_key, p_sys->psz_partial_keys );
+
+                if( psz_utf8 != NULL )
+                {
+                    if( i_chain_len + strlen( psz_utf8 ) < SEARCH_CHAIN_SIZE )
+                    {
+                        strcpy( p_sys->psz_search_chain + i_chain_len,
+                                psz_utf8 );
+                    }
+                    free( psz_utf8 );
+                }
+#endif
+                break;
+            }
+        }
+        free( p_sys->psz_old_search );
+        p_sys->psz_old_search = NULL;
+        SearchPlaylist( p_intf, p_sys->psz_search_chain );
+        goto end;
+    }
+    else if( p_sys->i_box_type == BOX_OPEN && p_sys->psz_open_chain )
+    {
+        int i_chain_len = strlen( p_sys->psz_open_chain );
+
+        switch( i_key )
+        {
+            case KEY_CLEAR:
+            case 0x0c:          /* ^l */
+                clear();
+                break;
+            case KEY_ENTER:
+            case '\r':
+            case '\n':
+                if( i_chain_len > 0 )
+                {
+                    playlist_item_t *p_parent = p_sys->p_node;
+
+                    PL_LOCK;
+                    if( !p_parent )
+                    p_parent = playlist_CurrentPlayingItem(p_playlist) ? playlist_CurrentPlayingItem(p_playlist)->p_parent : NULL;
+                    if( !p_parent )
+                        p_parent = p_playlist->p_local_onelevel;
+
+                    while( p_parent->p_parent && p_parent->p_parent->p_parent )
+                        p_parent = p_parent->p_parent;
+                    PL_UNLOCK;
+
+                    playlist_Add( p_playlist, p_sys->psz_open_chain, NULL,
+                                  PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
+                                  p_parent->p_input ==
+                                    p_playlist->p_local_onelevel->p_input
+                                  , false );
+
+                    p_sys->b_box_plidx_follow = true;
+                }
+                p_sys->i_box_type = BOX_PLAYLIST;
+                break;
+            case 0x1b:  /* ESC */
+                if( wgetch( p_sys->w ) != ERR )
+                {
+                    i_ret = 0;
+                    break;
+                }
+                p_sys->i_box_type = BOX_PLAYLIST;
+                break;
+            case KEY_BACKSPACE:
+            case 0x7f:
+                RemoveLastUTF8Entity( p_sys->psz_open_chain, i_chain_len );
+                break;
+            default:
+            {
+#ifdef HAVE_NCURSESW
+                if( i_chain_len + 1 < OPEN_CHAIN_SIZE )
+                {
+                    p_sys->psz_open_chain[i_chain_len] = (char) i_key;
+                    p_sys->psz_open_chain[i_chain_len + 1] = '\0';
+                }
+#else
+                char *psz_utf8 = KeyToUTF8( i_key, p_sys->psz_partial_keys );
+
+                if( psz_utf8 != NULL )
+                {
+                    if( i_chain_len + strlen( psz_utf8 ) < OPEN_CHAIN_SIZE )
+                    {
+                        strcpy( p_sys->psz_open_chain + i_chain_len,
+                                psz_utf8 );
+                    }
+                    free( psz_utf8 );
+                }
+#endif
+            }
+        }
+        goto end;
+    }
+
+
+    /* Common keys */
+    switch( i_key )
+    {
+        case 0x1b:  /* ESC */
+            if( wgetch( p_sys->w ) != ERR )
+            {
+                i_ret = 0;
+                break;
+            }
+        case 'q':
+        case 'Q':
+        case KEY_EXIT:
+            libvlc_Quit( p_intf->p_libvlc );
+            i_ret = 0;
+            break;
+
+        /* Box switching */
+        case 'i':
+            if( p_sys->i_box_type == BOX_INFO )
+                p_sys->i_box_type = BOX_NONE;
+            else
+                p_sys->i_box_type = BOX_INFO;
+            p_sys->i_box_lines_total = 0;
+            break;
+        case 'm':
+            if( p_sys->i_box_type == BOX_META )
+                p_sys->i_box_type = BOX_NONE;
+            else
+                p_sys->i_box_type = BOX_META;
+            p_sys->i_box_lines_total = 0;
+            break;
+        case 'L':
+            if( p_sys->i_box_type == BOX_LOG )
+                p_sys->i_box_type = BOX_NONE;
+            else
+                p_sys->i_box_type = BOX_LOG;
+            break;
+        case 'P':
+            if( p_sys->i_box_type == BOX_PLAYLIST )
+                p_sys->i_box_type = BOX_NONE;
+            else
+                p_sys->i_box_type = BOX_PLAYLIST;
+            break;
+        case 'B':
+            if( p_sys->i_box_type == BOX_BROWSE )
+                p_sys->i_box_type = BOX_NONE;
+            else
+                p_sys->i_box_type = BOX_BROWSE;
+            break;
+        case 'x':
+            if( p_sys->i_box_type == BOX_OBJECTS )
+                p_sys->i_box_type = BOX_NONE;
+            else
+                p_sys->i_box_type = BOX_OBJECTS;
+            break;
+        case 'S':
+            if( p_sys->i_box_type == BOX_STATS )
+                p_sys->i_box_type = BOX_NONE;
+            else
+                p_sys->i_box_type = BOX_STATS;
+            break;
+        case 'c':
+            p_sys->b_color = !p_sys->b_color;
+            if( p_sys->b_color && !p_sys->b_color_started )
+                start_color_and_pairs( p_intf );
+            break;
+        case 'h':
+        case 'H':
+            if( p_sys->i_box_type == BOX_HELP )
+                p_sys->i_box_type = BOX_NONE;
+            else
+                p_sys->i_box_type = BOX_HELP;
+            p_sys->i_box_lines_total = 0;
+            break;
+        case '/':
+            if( p_sys->i_box_type != BOX_SEARCH )
+            {
+                if( p_sys->psz_search_chain )
+                {
+                    p_sys->psz_search_chain[0] = '\0';
+                    p_sys->b_box_plidx_follow = false;
+                    p_sys->i_before_search = p_sys->i_box_plidx;
+                    p_sys->i_box_type = BOX_SEARCH;
+                }
+            }
+            break;
+        case 'A': /* Open */
+            if( p_sys->i_box_type != BOX_OPEN )
+            {
+                if( p_sys->psz_open_chain )
+                {
+                    p_sys->psz_open_chain[0] = '\0';
+                    p_sys->i_box_type = BOX_OPEN;
+                }
+            }
+            break;
+
+        /* Navigation */
+        case KEY_RIGHT:
+            p_sys->f_slider += 1.0;
+            if( p_sys->f_slider > 99.9 ) p_sys->f_slider = 99.9;
+            ManageSlider( p_intf );
+            break;
+
+        case KEY_LEFT:
+            p_sys->f_slider -= 1.0;
+            if( p_sys->f_slider < 0.0 ) p_sys->f_slider = 0.0;
+            ManageSlider( p_intf );
+            break;
+
+        /* Common control */
+        case 'f':
+        {
+            bool fs = var_ToggleBool( p_playlist, "fullscreen" );
+            if( p_intf->p_sys->p_input )
+            {
+                vout_thread_t *p_vout = input_GetVout( p_intf->p_sys->p_input );
+                if( p_vout )
+                {
+                    var_SetBool( p_vout, "fullscreen", fs );
+                    vlc_object_release( p_vout );
+                }
+            }
+            i_ret = 0;
+            break;
+        }
+
+        case ' ':
+            PlayPause( p_intf );
+            break;
+
+        case 's':
+            playlist_Stop( p_playlist );
+            break;
+
+        case 'e':
+            Eject( p_intf );
+            break;
+
+        case '[':
+            if( p_sys->p_input )
+                var_TriggerCallback( p_sys->p_input, "prev-title" );
+            break;
+
+        case ']':
+            if( p_sys->p_input )
+                var_TriggerCallback( p_sys->p_input, "next-title" );
+            break;
+
+        case '<':
+            if( p_sys->p_input )
+                var_TriggerCallback( p_sys->p_input, "prev-chapter" );
+            break;
+
+        case '>':
+            if( p_sys->p_input )
+                var_TriggerCallback( p_sys->p_input, "next-chapter" );
+            break;
+
+        case 'p':
+            playlist_Prev( p_playlist );
+            clear();
+            break;
+
+        case 'n':
+            playlist_Next( p_playlist );
+            clear();
+            break;
+
+        case 'a':
+            aout_VolumeUp( p_playlist, 1, NULL );
+            clear();
+            break;
+
+        case 'z':
+            aout_VolumeDown( p_playlist, 1, NULL );
+            clear();
+            break;
+
+        /*
+         * ^l should clear and redraw the screen
+         */
+        case KEY_CLEAR:
+        case 0x0c:          /* ^l */
+            clear();
+            break;
+
+        default:
+            i_ret = 0;
+    }
+
+end:
+    return i_ret;
 }
 
-static void DrawEmptyLine( WINDOW *win, int y, int x, int w )
+/*****************************************************************************
+ * Run: ncurses thread
+ *****************************************************************************/
+static void Run( intf_thread_t *p_intf )
 {
-    if( w > 0 )
+    intf_sys_t    *p_sys = p_intf->p_sys;
+    playlist_t    *p_playlist = pl_Get( p_intf );
+    p_sys->p_playlist = p_playlist;
+
+    int i_key;
+    time_t t_last_refresh;
+    int canc = vlc_savecancel();
+
+    /*
+     * force drawing the interface for the first time
+     */
+    t_last_refresh = ( time( 0 ) - 1);
+    /*
+     * force building of the playlist array
+     */
+    PlaylistRebuild( p_intf );
+    var_AddCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
+    var_AddCallback( p_playlist, "playlist-item-append", PlaylistChanged, p_intf );
+
+    while( vlc_object_alive( p_intf ) )
     {
-        mvwhline( win, y, x, ' ', w );
+        msleep( INTF_IDLE_SLEEP );
+
+        /* Update the input */
+        if( p_sys->p_input == NULL )
+        {
+            p_sys->p_input = playlist_CurrentInput( p_playlist );
+        }
+        else if( p_sys->p_input->b_dead )
+        {
+            vlc_object_release( p_sys->p_input );
+            p_sys->p_input = NULL;
+            p_sys->f_slider = p_sys->f_slider_old = 0.0;
+            p_sys->b_box_cleared = false;
+        }
+
+        PL_LOCK;
+        if( p_sys->b_box_plidx_follow && playlist_CurrentPlayingItem(p_playlist) )
+        {
+            PL_UNLOCK;
+            FindIndex( p_intf, p_playlist );
+        }
+        else
+            PL_UNLOCK;
+
+        while( ( i_key = wgetch( p_sys->w ) ) != -1 )
+        {
+            /*
+             * HandleKey returns 1 if the screen needs to be redrawn
+             */
+            if( HandleKey( p_intf, i_key ) )
+            {
+                Redraw( p_intf, &t_last_refresh );
+            }
+        }
+        /* Hack */
+        if( p_sys->f_slider > 0.0001 && !p_sys->b_box_cleared )
+        {
+            clear();
+            Redraw( p_intf, &t_last_refresh );
+            p_sys->b_box_cleared = true;
+        }
+
+        /*
+         * redraw the screen every second
+         */
+        if( (time(0) - t_last_refresh) >= 1 )
+        {
+            ManageSlider( p_intf );
+            Redraw( p_intf, &t_last_refresh );
+        }
     }
+    var_DelCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
+    var_DelCallback( p_playlist, "playlist-item-append", PlaylistChanged, p_intf );
+    vlc_restorecancel( canc );
 }
 
-static void DrawLine( WINDOW *win, int y, int x, int w )
+/*****************************************************************************
+ * Open: initialize and create window
+ *****************************************************************************/
+static int Open( vlc_object_t *p_this )
 {
-    if( w > 0 )
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    intf_sys_t    *p_sys;
+
+    /* Allocate instance and initialize some members */
+    p_sys = p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
+    p_sys->p_node = NULL;
+    p_sys->p_input = NULL;
+    p_sys->f_slider = 0.0;
+    p_sys->f_slider_old = 0.0;
+    p_sys->i_box_type = BOX_PLAYLIST;
+    p_sys->i_box_lines = 0;
+    p_sys->i_box_start= 0;
+    p_sys->i_box_lines_total = 0;
+    p_sys->b_box_plidx_follow = true;
+    p_sys->b_box_cleared = false;
+    p_sys->i_box_plidx = 0;
+    p_sys->i_box_bidx = 0;
+// FIXME    p_sys->p_sub = msg_Subscribe( p_intf );
+    p_sys->b_color = var_CreateGetBool( p_intf, "color" );
+    p_sys->b_color_started = false;
+
+#ifndef HAVE_NCURSESW
+    memset( p_sys->psz_partial_keys, 0, sizeof( p_sys->psz_partial_keys ) );
+#endif
+
+    /* Initialize the curses library */
+    p_sys->w = initscr();
+
+    if( p_sys->b_color )
+        start_color_and_pairs( p_intf );
+
+    keypad( p_sys->w, TRUE );
+    /* Don't do NL -> CR/NL */
+    nonl();
+    /* Take input chars one at a time */
+    cbreak();
+    /* Don't echo */
+    noecho();
+    /* Invisible cursor */
+    curs_set( 0 );
+    /* Non blocking wgetch() */
+    wtimeout( p_sys->w, 0 );
+
+    clear();
+
+    /* exported function */
+    p_intf->pf_run = Run;
+
+    /* Stop printing errors to the console */
+    freopen( "/dev/null", "wb", stderr );
+
+    /* Set defaul playlist view */
+    p_sys->i_current_view = VIEW_CATEGORY;
+    p_sys->pp_plist = NULL;
+    p_sys->i_plist_entries = 0;
+    p_sys->b_need_update = false;
+
+    /* Initialize search chain */
+    p_sys->psz_search_chain = malloc( SEARCH_CHAIN_SIZE + 1 );
+    p_sys->psz_old_search = NULL;
+    p_sys->i_before_search = 0;
+
+    /* Initialize open chain */
+    p_sys->psz_open_chain = malloc( OPEN_CHAIN_SIZE + 1 );
+
+    /* Initialize browser options */
+    char* psz_tmp = var_CreateGetString( p_intf, "browse-dir" );
+    if( psz_tmp && *psz_tmp )
+        p_sys->psz_current_dir = psz_tmp;
+    else
     {
-        attrset( A_REVERSE );
-        mvwhline( win, y, x, ' ', w );
-        attroff( A_REVERSE );
+        p_sys->psz_current_dir = config_GetUserDir( VLC_HOME_DIR );
+        free( psz_tmp );
     }
+
+    p_sys->i_dir_entries = 0;
+    p_sys->pp_dir_entries = NULL;
+    p_sys->b_show_hidden_files = false;
+    ReadDir( p_intf );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Close: destroy interface window
+ *****************************************************************************/
+static void Close( vlc_object_t *p_this )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    intf_sys_t    *p_sys = p_intf->p_sys;
+
+    PlaylistDestroy( p_intf );
+
+    while( p_sys->i_dir_entries )
+    {
+        struct dir_entry_t *p_dir_entry = p_sys->pp_dir_entries[0];
+        free( p_dir_entry->psz_path );
+        REMOVE_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries, 0 );
+        free( p_dir_entry );
+    }
+    p_sys->pp_dir_entries = NULL;
+
+    free( p_sys->psz_current_dir );
+    free( p_sys->psz_search_chain );
+    free( p_sys->psz_old_search );
+    free( p_sys->psz_open_chain );
+
+    if( p_sys->p_input )
+    {
+        vlc_object_release( p_sys->p_input );
+    }
+
+    /* Close the ncurses interface */
+    endwin();
+
+// FIXME    msg_Unsubscribe( p_intf, p_sys->p_sub );
+
+    /* Destroy structure */
+    free( p_sys );
 }
