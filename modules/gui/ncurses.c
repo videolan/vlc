@@ -309,66 +309,73 @@ static void PlaylistDestroy(intf_sys_t *p_sys)
     p_sys->pp_plist = NULL;
 }
 
-static void PlaylistAddNode(intf_thread_t *p_intf, playlist_item_t *p_node,
-                             int i, const char *c)
+static inline playlist_item_t *PlaylistGetRoot(intf_thread_t *p_intf)
 {
-    intf_sys_t *p_sys = p_intf->p_sys;
-    playlist_item_t *p_child;
-    int k;
+    playlist_t *p_playlist = pl_Get(p_intf);
+    return p_intf->p_sys->i_current_view == VIEW_CATEGORY ?
+        p_playlist->p_root_category :
+        p_playlist->p_root_onelevel;
+}
 
-    for(k = 0; k < p_node->i_children; k++)
+static bool PlaylistAddChild(intf_sys_t *p_sys, playlist_item_t *p_child,
+                             const char *c, const char d)
+{
+    int ret;
+    char *psz_name = input_item_GetTitleFbName(p_child->p_input);
+    struct pl_item_t *p_pl_item = malloc(sizeof *p_pl_item);
+
+    if (!psz_name || !p_pl_item)
+        goto error;
+
+    p_pl_item->p_item = p_child;
+
+    if (c && *c)
+        ret = asprintf(&p_pl_item->psz_display, "%s%c-%s", c, d, psz_name);
+    else
+        ret = asprintf(&p_pl_item->psz_display, " %s", psz_name);
+
+    free(psz_name);
+    psz_name = NULL;
+
+    if (ret == -1)
+        goto error;
+
+    INSERT_ELEM(p_sys->pp_plist, p_sys->i_plist_entries,
+                 p_sys->i_plist_entries, p_pl_item);
+
+    return true;
+
+error:
+    free(psz_name);
+    free(p_pl_item);
+    return false;
+}
+
+static void PlaylistAddNode(intf_sys_t *p_sys, playlist_item_t *p_node,
+                            const char *c)
+{
+    for(int k = 0; k < p_node->i_children; k++)
     {
-        char *psz_display;
-        p_child = p_node->pp_children[k];
-        char *psz_name = input_item_GetTitleFbName(p_child->p_input);
-
-        if (c && *c)
-        {
-            if (asprintf(&psz_display, "%s%c-%s", c,
-                    k == p_node->i_children - 1 ?  '`' : '|', psz_name) == -1)
-                return;
-        }
-        else if (asprintf(&psz_display, " %s", psz_name) == -1)
-                return;
-
-        free(psz_name);
-        struct pl_item_t *p_pl_item = malloc(sizeof(struct pl_item_t));
-        if (!p_pl_item)
+        playlist_item_t *p_child = p_node->pp_children[k];
+        char d = k == p_node->i_children - 1 ? '`' : '|';
+        if(!PlaylistAddChild(p_sys, p_child, c, d))
             return;
-        p_pl_item->psz_display = psz_display;
-        p_pl_item->p_item = p_child;
-        INSERT_ELEM(p_sys->pp_plist, p_sys->i_plist_entries,
-                     p_sys->i_plist_entries, p_pl_item);
-        i++;
 
-        if (p_child->i_children > 0)
+        if (p_child->i_children <= 0)
+            continue;
+
+        if (*c)
         {
             char *psz_tmp;
             if (asprintf(&psz_tmp, "%s%c ", c,
                      k == p_node->i_children - 1 ? ' ' : '|') == -1)
                 return;
-            PlaylistAddNode(p_intf, p_child, i,
-                             strlen(c) ? psz_tmp : " ");
+            PlaylistAddNode(p_sys, p_child, psz_tmp);
             free(psz_tmp);
         }
+        else
+            PlaylistAddNode(p_sys, p_child, " ");
     }
-}
-
-static playlist_item_t *PlaylistGetRoot(intf_thread_t *p_intf)
-{
-    intf_sys_t *p_sys = p_intf->p_sys;
-    playlist_t *p_playlist = pl_Get(p_intf);
-    playlist_item_t *p_item;
-
-    switch(p_sys->i_current_view)
-    {
-        case VIEW_CATEGORY:
-            p_item = p_playlist->p_root_category;
-            break;
-        default:
-            p_item = p_playlist->p_root_onelevel;
-    }
-    return p_item;
 }
 
 static void PlaylistRebuild(intf_thread_t *p_intf)
@@ -378,12 +385,8 @@ static void PlaylistRebuild(intf_thread_t *p_intf)
 
     PL_LOCK;
 
-    /* First clear the old one */
     PlaylistDestroy(p_sys);
-
-    /* Build the new one */
-    PlaylistAddNode(p_intf, PlaylistGetRoot(p_intf), 0, "");
-
+    PlaylistAddNode(p_sys, PlaylistGetRoot(p_intf), "");
     p_sys->b_need_update = false;
 
     PL_UNLOCK;
@@ -394,95 +397,89 @@ static int PlaylistChanged(vlc_object_t *p_this, const char *psz_variable,
 {
     VLC_UNUSED(p_this); VLC_UNUSED(psz_variable);
     VLC_UNUSED(oval); VLC_UNUSED(nval);
-    intf_thread_t *p_intf = (intf_thread_t *)param;
-    playlist_t *p_playlist = pl_Get(p_intf);
-    p_intf->p_sys->b_need_update = true;
-    p_intf->p_sys->p_node = playlist_CurrentPlayingItem(p_playlist) ? playlist_CurrentPlayingItem(p_playlist)->p_parent : NULL;
+
+    intf_thread_t *p_intf   = (intf_thread_t *)param;
+    intf_sys_t *p_sys       = p_intf->p_sys;
+    playlist_item_t *p_node = playlist_CurrentPlayingItem(pl_Get(p_intf));
+
+    p_sys->b_need_update = true;
+    p_sys->p_node = p_node ? p_node->p_parent : NULL;
+
     return VLC_SUCCESS;
 }
 
 /* Playlist suxx */
 /* This function have to be called with the playlist locked */
 static inline bool PlaylistIsPlaying(playlist_t *p_playlist,
-                                      playlist_item_t *p_item)
+                                     playlist_item_t *p_item)
 {
     playlist_item_t *p_played_item = playlist_CurrentPlayingItem(p_playlist);
-    return(p_item && p_played_item && p_item->p_input && p_played_item->p_input
-        && p_item->p_input->i_id == p_played_item->p_input->i_id);
+    return p_item                && p_played_item
+        && p_item->p_input       && p_played_item->p_input
+        && p_item->p_input->i_id == p_played_item->p_input->i_id;
 }
 
-static int SubSearchPlaylist(intf_thread_t *p_intf, char *psz_searchstring,
+static int SubSearchPlaylist(intf_sys_t *p_sys, char *psz_searchstring,
                               int i_start, int i_stop)
 {
-    intf_sys_t *p_sys = p_intf->p_sys;
-    int i, i_item = -1;
-
-    for(i = i_start + 1; i < i_stop; i++)
+    for(int i = i_start + 1; i < i_stop; i++)
         if (strcasestr(p_sys->pp_plist[i]->psz_display, psz_searchstring))
-        {
-            i_item = i;
-            break;
-        }
+            return i;
 
-    return i_item;
+    return -1;
 }
 
-static void SearchPlaylist(intf_thread_t *p_intf, char *psz_searchstring)
+static void SearchPlaylist(intf_sys_t *p_sys, char *psz_searchstring)
 {
-    int i_max;
-    int i_first = 0 ;
-    int i_item = -1;
-    intf_sys_t *p_sys = p_intf->p_sys;
+    int i_item, i_first = p_sys->i_before_search;
 
-    if (p_sys->i_before_search >= 0)
-        i_first = p_sys->i_before_search;
+    if (i_first < 0)
+        i_first = 0;
 
-    if ((! psz_searchstring) ||  strlen(psz_searchstring) <= 0)
+    if (!psz_searchstring || !*psz_searchstring)
     {
         p_sys->i_box_plidx = p_sys->i_before_search;
         return;
     }
 
-    i_max = p_sys->i_plist_entries;
-
-    i_item = SubSearchPlaylist(p_intf, psz_searchstring, i_first + 1, i_max);
+    i_item = SubSearchPlaylist(p_sys, psz_searchstring, i_first + 1,
+                               p_sys->i_plist_entries);
     if (i_item < 0)
-        i_item = SubSearchPlaylist(p_intf, psz_searchstring, 0, i_first);
+        i_item = SubSearchPlaylist(p_sys, psz_searchstring, 0, i_first);
 
-    if (i_item < 0 || i_item >= i_max) return;
-
-    p_sys->i_box_plidx = i_item;
+    if (i_item > 0)
+        p_sys->i_box_plidx = i_item;
 }
 
-static void FindIndex(intf_thread_t *p_intf, playlist_t *p_playlist)
+static inline bool IsIndex(intf_sys_t *p_sys, playlist_t *p_playlist, int i)
 {
-    intf_sys_t *p_sys = p_intf->p_sys;
-    int i;
+    playlist_item_t *p_item = p_sys->pp_plist[i]->p_item;
+    return (p_item->i_children == 0 && p_item == p_sys->p_node) ||
+            PlaylistIsPlaying(p_playlist, p_item);
+}
 
-    if (p_sys->i_box_plidx < p_sys->i_plist_entries && p_sys->i_box_plidx >= 0)
+static void FindIndex(intf_sys_t *p_sys, playlist_t *p_playlist)
+{
+    int plidx = p_sys->i_box_plidx;
+    PL_LOCK;
+
+    if (plidx < 0 || plidx >= p_sys->i_plist_entries ||
+        !IsIndex(p_sys, p_playlist, plidx))
     {
-        playlist_item_t *p_item = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
-        PL_LOCK;
-        if ((p_item->i_children == 0 && p_item == p_sys->p_node) ||
-                PlaylistIsPlaying(p_playlist, p_item))
-        {
-            PL_UNLOCK;
-            return;
-        }
+        for(int i = 0; i < p_sys->i_plist_entries; i++)
+            if (IsIndex(p_sys, p_playlist, i))
+            {
+                p_sys->i_box_plidx = i;
+                break;
+            }
     }
 
-    for(i = 0; i < p_sys->i_plist_entries; i++)
-    {
-        playlist_item_t *p_item = p_sys->pp_plist[i]->p_item;
-        if ((p_item->i_children == 0 && p_item == p_sys->p_node) ||
-                PlaylistIsPlaying(p_playlist, p_item))
-        {
-            p_sys->i_box_plidx = i;
-            break;
-        }
-    }
     PL_UNLOCK;
 }
+
+/****************************************************************************
+ * Drawing
+ ****************************************************************************/
 
 static void start_color_and_pairs(intf_thread_t *p_intf)
 {
@@ -535,10 +532,6 @@ static void start_color_and_pairs(intf_thread_t *p_intf)
 
     p_intf->p_sys->b_color_started = true;
 }
-
-/****************************************************************************
- * Drawing
- ****************************************************************************/
 
 static void DrawBox(WINDOW *win, int y, int x, int h, int w, const char *title, bool b_color)
 {
@@ -1359,7 +1352,7 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
         if (p_sys->b_need_update || !p_sys->pp_plist)
             PlaylistRebuild(p_intf);
         if (p_sys->b_box_plidx_follow)
-            FindIndex(p_intf, p_playlist);
+            FindIndex(p_sys, p_playlist);
 
         if (p_sys->i_box_plidx < 0) p_sys->i_box_plidx = 0;
         if (p_sys->i_box_plidx < 0) p_sys->i_box_plidx = 0;
@@ -1692,7 +1685,7 @@ static int HandleKey(intf_thread_t *p_intf, int i_key)
 
             /* Playlist navigation */
             case 'g':
-                FindIndex(p_intf, p_playlist);
+                FindIndex(p_sys, p_playlist);
                 break;
             case KEY_HOME:
                 p_sys->i_box_plidx = 0;
@@ -1962,7 +1955,7 @@ static int HandleKey(intf_thread_t *p_intf, int i_key)
                 if (i_chain_len > 0)
                     p_sys->psz_old_search = strdup(p_sys->psz_search_chain);
                 else if (p_sys->psz_old_search)
-                    SearchPlaylist(p_intf, p_sys->psz_old_search);
+                    SearchPlaylist(p_sys, p_sys->psz_old_search);
                 p_sys->i_box_type = BOX_PLAYLIST;
                 goto end;
             case 0x1b: /* ESC */
@@ -2015,7 +2008,7 @@ static int HandleKey(intf_thread_t *p_intf, int i_key)
         }
         free(p_sys->psz_old_search);
         p_sys->psz_old_search = NULL;
-        SearchPlaylist(p_intf, p_sys->psz_search_chain);
+        SearchPlaylist(p_sys, p_sys->psz_search_chain);
         goto end;
     }
     else if (p_sys->i_box_type == BOX_OPEN && p_sys->psz_open_chain)
@@ -2323,7 +2316,7 @@ static void Run(intf_thread_t *p_intf)
         if (p_sys->b_box_plidx_follow && playlist_CurrentPlayingItem(p_playlist))
         {
             PL_UNLOCK;
-            FindIndex(p_intf, p_playlist);
+            FindIndex(p_sys, p_playlist);
         }
         else
             PL_UNLOCK;
