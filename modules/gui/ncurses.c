@@ -119,13 +119,49 @@ enum
     C_PLAYLIST_3,
     C_BOX,
     C_STATUS,
+#if 0
     C_INFO,
     C_ERROR,
     C_WARNING,
     C_DEBUG,
+#endif
     C_CATEGORY,
-    C_FOLDER
+    C_FOLDER,
+    /* new elements here ! */
+
+    C_MAX
 };
+
+
+/* Available colors: BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE */
+static const struct { short f; short b; } color_pairs[] =
+{
+    /* element */       /* foreground*/ /* background*/
+    [C_TITLE]       = { COLOR_YELLOW,   COLOR_BLACK },
+
+    /* jamaican playlist */
+    [C_PLAYLIST_1]  = { COLOR_GREEN,    COLOR_BLACK },
+    [C_PLAYLIST_2]  = { COLOR_YELLOW,   COLOR_BLACK },
+    [C_PLAYLIST_3]  = { COLOR_RED,      COLOR_BLACK },
+
+    /* used in DrawBox() */
+    [C_BOX]         = { COLOR_CYAN,     COLOR_BLACK },
+    /* Source: State, Position, Volume, Chapters, etc...*/
+    [C_STATUS]      = { COLOR_BLUE,     COLOR_BLACK },
+
+#if 0
+    /* VLC messages, keep the order from highest priority to lowest */
+    [C_INFO]        = { COLOR_BLACK,    COLOR_WHITE },
+    [C_ERROR]       = { COLOR_RED,      COLOR_BLACK },
+    [C_WARNING]     = { COLOR_YELLOW,   COLOR_BLACK },
+    [C_DEBUG]       = { COLOR_WHITE,    COLOR_BLACK },
+#endif
+    /* Category title: help, info, metadata */
+    [C_CATEGORY]    = { COLOR_MAGENTA,  COLOR_BLACK },
+    /* Folder (BOX_BROWSE) */
+    [C_FOLDER]      = { COLOR_RED,      COLOR_BLACK },
+};
+
 enum
 {
     VIEW_CATEGORY,
@@ -493,42 +529,12 @@ static void start_color_and_pairs(intf_thread_t *p_intf)
     }
 
     start_color();
-
-    /* Available colors: BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE */
+    for(int i = C_DEFAULT + 1; i < C_MAX; i++)
+        init_pair(i, color_pairs[i].f, color_pairs[i].b);
 
     /* untested, in all my terminals, !can_change_color() --funman */
     if (can_change_color())
         init_color(COLOR_YELLOW, 960, 500, 0); /* YELLOW -> ORANGE */
-
-    /* title */
-    init_pair(C_TITLE, COLOR_YELLOW, COLOR_BLACK);
-
-    /* jamaican playlist */
-    init_pair(C_PLAYLIST_1, COLOR_GREEN, COLOR_BLACK);
-    init_pair(C_PLAYLIST_2, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(C_PLAYLIST_3, COLOR_RED, COLOR_BLACK);
-
-    /* used in DrawBox() */
-    init_pair(C_BOX, COLOR_CYAN, COLOR_BLACK);
-    /* Source, State, Position, Volume, Chapters, etc...*/
-    init_pair(C_STATUS, COLOR_BLUE, COLOR_BLACK);
-
-    /* VLC messages, keep the order from highest priority to lowest */
-
-    /* infos */
-    init_pair(C_INFO, COLOR_BLACK, COLOR_WHITE);
-    /* errors */
-    init_pair(C_ERROR, COLOR_RED, COLOR_BLACK);
-    /* warnings */
-    init_pair(C_WARNING, COLOR_YELLOW, COLOR_BLACK);
-/* debug */
-    init_pair(C_DEBUG, COLOR_WHITE, COLOR_BLACK);
-
-    /* Category title (help, info, metadata) */
-    init_pair(C_CATEGORY, COLOR_MAGENTA, COLOR_BLACK);
-
-    /* Folder (BOX_BROWSE) */
-    init_pair(C_FOLDER, COLOR_RED, COLOR_BLACK);
 
     p_intf->p_sys->b_color_started = true;
 }
