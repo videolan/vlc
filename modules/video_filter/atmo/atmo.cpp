@@ -168,7 +168,7 @@ static const char *const ppsz_device_type_descriptions[] = {
 #define FNORDLICHT_AMOUNT_TEXT      N_("Count of fnordlicht's")
 #define FNORDLICHT_AMOUNT_LONGTEXT  N_("Depending on the amount your " \
                                    "fnordlicht hardware " \
-                                   "choose 1 to 4 channels")
+                                   "choose 1 to 254 channels")
 
 #if defined( WIN32 )
 #  define DEFAULT_DEVICE   0
@@ -433,7 +433,7 @@ add_integer_with_range(CFG_PREFIX "momo-channels",   3, 3, 4, NULL,
    4 maximum amount
 */
 set_section( N_("fnordlicht options" ), 0 )
-add_integer_with_range(CFG_PREFIX "fnordlicht-amount",   2, 1, 4, NULL,
+add_integer_with_range(CFG_PREFIX "fnordlicht-amount",   2, 1, 254, NULL,
                        FNORDLICHT_AMOUNT_TEXT,
                        FNORDLICHT_AMOUNT_LONGTEXT, false)
 
