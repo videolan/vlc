@@ -256,8 +256,7 @@ int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
 
 void vlclua_dir_list_free( char **ppsz_dir_list )
 {
-    char **ppsz_dir;
-    for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
+    for( char **ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
         free( *ppsz_dir );
     free( ppsz_dir_list );
 }
@@ -272,20 +271,19 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
                                   void * user_data)
 {
     char **ppsz_dir_list = NULL;
+    int i_ret;
 
-    int i_ret = vlclua_dir_list( p_this, luadirname, &ppsz_dir_list );
-    if( i_ret != VLC_SUCCESS )
+    if((i_ret = vlclua_dir_list( p_this, luadirname, &ppsz_dir_list ) != VLC_SUCCESS))
         return i_ret;
-    i_ret = VLC_EGENERIC;
 
+    i_ret = VLC_EGENERIC;
     for( char **ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
     {
         char **ppsz_filelist;
-        int i_files;
 
         msg_Dbg( p_this, "Trying Lua scripts in %s", *ppsz_dir );
-        i_files = vlc_scandir( *ppsz_dir, &ppsz_filelist, file_select,
-                                file_compare );
+        int i_files = vlc_scandir( *ppsz_dir, &ppsz_filelist, file_select,
+                                   file_compare );
         if( i_files < 0 )
             continue;
 
@@ -326,9 +324,9 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
 char *vlclua_find_file( vlc_object_t *p_this, const char *psz_luadirname, const char *psz_name )
 {
     char **ppsz_dir_list = NULL;
-    char **ppsz_dir;
     vlclua_dir_list( p_this, psz_luadirname, &ppsz_dir_list );
-    for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
+
+    for( char **ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
     {
         for( const char **ppsz_ext = ppsz_lua_exts; *ppsz_ext; ppsz_ext++ )
         {
