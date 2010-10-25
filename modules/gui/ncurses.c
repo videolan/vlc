@@ -110,6 +110,7 @@ enum
     BOX_OBJECTS,
     BOX_STATS
 };
+
 enum
 {
     C_DEFAULT = 0,
@@ -127,11 +128,10 @@ enum
 #endif
     C_CATEGORY,
     C_FOLDER,
-    /* new elements here ! */
+    /* XXX: new elements here ! */
 
     C_MAX
 };
-
 
 /* Available colors: BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE */
 static const struct { short f; short b; } color_pairs[] =
@@ -162,28 +162,25 @@ static const struct { short f; short b; } color_pairs[] =
     [C_FOLDER]      = { COLOR_RED,      COLOR_BLACK },
 };
 
-enum
-{
-    VIEW_CATEGORY,
-    VIEW_ONELEVEL
-};
 struct dir_entry_t
 {
-    bool  b_file;
+    bool        b_file;
     char        *psz_path;
 };
+
 struct pl_item_t
 {
     playlist_item_t *p_item;
     char            *psz_display;
 };
+
 struct intf_sys_t
 {
     input_thread_t *p_input;
     playlist_t     *p_playlist;
 
-    bool      b_color;
-    bool      b_color_started;
+    bool            b_color;
+    bool            b_color_started;
 
     float           f_slider;
     float           f_slider_old;
@@ -218,12 +215,12 @@ struct intf_sys_t
     char            *psz_current_dir;
     int             i_dir_entries;
     struct dir_entry_t  **pp_dir_entries;
-    bool      b_show_hidden_files;
+    bool            b_show_hidden_files;
 
-    int             i_current_view;             /* playlist view             */
+    bool            category_view;
     struct pl_item_t    **pp_plist;
     int             i_plist_entries;
-    bool      b_need_update;              /* for playlist view         */
+    bool            b_need_update;              /* for playlist view         */
 };
 
 /*****************************************************************************
@@ -348,7 +345,7 @@ static void PlaylistDestroy(intf_sys_t *p_sys)
 static inline playlist_item_t *PlaylistGetRoot(intf_thread_t *p_intf)
 {
     playlist_t *p_playlist = pl_Get(p_intf);
-    return p_intf->p_sys->i_current_view == VIEW_CATEGORY ?
+    return p_intf->p_sys->category_view ?
         p_playlist->p_root_category :
         p_playlist->p_root_onelevel;
 }
@@ -1340,17 +1337,10 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
         int        i_item;
         char       *psz_title;
 
-        switch(p_sys->i_current_view)
-        {
-            case VIEW_ONELEVEL:
-                psz_title = strdup(_(" Playlist (All, one level) "));
-                break;
-            case VIEW_CATEGORY:
-                psz_title = strdup(_(" Playlist (By category) "));
-                break;
-            default:
-                psz_title = strdup(_(" Playlist (Manually added) "));
-        }
+        if (p_sys->category_view)
+            psz_title = strdup(_(" Playlist (By category) "));
+        else
+            psz_title = strdup(_(" Playlist (All, one level) "));
 
         DrawBox(p_sys->w, y++, 0, h, COLS, psz_title, p_sys->b_color);
         free(psz_title);
@@ -1678,14 +1668,7 @@ static int HandleKey(intf_thread_t *p_intf, int i_key)
 
             /* Playlist view */
             case 'v':
-                switch(p_sys->i_current_view)
-                {
-                    case VIEW_CATEGORY:
-                        p_sys->i_current_view = VIEW_ONELEVEL;
-                        break;
-                    default:
-                        p_sys->i_current_view = VIEW_CATEGORY;
-                }
+                p_sys->category_view = !p_sys->category_view;
                 PlaylistRebuild(p_intf);
                 goto end;
 
@@ -2412,7 +2395,7 @@ static int Open(vlc_object_t *p_this)
     freopen("/dev/null", "wb", stderr);
 
     /* Set defaul playlist view */
-    p_sys->i_current_view = VIEW_CATEGORY;
+    p_sys->category_view = true; //FIXME
     p_sys->pp_plist = NULL;
     p_sys->i_plist_entries = 0;
     p_sys->b_need_update = false;
