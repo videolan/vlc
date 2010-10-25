@@ -194,23 +194,34 @@ struct intf_sys_t
  * Directories
  *****************************************************************************/
 
-static int comp_dir_entries(const void *pp_dir_entry1,
-                             const void *pp_dir_entry2)
+static void DirsDestroy(intf_sys_t *p_sys)
+{
+    while (p_sys->i_dir_entries)
+    {
+        struct dir_entry_t *p_dir_entry;
+        p_dir_entry = p_sys->pp_dir_entries[--p_sys->i_dir_entries];
+        free(p_dir_entry->psz_path);
+        free(p_dir_entry);
+    }
+    free(p_sys->pp_dir_entries);
+    p_sys->pp_dir_entries = NULL;
+}
+
+static int comp_dir_entries(const void *pp_dir_entry1, const void *pp_dir_entry2)
 {
     struct dir_entry_t *p_dir_entry1 = *(struct dir_entry_t**)pp_dir_entry1;
     struct dir_entry_t *p_dir_entry2 = *(struct dir_entry_t**)pp_dir_entry2;
 
     if (p_dir_entry1->b_file == p_dir_entry2->b_file)
         return strcasecmp(p_dir_entry1->psz_path, p_dir_entry2->psz_path);
-    else
-        return (p_dir_entry1->b_file ? 1 : -1);
+
+    return p_dir_entry1->b_file ? 1 : -1;
 }
 
 static void ReadDir(intf_thread_t *p_intf)
 {
     intf_sys_t *p_sys = p_intf->p_sys;
     DIR *p_current_dir;
-    int i;
 
     if (!p_sys->psz_current_dir || !*p_sys->psz_current_dir)
     {
@@ -232,15 +243,7 @@ static void ReadDir(intf_thread_t *p_intf)
     }
 
     /* Clean the old shit */
-    for(i = 0; i < p_sys->i_dir_entries; i++)
-    {
-        struct dir_entry_t *p_dir_entry = p_sys->pp_dir_entries[i];
-        free(p_dir_entry->psz_path);
-        REMOVE_ELEM(p_sys->pp_dir_entries, p_sys->i_dir_entries, i);
-        free(p_dir_entry);
-    }
-    p_sys->pp_dir_entries = NULL;
-    p_sys->i_dir_entries = 0;
+    DirsDestroy(p_sys);
 
     /* while we still have entries in the directory */
     while ((psz_entry = vlc_readdir(p_current_dir)))
@@ -310,17 +313,15 @@ static void ReadDir(intf_thread_t *p_intf)
  * Playlist
  *****************************************************************************/
 
-static void PlaylistDestroy(intf_thread_t *p_intf)
+static void PlaylistDestroy(intf_sys_t *p_sys)
 {
-    intf_sys_t *p_sys = p_intf->p_sys;
-
     while (p_sys->i_plist_entries)
     {
-        struct pl_item_t *p_pl_item = p_sys->pp_plist[0];
+        struct pl_item_t *p_pl_item = p_sys->pp_plist[--p_sys->i_plist_entries];
         free(p_pl_item->psz_display);
-        REMOVE_ELEM(p_sys->pp_plist, p_sys->i_plist_entries, 0);
         free(p_pl_item);
     }
+    free(p_sys->pp_plist);
     p_sys->pp_plist = NULL;
 }
 
@@ -394,7 +395,7 @@ static void PlaylistRebuild(intf_thread_t *p_intf)
     PL_LOCK;
 
     /* First clear the old one */
-    PlaylistDestroy(p_intf);
+    PlaylistDestroy(p_sys);
 
     /* Build the new one */
     PlaylistAddNode(p_intf, PlaylistGetRoot(p_intf), 0, "");
@@ -1702,7 +1703,6 @@ static int HandleKey(intf_thread_t *p_intf, int i_key)
                     default:
                         p_sys->i_current_view = VIEW_CATEGORY;
                 }
-                //p_sys->b_need_update = true;
                 PlaylistRebuild(p_intf);
                 goto end;
 
@@ -2468,16 +2468,8 @@ static void Close(vlc_object_t *p_this)
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t    *p_sys = p_intf->p_sys;
 
-    PlaylistDestroy(p_intf);
-
-    while (p_sys->i_dir_entries)
-    {
-        struct dir_entry_t *p_dir_entry = p_sys->pp_dir_entries[0];
-        free(p_dir_entry->psz_path);
-        REMOVE_ELEM(p_sys->pp_dir_entries, p_sys->i_dir_entries, 0);
-        free(p_dir_entry);
-    }
-    p_sys->pp_dir_entries = NULL;
+    PlaylistDestroy(p_sys);
+    DirsDestroy(p_sys);
 
     free(p_sys->psz_current_dir);
     free(p_sys->psz_search_chain);
