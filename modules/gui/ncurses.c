@@ -177,7 +177,6 @@ struct pl_item_t
 struct intf_sys_t
 {
     input_thread_t *p_input;
-    playlist_t     *p_playlist;
 
     bool            b_color;
     bool            b_color_started;
@@ -201,7 +200,7 @@ struct intf_sys_t
 
     int             b_box_cleared;
 
-    msg_subscription_t* p_sub;                  /* message bank subscription */
+//  msg_subscription_t* p_sub;                  /* message bank subscription */
 
     char            *psz_search_chain;          /* for playlist searching    */
     char            *psz_old_search;            /* for searching next        */
@@ -538,36 +537,36 @@ static void start_color_and_pairs(intf_thread_t *p_intf)
 
 static void DrawBox(WINDOW *win, int y, int x, int h, int w, const char *title, bool b_color)
 {
-    int i;
     int i_len;
 
-    if (w > 3 && h > 2)
+    if (w <= 3 || h <= 2)
+        return;
+
+    if (b_color)
+        wcolor_set(win, C_BOX, NULL);
+    if (!title) title = "";
+    i_len = strlen(title);
+
+    if (i_len > w - 2)
+        i_len = w - 2;
+
+    mvwaddch(win, y, x,    ACS_ULCORNER);
+    mvwhline(win, y, x+1,  ACS_HLINE, (w-i_len-2)/2);
+    mvwprintw(win,y, x+1+(w-i_len-2)/2, "%s", title);
+    mvwhline(win, y, x+(w-i_len)/2+i_len,  ACS_HLINE, w - 1 - ((w-i_len)/2+i_len));
+    mvwaddch(win, y, x+w-1,ACS_URCORNER);
+
+    for(int i = 0; i < h-2; i++)
     {
-        if (b_color)
-            wcolor_set(win, C_BOX, NULL);
-        if (!title) title = "";
-        i_len = strlen(title);
-
-        if (i_len > w - 2) i_len = w - 2;
-
-        mvwaddch(win, y, x,    ACS_ULCORNER);
-        mvwhline(win, y, x+1,  ACS_HLINE, (w-i_len-2)/2);
-        mvwprintw(win,y, x+1+(w-i_len-2)/2, "%s", title);
-        mvwhline(win, y, x+(w-i_len)/2+i_len,  ACS_HLINE, w - 1 - ((w-i_len)/2+i_len));
-        mvwaddch(win, y, x+w-1,ACS_URCORNER);
-
-        for(i = 0; i < h-2; i++)
-        {
-            mvwaddch(win, y+i+1, x,     ACS_VLINE);
-            mvwaddch(win, y+i+1, x+w-1, ACS_VLINE);
-        }
-
-        mvwaddch(win, y+h-1, x,     ACS_LLCORNER);
-        mvwhline(win, y+h-1, x+1,   ACS_HLINE, w - 2);
-        mvwaddch(win, y+h-1, x+w-1, ACS_LRCORNER);
-        if (b_color)
-            wcolor_set(win, C_DEFAULT, NULL);
+        mvwaddch(win, y+i+1, x,     ACS_VLINE);
+        mvwaddch(win, y+i+1, x+w-1, ACS_VLINE);
     }
+
+    mvwaddch(win, y+h-1, x,     ACS_LLCORNER);
+    mvwhline(win, y+h-1, x+1,   ACS_HLINE, w - 2);
+    mvwaddch(win, y+h-1, x+w-1, ACS_LRCORNER);
+    if (b_color)
+        wcolor_set(win, C_DEFAULT, NULL);
 }
 
 static void DrawEmptyLine(WINDOW *win, int y, int x, int w)
@@ -589,7 +588,7 @@ static void DrawLine(WINDOW *win, int y, int x, int w)
 static void mvnprintw(int y, int x, int w, const char *p_fmt, ...)
 {
     va_list  vl_args;
-    char    *p_buf = NULL;
+    char    *p_buf;
     int      i_len;
 
     if (w <= 0)
@@ -610,78 +609,74 @@ static void mvnprintw(int y, int x, int w, const char *p_fmt, ...)
 
     size_t i_width; /* number of columns */
 
-    if (i_char_len == (size_t)-1)
-    /* an invalid character was encountered */
+    if (i_char_len == (size_t)-1) /* an invalid character was encountered */
     {
         free(p_buf);
         return;
     }
-    else
+
+    i_width = wcswidth(psz_wide, i_char_len);
+    if (i_width == (size_t)-1)
     {
-        i_width = wcswidth(psz_wide, i_char_len);
-        if (i_width == (size_t)-1)
+        /* a non printable character was encountered */
+        i_width = 0;
+        for(unsigned i = 0 ; i < i_char_len ; i++)
         {
-            /* a non printable character was encountered */
-            unsigned int i;
-            int i_cwidth;
-            i_width = 0;
-            for(i = 0 ; i < i_char_len ; i++)
-            {
-                i_cwidth = wcwidth(psz_wide[i]);
-                if (i_cwidth != -1)
-                    i_width += i_cwidth;
-            }
+            int i_cwidth = wcwidth(psz_wide[i]);
+            if (i_cwidth != -1)
+                i_width += i_cwidth;
         }
     }
-    if (i_width > (size_t)w)
-    {
-        int i_total_width = 0;
-        int i = 0;
-        while (i_total_width < w)
-        {
-            i_total_width += wcwidth(psz_wide[i]);
-            if (w > 7 && i_total_width >= w/2)
-            {
-                psz_wide[i  ] = '.';
-                psz_wide[i+1] = '.';
-                i_total_width -= wcwidth(psz_wide[i]) - 2;
-                if (i > 0)
-                {
-                    /* we require this check only if at least one character
-                     * 4 or more columns wide exists (which i doubt) */
-                    psz_wide[i-1] = '.';
-                    i_total_width -= wcwidth(psz_wide[i-1]) - 1;
-                }
 
-                /* find the widest string */
-                int j, i_2nd_width = 0;
-                for(j = i_char_len - 1; i_2nd_width < w - i_total_width; j--)
-                    i_2nd_width += wcwidth(psz_wide[j]);
-
-                /* we already have i_total_width columns filled, and we can't
-                 * have more than w columns */
-                if (i_2nd_width > w - i_total_width)
-                    j++;
-
-                wmemmove(&psz_wide[i+2], &psz_wide[j+1], i_char_len - j - 1);
-                psz_wide[i + 2 + i_char_len - j - 1] = '\0';
-                break;
-            }
-            i++;
-        }
-        if (w <= 7) /* we don't add the '...' else we lose too much chars */
-            psz_wide[i] = '\0';
-
-        size_t i_wlen = wcslen(psz_wide) * 6 + 1; /* worst case */
-        char psz_ellipsized[i_wlen];
-        wcstombs(psz_ellipsized, psz_wide, i_wlen);
-        mvprintw(y, x, "%s", psz_ellipsized);
-    }
-    else
+    if (i_width <= (size_t)w)
     {
         mvprintw(y, x, "%s", p_buf);
         mvhline(y, x + i_width, ' ', w - i_width);
+        free(p_buf);
+        return;
     }
+
+    int i_total_width = 0;
+    int i = 0;
+    while (i_total_width < w)
+    {
+        i_total_width += wcwidth(psz_wide[i]);
+        if (w > 7 && i_total_width >= w/2)
+        {
+            psz_wide[i  ] = '.';
+            psz_wide[i+1] = '.';
+            i_total_width -= wcwidth(psz_wide[i]) - 2;
+            if (i > 0)
+            {
+                /* we require this check only if at least one character
+                 * 4 or more columns wide exists (which i doubt) */
+                psz_wide[i-1] = '.';
+                i_total_width -= wcwidth(psz_wide[i-1]) - 1;
+            }
+
+            /* find the widest string */
+            int j, i_2nd_width = 0;
+            for(j = i_char_len - 1; i_2nd_width < w - i_total_width; j--)
+                i_2nd_width += wcwidth(psz_wide[j]);
+
+            /* we already have i_total_width columns filled, and we can't
+             * have more than w columns */
+            if (i_2nd_width > w - i_total_width)
+                j++;
+
+            wmemmove(&psz_wide[i+2], &psz_wide[j+1], i_char_len - j - 1);
+            psz_wide[i + 2 + i_char_len - j - 1] = '\0';
+            break;
+        }
+        i++;
+    }
+    if (w <= 7) /* we don't add the '...' else we lose too much chars */
+        psz_wide[i] = '\0';
+
+    size_t i_wlen = wcslen(psz_wide) * 6 + 1; /* worst case */
+    char psz_ellipsized[i_wlen];
+    wcstombs(psz_ellipsized, psz_wide, i_wlen);
+    mvprintw(y, x, "%s", psz_ellipsized);
 
 #else
     if (i_len > w)
@@ -700,27 +695,25 @@ static void mvnprintw(int y, int x, int w, const char *p_fmt, ...)
             p_buf[w/2  ] = '.';
             p_buf[w/2+1] = '.';
         }
-        char *psz_local = ToLocale(p_buf);
-        mvprintw(y, x, "%s", psz_local);
-        LocaleFree(p_buf);
     }
-    else
-    {
-        char *psz_local = ToLocale(p_buf);
-        mvprintw(y, x, "%s", psz_local);
-        LocaleFree(p_buf);
+
+    char *psz_local = ToLocale(p_buf);
+    mvprintw(y, x, "%s", psz_local);
+
+    if (i_len > w)
         mvhline(y, x + i_len, ' ', w - i_len);
-    }
+
+    LocaleFree(psz_local);
 #endif
+
     free(p_buf);
 }
 
 static void MainBoxWrite(intf_thread_t *p_intf, int l, int x, const char *p_fmt, ...)
 {
-    intf_sys_t     *p_sys = p_intf->p_sys;
-
-    va_list  vl_args;
-    char    *p_buf = NULL;
+    intf_sys_t  *p_sys = p_intf->p_sys;
+    va_list      vl_args;
+    char        *p_buf;
 
     if (l < p_sys->i_box_start || l - p_sys->i_box_start >= p_sys->i_box_lines)
         return;
@@ -768,7 +761,7 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
 
     /* Title */
     attrset(A_REVERSE);
-    int i_len = strlen("VLC media player "PACKAGE_VERSION);
+    int i_len = sizeof "VLC media player "PACKAGE_VERSION - 1;
     int mid = (COLS - i_len) / 2;
     if (mid < 0)
         mid = 0;
@@ -813,7 +806,9 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
         else if (val.i_int == PAUSE_S)
             mvnprintw(y++, 0, COLS, _(" State    : Paused %s"), psz_state);
 
-        if (val.i_int != INIT_S && val.i_int != END_S)
+        if (val.i_int == INIT_S || val.i_int == END_S)
+            y += 2;
+        else
         {
             audio_volume_t i_volume;
 
@@ -847,10 +842,6 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
                     mvnprintw(y++, 0, COLS, _(" Chapter  : %"PRId64"/%d"),
                                val.i_int, i_chapter_count);
             }
-        }
-        else
-        {
-            y += 2;
         }
     }
     else
@@ -1444,28 +1435,23 @@ static void ManageSlider(intf_thread_t *p_intf)
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
     input_thread_t *p_input = p_sys->p_input;
-    vlc_value_t     val;
+    float pos;
 
-    if (!p_input)
-        return;
-    var_Get(p_input, "state", &val);
-    if (val.i_int != PLAYING_S)
+    if (!p_input || var_GetInteger(p_input, "state") != PLAYING_S)
         return;
 
-    var_Get(p_input, "position", &val);
+    pos = var_GetFloat(p_input, "position");
     if (p_sys->f_slider == p_sys->f_slider_old)
-        p_sys->f_slider = p_sys->f_slider_old = 100 * val.f_float;
+        p_sys->f_slider = p_sys->f_slider_old = 100. * pos;
     else
     {
         p_sys->f_slider_old = p_sys->f_slider;
 
-        val.f_float = p_sys->f_slider / 100.0;
-        var_Set(p_input, "position", val);
+        pos = p_sys->f_slider / 100.;
+        var_SetFloat(p_input, "position", pos);
     }
 }
 
-
-/* following functions are local */
 #ifndef HAVE_NCURSESW
 static char *KeyToUTF8(int i_key, char *psz_part)
 {
@@ -1611,20 +1597,15 @@ static void Eject(intf_thread_t *p_intf)
 static void PlayPause(intf_thread_t *p_intf)
 {
     input_thread_t *p_input = p_intf->p_sys->p_input;
-    playlist_t *p_playlist = pl_Get(p_intf);
-    vlc_value_t val;
 
     if (p_input)
     {
-        var_Get(p_input, "state", &val);
-        if (val.i_int != PAUSE_S)
-            val.i_int = PAUSE_S;
-        else
-            val.i_int = PLAYING_S;
-        var_Set(p_input, "state", val);
+        int64_t state = var_GetInteger( p_input, "state" );
+        state = (state != PLAYING_S) ? PLAYING_S : PAUSE_S;
+        var_SetInteger( p_input, "state", state );
     }
     else
-        playlist_Play(p_playlist);
+        playlist_Play(pl_Get(p_intf));
 }
 
 static int HandleKey(intf_thread_t *p_intf, int i_key)
@@ -2269,7 +2250,6 @@ static void Run(intf_thread_t *p_intf)
 {
     intf_sys_t    *p_sys = p_intf->p_sys;
     playlist_t    *p_playlist = pl_Get(p_intf);
-    p_sys->p_playlist = p_playlist;
 
     int i_key;
     time_t t_last_refresh;
@@ -2342,87 +2322,47 @@ static void Run(intf_thread_t *p_intf)
 static int Open(vlc_object_t *p_this)
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    intf_sys_t    *p_sys;
-
-    /* Allocate instance and initialize some members */
-    p_sys = p_intf->p_sys = malloc(sizeof(intf_sys_t));
+    intf_sys_t    *p_sys  = p_intf->p_sys = calloc(1, sizeof(intf_sys_t));
     if (!p_sys)
         return VLC_ENOMEM;
-    p_sys->p_node = NULL;
-    p_sys->p_input = NULL;
+
     p_sys->f_slider = 0.0;
     p_sys->f_slider_old = 0.0;
     p_sys->i_box_type = BOX_PLAYLIST;
-    p_sys->i_box_lines = 0;
-    p_sys->i_box_start= 0;
-    p_sys->i_box_lines_total = 0;
     p_sys->b_box_plidx_follow = true;
-    p_sys->b_box_cleared = false;
-    p_sys->i_box_plidx = 0;
-    p_sys->i_box_bidx = 0;
 // FIXME    p_sys->p_sub = msg_Subscribe(p_intf);
     p_sys->b_color = var_CreateGetBool(p_intf, "color");
-    p_sys->b_color_started = false;
 
-#ifndef HAVE_NCURSESW
-    memset(p_sys->psz_partial_keys, 0, sizeof(p_sys->psz_partial_keys));
-#endif
+    p_sys->category_view = true; //FIXME: switching back & forth is broken
+    p_sys->psz_search_chain = malloc(SEARCH_CHAIN_SIZE + 1);
+    p_sys->psz_open_chain =   malloc(OPEN_CHAIN_SIZE + 1);
 
-    /* Initialize the curses library */
-    p_sys->w = initscr();
+    p_sys->psz_current_dir = var_CreateGetString(p_intf, "browse-dir");
+    if (!p_sys->psz_current_dir || !*p_sys->psz_current_dir)
+    {
+        free(p_sys->psz_current_dir);
+        p_sys->psz_current_dir = config_GetUserDir(VLC_HOME_DIR);
+    }
+
+    p_sys->w = initscr();   /* Initialize the curses library */
 
     if (p_sys->b_color)
         start_color_and_pairs(p_intf);
 
-    keypad(p_sys->w, TRUE);
-    /* Don't do NL -> CR/NL */
-    nonl();
-    /* Take input chars one at a time */
-    cbreak();
-    /* Don't echo */
-    noecho();
-    /* Invisible cursor */
-    curs_set(0);
-    /* Non blocking wgetch() */
+    keypad(p_sys->w, TRUE); /* Don't do NL -> CR/NL */
+    nonl();                 /* Take input chars one at a time */
+    cbreak();               /* Don't echo */
+    noecho();               /* Invisible cursor */
+    curs_set(0);            /* Non blocking wgetch() */
     wtimeout(p_sys->w, 0);
-
     clear();
-
-    /* exported function */
-    p_intf->pf_run = Run;
 
     /* Stop printing errors to the console */
     freopen("/dev/null", "wb", stderr);
 
-    /* Set defaul playlist view */
-    p_sys->category_view = true; //FIXME
-    p_sys->pp_plist = NULL;
-    p_sys->i_plist_entries = 0;
-    p_sys->b_need_update = false;
-
-    /* Initialize search chain */
-    p_sys->psz_search_chain = malloc(SEARCH_CHAIN_SIZE + 1);
-    p_sys->psz_old_search = NULL;
-    p_sys->i_before_search = 0;
-
-    /* Initialize open chain */
-    p_sys->psz_open_chain = malloc(OPEN_CHAIN_SIZE + 1);
-
-    /* Initialize browser options */
-    char* psz_tmp = var_CreateGetString(p_intf, "browse-dir");
-    if (psz_tmp && *psz_tmp)
-        p_sys->psz_current_dir = psz_tmp;
-    else
-    {
-        p_sys->psz_current_dir = config_GetUserDir(VLC_HOME_DIR);
-        free(psz_tmp);
-    }
-
-    p_sys->i_dir_entries = 0;
-    p_sys->pp_dir_entries = NULL;
-    p_sys->b_show_hidden_files = false;
     ReadDir(p_intf);
 
+    p_intf->pf_run = Run;
     return VLC_SUCCESS;
 }
 
