@@ -26,6 +26,29 @@ function descriptor()
     return { title="Channels.com" }
 end
 
+function search( string )
+    -- Do the query
+    query = string.gsub( string, ' ', '+' )
+    local feed = simplexml.parse_url( "http://www.metachannels.com/api/search?apikey=54868d5d73af69d6afa12d55db6f3d18735baa7d&searchTerms=" .. query )
+    local channel = feed.children[1]
+
+    -- List all answers
+    local node = vlc.sd.add_node( { path = "", title = string } )
+    for _,item in ipairs( channel.children ) do
+        if( item.name == 'item' ) then
+            simplexml.add_name_maps( item )
+            local url = string.gsub( item.children_map['link'][1].children[1], '&amp;', '&' )
+            local arturl = item.children_map['media:thumbnail'][1].attributes['url']
+            if( arturl == '/images/thumb_channel_default.jpg' ) then
+                arturl = 'http://www.metachannels.com/images/thumb_channel_default.jpg'
+            end
+            node:add_subitem( { path = url,
+                                title = item.children_map['title'][1].children[1],
+                                arturl = arturl } )
+        end
+    end
+end
+
 function main()
     -- get the primary feed and parse the <channel> tag
     local feed = simplexml.parse_url( "http://metachannels.com/meta_channels?device=vlc&lang=en,es,fr,de,it,other&format=rss&adult_ok=y" )
