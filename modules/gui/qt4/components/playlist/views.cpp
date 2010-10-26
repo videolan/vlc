@@ -1,5 +1,5 @@
 /*****************************************************************************
- * icon_view.cpp : Icon view for the Playlist
+ * views.cpp : Views for the Playlist
  ****************************************************************************
  * Copyright © 2010 the VideoLAN team
  * $Id$
@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "components/playlist/icon_view.hpp"
+#include "components/playlist/views.hpp"
 #include "components/playlist/playlist_model.hpp"
 #include "components/playlist/sorting.h"
 #include "input_manager.hpp"

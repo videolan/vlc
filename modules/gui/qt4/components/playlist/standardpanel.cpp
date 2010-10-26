@@ -30,7 +30,7 @@
 
 #include "components/playlist/playlist_model.hpp"
 #include "components/playlist/standardpanel.hpp"
-#include "components/playlist/icon_view.hpp"
+#include "components/playlist/views.hpp"
 #include "components/playlist/selector.hpp"
 #include "util/customwidgets.hpp"
 #include "menus.hpp"
