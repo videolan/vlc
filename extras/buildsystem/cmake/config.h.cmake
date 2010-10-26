@@ -188,7 +188,6 @@
 #cmakedefine HAVE_MPEG2DEC_MPEG2_H
 #cmakedefine HAVE_MUNMAP
 #cmakedefine HAVE_NANOSLEEP
-#cmakedefine HAVE_NCURSESW
 #cmakedefine HAVE_NETINET_IN_H
 #cmakedefine HAVE_NETINET_UDPLITE_H
 #cmakedefine HAVE_NET_IF_H

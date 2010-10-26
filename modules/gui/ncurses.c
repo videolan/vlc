@@ -41,10 +41,8 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
-#ifdef HAVE_NCURSESW
-#   define _XOPEN_SOURCE_EXTENDED 1
-#   include <wchar.h>
-#endif
+#define _XOPEN_SOURCE_EXTENDED 1
+#include <wchar.h>
 
 #include <ncurses.h>
 
@@ -202,14 +200,11 @@ struct intf_sys_t
 
 //  msg_subscription_t* p_sub;                  /* message bank subscription */
 
-    char            *psz_search_chain;          /* for playlist searching    */
+    char            psz_search_chain[SEARCH_CHAIN_SIZE];
     char            *psz_old_search;            /* for searching next        */
     int             i_before_search;
 
-    char            *psz_open_chain;
-#ifndef HAVE_NCURSESW
-    char             psz_partial_keys[7];
-#endif
+    char            psz_open_chain[OPEN_CHAIN_SIZE];
 
     char            *psz_current_dir;
     int             i_dir_entries;
@@ -517,7 +512,10 @@ static void FindIndex(intf_sys_t *p_sys, playlist_t *p_playlist, bool locked)
 
 static void start_color_and_pairs(intf_thread_t *p_intf)
 {
-    assert(p_intf->p_sys->b_color && !p_intf->p_sys->b_color_started);
+    if (p_intf->p_sys->b_color_started)
+        return;
+
+    p_intf->p_sys->b_color_started = true;
 
     if (!has_colors())
     {
@@ -603,7 +601,6 @@ static void mvnprintw(int y, int x, int w, const char *p_fmt, ...)
 
     i_len = strlen(p_buf);
 
-#ifdef HAVE_NCURSESW
     wchar_t psz_wide[i_len + 1];
 
     EnsureUTF8(p_buf);
@@ -679,34 +676,6 @@ static void mvnprintw(int y, int x, int w, const char *p_fmt, ...)
     char psz_ellipsized[i_wlen];
     wcstombs(psz_ellipsized, psz_wide, i_wlen);
     mvprintw(y, x, "%s", psz_ellipsized);
-
-#else
-    if (i_len > w)
-    {
-        int i_cut = i_len - w;
-        int x1 = i_len/2 - i_cut/2;
-        int x2 = x1 + i_cut;
-
-        if (i_len > x2)
-            memmove(&p_buf[x1], &p_buf[x2], i_len - x2);
-
-        p_buf[w] = '\0';
-        if (w > 7)
-        {
-            p_buf[w/2-1] = '.';
-            p_buf[w/2  ] = '.';
-            p_buf[w/2+1] = '.';
-        }
-    }
-
-    char *psz_local = ToLocale(p_buf);
-    mvprintw(y, x, "%s", psz_local);
-
-    if (i_len > w)
-        mvhline(y, x + i_len, ' ', w - i_len);
-
-    LocaleFree(psz_local);
-#endif
 
     free(p_buf);
 }
@@ -1363,16 +1332,10 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
     if (p_sys->i_box_type == BOX_SEARCH)
     {
         DrawEmptyLine(p_sys->w, 7, 1, COLS-2);
-        if (p_sys->psz_search_chain)
-        {
-            if (!*p_sys->psz_search_chain && p_sys->psz_old_search)
-                /* Searching next entry */
-                mvnprintw(7, 1, COLS-2, _("Find: %s"), p_sys->psz_old_search);
-            else
-                mvnprintw(7, 1, COLS-2, _("Find: %s"), p_sys->psz_search_chain);
-        }
+        mvnprintw(7, 1, COLS-2, _("Find: %s"), *p_sys->psz_search_chain ?
+                  p_sys->psz_search_chain : p_sys->psz_old_chain);
     }
-    if (p_sys->i_box_type == BOX_OPEN && p_sys->psz_open_chain)
+    if (p_sys->i_box_type == BOX_OPEN)
     {
         DrawEmptyLine(p_sys->w, 7, 1, COLS-2);
         mvnprintw(7, 1, COLS-2, _("Open: %s"), p_sys->psz_open_chain);
@@ -1406,46 +1369,6 @@ static void ManageSlider(intf_thread_t *p_intf)
         var_SetFloat(p_input, "position", pos);
     }
 }
-
-#ifndef HAVE_NCURSESW
-static char *KeyToUTF8(int i_key, char *psz_part)
-{
-    char *psz_utf8;
-    int len = strlen(psz_part);
-    if (len == 6)
-    {
-        /* overflow error - should not happen */
-        memset(psz_part, 0, 6);
-        return NULL;
-    }
-
-    psz_part[len] = (char)i_key;
-
-    psz_utf8 = FromLocaleDup(psz_part);
-
-    /* Ugly check for incomplete bytes sequences
-     * (in case of non-UTF8 multibyte local encoding) */
-    char *psz;
-    for(psz = psz_utf8; *psz; psz++)
-        if ((*psz == '?') && (*psz_utf8 != '?'))
-        {
-            /* incomplete bytes sequence detected
-             * (VLC core inserted dummy question marks) */
-            free(psz_utf8);
-            return NULL;
-        }
-
-    /* Check for incomplete UTF8 bytes sequence */
-    if (!EnsureUTF8(psz_utf8))
-    {
-        free(psz_utf8);
-        return NULL;
-    }
-
-    memset(psz_part, 0, 6);
-    return psz_utf8;
-}
-#endif
 
 static inline int RemoveLastUTF8Entity(char *psz, int len)
 {
@@ -1839,9 +1762,9 @@ static int HandleKey(intf_thread_t *p_intf)
             break;
         }
     }
-    else if (p_sys->i_box_type == BOX_SEARCH && p_sys->psz_search_chain)
+    else if (p_sys->i_box_type == BOX_SEARCH)
     {
-        int i_chain_len = strlen(p_sys->psz_search_chain);
+        size_t i_chain_len = strlen(p_sys->psz_search_chain);
         switch(i_key)
         {
         case KEY_CLEAR:
@@ -1851,7 +1774,7 @@ static int HandleKey(intf_thread_t *p_intf)
         case KEY_ENTER:
         case '\r':
         case '\n':
-            if (i_chain_len > 0)
+            if (i_chain_len)
                 p_sys->psz_old_search = strdup(p_sys->psz_search_chain);
             else if (p_sys->psz_old_search)
                 SearchPlaylist(p_sys, p_sys->psz_old_search);
@@ -1882,34 +1805,20 @@ static int HandleKey(intf_thread_t *p_intf)
             RemoveLastUTF8Entity(p_sys->psz_search_chain, i_chain_len);
             break;
         default:
-        {
-#ifdef HAVE_NCURSESW
             if (i_chain_len + 1 < SEARCH_CHAIN_SIZE)
             {
                 p_sys->psz_search_chain[i_chain_len] = (char) i_key;
                 p_sys->psz_search_chain[i_chain_len + 1] = '\0';
             }
-#else
-            char *psz_utf8 = KeyToUTF8(i_key, p_sys->psz_partial_keys);
-
-            if (psz_utf8)
-            {
-                if (i_chain_len + strlen(psz_utf8) < SEARCH_CHAIN_SIZE)
-                    strcpy(p_sys->psz_search_chain + i_chain_len, psz_utf8);
-                free(psz_utf8);
-            }
-#endif
-            break;
-        }
         }
         free(p_sys->psz_old_search);
         p_sys->psz_old_search = NULL;
         SearchPlaylist(p_sys, p_sys->psz_search_chain);
         return 1;
     }
-    else if (p_sys->i_box_type == BOX_OPEN && p_sys->psz_open_chain)
+    else if (p_sys->i_box_type == BOX_OPEN)
     {
-        int i_chain_len = strlen(p_sys->psz_open_chain);
+        size_t i_chain_len = strlen(p_sys->psz_open_chain);
 
         switch(i_key)
         {
@@ -1920,7 +1829,7 @@ static int HandleKey(intf_thread_t *p_intf)
         case KEY_ENTER:
         case '\r':
         case '\n':
-            if (i_chain_len > 0)
+            if (i_chain_len)
             {
                 playlist_item_t *p_parent = p_sys->p_node;
 
@@ -1954,24 +1863,11 @@ static int HandleKey(intf_thread_t *p_intf)
             RemoveLastUTF8Entity(p_sys->psz_open_chain, i_chain_len);
             return 1;
         default:
-#ifndef HAVE_NCURSESW
-        {
-            char *psz_utf8 = KeyToUTF8(i_key, p_sys->psz_partial_keys);
-
-            if (psz_utf8)
-            {
-                if (i_chain_len + strlen(psz_utf8) < OPEN_CHAIN_SIZE)
-                    strcpy(p_sys->psz_open_chain + i_chain_len, psz_utf8);
-                free(psz_utf8);
-            }
-        }
-#else
             if (i_chain_len + 1 < OPEN_CHAIN_SIZE)
             {
                 p_sys->psz_open_chain[i_chain_len] = (char) i_key;
                 p_sys->psz_open_chain[i_chain_len + 1] = '\0';
             }
-#endif
         }
         return 1;
     }
@@ -2017,8 +1913,7 @@ static int HandleKey(intf_thread_t *p_intf)
         BoxSwitch(p_sys, BOX_STATS);
         break;
     case 'c':
-        p_sys->b_color = !p_sys->b_color;
-        if (p_sys->b_color && !p_sys->b_color_started)
+        if ((p_sys->b_color = !p_sys->b_color))
             start_color_and_pairs(p_intf);
         break;
     case 'h':
@@ -2036,7 +1931,7 @@ static int HandleKey(intf_thread_t *p_intf)
         }
         break;
     case 'A': /* Open */
-        if (p_sys->i_box_type != BOX_OPEN && p_sys->psz_open_chain)
+        if (p_sys->i_box_type != BOX_OPEN)
         {
             p_sys->psz_open_chain[0] = '\0';
             p_sys->i_box_type = BOX_OPEN;
@@ -2207,16 +2102,12 @@ static int Open(vlc_object_t *p_this)
     if (!p_sys)
         return VLC_ENOMEM;
 
-    p_sys->f_slider = 0.0;
-    p_sys->f_slider_old = 0.0;
     p_sys->i_box_type = BOX_PLAYLIST;
     p_sys->b_box_plidx_follow = true;
 //  p_sys->p_sub = msg_Subscribe(p_intf);
     p_sys->b_color = var_CreateGetBool(p_intf, "color");
 
     p_sys->category_view = true; //FIXME: switching back & forth is broken
-    p_sys->psz_search_chain = malloc(SEARCH_CHAIN_SIZE + 1);
-    p_sys->psz_open_chain =   malloc(OPEN_CHAIN_SIZE + 1);
 
     p_sys->psz_current_dir = var_CreateGetString(p_intf, "browse-dir");
     if (!p_sys->psz_current_dir || !*p_sys->psz_current_dir)
@@ -2258,9 +2149,7 @@ static void Close(vlc_object_t *p_this)
     DirsDestroy(p_sys);
 
     free(p_sys->psz_current_dir);
-    free(p_sys->psz_search_chain);
     free(p_sys->psz_old_search);
-    free(p_sys->psz_open_chain);
 
     if (p_sys->p_input)
         vlc_object_release(p_sys->p_input);

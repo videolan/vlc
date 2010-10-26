@@ -3901,32 +3901,22 @@ AC_ARG_ENABLE(ncurses,
         [VLC_ADD_PLUGIN([ncurses])
         VLC_ADD_LIBS([ncurses],[-lncursesw])
         ALIASES="${ALIASES} nvlc"
-        AC_DEFINE([HAVE_NCURSESW], 1, [Define to 1 if you have libncursesw.])
         AC_CHECK_LIB(ncursesw, tgetent, [],
           AC_CHECK_LIB(tinfow, tgetent, [VLC_ADD_LIBS([ncurses],[-ltinfow])],
             [AC_CHECK_LIB(tinfo, tgetent, [VLC_ADD_LIBS([ncurses],[-ltinfo])],
-              [AS_IF([test "x${enable_ncurses}" != "x"],
+              [AS_IF([test "${enable_ncurses}" = "yes"],
                 [AC_MSG_ERROR([tgetent not found in ncursesw tinfow tinfo]
                )])])
             ]
           )
         )
         ],
-        [AC_CHECK_LIB( ncurses, mvprintw,
-          [VLC_ADD_PLUGIN([ncurses])
-          ALIASES="${ALIASES} nvlc"
-          VLC_ADD_LIBS([ncurses],[-lncurses])
-          AC_CHECK_LIB(ncurses, tgetent, [],
-            [AC_CHECK_LIB(tinfo, tgetent, [VLC_ADD_LIBS([ncurses],[-ltinfo])],
-              [AS_IF([test "x${enable_ncurses}" != "x"],
-                [AC_MSG_ERROR([tgetent not found in ncurses tinfo])])]
-            )]
-          )],
-          [AS_IF([test "x${enable_ncurses}" != "x"], [
-            AC_MSG_ERROR([libncurses not found])])]
-        )]
-      )]
-    )
+          [AS_IF([test "${enable_ncurses}" = "yes"], [
+            AC_MSG_ERROR([libncursesw not found])])]
+        )],
+        [AS_IF([test "${enable_ncurses}" = "yes"], [
+          AC_MSG_ERROR([ncurses.h not found])])]
+        )
   fi]
 )
 
