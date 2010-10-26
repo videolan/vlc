@@ -1688,8 +1688,6 @@ static int HandleKey(intf_thread_t *p_intf)
             if (p_sys->i_box_start >= p_sys->i_box_lines_total)
                 p_sys->i_box_start = p_sys->i_box_lines_total - 1;
             return 1;
-        default:
-            break;
         }
     }
     else if (p_sys->i_box_type == BOX_NONE)
@@ -1711,9 +1709,6 @@ static int HandleKey(intf_thread_t *p_intf)
         case KEY_DOWN:
             ChangePosition(p_intf, -0.05);
             return 1;
-
-        default:
-            break;
         }
     }
     else if (p_sys->i_box_type == BOX_SEARCH)
