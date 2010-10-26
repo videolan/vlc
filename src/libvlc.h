@@ -91,11 +91,6 @@ void msg_StackAdd ( const char*, ... );
 const char* msg_StackMsg ( void );
 
 /*
- * Unicode stuff
- */
-char *vlc_fix_readdir (const char *);
-
-/*
  * LibVLC exit event handling
  */
 typedef struct vlc_exit

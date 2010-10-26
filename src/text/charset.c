@@ -43,35 +43,6 @@
 #include "libvlc.h"
 #include <vlc_charset.h>
 
-char *vlc_fix_readdir( const char *psz_string )
-{
-#ifdef __APPLE__
-    vlc_iconv_t hd = vlc_iconv_open( "UTF-8", "UTF-8-MAC" );
-
-    if (hd != (vlc_iconv_t)(-1))
-    {
-        const char *psz_in = psz_string;
-        size_t i_in = strlen(psz_in);
-        size_t i_out = i_in * 2;
-        char *psz_utf8 = malloc(i_out + 1);
-        char *psz_out = psz_utf8;
-
-        size_t i_ret = vlc_iconv (hd, &psz_in, &i_in, &psz_out, &i_out);
-        vlc_iconv_close (hd);
-        if( i_ret == (size_t)(-1) || i_in )
-        {
-            free( psz_utf8 );
-            return strdup( psz_string );
-        }
-
-        *psz_out = '\0';
-        return psz_utf8;
-    }
-#endif
-    return strdup( psz_string );
-}
-
-
 /**
  * us_strtod() has the same prototype as ANSI C strtod() but it uses the
  * POSIX/C decimal format, regardless of the current numeric locale.
