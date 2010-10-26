@@ -183,7 +183,7 @@ while not vlc.misc.should_die() do
     for _, client in pairs(r) do
         local str = client.cmds .. client:recv(1000)
 
-        if not str then -- the telnet client program has leave
+        if not str then -- the telnet client program has left
             client.cmds = "quit"
         elseif string.match(str,"\n") then
             client.cmds = str
