@@ -193,8 +193,6 @@ struct intf_sys_t
 
     playlist_item_t *p_node;        /* current node */
 
-    int             b_box_cleared;
-
 //  msg_subscription_t* p_sub;                  /* message bank subscription */
 
     char            psz_search_chain[20];
@@ -2030,6 +2028,7 @@ static void Run(intf_thread_t *p_intf)
 {
     intf_sys_t    *p_sys = p_intf->p_sys;
     playlist_t    *p_playlist = pl_Get(p_intf);
+    bool           force_redraw = false;
 
     time_t t_last_refresh;
     int canc = vlc_savecancel();
@@ -2046,13 +2045,15 @@ static void Run(intf_thread_t *p_intf)
 
         /* Update the input */
         if (!p_sys->p_input)
+        {
             p_sys->p_input = playlist_CurrentInput(p_playlist);
+            force_redraw = true;
+        }
         else if (p_sys->p_input->b_dead)
         {
             vlc_object_release(p_sys->p_input);
             p_sys->p_input = NULL;
             p_sys->f_slider = p_sys->f_slider_old = 0.0;
-            p_sys->b_box_cleared = false;
         }
 
         PL_LOCK;
@@ -2064,12 +2065,11 @@ static void Run(intf_thread_t *p_intf)
         while (HandleKey(p_intf))
             Redraw(p_intf, &t_last_refresh);
 
-        /* Hack */
-        if (p_sys->f_slider > 0.0001 && !p_sys->b_box_cleared)
+        if (force_redraw)
         {
             clear();
             Redraw(p_intf, &t_last_refresh);
-            p_sys->b_box_cleared = true;
+            force_redraw = false;
         }
 
         if ((time(0) - t_last_refresh) >= 1)
