@@ -59,7 +59,9 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   intf_thread_t *_p_intf,
                                   playlist_t *p_playlist,
                                   playlist_item_t *p_root,
-                                  PLSelector *_p_selector ):
+                                  PLSelector *_p_selector,
+                                  PLModel *_p_model
+                                  ):
                                   QWidget( _parent ), p_intf( _p_intf ),
                                   p_selector( _p_selector )
 {
@@ -73,7 +75,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     viewStack = new QStackedLayout();
     layout->addLayout( viewStack, 1, 0, 1, -1 );
 
-    model = new PLModel( p_playlist, p_intf, p_root, this );
+    model = _p_model;
     currentRootId = -1;
     currentRootIndexId = -1;
     lastActivatedId = -1;

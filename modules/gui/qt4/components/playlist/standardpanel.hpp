@@ -59,7 +59,7 @@ class StandardPLPanel: public QWidget
 
 public:
     StandardPLPanel( PlaylistWidget *, intf_thread_t *,
-                     playlist_t *, playlist_item_t *, PLSelector * );
+                     playlist_t *, playlist_item_t *, PLSelector *, PLModel * );
     virtual ~StandardPLPanel();
 protected:
     friend class PlaylistWidget;
