@@ -1333,7 +1333,7 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
     {
         DrawEmptyLine(p_sys->w, 7, 1, COLS-2);
         mvnprintw(7, 1, COLS-2, _("Find: %s"), *p_sys->psz_search_chain ?
-                  p_sys->psz_search_chain : p_sys->psz_old_chain);
+                  p_sys->psz_search_chain : p_sys->psz_old_search);
     }
     if (p_sys->i_box_type == BOX_OPEN)
     {
