@@ -2621,10 +2621,8 @@ static char *EITConvertToUTF8( const unsigned char *psz_instring,
                                bool b_broken )
 {
     const char *psz_encoding;
-    char *psz_outstring;
     char psz_encbuf[sizeof( "ISO_8859-123" )];
-    size_t i_in, i_out, offset = 1;
-    vlc_iconv_t iconv_handle;
+    size_t offset = 1;
 
     if( i_length < 1 ) return NULL;
     if( psz_instring[0] >= 0x20 )
@@ -2710,55 +2708,26 @@ static char *EITConvertToUTF8( const unsigned char *psz_instring,
         offset = 0;
     }
 
-    i_in = i_length - offset;
-    i_out = i_in * 6 + 1;
+    psz_instring += offset;
+    i_length -= offset;
 
-    psz_outstring = malloc( i_out );
-    if( !psz_outstring )
-    {
-        return NULL;
+    char *psz = FromCharset( psz_encoding, psz_instring, i_length );
+    if( psz == NULL )
+    {    /* Invalid character set (e.g. ISO_8859-12) */
+        psz = strndup( (const char *)psz_instring, i_length );
+        if( unlikely(psz == NULL) )
+            return NULL;
+        EnsureUTF8( psz );
     }
 
-    iconv_handle = vlc_iconv_open( "UTF-8", psz_encoding );
-    if( iconv_handle == (vlc_iconv_t)(-1) )
+    /* Convert EIT-coded CR/LFs */
+    for(char *p = strstr( psz, "\xc2\x8a" ); p != NULL;
+        p = strstr( p, "\xc2\x8a" ))
     {
-         /* Invalid character set (e.g. ISO_8859-12) */
-         memcpy( psz_outstring, &psz_instring[offset], i_in );
-         psz_outstring[i_in] = '\0';
-         EnsureUTF8( psz_outstring );
+        p[0] = ' ';
+        p[1] = '\n';
     }
-    else
-    {
-        const char *psz_in = (const char *)&psz_instring[offset];
-        char *psz_out = psz_outstring;
-
-        while( vlc_iconv( iconv_handle, &psz_in, &i_in,
-                          &psz_out, &i_out ) == (size_t)(-1) )
-        {
-            /* skip naughty byte. This may fail terribly for multibyte stuff,
-             * but what can we do anyway? */
-            psz_in++;
-            i_in--;
-            vlc_iconv( iconv_handle, NULL, NULL, NULL, NULL ); /* reset */
-        }
-        vlc_iconv_close( iconv_handle );
-
-        *psz_out = '\0';
-
-        /* Convert EIT-coded CR/LFs */
-        unsigned char *pbuf = (unsigned char *)psz_outstring;
-        for( ; pbuf < (unsigned char *)psz_out ; pbuf++)
-        {
-            if( pbuf[0] == 0xc2 && pbuf[1] == 0x8a )
-            {
-                pbuf[0] = ' ';
-                pbuf[1] = '\n';
-            }
-        }
-
-
-    }
-    return psz_outstring;
+    return psz;
 }
 
 static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
