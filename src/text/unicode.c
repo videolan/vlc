@@ -466,3 +466,57 @@ char *FromCharset(const char *charset, const void *data, size_t data_size)
     return out;
 }
 
+/**
+ * Converts a nul-terminated UTF-8 string to a given character encoding.
+ * @param charset iconv name of the character set
+ * @param in nul-terminated UTF-8 string
+ * @param outsize pointer to hold the byte size of result
+ *
+ * @return A pointer to the result, which must be released using free().
+ * The UTF-8 nul terminator is included in the conversion if the target
+ * character encoding supports it. However it is not included in the returned
+ * byte size.
+ * In case of error, NULL is returned and the byte size is undefined.
+ */
+void *ToCharset(const char *charset, const char *in, size_t *outsize)
+{
+    vlc_iconv_t hd = vlc_iconv_open (charset, "UTF-8");
+    if (hd == (vlc_iconv_t)(-1))
+        return NULL;
+
+    const size_t inlen = strlen (in);
+    void *res;
+
+    for (unsigned mul = 4; mul < 16; mul++)
+    {
+        size_t outlen = mul * (inlen + 1);
+        res = malloc (outlen);
+        if (unlikely(res == NULL))
+            break;
+
+        const char *inp = in;
+        char *outp = res;
+        size_t inb = inlen + 1;
+        size_t outb = outlen;
+
+        if (vlc_iconv (hd, &inp, &inb, &outp, &outb) != (size_t)(-1))
+        {
+            *outsize = outlen - outb;
+            inb = 1; /* append nul terminator if possible */
+            if (vlc_iconv (hd, &inp, &inb, &outp, &outb) != (size_t)(-1))
+                break;
+            if (errno == EILSEQ) /* cannot translate nul terminator!? */
+                break;
+        }
+
+        free (res);
+        if (errno != E2BIG) /* conversion failure */
+        {
+            res = NULL;
+            break;
+        }
+    }
+    vlc_iconv_close (hd);
+    return res;
+}
+

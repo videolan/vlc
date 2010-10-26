@@ -438,6 +438,7 @@ subpicture_region_Delete
 subpicture_region_New
 tls_ClientCreate
 tls_ClientDelete
+ToCharset
 ToLocale
 ToLocaleDup
 update_Check
