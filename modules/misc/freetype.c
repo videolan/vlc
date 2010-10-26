@@ -1035,9 +1035,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     line_desc_t  *p_lines = NULL, *p_line = NULL, *p_next = NULL, *p_prev = NULL;
     int i, i_pen_y, i_pen_x, i_error, i_glyph_index, i_previous;
     uint32_t *psz_unicode, *psz_unicode_orig = NULL, i_char, *psz_line_start;
-    int i_string_length;
+    size_t i_string_length;
     char *psz_string;
-    vlc_iconv_t iconv_handle = (vlc_iconv_t)(-1);
     int i_font_color, i_font_alpha, i_font_size, i_red, i_green, i_blue;
     vlc_value_t val;
     int i_scale = 1000;
@@ -1079,44 +1078,15 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     result.x =  result.y = 0;
     line.xMin = line.xMax = line.yMin = line.yMax = 0;
 
-    psz_unicode = psz_unicode_orig =
-        malloc( ( strlen(psz_string) + 1 ) * sizeof(uint32_t) );
+#if defined(WORDS_BIGENDIAN)
+    psz_unicode = ToCharset( "UCS-4BE", psz_string, &i_string_length );
+#else
+    psz_unicode = ToCharset( "UCS-4LE", psz_string, &i_string_length );
+#endif
     if( psz_unicode == NULL )
         goto error;
-#if defined(WORDS_BIGENDIAN)
-    iconv_handle = vlc_iconv_open( "UCS-4BE", "UTF-8" );
-#else
-    iconv_handle = vlc_iconv_open( "UCS-4LE", "UTF-8" );
-#endif
-    if( iconv_handle == (vlc_iconv_t)-1 )
-    {
-        msg_Warn( p_filter, "unable to do conversion" );
-        goto error;
-    }
-
-    {
-        char *p_out_buffer;
-        const char *p_in_buffer = psz_string;
-        size_t i_in_bytes, i_out_bytes, i_out_bytes_left, i_ret;
-        i_in_bytes = strlen( psz_string );
-        i_out_bytes = i_in_bytes * sizeof( uint32_t );
-        i_out_bytes_left = i_out_bytes;
-        p_out_buffer = (char *)psz_unicode;
-        i_ret = vlc_iconv( iconv_handle, (const char**)&p_in_buffer,
-                           &i_in_bytes,
-                           &p_out_buffer, &i_out_bytes_left );
-
-        vlc_iconv_close( iconv_handle );
-
-        if( i_in_bytes )
-        {
-            msg_Warn( p_filter, "failed to convert string to unicode (%m), "
-                      "bytes left %zu", i_in_bytes );
-            goto error;
-        }
-        *(uint32_t*)p_out_buffer = 0;
-        i_string_length = (i_out_bytes - i_out_bytes_left) / sizeof(uint32_t);
-    }
+    psz_unicode_orig = psz_unicode;
+    i_string_length /= 4;
 
 #if defined(HAVE_FRIBIDI)
     {
@@ -1382,10 +1352,8 @@ static bool StyleEquals( ft_style_t *s1, ft_style_t *s2 )
 }
 
 static void IconvText( filter_t *p_filter, const char *psz_string,
-                       uint32_t *i_string_length, uint32_t **ppsz_unicode )
+                       size_t *i_string_length, uint32_t **ppsz_unicode )
 {
-    vlc_iconv_t iconv_handle = (vlc_iconv_t)(-1);
-
     /* If memory hasn't been allocated for our output string, allocate it here
      * - the calling function must now be responsible for freeing it.
      */
@@ -1398,41 +1366,17 @@ static void IconvText( filter_t *p_filter, const char *psz_string,
 
     if( *ppsz_unicode )
     {
+        *ppsz_unicode =
 #if defined(WORDS_BIGENDIAN)
-        iconv_handle = vlc_iconv_open( "UCS-4BE", "UTF-8" );
+            ToCharset( "UCS-4BE", psz_string, i_string_length );
 #else
-        iconv_handle = vlc_iconv_open( "UCS-4LE", "UTF-8" );
+            ToCharset( "UCS-4LE", psz_string, i_string_length );
 #endif
-        if( iconv_handle != (vlc_iconv_t)-1 )
-        {
-            char *p_in_buffer, *p_out_buffer;
-            size_t i_in_bytes, i_out_bytes, i_out_bytes_left, i_ret;
-            i_in_bytes = strlen( psz_string );
-            i_out_bytes = i_in_bytes * sizeof( uint32_t );
-            i_out_bytes_left = i_out_bytes;
-            p_in_buffer = (char *) psz_string;
-            p_out_buffer = (char *) *ppsz_unicode;
-            i_ret = vlc_iconv( iconv_handle, (const char**)&p_in_buffer,
-                    &i_in_bytes, &p_out_buffer, &i_out_bytes_left );
-
-            vlc_iconv_close( iconv_handle );
-
-            if( i_in_bytes )
-            {
-                msg_Warn( p_filter, "failed to convert string to unicode (%m), "
-                          "bytes left %u", (unsigned)i_in_bytes );
-            }
-            else
-            {
-                *(uint32_t*)p_out_buffer = 0;
-                *i_string_length =
-                    (i_out_bytes - i_out_bytes_left) / sizeof(uint32_t);
-            }
-        }
+        if( *ppsz_unicode != NULL )
+            *i_string_length /= 4;
         else
-        {
-            msg_Warn( p_filter, "unable to do conversion" );
-        }
+            /* FIXME: This is going to fail miserably in the caller */
+            msg_Warn( p_filter, "failed to convert string to unicode (%m)" );
     }
 }
 
@@ -1663,7 +1607,7 @@ static void SetupLine( filter_t *p_filter, const char *psz_text_in,
                        uint32_t **ppi_run_lengths, ft_style_t ***ppp_styles,
                        ft_style_t *p_style )
 {
-    uint32_t      i_string_length = 0;
+    size_t i_string_length;
 
     IconvText( p_filter, psz_text_in, &i_string_length, psz_text_out );
     *psz_text_out += i_string_length;
