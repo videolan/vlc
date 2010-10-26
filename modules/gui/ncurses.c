@@ -1440,6 +1440,121 @@ static inline void BoxSwitch(intf_sys_t *p_sys, int box)
     p_sys->i_box_type = (p_sys->i_box_type == box) ? BOX_NONE : box;
 }
 
+static bool HandlePlaylistKey(intf_thread_t *p_intf, int key)
+{
+    bool b_box_plidx_follow = false;
+    intf_sys_t *p_sys = p_intf->p_sys;
+    playlist_t *p_playlist = pl_Get(p_intf);
+    struct pl_item_t *p_pl_item;
+
+    switch(key)
+    {
+    /* Playlist Settings */
+    case 'r': var_ToggleBool(p_playlist, "random"); return true;
+    case 'l': var_ToggleBool(p_playlist, "loop");   return true;
+    case 'R': var_ToggleBool(p_playlist, "repeat"); return true;
+
+    /* Playlist sort */
+    case 'o':
+    case 'O':
+        playlist_RecursiveNodeSort(p_playlist, PlaylistGetRoot(p_intf),
+                                    SORT_TITLE_NODES_FIRST,
+                                    (key == 'o')? ORDER_NORMAL : ORDER_REVERSE);
+        p_sys->b_need_update = true;
+        return true;
+
+    /* Playlist view */
+    case 'v':
+        p_sys->category_view = !p_sys->category_view;
+        p_sys->b_need_update = true;
+        return true;
+
+    /* Playlist navigation */
+#ifdef __FreeBSD__
+/* workaround for FreeBSD + xterm:
+* see http://www.nabble.com/curses-vs.-xterm-key-mismatch-t3574377.html */
+    case KEY_SELECT:
+#endif
+    case KEY_END:   p_sys->i_box_plidx = p_playlist->items.i_size - 1;  break;
+    case KEY_HOME:  p_sys->i_box_plidx = 0;                             break;
+    case KEY_UP:    p_sys->i_box_plidx--;                               break;
+    case KEY_DOWN:  p_sys->i_box_plidx++;                               break;
+    case KEY_PPAGE: p_sys->i_box_plidx -= p_sys->i_box_lines;           break;
+    case KEY_NPAGE: p_sys->i_box_plidx += p_sys->i_box_lines;           break;
+    case 'g':       FindIndex(p_sys, p_playlist, false);                break;
+
+    /* Deletion */
+    case 'D':
+    case KEY_BACKSPACE:
+    case 0x7f:
+    case KEY_DC:
+    {
+        playlist_item_t *p_item;
+
+        PL_LOCK;
+        p_item = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
+        if (p_item->i_children == -1)
+            playlist_DeleteFromInput(p_playlist, p_item->p_input, pl_Locked);
+        else
+            playlist_NodeDelete(p_playlist, p_item, true , false);
+        PL_UNLOCK;
+        p_sys->b_need_update = true;
+        break;
+    }
+
+    case KEY_ENTER:
+    case '\r':
+    case '\n':
+        if (!(p_pl_item = p_sys->pp_plist[p_sys->i_box_plidx]))
+            return false;
+
+        if (p_pl_item->p_item->i_children)
+        {
+            playlist_item_t *p_item, *p_parent = p_pl_item->p_item;
+            if (p_parent->i_children == -1)
+            {
+                p_item = p_parent;
+
+                while (p_parent->p_parent)
+                    p_parent = p_parent->p_parent;
+            }
+            else
+            {
+                p_sys->p_node = p_parent;
+                p_item = NULL;
+            }
+
+            playlist_Control(p_playlist, PLAYLIST_VIEWPLAY, pl_Unlocked,
+                              p_parent, p_item);
+        }
+        else
+        {   /* We only want to set the current node */
+            playlist_Stop(p_playlist);
+            p_sys->p_node = p_pl_item->p_item;
+        }
+
+        b_box_plidx_follow = true;
+        break;
+
+    default:
+        return false;
+    }
+
+    if (p_sys->i_box_plidx > p_sys->i_plist_entries - 1)
+        p_sys->i_box_plidx = p_sys->i_plist_entries - 1;
+    if (p_sys->i_box_plidx < 0)
+        p_sys->i_box_plidx = 0;
+
+    p_pl_item = p_sys->pp_plist[p_sys->i_box_plidx];
+
+    PL_LOCK;
+    if (PlaylistIsPlaying(p_playlist, p_pl_item->p_item))
+        b_box_plidx_follow = true;
+    PL_UNLOCK;
+    p_sys->b_box_plidx_follow = b_box_plidx_follow;
+    return true;
+}
+
 static int HandleKey(intf_thread_t *p_intf)
 {
     intf_sys_t *p_sys = p_intf->p_sys;
@@ -1451,137 +1566,8 @@ static int HandleKey(intf_thread_t *p_intf)
 
     if (p_sys->i_box_type == BOX_PLAYLIST)
     {
-        int b_ret = true;
-        bool b_box_plidx_follow = false;
-
-        switch(i_key)
-        {
-        /* Playlist Settings */
-        case 'r':
-            var_ToggleBool(p_playlist, "random");
+        if (HandlePlaylistKey(p_intf, i_key))
             return 1;
-        case 'l':
-            var_ToggleBool(p_playlist, "loop");
-            return 1;
-        case 'R':
-            var_ToggleBool(p_playlist, "repeat");
-            return 1;
-
-        /* Playlist sort */
-        case 'o':
-            playlist_RecursiveNodeSort(p_playlist, PlaylistGetRoot(p_intf),
-                                        SORT_TITLE_NODES_FIRST, ORDER_NORMAL);
-            p_sys->b_need_update = true;
-            return 1;
-        case 'O':
-            playlist_RecursiveNodeSort(p_playlist, PlaylistGetRoot(p_intf),
-                                        SORT_TITLE_NODES_FIRST, ORDER_REVERSE);
-            p_sys->b_need_update = true;
-            return 1;
-
-        /* Playlist view */
-        case 'v':
-            p_sys->category_view = !p_sys->category_view;
-            PlaylistRebuild(p_intf);
-            return 1;
-
-        /* Playlist navigation */
-        case 'g':
-            FindIndex(p_sys, p_playlist, false);
-            break;
-        case KEY_HOME:
-            p_sys->i_box_plidx = 0;
-            break;
-#ifdef __FreeBSD__
-/* workaround for FreeBSD + xterm:
-* see http://www.nabble.com/curses-vs.-xterm-key-mismatch-t3574377.html */
-        case KEY_SELECT:
-#endif
-        case KEY_END:
-            p_sys->i_box_plidx = p_playlist->items.i_size - 1;
-            break;
-        case KEY_UP:
-            p_sys->i_box_plidx--;
-            break;
-        case KEY_DOWN:
-            p_sys->i_box_plidx++;
-            break;
-        case KEY_PPAGE:
-            p_sys->i_box_plidx -= p_sys->i_box_lines;
-            break;
-        case KEY_NPAGE:
-            p_sys->i_box_plidx += p_sys->i_box_lines;
-            break;
-        case 'D':
-        case KEY_BACKSPACE:
-        case 0x7f:
-        case KEY_DC:
-        {
-            playlist_item_t *p_item;
-
-            PL_LOCK;
-            p_item = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
-            if (p_item->i_children == -1)
-                playlist_DeleteFromInput(p_playlist, p_item->p_input, pl_Locked);
-            else
-                playlist_NodeDelete(p_playlist, p_item, true , false);
-            PL_UNLOCK;
-            PlaylistRebuild(p_intf);
-            break;
-        }
-
-        case KEY_ENTER:
-        case '\r':
-        case '\n':
-            if (!p_sys->pp_plist[p_sys->i_box_plidx])
-            {
-                b_ret = false;
-                break;
-            }
-            if (p_sys->pp_plist[p_sys->i_box_plidx]->p_item->i_children == -1)
-            {
-                playlist_item_t *p_item, *p_parent;
-                p_item = p_parent = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
-
-                if (!p_parent)
-                    p_parent = p_playlist->p_root_onelevel;
-                while (p_parent->p_parent)
-                    p_parent = p_parent->p_parent;
-                playlist_Control(p_playlist, PLAYLIST_VIEWPLAY, pl_Unlocked,
-                                  p_parent, p_item);
-            }
-            else if (!p_sys->pp_plist[p_sys->i_box_plidx]->p_item->i_children)
-            {   /* We only want to set the current node */
-                playlist_Stop(p_playlist);
-                p_sys->p_node = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
-            }
-            else
-            {
-                p_sys->p_node = p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
-                playlist_Control(p_playlist, PLAYLIST_VIEWPLAY, pl_Unlocked,
-                    p_sys->pp_plist[p_sys->i_box_plidx]->p_item, NULL);
-            }
-            b_box_plidx_follow = true;
-            break;
-        default:
-            b_ret = false;
-            break;
-        }
-
-        if (b_ret)
-        {
-            int i_max = p_sys->i_plist_entries;
-            if (p_sys->i_box_plidx >= i_max) p_sys->i_box_plidx = i_max - 1;
-            if (p_sys->i_box_plidx < 0) p_sys->i_box_plidx = 0;
-
-            PL_LOCK;
-            if (PlaylistIsPlaying(p_playlist,
-                                   p_sys->pp_plist[p_sys->i_box_plidx]->p_item))
-                b_box_plidx_follow = true;
-            PL_UNLOCK;
-            p_sys->b_box_plidx_follow = b_box_plidx_follow;
-            return 1;
-        }
     }
     else if (p_sys->i_box_type == BOX_BROWSE)
     {
