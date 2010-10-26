@@ -1650,9 +1650,8 @@ static int HandleKey(intf_thread_t *p_intf)
                 if (!p_parent)
                 {
                     playlist_item_t *p_item;
-                    p_item = playlist_CurrentPlayingItem(p_playlist);
-
                     PL_LOCK;
+                    p_item = playlist_CurrentPlayingItem(p_playlist);
                     p_parent = p_item ? p_item->p_parent : NULL;
                     PL_UNLOCK;
                     if (!p_parent)
