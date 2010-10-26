@@ -176,9 +176,6 @@ struct intf_sys_t
     bool            b_color;
     bool            b_color_started;
 
-    float           f_slider;
-    float           f_slider_old;
-
     WINDOW          *w;
 
     int             i_box_type;
@@ -781,7 +778,7 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
             var_Get(p_input, "length", &val);
             secstotimestr(buf2, val.i_time / CLOCK_FREQ);
 
-            mvnprintw(y++, 0, COLS, _(" Position : %s/%s (%.2f%%)"), buf1, buf2, p_sys->f_slider);
+            mvnprintw(y++, 0, COLS, _(" Position : %s/%s"), buf1, buf2);
 
             /* Volume */
             aout_VolumeGet(p_playlist, &i_volume);
@@ -819,7 +816,13 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
 
     DrawBox(p_sys->w, y, 0, 3, COLS, "", p_sys->b_color);
     DrawEmptyLine(p_sys->w, y+1, 1, COLS-2);
-    DrawLine(p_sys->w, y+1, 1, (int)(p_intf->p_sys->f_slider/100.0 * (COLS -2)));
+
+    if (p_input && var_GetInteger(p_input, "state") == PLAYING_S)
+    {
+        float pos = var_GetFloat(p_input, "position");
+        DrawLine(p_sys->w, y+1, 1, (int)(pos * (COLS-2)));
+    }
+
     y += 3;
 
     p_sys->i_box_y = y + 1;
@@ -1339,7 +1342,7 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
     *t_last_refresh = time(0);
 }
 
-static void ManageSlider(intf_thread_t *p_intf)
+static void ChangePosition(intf_thread_t *p_intf, float increment)
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
     input_thread_t *p_input = p_sys->p_input;
@@ -1348,16 +1351,12 @@ static void ManageSlider(intf_thread_t *p_intf)
     if (!p_input || var_GetInteger(p_input, "state") != PLAYING_S)
         return;
 
-    pos = var_GetFloat(p_input, "position");
-    if (p_sys->f_slider == p_sys->f_slider_old)
-        p_sys->f_slider = p_sys->f_slider_old = 100. * pos;
-    else
-    {
-        p_sys->f_slider_old = p_sys->f_slider;
+    pos = var_GetFloat(p_input, "position") + increment;
 
-        pos = p_sys->f_slider / 100.;
-        var_SetFloat(p_input, "position", pos);
-    }
+    if (pos > 0.99) pos = 0.99;
+    if (pos < 0.0)  pos = 0.0;
+
+    var_SetFloat(p_input, "position", pos);
 }
 
 static inline int RemoveLastUTF8Entity(char *psz, int len)
@@ -1726,25 +1725,19 @@ static int HandleKey(intf_thread_t *p_intf)
         switch(i_key)
         {
         case KEY_HOME:
-            p_sys->f_slider = 0;
-            ManageSlider(p_intf);
+            ChangePosition(p_intf, -1.0);
             return 1;
 #ifdef __FreeBSD__
         case KEY_SELECT:
 #endif
         case KEY_END:
-            p_sys->f_slider = 99.9;
-            ManageSlider(p_intf);
+            ChangePosition(p_intf, .99);
             return 1;
         case KEY_UP:
-            p_sys->f_slider += 5.0;
-            if (p_sys->f_slider >= 99.0) p_sys->f_slider = 99.0;
-            ManageSlider(p_intf);
+            ChangePosition(p_intf, 0.05);
             return 1;
         case KEY_DOWN:
-            p_sys->f_slider -= 5.0;
-            if (p_sys->f_slider < 0.0) p_sys->f_slider = 0.0;
-            ManageSlider(p_intf);
+            ChangePosition(p_intf, -0.05);
             return 1;
 
         default:
@@ -1929,15 +1922,11 @@ static int HandleKey(intf_thread_t *p_intf)
 
     /* Navigation */
     case KEY_RIGHT:
-        p_sys->f_slider += 1.0;
-        if (p_sys->f_slider > 99.9) p_sys->f_slider = 99.9;
-        ManageSlider(p_intf);
+        ChangePosition(p_intf, 0.01);
         break;
 
     case KEY_LEFT:
-        p_sys->f_slider -= 1.0;
-        if (p_sys->f_slider < 0.0) p_sys->f_slider = 0.0;
-        ManageSlider(p_intf);
+        ChangePosition(p_intf, -0.01);
         break;
 
     /* Common control */
@@ -2053,7 +2042,6 @@ static void Run(intf_thread_t *p_intf)
         {
             vlc_object_release(p_sys->p_input);
             p_sys->p_input = NULL;
-            p_sys->f_slider = p_sys->f_slider_old = 0.0;
         }
 
         PL_LOCK;
@@ -2073,10 +2061,7 @@ static void Run(intf_thread_t *p_intf)
         }
 
         if ((time(0) - t_last_refresh) >= 1)
-        {
-            ManageSlider(p_intf);
             Redraw(p_intf, &t_last_refresh);
-        }
     }
     var_DelCallback(p_playlist, "intf-change", PlaylistChanged, p_intf);
     var_DelCallback(p_playlist, "playlist-item-append", PlaylistChanged, p_intf);
