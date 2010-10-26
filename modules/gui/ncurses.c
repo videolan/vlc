@@ -1346,13 +1346,11 @@ static void ChangePosition(intf_thread_t *p_intf, float increment)
     var_SetFloat(p_input, "position", pos);
 }
 
-static inline int RemoveLastUTF8Entity(char *psz, int len)
+static inline void RemoveLastUTF8Entity(char *psz, int len)
 {
-    while (len && ((psz[--len] & 0xc0) == 0x80));
-                       /* UTF8 continuation byte */
-
+    while (len && ((psz[--len] & 0xc0) == 0x80))    /* UTF8 continuation byte */
+        ;
     psz[len] = '\0';
-    return len;
 }
 
 static char *GetDiscDevice(intf_thread_t *p_intf, const char *name)
@@ -1638,222 +1636,150 @@ static bool HandleBrowseKey(intf_thread_t *p_intf, int key)
     return true;
 }
 
+static bool HandleEditBoxKey(intf_thread_t *p_intf, int key, int box)
+{
+    intf_sys_t *p_sys = p_intf->p_sys;
+    bool search = box == BOX_SEARCH;
+    char *str = search ? p_sys->psz_search_chain: p_sys->psz_open_chain;
+    size_t len = strlen(str);
+
+    assert(box == BOX_SEARCH || box == BOX_OPEN);
+
+    switch(key)
+    {
+    case 0x0c:  /* ^l */
+    case KEY_CLEAR:     clear(); return 1;
+
+    case KEY_ENTER:
+    case '\r':
+    case '\n':
+        if (search)
+        {
+            if (len)
+                p_sys->psz_old_search = strdup(p_sys->psz_search_chain);
+            else if (p_sys->psz_old_search)
+                SearchPlaylist(p_sys, p_sys->psz_old_search);
+        }
+        else if (len)
+        {
+            playlist_t *p_playlist = pl_Get(p_intf);
+            playlist_item_t *p_parent = p_sys->p_node, *p_current;
+
+            PL_LOCK;
+            if (!p_parent)
+            {
+                p_current = playlist_CurrentPlayingItem(p_playlist);
+                p_parent = p_current ? p_current->p_parent : NULL;
+                if (!p_parent)
+                    p_parent = p_playlist->p_local_onelevel;
+            }
+
+            while (p_parent->p_parent && p_parent->p_parent->p_parent)
+                p_parent = p_parent->p_parent;
+            PL_UNLOCK;
+
+            playlist_Add(p_playlist, p_sys->psz_open_chain, NULL,
+                  PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
+                  p_parent->p_input == p_playlist->p_local_onelevel->p_input,
+                  false);
+
+            p_sys->b_box_plidx_follow = true;
+        }
+        p_sys->i_box_type = BOX_PLAYLIST;
+        return 1;
+
+    case 0x1b: /* ESC */
+        /* Alt+key combinations return 2 keys in the terminal keyboard:
+         * ESC, and the 2nd key.
+         * If some other key is available immediately (where immediately
+         * means after wgetch() 1 second delay), that means that the
+         * ESC key was not pressed.
+         *
+         * man 3X curs_getch says:
+         *
+         * Use of the escape key by a programmer for a single
+         * character function is discouraged, as it will cause a delay
+         * of up to one second while the keypad code looks for a
+         * following function-key sequence.
+         *
+         */
+        if (wgetch(p_sys->w) != ERR)
+            return 0;
+
+        if (search) p_sys->i_box_plidx = p_sys->i_before_search;
+        p_sys->i_box_type = BOX_PLAYLIST;
+        return 1;
+
+    case KEY_BACKSPACE:
+    case 0x7f:
+        RemoveLastUTF8Entity(str, len);
+        break;
+
+    default:
+        if (len + 1 < search ? sizeof p_sys->psz_search_chain
+                             : sizeof p_sys->psz_open_chain)
+        {
+            str[len + 0] = (char) key;
+            str[len + 1] = '\0';
+        }
+    }
+
+    if (search)
+    {
+        free(p_sys->psz_old_search);
+        p_sys->psz_old_search = NULL;
+        SearchPlaylist(p_sys, str);
+    }
+    return 1;
+}
+
 static void InputNavigate(input_thread_t* p_input, const char *var)
 {
     if (p_input)
         var_TriggerCallback(p_input, var);
 }
 
-static int HandleKey(intf_thread_t *p_intf)
+static bool HandleCommonKey(intf_thread_t *p_intf, int key)
 {
     intf_sys_t *p_sys = p_intf->p_sys;
     playlist_t *p_playlist = pl_Get(p_intf);
-    int i_key = wgetch(p_sys->w);
-
-    if (i_key == -1)
-        return 0;
-
-    if (p_sys->i_box_type == BOX_PLAYLIST)
-    {
-        if (HandlePlaylistKey(p_intf, i_key))
-            return 1;
-    }
-    else if (p_sys->i_box_type == BOX_BROWSE)
-    {
-        if (HandleBrowseKey(p_intf, i_key))
-            return 1;
-    }
-    else if (p_sys->i_box_type == BOX_HELP || p_sys->i_box_type == BOX_INFO ||
-             p_sys->i_box_type == BOX_META || p_sys->i_box_type == BOX_STATS ||
-             p_sys->i_box_type == BOX_OBJECTS)
-    {
-        bool ret = true;
-        switch(i_key)
-        {
-#ifdef __FreeBSD__
-        case KEY_SELECT:
-#endif
-        case KEY_END:  p_sys->i_box_start = p_sys->i_box_lines_total - 1; break;
-        case KEY_HOME: p_sys->i_box_start = 0;                            break;
-        case KEY_UP:   p_sys->i_box_start--;                              break;
-        case KEY_DOWN: p_sys->i_box_start++;                              break;
-        case KEY_PPAGE:p_sys->i_box_start -= p_sys->i_box_lines;          break;
-        case KEY_NPAGE:p_sys->i_box_start += p_sys->i_box_lines;          break;
-
-        default:
-            ret = false;
-            break;
-        }
-        if (ret)
-        {
-            if (p_sys->i_box_start < 0)
-                p_sys->i_box_start = 0;
-            if (p_sys->i_box_start > p_sys->i_box_lines_total - 1)
-                p_sys->i_box_start = p_sys->i_box_lines_total - 1;
-            return 1;
-        }
-    }
-    else if (p_sys->i_box_type == BOX_NONE)
-    {
-        switch(i_key)
-        {
-#ifdef __FreeBSD__
-        case KEY_SELECT:
-#endif
-        case KEY_END:   ChangePosition(p_intf, +.99);   return 1;
-        case KEY_HOME:  ChangePosition(p_intf, -1.0);   return 1;
-        case KEY_UP:    ChangePosition(p_intf, +0.05);  return 1;
-        case KEY_DOWN:  ChangePosition(p_intf, -0.05);  return 1;
-        }
-    }
-    else if (p_sys->i_box_type == BOX_SEARCH)
-    {
-        size_t i_chain_len = strlen(p_sys->psz_search_chain);
-        switch(i_key)
-        {
-        case KEY_CLEAR:
-        case 0x0c:      /* ^l */
-            clear();
-            return 1;
-        case KEY_ENTER:
-        case '\r':
-        case '\n':
-            if (i_chain_len)
-                p_sys->psz_old_search = strdup(p_sys->psz_search_chain);
-            else if (p_sys->psz_old_search)
-                SearchPlaylist(p_sys, p_sys->psz_old_search);
-            p_sys->i_box_type = BOX_PLAYLIST;
-            return 1;
-        case 0x1b: /* ESC */
-            /* Alt+key combinations return 2 keys in the terminal keyboard:
-             * ESC, and the 2nd key.
-             * If some other key is available immediately (where immediately
-             * means after wgetch() 1 second delay), that means that the
-             * ESC key was not pressed.
-             *
-             * man 3X curs_getch says:
-             *
-             * Use of the escape key by a programmer for a single
-             * character function is discouraged, as it will cause a delay
-             * of up to one second while the keypad code looks for a
-             * following function-key sequence.
-             *
-             */
-            if (wgetch(p_sys->w) != ERR)
-                return 0;
-            p_sys->i_box_plidx = p_sys->i_before_search;
-            p_sys->i_box_type = BOX_PLAYLIST;
-            return 1;
-        case KEY_BACKSPACE:
-        case 0x7f:
-            RemoveLastUTF8Entity(p_sys->psz_search_chain, i_chain_len);
-            break;
-        default:
-            if (i_chain_len + 1 < sizeof p_sys->psz_search_chain)
-            {
-                p_sys->psz_search_chain[i_chain_len] = (char) i_key;
-                p_sys->psz_search_chain[i_chain_len + 1] = '\0';
-            }
-        }
-        free(p_sys->psz_old_search);
-        p_sys->psz_old_search = NULL;
-        SearchPlaylist(p_sys, p_sys->psz_search_chain);
-        return 1;
-    }
-    else if (p_sys->i_box_type == BOX_OPEN)
-    {
-        size_t i_chain_len = strlen(p_sys->psz_open_chain);
-
-        switch(i_key)
-        {
-        case KEY_CLEAR:
-        case 0x0c:          /* ^l */
-            clear();
-            return 1;
-        case KEY_ENTER:
-        case '\r':
-        case '\n':
-            if (i_chain_len)
-            {
-                playlist_item_t *p_parent = p_sys->p_node;
-
-                PL_LOCK;
-                if (!p_parent)
-                p_parent = playlist_CurrentPlayingItem(p_playlist) ? playlist_CurrentPlayingItem(p_playlist)->p_parent : NULL;
-                if (!p_parent)
-                    p_parent = p_playlist->p_local_onelevel;
-
-                while (p_parent->p_parent && p_parent->p_parent->p_parent)
-                    p_parent = p_parent->p_parent;
-                PL_UNLOCK;
-
-                playlist_Add(p_playlist, p_sys->psz_open_chain, NULL,
-                              PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
-                              p_parent->p_input ==
-                                p_playlist->p_local_onelevel->p_input
-                              , false);
-
-                p_sys->b_box_plidx_follow = true;
-            }
-            p_sys->i_box_type = BOX_PLAYLIST;
-            return 1;
-        case 0x1b:  /* ESC */
-            if (wgetch(p_sys->w) != ERR)
-                return 0;
-            p_sys->i_box_type = BOX_PLAYLIST;
-            return 1;
-        case KEY_BACKSPACE:
-        case 0x7f:
-            RemoveLastUTF8Entity(p_sys->psz_open_chain, i_chain_len);
-            return 1;
-        default:
-            if (i_chain_len + 1 < sizeof p_sys->psz_open_chain)
-            {
-                p_sys->psz_open_chain[i_chain_len] = (char) i_key;
-                p_sys->psz_open_chain[i_chain_len + 1] = '\0';
-            }
-        }
-        return 1;
-    }
-
-    /* Common keys */
-    switch(i_key)
+    switch(key)
     {
     case 0x1b:  /* ESC */
         if (wgetch(p_sys->w) != ERR)
-            return 0;
+            return false;
 
     case 'q':
     case 'Q':
     case KEY_EXIT:
         libvlc_Quit(p_intf->p_libvlc);
-        return 0;
+        return false;
 
     case 'h':
-    case 'H': BoxSwitch(p_sys, BOX_HELP);       return 1;
-    case 'i': BoxSwitch(p_sys, BOX_INFO);       return 1;
-    case 'm': BoxSwitch(p_sys, BOX_META);       return 1;
-//  case 'L': BoxSwitch(p_sys, BOX_LOG)         return 1;
-    case 'P': BoxSwitch(p_sys, BOX_PLAYLIST);   return 1;
-    case 'B': BoxSwitch(p_sys, BOX_BROWSE);     return 1;
-    case 'x': BoxSwitch(p_sys, BOX_OBJECTS);    return 1;
-    case 'S': BoxSwitch(p_sys, BOX_STATS);      return 1;
+    case 'H': BoxSwitch(p_sys, BOX_HELP);       return true;
+    case 'i': BoxSwitch(p_sys, BOX_INFO);       return true;
+    case 'm': BoxSwitch(p_sys, BOX_META);       return true;
+//  case 'L': BoxSwitch(p_sys, BOX_LOG)         return true;
+    case 'P': BoxSwitch(p_sys, BOX_PLAYLIST);   return true;
+    case 'B': BoxSwitch(p_sys, BOX_BROWSE);     return true;
+    case 'x': BoxSwitch(p_sys, BOX_OBJECTS);    return true;
+    case 'S': BoxSwitch(p_sys, BOX_STATS);      return true;
 
     case '/': /* Search */
         p_sys->psz_search_chain[0] = '\0';
         p_sys->b_box_plidx_follow = false;
         p_sys->i_before_search = p_sys->i_box_plidx;
         p_sys->i_box_type = BOX_SEARCH;
-        return 1;
+        return true;
 
     case 'A': /* Open */
         p_sys->psz_open_chain[0] = '\0';
         p_sys->i_box_type = BOX_OPEN;
-        return 1;
+        return true;
 
     /* Navigation */
-    case KEY_RIGHT: ChangePosition(p_intf, +0.01); return 1;
-    case KEY_LEFT:  ChangePosition(p_intf, -0.01); return 1;
+    case KEY_RIGHT: ChangePosition(p_intf, +0.01); return true;
+    case KEY_LEFT:  ChangePosition(p_intf, -0.01); return true;
 
     /* Common control */
     case 'f':
@@ -1867,29 +1793,98 @@ static int HandleKey(intf_thread_t *p_intf)
                 vlc_object_release(p_vout);
             }
         }
-        return 0;
+        return false;
 
-    case ' ': PlayPause(p_intf);            return 1;
-    case 's': playlist_Stop(p_playlist);    return 1;
-    case 'e': Eject(p_intf);                return 1;
+    case ' ': PlayPause(p_intf);            return true;
+    case 's': playlist_Stop(p_playlist);    return true;
+    case 'e': Eject(p_intf);                return true;
 
-    case '[': InputNavigate(p_sys->p_input, "prev-title");      return 1;
-    case ']': InputNavigate(p_sys->p_input, "next-title");      return 1;
-    case '<': InputNavigate(p_sys->p_input, "prev-chapter");    return 1;
-    case '>': InputNavigate(p_sys->p_input, "next-chapter");    return 1;
+    case '[': InputNavigate(p_sys->p_input, "prev-title");      return true;
+    case ']': InputNavigate(p_sys->p_input, "next-title");      return true;
+    case '<': InputNavigate(p_sys->p_input, "prev-chapter");    return true;
+    case '>': InputNavigate(p_sys->p_input, "next-chapter");    return true;
 
-    case 'p': playlist_Prev(p_playlist);            goto lclear;
-    case 'n': playlist_Next(p_playlist);            goto lclear;
-    case 'a': aout_VolumeUp(p_playlist, 1, NULL);   goto lclear;
-    case 'z': aout_VolumeDown(p_playlist, 1, NULL); goto lclear;
+    case 'p': playlist_Prev(p_playlist);            break;
+    case 'n': playlist_Next(p_playlist);            break;
+    case 'a': aout_VolumeUp(p_playlist, 1, NULL);   break;
+    case 'z': aout_VolumeDown(p_playlist, 1, NULL); break;
 
-lclear:
     case 0x0c:  /* ^l */
-    case KEY_CLEAR:     clear(); return 1;
+    case KEY_CLEAR:
+        break;
+
+    default:
+        return false;
     }
 
-    /* key not handled */
-    return 0;
+    clear();
+    return true;
+}
+
+static bool HandleKey(intf_thread_t *p_intf)
+{
+    intf_sys_t *p_sys = p_intf->p_sys;
+    int key = wgetch(p_sys->w);
+
+    if (key == -1)
+        return false;
+
+    switch(p_sys->i_box_type)
+    {
+    case BOX_PLAYLIST:
+        if (HandlePlaylistKey(p_intf, key))
+            return true;
+        break;
+
+    case BOX_BROWSE:
+        if (HandleBrowseKey(p_intf, key))
+            return true;
+        break;
+
+    case BOX_SEARCH:
+    case BOX_OPEN:
+        return HandleEditBoxKey(p_intf, key, p_sys->i_box_type);
+
+    case BOX_NONE:
+        switch(key)
+        {
+#ifdef __FreeBSD__
+        case KEY_SELECT:
+#endif
+        case KEY_END:   ChangePosition(p_intf, +.99);   return 1;
+        case KEY_HOME:  ChangePosition(p_intf, -1.0);   return 1;
+        case KEY_UP:    ChangePosition(p_intf, +0.05);  return 1;
+        case KEY_DOWN:  ChangePosition(p_intf, -0.05);  return 1;
+        }
+        break;
+
+    default:
+        switch(key)
+        {
+#ifdef __FreeBSD__
+        case KEY_SELECT:
+#endif
+        case KEY_END:  p_sys->i_box_start = p_sys->i_box_lines_total - 1; break;
+        case KEY_HOME: p_sys->i_box_start = 0;                            break;
+        case KEY_UP:   p_sys->i_box_start--;                              break;
+        case KEY_DOWN: p_sys->i_box_start++;                              break;
+        case KEY_PPAGE:p_sys->i_box_start -= p_sys->i_box_lines;          break;
+        case KEY_NPAGE:p_sys->i_box_start += p_sys->i_box_lines;          break;
+
+        default:
+            goto common;
+        }
+
+        if (p_sys->i_box_start < 0)
+            p_sys->i_box_start = 0;
+        if (p_sys->i_box_start > p_sys->i_box_lines_total - 1)
+            p_sys->i_box_start = p_sys->i_box_lines_total - 1;
+        return true;
+    }
+
+common:
+    /* Keys common to all boxes, except Open/Search */
+    return HandleCommonKey(p_intf, key);
 }
 
 /*****************************************************************************
