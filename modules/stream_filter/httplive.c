@@ -468,14 +468,22 @@ static void parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
     else if (strncasecmp(attr, "NONE", 4) == 0)
     {
         char *uri = parse_Attributes(p_read, "URI");
-        char *iv = parse_Attributes(p_read, "IV");
-        if ((iv != NULL) || (uri != NULL))
+        if (uri != NULL)
         {
-            msg_Err(s, "#EXT-X-KEY: URI and IV not expected");
+            msg_Err(s, "#EXT-X-KEY: URI not expected");
             p_sys->b_error = true;
-
+        }
+        free(uri);
+        /* IV is only supported in version 2 and above */
+        if (hls->version >= 2)
+        {
+            char *iv = parse_Attributes(p_read, "IV");
+            if (iv != NULL)
+            {
+                msg_Err(s, "#EXT-X-KEY: IV not expected");
+                p_sys->b_error = true;
+            }
             free(iv);
-            free(uri);
         }
     }
     else
