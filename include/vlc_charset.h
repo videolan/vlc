@@ -30,6 +30,12 @@
  * This files handles locale conversions in vlc
  */
 
+/* iconv wrappers (defined in src/extras/libc.c) */
+typedef void *vlc_iconv_t;
+VLC_EXPORT( vlc_iconv_t, vlc_iconv_open, ( const char *, const char * ) LIBVLC_USED );
+VLC_EXPORT( size_t, vlc_iconv, ( vlc_iconv_t, const char **, size_t *, char **, size_t * ) LIBVLC_USED );
+VLC_EXPORT( int, vlc_iconv_close, ( vlc_iconv_t ) );
+
 #include <stdarg.h>
 
 VLC_EXPORT( void, LocaleFree, ( const char * ) );

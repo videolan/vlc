@@ -40,6 +40,7 @@
 #include <vlc_strings.h>
 #include <vlc_dialog.h>
 #include <vlc_memory.h>
+#include <vlc_charset.h>
 
 #include <math.h>
 
@@ -1110,7 +1111,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         if( i_in_bytes )
         {
             msg_Warn( p_filter, "failed to convert string to unicode (%m), "
-                      "bytes left %u", (unsigned)i_in_bytes );
+                      "bytes left %zu", i_in_bytes );
             goto error;
         }
         *(uint32_t*)p_out_buffer = 0;

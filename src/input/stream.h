@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_stream.h>
+#include <vlc_charset.h>
 
 struct stream_text_t
 {
