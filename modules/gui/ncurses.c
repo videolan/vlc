@@ -25,11 +25,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*
- * Note that when we use wide characters (and link with libncursesw),
- * we assume that an UTF8 locale is used (or compatible, such as ASCII).
- * Other characters encodings are not supported.
- */
+/* UTF8 locale is required */
 
 /*****************************************************************************
  * Preamble
