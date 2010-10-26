@@ -1638,6 +1638,12 @@ static bool HandleBrowseKey(intf_thread_t *p_intf, int key)
     return true;
 }
 
+static void InputNavigate(input_thread_t* p_input, const char *var)
+{
+    if (p_input)
+        var_TriggerCallback(p_input, var);
+}
+
 static int HandleKey(intf_thread_t *p_intf)
 {
     intf_sys_t *p_sys = p_intf->p_sys;
@@ -1661,31 +1667,28 @@ static int HandleKey(intf_thread_t *p_intf)
              p_sys->i_box_type == BOX_META || p_sys->i_box_type == BOX_STATS ||
              p_sys->i_box_type == BOX_OBJECTS)
     {
+        bool ret = true;
         switch(i_key)
         {
-        case KEY_HOME:
-            p_sys->i_box_start = 0;
-            return 1;
 #ifdef __FreeBSD__
         case KEY_SELECT:
 #endif
-        case KEY_END:
-            p_sys->i_box_start = p_sys->i_box_lines_total - 1;
-            return 1;
-        case KEY_UP:
-            if (p_sys->i_box_start > 0) p_sys->i_box_start--;
-            return 1;
-        case KEY_DOWN:
-            if (p_sys->i_box_start < p_sys->i_box_lines_total - 1)
-                p_sys->i_box_start++;
-            return 1;
-        case KEY_PPAGE:
-            p_sys->i_box_start -= p_sys->i_box_lines;
-            if (p_sys->i_box_start < 0) p_sys->i_box_start = 0;
-            return 1;
-        case KEY_NPAGE:
-            p_sys->i_box_start += p_sys->i_box_lines;
-            if (p_sys->i_box_start >= p_sys->i_box_lines_total)
+        case KEY_END:  p_sys->i_box_start = p_sys->i_box_lines_total - 1; break;
+        case KEY_HOME: p_sys->i_box_start = 0;                            break;
+        case KEY_UP:   p_sys->i_box_start--;                              break;
+        case KEY_DOWN: p_sys->i_box_start++;                              break;
+        case KEY_PPAGE:p_sys->i_box_start -= p_sys->i_box_lines;          break;
+        case KEY_NPAGE:p_sys->i_box_start += p_sys->i_box_lines;          break;
+
+        default:
+            ret = false;
+            break;
+        }
+        if (ret)
+        {
+            if (p_sys->i_box_start < 0)
+                p_sys->i_box_start = 0;
+            if (p_sys->i_box_start > p_sys->i_box_lines_total - 1)
                 p_sys->i_box_start = p_sys->i_box_lines_total - 1;
             return 1;
         }
@@ -1694,21 +1697,13 @@ static int HandleKey(intf_thread_t *p_intf)
     {
         switch(i_key)
         {
-        case KEY_HOME:
-            ChangePosition(p_intf, -1.0);
-            return 1;
 #ifdef __FreeBSD__
         case KEY_SELECT:
 #endif
-        case KEY_END:
-            ChangePosition(p_intf, .99);
-            return 1;
-        case KEY_UP:
-            ChangePosition(p_intf, 0.05);
-            return 1;
-        case KEY_DOWN:
-            ChangePosition(p_intf, -0.05);
-            return 1;
+        case KEY_END:   ChangePosition(p_intf, +.99);   return 1;
+        case KEY_HOME:  ChangePosition(p_intf, -1.0);   return 1;
+        case KEY_UP:    ChangePosition(p_intf, +0.05);  return 1;
+        case KEY_DOWN:  ChangePosition(p_intf, -0.05);  return 1;
         }
     }
     else if (p_sys->i_box_type == BOX_SEARCH)
@@ -1821,7 +1816,6 @@ static int HandleKey(intf_thread_t *p_intf)
         return 1;
     }
 
-
     /* Common keys */
     switch(i_key)
     {
@@ -1835,68 +1829,37 @@ static int HandleKey(intf_thread_t *p_intf)
         libvlc_Quit(p_intf->p_libvlc);
         return 0;
 
-    /* Box switching */
-    case 'i':
-        BoxSwitch(p_sys, BOX_INFO);
-        p_sys->i_box_lines_total = 0;
-        break;
-    case 'm':
-        BoxSwitch(p_sys, BOX_META);
-        p_sys->i_box_lines_total = 0;
-        break;
-#if 0
-    case 'L':
-        BoxSwitch(p_sys, BOX_LOG)
-        break;
-#endif
-    case 'P':
-        BoxSwitch(p_sys, BOX_PLAYLIST);
-        break;
-    case 'B':
-        BoxSwitch(p_sys, BOX_BROWSE);
-        break;
-    case 'x':
-        BoxSwitch(p_sys, BOX_OBJECTS);
-        break;
-    case 'S':
-        BoxSwitch(p_sys, BOX_STATS);
-        break;
     case 'h':
-    case 'H':
-        BoxSwitch(p_sys, BOX_HELP);
-        p_sys->i_box_lines_total = 0;
-        break;
-    case '/':
-        if (p_sys->i_box_type != BOX_SEARCH && p_sys->psz_search_chain)
-        {
-            p_sys->psz_search_chain[0] = '\0';
-            p_sys->b_box_plidx_follow = false;
-            p_sys->i_before_search = p_sys->i_box_plidx;
-            p_sys->i_box_type = BOX_SEARCH;
-        }
-        break;
+    case 'H': BoxSwitch(p_sys, BOX_HELP);       return 1;
+    case 'i': BoxSwitch(p_sys, BOX_INFO);       return 1;
+    case 'm': BoxSwitch(p_sys, BOX_META);       return 1;
+//  case 'L': BoxSwitch(p_sys, BOX_LOG)         return 1;
+    case 'P': BoxSwitch(p_sys, BOX_PLAYLIST);   return 1;
+    case 'B': BoxSwitch(p_sys, BOX_BROWSE);     return 1;
+    case 'x': BoxSwitch(p_sys, BOX_OBJECTS);    return 1;
+    case 'S': BoxSwitch(p_sys, BOX_STATS);      return 1;
+
+    case '/': /* Search */
+        p_sys->psz_search_chain[0] = '\0';
+        p_sys->b_box_plidx_follow = false;
+        p_sys->i_before_search = p_sys->i_box_plidx;
+        p_sys->i_box_type = BOX_SEARCH;
+        return 1;
+
     case 'A': /* Open */
-        if (p_sys->i_box_type != BOX_OPEN)
-        {
-            p_sys->psz_open_chain[0] = '\0';
-            p_sys->i_box_type = BOX_OPEN;
-        }
-        break;
+        p_sys->psz_open_chain[0] = '\0';
+        p_sys->i_box_type = BOX_OPEN;
+        return 1;
 
     /* Navigation */
-    case KEY_RIGHT:
-        ChangePosition(p_intf, 0.01);
-        break;
-
-    case KEY_LEFT:
-        ChangePosition(p_intf, -0.01);
-        break;
+    case KEY_RIGHT: ChangePosition(p_intf, +0.01); return 1;
+    case KEY_LEFT:  ChangePosition(p_intf, -0.01); return 1;
 
     /* Common control */
     case 'f':
-        if (p_intf->p_sys->p_input)
+        if (p_sys->p_input)
         {
-            vout_thread_t *p_vout = input_GetVout(p_intf->p_sys->p_input);
+            vout_thread_t *p_vout = input_GetVout(p_sys->p_input);
             if (p_vout)
             {
                 bool fs = var_ToggleBool(p_playlist, "fullscreen");
@@ -1906,71 +1869,27 @@ static int HandleKey(intf_thread_t *p_intf)
         }
         return 0;
 
-    case ' ':
-        PlayPause(p_intf);
-        break;
+    case ' ': PlayPause(p_intf);            return 1;
+    case 's': playlist_Stop(p_playlist);    return 1;
+    case 'e': Eject(p_intf);                return 1;
 
-    case 's':
-        playlist_Stop(p_playlist);
-        break;
+    case '[': InputNavigate(p_sys->p_input, "prev-title");      return 1;
+    case ']': InputNavigate(p_sys->p_input, "next-title");      return 1;
+    case '<': InputNavigate(p_sys->p_input, "prev-chapter");    return 1;
+    case '>': InputNavigate(p_sys->p_input, "next-chapter");    return 1;
 
-    case 'e':
-        Eject(p_intf);
-        break;
+    case 'p': playlist_Prev(p_playlist);            goto lclear;
+    case 'n': playlist_Next(p_playlist);            goto lclear;
+    case 'a': aout_VolumeUp(p_playlist, 1, NULL);   goto lclear;
+    case 'z': aout_VolumeDown(p_playlist, 1, NULL); goto lclear;
 
-    case '[':
-        if (p_sys->p_input)
-            var_TriggerCallback(p_sys->p_input, "prev-title");
-        break;
-
-    case ']':
-        if (p_sys->p_input)
-            var_TriggerCallback(p_sys->p_input, "next-title");
-        break;
-
-    case '<':
-        if (p_sys->p_input)
-            var_TriggerCallback(p_sys->p_input, "prev-chapter");
-        break;
-
-    case '>':
-        if (p_sys->p_input)
-            var_TriggerCallback(p_sys->p_input, "next-chapter");
-        break;
-
-    case 'p':
-        playlist_Prev(p_playlist);
-        clear();
-        break;
-
-    case 'n':
-        playlist_Next(p_playlist);
-        clear();
-        break;
-
-    case 'a':
-        aout_VolumeUp(p_playlist, 1, NULL);
-        clear();
-        break;
-
-    case 'z':
-        aout_VolumeDown(p_playlist, 1, NULL);
-        clear();
-        break;
-
-    /*
-     * ^l should clear and redraw the screen
-     */
-    case KEY_CLEAR:
-    case 0x0c:          /* ^l */
-        clear();
-        break;
-
-    default:
-        return 0;
+lclear:
+    case 0x0c:  /* ^l */
+    case KEY_CLEAR:     clear(); return 1;
     }
 
-    return 1;
+    /* key not handled */
+    return 0;
 }
 
 /*****************************************************************************
