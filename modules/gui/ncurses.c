@@ -1410,9 +1410,7 @@ static void Eject(intf_thread_t *p_intf)
     }
 
     psz_name = playlist_CurrentPlayingItem(p_playlist)->p_input->psz_name;
-
-    if (psz_name)
-        psz_device = GetDiscDevice(p_intf, psz_name);
+    psz_device = psz_name ? GetDiscDevice(p_intf, psz_name) : NULL;
 
     PL_UNLOCK;
 
