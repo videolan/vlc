@@ -174,7 +174,6 @@ struct intf_sys_t
     input_thread_t *p_input;
 
     bool            b_color;
-    bool            b_color_started;
 
     WINDOW          *w;
 
@@ -500,11 +499,6 @@ static void FindIndex(intf_sys_t *p_sys, playlist_t *p_playlist, bool locked)
 
 static void start_color_and_pairs(intf_thread_t *p_intf)
 {
-    if (p_intf->p_sys->b_color_started)
-        return;
-
-    p_intf->p_sys->b_color_started = true;
-
     if (!has_colors())
     {
         p_intf->p_sys->b_color = false;
@@ -519,8 +513,6 @@ static void start_color_and_pairs(intf_thread_t *p_intf)
     /* untested, in all my terminals, !can_change_color() --funman */
     if (can_change_color())
         init_color(COLOR_YELLOW, 960, 500, 0); /* YELLOW -> ORANGE */
-
-    p_intf->p_sys->b_color_started = true;
 }
 
 static void DrawBox(WINDOW *win, int y, int x, int h, int w, const char *title, bool b_color)
@@ -850,7 +842,6 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
         MainBoxWrite(p_intf, l++, 1, _("     B           Show/Hide filebrowser"));
         MainBoxWrite(p_intf, l++, 1, _("     x           Show/Hide objects box"));
         MainBoxWrite(p_intf, l++, 1, _("     S           Show/Hide statistics box"));
-        MainBoxWrite(p_intf, l++, 1, _("     c           Switch color on/off"));
         MainBoxWrite(p_intf, l++, 1, _("     Esc         Close Add/Search entry"));
         MainBoxWrite(p_intf, l++, 1, "");
 
@@ -1893,10 +1884,6 @@ static int HandleKey(intf_thread_t *p_intf)
         break;
     case 'S':
         BoxSwitch(p_sys, BOX_STATS);
-        break;
-    case 'c':
-        if ((p_sys->b_color = !p_sys->b_color))
-            start_color_and_pairs(p_intf);
         break;
     case 'h':
     case 'H':
