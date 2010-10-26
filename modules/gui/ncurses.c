@@ -1316,8 +1316,8 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
     if (p_sys->i_box_type == BOX_SEARCH)
     {
         DrawEmptyLine(p_sys->w, 7, 1, COLS-2);
-        mvnprintw(7, 1, COLS-2, _("Find: %s"), *p_sys->psz_search_chain ?
-                  p_sys->psz_search_chain : p_sys->psz_old_search);
+        mvnprintw(7, 1, COLS-2, _("Find: %s"), p_sys->psz_old_search ?
+                  p_sys->psz_old_search : p_sys->psz_search_chain);
     }
     if (p_sys->i_box_type == BOX_OPEN)
     {
