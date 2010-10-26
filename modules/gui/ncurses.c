@@ -819,10 +819,10 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
     h = LINES - y;
     y_end = y + h - 1;
 
-    if (p_sys->i_box_type == BOX_HELP)
+    int l = 0;
+    switch(p_sys->i_box_type)
     {
-        /* Help box */
-        int l = 0;
+    case BOX_HELP:
         DrawBox(p_sys->w, y++, 0, h, COLS, _(" Help "), p_sys->b_color);
 
         if (p_sys->b_color)
@@ -919,11 +919,10 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
             y += l - p_sys->i_box_start;
         else
             y += p_sys->i_box_lines;
-    }
-    else if (p_sys->i_box_type == BOX_INFO)
-    {
-        /* Info box */
-        int l = 0;
+
+        break;
+
+    case BOX_INFO:
         DrawBox(p_sys->w, y++, 0, h, COLS, _(" Information "), p_sys->b_color);
 
         if (p_input)
@@ -959,12 +958,9 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
             y += l - p_sys->i_box_start;
         else
             y += p_sys->i_box_lines;
-    }
-    else if (p_sys->i_box_type == BOX_META)
-    {
-        /* Meta data box */
-        int l = 0;
+        break;
 
+    case BOX_META:
         DrawBox(p_sys->w, y++, 0, h, COLS, _("Meta-information"),
                  p_sys->b_color);
 
@@ -994,9 +990,11 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
             p_sys->i_box_start = p_sys->i_box_lines_total - 1;
 
         y += __MIN(l - p_sys->i_box_start, p_sys->i_box_lines);
-    }
+
+        break;
+
 #if 0 /* Deprecated API */
-    else if (p_sys->i_box_type == BOX_LOG)
+    case BOX_LOG:
     {
         int i_line = 0;
         int i_stop;
@@ -1041,10 +1039,10 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
         vlc_mutex_unlock(p_intf->p_sys->p_sub->p_lock);
         y = y_end;
     }
+        break;
 #endif
-    else if (p_sys->i_box_type == BOX_BROWSE)
+    case BOX_BROWSE:
     {
-        /* Filebrowser box */
         int        i_start, i_stop;
         int        i_item;
         DrawBox(p_sys->w, y++, 0, h, COLS, _(" Browse "), p_sys->b_color);
@@ -1091,9 +1089,9 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
         }
 
     }
-    else if (p_sys->i_box_type == BOX_OBJECTS)
-    {
-        int l = 0;
+        break;
+
+    case BOX_OBJECTS:
         DrawBox(p_sys->w, y++, 0, h, COLS, _(" Objects "), p_sys->b_color);
         DumpObject(p_intf, &l, VLC_OBJECT(p_intf->p_libvlc), 0);
 
@@ -1105,146 +1103,137 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
             y += l - p_sys->i_box_start;
         else
             y += p_sys->i_box_lines;
-    }
-    else if (p_sys->i_box_type == BOX_STATS)
-    {
+
+        break;
+
+    case BOX_STATS:
         DrawBox(p_sys->w, y++, 0, h, COLS, _(" Stats "), p_sys->b_color);
+        if (!p_input)
+            break;
 
-        if (p_input)
-        {
-            input_item_t *p_item = input_GetItem(p_input);
-            assert(p_item);
-            vlc_mutex_lock(&p_item->lock);
-            vlc_mutex_lock(&p_item->p_stats->lock);
+        input_item_t *p_item = input_GetItem(p_input);
+        assert(p_item);
+        vlc_mutex_lock(&p_item->lock);
+        vlc_mutex_lock(&p_item->p_stats->lock);
 
-            int i_audio = 0;
-            int i_video = 0;
-            int i;
+        int i_audio = 0;
+        int i_video = 0;
+        int i;
 
-            if (!p_item->i_es)
-                i_video = i_audio = 1;
-            else
-                for(i = 0; i < p_item->i_es ; i++)
-                {
-                    i_audio += (p_item->es[i]->i_cat == AUDIO_ES);
-                    i_video += (p_item->es[i]->i_cat == VIDEO_ES);
-                }
+        if (!p_item->i_es)
+            i_video = i_audio = 1;
+        else
+            for(i = 0; i < p_item->i_es ; i++)
+            {
+                i_audio += (p_item->es[i]->i_cat == AUDIO_ES);
+                i_video += (p_item->es[i]->i_cat == VIDEO_ES);
+            }
 
-            int l = 0;
+        int l = 0;
 
 #define SHOW_ACS(x,c) \
-    if (l >= p_sys->i_box_start && l - p_sys->i_box_start < p_sys->i_box_lines) \
-        mvaddch(p_sys->i_box_y - p_sys->i_box_start + l, x, c)
+if (l >= p_sys->i_box_start && l - p_sys->i_box_start < p_sys->i_box_lines) \
+    mvaddch(p_sys->i_box_y - p_sys->i_box_start + l, x, c)
 
-            /* Input */
+        /* Input */
+        if (p_sys->b_color) wcolor_set(p_sys->w, C_CATEGORY, NULL);
+        MainBoxWrite(p_intf, l, 1, _("+-[Incoming]"));
+        SHOW_ACS(1, ACS_ULCORNER);  SHOW_ACS(2, ACS_HLINE); l++;
+        if (p_sys->b_color) wcolor_set(p_sys->w, C_DEFAULT, NULL);
+        MainBoxWrite(p_intf, l, 1, _("| input bytes read : %8.0f KiB"),
+                (float)(p_item->p_stats->i_read_bytes)/1024);
+        SHOW_ACS(1, ACS_VLINE); l++;
+        MainBoxWrite(p_intf, l, 1, _("| input bitrate    :   %6.0f kb/s"),
+                (float)(p_item->p_stats->f_input_bitrate)*8000);
+        MainBoxWrite(p_intf, l, 1, _("| demux bytes read : %8.0f KiB"),
+                (float)(p_item->p_stats->i_demux_read_bytes)/1024);
+        SHOW_ACS(1, ACS_VLINE); l++;
+        MainBoxWrite(p_intf, l, 1, _("| demux bitrate    :   %6.0f kb/s"),
+                (float)(p_item->p_stats->f_demux_bitrate)*8000);
+        SHOW_ACS(1, ACS_VLINE); l++;
+        DrawEmptyLine(p_sys->w, p_sys->i_box_y + l - p_sys->i_box_start, 1, COLS - 2);
+        SHOW_ACS(1, ACS_VLINE); l++;
+
+        /* Video */
+        if (i_video)
+        {
             if (p_sys->b_color) wcolor_set(p_sys->w, C_CATEGORY, NULL);
-            MainBoxWrite(p_intf, l, 1, _("+-[Incoming]"));
-            SHOW_ACS(1, ACS_ULCORNER);  SHOW_ACS(2, ACS_HLINE); l++;
+            MainBoxWrite(p_intf, l, 1, _("+-[Video Decoding]"));
+            SHOW_ACS(1, ACS_LTEE);  SHOW_ACS(2, ACS_HLINE); l++;
             if (p_sys->b_color) wcolor_set(p_sys->w, C_DEFAULT, NULL);
-            MainBoxWrite(p_intf, l, 1, _("| input bytes read : %8.0f KiB"),
-                    (float)(p_item->p_stats->i_read_bytes)/1024);
+            MainBoxWrite(p_intf, l, 1, _("| video decoded    :    %"PRId64),
+                    p_item->p_stats->i_decoded_video);
             SHOW_ACS(1, ACS_VLINE); l++;
-            MainBoxWrite(p_intf, l, 1, _("| input bitrate    :   %6.0f kb/s"),
-                    (float)(p_item->p_stats->f_input_bitrate)*8000);
-            MainBoxWrite(p_intf, l, 1, _("| demux bytes read : %8.0f KiB"),
-                    (float)(p_item->p_stats->i_demux_read_bytes)/1024);
+            MainBoxWrite(p_intf, l, 1, _("| frames displayed :    %"PRId64),
+                    p_item->p_stats->i_displayed_pictures);
             SHOW_ACS(1, ACS_VLINE); l++;
-            MainBoxWrite(p_intf, l, 1, _("| demux bitrate    :   %6.0f kb/s"),
-                    (float)(p_item->p_stats->f_demux_bitrate)*8000);
+            MainBoxWrite(p_intf, l, 1, _("| frames lost      :    %"PRId64),
+                    p_item->p_stats->i_lost_pictures);
             SHOW_ACS(1, ACS_VLINE); l++;
             DrawEmptyLine(p_sys->w, p_sys->i_box_y + l - p_sys->i_box_start, 1, COLS - 2);
             SHOW_ACS(1, ACS_VLINE); l++;
-
-            /* Video */
-            if (i_video)
-            {
-                if (p_sys->b_color) wcolor_set(p_sys->w, C_CATEGORY, NULL);
-                MainBoxWrite(p_intf, l, 1, _("+-[Video Decoding]"));
-                SHOW_ACS(1, ACS_LTEE);  SHOW_ACS(2, ACS_HLINE); l++;
-                if (p_sys->b_color) wcolor_set(p_sys->w, C_DEFAULT, NULL);
-                MainBoxWrite(p_intf, l, 1, _("| video decoded    :    %"PRId64),
-                        p_item->p_stats->i_decoded_video);
-                SHOW_ACS(1, ACS_VLINE); l++;
-                MainBoxWrite(p_intf, l, 1, _("| frames displayed :    %"PRId64),
-                        p_item->p_stats->i_displayed_pictures);
-                SHOW_ACS(1, ACS_VLINE); l++;
-                MainBoxWrite(p_intf, l, 1, _("| frames lost      :    %"PRId64),
-                        p_item->p_stats->i_lost_pictures);
-                SHOW_ACS(1, ACS_VLINE); l++;
-                DrawEmptyLine(p_sys->w, p_sys->i_box_y + l - p_sys->i_box_start, 1, COLS - 2);
-                SHOW_ACS(1, ACS_VLINE); l++;
-            }
-            /* Audio*/
-            if (i_audio)
-            {
-                if (p_sys->b_color) wcolor_set(p_sys->w, C_CATEGORY, NULL);
-                MainBoxWrite(p_intf, l, 1, _("+-[Audio Decoding]"));
-                SHOW_ACS(1, ACS_LTEE);  SHOW_ACS(2, ACS_HLINE); l++;
-                if (p_sys->b_color) wcolor_set(p_sys->w, C_DEFAULT, NULL);
-                MainBoxWrite(p_intf, l, 1, _("| audio decoded    :    %"PRId64),
-                        p_item->p_stats->i_decoded_audio);
-                SHOW_ACS(1, ACS_VLINE); l++;
-                MainBoxWrite(p_intf, l, 1, _("| buffers played   :    %"PRId64),
-                        p_item->p_stats->i_played_abuffers);
-                SHOW_ACS(1, ACS_VLINE); l++;
-                MainBoxWrite(p_intf, l, 1, _("| buffers lost     :    %"PRId64),
-                        p_item->p_stats->i_lost_abuffers);
-                SHOW_ACS(1, ACS_VLINE); l++;
-                DrawEmptyLine(p_sys->w, p_sys->i_box_y + l - p_sys->i_box_start, 1, COLS - 2);
-                SHOW_ACS(1, ACS_VLINE); l++;
-            }
-            /* Sout */
+        }
+        /* Audio*/
+        if (i_audio)
+        {
             if (p_sys->b_color) wcolor_set(p_sys->w, C_CATEGORY, NULL);
-            MainBoxWrite(p_intf, l, 1, _("+-[Streaming]"));
+            MainBoxWrite(p_intf, l, 1, _("+-[Audio Decoding]"));
             SHOW_ACS(1, ACS_LTEE);  SHOW_ACS(2, ACS_HLINE); l++;
             if (p_sys->b_color) wcolor_set(p_sys->w, C_DEFAULT, NULL);
-            MainBoxWrite(p_intf, l, 1, _("| packets sent     :    %5i"), p_item->p_stats->i_sent_packets);
+            MainBoxWrite(p_intf, l, 1, _("| audio decoded    :    %"PRId64),
+                    p_item->p_stats->i_decoded_audio);
             SHOW_ACS(1, ACS_VLINE); l++;
-            MainBoxWrite(p_intf, l, 1, _("| bytes sent       : %8.0f KiB"),
-                    (float)(p_item->p_stats->i_sent_bytes)/1024);
+            MainBoxWrite(p_intf, l, 1, _("| buffers played   :    %"PRId64),
+                    p_item->p_stats->i_played_abuffers);
             SHOW_ACS(1, ACS_VLINE); l++;
-            MainBoxWrite(p_intf, l, 1, _("\\ sending bitrate  :   %6.0f kb/s"),
-                    (float)(p_item->p_stats->f_send_bitrate*8)*1000);
-            SHOW_ACS(1, ACS_LLCORNER); l++;
-            if (p_sys->b_color) wcolor_set(p_sys->w, C_DEFAULT, NULL);
+            MainBoxWrite(p_intf, l, 1, _("| buffers lost     :    %"PRId64),
+                    p_item->p_stats->i_lost_abuffers);
+            SHOW_ACS(1, ACS_VLINE); l++;
+            DrawEmptyLine(p_sys->w, p_sys->i_box_y + l - p_sys->i_box_start, 1, COLS - 2);
+            SHOW_ACS(1, ACS_VLINE); l++;
+        }
+        /* Sout */
+        if (p_sys->b_color) wcolor_set(p_sys->w, C_CATEGORY, NULL);
+        MainBoxWrite(p_intf, l, 1, _("+-[Streaming]"));
+        SHOW_ACS(1, ACS_LTEE);  SHOW_ACS(2, ACS_HLINE); l++;
+        if (p_sys->b_color) wcolor_set(p_sys->w, C_DEFAULT, NULL);
+        MainBoxWrite(p_intf, l, 1, _("| packets sent     :    %5i"), p_item->p_stats->i_sent_packets);
+        SHOW_ACS(1, ACS_VLINE); l++;
+        MainBoxWrite(p_intf, l, 1, _("| bytes sent       : %8.0f KiB"),
+                (float)(p_item->p_stats->i_sent_bytes)/1024);
+        SHOW_ACS(1, ACS_VLINE); l++;
+        MainBoxWrite(p_intf, l, 1, _("\\ sending bitrate  :   %6.0f kb/s"),
+                (float)(p_item->p_stats->f_send_bitrate*8)*1000);
+        SHOW_ACS(1, ACS_LLCORNER); l++;
+        if (p_sys->b_color) wcolor_set(p_sys->w, C_DEFAULT, NULL);
 
 #undef SHOW_ACS
 
-            p_sys->i_box_lines_total = l;
-            if (p_sys->i_box_start >= p_sys->i_box_lines_total)
-                p_sys->i_box_start = p_sys->i_box_lines_total - 1;
+        p_sys->i_box_lines_total = l;
+        if (p_sys->i_box_start >= p_sys->i_box_lines_total)
+            p_sys->i_box_start = p_sys->i_box_lines_total - 1;
 
-            if (l - p_sys->i_box_start < p_sys->i_box_lines)
-                y += l - p_sys->i_box_start;
-            else
-                y += p_sys->i_box_lines;
-
-            vlc_mutex_unlock(&p_item->p_stats->lock);
-            vlc_mutex_unlock(&p_item->lock);
-
-        }
-    }
-    else if (p_sys->i_box_type == BOX_PLAYLIST ||
-               p_sys->i_box_type == BOX_SEARCH ||
-               p_sys->i_box_type == BOX_OPEN )
-    {
-        /* Playlist box */
-        int        i_start, i_stop, i_max = p_sys->i_plist_entries;
-        int        i_item;
-        char       *psz_title;
-
-        if (p_sys->category_view)
-            psz_title = strdup(_(" Playlist (By category) "));
+        if (l - p_sys->i_box_start < p_sys->i_box_lines)
+            y += l - p_sys->i_box_start;
         else
-            psz_title = strdup(_(" Playlist (All, one level) "));
+            y += p_sys->i_box_lines;
 
-        DrawBox(p_sys->w, y++, 0, h, COLS, psz_title, p_sys->b_color);
-        free(psz_title);
+        vlc_mutex_unlock(&p_item->p_stats->lock);
+        vlc_mutex_unlock(&p_item->lock);
+        break;
 
+    case BOX_NONE:
+        y++;
+        break;
+
+    default:    /* Playlist box */
+        DrawBox(p_sys->w, y++, 0, h, COLS, _(" Playlist "), p_sys->b_color);
         if (p_sys->b_need_update || !p_sys->pp_plist)
             PlaylistRebuild(p_intf);
         if (p_sys->b_box_plidx_follow)
             FindIndex(p_sys, p_playlist, false);
+
+        int  i_start, i_stop, i_max = p_sys->i_plist_entries;
 
         if (p_sys->i_box_plidx < 0) p_sys->i_box_plidx = 0;
         if (p_sys->i_box_plidx >= i_max) p_sys->i_box_plidx = i_max - 1;
@@ -1269,7 +1258,7 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
         if (i_stop > i_max)
             i_stop = i_max;
 
-        for(i_item = i_start; i_item < i_stop; i_item++)
+        for(int i_item = i_start; i_item < i_stop; i_item++)
         {
             bool b_selected = (p_sys->i_box_plidx == i_item);
             playlist_item_t *p_item = p_sys->pp_plist[i_item]->p_item;
@@ -1304,10 +1293,7 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
             if (b_selected)
                 attroff(A_REVERSE);
         }
-
     }
-    else
-        y++;
 
     if (p_sys->i_box_type == BOX_SEARCH)
     {
