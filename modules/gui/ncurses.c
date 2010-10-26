@@ -1869,12 +1869,10 @@ static void Run(intf_thread_t *p_intf)
 {
     intf_sys_t    *p_sys = p_intf->p_sys;
     playlist_t    *p_playlist = pl_Get(p_intf);
-    bool           force_redraw = false;
 
     time_t t_last_refresh;
     int canc = vlc_savecancel();
 
-    PlaylistRebuild(p_intf);
     Redraw(p_intf, &t_last_refresh);
 
     var_AddCallback(p_playlist, "intf-change", PlaylistChanged, p_intf);
@@ -1884,11 +1882,17 @@ static void Run(intf_thread_t *p_intf)
     {
         msleep(INTF_IDLE_SLEEP);
 
-        /* Update the input */
+        PL_LOCK;
+        if (p_sys->b_box_plidx_follow && playlist_CurrentPlayingItem(p_playlist))
+            FindIndex(p_sys, p_playlist, true);
+
+        PL_UNLOCK;
+
         if (!p_sys->p_input)
         {
             p_sys->p_input = playlist_CurrentInput(p_playlist);
-            force_redraw = true;
+            if (p_sys->p_input)
+                Redraw(p_intf, &t_last_refresh);
         }
         else if (p_sys->p_input->b_dead)
         {
@@ -1896,22 +1900,10 @@ static void Run(intf_thread_t *p_intf)
             p_sys->p_input = NULL;
         }
 
-        PL_LOCK;
-        if (p_sys->b_box_plidx_follow && playlist_CurrentPlayingItem(p_playlist))
-            FindIndex(p_sys, p_playlist, true);
-
-        PL_UNLOCK;
-
         while (HandleKey(p_intf))
             Redraw(p_intf, &t_last_refresh);
 
-        if (force_redraw)
-        {
-            clear();
-            Redraw(p_intf, &t_last_refresh);
-            force_redraw = false;
-        }
-        else if ((time(0) - t_last_refresh) >= 1)
+        if ((time(0) - t_last_refresh) >= 1)
             Redraw(p_intf, &t_last_refresh);
     }
     var_DelCallback(p_playlist, "intf-change", PlaylistChanged, p_intf);
