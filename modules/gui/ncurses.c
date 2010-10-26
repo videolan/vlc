@@ -62,9 +62,6 @@
 #   include <sys/stat.h>
 #endif
 
-#define SEARCH_CHAIN_SIZE 20
-#define OPEN_CHAIN_SIZE 50
-
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -200,11 +197,11 @@ struct intf_sys_t
 
 //  msg_subscription_t* p_sub;                  /* message bank subscription */
 
-    char            psz_search_chain[SEARCH_CHAIN_SIZE];
-    char            *psz_old_search;            /* for searching next        */
+    char            psz_search_chain[20];
+    char            *psz_old_search;
     int             i_before_search;
 
-    char            psz_open_chain[OPEN_CHAIN_SIZE];
+    char            psz_open_chain[50];
 
     char            *psz_current_dir;
     int             i_dir_entries;
@@ -245,6 +242,22 @@ static int comp_dir_entries(const void *pp_dir_entry1, const void *pp_dir_entry2
     return p_dir_entry1->b_file ? 1 : -1;
 }
 
+static bool IsFile(const char *current_dir, const char *entry)
+{
+    bool ret = true;
+#ifdef S_ISDIR
+    char *uri;
+    struct stat st;
+
+    if (asprintf(&uri, "%s/%s", current_dir, entry) != -1)
+    {
+        ret = vlc_stat(uri, &st) || !S_ISDIR(st.st_mode);
+        free(uri);
+    }
+#endif
+    return ret;
+}
+
 static void ReadDir(intf_thread_t *p_intf)
 {
     intf_sys_t *p_sys = p_intf->p_sys;
@@ -275,41 +288,21 @@ static void ReadDir(intf_thread_t *p_intf)
     /* while we still have entries in the directory */
     while ((psz_entry = vlc_readdir(p_current_dir)))
     {
-#if defined(S_ISDIR)
-        struct stat stat_data;
-#endif
         struct dir_entry_t *p_dir_entry;
-        char *psz_uri = NULL;
 
         if (!p_sys->b_show_hidden_files)
             if (*psz_entry == '.' && strcmp(psz_entry, ".."))
                 goto next;
 
-        if (asprintf(&psz_uri, "%s/%s", p_sys->psz_current_dir, psz_entry) == -1)
-        {
-            psz_uri = NULL;
-            goto next;
-        }
-
         if (!(p_dir_entry = malloc(sizeof *p_dir_entry)))
             goto next;
 
-        p_dir_entry->b_file =
-#if defined(S_ISDIR)
-            vlc_stat(psz_uri, &stat_data) || !S_ISDIR(stat_data.st_mode)
-/*#elif defined(DT_DIR)
-            !(p_dir_content->d_type & DT_DIR)*/
-#else
-            false
-#endif
-        ;
-
+        p_dir_entry->b_file = IsFile(p_sys->psz_current_dir, psz_entry);
         p_dir_entry->psz_path = strdup(psz_entry);
         INSERT_ELEM(p_sys->pp_dir_entries, p_sys->i_dir_entries,
              p_sys->i_dir_entries, p_dir_entry);
 
 next:
-        free(psz_uri);
         free(psz_entry);
     }
 
@@ -1266,7 +1259,6 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
             FindIndex(p_sys, p_playlist, false);
 
         if (p_sys->i_box_plidx < 0) p_sys->i_box_plidx = 0;
-        if (p_sys->i_box_plidx < 0) p_sys->i_box_plidx = 0;
         if (p_sys->i_box_plidx >= i_max) p_sys->i_box_plidx = i_max - 1;
 
         if (p_sys->i_box_plidx < (h - 2)/2)
@@ -1805,7 +1797,7 @@ static int HandleKey(intf_thread_t *p_intf)
             RemoveLastUTF8Entity(p_sys->psz_search_chain, i_chain_len);
             break;
         default:
-            if (i_chain_len + 1 < SEARCH_CHAIN_SIZE)
+            if (i_chain_len + 1 < sizeof p_sys->psz_search_chain)
             {
                 p_sys->psz_search_chain[i_chain_len] = (char) i_key;
                 p_sys->psz_search_chain[i_chain_len + 1] = '\0';
@@ -1863,7 +1855,7 @@ static int HandleKey(intf_thread_t *p_intf)
             RemoveLastUTF8Entity(p_sys->psz_open_chain, i_chain_len);
             return 1;
         default:
-            if (i_chain_len + 1 < OPEN_CHAIN_SIZE)
+            if (i_chain_len + 1 < sizeof p_sys->psz_open_chain)
             {
                 p_sys->psz_open_chain[i_chain_len] = (char) i_key;
                 p_sys->psz_open_chain[i_chain_len + 1] = '\0';
