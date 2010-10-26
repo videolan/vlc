@@ -46,8 +46,8 @@ class PlIconViewItemDelegate : public AbstractPlViewItemDelegate
 
 public:
     PlIconViewItemDelegate(QWidget *parent = 0) : AbstractPlViewItemDelegate( parent ) {}
-    void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
-    QSize sizeHint ( const QStyleOptionViewItem & option = QStyleOptionViewItem(),
+    virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    virtual QSize sizeHint ( const QStyleOptionViewItem & option = QStyleOptionViewItem(),
                      const QModelIndex & index = QModelIndex() ) const;
 };
 
@@ -58,8 +58,8 @@ class PlListViewItemDelegate : public AbstractPlViewItemDelegate
 public:
     PlListViewItemDelegate(QWidget *parent = 0) : AbstractPlViewItemDelegate(parent) {}
 
-    void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
-    QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    virtual QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 };
 
 class PlIconView : public QListView
@@ -68,9 +68,9 @@ class PlIconView : public QListView
 
 public:
     PlIconView( PLModel *model, QWidget *parent = 0 );
-private:
-    void startDrag ( Qt::DropActions supportedActions );
-    void dragMoveEvent ( QDragMoveEvent * event );
+protected:
+    virtual void startDrag ( Qt::DropActions supportedActions );
+    virtual void dragMoveEvent ( QDragMoveEvent * event );
 };
 
 class PlListView : public QListView
@@ -79,20 +79,20 @@ class PlListView : public QListView
 
 public:
     PlListView( PLModel *model, QWidget *parent = 0 );
-private:
-    void startDrag ( Qt::DropActions supportedActions );
-    void dragMoveEvent ( QDragMoveEvent * event );
-    void keyPressEvent( QKeyEvent *event );
+protected:
+    virtual void startDrag ( Qt::DropActions supportedActions );
+    virtual void dragMoveEvent ( QDragMoveEvent * event );
+    virtual void keyPressEvent( QKeyEvent *event );
 };
 
 class PlTreeView : public QTreeView
 {
     Q_OBJECT
 
-private:
-    void startDrag ( Qt::DropActions supportedActions );
-    void dragMoveEvent ( QDragMoveEvent * event );
-    void keyPressEvent( QKeyEvent *event );
+protected:
+    virtual void startDrag ( Qt::DropActions supportedActions );
+    virtual void dragMoveEvent ( QDragMoveEvent * event );
+    virtual void keyPressEvent( QKeyEvent *event );
 };
 
 #endif
