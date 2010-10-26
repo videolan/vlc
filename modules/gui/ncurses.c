@@ -1020,62 +1020,19 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
 
         if (p_input)
         {
-            int i;
             input_item_t *p_item = input_GetItem(p_input);
             vlc_mutex_lock(&p_item->lock);
-            for(i=0; i<VLC_META_TYPE_COUNT; i++)
+            for(int i=0; i<VLC_META_TYPE_COUNT; i++)
             {
-                if (y >= y_end) break;
                 const char *psz_meta = vlc_meta_Get(p_item->p_meta, i);
-                if (psz_meta && *psz_meta)
-                {
-                    const char *psz_meta_title;
-                    switch(i)
-                    {
-                        case 0:
-                            psz_meta_title = VLC_META_TITLE; break;
-                        case 1:
-                            psz_meta_title = VLC_META_ARTIST; break;
-                        case 2:
-                            psz_meta_title = VLC_META_GENRE ; break;
-                        case 3:
-                            psz_meta_title = VLC_META_COPYRIGHT; break;
-                        case 4:
-                            psz_meta_title = VLC_META_ALBUM; break;
-                        case 5:
-                            psz_meta_title = VLC_META_TRACK_NUMBER; break;
-                        case 6:
-                            psz_meta_title = VLC_META_DESCRIPTION; break;
-                        case 7:
-                            psz_meta_title = VLC_META_RATING; break;
-                        case 8:
-                            psz_meta_title = VLC_META_DATE; break;
-                        case 9:
-                            psz_meta_title = VLC_META_SETTING; break;
-                        case 10:
-                            psz_meta_title = VLC_META_URL; break;
-                        case 11:
-                            psz_meta_title = VLC_META_LANGUAGE; break;
-                        case 12:
-                            psz_meta_title = VLC_META_NOW_PLAYING; break;
-                        case 13:
-                            psz_meta_title = VLC_META_PUBLISHER; break;
-                        case 14:
-                            psz_meta_title = VLC_META_ENCODED_BY; break;
-                        case 15:
-                            psz_meta_title = VLC_META_ART_URL; break;
-                        case 16:
-                            psz_meta_title = VLC_META_TRACKID; break;
-                        default:
-                            psz_meta_title = ""; break;
-                    }
-                    if (p_sys->b_color)
-                        wcolor_set(p_sys->w, C_CATEGORY, NULL);
-                    MainBoxWrite(p_intf, l++, 1, "  [%s]", psz_meta_title);
-                    if (p_sys->b_color)
-                        wcolor_set(p_sys->w, C_DEFAULT, NULL);
-                    MainBoxWrite(p_intf, l++, 1, "      %s", psz_meta);
-                }
+                if (!psz_meta || !*psz_meta)
+                    continue;
+
+                if (p_sys->b_color) wcolor_set(p_sys->w, C_CATEGORY, NULL);
+                MainBoxWrite(p_intf, l++, 1, "  [%s]",
+                             vlc_meta_TypeToLocalizedString(i));
+                if (p_sys->b_color) wcolor_set(p_sys->w, C_DEFAULT, NULL);
+                MainBoxWrite(p_intf, l++, 1, "      %s", psz_meta);
             }
             vlc_mutex_unlock(&p_item->lock);
         }
@@ -1086,10 +1043,7 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
         if (p_sys->i_box_start >= p_sys->i_box_lines_total)
             p_sys->i_box_start = p_sys->i_box_lines_total - 1;
 
-        if (l - p_sys->i_box_start < p_sys->i_box_lines)
-            y += l - p_sys->i_box_start;
-        else
-            y += p_sys->i_box_lines;
+        y += __MIN(l - p_sys->i_box_start, p_sys->i_box_lines);
     }
 #if 0 /* Deprecated API */
     else if (p_sys->i_box_type == BOX_LOG)
