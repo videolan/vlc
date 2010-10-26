@@ -1551,6 +1551,93 @@ static bool HandlePlaylistKey(intf_thread_t *p_intf, int key)
     return true;
 }
 
+static bool HandleBrowseKey(intf_thread_t *p_intf, int key)
+{
+    struct dir_entry_t *dir_entry;
+    intf_sys_t *p_sys = p_intf->p_sys;
+
+    switch(key)
+    {
+    case '.':
+        p_sys->b_show_hidden_files = !p_sys->b_show_hidden_files;
+        ReadDir(p_intf);
+        return true;
+
+    case KEY_ENTER:
+    case '\r':
+    case '\n':
+    case ' ':
+        dir_entry = p_sys->pp_dir_entries[p_sys->i_box_bidx];
+
+        if (!dir_entry->b_file && key != ' ')
+        {
+            char *current_dir = p_sys->psz_current_dir;
+            if (asprintf(&p_sys->psz_current_dir, "%s/%s",
+                          p_sys->psz_current_dir, dir_entry->psz_path) != -1)
+            {
+                ReadDir(p_intf);
+                free(current_dir);
+            }
+            else
+                p_sys->psz_current_dir = current_dir;
+
+            return true;
+        }
+
+        char* psz_uri;
+        if (asprintf(&psz_uri, "%s://%s/%s",
+                    dir_entry->b_file ? "file" : "directory",
+                    p_sys->psz_current_dir, dir_entry->psz_path) == -1)
+        {
+            return false;
+        }
+
+        playlist_t *p_playlist = pl_Get(p_intf);
+        playlist_item_t *p_parent = p_sys->p_node;
+        if (!p_parent)
+        {
+            playlist_item_t *p_item;
+            PL_LOCK;
+            p_item = playlist_CurrentPlayingItem(p_playlist);
+            p_parent = p_item ? p_item->p_parent : NULL;
+            PL_UNLOCK;
+            if (!p_parent)
+                p_parent = p_playlist->p_local_onelevel;
+        }
+
+        while (p_parent->p_parent && p_parent->p_parent->p_parent)
+            p_parent = p_parent->p_parent;
+
+        input_item_t *p_input = p_playlist->p_local_onelevel->p_input;
+        playlist_Add(p_playlist, psz_uri, NULL, PLAYLIST_APPEND,
+                      PLAYLIST_END, p_parent->p_input == p_input, false);
+
+        p_sys->i_box_type = BOX_PLAYLIST;
+        free(psz_uri);
+        return true;
+
+#ifdef __FreeBSD__
+    case KEY_SELECT:
+#endif
+    case KEY_END:   p_sys->i_box_bidx = p_sys->i_dir_entries - 1;   break;
+    case KEY_HOME:  p_sys->i_box_bidx = 0;                          break;
+    case KEY_UP:    p_sys->i_box_bidx--;                            break;
+    case KEY_DOWN:  p_sys->i_box_bidx++;                            break;
+    case KEY_PPAGE: p_sys->i_box_bidx -= p_sys->i_box_lines;        break;
+    case KEY_NPAGE: p_sys->i_box_bidx += p_sys->i_box_lines;        break;
+
+    default:
+        return false;
+    }
+
+    if (p_sys->i_box_bidx >= p_sys->i_dir_entries)
+        p_sys->i_box_bidx = p_sys->i_dir_entries - 1;
+    if (p_sys->i_box_bidx < 0)
+        p_sys->i_box_bidx = 0;
+
+    return true;
+}
+
 static int HandleKey(intf_thread_t *p_intf)
 {
     intf_sys_t *p_sys = p_intf->p_sys;
@@ -1567,94 +1654,8 @@ static int HandleKey(intf_thread_t *p_intf)
     }
     else if (p_sys->i_box_type == BOX_BROWSE)
     {
-        bool b_ret = true;
-        /* Browser navigation */
-        switch(i_key)
-        {
-        case KEY_HOME:
-            p_sys->i_box_bidx = 0;
-            break;
-#ifdef __FreeBSD__
-        case KEY_SELECT:
-#endif
-        case KEY_END:
-            p_sys->i_box_bidx = p_sys->i_dir_entries - 1;
-            break;
-        case KEY_UP:
-            p_sys->i_box_bidx--;
-            break;
-        case KEY_DOWN:
-            p_sys->i_box_bidx++;
-            break;
-        case KEY_PPAGE:
-            p_sys->i_box_bidx -= p_sys->i_box_lines;
-            break;
-        case KEY_NPAGE:
-            p_sys->i_box_bidx += p_sys->i_box_lines;
-            break;
-        case '.': /* Toggle show hidden files */
-            p_sys->b_show_hidden_files = !p_sys->b_show_hidden_files;
-            ReadDir(p_intf);
-            break;
-
-        case KEY_ENTER:
-        case '\r':
-        case '\n':
-        case ' ':
-            if (p_sys->pp_dir_entries[p_sys->i_box_bidx]->b_file || i_key == ' ')
-            {
-                char* psz_uri;
-                if (asprintf(&psz_uri, "%s://%s/%s",
-                    p_sys->pp_dir_entries[p_sys->i_box_bidx]->b_file ?
-                        "file" : "directory",
-                    p_sys->psz_current_dir,
-                    p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path
-                   ) == -1)
-                {
-                    psz_uri = NULL;
-                }
-
-                playlist_item_t *p_parent = p_sys->p_node;
-                if (!p_parent)
-                {
-                    playlist_item_t *p_item;
-                    PL_LOCK;
-                    p_item = playlist_CurrentPlayingItem(p_playlist);
-                    p_parent = p_item ? p_item->p_parent : NULL;
-                    PL_UNLOCK;
-                    if (!p_parent)
-                        p_parent = p_playlist->p_local_onelevel;
-                }
-
-                while (p_parent->p_parent && p_parent->p_parent->p_parent)
-                    p_parent = p_parent->p_parent;
-
-                playlist_Add(p_playlist, psz_uri, NULL, PLAYLIST_APPEND,
-                              PLAYLIST_END,
-                              p_parent->p_input ==
-                                p_playlist->p_local_onelevel->p_input
-                              , false);
-
-                p_sys->i_box_type = BOX_PLAYLIST;
-                free(psz_uri);
-            }
-            else
-            {
-                if (asprintf(&(p_sys->psz_current_dir), "%s/%s", p_sys->psz_current_dir,
-                              p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path) != -1)
-                    ReadDir(p_intf);
-            }
-            break;
-        default:
-            b_ret = false;
-            break;
-        }
-        if (b_ret)
-        {
-            if (p_sys->i_box_bidx >= p_sys->i_dir_entries) p_sys->i_box_bidx = p_sys->i_dir_entries - 1;
-            if (p_sys->i_box_bidx < 0) p_sys->i_box_bidx = 0;
+        if (HandleBrowseKey(p_intf, i_key))
             return 1;
-        }
     }
     else if (p_sys->i_box_type == BOX_HELP || p_sys->i_box_type == BOX_INFO ||
              p_sys->i_box_type == BOX_META || p_sys->i_box_type == BOX_STATS ||
