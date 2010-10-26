@@ -1116,20 +1116,12 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
         vlc_mutex_lock(&p_item->lock);
         vlc_mutex_lock(&p_item->p_stats->lock);
 
-        int i_audio = 0;
-        int i_video = 0;
-        int i;
-
-        if (!p_item->i_es)
-            i_video = i_audio = 1;
-        else
-            for(i = 0; i < p_item->i_es ; i++)
-            {
-                i_audio += (p_item->es[i]->i_cat == AUDIO_ES);
-                i_video += (p_item->es[i]->i_cat == VIDEO_ES);
-            }
-
-        int l = 0;
+        int i_audio = 0, i_video = 0;
+        for(int i = 0; i < p_item->i_es ; i++)
+        {
+            i_audio += (p_item->es[i]->i_cat == AUDIO_ES);
+            i_video += (p_item->es[i]->i_cat == VIDEO_ES);
+        }
 
 #define SHOW_ACS(x,c) \
 if (l >= p_sys->i_box_start && l - p_sys->i_box_start < p_sys->i_box_lines) \
@@ -1210,13 +1202,10 @@ if (l >= p_sys->i_box_start && l - p_sys->i_box_start < p_sys->i_box_lines) \
 #undef SHOW_ACS
 
         p_sys->i_box_lines_total = l;
-        if (p_sys->i_box_start >= p_sys->i_box_lines_total)
+        if (p_sys->i_box_start > p_sys->i_box_lines_total - 1)
             p_sys->i_box_start = p_sys->i_box_lines_total - 1;
 
-        if (l - p_sys->i_box_start < p_sys->i_box_lines)
-            y += l - p_sys->i_box_start;
-        else
-            y += p_sys->i_box_lines;
+        y += __MIN(l - p_sys->i_box_start, p_sys->i_box_lines);
 
         vlc_mutex_unlock(&p_item->p_stats->lock);
         vlc_mutex_unlock(&p_item->lock);
@@ -1922,8 +1911,7 @@ static void Run(intf_thread_t *p_intf)
             Redraw(p_intf, &t_last_refresh);
             force_redraw = false;
         }
-
-        if ((time(0) - t_last_refresh) >= 1)
+        else if ((time(0) - t_last_refresh) >= 1)
             Redraw(p_intf, &t_last_refresh);
     }
     var_DelCallback(p_playlist, "intf-change", PlaylistChanged, p_intf);
