@@ -181,7 +181,7 @@ while not vlc.misc.should_die() do
 
     -- Handle reads
     for _, client in pairs(r) do
-        local str = client.cmds .. string.gsub(client:recv(1000), "\r", "\n")
+        local str = client.cmds .. client:recv(1000)
 
         if not str then -- the telnet client program has leave
             client.cmds = "quit"
