@@ -108,34 +108,26 @@ void var_buffer_addmemory( var_buffer_t *p_buf, void *p_mem, int i_mem )
 
 void var_buffer_addUTF16( var_buffer_t *p_buf, const char *p_str )
 {
-    unsigned int i;
-    if( !p_str )
-    {
-        var_buffer_add16( p_buf, 0 );
-    }
+    uint16_t *p_out;
+    size_t i_out;
+
+    if( p_str != NULL )
+#ifdef WORDS_BIGENDIAN
+        p_out = ToCharset( "UTF-16BE", p_str, &i_out );
+#else
+        p_out = ToCharset( "UTF-16LE", p_str, &i_out );
+#endif
     else
-    {
-        vlc_iconv_t iconv_handle;
-        size_t i_in = strlen( p_str );
-        size_t i_out = i_in * 4;
-        char *psz_out, *psz_tmp;
+        p_out = NULL;
+    if( p_out == NULL )
+        i_out = 0;
 
-        psz_out = psz_tmp = xmalloc( i_out + 1 );
-        iconv_handle = vlc_iconv_open( "UTF-16LE", "UTF-8" );
-        vlc_iconv( iconv_handle, &p_str, &i_in, &psz_tmp, &i_out );
-        vlc_iconv_close( iconv_handle );
-        psz_tmp[0] = '\0';
-        psz_tmp[1] = '\0';
+    i_out /= 2;
+    for( size_t i = 0; i < i_out; i ++ )
+        var_buffer_add16( p_buf, p_out[i] );
+    free( p_out );
 
-        for( i = 0; ; i += 2 )
-        {
-            uint16_t v = GetWLE( &psz_out[i] );
-            var_buffer_add16( p_buf, v );
-            if( !v )
-                break;
-        }
-        free( psz_out );
-    }
+    var_buffer_add16( p_buf, 0 );
 }
 
 void var_buffer_free( var_buffer_t *p_buf )
