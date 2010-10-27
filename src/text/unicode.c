@@ -43,73 +43,6 @@
 #include <errno.h>
 #include <wctype.h>
 
-#if defined (ASSUME_UTF8)
-/* Cool */
-
-#elif defined (WIN32) || defined (UNDER_CE)
-# define USE_MB2MB 1
-# include <io.h>
-
-static char *locale_dup (const char *string, bool from)
-{
-    char *out;
-    int len;
-
-    len = 1 + MultiByteToWideChar (from ? CP_ACP : CP_UTF8,
-                                   0, string, -1, NULL, 0);
-    wchar_t *wide = malloc (len * sizeof (wchar_t));
-    if (wide == NULL)
-        return NULL;
-
-    MultiByteToWideChar (from ? CP_ACP : CP_UTF8, 0, string, -1, wide, len);
-    len = 1 + WideCharToMultiByte (from ? CP_UTF8 : CP_ACP, 0, wide, -1,
-                                   NULL, 0, NULL, NULL);
-    out = malloc (len);
-    if (out != NULL)
-        WideCharToMultiByte (from ? CP_UTF8 : CP_ACP, 0, wide, -1, out, len,
-                             NULL, NULL);
-    free (wide);
-    return out;
-}
-
-#elif defined (HAVE_ICONV)
-# define USE_ICONV 1
-
-static char *locale_dup (const char *string, bool from)
-{
-    vlc_iconv_t hd = vlc_iconv_open (from ? "UTF-8" : "",
-                                     from ? "" : "UTF-8");
-    if (hd == (vlc_iconv_t)(-1))
-        return NULL; /* Uho! */
-
-    const char *iptr = string;
-    size_t inb = strlen (string);
-    size_t outb = inb * 6 + 1;
-    char output[outb], *optr = output;
-
-    while (vlc_iconv (hd, &iptr, &inb, &optr, &outb) == (size_t)(-1))
-    {
-        *optr++ = '?';
-        outb--;
-        iptr++;
-        inb--;
-        vlc_iconv (hd, NULL, NULL, NULL, NULL); /* reset */
-    }
-    *optr = '\0';
-    vlc_iconv_close (hd);
-
-    assert (inb == 0);
-    assert (*iptr == '\0');
-    assert (*optr == '\0');
-    assert (strlen (output) == (size_t)(optr - output));
-    return strdup (output);
-}
-
-#else
-# error No UTF8 charset conversion implemented on this platform!
-#endif
-
-
 /**
  * Releases (if needed) a localized or uniformized string.
  * @param str non-NULL return value from FromLocale() or ToLocale().
@@ -138,7 +71,7 @@ char *FromLocale (const char *locale)
 #ifdef ASSUME_UTF8
     return (char *)locale;
 #else
-    return locale ? locale_dup (locale, true) : NULL;
+    return locale ? FromCharset ("", locale) : NULL;
 #endif
 }
 
@@ -156,7 +89,7 @@ char *FromLocaleDup (const char *locale)
 #ifdef ASSUME_UTF8
     return strdup (locale);
 #else
-    return locale_dup (locale, true);
+    return FromCharset ("", locale);
 #endif
 }
 
@@ -175,7 +108,7 @@ char *ToLocale (const char *utf8)
 #ifdef ASSUME_UTF8
     return (char *)utf8;
 #else
-    return utf8 ? locale_dup (utf8, false) : NULL;
+    return utf8 ? ToCharset ("", utf8) : NULL;
 #endif
 }
 
@@ -194,7 +127,7 @@ char *ToLocaleDup (const char *utf8)
 #ifdef ASSUME_UTF8
     return strdup (utf8);
 #else
-    return locale_dup (utf8, false);
+    return ToCharset ("", utf8);
 #endif
 }
 
