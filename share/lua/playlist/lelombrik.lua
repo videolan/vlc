@@ -38,7 +38,7 @@ function parse()
         if string.match( line, "id=\"nom_fichier\">" ) then
             title = string.gsub( line, ".*\"nom_fichier\">([^<]*).*", "%1" )
             if title then
-                title = vlc.strings.iconv( "UTF8", "ISO_8859-1", title )
+                title = vlc.strings.from_charset( "ISO_8859-1", title )
             end
         elseif string.match( line, "'file'" ) then
             _,_,path = string.find( line, "'file', *'([^']*)")

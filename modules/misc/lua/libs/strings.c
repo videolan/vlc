@@ -113,31 +113,18 @@ static int vlclua_convert_xml_special_chars( lua_State *L )
     return i_top;
 }
 
-static int vlclua_iconv( lua_State *L )
+static int vlclua_from_charset( lua_State *L )
 {
-    int i_ret;
-    size_t i_out_bytes, i_in_bytes;
-    char *psz_output, *psz_original;
-
     if( lua_gettop( L ) < 3 ) return vlclua_error( L );
 
-    const char *psz_input = luaL_checklstring( L, 3, &i_in_bytes );
-
+    size_t i_in_bytes;
+    const char *psz_input = luaL_checklstring( L, 2, &i_in_bytes );
     if( i_in_bytes == 0 ) return vlclua_error( L );
-    vlc_iconv_t iconv_handle = vlc_iconv_open( luaL_checkstring(L, 1),
-                                             luaL_checkstring(L, 2) );
 
-    if( iconv_handle == (vlc_iconv_t)-1 )
-       return vlclua_error( L );
-    i_out_bytes = 4 * i_in_bytes;
-    psz_output = psz_original = malloc( i_out_bytes + 1 );
-    i_ret = vlc_iconv( iconv_handle, &psz_input ,
-                       &i_in_bytes, &psz_output, &i_out_bytes );
-    *psz_output = '\0';
-
-    lua_pushstring( L, psz_original );
-    vlc_iconv_close( iconv_handle );
-    free( psz_original );
+    const char *psz_charset = luaL_checkstring( L, 1 );
+    char *psz_output = FromCharset( psz_charset, psz_input, i_in_bytes );
+    lua_pushstring( L, psz_output ? psz_output : "" );
+    free( psz_output );
     return 1;
 }
 
@@ -149,7 +136,7 @@ static const luaL_Reg vlclua_strings_reg[] = {
     { "encode_uri_component", vlclua_encode_uri_component },
     { "resolve_xml_special_chars", vlclua_resolve_xml_special_chars },
     { "convert_xml_special_chars", vlclua_convert_xml_special_chars },
-    { "iconv", vlclua_iconv },
+    { "from_charset", vlclua_from_charset },
     { NULL, NULL }
 };
 
