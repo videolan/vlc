@@ -968,7 +968,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
                                      VLC_OBJECT(p_vlm->p_vod) :
                                      VLC_OBJECT(p_vlm->p_libvlc);
         if( !p_instance->p_input_resource )
-            p_instance->p_input_resource = input_resource_New( VLC_OBJECT( p_vlm ) );
+            p_instance->p_input_resource = input_resource_New( VLC_OBJECT( p_vlm->p_libvlc ) );
         p_instance->p_input = input_Create( p_parent, p_instance->p_item,
                                             psz_log, p_instance->p_input_resource );
         if( p_instance->p_input )
