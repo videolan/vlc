@@ -62,7 +62,7 @@ class StandardPLPanel: public QWidget
 
 public:
     StandardPLPanel( PlaylistWidget *, intf_thread_t *,
-                     playlist_t *, playlist_item_t *, PLSelector *, PLModel * );
+                     playlist_item_t *, PLSelector *, PLModel * );
     virtual ~StandardPLPanel();
 
     enum { TREE_VIEW = 0,
@@ -86,7 +86,6 @@ private:
 
     QStackedLayout    *viewStack;
 
-    int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
 
     int lastActivatedId;

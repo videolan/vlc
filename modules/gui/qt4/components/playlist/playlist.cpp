@@ -90,7 +90,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     setMinimumWidth( 300 );
 
     PLModel *model = new PLModel( p_playlist, p_intf, p_root, this );
-    mainView = new StandardPLPanel( this, p_intf, THEPL, p_root, selector, model );
+    mainView = new StandardPLPanel( this, p_intf, p_root, selector, model );
 
     /* Location Bar */
     locationBar = new LocationBar( model );

@@ -1,11 +1,11 @@
 /*****************************************************************************
  * standardpanel.cpp : The "standard" playlist panel : just a treeview
  ****************************************************************************
- * Copyright (C) 2000-2009 VideoLAN
+ * Copyright © 2000-2010 VideoLAN
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
- *          JB Kempf <jb@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,9 @@
 #include "menus.hpp"                              /* Popup */
 #include "input_manager.hpp"                      /* THEMIM */
 
-#include <vlc_services_discovery.h> /* SD_CMD_SEARCH */
+#include "sorting.h"                              /* Columns order */
+
+#include <vlc_services_discovery.h>               /* SD_CMD_SEARCH */
 
 #include <QHeaderView>
 #include <QModelIndexList>
@@ -47,38 +49,28 @@
 
 #include <assert.h>
 
-#include "sorting.h"
-
 StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   intf_thread_t *_p_intf,
-                                  playlist_t *p_playlist,
                                   playlist_item_t *p_root,
                                   PLSelector *_p_selector,
-                                  PLModel *_p_model
-                                  ):
-                                  QWidget( _parent ), p_intf( _p_intf ),
-                                  p_selector( _p_selector )
+                                  PLModel *_p_model )
+                : QWidget( _parent ), p_intf( _p_intf ),
+                  p_selector( _p_selector ), model( _p_model )
 {
-    QGridLayout *layout = new QGridLayout( this );
-    layout->setSpacing( 0 ); layout->setMargin( 0 );
+    viewStack = new QStackedLayout( this );
+    viewStack->setSpacing( 0 ); viewStack->setMargin( 0 );
     setMinimumWidth( 300 );
 
     iconView = NULL;
     treeView = NULL;
     listView = NULL;
-    viewStack = new QStackedLayout();
-    layout->addLayout( viewStack, 1, 0, 1, -1 );
 
-    model = _p_model;
-    currentRootId = -1;
-    currentRootIndexId = -1;
-    lastActivatedId = -1;
+    currentRootIndexId  = -1;
+    lastActivatedId     = -1;
 
     /* Saved Settings */
     getSettings()->beginGroup("Playlist");
-
     int i_viewMode = getSettings()->value( "view-mode", TREE_VIEW ).toInt();
-
     getSettings()->endGroup();
 
     showView( i_viewMode );
@@ -147,8 +139,7 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
     int i, j;
     for( i = 1 << 1, j = 1; i < COLUMN_END; i <<= 1, j++ )
     {
-        QAction* option = menu.addAction(
-            qfu( psz_column_title( i ) ) );
+        QAction* option = menu.addAction( qfu( psz_column_title( i ) ) );
         option->setCheckable( true );
         option->setChecked( !treeView->isColumnHidden( j ) );
         selectColumnsSigMapper->setMapping( option, j );
@@ -267,7 +258,6 @@ void StandardPLPanel::createListView()
     viewStack->addWidget( listView );
 }
 
-
 void StandardPLPanel::createTreeView()
 {
     /* Create and configure the QTreeView */
@@ -326,7 +316,6 @@ void StandardPLPanel::createTreeView()
     CONNECT( selectColumnsSigMapper, mapped( int ),
              this, toggleColumnShown( int ) );
 
-    /* Finish the layout */
     viewStack->addWidget( treeView );
 }
 
@@ -396,7 +385,6 @@ void StandardPLPanel::activate( const QModelIndex &index )
 
 void StandardPLPanel::browseInto( input_item_t *p_input )
 {
-
     if( p_input->i_id != lastActivatedId ) return;
 
     playlist_Lock( THEPL );
@@ -418,5 +406,4 @@ void StandardPLPanel::browseInto( input_item_t *p_input )
         browseInto( index );
 
     lastActivatedId = -1;
-
 }
