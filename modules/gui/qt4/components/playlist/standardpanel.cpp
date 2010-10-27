@@ -26,35 +26,28 @@
 # include "config.h"
 #endif
 
-#include "dialogs_provider.hpp"
-
-#include "components/playlist/playlist_model.hpp"
 #include "components/playlist/standardpanel.hpp"
-#include "components/playlist/views.hpp"
-#include "components/playlist/selector.hpp"
-#include "util/customwidgets.hpp"
-#include "menus.hpp"
-#include "input_manager.hpp"
 
-#include <vlc_intf_strings.h>
-#include <vlc_services_discovery.h>
+#include "components/playlist/playlist_model.hpp" /* PLModel */
+#include "components/playlist/views.hpp"          /* 3 views */
+#include "components/playlist/selector.hpp"       /* PLSelector */
+#include "menus.hpp"                              /* Popup */
+#include "input_manager.hpp"                      /* THEMIM */
 
-#include <QPushButton>
+#include <vlc_services_discovery.h> /* SD_CMD_SEARCH */
+
 #include <QHeaderView>
-#include <QKeyEvent>
 #include <QModelIndexList>
-#include <QLabel>
 #include <QMenu>
+#include <QKeyEvent>
 #include <QWheelEvent>
-#include <QToolButton>
-#include <QFontMetrics>
 #include <QStackedLayout>
 #include <QSignalMapper>
+#include <QSettings>
 
 #include <assert.h>
 
 #include "sorting.h"
-
 
 StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   intf_thread_t *_p_intf,

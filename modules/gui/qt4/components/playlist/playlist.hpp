@@ -43,10 +43,6 @@ class QSignalMapper;
 class SearchLineEdit;
 class QModelIndex;
 
-static const QString viewNames[] = { qtr( "Detailed View" ),
-                                     qtr( "Icon View" ),
-                                     qtr( "List View" ) };
-
 class PlaylistWidget : public QSplitter
 {
     Q_OBJECT

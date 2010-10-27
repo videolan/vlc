@@ -51,6 +51,11 @@ class LocationBar;
 class PLSelector;
 class PlaylistWidget;
 
+static const QString viewNames[3 /* VIEW_COUNT */]
+                                = { qtr( "Detailed View" ),
+                                    qtr( "Icon View" ),
+                                    qtr( "List View" ) };
+
 class StandardPLPanel: public QWidget
 {
     Q_OBJECT
