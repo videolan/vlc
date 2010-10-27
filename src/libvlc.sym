@@ -192,8 +192,10 @@ libvlc_video_get_width
 libvlc_video_set_adjust_float
 libvlc_video_set_adjust_int
 libvlc_video_set_aspect_ratio
+libvlc_video_set_callbacks
 libvlc_video_set_crop_geometry
 libvlc_video_set_deinterlace
+libvlc_video_set_format
 libvlc_video_set_key_input
 libvlc_video_set_logo_int
 libvlc_video_set_logo_string
@@ -206,8 +208,6 @@ libvlc_video_set_subtitle_file
 libvlc_video_set_teletext
 libvlc_video_set_track
 libvlc_video_take_snapshot
-libvlc_video_set_callbacks
-libvlc_video_set_format
 libvlc_vlm_add_broadcast
 libvlc_vlm_add_vod
 libvlc_vlm_add_input
