@@ -380,9 +380,9 @@ ifdef HAVE_DARWIN_OS
 	patch -p0 < Patches/gettext-macosx.patch
 endif
 
-.intl: gettext .iconv
+.intl: gettext
 ifdef HAVE_WIN32
-	( cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-relocatable --with-iconv-prefix=$(PREFIX) --disable-java --disable-native-java)
+	( cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-relocatable --disable-java --disable-native-java)
 else
 	( cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-java --disable-native-java --without-emacs)
 endif
