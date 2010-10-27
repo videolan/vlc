@@ -250,7 +250,7 @@ void LocationBar::setIndex( const QModelIndex &index )
     QModelIndex i = index;
     bool first = true;
 
-    while( i.isValid() )
+    while( true )
     {
         PLItem *item = model->getItem( i );
 
@@ -271,7 +271,8 @@ void LocationBar::setIndex( const QModelIndex &index )
 
         first = false;
 
-        i = i.parent();
+        if( i.isValid() ) i = i.parent();
+        else break;
     }
 
     QString prefix;
