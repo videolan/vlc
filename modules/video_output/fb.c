@@ -186,11 +186,11 @@ static int Open(vlc_object_t *object)
         return VLC_ENOMEM;
 
     /* Does the framebuffer uses hw acceleration? */
-    sys->is_hw_accel = var_CreateGetBool(vd, "fb-hw-accel");
+    sys->is_hw_accel = var_InheritBool(vd, "fb-hw-accel");
 
     /* Set tty and fb devices */
     sys->tty = 0; /* 0 == /dev/tty0 == current console */
-    sys->is_tty = var_CreateGetBool(vd, "fb-tty");
+    sys->is_tty = var_InheritBool(vd, "fb-tty");
 #if !defined(WIN32) &&  defined(HAVE_ISATTY)
     /* Check that stdin is a TTY */
     if (sys->is_tty && !isatty(0)) {
@@ -202,7 +202,7 @@ static int Open(vlc_object_t *object)
                  "there is no way to return to the TTY");
 #endif
 
-    const int mode = var_CreateGetInteger(vd, "fb-mode");
+    const int mode = var_InheritInteger(vd, "fb-mode");
     bool force_resolution = true;
     switch (mode) {
     case 0: /* QCIF */
@@ -227,7 +227,7 @@ static int Open(vlc_object_t *object)
         break;
     }
 
-    char *chroma = var_CreateGetNonEmptyString(vd, "fb-chroma");
+    char *chroma = var_InheritString(vd, "fb-chroma");
     if (chroma) {
         sys->chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, chroma);
 
