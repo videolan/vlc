@@ -74,7 +74,7 @@ int Open_LuaSD( vlc_object_t *p_this )
         // This module can be used to load lua script not registered
         // as builtin lua SD modules.
         config_ChainParse( p_sd, "lua-", ppsz_sd_options, p_sd->p_cfg );
-        psz_name = var_CreateGetString( p_sd, "lua-sd" );
+        psz_name = var_GetString( p_sd, "lua-sd" );
     }
     else
     {
@@ -233,6 +233,10 @@ static void* Run( void *data )
             free( psz_query );
             vlc_mutex_lock( &p_sys->lock );
         }
+        /* Force garbage collection, because the core will keep the SD
+         * open, but lua will never gc until lua_close(). */
+        lua_gc( L, LUA_GCCOLLECT, 0 );
+
         vlc_restorecancel( cancel );
     }
     vlc_cleanup_run();
