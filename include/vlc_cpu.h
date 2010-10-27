@@ -71,7 +71,7 @@ VLC_EXPORT( unsigned, vlc_GetCPUCount, ( void ) );
 # if defined (__i386__) || defined (__x86_64__)
 #  define HAVE_FPU 1
 
-# elif defined (__powerpc__) || defined (__ppc__) || defined (__pc64__)
+# elif defined (__powerpc__) || defined (__ppc__) || defined (__ppc64__)
 #  define HAVE_FPU 1
 
 # elif defined (__arm__)
