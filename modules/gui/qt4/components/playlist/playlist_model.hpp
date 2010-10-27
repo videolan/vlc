@@ -36,25 +36,19 @@
 
 #include "playlist_item.hpp"
 
-#include <QModelIndex>
-#include <QObject>
-#include <QEvent>
 #include <QMimeData>
-#include <QSignalMapper>
 #include <QAbstractItemModel>
 #include <QVariant>
-#include <QAction>
+#include <QModelIndex>
 
 class PLItem;
 class PLSelector;
 class PlMimeData;
+class QSignalMapper;
 
 class PLModel : public QAbstractItemModel
 {
     Q_OBJECT
-
-friend class PLItem;
-friend class PLSelector;
 
 public:
     enum {

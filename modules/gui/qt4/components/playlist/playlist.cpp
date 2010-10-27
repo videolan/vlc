@@ -26,18 +26,18 @@
 # include "config.h"
 #endif
 
-#include "components/playlist/standardpanel.hpp"
-#include "components/playlist/selector.hpp"
 #include "components/playlist/playlist.hpp"
-#include "components/playlist/playlist_model.hpp"
+#include "components/playlist/standardpanel.hpp"  /* MainView */
+#include "components/playlist/selector.hpp"       /* PLSelector */
+#include "components/playlist/playlist_model.hpp" /* PLModel */
+#include "components/interface_widgets.hpp"       /* CoverArtLabel */
 
-#include "input_manager.hpp" /* art signal */
-#include "main_interface.hpp" /* DropEvent TODO remove this*/
+#include "input_manager.hpp"                      /* art signal */
+#include "main_interface.hpp"                     /* DropEvent TODO remove this*/
 
-#include <QGroupBox>
 #include <QMenu>
+#include <QSignalMapper>
 
-#include <iostream>
 /**********************************************************************
  * Playlist Widget. The embedded playlist
  **********************************************************************/
@@ -54,7 +54,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     leftSplitter = new QSplitter( Qt::Vertical, this );
 
     /* Source Selector */
-    selector = new PLSelector( this, p_intf );
+    PLSelector *selector = new PLSelector( this, p_intf );
     leftSplitter->addWidget( selector);
 
     /* Create a Container for the Art Label
@@ -66,7 +66,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     artContainer->setMaximumHeight( 128 );
 
     /* Art label */
-    art = new ArtLabel( artContainer, p_intf );
+    CoverArtLabel *art = new CoverArtLabel( artContainer, p_intf );
     art->setToolTip( qtr( "Double click to get media information" ) );
     artContLay->addWidget( art, 1 );
 
@@ -107,10 +107,11 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     layout->addWidget( viewButton, 0, 1 );
 
     /* View selection menu */
-    viewSelectionMapper = new QSignalMapper( this );
+    QSignalMapper *viewSelectionMapper = new QSignalMapper( this );
     CONNECT( viewSelectionMapper, mapped( int ), mainView, showView( int ) );
 
     QActionGroup *actionGroup = new QActionGroup( this );
+    QAction *viewActions[StandardPLPanel::VIEW_COUNT];
     for( int i = 0; i < StandardPLPanel::VIEW_COUNT; i++ )
     {
         viewActions[i] = actionGroup->addAction( viewNames[i] );
@@ -119,10 +120,10 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
         CONNECT( viewActions[i], triggered(), viewSelectionMapper, map() );
     }
 
-    CONNECT( viewButton, clicked(), mainView, cycleViews() );
-    QMenu *viewMenu = new QMenu( this );
+    QMenu *viewMenu = new QMenu( viewButton );
     viewMenu->addActions( actionGroup->actions() );
     viewButton->setMenu( viewMenu );
+    CONNECT( viewButton, clicked(), mainView, cycleViews() );
 
     /* Search */
     searchEdit = new SearchLineEdit( this );
@@ -141,7 +142,6 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     DCONNECT( selector, activated( playlist_item_t * ),
               mainView, setRoot( playlist_item_t * ) );
 
-    mainView->setRoot( p_root );
     layout->addWidget( mainView, 1, 0, 1, -1 );
 
     /* Add the two sides of the QSplitter */

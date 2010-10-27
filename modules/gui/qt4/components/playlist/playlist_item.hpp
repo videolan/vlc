@@ -30,7 +30,6 @@
 
 #include <QList>
 
-
 class PLItem
 {
     friend class PLModel;

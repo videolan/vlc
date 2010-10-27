@@ -28,26 +28,27 @@
 #endif
 
 #include "qt4.hpp"
-#include "dialogs_provider.hpp"
 #include "components/playlist/playlist_model.hpp"
-#include "dialogs/mediainfo.hpp"
-#include "dialogs/playlist.hpp"
+#include "dialogs_provider.hpp"         /* THEDP */
+#include "input_manager.hpp"            /* THEMIM */
+#include "dialogs/mediainfo.hpp"        /* MediaInfo Dialog */
+#include "dialogs/playlist.hpp"         /* Playlist Dialog */
+
 #include <vlc_intf_strings.h>
 
 #include "pixmaps/types/type_unknown.xpm"
+#include "sorting.h"
 
 #include <assert.h>
 #include <QIcon>
 #include <QFont>
 #include <QMenu>
-#include <QApplication>
-#include <QSettings>
 #include <QUrl>
 #include <QFileInfo>
 #include <QDesktopServices>
 #include <QInputDialog>
+#include <QSignalMapper>
 
-#include "sorting.h"
 
 #define I_NEW_DIR \
     I_DIR_OR_FOLDER( N_("Create Directory"), N_( "Create Folder" ) )

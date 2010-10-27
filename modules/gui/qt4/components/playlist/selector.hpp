@@ -81,7 +81,7 @@ public:
     PLSelItem( QTreeWidgetItem*, const QString& );
 
     void setText( const QString& text ) { lbl->setText( text ); }
-    const QString text() { return lbl->text(); }
+    QString text() const { return lbl->text(); }
 
     void addAction( ItemAction, const QString& toolTip = 0 );
     QTreeWidgetItem *treeItem() { return qitem; }
@@ -100,10 +100,10 @@ private:
     inline void enterEvent( QEvent* ){ showAction(); }
     inline void leaveEvent( QEvent* ){ hideAction(); }
 
-    QTreeWidgetItem* qitem;
-    QVLCFramelessButton *lblAction;
-    QLabel *lbl;
-    QHBoxLayout *layout;
+    QTreeWidgetItem*     qitem;
+    QVLCFramelessButton* lblAction;
+    QLabel*              lbl;
+    QHBoxLayout*         layout;
 };
 
 Q_DECLARE_METATYPE( playlist_item_t *);
@@ -116,8 +116,12 @@ public:
     virtual ~PLSelector();
 
     void getCurrentSelectedItem( int *type, QString *name );
+
 protected:
-    friend class PlaylistWidget;
+    virtual void drawBranches ( QPainter *, const QRect &, const QModelIndex & ) const;
+    virtual void dragMoveEvent ( QDragMoveEvent * event );
+    virtual bool dropMimeData ( QTreeWidgetItem *, int, const QMimeData *, Qt::DropAction );
+    virtual QStringList mimeTypes () const;
 
 private:
     void createItems();
@@ -126,11 +130,6 @@ private:
     PLSelItem * addPodcastItem( playlist_item_t *p_item );
 
     inline PLSelItem * itemWidget( QTreeWidgetItem * );
-    void drawBranches ( QPainter *, const QRect &, const QModelIndex & ) const;
-
-    QStringList mimeTypes () const;
-    bool dropMimeData ( QTreeWidgetItem *, int, const QMimeData *, Qt::DropAction );
-    void dragMoveEvent ( QDragMoveEvent * event );
 
     intf_thread_t    *p_intf;
     QTreeWidgetItem  *podcastsParent;

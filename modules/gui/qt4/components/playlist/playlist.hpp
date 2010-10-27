@@ -32,60 +32,41 @@
 
 #include "qt4.hpp"
 
-#include "dialogs_provider.hpp"              /* Media Info from ArtLabel */
-#include "components/playlist/standardpanel.hpp"  /* CoverArt */
-#include "components/interface_widgets.hpp"  /* CoverArt */
-
-
 //#include <vlc_playlist.h>
 
 #include <QSplitter>
+#include <QPushButton>
 
-class PLSelector;
-
-class QPushButton;
 class StandardPLPanel;
+class LocationBar;
+class QSignalMapper;
+class SearchLineEdit;
+class QModelIndex;
 
 static const QString viewNames[] = { qtr( "Detailed View" ),
                                      qtr( "Icon View" ),
                                      qtr( "List View" ) };
 
-class ArtLabel : public CoverArtLabel
-{
-public:
-    ArtLabel( QWidget *parent, intf_thread_t *intf )
-            : CoverArtLabel( parent, intf ) {}
-
-    virtual void mouseDoubleClickEvent( QMouseEvent *event )
-    {
-        THEDP->mediaInfoDialog();
-        event->accept();
-    }
-};
-
-class LocationBar;
 class PlaylistWidget : public QSplitter
 {
     Q_OBJECT
 public:
     PlaylistWidget( intf_thread_t *_p_i, QWidget * );
     virtual ~PlaylistWidget();
+
     void forceHide();
     void forceShow();
+
 private:
-    PLSelector      *selector;
-    ArtLabel        *art;
+    QSplitter            *leftSplitter;
+    StandardPLPanel      *mainView;
 
-    QPushButton     *addButton;
-    QSplitter       *leftSplitter;
-    QSignalMapper *viewSelectionMapper;
-    QAction *viewActions[3];
-    StandardPLPanel *mainView;
+    LocationBar          *locationBar;
+    SearchLineEdit       *searchEdit;
 
-    LocationBar *locationBar;
-    SearchLineEdit *searchEdit;
-protected:
     intf_thread_t *p_intf;
+
+protected:
     virtual void dropEvent( QDropEvent *);
     virtual void dragEnterEvent( QDragEnterEvent * );
     virtual void closeEvent( QCloseEvent * );
@@ -98,39 +79,43 @@ class LocationButton : public QPushButton
 {
 public:
     LocationButton( const QString &, bool bold, bool arrow, QWidget * parent = NULL );
-    QSize sizeHint() const;
+    virtual QSize sizeHint() const;
+protected:
+    virtual void paintEvent ( QPaintEvent * event );
 private:
-    void paintEvent ( QPaintEvent * event );
-    QFontMetrics *metrics;
     bool b_arrow;
 };
 
 class PLModel;
+class QHBoxLayout;
 class LocationBar : public QWidget
 {
     Q_OBJECT
 public:
     LocationBar( PLModel * );
     void setIndex( const QModelIndex & );
-    QSize sizeHint() const;
-signals:
-    void invoked( const QModelIndex & );
-public slots:
-    void setRootIndex();
-private slots:
-    void invoke( int i_item_id );
+    virtual QSize sizeHint() const;
+protected:
+    virtual void resizeEvent ( QResizeEvent * event );
+
 private:
     void layOut( const QSize& size );
-    void resizeEvent ( QResizeEvent * event );
 
     PLModel *model;
     QSignalMapper *mapper;
-    QHBoxLayout *box;
     QList<QWidget*> buttons;
     QList<QAction*> actions;
     LocationButton *btnMore;
     QMenu *menuMore;
     QList<int> widths;
+
+public slots:
+    void setRootIndex();
+private slots:
+    void invoke( int i_item_id );
+
+signals:
+    void invoked( const QModelIndex & );
 };
 
 

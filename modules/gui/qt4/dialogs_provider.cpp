@@ -34,6 +34,7 @@
 #include "menus.hpp"
 #include "recents.hpp"
 #include "util/qt_dirs.hpp"
+#include "main_interface.hpp"
 
 /* The dialogs */
 #include "dialogs/playlist.hpp"

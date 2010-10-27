@@ -31,26 +31,24 @@
 #include "qt4.hpp"
 #include "components/playlist/playlist.hpp"
 
-#include <QModelIndex>
 #include <QWidget>
-#include <QString>
-#include <QToolBar>
 
-#include <vlc_playlist.h>
+#include <vlc_playlist.h> /* playlist_item_t */
 
 class QSignalMapper;
-class QTreeView;
-class QListView;
 class PLModel;
-class QPushButton;
 class QKeyEvent;
 class QWheelEvent;
 class QStackedLayout;
+class QModelIndex;
+
+class QAbstractItemView;
+class QTreeView;
 class PlIconView;
 class PlListView;
+
 class LocationBar;
 class PLSelector;
-class QAbstractItemView;
 class PlaylistWidget;
 
 class StandardPLPanel: public QWidget
@@ -61,30 +59,27 @@ public:
     StandardPLPanel( PlaylistWidget *, intf_thread_t *,
                      playlist_t *, playlist_item_t *, PLSelector *, PLModel * );
     virtual ~StandardPLPanel();
+
+    enum { TREE_VIEW = 0,
+           ICON_VIEW,
+           LIST_VIEW,
+           VIEW_COUNT  };
+
 protected:
-    friend class PlaylistWidget;
 
     PLModel *model;
+    virtual void wheelEvent( QWheelEvent *e );
 private:
-    enum {
-      TREE_VIEW = 0,
-      ICON_VIEW,
-      LIST_VIEW,
-
-      VIEW_COUNT
-    };
-
     intf_thread_t *p_intf;
 
-    QWidget     *parent;
-    QGridLayout *layout;
     PLSelector  *p_selector;
 
-    QTreeView   *treeView;
-    PlIconView  *iconView;
-    PlListView  *listView;
+    QTreeView         *treeView;
+    PlIconView        *iconView;
+    PlListView        *listView;
     QAbstractItemView *currentView;
-    QStackedLayout *viewStack;
+
+    QStackedLayout    *viewStack;
 
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
@@ -95,7 +90,6 @@ private:
     void createTreeView();
     void createIconView();
     void createListView();
-    void wheelEvent( QWheelEvent *e );
     bool eventFilter ( QObject * watched, QEvent * event );
 
 public slots:

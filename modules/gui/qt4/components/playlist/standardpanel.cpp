@@ -49,6 +49,7 @@
 #include <QToolButton>
 #include <QFontMetrics>
 #include <QStackedLayout>
+#include <QSignalMapper>
 
 #include <assert.h>
 
@@ -65,7 +66,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   QWidget( _parent ), p_intf( _p_intf ),
                                   p_selector( _p_selector )
 {
-    layout = new QGridLayout( this );
+    QGridLayout *layout = new QGridLayout( this );
     layout->setSpacing( 0 ); layout->setMargin( 0 );
     setMinimumWidth( 300 );
 
@@ -95,6 +96,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     CONNECT( model, currentChanged( const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
     CONNECT( model, rootChanged(), this, handleRootChange() );
+
+    setRoot( p_root );
 }
 
 StandardPLPanel::~StandardPLPanel()

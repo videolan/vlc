@@ -35,6 +35,8 @@
 
 #include "components/controller.hpp"
 #include "components/controller_widget.hpp"
+#include "dialogs_provider.hpp"
+#include "components/info_panels.hpp"
 
 #include <QWidget>
 #include <QFrame>
@@ -201,6 +203,15 @@ public:
     CoverArtLabel( QWidget *parent, intf_thread_t * );
     virtual ~CoverArtLabel();
 
+protected:
+    virtual void mouseDoubleClickEvent( QMouseEvent *event )
+    {
+        if( qobject_cast<MetaPanel *>(this->window()) == NULL )
+        {
+            THEDP->mediaInfoDialog();
+        }
+        event->accept();
+    }
 private:
     intf_thread_t *p_intf;
 
