@@ -189,7 +189,6 @@ src/video_output/video_widgets.c
 src/video_output/vout_control.h
 src/video_output/vout_internal.h
 src/video_output/vout_intf.c
-src/video_output/vout_pictures.c
 src/video_output/vout_subpictures.c
 
 # modules
