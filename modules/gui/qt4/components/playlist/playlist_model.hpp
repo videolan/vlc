@@ -64,21 +64,21 @@ public:
     /*** QModel subclassing ***/
 
     /* Data structure */
-    QVariant data( const QModelIndex &index, const int role ) const;
-    QVariant headerData( int section, Qt::Orientation orientation,
+    virtual QVariant data( const QModelIndex &index, const int role ) const;
+    virtual QVariant headerData( int section, Qt::Orientation orientation,
                          int role = Qt::DisplayRole ) const;
-    int rowCount( const QModelIndex &parent = QModelIndex() ) const;
-    int columnCount( const QModelIndex &parent = QModelIndex() ) const;
-    Qt::ItemFlags flags( const QModelIndex &index ) const;
-    QModelIndex index( const int r, const int c, const QModelIndex &parent ) const;
-    QModelIndex parent( const QModelIndex &index ) const;
+    virtual int rowCount( const QModelIndex &parent = QModelIndex() ) const;
+    virtual int columnCount( const QModelIndex &parent = QModelIndex() ) const;
+    virtual Qt::ItemFlags flags( const QModelIndex &index ) const;
+    virtual QModelIndex index( const int r, const int c, const QModelIndex &parent ) const;
+    virtual QModelIndex parent( const QModelIndex &index ) const;
 
     /* Drag and Drop */
-    Qt::DropActions supportedDropActions() const;
-    QMimeData* mimeData( const QModelIndexList &indexes ) const;
-    bool dropMimeData( const QMimeData *data, Qt::DropAction action,
+    virtual Qt::DropActions supportedDropActions() const;
+    virtual QMimeData* mimeData( const QModelIndexList &indexes ) const;
+    virtual bool dropMimeData( const QMimeData *data, Qt::DropAction action,
                       int row, int column, const QModelIndex &target );
-    QStringList mimeTypes() const;
+    virtual QStringList mimeTypes() const;
 
     /**** Custom ****/
 

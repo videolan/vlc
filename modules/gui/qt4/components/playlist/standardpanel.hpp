@@ -46,15 +46,11 @@ class QAbstractItemView;
 class QTreeView;
 class PlIconView;
 class PlListView;
+class PicFlowView;
 
 class LocationBar;
 class PLSelector;
 class PlaylistWidget;
-
-static const QString viewNames[3 /* VIEW_COUNT */]
-                                = { qtr( "Detailed View" ),
-                                    qtr( "Icon View" ),
-                                    qtr( "List View" ) };
 
 class StandardPLPanel: public QWidget
 {
@@ -68,7 +64,8 @@ public:
     enum { TREE_VIEW = 0,
            ICON_VIEW,
            LIST_VIEW,
-           VIEW_COUNT  };
+           PICTUREFLOW_VIEW,
+           VIEW_COUNT };
 
     const int getViewNumber();
 
@@ -84,6 +81,8 @@ private:
     QTreeView         *treeView;
     PlIconView        *iconView;
     PlListView        *listView;
+    PicFlowView       *picFlowView;
+
     QAbstractItemView *currentView;
 
     QStackedLayout    *viewStack;
@@ -96,6 +95,7 @@ private:
     void createTreeView();
     void createIconView();
     void createListView();
+    void createCoverView();
     bool eventFilter ( QObject * watched, QEvent * event );
 
 public slots:
@@ -125,5 +125,12 @@ private slots:
 signals:
     void viewChanged( const QModelIndex& );
 };
+
+
+static const QString viewNames[ StandardPLPanel::VIEW_COUNT ]
+                                = { qtr( "Detailed View" ),
+                                    qtr( "Icon View" ),
+                                    qtr( "List View" ),
+                                    qtr( "PictureFlow View ") };
 
 #endif

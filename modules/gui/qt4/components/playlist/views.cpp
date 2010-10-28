@@ -22,11 +22,10 @@
  *****************************************************************************/
 
 #include "components/playlist/views.hpp"
-#include "components/playlist/playlist_model.hpp"
-#include "components/playlist/sorting.h"
-#include "input_manager.hpp"
+#include "components/playlist/playlist_model.hpp" /* PLModel */
+#include "components/playlist/sorting.h"          /* Columns List */
+#include "input_manager.hpp"                      /* THEMIM */
 
-#include <QApplication>
 #include <QPainter>
 #include <QRect>
 #include <QStyleOptionViewItem>
@@ -178,9 +177,6 @@ QSize PlIconViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, co
 
 void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-    QModelIndex parent = index.parent();
-    QModelIndex i;
-
     QString title = PLModel::getMeta( index, COLUMN_TITLE );
     QString duration = PLModel::getMeta( index, COLUMN_DURATION );
     if( !duration.isEmpty() ) title += QString(" [%1]").arg( duration );
@@ -263,14 +259,14 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
 QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-  QFont f;
-  f.setBold( true );
-  QFontMetrics fm( f );
-  int height = qMax( LISTVIEW_ART_SIZE, 2 * fm.height() + 4 ) + 6;
-  return QSize( 0, height );
+    QFont f;
+    f.setBold( true );
+    QFontMetrics fm( f );
+    int height = qMax( LISTVIEW_ART_SIZE, 2 * fm.height() + 4 ) + 6;
+    return QSize( 0, height );
 }
 
-static void plViewStartDrag( QAbstractItemView *view, const Qt::DropActions & supportedActions )
+static inline void plViewStartDrag( QAbstractItemView *view, const Qt::DropActions & supportedActions )
 {
     QDrag *drag = new QDrag( view );
     drag->setPixmap( QPixmap( ":/noart64" ) );
@@ -375,3 +371,84 @@ void PlTreeView::keyPressEvent( QKeyEvent *event )
     else
         QTreeView::keyPressEvent( event );
 }
+
+#include <QHBoxLayout>
+PicFlowView::PicFlowView( PLModel *p_model, QWidget *parent ) : QAbstractItemView( parent )
+{
+    QHBoxLayout *layout = new QHBoxLayout( this );
+    layout->setMargin( 0 );
+    picFlow = new PictureFlow( this );
+    picFlow->setSlideSize(QSize(128,128));
+    layout->addWidget( picFlow );
+    setSelectionMode( QAbstractItemView::SingleSelection );
+    setModel( p_model );
+
+    CONNECT( picFlow, centerIndexChanged(int), this, playItem(int) );
+}
+
+int PicFlowView::horizontalOffset() const
+{
+    return 0;
+}
+
+int PicFlowView::verticalOffset() const
+{
+    return 0;
+}
+
+QRect PicFlowView::visualRect(const QModelIndex &index ) const
+{
+    return QRect( QPoint(0,0), picFlow->slideSize() );
+}
+
+void PicFlowView::scrollTo(const QModelIndex &index, QAbstractItemView::ScrollHint)
+{
+    if( index.column() >= 0 && picFlow->slideCount() > 0 )
+        picFlow->showSlide( index.column() );
+}
+
+QModelIndex PicFlowView::indexAt(const QPoint &) const
+{
+    // No idea, PictureFlow doesn't provide anything to help this
+}
+
+QModelIndex PicFlowView::moveCursor(QAbstractItemView::CursorAction action, Qt::KeyboardModifiers)
+{
+}
+
+bool PicFlowView::isIndexHidden(const QModelIndex &) const
+{
+    return false;
+}
+
+QRegion PicFlowView::visualRegionForSelection(const QItemSelection &) const
+{
+    return QRect();
+}
+
+void PicFlowView::setSelection(const QRect &, QFlags<QItemSelectionModel::SelectionFlag>)
+{
+    // No selection possible
+}
+
+void PicFlowView::rowsInserted(const QModelIndex &parent, int start, int end)
+{
+    for( int i = start; i <= end; i++ )
+    {
+        const QModelIndex index = model()->index( i, 0, parent );
+        if( !index.isValid() )
+            return;
+
+        /* FIXME, this returns no art, so far */
+        QPixmap pix = PLModel::getArtPixmap( index, QSize(128,128) );
+        picFlow->addSlide(pix);
+    }
+
+    picFlow->render();
+}
+
+void PicFlowView::playItem( int i_item )
+{
+    emit activated( model()->index(i_item, 0) );
+}
+

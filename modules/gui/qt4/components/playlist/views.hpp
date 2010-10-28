@@ -27,6 +27,8 @@
 #include <QStyledItemDelegate>
 #include <QListView>
 #include <QTreeView>
+#include <QAbstractItemView>
+#include "util/pictureflow.hpp"
 
 class QPainter;
 class PLModel;
@@ -93,5 +95,31 @@ protected:
     virtual void keyPressEvent( QKeyEvent *event );
 };
 
-#endif
+class PicFlowView : public QAbstractItemView
+{
+    Q_OBJECT
+public:
+    PicFlowView( PLModel *model, QWidget *parent = 0 );
 
+    virtual QRect visualRect(const QModelIndex&) const;
+    virtual void scrollTo(const QModelIndex&, QAbstractItemView::ScrollHint);
+    virtual QModelIndex indexAt(const QPoint&) const;
+
+protected:
+    virtual int horizontalOffset() const;
+    virtual int verticalOffset() const;
+    virtual QModelIndex moveCursor(QAbstractItemView::CursorAction, Qt::KeyboardModifiers);
+    virtual bool isIndexHidden(const QModelIndex&) const;
+    virtual QRegion visualRegionForSelection(const QItemSelection&) const;
+    virtual void setSelection(const QRect&, QFlags<QItemSelectionModel::SelectionFlag>);
+
+private:
+    PictureFlow *picFlow;
+
+protected slots:
+    void rowsInserted ( const QModelIndex & parent, int start, int end );
+private slots:
+    void playItem( int );
+};
+
+#endif

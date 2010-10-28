@@ -611,6 +611,9 @@ QPixmap PLModel::getArtPixmap( const QModelIndex & index, const QSize & size )
     PLItem *item = static_cast<PLItem*>( index.internalPointer() );
     assert( item );
 
+    if( item == NULL )
+        return NULL;
+
     QString artUrl = InputManager::decodeArtURL( item->inputItem() );
 
     /* If empty, take one of the children art URL */
@@ -623,6 +626,9 @@ QPixmap PLModel::getArtPixmap( const QModelIndex & index, const QSize & size )
                 break;
         }
     }
+
+    if( artUrl.isEmpty() )
+        return NULL;
 
     QPixmap artPix;
     QString key = artUrl + QString("%1%2").arg(size.width()).arg(size.height());
@@ -682,15 +688,17 @@ void PLModel::processItemAppend( int i_item, int i_parent )
 {
     playlist_item_t *p_item = NULL;
     PLItem *newItem = NULL;
-    input_thread_t *currentInputThread;
     int pos;
 
-    PLItem *nodeItem = findById( rootItem, i_parent );
-    if( !nodeItem ) return;
+    /* Find the Parent */
+    PLItem *nodeParentItem = findById( rootItem, i_parent );
+    if( !nodeParentItem ) return;
 
-    foreach( const PLItem *existing, nodeItem->children )
+    /* Search for an already matching children */
+    foreach( const PLItem *existing, nodeParentItem->children )
         if( existing->i_id == i_item ) return;
 
+    /* Find the child */
     PL_LOCK;
     p_item = playlist_ItemGetById( p_playlist, i_item );
     if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG )
@@ -701,11 +709,12 @@ void PLModel::processItemAppend( int i_item, int i_parent )
     for( pos = 0; pos < p_item->p_parent->i_children; pos++ )
         if( p_item->p_parent->pp_children[pos] == p_item ) break;
 
-    newItem = new PLItem( p_item, nodeItem );
+    newItem = new PLItem( p_item, nodeParentItem );
     PL_UNLOCK;
 
-    beginInsertRows( index( nodeItem, 0 ), pos, pos );
-    nodeItem->insertChild( newItem, pos );
+    /* We insert the newItem (children) inside the parent */
+    beginInsertRows( index( nodeParentItem, 0 ), pos, pos );
+    nodeParentItem->insertChild( newItem, pos );
     endInsertRows();
 
     if( newItem->p_input == THEMIM->currentInputItem() )
@@ -760,6 +769,7 @@ void PLModel::insertChildren( PLItem *node, QList<PLItem*>& items, int i_pos )
     assert( node );
     int count = items.size();
     if( !count ) return;
+    printf( "Here I am\n");
     beginInsertRows( index( node, 0 ), i_pos, i_pos + count - 1 );
     for( int i = 0; i < count; i++ )
     {

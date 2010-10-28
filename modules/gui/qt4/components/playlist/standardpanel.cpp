@@ -61,19 +61,20 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     viewStack->setSpacing( 0 ); viewStack->setMargin( 0 );
     setMinimumWidth( 300 );
 
-    iconView = NULL;
-    treeView = NULL;
-    listView = NULL;
+    iconView    = NULL;
+    treeView    = NULL;
+    listView    = NULL;
+    picFlowView = NULL;
 
     currentRootIndexId  = -1;
     lastActivatedId     = -1;
 
     /* Saved Settings */
     getSettings()->beginGroup("Playlist");
-    int i_viewMode = getSettings()->value( "view-mode", TREE_VIEW ).toInt();
+    int i_savedViewMode = getSettings()->value( "view-mode", TREE_VIEW ).toInt();
     getSettings()->endGroup();
 
-    showView( i_viewMode );
+    showView( i_savedViewMode );
 
     DCONNECT( THEMIM, leafBecameParent( input_item_t *),
               this, browseInto( input_item_t * ) );
@@ -96,6 +97,8 @@ StandardPLPanel::~StandardPLPanel()
         getSettings()->setValue( "view-mode", LIST_VIEW );
     else if( currentView == iconView )
         getSettings()->setValue( "view-mode", ICON_VIEW );
+    else if( currentView == picFlowView )
+        getSettings()->setValue( "view-mode", PICTUREFLOW_VIEW );
     getSettings()->endGroup();
 }
 
@@ -161,7 +164,7 @@ void StandardPLPanel::search( const QString& searchText )
     p_selector->getCurrentSelectedItem( &type, &name );
     if( type != SD_TYPE )
     {
-        bool flat = currentView == iconView || currentView == listView;
+        bool flat = currentView == iconView || currentView == listView || currentView == picFlowView;
         model->search( searchText,
                        flat ? currentView->rootIndex() : QModelIndex(),
                        !flat );
@@ -190,7 +193,7 @@ void StandardPLPanel::setRoot( playlist_item_t *p_item )
 
 void StandardPLPanel::browseInto( const QModelIndex &index )
 {
-    if( currentView == iconView || currentView == listView )
+    if( currentView == iconView || currentView == listView || currentView == picFlowView )
     {
         currentRootIndexId = model->itemId( index );
         currentView->setRootIndex( index );
@@ -256,6 +259,18 @@ void StandardPLPanel::createListView()
              this, activate( const QModelIndex & ) );
     listView->installEventFilter( this );
     viewStack->addWidget( listView );
+}
+
+void StandardPLPanel::createCoverView()
+{
+    picFlowView = new PicFlowView( model, this );
+    picFlowView->setContextMenuPolicy( Qt::CustomContextMenu );
+    CONNECT( picFlowView, customContextMenuRequested( const QPoint & ),
+             this, popupPlView( const QPoint & ) );
+    CONNECT( picFlowView, activated( const QModelIndex & ),
+             this, activate( const QModelIndex & ) );
+    viewStack->addWidget( picFlowView );
+    picFlowView->installEventFilter( this );
 }
 
 void StandardPLPanel::createTreeView()
@@ -344,6 +359,13 @@ void StandardPLPanel::showView( int i_view )
         currentView = listView;
         break;
     }
+    case PICTUREFLOW_VIEW:
+    {
+        if( picFlowView == NULL )
+            createCoverView();
+        currentView = picFlowView;
+        break;
+    }
     default: return;
     }
 
@@ -360,6 +382,8 @@ const int StandardPLPanel::getViewNumber()
         return ICON_VIEW;
     else if( currentView == listView )
         return LIST_VIEW;
+    else
+        return PICTUREFLOW_VIEW;
 }
 
 void StandardPLPanel::cycleViews()
@@ -369,6 +393,8 @@ void StandardPLPanel::cycleViews()
     else if( currentView == treeView )
         showView( LIST_VIEW );
     else if( currentView == listView )
+        showView( PICTUREFLOW_VIEW  );
+    else if( currentView == picFlowView )
         showView( ICON_VIEW );
     else
         assert( 0 );
@@ -376,6 +402,7 @@ void StandardPLPanel::cycleViews()
 
 void StandardPLPanel::activate( const QModelIndex &index )
 {
+    /* If we are not a leaf node */
     if( !index.data( PLModel::IsLeafNodeRole ).toBool() )
     {
         if( currentView != treeView )
@@ -406,7 +433,6 @@ void StandardPLPanel::browseInto( input_item_t *p_input )
     }
 
     QModelIndex index = model->index( p_item->i_id, 0 );
-
     playlist_Unlock( THEPL );
 
     if( currentView == treeView )
