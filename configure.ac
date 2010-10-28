@@ -2319,6 +2319,23 @@ AC_CHECK_FUNCS(inet_ntop,[
 
 
 dnl
+dnl  GME demux plugin
+dnl
+AC_ARG_ENABLE(gme,
+  [  --enable-gme            Game Music Emu support (default auto)])
+AS_IF([test "${enable_gme}" != "no"], [
+  AC_CHECK_HEADER([gme/gme.h], [
+    VLC_ADD_LIBS([gme], [-lgme])
+    VLC_ADD_PLUGIN([gme])
+  ], [
+    AS_IF([test "x${enable_gme}" != "x"], [
+      AC_MSG_ERROR([GME cannot be found. Please install the development files.])
+    ])
+  ])
+])
+
+
+dnl
 dnl  ogg demux plugin
 dnl
 PKG_ENABLE_MODULES_VLC([OGG], [], [ogg >= 1.0], [Ogg demux support], [auto])

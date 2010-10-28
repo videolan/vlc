@@ -123,6 +123,7 @@ $Id$
  * gestures: mouse gestures control plugin
  * globalhotkeys: module to catch hotkeys when application doesn't have the focus
  * glwin32: a opengl provider using DirectX OpenGL
+ * gme: old console games music playback using Game Music Emu
  * gnutls: GNU TLS encryption/decryption module
  * goom: visualisation plugin based on goom
  * gradfun: Gradfun video effects filter
