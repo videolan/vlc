@@ -916,6 +916,7 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
 
     /* b_frame_mbs_only */
     p_sys->b_frame_mbs_only = bs_read( &s, 1 );
+    p_dec->fmt_out.video.i_height *=  ( 2 - p_sys->b_frame_mbs_only );
     if( p_sys->b_frame_mbs_only == 0 )
     {
         bs_skip( &s, 1 );
