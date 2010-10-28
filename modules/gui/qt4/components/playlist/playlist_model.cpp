@@ -29,12 +29,12 @@
 
 #include "qt4.hpp"
 #include "components/playlist/playlist_model.hpp"
-#include "dialogs_provider.hpp"         /* THEDP */
-#include "input_manager.hpp"            /* THEMIM */
-#include "dialogs/mediainfo.hpp"        /* MediaInfo Dialog */
-#include "dialogs/playlist.hpp"         /* Playlist Dialog */
+#include "dialogs_provider.hpp"                         /* THEDP */
+#include "input_manager.hpp"                            /* THEMIM */
+#include "dialogs/mediainfo.hpp"                        /* MediaInfo Dialog */
+#include "dialogs/playlist.hpp"                         /* Playlist Dialog */
 
-#include <vlc_intf_strings.h>
+#include <vlc_intf_strings.h>                           /* I_DIR */
 
 #include "pixmaps/types/type_unknown.xpm"
 #include "sorting.h"
@@ -92,9 +92,9 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 
     rebuild( p_root );
     DCONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
-             this, processInputItemUpdate( input_item_t *) );
+              this, processInputItemUpdate( input_item_t *) );
     DCONNECT( THEMIM, inputChanged( input_thread_t * ),
-             this, processInputItemUpdate( input_thread_t* ) );
+              this, processInputItemUpdate( input_thread_t* ) );
     CONNECT( THEMIM, playlistItemAppended( int, int ),
              this, processItemAppend( int, int ) );
     CONNECT( THEMIM, playlistItemRemoved( int ),
@@ -188,7 +188,7 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
 
 /* Drop operation */
 bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
-                           int row, int column, const QModelIndex &parent )
+        int row, int column, const QModelIndex &parent )
 {
     bool copy = action == Qt::CopyAction;
     if( !copy && action != Qt::MoveAction )
@@ -210,7 +210,7 @@ void PLModel::dropAppendCopy( const PlMimeData *plMimeData, PLItem *target, int 
     PL_LOCK;
 
     playlist_item_t *p_parent =
-            playlist_ItemGetByInput( p_playlist, target->p_input );
+        playlist_ItemGetByInput( p_playlist, target->p_input );
     if( !p_parent ) return;
 
     if( pos == -1 ) pos = PLAYLIST_END;
@@ -270,7 +270,7 @@ void PLModel::dropMove( const PlMimeData * plMimeData, PLItem *target, int row )
 
         if( item->parentItem == target &&
             target->children.indexOf( item ) < new_pos )
-                model_pos--;
+            model_pos--;
 
         model_items.append( item );
         pp_items[i] = p_item;
@@ -322,7 +322,7 @@ void PLModel::activateItem( playlist_item_t *p_item )
     }
     if( p_parent )
         playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked,
-                          p_parent, p_item );
+                p_parent, p_item );
 }
 
 /****************** Base model mandatory implementations *****************/
@@ -436,7 +436,7 @@ QModelIndex PLModel::index( const int row, const int column, const QModelIndex &
 
 QModelIndex PLModel::index( const int i_id, const int c )
 {
-  return index( findById( rootItem, i_id ), c );
+    return index( findById( rootItem, i_id ), c );
 }
 
 /* Return the index of a given item */
@@ -516,9 +516,7 @@ QStringList PLModel::selectedURIs()
     return lst;
 }
 
-
 /************************* Lookups *****************************/
-
 PLItem *PLModel::findById( PLItem *root, int i_id ) const
 {
     return findInner( root, i_id, false );
@@ -544,16 +542,16 @@ PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_input ) const
     while ( it != root->children.end() )
     {
         if( !b_input && (*it)->i_id == i_id )
-             return (*it);
+            return (*it);
 
         else if( b_input && (*it)->p_input->i_id == i_id )
-             return (*it);
+            return (*it);
 
         if( (*it)->children.size() )
         {
             PLItem *childFound = findInner( (*it), i_id, b_input );
             if( childFound )
-               return childFound;
+                return childFound;
         }
         it++;
     }
@@ -590,16 +588,14 @@ int PLModel::columnFromMeta( int meta_col )
 
 bool PLModel::canEdit() const
 {
-  return (
-    rootItem != NULL &&
-    (
-      rootItem->p_input == p_playlist->p_playing->p_input ||
-      (
-        p_playlist->p_media_library &&
-        rootItem->p_input == p_playlist->p_media_library->p_input
-      )
-    )
-  );
+    return (
+            rootItem != NULL &&
+            (
+             rootItem->p_input == p_playlist->p_playing->p_input ||
+             ( p_playlist->p_media_library &&
+              rootItem->p_input == p_playlist->p_media_library->p_input )
+            )
+           );
 }
 /************************* Updates handling *****************************/
 
@@ -640,7 +636,7 @@ void PLModel::processItemAppend( int i_item, int i_parent )
     if( !nodeItem ) return;
 
     foreach( const PLItem *existing, nodeItem->children )
-      if( existing->i_id == i_item ) return;
+        if( existing->i_id == i_item ) return;
 
     PL_LOCK;
     p_item = playlist_ItemGetById( p_playlist, i_item );
@@ -662,7 +658,6 @@ void PLModel::processItemAppend( int i_item, int i_parent )
     if( newItem->p_input == THEMIM->currentInputItem() )
         emit currentChanged( index( newItem, 0 ) );
 }
-
 
 void PLModel::rebuild()
 {
