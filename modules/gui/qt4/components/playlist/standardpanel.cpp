@@ -348,9 +348,18 @@ void StandardPLPanel::showView( int i_view )
     }
 
     viewStack->setCurrentWidget( currentView );
-    //viewActions[i_view]->setChecked( true );
     browseInto();
     gotoPlayingItem();
+}
+
+const int StandardPLPanel::getViewNumber()
+{
+    if( currentView == treeView )
+        return TREE_VIEW;
+    else if( currentView == iconView )
+        return ICON_VIEW;
+    else if( currentView == listView )
+        return LIST_VIEW;
 }
 
 void StandardPLPanel::cycleViews()

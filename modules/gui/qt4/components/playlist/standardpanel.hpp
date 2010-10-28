@@ -70,6 +70,8 @@ public:
            LIST_VIEW,
            VIEW_COUNT  };
 
+    const int getViewNumber();
+
 protected:
 
     PLModel *model;

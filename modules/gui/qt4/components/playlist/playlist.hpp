@@ -57,6 +57,8 @@ private:
     QSplitter            *leftSplitter;
     StandardPLPanel      *mainView;
 
+    QAction *viewActions[ 4 /* StandardPLPanel::VIEW_COUNT*/ ];
+
     LocationBar          *locationBar;
     SearchLineEdit       *searchEdit;
 

@@ -111,7 +111,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     CONNECT( viewSelectionMapper, mapped( int ), mainView, showView( int ) );
 
     QActionGroup *actionGroup = new QActionGroup( this );
-    QAction *viewActions[StandardPLPanel::VIEW_COUNT];
+
     for( int i = 0; i < StandardPLPanel::VIEW_COUNT; i++ )
     {
         viewActions[i] = actionGroup->addAction( viewNames[i] );
@@ -119,6 +119,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
         viewSelectionMapper->setMapping( viewActions[i], i );
         CONNECT( viewActions[i], triggered(), viewSelectionMapper, map() );
     }
+    viewActions[0]->setChecked( true );
 
     QMenu *viewMenu = new QMenu( viewButton );
     viewMenu->addActions( actionGroup->actions() );
@@ -223,8 +224,9 @@ void PlaylistWidget::changeView( const QModelIndex& index )
 {
     searchEdit->clear();
     locationBar->setIndex( index );
+    int i = mainView->getViewNumber();
+    viewActions[i]->setChecked(true);
 }
-
 
 #include <QSignalMapper>
 #include <QMenu>
