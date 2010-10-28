@@ -25,7 +25,6 @@ SOURCES_xa = xa.c
 SOURCES_nuv = nuv.c
 SOURCES_nsc = nsc.c
 SOURCES_mpc = mpc.c
-SOURCES_gme = gme.cpp
 SOURCES_tta = tta.c
 SOURCES_vc1 = vc1.c
 SOURCES_demux_cdg = cdg.c

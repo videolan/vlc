@@ -451,7 +451,6 @@ modules/demux/cdg.c
 modules/demux/demuxdump.c
 modules/demux/dirac.c
 modules/demux/flac.c
-modules/demux/gme.cpp
 modules/demux/image.c
 modules/demux/kate_categories.c
 modules/demux/live555.cpp
