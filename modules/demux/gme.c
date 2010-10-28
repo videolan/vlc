@@ -29,6 +29,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_input.h>
 #include <vlc_demux.h>
 #include <vlc_plugin.h>
 
@@ -51,8 +52,13 @@ vlc_module_end ()
 struct demux_sys_t
 {
     Music_Emu   *emu;
+    unsigned     track_id;
+
     es_out_id_t *es;
     date_t       pts;
+
+    input_title_t **titlev;
+    unsigned        titlec;
 };
 
 
@@ -69,6 +75,7 @@ static int Open (vlc_object_t *obj)
      || size > LONG_MAX /* too big for GME */)
         return VLC_EGENERIC;
 
+    /* Auto detection */
     const uint8_t *peek;
     if (stream_Peek (demux->s, &peek, 4) < 4)
         return VLC_EGENERIC;
@@ -78,6 +85,7 @@ static int Open (vlc_object_t *obj)
         return VLC_EGENERIC;
     msg_Dbg (obj, "detected file type %s", type);
 
+    /* Initialization */
     demux_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -89,7 +97,7 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
     }
     gme_load_custom (sys->emu, Reader, size, demux->s);
-    gme_start_track (sys->emu, 0);
+    gme_start_track (sys->emu, sys->track_id = 0);
 
     es_format_t fmt;
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_S16N);
@@ -105,6 +113,31 @@ static int Open (vlc_object_t *obj)
     date_Init (&sys->pts, RATE, 1);
     date_Set (&sys->pts, 0);
 
+    /* Titles */
+    unsigned n = gme_track_count (sys->emu);
+    sys->titlev = malloc (n * sizeof (*sys->titlev));
+    if (unlikely(sys->titlev == NULL))
+        n = 0;
+    sys->titlec = n;
+    for (unsigned i = 0; i < n; i++)
+    {
+         input_title_t *title = vlc_input_title_New ();
+         sys->titlev[i] = title;
+         if (unlikely(title == NULL))
+             continue;
+
+         gme_info_t *infos;
+         if (gme_track_info (sys->emu, &infos, i))
+             continue;
+         msg_Dbg (obj, "track %u: %s %d ms", i, infos->song, infos->length);
+         if (infos->length != -1)
+             title->i_length = infos->length * INT64_C(1000);
+         if (infos->song[0])
+             title->psz_name = strdup (infos->song);
+         gme_free_info (infos);
+    }
+
+    /* Callbacks */
     demux->pf_demux = Demux;
     demux->pf_control = Control;
     demux->p_sys = sys;
@@ -117,6 +150,9 @@ static void Close (vlc_object_t *obj)
     demux_t *demux = (demux_t *)obj;
     demux_sys_t *sys = demux->p_sys;
 
+    for (unsigned i = 0, n = sys->titlec; i < n; i++)
+        vlc_input_title_Delete (sys->titlev[i]);
+    free (sys->titlev);
     gme_delete (sys->emu);
     free (sys);
 }
@@ -138,11 +174,18 @@ static int Demux (demux_t *demux)
 {
     demux_sys_t *sys = demux->p_sys;
 
+    /* Next track */
     if (gme_track_ended (sys->emu))
     {
-        msg_Dbg (demux, "track ended");
-        return 0;
+        msg_Dbg (demux, "track %u ended", sys->track_id);
+        if (++sys->track_id >= (unsigned)gme_track_count (sys->emu))
+            return 0;
+
+        demux->info.i_update |= INPUT_UPDATE_TITLE;
+        demux->info.i_title = sys->track_id;
+        gme_start_track (sys->emu, sys->track_id);
     }
+
 
     block_t *block = block_Alloc (2 * 2 * SAMPLES);
     if (unlikely(block == NULL))
@@ -170,15 +213,44 @@ static int Control (demux_t *demux, int query, va_list args)
 
     switch (query)
     {
-        case DEMUX_GET_POSITION: // TODO
+        case DEMUX_GET_POSITION:
         {
             double *pos = va_arg (args, double *);
-            *pos = 0.;
+
+            if (unlikely(sys->track_id >= sys->titlec)
+             || (sys->titlev[sys->track_id]->i_length == 0))
+                *pos = 0.;
+            else
+                *pos = (double)(gme_tell (sys->emu))
+                    / (double)(sys->titlev[sys->track_id]->i_length / 1000);
             return VLC_SUCCESS;
         }
 
-        //case DEMUX_SET_POSITION: TODO
-        //case DEMUX_GET_LENGTH: TODO
+        case DEMUX_SET_POSITION:
+        {
+            double pos = va_arg (args, double);
+
+            if (unlikely(sys->track_id >= sys->titlec)
+             || (sys->titlev[sys->track_id]->i_length == 0))
+                break;
+
+            int seek = (sys->titlev[sys->track_id]->i_length / 1000) * pos;
+            if (seek > INT_MAX || gme_seek (sys->emu, seek))
+                break;
+            return VLC_SUCCESS;
+        }
+
+        case DEMUX_GET_LENGTH:
+        {
+            int64_t *v = va_arg (args, int64_t *);
+
+            if (unlikely(sys->track_id >= sys->titlec)
+             || (sys->titlev[sys->track_id]->i_length == 0))
+                break;
+            *v = sys->titlev[sys->track_id]->i_length;
+            return VLC_SUCCESS;
+        }
+
         case DEMUX_GET_TIME:
         {
             int64_t *v = va_arg (args, int64_t *);
@@ -188,9 +260,38 @@ static int Control (demux_t *demux, int query, va_list args)
 
         case DEMUX_SET_TIME:
         {
-            int64_t v = va_arg (args, int64_t);
-            if (v > INT_MAX || gme_seek (sys->emu, v / 1000))
-                return VLC_EGENERIC;
+            int64_t v = va_arg (args, int64_t) / 1000;
+            if (v > INT_MAX || gme_seek (sys->emu, v))
+                break;
+            return VLC_SUCCESS;
+        }
+
+        case DEMUX_GET_TITLE_INFO:
+        {
+            input_title_t ***titlev = va_arg (args, input_title_t ***);
+            int *titlec = va_arg (args, int *);
+            *(va_arg (args, int *)) = 0; /* Title offset */
+            *(va_arg (args, int *)) = 0; /* Chapter offset */
+
+            unsigned n = sys->titlec;
+            *titlev = malloc (sizeof (**titlev) * n);
+            if (unlikely(titlev == NULL))
+                n = 0;
+            *titlec = n;
+            for (unsigned i = 0; i < n; i++)
+                (*titlev)[i] = vlc_input_title_Duplicate (sys->titlev[i]);
+            return VLC_SUCCESS;
+        }
+
+        case DEMUX_SET_TITLE:
+        {
+            int track_id = va_arg (args, int);
+            if (track_id >= gme_track_count (sys->emu))
+                break;
+            gme_start_track (sys->emu, track_id);
+            demux->info.i_update |= INPUT_UPDATE_TITLE;
+            demux->info.i_title = track_id;
+            sys->track_id = track_id;
             return VLC_SUCCESS;
         }
     }
