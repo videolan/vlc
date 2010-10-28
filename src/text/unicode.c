@@ -39,6 +39,8 @@
 #include <sys/types.h>
 #ifdef UNDER_CE
 #  include <tchar.h>
+#elif defined(WIN32)
+#  include <io.h>
 #endif
 #include <errno.h>
 #include <wctype.h>
