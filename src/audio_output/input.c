@@ -757,6 +757,14 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     return 0;
 }
 
+bool aout_InputIsEmpty( aout_instance_t * p_aout, aout_input_t * p_input )
+{
+    aout_lock_input_fifos( p_aout );
+    bool is_empty = date_Get( &p_input->mixer.fifo.end_date ) <= mdate();
+    aout_unlock_input_fifos( p_aout );
+    return is_empty;
+}
+
 /*****************************************************************************
  * static functions
  *****************************************************************************/
