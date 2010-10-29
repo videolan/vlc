@@ -327,7 +327,7 @@ next:
  *****************************************************************************/
 static void CheckIdx(intf_sys_t *p_sys)
 {
-    int lines = p_sys->i_box_lines_total - 1;
+    int lines = p_sys->i_box_lines_total;
     int height = LINES - p_sys->i_box_y - 2;
     if (height > lines - 1)
         height = lines - 1;
