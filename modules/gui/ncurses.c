@@ -1017,8 +1017,7 @@ static int DrawPlaylist(intf_thread_t *p_intf)
                     (!p_node && p_input2 && p_current_item &&
                       p_item->p_input == p_current_item->p_input))
             c = '*';
-        else if (p_item == p_node || (p_item != p_node &&
-                    PlaylistIsPlaying(p_playlist, p_item)))
+        else if (p_item == p_node || PlaylistIsPlaying(p_playlist, p_item))
             c = '>';
         PL_UNLOCK;
 
