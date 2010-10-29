@@ -209,7 +209,6 @@ struct intf_sys_t
     bool            b_show_hidden_files;
 
     /* Playlist context */
-    bool            category_view;
     struct pl_item_t    **pp_plist;
     int             i_plist_entries;
     bool            b_need_update;
@@ -374,14 +373,6 @@ static void PlaylistDestroy(intf_sys_t *p_sys)
     p_sys->pp_plist = NULL;
 }
 
-static inline playlist_item_t *PlaylistGetRoot(intf_thread_t *p_intf)
-{
-    playlist_t *p_playlist = pl_Get(p_intf);
-    return p_intf->p_sys->category_view ?
-        p_playlist->p_root_category :
-        p_playlist->p_root_onelevel;
-}
-
 static bool PlaylistAddChild(intf_sys_t *p_sys, playlist_item_t *p_child,
                              const char *c, const char d)
 {
@@ -450,7 +441,7 @@ static void PlaylistRebuild(intf_thread_t *p_intf)
 
     PL_LOCK;
     PlaylistDestroy(p_sys);
-    PlaylistAddNode(p_sys, PlaylistGetRoot(p_intf), "");
+    PlaylistAddNode(p_sys, p_playlist->p_root_onelevel, "");
     PL_UNLOCK;
 }
 
@@ -1363,15 +1354,9 @@ static bool HandlePlaylistKey(intf_thread_t *p_intf, int key)
     /* Playlist sort */
     case 'o':
     case 'O':
-        playlist_RecursiveNodeSort(p_playlist, PlaylistGetRoot(p_intf),
+        playlist_RecursiveNodeSort(p_playlist, p_playlist->p_root_onelevel,
                                     SORT_TITLE_NODES_FIRST,
                                     (key == 'o')? ORDER_NORMAL : ORDER_REVERSE);
-        p_sys->b_need_update = true;
-        return true;
-
-    /* Playlist view */
-    case 'v':
-        p_sys->category_view = !p_sys->category_view;
         p_sys->b_need_update = true;
         return true;
 
@@ -1853,8 +1838,6 @@ static int Open(vlc_object_t *p_this)
     p_sys->i_box_type = BOX_PLAYLIST;
     p_sys->b_plidx_follow = true;
     p_sys->b_color = var_CreateGetBool(p_intf, "color");
-
-    p_sys->category_view = true; //FIXME: switching back & forth is broken
 
     p_sys->psz_current_dir = var_CreateGetString(p_intf, "browse-dir");
     if (!p_sys->psz_current_dir || !*p_sys->psz_current_dir)
