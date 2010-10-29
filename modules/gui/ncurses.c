@@ -92,7 +92,7 @@ enum
     BOX_NONE,
     BOX_HELP,
     BOX_INFO,
-//  BOX_LOG,
+    BOX_LOG,
     BOX_PLAYLIST,
     BOX_SEARCH,
     BOX_OPEN,
@@ -106,7 +106,7 @@ static const char *box_title[] = {
     [BOX_NONE]      = "",
     [BOX_HELP]      = " Help ",
     [BOX_INFO]      = " Information ",
-//  [BOX_LOG]       = " Messages ",
+    [BOX_LOG]       = " Messages ",
     [BOX_PLAYLIST]  = " Playlist ",
     [BOX_SEARCH]    = " Playlist ",
     [BOX_OPEN]      = " Playlist ",
@@ -125,12 +125,10 @@ enum
     C_PLAYLIST_3,
     C_BOX,
     C_STATUS,
-#if 0
     C_INFO,
     C_ERROR,
     C_WARNING,
     C_DEBUG,
-#endif
     C_CATEGORY,
     C_FOLDER,
     /* XXX: new elements here ! */
@@ -154,13 +152,12 @@ static const struct { short f; short b; } color_pairs[] =
     /* Source: State, Position, Volume, Chapters, etc...*/
     [C_STATUS]      = { COLOR_BLUE,     COLOR_BLACK },
 
-#if 0
     /* VLC messages, keep the order from highest priority to lowest */
     [C_INFO]        = { COLOR_BLACK,    COLOR_WHITE },
     [C_ERROR]       = { COLOR_RED,      COLOR_BLACK },
     [C_WARNING]     = { COLOR_YELLOW,   COLOR_BLACK },
     [C_DEBUG]       = { COLOR_WHITE,    COLOR_BLACK },
-#endif
+
     /* Category title: help, info, metadata */
     [C_CATEGORY]    = { COLOR_MAGENTA,  COLOR_BLACK },
     /* Folder (BOX_BROWSE) */
@@ -192,7 +189,10 @@ struct intf_sys_t
     int             i_box_start;        // first line of box displayed
     int             i_box_idx;          // selected line
 
-//  msg_subscription_t* p_sub;                  /* message bank subscription */
+    msg_subscription_t  *p_sub;         // message bank subscription
+    msg_item_t          *msgs[50];      // ring buffer
+    int                 i_msgs;
+    vlc_mutex_t         msg_lock;
 
     /* Search Box context */
     char            psz_search_chain[20];
@@ -216,6 +216,11 @@ struct intf_sys_t
     bool            b_plidx_follow;
     playlist_item_t *p_node;        /* current node */
 
+};
+
+struct msg_cb_data_t
+{
+    intf_sys_t *p_sys;
 };
 
 /*****************************************************************************
@@ -910,7 +915,7 @@ static int DrawHelp(intf_thread_t *p_intf)
     MainBoxWrite(p_sys, l++, _("     h,H         Show/Hide help box"));
     MainBoxWrite(p_sys, l++, _("     i           Show/Hide info box"));
     MainBoxWrite(p_sys, l++, _("     m           Show/Hide metadata box"));
-//  MainBoxWrite(p_sys, l++, _("     L           Show/Hide messages box"));
+    MainBoxWrite(p_sys, l++, _("     L           Show/Hide messages box"));
     MainBoxWrite(p_sys, l++, _("     P           Show/Hide playlist box"));
     MainBoxWrite(p_sys, l++, _("     B           Show/Hide filebrowser"));
     MainBoxWrite(p_sys, l++, _("     x           Show/Hide objects box"));
@@ -1034,6 +1039,34 @@ static int DrawPlaylist(intf_thread_t *p_intf)
     }
 
     return p_sys->i_plist_entries;
+}
+
+static int DrawMessages(intf_thread_t *p_intf)
+{
+    intf_sys_t *p_sys = p_intf->p_sys;
+    int l = 0;
+    int i;
+
+    vlc_mutex_lock(&p_sys->msg_lock);
+    i = p_sys->i_msgs;
+    for(;;)
+    {
+        msg_item_t *msg = p_sys->msgs[i];
+        if (msg)
+        {
+            if (p_sys->b_color)
+                color_set(msg->i_type + C_INFO, NULL);
+            MainBoxWrite(p_sys, l++, "[%s] %s", msg->psz_module, msg->psz_msg);
+        }
+
+        if (++i == sizeof p_sys->msgs / sizeof *p_sys->msgs)
+            i = 0;
+
+        if (i == p_sys->i_msgs) /* did we loop around the ring buffer ? */
+            break;
+    }
+    vlc_mutex_unlock(&p_sys->msg_lock);
+    return l;
 }
 
 static int DrawStatus(intf_thread_t *p_intf)
@@ -1169,6 +1202,7 @@ static void FillBox(intf_thread_t *p_intf)
         [BOX_PLAYLIST]  = DrawPlaylist,
         [BOX_SEARCH]    = DrawPlaylist,
         [BOX_OPEN]      = DrawPlaylist,
+        [BOX_LOG]       = DrawMessages,
     };
 
     p_sys->i_box_lines_total = draw[p_sys->i_box_type](p_intf);
@@ -1595,7 +1629,7 @@ static bool HandleCommonKey(intf_thread_t *p_intf, int key)
     case 'H': BoxSwitch(p_sys, BOX_HELP);       return true;
     case 'i': BoxSwitch(p_sys, BOX_INFO);       return true;
     case 'm': BoxSwitch(p_sys, BOX_META);       return true;
-//  case 'L': BoxSwitch(p_sys, BOX_LOG)         return true;
+    case 'L': BoxSwitch(p_sys, BOX_LOG);        return true;
     case 'P': BoxSwitch(p_sys, BOX_PLAYLIST);   return true;
     case 'B': BoxSwitch(p_sys, BOX_BROWSE);     return true;
     case 'x': BoxSwitch(p_sys, BOX_OBJECTS);    return true;
@@ -1723,6 +1757,30 @@ static bool HandleKey(intf_thread_t *p_intf)
     return HandleListKey(p_intf, key) || HandleCommonKey(p_intf, key);
 }
 
+/*
+ *
+ */
+
+static void MsgCallback(msg_cb_data_t *data, msg_item_t *msg, unsigned i)
+{
+    intf_sys_t *p_sys = data->p_sys;
+    (void)i; // what is this?
+    int canc = vlc_savecancel();
+
+    vlc_mutex_lock(&p_sys->msg_lock);
+
+    if (p_sys->msgs[p_sys->i_msgs])
+        msg_Release(p_sys->msgs[p_sys->i_msgs]);
+    p_sys->msgs[p_sys->i_msgs++] = msg_Hold(msg);
+
+    if (p_sys->i_msgs == (sizeof p_sys->msgs / sizeof *p_sys->msgs))
+        p_sys->i_msgs = 0;
+
+    vlc_mutex_unlock(&p_sys->msg_lock);
+
+    vlc_restorecancel(canc);
+}
+
 /*****************************************************************************
  * Run: ncurses thread
  *****************************************************************************/
@@ -1773,13 +1831,26 @@ static int Open(vlc_object_t *p_this)
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t    *p_sys  = p_intf->p_sys = calloc(1, sizeof(intf_sys_t));
+    struct msg_cb_data_t *msg_cb_data;
 
     if (!p_sys)
         return VLC_ENOMEM;
 
+    msg_cb_data = malloc(sizeof *msg_cb_data);
+    if (!msg_cb_data)
+    {
+        free(p_sys);
+        return VLC_ENOMEM;
+    }
+
+    msg_cb_data->p_sys = p_sys;
+    vlc_mutex_init(&p_sys->msg_lock);
+    p_sys->i_msgs = 0;
+    memset(p_sys->msgs, 0, sizeof p_sys->msgs);
+    p_sys->p_sub = msg_Subscribe(p_intf->p_libvlc, MsgCallback, msg_cb_data);
+
     p_sys->i_box_type = BOX_PLAYLIST;
     p_sys->b_plidx_follow = true;
-//  p_sys->p_sub = msg_Subscribe(p_intf);
     p_sys->b_color = var_CreateGetBool(p_intf, "color");
 
     p_sys->category_view = true; //FIXME: switching back & forth is broken
@@ -1833,7 +1904,11 @@ static void Close(vlc_object_t *p_this)
 
     endwin();   /* Close the ncurses interface */
 
-//  msg_Unsubscribe(p_sys->p_sub);
+    msg_Unsubscribe(p_sys->p_sub);
+    vlc_mutex_destroy(&p_sys->msg_lock);
+    for(unsigned i = 0; i < sizeof p_sys->msgs / sizeof *p_sys->msgs; i++)
+        if (p_sys->msgs[i])
+            msg_Release(p_sys->msgs[i]);
 
     free(p_sys);
 }
