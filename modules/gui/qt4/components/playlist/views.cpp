@@ -31,7 +31,6 @@
 #include <QRect>
 #include <QStyleOptionViewItem>
 #include <QFontMetrics>
-#include <QPixmapCache>
 #include <QDrag>
 #include <QDragMoveEvent>
 
@@ -41,14 +40,6 @@
 #define ICON_SCALER         16
 #define ART_RADIUS          5
 #define SPACER              5
-
-QString AbstractPlViewItemDelegate::getMeta( const QModelIndex & index, int meta ) const
-{
-    return index.model()->index( index.row(),
-                                  PLModel::columnFromMeta( meta ),
-                                  index.parent() )
-                                .data().toString();
-}
 
 void AbstractPlViewItemDelegate::paintBackground(
     QPainter *painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
@@ -82,54 +73,10 @@ void AbstractPlViewItemDelegate::paintBackground(
     painter->restore();
 }
 
-QPixmap AbstractPlViewItemDelegate::getArtPixmap( const QModelIndex & index, const QSize & size ) const
-{
-    PLItem *item = static_cast<PLItem*>( index.internalPointer() );
-    assert( item );
-
-    QString artUrl = InputManager::decodeArtURL( item->inputItem() );
-
-    if( artUrl.isEmpty() )
-    {
-        for( int i = 0; i < item->childCount(); i++ )
-        {
-            artUrl = InputManager::decodeArtURL( item->child( i )->inputItem() );
-            if( !artUrl.isEmpty() )
-                break;
-        }
-    }
-
-    QPixmap artPix;
-
-    QString key = artUrl + QString("%1%2").arg(size.width()).arg(size.height());
-
-    if( !QPixmapCache::find( key, artPix ))
-    {
-        if( artUrl.isEmpty() || !artPix.load( artUrl ) )
-        {
-            key = QString("noart%1%2").arg(size.width()).arg(size.height());
-            if( !QPixmapCache::find( key, artPix ) )
-            {
-                artPix = QPixmap( ":/noart" ).scaled( size,
-                                                      Qt::KeepAspectRatio,
-                                                      Qt::SmoothTransformation );
-                QPixmapCache::insert( key, artPix );
-            }
-        }
-        else
-        {
-            artPix = artPix.scaled( size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
-            QPixmapCache::insert( key, artPix );
-        }
-    }
-
-    return artPix;
-}
-
 void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-    QString title = getMeta( index, COLUMN_TITLE );
-    QString artist = getMeta( index, COLUMN_ARTIST );
+    QString title = PLModel::getMeta( index, COLUMN_TITLE );
+    QString artist = PLModel::getMeta( index, COLUMN_ARTIST );
 
     QFont font( index.data( Qt::FontRole ).value<QFont>() );
     painter->setFont( font );
@@ -139,7 +86,7 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     int art_width = averagewidth * ICON_SCALER;
     int art_height = averagewidth * ICON_SCALER;
 
-    QPixmap artPix = getArtPixmap( index, QSize( art_width, art_height) );
+    QPixmap artPix = PLModel::getArtPixmap( index, QSize( art_width, art_height) );
 
     paintBackground( painter, option, index );
 
@@ -234,13 +181,13 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QModelIndex parent = index.parent();
     QModelIndex i;
 
-    QString title = getMeta( index, COLUMN_TITLE );
-    QString duration = getMeta( index, COLUMN_DURATION );
+    QString title = PLModel::getMeta( index, COLUMN_TITLE );
+    QString duration = PLModel::getMeta( index, COLUMN_DURATION );
     if( !duration.isEmpty() ) title += QString(" [%1]").arg( duration );
 
-    QString artist = getMeta( index, COLUMN_ARTIST );
-    QString album = getMeta( index, COLUMN_ALBUM );
-    QString trackNum = getMeta( index, COLUMN_TRACK_NUMBER );
+    QString artist = PLModel::getMeta( index, COLUMN_ARTIST );
+    QString album = PLModel::getMeta( index, COLUMN_ALBUM );
+    QString trackNum = PLModel::getMeta( index, COLUMN_TRACK_NUMBER );
     QString artistAlbum = artist;
     if( !album.isEmpty() )
     {
@@ -249,7 +196,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
         if( !trackNum.isEmpty() ) artistAlbum += QString( " [#%1]" ).arg( trackNum );
     }
 
-    QPixmap artPix = getArtPixmap( index, QSize( LISTVIEW_ART_SIZE, LISTVIEW_ART_SIZE ) );
+    QPixmap artPix = PLModel::getArtPixmap( index, QSize( LISTVIEW_ART_SIZE, LISTVIEW_ART_SIZE ) );
 
     //Draw selection rectangle and current playing item indication
     paintBackground( painter, option, index );

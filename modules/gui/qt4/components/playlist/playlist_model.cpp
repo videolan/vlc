@@ -48,7 +48,7 @@
 #include <QDesktopServices>
 #include <QInputDialog>
 #include <QSignalMapper>
-
+#include <QPixmapCache>
 
 #define I_NEW_DIR \
     I_DIR_OR_FOLDER( N_("Create Directory"), N_( "Create Folder" ) )
@@ -596,6 +596,59 @@ bool PLModel::canEdit() const
               rootItem->p_input == p_playlist->p_media_library->p_input )
             )
            );
+}
+
+QString PLModel::getMeta( const QModelIndex & index, int meta )
+{
+    return index.model()->index( index.row(),
+                                  PLModel::columnFromMeta( meta ),
+                                  index.parent() )
+                                .data().toString();
+}
+
+QPixmap PLModel::getArtPixmap( const QModelIndex & index, const QSize & size )
+{
+    PLItem *item = static_cast<PLItem*>( index.internalPointer() );
+    assert( item );
+
+    QString artUrl = InputManager::decodeArtURL( item->inputItem() );
+
+    /* If empty, take one of the children art URL */
+    if( artUrl.isEmpty() )
+    {
+        for( int i = 0; i < item->childCount(); i++ )
+        {
+            artUrl = InputManager::decodeArtURL( item->child( i )->inputItem() );
+            if( !artUrl.isEmpty() )
+                break;
+        }
+    }
+
+    QPixmap artPix;
+    QString key = artUrl + QString("%1%2").arg(size.width()).arg(size.height());
+
+    /* Lookup in the QPixmapCache */
+    if( !QPixmapCache::find( key, artPix ))
+    {
+        if( artUrl.isEmpty() || !artPix.load( artUrl ) )
+        {
+            key = QString("noart%1%2").arg(size.width()).arg(size.height());
+            if( !QPixmapCache::find( key, artPix ) )
+            {
+                artPix = QPixmap( ":/noart" ).scaled( size,
+                                                      Qt::KeepAspectRatio,
+                                                      Qt::SmoothTransformation );
+                QPixmapCache::insert( key, artPix );
+            }
+        }
+        else
+        {
+            artPix = artPix.scaled( size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+            QPixmapCache::insert( key, artPix );
+        }
+    }
+
+    return artPix;
 }
 /************************* Updates handling *****************************/
 

@@ -35,9 +35,7 @@ class AbstractPlViewItemDelegate : public QStyledItemDelegate
 {
 public:
     AbstractPlViewItemDelegate( QWidget * parent = 0 ) : QStyledItemDelegate(parent) {}
-    QString getMeta( const QModelIndex & index, int meta ) const;
     void paintBackground( QPainter *, const QStyleOptionViewItem &, const QModelIndex & ) const;
-    QPixmap getArtPixmap( const QModelIndex & index, const QSize & size ) const;
 };
 
 class PlIconViewItemDelegate : public AbstractPlViewItemDelegate

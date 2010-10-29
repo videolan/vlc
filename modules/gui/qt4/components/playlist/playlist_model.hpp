@@ -93,6 +93,9 @@ public:
     static int columnFromMeta( int meta_column );
     static int columnToMeta( int column );
 
+    static QString getMeta( const QModelIndex & index, int meta );
+    static QPixmap getArtPixmap( const QModelIndex & index, const QSize & size );
+
     /* Actions */
     bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
     void doDelete( QModelIndexList selected );
