@@ -1679,6 +1679,8 @@ static bool HandleListKey(intf_thread_t *p_intf, int key)
     switch(key)
     {
 #ifdef __FreeBSD__
+/* workaround for FreeBSD + xterm:
+ * see http://www.nabble.com/curses-vs.-xterm-key-mismatch-t3574377.html */
     case KEY_SELECT:
 #endif
     case KEY_END:  p_sys->i_box_idx = p_sys->i_box_lines_total - 1; break;
