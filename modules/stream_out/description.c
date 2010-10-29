@@ -149,7 +149,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         p_input = vlc_object_find( p_stream, VLC_OBJECT_INPUT, FIND_PARENT );
         if( p_input )
         {
-            p_input->b_eof = true;
+            input_Stop( p_input, true );
             vlc_object_release( p_input );
         }
     }
