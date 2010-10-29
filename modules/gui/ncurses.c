@@ -462,16 +462,6 @@ static int PlaylistChanged(vlc_object_t *p_this, const char *psz_variable,
 }
 
 /* Playlist suxx */
-/* This function have to be called with the playlist locked */
-static inline bool PlaylistIsPlaying(playlist_t *p_playlist,
-                                     playlist_item_t *p_item)
-{
-    playlist_item_t *p_played_item = playlist_CurrentPlayingItem(p_playlist);
-    return p_item                && p_played_item
-        && p_item->p_input       && p_played_item->p_input
-        && p_item->p_input->i_id == p_played_item->p_input->i_id;
-}
-
 static int SubSearchPlaylist(intf_sys_t *p_sys, char *psz_searchstring,
                               int i_start, int i_stop)
 {
@@ -510,8 +500,18 @@ static void SearchPlaylist(intf_sys_t *p_sys, char *psz_searchstring)
 static inline bool IsIndex(intf_sys_t *p_sys, playlist_t *p_playlist, int i)
 {
     playlist_item_t *p_item = p_sys->pp_plist[i]->p_item;
-    return (p_item->i_children == 0 && p_item == p_sys->p_node) ||
-            PlaylistIsPlaying(p_playlist, p_item);
+    playlist_item_t *p_played_item;
+
+    PL_ASSERT_LOCKED;
+
+    if (p_item->i_children == 0 && p_item == p_sys->p_node)
+        return true;
+
+    p_played_item = playlist_CurrentPlayingItem(p_playlist);
+    if (p_played_item && p_item->p_input && p_played_item->p_input)
+        return p_item->p_input->i_id == p_played_item->p_input->i_id;
+
+    return false;
 }
 
 static void FindIndex(intf_sys_t *p_sys, playlist_t *p_playlist)
@@ -1002,27 +1002,22 @@ static int DrawPlaylist(intf_thread_t *p_intf)
 
     for(int i = 0; i < p_sys->i_plist_entries; i++)
     {
-        char c = ' ';
-        playlist_item_t *p_current_item, *p_item, *p_node;
-        input_thread_t *p_input2;
-
-        p_item = p_sys->pp_plist[i]->p_item;
-        p_node = p_sys->p_node;
-        p_input2 = playlist_CurrentInput(p_playlist);
+        char c;
+        playlist_item_t *p_current_item;
+        playlist_item_t *p_item = p_sys->pp_plist[i]->p_item;
+        playlist_item_t *p_node = p_sys->p_node;
 
         PL_LOCK;
         assert(p_item);
         p_current_item = playlist_CurrentPlayingItem(p_playlist);
         if ((p_node && p_item->p_input == p_node->p_input) ||
-                    (!p_node && p_input2 && p_current_item &&
-                      p_item->p_input == p_current_item->p_input))
+           (!p_node && p_current_item && p_item->p_input == p_current_item->p_input))
             c = '*';
-        else if (p_item == p_node || PlaylistIsPlaying(p_playlist, p_item))
+        else if (p_item == p_node || p_current_item == p_item)
             c = '>';
+        else
+            c = ' ';
         PL_UNLOCK;
-
-        if (p_input2)
-            vlc_object_release(p_input2);
 
         if (p_sys->b_color) color_set(i%3 + C_PLAYLIST_1, NULL);
         MainBoxWrite(p_sys, i, "%c%s", c, p_sys->pp_plist[i]->psz_display);
