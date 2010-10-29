@@ -6,49 +6,56 @@ Important changes for packagers:
    its file systems and files content (except the Windows port). If this is
    not acceptable, pass --enable-non-utf8 to the configure script.
  * The default tarballs are now .tar.xz
+
  * The NPAPI webplugin has moved to git://git.videolan.org/npapi-vlc.git
  * The ActiveX webplugin has moved to git://git.videolan.org/activex-vlc.git
 
 Access
- * Multiple files are supported from RAR files
+ * Multiple files are now supported inside RAR files
  * BDA: experimental support for ClearQam devices
  * DVB-S scanning support
  * DShow: support for freq and video standard selection
- * Support for VDR recordings
- * Blu-Ray integration with libbluray
+ * Support for VDR recordings files and folders
+ * Blu-Ray Disc integration using libbluray
  * HTTP Live Streaming (IETF draft) playback support
  * Blackmagic DeckLink SDI card input support (Linux only currently)
 
 Codecs
  * You can now use ffmpeg-mt in conjunction with vlc
- * Important fixes for RealVideo 3.0 and 4.0 playback
+ * Important fixes for RealVideo 3.0 and 4.0 playback, notably in MKV
 
 Core:
  * Playback rate doesn't get resetted to 1 between items anymore
 
 Demuxers:
- * id3tag plugin is removed (superseded by taglib).
+ * id3tag plugin is removed (superseded by taglib)
  * Ogg seeking improvements
+ * Game Music Emu (GME) plugin rewritten from scratch using the C api
 
 Interfaces
  * The telnet interface has been removed in the favour of the lua one
  * Skins2 / Qt: misc improvements and usability fixes
  * Qt: effects dialogs reordering
  * Qt: port to MacOS X platform
+ * ncurses: heavy refactor of the complete interface
+
+Video Core:
+ * Major Video Output and Video Core reworks and rewrites
 
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
+
+Video Filter:
+ * New gradfun filter for debanding videos using dithering
+ * Rewrite of the grain filter, faster and with better quality
+ * New posterize filter for lowering the number of colors
+ * Atmo ambilight: improve Fnordlicht up to 254 channels
 
 Audio Output:
  * New audio output based on AudioQueue API for iOS
 
 Audio Filter:
  * New Compressor filter, a dynamic range compressor
-
-Video Filter:
- * New gradfun filter for debanding videos using dithering
- * Rewrite of the grain filter, faster and with better quality
- * New posterize filter for lowering the number of colors
 
 Stream output:
  * New livehttp-module for HTTP Live Streaming (IETF draft) output
@@ -57,6 +64,9 @@ Stream output:
     access=livehttp{index=public_html/iphonestream.m3u8,
     index-url=http://url-to-iphonestreamfile-###.ts},mux=ts{use-key-frames},
     dst=public_html/iphonestreamfile-###.ts}"
+
+Services Discovery:
+ * Search API to be able to query distant search APIs from the interfaces
 
 libVLC:
  * New capabilities for libVLC:
