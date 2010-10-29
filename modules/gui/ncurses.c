@@ -328,9 +328,10 @@ next:
  *****************************************************************************/
 static void CheckIdx(intf_sys_t *p_sys)
 {
+    int lines = p_sys->i_box_lines_total - 1;
     int height = LINES - p_sys->i_box_y - 2;
-    if (height > p_sys->i_box_lines_total - 1)
-        height = p_sys->i_box_lines_total - 1;
+    if (height > lines - 1)
+        height = lines - 1;
 
     /* make sure the new index is within the box */
     if (p_sys->i_box_idx <= 0)
@@ -338,9 +339,9 @@ static void CheckIdx(intf_sys_t *p_sys)
         p_sys->i_box_idx = 0;
         p_sys->i_box_start = 0;
     }
-    else if (p_sys->i_box_idx >= p_sys->i_box_lines_total - 1)
+    else if (p_sys->i_box_idx >= lines - 1 && lines > 0)
     {
-        p_sys->i_box_idx = p_sys->i_box_lines_total - 1;
+        p_sys->i_box_idx = lines - 1;
         p_sys->i_box_start = p_sys->i_box_idx - height;
     }
 
