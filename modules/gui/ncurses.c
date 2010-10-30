@@ -1051,7 +1051,10 @@ static int DrawMessages(intf_thread_t *p_intf)
         if (i == p_sys->i_msgs) /* did we loop around the ring buffer ? */
             break;
     }
+
     vlc_mutex_unlock(&p_sys->msg_lock);
+    if (p_sys->b_color)
+        color_set(C_DEFAULT, NULL);
     return l;
 }
 
@@ -1830,6 +1833,8 @@ static int Open(vlc_object_t *p_this)
     p_sys->i_msgs = 0;
     memset(p_sys->msgs, 0, sizeof p_sys->msgs);
     p_sys->p_sub = msg_Subscribe(p_intf->p_libvlc, MsgCallback, msg_cb_data);
+    msg_SubscriptionSetVerbosity(p_sys->p_sub,
+            var_GetInteger(p_intf->p_libvlc, "verbose"));
 
     p_sys->i_box_type = BOX_PLAYLIST;
     p_sys->b_plidx_follow = true;
