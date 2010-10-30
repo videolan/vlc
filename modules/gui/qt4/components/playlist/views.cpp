@@ -408,6 +408,7 @@ void PicFlowView::scrollTo(const QModelIndex &index, QAbstractItemView::ScrollHi
 
 QModelIndex PicFlowView::indexAt(const QPoint &) const
 {
+    return QModelIndex();
     // No idea, PictureFlow doesn't provide anything to help this
 }
 
