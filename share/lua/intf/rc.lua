@@ -404,12 +404,26 @@ function titlechap(name,client,value)
         client:append(item)
     end
 end
-function titlechap_offset(client,offset)
-    return function(name,value)
-        local input = vlc.object.input()
-        local var = string.gsub( name, "_.*$", "" )
-        vlc.var.set( input, var, vlc.var.get( input, var )+offset )
-    end
+
+function titlechap_offset(var,offset)
+    local input = vlc.object.input()
+    vlc.var.set( input, var, vlc.var.get( input, var ) + offset )
+end
+
+function title_next(name,client,value)
+    titlechap_offset('title', 1)
+end
+
+function title_previous(name,client,value)
+    titlechap_offset('title', -1)
+end
+
+function chapter_next(name,client,value)
+    titlechap_offset('chapter', 1)
+end
+
+function chapter_previous(name,client,value)
+    titlechap_offset('chapter', -1)
 end
 
 function seek(name,client,value)
@@ -502,11 +516,11 @@ commands_ordered = {
     { "clear"; { func = skip2(vlc.playlist.clear); help = "clear the playlist" } };
     { "status"; { func = playlist_status; help = "current playlist status" } };
     { "title"; { func = titlechap; args = "[X]"; help = "set/get title in current item" } };
-    { "title_n"; { func = titlechap_offset(1); help = "next title in current item" } };
-    { "title_p"; { func = titlechap_offset(-1); help = "previous title in current item" } };
+    { "title_n"; { func = title_next; help = "next title in current item" } };
+    { "title_p"; { func = title_previous; help = "previous title in current item" } };
     { "chapter"; { func = titlechap; args = "[X]"; help = "set/get chapter in current item" } };
-    { "chapter_n"; { func = titlechap_offset(1); help = "next chapter in current item" } };
-    { "chapter_p"; { func = titlechap_offset(-1); help = "previous chapter in current item" } };
+    { "chapter_n"; { func = chapter_next; help = "next chapter in current item" } };
+    { "chapter_p"; { func = chapter_previous; help = "previous chapter in current item" } };
     { "" };
     { "seek"; { func = seek; args = "X"; help = "seek in seconds, for instance `seek 12'" } };
     { "pause"; { func = skip2(vlc.playlist.pause); help = "toggle pause" } };
