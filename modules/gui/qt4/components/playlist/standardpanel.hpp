@@ -61,8 +61,8 @@ public:
                      playlist_item_t *, PLSelector *, PLModel * );
     virtual ~StandardPLPanel();
 
-    enum { TREE_VIEW = 0,
-           ICON_VIEW,
+    enum { ICON_VIEW = 0,
+           TREE_VIEW ,
            LIST_VIEW,
            PICTUREFLOW_VIEW,
            VIEW_COUNT };
@@ -128,8 +128,8 @@ signals:
 
 
 static const QString viewNames[ StandardPLPanel::VIEW_COUNT ]
-                                = { qtr( "Detailed View" ),
-                                    qtr( "Icon View" ),
+                                = { qtr( "Icon View" ),
+                                    qtr( "Detailed View" ),
                                     qtr( "List View" ),
                                     qtr( "PictureFlow View ") };
 
