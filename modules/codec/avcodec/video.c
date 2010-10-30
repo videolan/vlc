@@ -1136,7 +1136,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
             }
 #ifdef HAVE_AVCODEC_VAAPI
             msg_Dbg( p_dec, "Trying VA API" );
-            p_sys->p_va = vlc_va_NewVaapi( p_sys->i_codec_id );
+            p_sys->p_va = vlc_va_NewVaapi( VLC_OBJECT(p_dec), p_sys->i_codec_id );
             if( !p_sys->p_va )
                 msg_Warn( p_dec, "Failed to open VA API" );
 #else

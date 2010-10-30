@@ -27,6 +27,7 @@
 
 #include <vlc_common.h>
 #include <vlc_fourcc.h>
+#include <vlc_xlib.h>
 #include <assert.h>
 
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H
@@ -473,14 +474,9 @@ static void Delete( vlc_va_t *p_external )
 }
 
 /* */
-vlc_va_t *vlc_va_NewVaapi( int i_codec_id )
+vlc_va_t *vlc_va_NewVaapi( vlc_object_t *obj, int i_codec_id )
 {
-    bool fail;
-
-    vlc_global_lock( VLC_XLIB_MUTEX );
-    fail = !XInitThreads();
-    vlc_global_unlock( VLC_XLIB_MUTEX );
-    if( unlikely(fail) )
+    if( !vlc_xlib_init( obj ) )
         return NULL;
 
     vlc_va_vaapi_t *p_va = calloc( 1, sizeof(*p_va) );
