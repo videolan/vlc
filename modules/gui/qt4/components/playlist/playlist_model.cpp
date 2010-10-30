@@ -627,9 +627,6 @@ QPixmap PLModel::getArtPixmap( const QModelIndex & index, const QSize & size )
         }
     }
 
-    if( artUrl.isEmpty() )
-        return NULL;
-
     QPixmap artPix;
     QString key = artUrl + QString("%1%2").arg(size.width()).arg(size.height());
 
