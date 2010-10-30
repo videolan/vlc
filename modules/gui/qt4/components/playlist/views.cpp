@@ -416,9 +416,14 @@ QModelIndex PicFlowView::moveCursor(QAbstractItemView::CursorAction action, Qt::
 {
 }
 
-bool PicFlowView::isIndexHidden(const QModelIndex &) const
+bool PicFlowView::isIndexHidden(const QModelIndex &index) const
 {
-    return false;
+    int currentIndex = picFlow->centerIndex();
+    if( index.row()-5 <= currentIndex &&
+        index.row()+5 >= currentIndex )
+        return false;
+    else
+        return true;
 }
 
 QRegion PicFlowView::visualRegionForSelection(const QItemSelection &) const
