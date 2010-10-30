@@ -73,7 +73,7 @@ char *FromLocale (const char *locale)
 #ifdef ASSUME_UTF8
     return (char *)locale;
 #else
-    return locale ? FromCharset ("", locale) : NULL;
+    return locale ? FromCharset ("", locale, strlen(locale)) : NULL;
 #endif
 }
 
@@ -91,7 +91,7 @@ char *FromLocaleDup (const char *locale)
 #ifdef ASSUME_UTF8
     return strdup (locale);
 #else
-    return FromCharset ("", locale);
+    return FromCharset ("", locale, strlen(locale));
 #endif
 }
 
@@ -110,7 +110,8 @@ char *ToLocale (const char *utf8)
 #ifdef ASSUME_UTF8
     return (char *)utf8;
 #else
-    return utf8 ? ToCharset ("", utf8) : NULL;
+    size_t outsize;
+    return utf8 ? ToCharset ("", utf8, &outsize) : NULL;
 #endif
 }
 
@@ -129,7 +130,8 @@ char *ToLocaleDup (const char *utf8)
 #ifdef ASSUME_UTF8
     return strdup (utf8);
 #else
-    return ToCharset ("", utf8);
+    size_t outsize;
+    return ToCharset ("", utf8, &outsize);
 #endif
 }
 
