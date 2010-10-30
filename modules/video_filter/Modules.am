@@ -115,6 +115,7 @@ libvlc_LTLIBRARIES += \
 	libscale_plugin.la \
 	libscene_plugin.la \
 	libsharpen_plugin.la \
+	libtransform_plugin.la \
 	libwall_plugin.la \
 	libwave_plugin.la \
 	libgradfun_plugin.la \

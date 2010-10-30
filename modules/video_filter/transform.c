@@ -2,9 +2,11 @@
  * transform.c : transform image module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2006 the VideoLAN team
+ * Copyright (C) 2010 Laurent Aimar
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,192 +28,212 @@
  *****************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_vout.h>
-
-#include "filter_picture.h"
-
-#define TRANSFORM_MODE_HFLIP   1
-#define TRANSFORM_MODE_VFLIP   2
-#define TRANSFORM_MODE_90      3
-#define TRANSFORM_MODE_180     4
-#define TRANSFORM_MODE_270     5
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
-
-static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t * );
-static void Render    ( vout_thread_t *, picture_t * );
-
-static void FilterPlanar( vout_thread_t *, const picture_t *, picture_t * );
-static void FilterI422( vout_thread_t *, const picture_t *, picture_t * );
-static void FilterYUYV( vout_thread_t *, const picture_t *, picture_t * );
-
-static int  MouseEvent( vlc_object_t *, char const *,
-                        vlc_value_t, vlc_value_t, void * );
+#include <vlc_filter.h>
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open (vlc_object_t *);
+static void Close(vlc_object_t *);
+
+#define CFG_PREFIX "transform-"
+
 #define TYPE_TEXT N_("Transform type")
 #define TYPE_LONGTEXT N_("One of '90', '180', '270', 'hflip' and 'vflip'")
-
-static const char *const type_list[] = { "90", "180", "270", "hflip", "vflip" };
-static const char *const type_list_text[] = { N_("Rotate by 90 degrees"),
+static const char * const type_list[] = { "90", "180", "270", "hflip", "vflip" };
+static const char * const type_list_text[] = { N_("Rotate by 90 degrees"),
   N_("Rotate by 180 degrees"), N_("Rotate by 270 degrees"),
   N_("Flip horizontally"), N_("Flip vertically") };
 
-#define TRANSFORM_HELP N_("Rotate or flip the video")
-#define CFG_PREFIX "transform-"
+vlc_module_begin()
+    set_description(N_("Video transformation filter"))
+    set_shortname(N_("Transformation"))
+    set_help(N_("Rotate or flip the video"))
+    set_capability("video filter2", 0)
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VFILTER)
 
-vlc_module_begin ()
-    set_description( N_("Video transformation filter") )
-    set_shortname( N_("Transformation"))
-    set_help(TRANSFORM_HELP)
-    set_capability( "video filter", 0 )
-    set_category( CAT_VIDEO )
-    set_subcategory( SUBCAT_VIDEO_VFILTER )
+    add_string(CFG_PREFIX "type", "90", TYPE_TEXT, TYPE_LONGTEXT, false)
+        change_string_list(type_list, type_list_text, 0)
 
-    add_string( CFG_PREFIX "type", "90",
-                          TYPE_TEXT, TYPE_LONGTEXT, false)
-        change_string_list( type_list, type_list_text, 0)
-
-    add_shortcut( "transform" )
-    set_callbacks( Create, Destroy )
-vlc_module_end ()
-
-static const char *const ppsz_filter_options[] = {
-    "type", NULL
-};
+    add_shortcut("transform")
+    set_callbacks(Open, Close)
+vlc_module_end()
 
 /*****************************************************************************
- * vout_sys_t: Transform video output method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the Transform specific properties of an output thread.
+ * Local prototypes
  *****************************************************************************/
-struct vout_sys_t
+static void HFlip(int *sx, int *sy, int w, int h, int dx, int dy)
 {
-    int i_mode;
-    bool b_rotation;
-    vout_thread_t *p_vout;
-
-    void (*pf_filter)( vout_thread_t *, const picture_t *, picture_t * );
-};
-
-/*****************************************************************************
- * Control: control facility for the vout (forwards to child vout)
- *****************************************************************************/
-static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+    *sx = w - 1 - dx;
+    *sy = dy;
+}
+static void VFlip(int *sx, int *sy, int w, int h, int dx, int dy)
 {
-    return vout_vaControl( p_vout->p_sys->p_vout, i_query, args );
+    *sx = dx;
+    *sy = h - 1 - dy;
+}
+static void R90(int *sx, int *sy, int w, int h, int dx, int dy)
+{
+    *sx = dy;
+    *sy = w - 1 - dx;
+}
+static void R180(int *sx, int *sy, int w, int h, int dx, int dy)
+{
+    *sx = w - dx;
+    *sy = h - dy;
+}
+static void R270(int *sx, int *sy, int w, int h, int dx, int dy)
+{
+    *sx = h - 1 - dy;
+    *sy = dx;
+}
+typedef void (*convert_t)(int *, int *, int, int, int, int);
+
+static void Planar(plane_t *dst, const plane_t *src, convert_t f)
+{
+    for (int y = 0; y < src->i_visible_lines; y++) {
+        for (int x = 0; x < src->i_visible_pitch; x++) {
+            int sx, sy;
+            f(&sx, &sy, dst->i_visible_pitch, dst->i_visible_lines, x, y);
+            dst->p_pixels[y * dst->i_pitch + x] = src->p_pixels[sy * src->i_pitch + sx];
+        }
+    }
 }
 
-/*****************************************************************************
- * Create: allocates Transform video thread output method
- *****************************************************************************
- * This function allocates and initializes a Transform vout method.
- *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+#define PLANAR(f) \
+    static void Planar##f(plane_t *dst, const plane_t *src) { Planar(dst, src, f); }
+
+PLANAR(HFlip)
+PLANAR(VFlip)
+PLANAR(R90)
+PLANAR(R180)
+PLANAR(R270)
+
+typedef struct {
+    char      name[8];
+    bool      is_rotated;
+    convert_t convert;
+    void      (*planar)(plane_t *dst, const plane_t *src);
+} transform_description_t;
+
+static const transform_description_t descriptions[] = {
+    { "90",    true,  R90,   PlanarR90, },
+    { "180",   false, R180,  PlanarR180, },
+    { "270",   true,  R270,  PlanarR270, },
+    { "hflip", false, HFlip, PlanarHFlip, },
+    { "vflip", false, VFlip, PlanarVFlip, },
+
+    { "", false, NULL, NULL, }
+};
+
+struct filter_sys_t {
+    const transform_description_t  *dsc;
+    const vlc_chroma_description_t *chroma;
+};
+
+static picture_t *Filter(filter_t *filter, picture_t *src)
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    char *psz_method;
+    filter_sys_t *sys = filter->p_sys;
 
-    /* Allocate structure */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
-        return VLC_ENOMEM;
-
-    p_vout->pf_init = Init;
-    p_vout->pf_end = End;
-    p_vout->pf_manage = NULL;
-    p_vout->pf_render = Render;
-    p_vout->pf_display = NULL;
-    p_vout->pf_control = Control;
-
-    config_ChainParse( p_vout, CFG_PREFIX, ppsz_filter_options,
-                           p_vout->p_cfg );
-
-    /* Look what method was requested */
-    psz_method = var_CreateGetNonEmptyStringCommand( p_vout, "transform-type" );
-
-    switch( p_vout->fmt_in.i_chroma )
-    {
-        CASE_PLANAR_YUV_SQUARE
-        case VLC_CODEC_GREY:
-            p_vout->p_sys->pf_filter = FilterPlanar;
-            break;
-
-        case VLC_CODEC_I422:
-        case VLC_CODEC_J422:
-            p_vout->p_sys->pf_filter = FilterI422;
-            break;
-
-        CASE_PACKED_YUV_422
-            p_vout->p_sys->pf_filter = FilterYUYV;
-            break;
-
-        default:
-            msg_Err( p_vout, "Unsupported chroma" );
-            free( p_vout->p_sys );
-            return VLC_EGENERIC;
+    picture_t *dst = filter_NewPicture(filter);
+    if (!dst) {
+        picture_Release(src);
+        return NULL;
     }
 
-    if( psz_method == NULL )
-    {
-        msg_Err( p_vout, "configuration variable %s empty", "transform-type" );
-        msg_Err( p_vout, "no valid transform mode provided, using '90'" );
-        p_vout->p_sys->i_mode = TRANSFORM_MODE_90;
-        p_vout->p_sys->b_rotation = 1;
-    }
-    else
-    {
-        if( !strcmp( psz_method, "hflip" ) )
-        {
-            p_vout->p_sys->i_mode = TRANSFORM_MODE_HFLIP;
-            p_vout->p_sys->b_rotation = 0;
-        }
-        else if( !strcmp( psz_method, "vflip" ) )
-        {
-            p_vout->p_sys->i_mode = TRANSFORM_MODE_VFLIP;
-            p_vout->p_sys->b_rotation = 0;
-        }
-        else if( !strcmp( psz_method, "90" ) )
-        {
-            p_vout->p_sys->i_mode = TRANSFORM_MODE_90;
-            p_vout->p_sys->b_rotation = 1;
-        }
-        else if( !strcmp( psz_method, "180" ) )
-        {
-            p_vout->p_sys->i_mode = TRANSFORM_MODE_180;
-            p_vout->p_sys->b_rotation = 0;
-        }
-        else if( !strcmp( psz_method, "270" ) )
-        {
-            p_vout->p_sys->i_mode = TRANSFORM_MODE_270;
-            p_vout->p_sys->b_rotation = 1;
-        }
-        else
-        {
-            msg_Err( p_vout, "no valid transform mode provided, using '90'" );
-            p_vout->p_sys->i_mode = TRANSFORM_MODE_90;
-            p_vout->p_sys->b_rotation = 1;
-        }
-
-        free( psz_method );
+    const vlc_chroma_description_t *chroma = sys->chroma;
+    if (chroma->plane_count < 3) {
+        /* TODO */
+    } else {
+        for (unsigned i = 0; i < chroma->plane_count; i++)
+            sys->dsc->planar(&dst->p[i], &src->p[i]);
     }
 
+    picture_CopyProperties(dst, src);
+    picture_Release(src);
+    return dst;
+}
+
+static int Mouse(filter_t *filter, vlc_mouse_t *mouse,
+                 const vlc_mouse_t *mold, const vlc_mouse_t *mnew)
+{
+    const video_format_t          *fmt = &filter->fmt_in.video;
+    const transform_description_t *dsc = filter->p_sys->dsc;
+
+    *mouse = *mnew;
+    int w, h;
+    if (dsc->is_rotated) {
+        w = fmt->i_visible_height;
+        h = fmt->i_visible_width;
+    } else {
+        w = fmt->i_visible_width;
+        h = fmt->i_visible_height;
+    }
+    dsc->convert(&mouse->i_x, &mouse->i_y, w, h, mouse->i_x, mouse->i_y);
     return VLC_SUCCESS;
 }
 
+static int Open(vlc_object_t *object)
+{
+    filter_t *filter = (filter_t *)object;
+
+    const vlc_chroma_description_t *chroma =
+        vlc_fourcc_GetChromaDescription(filter->fmt_in.video.i_chroma);
+    if (!chroma || chroma->plane_count < 3) {
+        msg_Err(filter, "Unsupported chroma (%4.4s)",
+                (char*)&filter->fmt_in.video.i_chroma);
+        /* TODO support packed and rgb */
+        return VLC_EGENERIC;
+    }
+
+    filter_sys_t *sys = malloc(sizeof(*sys));
+    if (!sys)
+        return VLC_ENOMEM;
+
+    sys->chroma = chroma;
+
+    char *type_name = var_InheritString(filter, CFG_PREFIX"type");
+
+    sys->dsc = NULL;
+    for (int i = 0; !sys->dsc && *descriptions[i].name; i++) {
+        if (type_name && *type_name && !strcmp(descriptions[i].name, type_name))
+            sys->dsc = &descriptions[i];
+    }
+    if (!sys->dsc) {
+        sys->dsc = &descriptions[0];
+        msg_Warn(filter, "No valid transform mode provided, using '%s'", sys->dsc->name);
+    }
+
+    free(type_name);
+
+    if (sys->dsc->is_rotated) {
+        /* TODO */
+        msg_Err(filter, "Rotation mode not yet supported");
+        free(sys);
+        return VLC_EGENERIC;
+    }
+
+    filter->p_sys           = sys;
+    filter->pf_video_filter = Filter;
+    filter->pf_video_mouse  = Mouse;
+    return VLC_SUCCESS;
+}
+
+static void Close(vlc_object_t *object)
+{
+    filter_t     *filter = (filter_t *)object;
+    filter_sys_t *sys    = filter->p_sys;
+
+    free(sys);
+}
+
+#if 0
 /*****************************************************************************
  * Init: initialize Transform video thread output method
  *****************************************************************************/
@@ -220,7 +242,7 @@ static int Init( vout_thread_t *p_vout )
     video_format_t fmt;
 
     I_OUTPUTPICTURES = 0;
-    memset( &fmt, 0, sizeof(video_format_t) );
+    memset( &fmt, 0, sizeof(video_format_t ) );
 
     /* Initialize the output structure */
     p_vout->output.i_chroma = p_vout->render.i_chroma;
@@ -262,258 +284,6 @@ static int Init( vout_thread_t *p_vout )
 
     return VLC_SUCCESS;
 }
-
-/*****************************************************************************
- * End: terminate Transform video thread output method
- *****************************************************************************/
-static void End( vout_thread_t *p_vout )
-{
-    vout_sys_t *p_sys = p_vout->p_sys;
-
-    vout_filter_DelChild( p_vout, p_sys->p_vout, MouseEvent );
-    vout_CloseAndRelease( p_sys->p_vout );
-
-    vout_filter_ReleaseDirectBuffers( p_vout );
-}
-
-/*****************************************************************************
- * Destroy: destroy Transform video thread output method
- *****************************************************************************
- * Terminate an output method created by TransformCreateOutputMethod
- *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
-{
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-
-    free( p_vout->p_sys );
-}
-
-/*****************************************************************************
- * Render: displays previously rendered output
- *****************************************************************************
- * This function send the currently rendered image to Transform image, waits
- * until it is displayed and switch the two rendering buffers, preparing next
- * frame.
- *****************************************************************************/
-static void Render( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    picture_t *p_outpic;
-
-    /* This is a new frame. Get a structure from the video_output. */
-    while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
-              == NULL )
-    {
-        if( !vlc_object_alive (p_vout) || p_vout->b_error )
-        {
-            return;
-        }
-        msleep( VOUT_OUTMEM_SLEEP );
-    }
-
-    p_outpic->date = p_pic->date;
-    vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
-
-    p_vout->p_sys->pf_filter( p_vout, p_pic, p_outpic );
-
-    vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
-
-    vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
-}
-
-/**
- * Forward mouse event with proper conversion.
- */
-static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t val, void *p_data )
-{
-    vout_thread_t *p_vout = p_data;
-    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-
-    /* Translate the mouse coordinates
-     * FIXME missing lock */
-    if( !strcmp( psz_var, "mouse-button-down" ) )
-        return var_SetChecked( p_vout, psz_var, VLC_VAR_INTEGER, val );
-
-    int x = val.coords.x, y = val.coords.y;
-
-    switch( p_vout->p_sys->i_mode )
-    {
-        case TRANSFORM_MODE_90:
-            x = p_vout->p_sys->p_vout->output.i_height - val.coords.y;
-            y = val.coords.x;
-            break;
-
-        case TRANSFORM_MODE_180:
-            x = p_vout->p_sys->p_vout->output.i_width - val.coords.x;
-            y = p_vout->p_sys->p_vout->output.i_height - val.coords.y;
-            break;
-
-        case TRANSFORM_MODE_270:
-            x = val.coords.y;
-            y = p_vout->p_sys->p_vout->output.i_width - val.coords.x;
-            break;
-
-        case TRANSFORM_MODE_HFLIP:
-            x = p_vout->p_sys->p_vout->output.i_width - val.coords.x;
-            break;
-
-        case TRANSFORM_MODE_VFLIP:
-            y = p_vout->p_sys->p_vout->output.i_height - val.coords.y;
-            break;
-
-        default:
-            break;
-    }
-    return var_SetCoords( p_vout, psz_var, x, y );
-}
-
-static void FilterPlanar( vout_thread_t *p_vout,
-                          const picture_t *p_pic, picture_t *p_outpic )
-{
-    int i_index;
-    switch( p_vout->p_sys->i_mode )
-    {
-        case TRANSFORM_MODE_90:
-            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
-            {
-                int i_pitch = p_pic->p[i_index].i_pitch;
-
-                uint8_t *p_in = p_pic->p[i_index].p_pixels;
-
-                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
-                uint8_t *p_out_end = p_out +
-                    p_outpic->p[i_index].i_visible_lines *
-                    p_outpic->p[i_index].i_pitch;
-
-                for( ; p_out < p_out_end ; )
-                {
-                    uint8_t *p_line_end;
-
-                    p_out_end -= p_outpic->p[i_index].i_pitch
-                                  - p_outpic->p[i_index].i_visible_pitch;
-                    p_line_end = p_in + p_pic->p[i_index].i_visible_lines *
-                        i_pitch;
-
-                    for( ; p_in < p_line_end ; )
-                    {
-                        p_line_end -= i_pitch;
-                        *(--p_out_end) = *p_line_end;
-                    }
-
-                    p_in++;
-                }
-            }
-            break;
-
-        case TRANSFORM_MODE_180:
-            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
-            {
-                uint8_t *p_in = p_pic->p[i_index].p_pixels;
-                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_visible_lines
-                                            * p_pic->p[i_index].i_pitch;
-
-                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
-
-                for( ; p_in < p_in_end ; )
-                {
-                    uint8_t *p_line_start = p_in_end
-                                             - p_pic->p[i_index].i_pitch;
-                    p_in_end -= p_pic->p[i_index].i_pitch
-                                 - p_pic->p[i_index].i_visible_pitch;
-
-                    for( ; p_line_start < p_in_end ; )
-                    {
-                        *p_out++ = *(--p_in_end);
-                    }
-
-                    p_out += p_outpic->p[i_index].i_pitch
-                              - p_outpic->p[i_index].i_visible_pitch;
-                }
-            }
-            break;
-
-        case TRANSFORM_MODE_270:
-            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
-            {
-                int i_pitch = p_pic->p[i_index].i_pitch;
-
-                uint8_t *p_in = p_pic->p[i_index].p_pixels;
-
-                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
-                uint8_t *p_out_end = p_out +
-                    p_outpic->p[i_index].i_visible_lines *
-                    p_outpic->p[i_index].i_pitch;
-
-                for( ; p_out < p_out_end ; )
-                {
-                    uint8_t *p_in_end;
-
-                    p_in_end = p_in + p_pic->p[i_index].i_visible_lines *
-                        i_pitch;
-
-                    for( ; p_in < p_in_end ; )
-                    {
-                        p_in_end -= i_pitch;
-                        *p_out++ = *p_in_end;
-                    }
-
-                    p_out += p_outpic->p[i_index].i_pitch
-                              - p_outpic->p[i_index].i_visible_pitch;
-                    p_in++;
-                }
-            }
-            break;
-
-        case TRANSFORM_MODE_VFLIP:
-            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
-            {
-                uint8_t *p_in = p_pic->p[i_index].p_pixels;
-                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_visible_lines
-                                            * p_pic->p[i_index].i_pitch;
-
-                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
-
-                for( ; p_in < p_in_end ; )
-                {
-                    p_in_end -= p_pic->p[i_index].i_pitch;
-                    vlc_memcpy( p_out, p_in_end,
-                                p_pic->p[i_index].i_visible_pitch );
-                    p_out += p_outpic->p[i_index].i_pitch;
-                }
-            }
-            break;
-
-        case TRANSFORM_MODE_HFLIP:
-            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
-            {
-                uint8_t *p_in = p_pic->p[i_index].p_pixels;
-                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_visible_lines
-                                         * p_pic->p[i_index].i_pitch;
-
-                uint8_t *p_out = p_outpic->p[i_index].p_pixels;
-
-                for( ; p_in < p_in_end ; )
-                {
-                    uint8_t *p_line_end = p_in
-                                        + p_pic->p[i_index].i_visible_pitch;
-
-                    for( ; p_in < p_line_end ; )
-                    {
-                        *p_out++ = *(--p_line_end);
-                    }
-
-                    p_in += p_pic->p[i_index].i_pitch;
-                    p_out += p_outpic->p[i_index].i_pitch
-                                - p_outpic->p[i_index].i_visible_pitch;
-                }
-            }
-            break;
-
-        default:
-            break;
-    }
-}
-
 static void FilterI422( vout_thread_t *p_vout,
                         const picture_t *p_pic, picture_t *p_outpic )
 {
@@ -837,3 +607,4 @@ static void FilterYUYV( vout_thread_t *p_vout,
             break;
     }
 }
+#endif
