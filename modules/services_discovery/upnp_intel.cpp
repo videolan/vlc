@@ -38,6 +38,7 @@
 #include <vlc_plugin.h>
 #include <vlc_services_discovery.h>
 
+#include <assert.h>
 
 // Constants
 const char* MEDIA_SERVER_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaServer:1";
