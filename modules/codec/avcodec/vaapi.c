@@ -498,8 +498,9 @@ vlc_va_t *vlc_va_NewVaapi( vlc_object_t *obj, int i_codec_id )
     return &p_va->va;
 }
 #else
-vlc_va_t *vlc_va_NewVaapi( int i_codec_id )
+vlc_va_t *vlc_va_NewVaapi( vlc_object_t *obj, int i_codec_id )
 {
+    VLC_UNUSED( obj );
     VLC_UNUSED( i_codec_id );
     return NULL;
 }
