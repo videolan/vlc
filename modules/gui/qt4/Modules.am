@@ -339,7 +339,7 @@ noinst_HEADERS = \
 	util/qvlcapp.hpp \
 	util/qt_dirs.hpp \
 	util/registry.hpp \
-	util/pictureflow.hpp
+	util/pictureflow.hpp \
 	util/singleton.hpp
 
 
