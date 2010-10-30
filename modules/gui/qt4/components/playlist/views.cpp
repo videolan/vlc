@@ -383,7 +383,7 @@ PicFlowView::PicFlowView( PLModel *p_model, QWidget *parent ) : QAbstractItemVie
     setSelectionMode( QAbstractItemView::SingleSelection );
     setModel( p_model );
 
-    CONNECT( picFlow, centerIndexChanged(int), this, playItem(int) );
+    //CONNECT( picFlow, centerIndexChanged(int), this, playItem(int) );
 }
 
 int PicFlowView::horizontalOffset() const
