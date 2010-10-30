@@ -403,7 +403,11 @@ QRect PicFlowView::visualRect(const QModelIndex &index ) const
 
 void PicFlowView::scrollTo(const QModelIndex &index, QAbstractItemView::ScrollHint)
 {
-     picFlow->showSlide( index.row()-1 );
+     int currentIndex = picFlow->centerIndex();
+     if( qAbs( currentIndex - index.row()) > 100 )
+        picFlow->setCenterIndex( index.row()-1);
+     else
+        picFlow->showSlide( index.row()-1 );
 }
 
 QModelIndex PicFlowView::indexAt(const QPoint &) const
