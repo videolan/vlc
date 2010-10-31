@@ -3372,6 +3372,18 @@ then
 fi
 
 dnl
+dnl  QuartzText vout module (iOS/Mac OS)
+dnl
+AC_ARG_ENABLE(macosx-quartztext,
+  [  --enable-macosx-quartztext   Mac OS X quartz text module (default enabled on Mac OS X)])
+if test "x${enable_macosx_quartztext}" != "xno" &&
+  (test "${SYS}" = "darwin" || test "${enable_macosx_quartztext}" = "yes")
+then
+  VLC_ADD_PLUGIN([quartztext])
+  VLC_ADD_LDFLAGS([quartztext],[-Wl,-framework,ApplicationServices])
+fi
+
+dnl
 dnl  Windows DirectX module
 dnl
 
