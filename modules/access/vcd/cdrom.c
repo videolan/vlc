@@ -686,7 +686,6 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
         char filename[1024];
         char type[16];
         int i_temp = sscanf( line, "FILE \"%1023[^\"]\" %15s", filename, type );
-        *p_pos = 0;
         switch( i_temp )
         {
             case 2:
