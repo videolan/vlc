@@ -1680,7 +1680,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
     if( header[0] != 0 || header[1] != 0 || header[2] != 1 )
     {
         if( !p_demux->p_sys->b_silent )
-            msg_Warn( p_demux, "invalid header [0x%x:%x:%x:%x] (pid: %d)",
+            msg_Warn( p_demux, "invalid header [0x%02x:%02x:%02x:%02x] (pid: %d)",
                       header[0], header[1],header[2],header[3], pid->i_pid );
         block_ChainRelease( p_pes );
         return;
