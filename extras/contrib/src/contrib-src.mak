@@ -1853,9 +1853,6 @@ ifdef HAVE_WIN32
 endif
 
 .gpg-error: libgpg-error
-ifdef HAVE_DARWIN_OS_ON_INTEL
-	(cd $<; ./autogen.sh)
-endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls --disable-shared --disable-languages && make && make install)
 #	$(INSTALL_NAME)
 	touch $@
