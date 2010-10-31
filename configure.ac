@@ -3361,6 +3361,17 @@ then
 fi
 
 dnl
+dnl  iOS vout module
+dnl
+AC_ARG_ENABLE(ios-vout,
+  [  --enable-ios-vout    iOS video output module (default disabled)])
+if test "${enable_ios_vout}" = "yes"
+then
+  VLC_ADD_PLUGIN([vout_ios])
+  VLC_ADD_LDFLAGS([vout_ios], [-Wl,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit,-framework,Foundation])
+fi
+
+dnl
 dnl  Windows DirectX module
 dnl
 
