@@ -78,7 +78,7 @@ demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     p_demux->psz_file = get_path( psz_location );
 
     /* Take into account "demux" to be able to do :demux=dump */
-    if( p_demux->psz_demux && *p_demux->psz_demux == '\0' )
+    if( *p_demux->psz_demux == '\0' )
     {
         free( p_demux->psz_demux );
         p_demux->psz_demux = var_GetNonEmptyString( p_obj, "demux" );
