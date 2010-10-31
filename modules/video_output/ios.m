@@ -73,10 +73,10 @@ vlc_module_end ()
 @interface VLCOpenGLESVideoView : UIView
 {
     vout_display_t * _vd;
-	EAGLContext * _context;
+    EAGLContext * _context;
     GLuint _defaultFramebuffer;
-	GLuint _colorRenderbuffer;
-	BOOL _framebufferDirty;
+    GLuint _colorRenderbuffer;
+    BOOL _framebufferDirty;
 }
 - (id)initWithFrame:(CGRect)frame andVOutDisplay:(vout_display_t *)vd;
 @property (readonly) EAGLContext * context;
@@ -129,15 +129,15 @@ static int Open(vlc_object_t *this)
     /* Get our main view*/
     nsPool = [[NSAutoreleasePool alloc] init];
 
-	msg_Dbg(vd, "Creating VLCOpenGLESVideoView");
-	sys->glView = [[VLCOpenGLESVideoView alloc] initWithFrame:[container bounds] andVOutDisplay:vd];
+    msg_Dbg(vd, "Creating VLCOpenGLESVideoView");
+    sys->glView = [[VLCOpenGLESVideoView alloc] initWithFrame:[container bounds] andVOutDisplay:vd];
     if (!sys->glView)
         goto error;
 
     /* We don't wait, that means that we'll have to be careful about releasing
      * container.
      * That's why we'll release on main thread in Close(). */
-	[container performSelectorOnMainThread:@selector(addSubview:) withObject:sys->glView waitUntilDone:NO];
+    [container performSelectorOnMainThread:@selector(addSubview:) withObject:sys->glView waitUntilDone:NO];
 
     [nsPool drain];
     nsPool = nil;
@@ -269,15 +269,15 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
 static int OpenglClean(vout_opengl_t *gl) {
     vout_display_sys_t *sys = gl->sys;
-	[sys->glView cleanFramebuffer];
-	return 0;
+    [sys->glView cleanFramebuffer];
+    return 0;
 }
 
 static void OpenglSwap(vout_opengl_t *gl)
 {
     vout_display_sys_t *sys = gl->sys;
     EAGLContext *context = [sys->glView context];
-	[context presentRenderbuffer:GL_RENDERBUFFER_OES];
+    [context presentRenderbuffer:GL_RENDERBUFFER_OES];
 }
 
 /*****************************************************************************
@@ -304,28 +304,28 @@ static void OpenglSwap(vout_opengl_t *gl)
  */
 
 - (id)initWithFrame:(CGRect)frame andVOutDisplay:(vout_display_t *)vd {
-	if (self = [super initWithFrame:frame]) {
-		_vd = vd;
-		CAEAGLLayer * eaglLayer = (CAEAGLLayer *)self.layer;
+    if (self = [super initWithFrame:frame]) {
+        _vd = vd;
+        CAEAGLLayer * eaglLayer = (CAEAGLLayer *)self.layer;
 
         eaglLayer.opaque = TRUE;
         eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
-//										[NSNumber numberWithBool:FALSE], kEAGLDrawablePropertyRetainedBacking,
-										kEAGLColorFormatRGB565, kEAGLDrawablePropertyColorFormat,
-										nil];
+//                                        [NSNumber numberWithBool:FALSE], kEAGLDrawablePropertyRetainedBacking,
+                                        kEAGLColorFormatRGB565, kEAGLDrawablePropertyColorFormat,
+                                        nil];
 
-		_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
-		NSAssert(_context && [EAGLContext setCurrentContext:_context], @"Creating context");
+        _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+        NSAssert(_context && [EAGLContext setCurrentContext:_context], @"Creating context");
 
         // This shouldn't need to be done on the main thread.
         // Indeed, it works just fine from the render thread on iOS 3.2 to 4.1
         // However, if you don't call it from the main thread, it doesn't work on iOS 4.2 beta 1
         [self performSelectorOnMainThread:@selector(_createFramebuffer) withObject:nil waitUntilDone:YES];
 
-		_framebufferDirty = NO;
+        _framebufferDirty = NO;
 
-		[self setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
-	}
+        [self setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+    }
     return self;
 }
 
@@ -351,82 +351,82 @@ static void OpenglSwap(vout_opengl_t *gl)
  * Method called by UIKit when we have been resized
  */
 - (void)layoutSubviews {
-	// CAUTION : This is called from the main thread
-	_framebufferDirty = YES;
+    // CAUTION : This is called from the main thread
+    _framebufferDirty = YES;
 }
 
 - (void)cleanFramebuffer {
-	if (_framebufferDirty) {
-		[self _destroyFramebuffer];
-		[self _createFramebuffer];
-		_framebufferDirty = NO;
-	}
+    if (_framebufferDirty) {
+        [self _destroyFramebuffer];
+        [self _createFramebuffer];
+        _framebufferDirty = NO;
+    }
 }
 
 @end
 
 @implementation VLCOpenGLESVideoView (Private)
 - (void)_createFramebuffer {
-	msg_Dbg(_vd, "Creating framebuffer for layer %p with bounds (%.1f,%.1f,%.1f,%.1f)", self.layer, self.layer.bounds.origin.x, self.layer.bounds.origin.y, self.layer.bounds.size.width, self.layer.bounds.size.height);
-	[EAGLContext setCurrentContext:_context];
-	// Create default framebuffer object. The backing will be allocated for the current layer in -resizeFromLayer
-	glGenFramebuffersOES(1, &_defaultFramebuffer); // Generate one framebuffer, store it in _defaultFrameBuffer
-	glGenRenderbuffersOES(1, &_colorRenderbuffer);
-	glBindFramebufferOES(GL_FRAMEBUFFER_OES, _defaultFramebuffer);
-	glBindRenderbufferOES(GL_RENDERBUFFER_OES, _colorRenderbuffer);
+    msg_Dbg(_vd, "Creating framebuffer for layer %p with bounds (%.1f,%.1f,%.1f,%.1f)", self.layer, self.layer.bounds.origin.x, self.layer.bounds.origin.y, self.layer.bounds.size.width, self.layer.bounds.size.height);
+    [EAGLContext setCurrentContext:_context];
+    // Create default framebuffer object. The backing will be allocated for the current layer in -resizeFromLayer
+    glGenFramebuffersOES(1, &_defaultFramebuffer); // Generate one framebuffer, store it in _defaultFrameBuffer
+    glGenRenderbuffersOES(1, &_colorRenderbuffer);
+    glBindFramebufferOES(GL_FRAMEBUFFER_OES, _defaultFramebuffer);
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, _colorRenderbuffer);
 
-	// This call associates the storage for the current render buffer with the EAGLDrawable (our CAEAGLLayer)
-	// allowing us to draw into a buffer that will later be rendered to screen wherever the layer is (which corresponds with our view).
-	[_context renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:(id<EAGLDrawable>)self.layer];
-	glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, _colorRenderbuffer);
+    // This call associates the storage for the current render buffer with the EAGLDrawable (our CAEAGLLayer)
+    // allowing us to draw into a buffer that will later be rendered to screen wherever the layer is (which corresponds with our view).
+    [_context renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:(id<EAGLDrawable>)self.layer];
+    glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, _colorRenderbuffer);
 
-	GLuint backingWidth, backingHeight;
-	glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &backingWidth);
-	glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &backingHeight);
+    GLuint backingWidth, backingHeight;
+    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &backingWidth);
+    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &backingHeight);
 
-	if(glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) != GL_FRAMEBUFFER_COMPLETE_OES) {
-		msg_Err(_vd, "Failed to make complete framebuffer object %x", glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES));
-	}
-	[self _updateViewportWithBackingWitdh:backingWidth andBackingHeight:backingHeight];
+    if(glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) != GL_FRAMEBUFFER_COMPLETE_OES) {
+        msg_Err(_vd, "Failed to make complete framebuffer object %x", glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES));
+    }
+    [self _updateViewportWithBackingWitdh:backingWidth andBackingHeight:backingHeight];
 }
 
 - (void)_updateViewportWithBackingWitdh:(GLuint)backingWidth andBackingHeight:(GLuint)backingHeight {
-	msg_Dbg(_vd, "Reshaping to %dx%d", backingWidth, backingHeight);
+    msg_Dbg(_vd, "Reshaping to %dx%d", backingWidth, backingHeight);
 
-	CGFloat width = (CGFloat)backingWidth;
-	CGFloat height = (CGFloat)backingHeight;
+    CGFloat width = (CGFloat)backingWidth;
+    CGFloat height = (CGFloat)backingHeight;
 
     GLint x = width, y = height;
 
-	if (_vd) {
-		CGFloat videoHeight = _vd->source.i_visible_height;
-		CGFloat videoWidth = _vd->source.i_visible_width;
+    if (_vd) {
+        CGFloat videoHeight = _vd->source.i_visible_height;
+        CGFloat videoWidth = _vd->source.i_visible_width;
 
-		GLint sarNum = _vd->source.i_sar_num;
-		GLint sarDen = _vd->source.i_sar_den;
+        GLint sarNum = _vd->source.i_sar_num;
+        GLint sarDen = _vd->source.i_sar_den;
 
-		if (height * videoWidth * sarNum < width * videoHeight * sarDen)
-		{
-			x = (height * videoWidth * sarNum) / (videoHeight * sarDen);
-			y = height;
-		}
-		else
-		{
-			x = width;
-			y = (width * videoHeight * sarDen) / (videoWidth * sarNum);
-		}
-	}
+        if (height * videoWidth * sarNum < width * videoHeight * sarDen)
+        {
+            x = (height * videoWidth * sarNum) / (videoHeight * sarDen);
+            y = height;
+        }
+        else
+        {
+            x = width;
+            y = (width * videoHeight * sarDen) / (videoWidth * sarNum);
+        }
+    }
 
-	[EAGLContext setCurrentContext:_context];
-	glViewport((width - x) / 2, (height - y) / 2, x, y);
+    [EAGLContext setCurrentContext:_context];
+    glViewport((width - x) / 2, (height - y) / 2, x, y);
 }
 
 - (void)_destroyFramebuffer {
-	[EAGLContext setCurrentContext:_context];
-	glDeleteFramebuffersOES(1, &_defaultFramebuffer);
-	_defaultFramebuffer = 0;
-	glDeleteRenderbuffersOES(1, &_colorRenderbuffer);
-	_colorRenderbuffer = 0;
+    [EAGLContext setCurrentContext:_context];
+    glDeleteFramebuffersOES(1, &_defaultFramebuffer);
+    _defaultFramebuffer = 0;
+    glDeleteRenderbuffersOES(1, &_colorRenderbuffer);
+    _colorRenderbuffer = 0;
 }
 @end
 
