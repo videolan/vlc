@@ -89,6 +89,10 @@ done
 shift $(($OPTIND - 1))
 
 if [ "x$1" != "x" ]; then
+    error "Fallback to old command line switch, use the -t option now"
+    TARGET="$1"
+fi
+if [ "x$2" != "x" ]; then
     usage
     exit 1
 fi
