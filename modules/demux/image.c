@@ -104,7 +104,7 @@ struct demux_sys_t
     bool        is_realtime;
     mtime_t     pts_origin;
     mtime_t     pts_next;
-	date_t		pts;
+    date_t        pts;
 };
 
 static block_t *Load(demux_t *demux)
@@ -218,7 +218,7 @@ static int Control(demux_t *demux, int query, va_list args)
 {
     demux_sys_t *sys = demux->p_sys;
 
-	switch (query) {
+    switch (query) {
     case DEMUX_GET_POSITION: {
         double *position = va_arg(args, double *);
         if (sys->duration > 0)
@@ -267,9 +267,9 @@ static int Control(demux_t *demux, int query, va_list args)
     case DEMUX_GET_META:
     case DEMUX_HAS_UNSUPPORTED_META:
     case DEMUX_GET_ATTACHMENTS:
-	default:
-		return VLC_EGENERIC;
-	}
+    default:
+        return VLC_EGENERIC;
+    }
 }
 
 static bool IsBmp(stream_t *s)
