@@ -259,8 +259,6 @@ static int Open( vlc_object_t *p_this )
         goto failed;
     }
 
-    free( psz_src );
-
     if( var_InheritBool( p_intf, "http-album-art" ) )
     {
         /* FIXME: we're leaking h */
@@ -277,6 +275,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->p_art_handler = h->p_handler;
     }
 
+    free( psz_src );
     return VLC_SUCCESS;
 
 failed:
