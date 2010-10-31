@@ -38,10 +38,12 @@ all: $(TARGETALL)
 
 using-src:
 	$(MAKE) -C build-src
-	#Copy aclocal files
-	# This is necessary for --missing aclocal to succeed after a
-	# configure.ac/Makefile.am change in the vlc root dir
-	cp -R $(PREFIX)/share/aclocal/* $(VLCROOTDIR)/m4
+# Copy aclocal files
+# This is necessary for --missing aclocal to succeed after a
+# configure.ac/Makefile.am change in the vlc root dir
+	if test -e "$(PREFIX)/share/aclocal"; then \
+	    cp -Rf $(PREFIX)/share/aclocal/* $(VLCROOTDIR)/m4; \
+	fi
 
 ifdef HAVE_DARWIN_10
 	(cd $(PREFIX)/lib && sed -e 's%/usr/lib/libiconv.la%$(PREFIX)/lib/libiconv.la%g' -i.orig *.la && rm -f *.la.orig)
