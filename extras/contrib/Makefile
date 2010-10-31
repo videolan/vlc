@@ -1,1 +1,0 @@
-/Users/steg/Sources/vlc/extras/contrib/contrib.mak
