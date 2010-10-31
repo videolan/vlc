@@ -126,7 +126,6 @@ src/libvlc.c
 src/libvlc.h
 src/libvlc-module.c
 src/misc/action.c
-src/misc/beos_specific.cpp
 src/misc/block.c
 src/misc/cpu.c
 src/misc/darwin_specific.c
@@ -265,7 +264,6 @@ modules/access/rtsp/real_sdpplin.c
 modules/access/rtsp/real_sdpplin.h
 modules/access/rtsp/rtsp.c
 modules/access/rtsp/rtsp.h
-modules/access/screen/beos.cpp
 modules/access/screen/mac.c
 modules/access/screen/screen.c
 modules/access/screen/screen.h

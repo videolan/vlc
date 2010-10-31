@@ -26,7 +26,7 @@
 #include <vlc_access.h>
 #include <vlc_demux.h>
 
-#if !defined( HAVE_BEOS ) && !defined( HAVE_DARWIN )
+#if !defined( HAVE_DARWIN )
 #   define SCREEN_SUBSCREEN
 #   define SCREEN_MOUSE
 #endif

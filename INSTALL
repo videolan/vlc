@@ -1,6 +1,6 @@
 INSTALL file for the VLC media player
 
-More extensive information for *nix, Windows, Mac OS X and BeOS users can be
+More extensive information for *nix, Windows and Mac OS X users can be
 found here: http://developers.videolan.org/vlc/
 
 Bootstrapping VLC
@@ -25,8 +25,8 @@ symbols:
 
 We recommend using GCC to build VLC, though some people reported success
 with the Intel C compiler (version 8) as well. GCC version 3.3 or higher is
-required. On older systems (e.g. FreeBSD 4.x, BeOS), please select a more
-recent version manually by setting the CC and CXX environment variables
+required. On older systems (e.g. FreeBSD 4.x), please select a more recent
+version manually by setting the CC and CXX environment variables
 appropriately while running the ./configure shell script.
 
 

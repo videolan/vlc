@@ -57,9 +57,6 @@
 #ifdef __APPLE__
 #define DEFAULT_FONT "/Library/Fonts/Arial Black.ttf"
 #define FC_DEFAULT_FONT "Arial Black"
-#elif defined( SYS_BEOS )
-#define DEFAULT_FONT "/boot/beos/etc/fonts/ttfonts/Swiss721.ttf"
-#define FC_DEFAULT_FONT "Swiss"
 #elif defined( WIN32 )
 #define DEFAULT_FONT "" /* Default font found at run-time */
 #define FC_DEFAULT_FONT "Arial"

@@ -673,7 +673,6 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
         if (fd == -1)
             continue;
 
-#if !defined( SYS_BEOS )
         /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s)
         * to avoid packet loss caused by scheduling problems */
         setsockopt (fd, SOL_SOCKET, SO_RCVBUF, &(int){ 0x80000 }, sizeof (int));
@@ -681,7 +680,6 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
 
         /* Allow broadcast sending */
         setsockopt (fd, SOL_SOCKET, SO_BROADCAST, &(int){ 1 }, sizeof (int));
-#endif
 
         if( i_hlim >= 0 )
             net_SetMcastHopLimit( p_this, fd, ptr->ai_family, i_hlim );

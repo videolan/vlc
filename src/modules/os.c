@@ -42,10 +42,6 @@
 
 #if !defined(HAVE_DYNAMIC_PLUGINS)
     /* no support for plugins */
-#elif defined(HAVE_DL_BEOS)
-#   if defined(HAVE_IMAGE_H)
-#       include <image.h>
-#   endif
 #elif defined(__APPLE__)
 #   include <dlfcn.h>
 #elif defined(HAVE_DL_WINDOWS)
@@ -95,10 +91,7 @@ int module_Call( vlc_object_t *obj, module_t *p_module )
 
     if( pf_symbol == NULL )
     {
-#if defined(HAVE_DL_BEOS)
-        msg_Warn( obj, "cannot find symbol \"%s\" in file `%s'",
-                  psz_name, p_module->psz_filename );
-#elif defined(HAVE_DL_WINDOWS)
+#if defined(HAVE_DL_WINDOWS)
         char *psz_error = GetWindowsError();
         msg_Warn( obj, "cannot find symbol \"%s\" in file `%s' (%s)",
                   psz_name, p_module->psz_filename, psz_error );
@@ -142,15 +135,7 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
 {
     module_handle_t handle;
 
-#if defined(HAVE_DL_BEOS)
-    handle = load_add_on( psz_file );
-    if( handle < 0 )
-    {
-        msg_Warn( p_this, "cannot load module `%s'", psz_file );
-        return -1;
-    }
-
-#elif defined(HAVE_DL_WINDOWS)
+#if defined(HAVE_DL_WINDOWS)
     wchar_t psz_wfile[MAX_PATH];
     MultiByteToWideChar( CP_UTF8, 0, psz_file, -1, psz_wfile, MAX_PATH );
 
@@ -222,10 +207,7 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
  */
 void module_Unload( module_handle_t handle )
 {
-#if defined(HAVE_DL_BEOS)
-    unload_add_on( handle );
-
-#elif defined(HAVE_DL_WINDOWS)
+#if defined(HAVE_DL_WINDOWS)
     FreeLibrary( handle );
 
 #elif defined(HAVE_DL_DLOPEN)
@@ -255,19 +237,7 @@ void module_Unload( module_handle_t handle )
  */
 static void *module_Lookup( module_handle_t handle, const char *psz_function )
 {
-#if defined(HAVE_DL_BEOS)
-    void * p_symbol;
-    if( B_OK == get_image_symbol( handle, psz_function,
-                                  B_SYMBOL_TYPE_TEXT, &p_symbol ) )
-    {
-        return p_symbol;
-    }
-    else
-    {
-        return NULL;
-    }
-
-#elif defined(HAVE_DL_WINDOWS) && defined(UNDER_CE)
+#if defined(HAVE_DL_WINDOWS) && defined(UNDER_CE)
     wchar_t wide[strlen( psz_function ) + 1];
     size_t i = 0;
     do

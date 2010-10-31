@@ -110,8 +110,6 @@ resume:
 	 * FD_SETSIZE in terms of absolute value - they are not POSIX file
 	 * descriptors. From Vista, there is a much nicer WSAPoll(), but Mingw
 	 * is yet to support it.
-	 *
-	 * With BeOS, the situation is unknown (FIXME: document).
 	 */
         if (fds[i].events & POLLIN)
             FD_SET (fd, &rdset);

@@ -352,32 +352,6 @@ doc:
 
 .PHONY: libvlc core doc
 
-if HAVE_BEOS
-noinst_DATA = vlc-bundle
-vlc-bundle: vlc
-	rm -Rf $(top_builddir)/vlc-bundle ; mkdir -p $(top_builddir)/vlc-bundle
-	cp $(top_builddir)/vlc $(top_builddir)/vlc-bundle/
-	xres -o $(top_builddir)/vlc-bundle/vlc $(srcdir)/share/vlc_beos.rsrc
-	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
-	  if test -n "$$i" ; then \
-	    mkdir -p $(top_builddir)/vlc-bundle/plugins ; \
-	    cp "$$i$(LIBEXT)" $(top_builddir)/vlc-bundle/plugins/ ; \
-	  fi ; \
-	done
-	if test -d $(CONTRIB_DIR)/vlc-lib ; then \
-	  mkdir -p $(top_builddir)/vlc-bundle/lib ; \
-	  for i in $(CONTRIB_DIR)/vlc-lib/*.so ; do \
-	    cp $$i $(top_builddir)/vlc-bundle/lib/ ; \
-	  done ; \
-	fi
-	cat $(top_srcdir)/po/LINGUAS | while read i; do \
-	  mkdir -p "$(top_builddir)/vlc-bundle/share/locale/$$i/LC_MESSAGES" ; \
-	  cp "$(top_builddir)/po/$$i.gmo" \
-	    "$(top_builddir)/vlc-bundle/share/locale/$$i/LC_MESSAGES/vlc.mo" || true ; \
-	done
-	find $(top_builddir)/vlc-bundle -type f -exec mimeset -f "{}" \;
-endif
-
 ###############################################################################
 # Building aliases
 ###############################################################################

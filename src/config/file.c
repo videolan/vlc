@@ -84,7 +84,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
                  psz_filename );
 
     }
-#if !( defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS) )
+#if !( defined(WIN32) || defined(__APPLE__) )
     else if( p_stream == NULL && errno == ENOENT )
     {
         /* This is the fallback for pre XDG Base Directory

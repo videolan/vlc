@@ -1,12 +1,8 @@
 if HAVE_WIN32
 screen_extra = win32.c
 else
-if HAVE_BEOS
-screen_extra = beos.cpp
-else
 if HAVE_DARWIN
 screen_extra = mac.c
-endif
 endif
 endif
 SOURCES_screen = \

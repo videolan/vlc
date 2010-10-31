@@ -7,7 +7,6 @@ SUBDIRS = . test
 
 NULL =
 EXTRA_DIST = extras/COPYING \
-	misc/beos_specific.cpp \
 	libvlc.pc.in \
 	vlc-plugin.pc.in \
 	libvlc.sym \
@@ -236,7 +235,6 @@ endif
 
 
 EXTRA_libvlccore_la_SOURCES = \
-	$(SOURCES_libvlc_beos) \
 	$(SOURCES_libvlc_darwin) \
 	$(SOURCES_libvlc_linux) \
 	$(SOURCES_libvlc_win32) \
@@ -245,9 +243,6 @@ EXTRA_libvlccore_la_SOURCES = \
 	$(SOURCES_libvlc_sout) \
 	$(SOURCES_libvlc_vlm) \
 	$(NULL)
-if HAVE_BEOS
-libvlccore_la_SOURCES += $(SOURCES_libvlc_beos)
-else
 if HAVE_DARWIN
 libvlccore_la_SOURCES += $(SOURCES_libvlc_darwin)
 else
@@ -265,7 +260,6 @@ endif
 endif
 endif
 endif
-endif
 if BUILD_HTTPD
 libvlccore_la_SOURCES += $(SOURCES_libvlc_httpd)
 endif
@@ -275,11 +269,6 @@ if ENABLE_VLM
 libvlccore_la_SOURCES += $(SOURCES_libvlc_vlm)
 endif
 endif
-
-SOURCES_libvlc_beos = \
-	misc/atomic.c \
-	misc/pthread.c \
-	$(NULL)
 
 SOURCES_libvlc_darwin = \
 	config/dirs_macos.c \
@@ -492,7 +481,6 @@ SOURCES_libvlc_vlm = \
 
 SOURCES_libvlc = \
 	$(SOURCES_libvlc_common) \
-	$(OPT_SOURCES_libvlc_beos) \
 	$(OPT_SOURCES_libvlc_darwin) \
 	$(OPT_SOURCES_libvlc_win32) \
 	$(NULL)

@@ -138,9 +138,6 @@ AS_IF([test "${with_contrib}" != "no"],[
     if test "${SYS}" = "darwin"; then
       export LD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$LD_LIBRARY_PATH"
       export DYLD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$DYLD_LIBRARY_PATH"
-    elif test "${SYS}" = "beos"; then
-      export LIBRARY_PATH="${CONTRIB_DIR}/lib:$LIBRARY_PATH"
-      export BELIBRARIES="${CONTRIB_DIR}/lib:$BELIBRARIES"
     fi
   ],[
     AC_MSG_RESULT([no])
@@ -362,27 +359,10 @@ case "${host_os}" in
   hpux*)
     SYS=hpux
     ;;
-  beos)
-    SYS=beos
-    CFLAGS_save="${CFLAGS_save} -Wno-multichar"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar"; CXXFLAGS="${CXXFLAGS_save}"
-    VLC_ADD_CXXFLAGS([beos],[])
-    VLC_ADD_LIBS([vlc libvlccore logger],[-lbe])
-    VLC_ADD_LIBS([dvdnav dvdread],[-ldl])
-    VLC_ADD_LIBS([filesystem],[-lpoll])
-    LDFLAGS_save="${LDFLAGS_save} -lintl"; LDFLAGS="${LDFLAGS_save}"
-    dnl Check for BONE
-    if test -f /boot/beos/system/lib/libbind.so; then
-        VLC_ADD_LIBS([filesystem access_ftp access_mms access_output_udp netsync sap libvlccore growl_udp],[-lbind -lsocket])
-    else
-        VLC_ADD_LIBS([filesystem access_ftp access_mms access_output_udp netsync sap libvlccore growl_udp],[-lnet])
-    fi
-    ;;
   *)
     SYS="${host_os}"
     ;;
 esac
-AM_CONDITIONAL(HAVE_BEOS, test "${SYS}" = "beos")
 AM_CONDITIONAL(HAVE_DARWIN, test "${SYS}" = "darwin")
 AM_CONDITIONAL(HAVE_LINUX, [test "${SYS}" = "linux"])
 AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
@@ -722,14 +702,6 @@ if test "${ac_cv_have_plugins}" = "no"; then
   fi
 fi
 
-# BeOS style
-if test "${ac_cv_have_plugins}" = "no"; then
-  AC_CHECK_HEADERS(image.h)
-  AC_CHECK_FUNCS(load_add_on,
-   [AC_DEFINE(HAVE_DL_BEOS, 1, [Define if you have the BeOS dl])
-    ac_cv_have_plugins=yes])
-fi
-
 # Only test for dlopen() if the others didn't work
 LIBDL=""
 if test "${ac_cv_have_plugins}" = "no" -o "${SYS}" = "darwin"; then
@@ -1043,16 +1015,12 @@ if test "${ac_cv_c_fast_math}" != "no"; then
 fi
 
 dnl Check for -funroll-loops
-dnl Disabled on BeOS because BeOS' gcc is buggy and may crash with it
-if test "${SYS}" != "beos"
-then
-  AC_CACHE_CHECK([if \$CC accepts -funroll-loops],
-      [ac_cv_c_unroll_loops],
-      [CFLAGS="${CFLAGS_save} -funroll-loops"
-       AC_TRY_COMPILE([],,ac_cv_c_unroll_loops=yes, ac_cv_c_unroll_loops=no)])
-  if test "${ac_cv_c_unroll_loops}" != "no"; then
-      CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -funroll-loops"
-  fi
+AC_CACHE_CHECK([if \$CC accepts -funroll-loops],
+    [ac_cv_c_unroll_loops],
+    [CFLAGS="${CFLAGS_save} -funroll-loops"
+     AC_TRY_COMPILE([],,ac_cv_c_unroll_loops=yes, ac_cv_c_unroll_loops=no)])
+if test "${ac_cv_c_unroll_loops}" != "no"; then
+    CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -funroll-loops"
 fi
 
 dnl Check for -fomit-frame-pointer
@@ -1859,7 +1827,7 @@ dnl
 dnl dvdread module: check for libdvdread
 dnl
 dnl prepend -ldvdcss on OS that need it
-AS_CASE(["${SYS}"], [mingw32|darwin|beos], [VLC_ADD_LIBS([dvdread], [-ldvdcss])])
+AS_CASE(["${SYS}"], [mingw32|darwin], [VLC_ADD_LIBS([dvdread], [-ldvdcss])])
 PKG_ENABLE_MODULES_VLC([DVDREAD], [], [dvdread], [dvdread input module], [auto])
 
 dnl
@@ -1870,7 +1838,7 @@ AC_ARG_ENABLE(dvdnav,
 if test "${enable_dvdnav}" != "no"
 then
   dnl prepend -ldvdcss on OS that need it
-  AS_CASE(["${SYS}"], [mingw32|darwin|beos], [VLC_ADD_LIBS([dvdnav], [-ldvdcss])])
+  AS_CASE(["${SYS}"], [mingw32|darwin], [VLC_ADD_LIBS([dvdnav], [-ldvdcss])])
 
   DVDNAV_PATH="${PATH}"
   AC_ARG_WITH(dvdnav-config-path,
@@ -2295,10 +2263,6 @@ if test "${enable_screen}" != "no"; then
     VLC_ADD_LIBS([screen],[-lgdi32])
   elif test "${SYS}" = "mingwce"; then
     CPPFLAGS="${CPPFLAGS_save}"
-  elif test "${SYS}" = "beos"; then
-    VLC_ADD_PLUGIN([screen])
-    VLC_ADD_CXXFLAGS([screen],[])
-    VLC_ADD_LIBS([screen],[-lbe])
   fi
 fi
 
@@ -3681,9 +3645,9 @@ dnl Skins2 module
 dnl
 AC_ARG_ENABLE(skins2,
   [AS_HELP_STRING([--enable-skins2],[Skins2 interface module (default
-   enabled except on MacOSX, BeOS and WinCE)])])
+   enabled except on MacOSX and WinCE)])])
 if test "${enable_skins2}" != "no" ||
-  (test "${SYS}" != "darwin" && test "${SYS}" != "beos" &&
+  (test "${SYS}" != "darwin" &&
    test "${SYS}" != "mingwce" && test "${enable_skins2}" == "yes"); then
 
   dnl test for the required libraries
@@ -3721,7 +3685,7 @@ if test "${enable_skins2}" != "no" ||
   fi fi fi
 fi
 AM_CONDITIONAL(BUILD_SKINS, [test "${enable_skins2}" = "yes" ||
-	 (test "${SYS}" != "darwin" && test "${SYS}" != "beos" &&
+	 (test "${SYS}" != "darwin" &&
 	  test "${SYS}" != "mingwce" && test "${enable_skins2}" != "no")])
 
 dnl

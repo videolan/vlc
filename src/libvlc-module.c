@@ -2091,13 +2091,12 @@ vlc_module_begin ()
 
     add_obsolete_bool( "auto-adjust-pts-delay" )
 
-#if !defined(__APPLE__) && !defined(SYS_BEOS) && defined(LIBVLC_USE_PTHREAD)
+#ifdef LIBVLC_USE_PTHREAD
+# ifndef __APPLE__
     add_bool( "rt-priority", false, RT_PRIORITY_TEXT,
               RT_PRIORITY_LONGTEXT, true )
         change_need_restart ()
-#endif
-
-#if !defined(SYS_BEOS) && defined(LIBVLC_USE_PTHREAD)
+# endif
     add_integer( "rt-offset", 0, RT_OFFSET_TEXT,
                  RT_OFFSET_LONGTEXT, true )
         change_need_restart ()

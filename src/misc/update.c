@@ -78,8 +78,6 @@
 #   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-ce"
 #elif defined( WIN32 )
 #   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-win-x86"
-#elif defined( SYS_BEOS )
-#       define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-beos-x86"
 #else
 #   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status"
 #endif

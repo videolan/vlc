@@ -32,14 +32,6 @@
   - Put the relevant win32 contrib package
   - Update developers.v.o/vlc and www.v.o/vlc/download-sources.html
 
- * BeOS Packages
-    Information on building: http://developers.videolan.org/vlc/beos-compile.html
-    Configure with --enable-update-check
-    Build in the "buildbeos" chroot on altair.
-    # add the .zip files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/beos/
-    generate md5 plus SHA1 hashes and gpg signature of these files
-    (c.f. Tarballs)
-
  * Win32 Packages
     make the packages using the nightly builds configure/options/... , don't
      forget --enable-update-check

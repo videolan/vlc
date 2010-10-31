@@ -41,11 +41,6 @@ if test -d extras/contrib/build/bin; then
     DYLD_LIBRARY_PATH=./extras/contrib/build/lib:$DYLD_LIBRARY_PATH
     export LD_LIBRARY_PATH
     export DYLD_LIBRARY_PATH
-  elif test ".`uname -s`" = ".BeOS"; then
-    LIBRARY_PATH=./extras/contrib/build/lib:$LIBRARY_PATH
-    BELIBRARIES=./extras/contrib/build/lib:$BELIBRARIES
-    export LIBRARY_PATH
-    export BELIBRARIES
   fi
 elif test ".`uname -s`" = ".Darwin"; then
   set +x

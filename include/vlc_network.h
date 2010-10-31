@@ -70,8 +70,6 @@ struct msghdr
 #   endif
 #   ifdef HAVE_ARPA_INET_H
 #      include <arpa/inet.h>
-#   elif defined( SYS_BEOS )
-#      include <net/netdb.h>
 #   endif
 #   include <netdb.h>
 #   define net_errno errno

@@ -59,8 +59,7 @@ endif
 DIST_rsrc = \
 	newres.h \
 	resource.h \
-	vlc_wince_rc.rc \
-	vlc_beos.rsrc
+	vlc_wince_rc.rc
 
 DIST_skins2 = \
 	skins2/fonts/FreeSans.ttf \
