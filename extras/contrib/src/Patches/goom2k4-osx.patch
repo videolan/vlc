@@ -1,5 +1,5 @@
---- goom/configure.in.orig	2010-10-31 22:39:19.000000000 +0100
-+++ goom/configure.in	2010-10-31 22:39:26.000000000 +0100
+--- goom/configure.in.orig	2010-11-01 00:05:11.000000000 +0100
++++ goom/configure.in	2010-11-01 00:05:16.000000000 +0100
 @@ -43,8 +43,6 @@
  dnl HOST
  case "$host" in
