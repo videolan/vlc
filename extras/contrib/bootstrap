@@ -126,8 +126,8 @@ ln -sf "`pwd`/contrib.mak" "${BUILDDIR}/Makefile"
 # Create the 'build-src' folder to build from source
 mkdir -p "${BUILDDIR}/build-src"
 ln -sf "`pwd`/src/contrib-src.mak" "${BUILDDIR}/build-src/Makefile"
-ln -sf "`pwd`/src/packages.mak" "${BUILDDIR}/build-src/packages.mak"
-ln -sf "`pwd`/src/Patches" "${BUILDDIR}/build-src/Patches"
+ln -sf "`pwd`/src/packages.mak" "${BUILDDIR}/build-src/"
+ln -sf "`pwd`/src/Patches" "${BUILDDIR}/build-src/"
 
 # Create config.mak
 config_mak="${BUILDDIR}/config.mak"
