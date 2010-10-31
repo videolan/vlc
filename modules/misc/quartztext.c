@@ -36,11 +36,17 @@
 #include <vlc_xml.h>
 #include <vlc_input.h>
 
+#include <Availability.h>
+#include <CoreText/CoreText.h>
+#include <CoreGraphics/CoreGraphics.h>
+
+#if !TARGET_OS_IPHONE
 // Fix ourselves ColorSync headers that gets included in ApplicationServices.
 #define DisposeCMProfileIterateUPP(a) DisposeCMProfileIterateUPP(CMProfileIterateUPP userUPP __attribute__((unused)))
 #define DisposeCMMIterateUPP(a) DisposeCMMIterateUPP(CMProfileIterateUPP userUPP __attribute__((unused)))
 #define __MACHINEEXCEPTIONS__
 #include <ApplicationServices/ApplicationServices.h>
+#endif
 
 #define DEFAULT_FONT           "Arial Black"
 #define DEFAULT_FONT_COLOR     0xffffff
@@ -165,8 +171,10 @@ struct filter_sys_t
     int            i_font_color;
     int            i_font_size;
 
+#if !TARGET_OS_IPHONE
     ATSFontContainerRef    *p_fonts;
     int                     i_fonts;
+#endif
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -191,8 +199,10 @@ static int Create( vlc_object_t *p_this )
     p_filter->pf_render_text = RenderText;
     p_filter->pf_render_html = RenderHtml;
 
+#if !TARGET_OS_IPHONE
     p_sys->p_fonts = NULL;
     p_sys->i_fonts = 0;
+#endif
 
     LoadFontsFromAttachments( p_filter );
 
@@ -208,7 +218,7 @@ static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
-
+#if !TARGET_OS_IPHONE
     if( p_sys->p_fonts )
     {
         int   k;
@@ -220,7 +230,7 @@ static void Destroy( vlc_object_t *p_this )
 
         free( p_sys->p_fonts );
     }
-
+#endif
     free( p_sys->psz_font_name );
     free( p_sys );
 }
@@ -231,6 +241,10 @@ static void Destroy( vlc_object_t *p_this )
 //////////////////////////////////////////////////////////////////////////////
 static int LoadFontsFromAttachments( filter_t *p_filter )
 {
+#if TARGET_OS_IPHONE
+    VLC_UNUSED(p_filter);
+    return VLC_SUCCESS;
+#else
     filter_sys_t         *p_sys = p_filter->p_sys;
     input_attachment_t  **pp_attachments;
     int                   i_attachments_cnt;
@@ -267,8 +281,8 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
         vlc_input_attachment_Delete( p_attach );
     }
     free( pp_attachments );
-
     return VLC_SUCCESS;
+#endif
 }
 
 static char *EliminateCRLF( char *psz_string )
@@ -541,7 +555,7 @@ static void setFontAttibutes( char *psz_fontname, int i_font_size, uint32_t i_fo
 {
     CFStringRef p_cfString;
     CTFontRef   p_font;
-    
+
     // Handle font name and size
     p_cfString = CFStringCreateWithCString( NULL,
                                             psz_fontname,
@@ -881,7 +895,7 @@ static CGContextRef CreateOffScreenContext( int i_width, int i_height,
 
         p_bitmap->p_data = calloc( i_height, p_bitmap->i_bytesPerRow );
 
-        *pp_colorSpace = CGColorSpaceCreateWithName( kCGColorSpaceGenericRGB );
+        *pp_colorSpace = CGColorSpaceCreateDeviceRGB();
 
         if( p_bitmap->p_data && *pp_colorSpace )
         {
