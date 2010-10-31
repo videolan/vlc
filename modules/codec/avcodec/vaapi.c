@@ -27,7 +27,6 @@
 
 #include <vlc_common.h>
 #include <vlc_fourcc.h>
-#include <vlc_xlib.h>
 #include <assert.h>
 
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H
@@ -43,6 +42,8 @@
 #include "copy.h"
 
 #ifdef HAVE_AVCODEC_VAAPI
+
+#include <vlc_xlib.h>
 
 #include <libavcodec/vaapi.h>
 
