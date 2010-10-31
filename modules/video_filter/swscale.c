@@ -405,8 +405,10 @@ static int Init( filter_t *p_filter )
         p_sys->p_src_e = picture_New( p_fmti->i_chroma, i_fmti_width, p_fmti->i_height, 0, 1 );
         p_sys->p_dst_e = picture_New( p_fmto->i_chroma, i_fmto_width, p_fmto->i_height, 0, 1 );
 
-        memset( p_sys->p_src_e->p[0].p_pixels, 0, p_sys->p_src_e->p[0].i_pitch * p_sys->p_src_e->p[0].i_lines );
-        memset( p_sys->p_dst_e->p[0].p_pixels, 0, p_sys->p_dst_e->p[0].i_pitch * p_sys->p_dst_e->p[0].i_lines );
+        if( p_sys->p_src_e )
+            memset( p_sys->p_src_e->p[0].p_pixels, 0, p_sys->p_src_e->p[0].i_pitch * p_sys->p_src_e->p[0].i_lines );
+        if( p_sys->p_dst_e )
+            memset( p_sys->p_dst_e->p[0].p_pixels, 0, p_sys->p_dst_e->p[0].i_pitch * p_sys->p_dst_e->p[0].i_lines );
     }
 
     if( !p_sys->ctx ||
