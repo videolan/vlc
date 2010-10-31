@@ -2715,7 +2715,7 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
 /* */
 static const char *MP4_ConvertMacCode( uint16_t i_code )
 {
-    static const struct { const char *psz_iso639_1; uint16_t i_code; } p_cvt[] = {
+    static const struct { const char psz_iso639_1[3]; uint16_t i_code; } p_cvt[] = {
         { "en",   0 }, { "fr",   1 }, { "de",   2 }, { "it",   3 }, { "nl",   4 },
         { "sv",   5 }, { "es",   6 }, { "da",   7 }, { "pt",   8 }, { "no",   9 },
         { "he",  10 }, { "ja",  11 }, { "ar",  12 }, { "fi",  13 }, { "el",  14 },
@@ -2742,10 +2742,10 @@ static const char *MP4_ConvertMacCode( uint16_t i_code )
         { "gl", 140 }, { "af", 141 }, { "br", 142 }, { "iu", 143 }, { "gd", 144 },
         { "gv", 145 }, { "ga", 146 }, { "to", 147 }, { "el", 148 },
         /* */
-        { NULL, 0 }
+        { "", 0 }
     };
     int i;
-    for( i = 0; p_cvt[i].psz_iso639_1 != NULL; i++ )
+    for( i = 0; *p_cvt[i].psz_iso639_1; i++ )
     {
         if( p_cvt[i].i_code == i_code )
             return p_cvt[i].psz_iso639_1;
