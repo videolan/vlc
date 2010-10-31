@@ -24,16 +24,22 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 # ***************************************************************************
 
-if test "$#" -gt "2" -o "$1" = "-h" -o "$1" = "--help" ; then
-    echo "Usage: $0 [target [distro]]" >&2
-    echo "  Prepare config.mak and distro.mak file." >&2
-    exit 1
-fi
-
 LANG=C
 export LANG
 set -e
 set +x
+
+usage()
+{
+cat << EOF
+usage: $0 [-t target] [-d distro]
+
+OPTIONS:
+   -t      Force target
+   -d      Force distro
+   -h      Help
+EOF
+}
 
 add_makefile_cfg()
 {
@@ -63,18 +69,31 @@ ensure_macosx_sdk_presence()
 DISTRO=
 BUILDDIR=.
 
+while getopts “ht:d:” OPTION
+do
+     case $OPTION in
+         h)
+             usage
+             exit 1
+             ;;
+         t)
+             TARGET=$OPTARG
+             ;;
+         d)
+             DISTRO=$OPTARG
+             ;;
+         ?)
+             usage
+             exit
+             ;;
+     esac
+done
+
 BUILD=`gcc -dumpmachine`
 
-if test "$#" -ge "1"; then
-    TARGET="$1"
-else
+if test "x$TARGET" = "x"; then
+    info "No target specified, using '$BUILD'"
     TARGET="$BUILD"
-fi
-
-if test "$#" = "2"; then
-    info "Forcing distro.mak to use $2.mak"
-    DISTRO="$2"
-    TARGET="$1"
 fi
 
 config_mak="${BUILDDIR}/config.mak"
