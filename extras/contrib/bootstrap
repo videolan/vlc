@@ -112,6 +112,7 @@ fi
 # Make sure prefix is absolute and existing
 mkdir -p "${PREFIX}"
 PREFIX=`cd "${PREFIX}" && pwd`
+mkdir -p "${PREFIX}/share/aclocal" # aclocal needs this dir to exist
 
 #
 # Set up build dir
