@@ -199,10 +199,11 @@ char * libvlc_audio_output_device_longname( libvlc_instance_t *p_instance,
                 VLC_OBJECT( p_instance->p_libvlc_int ), psz_config_name, val, val, NULL );
             free( val.psz_string );
         }
-        free( psz_config_name );
 
         if( i_device >= 0 && i_device < p_module_config->i_list )
         {
+            free( psz_config_name );
+
             if( p_module_config->ppsz_list_text[i_device] )
                 return strdup( p_module_config->ppsz_list_text[i_device] );
             else
@@ -242,11 +243,12 @@ char * libvlc_audio_output_device_id( libvlc_instance_t *p_instance,
                 VLC_OBJECT( p_instance->p_libvlc_int ), psz_config_name, val, val, NULL );
             free( val.psz_string );
         }
-        free( psz_config_name );
 
         if( i_device >= 0 && i_device < p_module_config->i_list )
+        {
+            free( psz_config_name );
             return strdup( p_module_config->ppsz_list[i_device] );
-
+        }
     }
 
     free( psz_config_name );
