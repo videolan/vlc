@@ -1553,11 +1553,8 @@ static void PIDInit( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner )
         if( !b_old_valid )
         {
             pid->psi = xmalloc( sizeof( ts_psi_t ) );
-            if( pid->psi )
-            {
-                pid->psi->handle = NULL;
-                TAB_INIT( pid->psi->i_prg, pid->psi->prg );
-            }
+            pid->psi->handle = NULL;
+            TAB_INIT( pid->psi->i_prg, pid->psi->prg );
         }
         assert( pid->psi );
 
