@@ -135,6 +135,41 @@ const char *libvlc_printerr (const char *fmt, ...);
 VLC_PUBLIC_API libvlc_instance_t *
 libvlc_new( int argc , const char *const *argv );
 
+
+/**
+ * \return a static entry point for a module, suitable for passing to
+ * libvlc_new_with_builtins. This is to be used when you want to statically
+ * link to a module.
+ *
+ * Note, statically linking to a module will results in nearly zero speed gain
+ * and increased memory usage. Use with caution.
+ */
+
+#define vlc_plugin(module) & vlc_plugin_entry(module)
+
+#define vlc_plugin_entry(module) vlc_entry__ ## module
+#define vlc_declare_plugin(module) extern void *vlc_plugin_entry(module);
+
+/**
+ * Create and initialize a libvlc instance.
+ *
+ * \param argc the number of arguments
+ * \param argv command-line-type arguments
+ * \param builtins a NULL terminated array of \see vlc_plugin.
+ * \return the libvlc instance or NULL in case of error
+ * @begincode
+ * {
+ *     vlc_declare_plugin(mp4);
+ *     vlc_declare_plugin(dummy);
+ *     const void **builtins = { vlc_plugin(mp4), vlc_plugin(dummy), NULL };
+ *     libvlc_instance_t *vlc = libvlc_new_with_builtins(argc, argv, builtins);
+ * }
+ * @endcode
+ */
+VLC_PUBLIC_API libvlc_instance_t *
+libvlc_new_with_builtins( int argc , const char *const *argv, const void **builtins);
+
+
 /**
  * Decrement the reference count of a libvlc instance, and destroy it
  * if it reaches zero.
@@ -264,7 +299,7 @@ typedef int libvlc_event_type_t;
  * \param p_event the event triggering the callback
  */
 typedef void ( *libvlc_callback_t )( const struct libvlc_event_t *, void * );
-    
+
 /**
  * Register for an event notification.
  *

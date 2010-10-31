@@ -13,17 +13,17 @@ CLEANFILES = $(BUILT_SOURCES)
 
 LTLIBVLCCORE = $(top_builddir)/src/libvlccore.la
 
-AM_CFLAGS = `$(VLC_CONFIG) --cflags plugin $@`
-AM_CXXFLAGS = `$(VLC_CONFIG) --cxxflags plugin $@`
-AM_OBJCFLAGS = `$(VLC_CONFIG) --objcflags plugin $@`
+AM_CFLAGS = `$(VLC_CONFIG) --cflags $(VLC_DEFAULT_PLUGIN_TYPE) $@`
+AM_CXXFLAGS = `$(VLC_CONFIG) --cxxflags $(VLC_DEFAULT_PLUGIN_TYPE) $@`
+AM_OBJCFLAGS = `$(VLC_CONFIG) --objcflags $(VLC_DEFAULT_PLUGIN_TYPE) $@`
 AM_LDFLAGS = -rpath '$(libvlcdir)' \
 	-avoid-version -module \
 	-export-symbols-regex ^vlc_entry \
 	-shrext $(LIBEXT) \
 	-rpath "$(libvlcdir)" \
 	-no-undefined \
-	 `$(VLC_CONFIG) --ldflags plugin $@`
-AM_LIBADD = `$(VLC_CONFIG) -libs plugin $@` \
+	 `$(VLC_CONFIG) --ldflags $(VLC_DEFAULT_PLUGIN_TYPE) $@`
+AM_LIBADD = `$(VLC_CONFIG) -libs $(VLC_DEFAULT_PLUGIN_TYPE) $@` \
 	$(LTLIBVLCCORE) $(top_builddir)/compat/libcompat.la
 
 include $(srcdir)/Modules.am

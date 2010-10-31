@@ -411,6 +411,19 @@ AS_IF([test "${enable_shared}" = "no"], [
   AC_MSG_ERROR([VLC is based on plugins. Shared libraries cannot be disabled.])
 ])
 
+AC_ARG_ENABLE(static-modules,
+   [  --enable-static-modules  Allow module to be linked statically. This produces a non working vlc.])  
+AS_IF([test "${enable_static_modules}" = yes], [
+   enable_shared="no"
+   enable_static="yes"
+   VLC_DEFAULT_PLUGIN_TYPE="builtin"
+   echo "*** WARNING: Building modules as static. VLC will not work."
+], [
+   VLC_DEFAULT_PLUGIN_TYPE="plugin"
+])
+
+AC_SUBST(VLC_DEFAULT_PLUGIN_TYPE)
+
 dnl
 dnl Gettext stuff
 dnl
