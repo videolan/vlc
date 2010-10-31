@@ -915,7 +915,11 @@ VPX_TARGET=FIXME
 endif
 endif
 
+ifdef HAVE_DARWIN_OS_ON_INTEL
+.libvpx: libvpx .yasm
+else
 .libvpx: libvpx
+endif
 	(cd $<; CROSS=$(CROSS) ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-install-docs --disable-examples --disable-vp8-decoder && make && make install)
 	(rm -rf $(PREFIX)/include/vpx/ && mkdir -p $(PREFIX)/include/vpx/; cd $< && cp vpx/*.h vpx_ports/*.h $(PREFIX)/include/vpx/) # Of course, why the hell would one expect it to be listed or in make install?
 	rm $(PREFIX)/include/vpx/config.h
