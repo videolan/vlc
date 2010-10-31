@@ -52,10 +52,6 @@
 #define LT_CHROMA N_("Output chroma for the memory image as a 4-character " \
                       "string, eg. \"RV32\".")
 
-#define T_RATIO N_("Preserve aspect ratio")
-#define LT_RATIO N_("Preserve original video image aspect ratio when " \
-                     "rendering to the given video memory buffer.")
-
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
 
@@ -75,7 +71,6 @@ vlc_module_begin()
         change_private()
     add_string("vmem-chroma", "RV16", T_CHROMA, LT_CHROMA, true)
         change_private()
-    add_bool("vmem-preserve-aspect-ratio", true, T_RATIO, LT_RATIO, true)
     add_obsolete_string("vmem-lock") /* obsoleted since 1.1.1 */
     add_obsolete_string("vmem-unlock") /* obsoleted since 1.1.1 */
     add_obsolete_string("vmem-data") /* obsoleted since 1.1.1 */
@@ -88,15 +83,11 @@ vlc_module_end()
  *****************************************************************************/
 struct picture_sys_t {
     vout_display_sys_t *sys;
-    void *original_planes[PICTURE_PLANE_MAX]; /** planes sent by the client */
     void *id;
 };
 
 struct vout_display_sys_t {
     picture_pool_t *pool;
-    vout_display_place_t place;
-    int vmem_pitch;
-    int vmem_width;
     void *(*lock)(void *sys, void **plane);
     void (*unlock)(void *sys, void *id, void *const *plane);
     void (*display)(void *sys, void *id);
@@ -182,27 +173,8 @@ static int Open(vlc_object_t *object)
     sys->display = var_InheritAddress(vd, "vmem-display");
     sys->opaque = var_InheritAddress(vd, "vmem-data");
 
-    sys->vmem_width = fmt.i_width;
-
-    const bool keep_ratio = var_InheritBool(vd, "vmem-preserve-aspect-ratio");
-    if (keep_ratio) {
-        /* place the picture */
-        vout_display_cfg_t place_cfg = *vd->cfg;
-        place_cfg.display.width  = fmt.i_width;
-        place_cfg.display.height = fmt.i_height;
-        vout_display_PlacePicture(&sys->place, &vd->source, &place_cfg, false);
-
-
-        /* Request a slightly different picture */
-        fmt.i_width = vd->sys->place.width;
-        fmt.i_height = vd->sys->place.height;
-    } else {
-        sys->place.width = fmt.i_width;
-        sys->place.height = fmt.i_height;
-    }
-
     /* */
-    sys->vmem_pitch = var_InheritInteger(vd, "vmem-pitch");
+    const int pitch = var_InheritInteger(vd, "vmem-pitch");
     picture_resource_t rsc;
     rsc.p_sys = malloc(sizeof(*rsc.p_sys));
     if(unlikely(!rsc.p_sys)) {
@@ -214,8 +186,8 @@ static int Open(vlc_object_t *object)
     for (int i = 0; i < PICTURE_PLANE_MAX; i++) {
         /* vmem-lock is responsible for the allocation */
         rsc.p[i].p_pixels = NULL;
-        rsc.p[i].i_lines  = sys->place.height;
-        rsc.p[i].i_pitch  = sys->vmem_pitch;
+        rsc.p[i].i_lines  = fmt.i_height;
+        rsc.p[i].i_pitch  = pitch;
     }
     picture_t *picture = picture_NewFromResource(&fmt, &rsc);
     if (!picture) {
@@ -294,7 +266,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
             return VLC_EGENERIC;
         if (cfg->is_fullscreen)
             return VLC_EGENERIC;
-
         return VLC_SUCCESS;
     }
     default:
@@ -315,17 +286,8 @@ static int Lock(picture_t *picture)
 
     picsys->id = sys->lock(sys->opaque, planes);
 
-    const int y = sys->place.y;
-    const int x = sys->place.x;
-    const int pitch = sys->vmem_pitch;
-    const int bbp = pitch / sys->vmem_width;
-
-    for (int i = 0; i < picture->i_planes; i++) {
-        uint8_t *p = planes[i];
-        picsys->original_planes[i] = p;
-        picture->p[i].p_pixels = p + x * bbp + y * pitch;
-        picture->p[i].i_lines = sys->place.height;
-    }
+    for (int i = 0; i < picture->i_planes; i++)
+        picture->p[i].p_pixels = planes[i];
 
     return VLC_SUCCESS;
 }
@@ -338,7 +300,7 @@ static void Unlock(picture_t *picture)
     void *planes[PICTURE_PLANE_MAX];
 
     for (int i = 0; i < picture->i_planes; i++)
-        planes[i] = picsys->original_planes[i];
+        planes[i] = picture->p[i].p_pixels;
 
     if (sys->unlock != NULL)
         sys->unlock(sys->opaque, picsys->id, planes);
