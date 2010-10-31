@@ -57,6 +57,13 @@
 #include <limits.h>
 
 #ifdef __APPLE__
+#include "TargetConditionals.h"
+#if !TARGET_OS_IPHONE
+#define HAVE_MACOS_IOKIT
+#endif
+#endif
+
+#ifdef HAVE_MACOS_IOKIT
 #   include <mach/mach.h>
 #   include <IOKit/IOKitLib.h>
 #   include <CoreFoundation/CFNumber.h>
@@ -1724,7 +1731,7 @@ static int GetiPodID( int64_t *p_ipod_id )
         return 0;
     }
 
-#ifdef __APPLE__
+#ifdef HAVE_MACOS_IOKIT
     CFTypeRef value;
     mach_port_t port;
     io_object_t device;
