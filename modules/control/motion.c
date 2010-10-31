@@ -42,6 +42,13 @@
 #endif
 
 #ifdef __APPLE__
+#include "TargetConditionals.h"
+#if !TARGET_OS_IPHONE
+#define HAVE_MACOS_UNIMOTION
+#endif
+#endif
+
+#ifdef HAVE_MACOS_UNIMOTION
 #include "unimotion.h"
 #endif
 
@@ -52,7 +59,7 @@ struct intf_sys_t
 {
     enum { NO_SENSOR, HDAPS_SENSOR, AMS_SENSOR, APPLESMC_SENSOR,
            UNIMOTION_SENSOR } sensor;
-#ifdef __APPLE__
+#ifdef HAVE_MACOS_UNIMOTION
     enum sms_hardware unimotion_hw;
 #endif
     int i_calibrate;
@@ -144,7 +151,7 @@ int Open ( vlc_object_t *p_this )
             p_intf->p_sys->sensor = NO_SENSOR;
         }
     }
-#ifdef __APPLE__
+#ifdef HAVE_MACOS_UNIMOTION
     else if((p_intf->p_sys->unimotion_hw = detect_sms()))
         p_intf->p_sys->sensor = UNIMOTION_SENSOR;
 #endif
@@ -307,7 +314,7 @@ static int GetOrientation( intf_thread_t *p_intf )
 
         return ( i_x - p_intf->p_sys->i_calibrate ) * 10;
 
-#ifdef __APPLE__
+#ifdef HAVE_MACOS_UNIMOTION
     case UNIMOTION_SENSOR:
         if( read_sms_raw( p_intf->p_sys->unimotion_hw, &i_x, &i_y, &i_z ) )
         {

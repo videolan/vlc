@@ -69,6 +69,13 @@
  */
 
 #ifdef __APPLE__
+#include "TargetConditionals.h"
+#if !TARGET_OS_IPHONE
+#define HAVE_MACOS_UNIMOTION
+#endif
+#endif
+
+#ifdef HAVE_MACOS_UNIMOTION
 
 #include "unimotion.h"
 #include <IOKit/IOKitLib.h>
