@@ -916,7 +916,7 @@ endif
 endif
 
 .libvpx: libvpx
-	(cd $<; CROSS=$(CROSS) ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-examples && make && make install)
+	(cd $<; CROSS=$(CROSS) ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-install-docs --disable-examples && make && make install)
 	(rm -rf $(PREFIX)/include/vpx/ && mkdir -p $(PREFIX)/include/vpx/; cd $< && cp vpx/*.h vpx_ports/*.h $(PREFIX)/include/vpx/) # Of course, why the hell would one expect it to be listed or in make install?
 	rm $(PREFIX)/include/vpx/config.h
 	(cd $<; $(RANLIB) libvpx.a && mkdir -p $(PREFIX)/lib && cp libvpx.a $(PREFIX)/lib/) # Of course, why the hell would one expect it to be listed or in make install?
