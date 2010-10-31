@@ -38,7 +38,7 @@
 #elif USE_OPENGL_ES == 2
 # include <OpenGLES/ES2/gl.h>
 # include <OpenGLES/ES2/glext.h>
-#elif defindef(__APPLE__)
+#elif defined(__APPLE__)
 # define MACOS_OPENGL
 # include <OpenGL/gl.h>
 # include <OpenGL/glext.h>
