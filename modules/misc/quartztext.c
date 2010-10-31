@@ -36,7 +36,7 @@
 #include <vlc_xml.h>
 #include <vlc_input.h>
 
-#include <Availability.h>
+#include <TargetConditionals.h>
 
 #ifdef TARGET_OS_IPHONE
 #include <CoreText/CoreText.h>
