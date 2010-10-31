@@ -418,6 +418,7 @@ QModelIndex PicFlowView::indexAt(const QPoint &) const
 
 QModelIndex PicFlowView::moveCursor(QAbstractItemView::CursorAction action, Qt::KeyboardModifiers)
 {
+    return QModelIndex();
 }
 
 bool PicFlowView::isIndexHidden(const QModelIndex &index) const
