@@ -678,12 +678,9 @@ static demux_index_entry_t *get_bounds_for ( logical_stream_t *p_stream, int64_t
 
         if ( i_frame < i_tframe )
         {
-            if ( pi_pos_lower != NULL )
-            {
-                *pi_pos_lower = idx->i_pagepos;
-                idx = idx->p_next;
-                continue;
-            }
+            *pi_pos_lower = idx->i_pagepos;
+            idx = idx->p_next;
+            continue;
         }
 
         return idx;
