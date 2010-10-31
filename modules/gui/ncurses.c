@@ -181,6 +181,7 @@ struct intf_sys_t
     input_thread_t *p_input;
 
     bool            b_color;
+    bool            b_exit;
 
     int             i_box_type;
     int             i_box_y;            // start of box content
@@ -1200,7 +1201,7 @@ static void FillBox(intf_thread_t *p_intf)
         FillTextBox(p_sys);
 }
 
-static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
+static void Redraw(intf_thread_t *p_intf)
 {
     intf_sys_t *p_sys   = p_intf->p_sys;
     int         box     = p_sys->i_box_type;
@@ -1225,7 +1226,6 @@ static void Redraw(intf_thread_t *p_intf, time_t *t_last_refresh)
         DrawEmptyLine(y++, 1, COLS - 2);
 
     refresh();
-    *t_last_refresh = time(0);
 }
 
 static void ChangePosition(intf_thread_t *p_intf, float increment)
@@ -1606,6 +1606,7 @@ static bool HandleCommonKey(intf_thread_t *p_intf, int key)
     case 'Q':
     case KEY_EXIT:
         libvlc_Quit(p_intf->p_libvlc);
+        p_sys->b_exit = true;           // terminate the main loop
         return false;
 
     case 'h':
@@ -1774,23 +1775,18 @@ static void Run(intf_thread_t *p_intf)
     intf_sys_t    *p_sys = p_intf->p_sys;
     playlist_t    *p_playlist = pl_Get(p_intf);
 
-    time_t t_last_refresh;
     int canc = vlc_savecancel();
-
-    Redraw(p_intf, &t_last_refresh);
 
     var_AddCallback(p_playlist, "intf-change", PlaylistChanged, p_intf);
     var_AddCallback(p_playlist, "playlist-item-append", PlaylistChanged, p_intf);
 
-    while (vlc_object_alive(p_intf))
+    while (vlc_object_alive(p_intf) && !p_sys->b_exit)
     {
-        msleep(INTF_IDLE_SLEEP);
-
         if (!p_sys->p_input)
         {
             p_sys->p_input = playlist_CurrentInput(p_playlist);
             if (p_sys->p_input)
-                Redraw(p_intf, &t_last_refresh);
+                Redraw(p_intf);
         }
         else if (p_sys->p_input->b_dead)
         {
@@ -1798,11 +1794,9 @@ static void Run(intf_thread_t *p_intf)
             p_sys->p_input = NULL;
         }
 
-        while (HandleKey(p_intf))
-            Redraw(p_intf, &t_last_refresh);
-
-        if ((time(0) - t_last_refresh) >= 1)
-            Redraw(p_intf, &t_last_refresh);
+        do
+            Redraw(p_intf);
+        while (HandleKey(p_intf));
     }
     var_DelCallback(p_playlist, "intf-change", PlaylistChanged, p_intf);
     var_DelCallback(p_playlist, "playlist-item-append", PlaylistChanged, p_intf);
@@ -1857,7 +1851,7 @@ static int Open(vlc_object_t *p_this)
     cbreak();               /* Don't echo */
     noecho();               /* Invisible cursor */
     curs_set(0);            /* Non blocking wgetch() */
-    timeout(0);
+    timeout(1000);
     clear();
 
     /* Stop printing errors to the console */
