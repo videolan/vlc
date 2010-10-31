@@ -219,12 +219,6 @@ case $TARGET in
         HAVE_DARWIN_32=1
         SDK_TARGET=10.5
 
-        MIN_LD_VERSION_WITH_TEXT_RELOCATION=81
-        if test `ld -v 2> /dev/stdout | sed -E 's/.*ld64-([0-9]+).*/\1/'` -lt ${MIN_LD_VERSION_WITH_TEXT_RELOCATION}; then
-            error "Your ld version is unable to compile VLC.\nUpdate to Xcode 3.1 or higher."
-            exit 1
-        fi
-
         CFLAGS_TUNING=" -march=prescott -mtune=generic -arch i386 -m32"
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -arch i386 -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
