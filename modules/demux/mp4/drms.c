@@ -58,7 +58,7 @@
 
 #ifdef __APPLE__
 #include "TargetConditionals.h"
-#if !TARGET_OS_IPHONE
+#ifndef TARGET_OS_IPHONE
 #define HAVE_MACOS_IOKIT
 #endif
 #endif
