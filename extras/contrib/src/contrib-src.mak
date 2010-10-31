@@ -1467,15 +1467,13 @@ vcdimager-$(VCDIMAGER_VERSION).tar.gz:
 vcdimager: vcdimager-$(VCDIMAGER_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
+.vcdimager: vcdimager .cdio
 ifdef HAVE_DARWIN_OS
-.vcdimager: vcdimager
 	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static LDFLAGS="$(LDFLAGS) -framework CoreFoundation -framework IOKit" && make && make install)
-	touch $@
 else
-.vcdimager: vcdimager
 	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
-	touch $@
 endif
+	touch $@
 
 CLEAN_FILE += .vcdimager
 CLEAN_PKG += vcdimager
