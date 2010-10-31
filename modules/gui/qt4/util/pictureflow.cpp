@@ -42,6 +42,7 @@
 #include <QTimer>
 #include <QVector>
 #include <QWidget>
+#include "../components/playlist/playlist_model.hpp" /* getArtPixmap etc */
 
 // for fixed-point arithmetic, we need minimum 32-bit long
 // long long (64-bit) might be useful for multiplication and division
@@ -136,13 +137,13 @@ public:
     int slideWidth;
     int slideHeight;
     PictureFlow::ReflectionEffect reflectionEffect;
-    QVector<QImage*> slideImages;
 
     int angle;
     int spacing;
     PFreal offsetX;
     PFreal offsetY;
 
+    PLModel *model;
     SlideInfo centerSlide;
     QVector<SlideInfo> leftSlides;
     QVector<SlideInfo> rightSlides;
@@ -214,8 +215,6 @@ PictureFlowState::PictureFlowState():
 
 PictureFlowState::~PictureFlowState()
 {
-    for (int i = 0; i < (int)slideImages.count(); i++)
-        delete slideImages[i];
 }
 
 // readjust the settings, call this when slide dimension is changed
@@ -594,40 +593,13 @@ QImage* PictureFlowSoftwareRenderer::surface(int slideIndex)
         return 0;
     if (slideIndex < 0)
         return 0;
-    if (slideIndex >= (int)state->slideImages.count())
+    if (slideIndex >= (int)state->model->rowCount())
         return 0;
 
     int key = slideIndex;
 
-    QImage* img = state->slideImages.at(slideIndex);
-    bool empty = img ? img->isNull() : true;
-    if (empty) {
-        surfaceCache.remove(key);
-        imageHash.remove(slideIndex);
-        if (!blankSurface) {
-            int sw = state->slideWidth;
-            int sh = state->slideHeight;
-
-            QImage img = QImage(sw, sh, QImage::Format_RGB32);
-
-            QPainter painter(&img);
-            QPoint p1(sw*4 / 10, 0);
-            QPoint p2(sw*6 / 10, sh);
-            QLinearGradient linearGrad(p1, p2);
-            linearGrad.setColorAt(0, Qt::black);
-            linearGrad.setColorAt(1, Qt::white);
-            painter.setBrush(linearGrad);
-            painter.fillRect(0, 0, sw, sh, QBrush(linearGrad));
-
-            painter.setPen(QPen(QColor(64, 64, 64), 4));
-            painter.setBrush(QBrush());
-            painter.drawRect(2, 2, sw - 3, sh - 3);
-            painter.end();
-
-            blankSurface = prepareSurface(&img, sw, sh, bgcolor, state->reflectionEffect);
-        }
-        return blankSurface;
-    }
+    QImage* img = new QImage(PLModel::getArtPixmap( state->model->index( slideIndex, 0, QModelIndex() ),
+                                         QSize( state->slideWidth, state->slideHeight ) ).toImage());
 
     bool exist = imageHash.contains(slideIndex);
     if (exist)
@@ -796,11 +768,12 @@ public:
 };
 
 
-PictureFlow::PictureFlow(QWidget* parent): QWidget(parent)
+PictureFlow::PictureFlow(QWidget* parent, PLModel* _p_model): QWidget(parent)
 {
     d = new PictureFlowPrivate;
 
     d->state = new PictureFlowState;
+    d->state->model = _p_model;
     d->state->reset();
     d->state->reposition();
 
@@ -830,7 +803,7 @@ PictureFlow::~PictureFlow()
 
 int PictureFlow::slideCount() const
 {
-    return d->state->slideImages.count();
+    return d->state->model->rowCount();
 }
 
 QColor PictureFlow::backgroundColor() const
@@ -868,51 +841,6 @@ void PictureFlow::setReflectionEffect(ReflectionEffect effect)
     triggerRender();
 }
 
-QImage PictureFlow::slide(int index) const
-{
-    QImage* i = 0;
-    if ((index >= 0) && (index < slideCount()))
-        i = d->state->slideImages[index];
-    return i ? QImage(*i) : QImage();
-}
-
-void PictureFlow::addSlide(const QImage& image)
-{
-    int c = d->state->slideImages.count();
-    d->state->slideImages.resize(c + 1);
-    d->state->slideImages[c] = new QImage(image);
-    triggerRender();
-}
-
-void PictureFlow::addSlide(const QPixmap& pixmap)
-{
-    addSlide(pixmap.toImage());
-}
-
-void PictureFlow::removeSlide(int index)
-{
-    int c = d->state->slideImages.count();
-    if (index >= 0 && index < c) {
-        d->state->slideImages.remove(index);
-        triggerRender();
-    }
-}
-
-void PictureFlow::setSlide(int index, const QImage& image)
-{
-    if ((index >= 0) && (index < slideCount())) {
-        QImage* i = image.isNull() ? 0 : new QImage(image);
-        delete d->state->slideImages[index];
-        d->state->slideImages[index] = i;
-        triggerRender();
-    }
-}
-
-void PictureFlow::setSlide(int index, const QPixmap& pixmap)
-{
-    setSlide(index, pixmap.toImage());
-}
-
 int PictureFlow::centerIndex() const
 {
     return d->state->centerIndex;
@@ -930,11 +858,6 @@ void PictureFlow::setCenterIndex(int index)
 
 void PictureFlow::clear()
 {
-    int c = d->state->slideImages.count();
-    for (int i = 0; i < c; i++)
-        delete d->state->slideImages[i];
-    d->state->slideImages.resize(0);
-
     d->state->reset();
     triggerRender();
 }

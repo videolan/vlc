@@ -377,13 +377,12 @@ PicFlowView::PicFlowView( PLModel *p_model, QWidget *parent ) : QAbstractItemVie
 {
     QHBoxLayout *layout = new QHBoxLayout( this );
     layout->setMargin( 0 );
-    picFlow = new PictureFlow( this );
+    picFlow = new PictureFlow( this, p_model );
     picFlow->setSlideSize(QSize(128,128));
     layout->addWidget( picFlow );
     setSelectionMode( QAbstractItemView::SingleSelection );
     setModel( p_model );
 
-    //CONNECT( picFlow, centerIndexChanged(int), this, playItem(int) );
 }
 
 int PicFlowView::horizontalOffset() const
@@ -405,9 +404,9 @@ void PicFlowView::scrollTo(const QModelIndex &index, QAbstractItemView::ScrollHi
 {
      int currentIndex = picFlow->centerIndex();
      if( qAbs( currentIndex - index.row()) > 100 )
-        picFlow->setCenterIndex( index.row()-1);
+        picFlow->setCenterIndex( index.row());
      else
-        picFlow->showSlide( index.row()-1 );
+        picFlow->showSlide( index.row() );
 }
 
 QModelIndex PicFlowView::indexAt(const QPoint &) const
@@ -441,20 +440,18 @@ void PicFlowView::setSelection(const QRect &, QFlags<QItemSelectionModel::Select
     // No selection possible
 }
 
-void PicFlowView::rowsInserted(const QModelIndex &parent, int start, int end)
+void PicFlowView::dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight )
 {
-    for( int i = start; i <= end; i++ )
+    int currentIndex = picFlow->centerIndex();
+    for(int i = topLeft.row(); i<=bottomRight.row(); i++ )
     {
-        const QModelIndex index = model()->index( i, 0, parent );
-        if( !index.isValid() )
+        if( i-5 <= currentIndex &&
+            i+5 >= currentIndex )
+        {
+            picFlow->render();
             return;
-
-        /* FIXME, this returns no art, so far */
-        QPixmap pix = PLModel::getArtPixmap( index, QSize(128,128) );
-        picFlow->addSlide(pix);
+        }
     }
-
-    picFlow->render();
 }
 
 void PicFlowView::playItem( int i_item )

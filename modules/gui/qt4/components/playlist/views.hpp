@@ -116,8 +116,8 @@ protected:
 private:
     PictureFlow *picFlow;
 
-protected slots:
-    void rowsInserted ( const QModelIndex & parent, int start, int end );
+public slots:
+    void dataChanged( const QModelIndex &, const QModelIndex &);
 private slots:
     void playItem( int );
 };

@@ -29,6 +29,7 @@
 #define PICTUREFLOW_H
 
 #include <qwidget.h>
+#include "../components/playlist/playlist_model.hpp" /* getArtPixmap etc */
 
 class PictureFlowPrivate;
 
@@ -62,7 +63,7 @@ public:
     /*!
       Creates a new PictureFlow widget.
     */
-    PictureFlow(QWidget* parent = 0);
+    PictureFlow(QWidget* parent = 0, PLModel *model = 0);
 
     /*!
       Destroys the widget.
@@ -95,11 +96,6 @@ public:
     int slideCount() const;
 
     /*!
-      Returns QImage of specified slide.
-    */
-    QImage slide(int index) const;
-
-    /*!
       Returns the index of slide currently shown in the middle of the viewport.
     */
     int centerIndex() const;
@@ -116,33 +112,6 @@ public:
 
 
 public slots:
-
-    /*!
-      Adds a new slide.
-    */
-    void addSlide(const QImage& image);
-
-    /*!
-      Adds a new slide.
-    */
-    void addSlide(const QPixmap& pixmap);
-
-    /*!
-      Removes an existing slide.
-    */
-    void removeSlide(int index);
-
-    /*!
-      Sets an image for specified slide. If the slide already exists,
-      it will be replaced.
-    */
-    void setSlide(int index, const QImage& image);
-
-    /*!
-      Sets a pixmap for specified slide. If the slide already exists,
-      it will be replaced.
-    */
-    void setSlide(int index, const QPixmap& pixmap);
 
     /*!
       Sets slide to be shown in the middle of the viewport. No animation
