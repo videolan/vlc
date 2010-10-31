@@ -955,7 +955,7 @@ libvpx:
 
 ifdef HAVE_WIN32
 VPX_TARGET=x86-win32-gcc
-CROSS=
+CROSS=$(HOST)-
 else
 ifdef HAVE_DARWIN_OS
 ifdef HAVE_DARWIN_64
@@ -973,7 +973,7 @@ endif
 endif
 
 .libvpx: libvpx
-	(cd $<; CROSS=$(HOST)- ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-examples && make && make install)
+	(cd $<; CROSS=$(CROSS) ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-examples && make && make install)
 	(rm -rf $(PREFIX)/include/vpx/ && mkdir $(PREFIX)/include/vpx/; cd $< && cp vpx/*.h vpx_ports/*.h $(PREFIX)/include/vpx/) # Of course, why the hell would one expect it to be listed or in make install?
 	rm $(PREFIX)/include/vpx/config.h
 	(cd $<; $(RANLIB) libvpx.a && mkdir -p $(PREFIX)/lib && cp libvpx.a $(PREFIX)/lib/) # Of course, why the hell would one expect it to be listed or in make install?
