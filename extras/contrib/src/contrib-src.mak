@@ -259,46 +259,6 @@ CLEAN_FILE += .errno
 CLEAN_PKG += errno
 
 # ***************************************************************************
-# autoconf
-# ***************************************************************************
-
-autoconf-$(AUTOCONF_VERSION).tar.bz2:
-	$(WGET) $(AUTOCONF_URL)
-
-autoconf: autoconf-$(AUTOCONF_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
-
-.autoconf: autoconf
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
-	touch $@
-
-CLEAN_FILE += .autoconf
-CLEAN_PKG += autoconf
-DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.bz2
-
-# ***************************************************************************
-# gnumake
-# ***************************************************************************
-
-make-$(GNUMAKE_VERSION).tar.bz2:
-	$(WGET) $(GNUMAKE_URL)
-
-gnumake: make-$(GNUMAKE_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
-
-.gnumake: gnumake
-ifdef HAVE_DARWIN_OS
-ifndef HAVE_DARWIN_9
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
-endif
-endif
-	touch $@
-
-CLEAN_FILE += .gnumake
-CLEAN_PKG += gnumake
-DISTCLEAN_PKG += make-$(GNUMAKE_VERSION).tar.bz2
-
-# ***************************************************************************
 # CMake
 # ***************************************************************************
 cmake-$(CMAKE_VERSION).tar.gz:
@@ -336,24 +296,6 @@ DISTCLEAN_PKG += libtool-$(LIBTOOL_VERSION).tar.gz
 CLEAN_FILE += .libtool
 
 endif
-
-# ***************************************************************************
-# automake
-# ***************************************************************************
-
-automake-$(AUTOMAKE_VERSION).tar.gz:
-	$(WGET) $(AUTOMAKE_URL)
-
-automake: automake-$(AUTOMAKE_VERSION).tar.gz
-	$(EXTRACT_GZ)
-
-.automake: automake
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
-	touch $@
-
-CLEAN_FILE += .automake
-CLEAN_PKG += automake
-DISTCLEAN_PKG += automake-$(AUTOMAKE_VERSION).tar.gz
 
 # ***************************************************************************
 # pkgconfig
