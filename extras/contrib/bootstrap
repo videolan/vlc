@@ -164,6 +164,9 @@ case $TARGET in
     arm*eabi)
           ARCH="armel"
      ;;
+    arm*)
+          ARCH="arm"
+     ;;
 esac
 add_makefile_cfg "ARCH = $ARCH"
 
@@ -330,6 +333,10 @@ case $TARGET in
     ;;
 esac
 
+#
+# Fix up the Distro
+#
+
 if test -z "${DISTRO}" -a "$TARGET" = "$BUILD"; then
     if test -d "/usr/lib/pkgconfig"; then
         if test -z "$PKG_CONFIG_PATH"; then
@@ -355,6 +362,22 @@ fi
 test -z "${DISTRO}" && DISTRO=unix
 
 cat src/Distributions/"${DISTRO}".mak >> "${distro_mak}"
+
+#
+# Distro specific settings
+#
+
+case "$DISTRO" in
+  ios)
+    add_makefile_cfg 'HAVE_IOS = 1'
+    if test -z "$IOS_SDK_ROOT"; then
+        error "The bootstrap script requires the IOS_SDK_ROOT environment "
+        error "variable to be set when building for iOS"
+        exit 1
+    fi
+    add_makefile_cfg "IOS_SDK_ROOT = ${IOS_SDK_ROOT}"
+    ;;
+esac
 
 # Save passed flags
 EXTRA_CFLAGS+=" $CFLAGS"

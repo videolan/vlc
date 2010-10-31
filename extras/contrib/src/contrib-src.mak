@@ -101,7 +101,11 @@ ifneq ($(BUILD),$(HOST))
     #
     ifndef HAVE_CYGWIN
         # We are REALLY cross compiling
-        FFMPEGCONF+=--cross-prefix=$(HOST)- --enable-cross-compile
+        ifdef HAVE_IOS
+            FFMPEGCONF+=--enable-cross-compile
+        else
+            FFMPEGCONF+=--cross-prefix=$(HOST)- --enable-cross-compile
+        endif
         X264CONF=--host=$(HOST)
         PTHREADSCONF=CROSS="$(HOST)-"
     else
@@ -137,7 +141,9 @@ FFMPEGCONF+= --enable-small --disable-mpegaudio-hp
 FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
 else
 ifndef HAVE_WINCE
+ifndef HAVE_IOS
 FFMPEGCONF+= --enable-libmp3lame --enable-libgsm
+endif
 endif
 endif
 
@@ -1087,15 +1093,28 @@ else
 ifdef HAVE_WIN32
 FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --enable-dxva2 --disable-bsfs --enable-libvpx
 else
+ifdef HAVE_IOS
+FFMPEGCONF += --target-os=darwin --sysroot=${IOS_SDK_ROOT}
+ifeq ($(ARCH),arm)
+FFMPEGCONF += --disable-runtime-cpudetect --enable-neon --cpu=cortex-a8
+else
+FFMPEGCONF += --disable-mmx
+endif
+
+else
 FFMPEGCONF += --enable-pthreads
 endif
 FFMPEG_CFLAGS += --std=gnu99
+endif
 endif
 
 ifdef HAVE_WINCE
 .ffmpeg: ffmpeg .zlib
 else
 ifdef HAVE_UCLIBC
+.ffmpeg: ffmpeg
+else
+ifdef HAVE_IOS
 .ffmpeg: ffmpeg
 else
 ifeq ($(ARCH),armel)
@@ -1105,6 +1124,7 @@ ifdef HAVE_WIN64
 .ffmpeg: ffmpeg .lame .gsm .zlib
 else
 .ffmpeg: ffmpeg .lame .gsm .libvpx .zlib
+endif
 endif
 endif
 endif
