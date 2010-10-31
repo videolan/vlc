@@ -33,8 +33,6 @@
 #endif
 
 #include <QApplication>
-#include <QCache>
-#include <QHash>
 #include <QImage>
 #include <QKeyEvent>
 #include <QPainter>
@@ -197,8 +195,6 @@ private:
     QImage buffer;
     QVector<PFreal> rays;
     QImage* blankSurface;
-    QCache<int, QImage> surfaceCache;
-    QHash<int, QImage*> imageHash;
 
     void render();
     void renderSlides();
@@ -417,7 +413,6 @@ PictureFlowSoftwareRenderer::PictureFlowSoftwareRenderer():
 
 PictureFlowSoftwareRenderer::~PictureFlowSoftwareRenderer()
 {
-    surfaceCache.clear();
     buffer = QImage();
     delete blankSurface;
 }
@@ -432,12 +427,10 @@ void PictureFlowSoftwareRenderer::paint()
 
     if (state->backgroundColor != bgcolor) {
         bgcolor = state->backgroundColor;
-        surfaceCache.clear();
     }
 
     if ((int)(state->reflectionEffect) != effect) {
         effect = (int)state->reflectionEffect;
-        surfaceCache.clear();
     }
 
     if (dirty)
@@ -473,7 +466,6 @@ void PictureFlowSoftwareRenderer::init()
     if (!widget)
         return;
 
-    surfaceCache.clear();
     blankSurface = 0;
 
     size = widget->size();
@@ -623,16 +615,9 @@ QImage* PictureFlowSoftwareRenderer::surface(int slideIndex)
     QImage* img = new QImage(PLModel::getArtPixmap( state->model->index( slideIndex, 0, state->model->currentIndex().parent() ),
                                          QSize( state->slideWidth, state->slideHeight ) ).toImage());
 
-    bool exist = imageHash.contains(slideIndex);
-    if (exist)
-        if (img == imageHash.find(slideIndex).value())
-            if (surfaceCache.contains(key))
-                return surfaceCache[key];
-
     QImage* sr = prepareSurface(img, state->slideWidth, state->slideHeight, bgcolor, state->reflectionEffect);
-    surfaceCache.insert(key, sr);
-    imageHash.insert(slideIndex, img);
 
+    delete img;
     return sr;
 }
 
@@ -676,7 +661,10 @@ QRect PictureFlowSoftwareRenderer::renderSlide(const SlideInfo &slide, int col1,
 
     int xi = qMax((PFreal)0, (w * PFREAL_ONE / 2) + fdiv(xs * h, dist + ys) >> PFREAL_SHIFT);
     if (xi >= w)
+    {
+        delete src;
         return rect;
+    }
 
     bool flag = false;
     rect.setLeft(xi);
@@ -746,6 +734,7 @@ QRect PictureFlowSoftwareRenderer::renderSlide(const SlideInfo &slide, int col1,
 
     rect.setTop(0);
     rect.setBottom(h - 1);
+    delete src;
     return rect;
 }
 
