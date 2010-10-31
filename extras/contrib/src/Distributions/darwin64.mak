@@ -5,7 +5,7 @@ all: .autoconf .gnumake .automake .libtool .intl .pkgcfg .yasm .freetype \
     .dvdcss .libdvdread .dvdnav .dvbpsi .live .caca .mod .fontconfig \
     .png .jpeg .tiff .gpg-error .gcrypt .gnutls .cddb .cdio .vcdimager \
     .gecko .mpcdec .dirac_encoder .dirac_decoder \
-    .dca .tag .x264 .lua .zvbi .fontconfig .ncurses .liboil \
+    .dca .tag .x264 .lua .zvbi .fontconfig .ncurses \
     .schroedinger .libass .libupnp .kate .sqlite3 .Sparkle
 # .expat don't work with SDK yet
 # .glib .IDL .gecko are required to build the mozilla plugin
