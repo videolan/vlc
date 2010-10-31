@@ -827,7 +827,7 @@ faad2-$(FAAD2_VERSION).tar.gz:
 
 faad2: faad2-$(FAAD2_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	(cd $@; echo|$(CC) -iquote . -E - || sed -i 's/-iquote /-I/' libfaad/Makefile.am; sh ./bootstrap)
+	(cd $@; echo|$(CC) -iquote . -E - || sed -i 's/-iquote /-I/' libfaad/Makefile.am; autoreconf -ivf)
 	patch -p0 < Patches/faad-arm-fixed.patch
 
 .faad: faad2
