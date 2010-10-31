@@ -272,26 +272,22 @@ case $TARGET in
         ensure_macosx_sdk_presence
     ;;
     *mingw32ce)
-        add_makefile_cfg "HAVE_WINCE = 1"
         add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
         EXTRA_CPPFLAGS=" -D_WIN32_WCE=0x0500"
         DISTRO=wince
     ;;
     *64-*mingw*)
-        add_makefile_cfg "HAVE_WIN64 = 1"
         add_makefile_cfg "HAVE_WIN32 = 1"
         add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
         EXTRA_CFLAGS="-O3"
         DISTRO=win64
     ;;
     *mingw32*)
-        add_makefile_cfg "HAVE_WIN32 = 1"
         add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
         EXTRA_CFLAGS=" -O3 -march=i686 -mtune=generic"
         DISTRO=win32
     ;;
     i686-pc-cygwin)
-        add_makefile_cfg "HAVE_WIN32 = 1"
         add_makefile_cfg "HAVE_CYGWIN = 1"
         CC="gcc -mno-cygwin -isystem /usr/include/mingw"
         CXX="g++ -mno-cygwin -isystem /usr/include/mingw"
@@ -315,7 +311,6 @@ case $TARGET in
     arm-none-linux-gnueabi)
         if test -f /etc/maemo_version; then
             DISTRO=maemo
-            add_makefile_cfg 'HAVE_MAEMO = 1'
             EXTRA_CFLAGS=" -mcpu=cortex-a8 -mtune=cortex-a8 -march=armv7-a"
             EXTRA_CFLAGS="$EXTRA_CFLAGS -mfpu=neon -mfloat-abi=softfp"
             EXTRA_CFLAGS="$EXTRA_CFLAGS -O3 -fno-tree-vectorize"
@@ -351,7 +346,6 @@ if test -z "${DISTRO}" -a "$TARGET" = "$BUILD"; then
         DISTRO=fedora
     elif test -f /etc/maemo_version; then
         DISTRO=maemo
-        add_makefile_cfg 'HAVE_MAEMO = 1'
     elif test -f /etc/debian_version; then
         # NOTE: check for Debian *after* its derivatives
         DISTRO=debian
@@ -369,7 +363,6 @@ cat src/Distributions/"${DISTRO}".mak >> "${distro_mak}"
 
 case "$DISTRO" in
   ios)
-    add_makefile_cfg 'HAVE_IOS = 1'
     if test -z "$IOS_SDK_ROOT"; then
         error "The bootstrap script requires the IOS_SDK_ROOT environment "
         error "variable to be set when building for iOS"
@@ -385,6 +378,8 @@ EXTRA_LDFLAGS+=" $LDFLAGS"
 EXTRA_CPPFLAGS+=" $CPPFLAGS"
 EXTRA_CXXFLAGS+=" $CXXFLAGS"
 
+uppercase_distro=`echo "$DISTRO" | tr '[:lower:]' '[:upper:]'`
+add_makefile_cfg "HAVE_${uppercase_distro} = 1"
 add_makefile_cfg "BUILD = $BUILD"
 add_makefile_cfg "HOST = $TARGET"
 add_makefile_cfg "SRCDIR = `pwd`"
