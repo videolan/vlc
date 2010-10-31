@@ -58,11 +58,9 @@ static VLCLibrary * sharedLibrary = nil;
             NSMutableArray *defaultParams = [NSMutableArray array];
             [defaultParams addObject:@"--play-and-pause"];                          // We want every movie to pause instead of stopping at eof
             [defaultParams addObject:@"--no-color"];                                // Don't use color in output (Xcode doesn't show it)
-            [defaultParams addObject:@"--no-media-library"];                        // We don't need the media library
             [defaultParams addObject:@"--no-video-title-show"];                     // Don't show the title on overlay when starting to play
             [defaultParams addObject:@"--verbose=-1"];                               // Let's not wreck the logs
 #if TARGET_OS_IPHONE
-            [defaultParams addObject:@"--ignore-config"];                           // We don't need the config
 //            [defaultParams addObject:@"--ffmpeg-fast"];                             // Let's disable this as it is error-prone
             [defaultParams addObject:@"--ffmpeg-skiploopfilter=all"];
 #else
