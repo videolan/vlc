@@ -30,7 +30,16 @@
 #include <vlc_picture_pool.h>
 #include <vlc_vout_opengl.h>
 
-#ifdef __APPLE__
+// Define USE_OPENGL_ES to the GL ES Version you want to select
+
+#if USE_OPENGL_ES == 1
+# include <OpenGLES/ES1/gl.h>
+# include <OpenGLES/ES1/glext.h>
+#elif USE_OPENGL_ES == 2
+# include <OpenGLES/ES2/gl.h>
+# include <OpenGLES/ES2/glext.h>
+#elif defindef(__APPLE__)
+# define MACOS_OPENGL
 # include <OpenGL/gl.h>
 # include <OpenGL/glext.h>
 #else
@@ -51,7 +60,21 @@
 # define GL_CLAMP_TO_EDGE 0x812F
 #endif
 
-#ifdef __APPLE__
+
+#if USE_OPENGL_ES
+# define VLCGL_TARGET GL_TEXTURE_2D
+
+# define VLCGL_RGB_FORMAT GL_RGB
+# define VLCGL_RGB_TYPE   GL_UNSIGNED_SHORT_5_6_5
+
+// Use RGB with OpenGLES
+# define VLCGL_FORMAT VLCGL_RGB_FORMAT
+# define VLCGL_TYPE   VLCGL_RGB_TYPE
+
+# define VLCGL_TEXTURE_COUNT (1)
+
+#elif defined(MACOS_OPENGL)
+
 /* On OS X, use GL_TEXTURE_RECTANGLE_EXT instead of GL_TEXTURE_2D.
    This allows sizes which are not powers of 2 */
 # define VLCGL_TARGET GL_TEXTURE_RECTANGLE_EXT
@@ -91,7 +114,7 @@ static inline int GetAlignedSize(int i_size)
 }
 
 typedef struct {
-	vout_opengl_t  *gl;
+    vout_opengl_t  *gl;
 
     video_format_t fmt;
 
@@ -109,7 +132,7 @@ static int vout_display_opengl_Init(vout_display_opengl_t *vgl,
                                     video_format_t *fmt,
                                     vout_opengl_t *gl)
 {
-	vgl->gl = gl;
+    vgl->gl = gl;
 
     /* Find the chroma we will use and update fmt */
     /* TODO: We use YCbCr on Mac which is Y422, but on OSX it seems to == YUY2. Verify */
@@ -161,22 +184,43 @@ static int vout_display_opengl_Init(vout_display_opengl_t *vgl,
 
     vgl->fmt = *fmt;
 
-    /* Texture size */
-#ifdef __APPLE__
-    vgl->tex_width  = fmt->i_width;
-    vgl->tex_height = fmt->i_height;
-#else
-    /* A texture must have a size aligned on a power of 2 */
-    vgl->tex_width  = GetAlignedSize(fmt->i_width);
-    vgl->tex_height = GetAlignedSize(fmt->i_height);
+    /* */
+    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
+        vgl->texture[i] = 0;
+        vgl->buffer[i]  = NULL;
+    }
+    vgl->pool = NULL;
+
+    bool supports_npot = false;
+#if USE_OPENGL_ES == 2
+    supports_npot = true;
+#elif defined(MACOS_OPENGL)
+    supports_npot = true;
 #endif
 
-    /* */
-	for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
-		vgl->texture[i] = 0;
-		vgl->buffer[i]  = NULL;
-	}
-    vgl->pool = NULL;
+#if defined(__APPLE__) && USE_OPENGL_ES == 1
+    if (!vout_opengl_Lock(vgl->gl)) {
+        const char* extensions = (char*) glGetString(GL_EXTENSIONS);
+        if (extensions) {
+            bool npot = strstr(extensions, "GL_APPLE_texture_2D_limited_npot") != 0;
+            if (npot)
+                supports_npot = true;
+        }
+        vout_opengl_Unlock(vgl->gl);
+    }
+#endif
+
+    /* Texture size */
+    if (supports_npot) {
+        vgl->tex_width  = fmt->i_width;
+        vgl->tex_height = fmt->i_height;
+    }
+    else {
+        /* A texture must have a size aligned on a power of 2 */
+        vgl->tex_width  = GetAlignedSize(fmt->i_width);
+        vgl->tex_height = GetAlignedSize(fmt->i_height);
+    }
+
 
     /* */
     if (!vout_opengl_Lock(vgl->gl)) {
@@ -190,8 +234,9 @@ static int vout_display_opengl_Init(vout_display_opengl_t *vgl,
 
         vout_opengl_Unlock(vgl->gl);
     }
-	return VLC_SUCCESS;
+    return VLC_SUCCESS;
 }
+
 static void vout_display_opengl_Clean(vout_display_opengl_t *vgl)
 {
     /* */
@@ -221,18 +266,18 @@ static int vout_display_opengl_ResetTextures(vout_display_opengl_t *vgl)
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
         glBindTexture(VLCGL_TARGET, vgl->texture[i]);
 
+#if !USE_OPENGL_ES
         /* Set the texture parameters */
         glTexParameterf(VLCGL_TARGET, GL_TEXTURE_PRIORITY, 1.0);
-
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+#endif
 
         glTexParameteri(VLCGL_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(VLCGL_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-#ifdef __APPLE__
+#ifdef MACOS_OPENGL
         /* Tell the driver not to make a copy of the texture but to use
            our buffer */
         glEnable(GL_UNPACK_CLIENT_STORAGE_APPLE);
@@ -250,16 +295,18 @@ static int vout_display_opengl_ResetTextures(vout_display_opengl_t *vgl)
 #endif
 
         /* Call glTexImage2D only once, and use glTexSubImage2D later */
-        if (vgl->buffer[i])
-            glTexImage2D(VLCGL_TARGET, 0, 3, vgl->tex_width, vgl->tex_height,
-                         0, VLCGL_FORMAT, VLCGL_TYPE, vgl->buffer[i]);
+        if (vgl->buffer[i]) {
+            glTexImage2D(VLCGL_TARGET, 0, VLCGL_FORMAT, vgl->tex_width,
+                         vgl->tex_height, 0, VLCGL_FORMAT, VLCGL_TYPE,
+                         vgl->buffer[i]);
+        }
     }
 
     vout_opengl_Unlock(vgl->gl);
     return VLC_SUCCESS;
 }
 
-#ifdef __APPLE__
+#ifdef MACOS_OPENGL
 /* XXX See comment vout_display_opengl_Prepare */
 struct picture_sys_t {
     vout_display_opengl_t *vgl;
@@ -279,7 +326,6 @@ static int PictureLock(picture_t *picture)
 
     vout_display_opengl_t *vgl = picture->p_sys->vgl;
     if (!vout_opengl_Lock(vgl->gl)) {
-
         glBindTexture(VLCGL_TARGET, get_texture(picture));
         glTexSubImage2D(VLCGL_TARGET, 0, 0, 0,
                         vgl->fmt.i_width, vgl->fmt.i_height,
@@ -309,7 +355,7 @@ static picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl)
 
         picture_resource_t rsc;
         memset(&rsc, 0, sizeof(rsc));
-#ifdef __APPLE__
+#ifdef MACOS_OPENGL
         rsc.p_sys = malloc(sizeof(*rsc.p_sys));
         if (rsc.p_sys)
         {
@@ -336,7 +382,7 @@ static picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl)
     memset(&cfg, 0, sizeof(cfg));
     cfg.picture_count = i;
     cfg.picture = picture;
-#ifdef __APPLE__
+#ifdef MACOS_OPENGL
     cfg.lock = PictureLock;
     cfg.unlock = PictureUnlock;
 #endif
@@ -378,7 +424,7 @@ static int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     if (vout_opengl_Lock(vgl->gl))
         return VLC_EGENERIC;
 
-#ifdef __APPLE__
+#ifdef MACOS_OPENGL
     /* Bind to the texture for drawing */
     glBindTexture(VLCGL_TARGET, get_texture(picture));
 #else
@@ -422,12 +468,35 @@ static int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
     glEnable(VLCGL_TARGET);
 
+#if USE_OPENGL_ES
+    static const GLfloat vertexCoord[] = {
+        -1.0f, -1.0f,
+         1.0f, -1.0f,
+        -1.0f,  1.0f,
+         1.0f,  1.0f,
+    };
+
+    const GLfloat textureCoord[8] = {
+        f_x,     f_height,
+        f_width, f_height,
+        f_x,     f_y,
+        f_width, f_y
+    };
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
+    glTexCoordPointer(2, GL_FLOAT, 0, textureCoord);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+#else
     glBegin(GL_POLYGON);
     glTexCoord2f(f_x,      f_y);      glVertex2f(-1.0,  1.0);
     glTexCoord2f(f_width,  f_y);      glVertex2f( 1.0,  1.0);
     glTexCoord2f(f_width,  f_height); glVertex2f( 1.0, -1.0);
     glTexCoord2f(f_x,      f_height); glVertex2f(-1.0, -1.0);
     glEnd();
+#endif
 
     glDisable(VLCGL_TARGET);
 
