@@ -301,9 +301,9 @@ void PictureFlowAnimator::update()
     if (!state)
         return;
 
-    int speed = 16384 / 4;
+    int speed = 16384;
 
-#if 1
+#if 0
     // deaccelerate when approaching the target
     const int max = 2 * 65536;
 
