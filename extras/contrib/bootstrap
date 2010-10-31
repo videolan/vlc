@@ -58,14 +58,6 @@ info()
     echo "[contrib] $1"
 }
 
-ensure_macosx_sdk_presence()
-{
-    if ! test -e /Developer/SDKs; then
-        error "Your Developer Tools' SDKs were not found.\nYou need to add extra symbolic links to /Developer to achieve correctly\nbuilt contribs.\nHave a look at the OSX-Compile-HOWTO for details." >&2
-        exit 1
-    fi
-}
-
 DISTRO=
 BUILDDIR=.
 
@@ -195,75 +187,44 @@ case $TARGET in
     ;;
     powerpc-apple-darwin9)
         DISTRO=darwin
-        HAVE_DARWIN_9=1
         HAVE_DARWIN_32=1
-        SDK_TARGET=10.5
 
         CFLAGS_TUNING=" -arch ppc -mtune=G4"
-        EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
-        EXTRA_LDFLAGS=" -arch ppc -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET} -Wl,-syslibroot,\${MACOSX_SDK}"
-        CC="/Developer/usr/bin/gcc-4.2"
-        CXX="/Developer/usr/bin/g++-4.2"
-        LD="ld -arch ppc -syslibroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
+        EXTRA_LDFLAGS=" -arch ppc"
 
-        add_makefile_cfg "SDK_TARGET = ${SDK_TARGET}"
-        add_makefile_cfg "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}"
-        add_makefile_cfg "MACOSX_SDK = /Developer/SDKs/MacOSX10.5.sdk"
-        add_makefile_cfg "HAVE_DARWIN_9 = 1"
-        add_makefile_cfg "PATH = /bin:/usr/bin:/usr/local/bin:"
-        ensure_macosx_sdk_presence
+        # FIXME - this one seems to be redundant?
+        LD="ld -arch ppc -syslibroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
     ;;
     i686-apple-darwin*)
         DISTRO=darwin
-        HAVE_DARWIN_9=1
         HAVE_DARWIN_32=1
-        SDK_TARGET=10.5
 
         CFLAGS_TUNING=" -march=prescott -mtune=generic -arch i386 -m32"
-        EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
-        EXTRA_LDFLAGS=" -arch i386 -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
-        CC="/Developer/usr/bin/gcc-4.2"
-        CXX="/Developer/usr/bin/g++-4.2"
+        EXTRA_LDFLAGS=" -arch i386"
 
-        add_makefile_cfg "PATH = /bin:/usr/bin:/usr/local/bin"
-
-        add_makefile_cfg "SDK_TARGET = ${SDK_TARGET}"
         add_makefile_cfg "HAVE_DARWIN_OS_ON_INTEL = 1"
-        add_makefile_cfg "HAVE_DARWIN_9 = 1"
-        add_makefile_cfg "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}"
-        add_makefile_cfg "MACOSX_SDK = /Developer/SDKs/MacOSX10.5.sdk"
         if test $TARGET = "i686-apple-darwin10"; then
             add_makefile_cfg "HAVE_DARWIN_10 = 1"
         fi
-        ensure_macosx_sdk_presence
     ;;
     x86_64-apple-darwin*)
         DISTRO=darwin64
-        SDK_TARGET=10.5
         HAVE_DARWIN_64=1
 
         CFLAGS_TUNING=" -march=core2 -mtune=core2 -m64 -arch x86_64"
-        EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
-        EXTRA_LDFLAGS=" -arch x86_64 -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
+        EXTRA_LDFLAGS=" -arch x86_64"
 
-        CC="/Developer/usr/bin/gcc-4.2"
-        CXX="/Developer/usr/bin/g++-4.2"
+        # FIXME - is this stuff needed?
         LD="ld"
         RANLIB="ranlib"
         AR="ar"
         STRIP="strip"
 
-        add_makefile_cfg "SDK_TARGET = ${SDK_TARGET}"
         add_makefile_cfg "HAVE_DARWIN_OS_ON_INTEL = 1"
-        add_makefile_cfg "HAVE_DARWIN_9 = 1"
-        add_makefile_cfg "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}"
-        add_makefile_cfg "MACOSX_SDK = /Developer/SDKs/MacOSX${SDK_TARGET}.sdk"
-        add_makefile_cfg "HAVE_DARWIN_64 = 1"
         add_makefile_cfg "PATH = /bin:/usr/bin:/usr/local/bin"
         if test $TARGET = "x86_64-apple-darwin10"; then
             add_makefile_cfg "HAVE_DARWIN_10 = 1"
         fi
-        ensure_macosx_sdk_presence
     ;;
     *mingw32ce)
         add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
@@ -364,6 +325,23 @@ case "$DISTRO" in
     fi
     add_makefile_cfg "IOS_SDK_ROOT = ${IOS_SDK_ROOT}"
     ;;
+  darwin*)
+    SDK_TARGET=10.5
+    HAVE_DARWIN_9=1
+    EXTRA_LDFLAGS="${EXTRA_LDFLAGS} -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
+    EXTRA_CFLAGS="${EXTRA_CFLAGS} -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
+    CC="/Developer/usr/bin/gcc-4.2"
+    CXX="/Developer/usr/bin/g++-4.2"
+    add_makefile_cfg "PATH = /bin:/usr/bin:/usr/local/bin"
+    add_makefile_cfg "SDK_TARGET = ${SDK_TARGET}"
+    add_makefile_cfg "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}"
+    add_makefile_cfg "MACOSX_SDK = /Developer/SDKs/MacOSX${SDK_TARGET}.sdk"
+
+    if ! test -e /Developer/SDKs; then
+        error "Your Developer Tools' SDKs were not found.\nYou need to add extra symbolic links to /Developer to achieve correctly\nbuilt contribs.\nHave a look at the OSX-Compile-HOWTO for details." >&2
+        exit 1
+    fi
+    ;;
 esac
 
 # Save passed flags
@@ -438,12 +416,14 @@ if test -z "$CONTRIBS_RELEASE"; then
 fi
 
 if test $HAVE_DARWIN_9; then
+    add_makefile_cfg "HAVE_DARWIN_9 = 1"
     if ! /Developer/usr/bin/gcc-4.2 --version>/dev/null 2>&1; then
         error "You do not have GCC-4.2 instelled, compilation WILL FAIL."
     fi
 fi
 
 if test $HAVE_DARWIN_32; then
+    add_makefile_cfg "HAVE_DARWIN_32 = 1"
     info "*****************************************************************"
     info "* VLC will be compiled in 32bit mode.                           *"
     info "*                                                               *"
@@ -455,6 +435,7 @@ if test $HAVE_DARWIN_32; then
 fi
 
 if test $HAVE_DARWIN_64; then
+    add_makefile_cfg "HAVE_DARWIN_64 = 1"
     info
     info "*****************************************************************"
     info "* VLC will be compiled in 64bit mode using the 10.5 SDK.        *"
