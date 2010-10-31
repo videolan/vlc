@@ -35,10 +35,8 @@
 #include <stdbool.h>
 #include <locale.h>
 #include <signal.h>
-#include <time.h>
 #include <pthread.h>
 #include <unistd.h>
-#include <dlfcn.h>
 
 #ifdef __APPLE__
 #include <string.h>
