@@ -593,12 +593,12 @@ QImage* PictureFlowSoftwareRenderer::surface(int slideIndex)
         return 0;
     if (slideIndex < 0)
         return 0;
-    if (slideIndex >= (int)state->model->rowCount())
+    if (slideIndex >= state->model->rowCount( state->model->currentIndex().parent() ) )
         return 0;
 
     int key = slideIndex;
 
-    QImage* img = new QImage(PLModel::getArtPixmap( state->model->index( slideIndex, 0, QModelIndex() ),
+    QImage* img = new QImage(PLModel::getArtPixmap( state->model->index( slideIndex, 0, state->model->currentIndex().parent() ),
                                          QSize( state->slideWidth, state->slideHeight ) ).toImage());
 
     bool exist = imageHash.contains(slideIndex);
@@ -803,7 +803,7 @@ PictureFlow::~PictureFlow()
 
 int PictureFlow::slideCount() const
 {
-    return d->state->model->rowCount();
+    return d->state->model->rowCount( d->state->model->currentIndex().parent() );
 }
 
 QColor PictureFlow::backgroundColor() const
