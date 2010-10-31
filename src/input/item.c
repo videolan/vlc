@@ -744,6 +744,9 @@ void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update )
 
     vlc_mutex_unlock( &p_item->lock );
 
+    if( !p_epg )
+        return;
+
 #ifdef EPG_DEBUG
     char *psz_epg;
     if( asprintf( &psz_epg, "EPG %s", p_epg->psz_name ? p_epg->psz_name : "unknown" ) < 0 )
