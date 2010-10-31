@@ -278,9 +278,6 @@ static void FixParameters( int *pi_fmt, bool *pb_has_a, bool *pb_swap_uv, vlc_fo
         *pi_fmt = PIX_FMT_YUV410P;
         *pb_swap_uv = true;
         break;
-    case VLC_CODEC_RGB16:
-        *pi_fmt = PIX_FMT_RGB565;
-        break;
     default:
         break;
     }
