@@ -448,21 +448,24 @@ void PictureFlowSoftwareRenderer::paint()
 
     QModelIndex index = state->model->index( state->centerIndex, 0, state->model->currentIndex().parent() );
 
-    QString title = PLModel::getMeta( index, COLUMN_TITLE );
-    QString artist = PLModel::getMeta( index, COLUMN_ARTIST );
-    QFont font( index.data( Qt::FontRole ).value<QFont>() );
-    painter.setFont( font );
-    painter.setBrush( QBrush( Qt::lightGray ) );
-    painter.setPen( QColor( Qt::lightGray ) );
-    QFontMetrics fm = painter.fontMetrics();
+    if( index.isValid() )
+    {
+          QString title = PLModel::getMeta( index, COLUMN_TITLE );
+          QString artist = PLModel::getMeta( index, COLUMN_ARTIST );
+          QFont font( index.data( Qt::FontRole ).value<QFont>() );
+          painter.setFont( font );
+          painter.setBrush( QBrush( Qt::lightGray ) );
+          painter.setPen( QColor( Qt::lightGray ) );
+          QFontMetrics fm = painter.fontMetrics();
 
-    QPoint textstart( buffer.width() / 2 - state->slideWidth/2 , buffer.height() / 2 + state->slideWidth/2 + 5 );
-    QPoint artiststart( 0, fm.xHeight() * 2 );
+          QPoint textstart( buffer.width() / 2 - state->slideWidth/2 , buffer.height() / 2 + state->slideWidth/2 + 5 );
+          QPoint artiststart( 0, fm.xHeight() * 2 );
 
-    painter.drawText( textstart, title );
+          painter.drawText( textstart, title );
 
-    textstart += artiststart;
-    painter.drawText( textstart, artist);
+          textstart += artiststart;
+          painter.drawText( textstart, artist);
+    }
 }
 
 void PictureFlowSoftwareRenderer::init()
