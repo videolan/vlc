@@ -2172,9 +2172,6 @@ expat: expat-$(EXPAT_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .expat: expat
-ifdef HAVE_DARWIN_OS
-	(cd $< aclocal --force && libtoolize --force && autoconf --force && autoheader --force )
-endif
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	touch $@
 
