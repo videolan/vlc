@@ -1348,7 +1348,7 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
 {
-    block_t *p_block = NULL;
+    block_t *p_block;
     struct v4l2_buffer buf;
     ssize_t i_ret;
 
@@ -1477,7 +1477,7 @@ static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
         break;
 
     default:
-        break;
+        return NULL;
     }
 
     /* Timestamp */
