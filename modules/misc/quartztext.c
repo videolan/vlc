@@ -37,10 +37,12 @@
 #include <vlc_input.h>
 
 #include <Availability.h>
+
+#ifdef TARGET_OS_IPHONE
 #include <CoreText/CoreText.h>
 #include <CoreGraphics/CoreGraphics.h>
 
-#if !TARGET_OS_IPHONE
+#else
 // Fix ourselves ColorSync headers that gets included in ApplicationServices.
 #define DisposeCMProfileIterateUPP(a) DisposeCMProfileIterateUPP(CMProfileIterateUPP userUPP __attribute__((unused)))
 #define DisposeCMMIterateUPP(a) DisposeCMMIterateUPP(CMProfileIterateUPP userUPP __attribute__((unused)))
@@ -171,7 +173,7 @@ struct filter_sys_t
     int            i_font_color;
     int            i_font_size;
 
-#if !TARGET_OS_IPHONE
+#ifndef TARGET_OS_IPHONE
     ATSFontContainerRef    *p_fonts;
     int                     i_fonts;
 #endif
@@ -199,7 +201,7 @@ static int Create( vlc_object_t *p_this )
     p_filter->pf_render_text = RenderText;
     p_filter->pf_render_html = RenderHtml;
 
-#if !TARGET_OS_IPHONE
+#ifndef TARGET_OS_IPHONE
     p_sys->p_fonts = NULL;
     p_sys->i_fonts = 0;
 #endif
@@ -218,7 +220,7 @@ static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
-#if !TARGET_OS_IPHONE
+#ifndef TARGET_OS_IPHONE
     if( p_sys->p_fonts )
     {
         int   k;
@@ -241,7 +243,7 @@ static void Destroy( vlc_object_t *p_this )
 //////////////////////////////////////////////////////////////////////////////
 static int LoadFontsFromAttachments( filter_t *p_filter )
 {
-#if TARGET_OS_IPHONE
+#ifdef TARGET_OS_IPHONE
     VLC_UNUSED(p_filter);
     return VLC_SUCCESS;
 #else
