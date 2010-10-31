@@ -143,12 +143,12 @@ rm -f "${distro_mak}"
 } > "${distro_mak}"
 
 if test "$TARGET" != "$BUILD"; then
-    CC="${TARGET}-gcc"
-    CXX="${TARGET}-g++"
-    LD="${TARGET}-ld"
-    RANLIB="${TARGET}-ranlib"
-    AR="${TARGET}-ar"
-    STRIP="${TARGET}-strip"
+    test -z "$CC"    && CC="${TARGET}-gcc"
+    test -z "$CXX"   && CXX="${TARGET}-g++"
+    test -z "$LD"    && LD="${TARGET}-ld"
+    test -z "$RANLIB"&& RANLIB="${TARGET}-ranlib"
+    test -z "$AR"    && AR="${TARGET}-ar"
+    test -z "$STRIP" && STRIP="${TARGET}-strip"
 fi
 
 case $TARGET in
@@ -355,6 +355,12 @@ fi
 test -z "${DISTRO}" && DISTRO=unix
 
 cat src/Distributions/"${DISTRO}".mak >> "${distro_mak}"
+
+# Save passed flags
+EXTRA_CFLAGS+=" $CFLAGS"
+EXTRA_LDFLAGS+=" $LDFLAGS"
+EXTRA_CPPFLAGS+=" $CPPFLAGS"
+EXTRA_CXXFLAGS+=" $CXXFLAGS"
 
 add_makefile_cfg "BUILD = $BUILD"
 add_makefile_cfg "HOST = $TARGET"
