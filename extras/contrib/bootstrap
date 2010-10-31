@@ -32,12 +32,14 @@ set +x
 usage()
 {
 cat << EOF
-usage: $0 [-t target] [-d distro]
+usage: $0 [-t target] [-d distro] [-b buildir] [-i installdir]
 
 OPTIONS:
-   -t      Force target
-   -d      Force distro
-   -h      Help
+   -t target     Force target to "target"
+   -d distro     Force distro to "distro"
+   -b buildir    Set build dir to "builddir"
+   -i installdir Install to "installdir"
+   -h            Show some help
 EOF
 }
 
@@ -58,10 +60,8 @@ info()
 
 ensure_macosx_sdk_presence()
 {
-    if test -e /Developer/SDKs; then
-        echo "SDKs found. Everything is fine." >&2
-    else
-        echo "ERROR:\nYour Developer Tools' SDKs were not found.\nYou need to add extra symbolic links to /Developer to achieve correctly\nbuilt contribs.\nHave a look at the OSX-Compile-HOWTO for details." >&2
+    if ! test -e /Developer/SDKs; then
+        error "Your Developer Tools' SDKs were not found.\nYou need to add extra symbolic links to /Developer to achieve correctly\nbuilt contribs.\nHave a look at the OSX-Compile-HOWTO for details." >&2
         exit 1
     fi
 }
@@ -69,7 +69,7 @@ ensure_macosx_sdk_presence()
 DISTRO=
 BUILDDIR=.
 
-while getopts “ht:d:” OPTION
+while getopts “ht:d:b:i:” OPTION
 do
      case $OPTION in
          h)
@@ -82,6 +82,12 @@ do
          d)
              DISTRO=$OPTARG
              ;;
+         b)
+             BUILDDIR=$OPTARG
+             ;;
+         i)
+             PREFIX=$OPTARG
+             ;;
          ?)
              usage
              exit
@@ -92,10 +98,35 @@ done
 BUILD=`gcc -dumpmachine`
 
 if test "x$TARGET" = "x"; then
-    info "No target specified, using '$BUILD'"
     TARGET="$BUILD"
+    info "No target specified, using '$TARGET'"
 fi
 
+if test "x$PREFIX" = "x"; then
+    PREFIX="`pwd`/hosts/$TARGET"
+    info "No install dir specified, using '$PREFIX'"
+fi
+
+# Make sure prefix is absolute and existing
+mkdir -p "${PREFIX}"
+PREFIX=`cd "${PREFIX}" && pwd`
+
+#
+# Set up build dir
+#
+
+mkdir -p "${BUILDDIR}"
+
+# Install build dir makefile
+ln -sf "`pwd`/contrib.mak" "${BUILDDIR}/Makefile"
+
+# Create the 'build-src' folder to build from source
+mkdir -p "${BUILDDIR}/build-src"
+ln -sf "`pwd`/src/contrib-src.mak" "${BUILDDIR}/build-src/Makefile"
+ln -sf "`pwd`/src/packages.mak" "${BUILDDIR}/build-src/packages.mak"
+ln -sf "`pwd`/src/Patches" "${BUILDDIR}/build-src/Patches"
+
+# Create config.mak
 config_mak="${BUILDDIR}/config.mak"
 rm -f "${config_mak}"
 {
@@ -103,6 +134,7 @@ rm -f "${config_mak}"
     echo "# Make changes if you know what you're doing."
 } > "${config_mak}"
 
+# Create distro.mak
 distro_mak="${BUILDDIR}/distro.mak"
 rm -f "${distro_mak}"
 {
@@ -326,8 +358,9 @@ cat src/Distributions/"${DISTRO}".mak >> "${distro_mak}"
 
 add_makefile_cfg "BUILD = $BUILD"
 add_makefile_cfg "HOST = $TARGET"
-
-add_makefile_cfg "PREFIX = `pwd`/hosts/$TARGET"
+add_makefile_cfg "SRCDIR = `pwd`"
+add_makefile_cfg "PREFIX = ${PREFIX}"
+add_makefile_cfg "VLCROOTDIR = `pwd`/../.."
 
 ln -sfn hosts/$TARGET build
 

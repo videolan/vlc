@@ -11,10 +11,6 @@ phrasebooks
 *.bak
 toolchain.cmake
 # Ignore fetched contrib
-src/*
+build-src/*
 # But not our files
-!Makefile
-!src/Distributions/*
-!src/Patches
-!src/packages.mak
-!src/Makefile
+!*.mak
