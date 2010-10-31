@@ -3187,11 +3187,12 @@ AC_ARG_ENABLE(xvideo,
 ])
 
 need_xid_provider="no"
+have_xcb="no"
 AS_IF([test "${enable_xcb}" != "no"], [
   dnl libxcb
   PKG_CHECK_MODULES(XCB, [xcb])
+  have_xcb="yes"
   PKG_CHECK_MODULES(XCB_SHM, [xcb-shm])
-  VLC_ADD_PLUGIN([xscreensaver xcb_x11 xcb_window xcb_screen xcb_apps])
 
   AS_IF([test "${enable_xvideo}" != "no"], [
     PKG_CHECK_MODULES(XCB_XV, [xcb-xv >= 1.1.90.1], [
@@ -3233,8 +3234,8 @@ AS_IF([test "${enable_xcb}" != "no"], [
     VLC_ADD_LIBS([globalhotkeys], [${XCB_KEYSYMS_LIBS} ${XCB_LIBS}])
     VLC_ADD_CFLAGS([xcb_window], [-DHAVE_XCB_KEYSYMS])
   ])
-  VLC_ADD_PLUGIN([xdg_screensaver])
 ])
+AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
 
 AC_ARG_ENABLE(glx,
   [  --enable-glx            X11 OpenGL (GLX) support (default enabled)],, [

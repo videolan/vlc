@@ -19,8 +19,20 @@ SOURCES_audioscrobbler = audioscrobbler.c
 SOURCES_inhibit = inhibit.c
 SOURCES_sqlite = sqlite.c
 
-SOURCES_xscreensaver = inhibit/xscreensaver.c
-SOURCES_xdg_screensaver = inhibit/xdg.c
+libxdg_screensaver_plugin_la_SOURCES = inhibit/xdg.c
+libxdg_screensaver_plugin_la_CFLAGS = $(AM_CFLAGS)
+libxdg_screensaver_plugin_la_LIBADD = $(AM_LIBADD)
+libxdg_screensaver_plugin_la_DEPENDENCIES =
+libxscreensaver_plugin_la_SOURCES = inhibit/xscreensaver.c
+libxscreensaver_plugin_la_CFLAGS = $(AM_CFLAGS)
+libxscreensaver_plugin_la_LIBADD = $(AM_LIBADD)
+libxscreensaver_plugin_la_DEPENDENCIES =
+if HAVE_XCB
+libvlc_LTLIBRARIES += \
+	libxdg_screensaver_plugin.la \
+	libxscreensaver_plugin.la
+endif
+
 SOURCES_osso_screensaver = inhibit/osso.c
 
 libvlc_LTLIBRARIES += \

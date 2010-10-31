@@ -94,7 +94,9 @@ libxcb_screen_plugin_la_CFLAGS = $(AM_CFLAGS) \
 libxcb_screen_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS)
 libxcb_screen_plugin_la_DEPENDENCIES =
+if HAVE_XCB
+libvlc_LTLIBRARIES += libxcb_screen_plugin.la
+endif
+
 EXTRA_LTLIBRARIES += \
-	libaccess_rtmp_plugin.la \
-	libxcb_screen_plugin.la
-libvlc_LTLIBRARIES += $(LTLIBxcb_screen)
+	libaccess_rtmp_plugin.la

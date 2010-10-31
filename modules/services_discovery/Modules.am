@@ -20,13 +20,14 @@ libxcb_apps_plugin_la_CFLAGS = $(AM_CFLAGS) \
 libxcb_apps_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS)
 libxcb_apps_plugin_la_DEPENDENCIES =
+if HAVE_XCB
+libvlc_LTLIBRARIES += libxcb_apps_plugin.la
+endif
 
 EXTRA_LTLIBRARIES += \
-	libudev_plugin.la \
-	libxcb_apps_plugin.la
+	libudev_plugin.la
 libvlc_LTLIBRARIES += \
 	libmediadirs_plugin.la \
 	libpodcast_plugin.la \
 	libsap_plugin.la \
-	$(LTLIBudev) \
-	$(LTLIBxcb_apps)
+	$(LTLIBudev)
