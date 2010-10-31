@@ -2577,6 +2577,11 @@ CLEAN_FILE += .sqlite3
 CLEAN_PKG += sqlite-$(SQLITE_VERSION)
 DISTCLEAN_PKG += sqlite-amalgamation-$(SQLITE_VERSION).tar.gz
 
+# ***************************************************************************
+# Make sure the build tools are built before the other targets
+# ***************************************************************************
+
+$(CLEAN_PKG): $(TOOLS)
 
 # ***************************************************************************
 # Some cleaning
