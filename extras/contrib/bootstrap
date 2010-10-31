@@ -61,7 +61,7 @@ info()
 DISTRO=
 BUILDDIR=.
 
-while getopts “ht:d:b:i:” OPTION
+while getopts "ht:d:b:i:" OPTION
 do
      case $OPTION in
          h)
@@ -82,10 +82,16 @@ do
              ;;
          ?)
              usage
-             exit
+             exit 1
              ;;
      esac
 done
+shift $(($OPTIND - 1))
+
+if [ "x$1" != "x" ]; then
+    usage
+    exit 1
+fi
 
 BUILD=`gcc -dumpmachine`
 
