@@ -941,10 +941,13 @@ void PictureFlow::keyPressEvent(QKeyEvent* event)
 
 void PictureFlow::mousePressEvent(QMouseEvent* event)
 {
-    if (event->x() > width() / 2)
+    if (event->x() > width() / 2 + d->state->slideWidth/2 )
         showNext();
-    else
+    else if (event->x() < width() / 2 - d->state->slideWidth/2 )
         showPrevious();
+    else if ( d->state->model->currentIndex().row() != d->state->centerIndex )
+        d->state->model->activateItem( d->state->model->index( d->state->centerIndex, 0,
+                                                               d->state->model->currentIndex().parent() ) );
 }
 
 void PictureFlow::paintEvent(QPaintEvent* event)
