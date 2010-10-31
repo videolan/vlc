@@ -181,7 +181,6 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         {
                             free( psz_attrname );
                             free( psz_attrvalue );
-                            free( psz_eltname );
                             break;
                         }
 
