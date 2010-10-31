@@ -89,7 +89,7 @@ else
 HOSTCC2=$(HOSTCC)
 endif
 
-FFMPEGCONF=
+FFMPEGCONF=--disable-doc
 
 # cross compiling
 #This should be inside the if block but some config scripts are buggy
