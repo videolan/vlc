@@ -29,6 +29,7 @@ Core:
 
 Demuxers:
  * id3tag plugin is removed (superseded by taglib)
+ * new images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
  * Ogg seeking improvements
  * Game Music Emu (GME) plugin rewritten from scratch using the C api
 
@@ -44,6 +45,9 @@ Video Core:
 
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
+ * New video output for iOS platform
+ * Adaptation of the OpenGL layer for OpenGL ES 2.0
+ * Various vmem improvements
 
 Video Filter:
  * New gradfun filter for debanding videos using dithering
