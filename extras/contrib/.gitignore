@@ -10,7 +10,6 @@ phrasebooks
 *.tar.bz2
 *.bak
 toolchain.cmake
-# Ignore fetched contrib
-build-src/*
-# But not our files
-!*.mak
+build-src/
+distro.mak
+config.mak
