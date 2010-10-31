@@ -700,7 +700,6 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
      * Restore old settings from the config in file
      */
     fputs( p_bigbuffer, file );
-    free( p_bigbuffer );
 
     /*
      * Flush to disk and replace atomically
@@ -738,6 +737,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
     free (temporary);
     free (permanent);
+    free( p_bigbuffer );
     return 0;
 
 error:
