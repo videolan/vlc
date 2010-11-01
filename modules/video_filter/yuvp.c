@@ -162,7 +162,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             {
                 const int v = p_line[x];
 
-                if( v > rgbp.i_entries )  /* maybe assert ? */
+                if( v >= rgbp.i_entries )  /* maybe assert ? */
                     continue;
 
                 p_rgba[4*x+0] = rgbp.palette[v][0];
