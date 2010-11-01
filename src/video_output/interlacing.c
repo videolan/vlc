@@ -139,31 +139,6 @@ static void DeinterlaceAdd( vout_thread_t *p_vout )
     }
 }
 
-static void DeinterlaceSave( vout_thread_t *p_vout, int i_deinterlace, const char *psz_mode )
-{
-    /* We have to set input variable to ensure restart support
-     * FIXME to be removed when vout_Request does the right job.
-     */
-    vlc_object_t *p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( !p_input )
-        return;
-
-    var_Create( p_input, "deinterlace", VLC_VAR_INTEGER );
-    var_SetInteger( p_input, "deinterlace", i_deinterlace );
-
-    static const char * const ppsz_variable[] = {
-        "deinterlace-mode",
-        "sout-deinterlace-mode",
-        NULL
-    };
-    for( int i = 0; ppsz_variable[i]; i++ )
-    {
-        var_Create( p_input, ppsz_variable[i], VLC_VAR_STRING );
-        var_SetString( p_input, ppsz_variable[i], psz_mode );
-    }
-
-    vlc_object_release( p_input );
-}
 static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
                                 vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
@@ -176,8 +151,6 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
     const bool is_needed     = var_GetBool( p_this, "deinterlace-needed" );
     if( !psz_mode || !DeinterlaceIsModeValid(psz_mode) )
         return VLC_EGENERIC;
-
-    DeinterlaceSave( p_vout, i_deinterlace, psz_mode );
 
     /* */
     char *psz_old = var_CreateGetString( p_vout, "sout-deinterlace-mode" );
@@ -213,6 +186,7 @@ void vout_InitInterlacingSupport( vout_thread_t *p_vout, bool is_interlaced )
     /* */
     var_Create( p_vout, "deinterlace", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_HASCHOICE );
     int i_deinterlace = var_GetInteger( p_vout, "deinterlace" );
+    i_deinterlace = __MAX( __MIN( i_deinterlace, 1 ), -1 );
 
     text.psz_string = _("Deinterlace");
     var_Change( p_vout, "deinterlace", VLC_VAR_SETTEXT, &text, NULL );
@@ -255,15 +229,10 @@ void vout_InitInterlacingSupport( vout_thread_t *p_vout, bool is_interlaced )
         psz_filter_mode = var_CreateGetNonEmptyString( p_vout, "sout-deinterlace-mode" );
     if( psz_filter_mode )
     {
+        i_deinterlace = 1;
         free( psz_deinterlace );
-        if( i_deinterlace >= -1 )
-            i_deinterlace = 1;
         psz_deinterlace = psz_filter_mode;
     }
-
-    /* */
-    if( i_deinterlace < 0 )
-        i_deinterlace = -1;
 
     /* */
     val.psz_string = psz_deinterlace ? psz_deinterlace : p_optm->orig.psz;
