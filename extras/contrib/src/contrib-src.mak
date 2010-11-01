@@ -1,7 +1,7 @@
 #***************************************************************************
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
-# Copyright (C) 2003 - 2009 the VideoLAN team
+# Copyright (C) 2003 - 2010 the VideoLAN team
 # $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -1823,7 +1823,7 @@ CIPHDIG= --enable-ciphers=aes,des,rfc2268,arcfour --enable-digests=sha1,md5,rmd1
 
 .gcrypt: libgcrypt .gpg-error
 ifdef HAVE_WIN32
-	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(CIPHDIG) --disable-shared --enable-static --disable-nls && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(CIPHDIG) --disable-shared --enable-static --disable-nls && make && make install)
 else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS) -lgpg-error" $(CIPHDIG) && make && make install)
 endif
