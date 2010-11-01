@@ -27,6 +27,7 @@ Codecs
 Core:
  * Playback rate doesn't get resetted to 1 between items anymore
  * Major Video Output and Video Core reworks and rewrites
+ * Almost every video filter can now be transcoded
 
 Demuxers:
  * id3tag plugin is now removed (superseded by taglib)
