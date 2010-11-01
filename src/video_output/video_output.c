@@ -1017,9 +1017,11 @@ static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
         current = next;
     }
 
-    es_format_t fmt;
-    es_format_Init(&fmt, VIDEO_ES, vout->p->original.i_chroma);
-    fmt.video = vout->p->original;
+    es_format_t fmt_target;
+    es_format_Init(&fmt_target, VIDEO_ES, vout->p->original.i_chroma);
+    fmt_target.video = vout->p->original;
+
+    es_format_t fmt_current = fmt_target;
 
     vlc_mutex_lock(&vout->p->filter.lock);
 
@@ -1029,7 +1031,7 @@ static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
         filter_chain_t *chain = a == 0 ? vout->p->filter.chain_static :
                                          vout->p->filter.chain_interactive;
 
-        filter_chain_Reset(chain, &fmt, &fmt);
+        filter_chain_Reset(chain, &fmt_current, &fmt_current);
         for (int i = 0; i < vlc_array_count(array); i++) {
             vout_filter_t *e = vlc_array_item_at_index(array, i);
             msg_Dbg(vout, "Adding '%s' as %s", e->name, a == 0 ? "static" : "interactive");
@@ -1040,7 +1042,17 @@ static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
             free(e->name);
             free(e);
         }
+        fmt_current = *filter_chain_GetFmtOut(chain);
         vlc_array_clear(array);
+    }
+    if (!es_format_IsSimilar(&fmt_current, &fmt_target)) {
+        msg_Dbg(vout, "Adding a filter to compensate for format changes");
+        if (!filter_chain_AppendFilter(vout->p->filter.chain_interactive, NULL, NULL,
+                                       &fmt_current, &fmt_target)) {
+            msg_Err(vout, "Failed to compensate for the format changes, removing all filters");
+            filter_chain_Reset(vout->p->filter.chain_static,      &fmt_target, &fmt_target);
+            filter_chain_Reset(vout->p->filter.chain_interactive, &fmt_target, &fmt_target);
+        }
     }
 
     vlc_mutex_unlock(&vout->p->filter.lock);
@@ -1222,10 +1234,10 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
     vout->p->private_pool = NULL;
 
     vout->p->filter.chain_static =
-        filter_chain_New( vout, "video filter2", false,
+        filter_chain_New( vout, "video filter2", true,
                           VoutVideoFilterStaticAllocationSetup, NULL, vout);
     vout->p->filter.chain_interactive =
-        filter_chain_New( vout, "video filter2", false,
+        filter_chain_New( vout, "video filter2", true,
                           VoutVideoFilterInteractiveAllocationSetup, NULL, vout);
 
     vout_display_state_t state_default;
