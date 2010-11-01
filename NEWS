@@ -1,4 +1,4 @@
-Changes between 1.1.4 and 1.2.0-git:
+Changes between 1.1.5 and 1.2.0-git:
 ------------------------------------
 
 Important changes for packagers:
@@ -15,8 +15,8 @@ Access
  * BDA: experimental support for ClearQam devices
  * DVB-S scanning support
  * DShow: support for freq and video standard selection
- * Support for VDR recordings files and folders
- * Blu-Ray Disc integration using libbluray
+ * Support for VDR recordings (http://www.tvdr.de/) folders
+ * Blu-Ray Discs integration using libbluray
  * HTTP Live Streaming (IETF draft) playback support
  * Blackmagic DeckLink SDI card input support (Linux only currently)
 
@@ -26,9 +26,10 @@ Codecs
 
 Core:
  * Playback rate doesn't get resetted to 1 between items anymore
+ * Major Video Output and Video Core reworks and rewrites
 
 Demuxers:
- * id3tag plugin is removed (superseded by taglib)
+ * id3tag plugin is now removed (superseded by taglib)
  * new images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
  * Ogg seeking improvements
  * Game Music Emu (GME) plugin rewritten from scratch using the C api
@@ -36,12 +37,10 @@ Demuxers:
 Interfaces
  * The telnet interface has been removed in the favour of the lua one
  * Skins2 / Qt: misc improvements and usability fixes
- * Qt: effects dialogs reordering
+ * Qt: effects dialogs rework
+ * Qt: new CoverFlow-like view of the playlist
  * Qt: port to MacOS X platform
  * ncurses: heavy refactor of the complete interface
-
-Video Core:
- * Major Video Output and Video Core reworks and rewrites
 
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
