@@ -215,6 +215,9 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER( gradfun )
     SETUP_VFILTER_OPTION( gradfunRadiusSlider, valueChanged( int ) )
 
+    SETUP_VFILTER( grain )
+    SETUP_VFILTER_OPTION( grainVarianceSlider, valueChanged( int ) )
+
     if( module_exists( "atmo" ) )
     {
         SETUP_VFILTER( atmo )
