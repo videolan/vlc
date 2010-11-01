@@ -40,9 +40,9 @@
  */
 static const char *deinterlace_modes[] = {
     ""
-    //"discard",
+    "discard",
     "blend",
-    //"mean",
+    "mean",
     "bob",
     "linear",
     "x",
