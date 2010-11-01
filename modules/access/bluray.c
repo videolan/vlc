@@ -233,6 +233,7 @@ static int bluraySetTitle(access_t *p_access, int i_title)
     p_access->info.i_pos   = 0;
     p_access->info.b_eof   = false;
     p_access->info.i_seekpoint = 0;
+    p_access->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
 
     return VLC_SUCCESS;
 }
@@ -276,6 +277,7 @@ static int blurayControl(access_t *p_access, int query, va_list args)
         {
             int i_chapter = (int)va_arg( args, int );
             bd_seek_chapter( p_sys->bluray, i_chapter );
+            p_access->info.i_update = INPUT_UPDATE_SEEKPOINT;
             break;
         }
 
