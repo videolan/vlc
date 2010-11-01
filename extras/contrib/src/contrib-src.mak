@@ -90,7 +90,7 @@ else
 HOSTCC2=$(HOSTCC)
 endif
 
-FFMPEGCONF=--disable-doc
+FFMPEGCONF=--disable-doc --disable-decoder=libvpx
 
 # cross compiling
 #This should be inside the if block but some config scripts are buggy
@@ -155,6 +155,7 @@ endif
 ifdef HAVE_DARWIN_OS
 X264CONF=--host=$(HOST)
 X264CONF += --enable-pic
+FFMPEGCONF += --enable-libvpx
 ifdef HAVE_DARWIN_32
 FFMPEGCONF += --cc=gcc-4.0
 else
@@ -1035,7 +1036,7 @@ FFMPEGCONF += \
 	--disable-avfilter \
 	--disable-network
 ifdef HAVE_WIN64
-FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --disable-dxva2 --disable-bsfs 
+FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --disable-dxva2 --disable-bsfs
 else
 ifdef HAVE_WIN32
 FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --enable-dxva2 --disable-bsfs --enable-libvpx
