@@ -163,19 +163,12 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
 static int Mouse(filter_t *filter, vlc_mouse_t *mouse,
                  const vlc_mouse_t *mold, const vlc_mouse_t *mnew)
 {
-    const video_format_t          *fmt = &filter->fmt_in.video;
+    const video_format_t          *fmt = &filter->fmt_out.video;
     const transform_description_t *dsc = filter->p_sys->dsc;
 
     *mouse = *mnew;
-    int w, h;
-    if (dsc->is_rotated) {
-        w = fmt->i_visible_height;
-        h = fmt->i_visible_width;
-    } else {
-        w = fmt->i_visible_width;
-        h = fmt->i_visible_height;
-    }
-    dsc->convert(&mouse->i_x, &mouse->i_y, w, h, mouse->i_x, mouse->i_y);
+    dsc->convert(&mouse->i_x, &mouse->i_y,
+                 fmt->i_visible_width, fmt->i_visible_height, mouse->i_x, mouse->i_y);
     return VLC_SUCCESS;
 }
 
