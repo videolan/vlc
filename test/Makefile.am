@@ -22,6 +22,9 @@ check_PROGRAMS = \
 	test_src_misc_variables \
         $(NULL)
 
+check_SCRIPTS = \
+    modules/misc/lua/telnet.sh
+
 # Disabled test:
 # meta: No suitable test file
 EXTRA_PROGRAMS = \
