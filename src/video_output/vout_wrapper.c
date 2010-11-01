@@ -48,7 +48,7 @@ static int  Forward(vlc_object_t *, char const *,
  *
  *****************************************************************************/
 int vout_OpenWrapper(vout_thread_t *vout,
-                     const char *name, const vout_display_state_t *state)
+                     const char *splitter_name, const vout_display_state_t *state)
 {
     vout_thread_sys_t *sys = vout->p;
     msg_Dbg(vout, "Opening vout display wrapper");
@@ -66,13 +66,13 @@ int vout_OpenWrapper(vout_thread_t *vout,
     const mtime_t double_click_timeout = 300000;
     const mtime_t hide_timeout = var_CreateGetInteger(vout, "mouse-hide-timeout") * 1000;
 
-    sys->display.vd = vout_NewDisplay(vout, &source, state, name ? name : "$vout",
-                                      double_click_timeout, hide_timeout);
-    /* If we need to video filter and it fails, then try a splitter
-     * XXX it is a hack for now FIXME */
-    if (name && !sys->display.vd)
-        sys->display.vd = vout_NewSplitter(vout, &source, state, "$vout", name,
+    if (splitter_name) {
+        sys->display.vd = vout_NewSplitter(vout, &source, state, "$vout", splitter_name,
                                            double_click_timeout, hide_timeout);
+    } else {
+        sys->display.vd = vout_NewDisplay(vout, &source, state, "$vout",
+                                          double_click_timeout, hide_timeout);
+    }
     if (!sys->display.vd) {
         free(sys->display.title);
         return VLC_EGENERIC;
