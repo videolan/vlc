@@ -1018,8 +1018,7 @@ static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
     }
 
     es_format_t fmt_target;
-    es_format_Init(&fmt_target, VIDEO_ES, vout->p->original.i_chroma);
-    fmt_target.video = vout->p->original;
+    es_format_InitFromVideo(&fmt_target, &vout->p->original);
 
     es_format_t fmt_current = fmt_target;
 
