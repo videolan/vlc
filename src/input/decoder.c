@@ -1219,7 +1219,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         else
         {
             if( b_dated )
-                msg_Warn( p_aout, "received buffer in the future" );
+                msg_Warn( p_dec, "received buffer in the future" );
             else
                 msg_Warn( p_dec, "non-dated audio buffer received" );
 
@@ -1351,7 +1351,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
 
     if( p_picture->date <= VLC_TS_INVALID )
     {
-        msg_Warn( p_vout, "non-dated video buffer received" );
+        msg_Warn( p_dec, "non-dated video buffer received" );
         *pi_lost_sum += 1;
         vout_ReleasePicture( p_vout, p_picture );
         return;
@@ -1439,9 +1439,9 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
         else
         {
             if( b_dated )
-                msg_Warn( p_vout, "early picture skipped" );
+                msg_Warn( p_dec, "early picture skipped" );
             else
-                msg_Warn( p_vout, "non-dated video buffer received" );
+                msg_Warn( p_dec, "non-dated video buffer received" );
 
             *pi_lost_sum += 1;
             vout_ReleasePicture( p_vout, p_picture );
