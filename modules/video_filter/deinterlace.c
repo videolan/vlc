@@ -75,11 +75,10 @@ static const char *const mode_list_text[] = {
 vlc_module_begin ()
     set_description( N_("Deinterlacing video filter") )
     set_shortname( N_("Deinterlace" ))
-    set_capability( "video filter", 0 )
+    set_capability( "video filter2", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    set_capability( "video filter2", 0 )
     add_string( FILTER_CFG_PREFIX "mode", "blend", SOUT_MODE_TEXT,
                 SOUT_MODE_LONGTEXT, false )
         change_string_list( mode_list, mode_list_text, 0 )
