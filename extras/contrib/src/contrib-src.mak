@@ -2045,7 +2045,8 @@ ifdef HAVE_CYGWIN
 	patch -p0 < Patches/dirac-cygwin.patch
 endif
 	patch -p0 < Patches/dirac-noutils.patch
-	(cd $@; ./bootstrap)
+	patch -p0 < Patches/dirac-autotools.patch
+	(cd $@; autoreconf -ivf)
 
 DIRAC_SUBDIRS = libdirac_byteio libdirac_common libdirac_motionest libdirac_encoder libdirac_decoder
 
