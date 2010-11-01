@@ -2576,6 +2576,24 @@ CLEAN_FILE += .sqlite3
 CLEAN_PKG += sqlite-$(SQLITE_VERSION)
 DISTCLEAN_PKG += sqlite-amalgamation-$(SQLITE_VERSION).tar.gz
 
+# *****************************
+# GME
+# *****************************
+game-music-emu-$(GME_VERSION).tbz2:
+	$(WGET) $(GME_URL)
+
+game-music-emu-$(GME_VERSION): game-music-emu-$(GME_VERSION).tbz2
+	$(EXTRACT_BZ2)
+	patch -p0 < Patches/gme-static.patch
+
+.gme: game-music-emu-$(GME_VERSION)
+	(cd $<; $(HOSTCC) CPPFLAGS="$(CPPFLAGS)" cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make && make install )
+	touch $@
+
+CLEAN_FILE += .gme
+CLEAN_PKG  += game-music-emu-$(GME_VERSION)
+DISTCLEAN_PKG += game-music-emu-$(GME_VERSION).tbz2
+
 # ***************************************************************************
 # Make sure the build tools are built before the other targets
 # ***************************************************************************
