@@ -30,6 +30,7 @@
 #ifdef HAVE_CONFIG_H
 #   include "config.h"
 #endif
+#include <limits.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -97,8 +98,8 @@ typedef void (*convert_t)(int *, int *, int, int, int, int);
 
 static void Planar(plane_t *dst, const plane_t *src, convert_t f)
 {
-    for (int y = 0; y < src->i_visible_lines; y++) {
-        for (int x = 0; x < src->i_visible_pitch; x++) {
+    for (int y = 0; y < dst->i_visible_lines; y++) {
+        for (int x = 0; x < dst->i_visible_pitch; x++) {
             int sx, sy;
             f(&sx, &sy, dst->i_visible_pitch, dst->i_visible_lines, x, y);
             dst->p_pixels[y * dst->i_pitch + x] = src->p_pixels[sy * src->i_pitch + sx];
@@ -119,17 +120,18 @@ typedef struct {
     char      name[8];
     bool      is_rotated;
     convert_t convert;
+    convert_t iconvert;
     void      (*planar)(plane_t *dst, const plane_t *src);
 } transform_description_t;
 
 static const transform_description_t descriptions[] = {
-    { "90",    true,  R90,   PlanarR90, },
-    { "180",   false, R180,  PlanarR180, },
-    { "270",   true,  R270,  PlanarR270, },
-    { "hflip", false, HFlip, PlanarHFlip, },
-    { "vflip", false, VFlip, PlanarVFlip, },
+    { "90",    true,  R90,   R270,  PlanarR90, },
+    { "180",   false, R180,  R180,  PlanarR180, },
+    { "270",   true,  R270,  R90,   PlanarR270, },
+    { "hflip", false, HFlip, HFlip, PlanarHFlip, },
+    { "vflip", false, VFlip, VFlip, PlanarVFlip, },
 
-    { "", false, NULL, NULL, }
+    { "", false, NULL, NULL, NULL, }
 };
 
 struct filter_sys_t {
@@ -206,10 +208,32 @@ static int Open(vlc_object_t *object)
     free(type_name);
 
     if (sys->dsc->is_rotated) {
-        /* TODO */
-        msg_Err(filter, "Rotation mode not yet supported");
-        free(sys);
-        return VLC_EGENERIC;
+        if (!filter->b_allow_fmt_out_change) {
+            msg_Err(filter, "Format change is not allowed");
+            free(sys);
+            return VLC_EGENERIC;
+        }
+        const video_format_t *src = &filter->fmt_in.video;
+        video_format_t       *dst = &filter->fmt_out.video;
+
+        dst->i_width          = src->i_height;
+        dst->i_visible_width  = src->i_visible_height;
+        dst->i_height         = src->i_width;
+        dst->i_visible_height = src->i_visible_width;
+        dst->i_sar_num        = src->i_sar_den;
+        dst->i_sar_den        = src->i_sar_num;
+
+        dst->i_x_offset       = INT_MAX;
+        dst->i_y_offset       = INT_MIN;
+        for (int i = 0; i < 2; i++) {
+            int tx, ty;
+            sys->dsc->iconvert(&tx, &ty,
+                               src->i_width, src->i_height,
+                               src->i_x_offset + i * src->i_visible_width,
+                               src->i_y_offset + i * src->i_visible_height);
+            dst->i_x_offset = __MIN(dst->i_x_offset, (unsigned)tx);
+            dst->i_y_offset = __MIN(dst->i_y_offset, (unsigned)ty);
+        }
     }
 
     filter->p_sys           = sys;
