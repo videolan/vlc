@@ -7,7 +7,7 @@ all: .freetype .fribidi .a52 .mpeg2 .mad .ogg .vorbis .vorbisenc .theora \
     .dca .tag .x264 .goom2k4 .lua .zvbi .fontconfig .ncurses \
     .schroedinger .libass .libupnp .kate .sqlite3 .Sparkle
 
-TOOLS = .libtool .intl .pkgcfg .yasm
+TOOLS = .libtool .intl .pkgcfg .yasm .automake
 
 # .expat don't work with SDK yet
 # .glib .IDL .gecko are required to build the mozilla plugin

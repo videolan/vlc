@@ -299,6 +299,24 @@ CLEAN_FILE += .libtool
 endif
 
 # ***************************************************************************
+# automake
+# ***************************************************************************
+
+automake-$(AUTOMAKE_VERSION).tar.gz:
+	$(WGET) $(AUTOMAKE_URL)
+
+automake: automake-$(AUTOMAKE_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.automake: automake
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .automake
+CLEAN_PKG += automake
+DISTCLEAN_PKG += automake-$(AUTOMAKE_VERSION).tar.gz
+
+# ***************************************************************************
 # pkgconfig
 # ***************************************************************************
 
