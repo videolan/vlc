@@ -34,6 +34,7 @@
 #include <vlc_access.h>
 #include <vlc_messages.h>
 #include <vlc_input.h>
+#include <vlc_dialog.h>
 
 #include <libbluray/bluray.h>
 
@@ -127,6 +128,51 @@ static int blurayOpen( vlc_object_t *object )
         return VLC_EGENERIC;
     }
 
+    /* Warning the user about AACS/BD+ */
+    const BLURAY_DISC_INFO *disc_info = bd_get_disc_info(p_sys->bluray);
+    msg_Dbg (p_access, "First play: %i, Top menu: %i\n"
+                       "HDMV Titles: %i, BDJ Titles: %i, Other: %i",
+             disc_info->first_play_supported, disc_info->top_menu_supported,
+             disc_info->num_hdmv_titles, disc_info->num_bdj_titles,
+             disc_info->num_unsupported_titles);
+
+    /* AACS */
+    if (disc_info->aacs_detected) {
+        if (!disc_info->libaacs_detected) {
+            dialog_Fatal (p_access, _("Blu-Ray error"),
+                    _("This Blu-Ray Disc needs a library for AACS decoding, "
+                      "and your system does not have it."));
+            blurayClose(object);
+            return VLC_EGENERIC;
+        }
+        if (!disc_info->aacs_handled) {
+            dialog_Fatal (p_access, _("Blu-Ray error"),
+                    _("Your system AACS decoding library does not work. "
+                      "Missing keys?"));
+            blurayClose(object);
+            return VLC_EGENERIC;
+        }
+    }
+
+    /* BD+ */
+    if (disc_info->bdplus_detected) {
+        if (!disc_info->libbdplus_detected) {
+            dialog_Fatal (p_access, _("Blu-Ray error"),
+                    _("This Blu-Ray Disc needs a library for BD+ decoding, "
+                      "and your system does not have it."));
+            blurayClose(object);
+            return VLC_EGENERIC;
+        }
+        if (!disc_info->bdplus_handled) {
+            dialog_Fatal (p_access, _("Blu-Ray error"),
+                    _("Your system BD+ decoding library does not work. "
+                      "Missing configuration?"));
+            blurayClose(object);
+            return VLC_EGENERIC;
+        }
+    }
+
+    /* Get titles and chapters */
     if (blurayInitTitles(p_access) != VLC_SUCCESS) {
         blurayClose(object);
         return VLC_EGENERIC;
