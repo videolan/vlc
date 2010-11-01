@@ -602,12 +602,6 @@ static void BlendYUVARV24( filter_t *p_filter,
     else
     {
         int i_rindex, i_gindex, i_bindex;
-        uint32_t i_rmask, i_gmask, i_bmask;
-
-        i_rmask = p_filter->fmt_out.video.i_rmask;
-        i_gmask = p_filter->fmt_out.video.i_gmask;
-        i_bmask = p_filter->fmt_out.video.i_bmask;
-
         vlc_rgb_index( &i_rindex, &i_gindex, &i_bindex, &p_filter->fmt_out.video );
 
         /* Draw until we reach the bottom of the subtitle */
