@@ -439,7 +439,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             answer->i_status = 200;
             httpd_MsgAdd( answer, "Content-Type",  "%s", "application/sdp" );
             httpd_MsgAdd( answer, "Content-Base",  "%s", control );
-            answer->p_body = (uint8_t *)SDPGenerate( rtsp->owner, control );
+            answer->p_body = (uint8_t *)SDPGenerate( p_stream, control );
             if( answer->p_body != NULL )
                 answer->i_body = strlen( (char *)answer->p_body );
             else
@@ -661,7 +661,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                               + sizeof("url=/trackID=123;seq=65535;"
                                        "rtptime=4294967295, ") ) + 1];
                 size_t infolen = 0;
-                int64_t ts = rtp_get_ts( rtsp->owner );
+                int64_t ts = rtp_get_ts( p_stream );
 
                 for( int i = 0; i < ses->trackc; i++ )
                 {
