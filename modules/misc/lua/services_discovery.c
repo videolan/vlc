@@ -34,8 +34,9 @@
  * Local prototypes
  *****************************************************************************/
 static void *Run( void * );
-static int   DoSearch( services_discovery_t *p_sd, const char *psz_query );
-static int   Control( services_discovery_t *p_sd, int i_command, va_list args );
+static int DoSearch( services_discovery_t *p_sd, const char *psz_query );
+static int FillDescriptor( services_discovery_t *, services_discovery_descriptor_t * );
+static int Control( services_discovery_t *p_sd, int i_command, va_list args );
 
 static const char * const ppsz_sd_options[] = { "sd", "longname", NULL };
 
@@ -263,8 +264,12 @@ static int Control( services_discovery_t *p_sd, int i_command, va_list args )
         break;
     }
 
-    case SD_CMD_CAPABILITIES:
-        return VLC_EGENERIC;
+    case SD_CMD_DESCRIPTOR:
+    {
+        services_discovery_descriptor_t *p_desc = va_arg( args,
+                                services_discovery_descriptor_t * );
+        return FillDescriptor( p_sd, p_desc );
+    }
     }
 
     return VLC_SUCCESS;
@@ -298,4 +303,80 @@ static int DoSearch( services_discovery_t *p_sd, const char *psz_query )
     }
 
     return VLC_SUCCESS;
+}
+
+/** List of capabilities */
+static const char *const ppsz_capabilities[] = {
+    "search",
+    NULL
+};
+
+static int FillDescriptor( services_discovery_t *p_sd,
+                           services_discovery_descriptor_t *p_desc )
+{
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+    int i_ret = VLC_EGENERIC;
+
+    lua_State *L = luaL_newstate();
+    if( luaL_dofile( L, p_sys->psz_filename ) )
+    {
+        msg_Err( p_sd, "Error loading script %s: %s", p_sys->psz_filename,
+                 lua_tostring( L, -1 ) );
+        goto end;
+    }
+
+    /* Call the "descriptor" function */
+    lua_getglobal( L, "descriptor" );
+    if( !lua_isfunction( L, -1 ) || lua_pcall( L, 0, 1, 0 ) )
+    {
+        msg_Warn( p_sd, "Error getting the descriptor in '%s': %s",
+                  p_sys->psz_filename, lua_tostring( L, -1 ) );
+        goto end;
+    }
+
+    /* Get the different fields of the returned table */
+    lua_getfield( L, -1, "short_description" );
+    p_desc->psz_short_desc = luaL_strdupornull( L, -1 );
+    lua_pop( L, 1 );
+
+    lua_getfield( L, -1, "icon" );
+    p_desc->psz_icon_url = luaL_strdupornull( L, -1 );
+    lua_pop( L, 1 );
+
+    lua_getfield( L, -1, "url" );
+    p_desc->psz_url = luaL_strdupornull( L, -1 );
+    lua_pop( L, 1 );
+
+    lua_getfield( L, -1, "capabilities" );
+    p_desc->i_capabilities = 0;
+    if( lua_istable( L, -1 ) )
+    {
+        lua_pushnil( L );
+        while( lua_next( L, -2 ) != 0 )
+        {
+            /* Key is at index -2 and value at index -1 */
+            const char *psz_cap = luaL_checkstring( L, -1 );
+            int i_cap = 0;
+            const char *psz_iter;
+            for( psz_iter = *ppsz_capabilities; psz_iter;
+                 psz_iter = ppsz_capabilities[ ++i_cap ] )
+            {
+                if( !strcmp( psz_iter, psz_cap ) )
+                {
+                    p_desc->i_capabilities |= 1 << i_cap;
+                    break;
+                }
+            }
+            if( !psz_iter )
+                msg_Warn( p_sd, "Services discovery capability '%s' unknown in "
+                                "script '%s'", psz_cap, p_sys->psz_filename );
+        }
+    }
+    lua_pop( L, 1 );
+    i_ret = VLC_SUCCESS;
+
+end:
+    lua_close( L );
+    return i_ret;
+
 }
