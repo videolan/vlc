@@ -561,6 +561,26 @@ static int vlclua_dec_integer( lua_State *L )
     return 1;
 }
 
+static int vlclua_countchoices( lua_State *L )
+{
+    vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
+    const char *psz_var = luaL_checkstring( L, 2 );
+    int i_count = var_CountChoices( *pp_obj, psz_var );
+
+    lua_pushinteger( L, i_count );
+    return 1;
+}
+
+static int vlclua_togglebool( lua_State *L )
+{
+    vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
+    const char *psz_var = luaL_checkstring( L, 2 );
+    bool b_val = var_ToggleBool( *pp_obj, psz_var );
+
+    lua_pushboolean( L, b_val );
+    return 1;
+}
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -576,6 +596,8 @@ static const luaL_Reg vlclua_var_reg[] = {
     { "libvlc_command", vlclua_libvlc_command },
     { "inc_integer", vlclua_inc_integer },
     { "dec_integer", vlclua_dec_integer },
+    { "count_choices", vlclua_countchoices },
+    { "toggle_bool", vlclua_togglebool },
     { NULL, NULL }
 };
 
