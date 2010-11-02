@@ -852,7 +852,7 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
     if (hls->bandwidth != bw)
     {
         int newstream = BandwidthAdaptation(s, hls->id, &bw);
-        if ((newstream > 0) && (newstream != *cur_stream))
+        if ((newstream >= 0) && (newstream != *cur_stream))
         {
             msg_Info(s, "switching to %s bandwidth (%"PRIu64") stream",
                      (hls->bandwidth <= bw) ? "faster" : "lower", bw);
