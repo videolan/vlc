@@ -299,8 +299,22 @@ CLEAN_FILE += .libtool
 endif
 
 # ***************************************************************************
-# automake
+# autotools
 # ***************************************************************************
+
+autoconf-$(AUTOCONF_VERSION).tar.bz2:
+	$(WGET) $(AUTOCONF_URL)
+
+autoconf: autoconf-$(AUTOCONF_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.autoconf: autoconf
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .autoconf
+CLEAN_PKG += autoconf
+DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.bz2
 
 automake-$(AUTOMAKE_VERSION).tar.gz:
 	$(WGET) $(AUTOMAKE_URL)
@@ -308,7 +322,7 @@ automake-$(AUTOMAKE_VERSION).tar.gz:
 automake: automake-$(AUTOMAKE_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-.automake: automake
+.automake: automake .autoconf
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	touch $@
 
