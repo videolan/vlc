@@ -38,7 +38,6 @@ all: $(TARGETALL)
 
 using-src:
 	$(MAKE) -C build-src
-
 ifdef HAVE_DARWIN_10
 	(cd $(PREFIX)/lib && sed -e 's%/usr/lib/libiconv.la%$(PREFIX)/lib/libiconv.la%g' -i.orig *.la && rm -f *.la.orig)
 endif
