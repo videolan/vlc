@@ -73,6 +73,9 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     getSettings()->beginGroup("Playlist");
     int i_savedViewMode = getSettings()->value( "view-mode", TREE_VIEW ).toInt();
     getSettings()->endGroup();
+    /* Limit the saved value to a possible one inside [0, VIEW_COUNT[ */
+    if(i_savedViewMode < 0 || i_savedViewMode >= VIEW_COUNT)
+        i_savedViewMode = 0;
 
     showView( i_savedViewMode );
 
