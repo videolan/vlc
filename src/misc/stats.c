@@ -452,7 +452,7 @@ static int CounterUpdate( vlc_object_t *p_handler,
         {
             counter_sample_t *p_new = (counter_sample_t*)malloc(
                                                sizeof( counter_sample_t ) );
-            p_new->value.psz_string = NULL;
+            p_new->value.i_int = 0;
 
             INSERT_ELEM( p_counter->pp_samples, p_counter->i_samples,
                          p_counter->i_samples, p_new );
@@ -524,7 +524,7 @@ static int CounterUpdate( vlc_object_t *p_handler,
         {
             counter_sample_t *p_new = (counter_sample_t*)malloc(
                                                sizeof( counter_sample_t ) );
-            p_new->value.psz_string = NULL;
+            p_new->value.i_int = 0;
 
             INSERT_ELEM( p_counter->pp_samples, p_counter->i_samples,
                          p_counter->i_samples, p_new );
