@@ -809,6 +809,10 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
 
             i_kfa_elements = fh.i_length / 8;
         }
+        else
+        {
+            i_kfa_elements = 0;
+        }
     }
     else
     {
