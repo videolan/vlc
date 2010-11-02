@@ -363,7 +363,7 @@ static void Win32AddConnection( access_t *p_access, char *psz_path,
                                 char *psz_user, char *psz_pwd,
                                 char *psz_domain )
 {
-    DWORD (*OurWNetAddConnection2)( LPNETRESOURCE, LPCTSTR, LPCTSTR, DWORD );
+    DWORD WINAPI (*OurWNetAddConnection2)( LPNETRESOURCE, LPCTSTR, LPCTSTR, DWORD );
     char psz_remote[MAX_PATH], psz_server[MAX_PATH], psz_share[MAX_PATH];
     NETRESOURCE net_resource;
     DWORD i_result;
