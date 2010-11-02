@@ -1,13 +1,12 @@
 # Darwin rules
-all: .freetype .fribidi .a52 .mpeg2 .mad .ogg .vorbis .vorbisenc .theora \
+all: .libtool .intl .pkgcfg .yasm .automake .freetype \
+    .fribidi .a52 .mpeg2 .mad .ogg .vorbis .vorbisenc .theora \
     .flac .speex .shout .faad .lame .twolame .ebml .matroska .ffmpeg \
     .dvdcss .libdvdread .dvdnav .dvbpsi .live .caca .mod .fontconfig \
     .png .gpg-error .gcrypt .gnutls .cddb .cdio .vcdimager \
     .SDL_image .gecko .mpcdec .dirac_encoder .dirac_decoder \
     .dca .tag .x264 .goom2k4 .lua .zvbi .fontconfig .ncurses \
     .schroedinger .libass .libupnp .kate .sqlite3 .Sparkle
-
-TOOLS = .libtool .intl .pkgcfg .yasm .automake
 
 # .expat don't work with SDK yet
 # .glib .IDL .gecko are required to build the mozilla plugin
