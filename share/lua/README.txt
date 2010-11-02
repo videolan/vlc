@@ -404,6 +404,11 @@ var.command( object name, name, argument ): Issue "object name"'s "name"
 var.libvlc_command( name, argument ): Issue libvlc's "name" command with
   argument "argument".
 
+var.inc_integer( name ): Increment the given integer.
+var.dec_integer( name ): Decrement the given integer.
+var.count_choices( name ): Return the number of choices.
+var.toggle_bool( name ): Toggle the given boolean.
+
 Video
 -----
 video.fullscreen( [status] ):
