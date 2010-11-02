@@ -73,7 +73,7 @@ enum services_discovery_category_e
 enum services_discovery_command_e
 {
     SD_CMD_SEARCH = 1,          /**< arg1 = query */
-    SD_CMD_CAPABILITIES         /**< arg1 = services_discovery_descriptor_t* */
+    SD_CMD_DESCRIPTOR           /**< arg1 = services_discovery_descriptor_t* */
 };
 
 /**
@@ -120,7 +120,7 @@ VLC_EXPORT( char **, vlc_sd_GetNames, ( vlc_object_t *, char ***, int ** ) LIBVL
 #define vlc_sd_GetNames(obj, pln, pcat ) \
         vlc_sd_GetNames(VLC_OBJECT(obj), pln, pcat)
 
-/* Creation of a service_discovery object */
+/* Creation of a services_discovery object */
 VLC_EXPORT( services_discovery_t *, vlc_sd_Create, ( vlc_object_t *, const char * ) LIBVLC_USED );
 VLC_EXPORT( bool, vlc_sd_Start, ( services_discovery_t * ) );
 VLC_EXPORT( void, vlc_sd_Stop, ( services_discovery_t * ) );
