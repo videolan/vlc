@@ -45,7 +45,7 @@ static const luaL_Reg p_reg[] =
 #define EXT_META_LISTENER     (1 << 3)   ///< Hook: meta_changed
 #define EXT_PLAYING_LISTENER  (1 << 4)   ///< Hook: status_changed
 
-const char* const ppsz_capabilities[] = {
+static const char* const ppsz_capabilities[] = {
     "menu",
     "trigger",
     "input-listener",
