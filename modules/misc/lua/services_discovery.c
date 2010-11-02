@@ -1,9 +1,10 @@
 /*****************************************************************************
  * services_discovery.c : Services discovery using lua scripts
  *****************************************************************************
- * Copyright (C) 2009 VideoLAN and AUTHORS
+ * Copyright (C) 2010 VideoLAN and AUTHORS
  *
  * Authors: Fabio Ritrovato <sephiroth87 at videolan dot org>
+ *          Rémi Duraffort <ivoire at videolan -dot- org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +44,6 @@ static const char * const ppsz_sd_options[] = { "sd", "longname", NULL };
 /*****************************************************************************
  * Local structures
  *****************************************************************************/
-
 struct services_discovery_sys_t
 {
     lua_State *L;
@@ -246,7 +246,7 @@ static void* Run( void *data )
 }
 
 /*****************************************************************************
- * Search: search for items according to the given query
+ * Control: services discrovery control
  ****************************************************************************/
 static int Control( services_discovery_t *p_sd, int i_command, va_list args )
 {
@@ -275,6 +275,9 @@ static int Control( services_discovery_t *p_sd, int i_command, va_list args )
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * DoSearch: search for a given query
+ ****************************************************************************/
 static int DoSearch( services_discovery_t *p_sd, const char *psz_query )
 {
     services_discovery_sys_t *p_sys = p_sd->p_sys;
@@ -311,12 +314,16 @@ static const char *const ppsz_capabilities[] = {
     NULL
 };
 
+/*****************************************************************************
+ * FillDescriptor: call the descriptor function and fill the structure
+ ****************************************************************************/
 static int FillDescriptor( services_discovery_t *p_sd,
                            services_discovery_descriptor_t *p_desc )
 {
     services_discovery_sys_t *p_sys = p_sd->p_sys;
     int i_ret = VLC_EGENERIC;
 
+    /* Create a new lua thread */
     lua_State *L = luaL_newstate();
     if( luaL_dofile( L, p_sys->psz_filename ) )
     {
@@ -351,6 +358,7 @@ static int FillDescriptor( services_discovery_t *p_sd,
     p_desc->i_capabilities = 0;
     if( lua_istable( L, -1 ) )
     {
+        /* List all table entries */
         lua_pushnil( L );
         while( lua_next( L, -2 ) != 0 )
         {
