@@ -542,6 +542,26 @@ static int vlclua_trigger_callback( lua_State *L )
     return vlclua_push_ret( L, var_TriggerCallback( *pp_obj, psz_var ) );
 }
 
+static int vlclua_inc_integer( lua_State *L )
+{
+    vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
+    const char *psz_var = luaL_checkstring( L, 2 );
+    int64_t i_val = var_IncInteger( *pp_obj, psz_var );
+
+    lua_pushinteger( L, i_val );
+    return 1;
+}
+
+static int vlclua_dec_integer( lua_State *L )
+{
+    vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
+    const char *psz_var = luaL_checkstring( L, 2 );
+    int64_t i_val = var_DecInteger( *pp_obj, psz_var );
+
+    lua_pushinteger( L, i_val );
+    return 1;
+}
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -555,6 +575,8 @@ static const luaL_Reg vlclua_var_reg[] = {
     { "trigger_callback", vlclua_trigger_callback },
     { "command", vlclua_command },
     { "libvlc_command", vlclua_libvlc_command },
+    { "inc_integer", vlclua_inc_integer },
+    { "dec_integer", vlclua_dec_integer },
     { NULL, NULL }
 };
 
