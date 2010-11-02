@@ -281,7 +281,6 @@ struct sout_stream_sys_t
 
     /* */
     char     *psz_destination;
-    uint32_t  payload_bitmap;
     uint16_t  i_port;
     uint16_t  i_port_audio;
     uint16_t  i_port_video;
@@ -472,7 +471,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_npt_zero = VLC_TS_INVALID;
     p_sys->i_pts_zero = mdate(); /* arbitrary value, could probably be
                                   * random */
-    p_sys->payload_bitmap = 0xFFFFFFFF;
     p_sys->i_es = 0;
     p_sys->es   = NULL;
     p_sys->rtsp = NULL;
@@ -909,20 +907,15 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     char              *psz_sdp;
 
-    if (0 == p_sys->payload_bitmap)
-    {
-        msg_Err (p_stream, "too many RTP elementary streams");
-        return NULL;
-    }
-
     sout_stream_id_t *id = malloc( sizeof( *id ) );
     if( unlikely(id == NULL) )
         return NULL;
     id->p_stream   = p_stream;
 
-    /* Look for free dymanic payload type */
-    id->i_payload_type = 96 + clz32 (p_sys->payload_bitmap);
-    assert (id->i_payload_type < 128);
+    /* Dynamic payload type. Payload types are scoped to the RTP
+     * session, and we put each ES in its own session, so no risk of
+     * conflict. */
+    id->i_payload_type = 96;
 
     vlc_rand_bytes (&id->i_sequence, sizeof (id->i_sequence));
     vlc_rand_bytes (id->ssrc, sizeof (id->ssrc));
@@ -1357,9 +1350,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                      "codec: %4.4s)", (char*)&p_fmt->i_codec );
             goto error;
     }
-    if (id->i_payload_type >= 96)
-        /* Mark dynamic payload type in use */
-        p_sys->payload_bitmap &= ~(1 << (127 - id->i_payload_type));
 
 #if 0 /* No payload formats sets this at the moment */
     int cscov = -1;
@@ -1430,10 +1420,6 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         vlc_join( id->thread, NULL );
         block_FifoRelease( id->p_fifo );
     }
-
-    /* Release dynamic payload type */
-    if (id->i_payload_type >= 96)
-        p_sys->payload_bitmap |= 1 << (127 - id->i_payload_type);
 
     free( id->psz_fmtp );
 

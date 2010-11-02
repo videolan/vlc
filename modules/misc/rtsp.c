@@ -152,8 +152,6 @@ struct vod_media_t
     char         *psz_rtsp_control_v6;
     char         *psz_rtsp_path;
 
-    int  i_payload_type;
-
     vlc_mutex_t lock;
 
     /* ES list */
@@ -438,8 +436,6 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
 
     vlc_mutex_init( &p_media->lock );
 
-    p_media->i_payload_type = 96;
-
     p_media->i_length = input_item_GetDuration( p_item );
 
     vlc_mutex_lock( &p_item->lock );
@@ -490,12 +486,6 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
 {
     char *psz_urlc;
 
-    if( p_media->i_payload_type >= 128 )
-    {
-        msg_Err( p_vod, "too many elementary streams");
-        return VLC_EGENERIC;
-    }
-
     media_es_t *p_es = calloc( 1, sizeof(media_es_t) );
     if( !p_es )
         return VLC_ENOMEM;
@@ -511,6 +501,9 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
     }
     msg_Dbg( p_vod, "  - ES %4.4s (%s)", (char *)&p_fmt->i_codec, psz_urlc );
 
+    /* Dynamic payload. No conflict since we put each ES in its own
+     * RTP session */
+    p_es->i_payload_type = 96;
     p_es->i_clock_rate = 90000;
     p_es->i_channels = 1;
 
@@ -526,16 +519,11 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             {
                 p_es->i_payload_type = 10;
             }
-            else
-            {
-                p_es->i_payload_type = p_media->i_payload_type++;
-            }
             p_es->psz_ptname = "L16";
             p_es->i_clock_rate = p_fmt->audio.i_rate;
             p_es->i_channels = p_fmt->audio.i_channels;
             break;
         case VLC_CODEC_U8:
-            p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_ptname = "L8";
             p_es->i_clock_rate = p_fmt->audio.i_rate;
             p_es->i_channels = p_fmt->audio.i_channels;
@@ -549,16 +537,13 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             p_es->psz_ptname = "MPV";
             break;
         case VLC_CODEC_A52:
-            p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_ptname = "ac3";
             p_es->i_clock_rate = p_fmt->audio.i_rate;
             break;
         case VLC_CODEC_H263:
-            p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_ptname = "H263-1998";
             break;
         case VLC_CODEC_H264:
-            p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_ptname = "H264";
             p_es->psz_fmtp = NULL;
             /* FIXME AAAAAAAAAAAARRRRRRRRGGGG copied from stream_out/rtp.c */
@@ -649,7 +634,6 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
                 p_es->psz_fmtp = strdup( "packetization-mode=1" );
             break;
         case VLC_CODEC_MP4V:
-            p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_ptname = "MP4V-ES";
             if( p_fmt->i_extra > 0 )
             {
@@ -662,7 +646,6 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             }
             break;
         case VLC_CODEC_MP4A:
-            p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_ptname = "mpeg4-generic";
             p_es->i_clock_rate = p_fmt->audio.i_rate;
             if( p_fmt->i_extra > 0 )
@@ -684,11 +667,9 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             break;
         case VLC_FOURCC( 'm', 'p', '2', 'p' ):
             p_media->psz_mux = "ps";
-            p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_ptname = "MP2P";
             break;
         case VLC_CODEC_AMR_NB:
-            p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_ptname = "AMR";
             p_es->i_clock_rate = 8000;
             if(p_fmt->audio.i_channels == 2 )
@@ -696,7 +677,6 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             p_es->psz_fmtp = strdup( "octet-align=1" );
             break;
         case VLC_CODEC_AMR_WB:
-            p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_ptname = "AMR-WB";
             p_es->i_clock_rate = 16000;
             if(p_fmt->audio.i_channels == 2 )
