@@ -1,4 +1,4 @@
-List of vlc plugins (355)
+List of vlc plugins (360)
 $Id$
  * a52: A/52 basic parser/packetizer
  * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
@@ -330,6 +330,7 @@ $Id$
  * voc: VOC demuxer
  * vod_rtsp: RTSP VoD module
  * vorbis: a vorbis audio decoder/packetizer using the libvorbis library
+ * vout_ios: iOS video output
  * vout_macosx: MacOS X OpenGL provider
  * vout_sdl: video output module using the SDL library
  * wall: image wall filter
