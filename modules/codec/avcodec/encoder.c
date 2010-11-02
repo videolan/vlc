@@ -993,7 +993,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
                 p_sys->i_last_ref_pts = p_block->i_pts;
             }
         }
-        else
+        else if( p_pict )
         {
             /* Buggy libavcodec which doesn't update coded_frame->pts
              * correctly */
