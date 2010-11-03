@@ -1175,13 +1175,6 @@ static void ThreadChangeZoom(vout_thread_t *vout, int num, int den)
 static void ThreadChangeAspectRatio(vout_thread_t *vout,
                                     unsigned num, unsigned den)
 {
-    const video_format_t *source = &vout->p->original;
-
-    if (num > 0 && den > 0) {
-        num *= source->i_visible_height;
-        den *= source->i_visible_width;
-        vlc_ureduce(&num, &den, num, den, 0);
-    }
     vout_SetDisplayAspect(vout->p->display.vd, num, den);
 }
 
