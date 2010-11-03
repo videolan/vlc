@@ -48,14 +48,11 @@ static vlc_fourcc_t GetFOURCC( const uint8_t *p_buff )
 static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk )
 {
     const uint8_t *p_peek;
-    int i_peek;
 
     memset( p_chk, 0, sizeof( avi_chunk_t ) );
 
-    if( ( i_peek = stream_Peek( s, &p_peek, 8 ) ) < 8 )
-    {
+    if( stream_Peek( s, &p_peek, 8 ) < 8 )
         return VLC_EGENERIC;
-    }
 
     p_chk->common.i_chunk_fourcc = GetFOURCC( p_peek );
     p_chk->common.i_chunk_size   = GetDWLE( p_peek + 4 );
