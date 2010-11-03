@@ -398,7 +398,7 @@ void stats_TimersCleanAll( vlc_object_t *p_obj )
 
 void stats_CounterClean( counter_t *p_c )
 {
-    if( p_c )
+    if( p_c && p_c->pp_samples )
     {
         int i = p_c->i_samples - 1 ;
         while( i >= 0 )
