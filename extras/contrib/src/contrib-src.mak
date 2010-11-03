@@ -311,10 +311,6 @@ autoconf: autoconf-$(AUTOCONF_VERSION).tar.bz2
 
 .autoconf: autoconf
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
-# Copy aclocal files
-# This is necessary for --missing aclocal to succeed after a
-# configure.ac/Makefile.am change in the vlc root dir
-	cp -Rf $(PREFIX)/share/aclocal/* $(VLCROOTDIR)/m4
 	touch $@
 
 CLEAN_FILE += .autoconf
