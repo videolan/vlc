@@ -990,6 +990,8 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         /* granulepos is in millisec */
         op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) / 1000;
     }
+    else
+        return VLC_EGENERIC;
 
     p_stream->u_last_granulepos = op.granulepos;
     ogg_stream_packetin( &p_stream->os, &op );
