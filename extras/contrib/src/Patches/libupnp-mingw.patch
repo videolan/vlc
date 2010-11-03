@@ -38,3 +38,15 @@
  	#define EAFNOSUPPORT 97
  #endif
  
+diff -ruN libupnp/threadutil/inc/ithread.h libupnp.new/threadutil/inc/ithread.h
+--- libupnp/threadutil/inc/ithread.h	2008-03-22 17:36:03.000000000 +0100
++++ libupnp.new/threadutil/inc/ithread.h	2010-11-02 15:33:43.544547707 +0100
+@@ -35,7 +35,7 @@
+ extern "C" {
+ #endif
+ 
+-
++#undef HAVE_CONFIG_H
+ #include <pthread.h>
+ #ifndef WIN32
+ 	#include <unistd.h>
