@@ -1351,30 +1351,26 @@ static bool StyleEquals( ft_style_t *s1, ft_style_t *s2 )
 static void IconvText( filter_t *p_filter, const char *psz_string,
                        size_t *i_string_length, uint32_t **ppsz_unicode )
 {
-    /* If memory hasn't been allocated for our output string, allocate it here
-     * - the calling function must now be responsible for freeing it.
-     */
-    if( !*ppsz_unicode )
-        *ppsz_unicode = (uint32_t *)
-            malloc( (strlen( psz_string ) + 1) * sizeof( uint32_t ));
+    *i_string_length = 0;
+    if( *ppsz_unicode == NULL )
+        return;
 
-    /* We don't need to handle a NULL pointer in *ppsz_unicode
-     * if we are instead testing for a non NULL value like we are here */
-
-    if( *ppsz_unicode )
-    {
-        *ppsz_unicode =
+    size_t i_length;
+    uint32_t *psz_tmp =
 #if defined(WORDS_BIGENDIAN)
-            ToCharset( "UCS-4BE", psz_string, i_string_length );
+            ToCharset( "UCS-4BE", psz_string, &i_length );
 #else
-            ToCharset( "UCS-4LE", psz_string, i_string_length );
+            ToCharset( "UCS-4LE", psz_string, &i_length );
 #endif
-        if( *ppsz_unicode != NULL )
-            *i_string_length /= 4;
-        else
-            /* FIXME: This is going to fail miserably in the caller */
-            msg_Warn( p_filter, "failed to convert string to unicode (%m)" );
+    if( !psz_tmp )
+    {
+        msg_Warn( p_filter, "failed to convert string to unicode (%m)" );
+        return;
     }
+    memcpy( *ppsz_unicode, psz_tmp, i_length );
+    *i_string_length = i_length / 4;
+
+    free( psz_tmp );
 }
 
 static ft_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
