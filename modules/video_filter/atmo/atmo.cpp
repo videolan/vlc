@@ -44,6 +44,8 @@
 #include <vlc_playlist.h>
 #include <vlc_filter.h>
 
+#include "filter_picture.h"
+
 #include "AtmoDefs.h"
 #include "AtmoDynData.h"
 #include "AtmoLiveView.h"
@@ -2289,7 +2291,15 @@ static picture_t * Filter( filter_t *p_filter, picture_t *p_pic )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     if( !p_pic ) return NULL;
-
+    
+    picture_t *p_outpic = filter_NewPicture( p_filter );
+    if( !p_outpic )
+    {
+        picture_Release( p_pic );
+        return NULL;
+    }
+    picture_CopyPixels( p_outpic, p_pic );
+    
     vlc_mutex_lock( &p_sys->filter_lock );
 
     if((p_sys->b_enabled == true) &&
@@ -2301,14 +2311,13 @@ static picture_t * Filter( filter_t *p_filter, picture_t *p_pic )
         p_sys->i_crop_width     = p_filter->fmt_in.video.i_visible_width;
         p_sys->i_crop_height    = p_filter->fmt_in.video.i_visible_height;
 
-        CreateMiniImage(p_filter, p_pic);
+        CreateMiniImage(p_filter, p_outpic);
     }
 
     vlc_mutex_unlock( &p_sys->filter_lock );
 
 
-
-    return p_pic;
+    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 
