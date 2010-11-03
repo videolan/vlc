@@ -189,6 +189,8 @@ int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
     char *ansi = ToLocaleDup (str);
     free (str);
 
+    if (ansi == NULL)
+        return -1;
     fputs (ansi, stream);
     free (ansi);
     return res;
