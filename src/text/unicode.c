@@ -440,7 +440,7 @@ void *ToCharset(const char *charset, const char *in, size_t *outsize)
 
         if (vlc_iconv (hd, &inp, &inb, &outp, &outb) != (size_t)(-1))
         {
-            *outsize = outlen - outb;
+            *outsize = outlen - mul - outb;
             outb += mul;
             inb = 1; /* append nul terminator if possible */
             if (vlc_iconv (hd, &inp, &inb, &outp, &outb) != (size_t)(-1))
