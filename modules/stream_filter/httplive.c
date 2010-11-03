@@ -1087,8 +1087,12 @@ static int AccessDownload(stream_t *s, segment_t *segment)
         {
             msg_Dbg(s, "size changed %"PRIu64, segment->size);
             segment->data = block_Realloc(segment->data, 0, p_sys->p_access->info.i_size);
-            if (segment->data)
-                segment->size = p_sys->p_access->info.i_size;
+            if (segment->data == NULL)
+            {
+                AccessClose(s);
+                return VLC_ENOMEM;
+            }
+            segment->size = p_sys->p_access->info.i_size;
             assert(segment->data->i_buffer == segment->size);
         }
         length = p_sys->p_access->pf_read(p_sys->p_access,
