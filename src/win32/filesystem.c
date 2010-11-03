@@ -193,35 +193,6 @@ char *vlc_readdir (DIR *dir)
     return FromWide (ent->d_name);
 }
 
-#if 0
-void vlc_rewinddir (DIR *dir)
-{
-    vlc_DIR *p_dir = (DIR *)dir;
-
-    if (p_dir->p_real_dir == NULL)
-        p_dir->i_drives = GetLogicalDrives ();
-    else
-        _wrewinddir (p_dir->p_real_dir);
-}
-#endif
-
-/* FIXME XXX TODO: needs to replace closedir() with this!!! */
-#warning THIS REALLY NEEDS FIXING!!!
-int vlc_wclosedir (DIR *dir)
-{
-    vlc_DIR *p_dir = (vlc_DIR *)dir;
-    int ret;
-
-    if (p_dir->p_real_dir == NULL)
-        ret = 0;
-    else
-        ret = _wclosedir (p_dir->p_real_dir);
-    free (p_dir);
-
-    return ret;
-}
-
-
 int vlc_stat (const char *filename, struct stat *buf)
 {
 #ifdef UNDER_CE
