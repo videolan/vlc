@@ -435,7 +435,7 @@ void *ToCharset(const char *charset, const char *in, size_t *outsize)
 
         const char *inp = in;
         char *outp = res;
-        size_t inb = inlen + 1;
+        size_t inb = inlen;
         size_t outb = outlen;
 
         if (vlc_iconv (hd, &inp, &inb, &outp, &outb) != (size_t)(-1))
@@ -449,6 +449,7 @@ void *ToCharset(const char *charset, const char *in, size_t *outsize)
         }
 
         free (res);
+        res = NULL;
         if (errno != E2BIG) /* conversion failure */
         {
             res = NULL;
