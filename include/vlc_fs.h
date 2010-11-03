@@ -44,8 +44,18 @@ VLC_EXPORT( int, vlc_mkdir, ( const char *filename, mode_t mode ) );
 VLC_EXPORT( int, vlc_unlink, ( const char *filename ) );
 VLC_EXPORT( int, vlc_rename, ( const char *oldpath, const char *newpath ) );
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
-# define stat _stati64
+#if defined( WIN32 )
+# ifndef UNDER_CE
+#  define stat _stati64
+# endif
+static inline int vlc_closedir( DIR *dir )
+{
+    _WDIR *wdir = *(_WDIR **)dir;
+    free( dir );
+    return wdir ? _wclosedir( wdir ) : 0;
+}
+# undef closedir
+# define closedir vlc_closedir
 #endif
 
 VLC_EXPORT( int, vlc_stat, ( const char *filename, struct stat *buf ) );
