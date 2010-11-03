@@ -451,10 +451,7 @@ void *ToCharset(const char *charset, const char *in, size_t *outsize)
         free (res);
         res = NULL;
         if (errno != E2BIG) /* conversion failure */
-        {
-            res = NULL;
             break;
-        }
     }
     vlc_iconv_close (hd);
     return res;
