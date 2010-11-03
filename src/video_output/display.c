@@ -1229,24 +1229,17 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->event.fifo = NULL;
 
     osys->source = *source_org;
-
-    video_format_t source = *source_org;
-
-    source.i_x_offset =
-    osys->crop.x  = 0;
-    source.i_y_offset =
-    osys->crop.y  = 0;
-    source.i_visible_width  =
-    osys->crop.width    = source.i_width;
-    source.i_visible_height =
-    osys->crop.height   = source.i_height;
+    osys->crop.x      = source_org->i_x_offset;
+    osys->crop.y      = source_org->i_y_offset;
+    osys->crop.width  = source_org->i_visible_width;
+    osys->crop.height = source_org->i_visible_height;
     osys->crop_saved.num = 0;
     osys->crop_saved.den = 0;
     osys->crop.num = 0;
     osys->crop.den = 0;
 
-    osys->sar.num = osys->sar_initial.num ? osys->sar_initial.num : source.i_sar_num;
-    osys->sar.den = osys->sar_initial.den ? osys->sar_initial.den : source.i_sar_den;
+    osys->sar.num = osys->sar_initial.num ? osys->sar_initial.num : source_org->i_sar_num;
+    osys->sar.den = osys->sar_initial.den ? osys->sar_initial.den : source_org->i_sar_den;
 #ifdef ALLOW_DUMMY_VOUT
     vlc_mouse_Init(&osys->vout_mouse);
 #endif
@@ -1262,6 +1255,13 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     owner.sys = osys;
 
     /* */
+    video_format_t source = *source_org;
+
+    source.i_x_offset = 0;
+    source.i_y_offset = 0;
+    source.i_visible_width  = source.i_width;
+    source.i_visible_height = source.i_height;
+
     vout_display_t *p_display = vout_display_New(VLC_OBJECT(vout),
                                                  module, !is_wrapper,
                                                  &source, cfg, &owner);
@@ -1273,15 +1273,15 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     VoutDisplayCreateRender(p_display);
 
     /* Setup delayed request */
-    if (osys->sar.num != source_org->i_sar_num ||
-        osys->sar.den != source_org->i_sar_den)
+    if (osys->sar.num != source.i_sar_num ||
+        osys->sar.den != source.i_sar_den)
         osys->ch_sar = true;
     if (osys->wm_state != osys->wm_state_initial)
         osys->ch_wm_state = true;
-    if (osys->crop.x      != source_org->i_x_offset ||
-        osys->crop.y      != source_org->i_y_offset ||
-        osys->crop.width  != source_org->i_visible_width ||
-        osys->crop.height != source_org->i_visible_height)
+    if (osys->crop.x      != source.i_x_offset ||
+        osys->crop.y      != source.i_y_offset ||
+        osys->crop.width  != source.i_visible_width ||
+        osys->crop.height != source.i_visible_height)
         osys->ch_crop = true;
 
     return p_display;

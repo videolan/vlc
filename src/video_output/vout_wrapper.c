@@ -57,20 +57,14 @@ int vout_OpenWrapper(vout_thread_t *vout,
     sys->display.title = var_CreateGetNonEmptyString(vout, "video-title");
 
     /* */
-    video_format_t source   = vout->p->original;
-    source.i_visible_width  = source.i_width;
-    source.i_visible_height = source.i_height;
-    source.i_x_offset       = 0;
-    source.i_y_offset       = 0;
-
     const mtime_t double_click_timeout = 300000;
     const mtime_t hide_timeout = var_CreateGetInteger(vout, "mouse-hide-timeout") * 1000;
 
     if (splitter_name) {
-        sys->display.vd = vout_NewSplitter(vout, &source, state, "$vout", splitter_name,
+        sys->display.vd = vout_NewSplitter(vout, &vout->p->original, state, "$vout", splitter_name,
                                            double_click_timeout, hide_timeout);
     } else {
-        sys->display.vd = vout_NewDisplay(vout, &source, state, "$vout",
+        sys->display.vd = vout_NewDisplay(vout, &vout->p->original, state, "$vout",
                                           double_click_timeout, hide_timeout);
     }
     if (!sys->display.vd) {
