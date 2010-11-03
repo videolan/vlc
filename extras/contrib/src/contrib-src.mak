@@ -653,7 +653,6 @@ libogg-$(OGG_VERSION).tar.gz:
 
 libogg: libogg-$(OGG_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p0 < Patches/libogg-inttypes.patch
 	patch -p0 < Patches/libogg-1.1.patch
 ifdef HAVE_WINCE
 	patch -p0 < Patches/libogg-wince.patch
