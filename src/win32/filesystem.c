@@ -112,9 +112,12 @@ int vlc_mkdir( const char *dirname, mode_t mode )
  * when called with an empty argument or just '\'. */
 typedef struct vlc_DIR
 {
-    _WDIR *p_real_dir;
-    int i_drives;
-    bool b_insert_back;
+    _WDIR *wdir; /* MUST be first, see <vlc_fs.h> */
+    union
+    {
+        DWORD drives;
+        bool insert_dot_dot;
+    } u;
 } vlc_DIR;
 
 
@@ -130,26 +133,25 @@ DIR *vlc_opendir (const char *dirname)
      || (wcscmp (wpath, L"\\") == 0))
     {
         /* Special mode to list drive letters */
-        p_dir->p_real_dir = NULL;
+        p_dir->wdir = NULL;
 #ifdef UNDER_CE
-        p_dir->i_drives = 1;
+        p_dir->u.drives = 1;
 #else
-        p_dir->i_drives = GetLogicalDrives ();
+        p_dir->u.drives = GetLogicalDrives ();
 #endif
         return (void *)p_dir;
     }
 
-    _WDIR *p_real_dir = _wopendir (wpath);
-    if (p_real_dir == NULL)
+    _WDIR *wdir = _wopendir (wpath);
+    if (wdir == NULL)
     {
         free (p_dir);
         return NULL;
     }
 
-    p_dir->p_real_dir = p_real_dir;
-
+    p_dir->wdir = wdir;
     assert (wpath[0]); // wpath[1] is defined
-    p_dir->b_insert_back = !wcscmp (wpath + 1, L":\\");
+    p_dir->u.insert_dot_dot = !wcscmp (wpath + 1, L":\\");
     return (void *)p_dir;
 }
 
@@ -157,20 +159,20 @@ char *vlc_readdir (DIR *dir)
 {
     vlc_DIR *p_dir = (vlc_DIR *)dir;
 
-    if (p_dir->p_real_dir == NULL)
+    if (p_dir->wdir == NULL)
     {
         /* Drive letters mode */
-        DWORD drives = p_dir->i_drives;
+        DWORD drives = p_dir->u.drives;
         if (drives == 0)
             return NULL; /* end */
 #ifdef UNDER_CE
-        p_dir->i_drives = 0;
+        p_dir->u.drives = 0;
         return strdup ("\\");
 #else
         unsigned int i;
         for (i = 0; !(drives & 1); i++)
             drives >>= 1;
-        p_dir->i_drives &= ~(1UL << i);
+        p_dir->u.drives &= ~(1UL << i);
         assert (i < 26);
 
         char *ret;
@@ -180,14 +182,14 @@ char *vlc_readdir (DIR *dir)
 #endif
     }
 
-    if (p_dir->b_insert_back)
+    if (p_dir->u.insert_dot_dot)
     {
         /* Adds "..", gruik! */
-        p_dir->b_insert_back = false;
+        p_dir->u.insert_dot_dot = false;
         return strdup ("..");
     }
 
-    struct _wdirent *ent = _wreaddir (p_dir->p_real_dir);
+    struct _wdirent *ent = _wreaddir (p_dir->wdir);
     if (ent == NULL)
         return NULL;
     return FromWide (ent->d_name);
