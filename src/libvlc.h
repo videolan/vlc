@@ -319,19 +319,4 @@ VLC_EXPORT( void, stats_ComputeInputStats, (input_thread_t*, input_stats_t*) );
 VLC_EXPORT( void, stats_ReinitInputStats, (input_stats_t *) );
 VLC_EXPORT( void, stats_DumpInputStats, (input_stats_t *) );
 
-/*
- * Replacement functions
- */
-#if defined (WIN32)
-#   include <dirent.h>
-void *vlc_wopendir (const wchar_t *);
-void *vlc_wclosedir (void *);
-struct _wdirent *vlc_wreaddir (void *);
-void vlc_rewinddir (void *);
-#   define _wopendir vlc_wopendir
-#   define _wreaddir vlc_wreaddir
-#   define _wclosedir vlc_wclosedir
-#   define rewinddir vlc_rewinddir
-#endif
-
 #endif

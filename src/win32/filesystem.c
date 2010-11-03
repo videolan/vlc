@@ -108,20 +108,119 @@ int vlc_mkdir( const char *dirname, mode_t mode )
 #endif
 }
 
-DIR *vlc_opendir( const char *dirname )
+/* Under Windows, these wrappers return the list of drive letters
+ * when called with an empty argument or just '\'. */
+typedef struct vlc_DIR
+{
+    _WDIR *p_real_dir;
+    int i_drives;
+    bool b_insert_back;
+} vlc_DIR;
+
+
+DIR *vlc_opendir (const char *dirname)
 {
     CONVERT_PATH (dirname, wpath, NULL);
-    return (DIR *)vlc_wopendir (wpath);
-}
 
-char *vlc_readdir( DIR *dir )
-{
-    struct _wdirent *ent = vlc_wreaddir (dir);
-    if (ent == NULL)
+    vlc_DIR *p_dir = malloc (sizeof (*p_dir));
+    if (unlikely(p_dir == NULL))
         return NULL;
 
+    if (wpath == NULL || wpath[0] == '\0'
+     || (wcscmp (wpath, L"\\") == 0))
+    {
+        /* Special mode to list drive letters */
+        p_dir->p_real_dir = NULL;
+#ifdef UNDER_CE
+        p_dir->i_drives = 1;
+#else
+        p_dir->i_drives = GetLogicalDrives ();
+#endif
+        return (void *)p_dir;
+    }
+
+    _WDIR *p_real_dir = _wopendir (wpath);
+    if (p_real_dir == NULL)
+    {
+        free (p_dir);
+        return NULL;
+    }
+
+    p_dir->p_real_dir = p_real_dir;
+
+    assert (wpath[0]); // wpath[1] is defined
+    p_dir->b_insert_back = !wcscmp (wpath + 1, L":\\");
+    return (void *)p_dir;
+}
+
+char *vlc_readdir (DIR *dir)
+{
+    vlc_DIR *p_dir = (vlc_DIR *)dir;
+
+    if (p_dir->p_real_dir == NULL)
+    {
+        /* Drive letters mode */
+        DWORD drives = p_dir->i_drives;
+        if (drives == 0)
+            return NULL; /* end */
+#ifdef UNDER_CE
+        p_dir->i_drives = 0;
+        return strdup ("\\");
+#else
+        unsigned int i;
+        for (i = 0; !(drives & 1); i++)
+            drives >>= 1;
+        p_dir->i_drives &= ~(1UL << i);
+        assert (i < 26);
+
+        char *ret;
+        if (asprintf (&ret, "%c:\\", 'A' + i) == -1)
+            return NULL;
+        return ret;
+#endif
+    }
+
+    if (p_dir->b_insert_back)
+    {
+        /* Adds "..", gruik! */
+        p_dir->b_insert_back = false;
+        return strdup ("..");
+    }
+
+    struct _wdirent *ent = _wreaddir (p_dir->p_real_dir);
+    if (ent == NULL)
+        return NULL;
     return FromWide (ent->d_name);
 }
+
+#if 0
+void vlc_rewinddir (DIR *dir)
+{
+    vlc_DIR *p_dir = (DIR *)dir;
+
+    if (p_dir->p_real_dir == NULL)
+        p_dir->i_drives = GetLogicalDrives ();
+    else
+        _wrewinddir (p_dir->p_real_dir);
+}
+#endif
+
+/* FIXME XXX TODO: needs to replace closedir() with this!!! */
+#warning THIS REALLY NEEDS FIXING!!!
+int vlc_wclosedir (DIR *dir)
+{
+    vlc_DIR *p_dir = (vlc_DIR *)dir;
+    int ret;
+
+    if (p_dir->p_real_dir == NULL)
+        ret = 0;
+    else
+        ret = _wclosedir (p_dir->p_real_dir);
+    free (p_dir);
+
+    return ret;
+}
+
 
 int vlc_stat (const char *filename, struct stat *buf)
 {
