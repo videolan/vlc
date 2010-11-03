@@ -2302,11 +2302,7 @@ AC_ARG_ENABLE(gme,
   [  --enable-gme            Game Music Emu support (default auto)])
 AS_IF([test "${enable_gme}" != "no"], [
   AC_CHECK_HEADER([gme/gme.h], [
-    if test "${SYS}" = "mingw32"; then
-        VLC_ADD_LIBS([gme], [-lgme -lstdc++])
-    else
-        VLC_ADD_LIBS([gme], [-lgme])
-    fi
+    VLC_ADD_LIBS([gme], [-lgme])
     VLC_ADD_PLUGIN([gme])
   ], [
     AS_IF([test "x${enable_gme}" != "x"], [

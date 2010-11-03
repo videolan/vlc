@@ -29,7 +29,7 @@ SOURCES_tta = tta.c
 SOURCES_vc1 = vc1.c
 SOURCES_demux_cdg = cdg.c
 SOURCES_smf = smf.c
-SOURCES_gme = gme.c
+SOURCES_gme = gme.c dummy.cpp
 SOURCES_dirac = dirac.c
 SOURCES_image = image.c
 
