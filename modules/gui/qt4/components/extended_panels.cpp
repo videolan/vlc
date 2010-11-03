@@ -537,6 +537,8 @@ void ExtVideo::updateFilterOptions()
     else
     {
         i_type = var_Type( p_obj, qtu( option ) );
+        if( i_type == 0 )
+            i_type = config_GetType( p_intf, qtu( option ) );
         b_is_command = ( i_type & VLC_VAR_ISCOMMAND );
     }
 
