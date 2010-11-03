@@ -1,0 +1,205 @@
+/*****************************************************************************
+ * filesystem.c: Windows file system helpers
+ *****************************************************************************
+ * Copyright (C) 2005-2006 the VideoLAN team
+ * Copyright © 2005-2008 Rémi Denis-Courmont
+ *
+ * Authors: Rémi Denis-Courmont <rem # videolan.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <vlc_common.h>
+#include <vlc_charset.h>
+#include <vlc_fs.h>
+#include "libvlc.h" /* vlc_mkdir */
+
+#include <assert.h>
+
+#include <stdio.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <winsock2.h>
+#ifndef UNDER_CE
+# include <direct.h>
+#else
+# include <tchar.h>
+#endif
+
+static int convert_path (const char *restrict path, wchar_t *restrict wpath)
+{
+    if (!MultiByteToWideChar (CP_UTF8, 0, path, -1, wpath, MAX_PATH))
+    {
+        errno = ENOENT;
+        return -1;
+    }
+    wpath[MAX_PATH] = L'\0';
+    return 0;
+}
+#define CONVERT_PATH(path, wpath, err) \
+  wchar_t wpath[MAX_PATH+1]; \
+  if (convert_path (path, wpath)) \
+      return (err)
+
+int vlc_open (const char *filename, int flags, ...)
+{
+    unsigned int mode = 0;
+    va_list ap;
+
+    va_start (ap, flags);
+    if (flags & O_CREAT)
+        mode = va_arg (ap, unsigned int);
+    va_end (ap);
+
+#ifdef UNDER_CE
+    /*_open translates to wchar internally on WinCE*/
+    return _open (filename, flags, mode);
+#else
+    /*
+     * open() cannot open files with non-“ANSI” characters on Windows.
+     * We use _wopen() instead. Same thing for mkdir() and stat().
+     */
+    CONVERT_PATH(filename, wpath, -1);
+    return _wopen (wpath, flags, mode);
+
+#endif
+}
+
+int vlc_openat (int dir, const char *filename, int flags, ...)
+{
+    (void) dir; (void) filename; (void) flags;
+    errno = ENOSYS;
+    return -1;
+}
+
+int vlc_mkdir( const char *dirname, mode_t mode )
+{
+#if defined (UNDER_CE)
+    (void) mode;
+    /* mkdir converts internally to wchar */
+    return _mkdir(dirname);
+#else
+    (void) mode;
+    CONVERT_PATH (dirname, wpath, -1);
+    return _wmkdir (wpath);
+
+#endif
+}
+
+DIR *vlc_opendir( const char *dirname )
+{
+    CONVERT_PATH (dirname, wpath, NULL);
+    return (DIR *)vlc_wopendir (wpath);
+}
+
+char *vlc_readdir( DIR *dir )
+{
+    struct _wdirent *ent = vlc_wreaddir (dir);
+    if (ent == NULL)
+        return NULL;
+
+    return FromWide (ent->d_name);
+}
+
+int vlc_stat (const char *filename, struct stat *buf)
+{
+#ifdef UNDER_CE
+    /* _stat translates to wchar internally on WinCE */
+    return _stat (filename, buf);
+#else
+    CONVERT_PATH (filename, wpath, -1);
+    return _wstati64 (wpath, buf);
+#endif
+}
+
+int vlc_lstat (const char *filename, struct stat *buf)
+{
+    return vlc_stat (filename, buf);
+}
+
+int vlc_unlink (const char *filename)
+{
+#ifdef UNDER_CE
+    /*_open translates to wchar internally on WinCE*/
+    return _unlink( filename );
+#else
+    CONVERT_PATH (filename, wpath, -1);
+    return _wunlink (wpath);
+#endif
+}
+
+int vlc_rename (const char *oldpath, const char *newpath)
+{
+    CONVERT_PATH (oldpath, wold, -1);
+    CONVERT_PATH (newpath, wnew, -1);
+# ifdef UNDER_CE
+    /* FIXME: errno support */
+    return MoveFileW (wold, wnew) ? 0 : -1;
+#else
+    if (_wrename (wold, wnew) && errno == EACCES)
+    {   /* Windows does not allow atomic file replacement */
+        if (_wremove (wnew))
+        {
+            errno = EACCES; /* restore errno */
+            return -1;
+        }
+        if (_wrename (wold, wnew))
+            return -1;
+    }
+    return 0;
+#endif
+}
+
+int vlc_dup (int oldfd)
+{
+#ifdef UNDER_CE
+    (void) oldfd;
+    errno = ENOSYS;
+    return -1;
+#else
+    return dup (oldfd);
+#endif
+}
+
+#include <vlc_network.h>
+
+int vlc_socket (int pf, int type, int proto, bool nonblock)
+{
+    int fd = socket (pf, type, proto);
+    if (fd == -1)
+        return -1;
+
+    if (nonblock)
+        ioctlsocket (fd, FIONBIO, &(unsigned long){ 1 });
+    return fd;
+}
+
+int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)
+{
+    int fd = accept (lfd, addr, alen);
+    if (fd != -1 && nonblock)
+        ioctlsocket (fd, FIONBIO, &(unsigned long){ 1 });
+    return fd;
+}
