@@ -406,9 +406,11 @@ static int Open (vlc_object_t *obj)
 
             xfmt = FindFormat (vd, chroma, &fmt, a->base_id, r, &p_sys->att);
         }
-        free (r);
         if (xfmt == NULL) /* No acceptable image formats */
+        {
+            free (r);
             continue;
+        }
 
         p_sys->id = xfmt->id;
         p_sys->swap_uv = vlc_fourcc_AreUVPlanesSwapped (fmt.i_chroma, chroma);
@@ -420,6 +422,7 @@ static int Open (vlc_object_t *obj)
             fmt.i_gmask = xfmt->green_mask;
             fmt.i_bmask = xfmt->blue_mask;
         }
+        free (r);
 
         /* Grab a port */
         for (unsigned i = 0; i < a->num_ports; i++)
