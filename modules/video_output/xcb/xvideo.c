@@ -405,7 +405,6 @@ static int Open (vlc_object_t *obj)
             }
 
             xfmt = FindFormat (vd, chroma, &fmt, a->base_id, r, &p_sys->att);
-            if (xfmt != NULL) break;
         }
         free (r);
         if (xfmt == NULL) /* No acceptable image formats */
