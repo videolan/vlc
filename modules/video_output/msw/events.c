@@ -224,7 +224,6 @@ static void *EventThread( void *p_this )
     vout_display_t *vd = p_event->vd;
     MSG msg;
     POINT old_mouse_pos = {0,0}, mouse_pos;
-    HMODULE hkernel32;
     int canc = vlc_savecancel ();
 
     bool b_mouse_support = var_InheritBool( p_event->vd, "mouse-events" );
@@ -250,20 +249,8 @@ static void *EventThread( void *p_this )
     }
 
 #ifndef UNDER_CE
-    /* Set power management stuff */
-    if( (hkernel32 = GetModuleHandle( _T("KERNEL32") ) ) )
-    {
-        ULONG (WINAPI* OurSetThreadExecutionState)( ULONG );
-
-        OurSetThreadExecutionState = (ULONG (WINAPI*)( ULONG ))
-            GetProcAddress( hkernel32, _T("SetThreadExecutionState") );
-
-        if( OurSetThreadExecutionState )
-            /* Prevent monitor from powering off */
-            OurSetThreadExecutionState( ES_DISPLAY_REQUIRED | ES_CONTINUOUS );
-        else
-            msg_Dbg( vd, "no support for SetThreadExecutionState()" );
-    }
+    /* Prevent monitor from powering off */
+    SetThreadExecutionState( ES_DISPLAY_REQUIRED | ES_CONTINUOUS );
 #endif
 
     /* Main loop */
