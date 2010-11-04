@@ -1481,7 +1481,10 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         i_frame_size = R16( &p_data, &i_data );
         i_subpacket_size = R16( &p_data, &i_data );
         if( !i_frame_size || !i_coded_frame_size )
+        {
+            es_format_Clean( &fmt );
             return VLC_EGENERIC;
+        }
 
         RVoid( &p_data, &i_data, 2 + (i_version == 5 ? 6 : 0 ) );
 
@@ -1573,7 +1576,11 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
     case VLC_FOURCC( 's','i','p','r' ):
         fmt.i_codec = VLC_CODEC_SIPR;
         if( i_flavor > 3 )
+        {
+            msg_Dbg( p_demux, "    - unsupported sipr flavorc=%i", i_flavor );
+            es_format_Clean( &fmt );
             return VLC_EGENERIC;
+        }
 
         i_subpacket_size = i_subpacket_size_sipr[i_flavor];
         // The libavcodec sipr decoder requires stream bitrate
@@ -1612,13 +1619,11 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         break;
 
     case VLC_FOURCC('r','a','l','f'):
-        msg_Dbg( p_demux, "    - audio codec not supported=%4.4s",
-                 (char*)&fmt.i_codec );
-        break;
-
     default:
         msg_Dbg( p_demux, "    - unknown audio codec=%4.4s",
-                 (char*)&fmt.i_codec );
+                (char*)&fmt.i_codec );
+        es_format_Clean( &fmt );
+        return VLC_EGENERIC;
         break;
     }
     msg_Dbg( p_demux, "    - extra data=%d", fmt.i_extra );
