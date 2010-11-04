@@ -116,18 +116,6 @@ public:
     /// Map to find the GenericWindow associated with a Win32Window
     map<HWND, GenericWindow*> m_windowMap;
 
-    /// Functions dynamically loaded from the dll, because they don't exist
-    /// on Win9x/NT4
-    // We dynamically load msimg32.dll to get a pointer to TransparentBlt()
-    BOOL (WINAPI *TransparentBlt)( HDC, int, int, int, int,
-                                   HDC, int, int, int, int, UINT );
-    BOOL (WINAPI *AlphaBlend)( HDC, int, int, int, int,
-                               HDC, int, int, int, int, BLENDFUNCTION );
-
-    // Idem for user32.dll and SetLayeredWindowAttributes()
-    BOOL (WINAPI *SetLayeredWindowAttributes)( HWND, COLORREF,
-                                               BYTE, DWORD );
-
     HWND getParentWindow() { return m_hParentWindow; }
 
 private:

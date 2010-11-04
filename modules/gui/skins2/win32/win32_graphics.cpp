@@ -191,19 +191,10 @@ void Win32Graphics::drawBitmap( const GenericBitmap &rBitmap,
     bf.AlphaFormat = AC_SRC_ALPHA;
 
     // Blend the image onto the internal DC
-    BOOL (WINAPI *AlphaBlend)( HDC, int, int, int, int, HDC, int, int,
-                               int, int, BLENDFUNCTION );
-    AlphaBlend = ((Win32Factory*)OSFactory::instance( getIntf() ))->AlphaBlend;
-    if( AlphaBlend &&
-        !AlphaBlend( m_hDC, xDest, yDest, width, height, hDC, 0, 0,
+    if( !AlphaBlend( m_hDC, xDest, yDest, width, height, hDC, 0, 0,
                      width, height, bf ) )
     {
         msg_Err( getIntf(), "AlphaBlend() failed" );
-    }
-    else if( !AlphaBlend )
-    {
-        // Copy the image onto the internal DC
-        BitBlt( m_hDC, xDest, yDest, width, height, hDC, 0, 0, SRCCOPY );
     }
 
     // Add the bitmap mask to the global graphics mask

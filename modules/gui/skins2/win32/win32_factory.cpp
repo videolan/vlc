@@ -24,6 +24,10 @@
 
 #ifdef WIN32_SKINS
 
+#include <windows.h>
+#include <winuser.h>
+#include <wingdi.h>
+
 #include "win32_factory.hpp"
 #include "win32_graphics.hpp"
 #include "win32_timer.hpp"
@@ -108,8 +112,7 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 
 Win32Factory::Win32Factory( intf_thread_t *pIntf ):
-    OSFactory( pIntf ), TransparentBlt( NULL ), AlphaBlend( NULL ),
-    SetLayeredWindowAttributes( NULL ), m_hParentWindow( NULL ),
+    OSFactory( pIntf ), m_hParentWindow( NULL ),
     m_dirSep( "\\" )
 {
     // see init()
@@ -197,39 +200,6 @@ bool Win32Factory::init()
     // Initialize the OLE library (for drag & drop)
     OleInitialize( NULL );
 
-    // We dynamically load msimg32.dll to get a pointer to TransparentBlt()
-    m_hMsimg32 = LoadLibrary( _T("msimg32.dll") );
-    if( !m_hMsimg32 ||
-        !( TransparentBlt =
-            (BOOL (WINAPI*)(HDC, int, int, int, int,
-                            HDC, int, int, int, int, unsigned int))
-            GetProcAddress( m_hMsimg32, _T("TransparentBlt") ) ) )
-    {
-        TransparentBlt = NULL;
-        msg_Dbg( getIntf(), "couldn't find TransparentBlt(), "
-                 "falling back to BitBlt()" );
-    }
-    if( !m_hMsimg32 ||
-        !( AlphaBlend =
-            (BOOL (WINAPI*)( HDC, int, int, int, int, HDC, int, int,
-                              int, int, BLENDFUNCTION ))
-            GetProcAddress( m_hMsimg32, _T("AlphaBlend") ) ) )
-    {
-        AlphaBlend = NULL;
-        msg_Dbg( getIntf(), "couldn't find AlphaBlend()" );
-    }
-
-    // Idem for user32.dll and SetLayeredWindowAttributes()
-    m_hUser32 = LoadLibrary( _T("user32.dll") );
-    if( !m_hUser32 ||
-        !( SetLayeredWindowAttributes =
-            (BOOL (WINAPI *)(HWND, COLORREF, BYTE, DWORD))
-            GetProcAddress( m_hUser32, _T("SetLayeredWindowAttributes") ) ) )
-    {
-        SetLayeredWindowAttributes = NULL;
-        msg_Dbg( getIntf(), "couldn't find SetLayeredWindowAttributes()" );
-    }
-
     // Initialize the resource path
     char *datadir = config_GetUserDir( VLC_DATA_DIR );
     m_resourcePath.push_back( (string)datadir + "\\skins" );
@@ -255,12 +225,6 @@ Win32Factory::~Win32Factory()
     removeFromTray();
 
     if( m_hParentWindow ) DestroyWindow( m_hParentWindow );
-
-    // Unload msimg32.dll and user32.dll
-    if( m_hMsimg32 )
-        FreeLibrary( m_hMsimg32 );
-    if( m_hUser32 )
-        FreeLibrary( m_hUser32 );
 }
 
 

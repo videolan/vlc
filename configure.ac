@@ -3680,7 +3680,7 @@ if test "${enable_skins2}" != "no" ||
     ALIASES="${ALIASES} svlc"
     VLC_ADD_CPPFLAGS([skins2],[-U_OFF_T_ -U_off_t -Imodules/gui/skins2 -DWIN32_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
-    VLC_ADD_LIBS([skins2],[-loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32])
+    VLC_ADD_LIBS([skins2],[-loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32  -lmsimg32 -luser32])
 
   else if test "${skins2_missing_lib}" = "no" && (test "${SYS}" = "darwin"); then
     VLC_ADD_PLUGIN([skins2])
