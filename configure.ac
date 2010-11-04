@@ -3376,6 +3376,7 @@ if test "${enable_directx}" != "no"
 then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"
   then
+      VLC_ADD_LIBS([directx],[-luser32])
       AC_CHECK_HEADERS(ddraw.h,
       [ VLC_ADD_PLUGIN([directx aout_directx])
         VLC_ADD_LIBS([directx],[-lgdi32])

@@ -44,17 +44,10 @@
 #include <vlc_vout_display.h>
 #include <vlc_playlist.h>   /* needed for wallpaper */
 
+#include <windows.h>
+#include <winuser.h>
 #include <ddraw.h>
 #include <commctrl.h>       /* ListView_(Get|Set)* */
-
-#ifndef UNDER_CE
-#   include <multimon.h>
-#endif
-#undef GetSystemMetrics
-
-#ifndef MONITOR_DEFAULTTONEAREST
-#   define MONITOR_DEFAULTTONEAREST 2
-#endif
 
 #include "common.h"
 
@@ -178,16 +171,6 @@ static int Open(vlc_object_t *object)
         msg_Warn(vd, "DirectXInitDDraw failed loading ddraw.dll");
         free(sys);
         return VLC_EGENERIC;
-    }
-
-    /* */
-    HMODULE huser32 = GetModuleHandle(_T("USER32"));
-    if (huser32) {
-        sys->MonitorFromWindow = (void*)GetProcAddress(huser32, _T("MonitorFromWindow"));
-        sys->GetMonitorInfo = (void*)GetProcAddress(huser32, _T("GetMonitorInfoA"));
-    } else {
-        sys->MonitorFromWindow = NULL;
-        sys->GetMonitorInfo = NULL;
     }
 
     /* */
@@ -366,8 +349,8 @@ static void Manage(vout_display_t *vd)
             DirectXUpdateOverlay(vd, NULL);
 
         /* Check if we are still on the same monitor */
-        if (sys->MonitorFromWindow &&
-            sys->hmonitor != sys->MonitorFromWindow(sys->hwnd, MONITOR_DEFAULTTONEAREST)) {
+        HMONITOR hmon = MonitorFromWindow(sys->hwnd, MONITOR_DEFAULTTONEAREST);
+        if (sys->hmonitor != hmon) {
             vout_display_SendEventPicturesInvalid(vd);
         }
         /* */
@@ -475,7 +458,7 @@ static BOOL WINAPI DirectXOpenDDrawCallback(GUID *guid, LPTSTR desc,
         MONITORINFO monitor_info;
         monitor_info.cbSize = sizeof(MONITORINFO);
 
-        if (sys->GetMonitorInfo(hmon, &monitor_info)) {
+        if (GetMonitorInfoA(hmon, &monitor_info)) {
             RECT rect;
 
             /* Move window to the right screen */
@@ -591,24 +574,22 @@ static int DirectXOpenDDraw(vout_display_t *vd)
     }
 
     /* */
-    if (sys->MonitorFromWindow) {
-        HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEXA, LPVOID, DWORD);
-        OurDirectDrawEnumerateEx =
-          (void *)GetProcAddress(sys->hddraw_dll, _T("DirectDrawEnumerateExA"));
+    HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEXA, LPVOID, DWORD);
+    OurDirectDrawEnumerateEx =
+      (void *)GetProcAddress(sys->hddraw_dll, _T("DirectDrawEnumerateExA"));
 
-        if (OurDirectDrawEnumerateEx) {
-            char *device = var_GetString(vd, "directx-device");
-            if (device) {
-                msg_Dbg(vd, "directx-device: %s", device);
-                free(device);
-            }
-
-            sys->hmonitor = sys->MonitorFromWindow(sys->hwnd, MONITOR_DEFAULTTONEAREST);
-
-            /* Enumerate displays */
-            OurDirectDrawEnumerateEx(DirectXOpenDDrawCallback,
-                                     vd, DDENUM_ATTACHEDSECONDARYDEVICES);
+    if (OurDirectDrawEnumerateEx) {
+        char *device = var_GetString(vd, "directx-device");
+        if (device) {
+            msg_Dbg(vd, "directx-device: %s", device);
+            free(device);
         }
+
+        sys->hmonitor = MonitorFromWindow(sys->hwnd, MONITOR_DEFAULTTONEAREST);
+
+        /* Enumerate displays */
+        OurDirectDrawEnumerateEx(DirectXOpenDDrawCallback,
+                                 vd, DDENUM_ATTACHEDSECONDARYDEVICES);
     }
 
     /* Initialize DirectDraw now */
@@ -640,10 +621,10 @@ static int DirectXOpenDDraw(vout_display_t *vd)
     }
 
     /* Get the size of the current display device */
-    if (sys->hmonitor && sys->GetMonitorInfo) {
+    if (sys->hmonitor) {
         MONITORINFO monitor_info;
         monitor_info.cbSize = sizeof(MONITORINFO);
-        sys->GetMonitorInfo(vd->sys->hmonitor, &monitor_info);
+        GetMonitorInfoA(vd->sys->hmonitor, &monitor_info);
         sys->rect_display = monitor_info.rcMonitor;
     } else {
         sys->rect_display.left   = 0;

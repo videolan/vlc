@@ -114,8 +114,6 @@ struct vout_display_sys_t
     /* Multi-monitor support */
     HMONITOR             hmonitor;          /* handle of the current monitor */
     GUID                 *display_driver;
-    HMONITOR             (WINAPI* MonitorFromWindow)(HWND, DWORD);
-    BOOL                 (WINAPI* GetMonitorInfo)(HMONITOR, LPMONITORINFO);
 
     /* Overlay alignment restrictions */
     int          i_align_src_boundary;
