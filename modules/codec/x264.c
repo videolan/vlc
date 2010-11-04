@@ -1260,9 +1260,6 @@ static int  Open ( vlc_object_t *p_this )
     }
 
     /* get the globals headers */
-    p_enc->fmt_out.i_extra = 0;
-    p_enc->fmt_out.p_extra = NULL;
-
     p_enc->fmt_out.i_extra = x264_encoder_headers( p_sys->h, &nal, &i_nal );
     p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
     if( !p_enc->fmt_out.p_extra )
