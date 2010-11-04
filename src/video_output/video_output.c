@@ -757,7 +757,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
      * Check for subpictures to display
      */
     const bool do_snapshot = vout_snapshot_IsRequested(&vout->p->snapshot);
-    mtime_t spu_render_time = is_forced ? mdate() : filtered->date;
+    mtime_t spu_render_time;
     if (vout->p->pause.is_on)
         spu_render_time = vout->p->pause.date;
     else
