@@ -109,17 +109,17 @@ vlc_module_begin()
     set_callbacks( load, unload )
     set_category( CAT_ADVANCED )
     set_subcategory( SUBCAT_ADVANCED_MISC )
-    add_string( "ml-filename", "vlc-media-library.db", NULL,
+    add_string( "ml-filename", "vlc-media-library.db",
             MEDIA_LIBRARY_PATH_TEXT, MEDIA_LIBRARY_PATH_LONGTEXT, false )
-    add_string( "ml-username", "", NULL, N_( "Username for the database" ),
+    add_string( "ml-username", "",  N_( "Username for the database" ),
             N_( "Username for the database" ), false )
-    add_string( "ml-password", "", NULL, N_( "Password for the database" ),
+    add_string( "ml-password", "",  N_( "Password for the database" ),
             N_( "Password for the database" ), false )
-    add_integer( "ml-port", 0, NULL,
+    add_integer( "ml-port", 0,
             N_( "Port for the database" ), N_("Port for the database"), false )
-    add_bool( "ml-recursive-scan", true, NULL, RECURSIVE_TEXT,
+    add_bool( "ml-recursive-scan", true, RECURSIVE_TEXT,
             RECURSIVE_LONGTEXT, false )
-    add_bool( "ml-auto-add", true, NULL, N_("Auto add new medias"),
+    add_bool( "ml-auto-add", true,  N_("Auto add new medias"),
             N_( "Automatically add new medias to ML" ), false )
 vlc_module_end()
 
