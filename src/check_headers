@@ -9,7 +9,7 @@ regexp="$(cat ../config.h.in | \
 	sed -n -e 's/^#undef \([A-Z0-9_]*\)$/\1/p' | \
 	grep -v 'WORDS_BIGENDIAN' | \
 	xargs | \
-    sed -e 's/ /\\\| /g' | sed -e 's/\\|/\$\\|/g')"
+    sed -e 's/ /\\\(\\s\\\|$\\\)\\\| /g')"
 regexp=" $regexp\$"
 
 echo Looking for private defines in public headers...
