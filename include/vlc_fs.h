@@ -56,6 +56,15 @@ static inline int vlc_closedir( DIR *dir )
 }
 # undef closedir
 # define closedir vlc_closedir
+
+static inline void vlc_rewinddir( DIR *dir )
+{
+    _WDIR *wdir = *(_WDIR **)dir;
+
+    _wrewinddir( wdir );
+}
+# undef rewinddir
+# define rewinddir vlc_rewinddir
 #endif
 
 VLC_EXPORT( int, vlc_stat, ( const char *filename, struct stat *buf ) );
