@@ -251,18 +251,15 @@ case $TARGET in
         fi
     ;;
     *mingw32ce)
-        add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
         EXTRA_CPPFLAGS=" -D_WIN32_WCE=0x0500"
         hint_distro wince
     ;;
     *64-*mingw*)
         add_enabled_makefile_cfg "HAVE_WIN32"
-        add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
         EXTRA_CFLAGS="-O3"
         hint_distro win64
     ;;
     *mingw32*)
-        add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
         EXTRA_CFLAGS=" -O3 -march=i686 -mtune=generic"
         hint_distro win32
     ;;
@@ -274,11 +271,9 @@ case $TARGET in
         EXTRA_CFLAGS=" -mno-cygwin -isystem /usr/include/mingw"
         EXTRA_CPPFLAGS=" -mno-cygwin -isystem /usr/include/mingw"
         EXTRA_LDFLAGS=" -mno-cygwin"
-        add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
         hint_distro win32
     ;;
     arm-wince-pe)
-        add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
         EXTRA_CPPFLAGS=" -D_WIN32_WCE"
         hint_distro wince
     ;;
@@ -365,6 +360,9 @@ case "$DISTRO" in
         error "Your Developer Tools' SDKs were not found.\nYou need to add extra symbolic links to /Developer to achieve correctly\nbuilt contribs.\nHave a look at the OSX-Compile-HOWTO for details." >&2
         exit 1
     fi
+    ;;
+  win*)
+    add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
     ;;
 esac
 
