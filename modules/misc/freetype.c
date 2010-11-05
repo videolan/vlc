@@ -151,22 +151,28 @@ vlc_module_begin ()
 
     add_integer( "freetype-fontsize", 0, FONTSIZE_TEXT,
                  FONTSIZE_LONGTEXT, true )
+        change_safe()
 
     /* opacity valid on 0..255, with default 255 = fully opaque */
     add_integer_with_range( "freetype-opacity", 255, 0, 255, NULL,
         OPACITY_TEXT, OPACITY_LONGTEXT, true )
+        change_safe()
 
     /* hook to the color values list, with default 0x00ffffff = white */
     add_integer( "freetype-color", 0x00FFFFFF, COLOR_TEXT,
                  COLOR_LONGTEXT, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
+        change_safe()
 
     add_integer( "freetype-rel-fontsize", 16, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, false )
         change_integer_list( pi_sizes, ppsz_sizes_text )
+        change_safe()
+
     add_integer( "freetype-effect", 2, EFFECT_TEXT,
                  EFFECT_LONGTEXT, false )
         change_integer_list( pi_effects, ppsz_effects_text )
+        change_safe()
 
     add_bool( "freetype-yuvp", false, YUVP_TEXT,
               YUVP_LONGTEXT, true )
