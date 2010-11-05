@@ -45,7 +45,7 @@ export CPPFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
 export CXXFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
 export LDFLAGS = -L$(PREFIX)/lib $(EXTRA_LDFLAGS)
 export ACLOCAL = aclocal -I$(PREFIX)/share/aclocal
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 export CC
 export CXX
 export LD
@@ -148,26 +148,26 @@ endif
 endif
 endif
 
-ifdef HAVE_DARWIN_OS_ON_INTEL
+ifdef HAVE_MACOSX_ON_INTEL
 FFMPEGCONF += --enable-memalign-hack
 endif
 
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 X264CONF=--host=$(HOST)
 X264CONF += --enable-pic
-ifdef HAVE_DARWIN_32
+ifdef HAVE_MACOSX32
 FFMPEGCONF += --enable-libvpx
 FFMPEGCONF += --cc=gcc-4.0
 else
 FFMPEGCONF += --cc=$(CC)
 endif
 FFMPEGCONF += --arch=$(ARCH)
-ifdef HAVE_DARWIN_64
+ifdef HAVE_MACOSX64
 FFMPEGCONF += --enable-libvpx
 FFMPEGCONF += --cpu=core2
-X264CONF+=--host=x86_64-apple-darwin10
+X264CONF+=--host=x86_64-apple-MACOSX10
 endif
-ifdef HAVE_DARWIN_OS_ON_INTEL
+ifdef HAVE_MACOSX_ON_INTEL
 FFMPEG_CFLAGS += -DHAVE_LRINTF
 endif
 endif
@@ -280,7 +280,7 @@ CLEAN_PKG += cmake
 # libtool
 # ***************************************************************************
 
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 libtool-$(LIBTOOL_VERSION).tar.gz:
 	$(WGET) $(LIBTOOL_URL)
 
@@ -359,7 +359,7 @@ gettext-$(GETTEXT_VERSION).tar.gz:
 
 gettext: gettext-$(GETTEXT_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	patch -p0 < Patches/gettext-macosx.patch
 endif
 
@@ -415,8 +415,8 @@ libiconv-snowleopard.tar.bz2:
 libiconv-snowleopard: libiconv-snowleopard.tar.bz2
 	$(EXTRACT_BZ2)
 
-ifdef HAVE_DARWIN_OS
-ifdef HAVE_DARWIN_10
+ifdef HAVE_MACOSX
+ifdef HAVE_MACOSX_DARWIN_10
 .iconv: libiconv-snowleopard
 	(cd libiconv-snowleopard && cp libiconv.* $(PREFIX)/lib/)
 	touch $@
@@ -460,7 +460,7 @@ ifdef HAVE_WIN32
 	(cd $<; $(HOSTCC)  ./configure $(HOSTCONF) --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --disable-libxml2 --disable-docs && make && make install)
   endif
 else
-  ifdef HAVE_DARWIN_OS
+  ifdef HAVE_MACOSX
 	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs` ./configure $(HOSTCONF) --with-cache-dir=/usr/X11/var/cache/fontconfig --with-confdir=/usr/X11/lib/X11/fonts --with-default-fonts=/System/Library/Fonts --with-add-fonts=/Library/Fonts,~/Library/Fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --with-arch=$(ARCH) --enable-libxml2 --disable-docs && make && make install-exec && (cd fontconfig ; make install-data) && cp fontconfig.pc $(PKG_CONFIG_LIBDIR))
   else
 	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install)
@@ -583,7 +583,7 @@ DISTCLEAN_PKG += pcre-$(PCRE_VERSION).tar.bz2
 ifdef HAVE_WIN32
 LUA_MAKEPLATEFORM=mingw
 else
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 LUA_MAKEPLATEFORM=macosx
 else
 ifdef HAVE_LINUX
@@ -603,7 +603,7 @@ lua-$(LUA_VERSION).tar.gz:
 
 lua: lua-$(LUA_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	(cd $@; sed -e 's%gcc%$(CC)%' -e 's%LDFLAGS=%LDFLAGS=$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' -i.orig  src/Makefile)
 endif
 
@@ -631,7 +631,7 @@ libmad-$(LIBMAD_VERSION).tar.gz:
 
 libmad: libmad-$(LIBMAD_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	( cd $@; sed -e 's%-march=i486%$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' -e 's%-dynamiclib%-dynamiclib -arch $(ARCH)%' -i.orig  configure )
 endif
 
@@ -743,7 +743,7 @@ endif
 
 THEORACONF = --disable-sdltest --disable-oggtest --disable-vorbistest --disable-examples
 
-ifdef HAVE_DARWIN_64
+ifdef HAVE_MACOSX64
 THEORACONF += --disable-asm
 endif
 ifdef HAVE_WIN64
@@ -751,7 +751,7 @@ THEORACONF += --disable-asm
 endif
 
 .theora: libtheora .ogg
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	cd $<; ($(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF) && make && make install)
 else
 ifdef HAVE_WIN32
@@ -805,14 +805,14 @@ flac: flac-$(FLAC_VERSION).tar.gz
 ifdef HAVE_WIN32
 	patch -p0 < Patches/flac-win32.patch
 endif
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	( cd $@; sed -e 's%-dynamiclib%-dynamiclib -arch $(ARCH)%' -i.orig  configure )
 endif
 
 FLAC_DISABLE_FLAGS = --disable-oggtest --disable-xmms-plugin --disable-cpplibs
 
 .flac: flac .ogg
-ifdef HAVE_DARWIN_OS_ON_INTEL
+ifdef HAVE_MACOSX_ON_INTEL
 	cd $< && \
 	$(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-asm-optimizations $(FLAC_DISABLE_FLAGS)
 else
@@ -926,21 +926,21 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 #ibvpx-$(VPX_VERSION).tar.bz2:
 #$(WGET) $(VPX_URL)
 
-libvpx: 
+libvpx:
 	$(GIT) clone git://review.webmproject.org/libvpx.git
 
 ifdef HAVE_WIN32
 VPX_TARGET=x86-win32-gcc
 CROSS=$(HOST)-
 else
-ifdef HAVE_DARWIN_OS
-ifdef HAVE_DARWIN_64
-VPX_TARGET=x86_64-darwin9-gcc
+ifdef HAVE_MACOSX
+ifdef HAVE_MACOSX64
+VPX_TARGET=x86_64-MACOSX9-gcc
 else
-ifdef HAVE_DARWIN_OS_ON_INTEL
-VPX_TARGET=x86-darwin9-gcc
+ifdef HAVE_MACOSX_ON_INTEL
+VPX_TARGET=x86-MACOSX9-gcc
 else
-VPX_TARGET=ppc32-darwin9-gcc
+VPX_TARGET=ppc32-MACOSX9-gcc
 endif
 endif
 else
@@ -948,7 +948,7 @@ VPX_TARGET=FIXME
 endif
 endif
 
-ifdef HAVE_DARWIN_OS_ON_INTEL
+ifdef HAVE_MACOSX_ON_INTEL
 .libvpx: libvpx .yasm
 else
 .libvpx: libvpx
@@ -1074,7 +1074,7 @@ ifdef HAVE_WIN32
 FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --enable-dxva2 --disable-bsfs --enable-libvpx
 else
 ifdef HAVE_IOS
-FFMPEGCONF += --target-os=darwin --sysroot=${IOS_SDK_ROOT}
+FFMPEGCONF += --target-os=MACOSX --sysroot=${IOS_SDK_ROOT}
 ifeq ($(ARCH),arm)
 FFMPEGCONF += --disable-runtime-cpudetect --enable-neon --cpu=cortex-a8
 else
@@ -1273,7 +1273,7 @@ ifdef HAVE_WINCE
 	(cd $<; sed -e 's/-lws2_32/-lws2/g' -i.orig config.mingw)
 	(cd $<;./genMakefiles mingw && make $(HOSTCC))
 else
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	(cd $<; sed -e 's%-DBSD=1%-DBSD=1\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' -e 's%cc%$(CC)%'  -e 's%c++%$(CXX)\ $(EXTRA_LDFLAGS)%' -i.orig  config.macosx)
 	(cd $<; ./genMakefiles macosx && make)
 else
@@ -1326,7 +1326,7 @@ else
 endif
 	patch -p0 < Patches/goom2k4-0-memleaks.patch
 	patch -p0 < Patches/goom2k4-autotools.patch
-ifdef HAVE_DARWIN
+ifdef HAVE_MACOSX
 	patch -p0 < Patches/goom2k4-osx.patch
 endif
 	(cd $@; rm -f configure; autoreconf -ivf)
@@ -1348,7 +1348,7 @@ libcaca-$(LIBCACA_VERSION).tar.gz:
 
 libcaca: libcaca-$(LIBCACA_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	patch -p0 < Patches/libcaca-osx-sdkofourchoice.patch
 	(cd $@; sed -e 's%/Developer/SDKs/MacOSX10.4u.sdk%$(MACOSX_SDK)%' -i.orig  configure)
 endif
@@ -1358,7 +1358,7 @@ endif
 
 
 .caca: libcaca
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-imlib2 --disable-doc --disable-ruby --disable-csharp --disable-cxx --disable-x11 && cd caca && make && make install)
 else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-imlib2 --disable-doc --disable-ruby --disable-csharp --disable-cxx && cd caca && make && make install)
@@ -1378,7 +1378,7 @@ libdca-$(LIBDCA_VERSION).tar.bz2:
 
 libdca: libdca-$(LIBDCA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-ifdef HAVE_DARWIN_9
+ifdef HAVE_MACOSX_DARWIN_9
 	( cd $@; patch -p0 < ../Patches/libdca-llvm-gcc.patch )
 endif
 
@@ -1422,7 +1422,7 @@ ifdef HAVE_WIN32
 	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
   endif
 else
-ifdef HAVE_DARWIN_OS_ON_INTEL
+ifdef HAVE_MACOSX_ON_INTEL
   .x264: x264 .yasm
 	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 else
@@ -1501,7 +1501,7 @@ vcdimager: vcdimager-$(VCDIMAGER_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .vcdimager: vcdimager .cdio
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static LDFLAGS="$(LDFLAGS) -framework CoreFoundation -framework IOKit" && make && make install)
 else
 	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
@@ -1522,7 +1522,7 @@ libcdio-$(CDIO_VERSION).tar.gz:
 libcdio: libcdio-$(CDIO_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/libcdio-install-cdparanoia-pc.patch
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	patch -p0 < Patches/libcdio-modernOSX.patch
 endif
 
@@ -1677,7 +1677,7 @@ XMLCONF = --with-minimal --with-catalog --with-reader --with-tree --with-push --
   else
 	(cd xml; CFLAGS="-DLIBXML_STATIC" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(XMLCONF) && make && make install)
   endif
-ifndef HAVE_DARWIN_OS
+ifndef HAVE_MACOSX
 	$(INSTALL_NAME)
 endif
 	touch $@
@@ -1725,7 +1725,7 @@ endif
 	(patch -p0 < Patches/libpng-makefile.patch)
 
 .png: libpng .zlib
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 else
 ifdef HAVE_WIN32
@@ -1763,7 +1763,7 @@ ifdef HAVE_WIN32
 else
 .zvbi: zvbi
 endif
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -fnested-functions" && make && make install)
 else
 ifdef HAVE_WIN32
@@ -1996,7 +1996,7 @@ DISTCLEAN_PKG += tiff-$(TIFF_VERSION).tar.gz
 # LibSDL
 # ***************************************************************************
 
-ifndef HAVE_DARWIN_OS
+ifndef HAVE_MACOSX
 SDL-$(SDL_VERSION).tar.gz:
 	$(WGET) $(SDL_URL)
 
@@ -2055,7 +2055,7 @@ ifdef HAVE_WIN32
 else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 endif
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	$(INSTALL_NAME)
 endif
 	touch $@
@@ -2328,7 +2328,7 @@ orc: orc-$(ORC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .orc: orc
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)")
 else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX))
@@ -2438,7 +2438,7 @@ gsm: gsm-$(GSM_VERSION).tar.gz
 ifneq ($(HOST),$(BUILD))
 	(patch -p0 < Patches/gsm-cross.patch)
 endif
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 	(cd $@; sed -e 's%-O2%-O2\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' -e 's%# LDFLAGS 	=%LDFLAGS 	= $(EXTRA_LDFLAGS)%' -e 's%gcc%$(CC)%' -i.orig  Makefile)
 endif
 
@@ -2451,7 +2451,7 @@ CLEAN_PKG += gsm
 DISTCLEAN_PKG += gsm-$(GSM_VERSION).tar.gz
 
 # ***************************************************************************
-### GLEW 
+### GLEW
 # ***************************************************************************
 glew-$(GLEW_VERSION)-src.tgz:
 	$(WGET) $(GLEW_URL)

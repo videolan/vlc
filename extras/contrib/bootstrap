@@ -220,29 +220,18 @@ case $TARGET in
         LD="ld -arch ppc -syslibroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
     ;;
     i686-apple-darwin*)
-        hint_distro darwin
+        hint_distro macosx32
         HAVE_DARWIN_32=1
 
         CFLAGS_TUNING=" -march=prescott -mtune=generic -arch i386 -m32"
         EXTRA_LDFLAGS=" -arch i386"
-
-        add_enabled_makefile_cfg "HAVE_DARWIN_OS_ON_INTEL"
-        if test $TARGET = "i686-apple-darwin10"; then
-            add_enabled_makefile_cfg "HAVE_DARWIN_10"
-        fi
     ;;
     x86_64-apple-darwin*)
-        hint_distro darwin64
+        hint_distro macosx64
         HAVE_DARWIN_64=1
 
         CFLAGS_TUNING=" -march=core2 -mtune=core2 -m64 -arch x86_64"
         EXTRA_LDFLAGS=" -arch x86_64"
-
-        add_enabled_makefile_cfg "HAVE_DARWIN_OS_ON_INTEL"
-        add_makefile_cfg "PATH = /bin:/usr/bin:/usr/local/bin"
-        if test $TARGET = "x86_64-apple-darwin10"; then
-            add_enabled_makefile_cfg "HAVE_DARWIN_10"
-        fi
     ;;
     *mingw32ce)
         EXTRA_CPPFLAGS=" -D_WIN32_WCE=0x0500"
@@ -338,9 +327,9 @@ case "$DISTRO" in
     fi
     add_makefile_cfg "IOS_SDK_ROOT = ${IOS_SDK_ROOT}"
     ;;
-  darwin*)
+  macosx*)
     SDK_TARGET=10.5
-    HAVE_DARWIN_9=1
+    HAVE_MACOSX_DARWIN_9=1
     EXTRA_LDFLAGS="${EXTRA_LDFLAGS} -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
     EXTRA_CFLAGS="${EXTRA_CFLAGS} -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
     CC="/usr/bin/gcc-4.2"
@@ -349,6 +338,12 @@ case "$DISTRO" in
     add_makefile_cfg "SDK_TARGET = ${SDK_TARGET}"
     add_makefile_cfg "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}"
     add_makefile_cfg "MACOSX_SDK = /Developer/SDKs/MacOSX${SDK_TARGET}.sdk"
+
+    case $TARGET in
+    x86_64*|i686*) add_enabled_makefile_cfg "HAVE_MACOSX_ON_INTEL" ;;
+    *darwin10)     add_enabled_makefile_cfg "HAVE_MACOSX_DARWIN_10" ;;
+    *darwin9)      add_enabled_makefile_cfg "HAVE_MACOSX_DARWIN_9" ;;
+    esac
 
     if ! test -e /Developer/SDKs; then
         error "Your Developer Tools' SDKs were not found.\nYou need to add extra symbolic links to /Developer to achieve correctly\nbuilt contribs.\nHave a look at the OSX-Compile-HOWTO for details." >&2
@@ -431,15 +426,14 @@ if test -z "$CONTRIBS_RELEASE"; then
     info "*****************************************************************"
 fi
 
-if test $HAVE_DARWIN_9; then
-    add_enabled_makefile_cfg "HAVE_DARWIN_9"
+if test $HAVE_MACOSX_DARWIN_9; then
+    add_enabled_makefile_cfg "HAVE_MACOSX_DARWIN_9"
     if ! /usr/bin/gcc-4.2 --version>/dev/null 2>&1; then
         error "You do not have GCC-4.2 installed in /usr/bin, compilation WILL FAIL."
     fi
 fi
 
-if test $HAVE_DARWIN_32; then
-    add_enabled_makefile_cfg "HAVE_DARWIN_32"
+if test "$DISTRO" = "macosx32"; then
     info "*****************************************************************"
     info "* VLC will be compiled in 32bit mode.                           *"
     info "*                                                               *"
@@ -450,8 +444,7 @@ if test $HAVE_DARWIN_32; then
     info "*****************************************************************"
 fi
 
-if test $HAVE_DARWIN_64; then
-    add_enabled_makefile_cfg "HAVE_DARWIN_64"
+if test "$DISTRO" = "macosx64"; then
     info
     info "*****************************************************************"
     info "* VLC will be compiled in 64bit mode using the 10.5 SDK.        *"
