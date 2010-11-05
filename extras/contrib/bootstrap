@@ -59,6 +59,13 @@ info()
 }
 
 DISTRO=
+
+hint_distro()
+{
+    # Give a hint about the auto detected distro
+    if test -z "${DISTRO}"; then DISTRO="$1"; fi
+}
+
 BUILDDIR=.
 
 while getopts "ht:d:b:i:" OPTION
@@ -190,6 +197,7 @@ case $TARGET in
     ;;
 esac
 
+# Figure out the correct distro to use
 case $TARGET in
     ppc-darwin|*-apple-darwin8)
         error "Your version of Mac OS X is too old!"
@@ -197,7 +205,7 @@ case $TARGET in
         exit 1
     ;;
     powerpc-apple-darwin9)
-        DISTRO=darwin
+        hint_distro darwin
         HAVE_DARWIN_32=1
 
         CFLAGS_TUNING=" -arch ppc -mtune=G4"
@@ -207,7 +215,7 @@ case $TARGET in
         LD="ld -arch ppc -syslibroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
     ;;
     i686-apple-darwin*)
-        DISTRO=darwin
+        hint_distro darwin
         HAVE_DARWIN_32=1
 
         CFLAGS_TUNING=" -march=prescott -mtune=generic -arch i386 -m32"
@@ -219,7 +227,7 @@ case $TARGET in
         fi
     ;;
     x86_64-apple-darwin*)
-        DISTRO=darwin64
+        hint_distro darwin64
         HAVE_DARWIN_64=1
 
         CFLAGS_TUNING=" -march=core2 -mtune=core2 -m64 -arch x86_64"
@@ -240,18 +248,18 @@ case $TARGET in
     *mingw32ce)
         add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
         EXTRA_CPPFLAGS=" -D_WIN32_WCE=0x0500"
-        DISTRO=wince
+        hint_distro wince
     ;;
     *64-*mingw*)
         add_makefile_cfg "HAVE_WIN32 = 1"
         add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
         EXTRA_CFLAGS="-O3"
-        DISTRO=win64
+        hint_distro win64
     ;;
     *mingw32*)
         add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
         EXTRA_CFLAGS=" -O3 -march=i686 -mtune=generic"
-        DISTRO=win32
+        hint_distro win32
     ;;
     i686-pc-cygwin)
         add_makefile_cfg "HAVE_CYGWIN = 1"
@@ -262,12 +270,12 @@ case $TARGET in
         EXTRA_CPPFLAGS=" -mno-cygwin -isystem /usr/include/mingw"
         EXTRA_LDFLAGS=" -mno-cygwin"
         add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
-        DISTRO=win32
+        hint_distro win32
     ;;
     arm-wince-pe)
         add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
         EXTRA_CPPFLAGS=" -D_WIN32_WCE"
-        DISTRO=wince
+        hint_distro wince
     ;;
     armeb-linux-uclibc)
         add_makefile_cfg "HAVE_UCLIBC = 1"
@@ -276,7 +284,7 @@ case $TARGET in
     ;;
     arm-none-linux-gnueabi)
         if test -f /etc/maemo_version; then
-            DISTRO=maemo
+            hint_distro maemo
             EXTRA_CFLAGS=" -mcpu=cortex-a8 -mtune=cortex-a8 -march=armv7-a"
             EXTRA_CFLAGS="$EXTRA_CFLAGS -mfpu=neon -mfloat-abi=softfp"
             EXTRA_CFLAGS="$EXTRA_CFLAGS -O3 -fno-tree-vectorize"
@@ -309,17 +317,17 @@ if test -z "${DISTRO}" -a "$TARGET" = "$BUILD"; then
     fi
     # Try to match distribution
     if test -f /etc/fedora-release; then
-        DISTRO=fedora
+        hint_distro fedora
     elif test -f /etc/maemo_version; then
-        DISTRO=maemo
+        hint_distro maemo
     elif test -f /etc/debian_version; then
         # NOTE: check for Debian *after* its derivatives
-        DISTRO=debian
+        hint_distro debian
     fi
 fi
 
 # Default Unix-like systems
-test -z "${DISTRO}" && DISTRO=unix
+hint_distro unix
 
 cat src/Distributions/"${DISTRO}".mak >> "${distro_mak}"
 
