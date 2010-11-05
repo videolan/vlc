@@ -104,8 +104,6 @@ ifneq ($(BUILD),$(HOST))
         ifndef HAVE_IOS
 			HAVE_CROSS_COMPILE_NEEDS_CROSS_PREFIX=y
         endif
-		X264CONF=--host=$(HOST)
-        PTHREADSCONF=CROSS="$(HOST)-"
     else
         # We are compiling for MinGW on Cygwin
     endif
@@ -122,13 +120,6 @@ ifdef HAVE_WINCE
 HOSTCONF+= --without-pic --disable-shared
 endif
 
-ifdef HAVE_MACOSX
-X264CONF=--host=$(HOST)
-X264CONF += --enable-pic
-ifdef HAVE_MACOSX64
-X264CONF+=--host=x86_64-apple-MACOSX10
-endif
-endif
 
 ifdef HAVE_LINUX
 ifdef HAVE_MAEMO
@@ -136,14 +127,12 @@ ifdef HAVE_MAEMO
 # Installing statically-linked VLC plugins is so much simpler.
 HOSTCONF += --with-pic --disable-shared
 endif
-X264CONF += --enable-pic
 endif
+
 
 ifdef HAVE_ISA_THUMB
 NOTHUMB ?= -mno-thumb
 endif
-
-X264CONF+= --disable-avs --disable-lavf --disable-ffms --disable-mp4-output
 
 DATE=`date +%Y-%m-%d`
 
@@ -976,10 +965,10 @@ DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 FFMPEGCONF=--disable-doc --disable-decoder=libvpx
 
 ifdef HAVE_CROSS_COMPILE
-	FFMPEGCONF += --enable-cross-compile
+FFMPEGCONF += --enable-cross-compile
 endif
 ifdef HAVE_CROSS_COMPILE_NEEDS_CROSS_PREFIX
-	FFMPEGCONF += --cross-prefix=$(HOST)-
+FFMPEGCONF += --cross-prefix=$(HOST)-
 endif
 
 #
@@ -1419,6 +1408,24 @@ DISTCLEAN_PKG += libdca-$(LIBDCA_VERSION).tar.bz2
 # ***************************************************************************
 # libx264
 # ***************************************************************************
+
+ifdef HAVE_MACOSX
+X264CONF =--host=$(HOST)
+X264CONF += --enable-pic
+ifdef HAVE_MACOSX64
+X264CONF +=--host=x86_64-apple-MACOSX10
+endif
+endif
+
+ifdef HAVE_CROSS_COMPILE_NEEDS_CROSS_PREFIX
+X264CONF=--host=$(HOST)
+endif
+
+ifdef HAVE_LINUX
+X264CONF += --enable-pic
+endif
+
+X264CONF += --disable-avs --disable-lavf --disable-ffms --disable-mp4-output
 
 x264-$(X264_VERSION).tar.gz:
 	$(WGET) $(X264_URL)
@@ -2267,6 +2274,10 @@ DISTCLEAN_PKG += taglib-$(TAGLIB_VERSION).tar.gz
 # ***************************************************************************
 # pthreads for win32
 # ***************************************************************************
+
+ifdef HAVE_CROSS_COMPILE_NEEDS_CROSS_PREFIX
+PTHREADSCONF=CROSS="$(HOST)-"
+endif
 
 pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz:
 	$(WGET) $(PTHREADS_URL)
