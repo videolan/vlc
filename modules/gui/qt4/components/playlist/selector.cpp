@@ -173,20 +173,20 @@ PLSelItem * putPLData( PLSelItem* item, playlist_item_t* plItem )
 void PLSelector::createItems()
 {
     /* PL */
-    PLSelItem *pl = putPLData( addItem( PL_ITEM_TYPE, "Playlist", true ),
+    PLSelItem *pl = putPLData( addItem( PL_ITEM_TYPE, N_("Playlist"), true ),
                               THEPL->p_playing );
     pl->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PL ) );
 
     /* ML */
-    PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, "Media Library", true ),
+    PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, N_("Media Library"), true ),
                               THEPL->p_media_library );
     ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
 
     /* SD nodes */
-    QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, "My Computer" )->treeItem();
-    QTreeWidgetItem *devices = addItem( CATEGORY_TYPE, "Devices" )->treeItem();
-    QTreeWidgetItem *lan = addItem( CATEGORY_TYPE, "Local Network" )->treeItem();
-    QTreeWidgetItem *internet = addItem( CATEGORY_TYPE, "Internet" )->treeItem();
+    QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, N_("My Computer") )->treeItem();
+    QTreeWidgetItem *devices = addItem( CATEGORY_TYPE, N_("Devices") )->treeItem();
+    QTreeWidgetItem *lan = addItem( CATEGORY_TYPE, N_("Local Network") )->treeItem();
+    QTreeWidgetItem *internet = addItem( CATEGORY_TYPE, N_("Internet") )->treeItem();
 
     /* SD subnodes */
     char **ppsz_longnames;
