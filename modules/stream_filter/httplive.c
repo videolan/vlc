@@ -854,7 +854,7 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
         int newstream = BandwidthAdaptation(s, hls->id, &bw);
         if ((newstream >= 0) && (newstream != *cur_stream))
         {
-            msg_Info(s, "switching to %s bandwidth (%"PRIu64") stream",
+            msg_Info(s, "detected %s bandwidth (%"PRIu64") stream",
                      (hls->bandwidth <= bw) ? "faster" : "lower", bw);
             *cur_stream = newstream;
         }
@@ -920,13 +920,9 @@ static void* hls_Thread(vlc_object_t *p_this)
     return NULL;
 }
 
-static int Prefetch(stream_t *s)
+static int Prefetch(stream_t *s, int *current)
 {
     stream_sys_t *p_sys = s->p_sys;
-    int current;
-
-again:
-    current = p_sys->current;
 
     hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->current);
     if (hls == NULL)
@@ -936,12 +932,8 @@ again:
     if (segment == NULL )
         return VLC_EGENERIC;
 
-    if (Download(s, hls, segment, &p_sys->current) != VLC_SUCCESS)
+    if (Download(s, hls, segment, current) != VLC_SUCCESS)
         return VLC_EGENERIC;
-
-    /* Bandwidth changed? */
-    if (current != p_sys->current)
-        goto again;
 
     return VLC_SUCCESS;
 }
@@ -1147,10 +1139,10 @@ static int Open(vlc_object_t *p_this)
     }
 
     /* */
+    int current = p_sys->current = 0;
     p_sys->segment = 0;
-    p_sys->current = 0;
 
-    if (Prefetch(s) != VLC_SUCCESS)
+    if (Prefetch(s, &current) != VLC_SUCCESS)
     {
         msg_Err(s, "fetching first segment.");
         goto fail;
@@ -1164,7 +1156,7 @@ static int Open(vlc_object_t *p_this)
     }
 
     p_sys->thread->hls_stream = p_sys->hls_stream;
-    p_sys->thread->current = p_sys->current;
+    p_sys->thread->current = current;
     p_sys->thread->s = s;
 
     if (vlc_thread_create(p_sys->thread, "HTTP Live Streaming client",
@@ -1240,6 +1232,8 @@ static segment_t *NextSegment(stream_t *s)
         if (p_sys->current != p_sys->thread->current)
         {
             /* YES it was */
+            msg_Info(s, "playback is switching from stream %d to %d",
+                     p_sys->current, p_sys->thread->current);
             p_sys->current = p_sys->thread->current;
         }
         else
@@ -1335,18 +1329,22 @@ static int Peek(stream_t *s, const uint8_t **pp_peek, unsigned int i_peek)
 {
     stream_sys_t *p_sys = s->p_sys;
     size_t curlen = 0;
+    segment_t *segment;
 
-    hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->current);
-    if (hls == NULL)
-        return 0;
+again:
+    segment = NextSegment(s);
+    if (segment == NULL)
+    {
+        msg_Err(s, "segment should have been availabe");
+        return 0; /* eof? */
+    }
 
+    vlc_mutex_lock(&segment->lock);
+
+    /* remember segment to peek */
     int peek_segment = p_sys->segment;
     do
     {
-        segment_t *segment = segment_GetSegment(hls, peek_segment);
-        if (segment == NULL) return 0;
-
-        vlc_mutex_lock(&segment->lock);
         if (i_peek < segment->data->i_buffer)
         {
             *pp_peek = segment->data->p_buffer;
@@ -1354,10 +1352,16 @@ static int Peek(stream_t *s, const uint8_t **pp_peek, unsigned int i_peek)
         }
         else
         {
-             peek_segment++;
+            p_sys->segment++;
+            vlc_mutex_unlock(&segment->lock);
+            goto again;
         }
-        vlc_mutex_unlock(&segment->lock);
     } while ((curlen < i_peek) && vlc_object_alive(s));
+
+    /* restore segment to read */
+    p_sys->segment = peek_segment;
+
+    vlc_mutex_unlock(&segment->lock);
 
     return curlen;
 }
