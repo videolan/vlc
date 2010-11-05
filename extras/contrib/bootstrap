@@ -48,6 +48,11 @@ add_makefile_cfg()
     echo $1 >> "${config_mak}"
 }
 
+add_enabled_makefile_cfg()
+{
+    echo "$1=1" >> "${config_mak}"
+}
+
 error()
 {
     echo "[contrib] ERROR: $1"
@@ -183,17 +188,17 @@ add_makefile_cfg "ARCH = $ARCH"
 # Check the HAVE_{OS}
 case $TARGET in
     *darwin*)
-        add_makefile_cfg "HAVE_DARWIN_OS = 1"
-        add_makefile_cfg "HAVE_BSD = 1"
+        add_enabled_makefile_cfg "HAVE_DARWIN_OS"
+        add_enabled_makefile_cfg "HAVE_BSD"
     ;;
     *linux*)
-        add_makefile_cfg "HAVE_LINUX = 1"
+        add_enabled_makefile_cfg "HAVE_LINUX"
     ;;
     *bsd*)
-        add_makefile_cfg "HAVE_BSD = 1"
+        add_enabled_makefile_cfg "HAVE_BSD"
     ;;
     *wince*)
-        add_makefile_cfg "HAVE_WINCE = 1"
+        add_enabled_makefile_cfg "HAVE_WINCE"
     ;;
 esac
 
@@ -221,9 +226,9 @@ case $TARGET in
         CFLAGS_TUNING=" -march=prescott -mtune=generic -arch i386 -m32"
         EXTRA_LDFLAGS=" -arch i386"
 
-        add_makefile_cfg "HAVE_DARWIN_OS_ON_INTEL = 1"
+        add_enabled_makefile_cfg "HAVE_DARWIN_OS_ON_INTEL"
         if test $TARGET = "i686-apple-darwin10"; then
-            add_makefile_cfg "HAVE_DARWIN_10 = 1"
+            add_enabled_makefile_cfg "HAVE_DARWIN_10"
         fi
     ;;
     x86_64-apple-darwin*)
@@ -239,10 +244,10 @@ case $TARGET in
         AR="ar"
         STRIP="strip"
 
-        add_makefile_cfg "HAVE_DARWIN_OS_ON_INTEL = 1"
+        add_enabled_makefile_cfg "HAVE_DARWIN_OS_ON_INTEL"
         add_makefile_cfg "PATH = /bin:/usr/bin:/usr/local/bin"
         if test $TARGET = "x86_64-apple-darwin10"; then
-            add_makefile_cfg "HAVE_DARWIN_10 = 1"
+            add_enabled_makefile_cfg "HAVE_DARWIN_10"
         fi
     ;;
     *mingw32ce)
@@ -251,7 +256,7 @@ case $TARGET in
         hint_distro wince
     ;;
     *64-*mingw*)
-        add_makefile_cfg "HAVE_WIN32 = 1"
+        add_enabled_makefile_cfg "HAVE_WIN32"
         add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
         EXTRA_CFLAGS="-O3"
         hint_distro win64
@@ -262,7 +267,7 @@ case $TARGET in
         hint_distro win32
     ;;
     i686-pc-cygwin)
-        add_makefile_cfg "HAVE_CYGWIN = 1"
+        add_enabled_makefile_cfg "HAVE_CYGWIN"
         CC="gcc -mno-cygwin -isystem /usr/include/mingw"
         CXX="g++ -mno-cygwin -isystem /usr/include/mingw"
         TARGET=`$CC -dumpmachine`
@@ -278,8 +283,8 @@ case $TARGET in
         hint_distro wince
     ;;
     armeb-linux-uclibc)
-        add_makefile_cfg "HAVE_UCLIBC = 1"
-        add_makefile_cfg "HAVE_BIGENDIAN = 1"
+        add_enabled_makefile_cfg "HAVE_UCLIBC"
+        add_enabled_makefile_cfg "HAVE_BIGENDIAN"
         EXTRA_CFLAGS="-Os -march=armv5 -msoft-float"
     ;;
     arm-none-linux-gnueabi)
@@ -370,7 +375,7 @@ EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS $CPPFLAGS"
 EXTRA_CXXFLAGS="$EXTRA_CXXFLAGS $CXXFLAGS"
 
 uppercase_distro=`echo "$DISTRO" | tr '[:lower:]' '[:upper:]'`
-add_makefile_cfg "HAVE_${uppercase_distro} = 1"
+add_enabled_makefile_cfg "HAVE_${uppercase_distro}"
 add_makefile_cfg "BUILD = $BUILD"
 add_makefile_cfg "HOST = $TARGET"
 add_makefile_cfg "SRCDIR = `pwd`"
@@ -435,14 +440,14 @@ if test -z "$CONTRIBS_RELEASE"; then
 fi
 
 if test $HAVE_DARWIN_9; then
-    add_makefile_cfg "HAVE_DARWIN_9 = 1"
+    add_enabled_makefile_cfg "HAVE_DARWIN_9"
     if ! /usr/bin/gcc-4.2 --version>/dev/null 2>&1; then
         error "You do not have GCC-4.2 installed in /usr/bin, compilation WILL FAIL."
     fi
 fi
 
 if test $HAVE_DARWIN_32; then
-    add_makefile_cfg "HAVE_DARWIN_32 = 1"
+    add_enabled_makefile_cfg "HAVE_DARWIN_32"
     info "*****************************************************************"
     info "* VLC will be compiled in 32bit mode.                           *"
     info "*                                                               *"
@@ -454,7 +459,7 @@ if test $HAVE_DARWIN_32; then
 fi
 
 if test $HAVE_DARWIN_64; then
-    add_makefile_cfg "HAVE_DARWIN_64 = 1"
+    add_enabled_makefile_cfg "HAVE_DARWIN_64"
     info
     info "*****************************************************************"
     info "* VLC will be compiled in 64bit mode using the 10.5 SDK.        *"
