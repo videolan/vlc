@@ -238,12 +238,6 @@ case $TARGET in
         CFLAGS_TUNING=" -march=core2 -mtune=core2 -m64 -arch x86_64"
         EXTRA_LDFLAGS=" -arch x86_64"
 
-        # FIXME - is this stuff needed?
-        LD="ld"
-        RANLIB="ranlib"
-        AR="ar"
-        STRIP="strip"
-
         add_enabled_makefile_cfg "HAVE_DARWIN_OS_ON_INTEL"
         add_makefile_cfg "PATH = /bin:/usr/bin:/usr/local/bin"
         if test $TARGET = "x86_64-apple-darwin10"; then
