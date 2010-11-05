@@ -18,7 +18,7 @@ VLC_INSTALL_DIR=$(VLC_SRC_DIR)/install-ios-$(VLC_PLATFORM)
 
 #include "vlc-plugins.xcconfig"
 
-VLC_CONTRIB_DIR=$VLC_SRC_DIR/extras/contrib/hosts/$(VLC_ARCH)-apple-darwin10/ios
+VLC_CONTRIB_DIR=$VLC_SRC_DIR/contrib-ios-$(VLC_ARCH)-apple-darwin10
 AVCODEC=${VLC_CONTRIB_DIR}/lib/libavcore.a $(VLC_CONTRIB_DIR)/lib/libavutil.a ${VLC_CONTRIB_DIR}/lib/libavcodec.a $(VLC_CONTRIB_DIR)/lib/libavformat.a $(VLC_CONTRIB_DIR)/lib/libswscale.a
 LIVE555=$(VLC_CONTRIB_DIR)/lib/libBasicUsageEnvironment.a $(VLC_CONTRIB_DIR)/lib/libUsageEnvironment.a $(VLC_CONTRIB_DIR)/lib/libliveMedia.a $(VLC_CONTRIB_DIR)/lib/libgroupsock.a
 DVBPSI=$(VLC_CONTRIB_DIR)/lib/libdvbpsi.a
