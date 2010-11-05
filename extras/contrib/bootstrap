@@ -341,8 +341,8 @@ case "$DISTRO" in
     HAVE_DARWIN_9=1
     EXTRA_LDFLAGS="${EXTRA_LDFLAGS} -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
     EXTRA_CFLAGS="${EXTRA_CFLAGS} -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
-    CC="/Developer/usr/bin/gcc-4.2"
-    CXX="/Developer/usr/bin/g++-4.2"
+    CC="/usr/bin/gcc-4.2"
+    CXX="/usr/bin/g++-4.2"
     add_makefile_cfg "PATH = /bin:/usr/bin:/usr/local/bin"
     add_makefile_cfg "SDK_TARGET = ${SDK_TARGET}"
     add_makefile_cfg "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}"
@@ -428,8 +428,8 @@ fi
 
 if test $HAVE_DARWIN_9; then
     add_makefile_cfg "HAVE_DARWIN_9 = 1"
-    if ! /Developer/usr/bin/gcc-4.2 --version>/dev/null 2>&1; then
-        error "You do not have GCC-4.2 instelled, compilation WILL FAIL."
+    if ! /usr/bin/gcc-4.2 --version>/dev/null 2>&1; then
+        error "You do not have GCC-4.2 installed in /usr/bin, compilation WILL FAIL."
     fi
 fi
 
