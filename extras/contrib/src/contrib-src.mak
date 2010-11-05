@@ -90,8 +90,6 @@ else
 HOSTCC2=$(HOSTCC)
 endif
 
-FFMPEGCONF=--disable-doc --disable-decoder=libvpx
-
 # cross compiling
 #This should be inside the if block but some config scripts are buggy
 HOSTCONF=--target=$(HOST) --host=$(HOST) --build=$(BUILD) --program-prefix=""
@@ -101,13 +99,12 @@ ifneq ($(BUILD),$(HOST))
     # unfortunately there isn't a complete separate GCC toolchain for MinGW under Cygwin
     #
     ifndef HAVE_CYGWIN
-        # We are REALLY cross compiling
-        ifdef HAVE_IOS
-            FFMPEGCONF+=--enable-cross-compile
-        else
-            FFMPEGCONF+=--cross-prefix=$(HOST)- --enable-cross-compile
+		# We are REALLY cross compiling
+		HAVE_CROSS_COMPILE=y
+        ifndef HAVE_IOS
+			HAVE_CROSS_COMPILE_NEEDS_CROSS_PREFIX=y
         endif
-        X264CONF=--host=$(HOST)
+		X264CONF=--host=$(HOST)
         PTHREADSCONF=CROSS="$(HOST)-"
     else
         # We are compiling for MinGW on Cygwin
@@ -119,74 +116,26 @@ endif
 #
 ifdef HAVE_WIN32
 HOSTCONF+= --without-pic --disable-shared --disable-dependency-tracking
-FFMPEGCONF+= --target-os=mingw32 --arch=x86 --enable-memalign-hack
-ifdef HAVE_WIN64
-FFMPEGCONF+= --cpu=athlon64 --arch=x86_64
-else
-FFMPEGCONF+= --cpu=i686
-endif
 endif
 
 ifdef HAVE_WINCE
 HOSTCONF+= --without-pic --disable-shared
-FFMPEGCONF+= --target-os=mingw32ce --arch=armv4l --cpu=armv4t --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols
-endif
-
-ifdef HAVE_UCLIBC
-ifdef HAVE_BIGENDIAN
-FFMPEGCONF+= --arch=armeb --enable-armv5te --enable-iwmmxt
-else
-FFMPEGCONF+= --arch=armv4l
-endif
-FFMPEGCONF+= --enable-small --disable-mpegaudio-hp
-FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
-else
-ifndef HAVE_WINCE
-ifndef HAVE_IOS
-FFMPEGCONF+= --enable-libmp3lame --enable-libgsm
-endif
-endif
-endif
-
-ifdef HAVE_MACOSX_ON_INTEL
-FFMPEGCONF += --enable-memalign-hack
 endif
 
 ifdef HAVE_MACOSX
 X264CONF=--host=$(HOST)
 X264CONF += --enable-pic
-ifdef HAVE_MACOSX32
-FFMPEGCONF += --enable-libvpx
-FFMPEGCONF += --cc=gcc-4.0
-else
-FFMPEGCONF += --cc=$(CC)
-endif
-FFMPEGCONF += --arch=$(ARCH)
 ifdef HAVE_MACOSX64
-FFMPEGCONF += --enable-libvpx
-FFMPEGCONF += --cpu=core2
 X264CONF+=--host=x86_64-apple-MACOSX10
 endif
-ifdef HAVE_MACOSX_ON_INTEL
-FFMPEG_CFLAGS += -DHAVE_LRINTF
-endif
-endif
-
-ifdef HAVE_AMR
-FFMPEGCONF+= --enable-libamr-nb --enable-libamr-wb --enable-nonfree
 endif
 
 ifdef HAVE_LINUX
-FFMPEGCONF+= --target-os=linux
 ifdef HAVE_MAEMO
-ifneq ($(filter -m%=cortex-a8, $(EXTRA_CFLAGS)),)
-FFMPEGCONF += --disable-runtime-cpudetect --enable-neon --cpu=cortex-a8
-endif
 # Really, this could be done on all Linux platforms, not just Maemo.
 # Installing statically-linked VLC plugins is so much simpler.
 HOSTCONF += --with-pic --disable-shared
 endif
-FFMPEGCONF += --enable-pic
 X264CONF += --enable-pic
 endif
 
@@ -1023,6 +972,82 @@ DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 
 # ffmpeg
 # ***************************************************************************
+
+FFMPEGCONF=--disable-doc --disable-decoder=libvpx
+
+ifdef HAVE_CROSS_COMPILE
+	FFMPEGCONF += --enable-cross-compile
+endif
+ifdef HAVE_CROSS_COMPILE_NEEDS_CROSS_PREFIX
+	FFMPEGCONF += --cross-prefix=$(HOST)-
+endif
+
+#
+# Special target-dependant options
+#
+ifdef HAVE_WIN32
+FFMPEGCONF+= --target-os=mingw32 --arch=x86 --enable-memalign-hack
+ifdef HAVE_WIN64
+FFMPEGCONF+= --cpu=athlon64 --arch=x86_64
+else
+FFMPEGCONF+= --cpu=i686
+endif
+endif
+
+ifdef HAVE_WINCE
+FFMPEGCONF+= --target-os=mingw32ce --arch=armv4l --cpu=armv4t --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols
+endif
+
+ifdef HAVE_UCLIBC
+ifdef HAVE_BIGENDIAN
+FFMPEGCONF+= --arch=armeb --enable-armv5te --enable-iwmmxt
+else
+FFMPEGCONF+= --arch=armv4l
+endif
+FFMPEGCONF+= --enable-small --disable-mpegaudio-hp
+FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
+else
+ifndef HAVE_WINCE
+ifndef HAVE_IOS
+FFMPEGCONF+= --enable-libmp3lame --enable-libgsm
+endif
+endif
+endif
+
+ifdef HAVE_MACOSX_ON_INTEL
+FFMPEGCONF += --enable-memalign-hack
+endif
+
+ifdef HAVE_MACOSX
+ifdef HAVE_MACOSX32
+FFMPEGCONF += --enable-libvpx
+FFMPEGCONF += --cc=gcc-4.0
+else
+FFMPEGCONF += --cc=$(CC)
+endif
+FFMPEGCONF += --arch=$(ARCH)
+ifdef HAVE_MACOSX64
+FFMPEGCONF += --enable-libvpx
+FFMPEGCONF += --cpu=core2
+endif
+ifdef HAVE_MACOSX_ON_INTEL
+FFMPEG_CFLAGS += -DHAVE_LRINTF
+endif
+endif
+
+ifdef HAVE_AMR
+FFMPEGCONF+= --enable-libamr-nb --enable-libamr-wb --enable-nonfree
+endif
+
+ifdef HAVE_LINUX
+FFMPEGCONF+= --target-os=linux
+ifdef HAVE_MAEMO
+ifneq ($(filter -m%=cortex-a8, $(EXTRA_CFLAGS)),)
+FFMPEGCONF += --disable-runtime-cpudetect --enable-neon --cpu=cortex-a8
+endif
+endif
+FFMPEGCONF += --enable-pic
+endif
 
 ifdef SVN
 ifdef HAVE_WIN32
