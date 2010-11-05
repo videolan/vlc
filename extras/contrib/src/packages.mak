@@ -25,7 +25,7 @@
 # ***************************************************************************
 
 PENGUIN=http://ftp.penguin.cz/pub/users/utx/amr
-GNU=ftp://ftp.gnu.org/gnu
+GNU=http://ftp.gnu.org/gnu
 SF=http://heanet.dl.sourceforge.net/sourceforge
 VIDEOLAN=http://downloads.videolan.org/pub/videolan
 CONTRIB_VIDEOLAN=http://downloads.videolan.org/pub/videolan/testing/contrib
@@ -115,7 +115,7 @@ LIBCACA_VERSION=0.99.beta17
 #LIBCACA_URL=$(CONTRIB_VIDEOLAN)/libcaca-$(LIBCACA_VERSION).tar.gz
 LIBCACA_URL=http://caca.zoy.org/files/libcaca/libcaca-$(LIBCACA_VERSION).tar.gz
 LIBDCA_VERSION=0.0.5
-LIBDCA_URL=ftp://ftp.videolan.org/pub/videolan/libdca/$(LIBDCA_VERSION)/libdca-$(LIBDCA_VERSION).tar.bz2
+LIBDCA_URL=$(VIDEOLAN)/libdca/$(LIBDCA_VERSION)/libdca-$(LIBDCA_VERSION).tar.bz2
 LIBDC1394_VERSION=1.2.1
 LIBDC1394_URL=$(SF)/libdc1394/libdc1394-$(LIBDC1394_VERSION).tar.gz
 LIBDC1394_SVN=https://svn.sourceforge.net/svnroot
