@@ -28,7 +28,7 @@ include ./config.mak
 
 BUILDDIRS = hosts build
 
-ifdef HAVE_DARWIN_OS
+ifdef HAVE_MACOSX
 TARGETALL=using-bin
 else
 TARGETALL=using-src
