@@ -246,7 +246,6 @@ typedef struct aout_fifo_t aout_fifo_t;
 typedef struct aout_input_t aout_input_t;
 typedef struct block_t aout_buffer_t;
 typedef audio_format_t audio_sample_format_t;
-typedef struct audio_date_t audio_date_t;
 typedef struct aout_filter_t aout_filter_t;
 
 /* Video */
@@ -284,18 +283,6 @@ typedef struct config_chain_t       config_chain_t;
 typedef struct session_descriptor_t session_descriptor_t;
 typedef struct announce_method_t announce_method_t;
 
-typedef struct sout_param_t sout_param_t;
-typedef struct sout_pcat_t sout_pcat_t;
-typedef struct sout_std_t sout_std_t;
-typedef struct sout_display_t sout_display_t;
-typedef struct sout_duplicate_t sout_duplicate_t;
-typedef struct sout_transcode_t sout_transcode_t;
-typedef struct sout_chain_t sout_chain_t;
-typedef struct streaming_profile_t streaming_profile_t;
-typedef struct sout_module_t sout_module_t;
-typedef struct sout_gui_descr_t sout_gui_descr_t;
-typedef struct profile_parser_t profile_parser_t;
-
 /* Decoders */
 typedef struct decoder_t         decoder_t;
 typedef struct decoder_sys_t     decoder_sys_t;
@@ -310,16 +297,12 @@ typedef struct filter_t filter_t;
 typedef struct filter_sys_t filter_sys_t;
 
 /* Network */
-typedef struct network_socket_t network_socket_t;
 typedef struct virtual_socket_t v_socket_t;
 typedef struct vlc_acl_t vlc_acl_t;
 typedef struct vlc_url_t vlc_url_t;
 
 /* Misc */
 typedef struct iso639_lang_t iso639_lang_t;
-typedef struct device_t device_t;
-typedef struct device_probe_t device_probe_t;
-typedef struct probe_sys_t probe_sys_t;
 
 /* block */
 typedef struct block_t      block_t;
