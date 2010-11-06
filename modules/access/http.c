@@ -826,7 +826,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             if( ReadICYMeta( p_access ) )
             {
                 p_access->info.b_eof = true;
-                return -1;
+                return 0;
             }
         }
         if( i_len > i_next )
