@@ -340,6 +340,14 @@ libvlc_media_t *libvlc_media_new_path( libvlc_instance_t *p_instance,
     return m;
 }
 
+libvlc_media_t *libvlc_media_new_fd( libvlc_instance_t *p_instance, int fd )
+{
+    char mrl[16];
+    snprintf( mrl, sizeof(mrl), "fd://%d", fd );
+
+    return libvlc_media_new_location( p_instance, mrl );
+}
+
 /**************************************************************************
  * Create a new media descriptor object
  **************************************************************************/

@@ -203,6 +203,35 @@ VLC_PUBLIC_API libvlc_media_t *libvlc_media_new_path(
                                    const char *path );
 
 /**
+ * Create a media for an already open file descriptor.
+ * The file descriptor shall be open for reading (or reading and writing).
+ *
+ * Regular file descriptors, pipe read descriptors and character device
+ * descriptors (including TTYs) are supported on all platforms.
+ * Block device descriptors are supported where available.
+ * Directory descriptors are supported on systems that provide fdopendir().
+ * Sockets are supported on all platforms where they are file descriptors,
+ * i.e. all except Windows.
+ *
+ * \note This library will <b>not</b> automatically close the file descriptor
+ * under any circumstance. Nevertheless, a file descriptor can usually only be
+ * rendered once in a media player. To render it a second time, the file
+ * descriptor should probably be rewound to the beginning with lseek().
+ *
+ * \see libvlc_media_release
+ *
+ * \version LibVLC 1.1.5 and later.
+ *
+ * \param p_instance the instance
+ * \param fd open file descriptor
+ * \return the newly created media or NULL on error
+ */
+VLC_PUBLIC_API libvlc_media_t *libvlc_media_new_fd(
+                                   libvlc_instance_t *p_instance,
+                                   int fd );
+
+
+/**
  * Create a media as an empty node with a given name.
  *
  * \see libvlc_media_release

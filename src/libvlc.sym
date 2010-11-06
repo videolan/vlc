@@ -101,6 +101,7 @@ libvlc_media_list_remove_index
 libvlc_media_list_retain
 libvlc_media_list_set_media
 libvlc_media_list_unlock
+libvlc_media_new_fd
 libvlc_media_new_location
 libvlc_media_new_path
 libvlc_media_new_as_node
