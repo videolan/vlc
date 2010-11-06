@@ -90,6 +90,8 @@ else
 HOSTCC2=$(HOSTCC)
 endif
 
+ENABLED=1 # Just a shortcut for readability
+
 # cross compiling
 #This should be inside the if block but some config scripts are buggy
 HOSTCONF=--target=$(HOST) --host=$(HOST) --build=$(BUILD) --program-prefix=""
@@ -974,17 +976,14 @@ endif
 #
 # Special target-dependant options
 #
-ifdef HAVE_WIN32
-FFMPEGCONF+= --target-os=mingw32 --arch=x86 --enable-memalign-hack
-ifdef HAVE_WIN64
-FFMPEGCONF+= --cpu=athlon64 --arch=x86_64
-else
-FFMPEGCONF+= --cpu=i686
-endif
-endif
 
 ifdef HAVE_WINCE
-FFMPEGCONF+= --target-os=mingw32ce --arch=armv4l --cpu=armv4t --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols
+FFMPEGCONF+= --target-os=mingw32ce --arch=armv4l --cpu=armv4t \
+             --disable-encoders --disable-muxers --disable-mpegaudio-hp \
+			 --disable-decoder=snow --disable-decoder=vc9 \
+			 --disable-decoder=wmv3 --disable-decoder=vorbis \
+			 --disable-decoder=dvdsub --disable-decoder=dvbsub \
+			 --disable-protocols
 endif
 
 ifdef HAVE_UCLIBC
@@ -995,7 +994,9 @@ FFMPEGCONF+= --arch=armv4l
 endif
 FFMPEGCONF+= --enable-small --disable-mpegaudio-hp
 FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
-else
+endif
+
+ifndef HAVE_UCLIBC
 ifndef HAVE_WINCE
 ifndef HAVE_IOS
 FFMPEGCONF+= --enable-libmp3lame --enable-libgsm
@@ -1003,47 +1004,78 @@ endif
 endif
 endif
 
+ifdef CC
+FFMPEGCONF += --cc=$(CC)
+endif
+
 ifdef HAVE_MACOSX_ON_INTEL
 FFMPEGCONF += --enable-memalign-hack
 endif
 
-ifdef HAVE_MACOSX
+ifdef HAVE_DARWIN_OS
+FFMPEGCONF += --arch=$(ARCH) --target-os=darwin
+endif
+
 ifdef HAVE_MACOSX32
 FFMPEGCONF += --enable-libvpx
 FFMPEGCONF += --cc=gcc-4.0
-else
-FFMPEGCONF += --cc=$(CC)
 endif
-FFMPEGCONF += --arch=$(ARCH)
+
 ifdef HAVE_MACOSX64
 FFMPEGCONF += --enable-libvpx
 FFMPEGCONF += --cpu=core2
 endif
+
 ifdef HAVE_MACOSX_ON_INTEL
 FFMPEG_CFLAGS += -DHAVE_LRINTF
 endif
+
+ifdef HAVE_IOS
+FFMPEGCONF += --sysroot=${IOS_SDK_ROOT}
+ifeq ($(ARCH),arm)
+FFMPEGCONF += --disable-runtime-cpudetect --enable-neon --cpu=cortex-a8
+else
+FFMPEGCONF += --disable-mmx
 endif
+endif #IOS
 
 ifdef HAVE_AMR
 FFMPEGCONF+= --enable-libamr-nb --enable-libamr-wb --enable-nonfree
 endif
 
 ifdef HAVE_LINUX
-FFMPEGCONF+= --target-os=linux
+FFMPEGCONF += --target-os=linux
+FFMPEGCONF += --enable-pic
+endif
+
 ifdef HAVE_MAEMO
 ifneq ($(filter -m%=cortex-a8, $(EXTRA_CFLAGS)),)
 FFMPEGCONF += --disable-runtime-cpudetect --enable-neon --cpu=cortex-a8
 endif
 endif
-FFMPEGCONF += --enable-pic
+
+ifdef HAVE_WIN32
+FFMPEGCONF+= --target-os=mingw32 --arch=x86 --enable-memalign-hack
+
+FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis \
+		      --enable-libmp3lame --enable-w32threads --disable-bsfs
+ifdef HAVE_WIN64
+FFMPEGCONF += --disable-dxva2
+FFMPEGCONF+= --cpu=athlon64 --arch=x86_64
+else # !WIN64
+FFMPEGCONF += --enable-dxva2 --enable-libvpx
+FFMPEGCONF+= --cpu=i686
+endif
 endif
 
-ifdef SVN
-ifdef HAVE_WIN32
-ffmpeg: .dshow_headers
-else
-ffmpeg:
+ifndef HAVE_WIN32
+FFMPEGCONF += --enable-pthreads
+FFMPEG_CFLAGS += --std=gnu99
 endif
+
+PHONY += ffmpeg-svn ffmpeg-tar
+
+ffmpeg/.svn-co:
 	$(SVN) co $(FFMPEG_SVN) ffmpeg
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
@@ -1059,15 +1091,16 @@ endif
 ifdef HAVE_WIN32
 	sed -i "s/std=c99/std=gnu99/" ffmpeg/configure
 endif
-else
+	touch $@
+
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	echo "ffmpeg snapshot is too old, you MUST use subversion !"
 	exit -1
 	$(WGET) $(FFMPEG_URL)
 
-ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
+ffmpeg/.untar: ffmpeg-$(FFMPEG_VERSION).tar.gz
 	$(EXTRACT_GZ)
-endif
+	touch $@
 
 FFMPEGCONF += \
 	--disable-debug \
@@ -1081,49 +1114,27 @@ FFMPEGCONF += \
 	--disable-protocols \
 	--disable-avfilter \
 	--disable-network
-ifdef HAVE_WIN64
-FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --disable-dxva2 --disable-bsfs
-else
-ifdef HAVE_WIN32
-FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --enable-dxva2 --disable-bsfs --enable-libvpx
-else
-ifdef HAVE_IOS
-FFMPEGCONF += --target-os=MACOSX --sysroot=${IOS_SDK_ROOT}
-ifeq ($(ARCH),arm)
-FFMPEGCONF += --disable-runtime-cpudetect --enable-neon --cpu=cortex-a8
-else
-FFMPEGCONF += --disable-mmx
-endif
 
-else
-FFMPEGCONF += --enable-pthreads
-endif
-FFMPEG_CFLAGS += --std=gnu99
-endif
-endif
-
-ifdef HAVE_WINCE
-.ffmpeg: ffmpeg .zlib
-else
-ifdef HAVE_UCLIBC
-.ffmpeg: ffmpeg
-else
-ifdef HAVE_IOS
-.ffmpeg: ffmpeg
-else
 ifeq ($(ARCH),armel)
-.ffmpeg: ffmpeg .lame .gsm .zlib
+HAVE_ARMELF=1
+endif
+
+FFMPEG_DEPS-$(ENABLED)     = .lame .gsm .libvpx .zlib
+FFMPEG_DEPS-$(HAVE_WINCE)  = .zlib
+FFMPEG_DEPS-$(HAVE_UCLIBC) =
+FFMPEG_DEPS-$(HAVE_IOS)    =
+FFMPEG_DEPS-$(HAVE_WIN64)  = .lame .gsm .zlib
+FFMPEG_DEPS-$(HAVE_ARMELF) = .lame .gsm .zlib
+FFMPEG_DEPS-$(HAVE_WIN32) += .dshow_headers
+
+ifdef SVN
+FFMPEG_MK_TARGET = ffmpeg/.svn-co
 else
-ifdef HAVE_WIN64
-.ffmpeg: ffmpeg .lame .gsm .zlib
-else
-.ffmpeg: ffmpeg .lame .gsm .libvpx .zlib
+FFMPEG_MK_TARGET = ffmpeg/.untar
 endif
-endif
-endif
-endif
-endif
-	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --extra-cflags="$(FFMPEG_CFLAGS) -DHAVE_STDINT_H" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
+
+.ffmpeg: $(FFMPEG_MK_TARGET) $(FFMPEG_DEPS-1)
+	(cd ffmpeg; $(HOSTCC) ./configure --prefix=$(PREFIX) --extra-cflags="$(FFMPEG_CFLAGS) -DHAVE_STDINT_H" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
 	touch $@
 
 ifdef SVN
