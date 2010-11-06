@@ -171,12 +171,18 @@ typedef struct libvlc_media_track_info_t
 
 
 /**
- * Create a media with a certain given media resource location.
+ * Create a media with a certain given media resource location,
+ * for instance a valid URL.
+ *
+ * \note To refer to a local file with this function,
+ * the file://... URI syntax <b>must</b> be used (see IETF RFC3986).
+ * We recommend using libvlc_media_new_path() instead when dealing with
+ * local files.
  *
  * \see libvlc_media_release
  *
  * \param p_instance the instance
- * \param psz_mrl the MRL to read
+ * \param psz_mrl the media location
  * \return the newly created media or NULL on error
  */
 VLC_PUBLIC_API libvlc_media_t *libvlc_media_new_location(
@@ -184,7 +190,7 @@ VLC_PUBLIC_API libvlc_media_t *libvlc_media_new_location(
                                    const char * psz_mrl );
 
 /**
- * Create a media with a certain file path.
+ * Create a media for a certain file path.
  *
  * \see libvlc_media_release
  *
