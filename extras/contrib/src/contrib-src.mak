@@ -520,23 +520,11 @@ DISTCLEAN_PKG += pcre-$(PCRE_VERSION).tar.bz2
 # lua
 # ***************************************************************************
 
-ifdef HAVE_WIN32
-LUA_MAKEPLATEFORM=mingw
-else
-ifdef HAVE_MACOSX
-LUA_MAKEPLATEFORM=macosx
-else
-ifdef HAVE_LINUX
-LUA_MAKEPLATEFORM=linux
-else
-ifdef HAVE_BSD
-LUA_MAKEPLATEFORM=bsd
-else
-LUA_MAKEPLATEFORM=generic
-endif
-endif
-endif
-endif
+LUA_MAKEPLATEFORM-$(ENABLED)=generic
+LUA_MAKEPLATEFORM-$(HAVE_BSD)=bsd
+LUA_MAKEPLATEFORM-$(HAVE_LINUX)=linux
+LUA_MAKEPLATEFORM-$(HAVE_MACOSX)=macosx
+LUA_MAKEPLATEFORM-$(HAVE_WIN32)=mingw
 
 lua-$(LUA_VERSION).tar.gz:
 	$(WGET) $(LUA_URL)
@@ -550,11 +538,11 @@ endif
 .lua: lua
 ifdef HAVE_WIN32
 	( cd $< && sed -i.orig 's/lua luac/lua.exe/' Makefile && cd src && sed -i.orig 's/CC=/#CC=/' Makefile && sed -i 's/strip/$(STRIP)/' Makefile && cd ../..)
-	(cd $<&& $(HOSTCC) make $(LUA_MAKEPLATEFORM)&& cd src&& $(HOSTCC) make liblua.a&& cd ..&&$(HOSTCC) make install INSTALL_TOP=$(PREFIX)&& $(RANLIB) $(PREFIX)/lib/liblua.a)
+	(cd $<&& $(HOSTCC) make $(LUA_MAKEPLATEFORM-1)&& cd src&& $(HOSTCC) make liblua.a&& cd ..&&$(HOSTCC) make install INSTALL_TOP=$(PREFIX)&& $(RANLIB) $(PREFIX)/lib/liblua.a)
 	(cd $<&& sed -i.orig 's@prefix= /usr/local@prefix= $(PREFIX)@' etc/lua.pc&& mkdir -p $(PREFIX)/lib/pkgconfig&& cp etc/lua.pc $(PREFIX)/lib/pkgconfig)
 else
 	(cd $<&& patch -p1) < Patches/lua-noreadline.patch
-	(cd $<&& $(HOSTCC) make $(LUA_MAKEPLATEFORM) && make install INSTALL_TOP=$(PREFIX))
+	(cd $<&& $(HOSTCC) make $(LUA_MAKEPLATEFORM-1) && make install INSTALL_TOP=$(PREFIX))
 endif
 	touch $@
 
