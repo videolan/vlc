@@ -511,10 +511,10 @@ void vout_ControlChangeCropWindow(vout_thread_t *vout,
 {
     vout_control_cmd_t cmd;
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_WINDOW);
-    cmd.u.window.x      = x;
-    cmd.u.window.y      = y;
-    cmd.u.window.width  = width;
-    cmd.u.window.height = height;
+    cmd.u.window.x      = __MAX(x, 0);
+    cmd.u.window.y      = __MAX(y, 0);
+    cmd.u.window.width  = __MAX(width, 0);
+    cmd.u.window.height = __MAX(height, 0);
 
     vout_control_Push(&vout->p->control, &cmd);
 }
@@ -523,10 +523,10 @@ void vout_ControlChangeCropBorder(vout_thread_t *vout,
 {
     vout_control_cmd_t cmd;
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_BORDER);
-    cmd.u.border.left   = left;
-    cmd.u.border.top    = top;
-    cmd.u.border.right  = right;
-    cmd.u.border.bottom = bottom;
+    cmd.u.border.left   = __MAX(left, 0);
+    cmd.u.border.top    = __MAX(top, 0);
+    cmd.u.border.right  = __MAX(right, 0);
+    cmd.u.border.bottom = __MAX(bottom, 0);
 
     vout_control_Push(&vout->p->control, &cmd);
 }
@@ -1180,39 +1180,26 @@ static void ThreadChangeAspectRatio(vout_thread_t *vout,
 
 
 static void ThreadExecuteCropWindow(vout_thread_t *vout,
-                                    unsigned crop_num, unsigned crop_den,
                                     unsigned x, unsigned y,
                                     unsigned width, unsigned height)
 {
-    const video_format_t *source = &vout->p->original;
-
-    vout_SetDisplayCrop(vout->p->display.vd,
-                        crop_num, crop_den,
-                        source->i_x_offset + x,
-                        source->i_y_offset + y,
-                        width, height);
+    vout_SetDisplayCrop(vout->p->display.vd, 0, 0,
+                        x, y, width, height);
 }
 static void ThreadExecuteCropBorder(vout_thread_t *vout,
                                     unsigned left, unsigned top,
                                     unsigned right, unsigned bottom)
 {
-    const video_format_t *source = &vout->p->original;
-    ThreadExecuteCropWindow(vout, 0, 0,
-                            left,
-                            top,
-                            /* At worst, it becomes < 0 (but unsigned) and will be rejected */
-                            source->i_visible_width  - (left + right),
-                            source->i_visible_height - (top  + bottom));
+    msg_Err(vout, "ThreadExecuteCropBorder %d.%d %dx%d", left, top, right, bottom);
+    vout_SetDisplayCrop(vout->p->display.vd, 0, 0,
+                        left, top, -(int)right, -(int)bottom);
 }
 
 static void ThreadExecuteCropRatio(vout_thread_t *vout,
                                    unsigned num, unsigned den)
 {
-    const video_format_t *source = &vout->p->original;
-    ThreadExecuteCropWindow(vout, num, den,
-                            0, 0,
-                            source->i_visible_width,
-                            source->i_visible_height);
+    vout_SetDisplayCrop(vout->p->display.vd, num, den,
+                        0, 0, 0, 0);
 }
 
 static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
@@ -1436,7 +1423,7 @@ static void *Thread(void *object)
                 ThreadExecuteCropRatio(vout, cmd.u.pair.a, cmd.u.pair.b);
                 break;
             case VOUT_CONTROL_CROP_WINDOW:
-                ThreadExecuteCropWindow(vout, 0, 0,
+                ThreadExecuteCropWindow(vout,
                                         cmd.u.window.x, cmd.u.window.y,
                                         cmd.u.window.width, cmd.u.window.height);
                 break;
