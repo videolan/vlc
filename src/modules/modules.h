@@ -24,12 +24,14 @@
 #ifndef LIBVLC_MODULES_H
 # define LIBVLC_MODULES_H 1
 
+typedef struct module_cache_t module_cache_t;
+
 /*****************************************************************************
  * module_bank_t: the module bank
  *****************************************************************************
  * This variable is accessed by any function using modules.
  *****************************************************************************/
-struct module_bank_t
+typedef struct module_bank_t
 {
     unsigned         i_usage;
 
@@ -44,7 +46,7 @@ struct module_bank_t
     module_cache_t **pp_loaded_cache;
 
     module_t       *head;
-};
+} module_bank_t;
 
 /*****************************************************************************
  * Module cache description structure

@@ -204,11 +204,8 @@ typedef struct services_discovery_sys_t services_discovery_sys_t;
 typedef struct playlist_add_t playlist_add_t;
 
 /* Modules */
-typedef struct module_bank_t module_bank_t;
 typedef struct module_t module_t;
 typedef struct module_config_t module_config_t;
-typedef struct module_symbols_t module_symbols_t;
-typedef struct module_cache_t module_cache_t;
 
 typedef struct config_category_t config_category_t;
 
