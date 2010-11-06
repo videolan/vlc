@@ -177,8 +177,6 @@ typedef struct vlc_list_t vlc_list_t;
 typedef struct vlc_object_t vlc_object_t;
 typedef struct libvlc_int_t libvlc_int_t;
 typedef struct date_t date_t;
-typedef struct dict_entry_t dict_entry_t;
-typedef struct dict_t dict_t;
 
 /* Playlist */
 
@@ -211,7 +209,6 @@ typedef struct config_category_t config_category_t;
 
 /* Input */
 typedef struct input_thread_t input_thread_t;
-typedef struct input_thread_sys_t input_thread_sys_t;
 typedef struct input_item_t input_item_t;
 typedef struct input_item_node_t input_item_node_t;
 typedef struct access_t access_t;
@@ -223,7 +220,6 @@ typedef struct demux_sys_t demux_sys_t;
 typedef struct es_out_t     es_out_t;
 typedef struct es_out_id_t  es_out_id_t;
 typedef struct es_out_sys_t es_out_sys_t;
-typedef struct es_descriptor_t es_descriptor_t;
 typedef struct seekpoint_t seekpoint_t;
 typedef struct info_t info_t;
 typedef struct info_category_t info_category_t;
@@ -339,10 +335,6 @@ typedef struct xml_reader_sys_t xml_reader_sys_t;
 typedef struct vod_t     vod_t;
 typedef struct vod_sys_t vod_sys_t;
 typedef struct vod_media_t vod_media_t;
-
-/* opengl */
-typedef struct opengl_t     opengl_t;
-typedef struct opengl_sys_t opengl_sys_t;
 
 /* osdmenu */
 typedef struct osd_menu_t   osd_menu_t;
