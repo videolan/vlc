@@ -261,6 +261,8 @@ VLC_EXPORT(void,                 sout_MethodRelease, (announce_method_t *) );
 
 /** SDP */
 
+struct sockaddr;
+
 VLC_EXPORT( char *, vlc_sdp_Start, ( vlc_object_t *obj, const char *cfgpref, const struct sockaddr *src, size_t srclen, const struct sockaddr *addr, size_t addrlen ) LIBVLC_USED );
 VLC_EXPORT( char *, sdp_AddMedia, (char **sdp, const char *type, const char *protocol, int dport, unsigned pt, bool bw_indep, unsigned bw, const char *ptname, unsigned clockrate, unsigned channels, const char *fmtp) );
 VLC_EXPORT( char *, sdp_AddAttribute, (char **sdp, const char *name, const char *fmt, ...) LIBVLC_FORMAT( 3, 4 ) );
