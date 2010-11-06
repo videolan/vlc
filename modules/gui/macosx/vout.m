@@ -753,7 +753,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( o_return == nil )
     {
         NSRect null_rect;
-        bzero( &null_rect, sizeof( NSRect ) );
+        memset( &null_rect, 0, sizeof( NSRect ) );
         o_return = [[VLCDetachedVoutView alloc] initWithFrame: null_rect ];
     }
     [o_return setVout: p_vout subView: view frame: s_frame];

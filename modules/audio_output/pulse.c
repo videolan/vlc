@@ -476,7 +476,7 @@ static void stream_request_cb(pa_stream *s, size_t length, void *userdata) {
         {
             PULSE_DEBUG( "Pulse stream request write zeroes");
             void *data = pa_xmalloc(buffer_size);
-            bzero(data, buffer_size);
+            memset(data, 0, buffer_size);
             pa_stream_write(p_sys->stream, data, buffer_size, pa_xfree, 0, PA_SEEK_RELATIVE);
             length -= buffer_size;
         }
