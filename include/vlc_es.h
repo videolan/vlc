@@ -173,6 +173,11 @@ static inline void video_format_Clean( video_format_t *p_src )
 VLC_EXPORT( void, video_format_Setup, ( video_format_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) );
 
 /**
+ * It will copy the crop properties from a video_format_t to another.
+ */
+VLC_EXPORT( void, video_format_CopyCrop, ( video_format_t *, const video_format_t * ) );
+
+/**
  * This function will check if the first video format is similar
  * to the second one.
  */
