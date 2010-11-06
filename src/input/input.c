@@ -2380,8 +2380,6 @@ static int InputSourceInit( input_thread_t *p_input,
         /* Preparsing is only for file:// */
         if( *psz_demux )
             goto error;
-        if( !*psz_access ) /* path without scheme:// */
-            psz_access = "file";
         if( strcmp( psz_access, "file" ) )
             goto error;
         msg_Dbg( p_input, "trying to pre-parse %s",  psz_path );
@@ -2996,52 +2994,49 @@ static void input_ChangeState( input_thread_t *p_input, int i_state )
 void input_SplitMRL( const char **ppsz_access, const char **ppsz_demux,
                      char **ppsz_path, char *psz_dup )
 {
-    const char *psz_access;
-    const char *psz_demux = "";
-    char *psz_path;
+    char *p;
 
-    /* Either there is an access/demux specification before ://
-     * or we have a plain local file path. */
-    psz_path = strstr( psz_dup, "://" );
-    if( psz_path != NULL )
+    /* Separate <path> from <access>[/<demux>]:// */
+    p = strstr( psz_dup, "://" );
+    if( p != NULL )
     {
-        *psz_path = '\0';
-        psz_path += 3; /* skips "://" */
-
-        psz_access = psz_dup;
-        /* We really don't want module name substitution here! */
-        if( psz_access[0] == '$' )
-            psz_access++;
-
-        /* Separate access from demux (<access>/<demux>://<path>) */
-        char *p = strchr( psz_access, '/' );
-        if( p )
-        {
-            *p = '\0';
-            psz_demux = p + 1;
-            if( psz_demux[0] == '$' )
-                psz_demux++;
-        }
+        *p = '\0';
+        p += 3; /* skips "://" */
+        *ppsz_path = p;
 
         /* Remove HTML anchor if present (not supported).
          * The hash symbol itself should be URI-encoded. */
-        p = strchr( psz_path, '#' );
+        p = strchr( p, '#' );
         if( p )
             *p = '\0';
     }
     else
     {
 #ifndef NDEBUG
-        fprintf( stderr, "%s(\"%s\"): not a valid URI!\n", __func__,
+        fprintf( stderr, "%s(\"%s\") probably not a valid URI!\n", __func__,
                  psz_dup );
 #endif
-        psz_path = psz_dup;
-        psz_access = "";
+        /* Note: this is a valid non const pointer to "": */
+        *ppsz_path = psz_dup + strlen( psz_dup );
     }
 
-    *ppsz_access = psz_access;
-    *ppsz_demux = psz_demux;
-    *ppsz_path = psz_path;
+    /* Separate access from demux */
+    p = strchr( psz_dup, '/' );
+    if( p != NULL )
+    {
+        *(p++) = '\0';
+        if( p[0] == '$' )
+            p++;
+        *ppsz_demux = p;
+    }
+    else
+        *ppsz_demux = "";
+
+    /* We really don't want module name substitution here! */
+    p = psz_dup;
+    if( p[0] == '$' )
+        p++;
+    *ppsz_access = p;
 }
 
 static inline bool next(char ** src)
