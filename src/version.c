@@ -31,16 +31,6 @@
 #include <vlc_common.h>
 
 /*****************************************************************************
- * VLC_Version: return the libvlc version.
- *****************************************************************************
- * This function returns full version string (numeric version and codename).
- *****************************************************************************/
-char const * VLC_Version( void )
-{
-    return VERSION_MESSAGE;
-}
-
-/*****************************************************************************
  * VLC_CompileBy, VLC_CompileHost
  * VLC_Compiler, VLC_Changeset
  *****************************************************************************/

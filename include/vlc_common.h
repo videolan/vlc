@@ -856,7 +856,6 @@ static inline void *xrealloc (void *ptr, size_t len)
 /*****************************************************************************
  * libvlc features
  *****************************************************************************/
-VLC_EXPORT( const char *, VLC_Version, ( void ) LIBVLC_USED );
 VLC_EXPORT( const char *, VLC_CompileBy, ( void ) LIBVLC_USED );
 VLC_EXPORT( const char *, VLC_CompileHost, ( void ) LIBVLC_USED );
 VLC_EXPORT( const char *, VLC_Compiler, ( void ) LIBVLC_USED );

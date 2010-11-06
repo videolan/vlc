@@ -96,7 +96,7 @@ static VLAboutBox *_o_sharedInstance = nil;
             [NSString stringWithFormat: _NS("Compiled by %s"), VLC_CompileBy()]];
  
         /* Setup the nameversion field */
-        [o_name_version_field setStringValue: [NSString stringWithFormat:@"Version %s (%s)", VLC_Version(), PLATFORM]];
+        [o_name_version_field setStringValue: [NSString stringWithFormat:@"Version %s (%s)", VERSION_MESSAGE, PLATFORM]];
 
         /* setup the authors and thanks field */
         [o_credits_textview setString: [NSString stringWithFormat: @"%@\n\n\n\n%@\n%@\n\n%@", 

@@ -103,7 +103,7 @@ int vlclua_push_ret( lua_State *L, int i_error )
  *****************************************************************************/
 static int vlclua_version( lua_State *L )
 {
-    lua_pushstring( L, VLC_Version() );
+    lua_pushstring( L, VERSION_MESSAGE );
     return 1;
 }
 

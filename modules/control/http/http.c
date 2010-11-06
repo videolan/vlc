@@ -413,7 +413,7 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     mvar_AppendNewVar( p_args->vars, "url_param",
                            i_request > 0 ? "1" : "0" );
     mvar_AppendNewVar( p_args->vars, "url_value", p_request );
-    mvar_AppendNewVar( p_args->vars, "version", VLC_Version() );
+    mvar_AppendNewVar( p_args->vars, "version", VERSION_MESSAGE );
     mvar_AppendNewVar( p_args->vars, "copyright", COPYRIGHT_MESSAGE );
     mvar_AppendNewVar( p_args->vars, "vlc_compile_by", VLC_CompileBy() );
     mvar_AppendNewVar( p_args->vars, "vlc_compile_host",

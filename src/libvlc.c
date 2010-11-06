@@ -1865,7 +1865,7 @@ static void Version( void )
     ShowConsole( true );
 #endif
 
-    utf8_fprintf( stdout, _("VLC version %s (%s)\n"), VLC_Version(),
+    utf8_fprintf( stdout, _("VLC version %s (%s)\n"), VERSION_MESSAGE,
                   psz_vlc_changeset );
     utf8_fprintf( stdout, _("Compiled by %s on %s (%s)\n"),
              VLC_CompileBy(), VLC_CompileHost(), __DATE__" "__TIME__ );

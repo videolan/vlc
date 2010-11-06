@@ -153,7 +153,7 @@ void libvlc_set_user_agent (libvlc_instance_t *p_i,
 
 const char * libvlc_get_version(void)
 {
-    return VLC_Version();
+    return VERSION_MESSAGE;
 }
 
 const char * libvlc_get_compiler(void)
