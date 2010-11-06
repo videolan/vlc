@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define __LIBVLC__
+#define __LIBVLC__ 1
 #include "../config/keys.c"
 
 int main (void)
