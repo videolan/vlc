@@ -2417,7 +2417,11 @@ ifdef HAVE_WIN32
 LIBUPNP_ECFLAGS=-DPTW32_STATIC_LIB
 endif
 
+ifdef HAVE_WIN32
+.libupnp: libupnp .pthreads
+else
 .libupnp: libupnp
+endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-samples --without-documentation --enable-static --disable-webserver CFLAGS="$(CFLAGS) -O3 -DUPNP_STATIC_LIB $(LIBUPNP_ECFLAGS)" && make && make install)
 	touch $@
 
