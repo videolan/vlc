@@ -110,13 +110,6 @@ enum vlc_module_properties
     /* Insert new VLC_CONFIG_* here */
 };
 
-/*****************************************************************************
- * If we are not within a module, assume we're in the vlc core.
- *****************************************************************************/
-#if !defined( __PLUGIN__ ) && !defined( __BUILTIN__ )
-#   define MODULE_NAME main
-#endif
-
 /**
  * Current plugin ABI version
  */
