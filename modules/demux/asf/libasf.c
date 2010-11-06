@@ -213,10 +213,9 @@ static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
 {
     asf_object_header_t *p_hdr = &p_obj->header;
     asf_object_t        *p_subobj;
-    int                 i_peek;
     const uint8_t       *p_peek;
 
-    if( ( i_peek = stream_Peek( s, &p_peek, 30 ) ) < 30 )
+    if( stream_Peek( s, &p_peek, 30 ) < 30 )
        return VLC_EGENERIC;
 
     p_hdr->i_sub_object_count = GetDWLE( p_peek + 24 );
@@ -255,10 +254,9 @@ static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
 static int ASF_ReadObject_Data( stream_t *s, asf_object_t *p_obj )
 {
     asf_object_data_t *p_data = &p_obj->data;
-    int               i_peek;
     const uint8_t     *p_peek;
 
-    if( ( i_peek = stream_Peek( s, &p_peek, 50 ) ) < 50 )
+    if( stream_Peek( s, &p_peek, 50 ) < 50 )
        return VLC_EGENERIC;
 
     ASF_GetGUID( &p_data->i_file_id, p_peek + 24 );
@@ -333,10 +331,9 @@ static void ASF_FreeObject_Index( asf_object_t *p_obj )
 static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
 {
     asf_object_file_properties_t *p_fp = &p_obj->file_properties;
-    int           i_peek;
     const uint8_t *p_peek;
 
-    if( ( i_peek = stream_Peek( s, &p_peek,  104 ) ) < 104 )
+    if( stream_Peek( s, &p_peek,  104 ) < 104 )
        return VLC_EGENERIC;
 
     ASF_GetGUID( &p_fp->i_file_id, p_peek + 24 );
