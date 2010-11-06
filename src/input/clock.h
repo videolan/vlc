@@ -22,12 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
-# error This header file can only be included from LibVLC.
-#endif
-
-#ifndef _INPUT_CLOCK_H
-#define _INPUT_CLOCK_H 1
+#ifndef LIBVLC_INPUT_CLOCK_H
+#define LIBVLC_INPUT_CLOCK_H 1
 
 #include <vlc_common.h>
 #include <vlc_input.h> /* FIXME Needed for input_clock_t */
@@ -139,4 +135,3 @@ void input_clock_SetJitter( input_clock_t *,
 mtime_t input_clock_GetJitter( input_clock_t * );
 
 #endif
-

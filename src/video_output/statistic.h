@@ -21,12 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
-# error This header file can only be included from LibVLC.
-#endif
-
-#ifndef _VOUT_STATISTIC_H
-#define _VOUT_STATISTIC_H
+#ifndef LIBVLC_VOUT_STATISTIC_H
+#define LIBVLC_VOUT_STATISTIC_H
 
 typedef struct {
     vlc_spinlock_t spin;
@@ -62,4 +58,3 @@ static inline void vout_statistic_Update(vout_statistic_t *stat, int displayed, 
 }
 
 #endif
-

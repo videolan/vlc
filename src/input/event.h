@@ -21,12 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
-# error This header file can only be included from LibVLC.
-#endif
-
-#ifndef _INPUT_EVENT_H
-#define _INPUT_EVENT_H 1
+#ifndef LIBVLC_INPUT_EVENT_H
+#define LIBVLC_INPUT_EVENT_H 1
 
 #include <vlc_common.h>
 
@@ -83,6 +79,4 @@ void input_SendEventAout( input_thread_t *p_input );
  *****************************************************************************/
 void input_SendEventBookmark( input_thread_t *p_input );
 
-
 #endif
-

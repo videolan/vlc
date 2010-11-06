@@ -21,12 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
-# error This header file can only be included from LibVLC.
-#endif
-
-#ifndef _VOUT_INTERNAL_SNAPSHOT_H
-#define _VOUT_INTERNAL_SNAPSHOT_H
+#ifndef LIBVLC_VOUT_INTERNAL_SNAPSHOT_H
+#define LIBVLC_VOUT_INTERNAL_SNAPSHOT_H
 
 #include <vlc_picture.h>
 
@@ -85,4 +81,3 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
                             const vout_snapshot_save_cfg_t *cfg);
 
 #endif
-

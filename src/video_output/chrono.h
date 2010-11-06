@@ -21,12 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
-# error This header file can only be included from LibVLC.
-#endif
-
-#ifndef _VOUT_CHRONO_H
-#define _VOUT_CHRONO_H
+#ifndef LIBVLC_VOUT_CHRONO_H
+#define LIBVLC_VOUT_CHRONO_H
 
 typedef struct {
     int     shift;

@@ -21,12 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
-# error This header file can only be included from LibVLC.
-#endif
-
-#ifndef _VOUT_INTERNAL_CONTROL_H
-#define _VOUT_INTERNAL_CONTROL_H
+#ifndef LIBVLC_VOUT_INTERNAL_CONTROL_H
+#define LIBVLC_VOUT_INTERNAL_CONTROL_H
 
 /* */
 enum {
@@ -138,4 +134,3 @@ int vout_control_Pop(vout_control_t *, vout_control_cmd_t *, mtime_t deadline, m
 void vout_control_Dead(vout_control_t *);
 
 #endif
-

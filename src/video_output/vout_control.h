@@ -22,13 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
-#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
-# error This header file can only be included from LibVLC.
-#endif
-
-#ifndef _VOUT_CONTROL_H
-#define _VOUT_CONTROL_H 1
+#ifndef LIBVLC_VOUT_CONTROL_H
+#define LIBVLC_VOUT_CONTROL_H 1
 
 /**
  * This function will (un)pause the display of pictures.
@@ -81,4 +76,3 @@ void vout_DisplayTitle( vout_thread_t *p_vout, const char *psz_title );
 bool vout_IsEmpty( vout_thread_t *p_vout );
 
 #endif
-

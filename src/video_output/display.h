@@ -21,10 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
-# error This header file can only be included from LibVLC.
-#endif
-
 #include <vlc_vout_wrapper.h>
 
 #if 0
@@ -121,4 +117,3 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
 void vout_SendDisplayEventMouse(vout_thread_t *, const vlc_mouse_t *);
 vout_window_t *vout_NewDisplayWindow(vout_thread_t *, vout_display_t *, const vout_window_cfg_t *);
 void vout_DeleteDisplayWindow(vout_thread_t *, vout_display_t *, vout_window_t *);
-

@@ -21,12 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
-# error This header file can only be included from LibVLC.
-#endif
-
-#ifndef __LIBVLC_AOUT_INTERNAL_H
-# define __LIBVLC_AOUT_INTERNAL_H 1
+#ifndef LIBVLC_AOUT_INTERNAL_H
+# define LIBVLC_AOUT_INTERNAL_H 1
 
 aout_buffer_t *aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
         aout_buffer_t *old_buffer);
@@ -267,4 +263,4 @@ static inline void AoutInputsMarkToRestart( aout_instance_t *p_aout )
     aout_unlock_mixer( p_aout );
 }
 
-#endif /* !__LIBVLC_AOUT_INTERNAL_H */
+#endif /* !LIBVLC_AOUT_INTERNAL_H */

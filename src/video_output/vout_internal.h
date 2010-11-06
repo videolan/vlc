@@ -22,13 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
-#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
-# error This header file can only be included from LibVLC.
-#endif
-
-#ifndef _VOUT_INTERNAL_H
-#define _VOUT_INTERNAL_H 1
+#ifndef LIBVLC_VOUT_INTERNAL_H
+#define LIBVLC_VOUT_INTERNAL_H 1
 
 #include <vlc_picture_fifo.h>
 #include <vlc_picture_pool.h>
@@ -172,4 +167,3 @@ void spu_Attach( spu_t *, vlc_object_t *input, bool );
 void spu_ChangeMargin(spu_t *, int);
 
 #endif
-

@@ -21,12 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
-# error This header file can only be included from LibVLC.
-#endif
-
-#ifndef _VLM_EVENT_H
-#define _VLM_EVENT_H 1
+#ifndef LIBVLC_VLM_EVENT_H
+#define LIBVLC_VLM_EVENT_H 1
 
 #include <vlc_common.h>
 
@@ -42,4 +38,3 @@ void vlm_SendEventMediaInstanceStopped( vlm_t *, int64_t id, const char *psz_nam
 void vlm_SendEventMediaInstanceState( vlm_t *, int64_t id, const char *psz_name, const char *psz_instance_name, input_state_e state );
 
 #endif
-

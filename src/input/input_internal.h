@@ -21,12 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
-# error This header file can only be included from LibVLC.
-#endif
-
-#ifndef _INPUT_INTERNAL_H
-#define _INPUT_INTERNAL_H 1
+#ifndef LIBVLC_INPUT_INTERNAL_H
+#define LIBVLC_INPUT_INTERNAL_H 1
 
 #include <vlc_access.h>
 #include <vlc_demux.h>
