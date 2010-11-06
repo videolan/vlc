@@ -392,20 +392,35 @@ ifdef HAVE_WIN32
 	(cd $@; autoreconf -ivf)
 endif
 
-.fontconfig: fontconfig .xml .freetype
-ifdef HAVE_WIN32
-  ifdef HAVE_CYGWIN
-	(cd $<; ./configure --target=$(HOST) --disable-pic --disable-shared --disable-docs --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --disable-libxml2 && make && make install)
-  else
-	(cd $<; $(HOSTCC)  ./configure $(HOSTCONF) --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --disable-libxml2 --disable-docs && make && make install)
-  endif
-else
-  ifdef HAVE_MACOSX
-	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs` ./configure $(HOSTCONF) --with-cache-dir=/usr/X11/var/cache/fontconfig --with-confdir=/usr/X11/lib/X11/fonts --with-default-fonts=/System/Library/Fonts --with-add-fonts=/Library/Fonts,~/Library/Fonts --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --with-arch=$(ARCH) --enable-libxml2 --disable-docs && make && make install-exec && (cd fontconfig ; make install-data) && cp fontconfig.pc $(PKG_CONFIG_LIBDIR))
-  else
-	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 --disable-docs && make && make install)
-  endif
+FONTCONFIG_BASE_CONF = --prefix=$(PREFIX) \
+					   --with-freetype-config=$(PREFIX)/bin/freetype-config \
+					   --enable-libxml2 \
+					   --disable-docs
+
+FONTCONFIG_CONF-$(ENABLED)      = $(HOSTCONF) $(FONTCONFIG_BASE_CONF)
+FONTCONFIG_CONF-$(HAVE_MACOSX) += $(HOSTCONF) \
+	--with-cache-dir=/usr/X11/var/cache/fontconfig \
+	--with-confdir=/usr/X11/lib/X11/fonts \
+	--with-default-fonts=/System/Library/Fonts \
+	--with-add-fonts=/Library/Fonts,~/Library/Fonts  \
+	--with-arch=$(ARCH)
+
+FONTCONFIG_CONF-$(HAVE_WIN32)   = --with-arch=i686 $(FONTCONFIG_BASE_CONF)
+ifndef HAVE_CYGWIN
+FONTCONFIG_CONF-$(HAVE_WIN32)  += $(HOSTCONF)
 endif
+FONTCONFIG_CONF-$(HAVE_CYGWIN) += --target=$(HOST) --disable-pic --disable-shared
+
+FONTCONFIG_ENV-$(ENABLED)         = $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags`
+FONTCONFIG_ENV-$(HAVE_MACOSX)     = $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs`
+FONTCONFIG_ENV-$(HAVE_WIN32)      = $(HOSTCC)
+FONTCONFIG_ENV-$(HAVE_CYGWIN)     =
+
+FONTCONFIG_INSTALL-$(ENABLED)     = make install
+FONTCONFIG_INSTALL-$(HAVE_MACOSX) = make install-exec && (cd fontconfig ; make install-data) && cp fontconfig.pc $(PKG_CONFIG_LIBDIR)
+
+.fontconfig: fontconfig .xml .freetype
+	(cd $<; $(FONTCONFIG_ENV-1) ./configure $(FONTCONFIG_CONF-1) && make && $(FONTCONFIG_INSTALL-1))
 	$(INSTALL_NAME)
 	touch $@
 
