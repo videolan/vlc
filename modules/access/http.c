@@ -760,10 +760,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     int i_read;
 
     if( p_sys->fd == -1 )
-    {
-        p_access->info.b_eof = true;
-        return 0;
-    }
+        goto fatal;
 
     if( p_sys->b_has_size )
     {
@@ -780,10 +777,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( p_sys->b_chunked )
     {
         if( p_sys->i_chunk < 0 )
-        {
-            p_access->info.b_eof = true;
-            return 0;
-        }
+            goto fatal;
 
         if( p_sys->i_chunk <= 0 )
         {
@@ -801,8 +795,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             if( p_sys->i_chunk <= 0 )   /* eof */
             {
                 p_sys->i_chunk = -1;
-                p_access->info.b_eof = true;
-                return 0;
+                goto fatal;
             }
         }
 
@@ -811,10 +804,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     }
 
     if( i_len == 0 )
-    {
-        p_access->info.b_eof = true;
-        return 0;
-    }
+        goto fatal;
 
     if( p_sys->i_icy_meta > 0 && p_access->info.i_pos-p_sys->i_icy_offset > 0 )
     {
@@ -824,10 +814,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         if( i_next == p_sys->i_icy_meta )
         {
             if( ReadICYMeta( p_access ) )
-            {
-                p_access->info.b_eof = true;
-                return 0;
-            }
+                goto fatal;
         }
         if( i_len > i_next )
             i_len = i_next;
@@ -883,10 +870,9 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
         if( i_read <= 0 )
         {
-            p_access->info.b_eof = true;
             if( i_read < 0 )
                 p_sys->b_error = true;
-            return 0;
+            goto fatal;
         }
     }
 
@@ -900,6 +886,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     }
 
     return i_read;
+
+fatal:
+    p_access->info.b_eof = true;
+    return 0;
 }
 
 static int ReadICYMeta( access_t *p_access )
