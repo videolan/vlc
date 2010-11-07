@@ -619,8 +619,6 @@ QImage* PictureFlowSoftwareRenderer::surface(int slideIndex)
     if (slideIndex >= state->model->rowCount( state->model->currentIndex().parent() ) )
         return 0;
 
-    int key = slideIndex;
-
     QImage* img = new QImage(PLModel::getArtPixmap( state->model->index( slideIndex, 0, state->model->currentIndex().parent() ),
                                          QSize( state->slideWidth, state->slideHeight ) ).toImage());
 
@@ -791,7 +789,6 @@ public:
 PictureFlow::PictureFlow(QWidget* parent, PLModel* _p_model): QWidget(parent)
 {
     d = new PictureFlowPrivate;
-
     d->state = new PictureFlowState;
     d->state->model = _p_model;
     d->state->reset();
