@@ -721,7 +721,9 @@ package-win-common: install build-npapi build-activex
 	cp -r $(destdir)/lib/vlc/plugins $(win32_destdir)
 
 if BUILD_LUA
-	cp -r $(destdir)/share/vlc/lua $(win32_destdir)
+	mkdir -p $(win32_destdir)/lua
+	cp -r $(destdir)/lib/vlc/lua/* $(win32_destdir)/lua
+	cp -r $(destdir)/share/vlc/lua/* $(win32_destdir)/lua
 endif
 
 if BUILD_HTTPD
