@@ -1123,8 +1123,8 @@ void libvlc_media_player_next_chapter( libvlc_media_player_t *p_mi )
         return;
 
     int i_type = var_Type( p_input_thread, "next-chapter" );
-    var_SetBool( p_input_thread, (i_type & VLC_VAR_TYPE) != 0 ?
-                            "next-chapter":"next-title", true );
+    var_TriggerCallback( p_input_thread, (i_type & VLC_VAR_TYPE) != 0 ?
+                            "next-chapter":"next-title" );
 
     vlc_object_release( p_input_thread );
 }
@@ -1138,8 +1138,8 @@ void libvlc_media_player_previous_chapter( libvlc_media_player_t *p_mi )
         return;
 
     int i_type = var_Type( p_input_thread, "next-chapter" );
-    var_SetBool( p_input_thread, (i_type & VLC_VAR_TYPE) != 0 ?
-                            "prev-chapter":"prev-title", true );
+    var_TriggerCallback( p_input_thread, (i_type & VLC_VAR_TYPE) != 0 ?
+                            "prev-chapter":"prev-title" );
 
     vlc_object_release( p_input_thread );
 }
