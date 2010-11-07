@@ -2491,6 +2491,8 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         p_sys->i_input = 0;
         while( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &t_input ) >= 0 )
         {
+            if( t_input.index != p_sys->i_input )
+                break;
             p_sys->i_input++;
             t_input.index = p_sys->i_input;
         }
@@ -2527,6 +2529,8 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         p_sys->i_standard = 0;
         while( v4l2_ioctl( i_fd, VIDIOC_ENUMSTD, &t_standards ) >=0 )
         {
+            if( t_standards.index != p_sys->i_standard )
+                break;
             p_sys->i_standard++;
             t_standards.index = p_sys->i_standard;
         }
@@ -2592,6 +2596,8 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         p_sys->i_tuner = 0;
         while( v4l2_ioctl( i_fd, VIDIOC_G_TUNER, &tuner ) >= 0 )
         {
+            if( tuner.index != p_sys->i_tuner )
+                break;
             p_sys->i_tuner++;
             memset( &tuner, 0, sizeof(tuner) );
             tuner.index = p_sys->i_tuner;
@@ -2655,6 +2661,8 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
         while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FMT, &codec ) >= 0 )
         {
+            if( codec.index != i_index )
+                break;
             i_index++;
             codec.index = i_index;
         }
