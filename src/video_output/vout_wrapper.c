@@ -214,6 +214,7 @@ void vout_RenderWrapper(vout_thread_t *vout, picture_t *picture)
 
     assert(vout_IsDisplayFiltered(vd) == !sys->display.use_dr);
 
+    vout_UpdateDisplaySourceProperties(vd, &picture->format);
     if (sys->display.use_dr) {
         vout_display_Prepare(vd, picture);
     } else {

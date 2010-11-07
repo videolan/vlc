@@ -119,6 +119,8 @@ struct vout_thread_sys_t
     /* Video filter2 chain */
     struct {
         vlc_mutex_t     lock;
+        char            *configuration;
+        video_format_t  format;
         filter_chain_t  *chain_static;
         filter_chain_t  *chain_interactive;
     } filter;
