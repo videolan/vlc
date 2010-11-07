@@ -662,7 +662,6 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 destdir=$(prefix)
 win32_destdir=$(top_builddir)/vlc-$(VERSION)
 win32_debugdir=$(top_builddir)/symbols-$(VERSION)
-win32_lua_destdir=$(win32_destdir)/lua
 win32_xpi_destdir=$(win32_destdir)/vlc-plugin
 
 if HAVE_WIN64
@@ -722,51 +721,7 @@ package-win-common: install build-npapi build-activex
 	cp -r $(destdir)/lib/vlc/plugins $(win32_destdir)
 
 if BUILD_LUA
-# Copy the lua scripts (HTTP)
-	mkdir -p $(win32_lua_destdir)
-	cp -r $(destdir)/share/vlc/lua/http "$(win32_lua_destdir)/http"
-
-# Lua Scripts - cannot be simplified yet, because make install doesn't install READMEs
-	$(INSTALL) -d $(win32_lua_destdir)
-	for i in $(srcdir)/share/lua/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/`basename $${i}` ; \
-	done
-	$(INSTALL) -d $(win32_lua_destdir)/modules
-	for i in $(srcdir)/share/lua/modules/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/modules/`basename $${i}` ; \
-	done
-	$(INSTALL) -d $(win32_lua_destdir)/extensions
-	for i in $(srcdir)/share/lua/extensions/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/extensions/`basename $${i}` ; \
-	done
-	$(INSTALL) -d $(win32_lua_destdir)/intf
-	for i in $(srcdir)/share/lua/intf/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/intf/`basename $${i}` ; \
-	done
-	$(INSTALL) -d $(win32_lua_destdir)/intf/modules
-	for i in $(srcdir)/share/lua/intf/modules/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/intf/modules/`basename $${i}` ; \
-	done
-	$(INSTALL) -d $(win32_lua_destdir)/meta/art
-	for i in $(srcdir)/share/lua/meta/art/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/meta/art/`basename $${i}` ; \
-	done
-	$(INSTALL) -d $(win32_lua_destdir)/meta/fetcher
-	for i in $(srcdir)/share/lua/meta/fetcher/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/meta/fetcher/`basename $${i}` ; \
-	done
-	$(INSTALL) -d $(win32_lua_destdir)/meta/reader
-	for i in $(srcdir)/share/lua/meta/reader/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/meta/reader/`basename $${i}` ; \
-	done
-	$(INSTALL) -d $(win32_lua_destdir)/playlist
-	for i in $(srcdir)/share/lua/playlist/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/playlist/`basename $${i}` ; \
-	done
-	$(INSTALL) -d $(win32_lua_destdir)/sd
-	for i in $(srcdir)/share/lua/sd/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/sd/`basename $${i}` ; \
-	done
+	cp -r $(destdir)/share/vlc/lua $(win32_destdir)
 endif
 
 if BUILD_HTTPD
