@@ -196,6 +196,11 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     video_format_Setup( &fmt, p_fmt->i_chroma,
                               p_fmt->i_width, p_fmt->i_height,
                               p_fmt->i_sar_num, p_fmt->i_sar_den );
+    if( p_fmt->i_x_offset < p_fmt->i_width &&
+        p_fmt->i_y_offset < p_fmt->i_height &&
+        p_fmt->i_visible_width  > 0 && p_fmt->i_x_offset + p_fmt->i_visible_width  <= p_fmt->i_width &&
+        p_fmt->i_visible_height > 0 && p_fmt->i_y_offset + p_fmt->i_visible_height <= p_fmt->i_height )
+        video_format_CopyCrop( &fmt, p_fmt );
 
     /* */
     picture_t *p_picture = calloc( 1, sizeof(*p_picture) );
