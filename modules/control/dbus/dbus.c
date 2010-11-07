@@ -142,6 +142,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_this, "Failed to connect to the D-Bus session daemon: %s",
                 error.message );
         dbus_error_free( &error );
+        free( psz_service_name );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -368,7 +369,10 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
         state = (var_GetInteger(p_this, "state") == PAUSE_S) ? 1 : 0;
 
         if( state == p_intf->p_sys->i_playing_state )
+        {
+            free( info );
             goto end;
+        }
 
         p_intf->p_sys->i_playing_state = state;
         info->signal = SIGNAL_STATE;
