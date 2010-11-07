@@ -42,6 +42,8 @@
 #endif
 #include <x264.h>
 
+#include <assert.h>
+
 #define SOUT_CFG_PREFIX "sout-x264-"
 
 /*****************************************************************************
@@ -712,6 +714,8 @@ struct encoder_sys_t
     mtime_t         i_initial_delay;
 
     char            *psz_stat_name;
+    int             i_sei_size;
+    uint8_t         *p_sei;
 };
 
 #ifdef PTW32_STATIC_LIB
@@ -753,6 +757,8 @@ static int  Open ( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys->i_initial_delay = 0;
     p_sys->psz_stat_name = NULL;
+    p_sys->i_sei_size = 0;
+    p_sys->p_sei = NULL;
 
     x264_param_default( &p_sys->param );
     char *psz_preset = var_GetString( p_enc, SOUT_CFG_PREFIX  "preset" );
@@ -1260,19 +1266,42 @@ static int  Open ( vlc_object_t *p_this )
     }
 
     /* get the globals headers */
-    p_enc->fmt_out.i_extra = x264_encoder_headers( p_sys->h, &nal, &i_nal );
-    p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
-    if( !p_enc->fmt_out.p_extra )
+    size_t i_extra = x264_encoder_headers( p_sys->h, &nal, &i_nal );
+    uint8_t *p_extra = p_enc->fmt_out.p_extra = malloc( i_extra );
+    if( !p_extra )
     {
         Close( VLC_OBJECT(p_enc) );
         return VLC_ENOMEM;
     }
-    uint8_t *p_tmp = p_enc->fmt_out.p_extra;
+
     for( i = 0; i < i_nal; i++ )
     {
-        memcpy( p_tmp, nal[i].p_payload, nal[i].i_payload );
-        p_tmp += nal[i].i_payload;
+        if( nal[i].i_type != NAL_SEI )
+        {
+            memcpy( p_extra, nal[i].p_payload, nal[i].i_payload );
+            p_extra += nal[i].i_payload;
+            continue; /* next NAL */
+        }
+
+        /* we won't store this NAL in p_extra */
+        assert( i_extra >= (size_t)nal[i].i_payload );
+        i_extra -= nal[i].i_payload;
+
+        /* Make sure we only have one SEI NAL in the headers */
+        assert(p_sys->i_sei_size == 0);
+        p_sys->i_sei_size = nal[i].i_payload;
+
+        p_sys->p_sei = malloc( p_sys->i_sei_size );
+        if( !p_sys->p_sei )
+        {
+            free( p_extra );
+            Close( VLC_OBJECT(p_enc) );
+            return VLC_ENOMEM;
+        }
+        memcpy( p_sys->p_sei, nal[i].p_payload, nal[i].i_payload );
     }
+
+    p_enc->fmt_out.i_extra = i_extra;
 
     return VLC_SUCCESS;
 }
@@ -1321,7 +1350,8 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 
 
     /* Get size of block we need */
-    for( i = 0, i_out = 0; i < i_nal; i++ )
+    i_out = p_sys->i_sei_size;
+    for( i = 0; i < i_nal; i++ )
         i_out += nal[i].i_payload;
 
     p_block = block_New( p_enc, i_out );
@@ -1330,6 +1360,15 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     /* copy encoded data directly to block */
     for( i = 0, i_out = 0; i < i_nal; i++ )
     {
+        if( p_sys->i_sei_size && nal[i].i_type == NAL_SLICE )
+        {
+            /* insert x264 headers SEI nal before first SLICE nal */
+            memcpy( p_block->p_buffer, p_sys->p_sei, p_sys->i_sei_size );
+            i_out += p_sys->i_sei_size;
+            p_sys->i_sei_size = 0;
+            free( p_sys->p_sei );
+            p_sys->p_sei = NULL;
+        }
         memcpy( p_block->p_buffer + i_out, nal[i].p_payload, nal[i].i_payload );
         i_out += nal[i].i_payload;
     }
@@ -1364,6 +1403,7 @@ static void Close( vlc_object_t *p_this )
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     free( p_sys->psz_stat_name );
+    free( p_sys->p_sei );
 
     msg_Dbg( p_enc, "framecount still in libx264 buffer: %d", x264_encoder_delayed_frames( p_sys->h ) );
 
