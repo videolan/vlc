@@ -902,71 +902,75 @@ static int DrawHelp(intf_thread_t *p_intf)
     intf_sys_t *p_sys = p_intf->p_sys;
     int l = 0;
 
-    if (p_sys->b_color) color_set(C_CATEGORY, NULL);
-    MainBoxWrite(p_sys, l++, _("[Display]"));
-    if (p_sys->b_color) color_set(C_DEFAULT, NULL);
-    MainBoxWrite(p_sys, l++, _("     h,H         Show/Hide help box"));
-    MainBoxWrite(p_sys, l++, _("     i           Show/Hide info box"));
-    MainBoxWrite(p_sys, l++, _("     m           Show/Hide metadata box"));
-    MainBoxWrite(p_sys, l++, _("     L           Show/Hide messages box"));
-    MainBoxWrite(p_sys, l++, _("     P           Show/Hide playlist box"));
-    MainBoxWrite(p_sys, l++, _("     B           Show/Hide filebrowser"));
-    MainBoxWrite(p_sys, l++, _("     x           Show/Hide objects box"));
-    MainBoxWrite(p_sys, l++, _("     S           Show/Hide statistics box"));
-    MainBoxWrite(p_sys, l++, _("     Esc         Close Add/Search entry"));
-    MainBoxWrite(p_sys, l++, _("     Ctrl-l      Refresh the screen"));
-    MainBoxWrite(p_sys, l++, "");
+#define H(a) MainBoxWrite(p_sys, l++, a)
 
     if (p_sys->b_color) color_set(C_CATEGORY, NULL);
-    MainBoxWrite(p_sys, l++, _("[Global]"));
+    H(_("[Display]"));
     if (p_sys->b_color) color_set(C_DEFAULT, NULL);
-    MainBoxWrite(p_sys, l++, _("     q, Q, Esc   Quit"));
-    MainBoxWrite(p_sys, l++, _("     s           Stop"));
-    MainBoxWrite(p_sys, l++, _("     <space>     Pause/Play"));
-    MainBoxWrite(p_sys, l++, _("     f           Toggle Fullscreen"));
-    MainBoxWrite(p_sys, l++, _("     n, p        Next/Previous playlist item"));
-    MainBoxWrite(p_sys, l++, _("     [, ]        Next/Previous title"));
-    MainBoxWrite(p_sys, l++, _("     <, >        Next/Previous chapter"));
-    MainBoxWrite(p_sys, l++, _("     ←, →        Seek -/+ 1%%"));
-    MainBoxWrite(p_sys, l++, _("     a, z        Volume Up/Down"));
-    MainBoxWrite(p_sys, l++, "");
+    H(_(" h,H                    Show/Hide help box"));
+    H(_(" i                      Show/Hide info box"));
+    H(_(" m                      Show/Hide metadata box"));
+    H(_(" L                      Show/Hide messages box"));
+    H(_(" P                      Show/Hide playlist box"));
+    H(_(" B                      Show/Hide filebrowser"));
+    H(_(" x                      Show/Hide objects box"));
+    H(_(" S                      Show/Hide statistics box"));
+    H(_(" Esc                    Close Add/Search entry"));
+    H(_(" Ctrl-l                 Refresh the screen"));
+    H("");
 
     if (p_sys->b_color) color_set(C_CATEGORY, NULL);
-    MainBoxWrite(p_sys, l++, _("[Playlist]"));
+    H(_("[Global]"));
     if (p_sys->b_color) color_set(C_DEFAULT, NULL);
-    MainBoxWrite(p_sys, l++, _("     r           Toggle Random playing"));
-    MainBoxWrite(p_sys, l++, _("     l           Toggle Loop Playlist"));
-    MainBoxWrite(p_sys, l++, _("     R           Toggle Repeat item"));
-    MainBoxWrite(p_sys, l++, _("     o           Order Playlist by title"));
-    MainBoxWrite(p_sys, l++, _("     O           Reverse order Playlist by title"));
-    MainBoxWrite(p_sys, l++, _("     g           Go to the current playing item"));
-    MainBoxWrite(p_sys, l++, _("     /           Look for an item"));
-    MainBoxWrite(p_sys, l++, _("     A           Add an entry"));
-    MainBoxWrite(p_sys, l++, _("     D, ⌫, <del> Delete an entry"));
-    MainBoxWrite(p_sys, l++, _("     e           Eject (if stopped)"));
-    MainBoxWrite(p_sys, l++, "");
+    H(_(" q, Q, Esc              Quit"));
+    H(_(" s                      Stop"));
+    H(_(" <space>                Pause/Play"));
+    H(_(" f                      Toggle Fullscreen"));
+    H(_(" n, p                   Next/Previous playlist item"));
+    H(_(" [, ]                   Next/Previous title"));
+    H(_(" <, >                   Next/Previous chapter"));
+    /* xgettext: You can use ← and → characters */
+    H(_(" <left>,<right>         Seek -/+ 1%%"));
+    H(_(" a, z                   Volume Up/Down"));
+    /* xgettext: You can use ↑ and ↓ characters */
+    H(_(" <up>,<down>            Navigate through the box line by line"));
+    /* xgettext: You can use ⇞ and ⇟ characters */
+    H(_(" <pageup>,<pagedown>    Navigate through the box page by page"));
+    /* xgettext: You can use ↖ and ↘ characters */
+    H(_(" <start>,<end>          Navigate to start/end of box"));
+    H("");
 
     if (p_sys->b_color) color_set(C_CATEGORY, NULL);
-    MainBoxWrite(p_sys, l++, _("[Filebrowser]"));
+    H(_("[Playlist]"));
     if (p_sys->b_color) color_set(C_DEFAULT, NULL);
-    MainBoxWrite(p_sys, l++, _("     <enter>     Add the selected file to the playlist"));
-    MainBoxWrite(p_sys, l++, _("     <space>     Add the selected directory to the playlist"));
-    MainBoxWrite(p_sys, l++, _("     .           Show/Hide hidden files"));
-    MainBoxWrite(p_sys, l++, "");
+    H(_(" r                      Toggle Random playing"));
+    H(_(" l                      Toggle Loop Playlist"));
+    H(_(" R                      Toggle Repeat item"));
+    H(_(" o                      Order Playlist by title"));
+    H(_(" O                      Reverse order Playlist by title"));
+    H(_(" g                      Go to the current playing item"));
+    H(_(" /                      Look for an item"));
+    H(_(" A                      Add an entry"));
+    /* xgettext: You can use ⌫ character to translate <backspace> */
+    H(_(" D, <backspace>, <del>  Delete an entry"));
+    H(_(" e                      Eject (if stopped)"));
+    H("");
 
     if (p_sys->b_color) color_set(C_CATEGORY, NULL);
-    MainBoxWrite(p_sys, l++, _("[Boxes]"));
+    H(_("[Filebrowser]"));
     if (p_sys->b_color) color_set(C_DEFAULT, NULL);
-    MainBoxWrite(p_sys, l++, _("     ↑,↓         Navigate through the box line by line"));
-    MainBoxWrite(p_sys, l++, _("     ⇞,⇟         Navigate through the box page by page"));
-    MainBoxWrite(p_sys, l++, _("     ↖,↘         Navigate to start/end of box"));
-    MainBoxWrite(p_sys, l++, "");
+    H(_(" <enter>                Add the selected file to the playlist"));
+    H(_(" <space>                Add the selected directory to the playlist"));
+    H(_(" .                      Show/Hide hidden files"));
+    H("");
 
     if (p_sys->b_color) color_set(C_CATEGORY, NULL);
-    MainBoxWrite(p_sys, l++, _("[Player]"));
+    H(_("[Player]"));
     if (p_sys->b_color) color_set(C_DEFAULT, NULL);
-    MainBoxWrite(p_sys, l++, _("     ↑,↓         Seek +/-5%%"));
+    /* xgettext: You can use ↑ and ↓ characters */
+    H(_(" <up>,<down>            Seek +/-5%%"));
 
+#undef H
     return l;
 }
 
