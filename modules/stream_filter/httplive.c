@@ -1032,10 +1032,6 @@ static char *AccessReadLine(access_t *p_access, uint8_t *psz_tmp, size_t i_len)
         p++;
     }
 
-    /* EOL */
-    line = calloc(1, p - begin + 1);
-    if (line == NULL)
-        return NULL;
     /* copy line excluding \n */
     line = strndup(begin, p - begin);
 
