@@ -309,17 +309,21 @@ static int vlclua_timer_delete( lua_State *L )
 
     vlc_timer_destroy( (*pp_timer)->timer );
     free( (*pp_timer)->psz_callback );
+    free( (*pp_timer) );
     return 0;
 }
 
 static int vlclua_timer_create( lua_State *L )
 {
-    vlclua_timer_t *p_timer = malloc( sizeof( vlclua_timer_t ) );
     if( !lua_isstring( L, 1 ) )
         return luaL_error( L, "timer(function_name)" );
 
+    vlclua_timer_t *p_timer = malloc( sizeof( vlclua_timer_t ) );
     if( vlc_timer_create( &p_timer->timer, vlclua_timer_callback, p_timer ) )
+    {
+        free( p_timer );
         return luaL_error( L, "Cannot initialize the timer" );
+    }
 
     p_timer->L = L;
     p_timer->psz_callback = strdup( luaL_checkstring( L, 1 ) );
