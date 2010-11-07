@@ -212,6 +212,7 @@ case $TARGET in
     powerpc-apple-darwin9)
         hint_distro macosx32
         HAVE_DARWIN_32=1
+        add_enabled_makefile_cfg "HAVE_MACOSX"
 
         CFLAGS_TUNING=" -arch ppc -mtune=G4"
         EXTRA_LDFLAGS=" -arch ppc"
@@ -222,6 +223,7 @@ case $TARGET in
     i686-apple-darwin*)
         hint_distro macosx32
         HAVE_DARWIN_32=1
+        add_enabled_makefile_cfg "HAVE_MACOSX"
 
         CFLAGS_TUNING=" -march=prescott -mtune=generic -arch i386 -m32"
         EXTRA_LDFLAGS=" -arch i386"
@@ -229,6 +231,7 @@ case $TARGET in
     x86_64-apple-darwin*)
         hint_distro macosx64
         HAVE_DARWIN_64=1
+        add_enabled_makefile_cfg "HAVE_MACOSX"
 
         CFLAGS_TUNING=" -march=core2 -mtune=core2 -m64 -arch x86_64"
         EXTRA_LDFLAGS=" -arch x86_64"
