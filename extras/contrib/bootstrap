@@ -210,7 +210,7 @@ case $TARGET in
         exit 1
     ;;
     powerpc-apple-darwin9)
-        hint_distro darwin
+        hint_distro macosx32
         HAVE_DARWIN_32=1
 
         CFLAGS_TUNING=" -arch ppc -mtune=G4"
