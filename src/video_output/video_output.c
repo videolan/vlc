@@ -677,6 +677,101 @@ static int VoutVideoFilterInteractiveAllocationSetup(filter_t *filter, void *dat
     return VLC_SUCCESS;
 }
 
+static void ThreadFilterFlush(vout_thread_t *vout)
+{
+    if (vout->p->displayed.current)
+        picture_Release( vout->p->displayed.current );
+    vout->p->displayed.current = NULL;
+
+    if (vout->p->displayed.next)
+        picture_Release( vout->p->displayed.next );
+    vout->p->displayed.next = NULL;
+
+    vlc_mutex_lock(&vout->p->filter.lock);
+    filter_chain_VideoFlush(vout->p->filter.chain_static);
+    filter_chain_VideoFlush(vout->p->filter.chain_interactive);
+    vlc_mutex_unlock(&vout->p->filter.lock);
+}
+
+typedef struct {
+    char           *name;
+    config_chain_t *cfg;
+} vout_filter_t;
+
+static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
+{
+    ThreadFilterFlush(vout);
+
+    vlc_array_t array_static;
+    vlc_array_t array_interactive;
+
+    vlc_array_init(&array_static);
+    vlc_array_init(&array_interactive);
+    char *current = filters ? strdup(filters) : NULL;
+    while (current) {
+        config_chain_t *cfg;
+        char *name;
+        char *next = config_ChainCreate(&name, &cfg, current);
+
+        if (name && *name) {
+            vout_filter_t *e = xmalloc(sizeof(*e));
+            e->name = name;
+            e->cfg  = cfg;
+            if (!strcmp(e->name, "deinterlace") ||
+                !strcmp(e->name, "postproc")) {
+                vlc_array_append(&array_static, e);
+            } else {
+                vlc_array_append(&array_interactive, e);
+            }
+        } else {
+            if (cfg)
+                config_ChainDestroy(cfg);
+            free(name);
+        }
+        free(current);
+        current = next;
+    }
+
+    es_format_t fmt_target;
+    es_format_InitFromVideo(&fmt_target, &vout->p->original);
+
+    es_format_t fmt_current = fmt_target;
+
+    vlc_mutex_lock(&vout->p->filter.lock);
+
+    for (int a = 0; a < 2; a++) {
+        vlc_array_t    *array = a == 0 ? &array_static :
+                                         &array_interactive;
+        filter_chain_t *chain = a == 0 ? vout->p->filter.chain_static :
+                                         vout->p->filter.chain_interactive;
+
+        filter_chain_Reset(chain, &fmt_current, &fmt_current);
+        for (int i = 0; i < vlc_array_count(array); i++) {
+            vout_filter_t *e = vlc_array_item_at_index(array, i);
+            msg_Dbg(vout, "Adding '%s' as %s", e->name, a == 0 ? "static" : "interactive");
+            if (!filter_chain_AppendFilter(chain, e->name, e->cfg, NULL, NULL)) {
+                msg_Err(vout, "Failed to add filter '%s'", e->name);
+                config_ChainDestroy(e->cfg);
+            }
+            free(e->name);
+            free(e);
+        }
+        fmt_current = *filter_chain_GetFmtOut(chain);
+        vlc_array_clear(array);
+    }
+    if (!es_format_IsSimilar(&fmt_current, &fmt_target)) {
+        msg_Dbg(vout, "Adding a filter to compensate for format changes");
+        if (!filter_chain_AppendFilter(vout->p->filter.chain_interactive, NULL, NULL,
+                                       &fmt_current, &fmt_target)) {
+            msg_Err(vout, "Failed to compensate for the format changes, removing all filters");
+            filter_chain_Reset(vout->p->filter.chain_static,      &fmt_target, &fmt_target);
+            filter_chain_Reset(vout->p->filter.chain_interactive, &fmt_target, &fmt_target);
+        }
+    }
+
+    vlc_mutex_unlock(&vout->p->filter.lock);
+}
+
 /* */
 static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool is_late_dropped)
 {
@@ -958,101 +1053,6 @@ static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
     vout_OSDText(vout, SPU_DEFAULT_CHANNEL,
                  vout->p->title.position, INT64_C(1000) * vout->p->title.timeout,
                  string);
-}
-
-static void ThreadFilterFlush(vout_thread_t *vout)
-{
-    if (vout->p->displayed.current)
-        picture_Release( vout->p->displayed.current );
-    vout->p->displayed.current = NULL;
-
-    if (vout->p->displayed.next)
-        picture_Release( vout->p->displayed.next );
-    vout->p->displayed.next = NULL;
-
-    vlc_mutex_lock(&vout->p->filter.lock);
-    filter_chain_VideoFlush(vout->p->filter.chain_static);
-    filter_chain_VideoFlush(vout->p->filter.chain_interactive);
-    vlc_mutex_unlock(&vout->p->filter.lock);
-}
-
-typedef struct {
-    char           *name;
-    config_chain_t *cfg;
-} vout_filter_t;
-
-static void ThreadChangeFilters(vout_thread_t *vout, const char *filters)
-{
-    ThreadFilterFlush(vout);
-
-    vlc_array_t array_static;
-    vlc_array_t array_interactive;
-
-    vlc_array_init(&array_static);
-    vlc_array_init(&array_interactive);
-    char *current = filters ? strdup(filters) : NULL;
-    while (current) {
-        config_chain_t *cfg;
-        char *name;
-        char *next = config_ChainCreate(&name, &cfg, current);
-
-        if (name && *name) {
-            vout_filter_t *e = xmalloc(sizeof(*e));
-            e->name = name;
-            e->cfg  = cfg;
-            if (!strcmp(e->name, "deinterlace") ||
-                !strcmp(e->name, "postproc")) {
-                vlc_array_append(&array_static, e);
-            } else {
-                vlc_array_append(&array_interactive, e);
-            }
-        } else {
-            if (cfg)
-                config_ChainDestroy(cfg);
-            free(name);
-        }
-        free(current);
-        current = next;
-    }
-
-    es_format_t fmt_target;
-    es_format_InitFromVideo(&fmt_target, &vout->p->original);
-
-    es_format_t fmt_current = fmt_target;
-
-    vlc_mutex_lock(&vout->p->filter.lock);
-
-    for (int a = 0; a < 2; a++) {
-        vlc_array_t    *array = a == 0 ? &array_static :
-                                         &array_interactive;
-        filter_chain_t *chain = a == 0 ? vout->p->filter.chain_static :
-                                         vout->p->filter.chain_interactive;
-
-        filter_chain_Reset(chain, &fmt_current, &fmt_current);
-        for (int i = 0; i < vlc_array_count(array); i++) {
-            vout_filter_t *e = vlc_array_item_at_index(array, i);
-            msg_Dbg(vout, "Adding '%s' as %s", e->name, a == 0 ? "static" : "interactive");
-            if (!filter_chain_AppendFilter(chain, e->name, e->cfg, NULL, NULL)) {
-                msg_Err(vout, "Failed to add filter '%s'", e->name);
-                config_ChainDestroy(e->cfg);
-            }
-            free(e->name);
-            free(e);
-        }
-        fmt_current = *filter_chain_GetFmtOut(chain);
-        vlc_array_clear(array);
-    }
-    if (!es_format_IsSimilar(&fmt_current, &fmt_target)) {
-        msg_Dbg(vout, "Adding a filter to compensate for format changes");
-        if (!filter_chain_AppendFilter(vout->p->filter.chain_interactive, NULL, NULL,
-                                       &fmt_current, &fmt_target)) {
-            msg_Err(vout, "Failed to compensate for the format changes, removing all filters");
-            filter_chain_Reset(vout->p->filter.chain_static,      &fmt_target, &fmt_target);
-            filter_chain_Reset(vout->p->filter.chain_interactive, &fmt_target, &fmt_target);
-        }
-    }
-
-    vlc_mutex_unlock(&vout->p->filter.lock);
 }
 
 static void ThreadChangeSubFilters(vout_thread_t *vout, const char *filters)
