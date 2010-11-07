@@ -373,7 +373,7 @@ net_IPv4Join (vlc_object_t *obj, int fd,
     memset (&opt, 0, sizeof (opt));
     if (src != NULL)
     {
-# ifdef IP_ADD_SOURCE_MEMBERSHIP
+# if defined( IP_ADD_SOURCE_MEMBERSHIP ) && !defined( __ANDROID__ )
         cmd = IP_ADD_SOURCE_MEMBERSHIP;
         opt.gsr4.imr_multiaddr = grp->sin_addr;
         opt.gsr4.imr_sourceaddr = src->sin_addr;
