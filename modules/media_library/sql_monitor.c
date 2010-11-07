@@ -388,12 +388,14 @@ static void ScanFiles( monitoring_thread_t *p_mon, int i_dir_id,
     if( i_dir_content == -1 )
     {
         msg_Err( p_mon, "Cannot read `%s': %m", psz_dir );
+        free( pb_processed );
         free( psz_dir );
         return;
     }
     else if( i_dir_content == 0 )
     {
         msg_Dbg( p_mon, "Nothing in directory `%s'", psz_dir );
+        free( pb_processed );
         free( psz_dir );
         return;
     }
@@ -411,6 +413,7 @@ static void ScanFiles( monitoring_thread_t *p_mon, int i_dir_id,
             if( vlc_stat( psz_uri, &s_stat ) == -1 )
             {
                 msg_Err( p_mon, "%s: %m", psz_uri );
+                free( pb_processed );
                 free( psz_dir );
                 return;
             }
