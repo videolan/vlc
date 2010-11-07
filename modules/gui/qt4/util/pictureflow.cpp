@@ -522,7 +522,7 @@ static QImage* prepareSurface(const QImage* slideImage, int w, int h, QRgb bgcol
         for (int y = 0; y < h; y++)
             result->setPixel(hofs + y, x, img.pixel(x, y));
     */
-    imagePainter.drawImage( hofs+h, 0, result->transformed( rotation ) );
+    imagePainter.drawImage( hofs+h, 0, img );
     if (reflectionEffect != PictureFlow::NoReflection) {
         // create the reflection
         int ht = hs - h - hofs;
@@ -601,9 +601,12 @@ static QImage* prepareSurface(const QImage* slideImage, int w, int h, QRgb bgcol
             }
 
             // overdraw to leave only the reflection blurred (but not the actual image)
+            imagePainter.drawImage( hofs, 0, img.mirrored().transformed( rotation ) );
+            /*
             for (int x = 0; x < w; x++)
                 for (int y = 0; y < h; y++)
                     result->setPixel(hofs + y, x, img.pixel(x, y));
+            */
         }
     }
 
