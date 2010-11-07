@@ -509,24 +509,33 @@ static QImage* prepareSurface(const QImage* slideImage, int w, int h, QRgb bgcol
 
     // offscreen buffer: black is sweet
     QImage* result = new QImage(hs, w, QImage::Format_RGB32);
+    QPainter imagePainter( result );
+    QTransform rotation;
+    rotation.rotate(90);
     result->fill(bgcolor);
 
     // transpose the image, this is to speed-up the rendering
     // because we process one column at a time
     // (and much better and faster to work row-wise, i.e in one scanline)
+    /*
     for (int x = 0; x < w; x++)
         for (int y = 0; y < h; y++)
             result->setPixel(hofs + y, x, img.pixel(x, y));
-
+    */
+    imagePainter.drawImage( hofs+h, 0, result->transformed( rotation ) );
     if (reflectionEffect != PictureFlow::NoReflection) {
         // create the reflection
         int ht = hs - h - hofs;
         int hte = ht;
         for (int x = 0; x < w; x++)
+        {
+            QRgb *line = (QRgb*)(result->scanLine( x ));
             for (int y = 0; y < ht; y++) {
                 QRgb color = img.pixel(x, img.height() - y - 1);
-                result->setPixel(h + hofs + y, x, blendColor(color, bgcolor, 128*(hte - y) / hte));
+                line[h+hofs+y] = blendColor( color, bgcolor, 128*(hte-y)/hte );
+                //result->setPixel(h + hofs + y, x, blendColor(color, bgcolor, 128*(hte - y) / hte));
             }
+        }
 
         if (reflectionEffect == PictureFlow::BlurredReflection) {
             // blur the reflection everything first
