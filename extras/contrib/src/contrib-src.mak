@@ -1122,13 +1122,14 @@ ifeq ($(ARCH),armel)
 HAVE_ARMELF=1
 endif
 
-FFMPEG_DEPS-$(ENABLED)     = .lame .gsm .libvpx .zlib
-FFMPEG_DEPS-$(HAVE_WINCE)  = .zlib
-FFMPEG_DEPS-$(HAVE_UCLIBC) =
-FFMPEG_DEPS-$(HAVE_IOS)    =
-FFMPEG_DEPS-$(HAVE_WIN64)  = .lame .gsm .zlib
-FFMPEG_DEPS-$(HAVE_ARMELF) = .lame .gsm .zlib
-FFMPEG_DEPS-$(HAVE_WIN32) += .dshow_headers
+FFMPEG_DEPS-$(ENABLED)      = .lame .gsm .libvpx .zlib
+FFMPEG_DEPS-$(HAVE_WINCE)   = .zlib
+FFMPEG_DEPS-$(HAVE_UCLIBC)  =
+FFMPEG_DEPS-$(HAVE_IOS)     =
+FFMPEG_DEPS-$(HAVE_WIN64)   = .lame .gsm .zlib
+FFMPEG_DEPS-$(HAVE_ARMELF)  = .lame .gsm .zlib
+FFMPEG_DEPS-$(HAVE_MACOSX) += .yasm
+FFMPEG_DEPS-$(HAVE_WIN32)  += .dshow_headers
 
 ifdef SVN
 FFMPEG_MK_TARGET = ffmpeg/.svn-co
