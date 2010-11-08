@@ -82,6 +82,20 @@ if HAVE_WIN32
 libvlc_LTLIBRARIES += libdrawable_plugin.la
 endif
 
+### EGL ###
+libegl_plugin_la_SOURCES = \
+	opengl.h opengl.c \
+	egl.c
+#FIXME FIXME FIXME
+libegl_plugin_la_CFLAGS = $(AM_CFLAGS) \
+	$(EGL_CFLAGS) $(GL_CFLAGS)
+libegl_plugin_la_LIBADD = $(AM_LIBADD) \
+	$(EGL_LIBS) $(GL_LIBS)
+libegl_plugin_la_DEPENDENCIES =
+EXTRA_LTLIBRARIES += libegl_plugin.la
+libvlc_LTLIBRARIES += $(LTLIBegl)
+
+### Common ###
 libvlc_LTLIBRARIES += \
 	libvmem_plugin.la \
 	libyuv_plugin.la
