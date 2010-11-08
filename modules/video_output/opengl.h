@@ -44,7 +44,7 @@
 # define MACOS_OPENGL
 # include <OpenGL/gl.h>
 # undef VLCGL_TEXTURE_COUNT
-# define VLCGL_TEXTURE_COUNT
+# define VLCGL_TEXTURE_COUNT 2
 #else
 # include <GL/gl.h>
 #endif
