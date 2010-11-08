@@ -425,7 +425,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 #if VLCGL_TARGET == GL_TEXTURE_2D
     const float f_normw = vgl->tex_width;
     const float f_normh = vgl->tex_height;
-#elif defined (GL_TEXTURE_RECTABLE_EXT) \
+#elif defined (GL_TEXTURE_RECTANGLE_EXT) \
    && (VLCGL_TARGET == GL_TEXTURE_RECTANGLE_EXT)
     const float f_normw = 1.0;
     const float f_normh = 1.0;
