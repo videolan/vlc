@@ -188,6 +188,10 @@ void X11Graphics::drawBitmap( const GenericBitmap &rBitmap, int xSrc,
         return;
     }
 
+    // Force pending XCopyArea to be sent to the X Server
+    // before issuing an XGetImage.
+    XSync( XDISPLAY, False );
+
     // Get the image from the pixmap
     XImage *pImage = XGetImage( XDISPLAY, m_pixmap, xDest, yDest, width,
                                 height, AllPlanes, ZPixmap );
