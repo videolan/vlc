@@ -33,7 +33,7 @@ EXTRA_PROGRAMS = \
 	$(NULL)
 
 #check_DATA = samples/test.sample samples/meta.sample
-EXTRA_DIST = samples/empty.voc samples/image.jpg
+EXTRA_DIST = samples/empty.voc samples/image.jpg $(check_SCRIPTS)
 
 check_HEADERS = libvlc/test.h libvlc/libvlc_additions.h
 
