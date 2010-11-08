@@ -425,10 +425,11 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 #if VLCGL_TARGET == GL_TEXTURE_2D
     const float f_normw = vgl->tex_width;
     const float f_normh = vgl->tex_height;
-#else
-    assert(VLCGL_TARGET == GL_TEXTURE_RECTANGLE_EXT);
+#elif VLCGL_TARGET == GL_TEXTURE_RECTANGLE_EXT
     const float f_normw = 1.0;
     const float f_normh = 1.0;
+#else
+# error Unknown texture type!
 #endif
 
     float f_x      = (source->i_x_offset +                       0 ) / f_normw;
