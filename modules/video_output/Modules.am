@@ -15,6 +15,7 @@ SOURCES_yuv = yuv.c
 SOURCES_vout_macosx = macosx.m opengl.h opengl.c
 SOURCES_vout_ios = ios.m opengl.h opengl.c
 
+### XCB ###
 libxcb_x11_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
 	xcb/x11.c \
@@ -72,7 +73,7 @@ libvlc_LTLIBRARIES += \
 	$(LTLIBxcb_xv) \
 	$(LTLIBxcb_glx)
 
-# XXX: do we need yet another modules/ subdirectory?
+### Win32 ###
 libdrawable_plugin_la_SOURCES = drawable.c
 libdrawable_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdrawable_plugin_la_LIBADD = $(AM_LIBADD)
