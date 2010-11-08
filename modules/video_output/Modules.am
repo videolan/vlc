@@ -12,8 +12,8 @@ SOURCES_snapshot = snapshot.c
 SOURCES_directfb = directfb.c
 SOURCES_vmem = vmem.c
 SOURCES_yuv = yuv.c
-SOURCES_vout_macosx = macosx.m
-SOURCES_vout_ios = ios.m
+SOURCES_vout_macosx = macosx.m opengl.h opengl.c
+SOURCES_vout_ios = ios.m opengl.h opengl.c
 
 libxcb_x11_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
@@ -40,6 +40,8 @@ libxcb_xv_plugin_la_DEPENDENCIES =
 libxcb_glx_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
 	xcb/glx.c \
+	opengl.h \
+	opengl.c \
 	xcb/events.c
 libxcb_glx_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XLIB_XCB_CFLAGS) $(GL_CFLAGS)

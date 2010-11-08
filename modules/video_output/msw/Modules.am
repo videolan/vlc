@@ -24,10 +24,12 @@ SOURCES_direct3d = \
 
 SOURCES_glwin32 = \
 	glwin32.c \
+	../opengl.h \
 	common.h \
 	events.h \
 	events.c \
 	common.c \
+	../opengl.c \
 	$(NULL)
 
 SOURCES_wingdi = \
