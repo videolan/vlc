@@ -597,14 +597,24 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     if( in == NULL )
     {
-       block_t *p_block;
-       do {
-           video_timer_start( id->p_encoder );
-           p_block = id->p_encoder->pf_encode_video(id->p_encoder, NULL );
-           video_timer_stop( id->p_encoder );
-           block_ChainAppend( out, p_block );
-       } while( p_block );
-       return VLC_SUCCESS;
+        if( p_sys->i_threads == 0 )
+        {
+            block_t *p_block;
+            do {
+                video_timer_start( id->p_encoder );
+                p_block = id->p_encoder->pf_encode_video(id->p_encoder, NULL );
+                video_timer_stop( id->p_encoder );
+                block_ChainAppend( out, p_block );
+            } while( p_block );
+        }
+        else
+        {
+            /*
+             * FIXME: we need EncoderThread() to flush buffers and signal us
+             * when it's done so we can send the last frames to the chain
+             */
+        }
+        return VLC_SUCCESS;
     }
 
 
