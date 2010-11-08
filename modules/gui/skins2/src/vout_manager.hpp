@@ -44,7 +44,7 @@ class SavedWnd
 {
 public:
     SavedWnd( vout_window_t* pWnd, VoutWindow* pVoutWindow = NULL,
-               CtrlVideo* pCtrlVideo = NULL, int height = 0, int width = 0 )
+               CtrlVideo* pCtrlVideo = NULL, int height = -1, int width = -1 )
             : pWnd( pWnd ), pVoutWindow( pVoutWindow ),
               pCtrlVideo( pCtrlVideo ), height( height ), width( width ) { }
     ~SavedWnd() { }
