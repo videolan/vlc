@@ -30,6 +30,9 @@
 #include <vlc_vout_opengl.h>
 
 // Define USE_OPENGL_ES to the GL ES Version you want to select
+#ifndef USE_OPENGL_ES
+# define USE_OPENGL_ES 0
+#endif
 
 #define VLCGL_TEXTURE_COUNT 1
 
