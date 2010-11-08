@@ -284,6 +284,10 @@ int transcode_audio_new( sout_stream_t *p_stream,
         es_format_t fmt_fl32 = fmt_last;
         fmt_fl32.i_codec =
         fmt_fl32.audio.i_format = VLC_CODEC_FL32;
+        id->p_uf_chain = filter_chain_New( p_stream, "audio filter", false,
+                                           transcode_audio_filter_allocation_init, NULL, NULL );
+        filter_chain_Reset( id->p_uf_chain, &fmt_last, &fmt_fl32 );
+
         if( transcode_audio_filter_chain_build( p_stream, id->p_uf_chain,
                                                 &fmt_fl32, &fmt_last ) )
         {
@@ -292,9 +296,6 @@ int transcode_audio_new( sout_stream_t *p_stream,
         }
         fmt_last = fmt_fl32;
 
-        id->p_uf_chain = filter_chain_New( p_stream, "audio filter", false,
-                                           transcode_audio_filter_allocation_init, NULL, NULL );
-        filter_chain_Reset( id->p_uf_chain, &fmt_last, &fmt_fl32 );
         if( filter_chain_AppendFromString( id->p_uf_chain, p_sys->psz_af ) > 0 )
             fmt_last = *filter_chain_GetFmtOut( id->p_uf_chain );
     }
