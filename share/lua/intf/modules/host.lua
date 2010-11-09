@@ -235,6 +235,7 @@ function host()
         filter_client( pollfds, status.read, vlc.net.POLLIN )
         filter_client( pollfds, status.password, vlc.net.POLLIN )
         filter_client( pollfds, status.write, vlc.net.POLLOUT )
+
         if listeners.tcp then
             for _, listener in pairs(listeners.tcp.list) do
                 for _, fd in pairs({listener:fds()}) do
@@ -250,9 +251,10 @@ function host()
             for _, client in pairs(clients) do
                 if pollfds[client:fd()] == vlc.net.POLLOUT then
                     table.insert(wclients,client)
-                end
-                if pollfds[client:fd()] == vlc.net.POLLIN then
+                elseif pollfds[client:fd()] == vlc.net.POLLIN then
                     table.insert(rclients,client)
+                else
+                    del_client( client )
                 end
             end
             if listeners.tcp then
