@@ -38,18 +38,18 @@
 #include <vlc_vout.h>
 
 #ifdef HAVE_UNISTD_H
-#    include <unistd.h>
+# include <unistd.h>
 #endif
 
 #ifdef __APPLE__
-#include "TargetConditionals.h"
-#if !TARGET_OS_IPHONE
-#define HAVE_MACOS_UNIMOTION
-#endif
+# include "TargetConditionals.h"
+# if !TARGET_OS_IPHONE
+#  define HAVE_MACOS_UNIMOTION
+# endif
 #endif
 
 #ifdef HAVE_MACOS_UNIMOTION
-#include "unimotion.h"
+# include "unimotion.h"
 #endif
 
 /*****************************************************************************
@@ -103,7 +103,7 @@ int Open ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     FILE *f;
-    int i_x, i_y;
+    int i_x = 0, i_y = 0;
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
@@ -117,10 +117,8 @@ int Open ( vlc_object_t *p_this )
         f = fopen( "/sys/devices/platform/hdaps/calibrate", "r" );
         if( f )
         {
-            i_x = i_y = 0;
-            fscanf( f, "(%d,%d)", &i_x, &i_y );
+            p_intf->p_sys->i_calibrate = fscanf( f, "(%d,%d)", &i_x, &i_y ) == 2 ? i_x: 0;
             fclose( f );
-            p_intf->p_sys->i_calibrate = i_x;
             p_intf->p_sys->sensor = HDAPS_SENSOR;
         }
         else
@@ -140,10 +138,8 @@ int Open ( vlc_object_t *p_this )
         f = fopen( "/sys/devices/applesmc.768/calibrate", "r" );
         if( f )
         {
-            i_x = i_y = 0;
-            fscanf( f, "(%d,%d)", &i_x, &i_y );
+            p_intf->p_sys->i_calibrate = fscanf( f, "(%d,%d)", &i_x, &i_y ) == 2 ? i_x: 0;
             fclose( f );
-            p_intf->p_sys->i_calibrate = i_x;
             p_intf->p_sys->sensor = APPLESMC_SENSOR;
         }
         else
@@ -152,7 +148,7 @@ int Open ( vlc_object_t *p_this )
         }
     }
 #ifdef HAVE_MACOS_UNIMOTION
-    else if((p_intf->p_sys->unimotion_hw = detect_sms()))
+    else if( (p_intf->p_sys->unimotion_hw = detect_sms()) )
         p_intf->p_sys->sensor = UNIMOTION_SENSOR;
 #endif
     else
@@ -163,9 +159,9 @@ int Open ( vlc_object_t *p_this )
 
     p_intf->pf_run = RunIntf;
 
-    p_intf->p_sys->b_use_rotate =
-        var_InheritBool( p_intf, "motion-use-rotate" );
+    p_intf->p_sys->b_use_rotate = var_InheritBool( p_intf, "motion-use-rotate" );
 
+    msg_Dbg( p_intf, "Motion detection correctly loaded" );
     return VLC_SUCCESS;
 }
 
@@ -272,7 +268,8 @@ loop:
 static int GetOrientation( intf_thread_t *p_intf )
 {
     FILE *f;
-    int i_x, i_y, i_z = 0;
+    int i_x = 0, i_y = 0, i_z = 0;
+    int i_ret;
 
     switch( p_intf->p_sys->sensor )
     {
@@ -283,11 +280,13 @@ static int GetOrientation( intf_thread_t *p_intf )
             return 0;
         }
 
-        i_x = i_y = 0;
-        fscanf( f, "(%d,%d)", &i_x, &i_y );
+        i_ret = fscanf( f, "(%d,%d)", &i_x, &i_y );
         fclose( f );
 
-        return ( i_x - p_intf->p_sys->i_calibrate ) * 10;
+        if( i_ret < 2 )
+            return 0;
+        else
+            return ( i_x - p_intf->p_sys->i_calibrate ) * 10;
 
     case AMS_SENSOR:
         f = fopen( "/sys/devices/ams/x", "r" );
@@ -296,10 +295,13 @@ static int GetOrientation( intf_thread_t *p_intf )
             return 0;
         }
 
-        fscanf( f, "%d", &i_x);
+        i_ret = fscanf( f, "%d", &i_x);
         fclose( f );
 
-        return - i_x * 30; /* FIXME: arbitrary */
+        if( i_ret < 1 )
+            return 0;
+        else
+            return - i_x * 30; /* FIXME: arbitrary */
 
     case APPLESMC_SENSOR:
         f = fopen( "/sys/devices/applesmc.768/position", "r" );
@@ -308,11 +310,13 @@ static int GetOrientation( intf_thread_t *p_intf )
             return 0;
         }
 
-        i_x = i_y = i_z = 0;
-        fscanf( f, "(%d,%d,%d)", &i_x, &i_y, &i_z );
+        i_ret = fscanf( f, "(%d,%d,%d)", &i_x, &i_y, &i_z );
         fclose( f );
 
-        return ( i_x - p_intf->p_sys->i_calibrate ) * 10;
+        if( i_ret < 3 )
+            return 0;
+        else
+            return ( i_x - p_intf->p_sys->i_calibrate ) * 10;
 
 #ifdef HAVE_MACOS_UNIMOTION
     case UNIMOTION_SENSOR:
@@ -330,6 +334,7 @@ static int GetOrientation( intf_thread_t *p_intf )
         else
             return 0;
 #endif
+    case NO_SENSOR:
     default:
         return 0;
     }
