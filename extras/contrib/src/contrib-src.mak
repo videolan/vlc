@@ -874,30 +874,17 @@ libvpx:
 	$(GIT) clone git://review.webmproject.org/libvpx.git
 
 ifdef HAVE_WIN32
-VPX_TARGET=x86-win32-gcc
 CROSS=$(HOST)-
-else
-ifdef HAVE_MACOSX
-ifdef HAVE_MACOSX64
-VPX_TARGET=x86_64-MACOSX9-gcc
-else
-ifdef HAVE_MACOSX_ON_INTEL
-VPX_TARGET=x86-MACOSX9-gcc
-else
-VPX_TARGET=ppc32-MACOSX9-gcc
-endif
-endif
-else
-VPX_TARGET=FIXME
-endif
 endif
 
-ifdef HAVE_MACOSX_ON_INTEL
-.libvpx: libvpx .yasm
-else
-.libvpx: libvpx
-endif
-	(cd $<; CROSS=$(CROSS) ./configure --target=$(VPX_TARGET) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-install-docs --disable-examples --disable-vp8-decoder && make && make install)
+VPX_TARGET-$(ENABLED)             = $(TARGET)
+VPX_TARGET-$(HAVE_WIN32)          = x86-win32-gcc
+
+VPX_DEPS-$(ENABLED)               =
+VLX_DEPS-$(HAVE_MACOSX_ON_INTEL) += .yasm
+
+.libvpx: libvpx $(VPX_DEPS-1)
+	(cd $<; CROSS=$(CROSS) ./configure --target=$(VPX_TARGET-1) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-install-docs --disable-examples --disable-vp8-decoder && make && make install)
 	(rm -rf $(PREFIX)/include/vpx/ && mkdir -p $(PREFIX)/include/vpx/; cd $< && cp vpx/*.h vpx_ports/*.h $(PREFIX)/include/vpx/) # Of course, why the hell would one expect it to be listed or in make install?
 	rm $(PREFIX)/include/vpx/config.h
 	(cd $<; $(RANLIB) libvpx.a && mkdir -p $(PREFIX)/lib && cp libvpx.a $(PREFIX)/lib/) # Of course, why the hell would one expect it to be listed or in make install?
