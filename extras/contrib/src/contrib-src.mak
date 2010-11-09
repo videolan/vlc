@@ -90,7 +90,8 @@ else
 HOSTCC2=$(HOSTCC)
 endif
 
-ENABLED=1 # Just a shortcut for readability
+# Just a shortcut for readability
+ENABLED=1
 
 # cross compiling
 #This should be inside the if block but some config scripts are buggy
