@@ -105,7 +105,7 @@ void VoutManager::saveVoutConfig( )
     // Save width/height to be consistent across themes
     // and detach Video Controls
     vector<SavedWnd>::iterator it;
-    for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); it++ )
+    for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
         if( (*it).pCtrlVideo )
         {
@@ -135,7 +135,7 @@ void VoutManager::restoreVoutConfig( bool b_success )
 
     // reattach vout(s) to Video Controls
     vector<SavedWnd>::iterator it;
-    for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); it++ )
+    for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
         CtrlVideo* pCtrlVideo = getBestCtrlVideo();
         if( pCtrlVideo )
@@ -150,7 +150,7 @@ void VoutManager::restoreVoutConfig( bool b_success )
 void VoutManager::discardVout( CtrlVideo* pCtrlVideo )
 {
     vector<SavedWnd>::iterator it;
-    for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); it++ )
+    for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
         if( (*it).pCtrlVideo == pCtrlVideo )
         {
@@ -168,7 +168,7 @@ void VoutManager::discardVout( CtrlVideo* pCtrlVideo )
 void VoutManager::requestVout( CtrlVideo* pCtrlVideo )
 {
     vector<SavedWnd>::iterator it;
-    for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); it++ )
+    for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
         if( (*it).pCtrlVideo == NULL )
         {
@@ -186,7 +186,7 @@ CtrlVideo* VoutManager::getBestCtrlVideo( )
     // try to find an unused useable VideoControl
 
     vector<CtrlVideo*>::const_iterator it;
-    for( it = m_pCtrlVideoVec.begin(); it != m_pCtrlVideoVec.end(); it++ )
+    for( it = m_pCtrlVideoVec.begin(); it != m_pCtrlVideoVec.end(); ++it )
     {
         if( (*it)->isUseable() && !(*it)->isUsed() )
         {
@@ -236,7 +236,7 @@ void VoutManager::releaseWnd( vout_window_t *pWnd )
 {
     // remove vout thread from savedVec
     vector<SavedWnd>::iterator it;
-    for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); it++ )
+    for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
         if( (*it).pWnd == pWnd )
         {
@@ -267,7 +267,7 @@ void VoutManager::setSizeWnd( vout_window_t *pWnd, int width, int height )
                   width, height );
 
    vector<SavedWnd>::iterator it;
-   for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); it++ )
+   for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
    {
        if( (*it).pWnd == pWnd )
        {

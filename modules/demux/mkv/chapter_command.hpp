@@ -53,19 +53,19 @@ public:
         while ( indexe != enter_cmds.end() )
         {
             delete (*indexe);
-            indexe++;
+            ++indexe;
         }
         std::vector<KaxChapterProcessData*>::iterator indexl = leave_cmds.begin();
         while ( indexl != leave_cmds.end() )
         {
             delete (*indexl);
-            indexl++;
+            ++indexl;
         }
         std::vector<KaxChapterProcessData*>::iterator indexd = during_cmds.begin();
         while ( indexd != during_cmds.end() )
         {
             delete (*indexd);
-            indexd++;
+            ++indexd;
         }
     }
 

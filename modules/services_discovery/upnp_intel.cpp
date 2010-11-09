@@ -916,7 +916,7 @@ void MediaServerList::removeServer( const char* psz_udn )
             "Removing server '%s'", p_server->getFriendlyName() );
 
     std::vector<MediaServer*>::iterator it;
-    for ( it = _list.begin(); it != _list.end(); it++ )
+    for ( it = _list.begin(); it != _list.end(); ++it )
     {
         if ( *it == p_server )
         {

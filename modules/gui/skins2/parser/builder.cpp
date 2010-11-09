@@ -297,7 +297,7 @@ void Builder::addFont( const BuilderData::Font &rData )
         const string &sep = pOSFactory->getDirSeparator();
 
         list<string>::const_iterator it;
-        for( it = resPath.begin(); it != resPath.end(); it++ )
+        for( it = resPath.begin(); it != resPath.end(); ++it )
         {
             string path = (*it) + sep + "fonts" + sep + rData.m_fontFile;
             pFont = new FT2Font( getIntf(), path, rData.m_size );
@@ -1152,7 +1152,7 @@ GenericFont *Builder::getFont( const string &fontId )
         const string &sep = pOSFactory->getDirSeparator();
 
         list<string>::const_iterator it;
-        for( it = resPath.begin(); it != resPath.end(); it++ )
+        for( it = resPath.begin(); it != resPath.end(); ++it )
         {
             string path = (*it) + sep + "fonts" + sep + "FreeSans.ttf";
             pFont = new FT2Font( getIntf(), path, 12 );

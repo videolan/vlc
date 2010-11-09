@@ -707,7 +707,7 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
 
     int boxline = 0;
     for( QVector<checkBoxListItem*>::iterator it = modules.begin();
-            it != modules.end(); it++ )
+            it != modules.end(); ++it )
     {
         layoutGroupBox->addWidget( (*it)->checkBox, boxline++, 0 );
     }
@@ -731,7 +731,7 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
 ModuleListConfigControl::~ModuleListConfigControl()
 {
     for( QVector<checkBoxListItem*>::iterator it = modules.begin();
-            it != modules.end(); it++ )
+            it != modules.end(); ++it )
     {
         delete *it;
     }
@@ -811,7 +811,7 @@ QString ModuleListConfigControl::getValue()
 void ModuleListConfigControl::hide()
 {
     for( QVector<checkBoxListItem*>::iterator it = modules.begin();
-         it != modules.end(); it++ )
+         it != modules.end(); ++it )
     {
         (*it)->checkBox->hide();
     }
@@ -821,7 +821,7 @@ void ModuleListConfigControl::hide()
 void ModuleListConfigControl::show()
 {
     for( QVector<checkBoxListItem*>::iterator it = modules.begin();
-         it != modules.end(); it++ )
+         it != modules.end(); ++it )
     {
         (*it)->checkBox->show();
     }
@@ -835,7 +835,7 @@ void ModuleListConfigControl::onUpdate()
     bool first = true;
 
     for( QVector<checkBoxListItem*>::iterator it = modules.begin();
-         it != modules.end(); it++ )
+         it != modules.end(); ++it )
     {
         if( (*it)->checkBox->isChecked() )
         {

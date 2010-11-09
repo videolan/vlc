@@ -94,7 +94,7 @@ bool dvd_chapter_codec_c::Enter()
                 f_result |= sys.dvd_interpretor.Interpret( p_data );
             }
         }
-        index++;
+        ++index;
     }
     return f_result;
 }
@@ -117,7 +117,7 @@ bool dvd_chapter_codec_c::Leave()
                 f_result |= sys.dvd_interpretor.Interpret( p_data );
             }
         }
-        index++;
+        ++index;
     }
     return f_result;
 }
@@ -772,7 +772,7 @@ bool matroska_script_codec_c::Enter()
             msg_Dbg( &sys.demuxer, "Matroska Script enter command" );
             f_result |= interpretor.Interpret( (*index)->GetBuffer(), (*index)->GetSize() );
         }
-        index++;
+        ++index;
     }
     return f_result;
 }
@@ -788,7 +788,7 @@ bool matroska_script_codec_c::Leave()
             msg_Dbg( &sys.demuxer, "Matroska Script leave command" );
             f_result |= interpretor.Interpret( (*index)->GetBuffer(), (*index)->GetSize() );
         }
-        index++;
+        ++index;
     }
     return f_result;
 }

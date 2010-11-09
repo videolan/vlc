@@ -82,7 +82,7 @@ void X11DragDrop::dndEnter( ldata_t data )
     // Find the right target
     m_target = None;
     list<string>::iterator it;
-    for( it = dataTypes.begin(); it != dataTypes.end(); it++ )
+    for( it = dataTypes.begin(); it != dataTypes.end(); ++it )
     {
         if( *it == "text/plain" || *it == "STRING" )
         {

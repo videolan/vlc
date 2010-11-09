@@ -37,7 +37,7 @@ VarManager::~VarManager()
 {
     // Delete the variables in the reverse order they were added
     list<string>::const_iterator it1;
-    for( it1 = m_varList.begin(); it1 != m_varList.end(); it1++ )
+    for( it1 = m_varList.begin(); it1 != m_varList.end(); ++it1 )
     {
         m_varMap.erase(*it1);
     }

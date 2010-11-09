@@ -32,13 +32,13 @@ chapter_item_c::~chapter_item_c()
     while ( index != codecs.end() )
     {
         delete (*index);
-        index++;
+        ++index;
     }
     std::vector<chapter_item_c*>::iterator index_ = sub_chapters.begin();
     while ( index_ != sub_chapters.end() )
     {
         delete (*index_);
-        index_++;
+        ++index_;
     }
 }
 
@@ -91,7 +91,7 @@ chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id,
     {
         if ( match( **index ,p_cookie, i_cookie_size ) )
             return this;
-        index++;
+        ++index;
     }
  
     // sub-chapters
@@ -102,7 +102,7 @@ chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id,
         p_result = (*index2)->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size );
         if ( p_result != NULL )
             return p_result;
-        index2++;
+        ++index2;
     }
  
     return p_result;
@@ -158,7 +158,7 @@ std::string chapter_item_c::GetCodecName( bool f_for_title ) const
         result = (*index)->GetCodecName( f_for_title );
         if ( result != "" )
             break;
-        index++;
+        ++index;
     }
 
     return result;
@@ -174,7 +174,7 @@ int16 chapter_item_c::GetTitleNumber( ) const
         result = (*index)->GetTitleNumber( );
         if ( result >= 0 )
             break;
-        index++;
+        ++index;
     }
 
     return result;
@@ -189,7 +189,7 @@ int64_t chapter_item_c::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
     while ( index != sub_chapters.end() )
     {
         i_user_time = (*index)->RefreshChapters( b_ordered, i_user_time );
-        index++;
+        ++index;
     }
 
     if ( b_ordered )
@@ -243,7 +243,7 @@ chapter_item_c *chapter_item_c::FindTimecode( mtime_t i_user_timecode, const cha
         while ( index != sub_chapters.end() && ((p_current == NULL && psz_result == NULL) || (p_current != NULL && (!b_found || psz_result == NULL))))
         {
             psz_result = (*index)->FindTimecode( i_user_timecode, p_current, b_found );
-            index++;
+            ++index;
         }
  
         if ( psz_result == NULL )
@@ -263,7 +263,7 @@ bool chapter_item_c::ParentOf( const chapter_item_c & item ) const
     {
         if ( (*index)->ParentOf( item ) )
             return true;
-        index++;
+        ++index;
     }
 
     return false;
@@ -276,7 +276,7 @@ bool chapter_item_c::Enter( bool b_do_subs )
     while ( index != codecs.end() )
     {
         f_result |= (*index)->Enter();
-        index++;
+        ++index;
     }
 
     if ( b_do_subs )
@@ -286,7 +286,7 @@ bool chapter_item_c::Enter( bool b_do_subs )
         while ( index_ != sub_chapters.end() )
         {
             f_result |= (*index_)->Enter( true );
-            index_++;
+            ++index_;
         }
     }
     return f_result;
@@ -300,7 +300,7 @@ bool chapter_item_c::Leave( bool b_do_subs )
     while ( index != codecs.end() )
     {
         f_result |= (*index)->Leave();
-        index++;
+        ++index;
     }
 
     if ( b_do_subs )
@@ -310,7 +310,7 @@ bool chapter_item_c::Leave( bool b_do_subs )
         while ( index_ != sub_chapters.end() )
         {
             f_result |= (*index_)->Leave( true );
-            index_++;
+            ++index_;
         }
     }
     b_is_leaving = false;

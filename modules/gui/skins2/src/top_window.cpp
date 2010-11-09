@@ -432,7 +432,7 @@ CtrlGeneric *TopWindow::findHitControl( int xPos, int yPos )
     CtrlGeneric *pNewHitControl = NULL;
 
     // Loop on the control list to find the uppest hit control
-    for( iter = ctrlList.rbegin(); iter != ctrlList.rend(); iter++ )
+    for( iter = ctrlList.rbegin(); iter != ctrlList.rend(); ++iter )
     {
         // Get the position of the control in the layout
         const Position *pos = (*iter).m_pControl->getPosition();

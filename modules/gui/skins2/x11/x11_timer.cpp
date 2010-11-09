@@ -110,7 +110,7 @@ void X11TimerLoop::waitNextTimer()
 
     // Find the next timer to execute
     list<X11Timer*>::const_iterator timer;
-    for( timer = m_timers.begin(); timer != m_timers.end(); timer++ )
+    for( timer = m_timers.begin(); timer != m_timers.end(); ++timer )
     {
         mtime_t timerDate = (*timer)->getNextDate();
         if( timerDate < nextDate )

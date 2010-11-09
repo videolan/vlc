@@ -750,7 +750,7 @@ void SPrefsPanel::apply()
 {
     /* Generic save for ever panel */
     QList<ConfigControl *>::Iterator i;
-    for( i = controls.begin() ; i != controls.end() ; i++ )
+    for( i = controls.begin() ; i != controls.end() ; ++i )
     {
         ConfigControl *c = qobject_cast<ConfigControl *>(*i);
         c->doApply( p_intf );
@@ -867,7 +867,7 @@ void SPrefsPanel::changeStyle( QString s_style )
     QWidgetList::iterator it = widgets.begin();
     while( it != widgets.end() ) {
         (*it)->update();
-        it++;
+        ++it;
     };
 }
 

@@ -212,7 +212,7 @@ void CtrlList::handleEvent( EvtGeneric &rEvent )
         {
             // Flag to know if the current item must be selected
             bool select = false;
-            for( it = m_rList.begin(); it != m_rList.end(); it++ )
+            for( it = m_rList.begin(); it != m_rList.end(); ++it )
             {
                 bool nextSelect = select;
                 if( index == yPos || &*it == m_pLastSelected )
@@ -236,7 +236,7 @@ void CtrlList::handleEvent( EvtGeneric &rEvent )
         else if( rEvent.getAsString().find( "mouse:left:down:ctrl" ) !=
                  string::npos )
         {
-            for( it = m_rList.begin(); it != m_rList.end(); it++ )
+            for( it = m_rList.begin(); it != m_rList.end(); ++it )
             {
                 if( index == yPos )
                 {
@@ -253,7 +253,7 @@ void CtrlList::handleEvent( EvtGeneric &rEvent )
         {
             // Flag to know if the current item must be selected
             bool select = false;
-            for( it = m_rList.begin(); it != m_rList.end(); it++ )
+            for( it = m_rList.begin(); it != m_rList.end(); ++it )
             {
                 bool nextSelect = select;
                 if( index == yPos ||  &*it == m_pLastSelected )
@@ -277,7 +277,7 @@ void CtrlList::handleEvent( EvtGeneric &rEvent )
         else if( rEvent.getAsString().find( "mouse:left:down" ) !=
                  string::npos )
         {
-            for( it = m_rList.begin(); it != m_rList.end(); it++ )
+            for( it = m_rList.begin(); it != m_rList.end(); ++it )
             {
                 if( index == yPos )
                 {
@@ -295,7 +295,7 @@ void CtrlList::handleEvent( EvtGeneric &rEvent )
         else if( rEvent.getAsString().find( "mouse:left:dblclick" ) !=
                  string::npos )
         {
-            for( it = m_rList.begin(); it != m_rList.end(); it++ )
+            for( it = m_rList.begin(); it != m_rList.end(); ++it )
             {
                 if( index == yPos )
                 {
@@ -383,7 +383,7 @@ void CtrlList::autoScroll()
     // Find the current playing stream
     int playIndex = 0;
     VarList::ConstIterator it;
-    for( it = m_rList.begin(); it != m_rList.end(); it++ )
+    for( it = m_rList.begin(); it != m_rList.end(); ++it )
     {
         if( (*it).m_playing )
         {
@@ -446,7 +446,7 @@ void CtrlList::makeImage()
                     m_pImage->fillRect( 0, yPos, width, rectHeight,
                                         m_selColor );
                 }
-                it++;
+                ++it;
             }
         }
     }
@@ -462,7 +462,7 @@ void CtrlList::makeImage()
             {
                 uint32_t color = ( (*it).m_selected ? m_selColor : bgColor );
                 m_pImage->fillRect( 0, yPos, width, rectHeight, color );
-                it++;
+                ++it;
             }
             else
             {
@@ -475,7 +475,7 @@ void CtrlList::makeImage()
 
     // Draw the items
     int yPos = 0;
-    for( it = m_rList[m_lastPos]; it != m_rList.end() && yPos < height; it++ )
+    for( it = m_rList[m_lastPos]; it != m_rList.end() && yPos < height; ++it )
     {
         UString *pStr = (UString*)(it->m_cString.get());
         uint32_t color = ( it->m_playing ? m_playColor : m_fgColor );

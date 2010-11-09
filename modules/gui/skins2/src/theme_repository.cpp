@@ -66,14 +66,14 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
     list<string> resPath = pOsFactory->getResourcePath();
     list<string>::const_iterator it;
-    for( it = resPath.begin(); it != resPath.end(); it++ )
+    for( it = resPath.begin(); it != resPath.end(); ++it )
     {
         parseDirectory( *it );
     }
 
     // retrieve skins from skins directories and locate default skins
     map<string,string>::const_iterator itmap, itdefault;
-    for( itmap = m_skinsMap.begin(); itmap != m_skinsMap.end(); itmap++ )
+    for( itmap = m_skinsMap.begin(); itmap != m_skinsMap.end(); ++itmap )
     {
         string name = itmap->first;
         string path = itmap->second;
@@ -223,7 +223,7 @@ void ThemeRepository::updateRepository()
     // add this new skins if not yet present in repository
     string current( psz_current );
     map<string,string>::const_iterator it;
-    for( it = m_skinsMap.begin(); it != m_skinsMap.end(); it++ )
+    for( it = m_skinsMap.begin(); it != m_skinsMap.end(); ++it )
     {
         if( it->second == current )
             break;

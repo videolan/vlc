@@ -180,14 +180,14 @@ void Theme::saveConfig()
     map<string, TopWindowPtr>::const_iterator itWin;
     map<string, GenericLayoutPtr>::const_iterator itLay;
     ostringstream outStream;
-    for( itWin = m_windows.begin(); itWin != m_windows.end(); itWin++ )
+    for( itWin = m_windows.begin(); itWin != m_windows.end(); ++itWin )
     {
         TopWindow *pWin = itWin->second.get();
 
         // Find the layout id for this window
         string layoutId;
         const GenericLayout *pLayout = &pWin->getActiveLayout();
-        for( itLay = m_layouts.begin(); itLay != m_layouts.end(); itLay++ )
+        for( itLay = m_layouts.begin(); itLay != m_layouts.end(); ++itLay )
         {
             if( itLay->second.get() == pLayout )
             {

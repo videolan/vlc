@@ -92,7 +92,7 @@ void XMLParser::LoadCatalog()
 
     // Try to load the catalog first (needed at least on win32 where
     // we don't have a default catalog)
-    for( it = resPath.begin(); it != resPath.end(); it++ )
+    for( it = resPath.begin(); it != resPath.end(); ++it )
     {
         string catalog_path = (*it) + sep + "skin.catalog";
         if( !stat( catalog_path.c_str(), &statBuf ) )
@@ -108,7 +108,7 @@ void XMLParser::LoadCatalog()
         xml_CatalogLoad( m_pXML, 0 );
     }
 
-    for( it = resPath.begin(); it != resPath.end(); it++ )
+    for( it = resPath.begin(); it != resPath.end(); ++it )
     {
         string path = (*it) + sep + "skin.dtd";
         if( !stat( path.c_str(), &statBuf ) )
@@ -180,7 +180,7 @@ bool XMLParser::parse()
                 {
                     free( (char *)it->first );
                     free( (char *)it->second );
-                    it++;
+                    ++it;
                 }
                 break;
             }

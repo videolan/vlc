@@ -1014,7 +1014,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         return VLC_EGENERIC;
 
     list<string>::iterator iter;
-    for( iter = list_devices.begin(); iter != list_devices.end(); iter++ )
+    for( iter = list_devices.begin(); iter != list_devices.end(); ++iter )
         msg_Dbg( p_this, "found device: %s", iter->c_str() );
 
     /* If no device name was specified, pick the 1st one */
@@ -2043,7 +2043,7 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 
     list<string>::iterator iter;
     for( iter = list_devices.begin(), i = 2; iter != list_devices.end();
-         iter++, i++ )
+         ++iter, i++ )
     {
         p_item->ppsz_list[i] = strdup( iter->c_str() );
         p_item->ppsz_list_text[i] = NULL;
