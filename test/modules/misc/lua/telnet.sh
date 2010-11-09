@@ -1,7 +1,7 @@
 #!/bin/sh
 
 TELNET_FAIL="telnet_fail"
-PORT=$$
+PORT=`echo "$$+1024" | bc`
 
 killer()
 {
