@@ -104,8 +104,13 @@ static int Open(vlc_object_t *object)
      * Reusing WriteXSPF from the zip access is probably a good idea
      * (becareful about '\' and '/'.
      */
+    char *mrl;
+    if (asprintf(&mrl, "%s://%s", s->psz_access, s->psz_path)< 0)
+        mrl = NULL;
     char *base;
-    char *encoded = encode_URI_component(s->psz_path);
+    char *encoded = mrl ? encode_URI_component(mrl) : NULL;
+    free(mrl);
+
     if (!encoded || asprintf(&base, "rar://%s", encoded) < 0)
         base = NULL;
     free(encoded);
