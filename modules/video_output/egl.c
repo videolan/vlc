@@ -33,6 +33,9 @@
 #include <vlc_vout_display.h>
 #include <vlc_vout_opengl.h>
 #include "opengl.h"
+#ifdef __unix__
+# include <vlc_xlib.h>
+#endif
 
 #if USE_OPENGL_ES
 # define VLC_API_NAME "OpenGL_ES"
@@ -139,6 +142,10 @@ static vout_window_t *MakeWindow (vout_display_t *vd, EGLNativeWindowType *id)
  */
 static int Open (vlc_object_t *obj)
 {
+#ifdef __unix__
+    if (!vlc_xlib_init (obj))
+        return VLC_EGENERIC;
+#endif
     vout_display_t *vd = (vout_display_t *)obj;
 
     /* Initialize EGL display */

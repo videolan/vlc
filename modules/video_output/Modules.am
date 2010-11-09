@@ -92,7 +92,7 @@ libegl_plugin_la_CFLAGS = $(AM_CFLAGS) \
 libegl_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(EGL_LIBS) $(GL_LIBS)
 if !HAVE_WIN32
-libegl_plugin_la_LIBADD += -ldl
+libegl_plugin_la_LIBADD += -ldl $(X_LIBS) $(X_PRE_LIBS) -lX11
 endif
 libegl_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libegl_plugin.la
