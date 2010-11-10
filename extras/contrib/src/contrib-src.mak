@@ -881,7 +881,7 @@ VPX_TARGET-$(ENABLED)             = $(TARGET)
 VPX_TARGET-$(HAVE_WIN32)          = x86-win32-gcc
 
 VPX_DEPS-$(ENABLED)               =
-VLX_DEPS-$(HAVE_MACOSX_ON_INTEL) += .yasm
+VPX_DEPS-$(HAVE_MACOSX_ON_INTEL) += .yasm
 
 .libvpx: libvpx $(VPX_DEPS-1)
 	(cd $<; CROSS=$(CROSS) ./configure --target=$(VPX_TARGET-1) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-install-docs --disable-examples --disable-vp8-decoder && make && make install)
