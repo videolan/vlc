@@ -356,7 +356,7 @@ net_IPv4Join (vlc_object_t *obj, int fd,
     socklen_t optlen;
 
     /* Multicast interface IPv4 address */
-    char *iface = var_CreateGetNonEmptyString (obj, "miface-addr");
+    char *iface = var_InheritString (obj, "miface-addr");
     if ((iface != NULL)
      && (inet_pton (AF_INET, iface, &id) <= 0))
     {
@@ -459,7 +459,7 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
 {
     int level, iid = 0;
 
-    char *iface = var_CreateGetNonEmptyString (obj, "miface");
+    char *iface = var_InheritString (obj, "miface");
     if (iface != NULL)
     {
         iid = if_nametoindex (iface);
@@ -649,7 +649,7 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
     bool      b_unreach = false;
 
     if( i_hlim < 0 )
-        i_hlim = var_CreateGetInteger( p_this, "ttl" );
+        i_hlim = var_InheritInteger( p_this, "ttl" );
 
     memset( &hints, 0, sizeof( hints ) );
     hints.ai_socktype = SOCK_DGRAM;
@@ -684,21 +684,21 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
         if( i_hlim >= 0 )
             net_SetMcastHopLimit( p_this, fd, ptr->ai_family, i_hlim );
 
-        str = var_CreateGetNonEmptyString (p_this, "miface");
+        str = var_InheritString (p_this, "miface");
         if (str != NULL)
         {
             net_SetMcastOut (p_this, fd, ptr->ai_family, str, NULL);
             free (str);
         }
 
-        str = var_CreateGetNonEmptyString (p_this, "miface-addr");
+        str = var_InheritString (p_this, "miface-addr");
         if (str != NULL)
         {
             net_SetMcastOut (p_this, fd, ptr->ai_family, NULL, str);
             free (str);
         }
 
-        net_SetDSCP (fd, var_CreateGetInteger (p_this, "dscp"));
+        net_SetDSCP (fd, var_InheritInteger (p_this, "dscp"));
 
         if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) == 0 )
         {

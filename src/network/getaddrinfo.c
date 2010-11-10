@@ -137,11 +137,11 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     if( hints.ai_family == AF_UNSPEC )
     {
 #ifdef AF_INET6
-        if (var_CreateGetBool (p_this, "ipv6"))
+        if (var_InheritBool (p_this, "ipv6"))
             hints.ai_family = AF_INET6;
         else
 #endif
-        if (var_CreateGetBool (p_this, "ipv4"))
+        if (var_InheritBool (p_this, "ipv4"))
             hints.ai_family = AF_INET;
     }
 

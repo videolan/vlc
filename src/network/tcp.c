@@ -88,7 +88,7 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     hints.ai_socktype = type;
     hints.ai_protocol = proto;
 
-    psz_socks = var_CreateGetNonEmptyString( p_this, "socks" );
+    psz_socks = var_InheritString( p_this, "socks" );
     if( psz_socks != NULL )
     {
         char *psz = strchr( psz_socks, ':' );
@@ -224,8 +224,8 @@ next_ai: /* failure */
     if( psz_socks != NULL )
     {
         /* NOTE: psz_socks already free'd! */
-        char *psz_user = var_CreateGetNonEmptyString( p_this, "socks-user" );
-        char *psz_pwd  = var_CreateGetNonEmptyString( p_this, "socks-pwd" );
+        char *psz_user = var_InheritString( p_this, "socks-user" );
+        char *psz_pwd  = var_InheritString( p_this, "socks-pwd" );
 
         if( SocksHandshakeTCP( p_this, i_handle, 5, psz_user, psz_pwd,
                                psz_host, i_port ) )
