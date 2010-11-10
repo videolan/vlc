@@ -159,7 +159,7 @@ void ActionsManager::record()
 
             char *psz = input_item_GetURI( p_item );
             if( psz )
-                THEDP->streamingDialog( NULL, psz, true );
+                THEDP->streamingDialog( NULL, qfu(psz), true );
         }
 #endif
     }
