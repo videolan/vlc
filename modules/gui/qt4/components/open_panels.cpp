@@ -279,13 +279,13 @@ void FileOpenPanel::updateMRL()
         for( int i = 0; i < ui.fileListWidg->count(); i++ )
         {
             if( !ui.fileListWidg->item( i )->text().isEmpty() )
-                fileList << ui.fileListWidg->item( i )->text();
+                fileList << toURI(ui.fileListWidg->item( i )->text());
         }
     else
     {
         fileList = dialogBox->selectedFiles();
         for( int i = 0; i < fileList.count(); i++ )
-            fileList[i] = toNativeSeparators( fileList[i] );
+            fileList[i] = toURI( fileList[i] );
     }
 
     /* Options */
