@@ -486,20 +486,8 @@ VLC_PUBLIC_API void *libvlc_media_get_user_data( libvlc_media_t *p_md );
 /**
  * Get media descriptor's elementary streams description
  *
- * Note, you need to play the media _one_ time with --sout="#description"
- * Not doing this will result in an empty array, and doing it more than once
- * will duplicate the entries in the array each time. Something like this:
- *
- * @begincode
- * libvlc_media_player_t *player = libvlc_media_player_new_from_media(media);
- * libvlc_media_add_option_flag(media, "sout=#description");
- * libvlc_media_player_play(player);
- * // ... wait until playing
- * libvlc_media_player_release(player);
- * @endcode
- *
- * This is very likely to change in next release, and be done at the parsing
- * phase.
+ * Note, you need to call libvlc_media_parse() before calling this function.
+ * Not doing this will result in an empty array.
  *
  * \param p_md media descriptor object
  * \param tracks address to store an allocated array of Elementary Streams
