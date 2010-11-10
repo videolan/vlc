@@ -275,6 +275,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		util/input_slider.cpp \
 		util/customwidgets.cpp \
 		util/registry.cpp \
+		util/qt_dirs.cpp \
 		util/pictureflow.cpp
 
 noinst_HEADERS = \

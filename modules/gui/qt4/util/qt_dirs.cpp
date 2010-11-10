@@ -1,10 +1,7 @@
 /*****************************************************************************
- * dirs.hpp : String Directory helpers
+ * dirs.cpp : file path helpers
  ****************************************************************************
- * Copyright (C) 2006-2008 the VideoLAN team
- * $Id$
- *
- * Authors:       Jean-Baptiste Kempf <jb@videolan.org>
+ * Copyright (C) 2010 the VideoLAN team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,32 +18,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _QT_DIR_H_
-#define _QT_DIR_H_
-
-#include <QString>
-#include <QDir>
-
-#define toNativeSeparators( s ) QDir::toNativeSeparators ( s )
-
-static inline QString removeTrailingSlash( QString s )
-{
-    if( ( s.length() > 1 ) && ( s[s.length()-1] == QLatin1Char( '/' ) ) )
-        s.remove( s.length() - 1, 1 );
-    return s;
-}
-
-#define savedirpathFromFile( a ) p_intf->p_sys->filepath = toNativeSeparators( QFileInfo( a ).path() )
-#define toNativeSepNoSlash( a ) toNativeSeparators( removeTrailingSlash( a ) )
-
-static inline QString colon_escape( QString s )
-{
-    return s.replace( ":", "\\:" );
-}
-static inline QString colon_unescape( QString s )
-{
-    return s.replace( "\\:", ":" ).trimmed();
-}
-
-QString toURI( const QString& s );
+#ifdef HAVE_CONFIG_H
+# include <config.h>
 #endif
+
+#include "qt4.hpp"
+#include "qt_dirs.hpp"
+#include <vlc_url.h>
+
+QString toURI( const QString& s )
+{
+    QString path = toNativeSeparators( s );
+
+    char *psz = make_URI( qtu(path), NULL );
+    if( psz == NULL )
+        return qfu("");
+
+    QString uri = qfu( psz );
+    free( psz );
+    return uri;
+}
