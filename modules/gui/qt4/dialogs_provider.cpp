@@ -433,19 +433,16 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
 void DialogsProvider::addFromSimple( bool pl, bool go)
 {
     QStringList files = DialogsProvider::showSimpleOpen();
-    int i = 0;
+    int mode = go ? PLAYLIST_GO : PLAYLIST_PREPARSE;
+
     files.sort();
     foreach( const QString &file, files )
     {
-        char* psz_uri = make_URI( qtu( toNativeSeparators(file) ), NULL );
-        playlist_Add( THEPL, psz_uri, NULL,
-                      go ? ( PLAYLIST_APPEND | ( i ? PLAYLIST_PREPARSE : PLAYLIST_GO ) )
-                         : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
+        QString url = toURI( file );
+        playlist_Add( THEPL, qtu( url ), NULL, PLAYLIST_APPEND | mode,
                       PLAYLIST_END, pl, pl_Unlocked );
-        free( psz_uri );
-        RecentsMRL::getInstance( p_intf )->addRecent(
-                toNativeSeparators( file ) );
-        i++;
+        RecentsMRL::getInstance( p_intf )->addRecent( url );
+        mode = PLAYLIST_PREPARSE;
     }
 }
 
