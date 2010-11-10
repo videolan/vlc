@@ -327,7 +327,8 @@ VLC_PUBLIC_API uint32_t libvlc_media_player_get_agl ( libvlc_media_player_t *p_m
  * The specified identifier must correspond to an existing Input/Output class
  * X11 window. Pixmaps are <b>not</b> supported. The caller shall ensure that
  * the X11 server is the same as the one the VLC instance has been configured
- * with.
+ * with. This function must be called before video playback is started;
+ * otherwise it will only take effect after playback stop and restart.
  *
  * \param p_mi the Media Player
  * \param drawable the ID of the X window
