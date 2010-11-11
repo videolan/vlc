@@ -2648,7 +2648,7 @@ then
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${AVFORMAT_CFLAGS}"
       CFLAGS="${CFLAGS} ${AVFORMAT_CFLAGS}"
-      AC_CHECK_HEADERS(libavformat/avformat.h ffmpeg/avformat.h)
+      AC_CHECK_HEADERS(libavformat/avformat.h ffmpeg/avformat.h libavformat/avio.h)
       AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
       AS_IF([test "$enable_merge_ffmpeg" = "no"], [
         VLC_ADD_PLUGIN([avformat access_avio])

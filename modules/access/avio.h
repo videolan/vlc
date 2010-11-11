@@ -24,6 +24,9 @@
 /* ffmpeg header */
 #if defined(HAVE_LIBAVFORMAT_AVFORMAT_H)
 #   include <libavformat/avformat.h>
+#   if defined(HAVE_LIBAVFORMAT_AVIO_H)
+#      include <libavformat/avio.h>
+#   endif
 #elif defined(HAVE_FFMPEG_AVFORMAT_H)
 #   include <ffmpeg/avformat.h>
 #endif
