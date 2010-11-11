@@ -77,6 +77,54 @@ libVLC:
   ** libvlc_media_player_navigate for DVD navigation
 
 
+Changes between 1.1.4.1 and 1.1.5:
+----------------------------------
+
+Security:
+ * Fix a Windows crash on accessing Network Shared files/drives, 
+   VideoLAN-SA-1006
+
+Access:
+ * Support for RTP access for H264 streams by specifying the demux in the MRL
+
+Services Discovery:
+ * Integration in the playlist, of a list of web shows, provided by channels.com
+
+Demuxers:
+ * Game Music Emu (GME) plugin rewritten, using the proper C API
+ * DVDnav and DVDread fixes for encoding and misc issues
+ * Playback of live http .Webm streams
+ * Taglib thread-safety fix
+
+Decoders:
+ * Fix decoding of H264 using DxVA2 using Intel IGP, thanks to the donation from
+   "Puget Systems"
+
+Skins:
+ * Add an icon to VLC on Linux
+
+Video Output:
+ * fix a bug that could lead to 100% CPU usage on XCB
+
+Interfaces:
+ * fix for Qt bug where VLC didn't exit properly on some Windows XP configuration
+ * fixes on luatelnet and luarc
+
+Miscellaneous crashes and fixes in various plugins (telnet, live555, theora and
+ TS-mux, Qt)
+
+libLVC:
+ * add libvlc_media_new_fd() to play directly file descriptors (not Win32/Win64)
+ * Miscellaneous fixes
+
+Translations:
+ * Update translations for Walloon, Lithuanian, Spanish, Turkish, Estonian, Dutch,
+   Bengali, German, Polish, Brazillian Portuguese, Japanese, Italian, Galician,
+   French and Ukrainian
+ * Major update and activation on Windows of Modern Greek
+ * New Asturian translation
+
+
 Changes between 1.1.4 and 1.1.4.1:
 ----------------------------------
 
