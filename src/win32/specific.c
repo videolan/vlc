@@ -65,6 +65,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
         }
         else psz_path[0] = '\0';
     }
+    else psz_path[0] = '\0';
 
     psz_vlc = strrchr( psz_path, '\\' );
     if( psz_vlc )
