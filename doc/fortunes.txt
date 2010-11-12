@@ -929,4 +929,25 @@ VLC development is NOT about being a sed god.
 < TypX> I'd say the man who is still playing starcraft 1 is still a virgin
  -- #videolan
 %
+< sam> is there still a way to force the video decoder used by VLC? --codec no longer exists
+< mru> there's always butterflies
+< j-b> sam: --codec avcodec,none still works and exists
+< linkfanel> maybe sam is one branch ahead of us
+< j-b> very likely
+< xxcv> vlc-1.3 ?
+< ILEoo> vlc 2.0
+< ILEoo> like web 2.0
+< mru> someone is rewriting vlc in javascript?
+
+< sam> duh!
+< sam> j-b: you're right, I don't know what I smoked
+< mru> must've been good though, care to share it?
+< ILEoo> sam: hope you didn't smoke it all allready?
+< j-b> sam: I hope you could tell me what you smoked
+< sam> as a matter of fact, I know exactly what I smoked
+< sam> but it's not that good
+< linkfanel> you remember? i guess you didn't smoke enough of it
+< ILEoo> you smoked some capacitors from your motherboard? they're full of vitamins
+ -- #videolan, one _morning_
+%
 
