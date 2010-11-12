@@ -58,6 +58,7 @@
 #include "vlm_event.h"
 #include <vlc_vod.h>
 #include <vlc_sout.h>
+#include <vlc_url.h>
 #include "../stream_output/stream_output.h"
 #include "../libvlc.h"
 
@@ -586,8 +587,11 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             int i;
 
             vlc_gc_decref( p_media->vod.p_item );
-            p_media->vod.p_item = input_item_New( p_vlm, p_cfg->ppsz_input[0],
+
+            char *psz_uri = make_URI( p_cfg->ppsz_input[0], NULL );
+            p_media->vod.p_item = input_item_New( p_vlm, psz_uri,
                 p_cfg->psz_name );
+            free( psz_uri );
 
             if( p_cfg->psz_output )
             {
@@ -960,7 +964,10 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
 
     /* Start new one */
     p_instance->i_index = i_input_index;
-    input_item_SetURI( p_instance->p_item, p_media->cfg.ppsz_input[p_instance->i_index] ) ;
+    char *psz_uri = make_URI( p_media->cfg.ppsz_input[p_instance->i_index],
+                              NULL );
+    input_item_SetURI( p_instance->p_item, psz_uri ) ;
+    free( psz_uri );
 
     if( asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name ) != -1 )
     {
