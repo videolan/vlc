@@ -28,6 +28,14 @@
 
 /* CC have a maximum rate of 9600 bit/s (per field?) */
 #define CC_MAX_DATA_SIZE (2 * 3*600)
+enum
+{
+    CC_PAYLOAD_NONE,
+    CC_PAYLOAD_GA94,
+    CC_PAYLOAD_DVD,
+    CC_PAYLOAD_REPLAYTV,
+    CC_PAYLOAD_SCTE20,
+};
 typedef struct
 {
     /* Which channel are present */
@@ -35,6 +43,10 @@ typedef struct
 
     /* */
     bool b_reorder;
+
+    /* */
+    int i_payload_type;
+    int i_payload_other_count;
 
     /* CC data per field
      *  byte[x+0]: field (0/1)
@@ -53,6 +65,8 @@ static inline void cc_Init( cc_data_t *c )
         c-> pb_present[i] = false; 
     c->i_data = 0;
     c->b_reorder = false;
+    c->i_payload_type = CC_PAYLOAD_NONE;
+    c->i_payload_other_count = 0;
 }
 static inline void cc_Exit( cc_data_t *c )
 {
@@ -87,14 +101,57 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
     static const uint8_t p_cc_replaytv5b[2] = { 0xaa, 0x02 };
     static const uint8_t p_cc_scte20[2] = { 0x03, 0x81 };
     static const uint8_t p_cc_scte20_old[2] = { 0x03, 0x01 };
-    //static const uint8_t p_afd_start[4] = { 0x44, 0x54, 0x47, 0x31 };
 
     if( i_src < 4 )
         return;
 
+    int i_payload_type;
     if( !memcmp( p_cc_ga94, p_src, 4 ) && i_src >= 5+1+1+1 && p_src[4] == 0x03 )
     {
-        /* Extract CC from DVB/ATSC TS */
+        /* CC from DVB/ATSC TS */
+        i_payload_type = CC_PAYLOAD_GA94;
+    }
+    else if( !memcmp( p_cc_dvd, p_src, 4 ) && i_src > 4+1 )
+    {
+        i_payload_type = CC_PAYLOAD_DVD;
+    }
+    else if( i_src >= 2+2 + 2+2 &&
+             ( ( !memcmp( p_cc_replaytv4a, &p_src[0], 2 ) && !memcmp( p_cc_replaytv4b, &p_src[4], 2 ) ) ||
+               ( !memcmp( p_cc_replaytv5a, &p_src[0], 2 ) && !memcmp( p_cc_replaytv5b, &p_src[4], 2 ) ) ) )
+    {
+        i_payload_type = CC_PAYLOAD_REPLAYTV;
+    }
+    else if( ( !memcmp( p_cc_scte20, p_src, 2 ) ||
+               !memcmp( p_cc_scte20_old, p_src, 2 ) ) && i_src > 2 )
+    {
+        i_payload_type = CC_PAYLOAD_SCTE20;
+    }
+    else
+    {
+#if 0
+#define V(x) ( ( x < 0x20 || x >= 0x7f ) ? '?' : x )
+        fprintf( stderr, "-------------- unknown user data " );
+        for( int i = 0; i < i_src; i++ )
+            fprintf( stderr, "%2.2x ", p_src[i] );
+        for( int i = 0; i < i_src; i++ )
+            fprintf( stderr, "%c ", V(p_src[i]) );
+        fprintf( stderr, "\n" );
+#undef V
+#endif
+        return;
+    }
+
+    if( c->i_payload_type != CC_PAYLOAD_NONE && c->i_payload_type != i_payload_type )
+    {
+        c->i_payload_other_count++;
+        if( c->i_payload_other_count < 50 )
+            return;
+    }
+    c->i_payload_type        = i_payload_type;
+    c->i_payload_other_count = 0;
+
+    if( i_payload_type == CC_PAYLOAD_GA94 )
+    {
         /* cc_data()
          *          u1 reserved(1)
          *          u1 process_cc_data_flag
@@ -143,9 +200,8 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
         }
         c->b_reorder = true;
     }
-    else if( !memcmp( p_cc_dvd, p_src, 4 ) && i_src > 4+1 )
+    else if( i_payload_type == CC_PAYLOAD_DVD )
     {
-        /* DVD CC */
         const int b_truncate = p_src[4] & 0x01;
         const int i_field_first = (p_src[4] & 0x80) ? 0 : 1;
         const int i_count_cc2 = (p_src[4] >> 1) & 0xf;
@@ -173,11 +229,8 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
         }
         c->b_reorder = false;
     }
-    else if( i_src >= 2+2 + 2+2 &&
-             ( ( !memcmp( p_cc_replaytv4a, &p_src[0], 2 ) && !memcmp( p_cc_replaytv4b, &p_src[4], 2 ) ) ||
-               ( !memcmp( p_cc_replaytv5a, &p_src[0], 2 ) && !memcmp( p_cc_replaytv5b, &p_src[4], 2 ) ) ) )
+    else if( i_payload_type == CC_PAYLOAD_REPLAYTV )
     {
-        /* ReplayTV CC */
         const uint8_t *cc = &p_src[0];
         int i;
         if( c->i_data + 2*3 > CC_MAX_DATA_SIZE )
@@ -191,10 +244,8 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
         }
         c->b_reorder = false;
     }
-    else if( ( !memcmp( p_cc_scte20, p_src, 2 ) ||
-               !memcmp( p_cc_scte20_old, p_src, 2 ) ) && i_src > 2 )
+    else
     {
-        /* SCTE-20 CC */
         bs_t s;
         bs_init( &s, &p_src[2], i_src - 2 );
         const int i_cc_count = bs_read( &s, 5 );
@@ -225,20 +276,6 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
             cc_AppendData( c, i_field, &cc[0] );
         }
         c->b_reorder = true;
-    }
-    else
-    {
-#if 0
-#define V(x) ( ( x < 0x20 || x >= 0x7f ) ? '?' : x )
-        fprintf( stderr, "-------------- unknown user data " );
-        for( int i = 0; i < i_src; i++ )
-            fprintf( stderr, "%2.2x ", p_src[i] );
-        for( int i = 0; i < i_src; i++ )
-            fprintf( stderr, "%c ", V(p_src[i]) );
-        fprintf( stderr, "\n" );
-#undef V
-#endif
-        /* TODO DVD CC, ... */
     }
 }
 
