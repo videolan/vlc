@@ -119,6 +119,8 @@ vlc_module_begin ()
     add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_safe()
+    add_string( "http-referrer", NULL, NULL, NULL, false )
+        change_safe()
     add_string( "http-user-agent", NULL, NULL, NULL, false )
         change_safe()
         change_private()
@@ -156,6 +158,7 @@ struct access_sys_t
     /* From uri */
     vlc_url_t url;
     char    *psz_user_agent;
+    char    *psz_referrer;
     http_auth_t auth;
 
     /* Proxy */
@@ -281,6 +284,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     p_sys->b_icecast = false;
     p_sys->psz_location = NULL;
     p_sys->psz_user_agent = NULL;
+    p_sys->psz_referrer = NULL;
     p_sys->b_pace_control = true;
     p_sys->b_ssl = false;
 #ifdef HAVE_ZLIB_H
@@ -349,6 +353,9 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
                 *p = '_'; /* remove potentially harmful characters */
         }
     }
+
+    /* HTTP referrer */
+    p_sys->psz_referrer = var_InheritString( p_access, "http-referrer" );
 
     /* Check proxy */
     psz = var_InheritString( p_access, "http-proxy" );
@@ -596,6 +603,7 @@ connect:
         free( p_sys->psz_pragma );
         free( p_sys->psz_location );
         free( p_sys->psz_user_agent );
+        free( p_sys->psz_referrer );
 
         Disconnect( p_access );
         cookies = p_sys->cookies;
@@ -690,6 +698,7 @@ error:
     free( p_sys->psz_pragma );
     free( p_sys->psz_location );
     free( p_sys->psz_user_agent );
+    free( p_sys->psz_referrer );
 
     Disconnect( p_access );
 
@@ -730,6 +739,7 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->psz_icy_title );
 
     free( p_sys->psz_user_agent );
+    free( p_sys->psz_referrer );
 
     Disconnect( p_access );
 
@@ -1275,6 +1285,13 @@ static int Request( access_t *p_access, uint64_t i_tell )
     net_Printf( p_access, p_sys->fd, pvs,
                 "User-Agent: %s\r\n",
                 p_sys->psz_user_agent );
+    /* Referrer */
+    if (p_sys->psz_referrer)
+    {
+        net_Printf( p_access, p_sys->fd, pvs,
+                    "Referer: %s\r\n",
+                    p_sys->psz_referrer);
+    }
     /* Offset */
     if( p_sys->i_version == 1 && ! p_sys->b_continuous )
     {
