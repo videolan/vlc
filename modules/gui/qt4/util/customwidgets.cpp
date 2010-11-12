@@ -424,12 +424,13 @@ int qtEventToVLCKey( QKeyEvent *e )
     uint32_t i_vlck = 0;
 
     if( qtk <= 0xff )
-        /* VLC and X11 use lowercase whereas Qt uses uppercase */
-#if defined( __STDC_ISO_10646__ ) || defined( _WIN32 ) || defined( __APPLE__ )
-        i_vlck = towlower( qtk );
-#else
-# error FIXME
-#endif
+    {
+        /* VLC and X11 use lowercase whereas Qt uses uppercase, this
+         * method should be equal to towlower in case of latin1 */
+        if( qtk >= 'A' && qtk <= 'Z' ) i_vlck = qtk+32;
+        else if( qtk >= 0xC0 && qtk <= 0xDE && qtk != 0xD7) i_vlck = qtk+32;
+        else i_vlck = qtk;
+    }
     else
     {
         const vlc_qt_key_t *map;
