@@ -383,7 +383,7 @@ mtime_t chapter_edition_c::Duration() const
     if ( sub_chapters.size() )
     {
         std::vector<chapter_item_c*>::const_iterator index = sub_chapters.end();
-        index--;
+        --index;
         i_result = (*index)->i_user_end_time;
     }
  

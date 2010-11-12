@@ -70,19 +70,19 @@ matroska_segment_c::~matroska_segment_c()
     while ( index != stored_editions.end() )
     {
         delete (*index);
-        index++;
+        ++index;
     }
     std::vector<chapter_translation_c*>::iterator indext = translations.begin();
     while ( indext != translations.end() )
     {
         delete (*indext);
-        indext++;
+        ++indext;
     }
     std::vector<KaxSegmentFamily*>::iterator indexf = families.begin();
     while ( indexf != families.end() )
     {
         delete (*indexf);
-        indexf++;
+        ++indexf;
    }
 }
 

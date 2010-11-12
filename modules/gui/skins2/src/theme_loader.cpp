@@ -296,7 +296,7 @@ bool ThemeLoader::extract( const string &fileName )
             // Look for winamp2.xml in the resource path
             list<string> resPath = pOsFactory->getResourcePath();
             list<string>::const_iterator it;
-            for( it = resPath.begin(); it != resPath.end(); it++ )
+            for( it = resPath.begin(); it != resPath.end(); ++it )
             {
                 if( findFile( *it, WINAMP2_XML_FILE, xmlFile ) )
                     break;

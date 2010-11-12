@@ -124,7 +124,7 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
         {
             m_epgView->delEvent( item );
             delete item;
-            i--;
+            --i;
             m_events.erase( i + 1 );
         }
         else

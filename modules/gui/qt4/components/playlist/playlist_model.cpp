@@ -553,7 +553,7 @@ PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_input ) const
             if( childFound )
                 return childFound;
         }
-        it++;
+        ++it;
     }
     return NULL;
 }
