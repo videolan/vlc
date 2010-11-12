@@ -177,12 +177,13 @@ static int Mouse(filter_t *filter, vlc_mouse_t *mouse,
 static int Open(vlc_object_t *object)
 {
     filter_t *filter = (filter_t *)object;
+    const video_format_t *src = &filter->fmt_in.video;
+    video_format_t       *dst = &filter->fmt_out.video;
 
     const vlc_chroma_description_t *chroma =
-        vlc_fourcc_GetChromaDescription(filter->fmt_in.video.i_chroma);
+        vlc_fourcc_GetChromaDescription(src->i_chroma);
     if (!chroma || chroma->plane_count < 3) {
-        msg_Err(filter, "Unsupported chroma (%4.4s)",
-                (char*)&filter->fmt_in.video.i_chroma);
+        msg_Err(filter, "Unsupported chroma (%4.4s)", (char*)&src->i_chroma);
         /* TODO support packed and rgb */
         return VLC_EGENERIC;
     }
@@ -213,8 +214,6 @@ static int Open(vlc_object_t *object)
             free(sys);
             return VLC_EGENERIC;
         }
-        const video_format_t *src = &filter->fmt_in.video;
-        video_format_t       *dst = &filter->fmt_out.video;
 
         dst->i_width          = src->i_height;
         dst->i_visible_width  = src->i_visible_height;
@@ -222,18 +221,18 @@ static int Open(vlc_object_t *object)
         dst->i_visible_height = src->i_visible_width;
         dst->i_sar_num        = src->i_sar_den;
         dst->i_sar_den        = src->i_sar_num;
+    }
 
-        dst->i_x_offset       = INT_MAX;
-        dst->i_y_offset       = INT_MIN;
-        for (int i = 0; i < 2; i++) {
-            int tx, ty;
-            sys->dsc->iconvert(&tx, &ty,
-                               src->i_width, src->i_height,
-                               src->i_x_offset + i * src->i_visible_width,
-                               src->i_y_offset + i * src->i_visible_height);
-            dst->i_x_offset = __MIN(dst->i_x_offset, (unsigned)tx);
-            dst->i_y_offset = __MIN(dst->i_y_offset, (unsigned)ty);
-        }
+    dst->i_x_offset       = INT_MAX;
+    dst->i_y_offset       = INT_MAX;
+    for (int i = 0; i < 2; i++) {
+        int tx, ty;
+        sys->dsc->iconvert(&tx, &ty,
+                           src->i_width, src->i_height,
+                           src->i_x_offset + i * (src->i_visible_width  - 1),
+                           src->i_y_offset + i * (src->i_visible_height - 1));
+        dst->i_x_offset = __MIN(dst->i_x_offset, (unsigned)(1 + tx));
+        dst->i_y_offset = __MIN(dst->i_y_offset, (unsigned)(1 + ty));
     }
 
     filter->p_sys           = sys;
