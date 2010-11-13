@@ -235,10 +235,7 @@ void osd_StatesFree( osd_menu_t *p_menu, osd_state_t *p_states )
         if( p_state->p_next )
         {
             if( p_state->p_next->p_pic )
-            {
-                free( p_state->p_next->p_pic->p_data_orig );
-                free( p_state->p_next->p_pic );
-            }
+                picture_Release( p_state->p_next->p_pic );
             free( p_state->p_next->psz_state );
             free( p_state->p_next );
             p_state->p_next = NULL;
@@ -250,10 +247,7 @@ void osd_StatesFree( osd_menu_t *p_menu, osd_state_t *p_states )
         msg_Dbg( p_menu, " |- freeing state %s [%p]",
                  p_state->psz_state, p_states );
         if( p_states->p_pic )
-        {
-            free( p_states->p_pic->p_data_orig );
-            free( p_states->p_pic );
-        }
+            picture_Release( p_state->p_next->p_pic );
         free( p_state->psz_state );
         free( p_states );
     }
