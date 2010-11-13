@@ -347,7 +347,7 @@ static int Init( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     const video_format_t *p_fmti = &p_filter->fmt_in.video;
-    const video_format_t *p_fmto = &p_filter->fmt_out.video;
+    video_format_t       *p_fmto = &p_filter->fmt_out.video;
 
     if( IsFmtSimilar( p_fmti, &p_sys->fmt_in ) &&
         IsFmtSimilar( p_fmto, &p_sys->fmt_out ) &&
@@ -424,6 +424,7 @@ static int Init( filter_t *p_filter )
     p_sys->b_swap_uvi = cfg.b_swap_uvi;
     p_sys->b_swap_uvo = cfg.b_swap_uvo;
 
+    video_format_ScaleCropAr( p_fmto, p_fmti );
 #if 0
     msg_Dbg( p_filter, "%ix%i chroma: %4.4s -> %ix%i chroma: %4.4s extend by %d",
              p_fmti->i_width, p_fmti->i_height, (char *)&p_fmti->i_chroma,

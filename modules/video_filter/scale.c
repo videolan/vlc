@@ -67,6 +67,7 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    video_format_ScaleCropAr( &p_filter->fmt_out.video, &p_filter->fmt_in.video );
     p_filter->pf_video_filter = Filter;
 
     msg_Dbg( p_filter, "%ix%i -> %ix%i", p_filter->fmt_in.video.i_width,
@@ -93,6 +94,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( (p_filter->fmt_out.video.i_height == 0) ||
         (p_filter->fmt_out.video.i_width == 0) )
         return NULL;
+
+    video_format_ScaleCropAr( &p_filter->fmt_out.video, &p_filter->fmt_in.video );
 
     /* Request output picture */
     p_pic_dst = filter_NewPicture( p_filter );
