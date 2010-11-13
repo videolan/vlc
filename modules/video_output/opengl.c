@@ -93,14 +93,11 @@
 # define VLCGL_TYPE   VLCGL_RGB_TYPE
 #endif
 
-static inline int GetAlignedSize(int i_size)
+static inline int GetAlignedSize(unsigned size)
 {
-    /* Return the nearest power of 2 */
-    int i_result = 1;
-    while(i_result < i_size)
-        i_result *= 2;
-
-    return i_result;
+    /* Return the smallest larger or equal power of 2 */
+    unsigned align = 1 << (8 * sizeof (unsigned) - clz(size));
+    return ((align >> 1) == size) ? size : align;
 }
 
 int vout_display_opengl_Init(vout_display_opengl_t *vgl,
