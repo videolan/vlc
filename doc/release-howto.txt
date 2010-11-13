@@ -6,26 +6,26 @@
  * Tests: compilation, regression tests ...
 
  * Changes on the git repository
-   - update the version number everywhere it's needed
+   - Check that the version number everywhere it's needed
      · configure.ac
-   - update the NEWS files, as well as the Trac database.
-     read all the commits and add important things to the NEWS file
-   - update the milestones info on https://trac.videolan.org/vlc
-   - Add a note about the matching contrib package in INSTALL.win32
+     · NEWS
+   - Update important things and add them to the NEWS file
+   - Close the milestone on Trac https://trac.videolan.org/vlc
    - Update OpenGPG key embedded in include/vlc_update.h if needed
    - Increase the libvlccore and libvlc revisions in src/Makefile.am
       _if_and_only_if_ the ABI number has not been increased instead, in
       which case the revision goes back to zero.
 
  * Commit
+ * Tag the commit
 
  * Tarballs (Use a clean tree !!!)
-  - Use 'make distcheck' to make sure all files are exported
-    correctly
-  - copy the tar.xz file on ftp.videolan.org in
-    /opt/ftp/pub/videolan/testing/vlc-X.X.X/
+  - Use 'make distcheck' to make sure all files are exported correctly
+  - copy the tar.xz file on altair.videolan.org
+  - copy the binaries files on altair.videolan.org, if possible
   - generate SHA, MD5 hashes and OpenPGP signature of these files
     (use sha*sum --binary, md5sum --binary, gpg --sign --detach --armor)
+    Use the ~/bin/sumandsign.sh script
 
  * Contribs
   - Put a copy of the libraries or git snapshot in vlc-X.X.X/contrib
@@ -33,56 +33,40 @@
   - Update developers.v.o/vlc and www.v.o/vlc/download-sources.html
 
  * Win32 Packages
-    make the packages using the nightly builds configure/options/... , don't
-     forget --enable-update-check
-    don't forget to test the installer and uninstaller (the first 0.8.4
-    uninstaller was broken ... kind of suxxs)
-    add the .zip and .exe files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/win32/
-    generate md5 plus SHA1 hashes and gpg signature of these files
+  - configure using the extras/package/win32/configure-mingw-release.sh script
+  - move to altair and generate md5 plus SHA1 hashes and gpg signature of these files
     (c.f. Tarballs)
 
  * OS X packages
-    Information on compilation: wiki.videolan.org/OSXCompile
-    configure with --enable-update-check
-    compile the source on both a PowerPC and an Intel-based Mac. Don't try to
+  - configure using ./configure --enable-macosx
+  - compile the source on both a PowerPC and an Intel-based Mac. Don't try to
     cross-compile for either platform. Don't forget the framework.
-    use extras/package/macosx/ub.sh to create a Universal Binary. Test it on   
-     PowerPC and Intel-based Macs.
-    add the .dmg files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/macosx/
-    Nomenclature is vlc-X.X.X-$(PLATFORM).dmg respectively 
-     vlc-plugin-X.X.X-$(PLATFORM).dmg and vlckit-X.X.X-$(PLATFORM).dmg. 
-    Don't put any platform for the UB package.
-    generate md5 plus SHA1 hashes and gpg signature of these files
-     (c.f. gpg --sign --detach --armor)
+  - use extras/package/macosx/ub.sh to create a Universal Binary.
+  - move to altair and generate md5 plus SHA1 hashes and gpg signature of these files
+    (c.f. Tarballs)
 
  * Commit changes ... it never works the first time
 
  * "Tag" the release
-
     git tag -a -m "VLC Release VERSION" <VERSION>
     (Create an annotated tag, you can skip -a if you used -m)
     git push origin <VERSION>
 
-    (You are advised to play with it on the sandrox.git if you feel 
-     uncomfortable)
-
- * Move /opt/ftp/pub/videolan/testing/vlc-X.X.X to 
-     /opt/ftp/pub/videolan/vlc/X.X.X
-  - At first block access to this directory by http or ftp. Only authorize 
-     rsync.
-     This is to avoid leak as some journalists and forums seem to watch the ftp.
-  - Update the "latest" symlink
+ * Move the signed files from altair to ganesh, on /opt/ftp/pub/videolan/vlc/X.X.X
+  - At first block access to this directory by http or ftp. Only authorize rsync.
+    This is to avoid leak as some journalists and forums seem to watch the ftp.
+  - Update the "last" symlink
 
  * Update the website
-  - edit the /index.php /vlc/*.php pages
+  - edit the /index.php /vlc/*.php, include/os-specific.php files
+  - create a /vlc/release/X.X.X page
   - add a news item to news.msg
   - update the front page OS dependant screenshots if the interface changed.
 
  * "Check for updates" functionality
-  - add /opt/ftp/pub/videolan/vlc/X.X.X/vlc-X.X.X-announce
   - edit update.videolan.org/vlc/status
 
- * Mirrors
+ * Mirrors (if necessary)
   - Forwarn the mirror admins
   - Update the list of files for the mirror check 
      (/var/www/local/mirrors.v.o/files)
@@ -91,26 +75,19 @@
 
  * Update the wiki
   - edit http://wiki.videolan.org/Template:VLC:latest_version
-  - put the respective NEWS page to wiki.videolan.org/Changelog/X.X.X
-  - announce the release on the Main Page
 
- * Announce on www.gnome.org
-  - click on "Get more software"
-  - click on "Edit an existing map entry"
-  - look for the 'vlc' package
-  - update the version number and other info and submit
-  - the change is instantaneous
-
- * Announce on www.freshmeat.net (let sam do it)
+ * Announce on www.freshmeat.net (let jb or sam do it)
   - you need a freshmeat account
   - go to http://www.freshmeat.net/projects/vlc/
-  - click on the release's branch (i.e. Stable)
-  - chose "add release" in the drop-down menu
+  - chose "Submit a release" in the right menu
   - fill out all the info and submit
   - the update can take several hours
 
  * Announce on VersionTracker
   - ask Meuuh
+
+ * Announce on twitter and facebook...
+  Unfortunately, those are more followed than the other means
 
  * Announce email and forum topic
   - write something along the lines of previous releases
