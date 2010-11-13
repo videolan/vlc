@@ -687,7 +687,7 @@ static vout_window_t *VoutDisplayNewWindow(vout_display_t *vd, const vout_window
         if (!var_InheritBool(osys->vout, "embedded-video"))
             cfg_override.is_standalone = true;
 
-        return vout_window_New(VLC_OBJECT(osys->vout), NULL, &cfg_override);
+        return vout_window_New(VLC_OBJECT(osys->vout), "$window", &cfg_override);
     }
 #endif
     return vout_NewDisplayWindow(osys->vout, vd, cfg);
