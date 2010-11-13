@@ -509,7 +509,6 @@ static void VlcPictureToIplImage( vout_thread_t *p_vout, picture_t *p_in )
 
     //Hack the above opencv image array into a picture_t so that it can be sent to
     //another video filter
-    p_sys->hacked_pic.p_data_orig = p_sys->p_cv_image;
     p_sys->hacked_pic.i_planes = planes;
     p_sys->hacked_pic.format.i_chroma = fmt_out.i_chroma;
 

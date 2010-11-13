@@ -139,9 +139,6 @@ static void CloseFilter( vlc_object_t *p_this )
 
 /****************************************************************************
  * Filter: Check for faces and raises an event when one is found.
- ****************************************************************************
- * p_pic: A picture_t with its p_data_orig member set to an array of
- * IplImages (one image for each picture_t plane).
  ****************************************************************************/
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
@@ -156,13 +153,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         msg_Err( p_filter, "no image array" );
         return NULL;
     }
-    if (!(p_pic->p_data_orig))
-    {
-        msg_Err( p_filter, "no image array" );
-        return NULL;
-    }
     //(hack) cast the picture_t to array of IplImage*
-    p_img = (IplImage**) p_pic->p_data_orig;
+    p_img = (IplImage**) p_pic->p[0].p_pixels;
     i_planes = p_pic->i_planes;
 
     //check the image array for validity
