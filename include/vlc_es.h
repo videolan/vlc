@@ -178,6 +178,11 @@ VLC_EXPORT( void, video_format_Setup, ( video_format_t *, vlc_fourcc_t i_chroma,
 VLC_EXPORT( void, video_format_CopyCrop, ( video_format_t *, const video_format_t * ) );
 
 /**
+ * It will compute the crop/ar properties when scaling.
+ */
+VLC_EXPORT( void, video_format_ScaleCropAr, ( video_format_t *, const video_format_t * ) );
+
+/**
  * This function will check if the first video format is similar
  * to the second one.
  */
