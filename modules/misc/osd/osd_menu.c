@@ -92,7 +92,6 @@ osd_button_t *osd_ButtonNew( const char *psz_action, int i_x, int i_y )
 
     p_button->psz_action = strdup(psz_action);
     p_button->psz_action_down = NULL;
-    p_button->p_feedback = NULL;
     p_button->i_x = i_x;
     p_button->i_y = i_y;
 
@@ -128,12 +127,6 @@ void osd_ButtonFree( osd_menu_t *p_menu, osd_button_t *p_button )
             free( p_current->p_next->psz_name );
             free( p_current->p_next->psz_action );
             free( p_current->p_next->psz_action_down );
-            if( p_current->p_feedback )
-            {
-                free( p_current->p_feedback->p_data_orig );
-                free( p_current->p_feedback );
-                p_current->p_feedback = NULL;
-            }
 
             /* Free all states first */
             if( p_current->p_next->p_states )
@@ -148,13 +141,6 @@ void osd_ButtonFree( osd_menu_t *p_menu, osd_button_t *p_button )
             free( p_current->p_up->psz_name );
             free( p_current->p_up->psz_action );
             free( p_current->p_up->psz_action_down );
-            if( p_current->p_feedback )
-            {
-                free( p_current->p_feedback->p_data_orig );
-                free( p_current->p_feedback );
-            }
-
-            p_current->p_feedback = NULL;
 
             /* Free all states first */
             if( p_current->p_up->p_states )
@@ -171,12 +157,6 @@ void osd_ButtonFree( osd_menu_t *p_menu, osd_button_t *p_button )
         free( p_button->psz_name );
         free( p_button->psz_action );
         free( p_button->psz_action_down );
-        if( p_current->p_feedback )
-        {
-            free( p_current->p_feedback->p_data_orig );
-            free( p_current->p_feedback );
-            p_current->p_feedback = NULL;
-        }
 
         if( p_button->p_states )
             osd_StatesFree( p_menu, p_button->p_states );

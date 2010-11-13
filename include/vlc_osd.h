@@ -170,7 +170,6 @@ struct osd_button_t
 
     osd_state_t *p_current_state; /*< pointer to current state image */
     osd_state_t *p_states; /*< doubly linked list of states */
-    picture_t   *p_feedback; /*< feedback picture */
 
     char    *psz_name;     /*< name of button */
 
