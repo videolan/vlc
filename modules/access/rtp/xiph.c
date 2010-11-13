@@ -40,7 +40,7 @@
 #include "rtp.h"
 
 /* PT=dynamic
- * vorbis: Xiph Vorbis audio (draft-ietf-avt-rtp-vorbis-09, RFC FIXME)
+ * vorbis: Xiph Vorbis audio (RFC 5215)
  */
 typedef struct rtp_vorbis_t
 {
