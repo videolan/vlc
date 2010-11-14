@@ -115,7 +115,7 @@ static ssize_t vorbis_header (void **pextra, const uint8_t *buf, size_t len)
     unsigned sizes[3] = {
         idlen, cmtlen, setuplen
     };
-    void *payloads[3] = {
+    const void *payloads[3] = {
         buf + 0,
         buf + idlen,
         buf + cmtlen

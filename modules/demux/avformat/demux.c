@@ -392,14 +392,14 @@ int OpenDemux( vlc_object_t *p_this )
             if( cc->codec_id == CODEC_ID_THEORA && b_ogg )
             {
                 unsigned pi_size[3];
-                void     *pp_data[3];
+                const void *pp_data[3];
                 unsigned i_count;
                 for( i_count = 0; i_count < 3; i_count++ )
                 {
                     if( i_extra < 2 )
                         break;
                     pi_size[i_count] = GetWBE( p_extra );
-                    pp_data[i_count] = (uint8_t*)&p_extra[2];
+                    pp_data[i_count] = &p_extra[2];
                     if( i_extra < pi_size[i_count] + 2 )
                         break;
 
@@ -415,15 +415,15 @@ int OpenDemux( vlc_object_t *p_this )
             }
             else if( cc->codec_id == CODEC_ID_SPEEX && b_ogg )
             {
-                uint8_t p_dummy_comment[] = {
+                const uint8_t p_dummy_comment[] = {
                     0, 0, 0, 0,
                     0, 0, 0, 0,
                 };
                 unsigned pi_size[2];
-                void     *pp_data[2];
+                const void *pp_data[2];
 
                 pi_size[0] = i_extra;
-                pp_data[0] = (uint8_t*)p_extra;
+                pp_data[0] = p_extra;
 
                 pi_size[1] = sizeof(p_dummy_comment);
                 pp_data[1] = p_dummy_comment;
