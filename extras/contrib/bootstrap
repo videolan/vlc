@@ -342,6 +342,8 @@ case "$DISTRO" in
 
     case $TARGET in
     x86_64*|i686*) add_enabled_makefile_cfg "HAVE_MACOSX_ON_INTEL" ;;
+    esac
+    case $TARGET in
     *darwin10)     add_enabled_makefile_cfg "HAVE_MACOSX_DARWIN_10" ;;
     *darwin9)      add_enabled_makefile_cfg "HAVE_MACOSX_DARWIN_9" ;;
     esac
