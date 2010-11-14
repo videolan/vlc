@@ -117,7 +117,7 @@ static inline int xiph_PackHeaders(int *extra_size, void **extra,
 }
 
 static inline int xiph_AppendHeaders(int *extra_size, void **extra,
-                                     unsigned size, void *data)
+                                     unsigned size, const void *data)
 {
     unsigned packet_size[XIPH_MAX_HEADER_COUNT];
     void *packet[XIPH_MAX_HEADER_COUNT];
@@ -134,7 +134,7 @@ static inline int xiph_AppendHeaders(int *extra_size, void **extra,
     free(*extra);
 
     packet_size[count] = size;
-    packet[count]      = data;
+    packet[count]      = (void*)data;
     if (xiph_PackHeaders(extra_size, extra, packet_size,
                          (const void **)packet, count + 1)) {
         *extra_size = 0;
