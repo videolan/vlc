@@ -24,6 +24,14 @@ if HAVE_XCB
 libvlc_LTLIBRARIES += libxcb_apps_plugin.la
 endif
 
+libwindrive_plugin_la_SOURCES = windrive.c
+libwindrive_plugin_la_CFLAGS = $(AM_CFLAGS)
+libwindrive_plugin_la_LIBADD = $(AM_LIBADD)
+libwindrive_plugin_la_DEPENDENCIES =
+if HAVE_WIN32
+libvlc_LTLIBRARIES += libwindrive_plugin.la
+endif
+
 EXTRA_LTLIBRARIES += \
 	libudev_plugin.la
 libvlc_LTLIBRARIES += \
