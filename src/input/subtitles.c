@@ -57,7 +57,7 @@ static const char const sub_exts[][6] = {
     "idx", "sub",  "srt",
     "ssa", "ass",  "smi",
     "utf", "utf8", "utf-8",
-    "txt", "rt",   "aqt",
+    "rt",   "aqt",
     "usf", "jss",  "cdg",
     "psb", "mpsub","mpl2",
     "pjs", "dks",
