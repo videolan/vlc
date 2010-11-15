@@ -1146,6 +1146,10 @@ void MainInputManager::activatePlayQuit( bool b_exit )
     var_SetBool( THEPL, "play-and-exit", b_exit );
 }
 
+bool MainInputManager::getPlayExitState()
+{
+    return var_GetBool( THEPL, "play-and-exit" );
+}
 
 /****************************
  * Static callbacks for MIM *

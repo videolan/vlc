@@ -265,6 +265,7 @@ public:
     vout_thread_t* getVout();
     aout_instance_t *getAout();
 
+    bool getPlayExitState();
 private:
     MainInputManager( intf_thread_t * );
     virtual ~MainInputManager();
