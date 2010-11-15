@@ -96,6 +96,11 @@ static int visible (const char *name)
     return name[0] != '.';
 }
 
+static int collate (const char **a, const char **b)
+{
+    return strcoll (*a, *b);
+}
+
 /*****************************************************************************
  * Open: open the directory
  *****************************************************************************/
@@ -140,7 +145,7 @@ int DirInit (access_t *p_access, DIR *handle)
     root->parent = NULL;
     root->handle = handle;
     root->uri = uri;
-    root->filec = vlc_loaddir (handle, &root->filev, visible, NULL);
+    root->filec = vlc_loaddir (handle, &root->filev, visible, collate);
     if (root->filec < 0)
         root->filev = NULL;
     root->i = 0;
@@ -346,7 +351,7 @@ block_t *DirBlock (access_t *p_access)
         }
         sub->parent = current;
         sub->handle = handle;
-        sub->filec = vlc_loaddir (handle, &sub->filev, visible, NULL);
+        sub->filec = vlc_loaddir (handle, &sub->filev, visible, collate);
         if (sub->filec < 0)
             sub->filev = NULL;
         sub->i = 0;
