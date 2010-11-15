@@ -70,6 +70,8 @@ struct directory_t
     directory_t *parent;
     DIR         *handle;
     char        *uri;
+    char       **filev;
+    int          filec, i;
 #ifdef HAVE_OPENAT
     dev_t        device;
     ino_t        inode;
@@ -87,6 +89,12 @@ struct access_sys_t
     int i_item_count;
     char *xspf_ext;
 };
+
+/* Select non-hidden files only */
+static int visible (const char *name)
+{
+    return name[0] != '.';
+}
 
 /*****************************************************************************
  * Open: open the directory
@@ -132,6 +140,10 @@ int DirInit (access_t *p_access, DIR *handle)
     root->parent = NULL;
     root->handle = handle;
     root->uri = uri;
+    root->filec = vlc_loaddir (handle, &root->filev, visible, NULL);
+    if (root->filec < 0)
+        root->filev = NULL;
+    root->i = 0;
 #ifdef HAVE_OPENAT
     struct stat st;
     if (fstat (dirfd (handle), &st))
@@ -194,6 +206,9 @@ void DirClose( vlc_object_t * p_this )
         p_sys->current = current->parent;
         closedir (current->handle);
         free (current->uri);
+        while (current->i < current->filec)
+            free (current->filev[current->i++]);
+        free (current->filev);
 #ifndef HAVE_OPENAT
         free (current->path);
 #endif
@@ -239,12 +254,12 @@ block_t *DirBlock (access_t *p_access)
         return block;
     }
 
-    char *entry = vlc_readdir (current->handle);
-    if (entry == NULL)
+    if (current->i >= current->filec)
     {   /* End of directory, go back to parent */
         closedir (current->handle);
         p_sys->current = current->parent;
         free (current->uri);
+        free (current->filev);
 #ifndef HAVE_OPENAT
         free (current->path);
 #endif
@@ -282,12 +297,7 @@ block_t *DirBlock (access_t *p_access)
         return NULL;
     }
 
-    /* Skip current, parent and hidden directories */
-    if (entry[0] == '.')
-    {
-        free (entry);
-        return NULL;
-    }
+    char *entry = current->filev[current->i++];
 
     /* Handle recursion */
     if (p_sys->mode != MODE_COLLAPSE)
@@ -336,6 +346,10 @@ block_t *DirBlock (access_t *p_access)
         }
         sub->parent = current;
         sub->handle = handle;
+        sub->filec = vlc_loaddir (handle, &sub->filev, visible, NULL);
+        if (sub->filec < 0)
+            sub->filev = NULL;
+        sub->i = 0;
 #ifdef HAVE_OPENAT
         sub->device = st.st_dev;
         sub->inode = st.st_ino;
