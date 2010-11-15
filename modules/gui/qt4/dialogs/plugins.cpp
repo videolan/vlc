@@ -420,6 +420,7 @@ void ExtensionItemDelegate::paint( QPainter *painter,
     /// @todo Add extension's icon
 
     // Title: bold
+    pixpaint->setRenderHint( QPainter::TextAntialiasing );
     font.setBold( true );
     pixpaint->setFont( font );
     pixpaint->drawText( QRect( 10, 7, width - 70, metrics.height() ),
