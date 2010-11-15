@@ -81,10 +81,9 @@ struct directory_t
 struct access_sys_t
 {
     directory_t *current;
-    DIR *handle;
-    char *uri;
     char *ignored_exts;
-    int mode;
+    char mode;
+    bool header;
     int i_item_count;
     char *psz_xspf_extension;
 };
@@ -123,11 +122,30 @@ int DirInit (access_t *p_access, DIR *handle)
     if (unlikely(uri == NULL))
         goto error;
 
+    /* "Open" the base directory */
+    directory_t *root = malloc (sizeof (*root));
+    if (unlikely(root == NULL))
+    {
+        free (uri);
+        goto error;
+    }
+    root->parent = NULL;
+    root->handle = handle;
+    root->uri = uri;
+#ifndef HAVE_OPENAT
+    root->path = strdup (p_access->psz_filepath);
+#endif
+    if (fstat (dirfd (handle), &root->st))
+    {
+        free (root);
+        free (uri);
+        goto error;
+    }
+
     p_access->p_sys = p_sys;
-    p_sys->current = NULL;
-    p_sys->handle = handle;
-    p_sys->uri = uri;
+    p_sys->current = root;
     p_sys->ignored_exts = var_InheritString (p_access, "ignore-filetypes");
+    p_sys->header = true;
     p_sys->i_item_count = 0;
     p_sys->psz_xspf_extension = strdup( "" );
 
@@ -178,11 +196,6 @@ void DirClose( vlc_object_t * p_this )
         free (current);
     }
 
-    /* corner case: Block() not called ever */
-    if (p_sys->handle != NULL)
-        closedir (p_sys->handle);
-    free (p_sys->uri);
-
     free (p_sys->psz_xspf_extension);
     free (p_sys->ignored_exts);
     free (p_sys);
@@ -214,7 +227,7 @@ block_t *DirBlock (access_t *p_access)
     if (p_access->info.b_eof)
         return NULL;
 
-    if (current == NULL)
+    if (p_sys->header)
     {   /* Startup: send the XSPF header */
         static const char header[] =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -224,30 +237,7 @@ block_t *DirBlock (access_t *p_access)
         if (!block)
             goto fatal;
         memcpy (block->p_buffer, header, sizeof (header) - 1);
-
-        /* "Open" the base directory */
-        current = malloc (sizeof (*current));
-        if (current == NULL)
-        {
-            block_Release (block);
-            goto fatal;
-        }
-        current->parent = NULL;
-        current->handle = p_sys->handle;
-#ifndef HAVE_OPENAT
-        current->path = strdup (p_access->psz_filepath);
-#endif
-        current->uri = p_sys->uri;
-        if (fstat (dirfd (current->handle), &current->st))
-        {
-            free (current);
-            block_Release (block);
-            goto fatal;
-        }
-
-        p_sys->handle = NULL;
-        p_sys->uri = NULL;
-        p_sys->current = current;
+        p_sys->header = false;
         return block;
     }
 
