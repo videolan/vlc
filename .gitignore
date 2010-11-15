@@ -52,4 +52,4 @@ CMakeCache.txt
 CPackConfig.cmake
 CPackSourceConfig.cmake
 
-/include/vlc/libvlc_version.h
+include/vlc/libvlc_version.h
