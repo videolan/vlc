@@ -462,7 +462,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
         p_sys->i_end_date = p_spu->i_stop;
     }
 
-    p_sys->i_last_date = i_date;
     p_spu->i_start = p_sys->i_last_date = i_date;
 
     /* Send an empty subpicture to clear the display

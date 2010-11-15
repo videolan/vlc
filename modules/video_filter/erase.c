@@ -251,7 +251,6 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
         const int i_visible_pitch = p_inpic->p[i_plane].i_visible_pitch;
         const int i_visible_lines = p_inpic->p[i_plane].i_visible_lines;
 
-        uint8_t *p_outpix = p_outpic->p[i_plane].p_pixels;
         uint8_t *p_mask = p_sys->p_mask->A_PIXELS;
         int i_x = p_sys->i_x, i_y = p_sys->i_y;
 
@@ -280,7 +279,7 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
         plane_CopyPixels( &p_outpic->p[i_plane], &p_inpic->p[i_plane] );
 
         /* Horizontal linear interpolation of masked areas */
-        p_outpix = p_outpic->p[i_plane].p_pixels + i_y*i_pitch + i_x;
+        uint8_t *p_outpix = p_outpic->p[i_plane].p_pixels + i_y*i_pitch + i_x;
         for( y = 0; y < i_height;
              y++, p_mask += i_mask_pitch, p_outpix += i_pitch )
         {
