@@ -267,6 +267,7 @@ $Id$
  * schroedinger: Schroedinger video decoder
  * screen: a input module that takes screenshots of the primary monitor
  * sdl_image: SDL-based image decoder
+ * sepia: Sepia video filter
  * sharpen: Sharpen video filter
  * shine: MP3 encoder using Shine, a fixed point implementation
  * simple_channel_mixer: channel mixer

@@ -52,6 +52,7 @@ SOURCES_swscale_omap = swscale_omap.c \
 	libswscale_nokia770/arm_jit_swscale.h \
 	libswscale_nokia770/arm_colorconv.h
 SOURCES_scene = scene.c
+SOURCES_sepia = sepia.c
 SOURCES_yuvp = yuvp.c
 SOURCES_atmo = atmo/atmo.cpp \
 	atmo/AtmoDefs.h \
@@ -114,6 +115,7 @@ libvlc_LTLIBRARIES += \
 	librv32_plugin.la \
 	libscale_plugin.la \
 	libscene_plugin.la \
+	libsepia_plugin.la \
 	libsharpen_plugin.la \
 	libtransform_plugin.la \
 	libwall_plugin.la \

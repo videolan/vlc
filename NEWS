@@ -56,6 +56,7 @@ Video Filter:
  * Rewrite of the grain filter, faster and with better quality
  * New posterize filter for lowering the number of colors
  * Atmo ambilight: improve Fnordlicht up to 254 channels
+ * New sepia filter for creating sepia effect in videos
 
 Audio Output:
  * New audio output based on AudioQueue API for iOS

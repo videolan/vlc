@@ -1122,6 +1122,7 @@ modules/video_filter/rss.c
 modules/video_filter/rv32.c
 modules/video_filter/scale.c
 modules/video_filter/scene.c
+modules/video_filter/sepia.c
 modules/video_filter/sharpen.c
 modules/video_filter/swscale.c
 modules/video_filter/swscale_omap.c
