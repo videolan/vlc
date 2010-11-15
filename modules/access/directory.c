@@ -70,10 +70,10 @@ struct directory_t
     directory_t *parent;
     DIR         *handle;
     char        *uri;
-#ifndef WIN32
-    struct stat  st;
-#endif
-#ifndef HAVE_OPENAT
+#ifdef HAVE_OPENAT
+    dev_t        device;
+    ino_t        inode;
+#else
     char         *path;
 #endif
 };
@@ -85,7 +85,7 @@ struct access_sys_t
     char mode;
     bool header;
     int i_item_count;
-    char *psz_xspf_extension;
+    char *xspf_ext;
 };
 
 /*****************************************************************************
@@ -132,22 +132,26 @@ int DirInit (access_t *p_access, DIR *handle)
     root->parent = NULL;
     root->handle = handle;
     root->uri = uri;
-#ifndef HAVE_OPENAT
-    root->path = strdup (p_access->psz_filepath);
-#endif
-    if (fstat (dirfd (handle), &root->st))
+#ifdef HAVE_OPENAT
+    struct stat st;
+    if (fstat (dirfd (handle), &st))
     {
         free (root);
         free (uri);
         goto error;
     }
+    root->device = st.st_dev;
+    root->inode = st.st_ino;
+#else
+    root->path = strdup (p_access->psz_filepath);
+#endif
 
     p_access->p_sys = p_sys;
     p_sys->current = root;
     p_sys->ignored_exts = var_InheritString (p_access, "ignore-filetypes");
     p_sys->header = true;
     p_sys->i_item_count = 0;
-    p_sys->psz_xspf_extension = strdup( "" );
+    p_sys->xspf_ext = strdup ("");
 
     /* Handle mode */
     char *psz = var_InheritString (p_access, "recursive");
@@ -196,26 +200,20 @@ void DirClose( vlc_object_t * p_this )
         free (current);
     }
 
-    free (p_sys->psz_xspf_extension);
+    free (p_sys->xspf_ext);
     free (p_sys->ignored_exts);
     free (p_sys);
 }
 
 /* Detect directories that recurse into themselves. */
-static bool has_inode_loop (const directory_t *dir)
+static bool has_inode_loop (const directory_t *dir, dev_t dev, ino_t inode)
 {
-#ifndef WIN32
-    dev_t dev = dir->st.st_dev;
-    ino_t inode = dir->st.st_ino;
-
-    while ((dir = dir->parent) != NULL)
-        if ((dir->st.st_dev == dev) && (dir->st.st_ino == inode))
+    while (dir != NULL)
+    {
+        if ((dir->device == dev) && (dir->inode == inode))
             return true;
-#else
-# undef fstat
-# define fstat( fd, st ) (0)
-    VLC_UNUSED( dir );
-#endif
+        dir = dir->parent;
+    }
     return false;
 }
 
@@ -255,11 +253,12 @@ block_t *DirBlock (access_t *p_access)
         if (p_sys->current == NULL)
         {   /* End of XSPF playlist */
             char *footer;
-            int len = asprintf( &footer, " </trackList>\n" \
-                " <extension application=\"http://www.videolan.org/vlc/playlist/0\">\n" \
-                "%s" \
-                " </extension>\n" \
-                "</playlist>\n", p_sys->psz_xspf_extension );
+            int len = asprintf (&footer, " </trackList>\n"
+                " <extension application=\"http://www.videolan.org/"
+                                             "vlc/playlist/0\">\n"
+                "%s"
+                " </extension>\n"
+                "</playlist>\n", p_sys->xspf_ext ? p_sys->xspf_ext : "");
             if (unlikely(len == -1))
                 goto fatal;
 
@@ -273,14 +272,12 @@ block_t *DirBlock (access_t *p_access)
         {
             /* This was the end of a "subnode" */
             /* Write the ID to the extension */
-            char *old_xspf_extension = p_sys->psz_xspf_extension;
-            if (old_xspf_extension == NULL)
-                goto fatal;
-
-            int len2 = asprintf( &p_sys->psz_xspf_extension, "%s  </vlc:node>\n", old_xspf_extension );
-            if (len2 == -1)
-                goto fatal;
-            free( old_xspf_extension );
+            char *old_xspf_ext = p_sys->xspf_ext;
+            if (old_xspf_ext != NULL
+             && asprintf (&p_sys->xspf_ext, "%s  </vlc:node>\n",
+                          old_xspf_ext ? old_xspf_ext : "") == -1)
+                p_sys->xspf_ext = NULL;
+            free (old_xspf_ext);
         }
         return NULL;
     }
@@ -291,83 +288,86 @@ block_t *DirBlock (access_t *p_access)
         free (entry);
         return NULL;
     }
+
     /* Handle recursion */
     if (p_sys->mode != MODE_COLLAPSE)
     {
-        directory_t *sub = malloc (sizeof (*sub));
-        if (sub == NULL)
-        {
-            free (entry);
-            return NULL;
-        }
-
         DIR *handle;
 #ifdef HAVE_OPENAT
         int fd = vlc_openat (dirfd (current->handle), entry, O_RDONLY);
-        if (fd != -1)
+        if (fd == -1)
+            goto skip; /* File cannot be opened... forget it */
+
+        struct stat st;
+        if (fstat (fd, &st))
         {
-            handle = fdopendir (fd);
-            if (handle == NULL)
-                close (fd);
+            close (fd);
+            goto skip; /* cannot stat?! */
         }
-        else
-            handle = NULL;
+        if (!S_ISDIR (st.st_mode))
+        {
+            close (fd);
+            goto notdir;
+        }
+        if (p_sys->mode == MODE_NONE
+         || has_inode_loop (current, st.st_dev, st.st_ino)
+         || (handle = fdopendir (fd)) == NULL)
+        {
+            close (fd);
+            goto skip;
+        }
 #else
-        if (asprintf (&sub->path, "%s/%s", current->path, entry) != -1)
-            handle = vlc_opendir (sub->path);
-        else
-            handle = NULL;
+        char *path;
+        if (asprintf (&path, "%s/%s", current->path, entry) == -1)
+            goto skip;
+        if ((handle = vlc_opendir (path)) == NULL)
+            goto notdir;
+        if (p_sys->mode == MODE_NONE)
+            goto skip;
 #endif
-        if (handle != NULL)
+        directory_t *sub = malloc (sizeof (*sub));
+        if (unlikely(sub == NULL))
         {
-            sub->parent = current;
-            sub->handle = handle;
-
-            char *encoded = encode_URI_component (entry);
-            if ((encoded == NULL)
-             || (asprintf (&sub->uri, "%s/%s", current->uri, encoded) == -1))
-                 sub->uri = NULL;
-            free (encoded);
-
-            if ((p_sys->mode == MODE_NONE)
-             || fstat (dirfd (handle), &sub->st)
-             || has_inode_loop (sub)
-             || (sub->uri == NULL))
-            {
-                free (entry);
-                closedir (handle);
-                free (sub->uri);
-                free (sub);
-                return NULL;
-            }
-            p_sys->current = sub;
-
-            /* Add node to xspf extension */
-            char *old_xspf_extension = p_sys->psz_xspf_extension;
-            if (old_xspf_extension == NULL)
-            {
-                free (entry);
-                goto fatal;
-            }
-
-            char *title = convert_xml_special_chars (entry);
-            free (entry);
-            if (title == NULL
-             || asprintf (&p_sys->psz_xspf_extension, "%s"
-                          "  <vlc:node title=\"%s\">\n", old_xspf_extension,
-                          title) == -1)
-            {
-                free (title);
-                goto fatal;
-            }
-            free (title);
-            free (old_xspf_extension);
-            return NULL;
+            closedir (handle);
+#ifndef HAVE_OPENAT
+            free (path);
+#endif
+            goto skip;
         }
-        else
-            free (sub);
+        sub->parent = current;
+        sub->handle = handle;
+#ifdef HAVE_OPENAT
+        sub->device = st.st_dev;
+        sub->inode = st.st_ino;
+#else
+        sub->path = path;
+#endif
+        p_sys->current = sub;
+
+        char *encoded = encode_URI_component (entry);
+        if (encoded == NULL
+         || (asprintf (&sub->uri, "%s/%s", current->uri, encoded) == -1))
+             sub->uri = NULL;
+        free (encoded);
+        if (unlikely(sub->uri == NULL))
+        {
+            free (entry);
+            goto fatal;
+        }
+
+        /* Add node to XSPF extension */
+        char *old_xspf_ext = p_sys->xspf_ext;
+        char *title = convert_xml_special_chars (entry);
+        if (old_xspf_ext != NULL && title != NULL
+         && asprintf (&p_sys->xspf_ext, "%s  <vlc:node title=\"%s\">\n",
+                      old_xspf_ext, title) == -1)
+            p_sys->xspf_ext = NULL;
+        free (old_xspf_ext);
+        free (title);
+        goto skip;
     }
 
+notdir:
     /* Skip files with ignored extensions */
     if (p_sys->ignored_exts != NULL)
     {
@@ -411,15 +411,12 @@ block_t *DirBlock (access_t *p_access)
         goto fatal;
 
     /* Write the ID to the extension */
-    char *old_xspf_extension = p_sys->psz_xspf_extension;
-    if (old_xspf_extension == NULL)
-        goto fatal;
-
-    int len2 = asprintf( &p_sys->psz_xspf_extension, "%s   <vlc:item tid=\"%i\" />\n",
-                            old_xspf_extension, p_sys->i_item_count-1 );
-    if (len2 == -1)
-        goto fatal;
-    free( old_xspf_extension );
+    char *old_xspf_ext = p_sys->xspf_ext;
+    if (old_xspf_ext != NULL
+     && asprintf (&p_sys->xspf_ext, "%s   <vlc:item tid=\"%i\" />\n",
+                  old_xspf_ext, p_sys->i_item_count - 1) == -1)
+        p_sys->xspf_ext = NULL;
+    free (old_xspf_ext);
 
     block_t *block = block_heap_Alloc (entry, entry, len);
     if (unlikely(block == NULL))
@@ -431,6 +428,10 @@ block_t *DirBlock (access_t *p_access)
 
 fatal:
     p_access->info.b_eof = true;
+    return NULL;
+
+skip:
+    free (entry);
     return NULL;
 }
 
