@@ -225,6 +225,7 @@ void DirClose( vlc_object_t * p_this )
     free (p_sys);
 }
 
+#ifdef HAVE_OPENAT
 /* Detect directories that recurse into themselves. */
 static bool has_inode_loop (const directory_t *dir, dev_t dev, ino_t inode)
 {
@@ -236,6 +237,7 @@ static bool has_inode_loop (const directory_t *dir, dev_t dev, ino_t inode)
     }
     return false;
 }
+#endif
 
 block_t *DirBlock (access_t *p_access)
 {
