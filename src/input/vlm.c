@@ -981,6 +981,12 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
         if( p_instance->p_input )
         {
             var_AddCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
+            var_Create( p_instance->p_input, "vod-media", VLC_VAR_ADDRESS );
+            var_SetAddress( p_instance->p_input, "vod-media",
+                            p_media->vod.p_media );
+            var_Create( p_instance->p_input, "vod-session", VLC_VAR_STRING );
+            var_SetString( p_instance->p_input, "vod-session", psz_id );
+
             if( input_Start( p_instance->p_input ) != VLC_SUCCESS )
             {
                 var_DelCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
