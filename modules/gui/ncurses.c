@@ -1493,7 +1493,7 @@ static bool HandleBrowseKey(intf_thread_t *p_intf, int key)
     return false;
 }
 
-static bool HandleEditBoxKey(intf_thread_t *p_intf, int key, int box)
+static void HandleEditBoxKey(intf_thread_t *p_intf, int key, int box)
 {
     intf_sys_t *p_sys = p_intf->p_sys;
     bool search = box == BOX_SEARCH;
@@ -1505,7 +1505,7 @@ static bool HandleEditBoxKey(intf_thread_t *p_intf, int key, int box)
     switch(key)
     {
     case 0x0c:  /* ^l */
-    case KEY_CLEAR:     clear(); return 1;
+    case KEY_CLEAR:     clear(); return;
 
     case KEY_ENTER:
     case '\r':
@@ -1543,13 +1543,13 @@ static bool HandleEditBoxKey(intf_thread_t *p_intf, int key, int box)
             p_sys->b_plidx_follow = true;
         }
         p_sys->i_box_type = BOX_PLAYLIST;
-        return 1;
+        return;
 
     case 0x1b: /* ESC */
         /* Alt+key combinations return 2 keys in the terminal keyboard:
          * ESC, and the 2nd key.
          * If some other key is available immediately (where immediately
-         * means after wgetch() 1 second delay), that means that the
+         * means after getch() 1 second delay), that means that the
          * ESC key was not pressed.
          *
          * man 3X curs_getch says:
@@ -1561,11 +1561,11 @@ static bool HandleEditBoxKey(intf_thread_t *p_intf, int key, int box)
          *
          */
         if (getch() != ERR)
-            return 0;
+            return;
 
         if (search) p_sys->i_box_idx = p_sys->i_before_search;
         p_sys->i_box_type = BOX_PLAYLIST;
-        return 1;
+        return;
 
     case KEY_BACKSPACE:
     case 0x7f:
@@ -1587,7 +1587,6 @@ static bool HandleEditBoxKey(intf_thread_t *p_intf, int key, int box)
         p_sys->psz_old_search = NULL;
         SearchPlaylist(p_sys, str);
     }
-    return 1;
 }
 
 static void InputNavigate(input_thread_t* p_input, const char *var)
@@ -1596,7 +1595,7 @@ static void InputNavigate(input_thread_t* p_input, const char *var)
         var_TriggerCallback(p_input, var);
 }
 
-static bool HandleCommonKey(intf_thread_t *p_intf, int key)
+static void HandleCommonKey(intf_thread_t *p_intf, int key)
 {
     intf_sys_t *p_sys = p_intf->p_sys;
     playlist_t *p_playlist = pl_Get(p_intf);
@@ -1604,40 +1603,40 @@ static bool HandleCommonKey(intf_thread_t *p_intf, int key)
     {
     case 0x1b:  /* ESC */
         if (getch() != ERR)
-            return false;
+            return;
 
     case 'q':
     case 'Q':
     case KEY_EXIT:
         libvlc_Quit(p_intf->p_libvlc);
         p_sys->b_exit = true;           // terminate the main loop
-        return false;
+        return;
 
     case 'h':
-    case 'H': BoxSwitch(p_sys, BOX_HELP);       return true;
-    case 'i': BoxSwitch(p_sys, BOX_INFO);       return true;
-    case 'm': BoxSwitch(p_sys, BOX_META);       return true;
-    case 'L': BoxSwitch(p_sys, BOX_LOG);        return true;
-    case 'P': BoxSwitch(p_sys, BOX_PLAYLIST);   return true;
-    case 'B': BoxSwitch(p_sys, BOX_BROWSE);     return true;
-    case 'x': BoxSwitch(p_sys, BOX_OBJECTS);    return true;
-    case 'S': BoxSwitch(p_sys, BOX_STATS);      return true;
+    case 'H': BoxSwitch(p_sys, BOX_HELP);       return;
+    case 'i': BoxSwitch(p_sys, BOX_INFO);       return;
+    case 'm': BoxSwitch(p_sys, BOX_META);       return;
+    case 'L': BoxSwitch(p_sys, BOX_LOG);        return;
+    case 'P': BoxSwitch(p_sys, BOX_PLAYLIST);   return;
+    case 'B': BoxSwitch(p_sys, BOX_BROWSE);     return;
+    case 'x': BoxSwitch(p_sys, BOX_OBJECTS);    return;
+    case 'S': BoxSwitch(p_sys, BOX_STATS);      return;
 
     case '/': /* Search */
         p_sys->psz_search_chain[0] = '\0';
         p_sys->b_plidx_follow = false;
         p_sys->i_before_search = p_sys->i_box_idx;
         p_sys->i_box_type = BOX_SEARCH;
-        return true;
+        return;
 
     case 'A': /* Open */
         p_sys->psz_open_chain[0] = '\0';
         p_sys->i_box_type = BOX_OPEN;
-        return true;
+        return;
 
     /* Navigation */
-    case KEY_RIGHT: ChangePosition(p_intf, +0.01); return true;
-    case KEY_LEFT:  ChangePosition(p_intf, -0.01); return true;
+    case KEY_RIGHT: ChangePosition(p_intf, +0.01); return;
+    case KEY_LEFT:  ChangePosition(p_intf, -0.01); return;
 
     /* Common control */
     case 'f':
@@ -1651,16 +1650,16 @@ static bool HandleCommonKey(intf_thread_t *p_intf, int key)
                 vlc_object_release(p_vout);
             }
         }
-        return false;
+        return;
 
-    case ' ': PlayPause(p_intf);            return true;
-    case 's': playlist_Stop(p_playlist);    return true;
-    case 'e': Eject(p_intf);                return true;
+    case ' ': PlayPause(p_intf);            return;
+    case 's': playlist_Stop(p_playlist);    return;
+    case 'e': Eject(p_intf);                return;
 
-    case '[': InputNavigate(p_sys->p_input, "prev-title");      return true;
-    case ']': InputNavigate(p_sys->p_input, "next-title");      return true;
-    case '<': InputNavigate(p_sys->p_input, "prev-chapter");    return true;
-    case '>': InputNavigate(p_sys->p_input, "next-chapter");    return true;
+    case '[': InputNavigate(p_sys->p_input, "prev-title");      return;
+    case ']': InputNavigate(p_sys->p_input, "next-title");      return;
+    case '<': InputNavigate(p_sys->p_input, "prev-chapter");    return;
+    case '>': InputNavigate(p_sys->p_input, "next-chapter");    return;
 
     case 'p': playlist_Prev(p_playlist);            break;
     case 'n': playlist_Next(p_playlist);            break;
@@ -1672,11 +1671,11 @@ static bool HandleCommonKey(intf_thread_t *p_intf, int key)
         break;
 
     default:
-        return false;
+        return;
     }
 
     clear();
-    return true;
+    return;
 }
 
 static bool HandleListKey(intf_thread_t *p_intf, int key)
@@ -1713,17 +1712,20 @@ static bool HandleListKey(intf_thread_t *p_intf, int key)
     return true;
 }
 
-static bool HandleKey(intf_thread_t *p_intf)
+static void HandleKey(intf_thread_t *p_intf)
 {
     intf_sys_t *p_sys = p_intf->p_sys;
     int key = getch();
     int box = p_sys->i_box_type;
 
     if (key == -1)
-        return false;
+        return;
 
     if (box == BOX_SEARCH || box == BOX_OPEN)
-        return HandleEditBoxKey(p_intf, key, p_sys->i_box_type);
+    {
+        HandleEditBoxKey(p_intf, key, p_sys->i_box_type);
+        return;
+    }
 
     if (box == BOX_NONE)
         switch(key)
@@ -1731,20 +1733,23 @@ static bool HandleKey(intf_thread_t *p_intf)
 #ifdef __FreeBSD__
         case KEY_SELECT:
 #endif
-        case KEY_END:   ChangePosition(p_intf, +.99);   return true;
-        case KEY_HOME:  ChangePosition(p_intf, -1.0);   return true;
-        case KEY_UP:    ChangePosition(p_intf, +0.05);  return true;
-        case KEY_DOWN:  ChangePosition(p_intf, -0.05);  return true;
-        default:        return HandleCommonKey(p_intf, key);
+        case KEY_END:   ChangePosition(p_intf, +.99);   return;
+        case KEY_HOME:  ChangePosition(p_intf, -1.0);   return;
+        case KEY_UP:    ChangePosition(p_intf, +0.05);  return;
+        case KEY_DOWN:  ChangePosition(p_intf, -0.05);  return;
+        default:        HandleCommonKey(p_intf, key);   return;
         }
 
     if (box == BOX_BROWSE   && HandleBrowseKey(p_intf, key))
-        return true;
+        return;
 
     if (box == BOX_PLAYLIST && HandlePlaylistKey(p_intf, key))
-        return true;
+        return;
 
-    return HandleListKey(p_intf, key) || HandleCommonKey(p_intf, key);
+    if (HandleListKey(p_intf, key))
+        return;
+
+    HandleCommonKey(p_intf, key);
 }
 
 /*
@@ -1771,6 +1776,19 @@ static void MsgCallback(msg_cb_data_t *data, msg_item_t *msg, unsigned i)
     vlc_restorecancel(canc);
 }
 
+static inline void UpdateInput(intf_sys_t *p_sys, playlist_t *p_playlist)
+{
+    if (!p_sys->p_input)
+    {
+        p_sys->p_input = playlist_CurrentInput(p_playlist);
+    }
+    else if (p_sys->p_input->b_dead)
+    {
+        vlc_object_release(p_sys->p_input);
+        p_sys->p_input = NULL;
+    }
+}
+
 /*****************************************************************************
  * Run: ncurses thread
  *****************************************************************************/
@@ -1786,22 +1804,11 @@ static void Run(intf_thread_t *p_intf)
 
     while (vlc_object_alive(p_intf) && !p_sys->b_exit)
     {
-        if (!p_sys->p_input)
-        {
-            p_sys->p_input = playlist_CurrentInput(p_playlist);
-            if (p_sys->p_input)
-                Redraw(p_intf);
-        }
-        else if (p_sys->p_input->b_dead)
-        {
-            vlc_object_release(p_sys->p_input);
-            p_sys->p_input = NULL;
-        }
-
-        do
-            Redraw(p_intf);
-        while (HandleKey(p_intf));
+        UpdateInput(p_sys, p_playlist);
+        Redraw(p_intf);
+        HandleKey(p_intf);
     }
+
     var_DelCallback(p_playlist, "intf-change", PlaylistChanged, p_intf);
     var_DelCallback(p_playlist, "playlist-item-append", PlaylistChanged, p_intf);
     vlc_restorecancel(canc);
@@ -1854,7 +1861,7 @@ static int Open(vlc_object_t *p_this)
     nonl();                 /* Take input chars one at a time */
     cbreak();               /* Don't echo */
     noecho();               /* Invisible cursor */
-    curs_set(0);            /* Non blocking wgetch() */
+    curs_set(0);            /* Non blocking getch() */
     timeout(1000);
     clear();
 
