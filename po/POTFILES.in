@@ -1008,6 +1008,7 @@ modules/services_discovery/podcast.c
 modules/services_discovery/sap.c
 modules/services_discovery/udev.c
 modules/services_discovery/upnp_intel.cpp
+modules/services_discovery/windrive.c
 modules/services_discovery/xcb_apps.c
 modules/stream_filter/decomp.c
 modules/stream_filter/record.c
