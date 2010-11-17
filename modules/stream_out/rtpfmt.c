@@ -32,6 +32,7 @@
 #include <vlc_strings.h>
 
 #include "rtp.h"
+#include "../demux/xiph.h"
 
 #include <assert.h>
 
@@ -52,6 +53,63 @@ static int rtp_packetize_g726_24 (sout_stream_id_t *, block_t *);
 static int rtp_packetize_g726_32 (sout_stream_id_t *, block_t *);
 static int rtp_packetize_g726_40 (sout_stream_id_t *, block_t *);
 static int rtp_packetize_vorbis (sout_stream_id_t *, block_t *);
+
+#define VORBIS_IDENT (0)
+
+static int rtp_vorbis_pack_headers(size_t room, void *p_extra, size_t i_extra,
+                                   uint8_t **p_buffer, size_t *i_buffer)
+{
+    unsigned packet_size[XIPH_MAX_HEADER_COUNT];
+    void *packet[XIPH_MAX_HEADER_COUNT];
+    unsigned packet_count;
+    int val = xiph_SplitHeaders(packet_size, packet, &packet_count,
+                                i_extra, p_extra);
+    if (val != VLC_SUCCESS)
+        return val;
+    if (packet_count < 3)
+        return VLC_EGENERIC;
+
+    unsigned length_size[2] = { 0, 0 };
+    for (int i = 0; i < 2; i++)
+    {
+        unsigned size = packet_size[i];
+        while (size > 0)
+        {
+            length_size[i]++;
+            size >>= 7;
+        }
+    }
+
+    *i_buffer = room + 1 + length_size[0] + length_size[1]
+                + packet_size[0] + packet_size[1] + packet_size[2];
+    *p_buffer = malloc(*i_buffer);
+    if (*p_buffer == NULL)
+        return VLC_ENOMEM;
+
+    uint8_t *p = *p_buffer + room;
+    /* Number of headers */
+    *p++ = 2;
+
+    for (int i = 0; i < 2; i++)
+    {
+        unsigned size = length_size[i];
+        while (size > 0)
+        {
+            *p = (packet_size[i] >> (7 * (size - 1))) & 0x7f;
+            if (--size > 0)
+                *p |= 0x80;
+            p++;
+        }
+    }
+    for (int i = 0; i < 3; i++)
+    {
+        memcpy(p, packet[i], packet_size[i]);
+        free(packet[i]);
+        p += packet_size[i];
+    }
+
+    return VLC_SUCCESS;
+}
 
 static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
 {
@@ -337,6 +395,37 @@ int rtp_get_fmt( vlc_object_t *obj, es_format_t *p_fmt, const char *mux,
             rtp_fmt->ptname = "SPEEX";
             rtp_fmt->pf_packetize = rtp_packetize_spx;
             break;
+        case VLC_CODEC_VORBIS:
+            rtp_fmt->ptname = "vorbis";
+            rtp_fmt->pf_packetize = rtp_packetize_vorbis;
+            if( p_fmt->i_extra > 0 )
+            {
+                rtp_fmt->fmtp = NULL;
+                uint8_t *p_buffer;
+                size_t i_buffer;
+                if (rtp_vorbis_pack_headers(9, p_fmt->p_extra, p_fmt->i_extra,
+                                        &p_buffer, &i_buffer) != VLC_SUCCESS)
+                    break;
+
+                /* Number of packed headers */
+                SetDWBE(p_buffer, 1);
+                /* Ident */
+                uint32_t ident = VORBIS_IDENT;
+                SetWBE(p_buffer + 4, ident >> 8);
+                p_buffer[6] = ident & 0xff;
+                /* Length field */
+                SetWBE(p_buffer + 7, i_buffer);
+
+                char *config = vlc_b64_encode_binary(p_buffer, i_buffer);
+                free(p_buffer);
+                if (config == NULL)
+                    break;
+                if( asprintf( &rtp_fmt->fmtp,
+                              "configuration=%s;", config ) == -1 )
+                    rtp_fmt->fmtp = NULL;
+                free(config);
+            }
+            break;
         case VLC_CODEC_ITU_T140:
             rtp_fmt->ptname = "t140" ;
             rtp_fmt->clock_rate = 1000;
@@ -357,6 +446,62 @@ static int
 rtp_packetize_h264_nal( sout_stream_id_t *id,
                         const uint8_t *p_data, int i_data, int64_t i_pts,
                         int64_t i_dts, bool b_last, int64_t i_length );
+
+/* rfc5215 */
+static int rtp_packetize_vorbis( sout_stream_id_t *id, block_t *in )
+{
+    int     i_max   = rtp_mtu (id) - 6; /* payload max in one packet */
+    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
+
+    uint8_t *p_data = in->p_buffer;
+    int     i_data  = in->i_buffer;
+
+    for( int i = 0; i < i_count; i++ )
+    {
+        int           i_payload = __MIN( i_max, i_data );
+        block_t *out = block_Alloc( 18 + i_payload );
+
+        unsigned fragtype, numpkts;
+        if (i_count == 1)
+        {
+            /* No fragmentation */
+            fragtype = 0;
+            numpkts = 1;
+        }
+        else
+        {
+            /* Fragmentation */
+            numpkts = 0;
+            if (i == 0)
+                fragtype = 1;
+            else if (i == i_count - 1)
+                fragtype = 3;
+            else
+                fragtype = 2;
+        }
+        /* Ident:24, Fragment type:2, Vorbis Data Type:2, # of packets:4 */
+        uint32_t header = ((VORBIS_IDENT & 0xffffff) << 8) |
+                          (fragtype << 6) | (0 << 4) | numpkts;
+
+        /* rtp common header */
+        rtp_packetize_common( id, out, 0, in->i_pts);
+
+        SetDWBE( out->p_buffer + 12, header);
+        SetWBE( out->p_buffer + 16, i_payload);
+        memcpy( &out->p_buffer[18], p_data, i_payload );
+
+        out->i_buffer   = 18 + i_payload;
+        out->i_dts    = in->i_dts + i * in->i_length / i_count;
+        out->i_length = in->i_length / i_count;
+
+        rtp_packetize_send( id, out );
+
+        p_data += i_payload;
+        i_data -= i_payload;
+    }
+
+    return VLC_SUCCESS;
+}
 
 static int rtp_packetize_mpa( sout_stream_id_t *id, block_t *in )
 {
