@@ -387,7 +387,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 # if defined (WIN32) || defined (__APPLE__)
     if( !var_InheritBool( p_libvlc, "ignore-config" ) )
-        config_LoadConfigFile( p_libvlc, "main" );
+        config_LoadConfigFile( p_libvlc );
     priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
 
     /* Check if the user specified a custom language */
@@ -489,7 +489,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * Override default configuration with config file settings
      */
     if( !var_InheritBool( p_libvlc, "ignore-config" ) )
-        config_LoadConfigFile( p_libvlc, NULL );
+        config_LoadConfigFile( p_libvlc );
 
     /*
      * Override configuration with command line settings

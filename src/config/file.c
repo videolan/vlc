@@ -164,16 +164,13 @@ static int64_t strtoi (const char *str)
  * This function is called to load the config options stored in the config
  * file.
  *****************************************************************************/
-int config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
+int config_LoadConfigFile( vlc_object_t *p_this )
 {
     FILE *file;
 
     file = config_OpenConfigFile (p_this);
     if (file == NULL)
         return VLC_EGENERIC;
-
-    /* Look for the selected module, if NULL then save everything */
-    module_t **list = module_list_get (NULL);
 
     /* Look for UTF-8 Byte Order Mark */
     char * (*convert) (const char *) = strdupnull;
@@ -186,9 +183,7 @@ int config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         rewind (file); /* no BOM, rewind */
     }
 
-    module_t *module = NULL;
-    char line[1024], section[1022];
-    section[0] = '\0';
+    char line[1024];
 
     /* Ensure consistent number formatting... */
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
@@ -201,47 +196,11 @@ int config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         switch (line[0])
         {
             case '#':
+            case '[':
             case '\n':
             case '\0':
                 continue;
         }
-
-        if (line[0] == '[')
-        {
-            char *ptr = strchr (line, ']');
-            if (ptr == NULL)
-                continue; /* syntax error; */
-            *ptr = '\0';
-
-            /* New section ( = a given module) */
-            strcpy (section, line + 1);
-            module = NULL;
-
-            if ((psz_module_name == NULL)
-             || (strcmp (psz_module_name, section) == 0))
-            {
-                for (int i = 0; list[i]; i++)
-                {
-                    module_t *m = list[i];
-
-                    if ((strcmp (section, m->psz_object_name) == 0)
-                     && (m->i_config_items > 0)) /* ignore config-less modules */
-                    {
-                        module = m;
-                        if (psz_module_name != NULL)
-                            msg_Dbg (p_this,
-                                     "loading config for module \"%s\"",
-                                     section);
-                        break;
-                    }
-                }
-            }
-
-            continue;
-        }
-
-        if (module == NULL)
-            continue; /* no need to parse if there is no matching module */
 
         char *ptr = strchr (line, '\n');
         if (ptr != NULL)
@@ -253,62 +212,52 @@ int config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         ptr = strchr (line, '=');
         if (ptr == NULL)
             continue; /* syntax error */
-
         *ptr = '\0';
+
+        module_config_t *item = config_FindConfig (p_this, psz_option_name);
+        if (item == NULL)
+            continue;
+
         const char *psz_option_value = ptr + 1;
-
-        /* try to match this option with one of the module's options */
-        for (size_t i = 0; i < module->confsize; i++)
+        switch (item->i_type)
         {
-            module_config_t *p_item = module->p_config + i;
-
-            if ((p_item->i_type & CONFIG_HINT)
-             || strcmp (p_item->psz_name, psz_option_name))
-                continue;
-
-            /* We found it */
-            errno = 0;
-
-            switch( p_item->i_type )
+            case CONFIG_ITEM_BOOL:
+            case CONFIG_ITEM_INTEGER:
             {
-                case CONFIG_ITEM_BOOL:
-                case CONFIG_ITEM_INTEGER:
-                {
-                    int64_t l = strtoi (psz_option_value);
-                    if ((l > p_item->max.i) || (l < p_item->min.i))
-                        errno = ERANGE;
-                    if (errno)
-                        msg_Warn (p_this, "Integer value (%s) for %s: %m",
-                                  psz_option_value, psz_option_name);
-                    else
-                        p_item->saved.i = p_item->value.i = l;
-                    break;
-                }
+                int64_t l;
 
-                case CONFIG_ITEM_FLOAT:
-                    if( !*psz_option_value )
-                        break;                    /* ignore empty option */
-                    p_item->value.f = (float)atof (psz_option_value);
-                    p_item->saved.f = p_item->value.f;
-                    break;
-
-                case CONFIG_ITEM_KEY:
-                    if( !*psz_option_value )
-                        break;                    /* ignore empty option */
-                    p_item->value.i = ConfigStringToKey(psz_option_value);
-                    p_item->saved.i = p_item->value.i;
-                    break;
-
-                default:
-                    /* free old string */
-                    free( (char*) p_item->value.psz );
-                    free( (char*) p_item->saved.psz );
-
-                    p_item->value.psz = convert (psz_option_value);
-                    p_item->saved.psz = strdupnull (p_item->value.psz);
-                    break;
+                errno = 0;
+                l = strtoi (psz_option_value);
+                if ((l > item->max.i) || (l < item->min.i))
+                    errno = ERANGE;
+                if (errno)
+                    msg_Warn (p_this, "Integer value (%s) for %s: %m",
+                              psz_option_value, psz_option_name);
+                else
+                    item->saved.i = item->value.i = l;
+                break;
             }
-            break;
+
+            case CONFIG_ITEM_FLOAT:
+                if (!*psz_option_value)
+                    break;                    /* ignore empty option */
+                item->value.f = (float)atof (psz_option_value);
+                item->saved.f = item->value.f;
+                break;
+
+            case CONFIG_ITEM_KEY:
+                if (!*psz_option_value)
+                    break;                    /* ignore empty option */
+                item->value.i = ConfigStringToKey(psz_option_value);
+                item->saved.i = item->value.i;
+                break;
+
+            default:
+                free ((char *)item->value.psz);
+                free ((char *)item->saved.psz);
+                item->value.psz = convert (psz_option_value);
+                item->saved.psz = strdupnull (item->value.psz);
+                break;
         }
     }
     vlc_rwlock_unlock (&config_lock);
@@ -320,7 +269,6 @@ int config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     }
     fclose (file);
 
-    module_list_free (list);
     if (loc != (locale_t)0)
     {
         uselocale (baseloc);
