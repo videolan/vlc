@@ -162,9 +162,6 @@ int OpenVoD( vlc_object_t *p_this )
 
     p_vod->pf_media_new = MediaNew;
     p_vod->pf_media_del = MediaAskDel;
-    /* These are never used in the core, wonder why they're in the API */
-    p_vod->pf_media_add_es = NULL;
-    p_vod->pf_media_del_es = NULL;
 
     p_sys->p_fifo_cmd = block_FifoNew();
     if( vlc_thread_create( p_vod, "rtsp vod thread", CommandThread,

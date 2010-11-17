@@ -297,8 +297,6 @@ static int Open( vlc_object_t *p_this )
 
     p_vod->pf_media_new = MediaNew;
     p_vod->pf_media_del = MediaAskDel;
-    p_vod->pf_media_add_es = MediaAddES;
-    p_vod->pf_media_del_es = MediaDelES;
 
     p_sys->p_fifo_cmd = block_FifoNew();
     if( vlc_thread_create( p_vod, "rtsp vod thread", CommandThread,
