@@ -442,6 +442,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         }
         fclose (file);
         file = NULL;
+        free (line);
         *p_index = '\0';
         bigsize = p_index - bigbuf;
     }
