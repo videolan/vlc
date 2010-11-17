@@ -2671,6 +2671,8 @@ CLEAN_FILE += .gme
 CLEAN_PKG  += game-music-emu-$(GME_VERSION)
 DISTCLEAN_PKG += game-music-emu-$(GME_VERSION).tbz2
 
+tools: $(TOOLS)
+
 # ***************************************************************************
 # Some cleaning
 # ***************************************************************************

@@ -1,5 +1,7 @@
 # Darwin rules
-all: .automake .libtool .intl .pkgcfg .yasm .freetype \
+TOOLS = .libtool .intl .pkgcfg .yasm .automake
+
+all: .freetype \
     .fribidi .a52 .mpeg2 .mad .ogg .vorbis .vorbisenc .theora \
     .flac .speex .shout .faad .lame .twolame .ebml .matroska .ffmpeg \
     .dvdcss .libdvdread .dvdnav .dvbpsi .live .caca .mod .fontconfig \

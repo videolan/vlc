@@ -37,6 +37,7 @@ endif
 all: $(TARGETALL)
 
 using-src:
+	$(MAKE) -C build-src tools
 	$(MAKE) -C build-src
 
 ifdef HAVE_DARWIN_10
