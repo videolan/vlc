@@ -248,7 +248,7 @@ void Playtree::buildNode( playlist_item_t *pNode, VarTree &rTree )
                      playlist_CurrentPlayingItem(m_pPlaylist) == pNode->pp_children[i],
                      false, pNode->pp_children[i]->i_flags & PLAYLIST_RO_FLAG,
                      pNode->pp_children[i] );
-        if( pNode->pp_children[i]->i_children )
+        if( pNode->pp_children[i]->i_children > 0 )
         {
             buildNode( pNode->pp_children[i], rTree.back() );
         }
