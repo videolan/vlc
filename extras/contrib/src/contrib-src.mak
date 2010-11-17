@@ -1282,34 +1282,33 @@ ifndef HAVE_WINCE
 endif
 endif
 
-.live: live
-ifdef HAVE_WIN32
-	(cd $<;./genMakefiles mingw && make $(HOSTCC))
-else
-ifdef HAVE_WINCE
-	(cd $<; sed -e 's/-lws2_32/-lws2/g' -i.orig config.mingw)
-	(cd $<;./genMakefiles mingw && make $(HOSTCC))
-else
-ifdef HAVE_MACOSX
-	(cd $<; sed -e 's%-DBSD=1%-DBSD=1\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' -e 's%cc%$(CC)%'  -e 's%c++%$(CXX)\ $(EXTRA_LDFLAGS)%' -i.orig  config.macosx)
-	(cd $<; ./genMakefiles macosx && make)
-else
-	(cd $<; sed -e 's/=/= EXTRA_CPPFLAGS/' -e 's%EXTRA_CPPFLAGS%-I/include%' -i.orig groupsock/Makefile.head)
-ifdef HAVE_UCLIBC
-ifdef HAVE_BIGENDIAN
-	(cd $<; ./genMakefiles armeb-uclibc && make $(HOSTCC))
-endif
-else
+LIVE_TARGET-$(ENABLED)        = linux
+LIVE_TARGET-$(HAVE_WIN32)     = mingw
+LIVE_TARGET-$(HAVE_WINCE)     = mingw
+LIVE_TARGET-$(HAVE_DARWIN_OS) = macosx
+
 ifeq ($(ARCH)$(HAVE_MAEMO),armel)
-	(cd $<; ./genMakefiles armlinux && make $(HOSTCC))
-else
-	(cd $<; sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux)
-	(cd $<; ./genMakefiles linux && make $(HOSTCC))
+LIVE_TARGET-$(ENABLED)        = armlinux
+endif
+
+ifdef HAVE_BIGENDIAN
+LIVE_TARGET-$(HAVE_UCLIBC)    = armeb-uclib
+endif
+
+LIVE_PATCH-$(ENABLED)        =
+LIVE_PATCH-$(HAVE_WINCE)     = sed -e 's/-lws2_32/-lws2/g' -i.orig config.mingw
+LIVE_PATCH-$(HAVE_DARWIN_OS) = sed -e 's%-DBSD=1%-DBSD=1\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' -e 's%cc%$(CC)%'  -e 's%c++%$(CXX)\ $(EXTRA_LDFLAGS)%' -i.orig  config.macosx
+LIVE_PATCH-$(HAVE_LINUX)     = sed -e 's/=/= EXTRA_CPPFLAGS/' -e 's%EXTRA_CPPFLAGS%-I/include%' -i.orig groupsock/Makefile.head
+
+ifndef HAVE_UCLIBC
+ifneq ($(ARCH)$(HAVE_MAEMO),armel)
+LIVE_PATCH-$(HAVE_LINUX)    += ; sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux
 endif
 endif
-endif
-endif
-endif
+
+.live: live
+	(cd $<; $(LIVE_PATCH-1) )
+	(cd $<; ./genMakefiles $(LIVE_TARGET-1) && make $(HOSTCC))
 	mkdir -p $(PREFIX)/lib $(PREFIX)/include
 	cp $</groupsock/libgroupsock.a $(PREFIX)/lib
 	cp $</liveMedia/libliveMedia.a $(PREFIX)/lib
