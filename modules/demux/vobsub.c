@@ -329,6 +329,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->i_next_demux_date = (int64_t)va_arg( args, int64_t );
             return VLC_SUCCESS;
 
+        case DEMUX_GET_PTS_DELAY:
         case DEMUX_GET_FPS:
         case DEMUX_GET_META:
         case DEMUX_GET_TITLE_INFO:

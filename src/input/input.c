@@ -2388,12 +2388,6 @@ static int InputSourceInit( input_thread_t *p_input,
     if( in->p_demux )
     {
         /* Get infos from access_demux */
-        int i_ret = demux_Control( in->p_demux,
-                                   DEMUX_GET_PTS_DELAY, &in->i_pts_delay );
-        assert( !i_ret );
-        in->i_pts_delay = __MAX( 0, __MIN( in->i_pts_delay, INPUT_PTS_DELAY_MAX ) );
-
-
         in->b_title_demux = true;
         if( demux_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
                             &in->title, &in->i_title,
@@ -2454,9 +2448,6 @@ static int InputSourceInit( input_thread_t *p_input,
         if( !p_input->b_preparsing )
         {
             bool b_can_seek;
-            access_Control( in->p_access,
-                             ACCESS_GET_PTS_DELAY, &in->i_pts_delay );
-            in->i_pts_delay = __MAX( 0, __MIN( in->i_pts_delay, INPUT_PTS_DELAY_MAX ) );
 
             in->b_title_demux = false;
             if( access_Control( in->p_access, ACCESS_GET_TITLE_INFO,
@@ -2603,7 +2594,7 @@ static int InputSourceInit( input_thread_t *p_input,
 
     /* get attachment
      * FIXME improve for b_preparsing: move it after GET_META and check psz_arturl */
-    if( 1 || !p_input->b_preparsing )
+    if( !p_input->b_preparsing )
     {
         int i_attachment;
         input_attachment_t **attachment;
@@ -2615,7 +2606,24 @@ static int InputSourceInit( input_thread_t *p_input,
                               i_attachment, attachment );
             vlc_mutex_unlock( &p_input->p->p_item->lock );
         }
+
+        /* PTS delay: request from demux first. This is required for
+         * access_demux and some special cases like SDP demux. Otherwise,
+         * fallback to access */
+        if( demux_Control( in->p_demux, DEMUX_GET_PTS_DELAY,
+                           &in->i_pts_delay ) )
+        {
+            /* GET_PTS_DELAY is mandatory for access_demux */
+            assert( in->p_access );
+            access_Control( in->p_access,
+                            ACCESS_GET_PTS_DELAY, &in->i_pts_delay );
+        }
+        if( in->i_pts_delay > INPUT_PTS_DELAY_MAX )
+            in->i_pts_delay = INPUT_PTS_DELAY_MAX;
+        else if( in->i_pts_delay < 0 )
+            in->i_pts_delay = 0;
     }
+
     if( !demux_Control( in->p_demux, DEMUX_GET_FPS, &f_fps ) && f_fps > 0.0 )
     {
         vlc_mutex_lock( &p_input->p->p_item->lock );
