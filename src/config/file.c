@@ -183,33 +183,27 @@ int config_LoadConfigFile( vlc_object_t *p_this )
         rewind (file); /* no BOM, rewind */
     }
 
-    char line[1024];
+    char *line = NULL;
+    size_t bufsize;
+    ssize_t linelen;
 
     /* Ensure consistent number formatting... */
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     locale_t baseloc = uselocale (loc);
 
     vlc_rwlock_wrlock (&config_lock);
-    while (fgets (line, 1024, file) != NULL)
+    while ((linelen = getline (&line, &bufsize, file)) != -1)
     {
-        /* Ignore comments and empty lines */
-        switch (line[0])
-        {
-            case '#':
-            case '[':
-            case '\n':
-            case '\0':
-                continue;
-        }
+        line[linelen - 1] = '\0'; /* trim newline */
 
-        char *ptr = strchr (line, '\n');
-        if (ptr != NULL)
-            *ptr = '\0';
+        /* Ignore comments, section and empty lines */
+        if (memchr ("#[", line[0], 3) != NULL)
+            continue;
 
         /* look for option name */
         const char *psz_option_name = line;
 
-        ptr = strchr (line, '=');
+        char *ptr = strchr (line, '=');
         if (ptr == NULL)
             continue; /* syntax error */
         *ptr = '\0';
@@ -261,6 +255,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
         }
     }
     vlc_rwlock_unlock (&config_lock);
+    free (line);
 
     if (ferror (file))
     {
@@ -375,13 +370,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                            bool b_autosave )
 {
     module_t *p_parser;
-    FILE *file = NULL;
     char *permanent = NULL, *temporary = NULL;
-    char p_line[1024], *p_index2;
-    unsigned long i_sizebuf = 0;
-    char *p_bigbuffer = NULL, *p_index;
-    bool b_backup;
-    int i_index;
 
     if( config_PrepareDir( p_this ) )
     {
@@ -389,8 +378,13 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         return -1;
     }
 
-    file = config_OpenConfigFile( p_this );
-    if( file != NULL )
+    /* List all available modules */
+    module_t **list = module_list_get (NULL);
+
+    char *bigbuf = NULL;
+    size_t bigsize = 0;
+    FILE *file = config_OpenConfigFile (p_this);
+    if (file != NULL)
     {
         struct stat st;
 
@@ -403,72 +397,54 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
             msg_Err (p_this, "configuration file is read-only");
             goto error;
         }
-        i_sizebuf = ( st.st_size < LONG_MAX ) ? st.st_size : 0;
-    }
 
-    p_bigbuffer = p_index = malloc( i_sizebuf+1 );
-    if( !p_bigbuffer )
-        goto error;
-    p_bigbuffer[0] = 0;
+        bigsize = (st.st_size < LONG_MAX) ? st.st_size : 0;
+        bigbuf = malloc (bigsize + 1);
+        if (bigbuf == NULL)
+            goto error;
 
-    /* List all available modules */
-    module_t **list = module_list_get (NULL);
+        /* backup file into memory, we only need to backup the sections we
+         * won't save later on */
+        char *p_index = bigbuf;
+        char *line = NULL;
+        size_t bufsize;
+        ssize_t linelen;
+        bool backup = false;
 
-    /* backup file into memory, we only need to backup the sections we won't
-     * save later on */
-    b_backup = false;
-    while( file && fgets( p_line, 1024, file ) )
-    {
-        if( (p_line[0] == '[') && (p_index2 = strchr(p_line,']')))
+        while ((linelen = getline (&line, &bufsize, file)) != -1)
         {
+            char *p_index2;
 
-            /* we found a section, check if we need to do a backup */
-            for( i_index = 0; (p_parser = list[i_index]) != NULL; i_index++ )
+            if ((line[0] == '[') && (p_index2 = strchr(line,']')))
             {
-                if( ((p_index2 - &p_line[1])
-                       == (int)strlen(p_parser->psz_object_name) )
-                    && !memcmp( &p_line[1], p_parser->psz_object_name,
-                                strlen(p_parser->psz_object_name) ) )
+                /* we found a new section, check if we need to do a backup */
+                backup = true;
+                for (int i = 0; (p_parser = list[i]) != NULL; i++)
                 {
-                    if( !psz_module_name )
+                    if (!strncmp (line + 1, p_parser->psz_object_name,
+                                  strlen (p_parser->psz_object_name))
+                     && ((psz_module_name == NULL)
+                      || !strcmp (psz_module_name, p_parser->psz_object_name)))
+                    {
+                        backup = false; /* no, we will rewrite it! */
                         break;
-                    else if( !strcmp( psz_module_name,
-                                      p_parser->psz_object_name ) )
-                        break;
+                    }
                 }
             }
 
-            if( list[i_index] == NULL )
+            /* save line if requested and line is valid (doesn't begin with a
+             * space, tab, or eol) */
+            if (backup && !memchr ("\n\t ", line[0], 3))
             {
-                /* we don't have this section in our list so we need to back
-                 * it up */
-                *p_index2 = 0;
-#if 0
-                msg_Dbg( p_this, "backing up config for unknown module \"%s\"",
-                                 &p_line[1] );
-#endif
-                *p_index2 = ']';
-
-                b_backup = true;
-            }
-            else
-            {
-                b_backup = false;
+                memcpy (p_index, line, linelen);
+                p_index += linelen;
             }
         }
-
-        /* save line if requested and line is valid (doesn't begin with a
-         * space, tab, or eol) */
-        if( b_backup && (p_line[0] != '\n') && (p_line[0] != ' ')
-            && (p_line[0] != '\t') )
-        {
-            strcpy( p_index, p_line );
-            p_index += strlen( p_line );
-        }
+        fclose (file);
+        file = NULL;
+        *p_index = '\0';
+        bigsize = p_index - bigbuf;
     }
-    if( file )
-        fclose( file );
-    file = NULL;
 
     /*
      * Save module config in file
@@ -533,7 +509,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     vlc_rwlock_rdlock (&config_lock);*/
 
     /* Look for the selected module, if NULL then save everything */
-    for( i_index = 0; (p_parser = list[i_index]) != NULL; i_index++ )
+    for (int i = 0; (p_parser = list[i]) != NULL; i++)
     {
         module_config_t *p_item, *p_end;
 
@@ -647,7 +623,8 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     /*
      * Restore old settings from the config in file
      */
-    fputs( p_bigbuffer, file );
+    if (bigsize)
+        fwrite (bigbuf, 1, bigsize, file);
 
     /*
      * Flush to disk and replace atomically
@@ -685,7 +662,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
     free (temporary);
     free (permanent);
-    free( p_bigbuffer );
+    free (bigbuf);
     return 0;
 
 error:
@@ -693,7 +670,7 @@ error:
         fclose( file );
     free (temporary);
     free (permanent);
-    free( p_bigbuffer );
+    free (bigbuf);
     return -1;
 }
 
