@@ -325,8 +325,8 @@ static int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
 
     case VOD_MEDIA_SEEK:
     {
-        double d_position = (double)va_arg( args, double );
-        i_ret = vlm_ControlInternal( vlm, VLM_SET_MEDIA_INSTANCE_POSITION, id, psz_id, d_position/100.0 );
+        int64_t i_time = (int64_t)va_arg( args, int64_t );
+        i_ret = vlm_ControlInternal( vlm, VLM_SET_MEDIA_INSTANCE_TIME, id, psz_id, i_time );
         break;
     }
 

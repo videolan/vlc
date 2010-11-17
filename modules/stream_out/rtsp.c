@@ -478,7 +478,7 @@ static inline const char *parameter_next( const char *str )
 }
 
 
-static float ParseNPT (const char *str)
+static int64_t ParseNPT (const char *str)
 {
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     locale_t oldloc = uselocale (loc);
@@ -496,7 +496,7 @@ static float ParseNPT (const char *str)
         uselocale (oldloc);
         freelocale (loc);
     }
-    return sec;
+    return sec * CLOCK_FREQ;
 }
 
 
@@ -897,7 +897,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     {
                         if (range != NULL)
                         {
-                            float time = ParseNPT (range + 4);
+                            int64_t time = ParseNPT (range + 4);
                             vod_seek(rtsp->vod_media, psz_session, time);
                         }
                         if (ses->paused)

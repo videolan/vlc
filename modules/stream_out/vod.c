@@ -116,7 +116,7 @@ typedef struct
     vod_media_t *p_media;
     char *psz_session;
     char *psz_arg;
-    double f_arg;
+    int64_t i_arg;
 } rtsp_cmd_t;
 
 static vod_media_t *MediaNew( vod_t *, const char *, input_item_t * );
@@ -125,7 +125,7 @@ static void         MediaAskDel ( vod_t *, vod_media_t * );
 
 static void* CommandThread( vlc_object_t *p_this );
 static void  CommandPush( vod_t *, rtsp_cmd_type_t, vod_media_t *, const char *psz_session,
-                          double f_arg, const char *psz_arg );
+                          int64_t i_arg, const char *psz_arg );
 
 /*****************************************************************************
  * Open: Starts the RTSP server module
@@ -194,7 +194,7 @@ void CloseVoD( vlc_object_t * p_this )
 
     /* Stop command thread */
     vlc_object_kill( p_vod );
-    CommandPush( p_vod, RTSP_CMD_TYPE_NONE, NULL, NULL, 0.0, NULL );
+    CommandPush( p_vod, RTSP_CMD_TYPE_NONE, NULL, NULL, 0, NULL );
     vlc_thread_join( p_vod );
 
     while( block_FifoCount( p_sys->p_fifo_cmd ) > 0 )
@@ -310,7 +310,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
 
     msg_Dbg(p_vod, "adding media '%s', id %i", psz_name, p_media->id);
 
-    CommandPush( p_vod, RTSP_CMD_TYPE_ADD, p_media, NULL, 0.0, NULL );
+    CommandPush( p_vod, RTSP_CMD_TYPE_ADD, p_media, NULL, 0, NULL );
     return p_media;
 
 error:
@@ -321,7 +321,7 @@ error:
 static void MediaAskDel ( vod_t *p_vod, vod_media_t *p_media )
 {
     msg_Dbg( p_vod, "deleting media id %i", p_media->id );
-    CommandPush( p_vod, RTSP_CMD_TYPE_DEL, p_media, NULL, 0.0, NULL );
+    CommandPush( p_vod, RTSP_CMD_TYPE_DEL, p_media, NULL, 0, NULL );
 }
 
 static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
@@ -354,7 +354,7 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
 }
 
 static void CommandPush( vod_t *p_vod, rtsp_cmd_type_t i_type, vod_media_t *p_media, const char *psz_session,
-                         double f_arg, const char *psz_arg )
+                         int64_t i_arg, const char *psz_arg )
 {
     rtsp_cmd_t cmd;
     block_t *p_cmd;
@@ -366,7 +366,7 @@ static void CommandPush( vod_t *p_vod, rtsp_cmd_type_t i_type, vod_media_t *p_me
         cmd.i_media_id = p_media->id;
     if( psz_session )
         cmd.psz_session = strdup(psz_session);
-    cmd.f_arg = f_arg;
+    cmd.i_arg = i_arg;
     if( psz_arg )
         cmd.psz_arg = strdup(psz_arg);
 
@@ -439,7 +439,7 @@ static void* CommandThread( vlc_object_t *p_this )
 
         case RTSP_CMD_TYPE_SEEK:
             vod_MediaControl( p_vod, p_media, cmd.psz_session,
-                              VOD_MEDIA_SEEK, cmd.f_arg );
+                              VOD_MEDIA_SEEK, cmd.i_arg );
             break;
 
 #if 0
@@ -545,7 +545,7 @@ void vod_start(vod_media_t *p_media, const char *psz_session)
 {
     /* We're passing the #vod{} sout chain here */
     CommandPush(p_media->p_vod, RTSP_CMD_TYPE_PLAY, p_media,
-                psz_session, 0.0, "vod");
+                psz_session, 0, "vod");
 }
 
 /* FIXME: this sucks, RTSP doesn't really toggle the pause state, it
@@ -553,21 +553,19 @@ void vod_start(vod_media_t *p_media, const char *psz_session)
 void vod_toggle_pause(vod_media_t *p_media, const char *psz_session)
 {
     CommandPush(p_media->p_vod, RTSP_CMD_TYPE_PAUSE, p_media,
-                psz_session, 0.0, NULL);
+                psz_session, 0, NULL);
 }
 
 void vod_stop(vod_media_t *p_media, const char *psz_session)
 {
     CommandPush(p_media->p_vod, RTSP_CMD_TYPE_STOP, p_media,
-                psz_session, 0.0, NULL);
+                psz_session, 0, NULL);
 }
 
-void vod_seek(vod_media_t *p_media, const char *psz_session, float time)
+void vod_seek(vod_media_t *p_media, const char *psz_session, int64_t time)
 {
-    /* FIXME: why do we even bother converting from time to position??? */
-    double position = time / (((double)(p_media->i_length)) / CLOCK_FREQ / 100);
     CommandPush(p_media->p_vod, RTSP_CMD_TYPE_SEEK, p_media,
-                psz_session, position, NULL);
+                psz_session, time, NULL);
 }
 
 
