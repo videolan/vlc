@@ -27,6 +27,8 @@
 
 #import <UIKit/UIKit.h>
 #import <OpenGLES/ES1/gl.h>
+#import <OpenGLES/ES1/glext.h>
+#include <QuartzCore/QuartzCore.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -38,8 +40,8 @@
 #include <vlc_vout_opengl.h>
 
 #define USE_OPENGL_ES 1
+
 #include "opengl.h"
-#include <QuartzCore/QuartzCore.h>
 
 /**
  * Forward declarations
