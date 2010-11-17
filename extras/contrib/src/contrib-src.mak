@@ -358,21 +358,21 @@ libiconv-snowleopard: libiconv-snowleopard.tar.bz2
 
 ifdef HAVE_MACOSX
 ifdef HAVE_MACOSX_DARWIN_10
-.iconv: libiconv-snowleopard
+.iconv-from-os: libiconv-snowleopard
 	(cd libiconv-snowleopard && cp libiconv.* $(PREFIX)/lib/)
 	touch $@
 else
-.iconv:
+.iconv-from-os:
 	touch $@
 endif
-else
+endif
+
 .iconv: libiconv
 	(cd libiconv; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
 	$(INSTALL_NAME)
 	touch $@
-endif
 
-CLEAN_FILE += .iconv
+CLEAN_FILE += .iconv .iconv-from-os
 CLEAN_PKG += libiconv
 DISTCLEAN_PKG += libiconv-$(LIBICONV_VERSION).tar.gz
 

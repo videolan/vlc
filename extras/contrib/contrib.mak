@@ -72,7 +72,7 @@ contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2:
     # result in linking issues
 ifdef HAVE_MACOSX_DARWIN_10
 	(cd $(PREFIX)/lib && sed -e 's%/usr/lib/libiconv.la%$(PREFIX)/lib/libiconv.la%g' -i.orig *.la && rm -f *.la.orig)
-	(cd build-src && rm -f .iconv && $(MAKE) .iconv)
+	(cd build-src && rm -f .iconv && $(MAKE) .iconv-from-os)
 endif
 	touch .$(CONTRIBREV)
 
