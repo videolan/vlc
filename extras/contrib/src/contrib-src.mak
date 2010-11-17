@@ -1066,8 +1066,8 @@ endif
 
 PHONY += ffmpeg-svn ffmpeg-tar
 
-ffmpeg/.svn-co:
-	$(SVN) co $(FFMPEG_SVN) ffmpeg
+ffmpeg/.svn-$(FFMPEG_SVN_REV):
+	$(SVN) co -r $(FFMPEG_SVN_REV) $(FFMPEG_SVN) ffmpeg
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
 endif
@@ -1176,7 +1176,7 @@ DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.bz2
 # libdvdread: We use dvdnav's dvdread
 # ***************************************************************************
 libdvdread:
-	$(SVN) co $(LIBDVDREAD_SVN)  libdvdread
+	$(SVN) co -r $(LIBDVDREAD_SVN_REV) $(LIBDVDREAD_SVN)  libdvdread
 	(cd $@; patch  -p 0 < ../Patches/libdvdread-dvdcss-static.patch)
 ifdef HAVE_WIN32
 	(cd $@; patch  -p 0 < ../Patches/libdvdread-win32.patch)
@@ -1198,7 +1198,7 @@ CLEAN_PKG += libdvdread
 
 ifdef SVN
 libdvdnav:
-	$(SVN) co $(LIBDVDNAV_SVN)  libdvdnav
+	$(SVN) co -r $(LIBDVDNAV_SVN_REV) $(LIBDVDNAV_SVN)  libdvdnav
 	patch -d libdvdnav -p0 < Patches/libdvdnav.patch
 	(cd $@; ./autogen.sh noconfig)
 else
