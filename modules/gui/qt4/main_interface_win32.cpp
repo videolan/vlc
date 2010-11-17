@@ -182,6 +182,7 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
             break;
         case WM_APPCOMMAND:
             cmd = GET_APPCOMMAND_LPARAM(msg->lParam);
+            *result = TRUE;
             switch(cmd)
             {
                 case APPCOMMAND_MEDIA_PLAY_PAUSE:
@@ -213,8 +214,10 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
                     break;
                 default:
                      msg_Dbg( p_intf, "unknown APPCOMMAND = %d", cmd);
+                     *result = FALSE;
                      break;
             }
+            if (*result) return true;
             break;
     }
     return false;
