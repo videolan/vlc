@@ -66,24 +66,9 @@ matroska_segment_c::~matroska_segment_c()
     delete p_prev_segment_uid;
     delete p_next_segment_uid;
 
-    std::vector<chapter_edition_c*>::iterator index = stored_editions.begin();
-    while ( index != stored_editions.end() )
-    {
-        delete (*index);
-        ++index;
-    }
-    std::vector<chapter_translation_c*>::iterator indext = translations.begin();
-    while ( indext != translations.end() )
-    {
-        delete (*indext);
-        ++indext;
-    }
-    std::vector<KaxSegmentFamily*>::iterator indexf = families.begin();
-    while ( indexf != families.end() )
-    {
-        delete (*indexf);
-        ++indexf;
-   }
+    vlc_delete_all( stored_editions );
+    vlc_delete_all( translations );
+    vlc_delete_all( families );
 }
 
 
@@ -890,7 +875,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 p[8] == 'R' && p[9] == 'V' &&
                 (p[10] == '3' || p[10] == '4') && p[11] == '0' )
             {
-                p_tk->fmt.video.i_frame_rate = 
+                p_tk->fmt.video.i_frame_rate =
                     p[22] << 24 | p[23] << 16 | p[24] << 8 | p[25] << 0;
                 p_tk->fmt.video.i_frame_rate_base = 65536;
             }
@@ -1091,7 +1076,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             p_fmt->i_codec = VLC_CODEC_TTA;
             if( p_tk->i_extra_data > 0 )
             {
-	      fill_extra_data( p_tk, 0 );
+              fill_extra_data( p_tk, 0 );
             }
             else
             {

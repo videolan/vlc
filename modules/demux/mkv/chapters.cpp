@@ -28,18 +28,8 @@
 
 chapter_item_c::~chapter_item_c()
 {
-    std::vector<chapter_codec_cmds_c*>::iterator index = codecs.begin();
-    while ( index != codecs.end() )
-    {
-        delete (*index);
-        ++index;
-    }
-    std::vector<chapter_item_c*>::iterator index_ = sub_chapters.begin();
-    while ( index_ != sub_chapters.end() )
-    {
-        delete (*index_);
-        ++index_;
-    }
+    vlc_delete_all( codecs );
+    vlc_delete_all( sub_chapters );
 }
 
 int chapter_item_c::PublishChapters( input_title_t & title, int & i_user_chapters, int i_level )
@@ -93,7 +83,7 @@ chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id,
             return this;
         ++index;
     }
- 
+
     // sub-chapters
     chapter_item_c *p_result = NULL;
     std::vector<chapter_item_c*>::const_iterator index2 = sub_chapters.begin();
@@ -104,7 +94,7 @@ chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id,
             return p_result;
         ++index2;
     }
- 
+
     return p_result;
 }
 
@@ -183,7 +173,7 @@ int16 chapter_item_c::GetTitleNumber( ) const
 int64_t chapter_item_c::RefreshChapters( bool b_ordered, int64_t i_prev_user_time )
 {
     int64_t i_user_time = i_prev_user_time;
- 
+
     // first the sub-chapters, and then ourself
     std::vector<chapter_item_c*>::iterator index = sub_chapters.begin();
     while ( index != sub_chapters.end() )
@@ -245,7 +235,7 @@ chapter_item_c *chapter_item_c::FindTimecode( mtime_t i_user_timecode, const cha
             psz_result = (*index)->FindTimecode( i_user_timecode, p_current, b_found );
             ++index;
         }
- 
+
         if ( psz_result == NULL )
             psz_result = this;
     }
@@ -379,14 +369,14 @@ void chapter_edition_c::RefreshChapters( )
 mtime_t chapter_edition_c::Duration() const
 {
     mtime_t i_result = 0;
- 
+
     if ( sub_chapters.size() )
     {
         std::vector<chapter_item_c*>::const_iterator index = sub_chapters.end();
         --index;
         i_result = (*index)->i_user_end_time;
     }
- 
+
     return i_result;
 }
 
