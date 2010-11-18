@@ -1120,7 +1120,7 @@ FFMPEG_DEPS-$(HAVE_MACOSX) += .yasm
 FFMPEG_DEPS-$(HAVE_WIN32)  += .dshow_headers
 
 ifdef SVN
-FFMPEG_MK_TARGET = ffmpeg/.svn-co
+FFMPEG_MK_TARGET = ffmpeg/.svn-$(FFMPEG_SVN_REV)
 else
 FFMPEG_MK_TARGET = ffmpeg/.untar
 endif
