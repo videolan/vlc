@@ -75,7 +75,7 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     {
         // top-level window (owned by the root window)
         HWND hWnd_owner = pFactory->getParentWindow();
-        m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW, "SkinWindowClass",
+        m_hWnd = CreateWindowEx( 0, "SkinWindowClass",
             "default name", WS_POPUP | WS_CLIPCHILDREN,
             0, 0, 0, 0, hWnd_owner, 0, hInst, NULL );
     }
