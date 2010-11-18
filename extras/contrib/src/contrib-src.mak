@@ -877,10 +877,12 @@ ifdef HAVE_WIN32
 CROSS=$(HOST)-
 endif
 
-VPX_TARGET-$(ENABLED)             = $(TARGET)
-VPX_TARGET-$(HAVE_WIN32)          = x86-win32-gcc
-
-VPX_DEPS-$(ENABLED)               =
+VPX_TARGET-$(ENABLED)              = FIXME
+VPX_TARGET-$(HAVE_WIN32)           = x86-win32-gcc
+VPX_TARGET-$(HAVE_DARWIN_OS)       = ppc32-darwin9-gcc
+VPX_TARGET-$(HAVE_MACOSX_ON_INTEL) = x86-darwin9-gcc
+VPX_TARGET-$(HAVE_MACOSX64)        = x86_64-darwin9-gcc
+VPX_DEPS-$(ENABLED)                =
 VPX_DEPS-$(HAVE_MACOSX_ON_INTEL) += .yasm
 
 .libvpx: libvpx $(VPX_DEPS-1)
