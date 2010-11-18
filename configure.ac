@@ -376,6 +376,9 @@ case "${host_os}" in
   hpux*)
     SYS=hpux
     ;;
+  symbian*)
+    SYS=symbian
+    ;;
   *)
     SYS="${host_os}"
     ;;
@@ -3152,7 +3155,7 @@ dnl  X C Bindings modules
 dnl
 AC_ARG_ENABLE(xcb,
   [  --enable-xcb            X11 support with XCB (default enabled)],, [
-  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "darwin"], [
+  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "darwin" -a "${SYS}" != "symbian"], [
     enable_xcb="yes"
   ], [
     enable_xcb="no"
