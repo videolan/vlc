@@ -89,9 +89,7 @@ clean-bin:
 	$(MAKE) -C build-src clean-dots
 
 distclean:
-	$(MAKE) clean
-	$(MAKE) -C build-src clean-src
-	rm -rf config.mak distro.mak
+	rm -rf $(BUILDDIRS) config.mak distro.mak build-src toolchain.cmake Makefile
 
 bin: using-bin
 
