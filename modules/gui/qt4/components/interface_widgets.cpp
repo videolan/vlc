@@ -171,10 +171,12 @@ void VideoWidget::release( void )
 {
     msg_Dbg( p_intf, "Video is not needed anymore" );
 
-    assert( stable );
-    layout->removeWidget( stable );
-    stable->deleteLater();
-    stable = NULL;
+    if( stable )
+    {
+        layout->removeWidget( stable );
+        stable->deleteLater();
+        stable = NULL;
+    }
 
     updateGeometry();
 }
