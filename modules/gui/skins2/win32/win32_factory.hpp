@@ -118,6 +118,10 @@ public:
 
     HWND getParentWindow() { return m_hParentWindow; }
 
+    /// Callback function (Windows Procedure)
+    static LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg,
+                                       WPARAM wParam, LPARAM lParam );
+
 private:
     /// Handle of the instance
     HINSTANCE m_hInst;

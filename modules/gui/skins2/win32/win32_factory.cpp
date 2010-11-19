@@ -45,7 +45,8 @@
 #define MY_WM_TRAYACTION (WM_APP + 1)
 
 
-LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+LRESULT CALLBACK Win32Factory::Win32Proc( HWND hwnd, UINT uMsg,
+                                          WPARAM wParam, LPARAM lParam )
 {
     // Get pointer to thread info: should only work with the parent window
     intf_thread_t *p_intf = (intf_thread_t *)GetWindowLongPtr( hwnd,
@@ -58,6 +59,7 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
     }
 
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( p_intf );
+    GenericWindow *pWin = pFactory->m_windowMap[hwnd];
 
     if( hwnd == pFactory->getParentWindow() )
     {
@@ -92,18 +94,28 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
                 p_intf->p_sys->p_theme->getWindowManager().raiseAll();
                 CmdDlgHidePopupMenu aCmdPopup( p_intf );
                 aCmdPopup.execute();
+                return 0;
             }
             else if( (UINT)lParam == WM_RBUTTONDOWN )
             {
                 CmdDlgShowPopupMenu aCmdPopup( p_intf );
                 aCmdPopup.execute();
+                return 0;
             }
             else if( (UINT)lParam == WM_LBUTTONDBLCLK )
             {
                 CmdRestore aCmdRestore( p_intf );
                 aCmdRestore.execute();
+                return 0;
             }
         }
+    }
+    else if( pWin )
+    {
+        Win32Loop* pLoop =
+            (Win32Loop*) OSFactory::instance( p_intf )->getOSLoop();
+        if( pLoop )
+            return pLoop->processEvent( hwnd, uMsg, wParam, lParam );
     }
 
     // If hwnd does not match any window or message not processed
@@ -131,7 +143,7 @@ bool Win32Factory::init()
     // Create window class
     WNDCLASS skinWindowClass;
     skinWindowClass.style = CS_DBLCLKS;
-    skinWindowClass.lpfnWndProc = (WNDPROC) Win32Proc;
+    skinWindowClass.lpfnWndProc = (WNDPROC)Win32Factory::Win32Proc;
     skinWindowClass.lpszClassName = _T("SkinWindowClass");
     skinWindowClass.lpszMenuName = NULL;
     skinWindowClass.cbClsExtra = 0;
@@ -325,7 +337,6 @@ OSPopup *Win32Factory::createOSPopup()
 int Win32Factory::getScreenWidth() const
 {
     return GetSystemMetrics(SM_CXSCREEN);
-
 }
 
 

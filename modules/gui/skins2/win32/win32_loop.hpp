@@ -48,6 +48,10 @@ public:
     /// Exit the main loop
     virtual void exit();
 
+    /// called by the window procedure callback
+    virtual LRESULT CALLBACK processEvent( HWND hwnd, UINT msg,
+                                           WPARAM wParam, LPARAM lParam );
+
 private:
     // Private because it is a singleton
     Win32Loop( intf_thread_t *pIntf );

@@ -69,8 +69,10 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         m_hWnd = CreateWindowEx( WS_EX_APPWINDOW, "SkinWindowClass",
             "default name", WS_POPUP | WS_CLIPCHILDREN,
             0, 0, 0, 0, NULL, 0, hInst, NULL );
-    }
 
+        // Store with it a pointer to the interface thread
+        SetWindowLongPtr( m_hWnd, GWLP_USERDATA, (LONG_PTR)getIntf() );
+    }
     else
     {
         // top-level window (owned by the root window)
@@ -78,6 +80,9 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         m_hWnd = CreateWindowEx( 0, "SkinWindowClass",
             "default name", WS_POPUP | WS_CLIPCHILDREN,
             0, 0, 0, 0, hWnd_owner, 0, hInst, NULL );
+
+        // Store with it a pointer to the interface thread
+        SetWindowLongPtr( m_hWnd, GWLP_USERDATA, (LONG_PTR)getIntf() );
     }
 
     if( !m_hWnd )
