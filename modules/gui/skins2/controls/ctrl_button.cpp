@@ -132,6 +132,9 @@ void CtrlButton::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h )
 
 void CtrlButton::setImage( AnimBitmap *pImg )
 {
+    if( pImg == m_pImg )
+        return;
+
     AnimBitmap *pOldImg = m_pImg;
     m_pImg = pImg;
 

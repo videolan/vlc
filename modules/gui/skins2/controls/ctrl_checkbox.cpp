@@ -159,6 +159,9 @@ void CtrlCheckbox::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h 
 
 void CtrlCheckbox::setImage( AnimBitmap *pImg )
 {
+    if( pImg == m_pImgCurrent )
+        return;
+
     AnimBitmap *pOldImg = m_pImgCurrent;
     m_pImgCurrent = pImg;
 
