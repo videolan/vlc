@@ -21,6 +21,11 @@ libfilesystem_plugin_la_CFLAGS = $(AM_CFLAGS)
 libfilesystem_plugin_la_LIBADD = $(AM_LIBADD)
 libfilesystem_plugin_la_DEPENDENCIES =
 
+libsdp_plugin_la_SOURCES = sdp.c
+libsdp_plugin_la_CFLAGS = $(AM_CFLAGS)
+libsdp_plugin_la_LIBADD = $(AM_LIBADD)
+libsdp_plugin_la_DEPENDENCIES =
+
 SOURCES_access_mmap = mmap.c
 SOURCES_access_directory = directory.c
 SOURCES_access_dv = dv.c
@@ -54,6 +59,7 @@ SOURCES_access_vdr = vdr.c
 SOURCES_libbluray = bluray.c
 SOURCES_decklink = decklink.cpp
 
+
 SOURCES_access_rar = rar/rar.c rar/rar.h rar/access.c
 SOURCES_stream_filter_rar = rar/rar.c rar/rar.h rar/stream.c
 
@@ -75,6 +81,7 @@ libvlc_LTLIBRARIES += \
 	libaccess_ftp_plugin.la \
 	libaccess_imem_plugin.la \
 	libaccess_attachment_plugin.la \
+        libsdp_plugin.la \
 	libaccess_rar_plugin.la \
 	libstream_filter_rar_plugin.la \
 	libaccess_vdr_plugin.la \
