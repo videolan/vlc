@@ -1040,7 +1040,7 @@ static int vlm_ControlMediaInstancePause( vlm_t *p_vlm, int64_t id, const char *
 
     /* Toggle pause state */
     i_state = var_GetInteger( p_instance->p_input, "state" );
-    if( i_state == PAUSE_S )
+    if( i_state == PAUSE_S && !p_media->cfg.b_vod )
         var_SetInteger( p_instance->p_input, "state", PLAYING_S );
     else if( i_state == PLAYING_S )
         var_SetInteger( p_instance->p_input, "state", PAUSE_S );

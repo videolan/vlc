@@ -113,7 +113,6 @@ typedef struct
     char *psz_session;
 
     bool b_playing; /* is it in "play" state */
-    bool b_paused; /* is it in "pause" state */
 
     int i_es;
     rtsp_client_es_t **es;
@@ -1138,26 +1137,13 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                             CommandPush( p_vod, RTSP_CMD_TYPE_FORWARD, p_media,
                                          psz_session, 0, f_scale, NULL );
                         }
-
-                        if( p_rtsp->b_paused )
-                        {
-                            p_rtsp->b_paused = false;
-                            CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media,
-                                         psz_session, 0, 0.0, NULL );
-                        }
                     }
-                    break;
                 }
-            }
-
-            if( p_rtsp->b_playing && p_rtsp->b_paused )
-            {
-                CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media,
-                             psz_session, 0, 0.0, NULL );
-                p_rtsp->b_paused = false;
+                /* unpause, in case it's paused */
+                CommandPush( p_vod, RTSP_CMD_TYPE_PLAY, p_media, psz_session,
+                             0, 0.0, "" );
                 break;
             }
-            else if( p_rtsp->b_playing ) break;
 
             if( httpd_ClientIP( cl, ip ) == NULL ) break;
 
@@ -1233,12 +1219,8 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             p_rtsp = RtspClientGet( p_media, psz_session );
             if( !p_rtsp ) break;
 
-            if( !p_rtsp->b_paused )
-            {
-                CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media, psz_session,
-                             0, 0.0, NULL );
-                p_rtsp->b_paused = true;
-            }
+            CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media, psz_session,
+                         0, 0.0, NULL );
 
             answer->i_status = 200;
             answer->i_body = 0;
@@ -1494,12 +1476,8 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             p_rtsp = RtspClientGet( p_media, psz_session );
             if( !p_rtsp ) break;
 
-            if( !p_rtsp->b_paused )
-            {
-                CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media, psz_session,
-                             0, 0.0, NULL );
-                p_rtsp->b_paused = true;
-            }
+            CommandPush( p_vod, RTSP_CMD_TYPE_PAUSE, p_media, psz_session,
+                         0, 0.0, NULL );
 
             answer->i_status = 200;
             answer->i_body = 0;

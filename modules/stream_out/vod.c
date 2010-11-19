@@ -548,9 +548,7 @@ void vod_start(vod_media_t *p_media, const char *psz_session)
                 psz_session, 0, "vod");
 }
 
-/* FIXME: this sucks, RTSP doesn't really toggle the pause state, it
- * either PAUSEs or PLAYs */
-void vod_toggle_pause(vod_media_t *p_media, const char *psz_session)
+void vod_pause(vod_media_t *p_media, const char *psz_session)
 {
     CommandPush(p_media->p_vod, RTSP_CMD_TYPE_PAUSE, p_media,
                 psz_session, 0, NULL);

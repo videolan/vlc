@@ -173,7 +173,6 @@ struct rtsp_session_t
     rtsp_stream_t *stream;
     uint64_t       id;
     bool           vod_started; /* true if the VoD media instance was created */
-    bool           paused;      /* true if the client paused the VoD instance */
 
     /* output (id-access) */
     int            trackc;
@@ -300,7 +299,6 @@ rtsp_session_t *RtspClientNew( rtsp_stream_t *rtsp )
     s->stream = rtsp;
     vlc_rand_bytes (&s->id, sizeof (s->id));
     s->vod_started = false;
-    s->paused = false;
     s->trackc = 0;
     s->trackv = NULL;
 
@@ -900,11 +898,8 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                             int64_t time = ParseNPT (range + 4);
                             vod_seek(rtsp->vod_media, psz_session, time);
                         }
-                        if (ses->paused)
-                        {
-                            vod_toggle_pause(rtsp->vod_media, psz_session);
-                            ses->paused = false;
-                        }
+                        /* This is the thing to do to unpause... */
+                        vod_start(rtsp->vod_media, psz_session);
                     }
                 }
             }
@@ -931,11 +926,8 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             psz_session = httpd_MsgGet( query, "Session" );
             vlc_mutex_lock( &rtsp->lock );
             ses = RtspClientGet( rtsp, psz_session );
-            if (ses != NULL && !ses->paused)
-            {
-                vod_toggle_pause(rtsp->vod_media, psz_session);
-                ses->paused = true;
-            }
+            if (ses != NULL)
+                vod_pause(rtsp->vod_media, psz_session);
             vlc_mutex_unlock( &rtsp->lock );
             break;
         }

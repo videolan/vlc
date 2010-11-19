@@ -91,7 +91,7 @@ int  OpenVoD ( vlc_object_t * );
 void CloseVoD( vlc_object_t * );
 
 void vod_start(vod_media_t *p_media, const char *psz_session);
-void vod_toggle_pause(vod_media_t *p_media, const char *psz_session);
+void vod_pause(vod_media_t *p_media, const char *psz_session);
 void vod_stop(vod_media_t *p_media, const char *psz_session);
 void vod_seek(vod_media_t *p_media, const char *psz_session, int64_t time);
 
