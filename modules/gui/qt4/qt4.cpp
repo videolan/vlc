@@ -396,8 +396,15 @@ static void Close( vlc_object_t *p_this )
         var_Destroy (pl_Get(p_this), "qt4-iface");
     }
 
+    /* And quit */
+    msg_Dbg( p_intf, "Please die, die, die..." );
+    QApplication::closeAllWindows();
+
+//    QApplication::quit();
+
     QVLCApp::triggerQuit();
 
+    msg_Dbg( p_intf, "Please die, die, die 2..." );
 #ifndef Q_WS_MAC
     vlc_join (p_sys->thread, NULL);
 #endif
@@ -445,7 +452,7 @@ static void *Thread( void *obj )
 #endif
             QSettings::UserScope, "vlc", "vlc-qt-interface" );
 
-    /* Icon setting */
+    /* Icon setting, Mac uses icon from .icns */
 #ifndef Q_WS_MAC
     if( QDate::currentDate().dayOfYear() >= 352 ) /* One Week before Xmas */
         app.setWindowIcon( QIcon(vlc_christmas_xpm) );
@@ -456,7 +463,7 @@ static void *Thread( void *obj )
     /* Initialize timers and the Dialog Provider */
     DialogsProvider::getInstance( p_intf );
 
-    /* Detect screensize for small screens like TV or EEEpc*/
+    /* Detect screensize for small screens like TV or Netbooks */
     p_intf->p_sys->i_screenHeight =
         app.QApplication::desktop()->availableGeometry().height();
 
@@ -499,7 +506,7 @@ static void *Thread( void *obj )
 #endif
 
     /* Last settings */
-    app.setQuitOnLastWindowClosed( false );
+    app.setQuitOnLastWindowClosed( true );
 
     /* Retrieve last known path used in file browsing */
     p_intf->p_sys->filepath =
@@ -513,9 +520,7 @@ static void *Thread( void *obj )
     /* Launch */
     app.exec();
 
-    /* And quit */
-    QApplication::closeAllWindows();
-
+    msg_Dbg( p_intf, "QApp exec() finished" );
     if (p_mi != NULL)
     {
 #warning BUG!

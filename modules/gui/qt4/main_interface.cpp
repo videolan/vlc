@@ -226,6 +226,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     CONNECT( THEDP, toolBarConfUpdated(), this, recreateToolbars() );
 
+    CONNECT( this, askToQuit(), THEDP, quit() );
+
     /** END of CONNECTS**/
 
 
@@ -264,6 +266,8 @@ MainInterface::~MainInterface()
     /* Unsure we hide the videoWidget before destroying it */
     if( stackCentralOldWidget == videoWidget )
         showTab( bgWidget );
+
+    releaseVideoSlot();
 
 #ifdef WIN32
     if( himl )
@@ -597,7 +601,8 @@ void MainInterface::releaseVideo( void )
 /* Function that is CONNECTED to the previous emit */
 void MainInterface::releaseVideoSlot( void )
 {
-    videoWidget->release();
+    if( videoWidget )
+        videoWidget->release();
     setVideoOnTop( false );
     setVideoFullScreen( false );
 
@@ -1180,9 +1185,9 @@ void MainInterface::wheelEvent( QWheelEvent *e )
 
 void MainInterface::closeEvent( QCloseEvent *e )
 {
-    e->accept();
-    hide();
-    THEDP->quit();
+    e->ignore();      /* Do not quit */
+//  hide();
+    emit askToQuit(); /* ask THEDP to quit, so we have a unique method */
 }
 
 void MainInterface::setInterfaceFullScreen( bool fs )

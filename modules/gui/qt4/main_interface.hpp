@@ -244,6 +244,7 @@ signals:
     void askVideoOnTop( bool );
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );
+    void askToQuit();
 
 };
 
