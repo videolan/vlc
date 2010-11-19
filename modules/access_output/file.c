@@ -72,7 +72,7 @@ vlc_module_begin ()
     set_capability( "sout access", 50 )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
-    add_shortcut( "file", "stream" )
+    add_shortcut( "file", "stream", "fd" )
     add_bool( SOUT_CFG_PREFIX "append", false, APPEND_TEXT,APPEND_LONGTEXT,
               true )
 #ifdef O_SYNC
@@ -122,19 +122,40 @@ static int Open( vlc_object_t *p_this )
 
     bool append = var_GetBool( p_access, SOUT_CFG_PREFIX "append" );
 
+    if (!strcmp (p_access->psz_access, "fd"))
+    {
+        char *end;
+
+        fd = strtol (p_access->psz_path, &end, 0);
+        if (!*p_access->psz_path || *end)
+        {
+            msg_Err (p_access, "invalid file descriptor: %s",
+                     p_access->psz_path);
+            return VLC_EGENERIC;
+        }
+        fd = vlc_dup (fd);
+        if (fd == -1)
+        {
+            msg_Err (p_access, "cannot use file descriptor: %m");
+            return VLC_EGENERIC;
+        }
+    }
+#ifndef UNDER_CE
+    else
     if( !strcmp( p_access->psz_path, "-" ) )
     {
-#ifndef UNDER_CE
 #ifdef WIN32
         setmode (fileno (stdout), O_BINARY);
 #endif
         fd = vlc_dup (fileno (stdout));
+        if (fd == -1)
+        {
+            msg_Err (p_access, "cannot use standard output: %m");
+            return VLC_EGENERIC;
+        }
         msg_Dbg( p_access, "using stdout" );
-#else
-#warning stdout is not supported on Windows Mobile, but may be used on Windows CE
-        fd = -1;
-#endif
     }
+#endif
     else
     {
         char *psz_tmp = str_format( p_access, p_access->psz_path );
@@ -146,12 +167,11 @@ static int Open( vlc_object_t *p_this )
 #endif
                 (append ? 0 : O_TRUNC), 0666 );
         free( psz_tmp );
-    }
-
-    if (fd == -1)
-    {
-        msg_Err( p_access, "cannot open `%s' (%m)", p_access->psz_path );
-        return VLC_EGENERIC;
+        if (fd == -1)
+        {
+            msg_Err (p_access, "cannot create %s: %m", p_access->psz_path);
+            return VLC_EGENERIC;
+        }
     }
 
     p_access->pf_write = Write;
