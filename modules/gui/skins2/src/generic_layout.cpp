@@ -236,7 +236,7 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
         // first apply new shape to the window
         pWindow->updateShape();
 
-        pWindow->refresh( x, y, width, height );
+        pWindow->invalidateRect( x, y, width, height );
     }
 }
 

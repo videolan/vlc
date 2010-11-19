@@ -349,4 +349,11 @@ void X11Window::toggleOnTop( bool onTop ) const
     }
 }
 
+
+bool X11Window::invalidateRect( int x, int y, int w, int h ) const
+{
+    XClearArea( XDISPLAY, m_wnd, x, y, w, h, True );
+    return true;
+}
+
 #endif

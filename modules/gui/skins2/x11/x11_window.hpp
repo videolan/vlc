@@ -76,6 +76,9 @@ public:
     /// reparent the window
     void reparent( void* OSHandle, int x, int y, int w, int h );
 
+    /// invalidate a window surface
+    bool invalidateRect( int x, int y, int w, int h ) const;
+
     void setFullscreen() const;
 
 private:

@@ -135,7 +135,17 @@ void Win32Window::reparent( void* OSHandle, int x, int y, int w, int h )
     }
 
     SetParent( m_hWnd, (HWND)OSHandle );
-    MoveWindow( m_hWnd, x, y, w, h, true );
+    MoveWindow( m_hWnd, x, y, w, h, TRUE );
+}
+
+
+bool Win32Window::invalidateRect( int x, int y, int w, int h) const
+{
+    RECT rect = { x, y, x + w , y + h };
+    InvalidateRect( m_hWnd, &rect, FALSE );
+    UpdateWindow( m_hWnd );
+
+    return true;
 }
 
 
@@ -165,7 +175,7 @@ void Win32Window::hide() const
 
 void Win32Window::moveResize( int left, int top, int width, int height ) const
 {
-    MoveWindow( m_hWnd, left, top, width, height, true );
+    MoveWindow( m_hWnd, left, top, width, height, TRUE );
 }
 
 

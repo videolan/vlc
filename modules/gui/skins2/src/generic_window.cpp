@@ -179,3 +179,18 @@ void GenericWindow::setParent( GenericWindow* pParent, int x, int y, int w, int 
     void* handle = pParent ? pParent->getOSHandle() : NULL;
     m_pOsWindow->reparent( handle, m_left, m_top, m_width, m_height );
 }
+
+
+void GenericWindow::invalidateRect( int left, int top, int width, int height )
+{
+    if( m_pOsWindow )
+    {
+        // tell the OS we invalidate a window client area
+        bool b_supported =
+            m_pOsWindow->invalidateRect( left, top, width, height );
+
+        // if not supported, directly refresh the area
+        if( !b_supported )
+            refresh( left, top, width, height );
+    }
+}

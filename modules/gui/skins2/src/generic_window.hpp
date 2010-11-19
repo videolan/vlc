@@ -80,6 +80,9 @@ public:
     /// Refresh an area of the window
     virtual void refresh( int left, int top, int width, int height ) { }
 
+    /// Invalidate an area of the window
+    virtual void invalidateRect( int left, int top, int width, int height );
+
     /// Get the coordinates of the window
     int getLeft() const { return m_left; }
     int getTop() const { return m_top; }
