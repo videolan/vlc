@@ -639,11 +639,19 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
 
             if( p_cfg->vod.psz_mux )
             {
+                const char *psz_mux;
+                if (!strcmp(p_cfg->vod.psz_mux, "ps"))
+                    psz_mux = "mp2p";
+                else if (!strcmp(p_cfg->vod.psz_mux, "ts"))
+                    psz_mux = "mp2t";
+                else
+                    psz_mux = p_cfg->vod.psz_mux;
+
                 input_item_t item;
                 es_format_t es, *p_es = &es;
                 union { char text[5]; uint32_t value; } fourcc;
 
-                sprintf( fourcc.text, "%4.4s", p_cfg->vod.psz_mux );
+                sprintf( fourcc.text, "%4.4s", psz_mux );
                 fourcc.text[0] = tolower(fourcc.text[0]);
                 fourcc.text[1] = tolower(fourcc.text[1]);
                 fourcc.text[2] = tolower(fourcc.text[2]);
