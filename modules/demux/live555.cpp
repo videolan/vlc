@@ -106,7 +106,7 @@ vlc_module_begin ()
 
     add_submodule ()
         set_description( N_("RTSP/RTP access and demux") )
-        add_shortcut( "rtsp", "pnm", "sdp", "live", "livedotcom" )
+        add_shortcut( "rtsp", "pnm", "live", "livedotcom" )
         set_capability( "access_demux", 0 )
         set_callbacks( Open, Close )
         add_bool( "rtsp-tcp", false,
@@ -387,12 +387,6 @@ static int  Open ( vlc_object_t *p_this )
             p_sdp = (uint8_t*)xrealloc( p_sdp, i_sdp_max );
         }
         p_sys->p_sdp = (char*)p_sdp;
-    }
-    else if( ( p_demux->s == NULL ) &&
-             !strcasecmp( p_demux->psz_access, "sdp" ) )
-    {
-        /* sdp:// link from SAP */
-        p_sys->p_sdp = strdup( p_sys->psz_path );
     }
     else if( ( i_return = Connect( p_demux ) ) != VLC_SUCCESS )
     {
