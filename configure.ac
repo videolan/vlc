@@ -551,6 +551,9 @@ AC_CHECK_FUNCS(fdatasync,,
   [AC_DEFINE(fdatasync, fsync, [Alias fdatasync() to fsync() if missing.])
 ])
 
+# Windows CE doesn't have strcoll()
+AC_FUNC_STRCOLL
+
 dnl Check for non-standard system calls
 AC_CHECK_FUNCS([accept4 dup3 eventfd vmsplice sched_getaffinity])
 

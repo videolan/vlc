@@ -154,7 +154,7 @@ static int compare_sub_priority( const void *a, const void *b )
     if( p0->priority < p1->priority )
         return 1;
 
-#ifndef UNDER_CE
+#ifdef HAVE_STRCOLL
     return strcoll( p0->psz_fname, p1->psz_fname);
 #else
     return strcmp( p0->psz_fname, p1->psz_fname);

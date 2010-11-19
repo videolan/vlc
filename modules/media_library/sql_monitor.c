@@ -28,6 +28,9 @@
 /** **************************************************************************
  * MONITORING AND DIRECTORY SCANNING FUNCTIONS
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+#   include "config.h"
+#endif
 
 #include "sql_media_library.h"
 #include "vlc_playlist.h"
@@ -190,7 +193,11 @@ int AddDirToMonitor( media_library_t *p_ml, const char *psz_dir )
 
 static int Sort( const char **a, const char **b )
 {
+#ifdef HAVE_STRCOLL
     return strcoll( *a, *b );
+#else
+    return strcmp( *a, *b );
+#endif
 }
 
 /**
