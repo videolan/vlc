@@ -2,7 +2,7 @@
  * vmem.c: memory video driver for vlc
  *****************************************************************************
  * Copyright (C) 2008 the VideoLAN team
- * $Id$
+ * Copyrgiht (C) 2010 Rémi Denis-Courmont
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *
@@ -141,10 +141,6 @@ static int Open(vlc_object_t *object)
         fmt.i_bmask = 0xf800;
         break;
     case VLC_CODEC_RGB24:
-        fmt.i_rmask = 0xff0000;
-        fmt.i_gmask = 0x00ff00;
-        fmt.i_bmask = 0x0000ff;
-        break;
     case VLC_CODEC_RGB32:
         fmt.i_rmask = 0xff0000;
         fmt.i_gmask = 0x00ff00;
