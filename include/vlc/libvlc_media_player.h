@@ -699,7 +699,7 @@ int libvlc_video_get_size( libvlc_media_player_t *p_mi, unsigned num,
 
 /**
  * Get current video height.
- * You should use libvlc_video_get_size() instead.
+ * \deprecated Use libvlc_video_get_size() instead.
  *
  * \param p_mi the media player
  * \return the video pixel height or 0 if not applicable
@@ -709,7 +709,7 @@ int libvlc_video_get_height( libvlc_media_player_t *p_mi );
 
 /**
  * Get current video width.
- * You should use libvlc_video_get_size() instead.
+ * \deprecated Use libvlc_video_get_size() instead.
  *
  * \param p_mi the media player
  * \return the video pixel width or 0 if not applicable
