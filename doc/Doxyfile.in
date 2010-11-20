@@ -1,4 +1,4 @@
-# Doxyfile 1.6.2-20100208
+# Doxyfile 1.7.1
 
 # This file describes the settings to be used by the documentation system
 # doxygen (www.doxygen.org) for a project
@@ -207,14 +207,15 @@ OPTIMIZE_FOR_FORTRAN   = NO
 
 OPTIMIZE_OUTPUT_VHDL   = NO
 
-# Doxygen selects the parser to use depending on the extension of the files it parses.
-# With this tag you can assign which parser to use for a given extension.
-# Doxygen has a built-in mapping, but you can override or extend it using this tag.
-# The format is ext=language, where ext is a file extension, and language is one of
-# the parsers supported by doxygen: IDL, Java, Javascript, C#, C, C++, D, PHP,
-# Objective-C, Python, Fortran, VHDL, C, C++. For instance to make doxygen treat
-# .inc files as Fortran files (default is PHP), and .f files as C (default is Fortran),
-# use: inc=Fortran f=C. Note that for custom extensions you also need to set FILE_PATTERNS otherwise the files are not read by doxygen.
+# Doxygen selects the parser to use depending on the extension of the files it
+# parses. With this tag you can assign which parser to use for a given extension.
+# Doxygen has a built-in mapping, but you can override or extend it using this
+# tag. The format is ext=language, where ext is a file extension, and language
+# is one of the parsers supported by doxygen: IDL, Java, Javascript, CSharp, C,
+# C++, D, PHP, Objective-C, Python, Fortran, VHDL, C, C++. For instance to make
+# doxygen treat .inc files as Fortran files (default is PHP), and .f files as C
+# (default is Fortran), use: inc=Fortran f=C. Note that for custom extensions
+# you also need to set FILE_PATTERNS otherwise the files are not read by doxygen.
 
 EXTENSION_MAPPING      =
 
@@ -411,7 +412,13 @@ SORT_MEMBER_DOCS       = YES
 
 SORT_BRIEF_DOCS        = NO
 
-# If the SORT_MEMBERS_CTORS_1ST tag is set to YES then doxygen will sort the (brief and detailed) documentation of class members so that constructors and destructors are listed first. If set to NO (the default) the constructors will appear in the respective orders defined by SORT_MEMBER_DOCS and SORT_BRIEF_DOCS. This tag will be ignored for brief docs if SORT_BRIEF_DOCS is set to NO and ignored for detailed docs if SORT_MEMBER_DOCS is set to NO.
+# If the SORT_MEMBERS_CTORS_1ST tag is set to YES then doxygen
+# will sort the (brief and detailed) documentation of class members so that
+# constructors and destructors are listed first. If set to NO (the default)
+# the constructors will appear in the respective orders defined by
+# SORT_MEMBER_DOCS and SORT_BRIEF_DOCS.
+# This tag will be ignored for brief docs if SORT_BRIEF_DOCS is set to NO
+# and ignored for detailed docs if SORT_MEMBER_DOCS is set to NO.
 
 SORT_MEMBERS_CTORS_1ST = NO
 
@@ -505,12 +512,12 @@ SHOW_NAMESPACES        = YES
 
 FILE_VERSION_FILTER    =
 
-# The LAYOUT_FILE tag can be used to specify a layout file which will be parsed by
-# doxygen. The layout file controls the global structure of the generated output files
-# in an output format independent way. The create the layout file that represents
-# doxygen's defaults, run doxygen with the -l option. You can optionally specify a
-# file name after the option, if omitted DoxygenLayout.xml will be used as the name
-# of the layout file.
+# The LAYOUT_FILE tag can be used to specify a layout file which will be parsed
+# by doxygen. The layout file controls the global structure of the generated
+# output files in an output format independent way. The create the layout file
+# that represents doxygen's defaults, run doxygen with the -l option.
+# You can optionally specify a file name after the option, if omitted
+# DoxygenLayout.xml will be used as the name of the layout file.
 
 LAYOUT_FILE            =
 
@@ -803,6 +810,31 @@ HTML_FOOTER            =
 
 HTML_STYLESHEET        =
 
+# The HTML_COLORSTYLE_HUE tag controls the color of the HTML output.
+# Doxygen will adjust the colors in the stylesheet and background images
+# according to this color. Hue is specified as an angle on a colorwheel,
+# see http://en.wikipedia.org/wiki/Hue for more information.
+# For instance the value 0 represents red, 60 is yellow, 120 is green,
+# 180 is cyan, 240 is blue, 300 purple, and 360 is red again.
+# The allowed range is 0 to 359.
+
+HTML_COLORSTYLE_HUE    = 220
+
+# The HTML_COLORSTYLE_SAT tag controls the purity (or saturation) of
+# the colors in the HTML output. For a value of 0 the output will use
+# grayscales only. A value of 255 will produce the most vivid colors.
+
+HTML_COLORSTYLE_SAT    = 100
+
+# The HTML_COLORSTYLE_GAMMA tag controls the gamma correction applied to
+# the luminance component of the colors in the HTML output. Values below
+# 100 gradually make the output lighter, whereas values above 100 make
+# the output darker. The value divided by 100 is the actual gamma applied,
+# so 80 represents a gamma of 0.8, The value 220 represents a gamma of 2.2,
+# and 100 does not change the gamma.
+
+HTML_COLORSTYLE_GAMMA  = 80
+
 # If the HTML_TIMESTAMP tag is set to YES then the footer of each generated HTML
 # page will contain the date and time when the page was generated. Setting
 # this to NO can help when comparing the output of multiple runs.
@@ -831,7 +863,8 @@ HTML_DYNAMIC_SECTIONS  = NO
 # directory and running "make install" will install the docset in
 # ~/Library/Developer/Shared/Documentation/DocSets so that Xcode will find
 # it at startup.
-# See http://developer.apple.com/tools/creatingdocsetswithdoxygen.html for more information.
+# See http://developer.apple.com/tools/creatingdocsetswithdoxygen.html
+# for more information.
 
 GENERATE_DOCSET        = NO
 
@@ -840,7 +873,7 @@ GENERATE_DOCSET        = NO
 # documentation sets from a single provider (such as a company or product suite)
 # can be grouped.
 
-DOCSET_FEEDNAME        = "Doxygen generated docs"
+DOCSET_FEEDNAME        = "VideoLAN developer docs"
 
 # When GENERATE_DOCSET tag is set to YES, this tag specifies a string that
 # should uniquely identify the documentation set bundle. This should be a
@@ -848,6 +881,16 @@ DOCSET_FEEDNAME        = "Doxygen generated docs"
 # will append .docset to the name.
 
 DOCSET_BUNDLE_ID       = org.videolan.vlc
+
+# When GENERATE_PUBLISHER_ID tag specifies a string that should uniquely identify
+# the documentation publisher. This should be a reverse domain-name style
+# string, e.g. com.mycompany.MyDocSet.documentation.
+
+DOCSET_PUBLISHER_ID    = org.videolan
+
+# The GENERATE_PUBLISHER_NAME tag identifies the documentation publisher.
+
+DOCSET_PUBLISHER_NAME  = VideoLAN
 
 # If the GENERATE_HTMLHELP tag is set to YES, additional index files
 # will be generated that can be used as input for tools like the
@@ -893,10 +936,10 @@ BINARY_TOC             = NO
 
 TOC_EXPAND             = NO
 
-# If the GENERATE_QHP tag is set to YES and both QHP_NAMESPACE and QHP_VIRTUAL_FOLDER
-# are set, an additional index file will be generated that can be used as input for
-# Qt's qhelpgenerator to generate a Qt Compressed Help (.qch) of the generated
-# HTML documentation.
+# If the GENERATE_QHP tag is set to YES and both QHP_NAMESPACE and
+# QHP_VIRTUAL_FOLDER are set, an additional index file will be generated
+# that can be used as input for Qt's qhelpgenerator to generate a
+# Qt Compressed Help (.qch) of the generated HTML documentation.
 
 GENERATE_QHP           = NO
 
@@ -918,20 +961,24 @@ QHP_NAMESPACE          = org.doxygen.Project
 
 QHP_VIRTUAL_FOLDER     = doc
 
-# If QHP_CUST_FILTER_NAME is set, it specifies the name of a custom filter to add.
-# For more information please see
+# If QHP_CUST_FILTER_NAME is set, it specifies the name of a custom filter to
+# add. For more information please see
 # http://doc.trolltech.com/qthelpproject.html#custom-filters
 
 QHP_CUST_FILTER_NAME   =
 
-# The QHP_CUST_FILT_ATTRS tag specifies the list of the attributes of the custom filter to add.For more information please see
-# <a href="http://doc.trolltech.com/qthelpproject.html#custom-filters">Qt Help Project / Custom Filters</a>.
+# The QHP_CUST_FILT_ATTRS tag specifies the list of the attributes of the
+# custom filter to add. For more information please see
+# <a href="http://doc.trolltech.com/qthelpproject.html#custom-filters">
+# Qt Help Project / Custom Filters</a>.
 
 QHP_CUST_FILTER_ATTRS  =
 
-# The QHP_SECT_FILTER_ATTRS tag specifies the list of the attributes this project's
+# The QHP_SECT_FILTER_ATTRS tag specifies the list of the attributes this
+# project's
 # filter section matches.
-# <a href="http://doc.trolltech.com/qthelpproject.html#filter-attributes">Qt Help Project / Filter Attributes</a>.
+# <a href="http://doc.trolltech.com/qthelpproject.html#filter-attributes">
+# Qt Help Project / Filter Attributes</a>.
 
 QHP_SECT_FILTER_ATTRS  =
 
@@ -944,11 +991,12 @@ QHG_LOCATION           =
 
 # If the GENERATE_ECLIPSEHELP tag is set to YES, additional index files
 #  will be generated, which together with the HTML files, form an Eclipse help
-#  plugin. To install this plugin and make it available under the help contents
+# plugin. To install this plugin and make it available under the help contents
 # menu in Eclipse, the contents of the directory containing the HTML and XML
 # files needs to be copied into the plugins directory of eclipse. The name of
 # the directory within the plugins directory should be the same as
-# the ECLIPSE_DOC_ID value. After copying Eclipse needs to be restarted before the help appears.
+# the ECLIPSE_DOC_ID value. After copying Eclipse needs to be restarted before
+# the help appears.
 
 GENERATE_ECLIPSEHELP   = NO
 
@@ -990,6 +1038,11 @@ USE_INLINE_TREES       = NO
 
 TREEVIEW_WIDTH         = 250
 
+# When the EXT_LINKS_IN_WINDOW option is set to YES doxygen will open
+# links to external symbols imported via tag files in a separate window.
+
+EXT_LINKS_IN_WINDOW    = NO
+
 # Use this tag to change the font size of Latex formulas included
 # as images in the HTML documentation. The default is 10. Note that
 # when you change the font size after a successful doxygen run you need
@@ -998,15 +1051,30 @@ TREEVIEW_WIDTH         = 250
 
 FORMULA_FONTSIZE       = 10
 
-# When the SEARCHENGINE tag is enabled doxygen will generate a search box for the HTML output. The underlying search engine uses javascript
-# and DHTML and should work on any modern browser. Note that when using HTML help (GENERATE_HTMLHELP), Qt help (GENERATE_QHP), or docsets (GENERATE_DOCSET) there is already a search function so this one should
+# Use the FORMULA_TRANPARENT tag to determine whether or not the images
+# generated for formulas are transparent PNGs. Transparent PNGs are
+# not supported properly for IE 6.0, but are supported on all modern browsers.
+# Note that when changing this option you need to delete any form_*.png files
+# in the HTML output before the changes have effect.
+
+FORMULA_TRANSPARENT    = YES
+
+# When the SEARCHENGINE tag is enabled doxygen will generate a search box
+# for the HTML output. The underlying search engine uses javascript
+# and DHTML and should work on any modern browser. Note that when using
+# HTML help (GENERATE_HTMLHELP), Qt help (GENERATE_QHP), or docsets
+# (GENERATE_DOCSET) there is already a search function so this one should
 # typically be disabled. For large projects the javascript based search engine
 # can be slow, then enabling SERVER_BASED_SEARCH may provide a better solution.
 
 SEARCHENGINE           = YES
 
-# When the SERVER_BASED_SEARCH tag is enabled the search engine will be implemented using a PHP enabled web server instead of at the web client using Javascript. Doxygen will generate the search PHP script and index
-# file to put on the web server. The advantage of the server based approach is that it scales better to large projects and allows full text search. The disadvances is that it is more difficult to setup
+# When the SERVER_BASED_SEARCH tag is enabled the search engine will be
+# implemented using a PHP enabled web server instead of at the web client
+# using Javascript. Doxygen will generate the search PHP script and index
+# file to put on the web server. The advantage of the server
+# based approach is that it scales better to large projects and allows
+# full text search. The disadvances is that it is more difficult to setup
 # and does not have live searching capabilities.
 
 SERVER_BASED_SEARCH    = NO
@@ -1090,7 +1158,10 @@ LATEX_BATCHMODE        = NO
 
 LATEX_HIDE_INDICES     = NO
 
-# If LATEX_SOURCE_CODE is set to YES then doxygen will include source code with syntax highlighting in the LaTeX output. Note that which sources are shown also depends on other settings such as SOURCE_BROWSER.
+# If LATEX_SOURCE_CODE is set to YES then doxygen will include
+# source code with syntax highlighting in the LaTeX output.
+# Note that which sources are shown also depends on other settings
+# such as SOURCE_BROWSER.
 
 LATEX_SOURCE_CODE      = NO
 
@@ -1392,6 +1463,14 @@ HIDE_UNDOC_RELATIONS   = YES
 # have no effect if this option is set to NO (the default)
 
 HAVE_DOT               = YES
+
+# The DOT_NUM_THREADS specifies the number of dot invocations doxygen is
+# allowed to run in parallel. When set to 0 (the default) doxygen will
+# base this on the number of processors available in the system. You can set it
+# explicitly to a value larger than 0 to get control over the balance
+# between CPU load and processing speed.
+
+DOT_NUM_THREADS        = 0
 
 # By default doxygen will write a font called FreeSans.ttf to the output
 # directory and reference it in all dot files that doxygen generates. This
