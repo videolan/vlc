@@ -239,10 +239,10 @@ typedef void *(*libvlc_video_lock_cb)(void *opaque, void **planes);
  * but before the picture is displayed.
  *
  * \param opaque private pointer as passed to libvlc_video_set_callbacks() [IN]
- * \param picture private pointer returned from the libvlc_video_lock_cb
+ * \param picture private pointer returned from the @ref libvlc_video_lock_cb
  *                callback [IN]
- * \param planes pixel planes as allocated by the libvlc_video_lock_cb callback
- *               (this parameter is provided for convenience only) [IN]
+ * \param planes pixel planes as defined by the @ref libvlc_video_lock_cb
+ *               callback (this parameter is only for convenience) [IN]
  */
 typedef void (*libvlc_video_unlock_cb)(void *opaque, void *picture,
                                        void *const *planes);
@@ -254,7 +254,7 @@ typedef void (*libvlc_video_unlock_cb)(void *opaque, void *picture,
  * clock, the display callback is invoked.
  *
  * \param opaque private pointer as passed to libvlc_video_set_callbacks() [IN]
- * \param picture private pointer returned from the libvlc_video_lock_cb
+ * \param picture private pointer returned from the @ref libvlc_video_lock_cb
  *                callback [IN]
  */
 typedef void (*libvlc_video_display_cb)(void *opaque, void *picture);
@@ -264,9 +264,9 @@ typedef void (*libvlc_video_display_cb)(void *opaque, void *picture);
  * in memory. Use libvlc_video_set_format() to configure the decoded format.
  *
  * \param mp the media player
- * \param lock callback to lock video memory
- * \param unlock callback to unlock video memory
- * \param display callback to display video
+ * \param lock callback to lock video memory (must not be NULL)
+ * \param unlock callback to unlock video memory (or NULL if not needed)
+ * \param display callback to display video (or NULL if not needed)
  * \param opaque private pointer for the three callbacks (as first parameter)
  * \version LibVLC 1.1.1 or later
  */
