@@ -28,9 +28,7 @@
 
 QString toURI( const QString& s )
 {
-    QString path = toNativeSeparators( s );
-
-    char *psz = make_URI( qtu(path), NULL );
+    char *psz = make_URI( qtu(s), NULL );
     if( psz == NULL )
         return qfu("");
 
