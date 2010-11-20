@@ -213,34 +213,69 @@ VLC_PUBLIC_API void libvlc_media_player_pause ( libvlc_media_player_t *p_mi );
 VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t *p_mi );
 
 /**
- * Set callbacks and private data to render decoded video to a custom area
- * in memory. Use libvlc_video_set_format() to configure the decoded format.
+ * Callback prototype to allocate and lock a picture buffer.
  *
  * Whenever a new video frame needs to be decoded, the lock callback is
  * invoked. Depending on the video chroma, one or three pixel planes of
  * adequate dimensions must be returned via the second parameter. Those
  * planes must be aligned on 32-bytes boundaries.
  *
- * When the video frame is decoded, the unlock callback is invoked. The
- * second parameter to the callback corresponds is the return value of the
- * lock callback. The third parameter conveys the pixel planes for convenience.
+ * \param opaque private pointer as passed to libvlc_video_set_callbacks() [IN]
+ * \param planes start address of the pixel planes (LibVLC allocates the array
+ *             of void pointers, this callback must initialize the array) [OUT]
+ * \return a private pointer for the display and unlock callbacks to identify
+ *         the picture buffers
+ */
+typedef void *(*libvlc_video_lock_cb)(void *opaque, void **planes);
+
+/**
+ * Callback prototype to unlock a picture buffer.
+ *
+ * When the video frame decoding is complete, the unlock callback is invoked.
+ * This callback might not be needed at all. It is only an indication that the
+ * application can now read the pixel values if it needs to.
+ *
+ * \warning A picture buffer is unlocked after the picture is decoded,
+ * but before the picture is displayed.
+ *
+ * \param opaque private pointer as passed to libvlc_video_set_callbacks() [IN]
+ * \param picture private pointer returned from the libvlc_video_lock_cb
+ *                callback [IN]
+ * \param planes pixel planes as allocated by the libvlc_video_lock_cb callback
+ *               (this parameter is provided for convenience only) [IN]
+ */
+typedef void (*libvlc_video_unlock_cb)(void *opaque, void *picture,
+                                       void *const *planes);
+
+/**
+ * Callback prototype to display a picture.
  *
  * When the video frame needs to be shown, as determined by the media playback
- * clock, the display callback is invoked. The second parameter also conveys
- * the return value from the lock callback.
+ * clock, the display callback is invoked.
+ *
+ * \param opaque private pointer as passed to libvlc_video_set_callbacks() [IN]
+ * \param picture private pointer returned from the libvlc_video_lock_cb
+ *                callback [IN]
+ */
+typedef void (*libvlc_video_display_cb)(void *opaque, void *picture);
+
+/**
+ * Set callbacks and private data to render decoded video to a custom area
+ * in memory. Use libvlc_video_set_format() to configure the decoded format.
  *
  * \param mp the media player
- * \param lock callback to allocate video memory
- * \param unlock callback to release video memory
+ * \param lock callback to lock video memory
+ * \param unlock callback to unlock video memory
+ * \param display callback to display video
  * \param opaque private pointer for the three callbacks (as first parameter)
  * \version LibVLC 1.1.1 or later
  */
 VLC_PUBLIC_API
 void libvlc_video_set_callbacks( libvlc_media_player_t *mp,
-    void *(*lock) (void *opaque, void **plane),
-    void (*unlock) (void *opaque, void *picture, void *const *plane),
-    void (*display) (void *opaque, void *picture),
-    void *opaque );
+                                 libvlc_video_lock_cb lock,
+                                 libvlc_video_unlock_cb unlock,
+                                 libvlc_video_display_cb display,
+                                 void *opaque );
 
 /**
  * Set decoded video chroma and dimensions. This only works in combination with
