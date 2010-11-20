@@ -1,26 +1,99 @@
 #!/bin/sh
 set -e
 
-echo "Building libvlc for the iOS"
+PLATFORM=OS
+SDK=iphoneos3.2
+VERBOSE=no
 
-if [ "$1" = "Simulator" ]; then
-    PLATFORM="Simulator"
+usage()
+{
+cat << EOF
+usage: $0 [-s] [-k sdk]
+
+OPTIONS
+   -k       Specify which sdk to use ('xcodebuild -showsdks', current: ${SDK})
+   -s       Build for simulator
+EOF
+}
+
+spushd()
+{
+    pushd "$1" 2>&1> /dev/null
+}
+
+spopd()
+{
+    popd 2>&1> /dev/null
+}
+
+info()
+{
+    local blue="\033[1;34m"
+    local normal="\033[0m"
+    echo "[${blue}info${normal}] $1"
+}
+
+while getopts "hvsk:" OPTION
+do
+     case $OPTION in
+         h)
+             usage
+             exit 1
+             ;;
+         v)
+             VERBOSE=yes
+             ;;
+         s)
+             PLATFORM=Simulator
+             SDK=iphonesimulator3.2
+             ;;
+         k)
+             SDK=$OPTARG
+             ;;
+         ?)
+             usage
+             exit 1
+             ;;
+     esac
+done
+shift $(($OPTIND - 1))
+
+if [ "x$1" != "x" ]; then
+    usage
+    exit 1
+fi
+
+out="/dev/null"
+if [ "$VERBOSE" = "yes" ]; then
+   out="/dev/stdout"
+fi
+
+info "Building libvlc for the iOS"
+
+if [ "$PLATFORM" = "Simulator" ]; then
     TARGET="i686-apple-darwin10"
     ARCH="i386"
 else
-    PLATFORM="OS"
     TARGET="arm-apple-darwin10"
     ARCH="armv7"
     OPTIM="-mno-thumb"
 fi
 
+# Test if SDK exists
+xcodebuild -find gcc -sdk ${SDK} > ${out}
+
+SDK_VERSION=`echo ${SDK} | sed -e 's/iphoneos//' -e 's/iphonesimulator//'`
+
+info "Using ${ARCH} with SDK version ${SDK_VERSION}"
+
 THIS_SCRIPT_PATH=`pwd`/$0
 
-pushd `dirname $0`/../../.. > /dev/null
+spushd `dirname ${THIS_SCRIPT_PATH}`/../../..
 VLCROOT=`pwd` # Let's make sure VLCROOT is an absolute path
-popd > /dev/null
+spopd
+
 DEVROOT="/Developer/Platforms/iPhone${PLATFORM}.platform/Developer"
-IOS_SDK_ROOT="${DEVROOT}/SDKs/iPhone${PLATFORM}4.2.sdk"
+IOS_SDK_ROOT="${DEVROOT}/SDKs/iPhone${PLATFORM}${SDK_VERSION}.sdk"
 
 BUILDDIR="${VLCROOT}/build-ios-${PLATFORM}"
 
@@ -55,8 +128,7 @@ fi
 
 export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:${VLCROOT}/extras/contrib/build/bin:${VLCROOT}/extras/package/ios/resources"
 
-echo "Boostraping contribs"
-pushd ${VLCROOT}/extras/contrib > /dev/null
+spushd ${VLCROOT}/extras/contrib
 
 # contains gas-processor.pl
 export PATH=$PATH:${VLCROOT}/extras/package/ios/resources
@@ -64,19 +136,20 @@ export PATH=$PATH:${VLCROOT}/extras/package/ios/resources
 # The contrib will read the following
 export IOS_SDK_ROOT
 
-echo "Building contrib for iOS"
+info "Building contrib for iOS in '${VLCROOT}/contrib-builddir-ios-${TARGET}'"
+
 ./bootstrap -t ${TARGET} -d ios \
    -b "${VLCROOT}/contrib-builddir-ios-${TARGET}" \
-   -i "${VLCROOT}/contrib-ios-${TARGET}"
-pushd "${VLCROOT}/contrib-builddir-ios-${TARGET}" > /dev/null
-make src
-popd > /dev/null
+   -i "${VLCROOT}/contrib-ios-${TARGET}" > ${out}
+spushd "${VLCROOT}/contrib-builddir-ios-${TARGET}"
+make src > ${out}
+spopd
 
-echo "Building contrib for current host"
-./bootstrap
-make
+info "Building contrib for current host"
+./bootstrap > ${out}
+make > ${out}
 
-popd
+spopd
 
 if [ "$PLATFORM" = "OS" ]; then
   export AS="${IOS_GAS_PREPROCESSOR} ${CC}"
@@ -87,9 +160,10 @@ else
 fi
 
 
-echo "Bootstraping vlc"
+info "Bootstraping vlc"
+
 if ! [ -e ${VLCROOT}/configure ]; then
-    ${VLCROOT}/bootstrap
+    ${VLCROOT}/bootstrap > ${out}
 fi
 
 if [ ".$PLATFORM" != ".Simulator" ]; then
@@ -101,7 +175,7 @@ if [ ".$PLATFORM" != ".Simulator" ]; then
 fi
 
 mkdir -p ${BUILDDIR}
-pushd ${BUILDDIR}
+spushd ${BUILDDIR}
 
 # Run configure only upon changes.
 if [ "${VLCROOT}/configure" -nt config.log -o \
@@ -144,14 +218,15 @@ ${VLCROOT}/configure \
     --disable-lua \
     --disable-sse \
     --disable-neon \
-    --disable-mmx # MMX and SSE support requires llvm which is broken on Simulator
+    --disable-mmx > ${out} # MMX and SSE support requires llvm which is broken on Simulator
 fi
 
 CORE_COUNT=`sysctl -n machdep.cpu.core_count`
 let MAKE_JOBS=$CORE_COUNT+1
 
-echo "Running make -j$MAKE_JOBS"
+info "Building libvlc"
+make -j$MAKE_JOBS > ${out}
 
-make -j$MAKE_JOBS
-make install
+info "Installing libvlc"
+make install > ${out}
 popd
