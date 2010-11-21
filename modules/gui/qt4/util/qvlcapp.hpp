@@ -48,9 +48,9 @@ public:
 
     static void triggerQuit()
     {
-         QVLCApp *app = qobject_cast<QVLCApp*>( instance() );
-         if ( app )
-             emit app->quitSignal();
+        QVLCApp *app = qobject_cast<QVLCApp*>( instance() );
+        if( app )
+            emit app->quitSignal();
     }
 
 signals:
