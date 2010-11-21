@@ -53,17 +53,8 @@ public:
              emit app->quitSignal();
     }
 
-#if defined (Q_WS_X11)
-     QVLCApp( Display *dp, int & argc, char ** argv )
-         : QApplication( dp, argc, argv )
-     {
-        connect( this, SIGNAL(quitSignal()), this, SLOT(quit()) );
-     }
-#endif
-
 signals:
     void quitSignal();
 
 };
-
 #endif
