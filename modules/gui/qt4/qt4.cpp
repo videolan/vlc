@@ -359,12 +359,14 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     }
 #endif
 
-    /* */
+    /* Wait for the interface to be ready. This prevents the main
+     * LibVLC thread from starting video playback before we can create
+     * an embedded video window. */
     vlc_sem_wait (&ready);
     vlc_sem_destroy (&ready);
 
 #ifndef Q_WS_MAC
-    if( !p_sys->b_isDialogProvider )
+    if( !isDialogProvider )
     {
         RegisterIntf( p_this );
     }
