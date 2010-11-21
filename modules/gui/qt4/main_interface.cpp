@@ -267,7 +267,8 @@ MainInterface::~MainInterface()
     if( stackCentralOldWidget == videoWidget )
         showTab( bgWidget );
 
-    releaseVideoSlot();
+    if( videoWidget )
+        releaseVideoSlot();
 
 #ifdef WIN32
     if( himl )
@@ -601,8 +602,11 @@ void MainInterface::releaseVideo( void )
 /* Function that is CONNECTED to the previous emit */
 void MainInterface::releaseVideoSlot( void )
 {
-    if( videoWidget )
-        videoWidget->release();
+    /* This function is called when the embedded video window is destroyed,
+     * or in the rare case that the embedded window is still here but the
+     * Qt4 interface exits. */
+    assert( videoWidget );
+    videoWidget->release();
     setVideoOnTop( false );
     setVideoFullScreen( false );
 
