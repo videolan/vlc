@@ -25,6 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_inhibit.h>
+#include <assert.h>
 #include <spawn.h>
 #include <sys/wait.h>
 
@@ -43,9 +44,9 @@ vlc_module_end ()
 struct vlc_inhibit_sys
 {
     vlc_thread_t thread;
-    vlc_cond_t wait;
+    vlc_cond_t update, inactive;
     vlc_mutex_t lock;
-    bool suspend;
+    bool suspend, suspended;
 };
 
 static void Inhibit (vlc_inhibit_t *ih, bool suspend);
@@ -62,12 +63,15 @@ static int Open (vlc_object_t *obj)
     ih->inhibit = Inhibit;
 
     vlc_mutex_init (&p_sys->lock);
-    vlc_cond_init (&p_sys->wait);
+    vlc_cond_init (&p_sys->update);
+    vlc_cond_init (&p_sys->inactive);
     p_sys->suspend = false;
+    p_sys->suspended = false;
 
     if (vlc_clone (&p_sys->thread, Thread, ih, VLC_THREAD_PRIORITY_LOW))
     {
-        vlc_cond_destroy (&p_sys->wait);
+        vlc_cond_destroy (&p_sys->inactive);
+        vlc_cond_destroy (&p_sys->update);
         vlc_mutex_destroy (&p_sys->lock);
         free (p_sys);
         return VLC_ENOMEM;
@@ -80,9 +84,16 @@ static void Close (vlc_object_t *obj)
     vlc_inhibit_t *ih = (vlc_inhibit_t *)obj;
     vlc_inhibit_sys_t *p_sys = ih->p_sys;
 
+    /* Make sure xdg-screensaver is gone for good */
+    vlc_mutex_lock (&p_sys->lock);
+    while (p_sys->suspended)
+        vlc_cond_wait (&p_sys->inactive, &p_sys->lock);
+    vlc_mutex_unlock (&p_sys->lock);
+
     vlc_cancel (p_sys->thread);
     vlc_join (p_sys->thread, NULL);
-    vlc_cond_destroy (&p_sys->wait);
+    vlc_cond_destroy (&p_sys->inactive);
+    vlc_cond_destroy (&p_sys->update);
     vlc_mutex_destroy (&p_sys->lock);
     free (p_sys);
 }
@@ -95,7 +106,7 @@ static void Inhibit (vlc_inhibit_t *ih, bool suspend)
      * So we avoid _waiting_ for it unless we really need to (clean up). */
     vlc_mutex_lock (&p_sys->lock);
     p_sys->suspend = suspend;
-    vlc_cond_signal (&p_sys->wait);
+    vlc_cond_signal (&p_sys->update);
     vlc_mutex_unlock (&p_sys->lock);
 }
 
@@ -109,23 +120,23 @@ static void *Thread (void *data)
 
     snprintf (id, sizeof (id), "0x%08"PRIx32, ih->window_id);
 
-    for (bool suspended = false;;)
+    vlc_mutex_lock (&p_sys->lock);
+    mutex_cleanup_push (&p_sys->lock);
+    for (;;)
     {   /* TODO: detach the thread, so we don't need one at all time */
-        vlc_mutex_lock (&p_sys->lock);
-        mutex_cleanup_push (&p_sys->lock);
-        while (suspended == p_sys->suspend)
-            vlc_cond_wait (&p_sys->wait, &p_sys->lock);
-        vlc_cleanup_run ();
+        while (p_sys->suspended == p_sys->suspend)
+            vlc_cond_wait (&p_sys->update, &p_sys->lock);
 
+        int canc = vlc_savecancel ();
         char *argv[4] = {
             (char *)"xdg-screensaver",
-            (char *)(suspended ? "resume" : "suspend"),
+            (char *)(p_sys->suspend ? "suspend" : "resume"),
             id,
             NULL,
         };
         pid_t pid;
-        int canc = vlc_savecancel ();
 
+        vlc_mutex_unlock (&p_sys->lock);
         if (!posix_spawnp (&pid, "xdg-screensaver", NULL, NULL, argv, environ))
         {
             int status;
@@ -136,7 +147,14 @@ static void *Thread (void *data)
         }
         else/* We don't handle the error, but busy looping would be worse :( */
             msg_Warn (ih, "could not start xdg-screensaver");
-        suspended = !suspended;
+
+        vlc_mutex_lock (&p_sys->lock);
+        p_sys->suspended = p_sys->suspend;
+        if (!p_sys->suspended)
+            vlc_cond_signal (&p_sys->inactive);
         vlc_restorecancel (canc);
     }
+
+    vlc_cleanup_pop ();
+    assert (0);
 }
