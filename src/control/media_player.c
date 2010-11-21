@@ -396,6 +396,8 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "vmem-unlock", VLC_VAR_ADDRESS);
     var_Create (mp, "vmem-display", VLC_VAR_ADDRESS);
     var_Create (mp, "vmem-data", VLC_VAR_ADDRESS);
+    var_Create (mp, "vmem-setup", VLC_VAR_ADDRESS);
+    var_Create (mp, "vmem-cleanup", VLC_VAR_ADDRESS);
     var_Create (mp, "vmem-chroma", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     var_Create (mp, "vmem-width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     var_Create (mp, "vmem-height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
@@ -810,6 +812,14 @@ void libvlc_video_set_callbacks( libvlc_media_player_t *mp,
     var_SetAddress( mp, "vmem-display", display_cb );
     var_SetAddress( mp, "vmem-data", opaque );
     var_SetString( mp, "vout", "vmem" );
+}
+
+void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
+                                        libvlc_video_format_cb setup,
+                                        libvlc_video_cleanup_cb cleanup )
+{
+    var_SetAddress( mp, "vmem-setup", setup );
+    var_SetAddress( mp, "vmem-cleanup", cleanup );
 }
 
 void libvlc_video_set_format( libvlc_media_player_t *mp, const char *chroma,

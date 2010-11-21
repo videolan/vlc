@@ -260,8 +260,50 @@ typedef void (*libvlc_video_unlock_cb)(void *opaque, void *picture,
 typedef void (*libvlc_video_display_cb)(void *opaque, void *picture);
 
 /**
+ * Callback prototype to configure picture buffers format.
+ * This callback gets the format of the video as output by the video decoder
+ * and the chain of video filters (if any). It can opt to change any parameter
+ * as it needs. In that case, LibVLC will attempt to convert the video format
+ * (rescaling and chroma conversion) but these operations can be CPU intensive.
+ *
+ * \param opaque pointer to the private pointer passed to
+ *               libvlc_video_set_callbacks() [IN/OUT]
+ * \param chroma pointer to the 4 bytes video format identifier [IN/OUT]
+ * \param width pointer to the pixel width [IN/OUT]
+ * \param height pointer to the pixel height [IN/OUT]
+ * \param pitches table of scanline pitches in bytes for each pixel plane
+ *                (the table is allocated by LibVLC) [OUT]
+ * \param lines table of scanlines count for each plane [OUT]
+ * \return the number of picture buffers allocated, 0 indicates failure
+ *
+ * \note
+ * For each pixels plane, the scanline pitch must be bigger than or equal to
+ * the number of bytes per pixel multiplied by the pixel width.
+ * Similarly, the number of scanlines must be bigger than of equal to
+ * the pixel height.
+ * Furthermore, we recommend that pitches and lines be multiple of 32
+ * to not break assumption that might be made by various optimizations
+ * in the video decoders, video filters and/or video converters.
+ */
+typedef unsigned (*libvlc_video_format_cb)(void **opaque, char *chroma,
+                                           unsigned *width, unsigned *height,
+                                           unsigned *pitches,
+                                           unsigned *lines);
+
+/**
+ * Callback prototype to configure picture buffers format.
+ *
+ * \param opaque private pointer as passed to libvlc_video_set_callbacks()
+ *               (and possibly modified by @ref libvlc_video_format_cb) [IN]
+ */
+typedef void (*libvlc_video_cleanup_cb)(void *opaque);
+
+
+/**
  * Set callbacks and private data to render decoded video to a custom area
- * in memory. Use libvlc_video_set_format() to configure the decoded format.
+ * in memory.
+ * Use libvlc_video_set_format() or libvlc_video_set_format_callbacks()
+ * to configure the decoded format.
  *
  * \param mp the media player
  * \param lock callback to lock video memory (must not be NULL)
@@ -278,21 +320,39 @@ void libvlc_video_set_callbacks( libvlc_media_player_t *mp,
                                  void *opaque );
 
 /**
- * Set decoded video chroma and dimensions. This only works in combination with
- * libvlc_video_set_callbacks().
+ * Set decoded video chroma and dimensions.
+ * This only works in combination with libvlc_video_set_callbacks(),
+ * and is mutually exclusive with libvlc_video_set_format_callbacks().
  *
  * \param mp the media player
  * \param chroma a four-characters string identifying the chroma
- *               (e.g. "RV32" or "I420")
+ *               (e.g. "RV32" or "YUYV")
  * \param width pixel width
  * \param height pixel height
  * \param pitch line pitch (in bytes)
  * \version LibVLC 1.1.1 or later
+ * \bug All pixel planes are expected to have the same pitch.
+ * To use the YCbCr color space with chrominance subsampling,
+ * consider using libvlc_video_set_format_callback() instead.
  */
 VLC_PUBLIC_API
 void libvlc_video_set_format( libvlc_media_player_t *mp, const char *chroma,
                               unsigned width, unsigned height,
                               unsigned pitch );
+
+/**
+ * Set decoded video chroma and dimensions. This only works in combination with
+ * libvlc_video_set_callbacks().
+ *
+ * \param mp the media player
+ * \param setup callback to select the video format (cannot be NULL)
+ * \param cleanup callback to release any allocated resources (or NULL)
+ * \version LibVLC 1.2.0 or later
+ */
+VLC_PUBLIC_API
+void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
+                                        libvlc_video_format_cb setup,
+                                        libvlc_video_cleanup_cb cleanup );
 
 /**
  * Set the NSView handler where the media player should render its video output.
