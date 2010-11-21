@@ -40,10 +40,17 @@ class QVLCApp : public QApplication
 {
     Q_OBJECT
 
+private slots:
+    void doQuit()
+    {
+        closeAllWindows();
+        quit();
+    }
+
 public:
     QVLCApp( int & argc, char ** argv ) : QApplication( argc, argv, true )
     {
-        connect( this, SIGNAL(quitSignal()), this, SLOT(quit()) );
+        connect( this, SIGNAL(quitSignal()), this, SLOT(doQuit()) );
     }
 
     static void triggerQuit()

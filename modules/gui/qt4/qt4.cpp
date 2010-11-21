@@ -392,14 +392,10 @@ static void Close( vlc_object_t *p_this )
     }
 
     /* And quit */
-    msg_Dbg( p_intf, "Please die, die, die..." );
-    QApplication::closeAllWindows();
-
-//    QApplication::quit();
-
+    msg_Dbg( p_this, "requesting exit..." );
     QVLCApp::triggerQuit();
 
-    msg_Dbg( p_intf, "Please die, die, die 2..." );
+    msg_Dbg( p_this, "waiting for UI thread..." );
 #ifndef Q_WS_MAC
     vlc_join (p_sys->thread, NULL);
 #endif
