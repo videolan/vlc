@@ -134,6 +134,9 @@ protected:
     /// Actually hide the window
     virtual void innerHide();
 
+    ///
+    bool isVisible() const { return m_pVarVisible->get(); }
+
 private:
     /// Window position and size
     int m_left, m_top, m_width, m_height;

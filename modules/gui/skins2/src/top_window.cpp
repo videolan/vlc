@@ -324,9 +324,6 @@ void TopWindow::innerShow()
 
     // Show the window
     GenericWindow::innerShow();
-
-    // place the top window on the screen (after show!)
-    move( getLeft(), getTop() );
 }
 
 

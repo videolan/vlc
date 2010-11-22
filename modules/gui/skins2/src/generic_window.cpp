@@ -92,27 +92,30 @@ void GenericWindow::move( int left, int top )
     m_left = left;
     m_top = top;
 
-    m_pOsWindow->moveResize( left, top, m_width, m_height );
+    if( m_pOsWindow && isVisible() )
+        m_pOsWindow->moveResize( left, top, m_width, m_height );
 }
 
 
 void GenericWindow::resize( int width, int height )
 {
     // don't try when value is 0 (may crash)
-    if( !width || ! height )
+    if( !width || !height )
         return;
 
     // Update the window size
     m_width = width;
     m_height = height;
 
-    m_pOsWindow->moveResize( m_left, m_top, width, height );
+    if( m_pOsWindow && isVisible() )
+        m_pOsWindow->moveResize( m_left, m_top, width, height );
 }
 
 
 void GenericWindow::raise() const
 {
-    m_pOsWindow->raise();
+    if( m_pOsWindow )
+        m_pOsWindow->raise();
 }
 
 
@@ -124,7 +127,8 @@ void GenericWindow::setOpacity( uint8_t value )
 
 void GenericWindow::toggleOnTop( bool onTop ) const
 {
-    m_pOsWindow->toggleOnTop( onTop );
+    if( m_pOsWindow )
+        m_pOsWindow->toggleOnTop( onTop );
 }
 
 
@@ -149,6 +153,7 @@ void GenericWindow::innerShow()
     if( m_pOsWindow )
     {
         m_pOsWindow->show();
+        m_pOsWindow->moveResize( m_left, m_top, m_width, m_height );
     }
 }
 
