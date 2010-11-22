@@ -67,8 +67,8 @@ struct intf_sys_t
 #define NONE 0
 #define GESTURE( a, b, c, d ) (a | ( b << 4 ) | ( c << 8 ) | ( d << 12 ))
 
-int  Open   ( vlc_object_t * );
-void Close  ( vlc_object_t * );
+static int  Open   ( vlc_object_t * );
+static void Close  ( vlc_object_t * );
 static int  MouseEvent     ( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
 
@@ -114,7 +114,7 @@ vlc_module_end ()
 /*****************************************************************************
  * OpenIntf: initialize interface
  *****************************************************************************/
-int Open ( vlc_object_t *p_this )
+static int Open ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
@@ -159,7 +159,7 @@ static int gesture( int i_pattern, int i_num )
 /*****************************************************************************
  * CloseIntf: destroy dummy interface
  *****************************************************************************/
-void Close ( vlc_object_t *p_this )
+static void Close ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
