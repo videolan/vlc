@@ -486,11 +486,7 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 #endif
 
     if( p_oggpacket->bytes &&
-#ifdef MODULE_NAME_IS_tremor
-        vorbis_synthesis( &p_sys->vb, p_oggpacket, 1 ) == 0 )
-#else
         vorbis_synthesis( &p_sys->vb, p_oggpacket ) == 0 )
-#endif
         vorbis_synthesis_blockin( &p_sys->vd, &p_sys->vb );
 
     /* **pp_pcm is a multichannel float vector. In stereo, for
