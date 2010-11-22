@@ -176,7 +176,7 @@
     <SubBitmap id="item" x="16" y="0" height="8" width="8"/>
   </Bitmap>
 
-  <Window id="main">
+  <Window id="main" position="Center">
     <Layout id="normal" width="500" height="350" minwidth="500" maxwidth="99999" minheight="126" maxheight="99999">
       <Panel id="main.normal.titlebar" width="0" height="24" rightbottom="righttop">
         <Image id="main.normal.titlebar.left" image="main.png.titlebar.left" action="move" action2="main.maximize()"/>
@@ -194,7 +194,7 @@
         <Button up="sysbuttons.png.aot1.normal" down="sysbuttons.png.aot1.down" over="sysbuttons.png.aot1.hover" action="vlc.onTop()" id="main.normal.titlebar.aot1" x="26" y="3" visible="vlc.isOnTop" tooltiptext="Disable Always On Top"/>
       </Panel>
       <Panel id="main.normal.component" y="24" width="0" height="0" rightbottom="rightbottom">
-        <Image id="main.normal.component.background" image="main.png.background" resize="scale" rightbottom="rightbottom" />
+        <Image id="main.normal.component.background" image="main.png.background" resize="scale" rightbottom="rightbottom"/>
         <Image id="main.normal.component.art" image="main.png.background" resize="scale2" rightbottom="rightbottom" art="true"/>
         <Video id="main.normal.component.video" width="500" height="224" rightbottom="rightbottom" visible="vlc.hasVout"/>
       </Panel>
@@ -247,7 +247,7 @@
       </Panel>
     </Layout>
   </Window>
-  <Window id="eqwin" visible="false">
+  <Window id="eqwin" visible="false" position="Center">
     <Layout id="eqwin-main" width="330" height="171" minwidth="330" maxwidth="330" minheight="171" maxheight="171">
       <Image id="eq.normal.eq" image="eq.png.bg" action="move"/>
       <Button up="sysbuttons.png.menu.normal" down="sysbuttons.png.menu.down" over="sysbuttons.png.menu.hover" action="dialogs.popup()" id="eqwin.normal.titlebar.menu" x="6" y="3" tooltiptext="VLC Menu"/>
@@ -267,7 +267,7 @@
       <Checkbox state="equalizer.isEnabled" up1="eq.png.knob.normal" up2="eq.png.knob.normal" down1="eq.png.knob.down" down2="eq.png.knob.down" over1="eq.png.knob.hover" over2="eq.png.knob.hover" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable Equalizer" tooltiptext2="Disable Equalizer" id="eq.onoff.lef2" x="18" y="86"/>
     </Layout>
   </Window>
-  <Window id="plwin" visible="false">
+  <Window id="plwin" position="Center" xoffset="5%" yoffset="5%" visible="false">
     <Layout id="plwin-normal" width="500" height="350" minwidth="170" maxwidth="99999" minheight="200" maxheight="99999">
       <Panel id="pl.normal.titlebar" width="0" height="24" rightbottom="righttop">
         <Image id="pl.normal.titlebar.left" image="pl.png.titlebar.left" action="move"/>
@@ -298,12 +298,12 @@
       </Panel>
     </Layout>
   </Window>
-  <Window id="aboutwin" visible="false">
+  <Window id="aboutwin" visible="false" position="Center">
     <Layout id="aboutwinwin-main" width="330" height="171" minwidth="330" maxwidth="330" minheight="171" maxheight="171">
       <Image id="about.normal.eq" image="about.png" action="move" action2="aboutwin.hide()"/>
     </Layout>
   </Window>
-  <Window id="fullscreenController" x="30" y="30">
+  <Window id="fullscreenController" position="South" ymargin="3%">
     <Layout id="plwin-fsc-normal" width="500" height="350" minwidth="170" maxwidth="99999" minheight="200" maxheight="99999">
       <Panel id="fsc.pl.normal.titlebar" width="0" height="24" rightbottom="righttop">
         <Image id="fsc.pl.normal.titlebar.left" image="pl.png.titlebar.left" action="move"/>
@@ -351,7 +351,7 @@
       <Checkbox state="equalizer.isEnabled" up1="eq.png.led.off" up2="eq.png.led.on" down1="none" down2="none" over1="none" over2="none" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable Equalizer" tooltiptext2="Disable Equalizer" id="fsc.eq.onoff.lef1" x="29" y="72"/>
       <Checkbox state="equalizer.isEnabled" up1="eq.png.knob.normal" up2="eq.png.knob.normal" down1="eq.png.knob.down" down2="eq.png.knob.down" over1="eq.png.knob.hover" over2="eq.png.knob.hover" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable Equalizer" tooltiptext2="Disable Equalizer" id="fsc.eq.onoff.lef2" x="18" y="86"/>
     </Layout>
-    <Layout id="fsc_normal" width="500" height="500" minwidth="500" maxwidth="500" minheight="500" maxheight="500">
+    <Layout id="fsc_normal" width="500" height="130" minwidth="500" maxwidth="500" minheight="130" maxheight="130">
       <Panel id="fsc.normal.titlebar" width="0" height="24" rightbottom="righttop">
         <Image id="fsc.normal.titlebar.left" image="main.png.titlebar.left" action="move"/>
         <Image id="fsc.normal.titlebar.right" x="480" image="main.png.titlebar.right" action="move" lefttop="righttop" rightbottom="righttop"/>
