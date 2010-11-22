@@ -304,7 +304,7 @@ static block_t* GrabAudio( demux_t *p_demux )
     if( !p_block )
     {
         msg_Warn( p_demux, "cannot get block" );
-        return 0;
+        return NULL;
     }
 
     p_sys->p_block = p_block;
@@ -312,10 +312,10 @@ static block_t* GrabAudio( demux_t *p_demux )
     i_read = read( p_sys->i_fd, p_block->p_buffer,
                 p_sys->i_max_frame_size );
 
-    if( i_read <= 0 ) return 0;
+    if( i_read <= 0 ) return NULL;
 
     p_block->i_buffer = i_read;
-    p_sys->p_block = 0;
+    p_sys->p_block = NULL;
 
     /* Correct the date because of kernel buffering */
     i_correct = i_read;
