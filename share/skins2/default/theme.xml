@@ -1,5 +1,5 @@
 <!DOCTYPE Theme PUBLIC "-//VideoLAN//DTD VLC Skins V2.0//EN" "skin.dtd">
-<Theme version="2.0">
+<Theme version="2.0" alpha="255" movealpha="200">
   <ThemeInfo name="subX" author="Martin Poehlmann" email="" webpage="http://www.skinconsortium.com"/>
 
   <!-- Created using the VLC Skin Editor 0.8.0.dev (http://www.videolan.org/vlc/skineditor.html)-->
