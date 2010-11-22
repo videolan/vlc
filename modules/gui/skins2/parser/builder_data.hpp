@@ -154,12 +154,17 @@ m_pos( pos ), m_popupId( popupId ) {}
     /// Type definition
     struct Window
     {
-        Window( const string & id, int xPos, int yPos, bool visible, bool dragDrop, bool playOnDrop ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_dragDrop( dragDrop ), m_playOnDrop( playOnDrop ) {}
+        Window( const string & id, int xPos, int yPos, const string & position, const string & xOffset, const string & yOffset, const string & xMargin, const string & yMargin, bool visible, bool dragDrop, bool playOnDrop ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_position( position ), m_xOffset( xOffset ), m_yOffset( yOffset ), m_xMargin( xMargin ), m_yMargin( yMargin ), m_visible( visible ), m_dragDrop( dragDrop ), m_playOnDrop( playOnDrop ) {}
 
         string m_id;
         int m_xPos;
         int m_yPos;
+        string m_position;
+        string m_xOffset;
+        string m_yOffset;
+        string m_xMargin;
+        string m_yMargin;
         bool m_visible;
         bool m_dragDrop;
         bool m_playOnDrop;
@@ -267,12 +272,14 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
     /// Type definition
     struct Image
     {
-        Image( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, const string & visible, const string & bmpId, const string & actionId, const string & action2Id, const string & resize, const string & help, bool art, int layer, const string & windowId, const string & layoutId, const string & panelId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_visible( visible ), m_bmpId( bmpId ), m_actionId( actionId ), m_action2Id( action2Id ), m_resize( resize ), m_help( help ), m_art( art ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ), m_panelId( panelId ) {}
+        Image( const string & id, int xPos, int yPos, int width, int height, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, const string & visible, const string & bmpId, const string & actionId, const string & action2Id, const string & resize, const string & help, bool art, int layer, const string & windowId, const string & layoutId, const string & panelId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_visible( visible ), m_bmpId( bmpId ), m_actionId( actionId ), m_action2Id( action2Id ), m_resize( resize ), m_help( help ), m_art( art ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ), m_panelId( panelId ) {}
 
         string m_id;
         int m_xPos;
         int m_yPos;
+        int m_width;
+        int m_height;
         string m_leftTop;
         string m_rightBottom;
         bool m_xKeepRatio;
@@ -283,7 +290,7 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
         string m_action2Id;
         string m_resize;
         string m_help;
-        bool   m_art;
+        bool m_art;
         int m_layer;
         string m_windowId;
         string m_layoutId;

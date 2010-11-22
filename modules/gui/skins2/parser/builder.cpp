@@ -598,10 +598,12 @@ void Builder::addImage( const BuilderData::Image &rData )
 
     // Compute the position of the control
     const GenericRect *pRect;
+    int width = (rData.m_width > 0) ? rData.m_width : pBmp->getWidth();
+    int height = (rData.m_height > 0) ? rData.m_height : pBmp->getHeight();
     GET_BOX( pRect, rData.m_panelId , pLayout);
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,
                                        rData.m_xPos, rData.m_yPos,
-                                       pBmp->getWidth(), pBmp->getHeight(),
+                                       width, height,
                                        *pRect, rData.m_xKeepRatio,
                                        rData.m_yKeepRatio );
 
