@@ -120,8 +120,7 @@ public:
     void raise( TopWindow &rWindow ) const { rWindow.raise(); }
 
     /// Show the given window
-    void show( TopWindow &rWindow ) const
-        { rWindow.show(); rWindow.setOpacity( m_alpha); }
+    void show( TopWindow &rWindow ) const;
 
     /// Hide the given window
     void hide( TopWindow &rWindow ) const { rWindow.hide(); }
@@ -162,6 +161,10 @@ public:
 
     /// Return the active popup, or NULL if none is active
     Popup * getActivePopup() const { return m_pPopup; }
+
+    /// getter to know whether opacity is needed
+    bool isOpacityNeeded() const
+    { return (m_OpacityEnabled && (m_alpha != 255 || m_moveAlpha != 255 )); }
 
 private:
     /// Some useful typedefs for lazy people like me
@@ -206,6 +209,8 @@ private:
     int m_alpha;
     /// Alpha value of the moving windows
     int m_moveAlpha;
+    /// transparency set by user
+    bool m_OpacityEnabled;
     /// Direction of the current resizing
     Direction_t m_direction;
     /// Rect of the last maximized window

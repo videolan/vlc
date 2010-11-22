@@ -33,13 +33,15 @@
 
 WindowManager::WindowManager( intf_thread_t *pIntf ):
     SkinObject( pIntf ), m_magnet( 0 ), m_direction( kNone ),
-    m_maximizeRect(0, 0, 50, 50),
-    m_pTooltip( NULL ), m_pPopup( NULL )
+    m_maximizeRect(0, 0, 50, 50), m_pTooltip( NULL ), m_pPopup( NULL ),
+    m_alpha( 255 ), m_moveAlpha( 255 ), m_OpacityEnabled( false )
 {
     // Create and register a variable for the "on top" status
     VarManager *pVarManager = VarManager::instance( getIntf() );
     m_cVarOnTop = VariablePtr( new VarBoolImpl( getIntf() ) );
     pVarManager->registerVar( m_cVarOnTop, "vlc.isOnTop" );
+
+    m_OpacityEnabled = var_InheritBool( getIntf(), "skins2-transparency" );
 }
 
 
@@ -71,21 +73,13 @@ void WindowManager::startMove( TopWindow &rWindow )
     m_movingWindows.clear();
     buildDependSet( m_movingWindows, &rWindow );
 
-    if( var_InheritBool( getIntf(), "skins2-transparency" ) )
+    if( isOpacityNeeded() )
     {
         // Change the opacity of the moving windows
         WinSet_t::const_iterator it;
         for( it = m_movingWindows.begin(); it != m_movingWindows.end(); ++it )
         {
             (*it)->setOpacity( m_moveAlpha );
-        }
-
-        // FIXME: We need to refresh the windows, because if 2 windows overlap
-        // and one of them becomes transparent, the other one is not refreshed
-        // automatically. I don't know why... -- Ipkiss
-        for( it = m_allWindows.begin(); it != m_allWindows.end(); ++it )
-        {
-            (*it)->refresh( 0, 0, (*it)->getWidth(), (*it)->getHeight() );
         }
     }
 }
@@ -96,7 +90,7 @@ void WindowManager::stopMove()
     WinSet_t::const_iterator itWin1, itWin2;
     AncList_t::const_iterator itAnc1, itAnc2;
 
-    if( var_InheritBool( getIntf(), "skins2-transparency" ) )
+    if( isOpacityNeeded() )
     {
         // Restore the opacity of the moving windows
         WinSet_t::const_iterator it;
@@ -426,6 +420,15 @@ void WindowManager::showAll( bool firstTime ) const
             (*it)->show();
         }
     }
+}
+
+
+void WindowManager::show( TopWindow &rWindow ) const
+{
+    rWindow.show();
+
+    if( isOpacityNeeded() )
+        rWindow.setOpacity( m_alpha );
 }
 
 

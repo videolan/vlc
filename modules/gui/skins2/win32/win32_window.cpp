@@ -190,44 +190,17 @@ void Win32Window::setOpacity( uint8_t value ) const
 {
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
 
-    if( value == 255 )
+    if( !m_isLayered )
     {
-        // If the window is opaque, we remove the WS_EX_LAYERED attribute
-        // which slows down resizing for nothing
-        if( m_isLayered )
-        {
-            SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
-                GetWindowLongPtr( m_hWnd, GWL_EXSTYLE ) & ~WS_EX_LAYERED );
+        // add the WS_EX_LAYERED attribute.
+        SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
+            GetWindowLongPtr( m_hWnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
 
-            // Redraw the window, otherwise we may end up with a grey rectangle
-            // for some strange reason
-            RedrawWindow(m_hWnd, NULL, NULL,
-                RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
-
-            m_isLayered = false;
-        }
+        m_isLayered = true;
     }
-    else
-    {
-        if( ! m_isLayered )
-        {
-            // (Re)Add the WS_EX_LAYERED attribute.
-            // Resizing will be very slow, now :)
-            SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
-                GetWindowLongPtr( m_hWnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
 
-            // Redraw the window, otherwise we may end up with a grey
-            // rectangle for some strange reason
-            RedrawWindow(m_hWnd, NULL, NULL,
-                RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
-
-            m_isLayered = true;
-        }
-
-        // Change the opacity
-        SetLayeredWindowAttributes(
-            m_hWnd, 0, value, LWA_ALPHA|LWA_COLORKEY );
-    }
+    // Change the opacity
+    SetLayeredWindowAttributes( m_hWnd, 0, value, LWA_ALPHA );
 }
 
 
