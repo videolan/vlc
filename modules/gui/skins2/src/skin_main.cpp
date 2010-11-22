@@ -67,16 +67,6 @@ static int  Open  ( vlc_object_t * );
 static void Close ( vlc_object_t * );
 static void *Run  ( void * );
 
-//---------------------------------------------------------------------------
-// Prototypes for configuration callbacks
-//---------------------------------------------------------------------------
-static int onSystrayChange( vlc_object_t *pObj, const char *pVariable,
-                            vlc_value_t oldVal, vlc_value_t newVal,
-                            void *pParam );
-static int onTaskBarChange( vlc_object_t *pObj, const char *pVariable,
-                            vlc_value_t oldVal, vlc_value_t newVal,
-                            void *pParam );
-
 static struct
 {
     intf_thread_t *intf;
@@ -379,80 +369,6 @@ static void WindowClose( vlc_object_t *p_this )
 
 
 //---------------------------------------------------------------------------
-// Callbacks
-//---------------------------------------------------------------------------
-
-/// Callback for the systray configuration option
-static int onSystrayChange( vlc_object_t *pObj, const char *pVariable,
-                            vlc_value_t oldVal, vlc_value_t newVal,
-                            void *pParam )
-{
-    intf_thread_t *pIntf;
-
-    vlc_mutex_lock( &skin_load.mutex );
-    pIntf = skin_load.intf;
-    if( pIntf )
-        vlc_object_hold( pIntf );
-    vlc_mutex_unlock( &skin_load.mutex );
-
-    if( pIntf == NULL )
-    {
-        return VLC_EGENERIC;
-    }
-
-    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
-    if( newVal.b_bool )
-    {
-        CmdAddInTray *pCmd = new CmdAddInTray( pIntf );
-        pQueue->push( CmdGenericPtr( pCmd ) );
-    }
-    else
-    {
-        CmdRemoveFromTray *pCmd = new CmdRemoveFromTray( pIntf );
-        pQueue->push( CmdGenericPtr( pCmd ) );
-    }
-
-    vlc_object_release( pIntf );
-    return VLC_SUCCESS;
-}
-
-
-/// Callback for the systray configuration option
-static int onTaskBarChange( vlc_object_t *pObj, const char *pVariable,
-                            vlc_value_t oldVal, vlc_value_t newVal,
-                            void *pParam )
-{
-    intf_thread_t *pIntf;
-
-    vlc_mutex_lock( &skin_load.mutex );
-    pIntf = skin_load.intf;
-    if( pIntf )
-        vlc_object_hold( pIntf );
-    vlc_mutex_unlock( &skin_load.mutex );
-
-    if( pIntf == NULL )
-    {
-        return VLC_EGENERIC;
-    }
-
-    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
-    if( newVal.b_bool )
-    {
-        CmdAddInTaskBar *pCmd = new CmdAddInTaskBar( pIntf );
-        pQueue->push( CmdGenericPtr( pCmd ) );
-    }
-    else
-    {
-        CmdRemoveFromTaskBar *pCmd = new CmdRemoveFromTaskBar( pIntf );
-        pQueue->push( CmdGenericPtr( pCmd ) );
-    }
-
-    vlc_object_release( pIntf );
-    return VLC_SUCCESS;
-}
-
-
-//---------------------------------------------------------------------------
 // Module descriptor
 //---------------------------------------------------------------------------
 #define SKINS2_LAST      N_("Skin to use")
@@ -486,13 +402,10 @@ vlc_module_begin ()
         change_autosave ()
         change_private ()
 #ifdef WIN32
-#warning FIXME
-#if 0
-    add_bool( "skins2-systray", false, onSystrayChange, SKINS2_SYSTRAY,
+    add_bool( "skins2-systray", true, SKINS2_SYSTRAY,
               SKINS2_SYSTRAY_LONG, false );
-    add_bool( "skins2-taskbar", true, onTaskBarChange, SKINS2_TASKBAR,
+    add_bool( "skins2-taskbar", true, SKINS2_TASKBAR,
               SKINS2_TASKBAR_LONG, false );
-#endif
 #endif
     add_bool( "skins2-transparency", false, SKINS2_TRANSPARENCY,
               SKINS2_TRANSPARENCY_LONG, false );
