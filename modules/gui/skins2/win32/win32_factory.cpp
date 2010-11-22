@@ -133,6 +133,10 @@ Win32Factory::Win32Factory( intf_thread_t *pIntf ):
 
 bool Win32Factory::init()
 {
+    const char* vlc_name = "VLC Media Player";
+    const char* vlc_icon = "VLC_ICON";
+    const char* vlc_class = "SkinWindowClass";
+
     // Get instance handle
     m_hInst = GetModuleHandle( NULL );
     if( m_hInst == NULL )
@@ -144,13 +148,13 @@ bool Win32Factory::init()
     WNDCLASS skinWindowClass;
     skinWindowClass.style = CS_DBLCLKS;
     skinWindowClass.lpfnWndProc = (WNDPROC)Win32Factory::Win32Proc;
-    skinWindowClass.lpszClassName = _T("SkinWindowClass");
+    skinWindowClass.lpszClassName = _T(vlc_class);
     skinWindowClass.lpszMenuName = NULL;
     skinWindowClass.cbClsExtra = 0;
     skinWindowClass.cbWndExtra = 0;
     skinWindowClass.hbrBackground = NULL;
     skinWindowClass.hCursor = LoadCursor( NULL, IDC_ARROW );
-    skinWindowClass.hIcon = LoadIcon( m_hInst, _T("VLC_ICON") );
+    skinWindowClass.hIcon = LoadIcon( m_hInst, _T(vlc_icon) );
     skinWindowClass.hInstance = m_hInst;
 
     // Register class and check it
@@ -160,7 +164,7 @@ bool Win32Factory::init()
 
         // Check why it failed. If it's because the class already exists
         // then fine, otherwise return with an error.
-        if( !GetClassInfo( m_hInst, _T("SkinWindowClass"), &wndclass ) )
+        if( !GetClassInfo( m_hInst, _T(vlc_class), &wndclass ) )
         {
             msg_Err( getIntf(), "cannot register window class" );
             return false;
@@ -168,8 +172,8 @@ bool Win32Factory::init()
     }
 
     // Create Window
-    m_hParentWindow = CreateWindowEx( WS_EX_TOOLWINDOW, _T("SkinWindowClass"),
-        _T("VLC media player"), WS_POPUP | WS_SYSMENU | WS_MINIMIZEBOX,
+    m_hParentWindow = CreateWindowEx( WS_EX_TOOLWINDOW, _T(vlc_class),
+        _T(vlc_name), WS_POPUP | WS_SYSMENU | WS_MINIMIZEBOX,
         -200, -200, 0, 0, 0, 0, m_hInst, 0 );
     if( m_hParentWindow == NULL )
     {
@@ -194,8 +198,8 @@ bool Win32Factory::init()
     m_trayIcon.uID = 42;
     m_trayIcon.uFlags = NIF_ICON|NIF_TIP|NIF_MESSAGE;
     m_trayIcon.uCallbackMessage = MY_WM_TRAYACTION;
-    m_trayIcon.hIcon = LoadIcon( m_hInst, _T("VLC_ICON") );
-    strcpy( m_trayIcon.szTip, "VLC media player" );
+    m_trayIcon.hIcon = LoadIcon( m_hInst, _T(vlc_icon) );
+    strcpy( m_trayIcon.szTip, vlc_name );
 
     // Show the systray icon if needed
     if( var_InheritBool( getIntf(), "skins2-systray" ) )

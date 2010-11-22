@@ -53,22 +53,25 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
 {
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
 
+    const char* vlc_name =  "VlC Media Player";
+    const char* vlc_class =  "SkinWindowClass";
+
     // Create the window
     if( type == GenericWindow::VoutWindow )
     {
         // Child window (for vout)
         m_hWnd_parent = pParentWindow->getHandle();
         m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW | WS_EX_NOPARENTNOTIFY,
-                     "SkinWindowClass", "default name",
+                     vlc_class, vlc_name,
                      WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
                      0, 0, 0, 0, m_hWnd_parent, 0, hInst, NULL );
     }
     else if( type == GenericWindow::FullscreenWindow )
     {
         // top-level window
-        m_hWnd = CreateWindowEx( WS_EX_APPWINDOW, "SkinWindowClass",
-            "default name", WS_POPUP | WS_CLIPCHILDREN,
-            0, 0, 0, 0, NULL, 0, hInst, NULL );
+        m_hWnd = CreateWindowEx( WS_EX_APPWINDOW, vlc_class,
+                                 vlc_name, WS_POPUP | WS_CLIPCHILDREN,
+                                 0, 0, 0, 0, NULL, 0, hInst, NULL );
 
         // Store with it a pointer to the interface thread
         SetWindowLongPtr( m_hWnd, GWLP_USERDATA, (LONG_PTR)getIntf() );
@@ -77,9 +80,9 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     {
         // top-level window (owned by the root window)
         HWND hWnd_owner = pFactory->getParentWindow();
-        m_hWnd = CreateWindowEx( 0, "SkinWindowClass",
-            "default name", WS_POPUP | WS_CLIPCHILDREN,
-            0, 0, 0, 0, hWnd_owner, 0, hInst, NULL );
+        m_hWnd = CreateWindowEx( 0, vlc_class, vlc_name,
+                                 WS_POPUP | WS_CLIPCHILDREN,
+                                 0, 0, 0, 0, hWnd_owner, 0, hInst, NULL );
 
         // Store with it a pointer to the interface thread
         SetWindowLongPtr( m_hWnd, GWLP_USERDATA, (LONG_PTR)getIntf() );
