@@ -69,6 +69,8 @@ public:
     }
     virtual ~VoutMainWindow() { }
 
+#ifdef WIN32
+
     virtual void processEvent( EvtKey &rEvtKey )
     {
         // Only do the action when the key is down
@@ -87,6 +89,8 @@ public:
 
         var_SetInteger( getIntf()->p_libvlc, "key-pressed", i_vlck );
     }
+
+#endif
 };
 
 
