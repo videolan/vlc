@@ -1,10 +1,10 @@
 [Desktop Entry]
-X-KDE-Solid-Predicate=[ StorageVolume.ignored == false AND OpticalDisc.availableContent & 'VideoDvd' ]
+X-KDE-Solid-Predicate=[ StorageVolume.ignored == false AND OpticalDisc.availableContent == 'Data|VideoDvd' ]
 Type=Service
 Actions=open;
 
 [Desktop Action open]
 Name=Open with VLC media player
-Exec=vlc dvd://
+Exec=vlc dvd://%d
 Icon=vlc
 

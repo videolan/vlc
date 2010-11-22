@@ -5,6 +5,6 @@ Actions=open;
 
 [Desktop Action open]
 Name=Open with VLC media player
-Exec=vlc cdda://
+Exec=vlc cdda://%d
 Icon=vlc
 
