@@ -10,7 +10,7 @@
 <title>HowTo create your own skin</title>
 
 <copyright>
-<year>2004-2010</year>
+<year>2004-2012</year>
 <holder>
 the VideoLAN project
 </holder>
@@ -487,6 +487,32 @@ difficulty to understand how VLC skins work.</para>
     <para>Help text for the current control. The variable '$H' will be expanded to this value when the mouse hovers the current control (see <link linkend="textvars">Text variables</link>).</para>
     <para>Default value: </para>
   </sect3>
+    <para>The vlc2.0 extends some of these parameters and adds five more parameters to ease up positioning windows within a given screen and widgets within their own containers (layout, panel, ...). As extension, the x, y, width and height can now be given in pixels (default) or in percentage of their container. For instance, x="10" or x="10px" is construed as 10 pixels, and x="10%" is construed as 10% of the width of the screen for windows or their container for widgets.</para>
+  <sect3 id="position">
+    <title>position</title>
+    <para>Relative placement of windows or widget within their respective container(screen for windows, layout or panel for widgets). This placement is given with a geographical qualifier. Possible values are "Center", "North", "NorthWest", ....The skin engine computes the size of the element (from the width and height parameters) then places it at the center or sticks it to a given border depending on the geographical qualifer.</para>
+    <para>Default value: -1(N/A)</para>
+  </sect3>
+  <sect3 id="x-margin">
+    <title>x-margin</title>
+    <para>Coupled with position, x-margin allows for a horizontal margin instead of just sticking to the border. It can be given in pixels or in percentage of the width of the container.</para>
+    <para>Default value: 0</para>
+  </sect3>
+  <sect3 id="y-margin">
+    <title>y-margin</title>
+    <para>Coupled with position, y-margin allows for a vertical margin instead of just sticking to the border. It can be given in pixels or in percentage of the height of the container.</para>
+    <para>Default value: 0</para>
+  </sect3>
+  <sect3 id="x-offset">
+    <title>x-offset</title>
+    <para>Coupled with position and x-margin, this parameter moves the widget horizontally by this offset from the position computed above.</para>
+    <para>Default value: 0</para>
+  </sect3>
+  <sect3 id="y-offset">
+    <title>y-offset</title>
+    <para>Coupled with position and y-margin, this parameter moves the widget vertically by this offset from the position computed above.</para>
+    <para>Default value: 0</para>
+  </sect3>
 </sect2>
 
 <sect2 id="Image">
@@ -501,7 +527,7 @@ difficulty to understand how VLC skins work.</para>
   <sect3 id="imageresize">
     <title>resize</title>
     <para>Since VLC 0.8.2. Specify the behaviour of the image when it is resized. Possible values are 'mosaic' (the image is repeated as many times as necessary to reach the wanted dimensions) and 'scale' (the image is actually rescaled). Beware that the 'scale' behaviour is much slower than the 'mosaic' one, so make sure to use it only when it's really needed.</para>
-    <para>In future VLC 1.2. a third value 'scale2' is available to scale an image, yet preserving its aspect ratio. The image is centered and scaled either heightwise or widthwise to fill up as much area as possible. Extra borders are made transparent.</para>
+    <para>In VLC 2.0, a third value 'scale2' is available to scale an image, yet preserving its aspect ratio. The image is centered and scaled either heightwise or widthwise to fill up as much area as possible. Extra borders are made transparent.</para>
     <para>Default value: mosaic.</para>
   </sect3>
   <sect3 id="imageaction">
@@ -516,7 +542,7 @@ difficulty to understand how VLC skins work.</para>
   </sect3>
   <sect3 id="imageart">
     <title>art</title>
-    <para>if set to true, the skin engine reuses the control to display the art file of the resource currently being played back. Usually, resize="scale2" is desirable, for art to be rendered in the best possible way. (in future VLC 1.2).</para>
+    <para>if set to true, the skin engine reuses the control to display the art file of the resource currently being played back. Usually, resize="scale2" is desirable, for art to be rendered in the best possible way. (from VLC 2.0 on).</para>
     <para>Default value: false</para>
   </sect3>
 </sect2>
@@ -644,7 +670,7 @@ difficulty to understand how VLC skins work.</para>
   </sect3>
   <sect3 id="focus">
     <title>focus</title>
-    <para>indicates if the control is eligible for mouse focus or not. If focus is set to false, it is as though the control did not exist when it comes to mouse focus. This allows for instance displaying a dynamic text in the title bar, yet opting for being able to move the window rather than manage scrolling of lengthy text. Available in VLC 1.2.0.</para>
+    <para>indicates if the control is eligible for mouse focus or not. If focus is set to false, it is as though the control did not exist when it comes to mouse focus. This allows for instance displaying a dynamic text in the title bar, yet opting for being able to move the window rather than manage scrolling of lengthy text. Available in VLC 2.0</para>
     <para>Default value: true</para>
   </sect3>
   <sect3 id="textscrolling">
