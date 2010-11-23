@@ -312,7 +312,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     /* Check for daemon mode */
-#ifndef WIN32
+#if !defined( WIN32 ) && !defined( __SYMBIAN32__ )
     if( var_InheritBool( p_libvlc, "daemon" ) )
     {
 #ifdef HAVE_DAEMON
