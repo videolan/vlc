@@ -1050,35 +1050,3 @@ void input_item_node_PostAndDelete( input_item_node_t *p_root )
 
   input_item_node_Delete( p_root );
 }
-
-/* Called by es_out when a new Elementary Stream is added or updated. */
-void input_item_UpdateTracksInfo(input_item_t *item, const es_format_t *fmt)
-{
-    int i;
-    es_format_t *fmt_copy = malloc(sizeof *fmt_copy);
-    if (!fmt_copy)
-        return;
-
-    es_format_Copy(fmt_copy, fmt);
-    /* XXX: we could free p_extra to save memory, we will likely not need
-     * the decoder specific data */
-
-    vlc_mutex_lock( &item->lock );
-
-    for( i = 0; i < item->i_es; i++ )
-    {
-        if (item->es[i]->i_id != fmt->i_id)
-            continue;
-
-        /* We've found the right ES, replace it */
-        es_format_Clean(item->es[i]);
-        free(item->es[i]);
-        item->es[i] = fmt_copy;
-        vlc_mutex_unlock( &item->lock );
-        return;
-    }
-
-    /* ES not found, insert it */
-    TAB_APPEND(item->i_es, item->es, fmt_copy);
-    vlc_mutex_unlock( &item->lock );
-}
