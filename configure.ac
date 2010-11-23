@@ -105,7 +105,8 @@ AS_IF([test "${enable_static_modules}" = yes], [
    enable_shared="no"
    enable_static="yes"
    VLC_DEFAULT_PLUGIN_TYPE="builtin"
-   echo "*** WARNING: Building modules as static. VLC will not work."
+   AS_IF([test "${enable_vlc}" != "no"],
+     [AC_MSG_WARN([Building modules as static. VLC will not work.])])
 ], [
    VLC_DEFAULT_PLUGIN_TYPE="plugin"
 ])
