@@ -724,6 +724,7 @@ void vlc_testcancel (void)
     {
         for (vlc_cleanup_t *p = nfo->cleaners; p != NULL; p = p->next)
              p->proc (p->data);
+        vlc_threadvar_cleanup ();
 #ifndef UNDER_CE
         _endthreadex(0);
 #else
