@@ -853,7 +853,7 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
     if (hls->segment - s->p_sys->segment < 3)
         return VLC_SUCCESS;
 
-    /* check for devision by zero */
+    /* check for division by zero */
     double ms = (double)duration / 1000.0; /* ms */
     if (ms <= 0.0)
         return VLC_SUCCESS;
@@ -1217,9 +1217,9 @@ static void Close(vlc_object_t *p_this)
 static segment_t *NextSegment(stream_t *s)
 {
     stream_sys_t *p_sys = s->p_sys;
-    segment_t *segment;
+    segment_t *segment = NULL;
 
-    do
+    while(vlc_object_alive(s))
     {
         /* Is the next segment ready */
         hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->current);
@@ -1232,28 +1232,26 @@ static segment_t *NextSegment(stream_t *s)
         if (segment->data != NULL)
             return segment;
 
-        /* Was the stream changed to another bitrate? */
         if (!p_sys->b_meta) return NULL;
 
+        /* Was the stream changed to another bitrate? */
         if (p_sys->current != p_sys->thread->current)
         {
             /* YES it was */
             msg_Info(s, "playback is switching from stream %d to %d",
                      p_sys->current, p_sys->thread->current);
             p_sys->current = p_sys->thread->current;
+            continue;
         }
-        else
-        {
+
 #if 0
-            /* Not downloaded yet, do it here */
-            if (Download(s, hls, segment, &p_sys->current) != VLC_SUCCESS)
-                return segment;
-            else
+        /* Not downloaded yet, do it here */
+        if (Download(s, hls, segment, &p_sys->current) != VLC_SUCCESS)
+            return segment;
+        else
 #endif
-                return NULL;
-        }
+            return NULL;
     }
-    while(vlc_object_alive(s));
 
     return segment;
 }
@@ -1341,7 +1339,7 @@ again:
     segment = NextSegment(s);
     if (segment == NULL)
     {
-        msg_Err(s, "segment should have been availabe");
+        msg_Err(s, "segment should have been available");
         return 0; /* eof? */
     }
 
