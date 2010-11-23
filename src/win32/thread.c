@@ -79,7 +79,7 @@ static DWORD vlc_cancelable_wait (DWORD count, const HANDLE *handles,
                                            delay);
     if (result == WAIT_OBJECT_0 + count)
     {
-        vlc_cancel_self (NULL);
+        vlc_cancel_self ((uintptr_t)th);
         return WAIT_IO_COMPLETION;
     }
     else
@@ -645,20 +645,18 @@ int vlc_clone_detach (vlc_thread_t *p_handle, void *(*entry) (void *),
 /*** Thread cancellation ***/
 
 /* APC procedure for thread cancellation */
-static void CALLBACK vlc_cancel_self (ULONG_PTR dummy)
+static void CALLBACK vlc_cancel_self (ULONG_PTR self)
 {
-    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    struct vlc_thread *th = (void *)self;
 
     if (likely(th != NULL))
         th->killed = true;
-
-    (void)dummy;
 }
 
 void vlc_cancel (vlc_thread_t th)
 {
 #ifndef UNDER_CE
-    QueueUserAPC (vlc_cancel_self, th->id, 0);
+    QueueUserAPC (vlc_cancel_self, th->id, (uintptr_t)th);
 #else
     SetEvent (th->cancel_event);
 #endif
