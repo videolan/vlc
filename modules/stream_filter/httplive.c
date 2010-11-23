@@ -78,8 +78,6 @@ typedef struct hls_stream_s
     uint64_t    bandwidth;  /* bandwidth usage of segments (bits per second)*/
 
     vlc_array_t *segments;  /* list of segments */
-    int         segment;    /* current segment downloading */
-
     vlc_url_t   url;        /* uri to m3u8 */
     vlc_mutex_t lock;
     bool        b_cache;    /* allow caching */
@@ -91,6 +89,7 @@ typedef struct
 
     /* */
     int         current;    /* current hls_stream  */
+    int         segment;    /* current segment for downloading */
     vlc_array_t *hls_stream;/* bandwidth adaptation */
 
     stream_t    *s;
@@ -182,7 +181,6 @@ static hls_stream_t *hls_New(vlc_array_t *hls_stream, int id, uint64_t bw, char 
     hls->duration = -1;/* unknown */
     hls->sequence = 0; /* default is 0 */
     hls->version = 1;  /* default protocol version */
-    hls->segment = 0;
     hls->b_cache = true;
     vlc_UrlParse(&hls->url, uri, 0);
     hls->segments = vlc_array_new();
@@ -827,6 +825,8 @@ static int BandwidthAdaptation(stream_t *s, int progid, uint64_t *bandwidth)
 
 static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur_stream)
 {
+    stream_sys_t *p_sys = s->p_sys;
+
     assert(hls);
     assert(segment);
 
@@ -848,9 +848,20 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
 
     vlc_mutex_unlock(&segment->lock);
 
+    /* thread is not started yet */
+    if (p_sys->thread == NULL)
+    {
+        msg_Info(s, "downloaded segment %d from stream %d",
+                    p_sys->segment, p_sys->current);
+        return VLC_SUCCESS;
+    }
+
     /* Do bandwidth calculations when there are at least 3 segments
        downloaded */
-    if (hls->segment - s->p_sys->segment < 3)
+    msg_Info(s, "downloaded segment %d from stream %d",
+                p_sys->thread->segment, p_sys->thread->current);
+    /* FIXME: we need an average here */
+    if (p_sys->thread->segment - p_sys->segment < 3)
         return VLC_SUCCESS;
 
     /* check for division by zero */
@@ -886,8 +897,7 @@ static void* hls_Thread(vlc_object_t *p_this)
         assert(hls);
 
         vlc_mutex_lock(&hls->lock);
-        segment_t *segment = segment_GetSegment(hls, hls->segment);
-        if (segment) hls->segment++;
+        segment_t *segment = segment_GetSegment(hls, client->segment);
         vlc_mutex_unlock(&hls->lock);
 
         /* Is there a new segment to process? */
@@ -900,6 +910,9 @@ static void* hls_Thread(vlc_object_t *p_this)
         {
             if (!p_sys->b_live) break;
         }
+
+        /* download succeeded */
+        client->segment++;
 
         /* FIXME: Reread the m3u8 index file */
         if (p_sys->b_live)
@@ -938,7 +951,7 @@ static int Prefetch(stream_t *s, int *current)
     if (hls == NULL)
         return VLC_EGENERIC;
 
-    segment_t *segment = segment_GetSegment(hls, hls->segment);
+    segment_t *segment = segment_GetSegment(hls, p_sys->segment);
     if (segment == NULL )
         return VLC_EGENERIC;
 
@@ -1163,6 +1176,7 @@ static int Open(vlc_object_t *p_this)
 
     p_sys->thread->hls_stream = p_sys->hls_stream;
     p_sys->thread->current = current;
+    p_sys->thread->segment = p_sys->segment + 1;
     p_sys->thread->s = s;
 
     if (vlc_thread_create(p_sys->thread, "HTTP Live Streaming client",
@@ -1278,8 +1292,9 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
                 block_Release(segment->data);
                 segment->data = NULL;
             }
-            msg_Dbg(s, "switching to segment %d", p_sys->segment);
             p_sys->segment++;
+            msg_Info(s, "playing segment %d from stream %d",
+                        p_sys->segment, p_sys->current);
             vlc_mutex_unlock(&segment->lock);
             continue;
         }
@@ -1382,9 +1397,10 @@ static bool hls_MaySeek(stream_t *s)
 
     if (p_sys->b_live)
     {
-       int count = vlc_array_count(hls->segments);
        vlc_mutex_lock(&hls->lock);
-       bool may_seek = (hls->segment < count - 2);
+       int count = vlc_array_count(hls->segments);
+       bool may_seek = (p_sys->thread == NULL) ? false :
+                            (p_sys->thread->segment < count - 2);
        vlc_mutex_unlock(&hls->lock);
        return may_seek;
     }
@@ -1432,7 +1448,7 @@ static int segment_Seek(stream_t *s, uint64_t pos)
     for (int n = 0; n < count; n++)
     {
         /* FIXME: Seeking in segments not dowloaded is not supported. */
-        if (n >= hls->segment)
+        if (n >= p_sys->thread->segment)
         {
             msg_Err(s, "seeking in segment not downloaded yet.");
             return VLC_EGENERIC;
