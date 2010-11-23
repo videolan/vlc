@@ -112,6 +112,10 @@
 #   endif
 #endif
 
+#ifdef __SYMBIAN32__
+ #include <sys/syslimits.h>
+#endif
+
 /* Counter for statistics and profiling */
 typedef unsigned long       count_t;
 
