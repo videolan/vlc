@@ -95,7 +95,7 @@ AS_IF([test -n "${with_binary_version}"],[
 ])
 
 dnl Check how we are asked to build
-AS_IF([test "${enable_shared}" = "no"], [
+AS_IF([test "${enable_shared}" = "no" -a "${enable_vlc}" != "no"], [
   AC_MSG_ERROR([VLC is based on plugins. Shared libraries cannot be disabled.])
 ])
 
