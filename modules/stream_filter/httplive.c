@@ -75,7 +75,7 @@ typedef struct hls_stream_s
     int         version;    /* protocol version should be 1 */
     int         sequence;   /* media sequence number */
     int         duration;   /* maximum duration per segment (ms) */
-    uint64_t    bandwidth;  /* bandwidth usage of segments (kbps)*/
+    uint64_t    bandwidth;  /* bandwidth usage of segments (bits per second)*/
 
     vlc_array_t *segments;  /* list of segments */
     int         segment;    /* current segment downloading */
@@ -803,8 +803,6 @@ static int BandwidthAdaptation(stream_t *s, int progid, uint64_t *bandwidth)
     int candidate = -1;
     uint64_t bw = *bandwidth;
 
-    msg_Dbg(s, "bandwidth (bits/s) %"PRIu64, bw * 1000); /* bits / s */
-
     int count = vlc_array_count(p_sys->hls_stream);
     for (int n = 0; n < count; n++)
     {
@@ -815,8 +813,10 @@ static int BandwidthAdaptation(stream_t *s, int progid, uint64_t *bandwidth)
         /* only consider streams with the same PROGRAM-ID */
         if (hls->id == progid)
         {
-            if (bw <= hls->bandwidth)
+            if (bw >= hls->bandwidth)
             {
+                msg_Dbg(s, "candidate %d bandwidth (bits/s) %"PRIu64" >= %"PRIu64,
+                         n, bw, hls->bandwidth); /* bits / s */
                 *bandwidth = hls->bandwidth;
                 candidate = n; /* possible candidate */
             }
@@ -848,14 +848,24 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
 
     vlc_mutex_unlock(&segment->lock);
 
-    uint64_t bw = (segment->size * 8) / (duration/1000);      /* bits / ms */
+    /* Do bandwidth calculations when there are at least 3 segments
+       downloaded */
+    if (hls->segment - s->p_sys->segment < 3)
+        return VLC_SUCCESS;
+
+    /* check for devision by zero */
+    double ms = (double)duration / 1000.0; /* ms */
+    if (ms <= 0.0)
+        return VLC_SUCCESS;
+
+    uint64_t bw = ((double)(segment->size * 8) / ms) * 1000; /* bits / s */
     if (hls->bandwidth != bw)
     {
         int newstream = BandwidthAdaptation(s, hls->id, &bw);
         if ((newstream >= 0) && (newstream != *cur_stream))
         {
             msg_Info(s, "detected %s bandwidth (%"PRIu64") stream",
-                     (hls->bandwidth <= bw) ? "faster" : "lower", bw);
+                     (bw >= hls->bandwidth) ? "faster" : "lower", bw);
             *cur_stream = newstream;
         }
     }
