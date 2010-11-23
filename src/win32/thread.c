@@ -153,7 +153,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
         case DLL_PROCESS_ATTACH:
             vlc_mutex_init (&super_mutex);
             vlc_cond_init (&super_variable);
-            vlc_threadvar_create (&cancel_key, free);
+            vlc_threadvar_create (&cancel_key, NULL);
             break;
 
         case DLL_PROCESS_DETACH:
