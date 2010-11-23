@@ -164,7 +164,7 @@ typedef struct
     DWORD         writer;
 } vlc_rwlock_t;
 
-typedef DWORD   vlc_threadvar_t;
+typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 #endif
 

@@ -458,40 +458,74 @@ void vlc_rwlock_unlock (vlc_rwlock_t *lock)
 }
 
 /*** Thread-specific variables (TLS) ***/
+struct vlc_threadvar
+{
+    DWORD                 id;
+    void                (*destroy) (void *);
+    struct vlc_threadvar *prev;
+    struct vlc_threadvar *next;
+} *vlc_threadvar_last = NULL;
+
 int vlc_threadvar_create (vlc_threadvar_t *p_tls, void (*destr) (void *))
 {
-#warning FIXME: use destr() callback and stop leaking!
-    VLC_UNUSED( destr );
+    struct vlc_threadvar *var = malloc (sizeof (*var));
+    if (unlikely(var == NULL))
+        return errno;
 
-    *p_tls = TlsAlloc();
-    return (*p_tls == TLS_OUT_OF_INDEXES) ? EAGAIN : 0;
+    var->id = TlsAlloc();
+    if (var->id == TLS_OUT_OF_INDEXES)
+        return EAGAIN;
+    var->destroy = destr;
+    var->next = NULL;
+    *p_tls = var;
+
+    vlc_mutex_lock (&super_mutex);
+    var->prev = vlc_threadvar_last;
+    vlc_threadvar_last = var;
+    vlc_mutex_unlock (&super_mutex);
+    return 0;
 }
 
 void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 {
-    TlsFree (*p_tls);
+    struct vlc_threadvar *var = *p_tls;
+
+    vlc_mutex_lock (&super_mutex);
+    if (var->prev != NULL)
+        var->prev->next = var->next;
+    else
+        vlc_threadvar_last = var->next;
+    if (var->next != NULL)
+        var->next->prev = var->prev;
+    vlc_mutex_unlock (&super_mutex);
+
+    TlsFree (var->id);
+    free (var);
 }
 
-/**
- * Sets a thread-local variable.
- * @param key thread-local variable key (created with vlc_threadvar_create())
- * @param value new value for the variable for the calling thread
- * @return 0 on success, a system error code otherwise.
- */
 int vlc_threadvar_set (vlc_threadvar_t key, void *value)
 {
-    return TlsSetValue (key, value) ? ENOMEM : 0;
+    return TlsSetValue (key->id, value) ? ENOMEM : 0;
 }
 
-/**
- * Gets the value of a thread-local variable for the calling thread.
- * This function cannot fail.
- * @return the value associated with the given variable for the calling
- * or NULL if there is no value.
- */
 void *vlc_threadvar_get (vlc_threadvar_t key)
 {
-    return TlsGetValue (key);
+    return TlsGetValue (key->id);
+}
+
+static void vlc_threadvar_cleanup (void)
+{
+    vlc_threadvar_t key;
+
+    /* TODO: use RW lock or something similar */
+    vlc_mutex_lock (&super_mutex);
+    for (key = vlc_threadvar_last; key != NULL; key = key->prev)
+    {
+        void *value = vlc_threadvar_get (key);
+        if (value != NULL)
+            key->destroy (value);
+    }
+    vlc_mutex_unlock (&super_mutex);
 }
 
 
@@ -524,6 +558,7 @@ static unsigned __stdcall vlc_entry (void *p)
     vlc_threadvar_set (cancel_key, &cancel_data);
     vlc_sem_post (&entry->ready);
     func (data);
+    vlc_threadvar_cleanup ();
     return 0;
 }
 
