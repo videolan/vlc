@@ -358,6 +358,7 @@ void var_DestroyAll( vlc_object_t *obj )
     vlc_object_internals_t *priv = vlc_internals( obj );
 
     tdestroy( priv->var_root, CleanupVar );
+    priv->var_root = NULL;
 }
 
 #undef var_Change
