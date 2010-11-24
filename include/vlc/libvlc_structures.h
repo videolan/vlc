@@ -60,7 +60,6 @@ typedef struct libvlc_log_iterator_t libvlc_log_iterator_t;
 
 typedef struct libvlc_log_message_t
 {
-    unsigned    sizeof_msg;   /* sizeof() of message structure, must be filled in by user */
     int         i_severity;   /* 0=INFO, 1=ERR, 2=WARN, 3=DBG */
     const char *psz_type;     /* module type */
     const char *psz_name;     /* module name */
