@@ -833,6 +833,12 @@ static void *vlc_timer_thread (void *data)
         unsigned misses;
 
         vlc_mutex_lock (&timer->lock);
+        if (timer->interval == 0)
+        {
+            timer->value = 0; /* disarm */
+            continue;
+        }
+
         misses = (now - timer->value) / timer->interval;
         timer->value += timer->interval;
         /* Try to compensate for one miss (mwait() will return immediately)
