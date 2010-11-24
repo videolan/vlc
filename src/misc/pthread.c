@@ -804,7 +804,6 @@ struct vlc_timer
     void       (*func) (void *);
     void        *data;
     mtime_t      value, interval;
-    unsigned     users;
     vlc_atomic_t overruns;
 };
 
@@ -867,7 +866,6 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
     timer->data = data;
     timer->value = 0;
     timer->interval = 0;
-    timer->users = 0;
     vlc_atomic_set(&timer->overruns, 0);
     *id = timer;
     return 0;
