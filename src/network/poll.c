@@ -112,11 +112,11 @@ resume:
 	 * is yet to support it.
 	 */
         if (fds[i].events & POLLIN)
-            FD_SET (fd, &rdset);
+            FD_SET ((SOCKET)fd, rdset);
         if (fds[i].events & POLLOUT)
-            FD_SET (fd, &wrset);
+            FD_SET ((SOCKET)fd, wrset);
         if (fds[i].events & POLLPRI)
-            FD_SET (fd, &exset);
+            FD_SET ((SOCKET)fd, exset);
     }
 
 #ifndef HAVE_ALERTABLE_SELECT
