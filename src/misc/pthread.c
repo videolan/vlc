@@ -823,6 +823,8 @@ static void *vlc_timer_thread (void *data)
         if (vlc_cond_timedwait (&timer->reschedule, &timer->lock,
                                 timer->value) == 0)
             continue;
+        if (timer->interval == 0)
+            timer->value = 0; /* disarm */
         vlc_mutex_unlock (&timer->lock);
 
         int canc = vlc_savecancel ();
@@ -834,10 +836,7 @@ static void *vlc_timer_thread (void *data)
 
         vlc_mutex_lock (&timer->lock);
         if (timer->interval == 0)
-        {
-            timer->value = 0; /* disarm */
             continue;
-        }
 
         misses = (now - timer->value) / timer->interval;
         timer->value += timer->interval;
