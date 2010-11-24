@@ -474,7 +474,10 @@ int vlc_threadvar_create (vlc_threadvar_t *p_tls, void (*destr) (void *))
 
     var->id = TlsAlloc();
     if (var->id == TLS_OUT_OF_INDEXES)
+    {
+        free (var);
         return EAGAIN;
+    }
     var->destroy = destr;
     var->next = NULL;
     *p_tls = var;
