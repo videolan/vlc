@@ -800,6 +800,7 @@ void vlc_control_cancel (int cmd, ...)
 struct vlc_timer
 {
     vlc_thread_t thread;
+    vlc_cond_t   reschedule;
     vlc_mutex_t  lock;
     void       (*func) (void *);
     void        *data;
@@ -810,37 +811,43 @@ struct vlc_timer
 static void *vlc_timer_thread (void *data)
 {
     struct vlc_timer *timer = data;
-    mtime_t value, interval;
 
     vlc_mutex_lock (&timer->lock);
-    value = timer->value;
-    interval = timer->interval;
-    vlc_mutex_unlock (&timer->lock);
+    mutex_cleanup_push (&timer->lock);
 
     for (;;)
     {
-        mwait (value);
+        while (timer->value == 0)
+            vlc_cond_wait (&timer->reschedule, &timer->lock);
+
+        if (vlc_cond_timedwait (&timer->reschedule, &timer->lock,
+                                timer->value) == 0)
+            continue;
+        vlc_mutex_unlock (&timer->lock);
 
         int canc = vlc_savecancel ();
         timer->func (timer->data);
         vlc_restorecancel (canc);
 
-        if (interval == 0)
-            return NULL;
-
         mtime_t now = mdate ();
-        unsigned misses = (now - value) / interval;
+        unsigned misses;
+
+        vlc_mutex_lock (&timer->lock);
+        misses = (now - timer->value) / timer->interval;
+        timer->value += timer->interval;
         /* Try to compensate for one miss (mwait() will return immediately)
          * but no more. Otherwise, we might busy loop, after extended periods
          * without scheduling (suspend, SIGSTOP, RT preemption, ...). */
         if (misses > 1)
         {
             misses--;
+            timer->value += misses * timer->interval;
             vlc_atomic_add (&timer->overruns, misses);
-            value += misses * interval;
         }
-        value += interval;
     }
+
+    vlc_cleanup_pop ();
+    assert (0);
 }
 
 /**
@@ -861,12 +868,23 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
     if (unlikely(timer == NULL))
         return ENOMEM;
     vlc_mutex_init (&timer->lock);
+    vlc_cond_init (&timer->reschedule);
     assert (func);
     timer->func = func;
     timer->data = data;
     timer->value = 0;
     timer->interval = 0;
     vlc_atomic_set(&timer->overruns, 0);
+
+    if (vlc_clone (&timer->thread, vlc_timer_thread, timer,
+                   VLC_THREAD_PRIORITY_INPUT))
+    {
+        vlc_cond_destroy (&timer->reschedule);
+        vlc_mutex_destroy (&timer->lock);
+        free (timer);
+        return ENOMEM;
+    }
+
     *id = timer;
     return 0;
 }
@@ -882,7 +900,9 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
  */
 void vlc_timer_destroy (vlc_timer_t timer)
 {
-    vlc_timer_schedule (timer, false, 0, 0);
+    vlc_cancel (timer->thread);
+    vlc_join (timer->thread, NULL);
+    vlc_cond_destroy (&timer->reschedule);
     vlc_mutex_destroy (&timer->lock);
     free (timer);
 }
@@ -907,25 +927,13 @@ void vlc_timer_destroy (vlc_timer_t timer)
 void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
                          mtime_t value, mtime_t interval)
 {
-    vlc_mutex_lock (&timer->lock);
-    while (timer->value)
-    {
-        vlc_thread_t thread = timer->thread;
+    if (!absolute && value != 0)
+        value += mdate();
 
-        timer->value = 0;
-        vlc_mutex_unlock (&timer->lock);
-        vlc_cancel (thread);
-        /* cannot keep the lock during vlc_join X( */
-        vlc_join (thread, NULL);
-        vlc_mutex_lock (&timer->lock);
-    }
-    if ((value != 0)
-     && (vlc_clone (&timer->thread, vlc_timer_thread, timer,
-                    VLC_THREAD_PRIORITY_INPUT) == 0))
-    {
-        timer->value = (absolute ? 0 : mdate ()) + value;
-        timer->interval = interval;
-    }
+    vlc_mutex_lock (&timer->lock);
+    timer->value = value;
+    timer->interval = interval;
+    vlc_cond_signal (&timer->reschedule);
     vlc_mutex_unlock (&timer->lock);
 }
 
