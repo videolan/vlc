@@ -1232,11 +1232,12 @@ static segment_t *NextSegment(stream_t *s)
 {
     stream_sys_t *p_sys = s->p_sys;
     segment_t *segment = NULL;
+    int i_stream = 0;
 
     while(vlc_object_alive(s))
     {
         /* Is the next segment ready */
-        hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->current);
+        hls_stream_t *hls = hls_Get(p_sys->hls_stream, i_stream);
         if (hls == NULL) return NULL;
 
         segment = segment_GetSegment(hls, p_sys->segment);
@@ -1249,22 +1250,14 @@ static segment_t *NextSegment(stream_t *s)
         if (!p_sys->b_meta) return NULL;
 
         /* Was the stream changed to another bitrate? */
-        if (p_sys->current != p_sys->thread->current)
-        {
-            /* YES it was */
-            msg_Info(s, "playback is switching from stream %d to %d",
-                     p_sys->current, p_sys->thread->current);
-            p_sys->current = p_sys->thread->current;
-            continue;
-        }
-
-#if 0
-        /* Not downloaded yet, do it here */
-        if (Download(s, hls, segment, &p_sys->current) != VLC_SUCCESS)
-            return segment;
-        else
-#endif
+        i_stream++;
+        if (i_stream >= vlc_array_count(p_sys->hls_stream))
             return NULL;
+#if 0
+        msg_Info(s, "playback is switching from stream %d to %d",
+                 p_sys->current, i_stream);
+#endif
+        p_sys->current = i_stream;
     }
 
     return segment;
