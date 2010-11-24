@@ -819,27 +819,27 @@ static void *vlc_timer_thread (void *data)
 
     for (;;)
     {
-         mwait (value);
+        mwait (value);
 
-         int canc = vlc_savecancel ();
-         timer->func (timer->data);
-         vlc_restorecancel (canc);
+        int canc = vlc_savecancel ();
+        timer->func (timer->data);
+        vlc_restorecancel (canc);
 
-         if (interval == 0)
-             return NULL;
+        if (interval == 0)
+            return NULL;
 
-         mtime_t now = mdate ();
-         unsigned misses = (now - value) / interval;
-         /* Try to compensate for one miss (mwait() will return immediately)
-          * but no more. Otherwise, we might busy loop, after extended periods
-          * without scheduling (suspend, SIGSTOP, RT preemption, ...). */
-         if (misses > 1)
-         {
-             misses--;
-             vlc_atomic_add (&timer->overruns, misses);
-             value += misses * interval;
-         }
-         value += interval;
+        mtime_t now = mdate ();
+        unsigned misses = (now - value) / interval;
+        /* Try to compensate for one miss (mwait() will return immediately)
+         * but no more. Otherwise, we might busy loop, after extended periods
+         * without scheduling (suspend, SIGSTOP, RT preemption, ...). */
+        if (misses > 1)
+        {
+            misses--;
+            vlc_atomic_add (&timer->overruns, misses);
+            value += misses * interval;
+        }
+        value += interval;
     }
 }
 
