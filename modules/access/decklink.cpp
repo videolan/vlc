@@ -96,22 +96,22 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( "decklink-card-index", 0, NULL,
+    add_integer( "decklink-card-index", 0,
                  CARD_INDEX_TEXT, CARD_INDEX_LONGTEXT, true )
-    add_string( "decklink-mode", "pal ", NULL,
+    add_string( "decklink-mode", "pal ",
                  MODE_TEXT, MODE_LONGTEXT, true )
-    add_integer( "decklink-caching", DEFAULT_PTS_DELAY / 1000, NULL,
+    add_integer( "decklink-caching", DEFAULT_PTS_DELAY / 1000,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
-    add_string( "decklink-audio-connection", 0, NULL,
+    add_string( "decklink-audio-connection", 0,
                  AUDIO_CONNECTION_TEXT, AUDIO_CONNECTION_LONGTEXT, true )
-    add_integer( "decklink-audio-rate", 48000, NULL,
+    add_integer( "decklink-audio-rate", 48000,
                  RATE_TEXT, RATE_LONGTEXT, true )
-    add_integer( "decklink-audio-channels", 2, NULL,
+    add_integer( "decklink-audio-channels", 2,
                  CHANNELS_TEXT, CHANNELS_LONGTEXT, true )
-    add_string( "decklink-video-connection", 0, NULL,
+    add_string( "decklink-video-connection", 0,
                  VIDEO_CONNECTION_TEXT, VIDEO_CONNECTION_LONGTEXT, true )
         change_string_list( ppsz_videoconns, ppsz_videoconns_text, 0 )
-    add_string( "decklink-aspect-ratio", NULL, NULL,
+    add_string( "decklink-aspect-ratio", NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, true )
 
     add_shortcut( "decklink" )
