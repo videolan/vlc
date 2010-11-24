@@ -73,7 +73,7 @@ struct module_cache_t
 typedef NSModule module_handle_t;
 #elif defined(HAVE_IMAGE_H)
 typedef int module_handle_t;
-#elif defined(WIN32) || defined(UNDER_CE)
+#elif defined(WIN32) || defined(UNDER_CE) || defined(__SYMBIAN32__)
 typedef void * module_handle_t;
 #elif defined(HAVE_DL_DLOPEN)
 typedef void * module_handle_t;
