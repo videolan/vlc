@@ -30,6 +30,7 @@
 #include "../src/os_factory.hpp"
 #include "../src/generic_bitmap.hpp"
 #include "../src/top_window.hpp"
+#include "../src/fsc_window.hpp"
 #include "../src/anchor.hpp"
 #include "../src/bitmap_font.hpp"
 #include "../src/ft2_font.hpp"
@@ -359,16 +360,22 @@ void Builder::addMenuSeparator( const BuilderData::MenuSeparator &rData )
 
 void Builder::addWindow( const BuilderData::Window &rData )
 {
-    TopWindow *pWin =
-        new TopWindow( getIntf(), rData.m_xPos, rData.m_yPos,
+    TopWindow *pWin;
+    if( rData.m_id == "fullscreenController" )
+    {
+        pWin = new FscWindow( getIntf(), rData.m_xPos, rData.m_yPos,
                        m_pTheme->getWindowManager(),
                        rData.m_dragDrop, rData.m_playOnDrop,
                        rData.m_visible );
-
+    }
+    else
+    {
+        pWin = new TopWindow( getIntf(), rData.m_xPos, rData.m_yPos,
+                       m_pTheme->getWindowManager(),
+                       rData.m_dragDrop, rData.m_playOnDrop,
+                       rData.m_visible );
+    }
     m_pTheme->m_windows[rData.m_id] = TopWindowPtr( pWin );
-
-    if( rData.m_id == "fullscreenController" )
-        VoutManager::instance( getIntf())->registerFSC( pWin );
 }
 
 

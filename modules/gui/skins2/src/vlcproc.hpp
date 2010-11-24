@@ -111,6 +111,8 @@ public:
 
     void on_intf_show_changed( vlc_object_t* p_obj, vlc_value_t newVal );
 
+    void on_mouse_moved_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+
 protected:
     // Protected because it is a singleton
     VlcProc( intf_thread_t *pIntf );

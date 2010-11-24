@@ -50,9 +50,10 @@
 
 TopWindow::TopWindow( intf_thread_t *pIntf, int left, int top,
                       WindowManager &rWindowManager,
-                      bool dragDrop, bool playOnDrop, bool visible ):
-    GenericWindow( pIntf, left, top, dragDrop, playOnDrop, NULL ),
-    m_visible( visible ), m_rWindowManager( rWindowManager ),
+                      bool dragDrop, bool playOnDrop, bool visible,
+                      GenericWindow::WindowType_t type ):
+    GenericWindow( pIntf, left, top, dragDrop, playOnDrop, NULL, type ),
+    m_initialVisibility( visible ), m_rWindowManager( rWindowManager ),
     m_pActiveLayout( NULL ), m_pLastHitControl( NULL ),
     m_pCapturingControl( NULL ), m_pFocusControl( NULL ), m_currModifier( 0 )
 {

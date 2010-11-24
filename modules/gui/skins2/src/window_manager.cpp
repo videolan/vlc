@@ -34,14 +34,18 @@
 WindowManager::WindowManager( intf_thread_t *pIntf ):
     SkinObject( pIntf ), m_magnet( 0 ), m_direction( kNone ),
     m_maximizeRect(0, 0, 50, 50), m_pTooltip( NULL ), m_pPopup( NULL ),
-    m_alpha( 255 ), m_moveAlpha( 255 ), m_OpacityEnabled( false )
+    m_alpha( 255 ), m_moveAlpha( 255 ), m_opacityEnabled( false )
 {
     // Create and register a variable for the "on top" status
     VarManager *pVarManager = VarManager::instance( getIntf() );
     m_cVarOnTop = VariablePtr( new VarBoolImpl( getIntf() ) );
     pVarManager->registerVar( m_cVarOnTop, "vlc.isOnTop" );
 
-    m_OpacityEnabled = var_InheritBool( getIntf(), "skins2-transparency" );
+    // transparency switched on or off by user
+    m_opacityEnabled = var_InheritBool( getIntf(), "skins2-transparency" );
+
+    // opacity overridden by user
+    m_opacity = 255 * var_InheritFloat( getIntf(), "qt-opacity" );
 }
 
 
@@ -415,7 +419,7 @@ void WindowManager::showAll( bool firstTime ) const
     {
         // When the theme is opened for the first time,
         // only show the window if set as visible in the XML
-        if( (*it)->isVisible() || !firstTime )
+        if( (*it)->getInitialVisibility() || !firstTime )
         {
             (*it)->show();
         }

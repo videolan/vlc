@@ -55,6 +55,7 @@ public:
         TopWindow,
         VoutWindow,
         FullscreenWindow,
+        FscWindow,
     };
 
     GenericWindow( intf_thread_t *pIntf, int xPos, int yPos,
@@ -137,6 +138,9 @@ protected:
     ///
     bool isVisible() const { return m_pVarVisible->get(); }
 
+    /// Method called when the observed variable is modified
+    virtual void onUpdate( Subject<VarBool> &rVariable , void*);
+
 private:
     /// Window position and size
     int m_left, m_top, m_width, m_height;
@@ -144,9 +148,6 @@ private:
     OSWindow *m_pOsWindow;
     /// Variable for the visibility of the window
     mutable VarBoolImpl *m_pVarVisible;
-
-    /// Method called when the observed variable is modified
-    virtual void onUpdate( Subject<VarBool> &rVariable , void*);
 };
 
 

@@ -135,10 +135,12 @@ public:
     void setMagnetValue( int magnet ) { m_magnet = magnet; }
 
     /// Set the alpha value of the static windows
-    void setAlphaValue( int alpha ) { m_alpha = alpha; }
+    void setAlphaValue( int alpha )
+        { m_alpha = (m_opacity != 255) ? m_opacity : alpha; }
 
     /// Set the alpha value of the moving windows
-    void setMoveAlphaValue( int moveAlpha ) { m_moveAlpha = moveAlpha; }
+    void setMoveAlphaValue( int moveAlpha )
+        { m_moveAlpha = (m_opacity != 255) ? m_opacity : moveAlpha; }
 
     /// Create the tooltip window
     void createTooltip( const GenericFont &rTipFont );
@@ -164,7 +166,7 @@ public:
 
     /// getter to know whether opacity is needed
     bool isOpacityNeeded() const
-    { return (m_OpacityEnabled && (m_alpha != 255 || m_moveAlpha != 255 )); }
+    { return (m_opacityEnabled && (m_alpha != 255 || m_moveAlpha != 255 )); }
 
 private:
     /// Some useful typedefs for lazy people like me
@@ -210,7 +212,9 @@ private:
     /// Alpha value of the moving windows
     int m_moveAlpha;
     /// transparency set by user
-    bool m_OpacityEnabled;
+    bool m_opacityEnabled;
+    /// opacity overridden by user
+    int m_opacity;
     /// Direction of the current resizing
     Direction_t m_direction;
     /// Rect of the last maximized window

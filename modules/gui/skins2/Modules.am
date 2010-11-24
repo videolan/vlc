@@ -150,6 +150,8 @@ SOURCES_skins2 = \
 	src/tooltip.hpp \
 	src/top_window.cpp \
 	src/top_window.hpp \
+	src/fsc_window.cpp \
+	src/fsc_window.hpp \
 	src/var_manager.cpp \
 	src/var_manager.hpp \
 	src/vlcproc.cpp \

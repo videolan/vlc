@@ -37,6 +37,7 @@
 
 class VarBool;
 class GenericWindow;
+class FscWindow;
 
 #include <stdio.h>
 
@@ -131,7 +132,10 @@ public:
     void registerCtrlVideo( CtrlVideo* p_CtrlVideo );
 
     // Register Video Controls (when building theme)
-    void registerFSC( TopWindow* p_Win );
+    void registerFSC( FscWindow* p_Win );
+
+    // get the fullscreen controller window
+    FscWindow* getFscWindow( ) { return m_pFscWindow; }
 
     // save and restore vouts (when changing theme)
     void saveVoutConfig( );
@@ -166,7 +170,7 @@ private:
 
     VoutMainWindow* m_pVoutMainWindow;
 
-    TopWindow* m_pFscWindow;
+    FscWindow* m_pFscWindow;
 };
 
 

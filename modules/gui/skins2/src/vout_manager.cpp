@@ -90,13 +90,9 @@ void VoutManager::registerCtrlVideo( CtrlVideo* p_CtrlVideo )
 }
 
 
-void VoutManager::registerFSC( TopWindow* p_Win )
+void VoutManager::registerFSC( FscWindow* p_Win )
 {
     m_pFscWindow = p_Win;
-
-    int x = p_Win->getLeft();
-    int y = p_Win->getTop();
-    p_Win->setParent( m_pVoutMainWindow, x , y, 0, 0 );
 }
 
 

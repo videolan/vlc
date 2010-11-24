@@ -39,6 +39,7 @@
 #include "os_timer.hpp"
 #include "var_manager.hpp"
 #include "vout_manager.hpp"
+#include "fsc_window.hpp"
 #include "theme.hpp"
 #include "window_manager.hpp"
 #include "../commands/async_queue.hpp"
@@ -404,6 +405,8 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
 
     ADD_CALLBACK_ENTRY( "intf-show", on_intf_show_changed, false )
 
+    ADD_CALLBACK_ENTRY( "mouse-moved", on_mouse_moved_changed, false )
+
 #undef ADD_CALLBACK_ENTRY
 
     msg_Err( pThis->getIntf(), "no callback entry for %s", pVariable );
@@ -541,8 +544,26 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
         {
             vout_thread_t* pVout = input_GetVout( pInput );
             SET_BOOL( m_cVarHasVout, pVout != NULL );
-            if( pVout )
-                vlc_object_release( pVout );
+            if( !pVout || pVout == m_pVout )
+            {
+                // end of input or vout reuse (nothing to do)
+                if( pVout )
+                    vlc_object_release( pVout );
+                break;
+            }
+            if( m_pVout )
+            {
+                // remove previous Vout callbacks
+                var_DelCallback( m_pVout, "mouse-moved",
+                                 onGenericCallback, this );
+                vlc_object_release( m_pVout );
+                m_pVout = NULL;
+            }
+
+            // add new Vout callbackx
+            var_AddCallback( pVout, "mouse-moved",
+                             onGenericCallback, this );
+            m_pVout = pVout;
             break;
         }
 
@@ -721,8 +742,8 @@ void VlcProc::on_intf_show_changed( vlc_object_t* p_obj, vlc_value_t newVal )
     }
     else
     {
-        Theme* pTheme =  getIntf()->p_sys->p_theme;
-        TopWindow *pWin = pTheme->getWindowById( "fullscreenController" );
+        VoutManager* pVoutManager =  VoutManager::instance( getIntf() );
+        FscWindow *pWin = pVoutManager->getFscWindow();
         if( pWin )
         {
             bool b_visible = pWin->getVisibleVar().get();
@@ -744,6 +765,13 @@ void VlcProc::on_intf_show_changed( vlc_object_t* p_obj, vlc_value_t newVal )
             }
         }
     }
+}
+
+void VlcProc::on_mouse_moved_changed( vlc_object_t* p_obj, vlc_value_t newVal )
+{
+    FscWindow* pFscWindow = VoutManager::instance( getIntf() )->getFscWindow();
+    if( pFscWindow )
+        pFscWindow->onMouseMoved();
 }
 
 void VlcProc::reset_input()

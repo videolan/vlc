@@ -28,6 +28,7 @@
 
 #include "../src/generic_window.hpp"
 #include "../src/vlcproc.hpp"
+#include "../src/vout_manager.hpp"
 #include "x11_window.hpp"
 #include "x11_display.hpp"
 #include "x11_graphics.hpp"
@@ -77,6 +78,15 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         valuemask = CWBackingStore | CWBackPixel | CWEventMask;
 
         name_type = "VoutWindow";
+    }
+    else if( type == GenericWindow::FscWindow )
+    {
+        m_wnd_parent = DefaultRootWindow( XDISPLAY );
+
+        attr.event_mask = ExposureMask | StructureNotifyMask;
+        valuemask = CWEventMask;
+
+        name_type = "FscWindow";
     }
     else
     {
@@ -156,8 +166,20 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     string name_window = "VLC (" + name_type + ")";
     XStoreName( XDISPLAY, m_wnd, name_window.c_str() );
 
-    // Associate the window to the main "parent" window
-    XSetTransientForHint( XDISPLAY, m_wnd, m_rDisplay.getMainWindow() );
+    // Set the WM_TRANSIENT_FOR property
+    if( type == GenericWindow::FscWindow )
+    {
+        // Associate the fsc window to the fullscreen window
+        VoutManager* pVoutManager = VoutManager::instance( getIntf() );
+        GenericWindow* pWin = pVoutManager->getVoutMainWindow();
+        Window wnd = (Window) pWin->getOSHandle();
+        XSetTransientForHint( XDISPLAY, m_wnd, wnd );
+    }
+    else
+    {
+        // Associate the regular top-level window to the offscren main window
+        XSetTransientForHint( XDISPLAY, m_wnd, m_rDisplay.getMainWindow() );
+    }
 
     // initialize Class Hint
     XClassHint classhint;
@@ -241,7 +263,12 @@ void X11Window::show() const
     {
         XMapRaised( XDISPLAY, m_wnd );
         setFullscreen();
-        // toggleOnTop( true );
+        toggleOnTop( true );
+    }
+    else if(  m_type == GenericWindow::FscWindow )
+    {
+        XMapRaised( XDISPLAY, m_wnd );
+        toggleOnTop( true );
     }
     else
     {

@@ -44,7 +44,8 @@ private:
 public:
     TopWindow( intf_thread_t *pIntf, int xPos, int yPos,
                WindowManager &rWindowManager,
-               bool dragDrop, bool playOnDrop, bool visible );
+               bool dragDrop, bool playOnDrop, bool visible,
+               GenericWindow::WindowType_t type = GenericWindow::TopWindow );
     virtual ~TopWindow();
 
     /// Methods to process OS events.
@@ -81,7 +82,7 @@ public:
     VarBool &getMaximizedVar() { return *m_pVarMaximized; }
 
     /// Get the initial visibility status
-    bool isVisible() const { return m_visible; }
+    bool getInitialVisibility() const { return m_initialVisibility; }
 
 protected:
     /// Actually show the window
@@ -100,7 +101,7 @@ private:
     //@}
 
     /// Initial visibility status
-    bool m_visible;
+    bool m_initialVisibility;
     /// Window manager
     WindowManager &m_rWindowManager;
     /// Current active layout of the window

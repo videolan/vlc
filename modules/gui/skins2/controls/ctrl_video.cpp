@@ -101,8 +101,6 @@ void CtrlVideo::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h)
 
     if( m_pVoutWindow )
     {
-        m_pVoutWindow->move( pPos->getLeft(), pPos->getTop() );
-        m_pVoutWindow->resize( pPos->getWidth(), pPos->getHeight() );
         m_pVoutWindow->show();
     }
 }

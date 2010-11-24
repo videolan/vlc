@@ -26,6 +26,7 @@
 
 #include "../src/generic_window.hpp"
 #include "../src/vlcproc.hpp"
+#include "../src/vout_manager.hpp"
 #include "win32_window.hpp"
 #include "win32_dragdrop.hpp"
 #include "win32_factory.hpp"
@@ -72,6 +73,22 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         m_hWnd = CreateWindowEx( WS_EX_APPWINDOW, vlc_class,
                                  vlc_name, WS_POPUP | WS_CLIPCHILDREN,
                                  0, 0, 0, 0, NULL, 0, hInst, NULL );
+
+        // Store with it a pointer to the interface thread
+        SetWindowLongPtr( m_hWnd, GWLP_USERDATA, (LONG_PTR)getIntf() );
+    }
+    else if( type == GenericWindow::FscWindow )
+    {
+        VoutManager* pVoutManager = VoutManager::instance( getIntf() );
+        GenericWindow* pParent =
+           (GenericWindow*)pVoutManager->getVoutMainWindow();
+
+        m_hWnd_parent = (HWND)pParent->getOSHandle();
+
+        // top-level window
+        m_hWnd = CreateWindowEx( WS_EX_APPWINDOW, vlc_class, vlc_name,
+                                 WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
+                                 0, 0, 0, 0, m_hWnd_parent, 0, hInst, NULL );
 
         // Store with it a pointer to the interface thread
         SetWindowLongPtr( m_hWnd, GWLP_USERDATA, (LONG_PTR)getIntf() );
@@ -130,14 +147,8 @@ Win32Window::~Win32Window()
 void Win32Window::reparent( void* OSHandle, int x, int y, int w, int h )
 {
     // Reparent the window
-
-    if( m_type == GenericWindow::TopWindow )
-    {
-       // fullscreen controller
-       SetWindowLongPtr( m_hWnd, GWL_STYLE, WS_CHILD );
-    }
-
-    SetParent( m_hWnd, (HWND)OSHandle );
+    if( !SetParent( m_hWnd, (HWND)OSHandle ) )
+        msg_Err( getIntf(), "SetParent failed (%lu)", GetLastError() );
     MoveWindow( m_hWnd, x, y, w, h, TRUE );
 }
 
