@@ -615,28 +615,37 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             if( asprintf( &psz_header, _("Media: %s"), p_cfg->psz_name ) == -1 )
                 psz_header = NULL;
 
+            sout_description_data_t data;
+            TAB_INIT(data.i_es, data.es);
+
             p_input = input_Create( p_vlm->p_vod, p_media->vod.p_item, psz_header, NULL );
             if( p_input )
             {
                 vlc_sem_t sem_preparse;
                 vlc_sem_init( &sem_preparse, 0 );
                 var_AddCallback( p_input, "intf-event", InputEventPreparse, &sem_preparse );
+                data.stop = false;
+                data.sem = &sem_preparse;
+                var_Create( p_input, "sout-description-data", VLC_VAR_ADDRESS );
+                var_SetAddress( p_input, "sout-description-data", &data );
 
                 if( !input_Start( p_input ) )
                 {
-                    while( !p_input->b_dead && ( !p_cfg->vod.psz_mux || !input_item_IsPreparsed( p_media->vod.p_item ) ) )
+                    while( !data.stop && !p_input->b_dead && ( !p_cfg->vod.psz_mux || !input_item_IsPreparsed( p_media->vod.p_item ) ) )
                         vlc_sem_wait( &sem_preparse );
                 }
 
                 var_DelCallback( p_input, "intf-event", InputEventPreparse, &sem_preparse );
-                vlc_sem_destroy( &sem_preparse );
 
                 input_Stop( p_input, true );
                 vlc_thread_join( p_input );
                 vlc_object_release( p_input );
+                vlc_sem_destroy( &sem_preparse );
             }
             free( psz_header );
 
+            /* XXX: Don't do it that way, but properly use a new input item ref. */
+            input_item_t item = *p_media->vod.p_item;;
             if( p_cfg->vod.psz_mux )
             {
                 const char *psz_mux;
@@ -647,7 +656,6 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                 else
                     psz_mux = p_cfg->vod.psz_mux;
 
-                input_item_t item;
                 es_format_t es, *p_es = &es;
                 union { char text[5]; uint32_t value; } fourcc;
 
@@ -657,20 +665,19 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                 fourcc.text[2] = tolower(fourcc.text[2]);
                 fourcc.text[3] = tolower(fourcc.text[3]);
 
-                /* XXX: Don't do it that way, but properly use a new input item ref. */
-                item = *p_media->vod.p_item;
                 item.i_es = 1;
                 item.es = &p_es;
                 es_format_Init( &es, VIDEO_ES, fourcc.value );
-
-                p_media->vod.p_media =
-                    p_vlm->p_vod->pf_media_new( p_vlm->p_vod, p_cfg->psz_name, &item );
             }
             else
             {
-                p_media->vod.p_media =
-                    p_vlm->p_vod->pf_media_new( p_vlm->p_vod, p_cfg->psz_name, p_media->vod.p_item );
+                item.i_es = data.i_es;
+                item.es = data.es;
             }
+            p_media->vod.p_media = p_vlm->p_vod->pf_media_new( p_vlm->p_vod,
+                                                    p_cfg->psz_name, &item );
+
+            TAB_CLEAN(data.i_es, data.es);
         }
     }
     else if ( p_cfg->b_vod )

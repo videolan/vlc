@@ -59,6 +59,7 @@ vlc_module_end ()
 
 struct sout_stream_sys_t
 {
+    sout_description_data_t *data;
     mtime_t i_stream_start;
 };
 
@@ -79,6 +80,14 @@ static int Open( vlc_object_t *p_this )
     p_stream->pf_send = Send;
     p_sys = p_stream->p_sys = malloc(sizeof(sout_stream_sys_t));
 
+    p_sys->data = var_InheritAddress(p_stream, "sout-description-data");
+    if (p_sys->data == NULL)
+    {
+        msg_Err(p_stream, "Missing data: the description stream output is "
+                "not meant to be used without special setup from the core");
+        free(p_sys);
+        return VLC_EGENERIC;
+    }
     p_sys->i_stream_start = 0;
 
     return VLC_SUCCESS;
@@ -102,22 +111,13 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t *id;
     es_format_t *p_fmt_copy;
-    input_item_t *p_item;
-    input_thread_t *p_input;
 
     msg_Dbg( p_stream, "Adding a stream" );
-    p_input = vlc_object_find( p_stream, VLC_OBJECT_INPUT, FIND_PARENT );
-    assert( p_input );
  
-    p_item = input_GetItem(p_input);
-
     p_fmt_copy = malloc(sizeof(es_format_t));
     es_format_Copy( p_fmt_copy, p_fmt );
 
-    vlc_mutex_lock( &p_item->lock );
-    TAB_APPEND( p_item->i_es, p_item->es, p_fmt_copy );
-    vlc_mutex_unlock( &p_item->lock );
-    vlc_object_release( p_input );
+    TAB_APPEND( p_sys->data->i_es, p_sys->data->es, p_fmt_copy );
 
     if( p_sys->i_stream_start <= 0 )
         p_sys->i_stream_start = mdate();
@@ -144,14 +144,8 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     if( p_sys->i_stream_start + 1500000 < mdate() )
     {
-        input_thread_t *p_input;
-
-        p_input = vlc_object_find( p_stream, VLC_OBJECT_INPUT, FIND_PARENT );
-        if( p_input )
-        {
-            input_Stop( p_input, true );
-            vlc_object_release( p_input );
-        }
+        p_sys->data->stop = true;
+        vlc_sem_post(p_sys->data->sem);
     }
 
     return VLC_SUCCESS;
