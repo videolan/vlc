@@ -199,6 +199,8 @@ static int Control(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_GET_OPENGL: {
         vout_opengl_t **gl = va_arg(args, vout_opengl_t **);
         *gl = &vd->sys->gl;
+
+        CommonDisplay(vd);
         return VLC_SUCCESS;
     }
     default:
