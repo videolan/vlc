@@ -38,6 +38,7 @@ typedef struct
 
     bool      b_sout_keep;
 
+    vlc_object_t *p_parent;
     input_item_t      *p_item;
     input_thread_t    *p_input;
     input_resource_t *p_input_resource;

@@ -876,6 +876,8 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char 
 
     p_instance->i_index = 0;
     p_instance->b_sout_keep = false;
+    p_instance->p_parent = vlc_object_create( p_vlm, sizeof (vlc_object_t) );
+    vlc_object_attach( p_instance->p_parent, p_vlm->p_libvlc );
     p_instance->p_input = NULL;
     p_instance->p_input_resource = NULL;
 
@@ -899,6 +901,7 @@ static void vlm_MediaInstanceDelete( vlm_t *p_vlm, int64_t id, vlm_media_instanc
         input_resource_Terminate( p_instance->p_input_resource );
         input_resource_Release( p_instance->p_input_resource );
     }
+    vlc_object_release( p_instance->p_parent );
 
     TAB_REMOVE( p_media->i_instance, p_media->instance, p_instance );
     vlc_gc_decref( p_instance->p_item );
@@ -933,6 +936,15 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
         p_instance = vlm_MediaInstanceNew( p_vlm, psz_id );
         if( !p_instance )
             return VLC_ENOMEM;
+
+        if ( p_cfg->b_vod )
+        {
+            var_Create( p_instance->p_parent, "vod-media", VLC_VAR_ADDRESS );
+            var_SetAddress( p_instance->p_parent, "vod-media",
+                            p_media->vod.p_media );
+            var_Create( p_instance->p_parent, "vod-session", VLC_VAR_STRING );
+            var_SetString( p_instance->p_parent, "vod-session", psz_id );
+        }
 
         if( p_cfg->psz_output != NULL || psz_vod_output != NULL )
         {
@@ -994,21 +1006,15 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
 
     if( asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name ) != -1 )
     {
-        vlc_object_t *p_parent = p_media->cfg.b_vod ?
-                                     VLC_OBJECT(p_vlm->p_vod) :
-                                     VLC_OBJECT(p_vlm->p_libvlc);
         if( !p_instance->p_input_resource )
-            p_instance->p_input_resource = input_resource_New( VLC_OBJECT( p_vlm->p_libvlc ) );
-        p_instance->p_input = input_Create( p_parent, p_instance->p_item,
-                                            psz_log, p_instance->p_input_resource );
+            p_instance->p_input_resource = input_resource_New( p_instance->p_parent );
+
+        p_instance->p_input = input_Create( p_instance->p_parent,
+                                            p_instance->p_item, psz_log,
+                                            p_instance->p_input_resource );
         if( p_instance->p_input )
         {
             var_AddCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
-            var_Create( p_instance->p_input, "vod-media", VLC_VAR_ADDRESS );
-            var_SetAddress( p_instance->p_input, "vod-media",
-                            p_media->vod.p_media );
-            var_Create( p_instance->p_input, "vod-session", VLC_VAR_STRING );
-            var_SetString( p_instance->p_input, "vod-session", psz_id );
 
             if( input_Start( p_instance->p_input ) != VLC_SUCCESS )
             {
