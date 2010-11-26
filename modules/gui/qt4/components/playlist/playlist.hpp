@@ -35,7 +35,10 @@
 //#include <vlc_playlist.h>
 
 #include <QSplitter>
+
 #include <QPushButton>
+#include <QSPlitterHandle>
+#include <QMouseEvent>
 
 class StandardPLPanel;
 class LocationBar;
@@ -68,10 +71,27 @@ protected:
     virtual void dropEvent( QDropEvent *);
     virtual void dragEnterEvent( QDragEnterEvent * );
     virtual void closeEvent( QCloseEvent * );
+#ifdef __APPLE__
+    virtual QSplitterHandle *createHandle();
+#endif
 
 private slots:
     void changeView( const QModelIndex& index );
 };
+
+#ifdef Q_WS_MAC
+class SplitterHandle : public QSplitterHandle
+{
+public:
+    SplitterHandle( Qt::Orientation orientation, QSplitter * parent );
+
+protected:
+    virtual void paintEvent ( QPaintEvent * );
+
+private:
+    virtual QSize sizeHint () const;
+};
+#endif /* __APPLE__ */
 
 class LocationButton : public QPushButton
 {

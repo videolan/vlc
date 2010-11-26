@@ -415,3 +415,26 @@ QSize LocationButton::sizeHint() const
 }
 
 #undef PADDING
+
+#ifdef Q_WS_MAC
+QSplitterHandle *PlaylistWidget::createHandle()
+{
+    return new SplitterHandle( orientation(), this );
+}
+
+SplitterHandle::SplitterHandle( Qt::Orientation orientation, QSplitter * parent )
+               : QSplitterHandle( orientation, parent)
+{
+};
+
+QSize SplitterHandle::sizeHint() const
+{
+    return (orientation() == Qt::Horizontal) ? QSize( 1, height() ) : QSize( width(), 1 );
+}
+
+void SplitterHandle::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+    painter.fillRect(event->rect(), QBrush(Qt::gray));
+}
+#endif /* __APPLE__ */
