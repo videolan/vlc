@@ -38,7 +38,12 @@
 
 ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {
+#ifdef __APPLE__
+    setWindowFlags( Qt::Drawer );
+#else
     setWindowFlags( Qt::Tool );
+#endif
+
     setWindowOpacity( var_InheritFloat( p_intf, "qt-opacity" ) );
     setWindowTitle( qtr( "Adjustments and Effects" ) );
     setWindowRole( "vlc-extended" );
