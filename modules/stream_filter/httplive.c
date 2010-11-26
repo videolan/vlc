@@ -1309,11 +1309,13 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
                 segment->data = NULL;
             }
             p_sys->segment++;
-            msg_Info(s, "playing segment %d from stream %d",
-                        p_sys->segment, p_sys->current);
             vlc_mutex_unlock(&segment->lock);
             continue;
         }
+
+        if (segment->size == segment->data->i_buffer)
+            msg_Info(s, "playing segment %d from stream %d",
+                        p_sys->segment, p_sys->current);
 
         ssize_t len = -1;
         if (i_read <= segment->data->i_buffer)
