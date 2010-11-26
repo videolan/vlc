@@ -446,7 +446,7 @@ static void *Thread( void *obj )
 
     /* Icon setting, Mac uses icon from .icns */
 #ifndef Q_WS_MAC
-    if( QDate::currentDate().dayOfYear() >= 352 ) /* One Week before Xmas */
+    if( QDate::currentDate().dayOfYear() >= QT_CHRISTMAS_TROLL_DAY )
         app.setWindowIcon( QIcon(vlc_christmas_xpm) );
     else
         app.setWindowIcon( QIcon(vlc_xpm) );

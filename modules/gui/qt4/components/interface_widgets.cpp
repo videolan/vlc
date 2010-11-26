@@ -28,6 +28,7 @@
 # include "config.h"
 #endif
 
+#include "qt4.hpp"
 #include "components/interface_widgets.hpp"
 #include "dialogs_provider.hpp"
 #include "util/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
@@ -211,7 +212,7 @@ void BackgroundWidget::updateArt( const QString& url )
     }
     else
     {   /* Xmas joke */
-        if( QDate::currentDate().dayOfYear() >= 354 )
+        if( QDate::currentDate().dayOfYear() >= QT_CHRISTMAS_TROLL_DAY )
             pixmapUrl = QString( ":/logo/vlc128-christmas.png" );
         else
             pixmapUrl = QString( ":/logo/vlc128.png" );

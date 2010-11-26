@@ -26,6 +26,7 @@
 # include "config.h"
 #endif
 
+#include "qt4.hpp"
 #include "dialogs/help.hpp"
 #include "util/qt_dirs.hpp"
 
@@ -101,7 +102,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
     ui.introduction->setText(
             qtr( "VLC media player" ) + qfu( " " VERSION_MESSAGE ) );
 
-    if( QDate::currentDate().dayOfYear() >= 354 )
+    if( QDate::currentDate().dayOfYear() >= QT_CHRISTMAS_TROLL_DAY )
         ui.iconVLC->setPixmap( QPixmap( ":/logo/vlc128-christmas.png" ) );
     else
         ui.iconVLC->setPixmap( QPixmap( ":/logo/vlc128.png" ) );
