@@ -61,7 +61,7 @@ vlc_module_end()
 typedef struct segment_s
 {
     int         sequence;   /* unique sequence number */
-    int         length;     /* segment duration (ms) */
+    int         length;     /* segment duration (seconds) */
     uint64_t    size;       /* segment size in bytes */
 
     vlc_url_t   url;
@@ -1475,23 +1475,39 @@ static int segment_Seek(stream_t *s, uint64_t pos)
             return VLC_EGENERIC;
 
         vlc_mutex_lock(&segment->lock);
-        length += segment->size;
-        uint64_t size = segment->size -segment->data->i_buffer;
-        if (size > 0)
+        if (segment->data)
         {
-            segment->data->i_buffer += size;
-            segment->data->p_buffer -= size;
+            length += segment->size;
+            uint64_t size = segment->size -segment->data->i_buffer;
+            if (size > 0)
+            {
+                segment->data->i_buffer += size;
+                segment->data->p_buffer -= size;
+            }
+
+            if (!b_found && (pos <= length))
+            {
+                uint64_t used = length - pos;
+                segment->data->i_buffer -= used;
+                segment->data->p_buffer += used;
+
+                count = p_sys->segment;
+                p_sys->segment = n;
+                b_found = true;
+            }
         }
-
-        if (!b_found && (pos <= length))
+        else
         {
-            uint64_t used = length - pos;
-            segment->data->i_buffer -= used;
-            segment->data->p_buffer += used;
+            /* FIXME: seeking is weird when seeking in segments
+               that have not been downloaded yet */
+            length += segment->length * hls->bandwidth;
 
-            count = p_sys->segment;
-            p_sys->segment = n;
-            b_found = true;
+            if (!b_found && (pos <= length))
+            {
+                count = p_sys->segment;
+                p_sys->segment = n;
+                b_found = true;
+            }
         }
         vlc_mutex_unlock(&segment->lock);
     }
