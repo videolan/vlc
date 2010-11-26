@@ -70,15 +70,21 @@ static void vlm_Destructor( vlm_t *p_vlm );
 static void* Manage( void * );
 static int vlm_MediaVodControl( void *, vod_media_t *, const char *, int, va_list );
 
+typedef struct preparse_data_t
+{
+    vlc_sem_t *p_sem;
+    bool b_mux;
+} preparse_data_t;
+
 static int InputEventPreparse( vlc_object_t *p_this, char const *psz_cmd,
                                vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
-    vlc_sem_t *p_sem_preparse = p_data;
+    preparse_data_t *p_pre = p_data;
 
     if( newval.i_int == INPUT_EVENT_DEAD ||
-        newval.i_int == INPUT_EVENT_ITEM_META )
-        vlc_sem_post( p_sem_preparse );
+        ( p_pre->b_mux && newval.i_int == INPUT_EVENT_ITEM_META ) )
+        vlc_sem_post( p_pre->p_sem );
 
     return VLC_SUCCESS;
 }
@@ -623,19 +629,21 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             {
                 vlc_sem_t sem_preparse;
                 vlc_sem_init( &sem_preparse, 0 );
-                var_AddCallback( p_input, "intf-event", InputEventPreparse, &sem_preparse );
-                data.stop = false;
+
+                preparse_data_t preparse = { .p_sem = &sem_preparse,
+                                    .b_mux = (p_cfg->vod.psz_mux != NULL) };
+                var_AddCallback( p_input, "intf-event", InputEventPreparse,
+                                 &preparse );
+
                 data.sem = &sem_preparse;
                 var_Create( p_input, "sout-description-data", VLC_VAR_ADDRESS );
                 var_SetAddress( p_input, "sout-description-data", &data );
 
                 if( !input_Start( p_input ) )
-                {
-                    while( !data.stop && !p_input->b_dead && ( !p_cfg->vod.psz_mux || !input_item_IsPreparsed( p_media->vod.p_item ) ) )
-                        vlc_sem_wait( &sem_preparse );
-                }
+                    vlc_sem_wait( &sem_preparse );
 
-                var_DelCallback( p_input, "intf-event", InputEventPreparse, &sem_preparse );
+                var_DelCallback( p_input, "intf-event", InputEventPreparse,
+                                 &preparse );
 
                 input_Stop( p_input, true );
                 vlc_thread_join( p_input );

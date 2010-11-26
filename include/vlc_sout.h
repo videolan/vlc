@@ -273,7 +273,6 @@ typedef struct sout_description_data_t
     int i_es;
     es_format_t **es;
     vlc_sem_t *sem;
-    bool stop;
 } sout_description_data_t;
 
 #ifdef __cplusplus
