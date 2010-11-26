@@ -556,6 +556,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     setStyleSheet( " background: red ");
 #endif
 
+    setAttribute( Qt::WA_MacBrushedMetal);
     QVBoxLayout *controlLayout = new QVBoxLayout( this );
     controlLayout->setContentsMargins( 4, 1, 4, 0 );
     controlLayout->setSpacing( 0 );
