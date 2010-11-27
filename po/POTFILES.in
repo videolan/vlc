@@ -228,7 +228,6 @@ modules/access/gnomevfs.c
 modules/access/http.c
 modules/access/imem.c
 modules/access/jack.c
-modules/access/mmap.c
 modules/access/mms/asf.c
 modules/access/mms/asf.h
 modules/access/mms/buffer.c

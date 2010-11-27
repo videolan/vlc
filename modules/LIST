@@ -16,7 +16,6 @@ $Id$
  * access_http: HTTP Network access module
  * access_imem: memory input access module
  * access_jack: JACK audio input module
- * access_mmap: mmap file access
  * access_mms: MMS over TCP, UDP and HTTP access module
  * access_mtp: MTP access module
  * access_oss: OSS access module
