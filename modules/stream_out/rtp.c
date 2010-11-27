@@ -167,6 +167,12 @@ static const char *const ppsz_protocols[] = {
     "interfaces (address 0.0.0.0), on port 554, with no path.\nTo listen " \
     "only on the local interface, use \"localhost\" as address." )
 
+#define RTSP_TIMEOUT_TEXT N_( "RTSP session timeout (s)" )
+#define RTSP_TIMEOUT_LONGTEXT N_( "RTSP sessions will be closed after " \
+    "not receiving any RTSP request for this long. Setting it to a " \
+    "negative value or zero disables timeouts. The default is 60 (one " \
+    "minute)." )
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -240,6 +246,8 @@ vlc_module_begin ()
     add_shortcut( "rtsp" )
     add_string ( "rtsp-host", NULL, RTSP_HOST_TEXT,
                  RTSP_HOST_LONGTEXT, true )
+    add_integer( "rtsp-timeout", 60, RTSP_TIMEOUT_TEXT,
+                 RTSP_TIMEOUT_LONGTEXT, true )
 
 vlc_module_end ()
 

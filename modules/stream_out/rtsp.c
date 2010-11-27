@@ -68,6 +68,9 @@ struct rtsp_stream_t
 
     int             sessionc;
     rtsp_session_t **sessionv;
+
+    int             timeout;
+    vlc_timer_t     timer;
 };
 
 
@@ -78,6 +81,8 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
                             httpd_client_t *cl, httpd_message_t *answer,
                             const httpd_message_t *query );
 static void RtspClientDel( rtsp_stream_t *rtsp, rtsp_session_t *session );
+
+static void RtspTimeOut( void *data );
 
 rtsp_stream_t *RtspSetup( vlc_object_t *owner, vod_media_t *media,
                           const vlc_url_t *url )
@@ -99,6 +104,13 @@ rtsp_stream_t *RtspSetup( vlc_object_t *owner, vod_media_t *media,
     rtsp->psz_path = NULL;
     rtsp->track_id = 0;
     vlc_mutex_init( &rtsp->lock );
+
+    rtsp->timeout = var_InheritInteger(owner, "rtsp-timeout");
+    if (rtsp->timeout > 0)
+    {
+        if (vlc_timer_create(&rtsp->timer, RtspTimeOut, rtsp))
+            goto error;
+    }
 
     rtsp->port = (url->i_port > 0) ? url->i_port : 554;
     rtsp->psz_path = strdup( ( url->psz_path != NULL ) ? url->psz_path : "/" );
@@ -138,11 +150,14 @@ void RtspUnsetup( rtsp_stream_t *rtsp )
     if( rtsp->url )
         httpd_UrlDelete( rtsp->url );
 
+    if( rtsp->host )
+        httpd_HostDelete( rtsp->host );
+
     while( rtsp->sessionc > 0 )
         RtspClientDel( rtsp, rtsp->sessionv[0] );
 
-    if( rtsp->host )
-        httpd_HostDelete( rtsp->host );
+    if (rtsp->timeout > 0)
+        vlc_timer_destroy(rtsp->timer);
 
     free( rtsp->psz_path );
     vlc_mutex_destroy( &rtsp->lock );
@@ -172,6 +187,7 @@ struct rtsp_session_t
 {
     rtsp_stream_t *stream;
     uint64_t       id;
+    mtime_t        last_seen; /* for timeouts */
     bool           vod_started; /* true if the VoD media instance was created */
 
     /* output (id-access) */
@@ -289,6 +305,49 @@ void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t *id )
 
 
 /** rtsp must be locked */
+static void RtspUpdateTimer( rtsp_stream_t *rtsp )
+{
+    if (rtsp->timeout <= 0)
+        return;
+
+    mtime_t timeout = 0;
+    for (int i = 0; i < rtsp->sessionc; i++)
+    {
+        if (timeout == 0 || rtsp->sessionv[i]->last_seen < timeout)
+            timeout = rtsp->sessionv[i]->last_seen;
+    }
+    if (timeout != 0)
+        timeout += rtsp->timeout * CLOCK_FREQ;
+    vlc_timer_schedule(rtsp->timer, true, timeout, 0);
+}
+
+
+static void RtspTimeOut( void *data )
+{
+    rtsp_stream_t *rtsp = data;
+
+    vlc_mutex_lock(&rtsp->lock);
+    mtime_t now = mdate();
+    for (int i = rtsp->sessionc - 1; i >= 0; i--)
+    {
+        if (rtsp->sessionv[i]->last_seen + rtsp->timeout * CLOCK_FREQ < now)
+        {
+            if (rtsp->vod_media != NULL)
+            {
+                char psz_sesbuf[17];
+                snprintf( psz_sesbuf, sizeof( psz_sesbuf ), "%"PRIx64,
+                          rtsp->sessionv[i]->id );
+                vod_stop(rtsp->vod_media, psz_sesbuf);
+            }
+            RtspClientDel(rtsp, rtsp->sessionv[i]);
+        }
+    }
+    RtspUpdateTimer(rtsp);
+    vlc_mutex_unlock(&rtsp->lock);
+}
+
+
+/** rtsp must be locked */
 static
 rtsp_session_t *RtspClientNew( rtsp_stream_t *rtsp )
 {
@@ -346,6 +405,17 @@ void RtspClientDel( rtsp_stream_t *rtsp, rtsp_session_t *session )
 
     free( session->trackv );
     free( session );
+}
+
+
+/** rtsp must be locked */
+static void RtspClientAlive( rtsp_session_t *session )
+{
+    if (session->stream->timeout <= 0)
+        return;
+
+    session->last_seen = mdate();
+    RtspUpdateTimer(session->stream);
 }
 
 
@@ -764,6 +834,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                             continue;
                         }
                     }
+                    RtspClientAlive(ses);
 
                     INSERT_ELEM( ses->trackv, ses->trackc, ses->trackc,
                                  track );
@@ -825,6 +896,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                               + sizeof("url=/trackID=123;seq=65535;"
                                        "rtptime=4294967295, ") ) + 1];
                 size_t infolen = 0;
+                RtspClientAlive(ses);
 
                 sout_stream_id_t *sout_id = NULL;
                 if (vod)
@@ -927,7 +999,10 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             vlc_mutex_lock( &rtsp->lock );
             ses = RtspClientGet( rtsp, psz_session );
             if (ses != NULL)
+            {
                 vod_pause(rtsp->vod_media, psz_session);
+                RtspClientAlive(ses);
+            }
             vlc_mutex_unlock( &rtsp->lock );
             break;
         }
@@ -941,6 +1016,11 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
 
             psz_session = httpd_MsgGet( query, "Session" );
             answer->i_status = 200;
+            vlc_mutex_lock( &rtsp->lock );
+            rtsp_session_t *ses = RtspClientGet( rtsp, psz_session );
+            if (ses != NULL)
+                RtspClientAlive(ses);
+            vlc_mutex_unlock( &rtsp->lock );
             break;
 
         case HTTPD_MSG_TEARDOWN:
@@ -960,15 +1040,19 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     RtspClientDel( rtsp, ses );
                     if (vod)
                         vod_stop(rtsp->vod_media, psz_session);
+                    RtspUpdateTimer(rtsp);
                 }
                 else /* Delete one track from the session */
-                for( int i = 0; i < ses->trackc; i++ )
                 {
-                    if( ses->trackv[i].id == id )
+                    for( int i = 0; i < ses->trackc; i++ )
                     {
-                        RtspTrackClose( &ses->trackv[i] );
-                        REMOVE_ELEM( ses->trackv, ses->trackc, i );
+                        if( ses->trackv[i].id == id )
+                        {
+                            RtspTrackClose( &ses->trackv[i] );
+                            REMOVE_ELEM( ses->trackv, ses->trackc, i );
+                        }
                     }
+                    RtspClientAlive(ses);
                 }
             }
             vlc_mutex_unlock( &rtsp->lock );
@@ -980,7 +1064,13 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
     }
 
     if( psz_session )
-        httpd_MsgAdd( answer, "Session", "%s"/*;timeout=5*/, psz_session );
+    {
+        if (rtsp->timeout > 0)
+            httpd_MsgAdd( answer, "Session", "%s;timeout=%d", psz_session,
+                                                              rtsp->timeout );
+        else
+            httpd_MsgAdd( answer, "Session", "%s", psz_session );
+    }
 
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
     httpd_MsgAdd( answer, "Cache-Control", "no-cache" );
