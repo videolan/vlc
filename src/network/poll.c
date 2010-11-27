@@ -26,11 +26,9 @@
 #endif
 
 #include <vlc_common.h>
-#include <stdlib.h>
-#include <vlc_network.h>
-
 
 #ifdef HAVE_MAEMO
+# include <vlc_network.h>
 # include <signal.h>
 # include <errno.h>
 # include <poll.h>
@@ -63,6 +61,8 @@ int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 }
 
 #elif defined (HAVE_POLL)
+# include <vlc_network.h>
+
 struct pollfd;
 
 int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
@@ -73,12 +73,19 @@ int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 
 #elif defined (WIN32)
 
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#ifdef FD_SETSIZE
+/* No, it's not as simple as #undef FD_SETSIZE */
+# error Header inclusion order compromised!
+#endif
+#define FD_SETSIZE 0
+#include <vlc_network.h>
 
 int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 {
-    size_t setsize = sizeof (fd_set) + (nfds - FD_SETSIZE) * sizeof (SOCKET);
+    size_t setsize = sizeof (fd_set) + nfds * sizeof (SOCKET);
     fd_set *rdset = malloc (setsize);
     fd_set *wrset = malloc (setsize);
     fd_set *exset = malloc (setsize);
@@ -93,6 +100,10 @@ int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
         errno = ENOMEM;
         return -1;
     }
+
+/* Winsock FD_SET uses FD_SETSIZE in its expansion */
+#undef FD_SETSIZE
+#define FD_SETSIZE (nfds)
 
 resume:
     val = -1;
