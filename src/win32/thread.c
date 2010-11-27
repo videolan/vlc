@@ -526,7 +526,7 @@ retry:
     for (key = vlc_threadvar_last; key != NULL; key = key->prev)
     {
         void *value = vlc_threadvar_get (key);
-        if (value != NULL)
+        if (value != NULL && key->destroy != NULL)
         {
             vlc_mutex_unlock (&super_mutex);
             vlc_threadvar_set (key, NULL);
