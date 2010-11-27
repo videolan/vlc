@@ -55,22 +55,6 @@
 #include <vlc_charset.h>
 #include "../libvlc.h"
 
-typedef struct
-{
-    int i_code;
-    char * psz_message;
-} msg_context_t;
-
-static void cleanup_msg_context (void *data)
-{
-    msg_context_t *ctx = data;
-    free (ctx->psz_message);
-    free (ctx);
-}
-
-static vlc_threadvar_t msg_context;
-static uintptr_t banks = 0;
-
 /*****************************************************************************
  * Local macros
  *****************************************************************************/
@@ -128,11 +112,6 @@ msg_bank_t *msg_Create (void)
 
     /* C locale to get error messages in English in the logs */
     bank->locale = newlocale (LC_MESSAGES_MASK, "C", (locale_t)0);
-
-    vlc_mutex_lock( &msg_stack_lock );
-    if( banks++ == 0 )
-        vlc_threadvar_create( &msg_context, cleanup_msg_context );
-    vlc_mutex_unlock( &msg_stack_lock );
     return bank;
 }
 
@@ -182,12 +161,6 @@ void msg_Destroy (msg_bank_t *bank)
 {
     if (unlikely(bank->i_sub != 0))
         fputs ("stale interface subscribers (LibVLC might crash)\n", stderr);
-
-    vlc_mutex_lock( &msg_stack_lock );
-    assert(banks > 0);
-    if( --banks == 0 )
-        vlc_threadvar_delete( &msg_context );
-    vlc_mutex_unlock( &msg_stack_lock );
 
     if (bank->locale != (locale_t)0)
        freelocale (bank->locale);
@@ -564,70 +537,4 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     fflush( stderr );
 #endif
     vlc_restorecancel (canc);
-}
-
-static msg_context_t* GetContext(void)
-{
-    msg_context_t *p_ctx = vlc_threadvar_get( msg_context );
-    if( p_ctx == NULL )
-    {
-        p_ctx = malloc( sizeof( msg_context_t ) );
-        if( !p_ctx )
-            return NULL;
-        p_ctx->psz_message = NULL;
-        vlc_threadvar_set( msg_context, p_ctx );
-    }
-    return p_ctx;
-}
-
-void msg_StackSet( int i_code, const char *psz_message, ... )
-{
-    va_list ap;
-    msg_context_t *p_ctx = GetContext();
-
-    if( p_ctx == NULL )
-        return;
-    free( p_ctx->psz_message );
-
-    va_start( ap, psz_message );
-    if( vasprintf( &p_ctx->psz_message, psz_message, ap ) == -1 )
-        p_ctx->psz_message = NULL;
-    va_end( ap );
-
-    p_ctx->i_code = i_code;
-}
-
-void msg_StackAdd( const char *psz_message, ... )
-{
-    char *psz_tmp;
-    va_list ap;
-    msg_context_t *p_ctx = GetContext();
-
-    if( p_ctx == NULL )
-        return;
-
-    va_start( ap, psz_message );
-    if( vasprintf( &psz_tmp, psz_message, ap ) == -1 )
-        psz_tmp = NULL;
-    va_end( ap );
-
-    if( !p_ctx->psz_message )
-        p_ctx->psz_message = psz_tmp;
-    else
-    {
-        char *psz_new;
-        if( asprintf( &psz_new, "%s: %s", psz_tmp, p_ctx->psz_message ) == -1 )
-            psz_new = NULL;
-
-        free( p_ctx->psz_message );
-        p_ctx->psz_message = psz_new;
-        free( psz_tmp );
-    }
-}
-
-const char* msg_StackMsg( void )
-{
-    msg_context_t *p_ctx = GetContext();
-    assert( p_ctx );
-    return p_ctx->psz_message;
 }

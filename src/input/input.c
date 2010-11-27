@@ -2435,8 +2435,7 @@ static int InputSourceInit( input_thread_t *p_input,
         {
             if( vlc_object_alive( p_input ) )
             {
-                msg_Err( p_input, "open of `%s' failed: %s", psz_mrl,
-                                                             msg_StackMsg() );
+                msg_Err( p_input, "open of `%s' failed", psz_mrl );
                 dialog_Fatal( p_input, _("Your input can't be opened"),
                               _("VLC is unable to open the MRL '%s'."
                                 " Check the log for details."), psz_mrl );

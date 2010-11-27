@@ -85,11 +85,6 @@ typedef struct msg_bank_t msg_bank_t;
 msg_bank_t *msg_Create (void);
 void msg_Destroy (msg_bank_t *);
 
-/** Internal message stack context */
-void msg_StackSet ( int, const char*, ... );
-void msg_StackAdd ( const char*, ... );
-const char* msg_StackMsg ( void );
-
 /*
  * LibVLC exit event handling
  */
