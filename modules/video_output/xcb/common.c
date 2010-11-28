@@ -28,7 +28,9 @@
 #include <assert.h>
 
 #include <sys/types.h>
+#ifdef HAVE_SYS_SHM_H
 #include <sys/shm.h>
+#endif
 
 #include <xcb/xcb.h>
 #include <xcb/shm.h>
@@ -160,6 +162,7 @@ error:
 /** Check MIT-SHM shared memory support */
 void CheckSHM (vlc_object_t *obj, xcb_connection_t *conn, bool *restrict pshm)
 {
+#ifdef HAVE_SYS_SHM_H
     bool shm = var_InheritBool (obj, "x11-shm") > 0;
     if (shm)
     {
@@ -177,6 +180,11 @@ void CheckSHM (vlc_object_t *obj, xcb_connection_t *conn, bool *restrict pshm)
         free (r);
     }
     *pshm = shm;
+#else
+    msg_Warn (obj, "shared memory (MIT-SHM) not implemented");
+    (void) conn;
+    *pshm = false;
+#endif
 }
 
 /**
@@ -191,6 +199,7 @@ int PictureResourceAlloc (vout_display_t *vd, picture_resource_t *res, size_t si
     if (!res->p_sys)
         return VLC_EGENERIC;
 
+#ifdef HAVE_SYS_SHM_H
     /* Allocate shared memory segment */
     int id = shmget (IPC_PRIVATE, size, IPC_CREAT | 0700);
     if (id == -1)
@@ -231,6 +240,18 @@ int PictureResourceAlloc (vout_display_t *vd, picture_resource_t *res, size_t si
     shmctl (id, IPC_RMID, 0);
     res->p_sys->segment = segment;
     res->p->p_pixels = shm;
+#else
+    assert (!attach);
+    res->p_sys->segment = 0;
+
+    /* XXX: align on 32 bytes for VLC chroma filters */
+    res->p->p_pixels = malloc (size);
+    if (unlikely(res->p->p_pixels == NULL))
+    {
+        free (res->p_sys);
+        return VLC_EGENERIC;
+    }
+#endif
     return VLC_SUCCESS;
 }
 
@@ -239,10 +260,14 @@ int PictureResourceAlloc (vout_display_t *vd, picture_resource_t *res, size_t si
  */
 void PictureResourceFree (picture_resource_t *res, xcb_connection_t *conn)
 {
+#ifdef HAVE_SYS_SHM_H
     xcb_shm_seg_t segment = res->p_sys->segment;
 
     if (conn != NULL && segment != 0)
         xcb_shm_detach (conn, segment);
     shmdt (res->p->p_pixels);
+#else
+    free (res->p->p_pixels);
+#endif
 }
 
