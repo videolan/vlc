@@ -37,7 +37,7 @@
 #include <QSplitter>
 
 #include <QPushButton>
-#include <QSPlitterHandle>
+#include <QSplitterHandle>
 #include <QMouseEvent>
 
 class StandardPLPanel;
