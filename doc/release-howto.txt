@@ -65,6 +65,7 @@
 
  * "Check for updates" functionality
   - edit update.videolan.org/vlc/status
+  - gpg -t --sign --detach --armor
 
  * Mirrors (if necessary)
   - Forwarn the mirror admins
