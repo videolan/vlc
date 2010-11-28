@@ -188,7 +188,7 @@ void VideoWidget::release( void )
  **********************************************************************/
 
 BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
-                 :QWidget( NULL ), p_intf( _p_i ), b_expandPixmap( false )
+    :QWidget( NULL ), p_intf( _p_i ), b_expandPixmap( false ), b_withart( true )
 {
     /* A dark background */
     setAutoFillBackground( true );
@@ -222,6 +222,13 @@ void BackgroundWidget::updateArt( const QString& url )
 
 void BackgroundWidget::paintEvent( QPaintEvent *e )
 {
+    if ( !b_withart )
+    {
+        /* we just want background autofill */
+        QWidget::paintEvent( e );
+        return;
+    }
+
     int i_maxwidth, i_maxheight;
     QPixmap pixmap = QPixmap( pixmapUrl );
     QPainter painter(this);

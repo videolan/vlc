@@ -373,6 +373,11 @@ void MainInterface::createMainWidget( QSettings *settings )
     /* Bg Cone */
     bgWidget = new BackgroundWidget( p_intf );
     stackCentralW->addWidget( bgWidget );
+    if ( !var_InheritBool( p_intf, "qt-bgcone" ) )
+        bgWidget->setWithArt( false );
+    else
+        if ( var_InheritBool( p_intf, "qt-bgcone-expands" ) )
+            bgWidget->setExpandstoHeight( true );
 
     /* And video Outputs */
     if( b_videoEmbedded )

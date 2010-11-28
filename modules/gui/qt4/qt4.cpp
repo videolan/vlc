@@ -165,6 +165,12 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define QT_MINIMAL_MODE_TEXT N_("Start in minimal view (without menus)" )
 
+#define QT_BGCONE_TEXT N_( "Display background cone or art" )
+#define QT_BGCONE_LONGTEXT N_( "Display background cone or current album art " \
+                            "when not playing." \
+                            "Can be disabled to prevent burning screen." )
+#define QT_BGCONE_EXPANDS_TEXT N_( "Expanding background cone or art." )
+#define QT_BGCONE_EXPANDS_LONGTEXT N_( "Background art fits window's size" )
 /**********************************************************************/
 vlc_module_begin ()
     set_shortname( "Qt" )
@@ -237,6 +243,10 @@ vlc_module_begin ()
     add_bool( "qt-autoload-extensions", true,
               QT_AUTOLOAD_EXTENSIONS_TEXT, QT_AUTOLOAD_EXTENSIONS_LONGTEXT,
               false )
+
+    add_bool( "qt-bgcone", true, QT_BGCONE_TEXT, QT_BGCONE_LONGTEXT, true )
+    add_bool( "qt-bgcone-expands", false, QT_BGCONE_EXPANDS_TEXT,
+              QT_BGCONE_EXPANDS_LONGTEXT, true )
 
     add_obsolete_bool( "qt-blingbling" ) /* Suppressed since 1.0.0 */
     add_obsolete_integer( "qt-display-mode" ) /* Suppressed since 1.1.0 */

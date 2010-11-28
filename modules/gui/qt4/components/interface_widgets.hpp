@@ -87,9 +87,11 @@ class BackgroundWidget : public QWidget
 public:
     BackgroundWidget( intf_thread_t * );
     void setExpandstoHeight( bool b_expand ) { b_expandPixmap = b_expand; }
+    void setWithArt( bool b_withart_ ) { b_withart = b_withart_; };
 private:
     QString pixmapUrl;
     bool b_expandPixmap;
+    bool b_withart;
     virtual void contextMenuEvent( QContextMenuEvent *event );
     intf_thread_t *p_intf;
 protected:
