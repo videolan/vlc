@@ -1515,6 +1515,7 @@ endif
 ifdef HAVE_WIN32
 	(cd $@; patch -p0 < ../Patches/libcddb-win32.patch )
 endif
+	patch -p0 < Patches/libcddb-getenv-crash.patch
 
 ifdef HAVE_WIN32
 .cddb: libcddb .regex

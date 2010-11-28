@@ -1,0 +1,23 @@
+--- libcddb/lib/cddb_conn.c	2006-10-15 13:53:11.000000000 +0200
++++ libcddb.new/lib/cddb_conn.c	2010-11-28 21:03:39.012749230 +0100
+@@ -100,9 +100,17 @@
+         c->use_cache = CACHE_ON;
+         /* construct cache dir '$HOME/[DEFAULT_CACHE]' */
+         s = getenv("HOME");
+-        c->cache_dir = (char*)malloc(strlen(s) + 1 + sizeof(DEFAULT_CACHE) + 1);
+-        sprintf(c->cache_dir, "%s/%s", s, DEFAULT_CACHE);
+-        c->cache_read = FALSE;
++        if( s )
++        {
++            c->cache_dir = (char*)malloc(strlen(s) + 1 + sizeof(DEFAULT_CACHE) + 1);
++            sprintf(c->cache_dir, "%s/%s", s, DEFAULT_CACHE);
++            c->cache_read = FALSE;
++        }
++        else
++        {
++            c->cache_dir = NULL;
++            c->use_cache = CACHE_OFF;
++        }
+ 
+         /* use anonymous@localhost */
+         c->user = strdup(DEFAULT_USER);
