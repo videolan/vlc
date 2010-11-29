@@ -160,7 +160,7 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
 }
 
 /*****************************************************************************
- * 
+ *
  *****************************************************************************/
 void sout_UpdateStatistic( sout_instance_t *p_sout, sout_statistic_t i_type, int i_delta )
 {
@@ -176,21 +176,21 @@ void sout_UpdateStatistic( sout_instance_t *p_sout, sout_statistic_t i_type, int
     switch( i_type )
     {
     case SOUT_STATISTIC_DECODED_VIDEO:
-        i_input_type = SOUT_STATISTIC_DECODED_VIDEO;
+        i_input_type = INPUT_STATISTIC_DECODED_VIDEO;
         break;
     case SOUT_STATISTIC_DECODED_AUDIO:
-        i_input_type = SOUT_STATISTIC_DECODED_AUDIO;
+        i_input_type = INPUT_STATISTIC_DECODED_AUDIO;
         break;
     case SOUT_STATISTIC_DECODED_SUBTITLE:
-        i_input_type = SOUT_STATISTIC_DECODED_SUBTITLE;
+        i_input_type = INPUT_STATISTIC_DECODED_SUBTITLE;
         break;
 
     case SOUT_STATISTIC_SENT_PACKET:
-        i_input_type = SOUT_STATISTIC_SENT_PACKET;
+        i_input_type = INPUT_STATISTIC_SENT_PACKET;
         break;
 
     case SOUT_STATISTIC_SENT_BYTE:
-        i_input_type = SOUT_STATISTIC_SENT_BYTE;
+        i_input_type = INPUT_STATISTIC_SENT_BYTE;
         break;
 
     default:
