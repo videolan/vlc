@@ -42,8 +42,8 @@ struct sout_packetizer_input_t
     sout_stream_id_t    *id;
 };
 
-#define sout_NewInstance(a,b) __sout_NewInstance(VLC_OBJECT(a),b)
-sout_instance_t *  __sout_NewInstance( vlc_object_t *, const char * );
+sout_instance_t *sout_NewInstance( vlc_object_t *, const char * );
+#define sout_NewInstance(a,b) sout_NewInstance(VLC_OBJECT(a),b)
 void sout_DeleteInstance( sout_instance_t * );
 
 sout_packetizer_input_t *sout_InputNew( sout_instance_t *, es_format_t * );

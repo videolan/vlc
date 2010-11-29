@@ -75,10 +75,12 @@ static int  mrl_Parse( mrl_t *p_mrl, const char *psz_mrl );
 /* mrl_Clean: clean p_mrl  after a call to mrl_Parse */
 static void mrl_Clean( mrl_t *p_mrl );
 
+#undef sout_NewInstance
+
 /*****************************************************************************
  * sout_NewInstance: creates a new stream output instance
  *****************************************************************************/
-sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest )
+sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest )
 {
     static const char typename[] = "stream output";
     sout_instance_t *p_sout;
