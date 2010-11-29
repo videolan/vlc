@@ -665,15 +665,25 @@ void vlc_join (vlc_thread_t handle, void **result)
 #endif
 }
 
-void vlc_detach (vlc_thread_t handle)
+int vlc_clone_detach (vlc_thread_t *p_handle, void *(*entry) (void *),
+                      void *data, int priority)
 {
+    vlc_thread_t th;
+    if (p_handle == NULL)
+        p_handle = &th;
+
+    int ret = vlc_clone (p_handle, entry, data, priority);
+    if (ret)
+        return ret;
+
 #ifndef UNDER_CE
-    CloseHandle (handle);
+    CloseHandle (*p_handle);
 #else
     /* FIXME: handle->cancel_event leak */
     CloseHandle (handle->handle);
     free (handle);
 #endif
+    return 0;
 }
 
 /*** Thread cancellation ***/

@@ -51,8 +51,8 @@ void system_End       ( libvlc_int_t * );
  * Threads subsystem
  */
 
-/* This cannot be used as is from plugins: */
-void vlc_detach (vlc_thread_t);
+/* This cannot be used as is from plugins yet: */
+int vlc_clone_detach (vlc_thread_t *, void *(*)(void *), void *, int);
 
 /* Hopefully, no need to export this. There is a new thread API instead. */
 void vlc_thread_cancel (vlc_object_t *);

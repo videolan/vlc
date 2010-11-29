@@ -83,16 +83,12 @@ void playlist_preparser_Push( playlist_preparser_t *p_preparser, input_item_t *p
                  p_preparser->i_waiting, p_item );
     if( !p_preparser->b_live )
     {
-        vlc_thread_t th;
-
-        if( vlc_clone( &th, Thread, p_preparser, VLC_THREAD_PRIORITY_LOW ) )
+        if( vlc_clone_detach( NULL, Thread, p_preparser,
+                              VLC_THREAD_PRIORITY_LOW ) )
             msg_Warn( p_preparser->p_playlist,
                       "cannot spawn pre-parser thread" );
         else
-        {
-            vlc_detach( th );
             p_preparser->b_live = true;
-        }
     }
     vlc_mutex_unlock( &p_preparser->lock );
 }

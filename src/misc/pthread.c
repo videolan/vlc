@@ -600,22 +600,11 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
     vlc_mutex_unlock (&lock);
 }
 
-/**
- * Creates and starts new thread.
- *
- * @param p_handle [OUT] pointer to write the handle of the created thread to
- * @param entry entry point for the thread
- * @param data data parameter given to the entry point
- * @param priority thread priority value
- * @return 0 on success, a standard error code on error.
- */
-int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
-               int priority)
+
+static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
+                           void *(*entry) (void *), void *data, int priority)
 {
     int ret;
-
-    pthread_attr_t attr;
-    pthread_attr_init (&attr);
 
     /* Block the signals that signals interface plugin handles.
      * If the LibVLC caller wants to handle some signals by itself, it should
@@ -653,8 +642,8 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         else
             sp.sched_priority += sched_get_priority_min (policy = SCHED_RR);
 
-        pthread_attr_setschedpolicy (&attr, policy);
-        pthread_attr_setschedparam (&attr, &sp);
+        pthread_attr_setschedpolicy (attr, policy);
+        pthread_attr_setschedparam (attr, &sp);
     }
 #else
     (void) priority;
@@ -675,29 +664,36 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
 #define VLC_STACKSIZE (128 * sizeof (void *) * 1024)
 
 #ifdef VLC_STACKSIZE
-    ret = pthread_attr_setstacksize (&attr, VLC_STACKSIZE);
+    ret = pthread_attr_setstacksize (attr, VLC_STACKSIZE);
     assert (ret == 0); /* fails iif VLC_STACKSIZE is invalid */
 #endif
 
-    ret = pthread_create (p_handle, &attr, entry, data);
+    ret = pthread_create (th, attr, entry, data);
     pthread_sigmask (SIG_SETMASK, &oldset, NULL);
-    pthread_attr_destroy (&attr);
+    pthread_attr_destroy (attr);
     return ret;
 }
 
 /**
- * Marks a thread as cancelled. Next time the target thread reaches a
- * cancellation point (while not having disabled cancellation), it will
- * run its cancellation cleanup handler, the thread variable destructors, and
- * terminate. vlc_join() must be used afterward regardless of a thread being
- * cancelled or not.
+ * Creates and starts new thread.
+ *
+ * The thread must be <i>joined</i> with vlc_join() to reclaim resources
+ * when it is not needed anymore.
+ *
+ * @param th [OUT] pointer to write the handle of the created thread to
+ *                 (mandatory, must be non-NULL)
+ * @param entry entry point for the thread
+ * @param data data parameter given to the entry point
+ * @param priority thread priority value
+ * @return 0 on success, a standard error code on error.
  */
-void vlc_cancel (vlc_thread_t thread_id)
+int vlc_clone (vlc_thread_t *th, void *(*entry) (void *), void *data,
+               int priority)
 {
-    pthread_cancel (thread_id);
-#ifdef HAVE_MAEMO
-    pthread_kill (thread_id, SIGRTMIN);
-#endif
+    pthread_attr_t attr;
+
+    pthread_attr_init (&attr);
+    return vlc_clone_attr (th, &attr, entry, data, priority);
 }
 
 /**
@@ -718,25 +714,56 @@ void vlc_join (vlc_thread_t handle, void **result)
 }
 
 /**
- * Detaches a thread. When the specified thread completes, it will be
- * automatically destroyed (in particular, its stack will be reclaimed),
- * instead of waiting for another thread to call vlc_join(). If the thread has
- * already completed, it will be destroyed immediately.
+ * Creates and starts new detached thread.
+ * A detached thread cannot be joined. Its resources will be automatically
+ * released whenever the thread exits (in particular, its call stack will be
+ * reclaimed). Nevertheless, a detached thread may
+ * be cancelled; this can expedite its termination.
  *
- * When a thread performs some work asynchronously and may complete much
- * earlier than it can be joined, detaching the thread can save memory.
- * However, care must be taken that any resources used by a detached thread
- * remains valid until the thread completes. This will typically involve some
- * kind of thread-safe signaling.
+ * Detached thread are particularly useful when some work needs to be done
+ * asynchronously, that is likely to be completed much earlier than the thread
+ * can practically be joined. In this case, thread detach can spare memory.
  *
- * A thread may detach itself.
+ * @warning Care must be taken that any resources used by the detached thread
+ * remains valid until the thread completes.
  *
- * @param handle thread handle
+ * @note A detached thread must eventually exit just like another other
+ * thread. In practice, LibVLC will wait for detached threads to exit before
+ * it unloads the plugins.
+ *
+ * @param th [OUT] pointer to hold the thread handle, or NULL
+ * @param entry entry point for the thread
+ * @param data data parameter given to the entry point
+ * @param priority thread priority value
+ * @return 0 on success, a standard error code on error.
  */
-void vlc_detach (vlc_thread_t handle)
+int vlc_clone_detach (vlc_thread_t *th, void *(*entry) (void *), void *data,
+                      int priority)
 {
-    int val = pthread_detach (handle);
-    VLC_THREAD_ASSERT ("detaching thread");
+    vlc_thread_t dummy;
+    pthread_attr_t attr;
+
+    if (th == NULL)
+        th = &dummy;
+
+    pthread_attr_init (&attr);
+    pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED);
+    return vlc_clone_attr (th, &attr, entry, data, priority);
+}
+
+/**
+ * Marks a thread as cancelled. Next time the target thread reaches a
+ * cancellation point (while not having disabled cancellation), it will
+ * run its cancellation cleanup handler, the thread variable destructors, and
+ * terminate. vlc_join() must be used afterward regardless of a thread being
+ * cancelled or not.
+ */
+void vlc_cancel (vlc_thread_t thread_id)
+{
+    pthread_cancel (thread_id);
+#ifdef HAVE_MAEMO
+    pthread_kill (thread_id, SIGRTMIN);
+#endif
 }
 
 /**
