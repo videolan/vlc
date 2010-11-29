@@ -76,8 +76,6 @@ static inline msg_bank_t *libvlc_bank (libvlc_int_t *inst)
  *****************************************************************************/
 static void PrintMsg ( vlc_object_t *, msg_item_t * );
 
-static vlc_mutex_t msg_stack_lock = VLC_STATIC_MUTEX;
-
 /**
  * Store all data required by messages interfaces.
  */
