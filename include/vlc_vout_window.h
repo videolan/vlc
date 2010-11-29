@@ -113,30 +113,34 @@ struct vout_window_t {
 };
 
 /** 
- * It creates a new window.
- * 
+ * Creates a new window.
+ *
+ * @param module plugin name (usually "$window")
  * @note If you are inside a "vout display", you must use
- * vout_display_New/DeleteWindow when possible to allow window recycling.
+ / vout_display_NewWindow() and vout_display_DeleteWindow() instead.
+ * This enables recycling windows.
  */
 VLC_EXPORT( vout_window_t *, vout_window_New, (vlc_object_t *, const char *module, const vout_window_cfg_t *) );
 
 /**
- * It deletes a window created by vout_window_New().
+ * Deletes a window created by vout_window_New().
  *
  * @note See vout_window_New() about window recycling.
  */
 VLC_EXPORT( void, vout_window_Delete, (vout_window_t *) );
 
+
 /**
- * It allows configuring a window.
+ * Reconfigures a window.
+ *
+ * @note The vout_window_* wrappers should be used instead of this function.
  *
  * @warning The caller must own the window, as vout_window_t is not thread safe.
- * You should use it the vout_window_* wrappers instead of this function.
  */
 VLC_EXPORT( int, vout_window_Control, (vout_window_t *, int query, ...) );
 
 /**
- * Configure the window management state of a windows.
+ * Configures the window manager state for this window.
  */
 static inline int vout_window_SetState(vout_window_t *window, unsigned state)
 {
@@ -144,7 +148,7 @@ static inline int vout_window_SetState(vout_window_t *window, unsigned state)
 }
 
 /**
- * Configure the windows display size.
+ * Configures the window display (i.e. inner/useful) size.
  */
 static inline int vout_window_SetSize(vout_window_t *window,
                                       unsigned width, unsigned height)
@@ -153,7 +157,7 @@ static inline int vout_window_SetSize(vout_window_t *window,
 }
 
 /**
- * Configure the windows fullscreen mode.
+ * Sets fullscreen mode.
  */
 static inline int vout_window_SetFullScreen(vout_window_t *window, bool full)
 {
@@ -161,4 +165,3 @@ static inline int vout_window_SetFullScreen(vout_window_t *window, bool full)
 }
 
 #endif /* VLC_VOUT_WINDOW_H */
-
