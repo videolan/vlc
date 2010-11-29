@@ -40,26 +40,25 @@
 # include <mmsystem.h>
 #endif
 
-static vlc_threadvar_t cancel_key;
+static vlc_threadvar_t thread_key;
 
 /**
- * Per-thread cancellation data
+ * Per-thread data
  */
-typedef struct vlc_cancel_t
+struct vlc_thread
 {
-    vlc_cleanup_t *cleaners;
+    HANDLE         id;
 #ifdef UNDER_CE
     HANDLE         cancel_event;
 #endif
+
     bool           killable;
     bool           killed;
-} vlc_cancel_t;
+    vlc_cleanup_t *cleaners;
 
-#ifndef UNDER_CE
-# define VLC_CANCEL_INIT { NULL, true, false }
-#else
-# define VLC_CANCEL_INIT { NULL, NULL, true, false }
-#endif
+    void        *(*entry) (void *);
+    void          *data;
+};
 
 #ifdef UNDER_CE
 static void CALLBACK vlc_cancel_self (ULONG_PTR dummy);
@@ -67,15 +66,15 @@ static void CALLBACK vlc_cancel_self (ULONG_PTR dummy);
 static DWORD vlc_cancelable_wait (DWORD count, const HANDLE *handles,
                                   DWORD delay)
 {
-    vlc_cancel_t *nfo = vlc_threadvar_get (cancel_key);
-    if (nfo == NULL)
+    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    if (th == NULL)
     {
         /* Main thread - cannot be cancelled anyway */
         return WaitForMultipleObjects (count, handles, FALSE, delay);
     }
     HANDLE new_handles[count + 1];
     memcpy(new_handles, handles, count * sizeof(HANDLE));
-    new_handles[count] = nfo->cancel_event;
+    new_handles[count] = th->cancel_event;
     DWORD result = WaitForMultipleObjects (count + 1, new_handles, FALSE,
                                            delay);
     if (result == WAIT_OBJECT_0 + count)
@@ -153,11 +152,11 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
         case DLL_PROCESS_ATTACH:
             vlc_mutex_init (&super_mutex);
             vlc_cond_init (&super_variable);
-            vlc_threadvar_create (&cancel_key, NULL);
+            vlc_threadvar_create (&thread_key, free);
             break;
 
         case DLL_PROCESS_DETACH:
-            vlc_threadvar_delete( &cancel_key );
+            vlc_threadvar_delete (&thread_key);
             vlc_cond_destroy (&super_variable);
             vlc_mutex_destroy (&super_mutex);
             break;
@@ -544,29 +543,13 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
     (void) p_libvlc;
 }
 
-struct vlc_entry_data
-{
-    void * (*func) (void *);
-    void *  data;
-    vlc_sem_t ready;
-#ifdef UNDER_CE
-    HANDLE  cancel_event;
-#endif
-};
-
 static unsigned __stdcall vlc_entry (void *p)
 {
-    struct vlc_entry_data *entry = p;
-    vlc_cancel_t cancel_data = VLC_CANCEL_INIT;
-    void *(*func) (void *) = entry->func;
-    void *data = entry->data;
+    struct vlc_thread *th = p;
 
-#ifdef UNDER_CE
-    cancel_data.cancel_event = entry->cancel_event;
-#endif
-    vlc_threadvar_set (cancel_key, &cancel_data);
-    vlc_sem_post (&entry->ready);
-    func (data);
+    vlc_threadvar_set (thread_key, th);
+    th->killable = true;
+    th->entry (th->data);
     vlc_threadvar_cleanup ();
     return 0;
 }
@@ -574,94 +557,72 @@ static unsigned __stdcall vlc_entry (void *p)
 int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
                int priority)
 {
-    int err = ENOMEM;
-    HANDLE hThread;
-
-    struct vlc_entry_data *entry_data = malloc (sizeof (*entry_data));
-    if (entry_data == NULL)
+    struct vlc_thread *th = malloc (sizeof (*th));
+    if (unlikely(th == NULL))
         return ENOMEM;
-    entry_data->func = entry;
-    entry_data->data = data;
-    vlc_sem_init (&entry_data->ready, 0);
+    th->entry = entry;
+    th->data = data;
+    th->killable = false; /* not until vlc_entry() ! */
+    th->killed = false;
+    th->cleaners = NULL;
 
+    HANDLE hThread;
 #ifndef UNDER_CE
     /* When using the MSVCRT C library you have to use the _beginthreadex
      * function instead of CreateThread, otherwise you'll end up with
      * memory leaks and the signal functions not working (see Microsoft
      * Knowledge Base, article 104641) */
     hThread = (HANDLE)(uintptr_t)
-        _beginthreadex (NULL, 0, vlc_entry, entry_data, CREATE_SUSPENDED, NULL);
-    if (! hThread)
+        _beginthreadex (NULL, 0, vlc_entry, th, CREATE_SUSPENDED, NULL);
+    if (hThread == NULL)
     {
-        err = errno;
-        goto error;
+        int err = errno;
+        free (th);
+        return err;
     }
 
-    *p_handle = hThread;
-
 #else
-    vlc_thread_t th = malloc (sizeof (*th));
-    if (th == NULL)
-        goto error;
     th->cancel_event = CreateEvent (NULL, FALSE, FALSE, NULL);
     if (th->cancel_event == NULL)
     {
         free (th);
-        goto error;
+        return ENOMEM;
     }
     entry_data->cancel_event = th->cancel_event;
 
     /* Not sure if CREATE_SUSPENDED + ResumeThread() is any useful on WinCE.
      * Thread handles act up, too. */
-    th->handle = CreateThread (NULL, 128*1024, vlc_entry, entry_data,
-                               CREATE_SUSPENDED, NULL);
-    if (th->handle == NULL)
+    hThread = CreateThread (NULL, 128*1024, vlc_entry, entry_data,
+                            CREATE_SUSPENDED, NULL);
+    if (hThread == NULL)
     {
         CloseHandle (th->cancel_event);
         free (th);
-        goto error;
+        return ENOMEM;
     }
 
-    *p_handle = th;
-    hThread = th->handle;
-
 #endif
+    th->id = hThread;
+    *p_handle = th;
 
     ResumeThread (hThread);
     if (priority)
         SetThreadPriority (hThread, priority);
 
-    /* Prevent cancellation until cancel_data is initialized. */
-    /* XXX: This could be postponed to vlc_cancel() or avoided completely by
-     * passing the "right" pointer to vlc_cancel_self(). */
-    vlc_sem_wait (&entry_data->ready);
-    vlc_sem_destroy (&entry_data->ready);
-    free (entry_data);
-
     return 0;
-
-error:
-    vlc_sem_destroy (&entry_data->ready);
-    free (entry_data);
-    return err;
 }
 
-void vlc_join (vlc_thread_t handle, void **result)
+void vlc_join (vlc_thread_t th, void **result)
 {
-#ifdef UNDER_CE
-# define handle handle->handle
-#endif
     do
         vlc_testcancel ();
-    while (WaitForSingleObjectEx (handle, INFINITE, TRUE)
+    while (WaitForSingleObjectEx (th->id, INFINITE, TRUE)
                                                         == WAIT_IO_COMPLETION);
 
-    CloseHandle (handle);
+    CloseHandle (th->id);
     assert (result == NULL); /* <- FIXME if ever needed */
 #ifdef UNDER_CE
-# undef handle
-    CloseHandle (handle->cancel_event);
-    free (handle);
+    CloseHandle (th->cancel_event);
 #endif
 }
 
@@ -676,13 +637,8 @@ int vlc_clone_detach (vlc_thread_t *p_handle, void *(*entry) (void *),
     if (ret)
         return ret;
 
-#ifndef UNDER_CE
-    CloseHandle (*p_handle);
-#else
-    /* FIXME: handle->cancel_event leak */
-    CloseHandle (handle->handle);
-    free (handle);
-#endif
+    /* FIXME: handle->cancel_event leak UNDER_CE */
+    CloseHandle ((*p_handle)->id);
     return 0;
 }
 
@@ -691,57 +647,55 @@ int vlc_clone_detach (vlc_thread_t *p_handle, void *(*entry) (void *),
 /* APC procedure for thread cancellation */
 static void CALLBACK vlc_cancel_self (ULONG_PTR dummy)
 {
-    vlc_cancel_t *nfo = vlc_threadvar_get (cancel_key);
+    struct vlc_thread *th = vlc_threadvar_get (thread_key);
 
-    if (likely(nfo != NULL))
-        nfo->killed = true;
+    if (likely(th != NULL))
+        th->killed = true;
 
     (void)dummy;
 }
 
-void vlc_cancel (vlc_thread_t thread_id)
+void vlc_cancel (vlc_thread_t th)
 {
 #ifndef UNDER_CE
-    QueueUserAPC (vlc_cancel_self, thread_id, 0);
+    QueueUserAPC (vlc_cancel_self, th->id, 0);
 #else
-    SetEvent (thread_id->cancel_event);
+    SetEvent (th->cancel_event);
 #endif
 }
 
 int vlc_savecancel (void)
 {
-    int state;
-
-    vlc_cancel_t *nfo = vlc_threadvar_get (cancel_key);
-    if (nfo == NULL)
+    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    if (th == NULL)
         return false; /* Main thread - cannot be cancelled anyway */
 
-    state = nfo->killable;
-    nfo->killable = false;
+    int state = th->killable;
+    th->killable = false;
     return state;
 }
 
 void vlc_restorecancel (int state)
 {
-    vlc_cancel_t *nfo = vlc_threadvar_get (cancel_key);
+    struct vlc_thread *th = vlc_threadvar_get (thread_key);
     assert (state == false || state == true);
 
-    if (nfo == NULL)
+    if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
-    assert (!nfo->killable);
-    nfo->killable = state != 0;
+    assert (!th->killable);
+    th->killable = state != 0;
 }
 
 void vlc_testcancel (void)
 {
-    vlc_cancel_t *nfo = vlc_threadvar_get (cancel_key);
-    if (nfo == NULL)
+    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
-    if (nfo->killable && nfo->killed)
+    if (th->killable && th->killed)
     {
-        for (vlc_cleanup_t *p = nfo->cleaners; p != NULL; p = p->next)
+        for (vlc_cleanup_t *p = th->cleaners; p != NULL; p = p->next)
              p->proc (p->data);
         vlc_threadvar_cleanup ();
 #ifndef UNDER_CE
@@ -758,8 +712,8 @@ void vlc_control_cancel (int cmd, ...)
      * need to lock anything. */
     va_list ap;
 
-    vlc_cancel_t *nfo = vlc_threadvar_get (cancel_key);
-    if (nfo == NULL)
+    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
     va_start (ap, cmd);
@@ -770,14 +724,14 @@ void vlc_control_cancel (int cmd, ...)
             /* cleaner is a pointer to the caller stack, no need to allocate
              * and copy anything. As a nice side effect, this cannot fail. */
             vlc_cleanup_t *cleaner = va_arg (ap, vlc_cleanup_t *);
-            cleaner->next = nfo->cleaners;
-            nfo->cleaners = cleaner;
+            cleaner->next = th->cleaners;
+            th->cleaners = cleaner;
             break;
         }
 
         case VLC_CLEANUP_POP:
         {
-            nfo->cleaners = nfo->cleaners->next;
+            th->cleaners = th->cleaners->next;
             break;
         }
     }

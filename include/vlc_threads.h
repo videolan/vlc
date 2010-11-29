@@ -121,15 +121,7 @@ typedef sem_t           vlc_sem_t;
 #endif
 
 #elif defined( WIN32 )
-#if !defined( UNDER_CE )
-typedef HANDLE vlc_thread_t;
-#else
-typedef struct
-{
-    HANDLE handle;
-    HANDLE cancel_event;
-} *vlc_thread_t;
-#endif
+typedef struct vlc_thread *vlc_thread_t;
 
 typedef struct
 {
