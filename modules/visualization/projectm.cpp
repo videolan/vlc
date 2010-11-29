@@ -292,6 +292,8 @@ static void *Thread( void *p_data )
     vout_opengl_t *gl;
     int i_last_width  = 0;
     int i_last_height = 0;
+    locale_t loc;
+    locale_t oldloc;
 #ifdef HAVE_PROJECTM2
     projectM::Settings settings;
 #endif
@@ -339,6 +341,8 @@ static void *Thread( void *p_data )
         goto error;
     }
 
+    loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
+    oldloc = uselocale (loc);
     /* Create the projectM object */
 #ifndef HAVE_PROJECTM2
     p_sys->p_projectm = new projectM( p_sys->psz_config );
@@ -402,6 +406,11 @@ static void *Thread( void *p_data )
             delete p_sys->p_projectm;
             vout_DeleteDisplay( p_sys->p_vd, NULL );
             vlc_object_release( p_sys->p_vout );
+            if (loc != (locale_t)0)
+            {
+                uselocale (oldloc);
+                freelocale (loc);
+            }
             return NULL;
         }
         vlc_mutex_unlock( &p_sys->lock );
