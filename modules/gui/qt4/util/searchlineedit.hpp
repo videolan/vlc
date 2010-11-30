@@ -28,12 +28,7 @@
 #define _SEARCHLINEEDIT_H_
 
 #include <QLineEdit>
-#include <QPushButton>
-#include <QLabel>
-#include <QStackedWidget>
-#include <QSpinBox>
 
-class QVLCFramelessButton;
 /**
   This class provides a QLineEdit which contains a greyed-out hinting
   text as long as the user didn't enter any text
@@ -60,6 +55,7 @@ private:
     bool mDrawClickMsg;
 };
 
+class QVLCFramelessButton;
 class SearchLineEdit : public QLineEdit
 {
     Q_OBJECT

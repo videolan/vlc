@@ -34,16 +34,11 @@
 #include "qt4.hpp" /*needed for qtr and CONNECT, but not necessary */
 
 #include <QPainter>
-#include <QColorGroup>
 #include <QRect>
-#include <QKeyEvent>
-#include <QWheelEvent>
-#include <QHBoxLayout>
 #include <QStyle>
 #include <QStyleOption>
+
 #include <vlc_intf_strings.h>
-#include <vlc_keys.h>
-#include <wctype.h> /* twolower() */
 
 ClickLineEdit::ClickLineEdit( const QString &msg, QWidget *parent) : QLineEdit( parent )
 {
@@ -158,41 +153,41 @@ void SearchLineEdit::updateText( const QString& text )
 
 void SearchLineEdit::resizeEvent ( QResizeEvent * event )
 {
-  QLineEdit::resizeEvent( event );
-  int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth,0,this);
-  clearButton->resize( clearButton->sizeHint().width(), height() );
-  clearButton->move( width() - clearButton->width() - frameWidth, 0 );
+    QLineEdit::resizeEvent( event );
+    int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth,0,this);
+    clearButton->resize( clearButton->sizeHint().width(), height() );
+    clearButton->move( width() - clearButton->width() - frameWidth, 0 );
 }
 
 void SearchLineEdit::focusInEvent( QFocusEvent *event )
 {
-  if( message )
-  {
-      setMessageVisible( false );
-  }
-  QLineEdit::focusInEvent( event );
+    if( message )
+    {
+        setMessageVisible( false );
+    }
+    QLineEdit::focusInEvent( event );
 }
 
 void SearchLineEdit::focusOutEvent( QFocusEvent *event )
 {
-  if( text().isEmpty() )
-  {
-      setMessageVisible( true );
-  }
-  QLineEdit::focusOutEvent( event );
+    if( text().isEmpty() )
+    {
+        setMessageVisible( true );
+    }
+    QLineEdit::focusOutEvent( event );
 }
 
 void SearchLineEdit::paintEvent( QPaintEvent *event )
 {
-  QLineEdit::paintEvent( event );
-  if( !message ) return;
-  QStyleOption option;
-  option.initFrom( this );
-  QRect rect = style()->subElementRect( QStyle::SE_LineEditContents, &option, this )
-                  .adjusted( 3, 0, clearButton->width() + 1, 0 );
-  QPainter painter( this );
-  painter.setPen( palette().color( QPalette::Disabled, QPalette::Text ) );
-  painter.drawText( rect, Qt::AlignLeft | Qt::AlignVCenter, qtr( I_PL_FILTER ) );
+    QLineEdit::paintEvent( event );
+    if( !message ) return;
+    QStyleOption option;
+    option.initFrom( this );
+    QRect rect = style()->subElementRect( QStyle::SE_LineEditContents, &option, this )
+        .adjusted( 3, 0, clearButton->width() + 1, 0 );
+    QPainter painter( this );
+    painter.setPen( palette().color( QPalette::Disabled, QPalette::Text ) );
+    painter.drawText( rect, Qt::AlignLeft | Qt::AlignVCenter, qtr( I_PL_FILTER ) );
 }
 
 void SearchLineEdit::searchEditingFinished()

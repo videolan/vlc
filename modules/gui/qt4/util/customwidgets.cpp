@@ -29,19 +29,13 @@
 #endif
 
 #include "customwidgets.hpp"
-#include "qt4.hpp" /*needed for qtr and CONNECT, but not necessary */
+#include "qt4.hpp"               /*needed for qtr and CONNECT, but not necessary */
 
 #include <QPainter>
-#include <QColorGroup>
 #include <QRect>
 #include <QKeyEvent>
 #include <QWheelEvent>
-#include <QHBoxLayout>
-#include <QStyle>
-#include <QStyleOption>
-#include <vlc_intf_strings.h>
 #include <vlc_keys.h>
-#include <wctype.h> /* twolower() */
 
 QVLCFramelessButton::QVLCFramelessButton( QWidget *parent )
   : QPushButton( parent )
