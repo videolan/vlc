@@ -614,6 +614,7 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->p_delegate )
         p_sys->p_delegate->Release();
 
+    vlc_mutex_destroy( &p_sys->pts_lock );
     free( p_sys );
 }
 
