@@ -38,6 +38,7 @@
 #include <QTreeWidgetItem>
 #include <QHBoxLayout>
 #include <QPainter>
+#include <QPalette>
 
 #include <vlc_playlist.h>
 #include <vlc_services_discovery.h>
@@ -139,6 +140,13 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
 
     /* select the first item */
 //  view->setCurrentIndex( model->index( 0, 0, QModelIndex() ) );
+
+    setAutoFillBackground( true );
+#ifdef Q_WS_MAC
+    QPalette palette;
+    palette.setColor( QPalette::Window, QColor(209,215,226) );
+    setPalette( palette );
+#endif
 }
 
 PLSelector::~PLSelector()
