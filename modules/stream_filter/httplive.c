@@ -63,6 +63,7 @@ typedef struct segment_s
     int         sequence;   /* unique sequence number */
     int         length;     /* segment duration (seconds) */
     uint64_t    size;       /* segment size in bytes */
+    uint64_t    bandwidth;  /* bandwidth usage of segments (bits per second)*/
 
     vlc_url_t   url;
     vlc_mutex_t lock;
@@ -265,6 +266,7 @@ static segment_t *segment_New(hls_stream_t* hls, int duration, char *uri)
     segment->length = duration; /* seconds */
     segment->size = 0; /* bytes */
     segment->sequence = 0;
+    segment->bandwidth = 0;
     vlc_UrlParse(&segment->url, uri, 0);
     segment->data = NULL;
     vlc_array_append(hls->segments, segment);
@@ -878,14 +880,16 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
                     p_sys->segment, p_sys->current);
         return VLC_SUCCESS;
     }
+    else
+    {
+        /* Do bandwidth calculations when there are at least 3 segments
+           downloaded */
+        msg_Info(s, "downloaded segment %d from stream %d",
+                    p_sys->thread->segment, p_sys->thread->current);
 
-    /* Do bandwidth calculations when there are at least 3 segments
-       downloaded */
-    msg_Info(s, "downloaded segment %d from stream %d",
-                p_sys->thread->segment, p_sys->thread->current);
-    /* FIXME: we need an average here */
-    if (p_sys->thread->segment - p_sys->segment < 3)
-        return VLC_SUCCESS;
+        if (p_sys->thread->segment - p_sys->segment < 3)
+            return VLC_SUCCESS;
+    }
 
     /* check for division by zero */
     double ms = (double)duration / 1000.0; /* ms */
@@ -893,9 +897,12 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
         return VLC_SUCCESS;
 
     uint64_t bw = ((double)(segment->size * 8) / ms) * 1000; /* bits / s */
+    segment->bandwidth = bw;
     if (hls->bandwidth != bw)
     {
         int newstream = BandwidthAdaptation(s, hls->id, &bw);
+
+        /* FIXME: we need an average here */
         if ((newstream >= 0) && (newstream != *cur_stream))
         {
             msg_Info(s, "detected %s bandwidth (%"PRIu64") stream",
@@ -974,12 +981,18 @@ static int Prefetch(stream_t *s, int *current)
     if (hls == NULL)
         return VLC_EGENERIC;
 
-    segment_t *segment = segment_GetSegment(hls, p_sys->segment);
-    if (segment == NULL )
-        return VLC_EGENERIC;
+    /* Download first 3 segments of this HLS stream */
+    for (int i = 0; i < 3; i++)
+    {
+        segment_t *segment = segment_GetSegment(hls, p_sys->segment);
+        if (segment == NULL )
+            return VLC_EGENERIC;
 
-    if (Download(s, hls, segment, current) != VLC_SUCCESS)
-        return VLC_EGENERIC;
+        if (Download(s, hls, segment, current) != VLC_SUCCESS)
+            return VLC_EGENERIC;
+
+        p_sys->segment++;
+    }
 
     return VLC_SUCCESS;
 }
@@ -1199,7 +1212,8 @@ static int Open(vlc_object_t *p_this)
 
     p_sys->thread->hls_stream = p_sys->hls_stream;
     p_sys->thread->current = current;
-    p_sys->thread->segment = p_sys->segment + 1;
+    p_sys->thread->segment = p_sys->segment;
+    p_sys->segment = 0; /* reset to first segment */
     p_sys->thread->s = s;
 
     if (vlc_thread_create(p_sys->thread, "HTTP Live Streaming client",
