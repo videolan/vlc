@@ -43,10 +43,10 @@
 ClickLineEdit::ClickLineEdit( const QString &msg, QWidget *parent) : QLineEdit( parent )
 {
     mDrawClickMsg = true;
-    setClickMessage( msg );
+    setPlaceholderText( msg );
 }
 
-void ClickLineEdit::setClickMessage( const QString &msg )
+void ClickLineEdit::setPlaceholderText( const QString &msg )
 {
     mClickMessage = msg;
     repaint();
@@ -99,6 +99,9 @@ void ClickLineEdit::focusOutEvent( QFocusEvent *ev )
     }
     QLineEdit::focusOutEvent( ev );
 }
+
+
+
 
 SearchLineEdit::SearchLineEdit( QWidget *parent ) : QLineEdit( parent )
 {

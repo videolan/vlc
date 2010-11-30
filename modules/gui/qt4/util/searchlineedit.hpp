@@ -39,10 +39,10 @@
 class ClickLineEdit : public QLineEdit
 {
     Q_OBJECT
-    Q_PROPERTY( QString clickMessage READ clickMessage WRITE setClickMessage )
+    Q_PROPERTY( QString clickMessage READ clickMessage WRITE setPlaceholderText )
 public:
     ClickLineEdit( const QString &msg, QWidget *parent );
-    void setClickMessage( const QString &msg );
+    void setPlaceholderText( const QString &msg );
     const QString& clickMessage() const { return mClickMessage; }
     virtual void setText( const QString& txt );
 protected:
