@@ -3786,6 +3786,9 @@ AS_IF([test "${enable_qt4}" != "no"], [
     AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
         VLC_ADD_LIBS([qt4],[-lole32])
     ])
+    AS_IF([test "${SYS}" = "darwin" ],[
+         VLC_ADD_LDFLAGS([qt4], [-Wl,-framework,Cocoa])
+    ])
     AC_PATH_PROGS(MOC, [moc-qt4 moc], moc,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
     AC_PATH_PROG(RCC, rcc, rcc,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
     AC_PATH_PROGS(UIC, [uic-qt4 uic], uic,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)

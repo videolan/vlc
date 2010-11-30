@@ -69,6 +69,7 @@ private:
 };
 #endif
 
+#ifndef Q_WS_MAC
 class QVLCFramelessButton;
 class SearchLineEdit : public QLineEdit
 {
@@ -95,6 +96,27 @@ private slots:
 signals:
     void searchDelayedChanged( const QString& );
 };
+#else
+#include <QMacCocoaViewContainer>
+
+class SearchLineEdit : public QMacCocoaViewContainer
+{
+    Q_OBJECT
+
+public:
+    SearchLineEdit(QWidget *parent = 0);
+    virtual ~SearchLineEdit() {}
+
+    virtual QSize sizeHint() const { return QSize(150, 40); }
+
+public slots:
+    void clear() {}
+
+signals:
+    void searchDelayedChanged( const QString& );
+    void textEdited( const QString& );
+};
+#endif
 
 #endif
 

@@ -12,7 +12,7 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 MOSTLYCLEANFILES = $(UIH)
-SUFFIXES = .ui .h .hpp .moc.cpp
+SUFFIXES = .ui .h .hpp .moc.cpp .mm
 
 nodist_SOURCES_qt4 = \
 		main_interface.moc.cpp \
@@ -210,7 +210,11 @@ resources.cpp: vlc.qrc $(DEPS_res)
 	$(AM_V_GEN)$(RCC) -name vlc -o $@ $<
 
 .hpp.moc.cpp:
+if HAVE_DARWIN
+	$(moc_verbose)$(MOC) -DQ_WS_MAC $(DEFS) -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) `$(VLC_CONFIG) --cppflags plugin qt4` -o $@ $<
+else
 	$(moc_verbose)$(MOC) $(DEFS) -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) `$(VLC_CONFIG) --cppflags plugin qt4` -o $@ $<
+endif
 
 .ui.h:
 	$(AM_V_at)mkdir -p -- ui
@@ -219,6 +223,9 @@ resources.cpp: vlc.qrc $(DEPS_res)
 	$(uic_verbose)$(UIC) -tr "Q_" $< >> $@.tmp
 	$(AM_V_at)sed -e 's/Q_(\"_(\\\"\(.*\)\\\")"/Q_("\1"/' $@.tmp >$@
 	$(AM_V_at)rm -f $@.tmp
+
+.mm.lo: 
+	$(top_builddir)/libtool --verbose --mode=compile $(CXX) $(objcxxflags) -DQ_WS_MAC -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) `$(VLC_CONFIG) --cxxflags plugin qt4` -c $< -o $@ 
 
 SOURCES_qt4 = 	qt4.cpp \
 		menus.cpp \
@@ -279,6 +286,10 @@ SOURCES_qt4 = 	qt4.cpp \
 		util/registry.cpp \
 		util/qt_dirs.cpp \
 		util/pictureflow.cpp
+
+if HAVE_DARWIN
+SOURCES_qt4 +=  util/searchlineedit_mac.mm
+endif
 
 noinst_HEADERS = \
 	qt4.hpp \

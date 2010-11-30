@@ -103,6 +103,7 @@ void ClickLineEdit::focusOutEvent( QFocusEvent *ev )
 }
 #endif
 
+#ifndef Q_WS_MAC
 SearchLineEdit::SearchLineEdit( QWidget *parent ) : QLineEdit( parent )
 {
     clearButton = new QVLCFramelessButton( this );
@@ -198,3 +199,4 @@ void SearchLineEdit::searchEditingFinished()
     emit searchDelayedChanged( text() );
 }
 
+#endif
