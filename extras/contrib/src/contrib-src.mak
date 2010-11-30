@@ -1599,55 +1599,22 @@ CLEAN_PKG += qt4_win32
 DISTCLEAN_PKG += qt4-$(QT4_VERSION)-win32-bin.tar.bz2
 
 # ***************************************************************************
-# qt4 (trolltech binaries)
+# qt4 (Mac)
 # ***************************************************************************
-
-qt-win-opensource-$(QT4T_VERSION)-mingw.exe:
-	wget $(QT4T_URL)
-
-Qt_win32: qt-win-opensource-$(QT4T_VERSION)-mingw.exe
-	mkdir Qt
-	7z -oQt x qt-win-opensource-$(QT4T_VERSION)-mingw.exe \$$OUTDIR/bin\ /bin \$$OUTDIR/bin\ /lib \$$OUTDIR/bin\ /include/QtCore \$$OUTDIR/bin\ /include/QtGui \$$OUTDIR/bin\ /src/gui \$$OUTDIR/bin\ /src/corelib \$$OUTDIR/bin\ /translations
-	mv Qt/\$$OUTDIR/bin\ /* Qt/ && rmdir Qt/\$$OUTDIR/bin\  Qt/\$$OUTDIR
-	find Qt -name '* ' -exec sh -c "mv \"{}\" `echo {}`" \;
-	find Qt/src -name '*.cpp' -exec rm {} \;
-	find Qt/translations -type f -a ! -name 'qt_*.qm' -exec rm {} \;
-	find Qt/include -name '*.h' -exec sh -c "mv {} {}.tmp; sed 's,..\/..\/src,..\/src,' {}.tmp > {}; rm -f {}.tmp" \;
-	mkdir Qt/lib/pkgconfig
-	sed -e s,@@VERSION@@,$(QT4T_VERSION), -e s,@@PREFIX@@,$(PREFIX), Patches/QtCore.pc.in > Qt/lib/pkgconfig/QtCore.pc
-	sed -e s,@@VERSION@@,$(QT4T_VERSION), -e s,@@PREFIX@@,$(PREFIX), Patches/QtGui.pc.in > Qt/lib/pkgconfig/QtGui.pc
-
-.Qt_win32: Qt_win32
-	mkdir -p $(PREFIX)/bin $(PREFIX)/include/qt4/src $(PREFIX)/lib/pkgconfig $(PREFIX)/share/qt4/translations
-	cp Qt/bin/moc.exe Qt/bin/rcc.exe Qt/bin/uic.exe $(PREFIX)/bin
-	cp -r Qt/include/QtCore Qt/include/QtGui $(PREFIX)/include/qt4
-	cp -r Qt/src/corelib Qt/src/gui $(PREFIX)/include/qt4/src
-	cp Qt/lib/libQtCore4.a Qt/lib/libQtGui4.a $(PREFIX)/lib
-	cp Qt/lib/pkgconfig/* $(PREFIX)/lib/pkgconfig
-	cp Qt/translations/* $(PREFIX)/share/qt4/translations
-	touch $@
-
-CLEAN_FILE += .Qt_win32
-CLEAN_PKG += Qt_win32
-DISTCLEAN_PKG += qt-win-opensource-$(QT4T_VERSION)-mingw.exe
-
-# ***************************************************************************
-# qt4 (source-code compilation for Mac)
-# ***************************************************************************
-
-qt-everywhere-opensource-src-$(QT4_MAC_VERSION).tar.gz:
+ 
+qt-mac-opensource-$(QT4_MAC_VERSION).dmg: 
 	$(WGET) $(QT4_MAC_URL)
 
-qt4_mac: qt-everywhere-opensource-src-$(QT4_MAC_VERSION).tar.gz
-	$(EXTRACT_GZ)
+qt4_mac: qt-mac-opensource-$(QT4_MAC_VERSION).dmg
 
 .qt4_mac: qt4_mac
-	(cd qt4_mac; ./configure -prefix $(PREFIX) -release -fast -no-qt3support -nomake "examples demos" -sdk $(MACOSX_SDK) -no-framework -arch $(ARCH) && make && make install)
+	cp Patches/QtCoreMac.pc.in $(PREFIX)/lib/pkgconfig/QtCore.pc
+	cp Patches/QtGuiMac.pc.in $(PREFIX)/lib/pkgconfig/QtGui.pc
 	touch $@
 
 CLEAN_FILE += .qt4_mac
 CLEAN_PKG += qt4_mac
-DISTCLEAN_PKG += qt-mac-opensource-src-$(QT4_MAC_VERSION).tar.gz
+DISTCLEAN_PKG += qt-mac-opensource-$(QT4_MAC_VERSION).dmg
 
 # ***************************************************************************
 # zlib
