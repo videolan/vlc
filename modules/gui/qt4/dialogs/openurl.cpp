@@ -26,7 +26,7 @@
 #endif
 
 #include "dialogs/openurl.hpp"
-#include "util/customwidgets.hpp"
+#include "util/searchlineedit.hpp"
 
 #include <QPushButton>
 #include <QDialogButtonBox>

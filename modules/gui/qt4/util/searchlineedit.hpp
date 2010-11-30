@@ -24,8 +24,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _CUSTOMWIDGETS_H_
-#define _CUSTOMWIDGETS_H_
+#ifndef _SEARCHLINEEDIT_H_
+#define _SEARCHLINEEDIT_H_
 
 #include <QLineEdit>
 #include <QPushButton>
@@ -33,59 +33,58 @@
 #include <QStackedWidget>
 #include <QSpinBox>
 
-class QVLCFramelessButton : public QPushButton
+class QVLCFramelessButton;
+/**
+  This class provides a QLineEdit which contains a greyed-out hinting
+  text as long as the user didn't enter any text
+
+  @short LineEdit with customizable "Click here" text
+  @author Daniel Molkentin
+*/
+class ClickLineEdit : public QLineEdit
 {
     Q_OBJECT
+    Q_PROPERTY( QString clickMessage READ clickMessage WRITE setClickMessage )
 public:
-    QVLCFramelessButton( QWidget *parent = NULL );
-    QSize sizeHint() const;
+    ClickLineEdit( const QString &msg, QWidget *parent );
+    void setClickMessage( const QString &msg );
+    const QString& clickMessage() const { return mClickMessage; }
+    virtual void setText( const QString& txt );
 protected:
-    virtual void paintEvent( QPaintEvent * event );
-};
-
-
-class QVLCElidingLabel : public QLabel
-{
-public:
-    QVLCElidingLabel( const QString &s = QString(),
-                      Qt::TextElideMode mode = Qt::ElideRight,
-                      QWidget * parent = NULL );
-    void setElideMode( Qt::TextElideMode );
+    virtual void paintEvent( QPaintEvent *e );
+    virtual void dropEvent( QDropEvent *ev );
+    virtual void focusInEvent( QFocusEvent *ev );
+    virtual void focusOutEvent( QFocusEvent *ev );
 private:
-    void paintEvent( QPaintEvent * event );
-    Qt::TextElideMode elideMode;
+    QString mClickMessage;
+    bool mDrawClickMsg;
 };
 
-class QVLCStackedWidget : public QStackedWidget
-{
-public:
-    QVLCStackedWidget( QWidget *parent ) : QStackedWidget( parent ) { }
-    QSize minimumSizeHint () const
-    {
-        return currentWidget() ? currentWidget()->minimumSizeHint() : QSize();
-    }
-};
-
-class DebugLevelSpinBox : public QSpinBox
+class SearchLineEdit : public QLineEdit
 {
     Q_OBJECT
 public:
-    DebugLevelSpinBox( QWidget *parent ) : QSpinBox( parent ) { };
-protected:
-    QString textFromValue( int ) const;
-    int mapTextToValue ( bool * );
+    SearchLineEdit( QWidget *parent = NULL );
+
+private:
+    void resizeEvent ( QResizeEvent * event );
+    void focusInEvent( QFocusEvent *event );
+    void focusOutEvent( QFocusEvent *event );
+    void paintEvent( QPaintEvent *event );
+    void setMessageVisible( bool on );
+    QVLCFramelessButton   *clearButton;
+    bool message;
+
+public slots:
+    void clear();
+
+private slots:
+    void updateText( const QString& );
+    void searchEditingFinished();
+
+signals:
+    void searchDelayedChanged( const QString& );
 };
-
-/* VLC Key/Wheel hotkeys interactions */
-
-class QKeyEvent;
-class QWheelEvent;
-class QInputEvent;
-
-int qtKeyModifiersToVLC( QInputEvent* e );
-int qtEventToVLCKey( QKeyEvent *e );
-int qtWheelEventToVLCKey( QWheelEvent *e );
-QString VLCKeyToString( int val );
 
 #endif
 

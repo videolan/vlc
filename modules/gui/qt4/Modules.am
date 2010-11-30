@@ -66,6 +66,7 @@ nodist_SOURCES_qt4 = \
 		components/sout/sout_widgets.moc.cpp \
 		util/input_slider.moc.cpp \
 		util/customwidgets.moc.cpp \
+		util/searchlineedit.moc.cpp \
 		util/qvlcapp.moc.cpp \
 		util/pictureflow.moc.cpp \
 		resources.cpp \
@@ -274,6 +275,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/sout/sout_widgets.cpp \
 		util/input_slider.cpp \
 		util/customwidgets.cpp \
+		util/searchlineedit.cpp \
 		util/registry.cpp \
 		util/qt_dirs.cpp \
 		util/pictureflow.cpp
@@ -336,6 +338,7 @@ noinst_HEADERS = \
 	components/sout/profiles.hpp \
 	util/input_slider.hpp \
 	util/customwidgets.hpp \
+	util/searchlineedit.hpp \
 	util/qvlcframe.hpp \
 	util/qvlcapp.hpp \
 	util/qt_dirs.hpp \

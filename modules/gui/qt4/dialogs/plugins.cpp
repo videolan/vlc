@@ -28,7 +28,7 @@
 
 #include "plugins.hpp"
 
-#include "util/customwidgets.hpp"
+#include "util/searchlineedit.hpp"
 #include "extensions_manager.hpp"
 
 #include <assert.h>

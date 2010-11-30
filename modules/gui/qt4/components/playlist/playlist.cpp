@@ -32,6 +32,8 @@
 #include "components/playlist/playlist_model.hpp" /* PLModel */
 #include "components/interface_widgets.hpp"       /* CoverArtLabel */
 
+#include "util/searchlineedit.hpp"
+
 #include "input_manager.hpp"                      /* art signal */
 #include "main_interface.hpp"                     /* DropEvent TODO remove this*/
 
