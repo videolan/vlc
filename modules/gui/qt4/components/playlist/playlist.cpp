@@ -45,7 +45,11 @@
 PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
                : QSplitter( _par ), p_intf ( _p_i )
 {
+#ifndef Q_WS_MAC
     setContentsMargins( 3, 3, 3, 3 );
+#else
+    setContentsMargins( 0, 3, 0, 3 );
+#endif
 
     /*******************
      * Left            *
@@ -434,7 +438,7 @@ QSize SplitterHandle::sizeHint() const
 
 void SplitterHandle::paintEvent(QPaintEvent *event)
 {
-    QPainter painter(this);
-    painter.fillRect(event->rect(), QBrush(Qt::gray));
+    QPainter painter( this );
+    painter.fillRect( event->rect(), QColor(81, 81, 81) );
 }
 #endif /* __APPLE__ */
