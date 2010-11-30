@@ -56,7 +56,8 @@
 #import "prefs.h"
 #import "simple_prefs.h"
 #import "prefs_widgets.h"
-#import "vlc_keys.h"
+#import <vlc_keys.h>
+#import <vlc_modules.h>
 
 /* /!\ Warning: Unreadable code :/ */
 
@@ -347,8 +348,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
         /* Exclude empty plugins (submodules don't have config */
         /* options, they are stored in the parent module) */
-        if( module_is_main( p_module) )
-        {
+        if( module_is_main( p_module ) ) {
             pluginItem = self;
             _configItems = module_config_get( p_module, &confsize );
             _configSize = confsize;

@@ -33,6 +33,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_modules.h>
 #include <vlc_keys.h>
 
 #include "intf.h"
@@ -1361,7 +1362,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             if( module_provides( p_parser, p_item->psz_type ) )
             {
                 NSString *o_description = [[VLCMain sharedInstance]
-                    localizedString: module_GetLongName( p_parser )];
+                    localizedString: module_get_name( p_parser, TRUE )];
                 if( [newval isEqualToString: o_description] )
                 {
                     returnval = strdup( module_get_object( p_parser ));
@@ -1385,7 +1386,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                     p_config->value.i == p_item->min.i )
                 {
                     NSString *o_description = [[VLCMain sharedInstance]
-                        localizedString: module_GetLongName( p_parser )];
+                        localizedString: module_get_name( p_parser, TRUE )];
                     if( [newval isEqualToString: o_description] )
                     {
                         returnval = strdup(module_get_object( p_parser ));
@@ -1415,7 +1416,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             if( module_provides( p_parser, p_item->psz_type ) )
             {
                 NSString *o_description = [[VLCMain sharedInstance]
-                    localizedString: module_GetLongName( p_parser )];
+                    localizedString: module_get_name( p_parser, TRUE )];
                 [o_popup addItemWithTitle: o_description];
                 char *psz_value = config_GetPsz( VLCIntf, p_item->psz_name );
 
@@ -1443,7 +1444,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                     config_GetInt( VLCIntf, p_item->psz_name) == p_item->min.i )
                 {
                     NSString *o_description = [[VLCMain sharedInstance]
-                        localizedString: module_GetLongName( p_parser )];
+                        localizedString: module_get_name( p_parser, TRUE )];
                     [o_popup addItemWithTitle: o_description];
                     char *psz_value = config_GetPsz( VLCIntf, p_item->psz_name );
 
@@ -2093,11 +2094,11 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             o_keys_menu = [[NSMenu alloc] initWithTitle: @"Keys Menu"];
 #warning This does not work anymore. FIXME.
 #if 0
-            for ( i = 0; i < sizeof(vlc_keys) / sizeof(key_descriptor_t); i++)
-                if( vlc_keys[i].psz_key_string )
+            for ( i = 0; i < sizeof(vlc_key) / sizeof(key_descriptor_t); i++)
+                if( vlc_key[i].psz_key_string )
                     POPULATE_A_KEY( o_keys_menu,
-                        [NSString stringWithUTF8String:vlc_keys[i].psz_key_string]
-                        , vlc_keys[i].i_key_code)
+                        [NSString stringWithUTF8String:vlc_key[i].psz_key_string]
+                        , vlc_key[i].i_key_code)
 #endif
         }
         [o_popup setMenu:[o_keys_menu copyWithZone:nil]];
@@ -2180,7 +2181,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                 p_config->value.i == _p_item->min.i )
             {
                 o_modulelongname = [NSString stringWithUTF8String:
-                                        module_GetLongName( p_parser )];
+                                        module_get_name( p_parser, TRUE )];
                 o_modulename = [NSString stringWithUTF8String:
                                         module_get_object( p_parser )];
 
