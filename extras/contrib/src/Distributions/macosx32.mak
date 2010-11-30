@@ -7,7 +7,7 @@ all: .freetype \
     .dvdcss .libdvdread .dvdnav .dvbpsi .live .caca .mod .fontconfig \
     .png .gpg-error .gcrypt .gnutls .cddb .cdio .vcdimager \
     .SDL_image .gecko .mpcdec .dirac_encoder .dirac_decoder \
-    .dca .tag .x264 .goom2k4 .lua .zvbi .fontconfig .ncurses \
+    .dca .tag .x264 .goom2k4 .lua .zvbi .fluid .fontconfig .ncurses \
     .schroedinger .libass .libupnp .kate .sqlite3 .Sparkle
 
 # .expat don't work with SDK yet

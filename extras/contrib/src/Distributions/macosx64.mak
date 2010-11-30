@@ -2,7 +2,7 @@
 TOOLS = .libtool .intl .pkgcfg .yasm .automake
 
 all: .freetype \
-    .fribidi .a52 .mpeg2 .mad .ogg .vorbis .vorbisenc .theora \
+    .fribidi .a52 .mpeg2 .mad .ogg .vorbis .vorbisenc .fluid .theora \
     .flac .speex .shout .faad .lame .twolame .ebml .matroska .ffmpeg \
     .dvdcss .libdvdread .dvdnav .dvbpsi .live .caca .mod .fontconfig \
     .png .jpeg .tiff .gpg-error .gcrypt .gnutls .cddb .cdio .vcdimager \
