@@ -29,6 +29,19 @@
 
 #include <QLineEdit>
 
+#include <qt4.hpp>
+
+#if HAS_QT47
+class ClickLineEdit : public QLineEdit
+{
+    Q_OBJECT
+public:
+    ClickLineEdit( const QString &msg, QWidget *parent ) : QLineEdit( parent )
+    {
+        QLineEdit::setPlaceholderText ( msg );
+    }
+};
+#else
 /**
   This class provides a QLineEdit which contains a greyed-out hinting
   text as long as the user didn't enter any text
@@ -39,11 +52,11 @@
 class ClickLineEdit : public QLineEdit
 {
     Q_OBJECT
-    Q_PROPERTY( QString clickMessage READ clickMessage WRITE setPlaceholderText )
+    Q_PROPERTY( QString clickMessage READ placeholderText WRITE setPlaceholderText )
 public:
     ClickLineEdit( const QString &msg, QWidget *parent );
     void setPlaceholderText( const QString &msg );
-    const QString& clickMessage() const { return mClickMessage; }
+    const QString& placeholderText() const { return mClickMessage; }
     virtual void setText( const QString& txt );
 protected:
     virtual void paintEvent( QPaintEvent *e );
@@ -54,6 +67,7 @@ private:
     QString mClickMessage;
     bool mDrawClickMsg;
 };
+#endif
 
 class QVLCFramelessButton;
 class SearchLineEdit : public QLineEdit

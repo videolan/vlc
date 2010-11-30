@@ -40,6 +40,8 @@
 
 #include <vlc_intf_strings.h>
 
+#if QT_VERSION < 0x040700
+
 ClickLineEdit::ClickLineEdit( const QString &msg, QWidget *parent) : QLineEdit( parent )
 {
     mDrawClickMsg = true;
@@ -99,9 +101,7 @@ void ClickLineEdit::focusOutEvent( QFocusEvent *ev )
     }
     QLineEdit::focusOutEvent( ev );
 }
-
-
-
+#endif
 
 SearchLineEdit::SearchLineEdit( QWidget *parent ) : QLineEdit( parent )
 {
