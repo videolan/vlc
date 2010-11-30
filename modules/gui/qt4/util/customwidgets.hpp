@@ -38,7 +38,7 @@ class QVLCFramelessButton : public QPushButton
     Q_OBJECT
 public:
     QVLCFramelessButton( QWidget *parent = NULL );
-    QSize sizeHint() const;
+    virtual QSize sizeHint() const { return iconSize(); }
 protected:
     virtual void paintEvent( QPaintEvent * event );
 };
@@ -51,10 +51,12 @@ public:
                       Qt::TextElideMode mode = Qt::ElideRight,
                       QWidget * parent = NULL );
     void setElideMode( Qt::TextElideMode );
+protected:
+    virtual void paintEvent( QPaintEvent * event );
 private:
-    void paintEvent( QPaintEvent * event );
     Qt::TextElideMode elideMode;
 };
+
 
 class QVLCStackedWidget : public QStackedWidget
 {
@@ -72,8 +74,9 @@ class DebugLevelSpinBox : public QSpinBox
 public:
     DebugLevelSpinBox( QWidget *parent ) : QSpinBox( parent ) { };
 protected:
-    QString textFromValue( int ) const;
-    int mapTextToValue ( bool * );
+    virtual QString textFromValue( int ) const;
+    /* DebugLevelSpinBox is read-only */
+    virtual int valueFromText( const QString& ) const { return -1; }
 };
 
 /* VLC Key/Wheel hotkeys interactions */

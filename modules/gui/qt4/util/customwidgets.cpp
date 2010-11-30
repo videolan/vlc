@@ -38,7 +38,7 @@
 #include <vlc_keys.h>
 
 QVLCFramelessButton::QVLCFramelessButton( QWidget *parent )
-  : QPushButton( parent )
+                    : QPushButton( parent )
 {
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 }
@@ -51,13 +51,8 @@ void QVLCFramelessButton::paintEvent( QPaintEvent * )
     painter.drawPixmap( QRect( pos.x(), pos.y(), pix.width(), pix.height() ), pix );
 }
 
-QSize QVLCFramelessButton::sizeHint() const
-{
-    return iconSize();
-}
-
 QVLCElidingLabel::QVLCElidingLabel( const QString &s, Qt::TextElideMode mode, QWidget * parent )
-  : elideMode( mode ), QLabel( s, parent )
+                 : elideMode( mode ), QLabel( s, parent )
 { }
 
 void QVLCElidingLabel::setElideMode( Qt::TextElideMode mode )
@@ -88,14 +83,6 @@ QString DebugLevelSpinBox::textFromValue( int v ) const
     if ( v >= 2 ) v = 2;
 
     return QString( "%1 (%2)" ).arg( v ).arg( texts[v] );
-}
-
-int DebugLevelSpinBox::mapTextToValue ( bool *ok )
-{
-    int parsedvalue = cleanText().toInt();
-    /* fix range */
-    *ok = ( parsedvalue < 0 || parsedvalue > 2 )? FALSE : TRUE;
-    return parsedvalue;
 }
 
 /***************************************************************************
