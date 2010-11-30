@@ -289,6 +289,8 @@ static int Open( vlc_object_t *p_this )
 
     vlc_mutex_init( &p_sys->pts_lock );
 
+    IDeckLinkDisplayModeIterator *p_display_iterator = NULL;
+
     IDeckLinkIterator *decklink_iterator = CreateDeckLinkIteratorInstance();
     if( !decklink_iterator )
     {
@@ -404,7 +406,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Get the list of display modes. */
-    IDeckLinkDisplayModeIterator *p_display_iterator;
     result = p_sys->p_input->GetDisplayModeIterator( &p_display_iterator );
     if( result != S_OK )
     {
