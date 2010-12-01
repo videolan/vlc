@@ -588,11 +588,10 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         free (th);
         return ENOMEM;
     }
-    entry_data->cancel_event = th->cancel_event;
 
     /* Not sure if CREATE_SUSPENDED + ResumeThread() is any useful on WinCE.
      * Thread handles act up, too. */
-    hThread = CreateThread (NULL, 128*1024, vlc_entry, entry_data,
+    hThread = CreateThread (NULL, 128*1024, vlc_entry, th,
                             CREATE_SUSPENDED, NULL);
     if (hThread == NULL)
     {
