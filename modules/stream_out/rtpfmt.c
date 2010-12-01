@@ -67,7 +67,10 @@ static int rtp_vorbis_pack_headers(size_t room, void *p_extra, size_t i_extra,
     if (val != VLC_SUCCESS)
         return val;
     if (packet_count < 3)
-        return VLC_EGENERIC;
+    {
+        val = VLC_EGENERIC;
+        goto free;
+    }
 
     unsigned length_size[2] = { 0, 0 };
     for (int i = 0; i < 2; i++)
@@ -84,7 +87,10 @@ static int rtp_vorbis_pack_headers(size_t room, void *p_extra, size_t i_extra,
                 + packet_size[0] + packet_size[1] + packet_size[2];
     *p_buffer = malloc(*i_buffer);
     if (*p_buffer == NULL)
-        return VLC_ENOMEM;
+    {
+        val = VLC_ENOMEM;
+        goto free;
+    }
 
     uint8_t *p = *p_buffer + room;
     /* Number of headers */
@@ -104,11 +110,15 @@ static int rtp_vorbis_pack_headers(size_t room, void *p_extra, size_t i_extra,
     for (int i = 0; i < 3; i++)
     {
         memcpy(p, packet[i], packet_size[i]);
-        free(packet[i]);
         p += packet_size[i];
     }
 
-    return VLC_SUCCESS;
+    val = VLC_SUCCESS;
+free:
+    for (unsigned i = 0; i < packet_count; i++)
+        free(packet[i]);
+
+    return val;
 }
 
 static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
