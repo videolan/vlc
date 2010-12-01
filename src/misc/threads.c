@@ -170,7 +170,7 @@ void vlc_thread_join( vlc_object_t *p_this )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
+#if 0 && defined( WIN32 ) && !defined( UNDER_CE )
     HANDLE hThread;
     FILETIME create_ft, exit_ft, kernel_ft, user_ft;
     int64_t real_time, kernel_time, user_time;
@@ -190,7 +190,7 @@ void vlc_thread_join( vlc_object_t *p_this )
 
     vlc_join( p_priv->thread_id, NULL );
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
+#if 0 && defined( WIN32 ) && !defined( UNDER_CE )
     /* FIXME: this could work on WinCE too... except that it seems always to
      * return 0 for exit_ft and kernel_ft */
     if( GetThreadTimes( hThread, &create_ft, &exit_ft, &kernel_ft, &user_ft ) )
