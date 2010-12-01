@@ -388,6 +388,8 @@ static void parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_rea
                 duration, hls->duration);
     }
     vlc_mutex_unlock(&hls->lock);
+
+    free(psz_uri);
 }
 
 static void parse_TargetDuration(stream_t *s, hls_stream_t *hls, char *p_read)
@@ -451,6 +453,8 @@ static void parse_StreamInformation(stream_t *s, char *p_read, char *uri)
     hls_stream_t *hls = hls_New(p_sys->hls_stream, id, bw, psz_uri ? psz_uri : uri);
     if (hls == NULL)
         p_sys->b_error = true;
+
+    free(psz_uri);
 }
 
 static void parse_MediaSequence(stream_t *s, hls_stream_t *hls, char *p_read)
