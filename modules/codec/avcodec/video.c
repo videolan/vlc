@@ -55,9 +55,6 @@
 #if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2)
 #   define HAVE_AVCODEC_VA
 #endif
-#if defined(FF_THREAD_FRAME)
-#   define HAVE_AVCODEC_MT
-#endif
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
