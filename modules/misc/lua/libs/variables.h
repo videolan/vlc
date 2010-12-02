@@ -25,8 +25,6 @@
 #ifndef VLC_LUA_VARIABLES_H
 #define VLC_LUA_VARIABLES_H
 
-int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val ); /* internal use only */
-
 #define vlclua_var_toggle_or_set(a,b,c) \
     __vlclua_var_toggle_or_set(a,VLC_OBJECT(b),c)
 int __vlclua_var_toggle_or_set( lua_State *, vlc_object_t *, const char * );

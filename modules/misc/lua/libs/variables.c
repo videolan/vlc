@@ -46,12 +46,15 @@
 /*****************************************************************************
  * Variables handling
  *****************************************************************************/
-int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val )
+static int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val, bool b_error_void )
 {
     switch( i_type & VLC_VAR_CLASS )
     {
         case VLC_VAR_VOID:
-            vlclua_error( L );
+            if( b_error_void )
+                vlclua_error( L );
+            else
+                lua_pushnil( L );
             break;
         case VLC_VAR_BOOL:
             lua_pushboolean( L, val.b_bool );
@@ -90,7 +93,7 @@ static int vlclua_pushlist( lua_State *L, vlc_list_t *p_list )
     {
         lua_pushinteger( L, i+1 );
         if( !vlclua_pushvalue( L, p_list->pi_types[i],
-                               p_list->p_values[i] ) )
+                               p_list->p_values[i], true ) )
              lua_pushnil( L );
         lua_settable( L, -3 );
     }
@@ -143,7 +146,7 @@ static int vlclua_var_get( lua_State *L )
     if( var_Get( *pp_obj, psz_var, &val ) != VLC_SUCCESS )
         return 0;
     lua_pop( L, 2 );
-    return vlclua_pushvalue( L, i_type, val );
+    return vlclua_pushvalue( L, i_type, val, true );
 }
 
 static int vlclua_var_set( lua_State *L )
@@ -304,9 +307,9 @@ static int vlclua_callback( vlc_object_t *p_this, char const *psz_var,
     /* callbacks[index] callback */
     lua_pushstring( L, psz_var );
     /* callbacks[index] callback var */
-    vlclua_pushvalue( L, p_callback->i_type, oldval );
+    vlclua_pushvalue( L, p_callback->i_type, oldval, false );
     /* callbacks[index] callback var oldval */
-    vlclua_pushvalue( L, p_callback->i_type, newval );
+    vlclua_pushvalue( L, p_callback->i_type, newval, false );
     /* callbacks[index] callback var oldval newval */
     lua_getfield( L, -5, "data" );
     /* callbacks[index] callback var oldval newval data */
@@ -348,6 +351,7 @@ static int vlclua_add_callback( lua_State *L )
     /* Check variable type, in order to avoid PANIC */
     switch( i_type & VLC_VAR_CLASS )
     {
+        case VLC_VAR_VOID:
         case VLC_VAR_BOOL:
         case VLC_VAR_INTEGER:
         case VLC_VAR_STRING:
@@ -355,7 +359,6 @@ static int vlclua_add_callback( lua_State *L )
         case VLC_VAR_TIME:
             break;
         case VLC_VAR_ADDRESS:
-        case VLC_VAR_VOID:
         case VLC_VAR_MUTEX:
         default:
             return vlclua_error( L );
