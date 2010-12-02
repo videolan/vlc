@@ -45,6 +45,7 @@
 #include "es_out.h"
 #include "event.h"
 #include "info.h"
+#include "item.h"
 
 #include "../stream_output/stream_output.h"
 
@@ -2854,6 +2855,8 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
     input_thread_t *p_input = p_sys->p_input;
     const es_format_t *p_fmt_es = &es->fmt;
     lldiv_t         div;
+
+    input_item_UpdateTracksInfo(input_GetItem(p_input), fmt);
 
     /* Create category */
     char psz_cat[128];
