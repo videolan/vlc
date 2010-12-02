@@ -219,6 +219,7 @@ static void Close(vlc_object_t *object)
     vout_display_t * vd = (vout_display_t *)object;
 
     var_DelCallback(vd, "direct3d-desktop", DesktopCallback, NULL);
+    vlc_mutex_destroy(&vd->sys->lock);
 
     Direct3DClose(vd);
 
