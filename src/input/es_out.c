@@ -2856,7 +2856,14 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
     const es_format_t *p_fmt_es = &es->fmt;
     lldiv_t         div;
 
-    input_item_UpdateTracksInfo(input_GetItem(p_input), fmt);
+    if( es->fmt.i_cat == fmt->i_cat )
+    {
+        es_format_t update = *fmt;
+        update.i_id = es->i_meta_id;
+        update.i_codec = es->fmt.i_codec;
+        update.i_original_fourcc = es->fmt.i_original_fourcc;
+        input_item_UpdateTracksInfo(input_GetItem(p_input), &update);
+    }
 
     /* Create category */
     char psz_cat[128];
