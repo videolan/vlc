@@ -1430,7 +1430,7 @@ ifdef HAVE_LINUX
 X264CONF += --enable-pic
 endif
 
-X264CONF += --disable-avs --disable-lavf --disable-ffms --disable-mp4-output
+X264CONF += --disable-avs --disable-lavf --disable-ffms
 
 x264-$(X264_VERSION).tar.gz:
 	$(WGET) $(X264_URL)
