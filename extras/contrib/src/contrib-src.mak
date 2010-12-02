@@ -2052,24 +2052,12 @@ DISTCLEAN_PKG += SDL_image-$(SDL_IMAGE_VERSION).tar.gz
 # Musepack decoder library (libmpcdec)
 # ***************************************************************************
 
-libmpcdec-$(MUSE_VERSION).tar.bz2:
-	$(WGET) $(MUSE_URL)
-
-mpcdec: libmpcdec-$(MUSE_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
-	patch -p0 < Patches/mpcdec.patch
-	(cd $@; autoreconf -ivf)
+mpcdec:
+	$(SVN) co $(MUSE_SVN) -r 468 mpcdec
+	cd $@; patch -p0 < ../Patches/libmpc-simple.patch
 
 .mpcdec: mpcdec
-ifdef HAVE_WIN32
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS=-D_PTRDIFF_T=mpc_int32_t && make && make install)
-else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
-endif
-ifdef HAVE_MACOSX
-	$(INSTALL_NAME)
-endif
-	touch $@
+	(cd $<; cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make install)
 
 CLEAN_FILE += .mpcdec
 CLEAN_PKG += mpcdec
