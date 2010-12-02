@@ -239,7 +239,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     /* Monitor pixel aspect-ratio */
     var_Create( p_vout, "monitor-par", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_vout, "monitor-par", &val );
 
     /* Aspect-ratio object var */
     var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING | VLC_VAR_ISCOMMAND |
