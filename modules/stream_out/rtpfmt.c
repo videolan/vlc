@@ -52,12 +52,15 @@ static int rtp_packetize_g726_16 (sout_stream_id_t *, block_t *);
 static int rtp_packetize_g726_24 (sout_stream_id_t *, block_t *);
 static int rtp_packetize_g726_32 (sout_stream_id_t *, block_t *);
 static int rtp_packetize_g726_40 (sout_stream_id_t *, block_t *);
-static int rtp_packetize_vorbis (sout_stream_id_t *, block_t *);
+static int rtp_packetize_xiph (sout_stream_id_t *, block_t *);
 
-#define VORBIS_IDENT (0)
+#define XIPH_IDENT (0)
 
-static int rtp_vorbis_pack_headers(size_t room, void *p_extra, size_t i_extra,
-                                   uint8_t **p_buffer, size_t *i_buffer)
+/* Helpers common to xiph codecs (vorbis and theora) */
+
+static int rtp_xiph_pack_headers(size_t room, void *p_extra, size_t i_extra,
+                                 uint8_t **p_buffer, size_t *i_buffer,
+                                 uint8_t *theora_pixel_fmt)
 {
     unsigned packet_size[XIPH_MAX_HEADER_COUNT];
     void *packet[XIPH_MAX_HEADER_COUNT];
@@ -70,6 +73,16 @@ static int rtp_vorbis_pack_headers(size_t room, void *p_extra, size_t i_extra,
     {
         val = VLC_EGENERIC;
         goto free;
+    }
+
+    if (theora_pixel_fmt != NULL)
+    {
+        if (packet_size[0] < 42)
+        {
+            val = VLC_EGENERIC;
+            goto free;
+        }
+        *theora_pixel_fmt = (((uint8_t *)packet[0])[41] >> 3) & 0x03;
     }
 
     unsigned length_size[2] = { 0, 0 };
@@ -119,6 +132,29 @@ free:
         free(packet[i]);
 
     return val;
+}
+
+static char *rtp_xiph_b64_oob_config(void *p_extra, size_t i_extra,
+                                     uint8_t *theora_pixel_fmt)
+{
+    uint8_t *p_buffer;
+    size_t i_buffer;
+    if (rtp_xiph_pack_headers(9, p_extra, i_extra, &p_buffer, &i_buffer,
+                              theora_pixel_fmt) != VLC_SUCCESS)
+        return NULL;
+
+    /* Number of packed headers */
+    SetDWBE(p_buffer, 1);
+    /* Ident */
+    uint32_t ident = XIPH_IDENT;
+    SetWBE(p_buffer + 4, ident >> 8);
+    p_buffer[6] = ident & 0xff;
+    /* Length field */
+    SetWBE(p_buffer + 7, i_buffer);
+
+    char *config = vlc_b64_encode_binary(p_buffer, i_buffer);
+    free(p_buffer);
+    return config;
 }
 
 static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
@@ -407,31 +443,60 @@ int rtp_get_fmt( vlc_object_t *obj, es_format_t *p_fmt, const char *mux,
             break;
         case VLC_CODEC_VORBIS:
             rtp_fmt->ptname = "vorbis";
-            rtp_fmt->pf_packetize = rtp_packetize_vorbis;
+            rtp_fmt->pf_packetize = rtp_packetize_xiph;
             if( p_fmt->i_extra > 0 )
             {
                 rtp_fmt->fmtp = NULL;
-                uint8_t *p_buffer;
-                size_t i_buffer;
-                if (rtp_vorbis_pack_headers(9, p_fmt->p_extra, p_fmt->i_extra,
-                                        &p_buffer, &i_buffer) != VLC_SUCCESS)
-                    break;
-
-                /* Number of packed headers */
-                SetDWBE(p_buffer, 1);
-                /* Ident */
-                uint32_t ident = VORBIS_IDENT;
-                SetWBE(p_buffer + 4, ident >> 8);
-                p_buffer[6] = ident & 0xff;
-                /* Length field */
-                SetWBE(p_buffer + 7, i_buffer);
-
-                char *config = vlc_b64_encode_binary(p_buffer, i_buffer);
-                free(p_buffer);
+                char *config = rtp_xiph_b64_oob_config(p_fmt->p_extra,
+                                                       p_fmt->i_extra, NULL);
                 if (config == NULL)
                     break;
                 if( asprintf( &rtp_fmt->fmtp,
                               "configuration=%s;", config ) == -1 )
+                    rtp_fmt->fmtp = NULL;
+                free(config);
+            }
+            break;
+        case VLC_CODEC_THEORA:
+            rtp_fmt->ptname = "theora";
+            rtp_fmt->pf_packetize = rtp_packetize_xiph;
+            if( p_fmt->i_extra > 0 )
+            {
+                rtp_fmt->fmtp = NULL;
+                uint8_t pixel_fmt, c1, c2;
+                char *config = rtp_xiph_b64_oob_config(p_fmt->p_extra,
+                                                       p_fmt->i_extra,
+                                                       &pixel_fmt);
+                if (config == NULL)
+                    break;
+
+                if (pixel_fmt == 1)
+                {
+                    /* reserved */
+                    free(config);
+                    break;
+                }
+                switch (pixel_fmt)
+                {
+                    case 0:
+                        c1 = 2;
+                        c2 = 0;
+                        break;
+                    case 2:
+                        c1 = c2 = 2;
+                        break;
+                    case 3:
+                        c1 = c2 = 4;
+                        break;
+                    default:
+                        assert(0);
+                }
+
+                if( asprintf( &rtp_fmt->fmtp,
+                              "sampling=YCbCr-4:%d:%d; width=%d; height=%d; "
+                              "delivery-method=inline; configuration=%s;",
+                              c1, c2, p_fmt->video.i_width,
+                              p_fmt->video.i_height, config ) == -1 )
                     rtp_fmt->fmtp = NULL;
                 free(config);
             }
@@ -458,7 +523,7 @@ rtp_packetize_h264_nal( sout_stream_id_t *id,
                         int64_t i_dts, bool b_last, int64_t i_length );
 
 /* rfc5215 */
-static int rtp_packetize_vorbis( sout_stream_id_t *id, block_t *in )
+static int rtp_packetize_xiph( sout_stream_id_t *id, block_t *in )
 {
     int     i_max   = rtp_mtu (id) - 6; /* payload max in one packet */
     int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
@@ -489,8 +554,8 @@ static int rtp_packetize_vorbis( sout_stream_id_t *id, block_t *in )
             else
                 fragtype = 2;
         }
-        /* Ident:24, Fragment type:2, Vorbis Data Type:2, # of packets:4 */
-        uint32_t header = ((VORBIS_IDENT & 0xffffff) << 8) |
+        /* Ident:24, Fragment type:2, Vorbis/Theora Data Type:2, # of pkts:4 */
+        uint32_t header = ((XIPH_IDENT & 0xffffff) << 8) |
                           (fragtype << 6) | (0 << 4) | numpkts;
 
         /* rtp common header */
