@@ -343,8 +343,10 @@ static int vlclua_add_callback( lua_State *L )
     if( !pp_obj || !*pp_obj )
         return vlclua_error( L );
 
+    int i_type = var_Type( *pp_obj, psz_var );
+
     /* Check variable type, in order to avoid PANIC */
-    switch( var_Type( *pp_obj, psz_var ) )
+    switch( i_type & VLC_VAR_CLASS )
     {
         case VLC_VAR_BOOL:
         case VLC_VAR_INTEGER:
@@ -415,7 +417,7 @@ static int vlclua_add_callback( lua_State *L )
     /* Do not move this before the lua specific code (it somehow changes
      * the function in the stack to nil) */
     p_callback->i_index = i_index;
-    p_callback->i_type = var_Type( *pp_obj, psz_var );
+    p_callback->i_type = i_type;
     p_callback->L = lua_newthread( L ); /* Do we have to keep a reference to this thread somewhere to prevent garbage collection? */
 
     var_AddCallback( *pp_obj, psz_var, vlclua_callback, p_callback );
