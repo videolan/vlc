@@ -1418,7 +1418,7 @@ ifdef HAVE_MACOSX
 X264CONF =--host=$(HOST)
 X264CONF += --enable-pic
 ifdef HAVE_MACOSX64
-X264CONF +=--host=x86_64-apple-MACOSX10
+X264CONF +=--host=x86_64-apple-darwin10
 endif
 endif
 
