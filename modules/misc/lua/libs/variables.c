@@ -48,7 +48,7 @@
  *****************************************************************************/
 int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val )
 {
-    switch( i_type &= VLC_VAR_CLASS )
+    switch( i_type & VLC_VAR_CLASS )
     {
         case VLC_VAR_VOID:
             vlclua_error( L );
