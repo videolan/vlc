@@ -460,7 +460,11 @@ fribidi: fribidi-$(FRIBIDI_VERSION).tar.gz
 	patch -p0 < Patches/fribidi.patch
 	( cd $@; rm -f configure; ./bootstrap)
 
+ifdef HAVE_MACOSX
+.fribidi: fribidi .iconv-from-os
+else
 .fribidi: fribidi .iconv
+endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  && make && make install)
 	$(INSTALL_NAME)
 	touch $@
