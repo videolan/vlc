@@ -138,36 +138,39 @@ static int vlclua_tovalue( lua_State *L, int i_type, vlc_value_t *val )
 
 static int vlclua_var_get( lua_State *L )
 {
-    int i_type;
     vlc_value_t val;
     vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
     const char *psz_var = luaL_checkstring( L, 2 );
-    i_type = var_Type( *pp_obj, psz_var );
+
+    int i_type = var_Type( *pp_obj, psz_var );
     if( var_Get( *pp_obj, psz_var, &val ) != VLC_SUCCESS )
         return 0;
+
     lua_pop( L, 2 );
     return vlclua_pushvalue( L, i_type, val, true );
 }
 
 static int vlclua_var_set( lua_State *L )
 {
-    int i_type;
     vlc_value_t val;
     vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
     const char *psz_var = luaL_checkstring( L, 2 );
-    int i_ret;
-    i_type = var_Type( *pp_obj, psz_var );
+
+    int i_type = var_Type( *pp_obj, psz_var );
     vlclua_tovalue( L, i_type, &val );
-    i_ret = var_Set( *pp_obj, psz_var, val );
+
+    int i_ret = var_Set( *pp_obj, psz_var, val );
+
     lua_pop( L, 3 );
     return vlclua_push_ret( L, i_ret );
 }
 
 static int vlclua_var_create( lua_State *L )
 {
+    int i_type, i_ret;
     vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
     const char *psz_var = luaL_checkstring( L, 2 );
-    int i_type;
+
     switch( lua_type( L, 3 ) )
     {
         case LUA_TNUMBER:
@@ -186,8 +189,7 @@ static int vlclua_var_create( lua_State *L )
             return 0;
     }
 
-    int i_ret = var_Create( *pp_obj, psz_var, i_type );
-    if( i_ret != VLC_SUCCESS )
+    if( ( i_ret = var_Create( *pp_obj, psz_var, i_type ) ) != VLC_SUCCESS )
         return vlclua_push_ret( L, i_ret );
 
     // Special case for void variables
@@ -205,10 +207,14 @@ static int vlclua_var_get_list( lua_State *L )
     vlc_value_t text;
     vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
     const char *psz_var = luaL_checkstring( L, 2 );
+
     int i_ret = var_Change( *pp_obj, psz_var, VLC_VAR_GETLIST, &val, &text );
-    if( i_ret < 0 ) return vlclua_push_ret( L, i_ret );
+    if( i_ret < 0 )
+        return vlclua_push_ret( L, i_ret );
+
     vlclua_pushlist( L, val.p_list );
     vlclua_pushlist( L, text.p_list );
+
     var_FreeList( &val, &text );
     return 2;
 }
@@ -216,16 +222,13 @@ static int vlclua_var_get_list( lua_State *L )
 static int vlclua_command( lua_State *L )
 {
     vlc_object_t * p_this = vlclua_get_this( L );
-    const char *psz_name;
-    const char *psz_cmd;
-    const char *psz_arg;
     char *psz_msg;
-    int ret;
-    psz_name = luaL_checkstring( L, 1 );
-    psz_cmd = luaL_checkstring( L, 2 );
-    psz_arg = luaL_checkstring( L, 3 );
+    const char *psz_name = luaL_checkstring( L, 1 );
+    const char *psz_cmd = luaL_checkstring( L, 2 );
+    const char *psz_arg = luaL_checkstring( L, 3 );
     lua_pop( L, 3 );
-    ret = var_Command( p_this, psz_name, psz_cmd, psz_arg, &psz_msg );
+
+    int ret = var_Command( p_this, psz_name, psz_cmd, psz_arg, &psz_msg );
     if( psz_msg )
     {
         lua_pushstring( L, psz_msg );
@@ -241,11 +244,12 @@ static int vlclua_command( lua_State *L )
 static int vlclua_libvlc_command( lua_State *L )
 {
     vlc_object_t * p_this = vlclua_get_this( L );
-    const char *psz_cmd;
     vlc_value_t val_arg;
-    psz_cmd = luaL_checkstring( L, 1 );
+
+    const char *psz_cmd = luaL_checkstring( L, 1 );
     val_arg.psz_string = strdup( luaL_optstring( L, 2, "" ) );
     lua_pop( L, 2 );
+
     int i_type = var_Type( p_this->p_libvlc, psz_cmd );
     if( ! (i_type & VLC_VAR_ISCOMMAND) )
     {
