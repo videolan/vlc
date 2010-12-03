@@ -1858,26 +1858,17 @@ then
   dnl prepend -ldvdcss on OS that need it
   AS_CASE(["${SYS}"], [mingw32|darwin], [VLC_ADD_LIBS([dvdnav], [-ldvdcss])])
 
-  DVDNAV_PATH="${PATH}"
-  AC_ARG_WITH(dvdnav-config-path,
-    [  --with-dvdnav-config-path=PATH dvdnav-config path (default search in \$PATH)],
-    [ if test "${with_dvdnav_config_path}" != "no"
-      then
-        DVDNAV_PATH="${with_dvdnav_config_path}:${PATH}"
-      fi ])
-  AC_PATH_PROG(DVDNAV_CONFIG, dvdnav-config, no, ${DVDNAV_PATH})
-  if test "${DVDNAV_CONFIG}" != "no"
-  then
+  PKG_CHECK_MODULES(DVDNAV, dvdnav, [
     VLC_ADD_PLUGIN([dvdnav])
-    VLC_ADD_CFLAGS([dvdnav],[`${DVDNAV_CONFIG} --cflags`])
-    VLC_ADD_LIBS([dvdnav],[`${DVDNAV_CONFIG} --libs`])
+    VLC_ADD_CFLAGS([dvdnav],[${DVDNAV_CFLAGS}])
+    VLC_ADD_LIBS([dvdnav],[${DVDNAV_LIBS}])
     AC_CHECK_LIB(dvdnav, dvdnav_get_video_resolution,
-		AC_DEFINE(HAVE_DVDNAV_GET_VIDEO_RESOLUTION, 1, [Define if you have dvdnav_get_video_resolution.]),
-		[], [${LIBS_dvdnav}])
+      AC_DEFINE(HAVE_DVDNAV_GET_VIDEO_RESOLUTION, 1, [Define if you have dvdnav_get_video_resolution.]),
+        [], [${LIBS_dvdnav}])
     AC_CHECK_LIB(dvdnav, dvdnav_describe_title_chapters,
-		AC_DEFINE(HAVE_DVDNAV_DESCRIBE_TITLE_CHAPTERS, 1, [Define if you have dvdnav_describe_title_chapters.]),
-		[], [${LIBS_dvdnav}])
-  fi
+      AC_DEFINE(HAVE_DVDNAV_DESCRIBE_TITLE_CHAPTERS, 1, [Define if you have dvdnav_describe_title_chapters.]),
+        [], [${LIBS_dvdnav}])
+    ])
 fi
 
 dnl
