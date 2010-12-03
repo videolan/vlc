@@ -567,7 +567,6 @@ struct demux_sys_t
     int i_height;
     unsigned int i_aspect;
     float f_fps;            /* <= 0.0 mean to grab at full rate */
-    mtime_t i_video_pts;    /* only used when f_fps > 0 */
     int i_fourcc;
     uint32_t i_block_flags;
 
@@ -580,7 +579,6 @@ struct demux_sys_t
 
     /* Controls */
     char *psz_set_ctrls;
-
 
 #ifdef HAVE_LIBV4L2
     /* */
@@ -707,8 +705,6 @@ static int DemuxOpen( vlc_object_t *p_this )
  *****************************************************************************/
 static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
 {
-    p_sys->i_video_pts = -1;
-
     p_sys->i_selected_standard_id =
         i_standards_list[var_CreateGetInteger( p_obj, "v4l2-standard" )];
 
@@ -1352,15 +1348,6 @@ static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
     struct v4l2_buffer buf;
     ssize_t i_ret;
 
-    if( p_sys->f_fps >= 0.1 && p_sys->i_video_pts > 0 )
-    {
-        mtime_t i_dur = (mtime_t)((double)1000000 / (double)p_sys->f_fps);
-
-        /* Did we wait long enough ? (frame rate reduction) */
-        if( p_sys->i_video_pts + i_dur > mdate() )
-            return NULL;
-    }
-
     /* Grab Video Frame */
     switch( p_sys->io )
     {
@@ -1481,7 +1468,7 @@ static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
     }
 
     /* Timestamp */
-    p_sys->i_video_pts = p_block->i_pts = p_block->i_dts = mdate();
+    p_block->i_pts = p_block->i_dts = mdate();
     p_block->i_flags |= p_sys->i_block_flags;
 
     return p_block;
