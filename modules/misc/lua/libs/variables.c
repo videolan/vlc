@@ -223,12 +223,13 @@ static int vlclua_command( lua_State *L )
 {
     vlc_object_t * p_this = vlclua_get_this( L );
     char *psz_msg;
+
     const char *psz_name = luaL_checkstring( L, 1 );
     const char *psz_cmd = luaL_checkstring( L, 2 );
     const char *psz_arg = luaL_checkstring( L, 3 );
+    int ret = var_Command( p_this, psz_name, psz_cmd, psz_arg, &psz_msg );
     lua_pop( L, 3 );
 
-    int ret = var_Command( p_this, psz_name, psz_cmd, psz_arg, &psz_msg );
     if( psz_msg )
     {
         lua_pushstring( L, psz_msg );
