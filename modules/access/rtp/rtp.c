@@ -75,6 +75,16 @@
     "RTP packets will be discarded if they are too far behind (i.e. in the " \
     "past) by this many packets from the last received packet." )
 
+#define RTP_DYNAMIC_PT_TEXT N_("RTP payload format assumed for dynamic " \
+                               "payloads")
+#define RTP_DYNAMIC_PT_LONGTEXT N_( \
+    "This payload format will be assumed for dynamic payload types " \
+    "(between 96 and 127) if it can't be determined otherwise with " \
+    "out-of-band mappings (SDP)" )
+
+static const char *const dynamic_pt_list[] = { "theora" };
+static const char *const dynamic_pt_list_text[] = { "Theora Encoded Video" };
+
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
@@ -114,6 +124,9 @@ vlc_module_begin ()
     add_integer ("rtp-max-misorder", 100, RTP_MAX_MISORDER_TEXT,
                  RTP_MAX_MISORDER_LONGTEXT, true)
         change_integer_range (0, 32767)
+    add_string ("rtp-dynamic-pt", NULL, RTP_DYNAMIC_PT_TEXT,
+                RTP_DYNAMIC_PT_LONGTEXT, true)
+        change_string_list (dynamic_pt_list, dynamic_pt_list_text, NULL)
 
     /*add_shortcut ("sctp")*/
     add_shortcut ("dccp", "rtptcp", /* "tcp" is already taken :( */
@@ -407,19 +420,19 @@ static int Control (demux_t *demux, int i_query, va_list args)
  * Generic packet handlers
  */
 
-static void *codec_init (demux_t *demux, es_format_t *fmt)
+void *codec_init (demux_t *demux, es_format_t *fmt)
 {
     return es_out_Add (demux->out, fmt);
 }
 
-static void codec_destroy (demux_t *demux, void *data)
+void codec_destroy (demux_t *demux, void *data)
 {
     if (data)
         es_out_Del (demux->out, (es_out_id_t *)data);
 }
 
 /* Send a packet to decoder */
-static void codec_decode (demux_t *demux, void *data, block_t *block)
+void codec_decode (demux_t *demux, void *data, block_t *block)
 {
     if (data)
     {
@@ -695,6 +708,28 @@ int rtp_autodetect (demux_t *demux, rtp_session_t *session,
           pt.frequency = 90000;
           break;
         }
+        else if (ptype >= 96)
+        {
+            char *dynamic = var_InheritString(demux, "rtp-dynamic-pt");
+            if (dynamic == NULL)
+                ;
+            else if (!strcmp(dynamic, "theora"))
+            {
+                msg_Dbg (demux, "assuming Theora Encoded Video");
+                pt.init = theora_init;
+                pt.destroy = xiph_destroy;
+                pt.decode = xiph_decode;
+                pt.frequency = 90000;
+            }
+            else
+            {
+                msg_Err (demux, "invalid dynamic payload format `%s' "
+                                "specified", dynamic);
+                free(dynamic);
+                return -1;
+            }
+            free(dynamic);
+        }
         else
         {
           return -1;
@@ -706,5 +741,5 @@ int rtp_autodetect (demux_t *demux, rtp_session_t *session,
 
 /*
  * Dynamic payload type handlers
- * Hmm, none implemented yet.
+ * Hmm, none implemented yet apart from Xiph ones.
  */

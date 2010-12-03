@@ -5,7 +5,8 @@ librtp_plugin_la_SOURCES = \
 	rtp.c \
 	rtp.h \
 	input.c \
-	session.c
+	session.c \
+	xiph.c
 librtp_plugin_la_CFLAGS = $(AM_CFLAGS)
 librtp_plugin_la_LIBADD = $(AM_LIBADD)
 librtp_plugin_la_DEPENDENCIES =

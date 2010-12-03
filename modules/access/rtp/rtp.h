@@ -39,6 +39,14 @@ static inline uint8_t rtp_ptype (const block_t *block)
     return block->p_buffer[1] & 0x7F;
 }
 
+void *codec_init (demux_t *demux, es_format_t *fmt);
+void codec_destroy (demux_t *demux, void *data);
+void codec_decode (demux_t *demux, void *data, block_t *block);
+
+void *theora_init (demux_t *demux);
+void xiph_destroy (demux_t *demux, void *data);
+void xiph_decode (demux_t *demux, void *data, block_t *block);
+
 /** @section RTP session */
 rtp_session_t *rtp_session_create (demux_t *);
 void rtp_session_destroy (demux_t *, rtp_session_t *);

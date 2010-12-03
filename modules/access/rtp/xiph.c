@@ -61,6 +61,7 @@ static void *xiph_init (bool vorbis)
     return self;
 }
 
+#if 0
 /* PT=dynamic
  * vorbis: Xiph Vorbis audio (RFC 5215)
  */
@@ -69,17 +70,18 @@ static void *vorbis_init (demux_t *demux)
     (void)demux;
     return xiph_init (true);
 }
+#endif
 
 /* PT=dynamic
  * vorbis: Xiph Theora video
  */
-static void *theora_init (demux_t *demux)
+void *theora_init (demux_t *demux)
 {
     (void)demux;
     return xiph_init (false);
 }
 
-static void xiph_destroy (demux_t *demux, void *data)
+void xiph_destroy (demux_t *demux, void *data)
 {
     rtp_xiph_t *self = data;
 
@@ -145,7 +147,7 @@ static ssize_t xiph_header (void **pextra, const uint8_t *buf, size_t len)
 }
 
 
-static void xiph_decode (demux_t *demux, void *data, block_t *block)
+void xiph_decode (demux_t *demux, void *data, block_t *block)
 {
     rtp_xiph_t *self = data;
 
@@ -240,7 +242,12 @@ static void xiph_decode (demux_t *demux, void *data, block_t *block)
             case 0: /* Raw payload */
             {
                 if (self->ident != ident)
-                    break; /* Ignore raw without configuration */
+                {
+                    msg_Warn (demux, self->vorbis ?
+                        "ignoring raw Vorbis payload without configuration" :
+                        "ignoring raw Theora payload without configuration");
+                    break;
+                }
                 block_t *raw = block_Alloc (len);
                 memcpy (raw->p_buffer, block->p_buffer, len);
                 raw->i_pts = block->i_pts; /* FIXME: what about pkts > 1 */
