@@ -38,6 +38,7 @@
 #include <vlc_charset.h>
 #include <vlc_fs.h>
 #include <vlc_url.h>
+#include <vlc_vout.h>
 
 #include <vlc_dialog.h>
 
@@ -129,7 +130,7 @@ struct demux_sys_t
     input_thread_t *p_input;
 
     /* event */
-    vlc_object_t *p_vout;
+    vout_thread_t *p_vout;
 
     /* palette for menus */
     uint32_t clut[16];
@@ -1425,22 +1426,18 @@ static int EventIntf( vlc_object_t *p_input, char const *psz_var,
 
     if (val.i_int == INPUT_EVENT_VOUT)
     {
-        vlc_object_t *p_vout;
-
-        p_vout = p_sys->p_vout;
-        if( p_vout != NULL )
+        if( p_sys->p_vout != NULL )
         {
-            var_DelCallback( p_vout, "mouse-moved", EventMouse, p_demux );
-            var_DelCallback( p_vout, "mouse-clicked", EventMouse, p_demux );
-            vlc_object_release( p_vout );
+            var_DelCallback( p_sys->p_vout, "mouse-moved", EventMouse, p_demux );
+            var_DelCallback( p_sys->p_vout, "mouse-clicked", EventMouse, p_demux );
+            vlc_object_release( p_sys->p_vout );
         }
 
-        p_vout = (vlc_object_t *)input_GetVout( (input_thread_t *)p_input );
-        p_sys->p_vout = p_vout;
-        if( p_vout != NULL )
+        p_sys->p_vout = input_GetVout( (input_thread_t *)p_input );
+        if( p_sys->p_vout != NULL )
         {
-            var_AddCallback( p_vout, "mouse-moved", EventMouse, p_demux );
-            var_AddCallback( p_vout, "mouse-clicked", EventMouse, p_demux );
+            var_AddCallback( p_sys->p_vout, "mouse-moved", EventMouse, p_demux );
+            var_AddCallback( p_sys->p_vout, "mouse-clicked", EventMouse, p_demux );
         }
     }
     (void) psz_var; (void) oldval;
