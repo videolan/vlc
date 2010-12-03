@@ -2292,6 +2292,10 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         es_fmt.video.i_sar_num = p_sys->i_aspect    * es_fmt.video.i_height;
         es_fmt.video.i_sar_den = VOUT_ASPECT_FACTOR * es_fmt.video.i_width;
 
+        /* Framerate */
+        es_fmt.video.i_frame_rate = p_sys->f_fps * INT64_C(1000000);
+        es_fmt.video.i_frame_rate_base = INT64_C(1000000);
+
         demux_t *p_demux = (demux_t *) p_obj;
         msg_Dbg( p_demux, "added new video es %4.4s %dx%d",
             (char*)&es_fmt.i_codec, es_fmt.video.i_width, es_fmt.video.i_height );
