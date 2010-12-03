@@ -59,6 +59,9 @@ void rtp_packetize_common (sout_stream_id_t *id, block_t *out,
 void rtp_packetize_send (sout_stream_id_t *id, block_t *out);
 size_t rtp_mtu (const sout_stream_id_t *id);
 
+int rtp_packetize_xiph_config( sout_stream_id_t *id, const char *fmtp,
+                               int64_t i_pts );
+
 /* RTCP */
 typedef struct rtcp_sender_t rtcp_sender_t;
 rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd, int proto,

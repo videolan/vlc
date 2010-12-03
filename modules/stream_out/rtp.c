@@ -1261,6 +1261,15 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     while( p_buffer != NULL )
     {
         p_next = p_buffer->p_next;
+
+        /* Send a Vorbis/Theora Packed Configuration packet (RFC 5215 §3.1)
+         * as the first packet of the stream */
+        if (id->i_sequence == id->i_seq_sent_next
+            && (!strcmp(id->rtp_fmt.ptname, "vorbis")
+                || !strcmp(id->rtp_fmt.ptname, "theora")))
+                rtp_packetize_xiph_config(id, id->rtp_fmt.fmtp,
+                                          p_buffer->i_pts);
+
         if( id->rtp_fmt.pf_packetize( id, p_buffer ) )
             break;
 
