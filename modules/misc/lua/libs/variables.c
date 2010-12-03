@@ -179,6 +179,9 @@ static int vlclua_var_create( lua_State *L )
         case LUA_TSTRING:
             i_type = VLC_VAR_STRING;
             break;
+        case LUA_TNIL:
+            i_type = VLC_VAR_VOID;
+            break;
         default:
             return 0;
     }
@@ -186,6 +189,11 @@ static int vlclua_var_create( lua_State *L )
     int i_ret = var_Create( *pp_obj, psz_var, i_type );
     if( i_ret != VLC_SUCCESS )
         return vlclua_push_ret( L, i_ret );
+
+    // Special case for void variables
+    if( i_type == VLC_VAR_VOID )
+        return 0;
+
     vlc_value_t val;
     vlclua_tovalue( L, i_type, &val );
     return vlclua_push_ret( L, var_Set( *pp_obj, psz_var, val ) );

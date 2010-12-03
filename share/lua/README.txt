@@ -388,7 +388,8 @@ var.get_list( object, name ): Get the object's variable "name"'s value list.
   1st return value is the value list, 2nd return value is the text list.
 var.set( object, name, value ): Set the object's variable "name" to "value".
 var.create( object, name, value ): Create and set the object's variable "name"
-  to "value". Created vars can be of type float, string or bool.
+  to "value". Created vars can be of type float, string, bool or void.
+  For a void variable the value has to be 'nil'.
 
 var.add_callback( object, name, function, data ): Add a callback to the
   object's "name" variable. Callback functions take 4 arguments: the
