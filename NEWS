@@ -68,6 +68,7 @@ Stream output:
     access=livehttp{index=public_html/iphonestream.m3u8,
     index-url=http://url-to-iphonestreamfile-###.ts},mux=ts{use-key-frames},
     dst=public_html/iphonestreamfile-###.ts}"
+ * RTP: support for Vorbis and Theora
 
 Services Discovery:
  * Search API to be able to query distant search APIs from the interfaces
