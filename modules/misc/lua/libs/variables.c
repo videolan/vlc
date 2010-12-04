@@ -248,19 +248,19 @@ static int vlclua_libvlc_command( lua_State *L )
     vlc_value_t val_arg;
 
     const char *psz_cmd = luaL_checkstring( L, 1 );
-    val_arg.psz_string = strdup( luaL_optstring( L, 2, "" ) );
-    lua_pop( L, 2 );
+    val_arg.psz_string = (char*)luaL_optstring( L, 2, "" );
 
     int i_type = var_Type( p_this->p_libvlc, psz_cmd );
     if( ! (i_type & VLC_VAR_ISCOMMAND) )
     {
-        free( val_arg.psz_string );
         return luaL_error( L, "libvlc's \"%s\" is not a command",
                            psz_cmd );
     }
 
-    return vlclua_push_ret( L,
-                            var_Set( p_this->p_libvlc, psz_cmd, val_arg ) );
+    int i_ret = var_Set( p_this->p_libvlc, psz_cmd, val_arg );
+    lua_pop( L, 2 );
+
+    return vlclua_push_ret( L, i_ret );
 }
 
 int __vlclua_var_toggle_or_set( lua_State *L, vlc_object_t *p_obj,
