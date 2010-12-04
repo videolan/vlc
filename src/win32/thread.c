@@ -52,6 +52,7 @@ struct vlc_thread
     HANDLE         cancel_event;
 #endif
 
+    bool           detached;
     bool           killable;
     bool           killed;
     vlc_cleanup_t *cleaners;
@@ -152,7 +153,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
         case DLL_PROCESS_ATTACH:
             vlc_mutex_init (&super_mutex);
             vlc_cond_init (&super_variable);
-            vlc_threadvar_create (&thread_key, free);
+            vlc_threadvar_create (&thread_key, NULL);
             break;
 
         case DLL_PROCESS_DETACH:
@@ -551,6 +552,8 @@ static unsigned __stdcall vlc_entry (void *p)
     th->killable = true;
     th->entry (th->data);
     vlc_threadvar_cleanup ();
+    if (th->detached)
+        free (th);
     return 0;
 }
 
@@ -562,6 +565,7 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         return ENOMEM;
     th->entry = entry;
     th->data = data;
+    th->detached = p_handle == NULL;
     th->killable = false; /* not until vlc_entry() ! */
     th->killed = false;
     th->cleaners = NULL;
@@ -582,6 +586,7 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
     }
 
 #else
+    /* FIXME: cancel_event is useless and leaked in detached threads */
     th->cancel_event = CreateEvent (NULL, FALSE, FALSE, NULL);
     if (th->cancel_event == NULL)
     {
@@ -602,11 +607,15 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
 
 #endif
     th->id = hThread;
-    *p_handle = th;
 
     ResumeThread (hThread);
     if (priority)
         SetThreadPriority (hThread, priority);
+
+    if (p_handle != NULL)
+        *p_handle = th;
+    else
+        CloseHandle (hThread);
 
     return 0;
 }
@@ -623,18 +632,12 @@ void vlc_join (vlc_thread_t th, void **result)
 #ifdef UNDER_CE
     CloseHandle (th->cancel_event);
 #endif
+    free (th);
 }
 
 int vlc_clone_detach (void *(*entry) (void *), void *data, int priority)
 {
-    vlc_thread_t th;
-    int ret = vlc_clone (&th, entry, data, priority);
-    if (ret)
-        return ret;
-
-    /* FIXME: handle->cancel_event leak UNDER_CE */
-    CloseHandle (th->id);
-    return 0;
+    return vlc_clone (NULL, entry, data, priority);
 }
 
 /*** Thread cancellation ***/
@@ -688,6 +691,9 @@ void vlc_testcancel (void)
 
     if (th->killable && th->killed)
     {
+        /* Detached threads cannot be cancelled */
+        assert (!th->detached);
+
         for (vlc_cleanup_t *p = th->cleaners; p != NULL; p = p->next)
              p->proc (p->data);
         vlc_threadvar_cleanup ();
