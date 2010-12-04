@@ -1540,7 +1540,7 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
     if( p_media->i_length > 0 )
     {
         lldiv_t d = lldiv( p_media->i_length / 1000, 1000 );
-        sdp_AddAttribute( &psz_sdp, "range"," npt=0-%lld.%03u", d.quot,
+        sdp_AddAttribute( &psz_sdp, "range","npt=0-%lld.%03u", d.quot,
                           (unsigned)d.rem );
     }
 
