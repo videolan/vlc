@@ -37,10 +37,6 @@
 
 #include "xcb_vlc.h"
 
-#define SHM_TEXT N_("Use shared memory")
-#define SHM_LONGTEXT N_( \
-    "Use shared memory to communicate between VLC and the X server.")
-
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
@@ -56,7 +52,7 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
     add_shortcut ("xcb-x11", "x11", "xid")
 
-    add_bool ("x11-shm", true, SHM_TEXT, SHM_LONGTEXT, true)
+    add_obsolete_bool ("x11-shm") /* obsoleted since 1.2.0 */
 vlc_module_end ()
 
 /* It must be large enough to absorb the server display jitter but it is
@@ -310,7 +306,7 @@ static int Open (vlc_object_t *obj)
 
     p_sys->visible = false;
 
-    CheckSHM (obj, p_sys->conn, &p_sys->shm);
+    p_sys->shm = CheckSHM (obj, p_sys->conn);
 
     /* */
     vout_display_info_t info = vd->info;

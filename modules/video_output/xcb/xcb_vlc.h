@@ -48,7 +48,7 @@ struct vout_window_t *GetWindow (vout_display_t *obj,
                                  uint8_t *restrict pdepth);
 int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
                    unsigned *restrict width, unsigned *restrict height);
-void CheckSHM (vlc_object_t *obj, xcb_connection_t *conn, bool *restrict pshm);
+bool CheckSHM (vlc_object_t *obj, xcb_connection_t *conn);
 xcb_cursor_t CreateBlankCursor (xcb_connection_t *, const xcb_screen_t *);
 void RegisterMouseEvents (vlc_object_t *, xcb_connection_t *, xcb_window_t);
 

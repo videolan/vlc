@@ -49,10 +49,6 @@
     "XVideo image format id to use. By default, VLC will " \
     "try to use the best match for the video being played.")
 
-#define SHM_TEXT N_("Use shared memory")
-#define SHM_LONGTEXT N_( \
-    "Use shared memory to communicate between VLC and the X server.")
-
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
@@ -71,8 +67,7 @@ vlc_module_begin ()
                  ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true)
     add_integer ("xvideo-format-id", 0,
                  FORMAT_TEXT, FORMAT_LONGTEXT, true)
-    add_bool ("x11-shm", true, SHM_TEXT, SHM_LONGTEXT, true)
-        add_deprecated_alias ("xvideo-shm")
+    add_obsolete_bool ("xvideo-shm") /* removed in 1.2.0 */
     add_shortcut ("xcb-xv", "xv", "xvideo", "xid")
 vlc_module_end ()
 
@@ -542,7 +537,7 @@ static int Open (vlc_object_t *obj)
     /* Create cursor */
     p_sys->cursor = CreateBlankCursor (conn, screen);
 
-    CheckSHM (obj, conn, &p_sys->shm);
+    p_sys->shm = CheckSHM (obj, conn);
 
     /* */
     vout_display_info_t info = vd->info;

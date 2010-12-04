@@ -160,31 +160,26 @@ error:
 }
 
 /** Check MIT-SHM shared memory support */
-void CheckSHM (vlc_object_t *obj, xcb_connection_t *conn, bool *restrict pshm)
+bool CheckSHM (vlc_object_t *obj, xcb_connection_t *conn)
 {
 #ifdef HAVE_SYS_SHM_H
-    bool shm = var_InheritBool (obj, "x11-shm") > 0;
-    if (shm)
-    {
-        xcb_shm_query_version_cookie_t ck;
-        xcb_shm_query_version_reply_t *r;
+    xcb_shm_query_version_cookie_t ck;
+    xcb_shm_query_version_reply_t *r;
 
-        ck = xcb_shm_query_version (conn);
-        r = xcb_shm_query_version_reply (conn, ck, NULL);
-        if (!r)
-        {
-            msg_Err (obj, "shared memory (MIT-SHM) not available");
-            msg_Warn (obj, "display will be slow");
-            shm = false;
-        }
+    ck = xcb_shm_query_version (conn);
+    r = xcb_shm_query_version_reply (conn, ck, NULL);
+    if (r != NULL)
+    {
         free (r);
+        return true;
     }
-    *pshm = shm;
+    msg_Err (obj, "shared memory (MIT-SHM) not available");
+    msg_Warn (obj, "display will be slow");
 #else
     msg_Warn (obj, "shared memory (MIT-SHM) not implemented");
     (void) conn;
-    *pshm = false;
 #endif
+    return false;
 }
 
 /**
