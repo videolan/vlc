@@ -85,11 +85,11 @@ public slots:
     void AudioUp();
     void AudioDown();
     void play();
+    void record();
 protected slots:
     void fullscreen();
     void snapshot();
     void playlist();
-    void record();
     void frame();
 
     virtual void doAction( int );

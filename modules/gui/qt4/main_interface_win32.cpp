@@ -203,6 +203,9 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
                 case APPCOMMAND_MEDIA_STOP:
                     THEMIM->stop();
                     break;
+                case APPCOMMAND_MEDIA_RECORD:
+                    THEAM->record();
+                    break;
                 case APPCOMMAND_VOLUME_DOWN:
                     THEAM->AudioDown();
                     break;
