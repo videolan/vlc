@@ -289,9 +289,6 @@ static int CreateFilter( vlc_object_t *p_this )
     vlc_value_t val;
     int i_command;
 
-    /* The mosaic thread is more important than the decoder threads */
-    vlc_thread_set_priority( p_this, VLC_THREAD_PRIORITY_OUTPUT );
-
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_sys == NULL )
