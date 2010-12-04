@@ -550,7 +550,7 @@ static unsigned __stdcall vlc_entry (void *p)
 
     vlc_threadvar_set (thread_key, th);
     th->killable = true;
-    th->entry (th->data);
+    th->data = th->entry (th->data);
     vlc_threadvar_cleanup ();
     if (th->detached)
         free (th);
@@ -628,10 +628,11 @@ void vlc_join (vlc_thread_t th, void **result)
                                                         == WAIT_IO_COMPLETION);
 
     CloseHandle (th->id);
-    assert (result == NULL); /* <- FIXME if ever needed */
 #ifdef UNDER_CE
     CloseHandle (th->cancel_event);
 #endif
+    if (result != NULL)
+        *result = th->data;
     free (th);
 }
 
@@ -693,6 +694,8 @@ void vlc_testcancel (void)
     {
         /* Detached threads cannot be cancelled */
         assert (!th->detached);
+
+        th->data = NULL; /* TODO: special value? */
 
         for (vlc_cleanup_t *p = th->cleaners; p != NULL; p = p->next)
              p->proc (p->data);
