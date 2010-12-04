@@ -170,56 +170,7 @@ void vlc_thread_join( vlc_object_t *p_this )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-#if 0 && defined( WIN32 ) && !defined( UNDER_CE )
-    HANDLE hThread;
-    FILETIME create_ft, exit_ft, kernel_ft, user_ft;
-    int64_t real_time, kernel_time, user_time;
-
-    if( ! DuplicateHandle(GetCurrentProcess(),
-            p_priv->thread_id,
-            GetCurrentProcess(),
-            &hThread,
-            0,
-            FALSE,
-            DUPLICATE_SAME_ACCESS) )
-    {
-        p_priv->b_thread = false;
-        return; /* We have a problem! */
-    }
-#endif
-
     vlc_join( p_priv->thread_id, NULL );
-
-#if 0 && defined( WIN32 ) && !defined( UNDER_CE )
-    /* FIXME: this could work on WinCE too... except that it seems always to
-     * return 0 for exit_ft and kernel_ft */
-    if( GetThreadTimes( hThread, &create_ft, &exit_ft, &kernel_ft, &user_ft ) )
-    {
-        real_time =
-          ((((int64_t)exit_ft.dwHighDateTime)<<32)| exit_ft.dwLowDateTime) -
-          ((((int64_t)create_ft.dwHighDateTime)<<32)| create_ft.dwLowDateTime);
-        real_time /= 10;
-
-        kernel_time =
-          ((((int64_t)kernel_ft.dwHighDateTime)<<32)|
-           kernel_ft.dwLowDateTime) / 10;
-
-        user_time =
-          ((((int64_t)user_ft.dwHighDateTime)<<32)|
-           user_ft.dwLowDateTime) / 10;
-
-        msg_Dbg( p_this, "thread times: "
-                 "real %"PRId64"m%fs, kernel %"PRId64"m%fs, user %"PRId64"m%fs",
-                 real_time/60/1000000,
-                 (double)((real_time%(60*1000000))/1000000.0),
-                 kernel_time/60/1000000,
-                 (double)((kernel_time%(60*1000000))/1000000.0),
-                 user_time/60/1000000,
-                 (double)((user_time%(60*1000000))/1000000.0) );
-    }
-    CloseHandle( hThread );
-#endif
-
     p_priv->b_thread = false;
 }
 
