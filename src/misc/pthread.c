@@ -717,8 +717,7 @@ void vlc_join (vlc_thread_t handle, void **result)
  * Creates and starts new detached thread.
  * A detached thread cannot be joined. Its resources will be automatically
  * released whenever the thread exits (in particular, its call stack will be
- * reclaimed). Nevertheless, a detached thread may
- * be cancelled; this can expedite its termination.
+ * reclaimed).
  *
  * Detached thread are particularly useful when some work needs to be done
  * asynchronously, that is likely to be completed much earlier than the thread
@@ -731,24 +730,19 @@ void vlc_join (vlc_thread_t handle, void **result)
  * thread. In practice, LibVLC will wait for detached threads to exit before
  * it unloads the plugins.
  *
- * @param th [OUT] pointer to hold the thread handle, or NULL
  * @param entry entry point for the thread
  * @param data data parameter given to the entry point
  * @param priority thread priority value
  * @return 0 on success, a standard error code on error.
  */
-int vlc_clone_detach (vlc_thread_t *th, void *(*entry) (void *), void *data,
-                      int priority)
+int vlc_clone_detach (void *(*entry) (void *), void *data, int priority)
 {
-    vlc_thread_t dummy;
+    vlc_thread_t th;
     pthread_attr_t attr;
-
-    if (th == NULL)
-        th = &dummy;
 
     pthread_attr_init (&attr);
     pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED);
-    return vlc_clone_attr (th, &attr, entry, data, priority);
+    return vlc_clone_attr (&th, &attr, entry, data, priority);
 }
 
 /**
