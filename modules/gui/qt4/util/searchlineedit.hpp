@@ -27,9 +27,8 @@
 #ifndef _SEARCHLINEEDIT_H_
 #define _SEARCHLINEEDIT_H_
 
+#import "../qt4.hpp"
 #include <QLineEdit>
-
-#include <qt4.hpp>
 
 #if HAS_QT47
 class ClickLineEdit : public QLineEdit

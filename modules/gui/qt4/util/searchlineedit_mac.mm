@@ -29,11 +29,11 @@
 **
 ****************************************************************************/
 
-#include "util/searchlineedit.hpp"
+#include "searchlineedit.hpp"
 
 #ifdef Q_WS_MAC
 
-#include <Carbon/Carbon.h>
+#include <Cocoa/Cocoa.h>
 
 //![0]
 SearchLineEdit::SearchLineEdit(QWidget *parent)
