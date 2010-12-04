@@ -706,7 +706,7 @@
                     inNode: (playlist_item_t *)p_node
                     checkItemExistence:(BOOL)b_check
 {
-    [self isItem:p_item inNode:p_node checkItemExistence:b_check locked:NO];
+    return [self isItem:p_item inNode:p_node checkItemExistence:b_check locked:NO];
 }
 
 /* This method is useful for instance to remove the selected children of an
