@@ -522,7 +522,7 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
     (void) p_libvlc;
 }
 
-static void vlc_thread_cleanup (vlc_thread_t *th)
+static void vlc_thread_cleanup (struct vlc_thread *th)
 {
     vlc_threadvar_t key;
 
@@ -559,7 +559,7 @@ static unsigned __stdcall vlc_entry (void *p)
     vlc_threadvar_set (thread_key, th);
     th->killable = true;
     th->data = th->entry (th->data);
-    vlc_thread_exit (th);
+    vlc_thread_cleanup (th);
     return 0;
 }
 
