@@ -1475,8 +1475,6 @@ static const char *const ppsz_albumart_descriptions[] =
 
 #define RECORD_KEY_TEXT N_("Record")
 #define RECORD_KEY_LONGTEXT N_("Record access filter start/stop.")
-#define DUMP_KEY_TEXT N_("Dump")
-#define DUMP_KEY_LONGTEXT N_("Media dump access filter trigger.")
 
 #define LOOP_KEY_TEXT N_("Normal/Repeat/Loop")
 #define LOOP_KEY_LONGTEXT N_("Toggle Normal/Repeat/Loop playlist modes")
@@ -2360,7 +2358,6 @@ vlc_module_begin ()
 #   define KEY_PLAY_BOOKMARK9     KEY_UNSET
 #   define KEY_PLAY_BOOKMARK10    KEY_UNSET
 #   define KEY_RECORD             KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'r'
-#   define KEY_DUMP               KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'d'
 #   define KEY_WALLPAPER          KEY_MODIFIER_COMMAND|'w'
 
 #   define KEY_MENU_ON            KEY_MODIFIER_ALT|'m'
@@ -2444,7 +2441,6 @@ vlc_module_begin ()
 #   define KEY_AUDIODEVICE_CYCLE  KEY_MODIFIER_SHIFT|'a'
 
 #   define KEY_RECORD             KEY_MODIFIER_SHIFT|'r'
-#   define KEY_DUMP               KEY_MODIFIER_SHIFT|'d'
 #   define KEY_WALLPAPER          'w'
 
 /* Cropping */
@@ -2609,8 +2605,6 @@ vlc_module_begin ()
         SNAP_KEY_TEXT, SNAP_KEY_LONGTEXT, true )
     add_key( "key-record", KEY_RECORD,
              RECORD_KEY_TEXT, RECORD_KEY_LONGTEXT, true )
-    add_key( "key-dump", KEY_DUMP,
-             DUMP_KEY_TEXT, DUMP_KEY_LONGTEXT, true )
     add_key( "key-zoom", KEY_ZOOM,
              ZOOM_KEY_TEXT, ZOOM_KEY_LONGTEXT, true )
     add_key( "key-unzoom", KEY_UNZOOM,
@@ -2835,7 +2829,6 @@ const struct action libvlc_actions[] =
     { "key-decr-scalefactor", ACTIONID_SCALE_DOWN, },
     { "key-deinterlace", ACTIONID_DEINTERLACE, },
     { "key-disc-menu", ACTIONID_DISC_MENU, },
-    { "key-dump", ACTIONID_DUMP, },
     { "key-faster", ACTIONID_FASTER, },
     { "key-frame-next", ACTIONID_FRAME_NEXT, },
     { "key-incr-scalefactor", ACTIONID_SCALE_UP, },
