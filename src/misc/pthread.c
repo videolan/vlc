@@ -717,12 +717,18 @@ void vlc_join (vlc_thread_t handle, void **result)
  * Creates and starts new detached thread.
  * A detached thread cannot be joined. Its resources will be automatically
  * released whenever the thread exits (in particular, its call stack will be
- * reclaimed). Nevertheless, a detached thread may
- * be cancelled; this can expedite its termination.
+ * reclaimed).
  *
  * Detached thread are particularly useful when some work needs to be done
  * asynchronously, that is likely to be completed much earlier than the thread
  * can practically be joined. In this case, thread detach can spare memory.
+ *
+ * A detached thread may be cancelled, so as to expedite its termination.
+ * Be extremely careful if you do this: while a normal joinable thread can
+ * safely be cancelled after it has already exited, cancelling an already
+ * exited detached thread is undefined: The thread handle would is destroyed
+ * immediately when the detached thread exits. So you need to ensure that the
+ * detached thread is still running before cancellation is attempted.
  *
  * @warning Care must be taken that any resources used by the detached thread
  * remains valid until the thread completes.
