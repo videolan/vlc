@@ -25,15 +25,16 @@
 #define _VLC_MOUSE_H 1
 
 /**
- * Mouse button
+ * Mouse buttons
  */
 enum
 {
-    MOUSE_BUTTON_LEFT,
+    MOUSE_BUTTON_LEFT=0,
     MOUSE_BUTTON_CENTER,
     MOUSE_BUTTON_RIGHT,
     MOUSE_BUTTON_WHEEL_UP,
     MOUSE_BUTTON_WHEEL_DOWN,
+    MOUSE_BUTTON_MAX
 };
 
 /**

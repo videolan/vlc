@@ -1627,16 +1627,7 @@ void vout_SendDisplayEventMouse(vout_thread_t *vout, const vlc_mouse_t *m)
         vout_SendEventMouseMoved(vout, m->i_x, m->i_y);
     }
     if (vlc_mouse_HasButton(&vout->p->mouse, m)) {
-        static const int buttons[] = {
-            MOUSE_BUTTON_LEFT,
-            MOUSE_BUTTON_CENTER,
-            MOUSE_BUTTON_RIGHT,
-            MOUSE_BUTTON_WHEEL_UP,
-            MOUSE_BUTTON_WHEEL_DOWN,
-            -1
-        };
-        for (int i = 0; buttons[i] >= 0; i++) {
-            const int button = buttons[i];
+        for (unsigned button = 0; button < MOUSE_BUTTON_MAX; button++) {
             if (vlc_mouse_HasPressed(&vout->p->mouse, m, button))
                 vout_SendEventMousePressed(vout, button);
             else if (vlc_mouse_HasReleased(&vout->p->mouse, m, button))
