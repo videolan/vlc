@@ -3566,7 +3566,7 @@ fi
 dnl
 dnl  Pulseaudio module
 dnl
-PKG_ENABLE_MODULES_VLC([PULSE], [], [libpulse >= 0.9.22], [Pulseaudio support], [auto])
+PKG_ENABLE_MODULES_VLC([PULSE], [], [libpulse >= 0.9.22], [PulseAudio support], [auto])
 
 dnl
 dnl  Portaudio module
