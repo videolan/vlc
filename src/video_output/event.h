@@ -56,6 +56,7 @@ static inline void vout_SendEventMouseMoved(vout_thread_t *vout, int x, int y)
 }
 static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
 {
+    int key;
     var_OrInteger(vout, "mouse-button-down", 1 << button);
 
     switch (button)
@@ -67,21 +68,20 @@ static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
         var_GetCoords(vout, "mouse-moved", &x, &y);
         var_SetCoords(vout, "mouse-clicked", x, y);
         var_SetBool(vout->p_libvlc, "intf-popupmenu", false);
-        break;
+        return;
     }
     case MOUSE_BUTTON_CENTER:
         var_ToggleBool(vout->p_libvlc, "intf-show");
-        break;
+        return;
     case MOUSE_BUTTON_RIGHT:
         var_SetBool(vout->p_libvlc, "intf-popupmenu", true);
-        break;
-    case MOUSE_BUTTON_WHEEL_UP:
-        vout_SendEventKey(vout, KEY_MOUSEWHEELUP);
-        break;
-    case MOUSE_BUTTON_WHEEL_DOWN:
-        vout_SendEventKey(vout, KEY_MOUSEWHEELDOWN);
-        break;
+        return;
+    case MOUSE_BUTTON_WHEEL_UP:    key = KEY_MOUSEWHEELUP;    break;
+    case MOUSE_BUTTON_WHEEL_DOWN:  key = KEY_MOUSEWHEELDOWN;  break;
+    case MOUSE_BUTTON_WHEEL_LEFT:  key = KEY_MOUSEWHEELLEFT;  break;
+    case MOUSE_BUTTON_WHEEL_RIGHT: key = KEY_MOUSEWHEELRIGHT; break;
     }
+    vout_SendEventKey(vout, key);
 }
 static inline void vout_SendEventMouseReleased(vout_thread_t *vout, int button)
 {
