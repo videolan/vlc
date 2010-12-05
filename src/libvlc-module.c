@@ -1450,11 +1450,6 @@ static const char *const ppsz_albumart_descriptions[] =
 #define BOOKMARK_LONGTEXT N_( \
       "This allows you to define playlist bookmarks.")
 
-#define HISTORY_BACK_TEXT N_("Go back in browsing history")
-#define HISTORY_BACK_LONGTEXT N_("Select the key to go back (to the previous media item) in the browsing history.")
-#define HISTORY_FORWARD_TEXT N_("Go forward in browsing history")
-#define HISTORY_FORWARD_LONGTEXT N_("Select the key to go forward (to the next media item) in the browsing history.")
-
 #define AUDIO_TRACK_KEY_TEXT N_("Cycle audio track")
 #define AUDIO_TRACK_KEY_LONGTEXT N_("Cycle through the available audio tracks(languages).")
 #define SUBTITLE_TRACK_KEY_TEXT N_("Cycle subtitle track")
@@ -2364,8 +2359,6 @@ vlc_module_begin ()
 #   define KEY_PLAY_BOOKMARK8     KEY_F8
 #   define KEY_PLAY_BOOKMARK9     KEY_UNSET
 #   define KEY_PLAY_BOOKMARK10    KEY_UNSET
-#   define KEY_HISTORY_BACK       KEY_MODIFIER_COMMAND|'['
-#   define KEY_HISTORY_FORWARD    KEY_MODIFIER_COMMAND|']'
 #   define KEY_RECORD             KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'r'
 #   define KEY_DUMP               KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'d'
 #   define KEY_WALLPAPER          KEY_MODIFIER_COMMAND|'w'
@@ -2450,8 +2443,6 @@ vlc_module_begin ()
 
 #   define KEY_AUDIODEVICE_CYCLE  KEY_MODIFIER_SHIFT|'a'
 
-#   define KEY_HISTORY_BACK       KEY_MODIFIER_SHIFT|'g'
-#   define KEY_HISTORY_FORWARD    KEY_MODIFIER_SHIFT|'h'
 #   define KEY_RECORD             KEY_MODIFIER_SHIFT|'r'
 #   define KEY_DUMP               KEY_MODIFIER_SHIFT|'d'
 #   define KEY_WALLPAPER          'w'
@@ -2616,10 +2607,6 @@ vlc_module_begin ()
              INTF_HIDE_KEY_TEXT, INTF_HIDE_KEY_LONGTEXT, true )
     add_key( "key-snapshot", KEY_SNAPSHOT,
         SNAP_KEY_TEXT, SNAP_KEY_LONGTEXT, true )
-    add_key( "key-history-back", KEY_HISTORY_BACK, HISTORY_BACK_TEXT,
-             HISTORY_BACK_LONGTEXT, true )
-    add_key( "key-history-forward", KEY_HISTORY_FORWARD,
-             HISTORY_FORWARD_TEXT, HISTORY_FORWARD_LONGTEXT, true )
     add_key( "key-record", KEY_RECORD,
              RECORD_KEY_TEXT, RECORD_KEY_LONGTEXT, true )
     add_key( "key-dump", KEY_DUMP,
@@ -2851,8 +2838,6 @@ const struct action libvlc_actions[] =
     { "key-dump", ACTIONID_DUMP, },
     { "key-faster", ACTIONID_FASTER, },
     { "key-frame-next", ACTIONID_FRAME_NEXT, },
-    { "key-history-back", ACTIONID_HISTORY_BACK, },
-    { "key-history-forward", ACTIONID_HISTORY_FORWARD, },
     { "key-incr-scalefactor", ACTIONID_SCALE_UP, },
     { "key-intf-hide", ACTIONID_INTF_HIDE, },
     { "key-intf-show", ACTIONID_INTF_SHOW, },
