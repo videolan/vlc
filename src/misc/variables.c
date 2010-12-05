@@ -1063,9 +1063,6 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
         break;
 
     case VLC_VAR_STRING:
-    case VLC_VAR_MODULE:
-    case VLC_VAR_FILE:
-    case VLC_VAR_DIRECTORY:
         val.psz_string = psz_value;
         break;
 

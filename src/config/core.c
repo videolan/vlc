@@ -109,24 +109,12 @@ int config_GetType( vlc_object_t *p_this, const char *psz_name )
     case CONFIG_ITEM_MODULE_CAT:
     case CONFIG_ITEM_MODULE_LIST:
     case CONFIG_ITEM_MODULE_LIST_CAT:
-        i_type = VLC_VAR_MODULE;
-        break;
-
     case CONFIG_ITEM_STRING:
-        i_type = VLC_VAR_STRING;
-        break;
-
     case CONFIG_ITEM_PASSWORD:
-        i_type = VLC_VAR_STRING;
-        break;
-
     case CONFIG_ITEM_LOADFILE:
     case CONFIG_ITEM_SAVEFILE:
-        i_type = VLC_VAR_FILE;
-        break;
-
     case CONFIG_ITEM_DIRECTORY:
-        i_type = VLC_VAR_DIRECTORY;
+        i_type = VLC_VAR_STRING;
         break;
 
     default:

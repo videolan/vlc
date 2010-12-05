@@ -50,10 +50,7 @@ static int vlclua_config_get( lua_State *L )
     psz_name = luaL_checkstring( L, 1 );
     switch( config_GetType( p_this, psz_name ) )
     {
-        case VLC_VAR_MODULE:
         case VLC_VAR_STRING:
-        case VLC_VAR_FILE:
-        case VLC_VAR_DIRECTORY:
         {
             char *psz = config_GetPsz( p_this, psz_name );
             lua_pushstring( L, psz );
@@ -87,10 +84,7 @@ static int vlclua_config_set( lua_State *L )
     psz_name = luaL_checkstring( L, 1 );
     switch( config_GetType( p_this, psz_name ) )
     {
-        case VLC_VAR_MODULE:
         case VLC_VAR_STRING:
-        case VLC_VAR_FILE:
-        case VLC_VAR_DIRECTORY:
             config_PutPsz( p_this, psz_name, luaL_checkstring( L, 2 ) );
             break;
 

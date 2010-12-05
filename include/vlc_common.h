@@ -416,9 +416,6 @@ struct vlc_list_t
 #define VLC_VAR_INTEGER   0x0030
 #define VLC_VAR_HOTKEY    0x0031
 #define VLC_VAR_STRING    0x0040
-#define VLC_VAR_MODULE    0x0041
-#define VLC_VAR_FILE      0x0042
-#define VLC_VAR_DIRECTORY 0x0043
 #define VLC_VAR_VARIABLE  0x0044
 #define VLC_VAR_FLOAT     0x0050
 #define VLC_VAR_TIME      0x0060

@@ -387,7 +387,6 @@ void config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                 val.f_float = us_atof( cfg->psz_value ? cfg->psz_value : "0" );
                 break;
             case VLC_VAR_STRING:
-            case VLC_VAR_MODULE:
                 val.psz_string = cfg->psz_value;
                 break;
             default:

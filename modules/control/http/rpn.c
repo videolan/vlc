@@ -562,15 +562,6 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 case VLC_VAR_STRING:
                     psz_type = "VLC_VAR_STRING";
                     break;
-                case VLC_VAR_MODULE:
-                    psz_type = "VLC_VAR_MODULE";
-                    break;
-                case VLC_VAR_FILE:
-                    psz_type = "VLC_VAR_FILE";
-                    break;
-                case VLC_VAR_DIRECTORY:
-                    psz_type = "VLC_VAR_DIRECTORY";
-                    break;
                 case VLC_VAR_VARIABLE:
                     psz_type = "VLC_VAR_VARIABLE";
                     break;
@@ -618,9 +609,6 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                              psz_object, psz_variable, val.i_int );
                     break;
                 case VLC_VAR_STRING:
-                case VLC_VAR_MODULE:
-                case VLC_VAR_FILE:
-                case VLC_VAR_DIRECTORY:
                 case VLC_VAR_VARIABLE:
                     val.psz_string = psz_value = SSPop( st );
                     msg_Dbg( p_intf, "requested %s var change: %s->%s",
@@ -678,9 +666,6 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                     SSPushN( st, val.i_int );
                     break;
                 case VLC_VAR_STRING:
-                case VLC_VAR_MODULE:
-                case VLC_VAR_FILE:
-                case VLC_VAR_DIRECTORY:
                 case VLC_VAR_VARIABLE:
                     SSPush( st, val.psz_string );
                     free( val.psz_string );
@@ -738,9 +723,6 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 config_PutInt( p_intf, psz_variable, SSPopN( st, vars ) );
                 break;
             case VLC_VAR_STRING:
-            case VLC_VAR_MODULE:
-            case VLC_VAR_FILE:
-            case VLC_VAR_DIRECTORY:
             {
                 char *psz_string = SSPop( st );
                 config_PutPsz( p_intf, psz_variable, psz_string );
@@ -772,9 +754,6 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 SSPushN( st, config_GetInt( p_intf, psz_variable ) );
                 break;
             case VLC_VAR_STRING:
-            case VLC_VAR_MODULE:
-            case VLC_VAR_FILE:
-            case VLC_VAR_DIRECTORY:
             {
                 char *psz_string = config_GetPsz( p_intf, psz_variable );
                 SSPush( st, psz_string );

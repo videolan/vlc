@@ -689,9 +689,6 @@ static void DumpVariable (const void *data, const VISIT which, const int depth)
         MYCASE( INTEGER, "integer" );
         MYCASE( HOTKEY, "hotkey" );
         MYCASE( STRING, "string" );
-        MYCASE( MODULE, "module" );
-        MYCASE( FILE, "file" );
-        MYCASE( DIRECTORY, "directory" );
         MYCASE( VARIABLE, "variable" );
         MYCASE( FLOAT, "float" );
         MYCASE( TIME, "time" );

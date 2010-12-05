@@ -495,11 +495,8 @@ static int ParseImageAttachments( decoder_t *p_dec )
                         /* ffmpeg thinks it can handle bmp properly but it can't (at least
                          * not all of them), so use sdl_image if it is available */
 
-                        vlc_value_t val;
-
-                        var_Create( p_dec, "codec", VLC_VAR_MODULE | VLC_VAR_DOINHERIT );
-                        val.psz_string = (char*) "sdl_image";
-                        var_Set( p_dec, "codec", val );
+                        var_Create( p_dec, "codec", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+                        var_SetString( p_dec, "codec", "sdl_image" );
                     }
 
                     p_pic = image_Read( p_image, p_block, &fmt_in, &fmt_out );
