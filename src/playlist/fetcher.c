@@ -91,7 +91,8 @@ void playlist_fetcher_Push( playlist_fetcher_t *p_fetcher,
                  p_fetcher->i_waiting, p_item );
     if( !p_fetcher->b_live )
     {
-        if( vlc_clone_detach( Thread, p_fetcher, VLC_THREAD_PRIORITY_LOW ) )
+        if( vlc_clone_detach( NULL, Thread, p_fetcher,
+                              VLC_THREAD_PRIORITY_LOW ) )
             msg_Err( p_fetcher->p_playlist,
                      "cannot spawn secondary preparse thread" );
         else

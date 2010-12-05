@@ -563,15 +563,15 @@ static unsigned __stdcall vlc_entry (void *p)
     return 0;
 }
 
-int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
-               int priority)
+static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
+                           void *(*entry) (void *), void *data, int priority)
 {
     struct vlc_thread *th = malloc (sizeof (*th));
     if (unlikely(th == NULL))
         return ENOMEM;
     th->entry = entry;
     th->data = data;
-    th->detached = p_handle == NULL;
+    th->detached = detached;
     th->killable = false; /* not until vlc_entry() ! */
     th->killed = false;
     th->cleaners = NULL;
@@ -623,6 +623,12 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
     return 0;
 }
 
+int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
+                void *data, int priority)
+{
+    return vlc_clone_attr (p_handle, false, entry, data, prioity);
+}
+
 void vlc_join (vlc_thread_t th, void **result)
 {
     do
@@ -639,9 +645,14 @@ void vlc_join (vlc_thread_t th, void **result)
     free (th);
 }
 
-int vlc_clone_detach (void *(*entry) (void *), void *data, int priority)
+int vlc_clone_detach (vlc_thread_t *p_handle, void *(*entry) (void *),
+                      void *data, int priority)
 {
-    return vlc_clone (NULL, entry, data, priority);
+    vlc_thread_t th;
+    if (p_handle == NULL)
+        p_handle = &th;
+
+    return vlc_clone_attr (p_handle, true, entry, data, priority);
 }
 
 /*** Thread cancellation ***/
