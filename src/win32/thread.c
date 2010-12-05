@@ -626,7 +626,7 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
 int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
                 void *data, int priority)
 {
-    return vlc_clone_attr (p_handle, false, entry, data, prioity);
+    return vlc_clone_attr (p_handle, false, entry, data, priority);
 }
 
 void vlc_join (vlc_thread_t th, void **result)
