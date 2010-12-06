@@ -102,14 +102,10 @@ void Close_IFO( vlc_object_t *p_this )
 
 static int Demux( demux_t *p_demux )
 {
-    size_t len = strlen( "dvd://" ) + strlen( p_demux->psz_file )
-               - strlen( "VIDEO_TS.IFO" );
     char *psz_url;
 
-    psz_url = malloc( len+1 );
-    if( !psz_url )
+    if( asprintf( &psz_url, "dvd://%s", p_demux->psz_location ) == -1 )
         return 0;
-    snprintf( psz_url, len+1, "dvd://%s", p_demux->psz_file );
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
     input_item_t *p_input = input_item_New( p_demux, psz_url, psz_url );
