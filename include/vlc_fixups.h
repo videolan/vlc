@@ -240,8 +240,43 @@ struct pollfd
 int vlc_poll (struct pollfd *, unsigned, int);
 #endif
 
+#ifndef HAVE_SEARCH_H
+
+typedef struct entry {
+    char *key;
+    void *data;
+} ENTRY;
+
+typedef enum {
+    FIND, ENTER
+} ACTION;
+
+typedef enum {
+    preorder,
+    postorder,
+    endorder,
+    leaf
+} VISIT;
+
+#ifdef _SEARCH_PRIVATE
+typedef struct node {
+    char         *key;
+    struct node  *llink, *rlink;
+} node_t;
+#endif
+
+void *tsearch( const void *key, void **rootp, int(*cmp)(const void *, const void *) );
+void *tfind( const void *key, const void **rootp, int(*cmp)(const void *, const void *) );
+void *tdelete( const void *key, void **rootp, int(*cmp)(const void *, const void *) );
+void twalk( const void *root, void(*action)(const void *nodep, VISIT which, int depth) );
+void tdestroy( void *root, void (*free_node)(void *nodep) );
+#endif
+
 #ifndef HAVE_TDESTROY
-# define tdestroy vlc_tdestroy
+// If search.h is not present we are already building tdestroy
+# ifdef HAVE_SEARCH_H
+#  define tdestroy vlc_tdestroy
+# endif
 #endif
 
 /* Random numbers */

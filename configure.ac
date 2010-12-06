@@ -546,8 +546,8 @@ dnl Check for system libs needed
 need_libc=false
 
 dnl Check for usual libc functions
-AC_CHECK_FUNCS([daemon fcntl fdopendir fstatvfs fork getenv getpwuid_r gettimeofday isatty lstat memalign mmap openat posix_fadvise posix_madvise posix_memalign setenv setlocale stricmp strnicmp tdestroy uselocale])
-AC_REPLACE_FUNCS([asprintf atof atoll getcwd getdelim getpid gmtime_r lldiv localtime_r nrand48 rewind strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtok_r strtoll swab vasprintf])
+AC_CHECK_FUNCS([daemon fcntl fdopendir fstatvfs fork getenv getpwuid_r gettimeofday isatty lstat memalign mmap openat posix_fadvise posix_madvise posix_memalign setenv setlocale stricmp strnicmp uselocale])
+AC_REPLACE_FUNCS([asprintf atof atoll getcwd getdelim getpid gmtime_r lldiv localtime_r nrand48 rewind strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtok_r strtoll swab tdelete tdestroy tfind tsearch twalk vasprintf])
 AC_CHECK_FUNCS(fdatasync,,
   [AC_DEFINE(fdatasync, fsync, [Alias fdatasync() to fsync() if missing.])
 ])
@@ -795,6 +795,7 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
   AC_MSG_RESULT(no)])
 
 dnl Check for headers
+AC_CHECK_HEADERS([search.h])
 AC_CHECK_HEADERS(getopt.h strings.h locale.h xlocale.h)
 AC_CHECK_HEADERS(fcntl.h sys/time.h sys/ioctl.h sys/stat.h)
 AC_CHECK_HEADERS([arpa/inet.h netinet/in.h netinet/udplite.h sys/eventfd.h])
