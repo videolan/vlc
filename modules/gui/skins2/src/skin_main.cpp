@@ -362,7 +362,9 @@ static void WindowClose( vlc_object_t *p_this )
     vout_window_t *pWnd = (vout_window_t *)p_this;
     intf_thread_t *pIntf = (intf_thread_t *)pWnd->sys;
 
+    vlc_mutex_lock( &serializer );
     VoutManager::releaseWindow( pIntf, pWnd );
+    vlc_mutex_unlock( &serializer );
 
     vlc_object_release( pIntf );
 }
