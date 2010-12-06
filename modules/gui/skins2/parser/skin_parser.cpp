@@ -78,7 +78,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         msg_Dbg( getIntf(), "opening included XML file: %s", fullPath.c_str() );
         // FIXME: We do not use the DTD to validate the included XML file,
         // as the parser seems to dislike it otherwise...
-        SkinParser subParser( getIntf(), fullPath.c_str(), false, m_pData );
+        SkinParser subParser( getIntf(), fullPath.c_str(), m_path, false, m_pData );
         subParser.parse();
     }
 
