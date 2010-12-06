@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_demux.h>
+#include <assert.h>
 
 #include "playlist.h"
 
@@ -120,14 +121,15 @@ static int Demux( demux_t *p_demux )
 
 static int DemuxDVD_VR( demux_t *p_demux )
 {
-    char *psz_url = strdup( p_demux->psz_file );
+    size_t len = strlen( p_demux->psz_location );
+    char *psz_url = malloc( len + 1 );
 
-    if( !psz_url )
+    if( unlikely( psz_url == NULL ) )
         return 0;
-
-    size_t len = strlen( psz_url );
-
-    strncpy( psz_url + len - 12, "VR_MOVIE.VRO", 12 );
+    assert( len >= 12 );
+    len -= 12;
+    memcpy( psz_url, p_demux->psz_location, len );
+    memcpy( psz_url + len, "VR_MOVIE.VRO", 13 );
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
     input_item_t *p_input = input_item_New( p_demux, psz_url, psz_url );
