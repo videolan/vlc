@@ -1867,8 +1867,8 @@ then
         [], [${LIBS_dvdnav}])
     AC_CHECK_LIB(dvdnav, dvdnav_describe_title_chapters,
       AC_DEFINE(HAVE_DVDNAV_DESCRIBE_TITLE_CHAPTERS, 1, [Define if you have dvdnav_describe_title_chapters.]),
-        [], [${LIBS_dvdnav}])
-    ])
+        [], [${LIBS_dvdnav}])],
+      [AC_MSG_WARN(dvdnav library not found)])
 fi
 
 dnl
