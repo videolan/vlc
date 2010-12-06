@@ -20,7 +20,6 @@
 // Do not implement tdestroy if that's the only missing t* function
 #ifndef HAVE_SEARCH_H
 
-#include <sys/cdefs.h>
 #include <assert.h>
 #include <stdlib.h>
 

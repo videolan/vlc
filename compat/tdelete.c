@@ -17,7 +17,6 @@
 # include <config.h>
 #endif
 
-#include <sys/cdefs.h>
 #include <assert.h>
 #include <stdlib.h>
 
@@ -26,7 +25,7 @@ void *
 tdelete(vkey, vrootp, compar)
 	const void *vkey;	/* key to be deleted */
 	void      **vrootp;	/* address of the root of tree */
-	int       (*compar) __P((const void *, const void *));
+	int       (*compar) (const void *, const void *);
 {
 	node_t **rootp = (node_t **)vrootp;
 	node_t *p, *q, *r;

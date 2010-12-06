@@ -17,18 +17,17 @@
 # include <config.h>
 #endif
 
-#include <sys/cdefs.h>
 #include <assert.h>
 #include <stdlib.h>
 
-static void trecurse __P((const node_t *,
-    void  (*action)(const void *, VISIT, int), int level));
+static void trecurse (const node_t *,
+    void  (*action)(const void *, VISIT, int), int level);
 
 /* Walk the nodes of a tree */
 static void
 trecurse(root, action, level)
 	const node_t *root;	/* Root of the tree to be walked */
-	void (*action) __P((const void *, VISIT, int));
+	void (*action) (const void *, VISIT, int);
 	int level;
 {
 	assert(root != NULL);
@@ -51,7 +50,7 @@ trecurse(root, action, level)
 void
 twalk(vroot, action)
 	const void *vroot;	/* Root of the tree to be walked */
-	void (*action) __P((const void *, VISIT, int));
+	void (*action) (const void *, VISIT, int);
 {
 	if (vroot != NULL && action != NULL)
 		trecurse(vroot, action, 0);

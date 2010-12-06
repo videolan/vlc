@@ -17,7 +17,6 @@
 # include <config.h>
 #endif
 
-#include <sys/cdefs.h>
 #include <assert.h>
 #include <stdlib.h>
 
@@ -26,7 +25,7 @@ void *
 tsearch(vkey, vrootp, compar)
 	const void *vkey;		/* key to be located */
 	void **vrootp;			/* address of tree root */
-	int (*compar) __P((const void *, const void *));
+	int (*compar) (const void *, const void *);
 {
 	node_t *q;
 	node_t **rootp = (node_t **)vrootp;
