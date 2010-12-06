@@ -47,6 +47,11 @@
 #include "vlc_codec.h"
 
 #include "variables.h"
+
+#ifdef HAVE_SEARCH_H
+# include <search.h>
+#endif
+
 #ifndef WIN32
 # include <unistd.h>
 #else
@@ -61,7 +66,6 @@
 # define close( a )       closesocket (a)
 #endif
 
-#include <search.h>
 #include <limits.h>
 #include <assert.h>
 

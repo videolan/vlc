@@ -29,7 +29,9 @@
 #include <vlc_services_discovery.h>
 #include <vlc_plugin.h>
 #include <vlc_url.h>
-#include <search.h>
+#ifdef HAVE_SEARCH_H
+# include <search.h>
+#endif
 #include <poll.h>
 #include <errno.h>
 

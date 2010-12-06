@@ -32,9 +32,12 @@
 #include <vlc_charset.h>
 #include "variables.h"
 
+#ifdef HAVE_SEARCH_H
+# include <search.h>
+#endif
+
 #include "libvlc.h"
 
-#include <search.h>
 #include <assert.h>
 #include <math.h>
 #include <limits.h>

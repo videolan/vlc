@@ -32,8 +32,10 @@ typedef xcb_atom_t Atom;
 #include <vlc_dialog.h>
 #include <vlc_charset.h>
 #include <vlc_plugin.h>
+#ifdef HAVE_SEARCH_H
+# include <search.h>
+#endif
 #include <poll.h>
-#include <search.h>
 
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
