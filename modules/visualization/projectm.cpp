@@ -104,16 +104,6 @@ struct filter_sys_t
     vout_thread_t  *p_vout;
     vout_display_t *p_vd;
 
-    /* libprojectM objects */
-    projectM      *p_projectm;
-#ifndef HAVE_PROJECTM2
-    char          *psz_config;
-#else
-    char          *psz_preset_path;
-    char          *psz_title_font;
-    char          *psz_menu_font;
-#endif
-
     /* Window size */
     int i_width;
     int i_height;
@@ -169,13 +159,6 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_width  = var_InheritInteger( p_filter, "projectm-width" );
     p_sys->i_height = var_InheritInteger( p_filter, "projectm-height" );
     p_sys->i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
-#ifndef HAVE_PROJECTM2
-    p_sys->psz_config = var_InheritString( p_filter, "projectm-config" );
-#else
-    p_sys->psz_preset_path = var_InheritString( p_filter, "projectm-preset-path" );
-    p_sys->psz_title_font = var_InheritString( p_filter, "projectm-title-font" );
-    p_sys->psz_menu_font = var_InheritString( p_filter, "projectm-menu-font" );
-#endif
     vlc_mutex_init( &p_sys->lock );
     p_sys->p_buffer = NULL;
     p_sys->i_buffer_size = 0;
@@ -223,13 +206,6 @@ static void Close( vlc_object_t *p_this )
     vlc_sem_destroy( &p_sys->ready );
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys->p_buffer );
-#ifndef HAVE_PROJECTM2
-    free( p_sys->psz_config );
-#else
-    free( p_sys->psz_preset_path );
-    free( p_sys->psz_title_font );
-    free( p_sys->psz_menu_font );
-#endif
     free( p_sys );
 }
 
@@ -295,7 +271,14 @@ static void *Thread( void *p_data )
     int i_last_height = 0;
     locale_t loc;
     locale_t oldloc;
-#ifdef HAVE_PROJECTM2
+
+    projectM *p_projectm;
+#ifndef HAVE_PROJECTM2
+    char *psz_config;
+#else
+    char *psz_preset_path;
+    char *psz_title_font;
+    char *psz_menu_font;
     projectM::Settings settings;
 #endif
 
@@ -346,33 +329,43 @@ static void *Thread( void *p_data )
     oldloc = uselocale (loc);
     /* Create the projectM object */
 #ifndef HAVE_PROJECTM2
-    p_sys->p_projectm = new projectM( p_sys->psz_config );
+    psz_config = var_InheritString( p_filter, "projectm-config" );
+    p_projectm new projectM( psz_config );
+    free( psz_config );
 #else
+    psz_preset_path = var_InheritString( p_filter, "projectm-preset-path" );
+    psz_title_font = var_InheritString( p_filter, "projectm-title-font" );
+    psz_menu_font = var_InheritString( p_filter, "projectm-menu-font" );
+
     settings.meshX = 32;
     settings.meshY = 24;
     settings.fps = 35;
     settings.textureSize = 1024;
     settings.windowWidth = p_sys->i_width;
     settings.windowHeight = p_sys->i_height;
-    settings.presetURL = p_sys->psz_preset_path;
-    settings.titleFontURL =  p_sys->psz_title_font;
-    settings.menuFontURL = p_sys->psz_menu_font;
+    settings.presetURL = psz_preset_path;
+    settings.titleFontURL = psz_title_font;
+    settings.menuFontURL = psz_menu_font;
     settings.smoothPresetDuration = 5;
     settings.presetDuration = 30;
     settings.beatSensitivity = 10;
     settings.aspectCorrection = 1;
     settings.easterEgg = 1;
     settings.shuffleEnabled = 1;
-    p_sys->p_projectm = new projectM( settings );
+    p_projectm = new projectM( settings );
+
+    free( psz_menu_font );
+    free( psz_title_font );
+    free( psz_preset_path );
 #endif
-    p_sys->i_buffer_size = p_sys->p_projectm->pcm()->maxsamples;
+    p_sys->i_buffer_size = p_projectm->pcm()->maxsamples;
     p_sys->p_buffer = (float*)calloc( p_sys->i_buffer_size,
                                       sizeof( float ) );
 
     vlc_sem_post( &p_sys->ready );
 
     /* Choose a preset randomly or projectM will always show the first one */
-    p_sys->p_projectm->selectPreset( (unsigned)vlc_mrand48() % p_sys->p_projectm->getPlaylistSize() );
+    p_projectm->selectPreset( (unsigned)vlc_mrand48() % p_projectm->getPlaylistSize() );
 
     /* */
     for( ;; )
@@ -386,7 +379,7 @@ static void *Thread( void *p_data )
             /* FIXME it is not perfect as we will have black bands */
             vout_display_place_t place;
             vout_display_PlacePicture( &place, &p_sys->p_vd->source, p_sys->p_vd->cfg, false );
-            p_sys->p_projectm->projectM_resetGL( place.width, place.height );
+            p_projectm->projectM_resetGL( place.width, place.height );
 
             i_last_width  = p_sys->p_vd->cfg->display.width;
             i_last_height = p_sys->p_vd->cfg->display.height;
@@ -396,15 +389,15 @@ static void *Thread( void *p_data )
         vlc_mutex_lock( &p_sys->lock );
         if( p_sys->i_nb_samples > 0 )
         {
-            p_sys->p_projectm->pcm()->addPCMfloat( p_sys->p_buffer,
-                                                   p_sys->i_nb_samples );
+            p_projectm->pcm()->addPCMfloat( p_sys->p_buffer,
+                                            p_sys->i_nb_samples );
             p_sys->i_nb_samples = 0;
         }
         if( p_sys->b_quit )
         {
             vlc_mutex_unlock( &p_sys->lock );
 
-            delete p_sys->p_projectm;
+            delete p_projectm;
             vout_DeleteDisplay( p_sys->p_vd, NULL );
             vlc_object_release( p_sys->p_vout );
             if (loc != (locale_t)0)
@@ -416,7 +409,7 @@ static void *Thread( void *p_data )
         }
         vlc_mutex_unlock( &p_sys->lock );
 
-        p_sys->p_projectm->renderFrame();
+        p_projectm->renderFrame();
 
         /* */
         mwait( i_deadline );
