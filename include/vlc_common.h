@@ -810,8 +810,6 @@ VLC_EXPORT( void *, vlc_memalign, ( void **base, size_t alignment, size_t size )
 VLC_EXPORT( int, vlc_execve, ( vlc_object_t *p_object, int i_argc, char *const *pp_argv, char *const *pp_env, const char *psz_cwd, const char *p_in, size_t i_in, char **pp_data, size_t *pi_data ) LIBVLC_USED );
 #define vlc_execve(a,b,c,d,e,f,g,h,i) vlc_execve(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 
-VLC_EXPORT( void, vlc_tdestroy, ( void *, void (*)(void *) ) );
-
 /* Fast large memory copy and memory set */
 VLC_EXPORT( void *, vlc_memcpy, ( void *, const void *, size_t ) );
 VLC_EXPORT( void *, vlc_memset, ( void *, int, size_t ) );
