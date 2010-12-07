@@ -34,6 +34,7 @@
 #include <vlc_vout.h>
 #include <vlc_vout_wrapper.h>
 #include <vlc_filter.h>
+#include <vlc_rand.h>
 
 #include <libprojectM/projectM.hpp>
 
@@ -370,8 +371,8 @@ static void *Thread( void *p_data )
 
     vlc_sem_post( &p_sys->ready );
 
-    /* TODO: Give to projectm the name of the input
-    p_sys->p_projectm->projectM_setTitle( "" ); */
+    /* Choose a preset randomly or projectM will always show the first one */
+    p_sys->p_projectm->selectPreset( (unsigned)vlc_mrand48() % p_sys->p_projectm->getPlaylistSize() );
 
     /* */
     for( ;; )
