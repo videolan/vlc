@@ -856,8 +856,6 @@ static int BandwidthAdaptation(stream_t *s, int progid, uint64_t *bandwidth)
 
 static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur_stream)
 {
-    stream_sys_t *p_sys = s->p_sys;
-
     assert(hls);
     assert(segment);
 
@@ -879,23 +877,8 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
 
     vlc_mutex_unlock(&segment->lock);
 
-    /* thread is not started yet */
-    if (p_sys->thread == NULL)
-    {
-        msg_Info(s, "downloaded segment %d from stream %d",
-                    p_sys->segment, p_sys->current);
-        return VLC_SUCCESS;
-    }
-    else
-    {
-        /* Do bandwidth calculations when there are at least 3 segments
-           downloaded */
-        msg_Info(s, "downloaded segment %d from stream %d",
-                    p_sys->thread->segment, p_sys->thread->current);
-
-        if (p_sys->thread->segment - p_sys->segment < 3)
-            return VLC_SUCCESS;
-    }
+    msg_Info(s, "downloaded segment %d from stream %d",
+                segment->sequence, *cur_stream);
 
     /* check for division by zero */
     double ms = (double)duration / 1000.0; /* ms */
@@ -982,17 +965,45 @@ static void* hls_Thread(vlc_object_t *p_this)
 static int Prefetch(stream_t *s, int *current)
 {
     stream_sys_t *p_sys = s->p_sys;
+    int i_segment = p_sys->segment;
 
-    hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->current);
-    if (hls == NULL)
-        return VLC_EGENERIC;
+    /* Try to pick best matching stream */
+    int count = vlc_array_count(p_sys->hls_stream);
+    for (int stream = 0; stream < count; stream++)
+    {
+        hls_stream_t *hls = hls_Get(p_sys->hls_stream, stream);
+        if (hls == NULL)
+            return VLC_EGENERIC;
+
+        segment_t *segment = segment_GetSegment(hls,i_segment);
+        if (segment == NULL )
+            return VLC_EGENERIC;
+
+        if (Download(s, hls, segment, &stream) != VLC_SUCCESS)
+            return VLC_EGENERIC;
+
+        i_segment++;
+
+        /* */
+        *current = stream;
+    }
 
     /* Download first 3 segments of this HLS stream */
+    hls_stream_t *hls = hls_Get(p_sys->hls_stream, *current);
+    if (hls == NULL)
+        return VLC_EGENERIC; /* FIXME: */
+
     for (int i = 0; i < 3; i++)
     {
         segment_t *segment = segment_GetSegment(hls, p_sys->segment);
         if (segment == NULL )
             return VLC_EGENERIC;
+
+        if (segment->data)
+        {
+            p_sys->segment++;
+            continue;
+        }
 
         if (Download(s, hls, segment, current) != VLC_SUCCESS)
             return VLC_EGENERIC;
@@ -1218,6 +1229,7 @@ static int Open(vlc_object_t *p_this)
 
     p_sys->thread->hls_stream = p_sys->hls_stream;
     p_sys->thread->current = current;
+    p_sys->current = current;
     p_sys->thread->segment = p_sys->segment;
     p_sys->segment = 0; /* reset to first segment */
     p_sys->thread->s = s;
@@ -1275,8 +1287,23 @@ static segment_t *NextSegment(stream_t *s)
 {
     stream_sys_t *p_sys = s->p_sys;
     segment_t *segment = NULL;
-    int i_stream = 0;
 
+    /* Is the next segment of the current HLS stream ready? */
+    hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->current);
+    if (hls != NULL)
+    {
+        segment = segment_GetSegment(hls, p_sys->segment);
+        if (segment != NULL)
+        {
+            /* This segment is ready? */
+            if (segment->data != NULL)
+               return segment;
+        }
+    }
+
+    /* Was the HLS stream changed to another bitrate? */
+    int i_stream = 0;
+    segment = NULL;
     while(vlc_object_alive(s))
     {
         /* Is the next segment ready */
@@ -1288,7 +1315,7 @@ static segment_t *NextSegment(stream_t *s)
 
         /* This segment is ready? */
         if (segment->data != NULL)
-            return segment;
+            goto segment_ok;
 
         if (!p_sys->b_meta) return NULL;
 
@@ -1296,13 +1323,10 @@ static segment_t *NextSegment(stream_t *s)
         i_stream++;
         if (i_stream >= vlc_array_count(p_sys->hls_stream))
             return NULL;
-#if 0
-        msg_Info(s, "playback is switching from stream %d to %d",
-                 p_sys->current, i_stream);
-#endif
-        p_sys->current = i_stream;
     }
 
+segment_ok:
+    p_sys->current = i_stream;
     return segment;
 }
 
