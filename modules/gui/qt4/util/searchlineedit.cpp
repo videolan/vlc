@@ -40,7 +40,7 @@
 
 #include <vlc_intf_strings.h>
 
-#if QT_VERSION < 0x040700
+#if !HAS_QT47
 
 ClickLineEdit::ClickLineEdit( const QString &msg, QWidget *parent) : QLineEdit( parent )
 {
