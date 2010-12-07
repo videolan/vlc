@@ -381,7 +381,7 @@ static void parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_rea
     vlc_mutex_lock(&hls->lock);
     segment_t *segment = segment_New(hls, duration, psz_uri ? psz_uri : uri);
     if (segment)
-        segment->sequence = hls->sequence + vlc_array_count(hls->segments);
+        segment->sequence = hls->sequence + vlc_array_count(hls->segments) - 1;
     if (duration > hls->duration)
     {
         msg_Err(s, "EXTINF:%d duration is larger then EXT-X-TARGETDURATION:%d",
