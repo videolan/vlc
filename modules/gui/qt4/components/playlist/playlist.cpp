@@ -45,13 +45,15 @@
  **********************************************************************/
 
 PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
-               : QSplitter( _par ), p_intf ( _p_i )
+               : QWidget( _par ), p_intf ( _p_i )
 {
 #ifndef Q_WS_MAC
     setContentsMargins( 3, 3, 3, 3 );
 #else
     setContentsMargins( 0, 3, 0, 3 );
 #endif
+
+    QGridLayout *layout = new QGridLayout( this );
 
     /*******************
      * Left            *
@@ -90,10 +92,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     playlist_item_t *p_root = THEPL->p_playing;
     PL_UNLOCK;
 
-    QWidget *rightPanel = new QWidget( this );
-    QGridLayout *layout = new QGridLayout( rightPanel );
-    layout->setSpacing( 0 ); layout->setMargin( 0 );
-    setMinimumWidth( 300 );
+    setMinimumWidth( 350 );
 
     PLModel *model = new PLModel( p_playlist, p_intf, p_root, this );
     mainView = new StandardPLPanel( this, p_intf, p_root, selector, model );
@@ -101,7 +100,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     /* Location Bar */
     locationBar = new LocationBar( model );
     locationBar->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
-    layout->addWidget( locationBar, 0, 0 );
+    layout->addWidget( locationBar, 0, 0, 1, 2 );
     layout->setColumnStretch( 0, 5 );
     CONNECT( locationBar, invoked( const QModelIndex & ),
              mainView, browseInto( const QModelIndex & ) );
@@ -110,7 +109,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     QToolButton *viewButton = new QToolButton( this );
     viewButton->setIcon( style()->standardIcon( QStyle::SP_FileDialogDetailedView ) );
     viewButton->setToolTip( qtr("Change playlistview") );
-    layout->addWidget( viewButton, 0, 1 );
+    layout->addWidget( viewButton, 0, 2 );
 
     /* View selection menu */
     QSignalMapper *viewSelectionMapper = new QSignalMapper( this );
@@ -136,42 +135,43 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     searchEdit = new SearchLineEdit( this );
     searchEdit->setMaximumWidth( 250 );
     searchEdit->setMinimumWidth( 80 );
-    layout->addWidget( searchEdit, 0, 2 );
+    layout->addWidget( searchEdit, 0, 3 );
     CONNECT( searchEdit, textEdited( const QString& ),
              mainView, search( const QString& ) );
     CONNECT( searchEdit, searchDelayedChanged( const QString& ),
              mainView, searchDelayed( const QString & ) );
     CONNECT( mainView, viewChanged( const QModelIndex& ),
              this, changeView( const QModelIndex &) );
-    layout->setColumnStretch( 2, 3 );
+    layout->setColumnStretch( 3, 3 );
 
     /* Connect the activation of the selector to a redefining of the PL */
     DCONNECT( selector, activated( playlist_item_t * ),
               mainView, setRoot( playlist_item_t * ) );
 
-    layout->addWidget( mainView, 1, 0, 1, -1 );
+
+    split = new QSplitter(this);
 
     /* Add the two sides of the QSplitter */
-    addWidget( leftSplitter );
-    addWidget( rightPanel );
+    split->addWidget( leftSplitter );
+    split->addWidget( mainView );
 
     QList<int> sizeList;
     sizeList << 180 << 420 ;
-    setSizes( sizeList );
-    //setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
-    setStretchFactor( 0, 0 );
-    setStretchFactor( 1, 3 );
+    split->setSizes( sizeList );
+    split->setStretchFactor( 0, 0 );
+    split->setStretchFactor( 1, 3 );
+    split->setCollapsible( 1, false );
     leftSplitter->setMaximumWidth( 250 );
-    setCollapsible( 1, false );
 
     /* In case we want to keep the splitter information */
     // components shall never write there setting to a fixed location, may infer
     // with other uses of the same component...
     getSettings()->beginGroup("Playlist");
-    restoreState( getSettings()->value("splitterSizes").toByteArray());
+    split->restoreState( getSettings()->value("splitterSizes").toByteArray());
     leftSplitter->restoreState( getSettings()->value("leftSplitterGeometry").toByteArray() );
     getSettings()->endGroup();
 
+    layout->addWidget( split, 1, 0, 1, -1 );
     setAcceptDrops( true );
     setWindowTitle( qtr( "Playlist" ) );
     setWindowRole( "vlc-playlist" );
@@ -181,7 +181,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 PlaylistWidget::~PlaylistWidget()
 {
     getSettings()->beginGroup("Playlist");
-    getSettings()->setValue( "splitterSizes", saveState() );
+    getSettings()->setValue( "splitterSizes", split->saveState() );
     getSettings()->setValue( "leftSplitterGeometry", leftSplitter->saveState() );
     getSettings()->endGroup();
     msg_Dbg( p_intf, "Playlist Destroyed" );
