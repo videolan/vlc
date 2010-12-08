@@ -182,7 +182,18 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
             break;
         case WM_APPCOMMAND:
             cmd = GET_APPCOMMAND_LPARAM(msg->lParam);
+
+            bool disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
+            if( disable_volume_keys &&
+                    (   cmd == APPCOMMAND_VOLUME_DOWN   ||
+                        cmd == APPCOMMAND_VOLUME_UP     ||
+                        cmd == APPCOMMAND_VOLUME_MUTE ) )
+            {
+                break;
+            }
+
             *result = TRUE;
+
             switch(cmd)
             {
                 case APPCOMMAND_MEDIA_PLAY_PAUSE:

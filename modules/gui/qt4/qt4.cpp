@@ -171,6 +171,13 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                             "Can be disabled to prevent burning screen." )
 #define QT_BGCONE_EXPANDS_TEXT N_( "Expanding background cone or art." )
 #define QT_BGCONE_EXPANDS_LONGTEXT N_( "Background art fits window's size" )
+
+#define QT_DISABLE_VOLUME_KEYS_TEXT N_( "Ignore keyboard volume buttons." )
+#define QT_DISABLE_VOLUME_KEYS_LONGTEXT N_(                                             \
+    "With this option checked, the volume up, volume down and mute buttons on your "    \
+    "keyboard will always change your system volume. With this option unchecked, the "  \
+    "volume buttons will change VLC's volume when VLC is selected and change the "      \
+    "system volume when VLC is not selected." )
 /**********************************************************************/
 vlc_module_begin ()
     set_shortname( "Qt" )
@@ -247,6 +254,14 @@ vlc_module_begin ()
     add_bool( "qt-bgcone", true, QT_BGCONE_TEXT, QT_BGCONE_LONGTEXT, true )
     add_bool( "qt-bgcone-expands", false, QT_BGCONE_EXPANDS_TEXT,
               QT_BGCONE_EXPANDS_LONGTEXT, true )
+
+#ifdef WIN32
+    add_bool( "qt-disable-volume-keys"             /* name */,
+              false                                /* default value */,
+              QT_DISABLE_VOLUME_KEYS_TEXT          /* text */,
+              QT_DISABLE_VOLUME_KEYS_LONGTEXT      /* longtext */,
+              false                                /* advanced mode only */)
+#endif
 
     add_obsolete_bool( "qt-blingbling" ) /* Suppressed since 1.0.0 */
     add_obsolete_integer( "qt-display-mode" ) /* Suppressed since 1.1.0 */
