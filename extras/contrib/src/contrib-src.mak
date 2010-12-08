@@ -2058,6 +2058,7 @@ mpcdec:
 
 .mpcdec: mpcdec
 	(cd $<; cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make install)
+	touch $@
 
 CLEAN_FILE += .mpcdec
 CLEAN_PKG += mpcdec
