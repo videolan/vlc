@@ -1124,6 +1124,11 @@ static const char *const ppsz_clock_descriptions[] =
     "the correct demuxer is not automatically detected. You should not "\
     "set this as a global option unless you really know what you are doing." )
 
+#define VOD_SERVER_TEXT N_("VoD server module")
+#define VOD_SERVER_LONGTEXT N_( \
+    "You can select which VoD server module you want to use. Set this " \
+    "to `vod_rtsp' to switch back to the old, legacy module." )
+
 #define RT_PRIORITY_TEXT N_("Allow real-time priority")
 #define RT_PRIORITY_LONGTEXT N_( \
     "Running VLC in real-time priority will allow for much more precise " \
@@ -2065,6 +2070,8 @@ vlc_module_begin ()
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT,
                 MEMCPY_LONGTEXT, true )
         change_need_restart ()
+    add_module( "vod-server", "vod server", NULL, NULL, VOD_SERVER_TEXT,
+                VOD_SERVER_LONGTEXT, true )
 
     set_section( N_("Plugins" ), NULL )
     add_bool( "plugins-cache", true, PLUGINS_CACHE_TEXT,
