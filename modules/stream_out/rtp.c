@@ -241,7 +241,7 @@ vlc_module_begin ()
     set_description( N_("RTSP VoD server") )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_VOD )
-    set_capability( "vod server", 0 )
+    set_capability( "vod server", 10 )
     set_callbacks( OpenVoD, CloseVoD )
     add_shortcut( "rtsp" )
     add_string ( "rtsp-host", NULL, RTSP_HOST_TEXT,
