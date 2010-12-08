@@ -141,8 +141,8 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
     /* select the first item */
 //  view->setCurrentIndex( model->index( 0, 0, QModelIndex() ) );
 
-    setAutoFillBackground( true );
 #ifdef Q_WS_MAC
+    setAutoFillBackground( true );
     QPalette palette;
     palette.setColor( QPalette::Window, QColor(209,215,226) );
     setPalette( palette );

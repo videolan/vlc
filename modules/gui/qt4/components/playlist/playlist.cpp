@@ -47,11 +47,8 @@
 PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
                : QWidget( _par ), p_intf ( _p_i )
 {
-#ifndef Q_WS_MAC
-    setContentsMargins( 3, 3, 3, 3 );
-#else
+
     setContentsMargins( 0, 3, 0, 3 );
-#endif
 
     QGridLayout *layout = new QGridLayout( this );
 
