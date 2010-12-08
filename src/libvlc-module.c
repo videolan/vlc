@@ -2072,6 +2072,7 @@ vlc_module_begin ()
         change_need_restart ()
     add_module( "vod-server", "vod server", NULL, NULL, VOD_SERVER_TEXT,
                 VOD_SERVER_LONGTEXT, true )
+        change_need_restart ()
 
     set_section( N_("Plugins" ), NULL )
     add_bool( "plugins-cache", true, PLUGINS_CACHE_TEXT,
