@@ -27,7 +27,7 @@
 #ifndef _SEARCHLINEEDIT_H_
 #define _SEARCHLINEEDIT_H_
 
-#import "../qt4.hpp"
+#include "qt4.hpp"
 #include <QLineEdit>
 
 #if HAS_QT47
@@ -96,6 +96,8 @@ signals:
     void searchDelayedChanged( const QString& );
 };
 #else
+
+/* On Mac, we try to use the native NSSearchField */
 #include <QMacCocoaViewContainer>
 
 class SearchLineEdit : public QMacCocoaViewContainer
