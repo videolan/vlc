@@ -269,7 +269,7 @@ RTSPDestBox::RTSPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     RTSPPort->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
     RTSPPort->setMinimum( 1 );
     RTSPPort->setMaximum( 65535 );
-    RTSPPort->setValue( 5544 );
+    RTSPPort->setValue( 8544 );
 
     layout->addWidget( RTSPEdit, 2, 1, 1, 1 );
     layout->addWidget( RTSPPort, 1, 1, 1, 1 );
