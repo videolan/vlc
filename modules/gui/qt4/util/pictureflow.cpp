@@ -512,6 +512,8 @@ static QImage* prepareSurface(const QImage* slideImage, int w, int h, QRgb bgcol
     QPainter imagePainter( result );
     QTransform rotation;
     rotation.rotate(90);
+    rotation.scale(1,-1);
+    rotation.translate( 0, hofs );
     result->fill(bgcolor);
 
     // transpose the image, this is to speed-up the rendering
@@ -601,7 +603,8 @@ static QImage* prepareSurface(const QImage* slideImage, int w, int h, QRgb bgcol
             }
 
             // overdraw to leave only the reflection blurred (but not the actual image)
-            imagePainter.drawImage( hofs, 0, img.mirrored().transformed( rotation ) );
+            imagePainter.setTransform( rotation );
+            imagePainter.drawImage( 0, 0, img );
             /*
             for (int x = 0; x < w; x++)
                 for (int y = 0; y < h; y++)
