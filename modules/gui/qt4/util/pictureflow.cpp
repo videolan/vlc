@@ -441,24 +441,6 @@ void PictureFlowSoftwareRenderer::paint()
 
     QModelIndex index = state->model->index( state->centerIndex, 0, state->model->currentIndex().parent() );
 
-    if( index.isValid() )
-    {
-          QString title = PLModel::getMeta( index, COLUMN_TITLE );
-          QString artist = PLModel::getMeta( index, COLUMN_ARTIST );
-          QFont font( index.data( Qt::FontRole ).value<QFont>() );
-          painter.setFont( font );
-          painter.setBrush( QBrush( Qt::lightGray ) );
-          painter.setPen( QColor( Qt::lightGray ) );
-          QFontMetrics fm = painter.fontMetrics();
-
-          QPoint textstart( buffer.width() / 2 - state->slideWidth/2 , buffer.height() / 2 + state->slideWidth/2 + 5 );
-          QPoint artiststart( 0, fm.xHeight() * 2 );
-
-          painter.drawText( textstart, title );
-
-          textstart += artiststart;
-          painter.drawText( textstart, artist);
-    }
 }
 
 void PictureFlowSoftwareRenderer::init()
@@ -498,7 +480,7 @@ static QRgb blendColor(QRgb c1, QRgb c2, int blend)
 
 
 static QImage* prepareSurface(const QImage* slideImage, int w, int h, QRgb bgcolor,
-                              PictureFlow::ReflectionEffect reflectionEffect)
+                              PictureFlow::ReflectionEffect reflectionEffect, QModelIndex index)
 {
     Qt::TransformationMode mode = Qt::SmoothTransformation;
     QImage img = slideImage->scaled(w, h, Qt::IgnoreAspectRatio, mode);
@@ -509,8 +491,10 @@ static QImage* prepareSurface(const QImage* slideImage, int w, int h, QRgb bgcol
 
     // offscreen buffer: black is sweet
     QImage* result = new QImage(hs, w, QImage::Format_RGB32);
+    QFont font( index.data( Qt::FontRole ).value<QFont>() );
     QPainter imagePainter( result );
     QTransform rotation;
+    imagePainter.setFont( font );
     rotation.rotate(90);
     rotation.scale(1,-1);
     rotation.translate( 0, hofs );
@@ -605,6 +589,11 @@ static QImage* prepareSurface(const QImage* slideImage, int w, int h, QRgb bgcol
             // overdraw to leave only the reflection blurred (but not the actual image)
             imagePainter.setTransform( rotation );
             imagePainter.drawImage( 0, 0, img );
+            imagePainter.setBrush( QBrush( Qt::lightGray ) );
+            imagePainter.setPen( QColor( Qt::lightGray ) );
+            QFontMetrics fm = imagePainter.fontMetrics();
+            imagePainter.drawText( 0, img.height()+ 13, PLModel::getMeta( index, COLUMN_TITLE ) );
+            imagePainter.drawText( 0, img.height()+ 13 + fm.xHeight()*2, PLModel::getMeta( index, COLUMN_ARTIST ) );
             /*
             for (int x = 0; x < w; x++)
                 for (int y = 0; y < h; y++)
@@ -628,7 +617,7 @@ QImage* PictureFlowSoftwareRenderer::surface(int slideIndex)
     QImage* img = new QImage(PLModel::getArtPixmap( state->model->index( slideIndex, 0, state->model->currentIndex().parent() ),
                                          QSize( state->slideWidth, state->slideHeight ) ).toImage());
 
-    QImage* sr = prepareSurface(img, state->slideWidth, state->slideHeight, bgcolor, state->reflectionEffect);
+    QImage* sr = prepareSurface(img, state->slideWidth, state->slideHeight, bgcolor, state->reflectionEffect, state->model->index( slideIndex, 0, state->model->currentIndex().parent() ) );
 
     delete img;
     return sr;
