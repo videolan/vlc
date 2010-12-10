@@ -72,13 +72,21 @@ protected:
     virtual void dropEvent( QDropEvent *);
     virtual void dragEnterEvent( QDragEnterEvent * );
     virtual void closeEvent( QCloseEvent * );
-#ifdef __APPLE__
-    virtual QSplitterHandle *createHandle();
-#endif
-
 private slots:
     void changeView( const QModelIndex& index );
 };
+
+#ifdef Q_WS_MAC
+class PlaylistSplitter : public QSplitter
+{
+public:
+    PlaylistSplitter( QWidget *_parent ) : QSplitter( _parent ){}
+protected:
+    virtual QSplitterHandle *createHandle();
+};
+#else
+ #define PlaylistSplitter QSplitter
+#endif
 
 #ifdef Q_WS_MAC
 class SplitterHandle : public QSplitterHandle

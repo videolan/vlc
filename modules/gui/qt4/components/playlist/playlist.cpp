@@ -147,7 +147,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
               mainView, setRoot( playlist_item_t * ) );
 
 
-    split = new QSplitter(this);
+    split = new PlaylistSplitter( this );
 
     /* Add the two sides of the QSplitter */
     split->addWidget( leftSplitter );
@@ -421,9 +421,9 @@ QSize LocationButton::sizeHint() const
 #undef PADDING
 
 #ifdef Q_WS_MAC
-QSplitterHandle *PlaylistWidget::createHandle()
+QSplitterHandle *PlaylistSplitter::createHandle()
 {
-    return new SplitterHandle( split->orientation(), split );
+    return new SplitterHandle( orientation(), this );
 }
 
 SplitterHandle::SplitterHandle( Qt::Orientation orientation, QSplitter * parent )
