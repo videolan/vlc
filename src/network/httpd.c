@@ -1829,9 +1829,9 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                 }
                 if( cl->query.i_body > 0 )
                 {
-                    /* TODO Mhh, handle the case client will only send a
-                     * request and close the connection
-                     * to mark and of body (probably only RTSP) */
+                    /* TODO Mhh, handle the case where the client only
+                     * sends a request and closes the connection to
+                     * mark the end of the body (probably only RTSP) */
                     cl->query.p_body = xmalloc( cl->query.i_body );
                     cl->i_buffer = 0;
                 }
