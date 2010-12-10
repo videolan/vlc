@@ -103,6 +103,7 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
 {
     /* Properties */
     setFrameStyle( QFrame::NoFrame );
+    setAttribute( Qt::WA_MacShowFocusRect, false );
     viewport()->setAutoFillBackground( false );
     setIconSize( QSize( 24,24 ) );
     setIndentation( 12 );

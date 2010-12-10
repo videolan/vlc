@@ -295,6 +295,7 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
     setUniformItemSizes( true );
     setSelectionMode( QAbstractItemView::ExtendedSelection );
     setDragEnabled(true);
+    setAttribute( Qt::WA_MacShowFocusRect, false );
     /* dropping in QListView::IconMode does not seem to work */
     //setAcceptDrops( true );
     //setDropIndicatorShown(true);
@@ -326,6 +327,7 @@ PlListView::PlListView( PLModel *model, QWidget *parent ) : QListView( parent )
 
     PlListViewItemDelegate *delegate = new PlListViewItemDelegate( this );
     setItemDelegate( delegate );
+    setAttribute( Qt::WA_MacShowFocusRect, false );
 }
 
 void PlListView::startDrag ( Qt::DropActions supportedActions )

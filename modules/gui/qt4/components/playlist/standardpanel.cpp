@@ -286,6 +286,7 @@ void StandardPLPanel::createTreeView()
     treeView->setAnimated( true );
     treeView->setUniformRowHeights( true );
     treeView->setSortingEnabled( true );
+    treeView->setAttribute( Qt::WA_MacShowFocusRect, false );
     treeView->header()->setSortIndicator( -1 , Qt::AscendingOrder );
     treeView->header()->setSortIndicatorShown( true );
     treeView->header()->setClickable( true );
