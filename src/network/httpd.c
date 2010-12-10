@@ -1832,8 +1832,31 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                     /* TODO Mhh, handle the case where the client only
                      * sends a request and closes the connection to
                      * mark the end of the body (probably only RTSP) */
-                    cl->query.p_body = xmalloc( cl->query.i_body );
+                    cl->query.p_body = malloc( cl->query.i_body );
                     cl->i_buffer = 0;
+                    if ( cl->query.p_body == NULL )
+                    {
+                        switch (cl->query.i_proto)
+                        {
+                            case HTTPD_PROTO_HTTP:
+                            {
+                                const uint8_t sorry[] =
+                            "HTTP/1.1 413 Request Entity Too Large\r\n\r\n";
+                                httpd_NetSend( cl, sorry, sizeof( sorry ) - 1 );
+                                break;
+                            }
+                            case HTTPD_PROTO_RTSP:
+                            {
+                                const uint8_t sorry[] =
+                            "RTSP/1.0 413 Request Entity Too Large\r\n\r\n";
+                                httpd_NetSend( cl, sorry, sizeof( sorry ) - 1 );
+                                break;
+                            }
+                            default:
+                                assert( 0 );
+                        }
+                        i_len = 0; /* drop */
+                    }
                     break;
                 }
                 else
