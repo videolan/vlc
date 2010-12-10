@@ -93,6 +93,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     else
     {
         volumeSlider = new QSlider( NULL );
+        volumeSlider->setAttribute( Qt::WA_MacSmallSize);
         volumeSlider->setOrientation( b_special ? Qt::Vertical
                                                 : Qt::Horizontal );
         volumeSlider->setMaximum( var_InheritBool( p_intf, "qt-volume-complete" )
