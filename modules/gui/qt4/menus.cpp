@@ -93,7 +93,9 @@ void addDPStaticEntry( QMenu *menu,
                        const QString& text,
                        const char *icon,
                        const char *member,
-                       const char *shortcut = NULL )
+                       const char *shortcut = NULL,
+                       QAction::MenuRole = QAction::NoRole
+                       )
 {
     QAction *action = NULL;
 #ifndef __APPLE__ /* We don't set icons in menus in MacOS X */
@@ -398,7 +400,7 @@ QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
     menu->addSeparator();
 
     addDPStaticEntry( menu, qtr( "&Preferences" ),
-        ":/menu/preferences", SLOT( prefsDialog() ), "Ctrl+P" );
+        ":/menu/preferences", SLOT( prefsDialog() ), "Ctrl+P", QAction::PreferencesRole );
 
     return menu;
 }
@@ -762,7 +764,7 @@ QMenu *QVLCMenu::HelpMenu( QWidget *parent )
 #endif
     menu->addSeparator();
     addDPStaticEntry( menu, qtr( I_MENU_ABOUT ), ":/menu/info",
-            SLOT( aboutDialog() ), "Shift+F1" );
+            SLOT( aboutDialog() ), "Shift+F1", QAction::AboutRole );
     return menu;
 }
 
@@ -901,7 +903,7 @@ void QVLCMenu::PopupMenuStaticEntries( QMenu *menu )
 #endif
 
     addDPStaticEntry( menu, qtr( "Quit" ), ":/menu/quit",
-                      SLOT( quit() ), "Ctrl+Q" );
+                      SLOT( quit() ), "Ctrl+Q", QAction::QuitRole );
 }
 
 /* Video Tracks and Subtitles tracks */
