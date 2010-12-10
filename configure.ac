@@ -2310,6 +2310,12 @@ AS_IF([test "${enable_gme}" != "no"], [
 
 
 dnl
+dnl  SIDPlay plugin
+dnl
+PKG_ENABLE_MODULES_VLC([SID], [], [libsidplay2], [C64 sid demux support], [auto], [], [-lresid-builder])
+
+
+dnl
 dnl  ogg demux plugin
 dnl
 PKG_ENABLE_MODULES_VLC([OGG], [], [ogg >= 1.0], [Ogg demux support], [auto])
