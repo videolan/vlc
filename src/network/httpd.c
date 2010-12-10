@@ -1834,6 +1834,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                      * mark the end of the body (probably only RTSP) */
                     cl->query.p_body = xmalloc( cl->query.i_body );
                     cl->i_buffer = 0;
+                    break;
                 }
                 else
                 {
