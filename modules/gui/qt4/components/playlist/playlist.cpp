@@ -423,7 +423,7 @@ QSize LocationButton::sizeHint() const
 #ifdef Q_WS_MAC
 QSplitterHandle *PlaylistWidget::createHandle()
 {
-    return new SplitterHandle( orientation(), this );
+    return new SplitterHandle( split->orientation(), split );
 }
 
 SplitterHandle::SplitterHandle( Qt::Orientation orientation, QSplitter * parent )
