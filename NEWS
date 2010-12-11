@@ -36,6 +36,7 @@ Demuxers:
  * new images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
  * Ogg seeking improvements
  * Game Music Emu (GME) plugin rewritten from scratch using the C api
+ * C64 SID file playback support using sidplay2
 
 Interfaces
  * The telnet interface has been removed in the favour of the lua one
