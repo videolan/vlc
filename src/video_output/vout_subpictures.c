@@ -142,7 +142,7 @@ static void SubpictureChain( subpicture_t **pp_head, subpicture_t *p_subpic );
 static int SubpictureCmp( const void *s0, const void *s1 );
 
 static void SpuRenderRegion( spu_t *,
-                             picture_t *p_pic_dst, spu_area_t *,
+                             subpicture_region_t **, spu_area_t *,
                              subpicture_t *, subpicture_region_t *,
                              const spu_scale_t scale_size,
                              const video_format_t *p_fmt,
@@ -399,6 +399,7 @@ void spu_RenderSubpictures( spu_t *p_spu,
         vlc_mutex_unlock( &p_sys->lock );
         return;
     }
+    subpicture_t *p_output = subpicture_New( NULL );
 
     /* Now order subpicture array
      * XXX The order is *really* important for overlap subtitles positionning */
@@ -409,10 +410,6 @@ void spu_RenderSubpictures( spu_t *p_spu,
     p_subtitle_area = p_subtitle_area_buffer;
     if( i_subtitle_region_count > sizeof(p_subtitle_area_buffer)/sizeof(*p_subtitle_area_buffer) )
         p_subtitle_area = calloc( i_subtitle_region_count, sizeof(*p_subtitle_area) );
-
-    /* Create the blending module */
-    if( !p_sys->p_blend )
-        p_spu->p->p_blend = filter_NewBlend( VLC_OBJECT(p_spu), p_fmt_dst );
 
     /* Process all subpictures and regions (in the right order) */
     for( unsigned int i_index = 0; i_index < i_subpicture; i_index++ )
@@ -487,10 +484,18 @@ void spu_RenderSubpictures( spu_t *p_spu,
                 continue;
 
             /* */
-            SpuRenderRegion( p_spu, p_pic_dst, &area,
+            subpicture_region_t *p_render;
+            SpuRenderRegion( p_spu, &p_render, &area,
                              p_subpic, p_region, scale, p_fmt_dst,
                              p_subtitle_area, i_subtitle_area,
                              p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
+            if( p_render )
+            {
+                subpicture_region_t **pp_last = &p_output->p_region;
+                while( *pp_last )
+                    pp_last = &(*pp_last)->p_next;
+                *pp_last = p_render;
+            }
 
             if( p_subpic->b_subtitle )
             {
@@ -511,6 +516,19 @@ void spu_RenderSubpictures( spu_t *p_spu,
     /* */
     if( p_subtitle_area != p_subtitle_area_buffer )
         free( p_subtitle_area );
+
+    if( p_output )
+    {
+        /* Create the blending module */
+        if( !p_sys->p_blend )
+            p_spu->p->p_blend = filter_NewBlend( VLC_OBJECT(p_spu), p_fmt_dst );
+
+        /* Do the blending */
+        if( p_spu->p->p_blend )
+            picture_BlendSubpicture( p_pic_dst, p_spu->p->p_blend, p_output );
+
+        subpicture_Delete( p_output );
+    }
 
     vlc_mutex_unlock( &p_sys->lock );
 }
@@ -1189,33 +1207,11 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
 }
 
 /**
- * This function computes the current alpha value for a given region.
- */
-static int SpuRegionAlpha( subpicture_t *p_subpic, subpicture_region_t *p_region )
-{
-    /* Compute alpha blend value */
-    int i_fade_alpha = 255;
-    if( p_subpic->b_fade )
-    {
-        mtime_t i_fade_start = ( p_subpic->i_stop +
-                                 p_subpic->i_start ) / 2;
-        mtime_t i_now = mdate();
-
-        if( i_now >= i_fade_start && p_subpic->i_stop > i_fade_start )
-        {
-            i_fade_alpha = 255 * ( p_subpic->i_stop - i_now ) /
-                           ( p_subpic->i_stop - i_fade_start );
-        }
-    }
-    return i_fade_alpha * p_subpic->i_alpha * p_region->i_alpha / 65025;
-}
-
-/**
- * It will render the provided region onto p_pic_dst.
+ * It will transform the provided region into another region suitable for rendering.
  */
 
 static void SpuRenderRegion( spu_t *p_spu,
-                             picture_t *p_pic_dst, spu_area_t *p_area,
+                             subpicture_region_t **pp_dst, spu_area_t *p_dst_area,
                              subpicture_t *p_subpic, subpicture_region_t *p_region,
                              const spu_scale_t scale_size,
                              const video_format_t *p_fmt,
@@ -1234,7 +1230,8 @@ static void SpuRenderRegion( spu_t *p_spu,
     picture_t *p_region_picture;
 
     /* Invalidate area by default */
-    *p_area = spu_area_create( 0,0, 0,0, scale_size );
+    *p_dst_area = spu_area_create( 0,0, 0,0, scale_size );
+    *pp_dst     = NULL;
 
     /* Render text region */
     if( p_region->fmt.i_chroma == VLC_CODEC_TEXT )
@@ -1273,20 +1270,20 @@ static void SpuRenderRegion( spu_t *p_spu,
 
     /* Save this position for subtitle overlap support
      * it is really important that there are given without scale_size applied */
-    *p_area = spu_area_create( i_x_offset, i_y_offset,
+    *p_dst_area = spu_area_create( i_x_offset, i_y_offset,
                                p_region->fmt.i_width, p_region->fmt.i_height,
                                scale_size );
 
     /* Handle overlapping subtitles when possible */
     if( p_subpic->b_subtitle && !p_subpic->b_absolute )
     {
-        SpuAreaFixOverlap( p_area, p_subtitle_area, i_subtitle_area,
+        SpuAreaFixOverlap( p_dst_area, p_subtitle_area, i_subtitle_area,
                            p_region->i_align );
     }
 
     /* we copy the area: for the subtitle overlap support we want
      * to only save the area without margin applied */
-    spu_area_t restrained = *p_area;
+    spu_area_t restrained = *p_dst_area;
 
     /* apply margin to subtitles and correct if they go over the picture edge */
     if( p_subpic->b_subtitle )
@@ -1476,17 +1473,24 @@ static void SpuRenderRegion( spu_t *p_spu,
         }
     }
 
-    /* Update the blender */
-    if( filter_ConfigureBlend( p_spu->p->p_blend,
-                               p_fmt->i_width, p_fmt->i_height,
-                               &region_fmt ) ||
-        filter_Blend( p_spu->p->p_blend,
-                      p_pic_dst, i_x_offset, i_y_offset,
-                      p_region_picture, SpuRegionAlpha( p_subpic, p_region ) ) )
+    subpicture_region_t *p_dst = *pp_dst = subpicture_region_New( &region_fmt );
+    if( p_dst )
     {
-        msg_Err( p_spu, "blending %4.4s to %4.4s failed",
-                 (char *)&p_sys->p_blend->fmt_in.video.i_chroma,
-                 (char *)&p_sys->p_blend->fmt_out.video.i_chroma );
+        p_dst->i_x       = i_x_offset;
+        p_dst->i_y       = i_y_offset;
+        p_dst->i_align   = 0;
+        p_dst->p_picture = picture_Hold( p_region_picture );
+        int i_fade_alpha = 255;
+        if( p_subpic->b_fade )
+        {
+            mtime_t fade_start = ( p_subpic->i_stop +
+                                   p_subpic->i_start ) / 2;
+
+            if( fade_start <= render_date && fade_start < p_subpic->i_stop )
+                i_fade_alpha = 255 * ( p_subpic->i_stop - render_date ) /
+                                     ( p_subpic->i_stop - fade_start );
+        }
+        p_dst->i_alpha   = i_fade_alpha * p_subpic->i_alpha * p_region->i_alpha / 65025;
     }
 
 exit:
