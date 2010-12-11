@@ -279,6 +279,19 @@ VLC_EXPORT( int, picture_Export, ( vlc_object_t *p_obj, block_t **pp_image, vide
  */
 VLC_EXPORT( int, picture_Setup, ( picture_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) );
 
+
+/**
+ * This function will blend a given subpicture onto a picture.
+ *
+ * The subpicture and all its region must:
+ *  - be absolute.
+ *  - not be ephemere.
+ *  - not have the fade flag.
+ *  - contains only picture (no text rendering).
+ */
+VLC_EXPORT( void, picture_BlendSubpicture, ( picture_t *, filter_t *p_blend, subpicture_t * ) );
+
+
 /*****************************************************************************
  * Flags used to describe the status of a picture
  *****************************************************************************/
