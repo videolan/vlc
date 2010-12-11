@@ -625,6 +625,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         DefaultAttr( attr, "color", "#000000" );
         DefaultAttr( attr, "scrolling", "auto" );
         DefaultAttr( attr, "alignment", "left" );
+        DefaultAttr( attr, "focus", "true" );
         DefaultAttr( attr, "width", "0" );
         DefaultAttr( attr, "lefttop", "lefttop" );
         DefaultAttr( attr, "rightbottom", "lefttop" );
@@ -649,7 +650,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 convertBoolean( attr["ykeepratio"] ),
                 convertColor( attr["color"] ),
                 attr["scrolling"], attr["alignment"],
-                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId,
+                attr["focus"], attr["help"],
+                m_curLayer, m_curWindowId, m_curLayoutId,
                 m_panelStack.back() );
         m_curLayer++;
         m_pData->m_listText.push_back( textData );

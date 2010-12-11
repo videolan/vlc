@@ -42,9 +42,9 @@
 
 CtrlText::CtrlText( intf_thread_t *pIntf, VarText &rVariable,
                     const GenericFont &rFont, const UString &rHelp,
-                    uint32_t color, VarBool *pVisible, Scrolling_t scrollMode,
-                    Align_t alignment ):
-    CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ),
+                    uint32_t color, VarBool *pVisible, VarBool *pFocus,
+                    Scrolling_t scrollMode, Align_t alignment ):
+    CtrlGeneric( pIntf, rHelp, pVisible ), m_pFocus( pFocus), m_fsm( pIntf ),
     m_rVariable( rVariable ), m_cmdToManual( this ),
     m_cmdManualMoving( this ), m_cmdManualStill( this ),
     m_cmdMove( this ), m_pEvt( NULL ), m_rFont( rFont ),
@@ -121,6 +121,9 @@ void CtrlText::handleEvent( EvtGeneric &rEvent )
 
 bool CtrlText::mouseOver( int x, int y ) const
 {
+    if( !m_pFocus->get() )
+        return false;
+
     if( m_pCurrImg )
     {
         // We have 3 different ways of deciding when to return true here:

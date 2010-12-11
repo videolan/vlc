@@ -337,8 +337,8 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
     /// Type definition
     struct Text
     {
-        Text( const string & id, int xPos, int yPos, const string & visible, const string & fontId, const string & text, int width, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, uint32_t color, const string & scrolling, const string & alignment, const string & help, int layer, const string & windowId, const string & layoutId, const string & panelId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_fontId( fontId ), m_text( text ), m_width( width ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_color( color ), m_scrolling( scrolling ), m_alignment( alignment ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ), m_panelId( panelId ) {}
+        Text( const string & id, int xPos, int yPos, const string & visible, const string & fontId, const string & text, int width, const string & leftTop, const string & rightBottom, bool xKeepRatio, bool yKeepRatio, uint32_t color, const string & scrolling, const string & alignment, const string & focus, const string & help, int layer, const string & windowId, const string & layoutId, const string & panelId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_fontId( fontId ), m_text( text ), m_width( width ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_xKeepRatio( xKeepRatio ), m_yKeepRatio( yKeepRatio ), m_color( color ), m_scrolling( scrolling ), m_alignment( alignment ), m_focus( focus ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ), m_panelId( panelId ) {}
 
         string m_id;
         int m_xPos;
@@ -354,6 +354,7 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_fontId( font
         uint32_t m_color;
         string m_scrolling;
         string m_alignment;
+        string m_focus;
         string m_help;
         int m_layer;
         string m_windowId;

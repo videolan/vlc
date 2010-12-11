@@ -739,10 +739,11 @@ void Builder::addText( const BuilderData::Text &rData )
     // XXX check when it is null
     Interpreter *pInterpreter = Interpreter::instance( getIntf() );
     VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
+    VarBool *pFocus = pInterpreter->getVarBool( rData.m_focus, m_pTheme );
 
     CtrlText *pText = new CtrlText( getIntf(), *pVar, *pFont,
-        UString( getIntf(), rData.m_help.c_str() ), rData.m_color, pVisible,
-        scrolling, alignment );
+        UString( getIntf(), rData.m_help.c_str() ), rData.m_color,
+        pVisible, pFocus, scrolling, alignment );
     m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pText );
 
     int height = pFont->getSize();

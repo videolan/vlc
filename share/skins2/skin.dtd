@@ -257,6 +257,7 @@
         color       CDATA   "#000000"
         scrolling   CDATA   "auto"
         alignment   CDATA   "left"
+        focus       CDATA   "true"
         help        CDATA   ""
     >
 <!ELEMENT Playlist (Slider)?>
