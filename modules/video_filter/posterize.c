@@ -48,8 +48,6 @@ static void PackedYUVPosterize( picture_t *, picture_t *, int);
 static void RVPosterize( picture_t *, picture_t *, bool, int );
 static void YuvPosterization( uint8_t *, uint8_t *, uint8_t *, uint8_t *,
                     uint8_t, uint8_t, uint8_t, uint8_t, int );
-static void yuv2rgb( uint8_t *, uint8_t *, uint8_t *,
-                    uint8_t, uint8_t, uint8_t);
 
 static const char *const ppsz_filter_options[] = {
     "level", NULL
@@ -419,13 +417,13 @@ static void YuvPosterization( uint8_t* posterized_y1, uint8_t* posterized_y2,
                              uint8_t* posterized_u, uint8_t* posterized_v,
                              uint8_t y1, uint8_t y2, uint8_t u, uint8_t v,
                              int i_level ) {
-    uint8_t r1, g1, b1; /* for y1 new value */
-    uint8_t r2, b2, g2; /* for y2 new value */
-    uint8_t r3, g3, b3; /* for new values of u and v */
+    int r1, g1, b1; /* for y1 new value */
+    int r2, b2, g2; /* for y2 new value */
+    int r3, g3, b3; /* for new values of u and v */
     /* fist convert YUV -> RGB */
-    yuv2rgb( &r1, &g1, &b1, y1, u, v );
-    yuv2rgb( &r2, &g2, &b2, y2, u, v );
-    yuv2rgb( &r3, &g3, &b3, ( y1 + y2 ) / 2, u, v );
+    yuv_to_rgb( &r1, &g1, &b1, y1, u, v );
+    yuv_to_rgb( &r2, &g2, &b2, y1, u, v );
+    yuv_to_rgb( &r3, &g3, &b3, ( y1 + y2 ) / 2, u, v );
     /* round RGB values to specified posterize level */
     r1 = POSTERIZE_PIXEL( r1, i_level );
     g1 = POSTERIZE_PIXEL( g1, i_level );
@@ -441,59 +439,6 @@ static void YuvPosterization( uint8_t* posterized_y1, uint8_t* posterized_y2,
     *posterized_y2 = ( ( 66 * r2 + 129 * g2 +  25 * b2 + 128 ) >> 8 ) +  16;
     *posterized_u = ( ( -38 * r3 -  74 * g3 + 112 * b3 + 128 ) >> 8 ) + 128;
     *posterized_v = ( ( 112 * r3 -  94 * g3 -  18 * b3 + 128 ) >> 8 ) + 128;
-}
-
-/*****************************************************************************
- * yuv2rgb: Converts from YUV to RGB color space
- *****************************************************************************
- * This function converts YUV values to RGB values using function defined in:
- * http://msdn.microsoft.com/en-us/library/ms893078
- *****************************************************************************/
-static void yuv2rgb( uint8_t* r, uint8_t* g, uint8_t* b, uint8_t y,
-                    uint8_t u, uint8_t v )
-{
-    int16_t c = y - 16;
-    int16_t d = u - 128;
-    int16_t e = v - 128;
-    int16_t noclipped_r = ( 298 * c + 409 * e + 128 ) >> 8;
-    if ( noclipped_r < 0 )
-    {
-        *r=0;
-    }
-    else if ( noclipped_r > 255 )
-    {
-        *r = 255;
-    }
-    else
-    {
-        *r = noclipped_r;
-    }
-    int16_t noclipped_g = ( 298 * c - 100 * d - 208 * e + 128 ) >> 8;
-    if ( noclipped_g < 0 )
-    {
-        *g=0;
-    }
-    else if ( noclipped_g > 255 )
-    {
-        *g = 255;
-    }
-    else
-    {
-        *g = noclipped_g;
-    }
-    int16_t noclipped_b = ( 298 * c + 516 * d + 128 ) >> 8;
-    if ( noclipped_b < 0 )
-    {
-        *b=0;
-    }
-    else if ( noclipped_b > 255 )
-    {
-        *b = 255;
-    }
-    else
-    {
-        *b = noclipped_b;
-    }
 }
 
 static int FilterCallback ( vlc_object_t *p_this, char const *psz_var,

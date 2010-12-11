@@ -42,8 +42,6 @@
 static int  Create      ( vlc_object_t * );
 static void Destroy     ( vlc_object_t * );
 
-static void vlc_rgb_index( int *, int *, int *, const video_format_t * );
-static void vlc_yuv_index( int *, int *, int *, const video_format_t * );
 static void RVSepia( picture_t *, picture_t *, int );
 static void PlanarI420Sepia( picture_t *, picture_t *, int);
 static void PackedYUVSepia( picture_t *, picture_t *, int);
@@ -207,96 +205,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
-/***********************************************************************
- * Utils
- ***********************************************************************/
-static inline uint8_t vlc_uint8( int v )
-{
-    if( v > 255 )
-        return 255;
-    else if( v < 0 )
-        return 0;
-    return v;
-}
-
-static inline void yuv_to_rgb( int *r, int *g, int *b,
-                               uint8_t y1, uint8_t u1, uint8_t v1 )
-{
-    /* macros used for YUV pixel conversions */
-#   define SCALEBITS 10
-#   define ONE_HALF  (1 << (SCALEBITS - 1))
-#   define FIX(x)    ((int) ((x) * (1<<SCALEBITS) + 0.5))
-
-    int y, cb, cr, r_add, g_add, b_add;
-
-    cb = u1 - 128;
-    cr = v1 - 128;
-    r_add = FIX(1.40200*255.0/224.0) * cr + ONE_HALF;
-    g_add = - FIX(0.34414*255.0/224.0) * cb
-            - FIX(0.71414*255.0/224.0) * cr + ONE_HALF;
-    b_add = FIX(1.77200*255.0/224.0) * cb + ONE_HALF;
-    y = (y1 - 16) * FIX(255.0/219.0);
-    *r = vlc_uint8( (y + r_add) >> SCALEBITS );
-    *g = vlc_uint8( (y + g_add) >> SCALEBITS );
-    *b = vlc_uint8( (y + b_add) >> SCALEBITS );
-#undef FIX
-#undef ONE_HALF
-#undef SCALEBITS
-}
-
-static void vlc_rgb_index( int *pi_rindex, int *pi_gindex, int *pi_bindex,
-                           const video_format_t *p_fmt )
-{
-    if( p_fmt->i_chroma != VLC_CODEC_RGB24 && p_fmt->i_chroma != VLC_CODEC_RGB32 )
-        return;
-
-#ifdef WORDS_BIGENDIAN
-    const int i_mask_bits = p_fmt->i_chroma == VLC_CODEC_RGB24 ? 24 : 32;
-    *pi_rindex = ( i_mask_bits - p_fmt->i_lrshift ) / 8;
-    *pi_gindex = ( i_mask_bits - p_fmt->i_lgshift ) / 8;
-    *pi_bindex = ( i_mask_bits - p_fmt->i_lbshift ) / 8;
-#else
-    *pi_rindex = p_fmt->i_lrshift / 8;
-    *pi_gindex = p_fmt->i_lgshift / 8;
-    *pi_bindex = p_fmt->i_lbshift / 8;
-#endif
-}
-
-static void vlc_yuv_index( int *pi_y_index, int *pi_u_index, int *pi_v_index,
-                          const video_format_t *p_fmt )
-{
-    if(
-       p_fmt->i_chroma != VLC_CODEC_UYVY &&
-       p_fmt->i_chroma != VLC_CODEC_VYUY &&
-       p_fmt->i_chroma != VLC_CODEC_YUYV &&
-       p_fmt->i_chroma != VLC_CODEC_YVYU )
-        return;
-
-    switch( p_fmt->i_chroma )
-    {
-        case VLC_CODEC_UYVY:
-            *pi_u_index = 0;
-            *pi_y_index = 1;
-            *pi_v_index = 2;
-            break;
-        case VLC_CODEC_VYUY:
-            *pi_v_index = 0;
-            *pi_y_index = 1;
-            *pi_u_index = 2;
-            break;
-        case VLC_CODEC_YUYV:
-            *pi_y_index = 0;
-            *pi_u_index = 1;
-            *pi_v_index = 3;
-            break;
-        case VLC_CODEC_YVYU:
-            *pi_y_index = 0;
-            *pi_v_index = 1;
-            *pi_u_index = 3;
-            break;
-    }
-}
-
 /*****************************************************************************
  * PlanarI420Sepia: Applies sepia to one frame of the planar I420 video
  *****************************************************************************
@@ -363,7 +271,8 @@ static void PackedYUVSepia( picture_t *p_pic, picture_t *p_outpic,
     uint8_t *p_in, *p_in_end, *p_line_start, *p_line_end, *p_out;
     int i_yindex = 1, i_uindex = 2, i_vindex = 0;
 
-    vlc_yuv_index( &i_yindex, &i_vindex, &i_uindex, &p_outpic->format );
+    GetPackedYuvOffsets( p_outpic->format.i_chroma,
+                        &i_yindex, &i_uindex, &i_vindex );
 
     p_in = p_pic->p[0].p_pixels;
     p_in_end = p_in + p_pic->p[0].i_visible_lines
@@ -403,7 +312,7 @@ static void RVSepia( picture_t *p_pic, picture_t *p_outpic, int i_intensity )
     bool b_isRV32 = p_pic->format.i_chroma == VLC_CODEC_RGB32;
     int i_rindex = 0, i_gindex = 1, i_bindex = 2;
 
-    vlc_rgb_index( &i_rindex, &i_gindex, &i_bindex, &p_outpic->format );
+    GetPackedRgbIndexes( &p_outpic->format, &i_rindex, &i_gindex, &i_bindex );
 
     p_in = p_pic->p[0].p_pixels;
     p_in_end = p_in + p_pic->p[0].i_visible_lines

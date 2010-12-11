@@ -58,6 +58,12 @@ static inline int GetPackedYuvOffsets( vlc_fourcc_t i_chroma,
             *i_u_offset = 0;
             *i_v_offset = 2;
             return VLC_SUCCESS;
+        case VLC_CODEC_VYUY:
+            /* VYUY */
+            *i_y_offset = 1;
+            *i_u_offset = 2;
+            *i_v_offset = 0;
+            return VLC_SUCCESS;
         case VLC_CODEC_YUYV:
             /* YUYV */
             *i_y_offset = 0;
@@ -73,6 +79,67 @@ static inline int GetPackedYuvOffsets( vlc_fourcc_t i_chroma,
         default:
             return VLC_EGENERIC;
     }
+}
+
+static inline int GetPackedRgbIndexes( const video_format_t *p_fmt, int *i_r_index,
+                                      int *i_g_index, int *i_b_index )
+{
+    if( p_fmt->i_chroma != VLC_CODEC_RGB24 && p_fmt->i_chroma != VLC_CODEC_RGB32 )
+        return VLC_EGENERIC;
+
+#ifdef WORDS_BIGENDIAN
+    const int i_mask_bits = p_fmt->i_chroma == VLC_CODEC_RGB24 ? 24 : 32;
+    *i_r_index = ( i_mask_bits - p_fmt->i_lrshift ) / 8;
+    *i_g_index = ( i_mask_bits - p_fmt->i_lgshift ) / 8;
+    *i_b_index = ( i_mask_bits - p_fmt->i_lbshift ) / 8;
+#else
+    *i_r_index = p_fmt->i_lrshift / 8;
+    *i_g_index = p_fmt->i_lgshift / 8;
+    *i_b_index = p_fmt->i_lbshift / 8;
+#endif
+    return VLC_SUCCESS;
+}
+
+static inline uint8_t vlc_uint8( int v )
+{
+    if( v > 255 )
+        return 255;
+    else if( v < 0 )
+        return 0;
+    return v;
+}
+
+static inline void yuv_to_rgb( int *r, int *g, int *b,
+                               uint8_t y1, uint8_t u1, uint8_t v1 )
+{
+    /* macros used for YUV pixel conversions */
+#   define SCALEBITS 10
+#   define ONE_HALF  (1 << (SCALEBITS - 1))
+#   define FIX(x)    ((int) ((x) * (1<<SCALEBITS) + 0.5))
+
+    int y, cb, cr, r_add, g_add, b_add;
+
+    cb = u1 - 128;
+    cr = v1 - 128;
+    r_add = FIX(1.40200*255.0/224.0) * cr + ONE_HALF;
+    g_add = - FIX(0.34414*255.0/224.0) * cb
+            - FIX(0.71414*255.0/224.0) * cr + ONE_HALF;
+    b_add = FIX(1.77200*255.0/224.0) * cb + ONE_HALF;
+    y = (y1 - 16) * FIX(255.0/219.0);
+    *r = vlc_uint8( (y + r_add) >> SCALEBITS );
+    *g = vlc_uint8( (y + g_add) >> SCALEBITS );
+    *b = vlc_uint8( (y + b_add) >> SCALEBITS );
+#undef FIX
+#undef ONE_HALF
+#undef SCALEBITS
+}
+
+static inline void rgb_to_yuv( uint8_t *y, uint8_t *u, uint8_t *v,
+                               int r, int g, int b )
+{
+    *y = ( ( (  66 * r + 129 * g +  25 * b + 128 ) >> 8 ) + 16 );
+    *u =   ( ( -38 * r -  74 * g + 112 * b + 128 ) >> 8 ) + 128 ;
+    *v =   ( ( 112 * r -  94 * g -  18 * b + 128 ) >> 8 ) + 128 ;
 }
 
 /*****************************************************************************

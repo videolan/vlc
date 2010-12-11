@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include "filter_picture.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -248,15 +249,6 @@ static void Blend( filter_t *p_filter,
 /***********************************************************************
  * Utils
  ***********************************************************************/
-static inline uint8_t vlc_uint8( int v )
-{
-    if( v > 255 )
-        return 255;
-    else if( v < 0 )
-        return 0;
-    return v;
-}
-
 #define MAX_TRANS 255
 #define TRANS_BITS  8
 
@@ -275,39 +267,6 @@ static inline int vlc_alpha( int t, int a )
     if( a == 255 )
         return t;
     return (t * a) / 255;
-}
-
-static inline void yuv_to_rgb( int *r, int *g, int *b,
-                               uint8_t y1, uint8_t u1, uint8_t v1 )
-{
-    /* macros used for YUV pixel conversions */
-#   define SCALEBITS 10
-#   define ONE_HALF  (1 << (SCALEBITS - 1))
-#   define FIX(x)    ((int) ((x) * (1<<SCALEBITS) + 0.5))
-
-    int y, cb, cr, r_add, g_add, b_add;
-
-    cb = u1 - 128;
-    cr = v1 - 128;
-    r_add = FIX(1.40200*255.0/224.0) * cr + ONE_HALF;
-    g_add = - FIX(0.34414*255.0/224.0) * cb
-            - FIX(0.71414*255.0/224.0) * cr + ONE_HALF;
-    b_add = FIX(1.77200*255.0/224.0) * cb + ONE_HALF;
-    y = (y1 - 16) * FIX(255.0/219.0);
-    *r = vlc_uint8( (y + r_add) >> SCALEBITS );
-    *g = vlc_uint8( (y + g_add) >> SCALEBITS );
-    *b = vlc_uint8( (y + b_add) >> SCALEBITS );
-#undef FIX
-#undef ONE_HALF
-#undef SCALEBITS
-}
-
-static inline void rgb_to_yuv( uint8_t *y, uint8_t *u, uint8_t *v,
-                               int r, int g, int b )
-{
-    *y = ( ( (  66 * r + 129 * g +  25 * b + 128 ) >> 8 ) + 16 );
-    *u =   ( ( -38 * r -  74 * g + 112 * b + 128 ) >> 8 ) + 128 ;
-    *v =   ( ( 112 * r -  94 * g -  18 * b + 128 ) >> 8 ) + 128 ;
 }
 
 static uint8_t *vlc_plane_start( int *pi_pitch,
