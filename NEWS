@@ -35,7 +35,6 @@ Demuxers:
  * id3tag plugin is now removed (superseded by taglib)
  * new images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
  * Ogg seeking improvements
- * Game Music Emu (GME) plugin rewritten from scratch using the C api
  * C64 SID file playback support using sidplay2
 
 Interfaces
