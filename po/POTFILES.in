@@ -511,6 +511,7 @@ modules/demux/rawaud.c
 modules/demux/rawdv.c
 modules/demux/rawvid.c
 modules/demux/real.c
+modules/demux/sid.cpp
 modules/demux/smf.c
 modules/demux/subtitle.c
 modules/demux/ts.c
