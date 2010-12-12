@@ -248,7 +248,6 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
     id->track_id = rtsp->track_id;
     id->ssrc = ssrc;
     id->clock_rate = clock_rate;
-    /* TODO: can we assume that this need not be strdup'd? */
     id->dst = dst;
     if( id->dst != NULL )
     {
@@ -458,11 +457,6 @@ int RtspTrackAttach( rtsp_stream_t *rtsp, const char *name,
 #endif
             if (rtp_fd == -1)
                 break;
-
-            /* Ignore any unexpected incoming packet */
-            /* XXX: is this needed again? */
-            setsockopt (rtp_fd, SOL_SOCKET, SO_RCVBUF, &(int){ 0 },
-                        sizeof (int));
 
             uint16_t seq;
             *ssrc = ntohl(tr->ssrc);
