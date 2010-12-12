@@ -316,6 +316,8 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     sys->snapshot[index]->date = snapshot_GetMovietime(vd);
 
     sys->index = (index + 1) % sys->count;
+
+    picture_Release(picture);
 }
 
 static int Control(vout_display_t *vd, int query, va_list args)
