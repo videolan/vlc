@@ -85,7 +85,6 @@ static picture_pool_t *Pool (vout_display_t *, unsigned);
 static void PictureRender (vout_display_t *, picture_t *);
 static void PictureDisplay (vout_display_t *, picture_t *);
 static int Control (vout_display_t *, int, va_list);
-static void Manage (vout_display_t *);
 /* OpenGL callbacks */
 static void SwapBuffers (vout_opengl_t *gl);
 
@@ -270,7 +269,7 @@ static int Open (vlc_object_t *obj)
     vd->prepare = PictureRender;
     vd->display = PictureDisplay;
     vd->control = Control;
-    vd->manage = Manage;
+    vd->manage = NULL;
 
     return VLC_SUCCESS;
 error:
@@ -413,8 +412,3 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     return VLC_EGENERIC;
 }
 
-static void Manage (vout_display_t *vd)
-{
-    //vout_display_sys_t *sys = vd->sys;
-    (void) vd;
-}

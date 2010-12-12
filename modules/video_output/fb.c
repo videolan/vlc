@@ -103,7 +103,6 @@ vlc_module_end ()
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *);
 static int            Control(vout_display_t *, int, va_list);
-static void           Manage (vout_display_t *);
 
 /* */
 static int  OpenDisplay  (vout_display_t *, bool force_resolution);
@@ -311,7 +310,7 @@ static int Open(vlc_object_t *object)
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
-    vd->manage  = Manage;
+    vd->manage  = NULL;
 
     /* */
     vout_display_SendEventFullscreen(vd, true);
@@ -409,24 +408,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
         msg_Err(vd, "Unsupported query in vout display fb");
         return VLC_EGENERIC;
     }
-}
-static void Manage (vout_display_t *vd)
-{
-    VLC_UNUSED(vd);
-#if 0
-    /*
-     * Size change
-     */
-    if (vd->i_changes & VOUT_SIZE_CHANGE)
-    {
-        msg_Dbg(vd, "reinitializing framebuffer screen");
-        vd->i_changes &= ~VOUT_SIZE_CHANGE;
-
-        vout_display_SendEventDisplaySize();
-
-        ClearScreen(vd->sys);
-    }
-#endif
 }
 
 /* following functions are local */
