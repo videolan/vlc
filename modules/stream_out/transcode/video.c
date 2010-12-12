@@ -626,7 +626,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     while( (p_pic = id->p_decoder->pf_decode_video( id->p_decoder, &in )) )
     {
-        subpicture_t *p_subpic = NULL;
 
         sout_UpdateStatistic( p_stream->p_sout, SOUT_STATISTIC_DECODED_VIDEO, 1 );
 
@@ -707,34 +706,35 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
         /* Check if we have a subpicture to overlay */
         if( p_sys->p_spu )
         {
-            p_subpic = spu_SortSubpictures( p_sys->p_spu, p_pic->date, false );
-            /* TODO: get another pic */
-        }
-
-        /* Overlay subpicture */
-        if( p_subpic )
-        {
             video_format_t fmt;
-
-            if( picture_IsReferenced( p_pic ) && !filter_chain_GetLength( id->p_f_chain ) )
-            {
-                /* We can't modify the picture, we need to duplicate it */
-                picture_t *p_tmp = video_new_buffer_decoder( id->p_decoder );
-                if( p_tmp )
-                {
-                    picture_Copy( p_tmp, p_pic );
-                    picture_Release( p_pic );
-                    p_pic = p_tmp;
-                }
-            }
-
             if( filter_chain_GetLength( id->p_f_chain ) > 0 )
                 fmt = filter_chain_GetFmtOut( id->p_f_chain )->video;
             else
                 fmt = id->p_decoder->fmt_out.video;
 
-            spu_RenderSubpictures( p_sys->p_spu, p_pic, &fmt,
-                                   p_subpic, &id->p_decoder->fmt_out.video, p_pic->date );
+            subpicture_t *p_subpic = spu_Render( p_sys->p_spu, &fmt, &fmt,
+                                                 p_pic->date, p_pic->date, false );
+
+            /* Overlay subpicture */
+            if( p_subpic )
+            {
+                if( picture_IsReferenced( p_pic ) && !filter_chain_GetLength( id->p_f_chain ) )
+                {
+                    /* We can't modify the picture, we need to duplicate it */
+                    picture_t *p_tmp = video_new_buffer_decoder( id->p_decoder );
+                    if( p_tmp )
+                    {
+                        picture_Copy( p_tmp, p_pic );
+                        picture_Release( p_pic );
+                        p_pic = p_tmp;
+                    }
+                }
+                if( !p_sys->p_spu_blend )
+                    p_sys->p_spu_blend = filter_NewBlend( VLC_OBJECT( p_sys->p_spu ), &fmt );
+                if( p_sys->p_spu_blend )
+                    picture_BlendSubpicture( p_pic, p_sys->p_spu_blend, p_subpic );
+                subpicture_Delete( p_subpic );
+            }
         }
 
         /* Run user specified filter chain */

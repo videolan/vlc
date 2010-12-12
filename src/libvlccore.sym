@@ -403,8 +403,7 @@ spu_Create
 spu_Destroy
 spu_DisplaySubpicture
 spu_ChangeFilters
-spu_RenderSubpictures
-spu_SortSubpictures
+spu_Render
 spu_RegisterChannel
 spu_ClearChannel
 sql_Create

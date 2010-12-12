@@ -62,6 +62,7 @@ struct sout_stream_sys_t
     bool            b_soverlay;
     config_chain_t  *p_spu_cfg;
     spu_t           *p_spu;
+    filter_t        *p_spu_blend;
 
     /* OSD Menu */
     vlc_fourcc_t    i_osdcodec; /* codec osd menu (0 if not transcode) */

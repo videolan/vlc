@@ -79,7 +79,6 @@ struct spu_private_t
     spu_heap_t heap;
 
     int i_channel;             /**< number of subpicture channels registered */
-    filter_t *p_blend;                            /**< alpha blending module */
     filter_t *p_text;                              /**< text renderer module */
     filter_t *p_scale_yuvp;                     /**< scaling module for YUVP */
     filter_t *p_scale;                    /**< scaling module (all but YUVP) */
@@ -202,7 +201,6 @@ spu_t *spu_Create( vlc_object_t *p_this )
 
     SpuHeapInit( &p_sys->heap );
 
-    p_sys->p_blend = NULL;
     p_sys->p_text = NULL;
     p_sys->p_scale = NULL;
     p_sys->p_scale_yuvp = NULL;
@@ -237,9 +235,6 @@ spu_t *spu_Create( vlc_object_t *p_this )
 void spu_Destroy( spu_t *p_spu )
 {
     spu_private_t *p_sys = p_spu->p;
-
-    if( p_sys->p_blend )
-        filter_DeleteBlend( p_sys->p_blend );
 
     if( p_sys->p_text )
         FilterRelease( p_sys->p_text );
@@ -348,15 +343,14 @@ void spu_DisplaySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
 /**
  * This function renders all sub picture units in the list.
  */
-void spu_RenderSubpictures( spu_t *p_spu,
-                            picture_t *p_pic_dst, const video_format_t *p_fmt_dst,
-                            subpicture_t *p_subpic_list,
-                            const video_format_t *p_fmt_src,
-                            mtime_t render_subtitle_date )
+static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
+                                           const video_format_t *p_fmt_dst,
+                                           subpicture_t *p_subpic_list,
+                                           const video_format_t *p_fmt_src,
+                                           mtime_t render_subtitle_date,
+                                           mtime_t render_osd_date )
 {
     spu_private_t *p_sys = p_spu->p;
-
-    const mtime_t render_osd_date = mdate();
 
     const int i_source_video_width  = p_fmt_src->i_width;
     const int i_source_video_height = p_fmt_src->i_height;
@@ -368,8 +362,6 @@ void spu_RenderSubpictures( spu_t *p_spu,
     spu_area_t p_subtitle_area_buffer[VOUT_MAX_SUBPICTURES];
     spu_area_t *p_subtitle_area;
     int i_subtitle_area;
-
-    vlc_mutex_lock( &p_sys->lock );
 
     /* Preprocess subpictures */
     i_subpicture = 0;
@@ -395,10 +387,8 @@ void spu_RenderSubpictures( spu_t *p_spu,
 
     /* Be sure we have at least 1 picture to process */
     if( i_subpicture <= 0 )
-    {
-        vlc_mutex_unlock( &p_sys->lock );
-        return;
-    }
+        return NULL;
+
     subpicture_t *p_output = subpicture_New( NULL );
 
     /* Now order subpicture array
@@ -517,24 +507,11 @@ void spu_RenderSubpictures( spu_t *p_spu,
     if( p_subtitle_area != p_subtitle_area_buffer )
         free( p_subtitle_area );
 
-    if( p_output )
-    {
-        /* Create the blending module */
-        if( !p_sys->p_blend )
-            p_spu->p->p_blend = filter_NewBlend( VLC_OBJECT(p_spu), p_fmt_dst );
-
-        /* Do the blending */
-        if( p_spu->p->p_blend )
-            picture_BlendSubpicture( p_pic_dst, p_spu->p->p_blend, p_output );
-
-        subpicture_Delete( p_output );
-    }
-
-    vlc_mutex_unlock( &p_sys->lock );
+    return p_output;
 }
 
 /*****************************************************************************
- * spu_SortSubpictures: find the subpictures to display
+ * SpuSortSubpictures: find the subpictures to display
  *****************************************************************************
  * This function parses all subpictures and decides which ones need to be
  * displayed. If no picture has been selected, display_date will depend on
@@ -543,33 +520,13 @@ void spu_RenderSubpictures( spu_t *p_spu,
  * to be removed if a newer one is available), which makes it a lot
  * more difficult to guess if a subpicture has to be rendered or not.
  *****************************************************************************/
-subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_subtitle_date,
-                                   bool b_subtitle_only )
+static subpicture_t *SpuSortSubpictures( spu_t *p_spu,
+                                         mtime_t render_subtitle_date,
+                                         mtime_t render_osd_date,
+                                         bool b_subtitle_only )
 {
     spu_private_t *p_sys = p_spu->p;
     subpicture_t *p_subpic = NULL;
-    const mtime_t render_osd_date = mdate();
-
-    /* Update sub-filter chain */
-    vlc_mutex_lock( &p_sys->lock );
-    char *psz_chain_update = p_sys->psz_chain_update;
-    p_sys->psz_chain_update = NULL;
-    vlc_mutex_unlock( &p_sys->lock );
-
-    vlc_mutex_lock( &p_sys->chain_lock );
-    if( psz_chain_update )
-    {
-        filter_chain_Reset( p_sys->p_chain, NULL, NULL );
-
-        filter_chain_AppendFromString( p_spu->p->p_chain, psz_chain_update );
-
-        free( psz_chain_update );
-    }
-    /* Run subpicture filters */
-    filter_chain_SubFilter( p_sys->p_chain, render_osd_date );
-    vlc_mutex_unlock( &p_sys->chain_lock );
-
-    vlc_mutex_lock( &p_sys->lock );
 
     /* Create a list of channels */
     int pi_channel[VOUT_MAX_SUBPICTURES];
@@ -695,9 +652,61 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_subtitle_date,
     }
 
     p_sys->i_last_sort_date = render_subtitle_date;
-    vlc_mutex_unlock( &p_sys->lock );
 
     return p_subpic;
+}
+
+subpicture_t *spu_Render( spu_t *p_spu,
+                          const video_format_t *p_fmt_dst,
+                          const video_format_t *p_fmt_src,
+                          mtime_t render_subtitle_date,
+                          mtime_t render_osd_date,
+                          bool b_subtitle_only )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    /* Update sub-filter chain */
+    vlc_mutex_lock( &p_sys->lock );
+    char *psz_chain_update = p_sys->psz_chain_update;
+    p_sys->psz_chain_update = NULL;
+    vlc_mutex_unlock( &p_sys->lock );
+
+    vlc_mutex_lock( &p_sys->chain_lock );
+    if( psz_chain_update )
+    {
+        filter_chain_Reset( p_sys->p_chain, NULL, NULL );
+
+        filter_chain_AppendFromString( p_spu->p->p_chain, psz_chain_update );
+
+        free( psz_chain_update );
+    }
+    /* Run subpicture filters */
+    filter_chain_SubFilter( p_sys->p_chain, render_osd_date );
+    vlc_mutex_unlock( &p_sys->chain_lock );
+
+    /* Get the sorted list of subpicture to render */
+    vlc_mutex_lock( &p_sys->lock );
+
+    subpicture_t *p_list = SpuSortSubpictures( p_spu,
+                                               render_subtitle_date,
+                                               render_osd_date,
+                                               b_subtitle_only );
+    if( !p_list )
+    {
+        vlc_mutex_unlock( &p_sys->lock );
+        return NULL;
+    }
+
+    /* Render the current list of subpictures */
+    subpicture_t *p_render = SpuRenderSubpictures( p_spu,
+                                                   p_fmt_dst,
+                                                   p_list,
+                                                   p_fmt_src,
+                                                   render_subtitle_date,
+                                                   render_osd_date );
+    vlc_mutex_unlock( &p_sys->lock );
+
+    return p_render;
 }
 
 void spu_OffsetSubtitleDate( spu_t *p_spu, mtime_t i_duration )

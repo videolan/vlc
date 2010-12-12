@@ -71,19 +71,15 @@ VLC_EXPORT( void, spu_Destroy, ( spu_t * ) );
 VLC_EXPORT( void, spu_DisplaySubpicture, ( spu_t *, subpicture_t * ) );
 
 /**
- * This function asks the spu_t core a list of subpictures to display.
+ * This function will return an unique subpicture containing the OSD and
+ * subtitles visibles at the requested date.
  *
- * The returned list can only be used by spu_RenderSubpictures.
- */
-VLC_EXPORT( subpicture_t *, spu_SortSubpictures, ( spu_t *, mtime_t render_subtitle_date, bool b_subtitle_only ) );
-
-/**
- * This function renders a list of subpicture_t on the provided picture.
- *
- * \param p_fmt_dst is the format of the destination picture.
+ * \param p_fmt_dst is the format of the picture on which the return subpicture will be rendered.
  * \param p_fmt_src is the format of the original(source) video.
+ *
+ * The returned value if non NULL must be released by subpicture_Delete().
  */
-VLC_EXPORT( void, spu_RenderSubpictures, ( spu_t *,  picture_t *, const video_format_t *p_fmt_dst, subpicture_t *p_list, const video_format_t *p_fmt_src, mtime_t render_subtitle_date ) );
+VLC_EXPORT( subpicture_t *, spu_Render, ( spu_t *, const video_format_t *p_fmt_dst, const video_format_t *p_fmt_src, mtime_t render_subtitle_date, mtime_t render_osd_date, bool b_subtitle_only ) );
 
 /**
  * It registers a new SPU channel.

@@ -890,18 +890,20 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         msg_Warn(vout, "Unsupported timestamp modifications done by chain_interactive");
 
     /*
-     * Check for subpictures to display
+     * Get the subpicture to be displayed
      */
     const bool do_snapshot = vout_snapshot_IsRequested(&vout->p->snapshot);
-    mtime_t spu_render_time;
+    mtime_t render_subtitle_date;
     if (vout->p->pause.is_on)
-        spu_render_time = vout->p->pause.date;
+        render_subtitle_date = vout->p->pause.date;
     else
-        spu_render_time = filtered->date > 1 ? filtered->date : mdate();
+        render_subtitle_date = filtered->date > 1 ? filtered->date : mdate();
+    mtime_t render_osd_date = mdate(); /* FIXME wrong */
 
-    subpicture_t *subpic = spu_SortSubpictures(vout->p->spu,
-                                               spu_render_time,
-                                               do_snapshot);
+    subpicture_t *subpic = spu_Render(vout->p->spu, &vd->source, &vd->source,
+                                      render_subtitle_date, render_osd_date,
+                                      do_snapshot);
+
     /*
      * Perform rendering
      *
@@ -923,9 +925,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         if (render) {
             picture_Copy(render, filtered);
 
-            spu_RenderSubpictures(vout->p->spu,
-                                  render, &vd->source,
-                                  subpic, &vd->source, spu_render_time);
+            if (vout->p->spu_blend && subpic)
+                picture_BlendSubpicture(render, vout->p->spu_blend, subpic);
         }
         if (vout->p->is_decoder_pool_slow) {
             direct = picture_pool_Get(vout->p->display_pool);
@@ -942,6 +943,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     } else {
         direct = filtered;
     }
+    if (subpic)
+        subpicture_Delete(subpic);
 
     if (!direct)
         return VLC_EGENERIC;
@@ -1289,12 +1292,20 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
     vout->p->step.last               = VLC_TS_INVALID;
     vout->p->step.timestamp          = VLC_TS_INVALID;
 
+
+    vout->p->spu_blend = filter_NewBlend(VLC_OBJECT(vout), &vout->p->original);
+    if (!vout->p->spu_blend)
+        msg_Err(vout, "Failed to create blending filter, OSD/Subtitles will not work");
+
     video_format_Print(VLC_OBJECT(vout), "original format", &vout->p->original);
     return VLC_SUCCESS;
 }
 
 static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
 {
+    if (vout->p->spu_blend)
+        filter_DeleteBlend(vout->p->spu_blend);
+
     /* Destroy translation tables */
     if (vout->p->display.vd) {
         if (vout->p->decoder_pool) {
