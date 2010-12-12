@@ -302,7 +302,7 @@ void filter_chain_SubFilter( filter_chain_t *p_chain,
         subpicture_t *p_subpic = p_filter->pf_sub_filter( p_filter, display_date );
         /* XXX I find that spu_t cast ugly */
         if( p_subpic )
-            spu_DisplaySubpicture( (spu_t*)p_chain->p_this, p_subpic );
+            spu_PutSubpicture( (spu_t*)p_chain->p_this, p_subpic );
     }
 }
 

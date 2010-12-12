@@ -106,7 +106,7 @@ int osd_ShowTextAbsolute( spu_t *p_spu_channel, int i_channel,
     p_spu->p_region->i_x = i_hmargin;
     p_spu->p_region->i_y = i_vmargin;
 
-    spu_DisplaySubpicture( p_spu_channel, p_spu );
+    spu_PutSubpicture( p_spu_channel, p_spu );
 
     return VLC_SUCCESS;
 }

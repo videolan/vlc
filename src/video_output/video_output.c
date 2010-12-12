@@ -1082,7 +1082,7 @@ static void ThreadManage(vout_thread_t *vout,
 static void ThreadDisplaySubpicture(vout_thread_t *vout,
                                     subpicture_t *subpicture)
 {
-    spu_DisplaySubpicture(vout->p->spu, subpicture);
+    spu_PutSubpicture(vout->p->spu, subpicture);
 }
 
 static void ThreadFlushSubpicture(vout_thread_t *vout, int channel)

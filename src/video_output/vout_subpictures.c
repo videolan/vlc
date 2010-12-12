@@ -316,7 +316,7 @@ int spu_ProcessMouse( spu_t *p_spu,
  * \param p_spu the subpicture unit object
  * \param p_subpic the subpicture to display
  */
-void spu_DisplaySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
+void spu_PutSubpicture( spu_t *p_spu, subpicture_t *p_subpic )
 {
     spu_private_t *p_sys = p_spu->p;
 

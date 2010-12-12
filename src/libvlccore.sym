@@ -401,7 +401,7 @@ sout_StreamChainNew
 sout_UpdateStatistic
 spu_Create
 spu_Destroy
-spu_DisplaySubpicture
+spu_PutSubpicture
 spu_ChangeFilters
 spu_Render
 spu_RegisterChannel

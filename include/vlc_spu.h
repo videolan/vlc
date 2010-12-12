@@ -68,7 +68,7 @@ VLC_EXPORT( void, spu_Destroy, ( spu_t * ) );
  * You cannot use the provided subpicture anymore. The spu_t core
  * will destroy it at its convenience.
  */
-VLC_EXPORT( void, spu_DisplaySubpicture, ( spu_t *, subpicture_t * ) );
+VLC_EXPORT( void, spu_PutSubpicture, ( spu_t *, subpicture_t * ) );
 
 /**
  * This function will return an unique subpicture containing the OSD and
