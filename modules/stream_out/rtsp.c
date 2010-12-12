@@ -823,8 +823,6 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     }
                     else
                     {
-                        /* FIXME: we probably need to remove an access out,
-                         * if there is already one for the same ID */
                         ses = RtspClientGet( rtsp, psz_session );
                         if( ses == NULL )
                         {
@@ -835,6 +833,26 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         }
                     }
                     RtspClientAlive(ses);
+
+                    /* Bail if the track is already set up: we don't
+                     * support changing the transport parameters on the
+                     * fly */
+                    bool setup = false;
+                    for (int i = 0; i < ses->trackc; i++)
+                    {
+                        if (ses->trackv[i].id == id)
+                        {
+                            setup = true;
+                            break;
+                        }
+                    }
+                    if (setup)
+                    {
+                        vlc_mutex_unlock( &rtsp->lock );
+                        answer->i_status = 455;
+                        net_Close( fd );
+                        break;
+                    }
 
                     INSERT_ELEM( ses->trackv, ses->trackc, ses->trackc,
                                  track );
