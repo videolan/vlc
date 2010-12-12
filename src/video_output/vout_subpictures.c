@@ -34,15 +34,14 @@
 #include <limits.h>
 
 #include <vlc_common.h>
+#include <vlc_modules.h>
+#include <vlc_input.h>
 #include <vlc_vout.h>
-#include <vlc_block.h>
 #include <vlc_filter.h>
 #include <vlc_spu.h>
+
 #include "../libvlc.h"
 #include "vout_internal.h"
-#include <vlc_image.h>
-#include <vlc_input.h>
-#include <vlc_modules.h>
 #include "../misc/subpicture.h"
 
 /*****************************************************************************
