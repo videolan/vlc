@@ -65,12 +65,6 @@ typedef struct
 
 } spu_heap_t;
 
-static void SpuHeapInit( spu_heap_t * );
-static int  SpuHeapPush( spu_heap_t *, subpicture_t * );
-static void SpuHeapDeleteAt( spu_heap_t *, int i_index );
-static int  SpuHeapDeleteSubpicture( spu_heap_t *, subpicture_t * );
-static void SpuHeapClean( spu_heap_t *p_heap );
-
 struct spu_private_t
 {
     vlc_mutex_t lock;   /* lock to protect all followings fields */
@@ -98,700 +92,12 @@ struct spu_private_t
     mtime_t i_last_sort_date;
 };
 
-/* */
-typedef struct
-{
-    int w;
-    int h;
-} spu_scale_t;
-static spu_scale_t spu_scale_create( int w, int h );
-static spu_scale_t spu_scale_unit(void );
-static spu_scale_t spu_scale_createq( int wn, int wd, int hn, int hd );
-static int spu_scale_w( int v, const spu_scale_t s );
-static int spu_scale_h( int v, const spu_scale_t s );
-static int spu_invscale_w( int v, const spu_scale_t s );
-static int spu_invscale_h( int v, const spu_scale_t s );
-
-typedef struct
-{
-    int i_x;
-    int i_y;
-    int i_width;
-    int i_height;
-
-    spu_scale_t scale;
-} spu_area_t;
-
-static spu_area_t spu_area_create( int x, int y, int w, int h, spu_scale_t );
-static spu_area_t spu_area_scaled( spu_area_t );
-static spu_area_t spu_area_unscaled( spu_area_t, spu_scale_t );
-static bool spu_area_overlap( spu_area_t, spu_area_t );
-
-
 /* Subpicture rendered flag
  * FIXME ? it could be moved to private ? */
 #define SUBPICTURE_RENDERED  (0x1000)
 #if SUBPICTURE_RENDERED < SUBPICTURE_ALIGN_MASK
 #   error SUBPICTURE_RENDERED too low
 #endif
-
-#define SCALE_UNIT (1000)
-
-static void SubpictureChain( subpicture_t **pp_head, subpicture_t *p_subpic );
-static int SubpictureCmp( const void *s0, const void *s1 );
-
-static void SpuRenderRegion( spu_t *,
-                             subpicture_region_t **, spu_area_t *,
-                             subpicture_t *, subpicture_region_t *,
-                             const spu_scale_t scale_size,
-                             const video_format_t *p_fmt,
-                             const spu_area_t *p_subtitle_area, int i_subtitle_area,
-                             mtime_t render_date );
-
-static void UpdateSPU   ( spu_t *, vlc_object_t * );
-static int  CropCallback( vlc_object_t *, char const *,
-                          vlc_value_t, vlc_value_t, void * );
-
-/* Buffer allocation for SPU filter (blend, scale, ...) */
-struct filter_owner_sys_t
-{
-    spu_t *p_spu;
-    int i_channel;
-};
-static int spu_get_attachments( filter_t *,
-                                input_attachment_t ***, int * );
-static picture_t *spu_new_video_buffer( filter_t * );
-static void spu_del_video_buffer( filter_t *, picture_t * );
-
-/* Buffer aloccation fir SUB filter */
-static int SubFilterAllocationInit( filter_t *, void * );
-static void SubFilterAllocationClean( filter_t * );
-
-/* */
-static void SpuRenderCreateAndLoadText( spu_t * );
-static void SpuRenderCreateAndLoadScale( spu_t * );
-static void FilterRelease( filter_t *p_filter );
-
-/*****************************************************************************
- * Public API
- *****************************************************************************/
-
-#undef spu_Create
-/**
- * Creates the subpicture unit
- *
- * \param p_this the parent object which creates the subpicture unit
- */
-spu_t *spu_Create( vlc_object_t *p_this )
-{
-    spu_t *p_spu;
-    spu_private_t *p_sys;
-
-    p_spu = vlc_custom_create( p_this, sizeof(spu_t) + sizeof(spu_private_t),
-                               VLC_OBJECT_GENERIC, "subpicture" );
-    if( !p_spu )
-        return NULL;
-    vlc_object_attach( p_spu, p_this );
-
-    /* Initialize spu fields */
-    p_spu->p = p_sys = (spu_private_t*)&p_spu[1];
-
-    /* Initialize private fields */
-    vlc_mutex_init( &p_sys->lock );
-
-    SpuHeapInit( &p_sys->heap );
-
-    p_sys->p_text = NULL;
-    p_sys->p_scale = NULL;
-    p_sys->p_scale_yuvp = NULL;
-
-    p_sys->i_margin = var_InheritInteger( p_spu, "sub-margin" );
-
-    /* Register the default subpicture channel */
-    p_sys->i_channel = SPU_DEFAULT_CHANNEL + 1;
-
-    p_sys->psz_chain_update = NULL;
-    vlc_mutex_init( &p_sys->chain_lock );
-    p_sys->p_chain = filter_chain_New( p_spu, "sub filter", false,
-                                       SubFilterAllocationInit,
-                                       SubFilterAllocationClean,
-                                       p_spu );
-
-    /* Load text and scale module */
-    SpuRenderCreateAndLoadText( p_spu );
-    SpuRenderCreateAndLoadScale( p_spu );
-
-    /* */
-    p_sys->i_last_sort_date = -1;
-
-    return p_spu;
-}
-
-/**
- * Destroy the subpicture unit
- *
- * \param p_this the parent object which destroys the subpicture unit
- */
-void spu_Destroy( spu_t *p_spu )
-{
-    spu_private_t *p_sys = p_spu->p;
-
-    if( p_sys->p_text )
-        FilterRelease( p_sys->p_text );
-
-    if( p_sys->p_scale_yuvp )
-        FilterRelease( p_sys->p_scale_yuvp );
-
-    if( p_sys->p_scale )
-        FilterRelease( p_sys->p_scale );
-
-    filter_chain_Delete( p_sys->p_chain );
-    vlc_mutex_destroy( &p_sys->chain_lock );
-    free( p_sys->psz_chain_update );
-
-    /* Destroy all remaining subpictures */
-    SpuHeapClean( &p_sys->heap );
-
-    vlc_mutex_destroy( &p_sys->lock );
-
-    vlc_object_release( p_spu );
-}
-
-/**
- * Attach/Detach the SPU from any input
- *
- * \param p_this the object in which to destroy the subpicture unit
- * \param b_attach to select attach or detach
- */
-void spu_Attach( spu_t *p_spu, vlc_object_t *p_input, bool b_attach )
-{
-    if( b_attach )
-    {
-        UpdateSPU( p_spu, p_input );
-        var_Create( p_input, "highlight", VLC_VAR_BOOL );
-        var_AddCallback( p_input, "highlight", CropCallback, p_spu );
-
-        vlc_mutex_lock( &p_spu->p->lock );
-        p_spu->p->p_input = p_input;
-
-        FilterRelease( p_spu->p->p_text );
-        p_spu->p->p_text = NULL;
-        SpuRenderCreateAndLoadText( p_spu );
-
-        vlc_mutex_unlock( &p_spu->p->lock );
-    }
-    else
-    {
-        vlc_mutex_lock( &p_spu->p->lock );
-        p_spu->p->p_input = NULL;
-        vlc_mutex_unlock( &p_spu->p->lock );
-
-        /* Delete callbacks */
-        var_DelCallback( p_input, "highlight", CropCallback, p_spu );
-        var_Destroy( p_input, "highlight" );
-    }
-}
-
-/**
- * Inform the SPU filters of mouse event
- */
-int spu_ProcessMouse( spu_t *p_spu,
-                      const vlc_mouse_t *p_mouse,
-                      const video_format_t *p_fmt )
-{
-    spu_private_t *p_sys = p_spu->p;
-
-    vlc_mutex_lock( &p_sys->chain_lock );
-    filter_chain_MouseEvent( p_sys->p_chain, p_mouse, p_fmt );
-    vlc_mutex_unlock( &p_sys->chain_lock );
-
-    return VLC_SUCCESS;
-}
-
-/**
- * Display a subpicture
- *
- * Remove the reservation flag of a subpicture, which will cause it to be
- * ready for display.
- * \param p_spu the subpicture unit object
- * \param p_subpic the subpicture to display
- */
-void spu_PutSubpicture( spu_t *p_spu, subpicture_t *p_subpic )
-{
-    spu_private_t *p_sys = p_spu->p;
-
-    /* SPU_DEFAULT_CHANNEL always reset itself */
-    if( p_subpic->i_channel == SPU_DEFAULT_CHANNEL )
-        spu_ClearChannel( p_spu, SPU_DEFAULT_CHANNEL );
-
-    /* p_private is for spu only and cannot be non NULL here */
-    for( subpicture_region_t *r = p_subpic->p_region; r != NULL; r = r->p_next )
-        assert( r->p_private == NULL );
-
-    /* */
-    vlc_mutex_lock( &p_sys->lock );
-    if( SpuHeapPush( &p_sys->heap, p_subpic ) )
-    {
-        vlc_mutex_unlock( &p_sys->lock );
-        msg_Err( p_spu, "subpicture heap full" );
-        subpicture_Delete( p_subpic );
-        return;
-    }
-    vlc_mutex_unlock( &p_sys->lock );
-}
-
-/**
- * This function renders all sub picture units in the list.
- */
-static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
-                                           const video_format_t *p_fmt_dst,
-                                           subpicture_t *p_subpic_list,
-                                           const video_format_t *p_fmt_src,
-                                           mtime_t render_subtitle_date,
-                                           mtime_t render_osd_date )
-{
-    spu_private_t *p_sys = p_spu->p;
-
-    const int i_source_video_width  = p_fmt_src->i_width;
-    const int i_source_video_height = p_fmt_src->i_height;
-
-    unsigned int i_subpicture;
-    subpicture_t *pp_subpicture[VOUT_MAX_SUBPICTURES];
-
-    unsigned int i_subtitle_region_count;
-    spu_area_t p_subtitle_area_buffer[VOUT_MAX_SUBPICTURES];
-    spu_area_t *p_subtitle_area;
-    int i_subtitle_area;
-
-    /* Preprocess subpictures */
-    i_subpicture = 0;
-    i_subtitle_region_count = 0;
-    for( subpicture_t * p_subpic = p_subpic_list;
-            p_subpic != NULL;
-                p_subpic = p_subpic->p_next )
-    {
-        subpicture_Update( p_subpic,
-                           p_fmt_src, p_fmt_dst,
-                           p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
-
-        /* */
-        if( p_subpic->b_subtitle )
-        {
-            for( subpicture_region_t *r = p_subpic->p_region; r != NULL; r = r->p_next )
-                i_subtitle_region_count++;
-        }
-
-        /* */
-        pp_subpicture[i_subpicture++] = p_subpic;
-    }
-
-    /* Be sure we have at least 1 picture to process */
-    if( i_subpicture <= 0 )
-        return NULL;
-
-    subpicture_t *p_output = subpicture_New( NULL );
-
-    /* Now order subpicture array
-     * XXX The order is *really* important for overlap subtitles positionning */
-    qsort( pp_subpicture, i_subpicture, sizeof(*pp_subpicture), SubpictureCmp );
-
-    /* Allocate area array for subtitle overlap */
-    i_subtitle_area = 0;
-    p_subtitle_area = p_subtitle_area_buffer;
-    if( i_subtitle_region_count > sizeof(p_subtitle_area_buffer)/sizeof(*p_subtitle_area_buffer) )
-        p_subtitle_area = calloc( i_subtitle_region_count, sizeof(*p_subtitle_area) );
-
-    /* Process all subpictures and regions (in the right order) */
-    for( unsigned int i_index = 0; i_index < i_subpicture; i_index++ )
-    {
-        subpicture_t *p_subpic = pp_subpicture[i_index];
-        subpicture_region_t *p_region;
-
-        if( !p_subpic->p_region )
-            continue;
-
-        /* FIXME when possible use a better rendering size than source size
-         * (max of display size and source size for example) FIXME */
-        int i_render_width  = p_subpic->i_original_picture_width;
-        int i_render_height = p_subpic->i_original_picture_height;
-        if( !i_render_width || !i_render_height )
-        {
-            if( i_render_width != 0 || i_render_height != 0 )
-                msg_Err( p_spu, "unsupported original picture size %dx%d",
-                         i_render_width, i_render_height );
-
-            p_subpic->i_original_picture_width  = i_render_width = i_source_video_width;
-            p_subpic->i_original_picture_height = i_render_height = i_source_video_height;
-        }
-
-        if( p_sys->p_text )
-        {
-            p_sys->p_text->fmt_out.video.i_width          =
-            p_sys->p_text->fmt_out.video.i_visible_width  = i_render_width;
-
-            p_sys->p_text->fmt_out.video.i_height         =
-            p_sys->p_text->fmt_out.video.i_visible_height = i_render_height;
-        }
-
-        /* Compute scaling from picture to source size */
-        spu_scale_t scale = spu_scale_createq( i_source_video_width,  i_render_width,
-                                               i_source_video_height, i_render_height );
-
-        /* Update scaling from source size to display size(p_fmt_dst) */
-        scale.w = scale.w * p_fmt_dst->i_width  / i_source_video_width;
-        scale.h = scale.h * p_fmt_dst->i_height / i_source_video_height;
-
-        /* Set default subpicture aspect ratio
-         * FIXME if we only handle 1 aspect ratio per picture, why is it set per
-         * region ? */
-        p_region = p_subpic->p_region;
-        if( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den )
-        {
-            p_region->fmt.i_sar_den = p_fmt_dst->i_sar_den;
-            p_region->fmt.i_sar_num = p_fmt_dst->i_sar_num;
-        }
-
-        /* Take care of the aspect ratio */
-        if( p_region->fmt.i_sar_num * p_fmt_dst->i_sar_den !=
-            p_region->fmt.i_sar_den * p_fmt_dst->i_sar_num )
-        {
-            /* FIXME FIXME what about region->i_x/i_y ? */
-            scale.w = scale.w *
-                (int64_t)p_region->fmt.i_sar_num * p_fmt_dst->i_sar_den /
-                p_region->fmt.i_sar_den / p_fmt_dst->i_sar_num;
-        }
-
-        /* Render all regions
-         * We always transform non absolute subtitle into absolute one on the
-         * first rendering to allow good subtitle overlap support.
-         */
-        for( p_region = p_subpic->p_region; p_region != NULL; p_region = p_region->p_next )
-        {
-            spu_area_t area;
-
-            /* Check scale validity */
-            if( scale.w <= 0 || scale.h <= 0 )
-                continue;
-
-            /* */
-            subpicture_region_t *p_render;
-            SpuRenderRegion( p_spu, &p_render, &area,
-                             p_subpic, p_region, scale, p_fmt_dst,
-                             p_subtitle_area, i_subtitle_area,
-                             p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
-            if( p_render )
-            {
-                subpicture_region_t **pp_last = &p_output->p_region;
-                while( *pp_last )
-                    pp_last = &(*pp_last)->p_next;
-                *pp_last = p_render;
-            }
-
-            if( p_subpic->b_subtitle )
-            {
-                area = spu_area_unscaled( area, scale );
-                if( !p_subpic->b_absolute && area.i_width > 0 && area.i_height > 0 )
-                {
-                    p_region->i_x = area.i_x;
-                    p_region->i_y = area.i_y;
-                }
-                if( p_subtitle_area )
-                    p_subtitle_area[i_subtitle_area++] = area;
-            }
-        }
-        if( p_subpic->b_subtitle )
-            p_subpic->b_absolute = true;
-    }
-
-    /* */
-    if( p_subtitle_area != p_subtitle_area_buffer )
-        free( p_subtitle_area );
-
-    return p_output;
-}
-
-/*****************************************************************************
- * SpuSortSubpictures: find the subpictures to display
- *****************************************************************************
- * This function parses all subpictures and decides which ones need to be
- * displayed. If no picture has been selected, display_date will depend on
- * the subpicture.
- * We also check for ephemer DVD subpictures (subpictures that have
- * to be removed if a newer one is available), which makes it a lot
- * more difficult to guess if a subpicture has to be rendered or not.
- *****************************************************************************/
-static subpicture_t *SpuSortSubpictures( spu_t *p_spu,
-                                         mtime_t render_subtitle_date,
-                                         mtime_t render_osd_date,
-                                         bool b_subtitle_only )
-{
-    spu_private_t *p_sys = p_spu->p;
-    subpicture_t *p_subpic = NULL;
-
-    /* Create a list of channels */
-    int pi_channel[VOUT_MAX_SUBPICTURES];
-    int i_channel_count = 0;
-
-    for( int i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
-    {
-        spu_heap_entry_t *p_entry = &p_sys->heap.p_entry[i_index];
-        if( !p_entry->p_subpicture || p_entry->b_reject )
-            continue;
-        const int i_channel = p_entry->p_subpicture->i_channel;
-        int i;
-        for( i = 0; i < i_channel_count; i++ )
-        {
-            if( pi_channel[i] == i_channel )
-                break;
-        }
-        if( i_channel_count <= i )
-            pi_channel[i_channel_count++] = i_channel;
-    }
-
-    /* We get an easily parsable chained list of subpictures which
-     * ends with NULL since p_subpic was initialized to NULL. */
-    for( int i = 0; i < i_channel_count; i++ )
-    {
-        const int i_channel = pi_channel[i];
-        subpicture_t *p_available_subpic[VOUT_MAX_SUBPICTURES];
-        bool         pb_available_late[VOUT_MAX_SUBPICTURES];
-        int          i_available = 0;
-
-        mtime_t      start_date = render_subtitle_date;
-        mtime_t      ephemer_subtitle_date = 0;
-        mtime_t      ephemer_osd_date = 0;
-        int64_t      i_ephemer_subtitle_order = INT64_MIN;
-        int64_t      i_ephemer_system_order = INT64_MIN;
-        int i_index;
-
-        /* Select available pictures */
-        for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
-        {
-            spu_heap_entry_t *p_entry = &p_sys->heap.p_entry[i_index];
-            subpicture_t *p_current = p_entry->p_subpicture;
-            bool b_stop_valid;
-            bool b_late;
-
-            if( !p_current || p_entry->b_reject )
-            {
-                if( p_entry->b_reject )
-                    SpuHeapDeleteAt( &p_sys->heap, i_index );
-                continue;
-            }
-
-            if( p_current->i_channel != i_channel ||
-                ( b_subtitle_only && !p_current->b_subtitle ) )
-            {
-                continue;
-            }
-            const mtime_t render_date = p_current->b_subtitle ? render_subtitle_date : render_osd_date;
-            if( render_date &&
-                render_date < p_current->i_start )
-            {
-                /* Too early, come back next monday */
-                continue;
-            }
-
-            mtime_t *pi_ephemer_date  = p_current->b_subtitle ? &ephemer_subtitle_date : &ephemer_osd_date;
-            int64_t *pi_ephemer_order = p_current->b_subtitle ? &i_ephemer_subtitle_order : &i_ephemer_system_order;
-            if( p_current->i_start >= *pi_ephemer_date )
-            {
-                *pi_ephemer_date = p_current->i_start;
-                if( p_current->i_order > *pi_ephemer_order )
-                    *pi_ephemer_order = p_current->i_order;
-            }
-
-            b_stop_valid = !p_current->b_ephemer || p_current->i_stop > p_current->i_start;
-
-            b_late = b_stop_valid && p_current->i_stop <= render_date;
-
-            /* start_date will be used for correct automatic overlap support
-             * in case picture that should not be displayed anymore (display_time)
-             * overlap with a picture to be displayed (p_current->i_start)  */
-            if( p_current->b_subtitle && !b_late && !p_current->b_ephemer )
-                start_date = p_current->i_start;
-
-            /* */
-            p_available_subpic[i_available] = p_current;
-            pb_available_late[i_available] = b_late;
-            i_available++;
-        }
-
-        /* Only forced old picture display at the transition */
-        if( start_date < p_sys->i_last_sort_date )
-            start_date = p_sys->i_last_sort_date;
-        if( start_date <= 0 )
-            start_date = INT64_MAX;
-
-        /* Select pictures to be displayed */
-        for( i_index = 0; i_index < i_available; i_index++ )
-        {
-            subpicture_t *p_current = p_available_subpic[i_index];
-            bool b_late = pb_available_late[i_index];
-
-            const mtime_t stop_date = p_current->b_subtitle ? __MAX( start_date, p_sys->i_last_sort_date ) : render_osd_date;
-            const mtime_t ephemer_date = p_current->b_subtitle ? ephemer_subtitle_date : ephemer_osd_date;
-            const int64_t i_ephemer_order = p_current->b_subtitle ? i_ephemer_subtitle_order : i_ephemer_system_order;
-
-            /* Destroy late and obsolete ephemer subpictures */
-            bool b_rejet = b_late && p_current->i_stop <= stop_date;
-            if( p_current->b_ephemer )
-            {
-                if( p_current->i_start < ephemer_date )
-                    b_rejet = true;
-                else if( p_current->i_start == ephemer_date &&
-                         p_current->i_order < i_ephemer_order )
-                    b_rejet = true;
-            }
-
-            if( b_rejet )
-                SpuHeapDeleteSubpicture( &p_sys->heap, p_current );
-            else
-                SubpictureChain( &p_subpic, p_current );
-        }
-    }
-
-    p_sys->i_last_sort_date = render_subtitle_date;
-
-    return p_subpic;
-}
-
-subpicture_t *spu_Render( spu_t *p_spu,
-                          const video_format_t *p_fmt_dst,
-                          const video_format_t *p_fmt_src,
-                          mtime_t render_subtitle_date,
-                          mtime_t render_osd_date,
-                          bool b_subtitle_only )
-{
-    spu_private_t *p_sys = p_spu->p;
-
-    /* Update sub-filter chain */
-    vlc_mutex_lock( &p_sys->lock );
-    char *psz_chain_update = p_sys->psz_chain_update;
-    p_sys->psz_chain_update = NULL;
-    vlc_mutex_unlock( &p_sys->lock );
-
-    vlc_mutex_lock( &p_sys->chain_lock );
-    if( psz_chain_update )
-    {
-        filter_chain_Reset( p_sys->p_chain, NULL, NULL );
-
-        filter_chain_AppendFromString( p_spu->p->p_chain, psz_chain_update );
-
-        free( psz_chain_update );
-    }
-    /* Run subpicture filters */
-    filter_chain_SubFilter( p_sys->p_chain, render_osd_date );
-    vlc_mutex_unlock( &p_sys->chain_lock );
-
-    /* Get the sorted list of subpicture to render */
-    vlc_mutex_lock( &p_sys->lock );
-
-    subpicture_t *p_list = SpuSortSubpictures( p_spu,
-                                               render_subtitle_date,
-                                               render_osd_date,
-                                               b_subtitle_only );
-    if( !p_list )
-    {
-        vlc_mutex_unlock( &p_sys->lock );
-        return NULL;
-    }
-
-    /* Render the current list of subpictures */
-    subpicture_t *p_render = SpuRenderSubpictures( p_spu,
-                                                   p_fmt_dst,
-                                                   p_list,
-                                                   p_fmt_src,
-                                                   render_subtitle_date,
-                                                   render_osd_date );
-    vlc_mutex_unlock( &p_sys->lock );
-
-    return p_render;
-}
-
-void spu_OffsetSubtitleDate( spu_t *p_spu, mtime_t i_duration )
-{
-    spu_private_t *p_sys = p_spu->p;
-
-    vlc_mutex_lock( &p_sys->lock );
-    for( int i = 0; i < VOUT_MAX_SUBPICTURES; i++ )
-    {
-        spu_heap_entry_t *p_entry = &p_sys->heap.p_entry[i];
-        subpicture_t *p_current = p_entry->p_subpicture;
-
-        if( p_current && p_current->b_subtitle )
-        {
-            if( p_current->i_start > 0 )
-                p_current->i_start += i_duration;
-            if( p_current->i_stop > 0 )
-                p_current->i_stop += i_duration;
-        }
-    }
-    vlc_mutex_unlock( &p_sys->lock );
-}
-
-int spu_RegisterChannel( spu_t *p_spu )
-{
-    spu_private_t *p_sys = p_spu->p;
-
-    vlc_mutex_lock( &p_sys->lock );
-    int i_channel = p_sys->i_channel++;
-    vlc_mutex_unlock( &p_sys->lock );
-
-    return i_channel;
-}
-
-void spu_ClearChannel( spu_t *p_spu, int i_channel )
-{
-    spu_private_t *p_sys = p_spu->p;
-
-    vlc_mutex_lock( &p_sys->lock );
-
-    for( int i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
-    {
-        spu_heap_entry_t *p_entry = &p_sys->heap.p_entry[i_subpic];
-        subpicture_t *p_subpic = p_entry->p_subpicture;
-
-        if( !p_subpic )
-            continue;
-        if( p_subpic->i_channel != i_channel && ( i_channel != -1 || p_subpic->i_channel == SPU_DEFAULT_CHANNEL ) )
-            continue;
-
-        /* You cannot delete subpicture outside of spu_SortSubpictures */
-        p_entry->b_reject = true;
-    }
-
-    vlc_mutex_unlock( &p_sys->lock );
-}
-
-void spu_ChangeFilters( spu_t *p_spu, const char *psz_filters )
-{
-    spu_private_t *p_sys = p_spu->p;
-
-    vlc_mutex_lock( &p_sys->lock );
-
-    free( p_sys->psz_chain_update );
-    p_sys->psz_chain_update = strdup( psz_filters );
-
-    vlc_mutex_unlock( &p_sys->lock );
-}
-
-void spu_ChangeMargin( spu_t *p_spu, int i_margin )
-{
-    spu_private_t *p_sys = p_spu->p;
-
-    vlc_mutex_lock( &p_sys->lock );
-    p_sys->i_margin = i_margin;
-    vlc_mutex_unlock( &p_sys->lock );
-}
-
-/* */
-static void SubpictureChain( subpicture_t **pp_head, subpicture_t *p_subpic )
-{
-    p_subpic->p_next = *pp_head;
-
-    *pp_head = p_subpic;
-}
 
 /*****************************************************************************
  * heap managment
@@ -858,6 +164,12 @@ static void SpuHeapClean( spu_heap_t *p_heap )
     }
 }
 
+struct filter_owner_sys_t
+{
+    spu_t *p_spu;
+    int i_channel;
+};
+
 static void FilterRelease( filter_t *p_filter )
 {
     if( p_filter->p_module )
@@ -866,6 +178,33 @@ static void FilterRelease( filter_t *p_filter )
         free( p_filter->p_owner );
 
     vlc_object_release( p_filter );
+}
+
+static picture_t *spu_new_video_buffer( filter_t *p_filter )
+{
+    const video_format_t *p_fmt = &p_filter->fmt_out.video;
+
+    VLC_UNUSED(p_filter);
+    return picture_NewFromFormat( p_fmt );
+}
+static void spu_del_video_buffer( filter_t *p_filter, picture_t *p_picture )
+{
+    VLC_UNUSED(p_filter);
+    picture_Release( p_picture );
+}
+
+static int spu_get_attachments( filter_t *p_filter,
+                                input_attachment_t ***ppp_attachment,
+                                int *pi_attachment )
+{
+    spu_t *p_spu = p_filter->p_owner->p_spu;
+
+    int i_ret = VLC_EGENERIC;
+    if( p_spu->p->p_input )
+        i_ret = input_Control( (input_thread_t*)p_spu->p->p_input,
+                               INPUT_GET_ATTACHMENTS,
+                               ppp_attachment, pi_attachment );
+    return i_ret;
 }
 
 static void SpuRenderCreateAndLoadText( spu_t *p_spu )
@@ -1010,6 +349,14 @@ exit:
 /**
  * A few scale functions helpers.
  */
+
+#define SCALE_UNIT (1000)
+typedef struct
+{
+    int w;
+    int h;
+} spu_scale_t;
+
 static spu_scale_t spu_scale_create( int w, int h )
 {
     spu_scale_t s = { .w = w, .h = h };
@@ -1048,6 +395,16 @@ static int spu_invscale_h( int v, const spu_scale_t s )
 /**
  * A few area functions helpers
  */
+typedef struct
+{
+    int i_x;
+    int i_y;
+    int i_width;
+    int i_height;
+
+    spu_scale_t scale;
+} spu_area_t;
+
 static spu_area_t spu_area_create( int x, int y, int w, int h, spu_scale_t s )
 {
     spu_area_t a = { .i_x = x, .i_y = y, .i_width = w, .i_height = h, .scale = s };
@@ -1214,6 +571,196 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
     *pi_x = i_x;
     *pi_y = i_y;
 }
+
+/**
+ * This function compares two 64 bits integers.
+ * It can be used by qsort.
+ */
+static int IntegerCmp( int64_t i0, int64_t i1 )
+{
+    return i0 < i1 ? -1 : i0 > i1 ? 1 : 0;
+}
+/**
+ * This function compares 2 subpictures using the following properties
+ * (ordered by priority)
+ * 1. absolute positionning
+ * 2. start time
+ * 3. creation order (per channel)
+ *
+ * It can be used by qsort.
+ *
+ * XXX spu_RenderSubpictures depends heavily on this order.
+ */
+static int SubpictureCmp( const void *s0, const void *s1 )
+{
+    subpicture_t *p_subpic0 = *(subpicture_t**)s0;
+    subpicture_t *p_subpic1 = *(subpicture_t**)s1;
+    int r;
+
+    r = IntegerCmp( !p_subpic0->b_absolute, !p_subpic1->b_absolute );
+    if( !r )
+        r = IntegerCmp( p_subpic0->i_start, p_subpic1->i_start );
+    if( !r )
+        r = IntegerCmp( p_subpic0->i_channel, p_subpic1->i_channel );
+    if( !r )
+        r = IntegerCmp( p_subpic0->i_order, p_subpic1->i_order );
+    return r;
+}
+
+static void SubpictureChain( subpicture_t **pp_head, subpicture_t *p_subpic )
+{
+    p_subpic->p_next = *pp_head;
+
+    *pp_head = p_subpic;
+}
+
+/*****************************************************************************
+ * SpuSortSubpictures: find the subpictures to display
+ *****************************************************************************
+ * This function parses all subpictures and decides which ones need to be
+ * displayed. If no picture has been selected, display_date will depend on
+ * the subpicture.
+ * We also check for ephemer DVD subpictures (subpictures that have
+ * to be removed if a newer one is available), which makes it a lot
+ * more difficult to guess if a subpicture has to be rendered or not.
+ *****************************************************************************/
+static subpicture_t *SpuSortSubpictures( spu_t *p_spu,
+                                         mtime_t render_subtitle_date,
+                                         mtime_t render_osd_date,
+                                         bool b_subtitle_only )
+{
+    spu_private_t *p_sys = p_spu->p;
+    subpicture_t *p_subpic = NULL;
+
+    /* Create a list of channels */
+    int pi_channel[VOUT_MAX_SUBPICTURES];
+    int i_channel_count = 0;
+
+    for( int i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
+    {
+        spu_heap_entry_t *p_entry = &p_sys->heap.p_entry[i_index];
+        if( !p_entry->p_subpicture || p_entry->b_reject )
+            continue;
+        const int i_channel = p_entry->p_subpicture->i_channel;
+        int i;
+        for( i = 0; i < i_channel_count; i++ )
+        {
+            if( pi_channel[i] == i_channel )
+                break;
+        }
+        if( i_channel_count <= i )
+            pi_channel[i_channel_count++] = i_channel;
+    }
+
+    /* We get an easily parsable chained list of subpictures which
+     * ends with NULL since p_subpic was initialized to NULL. */
+    for( int i = 0; i < i_channel_count; i++ )
+    {
+        const int i_channel = pi_channel[i];
+        subpicture_t *p_available_subpic[VOUT_MAX_SUBPICTURES];
+        bool         pb_available_late[VOUT_MAX_SUBPICTURES];
+        int          i_available = 0;
+
+        mtime_t      start_date = render_subtitle_date;
+        mtime_t      ephemer_subtitle_date = 0;
+        mtime_t      ephemer_osd_date = 0;
+        int64_t      i_ephemer_subtitle_order = INT64_MIN;
+        int64_t      i_ephemer_system_order = INT64_MIN;
+        int i_index;
+
+        /* Select available pictures */
+        for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
+        {
+            spu_heap_entry_t *p_entry = &p_sys->heap.p_entry[i_index];
+            subpicture_t *p_current = p_entry->p_subpicture;
+            bool b_stop_valid;
+            bool b_late;
+
+            if( !p_current || p_entry->b_reject )
+            {
+                if( p_entry->b_reject )
+                    SpuHeapDeleteAt( &p_sys->heap, i_index );
+                continue;
+            }
+
+            if( p_current->i_channel != i_channel ||
+                ( b_subtitle_only && !p_current->b_subtitle ) )
+            {
+                continue;
+            }
+            const mtime_t render_date = p_current->b_subtitle ? render_subtitle_date : render_osd_date;
+            if( render_date &&
+                render_date < p_current->i_start )
+            {
+                /* Too early, come back next monday */
+                continue;
+            }
+
+            mtime_t *pi_ephemer_date  = p_current->b_subtitle ? &ephemer_subtitle_date : &ephemer_osd_date;
+            int64_t *pi_ephemer_order = p_current->b_subtitle ? &i_ephemer_subtitle_order : &i_ephemer_system_order;
+            if( p_current->i_start >= *pi_ephemer_date )
+            {
+                *pi_ephemer_date = p_current->i_start;
+                if( p_current->i_order > *pi_ephemer_order )
+                    *pi_ephemer_order = p_current->i_order;
+            }
+
+            b_stop_valid = !p_current->b_ephemer || p_current->i_stop > p_current->i_start;
+
+            b_late = b_stop_valid && p_current->i_stop <= render_date;
+
+            /* start_date will be used for correct automatic overlap support
+             * in case picture that should not be displayed anymore (display_time)
+             * overlap with a picture to be displayed (p_current->i_start)  */
+            if( p_current->b_subtitle && !b_late && !p_current->b_ephemer )
+                start_date = p_current->i_start;
+
+            /* */
+            p_available_subpic[i_available] = p_current;
+            pb_available_late[i_available] = b_late;
+            i_available++;
+        }
+
+        /* Only forced old picture display at the transition */
+        if( start_date < p_sys->i_last_sort_date )
+            start_date = p_sys->i_last_sort_date;
+        if( start_date <= 0 )
+            start_date = INT64_MAX;
+
+        /* Select pictures to be displayed */
+        for( i_index = 0; i_index < i_available; i_index++ )
+        {
+            subpicture_t *p_current = p_available_subpic[i_index];
+            bool b_late = pb_available_late[i_index];
+
+            const mtime_t stop_date = p_current->b_subtitle ? __MAX( start_date, p_sys->i_last_sort_date ) : render_osd_date;
+            const mtime_t ephemer_date = p_current->b_subtitle ? ephemer_subtitle_date : ephemer_osd_date;
+            const int64_t i_ephemer_order = p_current->b_subtitle ? i_ephemer_subtitle_order : i_ephemer_system_order;
+
+            /* Destroy late and obsolete ephemer subpictures */
+            bool b_rejet = b_late && p_current->i_stop <= stop_date;
+            if( p_current->b_ephemer )
+            {
+                if( p_current->i_start < ephemer_date )
+                    b_rejet = true;
+                else if( p_current->i_start == ephemer_date &&
+                         p_current->i_order < i_ephemer_order )
+                    b_rejet = true;
+            }
+
+            if( b_rejet )
+                SpuHeapDeleteSubpicture( &p_sys->heap, p_current );
+            else
+                SubpictureChain( &p_subpic, p_current );
+        }
+    }
+
+    p_sys->i_last_sort_date = render_subtitle_date;
+
+    return p_subpic;
+}
+
+
 
 /**
  * It will transform the provided region into another region suitable for rendering.
@@ -1527,38 +1074,173 @@ exit:
 }
 
 /**
- * This function compares two 64 bits integers.
- * It can be used by qsort.
+ * This function renders all sub picture units in the list.
  */
-static int IntegerCmp( int64_t i0, int64_t i1 )
+static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
+                                           const video_format_t *p_fmt_dst,
+                                           subpicture_t *p_subpic_list,
+                                           const video_format_t *p_fmt_src,
+                                           mtime_t render_subtitle_date,
+                                           mtime_t render_osd_date )
 {
-    return i0 < i1 ? -1 : i0 > i1 ? 1 : 0;
-}
-/**
- * This function compares 2 subpictures using the following properties
- * (ordered by priority)
- * 1. absolute positionning
- * 2. start time
- * 3. creation order (per channel)
- *
- * It can be used by qsort.
- *
- * XXX spu_RenderSubpictures depends heavily on this order.
- */
-static int SubpictureCmp( const void *s0, const void *s1 )
-{
-    subpicture_t *p_subpic0 = *(subpicture_t**)s0;
-    subpicture_t *p_subpic1 = *(subpicture_t**)s1;
-    int r;
+    spu_private_t *p_sys = p_spu->p;
 
-    r = IntegerCmp( !p_subpic0->b_absolute, !p_subpic1->b_absolute );
-    if( !r )
-        r = IntegerCmp( p_subpic0->i_start, p_subpic1->i_start );
-    if( !r )
-        r = IntegerCmp( p_subpic0->i_channel, p_subpic1->i_channel );
-    if( !r )
-        r = IntegerCmp( p_subpic0->i_order, p_subpic1->i_order );
-    return r;
+    const int i_source_video_width  = p_fmt_src->i_width;
+    const int i_source_video_height = p_fmt_src->i_height;
+
+    unsigned int i_subpicture;
+    subpicture_t *pp_subpicture[VOUT_MAX_SUBPICTURES];
+
+    unsigned int i_subtitle_region_count;
+    spu_area_t p_subtitle_area_buffer[VOUT_MAX_SUBPICTURES];
+    spu_area_t *p_subtitle_area;
+    int i_subtitle_area;
+
+    /* Preprocess subpictures */
+    i_subpicture = 0;
+    i_subtitle_region_count = 0;
+    for( subpicture_t * p_subpic = p_subpic_list;
+            p_subpic != NULL;
+                p_subpic = p_subpic->p_next )
+    {
+        subpicture_Update( p_subpic,
+                           p_fmt_src, p_fmt_dst,
+                           p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
+
+        /* */
+        if( p_subpic->b_subtitle )
+        {
+            for( subpicture_region_t *r = p_subpic->p_region; r != NULL; r = r->p_next )
+                i_subtitle_region_count++;
+        }
+
+        /* */
+        pp_subpicture[i_subpicture++] = p_subpic;
+    }
+
+    /* Be sure we have at least 1 picture to process */
+    if( i_subpicture <= 0 )
+        return NULL;
+
+    subpicture_t *p_output = subpicture_New( NULL );
+
+    /* Now order subpicture array
+     * XXX The order is *really* important for overlap subtitles positionning */
+    qsort( pp_subpicture, i_subpicture, sizeof(*pp_subpicture), SubpictureCmp );
+
+    /* Allocate area array for subtitle overlap */
+    i_subtitle_area = 0;
+    p_subtitle_area = p_subtitle_area_buffer;
+    if( i_subtitle_region_count > sizeof(p_subtitle_area_buffer)/sizeof(*p_subtitle_area_buffer) )
+        p_subtitle_area = calloc( i_subtitle_region_count, sizeof(*p_subtitle_area) );
+
+    /* Process all subpictures and regions (in the right order) */
+    for( unsigned int i_index = 0; i_index < i_subpicture; i_index++ )
+    {
+        subpicture_t *p_subpic = pp_subpicture[i_index];
+        subpicture_region_t *p_region;
+
+        if( !p_subpic->p_region )
+            continue;
+
+        /* FIXME when possible use a better rendering size than source size
+         * (max of display size and source size for example) FIXME */
+        int i_render_width  = p_subpic->i_original_picture_width;
+        int i_render_height = p_subpic->i_original_picture_height;
+        if( !i_render_width || !i_render_height )
+        {
+            if( i_render_width != 0 || i_render_height != 0 )
+                msg_Err( p_spu, "unsupported original picture size %dx%d",
+                         i_render_width, i_render_height );
+
+            p_subpic->i_original_picture_width  = i_render_width = i_source_video_width;
+            p_subpic->i_original_picture_height = i_render_height = i_source_video_height;
+        }
+
+        if( p_sys->p_text )
+        {
+            p_sys->p_text->fmt_out.video.i_width          =
+            p_sys->p_text->fmt_out.video.i_visible_width  = i_render_width;
+
+            p_sys->p_text->fmt_out.video.i_height         =
+            p_sys->p_text->fmt_out.video.i_visible_height = i_render_height;
+        }
+
+        /* Compute scaling from picture to source size */
+        spu_scale_t scale = spu_scale_createq( i_source_video_width,  i_render_width,
+                                               i_source_video_height, i_render_height );
+
+        /* Update scaling from source size to display size(p_fmt_dst) */
+        scale.w = scale.w * p_fmt_dst->i_width  / i_source_video_width;
+        scale.h = scale.h * p_fmt_dst->i_height / i_source_video_height;
+
+        /* Set default subpicture aspect ratio
+         * FIXME if we only handle 1 aspect ratio per picture, why is it set per
+         * region ? */
+        p_region = p_subpic->p_region;
+        if( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den )
+        {
+            p_region->fmt.i_sar_den = p_fmt_dst->i_sar_den;
+            p_region->fmt.i_sar_num = p_fmt_dst->i_sar_num;
+        }
+
+        /* Take care of the aspect ratio */
+        if( p_region->fmt.i_sar_num * p_fmt_dst->i_sar_den !=
+            p_region->fmt.i_sar_den * p_fmt_dst->i_sar_num )
+        {
+            /* FIXME FIXME what about region->i_x/i_y ? */
+            scale.w = scale.w *
+                (int64_t)p_region->fmt.i_sar_num * p_fmt_dst->i_sar_den /
+                p_region->fmt.i_sar_den / p_fmt_dst->i_sar_num;
+        }
+
+        /* Render all regions
+         * We always transform non absolute subtitle into absolute one on the
+         * first rendering to allow good subtitle overlap support.
+         */
+        for( p_region = p_subpic->p_region; p_region != NULL; p_region = p_region->p_next )
+        {
+            spu_area_t area;
+
+            /* Check scale validity */
+            if( scale.w <= 0 || scale.h <= 0 )
+                continue;
+
+            /* */
+            subpicture_region_t *p_render;
+            SpuRenderRegion( p_spu, &p_render, &area,
+                             p_subpic, p_region, scale, p_fmt_dst,
+                             p_subtitle_area, i_subtitle_area,
+                             p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
+            if( p_render )
+            {
+                subpicture_region_t **pp_last = &p_output->p_region;
+                while( *pp_last )
+                    pp_last = &(*pp_last)->p_next;
+                *pp_last = p_render;
+            }
+
+            if( p_subpic->b_subtitle )
+            {
+                area = spu_area_unscaled( area, scale );
+                if( !p_subpic->b_absolute && area.i_width > 0 && area.i_height > 0 )
+                {
+                    p_region->i_x = area.i_x;
+                    p_region->i_y = area.i_y;
+                }
+                if( p_subtitle_area )
+                    p_subtitle_area[i_subtitle_area++] = area;
+            }
+        }
+        if( p_subpic->b_subtitle )
+            p_subpic->b_absolute = true;
+    }
+
+    /* */
+    if( p_subtitle_area != p_subtitle_area_buffer )
+        free( p_subtitle_area );
+
+    return p_output;
 }
 
 /*****************************************************************************
@@ -1623,19 +1305,6 @@ static int CropCallback( vlc_object_t *p_object, char const *psz_var,
 /*****************************************************************************
  * Buffers allocation callbacks for the filters
  *****************************************************************************/
-static int spu_get_attachments( filter_t *p_filter,
-                                input_attachment_t ***ppp_attachment,
-                                int *pi_attachment )
-{
-    spu_t *p_spu = p_filter->p_owner->p_spu;
-
-    int i_ret = VLC_EGENERIC;
-    if( p_spu->p->p_input )
-        i_ret = input_Control( (input_thread_t*)p_spu->p->p_input,
-                               INPUT_GET_ATTACHMENTS,
-                               ppp_attachment, pi_attachment );
-    return i_ret;
-}
 
 static subpicture_t *sub_new_buffer( filter_t *p_filter )
 {
@@ -1650,18 +1319,6 @@ static void sub_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
 {
     VLC_UNUSED( p_filter );
     subpicture_Delete( p_subpic );
-}
-static picture_t *spu_new_video_buffer( filter_t *p_filter )
-{
-    const video_format_t *p_fmt = &p_filter->fmt_out.video;
-
-    VLC_UNUSED(p_filter);
-    return picture_NewFromFormat( p_fmt );
-}
-static void spu_del_video_buffer( filter_t *p_filter, picture_t *p_picture )
-{
-    VLC_UNUSED(p_filter);
-    picture_Release( p_picture );
 }
 
 static int SubFilterAllocationInit( filter_t *p_filter, void *p_data )
@@ -1688,5 +1345,302 @@ static void SubFilterAllocationClean( filter_t *p_filter )
 
     spu_ClearChannel( p_sys->p_spu, p_sys->i_channel );
     free( p_filter->p_owner );
+}
+
+/*****************************************************************************
+ * Public API
+ *****************************************************************************/
+
+#undef spu_Create
+/**
+ * Creates the subpicture unit
+ *
+ * \param p_this the parent object which creates the subpicture unit
+ */
+spu_t *spu_Create( vlc_object_t *p_this )
+{
+    spu_t *p_spu;
+    spu_private_t *p_sys;
+
+    p_spu = vlc_custom_create( p_this, sizeof(spu_t) + sizeof(spu_private_t),
+                               VLC_OBJECT_GENERIC, "subpicture" );
+    if( !p_spu )
+        return NULL;
+    vlc_object_attach( p_spu, p_this );
+
+    /* Initialize spu fields */
+    p_spu->p = p_sys = (spu_private_t*)&p_spu[1];
+
+    /* Initialize private fields */
+    vlc_mutex_init( &p_sys->lock );
+
+    SpuHeapInit( &p_sys->heap );
+
+    p_sys->p_text = NULL;
+    p_sys->p_scale = NULL;
+    p_sys->p_scale_yuvp = NULL;
+
+    p_sys->i_margin = var_InheritInteger( p_spu, "sub-margin" );
+
+    /* Register the default subpicture channel */
+    p_sys->i_channel = SPU_DEFAULT_CHANNEL + 1;
+
+    p_sys->psz_chain_update = NULL;
+    vlc_mutex_init( &p_sys->chain_lock );
+    p_sys->p_chain = filter_chain_New( p_spu, "sub filter", false,
+                                       SubFilterAllocationInit,
+                                       SubFilterAllocationClean,
+                                       p_spu );
+
+    /* Load text and scale module */
+    SpuRenderCreateAndLoadText( p_spu );
+    SpuRenderCreateAndLoadScale( p_spu );
+
+    /* */
+    p_sys->i_last_sort_date = -1;
+
+    return p_spu;
+}
+
+/**
+ * Destroy the subpicture unit
+ *
+ * \param p_this the parent object which destroys the subpicture unit
+ */
+void spu_Destroy( spu_t *p_spu )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    if( p_sys->p_text )
+        FilterRelease( p_sys->p_text );
+
+    if( p_sys->p_scale_yuvp )
+        FilterRelease( p_sys->p_scale_yuvp );
+
+    if( p_sys->p_scale )
+        FilterRelease( p_sys->p_scale );
+
+    filter_chain_Delete( p_sys->p_chain );
+    vlc_mutex_destroy( &p_sys->chain_lock );
+    free( p_sys->psz_chain_update );
+
+    /* Destroy all remaining subpictures */
+    SpuHeapClean( &p_sys->heap );
+
+    vlc_mutex_destroy( &p_sys->lock );
+
+    vlc_object_release( p_spu );
+}
+
+/**
+ * Attach/Detach the SPU from any input
+ *
+ * \param p_this the object in which to destroy the subpicture unit
+ * \param b_attach to select attach or detach
+ */
+void spu_Attach( spu_t *p_spu, vlc_object_t *p_input, bool b_attach )
+{
+    if( b_attach )
+    {
+        UpdateSPU( p_spu, p_input );
+        var_Create( p_input, "highlight", VLC_VAR_BOOL );
+        var_AddCallback( p_input, "highlight", CropCallback, p_spu );
+
+        vlc_mutex_lock( &p_spu->p->lock );
+        p_spu->p->p_input = p_input;
+
+        FilterRelease( p_spu->p->p_text );
+        p_spu->p->p_text = NULL;
+        SpuRenderCreateAndLoadText( p_spu );
+
+        vlc_mutex_unlock( &p_spu->p->lock );
+    }
+    else
+    {
+        vlc_mutex_lock( &p_spu->p->lock );
+        p_spu->p->p_input = NULL;
+        vlc_mutex_unlock( &p_spu->p->lock );
+
+        /* Delete callbacks */
+        var_DelCallback( p_input, "highlight", CropCallback, p_spu );
+        var_Destroy( p_input, "highlight" );
+    }
+}
+
+/**
+ * Inform the SPU filters of mouse event
+ */
+int spu_ProcessMouse( spu_t *p_spu,
+                      const vlc_mouse_t *p_mouse,
+                      const video_format_t *p_fmt )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    vlc_mutex_lock( &p_sys->chain_lock );
+    filter_chain_MouseEvent( p_sys->p_chain, p_mouse, p_fmt );
+    vlc_mutex_unlock( &p_sys->chain_lock );
+
+    return VLC_SUCCESS;
+}
+
+/**
+ * Display a subpicture
+ *
+ * Remove the reservation flag of a subpicture, which will cause it to be
+ * ready for display.
+ * \param p_spu the subpicture unit object
+ * \param p_subpic the subpicture to display
+ */
+void spu_PutSubpicture( spu_t *p_spu, subpicture_t *p_subpic )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    /* SPU_DEFAULT_CHANNEL always reset itself */
+    if( p_subpic->i_channel == SPU_DEFAULT_CHANNEL )
+        spu_ClearChannel( p_spu, SPU_DEFAULT_CHANNEL );
+
+    /* p_private is for spu only and cannot be non NULL here */
+    for( subpicture_region_t *r = p_subpic->p_region; r != NULL; r = r->p_next )
+        assert( r->p_private == NULL );
+
+    /* */
+    vlc_mutex_lock( &p_sys->lock );
+    if( SpuHeapPush( &p_sys->heap, p_subpic ) )
+    {
+        vlc_mutex_unlock( &p_sys->lock );
+        msg_Err( p_spu, "subpicture heap full" );
+        subpicture_Delete( p_subpic );
+        return;
+    }
+    vlc_mutex_unlock( &p_sys->lock );
+}
+
+subpicture_t *spu_Render( spu_t *p_spu,
+                          const video_format_t *p_fmt_dst,
+                          const video_format_t *p_fmt_src,
+                          mtime_t render_subtitle_date,
+                          mtime_t render_osd_date,
+                          bool b_subtitle_only )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    /* Update sub-filter chain */
+    vlc_mutex_lock( &p_sys->lock );
+    char *psz_chain_update = p_sys->psz_chain_update;
+    p_sys->psz_chain_update = NULL;
+    vlc_mutex_unlock( &p_sys->lock );
+
+    vlc_mutex_lock( &p_sys->chain_lock );
+    if( psz_chain_update )
+    {
+        filter_chain_Reset( p_sys->p_chain, NULL, NULL );
+
+        filter_chain_AppendFromString( p_spu->p->p_chain, psz_chain_update );
+
+        free( psz_chain_update );
+    }
+    /* Run subpicture filters */
+    filter_chain_SubFilter( p_sys->p_chain, render_osd_date );
+    vlc_mutex_unlock( &p_sys->chain_lock );
+
+    /* Get the sorted list of subpicture to render */
+    vlc_mutex_lock( &p_sys->lock );
+
+    subpicture_t *p_list = SpuSortSubpictures( p_spu,
+                                               render_subtitle_date,
+                                               render_osd_date,
+                                               b_subtitle_only );
+    if( !p_list )
+    {
+        vlc_mutex_unlock( &p_sys->lock );
+        return NULL;
+    }
+
+    /* Render the current list of subpictures */
+    subpicture_t *p_render = SpuRenderSubpictures( p_spu,
+                                                   p_fmt_dst,
+                                                   p_list,
+                                                   p_fmt_src,
+                                                   render_subtitle_date,
+                                                   render_osd_date );
+    vlc_mutex_unlock( &p_sys->lock );
+
+    return p_render;
+}
+
+void spu_OffsetSubtitleDate( spu_t *p_spu, mtime_t i_duration )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    vlc_mutex_lock( &p_sys->lock );
+    for( int i = 0; i < VOUT_MAX_SUBPICTURES; i++ )
+    {
+        spu_heap_entry_t *p_entry = &p_sys->heap.p_entry[i];
+        subpicture_t *p_current = p_entry->p_subpicture;
+
+        if( p_current && p_current->b_subtitle )
+        {
+            if( p_current->i_start > 0 )
+                p_current->i_start += i_duration;
+            if( p_current->i_stop > 0 )
+                p_current->i_stop += i_duration;
+        }
+    }
+    vlc_mutex_unlock( &p_sys->lock );
+}
+
+int spu_RegisterChannel( spu_t *p_spu )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    vlc_mutex_lock( &p_sys->lock );
+    int i_channel = p_sys->i_channel++;
+    vlc_mutex_unlock( &p_sys->lock );
+
+    return i_channel;
+}
+
+void spu_ClearChannel( spu_t *p_spu, int i_channel )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    vlc_mutex_lock( &p_sys->lock );
+
+    for( int i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
+    {
+        spu_heap_entry_t *p_entry = &p_sys->heap.p_entry[i_subpic];
+        subpicture_t *p_subpic = p_entry->p_subpicture;
+
+        if( !p_subpic )
+            continue;
+        if( p_subpic->i_channel != i_channel && ( i_channel != -1 || p_subpic->i_channel == SPU_DEFAULT_CHANNEL ) )
+            continue;
+
+        /* You cannot delete subpicture outside of spu_SortSubpictures */
+        p_entry->b_reject = true;
+    }
+
+    vlc_mutex_unlock( &p_sys->lock );
+}
+
+void spu_ChangeFilters( spu_t *p_spu, const char *psz_filters )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    vlc_mutex_lock( &p_sys->lock );
+
+    free( p_sys->psz_chain_update );
+    p_sys->psz_chain_update = strdup( psz_filters );
+
+    vlc_mutex_unlock( &p_sys->lock );
+}
+
+void spu_ChangeMargin( spu_t *p_spu, int i_margin )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->i_margin = i_margin;
+    vlc_mutex_unlock( &p_sys->lock );
 }
 
