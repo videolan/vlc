@@ -93,8 +93,8 @@ struct picture_sys_t
 static int  Open(vlc_object_t *);
 
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
-static void           Prepare(vout_display_t *, picture_t *);
-static void           Display(vout_display_t *, picture_t *);
+static void           Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture);
+static void           Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
 static int            Control(vout_display_t *, int, va_list);
 static void           Manage (vout_display_t *);
 
@@ -240,11 +240,12 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 static int  Direct3DLockSurface(picture_t *);
 static void Direct3DUnlockSurface(picture_t *);
 
-static void Prepare(vout_display_t *vd, picture_t *picture)
+static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     LPDIRECT3DSURFACE9 surface = picture->p_sys->surface;
 #if 0
     picture_Release(picture);
+    VLC_UNUSED(subpicture);
     Direct3DRenderScene(vd, surface);
 #else
     /* FIXME it is a bit ugly, we need the surface to be unlocked for
@@ -256,10 +257,11 @@ static void Prepare(vout_display_t *vd, picture_t *picture)
     Direct3DUnlockSurface(picture);
 
     Direct3DRenderScene(vd, surface);
+    VLC_UNUSED(subpicture);
 #endif
 }
 
-static void Display(vout_display_t *vd, picture_t *picture)
+static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
     LPDIRECT3DDEVICE9 d3ddev = sys->d3ddev;
@@ -275,10 +277,12 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
 #if 0
     VLC_UNUSED(picture);
+    VLC_UNUSED(subpicture);
 #else
     /* XXX See Prepare() */
     Direct3DLockSurface(picture);
     picture_Release(picture);
+    VLC_UNUSED(subpicture);
 #endif
 
     CommonDisplay(vd);

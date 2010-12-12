@@ -40,18 +40,22 @@ static inline picture_pool_t *vout_display_Pool(vout_display_t *vd, unsigned cou
 /**
  * It preparse a picture for display.
  */
-static inline void vout_display_Prepare(vout_display_t *vd, picture_t *picture)
+static inline void vout_display_Prepare(vout_display_t *vd,
+                                        picture_t *picture,
+                                        subpicture_t *subpicture)
 {
     if (vd->prepare )
-        vd->prepare(vd, picture);
+        vd->prepare(vd, picture, subpicture);
 }
 
 /**
  * It display a picture.
  */
-static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
+static inline void vout_display_Display(vout_display_t *vd,
+                                        picture_t *picture,
+                                        subpicture_t *subpicture)
 {
-    vd->display(vd, picture);
+    vd->display(vd, picture, subpicture);
 }
 
 /**

@@ -96,7 +96,7 @@ struct vout_display_sys_t
 };
 
 static picture_pool_t *Pool (vout_display_t *, unsigned);
-static void Display (vout_display_t *, picture_t *);
+static void Display (vout_display_t *, picture_t *, subpicture_t *subpicture);
 static int Control (vout_display_t *, int, va_list);
 static void Manage (vout_display_t *);
 
@@ -680,7 +680,7 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 /**
  * Sends an image to the X server.
  */
-static void Display (vout_display_t *vd, picture_t *pic)
+static void Display (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *p_sys = vd->sys;
     xcb_shm_seg_t segment = pic->p_sys->segment;
@@ -719,6 +719,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
     }
 out:
     picture_Release (pic);
+    (void)subpicture;
 }
 
 static int Control (vout_display_t *vd, int query, va_list ap)

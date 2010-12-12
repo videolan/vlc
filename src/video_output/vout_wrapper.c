@@ -207,7 +207,8 @@ void vout_ManageWrapper(vout_thread_t *vout)
 /*****************************************************************************
  * Render
  *****************************************************************************/
-void vout_RenderWrapper(vout_thread_t *vout, picture_t *picture)
+void vout_RenderWrapper(vout_thread_t *vout,
+                        picture_t *picture, subpicture_t *subpicture)
 {
     vout_thread_sys_t *sys = vout->p;
     vout_display_t *vd = sys->display.vd;
@@ -216,24 +217,28 @@ void vout_RenderWrapper(vout_thread_t *vout, picture_t *picture)
 
     vout_UpdateDisplaySourceProperties(vd, &picture->format);
     if (sys->display.use_dr) {
-        vout_display_Prepare(vd, picture);
+        vout_display_Prepare(vd, picture, subpicture);
     } else {
         sys->display.filtered = vout_FilterDisplay(vd, picture);
         if (sys->display.filtered)
-            vout_display_Prepare(vd, sys->display.filtered);
+            vout_display_Prepare(vd, sys->display.filtered, subpicture);
     }
 }
 
 /*****************************************************************************
  *
  *****************************************************************************/
-void vout_DisplayWrapper(vout_thread_t *vout, picture_t *picture)
+void vout_DisplayWrapper(vout_thread_t *vout,
+                         picture_t *picture, subpicture_t *subpicture)
 {
     vout_thread_sys_t *sys = vout->p;
     vout_display_t *vd = sys->display.vd;
 
-     vout_display_Display(vd, sys->display.filtered ? sys->display.filtered : picture);
-     sys->display.filtered = NULL;
+    vout_display_Display(vd,
+                         sys->display.filtered ? sys->display.filtered
+                                                : picture,
+                         subpicture);
+    sys->display.filtered = NULL;
 }
 
 #ifdef WIN32

@@ -76,8 +76,8 @@ struct vout_display_sys_t
 };
 
 static picture_pool_t *Pool (vout_display_t *, unsigned);
-static void PictureRender (vout_display_t *, picture_t *);
-static void PictureDisplay (vout_display_t *, picture_t *);
+static void PictureRender (vout_display_t *, picture_t *, subpicture_t *);
+static void PictureDisplay (vout_display_t *, picture_t *, subpicture_t *);
 static int Control (vout_display_t *, int, va_list);
 static void Manage (vout_display_t *);
 
@@ -456,19 +456,21 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
     return sys->pool;
 }
 
-static void PictureRender (vout_display_t *vd, picture_t *pic)
+static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
 
     vout_display_opengl_Prepare (&sys->vgl, pic);
+    (void)subpicture;
 }
 
-static void PictureDisplay (vout_display_t *vd, picture_t *pic)
+static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
 
     vout_display_opengl_Display (&sys->vgl, &vd->source);
     picture_Release (pic);
+    (void)subpicture;
 }
 
 static int Control (vout_display_t *vd, int query, va_list ap)

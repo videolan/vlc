@@ -62,8 +62,8 @@ vlc_module_end()
  * Local prototypes.
  *****************************************************************************/
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
-static void           Prepare(vout_display_t *, picture_t *);
-static void           Display(vout_display_t *, picture_t *);
+static void           Prepare(vout_display_t *, picture_t *, subpicture_t *);
+static void           Display(vout_display_t *, picture_t *, subpicture_t *);
 static int            Control(vout_display_t *, int, va_list);
 static void           Manage (vout_display_t *);
 
@@ -175,20 +175,22 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     return sys->pool;
 }
 
-static void Prepare(vout_display_t *vd, picture_t *picture)
+static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
 
     vout_display_opengl_Prepare(&sys->vgl, picture);
+    VLC_UNUSED(subpicture);
 }
 
-static void Display(vout_display_t *vd, picture_t *picture)
+static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
 
     vout_display_opengl_Display(&sys->vgl, &vd->source);
 
     picture_Release(picture);
+    VLC_UNUSED(subpicture);
 
     CommonDisplay(vd);
 }

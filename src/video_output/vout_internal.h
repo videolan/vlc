@@ -161,8 +161,8 @@ void vout_CloseWrapper(vout_thread_t *, vout_display_state_t *);
 int  vout_InitWrapper(vout_thread_t *);
 void vout_EndWrapper(vout_thread_t *);
 void vout_ManageWrapper(vout_thread_t *);
-void vout_RenderWrapper(vout_thread_t *, picture_t *);
-void vout_DisplayWrapper(vout_thread_t *, picture_t *);
+void vout_RenderWrapper(vout_thread_t *, picture_t *, subpicture_t *);
+void vout_DisplayWrapper(vout_thread_t *, picture_t *, subpicture_t *);
 
 /* */
 int spu_ProcessMouse(spu_t *, const vlc_mouse_t *, const video_format_t *);

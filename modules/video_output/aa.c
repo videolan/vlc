@@ -66,8 +66,8 @@ vlc_module_end()
  * Local prototypes
  *****************************************************************************/
 static picture_pool_t *Pool   (vout_display_t *, unsigned);
-static void            Prepare(vout_display_t *, picture_t *);
-static void            PictureDisplay(vout_display_t *, picture_t *);
+static void            Prepare(vout_display_t *, picture_t *, subpicture_t *);
+static void            PictureDisplay(vout_display_t *, picture_t *, subpicture_t *);
 static int             Control(vout_display_t *, int, va_list);
 
 /* */
@@ -191,7 +191,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 
 /**
  * Prepare a picture for display */
-static void Prepare(vout_display_t *vd, picture_t *picture)
+static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -208,6 +208,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture)
 #else
     VLC_UNUSED(picture);
 #endif
+    VLC_UNUSED(subpicture);
 
     aa_fastrender(sys->aa_context, 0, 0,
                   vd->fmt.i_width, vd->fmt.i_height);
@@ -216,12 +217,13 @@ static void Prepare(vout_display_t *vd, picture_t *picture)
 /**
  * Display a picture
  */
-static void PictureDisplay(vout_display_t *vd, picture_t *picture)
+static void PictureDisplay(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
 
     aa_flush(sys->aa_context);
     picture_Release(picture);
+    VLC_UNUSED(subpicture);
 }
 
 /**

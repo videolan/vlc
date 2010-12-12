@@ -956,7 +956,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         vout_snapshot_Set(&vout->p->snapshot, &vd->source, direct);
 
     /* Render the direct buffer returned by vout_RenderPicture */
-    vout_RenderWrapper(vout, direct);
+    vout_RenderWrapper(vout, direct, NULL);
 
     vout_chrono_Stop(&vout->p->render);
 #if 0
@@ -980,7 +980,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     /* Display the direct buffer returned by vout_RenderPicture */
     vout->p->displayed.date = mdate();
 
-    vout_DisplayWrapper(vout, direct);
+    vout_DisplayWrapper(vout, direct, NULL);
 
     vout_statistic_Update(&vout->p->statistic, 1, 0);
 

@@ -115,6 +115,7 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
     vd->info.has_hide_mouse = false;
     vd->info.has_pictures_invalid = false;
     vd->info.has_event_thread = false;
+    vd->info.subpicture_chromas = NULL;
 
     vd->cfg = cfg;
     vd->pool = NULL;
@@ -1431,11 +1432,14 @@ static picture_pool_t *SplitterPool(vout_display_t *vd, unsigned count)
         sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
     return sys->pool;
 }
-static void SplitterPrepare(vout_display_t *vd, picture_t *picture)
+static void SplitterPrepare(vout_display_t *vd,
+                            picture_t *picture,
+                            subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
 
     picture_Hold(picture);
+    assert(!subpicture);
 
     if (video_splitter_Filter(sys->splitter, sys->picture, picture)) {
         for (int i = 0; i < sys->count; i++)
@@ -1448,16 +1452,19 @@ static void SplitterPrepare(vout_display_t *vd, picture_t *picture)
         if (vout_IsDisplayFiltered(sys->display[i]))
             sys->picture[i] = vout_FilterDisplay(sys->display[i], sys->picture[i]);
         if (sys->picture[i])
-            vout_display_Prepare(sys->display[i], sys->picture[i]);
+            vout_display_Prepare(sys->display[i], sys->picture[i], NULL);
     }
 }
-static void SplitterDisplay(vout_display_t *vd, picture_t *picture)
+static void SplitterDisplay(vout_display_t *vd,
+                            picture_t *picture,
+                            subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
 
+    assert(!subpicture);
     for (int i = 0; i < sys->count; i++) {
         if (sys->picture[i])
-            vout_display_Display(sys->display[i], sys->picture[i]);
+            vout_display_Display(sys->display[i], sys->picture[i], NULL);
     }
     picture_Release(picture);
 }

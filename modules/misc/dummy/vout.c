@@ -40,8 +40,8 @@ struct vout_display_sys_t {
     picture_pool_t *pool;
 };
 static picture_pool_t *Pool(vout_display_t *, unsigned count);
-static void            Display(vout_display_t *, picture_t *);
-static void            DisplayStat(vout_display_t *, picture_t *);
+static void            Display(vout_display_t *, picture_t *, subpicture_t *);
+static void            DisplayStat(vout_display_t *, picture_t *, subpicture_t *);
 static int             Control(vout_display_t *, int, va_list);
 static void            Manage (vout_display_t *);
 
@@ -104,15 +104,17 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     return sys->pool;
 }
 
-static void Display(vout_display_t *vd, picture_t *picture)
+static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     VLC_UNUSED(vd);
+    VLC_UNUSED(subpicture);
     picture_Release(picture);
 }
 
-static void DisplayStat(vout_display_t *vd, picture_t *picture)
+static void DisplayStat(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     VLC_UNUSED(vd);
+    VLC_UNUSED(subpicture);
     if (vd->fmt.i_width*vd->fmt.i_height >= sizeof(mtime_t)) {
         mtime_t date;
         memcpy(&date, picture->p->p_pixels, sizeof(date));

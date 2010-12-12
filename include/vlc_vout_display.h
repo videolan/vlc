@@ -116,15 +116,16 @@ typedef struct {
  * Information from a vout_display_t to configure
  * the core behaviour.
  *
- * By default they are all false.
+ * By default they are all false or NULL.
  *
  */
 typedef struct {
-    bool is_slow;            /* The picture memory has slow read/write */
-    bool has_double_click;    /* Is double-click generated */
-    bool has_hide_mouse;      /* Is mouse automatically hidden */
-    bool has_pictures_invalid;/* Will VOUT_DISPLAY_EVENT_PICTURES_INVALID be used */
-    bool has_event_thread;    /* Will events (key at least) be emitted using an independent thread */
+    bool is_slow;                           /* The picture memory has slow read/write */
+    bool has_double_click;                  /* Is double-click generated */
+    bool has_hide_mouse;                    /* Is mouse automatically hidden */
+    bool has_pictures_invalid;              /* Will VOUT_DISPLAY_EVENT_PICTURES_INVALID be used */
+    bool has_event_thread;                  /* Will events (key at least) be emitted using an independent thread */
+    const vlc_fourcc_t *subpicture_chromas; /* List of supported chromas for subpicture rendering. */
 } vout_display_info_t;
 
 /**
@@ -288,25 +289,29 @@ struct vout_display_t {
      */
     picture_pool_t *(*pool)(vout_display_t *, unsigned count);
 
-    /* Prepare a picture for display (optional).
+    /* Prepare a picture and an optional subpicture for display (optional).
      *
      * It is called before the next pf_display call to provide as much
-     * time as possible to prepare the given picture for display.
+     * time as possible to prepare the given picture and the subpicture
+     * for display.
      * You are guaranted that pf_display will always be called and using
-     * the exact same picture_t.
-     * You cannot change the pixel content of the picture_t.
+     * the exact same picture_t and subpicture_t.
+     * You cannot change the pixel content of the picture_t or of the
+     * subpicture_t.
      */
-    void       (*prepare)(vout_display_t *, picture_t *);
+    void       (*prepare)(vout_display_t *, picture_t *, subpicture_t *);
 
-    /* Display a picture (mandatory).
+    /* Display a picture and an optional subpicture (mandatory).
      *
-     * The picture must be displayed as soon as possible.
-     * You cannot change the pixel content of the picture_t.
+     * The picture and the optional subpicture must be displayed as soon as
+     * possible.
+     * You cannot change the pixel content of the picture_t or of the
+     * subpicture_t.
      *
-     * This function gives away the ownership of the picture, so you must
-     * release it as soon as possible.
+     * This function gives away the ownership of the picture and of the
+     * subpicture, so you must release them as soon as possible.
      */
-    void       (*display)(vout_display_t *, picture_t *);
+    void       (*display)(vout_display_t *, picture_t *, subpicture_t *);
 
     /* Control on the module (mandatory) */
     int        (*control)(vout_display_t *, int, va_list);

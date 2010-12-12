@@ -318,19 +318,21 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned count)
     return sys->pool;
 }
 
-static void PictureRender (vout_display_t *vd, picture_t *pic)
+static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
 
     vout_display_opengl_Prepare (&sys->vgl, pic);
+    (void)subpicture;
 }
 
-static void PictureDisplay (vout_display_t *vd, picture_t *pic)
+static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
 
     vout_display_opengl_Display (&sys->vgl, &vd->source);
     picture_Release (pic);
+    (void)subpicture;
 }
 
 static int Control (vout_display_t *vd, int query, va_list ap)
