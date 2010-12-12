@@ -308,7 +308,7 @@ static const http_status_info http_reason[] =
     { 452, "Conference not found" },
     { 453, "Not enough bandwidth" },*/
     { 454, "Session not found" },
-  /*{ 455, "Method not valid in this State" },*/
+    { 455, "Method not valid in this State" },
     { 456, "Header field not valid for resource" },
   /*{ 457, "Invalid range" },
     { 458, "Read-only parameter" },*/
