@@ -210,6 +210,8 @@ struct rtsp_strack_t
 
 static void RtspTrackClose( rtsp_strack_t *tr );
 
+#define TRACK_PATH_SIZE (sizeof("/trackID=999") - 1)
+
 char *RtspAppendTrackPath( rtsp_stream_id_t *id, const char *base )
 {
     const char *sep = strlen( base ) > 0 && base[strlen( base ) - 1] == '/' ?
@@ -228,6 +230,12 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
                              const char *dst, int ttl,
                              unsigned loport, unsigned hiport )
 {
+    if (rtsp->track_id > 999)
+    {
+        msg_Err(rtsp->owner, "RTSP: too many IDs!");
+        return NULL;
+    }
+
     char *urlbuf;
     rtsp_stream_id_t *id = malloc( sizeof( *id ) );
     httpd_url_t *url;
@@ -907,12 +915,9 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             ses = RtspClientGet( rtsp, psz_session );
             if( ses != NULL )
             {
-                /* The "trackID" part must match what is done in
-                 * RtspAppendTrackPath() */
-                /* FIXME: we really need to limit the number of tracks... */
-                char info[ses->trackc * ( strlen( control )
-                              + sizeof("url=/trackID=123;seq=65535;"
-                                       "rtptime=4294967295, ") ) + 1];
+                char info[ses->trackc * ( strlen( control ) + TRACK_PATH_SIZE
+                          + sizeof("url=;seq=65535;rtptime=4294967295, ")
+                                          - 1 ) + 1];
                 size_t infolen = 0;
                 RtspClientAlive(ses);
 
