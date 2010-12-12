@@ -2058,6 +2058,9 @@ mpcdec:
 
 .mpcdec: mpcdec
 	(cd $<; cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make install)
+ifdef HAVE_WIN32
+	(cd $<; cp libmpcdec/libmpcdec_static.a $(PREFIX)/lib/libmpcdec.a)
+endif
 	touch $@
 
 CLEAN_FILE += .mpcdec
