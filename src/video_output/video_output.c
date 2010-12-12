@@ -873,6 +873,7 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool is_
 
 static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 {
+    vout_thread_sys_t *sys = vout->p;
     vout_display_t *vd = vout->p->display.vd;
 
     picture_t *torender = picture_Hold(vout->p->displayed.current);
@@ -955,8 +956,16 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     if (do_snapshot)
         vout_snapshot_Set(&vout->p->snapshot, &vd->source, direct);
 
-    /* Render the direct buffer returned by vout_RenderPicture */
-    vout_RenderWrapper(vout, direct, NULL);
+    /* Render the direct buffer */
+    assert(vout_IsDisplayFiltered(vd) == !sys->display.use_dr);
+    vout_UpdateDisplaySourceProperties(vd, &direct->format);
+    if (sys->display.use_dr) {
+        vout_display_Prepare(vd, direct, NULL);
+    } else {
+        sys->display.filtered = vout_FilterDisplay(vd, direct);
+        if (sys->display.filtered)
+            vout_display_Prepare(vd, sys->display.filtered, NULL);
+    }
 
     vout_chrono_Stop(&vout->p->render);
 #if 0
@@ -979,8 +988,11 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
     /* Display the direct buffer returned by vout_RenderPicture */
     vout->p->displayed.date = mdate();
-
-    vout_DisplayWrapper(vout, direct, NULL);
+    vout_display_Display(vd,
+                         sys->display.filtered ? sys->display.filtered
+                                                : direct,
+                         NULL);
+    sys->display.filtered = NULL;
 
     vout_statistic_Update(&vout->p->statistic, 1, 0);
 
