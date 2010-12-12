@@ -762,7 +762,6 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 val.i_int = PAUSE_S;
                 Control( p_input, INPUT_CONTROL_SET_STATE, val );
 
-                b_pause_after_eof = false;
                 b_paused = true;
             }
             else
