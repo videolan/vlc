@@ -712,7 +712,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
             else
                 fmt = id->p_decoder->fmt_out.video;
 
-            subpicture_t *p_subpic = spu_Render( p_sys->p_spu, &fmt, &fmt,
+            subpicture_t *p_subpic = spu_Render( p_sys->p_spu, NULL, &fmt, &fmt,
                                                  p_pic->date, p_pic->date, false );
 
             /* Overlay subpicture */

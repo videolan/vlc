@@ -289,7 +289,7 @@ static void SpuRenderCreateAndLoadScale( spu_t *p_spu )
     /* XXX p_spu->p_scale is used for all conversion/scaling except yuvp to
      * yuva/rgba */
     p_spu->p->p_scale = CreateAndLoadScale( VLC_OBJECT(p_spu),
-                                            VLC_CODEC_YUVA, VLC_CODEC_YUVA, true );
+                                            VLC_CODEC_YUVA, VLC_CODEC_RGBA, true );
     /* This one is used for YUVP to YUVA/RGBA without scaling
      * FIXME rename it */
     p_spu->p->p_scale_yuvp = CreateAndLoadScale( VLC_OBJECT(p_spu),
@@ -769,6 +769,7 @@ static void SpuRenderRegion( spu_t *p_spu,
                              subpicture_region_t **pp_dst, spu_area_t *p_dst_area,
                              subpicture_t *p_subpic, subpicture_region_t *p_region,
                              const spu_scale_t scale_size,
+                             const vlc_fourcc_t *p_chroma_list,
                              const video_format_t *p_fmt,
                              const spu_area_t *p_subtitle_area, int i_subtitle_area,
                              mtime_t render_date )
@@ -809,7 +810,6 @@ static void SpuRenderRegion( spu_t *p_spu,
     const bool b_force_palette = b_using_palette && p_sys->b_force_palette;
     const bool b_force_crop    = b_force_palette && p_sys->b_force_crop;
     bool b_changed_palette     = false;
-
 
     /* Compute the margin which is expressed in destination pixel unit
      * The margin is applied only to subtitle and when no forced crop is
@@ -881,11 +881,18 @@ static void SpuRenderRegion( spu_t *p_spu,
     region_fmt = p_region->fmt;
     p_region_picture = p_region->p_picture;
 
+    bool b_convert_chroma = true;
+    for( int i = 0; p_chroma_list[i] && b_convert_chroma; i++ )
+    {
+        if( region_fmt.i_chroma == p_chroma_list[i] )
+            b_convert_chroma = false;
+    }
 
     /* Scale from rendered size to destination size */
     if( p_sys->p_scale && p_sys->p_scale->p_module &&
         ( !b_using_palette || ( p_sys->p_scale_yuvp && p_sys->p_scale_yuvp->p_module ) ) &&
-        ( scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT || b_using_palette ) )
+        ( scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT ||
+          b_using_palette || b_convert_chroma) )
     {
         const unsigned i_dst_width  = spu_scale_w( p_region->fmt.i_width, scale_size );
         const unsigned i_dst_height = spu_scale_h( p_region->fmt.i_height, scale_size );
@@ -903,6 +910,9 @@ static void SpuRenderRegion( spu_t *p_spu,
 
             /* Check forced palette changes */
             if( b_changed_palette )
+                b_changed = true;
+
+            if( b_convert_chroma && p_private->fmt.i_chroma != p_chroma_list[0] )
                 b_changed = true;
 
             if( b_changed )
@@ -927,9 +937,8 @@ static void SpuRenderRegion( spu_t *p_spu,
 
                 p_scale_yuvp->fmt_in.video = p_region->fmt;
 
-                /* TODO converting to RGBA for RGB video output is better */
                 p_scale_yuvp->fmt_out.video = p_region->fmt;
-                p_scale_yuvp->fmt_out.video.i_chroma = VLC_CODEC_YUVA;
+                p_scale_yuvp->fmt_out.video.i_chroma = p_chroma_list[0];
 
                 p_picture = p_scale_yuvp->pf_video_filter( p_scale_yuvp, p_picture );
                 if( !p_picture )
@@ -944,10 +953,14 @@ static void SpuRenderRegion( spu_t *p_spu,
             /* Conversion(except from YUVP)/Scaling */
             if( p_picture &&
                 ( p_picture->format.i_width != i_dst_width ||
-                  p_picture->format.i_height != i_dst_height ) )
+                  p_picture->format.i_height != i_dst_height ||
+                  ( b_convert_chroma && !b_using_palette ) ) )
             {
                 p_scale->fmt_in.video = p_picture->format;
                 p_scale->fmt_out.video = p_picture->format;
+                if( b_convert_chroma )
+                    p_scale->fmt_out.i_codec        =
+                    p_scale->fmt_out.video.i_chroma = p_chroma_list[0];
 
                 p_scale->fmt_out.video.i_width = i_dst_width;
                 p_scale->fmt_out.video.i_height = i_dst_height;
@@ -1076,6 +1089,7 @@ exit:
  * This function renders all sub picture units in the list.
  */
 static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
+                                           const vlc_fourcc_t *p_chroma_list,
                                            const video_format_t *p_fmt_dst,
                                            subpicture_t *p_subpic_list,
                                            const video_format_t *p_fmt_src,
@@ -1208,7 +1222,8 @@ static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
             /* */
             subpicture_region_t *p_render;
             SpuRenderRegion( p_spu, &p_render, &area,
-                             p_subpic, p_region, scale, p_fmt_dst,
+                             p_subpic, p_region, scale,
+                             p_chroma_list, p_fmt_dst,
                              p_subtitle_area, i_subtitle_area,
                              p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
             if( p_render )
@@ -1515,6 +1530,7 @@ void spu_PutSubpicture( spu_t *p_spu, subpicture_t *p_subpic )
 }
 
 subpicture_t *spu_Render( spu_t *p_spu,
+                          const vlc_fourcc_t *p_chroma_list,
                           const video_format_t *p_fmt_dst,
                           const video_format_t *p_fmt_src,
                           mtime_t render_subtitle_date,
@@ -1542,6 +1558,23 @@ subpicture_t *spu_Render( spu_t *p_spu,
     filter_chain_SubFilter( p_sys->p_chain, render_osd_date );
     vlc_mutex_unlock( &p_sys->chain_lock );
 
+    static const vlc_fourcc_t p_chroma_list_default_yuv[] = {
+        VLC_CODEC_YUVA,
+        VLC_CODEC_RGBA,
+        VLC_CODEC_YUVP,
+        0,
+    };
+    static const vlc_fourcc_t p_chroma_list_default_rgb[] = {
+        VLC_CODEC_RGBA,
+        VLC_CODEC_YUVA,
+        VLC_CODEC_YUVP,
+        0,
+    };
+
+    if( !p_chroma_list || *p_chroma_list == 0 )
+        p_chroma_list = vlc_fourcc_IsYUV(p_fmt_dst->i_chroma) ? p_chroma_list_default_yuv
+                                                              : p_chroma_list_default_rgb;
+
     /* Get the sorted list of subpicture to render */
     vlc_mutex_lock( &p_sys->lock );
 
@@ -1557,6 +1590,7 @@ subpicture_t *spu_Render( spu_t *p_spu,
 
     /* Render the current list of subpictures */
     subpicture_t *p_render = SpuRenderSubpictures( p_spu,
+                                                   p_chroma_list,
                                                    p_fmt_dst,
                                                    p_list,
                                                    p_fmt_src,

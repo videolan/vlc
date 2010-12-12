@@ -900,7 +900,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         render_subtitle_date = filtered->date > 1 ? filtered->date : mdate();
     mtime_t render_osd_date = mdate(); /* FIXME wrong */
 
-    subpicture_t *subpic = spu_Render(vout->p->spu, &vd->source, &vd->source,
+    subpicture_t *subpic = spu_Render(vout->p->spu, NULL, &vd->source, &vd->source,
                                       render_subtitle_date, render_osd_date,
                                       do_snapshot);
 
