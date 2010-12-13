@@ -71,7 +71,6 @@ static const struct ml_table_elt ml_table_map[]=
     { ML_COMMENT,	    "comment" },
     { ML_COVER,	        "cover" },
     { ML_DIRECTORY,	    "directory_id" },
-    { ML_DIRECTORY,	    "directory_id" },
     { ML_DISC_NUMBER,	"disc" },
     { ML_DURATION,	    "duration" },
     { ML_EXTRA,	        "extra" },
