@@ -471,7 +471,10 @@ int SQLToMediaArray( media_library_t *p_ml, vlc_array_t *p_result_array,
     /* Analyze first row */
     int *indexes = ( int* ) calloc( i_cols + 1, sizeof( int ) );
     if( !indexes )
+    {
+        vlc_array_destroy( p_intermediate_array );
         return VLC_ENOMEM;
+    }
 
     const int count = sizeof( ml_table_map )/ sizeof( struct ml_table_elt );
     for( int col = 0; col < i_cols; col++ )
@@ -508,14 +511,16 @@ int SQLToMediaArray( media_library_t *p_ml, vlc_array_t *p_result_array,
         if( !p_media )
         {
             free( indexes );
-            return VLC_ENOMEM;
+            i_ret = VLC_ENOMEM;
+            goto quit_sqlmediaarray;
         }
         p_result = ( ml_result_t * ) calloc( 1, sizeof( ml_result_t ) );
         if( !p_result )
         {
             ml_gc_decref( p_media );
             free( indexes );
-            return VLC_ENOMEM;
+            i_ret = VLC_ENOMEM;
+            goto quit_sqlmediaarray;
         }
 
         char* psz_append_pname = NULL;
