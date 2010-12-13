@@ -29,7 +29,7 @@
  */
 @interface VLCTime : NSObject <NSCopying>
 {
-    NSNumber * value;       //< Holds, in seconds, the VLCTime value
+    NSNumber * value;       //< Holds, in milliseconds, the VLCTime value
 }
 
 /* Factories */
