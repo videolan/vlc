@@ -264,7 +264,7 @@ void twalk( const void *root, void(*action)(const void *nodep, VISIT which, int 
 void tdestroy( void *root, void (*free_node)(void *nodep) );
 #else // HAVE_SEARCH_H
 # ifndef HAVE_TDESTROY
-void tdestroy( void *root, void (*free_node)(void *nodep) );
+#  define tdestroy vlc_tdestroy
 # endif
 #endif
 

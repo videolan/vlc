@@ -606,6 +606,7 @@ vlc_sd_probe_Add
 vlc_sdp_Start
 vlc_sd_Start
 vlc_sd_Stop
+vlc_tdestroy
 vlc_testcancel
 vlc_thread_create
 vlc_thread_join
