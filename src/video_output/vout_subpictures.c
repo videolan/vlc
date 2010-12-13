@@ -1193,13 +1193,13 @@ static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
         p_region = p_subpic->p_region;
         if( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den )
         {
-            p_region->fmt.i_sar_den = p_fmt_dst->i_sar_den;
-            p_region->fmt.i_sar_num = p_fmt_dst->i_sar_num;
+            p_region->fmt.i_sar_den = p_fmt_src->i_sar_den;
+            p_region->fmt.i_sar_num = p_fmt_src->i_sar_num;
         }
 
         /* Take care of the aspect ratio */
-        if( p_region->fmt.i_sar_num * p_fmt_dst->i_sar_den !=
-            p_region->fmt.i_sar_den * p_fmt_dst->i_sar_num )
+        if( p_region->fmt.i_sar_num * p_fmt_src->i_sar_den !=
+            p_region->fmt.i_sar_den * p_fmt_src->i_sar_num )
         {
             /* FIXME FIXME what about region->i_x/i_y ? */
             scale.w = scale.w *
