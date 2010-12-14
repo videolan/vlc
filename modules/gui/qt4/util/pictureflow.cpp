@@ -40,8 +40,10 @@
 #include <QTimer>
 #include <QVector>
 #include <QWidget>
+#include <QHash>
 #include "../components/playlist/playlist_model.hpp" /* getArtPixmap etc */
 #include "../components/playlist/sorting.h"          /* Columns List */
+#include "input_manager.hpp"
 
 // for fixed-point arithmetic, we need minimum 32-bit long
 // long long (64-bit) might be useful for multiplication and division
@@ -199,7 +201,8 @@ private:
     void render();
     void renderSlides();
     QRect renderSlide(const SlideInfo &slide, int col1 = -1, int col2 = -1);
-    QImage* surface(int slideIndex);
+    QImage* surface(QModelIndex);
+    QHash<QString, QImage*> cache;
 };
 
 // ------------- PictureFlowState ---------------------------------------
@@ -414,6 +417,7 @@ PictureFlowSoftwareRenderer::PictureFlowSoftwareRenderer():
 PictureFlowSoftwareRenderer::~PictureFlowSoftwareRenderer()
 {
     buffer = QImage();
+    cache.clear();
     delete blankSurface;
 }
 
@@ -605,19 +609,15 @@ static QImage* prepareSurface(const QImage* slideImage, int w, int h, QRgb bgcol
     return result;
 }
 
-QImage* PictureFlowSoftwareRenderer::surface(int slideIndex)
+QImage* PictureFlowSoftwareRenderer::surface(QModelIndex index)
 {
-    if (!state)
-        return 0;
-    if (slideIndex < 0)
-        return 0;
-    if (slideIndex >= state->model->rowCount( state->model->currentIndex().parent() ) )
+    if (!state || !index.isValid())
         return 0;
 
-    QImage* img = new QImage(PLModel::getArtPixmap( state->model->index( slideIndex, 0, state->model->currentIndex().parent() ),
+    QImage* img = new QImage(PLModel::getArtPixmap( index,
                                          QSize( state->slideWidth, state->slideHeight ) ).toImage());
 
-    QImage* sr = prepareSurface(img, state->slideWidth, state->slideHeight, bgcolor, state->reflectionEffect, state->model->index( slideIndex, 0, state->model->currentIndex().parent() ) );
+    QImage* sr = prepareSurface(img, state->slideWidth, state->slideHeight, bgcolor, state->reflectionEffect, index );
 
     delete img;
     return sr;
@@ -631,7 +631,24 @@ QRect PictureFlowSoftwareRenderer::renderSlide(const SlideInfo &slide, int col1,
     if (!blend)
         return QRect();
 
-    QImage* src = surface(slide.slideIndex);
+    QModelIndex index;
+
+    index = state->model->index( slide.slideIndex, 0, state->model->currentIndex().parent() );
+    if( !index.isValid() )
+        return QRect();
+
+    PLItem *item = static_cast<PLItem*>( index.internalPointer() );
+
+    QString key = QString("%1%2%3%4").arg(PLModel::getMeta( index, COLUMN_TITLE )).arg( PLModel::getMeta( index, COLUMN_ARTIST ) ).arg(index.data( PLModel::IsCurrentRole ).toBool() ).arg( InputManager::decodeArtURL( item->inputItem() ) );
+
+    QImage* src;
+    if( cache.contains( key ) )
+       src = cache.value( key );
+    else
+    {
+       src = surface( index );
+       cache.insert( key, src );
+    }
     if (!src)
         return QRect();
 
@@ -664,7 +681,6 @@ QRect PictureFlowSoftwareRenderer::renderSlide(const SlideInfo &slide, int col1,
     int xi = qMax((PFreal)0, (w * PFREAL_ONE / 2) + fdiv(xs * h, dist + ys) >> PFREAL_SHIFT);
     if (xi >= w)
     {
-        delete src;
         return rect;
     }
 
@@ -736,7 +752,6 @@ QRect PictureFlowSoftwareRenderer::renderSlide(const SlideInfo &slide, int col1,
 
     rect.setTop(0);
     rect.setBottom(h - 1);
-    delete src;
     return rect;
 }
 
