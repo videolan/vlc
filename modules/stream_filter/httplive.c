@@ -965,35 +965,29 @@ static void* hls_Thread(vlc_object_t *p_this)
 static int Prefetch(stream_t *s, int *current)
 {
     stream_sys_t *p_sys = s->p_sys;
-    int i_segment = p_sys->segment;
+    int stream;
 
     /* Try to pick best matching stream */
-    int count = vlc_array_count(p_sys->hls_stream);
-    for (int stream = 0; stream < count; stream++)
-    {
-        hls_stream_t *hls = hls_Get(p_sys->hls_stream, stream);
-        if (hls == NULL)
-            return VLC_EGENERIC;
+again:
+    stream = *current;
 
-        segment_t *segment = segment_GetSegment(hls,i_segment);
-        if (segment == NULL )
-            return VLC_EGENERIC;
-
-        if (Download(s, hls, segment, &stream) != VLC_SUCCESS)
-            return VLC_EGENERIC;
-
-        i_segment++;
-
-        /* */
-        *current = stream;
-    }
-
-    /* Download first 3 segments of this HLS stream */
     hls_stream_t *hls = hls_Get(p_sys->hls_stream, *current);
     if (hls == NULL)
-        return VLC_EGENERIC; /* FIXME: */
+        return VLC_EGENERIC;
 
-    for (int i = 0; i < 3; i++)
+    segment_t *segment = segment_GetSegment(hls,  p_sys->segment);
+    if (segment == NULL )
+        return VLC_EGENERIC;
+
+    if (Download(s, hls, segment, current) != VLC_SUCCESS)
+        return VLC_EGENERIC;
+
+    /* Found better bandwidth match, try again */
+    if (*current != stream)
+        goto again;
+
+    /* Download first 2 segments of this HLS stream */
+    for (int i = 0; i < 2; i++)
     {
         segment_t *segment = segment_GetSegment(hls, p_sys->segment);
         if (segment == NULL )
@@ -1210,8 +1204,8 @@ static int Open(vlc_object_t *p_this)
         goto fail;
     }
 
-    /* */
-    int current = p_sys->current = hls_LowestBandwidthStream(p_sys->hls_stream);
+    /* Choose first HLS stream to start with */
+    int current = p_sys->current = 0;
     p_sys->segment = 0;
 
     if (Prefetch(s, &current) != VLC_SUCCESS)
