@@ -543,8 +543,6 @@ static int Open( vlc_object_t *p_this )
     psz = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "mux" );
     if( psz != NULL )
     {
-        sout_stream_id_t *id;
-
         /* Check muxer type */
         if( strncasecmp( psz, "ps", 2 )
          && strncasecmp( psz, "mpeg1", 5 )
@@ -568,20 +566,6 @@ static int Open( vlc_object_t *p_this )
         if( p_sys->p_mux == NULL )
         {
             msg_Err( p_stream, "cannot create muxer" );
-            sout_AccessOutDelete( p_sys->p_grab );
-            vlc_mutex_destroy( &p_sys->lock_sdp );
-            vlc_mutex_destroy( &p_sys->lock_ts );
-            vlc_mutex_destroy( &p_sys->lock_es );
-            free( p_sys->psz_vod_session );
-            free( p_sys->psz_destination );
-            free( p_sys );
-            return VLC_EGENERIC;
-        }
-
-        id = Add( p_stream, NULL );
-        if( id == NULL )
-        {
-            sout_MuxDelete( p_sys->p_mux );
             sout_AccessOutDelete( p_sys->p_grab );
             vlc_mutex_destroy( &p_sys->lock_sdp );
             vlc_mutex_destroy( &p_sys->lock_ts );
@@ -638,6 +622,16 @@ static int Open( vlc_object_t *p_this )
     /* update p_sout->i_out_pace_nocontrol */
     p_stream->p_sout->i_out_pace_nocontrol++;
 
+    if( p_sys->p_mux != NULL )
+    {
+        sout_stream_id_t *id = Add( p_stream, NULL );
+        if( id == NULL )
+        {
+            Close( p_this );
+            return VLC_EGENERIC;
+        }
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -654,20 +648,16 @@ static void Close( vlc_object_t * p_this )
 
     if( p_sys->p_mux )
     {
-        assert( p_sys->i_es == 1 );
+        assert( p_sys->i_es <= 1 );
 
         sout_MuxDelete( p_sys->p_mux );
-        Del( p_stream, p_sys->es[0] );
+        if ( p_sys->i_es > 0 )
+            Del( p_stream, p_sys->es[0] );
         sout_AccessOutDelete( p_sys->p_grab );
 
         if( p_sys->packet )
         {
             block_Release( p_sys->packet );
-        }
-        if( p_sys->b_export_sap )
-        {
-            p_sys->p_mux = NULL;
-            SapSetup( p_stream );
         }
     }
 
@@ -728,22 +718,9 @@ static void SDPHandleUrl( sout_stream_t *p_stream, const char *psz_url )
             goto out;
         }
 
-        /* FIXME test if destination is multicast or no destination at all */
         p_sys->rtsp = RtspSetup( VLC_OBJECT(p_stream), NULL, &url );
         if( p_sys->rtsp == NULL )
             msg_Err( p_stream, "cannot export SDP as RTSP" );
-        else
-        if( p_sys->p_mux != NULL )
-        {
-            sout_stream_id_t *id = p_sys->es[0];
-            rtsp_stream_id_t *rtsp_id = RtspAddId( p_sys->rtsp, id,
-                                GetDWBE( id->ssrc ), id->rtp_fmt.clock_rate,
-                                p_sys->psz_destination, p_sys->i_ttl,
-                                id->i_port, id->i_port + 1 );
-            vlc_mutex_lock( &p_sys->lock_es );
-            id->rtsp_id = rtsp_id;
-            vlc_mutex_unlock( &p_sys->lock_es );
-        }
     }
     else if( ( url.psz_protocol && !strcasecmp( url.psz_protocol, "sap" ) ) ||
              ( url.psz_host && !strcasecmp( url.psz_host, "sap" ) ) )
@@ -1246,7 +1223,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     vlc_mutex_destroy( &id->lock_sink );
 
     /* Update SDP (sap/file) */
-    if( p_sys->b_export_sap && !p_sys->p_mux ) SapSetup( p_stream );
+    if( p_sys->b_export_sap ) SapSetup( p_stream );
     if( p_sys->psz_sdp_file != NULL ) FileSetup( p_stream );
 
     free( id );
@@ -1297,7 +1274,7 @@ static int SapSetup( sout_stream_t *p_stream )
         p_sys->p_session = NULL;
     }
 
-    if( ( p_sys->i_es > 0 || p_sys->p_mux ) && p_sys->psz_sdp && *p_sys->psz_sdp )
+    if( p_sys->i_es > 0 && p_sys->psz_sdp && *p_sys->psz_sdp )
     {
         announce_method_t *p_method = sout_SAPMethod();
         p_sys->p_session = sout_AnnounceRegisterSDP( p_sout,
