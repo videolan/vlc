@@ -316,7 +316,6 @@ struct sout_stream_sys_t
     uint16_t  i_port_video;
     uint8_t   proto;
     bool      rtcp_mux;
-    int       i_ttl:9;
     bool      b_latm;
 
     /* VoD */
@@ -502,14 +501,11 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->i_ttl = var_GetInteger( p_stream, SOUT_CFG_PREFIX "ttl" );
-    if( p_sys->i_ttl == -1 )
+    int i_ttl = var_GetInteger( p_stream, SOUT_CFG_PREFIX "ttl" );
+    if( i_ttl != -1 )
     {
-        /* Normally, we should let the default hop limit up to the core,
-         * but we have to know it to write our RTSP headers properly,
-         * which is why we ask the core. FIXME: broken when neither
-         * sout-rtp-ttl nor ttl are set. */
-        p_sys->i_ttl = var_InheritInteger( p_stream, "ttl" );
+        var_Create( p_stream, "ttl", VLC_VAR_INTEGER );
+        var_SetInteger( p_stream, "ttl", i_ttl );
     }
 
     p_sys->b_latm = var_GetBool( p_stream, SOUT_CFG_PREFIX "mp4a-latm" );
@@ -1020,6 +1016,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     id->i_seq_sent_next = id->i_sequence;
 
+    int mcast_fd = -1;
     if( p_sys->psz_destination != NULL )
     {
         /* Choose the port */
@@ -1094,9 +1091,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
             default:
             {
-                int ttl = (p_sys->i_ttl >= 0) ? p_sys->i_ttl : -1;
                 int fd = net_ConnectDgram( p_stream, p_sys->psz_destination,
-                                           i_port, ttl, p_sys->proto );
+                                           i_port, -1, p_sys->proto );
                 if( fd == -1 )
                 {
                     msg_Err( p_stream, "cannot create RTP socket" );
@@ -1107,6 +1103,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 setsockopt (fd, SOL_SOCKET, SO_RCVBUF, &(int){ 0 },
                             sizeof (int));
                 rtp_add_sink( id, fd, p_sys->rtcp_mux, NULL );
+                /* FIXME: test if this is multicast  */
+                mcast_fd = fd;
             }
         }
     }
@@ -1143,11 +1141,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                                           p_sys->i_pts_offset );
 
     if( p_sys->rtsp != NULL )
-        id->rtsp_id = RtspAddId( p_sys->rtsp, id,
-                                 GetDWBE( id->ssrc ),
-                                 id->rtp_fmt.clock_rate,
-                                 p_sys->psz_destination,
-                                 p_sys->i_ttl, id->i_port, id->i_port + 1 );
+        id->rtsp_id = RtspAddId( p_sys->rtsp, id, GetDWBE( id->ssrc ),
+                                 id->rtp_fmt.clock_rate, mcast_fd );
 
     id->p_fifo = block_FifoNew();
     if( unlikely(id->p_fifo == NULL) )

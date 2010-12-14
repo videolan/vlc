@@ -301,7 +301,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     {
         media_es_t *p_es = p_media->es[i];
         p_es->rtsp_id = RtspAddId(p_media->rtsp, NULL, 0,
-                                  p_es->rtp_fmt.clock_rate, NULL, 0, 0, 0);
+                                  p_es->rtp_fmt.clock_rate, -1);
         if (p_es->rtsp_id == NULL)
             goto error;
     }

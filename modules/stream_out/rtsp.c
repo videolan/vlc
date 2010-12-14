@@ -170,13 +170,11 @@ struct rtsp_stream_id_t
 {
     rtsp_stream_t    *stream;
     sout_stream_id_t *sout_id;
-    unsigned          clock_rate; /* needed to compute rtptime in RTP-Info */
     httpd_url_t      *url;
-    const char       *dst;
-    int               ttl;
     unsigned          track_id;
     uint32_t          ssrc;
-    uint16_t          loport, hiport;
+    unsigned          clock_rate; /* needed to compute rtptime in RTP-Info */
+    int               mcast_fd;
 };
 
 
@@ -226,9 +224,7 @@ char *RtspAppendTrackPath( rtsp_stream_id_t *id, const char *base )
 
 rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
                              uint32_t ssrc, unsigned clock_rate,
-                             /* Multicast stuff - TODO: cleanup */
-                             const char *dst, int ttl,
-                             unsigned loport, unsigned hiport )
+                             int mcast_fd)
 {
     if (rtsp->track_id > 999)
     {
@@ -248,13 +244,7 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
     id->track_id = rtsp->track_id;
     id->ssrc = ssrc;
     id->clock_rate = clock_rate;
-    id->dst = dst;
-    if( id->dst != NULL )
-    {
-        id->ttl = ttl;
-        id->loport = loport;
-        id->hiport = hiport;
-    }
+    id->mcast_fd = mcast_fd;
 
     urlbuf = RtspAppendTrackPath( id, rtsp->psz_path );
     if( urlbuf == NULL )
@@ -684,7 +674,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                  tpt = transport_next( tpt ) )
             {
                 bool b_multicast = true, b_unsupp = false;
-                unsigned loport = 5004, hiport = 5005; /* from RFC3551 */
+                unsigned loport = 5004, hiport; /* from RFC3551 */
 
                 /* Check transport protocol. */
                 /* Currently, we only support RTP/AVP over UDP */
@@ -752,9 +742,18 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
 
                 if( b_multicast )
                 {
-                    const char *dst = id->dst;
-                    if( dst == NULL )
+                    char dst[NI_MAXNUMERICHOST];
+                    int dport, ttl;
+                    if( id->mcast_fd == -1 )
                         continue;
+
+                    net_GetPeerAddress(id->mcast_fd, dst, &dport);
+
+                    ttl = var_InheritInteger(owner, "ttl");
+                    if (ttl <= 0)
+                    /* FIXME: the TTL is left to the OS default, we can
+                     * only guess that it's 1. */
+                        ttl = 1;
 
                     if( psz_session == NULL )
                     {
@@ -768,8 +767,8 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     httpd_MsgAdd( answer, "Transport",
                                   "RTP/AVP/UDP;destination=%s;port=%u-%u;"
                                   "ttl=%d;mode=play",
-                                  dst, id->loport, id->hiport,
-                                  ( id->ttl > 0 ) ? id->ttl : 1 );
+                                  dst, dport, dport + 1, ttl );
+                     /* FIXME: this doesn't work with RTP + RTCP mux */
                 }
                 else
                 {

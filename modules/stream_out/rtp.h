@@ -31,8 +31,7 @@ void RtspUnsetup( rtsp_stream_t *rtsp );
 
 rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
                              uint32_t ssrc, unsigned clock_rate,
-                             const char *dst, int ttl,
-                             unsigned loport, unsigned hiport );
+                             int mcast_fd );
 void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t * );
 
 char *RtspAppendTrackPath( rtsp_stream_id_t *id, const char *base );
