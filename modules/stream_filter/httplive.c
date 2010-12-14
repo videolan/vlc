@@ -774,6 +774,8 @@ static int parse_HTTPLiveStreaming(stream_t *s)
 
         if (p_sys->b_live)
         {
+            vlc_mutex_lock(&hls->lock);
+
             /* There should at least be 3 segments of hls->duration */
             int ok = 0;
             int num = vlc_array_count(hls->segments);
@@ -786,11 +788,16 @@ static int parse_HTTPLiveStreaming(stream_t *s)
             if (ok < 3)
             {
                 msg_Err(s, "cannot start live playback at this time, try again later.");
+                vlc_mutex_unlock(&hls->lock);
                 return VLC_EGENERIC;
             }
+
             /* Determine next time to reload playlist */
             p_sys->wakeup = p_sys->last + (hls->duration * 2 * (mtime_t)1000000);
+
+            vlc_mutex_unlock(&hls->lock);
         }
+
         /* Can we cache files after playback */
         p_sys->b_cache = hls->b_cache;
     }
@@ -1263,13 +1270,18 @@ static segment_t *NextSegment(stream_t *s)
     hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->current);
     if (hls != NULL)
     {
+        vlc_mutex_lock(&hls->lock);
         segment = segment_GetSegment(hls, p_sys->segment);
         if (segment != NULL)
         {
             /* This segment is ready? */
             if (segment->data != NULL)
+            {
+               vlc_mutex_unlock(&hls->lock);
                return segment;
+            }
         }
+        vlc_mutex_unlock(&hls->lock);
     }
 
     /* Was the HLS stream changed to another bitrate? */
@@ -1279,26 +1291,37 @@ static segment_t *NextSegment(stream_t *s)
     {
         /* Is the next segment ready */
         hls_stream_t *hls = hls_Get(p_sys->hls_stream, i_stream);
-        if (hls == NULL) return NULL;
+        if (hls == NULL)
+            return NULL;
 
+        vlc_mutex_lock(&hls->lock);
         segment = segment_GetSegment(hls, p_sys->segment);
-        if (segment == NULL) return NULL;
+        if (segment == NULL)
+        {
+            vlc_mutex_unlock(&hls->lock);
+            break;
+        }
 
         /* This segment is ready? */
-        if (segment->data != NULL)
-            goto segment_ok;
+        if ((segment->data != NULL) &&
+            (p_sys->segment < p_sys->thread->segment))
+        {
+            p_sys->current = i_stream;
+            vlc_mutex_unlock(&hls->lock);
+            return segment;
+        }
+        vlc_mutex_unlock(&hls->lock);
 
-        if (!p_sys->b_meta) return NULL;
+        if (!p_sys->b_meta)
+            break;
 
         /* Was the stream changed to another bitrate? */
         i_stream++;
         if (i_stream >= vlc_array_count(p_sys->hls_stream))
-            return NULL;
+            break;
     }
-
-segment_ok:
-    p_sys->current = i_stream;
-    return segment;
+    /* */
+    return NULL;
 }
 
 static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
@@ -1450,6 +1473,8 @@ static uint64_t GetStreamSize(stream_t *s)
     hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->current);
     if (hls == NULL) return 0;
 
+    vlc_mutex_lock(&hls->lock);
+
     /* FIXME: Stream size is not entirely exacts at this point */
     uint64_t length = 0UL;
     int count = vlc_array_count(hls->segments);
@@ -1462,6 +1487,8 @@ static uint64_t GetStreamSize(stream_t *s)
                         (segment->length * hls->bandwidth);
         }
     }
+
+    vlc_mutex_unlock(&hls->lock);
     return length;
 }
 
@@ -1477,7 +1504,10 @@ static int segment_Seek(stream_t *s, uint64_t pos)
     uint64_t length = 0;
     bool b_found = false;
 
+    vlc_mutex_lock(&hls->lock);
     int count = vlc_array_count(hls->segments);
+    vlc_mutex_unlock(&hls->lock);
+
     for (int n = 0; n < count; n++)
     {
         /* FIXME: Seeking in segments not dowloaded is not supported. */
