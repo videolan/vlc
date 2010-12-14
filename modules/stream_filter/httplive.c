@@ -233,29 +233,6 @@ static hls_stream_t *hls_GetLast(vlc_array_t *hls_stream)
     return (hls_stream_t *) hls_Get(hls_stream, count);
 }
 
-static int hls_LowestBandwidthStream(vlc_array_t *hls_stream)
-{
-    int count = vlc_array_count(hls_stream);
-    int i_lowest = 0;
-    uint64_t lowest = 0;
-
-    for (int i = 0; i < count; i++)
-    {
-        hls_stream_t *hls = (hls_stream_t *) vlc_array_item_at_index(hls_stream, i);
-        if (lowest == 0)
-        {
-            lowest = hls->bandwidth;
-            i_lowest = i;
-        }
-        else if (hls->bandwidth < lowest)
-        {
-            lowest = hls->bandwidth;
-            i_lowest = i;
-        }
-    }
-    return i_lowest;
-}
-
 /* Segment */
 static segment_t *segment_New(hls_stream_t* hls, int duration, char *uri)
 {
