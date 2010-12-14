@@ -901,10 +901,47 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         render_subtitle_date = filtered->date > 1 ? filtered->date : mdate();
     mtime_t render_osd_date = mdate(); /* FIXME wrong */
 
-    subpicture_t *subpic = spu_Render(vout->p->spu, NULL, &vd->source, &vd->source,
+    /*
+     * Get the subpicture to be displayed
+     */
+    const bool do_dr_spu = !do_snapshot &&
+                           vd->info.subpicture_chromas &&
+                           *vd->info.subpicture_chromas != 0;
+    const bool do_early_spu = true; /* TODO */
+    const vlc_fourcc_t *subpicture_chromas;
+    video_format_t fmt_spu;
+    if (do_dr_spu) {
+        fmt_spu = vd->source; /* TODO improve */
+        subpicture_chromas = vd->info.subpicture_chromas;
+    } else {
+        if (do_early_spu) {
+            fmt_spu = vd->source;
+        } else {
+            fmt_spu = vd->fmt;
+            fmt_spu.i_sar_num = vd->cfg->display.sar.num;
+            fmt_spu.i_sar_den = vd->cfg->display.sar.den;
+        }
+        subpicture_chromas = NULL;
+
+        if (vout->p->spu_blend &&
+            vout->p->spu_blend->fmt_out.video.i_chroma != fmt_spu.i_chroma) {
+            filter_DeleteBlend(vout->p->spu_blend);
+            vout->p->spu_blend = NULL;
+            vout->p->spu_blend_chroma = 0;
+        }
+        if (!vout->p->spu_blend && vout->p->spu_blend_chroma != fmt_spu.i_chroma) {
+            vout->p->spu_blend_chroma = fmt_spu.i_chroma;
+            vout->p->spu_blend = filter_NewBlend(VLC_OBJECT(vout), &fmt_spu);
+            if (!vout->p->spu_blend)
+                msg_Err(vout, "Failed to create blending filter, OSD/Subtitles will not work");
+        }
+    }
+
+    subpicture_t *subpic = spu_Render(vout->p->spu,
+                                      subpicture_chromas, &fmt_spu,
+                                      &vd->source,
                                       render_subtitle_date, render_osd_date,
                                       do_snapshot);
-
     /*
      * Perform rendering
      *
@@ -912,43 +949,50 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
      * - be sure to end up with a direct buffer.
      * - blend subtitles, and in a fast access buffer
      */
-    picture_t *direct = NULL;
-    if (filtered &&
-        (vout->p->decoder_pool != vout->p->display_pool || subpic)) {
-        picture_t *render;
-        if (vout->p->is_decoder_pool_slow)
-            render = picture_NewFromFormat(&vd->source);
-        else if (vout->p->decoder_pool != vout->p->display_pool)
-            render = picture_pool_Get(vout->p->display_pool);
-        else
-            render = picture_pool_Get(vout->p->private_pool);
+    bool is_direct;
+    picture_t *todisplay;
 
-        if (render) {
-            picture_Copy(render, filtered);
-
-            if (vout->p->spu_blend && subpic)
-                picture_BlendSubpicture(render, vout->p->spu_blend, subpic);
-        }
-        if (vout->p->is_decoder_pool_slow) {
-            direct = picture_pool_Get(vout->p->display_pool);
-            if (direct)
-                picture_Copy(direct, render);
-            picture_Release(render);
-
+    if (filtered && do_early_spu && vout->p->spu_blend && subpic) {
+        if (vd->info.is_slow) {
+            is_direct = false;
+            todisplay = picture_NewFromFormat(&vd->source); /* FIXME a pool ? */
         } else {
-            direct = render;
+            is_direct = true;
+            todisplay = picture_pool_Get(vout->p->display_pool);
         }
-        VideoFormatCopyCropAr(&direct->format, &filtered->format);
+        if (todisplay) {
+            VideoFormatCopyCropAr(&todisplay->format, &filtered->format);
+            picture_Copy(todisplay, filtered);
+            picture_BlendSubpicture(todisplay, vout->p->spu_blend, subpic);
+        }
         picture_Release(filtered);
-        filtered = NULL;
-    } else {
-        direct = filtered;
-    }
-    if (subpic)
         subpicture_Delete(subpic);
+        subpic = NULL;
 
-    if (!direct)
+        if (!todisplay)
+            return VLC_EGENERIC;
+    } else {
+        is_direct = vout->p->decoder_pool == vout->p->display_pool;
+        todisplay = filtered;
+    }
+
+    picture_t *direct;
+    if (!is_direct && todisplay) {
+        direct = picture_pool_Get(vout->p->display_pool);
+        if (direct) {
+            VideoFormatCopyCropAr(&direct->format, &todisplay->format);
+            picture_Copy(direct, todisplay);
+        }
+        picture_Release(todisplay);
+    } else {
+        direct = todisplay;
+    }
+
+    if (!direct) {
+        if (subpic)
+            subpicture_Delete(subpic);
         return VLC_EGENERIC;
+    }
 
     /*
      * Take a snapshot if requested
@@ -960,11 +1004,16 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     assert(vout_IsDisplayFiltered(vd) == !sys->display.use_dr);
     vout_UpdateDisplaySourceProperties(vd, &direct->format);
     if (sys->display.use_dr) {
-        vout_display_Prepare(vd, direct, NULL);
+        vout_display_Prepare(vd, direct, subpic);
     } else {
         sys->display.filtered = vout_FilterDisplay(vd, direct);
-        if (sys->display.filtered)
-            vout_display_Prepare(vd, sys->display.filtered, NULL);
+        if (sys->display.filtered) {
+            if (!do_dr_spu && !do_early_spu && vout->p->spu_blend && subpic)
+                picture_BlendSubpicture(sys->display.filtered, vout->p->spu_blend, subpic);
+            vout_display_Prepare(vd, sys->display.filtered, do_dr_spu ? subpic : NULL);
+        }
+        if (!do_dr_spu && subpic)
+            subpicture_Delete(subpic);
     }
 
     vout_chrono_Stop(&vout->p->render);
@@ -991,7 +1040,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     vout_display_Display(vd,
                          sys->display.filtered ? sys->display.filtered
                                                 : direct,
-                         NULL);
+                         subpic);
     sys->display.filtered = NULL;
 
     vout_statistic_Update(&vout->p->statistic, 1, 0);
@@ -1304,10 +1353,8 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
     vout->p->step.last               = VLC_TS_INVALID;
     vout->p->step.timestamp          = VLC_TS_INVALID;
 
-
-    vout->p->spu_blend = filter_NewBlend(VLC_OBJECT(vout), &vout->p->original);
-    if (!vout->p->spu_blend)
-        msg_Err(vout, "Failed to create blending filter, OSD/Subtitles will not work");
+    vout->p->spu_blend_chroma        = 0;
+    vout->p->spu_blend               = NULL;
 
     video_format_Print(VLC_OBJECT(vout), "original format", &vout->p->original);
     return VLC_SUCCESS;

@@ -65,6 +65,7 @@ struct vout_thread_sys_t
     /* Subpicture unit */
     vlc_mutex_t     spu_lock;
     spu_t           *spu;
+    vlc_fourcc_t    spu_blend_chroma;
     filter_t        *spu_blend;
 
     /* Video output window */
