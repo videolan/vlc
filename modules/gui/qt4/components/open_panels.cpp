@@ -594,6 +594,12 @@ NetOpenPanel::~NetOpenPanel()
 void NetOpenPanel::clear()
 {}
 
+void NetOpenPanel::onFocus()
+{
+    ui.urlComboBox->setFocus();
+    ui.urlComboBox->lineEdit()->selectAll();
+}
+
 static int strcmp_void( const void *k, const void *e )
 {
     return strcmp( (const char *)k, (const char *)e );

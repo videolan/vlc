@@ -240,15 +240,25 @@ void OpenDialog::showTab( int i_tab )
     if( i_tab == OPEN_CAPTURE_TAB ) captureOpenPanel->initialize();
     ui.Tab->setCurrentIndex( i_tab );
     show();
+    if( ui.Tab->currentWidget() != NULL )
+    {
+        OpenPanel *panel = dynamic_cast<OpenPanel *>( ui.Tab->currentWidget() );
+        assert( panel );
+        panel->onFocus();
+    }
 }
 
 /* Function called on signal currentChanged triggered */
 void OpenDialog::signalCurrent( int i_tab )
 {
     if( i_tab == OPEN_CAPTURE_TAB ) captureOpenPanel->initialize();
-
     if( ui.Tab->currentWidget() != NULL )
-        ( dynamic_cast<OpenPanel *>( ui.Tab->currentWidget() ) )->updateMRL();
+    {
+        OpenPanel *panel = dynamic_cast<OpenPanel *>( ui.Tab->currentWidget() );
+        assert( panel );
+        panel->onFocus();
+        panel->updateMRL();
+    }
 }
 
 void OpenDialog::toggleAdvancedPanel()

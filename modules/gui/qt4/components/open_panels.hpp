@@ -74,6 +74,7 @@ public:
     }
     virtual ~OpenPanel() {};
     virtual void clear() = 0;
+    virtual void onFocus() {}
 protected:
     intf_thread_t *p_intf;
 public slots:
@@ -140,6 +141,7 @@ public:
     NetOpenPanel( QWidget *, intf_thread_t * );
     virtual ~NetOpenPanel();
     virtual void clear() ;
+    void onFocus();
 private:
     Ui::OpenNetwork ui;
     QStringListModel *mrlList;
