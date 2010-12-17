@@ -324,6 +324,20 @@ static void HandleMediaParsedChanged(const libvlc_event_t * event, void * self)
     libvlc_media_parse_async(p_md);
 }
 
+- (void)addOptions:(NSDictionary*)options
+{
+    if (p_md)
+    {
+        for (NSString * key in [options allKeys])
+        {
+            if ([options objectForKey:key] != [NSNull null])
+                libvlc_media_add_option(p_md, [[NSString stringWithFormat:@"%@=%@", key, [options objectForKey:key]] UTF8String]);
+            else
+                libvlc_media_add_option(p_md, [[NSString stringWithFormat:@"%@", key] UTF8String]);
+        }
+    }
+}
+
 NSString *VLCMediaTracksInformationCodec = @"codec"; // NSNumber
 NSString *VLCMediaTracksInformationId    = @"id";    // NSNumber
 NSString *VLCMediaTracksInformationType  = @"type";  // NSString
