@@ -891,6 +891,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         /* The track was not SETUP, but it exists
                          * because there is a sout_id running for it */
                         tr->setup_fd = fd;
+                        ssrc = tr->ssrc;
                     }
                     else
                     {
