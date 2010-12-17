@@ -905,29 +905,22 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
 
                     httpd_ServerIP( cl, ip );
 
+                    /* Specify source IP only if it is different from the
+                     * RTSP control connection server address */
                     if( strcmp( src, ip ) )
                     {
-                        /* Specify source IP if it is different from the RTSP
-                         * control connection server address */
                         char *ptr = strchr( src, '%' );
                         if( ptr != NULL ) *ptr = '\0'; /* remove scope ID */
-
-                        httpd_MsgAdd( answer, "Transport",
-                                      "RTP/AVP/UDP;unicast;source=%s;"
-                                      "client_port=%u-%u;server_port=%u-%u;"
-                                      "ssrc=%08X;mode=play",
-                                      src, loport, loport + 1, sport,
-                                      sport + 1, ssrc );
                     }
                     else
-                    {
-                        httpd_MsgAdd( answer, "Transport",
-                                      "RTP/AVP/UDP;unicast;"
-                                      "client_port=%u-%u;server_port=%u-%u;"
-                                      "ssrc=%08X;mode=play",
-                                      loport, loport + 1, sport, sport + 1,
-                                      ssrc );
-                    }
+                        src[0] = '\0';
+
+                    httpd_MsgAdd( answer, "Transport",
+                                  "RTP/AVP/UDP;unicast%s%s;"
+                                  "client_port=%u-%u;server_port=%u-%u;"
+                                  "ssrc=%08X;mode=play",
+                                  src[0] ? ";source=" : "", src,
+                                  loport, loport + 1, sport, sport + 1, ssrc );
 
                     answer->i_status = 200;
                 }
