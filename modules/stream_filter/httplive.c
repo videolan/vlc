@@ -1574,14 +1574,20 @@ static int segment_Seek(stream_t *s, uint64_t pos)
 
         vlc_mutex_lock(&segment->lock);
         length += segment->duration * (hls->bandwidth/8);
+        vlc_mutex_unlock(&segment->lock);
 
         if (!b_found && (pos <= length))
         {
-            count = p_sys->segment;
-            p_sys->segment = n;
-            b_found = true;
+            if (count - n >= 3)
+            {
+                p_sys->segment = n;
+                b_found = true;
+                break;
+            }
+            /* Do not search in last 3 segments */
+            vlc_mutex_unlock(&hls->lock);
+            return VLC_EGENERIC;
         }
-        vlc_mutex_unlock(&segment->lock);
     }
 
     /* */
@@ -1626,9 +1632,12 @@ static int segment_Seek(stream_t *s, uint64_t pos)
             while ((p_sys->thread->seek != -1) ||
                    (p_sys->thread->segment - p_sys->segment < 3))
             {
+                /* FIXME: This never finishes when the download thread is
+                 * at its end and the user searches to a segment within the
+                 * last three segments. In that case it should just count the
+                 * segment as being available. */
                 vlc_cond_wait(&p_sys->thread->wait, &p_sys->thread->lock_wait);
-                if (!vlc_object_alive (s) ||
-                    s->b_error) break;
+                if (!vlc_object_alive(s) || s->b_error) break;
             }
             vlc_mutex_unlock(&p_sys->thread->lock_wait);
 
