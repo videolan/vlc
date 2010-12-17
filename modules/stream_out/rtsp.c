@@ -582,14 +582,14 @@ static int64_t ParseNPT (const char *str)
         sec += ((hour * 60) + min) * 60;
     else
     if (sscanf (str, "%f", &sec) != 1)
-        sec = 0.;
+        sec = -1;
 
     if (loc != (locale_t)0)
     {
         uselocale (oldloc);
         freelocale (loc);
     }
-    return sec * CLOCK_FREQ;
+    return sec < 0 ? -1 : sec * CLOCK_FREQ;
 }
 
 
@@ -934,10 +934,32 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             answer->i_status = 200;
 
             psz_session = httpd_MsgGet( query, "Session" );
+            int64_t start = -1, end = -1;
             const char *range = httpd_MsgGet (query, "Range");
-            if (range != NULL && strncmp (range, "npt=", 4))
+            if (range != NULL)
             {
-                answer->i_status = 501;
+                if (strncmp (range, "npt=", 4))
+                {
+                    answer->i_status = 501;
+                    break;
+                }
+
+                start = ParseNPT (range + 4);
+                range = strchr(range, '-');
+                if (range != NULL && *(range + 1))
+                    end = ParseNPT (range + 1);
+
+                if (end >= 0 && end < start)
+                {
+                    answer->i_status = 457;
+                    break;
+                }
+            }
+            /* We accept start times of 0 even for broadcast streams
+             * that already started */
+            if (!vod && (start > 0 || end >= 0))
+            {
+                answer->i_status = 456;
                 break;
             }
 
@@ -1015,16 +1037,6 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                 if (vod)
                 {
                     bool running = (sout_id != NULL);
-                    int64_t start = -1, end = -1;
-
-                    if (range != NULL)
-                    {
-                        start = ParseNPT (range + 4);
-                        range = strchr(range, '-');
-                        if (range != NULL && *(range + 1))
-                            end = ParseNPT (range + 1);
-                    }
-
                     if (vod_play(rtsp->vod_media, psz_session, start, end,
                                  running) != VLC_SUCCESS)
                         answer->i_status = 457;
