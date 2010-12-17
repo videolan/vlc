@@ -443,31 +443,47 @@ int RtspTrackAttach( rtsp_stream_t *rtsp, const char *name,
     if (session == NULL)
         goto out;
 
+    rtsp_strack_t *tr = NULL;
     for (int i = 0; session->trackc; i++)
     {
-        rtsp_strack_t *tr = session->trackv + i;
-        if (tr->id == id)
+        if (session->trackv[i].id == id)
         {
-            tr->rtp_fd = dup_socket(tr->setup_fd);
-            if (tr->rtp_fd == -1)
-                break;
-
-            tr->sout_id = sout_id;
-
-            uint16_t seq;
-            *ssrc = ntohl(tr->ssrc);
-            *seq_init = tr->seq_init;
-            rtp_add_sink(tr->sout_id, tr->rtp_fd, false, &seq);
-            /* To avoid race conditions, sout_id->i_seq_sent_next must
-             * be set here and now. Make sure the caller did its job
-             * properly when passing seq_init. */
-            assert(tr->seq_init == seq);
-
-            val = VLC_SUCCESS;
+            tr = session->trackv + i;
             break;
         }
     }
 
+    if (tr != NULL)
+    {
+        tr->sout_id = sout_id;
+        tr->rtp_fd = dup_socket(tr->setup_fd);
+    }
+    else
+    {
+        /* The track was not SETUP. We still create one because we'll
+         * need the sout_id if we set it up later. */
+        rtsp_strack_t track = { .id = id, .sout_id = sout_id,
+                                .setup_fd = -1, .rtp_fd = -1 };
+        vlc_rand_bytes (&track.seq_init, sizeof (track.seq_init));
+        vlc_rand_bytes (&track.ssrc, sizeof (track.ssrc));
+
+        INSERT_ELEM(session->trackv, session->trackc, session->trackc, track);
+    }
+
+    *ssrc = ntohl(tr->ssrc);
+    *seq_init = tr->seq_init;
+
+    if (tr->rtp_fd != -1)
+    {
+        uint16_t seq;
+        rtp_add_sink(tr->sout_id, tr->rtp_fd, false, &seq);
+        /* To avoid race conditions, sout_id->i_seq_sent_next must
+         * be set here and now. Make sure the caller did its job
+         * properly when passing seq_init. */
+        assert(tr->seq_init == seq);
+    }
+
+    val = VLC_SUCCESS;
 out:
     vlc_mutex_unlock(&rtsp->lock);
     return val;
@@ -491,9 +507,21 @@ void RtspTrackDetach( rtsp_stream_t *rtsp, const char *name,
         rtsp_strack_t *tr = session->trackv + i;
         if (tr->sout_id == sout_id)
         {
+            if (tr->setup_fd == -1)
+            {
+                /* No (more) SETUP information: better get rid of the
+                 * track so that we can have new random ssrc and
+                 * seq_init next time. */
+                REMOVE_ELEM( session->trackv, session->trackc, i );
+                break;
+            }
+            /* We keep the SETUP information of the track, but stop it */
+            if (tr->rtp_fd != -1)
+            {
+                rtp_del_sink(tr->sout_id, tr->rtp_fd);
+                tr->rtp_fd = -1;
+            }
             tr->sout_id = NULL;
-            rtp_del_sink(sout_id, tr->rtp_fd);
-            tr->rtp_fd = -1;
             break;
         }
     }
@@ -506,9 +534,16 @@ out:
 /** rtsp must be locked */
 static void RtspTrackClose( rtsp_strack_t *tr )
 {
-    if (tr->rtp_fd != -1)
-        rtp_del_sink(tr->sout_id, tr->rtp_fd);
-    net_Close(tr->setup_fd);
+    if (tr->setup_fd != -1)
+    {
+        if (tr->rtp_fd != -1)
+        {
+            rtp_del_sink(tr->sout_id, tr->rtp_fd);
+            tr->rtp_fd = -1;
+        }
+        net_Close(tr->setup_fd);
+        tr->setup_fd = -1;
+    }
 }
 
 
@@ -799,18 +834,6 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                                 sizeof (int));
                     net_GetSockAddress( fd, src, &sport );
 
-                    rtsp_strack_t track = { .id = id, .sout_id = id->sout_id,
-                                            .setup_fd = fd, .rtp_fd = -1 };
-
-                    if (vod)
-                    {
-                        vlc_rand_bytes (&track.seq_init, sizeof (track.seq_init));
-                        vlc_rand_bytes (&track.ssrc, sizeof (track.ssrc));
-                        ssrc = track.ssrc;
-                    }
-                    else
-                        ssrc = id->ssrc;
-
                     vlc_mutex_lock( &rtsp->lock );
                     if( psz_session == NULL )
                     {
@@ -832,28 +855,53 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     }
                     RtspClientAlive(ses);
 
-                    /* Bail if the track is already set up: we don't
-                     * support changing the transport parameters on the
-                     * fly */
-                    bool setup = false;
+                    rtsp_strack_t *tr = NULL;
                     for (int i = 0; i < ses->trackc; i++)
                     {
                         if (ses->trackv[i].id == id)
                         {
-                            setup = true;
+                            tr = ses->trackv + i;
                             break;
                         }
                     }
-                    if (setup)
+
+                    if (tr == NULL)
                     {
+                        /* Set up a new track */
+                        rtsp_strack_t track = { .id = id,
+                                                .sout_id = id->sout_id,
+                                                .setup_fd = fd,
+                                                .rtp_fd = -1 };
+
+                        if (vod)
+                        {
+                            vlc_rand_bytes (&track.seq_init,
+                                            sizeof (track.seq_init));
+                            vlc_rand_bytes (&track.ssrc, sizeof (track.ssrc));
+                            ssrc = track.ssrc;
+                        }
+                        else
+                            ssrc = id->ssrc;
+
+                        INSERT_ELEM( ses->trackv, ses->trackc, ses->trackc,
+                                     track );
+                    }
+                    else if (tr->setup_fd == -1)
+                    {
+                        /* The track was not SETUP, but it exists
+                         * because there is a sout_id running for it */
+                        tr->setup_fd = fd;
+                    }
+                    else
+                    {
+                        /* The track is already set up, and we don't
+                         * support changing the transport parameters on
+                         * the fly */
                         vlc_mutex_unlock( &rtsp->lock );
                         answer->i_status = 455;
                         net_Close( fd );
                         break;
                     }
-
-                    INSERT_ELEM( ses->trackv, ses->trackc, ses->trackc,
-                                 track );
                     vlc_mutex_unlock( &rtsp->lock );
 
                     httpd_ServerIP( cl, ip );
@@ -915,10 +963,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                 if (vod)
                 {
                     /* We don't keep a reference to the sout_stream_t,
-                     * so we check if a sout_id is available instead.
-                     * FIXME: this is broken if the stream is still
-                     * running but with no track set up; but this case
-                     * is already broken anyway (see below). */
+                     * so we check if a sout_id is available instead. */
                     for (int i = 0; i < ses->trackc; i++)
                     {
                         sout_id = ses->trackv[i].sout_id;
@@ -934,17 +979,20 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     rtsp_strack_t *tr = ses->trackv + i;
                     if( ( id == NULL ) || ( tr->id == id ) )
                     {
+                        if (tr->setup_fd == -1)
+                            /* Track not SETUP */
+                            continue;
+
                         uint16_t seq;
                         if( tr->rtp_fd == -1 )
                         {
-                            if (vod)
-                                /* TODO: if the RTP stream output is already
-                                 * started, it won't pick up newly set-up
-                                 * tracks, so we need to call rtp_add_sink()
-                                 * or something. */
+                            /* Track not PLAYing yet */
+                            if (tr->sout_id == NULL)
+                                /* Instance not running yet (VoD) */
                                 seq = tr->seq_init;
                             else
                             {
+                                /* Instance running, add a sink to it */
                                 tr->rtp_fd = dup_socket(tr->setup_fd);
                                 if (tr->rtp_fd == -1)
                                     continue;
@@ -955,6 +1003,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         }
                         else
                         {
+                            /* Track already playing */
                             assert( tr->sout_id != NULL );
                             seq = rtp_get_seq( tr->sout_id );
                         }
@@ -1029,12 +1078,15 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         rtsp_strack_t *tr = ses->trackv + i;;
                         if (tr->id == id)
                         {
+                            if (tr->setup_fd == -1)
+                                break;
+
+                            found = true;
                             if (tr->rtp_fd != -1)
                             {
                                 rtp_del_sink(tr->sout_id, tr->rtp_fd);
                                 tr->rtp_fd = -1;
                             }
-                            found = true;
                             break;
                         }
                     }
@@ -1089,7 +1141,10 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         if( ses->trackv[i].id == id )
                         {
                             RtspTrackClose( &ses->trackv[i] );
-                            REMOVE_ELEM( ses->trackv, ses->trackc, i );
+                            /* Keep VoD tracks whose instance is still
+                             * running */
+                            if (!(vod && ses->trackv[i].sout_id != NULL))
+                                REMOVE_ELEM( ses->trackv, ses->trackc, i );
                         }
                     }
                     RtspClientAlive(ses);

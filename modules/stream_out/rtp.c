@@ -972,7 +972,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->i_sequence = id->i_seq_sent_next;
         }
         /* vod_init_id() may fail either because the ES wasn't found in
-         * the VoD media, or because that track wasn't SETUP. In the
+         * the VoD media, or because the RTSP session is gone. In the
          * former case, id->rtp_fmt was left untouched. */
         format = (id->rtp_fmt.ptname != NULL);
     }
