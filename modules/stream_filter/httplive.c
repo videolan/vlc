@@ -1509,17 +1509,16 @@ static int segment_Seek(stream_t *s, uint64_t pos)
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    /* Find the right offset */
     hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->current);
     if (hls == NULL)
         return VLC_EGENERIC;
 
-    uint64_t length = 0;
-    bool b_found = false;
-
     vlc_mutex_lock(&hls->lock);
+
+    bool b_found = false;
+    uint64_t length = 0;
+    uint64_t size = hls->size;
     int count = vlc_array_count(hls->segments);
-    vlc_mutex_unlock(&hls->lock);
 
     for (int n = 0; n < count; n++)
     {
@@ -1527,51 +1526,62 @@ static int segment_Seek(stream_t *s, uint64_t pos)
         if (n >= p_sys->thread->segment)
         {
             msg_Err(s, "seeking in segment not downloaded yet.");
+            vlc_mutex_unlock(&hls->lock);
             return VLC_EGENERIC;
         }
 
         segment_t *segment = vlc_array_item_at_index(hls->segments, n);
         if (segment == NULL)
+        {
+            vlc_mutex_unlock(&hls->lock);
             return VLC_EGENERIC;
+        }
+
+        vlc_mutex_lock(&segment->lock);
+        length += segment->duration * (hls->bandwidth/8);
+
+        if (!b_found && (pos <= length))
+        {
+            count = p_sys->segment;
+            p_sys->segment = n;
+            b_found = true;
+        }
+        vlc_mutex_unlock(&segment->lock);
+    }
+
+    /* */
+    if (!b_found && (pos >= size))
+    {
+        p_sys->segment = count - 1;
+        b_found = true;
+    }
+
+    /* */
+    if (b_found)
+    {
+        /* restore segment to start position */
+        segment_t *segment = segment_GetSegment(hls, p_sys->segment);
+        if (segment == NULL)
+        {
+            vlc_mutex_unlock(&hls->lock);
+            return VLC_EGENERIC;
+        }
 
         vlc_mutex_lock(&segment->lock);
         if (segment->data)
         {
-            length += segment->size;
             uint64_t size = segment->size -segment->data->i_buffer;
             if (size > 0)
             {
                 segment->data->i_buffer += size;
                 segment->data->p_buffer -= size;
             }
-
-            if (!b_found && (pos <= length))
-            {
-                uint64_t used = length - pos;
-                segment->data->i_buffer -= used;
-                segment->data->p_buffer += used;
-
-                count = p_sys->segment;
-                p_sys->segment = n;
-                b_found = true;
-            }
-        }
-        else
-        {
-            /* FIXME: seeking is weird when seeking in segments
-               that have not been downloaded yet */
-            length += segment->duration * hls->bandwidth;
-
-            if (!b_found && (pos <= length))
-            {
-                count = p_sys->segment;
-                p_sys->segment = n;
-                b_found = true;
-            }
         }
         vlc_mutex_unlock(&segment->lock);
     }
-    return VLC_SUCCESS;
+    vlc_mutex_unlock(&hls->lock);
+
+    return b_found ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static int Control(stream_t *s, int i_query, va_list args)
