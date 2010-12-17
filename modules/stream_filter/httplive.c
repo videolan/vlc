@@ -1313,12 +1313,12 @@ static void Close(vlc_object_t *p_this)
 /****************************************************************************
  * Stream filters functions
  ****************************************************************************/
-static segment_t *NextSegment(stream_t *s)
+static segment_t *GetSegment(stream_t *s)
 {
     stream_sys_t *p_sys = s->p_sys;
     segment_t *segment = NULL;
 
-    /* Is the next segment of the current HLS stream ready? */
+    /* Is this segment of the current HLS stream ready? */
     hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->current);
     if (hls != NULL)
     {
@@ -1390,7 +1390,7 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
         /* Determine next segment to read. If this is a meta playlist and
          * bandwidth conditions changed, then the stream might have switched
          * to another bandwidth. */
-        segment_t *segment = NextSegment(s);
+        segment_t *segment = GetSegment(s);
         if (segment == NULL)
             break;
 
@@ -1472,7 +1472,7 @@ static int Peek(stream_t *s, const uint8_t **pp_peek, unsigned int i_peek)
     segment_t *segment;
 
 again:
-    segment = NextSegment(s);
+    segment = GetSegment(s);
     if (segment == NULL)
     {
         msg_Err(s, "segment should have been available");
