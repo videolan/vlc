@@ -61,7 +61,7 @@ vlc_module_end()
 typedef struct segment_s
 {
     int         sequence;   /* unique sequence number */
-    int         length;     /* segment duration (seconds) */
+    int         duration;     /* segment duration (seconds) */
     uint64_t    size;       /* segment size in bytes */
     uint64_t    bandwidth;  /* bandwidth usage of segments (bits per second)*/
 
@@ -240,7 +240,7 @@ static segment_t *segment_New(hls_stream_t* hls, int duration, char *uri)
     if (segment == NULL)
         return NULL;
 
-    segment->length = duration; /* seconds */
+    segment->duration = duration; /* seconds */
     segment->size = 0; /* bytes */
     segment->sequence = 0;
     segment->bandwidth = 0;
@@ -782,7 +782,7 @@ static int parse_HTTPLiveStreaming(stream_t *s)
             for (int i = 0; i < num; i++)
             {
                 segment_t *segment = segment_GetSegment(hls, i);
-                if (segment && segment->length >= hls->duration)
+                if (segment && segment->duration >= hls->duration)
                     ok++;
             }
             if (ok < 3)
@@ -1484,7 +1484,7 @@ static uint64_t GetStreamSize(stream_t *s)
         if (segment)
         {
             length += (segment->size > 0) ? segment->size :
-                        (segment->length * hls->bandwidth);
+                        (segment->duration * hls->bandwidth);
         }
     }
 
@@ -1547,7 +1547,7 @@ static int segment_Seek(stream_t *s, uint64_t pos)
         {
             /* FIXME: seeking is weird when seeking in segments
                that have not been downloaded yet */
-            length += segment->length * hls->bandwidth;
+            length += segment->duration * hls->bandwidth;
 
             if (!b_found && (pos <= length))
             {
