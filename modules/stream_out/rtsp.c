@@ -186,7 +186,6 @@ struct rtsp_session_t
     rtsp_stream_t *stream;
     uint64_t       id;
     mtime_t        last_seen; /* for timeouts */
-    bool           vod_started; /* true if the VoD media instance was created */
 
     /* output (id-access) */
     int            trackc;
@@ -353,7 +352,6 @@ rtsp_session_t *RtspClientNew( rtsp_stream_t *rtsp )
 
     s->stream = rtsp;
     vlc_rand_bytes (&s->id, sizeof (s->id));
-    s->vod_started = false;
     s->trackc = 0;
     s->trackv = NULL;
 
@@ -1024,21 +1022,22 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                 if (vod)
                 {
                     /* TODO: fix that crap, this is barely RTSP */
-                    if (!ses->vod_started)
-                    {
+
+                    /* We want to seek before unpausing, but it won't
+                     * work if the instance is not running yet. */
+                    bool running = (sout_id != NULL);
+                    if (!running)
                         vod_start(rtsp->vod_media, psz_session);
-                        ses->vod_started = true;
-                    }
-                    else
+
+                    if (range != NULL)
                     {
-                        if (range != NULL)
-                        {
-                            int64_t time = ParseNPT (range + 4);
-                            vod_seek(rtsp->vod_media, psz_session, time);
-                        }
-                        /* This is the thing to do to unpause... */
-                        vod_start(rtsp->vod_media, psz_session);
+                        int64_t time = ParseNPT (range + 4);
+                        vod_seek(rtsp->vod_media, psz_session, time);
                     }
+
+                    /* This is the thing to do to unpause... */
+                    if (running)
+                        vod_start(rtsp->vod_media, psz_session);
                 }
             }
             vlc_mutex_unlock( &rtsp->lock );
