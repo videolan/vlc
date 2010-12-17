@@ -77,6 +77,7 @@ typedef struct hls_stream_s
     int         sequence;   /* media sequence number */
     int         duration;   /* maximum duration per segment (ms) */
     uint64_t    bandwidth;  /* bandwidth usage of segments (bits per second)*/
+    uint64_t    size;       /* stream length (segment->duration * hls->bandwidth/8) */
 
     vlc_array_t *segments;  /* list of segments */
     vlc_url_t   url;        /* uri to m3u8 */
@@ -136,6 +137,7 @@ static int AccessDownload(stream_t *s, segment_t *segment);
 static void* hls_Thread(vlc_object_t *);
 static int get_HTTPLivePlaylist(stream_t *s, hls_stream_t *hls);
 
+static segment_t *segment_GetSegment(hls_stream_t *hls, int wanted);
 static void segment_Free(segment_t *segment);
 
 /****************************************************************************
@@ -180,6 +182,7 @@ static hls_stream_t *hls_New(vlc_array_t *hls_stream, int id, uint64_t bw, char 
     hls->id = id;
     hls->bandwidth = bw;
     hls->duration = -1;/* unknown */
+    hls->size = 0;
     hls->sequence = 0; /* default is 0 */
     hls->version = 1;  /* default protocol version */
     hls->b_cache = true;
@@ -231,6 +234,25 @@ static hls_stream_t *hls_GetLast(vlc_array_t *hls_stream)
         return NULL;
     count--;
     return (hls_stream_t *) hls_Get(hls_stream, count);
+}
+
+static uint64_t hls_GetStreamSize(hls_stream_t *hls)
+{
+    /* NOTE: Stream size is calculated based on segment duration and
+     * HLS stream bandwidth from the .m3u8 file. If these are not correct
+     * then the deviation from exact byte size will be big and the seek/
+     * progressbar will not behave entirely as one expects. */
+    uint64_t size = 0UL;
+    int count = vlc_array_count(hls->segments);
+    for (int n = 0; n < count; n++)
+    {
+        segment_t *segment = segment_GetSegment(hls, n);
+        if (segment)
+        {
+            size += (segment->duration * (hls->bandwidth / 8));
+        }
+    }
+    return size;
 }
 
 /* Segment */
@@ -772,9 +794,9 @@ static int parse_HTTPLiveStreaming(stream_t *s)
             }
         }
 
+        vlc_mutex_lock(&hls->lock);
         if (p_sys->b_live)
         {
-            vlc_mutex_lock(&hls->lock);
 
             /* There should at least be 3 segments of hls->duration */
             int ok = 0;
@@ -794,12 +816,15 @@ static int parse_HTTPLiveStreaming(stream_t *s)
 
             /* Determine next time to reload playlist */
             p_sys->wakeup = p_sys->last + (hls->duration * 2 * (mtime_t)1000000);
-
-            vlc_mutex_unlock(&hls->lock);
         }
+
+        /* Stream size (approximate) */
+        hls->size = hls_GetStreamSize(hls);
 
         /* Can we cache files after playback */
         p_sys->b_cache = hls->b_cache;
+
+        vlc_mutex_unlock(&hls->lock);
     }
 
     return VLC_SUCCESS;
@@ -1474,22 +1499,10 @@ static uint64_t GetStreamSize(stream_t *s)
     if (hls == NULL) return 0;
 
     vlc_mutex_lock(&hls->lock);
-
-    /* FIXME: Stream size is not entirely exacts at this point */
-    uint64_t length = 0UL;
-    int count = vlc_array_count(hls->segments);
-    for (int n = 0; n < count; n++)
-    {
-        segment_t *segment = segment_GetSegment(hls, n);
-        if (segment)
-        {
-            length += (segment->size > 0) ? segment->size :
-                        (segment->duration * hls->bandwidth);
-        }
-    }
-
+    uint64_t size = hls->size;
     vlc_mutex_unlock(&hls->lock);
-    return length;
+
+    return size;
 }
 
 static int segment_Seek(stream_t *s, uint64_t pos)
