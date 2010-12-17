@@ -1014,23 +1014,20 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                 }
                 if (vod)
                 {
-                    /* TODO: fix that crap, this is barely RTSP */
-
-                    /* We want to seek before unpausing, but it won't
-                     * work if the instance is not running yet. */
                     bool running = (sout_id != NULL);
-                    if (!running)
-                        vod_start(rtsp->vod_media, psz_session);
+                    int64_t start = -1, end = -1;
 
                     if (range != NULL)
                     {
-                        int64_t time = ParseNPT (range + 4);
-                        vod_seek(rtsp->vod_media, psz_session, time);
+                        start = ParseNPT (range + 4);
+                        range = strchr(range, '-');
+                        if (range != NULL && *(range + 1))
+                            end = ParseNPT (range + 1);
                     }
 
-                    /* This is the thing to do to unpause... */
-                    if (running)
-                        vod_start(rtsp->vod_media, psz_session);
+                    if (vod_play(rtsp->vod_media, psz_session, start, end,
+                                 running) != VLC_SUCCESS)
+                        answer->i_status = 457;
                 }
             }
             vlc_mutex_unlock( &rtsp->lock );

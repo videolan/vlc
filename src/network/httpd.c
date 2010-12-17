@@ -310,8 +310,8 @@ static const http_status_info http_reason[] =
     { 454, "Session not found" },
     { 455, "Method not valid in this State" },
     { 456, "Header field not valid for resource" },
-  /*{ 457, "Invalid range" },
-    { 458, "Read-only parameter" },*/
+    { 457, "Invalid range" },
+  /*{ 458, "Read-only parameter" },*/
     { 459, "Aggregate operation not allowed" },
     { 460, "Non-aggregate operation not allowed" },
     { 461, "Unsupported transport" },
