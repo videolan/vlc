@@ -26,6 +26,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/playlist.moc.cpp \
 		dialogs/bookmarks.moc.cpp \
 		dialogs/mediainfo.moc.cpp \
+		dialogs/ml_configuration.moc.cpp \
 		dialogs/extended.moc.cpp \
 		dialogs/messages.moc.cpp \
 		dialogs/epg.moc.cpp \
@@ -241,6 +242,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/bookmarks.cpp \
 		dialogs/preferences.cpp \
 		dialogs/mediainfo.cpp \
+		dialogs/ml_configuration.cpp \
 		dialogs/epg.cpp \
 		dialogs/extended.cpp \
 		dialogs/messages.cpp \
@@ -304,6 +306,7 @@ noinst_HEADERS = \
 	dialogs/playlist.hpp \
 	dialogs/bookmarks.hpp \
 	dialogs/mediainfo.hpp \
+	dialogs/ml_configuration.hpp \
 	dialogs/extended.hpp \
 	dialogs/messages.hpp \
 	dialogs/epg.hpp \
