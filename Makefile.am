@@ -769,6 +769,7 @@ endif
 if USE_PEFLAGS
 	find $(win32_destdir) -type f \( -name '*$(LIBEXT)' -print -o -name '*$(EXEEXT)' -print \) -exec $(PEFLAGS) --dynamicbase=true --nxcompat=true {} \;
 endif
+	find $(win32_destdir) -type f \( -name '*.a' -or -name '*.la' \) -exec rm -rf {} \;
 
 package-win-base: package-win-common
 	find $(win32_destdir) -type f \( -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' \) | while read i; \
