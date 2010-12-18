@@ -25,6 +25,7 @@ Access
 Codecs
  * You can now use ffmpeg-mt in conjunction with vlc
  * Important fixes for RealVideo 3.0 and 4.0 playback, notably in MKV
+ * Experimental Hardware decoding using Broadcom CrystalHD cards
 
 Core:
  * Playback rate doesn't get resetted to 1 between items anymore

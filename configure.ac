@@ -2452,6 +2452,25 @@ then
 fi
 
 dnl
+dnl CrystalHD codec plugin
+dnl
+AC_ARG_ENABLE(crystalhd,
+  [  --enable-crystalhd       crystalhd codec plugin (default disabled)])
+if test "${enable_crystalhd}" == "yes"; then
+    AC_CHECK_HEADERS(libcrystalhd/libcrystalhd_if.h, [
+      VLC_ADD_PLUGIN([crystalhd])
+      VLC_ADD_LIBS([crystalhd], [-lcrystalhd])
+    ],[
+        AC_CHECK_HEADERS(libcrystalhd/bc_drv_if.h, [
+          VLC_ADD_PLUGIN([crystalhd])
+          VLC_ADD_LIBS([crystalhd], [-lbcmDIL])
+        ],[
+          AC_MSG_ERROR("Could not find CrystalHD development headers")
+        ])
+    ])
+fi
+
+dnl
 dnl  mad plugin
 dnl
 AC_ARG_ENABLE(mad,

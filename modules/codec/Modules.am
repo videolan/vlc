@@ -37,6 +37,7 @@ SOURCES_aes3 = aes3.c
 SOURCES_subsdec = subsass.c subsdec.c subsdec.h
 SOURCES_subsusf = subsusf.c subsdec.h
 SOURCES_t140 = t140.c
+SOURCES_crystalhd = crystalhd.c
 
 libvlc_LTLIBRARIES += \
 	liba52_plugin.la \
