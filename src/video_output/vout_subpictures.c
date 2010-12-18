@@ -91,13 +91,6 @@ struct spu_private_t
     mtime_t i_last_sort_date;
 };
 
-/* Subpicture rendered flag
- * FIXME ? it could be moved to private ? */
-#define SUBPICTURE_RENDERED  (0x1000)
-#if SUBPICTURE_RENDERED < SUBPICTURE_ALIGN_MASK
-#   error SUBPICTURE_RENDERED too low
-#endif
-
 /*****************************************************************************
  * heap managment
  *****************************************************************************/
@@ -305,7 +298,7 @@ static void SpuRenderText( spu_t *p_spu, bool *pb_rerender_text,
     assert( p_region->fmt.i_chroma == VLC_CODEC_TEXT );
 
     if( !p_text || !p_text->p_module )
-        goto exit;
+        return;
 
     /* Setup 3 variables which can be used to render
      * time-dependent text (and effects). The first indicates
@@ -340,9 +333,6 @@ static void SpuRenderText( spu_t *p_spu, bool *pb_rerender_text,
         p_text->pf_render_text( p_text, p_region, p_region );
     }
     *pb_rerender_text = var_GetBool( p_text, "text-rerender" );
-
-exit:
-    p_region->i_align |= SUBPICTURE_RENDERED;
 }
 
 /**
@@ -772,8 +762,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     spu_private_t *p_sys = p_spu->p;
 
     video_format_t fmt_original = p_region->fmt;
-    bool b_rerender_text = false;
-    bool b_restore_format = false;
+    bool b_restore_text = false;
     int i_x_offset;
     int i_y_offset;
 
@@ -788,9 +777,8 @@ static void SpuRenderRegion( spu_t *p_spu,
     if( p_region->fmt.i_chroma == VLC_CODEC_TEXT )
     {
         const int i_min_scale_ratio = SCALE_UNIT; /* FIXME what is the right value? (scale_size is not) */
-        SpuRenderText( p_spu, &b_rerender_text, p_subpic, p_region,
+        SpuRenderText( p_spu, &b_restore_text, p_subpic, p_region,
                        i_min_scale_ratio, render_date );
-        b_restore_format = b_rerender_text;
 
         /* Check if the rendering has failed ... */
         if( p_region->fmt.i_chroma == VLC_CODEC_TEXT )
@@ -1057,7 +1045,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     }
 
 exit:
-    if( b_rerender_text )
+    if( b_restore_text )
     {
         /* Some forms of subtitles need to be re-rendered more than
          * once, eg. karaoke. We therefore restore the region to its
@@ -1074,10 +1062,8 @@ exit:
             subpicture_region_private_Delete( p_region->p_private );
             p_region->p_private = NULL;
         }
-        p_region->i_align &= ~SUBPICTURE_RENDERED;
-    }
-    if( b_restore_format )
         p_region->fmt = fmt_original;
+    }
 }
 
 /**
