@@ -530,45 +530,40 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
                             const subpicture_t *p_subpic,
                             const subpicture_region_t *p_region )
 {
-    const int i_delta_x = p_region->i_x;
-    const int i_delta_y = p_region->i_y;
-    int i_x, i_y;
-
     assert( p_region->i_x != INT_MAX && p_region->i_y != INT_MAX );
-    if( p_region->i_align & SUBPICTURE_ALIGN_TOP )
-    {
-        i_y = i_delta_y;
-    }
-    else if( p_region->i_align & SUBPICTURE_ALIGN_BOTTOM )
-    {
-        i_y = p_subpic->i_original_picture_height - p_region->fmt.i_height - i_delta_y;
-    }
-    else
-    {
-        i_y = p_subpic->i_original_picture_height / 2 - p_region->fmt.i_height / 2;
-    }
-
-    if( p_region->i_align & SUBPICTURE_ALIGN_LEFT )
-    {
-        i_x = i_delta_x;
-    }
-    else if( p_region->i_align & SUBPICTURE_ALIGN_RIGHT )
-    {
-        i_x = p_subpic->i_original_picture_width - p_region->fmt.i_width - i_delta_x;
-    }
-    else
-    {
-        i_x = p_subpic->i_original_picture_width / 2 - p_region->fmt.i_width / 2;
-    }
-
     if( p_subpic->b_absolute )
     {
-        i_x = i_delta_x;
-        i_y = i_delta_y;
+        *pi_x = p_region->i_x;
+        *pi_y = p_region->i_y;
     }
+    else
+    {
+        if( p_region->i_align & SUBPICTURE_ALIGN_TOP )
+        {
+            *pi_y = p_region->i_y;
+        }
+        else if( p_region->i_align & SUBPICTURE_ALIGN_BOTTOM )
+        {
+            *pi_y = p_subpic->i_original_picture_height - p_region->fmt.i_height - p_region->i_y;
+        }
+        else
+        {
+            *pi_y = p_subpic->i_original_picture_height / 2 - p_region->fmt.i_height / 2;
+        }
 
-    *pi_x = i_x;
-    *pi_y = i_y;
+        if( p_region->i_align & SUBPICTURE_ALIGN_LEFT )
+        {
+            *pi_x = p_region->i_x;
+        }
+        else if( p_region->i_align & SUBPICTURE_ALIGN_RIGHT )
+        {
+            *pi_x = p_subpic->i_original_picture_width - p_region->fmt.i_width - p_region->i_x;
+        }
+        else
+        {
+            *pi_x = p_subpic->i_original_picture_width / 2 - p_region->fmt.i_width / 2;
+        }
+    }
 }
 
 /**
