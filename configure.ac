@@ -338,7 +338,7 @@ case "${host_os}" in
         AC_ARG_ENABLE(peflags,
           [  --enable-peflags        peflags use (default enabled on Windows)])
         if test "${enable_peflags}" != "no" ; then
-          AC_CHECK_TOOL(PEFLAGS, peflags, :)
+          AC_PATH_TOOL(PEFLAGS, peflags, :)
         fi
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
         ac_default_prefix="`pwd`/_win32"
