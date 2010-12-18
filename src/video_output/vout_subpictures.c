@@ -199,17 +199,12 @@ static int spu_get_attachments( filter_t *p_filter,
     return i_ret;
 }
 
-static void SpuRenderCreateAndLoadText( spu_t *p_spu )
+static filter_t *SpuRenderCreateAndLoadText( spu_t *p_spu )
 {
-    filter_t *p_text;
-
-    assert( !p_spu->p->p_text );
-
-    p_spu->p->p_text =
-    p_text        = vlc_custom_create( p_spu, sizeof(filter_t),
-                                       VLC_OBJECT_GENERIC, "spu text" );
+    filter_t *p_text = vlc_custom_create( p_spu, sizeof(*p_text),
+                                          VLC_OBJECT_GENERIC, "spu text" );
     if( !p_text )
-        return;
+        return NULL;
 
     p_text->p_owner = xmalloc( sizeof(*p_text->p_owner) );
     p_text->p_owner->p_spu = p_spu;
@@ -225,35 +220,22 @@ static void SpuRenderCreateAndLoadText( spu_t *p_spu )
     p_text->pf_get_attachments = spu_get_attachments;
 
     vlc_object_attach( p_text, p_spu );
-
-    /* FIXME TOCHECK shouldn't module_need( , , psz_modulename, false ) do the
-     * same than these 2 calls ? */
-    char *psz_modulename = var_CreateGetString( p_spu, "text-renderer" );
-    if( psz_modulename && *psz_modulename )
-    {
-        p_text->p_module = module_need( p_text, "text renderer",
-                                        psz_modulename, true );
-    }
-    free( psz_modulename );
-
-    if( !p_text->p_module )
-        p_text->p_module = module_need( p_text, "text renderer", NULL, false );
+    p_text->p_module = module_need( p_text, "text renderer", "$text-renderer", false );
 
     /* Create a few variables used for enhanced text rendering */
-    var_Create( p_text, "spu-duration", VLC_VAR_TIME );
     var_Create( p_text, "spu-elapsed", VLC_VAR_TIME );
     var_Create( p_text, "text-rerender", VLC_VAR_BOOL );
     var_Create( p_text, "scale", VLC_VAR_INTEGER );
+
+    return p_text;
 }
 
-static filter_t *CreateAndLoadScale( vlc_object_t *p_obj,
-                                     vlc_fourcc_t i_src_chroma, vlc_fourcc_t i_dst_chroma,
-                                     bool b_resize )
+static filter_t *SpuRenderCreateAndLoadScale( vlc_object_t *p_obj,
+                                              vlc_fourcc_t i_src_chroma, vlc_fourcc_t i_dst_chroma,
+                                              bool b_resize )
 {
-    filter_t *p_scale;
-
-    p_scale = vlc_custom_create( p_obj, sizeof(filter_t),
-                                 VLC_OBJECT_GENERIC, "scale" );
+    filter_t *p_scale = vlc_custom_create( p_obj, sizeof(*p_scale),
+                                           VLC_OBJECT_GENERIC, "scale" );
     if( !p_scale )
         return NULL;
 
@@ -275,22 +257,9 @@ static filter_t *CreateAndLoadScale( vlc_object_t *p_obj,
 
     return p_scale;
 }
-static void SpuRenderCreateAndLoadScale( spu_t *p_spu )
-{
-    assert( !p_spu->p->p_scale );
-    assert( !p_spu->p->p_scale_yuvp );
-    /* XXX p_spu->p_scale is used for all conversion/scaling except yuvp to
-     * yuva/rgba */
-    p_spu->p->p_scale = CreateAndLoadScale( VLC_OBJECT(p_spu),
-                                            VLC_CODEC_YUVA, VLC_CODEC_RGBA, true );
-    /* This one is used for YUVP to YUVA/RGBA without scaling
-     * FIXME rename it */
-    p_spu->p->p_scale_yuvp = CreateAndLoadScale( VLC_OBJECT(p_spu),
-                                                 VLC_CODEC_YUVP, VLC_CODEC_YUVA, false );
-}
 
 static void SpuRenderText( spu_t *p_spu, bool *pb_rerender_text,
-                           subpicture_t *p_subpic, subpicture_region_t *p_region,
+                           subpicture_region_t *p_region,
                            int i_min_scale_ratio, mtime_t render_date )
 {
     filter_t *p_text = p_spu->p->p_text;
@@ -319,7 +288,6 @@ static void SpuRenderText( spu_t *p_spu, bool *pb_rerender_text,
      * least show up on screen, but the effect won't change
      * the text over time.
      */
-    var_SetTime( p_text, "spu-duration", p_subpic->i_stop - p_subpic->i_start );
     var_SetTime( p_text, "spu-elapsed", render_date );
     var_SetBool( p_text, "text-rerender", false );
     var_SetInteger( p_text, "scale", i_min_scale_ratio );
@@ -591,15 +559,8 @@ static int SubpictureCmp( const void *s0, const void *s1 )
     return r;
 }
 
-static void SubpictureChain( subpicture_t **pp_head, subpicture_t *p_subpic )
-{
-    p_subpic->p_next = *pp_head;
-
-    *pp_head = p_subpic;
-}
-
 /*****************************************************************************
- * SpuSortSubpictures: find the subpictures to display
+ * SpuSelectSubpictures: find the subpictures to display
  *****************************************************************************
  * This function parses all subpictures and decides which ones need to be
  * displayed. If no picture has been selected, display_date will depend on
@@ -608,13 +569,17 @@ static void SubpictureChain( subpicture_t **pp_head, subpicture_t *p_subpic )
  * to be removed if a newer one is available), which makes it a lot
  * more difficult to guess if a subpicture has to be rendered or not.
  *****************************************************************************/
-static subpicture_t *SpuSortSubpictures( spu_t *p_spu,
-                                         mtime_t render_subtitle_date,
-                                         mtime_t render_osd_date,
-                                         bool b_subtitle_only )
+static void SpuSelectSubpictures( spu_t *p_spu,
+                                  unsigned int *pi_subpicture,
+                                  subpicture_t **pp_subpicture,
+                                  mtime_t render_subtitle_date,
+                                  mtime_t render_osd_date,
+                                  bool b_subtitle_only )
 {
     spu_private_t *p_sys = p_spu->p;
-    subpicture_t *p_subpic = NULL;
+
+    /* */
+    *pi_subpicture = 0;
 
     /* Create a list of channels */
     int pi_channel[VOUT_MAX_SUBPICTURES];
@@ -636,8 +601,7 @@ static subpicture_t *SpuSortSubpictures( spu_t *p_spu,
             pi_channel[i_channel_count++] = i_channel;
     }
 
-    /* We get an easily parsable chained list of subpictures which
-     * ends with NULL since p_subpic was initialized to NULL. */
+    /* Fill up the pp_subpicture arrays with relevent pictures */
     for( int i = 0; i < i_channel_count; i++ )
     {
         const int i_channel = pi_channel[i];
@@ -735,13 +699,11 @@ static subpicture_t *SpuSortSubpictures( spu_t *p_spu,
             if( b_rejet )
                 SpuHeapDeleteSubpicture( &p_sys->heap, p_current );
             else
-                SubpictureChain( &p_subpic, p_current );
+                pp_subpicture[(*pi_subpicture)++] = p_current;
         }
     }
 
     p_sys->i_last_sort_date = render_subtitle_date;
-
-    return p_subpic;
 }
 
 
@@ -777,7 +739,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     if( p_region->fmt.i_chroma == VLC_CODEC_TEXT )
     {
         const int i_min_scale_ratio = SCALE_UNIT; /* FIXME what is the right value? (scale_size is not) */
-        SpuRenderText( p_spu, &b_restore_text, p_subpic, p_region,
+        SpuRenderText( p_spu, &b_restore_text, p_region,
                        i_min_scale_ratio, render_date );
 
         /* Check if the rendering has failed ... */
@@ -1070,65 +1032,48 @@ exit:
  * This function renders all sub picture units in the list.
  */
 static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
+                                           unsigned int i_subpicture,
+                                           subpicture_t **pp_subpicture,
                                            const vlc_fourcc_t *p_chroma_list,
                                            const video_format_t *p_fmt_dst,
-                                           subpicture_t *p_subpic_list,
                                            const video_format_t *p_fmt_src,
                                            mtime_t render_subtitle_date,
                                            mtime_t render_osd_date )
 {
     spu_private_t *p_sys = p_spu->p;
 
-    const int i_source_video_width  = p_fmt_src->i_width;
-    const int i_source_video_height = p_fmt_src->i_height;
+    /* Count the number of regions and subtitle regions */
+    unsigned int i_subtitle_region_count = 0;
+    unsigned int i_region_count          = 0;
+    for( unsigned i = 0; i < i_subpicture; i++ )
+    {
+        const subpicture_t *p_subpic = pp_subpicture[i];
 
-    unsigned int i_subpicture;
-    subpicture_t *pp_subpicture[VOUT_MAX_SUBPICTURES];
+        unsigned i_count = 0;
+        for( subpicture_region_t *r = p_subpic->p_region; r != NULL; r = r->p_next )
+            i_count++;
 
-    unsigned int i_subtitle_region_count;
+        if( p_subpic->b_subtitle )
+            i_subtitle_region_count += i_count;
+        i_region_count += i_count;
+    }
+    if( i_region_count <= 0 )
+        return NULL;
+
+    /* Allocate area array for subtitle overlap */
     spu_area_t p_subtitle_area_buffer[VOUT_MAX_SUBPICTURES];
     spu_area_t *p_subtitle_area;
     int i_subtitle_area;
 
-    /* Preprocess subpictures */
-    i_subpicture = 0;
-    i_subtitle_region_count = 0;
-    for( subpicture_t * p_subpic = p_subpic_list;
-            p_subpic != NULL;
-                p_subpic = p_subpic->p_next )
-    {
-        subpicture_Update( p_subpic,
-                           p_fmt_src, p_fmt_dst,
-                           p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
-
-        /* */
-        if( p_subpic->b_subtitle )
-        {
-            for( subpicture_region_t *r = p_subpic->p_region; r != NULL; r = r->p_next )
-                i_subtitle_region_count++;
-        }
-
-        /* */
-        pp_subpicture[i_subpicture++] = p_subpic;
-    }
-
-    /* Be sure we have at least 1 picture to process */
-    if( i_subpicture <= 0 )
-        return NULL;
-
-    subpicture_t *p_output = subpicture_New( NULL );
-
-    /* Now order subpicture array
-     * XXX The order is *really* important for overlap subtitles positionning */
-    qsort( pp_subpicture, i_subpicture, sizeof(*pp_subpicture), SubpictureCmp );
-
-    /* Allocate area array for subtitle overlap */
     i_subtitle_area = 0;
     p_subtitle_area = p_subtitle_area_buffer;
     if( i_subtitle_region_count > sizeof(p_subtitle_area_buffer)/sizeof(*p_subtitle_area_buffer) )
         p_subtitle_area = calloc( i_subtitle_region_count, sizeof(*p_subtitle_area) );
 
     /* Process all subpictures and regions (in the right order) */
+    const int i_source_video_width  = p_fmt_src->i_width;
+    const int i_source_video_height = p_fmt_src->i_height;
+    subpicture_t *p_output = subpicture_New( NULL );
     for( unsigned int i_index = 0; i_index < i_subpicture; i_index++ )
     {
         subpicture_t *p_subpic = pp_subpicture[i_index];
@@ -1388,8 +1333,17 @@ spu_t *spu_Create( vlc_object_t *p_this )
                                        p_spu );
 
     /* Load text and scale module */
-    SpuRenderCreateAndLoadText( p_spu );
-    SpuRenderCreateAndLoadScale( p_spu );
+    p_sys->p_text = SpuRenderCreateAndLoadText( p_spu );
+
+    /* XXX p_spu->p_scale is used for all conversion/scaling except yuvp to
+     * yuva/rgba */
+    p_sys->p_scale = SpuRenderCreateAndLoadScale( VLC_OBJECT(p_spu),
+                                                  VLC_CODEC_YUVA, VLC_CODEC_RGBA, true );
+
+    /* This one is used for YUVP to YUVA/RGBA without scaling
+     * FIXME rename it */
+    p_sys->p_scale_yuvp = SpuRenderCreateAndLoadScale( VLC_OBJECT(p_spu),
+                                                       VLC_CODEC_YUVP, VLC_CODEC_YUVA, false );
 
     /* */
     p_sys->i_last_sort_date = -1;
@@ -1444,9 +1398,9 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_input, bool b_attach )
         vlc_mutex_lock( &p_spu->p->lock );
         p_spu->p->p_input = p_input;
 
-        FilterRelease( p_spu->p->p_text );
-        p_spu->p->p_text = NULL;
-        SpuRenderCreateAndLoadText( p_spu );
+        if( p_spu->p->p_text )
+            FilterRelease( p_spu->p->p_text );
+        p_spu->p->p_text = SpuRenderCreateAndLoadText( p_spu );
 
         vlc_mutex_unlock( &p_spu->p->lock );
     }
@@ -1556,24 +1510,38 @@ subpicture_t *spu_Render( spu_t *p_spu,
         p_chroma_list = vlc_fourcc_IsYUV(p_fmt_dst->i_chroma) ? p_chroma_list_default_yuv
                                                               : p_chroma_list_default_rgb;
 
-    /* Get the sorted list of subpicture to render */
     vlc_mutex_lock( &p_sys->lock );
 
-    subpicture_t *p_list = SpuSortSubpictures( p_spu,
-                                               render_subtitle_date,
-                                               render_osd_date,
-                                               b_subtitle_only );
-    if( !p_list )
+    unsigned int i_subpicture;
+    subpicture_t *pp_subpicture[VOUT_MAX_SUBPICTURES];
+
+    /* Get an array of subpictures to render */
+    SpuSelectSubpictures( p_spu, &i_subpicture, pp_subpicture,
+                          render_subtitle_date, render_osd_date, b_subtitle_only );
+    if( i_subpicture <= 0 )
     {
         vlc_mutex_unlock( &p_sys->lock );
         return NULL;
     }
 
-    /* Render the current list of subpictures */
+    /* Updates the subpictures */
+    for( unsigned i = 0; i < i_subpicture; i++ )
+    {
+        subpicture_t *p_subpic = pp_subpicture[i];
+        subpicture_Update( p_subpic,
+                           p_fmt_src, p_fmt_dst,
+                           p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
+    }
+
+    /* Now order the subpicture array
+     * XXX The order is *really* important for overlap subtitles positionning */
+    qsort( pp_subpicture, i_subpicture, sizeof(*pp_subpicture), SubpictureCmp );
+
+    /* Render the subpictures */
     subpicture_t *p_render = SpuRenderSubpictures( p_spu,
+                                                   i_subpicture, pp_subpicture,
                                                    p_chroma_list,
                                                    p_fmt_dst,
-                                                   p_list,
                                                    p_fmt_src,
                                                    render_subtitle_date,
                                                    render_osd_date );
