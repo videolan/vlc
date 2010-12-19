@@ -593,6 +593,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_BOOL( "qt-fs-controller", fsController );
             CONFIG_BOOL( "qt-system-tray", systrayBox );
             CONFIG_BOOL( "qt-notification", sysPop );
+            CONNECT( ui.systrayBox, toggled( bool ), ui.sysPop, setEnabled( bool ) );
+
             CONFIG_BOOL( "playlist-tree", treePlaylist );
             CONFIG_GENERIC_FILE( "skins2-last", File, ui.skinFileLabel,
                                  ui.fileSkin, ui.skinBrowse );
