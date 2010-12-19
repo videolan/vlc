@@ -1060,6 +1060,12 @@ static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
     if( i_region_count <= 0 )
         return NULL;
 
+    /* Create the output subpicture */
+    subpicture_t *p_output = subpicture_New( NULL );
+    if( !p_output )
+        return NULL;
+    subpicture_region_t **pp_output_last = &p_output->p_region;
+
     /* Allocate area array for subtitle overlap */
     spu_area_t p_subtitle_area_buffer[VOUT_MAX_SUBPICTURES];
     spu_area_t *p_subtitle_area;
@@ -1073,7 +1079,6 @@ static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
     /* Process all subpictures and regions (in the right order) */
     const int i_source_video_width  = p_fmt_src->i_width;
     const int i_source_video_height = p_fmt_src->i_height;
-    subpicture_t *p_output = subpicture_New( NULL );
     for( unsigned int i_index = 0; i_index < i_subpicture; i_index++ )
     {
         subpicture_t *p_subpic = pp_subpicture[i_index];
@@ -1146,19 +1151,14 @@ static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
                 continue;
 
             /* */
-            subpicture_region_t *p_render;
-            SpuRenderRegion( p_spu, &p_render, &area,
+            SpuRenderRegion( p_spu, pp_output_last, &area,
                              p_subpic, p_region, scale,
                              p_chroma_list, p_fmt_dst,
                              p_subtitle_area, i_subtitle_area,
                              p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
-            if( p_render )
-            {
-                subpicture_region_t **pp_last = &p_output->p_region;
-                while( *pp_last )
-                    pp_last = &(*pp_last)->p_next;
-                *pp_last = p_render;
-            }
+
+            if( *pp_output_last )
+                pp_output_last = &(*pp_output_last)->p_next;
 
             if( p_subpic->b_subtitle )
             {
