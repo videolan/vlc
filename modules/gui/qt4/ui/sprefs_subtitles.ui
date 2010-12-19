@@ -246,12 +246,14 @@
  </widget>
  <tabstops>
   <tabstop>OSDBox</tabstop>
+  <tabstop>OSDTitleBox</tabstop>
   <tabstop>preferredLanguage</tabstop>
   <tabstop>encoding</tabstop>
   <tabstop>font</tabstop>
   <tabstop>fontSize</tabstop>
   <tabstop>fontColor</tabstop>
   <tabstop>effect</tabstop>
+  <tabstop>subsPosition</tabstop>
  </tabstops>
  <resources/>
  <connections/>

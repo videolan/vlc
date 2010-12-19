@@ -231,6 +231,9 @@
         <property name="text">
          <string>Record directory or filename</string>
         </property>
+        <property name="buddy">
+         <cstring>recordPath</cstring>
+        </property>
        </widget>
       </item>
       <item row="1" column="1">
@@ -317,6 +320,9 @@
        <widget class="QLabel" name="live555TransportLabel">
         <property name="text">
          <string>Live555 stream transport</string>
+        </property>
+        <property name="buddy">
+         <cstring>live555TransportHTTPRadio</cstring>
         </property>
        </widget>
       </item>
