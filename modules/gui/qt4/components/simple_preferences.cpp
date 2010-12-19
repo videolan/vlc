@@ -639,7 +639,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                             qtr("Subtitles & On Screen Display Settings") );
             CONFIG_BOOL( "osd", OSDBox);
             CONFIG_BOOL( "video-title-show", OSDTitleBox);
-
+            CONFIG_GENERIC( "video-title-position", IntegerList,
+                            ui.OSDTitlePosLabel, OSDTitlePos );
 
             CONFIG_GENERIC( "subsdec-encoding", StringList, ui.encodLabel,
                             encoding );

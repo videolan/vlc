@@ -23,18 +23,40 @@
      <property name="title">
       <string>On Screen Display</string>
      </property>
-     <layout class="QVBoxLayout">
-      <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
        <widget class="QCheckBox" name="OSDBox">
         <property name="text">
          <string>Enable On Screen Display (OSD)</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QCheckBox" name="OSDTitleBox">
         <property name="text">
          <string>Show media title on video start</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QComboBox" name="OSDTitlePos"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="OSDTitlePosLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Position</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="buddy">
+         <cstring>OSDTitlePos</cstring>
         </property>
        </widget>
       </item>
@@ -247,6 +269,7 @@
  <tabstops>
   <tabstop>OSDBox</tabstop>
   <tabstop>OSDTitleBox</tabstop>
+  <tabstop>OSDTitlePos</tabstop>
   <tabstop>preferredLanguage</tabstop>
   <tabstop>encoding</tabstop>
   <tabstop>font</tabstop>
