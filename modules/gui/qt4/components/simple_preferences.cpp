@@ -1,7 +1,7 @@
 /*****************************************************************************
  * simple_preferences.cpp : "Simple preferences"
  ****************************************************************************
- * Copyright (C) 2006-2008 the VideoLAN team
+ * Copyright (C) 2006-2010 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -594,6 +594,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_BOOL( "qt-system-tray", systrayBox );
             CONFIG_BOOL( "qt-notification", sysPop );
             CONNECT( ui.systrayBox, toggled( bool ), ui.sysPop, setEnabled( bool ) );
+            ui.sysPop->setEnabled( ui.systrayBox->isChecked() );
 
             CONFIG_BOOL( "playlist-tree", treePlaylist );
             CONFIG_GENERIC_FILE( "skins2-last", File, ui.skinFileLabel,
