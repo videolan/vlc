@@ -399,6 +399,9 @@ QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
         "", SLOT( pluginDialog() ) );
     menu->addSeparator();
 
+    addDPStaticEntry( menu, qtr( "Customi&ze Interface..." ),
+        ":/menu/preferences", SLOT( toolbarDialog() ) );
+
     addDPStaticEntry( menu, qtr( "&Preferences" ),
         ":/menu/preferences", SLOT( prefsDialog() ), "Ctrl+P", QAction::PreferencesRole );
 
@@ -509,9 +512,6 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
 #endif
 
     menu->addSeparator();
-    addDPStaticEntry( menu, qtr( "Customi&ze Interface..." ),
-        ":/menu/preferences", SLOT( toolbarDialog() ) );
-
     /* Extensions */
     ExtensionsMenu( p_intf, menu );
 
