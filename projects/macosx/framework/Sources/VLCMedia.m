@@ -240,7 +240,7 @@ static void HandleMediaParsedChanged(const libvlc_event_t * event, void * self)
     libvlc_event_detach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self);
     libvlc_event_detach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self);
     libvlc_event_detach(p_em, libvlc_MediaSubItemAdded,    HandleMediaSubItemAdded,    self);
-    libvlc_event_detach(p_em, libvlc_MediaParsedChanged,   HandleMediaParsedChanged,    self);
+    libvlc_event_detach(p_em, libvlc_MediaParsedChanged,   HandleMediaParsedChanged,   self);
     [[VLCEventManager sharedManager] cancelCallToObject:self];
 
     // Testing to see if the pointer exists is not required, if the pointer is null
@@ -336,6 +336,34 @@ static void HandleMediaParsedChanged(const libvlc_event_t * event, void * self)
                 libvlc_media_add_option(p_md, [[NSString stringWithFormat:@"%@", key] UTF8String]);
         }
     }
+}
+
+- (NSDictionary*) stats
+{
+    if(!p_md)
+        return NULL;
+
+    NSMutableDictionary *d = [NSMutableDictionary dictionary];
+    libvlc_media_stats_t p_stats;
+    libvlc_media_get_stats(p_md, &p_stats);
+
+    [d setObject:[NSNumber numberWithFloat: p_stats.f_demux_bitrate]       forKey:@"demuxBitrate"];
+    [d setObject:[NSNumber numberWithFloat: p_stats.f_input_bitrate]       forKey:@"inputBitrate"];
+    [d setObject:[NSNumber numberWithFloat: p_stats.f_send_bitrate]        forKey:@"sendBitrate"];
+    [d setObject:[NSNumber numberWithInt:   p_stats.i_decoded_audio]       forKey:@"decodedAudio"];
+    [d setObject:[NSNumber numberWithInt:   p_stats.i_decoded_video]       forKey:@"decodedVideo"];
+    [d setObject:[NSNumber numberWithInt:   p_stats.i_demux_corrupted]     forKey:@"demuxCorrupted"];
+    [d setObject:[NSNumber numberWithInt:   p_stats.i_demux_discontinuity] forKey:@"demuxDiscontinuity"];
+    [d setObject:[NSNumber numberWithInt:   p_stats.i_demux_read_bytes]    forKey:@"demuxReadBytes"];
+    [d setObject:[NSNumber numberWithInt:   p_stats.i_displayed_pictures]  forKey:@"displayedPictures"];
+    [d setObject:[NSNumber numberWithInt:   p_stats.i_lost_abuffers]       forKey:@"lostAbuffers"];
+    [d setObject:[NSNumber numberWithInt:   p_stats.i_lost_pictures]       forKey:@"lostPictures"];
+    [d setObject:[NSNumber numberWithInt:   p_stats.i_played_abuffers]     forKey:@"playedAbuffers"];
+    [d setObject:[NSNumber numberWithInt:   p_stats.i_read_bytes]          forKey:@"readBytes"];
+    [d setObject:[NSNumber numberWithInt:   p_stats.i_sent_bytes]          forKey:@"sentBytes"];
+    [d setObject:[NSNumber numberWithInt:   p_stats.i_sent_packets]        forKey:@"sentPackets"];
+
+    return d;
 }
 
 NSString *VLCMediaTracksInformationCodec = @"codec"; // NSNumber

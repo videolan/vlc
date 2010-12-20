@@ -332,15 +332,21 @@ extern NSString *VLCMediaTracksInformationTypeUnknown;
  */
 - (void)parse;
 
-/**************************************************************************
+/**
  * Add options to the media, that will be used to determine how
  * VLCMediaPlayer will read the media. This allow to use VLC advanced
  * reading/streaming options in a per-media basis
  *
  * The options are detailed in vlc --long-help, for instance "--sout-all"
  * And on the web: http://wiki.videolan.org/VLC_command-line_help
-
-**************************************************************************/
+*/
 - (void) addOptions:(NSDictionary*) options;
+
+/**
+ * Getter for statistics information
+ * Returns a NSDictionary with NSNumbers for values.
+ *
+ */
+- (NSDictionary*) stats;
 
 @end
