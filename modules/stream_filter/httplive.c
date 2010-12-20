@@ -1012,9 +1012,10 @@ again:
         goto again;
 
     /* Download first 2 segments of this HLS stream */
+    stream = *current;
     for (int i = 0; i < 2; i++)
     {
-        segment_t *segment = segment_GetSegment(hls, p_sys->segment);
+        segment_t *segment = segment_GetSegment(hls, i);
         if (segment == NULL )
             return VLC_EGENERIC;
 
@@ -1028,6 +1029,16 @@ again:
             return VLC_EGENERIC;
 
         p_sys->segment++;
+
+        /* adapt bandwidth? */
+        if (*current != stream)
+        {
+            hls_stream_t *hls = hls_Get(p_sys->hls_stream, *current);
+            if (hls == NULL)
+                return VLC_EGENERIC;
+
+             stream = *current;
+        }
     }
 
     return VLC_SUCCESS;
