@@ -392,6 +392,10 @@ static const entry_t p_list_video[] = {
         A("vc-1"),
         A("VC-1"),
 
+    B(VLC_CODEC_WMVP, "Windows Media Video Presentation"),
+        A("WMVP"),
+        A("wmvp"),
+
     /* Microsoft Video 1 */
     B(VLC_CODEC_MSVIDEO1, "Microsoft Video 1"),
         A("MSVC"),
