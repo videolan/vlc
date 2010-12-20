@@ -106,7 +106,8 @@ struct stream_sys_t
 
     /* */
     hls_thread_t *thread;
-    vlc_array_t *hls_stream;/* bandwidth adaptation */
+    vlc_array_t  *hls_stream;/* bandwidth adaptation */
+    uint64_t      bandwidth; /* measured bandwidth (bits per second) */
 
     /* Playback */
     uint64_t    offset;     /* current offset in media */
@@ -876,6 +877,21 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
         return VLC_SUCCESS;
     }
 
+    /* sanity check - can we download this segment on time? */
+    if (s->p_sys->bandwidth > 0)
+    {
+        uint64_t size = (segment->duration * hls->bandwidth); /* bits */
+        int estimated = (int)(size / s->p_sys->bandwidth);
+        if (estimated > segment->duration)
+        {
+            msg_Err(s, "cannot quarantee smooth playback");
+            msg_Warn(s,"downloading takes (%ds) takes longer then playback (%ds) of segment %d",
+                        estimated, segment->duration, segment->sequence);
+            vlc_mutex_unlock(&segment->lock);
+            return VLC_EGENERIC;
+        }
+    }
+
     mtime_t start = mdate();
     if (AccessDownload(s, segment) != VLC_SUCCESS)
     {
@@ -895,7 +911,7 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
         return VLC_SUCCESS;
 
     uint64_t bw = ((double)(segment->size * 8) / ms) * 1000; /* bits / s */
-    segment->bandwidth = bw;
+    s->p_sys->bandwidth = bw;
     if (hls->bandwidth != bw)
     {
         int newstream = BandwidthAdaptation(s, hls->id, &bw);
@@ -940,7 +956,11 @@ static void* hls_Thread(vlc_object_t *p_this)
         }
         else if (Download(client->s, hls, segment, &client->current) != VLC_SUCCESS)
         {
-            if (!p_sys->b_live) break;
+            if (!p_sys->b_live)
+            {
+                p_sys->b_error = true;
+                break;
+            }
         }
 
         /* download succeeded */
@@ -1215,8 +1235,10 @@ static int Open(vlc_object_t *p_this)
     if (p_sys == NULL)
         return VLC_ENOMEM;
 
+    p_sys->bandwidth = -1;
     p_sys->b_live = true;
     p_sys->b_meta = false;
+    p_sys->b_error = false;
 
     p_sys->hls_stream = vlc_array_new();
     if (p_sys->hls_stream == NULL)
@@ -1456,6 +1478,9 @@ static int Read(stream_t *s, void *buffer, unsigned int i_read)
 
     assert(p_sys->hls_stream);
 
+    if (p_sys->b_error)
+        return 0;
+
     if (buffer == NULL)
     {
         /* caller skips data, get big enough buffer */
@@ -1483,7 +1508,8 @@ again:
     segment = GetSegment(s);
     if (segment == NULL)
     {
-        msg_Err(s, "segment should have been available");
+        msg_Err(s, "segment %d should have been available (stream %d)",
+                p_sys->segment, p_sys->current);
         return 0; /* eof? */
     }
 
