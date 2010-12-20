@@ -61,7 +61,7 @@ vlc_module_end()
 typedef struct segment_s
 {
     int         sequence;   /* unique sequence number */
-    int         duration;     /* segment duration (seconds) */
+    int         duration;   /* segment duration (seconds) */
     uint64_t    size;       /* segment size in bytes */
     uint64_t    bandwidth;  /* bandwidth usage of segments (bits per second)*/
 
@@ -937,9 +937,6 @@ static void* hls_Thread(vlc_object_t *p_this)
                 p_sys->wakeup = p_sys->last + (2 * (mtime_t)1000000);
             }
             mwait(p_sys->wakeup);
-
-            /* reset download segment to current playback segment */
-            client->segment = p_sys->segment + 1;
         }
         else if (Download(client->s, hls, segment, &client->current) != VLC_SUCCESS)
         {
