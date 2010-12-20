@@ -26,6 +26,7 @@
 #endif
 
 #include "libvlc_internal.h"
+#include <vlc_modules.h>
 #include <vlc/libvlc.h>
 
 #include <vlc_interface.h>
@@ -170,4 +171,77 @@ const char * libvlc_get_changeset(void)
 void libvlc_free( void *ptr )
 {
     free( ptr );
+}
+
+libvlc_module_description_t *libvlc_module_description_list_get( libvlc_instance_t *p_instance, const char *capability )
+{
+    VLC_UNUSED( p_instance );
+    libvlc_module_description_t *p_list = NULL,
+                          *p_actual = NULL,
+                          *p_previous = NULL;
+    module_t **module_list = module_list_get( NULL );
+
+    for (size_t i = 0; module_list[i]; i++)
+    {
+        module_t *p_module = module_list[i];
+
+        if ( !module_provides( p_module, capability ) )
+            continue;
+
+        p_actual = ( libvlc_module_description_t * ) malloc( sizeof( libvlc_module_description_t ) );
+        if ( p_actual == NULL )
+        {
+            libvlc_printerr( "Not enough memory" );
+            libvlc_module_description_list_release( p_list );
+            module_list_free( module_list );
+            return NULL;
+        }
+
+        if ( p_list == NULL )
+            p_list = p_actual;
+
+        const char* name = module_get_object( p_module );
+        const char* shortname = module_get_name( p_module, false );
+        const char* longname = module_get_name( p_module, true );
+        const char* help = module_get_help( p_module );
+        p_actual->psz_name = name ? strdup( name ) : NULL;
+        p_actual->psz_shortname = shortname ? strdup( shortname ) : NULL;
+        p_actual->psz_longname = longname ? strdup( longname ) : NULL;
+        p_actual->psz_help = help ? strdup( help ) : NULL;
+
+        p_actual->p_next = NULL;
+        if ( p_previous )
+            p_previous->p_next = p_actual;
+        p_previous = p_actual;
+    }
+
+    module_list_free( module_list );
+    return p_list;
+}
+
+void libvlc_module_description_list_release( libvlc_module_description_t *p_list )
+{
+    libvlc_module_description_t *p_actual, *p_before;
+    p_actual = p_list;
+
+    while ( p_actual )
+    {
+        free( p_actual->psz_name );
+        free( p_actual->psz_shortname );
+        free( p_actual->psz_longname );
+        free( p_actual->psz_help );
+        p_before = p_actual;
+        p_actual = p_before->p_next;
+        free( p_before );
+    }
+}
+
+libvlc_module_description_t *libvlc_audio_filter_list_get( libvlc_instance_t *p_instance )
+{
+    return libvlc_module_description_list_get( p_instance, "audio filter" );
+}
+
+libvlc_module_description_t *libvlc_video_filter_list_get( libvlc_instance_t *p_instance )
+{
+    return libvlc_module_description_list_get( p_instance, "video filter2" );
 }

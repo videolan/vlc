@@ -23,6 +23,8 @@
 
 #include "test.h"
 
+#include <string.h>
+
 static void test_core (const char ** argv, int argc)
 {
     libvlc_instance_t *vlc;
@@ -37,12 +39,41 @@ static void test_core (const char ** argv, int argc)
     libvlc_release (vlc);
 }
 
+static void test_moduledescriptionlist (libvlc_module_description_t *list)
+{
+    libvlc_module_description_t *module = list;
+    while ( module ) {
+        assert (strlen (module->psz_name) );
+        assert (strlen (module->psz_shortname) );
+        assert (module->psz_longname == NULL || strlen (module->psz_longname));
+        assert (module->psz_help == NULL || strlen (module->psz_help));
+        module = module->p_next;
+    }    
+
+    libvlc_module_description_list_release (list);
+}
+
+static void test_audiovideofilterlists (const char ** argv, int argc)
+{
+    libvlc_instance_t *vlc;
+
+    log ("Testing libvlc_(audio|video)_filter_list_get()\n");
+
+    vlc = libvlc_new (argc, argv);
+    assert (vlc != NULL);
+
+    test_moduledescriptionlist (libvlc_audio_filter_list_get (vlc));
+    test_moduledescriptionlist (libvlc_video_filter_list_get (vlc));
+
+    libvlc_release (vlc);
+}
 
 int main (void)
 {
     test_init();
 
     test_core (test_defaults_args, test_defaults_nargs);
+    test_audiovideofilterlists (test_defaults_args, test_defaults_nargs);
 
     return 0;
 }

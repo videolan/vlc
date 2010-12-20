@@ -429,6 +429,57 @@ VLC_PUBLIC_API libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterat
                                                                libvlc_log_message_t *p_buffer );
 
 /** @} */
+
+/**
+ * Description of a module.
+ */
+typedef struct libvlc_module_description_t
+{
+    char *psz_name;
+    char *psz_shortname;
+    char *psz_longname;
+    char *psz_help;
+    struct libvlc_module_description_t *p_next;
+} libvlc_module_description_t;
+
+libvlc_module_description_t *libvlc_module_description_list_get( libvlc_instance_t *p_instance, const char *capability );
+
+/**
+ * Release a list of module descriptions.
+ *
+ * \param p_list the list to be released
+ */
+VLC_PUBLIC_API
+void libvlc_module_description_list_release( libvlc_module_description_t *p_list );
+
+/**
+ * Returns a list of audio filters that are available.
+ *
+ * \param p_instance libvlc instance
+ *
+ * \return a list of module descriptions. It should be freed with libvlc_module_description_list_release().
+ *         In case of an error, NULL is returned.
+ *
+ * \see libvlc_module_description_t
+ * \see libvlc_module_description_list_release
+ */
+VLC_PUBLIC_API
+libvlc_module_description_t *libvlc_audio_filter_list_get( libvlc_instance_t *p_instance );
+
+/**
+ * Returns a list of video filters that are available.
+ *
+ * \param p_instance libvlc instance
+ *
+ * \return a list of module descriptions. It should be freed with libvlc_module_description_list_release().
+ *         In case of an error, NULL is returned.
+ *
+ * \see libvlc_module_description_t
+ * \see libvlc_module_description_list_release
+ */
+VLC_PUBLIC_API
+libvlc_module_description_t *libvlc_video_filter_list_get( libvlc_instance_t *p_instance );
+
 /** @} */
 /** @} */
 
