@@ -397,7 +397,7 @@ DIST_maemo = \
 	maemo/next.png
 
 maemo_FILES = \
-	vlc32x32.png
+	icons/32x32/vlc.png
 
 DIST_solid = \
 	solid/vlc-opencda.desktop \

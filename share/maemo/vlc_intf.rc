@@ -37,6 +37,6 @@ style "videolan"
   stock["vlc-play"] = {{ "play.png" }}
   stock["vlc-pause"] = {{ "pause.png" }}
   stock["vlc-playlist"] = {{ "playlist.png" }}
-  stock["vlc"] = {{ "vlc32x32.png" }}
+  stock["vlc"] = {{ "../../icons/hicolor/32x32/apps/vlc.png" }}
 }
 widget "*" style "videolan"
