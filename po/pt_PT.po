@@ -17745,22 +17745,22 @@ msgstr "A&brir Lista de Reprodução..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
 #, fuzzy
-msgid "XSPF playlist (*.xspf)"
-msgstr "Lista de reprodução XSPF (*.xspf);; "
+msgid "XSPF playlist"
+msgstr "Lista de reprodução XSPF"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "Lista de reprodução M3U (*.m3u);; Qualquer (*.*) "
+msgid "M3U8 playlist"
+msgstr "Lista de reprodução M3U"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
 #, fuzzy
-msgid "M3U playlist (*.m3u)"
-msgstr "Lista de reprodução M3U (*.m3u);; Qualquer (*.*) "
+msgid "M3U playlist"
+msgstr "Lista de reprodução M3U"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
 #, fuzzy
-msgid "HTML playlist (*.html)"
+msgid "HTML playlist"
 msgstr "Item seguinte da lista de reprodução"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
@@ -27545,9 +27545,6 @@ msgstr "Analisador de espectro"
 
 #~ msgid "root"
 #~ msgstr "raíz"
-
-#~ msgid "XSPF playlist"
-#~ msgstr "Lista de reprodução XSPF"
 
 #~ msgid "Playlist is empty"
 #~ msgstr "A lista de reprodução está vazia"

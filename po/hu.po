@@ -18224,21 +18224,21 @@ msgid "Open playlist..."
 msgstr "Lejátszólista megnyitása…"
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
-msgid "XSPF playlist (*.xspf)"
-msgstr "XSPF lejátszólista (*.xspf)"
+msgid "XSPF playlist"
+msgstr "XSPF lejátszólista"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "M3U lejátszólista (*.m3u)"
+msgid "M3U8 playlist"
+msgstr "M3U lejátszólista"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
-msgid "M3U playlist (*.m3u)"
-msgstr "M3U lejátszólista (*.m3u)"
+msgid "M3U playlist"
+msgstr "M3U lejátszólista"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "HTML lejátszólista (*.html)"
+msgid "HTML playlist"
+msgstr "HTML lejátszólista"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."

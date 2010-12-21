@@ -17638,22 +17638,22 @@ msgstr "Öppna spellista..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
 #, fuzzy
-msgid "XSPF playlist (*.xspf)"
-msgstr "XSPF-spellista (*.xspf);; "
+msgid "XSPF playlist"
+msgstr "XSPF-spellista"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "M3U-spellista (*.m3u);; "
+msgid "M3U8 playlist"
+msgstr "M3U-spellista "
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
 #, fuzzy
-msgid "M3U playlist (*.m3u)"
-msgstr "M3U-spellista (*.m3u);; "
+msgid "M3U playlist"
+msgstr "M3U-spellista"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "HTML-spellista (*.html)"
+msgid "HTML playlist"
+msgstr "HTML-spellista"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."
@@ -27475,9 +27475,6 @@ msgstr "Spektrumanalysator"
 
 #~ msgid "root"
 #~ msgstr "rot"
-
-#~ msgid "XSPF playlist"
-#~ msgstr "XSPF-spellista"
 
 #~ msgid "Playlist is empty"
 #~ msgstr "Spellistan är tom"

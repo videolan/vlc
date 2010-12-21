@@ -21543,22 +21543,22 @@ msgid "Open playlist..."
 msgstr "Բացել երգացանկ..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:558
-msgid "XSPF playlist (*.xspf)"
-msgstr "XSPF երգացանկ (*. xspf)"
+msgid "XSPF playlist"
+msgstr "XSPF երգացանկ"
 
 #: modules/gui/qt4/dialogs_provider.cpp:559
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "M3U8 երգացանկ (*. m3u)"
+msgid "M3U8 playlist"
+msgstr "M3U8 երգացանկ"
 
 #: modules/gui/qt4/dialogs_provider.cpp:560
 #, fuzzy
-msgid "M3U playlist (*.m3u)"
-msgstr "M3U երգացանկ (*. m3u)"
+msgid "M3U playlist"
+msgstr "M3U երգացանկ"
 
 #: modules/gui/qt4/dialogs_provider.cpp:561
-msgid "HTML playlist (*.html)"
-msgstr "HTML երգացանկ (*. html)"
+msgid "HTML playlist"
+msgstr "HTML երգացանկ"
 
 #: modules/gui/qt4/dialogs_provider.cpp:573
 msgid "Save playlist as..."
@@ -33582,10 +33582,6 @@ msgstr "Մեդիա տնօրենը Պանակ,"
 #, fuzzy
 #~ msgid "X11 display name"
 #~ msgstr "X11 ցուցադրվող անվանումը"
-
-#, fuzzy
-#~ msgid "XSPF playlist"
-#~ msgstr "XSPF երգացանկ"
 
 #, fuzzy
 #~ msgid "XVMC adaptor number"

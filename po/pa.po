@@ -17420,20 +17420,20 @@ msgid "Open playlist..."
 msgstr "ਪਲੇਅਲਿਸਟ ਖੋਲ੍ਹੋ..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
-msgid "XSPF playlist (*.xspf)"
-msgstr "XSPF ਪਲੇਅਲਿਸਟ (*.xspf)"
+msgid "XSPF playlist"
+msgstr "XSPF ਪਲੇਅਲਿਸਟ"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
-msgid "M3U8 playlist (*.m3u)"
-msgstr "M3U8 ਪਲੇਅਲਿਸਟ (*.m3u)"
+msgid "M3U8 playlist"
+msgstr "M3U8 ਪਲੇਅਲਿਸਟ"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
-msgid "M3U playlist (*.m3u)"
-msgstr "M3U ਪਲੇਅਲਿਸਟ (*.m3u)"
+msgid "M3U playlist"
+msgstr "M3U ਪਲੇਅਲਿਸਟ"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "HTML ਪਲੇਅਲਿਸਟ (*.html)"
+msgid "HTML playlist"
+msgstr "HTML ਪਲੇਅਲਿਸਟ"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."
@@ -25607,10 +25607,6 @@ msgstr "ਸਪੈਕਟਰ ਐਨਲੇਸਾਈਜ਼ਰ"
 
 #, fuzzy
 #~ msgid "%i items in playlist"
-#~ msgstr "ਸੰਗੀਤ-ਸੂਚੀ"
-
-#, fuzzy
-#~ msgid "XSPF playlist"
 #~ msgstr "ਸੰਗੀਤ-ਸੂਚੀ"
 
 #, fuzzy

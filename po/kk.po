@@ -16960,22 +16960,22 @@ msgstr "Ойнату тізімін ашу..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
 #, fuzzy
-msgid "XSPF playlist (*.xspf)"
-msgstr "XSPF ойнату тізімі (*.xspf);; "
+msgid "XSPF playlist"
+msgstr "XSPF ойнату тізімі"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "M3U ойнату тізімі (*.m3u);; "
+msgid "M3U8 playlist"
+msgstr "M3U ойнату тізімі"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
 #, fuzzy
-msgid "M3U playlist (*.m3u)"
-msgstr "M3U ойнату тізімі (*.m3u);; "
+msgid "M3U playlist"
+msgstr "M3U ойнату тізімі"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "HTML ойнату тізімі (*.html)"
+msgid "HTML playlist"
+msgstr "HTML ойнату тізімі"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."

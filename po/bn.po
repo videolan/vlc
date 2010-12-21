@@ -18560,22 +18560,22 @@ msgstr "প্লে-লিস্ট খুলুন..."
 
 # Translated by sadia
 #: modules/gui/qt4/dialogs_provider.cpp:553
-msgid "XSPF playlist (*.xspf)"
-msgstr "XSPF প্লে-লিস্ট (*.xspf)"
+msgid "XSPF playlist"
+msgstr "XSPF প্লে-লিস্ট"
 
 # Translated by sadia
 #: modules/gui/qt4/dialogs_provider.cpp:554
-msgid "M3U8 playlist (*.m3u)"
-msgstr "M3U8 প্লে-লিস্ট (*.m3u)"
+msgid "M3U8 playlist"
+msgstr "M3U8 প্লে-লিস্ট"
 
 # Translated by sadia
 #: modules/gui/qt4/dialogs_provider.cpp:555
-msgid "M3U playlist (*.m3u)"
-msgstr "M3U প্লে-লিস্ট (*.m3u)"
+msgid "M3U playlist"
+msgstr "M3U প্লে-লিস্ট"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "HTML প্লে-লিস্ট (*.html)"
+msgid "HTML playlist"
+msgstr "HTML প্লে-লিস্ট"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."
@@ -28218,9 +28218,6 @@ msgstr "বর্ণালী বিশ্লেষক"
 
 #~ msgid "%i items in playlist"
 #~ msgstr "চালানোর তালিকায় %i আইটেম"
-
-#~ msgid "XSPF playlist"
-#~ msgstr "XSPF চালানোর তালিকা"
 
 #~ msgid "Playlist is empty"
 #~ msgstr "চালানোর তালিকা খালি"

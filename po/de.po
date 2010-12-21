@@ -18327,22 +18327,22 @@ msgstr "Wiedergabeliste &öffnen"
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
 #, fuzzy
-msgid "XSPF playlist (*.xspf)"
-msgstr "XSPF-Wiedergabeliste (*.xspf);; "
+msgid "XSPF playlist"
+msgstr "XSPF-Wiedergabeliste"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "M3U-Wiedergabeliste (*.m3u);; "
+msgid "M3U8 playlist"
+msgstr "M3U-Wiedergabeliste"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
 #, fuzzy
-msgid "M3U playlist (*.m3u)"
-msgstr "M3U-Wiedergabeliste (*.m3u);; "
+msgid "M3U playlist"
+msgstr "M3U-Wiedergabeliste"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "HTML-Wiedergabeliste (*.html)"
+msgid "HTML playlist"
+msgstr "HTML-Wiedergabeliste"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."
@@ -29244,9 +29244,6 @@ msgstr "Spektrum-Analysierer"
 
 #~ msgid "root"
 #~ msgstr "Ausgangspunkt"
-
-#~ msgid "XSPF playlist"
-#~ msgstr "XSPF-Wiedergabeliste"
 
 #~ msgid "Playlist is empty"
 #~ msgstr "Wiedergabeliste ist leer"

@@ -17194,22 +17194,22 @@ msgstr "Oynatma Listesi Aç..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
 #, fuzzy
-msgid "XSPF playlist (*.xspf)"
-msgstr "XSPF oynatma listesi (*.xspf);; "
+msgid "XSPF playlist"
+msgstr "XSPF oynatma listesi"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "M3U oynatma listesi (*.m3u);;"
+msgid "M3U8 playlist"
+msgstr "M3U oynatma listesi"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
 #, fuzzy
-msgid "M3U playlist (*.m3u)"
-msgstr "M3U oynatma listesi (*.m3u);;"
+msgid "M3U playlist"
+msgstr "M3U oynatma listesi"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "HTML oynatma listesi (*.html)"
+msgid "HTML playlist"
+msgstr "HTML oynatma listesi"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."
@@ -26622,10 +26622,6 @@ msgstr "Spektrum analizörü"
 
 #~ msgid "root"
 #~ msgstr "kök"
-
-#, fuzzy
-#~ msgid "XSPF playlist"
-#~ msgstr "Oynatma Listesini kaydet"
 
 #~ msgid "Playlist is empty"
 #~ msgstr "Oynatma listesi boş"

@@ -17149,22 +17149,22 @@ msgstr "Dobrir una lista de lectura..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
 #, fuzzy
-msgid "XSPF playlist (*.xspf)"
-msgstr "Lista XSPF (*.xspf);; "
+msgid "XSPF playlist"
+msgstr "Lista XSPF"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "Lista M3U (*.m3u);; Totas (*.*) "
+msgid "M3U8 playlist"
+msgstr "Lista M3U"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
 #, fuzzy
-msgid "M3U playlist (*.m3u)"
-msgstr "Lista M3U (*.m3u);; Totas (*.*) "
+msgid "M3U playlist"
+msgstr "Lista M3U"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "Lista HTML (*.html)"
+msgid "HTML playlist"
+msgstr "Lista HTML"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."
@@ -26027,9 +26027,6 @@ msgstr ""
 
 #~ msgid "root"
 #~ msgstr "root"
-
-#~ msgid "XSPF playlist"
-#~ msgstr "Lista de lectura XSPF"
 
 #~ msgid "Ctrl"
 #~ msgstr "Ctrl"

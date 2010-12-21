@@ -17286,21 +17286,21 @@ msgid "Open playlist..."
 msgstr "재생목록 열기..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
-msgid "XSPF playlist (*.xspf)"
-msgstr "XSPF 재생목록 (*.xspf)"
+msgid "XSPF playlist"
+msgstr "XSPF 재생목록"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "M3U 재생목록 (*.m3u)"
+msgid "M3U8 playlist"
+msgstr "M3U 재생목록"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
-msgid "M3U playlist (*.m3u)"
-msgstr "M3U 재생목록 (*.m3u)"
+msgid "M3U playlist"
+msgstr "M3U 재생목록"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "HTML 재생목록 (*.html)"
+msgid "HTML playlist"
+msgstr "HTML 재생목록"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."
@@ -26615,9 +26615,6 @@ msgstr "스펙트럼 분석기"
 
 #~ msgid "root"
 #~ msgstr "루트"
-
-#~ msgid "XSPF playlist"
-#~ msgstr "XSPF 재생목록"
 
 #~ msgid "Playlist is empty"
 #~ msgstr "재생목록이 비었습니다"

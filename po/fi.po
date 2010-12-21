@@ -17657,22 +17657,22 @@ msgstr "&Avaa soittolista..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
 #, fuzzy
-msgid "XSPF playlist (*.xspf)"
-msgstr "XSPF-soittolista (*.xspf);; "
+msgid "XSPF playlist"
+msgstr "XSPF-soittolista"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "M3U-soittolista (*.m3u);; "
+msgid "M3U8 playlist"
+msgstr "M3U-soittolista"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
 #, fuzzy
-msgid "M3U playlist (*.m3u)"
-msgstr "M3U-soittolista (*.m3u);; "
+msgid "M3U playlist"
+msgstr "M3U-soittolista"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "HTML soittolista (*.html)"
+msgid "HTML playlist"
+msgstr "HTML soittolista"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 #, fuzzy
@@ -27539,9 +27539,6 @@ msgstr "Spektrin tarkastelu"
 
 #~ msgid "root"
 #~ msgstr "root"
-
-#~ msgid "XSPF playlist"
-#~ msgstr "XSPF-soittoluettelo"
 
 #~ msgid "Can't save"
 #~ msgstr "Ei voi tallentaa"

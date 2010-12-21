@@ -17964,21 +17964,21 @@ msgid "Open playlist..."
 msgstr "Deschide o listă de redare..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
-msgid "XSPF playlist (*.xspf)"
-msgstr "Listă de redare XSPF (*.xspf)"
+msgid "XSPF playlist"
+msgstr "Listă de redare XSPF"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "Listă de redare M3U (*.,3u)"
+msgid "M3U8 playlist"
+msgstr "Listă de redare M3U"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
-msgid "M3U playlist (*.m3u)"
-msgstr "Listă de redare M3U (*.,3u)"
+msgid "M3U playlist"
+msgstr "Listă de redare M3U"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "Listă de redare HTML (*.html)"
+msgid "HTML playlist"
+msgstr "Listă de redare HTML"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."

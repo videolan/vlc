@@ -17477,21 +17477,21 @@ msgid "Open playlist..."
 msgstr "Atverti grojaraštį..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
-msgid "XSPF playlist (*.xspf)"
-msgstr "XSPF grojaraštis (*.xspf)"
+msgid "XSPF playlist"
+msgstr "XSPF grojaraštis"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "M3U grojaraštis (*.m3u)"
+msgid "M3U8 playlist"
+msgstr "M3U grojaraštis"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
-msgid "M3U playlist (*.m3u)"
-msgstr "M3U grojaraštis (*.m3u)"
+msgid "M3U playlist"
+msgstr "M3U grojaraštis"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "HTML grojaraštis (*.html)"
+msgid "HTML playlist"
+msgstr "HTML grojaraštis"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."

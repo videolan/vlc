@@ -18707,20 +18707,20 @@ msgid "Open playlist..."
 msgstr "Abrir lista de reproducción..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
-msgid "XSPF playlist (*.xspf)"
-msgstr "Lista de reproducción XSPF (*.xspf);; "
+msgid "XSPF playlist"
+msgstr "Lista de reproducción XSPF"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
-msgid "M3U8 playlist (*.m3u)"
-msgstr "Lista de reproducción M3U (*.m3u)"
+msgid "M3U8 playlist"
+msgstr "Lista de reproducción M3U"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
-msgid "M3U playlist (*.m3u)"
-msgstr "Lista de reproducción M3U (*.m3u)"
+msgid "M3U playlist"
+msgstr "Lista de reproducción M3U"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "Lista de reproducción HTML (*.html)"
+msgid "HTML playlist"
+msgstr "Lista de reproducción HTML"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."
@@ -28819,9 +28819,6 @@ msgstr "Espectrómetro"
 
 #~ msgid "root"
 #~ msgstr "raíz"
-
-#~ msgid "XSPF playlist"
-#~ msgstr "Lista de reproducción XSPF"
 
 #~ msgid "Playlist is empty"
 #~ msgstr "Lista de reproducción vacía"

@@ -18038,21 +18038,21 @@ msgstr "Открыть плейлист..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
 #, fuzzy
-msgid "XSPF playlist (*.xspf)"
-msgstr "Плейлист XSPF (*.xspf)"
+msgid "XSPF playlist"
+msgstr "Плейлист XSPF"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "Плейлист M3U (*.m3u)"
+msgid "M3U8 playlist"
+msgstr "Плейлист M3U"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
-msgid "M3U playlist (*.m3u)"
-msgstr "Плейлист M3U (*.m3u)"
+msgid "M3U playlist"
+msgstr "Плейлист M3U"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "Плейлист HTML (*.html)"
+msgid "HTML playlist"
+msgstr "Плейлист HTML"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."
@@ -28623,9 +28623,6 @@ msgstr "Анализатор спектра"
 
 #~ msgid "root"
 #~ msgstr "корень"
-
-#~ msgid "XSPF playlist"
-#~ msgstr "Плейлист XSPF"
 
 #~ msgid "Playlist is empty"
 #~ msgstr "Плейлист пуст"

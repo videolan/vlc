@@ -17607,21 +17607,21 @@ msgid "Open playlist..."
 msgstr "បើក​បញ្ជី​ចាក់..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
-msgid "XSPF playlist (*.xspf)"
-msgstr "បញ្ជី​ចាក់ XSPF (*.xspf)"
+msgid "XSPF playlist"
+msgstr "បញ្ជី​ចាក់ XSPF"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "បញ្ជីចាក់ M3U (*.m3u)"
+msgid "M3U8 playlist"
+msgstr "បញ្ជីចាក់ M3U"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
-msgid "M3U playlist (*.m3u)"
-msgstr "បញ្ជីចាក់ M3U (*.m3u)"
+msgid "M3U playlist"
+msgstr "បញ្ជីចាក់ M3U"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "បញ្ជីចាក់ HTML (*.html)"
+msgid "HTML playlist"
+msgstr "បញ្ជីចាក់ HTML"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."

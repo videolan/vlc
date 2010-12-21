@@ -18563,20 +18563,20 @@ msgid "Open playlist..."
 msgstr "Відкрити список відтворення…"
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
-msgid "XSPF playlist (*.xspf)"
-msgstr "Список відтворення XSPF (*.xspf)"
+msgid "XSPF playlist"
+msgstr "Список відтворення XSPF"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
-msgid "M3U8 playlist (*.m3u)"
-msgstr "Список відтворення M3U8 (*.m3u)"
+msgid "M3U8 playlist"
+msgstr "Список відтворення M3U8"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
-msgid "M3U playlist (*.m3u)"
-msgstr "Список відтворення M3U (*.m3u)"
+msgid "M3U playlist"
+msgstr "Список відтворення M3U"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "Список відтворення HTML (*.html)"
+msgid "HTML playlist"
+msgstr "Список відтворення HTML"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."

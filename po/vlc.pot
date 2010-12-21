@@ -16552,19 +16552,19 @@ msgid "Open playlist..."
 msgstr ""
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
-msgid "XSPF playlist (*.xspf)"
+msgid "XSPF playlist"
 msgstr ""
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
-msgid "M3U8 playlist (*.m3u)"
+msgid "M3U8 playlist"
 msgstr ""
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
-msgid "M3U playlist (*.m3u)"
+msgid "M3U playlist"
 msgstr ""
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
+msgid "HTML playlist"
 msgstr ""
 
 #: modules/gui/qt4/dialogs_provider.cpp:568

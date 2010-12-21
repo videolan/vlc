@@ -17775,22 +17775,22 @@ msgstr "Otevřít seznam skladeb..."
 
 #: modules/gui/qt4/dialogs_provider.cpp:553
 #, fuzzy
-msgid "XSPF playlist (*.xspf)"
-msgstr "Seznam skladeb XSPF (*.xspf);;"
+msgid "XSPF playlist"
+msgstr "Seznam skladeb XSPF"
 
 #: modules/gui/qt4/dialogs_provider.cpp:554
 #, fuzzy
-msgid "M3U8 playlist (*.m3u)"
-msgstr "M3U·seznam skladeb·(*.m3u);;·"
+msgid "M3U8 playlist"
+msgstr "M3U·seznam skladeb"
 
 #: modules/gui/qt4/dialogs_provider.cpp:555
 #, fuzzy
-msgid "M3U playlist (*.m3u)"
-msgstr "M3U·seznam skladeb·(*.m3u);;·"
+msgid "M3U playlist"
+msgstr "M3U·seznam skladeb"
 
 #: modules/gui/qt4/dialogs_provider.cpp:556
-msgid "HTML playlist (*.html)"
-msgstr "HTML seznam skladeb (*.html)"
+msgid "HTML playlist"
+msgstr "HTML seznam skladeb"
 
 #: modules/gui/qt4/dialogs_provider.cpp:568
 msgid "Save playlist as..."

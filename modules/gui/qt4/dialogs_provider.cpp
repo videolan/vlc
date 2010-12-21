@@ -554,13 +554,14 @@ void DialogsProvider::saveAPlaylist()
 {
     static const struct
     {
-        char filter[24];
+        char filter_name[14];
+        char filter_patterns[7];
         char module[12];
     } types[] = {
-        { N_("XSPF playlist (*.xspf)"), "export-xspf", },
-        { N_("M3U8 playlist (*.m3u)"), "export-m3u8", },
-        { N_("M3U playlist (*.m3u)"), "export-m3u", },
-        { N_("HTML playlist (*.html)"), "export-html", },
+        { N_("XSPF playlist"), "*.xspf", "export-xspf", },
+        { N_("M3U8 playlist"), "*.m3u", "export-m3u8", },
+        { N_("M3U playlist"), "*.m3u", "export-m3u", },
+        { N_("HTML playlist"), "*.html", "export-html", },
     };
     QString filters, selected;
 
@@ -568,7 +569,10 @@ void DialogsProvider::saveAPlaylist()
     {
         if( !filters.isEmpty() )
             filters += ";;";
-        filters += qfu( vlc_gettext( types[i].filter ) );
+        filters += qfu( vlc_gettext( types[i].filter_name ) );
+        filters += " (";
+        filters += qfu( types[i].filter_patterns );
+        filters += ")";
     }
 
     QString file = QFileDialog::getSaveFileName( NULL,
@@ -578,7 +582,7 @@ void DialogsProvider::saveAPlaylist()
         return;
 
     for( size_t i = 0; i < sizeof (types) / sizeof (types[0]); i++)
-        if( selected == qfu( vlc_gettext( types[i].filter ) ) )
+        if( selected == qfu( vlc_gettext( types[i].filter_name ) ) + " (" + qfu( types[i].filter_patterns ) + ")" )
         {
             playlist_Export( THEPL, qtu( toNativeSeparators( file ) ),
                              THEPL->p_playing, types[i].module );
