@@ -60,7 +60,7 @@ static int CreateInputItemFromMedia( media_library_t *p_ml,
 struct ml_table_elt
 {
     int column_id;
-    char column_name[];
+    char column_name[20];
 };
 
 static const struct ml_table_elt ml_table_map[]=
@@ -486,9 +486,9 @@ int SQLToMediaArray( media_library_t *p_ml, vlc_array_t *p_result_array,
             int mid = (low + high ) / 2;
             char* mid_val = ml_table_map[mid].column_name;
             int cmp = strcmp( mid_val, res( 0, col ) );
-            if( cmp > 0 )
+            if( cmp < 0 )
                 low = mid + 1;
-            else if ( cmp < 0 )
+            else if ( cmp > 0 )
                 high = mid - 1;
             else
             {
