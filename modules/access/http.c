@@ -105,6 +105,12 @@ static void Close( vlc_object_t * );
     "server for all URL. Don't take into account bypasses settings and auto " \
     "configuration scripts.")
 
+#define REFERER_TEXT N_("HTTP referer value")
+#define REFERER_LONGTEXT N_("Customize the HTTP referer, simulating a previous document")
+
+#define UA_TEXT N_("User Agent")
+#define UA_LONGTEXT N_("You can use a custom User agent or use a known one")
+
 vlc_module_begin ()
     set_description( N_("HTTP input") )
     set_capability( "access", 0 )
@@ -119,9 +125,9 @@ vlc_module_begin ()
     add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_safe()
-    add_string( "http-referrer", NULL, NULL, NULL, false )
+    add_string( "http-referrer", NULL, REFERER_TEXT, REFERER_LONGTEXT, false )
         change_safe()
-    add_string( "http-user-agent", NULL, NULL, NULL, false )
+    add_string( "http-user-agent", NULL, UA_TEXT, UA_LONGTEXT, false )
         change_safe()
         change_private()
     add_bool( "http-reconnect", false, RECONNECT_TEXT,
