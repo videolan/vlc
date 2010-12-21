@@ -262,13 +262,13 @@ vlc_module_begin ()
                   PASSWORD_LONGTEXT, true )
     add_string( "dvb-http-acl", NULL, ACL_TEXT, ACL_LONGTEXT,
                 true )
-    add_string( "dvb-http-intf-cert", NULL, CERT_TEXT, CERT_LONGTEXT,
+    add_loadfile( "dvb-http-intf-cert", NULL, CERT_TEXT, CERT_LONGTEXT,
                 true )
-    add_string( "dvb-http-intf-key",  NULL, KEY_TEXT,  KEY_LONGTEXT,
+    add_loadfile( "dvb-http-intf-key",  NULL, KEY_TEXT,  KEY_LONGTEXT,
                 true )
-    add_string( "dvb-http-intf-ca",   NULL, CA_TEXT,   CA_LONGTEXT,
+    add_loadfile( "dvb-http-intf-ca",   NULL, CA_TEXT,   CA_LONGTEXT,
                 true )
-    add_string( "dvb-http-intf-crl",  NULL, CRL_TEXT,  CRL_LONGTEXT,
+    add_loadfile( "dvb-http-intf-crl",  NULL, CRL_TEXT,  CRL_LONGTEXT,
                 true )
 #endif
 

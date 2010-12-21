@@ -104,13 +104,13 @@ vlc_module_begin ()
                   PASS_TEXT, PASS_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "mime", "",
                 MIME_TEXT, MIME_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "cert", "vlc.pem",
+    add_loadfile( SOUT_CFG_PREFIX "cert", "vlc.pem",
                 CERT_TEXT, CERT_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "key", NULL,
+    add_loadfile( SOUT_CFG_PREFIX "key", NULL,
                 KEY_TEXT, KEY_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "ca", NULL,
+    add_loadfile( SOUT_CFG_PREFIX "ca", NULL,
                 CA_TEXT, CA_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "crl", NULL,
+    add_loadfile( SOUT_CFG_PREFIX "crl", NULL,
                 CRL_TEXT, CRL_LONGTEXT, true )
 #if 0 //def HAVE_AVAHI_CLIENT
     add_bool( SOUT_CFG_PREFIX "bonjour", false,

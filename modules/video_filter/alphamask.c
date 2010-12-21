@@ -69,7 +69,7 @@ vlc_module_begin ()
     add_shortcut( "alphamask", "mask" )
     set_callbacks( Create, Destroy )
 
-    add_string( CFG_PREFIX "mask", NULL, MASK_TEXT,
+    add_loadfile( CFG_PREFIX "mask", NULL, MASK_TEXT,
                 MASK_LONGTEXT, false )
 vlc_module_end ()
 
