@@ -92,6 +92,9 @@ typedef struct
     /* */
     int         current;    /* current hls_stream  */
     int         segment;    /* current segment for downloading */
+    int         seek;       /* segment requested by seek (default -1) */
+    vlc_mutex_t lock_wait;  /* protect segment download counter */
+    vlc_cond_t  wait;       /* some condition to wait on */
     vlc_array_t *hls_stream;/* bandwidth adaptation */
 
     stream_t    *s;
@@ -813,9 +816,6 @@ static int parse_HTTPLiveStreaming(stream_t *s)
                 vlc_mutex_unlock(&hls->lock);
                 return VLC_EGENERIC;
             }
-
-            /* Determine next time to reload playlist */
-            p_sys->wakeup = p_sys->last + (hls->duration * 2 * (mtime_t)1000000);
         }
 
         /* Stream size (approximate) */
@@ -931,8 +931,15 @@ static void* hls_Thread(vlc_object_t *p_this)
         /* Is there a new segment to process? */
         if (segment == NULL)
         {
-            if (!p_sys->b_live) break;
+            if (!p_sys->b_live)
+            {
+                p_sys->last = mdate();
+                p_sys->wakeup = p_sys->last + (2 * (mtime_t)1000000);
+            }
             mwait(p_sys->wakeup);
+
+            /* reset download segment to current playback segment */
+            client->segment = p_sys->segment + 1;
         }
         else if (Download(client->s, hls, segment, &client->current) != VLC_SUCCESS)
         {
@@ -940,7 +947,16 @@ static void* hls_Thread(vlc_object_t *p_this)
         }
 
         /* download succeeded */
-        client->segment++;
+        /* determine next segment to download */
+        vlc_mutex_lock(&client->lock_wait);
+        if (client->seek >= 0)
+        {
+            client->segment = client->seek;
+            client->seek = -1;
+        }
+        else client->segment++;
+        vlc_cond_signal(&client->wait);
+        vlc_mutex_unlock(&client->lock_wait);
 
         /* FIXME: Reread the m3u8 index file */
         if (p_sys->b_live)
@@ -1234,8 +1250,12 @@ static int Open(vlc_object_t *p_this)
     p_sys->thread->current = current;
     p_sys->current = current;
     p_sys->thread->segment = p_sys->segment;
+    p_sys->thread->seek = -1;
     p_sys->segment = 0; /* reset to first segment */
     p_sys->thread->s = s;
+
+    vlc_mutex_init(&p_sys->thread->lock_wait);
+    vlc_cond_init(&p_sys->thread->wait);
 
     if (vlc_thread_create(p_sys->thread, "HTTP Live Streaming client",
                           hls_Thread, VLC_THREAD_PRIORITY_INPUT))
@@ -1265,8 +1285,15 @@ static void Close(vlc_object_t *p_this)
     /* */
     if (p_sys->thread)
     {
+        vlc_mutex_lock(&p_sys->thread->lock_wait);
         vlc_object_kill(p_sys->thread);
+        vlc_cond_signal(&p_sys->thread->wait);
+        vlc_mutex_unlock(&p_sys->thread->lock_wait);
+
+        /* */
         vlc_thread_join(p_sys->thread);
+        vlc_mutex_destroy(&p_sys->thread->lock_wait);
+        vlc_cond_destroy(&p_sys->thread->wait);
         vlc_object_release(p_sys->thread);
     }
 
@@ -1302,8 +1329,8 @@ static segment_t *NextSegment(stream_t *s)
             /* This segment is ready? */
             if (segment->data != NULL)
             {
-               vlc_mutex_unlock(&hls->lock);
-               return segment;
+                vlc_mutex_unlock(&hls->lock);
+                return segment;
             }
         }
         vlc_mutex_unlock(&hls->lock);
@@ -1327,9 +1354,13 @@ static segment_t *NextSegment(stream_t *s)
             break;
         }
 
+        vlc_mutex_lock(&p_sys->thread->lock_wait);
+        int i_segment = p_sys->thread->segment;
+        vlc_mutex_unlock(&p_sys->thread->lock_wait);
+
         /* This segment is ready? */
         if ((segment->data != NULL) &&
-            (p_sys->segment < p_sys->thread->segment))
+            (p_sys->segment < i_segment))
         {
             p_sys->current = i_stream;
             vlc_mutex_unlock(&hls->lock);
@@ -1370,6 +1401,15 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
             {
                 block_Release(segment->data);
                 segment->data = NULL;
+            }
+            else
+            {   /* reset playback pointer to start of buffer */
+                uint64_t size = segment->size - segment->data->i_buffer;
+                if (size > 0)
+                {
+                    segment->data->i_buffer += size;
+                    segment->data->p_buffer -= size;
+                }
             }
             p_sys->segment++;
             vlc_mutex_unlock(&segment->lock);
@@ -1470,7 +1510,8 @@ static bool hls_MaySeek(stream_t *s)
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    if (p_sys->hls_stream == NULL)
+    if ((p_sys->hls_stream == NULL) ||
+        (p_sys->thread == NULL))
         return false;
 
     hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->current);
@@ -1478,12 +1519,14 @@ static bool hls_MaySeek(stream_t *s)
 
     if (p_sys->b_live)
     {
-       vlc_mutex_lock(&hls->lock);
-       int count = vlc_array_count(hls->segments);
-       bool may_seek = (p_sys->thread == NULL) ? false :
-                            (p_sys->thread->segment < count - 2);
-       vlc_mutex_unlock(&hls->lock);
-       return may_seek;
+        vlc_mutex_lock(&hls->lock);
+        int count = vlc_array_count(hls->segments);
+        vlc_mutex_unlock(&hls->lock);
+
+        vlc_mutex_lock(&p_sys->thread->lock_wait);
+        bool may_seek = (p_sys->thread->segment < (count - 2));
+        vlc_mutex_unlock(&p_sys->thread->lock_wait);
+        return may_seek;
     }
     return true;
 }
@@ -1522,14 +1565,6 @@ static int segment_Seek(stream_t *s, uint64_t pos)
 
     for (int n = 0; n < count; n++)
     {
-        /* FIXME: Seeking in segments not dowloaded is not supported. */
-        if (n >= p_sys->thread->segment)
-        {
-            msg_Err(s, "seeking in segment not downloaded yet.");
-            vlc_mutex_unlock(&hls->lock);
-            return VLC_EGENERIC;
-        }
-
         segment_t *segment = vlc_array_item_at_index(hls->segments, n);
         if (segment == NULL)
         {
@@ -1578,6 +1613,27 @@ static int segment_Seek(stream_t *s, uint64_t pos)
             }
         }
         vlc_mutex_unlock(&segment->lock);
+
+        /* start download at current playback segment */
+        if (p_sys->thread)
+        {
+            vlc_mutex_unlock(&hls->lock);
+
+            /* Wait for download to be finished */
+            vlc_mutex_lock(&p_sys->thread->lock_wait);
+            p_sys->thread->seek = p_sys->segment;
+            msg_Info(s, "seek to segment %d", p_sys->segment);
+            while ((p_sys->thread->seek != -1) ||
+                   (p_sys->thread->segment - p_sys->segment < 3))
+            {
+                vlc_cond_wait(&p_sys->thread->wait, &p_sys->thread->lock_wait);
+                if (!vlc_object_alive (s) ||
+                    s->b_error) break;
+            }
+            vlc_mutex_unlock(&p_sys->thread->lock_wait);
+
+            return VLC_SUCCESS;
+        }
     }
     vlc_mutex_unlock(&hls->lock);
 
