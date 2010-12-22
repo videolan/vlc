@@ -885,8 +885,8 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
         if (estimated > segment->duration)
         {
             msg_Err(s, "cannot quarantee smooth playback");
-            msg_Warn(s,"downloading takes (%ds) takes longer then playback (%ds) of segment %d",
-                        estimated, segment->duration, segment->sequence);
+            msg_Warn(s,"downloading of segment %d takes %ds, which is longer then its playback (%ds)",
+                        segment->sequence, estimated, segment->duration);
             vlc_mutex_unlock(&segment->lock);
             return VLC_EGENERIC;
         }
