@@ -78,6 +78,8 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
     /* Build Ui */
     ui.setupUi( this );
+    ui.bottomButtonsBox->addButton( new QPushButton( qtr("&Close"), this ),
+                                         QDialogButtonBox::RejectRole );
     updateTree();
 
     /* Modules tree */
