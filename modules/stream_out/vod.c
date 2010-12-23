@@ -60,8 +60,6 @@ struct media_es_t
 
 struct vod_media_t
 {
-    int id;
-
     /* VoD server */
     vod_t *p_vod;
 
@@ -80,11 +78,6 @@ struct vod_media_t
 struct vod_sys_t
 {
     char *psz_rtsp_url;
-
-    /* List of media */
-    int i_media_id;
-    int i_media;
-    vod_media_t **media;
 
     /* */
     block_fifo_t *p_fifo_cmd;
@@ -112,7 +105,6 @@ typedef enum
 typedef struct
 {
     int i_type;
-    int i_media_id;
     vod_media_t *p_media;
     char *psz_session;
     char *psz_arg;
@@ -156,9 +148,6 @@ int OpenVoD( vlc_object_t *p_this )
     }
     else
         p_sys->psz_rtsp_url = psz_url;
-
-    TAB_INIT( p_sys->i_media, p_sys->media );
-    p_sys->i_media_id = 0;
 
     p_vod->pf_media_new = MediaNew;
     p_vod->pf_media_del = MediaAskDel;
@@ -209,11 +198,6 @@ void CloseVoD( vlc_object_t * p_this )
         free( cmd.psz_arg );
     }
     block_FifoRelease( p_sys->p_fifo_cmd );
-
-    /* Check VLM is not buggy */
-    if( p_sys->i_media > 0 )
-        msg_Err( p_vod, "rtsp vod leaking %d medias", p_sys->i_media );
-    TAB_CLEAN( p_sys->i_media, p_sys->media );
 
     free( p_sys->psz_rtsp_url );
     free( p_sys );
@@ -306,9 +290,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
             goto error;
     }
 
-    p_media->id = p_sys->i_media_id++;
-
-    msg_Dbg(p_vod, "adding media '%s', id %i", psz_name, p_media->id);
+    msg_Dbg(p_vod, "adding media '%s'", psz_name);
 
     CommandPush( p_vod, RTSP_CMD_TYPE_ADD, p_media, NULL, 0, NULL );
     return p_media;
@@ -320,15 +302,13 @@ error:
 
 static void MediaAskDel ( vod_t *p_vod, vod_media_t *p_media )
 {
-    msg_Dbg( p_vod, "deleting media id %i", p_media->id );
+    msg_Dbg( p_vod, "deleting media" );
     CommandPush( p_vod, RTSP_CMD_TYPE_DEL, p_media, NULL, 0, NULL );
 }
 
 static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
 {
-    vod_sys_t *p_sys = p_vod->p_sys;
-
-    TAB_REMOVE( p_sys->i_media, p_sys->media, p_media );
+    (void) p_vod;
 
     if (p_media->rtsp != NULL)
     {
@@ -362,8 +342,6 @@ static void CommandPush( vod_t *p_vod, rtsp_cmd_type_t i_type, vod_media_t *p_me
     memset( &cmd, 0, sizeof(cmd) );
     cmd.i_type = i_type;
     cmd.p_media = p_media;
-    if( p_media )
-        cmd.i_media_id = p_media->id;
     if( psz_session )
         cmd.psz_session = strdup(psz_session);
     cmd.i_arg = i_arg;
@@ -386,8 +364,7 @@ static void* CommandThread( vlc_object_t *p_this )
     {
         block_t *p_block_cmd = block_FifoGet( p_sys->p_fifo_cmd );
         rtsp_cmd_t cmd;
-        vod_media_t *p_media = NULL;
-        int i;
+        vod_media_t *p_media = cmd.p_media;
 
         if( !p_block_cmd )
             break;
@@ -400,7 +377,6 @@ static void* CommandThread( vlc_object_t *p_this )
 
         if ( cmd.i_type == RTSP_CMD_TYPE_ADD )
         {
-            TAB_APPEND( p_sys->i_media, p_sys->media, cmd.p_media );
             goto next;
         }
 
@@ -411,17 +387,6 @@ static void* CommandThread( vlc_object_t *p_this )
         }
 
         /* */
-        for( i = 0; i < p_sys->i_media; i++ )
-        {
-            if( p_sys->media[i]->id == cmd.i_media_id )
-                break;
-        }
-        if( i >= p_sys->i_media )
-        {
-            goto next;
-        }
-        p_media = p_sys->media[i];
-
         switch( cmd.i_type )
         {
         case RTSP_CMD_TYPE_PLAY:
