@@ -541,15 +541,26 @@ char *SDPGenerateVoD( const vod_media_t *p_media, const char *rtsp_url )
     return psz_sdp;
 }
 
-/* TODO: add support in the VLM for queueing proper PLAY requests with
- * start and end times, fetch whether the input is seekable... and then
- * clean this up and remove the running argument */
-int vod_play(vod_media_t *p_media, const char *psz_session,
-             int64_t start, int64_t end, bool running)
+int vod_check_range(vod_media_t *p_media, const char *psz_session,
+                    int64_t start, int64_t end)
 {
+    (void) psz_session;
+
     if (p_media->i_length > 0 && (start > p_media->i_length
                                   || end > p_media->i_length))
         return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
+}
+
+/* TODO: add support in the VLM for queueing proper PLAY requests with
+ * start and end times, fetch whether the input is seekable... and then
+ * clean this up and remove the running argument */
+void vod_play(vod_media_t *p_media, const char *psz_session,
+              int64_t start, int64_t end, bool running)
+{
+    if (vod_check_range(p_media, psz_session, start, end) != VLC_SUCCESS)
+        return;
 
     /* We want to seek before unpausing, but it won't
      * work if the instance is not running yet. */
@@ -565,8 +576,6 @@ int vod_play(vod_media_t *p_media, const char *psz_session,
         /* This is the thing to do to unpause... */
         CommandPush(p_media->p_vod, RTSP_CMD_TYPE_PLAY, p_media,
                     psz_session, 0, "vod");
-
-    return VLC_SUCCESS;
 }
 
 void vod_pause(vod_media_t *p_media, const char *psz_session)

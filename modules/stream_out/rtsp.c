@@ -954,15 +954,24 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     answer->i_status = 457;
                     break;
                 }
-            }
-            /* We accept start times of 0 even for broadcast streams
-             * that already started */
-            if (!vod && (start > 0 || end >= 0))
-            {
-                answer->i_status = 456;
-                break;
-            }
 
+                if (vod)
+                {
+                    if (vod_check_range(rtsp->vod_media, psz_session,
+                                        start, end) != VLC_SUCCESS)
+                    {
+                        answer->i_status = 457;
+                        break;
+                    }
+                }
+                /* We accept start times of 0 even for broadcast streams
+                 * that already started */
+                else if (start > 0 || end >= 0)
+                {
+                    answer->i_status = 456;
+                    break;
+                }
+            }
             vlc_mutex_lock( &rtsp->lock );
             ses = RtspClientGet( rtsp, psz_session );
             if( ses != NULL )
@@ -1037,9 +1046,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                 if (vod)
                 {
                     bool running = (sout_id != NULL);
-                    if (vod_play(rtsp->vod_media, psz_session, start, end,
-                                 running) != VLC_SUCCESS)
-                        answer->i_status = 457;
+                    vod_play(rtsp->vod_media, psz_session, start, end, running);
                 }
             }
             vlc_mutex_unlock( &rtsp->lock );

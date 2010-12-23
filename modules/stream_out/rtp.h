@@ -92,8 +92,10 @@ int rtp_get_fmt( vlc_object_t *obj, es_format_t *p_fmt, const char *mux,
 int  OpenVoD ( vlc_object_t * );
 void CloseVoD( vlc_object_t * );
 
-int vod_play(vod_media_t *p_media, const char *psz_session,
-             int64_t start, int64_t end, bool running);
+int vod_check_range(vod_media_t *p_media, const char *psz_session,
+                    int64_t start, int64_t end);
+void vod_play(vod_media_t *p_media, const char *psz_session,
+              int64_t start, int64_t end, bool running);
 void vod_pause(vod_media_t *p_media, const char *psz_session);
 void vod_stop(vod_media_t *p_media, const char *psz_session);
 
