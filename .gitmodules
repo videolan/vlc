@@ -18,4 +18,4 @@
 [submodule "bindings/phonon"]
 	path = bindings/phonon
 	update = rebase
-	url = git://gitorious.org/phonon/phonon-vlc.git
+	url = git://git.kde.org/phonon-vlc.git
