@@ -130,6 +130,7 @@ public:
             && vlc_object_alive (p_input); /* and the VLC object is alive */
     }
 
+    int playingStatus();
     bool hasAudio();
     bool hasVideo() { return hasInput() && b_video; }
     void requestArtUpdate();
@@ -218,7 +219,7 @@ signals:
     void metaChanged( input_item_t *);
     void artChanged( QString );
     /// Play/pause status
-    void statusChanged( int );
+    void playingStatusChanged( int );
     void recordingStateChanged( bool );
     /// Teletext
     void teletextPossible( bool );

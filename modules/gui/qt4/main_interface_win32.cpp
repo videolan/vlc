@@ -142,7 +142,7 @@ void MainInterface::createTaskBarButtons()
             if(S_OK != hr)
                 msg_Err( p_intf, "ThumbBarAddButtons failed with error %08x", hr );
         }
-        CONNECT( THEMIM->getIM(), statusChanged( int ), this, changeThumbbarButtons( int ) );
+        CONNECT( THEMIM->getIM(), playingStatusChanged( int ), this, changeThumbbarButtons( int ) );
     }
     else
     {

@@ -67,7 +67,7 @@ AbstractController::AbstractController( intf_thread_t * _p_i, QWidget *_parent )
     toolbarActionsMapper = new QSignalMapper( this );
     CONNECT( toolbarActionsMapper, mapped( int ),
              ActionsManager::getInstance( p_intf  ), doAction( int ) );
-    CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
+    CONNECT( THEMIM->getIM(), playingStatusChanged( int ), this, setStatus( int ) );
 
     setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
 }

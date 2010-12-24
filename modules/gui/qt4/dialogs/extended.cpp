@@ -111,7 +111,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
             move ( 450 , 0 );
     }
 
-    CONNECT( THEMIM->getIM(), statusChanged( int ), this, changedItem( int ) );
+    CONNECT( THEMIM->getIM(), playingStatusChanged( int ), this, changedItem( int ) );
 }
 
 ExtendedDialog::~ExtendedDialog()

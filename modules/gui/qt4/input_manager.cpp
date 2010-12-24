@@ -157,7 +157,7 @@ void InputManager::delInput()
     emit nameChanged( "" );
     emit chapterChanged( 0 );
     emit titleChanged( 0 );
-    emit statusChanged( END_S );
+    emit playingStatusChanged( END_S );
 
     emit teletextPossible( false );
     emit AtoBchanged( false, false );
@@ -436,7 +436,7 @@ void InputManager::UpdateStatus()
     if( i_old_playing_status != state )
     {
         i_old_playing_status = state;
-        emit statusChanged( state );
+        emit playingStatusChanged( state );
     }
 }
 
@@ -496,6 +496,11 @@ void InputManager::UpdateName()
         emit nameChanged( text );
         oldName = text;
     }
+}
+
+int InputManager::playingStatus()
+{
+    return i_old_playing_status;
 }
 
 bool InputManager::hasAudio()
