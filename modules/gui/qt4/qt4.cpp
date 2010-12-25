@@ -178,6 +178,11 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
     "keyboard will always change your system volume. With this option unchecked, the "  \
     "volume buttons will change VLC's volume when VLC is selected and change the "      \
     "system volume when VLC is not selected." )
+
+#define QT_PAUSE_MINIMIZED_TEXT N_( "Pause the video playback when minimized" )
+#define QT_PAUSE_MINIMIZED_LONGTEXT N_( \
+    "With this option enabled, the playback will be automatically paused when minimizing the window." )
+
 /**********************************************************************/
 vlc_module_begin ()
     set_shortname( "Qt" )
@@ -262,6 +267,9 @@ vlc_module_begin ()
               QT_DISABLE_VOLUME_KEYS_LONGTEXT      /* longtext */,
               false                                /* advanced mode only */)
 #endif
+
+    add_bool( "qt-pause-minimized", true, QT_PAUSE_MINIMIZED_TEXT,
+              QT_PAUSE_MINIMIZED_LONGTEXT, false )
 
     add_obsolete_bool( "qt-blingbling" ) /* Suppressed since 1.0.0 */
     add_obsolete_integer( "qt-display-mode" ) /* Suppressed since 1.1.0 */

@@ -93,6 +93,7 @@ protected:
 #ifdef WIN32
     virtual bool winEvent( MSG *, long * );
 #endif
+    virtual void changeEvent( QEvent * );
     virtual void dropEvent( QDropEvent *);
     virtual void dragEnterEvent( QDragEnterEvent * );
     virtual void dragMoveEvent( QDragMoveEvent * );
@@ -168,6 +169,7 @@ private:
 //    bool                 b_visualSelectorEnabled;
     bool                 b_plDocked;            ///< Is the playlist docked ?
 
+    bool                 b_hasPausedWhenMinimized;
 
 #ifdef WIN32
     HIMAGELIST himl;

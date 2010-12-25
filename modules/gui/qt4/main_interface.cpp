@@ -259,6 +259,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Switch to minimal view if needed, must be called after the show() */
     if( b_minimalView )
         toggleMinimalView( true );
+
+    b_hasPausedWhenMinimized = false;
 }
 
 MainInterface::~MainInterface()
@@ -1089,6 +1091,39 @@ void MainInterface::updateSystrayTooltipStatus( int i_status )
     QVLCMenu::updateSystrayMenu( this, p_intf );
 }
 #endif
+
+void MainInterface::changeEvent(QEvent *event)
+{
+    if( event->type() == QEvent::WindowStateChange )
+    {
+        QWindowStateChangeEvent *windowStateChangeEvent = static_cast<QWindowStateChangeEvent*>(event);
+        Qt::WindowStates newState = windowState();
+        Qt::WindowStates oldState = windowStateChangeEvent->oldState();
+
+        if( newState & Qt::WindowMinimized )
+        {
+            b_hasPausedWhenMinimized = false;
+
+            if( THEMIM->getIM()->playingStatus() == PLAYING_S &&
+                THEMIM->getIM()->hasVideo() &&
+                !THEMIM->getIM()->hasVisualisation() &&
+                var_InheritBool( p_intf, "qt-pause-minimized" ) )
+            {
+                b_hasPausedWhenMinimized = true;
+                THEMIM->pause();
+            }
+        }
+        else if( oldState & Qt::WindowMinimized && !( newState & Qt::WindowMinimized ) )
+        {
+            if( b_hasPausedWhenMinimized )
+            {
+                THEMIM->play();
+            }
+        }
+    }
+
+    QWidget::changeEvent(event);
+}
 
 /************************************************************************
  * D&D Events

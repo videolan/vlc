@@ -514,6 +514,23 @@ bool InputManager::hasAudio()
     return false;
 }
 
+bool InputManager::hasVisualisation()
+{
+    if( !p_input )
+        return false;
+
+    aout_instance_t *aout = input_GetAout( p_input );
+    if( !aout )
+        return false;
+
+    char *visual = var_InheritString( aout, "visual" );
+    if( !visual )
+        return false;
+
+    free( visual );
+    return true;
+}
+
 void InputManager::UpdateTeletext()
 {
     if( hasInput() )

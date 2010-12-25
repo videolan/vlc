@@ -133,6 +133,7 @@ public:
     int playingStatus();
     bool hasAudio();
     bool hasVideo() { return hasInput() && b_video; }
+    bool hasVisualisation();
     void requestArtUpdate();
 
     QString getName() { return oldName; }
