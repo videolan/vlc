@@ -596,6 +596,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.systrayBox, toggled( bool ), ui.sysPop, setEnabled( bool ) );
             ui.sysPop->setEnabled( ui.systrayBox->isChecked() );
 
+            CONFIG_BOOL( "qt-pause-minimized", pauseMinimizedBox );
             CONFIG_BOOL( "playlist-tree", treePlaylist );
             CONFIG_GENERIC_FILE( "skins2-last", File, ui.skinFileLabel,
                                  ui.fileSkin, ui.skinBrowse );
