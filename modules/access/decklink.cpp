@@ -371,7 +371,7 @@ static int Open( vlc_object_t *p_this )
         }
 
         msg_Dbg( p_demux, "Setting video input format to 0x%x", conn);
-        result = p_config->SetVideoInputFormat( conn );
+        result = p_config->SetInt( bmdDeckLinkConfigVideoInputConnection, conn );
         if( result != S_OK )
         {
             msg_Err( p_demux, "Failed to set video input connection" );
@@ -397,7 +397,7 @@ static int Open( vlc_object_t *p_this )
         }
 
         msg_Dbg( p_demux, "Setting audio input format to 0x%x", conn);
-        result = p_config->SetAudioInputFormat( conn );
+        result = p_config->SetInt( bmdDeckLinkConfigAudioInputConnection, conn );
         if( result != S_OK )
         {
             msg_Err( p_demux, "Failed to set audio input connection" );
