@@ -590,6 +590,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.skinsPreview->setPreview( InterfacePreviewWidget::SKINS );
 
             CONFIG_BOOL( "embedded-video", embedVideo );
+            CONFIG_BOOL( "qt-video-autoresize", resizingBox );
+            CONNECT( ui.embedVideo, toggled( bool ), ui.resizingBox, setEnabled( bool ) );
+            ui.resizingBox->setEnabled( ui.embedVideo->isChecked() );
+
             CONFIG_BOOL( "qt-fs-controller", fsController );
             CONFIG_BOOL( "qt-system-tray", systrayBox );
             CONFIG_BOOL( "qt-notification", sysPop );
@@ -600,7 +604,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_BOOL( "playlist-tree", treePlaylist );
             CONFIG_GENERIC_FILE( "skins2-last", File, ui.skinFileLabel,
                                  ui.fileSkin, ui.skinBrowse );
-            CONFIG_BOOL( "qt-video-autoresize", resizingBox );
 
             CONFIG_GENERIC( "album-art", IntegerList, ui.artFetchLabel,
                                                       artFetcher );
