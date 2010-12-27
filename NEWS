@@ -81,6 +81,8 @@ Services Discovery:
 libVLC:
  * New capabilities for libVLC:
   ** libvlc_media_player_navigate for DVD navigation
+  ** libvlc_audio_filter_list_get, libvlc_video_filter_list_get to get the
+     list of available audio and video filters
 
 
 Changes between 1.1.4.1 and 1.1.5:
