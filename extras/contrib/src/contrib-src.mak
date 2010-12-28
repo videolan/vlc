@@ -967,7 +967,11 @@ ifdef HAVE_CROSS_COMPILE
 FFMPEGCONF += --enable-cross-compile
 endif
 ifdef HAVE_CROSS_COMPILE_NEEDS_CROSS_PREFIX
+ifndef HAVE_ANDROID
 FFMPEGCONF += --cross-prefix=$(HOST)-
+else
+FFMPEGCONF += --cross-prefix=arm-linux-androideabi- --arch=armv4l
+endif
 endif
 
 #
@@ -996,13 +1000,15 @@ endif
 ifndef HAVE_UCLIBC
 ifndef HAVE_WINCE
 ifndef HAVE_IOS
+ifndef HAVE_ANDROID
 FFMPEGCONF+= --enable-libmp3lame --enable-libgsm
+endif
 endif
 endif
 endif
 
 ifdef CC
-FFMPEGCONF += --cc=$(CC)
+FFMPEGCONF += --cc="$(CC)"
 endif
 
 ifdef HAVE_MACOSX_ON_INTEL
@@ -1124,6 +1130,7 @@ FFMPEG_DEPS-$(HAVE_WIN64)   = .lame .gsm .zlib
 FFMPEG_DEPS-$(HAVE_ARMELF)  = .lame .gsm .zlib
 FFMPEG_DEPS-$(HAVE_MACOSX) += .yasm
 FFMPEG_DEPS-$(HAVE_WIN32)  += .dshow_headers
+FFMPEG_DEPS-$(HAVE_ANDROID) =
 
 ifdef SVN
 FFMPEG_MK_TARGET = ffmpeg/.svn-$(FFMPEG_SVN_REV)
