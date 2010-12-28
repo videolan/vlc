@@ -404,7 +404,8 @@ static void parse_TargetDuration(stream_t *s, hls_stream_t *hls, char *p_read)
     hls->duration = duration; /* seconds */
 }
 
-static void parse_StreamInformation(stream_t *s, char *p_read, char *uri)
+static void parse_StreamInformation(stream_t *s, vlc_array_t **hls_stream,
+                                    char *p_read, char *uri)
 {
     stream_sys_t *p_sys = s->p_sys;
 
@@ -444,7 +445,7 @@ static void parse_StreamInformation(stream_t *s, char *p_read, char *uri)
     char *psz_uri = NULL;
     psz_uri = relative_URI(s, uri, psz_uri);
 
-    hls_stream_t *hls = hls_New(p_sys->hls_stream, id, bw, psz_uri ? psz_uri : uri);
+    hls_stream_t *hls = hls_New(*hls_stream, id, bw, psz_uri ? psz_uri : uri);
     if (hls == NULL)
         p_sys->b_error = true;
 
@@ -730,7 +731,7 @@ static int parse_HTTPLiveStreaming(stream_t *s)
                 p_sys->b_error = true;
             else
             {
-                parse_StreamInformation(s, p_read, uri);
+                parse_StreamInformation(s, &p_sys->hls_stream, p_read, uri);
                 free(uri);
             }
         }
