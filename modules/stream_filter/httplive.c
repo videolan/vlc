@@ -103,6 +103,7 @@ typedef struct
 struct stream_sys_t
 {
     access_t    *p_access;  /* HTTP access input */
+    vlc_url_t   m3u8;       /* M3U8 url */
 
     /* */
     hls_thread_t *thread;
@@ -334,32 +335,16 @@ static char *parse_Attributes(const char *line, const char *attr)
 
 static char *relative_URI(stream_t *s, const char *uri, char *psz_uri)
 {
+    stream_sys_t *p_sys = s->p_sys;
+
     char *p = strchr(uri, ':');
     if (p != NULL)
         return NULL;
 
-    char *tmp;
-    if (asprintf(&tmp,"%s://%s", s->psz_access, s->psz_path) < 0)
-    {
-        s->p_sys->b_error = true;
+    if (asprintf(&psz_uri, "%s://%s%s/%s", p_sys->m3u8.psz_protocol,
+                 p_sys->m3u8.psz_host, p_sys->m3u8.psz_path, uri) < 0)
         return NULL;
-    }
 
-    char *psz_path = strrchr(tmp, '/');
-    if (psz_path) *psz_path = '\0';
-
-    vlc_url_t url;
-    vlc_UrlParse(&url, tmp, 0);
-    if (asprintf(&psz_uri, "%s://%s%s/%s",
-           url.psz_protocol, url.psz_host, url.psz_path, uri) < 0)
-    {
-        free(tmp);
-        vlc_UrlClean(&url);
-        s->p_sys->b_error = true;
-        return NULL;
-    }
-    vlc_UrlClean(&url);
-    free(tmp);
     return psz_uri;
 }
 
@@ -1255,6 +1240,17 @@ static int Open(vlc_object_t *p_this)
     if (p_sys == NULL)
         return VLC_ENOMEM;
 
+    char *psz_uri = NULL;
+    if (asprintf(&psz_uri,"%s://%s", s->psz_access, s->psz_path) < 0)
+    {
+        free(p_sys);
+        return VLC_ENOMEM;
+    }
+    char *psz_path = strrchr(psz_uri, '/');
+    if (psz_path) *psz_path = '\0';
+    vlc_UrlParse(&p_sys->m3u8, psz_uri, 0);
+    free(psz_uri);
+
     p_sys->bandwidth = -1;
     p_sys->b_live = true;
     p_sys->b_meta = false;
@@ -1357,6 +1353,7 @@ static void Close(vlc_object_t *p_this)
     vlc_array_destroy(p_sys->hls_stream);
 
     /* */
+    vlc_UrlClean(&p_sys->m3u8);
     free(p_sys);
 }
 
