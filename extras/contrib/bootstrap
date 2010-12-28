@@ -350,6 +350,25 @@ case "$DISTRO" in
   win*)
     add_makefile_cfg "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig"
     ;;
+  android)
+    if test -z "$ANDROID_NDK"; then
+        error "The bootstrap script requires the ANDROID_NDK environment variable "
+        error "to be set when building for Android"
+        exit 1
+    fi
+    # The given host (arm-eabi) is not the real one (arm-linux-androideabi)
+    ln -sfn $TARGET hosts/arm-linux-androideabi
+    CC="arm-linux-androideabi-gcc -nostdlib -lc -lgcc"
+    CXX="arm-linux-androideabi-g++ -nostdlib -lc -lgcc"
+    NM=arm-linux-androideabi-nm
+    AR=arm-linux-androideabi-ar
+    LD=arm-linux-androideabi-ld
+    RANLIB=arm-linux-androideabi-ranlib
+    STRIP=arm-linux-androideabi-strip
+    # Add the PATH to the NDK
+    add_makefile_cfg "ANDROID_NDK = ${ANDROID_NDK}"
+    add_makefile_cfg "PATH = ${ANDROID_NDK}/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin/:${PATH}"
+    add_enabled_makefile_cfg "HAVE_LINUX"
 esac
 
 # Save passed flags
