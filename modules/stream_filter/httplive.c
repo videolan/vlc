@@ -1459,7 +1459,7 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
         vlc_mutex_lock(&segment->lock);
         if (segment->data->i_buffer == 0)
         {
-            if (!p_sys->b_cache)
+            if (!p_sys->b_cache || p_sys->b_live)
             {
                 block_Release(segment->data);
                 segment->data = NULL;
