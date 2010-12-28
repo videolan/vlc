@@ -815,10 +815,6 @@ static int parse_HTTPLiveStreaming(stream_t *s)
             /* Stream size (approximate) */
             hls->size = hls_GetStreamSize(hls);
         }
-
-        /* Can we cache files after playback */
-        p_sys->b_cache = hls->b_cache;
-
         vlc_mutex_unlock(&hls->lock);
     }
 
@@ -1394,6 +1390,7 @@ static segment_t *GetSegment(stream_t *s)
             /* This segment is ready? */
             if (segment->data != NULL)
             {
+                p_sys->b_cache = hls->b_cache;
                 vlc_mutex_unlock(&hls->lock);
                 return segment;
             }
@@ -1428,6 +1425,7 @@ static segment_t *GetSegment(stream_t *s)
             (p_sys->playback.segment < i_segment))
         {
             p_sys->playback.current = i_stream;
+            p_sys->b_cache = hls->b_cache;
             vlc_mutex_unlock(&hls->lock);
             return segment;
         }
