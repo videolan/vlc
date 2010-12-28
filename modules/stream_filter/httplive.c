@@ -116,9 +116,12 @@ struct stream_sys_t
     int         segment;    /* current segment for playback */
 
     /* Playlist */
-    mtime_t     last;       /* playlist last loaded */
-    mtime_t     wakeup;     /* next reload time */
-    int         tries;      /* times it was not changed */
+    struct hls_playlist_s
+    {
+        mtime_t     last;       /* playlist last loaded */
+        mtime_t     wakeup;     /* next reload time */
+        int         tries;      /* times it was not changed */
+    } playlist;
 
     /* state */
     bool        b_cache;    /* can cache files */
@@ -985,22 +988,22 @@ static void* hls_Thread(vlc_object_t *p_this)
         {
             double wait = 1;
             mtime_t now = mdate();
-            if (now >= p_sys->wakeup)
+            if (now >= p_sys->playlist.wakeup)
             {
 #if 0
                 /** FIXME: Implement m3u8 playlist reloading */
                 if (!hls_ReloadPlaylist(client->s))
                 {
                     /* No change in playlist, then backoff */
-                    p_sys->tries++;
-                    if (p_sys->tries == 1) wait = 0.5;
-                    else if (p_sys->tries == 2) wait = 1;
-                    else if (p_sys->tries >= 3) wait = 3;
+                    p_sys->playlist.tries++;
+                    if (p_sys->playlist.tries == 1) wait = 0.5;
+                    else if (p_sys->playlist.tries == 2) wait = 1;
+                    else if (p_sys->playlist.tries >= 3) wait = 3;
                 }
 #endif
                 /* determine next time to update playlist */
-                p_sys->last = now;
-                p_sys->wakeup = now + ((mtime_t)(hls->duration * wait) * (mtime_t)1000000);
+                p_sys->playlist.last = now;
+                p_sys->playlist.wakeup = now + ((mtime_t)(hls->duration * wait) * (mtime_t)1000000);
             }
         }
     }
@@ -1269,7 +1272,6 @@ static int Open(vlc_object_t *p_this)
     s->pf_control = Control;
 
     /* Select first segment to play */
-    p_sys->last = mdate();
     if (parse_HTTPLiveStreaming(s) != VLC_SUCCESS)
     {
         goto fail;
@@ -1290,6 +1292,15 @@ static int Open(vlc_object_t *p_this)
     {
         msg_Err(s, "creating HTTP Live Streaming client thread");
         goto fail;
+    }
+
+    /* Initialize HLS live stream */
+    if (p_sys->b_live)
+    {
+        hls_stream_t *hls = hls_Get(p_sys->hls_stream, current);
+        p_sys->playlist.last = mdate();
+        p_sys->playlist.wakeup = p_sys->playlist.last +
+                ((mtime_t)hls->duration * UINT64_C(1000000));
     }
 
     p_sys->thread->hls_stream = p_sys->hls_stream;
