@@ -1,0 +1,26 @@
+--- sidplay-2.1.1/libsidplay/include/sidplay/SmartPtr.h	2004-06-14 22:08:04.000000000 +0200
++++ sidplay2/libsidplay/include/sidplay/SmartPtr.h	2010-12-28 23:33:07.803027697 +0100
+@@ -211,16 +211,16 @@
+ 	{
+ 		if ( bufferLen >= 1 )
+ 		{
+-			pBufCurrent = ( bufBegin = buffer );
+-			bufEnd = bufBegin + bufferLen;
+-			bufLen = bufferLen;
+-			status = true;
++			this->pBufCurrent = ( this->bufBegin = buffer );
++			this->bufEnd = this->bufBegin + bufferLen;
++			this->bufLen = bufferLen;
++			this->status = true;
+ 		}
+ 		else
+ 		{
+-			pBufCurrent = bufBegin = bufEnd = 0;
+-			bufLen = 0;
+-			status = false;
++			this->pBufCurrent = this->bufBegin = this->bufEnd = 0;
++			this->bufLen = 0;
++			this->status = false;
+ 		}
+ 	}
+ };

@@ -1,0 +1,40 @@
+--- sidplay-libs-2.1.1/libsidplay/src/sidtune/SidTune.cpp.old	2008-07-25 16:55:02.000000000 \
++0000
++++ sidplay-libs-2.1.1/libsidplay/src/sidtune/SidTune.cpp	2008-07-25 16:53:58.000000000 \
++0000
+@@ -283,7 +283,7 @@
+     uint_least32_t fileLen = 0;
+ 
+     // This sucks big time
+-    openmode createAtrr = std::ios::in;
++    std::_Ios_Openmode createAtrr = std::ios::in;
+ #ifdef HAVE_IOS_NOCREATE
+     createAtrr |= std::ios::nocreate;
+ #endif
+@@ -952,7 +952,7 @@
+     if ( status )
+     {
+         // Open binary output file stream.
+-        openmode createAttr = std::ios::out;
++        std::_Ios_Openmode createAttr = std::ios::out;
+ #if defined(HAVE_IOS_BIN)
+         createAttr |= std::ios::bin;
+ #else
+@@ -1002,7 +1002,7 @@
+     if ( status )
+     {
+         // Open ASCII output file stream.
+-        openmode createAttr = std::ios::out;
++        std::_Ios_Openmode createAttr = std::ios::out;
+         if ( overWriteFlag )
+             createAttr |= std::ios::trunc;
+         else
+@@ -1036,7 +1036,7 @@
+     if ( status )
+     {
+         // Open binary output file stream.
+-        openmode createAttr = std::ios::out;
++        std::_Ios_Openmode createAttr = std::ios::out;
+ #if defined(HAVE_IOS_BIN)
+         createAttr |= std::ios::bin;
+ #else

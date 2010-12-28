@@ -2644,6 +2644,27 @@ CLEAN_FILE += .gme
 CLEAN_PKG  += game-music-emu-$(GME_VERSION)
 DISTCLEAN_PKG += game-music-emu-$(GME_VERSION).tbz2
 
+# ********************************
+# SidPlay2
+# ********************************
+sidplay-libs-2.1.1.tar.gz:
+	$(WGET) $(SID_URL)
+
+sidplay-2.1.1: sidplay-libs-2.1.1.tar.gz
+	$(EXTRACT_GZ)
+	(cd $@; patch -p1 < ../Patches/sidplay2-openmode.patch)
+	(cd $@; patch -p1 < ../Patches/sidplay2-endian.patch)
+	(cd $@; patch -p1 < ../Patches/sidplay2-smartprt.patch)
+
+.sidplay: sidplay-2.1.1
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make -C libsidplay && make -C libsidplay install )
+
+CLEAN_FILE += .sidplay
+CLEAN_PKG  += sidplay-2.1.1
+DISTCLEAN_PKG += sidplay-libs-2.1.1.tar.gz
+
+##
+
 tools: $(TOOLS)
 
 # ***************************************************************************

@@ -246,3 +246,4 @@ VPX_VERSION=0.9.2
 VPX_URL=http://webm.googlecode.com/files/libvpx-$(VPX_VERSION).tar.bz2
 GME_VERSION=0.5.5
 GME_URL=http://game-music-emu.googlecode.com/files/game-music-emu-$(GME_VERSION).tbz2
+SID_URL=$(SF)/sidplay2/sidplay2/sidplay-libs-2.1.1/sidplay-libs-2.1.1.tar.gz
