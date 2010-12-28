@@ -62,7 +62,7 @@
 #   include <mach/mach_time.h>
 #endif
 
-#if !defined(HAVE_STRUCT_TIMESPEC) && !defined(__APPLE__)
+#if !defined(HAVE_STRUCT_TIMESPEC)
 struct timespec
 {
     time_t  tv_sec;
@@ -71,7 +71,7 @@ struct timespec
 #endif
 
 #if defined(HAVE_NANOSLEEP) && !defined(HAVE_DECL_NANOSLEEP)
-int nanosleep(const struct timespec *, struct timespec *);
+int nanosleep(struct timespec *, struct timespec *);
 #endif
 
 #if !defined (_POSIX_CLOCK_SELECTION)
