@@ -810,9 +810,11 @@ static int parse_HTTPLiveStreaming(stream_t *s)
                 return VLC_EGENERIC;
             }
         }
-
-        /* Stream size (approximate) */
-        hls->size = hls_GetStreamSize(hls);
+        else
+        {
+            /* Stream size (approximate) */
+            hls->size = hls_GetStreamSize(hls);
+        }
 
         /* Can we cache files after playback */
         p_sys->b_cache = hls->b_cache;
