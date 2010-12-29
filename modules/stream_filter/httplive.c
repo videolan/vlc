@@ -348,10 +348,20 @@ static char *relative_URI(stream_t *s, const char *uri, const char *path)
         return NULL;
 
     char *psz_uri = NULL;
-    if (asprintf(&psz_uri, "%s://%s%s/%s", p_sys->m3u8.psz_protocol,
+    if (p_sys->m3u8.psz_password || p_sys->m3u8.psz_username)
+    {
+        if (asprintf(&psz_uri, "%s://%s:%s@%s%s/%s", p_sys->m3u8.psz_protocol,
+                     p_sys->m3u8.psz_username, p_sys->m3u8.psz_password,
+                     p_sys->m3u8.psz_host,
+                     path ? path : p_sys->m3u8.psz_path, uri) < 0)
+            return NULL;
+    }
+    else
+    {
+        if (asprintf(&psz_uri, "%s://%s%s/%s", p_sys->m3u8.psz_protocol,
                  p_sys->m3u8.psz_host, path ? path : p_sys->m3u8.psz_path, uri) < 0)
-        return NULL;
-
+           return NULL;
+    }
     return psz_uri;
 }
 
