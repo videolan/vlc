@@ -60,8 +60,14 @@ static int CreateInputItemFromMedia( media_library_t *p_ml,
 struct ml_table_elt
 {
     int column_id;
-    char column_name[20];
+    char* column_name;
 };
+
+static int compare_ml_elts( const void *a, const void *b )
+{
+    return strcmp( ( (struct ml_table_elt* )a )->column_name,
+            ( ( struct ml_table_elt* )b )->column_name );
+}
 
 static const struct ml_table_elt ml_table_map[]=
 {
@@ -479,26 +485,15 @@ int SQLToMediaArray( media_library_t *p_ml, vlc_array_t *p_result_array,
     const int count = sizeof( ml_table_map )/ sizeof( struct ml_table_elt );
     for( int col = 0; col < i_cols; col++ )
     {
-        //binary search
-        int low = 0, high = count - 1;
-        int answer = -1;
-        while( low <= high ) {
-            int mid = (low + high ) / 2;
-            char* mid_val = ml_table_map[mid].column_name;
-            int cmp = strcmp( mid_val, res( 0, col ) );
-            if( cmp < 0 )
-                low = mid + 1;
-            else if ( cmp > 0 )
-                high = mid - 1;
-            else
-            {
-                answer = mid;  break;
-            }
-        }
-        if( answer == -1 )
+        struct ml_table_elt key, *result = NULL;
+        key.column_name = res( 0, col );
+        result = bsearch( &key, ml_table_map, count,
+                sizeof( struct ml_table_elt ), compare_ml_elts );
+
+        if( !result )
             msg_Warn( p_ml, "unknown column: %s", res( 0, col ) );
         else
-            indexes[col] = ml_table_map[answer].column_id;
+            indexes[col] = result->column_id;
     }
 
     /* Read rows 1 to i_rows */
