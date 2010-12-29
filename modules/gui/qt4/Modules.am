@@ -60,6 +60,8 @@ nodist_SOURCES_qt4 = \
 		components/epg/EPGWidget.moc.cpp \
 		components/playlist/views.moc.cpp \
 		components/playlist/vlc_model.moc.cpp \
+		components/playlist/ml_item.moc.cpp \
+		components/playlist/ml_model.moc.cpp \
 		components/playlist/playlist_model.moc.cpp \
 		components/playlist/playlist.moc.cpp \
 		components/playlist/standardpanel.moc.cpp \
@@ -276,6 +278,8 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/epg/EPGView.cpp \
 		components/epg/EPGWidget.cpp \
 		components/playlist/views.cpp \
+		components/playlist/ml_item.cpp \
+		components/playlist/ml_model.cpp \
 		components/playlist/vlc_model.cpp \
 		components/playlist/playlist_model.cpp \
 		components/playlist/playlist_item.cpp \
@@ -343,6 +347,8 @@ noinst_HEADERS = \
 	components/epg/EPGView.hpp \
 	components/epg/EPGWidget.hpp \
 	components/playlist/views.hpp \
+    components/playlist/ml_item.hpp \
+    components/playlist/ml_model.hpp \
 	components/playlist/vlc_model.hpp \
 	components/playlist/playlist_model.hpp \
 	components/playlist/playlist_item.hpp \

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sorting.h : commun sorting & column display code
  ****************************************************************************
- * Copyright © 2008 the VideoLAN team
+ * Copyright © 2008 the VideoLAN team and AUTHORS
  * $Id$
  *
  * Authors: Rafaël Carré <funman@videolanorg>
@@ -21,6 +21,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef _SORTING_H_
+#define _SORTING_H_
+#include <vlc_media_library.h>
 /* You can use these numbers with | and & to determine what you want to show */
 enum
 {
@@ -33,10 +36,12 @@ enum
     COLUMN_DESCRIPTION    = 0x0040,
     COLUMN_URI            = 0x0080,
     COLUMN_NUMBER         = 0x0100,
+    COLUMN_RATING         = 0x0200,
+    COLUMN_COVER          = 0x0400,
 
     /* Add new entries here and update the COLUMN_END value*/
 
-    COLUMN_END          = 0x0200
+    COLUMN_END          = 0x0800
 };
 
 #define COLUMN_DEFAULT (COLUMN_TITLE|COLUMN_DURATION|COLUMN_ALBUM)
@@ -55,6 +60,8 @@ static inline const char * psz_column_title( uint32_t i_column )
     case COLUMN_TRACK_NUMBER:    return VLC_META_TRACK_NUMBER;
     case COLUMN_DESCRIPTION:     return VLC_META_DESCRIPTION;
     case COLUMN_URI:             return _("URI");
+    case COLUMN_RATING:          return VLC_META_RATING;
+    case COLUMN_COVER:           return VLC_META_ART_URL;
     default: abort();
     }
 }
@@ -88,6 +95,10 @@ static inline char * psz_column_meta( input_item_t *p_item, uint32_t i_column )
         return input_item_GetDescription( p_item );
     case COLUMN_URI:
         return input_item_GetURI( p_item );
+    case COLUMN_RATING:
+        return input_item_GetRating( p_item );
+    case COLUMN_COVER:
+        return input_item_GetArtworkURL( p_item );
     default:
         abort();
     }
@@ -107,6 +118,28 @@ static inline int i_column_sorting( uint32_t i_column )
     case COLUMN_TRACK_NUMBER:   return SORT_TRACK_NUMBER;
     case COLUMN_DESCRIPTION:    return SORT_DESCRIPTION;
     case COLUMN_URI:            return SORT_URI;
+    case COLUMN_RATING:         return SORT_RATING;
     default: abort();
     }
 }
+
+static inline ml_select_e meta_to_mlmeta( uint32_t i_column )
+{
+    switch( i_column )
+    {
+    case COLUMN_NUMBER:         return ML_ID;
+    case COLUMN_TITLE:          return ML_TITLE;
+    case COLUMN_DURATION:       return ML_DURATION;
+    case COLUMN_ARTIST:         return ML_ARTIST;
+    case COLUMN_GENRE:          return ML_GENRE;
+    case COLUMN_ALBUM:          return ML_ALBUM;
+    case COLUMN_TRACK_NUMBER:   return ML_TRACK_NUMBER;
+    case COLUMN_DESCRIPTION:    return ML_EXTRA;
+    case COLUMN_URI:            return ML_URI;
+    case COLUMN_RATING:         return ML_VOTE;
+    case COLUMN_COVER:          return ML_COVER;
+    default: abort();
+    }
+}
+
+#endif
