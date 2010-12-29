@@ -29,13 +29,14 @@
 # include "config.h"
 #endif
 
-#include "qt4.hpp"
-
 #include <vlc_input.h>
 #include <vlc_playlist.h>
-
+#include "vlc_model.hpp"
 #include "playlist_item.hpp"
 
+#include <QObject>
+#include <QEvent>
+#include <QSignalMapper>
 #include <QMimeData>
 #include <QAbstractItemModel>
 #include <QVariant>
@@ -46,20 +47,14 @@ class PLSelector;
 class PlMimeData;
 class QSignalMapper;
 
-class PLModel : public QAbstractItemModel
+class PLModel : public VLCModel
 {
     Q_OBJECT
 
 public:
-    enum {
-      IsCurrentRole = Qt::UserRole,
-      IsLeafNodeRole,
-      IsCurrentsParentNodeRole
-    };
-
     PLModel( playlist_t *, intf_thread_t *,
              playlist_item_t *, QObject *parent = 0 );
-    ~PLModel();
+    virtual ~PLModel();
 
     /*** QModel subclassing ***/
 
@@ -86,18 +81,16 @@ public:
     QStringList selectedURIs();
     QModelIndex index( PLItem *, const int c ) const;
     QModelIndex index( const int i_id, const int c );
-    QModelIndex currentIndex() const;
+    virtual QModelIndex currentIndex() const;
     bool isParent( const QModelIndex &index, const QModelIndex &current) const;
     bool isCurrent( const QModelIndex &index ) const;
     int itemId( const QModelIndex &index ) const;
-    static int columnFromMeta( int meta_column );
-    static int columnToMeta( int column );
 
-    static QString getMeta( const QModelIndex & index, int meta );
     static QPixmap getArtPixmap( const QModelIndex & index, const QSize & size );
+    static QString getMeta( const QModelIndex & index, int meta );
 
     /* Actions */
-    bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
+    virtual bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
     void doDelete( QModelIndexList selected );
     void search( const QString& search_text, const QModelIndex & root, bool b_recursive );
     void sort( const int column, Qt::SortOrder order );
@@ -111,13 +104,17 @@ public:
             return static_cast<PLItem*>( index.internalPointer() );
         else return rootItem;
     }
+    virtual int getId( QModelIndex index ) const
+    {
+        return getItem( index )->id();
+    }
 
 signals:
     void currentChanged( const QModelIndex& );
     void rootChanged();
 
 public slots:
-    void activateItem( const QModelIndex &index );
+    virtual void activateItem( const QModelIndex &index );
     void activateItem( playlist_item_t *p_item );
 
 private:
@@ -125,7 +122,6 @@ private:
     PLItem *rootItem;
 
     playlist_t *p_playlist;
-    intf_thread_t *p_intf;
 
     static QIcon icons[ITEM_TYPE_NUMBER];
 

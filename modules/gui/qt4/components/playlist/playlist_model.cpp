@@ -66,9 +66,8 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
                   intf_thread_t *_p_intf,   /* main Qt p_intf */
                   playlist_item_t * p_root,
                   QObject *parent )         /* Basic Qt parent */
-                  : QAbstractItemModel( parent )
+                  : VLCModel( _p_intf, parent )
 {
-    p_intf            = _p_intf;
     p_playlist        = _p_playlist;
     i_cached_id       = -1;
     i_cached_input_id = -1;
@@ -338,6 +337,21 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
         QString returninfo;
         if( metadata == COLUMN_NUMBER )
             returninfo = QString::number( index.row() + 1 );
+        else if( metadata == COLUMN_COVER )
+        {
+            QString artUrl;
+            artUrl = InputManager::decodeArtURL( item->inputItem() );
+            if( artUrl.isEmpty() )
+            {
+                for( int i = 0; i < item->childCount(); i++ )
+                {
+                    artUrl = InputManager::decodeArtURL( item->child( i )->inputItem() );
+                    if( !artUrl.isEmpty() )
+                        break;
+                }
+            }
+            return QVariant( artUrl );
+        }
         else
         {
             char *psz = psz_column_meta( item->p_input, metadata );
@@ -558,34 +572,6 @@ PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_input ) const
     return NULL;
 }
 
-int PLModel::columnToMeta( int _column )
-{
-    int meta = 1;
-    int column = 0;
-
-    while( column != _column && meta != COLUMN_END )
-    {
-        meta <<= 1;
-        column++;
-    }
-
-    return meta;
-}
-
-int PLModel::columnFromMeta( int meta_col )
-{
-    int meta = 1;
-    int column = 0;
-
-    while( meta != meta_col && meta != COLUMN_END )
-    {
-        meta <<= 1;
-        column++;
-    }
-
-    return column;
-}
-
 bool PLModel::canEdit() const
 {
     return (
@@ -601,10 +587,11 @@ bool PLModel::canEdit() const
 QString PLModel::getMeta( const QModelIndex & index, int meta )
 {
     return index.model()->index( index.row(),
-                                  PLModel::columnFromMeta( meta ),
-                                  index.parent() )
-                                .data().toString();
+            columnFromMeta( meta ),
+            index.parent() )
+            .data().toString();
 }
+
 
 QPixmap PLModel::getArtPixmap( const QModelIndex & index, const QSize & size )
 {

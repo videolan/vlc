@@ -49,11 +49,11 @@ public:
     void removeChildren();
     void takeChildAt( int );
 
-    PLItem *child( int row ) { return children.value( row ); }
+    PLItem *child( int row ) const { return children.value( row ); }
     int childCount() const { return children.count(); }
 
     PLItem *parent() { return parentItem; }
-    input_item_t *inputItem() { return p_input; }
+    input_item_t *inputItem() const { return p_input; }
     int id() { return i_id; }
     bool operator< ( PLItem& );
 
