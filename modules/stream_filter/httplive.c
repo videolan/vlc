@@ -339,7 +339,7 @@ static char *parse_Attributes(const char *line, const char *attr)
     return NULL;
 }
 
-static char *relative_URI(stream_t *s, const char *uri, char *psz_uri)
+static char *relative_URI(stream_t *s, const char *uri, const char *path)
 {
     stream_sys_t *p_sys = s->p_sys;
 
@@ -347,8 +347,9 @@ static char *relative_URI(stream_t *s, const char *uri, char *psz_uri)
     if (p != NULL)
         return NULL;
 
+    char *psz_uri = NULL;
     if (asprintf(&psz_uri, "%s://%s%s/%s", p_sys->m3u8.psz_protocol,
-                 p_sys->m3u8.psz_host, p_sys->m3u8.psz_path, uri) < 0)
+                 p_sys->m3u8.psz_host, path ? path : p_sys->m3u8.psz_path, uri) < 0)
         return NULL;
 
     return psz_uri;
@@ -369,8 +370,16 @@ static void parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_rea
         return;
     }
 
-    char *psz_uri = NULL;
-    psz_uri = relative_URI(s, uri, psz_uri);
+    char *psz_path = strdup(hls->url.psz_path);
+    if (psz_path == NULL)
+    {
+        p_sys->b_error = true;
+        return;
+    }
+    char *p = strrchr(psz_path, '/');
+    if (p) *p = '\0';
+    char *psz_uri = relative_URI(s, uri, psz_path);
+    free(psz_path);
 
     vlc_mutex_lock(&hls->lock);
     segment_t *segment = segment_New(hls, duration, psz_uri ? psz_uri : uri);
@@ -442,8 +451,7 @@ static void parse_StreamInformation(stream_t *s, vlc_array_t **hls_stream,
 
     msg_Info(s, "bandwidth adaption detected (program-id=%d, bandwidth=%"PRIu64").", id, bw);
 
-    char *psz_uri = NULL;
-    psz_uri = relative_URI(s, uri, psz_uri);
+    char *psz_uri = relative_URI(s, uri, NULL);
 
     hls_stream_t *hls = hls_New(*hls_stream, id, bw, psz_uri ? psz_uri : uri);
     if (hls == NULL)
