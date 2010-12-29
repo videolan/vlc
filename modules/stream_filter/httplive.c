@@ -347,22 +347,30 @@ static char *relative_URI(stream_t *s, const char *uri, const char *path)
     if (p != NULL)
         return NULL;
 
+    char *psz_path = strdup(p_sys->m3u8.psz_path);
+    if (psz_path == NULL) return NULL;
+    p = strrchr(psz_path, '/');
+    if (p) *p = '\0';
+
     char *psz_uri = NULL;
     if (p_sys->m3u8.psz_password || p_sys->m3u8.psz_username)
     {
         if (asprintf(&psz_uri, "%s://%s:%s@%s%s/%s", p_sys->m3u8.psz_protocol,
                      p_sys->m3u8.psz_username, p_sys->m3u8.psz_password,
-                     p_sys->m3u8.psz_host,
-                     path ? path : p_sys->m3u8.psz_path, uri) < 0)
-            return NULL;
+                     p_sys->m3u8.psz_host, path ? path : psz_path, uri) < 0)
+            goto fail;
     }
     else
     {
         if (asprintf(&psz_uri, "%s://%s%s/%s", p_sys->m3u8.psz_protocol,
-                 p_sys->m3u8.psz_host, path ? path : p_sys->m3u8.psz_path, uri) < 0)
-           return NULL;
+                 p_sys->m3u8.psz_host, path ? path : psz_path, uri) < 0)
+           goto fail;
     }
     return psz_uri;
+
+fail:
+    free(psz_path);
+    return NULL;
 }
 
 static void parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_read, char *uri)
@@ -1270,8 +1278,6 @@ static int Open(vlc_object_t *p_this)
         free(p_sys);
         return VLC_ENOMEM;
     }
-    char *psz_path = strrchr(psz_uri, '/');
-    if (psz_path) *psz_path = '\0';
     vlc_UrlParse(&p_sys->m3u8, psz_uri, 0);
     free(psz_uri);
 
