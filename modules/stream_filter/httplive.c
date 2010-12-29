@@ -530,6 +530,7 @@ static void parse_MediaSequence(stream_t *s, hls_stream_t *hls, char *p_read)
     if (hls->sequence > 0)
         msg_Err(s, "EXT-X-MEDIA-SEQUENCE already present in playlist");
 
+    msg_Info(s, "#EXT-X-MEDIA-SEQUENCE:%d", sequence);
     hls->sequence = sequence;
 }
 
@@ -982,7 +983,7 @@ static int parse_HTTPLiveStreaming(stream_t *s)
 }
 
 /* Reload playlist */
-static int hls_UpdatePlaylist(hls_stream_t *hls_new, hls_stream_t **hls)
+static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t **hls)
 {
     int count = vlc_array_count(hls_new->segments);
 
@@ -1001,7 +1002,13 @@ static int hls_UpdatePlaylist(hls_stream_t *hls_new, hls_stream_t **hls)
             if ((p->sequence != segment->sequence) ||
                 (p->duration != segment->duration) ||
                 (strcmp(p->url.psz_path, segment->url.psz_path) != 0))
-                goto fail_and_unlock;
+            {
+                msg_Err(s, "existing segment %d found with different content",
+                        p->sequence);
+                msg_Err(s, "- sequence: new=%d, old=%d", p->sequence, segment->sequence);
+                msg_Err(s, "- duration: new=%d, old=%d", p->duration, segment->duration);
+                msg_Err(s, "- file: new=%s, old=%s", p->url.psz_path, segment->url.psz_path);
+            }
         }
         else
         {
@@ -1009,6 +1016,8 @@ static int hls_UpdatePlaylist(hls_stream_t *hls_new, hls_stream_t **hls)
             segment_t *l = segment_GetSegment(*hls, last);
             if (l == NULL) goto fail_and_unlock;
 
+            msg_Info(s, "adding segment %d after %d",
+                     p->sequence, l->sequence);
             if ((l->sequence + 1) == p->sequence)
             {
                 vlc_array_append((*hls)->segments, p);
@@ -1038,6 +1047,7 @@ static int hls_ReloadPlaylist(stream_t *s)
     if (hls_streams == NULL)
         return VLC_ENOMEM;
 
+    msg_Info(s, "Reloading HLS live meta playlist");
     if (get_HTTPLiveMetaPlaylist(s, &hls_streams) != VLC_SUCCESS)
         goto fail;
 
@@ -1051,7 +1061,7 @@ static int hls_ReloadPlaylist(stream_t *s)
             hls_stream_t *hls = hls_Get(hls_streams, n);
             if (hls == NULL) goto fail;
 
-            msg_Dbg(s, "parsing %s", hls->url.psz_path);
+            msg_Info(s, "parsing %s", hls->url.psz_path);
             if (get_HTTPLivePlaylist(s, hls) != VLC_SUCCESS)
             {
                 msg_Err(s, "could not parse playlist file from meta index." );
@@ -1061,6 +1071,7 @@ static int hls_ReloadPlaylist(stream_t *s)
     }
 
     /* merge playlists */
+    msg_Info(s, "Merging playlist");
     for (int n = 0; n < count; n++)
     {
         hls_stream_t *hls_new = hls_Get(hls_streams, n);
@@ -1070,8 +1081,10 @@ static int hls_ReloadPlaylist(stream_t *s)
         if (hls_old == NULL)
         {   /* new hls stream - append */
             vlc_array_append(p_sys->hls_stream, hls_new);
+            msg_Info(s, "New HLS stream appended (id=%d, bandwidth=%"PRIu64")",
+                     hls_new->id, hls_new->bandwidth);
         }
-        else if (hls_UpdatePlaylist(hls_new, &hls_old) != VLC_SUCCESS)
+        else if (hls_UpdatePlaylist(s, hls_new, &hls_old) != VLC_SUCCESS)
             goto fail;
     }
 
@@ -1079,6 +1092,7 @@ static int hls_ReloadPlaylist(stream_t *s)
     return VLC_SUCCESS;
 
 fail:
+    msg_Err(s, "reloading playlist failed");
     vlc_array_destroy(hls_streams);
     return VLC_EGENERIC;
 }
