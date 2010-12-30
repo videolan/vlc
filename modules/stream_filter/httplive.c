@@ -366,6 +366,7 @@ static char *relative_URI(stream_t *s, const char *uri, const char *path)
                  p_sys->m3u8.psz_host, path ? path : psz_path, uri) < 0)
            goto fail;
     }
+    free(psz_path);
     return psz_uri;
 
 fail:
