@@ -64,6 +64,15 @@ static void Close        ( vlc_object_t * );
 #define HEIGHT_TEXT N_("Video height")
 #define HEIGHT_LONGTEXT N_("The height of the video window, in pixels.")
 
+#define MESHX_TEXT N_("Mesh width")
+#define MESHX_LONGTEXT N_("The width of the mesh, in pixels.")
+
+#define MESHY_TEXT N_("Mesh height")
+#define MESHY_LONGTEXT N_("The height of the mesh, in pixels.")
+
+#define TEXTURE_TEXT N_("Texture size")
+#define TEXTURE_LONGTEXT N_("The size of the texture, in pixels.")
+
 vlc_module_begin ()
     set_shortname( N_("projectM"))
     set_description( N_("libprojectM effect") )
@@ -84,6 +93,12 @@ vlc_module_begin ()
     add_integer( "projectm-width", 800, WIDTH_TEXT, WIDTH_LONGTEXT,
                  false )
     add_integer( "projectm-height", 640, HEIGHT_TEXT, HEIGHT_LONGTEXT,
+                 false )
+    add_integer( "projectm-meshx", 32, MESHX_TEXT, MESHX_LONGTEXT,
+                 false )
+    add_integer( "projectm-meshy", 24, MESHY_TEXT, MESHY_LONGTEXT,
+                 false )
+    add_integer( "projectm-texture-size", 1024, TEXTURE_TEXT, TEXTURE_LONGTEXT,
                  false )
     add_shortcut( "projectm" )
     set_callbacks( Open, Close )
@@ -330,17 +345,17 @@ static void *Thread( void *p_data )
     /* Create the projectM object */
 #ifndef HAVE_PROJECTM2
     psz_config = var_InheritString( p_filter, "projectm-config" );
-    p_projectm new projectM( psz_config );
+    p_projectm = new projectM( psz_config );
     free( psz_config );
 #else
     psz_preset_path = var_InheritString( p_filter, "projectm-preset-path" );
     psz_title_font = var_InheritString( p_filter, "projectm-title-font" );
     psz_menu_font = var_InheritString( p_filter, "projectm-menu-font" );
 
-    settings.meshX = 32;
-    settings.meshY = 24;
+    settings.meshX = var_InheritInteger( p_filter, "projectm-meshx" );
+    settings.meshY = var_InheritInteger( p_filter, "projectm-meshy" );
     settings.fps = 35;
-    settings.textureSize = 1024;
+    settings.textureSize = var_InheritInteger( p_filter, "projectm-texture-size" );
     settings.windowWidth = p_sys->i_width;
     settings.windowHeight = p_sys->i_height;
     settings.presetURL = psz_preset_path;
@@ -365,7 +380,8 @@ static void *Thread( void *p_data )
     vlc_sem_post( &p_sys->ready );
 
     /* Choose a preset randomly or projectM will always show the first one */
-    p_projectm->selectPreset( (unsigned)vlc_mrand48() % p_projectm->getPlaylistSize() );
+    if ( p_projectm->getPlaylistSize() > 0 )
+        p_projectm->selectPreset( (unsigned)vlc_mrand48() % p_projectm->getPlaylistSize() );
 
     /* */
     for( ;; )
