@@ -1758,7 +1758,7 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
 
         if (segment->size == segment->data->i_buffer)
             msg_Info(s, "playing segment %d from stream %d",
-                        p_sys->playback.segment, p_sys->playback.current);
+                     segment->sequence, p_sys->playback.current);
 
         ssize_t len = -1;
         if (i_read <= segment->data->i_buffer)
