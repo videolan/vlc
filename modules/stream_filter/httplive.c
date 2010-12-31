@@ -1660,7 +1660,7 @@ static segment_t *GetSegment(stream_t *s)
             {
                 p_sys->b_cache = hls->b_cache;
                 vlc_mutex_unlock(&hls->lock);
-                return segment;
+                goto check;
             }
         }
         vlc_mutex_unlock(&hls->lock);
@@ -1695,7 +1695,7 @@ static segment_t *GetSegment(stream_t *s)
             p_sys->playback.current = i_stream;
             p_sys->b_cache = hls->b_cache;
             vlc_mutex_unlock(&hls->lock);
-            return segment;
+            goto check;
         }
         vlc_mutex_unlock(&hls->lock);
 
@@ -1709,6 +1709,14 @@ static segment_t *GetSegment(stream_t *s)
     }
     /* */
     return NULL;
+
+check:
+    /* sanity check */
+    if (p_sys->thread->segment - p_sys->playback.segment == 0)
+        msg_Err(s, "playback will stall");
+    else if (p_sys->thread->segment - p_sys->playback.segment < 3)
+        msg_Warn(s, "playback in danger of stalling");
+    return segment;
 }
 
 static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
