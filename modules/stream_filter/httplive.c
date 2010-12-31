@@ -1216,9 +1216,10 @@ static void* hls_Thread(vlc_object_t *p_this)
             vlc_mutex_lock(&p_sys->download.lock_wait);
             while (((p_sys->download.segment - p_sys->playback.segment > 6) ||
                     (p_sys->download.segment >= count)) &&
-                   (p_sys->download.seek == -1) &&
-                   (mdate() < p_sys->playlist.wakeup))
+                   (p_sys->download.seek == -1))
             {
+                if (p_sys->b_live && (mdate() >= p_sys->playlist.wakeup))
+                    break;
                 vlc_cond_wait(&p_sys->download.wait, &p_sys->download.lock_wait);
                 if (!vlc_object_alive(p_this)) break;
             }
