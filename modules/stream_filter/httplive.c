@@ -447,10 +447,8 @@ static void parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_rea
     free(psz_uri);
 }
 
-static void parse_TargetDuration(stream_t *s, hls_stream_t *hls, char *p_read)
+static int parse_TargetDuration(stream_t *s, hls_stream_t *hls, char *p_read)
 {
-    stream_sys_t *p_sys = s->p_sys;
-
     assert(hls);
 
     int duration = -1;
@@ -458,11 +456,11 @@ static void parse_TargetDuration(stream_t *s, hls_stream_t *hls, char *p_read)
     if (ret != 1)
     {
         msg_Err(s, "expected #EXT-X-TARGETDURATION:<s>");
-        p_sys->b_error = true;
-        return;
+        return VLC_EGENERIC;
     }
 
     hls->duration = duration; /* seconds */
+    return VLC_SUCCESS;
 }
 
 static void parse_StreamInformation(stream_t *s, vlc_array_t **hls_stream,
@@ -512,10 +510,8 @@ static void parse_StreamInformation(stream_t *s, vlc_array_t **hls_stream,
     free(psz_uri);
 }
 
-static void parse_MediaSequence(stream_t *s, hls_stream_t *hls, char *p_read)
+static int parse_MediaSequence(stream_t *s, hls_stream_t *hls, char *p_read)
 {
-    stream_sys_t *p_sys = s->p_sys;
-
     assert(hls);
 
     int sequence;
@@ -523,8 +519,7 @@ static void parse_MediaSequence(stream_t *s, hls_stream_t *hls, char *p_read)
     if (ret != 1)
     {
         msg_Err(s, "expected #EXT-X-MEDIA-SEQUENCE:<s>");
-        p_sys->b_error = true;
-        return;
+        return VLC_EGENERIC;
     }
 
     if (hls->sequence > 0)
@@ -532,29 +527,30 @@ static void parse_MediaSequence(stream_t *s, hls_stream_t *hls, char *p_read)
 
     msg_Info(s, "#EXT-X-MEDIA-SEQUENCE:%d", sequence);
     hls->sequence = sequence;
+    return VLC_SUCCESS;
 }
 
-static void parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
+static int parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
 {
-    stream_sys_t *p_sys = s->p_sys;
-
     assert(hls);
 
     /* #EXT-X-KEY:METHOD=<method>[,URI="<URI>"][,IV=<IV>] */
-    char *attr;
-    attr = parse_Attributes(p_read, "METHOD");
+    int err = VLC_SUCCESS;
+    char *attr = parse_Attributes(p_read, "METHOD");
     if (attr == NULL)
     {
         msg_Err(s, "#EXT-X-KEY: expected METHOD=<value>");
-        p_sys->b_error = true;
+        return err;
     }
-    else if (strncasecmp(attr, "NONE", 4) == 0)
+
+    if (strncasecmp(attr, "NONE", 4) == 0)
     {
+
         char *uri = parse_Attributes(p_read, "URI");
         if (uri != NULL)
         {
             msg_Err(s, "#EXT-X-KEY: URI not expected");
-            p_sys->b_error = true;
+            err = VLC_EGENERIC;
         }
         free(uri);
         /* IV is only supported in version 2 and above */
@@ -564,7 +560,7 @@ static void parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
             if (iv != NULL)
             {
                 msg_Err(s, "#EXT-X-KEY: IV not expected");
-                p_sys->b_error = true;
+                err = VLC_EGENERIC;
             }
             free(iv);
         }
@@ -572,21 +568,21 @@ static void parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
     else
     {
         msg_Warn(s, "playback of encrypted HTTP Live media is not supported.");
-        p_sys->b_error = true;
+        err = VLC_EGENERIC;
     }
     free(attr);
+    return err;
 }
 
-static void parse_ProgramDateTime(stream_t *s, hls_stream_t *hls, char *p_read)
+static int parse_ProgramDateTime(stream_t *s, hls_stream_t *hls, char *p_read)
 {
     VLC_UNUSED(hls);
     msg_Dbg(s, "tag not supported: #EXT-X-PROGRAM-DATE-TIME %s", p_read);
+    return VLC_SUCCESS;
 }
 
-static void parse_AllowCache(stream_t *s, hls_stream_t *hls, char *p_read)
+static int parse_AllowCache(stream_t *s, hls_stream_t *hls, char *p_read)
 {
-    stream_sys_t *p_sys = s->p_sys;
-
     assert(hls);
 
     char answer[4] = "\0";
@@ -594,17 +590,15 @@ static void parse_AllowCache(stream_t *s, hls_stream_t *hls, char *p_read)
     if (ret != 1)
     {
         msg_Err(s, "#EXT-X-ALLOW-CACHE, ignoring ...");
-        p_sys->b_error = true;
-        return;
+        return VLC_EGENERIC;
     }
 
     hls->b_cache = (strncmp(answer, "NO", 2) != 0);
+    return VLC_SUCCESS;
 }
 
-static void parse_Version(stream_t *s, hls_stream_t *hls, char *p_read)
+static int parse_Version(stream_t *s, hls_stream_t *hls, char *p_read)
 {
-    stream_sys_t *p_sys = s->p_sys;
-
     assert(hls);
 
     int version;
@@ -612,8 +606,7 @@ static void parse_Version(stream_t *s, hls_stream_t *hls, char *p_read)
     if (ret != 1)
     {
         msg_Err(s, "#EXT-X-VERSION: no protocol version found, should be version 1.");
-        p_sys->b_error = true;
-        return;
+        return VLC_EGENERIC;
     }
 
     /* Check version */
@@ -621,48 +614,53 @@ static void parse_Version(stream_t *s, hls_stream_t *hls, char *p_read)
     if (hls->version != 1)
     {
         msg_Err(s, "#EXT-X-VERSION should be version 1 iso %d", version);
-        p_sys->b_error = true;
+        return VLC_EGENERIC;
     }
+    return VLC_SUCCESS;
 }
 
-static void parse_EndList(stream_t *s, hls_stream_t *hls)
+static int parse_EndList(stream_t *s, hls_stream_t *hls)
 {
-    stream_sys_t *p_sys = s->p_sys;
-
     assert(hls);
 
-    p_sys->b_live = false;
+    s->p_sys->b_live = false;
     msg_Info(s, "video on demand (vod) mode");
+    return VLC_SUCCESS;
 }
 
-static void parse_Discontinuity(stream_t *s, hls_stream_t *hls, char *p_read)
+static int parse_Discontinuity(stream_t *s, hls_stream_t *hls, char *p_read)
 {
     assert(hls);
 
     /* FIXME: Do we need to act on discontinuity ?? */
     msg_Dbg(s, "#EXT-X-DISCONTINUITY %s", p_read);
+    return VLC_SUCCESS;
 }
 
 static void parse_M3U8ExtLine(stream_t *s, hls_stream_t *hls, char *line)
 {
     if (*line == '#')
     {
+        int err = VLC_SUCCESS;
         if (strncmp(line, "#EXT-X-TARGETDURATION", 21) == 0)
-            parse_TargetDuration(s, hls, line);
+            err = parse_TargetDuration(s, hls, line);
         else if (strncmp(line, "#EXT-X-MEDIA-SEQUENCE", 21) == 0)
-            parse_MediaSequence(s, hls, line);
+            err = parse_MediaSequence(s, hls, line);
         else if (strncmp(line, "#EXT-X-KEY", 10) == 0)
-            parse_Key(s, hls, line);
+            err = parse_Key(s, hls, line);
         else if (strncmp(line, "#EXT-X-PROGRAM-DATE-TIME", 24) == 0)
-            parse_ProgramDateTime(s, hls, line);
+            err = parse_ProgramDateTime(s, hls, line);
         else if (strncmp(line, "#EXT-X-ALLOW-CACHE", 18) == 0)
-            parse_AllowCache(s, hls, line);
+            err = parse_AllowCache(s, hls, line);
         else if (strncmp(line, "#EXT-X-DISCONTINUITY", 20) == 0)
-            parse_Discontinuity(s, hls, line);
+            err = parse_Discontinuity(s, hls, line);
         else if (strncmp(line, "#EXT-X-VERSION", 14) == 0)
-            parse_Version(s, hls, line);
+            err = parse_Version(s, hls, line);
         else if (strncmp(line, "#EXT-X-ENDLIST", 14) == 0)
-            parse_EndList(s, hls);
+            err = parse_EndList(s, hls);
+
+        if (err != VLC_SUCCESS)
+            s->p_sys->b_error = true;
     }
 }
 
