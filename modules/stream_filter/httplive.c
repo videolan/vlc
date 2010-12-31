@@ -525,7 +525,6 @@ static int parse_MediaSequence(stream_t *s, hls_stream_t *hls, char *p_read)
     if (hls->sequence > 0)
         msg_Err(s, "EXT-X-MEDIA-SEQUENCE already present in playlist");
 
-    msg_Info(s, "#EXT-X-MEDIA-SEQUENCE:%d", sequence);
     hls->sequence = sequence;
     return VLC_SUCCESS;
 }
@@ -1014,8 +1013,6 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
             segment_t *l = segment_GetSegment(*hls, last);
             if (l == NULL) goto fail_and_unlock;
 
-            msg_Info(s, "adding segment %d after %d",
-                     p->sequence, l->sequence);
             if ((l->sequence + 1) == p->sequence)
             {
                 vlc_array_append((*hls)->segments, p);
@@ -1023,7 +1020,7 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
             }
             else /* there is a gap */
             {
-                msg_Err(s, "gap in sequence numbers found: new=%d, old=%d",
+                msg_Err(s, "gap in sequence numbers found: new=%d expected old=%d",
                         p->sequence, l->sequence);
                 goto fail_and_unlock;
             }
@@ -1069,7 +1066,6 @@ static int hls_ReloadPlaylist(stream_t *s)
     }
 
     /* merge playlists */
-    msg_Info(s, "Merging playlist");
     for (int n = 0; n < count; n++)
     {
         hls_stream_t *hls_new = hls_Get(hls_streams, n);
@@ -1079,7 +1075,7 @@ static int hls_ReloadPlaylist(stream_t *s)
         if (hls_old == NULL)
         {   /* new hls stream - append */
             vlc_array_append(p_sys->hls_stream, hls_new);
-            msg_Info(s, "New HLS stream appended (id=%d, bandwidth=%"PRIu64")",
+            msg_Info(s, "new HLS stream appended (id=%d, bandwidth=%"PRIu64")",
                      hls_new->id, hls_new->bandwidth);
         }
         else if (hls_UpdatePlaylist(s, hls_new, &hls_old) != VLC_SUCCESS)
