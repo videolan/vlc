@@ -207,9 +207,6 @@ case $TARGET in
 
         CFLAGS_TUNING=" -arch ppc -mtune=G4"
         EXTRA_LDFLAGS=" -arch ppc"
-
-        # FIXME - this one seems to be redundant?
-        LD="ld -arch ppc -syslibroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
     ;;
     i686-apple-darwin*)
         hint_distro macosx32
@@ -328,6 +325,10 @@ case "$DISTRO" in
     EXTRA_CFLAGS="${EXTRA_CFLAGS} -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
     CC="/usr/bin/gcc-4.2"
     CXX="/usr/bin/g++-4.2"
+    LD="ld"
+    RANLIB="ranlib"
+    AR=
+    STRIP="strip"
     add_makefile_cfg "PATH = /bin:/usr/bin:/usr/local/bin"
     add_makefile_cfg "SDK_TARGET = ${SDK_TARGET}"
     add_makefile_cfg "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}"
@@ -404,6 +405,12 @@ if test "$TARGET" != "$BUILD"; then
     if test ${DISTRO} = "win32"; then
         echo "SET(CMAKE_SYSTEM_NAME Windows)" >> "${toolchain_cmake}"
     fi
+    if test ${DISTRO} = "macosx64"||"macosx32"; then
+        echo "SET(CMAKE_SYSTEM_NAME Darwin)" >> "${toolchain_cmake}"
+        echo "set(CMAKE_C_FLAGS ${CFLAGS_TUNING} ${EXTRA_CFLAGS})" >> "${toolchain_cmake}"
+        echo "set(CMAKE_CXX_FLAGS ${CFLAGS_TUNING} ${EXTRA_CFLAGS})" >> "${toolchain_cmake}"
+        echo "set(CMAKE_LD_FLAGS ${EXTRA_LDFLAGS})" >> "${toolchain_cmake}"
+    fi
     echo "SET(CMAKE_C_COMPILER ${CC})" >> "${toolchain_cmake}"
     echo "SET(CMAKE_CXX_COMPILER ${CXX})" >> "${toolchain_cmake}"
     echo "SET(CMAKE_FIND_ROOT_PATH  `pwd` )" >> "${toolchain_cmake}"
@@ -451,19 +458,19 @@ fi
 
 if test "$DISTRO" = "macosx32"; then
     info "*****************************************************************"
-    info "* VLC will be compiled in 32bit mode.                           *"
+    info "* VLC will be compiled in 32bit mode using the 10.5 & later SDK.*"
     info "*                                                               *"
     info "* Re-run with the x86_64-apple-darwin* argument to turn on      *"
     info "* 64bit compilation for Intel-based Macs, whereas * is either   *"
     info "* 9 or 10 depending on your Darwin version.                     *"
-    info "* There is NO PPC64 support right now.                          *"
+    info "* There is no PPC64 support.                                    *"
     info "*****************************************************************"
 fi
 
 if test "$DISTRO" = "macosx64"; then
     info
     info "*****************************************************************"
-    info "* VLC will be compiled in 64bit mode using the 10.5 SDK.        *"
+    info "* VLC will be compiled in 64bit mode using the 10.5 & later SDK.*"
     info "*****************************************************************"
 fi
 
@@ -471,9 +478,9 @@ case `uname` in
     Linux)
         CPUS=`grep -c ^processor /proc/cpuinfo`
      ;;
-    Darwin)
-        CPUS=`sysctl hw.ncpu|cut -d: -f2`
-    ;;
+#    Darwin)
+#        CPUS=`sysctl hw.ncpu|cut -d: -f2`
+#    ;;
     *)
         CPUS=1  # default
      ;;
