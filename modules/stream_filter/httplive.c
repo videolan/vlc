@@ -649,13 +649,13 @@ static void parse_M3U8ExtLine(stream_t *s, hls_stream_t *hls, char *line)
     {
         if (strncmp(line, "#EXT-X-TARGETDURATION", 21) == 0)
             parse_TargetDuration(s, hls, line);
-        else if (strncmp(line, "#EXT-X-MEDIA-SEQUENCE", 22) == 0)
+        else if (strncmp(line, "#EXT-X-MEDIA-SEQUENCE", 21) == 0)
             parse_MediaSequence(s, hls, line);
-        else if (strncmp(line, "#EXT-X-KEY", 11) == 0)
+        else if (strncmp(line, "#EXT-X-KEY", 10) == 0)
             parse_Key(s, hls, line);
-        else if (strncmp(line, "#EXT-X-PROGRAM-DATE-TIME", 25) == 0)
+        else if (strncmp(line, "#EXT-X-PROGRAM-DATE-TIME", 24) == 0)
             parse_ProgramDateTime(s, hls, line);
-        else if (strncmp(line, "#EXT-X-ALLOW-CACHE", 17) == 0)
+        else if (strncmp(line, "#EXT-X-ALLOW-CACHE", 18) == 0)
             parse_AllowCache(s, hls, line);
         else if (strncmp(line, "#EXT-X-DISCONTINUITY", 20) == 0)
             parse_Discontinuity(s, hls, line);
