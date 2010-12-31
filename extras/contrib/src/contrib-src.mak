@@ -2070,6 +2070,9 @@ endif
 ifdef HAVE_WIN32
 	(cd $<; cp libmpcdec/libmpcdec_static.a $(PREFIX)/lib/libmpcdec.a)
 endif
+ifdef HAVE_MACOSX
+	(cd $<; cp libmpcdec/libmpcdec.dylib $(PREFIX)/lib/libmpcdec.dylib)
+endif
 	touch $@
 
 CLEAN_FILE += .mpcdec
