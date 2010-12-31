@@ -2060,7 +2060,10 @@ DISTCLEAN_PKG += SDL_image-$(SDL_IMAGE_VERSION).tar.gz
 
 mpcdec:
 	$(SVN) co $(MUSE_SVN) -r 468 mpcdec
-	cd $@; patch -p0 < ../Patches/libmpc-simple.patch
+	(cd $@; patch -p0 < ../Patches/libmpc-simple.patch)
+ifdef HAVE_MACOSX
+	(cd $@; sed -e 's%-O3 -Wall%-O3 -Wall $(CFLAGS)%' -i.orig  CMakeLists.txt)
+endif
 
 .mpcdec: mpcdec
 	(cd $<; cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make install)
