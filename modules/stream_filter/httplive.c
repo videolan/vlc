@@ -1192,8 +1192,7 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
 
 static void* hls_Thread(vlc_object_t *p_this)
 {
-    hls_thread_t *client = (hls_thread_t *) p_this;
-    stream_t *s = client->s;
+    stream_t *s = ((hls_thread_t*)p_this)->s;
     stream_sys_t *p_sys = s->p_sys;
 
     int canc = vlc_savecancel();
@@ -1241,7 +1240,7 @@ static void* hls_Thread(vlc_object_t *p_this)
             mtime_t now = mdate();
             if (now >= p_sys->playlist.wakeup)
             {
-                if (hls_ReloadPlaylist(client->s) != VLC_SUCCESS)
+                if (hls_ReloadPlaylist(s) != VLC_SUCCESS)
                 {
                     /* No change in playlist, then backoff */
                     p_sys->playlist.tries++;
@@ -1265,7 +1264,7 @@ static void* hls_Thread(vlc_object_t *p_this)
         assert(segment);
         vlc_mutex_unlock(&hls->lock);
 
-        if (Download(client->s, hls, segment, &p_sys->download.current) != VLC_SUCCESS)
+        if (Download(s, hls, segment, &p_sys->download.current) != VLC_SUCCESS)
         {
             if (!vlc_object_alive(p_this)) break;
 
