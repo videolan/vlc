@@ -90,13 +90,6 @@ typedef struct
     VLC_COMMON_MEMBERS
 
     /* */
-    int         current;    /* current hls_stream  */
-    int         segment;    /* current segment for downloading */
-    int         seek;       /* segment requested by seek (default -1) */
-    vlc_mutex_t lock_wait;  /* protect segment download counter */
-    vlc_cond_t  wait;       /* some condition to wait on */
-    vlc_array_t *hls_stream;/* bandwidth adaptation */
-
     stream_t    *s;
 } hls_thread_t;
 
@@ -110,8 +103,18 @@ struct stream_sys_t
     vlc_array_t  *hls_stream;/* bandwidth adaptation */
     uint64_t      bandwidth; /* measured bandwidth (bits per second) */
 
+    /* Download */
+    struct hls_download_s
+    {
+        int         current;    /* current hls_stream  */
+        int         segment;    /* current segment for downloading */
+        int         seek;       /* segment requested by seek (default -1) */
+        vlc_mutex_t lock_wait;  /* protect segment download counter */
+        vlc_cond_t  wait;       /* some condition to wait on */
+    } download;
+
     /* Playback */
-    struct hls_playback_t
+    struct hls_playback_s
     {
         uint64_t    offset;     /* current offset in media */
         int         current;    /* current hls_stream  */
@@ -1197,7 +1200,7 @@ static void* hls_Thread(vlc_object_t *p_this)
 
     while (vlc_object_alive(p_this))
     {
-        hls_stream_t *hls = hls_Get(client->hls_stream, client->current);
+        hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->download.current);
         assert(hls);
 
         /* Sliding window (~60 seconds worth of movie) */
@@ -1207,25 +1210,25 @@ static void* hls_Thread(vlc_object_t *p_this)
 
         /* Is there a new segment to process? */
         if ((!p_sys->b_live && (p_sys->playback.segment < (count - 6))) ||
-            (client->segment >= count))
+            (p_sys->download.segment >= count))
         {
             /* wait */
-            vlc_mutex_lock(&client->lock_wait);
-            while (((client->segment - p_sys->playback.segment > 6) ||
-                    (client->segment >= count)) &&
-                   (client->seek == -1) &&
+            vlc_mutex_lock(&p_sys->download.lock_wait);
+            while (((p_sys->download.segment - p_sys->playback.segment > 6) ||
+                    (p_sys->download.segment >= count)) &&
+                   (p_sys->download.seek == -1) &&
                    (mdate() < p_sys->playlist.wakeup))
             {
-                vlc_cond_wait(&client->wait, &client->lock_wait);
+                vlc_cond_wait(&p_sys->download.wait, &p_sys->download.lock_wait);
                 if (!vlc_object_alive(p_this)) break;
             }
             /* */
-            if (client->seek >= 0)
+            if (p_sys->download.seek >= 0)
             {
-                client->segment = client->seek;
-                client->seek = -1;
+                p_sys->download.segment = p_sys->download.seek;
+                p_sys->download.seek = -1;
             }
-            vlc_mutex_unlock(&client->lock_wait);
+            vlc_mutex_unlock(&p_sys->download.lock_wait);
         }
 
         if (!vlc_object_alive(p_this)) break;
@@ -1257,11 +1260,11 @@ static void* hls_Thread(vlc_object_t *p_this)
         }
 
         vlc_mutex_lock(&hls->lock);
-        segment_t *segment = segment_GetSegment(hls, client->segment);
+        segment_t *segment = segment_GetSegment(hls, p_sys->download.segment);
         assert(segment);
         vlc_mutex_unlock(&hls->lock);
 
-        if (Download(client->s, hls, segment, &client->current) != VLC_SUCCESS)
+        if (Download(client->s, hls, segment, &p_sys->download.current) != VLC_SUCCESS)
         {
             if (!vlc_object_alive(p_this)) break;
 
@@ -1274,16 +1277,16 @@ static void* hls_Thread(vlc_object_t *p_this)
 
         /* download succeeded */
         /* determine next segment to download */
-        vlc_mutex_lock(&client->lock_wait);
-        if (client->seek >= 0)
+        vlc_mutex_lock(&p_sys->download.lock_wait);
+        if (p_sys->download.seek >= 0)
         {
-            client->segment = client->seek;
-            client->seek = -1;
+            p_sys->download.segment = p_sys->download.seek;
+            p_sys->download.seek = -1;
         }
-        else if (client->segment < count)
-            client->segment++;
-        vlc_cond_signal(&client->wait);
-        vlc_mutex_unlock(&client->lock_wait);
+        else if (p_sys->download.segment < count)
+            p_sys->download.segment++;
+        vlc_cond_signal(&p_sys->download.wait);
+        vlc_mutex_unlock(&p_sys->download.lock_wait);
     }
 
     vlc_restorecancel(canc);
@@ -1579,16 +1582,15 @@ static int Open(vlc_object_t *p_this)
                 ((mtime_t)hls->duration * UINT64_C(1000000));
     }
 
-    p_sys->thread->hls_stream = p_sys->hls_stream;
-    p_sys->thread->current = current;
+    p_sys->download.current = current;
     p_sys->playback.current = current;
-    p_sys->thread->segment = p_sys->playback.segment;
-    p_sys->thread->seek = -1;
+    p_sys->download.segment = p_sys->playback.segment;
+    p_sys->download.seek = -1;
     p_sys->playback.segment = 0; /* reset to first segment */
     p_sys->thread->s = s;
 
-    vlc_mutex_init(&p_sys->thread->lock_wait);
-    vlc_cond_init(&p_sys->thread->wait);
+    vlc_mutex_init(&p_sys->download.lock_wait);
+    vlc_cond_init(&p_sys->download.wait);
 
     if (vlc_thread_create(p_sys->thread, "HTTP Live Streaming client",
                           hls_Thread, VLC_THREAD_PRIORITY_INPUT))
@@ -1618,15 +1620,15 @@ static void Close(vlc_object_t *p_this)
     /* */
     if (p_sys->thread)
     {
-        vlc_mutex_lock(&p_sys->thread->lock_wait);
+        vlc_mutex_lock(&p_sys->download.lock_wait);
         vlc_object_kill(p_sys->thread);
-        vlc_cond_signal(&p_sys->thread->wait);
-        vlc_mutex_unlock(&p_sys->thread->lock_wait);
+        vlc_cond_signal(&p_sys->download.wait);
+        vlc_mutex_unlock(&p_sys->download.lock_wait);
 
         /* */
         vlc_thread_join(p_sys->thread);
-        vlc_mutex_destroy(&p_sys->thread->lock_wait);
-        vlc_cond_destroy(&p_sys->thread->wait);
+        vlc_mutex_destroy(&p_sys->download.lock_wait);
+        vlc_cond_destroy(&p_sys->download.wait);
         vlc_object_release(p_sys->thread);
     }
 
@@ -1689,9 +1691,9 @@ static segment_t *GetSegment(stream_t *s)
             break;
         }
 
-        vlc_mutex_lock(&p_sys->thread->lock_wait);
-        int i_segment = p_sys->thread->segment;
-        vlc_mutex_unlock(&p_sys->thread->lock_wait);
+        vlc_mutex_lock(&p_sys->download.lock_wait);
+        int i_segment = p_sys->download.segment;
+        vlc_mutex_unlock(&p_sys->download.lock_wait);
 
         /* This segment is ready? */
         if ((segment->data != NULL) &&
@@ -1717,9 +1719,9 @@ static segment_t *GetSegment(stream_t *s)
 
 check:
     /* sanity check */
-    if (p_sys->thread->segment - p_sys->playback.segment == 0)
+    if (p_sys->download.segment - p_sys->playback.segment == 0)
         msg_Err(s, "playback will stall");
-    else if (p_sys->thread->segment - p_sys->playback.segment < 3)
+    else if (p_sys->download.segment - p_sys->playback.segment < 3)
         msg_Warn(s, "playback in danger of stalling");
     return segment;
 }
@@ -1759,9 +1761,9 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
             vlc_mutex_unlock(&segment->lock);
 
             /* signal download thread */
-            vlc_mutex_lock(&p_sys->thread->lock_wait);
-            vlc_cond_signal(&p_sys->thread->wait);
-            vlc_mutex_unlock(&p_sys->thread->lock_wait);
+            vlc_mutex_lock(&p_sys->download.lock_wait);
+            vlc_cond_signal(&p_sys->download.wait);
+            vlc_mutex_unlock(&p_sys->download.lock_wait);
             continue;
         }
 
@@ -1863,8 +1865,7 @@ static bool hls_MaySeek(stream_t *s)
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    if ((p_sys->hls_stream == NULL) ||
-        (p_sys->thread == NULL))
+    if (p_sys->hls_stream == NULL)
         return false;
 
     hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->playback.current);
@@ -1876,9 +1877,9 @@ static bool hls_MaySeek(stream_t *s)
         int count = vlc_array_count(hls->segments);
         vlc_mutex_unlock(&hls->lock);
 
-        vlc_mutex_lock(&p_sys->thread->lock_wait);
-        bool may_seek = (p_sys->thread->segment < (count - 2));
-        vlc_mutex_unlock(&p_sys->thread->lock_wait);
+        vlc_mutex_lock(&p_sys->download.lock_wait);
+        bool may_seek = (p_sys->download.segment < (count - 2));
+        vlc_mutex_unlock(&p_sys->download.lock_wait);
         return may_seek;
     }
     return true;
@@ -1974,30 +1975,27 @@ static int segment_Seek(stream_t *s, uint64_t pos)
         vlc_mutex_unlock(&segment->lock);
 
         /* start download at current playback segment */
-        if (p_sys->thread)
+        vlc_mutex_unlock(&hls->lock);
+
+        /* Wake up download thread */
+        vlc_mutex_lock(&p_sys->download.lock_wait);
+        p_sys->download.seek = p_sys->playback.segment;
+        vlc_cond_signal(&p_sys->download.wait);
+        vlc_mutex_unlock(&p_sys->download.lock_wait);
+
+        /* Wait for download to be finished */
+        vlc_mutex_lock(&p_sys->download.lock_wait);
+        msg_Info(s, "seek to segment %d", p_sys->playback.segment);
+        while (((p_sys->download.seek != -1) ||
+                (p_sys->download.segment - p_sys->playback.segment < 3)) &&
+                (p_sys->download.segment < (count - 6)))
         {
-            vlc_mutex_unlock(&hls->lock);
-
-            /* Wake up download thread */
-            vlc_mutex_lock(&p_sys->thread->lock_wait);
-            p_sys->thread->seek = p_sys->playback.segment;
-            vlc_cond_signal(&p_sys->thread->wait);
-            vlc_mutex_unlock(&p_sys->thread->lock_wait);
-
-            /* Wait for download to be finished */
-            vlc_mutex_lock(&p_sys->thread->lock_wait);
-            msg_Info(s, "seek to segment %d", p_sys->playback.segment);
-            while (((p_sys->thread->seek != -1) ||
-                    (p_sys->thread->segment - p_sys->playback.segment < 3)) &&
-                    (p_sys->thread->segment < (count - 6)))
-            {
-                vlc_cond_wait(&p_sys->thread->wait, &p_sys->thread->lock_wait);
-                if (!vlc_object_alive(s) || s->b_error) break;
-            }
-            vlc_mutex_unlock(&p_sys->thread->lock_wait);
-
-            return VLC_SUCCESS;
+            vlc_cond_wait(&p_sys->download.wait, &p_sys->download.lock_wait);
+            if (!vlc_object_alive(s) || s->b_error) break;
         }
+        vlc_mutex_unlock(&p_sys->download.lock_wait);
+
+        return VLC_SUCCESS;
     }
     vlc_mutex_unlock(&hls->lock);
 
