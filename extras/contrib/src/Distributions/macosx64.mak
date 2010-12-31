@@ -6,7 +6,7 @@ all: .freetype \
     .flac .speex .shout .faad .lame .twolame .ebml .matroska .ffmpeg \
     .dvdcss .libdvdread .dvdnav .dvbpsi .live .caca .mod .fontconfig \
     .png .jpeg .tiff .gpg-error .gcrypt .gnutls .cddb .cdio .vcdimager \
-    .gecko .cmake .mpcdec .dirac_encoder .dirac_decoder \
+    .gecko .mpcdec .dirac_encoder .dirac_decoder \
     .dca .tag .x264 .lua .zvbi .fontconfig .ncurses \
     .schroedinger .libass .libupnp .kate .sqlite3 .Sparkle
 
