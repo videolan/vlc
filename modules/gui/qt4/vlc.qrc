@@ -3,8 +3,8 @@
         <file alias="vlc128.png" >../../../share/icons/128x128/vlc.png</file>
         <file alias="vlc16.png" >../../../share/icons/16x16/vlc.png</file>
         <file alias="vlc48.png" >../../../share/icons/48x48/vlc.png</file>
-        <file alias="vlc128-christmas.png" >../../../share/icons/128x128/vlc-christmas.png</file>
-        <file alias="vlc48-christmas.png" >../../../share/icons/48x48/vlc-christmas.png</file>
+        <file alias="vlc128-xmas.png" >../../../share/icons/128x128/vlc-xmas.png</file>
+        <file alias="vlc48-xmas.png" >../../../share/icons/48x48/vlc-xmas.png</file>
     </qresource>
     <qresource prefix="/menu" >
         <file alias="help" >pixmaps/menus/help_16px.png</file>

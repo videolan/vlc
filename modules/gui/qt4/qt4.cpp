@@ -44,7 +44,7 @@
 #endif
 
 #include "../../../share/icons/32x32/vlc.xpm"
-#include "../../../share/icons/32x32/vlc-christmas.xpm"
+#include "../../../share/icons/32x32/vlc-xmas.xpm"
 #include <vlc_plugin.h>
 
 #ifdef WIN32 /* For static builds */
@@ -479,8 +479,8 @@ static void *Thread( void *obj )
 
     /* Icon setting, Mac uses icon from .icns */
 #ifndef Q_WS_MAC
-    if( QDate::currentDate().dayOfYear() >= QT_CHRISTMAS_TROLL_DAY )
-        app.setWindowIcon( QIcon(vlc_christmas_xpm) );
+    if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY )
+        app.setWindowIcon( QIcon(vlc_xmas_xpm) );
     else
         app.setWindowIcon( QIcon(vlc_xpm) );
 #endif

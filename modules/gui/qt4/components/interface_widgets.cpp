@@ -212,8 +212,8 @@ void BackgroundWidget::updateArt( const QString& url )
     }
     else
     {   /* Xmas joke */
-        if( QDate::currentDate().dayOfYear() >= QT_CHRISTMAS_TROLL_DAY )
-            pixmapUrl = QString( ":/logo/vlc128-christmas.png" );
+        if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY )
+            pixmapUrl = QString( ":/logo/vlc128-xmas.png" );
         else
             pixmapUrl = QString( ":/logo/vlc128.png" );
     }

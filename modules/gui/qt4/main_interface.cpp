@@ -942,8 +942,8 @@ void MainInterface::showBuffering( float f_cache )
 void MainInterface::createSystray()
 {
     QIcon iconVLC;
-    if( QDate::currentDate().dayOfYear() >= QT_CHRISTMAS_TROLL_DAY )
-        iconVLC =  QIcon( ":/logo/vlc128-christmas.png" );
+    if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY )
+        iconVLC =  QIcon( ":/logo/vlc128-xmas.png" );
     else
         iconVLC =  QIcon( ":/logo/vlc128.png" );
     sysTray = new QSystemTrayIcon( iconVLC, this );
