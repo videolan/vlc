@@ -365,7 +365,7 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
             if( p_chk->strf.auds.p_wf->cbSize > 0 )
             {
                 memcpy( &p_chk->strf.auds.p_wf[1] ,
-                        p_buff + 8 + sizeof( WAVEFORMATEX ),    /*  8=fourrc+size */
+                        p_buff + 8 + sizeof( WAVEFORMATEX ),    /*  8=fourcc+size */
                         p_chk->strf.auds.p_wf->cbSize );
             }
 #ifdef AVI_DEBUG
