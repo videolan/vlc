@@ -1719,10 +1719,19 @@ static segment_t *GetSegment(stream_t *s)
 
 check:
     /* sanity check */
-    if (p_sys->download.segment - p_sys->playback.segment == 0)
-        msg_Err(s, "playback will stall");
-    else if (p_sys->download.segment - p_sys->playback.segment < 3)
-        msg_Warn(s, "playback in danger of stalling");
+    if (segment->data->i_buffer == 0)
+    {
+        vlc_mutex_lock(&hls->lock);
+        int count = vlc_array_count(hls->segments);
+        vlc_mutex_unlock(&hls->lock);
+
+        if ((p_sys->download.segment - p_sys->playback.segment == 0) &&
+            ((count != p_sys->download.segment) || p_sys->b_live))
+            msg_Err(s, "playback will stall");
+        else if ((p_sys->download.segment - p_sys->playback.segment < 3) &&
+                 ((count != p_sys->download.segment) || p_sys->b_live))
+            msg_Warn(s, "playback in danger of stalling");
+    }
     return segment;
 }
 
