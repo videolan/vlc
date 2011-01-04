@@ -343,6 +343,15 @@ static segment_t *segment_Find(hls_stream_t *hls, int sequence)
     return NULL;
 }
 
+static int live_ChooseSegment(stream_t *s, int current)
+{
+    stream_sys_t *p_sys = (stream_sys_t *)s->p_sys;
+    hls_stream_t *hls = hls_Get(p_sys->hls_stream, current);
+    if (hls == NULL) return 0;
+    int wanted = vlc_array_count(hls->segments) - 4;
+    return (wanted < 0) ? 0 : wanted;
+}
+
 /* Parsing */
 static char *parse_Attributes(const char *line, const char *attr)
 {
@@ -1261,10 +1270,10 @@ static void* hls_Thread(vlc_object_t *p_this)
 
         vlc_mutex_lock(&hls->lock);
         segment_t *segment = segment_GetSegment(hls, p_sys->download.segment);
-        assert(segment);
         vlc_mutex_unlock(&hls->lock);
 
-        if (Download(s, hls, segment, &p_sys->download.current) != VLC_SUCCESS)
+        if ((segment != NULL) &&
+            (Download(s, hls, segment, &p_sys->download.current) != VLC_SUCCESS))
         {
             if (!vlc_object_alive(p_this)) break;
 
@@ -1306,7 +1315,7 @@ again:
     if (hls == NULL)
         return VLC_EGENERIC;
 
-    segment_t *segment = segment_GetSegment(hls, p_sys->playback.segment);
+    segment_t *segment = segment_GetSegment(hls, p_sys->download.segment);
     if (segment == NULL )
         return VLC_EGENERIC;
 
@@ -1321,20 +1330,20 @@ again:
     stream = *current;
     for (int i = 0; i < 2; i++)
     {
-        segment_t *segment = segment_GetSegment(hls, i);
+        segment_t *segment = segment_GetSegment(hls, p_sys->download.segment);
         if (segment == NULL )
             return VLC_EGENERIC;
 
         if (segment->data)
         {
-            p_sys->playback.segment++;
+            p_sys->download.segment++;
             continue;
         }
 
         if (Download(s, hls, segment, current) != VLC_SUCCESS)
             return VLC_EGENERIC;
 
-        p_sys->playback.segment++;
+        p_sys->download.segment++;
 
         /* adapt bandwidth? */
         if (*current != stream)
@@ -1558,7 +1567,8 @@ static int Open(vlc_object_t *p_this)
 
     /* Choose first HLS stream to start with */
     int current = p_sys->playback.current = 0;
-    p_sys->playback.segment = 0;
+    p_sys->playback.segment = p_sys->download.segment =
+            p_sys->b_live ? live_ChooseSegment(s, current) : 0;
 
     if (Prefetch(s, &current) != VLC_SUCCESS)
     {
@@ -1584,9 +1594,7 @@ static int Open(vlc_object_t *p_this)
 
     p_sys->download.current = current;
     p_sys->playback.current = current;
-    p_sys->download.segment = p_sys->playback.segment;
     p_sys->download.seek = -1;
-    p_sys->playback.segment = 0; /* reset to first segment */
     p_sys->thread->s = s;
 
     vlc_mutex_init(&p_sys->download.lock_wait);
