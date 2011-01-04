@@ -147,6 +147,9 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( colorthresSaturationthresSlider, valueChanged( int ) )
     SETUP_VFILTER_OPTION( colorthresSimilaritythresSlider, valueChanged( int ) )
 
+    SETUP_VFILTER( sepia )
+    SETUP_VFILTER_OPTION( sepiaIntensitySpin, valueChanged( int ) )
+
     SETUP_VFILTER( invert )
 
     SETUP_VFILTER( gradient )

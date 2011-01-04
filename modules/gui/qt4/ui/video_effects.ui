@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>542</width>
-    <height>286</height>
+    <height>302</height>
    </rect>
   </property>
   <property name="currentIndex">
@@ -572,7 +572,7 @@
    <attribute name="title">
     <string>Color</string>
    </attribute>
-   <layout class="QGridLayout" name="gridLayout_7">
+   <layout class="QGridLayout" name="gridLayout_9">
     <item row="0" column="0" rowspan="2">
      <widget class="QGroupBox" name="colorthresEnable">
       <property name="title">
@@ -639,7 +639,7 @@
       </layout>
      </widget>
     </item>
-    <item row="0" column="1" rowspan="2" colspan="2">
+    <item row="0" column="1" rowspan="2">
      <widget class="QGroupBox" name="gradientEnable">
       <property name="title">
        <string>Gradient</string>
@@ -678,7 +678,7 @@
       </layout>
      </widget>
     </item>
-    <item row="0" column="3">
+    <item row="0" column="2">
      <widget class="QGroupBox" name="posterizeEnable">
       <property name="title">
        <string>Posterize</string>
@@ -713,7 +713,7 @@
       </layout>
      </widget>
     </item>
-    <item row="1" column="3" rowspan="3">
+    <item row="1" column="2">
      <widget class="QGroupBox" name="motionblurEnable">
       <property name="title">
        <string>Motion blur</string>
@@ -760,7 +760,7 @@
       </layout>
      </widget>
     </item>
-    <item row="2" column="0" rowspan="6">
+    <item row="2" column="0">
      <widget class="QGroupBox" name="extractEnable">
       <property name="title">
        <string>Color extraction</string>
@@ -790,41 +790,77 @@
      </widget>
     </item>
     <item row="2" column="1">
+     <widget class="QGroupBox" name="sepiaEnable">
+      <property name="title">
+       <string>Sepia</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label_18">
+         <property name="text">
+          <string>Intensity</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="sepiaIntensitySpin">
+         <property name="maximum">
+          <number>255</number>
+         </property>
+         <property name="value">
+          <number>30</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="2" rowspan="2">
+     <layout class="QGridLayout" name="gridLayout_7">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="motiondetectEnable">
+        <property name="text">
+         <string>Motion detect</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="rippleEnable">
+        <property name="text">
+         <string>Water effect</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="waveEnable">
+        <property name="text">
+         <string>Waves</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="psychedelicEnable">
+        <property name="text">
+         <string>Psychedelic</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="3" column="0">
      <widget class="QCheckBox" name="invertEnable">
       <property name="text">
        <string>Invert colors</string>
       </property>
      </widget>
     </item>
-    <item row="4" column="3">
-     <widget class="QCheckBox" name="rippleEnable">
-      <property name="text">
-       <string>Water effect</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="3">
-     <widget class="QCheckBox" name="waveEnable">
-      <property name="text">
-       <string>Waves</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="1">
-     <widget class="QCheckBox" name="psychedelicEnable">
-      <property name="text">
-       <string>Psychedelic</string>
-      </property>
-     </widget>
-    </item>
     <item row="3" column="1">
-     <widget class="QCheckBox" name="motiondetectEnable">
-      <property name="text">
-       <string>Motion detect</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="1">
      <widget class="QCheckBox" name="noiseEnable">
       <property name="text">
        <string>Noise</string>
@@ -1595,34 +1631,35 @@
   <tabstop>magnifyEnable</tabstop>
   <tabstop>colorthresEnable</tabstop>
   <tabstop>colorthresColorText</tabstop>
-  <tabstop>eraseXSpin</tabstop>
   <tabstop>colorthresSaturationthresSlider</tabstop>
   <tabstop>colorthresSimilaritythresSlider</tabstop>
   <tabstop>extractEnable</tabstop>
   <tabstop>extractComponentText</tabstop>
+  <tabstop>invertEnable</tabstop>
   <tabstop>gradientEnable</tabstop>
   <tabstop>gradientModeCombo</tabstop>
   <tabstop>gradientTypeCheck</tabstop>
   <tabstop>gradientCartoonCheck</tabstop>
-  <tabstop>invertEnable</tabstop>
-  <tabstop>motiondetectEnable</tabstop>
+  <tabstop>sepiaEnable</tabstop>
+  <tabstop>sepiaIntensitySpin</tabstop>
   <tabstop>noiseEnable</tabstop>
-  <tabstop>psychedelicEnable</tabstop>
   <tabstop>posterizeEnable</tabstop>
   <tabstop>posterizeLevelSpin</tabstop>
   <tabstop>motionblurEnable</tabstop>
   <tabstop>blurFactorSlider</tabstop>
+  <tabstop>motiondetectEnable</tabstop>
   <tabstop>rippleEnable</tabstop>
   <tabstop>waveEnable</tabstop>
+  <tabstop>psychedelicEnable</tabstop>
   <tabstop>atmoEnable</tabstop>
   <tabstop>atmoEdgeweightningSlider</tabstop>
   <tabstop>atmoBrightnessSlider</tabstop>
   <tabstop>atmoDarknesslimitSlider</tabstop>
-  <tabstop>atmoFiltermodeCombo</tabstop>
-  <tabstop>atmoShowdotsCheck</tabstop>
   <tabstop>atmoMeanlengthSlider</tabstop>
   <tabstop>atmoMeanthresholdSlider</tabstop>
   <tabstop>atmoPercentnewSlider</tabstop>
+  <tabstop>atmoFiltermodeCombo</tabstop>
+  <tabstop>atmoShowdotsCheck</tabstop>
   <tabstop>wallEnable</tabstop>
   <tabstop>wallRowsSpin</tabstop>
   <tabstop>wallColsSpin</tabstop>
@@ -1642,6 +1679,7 @@
   <tabstop>eraseEnable</tabstop>
   <tabstop>eraseMaskText</tabstop>
   <tabstop>eraseYSpin</tabstop>
+  <tabstop>eraseXSpin</tabstop>
  </tabstops>
  <resources/>
  <connections/>
