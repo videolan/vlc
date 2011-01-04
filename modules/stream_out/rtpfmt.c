@@ -238,6 +238,10 @@ int rtp_get_fmt( vlc_object_t *obj, es_format_t *p_fmt, const char *mux,
             rtp_fmt->ptname = "L8";
             rtp_fmt->pf_packetize = rtp_packetize_split;
             break;
+        case VLC_CODEC_S24B:
+            rtp_fmt->ptname = "L24";
+            rtp_fmt->pf_packetize = rtp_packetize_split;
+            break;
         case VLC_CODEC_MPGA:
             rtp_fmt->payload_type = 14;
             rtp_fmt->ptname = "MPA";
