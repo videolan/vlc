@@ -106,7 +106,7 @@ struct stream_sys_t
     /* Download */
     struct hls_download_s
     {
-        int         current;    /* current hls_stream  */
+        int         stream;     /* current hls_stream  */
         int         segment;    /* current segment for downloading */
         int         seek;       /* segment requested by seek (default -1) */
         vlc_mutex_t lock_wait;  /* protect segment download counter */
@@ -117,7 +117,7 @@ struct stream_sys_t
     struct hls_playback_s
     {
         uint64_t    offset;     /* current offset in media */
-        int         current;    /* current hls_stream  */
+        int         stream;     /* current hls_stream  */
         int         segment;    /* current segment for playback */
     } playback;
 
@@ -1208,7 +1208,7 @@ static void* hls_Thread(vlc_object_t *p_this)
 
     while (vlc_object_alive(p_this))
     {
-        hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->download.current);
+        hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->download.stream);
         assert(hls);
 
         /* Sliding window (~60 seconds worth of movie) */
@@ -1273,7 +1273,7 @@ static void* hls_Thread(vlc_object_t *p_this)
         vlc_mutex_unlock(&hls->lock);
 
         if ((segment != NULL) &&
-            (Download(s, hls, segment, &p_sys->download.current) != VLC_SUCCESS))
+            (Download(s, hls, segment, &p_sys->download.stream) != VLC_SUCCESS))
         {
             if (!vlc_object_alive(p_this)) break;
 
@@ -1566,7 +1566,7 @@ static int Open(vlc_object_t *p_this)
     }
 
     /* Choose first HLS stream to start with */
-    int current = p_sys->playback.current = 0;
+    int current = p_sys->playback.stream = 0;
     p_sys->playback.segment = p_sys->download.segment =
             p_sys->b_live ? live_ChooseSegment(s, current) : 0;
 
@@ -1592,8 +1592,8 @@ static int Open(vlc_object_t *p_this)
                 ((mtime_t)hls->duration * UINT64_C(1000000));
     }
 
-    p_sys->download.current = current;
-    p_sys->playback.current = current;
+    p_sys->download.stream = current;
+    p_sys->playback.stream = current;
     p_sys->download.seek = -1;
     p_sys->thread->s = s;
 
@@ -1663,7 +1663,7 @@ static segment_t *GetSegment(stream_t *s)
     segment_t *segment = NULL;
 
     /* Is this segment of the current HLS stream ready? */
-    hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->playback.current);
+    hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->playback.stream);
     if (hls != NULL)
     {
         vlc_mutex_lock(&hls->lock);
@@ -1707,7 +1707,7 @@ static segment_t *GetSegment(stream_t *s)
         if ((segment->data != NULL) &&
             (p_sys->playback.segment < i_segment))
         {
-            p_sys->playback.current = i_stream;
+            p_sys->playback.stream = i_stream;
             p_sys->b_cache = hls->b_cache;
             vlc_mutex_unlock(&hls->lock);
             goto check;
@@ -1786,7 +1786,7 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
 
         if (segment->size == segment->data->i_buffer)
             msg_Info(s, "playing segment %d from stream %d",
-                     segment->sequence, p_sys->playback.current);
+                     segment->sequence, p_sys->playback.stream);
 
         ssize_t len = -1;
         if (i_read <= segment->data->i_buffer)
@@ -1847,7 +1847,7 @@ again:
     if (segment == NULL)
     {
         msg_Err(s, "segment %d should have been available (stream %d)",
-                p_sys->playback.segment, p_sys->playback.current);
+                p_sys->playback.segment, p_sys->playback.stream);
         return 0; /* eof? */
     }
 
@@ -1885,7 +1885,7 @@ static bool hls_MaySeek(stream_t *s)
     if (p_sys->hls_stream == NULL)
         return false;
 
-    hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->playback.current);
+    hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->playback.stream);
     if (hls == NULL) return false;
 
     if (p_sys->b_live)
@@ -1909,7 +1909,7 @@ static uint64_t GetStreamSize(stream_t *s)
     if (p_sys->b_live)
         return 0;
 
-    hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->playback.current);
+    hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->playback.stream);
     if (hls == NULL) return 0;
 
     vlc_mutex_lock(&hls->lock);
@@ -1923,7 +1923,7 @@ static int segment_Seek(stream_t *s, uint64_t pos)
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->playback.current);
+    hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->playback.stream);
     if (hls == NULL)
         return VLC_EGENERIC;
 
