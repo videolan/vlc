@@ -85,21 +85,12 @@ typedef struct hls_stream_s
     bool        b_cache;    /* allow caching */
 } hls_stream_t;
 
-typedef struct
-{
-    VLC_COMMON_MEMBERS
-
-    /* */
-    stream_t    *s;
-} hls_thread_t;
-
 struct stream_sys_t
 {
     access_t    *p_access;  /* HTTP access input */
     vlc_url_t   m3u8;       /* M3U8 url */
 
     /* */
-    hls_thread_t *thread;
     vlc_array_t  *hls_stream;/* bandwidth adaptation */
     uint64_t      bandwidth; /* measured bandwidth (bits per second) */
 
@@ -1201,12 +1192,12 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
 
 static void* hls_Thread(vlc_object_t *p_this)
 {
-    stream_t *s = ((hls_thread_t*)p_this)->s;
+    stream_t *s = (stream_t *)p_this;
     stream_sys_t *p_sys = s->p_sys;
 
     int canc = vlc_savecancel();
 
-    while (vlc_object_alive(p_this))
+    while (vlc_object_alive(s))
     {
         hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->download.stream);
         assert(hls);
@@ -1229,7 +1220,7 @@ static void* hls_Thread(vlc_object_t *p_this)
                 if (p_sys->b_live && (mdate() >= p_sys->playlist.wakeup))
                     break;
                 vlc_cond_wait(&p_sys->download.wait, &p_sys->download.lock_wait);
-                if (!vlc_object_alive(p_this)) break;
+                if (!vlc_object_alive(s)) break;
             }
             /* */
             if (p_sys->download.seek >= 0)
@@ -1240,7 +1231,7 @@ static void* hls_Thread(vlc_object_t *p_this)
             vlc_mutex_unlock(&p_sys->download.lock_wait);
         }
 
-        if (!vlc_object_alive(p_this)) break;
+        if (!vlc_object_alive(s)) break;
 
         /* reload the m3u8 index file */
         if (p_sys->b_live)
@@ -1265,7 +1256,7 @@ static void* hls_Thread(vlc_object_t *p_this)
                                                 * (mtime_t)1000000);
             }
 
-            if (!vlc_object_alive(p_this)) break;
+            if (!vlc_object_alive(s)) break;
         }
 
         vlc_mutex_lock(&hls->lock);
@@ -1275,7 +1266,7 @@ static void* hls_Thread(vlc_object_t *p_this)
         if ((segment != NULL) &&
             (Download(s, hls, segment, &p_sys->download.stream) != VLC_SUCCESS))
         {
-            if (!vlc_object_alive(p_this)) break;
+            if (!vlc_object_alive(s)) break;
 
             if (!p_sys->b_live)
             {
@@ -1576,13 +1567,6 @@ static int Open(vlc_object_t *p_this)
         goto fail;
     }
 
-    p_sys->thread = vlc_object_create(s, sizeof(hls_thread_t));
-    if( p_sys->thread == NULL )
-    {
-        msg_Err(s, "creating HTTP Live Streaming client thread");
-        goto fail;
-    }
-
     /* Initialize HLS live stream */
     if (p_sys->b_live)
     {
@@ -1595,18 +1579,15 @@ static int Open(vlc_object_t *p_this)
     p_sys->download.stream = current;
     p_sys->playback.stream = current;
     p_sys->download.seek = -1;
-    p_sys->thread->s = s;
 
     vlc_mutex_init(&p_sys->download.lock_wait);
     vlc_cond_init(&p_sys->download.wait);
 
-    if (vlc_thread_create(p_sys->thread, "HTTP Live Streaming client",
+    if (vlc_thread_create(s, "HTTP Live Streaming client",
                           hls_Thread, VLC_THREAD_PRIORITY_INPUT))
     {
         goto fail;
     }
-
-    vlc_object_attach(p_sys->thread, s);
 
     return VLC_SUCCESS;
 
@@ -1626,19 +1607,14 @@ static void Close(vlc_object_t *p_this)
     assert(p_sys->hls_stream);
 
     /* */
-    if (p_sys->thread)
-    {
-        vlc_mutex_lock(&p_sys->download.lock_wait);
-        vlc_object_kill(p_sys->thread);
-        vlc_cond_signal(&p_sys->download.wait);
-        vlc_mutex_unlock(&p_sys->download.lock_wait);
+    vlc_mutex_lock(&p_sys->download.lock_wait);
+    vlc_cond_signal(&p_sys->download.wait);
+    vlc_mutex_unlock(&p_sys->download.lock_wait);
 
-        /* */
-        vlc_thread_join(p_sys->thread);
-        vlc_mutex_destroy(&p_sys->download.lock_wait);
-        vlc_cond_destroy(&p_sys->download.wait);
-        vlc_object_release(p_sys->thread);
-    }
+    /* */
+    vlc_thread_join(s);
+    vlc_mutex_destroy(&p_sys->download.lock_wait);
+    vlc_cond_destroy(&p_sys->download.wait);
 
     /* Free hls streams */
     for (int i = 0; i < vlc_array_count(p_sys->hls_stream); i++)
