@@ -98,6 +98,8 @@ private:
     const GenericBitmap *m_pOpenBitmap;
     /// Closed node bitmap
     const GenericBitmap *m_pClosedBitmap;
+    /// scaled bitmap
+    GenericBitmap *m_pScaledBitmap;
     /// Color of normal test
     uint32_t m_fgColor;
     /// Color of the playing item

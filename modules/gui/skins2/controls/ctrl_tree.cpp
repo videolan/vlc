@@ -61,7 +61,8 @@ CtrlTree::CtrlTree( intf_thread_t *pIntf,
     m_pOpenBitmap( pOpenBitmap ), m_pClosedBitmap( pClosedBitmap ),
     m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ),
     m_bgColor2( bgColor2 ), m_selColor( selColor ),
-    m_pLastSelected( NULL ), m_pImage( NULL ), m_dontMove( false )
+    m_pLastSelected( NULL ), m_pImage( NULL ), m_dontMove( false ),
+    m_pScaledBitmap( NULL )
 {
     // Observe the tree and position variables
     m_rTree.addObserver( this );
@@ -78,6 +79,7 @@ CtrlTree::~CtrlTree()
 {
     m_rTree.getPositionVar().delObserver( this );
     m_rTree.delObserver( this );
+    delete m_pScaledBitmap;
     delete m_pImage;
 }
 
@@ -791,8 +793,15 @@ void CtrlTree::makeImage()
     if( m_pBgBitmap )
     {
         // Draw the background bitmap
-        ScaledBitmap bmp( getIntf(), *m_pBgBitmap, width, height );
-        m_pImage->drawBitmap( bmp, 0, 0 );
+        if( !m_pScaledBitmap ||
+            m_pScaledBitmap->getWidth() != width ||
+            m_pScaledBitmap->getHeight() != height )
+        {
+            delete m_pScaledBitmap;
+            m_pScaledBitmap =
+                new ScaledBitmap( getIntf(), *m_pBgBitmap, width, height );
+        }
+        m_pImage->drawBitmap( *m_pScaledBitmap, 0, 0 );
 
         for( int yPos = 0; yPos < height; yPos += i_itemHeight )
         {
