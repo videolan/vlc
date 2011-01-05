@@ -207,6 +207,7 @@ ATTR_PACKED
 #endif
 
 /* WAVE format wFormatTag IDs */
+/* See http://msdn.microsoft.com/en-us/library/aa904731%28v=vs.80%29.aspx */
 #define WAVE_FORMAT_UNKNOWN             0x0000 /* Microsoft Corporation */
 #define WAVE_FORMAT_PCM                 0x0001 /* Microsoft Corporation */
 #define WAVE_FORMAT_ADPCM               0x0002 /* Microsoft Corporation */
@@ -222,17 +223,22 @@ ATTR_PACKED
 #define WAVE_FORMAT_G726                0x0045 /* ITU-T standard  */
 #define WAVE_FORMAT_MPEG                0x0050 /* Microsoft Corporation */
 #define WAVE_FORMAT_MPEGLAYER3          0x0055 /* ISO/MPEG Layer3 Format Tag */
+#define WAVE_FORMAT_AMR_NB              0x0057 /* AMR NB */
+#define WAVE_FORMAT_AMR_WB              0x0058 /* AMR Wideband */
 #define WAVE_FORMAT_DOLBY_AC3_SPDIF     0x0092 /* Sonic Foundry */
 
-#define WAVE_FORMAT_A52                 0x2000
-#define WAVE_FORMAT_DTS                 0x2001
+#define WAVE_FORMAT_AAC                 0x00FF /* */
+#define WAVE_FORMAT_SIPRO               0x0130 /* Sipro Lab Telecom Inc. */
+
 #define WAVE_FORMAT_WMA1                0x0160 /* WMA version 1 */
 #define WAVE_FORMAT_WMA2                0x0161 /* WMA (v2) 7, 8, 9 Series */
 #define WAVE_FORMAT_WMAP                0x0162 /* WMA 9 Professional */
 #define WAVE_FORMAT_WMAL                0x0163 /* WMA 9 Lossless */
-#define WAVE_FORMAT_DIVIO_AAC           0x4143
-#define WAVE_FORMAT_AAC                 0x00FF
+
+#define WAVE_FORMAT_A52                 0x2000 /* a52 */
+#define WAVE_FORMAT_DTS                 0x2001 /* DTS */
 #define WAVE_FORMAT_FFMPEG_AAC          0x706D
+#define WAVE_FORMAT_DIVIO_AAC           0x4143 /* Divio's AAC */
 
 /* Need to check these */
 #define WAVE_FORMAT_DK3                 0x0061
@@ -258,9 +264,8 @@ ATTR_PACKED
 
 #define WAVE_FORMAT_SPEEX               0xa109 /* Speex audio */
 
-
 #if !defined(WAVE_FORMAT_EXTENSIBLE)
-#define WAVE_FORMAT_EXTENSIBLE          0xFFFE /* Microsoft */
+  #define WAVE_FORMAT_EXTENSIBLE          0xFFFE /* Microsoft */
 #endif
 
 /* GUID SubFormat IDs */
@@ -325,6 +330,9 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_G726,       VLC_CODEC_ADPCM_G726,             "G.726 ADPCM" },
     { WAVE_FORMAT_MPEGLAYER3, VLC_CODEC_MPGA,                   "Mpeg Audio" },
     { WAVE_FORMAT_MPEG,       VLC_CODEC_MPGA,                   "Mpeg Audio" },
+    { WAVE_FORMAT_AMR_NB,     VLC_CODEC_AMR_NB,                 "AMR NB" },
+    { WAVE_FORMAT_AMR_WB,     VLC_CODEC_AMR_WB,                 "AMR Wideband" },
+    { WAVE_FORMAT_SIPRO,      VLC_CODEC_SIPR,                   "Sipr Audio" },
     { WAVE_FORMAT_A52,        VLC_CODEC_A52,                    "A/52" },
     { WAVE_FORMAT_WMA1,       VLC_CODEC_WMA1,                   "Window Media Audio v1" },
     { WAVE_FORMAT_WMA2,       VLC_CODEC_WMA2,                   "Window Media Audio v2" },
