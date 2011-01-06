@@ -849,6 +849,11 @@ static int SessionsSetup( demux_t *p_demux )
                     tk->fmt.i_codec = VLC_CODEC_S16B;
                     tk->fmt.audio.i_bitspersample = 16;
                 }
+                else if( !strcmp( sub-codecName(), "L24" ) )
+                {
+                    tk->fmt.i_codec = VLC_CODEC_S24B;
+                    tk->fmt.audio.i_bitspersample = 24;
+                }
                 else if( !strcmp( sub->codecName(), "L8" ) )
                 {
                     tk->fmt.i_codec = VLC_CODEC_U8;
