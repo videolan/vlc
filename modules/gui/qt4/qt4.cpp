@@ -183,6 +183,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define QT_PAUSE_MINIMIZED_LONGTEXT N_( \
     "With this option enabled, the playback will be automatically paused when minimizing the window." )
 
+#define ICONCHANGE_TEXT N_( "Allow automatic icon changes")
+#define ICONCHANGE_LONGTEXT N_( \
+    "This option allows the interface to change its icon on various occasions.")
+
 /**********************************************************************/
 vlc_module_begin ()
     set_shortname( "Qt" )
@@ -273,6 +277,8 @@ vlc_module_begin ()
 
     add_obsolete_bool( "qt-blingbling" ) /* Suppressed since 1.0.0 */
     add_obsolete_integer( "qt-display-mode" ) /* Suppressed since 1.1.0 */
+
+    add_bool( "qt-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT, true )
 
 #ifdef WIN32
     cannot_unload_broken_library()
@@ -479,7 +485,7 @@ static void *Thread( void *obj )
 
     /* Icon setting, Mac uses icon from .icns */
 #ifndef Q_WS_MAC
-    if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY )
+    if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY && var_InheritBool( p_intf, "qt-icon-change" ) )
         app.setWindowIcon( QIcon(vlc_xmas_xpm) );
     else
         app.setWindowIcon( QIcon(vlc_xpm) );

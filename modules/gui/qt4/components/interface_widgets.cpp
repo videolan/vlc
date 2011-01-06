@@ -212,7 +212,7 @@ void BackgroundWidget::updateArt( const QString& url )
     }
     else
     {   /* Xmas joke */
-        if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY )
+        if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY && var_InheritBool( p_intf, "qt-icon-change" ) )
             pixmapUrl = QString( ":/logo/vlc128-xmas.png" );
         else
             pixmapUrl = QString( ":/logo/vlc128.png" );

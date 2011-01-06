@@ -102,7 +102,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
     ui.introduction->setText(
             qtr( "VLC media player" ) + qfu( " " VERSION_MESSAGE ) );
 
-    if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY )
+    if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY && var_InheritBool( p_intf, "qt-icon-change" ) )
         ui.iconVLC->setPixmap( QPixmap( ":/logo/vlc128-xmas.png" ) );
     else
         ui.iconVLC->setPixmap( QPixmap( ":/logo/vlc128.png" ) );
