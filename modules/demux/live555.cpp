@@ -846,12 +846,12 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strcmp( sub->codecName(), "L16" ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 't', 'w', 'o', 's' );
+                    tk->fmt.i_codec = VLC_CODEC_S16B;
                     tk->fmt.audio.i_bitspersample = 16;
                 }
                 else if( !strcmp( sub->codecName(), "L8" ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 'a', 'r', 'a', 'w' );
+                    tk->fmt.i_codec = VLC_CODEC_U8;
                     tk->fmt.audio.i_bitspersample = 8;
                 }
                 else if( !strcmp( sub->codecName(), "PCMU" ) )
