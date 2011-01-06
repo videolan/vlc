@@ -95,7 +95,10 @@ struct demux_sys_t
     int64_t             i_data_begin;
     int64_t             i_data_end;
 
-    bool          b_index;
+    bool                b_index;
+    unsigned int        i_seek_track;
+    unsigned int        i_wait_keyframe;
+
     vlc_meta_t          *meta;
 };
 
@@ -228,6 +231,7 @@ static void Close( vlc_object_t * p_this )
 static int SeekPercent( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    p_sys->i_wait_keyframe = p_sys->i_seek_track ? 50 : 0;
     return demux_vaControlHelper( p_demux->s, p_sys->i_data_begin,
                                    p_sys->i_data_end, p_sys->i_bitrate,
                                    p_sys->p_fp->i_min_data_packet_size,
@@ -253,6 +257,8 @@ static int SeekIndex( demux_t *p_demux, mtime_t i_date, float f_pos )
         msg_Warn( p_demux, "Incomplete index" );
         return VLC_EGENERIC;
     }
+
+    p_sys->i_wait_keyframe = p_sys->i_seek_track ? 50 : 0;
 
     uint64_t i_offset = (uint64_t)p_index->index_entry[i_entry].i_packet_number *
                         p_sys->p_fp->i_min_data_packet_size;
@@ -580,6 +586,16 @@ static int DemuxPacket( demux_t *p_demux )
             continue;   // over payload
         }
 
+        if( p_sys->i_wait_keyframe &&
+            !(i_stream_number == p_sys->i_seek_track && i_packet_keyframe &&
+              !i_media_object_offset) )
+        {
+            i_skip += i_payload_data_length;
+            p_sys->i_wait_keyframe--;
+            continue;   // over payload
+        }
+        p_sys->i_wait_keyframe = 0;
+
         if( !tk->p_es )
         {
             i_skip += i_payload_data_length;
@@ -712,6 +728,8 @@ static int DemuxInit( demux_t *p_demux )
     p_sys->p_fp     = NULL;
     p_sys->b_index  = 0;
     p_sys->i_track  = 0;
+    p_sys->i_seek_track = 0;
+    p_sys->i_wait_keyframe = 0;
     for( int i = 0; i < 128; i++ )
     {
         p_sys->track[i] = NULL;
@@ -977,6 +995,10 @@ static int DemuxInit( demux_t *p_demux )
                 if( fmt.psz_language && (p = strchr( fmt.psz_language, '-' )) )
                     *p = '\0';
             }
+
+            /* Set the track on which we'll do our seeking to the first video track */
+            if(!p_sys->i_seek_track && fmt.i_cat == VIDEO_ES)
+                p_sys->i_seek_track = p_sp->i_stream_number;
 
             tk->p_es = es_out_Add( p_demux->out, &fmt );
         }
