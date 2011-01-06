@@ -857,10 +857,12 @@ static int SessionsSetup( demux_t *p_demux )
                 else if( !strcmp( sub->codecName(), "PCMU" ) )
                 {
                     tk->fmt.i_codec = VLC_CODEC_MULAW;
+                    tk->fmt.audio.i_bitspersample = 8;
                 }
                 else if( !strcmp( sub->codecName(), "PCMA" ) )
                 {
                     tk->fmt.i_codec = VLC_CODEC_ALAW;
+                    tk->fmt.audio.i_bitspersample = 8;
                 }
                 else if( !strncmp( sub->codecName(), "G726", 4 ) )
                 {
