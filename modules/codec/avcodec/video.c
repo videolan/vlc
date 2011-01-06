@@ -258,7 +258,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
             p_sys->p_context->skip_frame = AVDISCARD_DEFAULT;
             break;
         case 1:
-            p_sys->p_context->skip_frame = AVDISCARD_BIDIR;
+            p_sys->p_context->skip_frame = AVDISCARD_NONREF;
             break;
         case 2:
             p_sys->p_context->skip_frame = AVDISCARD_NONKEY;
@@ -281,7 +281,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
             p_sys->p_context->skip_idct = AVDISCARD_DEFAULT;
             break;
         case 1:
-            p_sys->p_context->skip_idct = AVDISCARD_BIDIR;
+            p_sys->p_context->skip_idct = AVDISCARD_NONREF;
             break;
         case 2:
             p_sys->p_context->skip_idct = AVDISCARD_NONKEY;
@@ -490,8 +490,8 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         if( p_sys->i_late_frames < 12 )
         {
             p_context->skip_frame =
-                    (p_sys->i_skip_frame <= AVDISCARD_BIDIR) ?
-                    AVDISCARD_BIDIR : p_sys->i_skip_frame;
+                    (p_sys->i_skip_frame <= AVDISCARD_NONREF) ?
+                    AVDISCARD_NONREF : p_sys->i_skip_frame;
         }
         else
         {
