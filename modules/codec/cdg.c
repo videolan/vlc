@@ -254,7 +254,13 @@ static int DecodeTileBlock( decoder_sys_t *p_cdg, const uint8_t *p_data, int doX
         for( x = 0; x < 6; x++ )
         {
             const int idx = ( p_data[4+y] >> (5-x) ) & 0x01;
-            uint8_t *p = &p_cdg->p_screen[(sy+y)*CDG_SCREEN_PITCH+(sx+x)];
+
+            int index = (sy+y)*CDG_SCREEN_PITCH+(sx+x);
+            if( index >= CDG_SCREEN_PITCH*CDG_SCREEN_HEIGHT )
+                return 0;
+
+            uint8_t *p = &p_cdg->p_screen[index];
+
             if( doXor )
                 *p ^= p_color[idx];
             else
@@ -319,8 +325,8 @@ static int DecodeScroll( decoder_sys_t *p_cdg, const uint8_t *p_data, int b_copy
 
             if( b_copy )
             {
-                dy = ( dy + CDG_SCREEN_HEIGHT ) % CDG_SCREEN_HEIGHT;
-                dy = ( dy + CDG_SCREEN_WIDTH  ) % CDG_SCREEN_WIDTH;
+                dy %= CDG_SCREEN_HEIGHT;
+                dx %= CDG_SCREEN_WIDTH;
             }
             else
             {
