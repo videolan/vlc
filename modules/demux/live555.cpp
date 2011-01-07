@@ -60,6 +60,7 @@
 #include <BasicUsageEnvironment.hh>
 #include <GroupsockHelper.hh>
 #include <liveMedia.hh>
+#include <liveMedia_version.hh>
 
 extern "C" {
 #include "../access/mms/asf.h"  /* Who said ugly ? */
@@ -296,6 +297,8 @@ static int  Open ( vlc_object_t *p_this )
     p_demux->pf_control= Control;
     p_demux->p_sys     = p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
     if( !p_sys ) return VLC_ENOMEM;
+
+    msg_Dbg( p_demux, "version "LIVEMEDIA_LIBRARY_VERSION_STRING );
 
     p_sys->p_sdp = NULL;
     p_sys->scheduler = NULL;
