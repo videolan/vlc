@@ -438,7 +438,7 @@ void DialogsProvider::addFromSimple( bool pl, bool go)
     files.sort();
     foreach( const QString &file, files )
     {
-        QString url = toURI( file );
+        QString url = toURI( toNativeSeparators( file ) );
         playlist_Add( THEPL, qtu( url ), NULL, PLAYLIST_APPEND | mode,
                       PLAYLIST_END, pl, pl_Unlocked );
         RecentsMRL::getInstance( p_intf )->addRecent( url );
