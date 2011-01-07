@@ -524,6 +524,8 @@ bool InputManager::hasVisualisation()
         return false;
 
     char *visual = var_InheritString( aout, "visual" );
+    vlc_object_release( aout );
+
     if( !visual )
         return false;
 
