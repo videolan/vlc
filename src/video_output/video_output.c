@@ -401,7 +401,6 @@ picture_t *vout_GetPicture(vout_thread_t *vout)
     picture_t *picture = picture_pool_Get(vout->p->decoder_pool);
     if (picture) {
         picture_Reset(picture);
-        picture->p_next = NULL;
         VideoFormatCopyCropAr(&picture->format, &vout->p->original);
     }
     vlc_mutex_unlock(&vout->p->picture_lock);

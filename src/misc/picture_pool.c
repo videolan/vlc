@@ -223,6 +223,7 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
             continue;
 
         /* */
+        picture->p_next = NULL;
         picture->p_release_sys->tick = pool->tick++;
         picture_Hold(picture);
         return picture;

@@ -62,6 +62,7 @@ static picture_t *PictureFifoPop(picture_fifo_t *fifo)
         fifo->first = picture->p_next;
         if (!fifo->first)
             fifo->last_ptr = &fifo->first;
+        picture->p_next = NULL;
     }
     return picture;
 }
