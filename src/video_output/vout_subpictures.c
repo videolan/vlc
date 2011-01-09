@@ -260,7 +260,7 @@ static filter_t *SpuRenderCreateAndLoadScale( vlc_object_t *p_obj,
 
 static void SpuRenderText( spu_t *p_spu, bool *pb_rerender_text,
                            subpicture_region_t *p_region,
-                           int i_min_scale_ratio, mtime_t render_date )
+                           mtime_t render_date )
 {
     filter_t *p_text = p_spu->p->p_text;
 
@@ -290,7 +290,6 @@ static void SpuRenderText( spu_t *p_spu, bool *pb_rerender_text,
      */
     var_SetTime( p_text, "spu-elapsed", render_date );
     var_SetBool( p_text, "text-rerender", false );
-    var_SetInteger( p_text, "scale", i_min_scale_ratio );
 
     if( p_text->pf_render_html && p_region->psz_html )
     {
@@ -738,9 +737,8 @@ static void SpuRenderRegion( spu_t *p_spu,
     /* Render text region */
     if( p_region->fmt.i_chroma == VLC_CODEC_TEXT )
     {
-        const int i_min_scale_ratio = SCALE_UNIT; /* FIXME what is the right value? (scale_size is not) */
         SpuRenderText( p_spu, &b_restore_text, p_region,
-                       i_min_scale_ratio, render_date );
+                       render_date );
 
         /* Check if the rendering has failed ... */
         if( p_region->fmt.i_chroma == VLC_CODEC_TEXT )
@@ -1108,6 +1106,8 @@ static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
 
             p_sys->p_text->fmt_out.video.i_height         =
             p_sys->p_text->fmt_out.video.i_visible_height = i_render_height;
+
+            var_SetInteger( p_sys->p_text, "scale", SCALE_UNIT );
         }
 
         /* Compute scaling from picture to source size */
