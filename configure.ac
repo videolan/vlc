@@ -389,6 +389,7 @@ AM_CONDITIONAL(HAVE_LINUX, [test "${SYS}" = "linux"])
 AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64, test "${HAVE_WIN64}" = "1")
 AM_CONDITIONAL(HAVE_WINCE, test "${SYS}" = "mingwce")
+AM_CONDITIONAL(HAVE_SYMBIAN, test "${SYS}" = "symbian")
 AM_CONDITIONAL(USE_PEFLAGS, [test "${enable_peflags}" = "yes"])
 
 dnl
