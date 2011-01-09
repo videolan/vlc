@@ -83,7 +83,11 @@ vlc_module_begin ()
     add_loadfile( "projectm-config", "/usr/share/projectM/config.inp",
                   CONFIG_TEXT, CONFIG_LONGTEXT, true )
 #else
+#ifdef WIN32
+    add_directory( "projectm-preset-path", NULL,
+#else
     add_directory( "projectm-preset-path", "/usr/share/projectM/presets",
+#endif
                   PRESET_PATH_TXT, PRESET_PATH_LONGTXT, true )
     add_font( "projectm-title-font", "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf",
                   TITLE_FONT_TXT, TITLE_FONT_LONGTXT, true )
@@ -349,6 +353,14 @@ static void *Thread( void *p_data )
     free( psz_config );
 #else
     psz_preset_path = var_InheritString( p_filter, "projectm-preset-path" );
+#ifdef WIN32
+    if ( psz_preset_path == NULL )
+    {
+        char *psz_data_path = config_GetDataDir( p_filter );
+        asprintf( &psz_preset_path, "%s" DIR_SEP "visualisation", psz_data_path );
+        free( psz_data_path );
+    }
+#endif
     psz_title_font = var_InheritString( p_filter, "projectm-title-font" );
     psz_menu_font = var_InheritString( p_filter, "projectm-menu-font" );
 
