@@ -1448,9 +1448,6 @@ x264-$(X264_VERSION).tar.gz:
 ifdef GIT
 x264:
 	$(GIT) clone git://git.videolan.org/x264.git
-ifdef HAVE_WIN32
-	(cd x264; patch -p0 < ../Patches/x264-svn-win32.patch )
-endif
 ifdef HAVE_WIN64
 	(cd x264; patch -p0 < ../Patches/x264-svn-win64.patch )
 endif
