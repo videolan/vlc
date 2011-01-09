@@ -913,7 +913,6 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     if (filtered &&
         (vout->p->decoder_pool != vout->p->display_pool || subpic)) {
         picture_t *render;
-
         if (vout->p->is_decoder_pool_slow)
             render = picture_NewFromFormat(&vd->source);
         else if (vout->p->decoder_pool != vout->p->display_pool)
@@ -921,24 +920,17 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         else
             render = picture_pool_Get(vout->p->private_pool);
 
-        if (unlikely(render == NULL)) {
-            picture_Release(filtered);
-            return VLC_EGENERIC;
+        if (render) {
+            picture_Copy(render, filtered);
+
+            spu_RenderSubpictures(vout->p->spu,
+                                  render, &vd->source,
+                                  subpic, &vd->source, spu_render_time);
         }
-
-        picture_Copy(render, filtered);
-        spu_RenderSubpictures(vout->p->spu,
-                              render, &vd->source,
-                              subpic, &vd->source, spu_render_time);
-
         if (vout->p->is_decoder_pool_slow) {
             direct = picture_pool_Get(vout->p->display_pool);
-            if (unlikely(direct == NULL)) {
-                picture_Release(render);
-                picture_Release(filtered);
-                return VLC_EGENERIC;
-            }
-            picture_Copy(direct, render);
+            if (direct)
+                picture_Copy(direct, render);
             picture_Release(render);
 
         } else {
@@ -946,12 +938,13 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         }
         VideoFormatCopyCropAr(&direct->format, &filtered->format);
         picture_Release(filtered);
-
+        filtered = NULL;
     } else {
         direct = filtered;
     }
 
-    assert (direct != NULL);
+    if (!direct)
+        return VLC_EGENERIC;
 
     /*
      * Take a snapshot if requested
