@@ -28,29 +28,29 @@
 
 static inline bool vlc_xlib_init (vlc_object_t *obj)
 {
+    if (!var_InheritBool (obj, "xlib"))
+        return false;
+
     bool ok = false;
 
-    if (var_InheritBool (obj, "xlib"))
-    {
-        /* XInitThreads() can be called multiple times,
-         * but it is not reentrant, so we need this global lock. */
-        vlc_global_lock (VLC_XLIB_MUTEX);
+    /* XInitThreads() can be called multiple times,
+     * but it is not reentrant, so we need this global lock. */
+    vlc_global_lock (VLC_XLIB_MUTEX);
 
-        if (_Xglobal_lock == NULL && unlikely(_XErrorFunction != NULL))
-        {
-            /* (_Xglobal_lock == NULL) => Xlib threads not initialized */
-            /* (_XErrorFunction != NULL) => Xlib already in use */
-            fprintf (stderr, "%s:%u:%s: Xlib not initialized for threads.\n"
-                     "This process is probably using LibVLC incorrectly.\n"
-                     "Pass \"--no-xlib\" to libvlc_new() to fix this.\n",
-                     __FILE__, __LINE__, __func__);
-            /* Initiate core meltdown */
-            abort ();
-        }
-        else
-            ok = XInitThreads () != 0;
-        vlc_global_unlock (VLC_XLIB_MUTEX);
-    }
+    if (_Xglobal_lock == NULL && unlikely(_XErrorFunction != NULL))
+        /* (_Xglobal_lock == NULL) => Xlib threads not initialized */
+        /* (_XErrorFunction != NULL) => Xlib already in use */
+        fprintf (stderr, "%s:%u:%s: Xlib not initialized for threads.\n"
+                 "This process is probably using LibVLC incorrectly.\n"
+                 "Pass \"--no-xlib\" to libvlc_new() to fix this.\n",
+                 __FILE__, __LINE__, __func__);
+    else if (XInitThreads ())
+        ok = true;
+
+    vlc_global_unlock (VLC_XLIB_MUTEX);
+
+    if (!ok)
+        msg_Err (obj, "Xlib not initialized for threads");
     return ok;
 }
 
