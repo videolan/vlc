@@ -238,6 +238,7 @@ EXTRA_libvlccore_la_SOURCES = \
 	$(SOURCES_libvlc_darwin) \
 	$(SOURCES_libvlc_linux) \
 	$(SOURCES_libvlc_win32) \
+	$(SOURCES_libvlc_symbian) \
 	$(SOURCES_libvlc_other) \
 	$(SOURCES_libvlc_httpd) \
 	$(SOURCES_libvlc_sout) \
@@ -255,7 +256,11 @@ else
 if HAVE_WINCE
 libvlccore_la_SOURCES += $(SOURCES_libvlc_win32)
 else
+if HAVE_SYMBIAN
+libvlccore_la_SOURCES += $(SOURCES_libvlc_symbian)
+else
 libvlccore_la_SOURCES += $(SOURCES_libvlc_other)
+endif
 endif
 endif
 endif
@@ -293,6 +298,10 @@ SOURCES_libvlc_win32 = \
 	win32/filesystem.c \
 	win32/thread.c \
 	win32/winsock.c \
+	$(NULL)
+
+SOURCES_libvlc_symbian = \
+	symbian/path.cpp \
 	$(NULL)
 
 SOURCES_libvlc_other = \
