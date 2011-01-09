@@ -1,11 +1,11 @@
-List of vlc plugins (360)
+List of vlc plugins (366)
 $Id$
  * a52: A/52 basic parser/packetizer
  * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
  * a52tospdif: Audio converter module to encapsulate A/52 into S/PDIF
  * aa: Ascii art video output
  * access_alsa: Alsa access module
- * access_attachment: Attachment accesss module
+ * access_attachment: Attachment access module
  * access_avio: Access module using FFmpeg libavformat network
  * access_bd: Blu-Ray Disc access
  * access_directory: Access module to read files in a directory
@@ -77,6 +77,7 @@ $Id$
  * converter_fixed: Fixed-point audio format conversions
  * crop: Crop video filter
  * croppadd: Crop/Padd image filter
+ * crystalhd: crystalhd decoder
  * cvdsub: CVD subtitles decoder
  * dbus: D-Bus control interface
  * dc1394: firewire input module
@@ -260,16 +261,18 @@ $Id$
  * rss: Display a RSS feed on the video output
  * rtp: rtp demux module
  * rv32: RV32 image format conversion module
- * sap: Interface module to read SAP/SDP announcments
+ * sap: Interface module to read SAP/SDP announcements
  * scale: Images rescaler
  * scaletempo: Scale audio tempo in sync with playback rate
  * scene: scene video filter
  * schroedinger: Schroedinger video decoder
  * screen: a input module that takes screenshots of the primary monitor
  * sdl_image: SDL-based image decoder
+ * sdp: SDP fake access
  * sepia: Sepia video filter
  * sharpen: Sharpen video filter
  * shine: MP3 encoder using Shine, a fixed point implementation
+ * sid: Sidplay demuxer
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation
  * smf: Standard MIDI file demuxer
