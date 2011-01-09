@@ -626,6 +626,7 @@ int SQLToMediaArray( media_library_t *p_ml, vlc_array_t *p_result_array,
         }
         else /* This is a repeat row and the people need to be put together */
         {
+            free( p_result );
             ml_LockMedia( p_append->value.p_media );
             if( psz_append_pname && i_append_pid && psz_append_prole )
                 ml_CreateAppendPersonAdv( &(p_append->value.p_media->p_people),
