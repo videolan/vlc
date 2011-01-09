@@ -744,7 +744,7 @@ Section $Name_Section07 SEC07
   !insertmacro AddContextMenuExt "Directory"
 SectionEnd
 
-Section $Name_Section08 SEC08
+Section /o $Name_Section08 SEC08
   !insertmacro delprefs
 SectionEnd
 
