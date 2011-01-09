@@ -1,6 +1,6 @@
 dnl Autoconf settings for vlc
 
-AC_COPYRIGHT([Copyright 2002-2010 the VideoLAN team])
+AC_COPYRIGHT([Copyright 2002-2011 the VideoLAN team])
 
 AC_INIT(vlc, 1.2.0-git)
 VERSION_MAJOR="1"
@@ -12,7 +12,7 @@ AC_SUBST(PKGDIR)
 
 CONFIGURE_LINE="`echo "$0 $ac_configure_args" | sed -e 's/\\\/\\\\\\\/g'`"
 CODENAME="Twoflower"
-COPYRIGHT_YEARS="1996-2010"
+COPYRIGHT_YEARS="1996-2011"
 
 AC_CONFIG_SRCDIR(src/libvlc.c)
 AC_CONFIG_AUX_DIR(autotools)
