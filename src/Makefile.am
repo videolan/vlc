@@ -302,6 +302,7 @@ SOURCES_libvlc_win32 = \
 
 SOURCES_libvlc_symbian = \
 	symbian/path.cpp \
+        symbian/dirs.c \
 	$(NULL)
 
 SOURCES_libvlc_other = \
