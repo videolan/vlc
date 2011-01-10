@@ -18,14 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <f32file.h>
-#include <e32base.h>
-#include <sys/types.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <wchar.h>
-#include <string.h>
-#include <utf.h>
+#include <f32file.h>    /* RFs */
+#include <string.h>     /* strlen */
+#include <utf.h>        /* CnvUtfConverter */
 
 #include "path.h"
 
@@ -62,33 +57,28 @@ extern "C" char * GetConstPrivatePath(void)
     size_t len;
     char carray[KMaxFileName];
 
-    if(GetPrivatePath(privatePath)!=KErrNone)
+    if (GetPrivatePath(privatePath) != KErrNone)
     {
-        goto defaultreturn;
+        return strdup("C:\\Data\\Others");
     }
 
     CnvUtfConverter::ConvertFromUnicodeToUtf8( privatepathutf8, privatePath );
 
     TInt index = 0;
-    for(index =0 ; index < privatepathutf8.Length(); index++)
+    for (index = 0; index < privatepathutf8.Length(); index++)
     {
         carray[index] = privatepathutf8[index];
     }
     carray[index] = 0;
 
-    if((len = strnlen((const char *)carray, KMaxFileName) < KMaxFileName)
+    if ((len = strnlen((const char *)carray, KMaxFileName) < KMaxFileName))
     {
-        carray[len-1]='\0';
+        carray[len-1] = '\0';
+        return strdup((const char *)carray);
     }
     else
     {
-        goto defaultreturn;
+        return strdup("C:\\Data\\Others");
     }
-
-
-    return strdup((const char *)carray);
-
-defaultreturn:
-    return strdup("C:\\Data\\Others");
 }
 
