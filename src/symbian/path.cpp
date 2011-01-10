@@ -22,7 +22,9 @@
 #include <string.h>     /* strlen */
 #include <utf.h>        /* CnvUtfConverter */
 
-#include "path.h"
+extern "C" {
+    #include "path.h"
+}
 
 /*Way to Find AppPrivatePath (A Path where an application can store its private data) */
 static TInt GetPrivatePath(TFileName& privatePath)

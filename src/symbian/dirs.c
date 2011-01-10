@@ -25,10 +25,12 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
 #include <vlc_common.h>
 
-#include "../../../../src/libvlc.h"
+#include "../libvlc.h"
 #include <vlc_charset.h>
+#include <vlc_configuration.h>
 #include "config/configuration.h"
 
 #include <string.h>
