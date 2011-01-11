@@ -112,7 +112,7 @@ vlc_thread_fatal (const char *action, int error,
             msg = buf;
             break;
         case ERANGE: /* should never happen */
-            msg = "unknwon (too big to display)";
+            msg = "unknown (too big to display)";
             break;
         default:
             msg = "unknown (invalid error number)";
