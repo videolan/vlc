@@ -160,8 +160,6 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
 {
     va_list ap;
     int ret = 0;
-    typedef int(*int_fp_vlcobjectt)(vlc_object_t *) ;
-    typedef void(*void_fp_vlcobjectt)(vlc_object_t *);
 
     va_start (ap, propid);
     switch (propid)
@@ -215,11 +213,11 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             break;
 
         case VLC_MODULE_CB_OPEN:
-            module->pf_activate = va_arg (ap, int_fp_vlcobjectt);
+            module->pf_activate = va_arg (ap, void *);
             break;
 
         case VLC_MODULE_CB_CLOSE:
-            module->pf_deactivate = va_arg (ap, void_fp_vlcobjectt);
+            module->pf_deactivate = va_arg (ap, void *);
             break;
 
         case VLC_MODULE_NO_UNLOAD:

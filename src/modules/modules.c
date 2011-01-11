@@ -1,13 +1,14 @@
 /*****************************************************************************
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
- * Copyright (C) 2001-2007 the VideoLAN team
+ * Copyright (C) 2001-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
  *          Hans-Peter Jansen <hpj@urpla.net>
  *          Gildas Bazin <gbazin@videolan.org>
+ *          Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -330,14 +331,18 @@ void module_release (module_t *m)
 #undef module_start
 int module_start (vlc_object_t *obj, module_t *m)
 {
-   return m->pf_activate ? (m->pf_activate (obj)) : VLC_SUCCESS;
+   int (*activate) (vlc_object_t *) = m->pf_activate;
+
+   return (activate != NULL) ? activate (obj) : VLC_SUCCESS;
 }
 
 #undef module_stop
 void module_stop (vlc_object_t *obj, module_t *m)
 {
-    if (m->pf_deactivate)
-        m->pf_deactivate (obj);
+   void (*deactivate) (vlc_object_t *) = m->pf_deactivate;
+
+    if (deactivate != NULL)
+        deactivate (obj);
 }
 
 /**
@@ -406,21 +411,30 @@ static int modulecmp (const void *a, const void *b)
     return lb->i_score - la->i_score;
 }
 
-#undef module_need
+#undef vlc_module_load
 /**
- * module Need
+ * Finds and instantiates the best module of a certain type.
+ * All candidates modules having the specified capability and name will be
+ * sorted in decreasing order of priority. Then the probe callback will be
+ * invoked for each module, until it succeeds (returns 0), or all candidate
+ * module failed to initialize.
  *
- * Return the best module function, given a capability list.
+ * The probe callback first parameter is the address of the module entry point.
+ * Further parameters are passed as an argument list; it corresponds to the
+ * variable arguments passed to this function. This scheme is meant to
+ * support arbitrary prototypes for the module entry point.
  *
- * \param p_this the vlc object
- * \param psz_capability list of capabilities needed
- * \param psz_name name of the module asked
+ * \param p_this VLC object
+ * \param psz_capability capability, i.e. class of module
+ * \param psz_name name name of the module asked, if any
  * \param b_strict if true, do not fallback to plugin with a different name
  *                 but the same capability
+ * \param probe module probe callback
  * \return the module or NULL in case of a failure
  */
-module_t * module_need( vlc_object_t *p_this, const char *psz_capability,
-                        const char *psz_name, bool b_strict )
+module_t *vlc_module_load(vlc_object_t *p_this, const char *psz_capability,
+                          const char *psz_name, bool b_strict,
+                          vlc_activate_t probe, ...)
 {
     stats_TimerStart( p_this, "module_need()", STATS_TIMER_MODULE_NEED );
 
@@ -547,7 +561,11 @@ found_shortcut:
              count, count == 1 ? "" : "s" );
 
     /* Parse the linked list and use the first successful module */
+    va_list args;
+
+    va_start(args, probe);
     p_module = NULL;
+
     for (size_t i = 0; (i < count) && (p_module == NULL); i++)
     {
         module_t *p_cand = p_list[i].p_module;
@@ -569,10 +587,22 @@ found_shortcut:
             DeleteModule( p_module_bank, p_new_module );
         }
 #endif
-
         p_this->b_force = p_list[i].b_force;
 
-        switch( module_start( p_this, p_cand ) )
+        int ret;
+
+        if (likely(p_cand->pf_activate != NULL))
+        {
+            va_list ap;
+
+            va_copy(ap, args);
+            ret = probe(p_cand->pf_activate, ap);
+            va_end(ap);
+        }
+        else
+            ret = VLC_SUCCESS;
+
+        switch (ret)
         {
         case VLC_SUCCESS:
             /* good module! */
@@ -594,6 +624,7 @@ found_shortcut:
             module_release (p_list[i].p_module);
     }
 
+    va_end (args);
     free( p_list );
     p_this->b_force = b_force_backup;
 
@@ -622,21 +653,54 @@ found_shortcut:
     return p_module;
 }
 
-#undef module_unneed
+
 /**
- * Module unneed
- *
- * This function must be called by the thread that called module_need, to
- * decrease the reference count and allow for hiding of modules.
- * \param p_this vlc object structure
- * \param p_module the module structure
- * \return nothing
+ * Deinstantiates a module.
+ * \param module the module pointer as returned by vlc_module_load()
+ * \param deinit deactivation callback
  */
-void module_unneed( vlc_object_t * p_this, module_t * p_module )
+void vlc_module_unload(module_t *module, vlc_deactivate_t deinit, ...)
 {
-    msg_Dbg( p_this, "removing module \"%s\"", p_module->psz_object_name );
-    module_stop( p_this, p_module );
-    module_release( p_module );
+    if (module->pf_deactivate != NULL)
+    {
+        va_list ap;
+
+        va_start(ap, deinit);
+        deinit(module->pf_deactivate, ap);
+        va_end(ap);
+    }
+    module_release(module);
+}
+
+
+static int generic_start(void *func, va_list ap)
+{
+    vlc_object_t *obj = va_arg(ap, vlc_object_t *);
+    int (*activate)(vlc_object_t *) = func;
+
+    return activate(obj);
+}
+
+static void generic_stop(void *func, va_list ap)
+{
+    vlc_object_t *obj = va_arg(ap, vlc_object_t *);
+    void (*deactivate)(vlc_object_t *) = func;
+
+    deactivate(obj);
+}
+
+#undef module_need
+module_t *module_need(vlc_object_t *obj, const char *cap, const char *name,
+                      bool strict)
+{
+    return vlc_module_load(obj, cap, name, strict, generic_start, obj);
+}
+
+#undef module_unneed
+void module_unneed(vlc_object_t *obj, module_t *module)
+{
+    msg_Dbg(obj, "removing module \"%s\"", module->psz_object_name);
+    vlc_module_unload(module, generic_stop, obj);
 }
 
 /**

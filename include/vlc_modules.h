@@ -1,7 +1,7 @@
 /*****************************************************************************
  * modules.h : Module descriptor and load functions
  *****************************************************************************
- * Copyright (C) 2001 the VideoLAN team
+ * Copyright (C) 2001-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -26,9 +26,17 @@
  * This file defines functions for modules in vlc
  */
 
+typedef int (*vlc_activate_t)(void *func, va_list args);
+typedef void (*vlc_deactivate_t)(void *func, va_list args);
+
 /*****************************************************************************
  * Exported functions.
  *****************************************************************************/
+
+VLC_EXPORT( module_t *, vlc_module_load, ( vlc_object_t *obj, const char *cap, const char *name, bool strict, vlc_activate_t probe, ... ) );
+#define vlc_module_load(o,c,n,s,...) \
+        vlc_module_load(VLC_OBJECT(o),c,n,s,__VA_ARGS__)
+VLC_EXPORT( void, vlc_module_unload, ( module_t *, vlc_deactivate_t deinit, ... ) );
 
 VLC_EXPORT( module_t *, module_need, ( vlc_object_t *, const char *, const char *, bool ) );
 #define module_need(a,b,c,d) module_need(VLC_OBJECT(a),b,c,d)

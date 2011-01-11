@@ -114,8 +114,8 @@ struct module_t
     bool b_submodule;                        /**< Is this a submodule? */
 
     /* Callbacks */
-    int  ( * pf_activate )   ( vlc_object_t * );
-    void ( * pf_deactivate ) ( vlc_object_t * );
+    void *pf_activate;
+    void *pf_deactivate;
 
     /*
      * Variables set by the module to store its config options
