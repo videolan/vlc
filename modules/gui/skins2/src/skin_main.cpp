@@ -316,10 +316,8 @@ end:
 static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 
 // Callbacks for vout requests
-static int WindowOpen( vlc_object_t *p_this )
+static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
 {
-    vout_window_t *pWnd = (vout_window_t *)p_this;
-
     vlc_mutex_lock( &skin_load.mutex );
     intf_thread_t *pIntf = skin_load.intf;
     if( pIntf )
@@ -331,7 +329,7 @@ static int WindowOpen( vlc_object_t *p_this )
 
     if( !vlc_object_alive( pIntf ) ||
         !var_InheritBool( pIntf, "skinned-video") ||
-        pWnd->cfg->is_standalone )
+        cfg->is_standalone )
     {
         vlc_object_release( pIntf );
         return VLC_EGENERIC;
@@ -357,9 +355,8 @@ static int WindowOpen( vlc_object_t *p_this )
     }
 }
 
-static void WindowClose( vlc_object_t *p_this )
+static void WindowClose( vout_window_t *pWnd )
 {
-    vout_window_t *pWnd = (vout_window_t *)p_this;
     intf_thread_t *pIntf = (intf_thread_t *)pWnd->sys;
 
     vlc_mutex_lock( &serializer );

@@ -45,10 +45,10 @@ typedef xcb_atom_t Atom;
     "VLC can embed its video output in an existing X11 window. " \
     "This is the X identifier of that window (0 means none).")
 
-static int  Open (vlc_object_t *);
-static void Close (vlc_object_t *);
-static int  EmOpen (vlc_object_t *);
-static void EmClose (vlc_object_t *);
+static int  Open (vout_window_t *, const vout_window_cfg_t *);
+static void Close (vout_window_t *);
+static int  EmOpen (vout_window_t *, const vout_window_cfg_t *);
+static void EmClose (vout_window_t *);
 
 /*
  * Module descriptor
@@ -208,9 +208,8 @@ static void CacheAtoms (vout_window_sys_t *p_sys)
 /**
  * Create an X11 window.
  */
-static int Open (vlc_object_t *obj)
+static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
-    vout_window_t *wnd = (vout_window_t *)obj;
     xcb_generic_error_t *err;
     xcb_void_cookie_t ck;
 
@@ -257,8 +256,7 @@ static int Open (vlc_object_t *obj)
 
     xcb_window_t window = xcb_generate_id (conn);
     ck = xcb_create_window_checked (conn, scr->root_depth, window, scr->root,
-                                    wnd->cfg->x, wnd->cfg->y,
-                                    wnd->cfg->width, wnd->cfg->height, 0,
+                                    cfg->x, cfg->y, cfg->width, cfg->height, 0,
                                     XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                     scr->root_visual, mask, values);
     err = xcb_request_check (conn, ck);
@@ -275,8 +273,8 @@ static int Open (vlc_object_t *obj)
     wnd->sys = p_sys;
 
     p_sys->conn = conn;
-    if (var_InheritBool (obj, "keyboard-events"))
-        p_sys->keys = CreateKeyHandler (obj, conn);
+    if (var_InheritBool (wnd, "keyboard-events"))
+        p_sys->keys = CreateKeyHandler (VLC_OBJECT(wnd), conn);
     else
         p_sys->keys = NULL;
     p_sys->root = scr->root;
@@ -342,7 +340,7 @@ static int Open (vlc_object_t *obj)
     /* Make the window visible */
     xcb_map_window (conn, window);
 
-    if (var_InheritBool (obj, "video-wallpaper"))
+    if (var_InheritBool (wnd, "video-wallpaper"))
     {
         vout_window_SetState (wnd, VOUT_WINDOW_STATE_BELOW);
         vout_window_SetFullScreen (wnd, true);
@@ -373,9 +371,8 @@ error:
 /**
  * Destroys the X11 window.
  */
-static void Close (vlc_object_t *obj)
+static void Close (vout_window_t *wnd)
 {
-    vout_window_t *wnd = (vout_window_t *)obj;
     vout_window_sys_t *p_sys = wnd->sys;
     xcb_connection_t *conn = p_sys->conn;
 
@@ -607,15 +604,13 @@ static void ReleaseDrawable (vlc_object_t *obj, xcb_window_t window)
 /**
  * Wrap an existing X11 window to embed the video.
  */
-static int EmOpen (vlc_object_t *obj)
+static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
-    vout_window_t *wnd = (vout_window_t *)obj;
-
-    xcb_window_t window = var_InheritInteger (obj, "drawable-xid");
+    xcb_window_t window = var_InheritInteger (wnd, "drawable-xid");
     if (window == 0)
         return VLC_EGENERIC;
 
-    if (AcquireDrawable (obj, window))
+    if (AcquireDrawable (VLC_OBJECT(wnd), window))
         return VLC_EGENERIC;
 
     vout_window_sys_t *p_sys = malloc (sizeof (*p_sys));
@@ -635,15 +630,15 @@ static int EmOpen (vlc_object_t *obj)
         xcb_get_geometry_reply (conn, xcb_get_geometry (conn, window), NULL);
     if (geo == NULL)
     {
-        msg_Err (obj, "bad X11 window 0x%08"PRIx8, window);
+        msg_Err (wnd, "bad X11 window 0x%08"PRIx8, window);
         goto error;
     }
     p_sys->root = geo->root;
     free (geo);
 
-    if (var_InheritBool (obj, "keyboard-events"))
+    if (var_InheritBool (wnd, "keyboard-events"))
     {
-        p_sys->keys = CreateKeyHandler (obj, conn);
+        p_sys->keys = CreateKeyHandler (VLC_OBJECT(wnd), conn);
         if (p_sys->keys != NULL)
         {
             const uint32_t mask = XCB_CW_EVENT_MASK;
@@ -660,21 +655,20 @@ static int EmOpen (vlc_object_t *obj)
         DestroyKeyHandler (p_sys->keys);
 
     xcb_flush (conn);
-
+    (void) cfg;
     return VLC_SUCCESS;
 
 error:
     xcb_disconnect (conn);
     free (p_sys);
-    ReleaseDrawable (obj, window);
+    ReleaseDrawable (VLC_OBJECT(wnd), window);
     return VLC_EGENERIC;
 }
 
-static void EmClose (vlc_object_t *obj)
+static void EmClose (vout_window_t *wnd)
 {
-    vout_window_t *wnd = (vout_window_t *)obj;
     xcb_window_t window = wnd->handle.xid;
 
-    Close (obj);
-    ReleaseDrawable (obj, window);
+    Close (wnd);
+    ReleaseDrawable (VLC_OBJECT(wnd), window);
 }

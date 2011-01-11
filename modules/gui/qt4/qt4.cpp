@@ -46,6 +46,7 @@
 #include "../../../share/icons/32x32/vlc.xpm"
 #include "../../../share/icons/32x32/vlc-xmas.xpm"
 #include <vlc_plugin.h>
+#include <vlc_vout_window.h>
 
 #ifdef WIN32 /* For static builds */
  #include <QtPlugin>
@@ -60,8 +61,8 @@ static int  OpenIntf     ( vlc_object_t * );
 static int  OpenDialogs  ( vlc_object_t * );
 static int  Open         ( vlc_object_t *, bool );
 static void Close        ( vlc_object_t * );
-static int  WindowOpen   ( vlc_object_t * );
-static void WindowClose  ( vlc_object_t * );
+static int  WindowOpen   ( vout_window_t *, const vout_window_cfg_t * );
+static void WindowClose  ( vout_window_t * );
 static void *Thread      ( void * );
 static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
@@ -607,31 +608,23 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
  *
  * TODO move it out of here ?
  */
-#include <vlc_vout_window.h>
-
 static int WindowControl( vout_window_t *, int i_query, va_list );
 
-static int WindowOpen( vlc_object_t *p_obj )
+static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 {
-    vout_window_t *p_wnd = (vout_window_t*)p_obj;
-
     /* */
-    if( p_wnd->cfg->is_standalone )
+    if( cfg->is_standalone )
         return VLC_EGENERIC;
 #if defined (Q_WS_X11)
-    if( var_InheritBool( p_obj, "video-wallpaper" ) )
+    if( var_InheritBool( p_wnd, "video-wallpaper" ) )
         return VLC_EGENERIC;
 #endif
 
-    vlc_value_t val;
-    if( var_Inherit( p_obj, "qt4-iface", VLC_VAR_ADDRESS, &val ) )
-        val.p_address = NULL;
-
-    intf_thread_t *p_intf = (intf_thread_t *)val.p_address;
-
+    intf_thread_t *p_intf =
+        (intf_thread_t *)var_InheritAddress( p_wnd, "qt4-iface" );
     if( !p_intf )
     {   /* If another interface is used, this plugin cannot work */
-        msg_Dbg( p_obj, "Qt4 interface not found" );
+        msg_Dbg( p_wnd, "Qt4 interface not found" );
         return VLC_EGENERIC;
     }
 
@@ -640,12 +633,12 @@ static int WindowOpen( vlc_object_t *p_obj )
         return VLC_EGENERIC;
 
     MainInterface *p_mi = p_intf->p_sys->p_mi;
-    msg_Dbg( p_obj, "requesting video..." );
+    msg_Dbg( p_wnd, "requesting video..." );
 
-    int i_x = p_wnd->cfg->x;
-    int i_y = p_wnd->cfg->y;
-    unsigned i_width = p_wnd->cfg->width;
-    unsigned i_height = p_wnd->cfg->height;
+    int i_x = cfg->x;
+    int i_y = cfg->y;
+    unsigned i_width = cfg->width;
+    unsigned i_height = cfg->height;
 
 #if defined (Q_WS_X11)
     p_wnd->handle.xid = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
@@ -684,9 +677,8 @@ static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
     return p_mi->controlVideo( i_query, args );
 }
 
-static void WindowClose( vlc_object_t *p_obj )
+static void WindowClose( vout_window_t *p_wnd )
 {
-    vout_window_t *p_wnd = (vout_window_t*)p_obj;
     MainInterface *p_mi = (MainInterface *)p_wnd->sys;
     QMutexLocker locker (&lock);
 
@@ -701,9 +693,9 @@ static void WindowClose( vlc_object_t *p_obj )
      * XCB and Xlib-XCB are fine with that. Plain Xlib wouldn't, */
     if (unlikely(!active))
     {
-        msg_Warn (p_obj, "video already released");
+        msg_Warn (p_wnd, "video already released");
         return;
     }
-    msg_Dbg (p_obj, "releasing video...");
+    msg_Dbg (p_wnd, "releasing video...");
     p_mi->releaseVideo();
 }

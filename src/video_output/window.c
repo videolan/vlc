@@ -42,6 +42,15 @@ typedef struct
     vlc_inhibit_t *inhibit;
 } window_t;
 
+static int vout_window_start(void *func, va_list ap)
+{
+    int (*activate)(vout_window_t *, const vout_window_cfg_t *) = func;
+    vout_window_t *wnd = va_arg(ap, vout_window_t *);
+    const vout_window_cfg_t *cfg = va_arg(ap, const vout_window_cfg_t *);
+
+    return activate(wnd, cfg);
+}
+
 vout_window_t *vout_window_New(vlc_object_t *obj,
                                const char *module,
                                const vout_window_cfg_t *cfg)
@@ -50,7 +59,6 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
     window_t *w = vlc_custom_create(obj, sizeof(*w), VLC_OBJECT_GENERIC, name);
     vout_window_t *window = &w->wnd;
 
-    window->cfg = cfg;
     memset(&window->handle, 0, sizeof(window->handle));
     window->control = NULL;
     window->sys = NULL;
@@ -80,7 +88,8 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
         assert(0);
     }
 
-    w->module = module_need(window, type, module, module && *module != '\0');
+    w->module = vlc_module_load(window, type, module, module && *module,
+                                vout_window_start, window, cfg);
     if (!w->module) {
         vlc_object_release(window);
         return NULL;
@@ -100,6 +109,14 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
     return window;
 }
 
+static void vout_window_stop(void *func, va_list ap)
+{
+    int (*deactivate)(vout_window_t *) = func;
+    vout_window_t *wnd = va_arg(ap, vout_window_t *);
+
+    deactivate(wnd);
+}
+
 void vout_window_Delete(vout_window_t *window)
 {
     if (!window)
@@ -112,8 +129,7 @@ void vout_window_Delete(vout_window_t *window)
         vlc_inhibit_Destroy (w->inhibit);
     }
 
-    module_unneed(window, w->module);
-
+    vlc_module_unload(w->module, vout_window_stop, window);
     vlc_object_release(window);
 }
 

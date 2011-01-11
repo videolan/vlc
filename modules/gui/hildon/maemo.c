@@ -47,13 +47,13 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int      Open               ( vlc_object_t * );
-static void     Close              ( vlc_object_t * );
-static void     *Thread            ( void * );
-static int      OpenWindow         ( vlc_object_t * );
-static void     CloseWindow        ( vlc_object_t * );
-static int      ControlWindow      ( vout_window_t *, int, va_list );
-static gboolean interface_ready    ( gpointer );
+static int      Open            ( vlc_object_t * );
+static void     Close           ( vlc_object_t * );
+static void     *Thread         ( void * );
+static int      OpenWindow      ( vout_window_t *, const vout_window_cfg_t * );
+static void     CloseWindow     ( vout_window_t * );
+static int      ControlWindow   ( vout_window_t *, int, va_list );
+static gboolean interface_ready ( gpointer );
 
 /*****************************************************************************
 * Module descriptor
@@ -283,13 +283,12 @@ static void *Thread( void *obj )
 /**
 * Video output window provider
 */
-static int OpenWindow (vlc_object_t *p_obj)
+static int OpenWindow (vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 {
-    vout_window_t *p_wnd = (vout_window_t *)p_obj;
     intf_thread_t *p_intf;
     vlc_value_t val;
 
-    if (p_wnd->cfg->is_standalone)
+    if (cfg->is_standalone)
         return VLC_EGENERIC;
 
     if( var_Get( p_obj->p_libvlc, "hildon-iface", &val ) )
@@ -343,9 +342,8 @@ static int ControlWindow (vout_window_t *p_wnd, int query, va_list args)
     }
 }
 
-static void CloseWindow (vlc_object_t *p_obj)
+static void CloseWindow (vout_window_t *p_wnd)
 {
-    vout_window_t *p_wnd = (vout_window_t *)p_obj;
     intf_thread_t *p_intf = (intf_thread_t *)p_wnd->sys;
 
     if( p_intf->p_sys->b_fullscreen )

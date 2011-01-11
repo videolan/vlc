@@ -31,8 +31,8 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 
-static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
+static int  Open (vout_window_t *, const vout_window_cfg_t *);
+static void Close(vout_window_t *);
 
 /*
  * Module descriptor
@@ -54,23 +54,22 @@ static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 /**
  * Find the drawable set by libvlc application.
  */
-static int Open (vlc_object_t *obj)
+static int Open (vout_window_t *wnd)
 {
-    vout_window_t *wnd = (vout_window_t *)obj;
     void **used, *val;
     size_t n = 0;
 
-    if (var_Create (obj->p_libvlc, "hwnd-in-use", VLC_VAR_ADDRESS)
-     || var_Create (obj, "drawable-hwnd", VLC_VAR_DOINHERIT | VLC_VAR_ADDRESS))
+    if (var_Create (wnd->p_libvlc, "hwnd-in-use", VLC_VAR_ADDRESS)
+     || var_Create (wnd, "drawable-hwnd", VLC_VAR_DOINHERIT | VLC_VAR_ADDRESS))
         return VLC_ENOMEM;
 
-    val = var_GetAddress (obj, "drawable-hwnd");
-    var_Destroy (obj, "drawable-hwnd");
+    val = var_GetAddress (wnd, "drawable-hwnd");
+    var_Destroy (wnd, "drawable-hwnd");
 
     /* Keep a list of busy drawables, so we don't overlap videos if there are
      * more than one video track in the stream. */
     vlc_mutex_lock (&serializer);
-    used = var_GetAddress (obj->p_libvlc, "hwnd-in-use");
+    used = var_GetAddress (wnd->p_libvlc, "hwnd-in-use");
     if (used != NULL)
     {
         while (used[n] != NULL)
@@ -86,7 +85,7 @@ static int Open (vlc_object_t *obj)
     {
         used[n] = val;
         used[n + 1] = NULL;
-        var_SetAddress (obj->p_libvlc, "hwnd-in-use", used);
+        var_SetAddress (wnd->p_libvlc, "hwnd-in-use", used);
     }
     else
     {
@@ -108,15 +107,14 @@ skip:
 /**
  * Release the drawable.
  */
-static void Close (vlc_object_t *obj)
+static void Close (vout_window_t *wnd)
 {
-    vout_window_t *wnd = (vout_window_t *)obj;
     void **used, *val = wnd->sys;
     size_t n = 0;
 
     /* Remove this drawable from the list of busy ones */
     vlc_mutex_lock (&serializer);
-    used = var_GetAddress (obj->p_libvlc, "hwnd-in-use");
+    used = var_GetAddress (wnd->p_libvlc, "hwnd-in-use");
     assert (used);
     while (used[n] != val)
     {
@@ -128,13 +126,13 @@ static void Close (vlc_object_t *obj)
     while (used[++n] != NULL);
 
     if (n == 0)
-         var_SetAddress (obj->p_libvlc, "hwnd-in-use", NULL);
+         var_SetAddress (wnd->p_libvlc, "hwnd-in-use", NULL);
     vlc_mutex_unlock (&serializer);
 
     if (n == 0)
         free (used);
     /* Variables are reference-counted... */
-    var_Destroy (obj->p_libvlc, "hwnd-in-use");
+    var_Destroy (wnd->p_libvlc, "hwnd-in-use");
 }
 
 

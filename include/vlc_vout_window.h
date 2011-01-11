@@ -79,11 +79,6 @@ typedef struct {
 struct vout_window_t {
     VLC_COMMON_MEMBERS
 
-    /* Initial state (reserved).
-     * Once the open function is called, it will be set to NULL
-     */
-    const vout_window_cfg_t *cfg;
-
     /* window handle (mandatory)
      *
      * It must be filled in the open function.
