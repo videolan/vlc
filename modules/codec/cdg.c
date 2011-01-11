@@ -37,18 +37,18 @@
  *****************************************************************************/
 
 /* The screen size */
-#define CDG_SCREEN_WIDTH (300)
-#define CDG_SCREEN_HEIGHT (216)
+#define CDG_SCREEN_WIDTH 300u
+#define CDG_SCREEN_HEIGHT 216u
 
 /* The border of the screen size */
-#define CDG_SCREEN_BORDER_WIDTH (6)
-#define CDG_SCREEN_BORDER_HEIGHT (12)
+#define CDG_SCREEN_BORDER_WIDTH 6u
+#define CDG_SCREEN_BORDER_HEIGHT 12u
 
 /* The display part */
 #define CDG_DISPLAY_WIDTH  (CDG_SCREEN_WIDTH-2*CDG_SCREEN_BORDER_WIDTH)
 #define CDG_DISPLAY_HEIGHT (CDG_SCREEN_HEIGHT-2*CDG_SCREEN_BORDER_HEIGHT)
 
-#define CDG_SCREEN_PITCH (CDG_SCREEN_WIDTH)
+#define CDG_SCREEN_PITCH CDG_SCREEN_WIDTH
 
 struct decoder_sys_t
 {
@@ -61,11 +61,11 @@ struct decoder_sys_t
     int     i_packet;
 };
 
-#define CDG_PACKET_SIZE (24)
+#define CDG_PACKET_SIZE 24u
 
-#define CDG_COLOR_R_SHIFT ( 0)
-#define CDG_COLOR_G_SHIFT ( 8)
-#define CDG_COLOR_B_SHIFT (16)
+#define CDG_COLOR_R_SHIFT  0
+#define CDG_COLOR_G_SHIFT  8
+#define CDG_COLOR_B_SHIFT 16
 
 /*****************************************************************************
  * Local prototypes
