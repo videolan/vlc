@@ -82,8 +82,8 @@ struct vout_display_sys_t
 
 /* Display callbacks */
 static picture_pool_t *Pool (vout_display_t *, unsigned);
-static void PictureRender (vout_display_t *, picture_t *);
-static void PictureDisplay (vout_display_t *, picture_t *);
+static void PictureRender (vout_display_t *, picture_t *, subpicture_t *);
+static void PictureDisplay (vout_display_t *, picture_t *, subpicture_t *);
 static int Control (vout_display_t *, int, va_list);
 /* OpenGL callbacks */
 static void SwapBuffers (vout_opengl_t *gl);
