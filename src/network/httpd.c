@@ -37,6 +37,7 @@
 #include <vlc_acl.h>
 #include <vlc_strings.h>
 #include <vlc_rand.h>
+#include <vlc_charset.h>
 #include "../libvlc.h"
 
 #include <string.h>
@@ -1378,7 +1379,7 @@ void httpd_MsgAdd( httpd_message_t *msg, const char *name, const char *psz_value
     char *value = NULL;
 
     va_start( args, psz_value );
-    if( vasprintf( &value, psz_value, args ) == -1 )
+    if( us_vasprintf( &value, psz_value, args ) == -1 )
         value = NULL;
     va_end( args );
 
