@@ -249,15 +249,12 @@ VLC_EXPORT( encoder_t *, sout_EncoderCreate, ( vlc_object_t *obj ) );
 /****************************************************************************
  * Announce handler
  ****************************************************************************/
-VLC_EXPORT(session_descriptor_t*,sout_AnnounceRegisterSDP, ( vlc_object_t *, const char *, const char *, announce_method_t* ) LIBVLC_USED );
+VLC_EXPORT(session_descriptor_t*,sout_AnnounceRegisterSDP, ( vlc_object_t *, const char *, const char * ) LIBVLC_USED );
 VLC_EXPORT( int,                sout_AnnounceUnRegister, (vlc_object_t *,session_descriptor_t* ) );
-#define sout_AnnounceRegisterSDP(o, sdp, addr, m) \
-        sout_AnnounceRegisterSDP(VLC_OBJECT (o), sdp, addr, m)
+#define sout_AnnounceRegisterSDP(o, sdp, addr) \
+        sout_AnnounceRegisterSDP(VLC_OBJECT (o), sdp, addr)
 #define sout_AnnounceUnRegister(o, a) \
         sout_AnnounceUnRegister(VLC_OBJECT (o), a)
-
-VLC_EXPORT(announce_method_t*,   sout_SAPMethod, (void) LIBVLC_USED );
-VLC_EXPORT(void,                 sout_MethodRelease, (announce_method_t *) );
 
 /** SDP */
 

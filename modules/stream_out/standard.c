@@ -463,12 +463,9 @@ static int Open( vlc_object_t *p_this )
         /* Register the SDP with the SAP thread */
         if (psz_sdp != NULL)
         {
-            announce_method_t *p_method = sout_SAPMethod ();
             msg_Dbg (p_stream, "Generated SDP:\n%s", psz_sdp);
-
             p_sys->p_session =
-                sout_AnnounceRegisterSDP (p_sout, psz_sdp, dhost, p_method);
-            sout_MethodRelease (p_method);
+                sout_AnnounceRegisterSDP (p_sout, psz_sdp, dhost);
             free( psz_sdp );
         }
         free (dhost);

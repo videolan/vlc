@@ -1270,14 +1270,9 @@ static int SapSetup( sout_stream_t *p_stream )
     }
 
     if( p_sys->i_es > 0 && p_sys->psz_sdp && *p_sys->psz_sdp )
-    {
-        announce_method_t *p_method = sout_SAPMethod();
         p_sys->p_session = sout_AnnounceRegisterSDP( p_sout,
                                                      p_sys->psz_sdp,
-                                                     p_sys->psz_destination,
-                                                     p_method );
-        sout_MethodRelease( p_method );
-    }
+                                                     p_sys->psz_destination );
 
     return VLC_SUCCESS;
 }

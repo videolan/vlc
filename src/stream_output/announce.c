@@ -35,10 +35,6 @@
 
 #include <assert.h>
 
-struct announce_method_t
-{
-} sap_method;
-
 /****************************************************************************
  * Sout-side functions
  ****************************************************************************/
@@ -58,16 +54,12 @@ static vlc_mutex_t sap_mutex = VLC_STATIC_MUTEX;
  * \param obj a VLC object
  * \param psz_sdp the SDP to register
  * \param psz_dst session address (needed for SAP address auto detection)
- * \param p_method an announce method descriptor
  * \return the new session descriptor structure
  */
 session_descriptor_t *
 sout_AnnounceRegisterSDP( vlc_object_t *obj, const char *psz_sdp,
-                          const char *psz_dst, announce_method_t *p_method )
+                          const char *psz_dst )
 {
-    assert (p_method == &sap_method);
-    (void) p_method;
-
     session_descriptor_t *p_session = calloc( 1, sizeof (*p_session) );
     if( !p_session )
         return NULL;
@@ -133,17 +125,4 @@ int sout_AnnounceUnRegister( vlc_object_t *obj,
     free (p_session);
 
     return 0;
-}
-
-/**
- * \return the SAP announce method
- */
-announce_method_t * sout_SAPMethod (void)
-{
-    return &sap_method;
-}
-
-void sout_MethodRelease (announce_method_t *m)
-{
-    assert (m == &sap_method);
 }
