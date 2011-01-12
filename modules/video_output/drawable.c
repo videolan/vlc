@@ -54,8 +54,9 @@ static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 /**
  * Find the drawable set by libvlc application.
  */
-static int Open (vout_window_t *wnd)
+static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
+    VLC_UNUSED (cfg);
     void **used, *val;
     size_t n = 0;
 
