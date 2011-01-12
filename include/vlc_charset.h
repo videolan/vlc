@@ -114,6 +114,7 @@ VLC_EXPORT( void *, ToCharset, ( const char *charset, const char *in, size_t *ou
 VLC_EXPORT( double, us_strtod, ( const char *, char ** ) LIBVLC_USED );
 VLC_EXPORT( float, us_strtof, ( const char *, char ** ) LIBVLC_USED );
 VLC_EXPORT( double, us_atof, ( const char * ) LIBVLC_USED );
+VLC_EXPORT( int, us_vasprintf, ( char **, const char *, va_list ) );
 VLC_EXPORT( int, us_asprintf, ( char **, const char *, ... ) LIBVLC_USED );
 
 #endif

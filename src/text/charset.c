@@ -92,25 +92,38 @@ double us_atof( const char *str )
 
 
 /**
- * us_asprintf() has the same prototype as asprintf(), but doesn't use
+ * us_vasprintf() has the same prototype as vasprintf(), but doesn't use
  * the system locale.
  */
-int us_asprintf( char **ret, const char *format, ... )
+int us_vasprintf( char **ret, const char *format, va_list ap )
 {
-    va_list ap;
     locale_t loc = newlocale( LC_NUMERIC_MASK, "C", NULL );
     locale_t oldloc = uselocale( loc );
-    int i_rc;
 
-    va_start( ap, format );
-    i_rc = vasprintf( ret, format, ap );
-    va_end( ap );
+    int i_rc = vasprintf( ret, format, ap );
 
     if ( loc != (locale_t)0 )
     {
         uselocale( oldloc );
         freelocale( loc );
     }
+
+    return i_rc;
+}
+
+
+/**
+ * us_asprintf() has the same prototype as asprintf(), but doesn't use
+ * the system locale.
+ */
+int us_asprintf( char **ret, const char *format, ... )
+{
+    va_list ap;
+    int i_rc;
+
+    va_start( ap, format );
+    i_rc = us_vasprintf( ret, format, ap );
+    va_end( ap );
 
     return i_rc;
 }
