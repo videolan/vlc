@@ -91,12 +91,11 @@ public:
     static void executeWait( const CmdGenericPtr& rcCommand  )
     {
         CmdExecuteBlock& rCmd = (CmdExecuteBlock&)*rcCommand.get();
-        vlc_mutex_lock( &rCmd.m_lock );
+        vlc_mutex_locker locker( &rCmd.m_lock );
 
         if( !rCmd.m_pObj || !rCmd.m_pfFunc || rCmd.m_executing )
         {
             msg_Err( rCmd.getIntf(), "unexpected command call" );
-            vlc_mutex_unlock( &rCmd.m_lock );
             return;
         }
 
@@ -106,25 +105,21 @@ public:
         rCmd.m_executing = true;
         while( rCmd.m_executing )
             vlc_cond_wait( &rCmd.m_wait, &rCmd.m_lock );
-
-        vlc_mutex_unlock( &rCmd.m_lock );
     }
 
     virtual void execute()
     {
-        vlc_mutex_lock( &m_lock );
+        vlc_mutex_locker locker( &m_lock );
 
         if( !m_pObj || !m_pfFunc || !m_executing )
         {
             msg_Err( getIntf(), "unexpected command call" );
-            vlc_mutex_unlock( &m_lock );
             return;
         }
 
         (*m_pfFunc)( getIntf(), m_pObj );
         m_executing = false;
         vlc_cond_signal( &m_wait );
-        vlc_mutex_unlock( &m_lock );
     }
 
     virtual string getType() const { return "CmdExecuteBlock"; }
