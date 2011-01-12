@@ -68,13 +68,13 @@ public:
     Window getDrawable() const { return m_wnd; }
 
     /// Getter for the handler
-    void* getOSHandle() const { return (void*) m_wnd; }
+    uint32_t getOSHandle() const { return m_wnd; }
 
     /// Getter for the handler
-    void* getParentOSHandle() const { return (void*) m_wnd_parent; }
+    uint32_t getParentOSHandle() const { return m_wnd_parent; }
 
     /// reparent the window
-    void reparent( void* OSHandle, int x, int y, int w, int h );
+    void reparent( uint32_t OSHandle, int x, int y, int w, int h );
 
     /// invalidate a window surface
     bool invalidateRect( int x, int y, int w, int h ) const;

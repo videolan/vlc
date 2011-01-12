@@ -132,6 +132,9 @@ public:
     /// Delete a directory recursively
     virtual void rmDir( const string &rPath ) = 0;
 
+    /// Get Display
+    virtual char* getDisplay() = 0;
+
 protected:
     // Protected because it's a singleton
     OSFactory( intf_thread_t* pIntf ): SkinObject( pIntf ) { }

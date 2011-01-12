@@ -25,17 +25,9 @@
 # include "config.h"
 #endif
 
-#include <vlc_vout.h>
-#include <vlc_vout_display.h>
-
 #include "vout_manager.hpp"
-#include "window_manager.hpp"
 #include "vlcproc.hpp"
-#include "../commands/async_queue.hpp"
-#include "../commands/cmd_show_window.hpp"
-#include "../commands/cmd_resize.hpp"
-#include "../commands/cmd_voutwindow.hpp"
-#include "../commands/cmd_on_top.hpp"
+#include "os_factory.hpp"
 
 
 
@@ -194,16 +186,15 @@ CtrlVideo* VoutManager::getBestCtrlVideo( )
 }
 
 
-void* VoutManager::acceptWnd( vout_window_t* pWnd )
-{
-    int width = (int)pWnd->cfg->width;
-    int height = (int)pWnd->cfg->height;
 
+// Functions called by window provider
+// ///////////////////////////////////
+
+void VoutManager::acceptWnd( vout_window_t* pWnd, int width, int height )
+{
     // Creation of a dedicated Window per vout thread
     VoutWindow* pVoutWindow = new VoutWindow( getIntf(), pWnd, width, height,
                                          (GenericWindow*) m_pVoutMainWindow );
-
-    void* handle = pVoutWindow->getOSHandle();
 
     // try to find a video Control within the theme
     CtrlVideo* pCtrlVideo = getBestCtrlVideo();
@@ -221,14 +212,12 @@ void* VoutManager::acceptWnd( vout_window_t* pWnd )
     // save vout characteristics
     m_SavedWndVec.push_back( SavedWnd( pWnd, pVoutWindow, pCtrlVideo ) );
 
-    msg_Dbg( pWnd, "New vout : handle = %p, Ctrl = %p, w x h = %dx%d",
-                    handle, pCtrlVideo, width, height );
-
-    return handle;
+    msg_Dbg( pWnd, "New vout : Ctrl = %p, w x h = %dx%d",
+                    pCtrlVideo, width, height );
 }
 
 
-void VoutManager::releaseWnd( vout_window_t *pWnd )
+void VoutManager::releaseWnd( vout_window_t* pWnd )
 {
     // remove vout thread from savedVec
     vector<SavedWnd>::iterator it;
@@ -259,7 +248,7 @@ void VoutManager::releaseWnd( vout_window_t *pWnd )
 
 void VoutManager::setSizeWnd( vout_window_t *pWnd, int width, int height )
 {
-   msg_Dbg( pWnd, "setSize (%dx%d) received from vout threadr",
+   msg_Dbg( pWnd, "setSize (%dx%d) received from vout thread",
                   width, height );
 
    vector<SavedWnd>::iterator it;
@@ -301,116 +290,6 @@ void VoutManager::onUpdate( Subject<VarBool> &rVariable, void *arg  )
             m_pVoutMainWindow->show();
         else
             m_pVoutMainWindow->hide();
-    }
-}
-
-
-// Functions called by window provider
-// ///////////////////////////////////
-
-void *VoutManager::getWindow( intf_thread_t *pIntf, vout_window_t *pWnd )
-{
-    // Theme may have been destroyed
-    if( !pIntf->p_sys->p_theme )
-        return NULL;
-
-    vlc_mutex_lock( &pIntf->p_sys->vout_lock );
-    pIntf->p_sys->b_vout_ready = false;
-    pIntf->p_sys->handle = NULL;
-
-    CmdNewVoutWindow *pCmd =
-        new CmdNewVoutWindow( pIntf, pWnd );
-
-    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
-    pQueue->push( CmdGenericPtr( pCmd ), false );
-
-    while( !pIntf->p_sys->b_vout_ready )
-        vlc_cond_wait( &pIntf->p_sys->vout_wait, &pIntf->p_sys->vout_lock );
-
-    void* handle = pIntf->p_sys->handle;
-    vlc_mutex_unlock( &pIntf->p_sys->vout_lock );
-
-    return handle;
-}
-
-
-void VoutManager::releaseWindow( intf_thread_t *pIntf, vout_window_t *pWnd )
-{
-    vlc_mutex_lock( &pIntf->p_sys->vout_lock );
-    pIntf->p_sys->b_vout_ready = false;
-
-    CmdReleaseVoutWindow *pCmd =
-        new CmdReleaseVoutWindow( pIntf, pWnd );
-
-    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
-    pQueue->push( CmdGenericPtr( pCmd ), false );
-
-    while( !pIntf->p_sys->b_vout_ready )
-        vlc_cond_wait( &pIntf->p_sys->vout_wait, &pIntf->p_sys->vout_lock );
-
-    vlc_mutex_unlock( &pIntf->p_sys->vout_lock );
-}
-
-
-int VoutManager::controlWindow( struct vout_window_t *pWnd,
-                            int query, va_list args )
-{
-    intf_thread_t *pIntf = (intf_thread_t *)pWnd->sys;
-    VoutManager *pThis = pIntf->p_sys->p_voutManager;
-
-    switch( query )
-    {
-        case VOUT_WINDOW_SET_SIZE:
-        {
-            unsigned int i_width  = va_arg( args, unsigned int );
-            unsigned int i_height = va_arg( args, unsigned int );
-
-            if( i_width && i_height )
-            {
-                // Post a vout resize command
-                CmdResizeVout *pCmd =
-                    new CmdResizeVout( pThis->getIntf(),
-                                        pWnd, (int)i_width, (int)i_height );
-                AsyncQueue *pQueue =
-                   AsyncQueue::instance( pThis->getIntf() );
-                pQueue->push( CmdGenericPtr( pCmd ) );
-            }
-            return VLC_EGENERIC;
-        }
-
-        case VOUT_WINDOW_SET_FULLSCREEN:
-        {
-            bool b_fullscreen = va_arg( args, int );
-
-            // Post a vout resize command
-            CmdSetFullscreen* pCmd =
-                new CmdSetFullscreen( pThis->getIntf(), pWnd, b_fullscreen );
-
-            AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-            pQueue->push( CmdGenericPtr( pCmd ) );
-
-            return VLC_SUCCESS;
-        }
-
-        case VOUT_WINDOW_SET_STATE:
-        {
-            unsigned i_arg = va_arg( args, unsigned );
-            unsigned on_top = i_arg & VOUT_WINDOW_STATE_ABOVE;
-
-            // Post a SetOnTop command
-            CmdSetOnTop* pCmd =
-                new CmdSetOnTop( pThis->getIntf(), on_top );
-
-            AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-            pQueue->push( CmdGenericPtr( pCmd ) );
-
-            return VLC_SUCCESS;
-        }
-
-
-        default:
-            msg_Dbg( pWnd, "control query not supported" );
-            return VLC_EGENERIC;
     }
 }
 

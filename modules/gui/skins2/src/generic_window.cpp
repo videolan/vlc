@@ -166,8 +166,7 @@ void GenericWindow::innerHide()
     }
 }
 
-
-void* GenericWindow::getOSHandle() const
+vlc_wnd_type GenericWindow::getOSHandle() const
 {
     return m_pOsWindow->getOSHandle();
 }
@@ -181,7 +180,7 @@ void GenericWindow::setParent( GenericWindow* pParent, int x, int y, int w, int 
     m_width  = ( w > 0 ) ? w : m_width;
     m_height = ( h > 0 ) ? h : m_height;
 
-    void* handle = pParent ? pParent->getOSHandle() : NULL;
+    vlc_wnd_type handle = pParent ? pParent->getOSHandle() : 0;
     m_pOsWindow->reparent( handle, m_left, m_top, m_width, m_height );
 }
 

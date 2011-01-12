@@ -29,6 +29,7 @@
 
 #include "../src/os_factory.hpp"
 #include "../src/generic_window.hpp"
+#include "x11_display.hpp"
 #include <map>
 
 class X11Display;
@@ -140,6 +141,9 @@ public:
 
     /// Get the timer loop
     X11TimerLoop *getTimerLoop() const { return m_pTimerLoop; }
+
+    /// Get x11_display string (to be freed by caller)
+    char* getDisplay() { return m_pDisplay->getX11Display(); }
 
 private:
     /// X11 display

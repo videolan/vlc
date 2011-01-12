@@ -41,14 +41,32 @@ VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
       m_pParentWindow( pParent ), m_pCtrlVideo( NULL )
 {
     if( m_pWnd )
+    {
         vlc_object_hold( m_pWnd );
+
+#ifdef X11_SKINS
+        m_pWnd->handle.xid = getOSHandle();
+        if( m_pWnd->handle.xid )
+            m_pWnd->display.x11 =
+                OSFactory::instance( getIntf() )->getDisplay();
+#else
+        m_pWnd->handle.hwnd = getOSHandle();
+#endif
+    }
+
 }
 
 
 VoutWindow::~VoutWindow()
 {
     if( m_pWnd )
+    {
+#ifdef X11_SKINS
+        free( m_pWnd->display.x11 );
+        m_pWnd->display.x11 = NULL;
+#endif
         vlc_object_release( m_pWnd );
+    }
 }
 
 

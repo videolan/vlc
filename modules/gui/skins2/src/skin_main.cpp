@@ -32,6 +32,7 @@
 #include <vlc_playlist.h>
 #include <vlc_threads.h>
 #include <vlc_vout_window.h>
+#include <vlc_vout_display.h>
 
 #include "dialogs.hpp"
 #include "os_factory.hpp"
@@ -50,6 +51,10 @@
 #include "../commands/cmd_dialogs.hpp"
 #include "../commands/cmd_minimize.hpp"
 #include "../commands/cmd_playlist.hpp"
+#include "../commands/cmd_callbacks.hpp"
+#include "../commands/cmd_show_window.hpp"
+#include "../commands/cmd_resize.hpp"
+#include "../commands/cmd_on_top.hpp"
 
 //---------------------------------------------------------------------------
 // Exported interface functions.
@@ -108,9 +113,6 @@ static int Open( vlc_object_t *p_this )
     // No theme yet
     p_intf->p_sys->p_theme = NULL;
 
-    vlc_mutex_init( &p_intf->p_sys->vout_lock );
-    vlc_cond_init( &p_intf->p_sys->vout_wait );
-
     vlc_mutex_init( &p_intf->p_sys->init_lock );
     vlc_cond_init( &p_intf->p_sys->init_wait );
 
@@ -124,8 +126,6 @@ static int Open( vlc_object_t *p_this )
 
         vlc_cond_destroy( &p_intf->p_sys->init_wait );
         vlc_mutex_destroy( &p_intf->p_sys->init_lock );
-        vlc_cond_destroy( &p_intf->p_sys->vout_wait );
-        vlc_mutex_destroy( &p_intf->p_sys->vout_lock );
         free( p_intf->p_sys );
         return VLC_EGENERIC;
     }
@@ -163,9 +163,6 @@ static void Close( vlc_object_t *p_this )
 #if 0
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 #endif
-
-    vlc_cond_destroy( &p_intf->p_sys->vout_wait );
-    vlc_mutex_destroy( &p_intf->p_sys->vout_lock );
 
     // Destroy structure
     free( p_intf->p_sys );
@@ -313,11 +310,34 @@ end:
     return NULL;
 }
 
-static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
+static int  WindowOpen( vout_window_t *, const vout_window_cfg_t * );
+static void WindowClose( vout_window_t * );
+static int  WindowControl( vout_window_t *, int, va_list );
 
-// Callbacks for vout requests
+struct vout_window_sys_t
+{
+    intf_thread_t*     pIntf;
+    vout_window_cfg_t  cfg;
+};
+
+static void WindowOpenLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
+{
+    vout_window_t* pWnd = (vout_window_t*)pObj;
+    int width = (int)pWnd->sys->cfg.width;
+    int height = (int)pWnd->sys->cfg.height;
+    VoutManager::instance( pIntf )->acceptWnd( pWnd, width, height );
+}
+
+static void WindowCloseLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
+{
+    vout_window_t* pWnd = (vout_window_t*)pObj;
+    VoutManager::instance( pIntf )->releaseWnd( pWnd );
+}
+
 static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
 {
+    vout_window_sys_t* sys;
+
     vlc_mutex_lock( &skin_load.mutex );
     intf_thread_t *pIntf = skin_load.intf;
     if( pIntf )
@@ -335,37 +355,104 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
         return VLC_EGENERIC;
     }
 
-    vlc_mutex_lock( &serializer );
-
-    pWnd->handle.hwnd = VoutManager::getWindow( pIntf, pWnd );
-
-    if( pWnd->handle.hwnd )
-    {
-        pWnd->control = &VoutManager::controlWindow;
-        pWnd->sys = (vout_window_sys_t*)pIntf;
-
-        vlc_mutex_unlock( &serializer );
-        return VLC_SUCCESS;
-    }
-    else
+    sys = (vout_window_sys_t*)calloc( 1, sizeof( *sys ) );
+    if( !sys )
     {
         vlc_object_release( pIntf );
-        vlc_mutex_unlock( &serializer );
+        return VLC_ENOMEM;
+    }
+
+    pWnd->sys = sys;
+    pWnd->sys->cfg = *cfg;
+    pWnd->sys->pIntf = pIntf;
+    pWnd->control = WindowControl;
+
+    // force execution in the skins2 thread context
+    CmdExecuteBlock* cmd = new CmdExecuteBlock( pIntf, VLC_OBJECT( pWnd ),
+                                                WindowOpenLocal );
+    CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
+
+#ifdef X11_SKINS
+    if( !pWnd->handle.xid )
+#else
+    if( !pWnd->handle.hwnd )
+#endif
+    {
+        free( sys );
+        vlc_object_release( pIntf );
         return VLC_EGENERIC;
     }
+
+    return VLC_SUCCESS;
 }
 
 static void WindowClose( vout_window_t *pWnd )
 {
-    intf_thread_t *pIntf = (intf_thread_t *)pWnd->sys;
+    vout_window_sys_t* sys = pWnd->sys;
+    intf_thread_t *pIntf = sys->pIntf;
 
-    vlc_mutex_lock( &serializer );
-    VoutManager::releaseWindow( pIntf, pWnd );
-    vlc_mutex_unlock( &serializer );
+    // force execution in the skins2 thread context
+    CmdExecuteBlock* cmd = new CmdExecuteBlock( pIntf, VLC_OBJECT( pWnd ),
+                                                WindowCloseLocal );
+    CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
 
-    vlc_object_release( pIntf );
+    vlc_object_release( sys->pIntf );
+    free( sys );
 }
 
+static int WindowControl( vout_window_t *pWnd, int query, va_list args )
+{
+    vout_window_sys_t* sys = pWnd->sys;
+    intf_thread_t *pIntf = sys->pIntf;
+    VoutManager *pVoutManager = VoutManager::instance( pIntf );
+    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+
+    switch( query )
+    {
+        case VOUT_WINDOW_SET_SIZE:
+        {
+            unsigned int i_width  = va_arg( args, unsigned int );
+            unsigned int i_height = va_arg( args, unsigned int );
+
+            if( i_width && i_height )
+            {
+                // Post a vout resize command
+                CmdResizeVout *pCmd =
+                    new CmdResizeVout( pIntf, pWnd,
+                                       (int)i_width, (int)i_height );
+                pQueue->push( CmdGenericPtr( pCmd ) );
+            }
+            return VLC_EGENERIC;
+        }
+
+        case VOUT_WINDOW_SET_FULLSCREEN:
+        {
+            bool b_fullscreen = va_arg( args, int );
+
+            // Post a set fullscreen command
+            CmdSetFullscreen* pCmd =
+                new CmdSetFullscreen( pIntf, pWnd, b_fullscreen );
+            pQueue->push( CmdGenericPtr( pCmd ) );
+            return VLC_SUCCESS;
+        }
+
+        case VOUT_WINDOW_SET_STATE:
+        {
+            unsigned i_arg = va_arg( args, unsigned );
+            unsigned on_top = i_arg & VOUT_WINDOW_STATE_ABOVE;
+
+            // Post a SetOnTop command
+            CmdSetOnTop* pCmd =
+                new CmdSetOnTop( pIntf, on_top );
+            pQueue->push( CmdGenericPtr( pCmd ) );
+            return VLC_SUCCESS;
+        }
+
+        default:
+            msg_Dbg( pIntf, "control query not supported" );
+            return VLC_EGENERIC;
+    }
+}
 
 //---------------------------------------------------------------------------
 // Module descriptor

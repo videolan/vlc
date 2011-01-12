@@ -97,7 +97,7 @@ public:
     virtual string getType() const { return "Generic"; }
 
     /// windows handle
-    void* getOSHandle() const;
+    vlc_wnd_type getOSHandle() const;
 
     /// reparent
     void setParent( GenericWindow* pParent,

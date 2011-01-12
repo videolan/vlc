@@ -106,27 +106,17 @@ public:
     /// Delete the instance of VoutManager
     static void destroy( intf_thread_t *pIntf );
 
-    /// Accept Wnd
-    void* acceptWnd( vout_window_t* pWnd );
+    /// accept window request (vout window provider)
+    void acceptWnd( vout_window_t *pWnd, int width, int height );
 
-    /// Release Wnd
-    void releaseWnd( vout_window_t* pWnd );
+    // release window (vout window provider)
+    void releaseWnd( vout_window_t *pWnd );
 
-    /// set size Wnd
+    /// set window size (vout window provider)
     void setSizeWnd( vout_window_t* pWnd, int width, int height );
 
-    /// set fullscreen Wnd
+    /// set fullscreen mode (vout window provider)
     void setFullscreenWnd( vout_window_t* pWnd, bool b_fullscreen );
-
-    /// Callback to request a vout window
-    static void *getWindow( intf_thread_t *pIntf, vout_window_t *pWnd );
-
-    // Window provider (release)
-    static void releaseWindow( intf_thread_t *pIntf, vout_window_t *pWnd  );
-
-    /// Callback to change a vout window
-    static int controlWindow( struct vout_window_t *pWnd,
-                              int query, va_list args );
 
     // Register Video Controls (when building theme)
     void registerCtrlVideo( CtrlVideo* p_CtrlVideo );

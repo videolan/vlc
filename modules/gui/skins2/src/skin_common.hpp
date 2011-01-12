@@ -61,6 +61,11 @@ class ThemeRepository;
 #pragma warning ( disable:4786 )
 #endif
 
+#ifdef X11_SKINS
+typedef uint32_t vlc_wnd_type;
+#else
+typedef void* vlc_wnd_type;
+#endif
 
 /// Wrapper around FromLocale, to avoid the need to call LocaleFree()
 static inline string sFromLocale( const string &rLocale )
@@ -138,12 +143,6 @@ struct intf_sys_t
     vlc_mutex_t  init_lock;
     vlc_cond_t   init_wait;
     bool         b_ready;
-
-    /// handle (vout windows)
-    void*        handle;
-    vlc_mutex_t  vout_lock;
-    vlc_cond_t   vout_wait;
-    bool         b_vout_ready;
 };
 
 

@@ -83,8 +83,9 @@ public:
     /// Get the main window ID
     Window getMainWindow() const { return m_mainWindow; }
 
-    //XXX
-    ///Window m_voutWindow;
+    /// Get the x11_display string (to be freed by caller)
+    char* getX11Display()
+        { return (m_psz_display ? strdup( m_psz_display ) : NULL); }
 
     /// EWMH spec
     Atom m_net_wm_supported;
@@ -101,6 +102,8 @@ public:
     void testEWMH();
 
 private:
+    /// x11-display (as a character string)
+    char* m_psz_display;
     /// Dummy parent window for the task bar
     Window m_mainWindow;
     /// Display parameters

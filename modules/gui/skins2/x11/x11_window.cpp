@@ -237,7 +237,7 @@ X11Window::~X11Window()
     XSync( XDISPLAY, False );
 }
 
-void X11Window::reparent( void* OSHandle, int x, int y, int w, int h )
+void X11Window::reparent( uint32_t OSHandle, int x, int y, int w, int h )
 {
     // Reparent the window
     Window new_parent =
