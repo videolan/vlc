@@ -1097,15 +1097,18 @@ static void LoadSlaves( input_thread_t *p_input )
         if( *psz == 0 )
             break;
 
-        msg_Dbg( p_input, "adding slave input '%s'", psz );
+        char *uri = make_URI( psz, NULL );
+        psz = psz_delim;
+        if( uri == NULL )
+            continue;
+        msg_Dbg( p_input, "adding slave input '%s'", uri );
 
         input_source_t *p_slave = InputSourceNew( p_input );
-        if( p_slave && !InputSourceInit( p_input, p_slave, psz, NULL ) )
+        if( p_slave && !InputSourceInit( p_input, p_slave, uri, NULL ) )
             TAB_APPEND( p_input->p->i_slave, p_input->p->slave, p_slave );
         else
             free( p_slave );
-
-        psz = psz_delim;
+        free( uri );
     }
     free( psz_org );
 }
@@ -2030,16 +2033,19 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_ADD_SLAVE:
             if( val.psz_string )
             {
+                char *uri = make_URI( val.psz_string, NULL );
+                if( uri == NULL )
+                    break;
+
                 input_source_t *slave = InputSourceNew( p_input );
 
-                if( slave && !InputSourceInit( p_input, slave, val.psz_string, NULL ) )
+                if( slave && !InputSourceInit( p_input, slave, uri, NULL ) )
                 {
                     vlc_meta_t *p_meta;
                     int64_t i_time;
 
                     /* Add the slave */
-                    msg_Dbg( p_input, "adding %s as slave on the fly",
-                             val.psz_string );
+                    msg_Dbg( p_input, "adding %s as slave on the fly", uri );
 
                     /* Set position */
                     if( demux_Control( p_input->p->input.p_demux,
@@ -2073,9 +2079,9 @@ static bool Control( input_thread_t *p_input,
                 else
                 {
                     free( slave );
-                    msg_Warn( p_input, "failed to add %s as slave",
-                              val.psz_string );
+                    msg_Warn( p_input, "failed to add %s as slave", uri );
                 }
+                free( uri );
             }
             break;
 
