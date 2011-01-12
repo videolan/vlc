@@ -277,6 +277,7 @@ bool MLModel::setData( const QModelIndex &idx, const QVariant &value,
     MLItem *media = static_cast<MLItem*>( idx.internalPointer() );
     media->setData( columnType( idx.column() ), value );
     emit dataChanged( idx, idx );
+    return true;
 }
 
 /**
