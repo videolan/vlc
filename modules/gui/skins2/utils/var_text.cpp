@@ -152,16 +152,10 @@ void VarText::set( const UString &rText )
             pVarManager->getHelpText().addObserver( this );
         }
         if( m_text.find( "$T" ) != UString::npos ||
-            m_text.find( "$t" ) != UString::npos )
-        {
-            pVlcProc->getTimeVar().addObserver( this );
-        }
-        if( m_text.find( "$L" ) != UString::npos ||
-            m_text.find( "$l" ) != UString::npos )
-        {
-            pVlcProc->getTimeVar().addObserver( this );
-        }
-        if( m_text.find( "$D" ) != UString::npos ||
+            m_text.find( "$t" ) != UString::npos ||
+            m_text.find( "$L" ) != UString::npos ||
+            m_text.find( "$l" ) != UString::npos ||
+            m_text.find( "$D" ) != UString::npos ||
             m_text.find( "$d" ) != UString::npos )
         {
             pVlcProc->getTimeVar().addObserver( this );
