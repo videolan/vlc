@@ -76,12 +76,12 @@ void VarTree::delSelected()
         if( it->m_selected )
         {
             Iterator oldIt = it;
-            it++;
+            ++it;
             m_children.erase( oldIt );
         }
         else
         {
-            it++;
+            ++it;
         }
     }
 }
@@ -97,7 +97,7 @@ VarTree::Iterator VarTree::operator[]( int n )
     int i;
     for( it = begin(), i = 0;
          i < n && it != end();
-         it++, i++ );
+         ++it, i++ );
     return it;
 }
 
@@ -107,7 +107,7 @@ VarTree::ConstIterator VarTree::operator[]( int n ) const
     int i;
     for( it = begin(), i = 0;
          i < n && it != end();
-         it++, i++ );
+         ++it, i++ );
     return it;
 }
 
@@ -147,10 +147,10 @@ VarTree::Iterator VarTree::next_uncle()
         while( p_grandparent != NULL )
         {
             Iterator it = p_grandparent->begin();
-            while( it != p_grandparent->end() && &(*it) != p_parent ) it++;
+            while( it != p_grandparent->end() && &(*it) != p_parent ) ++it;
             if( it != p_grandparent->end() )
             {
-                it++;
+                ++it;
                 if( it != p_grandparent->end() )
                 {
                     return it;
@@ -179,10 +179,10 @@ VarTree::Iterator VarTree::prev_uncle()
         while( p_grandparent != NULL )
         {
             Iterator it = p_grandparent->end();
-            while( it != p_grandparent->begin() && &(*it) != p_parent ) it--;
+            while( it != p_grandparent->begin() && &(*it) != p_parent ) --it;
             if( it != p_grandparent->begin() )
             {
-                it--;
+                --it;
                 if( it != p_grandparent->begin() )
                 {
                     return it;
@@ -212,7 +212,7 @@ int VarTree::visibleItems()
         {
             i_count += it->visibleItems();
         }
-        it++;
+        ++it;
     }
     return i_count;
 }
@@ -232,7 +232,7 @@ VarTree::Iterator VarTree::getVisibleItem( int n )
             if( i <= 0 ) return it->getVisibleItem( n );
             n = i;
         }
-        it++;
+        ++it;
     }
     return end();
 }
@@ -255,7 +255,7 @@ VarTree::Iterator VarTree::getLeaf( int n )
             if( n <= 0 )
                 return it;
         }
-        it++;
+        ++it;
     }
     return end();
 }
@@ -269,7 +269,7 @@ VarTree::Iterator VarTree::getNextVisibleItem( Iterator it )
     else
     {
         VarTree::Iterator it_old = it;
-        it++;
+        ++it;
         // Was 'it' the last brother? If so, look for uncles
         if( it_old->parent() && it_old->parent()->end() == it )
         {
@@ -291,13 +291,13 @@ VarTree::Iterator VarTree::getPrevVisibleItem( Iterator it )
         it = it_old->prev_uncle();
     }
     else
-        it--;
+        --it;
 
     /* We have found an expanded uncle, take its last child */
     while( it != root()->begin() && it->size() && it->m_expanded )
     {
             it = it->end();
-            it--;
+            --it;
     }
     return it;
 }
@@ -311,7 +311,7 @@ VarTree::Iterator VarTree::getNextItem( Iterator it )
     else
     {
         VarTree::Iterator it_old = it;
-        it++;
+        ++it;
         // Was 'it' the last brother? If so, look for uncles
         if( it_old->parent() && it_old->parent()->end() == it )
         {
@@ -333,13 +333,13 @@ VarTree::Iterator VarTree::getPrevItem( Iterator it )
         it = it_old->prev_uncle();
     }
     else
-        it--;
+        --it;
 
     /* We have found an expanded uncle, take its last child */
     while( it != root()->begin() && it->size() )
     {
             it = it->end();
-            it--;
+            --it;
     }
     return it;
 }
@@ -401,7 +401,7 @@ int VarTree::countLeafs()
     while( it != end() )
     {
         i_count += it->countLeafs();
-        it++;
+        ++it;
     }
     return i_count;
 }
