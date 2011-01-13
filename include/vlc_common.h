@@ -278,7 +278,6 @@ typedef struct sout_stream_sys_t sout_stream_sys_t;
 
 typedef struct config_chain_t       config_chain_t;
 typedef struct session_descriptor_t session_descriptor_t;
-typedef struct announce_method_t announce_method_t;
 
 /* Decoders */
 typedef struct decoder_t         decoder_t;

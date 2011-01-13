@@ -73,7 +73,7 @@ function VlcSyntax()
   syn keyword cType sout_mux_t sout_mux_sys_t
   syn keyword cType sout_stream_t sout_stream_sys_t
   " Sout - announce
-  syn keyword cType announce_handler_t announce_method_t session_descriptor_t
+  syn keyword cType session_descriptor_t
   syn keyword cType sap_address_t sap_handler_t sap_session_t
   " Decoders
   syn keyword cType decoder_t decoder_sys_t encoder_t encoder_sys_t
