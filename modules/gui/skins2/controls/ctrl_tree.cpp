@@ -170,14 +170,14 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update> &rTree,
     else if( arg->i_type == 3 ) // item-del
     {
         /* Make sure firstPos is valid */
-        while( m_firstPos->m_deleted &&
+        while( m_firstPos->isDeleted() &&
                m_firstPos != (m_flat ? m_rTree.firstLeaf()
                                      : m_rTree.begin()) )
         {
             m_firstPos = m_flat ? m_rTree.getPrevLeaf( m_firstPos )
                                 : m_rTree.getPrevVisibleItem( m_firstPos );
         }
-        if( m_firstPos->m_deleted )
+        if( m_firstPos->isDeleted() )
             m_firstPos = m_rTree.begin();
 
         if( arg->b_visible == true )
@@ -277,7 +277,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                               : m_rTree.getNextVisibleItem( it )) )
             {
                 if( &*it == m_pLastSelected ) break;
-                if( !it->m_selected ) it_sel = it;
+                if( !it->isSelected() ) it_sel = it;
             }
 
             /* Delete selected stuff */
@@ -290,14 +290,14 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                  it = (m_flat ? m_rTree.getNextLeaf( it )
                               : m_rTree.getNextVisibleItem( it )) )
             {
-                if( it->m_selected )
+                if( it->isSelected() )
                     m_pLastSelected = &*it;
             }
 
             /* if everything was deleted, use it_sel as last selection */
             if( !m_pLastSelected )
             {
-                it_sel->m_selected = true;
+                it_sel->setSelected( true );
                 m_pLastSelected = &*it_sel;
             }
 
@@ -372,7 +372,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                         || &*it != m_pLastSelected )
                     {
                         bool nextWasSelected = ( &*next == m_pLastSelected );
-                        it->m_selected = nextWasSelected;
+                        it->setSelected( nextWasSelected );
                         if( nextWasSelected )
                         {
                             m_pLastSelected = &*it;
@@ -387,7 +387,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                           && next != it->parent()->end() )
                         || &*it != m_pLastSelected )
                     {
-                        (*it).m_selected = previousWasSelected;
+                        it->setSelected( previousWasSelected );
                     }
                     if( previousWasSelected )
                     {
@@ -405,7 +405,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                         : m_rTree.getNextVisibleItem( it ) ) == m_rTree.end()
                      && &*it == m_pLastSelected )
                     {
-                        (*it).m_selected = true;
+                        it->setSelected( true );
                     }
                 }
                 else if( key == KEY_RIGHT )
@@ -413,12 +413,12 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                     // Go down one level (and expand node)
                     if( &*it == m_pLastSelected )
                     {
-                        if( it->m_expanded )
+                        if( it->isExpanded() )
                         {
                             if( it->size() )
                             {
-                                it->m_selected = false;
-                                it->begin()->m_selected = true;
+                                it->setSelected( false );
+                                it->begin()->setSelected( true );
                                 m_pLastSelected = &*(it->begin());
                             }
                             else
@@ -428,7 +428,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                         }
                         else
                         {
-                            it->m_expanded = true;
+                            it->setExpanded( true );
                             bChangedPosition = true;
                         }
                     }
@@ -438,18 +438,18 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                     // Go up one level (and close node)
                     if( &*it == m_pLastSelected )
                     {
-                        if( it->m_expanded && it->size() )
+                        if( it->isExpanded() && it->size() )
                         {
-                            it->m_expanded = false;
+                            it->setExpanded( false );
                             bChangedPosition = true;
                         }
                         else
                         {
                             if( it->parent() && it->parent() != &m_rTree)
                             {
-                                it->m_selected = false;
+                                it->setSelected( false );
                                 m_pLastSelected = it->parent();
-                                m_pLastSelected->m_selected = true;
+                                m_pLastSelected->setSelected( true );
                             }
                         }
                     }
@@ -511,7 +511,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                         nextSelect = true;
                     }
                 }
-                it->m_selected = (*it).m_selected || select;
+                it->setSelected( it->isSelected() || select );
                 select = nextSelect;
             }
             // Redraw the control
@@ -525,7 +525,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             it = findItemAtPos( yPos );
             if( it != m_rTree.end() )
             {
-                it->m_selected = !it->m_selected;
+                it->toggleSelected();
                 m_pLastSelected = &*it;
             }
             // Redraw the control
@@ -556,7 +556,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                         nextSelect = true;
                     }
                 }
-                it->m_selected = select;
+                it->setSelected( select );
                 select = nextSelect;
             }
             // Redraw the control
@@ -574,7 +574,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                  && !m_flat )
                 {
                     // Fold/unfold the item
-                    it->m_expanded = !it->m_expanded;
+                    it->toggleExpanded();
                     bChangedPosition = true;
                 }
                 else
@@ -586,12 +586,12 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                          it2 = m_flat ? m_rTree.getNextLeaf( it2 )
                                       : m_rTree.getNextVisibleItem( it2 ) )
                     {
-                        it2->m_selected = false;
+                        it2->setSelected( false );
                     }
                     // Select the new item
                     if( it != m_rTree.end() )
                     {
-                        it->m_selected = true;
+                        it->setSelected( true );
                         m_pLastSelected = &*it;
                     }
                 }
@@ -696,7 +696,7 @@ bool CtrlTree::ensureVisible( VarTree::Iterator item )
          it = m_flat ? m_rTree.getNextLeaf( it )
                      : m_rTree.getNextVisibleItem( it ) )
     {
-        if( it->m_id == item->m_id ) break;
+        if( it->getId() == item->getId() ) break;
         focusItemIndex++;
     }
    return ensureVisible( focusItemIndex );
@@ -744,7 +744,7 @@ void CtrlTree::autoScroll()
          it = m_flat ? m_rTree.getNextLeaf( it )
                      : m_rTree.getNextItem( it ) )
     {
-        if( it->m_playing )
+        if( it->isPlaying() )
         {
            m_rTree.ensureExpanded( it );
            break;
@@ -756,7 +756,7 @@ void CtrlTree::autoScroll()
          it = m_flat ? m_rTree.getNextLeaf( it )
                      : m_rTree.getNextVisibleItem( it ) )
     {
-        if( it->m_playing )
+        if( it->isPlaying() )
         {
            ensureVisible( playIndex );
            break;
@@ -807,7 +807,7 @@ void CtrlTree::makeImage()
         {
             if( it != m_rTree.end() )
             {
-                if( (*it).m_selected )
+                if( it->isSelected() )
                 {
                     int rectHeight = __MIN( i_itemHeight, height - yPos );
                     m_pImage->fillRect( 0, yPos, width, rectHeight,
@@ -817,7 +817,7 @@ void CtrlTree::makeImage()
                 {
                     it = m_flat ? m_rTree.getNextLeaf( it )
                                 : m_rTree.getNextVisibleItem( it );
-                } while( it != m_rTree.end() && it->m_deleted );
+                } while( it != m_rTree.end() && it->isDeleted() );
             }
         }
     }
@@ -834,13 +834,13 @@ void CtrlTree::makeImage()
                 m_pImage->fillRect( 0, yPos, width, rectHeight, bgColor );
             else
             {
-                uint32_t color = ( it->m_selected ? m_selColor : bgColor );
+                uint32_t color = ( it->isSelected() ? m_selColor : bgColor );
                 m_pImage->fillRect( 0, yPos, width, rectHeight, color );
                 do
                 {
                     it = m_flat ? m_rTree.getNextLeaf( it )
                                 : m_rTree.getNextVisibleItem( it );
-                } while( it != m_rTree.end() && it->m_deleted );
+                } while( it != m_rTree.end() && it->isDeleted() );
             }
             bgColor = ( bgColor == m_bgColor1 ? m_bgColor2 : m_bgColor1 );
         }
@@ -853,8 +853,8 @@ void CtrlTree::makeImage()
     while( it != m_rTree.end() && yPos < height )
     {
         const GenericBitmap *m_pCurBitmap;
-        UString *pStr = (UString*)(it->m_cString.get());
-        uint32_t color = ( it->m_playing ? m_playColor : m_fgColor );
+        UString *pStr = it->getString();
+        uint32_t color = ( it->isPlaying() ? m_playColor : m_fgColor );
 
         // Draw the text
         if( pStr != NULL )
@@ -867,7 +867,7 @@ void CtrlTree::makeImage()
                 return;
             }
             if( it->size() )
-                m_pCurBitmap = it->m_expanded ? m_pOpenBitmap : m_pClosedBitmap;
+                m_pCurBitmap = it->isExpanded() ? m_pOpenBitmap : m_pClosedBitmap;
             else
                 m_pCurBitmap = m_pItemBitmap;
 
@@ -904,7 +904,7 @@ void CtrlTree::makeImage()
         {
             it = m_flat ? m_rTree.getNextLeaf( it )
                 : m_rTree.getNextVisibleItem( it );
-        } while( it != m_rTree.end() && it->m_deleted );
+        } while( it != m_rTree.end() && it->isDeleted() );
     }
     stats_TimerStop( getIntf(), STATS_TIMER_SKINS_PLAYTREE_IMAGE );
 }

@@ -68,16 +68,24 @@ public:
     /// Remove all elements from the children's list
     virtual void clear();
 
-    /// \todo Use accessors for these fields ?
-    int m_id;
-    UStringPtr m_cString;
-    bool m_selected;
-    bool m_playing;
-    bool m_expanded;
-    bool m_deleted;
-    void *m_pData;
+    inline int  getId() { return m_id; }
+    inline void *getData() { return m_pData; }
+    inline UString* getString() {return (UString*)m_cString.get(); }
+    inline void setString( UStringPtr val ) { m_cString = val; }
 
     inline bool isReadonly() { return m_readonly; };
+    inline bool isSelected() { return m_selected; };
+    inline bool isPlaying() { return m_playing; };
+    inline bool isExpanded() { return m_expanded; };
+    inline bool isDeleted() { return m_deleted; };
+
+    inline void setSelected( bool val ) { m_selected = val; }
+    inline void setPlaying( bool val ) { m_playing = val; }
+    inline void setExpanded( bool val ) { m_expanded = val; }
+    inline void setDeleted( bool val ) { m_deleted = val; }
+
+    inline void toggleSelected() { m_selected = !m_selected; }
+    inline void toggleExpanded() { m_expanded = !m_expanded; }
 
     /// Get the number of children
     int size() const { return m_children.size(); }
@@ -196,7 +204,16 @@ private:
     /// Pointer to parent node
     VarTree *m_pParent;
 
+    int m_id;
+    void *m_pData;
+    UStringPtr m_cString;
+
+    /// indicators
     bool m_readonly;
+    bool m_selected;
+    bool m_playing;
+    bool m_expanded;
+    bool m_deleted;
 
     /// Variable type
     static const string m_type;

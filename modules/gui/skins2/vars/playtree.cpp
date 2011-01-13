@@ -53,7 +53,7 @@ void Playtree::delSelected()
     playlist_Lock( getIntf()->p_sys->p_playlist );
     for( it = begin(); it != end(); it = getNextItem( it ) )
     {
-        if( it->m_selected && !it->isReadonly() )
+        if( it->isSelected() && !it->isReadonly() )
         {
             it->cascadeDelete();
         }
@@ -65,10 +65,10 @@ void Playtree::delSelected()
     it = begin();
     while( it != end() )
     {
-        if( it->m_deleted )
+        if( it->isDeleted() )
         {
             VarTree::Iterator it2;
-            playlist_item_t *p_item = (playlist_item_t *)(it->m_pData);
+            playlist_item_t *p_item = (playlist_item_t *)(it->getData());
             if( p_item->i_children == -1 )
             {
                 playlist_DeleteFromInput( getIntf()->p_sys->p_playlist,
@@ -97,7 +97,7 @@ void Playtree::action( VarTree *pItem )
     playlist_Lock( m_pPlaylist );
     VarTree::Iterator it;
 
-    playlist_item_t *p_item = (playlist_item_t *)pItem->m_pData;
+    playlist_item_t *p_item = (playlist_item_t *)pItem->getData();
     playlist_item_t *p_parent = p_item;
     while( p_parent )
     {
@@ -129,9 +129,9 @@ void Playtree::onUpdateItem( int id )
     if( it != end() )
     {
         // Update the item
-        playlist_item_t* pNode = (playlist_item_t*)(it->m_pData);
+        playlist_item_t* pNode = (playlist_item_t*)(it->getData());
         UString *pName = new UString( getIntf(), pNode->p_input->psz_name );
-        it->m_cString = UStringPtr( pName );
+        it->setString( UStringPtr( pName ) );
     }
     else
     {
@@ -151,7 +151,7 @@ void Playtree::onUpdateCurrent( bool b_active )
 
         Iterator it = findById( m_currentItem->i_id );
         if( it != end() )
-            it->m_playing = false;
+            it->setPlaying( false );
         m_currentItem = NULL;
     }
     else
@@ -167,7 +167,7 @@ void Playtree::onUpdateCurrent( bool b_active )
 
         Iterator it = findById( current->i_id );
         if( it != end() )
-            it->m_playing = true;
+            it->setPlaying( true );
         m_currentItem = current;
 
         playlist_Unlock( m_pPlaylist );
@@ -189,12 +189,12 @@ void Playtree::onDelete( int i_id )
     {
         VarTree* parent = item->parent();
 
-        item->m_deleted = true;
+        item->setDeleted( true );
 
         tree_update descr;
         descr.i_id = i_id;
         descr.i_type = 3;
-        descr.b_visible = parent ? parent->m_expanded : true;
+        descr.b_visible = parent ? parent->isExpanded() : true;
         notify( &descr );
 
         if( parent )
@@ -232,7 +232,7 @@ void Playtree::onAppend( playlist_add_t *p_add )
     tree_update descr;
     descr.i_id = p_add->i_item;
     descr.i_parent = p_add->i_node;
-    descr.b_visible = node->m_expanded;
+    descr.b_visible = node->isExpanded();
     descr.i_type = 2;
     notify( &descr );
 }
@@ -269,7 +269,7 @@ void Playtree::buildTree()
     /* Set the root's name */
     UString *pName = new UString( getIntf(),
                              m_pPlaylist->p_root_category->p_input->psz_name );
-    m_cString = UStringPtr( pName );
+    setString( UStringPtr( pName ) );
 
     buildNode( m_pPlaylist->p_root_category, *this );
 
