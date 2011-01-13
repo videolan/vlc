@@ -251,11 +251,9 @@ ssize_t sout_AccessOutWrite (sout_access_out_t *out, block_t *block)
 #undef sout_AnnounceRegisterSDP
 session_descriptor_t *sout_AnnounceRegisterSDP (vlc_object_t *obj,
                                                 const char *sdp,
-                                                const char *dst,
-                                                announce_method_t *method)
+                                                const char *dst)
 {
     msg_Err (obj, "SDP export not compiled-in!");
-    assert (method == NULL);
     return NULL;
 }
 
@@ -270,11 +268,6 @@ encoder_t *sout_EncoderCreate( vlc_object_t *p_this )
 {
     msg_Err (p_this, "Encoding support not compiled-in!");
     return NULL;
-}
-
-void sout_MethodRelease (announce_method_t *method)
-{
-    (void)method;
 }
 
 sout_input_t *sout_MuxAddStream (sout_mux_t *mux, es_format_t *fmt)
@@ -306,11 +299,6 @@ sout_mux_t *sout_MuxNew (sout_instance_t *instance, const char *mux,
 void sout_MuxSendBuffer (sout_mux_t *mux, sout_input_t *input, block_t *block)
 {
     assert (0);
-}
-
-announce_method_t *sout_SAPMethod (void)
-{
-    return NULL;
 }
 
 void sout_StreamChainDelete (sout_stream_t *p_first, sout_stream_t *p_last)
