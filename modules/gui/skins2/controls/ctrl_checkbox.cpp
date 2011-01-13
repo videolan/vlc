@@ -111,6 +111,11 @@ CtrlCheckbox::CtrlCheckbox( intf_thread_t *pIntf,
 
 CtrlCheckbox::~CtrlCheckbox()
 {
+    if( m_pImgCurrent )
+    {
+        m_pImgCurrent->stopAnim();
+        m_pImgCurrent->delObserver( this );
+    }
     m_rVariable.delObserver( this );
 }
 

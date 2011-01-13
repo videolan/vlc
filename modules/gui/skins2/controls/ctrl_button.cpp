@@ -79,6 +79,11 @@ CtrlButton::CtrlButton( intf_thread_t *pIntf, const GenericBitmap &rBmpUp,
 
 CtrlButton::~CtrlButton()
 {
+    if( m_pImg )
+    {
+        m_pImg->stopAnim();
+        m_pImg->delObserver( this );
+    }
 }
 
 void CtrlButton::setLayout( GenericLayout *pLayout,
