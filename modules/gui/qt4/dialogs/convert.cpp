@@ -138,7 +138,8 @@ void ConvertDialog::close()
         mrl += ":";
         if( displayBox->isChecked() )
             mrl += "duplicate{dst=display,dst=";
-        mrl += "file{dst='" + fileLine->text() + "'}";
+        mrl += "std{access=file,mux=" + profile->getMux()
+             + ",dst='" + fileLine->text() + "'}";
         if( displayBox->isChecked() )
             mrl += "}";
     }
