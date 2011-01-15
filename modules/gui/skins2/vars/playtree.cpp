@@ -210,24 +210,20 @@ void Playtree::onAppend( playlist_add_t *p_add )
     Iterator node = findById( p_add->i_node );
     if( node != end() )
     {
-        Iterator item =  findById( p_add->i_item );
-        if( item == end() )
+        playlist_Lock( m_pPlaylist );
+        playlist_item_t *p_item = playlist_ItemGetById(
+                                    m_pPlaylist, p_add->i_item );
+        if( !p_item )
         {
-            playlist_Lock( m_pPlaylist );
-            playlist_item_t *p_item = playlist_ItemGetById(
-                                        m_pPlaylist, p_add->i_item );
-            if( !p_item )
-            {
-                playlist_Unlock( m_pPlaylist );
-                return;
-            }
-            UString *pName = new UString( getIntf(),
-                                          p_item->p_input->psz_name );
-            node->add( p_add->i_item, UStringPtr( pName ),
-                      false,false, false, p_item->i_flags & PLAYLIST_RO_FLAG,
-                      p_item );
             playlist_Unlock( m_pPlaylist );
+            return;
         }
+        UString *pName = new UString( getIntf(),
+                                      p_item->p_input->psz_name );
+        node->add( p_add->i_item, UStringPtr( pName ),
+                  false,false, false, p_item->i_flags & PLAYLIST_RO_FLAG,
+                  p_item );
+        playlist_Unlock( m_pPlaylist );
     }
     tree_update descr;
     descr.i_id = p_add->i_item;
