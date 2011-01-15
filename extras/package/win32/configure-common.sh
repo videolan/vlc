@@ -28,7 +28,8 @@
       --enable-sse --enable-mmx \
       --enable-libcddb \
       --enable-zvbi --disable-telx \
+      --enable-sqlite \
       --disable-dvb \
-      --disable-sqlite \
+      --disable-dirac \
       --enable-peflags \
       $CONFIGOPTS
