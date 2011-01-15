@@ -685,43 +685,13 @@ void CtrlTree::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h)
 
 bool CtrlTree::ensureVisible( VarTree::Iterator item )
 {
-    // Find the item to focus
-    int focusItemIndex = 0;
-    VarTree::Iterator it;
-
     m_rTree.ensureExpanded( item );
 
-    for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
-         it != m_rTree.end();
-         it = m_flat ? m_rTree.getNextLeaf( it )
-                     : m_rTree.getNextVisibleItem( it ) )
-    {
-        if( it->getId() == item->getId() ) break;
-        focusItemIndex++;
-    }
-   return ensureVisible( focusItemIndex );
-}
+    int firstPosIndex = m_rTree.getRank( m_firstPos, m_flat) - 1;
+    int focusItemIndex = m_rTree.getRank( item, m_flat) - 1;
 
-bool CtrlTree::ensureVisible( int focusItemIndex )
-{
-    // Find  m_firstPos
-    VarTree::Iterator it;
-    int firstPosIndex = 0;
-    for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
-         it != m_rTree.end();
-         it = m_flat ? m_rTree.getNextLeaf( it )
-                     : m_rTree.getNextVisibleItem( it ) )
-    {
-        if( it == m_firstPos ) break;
-        firstPosIndex++;
-    }
-
-    if( it == m_rTree.end() ) return false;
-
-
-    if( it != m_rTree.end()
-        && ( focusItemIndex < firstPosIndex
-           || focusItemIndex > firstPosIndex + maxItems() - 1 ) )
+    if( focusItemIndex < firstPosIndex ||
+        focusItemIndex > firstPosIndex + maxItems() - 1 )
     {
         // Scroll to have the wanted stream visible
         VarPercent &rVarPos = m_rTree.getPositionVar();
@@ -746,22 +716,9 @@ void CtrlTree::autoScroll()
     {
         if( it->isPlaying() )
         {
-           m_rTree.ensureExpanded( it );
+           ensureVisible( it );
            break;
         }
-    }
-
-    for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
-         it != m_rTree.end();
-         it = m_flat ? m_rTree.getNextLeaf( it )
-                     : m_rTree.getNextVisibleItem( it ) )
-    {
-        if( it->isPlaying() )
-        {
-           ensureVisible( playIndex );
-           break;
-        }
-        playIndex++;
     }
 }
 

@@ -421,3 +421,20 @@ void VarTree::cascadeDelete()
         it->cascadeDelete();
     }
 }
+
+int VarTree::getRank( Iterator item, bool flat )
+{
+    int index = 1;
+    Iterator it;
+    for( it = flat ? firstLeaf() : begin();
+         it != end();
+         it = flat ? getNextLeaf( it ) : getNextVisibleItem( it ) )
+    {
+        if( it->isDeleted() )
+            continue;
+        if( it == item )
+            break;
+        index++;
+    }
+    return (it == item) ? index : -1;
+}

@@ -78,11 +78,6 @@ public:
     /// \return true if it changed the position
     bool ensureVisible( VarTree::Iterator item );
 
-    /// Make sure an item is visible
-    /// \param itemIndex the absolute index in the tree
-    /// \return true if it changed the position
-    bool ensureVisible( int itemIndex );
-
 private:
     /// Tree associated to the control
     VarTree &m_rTree;

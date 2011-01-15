@@ -167,6 +167,9 @@ public:
     /// Given an iterator to an item, return the previous leaf
     Iterator getPrevLeaf( Iterator it );
 
+    /// return rank of visible item starting from 1
+    int getRank( Iterator it, bool flat );
+
     /// Find a children node with the given id
     Iterator findById( int id );
 
