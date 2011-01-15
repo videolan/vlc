@@ -2664,12 +2664,15 @@ sidplay-2.1.1: sidplay-libs-2.1.1.tar.gz
 
 .sidplay: sidplay-2.1.1
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cp -f $(PREFIX)/lib/sidplay/builders/* $(PREFIX)/lib/)
+	touch $@
 
 CLEAN_FILE += .sidplay
 CLEAN_PKG  += sidplay-2.1.1
 DISTCLEAN_PKG += sidplay-libs-2.1.1.tar.gz
 
-##
+
+###################################
 
 tools: $(TOOLS)
 
