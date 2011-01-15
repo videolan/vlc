@@ -236,6 +236,7 @@ int BuildUpdate( media_library_t *p_ml,
     i_ret = BuildWhere( p_ml, &psz_where, where );
     if( i_ret != VLC_SUCCESS )
         goto quit_buildupdate;
+    i_ret = VLC_ENOMEM;
 
     /** Firstly, choose the right table */
     switch( selected_type )
@@ -277,7 +278,11 @@ int BuildUpdate( media_library_t *p_ml,
                                                   "title = %Q",
                                                   find->value.str );
                     if( !psz_set[i_type] )
+                    {
+                        msg_Err( p_ml, "Couldn't create string at BuildUpdate():(%s, %d)",
+                                __FILE__, __LINE__ );
                         goto quit_buildupdate;
+                    }
                 }
             }
             else if( selected_type == ML_MEDIA )
@@ -301,7 +306,11 @@ int BuildUpdate( media_library_t *p_ml,
                                                       "album_id = '%d'",
                                                       find->value.i );
                         if( !psz_set[i_type] )
+                        {
+                            msg_Err( p_ml, "Couldn't create string at BuildUpdate():(%s, %d)",
+                                __FILE__, __LINE__ );
                             goto quit_buildupdate;
+                        }
                     }
                 }
             }
@@ -433,18 +442,31 @@ int BuildUpdate( media_library_t *p_ml,
 exitfor:
 
     /* TODO: Album artist. Verify albumart */
-    if( i_album_id <= 0 && psz_album && *psz_album )
+    if( i_album_id <= 0 || ( psz_album && *psz_album ) )
     {
-        i_ret = AddAlbum( p_ml, psz_album, psz_cover, 0 );
-        if( i_ret != VLC_SUCCESS )
-            goto quit_buildupdate;
         i_album_id = ml_GetAlbumId( p_ml, psz_album );
-        if( i_album_id <= 0 )
-            goto quit_buildupdate;
+        if( i_album_id < 0 ) //0 is Unknown
+        {
+            i_ret = AddAlbum( p_ml, psz_album, psz_cover, 0 );
+            if( i_ret != VLC_SUCCESS )
+            {
+
+                msg_Err( p_ml, "Couldn't AddAlbum at BuildUpdate():(%s, %d)",
+                        __FILE__, __LINE__ );
+                goto quit_buildupdate;
+            }
+            i_album_id = ml_GetAlbumId( p_ml, psz_album );
+            if( i_album_id < 0 )
+                goto quit_buildupdate;
+        }
         psz_set[ML_ALBUM_ID] = sql_Printf( p_ml->p_sys->p_sql,
                                       "album_id = '%d'", i_album_id );
-        if( !psz_set[i_type] )
+        if( !psz_set[ML_ALBUM_ID] )
+        {
+            msg_Err( p_ml, "Couldn't create string at BuildUpdate():(%s, %d)",
+                    __FILE__, __LINE__ );
             goto quit_buildupdate;
+        }
     }
 
     for( unsigned i = 0; i <= ML_DIRECTORY; i++ )
@@ -456,7 +478,11 @@ exitfor:
                 free( psz_tmp );
                 if( asprintf( &psz_tmp, "%s%s%s", psz_extra ? psz_extra : "",
                                psz_extra ? ", ": "",  psz_set[i] ) == -1 )
+                {
+                    msg_Err( p_ml, "Couldn't create string at BuildUpdate():(%s, %d)",
+                            __FILE__, __LINE__ );
                     goto quit_buildupdate;
+                }
                 free( psz_extra );
                 psz_extra = strdup( psz_tmp );
             }
@@ -465,7 +491,11 @@ exitfor:
                 free( psz_tmp );
                 if( asprintf( &psz_tmp, "%s%s%s", psz_fullset ? psz_fullset : "",
                                psz_fullset ? ", ": "",  psz_set[i] ) == -1 )
+                {
+                    msg_Err( p_ml, "Couldn't create string at BuildUpdate():(%s, %d)",
+                            __FILE__, __LINE__ );
                     goto quit_buildupdate;
+                }
                 free( psz_fullset );
                 psz_fullset = strdup( psz_tmp );
             }
@@ -477,10 +507,12 @@ exitfor:
     assert( psz_where && *psz_where );
 
     /** Finally build the full query */
-    /** Pass if we have some people to add - Indirect update*/
+    /** Pass if we have some people to add - Indirect update */
     if( !psz_fullset && i_people_add == 0 )
     {
         i_ret = VLC_EGENERIC;
+        msg_Err( p_ml, "Nothing found to create update at BuildUpdate():(%s, %d)",
+                        __FILE__, __LINE__ );
         goto quit_buildupdate;
     }
 
@@ -488,6 +520,8 @@ exitfor:
         if( asprintf( ppsz_query, "UPDATE %s SET %s WHERE %s", psz_table,
                       psz_fullset, psz_where ) == -1 )
         {
+            msg_Err( p_ml, "Couldn't create string at BuildUpdate():(%s, %d)",
+                            __FILE__, __LINE__ );
             goto quit_buildupdate;
         }
     }
@@ -498,7 +532,11 @@ exitfor:
         {
             if( asprintf( &psz_tmp, "%s; UPDATE extra SET %s WHERE %s",
                         *ppsz_query, psz_extra, psz_where ) == -1 )
+            {
+                msg_Err( p_ml, "Couldn't create string at BuildUpdate():(%s, %d)",
+                            __FILE__, __LINE__ );
                 goto quit_buildupdate;
+            }
             free( *ppsz_query );
             *ppsz_query = psz_tmp;
             psz_tmp = NULL;
@@ -513,6 +551,8 @@ exitfor:
                 {
                     free( psz_tmp );
                     free( psz_idstring );
+                    msg_Err( p_ml, "Couldn't create string at BuildUpdate():(%s, %d)",
+                            __FILE__, __LINE__ );
                     goto quit_buildupdate;
                 }
                 free( psz_idstring );
@@ -533,6 +573,8 @@ exitfor:
                     psz_idstring, psz_idstring ) == -1 )
             {
                 free( psz_idstring );
+                msg_Err( p_ml, "Couldn't create string at BuildUpdate():(%s, %d)",
+                                __FILE__, __LINE__ );
                 goto quit_buildupdate;
             }
             free( *ppsz_query );
@@ -550,7 +592,11 @@ exitfor:
                 "(media_id,people_id) SELECT media.id, %d FROM media WHERE %s",
                 *ppsz_query == NULL ? "" : *ppsz_query, pi_padd_ids[i],
                 psz_where ) == -1 )
-                   goto quit_buildupdate;
+                {
+                    msg_Err( p_ml, "Couldn't create string at BuildUpdate():(%s, %d)",
+                                    __FILE__, __LINE__ );
+                    goto quit_buildupdate;
+                }
                 FREENULL( *ppsz_query );
                 *ppsz_query = psz_tmp;
                 psz_tmp = NULL;
@@ -561,13 +607,18 @@ exitfor:
     if( asprintf( ppsz_id_query, "SELECT id AS %s_id FROM %s WHERE %s",
                 psz_table, psz_table, psz_where ) == -1 )
     {
+        msg_Err( p_ml, "Couldn't create string at BuildUpdate():(%s, %d)",
+                        __FILE__, __LINE__ );
         goto quit_buildupdate;
     }
 #ifndef NDEBUG
     msg_Dbg( p_ml, "updated media where %s", psz_where );
 #endif
+    goto quit_buildupdate_success;
 
 quit_buildupdate:
+    msg_Warn( p_ml, "BuildUpdate() could not generate update sql query" );
+quit_buildupdate_success:
     free( psz_tmp );
     free( psz_table );
     free( psz_fullset );
