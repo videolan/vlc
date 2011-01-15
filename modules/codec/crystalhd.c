@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright © 2010 VideoLAN
+ * Copyright © 2010-2011 VideoLAN
  *
  * Authors: Jean-Baptiste Kempf <jb@videolan.org>
  *          Narendra Sankar <nsankar@broadcom.com>
@@ -33,16 +33,31 @@
 #include <vlc_codec.h>
 
 #if !defined(_WIN32) && !defined(__APPLE__)
-   #define __LINUX_USER__
+#  define __LINUX_USER__
 #endif
 
 /* CrystalHD */
 #include <libcrystalhd/bc_dts_defs.h>
 #include <libcrystalhd/bc_dts_types.h>
-#if HAVE_LIBCRYSTALHD_BC_DRV_IF_H
-  #include <libcrystalhd/bc_drv_if.h>
+
+#if defined(HAVE_LIBCRYSTALHD_BC_DRV_IF_H) /* Win32 */
+#  include <libcrystalhd/bc_drv_if.h>
+#elif defined(_WIN32)
+#  define USE_DL_OPENING 1
 #else
-  #include <libcrystalhd/libcrystalhd_if.h>
+#  include <libcrystalhd/libcrystalhd_if.h>
+#endif
+
+/* On a normal Win32 build, well aren't going to ship the BCM dll
+   And forcing users to install the right dll at the right place will not work
+   Therefore, we need to dl_open and resolve the symbols */
+#ifdef USE_DL_OPENING
+#  warning DLL opening mode
+#  define BC_FUNC( a ) Our ## a
+#  define BC_FUNC_PSYS( a ) p_sys->Our ## a
+#else
+#  define BC_FUNC( a ) a
+#  define BC_FUNC_PSYS( a ) a
 #endif
 
 #include <assert.h>
@@ -86,11 +101,24 @@ struct decoder_sys_t
     uint32_t i_sps_pps_size; /* SPS/PPS size */
 
     uint32_t i_nal_size;     /* NAL header size */
+
+#ifdef USE_DL_OPENING
+    HINSTANCE p_bcm_dll;
+    BC_STATUS (WINAPI *OurDtsCloseDecoder)( HANDLE hDevice );
+    BC_STATUS (WINAPI *OurDtsDeviceClose)( HANDLE hDevice );
+    BC_STATUS (WINAPI *OurDtsFlushInput)( HANDLE hDevice, U32 Mode );
+    BC_STATUS (WINAPI *OurDtsStopDecoder)( HANDLE hDevice );
+    BC_STATUS (WINAPI *OurDtsGetDriverStatus)( HANDLE hDevice, BC_DTS_STATUS *pStatus );
+    BC_STATUS (WINAPI *OurDtsProcInput)( HANDLE hDevice, U8 *pUserData,
+                            U32 ulSizeInBytes, U64 timeStamp, BOOL encrypted );
+    BC_STATUS (WINAPI *OurDtsProcOutput)( HANDLE hDevice, U32 milliSecWait, BC_DTS_PROC_OUT *pOut );
+    BC_STATUS (WINAPI *OurDtsIsEndOfStream)( HANDLE hDevice, U8* bEOS );
+#endif
 };
 
 /*****************************************************************************
- * OpenDecoder: probe the decoder and return score
- *****************************************************************************/
+* OpenDecoder: probe the decoder and return score
+*****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
@@ -126,17 +154,6 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-#ifdef _WIN32
-    HINSTANCE p_bcm_dll = LoadLibrary( "bcmDIL.dll" );
-    if( !p_bcm_dll )
-    {
-        #ifdef DEBUG_CRYSTALHD
-        msg_Dbg( p_dec, "Couldn't load the CrystalHD dll");
-        #endif
-        return VLC_EGENERIC
-    }
-#endif
-
     /* Allocate the memory needed to store the decoder's structure */
     p_sys = malloc( sizeof(*p_sys) );
     if( !p_sys )
@@ -148,16 +165,59 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_sps_pps_size = 0;
     p_sys->p_sps_pps_buf  = NULL;
 
+#ifdef USE_DL_OPENING
+    p_sys->p_bcm_dll = LoadLibrary( "bcmDIL.dll" );
+    if( !p_sys->p_bcm_dll )
+    {
+        #ifdef DEBUG_CRYSTALHD
+        msg_Dbg( p_dec, "Couldn't load the CrystalHD dll");
+        #endif
+        return VLC_EGENERIC;
+    }
+
+#define LOAD_SYM( a ) \
+    BC_FUNC( a )  = (void *)GetProcAddress(p_sys->p_bcm_dll, TEXT( #a ) ); \
+    if( !BC_FUNC( a ) ) { msg_Err( p_dec, "missing symbol " # a ); return VLC_EGENERIC; }
+
+#define LOAD_SYM_PSYS( a ) \
+    p_sys->BC_FUNC( a )  = (void *)GetProcAddress(p_sys->p_bcm_dll, #a ); \
+    if( !p_sys->BC_FUNC( a ) ) { msg_Err( p_dec, "missing symbol " # a ); return VLC_EGENERIC; }
+
+    BC_STATUS (WINAPI *OurDtsDeviceOpen)( HANDLE *hDevice, U32 mode );
+    LOAD_SYM( DtsDeviceOpen );
+    BC_STATUS (WINAPI *OurDtsCrystalHDVersion)( HANDLE  hDevice, PBC_INFO_CRYSTAL bCrystalInfo );
+    LOAD_SYM( DtsCrystalHDVersion );
+    BC_STATUS (WINAPI *OurDtsSetColorSpace)( HANDLE hDevice, BC_OUTPUT_FORMAT Mode422 );
+    LOAD_SYM( DtsSetColorSpace );
+    BC_STATUS (WINAPI *OurDtsSetInputFormat)( HANDLE hDevice, BC_INPUT_FORMAT *pInputFormat );
+    LOAD_SYM( DtsSetInputFormat );
+    BC_STATUS (WINAPI *OurDtsOpenDecoder)( HANDLE hDevice, U32 StreamType );
+    LOAD_SYM( DtsOpenDecoder );
+    BC_STATUS (WINAPI *OurDtsStartDecoder)( HANDLE hDevice );
+    LOAD_SYM( DtsStartDecoder );
+    BC_STATUS (WINAPI *OurDtsStartCapture)( HANDLE hDevice );
+    LOAD_SYM( DtsStartCapture );
+    LOAD_SYM_PSYS( DtsCloseDecoder );
+    LOAD_SYM_PSYS( DtsDeviceClose );
+    LOAD_SYM_PSYS( DtsFlushInput );
+    LOAD_SYM_PSYS( DtsStopDecoder );
+    LOAD_SYM_PSYS( DtsGetDriverStatus );
+    LOAD_SYM_PSYS( DtsProcInput );
+    LOAD_SYM_PSYS( DtsProcOutput );
+    LOAD_SYM_PSYS( DtsIsEndOfStream );
+#undef LOAD_SYM
+#undef LOAD_SYM_PSYS
+#endif /* USE_DL_OPENING */
 
 #ifdef DEBUG_CRYSTALHD
     msg_Dbg( p_dec, "Trying to open CrystalHD HW");
 #endif
 
     /* Get the handle for the device */
-    if( DtsDeviceOpen( &p_sys->bcm_handle,
-                      (DTS_PLAYBACK_MODE | DTS_LOAD_FILE_PLAY_FW | DTS_SKIP_TX_CHK_CPB ) )
-                      // | DTS_DFLT_RESOLUTION(vdecRESOLUTION_720p29_97) ) )
-                     != BC_STS_SUCCESS )
+    if( BC_FUNC(DtsDeviceOpen)( &p_sys->bcm_handle,
+                    (DTS_PLAYBACK_MODE | DTS_LOAD_FILE_PLAY_FW | DTS_SKIP_TX_CHK_CPB ) )
+                    // | DTS_DFLT_RESOLUTION(vdecRESOLUTION_720p29_97) ) )
+                    != BC_STS_SUCCESS )
     {
         msg_Err( p_dec, "Couldn't find and open the BCM CrystalHD device" );
         free( p_sys );
@@ -166,7 +226,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
 #ifdef DEBUG_CRYSTALHD
     BC_INFO_CRYSTAL info;
-    if( DtsCrystalHDVersion( p_sys->bcm_handle, &info ) == BC_STS_SUCCESS )
+    if( BC_FUNC(DtsCrystalHDVersion)( p_sys->bcm_handle, &info ) == BC_STS_SUCCESS )
     {
         msg_Dbg( p_dec, "Using CrystalHD Driver version: %i.%i.%i, "
             "Library version: %i.%i.%i, "
@@ -195,7 +255,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Always YUY2 color */
-    if( DtsSetColorSpace( p_sys->bcm_handle, OUTPUT_MODE422_YUY2 ) != BC_STS_SUCCESS )
+    if( BC_FUNC(DtsSetColorSpace)( p_sys->bcm_handle, OUTPUT_MODE422_YUY2 ) != BC_STS_SUCCESS )
     {
         msg_Err( p_dec, "Couldn't set the color space. Please report this!" );
         goto error;
@@ -213,27 +273,27 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_in.height      = p_dec->fmt_in.video.i_height;
     p_in.Progressive = true;
 
-    if( DtsSetInputFormat( p_sys->bcm_handle, &p_in ) != BC_STS_SUCCESS )
+    if( BC_FUNC(DtsSetInputFormat)( p_sys->bcm_handle, &p_in ) != BC_STS_SUCCESS )
     {
         msg_Err( p_dec, "Couldn't set the color space. Please report this!" );
         goto error;
     }
 
     /* Open a decoder */
-    if( DtsOpenDecoder( p_sys->bcm_handle, BC_STREAM_TYPE_ES ) != BC_STS_SUCCESS )
+    if( BC_FUNC(DtsOpenDecoder)( p_sys->bcm_handle, BC_STREAM_TYPE_ES ) != BC_STS_SUCCESS )
     {
         msg_Err( p_dec, "Couldn't open the CrystalHD decoder" );
         goto error;
     }
 
     /* Start it */
-    if( DtsStartDecoder( p_sys->bcm_handle ) != BC_STS_SUCCESS )
+    if( BC_FUNC(DtsStartDecoder)( p_sys->bcm_handle ) != BC_STS_SUCCESS )
     {
         msg_Err( p_dec, "Couldn't start the decoder" );
         goto error;
     }
 
-    if( DtsStartCapture( p_sys->bcm_handle ) != BC_STS_SUCCESS )
+    if( BC_FUNC(DtsStartCapture)( p_sys->bcm_handle ) != BC_STS_SUCCESS )
     {
         msg_Err( p_dec, "Couldn't start the capture" );
         goto error_complete;
@@ -253,9 +313,9 @@ static int OpenDecoder( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error_complete:
-    DtsCloseDecoder( p_sys->bcm_handle );
+    BC_FUNC_PSYS(DtsCloseDecoder)( p_sys->bcm_handle );
 error:
-    DtsDeviceClose( p_sys->bcm_handle );
+    BC_FUNC_PSYS(DtsDeviceClose)( p_sys->bcm_handle );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -268,13 +328,13 @@ static void CloseDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( DtsFlushInput( p_sys->bcm_handle, 2 ) != BC_STS_SUCCESS )
+    if( BC_FUNC_PSYS(DtsFlushInput)( p_sys->bcm_handle, 2 ) != BC_STS_SUCCESS )
         goto error;
-    if( DtsStopDecoder( p_sys->bcm_handle ) != BC_STS_SUCCESS )
+    if( BC_FUNC_PSYS(DtsStopDecoder)( p_sys->bcm_handle ) != BC_STS_SUCCESS )
         goto error;
-    if( DtsCloseDecoder( p_sys->bcm_handle ) != BC_STS_SUCCESS )
+    if( BC_FUNC_PSYS(DtsCloseDecoder)( p_sys->bcm_handle ) != BC_STS_SUCCESS )
         goto error;
-    if( DtsDeviceClose( p_sys->bcm_handle ) != BC_STS_SUCCESS )
+    if( BC_FUNC_PSYS(DtsDeviceClose)( p_sys->bcm_handle ) != BC_STS_SUCCESS )
         goto error;
 
 error:
@@ -299,7 +359,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     picture_t *p_pic;
 
     /* First check the status of the decode to produce pictures */
-    if( DtsGetDriverStatus( p_sys->bcm_handle, &driver_stat ) != BC_STS_SUCCESS )
+    if( BC_FUNC_PSYS(DtsGetDriverStatus)( p_sys->bcm_handle, &driver_stat ) != BC_STS_SUCCESS )
         return NULL;
 
     p_block = *pp_block;
@@ -309,10 +369,10 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         {
             /* Valid input block, so we can send to HW to decode */
 
-            BC_STATUS status = DtsProcInput( p_sys->bcm_handle,
-                                             p_block->p_buffer,
-                                             p_block->i_buffer,
-                                             p_block->i_pts >= VLC_TS_INVALID ? TO_BC_PTS(p_block->i_pts) : 0, false );
+            BC_STATUS status = BC_FUNC_PSYS(DtsProcInput)( p_sys->bcm_handle,
+                                            p_block->p_buffer,
+                                            p_block->i_buffer,
+                                            p_block->i_pts >= VLC_TS_INVALID ? TO_BC_PTS(p_block->i_pts) : 0, false );
 
             block_Release( p_block );
             *pp_block = NULL;
@@ -347,7 +407,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( !proc_out.Ybuff )
         return NULL;
 
-    BC_STATUS sts = DtsProcOutput( p_sys->bcm_handle, 128, &proc_out );
+    BC_STATUS sts = BC_FUNC_PSYS(DtsProcOutput)( p_sys->bcm_handle, 128, &proc_out );
 #ifdef DEBUG_CRYSTALHD
     if( sts != BC_STS_SUCCESS )
         msg_Err( p_dec, "DtsProcOutput returned %i", sts );
@@ -419,7 +479,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         /* Nothing is documented here... */
         case BC_STS_NO_DATA:
-            if( DtsIsEndOfStream( p_sys->bcm_handle, &b_eos ) == BC_STS_SUCCESS )
+            if( BC_FUNC_PSYS(DtsIsEndOfStream)( p_sys->bcm_handle, &b_eos ) == BC_STS_SUCCESS )
                 if( b_eos )
                     msg_Dbg( p_dec, "End of Stream" );
             break;

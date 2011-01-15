@@ -2462,12 +2462,16 @@ if test "${enable_crystalhd}" == "yes"; then
       VLC_ADD_PLUGIN([crystalhd])
       VLC_ADD_LIBS([crystalhd], [-lcrystalhd])
     ],[
-        AC_CHECK_HEADERS(libcrystalhd/bc_drv_if.h, [
+      if test "${SYS}" = "mingw32" ; then
+        AC_CHECK_HEADERS(libcrystalhd/bc_dts_defs.h, [
           VLC_ADD_PLUGIN([crystalhd])
-          VLC_ADD_LIBS([crystalhd], [-lbcmDIL])
+          AC_CHECK_HEADERS(libcrystalhd/bc_drv_if.h, [
+            VLC_ADD_LIBS([crystalhd], [-lbcmDIL])
+            ])
         ],[
           AC_MSG_ERROR("Could not find CrystalHD development headers")
         ])
+      fi
     ])
 fi
 
