@@ -172,6 +172,9 @@ function click_chercher()
             -- Read <table> tag as xml
             local substring = string.sub(data, first, last or -1)
 
+            -- Fix Allocine's broken XML (!!!)
+            substring = string.gsub(substring, "<div class=\"spacer vmargin10\">", "")
+
             local xml = simplexml.parse_string(substring)
             for _, tr in ipairs(xml.children) do
                 -- Get film title & year
@@ -317,18 +320,15 @@ function open_fiche(url)
     local synopsis = string.gsub(sub, ".*Synopsis :(.*)", "<h2>Synposis</h2>%1")
 
     -- Note
-    first, _ = string.find(data, "Note Moyenne:")
-    if first then
-        local _, note = string.find(data, "span class=\"lighten\">%(", first)
-        if note then
-            note = string.sub(data, note+1, note+3)
-            note = string.gsub(note, "%).*$", "")
-            page = page .. "Note moyenne: <b>" .. note .. " / 4</b>"
-            local nbpeople = string.gsub(data, ".*pour (%d+) notes.*", "%1")
-            if nbpeople then
-                page = page .. " (" .. nbpeople .. " votes)"
-            end
+    for w in string.gmatch(data, "property=\"v:average\"[^>]*>([^<]+)</span>") do
+        local note = trim(w)
+        page = page .. "Note moyenne: <b>" .. note .. " / 4</b>"
+        for y in string.gmatch(data, "property=\"v:count\"[^>]*>([^<]+)</span>") do
+           local nbpeople = trim(y)
+           page = page .. " (" .. nbpeople .. " votes)"
+           break
         end
+        break
     end
 
     -- Synopsis
