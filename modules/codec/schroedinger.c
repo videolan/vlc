@@ -3,12 +3,11 @@
  *          (http://www.bbc.co.uk/rd/projects/dirac/index.shtml)
  *          (http://diracvideo.org)
  *****************************************************************************
- * Copyright (C) 2008 the VideoLAN team
- * $Id$
+ * Copyright (C) 2008-2010 the VideoLAN team
  *
  * Authors: Jonathan Rosser <jonathan.rosser@gmail.com>
  *          David Flynn <davidf at rd dot bbc.co.uk>
- *          Anuradha Suraparaju <asuraparaju at gmail dot com>
+ *          Anuradha Suraparaju <asuraparaju at gmail dot com> (encoding)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -135,7 +134,6 @@ vlc_module_begin ()
                 ENC_CODINGMODE_TEXT, ENC_CODINGMODE_LONGTEXT, false )
 
     ppsz_enc_options[i_numopts+2] = NULL;
-
 
 vlc_module_end ()
 
@@ -1139,3 +1137,4 @@ static void CloseEncoder( vlc_object_t *p_this )
 
     free( p_sys );
 }
+
