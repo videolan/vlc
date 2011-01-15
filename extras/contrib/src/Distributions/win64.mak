@@ -6,7 +6,7 @@ all: .iconv .intl .freetype .fribidi .zlib \
         .png .gpg-error .gcrypt .gnutls .mpcdec \
         .dvdnav .dvbpsi .qt4_win32 .schroedinger .SDL_image \
         .dx_headers .dshow_headers .gecko .dca .portaudio \
-        .lua .tag .fontconfig .kate .libass .dirac
+        .lua .tag .fontconfig .kate .libass
 # .pthreads
 #.zvbi \
 #        .fluid
