@@ -52,13 +52,13 @@
 
 struct decoder_sys_t
 {
-    uint8_t color[16][3];
-    int     i_offseth;
-    int     i_offsetv;
-    uint8_t screen[CDG_SCREEN_PITCH*CDG_SCREEN_HEIGHT];
-    uint8_t *p_screen;
+    uint8_t  color[16][3];
+    unsigned i_offseth;
+    unsigned i_offsetv;
+    uint8_t  screen[CDG_SCREEN_PITCH*CDG_SCREEN_HEIGHT];
+    uint8_t  *p_screen;
 
-    int     i_packet;
+    int      i_packet;
 };
 
 #define CDG_PACKET_SIZE 24u
@@ -255,7 +255,7 @@ static int DecodeTileBlock( decoder_sys_t *p_cdg, const uint8_t *p_data, int doX
         {
             const int idx = ( p_data[4+y] >> (5-x) ) & 0x01;
 
-            int index = (sy+y)*CDG_SCREEN_PITCH+(sx+x);
+            unsigned index = (sy+y)*CDG_SCREEN_PITCH+(sx+x);
             if( index >= CDG_SCREEN_PITCH*CDG_SCREEN_HEIGHT )
                 return 0;
 
@@ -277,7 +277,6 @@ static int DecodeScroll( decoder_sys_t *p_cdg, const uint8_t *p_data, int b_copy
     uint8_t color = p_data[0]&0x0f;
     int i_shifth;
     int i_shiftv;
-    int x, y;
 
     /* */
     p_cdg->i_offseth = p_data[1]&0x7;
@@ -316,10 +315,10 @@ static int DecodeScroll( decoder_sys_t *p_cdg, const uint8_t *p_data, int b_copy
     ScreenFill( p_cdg, 0, 0, CDG_SCREEN_WIDTH, CDG_SCREEN_HEIGHT, color );
 
     /* Copy back */
-    for( y = 0; y < CDG_SCREEN_HEIGHT; y++ )
+    for( unsigned y = 0; y < CDG_SCREEN_HEIGHT; y++ )
     {
         int dy = i_shiftv + y;
-        for( x = 0; x < CDG_SCREEN_WIDTH; x++ )
+        for( unsigned x = 0; x < CDG_SCREEN_WIDTH; x++ )
         {
             int dx = i_shifth + x;
 
@@ -408,11 +407,9 @@ static uint32_t RenderRGB( int r, int g, int b )
 
 static int Render( decoder_sys_t *p_cdg, picture_t *p_picture )
 {
-    int x, y;
-
-    for( y = 0; y < CDG_DISPLAY_HEIGHT; y++ )
+    for( unsigned y = 0; y < CDG_DISPLAY_HEIGHT; y++ )
     {
-        for( x = 0; x < CDG_DISPLAY_WIDTH; x++ )
+        for( unsigned x = 0; x < CDG_DISPLAY_WIDTH; x++ )
         {
             const int sx = x + p_cdg->i_offseth + CDG_SCREEN_BORDER_WIDTH;
             const int sy = y + p_cdg->i_offsetv + CDG_SCREEN_BORDER_HEIGHT;
