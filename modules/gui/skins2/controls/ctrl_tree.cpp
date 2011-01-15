@@ -143,33 +143,36 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update> &rTree,
     if( arg->i_type == 0 ) // Item update
     {
         if( arg->b_active_item )
-        {
             autoScroll();
-            ///\todo We should make image if we are visible in the view
-            makeImage();
-        }
+        makeImage();
+        notifyLayout();
     }
-    /// \todo handle delete in a more clever way
     else if ( arg->i_type == 1 ) // Global change or deletion
     {
         m_firstPos = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
 
         makeImage();
+        notifyLayout();
     }
     else if ( arg->i_type == 2 ) // Item-append
     {
         if( m_flat && m_firstPos->size() )
+        {
             m_firstPos = m_rTree.getNextLeaf( m_firstPos );
-        /// \todo Check if the item is really visible in the view
-        // (we only check if it in the document)
-        if( arg->b_visible == true )
+
+            makeImage();
+            notifyLayout();
+        }
+        else if( isItemVisible( arg->i_id ) )
         {
             makeImage();
+            notifyLayout();
         }
     }
     else if( arg->i_type == 3 ) // item-del
     {
         /* Make sure firstPos is valid */
+        VarTree::Iterator it_old = m_firstPos;
         while( m_firstPos->isDeleted() &&
                m_firstPos != (m_flat ? m_rTree.firstLeaf()
                                      : m_rTree.begin()) )
@@ -180,12 +183,12 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update> &rTree,
         if( m_firstPos->isDeleted() )
             m_firstPos = m_rTree.begin();
 
-        if( arg->b_visible == true )
+        if( m_firstPos != it_old || isItemVisible( arg->i_id ) )
         {
             makeImage();
+            notifyLayout();
         }
     }
-    notifyLayout();
 }
 
 void CtrlTree::onUpdate( Subject<VarPercent> &rPercent, void* arg)
@@ -879,4 +882,13 @@ VarTree::Iterator CtrlTree::findItemAtPos( int pos )
     }
 
     return it;
+}
+
+bool CtrlTree::isItemVisible( int id )
+{
+    VarTree::Iterator it = m_rTree.findById( id );
+
+    int rank1 = m_rTree.getRank( m_firstPos, m_flat );
+    int rank2 = m_rTree.getRank( it, m_flat );
+    return ( rank2 >= rank1 && rank2 <= rank1 + maxItems() -1 );
 }

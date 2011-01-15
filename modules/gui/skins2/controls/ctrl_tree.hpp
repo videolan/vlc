@@ -147,6 +147,9 @@ private:
      *  n too big)
      */
     VarTree::Iterator findItemAtPos( int n );
+
+    /// check if id is within the visible control
+    bool isItemVisible( int id );
 };
 
 #endif
