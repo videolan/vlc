@@ -1,0 +1,11 @@
+--- sidplay-2.1.1/Makefile.am	2002-12-23 21:21:03.000000000 +0100
++++ sidplay-2.1.1.new/Makefile.am	2011-01-15 16:50:45.517649286 +0100
+@@ -1,7 +1,7 @@
+ 
+ AUTOMAKE_OPTIONS = foreign
+ 
+-SUBDIRS = libsidplay libsidutils resid builders
++SUBDIRS = libsidplay resid builders
+ 
+ # Remove CVS directories from any subdirs that get
+ # included completely (e.g. win, directx,...).

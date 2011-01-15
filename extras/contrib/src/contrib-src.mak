@@ -2658,9 +2658,12 @@ sidplay-2.1.1: sidplay-libs-2.1.1.tar.gz
 	(cd $@; patch -p1 < ../Patches/sidplay2-openmode.patch)
 	(cd $@; patch -p1 < ../Patches/sidplay2-endian.patch)
 	(cd $@; patch -p1 < ../Patches/sidplay2-smartprt.patch)
+	(cd $@; patch -p1 < ../Patches/sidplay2-noutils.patch)
+	(cd $@; patch -p1 < ../Patches/sidplay2-string.patch)
+	(cd $@; autoreconf -ivf)
 
 .sidplay: sidplay-2.1.1
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make -C libsidplay && make -C libsidplay install )
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 
 CLEAN_FILE += .sidplay
 CLEAN_PKG  += sidplay-2.1.1
