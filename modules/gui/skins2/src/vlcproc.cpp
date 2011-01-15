@@ -290,15 +290,12 @@ int VlcProc::onItemAppend( vlc_object_t *pObj, const char *pVariable,
     VlcProc *pThis = (VlcProc*)pParam;
 
     playlist_add_t *p_add = static_cast<playlist_add_t*>(newVal.p_address);
-
-    CmdGenericPtr ptrTree;
-    CmdPlaytreeAppend *pCmdTree = new CmdPlaytreeAppend( pThis->getIntf(),
-                                                             p_add );
-    ptrTree = CmdGenericPtr( pCmdTree );
+    CmdPlaytreeAppend *pCmdTree =
+        new CmdPlaytreeAppend( pThis->getIntf(), p_add );
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-    pQueue->push( ptrTree , false );
+    pQueue->push( CmdGenericPtr( pCmdTree ), false );
 
     return VLC_SUCCESS;
 }
@@ -310,15 +307,12 @@ int VlcProc::onItemDelete( vlc_object_t *pObj, const char *pVariable,
     VlcProc *pThis = (VlcProc*)pParam;
 
     int i_id = newVal.i_int;
-
-    CmdGenericPtr ptrTree;
-    CmdPlaytreeDelete *pCmdTree = new CmdPlaytreeDelete( pThis->getIntf(),
-                                                         i_id);
-    ptrTree = CmdGenericPtr( pCmdTree );
+    CmdPlaytreeDelete *pCmdTree =
+        new CmdPlaytreeDelete( pThis->getIntf(), i_id);
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-    pQueue->push( ptrTree , false );
+    pQueue->push( CmdGenericPtr( pCmdTree ), false );
 
     return VLC_SUCCESS;
 }
