@@ -173,13 +173,9 @@ static void detachItemEvents( media_library_t *p_ml, input_item_t *p_item )
 void watch_Close( media_library_t *p_ml )
 {
     playlist_t *p_pl = pl_Get( p_ml );
-    var_DelCallback( p_pl, "item-current", watch_PlaylistItemCurrent, p_ml );
-    var_DelCallback( p_pl, "playlist-item-append", watch_PlaylistItemAppend, p_ml );
     var_DelCallback( p_pl, "playlist-item-deleted", watch_PlaylistItemDeleted, p_ml );
-
-    /* Stop the watch thread and join in */
-    vlc_object_kill( p_ml->p_sys->p_watch );
-    vlc_thread_join( p_ml->p_sys->p_watch );
+    var_DelCallback( p_pl, "playlist-item-append", watch_PlaylistItemAppend, p_ml );
+    var_DelCallback( p_pl, "item-current", watch_PlaylistItemCurrent, p_ml );
 
     /* Flush item list */
     il_foreachhashlist( p_ml->p_sys->p_watch->p_hlist, p_elt, ixx )
@@ -189,6 +185,10 @@ void watch_Close( media_library_t *p_ml )
         vlc_gc_decref( p_elt->p_item );
     }
     item_list_destroy( p_ml->p_sys->p_watch );
+
+    /* Stop the watch thread and join in */
+    vlc_object_kill( p_ml->p_sys->p_watch );
+    vlc_thread_join( p_ml->p_sys->p_watch );
 
     /* Clear up other stuff */
     vlc_mutex_destroy( &p_ml->p_sys->p_watch->lock );
@@ -558,12 +558,16 @@ static void watch_ProcessAppendQueue( media_library_t* p_ml )
         vlc_mutex_lock( &p_wt->list_mutex );
         p_media = media_New( p_ml, i_media_id, ML_MEDIA, true );
         if( p_media == NULL )
+        {
+            vlc_mutex_unlock( &p_wt->list_mutex );
             continue;
+        }
         /* If duplicate, then it just continues */
         i_ret = __watch_add_Item( p_ml, p_item, p_media, true );
         if( i_ret != VLC_SUCCESS )
         {
             ml_gc_decref( p_media );
+            vlc_mutex_unlock( &p_wt->list_mutex );
             continue;
         }
 
