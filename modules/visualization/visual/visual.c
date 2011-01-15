@@ -197,14 +197,16 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
-    if( p_sys == NULL )
+    if( unlikely (p_sys == NULL ) )
         return VLC_EGENERIC;
 
     p_sys->i_height = var_InheritInteger( p_filter , "effect-height");
     p_sys->i_width  = var_InheritInteger( p_filter , "effect-width");
 
+    /* No resolution under 400x532 */
     if( p_sys->i_height < 400 ) p_sys->i_height = 400;
     if( p_sys->i_width  < 532 ) p_sys->i_width  = 532;
+    /* Work on even dimensions */
     if( (p_sys->i_height % 2 ) != 0 ) p_sys->i_height--;
     if( (p_sys->i_width % 2 )  != 0 ) p_sys->i_width--;
 
@@ -218,24 +220,23 @@ static int Open( vlc_object_t *p_this )
     while( psz_parser && *psz_parser != '\0' )
     {
         visual_effect_t *p_effect;
-        int  i;
 
         p_effect = malloc( sizeof( visual_effect_t ) );
         if( !p_effect )
             break;
-        p_effect->i_width = p_sys->i_width;
-        p_effect->i_height= p_sys->i_height;
-        p_effect->i_nb_chans = aout_FormatNbChannels( &p_filter->fmt_in.audio);
+        p_effect->i_width     = p_sys->i_width;
+        p_effect->i_height    = p_sys->i_height;
+        p_effect->i_nb_chans  = aout_FormatNbChannels( &p_filter->fmt_in.audio);
         p_effect->i_idx_left  = 0;
         p_effect->i_idx_right = __MIN( 1, p_effect->i_nb_chans-1 );
 
         p_effect->psz_args = NULL;
-        p_effect->p_data = NULL;
+        p_effect->p_data   = NULL;
 
-        p_effect->pf_run = NULL;
+        p_effect->pf_run   = NULL;
         p_effect->psz_name = NULL;
 
-        for( i = 0; pf_effect_run[i].psz_name != NULL; i++ )
+        for( int i = 0; pf_effect_run[i].psz_name != NULL; i++ )
         {
             if( !strncasecmp( psz_parser,
                               pf_effect_run[i].psz_name,
@@ -300,9 +301,9 @@ static int Open( vlc_object_t *p_this )
     /* Open the video output */
     memset( &fmt, 0, sizeof(video_format_t) );
 
-    fmt.i_width = fmt.i_visible_width = p_sys->i_width;
-    fmt.i_height = fmt.i_visible_height = p_sys->i_height;
-    fmt.i_chroma = VLC_CODEC_I420;
+    fmt.i_width   = fmt.i_visible_width  = p_sys->i_width;
+    fmt.i_height  = fmt.i_visible_height = p_sys->i_height;
+    fmt.i_chroma  = VLC_CODEC_I420;
     fmt.i_sar_num = fmt.i_sar_den = 1;
 
     p_sys->p_vout = aout_filter_RequestVout( p_filter, NULL, &fmt );
@@ -333,7 +334,6 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     picture_t *p_outpic;
-    int i;
 
     /* First, get a new picture */
     while( ( p_outpic = vout_GetPicture( p_sys->p_vout ) ) == NULL)
@@ -345,14 +345,14 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     }
 
     /* Blank the picture */
-    for( i = 0 ; i < p_outpic->i_planes ; i++ )
+    for( int i = 0 ; i < p_outpic->i_planes ; i++ )
     {
         memset( p_outpic->p[i].p_pixels, i > 0 ? 0x80 : 0x00,
                 p_outpic->p[i].i_visible_lines * p_outpic->p[i].i_pitch );
     }
 
     /* We can now call our visualization effects */
-    for( i = 0; i < p_sys->i_effect; i++ )
+    for( int i = 0; i < p_sys->i_effect; i++ )
     {
 #define p_effect p_sys->effect[i]
         if( p_effect->pf_run )
@@ -377,15 +377,13 @@ static void Close( vlc_object_t *p_this )
     filter_t * p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    int i;
-
     if( p_filter->p_sys->p_vout )
     {
         aout_filter_RequestVout( p_filter, p_filter->p_sys->p_vout, 0 );
     }
 
     /* Free the list */
-    for( i = 0; i < p_sys->i_effect; i++ )
+    for( int i = 0; i < p_sys->i_effect; i++ )
     {
 #define p_effect p_sys->effect[i]
         if( !strncmp( p_effect->psz_name, "spectrum", strlen( "spectrum" ) ) )
@@ -420,6 +418,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     VLC_UNUSED(p_data); VLC_UNUSED(newval);
+
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     /* restart this baby */
     msg_Dbg( p_filter, "we should restart the visual filter" );
