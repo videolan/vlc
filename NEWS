@@ -46,11 +46,14 @@ Interfaces
  * Qt: effects dialogs rework
  * Qt: new CoverFlow-like view of the playlist
  * Qt: port to MacOS X platform
+ * Skins2: fullscreen controller support, relative placement support
+   and important cleanups and optimisations
  * ncurses: heavy refactor of the complete interface
 
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
  * New video output for iOS platform
+ * New video output using EGL
  * Adaptation of the OpenGL layer for OpenGL ES 1.1
  * Various vmem improvements
 
