@@ -57,7 +57,7 @@ void Playtree::delSelected()
     }
     /// \todo Do this better (handle item-deleted)
     tree_update descr;
-    descr.i_type = 3;
+    descr.type = tree_update::DeleteItem;
     notify( &descr );
     it = begin();
     while( it != end() )
@@ -114,7 +114,7 @@ void Playtree::onChange()
 {
     buildTree();
     tree_update descr;
-    descr.i_type = 1;
+    descr.type = tree_update::ResetAll;
     notify( &descr );
 }
 
@@ -129,7 +129,7 @@ void Playtree::onUpdateItem( int id )
         it->setString( UStringPtr( pName ) );
 
         tree_update descr;
-        descr.i_type = 0;
+        descr.type = tree_update::UpdateItem;
         descr.i_id = id;
         descr.b_active_item = false;
         notify( &descr );
@@ -149,7 +149,7 @@ void Playtree::onUpdateCurrent( bool b_active )
            it->setPlaying( false );
 
            tree_update descr;
-           descr.i_type = 0;
+           descr.type = tree_update::UpdateItem;
            descr.i_id = it->getId();
            descr.b_active_item = false;
            notify( &descr );
@@ -175,7 +175,7 @@ void Playtree::onUpdateCurrent( bool b_active )
         playlist_Unlock( m_pPlaylist );
 
         tree_update descr;
-        descr.i_type = 0;
+        descr.type = tree_update::UpdateItem;
         descr.i_id = current->i_id;
         descr.b_active_item = true;
         notify( &descr );
@@ -192,7 +192,7 @@ void Playtree::onDelete( int i_id )
         item->setDeleted( true );
 
         tree_update descr;
-        descr.i_type = 3;
+        descr.type = tree_update::DeleteItem;
         descr.i_id = i_id;
         notify( &descr );
 
@@ -223,7 +223,7 @@ void Playtree::onAppend( playlist_add_t *p_add )
         playlist_Unlock( m_pPlaylist );
 
         tree_update descr;
-        descr.i_type = 2;
+        descr.type = tree_update::AppendItem;
         descr.i_id = p_add->i_item;
         notify( &descr );
     }

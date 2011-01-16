@@ -35,9 +35,18 @@
 /// Description of an update to the tree
 typedef struct tree_update
 {
-     int i_type;
-     int i_id;
-     bool b_active_item;
+    enum type_t
+    {
+        UpdateItem,
+        AppendItem,
+        DeleteItem,
+        ResetAll,
+    };
+
+    enum type_t type;
+    int i_id;
+    bool b_active_item;
+
 } tree_update;
 
 /// Tree variable

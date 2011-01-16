@@ -140,21 +140,24 @@ int CtrlTree::maxItems()
 void CtrlTree::onUpdate( Subject<VarTree, tree_update> &rTree,
                          tree_update *arg )
 {
-    if( arg->i_type == 0 ) // Item update
+    if( arg->type == arg->UpdateItem ) // Item update
     {
         if( arg->b_active_item )
             autoScroll();
-        makeImage();
-        notifyLayout();
+        if( isItemVisible( arg->i_id ) )
+        {
+            makeImage();
+            notifyLayout();
+        }
     }
-    else if ( arg->i_type == 1 ) // Global change or deletion
+    else if ( arg->type == arg->ResetAll ) // Global change or deletion
     {
         m_firstPos = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
 
         makeImage();
         notifyLayout();
     }
-    else if ( arg->i_type == 2 ) // Item-append
+    else if ( arg->type == arg->AppendItem ) // Item-append
     {
         if( m_flat && m_firstPos->size() )
         {
@@ -169,7 +172,7 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update> &rTree,
             notifyLayout();
         }
     }
-    else if( arg->i_type == 3 ) // item-del
+    else if( arg->type == arg->DeleteItem ) // item-del
     {
         /* Make sure firstPos is valid */
         VarTree::Iterator it_old = m_firstPos;
