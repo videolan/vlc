@@ -1686,7 +1686,7 @@ AS_IF([test "${enable_growl}" != "no"], [
 dnl
 dnl Libnotify notification plugin
 dnl
-PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify], [libnotify notification], [auto])
+PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify gtk+-2.0], [libnotify notification], [auto])
 
 dnl
 dnl Taglibplugin
