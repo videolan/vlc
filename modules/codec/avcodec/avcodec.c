@@ -128,7 +128,7 @@ vlc_module_begin ()
     add_integer ( "ffmpeg-lowres", 0, LOWRES_TEXT, LOWRES_LONGTEXT,
         true )
         change_integer_range( 0, 2 )
-    add_bool( "ffmpeg-fast", false, FAST_TEXT, FAST_LONGTEXT, true )
+    add_bool( "ffmpeg-fast", false, FAST_TEXT, FAST_LONGTEXT, false )
     add_integer ( "ffmpeg-skiploopfilter", 0, SKIPLOOPF_TEXT,
                   SKIPLOOPF_LONGTEXT, true )
         change_safe ()
@@ -137,7 +137,7 @@ vlc_module_begin ()
     add_integer( "ffmpeg-debug", 0, DEBUG_TEXT, DEBUG_LONGTEXT,
                  true )
 #if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2)
-    add_bool( "ffmpeg-hw", false, HW_TEXT, HW_LONGTEXT, true )
+    add_bool( "ffmpeg-hw", false, HW_TEXT, HW_LONGTEXT, false )
 #endif
 #if defined(FF_THREAD_FRAME)
     add_integer( "ffmpeg-threads", 0, THREADS_TEXT, THREADS_LONGTEXT, true );
