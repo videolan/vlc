@@ -166,12 +166,25 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->p_sps_pps_buf  = NULL;
 
 #ifdef USE_DL_OPENING
-    p_sys->p_bcm_dll = LoadLibrary( "bcmDIL.dll" );
+#  define DLL_NAME "bcmDIL.dll"
+#  define PATHS_NB 3
+    static const char *psz_paths[PATHS_NB] = {
+    DLL_NAME,
+    "C:\\Program Files\\Broadcom\\Broadcom CrystalHD Decoder\\" DLL_NAME,
+    "C:\\Program Files (x86)\\Broadcom\\Broadcom CrystalHD Decoder\\" DLL_NAME,
+    };
+    for( int i = 0; i < PATHS_NB; i++ )
+    {
+        HINSTANCE p_bcm_dll = LoadLibrary( psz_paths[i] );
+        if( p_bcm_dll )
+        {
+            p_sys->p_bcm_dll = p_bcm_dll;
+            break;
+        }
+    }
     if( !p_sys->p_bcm_dll )
     {
-        #ifdef DEBUG_CRYSTALHD
         msg_Dbg( p_dec, "Couldn't load the CrystalHD dll");
-        #endif
         return VLC_EGENERIC;
     }
 
