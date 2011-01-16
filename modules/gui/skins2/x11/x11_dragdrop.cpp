@@ -168,16 +168,28 @@ void X11DragDrop::dndDrop( ldata_t data )
     {
         char* psz_dup = strdup( buffer );
         char* psz_new = psz_dup;
+        bool first = true;
         while( psz_new && *psz_new )
         {
-            char* psz_end = strchr( psz_new, '\n' );
-            if( psz_end )
+            int skip = 0;
+            const char* sep[] = { "\r\n", "\n", NULL };
+            for( int i = 0; sep[i]; i++ )
+            {
+                char* psz_end = strstr( psz_new, sep[i] );
+                if( !psz_end )
+                    continue;
                 *psz_end = '\0';
+                skip = strlen( sep[i] );
+                break;
+            }
+            if( *psz_new )
+            {
+                bool playOnDrop = m_playOnDrop && first;
+                CmdAddItem( getIntf(), psz_new, playOnDrop ).execute();
+                first = false;
+            }
 
-            CmdAddItem cmd( getIntf(), psz_new, m_playOnDrop );
-            cmd.execute();
-
-            psz_new = psz_end ? psz_end + 1 : NULL;
+            psz_new += strlen( psz_new ) + skip;
         }
         free( psz_dup );
         XFree( buffer );
