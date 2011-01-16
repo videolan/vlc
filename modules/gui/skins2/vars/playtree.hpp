@@ -56,9 +56,6 @@ public:
     /// Function called to notify playlist item delete
     void onDelete( int );
 
-    /// Items waiting to be appended
-    int i_items_to_append;
-
 private:
     /// VLC playlist object
     playlist_t *m_pPlaylist;
@@ -68,9 +65,6 @@ private:
 
     /// Update Node's children
     void buildNode( playlist_item_t *p_node, VarTree &m_pNode );
-
-    /// keep track of item being played
-    playlist_item_t* m_currentItem;
 };
 
 #endif

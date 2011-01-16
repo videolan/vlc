@@ -36,10 +36,8 @@
 typedef struct tree_update
 {
      int i_type;
-     int i_parent;
      int i_id;
      bool b_active_item;
-     bool b_visible;
 } tree_update;
 
 /// Tree variable
@@ -188,7 +186,6 @@ public:
             depth++;
         return depth;
     }
-
 
 private:
 
