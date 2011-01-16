@@ -1072,6 +1072,9 @@ static char *StripTags( char *psz_subtitle )
             *psz_text++ = *psz_subtitle;
         }
 
+        /* Security fix: Account for the case where input ends early */
+        if( *psz_subtitle == '\0' ) break;
+
         psz_subtitle++;
     }
     *psz_text = '\0';
