@@ -89,6 +89,13 @@ libVLC:
   ** libvlc_audio_filter_list_get, libvlc_video_filter_list_get to get the
      list of available audio and video filters
 
+Removed modules:
+ * asademux: use libass only
+ * fake: use the new image demuxers
+ * hal, v4l, gapi, omapfb, hd1000v: obsolete unmaintained modules
+ * id3tag: use taglib
+ * upnp: use upnp_intel
+
 
 Changes between 1.1.4.1 and 1.1.5:
 ----------------------------------
