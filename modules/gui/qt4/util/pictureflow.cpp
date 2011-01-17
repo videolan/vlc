@@ -26,6 +26,7 @@
 */
 
 #include "pictureflow.hpp"
+#include "components/playlist/ml_model.hpp"
 
 // detect Qt version
 #if QT_VERSION < 0x040300
@@ -144,7 +145,7 @@ public:
     PFreal offsetX;
     PFreal offsetY;
 
-    PLModel *model;
+    VLCModel *model;
     SlideInfo centerSlide;
     QVector<SlideInfo> leftSlides;
     QVector<SlideInfo> rightSlides;
@@ -596,8 +597,8 @@ static QImage* prepareSurface(const QImage* slideImage, int w, int h, QRgb bgcol
             imagePainter.setBrush( QBrush( Qt::lightGray ) );
             imagePainter.setPen( QColor( Qt::lightGray ) );
             QFontMetrics fm = imagePainter.fontMetrics();
-            imagePainter.drawText( 0, img.height()+ 13, PLModel::getMeta( index, COLUMN_TITLE ) );
-            imagePainter.drawText( 0, img.height()+ 13 + fm.xHeight()*2, PLModel::getMeta( index, COLUMN_ARTIST ) );
+            imagePainter.drawText( 0, img.height()+ 13, VLCModel::getMeta( index, COLUMN_TITLE ) );
+            imagePainter.drawText( 0, img.height()+ 13 + fm.xHeight()*2, VLCModel::getMeta( index, COLUMN_ARTIST ) );
             /*
             for (int x = 0; x < w; x++)
                 for (int y = 0; y < h; y++)
@@ -614,7 +615,7 @@ QImage* PictureFlowSoftwareRenderer::surface(QModelIndex index)
     if (!state || !index.isValid())
         return 0;
 
-    QImage* img = new QImage(PLModel::getArtPixmap( index,
+    QImage* img = new QImage(VLCModel::getArtPixmap( index,
                                          QSize( state->slideWidth, state->slideHeight ) ).toImage());
 
     QImage* sr = prepareSurface(img, state->slideWidth, state->slideHeight, bgcolor, state->reflectionEffect, index );
@@ -633,13 +634,33 @@ QRect PictureFlowSoftwareRenderer::renderSlide(const SlideInfo &slide, int col1,
 
     QModelIndex index;
 
-    index = state->model->index( slide.slideIndex, 0, state->model->currentIndex().parent() );
-    if( !index.isValid() )
-        return QRect();
+    QString artURL;
 
-    PLItem *item = static_cast<PLItem*>( index.internalPointer() );
+    PLModel* plm = dynamic_cast<PLModel*>( state->model );
+#ifdef MEDIA_LIBRARY
+    MLModel* mlm = dynamic_cast<MLModel*>( state->model );
+#endif
+    if( plm != 0 )
+    {
+        index = ((PLModel*)state->model)->index( slide.slideIndex, 0, state->model->currentIndex().parent() );
+        if( !index.isValid() )
+            return QRect();
 
-    QString key = QString("%1%2%3%4").arg(PLModel::getMeta( index, COLUMN_TITLE )).arg( PLModel::getMeta( index, COLUMN_ARTIST ) ).arg(index.data( PLModel::IsCurrentRole ).toBool() ).arg( InputManager::decodeArtURL( item->inputItem() ) );
+        PLItem *item = static_cast<PLItem*>( index.internalPointer() );
+        artURL = InputManager::decodeArtURL( item->inputItem() );
+    }
+#ifdef MEDIA_LIBRARY
+    else if( mlm != 0 )
+    {
+        index = ((MLModel*)state->model)->index( slide.slideIndex, 0, QModelIndex() );
+        if( !index.isValid() )
+            return QRect();
+
+        MLItem *item = static_cast<MLItem*>( index.internalPointer() );
+        artURL = qfu( item->getMedia()->psz_cover );
+    }
+#endif
+    QString key = QString("%1%2%3%4").arg(VLCModel::getMeta( index, COLUMN_TITLE )).arg( VLCModel::getMeta( index, COLUMN_ARTIST ) ).arg(index.data( VLCModel::IsCurrentRole ).toBool() ).arg( artURL );
 
     QImage* src;
     if( cache.contains( key ) )
@@ -796,7 +817,7 @@ public:
 };
 
 
-PictureFlow::PictureFlow(QWidget* parent, PLModel* _p_model): QWidget(parent)
+PictureFlow::PictureFlow(QWidget* parent, VLCModel* _p_model): QWidget(parent)
 {
     d = new PictureFlowPrivate;
     d->state = new PictureFlowState;
