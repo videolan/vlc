@@ -50,7 +50,7 @@ struct access_sys_t
 static int AccessControl( access_t *p_access, int i_query, va_list args );
 static ssize_t AccessRead( access_t *, uint8_t *, size_t );
 static int AccessSeek( access_t *, uint64_t );
-static int OpenFileInZip( access_t *p_access, uint64_t i_pos );
+static int OpenFileInZip( access_t *p_access );
 static char *unescapeXml( const char *psz_text );
 
 /** **************************************************************************
@@ -156,7 +156,7 @@ int AccessOpen( vlc_object_t *p_this )
     }
 
     /* Open file in zip */
-    OpenFileInZip( p_access, 0 );
+    OpenFileInZip( p_access );
 
     /* Set callback */
     ACCESS_SET_CALLBACKS( AccessRead, NULL, AccessControl, AccessSeek );
@@ -292,6 +292,7 @@ static int AccessSeek( access_t *p_access, uint64_t seek_len )
     access_sys_t *p_sys = p_access->p_sys;
     assert( p_sys );
     unzFile file = p_sys->zipFile;
+
     if( !file )
     {
         msg_Err( p_access, "archive not opened !" );
@@ -299,9 +300,9 @@ static int AccessSeek( access_t *p_access, uint64_t seek_len )
     }
 
     /* Reopen file in zip if needed */
-    if( p_access->info.i_pos != 0 )
+    if( p_access->info.i_pos > seek_len )
     {
-        OpenFileInZip( p_access, p_access->info.i_pos + seek_len );
+        OpenFileInZip( p_access );
     }
 
     /* Read seek_len data and drop it */
@@ -333,7 +334,7 @@ static int AccessSeek( access_t *p_access, uint64_t seek_len )
 /** **************************************************************************
  * \brief Open file in zip
  *****************************************************************************/
-static int OpenFileInZip( access_t *p_access, uint64_t i_pos )
+static int OpenFileInZip( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     unzFile file = p_sys->zipFile;
@@ -357,10 +358,8 @@ static int OpenFileInZip( access_t *p_access, uint64_t i_pos )
                  p_sys->psz_fileInzip );
         return VLC_EGENERIC;
     }
-    if( i_pos > 0 )
-        return AccessSeek( p_access, i_pos );
-    else
-        return VLC_SUCCESS;
+
+    return VLC_SUCCESS;
 }
 
 /** **************************************************************************
@@ -433,7 +432,6 @@ static long ZCALLBACK ZipIO_Seek( void* opaque, void* stream,
                                   uLong offset, int origin )
 {
     (void)opaque;
-    //access_t *p_access = (access_t*) opaque;
     int64_t pos = offset;
     switch( origin )
     {
@@ -450,7 +448,6 @@ static long ZCALLBACK ZipIO_Seek( void* opaque, void* stream,
     }
     if( pos < 0 )
         return -1;
-    //msg_Dbg( p_access, "seek (%d,%d): %" PRIu64, offset, origin, pos );
     stream_Seek( (stream_t*) stream, pos );
     /* Note: in unzip.c, unzlocal_SearchCentralDir seeks to the end of
              the stream, which is doable but returns an error in VLC.
