@@ -2065,10 +2065,10 @@ endif
 .mpcdec: mpcdec
 	(cd $<; cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make install)
 ifdef HAVE_WIN32
-	(cd $<; cp libmpcdec/libmpcdec_static.a $(PREFIX)/lib/libmpcdec.a)
+	(cd $<; mkdir -p $(PREFIX)/lib && cp libmpcdec/libmpcdec_static.a $(PREFIX)/lib/libmpcdec.a)
 endif
 ifdef HAVE_MACOSX
-	(cd $<; cp libmpcdec/libmpcdec.dylib $(PREFIX)/lib/libmpcdec.dylib)
+	(cd $<; mkdir -p $(PREFIX)/lib && cp libmpcdec/libmpcdec.dylib $(PREFIX)/lib/libmpcdec.dylib)
 endif
 	touch $@
 
