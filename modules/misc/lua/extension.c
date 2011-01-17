@@ -21,13 +21,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "vlc.h"
 #include "libs.h"
 #include "extension.h"
 #include "assert.h"
 
+#include <vlc_common.h>
 #include <vlc_input.h>
 #include <vlc_events.h>
+#include <vlc_dialog.h>
 
 /* Functions to register */
 static const luaL_Reg p_reg[] =
@@ -54,6 +64,8 @@ static const char* const ppsz_capabilities[] = {
     NULL
 };
 
+#define WATCH_TIMER_PERIOD    (10 * CLOCK_FREQ) ///< 10s period for the timer
+
 static int ScanExtensions( extensions_manager_t *p_this );
 static int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
                             void *dummy );
@@ -65,8 +77,10 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
 static int TriggerMenu( extension_t *p_ext, int id );
 static int TriggerExtension( extensions_manager_t *p_mgr,
                              extension_t *p_ext );
+static void WatchTimerCallback( void* );
 
-int vlclua_extension_deactivate( lua_State *L );
+static int vlclua_extension_deactivate( lua_State *L );
+static int vlclua_extension_keep_alive( lua_State *L );
 
 /* Interactions */
 static int vlclua_extension_dialog_callback( vlc_object_t *p_this,
@@ -166,6 +180,7 @@ void Close_Extension( vlc_object_t *p_this )
         vlc_mutex_destroy( &p_ext->p_sys->running_lock );
         vlc_mutex_destroy( &p_ext->p_sys->command_lock );
         vlc_cond_destroy( &p_ext->p_sys->wait );
+        vlc_timer_destroy( p_ext->p_sys->timer );
 
         free( p_ext->p_sys );
         free( p_ext );
@@ -236,6 +251,15 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
         return 0;
     }
     p_ext->p_sys->p_mgr = p_mgr;
+
+    /* Watch timer */
+    if( vlc_timer_create( &p_ext->p_sys->timer, WatchTimerCallback, p_ext ) )
+    {
+        free( p_ext->psz_name );
+        free( p_ext->p_sys );
+        free( p_ext );
+        return 0;
+    }
 
     /* Mutexes and conditions */
     vlc_mutex_init( &p_ext->p_sys->command_lock );
@@ -743,6 +767,8 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
             lua_getglobal( L, "vlc" );
             lua_pushcfunction( L, vlclua_extension_deactivate );
             lua_setfield( L, -2, "deactivate" );
+            lua_pushcfunction( L, vlclua_extension_keep_alive );
+            lua_setfield( L, -2, "keep_alive" );
 
             /* Setup the module search path */
             if( vlclua_add_modules_path( p_mgr, L, p_ext->psz_name ) )
@@ -787,9 +813,9 @@ int lua_ExecuteFunction( extensions_manager_t *p_mgr, extension_t *p_ext,
  * (see extension_thread.c)
  **/
 int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
-                            const char *psz_function, va_list args )
+                           const char *psz_function, va_list args )
 {
-    int i_ret = VLC_EGENERIC;
+    int i_ret = VLC_SUCCESS;
     int i_args = 0;
     assert( p_mgr != NULL );
     assert( p_ext != NULL );
@@ -824,15 +850,33 @@ int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
         }
         i_args ++;
     }
+
+    // Create watch timer
+    vlc_mutex_lock( &p_ext->p_sys->command_lock );
+    vlc_timer_schedule( p_ext->p_sys->timer, false, WATCH_TIMER_PERIOD, 0 );
+    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+
+    // Start actual call to Lua
     if( lua_pcall( L, i_args, 1, 0 ) )
     {
         msg_Warn( p_mgr, "Error while running script %s, "
                   "function %s(): %s", p_ext->psz_name, psz_function,
                   lua_tostring( L, lua_gettop( L ) ) );
-        goto exit;
+        i_ret = VLC_EGENERIC;
     }
 
-    i_ret = lua_DialogFlush( L );
+    // Reset watch timer and timestamp
+    vlc_mutex_lock( &p_ext->p_sys->command_lock );
+    if( p_ext->p_sys->progress )
+    {
+        dialog_ProgressDestroy( p_ext->p_sys->progress );
+        p_ext->p_sys->progress = NULL;
+    }
+    vlc_timer_schedule( p_ext->p_sys->timer, false, 0, 0 );
+    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+
+    i_ret |= lua_DialogFlush( L );
+
 exit:
     return i_ret;
 
@@ -846,7 +890,7 @@ static inline int TriggerMenu( extension_t *p_ext, int i_id )
 int lua_ExtensionTriggerMenu( extensions_manager_t *p_mgr,
                               extension_t *p_ext, int id )
 {
-    int i_ret = VLC_EGENERIC;
+    int i_ret = VLC_SUCCESS;
     lua_State *L = GetLuaState( p_mgr, p_ext );
 
     if( !L )
@@ -865,20 +909,36 @@ int lua_ExtensionTriggerMenu( extensions_manager_t *p_mgr,
     /* Pass id as unique argument to the function */
     lua_pushinteger( L, id );
 
+    // Create watch timer
+    vlc_mutex_lock( &p_ext->p_sys->command_lock );
+    vlc_timer_schedule( p_ext->p_sys->timer, false, WATCH_TIMER_PERIOD, 0 );
+    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+
     if( lua_pcall( L, 1, 1, 0 ) != 0 )
     {
         msg_Warn( p_mgr, "Error while running script %s, "
                   "function trigger_menu(): %s", p_ext->psz_name,
                   lua_tostring( L, lua_gettop( L ) ) );
-        return VLC_EGENERIC;
+        i_ret = VLC_EGENERIC;
     }
 
-    i_ret = lua_DialogFlush( L );
+    // Reset watch timer and timestamp
+    vlc_mutex_lock( &p_ext->p_sys->command_lock );
+    if( p_ext->p_sys->progress )
+    {
+        dialog_ProgressDestroy( p_ext->p_sys->progress );
+        p_ext->p_sys->progress = NULL;
+    }
+    vlc_timer_schedule( p_ext->p_sys->timer, false, 0, 0 );
+    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+
+    i_ret |= lua_DialogFlush( L );
     if( i_ret < VLC_SUCCESS )
     {
         msg_Dbg( p_mgr, "Something went wrong in %s (%s:%d)",
                  __func__, __FILE__, __LINE__ );
     }
+
     return i_ret;
 }
 
@@ -935,6 +995,26 @@ int vlclua_extension_deactivate( lua_State *L )
     extension_t *p_ext = vlclua_extension_get( L );
     int i_ret = Deactivate( p_ext->p_sys->p_mgr, p_ext );
     return ( i_ret == VLC_SUCCESS ) ? 1 : 0;
+}
+
+/** Keep an extension alive. This resets the watch timer to 0
+ * @param L lua_State
+ * @note This is the "vlc.keep_alive()" function
+ **/
+int vlclua_extension_keep_alive( lua_State *L )
+{
+    extension_t *p_ext = vlclua_extension_get( L );
+
+    vlc_mutex_lock( &p_ext->p_sys->command_lock );
+    if( p_ext->p_sys->progress )
+    {
+        dialog_ProgressDestroy( p_ext->p_sys->progress );
+        p_ext->p_sys->progress = NULL;
+    }
+    vlc_timer_schedule( p_ext->p_sys->timer, false, WATCH_TIMER_PERIOD, 0 );
+    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+
+    return 1;
 }
 
 /** Callback for the variable "dialog-event"
@@ -995,23 +1075,87 @@ static void inputItemMetaChanged( const vlc_event_t *p_event,
     PushCommandUnique( p_ext, CMD_UPDATE_META );
 }
 
-/* Lock this extension. Can fail. */
+/** Lock this extension. Can fail. */
 bool LockExtension( extension_t *p_ext )
 {
+    vlc_mutex_lock( &p_ext->p_sys->command_lock );
     if( p_ext->p_sys->b_exiting )
+    {
+        vlc_mutex_unlock( &p_ext->p_sys->command_lock );
         return false;
+    }
 
     vlc_mutex_lock( &p_ext->p_sys->running_lock );
     if( p_ext->p_sys->b_exiting )
     {
         vlc_mutex_unlock( &p_ext->p_sys->running_lock );
+        vlc_mutex_unlock( &p_ext->p_sys->command_lock );
         return false;
     }
 
+    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
     return true;
 }
 
+/** Unlock this extension. */
 void UnlockExtension( extension_t *p_ext )
 {
     vlc_mutex_unlock( &p_ext->p_sys->running_lock );
+}
+
+/** Watch timer callback
+ * The timer expired, Lua may be stuck, ask the user what to do now
+ **/
+static void WatchTimerCallback( void *data )
+{
+    extension_t *p_ext = data;
+    extensions_manager_t *p_mgr = p_ext->p_sys->p_mgr;
+
+    char *message;
+    if( asprintf( &message, _( "Extension '%s' does not respond.\n"
+                               "Do you want to kill it now? " ),
+                  p_ext->psz_title ) == -1 )
+    {
+        return;
+    }
+
+    vlc_mutex_lock( &p_ext->p_sys->command_lock );
+
+    // Do we have a pending Deactivate command?
+    if( ( p_ext->p_sys->command &&
+          p_ext->p_sys->command->i_command == CMD_DEACTIVATE )
+        || ( p_ext->p_sys->command->next
+             && p_ext->p_sys->command->next->i_command == CMD_DEACTIVATE) )
+    {
+        if( p_ext->p_sys->progress )
+        {
+            dialog_ProgressDestroy( p_ext->p_sys->progress );
+            p_ext->p_sys->progress = NULL;
+        }
+        vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+        KillExtension( p_mgr, p_ext );
+        return;
+    }
+
+    if( !p_ext->p_sys->progress )
+    {
+        p_ext->p_sys->progress =
+                dialog_ProgressCreate( p_mgr, _( "Extension not responding!" ),
+                                       message,
+                                       _( "Yes" ) );
+        vlc_timer_schedule( p_ext->p_sys->timer, false, 100000, 0 );
+    }
+    else
+    {
+        if( dialog_ProgressCancelled( p_ext->p_sys->progress ) )
+        {
+            dialog_ProgressDestroy( p_ext->p_sys->progress );
+            p_ext->p_sys->progress = NULL;
+            vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+            KillExtension( p_mgr, p_ext );
+            return;
+        }
+        vlc_timer_schedule( p_ext->p_sys->timer, false, 100000, 0 );
+    }
+    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
 }

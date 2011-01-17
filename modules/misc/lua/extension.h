@@ -26,6 +26,7 @@
 
 #include <vlc_extensions.h>
 #include <vlc_arrays.h>
+#include <vlc_dialog.h>
 
 /* List of available commands */
 typedef enum
@@ -87,6 +88,10 @@ struct extension_sys_t
         struct command_t *next; ///< Next command
     } *command;
 
+    // The two following booleans are protected by command_lock
+    dialog_progress_bar_t *progress;
+    vlc_timer_t timer; ///< This timer makes sure Lua never gets stuck >5s
+
     bool b_exiting;
 };
 
@@ -94,6 +99,7 @@ struct extension_sys_t
 int Activate( extensions_manager_t *p_mgr, extension_t * );
 bool IsActivated( extensions_manager_t *p_mgr, extension_t * );
 int Deactivate( extensions_manager_t *p_mgr, extension_t * );
+void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext );
 int __PushCommand( extension_t *ext, bool unique, command_type_e cmd, va_list options );
 static inline int PushCommand( extension_t *ext, int cmd, ... )
 {

@@ -145,6 +145,16 @@ int Deactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
         return VLC_EGENERIC;
     }
 
+    if( p_ext->p_sys->progress )
+    {
+        // Extension is stuck, kill it now
+        dialog_ProgressDestroy( p_ext->p_sys->progress );
+        p_ext->p_sys->progress = NULL;
+        vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+        KillExtension( p_mgr, p_ext );
+        return VLC_SUCCESS;
+    }
+
     /* Free the list of commands */
     if( p_ext->p_sys->command )
         FreeCommands( p_ext->p_sys->command->next );
@@ -198,6 +208,16 @@ static int RemoveActivated( extensions_manager_t *p_mgr, extension_t *p_ext )
 
     vlc_mutex_unlock( &p_mgr->p_sys->lock );
     return (i_idx >= 0) ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
+void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext )
+{
+    /* Cancel thread if it seems stuck for a while */
+    msg_Dbg( p_mgr, "Killing extension now" );
+    vlc_cancel( p_ext->p_sys->thread );
+    lua_ExtensionDeactivate( p_mgr, p_ext );
+    p_ext->p_sys->b_exiting = true;
+    RemoveActivated( p_mgr, p_ext );
 }
 
 /** Push a UI command */
@@ -294,6 +314,7 @@ static void* Run( void *data )
     extension_t *p_ext = data;
     extensions_manager_t *p_mgr = p_ext->p_sys->p_mgr;
 
+    int cancel = vlc_savecancel();
     vlc_mutex_lock( &p_ext->p_sys->command_lock );
 
     while( !p_ext->p_sys->b_exiting )
@@ -301,12 +322,14 @@ static void* Run( void *data )
         /* Pop command in front */
         struct command_t *cmd = p_ext->p_sys->command;
         vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+        vlc_restorecancel( cancel );
 
         /* Run command */
         if( cmd )
         {
             if( LockExtension( p_ext ) )
             {
+                mutex_cleanup_push( &p_ext->p_sys->running_lock );
                 switch( cmd->i_command )
                 {
                     case CMD_ACTIVATE:
@@ -389,10 +412,12 @@ static void* Run( void *data )
                         break;
                     }
                 }
+                vlc_cleanup_pop();
                 UnlockExtension( p_ext );
             }
         }
 
+        cancel = vlc_savecancel();
         vlc_mutex_lock( &p_ext->p_sys->command_lock );
         if( p_ext->p_sys->command )
         {
@@ -410,6 +435,7 @@ static void* Run( void *data )
 
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );
     msg_Dbg( p_mgr, "Extension thread end: '%s'", p_ext->psz_title );
+    vlc_restorecancel( cancel );
 
     // Note: At this point, the extension should be deactivated
     return NULL;
