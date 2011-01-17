@@ -373,7 +373,21 @@ static void* ZCALLBACK ZipIO_Open( void* opaque, const char* file, int mode )
 
     access_t *p_access = (access_t*) opaque;
 
-    return stream_UrlNew( p_access, file );
+    char *fileUri = malloc( strlen(file) + 8 );
+    if( !fileUri ) return VLC_ENOMEM;
+    if( !strstr( file, "://" ) )
+    {
+        strcpy( fileUri, "file://" );
+        strcat( fileUri, file );
+    }
+    else
+    {
+        strcpy( fileUri, file );
+    }
+
+    stream_t *s = stream_UrlNew( p_access, fileUri );
+    free( fileUri );
+    return s;
 }
 
 /** **************************************************************************
