@@ -26,7 +26,6 @@ nodist_SOURCES_qt4 = \
 		dialogs/playlist.moc.cpp \
 		dialogs/bookmarks.moc.cpp \
 		dialogs/mediainfo.moc.cpp \
-		dialogs/ml_configuration.moc.cpp \
 		dialogs/extended.moc.cpp \
 		dialogs/messages.moc.cpp \
 		dialogs/epg.moc.cpp \
@@ -60,8 +59,6 @@ nodist_SOURCES_qt4 = \
 		components/epg/EPGWidget.moc.cpp \
 		components/playlist/views.moc.cpp \
 		components/playlist/vlc_model.moc.cpp \
-		components/playlist/ml_item.moc.cpp \
-		components/playlist/ml_model.moc.cpp \
 		components/playlist/playlist_model.moc.cpp \
 		components/playlist/playlist.moc.cpp \
 		components/playlist/standardpanel.moc.cpp \
@@ -94,6 +91,13 @@ nodist_SOURCES_qt4 = \
 		ui/about.h \
 		ui/update.h \
 		ui/sout.h
+
+if ENABLE_MEDIA_LIBRARY
+nodist_SOURCES_qt4 +=
+		dialogs/ml_configuration.moc.cpp \
+		components/playlist/ml_item.moc.cpp \
+		components/playlist/ml_model.moc.cpp
+endif
 
 DEPS_res = \
 	pixmaps/arrow_down_dark.png \
@@ -347,8 +351,8 @@ noinst_HEADERS = \
 	components/epg/EPGView.hpp \
 	components/epg/EPGWidget.hpp \
 	components/playlist/views.hpp \
-    components/playlist/ml_item.hpp \
-    components/playlist/ml_model.hpp \
+	components/playlist/ml_item.hpp \
+	components/playlist/ml_model.hpp \
 	components/playlist/vlc_model.hpp \
 	components/playlist/playlist_model.hpp \
 	components/playlist/playlist_item.hpp \
