@@ -94,8 +94,8 @@ public:
     int insertResultArray( vlc_array_t *p_result_array, int row = -1,
                            bool bSignal = true );
 
+    virtual void doDelete( QModelIndexList list );
     void remove( MLItem *item );
-    void remove( QModelIndexList list );
     void remove( QModelIndex idx );
 
     void clear();

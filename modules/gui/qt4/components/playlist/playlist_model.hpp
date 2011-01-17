@@ -86,12 +86,9 @@ public:
     bool isCurrent( const QModelIndex &index ) const;
     int itemId( const QModelIndex &index ) const;
 
-    static QPixmap getArtPixmap( const QModelIndex & index, const QSize & size );
-    static QString getMeta( const QModelIndex & index, int meta );
-
     /* Actions */
     virtual bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
-    void doDelete( QModelIndexList selected );
+    virtual void doDelete( QModelIndexList selected );
     void search( const QString& search_text, const QModelIndex & root, bool b_recursive );
     void sort( const int column, Qt::SortOrder order );
     void sort( const int i_root_id, const int column, Qt::SortOrder order );

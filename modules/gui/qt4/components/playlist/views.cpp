@@ -74,8 +74,8 @@ void AbstractPlViewItemDelegate::paintBackground(
 
 void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-    QString title = PLModel::getMeta( index, COLUMN_TITLE );
-    QString artist = PLModel::getMeta( index, COLUMN_ARTIST );
+    QString title = VLCModel::getMeta( index, COLUMN_TITLE );
+    QString artist = VLCModel::getMeta( index, COLUMN_ARTIST );
 
     QFont font( index.data( Qt::FontRole ).value<QFont>() );
     painter->setFont( font );
@@ -85,7 +85,7 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     int art_width = averagewidth * ICON_SCALER;
     int art_height = averagewidth * ICON_SCALER;
 
-    QPixmap artPix = PLModel::getArtPixmap( index, QSize( art_width, art_height) );
+    QPixmap artPix = VLCModel::getArtPixmap( index, QSize( art_width, art_height) );
 
     paintBackground( painter, option, index );
 
@@ -177,13 +177,13 @@ QSize PlIconViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, co
 
 void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-    QString title = PLModel::getMeta( index, COLUMN_TITLE );
-    QString duration = PLModel::getMeta( index, COLUMN_DURATION );
+    QString title = VLCModel::getMeta( index, COLUMN_TITLE );
+    QString duration = VLCModel::getMeta( index, COLUMN_DURATION );
     if( !duration.isEmpty() ) title += QString(" [%1]").arg( duration );
 
-    QString artist = PLModel::getMeta( index, COLUMN_ARTIST );
-    QString album = PLModel::getMeta( index, COLUMN_ALBUM );
-    QString trackNum = PLModel::getMeta( index, COLUMN_TRACK_NUMBER );
+    QString artist = VLCModel::getMeta( index, COLUMN_ARTIST );
+    QString album = VLCModel::getMeta( index, COLUMN_ALBUM );
+    QString trackNum = VLCModel::getMeta( index, COLUMN_TRACK_NUMBER );
     QString artistAlbum = artist;
     if( !album.isEmpty() )
     {
@@ -192,7 +192,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
         if( !trackNum.isEmpty() ) artistAlbum += QString( " [#%1]" ).arg( trackNum );
     }
 
-    QPixmap artPix = PLModel::getArtPixmap( index, QSize( LISTVIEW_ART_SIZE, LISTVIEW_ART_SIZE ) );
+    QPixmap artPix = VLCModel::getArtPixmap( index, QSize( LISTVIEW_ART_SIZE, LISTVIEW_ART_SIZE ) );
 
     //Draw selection rectangle and current playing item indication
     paintBackground( painter, option, index );

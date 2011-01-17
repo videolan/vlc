@@ -34,6 +34,8 @@
 #include <vlc_input.h>
 
 #include <QModelIndex>
+#include <QPixmapCache>
+#include <QSize>
 #include <QAbstractItemModel>
 
 
@@ -52,7 +54,10 @@ public:
     virtual QModelIndex currentIndex() const = 0;
     virtual bool popup( const QModelIndex & index,
             const QPoint &point, const QModelIndexList &list ) = 0;
+    virtual void doDelete( QModelIndexList ) = 0;
     virtual ~VLCModel();
+    static QString getMeta( const QModelIndex & index, int meta );
+    static QPixmap getArtPixmap( const QModelIndex & index, const QSize & size );
 
 public slots:
     virtual void activateItem( const QModelIndex &index ) = 0;

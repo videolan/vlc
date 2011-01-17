@@ -584,62 +584,6 @@ bool PLModel::canEdit() const
            );
 }
 
-QString PLModel::getMeta( const QModelIndex & index, int meta )
-{
-    return index.model()->index( index.row(),
-            columnFromMeta( meta ),
-            index.parent() )
-            .data().toString();
-}
-
-
-QPixmap PLModel::getArtPixmap( const QModelIndex & index, const QSize & size )
-{
-    PLItem *item = static_cast<PLItem*>( index.internalPointer() );
-    assert( item );
-
-    if( item == NULL )
-        return NULL;
-
-    QString artUrl = InputManager::decodeArtURL( item->inputItem() );
-
-    /* If empty, take one of the children art URL */
-    if( artUrl.isEmpty() )
-    {
-        for( int i = 0; i < item->childCount(); i++ )
-        {
-            artUrl = InputManager::decodeArtURL( item->child( i )->inputItem() );
-            if( !artUrl.isEmpty() )
-                break;
-        }
-    }
-
-    QPixmap artPix;
-    QString key = artUrl + QString("%1%2").arg(size.width()).arg(size.height());
-
-    /* Lookup in the QPixmapCache */
-    if( !QPixmapCache::find( key, artPix ))
-    {
-        if( artUrl.isEmpty() || !artPix.load( artUrl ) )
-        {
-            key = QString("noart%1%2").arg(size.width()).arg(size.height());
-            if( !QPixmapCache::find( key, artPix ) )
-            {
-                artPix = QPixmap( ":/noart" ).scaled( size,
-                                                      Qt::KeepAspectRatio,
-                                                      Qt::SmoothTransformation );
-                QPixmapCache::insert( key, artPix );
-            }
-        }
-        else
-        {
-            artPix = artPix.scaled( size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
-            QPixmapCache::insert( key, artPix );
-        }
-    }
-
-    return artPix;
-}
 /************************* Updates handling *****************************/
 
 /**** Events processing ****/

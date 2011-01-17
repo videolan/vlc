@@ -94,7 +94,7 @@ void MLModel::clear()
 QModelIndex MLModel::index( int row, int column,
                                   const QModelIndex &parent ) const
 {
-    if( parent.isValid() )
+    if( parent.isValid() || row >= items.count() )
         return QModelIndex();
     else
     {
@@ -229,10 +229,12 @@ void MLModel::remove( MLItem *item )
     remove( createIndex( row, 0 ) );
 }
 
-void MLModel::remove( QModelIndexList list )
+void MLModel::doDelete( QModelIndexList list )
 {
-    for (int i = 0; i < list.size(); ++i) {
-        remove( list.at(i) );
+    for (int i = 0; i < list.size(); ++i)
+    {
+        int id = getId( list.at(i) );
+        ml_DeleteSimple( p_ml, id );
     }
 }
 
@@ -514,9 +516,9 @@ bool MLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
 
     QIcon addIcon( ":/buttons/playlist/playlist_add" );
     menu.addSeparator();
-    menu.addAction( addIcon, qtr(I_PL_ADDF), THEDP, SLOT( simpleMLAppendDialog()) );
-    menu.addAction( addIcon, qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
-    menu.addAction( addIcon, qtr(I_OP_ADVOP), THEDP, SLOT( MLAppendDialog() ) );
+    //menu.addAction( addIcon, qtr(I_PL_ADDF), THEDP, SLOT( simpleMLAppendDialog()) );
+    //menu.addAction( addIcon, qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
+    //menu.addAction( addIcon, qtr(I_OP_ADVOP), THEDP, SLOT( MLAppendDialog() ) );
 
     if( index.isValid() )
     {
@@ -531,15 +533,14 @@ bool MLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     else return false;
 }
 
-
-void MLModel::popupDel()
-{
-    remove( current_selection );
-}
-
 void MLModel::popupPlay()
 {
     play( current_index );
+}
+
+void MLModel::popupDel()
+{
+    doDelete( current_selection );
 }
 
 void MLModel::popupInfo()

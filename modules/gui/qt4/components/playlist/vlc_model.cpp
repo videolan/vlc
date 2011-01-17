@@ -31,3 +31,43 @@ VLCModel::VLCModel( intf_thread_t *_p_intf, QObject *parent )
 VLCModel::~VLCModel()
 {
 }
+
+QString VLCModel::getMeta( const QModelIndex & index, int meta )
+{
+    return index.model()->index( index.row(), columnFromMeta( meta ), index.parent() ).
+        data().toString();
+}
+
+QPixmap VLCModel::getArtPixmap( const QModelIndex & index, const QSize & size )
+{
+    QString artUrl;
+    artUrl = index.model()->index( index.row(),
+                                  COLUMN_COVER,
+                                  index.parent() )
+                                  .data().toString();
+    QPixmap artPix;
+
+    QString key = artUrl + QString("%1%2").arg(size.width()).arg(size.height());
+
+    if( !QPixmapCache::find( key, artPix ))
+    {
+        if( artUrl.isEmpty() || !artPix.load( artUrl ) )
+        {
+            key = QString("noart%1%2").arg(size.width()).arg(size.height());
+            if( !QPixmapCache::find( key, artPix ) )
+            {
+                artPix = QPixmap( ":/noart" ).scaled( size,
+                                                      Qt::KeepAspectRatio,
+                                                      Qt::SmoothTransformation );
+                QPixmapCache::insert( key, artPix );
+            }
+        }
+        else
+        {
+            artPix = artPix.scaled( size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+            QPixmapCache::insert( key, artPix );
+        }
+    }
+
+    return artPix;
+}
