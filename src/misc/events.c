@@ -338,8 +338,8 @@ int vlc_event_detach( vlc_event_manager_t *p_em,
     vlc_event_listeners_group_t * listeners_group;
     struct vlc_event_listener_t * listener;
 
-    vlc_mutex_lock( &p_em->object_lock );
     vlc_mutex_lock( &p_em->event_sending_lock );
+    vlc_mutex_lock( &p_em->object_lock );
     FOREACH_ARRAY( listeners_group, p_em->listeners_groups )
         if( listeners_group->event_type == event_type )
         {
