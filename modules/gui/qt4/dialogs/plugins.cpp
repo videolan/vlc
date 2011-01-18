@@ -52,6 +52,9 @@
 #include <QStyleOptionViewItem>
 #include <QKeyEvent>
 #include <QPushButton>
+#include <QPixmap>
+
+static QPixmap *loadPixmapFromData( char *, int size );
 
 
 PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
@@ -272,10 +275,12 @@ public:
         author = qfu( p_ext->psz_author );
         version = qfu( p_ext->psz_version );
         url = qfu( p_ext->psz_url );
+        icon = loadPixmapFromData( p_ext->p_icondata, p_ext->i_icondata_size );
     }
     ~ExtensionCopy() {}
 
     QString name, title, description, shortdesc, author, version, url;
+    QPixmap *icon;
 };
 
 /* Extensions list model for the QListView */
@@ -418,19 +423,27 @@ void ExtensionItemDelegate::paint( QPainter *painter,
     pixpaint->setPen( pen );
     QFontMetrics metrics = option.fontMetrics;
 
-    /// @todo Add extension's icon
+    // Icon
+    if( ext->icon != NULL )
+    {
+        pixpaint->drawPixmap( 7, 7, 2*metrics.height(), 2*metrics.height(),
+                              *ext->icon );
+    }
 
     // Title: bold
     pixpaint->setRenderHint( QPainter::TextAntialiasing );
     font.setBold( true );
     pixpaint->setFont( font );
-    pixpaint->drawText( QRect( 10, 7, width - 70, metrics.height() ),
+    pixpaint->drawText( QRect( 17 + 2 * metrics.height(), 7,
+                               width - 40 - 2 * metrics.height(),
+                               metrics.height() ),
                         Qt::AlignLeft, ext->title );
 
     // Short description: normal
     font.setBold( false );
     pixpaint->setFont( font );
-    pixpaint->drawText( QRect( 10, 7 + metrics.height(), width - 40,
+    pixpaint->drawText( QRect( 17 + 2 * metrics.height(),
+                               7 + metrics.height(), width - 40,
                                metrics.height() ),
                         Qt::AlignLeft, ext->shortdesc );
 
@@ -471,10 +484,18 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
     QGridLayout *layout = new QGridLayout( this );
 
     // Icon
-    /// @todo Use the extension's icon, when extensions will support icons :)
     QLabel *icon = new QLabel( this );
-    QPixmap pix( ":/logo/vlc48.png" );
-    icon->setPixmap( pix );
+    if( !extension.icon )
+    {
+        QPixmap pix( ":/logo/vlc48.png" );
+        icon->setPixmap( pix );
+    }
+    else
+    {
+        icon->setPixmap( *extension.icon );
+    }
+    icon->setAlignment( Qt::AlignCenter );
+    icon->setFixedSize( 48, 48 );
     layout->addWidget( icon, 1, 0, 2, 1 );
 
     // Title
@@ -541,4 +562,17 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
 ExtensionInfoDialog::~ExtensionInfoDialog()
 {
     delete extension;
+}
+
+static QPixmap *loadPixmapFromData( char *data, int size )
+{
+    if( !data || size <= 0 )
+        return NULL;
+    QPixmap *pixmap = new QPixmap();
+    if( !pixmap->loadFromData( (const uchar*) data, (uint) size ) )
+    {
+        delete pixmap;
+        return NULL;
+    }
+    return pixmap;
 }
