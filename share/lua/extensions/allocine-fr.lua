@@ -154,9 +154,11 @@ function click_chercher()
         spin:stop()
         return
     end
+    vlc.keep_alive()
 
     -- Fetch HTML data (max 65 kb)
     local data = s:read(65535)
+    vlc.keep_alive()
 
     -- Clean data
     data = string.gsub(data, "<b>", "")
@@ -296,8 +298,11 @@ function open_fiche(url)
 
     -- Open stream
     local s = vlc.stream(url)
+    vlc.keep_alive()
+
     -- Read max 500k (Note: 65k is not enough for the average note)
     local data = s:read(500000)
+    vlc.keep_alive()
 
     -- Buffer & temp variables
     local first = nil
