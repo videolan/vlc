@@ -255,6 +255,7 @@ typedef enum
     EXTENSION_WIDGET_DROPDOWN,   ///< Drop-down box
     EXTENSION_WIDGET_LIST,       ///< Vertical list box (of strings)
     EXTENSION_WIDGET_CHECK_BOX,  ///< Checkable box with label
+    EXTENSION_WIDGET_SPIN_ICON,  ///< A "loading..." spinning icon
 } extension_widget_type_e;
 
 /// Widget descriptor for extensions
@@ -284,6 +285,10 @@ struct extension_widget_t
     int i_width;                  ///< Width hint
     int i_height;                 ///< Height hint
     bool b_hide;                  ///< Hide this widget (make it invisible)
+
+    /* Spinning icon */
+    int i_spin_loops;             ///< Number of loops to play (-1 = infinite,
+                                  // 0 = stop animation)
 
     /* Orders */
     bool b_kill;                  ///< Destroy this widget

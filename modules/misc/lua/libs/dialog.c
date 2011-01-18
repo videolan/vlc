@@ -78,6 +78,7 @@ static int vlclua_dialog_add_check_box( lua_State *L );
 static int vlclua_dialog_add_list( lua_State *L );
 static int vlclua_dialog_add_dropdown( lua_State *L );
 static int vlclua_dialog_add_image( lua_State *L );
+static int vlclua_dialog_add_spin_icon( lua_State *L );
 static int vlclua_create_widget_inner( lua_State *L, int i_args,
                                        extension_widget_t *p_widget);
 
@@ -92,6 +93,8 @@ static int vlclua_widget_add_value( lua_State *L );
 static int vlclua_widget_get_value( lua_State *L );
 static int vlclua_widget_clear( lua_State *L );
 static int vlclua_widget_get_selection( lua_State *L );
+static int vlclua_widget_animate( lua_State *L );
+static int vlclua_widget_stop( lua_State *L );
 
 /* Helpers */
 static void AddWidget( extension_dialog_t *p_dialog,
@@ -115,6 +118,7 @@ static const luaL_Reg vlclua_dialog_reg[] = {
     { "add_dropdown", vlclua_dialog_add_dropdown },
     { "add_list", vlclua_dialog_add_list },
     { "add_image", vlclua_dialog_add_image },
+    { "add_spin_icon", vlclua_dialog_add_spin_icon },
 
     { "del_widget", vlclua_dialog_delete_widget },
     { NULL, NULL }
@@ -129,6 +133,8 @@ static const luaL_Reg vlclua_widget_reg[] = {
     { "get_value", vlclua_widget_get_value },
     { "clear", vlclua_widget_clear },
     { "get_selection", vlclua_widget_get_selection },
+    { "animate", vlclua_widget_animate },
+    { "stop", vlclua_widget_stop },
     { NULL, NULL }
 };
 
@@ -511,7 +517,7 @@ static int vlclua_dialog_add_list( lua_State *L )
 
 /**
  * Create an image label
- * Arguments: url
+ * Arguments: (string) url
  * Qt: QLabel with setPixmap( QPixmap& )
  **/
 static int vlclua_dialog_add_image( lua_State *L )
@@ -525,6 +531,23 @@ static int vlclua_dialog_add_image( lua_State *L )
     p_widget->psz_text = strdup( luaL_checkstring( L, 2 ) );
 
     return vlclua_create_widget_inner( L, 1, p_widget );
+}
+
+/**
+ * Create a spinning icon
+ * Arguments: (int) loop count to play: 0 means stopped, -1 means infinite.
+ * Qt: SpinningIcon (custom widget)
+ **/
+static int vlclua_dialog_add_spin_icon( lua_State *L )
+{
+    /* Verify arguments */
+    if( !lua_isstring( L, 2 ) )
+        return luaL_error( L, "dialog:add_image usage: (filename)" );
+
+    extension_widget_t *p_widget = calloc( 1, sizeof( extension_widget_t ) );
+    p_widget->type = EXTENSION_WIDGET_SPIN_ICON;
+
+    return vlclua_create_widget_inner( L, 0, p_widget );
 }
 
 /**
@@ -847,7 +870,6 @@ static int vlclua_widget_get_selection( lua_State *L )
     return 1;
 }
 
-
 static int vlclua_widget_set_checked( lua_State *L )
 {
     /* Get dialog */
@@ -872,6 +894,62 @@ static int vlclua_widget_set_checked( lua_State *L )
     vlc_mutex_unlock( &p_widget->p_dialog->lock );
 
     if( b_old_check != p_widget->b_checked )
+    {
+        /* Signal interface of the change */
+        p_widget->b_update = true;
+        lua_SetDialogUpdate( L, 1 );
+    }
+
+    return 1;
+}
+
+static int vlclua_widget_animate( lua_State *L )
+{
+    /* Get dialog */
+    extension_widget_t **pp_widget =
+            (extension_widget_t **) luaL_checkudata( L, 1, "widget" );
+    if( !pp_widget || !*pp_widget )
+        return luaL_error( L, "Can't get pointer to widget" );
+    extension_widget_t *p_widget = *pp_widget;
+
+    if( p_widget->type != EXTENSION_WIDGET_SPIN_ICON )
+        return luaL_error( L, "method animate not valid for this widget" );
+
+    /* Verify arguments */
+    vlc_mutex_lock( &p_widget->p_dialog->lock );
+    if( !lua_isnumber( L, 2 ) )
+        p_widget->i_spin_loops = -1;
+    else
+        p_widget->i_spin_loops = lua_tointeger( L, 2 );
+    vlc_mutex_unlock( &p_widget->p_dialog->lock );
+
+    /* Signal interface of the change */
+    p_widget->b_update = true;
+    lua_SetDialogUpdate( L, 1 );
+
+    return 1;
+}
+
+static int vlclua_widget_stop( lua_State *L )
+{
+    /* Get dialog */
+    extension_widget_t **pp_widget =
+            (extension_widget_t **) luaL_checkudata( L, 1, "widget" );
+    if( !pp_widget || !*pp_widget )
+        return luaL_error( L, "Can't get pointer to widget" );
+    extension_widget_t *p_widget = *pp_widget;
+
+    if( p_widget->type != EXTENSION_WIDGET_SPIN_ICON )
+        return luaL_error( L, "method stop not valid for this widget" );
+
+    vlc_mutex_lock( &p_widget->p_dialog->lock );
+
+    bool b_needs_update = p_widget->i_spin_loops != 0;
+    p_widget->i_spin_loops = 0;
+
+    vlc_mutex_unlock( &p_widget->p_dialog->lock );
+
+    if( b_needs_update )
     {
         /* Signal interface of the change */
         p_widget->b_update = true;
