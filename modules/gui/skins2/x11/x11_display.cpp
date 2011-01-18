@@ -59,9 +59,8 @@ type X11Display::blendPixel(type v,type r, type g, type b, type a) const
 X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
     m_mainWindow( 0 ), m_gc( NULL ), m_colormap( 0 )
 {
-    m_psz_display = var_CreateGetNonEmptyString( pIntf, "x11-display" );
     // Open a connection to the X Server
-    m_pDisplay = XOpenDisplay( m_psz_display );
+    m_pDisplay = XOpenDisplay( NULL );
     if( m_pDisplay == NULL )
     {
         MSG_ERR( "Cannot open display" );
@@ -285,7 +284,6 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
 X11Display::~X11Display()
 {
-    free( m_psz_display );
     if( m_mainWindow ) XDestroyWindow( m_pDisplay, m_mainWindow );
     if( m_gc )         XFreeGC( m_pDisplay, m_gc );
     if( m_colormap )   XFreeColormap( m_pDisplay, m_colormap );
