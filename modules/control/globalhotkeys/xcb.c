@@ -94,11 +94,8 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    char *psz_display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
-
     int i_screen_default;
-    p_sys->p_connection = xcb_connect( psz_display, &i_screen_default );
-    free( psz_display );
+    p_sys->p_connection = xcb_connect( NULL, &i_screen_default );
 
     if( xcb_connection_has_error( p_sys->p_connection ) )
         goto error;
