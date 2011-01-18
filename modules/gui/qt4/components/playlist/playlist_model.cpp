@@ -922,9 +922,11 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
                         qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
         menu.addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
         menu.addAction( QIcon( ":/menu/info" ), qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
-        if( !strncasecmp( p_input->psz_uri, "file://", 7 ) )
+        if( p_input->psz_uri && !strncasecmp( p_input->psz_uri, "file://", 7 ) )
+        {
             menu.addAction( QIcon( ":/type/folder-grey" ),
                             qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
+        }
         menu.addSeparator();
     }
     if( canEdit() )
