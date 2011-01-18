@@ -40,10 +40,15 @@ typedef xcb_atom_t Atom;
 
 #include "xcb_vlc.h"
 
-#define XID_TEXT N_("ID of the video output X window")
+#define DISPLAY_TEXT N_("X11 display")
+#define DISPLAY_LONGTEXT N_( \
+    "Video will be rendered with this X11 display. " \
+    "If empty, the default display will be used.")
+
+#define XID_TEXT N_("X11 window ID")
 #define XID_LONGTEXT N_( \
-    "VLC can embed its video output in an existing X11 window. " \
-    "This is the X identifier of that window (0 means none).")
+    "Video will be embedded in this pre-existing X11 window. " \
+    "If zero, a new window will be created.")
 
 static int  Open (vout_window_t *, const vout_window_cfg_t *);
 static void Close (vout_window_t *);
@@ -76,6 +81,7 @@ vlc_module_begin ()
     set_callbacks (EmOpen, EmClose)
     add_shortcut ("embed-xid")
 
+    add_string ("x11-display", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
     add_integer ("drawable-xid", 0, XID_TEXT, XID_LONGTEXT, true)
         change_volatile ()
 
