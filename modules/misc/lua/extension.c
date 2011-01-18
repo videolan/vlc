@@ -357,6 +357,20 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
             lua_getfield( L, -1, "version" );
             p_ext->psz_version = luaL_strdupornull( L, -1 );
             lua_pop( L, 1 );
+
+            /* Get icon data */
+            lua_getfield( L, -1, "icon" );
+            if( !lua_isnil( L, -1 ) && lua_isstring( L, -1 ) )
+            {
+                int len = lua_strlen( L, -1 );
+                p_ext->p_icondata = malloc( len );
+                if( p_ext->p_icondata )
+                {
+                    p_ext->i_icondata_size = len;
+                    memcpy( p_ext->p_icondata, lua_tostring( L, -1 ), len );
+                }
+            }
+            lua_pop( L, 1 );
         }
         else
         {

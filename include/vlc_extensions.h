@@ -43,6 +43,8 @@ typedef struct extension_t {
     char *psz_url;            /**< A URL to the official page (ro) */
     char *psz_description;    /**< Full description (ro) */
     char *psz_shortdescription; /**< Short description (eg. 1 line)  (ro) */
+    char *p_icondata;         /**< Embedded data for the icon (ro) */
+    int   i_icondata_size;    /**< Size of that data */
 
     extension_sys_t *p_sys;   /**< Reserved for the manager module */
 } extension_t;
