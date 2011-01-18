@@ -35,6 +35,7 @@
 #include <QRect>
 #include <QKeyEvent>
 #include <QWheelEvent>
+#include <QPixmap>
 #include <vlc_keys.h>
 
 QVLCFramelessButton::QVLCFramelessButton( QWidget *parent )
@@ -308,3 +309,117 @@ QString VLCKeyToString( int val )
     return r;
 }
 
+
+/* Animated Icon implementation */
+
+AnimatedIcon::AnimatedIcon( QWidget *parent )
+    : mTimer( this ), mIdleFrame( NULL )
+{
+    mCurrentFrame = mRemainingLoops = 0;
+    connect( &mTimer, SIGNAL( timeout() ), this, SLOT( onTimerTick() ) );
+}
+
+AnimatedIcon::~AnimatedIcon()
+{
+    // We don't need to destroy the timer, he's our child
+    delete mIdleFrame;
+    foreach( QPixmap *frame, mFrames )
+        delete frame;
+}
+
+void AnimatedIcon::addFrame( const QPixmap &pxm, int index )
+{
+    if( index == 0 )
+    {
+        // Replace idle frame
+        delete mIdleFrame;
+        mIdleFrame = new QPixmap( pxm );
+        setPixmap( *mIdleFrame );
+        return;
+    }
+    QPixmap *copy = new QPixmap( pxm );
+    mFrames.insert( ( index < 0 || index > mFrames.size() ) ? mFrames.size() :
+                    index, copy );
+    if( !pixmap() )
+        setPixmap( *copy );
+}
+
+void AnimatedIcon::play( int loops, int interval )
+{
+    if( interval < 20 )
+    {
+#ifndef NDEBUG
+        printf( "AnimatedIcon::play(): interval is too short (%d ms)",
+                interval );
+#endif
+        interval = 20;
+    }
+
+    if( !mIdleFrame && ( mFrames.empty() | loops != 0 ) )
+    {
+#ifndef NDEBUG
+        printf( "AnimatedIcon::play(): no frames to display" );
+#endif
+        return;
+    }
+
+    if( loops == 0 )
+    {
+        // Stop playback
+        mCurrentFrame = mRemainingLoops = 0;
+        mTimer.stop();
+        setPixmap( mIdleFrame != NULL ? *mIdleFrame : *mFrames.last() );
+        return;
+    }
+
+    if( loops <= -1 )
+        loops = -1;
+
+    mCurrentFrame = 1;
+    mRemainingLoops = loops;
+    mTimer.start( interval );
+    setPixmap( *mFrames.first() );
+}
+
+// private slot
+void AnimatedIcon::onTimerTick()
+{
+    //assert( !mFrames.empty() );
+    if( ++mCurrentFrame > mFrames.size() )
+    {
+        if( mRemainingLoops != -1 )
+        {
+            if( --mRemainingLoops == 0 )
+            {
+                mTimer.stop();
+                setPixmap( mIdleFrame ? *mIdleFrame : *mFrames.last() );
+                return;
+            }
+        }
+        mCurrentFrame = 1;
+    }
+    //assert( mCurrentFrame >= 1 && mCurrentFrame <= mFrames.size() );
+    setPixmap( *mFrames.at( mCurrentFrame - 1 ) );
+}
+
+
+/* SpinningIcon implementation */
+
+SpinningIcon::SpinningIcon( QWidget *parent, bool noIdleFrame )
+    : AnimatedIcon( parent )
+{
+    if( noIdleFrame )
+        addFrame( QPixmap(), 0 );
+    else
+        addFrame( QPixmap( ":/util/wait0" ), 0 );
+    addFrame( QPixmap( ":/util/wait1" ) );
+    addFrame( QPixmap( ":/util/wait2" ) );
+    addFrame( QPixmap( ":/util/wait3" ) );
+    addFrame( QPixmap( ":/util/wait4" ) );
+    setScaledContents( true );
+    setFixedSize( 16, 16 );
+}
+
+SpinningIcon::~SpinningIcon()
+{
+}
