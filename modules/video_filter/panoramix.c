@@ -345,7 +345,7 @@ static const panoramix_chroma_t p_chroma_array[] = {
 /* Get the number of outputs */
 static unsigned CountMonitors( vlc_object_t *obj )
 {
-    char *psz_display = var_CreateGetNonEmptyString( obj, "x11-display" );
+    char *psz_display = var_InheritString( obj, "x11-display" );
     int snum;
     xcb_connection_t *conn = xcb_connect( psz_display, &snum );
     free( psz_display );
@@ -446,8 +446,8 @@ static int Open( vlc_object_t *p_this )
                        p_splitter->p_cfg );
 
     /* */
-    p_sys->i_col = var_CreateGetInteger( p_splitter, CFG_PREFIX "cols" );
-    p_sys->i_row = var_CreateGetInteger( p_splitter, CFG_PREFIX "rows" );
+    p_sys->i_col = var_InheritInteger( p_splitter, CFG_PREFIX "cols" );
+    p_sys->i_row = var_InheritInteger( p_splitter, CFG_PREFIX "rows" );
 
     /* Autodetect number of displays */
     if( p_sys->i_col < 0 || p_sys->i_row < 0 )
@@ -485,13 +485,13 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* */
-    p_sys->b_attenuate = var_CreateGetBool( p_splitter, CFG_PREFIX "attenuate");
-    p_sys->bz_length = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-length" );
-    p_sys->bz_height = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-height" );
-    p_sys->bz_begin = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-begin" );
-    p_sys->bz_middle = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-middle" );
-    p_sys->bz_end = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-end" );
-    p_sys->bz_middle_pos = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-middle-pos" );
+    p_sys->b_attenuate = var_InheritBool( p_splitter, CFG_PREFIX "attenuate");
+    p_sys->bz_length = var_InheritInteger( p_splitter, CFG_PREFIX "bz-length" );
+    p_sys->bz_height = var_InheritInteger( p_splitter, CFG_PREFIX "bz-height" );
+    p_sys->bz_begin = var_InheritInteger( p_splitter, CFG_PREFIX "bz-begin" );
+    p_sys->bz_middle = var_InheritInteger( p_splitter, CFG_PREFIX "bz-middle" );
+    p_sys->bz_end = var_InheritInteger( p_splitter, CFG_PREFIX "bz-end" );
+    p_sys->bz_middle_pos = var_InheritInteger( p_splitter, CFG_PREFIX "bz-middle-pos" );
     double d_p = 100.0 / p_sys->bz_middle_pos;
 
     p_sys->a_2 = d_p * p_sys->bz_begin - (double)(d_p * d_p / (d_p - 1)) * p_sys->bz_middle + (double)(d_p / (d_p - 1)) * p_sys->bz_end;
@@ -542,23 +542,23 @@ static int Open( vlc_object_t *p_this )
     {
         panoramix_gamma_t p_gamma[VOUT_MAX_PLANES];
 
-        p_gamma[0].f_gamma = var_CreateGetFloat( p_splitter, CFG_PREFIX "bz-gamma-red" );
-        p_gamma[1].f_gamma = var_CreateGetFloat( p_splitter, CFG_PREFIX "bz-gamma-green" );
-        p_gamma[2].f_gamma = var_CreateGetFloat( p_splitter, CFG_PREFIX "bz-gamma-blue" );
+        p_gamma[0].f_gamma = var_InheritFloat( p_splitter, CFG_PREFIX "bz-gamma-red" );
+        p_gamma[1].f_gamma = var_InheritFloat( p_splitter, CFG_PREFIX "bz-gamma-green" );
+        p_gamma[2].f_gamma = var_InheritFloat( p_splitter, CFG_PREFIX "bz-gamma-blue" );
 
-        p_gamma[0].f_black_crush = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-blackcrush-red" ) / 255.0;
-        p_gamma[1].f_black_crush = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-blackcrush-green" ) / 255.0;
-        p_gamma[2].f_black_crush = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-blackcrush-blue" ) / 255.0;
-        p_gamma[0].f_white_crush = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-whitecrush-red" ) / 255.0;
-        p_gamma[1].f_white_crush = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-whitecrush-green" ) / 255.0;
-        p_gamma[2].f_white_crush = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-whitecrush-blue" ) / 255.0;
+        p_gamma[0].f_black_crush = var_InheritInteger( p_splitter, CFG_PREFIX "bz-blackcrush-red" ) / 255.0;
+        p_gamma[1].f_black_crush = var_InheritInteger( p_splitter, CFG_PREFIX "bz-blackcrush-green" ) / 255.0;
+        p_gamma[2].f_black_crush = var_InheritInteger( p_splitter, CFG_PREFIX "bz-blackcrush-blue" ) / 255.0;
+        p_gamma[0].f_white_crush = var_InheritInteger( p_splitter, CFG_PREFIX "bz-whitecrush-red" ) / 255.0;
+        p_gamma[1].f_white_crush = var_InheritInteger( p_splitter, CFG_PREFIX "bz-whitecrush-green" ) / 255.0;
+        p_gamma[2].f_white_crush = var_InheritInteger( p_splitter, CFG_PREFIX "bz-whitecrush-blue" ) / 255.0;
 
-        p_gamma[0].f_black_level = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-blacklevel-red" ) / 255.0;
-        p_gamma[1].f_black_level = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-blacklevel-green" ) / 255.0;
-        p_gamma[2].f_black_level = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-blacklevel-blue" ) / 255.0;
-        p_gamma[0].f_white_level = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-whitelevel-red" ) / 255.0;
-        p_gamma[1].f_white_level = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-whitelevel-green" ) / 255.0;
-        p_gamma[2].f_white_level = var_CreateGetInteger( p_splitter, CFG_PREFIX "bz-whitelevel-blue" ) / 255.0;
+        p_gamma[0].f_black_level = var_InheritInteger( p_splitter, CFG_PREFIX "bz-blacklevel-red" ) / 255.0;
+        p_gamma[1].f_black_level = var_InheritInteger( p_splitter, CFG_PREFIX "bz-blacklevel-green" ) / 255.0;
+        p_gamma[2].f_black_level = var_InheritInteger( p_splitter, CFG_PREFIX "bz-blacklevel-blue" ) / 255.0;
+        p_gamma[0].f_white_level = var_InheritInteger( p_splitter, CFG_PREFIX "bz-whitelevel-red" ) / 255.0;
+        p_gamma[1].f_white_level = var_InheritInteger( p_splitter, CFG_PREFIX "bz-whitelevel-green" ) / 255.0;
+        p_gamma[2].f_white_level = var_InheritInteger( p_splitter, CFG_PREFIX "bz-whitelevel-blue" ) / 255.0;
 
         for( int i = 3; i < VOUT_MAX_PLANES; i++ )
         {
@@ -626,7 +626,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* */
-    char *psz_state = var_CreateGetNonEmptyString( p_splitter, CFG_PREFIX "active" );
+    char *psz_state = var_InheritString( p_splitter, CFG_PREFIX "active" );
 
     /* */
     bool pb_active[COL_MAX*ROW_MAX];
