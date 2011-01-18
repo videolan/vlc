@@ -309,9 +309,6 @@ vlc_module_end ()
 
 /* Ugly, but the Qt4 interface assumes single instance anyway */
 static vlc_sem_t ready;
-#ifdef Q_WS_X11
-static char *x11_display = NULL;
-#endif
 static QMutex lock;
 static bool busy = false;
 static bool active = false;
@@ -347,24 +344,19 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     if( !vlc_xlib_init( p_this ) )
         return VLC_EGENERIC;
 
-    char *display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
-    Display *p_display = XOpenDisplay( x11_display );
+    Display *p_display = XOpenDisplay( NULL );
     if( !p_display )
     {
         msg_Err( p_intf, "Could not connect to X server" );
-        free (display);
         return VLC_EGENERIC;
     }
     XCloseDisplay( p_display );
-#else
-    char *display = NULL;
 #endif
 
     QMutexLocker locker (&lock);
     if (busy)
     {
         msg_Err (p_this, "cannot start Qt4 multiple times");
-        free (display);
         return VLC_EGENERIC;
     }
 
@@ -374,9 +366,6 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     p_sys->p_mi = NULL;
 
     /* */
-#ifdef Q_WS_X11
-    x11_display = display;
-#endif
     vlc_sem_init (&ready, 0);
 #ifdef Q_WS_MAC
     /* Run mainloop on the main thread as Cocoa requires */
@@ -386,7 +375,6 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
         delete p_sys;
-        free (display);
         return VLC_ENOMEM;
     }
 #endif
@@ -439,10 +427,6 @@ static void Close( vlc_object_t *p_this )
 #ifndef Q_WS_MAC
     vlc_join (p_sys->thread, NULL);
 #endif
-#ifdef Q_WS_X11
-    free (x11_display);
-    x11_display = NULL;
-#endif
     delete p_sys;
 
     QMutexLocker locker (&lock);
@@ -455,21 +439,12 @@ static void *Thread( void *obj )
     intf_thread_t *p_intf = (intf_thread_t *)obj;
     MainInterface *p_mi;
     char dummy[] = "vlc"; /* for WM_CLASS */
-    char *argv[4] = { dummy, NULL, };
+    char *argv[2] = { dummy, NULL, };
     int argc = 1;
 
     Q_INIT_RESOURCE( vlc );
 
     /* Start the QApplication here */
-#ifdef Q_WS_X11
-    if( x11_display != NULL )
-    {
-        argv[argc++] = const_cast<char *>("-display");
-        argv[argc++] = x11_display;
-        argv[argc] = NULL;
-    }
-#endif
-
     QVLCApp app( argc, argv );
 
     p_intf->p_sys->p_app = &app;
@@ -644,7 +619,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     p_wnd->handle.xid = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
     if( !p_wnd->handle.xid )
         return VLC_EGENERIC;
-    p_wnd->display.x11 = x11_display;
+    p_wnd->display.x11 = NULL;
 
 #elif defined (Q_WS_WIN)
     p_wnd->handle.hwnd = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
