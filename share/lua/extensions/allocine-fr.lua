@@ -31,6 +31,7 @@ message = nil -- Label
 list = nil    -- List widget
 okay = nil    -- Okay button
 html = nil    -- HTML box
+spin = nil    -- spinning icon
 films = {}
 
 -- Extension description
@@ -82,6 +83,7 @@ function create_dialog()
     dlg:add_label("<b>Titre du film:</b>", 1, 1, 1, 1)
     title = dlg:add_text_input(get_title(), 2, 1, 1, 1)
     dlg:add_button("Rechercher", click_chercher, 3, 1, 1, 1)
+    spin = dlg:add_spin_icon(4, 1, 1, 1)
 end
 
 -- Get clean title from filename
@@ -129,7 +131,7 @@ function click_chercher()
     -- Please wait...
     local message_text = "Recherche <a href=\"" .. url .. "\">" .. string.gsub(name, "%+", " ") .. "</a> sur Allociné..."
     if not message then
-        message = dlg:add_label(message_text, 1, 2, 3, 1)
+        message = dlg:add_label(message_text, 1, 2, 4, 1)
     else
         message:set_text(message_text)
     end
@@ -139,12 +141,17 @@ function click_chercher()
     list = nil
     okay = nil
     html = nil
+
+    -- Show progress
+    spin:animate()
     dlg:update()
 
     -- Open URL
     local s, msg = vlc.stream(url)
     if not s then
         vlc.msg.warn("[ALLOCINE.COM] " .. msg)
+        spin:stop()
+        return
     end
 
     -- Fetch HTML data (max 65 kb)
@@ -238,14 +245,17 @@ function click_chercher()
     if #films > 1 then
         message_text = tostring(#films) .. " films ou séries TV trouvés sur Allociné :"
         message:set_text(message_text)
-        list = dlg:add_list(1, 3, 3, 1)
+        list = dlg:add_list(1, 3, 4, 1)
         for idx, film in ipairs(films) do
             local txt = film.title
             if film.year then txt = txt .. " (" .. film.year .. ")" end
             list:add_value(txt, idx)
         end
-        okay = dlg:add_button("Voir la fiche", click_okay, 3, 4, 1, 1)
+        okay = dlg:add_button("Voir la fiche", click_okay, 3, 4, 2, 1)
     end
+
+    -- We're done now
+    spin:stop()
 end
 
 -- Click after selection
@@ -259,7 +269,11 @@ function click_okay()
 
     message_text = "<center><a href=\"" .. films[sel].url .. "\">" .. films[sel].title .. "</a></center>"
     message:set_text(message_text)
+
+    -- Show progress
+    spin:animate()
     dlg:update()
+
     open_fiche(films[sel].url)
 end
 
@@ -275,7 +289,7 @@ function open_fiche(url)
     end
 
     if not html then
-        html = dlg:add_html("<center><i>Chargement en cours...</i></center>", 1, 3, 3, 1)
+        html = dlg:add_html("<center><i>Chargement en cours...</i></center>", 1, 3, 4, 1)
     end
     dlg:update()
 
@@ -297,6 +311,7 @@ function open_fiche(url)
         message:set_text("<h2>Erreur !</h2>Désolé, une erreur est survenue pendant le chargement de la fiche.<br />"
                       .. "<a href=\"" .. url .. "\">Cliquez ici pour consulter la page sur Allociné.fr</a>.")
         dlg:del_widget(html)
+        spin:stop()
         return
     end
 
@@ -349,4 +364,6 @@ function open_fiche(url)
 
     page = string.gsub(page, "href=([\"'])/", "href=%1http://www.allocine.fr/")
     html:set_text(page)
+
+    spin:stop()
 end
