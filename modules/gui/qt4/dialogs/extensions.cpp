@@ -38,6 +38,7 @@
 #include <QComboBox>
 #include <QCloseEvent>
 #include <QCoreApplication>
+#include "util/customwidgets.hpp"
 
 ExtensionsDialogProvider *ExtensionsDialogProvider::instance = NULL;
 
@@ -218,6 +219,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
     QCheckBox *checkBox = NULL;
     QComboBox *comboBox = NULL;
     QListWidget *list = NULL;
+    SpinningIcon *spinIcon = NULL;
     struct extension_widget_t::extension_widget_value_t *p_value = NULL;
 
     assert( p_widget->p_sys_intf == NULL );
@@ -326,6 +328,12 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             CONNECT( list, itemSelectionChanged(),
                      selectMapper, map() );
             return list;
+
+        case EXTENSION_WIDGET_SPIN_ICON:
+            spinIcon = new SpinningIcon( this );
+            spinIcon->play( p_widget->i_spin_loops );
+            p_widget->p_sys_intf = spinIcon;
+            return spinIcon;
 
         default:
             msg_Err( p_intf, "Widget type %d unknown", p_widget->type );
@@ -559,6 +567,7 @@ QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
     QCheckBox *checkBox = NULL;
     QComboBox *comboBox = NULL;
     QListWidget *list = NULL;
+    SpinningIcon *spinIcon = NULL;
     struct extension_widget_t::extension_widget_value_t *p_value = NULL;
 
     assert( p_widget->p_sys_intf != NULL );
@@ -636,6 +645,15 @@ QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
                 list->addItem( item );
             }
             return list;
+
+        case EXTENSION_WIDGET_SPIN_ICON:
+            spinIcon = static_cast< SpinningIcon* >( p_widget->p_sys_intf );
+            if( !spinIcon->isPlaying() && p_widget->i_spin_loops != 0 )
+                spinIcon->play( p_widget->i_spin_loops );
+            else if( spinIcon->isPlaying() && p_widget->i_spin_loops == 0 )
+                spinIcon->stop();
+            p_widget->i_height = p_widget->i_width = 16;
+            return spinIcon;
 
         default:
             msg_Err( p_intf, "Widget type %d unknown", p_widget->type );
