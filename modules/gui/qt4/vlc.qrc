@@ -21,6 +21,13 @@
         <file alias="pause" >pixmaps/pause_16px.png</file>
         <file alias="stop" >pixmaps/stop_16px.png</file>
     </qresource>
+    <qresource prefix="/util" >
+        <file alias="wait0" >pixmaps/util/wait0.png</file>
+        <file alias="wait1" >pixmaps/util/wait1.png</file>
+        <file alias="wait2" >pixmaps/util/wait2.png</file>
+        <file alias="wait3" >pixmaps/util/wait3.png</file>
+        <file alias="wait4" >pixmaps/util/wait4.png</file>
+    </qresource>
     <qresource prefix="/toolbar" >
         <file alias="faster" >pixmaps/faster.png</file>
         <file alias="slower" >pixmaps/slower.png</file>
