@@ -42,7 +42,7 @@ QPixmap VLCModel::getArtPixmap( const QModelIndex & index, const QSize & size )
 {
     QString artUrl;
     artUrl = index.model()->index( index.row(),
-                                  COLUMN_COVER,
+                                  columnFromMeta( COLUMN_COVER ),
                                   index.parent() )
                                   .data().toString();
     QPixmap artPix;
