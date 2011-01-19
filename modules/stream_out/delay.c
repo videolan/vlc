@@ -40,9 +40,9 @@
 #define ID_LONGTEXT N_( \
     "Specify an identifier integer for this elementary stream" )
 
-#define DELAY_TEXT N_("Delay")
+#define DELAY_TEXT N_("Delay (ms)")
 #define DELAY_LONGTEXT N_( \
-    "Specify a delay for this elementary stream (positive or negative)" )
+    "Specify a delay (in ms) for this elementary stream (positive or negative)" )
 
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
