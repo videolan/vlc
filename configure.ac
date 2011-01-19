@@ -4457,7 +4457,6 @@ AC_CONFIG_FILES([
   modules/misc/playlist/Makefile
   modules/misc/osd/Makefile
   modules/misc/stats/Makefile
-  modules/misc/xml/Makefile
   modules/media_library/Makefile
   modules/mux/Makefile
   modules/mux/mpeg/Makefile
