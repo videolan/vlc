@@ -217,31 +217,52 @@ static int ScanExtensions( extensions_manager_t *p_mgr )
 static int vlclua_dummy_require( lua_State *L )
 {
     (void) L;
+    // const char *psz_module = luaL_checkstring( L, 1 );
     return 0;
 }
 
 /**
  * Batch scan all Lua files in folder "extensions": callback
  * @param p_this This extensions_manager_t object
- * @param psz_script Name of the script to run
+ * @param psz_filename Name of the script to run
  * @param L Lua State, common to all scripts here
  * @param dummy: unused
  **/
-int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
+int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
                      void *dummy )
 {
     VLC_UNUSED(dummy);
     extensions_manager_t *p_mgr = ( extensions_manager_t* ) p_this;
     bool b_ok = false;
 
-    msg_Dbg( p_mgr, "Scanning Lua script %s", psz_script );
+    msg_Dbg( p_mgr, "Scanning Lua script %s", psz_filename );
+
+    /* Experimental: read .vle packages (Zip archives) */
+    char *psz_script = NULL;
+    int i_flen = strlen( psz_filename );
+    if( !strncasecmp( psz_filename + i_flen - 4, ".vle", 4 ) )
+    {
+        msg_Dbg( p_this, "reading Lua script in a zip archive" );
+        psz_script = calloc( 1, i_flen + 6 + 2 + 10 + 1 );
+        if( !psz_script )
+            return 0;
+        strcpy( psz_script, "zip://" );
+        strncat( psz_script, psz_filename, i_flen + 19 );
+        strncat( psz_script, "!/script.lua", i_flen + 19 );
+    }
+    else
+    {
+        psz_script = strdup( psz_filename );
+        if( !psz_script )
+            return 0;
+    }
 
     /* Create new script descriptor */
     extension_t *p_ext = ( extension_t* ) calloc( 1, sizeof( extension_t ) );
     if( !p_ext )
         return 0;
 
-    p_ext->psz_name = strdup( psz_script );
+    p_ext->psz_name = psz_script;
     p_ext->p_sys = (extension_sys_t*) calloc( 1, sizeof( extension_sys_t ) );
     if( !p_ext->p_sys || !p_ext->psz_name )
     {
@@ -271,7 +292,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
     lua_register( L, "require", &vlclua_dummy_require );
 
     /* Let's run it */
-    if( luaL_dofile( L, psz_script ) )
+    if( vlclua_dofile( p_this, L, psz_script ) ) // luaL_dofile
     {
         msg_Warn( p_mgr, "Error loading script %s: %s", psz_script,
                   lua_tostring( L, lua_gettop( L ) ) );
@@ -778,7 +799,7 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
             }
 
             /* Load and run the script(s) */
-            if( luaL_dofile( L, p_ext->psz_name ) != 0 )
+            if( vlclua_dofile( p_mgr, L, p_ext->psz_name ) ) // luaL_dofile
             {
                 msg_Warn( p_mgr, "Error loading script %s: %s", p_ext->psz_name,
                           lua_tostring( L, lua_gettop( L ) ) );

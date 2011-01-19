@@ -123,6 +123,11 @@ void vlclua_dir_list_free( char **ppsz_dir_list );
 char *vlclua_find_file( vlc_object_t *p_this, const char *psz_luadirname, const char *psz_name );
 
 /*****************************************************************************
+ * Replace Lua file reader by VLC input. Allows loadings scripts in Zip pkg.
+ *****************************************************************************/
+int vlclua_dofile( vlc_object_t *p_this, lua_State *L, const char *url );
+
+/*****************************************************************************
  * Playlist and meta data internal utilities.
  *****************************************************************************/
 void __vlclua_read_options( vlc_object_t *, lua_State *, int *, char *** );

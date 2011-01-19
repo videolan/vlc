@@ -42,6 +42,7 @@
 #include <vlc_fs.h>
 #include <vlc_aout.h>
 #include <vlc_services_discovery.h>
+#include <vlc_stream.h>
 #include <sys/stat.h>
 
 #include <lua.h>        /* Low level lua C API */
@@ -188,7 +189,7 @@ vlc_module_end ()
 /*****************************************************************************
  *
  *****************************************************************************/
-static const char *ppsz_lua_exts[] = { ".luac", ".lua", NULL };
+static const char *ppsz_lua_exts[] = { ".luac", ".lua", ".vle", NULL };
 static int file_select( const char *file )
 {
     int i = strlen( file );
@@ -837,5 +838,34 @@ int __vlclua_add_modules_path( vlc_object_t *obj, lua_State *L, const char *psz_
 
     vlclua_dir_list_free( ppsz_dir_list );
     return 0;
+}
+
+/** Replacement for luaL_dofile, using VLC's input capabilities */
+int vlclua_dofile( vlc_object_t *p_this, lua_State *L, const char *uri )
+{
+    if( !strstr( uri, "://" ) )
+        return luaL_dofile( L, uri );
+    if( !strncasecmp( uri, "file://", 7 ) )
+        return luaL_dofile( L, uri + 7 );
+    stream_t *s = stream_UrlNew( p_this, uri );
+    if( !s )
+        return 1;
+    int64_t i_size = stream_Size( s );
+    char *p_buffer = ( i_size > 0 ) ? malloc( i_size ) : NULL;
+    if( !p_buffer )
+    {
+        // FIXME: read the whole stream until we reach the end (if no size)
+        stream_Delete( s );
+        return 1;
+    }
+    int64_t i_read = stream_Read( s, p_buffer, (int) i_size );
+    int i_ret = ( i_read == i_size ) ? 0 : 1;
+    if( !i_ret )
+        i_ret = luaL_loadbuffer( L, p_buffer, (size_t) i_size, uri );
+    if( !i_ret )
+        i_ret = lua_pcall( L, 0, LUA_MULTRET, 0 );
+    stream_Delete( s );
+    free( p_buffer );
+    return i_ret;
 }
 
