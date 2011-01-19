@@ -75,7 +75,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
     EDocTypeReadVersion doc_read_version = GetChild<EDocTypeReadVersion>(*static_cast<EbmlHead*>(p_l0));
     if (uint64(doc_read_version) > 2)
     {
-        msg_Err( p_demux, "This matroska file is needs version %"PRId64" and this VLC only supports version 1 & 2", uint64(doc_read_version));
+        msg_Err( p_demux, "matroska file needs version %"PRId64" but only versions 1 & 2 supported", uint64(doc_read_version));
         return NULL;
     }
 
