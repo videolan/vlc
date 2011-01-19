@@ -431,7 +431,7 @@ static void parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_rea
     char *psz_path = NULL;
     if (hls->url.psz_path != NULL)
     {
-        char *psz_path = strdup(hls->url.psz_path);
+        psz_path = strdup(hls->url.psz_path);
         if (psz_path == NULL)
         {
             p_sys->b_error = true;
