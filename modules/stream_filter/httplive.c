@@ -383,6 +383,9 @@ static char *relative_URI(stream_t *s, const char *uri, const char *path)
     if (p != NULL)
         return NULL;
 
+    if (p_sys->m3u8.psz_path == NULL)
+        return NULL;
+
     char *psz_path = strdup(p_sys->m3u8.psz_path);
     if (psz_path == NULL) return NULL;
     p = strrchr(psz_path, '/');
@@ -425,14 +428,18 @@ static void parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_rea
         return;
     }
 
-    char *psz_path = strdup(hls->url.psz_path);
-    if (psz_path == NULL)
+    char *psz_path = NULL;
+    if (hls->url.psz_path != NULL)
     {
-        p_sys->b_error = true;
-        return;
+        char *psz_path = strdup(hls->url.psz_path);
+        if (psz_path == NULL)
+        {
+            p_sys->b_error = true;
+            return;
+        }
+        char *p = strrchr(psz_path, '/');
+        if (p) *p = '\0';
     }
-    char *p = strrchr(psz_path, '/');
-    if (p) *p = '\0';
     char *psz_uri = relative_URI(s, uri, psz_path);
     free(psz_path);
 
