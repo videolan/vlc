@@ -88,9 +88,10 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
-    vlc_value_t       val;
 
-    p_sys          = malloc( sizeof( sout_stream_sys_t ) );
+    p_sys = malloc( sizeof( sout_stream_sys_t ) );
+    if( unlikely( !p_sys ) )
+        return VLC_ENOMEM;
 
     if( !p_stream->p_next )
     {
@@ -102,10 +103,8 @@ static int Open( vlc_object_t *p_this )
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                    p_stream->p_cfg );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "id", &val );
-    p_sys->i_id = val.i_int;
-    var_Get( p_stream, SOUT_CFG_PREFIX "new-id", &val );
-    p_sys->i_new_id = val.i_int;
+    p_sys->i_id = var_GetInteger( p_stream, SOUT_CFG_PREFIX "id" );
+    p_sys->i_new_id = var_GetInteger( p_stream, SOUT_CFG_PREFIX "new-id" );
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
