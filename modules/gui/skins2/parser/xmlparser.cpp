@@ -132,24 +132,18 @@ void XMLParser::LoadCatalog()
 
 bool XMLParser::parse()
 {
+    int type;
+
     if( !m_pReader ) return false;
 
     m_errors = false;
 
-    int ret = xml_ReaderRead( m_pReader );
-    while( ret == 1 )
+    while( (ret = xml_ReaderNextNode( m_pReader )) > 0 )
     {
         if( m_errors ) return false;
 
-        // Get the node type
-        int type = xml_ReaderNodeType( m_pReader );
         switch( type )
         {
-            // Error
-            case -1:
-                return false;
-                break;
-
             case XML_READER_STARTELEM:
             {
                 // Read the element name
@@ -197,7 +191,6 @@ bool XMLParser::parse()
                 break;
             }
         }
-        ret = xml_ReaderRead( m_pReader );
     }
-    return (ret == 0 && !m_errors );
+    return (type == 0 && !m_errors );
 }

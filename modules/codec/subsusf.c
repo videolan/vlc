@@ -532,14 +532,12 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
     ssa_style_t *p_ssa_style = NULL;
     int i_style_level = 0;
     int i_metadata_level = 0;
+    int type;
 
-    while ( xml_ReaderRead( p_xml_reader ) == 1 )
+    while( (type = xml_ReaderNextNode( p_xml_reader )) > 0 )
     {
-        switch ( xml_ReaderNodeType( p_xml_reader ) )
+        switch( type )
         {
-            case XML_READER_TEXT:
-            case XML_READER_NONE:
-                break;
             case XML_READER_ENDELEM:
                 psz_node = xml_ReaderName( p_xml_reader );
 
@@ -996,10 +994,10 @@ static void ParseUSFHeader( decoder_t *p_dec )
         return;
 
     p_xml_reader = xml_ReaderCreate( p_dec, p_sub );
-    if( p_xml_reader )
+    if( likely(p_xml_reader) )
     {
         /* Look for Root Node */
-        if( xml_ReaderRead( p_xml_reader ) == 1 )
+        if( xml_ReaderNextNode( p_xml_reader ) == XML_READER_STARTELEM )
         {
             char *psz_node = xml_ReaderName( p_xml_reader );
 

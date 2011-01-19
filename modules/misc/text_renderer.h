@@ -560,12 +560,12 @@ static int ProcessNodes( filter_t *p_filter,
     if( rv != VLC_SUCCESS )
         return rv;
 
-    while ( ( xml_ReaderRead( p_xml_reader ) == 1 ) )
+    int type;
+
+    while ( (type = xml_ReaderNextNode( p_xml_reader )) > 0 )
     {
-        switch ( xml_ReaderNodeType( p_xml_reader ) )
+        switch ( type )
         {
-            case XML_READER_NONE:
-                break;
             case XML_READER_ENDELEM:
                 psz_node = xml_ReaderName( p_xml_reader );
                 if( psz_node )

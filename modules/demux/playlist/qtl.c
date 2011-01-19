@@ -130,30 +130,21 @@ static int Demux( demux_t *p_demux )
         goto error;
 
     /* check root node */
-    if( xml_ReaderRead( p_xml_reader ) != 1 )
-    {
-        msg_Err( p_demux, "invalid file (no root node)" );
-        goto error;
-    }
-
-    if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM ||
+    if( xml_ReaderNextNode( p_xml_reader ) != XML_READER_STARTELEM ||
         ( psz_eltname = xml_ReaderName( p_xml_reader ) ) == NULL ||
         strcmp( psz_eltname, "embed" ) )
     {
-        msg_Err( p_demux, "invalid root node %i, %s",
-                 xml_ReaderNodeType( p_xml_reader ), psz_eltname );
+        msg_Err( p_demux, "invalid root node: %s", psz_eltname );
         free( psz_eltname );
         psz_eltname = NULL;
 
         /* second line has <?quicktime tag ... so we try to skip it */
         msg_Dbg( p_demux, "trying to read one more node" );
-        xml_ReaderRead( p_xml_reader );
-        if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM ||
+        if( xml_ReaderNextNode( p_xml_reader ) != XML_READER_STARTELEM ||
             ( psz_eltname = xml_ReaderName( p_xml_reader ) ) == NULL ||
             strcmp( psz_eltname, "embed" ) )
         {
-            msg_Err( p_demux, "invalid root node %i, %s",
-                     xml_ReaderNodeType( p_xml_reader ), psz_eltname );
+            msg_Err( p_demux, "invalid root node: %s", psz_eltname );
             free( psz_eltname );
             goto error;
         }

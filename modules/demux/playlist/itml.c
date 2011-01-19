@@ -79,14 +79,16 @@ int Demux( demux_t *p_demux )
         goto end;
 
     /* locating the root node */
+    int type;
     do
     {
-        if( xml_ReaderRead( p_xml_reader ) != 1 )
+        type =  xml_ReaderNextNode( p_xml_reader );
+        if( type <= 0 )
         {
             msg_Err( p_demux, "can't read xml stream" );
             goto end;
         }
-    } while( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM );
+    } while( type != XML_READER_STARTELEM );
 
     /* checking root node name */
     psz_name = xml_ReaderName( p_xml_reader );
@@ -184,14 +186,10 @@ static bool parse_dict( demux_t *p_demux, input_item_node_t *p_input_node,
     xml_elem_hnd_t *p_handler = NULL;
     bool b_ret = false;
 
-    while( xml_ReaderRead( p_xml_reader ) == 1 )
+    while( (i_node = xml_ReaderNextNode( p_xml_reader )) > 0 )
     {
-        i_node = xml_ReaderNodeType( p_xml_reader );
         switch( i_node )
         {
-        case XML_READER_NONE:
-            break;
-
         case XML_READER_STARTELEM:
             /*  element start tag  */
             psz_name = xml_ReaderName( p_xml_reader );
@@ -272,15 +270,10 @@ static bool parse_dict( demux_t *p_demux, input_item_node_t *p_input_node,
             FREE_ATT();
             p_handler = NULL;
             break;
-
-        default:
-            /* unknown/unexpected xml node */
-            msg_Err( p_demux, "unexpected xml node %i", i_node );
-            goto end;
         }
         FREE_NAME();
     }
-    msg_Err( p_demux, "unexpected end of xml data" );
+    msg_Err( p_demux, "unexpected end of XML data" );
 
 end:
     free( psz_name );
@@ -472,10 +465,11 @@ static bool skip_element( demux_t *p_demux, input_item_node_t *p_input_node,
     VLC_UNUSED(p_demux); VLC_UNUSED(p_input_node);
     VLC_UNUSED(p_track); VLC_UNUSED(p_handlers);
     char *psz_endname;
+    int type;
 
-    while( xml_ReaderRead( p_xml_reader ) == 1 )
+    while( (type = xml_ReaderNextNode( p_xml_reader )) > 0 )
     {
-        if( xml_ReaderNodeType( p_xml_reader ) == XML_READER_ENDELEM )
+        if( type == XML_READER_ENDELEM )
         {
             psz_endname = xml_ReaderName( p_xml_reader );
             if( !psz_endname )

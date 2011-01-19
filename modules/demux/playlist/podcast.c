@@ -71,7 +71,6 @@ static int Demux( demux_t *p_demux )
 {
     bool b_item = false;
     bool b_image = false;
-    int i_ret;
 
     xml_reader_t *p_xml_reader;
     char *psz_elname = NULL;
@@ -99,43 +98,26 @@ static int Demux( demux_t *p_demux )
 
     /* xml */
     /* check root node */
-    if( xml_ReaderRead( p_xml_reader ) != 1 )
+    if( xml_ReaderNextNode( p_xml_reader ) != XML_READER_STARTELEM
+     || ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL)
     {
         msg_Err( p_demux, "invalid file (no root node)" );
         goto error;
     }
 
-    while( xml_ReaderNodeType( p_xml_reader ) == XML_READER_NONE )
+    if( strcmp( psz_elname, "rss" ) )
     {
-        if( xml_ReaderRead( p_xml_reader ) != 1 )
-        {
-            msg_Err( p_demux, "invalid file (no root node)" );
-            goto error;
-        }
-    }
-
-    if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM ||
-        ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL ||
-        strcmp( psz_elname, "rss" ) )
-    {
-        msg_Err( p_demux, "invalid root node %i, %s",
-                 xml_ReaderNodeType( p_xml_reader ), psz_elname );
+        msg_Err( p_demux, "invalid root node: %s", psz_elname );
         goto error;
     }
     FREENULL( psz_elname );
 
     p_subitems = input_item_node_Create( p_current_input );
 
-    while( (i_ret = xml_ReaderRead( p_xml_reader )) == 1 )
+    while( (i_type = xml_ReaderNextNode( p_xml_reader )) > 0 )
     {
-        // Get the node type
-        i_type = xml_ReaderNodeType( p_xml_reader );
         switch( i_type )
         {
-            // Error
-            case -1:
-                goto error;
-
             case XML_READER_STARTELEM:
             {
                 // Read the element name
@@ -351,7 +333,7 @@ static int Demux( demux_t *p_demux )
         }
     }
 
-    if( i_ret != 0 )
+    if( i_type < 0 )
     {
         msg_Warn( p_demux, "error while parsing data" );
     }

@@ -439,8 +439,8 @@ XML
 ---
 xml = vlc.xml(): Create an xml object.
 reader = xml:create_reader( stream ): create an xml reader that use the given stream.
-reader:read(): read some data
-reader:node_type(): return the type of the curret node: 'none', 'startelem', 'endelem' or 'text'.
+reader:read(): read some data, return -1 on error, 0 on EOF, 1 on start of XML
+  element, 2 on end of XML element, 3 on text
 reader:name(): name of the element
 reader:value(): value of the element
 reader:next_attr(): next attribute of the element

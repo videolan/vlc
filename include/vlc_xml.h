@@ -70,8 +70,7 @@ struct xml_reader_t
     stream_t *p_stream;
     module_t *p_module;
 
-    int (*pf_read) ( xml_reader_t * );
-    int (*pf_node_type) ( xml_reader_t * );
+    int (*pf_next_node) ( xml_reader_t * );
     char * (*pf_name) ( xml_reader_t * );
     char * (*pf_value) ( xml_reader_t * );
     int (*pf_next_attr) ( xml_reader_t * );
@@ -84,14 +83,9 @@ VLC_EXPORT( xml_reader_t *, xml_ReaderCreate, (vlc_object_t *, stream_t *) LIBVL
 VLC_EXPORT( void, xml_ReaderDelete, (xml_reader_t *) );
 VLC_EXPORT( xml_reader_t *, xml_ReaderReset, (xml_reader_t *, stream_t *) LIBVLC_USED );
 
-static inline int xml_ReaderRead( xml_reader_t *reader )
+static inline int xml_ReaderNextNode( xml_reader_t *reader )
 {
-  return reader->pf_read( reader );
-}
-
-static inline int xml_ReaderNodeType( xml_reader_t *reader )
-{
-  return reader->pf_node_type( reader );
+  return reader->pf_next_node( reader );
 }
 
 static inline char *xml_ReaderName( xml_reader_t *reader )

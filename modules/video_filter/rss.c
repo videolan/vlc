@@ -685,15 +685,12 @@ static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
     bool b_is_image = false;
 
     int i_item = 0;
+    int type;
 
-    while( xml_ReaderRead( p_xml_reader ) == 1 )
+    while( (type = xml_ReaderNextNode( p_xml_reader )) > 0 )
     {
-        switch( xml_ReaderNodeType( p_xml_reader ) )
+        switch( type )
         {
-        // Error
-        case -1:
-            goto end;
-
         case XML_READER_STARTELEM:
             free( psz_eltname );
             psz_eltname = xml_ReaderName( p_xml_reader );

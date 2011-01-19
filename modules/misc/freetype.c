@@ -2160,7 +2160,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( p_xml_reader )
     {
         /* Look for Root Node */
-        if( xml_ReaderRead( p_xml_reader ) == 1 )
+        if( xml_ReaderNextNode( p_xml_reader ) == XML_READER_STARTELEM )
         {
             char *psz_node = xml_ReaderName( p_xml_reader );
 

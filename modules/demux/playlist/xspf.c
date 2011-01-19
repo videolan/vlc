@@ -94,14 +94,11 @@ int Demux( demux_t *p_demux )
         goto end;
 
     /* locating the root node */
-    do
+    if( xml_ReaderNextNode( p_xml_reader ) != XML_READER_STARTELEM )
     {
-        if( xml_ReaderRead( p_xml_reader ) != 1 )
-        {
-            msg_Err( p_demux, "can't read xml stream" );
-            goto end;
-        }
-    } while( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM );
+        msg_Err( p_demux, "can't read xml stream" );
+        goto end;
+    }
 
     /* checking root node name */
     psz_name = xml_ReaderName( p_xml_reader );
@@ -217,13 +214,10 @@ static bool parse_playlist_node COMPLEX_INTERFACE
     /* parse the child elements - we only take care of <trackList> */
     psz_name = NULL;
     psz_value = NULL;
-    while( xml_ReaderRead( p_xml_reader ) == 1 )
+    while( (i_node = xml_ReaderNextNode( p_xml_reader )) > 0 )
     {
-        i_node = xml_ReaderNodeType( p_xml_reader );
         switch( i_node )
         {
-            case XML_READER_NONE:
-                break;
             case XML_READER_STARTELEM:
                 /*  element start tag  */
                 psz_name = xml_ReaderName( p_xml_reader );
@@ -302,11 +296,6 @@ static bool parse_playlist_node COMPLEX_INTERFACE
                 FREE_ATT();
                 p_handler = NULL;
                 break;
-
-            default:
-                /* unknown/unexpected xml node */
-                msg_Err( p_demux, "unexpected xml node %i", i_node );
-                goto end;
         }
     }
 
@@ -324,11 +313,11 @@ static bool parse_tracklist_node COMPLEX_INTERFACE
     VLC_UNUSED(psz_element);
     char *psz_name;
     int i_ntracks = 0;
+    int i_node;
 
     /* now parse the <track>s */
-    while( xml_ReaderRead( p_xml_reader ) == 1 )
+    while( (i_node = xml_ReaderNextNode( p_xml_reader )) > 0 )
     {
-        int i_node = xml_ReaderNodeType( p_xml_reader );
         if( i_node == XML_READER_STARTELEM )
         {
             char *psz_eltname = xml_ReaderName( p_xml_reader );
@@ -357,7 +346,7 @@ static bool parse_tracklist_node COMPLEX_INTERFACE
     }
 
     /* the <trackList> has to be terminated */
-    if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_ENDELEM )
+    if( i_node != XML_READER_ENDELEM )
     {
         msg_Err( p_demux, "there's a missing </trackList>" );
         return false;
@@ -386,6 +375,7 @@ static bool parse_track_node COMPLEX_INTERFACE
     char *psz_value = NULL;
     xml_elem_hnd_t *p_handler = NULL;
     demux_sys_t *p_sys = p_demux->p_sys;
+    int i_node;
     bool b_ret = false;
 
     xml_elem_hnd_t track_elements[] =
@@ -417,14 +407,10 @@ static bool parse_track_node COMPLEX_INTERFACE
     /* reset i_track_id */
     p_sys->i_track_id = -1;
 
-    while( xml_ReaderRead( p_xml_reader ) == 1 )
+    while( (i_node = xml_ReaderNextNode( p_xml_reader )) > 0 )
     {
-        int i_node = xml_ReaderNodeType( p_xml_reader );
         switch( i_node )
         {
-            case XML_READER_NONE:
-                break;
-
             case XML_READER_STARTELEM:
                 /*  element start tag  */
                 psz_name = xml_ReaderName( p_xml_reader );
@@ -570,11 +556,6 @@ static bool parse_track_node COMPLEX_INTERFACE
                 FREE_ATT();
                 p_handler = NULL;
                 break;
-
-            default:
-                /* unknown/unexpected xml node */
-                msg_Err( p_demux, "unexpected xml node %i", i_node );
-                goto end;
         }
     }
     msg_Err( p_demux, "unexpected end of xml data" );
@@ -738,20 +719,13 @@ static bool parse_extension_node COMPLEX_INTERFACE
             msg_Dbg( p_demux, "Skipping \"%s\" extension tag", psz_application );
             free( psz_application );
             /* Skip all children */
-            while( xml_ReaderRead( p_xml_reader ) == 1 )
-            {
-                if( xml_ReaderNodeType( p_xml_reader ) == XML_READER_ENDELEM )
+            for( unsigned lvl = 1; lvl; )
+                switch( xml_ReaderNextNode( p_xml_reader ) )
                 {
-                    char *psz_name = xml_ReaderName( p_xml_reader );
-                    if( !strcmp( psz_name, "extension" ) )
-                    {
-                        free( psz_name );
-                        break;
-                    }
-                    msg_Dbg( p_demux, "\tskipping \"%s\" extension child", psz_name );
-                    free( psz_name );
+                    case XML_READER_STARTELEM: lvl++; break;
+                    case XML_READER_ENDELEM:   lvl--; break;
+                    case 0: case -1: return -1;
                 }
-            }
             return true;
         }
     }
@@ -759,13 +733,10 @@ static bool parse_extension_node COMPLEX_INTERFACE
 
 
     /* parse the child elements */
-    while( xml_ReaderRead( p_xml_reader ) == 1 )
+    while( (i_node = xml_ReaderNextNode( p_xml_reader )) > 0 )
     {
-        i_node = xml_ReaderNodeType( p_xml_reader );
         switch( i_node )
         {
-            case XML_READER_NONE:
-                break;
             case XML_READER_STARTELEM:
                 /*  element start tag  */
                 psz_name = xml_ReaderName( p_xml_reader );
@@ -862,13 +833,6 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 FREE_ATT();
                 p_handler = NULL;
                 break;
-
-            default:
-                /* unknown/unexpected xml node */
-                msg_Err( p_demux, "unexpected xml node %i", i_node );
-                FREE_ATT();
-                if( b_release_input_item ) vlc_gc_decref( p_new_input );
-                return false;
         }
         FREE_NAME();
     }
@@ -931,9 +895,7 @@ static bool parse_extitem_node COMPLEX_INTERFACE
         p_demux->p_sys->pp_tracklist[i_tid] = NULL;
     }
 
-    /* kludge for #1293 - XTAG sends ENDELEM for self closing tag */
-    /* (libxml sends NONE) */
-    xml_ReaderRead( p_xml_reader );
+    xml_ReaderNextNode( p_xml_reader );
 
     return true;
 }
@@ -944,22 +906,15 @@ static bool parse_extitem_node COMPLEX_INTERFACE
 static bool skip_element COMPLEX_INTERFACE
 {
     VLC_UNUSED(p_demux); VLC_UNUSED(p_input_node);
+    VLC_UNUSED(psz_element);
 
-    while( xml_ReaderRead( p_xml_reader ) == 1 )
-    {
-        if( xml_ReaderNodeType( p_xml_reader ) == XML_READER_ENDELEM )
+    for( unsigned lvl = 1; lvl; )
+        switch( xml_ReaderNextNode( p_xml_reader ) )
         {
-            char *psz_endname = xml_ReaderName( p_xml_reader );
-            if( !psz_endname )
-                return false;
-            if( !strcmp( psz_element, psz_endname ) )
-            {
-                free( psz_endname );
-                return true;
-            }
-            else
-                free( psz_endname );
+            case XML_READER_STARTELEM: lvl++; break;
+            case XML_READER_ENDELEM:   lvl--; break;
+            case 0: case -1: return false;
         }
-    }
-    return false;
+
+    return true;
 }

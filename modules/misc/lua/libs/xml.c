@@ -83,15 +83,13 @@ static int vlclua_xml_create( lua_State *L )
 /*****************************************************************************
  * XML Reader
  *****************************************************************************/
-static int vlclua_xml_reader_read( lua_State * );
-static int vlclua_xml_reader_node_type( lua_State * );
+static int vlclua_xml_reader_next_node( lua_State * );
 static int vlclua_xml_reader_name( lua_State * );
 static int vlclua_xml_reader_value( lua_State * );
 static int vlclua_xml_reader_next_attr( lua_State * );
 
 static const luaL_Reg vlclua_xml_reader_reg[] = {
-    { "read", vlclua_xml_reader_read },
-    { "node_type", vlclua_xml_reader_node_type },
+    { "next_node", vlclua_xml_reader_next_node },
     { "name", vlclua_xml_reader_name },
     { "value", vlclua_xml_reader_value },
     { "next_attr", vlclua_xml_reader_next_attr },
@@ -130,18 +128,10 @@ static int vlclua_xml_create_reader( lua_State *L )
     return 1;
 }
 
-static int vlclua_xml_reader_read( lua_State *L )
+static int vlclua_xml_reader_next_node( lua_State *L )
 {
     xml_reader_t *p_reader = *(xml_reader_t**)luaL_checkudata( L, 1, "xml_reader" );
-    lua_pushinteger( L, xml_ReaderRead( p_reader ) );
-    return 1;
-}
-
-static int vlclua_xml_reader_node_type( lua_State *L )
-{
-    xml_reader_t *p_reader = *(xml_reader_t**)luaL_checkudata( L, 1, "xml_reader" );
-    static const char *ppsz_type[] = { "none", "startelem", "endelem", "text" };
-    lua_pushstring( L, ppsz_type[xml_ReaderNodeType( p_reader )] );
+    lua_pushinteger( L, xml_ReaderNextNode( p_reader ) );
     return 1;
 }
 

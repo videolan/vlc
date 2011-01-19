@@ -60,8 +60,7 @@ vlc_module_begin ()
 
 vlc_module_end ()
 
-static int ReaderRead( xml_reader_t * );
-static int ReaderNodeType( xml_reader_t * );
+static int ReaderNextNode( xml_reader_t * );
 static char *ReaderName( xml_reader_t * );
 static char *ReaderValue( xml_reader_t * );
 static int ReaderNextAttr( xml_reader_t * );
@@ -165,8 +164,7 @@ static int ReaderOpen( vlc_object_t *p_this )
     xmlTextReaderSetErrorHandler( p_libxml_reader,
                                   ReaderErrorHandler, p_reader );
 
-    p_reader->pf_read = ReaderRead;
-    p_reader->pf_node_type = ReaderNodeType;
+    p_reader->pf_next_node = ReaderNextNode;
     p_reader->pf_name = ReaderName;
     p_reader->pf_value = ReaderValue;
     p_reader->pf_next_attr = ReaderNextAttr;
@@ -198,37 +196,31 @@ static int ReaderUseDTD ( xml_reader_t *p_reader )
     return VLC_SUCCESS;
 }
 
-static int ReaderRead( xml_reader_t *p_reader )
+static int ReaderNextNode( xml_reader_t *p_reader )
 {
-    int i_ret = xmlTextReaderRead( (void *)p_reader->p_sys );
-
-#if 0
-    switch( i_ret )
+skip:
+    switch( xmlTextReaderRead( (void *)p_reader->p_sys ) )
     {
-    default:
+        case 0: /* EOF */
+            return 0;
+        case -1: /* error */
+            return -1;
     }
-#endif
 
-    return i_ret;
-}
-
-static int ReaderNodeType( xml_reader_t *p_reader )
-{
     switch( xmlTextReaderNodeType( (void *)p_reader->p_sys ) )
     {
-    case XML_READER_TYPE_ELEMENT:
-        return XML_READER_STARTELEM;
-    case XML_READER_TYPE_END_ELEMENT:
-        return XML_READER_ENDELEM;
-    case XML_READER_TYPE_CDATA:
-    case XML_READER_TYPE_TEXT:
-        return XML_READER_TEXT;
-    case -1:
-        return -1;
+        case XML_READER_TYPE_ELEMENT:
+            return XML_READER_STARTELEM;
+        case XML_READER_TYPE_END_ELEMENT:
+            return XML_READER_ENDELEM;
+        case XML_READER_TYPE_CDATA:
+        case XML_READER_TYPE_TEXT:
+            return XML_READER_TEXT;
+        case -1:
+            return -1;
+        default:
+            goto skip;
     }
-
-    return XML_READER_NONE;
-
 }
 
 static char *ReaderName( xml_reader_t *p_reader )

@@ -90,19 +90,17 @@ static int Demux( demux_t *p_demux )
         goto error;
 
     /* check root node */
-    if( xml_ReaderRead( p_xml_reader ) != 1 )
+    if( xml_ReaderNextNode( p_xml_reader ) != XML_READER_STARTELEM )
     {
         msg_Err( p_demux, "invalid file (no root node)" );
         goto error;
     }
 
-    if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM ||
-        ( psz_eltname = xml_ReaderName( p_xml_reader ) ) == NULL ||
+    if( ( psz_eltname = xml_ReaderName( p_xml_reader ) ) == NULL ||
         ( strcmp( psz_eltname, "genrelist" )
           && strcmp( psz_eltname, "stationlist" ) ) )
     {
-        msg_Err( p_demux, "invalid root node %i, %s",
-                 xml_ReaderNodeType( p_xml_reader ), psz_eltname );
+        msg_Err( p_demux, "invalid root node: %s", psz_eltname );
         goto error;
     }
 
@@ -151,17 +149,12 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                        input_item_node_t *p_input_node )
 {
     char *psz_name = NULL; /* genre name */
-    int i_ret = -1;
+    int type;
 
-    while( xml_ReaderRead( p_xml_reader ) == 1 )
+    while( (type = xml_ReaderNextNode( p_xml_reader )) > 0 )
     {
-        // Get the node type
-        switch( xml_ReaderNodeType( p_xml_reader ) )
+        switch( type )
         {
-            // Error
-            case -1:
-                goto error;
-
             case XML_READER_STARTELEM:
             {
                 // Read the element name
@@ -230,11 +223,10 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
             }
         }
     }
-    i_ret = 0;
 
 error:
     free( psz_name );
-    return i_ret;
+    return 0;
 }
 
 /* radio stations:
@@ -280,20 +272,12 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
     char *psz_load = NULL; /* load for shoutcast TV */
 
     char *psz_eltname = NULL; /* tag name */
+    int i_type;
 
-    while( xml_ReaderRead( p_xml_reader ) == 1 )
+    while( (i_type = xml_ReaderNextNode( p_xml_reader )) > 0 )
     {
-        int i_type;
-
-        // Get the node type
-        i_type = xml_ReaderNodeType( p_xml_reader );
         switch( i_type )
         {
-            // Error
-            case -1:
-                return -1;
-                break;
-
             case XML_READER_STARTELEM:
                 // Read the element name
                 psz_eltname = xml_ReaderName( p_xml_reader );

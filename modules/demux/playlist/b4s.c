@@ -88,18 +88,16 @@ static int Demux( demux_t *p_demux )
 
     /* xml */
     /* check root node */
-    if( xml_ReaderRead( p_xml_reader ) != 1 )
+    if( xml_ReaderNextNode( p_xml_reader ) != XML_READER_STARTELEM )
     {
         msg_Err( p_demux, "invalid file (no root node)" );
         goto end;
     }
 
-    if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM ||
-        ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL ||
+    if( ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL ||
         strcmp( psz_elname, "WinampXML" ) )
     {
-        msg_Err( p_demux, "invalid root node %i, %s",
-                 xml_ReaderNodeType( p_xml_reader ), psz_elname );
+        msg_Err( p_demux, "invalid root node: %s", psz_elname );
         goto end;
     }
     FREENULL( psz_elname );
@@ -108,13 +106,12 @@ static int Demux( demux_t *p_demux )
      * contain the "playlist node */
 
     /* Skip until 1st child node */
-    while( (i_ret = xml_ReaderRead( p_xml_reader )) == 1 &&
-           xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM );
-    if( i_ret != 1 )
-    {
-        msg_Err( p_demux, "invalid file (no child node)" );
-        goto end;
-    }
+    while( (i_ret = xml_ReaderNextNode( p_xml_reader )) != XML_READER_STARTELEM )
+        if( i_ret <= 0 )
+        {
+            msg_Err( p_demux, "invalid file (no child node)" );
+            goto end;
+        }
 
     if( ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL ||
         strcmp( psz_elname, "playlist" ) )
@@ -154,15 +151,11 @@ static int Demux( demux_t *p_demux )
 
     p_subitems = input_item_node_Create( p_current_input );
 
-    while( (i_ret = xml_ReaderRead( p_xml_reader )) == 1 )
+    while( (i_ret = xml_ReaderNextNode( p_xml_reader )) > 0 )
     {
         // Get the node type
-        switch( xml_ReaderNodeType( p_xml_reader ) )
+        switch( i_ret )
         {
-            // Error
-            case -1:
-                goto end;
-
             case XML_READER_STARTELEM:
             {
                 // Read the element name
@@ -274,7 +267,7 @@ static int Demux( demux_t *p_demux )
         }
     }
 
-    if( i_ret != 0 )
+    if( i_ret < 0 )
     {
         msg_Warn( p_demux, "error while parsing data" );
         i_ret = 0; /* Needed for correct operation of go back */

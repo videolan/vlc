@@ -36,10 +36,11 @@ local function parsexml(stream, errormsg)
 
     local tree
     local parents = {}
-    while reader:read() > 0 do
-        local nodetype = reader:node_type()
+    local nodetype = reader:next_node()
+
+    while nodetype > 0 do
         --print(nodetype, reader:name())
-        if nodetype == 'startelem' then
+        if nodetype == 1 then
             local name = reader:name()
             local node = { name= '', attributes= {}, children= {} }
             node.name = name
@@ -51,7 +52,7 @@ local function parsexml(stream, errormsg)
                 table.insert(parents, tree)
             end
             tree = node
-        elseif nodetype == 'endelem' then
+        elseif nodetype == 2 then
             if #parents > 0 then
                 local name = reader:name()
                 local tmp = {}
@@ -76,7 +77,7 @@ local function parsexml(stream, errormsg)
                 tree = parents[#parents]
                 table.remove(parents)
             end
-        elseif nodetype == 'text' then
+        elseif nodetype == 3 then
             table.insert(tree.children, reader:value())
         end
     end
