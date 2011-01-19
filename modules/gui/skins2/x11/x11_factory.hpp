@@ -142,9 +142,6 @@ public:
     /// Get the timer loop
     X11TimerLoop *getTimerLoop() const { return m_pTimerLoop; }
 
-    /// Get x11_display string (to be freed by caller)
-    char* getDisplay() { return m_pDisplay->getX11Display(); }
-
 private:
     /// X11 display
     X11Display *m_pDisplay;

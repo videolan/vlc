@@ -83,9 +83,6 @@ public:
     /// Get the main window ID
     Window getMainWindow() const { return m_mainWindow; }
 
-    /// Get the x11_display string (to be freed by caller)
-    char* getX11Display() { return NULL; }
-
     /// EWMH spec
     Atom m_net_wm_supported;
     Atom m_net_wm_state;
