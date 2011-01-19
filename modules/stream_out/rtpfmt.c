@@ -1232,7 +1232,7 @@ static int rtp_packetize_t140( sout_stream_id_t *id, block_t *in )
         memcpy( out->p_buffer + 12, p_data, i_payload );
 
         out->i_buffer = 12 + i_payload;
-        out->i_dts    = out->i_pts;
+        out->i_dts    = in->i_pts;
         out->i_length = 0;
 
         rtp_packetize_send( id, out );
