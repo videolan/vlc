@@ -1548,6 +1548,7 @@ static int Open(vlc_object_t *p_this)
     p_sys->hls_stream = vlc_array_new();
     if (p_sys->hls_stream == NULL)
     {
+        vlc_UrlClean(&p_sys->m3u8);
         free(p_sys);
         return VLC_ENOMEM;
     }
@@ -1559,9 +1560,7 @@ static int Open(vlc_object_t *p_this)
 
     /* Select first segment to play */
     if (parse_HTTPLiveStreaming(s) != VLC_SUCCESS)
-    {
         goto fail;
-    }
 
     /* Choose first HLS stream to start with */
     int current = p_sys->playback.stream = 0;
@@ -1593,13 +1592,28 @@ static int Open(vlc_object_t *p_this)
     if (vlc_thread_create(s, "HTTP Live Streaming client",
                           hls_Thread, VLC_THREAD_PRIORITY_INPUT))
     {
-        goto fail;
+        goto fail_thread;
     }
 
     return VLC_SUCCESS;
 
+fail_thread:
+    vlc_mutex_destroy(&p_sys->download.lock_wait);
+    vlc_cond_destroy(&p_sys->download.wait);
+
 fail:
-    Close(p_this);
+    /* Free hls streams */
+    for (int i = 0; i < vlc_array_count(p_sys->hls_stream); i++)
+    {
+        hls_stream_t *hls;
+        hls = (hls_stream_t *)vlc_array_item_at_index(p_sys->hls_stream, i);
+        if (hls) hls_Free(hls);
+    }
+    vlc_array_destroy(p_sys->hls_stream);
+
+    /* */
+    vlc_UrlClean(&p_sys->m3u8);
+    free(p_sys);
     return VLC_EGENERIC;
 }
 
