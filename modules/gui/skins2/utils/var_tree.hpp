@@ -57,7 +57,7 @@ public:
 
     VarTree( intf_thread_t *pIntf, VarTree *pParent, int id,
              const UStringPtr &rcString, bool selected, bool playing,
-             bool expanded,bool readonly, void *pData );
+             bool expanded, bool readonly, void *pData );
 
     virtual ~VarTree();
 
@@ -66,8 +66,7 @@ public:
 
     /// Add a pointer on string in the children's list
     virtual void add( int id, const UStringPtr &rcString, bool selected,
-                      bool playing, bool expanded, bool readonly,
-                      void *pData );
+                      bool playing, bool expanded, bool readonly, void *pData );
 
     /// Remove the selected item from the children's list
     virtual void delSelected();
@@ -128,10 +127,8 @@ public:
     /// Get first leaf
     Iterator firstLeaf();
 
-    void removeChild( VarTree::Iterator item )
-    {
-        m_children.erase( item );
-    }
+    /// Remove a child
+    void removeChild( Iterator it ) { m_children.erase( it ); }
 
     /// Execute the action associated to this item
     virtual void action( VarTree *pItem ) { }
@@ -175,13 +172,13 @@ public:
     Iterator getPrevLeaf( Iterator it );
 
     /// return rank of visible item starting from 1
-    int getRank( Iterator it, bool flat );
+    int getRank( const Iterator& it, bool flat );
 
     /// Find a children node with the given id
     Iterator findById( int id );
 
     /// Ensure an item is expanded
-    void ensureExpanded( VarTree::Iterator );
+    void ensureExpanded( const Iterator& it );
 
     /// flag a whole subtree for deletion
     void cascadeDelete();

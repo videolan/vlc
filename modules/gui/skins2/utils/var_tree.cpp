@@ -39,8 +39,7 @@ VarTree::VarTree( intf_thread_t *pIntf )
 
 VarTree::VarTree( intf_thread_t *pIntf, VarTree *pParent, int id,
                   const UStringPtr &rcString, bool selected, bool playing,
-                  bool expanded, bool readonly,
-                  void *pData )
+                  bool expanded, bool readonly, void *pData )
     : Variable( pIntf ), m_id( id ), m_cString( rcString ),
     m_selected( selected ), m_playing( playing ), m_expanded( expanded ),
     m_deleted( false ), m_pData( pData ), m_pParent( pParent ),
@@ -57,8 +56,7 @@ VarTree::~VarTree()
 }
 
 void VarTree::add( int id, const UStringPtr &rcString, bool selected,
-                   bool playing, bool expanded, bool readonly,
-                   void *pData )
+                   bool playing, bool expanded, bool readonly, void *pData )
 {
     m_children.push_back( VarTree( getIntf(), this, id, rcString, selected,
                                    playing, expanded, readonly,
@@ -268,7 +266,7 @@ VarTree::Iterator VarTree::getNextVisibleItem( Iterator it )
     }
     else
     {
-        VarTree::Iterator it_old = it;
+        Iterator it_old = it;
         ++it;
         // Was 'it' the last brother? If so, look for uncles
         if( it_old->parent() && it_old->parent()->end() == it )
@@ -281,7 +279,7 @@ VarTree::Iterator VarTree::getNextVisibleItem( Iterator it )
 
 VarTree::Iterator VarTree::getPrevVisibleItem( Iterator it )
 {
-    VarTree::Iterator it_old = it;
+    Iterator it_old = it;
     if( it == root()->begin() || it == ++(root()->begin()) ) return it;
 
     /* Was it the first child of its parent ? */
@@ -310,7 +308,7 @@ VarTree::Iterator VarTree::getNextItem( Iterator it )
     }
     else
     {
-        VarTree::Iterator it_old = it;
+        Iterator it_old = it;
         ++it;
         // Was 'it' the last brother? If so, look for uncles
         if( it_old->parent() && it_old->parent()->end() == it )
@@ -323,7 +321,7 @@ VarTree::Iterator VarTree::getNextItem( Iterator it )
 
 VarTree::Iterator VarTree::getPrevItem( Iterator it )
 {
-    VarTree::Iterator it_old = it;
+    Iterator it_old = it;
     if( it == root()->begin() || it == ++(root()->begin()) ) return it;
 
     /* Was it the first child of its parent ? */
@@ -380,7 +378,7 @@ VarTree::Iterator VarTree::findById( int id )
 }
 
 
-void VarTree::ensureExpanded( VarTree::Iterator it )
+void VarTree::ensureExpanded( const Iterator& it )
 {
     /// Don't expand ourselves, only our parents
     VarTree *current = &(*it);
@@ -422,7 +420,7 @@ void VarTree::cascadeDelete()
     }
 }
 
-int VarTree::getRank( Iterator item, bool flat )
+int VarTree::getRank( const Iterator& item, bool flat )
 {
     int index = 1;
     Iterator it;
