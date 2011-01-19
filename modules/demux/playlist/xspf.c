@@ -895,8 +895,6 @@ static bool parse_extitem_node COMPLEX_INTERFACE
         p_demux->p_sys->pp_tracklist[i_tid] = NULL;
     }
 
-    xml_ReaderNextNode( p_xml_reader );
-
     return true;
 }
 
