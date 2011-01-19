@@ -214,29 +214,21 @@ static int ReaderRead( xml_reader_t *p_reader )
 
 static int ReaderNodeType( xml_reader_t *p_reader )
 {
-    int i_ret = xmlTextReaderNodeType( (void *)p_reader->p_sys );
-
-    switch( i_ret )
+    switch( xmlTextReaderNodeType( (void *)p_reader->p_sys ) )
     {
     case XML_READER_TYPE_ELEMENT:
-        i_ret = XML_READER_STARTELEM;
-        break;
+        return XML_READER_STARTELEM;
     case XML_READER_TYPE_END_ELEMENT:
-        i_ret = XML_READER_ENDELEM;
-        break;
+        return XML_READER_ENDELEM;
     case XML_READER_TYPE_CDATA:
     case XML_READER_TYPE_TEXT:
-        i_ret = XML_READER_TEXT;
-        break;
+        return XML_READER_TEXT;
     case -1:
-        i_ret = -1;
-        break;
-    default:
-        i_ret = XML_READER_NONE;
-        break;
+        return -1;
     }
 
-    return i_ret;
+    return XML_READER_NONE;
+
 }
 
 static char *ReaderName( xml_reader_t *p_reader )
