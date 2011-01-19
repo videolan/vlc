@@ -975,7 +975,6 @@ modules/misc/svg.c
 modules/misc/text_renderer.h
 modules/misc/win32text.c
 modules/misc/xml/libxml.c
-modules/misc/xml/xtag.c
 modules/mmx/memcpy.c
 modules/mmxext/memcpy.c
 modules/mux/asf.c
