@@ -133,6 +133,7 @@ void XMLParser::LoadCatalog()
 bool XMLParser::parse()
 {
     int type;
+    int ret;
 
     if( !m_pReader ) return false;
 
