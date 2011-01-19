@@ -80,9 +80,7 @@ static int Demux( demux_t *p_demux )
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
-    psz_elname = stream_ReadLine( p_demux->s );
-    free( psz_elname );
-    psz_elname = NULL;
+    free( stream_ReadLine( p_demux->s ) );
 
     p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
     if( !p_xml_reader )
