@@ -1025,6 +1025,7 @@ static int Capture( demux_t *p_demux )
         if ( read( p_sys->i_vfd, p_buffer, p_sys->i_vbuffer_size ) < 0 )
         {
             msg_Warn( p_demux, "couldn't read %s", strerror(errno) );
+            free( p_buffer );
             return VLC_EGENERIC;
         }
 
@@ -1069,6 +1070,7 @@ static int Capture( demux_t *p_demux )
         if ( read( p_sys->i_afd, p_buffer, p_sys->i_abuffer_size ) < 0 )
         {
             msg_Warn( p_demux, "couldn't read %s", strerror(errno) );
+            free( p_buffer );
             return VLC_EGENERIC;
         }
 
