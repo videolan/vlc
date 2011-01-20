@@ -44,7 +44,7 @@ struct demux_sys_t
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
-static int IsWhitespace( char *psz_string );
+static bool IsWhitespace( const char *psz_string );
 
 /*****************************************************************************
  * Import_B4S: main import function
@@ -281,16 +281,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     return VLC_EGENERIC;
 }
 
-static int IsWhitespace( char *psz_string )
+static bool IsWhitespace( const char *psz_string )
 {
-    while( *psz_string )
-    {
-        if( *psz_string != ' ' && *psz_string != '\t' && *psz_string != '\r' &&
-            *psz_string != '\n' )
-        {
-            return false;
-        }
-        psz_string++;
-    }
-    return true;
+    psz_string += strspn( psz_string, " \t\r\n" );
+    return !*psz_string;
 }
