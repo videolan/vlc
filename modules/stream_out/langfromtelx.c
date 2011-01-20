@@ -38,7 +38,8 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ID_TEXT N_("ID")
+
+#define ID_TEXT N_("Elementary Stream ID")
 #define ID_LONGTEXT N_( \
     "Specify an identifier integer for this elementary stream to change" )
 #define MAGAZINE_TEXT N_("Magazine")
@@ -57,10 +58,13 @@ static void Close   ( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-langfromtelx-"
 
 vlc_module_begin()
-    set_shortname( _("langfromtelx"))
-    set_description( _("Dynamic language setting from telx"))
+    set_shortname( N_("Lang From Telx"))
+    set_description( N_("Dynamic language setting from teletext"))
     set_capability( "sout stream", 50 )
     add_shortcut( "langfromtelx" )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_STREAM )
+
     set_callbacks( Open, Close )
     add_integer( SOUT_CFG_PREFIX "id", 0, ID_TEXT, ID_LONGTEXT,
                  false )

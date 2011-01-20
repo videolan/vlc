@@ -36,13 +36,14 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ID_TEXT N_("ID")
+#define ID_TEXT N_("Elementary Stream ID")
 #define ID_LONGTEXT N_( \
     "Specify an identifier integer for this elementary stream" )
 
-#define DELAY_TEXT N_("Delay (ms)")
+#define DELAY_TEXT N_("Delay of the ES (ms)")
 #define DELAY_LONGTEXT N_( \
-    "Specify a delay (in ms) for this elementary stream (positive or negative)" )
+    "Specify a delay (in ms) for this elementary stream. " \
+    "Positive means delay and negative means advance." )
 
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
@@ -50,10 +51,12 @@ static void Close   ( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-delay-"
 
 vlc_module_begin()
-    set_shortname( _("delay"))
-    set_description( _("Delay a stream"))
+    set_shortname( N_("Delay"))
+    set_description( N_("Delay a stream"))
     set_capability( "sout stream", 50 )
     add_shortcut( "delay" )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_STREAM )
     set_callbacks( Open, Close )
     add_integer( SOUT_CFG_PREFIX "id", 0, ID_TEXT, ID_LONGTEXT,
                  false )

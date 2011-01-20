@@ -38,11 +38,11 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ID_TEXT N_("ID")
+#define ID_TEXT N_("Elementary Stream ID")
 #define ID_LONGTEXT N_( \
     "Specify an identifier integer for this elementary stream" )
 
-#define NEWID_TEXT N_("New ID")
+#define NEWID_TEXT N_("New ES ID")
 #define NEWID_LONGTEXT N_( \
     "Specify an new identifier integer for this elementary stream" )
 
@@ -58,19 +58,22 @@ static void Close     ( vlc_object_t * );
 #define SOUT_CFG_PREFIX_LANG "sout-setlang-"
 
 vlc_module_begin()
-    set_shortname( _("setid"))
-    set_description( _("Automatically add/delete input streams"))
+    set_shortname( N_("Set ID"))
+    set_section( N_("Set ES id"), NULL )
+    set_description( N_("Change the id of an elementary stream"))
     set_capability( "sout stream", 50 )
     add_shortcut( "setid" )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_STREAM )
     set_callbacks( OpenId, Close )
     add_integer( SOUT_CFG_PREFIX_ID "id", 0, ID_TEXT, ID_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX_ID "new-id", 0, NEWID_TEXT, NEWID_LONGTEXT,
                  false )
 
     add_submodule ()
-    set_section( N_("setlang"), NULL )
-    set_shortname( _("setlang"))
-    set_description( _("Automatically add/delete input streams"))
+    set_section( N_("Set ES Lang"), NULL )
+    set_shortname( N_("Set Lang"))
+    set_description( N_("Change the language of an elementary stream"))
     set_capability( "sout stream", 50 )
     add_shortcut( "setlang" );
     set_callbacks( OpenLang, Close )

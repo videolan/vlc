@@ -159,6 +159,8 @@ $Id$
  * libass: Subtitle renderers using libass
  * libbluray: Library to access Blu-Ray drives
  * libmpeg2: Mpeg2 video decoder using libmpeg2
+ * linsys_hdsdi: Linsys HDSDI cards access module
+ * linsys_sdi: Linsys SDI cards access module
  * lirc: Linux infrared control module
  * live555: rtp demux based on liveMedia (live555.com)
  * logger: file logger plugin
@@ -288,16 +290,19 @@ $Id$
  * stream_filter_record: record any stream instantly
  * stream_out_autodel: monitor mux inputs and automatically add/delete streams
  * stream_out_bridge: "exchange" streams between sout instances. To be used with VLM
+ * stream_out_delay: introduce delay in an ES when streaming
  * stream_out_description: helper module for RTSP vod
  * stream_out_display: displays a stream output chain
  * stream_out_dummy: dummy stream out chain module
  * stream_out_duplicate: duplicates a stream output chain
  * stream_out_es: stream out module outputing ES
  * stream_out_gather: stream out module gathering inputs for seemless transitions
+ * stream_out_langfromtelx: set the the Lang of an ES when streaming based on a teletext page
  * stream_out_mosaic_bridge: stream output module to make a mosaic. To be used with VLM
  * stream_out_raop: Remote Audio Output Protocol (AirTunes) stream out
  * stream_out_record: record stream output module
  * stream_out_rtp: rtp stream output module
+ * stream_out_setid: Set the ID/Lang of an ES when streaming
  * stream_out_smem: stream output module to a memory buffer
  * stream_out_standard: standard stream output module
  * stream_out_switcher: stream output module to display backgrounds
