@@ -90,14 +90,9 @@ nodist_SOURCES_qt4 = \
 		ui/messages_panel.h \
 		ui/about.h \
 		ui/update.h \
-		ui/sout.h
-
-if ENABLE_MEDIA_LIBRARY
-nodist_SOURCES_qt4 +=
 		dialogs/ml_configuration.moc.cpp \
-		components/playlist/ml_item.moc.cpp \
-		components/playlist/ml_model.moc.cpp
-endif
+		components/playlist/ml_model.moc.cpp \
+		ui/sout.h
 
 DEPS_res = \
 	pixmaps/arrow_down_dark.png \

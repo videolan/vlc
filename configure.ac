@@ -4239,7 +4239,7 @@ if test "${enable_media_library}" == "yes"; then
        VLC_ADD_PLUGIN([media_library])
     fi
 fi
-AM_CONDITIONAL([ENABLE_MEDIA_LIBRARY], [test "${enable_media_library}" != "no"])
+AM_CONDITIONAL([ENABLE_MEDIA_LIBRARY], [test "${enable_media_library}" = "yes"])
 
 dnl
 dnl  Endianness check
