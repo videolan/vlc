@@ -1094,6 +1094,7 @@ endif
 ifdef HAVE_WIN32
 	sed -i "s/std=c99/std=gnu99/" ffmpeg/configure
 endif
+	(cd ffmpeg; patch -p1 < ../Patches/ffmpeg-h264-ssse3.patch )
 	touch $@
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
