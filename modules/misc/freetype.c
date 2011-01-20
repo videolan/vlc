@@ -2160,11 +2160,11 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( p_xml_reader )
     {
         /* Look for Root Node */
-        if( xml_ReaderNextNode( p_xml_reader ) == XML_READER_STARTELEM )
-        {
-            char *psz_node = xml_ReaderName( p_xml_reader );
+        const char *node;
 
-            if( !strcasecmp( "karaoke", psz_node ) )
+        if( xml_ReaderNextNode( p_xml_reader, &node ) == XML_READER_STARTELEM )
+        {
+            if( !strcasecmp( "karaoke", node ) )
             {
                 /* We're going to have to render the text a number
                  * of times to show the progress marker on the text.
@@ -2172,20 +2172,19 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                 var_SetBool( p_filter, "text-rerender", true );
                 b_karaoke = true;
             }
-            else if( !strcasecmp( "text", psz_node ) )
+            else if( !strcasecmp( "text", node ) )
             {
                 b_karaoke = false;
             }
             else
             {
                 /* Only text and karaoke tags are supported */
-                msg_Dbg( p_filter, "Unsupported top-level tag '%s' ignored.", psz_node );
+                msg_Dbg( p_filter, "Unsupported top-level tag <%s> ignored.",
+                         node );
                 p_filter->p_sys->p_xml = xml_ReaderReset( p_xml_reader, NULL );
                 p_xml_reader = NULL;
                 rv = VLC_EGENERIC;
             }
-
-            free( psz_node );
         }
     }
 

@@ -558,83 +558,40 @@ static int ProcessNodes( filter_t *p_filter,
     if( rv != VLC_SUCCESS )
         return rv;
 
+    const char *node;
     int type;
 
-    while ( (type = xml_ReaderNextNode( p_xml_reader )) > 0 )
+    while ( (type = xml_ReaderNextNode( p_xml_reader, &node )) > 0 )
     {
         switch ( type )
         {
             case XML_READER_ENDELEM:
-                psz_node = xml_ReaderName( p_xml_reader );
-                if( psz_node )
-                {
-                    if( !strcasecmp( "font", psz_node ) )
-                        PopFont( &p_fonts );
-                    else if( !strcasecmp( "b", psz_node ) )
-                        b_bold   = false;
-                    else if( !strcasecmp( "i", psz_node ) )
-                        b_italic = false;
-                    else if( !strcasecmp( "u", psz_node ) )
-                        b_uline  = false;
-                    else if( !strcasecmp( "s", psz_node ) )
-                        b_through = false;
-
-                    free( psz_node );
-                }
+                if( !strcasecmp( "font", node ) )
+                    PopFont( &p_fonts );
+                else if( !strcasecmp( "b", node ) )
+                    b_bold   = false;
+               else if( !strcasecmp( "i", node ) )
+                    b_italic = false;
+                else if( !strcasecmp( "u", node ) )
+                    b_uline  = false;
+                else if( !strcasecmp( "s", node ) )
+                    b_through = false;
                 break;
+
             case XML_READER_STARTELEM:
-                psz_node = xml_ReaderName( p_xml_reader );
-                if( psz_node )
+                if( !strcasecmp( "font", node ) )
+                    rv = HandleFontAttributes( p_xml_reader, &p_fonts, i_scale );
+                else if( !strcasecmp( "b", node ) )
+                    b_bold = true;
+                else if( !strcasecmp( "i", node ) )
+                    b_italic = true;
+                else if( !strcasecmp( "u", node ) )
+                    b_uline = true;
+                else if( !strcasecmp( "s", node ) )
+                    b_through = true;
+                else if( !strcasecmp( "br", node ) )
                 {
-                    if( !strcasecmp( "font", psz_node ) )
-                        rv = HandleFontAttributes( p_xml_reader, &p_fonts, i_scale );
-                    else if( !strcasecmp( "b", psz_node ) )
-                        b_bold = true;
-                    else if( !strcasecmp( "i", psz_node ) )
-                        b_italic = true;
-                    else if( !strcasecmp( "u", psz_node ) )
-                        b_uline = true;
-                    else if( !strcasecmp( "s", psz_node ) )
-                        b_through = true;
-
-                    else if( !strcasecmp( "br", psz_node ) )
-                    {
-                        SetupLine( p_filter, "\n", &psz_text,
-                                   pi_runs, ppi_run_lengths, ppp_styles,
-                                   GetStyleFromFontStack( p_sys,
-                                                          &p_fonts,
-                                                          b_bold,
-                                                          b_italic,
-                                                          b_uline,
-                                                          b_through) );
-                    }
-                    else if( !strcasecmp( "k", psz_node ) )
-                    {
-                        /* Only valid in karaoke */
-                        if( b_karaoke )
-                        {
-                            if( *pi_k_runs > 0 )
-                            {
-                                SetKaraokeLen( *pi_runs, *ppi_run_lengths,
-                                               *pi_k_runs, *ppi_k_run_lengths );
-                            }
-                            SetupKaraoke( p_xml_reader, pi_k_runs,
-                                          ppi_k_run_lengths, ppi_k_durations );
-                        }
-                    }
-
-                    free( psz_node );
-                }
-                break;
-            case XML_READER_TEXT:
-                psz_node = xml_ReaderValue( p_xml_reader );
-                if( psz_node )
-                {
-                    /* */
-                    HandleWhiteSpace( psz_node );
-                    resolve_xml_special_chars( psz_node );
-
-                    SetupLine( p_filter, psz_node, &psz_text,
+                    SetupLine( p_filter, "\n", &psz_text,
                                pi_runs, ppi_run_lengths, ppp_styles,
                                GetStyleFromFontStack( p_sys,
                                                       &p_fonts,
@@ -642,9 +599,41 @@ static int ProcessNodes( filter_t *p_filter,
                                                       b_italic,
                                                       b_uline,
                                                       b_through) );
-                    free( psz_node );
+                }
+                else if( !strcasecmp( "k", node ) )
+                {
+                    /* Only valid in karaoke */
+                    if( b_karaoke )
+                    {
+                        if( *pi_k_runs > 0 )
+                            SetKaraokeLen( *pi_runs, *ppi_run_lengths,
+                                           *pi_k_runs, *ppi_k_run_lengths );
+                        SetupKaraoke( p_xml_reader, pi_k_runs,
+                                      ppi_k_run_lengths, ppi_k_durations );
+                    }
                 }
                 break;
+
+            case XML_READER_TEXT:
+            {
+                char *psz_node = strdup( node );
+                if( unlikely(!psz_node) )
+                    break;
+
+                HandleWhiteSpace( psz_node );
+                resolve_xml_special_chars( psz_node );
+
+                SetupLine( p_filter, psz_node, &psz_text,
+                           pi_runs, ppi_run_lengths, ppp_styles,
+                           GetStyleFromFontStack( p_sys,
+                                                  &p_fonts,
+                                                  b_bold,
+                                                  b_italic,
+                                                  b_uline,
+                                                  b_through) );
+                free( psz_node );
+                break;
+            }
         }
         if( rv != VLC_SUCCESS )
         {

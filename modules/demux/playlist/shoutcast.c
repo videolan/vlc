@@ -80,7 +80,7 @@ void Close_Shoutcast( vlc_object_t *p_this )
 static int Demux( demux_t *p_demux )
 {
     xml_reader_t *p_xml_reader = NULL;
-    char *psz_eltname = NULL;
+    const char *node;
     int i_ret = -1;
     input_item_t *p_current_input = GetCurrentItem(p_demux);
     input_item_node_t *p_input_node = NULL;
@@ -90,23 +90,21 @@ static int Demux( demux_t *p_demux )
         goto error;
 
     /* check root node */
-    if( xml_ReaderNextNode( p_xml_reader ) != XML_READER_STARTELEM )
+    if( xml_ReaderNextNode( p_xml_reader, &node ) != XML_READER_STARTELEM )
     {
         msg_Err( p_demux, "invalid file (no root node)" );
         goto error;
     }
 
-    if( ( psz_eltname = xml_ReaderName( p_xml_reader ) ) == NULL ||
-        ( strcmp( psz_eltname, "genrelist" )
-          && strcmp( psz_eltname, "stationlist" ) ) )
+    if( strcmp( node, "genrelist" ) && strcmp( node, "stationlist" ) )
     {
-        msg_Err( p_demux, "invalid root node: %s", psz_eltname );
+        msg_Err( p_demux, "invalid root node <%s>", node );
         goto error;
     }
 
     p_input_node = input_item_node_Create( p_current_input );
 
-    if( !strcmp( psz_eltname, "genrelist" ) )
+    if( !strcmp( node, "genrelist" ) )
     {
         /* we're reading a genre list */
         if( DemuxGenre( p_demux, p_xml_reader, p_input_node ) )
@@ -128,7 +126,6 @@ static int Demux( demux_t *p_demux )
 error:
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
-    free( psz_eltname );
     if( p_input_node ) input_item_node_Delete( p_input_node );
     vlc_gc_decref(p_current_input);
     return i_ret;
@@ -148,21 +145,17 @@ error:
 static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                        input_item_node_t *p_input_node )
 {
+    const char *node;
     char *psz_name = NULL; /* genre name */
     int type;
 
-    while( (type = xml_ReaderNextNode( p_xml_reader )) > 0 )
+    while( (type = xml_ReaderNextNode( p_xml_reader, &node )) > 0 )
     {
         switch( type )
         {
             case XML_READER_STARTELEM:
             {
-                // Read the element name
-                char *psz_eltname = xml_ReaderName( p_xml_reader );
-                if( !psz_eltname )
-                    goto error;
-
-                if( !strcmp( psz_eltname, "genre" ) )
+                if( !strcmp( node, "genre" ) )
                 {
                     // Read the attributes
                     const char *attrname;
@@ -180,31 +173,21 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         {
                             msg_Warn( p_demux,
                                       "unexpected attribute %s in element %s",
-                                      attrname, psz_eltname );
+                                      attrname, node );
                             free( psz_attrvalue );
                         }
                     }
                 }
-                free( psz_eltname );
                 break;
             }
 
-            case XML_READER_TEXT:
-                break;
-
-            // End element
             case XML_READER_ENDELEM:
-            {
-                // Read the element name
-                char *psz_eltname = xml_ReaderName( p_xml_reader );
-                if( !psz_eltname )
-                    goto error;
-
-                if( !strcmp( psz_eltname, "genre" ) )
+                if( !strcmp( node, "genre" ) && psz_name != NULL )
                 {
                     char* psz_mrl;
+
                     if( asprintf( &psz_mrl, SHOUTCAST_BASE_URL "?genre=%s",
-                             psz_name ) != -1 )
+                                  psz_name ) != -1 )
                     {
                         input_item_t *p_input;
                         p_input = input_item_New( p_demux, psz_mrl, psz_name );
@@ -215,13 +198,10 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                     }
                     FREENULL( psz_name );
                 }
-                free( psz_eltname );
                 break;
-            }
         }
     }
 
-error:
     free( psz_name );
     return 0;
 }
@@ -268,20 +248,16 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
     char *psz_rt = NULL; /* rating for shoutcast TV */
     char *psz_load = NULL; /* load for shoutcast TV */
 
-    char *psz_eltname = NULL; /* tag name */
+    const char *node; /* tag name */
     int i_type;
 
-    while( (i_type = xml_ReaderNextNode( p_xml_reader )) > 0 )
+    while( (i_type = xml_ReaderNextNode( p_xml_reader, &node )) > 0 )
     {
         switch( i_type )
         {
             case XML_READER_STARTELEM:
-                // Read the element name
-                psz_eltname = xml_ReaderName( p_xml_reader );
-                if( !psz_eltname ) return -1;
-
                 // Read the attributes
-                if( !strcmp( psz_eltname, "tunein" ) )
+                if( !strcmp( node, "tunein" ) )
                 {
                     const char *attrname;
                     while( (attrname = xml_ReaderNextAttr( p_xml_reader )) )
@@ -289,7 +265,6 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         char *psz_attrvalue = xml_ReaderValue( p_xml_reader );
                         if( !psz_attrvalue )
                         {
-                            free( psz_eltname );
                             free( psz_attrvalue );
                             return -1;
                         }
@@ -299,12 +274,12 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         {
                             msg_Warn( p_demux,
                                       "unexpected attribute %s in element %s",
-                                      attrname, psz_eltname );
+                                      attrname, node );
                             free( psz_attrvalue );
                         }
                     }
                 }
-                else if( !strcmp( psz_eltname, "station" ) )
+                else if( !strcmp( node, "station" ) )
                 {
                     const char *attrname;
                     while( (attrname = xml_ReaderNextAttr( p_xml_reader )) )
@@ -312,7 +287,6 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         char *psz_attrvalue = xml_ReaderValue( p_xml_reader );
                         if( !psz_attrvalue )
                         {
-                            free( psz_eltname );
                             free( psz_attrvalue );
                             return -1;
                         }
@@ -330,23 +304,16 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         {
                             msg_Warn( p_demux,
                                       "unexpected attribute %s in element %s",
-                                      attrname, psz_eltname );
+                                      attrname, node );
                             free( psz_attrvalue );
                         }
                     }
                 }
-                free( psz_eltname );
-                break;
-
-            case XML_READER_TEXT:
                 break;
 
             // End element
             case XML_READER_ENDELEM:
-                // Read the element name
-                psz_eltname = xml_ReaderName( p_xml_reader );
-                if( !psz_eltname ) return -1;
-                if( !strcmp( psz_eltname, "station" ) &&
+                if( !strcmp( node, "station" ) &&
                     ( psz_base || ( psz_rt && psz_load &&
                     ( b_adult || strcmp( psz_rt, "NC17" ) ) ) ) )
                 {
@@ -399,10 +366,10 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                     FREENULL( psz_rt );
                     FREENULL( psz_load );
                 }
-                free( psz_eltname );
                 break;
         }
     }
+    /* FIXME: leaks on missing ENDELEMENT? */
     return 0;
 }
 

@@ -73,6 +73,7 @@ static int Demux( demux_t *p_demux )
 
     xml_reader_t *p_xml_reader = NULL;
     char *psz_elname = NULL;
+    const char *node;
     input_item_t *p_input;
     char *psz_mrl = NULL, *psz_title = NULL, *psz_genre = NULL;
     char *psz_now = NULL, *psz_listeners = NULL, *psz_bitrate = NULL;
@@ -84,42 +85,38 @@ static int Demux( demux_t *p_demux )
 
     p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
     if( !p_xml_reader )
-        goto end;
+        return -1;
 
     /* xml */
     /* check root node */
-    if( xml_ReaderNextNode( p_xml_reader ) != XML_READER_STARTELEM )
+    if( xml_ReaderNextNode( p_xml_reader, &node ) != XML_READER_STARTELEM )
     {
         msg_Err( p_demux, "invalid file (no root node)" );
         goto end;
     }
 
-    if( ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL ||
-        strcmp( psz_elname, "WinampXML" ) )
+    if( strcmp( node, "WinampXML" ) )
     {
-        msg_Err( p_demux, "invalid root node: %s", psz_elname );
+        msg_Err( p_demux, "invalid root node: %s", node );
         goto end;
     }
-    FREENULL( psz_elname );
 
     /* root node should not have any attributes, and should only
      * contain the "playlist node */
 
     /* Skip until 1st child node */
-    while( (i_ret = xml_ReaderNextNode( p_xml_reader )) != XML_READER_STARTELEM )
+    while( (i_ret = xml_ReaderNextNode( p_xml_reader, &node )) != XML_READER_STARTELEM )
         if( i_ret <= 0 )
         {
             msg_Err( p_demux, "invalid file (no child node)" );
             goto end;
         }
 
-    if( ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL ||
-        strcmp( psz_elname, "playlist" ) )
+    if( strcmp( node, "playlist" ) )
     {
-        msg_Err( p_demux, "invalid child node %s", psz_elname );
+        msg_Err( p_demux, "invalid child node %s", node );
         goto end;
     }
-    FREENULL( psz_elname );
 
     // Read the attributes
     const char *attr;
@@ -144,7 +141,7 @@ static int Demux( demux_t *p_demux )
 
     p_subitems = input_item_node_Create( p_current_input );
 
-    while( (i_ret = xml_ReaderNextNode( p_xml_reader )) > 0 )
+    while( (i_ret = xml_ReaderNextNode( p_xml_reader, &node )) > 0 )
     {
         // Get the node type
         switch( i_ret )
@@ -153,8 +150,8 @@ static int Demux( demux_t *p_demux )
             {
                 // Read the element name
                 free( psz_elname );
-                psz_elname = xml_ReaderName( p_xml_reader );
-                if( !psz_elname )
+                psz_elname = strdup( node );
+                if( unlikely(!psz_elname) )
                     goto end;
 
                 // Read the attributes
@@ -180,55 +177,41 @@ static int Demux( demux_t *p_demux )
                 }
                 break;
             }
+
             case XML_READER_TEXT:
             {
-                char *psz_text = xml_ReaderValue( p_xml_reader );
-                if( IsWhitespace( psz_text ) )
-                {
-                    free( psz_text );
+                char **p;
+
+                if( psz_elname == NULL )
                     break;
-                }
+                if( IsWhitespace( node ) )
+                    break;
                 if( !strcmp( psz_elname, "Name" ) )
-                {
-                    psz_title = psz_text;
-                }
+                    p = &psz_title;
                 else if( !strcmp( psz_elname, "Genre" ) )
-                {
-                    psz_genre = psz_text;
-                }
+                    p = &psz_genre;
                 else if( !strcmp( psz_elname, "Nowplaying" ) )
-                {
-                    psz_now = psz_text;
-                }
+                    p = &psz_now;
                 else if( !strcmp( psz_elname, "Listeners" ) )
-                {
-                    psz_listeners = psz_text;
-                }
+                    p = &psz_listeners;
                 else if( !strcmp( psz_elname, "Bitrate" ) )
-                {
-                    psz_bitrate = psz_text;
-                }
-                else if( !strcmp( psz_elname, "" ) )
-                {
-                    free( psz_text );
-                }
+                    p = &psz_bitrate;
                 else
                 {
-                    msg_Warn( p_demux, "unexpected text in element '%s'",
+                    msg_Warn( p_demux, "unexpected text in element <%s>",
                               psz_elname );
-                    free( psz_text );
+                    break;
                 }
+                free( *p );
+                *p = strdup( node );
                 break;
             }
+
             // End element
             case XML_READER_ENDELEM:
             {
                 // Read the element name
-                free( psz_elname );
-                psz_elname = xml_ReaderName( p_xml_reader );
-                if( !psz_elname )
-                    goto end;
-                if( !strcmp( psz_elname, "entry" ) )
+                if( !strcmp( node, "entry" ) )
                 {
                     p_input = input_item_New( p_demux, psz_mrl, psz_title );
                     if( psz_now )
@@ -249,9 +232,7 @@ static int Demux( demux_t *p_demux )
                     FREENULL( psz_listeners );
                     FREENULL( psz_now );
                 }
-                free( psz_elname );
-                psz_elname = strdup( "" );
-
+                FREENULL( psz_elname );
                 break;
             }
         }

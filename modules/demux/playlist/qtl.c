@@ -103,7 +103,7 @@ void Close_QTL( vlc_object_t *p_this )
 static int Demux( demux_t *p_demux )
 {
     xml_reader_t *p_xml_reader;
-    char *psz_eltname = NULL;
+    const char *node;
     input_item_t *p_input;
     int i_ret = -1;
 
@@ -130,26 +130,20 @@ static int Demux( demux_t *p_demux )
         goto error;
 
     /* check root node */
-    if( xml_ReaderNextNode( p_xml_reader ) != XML_READER_STARTELEM ||
-        ( psz_eltname = xml_ReaderName( p_xml_reader ) ) == NULL ||
-        strcmp( psz_eltname, "embed" ) )
+    if( xml_ReaderNextNode( p_xml_reader, &node ) != XML_READER_STARTELEM
+     || strcmp( node, "embed" ) )
     {
-        msg_Err( p_demux, "invalid root node: %s", psz_eltname );
-        free( psz_eltname );
-        psz_eltname = NULL;
+        msg_Err( p_demux, "invalid root node <%s>", node );
 
         /* second line has <?quicktime tag ... so we try to skip it */
         msg_Dbg( p_demux, "trying to read one more node" );
-        if( xml_ReaderNextNode( p_xml_reader ) != XML_READER_STARTELEM ||
-            ( psz_eltname = xml_ReaderName( p_xml_reader ) ) == NULL ||
-            strcmp( psz_eltname, "embed" ) )
+        if( xml_ReaderNextNode( p_xml_reader, &node ) != XML_READER_STARTELEM
+         || strcmp( node, "embed" ) )
         {
-            msg_Err( p_demux, "invalid root node: %s", psz_eltname );
-            free( psz_eltname );
+            msg_Err( p_demux, "invalid root node <%s>", node );
             goto error;
         }
     }
-    free( psz_eltname );
 
     const char *attrname;
     while( (attrname = xml_ReaderNextAttr( p_xml_reader )) != NULL )

@@ -528,37 +528,29 @@ static int ParseImageAttachments( decoder_t *p_dec )
 static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    char *psz_node;
+    const char *node;
     ssa_style_t *p_ssa_style = NULL;
     int i_style_level = 0;
     int i_metadata_level = 0;
     int type;
 
-    while( (type = xml_ReaderNextNode( p_xml_reader )) > 0 )
+    while( (type = xml_ReaderNextNode( p_xml_reader, &node )) > 0 )
     {
         switch( type )
         {
             case XML_READER_ENDELEM:
-                psz_node = xml_ReaderName( p_xml_reader );
-
-                if( !psz_node )
-                    break;
                 switch (i_style_level)
                 {
                     case 0:
-                        if( !strcasecmp( "metadata", psz_node ) && (i_metadata_level == 1) )
-                        {
+                        if( !strcasecmp( "metadata", node ) && (i_metadata_level == 1) )
                             i_metadata_level--;
-                        }
                         break;
                     case 1:
-                        if( !strcasecmp( "styles", psz_node ) )
-                        {
+                        if( !strcasecmp( "styles", node ) )
                             i_style_level--;
-                        }
                         break;
                     case 2:
-                        if( !strcasecmp( "style", psz_node ) )
+                        if( !strcasecmp( "style", node ) )
                         {
                             TAB_APPEND( p_sys->i_ssa_styles, p_sys->pp_ssa_styles, p_ssa_style );
 
@@ -567,20 +559,12 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         }
                         break;
                 }
-
-                free( psz_node );
                 break;
+
             case XML_READER_STARTELEM:
-                psz_node = xml_ReaderName( p_xml_reader );
-
-                if( !psz_node )
-                    break;
-
-                if( !strcasecmp( "metadata", psz_node ) && (i_style_level == 0) )
-                {
+                if( !strcasecmp( "metadata", node ) && (i_style_level == 0) )
                     i_metadata_level++;
-                }
-                else if( !strcasecmp( "resolution", psz_node ) &&
+                else if( !strcasecmp( "resolution", node ) &&
                          ( i_metadata_level == 1) )
                 {
                     const char *attr;
@@ -597,27 +581,23 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         free( psz_value );
                     }
                 }
-                else if( !strcasecmp( "styles", psz_node ) && (i_style_level == 0) )
+                else if( !strcasecmp( "styles", node ) && (i_style_level == 0) )
                 {
                     i_style_level++;
                 }
-                else if( !strcasecmp( "style", psz_node ) && (i_style_level == 1) )
+                else if( !strcasecmp( "style", node ) && (i_style_level == 1) )
                 {
                     i_style_level++;
 
                     p_ssa_style = calloc( 1, sizeof(ssa_style_t) );
-                    if( !p_ssa_style )
-                    {
-                        free( psz_node );
+                    if( unlikely(!p_ssa_style) )
                         return;
-                    }
                     /* All styles are supposed to default to Default, and then
                      * one or more settings are over-ridden.
                      * At the moment this only effects styles defined AFTER
                      * Default in the XML
                      */
-                    int i;
-                    for( i = 0; i < p_sys->i_ssa_styles; i++ )
+                    for( int i = 0; i < p_sys->i_ssa_styles; i++ )
                     {
                         if( !strcasecmp( p_sys->pp_ssa_styles[i]->psz_stylename, "Default" ) )
                         {
@@ -646,7 +626,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         free( psz_value );
                     }
                 }
-                else if( !strcasecmp( "fontstyle", psz_node ) && (i_style_level == 2) )
+                else if( !strcasecmp( "fontstyle", node ) && (i_style_level == 2) )
                 {
                     const char *attr;
                     while( (attr = xml_ReaderNextAttr( p_xml_reader )) )
@@ -749,7 +729,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         free( psz_value );
                     }
                 }
-                else if( !strcasecmp( "position", psz_node ) && (i_style_level == 2) )
+                else if( !strcasecmp( "position", node ) && (i_style_level == 2) )
                 {
                     const char *attr;
                     while( (attr = xml_ReaderNextAttr( p_xml_reader )) )
@@ -808,8 +788,6 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         free( psz_value );
                     }
                 }
-
-                free( psz_node );
                 break;
         }
     }
@@ -991,16 +969,13 @@ static void ParseUSFHeader( decoder_t *p_dec )
     p_xml_reader = xml_ReaderCreate( p_dec, p_sub );
     if( likely(p_xml_reader) )
     {
+        const char *node;
+
         /* Look for Root Node */
-        if( xml_ReaderNextNode( p_xml_reader ) == XML_READER_STARTELEM )
-        {
-            char *psz_node = xml_ReaderName( p_xml_reader );
+        if( xml_ReaderNextNode( p_xml_reader, &node ) == XML_READER_STARTELEM
+         && !strcasecmp( "usfsubtitles", node ) )
+            ParseUSFHeaderTags( p_dec, p_xml_reader );
 
-            if( !strcasecmp( "usfsubtitles", psz_node ) )
-                ParseUSFHeaderTags( p_dec, p_xml_reader );
-
-            free( psz_node );
-        }
         xml_ReaderDelete( p_xml_reader );
     }
     stream_Delete( p_sub );

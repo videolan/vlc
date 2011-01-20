@@ -132,6 +132,7 @@ void XMLParser::LoadCatalog()
 
 bool XMLParser::parse()
 {
+    const char *node;
     int type;
     int ret;
 
@@ -139,7 +140,7 @@ bool XMLParser::parse()
 
     m_errors = false;
 
-    while( (ret = xml_ReaderNextNode( m_pReader )) > 0 )
+    while( (ret = xml_ReaderNextNode( m_pReader, &node )) > 0 )
     {
         if( m_errors ) return false;
 
@@ -147,10 +148,6 @@ bool XMLParser::parse()
         {
             case XML_READER_STARTELEM:
             {
-                // Read the element name
-                char *eltName = xml_ReaderName( m_pReader );
-                if( !eltName ) return false;
-
                 // Read the attributes
                 AttrList_t attributes;
                 const char *name;
@@ -165,8 +162,7 @@ bool XMLParser::parse()
                     attributes[strdup(name)] = value;
                 }
 
-                handleBeginElement( eltName, attributes );
-                free( eltName );
+                handleBeginElement( node, attributes );
 
                 map<const char*, const char*, ltstr> ::iterator it =
                     attributes.begin();
@@ -182,12 +178,7 @@ bool XMLParser::parse()
             // End element
             case XML_READER_ENDELEM:
             {
-                // Read the element name
-                char *eltName = xml_ReaderName( m_pReader );
-                if( !eltName ) return false;
-
-                handleEndElement( eltName );
-                free( eltName );
+                handleEndElement( node );
                 break;
             }
         }

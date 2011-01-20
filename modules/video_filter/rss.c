@@ -679,6 +679,7 @@ static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
                       rss_feed_t *p_feed )
 {
     VLC_UNUSED(p_filter);
+    const char *node;
     char *psz_eltname = NULL;
 
     bool b_is_item = false;
@@ -687,21 +688,20 @@ static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
     int i_item = 0;
     int type;
 
-    while( (type = xml_ReaderNextNode( p_xml_reader )) > 0 )
+    while( (type = xml_ReaderNextNode( p_xml_reader, &node )) > 0 )
     {
         switch( type )
         {
         case XML_READER_STARTELEM:
-            free( psz_eltname );
-            psz_eltname = xml_ReaderName( p_xml_reader );
-            if( !psz_eltname )
+#ifdef RSS_DEBUG
+            msg_Dbg( p_filter, "element <%s>", node );
+#endif
+            psz_eltname = strdup( node );
+            if( unlikely(!psz_eltname) )
                 goto end;
 
-#ifdef RSS_DEBUG
-            msg_Dbg( p_filter, "element name: %s", psz_eltname );
-#endif
             /* rss or atom */
-            if( !strcmp( psz_eltname, "item" ) || !strcmp( psz_eltname, "entry" ) )
+            if( !strcmp( node, "item" ) || !strcmp( node, "entry" ) )
             {
                 b_is_item = true;
                 p_feed->i_items++;
@@ -712,12 +712,12 @@ static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
                 p_feed->p_items[p_feed->i_items-1].psz_link = NULL;
             }
             /* rss */
-            else if( !strcmp( psz_eltname, "image" ) )
+            else if( !strcmp( node, "image" ) )
             {
                 b_is_image = true;
             }
             /* atom */
-            else if( !strcmp( psz_eltname, "link" ) )
+            else if( !strcmp( node, "link" ) )
             {
                 const char *name;
                 char *psz_href = NULL;
@@ -772,42 +772,32 @@ static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
             break;
 
         case XML_READER_ENDELEM:
-            free( psz_eltname );
-            psz_eltname = xml_ReaderName( p_xml_reader );
-            if( !psz_eltname )
-                goto end;
-
+            FREENULL( psz_eltname );
 #ifdef RSS_DEBUG
-            msg_Dbg( p_filter, "element end : %s", psz_eltname );
+            msg_Dbg( p_filter, "element end </%s>", node );
 #endif
             /* rss or atom */
-            if( !strcmp( psz_eltname, "item" ) || !strcmp( psz_eltname, "entry" ) )
+            if( !strcmp( node, "item" ) || !strcmp( node, "entry" ) )
             {
                 b_is_item = false;
                 i_item++;
             }
             /* rss */
-            else if( !strcmp( psz_eltname, "image" ) )
+            else if( !strcmp( node, "image" ) )
             {
                 b_is_image = false;
             }
-            FREENULL( psz_eltname );
             break;
 
         case XML_READER_TEXT:
         {
             if( !psz_eltname )
                 break;
-            char *psz_eltvalue = xml_ReaderValue( p_xml_reader );
-            if( !psz_eltvalue )
-                goto end;
 
-            char *psz_clean = removeWhiteChars( psz_eltvalue );
-            free( psz_eltvalue );
-            psz_eltvalue = psz_clean;
+            char *psz_eltvalue = removeWhiteChars( node );
 
 #ifdef RSS_DEBUG
-            msg_Dbg( p_filter, "  text : <%s>", psz_eltvalue );
+            msg_Dbg( p_filter, "  text : \"%s\"", psz_eltvalue );
 #endif
             /* Is it an item ? */
             if( b_is_item )

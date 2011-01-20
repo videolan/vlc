@@ -86,6 +86,7 @@ static int Demux( demux_t *p_demux )
     char *psz_item_subtitle = NULL;
     char *psz_item_summary = NULL;
     char *psz_art_url = NULL;
+    const char *node;
     int i_type;
     input_item_t *p_input;
     input_item_node_t *p_subitems = NULL;
@@ -98,42 +99,35 @@ static int Demux( demux_t *p_demux )
 
     /* xml */
     /* check root node */
-    if( xml_ReaderNextNode( p_xml_reader ) != XML_READER_STARTELEM
-     || ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL)
+    if( xml_ReaderNextNode( p_xml_reader, &node ) != XML_READER_STARTELEM )
     {
         msg_Err( p_demux, "invalid file (no root node)" );
         goto error;
     }
 
-    if( strcmp( psz_elname, "rss" ) )
+    if( strcmp( node, "rss" ) )
     {
-        msg_Err( p_demux, "invalid root node: %s", psz_elname );
+        msg_Err( p_demux, "invalid root node <%s>", node );
         goto error;
     }
-    FREENULL( psz_elname );
 
     p_subitems = input_item_node_Create( p_current_input );
 
-    while( (i_type = xml_ReaderNextNode( p_xml_reader )) > 0 )
+    while( (i_type = xml_ReaderNextNode( p_xml_reader, &node )) > 0 )
     {
         switch( i_type )
         {
             case XML_READER_STARTELEM:
             {
-                // Read the element name
                 free( psz_elname );
-                psz_elname = xml_ReaderName( p_xml_reader );
-                if( !psz_elname )
+                psz_elname = strdup( node );
+                if( unlikely(!node) )
                     goto error;
 
-                if( !strcmp( psz_elname, "item" ) )
-                {
+                if( !strcmp( node, "item" ) )
                     b_item = true;
-                }
-                else if( !strcmp( psz_elname, "image" ) )
-                {
+                else if( !strcmp( node, "image" ) )
                     b_image = true;
-                }
 
                 // Read the attributes
                 const char *attr;
@@ -146,7 +140,7 @@ static int Demux( demux_t *p_demux )
                         goto error;
                     }
 
-                    if( !strcmp( psz_elname, "enclosure" ) )
+                    if( !strcmp( node, "enclosure" ) )
                     {
                         if( !strcmp( attr, "url" ) )
                         {
@@ -166,68 +160,64 @@ static int Demux( demux_t *p_demux )
                         else
                         {
                             msg_Dbg( p_demux,"unhandled attribute %s in element %s",
-                                     attr, psz_elname );
+                                     attr, node );
                             free( psz_value );
                         }
                     }
                     else
                     {
                         msg_Dbg( p_demux,"unhandled attribute %s in element %s",
-                                 attr, psz_elname );
+                                 attr, node );
                         free( psz_value );
                     }
                 }
                 break;
             }
+
             case XML_READER_TEXT:
             {
                 if(!psz_elname) break;
 
-                char *psz_text = xml_ReaderValue( p_xml_reader );
-
-#define SET_DATA( field, name )                 \
-    else if( !strcmp( psz_elname, name ) )      \
-    {                                           \
-        field = psz_text;                       \
-    }
                 /* item specific meta data */
-                if( b_item == true )
+                if( b_item )
                 {
+                    char **p;
+
                     if( !strcmp( psz_elname, "title" ) )
-                    {
-                        psz_item_name = psz_text;
-                    }
+                        p = &psz_item_name;
                     else if( !strcmp( psz_elname, "itunes:author" ) ||
                              !strcmp( psz_elname, "author" ) )
-                    { /* <author> isn't standard iTunes podcast stuff */
-                        psz_item_author = psz_text;
-                    }
+                        /* <author> isn't standard iTunes podcast stuff */
+                        p = &psz_item_author;
                     else if( !strcmp( psz_elname, "itunes:summary" ) ||
                              !strcmp( psz_elname, "description" ) )
-                    { /* <description> isn't standard iTunes podcast stuff */
-                        psz_item_summary = psz_text;
-                    }
-                    SET_DATA( psz_item_date, "pubDate" )
-                    SET_DATA( psz_item_category, "itunes:category" )
-                    SET_DATA( psz_item_duration, "itunes:duration" )
-                    SET_DATA( psz_item_keywords, "itunes:keywords" )
-                    SET_DATA( psz_item_subtitle, "itunes:subtitle" )
+                        /* <description> isn't standard iTunes podcast stuff */
+                        p = &psz_item_summary;
+                    else if( !strcmp( psz_elname, "pubDate" ) )
+                        p = &psz_item_date;
+                    else if( !strcmp( psz_elname, "itunes:category" ) )
+                        p = &psz_item_category;
+                    else if( !strcmp( psz_elname, "itunes:duration" ) )
+                        p = &psz_item_duration;
+                    else if( !strcmp( psz_elname, "itunes:keywords" ) )
+                        p = &psz_item_keywords;
+                    else if( !strcmp( psz_elname, "itunes:subtitle" ) )
+                        p = &psz_item_subtitle;
                     else
-                        free( psz_text );
-                }
-#undef SET_DATA
+                        break;
 
+                    free( *p );
+                    *p = strdup( node );
+                }
                 /* toplevel meta data */
-                else if( b_image == false )
+                else if( !b_image )
                 {
                     if( !strcmp( psz_elname, "title" ) )
-                    {
-                        input_item_SetName( p_current_input, psz_text );
-                    }
+                        input_item_SetName( p_current_input, node );
 #define ADD_GINFO( info, name ) \
     else if( !strcmp( psz_elname, name ) ) \
         input_item_AddInfo( p_current_input, _("Podcast Info"), \
-                            info, "%s", psz_text );
+                            info, "%s", node );
                     ADD_GINFO( _("Podcast Link"), "link" )
                     ADD_GINFO( _("Podcast Copyright"), "copyright" )
                     ADD_GINFO( _("Podcast Category"), "itunes:category" )
@@ -239,46 +229,52 @@ static int Demux( demux_t *p_demux )
                     { /* <description> isn't standard iTunes podcast stuff */
                         input_item_AddInfo( p_current_input,
                             _( "Podcast Info" ), _( "Podcast Summary" ),
-                            "%s", psz_text );
+                            "%s", node );
                     }
-                    free( psz_text );
                 }
                 else
                 {
                     if( !strcmp( psz_elname, "url" ) )
                     {
                         free( psz_art_url );
-                        psz_art_url = psz_text;
+                        psz_art_url = strdup( node );
                     }
                     else
-                    {
-                        msg_Dbg( p_demux, "unhandled text in element '%s'",
+                        msg_Dbg( p_demux, "unhandled text in element <%s>",
                                  psz_elname );
-                        free( psz_text );
-                    }
                 }
                 break;
             }
+
             // End element
             case XML_READER_ENDELEM:
             {
-                // Read the element name
-                free( psz_elname );
-                psz_elname = xml_ReaderName( p_xml_reader );
-                if( !psz_elname )
-                    goto error;
-                if( !strcmp( psz_elname, "item" ) )
+                FREENULL( psz_elname );
+
+                if( !strcmp( node, "item" ) )
                 {
                     if( psz_item_mrl == NULL )
                     {
                         msg_Err( p_demux, "invalid XML (no enclosure markup)" );
                         goto error;
                     }
+
                     p_input = input_item_New( p_demux, psz_item_mrl, psz_item_name );
-                    if( p_input == NULL ) break;
+                    FREENULL( psz_item_mrl );
+                    FREENULL( psz_item_name );
+
+                    if( p_input == NULL )
+                        break; /* FIXME: meta data memory leaks? */
+
+                    /* Set the duration if available */
+                    if( psz_item_duration )
+                        input_item_SetDuration( p_input, strTimeToMTime( psz_item_duration ) );
+
 #define ADD_INFO( info, field ) \
-    if( field ) { input_item_AddInfo( p_input, \
-                            _( "Podcast Info" ),  info, "%s", field ); }
+    if( field ) { \
+        input_item_AddInfo( p_input, _( "Podcast Info" ), (info), "%s", \
+                            (field) ); \
+        FREENULL( field ); }
                     ADD_INFO( _("Podcast Publication Date"), psz_item_date  );
                     ADD_INFO( _("Podcast Author"), psz_item_author );
                     ADD_INFO( _("Podcast Subcategory"), psz_item_category );
@@ -289,9 +285,6 @@ static int Demux( demux_t *p_demux )
                     ADD_INFO( _("Podcast Type"), psz_item_type );
 #undef ADD_INFO
 
-                    /* Set the duration if available */
-                    if( psz_item_duration )
-                        input_item_SetDuration( p_input, strTimeToMTime( psz_item_duration ) );
                     /* Add the global art url to this item, if any */
                     if( psz_art_url )
                         input_item_SetArtURL( p_input, psz_art_url );
@@ -303,29 +296,16 @@ static int Demux( demux_t *p_demux )
                                                 _( "Podcast Size" ),
                                                 _("%s bytes"),
                                                 psz_item_size );
+                        FREENULL( psz_item_size );
                     }
                     input_item_node_AppendItem( p_subitems, p_input );
                     vlc_gc_decref( p_input );
-                    FREENULL( psz_item_name );
-                    FREENULL( psz_item_mrl );
-                    FREENULL( psz_item_size );
-                    FREENULL( psz_item_type );
-                    FREENULL( psz_item_date );
-                    FREENULL( psz_item_author );
-                    FREENULL( psz_item_category );
-                    FREENULL( psz_item_duration );
-                    FREENULL( psz_item_keywords );
-                    FREENULL( psz_item_subtitle );
-                    FREENULL( psz_item_summary );
                     b_item = false;
                 }
                 else if( !strcmp( psz_elname, "image" ) )
                 {
                     b_image = false;
                 }
-                free( psz_elname );
-                psz_elname = strdup( "" );
-
                 break;
             }
         }
