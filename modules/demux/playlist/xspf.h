@@ -21,9 +21,8 @@
  */
 
 /* defines */
-#define FREE_NAME()  free(psz_name);psz_name=NULL;
 #define FREE_VALUE() free(psz_value);psz_value=NULL;
-#define FREE_ATT()   FREE_NAME();FREE_VALUE()
+#define FREE_ATT()   FREE_VALUE()
 
 enum {
     UNKNOWN_CONTENT,

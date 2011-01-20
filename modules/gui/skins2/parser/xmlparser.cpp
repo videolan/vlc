@@ -153,17 +153,16 @@ bool XMLParser::parse()
 
                 // Read the attributes
                 AttrList_t attributes;
-                while( xml_ReaderNextAttr( m_pReader ) == VLC_SUCCESS )
+                const char *name;
+                while( (name = xml_ReaderNextAttr( m_pReader )) != NULL )
                 {
-                    char *name = xml_ReaderName( m_pReader );
                     char *value = xml_ReaderValue( m_pReader );
-                    if( !name || !value )
+                    if( !value )
                     {
-                        free( name );
                         free( value );
                         return false;
                     }
-                    attributes[name] = value;
+                    attributes[strdup(name)] = value;
                 }
 
                 handleBeginElement( eltName, attributes );

@@ -152,7 +152,7 @@ static int vlclua_xml_reader_value( lua_State *L )
 static int vlclua_xml_reader_next_attr( lua_State *L )
 {
     xml_reader_t *p_reader = *(xml_reader_t**)luaL_checkudata( L, 1, "xml_reader" );
-    lua_pushinteger( L, xml_ReaderNextAttr( p_reader ) );
+    lua_pushstring( L, xml_ReaderNextAttr( p_reader ) );
     return 1;
 }
 

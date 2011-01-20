@@ -331,61 +331,58 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     i_font_alpha = (i_font_color >> 24) & 0xff;
     i_font_color &= 0x00ffffff;
 
-    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+    const char *name;
+    while( (name = xml_ReaderNextAttr( p_xml_reader )) != NULL )
     {
-        char *psz_name = xml_ReaderName( p_xml_reader );
         char *psz_value = xml_ReaderValue( p_xml_reader );
+        if( !psz_value )
+            continue;
 
-        if( psz_name && psz_value )
+        if( !strcasecmp( "face", name ) )
         {
-            if( !strcasecmp( "face", psz_name ) )
+            free( psz_fontname );
+            psz_fontname = strdup( psz_value );
+        }
+        else if( !strcasecmp( "size", name ) )
+        {
+            if( ( *psz_value == '+' ) || ( *psz_value == '-' ) )
             {
-                free( psz_fontname );
-                psz_fontname = strdup( psz_value );
-            }
-            else if( !strcasecmp( "size", psz_name ) )
-            {
-                if( ( *psz_value == '+' ) || ( *psz_value == '-' ) )
-                {
-                    int i_value = atoi( psz_value );
+                int i_value = atoi( psz_value );
 
-                    if( ( i_value >= -5 ) && ( i_value <= 5 ) )
-                        i_font_size += ( i_value * i_font_size ) / 10;
-                    else if( i_value < -5 )
-                        i_font_size = - i_value;
-                    else if( i_value > 5 )
-                        i_font_size = i_value;
-                }
-                else
-                    i_font_size = atoi( psz_value );
+                if( ( i_value >= -5 ) && ( i_value <= 5 ) )
+                    i_font_size += ( i_value * i_font_size ) / 10;
+                else if( i_value < -5 )
+                    i_font_size = - i_value;
+                else if( i_value > 5 )
+                    i_font_size = i_value;
             }
-            else if( !strcasecmp( "color", psz_name ) )
+            else
+                i_font_size = atoi( psz_value );
+        }
+        else if( !strcasecmp( "color", name ) )
+        {
+            if( psz_value[0] == '#' )
             {
-                if( psz_value[0] == '#' )
+                i_font_color = strtol( psz_value + 1, NULL, 16 );
+                i_font_color &= 0x00ffffff;
+            }
+            else
+            {
+                for( int i = 0; p_html_colors[i].psz_name != NULL; i++ )
                 {
-                    i_font_color = strtol( psz_value + 1, NULL, 16 );
-                    i_font_color &= 0x00ffffff;
-                }
-                else
-                {
-                    for( int i = 0; p_html_colors[i].psz_name != NULL; i++ )
+                    if( !strncasecmp( psz_value, p_html_colors[i].psz_name, strlen(p_html_colors[i].psz_name) ) )
                     {
-                        if( !strncasecmp( psz_value, p_html_colors[i].psz_name, strlen(p_html_colors[i].psz_name) ) )
-                        {
-                            i_font_color = p_html_colors[i].i_value;
-                            break;
-                        }
+                        i_font_color = p_html_colors[i].i_value;
+                        break;
                     }
                 }
             }
-            else if( !strcasecmp( "alpha", psz_name ) &&
-                     ( psz_value[0] == '#' ) )
-            {
-                i_font_alpha = strtol( psz_value + 1, NULL, 16 );
-                i_font_alpha &= 0xff;
-            }
         }
-        free( psz_name );
+        else if( !strcasecmp( "alpha", name ) && ( psz_value[0] == '#' ) )
+        {
+            i_font_alpha = strtol( psz_value + 1, NULL, 16 );
+            i_font_alpha &= 0xff;
+        }
         free( psz_value );
     }
     rv = PushFont( p_fonts,
@@ -430,13 +427,15 @@ static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
                           uint32_t **ppi_k_run_lengths,
                           uint32_t **ppi_k_durations )
 {
-    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
-    {
-        char *psz_name = xml_ReaderName( p_xml_reader );
-        char *psz_value = xml_ReaderValue( p_xml_reader );
+    const char *name;
 
-        if( psz_name && psz_value &&
-            !strcasecmp( "t", psz_name ) )
+    while( (name = xml_ReaderNextAttr( p_xml_reader )) != NULL )
+    {
+        char *psz_value = xml_ReaderValue( p_xml_reader );
+        if( !psz_value )
+            continue;
+
+        if( !strcasecmp( "t", name ) )
         {
             if( ppi_k_durations && ppi_k_run_lengths )
             {
@@ -470,7 +469,6 @@ static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
                     (*ppi_k_run_lengths)[ *pi_k_runs - 1 ] = 0;
             }
         }
-        free( psz_name );
         free( psz_value );
     }
 }

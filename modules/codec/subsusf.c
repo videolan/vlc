@@ -583,19 +583,17 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                 else if( !strcasecmp( "resolution", psz_node ) &&
                          ( i_metadata_level == 1) )
                 {
-                    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                    const char *attr;
+                    while( (attr = xml_ReaderNextAttr( p_xml_reader )) )
                     {
-                        char *psz_name = xml_ReaderName ( p_xml_reader );
                         char *psz_value = xml_ReaderValue ( p_xml_reader );
+                        if( !psz_value )
+                            continue;
 
-                        if( psz_name && psz_value )
-                        {
-                            if( !strcasecmp( "x", psz_name ) )
-                                p_sys->i_original_width = atoi( psz_value );
-                            else if( !strcasecmp( "y", psz_name ) )
-                                p_sys->i_original_height = atoi( psz_value );
-                        }
-                        free( psz_name );
+                        if( !strcasecmp( "x", attr ) )
+                            p_sys->i_original_width = atoi( psz_value );
+                        else if( !strcasecmp( "y", attr ) )
+                            p_sys->i_original_height = atoi( psz_value );
                         free( psz_value );
                     }
                 }
@@ -633,183 +631,180 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         }
                     }
 
-                    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                    const char *attr;
+                    while( (attr = xml_ReaderNextAttr( p_xml_reader )) )
                     {
-                        char *psz_name = xml_ReaderName ( p_xml_reader );
                         char *psz_value = xml_ReaderValue ( p_xml_reader );
+                        if( !psz_value )
+                            continue;
 
-                        if( psz_name && psz_value )
+                        if( !strcasecmp( "name", attr ) )
                         {
-                            if( !strcasecmp( "name", psz_name ) )
-                                p_ssa_style->psz_stylename = strdup( psz_value );
+                            free( p_ssa_style->psz_stylename );
+                            p_ssa_style->psz_stylename = strdup( psz_value );
                         }
-                        free( psz_name );
                         free( psz_value );
                     }
                 }
                 else if( !strcasecmp( "fontstyle", psz_node ) && (i_style_level == 2) )
                 {
-                    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                    const char *attr;
+                    while( (attr = xml_ReaderNextAttr( p_xml_reader )) )
                     {
-                        char *psz_name = xml_ReaderName ( p_xml_reader );
                         char *psz_value = xml_ReaderValue ( p_xml_reader );
+                        if( !psz_value )
+                            continue;
 
-                        if( psz_name && psz_value )
+                        if( !strcasecmp( "face", attr ) )
                         {
-                            if( !strcasecmp( "face", psz_name ) )
+                            free( p_ssa_style->font_style.psz_fontname );
+                            p_ssa_style->font_style.psz_fontname = strdup( psz_value );
+                        }
+                        else if( !strcasecmp( "size", attr ) )
+                        {
+                            if( ( *psz_value == '+' ) || ( *psz_value == '-' ) )
                             {
-                                free( p_ssa_style->font_style.psz_fontname );
-                                p_ssa_style->font_style.psz_fontname = strdup( psz_value );
-                            }
-                            else if( !strcasecmp( "size", psz_name ) )
-                            {
-                                if( ( *psz_value == '+' ) || ( *psz_value == '-' ) )
-                                {
-                                    int i_value = atoi( psz_value );
+                                int i_value = atoi( psz_value );
 
-                                    if( ( i_value >= -5 ) && ( i_value <= 5 ) )
-                                        p_ssa_style->font_style.i_font_size  +=
-                                            ( i_value * p_ssa_style->font_style.i_font_size ) / 10;
-                                    else if( i_value < -5 )
-                                        p_ssa_style->font_style.i_font_size  = - i_value;
-                                    else if( i_value > 5 )
-                                        p_ssa_style->font_style.i_font_size  = i_value;
-                                }
-                                else
-                                    p_ssa_style->font_style.i_font_size  = atoi( psz_value );
+                                if( ( i_value >= -5 ) && ( i_value <= 5 ) )
+                                    p_ssa_style->font_style.i_font_size  +=
+                                       ( i_value * p_ssa_style->font_style.i_font_size ) / 10;
+                                else if( i_value < -5 )
+                                    p_ssa_style->font_style.i_font_size  = - i_value;
+                                else if( i_value > 5 )
+                                    p_ssa_style->font_style.i_font_size  = i_value;
                             }
-                            else if( !strcasecmp( "italic", psz_name ) )
+                            else
+                                p_ssa_style->font_style.i_font_size  = atoi( psz_value );
+                        }
+                        else if( !strcasecmp( "italic", attr ) )
+                        {
+                            if( !strcasecmp( "yes", psz_value ))
+                                p_ssa_style->font_style.i_style_flags |= STYLE_ITALIC;
+                            else
+                                p_ssa_style->font_style.i_style_flags &= ~STYLE_ITALIC;
+                        }
+                        else if( !strcasecmp( "weight", attr ) )
+                        {
+                            if( !strcasecmp( "bold", psz_value ))
+                                p_ssa_style->font_style.i_style_flags |= STYLE_BOLD;
+                            else
+                                p_ssa_style->font_style.i_style_flags &= ~STYLE_BOLD;
+                        }
+                        else if( !strcasecmp( "underline", attr ) )
+                        {
+                            if( !strcasecmp( "yes", psz_value ))
+                                p_ssa_style->font_style.i_style_flags |= STYLE_UNDERLINE;
+                            else
+                                p_ssa_style->font_style.i_style_flags &= ~STYLE_UNDERLINE;
+                        }
+                        else if( !strcasecmp( "color", attr ) )
+                        {
+                            if( *psz_value == '#' )
                             {
-                                if( !strcasecmp( "yes", psz_value ))
-                                    p_ssa_style->font_style.i_style_flags |= STYLE_ITALIC;
-                                else
-                                    p_ssa_style->font_style.i_style_flags &= ~STYLE_ITALIC;
-                            }
-                            else if( !strcasecmp( "weight", psz_name ) )
-                            {
-                                if( !strcasecmp( "bold", psz_value ))
-                                    p_ssa_style->font_style.i_style_flags |= STYLE_BOLD;
-                                else
-                                    p_ssa_style->font_style.i_style_flags &= ~STYLE_BOLD;
-                            }
-                            else if( !strcasecmp( "underline", psz_name ) )
-                            {
-                                if( !strcasecmp( "yes", psz_value ))
-                                    p_ssa_style->font_style.i_style_flags |= STYLE_UNDERLINE;
-                                else
-                                    p_ssa_style->font_style.i_style_flags &= ~STYLE_UNDERLINE;
-                            }
-                            else if( !strcasecmp( "color", psz_name ) )
-                            {
-                                if( *psz_value == '#' )
-                                {
-                                    unsigned long col = strtol(psz_value+1, NULL, 16);
-                                    p_ssa_style->font_style.i_font_color = (col & 0x00ffffff);
-                                    p_ssa_style->font_style.i_font_alpha = (col >> 24) & 0xff;
-                                }
-                            }
-                            else if( !strcasecmp( "outline-color", psz_name ) )
-                            {
-                                if( *psz_value == '#' )
-                                {
-                                    unsigned long col = strtol(psz_value+1, NULL, 16);
-                                    p_ssa_style->font_style.i_outline_color = (col & 0x00ffffff);
-                                    p_ssa_style->font_style.i_outline_alpha = (col >> 24) & 0xff;
-                                }
-                            }
-                            else if( !strcasecmp( "outline-level", psz_name ) )
-                            {
-                                p_ssa_style->font_style.i_outline_width = atoi( psz_value );
-                            }
-                            else if( !strcasecmp( "shadow-color", psz_name ) )
-                            {
-                                if( *psz_value == '#' )
-                                {
-                                    unsigned long col = strtol(psz_value+1, NULL, 16);
-                                    p_ssa_style->font_style.i_shadow_color = (col & 0x00ffffff);
-                                    p_ssa_style->font_style.i_shadow_alpha = (col >> 24) & 0xff;
-                                }
-                            }
-                            else if( !strcasecmp( "shadow-level", psz_name ) )
-                            {
-                                p_ssa_style->font_style.i_shadow_width = atoi( psz_value );
-                            }
-                            else if( !strcasecmp( "back-color", psz_name ) )
-                            {
-                                if( *psz_value == '#' )
-                                {
-                                    unsigned long col = strtol(psz_value+1, NULL, 16);
-                                    p_ssa_style->font_style.i_karaoke_background_color = (col & 0x00ffffff);
-                                    p_ssa_style->font_style.i_karaoke_background_alpha = (col >> 24) & 0xff;
-                                }
-                            }
-                            else if( !strcasecmp( "spacing", psz_name ) )
-                            {
-                                p_ssa_style->font_style.i_spacing = atoi( psz_value );
+                                unsigned long col = strtol(psz_value+1, NULL, 16);
+                                 p_ssa_style->font_style.i_font_color = (col & 0x00ffffff);
+                                 p_ssa_style->font_style.i_font_alpha = (col >> 24) & 0xff;
                             }
                         }
-                        free( psz_name );
+                        else if( !strcasecmp( "outline-color", attr ) )
+                        {
+                            if( *psz_value == '#' )
+                            {
+                                unsigned long col = strtol(psz_value+1, NULL, 16);
+                                p_ssa_style->font_style.i_outline_color = (col & 0x00ffffff);
+                                p_ssa_style->font_style.i_outline_alpha = (col >> 24) & 0xff;
+                            }
+                        }
+                        else if( !strcasecmp( "outline-level", attr ) )
+                        {
+                            p_ssa_style->font_style.i_outline_width = atoi( psz_value );
+                        }
+                        else if( !strcasecmp( "shadow-color", attr ) )
+                        {
+                            if( *psz_value == '#' )
+                            {
+                                unsigned long col = strtol(psz_value+1, NULL, 16);
+                                p_ssa_style->font_style.i_shadow_color = (col & 0x00ffffff);
+                                p_ssa_style->font_style.i_shadow_alpha = (col >> 24) & 0xff;
+                            }
+                        }
+                        else if( !strcasecmp( "shadow-level", attr ) )
+                        {
+                            p_ssa_style->font_style.i_shadow_width = atoi( psz_value );
+                        }
+                        else if( !strcasecmp( "back-color", attr ) )
+                        {
+                            if( *psz_value == '#' )
+                            {
+                                unsigned long col = strtol(psz_value+1, NULL, 16);
+                                p_ssa_style->font_style.i_karaoke_background_color = (col & 0x00ffffff);
+                                p_ssa_style->font_style.i_karaoke_background_alpha = (col >> 24) & 0xff;
+                            }
+                        }
+                        else if( !strcasecmp( "spacing", attr ) )
+                        {
+                            p_ssa_style->font_style.i_spacing = atoi( psz_value );
+                        }
                         free( psz_value );
                     }
                 }
                 else if( !strcasecmp( "position", psz_node ) && (i_style_level == 2) )
                 {
-                    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                    const char *attr;
+                    while( (attr = xml_ReaderNextAttr( p_xml_reader )) )
                     {
-                        char *psz_name = xml_ReaderName ( p_xml_reader );
                         char *psz_value = xml_ReaderValue ( p_xml_reader );
+                        if( !psz_value )
+                            continue;
 
-                        if( psz_name && psz_value )
+                        if( !strcasecmp( "alignment", attr ) )
                         {
-                            if( !strcasecmp( "alignment", psz_name ) )
+                            if( !strcasecmp( "TopLeft", psz_value ) )
+                                p_ssa_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
+                            else if( !strcasecmp( "TopCenter", psz_value ) )
+                                p_ssa_style->i_align = SUBPICTURE_ALIGN_TOP;
+                            else if( !strcasecmp( "TopRight", psz_value ) )
+                                p_ssa_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT;
+                            else if( !strcasecmp( "MiddleLeft", psz_value ) )
+                                p_ssa_style->i_align = SUBPICTURE_ALIGN_LEFT;
+                            else if( !strcasecmp( "MiddleCenter", psz_value ) )
+                                p_ssa_style->i_align = 0;
+                            else if( !strcasecmp( "MiddleRight", psz_value ) )
+                                p_ssa_style->i_align = SUBPICTURE_ALIGN_RIGHT;
+                            else if( !strcasecmp( "BottomLeft", psz_value ) )
+                                p_ssa_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
+                            else if( !strcasecmp( "BottomCenter", psz_value ) )
+                                p_ssa_style->i_align = SUBPICTURE_ALIGN_BOTTOM;
+                            else if( !strcasecmp( "BottomRight", psz_value ) )
+                                p_ssa_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
+                        }
+                        else if( !strcasecmp( "horizontal-margin", attr ) )
+                        {
+                            if( strchr( psz_value, '%' ) )
                             {
-                                if( !strcasecmp( "TopLeft", psz_value ) )
-                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
-                                else if( !strcasecmp( "TopCenter", psz_value ) )
-                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_TOP;
-                                else if( !strcasecmp( "TopRight", psz_value ) )
-                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT;
-                                else if( !strcasecmp( "MiddleLeft", psz_value ) )
-                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_LEFT;
-                                else if( !strcasecmp( "MiddleCenter", psz_value ) )
-                                    p_ssa_style->i_align = 0;
-                                else if( !strcasecmp( "MiddleRight", psz_value ) )
-                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_RIGHT;
-                                else if( !strcasecmp( "BottomLeft", psz_value ) )
-                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
-                                else if( !strcasecmp( "BottomCenter", psz_value ) )
-                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_BOTTOM;
-                                else if( !strcasecmp( "BottomRight", psz_value ) )
-                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
+                                p_ssa_style->i_margin_h = 0;
+                                p_ssa_style->i_margin_percent_h = atoi( psz_value );
                             }
-                            else if( !strcasecmp( "horizontal-margin", psz_name ) )
+                            else
                             {
-                                if( strchr( psz_value, '%' ) )
-                                {
-                                    p_ssa_style->i_margin_h = 0;
-                                    p_ssa_style->i_margin_percent_h = atoi( psz_value );
-                                }
-                                else
-                                {
-                                    p_ssa_style->i_margin_h = atoi( psz_value );
-                                    p_ssa_style->i_margin_percent_h = 0;
-                                }
-                            }
-                            else if( !strcasecmp( "vertical-margin", psz_name ) )
-                            {
-                                if( strchr( psz_value, '%' ) )
-                                {
-                                    p_ssa_style->i_margin_v = 0;
-                                    p_ssa_style->i_margin_percent_v = atoi( psz_value );
-                                }
-                                else
-                                {
-                                    p_ssa_style->i_margin_v = atoi( psz_value );
-                                    p_ssa_style->i_margin_percent_v = 0;
-                                }
+                                p_ssa_style->i_margin_h = atoi( psz_value );
+                                p_ssa_style->i_margin_percent_h = 0;
                             }
                         }
-                        free( psz_name );
+                        else if( !strcasecmp( "vertical-margin", attr ) )
+                        {
+                            if( strchr( psz_value, '%' ) )
+                            {
+                                p_ssa_style->i_margin_v = 0;
+                                p_ssa_style->i_margin_percent_v = atoi( psz_value );
+                            }
+                            else
+                            {
+                                p_ssa_style->i_margin_v = atoi( psz_value );
+                                p_ssa_style->i_margin_percent_v = 0;
+                            }
+                        }
                         free( psz_value );
                     }
                 }

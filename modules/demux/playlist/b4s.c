@@ -122,30 +122,23 @@ static int Demux( demux_t *p_demux )
     FREENULL( psz_elname );
 
     // Read the attributes
-    while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+    const char *attr;
+    while( (attr = xml_ReaderNextAttr( p_xml_reader )) != NULL )
     {
-        char *psz_name = xml_ReaderName( p_xml_reader );
         char *psz_value = xml_ReaderValue( p_xml_reader );
-        if( !psz_name || !psz_value )
+        if( !psz_value )
         {
-            free( psz_name );
             free( psz_value );
             goto end;
         }
-        if( !strcmp( psz_name, "num_entries" ) )
-        {
+
+        if( !strcmp( attr, "num_entries" ) )
             msg_Dbg( p_demux, "playlist has %d entries", atoi(psz_value) );
-        }
-        else if( !strcmp( psz_name, "label" ) )
-        {
+        else if( !strcmp( attr, "label" ) )
             input_item_SetName( p_current_input, psz_value );
-        }
         else
-        {
             msg_Warn( p_demux, "stray attribute %s with value %s in element"
-                      " 'playlist'", psz_name, psz_value );
-        }
-        free( psz_name );
+                      " 'playlist'", attr, psz_value );
         free( psz_value );
     }
 
@@ -165,28 +158,25 @@ static int Demux( demux_t *p_demux )
                     goto end;
 
                 // Read the attributes
-                while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                while( (attr = xml_ReaderNextAttr( p_xml_reader )) )
                 {
-                    char *psz_name = xml_ReaderName( p_xml_reader );
                     char *psz_value = xml_ReaderValue( p_xml_reader );
-                    if( !psz_name || !psz_value )
+                    if( !psz_value )
                     {
-                        free( psz_name );
                         free( psz_value );
                         goto end;
                     }
                     if( !strcmp( psz_elname, "entry" ) &&
-                        !strcmp( psz_name, "Playstring" ) )
+                        !strcmp( attr, "Playstring" ) )
                     {
                         psz_mrl = psz_value;
                     }
                     else
                     {
                         msg_Warn( p_demux, "unexpected attribute %s in element %s",
-                                  psz_name, psz_elname );
+                                  attr, psz_elname );
                         free( psz_value );
                     }
-                    free( psz_name );
                 }
                 break;
             }

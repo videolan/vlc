@@ -151,115 +151,81 @@ static int Demux( demux_t *p_demux )
     }
     free( psz_eltname );
 
-    while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+    const char *attrname;
+    while( (attrname = xml_ReaderNextAttr( p_xml_reader )) != NULL )
     {
-        char *psz_attrname = xml_ReaderName( p_xml_reader );
         char *psz_attrvalue = xml_ReaderValue( p_xml_reader );
 
-        if( !psz_attrname || !psz_attrvalue )
+        if( !psz_attrvalue )
         {
-            free( psz_attrname );
             free( psz_attrvalue );
             goto error;
         }
 
-        if( !strcmp( psz_attrname, "autoplay" ) )
-        {
+        if( !strcmp( attrname, "autoplay" ) )
             b_autoplay = !strcmp( psz_attrvalue, "true" );
-        }
-        else if( !strcmp( psz_attrname, "controler" ) )
-        {
+        else if( !strcmp( attrname, "controler" ) )
             b_controler = !strcmp( psz_attrvalue, "false" );
-        }
-        else if( !strcmp( psz_attrname, "fullscreen" ) )
+        else if( !strcmp( attrname, "fullscreen" ) )
         {
             if( !strcmp( psz_attrvalue, "double" ) )
-            {
                 fullscreen = FULLSCREEN_DOUBLE;
-            }
             else if( !strcmp( psz_attrvalue, "half" ) )
-            {
                 fullscreen = FULLSCREEN_HALF;
-            }
             else if( !strcmp( psz_attrvalue, "current" ) )
-            {
                 fullscreen = FULLSCREEN_CURRENT;
-            }
             else if( !strcmp( psz_attrvalue, "full" ) )
-            {
                 fullscreen = FULLSCREEN_FULL;
-            }
             else
-            {
                 fullscreen = FULLSCREEN_NORMAL;
-            }
         }
-        else if( !strcmp( psz_attrname, "href" ) )
+        else if( !strcmp( attrname, "href" ) )
         {
             psz_href = psz_attrvalue;
             psz_attrvalue = NULL;
         }
-        else if( !strcmp( psz_attrname, "kioskmode" ) )
-        {
+        else if( !strcmp( attrname, "kioskmode" ) )
             b_kioskmode = !strcmp( psz_attrvalue, "true" );
-        }
-        else if( !strcmp( psz_attrname, "loop" ) )
+        else if( !strcmp( attrname, "loop" ) )
         {
             if( !strcmp( psz_attrvalue, "true" ) )
-            {
                 loop = LOOP_TRUE;
-            }
             else if( !strcmp( psz_attrvalue, "palindrome" ) )
-            {
                 loop = LOOP_PALINDROME;
-            }
             else
-            {
                 loop = LOOP_FALSE;
-            }
         }
-        else if( !strcmp( psz_attrname, "movieid" ) )
-        {
+        else if( !strcmp( attrname, "movieid" ) )
             i_movieid = atoi( psz_attrvalue );
-        }
-        else if( !strcmp( psz_attrname, "moviename" ) )
+        else if( !strcmp( attrname, "moviename" ) )
         {
             psz_moviename = psz_attrvalue;
             psz_attrvalue = NULL;
         }
-        else if( !strcmp( psz_attrname, "playeveryframe" ) )
-        {
+        else if( !strcmp( attrname, "playeveryframe" ) )
             b_playeveryframe = !strcmp( psz_attrvalue, "true" );
-        }
-        else if( !strcmp( psz_attrname, "qtnext" ) )
+        else if( !strcmp( attrname, "qtnext" ) )
         {
             psz_qtnext = psz_attrvalue;
             psz_attrvalue = NULL;
         }
-        else if( !strcmp( psz_attrname, "quitwhendone" ) )
-        {
+        else if( !strcmp( attrname, "quitwhendone" ) )
             b_quitwhendone = !strcmp( psz_attrvalue, "true" );
-        }
-        else if( !strcmp( psz_attrname, "src" ) )
+        else if( !strcmp( attrname, "src" ) )
         {
             psz_src = psz_attrvalue;
             psz_attrvalue = NULL;
         }
-        else if( !strcmp( psz_attrname, "mimetype" ) )
+        else if( !strcmp( attrname, "mimetype" ) )
         {
             psz_mimetype = psz_attrvalue;
             psz_attrvalue = NULL;
         }
-        else if( !strcmp( psz_attrname, "volume" ) )
-        {
+        else if( !strcmp( attrname, "volume" ) )
             i_volume = atoi( psz_attrvalue );
-        }
         else
-        {
             msg_Dbg( p_demux, "Attribute %s with value %s isn't valid",
-                     psz_attrname, psz_attrvalue );
-        }
-        free( psz_attrname );
+                     attrname, psz_attrvalue );
         free( psz_attrvalue );
     }
 

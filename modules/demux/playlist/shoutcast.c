@@ -135,7 +135,7 @@ error:
 }
 
 #define GET_VALUE( a ) \
-                        if( !strcmp( psz_attrname, #a ) ) \
+                        if( !strcmp( attrname, #a ) ) \
                         { \
                             free(psz_ ## a); \
                             psz_ ## a = psz_attrvalue; \
@@ -165,14 +165,12 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                 if( !strcmp( psz_eltname, "genre" ) )
                 {
                     // Read the attributes
-                    while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                    const char *attrname;
+                    while( (attrname = xml_ReaderNextAttr( p_xml_reader )) )
                     {
-                        char *psz_attrname = xml_ReaderName( p_xml_reader );
-                        char *psz_attrvalue =
-                            xml_ReaderValue( p_xml_reader );
-                        if( !psz_attrname || !psz_attrvalue )
+                        char *psz_attrvalue = xml_ReaderValue( p_xml_reader );
+                        if( !psz_attrvalue )
                         {
-                            free( psz_attrname );
                             free( psz_attrvalue );
                             break;
                         }
@@ -182,10 +180,9 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         {
                             msg_Warn( p_demux,
                                       "unexpected attribute %s in element %s",
-                                      psz_attrname, psz_eltname );
+                                      attrname, psz_eltname );
                             free( psz_attrvalue );
                         }
-                        free( psz_attrname );
                     }
                 }
                 free( psz_eltname );
@@ -286,15 +283,13 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                 // Read the attributes
                 if( !strcmp( psz_eltname, "tunein" ) )
                 {
-                    while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                    const char *attrname;
+                    while( (attrname = xml_ReaderNextAttr( p_xml_reader )) )
                     {
-                        char *psz_attrname = xml_ReaderName( p_xml_reader );
-                        char *psz_attrvalue =
-                            xml_ReaderValue( p_xml_reader );
-                        if( !psz_attrname || !psz_attrvalue )
+                        char *psz_attrvalue = xml_ReaderValue( p_xml_reader );
+                        if( !psz_attrvalue )
                         {
                             free( psz_eltname );
-                            free( psz_attrname );
                             free( psz_attrvalue );
                             return -1;
                         }
@@ -304,23 +299,20 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         {
                             msg_Warn( p_demux,
                                       "unexpected attribute %s in element %s",
-                                      psz_attrname, psz_eltname );
+                                      attrname, psz_eltname );
                             free( psz_attrvalue );
                         }
-                        free( psz_attrname );
                     }
                 }
                 else if( !strcmp( psz_eltname, "station" ) )
                 {
-                    while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                    const char *attrname;
+                    while( (attrname = xml_ReaderNextAttr( p_xml_reader )) )
                     {
-                        char *psz_attrname = xml_ReaderName( p_xml_reader );
-                        char *psz_attrvalue =
-                            xml_ReaderValue( p_xml_reader );
-                        if( !psz_attrname || !psz_attrvalue )
+                        char *psz_attrvalue = xml_ReaderValue( p_xml_reader );
+                        if( !psz_attrvalue )
                         {
                             free( psz_eltname );
-                            free( psz_attrname );
                             free( psz_attrvalue );
                             return -1;
                         }
@@ -338,10 +330,9 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         {
                             msg_Warn( p_demux,
                                       "unexpected attribute %s in element %s",
-                                      psz_attrname, psz_eltname );
+                                      attrname, psz_eltname );
                             free( psz_attrvalue );
                         }
-                        free( psz_attrname );
                     }
                 }
                 free( psz_eltname );

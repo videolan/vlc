@@ -73,7 +73,7 @@ struct xml_reader_t
     int (*pf_next_node) ( xml_reader_t * );
     char * (*pf_name) ( xml_reader_t * );
     char * (*pf_value) ( xml_reader_t * );
-    int (*pf_next_attr) ( xml_reader_t * );
+    const char *(*pf_next_attr) ( xml_reader_t * );
 
     int (*pf_use_dtd) ( xml_reader_t * );
 };
@@ -98,7 +98,7 @@ static inline char *xml_ReaderValue( xml_reader_t *reader )
   return reader->pf_value( reader );
 }
 
-static inline int xml_ReaderNextAttr( xml_reader_t *reader )
+static inline const char *xml_ReaderNextAttr( xml_reader_t *reader )
 {
   return reader->pf_next_attr( reader );
 }

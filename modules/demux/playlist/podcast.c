@@ -136,30 +136,29 @@ static int Demux( demux_t *p_demux )
                 }
 
                 // Read the attributes
-                while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                const char *attr;
+                while( (attr = xml_ReaderNextAttr( p_xml_reader )) )
                 {
-                    char *psz_name = xml_ReaderName( p_xml_reader );
                     char *psz_value = xml_ReaderValue( p_xml_reader );
-                    if( !psz_name || !psz_value )
+                    if( !psz_value )
                     {
-                        free( psz_name );
                         free( psz_value );
                         goto error;
                     }
 
                     if( !strcmp( psz_elname, "enclosure" ) )
                     {
-                        if( !strcmp( psz_name, "url" ) )
+                        if( !strcmp( attr, "url" ) )
                         {
                             free( psz_item_mrl );
                             psz_item_mrl = psz_value;
                         }
-                        else if( !strcmp( psz_name, "length" ) )
+                        else if( !strcmp( attr, "length" ) )
                         {
                             free( psz_item_size );
                             psz_item_size = psz_value;
                         }
-                        else if( !strcmp( psz_name, "type" ) )
+                        else if( !strcmp( attr, "type" ) )
                         {
                             free( psz_item_type );
                             psz_item_type = psz_value;
@@ -167,17 +166,16 @@ static int Demux( demux_t *p_demux )
                         else
                         {
                             msg_Dbg( p_demux,"unhandled attribute %s in element %s",
-                                     psz_name, psz_elname );
+                                     attr, psz_elname );
                             free( psz_value );
                         }
                     }
                     else
                     {
                         msg_Dbg( p_demux,"unhandled attribute %s in element %s",
-                                  psz_name, psz_elname );
+                                 attr, psz_elname );
                         free( psz_value );
                     }
-                    free( psz_name );
                 }
                 break;
             }

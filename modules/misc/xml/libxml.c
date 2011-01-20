@@ -63,7 +63,7 @@ vlc_module_end ()
 static int ReaderNextNode( xml_reader_t * );
 static char *ReaderName( xml_reader_t * );
 static char *ReaderValue( xml_reader_t * );
-static int ReaderNextAttr( xml_reader_t * );
+static const char *ReaderNextAttr( xml_reader_t * );
 
 static int ReaderUseDTD ( xml_reader_t * );
 
@@ -239,10 +239,11 @@ static char *ReaderValue( xml_reader_t *p_reader )
     return psz_value ? strdup( (const char *)psz_value ) : NULL;
 }
 
-static int ReaderNextAttr( xml_reader_t *p_reader )
+static const char *ReaderNextAttr( xml_reader_t *p_reader )
 {
-    return ( xmlTextReaderMoveToNextAttribute( (void *)p_reader->p_sys )
-             == 1 ) ? VLC_SUCCESS : VLC_EGENERIC;
+    if( xmlTextReaderMoveToNextAttribute( (void *)p_reader->p_sys ) != 1 )
+        return NULL;
+    return (const char *)xmlTextReaderConstValue( (void *)p_reader->p_sys );
 }
 
 static int StreamRead( void *p_context, char *p_buffer, int i_buffer )

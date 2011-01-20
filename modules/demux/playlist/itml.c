@@ -132,24 +132,22 @@ static bool parse_plist_node( demux_t *p_demux, input_item_node_t *p_input_node,
                               xml_elem_hnd_t *p_handlers )
 {
     VLC_UNUSED(p_track); VLC_UNUSED(psz_element);
-    char *psz_name;
+    const char *attr;
     char *psz_value;
     bool b_version_found = false;
 
     /* read all playlist attributes */
-    while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+    while( (attr = xml_ReaderNextAttr( p_xml_reader )) )
     {
-        psz_name = xml_ReaderName( p_xml_reader );
         psz_value = xml_ReaderValue( p_xml_reader );
-        if( !psz_name || !psz_value )
+        if( !psz_value )
         {
             msg_Err( p_demux, "invalid xml stream @ <plist>" );
-            free( psz_name );
             free( psz_value );
             return false;
         }
         /* attribute: version */
-        if( !strcmp( psz_name, "version" ) )
+        if( !strcmp( attr, "version" ) )
         {
             b_version_found = true;
             if( strcmp( psz_value, "1.0" ) )
@@ -157,9 +155,8 @@ static bool parse_plist_node( demux_t *p_demux, input_item_node_t *p_input_node,
         }
         /* unknown attribute */
         else
-            msg_Warn( p_demux, "invalid <plist> attribute:\"%s\"", psz_name);
+            msg_Warn( p_demux, "invalid <plist> attribute:\"%s\"", attr );
 
-        free( psz_name );
         free( psz_value );
     }
 

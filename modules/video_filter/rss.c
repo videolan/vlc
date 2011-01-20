@@ -719,27 +719,27 @@ static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
             /* atom */
             else if( !strcmp( psz_eltname, "link" ) )
             {
+                const char *name;
                 char *psz_href = NULL;
                 char *psz_rel = NULL;
-                while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+
+                while( (name = xml_ReaderNextAttr( p_xml_reader )) != NULL )
                 {
-                    char *psz_name = xml_ReaderName( p_xml_reader );
                     char *psz_value = xml_ReaderValue( p_xml_reader );
-                    if( !strcmp( psz_name, "rel" ) )
+                    if( !psz_value )
+                        continue;
+                    if( !strcmp( name, "rel" ) )
                     {
                         free( psz_rel );
                         psz_rel = psz_value;
                     }
-                    else if( !strcmp( psz_name, "href" ) )
+                    else if( !strcmp( name, "href" ) )
                     {
                         free( psz_href );
                         psz_href = psz_value;
                     }
                     else
-                    {
                         free( psz_value );
-                    }
-                    free( psz_name );
                 }
 
                 /* "rel" and "href" must be defined */
