@@ -1022,6 +1022,7 @@ modules/stream_out/dummy.c
 modules/stream_out/duplicate.c
 modules/stream_out/es.c
 modules/stream_out/gather.c
+modules/stream_out/langfromtelx.c
 modules/stream_out/mosaic_bridge.c
 modules/stream_out/raop.c
 modules/stream_out/record.c
