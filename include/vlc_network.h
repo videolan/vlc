@@ -75,6 +75,16 @@ struct msghdr
 #   define net_errno errno
 #endif
 
+#if defined( __SYMBIAN32__ )
+#undef AF_INET6
+#undef IN6_IS_ADDR_MULTICAST
+#undef IPV6_V6ONLY
+#undef IPV6_MULTICAST_HOPS
+#undef IPV6_MULTICAST_IF
+#undef IPV6_TCLASS
+#undef IPV6_JOIN_GROUP
+#endif
+
 int vlc_socket (int, int, int, bool nonblock) LIBVLC_USED;
 
 struct sockaddr;
