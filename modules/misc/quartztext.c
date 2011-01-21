@@ -833,10 +833,21 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                     else
                     {
                         /* Only text and karaoke tags are supported */
-                        xml_ReaderDelete( p_xml_reader );
-                        p_xml_reader = NULL;
+                        msg_Dbg( p_filter, "Unsupported top-level tag "
+                                           "<%s> ignored.", name );
                         rv = VLC_EGENERIC;
                     }
+                }
+                else
+                {
+                    msg_Err( p_filter, "Malformed HTML subtitle" );
+                    rv = VLC_EGENERIC;
+                }
+
+                if( rv != VLC_SUCCESS )
+                {
+                    xml_ReaderDelete( p_xml_reader );
+                    p_xml_reader = NULL;
                 }
             }
 
