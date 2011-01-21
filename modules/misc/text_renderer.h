@@ -514,8 +514,6 @@ static int ProcessNodes( filter_t *p_filter,
     vlc_value_t   val;
     int           i_scale        = 1000;
 
-    char *psz_node  = NULL;
-
     bool b_italic = false;
     bool b_bold   = false;
     bool b_uline  = false;
