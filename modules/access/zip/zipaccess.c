@@ -152,11 +152,13 @@ int AccessOpen( vlc_object_t *p_this )
     if( !file )
     {
         msg_Err( p_access, "not a valid zip archive: '%s'", psz_pathToZip );
+        i_ret = VLC_EGENERIC;
         goto exit;
     }
 
     /* Open file in zip */
-    OpenFileInZip( p_access );
+    if( ( i_ret = OpenFileInZip( p_access ) ) != VLC_SUCCESS )
+        goto exit;
 
     /* Set callback */
     ACCESS_SET_CALLBACKS( AccessRead, NULL, AccessControl, AccessSeek );
