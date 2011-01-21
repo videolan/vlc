@@ -50,7 +50,6 @@ private:
     bool b_isSliding; /* Whether we are currently sliding by user action */
     int inputLength;  /* InputLength that can change */
     char psz_length[MSTRTIME_MAX_SIZE]; /* Used for the ToolTip */
-    int lastSeeked;
     QTimer *timer;
 
 public slots:

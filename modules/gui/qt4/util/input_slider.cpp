@@ -41,8 +41,8 @@ InputSlider::InputSlider( Qt::Orientation q, QWidget *_parent ) :
                                  QSlider( q, _parent )
 {
     b_isSliding = false;
-    lastSeeked  = 0;
 
+    /* Timer used to fire intermediate seekTick() when sliding */
     timer = new QTimer(this);
     timer->setSingleShot(true);
 
@@ -58,7 +58,7 @@ InputSlider::InputSlider( Qt::Orientation q, QWidget *_parent ) :
     setPosition( -1.0, 0, 0 );
     secstotimestr( psz_length, 0 );
 
-    CONNECT( this, valueChanged(int), this, userDrag( int ) );
+    CONNECT( this, sliderMoved(int), this, userDrag( int ) );
     CONNECT( timer, timeout(), this, seekTick() );
 }
 
@@ -80,25 +80,24 @@ void InputSlider::setPosition( float pos, int64_t a, int b )
 
 void InputSlider::userDrag( int new_value )
 {
+    /* Only fire one update, when sliding, every 150ms */
     if( b_isSliding && !timer->isActive() )
         timer->start( 150 );
 }
 
 void InputSlider::seekTick()
 {
-    if( value() != lastSeeked )
-    {
-        lastSeeked = value();
-        float f_pos = (float)(lastSeeked)/1000.0;
-        emit sliderDragged( f_pos );
-    }
+    float f_pos = (float)(value())/1000.0;
+    emit sliderDragged( f_pos ); /* Send new position to our video */
 }
 
 void InputSlider::mouseReleaseEvent( QMouseEvent *event )
 {
+    timer->stop(); /* We're not sliding anymore: only last seek on release */
     b_isSliding = false;
     event->accept();
     QSlider::mouseReleaseEvent( event );
+    seekTick();
 }
 
 void InputSlider::mousePressEvent(QMouseEvent* event)
@@ -116,8 +115,6 @@ void InputSlider::mousePressEvent(QMouseEvent* event)
         Qt::MouseButtons( event->buttons() ^ Qt::LeftButton ^ Qt::MidButton ),
         event->modifiers() );
     QSlider::mousePressEvent( &newEvent );
-
-    seekTick();
 }
 
 void InputSlider::mouseMoveEvent(QMouseEvent *event)
