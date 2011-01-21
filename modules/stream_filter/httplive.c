@@ -339,8 +339,29 @@ static int live_ChooseSegment(stream_t *s, int current)
     stream_sys_t *p_sys = (stream_sys_t *)s->p_sys;
     hls_stream_t *hls = hls_Get(p_sys->hls_stream, current);
     if (hls == NULL) return 0;
-    int wanted = vlc_array_count(hls->segments) - 4;
-    return (wanted < 0) ? 0 : wanted;
+
+    /* Choose a segment to start which is no closer then
+     * 3 times the target duration from the end of the playlist.
+     */
+    int wanted = -1;
+    int duration = 0;
+    int count = vlc_array_count(hls->segments);
+    for (int i = count; i >= 0; i--)
+    {
+        segment_t *segment = segment_GetSegment(hls, i);
+        if (segment)
+        {
+            duration += segment->duration;
+            if (duration >= 3 * hls->duration)
+            {
+                /* Start point found */
+                wanted = i;
+                break;
+            }
+        }
+    }
+
+    return wanted;
 }
 
 /* Parsing */
@@ -961,25 +982,7 @@ static int parse_HTTPLiveStreaming(stream_t *s)
         }
 
         vlc_mutex_lock(&hls->lock);
-        if (p_sys->b_live)
-        {
-            /* There should at least be 3 segments of hls->duration */
-            int ok = 0;
-            int num = vlc_array_count(hls->segments);
-            for (int i = 0; i < num; i++)
-            {
-                segment_t *segment = segment_GetSegment(hls, i);
-                if (segment && segment->duration >= hls->duration)
-                    ok++;
-            }
-            if (ok < 3)
-            {
-                msg_Err(s, "cannot start live playback at this time, try again later.");
-                vlc_mutex_unlock(&hls->lock);
-                return VLC_EGENERIC;
-            }
-        }
-        else
+        if (!p_sys->b_live)
         {
             /* Stream size (approximate) */
             hls->size = hls_GetStreamSize(hls);
@@ -1576,6 +1579,12 @@ static int Open(vlc_object_t *p_this)
     int current = p_sys->playback.stream = 0;
     p_sys->playback.segment = p_sys->download.segment =
             p_sys->b_live ? live_ChooseSegment(s, current) : 0;
+
+    if (p_sys->b_live && (p_sys->playback.segment < 0))
+    {
+        msg_Err(s, "not enough data available for live playback, try again later");
+        goto fail;
+    }
 
     if (Prefetch(s, &current) != VLC_SUCCESS)
     {
