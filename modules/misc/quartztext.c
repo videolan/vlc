@@ -483,6 +483,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     uint32_t   i_font_color = 0xffffff;
     int        i_font_alpha = 0;
     int        i_font_size  = 24;
+    const char *attr;
 
     // Default all attributes to the top font in the stack -- in case not
     // all attributes are specified in the sub-font
@@ -497,49 +498,48 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     i_font_alpha = (i_font_color >> 24) & 0xff;
     i_font_color &= 0x00ffffff;
 
-    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+    while ( (attr = xml_ReaderNextAttr( p_xml_reader )) )
     {
-        char *psz_name = xml_ReaderName( p_xml_reader );
         char *psz_value = xml_ReaderValue( p_xml_reader );
 
-        if( psz_name && psz_value )
-        {
-            if( !strcasecmp( "face", psz_name ) )
-            {
-                free( psz_fontname );
-                psz_fontname = strdup( psz_value );
-            }
-            else if( !strcasecmp( "size", psz_name ) )
-            {
-                if( ( *psz_value == '+' ) || ( *psz_value == '-' ) )
-                {
-                    int i_value = atoi( psz_value );
+        if( !psz_value )
+            continue;
 
-                    if( ( i_value >= -5 ) && ( i_value <= 5 ) )
-                        i_font_size += ( i_value * i_font_size ) / 10;
-                    else if( i_value < -5 )
-                        i_font_size = - i_value;
-                    else if( i_value > 5 )
-                        i_font_size = i_value;
-                }
-                else
-                    i_font_size = atoi( psz_value );
-            }
-            else if( !strcasecmp( "color", psz_name )  &&
-                     ( psz_value[0] == '#' ) )
-            {
-                i_font_color = strtol( psz_value + 1, NULL, 16 );
-                i_font_color &= 0x00ffffff;
-            }
-            else if( !strcasecmp( "alpha", psz_name ) &&
-                     ( psz_value[0] == '#' ) )
-            {
-                i_font_alpha = strtol( psz_value + 1, NULL, 16 );
-                i_font_alpha &= 0xff;
-            }
-            free( psz_name );
-            free( psz_value );
+        if( !strcasecmp( "face", attr ) )
+        {
+            free( psz_fontname );
+            psz_fontname = strdup( psz_value );
         }
+        else if( !strcasecmp( "size", attr ) )
+        {
+            if( ( *psz_value == '+' ) || ( *psz_value == '-' ) )
+            {
+                int i_value = atoi( psz_value );
+
+                if( ( i_value >= -5 ) && ( i_value <= 5 ) )
+                    i_font_size += ( i_value * i_font_size ) / 10;
+                else if( i_value < -5 )
+                    i_font_size = - i_value;
+                else if( i_value > 5 )
+                    i_font_size = i_value;
+            }
+            else
+                i_font_size = atoi( psz_value );
+        }
+        else if( !strcasecmp( "color", attr )  &&
+                 ( psz_value[0] == '#' ) )
+        {
+            i_font_color = strtol( psz_value + 1, NULL, 16 );
+            i_font_color &= 0x00ffffff;
+        }
+        else if( !strcasecmp( "alpha", attr ) &&
+                 ( psz_value[0] == '#' ) )
+        {
+            i_font_alpha = strtol( psz_value + 1, NULL, 16 );
+            i_font_alpha &= 0xff;
+        }
+
+        free( psz_value );
     }
     rv = PushFont( p_fonts,
                    psz_fontname,
@@ -662,7 +662,8 @@ static int ProcessNodes( filter_t *p_filter,
     vlc_value_t   val;
     int           i_scale        = 1000;
 
-    char *psz_node  = NULL;
+    int type;
+    const char *node;
 
     bool b_italic = false;
     bool b_bold   = false;
@@ -696,96 +697,79 @@ static int ProcessNodes( filter_t *p_filter,
     if( rv != VLC_SUCCESS )
         return rv;
 
-    while ( ( xml_ReaderRead( p_xml_reader ) == 1 ) )
+    while ( ( type = xml_ReaderNextNode( p_xml_reader, &node ) ) > 0 )
     {
-        switch ( xml_ReaderNodeType( p_xml_reader ) )
+        switch ( type )
         {
-            case XML_READER_NONE:
-                break;
             case XML_READER_ENDELEM:
-                psz_node = xml_ReaderName( p_xml_reader );
+                if( !strcasecmp( "font", node ) )
+                    PopFont( &p_fonts );
+                else if( !strcasecmp( "b", node ) )
+                    b_bold   = false;
+                else if( !strcasecmp( "i", node ) )
+                    b_italic = false;
+                else if( !strcasecmp( "u", node ) )
+                    b_uline  = false;
 
-                if( psz_node )
-                {
-                    if( !strcasecmp( "font", psz_node ) )
-                        PopFont( &p_fonts );
-                    else if( !strcasecmp( "b", psz_node ) )
-                        b_bold   = false;
-                    else if( !strcasecmp( "i", psz_node ) )
-                        b_italic = false;
-                    else if( !strcasecmp( "u", psz_node ) )
-                        b_uline  = false;
-
-                    free( psz_node );
-                }
                 break;
             case XML_READER_STARTELEM:
-                psz_node = xml_ReaderName( p_xml_reader );
-                if( psz_node )
+                if( !strcasecmp( "font", node ) )
+                    rv = HandleFontAttributes( p_xml_reader, &p_fonts, i_scale );
+                else if( !strcasecmp( "b", node ) )
+                    b_bold = true;
+                else if( !strcasecmp( "i", node ) )
+                    b_italic = true;
+                else if( !strcasecmp( "u", node ) )
+                    b_uline = true;
+                else if( !strcasecmp( "br", node ) )
                 {
-                    if( !strcasecmp( "font", psz_node ) )
-                        rv = HandleFontAttributes( p_xml_reader, &p_fonts, i_scale );
-                    else if( !strcasecmp( "b", psz_node ) )
-                        b_bold = true;
-                    else if( !strcasecmp( "i", psz_node ) )
-                        b_italic = true;
-                    else if( !strcasecmp( "u", psz_node ) )
-                        b_uline = true;
-                    else if( !strcasecmp( "br", psz_node ) )
-                    {
-                        CFMutableAttributedStringRef p_attrnode = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
-                        CFAttributedStringReplaceString( p_attrnode, CFRangeMake(0, 0), CFSTR("\n") );
-
-                        GetAttrStrFromFontStack( &p_fonts, b_bold, b_italic, b_uline,
-                                                 CFRangeMake( 0, 1 ),
-                                                 p_attrnode );
-                        CFAttributedStringReplaceAttributedString( p_attrString,
-                                        CFRangeMake(CFAttributedStringGetLength(p_attrString), 0),
-                                        p_attrnode);
-                        CFRelease( p_attrnode );
-                    }
-                    free( psz_node );
-                }
-                break;
-            case XML_READER_TEXT:
-                psz_node = xml_ReaderValue( p_xml_reader );
-                if( psz_node )
-                {
-                    CFStringRef   p_cfString;
-                    int           len;
-
-                    // Turn any multiple-whitespaces into single spaces
-                    char *s = strpbrk( psz_node, "\t\r\n " );
-                    while( s )
-                    {
-                        int i_whitespace = strspn( s, "\t\r\n " );
-
-                        if( i_whitespace > 1 )
-                            memmove( &s[1],
-                                     &s[i_whitespace],
-                                     strlen( s ) - i_whitespace + 1 );
-                        *s++ = ' ';
-
-                        s = strpbrk( s, "\t\r\n " );
-                    }
-
-
                     CFMutableAttributedStringRef p_attrnode = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
-                    p_cfString = CFStringCreateWithCString( NULL, psz_node, kCFStringEncodingUTF8 );
-                    CFAttributedStringReplaceString( p_attrnode, CFRangeMake(0, 0), p_cfString );
-                    CFRelease( p_cfString );
-                    len = CFAttributedStringGetLength( p_attrnode );
+                    CFAttributedStringReplaceString( p_attrnode, CFRangeMake(0, 0), CFSTR("\n") );
 
                     GetAttrStrFromFontStack( &p_fonts, b_bold, b_italic, b_uline,
-                                             CFRangeMake( 0, len ),
+                                             CFRangeMake( 0, 1 ),
                                              p_attrnode );
-
                     CFAttributedStringReplaceAttributedString( p_attrString,
                                     CFRangeMake(CFAttributedStringGetLength(p_attrString), 0),
                                     p_attrnode);
                     CFRelease( p_attrnode );
-                    free( psz_node );
                 }
+                break;
+            case XML_READER_TEXT:
+                CFStringRef   p_cfString;
+                int           len;
+
+                // Turn any multiple-whitespaces into single spaces
+                char *s = strpbrk( node, "\t\r\n " );
+                while( s )
+                {
+                    int i_whitespace = strspn( s, "\t\r\n " );
+
+                    if( i_whitespace > 1 )
+                        memmove( &s[1],
+                                 &s[i_whitespace],
+                                 strlen( s ) - i_whitespace + 1 );
+                    *s++ = ' ';
+
+                    s = strpbrk( s, "\t\r\n " );
+                }
+
+
+                CFMutableAttributedStringRef p_attrnode = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
+                p_cfString = CFStringCreateWithCString( NULL, node, kCFStringEncodingUTF8 );
+                CFAttributedStringReplaceString( p_attrnode, CFRangeMake(0, 0), p_cfString );
+                CFRelease( p_cfString );
+                len = CFAttributedStringGetLength( p_attrnode );
+
+                GetAttrStrFromFontStack( &p_fonts, b_bold, b_italic, b_uline,
+                                         CFRangeMake( 0, len ),
+                                         p_attrnode );
+
+                CFAttributedStringReplaceAttributedString( p_attrString,
+                                CFRangeMake(CFAttributedStringGetLength(p_attrString), 0),
+                                p_attrnode);
+                CFRelease( p_attrnode );
+
                 break;
         }
     }
@@ -824,11 +808,11 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
             if( p_xml_reader )
             {
                 /* Look for Root Node */
-                if( xml_ReaderRead( p_xml_reader ) == 1 )
+                const char *name;
+                if( xml_ReaderNextNode( p_xml_reader, &name )
+                        == XML_READER_STARTELEM )
                 {
-                    char *psz_node = xml_ReaderName( p_xml_reader );
-
-                    if( !strcasecmp( "karaoke", psz_node ) )
+                    if( !strcasecmp( "karaoke", name ) )
                     {
                         /* We're going to have to render the text a number
                          * of times to show the progress marker on the text.
@@ -836,7 +820,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                         var_SetBool( p_filter, "text-rerender", true );
                         b_karaoke = true;
                     }
-                    else if( !strcasecmp( "text", psz_node ) )
+                    else if( !strcasecmp( "text", name ) )
                     {
                         b_karaoke = false;
                     }
@@ -847,8 +831,6 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                         p_xml_reader = NULL;
                         rv = VLC_EGENERIC;
                     }
-
-                    free( psz_node );
                 }
             }
 
