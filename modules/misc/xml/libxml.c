@@ -272,7 +272,7 @@ static const char *ReaderNextAttr( xml_reader_t *p_reader )
 {
     if( xmlTextReaderMoveToNextAttribute( p_reader->p_sys->xml ) != 1 )
         return NULL;
-    return (const char *)xmlTextReaderConstValue( p_reader->p_sys->xml );
+    return (const char *)xmlTextReaderConstName( p_reader->p_sys->xml );
 }
 
 static int StreamRead( void *p_context, char *p_buffer, int i_buffer )
