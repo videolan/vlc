@@ -128,16 +128,31 @@ int AccessOpen( vlc_object_t *p_this )
         msg_Dbg( p_access, "not an encoded URL  Trying file '%s'",
                  psz_path );
         psz_pathToZip = strdup( psz_path );
+        if( !psz_pathToZip )
+        {
+            i_ret = VLC_ENOMEM;
+            goto exit;
+        }
     }
     p_sys->psz_fileInzip = unescapeXml( psz_sep + ZIP_SEP_LEN );
     if( !p_sys->psz_fileInzip )
     {
         p_sys->psz_fileInzip = strdup( psz_sep + ZIP_SEP_LEN );
+        if( !p_sys->psz_fileInzip )
+        {
+            i_ret = VLC_ENOMEM;
+            goto exit;
+        }
     }
 
     /* Define IO functions */
     zlib_filefunc_def *p_func = (zlib_filefunc_def*)
                                     calloc( 1, sizeof( zlib_filefunc_def ) );
+    if( !p_func )
+    {
+        i_ret = VLC_ENOMEM;
+        goto exit;
+    }
     p_func->zopen_file   = ZipIO_Open;
     p_func->zread_file   = ZipIO_Read;
     p_func->zwrite_file  = ZipIO_Write; // see comment
@@ -375,7 +390,8 @@ static void* ZCALLBACK ZipIO_Open( void* opaque, const char* file, int mode )
     access_t *p_access = (access_t*) opaque;
 
     char *fileUri = malloc( strlen(file) + 8 );
-    if( !fileUri ) return VLC_ENOMEM;
+    if( !fileUri )
+        return NULL;
     if( !strstr( file, "://" ) )
     {
         strcpy( fileUri, "file://" );
