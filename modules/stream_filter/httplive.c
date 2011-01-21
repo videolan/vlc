@@ -394,15 +394,17 @@ static char *relative_URI(stream_t *s, const char *uri, const char *path)
     char *psz_uri = NULL;
     if (p_sys->m3u8.psz_password || p_sys->m3u8.psz_username)
     {
-        if (asprintf(&psz_uri, "%s://%s:%s@%s%s/%s", p_sys->m3u8.psz_protocol,
+        if (asprintf(&psz_uri, "%s://%s:%s@%s:%d%s/%s", p_sys->m3u8.psz_protocol,
                      p_sys->m3u8.psz_username, p_sys->m3u8.psz_password,
-                     p_sys->m3u8.psz_host, path ? path : psz_path, uri) < 0)
+                     p_sys->m3u8.psz_host, p_sys->m3u8.i_port,
+                     path ? path : psz_path, uri) < 0)
             goto fail;
     }
     else
     {
-        if (asprintf(&psz_uri, "%s://%s%s/%s", p_sys->m3u8.psz_protocol,
-                 p_sys->m3u8.psz_host, path ? path : psz_path, uri) < 0)
+        if (asprintf(&psz_uri, "%s://%s:%d%s/%s", p_sys->m3u8.psz_protocol,
+                     p_sys->m3u8.psz_host, p_sys->m3u8.i_port,
+                     path ? path : psz_path, uri) < 0)
            goto fail;
     }
     free(psz_path);
@@ -961,7 +963,6 @@ static int parse_HTTPLiveStreaming(stream_t *s)
         vlc_mutex_lock(&hls->lock);
         if (p_sys->b_live)
         {
-
             /* There should at least be 3 segments of hls->duration */
             int ok = 0;
             int num = vlc_array_count(hls->segments);
@@ -1372,13 +1373,21 @@ static int AccessOpen(stream_t *s, vlc_url_t *url)
     if (p_sys->p_access == NULL)
         return VLC_ENOMEM;
 
+    if (url->i_port <= 0)
+    {
+        if (strncmp(url->psz_protocol, "https", 5) == 0)
+            url->i_port = 443;
+        else
+            url->i_port = 80;
+    }
+
     p_sys->p_access->psz_access = strdup(url->psz_protocol);
     p_sys->p_access->psz_filepath = strdup(url->psz_path);
     if (url->psz_password || url->psz_username)
     {
-        if (asprintf(&p_sys->p_access->psz_location, "%s:%s@%s%s",
+        if (asprintf(&p_sys->p_access->psz_location, "%s:%s@%s:%d%s",
                      url->psz_username, url->psz_password,
-                     url->psz_host, url->psz_path) < 0)
+                     url->psz_host, url->i_port, url->psz_path) < 0)
         {
             msg_Err(s, "creating http access module");
             goto fail;
@@ -1386,16 +1395,17 @@ static int AccessOpen(stream_t *s, vlc_url_t *url)
     }
     else
     {
-        if (asprintf(&p_sys->p_access->psz_location, "%s%s",
-                     url->psz_host, url->psz_path) < 0)
+        if (asprintf(&p_sys->p_access->psz_location, "%s:%d%s",
+                     url->psz_host, url->i_port, url->psz_path) < 0)
         {
             msg_Err(s, "creating http access module");
             goto fail;
         }
     }
+
     vlc_object_attach(p_sys->p_access, s);
     p_sys->p_access->p_module =
-        module_need(p_sys->p_access, "access", "http", true);
+        module_need(p_sys->p_access, "access", p_sys->p_access->psz_access, true);
     if (p_sys->p_access->p_module == NULL)
     {
         msg_Err(s, "could not load http access module");
