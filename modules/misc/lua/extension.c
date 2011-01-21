@@ -176,6 +176,7 @@ void Close_Extension( vlc_object_t *p_this )
         free( p_ext->psz_shortdescription );
         free( p_ext->psz_url );
         free( p_ext->psz_version );
+        free( p_ext->p_icondata );
 
         vlc_mutex_destroy( &p_ext->p_sys->running_lock );
         vlc_mutex_destroy( &p_ext->p_sys->command_lock );
@@ -217,7 +218,50 @@ static int ScanExtensions( extensions_manager_t *p_mgr )
 static int vlclua_dummy_require( lua_State *L )
 {
     (void) L;
-    // const char *psz_module = luaL_checkstring( L, 1 );
+    return 0;
+}
+
+/**
+ * Replacement for "require", adding support for packaged extensions
+ * @note Loads modules in the modules/ folder of a package
+ * @note Try first with .luac and then with .lua
+ **/
+static int vlclua_extension_require( lua_State *L )
+{
+    const char *psz_module = luaL_checkstring( L, 1 );
+    vlc_object_t *p_this = vlclua_get_this( L );
+    extension_t *p_ext = vlclua_extension_get( L );
+    msg_Dbg( p_this, "loading module '%s' from extension package",
+             psz_module );
+    char *psz_fullpath, *psz_package, *sep;
+    psz_package = strdup( p_ext->psz_name );
+    sep = strrchr( psz_package, '/' );
+    if( !sep )
+    {
+        free( psz_package );
+        return luaL_error( L, "could not find package name" );
+    }
+    *sep = '\0';
+    if( -1 == asprintf( &psz_fullpath,
+                        "%s/modules/%s.luac", psz_package, psz_module ) )
+    {
+        free( psz_package );
+        return 1;
+    }
+    int i_ret = vlclua_dofile( p_this, L, psz_fullpath );
+    if( i_ret != 0 )
+    {
+        // Remove trailing 'c' --> try with .lua script
+        psz_fullpath[ strlen( psz_fullpath ) - 1 ] = '\0';
+        i_ret = vlclua_dofile( p_this, L, psz_fullpath );
+    }
+    free( psz_fullpath );
+    free( psz_package );
+    if( i_ret != 0 )
+    {
+        return luaL_error( L, "unable to load module '%s' from package",
+                           psz_module );
+    }
     return 0;
 }
 
@@ -243,7 +287,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
     if( !strncasecmp( psz_filename + i_flen - 4, ".vle", 4 ) )
     {
         msg_Dbg( p_this, "reading Lua script in a zip archive" );
-        psz_script = calloc( 1, i_flen + 6 + 2 + 10 + 1 );
+        psz_script = calloc( 1, i_flen + 6 + 12 + 1 );
         if( !psz_script )
             return 0;
         strcpy( psz_script, "zip://" );
@@ -792,18 +836,27 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
             lua_setfield( L, -2, "keep_alive" );
 
             /* Setup the module search path */
-            if( vlclua_add_modules_path( p_mgr, L, p_ext->psz_name ) )
+            if( !strncmp( p_ext->psz_name, "zip://", 6 ) )
             {
-                msg_Warn( p_mgr, "Error while setting the module search path for %s", p_ext->psz_name );
-                return NULL;
+                /* Load all required modules manually */
+                lua_register( L, "require", &vlclua_extension_require );
             }
-
+            else
+            {
+                if( vlclua_add_modules_path( p_mgr, L, p_ext->psz_name ) )
+                {
+                    msg_Warn( p_mgr, "Error while setting the module "
+                              "search path for %s", p_ext->psz_name );
+                    lua_close( L );
+                    return NULL;
+                }
+            }
             /* Load and run the script(s) */
-            if( vlclua_dofile( p_mgr, L, p_ext->psz_name ) ) // luaL_dofile
+            if( vlclua_dofile( VLC_OBJECT( p_mgr ), L, p_ext->psz_name ) )
             {
                 msg_Warn( p_mgr, "Error loading script %s: %s", p_ext->psz_name,
                           lua_tostring( L, lua_gettop( L ) ) );
-                lua_pop( L, 1 );
+                lua_close( L );
                 return NULL;
             }
 
@@ -842,6 +895,9 @@ int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
     assert( p_ext != NULL );
 
     lua_State *L = GetLuaState( p_mgr, p_ext );
+    if( !L )
+        return -1;
+
     if( psz_function )
         lua_getglobal( L, psz_function );
 

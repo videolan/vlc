@@ -849,7 +849,9 @@ int vlclua_dofile( vlc_object_t *p_this, lua_State *L, const char *uri )
         return luaL_dofile( L, uri + 7 );
     stream_t *s = stream_UrlNew( p_this, uri );
     if( !s )
+    {
         return 1;
+    }
     int64_t i_size = stream_Size( s );
     char *p_buffer = ( i_size > 0 ) ? malloc( i_size ) : NULL;
     if( !p_buffer )
@@ -868,4 +870,3 @@ int vlclua_dofile( vlc_object_t *p_this, lua_State *L, const char *uri )
     free( p_buffer );
     return i_ret;
 }
-

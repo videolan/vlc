@@ -85,7 +85,9 @@ int Activate( extensions_manager_t *p_mgr, extension_t *p_ext )
     return VLC_SUCCESS;
 }
 
-/** Look for an extension in the activated extensions list */
+/** Look for an extension in the activated extensions list
+ * @todo FIXME Should be entered with the lock held
+ **/
 bool IsActivated( extensions_manager_t *p_mgr, extension_t *p_ext )
 {
     assert( p_ext != NULL );
