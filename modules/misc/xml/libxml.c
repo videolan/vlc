@@ -200,9 +200,9 @@ static void ReaderClose( vlc_object_t *p_this )
 static int ReaderUseDTD ( xml_reader_t *p_reader )
 {
     /* Activate DTD validation */
-    xmlTextReaderSetParserProp( (void *)p_reader->p_sys,
+    xmlTextReaderSetParserProp( p_reader->p_sys->xml,
                                 XML_PARSER_DEFAULTATTRS, true );
-    xmlTextReaderSetParserProp( (void *)p_reader->p_sys,
+    xmlTextReaderSetParserProp( p_reader->p_sys->xml,
                                 XML_PARSER_VALIDATE, true );
 
     return VLC_SUCCESS;
@@ -263,16 +263,16 @@ skip:
 static char *ReaderValue( xml_reader_t *p_reader )
 {
     const xmlChar *psz_value =
-        xmlTextReaderConstValue( (void *)p_reader->p_sys );
+        xmlTextReaderConstValue( p_reader->p_sys->xml );
 
     return psz_value ? strdup( (const char *)psz_value ) : NULL;
 }
 
 static const char *ReaderNextAttr( xml_reader_t *p_reader )
 {
-    if( xmlTextReaderMoveToNextAttribute( (void *)p_reader->p_sys ) != 1 )
+    if( xmlTextReaderMoveToNextAttribute( p_reader->p_sys->xml ) != 1 )
         return NULL;
-    return (const char *)xmlTextReaderConstValue( (void *)p_reader->p_sys );
+    return (const char *)xmlTextReaderConstValue( p_reader->p_sys->xml );
 }
 
 static int StreamRead( void *p_context, char *p_buffer, int i_buffer )
