@@ -149,15 +149,18 @@ static int ReaderOpen( vlc_object_t *p_this )
     xml_reader_sys_t *p_sys = malloc( sizeof( *p_sys ) );
     xmlTextReaderPtr p_libxml_reader;
 
+    if( unlikely(!p_sys) )
+        return VLC_ENOMEM;
+
     if( !xmlHasFeature( XML_WITH_THREAD ) )
+    {
+        free( p_sys );
         return VLC_EGENERIC;
+    }
 
     vlc_mutex_lock( &lock );
     xmlInitParser();
     vlc_mutex_unlock( &lock );
-
-    if( unlikely(!p_sys) )
-        return VLC_ENOMEM;
 
     p_libxml_reader = xmlReaderForIO( StreamRead, NULL, p_reader->p_stream,
                                       NULL, NULL, 0 );
