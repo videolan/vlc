@@ -34,6 +34,7 @@ class QObject;
 class QGridLayout;
 class QSignalMapper;
 class QCloseEvent;
+class QKeyEvent;
 
 class ExtensionsDialogProvider;
 class ExtensionDialog;
@@ -106,6 +107,7 @@ private:
 
 protected:
     virtual void closeEvent( QCloseEvent* );
+    virtual void keyPressEvent( QKeyEvent* );
 
 private slots:
     int TriggerClick( QObject *object );

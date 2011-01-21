@@ -38,6 +38,7 @@
 #include <QComboBox>
 #include <QCloseEvent>
 #include <QCoreApplication>
+#include <QKeyEvent>
 #include "util/customwidgets.hpp"
 
 ExtensionsDialogProvider *ExtensionsDialogProvider::instance = NULL;
@@ -679,6 +680,21 @@ void ExtensionDialog::closeEvent( QCloseEvent *event )
     msg_Dbg( p_intf, "Dialog '%s' received a closeEvent",
              p_dialog->psz_title );
     extension_DialogClosed( p_dialog );
+}
+
+/** Grab some keyboard input (ESC, ...) and handle actions manually */
+void ExtensionDialog::keyPressEvent( QKeyEvent *event )
+{
+    assert( p_dialog != NULL );
+    switch( event->key() )
+    {
+    case Qt::Key_Escape:
+        close();
+        return;
+    default:
+        QDialog::keyPressEvent( event );
+        return;
+    }
 }
 
 void ExtensionDialog::parentDestroyed()
