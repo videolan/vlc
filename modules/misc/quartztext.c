@@ -736,6 +736,7 @@ static int ProcessNodes( filter_t *p_filter,
                 }
                 break;
             case XML_READER_TEXT:
+            {
                 CFStringRef   p_cfString;
                 int           len;
 
@@ -771,6 +772,7 @@ static int ProcessNodes( filter_t *p_filter,
                 CFRelease( p_attrnode );
 
                 break;
+            }
         }
     }
 
