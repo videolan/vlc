@@ -741,7 +741,10 @@ static int ProcessNodes( filter_t *p_filter,
                 int           len;
 
                 // Turn any multiple-whitespaces into single spaces
-                char *s = strpbrk( node, "\t\r\n " );
+                char *dup = strdup( node );
+                if( !dup )
+                    break;
+                char *s = strpbrk( dup, "\t\r\n " );
                 while( s )
                 {
                     int i_whitespace = strspn( s, "\t\r\n " );
@@ -757,7 +760,7 @@ static int ProcessNodes( filter_t *p_filter,
 
 
                 CFMutableAttributedStringRef p_attrnode = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
-                p_cfString = CFStringCreateWithCString( NULL, node, kCFStringEncodingUTF8 );
+                p_cfString = CFStringCreateWithCString( NULL, dup, kCFStringEncodingUTF8 );
                 CFAttributedStringReplaceString( p_attrnode, CFRangeMake(0, 0), p_cfString );
                 CFRelease( p_cfString );
                 len = CFAttributedStringGetLength( p_attrnode );
@@ -771,6 +774,7 @@ static int ProcessNodes( filter_t *p_filter,
                                 p_attrnode);
                 CFRelease( p_attrnode );
 
+                free( dup );
                 break;
             }
         }
