@@ -36,16 +36,15 @@ local function parsexml(stream, errormsg)
 
     local tree
     local parents = {}
-    local nodetype = reader:next_node()
+    local nodetype, nodename = reader:next_node()
 
     while nodetype > 0 do
-        --print(nodetype, reader:name())
         if nodetype == 1 then
-            local name = reader:name()
-            local node = { name= '', attributes= {}, children= {} }
-            node.name = name
-            while reader:next_attr() == 0 do
-                node.attributes[reader:name()] = reader:value()
+            local node = { name= nodename, attributes= {}, children= {} }
+            local attr = reader:next_attr()
+            while attr ~= nil do
+                node.attributes[attr] = reader:value()
+                attr = reader:next_attr()
             end
             if tree then
                 table.insert(tree.children, node)
@@ -54,10 +53,8 @@ local function parsexml(stream, errormsg)
             tree = node
         elseif nodetype == 2 then
             if #parents > 0 then
-                local name = reader:name()
                 local tmp = {}
-                --print(name, tree.name, #parents)
-                while name ~= tree.name do
+                while nodename ~= tree.name do
                     if #parents == 0 then
                         error("XML parser error/faulty logic")
                     end
@@ -80,6 +77,7 @@ local function parsexml(stream, errormsg)
         elseif nodetype == 3 then
             table.insert(tree.children, reader:value())
         end
+        nodetype, nodename = reader:next_node()
     end
 
     if #parents > 0 then
@@ -108,3 +106,4 @@ function add_name_maps(tree)
         end
     end
 end
+
