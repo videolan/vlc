@@ -29,6 +29,7 @@
       --enable-libcddb \
       --enable-zvbi --disable-telx \
       --enable-sqlite \
+      --enable-media-library \
       --disable-dvb \
       --disable-dirac \
       --enable-peflags \
