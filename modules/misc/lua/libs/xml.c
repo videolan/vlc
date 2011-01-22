@@ -140,7 +140,7 @@ static int vlclua_xml_reader_next_attr( lua_State *L )
 
     lua_pushstring( L, xml_ReaderNextAttr( p_reader, &psz_value ) );
     lua_pushstring( L, psz_value );
-    return 1;
+    return 2;
 }
 
 void luaopen_xml( lua_State *L )

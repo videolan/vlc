@@ -75,7 +75,7 @@ local function parsexml(stream, errormsg)
                 table.remove(parents)
             end
         elseif nodetype == 3 then
-            table.insert(tree.children, reader:value())
+            table.insert(tree.children, nodename)
         end
         nodetype, nodename = reader:next_node()
     end
