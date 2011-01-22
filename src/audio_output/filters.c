@@ -189,7 +189,8 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
         /* There was only one conversion to do, and we already failed. */
         msg_Err( p_aout, "couldn't find a filter for the conversion "
                 "%4.4s -> %4.4s",
-                &p_input_format->i_format, &p_output_format->i_format );
+                (const char *)&p_input_format->i_format,
+                (const char *)&p_output_format->i_format );
         return -1;
     }
 
