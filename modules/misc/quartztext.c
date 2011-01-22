@@ -498,7 +498,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     i_font_alpha = (i_font_color >> 24) & 0xff;
     i_font_color &= 0x00ffffff;
 
-    while ( (attr = xml_ReaderNextAttr( p_xml_reader, &psz_value )) )
+    while ( (attr = xml_ReaderNextAttr( p_xml_reader, &value )) )
     {
         if( !strcasecmp( "face", attr ) )
         {
