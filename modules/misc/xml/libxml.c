@@ -145,18 +145,15 @@ struct xml_reader_sys_t
 
 static int ReaderOpen( vlc_object_t *p_this )
 {
+    if( !xmlHasFeature( XML_WITH_THREAD ) )
+        return VLC_EGENERIC;
+
     xml_reader_t *p_reader = (xml_reader_t *)p_this;
     xml_reader_sys_t *p_sys = malloc( sizeof( *p_sys ) );
     xmlTextReaderPtr p_libxml_reader;
 
     if( unlikely(!p_sys) )
         return VLC_ENOMEM;
-
-    if( !xmlHasFeature( XML_WITH_THREAD ) )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
 
     vlc_mutex_lock( &lock );
     xmlInitParser();
