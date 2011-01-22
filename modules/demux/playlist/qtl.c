@@ -145,82 +145,73 @@ static int Demux( demux_t *p_demux )
         }
     }
 
-    const char *attrname;
-    while( (attrname = xml_ReaderNextAttr( p_xml_reader )) != NULL )
+    const char *attrname, *value;
+    while( (attrname = xml_ReaderNextAttr( p_xml_reader, &value )) != NULL )
     {
-        char *psz_attrvalue = xml_ReaderValue( p_xml_reader );
-
-        if( !psz_attrvalue )
-        {
-            free( psz_attrvalue );
-            goto error;
-        }
-
         if( !strcmp( attrname, "autoplay" ) )
-            b_autoplay = !strcmp( psz_attrvalue, "true" );
+            b_autoplay = !strcmp( value, "true" );
         else if( !strcmp( attrname, "controler" ) )
-            b_controler = !strcmp( psz_attrvalue, "false" );
+            b_controler = !strcmp( attrname, "false" );
         else if( !strcmp( attrname, "fullscreen" ) )
         {
-            if( !strcmp( psz_attrvalue, "double" ) )
+            if( !strcmp( value, "double" ) )
                 fullscreen = FULLSCREEN_DOUBLE;
-            else if( !strcmp( psz_attrvalue, "half" ) )
+            else if( !strcmp( value, "half" ) )
                 fullscreen = FULLSCREEN_HALF;
-            else if( !strcmp( psz_attrvalue, "current" ) )
+            else if( !strcmp( value, "current" ) )
                 fullscreen = FULLSCREEN_CURRENT;
-            else if( !strcmp( psz_attrvalue, "full" ) )
+            else if( !strcmp( value, "full" ) )
                 fullscreen = FULLSCREEN_FULL;
             else
                 fullscreen = FULLSCREEN_NORMAL;
         }
         else if( !strcmp( attrname, "href" ) )
         {
-            psz_href = psz_attrvalue;
-            psz_attrvalue = NULL;
+            free( psz_href );
+            psz_href = strdup( value );
         }
         else if( !strcmp( attrname, "kioskmode" ) )
-            b_kioskmode = !strcmp( psz_attrvalue, "true" );
+            b_kioskmode = !strcmp( value, "true" );
         else if( !strcmp( attrname, "loop" ) )
         {
-            if( !strcmp( psz_attrvalue, "true" ) )
+            if( !strcmp( value, "true" ) )
                 loop = LOOP_TRUE;
-            else if( !strcmp( psz_attrvalue, "palindrome" ) )
+            else if( !strcmp( value, "palindrome" ) )
                 loop = LOOP_PALINDROME;
             else
                 loop = LOOP_FALSE;
         }
         else if( !strcmp( attrname, "movieid" ) )
-            i_movieid = atoi( psz_attrvalue );
+            i_movieid = atoi( value );
         else if( !strcmp( attrname, "moviename" ) )
         {
-            psz_moviename = psz_attrvalue;
-            psz_attrvalue = NULL;
+            free( psz_moviename );
+            psz_moviename = strdup( value );
         }
         else if( !strcmp( attrname, "playeveryframe" ) )
-            b_playeveryframe = !strcmp( psz_attrvalue, "true" );
+            b_playeveryframe = !strcmp( value, "true" );
         else if( !strcmp( attrname, "qtnext" ) )
         {
-            psz_qtnext = psz_attrvalue;
-            psz_attrvalue = NULL;
+            free( psz_qtnext );
+            psz_qtnext = strdup( value );
         }
         else if( !strcmp( attrname, "quitwhendone" ) )
-            b_quitwhendone = !strcmp( psz_attrvalue, "true" );
+            b_quitwhendone = !strcmp( value, "true" );
         else if( !strcmp( attrname, "src" ) )
         {
-            psz_src = psz_attrvalue;
-            psz_attrvalue = NULL;
+            free( psz_src );
+            psz_src = strdup( value );
         }
         else if( !strcmp( attrname, "mimetype" ) )
         {
-            psz_mimetype = psz_attrvalue;
-            psz_attrvalue = NULL;
+            free( psz_mimetype );
+            psz_mimetype = strdup( value );
         }
         else if( !strcmp( attrname, "volume" ) )
-            i_volume = atoi( psz_attrvalue );
+            i_volume = atoi( value );
         else
             msg_Dbg( p_demux, "Attribute %s with value %s isn't valid",
-                     attrname, psz_attrvalue );
-        free( psz_attrvalue );
+                     attrname, value );
     }
 
     msg_Dbg( p_demux, "autoplay: %s (unused by VLC)",

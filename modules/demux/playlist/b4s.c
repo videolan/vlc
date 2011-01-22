@@ -119,24 +119,16 @@ static int Demux( demux_t *p_demux )
     }
 
     // Read the attributes
-    const char *attr;
-    while( (attr = xml_ReaderNextAttr( p_xml_reader )) != NULL )
+    const char *attr, *value;
+    while( (attr = xml_ReaderNextAttr( p_xml_reader, &value )) != NULL )
     {
-        char *psz_value = xml_ReaderValue( p_xml_reader );
-        if( !psz_value )
-        {
-            free( psz_value );
-            goto end;
-        }
-
         if( !strcmp( attr, "num_entries" ) )
-            msg_Dbg( p_demux, "playlist has %d entries", atoi(psz_value) );
+            msg_Dbg( p_demux, "playlist has %d entries", atoi(value) );
         else if( !strcmp( attr, "label" ) )
-            input_item_SetName( p_current_input, psz_value );
+            input_item_SetName( p_current_input, value );
         else
             msg_Warn( p_demux, "stray attribute %s with value %s in element"
-                      " 'playlist'", attr, psz_value );
-        free( psz_value );
+                      " <playlist>", attr, value );
     }
 
     p_subitems = input_item_node_Create( p_current_input );
@@ -155,24 +147,18 @@ static int Demux( demux_t *p_demux )
                     goto end;
 
                 // Read the attributes
-                while( (attr = xml_ReaderNextAttr( p_xml_reader )) )
+                while( (attr = xml_ReaderNextAttr( p_xml_reader, &value )) )
                 {
-                    char *psz_value = xml_ReaderValue( p_xml_reader );
-                    if( !psz_value )
-                    {
-                        free( psz_value );
-                        goto end;
-                    }
                     if( !strcmp( psz_elname, "entry" ) &&
                         !strcmp( attr, "Playstring" ) )
                     {
-                        psz_mrl = psz_value;
+                        free( psz_mrl );
+                        psz_mrl = strdup( value );
                     }
                     else
                     {
-                        msg_Warn( p_demux, "unexpected attribute %s in element %s",
+                        msg_Warn( p_demux, "unexpected attribute %s in <%s>",
                                   attr, psz_elname );
-                        free( psz_value );
                     }
                 }
                 break;

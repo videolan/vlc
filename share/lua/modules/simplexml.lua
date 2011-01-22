@@ -41,10 +41,10 @@ local function parsexml(stream, errormsg)
     while nodetype > 0 do
         if nodetype == 1 then
             local node = { name= nodename, attributes= {}, children= {} }
-            local attr = reader:next_attr()
+            local attr, value = reader:next_attr()
             while attr ~= nil do
-                node.attributes[attr] = reader:value()
-                attr = reader:next_attr()
+                node.attributes[attr] = value
+                attr, value = reader:next_attr()
             end
             if tree then
                 table.insert(tree.children, node)

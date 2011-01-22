@@ -61,8 +61,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 static int ReaderNextNode( xml_reader_t *, const char ** );
-static char *ReaderValue( xml_reader_t * );
-static const char *ReaderNextAttr( xml_reader_t * );
+static const char *ReaderNextAttr( xml_reader_t *, const char ** );
 
 static int ReaderUseDTD ( xml_reader_t * );
 
@@ -175,7 +174,6 @@ static int ReaderOpen( vlc_object_t *p_this )
     p_sys->node = NULL;
     p_reader->p_sys = p_sys;
     p_reader->pf_next_node = ReaderNextNode;
-    p_reader->pf_value = ReaderValue;
     p_reader->pf_next_attr = ReaderNextAttr;
     p_reader->pf_use_dtd = ReaderUseDTD;
 
@@ -268,11 +266,18 @@ static char *ReaderValue( xml_reader_t *p_reader )
     return psz_value ? strdup( (const char *)psz_value ) : NULL;
 }
 
-static const char *ReaderNextAttr( xml_reader_t *p_reader )
+static const char *ReaderNextAttr( xml_reader_t *p_reader, const char **pval )
 {
-    if( xmlTextReaderMoveToNextAttribute( p_reader->p_sys->xml ) != 1 )
+    xmlTextReaderPtr xml = p_reader->p_sys->xml;
+    const xmlChar *name, *value;
+
+    if( xmlTextReaderMoveToNextAttribute( xml ) != 1
+     || (name = xmlTextReaderConstName( xml )) == NULL
+     || (value = xmlTextReaderConstValue( xml )) == NULL )
         return NULL;
-    return (const char *)xmlTextReaderConstName( p_reader->p_sys->xml );
+
+    *pval = (const char *)value;
+    return (const char *)name;
 }
 
 static int StreamRead( void *p_context, char *p_buffer, int i_buffer )

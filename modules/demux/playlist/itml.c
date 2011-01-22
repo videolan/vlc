@@ -131,32 +131,22 @@ static bool parse_plist_node( demux_t *p_demux, input_item_node_t *p_input_node,
                               xml_elem_hnd_t *p_handlers )
 {
     VLC_UNUSED(p_track); VLC_UNUSED(psz_element);
-    const char *attr;
-    char *psz_value;
+    const char *attr, *value;
     bool b_version_found = false;
 
     /* read all playlist attributes */
-    while( (attr = xml_ReaderNextAttr( p_xml_reader )) )
+    while( (attr = xml_ReaderNextAttr( p_xml_reader, &value )) != NULL )
     {
-        psz_value = xml_ReaderValue( p_xml_reader );
-        if( !psz_value )
-        {
-            msg_Err( p_demux, "invalid xml stream @ <plist>" );
-            free( psz_value );
-            return false;
-        }
         /* attribute: version */
         if( !strcmp( attr, "version" ) )
         {
             b_version_found = true;
-            if( strcmp( psz_value, "1.0" ) )
+            if( strcmp( value, "1.0" ) )
                 msg_Warn( p_demux, "unsupported iTunes Media Library version" );
         }
         /* unknown attribute */
         else
             msg_Warn( p_demux, "invalid <plist> attribute:\"%s\"", attr );
-
-        free( psz_value );
     }
 
     /* attribute version is mandatory !!! */

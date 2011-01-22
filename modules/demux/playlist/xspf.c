@@ -173,21 +173,15 @@ static bool parse_playlist_node COMPLEX_INTERFACE
         };
 
     /* read all playlist attributes */
-    const char *name;
-    while( (name = xml_ReaderNextAttr( p_xml_reader )) != NULL )
+    const char *name, *value;
+    while( (name = xml_ReaderNextAttr( p_xml_reader, &value )) != NULL )
     {
-        psz_value = xml_ReaderValue( p_xml_reader );
-        if( !psz_value )
-        {
-            msg_Err( p_demux, "invalid xml stream @ <playlist>" );
-            goto end;
-        }
         /* attribute: version */
         if( !strcmp( name, "version" ) )
         {
             b_version_found = true;
-            if( strcmp( psz_value, "0" ) && strcmp( psz_value, "1" ) )
-                msg_Warn( p_demux, "unsupported XSPF version" );
+            if( strcmp( value, "0" ) && strcmp( value, "1" ) )
+                msg_Warn( p_demux, "unsupported XSPF version %s", value );
         }
         /* attribute: xmlns */
         else if( !strcmp( name, "xmlns" ) || !strcmp( name, "xmlns:vlc" ) )
@@ -200,8 +194,6 @@ static bool parse_playlist_node COMPLEX_INTERFACE
         /* unknown attribute */
         else
             msg_Warn( p_demux, "invalid <playlist> attribute: \"%s\"", name);
-
-        free( psz_value );
     }
     /* attribute version is mandatory !!! */
     if( !b_version_found )
@@ -590,37 +582,27 @@ static bool parse_extension_node COMPLEX_INTERFACE
         };
 
     /* read all extension node attributes */
-    const char *name;
-    while( (name = xml_ReaderNextAttr( p_xml_reader )) != NULL )
+    const char *name, *value;
+    while( (name = xml_ReaderNextAttr( p_xml_reader, &value )) != NULL )
     {
-        psz_value = xml_ReaderValue( p_xml_reader );
-        if( !psz_value )
-        {
-            msg_Err( p_demux, "invalid xml stream @ <vlc:node>" );
-            FREE_ATT();
-            return false;
-        }
         /* attribute: title */
         if( !strcmp( name, "title" ) )
         {
-            resolve_xml_special_chars( psz_value );
             free( psz_title );
-            psz_title = psz_value;
+            psz_title = strdup( value );
+            if( likely(psz_title != NULL) )
+                resolve_xml_special_chars( psz_title );
         }
         /* extension attribute: application */
         else if( !strcmp( name, "application" ) )
         {
             free( psz_application );
-            psz_application = psz_value;
+            psz_application = strdup( value );
         }
         /* unknown attribute */
         else
-        {
             msg_Warn( p_demux, "invalid <%s> attribute:\"%s\"", psz_element,
                       name );
-            FREE_VALUE();
-        }
-        psz_value = NULL;
     }
 
     /* attribute title is mandatory except for <extension> */
@@ -776,24 +758,15 @@ static bool parse_extitem_node COMPLEX_INTERFACE
     int i_tid = -1;
 
     /* read all extension item attributes */
-    const char *name;
-    while( (name = xml_ReaderNextAttr( p_xml_reader )) != NULL )
+    const char *name, *value;
+    while( (name = xml_ReaderNextAttr( p_xml_reader, &value )) != NULL )
     {
-        char *psz_value = xml_ReaderValue( p_xml_reader );
-        if( !psz_value )
-        {
-            msg_Err( p_demux, "invalid xml stream @ <vlc:item>" );
-            free( psz_value );
-            return false;
-        }
         /* attribute: href */
         if( !strcmp( name, "tid" ) )
-            i_tid = atoi( psz_value );
+            i_tid = atoi( value );
         /* unknown attribute */
         else
             msg_Warn( p_demux, "invalid <vlc:item> attribute: \"%s\"", name);
-
-        free( psz_value );
     }
 
     /* attribute href is mandatory */

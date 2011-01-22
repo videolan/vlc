@@ -150,17 +150,9 @@ bool XMLParser::parse()
             {
                 // Read the attributes
                 AttrList_t attributes;
-                const char *name;
-                while( (name = xml_ReaderNextAttr( m_pReader )) != NULL )
-                {
-                    char *value = xml_ReaderValue( m_pReader );
-                    if( !value )
-                    {
-                        free( value );
-                        return false;
-                    }
-                    attributes[strdup(name)] = value;
-                }
+                const char *name, *value;
+                while( (name = xml_ReaderNextAttr( m_pReader, &value )) != NULL )
+                    attributes[strdup(name)] = strdup(value);
 
                 handleBeginElement( node, attributes );
 

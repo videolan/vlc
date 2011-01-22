@@ -71,8 +71,7 @@ struct xml_reader_t
     module_t *p_module;
 
     int (*pf_next_node) ( xml_reader_t *, const char ** );
-    char * (*pf_value) ( xml_reader_t * );
-    const char *(*pf_next_attr) ( xml_reader_t * );
+    const char *(*pf_next_attr) ( xml_reader_t *, const char ** );
 
     int (*pf_use_dtd) ( xml_reader_t * );
 };
@@ -87,14 +86,10 @@ static inline int xml_ReaderNextNode( xml_reader_t *reader, const char **pval )
     return reader->pf_next_node( reader, pval );
 }
 
-static inline char *xml_ReaderValue( xml_reader_t *reader )
+static inline const char *xml_ReaderNextAttr( xml_reader_t *reader,
+                                              const char **pval )
 {
-  return reader->pf_value( reader );
-}
-
-static inline const char *xml_ReaderNextAttr( xml_reader_t *reader )
-{
-  return reader->pf_next_attr( reader );
+  return reader->pf_next_attr( reader, pval );
 }
 
 static inline int xml_ReaderUseDTD( xml_reader_t *reader )

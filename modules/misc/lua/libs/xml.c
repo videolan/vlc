@@ -84,12 +84,10 @@ static int vlclua_xml_create( lua_State *L )
  * XML Reader
  *****************************************************************************/
 static int vlclua_xml_reader_next_node( lua_State * );
-static int vlclua_xml_reader_value( lua_State * );
 static int vlclua_xml_reader_next_attr( lua_State * );
 
 static const luaL_Reg vlclua_xml_reader_reg[] = {
     { "next_node", vlclua_xml_reader_next_node },
-    { "value", vlclua_xml_reader_value },
     { "next_attr", vlclua_xml_reader_next_attr },
     { NULL, NULL }
 };
@@ -135,17 +133,13 @@ static int vlclua_xml_reader_next_node( lua_State *L )
     return 2;
 }
 
-static int vlclua_xml_reader_value( lua_State *L )
-{
-    xml_reader_t *p_reader = *(xml_reader_t**)luaL_checkudata( L, 1, "xml_reader" );
-    lua_pushstring( L, xml_ReaderValue( p_reader ) );
-    return 1;
-}
-
 static int vlclua_xml_reader_next_attr( lua_State *L )
 {
     xml_reader_t *p_reader = *(xml_reader_t**)luaL_checkudata( L, 1, "xml_reader" );
-    lua_pushstring( L, xml_ReaderNextAttr( p_reader ) );
+    const char *psz_value;
+
+    lua_pushstring( L, xml_ReaderNextAttr( p_reader, &psz_value ) );
+    lua_pushstring( L, psz_value );
     return 1;
 }
 

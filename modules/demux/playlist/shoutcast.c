@@ -131,12 +131,6 @@ error:
     return i_ret;
 }
 
-#define GET_VALUE( a ) \
-                        if( !strcmp( attrname, #a ) ) \
-                        { \
-                            free(psz_ ## a); \
-                            psz_ ## a = psz_attrvalue; \
-                        }
 /* <genrelist>
  *   <genre name="the name"></genre>
  *   ...
@@ -158,24 +152,18 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                 if( !strcmp( node, "genre" ) )
                 {
                     // Read the attributes
-                    const char *attrname;
-                    while( (attrname = xml_ReaderNextAttr( p_xml_reader )) )
+                    const char *name, *value;
+                    while( (name = xml_ReaderNextAttr( p_xml_reader, &value )) )
                     {
-                        char *psz_attrvalue = xml_ReaderValue( p_xml_reader );
-                        if( !psz_attrvalue )
+                        if( !strcmp( name, "name" ) )
                         {
-                            free( psz_attrvalue );
-                            break;
+                            free(psz_name);
+                            psz_name = strdup( value );
                         }
-
-                        GET_VALUE( name )
                         else
-                        {
                             msg_Warn( p_demux,
-                                      "unexpected attribute %s in element %s",
-                                      attrname, node );
-                            free( psz_attrvalue );
-                        }
+                                      "unexpected attribute %s in <%s>",
+                                      name, node );
                     }
                 }
                 break;
@@ -259,54 +247,53 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                 // Read the attributes
                 if( !strcmp( node, "tunein" ) )
                 {
-                    const char *attrname;
-                    while( (attrname = xml_ReaderNextAttr( p_xml_reader )) )
+                    const char *name, *value;
+                    while( (name = xml_ReaderNextAttr( p_xml_reader, &value )) )
                     {
-                        char *psz_attrvalue = xml_ReaderValue( p_xml_reader );
-                        if( !psz_attrvalue )
+                        if( !strcmp( name, "base" ) )
                         {
-                            free( psz_attrvalue );
-                            return -1;
+                            free( psz_base );
+                            psz_base = strdup( value );
                         }
-
-                        GET_VALUE( base )
                         else
-                        {
                             msg_Warn( p_demux,
-                                      "unexpected attribute %s in element %s",
-                                      attrname, node );
-                            free( psz_attrvalue );
-                        }
+                                      "unexpected attribute %s in <%s>",
+                                      name, node );
                     }
                 }
                 else if( !strcmp( node, "station" ) )
                 {
-                    const char *attrname;
-                    while( (attrname = xml_ReaderNextAttr( p_xml_reader )) )
+                    const char *name, *value;
+                    while( (name = xml_ReaderNextAttr( p_xml_reader, &value )) )
                     {
-                        char *psz_attrvalue = xml_ReaderValue( p_xml_reader );
-                        if( !psz_attrvalue )
+                        char **p = NULL;
+                        if( !strcmp( name, "name" ) )
+                            p = &psz_name;
+                        else if ( !strcmp( name, "mt" ) )
+                            p = &psz_mt;
+                        else if ( !strcmp( name, "id" ) )
+                            p = &psz_id;
+                        else if ( !strcmp( name, "br" ) )
+                            p = &psz_br;
+                        else if ( !strcmp( name, "genre" ) )
+                            p = &psz_genre;
+                        else if ( !strcmp( name, "ct" ) )
+                            p = &psz_ct;
+                        else if ( !strcmp( name, "lc" ) )
+                            p = &psz_lc;
+                        else if ( !strcmp( name, "rt" ) )
+                            p = &psz_rt;
+                        else if ( !strcmp( name, "load" ) )
+                            p = &psz_load;
+                        if( p != NULL )
                         {
-                            free( psz_attrvalue );
-                            return -1;
+                            free( *p );
+                            *p = strdup( value );
                         }
-
-                        GET_VALUE( name )
-                        else GET_VALUE( mt )
-                        else GET_VALUE( id )
-                        else GET_VALUE( br )
-                        else GET_VALUE( genre )
-                        else GET_VALUE( ct )
-                        else GET_VALUE( lc )
-                        else GET_VALUE( rt )
-                        else GET_VALUE( load )
                         else
-                        {
                             msg_Warn( p_demux,
-                                      "unexpected attribute %s in element %s",
-                                      attrname, node );
-                            free( psz_attrvalue );
-                        }
+                                      "unexpected attribute %s in <%s>",
+                                      name, node );
                     }
                 }
                 break;

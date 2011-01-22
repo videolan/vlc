@@ -483,7 +483,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     uint32_t   i_font_color = 0xffffff;
     int        i_font_alpha = 0;
     int        i_font_size  = 24;
-    const char *attr;
+    const char *attr, *value;
 
     // Default all attributes to the top font in the stack -- in case not
     // all attributes are specified in the sub-font
@@ -498,23 +498,18 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     i_font_alpha = (i_font_color >> 24) & 0xff;
     i_font_color &= 0x00ffffff;
 
-    while ( (attr = xml_ReaderNextAttr( p_xml_reader )) )
+    while ( (attr = xml_ReaderNextAttr( p_xml_reader, &psz_value )) )
     {
-        char *psz_value = xml_ReaderValue( p_xml_reader );
-
-        if( !psz_value )
-            continue;
-
         if( !strcasecmp( "face", attr ) )
         {
             free( psz_fontname );
-            psz_fontname = strdup( psz_value );
+            psz_fontname = strdup( value );
         }
         else if( !strcasecmp( "size", attr ) )
         {
-            if( ( *psz_value == '+' ) || ( *psz_value == '-' ) )
+            if( ( *value == '+' ) || ( *value == '-' ) )
             {
-                int i_value = atoi( psz_value );
+                int i_value = atoi( value );
 
                 if( ( i_value >= -5 ) && ( i_value <= 5 ) )
                     i_font_size += ( i_value * i_font_size ) / 10;
@@ -524,22 +519,18 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
                     i_font_size = i_value;
             }
             else
-                i_font_size = atoi( psz_value );
+                i_font_size = atoi( value );
         }
-        else if( !strcasecmp( "color", attr )  &&
-                 ( psz_value[0] == '#' ) )
+        else if( !strcasecmp( "color", attr )  && ( value[0] == '#' ) )
         {
-            i_font_color = strtol( psz_value + 1, NULL, 16 );
+            i_font_color = strtol( value + 1, NULL, 16 );
             i_font_color &= 0x00ffffff;
         }
-        else if( !strcasecmp( "alpha", attr ) &&
-                 ( psz_value[0] == '#' ) )
+        else if( !strcasecmp( "alpha", attr ) && ( value[0] == '#' ) )
         {
-            i_font_alpha = strtol( psz_value + 1, NULL, 16 );
+            i_font_alpha = strtol( value + 1, NULL, 16 );
             i_font_alpha &= 0xff;
         }
-
-        free( psz_value );
     }
     rv = PushFont( p_fonts,
                    psz_fontname,

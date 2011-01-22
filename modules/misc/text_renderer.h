@@ -331,23 +331,19 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     i_font_alpha = (i_font_color >> 24) & 0xff;
     i_font_color &= 0x00ffffff;
 
-    const char *name;
-    while( (name = xml_ReaderNextAttr( p_xml_reader )) != NULL )
+    const char *name, *value;
+    while( (name = xml_ReaderNextAttr( p_xml_reader, &value )) != NULL )
     {
-        char *psz_value = xml_ReaderValue( p_xml_reader );
-        if( !psz_value )
-            continue;
-
         if( !strcasecmp( "face", name ) )
         {
             free( psz_fontname );
-            psz_fontname = strdup( psz_value );
+            psz_fontname = strdup( value );
         }
         else if( !strcasecmp( "size", name ) )
         {
-            if( ( *psz_value == '+' ) || ( *psz_value == '-' ) )
+            if( ( *value == '+' ) || ( *value == '-' ) )
             {
-                int i_value = atoi( psz_value );
+                int i_value = atoi( value );
 
                 if( ( i_value >= -5 ) && ( i_value <= 5 ) )
                     i_font_size += ( i_value * i_font_size ) / 10;
@@ -357,20 +353,20 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
                     i_font_size = i_value;
             }
             else
-                i_font_size = atoi( psz_value );
+                i_font_size = atoi( value );
         }
         else if( !strcasecmp( "color", name ) )
         {
-            if( psz_value[0] == '#' )
+            if( value[0] == '#' )
             {
-                i_font_color = strtol( psz_value + 1, NULL, 16 );
+                i_font_color = strtol( value + 1, NULL, 16 );
                 i_font_color &= 0x00ffffff;
             }
             else
             {
                 for( int i = 0; p_html_colors[i].psz_name != NULL; i++ )
                 {
-                    if( !strncasecmp( psz_value, p_html_colors[i].psz_name, strlen(p_html_colors[i].psz_name) ) )
+                    if( !strncasecmp( value, p_html_colors[i].psz_name, strlen(p_html_colors[i].psz_name) ) )
                     {
                         i_font_color = p_html_colors[i].i_value;
                         break;
@@ -378,12 +374,11 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
                 }
             }
         }
-        else if( !strcasecmp( "alpha", name ) && ( psz_value[0] == '#' ) )
+        else if( !strcasecmp( "alpha", name ) && ( value[0] == '#' ) )
         {
-            i_font_alpha = strtol( psz_value + 1, NULL, 16 );
+            i_font_alpha = strtol( value + 1, NULL, 16 );
             i_font_alpha &= 0xff;
         }
-        free( psz_value );
     }
     rv = PushFont( p_fonts,
                    psz_fontname,
@@ -427,14 +422,10 @@ static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
                           uint32_t **ppi_k_run_lengths,
                           uint32_t **ppi_k_durations )
 {
-    const char *name;
+    const char *name, *value;
 
-    while( (name = xml_ReaderNextAttr( p_xml_reader )) != NULL )
+    while( (name = xml_ReaderNextAttr( p_xml_reader, &value )) != NULL )
     {
-        char *psz_value = xml_ReaderValue( p_xml_reader );
-        if( !psz_value )
-            continue;
-
         if( !strcasecmp( "t", name ) )
         {
             if( ppi_k_durations && ppi_k_run_lengths )
@@ -463,13 +454,12 @@ static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
                         malloc( *pi_k_runs * sizeof( uint32_t ) );
                 }
                 if( *ppi_k_durations )
-                    (*ppi_k_durations)[ *pi_k_runs - 1 ] = atoi( psz_value );
+                    (*ppi_k_durations)[ *pi_k_runs - 1 ] = atoi( value );
 
                 if( *ppi_k_run_lengths )
                     (*ppi_k_run_lengths)[ *pi_k_runs - 1 ] = 0;
             }
         }
-        free( psz_value );
     }
 }
 

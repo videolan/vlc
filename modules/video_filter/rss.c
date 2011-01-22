@@ -719,27 +719,22 @@ static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
             /* atom */
             else if( !strcmp( node, "link" ) )
             {
-                const char *name;
+                const char *name, *value;
                 char *psz_href = NULL;
                 char *psz_rel = NULL;
 
-                while( (name = xml_ReaderNextAttr( p_xml_reader )) != NULL )
+                while( (name = xml_ReaderNextAttr( p_xml_reader, &value )) != NULL )
                 {
-                    char *psz_value = xml_ReaderValue( p_xml_reader );
-                    if( !psz_value )
-                        continue;
                     if( !strcmp( name, "rel" ) )
                     {
                         free( psz_rel );
-                        psz_rel = psz_value;
+                        psz_rel = strdup( value );
                     }
                     else if( !strcmp( name, "href" ) )
                     {
                         free( psz_href );
-                        psz_href = psz_value;
+                        psz_href = strdup( value );
                     }
-                    else
-                        free( psz_value );
                 }
 
                 /* "rel" and "href" must be defined */
