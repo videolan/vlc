@@ -192,6 +192,9 @@ case $TARGET in
     *wince*)
         add_enabled_makefile_cfg "HAVE_WINCE"
     ;;
+    *symbian*)
+        add_enabled_makefile_cfg "HAVE_SYMBIAN"
+    ;;
 esac
 
 # Figure out the correct distro to use
