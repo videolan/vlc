@@ -265,6 +265,7 @@
 #define VLC_CODEC_S16B      VLC_FOURCC('s','1','6','b')
 #define VLC_CODEC_U16L      VLC_FOURCC('u','1','6','l')
 #define VLC_CODEC_U16B      VLC_FOURCC('u','1','6','b')
+#define VLC_CODEC_S20B      VLC_FOURCC('s','2','0','b')
 #define VLC_CODEC_S24L      VLC_FOURCC('s','2','4','l')
 #define VLC_CODEC_S24B      VLC_FOURCC('s','2','4','b')
 #define VLC_CODEC_U24L      VLC_FOURCC('u','2','4','l')
@@ -280,6 +281,7 @@
 
 #define VLC_CODEC_ALAW      VLC_FOURCC('a','l','a','w')
 #define VLC_CODEC_MULAW     VLC_FOURCC('m','l','a','w')
+#define VLC_CODEC_DAT12     VLC_FOURCC('L','P','1','2')
 #define VLC_CODEC_S24DAUD   VLC_FOURCC('d','a','u','d')
 #define VLC_CODEC_FI32      VLC_FOURCC('f','i','3','2')
 #define VLC_CODEC_TWINVQ    VLC_FOURCC('T','W','I','N')

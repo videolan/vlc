@@ -1073,6 +1073,8 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_U16B, "PCM U16 BE"),
         A("u16b"),
 
+    B(VLC_CODEC_S20B, "PCM S20 BE"),
+
     B(VLC_CODEC_S24L, "PCM S24 LE"),
         A("s24l"),
         A("42ni"),  /* Quicktime */
@@ -1107,6 +1109,8 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_MULAW, "PCM MU-LAW"),
         A("mlaw"),
         A("ulaw"),
+
+    B(VLC_CODEC_DAT12, "12 bits DAT audio"),
 
     B(VLC_CODEC_S24DAUD, "PCM DAUD"),
         A("daud"),
