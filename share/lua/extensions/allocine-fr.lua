@@ -157,8 +157,13 @@ function click_chercher()
     vlc.keep_alive()
 
     -- Fetch HTML data (max 65 kb)
-    local data = s:read(65535)
-    vlc.keep_alive()
+    local data = "", tmpdata
+    repeat
+       tmpdata = s:read(65535)
+       vlc.keep_alive()
+       if not tmpdata then break end
+       data = data .. tmpdata
+    until tmpdata == ""
 
     -- Clean data
     data = string.gsub(data, "<b>", "")
