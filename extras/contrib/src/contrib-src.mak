@@ -2079,6 +2079,7 @@ ifdef HAVE_WIN32
 endif
 ifdef HAVE_MACOSX
 	(cd $<; mkdir -p $(PREFIX)/lib && cp libmpcdec/libmpcdec.dylib $(PREFIX)/lib/libmpcdec.dylib)
+	(install_name_tool -id $(PREFIX)/lib/libmpcdec.dylib $(PREFIX)/lib/libmpcdec.dylib)
 endif
 	touch $@
 
