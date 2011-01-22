@@ -156,7 +156,7 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma,
     */
     int i_modulo_w = 1;
     int i_modulo_h = 1;
-    int i_ratio_h  = 1;
+    unsigned int i_ratio_h  = 1;
     for( unsigned i = 0; i < p_dsc->plane_count; i++ )
     {
         i_modulo_w = LCM( i_modulo_w, 16 * p_dsc->p[i].w.den );
