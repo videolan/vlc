@@ -852,6 +852,11 @@ static int SessionsSetup( demux_t *p_demux )
                     tk->fmt.i_codec = VLC_CODEC_S16B;
                     tk->fmt.audio.i_bitspersample = 16;
                 }
+                else if( !strcmp( sub->codecName(), "L20" ) )
+                {
+                    tk->fmt.i_codec = VLC_CODEC_S20B;
+                    tk->fmt.audio.i_bitspersample = 20;
+                }
                 else if( !strcmp( sub->codecName(), "L24" ) )
                 {
                     tk->fmt.i_codec = VLC_CODEC_S24B;
@@ -861,6 +866,11 @@ static int SessionsSetup( demux_t *p_demux )
                 {
                     tk->fmt.i_codec = VLC_CODEC_U8;
                     tk->fmt.audio.i_bitspersample = 8;
+                }
+                else if( !strcmp( sub->codecName(), "DAT12" ) )
+                {
+                    tk->fmt.i_codec = VLC_CODEC_DAT12;
+                    tk->fmt.audio.i_bitspersample = 12;
                 }
                 else if( !strcmp( sub->codecName(), "PCMU" ) )
                 {
