@@ -134,13 +134,12 @@ bool XMLParser::parse()
 {
     const char *node;
     int type;
-    int ret;
 
     if( !m_pReader ) return false;
 
     m_errors = false;
 
-    while( (ret = xml_ReaderNextNode( m_pReader, &node )) > 0 )
+    while( (type = xml_ReaderNextNode( m_pReader, &node )) > 0 )
     {
         if( m_errors ) return false;
 
