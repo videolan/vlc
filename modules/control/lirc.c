@@ -25,6 +25,7 @@
  * Preamble
  *****************************************************************************/
 
+#include <errno.h>
 #include <fcntl.h>
 
 #ifdef HAVE_CONFIG_H
@@ -154,10 +155,12 @@ static void Run( intf_thread_t *p_intf )
         /* Wait for data */
         struct pollfd ufd = { .fd = p_sys->i_fd, .events = POLLIN, .revents = 0 };
         if( poll( &ufd, 1, -1 ) == -1 )
+        {
             if( errno == EINTR )
                 continue;
             else
                 break;
+        }
 
         /* Process */
         int canc = vlc_savecancel();
