@@ -34,13 +34,13 @@
 #include <vlc_access.h>
 #include <vlc_fs.h>
 #include <vlc_url.h>
+#include <vlc_network.h>
 
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <linux/types.h>
 #include <sys/ioctl.h>
-#include <sys/poll.h>
 #ifdef HAVE_NEW_LINUX_VIDEODEV2_H
 #   ifdef VIDEODEV2_H_FILE
 #   include VIDEODEV2_H_FILE
@@ -905,31 +905,12 @@ static void Close( vlc_object_t * p_this )
 static ssize_t Read( access_t * p_access, uint8_t * p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = (access_sys_t *) p_access->p_sys;
-    struct pollfd ufd;
-    int i_ret;
-
-    ufd.fd = p_sys->i_fd;
-    ufd.events = POLLIN;
+    ssize_t i_ret;
 
     if( p_access->info.b_eof )
         return 0;
 
-    do
-    {
-        if( !vlc_object_alive (p_access) )
-            return 0;
-
-        ufd.revents = 0;
-    }
-    while( ( i_ret = poll( &ufd, 1, 500 ) ) == 0 );
-
-    if( i_ret < 0 )
-    {
-        msg_Err( p_access, "Polling error (%m)." );
-        return -1;
-    }
-
-    i_ret = read( p_sys->i_fd, p_buffer, i_len );
+    i_ret = net_Read( p_access, p_sys->i_fd, NULL, p_buffer, i_len, false );
     if( i_ret == 0 )
     {
         p_access->info.b_eof = true;
