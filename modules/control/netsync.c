@@ -180,7 +180,7 @@ static void *Master(void *handle)
         struct pollfd ufd = { .fd = sys->fd, .events = POLLIN, };
         uint64_t data[2];
 
-        if (poll(&ufd, 1, -1) <= 0)
+        if (poll(&ufd, 1, -1) < 0)
             continue;
 
         /* We received something */
@@ -232,11 +232,8 @@ static void *Slave(void *handle)
             goto wait;
 
         /* Don't block */
-        int ret = poll(&ufd, 1, sys->timeout);
-        if (ret == 0)
+        if (poll(&ufd, 1, sys->timeout) <= 0)
             continue;
-        if (ret < 0)
-            goto wait;
 
         const mtime_t receive_date = mdate();
         if (recv(sys->fd, data, sizeof(data), 0) <= 0)
