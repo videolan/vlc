@@ -261,9 +261,17 @@ static int TPDURecv( access_t * p_access, uint8_t i_slot, uint8_t *pi_tag,
 
     pfd[0].fd = p_sys->i_ca_handle;
     pfd[0].events = POLLIN;
-    if ( !(poll(pfd, 1, CAM_READ_TIMEOUT) > 0 && (pfd[0].revents & POLLIN)) )
+
+    while( poll(pfd, 1, CAM_READ_TIMEOUT ) == -1 )
+        if( errno != EINTR )
+        {
+            msg_Err( p_access, "poll error: %m" );
+            return VLC_EGENERIC;
+        }
+
+    if ( !(pfd[0].revents & POLLIN) )
     {
-        msg_Err( p_access, "cannot poll from CAM device" );
+        msg_Err( p_access, "CAM device poll time-out" );
         return VLC_EGENERIC;
     }
 
