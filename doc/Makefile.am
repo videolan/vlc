@@ -19,6 +19,7 @@ CHANGELOGS = \
 	ChangeLog-2008 \
 	ChangeLog-2009 \
 	ChangeLog-2010 \
+	ChangeLog-2011 \
 	$(NULL)
 
 man1_MANS = \
