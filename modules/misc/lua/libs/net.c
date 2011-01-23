@@ -201,7 +201,6 @@ static int vlclua_net_recv( lua_State *L )
 static int vlclua_net_poll( lua_State *L )
 {
     luaL_checktype( L, 1, LUA_TTABLE );
-    double f_timeout = luaL_optnumber( L, 2, -1. );
 
     int i_fds = 0;
     lua_pushnil( L );
@@ -223,7 +222,11 @@ static int vlclua_net_poll( lua_State *L )
         i++;
     }
 
-    int i_ret = poll( p_fds, i_fds, f_timeout < 0. ? -1 : (int)(f_timeout*1000) );
+    int i_ret;
+    do
+        i_ret = poll( p_fds, i_fds, -1 );
+    while( i_ret == -1 );
+
     for( i = 0; i < i_fds; i++ )
     {
         lua_pushinteger( L, p_fds[i].fd );

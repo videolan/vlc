@@ -244,7 +244,7 @@ function host()
             end
         end
 
-        local ret = vlc.net.poll( pollfds, timeout or -1 )
+        local ret = vlc.net.poll( pollfds )
         local wclients = {}
         local rclients = {}
         if ret > 0 then
