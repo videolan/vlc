@@ -1,0 +1,20 @@
+--- goom/src/plugin_info.c	2005-02-07 14:46:41.000000000 +0100
++++ goom.new/src/plugin_info.c	2011-01-23 15:37:37.524184437 +0100
+@@ -31,6 +31,7 @@
+ /*    p->methods.create_output_with_brightness = create_output_with_brightness;*/
+ 
+ #ifdef CPU_X86
++#if 0
+ 	if (cpuFlavour & CPU_OPTION_XMMX) {
+ #ifdef VERBOSE
+ 		printf ("Extented MMX detected. Using the fastest methods !\n");
+@@ -38,7 +39,8 @@
+ 		p->methods.draw_line = draw_line_mmx;
+ 		p->methods.zoom_filter = zoom_filter_xmmx;
+ 	}
+-	else if (cpuFlavour & CPU_OPTION_MMX) {
++#endif
++	if (cpuFlavour & CPU_OPTION_MMX) {
+ #ifdef VERBOSE
+ 		printf ("MMX detected. Using fast methods !\n");
+ #endif
