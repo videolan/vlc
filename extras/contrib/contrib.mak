@@ -1,7 +1,7 @@
 # ***************************************************************************
 # Makefile : Build vlc-contrib files
 # ***************************************************************************
-# Copyright (C) 2003-2010 the VideoLAN team
+# Copyright (C) 2003-2011 the VideoLAN team
 # $Id$
 # 
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -49,7 +49,7 @@ src: using-src
 
 ifdef HAVE_DARWIN_OS
 
-CONTRIBREV=38
+CONTRIBREV=39
 
 contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2:
 	$(WGET) http://downloads.videolan.org/pub/videolan/testing/contrib/$@
