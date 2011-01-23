@@ -38,6 +38,7 @@
 #include <vlc_demux.h>
 #include <vlc_fs.h>
 
+#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -272,6 +273,8 @@ static int Demux( demux_t *p_demux )
         /* Wait for data */
         if( poll( &fd, 1, 10 ) ) /* Timeout after 0.01 seconds. Bigger delays are an issue when used with/as an input-slave since all the inputs run in the same thread. */
         {
+            if( errno == EINTR )
+                continue;
             if( fd.revents & (POLLIN|POLLPRI) )
             {
                 p_block = GrabAudio( p_demux );
