@@ -1259,13 +1259,8 @@ static block_t *AccessRead( access_t * p_access )
     fd.revents = 0;
 
     /* Wait for data */
-    if( poll( &fd, 1, 500 ) ) /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
-    {
-        if( fd.revents & (POLLIN|POLLPRI) )
-        {
-            return GrabVideo( VLC_OBJECT(p_access), p_sys );
-        }
-    }
+    if( poll( &fd, 1, 500 ) > 0 ) /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
+        return GrabVideo( VLC_OBJECT(p_access), p_sys );
 
     return NULL;
 }
@@ -1323,16 +1318,21 @@ static int Demux( demux_t *p_demux )
     fd.revents = 0;
 
     /* Wait for data */
-    if( poll( &fd, 1, 500 ) ) /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
-    {
-        if( fd.revents & (POLLIN|POLLPRI) )
+    /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
+    while( poll( &fd, 1, 500 ) == -1 )
+        if( errno != EINTR )
         {
-            block_t *p_block = GrabVideo( VLC_OBJECT(p_demux), p_sys );
-            if( p_block )
-            {
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
-                es_out_Send( p_demux->out, p_sys->p_es, p_block );
-            }
+            msg_Err( p_demux, "poll error: %m" );
+            return -1;
+        }
+
+    if( fd.revents )
+    {
+         block_t *p_block = GrabVideo( VLC_OBJECT(p_demux), p_sys );
+         if( p_block )
+         {
+             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
+             es_out_Send( p_demux->out, p_sys->p_es, p_block );
         }
     }
 
