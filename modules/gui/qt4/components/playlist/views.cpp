@@ -82,6 +82,7 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QFontMetrics fm = painter->fontMetrics();
 
     int averagewidth = fm.averageCharWidth();
+    QSize rectSize = option.rect.size();
     int art_width = averagewidth * ICON_SCALER;
     int art_height = averagewidth * ICON_SCALER;
 
@@ -91,8 +92,8 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
     painter->save();
 
-    QRect artRect( option.rect.x() + averagewidth*2 + ( art_width - artPix.width() ) / 2,
-                   option.rect.y() + averagewidth + ( art_height - artPix.height() ) / 2,
+    QRect artRect( option.rect.x() + ( rectSize.width() - artPix.width() ) / 2,
+                   option.rect.y() - averagewidth*3 + ( rectSize.height() - artPix.height() ) / 2,
                    artPix.width(), artPix.height() );
 
     // Draw the drop shadow
@@ -137,9 +138,8 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     // Draw title
     font.setItalic( true );
 
-    fm = painter->fontMetrics();
-    QRect textRect = option.rect.adjusted( 1, art_height + 10, 0, -1 );
-    textRect.setHeight( fm.height() );
+    QRect textRect;
+    textRect.setRect( option.rect.x() , artRect.bottom() + fm.height()/2, option.rect.width(), fm.height() );
 
     painter->drawText( textRect,
                       fm.elidedText( title, Qt::ElideRight, textRect.width() ),
