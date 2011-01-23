@@ -304,7 +304,10 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
     /* Create new script descriptor */
     extension_t *p_ext = ( extension_t* ) calloc( 1, sizeof( extension_t ) );
     if( !p_ext )
+    {
+        free( psz_script );
         return 0;
+    }
 
     p_ext->psz_name = psz_script;
     p_ext->p_sys = (extension_sys_t*) calloc( 1, sizeof( extension_sys_t ) );
