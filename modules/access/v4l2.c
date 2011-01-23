@@ -1288,7 +1288,8 @@ static ssize_t AccessReadStream( access_t * p_access, uint8_t * p_buffer, size_t
 
     if( i_ret < 0 )
     {
-        msg_Err( p_access, "Polling error (%m)." );
+        if( errno != EINTR )
+            msg_Err( p_access, "poll error" );
         return -1;
     }
 
