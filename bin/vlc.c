@@ -84,12 +84,11 @@ static void exit_timeout (int signum)
 int main( int i_argc, const char *ppsz_argv[] )
 {
     /* The so-called POSIX-compliant MacOS X reportedly processes SIGPIPE even
-     * if it is blocked in all thread. Also some libraries want SIGPIPE blocked
-     * as they have no clue about signal masks.
+     * if it is blocked in all thread.
      * Note: this is NOT an excuse for not protecting against SIGPIPE. If
      * LibVLC runs outside of VLC, we cannot rely on this code snippet. */
     signal (SIGPIPE, SIG_IGN);
-    /* Restore default for SIGCHLD in case parent ignores it. */
+    /* Restore SIGCHLD in case our parent process ignores it. */
     signal (SIGCHLD, SIG_DFL);
 
 #ifdef HAVE_SETENV
@@ -129,19 +128,17 @@ int main( int i_argc, const char *ppsz_argv[] )
     sigset_t set;
 
     sigemptyset (&set);
-    /* Synchronously intercepted POSIX signals.
+    /* VLC uses sigwait() to dequeue interesting signals.
+     * For this to work, those signals must be blocked in all threads,
+     * including the thread calling sigwait() (see the man page for details).
      *
-     * In a threaded program such as VLC, the only sane way to handle signals
-     * is to block them in all threads but one - this is the only way to
-     * predict which thread will receive them. If any piece of code depends
-     * on delivery of one of this signal it is intrinsically not thread-safe
-     * and MUST NOT be used in VLC, whether we like it or not.
-     * There is only one exception: if the signal is raised with
-     * pthread_kill() - we do not use this in LibVLC but some pthread
-     * implementations use them internally. You should really use conditions
-     * for thread synchronization anyway.
+     * There are two advantages to sigwait() over traditional signal handlers:
+     *  - delivery is synchronous: no need to worry about async-safety,
+     *  - EINTR is not generated: other threads need not handle that error.
+     * That being said, some LibVLC programs do not use sigwait(). Therefore
+     * EINTR must still be handled cleanly, notably from poll() calls.
      *
-     * Signal that request a clean shutdown, and force an unclean shutdown
+     * Signals that request a clean shutdown, and force an unclean shutdown
      * if they are triggered again 2+ seconds later.
      * We have to handle SIGTERM cleanly because of daemon mode. */
     sigaddset (&set, SIGINT);
@@ -149,14 +146,23 @@ int main( int i_argc, const char *ppsz_argv[] )
     sigaddset (&set, SIGQUIT);
     sigaddset (&set, SIGTERM);
 
-    /* Signals that cause a no-op:
-     * - SIGPIPE might happen with sockets and would crash VLC. It MUST be
-     *   blocked by any LibVLC-dependent application, not just VLC.
-     * - SIGCHLD comes after exec*() (such as httpd CGI support) and must
-     *   be dequeued to cleanup zombie processes.
+    /* SIGPIPE can happen and would crash the process. On modern systems,
+     * the MSG_NOSIGNAL flag protects socket write operations against SIGPIPE.
+     * But we still need to block SIGPIPE when:
+     *  - writing to pipes,
+     *  - using write() instead of send() for code not specific to sockets.
+     * LibVLC code assumes that SIGPIPE is blocked. Other LibVLC applications
+     * shall block it (or handle it somehow) too.
      */
     sigaddset (&set, SIGPIPE);
-    sigaddset (&set, SIGCHLD);
+
+    /* SIGCHLD must be dequeued to clean up zombie child processes.
+     * Furthermore the handler must not be set to SIG_IGN (see above). */
+    /* Unfortunately, the QProcess class from Qt4 has a bug. It installs a
+     * custom signal handlers and gets stuck if it is not called. So we cannot
+     * use sigwait() for SIGCHLD:
+     * http://bugs.kde.org/show_bug.cgi?id=260719 */
+    //sigaddset (&set, SIGCHLD);
 
 #ifdef HAVE_MAEMO
     sigaddset (&set, SIGRTMIN);
