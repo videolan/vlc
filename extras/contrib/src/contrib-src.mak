@@ -1,7 +1,7 @@
 #***************************************************************************
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
-# Copyright (C) 2003 - 2010 the VideoLAN team
+# Copyright (C) 2003 - 2011 the VideoLAN team
 # $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -400,7 +400,7 @@ FONTCONFIG_BASE_CONF = --prefix=$(PREFIX) \
 
 FONTCONFIG_CONF-$(ENABLED)      = $(HOSTCONF) $(FONTCONFIG_BASE_CONF)
 FONTCONFIG_CONF-$(HAVE_MACOSX) += $(HOSTCONF) \
-	--with-cache-dir=/usr/X11/var/cache/fontconfig \
+	--with-cache-dir=~/Library/Caches/fontconfig \
 	--with-confdir=/usr/X11/lib/X11/fonts \
 	--with-default-fonts=/System/Library/Fonts \
 	--with-add-fonts=/Library/Fonts,~/Library/Fonts  \
