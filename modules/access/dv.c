@@ -343,11 +343,8 @@ static void* Raw1394EventThread( vlc_object_t *p_this )
     {
         while( ( result = poll( &(p_sys->raw1394_poll), 1, 200 ) ) < 0 )
         {
-            if( !( errno == EAGAIN || errno == EINTR ) )
-            {
-                perror( "error: raw1394 poll" );
-                msg_Err( p_access, "retrying device raw1394" );
-            }
+            if( errno != EINTR )
+                msg_Err( p_access, "poll error: %m" );
         }
         if( !vlc_object_alive (p_sys->p_ev) )
                 break;
