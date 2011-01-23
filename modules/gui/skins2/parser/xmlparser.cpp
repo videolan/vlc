@@ -29,35 +29,28 @@
 #   include <sys/stat.h>
 #endif
 
-XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
-                      bool useDTD ):
-    SkinObject( pIntf )
+XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName )
+    : SkinObject( pIntf ), m_pXML( NULL ), m_pReader( NULL ), m_pStream( NULL )
 {
-    m_pReader = NULL;
-    m_pStream = NULL;
-
-    if( useDTD )
+    m_pXML = xml_Create( pIntf );
+    if( !m_pXML )
     {
-        m_pXML = xml_Create( pIntf );
-        if( m_pXML )
-            LoadCatalog();
-        else
-            msg_Err( getIntf(), "DTD not supported" );
+        msg_Err( getIntf(), "cannot initialize xml" );
+        return;
     }
-    else
-        m_pXML = NULL;
+
+    LoadCatalog();
 
     char* psz_uri = make_URI( rFileName.c_str(), NULL );
     m_pStream = stream_UrlNew( pIntf, psz_uri );
     free( psz_uri );
-
     if( !m_pStream )
     {
         msg_Err( getIntf(), "failed to open %s for reading",
                  rFileName.c_str() );
-        m_pReader = NULL;
         return;
     }
+
     m_pReader = xml_ReaderCreate( m_pXML, m_pStream );
     if( !m_pReader )
     {
@@ -66,8 +59,7 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
         return;
     }
 
-    if( m_pXML )
-        xml_ReaderUseDTD( m_pReader );
+    xml_ReaderUseDTD( m_pReader );
 }
 
 
@@ -105,7 +97,7 @@ void XMLParser::LoadCatalog()
     if( it == resPath.end() )
     {
         // Ok, try the default one
-        xml_CatalogLoad( m_pXML, 0 );
+        xml_CatalogLoad( m_pXML, NULL );
     }
 
     for( it = resPath.begin(); it != resPath.end(); ++it )

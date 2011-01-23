@@ -44,8 +44,7 @@ public:
     };
 
     SkinParser( intf_thread_t *pIntf, const string &rFileName,
-                const string &rPath, bool useDTD = true,
-                BuilderData *pData = NULL );
+                const string &rPath, BuilderData *pData = NULL );
     virtual ~SkinParser();
 
     const BuilderData &getData() const { return *m_pData; }

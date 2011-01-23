@@ -27,9 +27,9 @@
 #include <math.h>
 
 SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName,
-                        const string &rPath, bool useDTD, BuilderData *pData ):
-    XMLParser( pIntf, rFileName, useDTD ), m_path( rPath), m_pData(pData),
-    m_ownData(pData == NULL), m_xOffset( 0 ), m_yOffset( 0 )
+                        const string &rPath, BuilderData *pData ):
+    XMLParser( pIntf, rFileName ), m_path( rPath ), m_pData( pData ),
+    m_ownData( pData == NULL ), m_xOffset( 0 ), m_yOffset( 0 )
 {
     // Make sure the data is allocated
     if( m_pData == NULL )
@@ -76,9 +76,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         OSFactory *pFactory = OSFactory::instance( getIntf() );
         string fullPath = m_path + pFactory->getDirSeparator() + attr["file"];
         msg_Dbg( getIntf(), "opening included XML file: %s", fullPath.c_str() );
-        // FIXME: We do not use the DTD to validate the included XML file,
-        // as the parser seems to dislike it otherwise...
-        SkinParser subParser( getIntf(), fullPath.c_str(), m_path, false, m_pData );
+        SkinParser subParser( getIntf(), fullPath.c_str(), m_path, m_pData );
         subParser.parse();
     }
 
