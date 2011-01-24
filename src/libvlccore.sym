@@ -243,8 +243,7 @@ make_path
 mdate
 ml_Create
 ml_Destroy
-ml_Hold
-ml_Release
+ml_Get
 media_New
 ml_OpConnectChilds
 ml_FtreeSpec

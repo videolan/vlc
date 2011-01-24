@@ -230,7 +230,7 @@ MLConfDialog::MLConfDialog( QWidget *parent, intf_thread_t *_p_intf )
     main_layout->addWidget( recursivity, 1, 0 );
     main_layout->addWidget( buttonsBox, 2, 0 );
 
-    p_ml = ml_Hold( p_intf );
+    p_ml = ml_Get( p_intf );
     init();
 
     BUTTONACT( save, save() );
@@ -241,7 +241,6 @@ MLConfDialog::MLConfDialog( QWidget *parent, intf_thread_t *_p_intf )
 
 MLConfDialog::~MLConfDialog()
 {
-    ml_Release( p_intf );
 }
 
 void MLConfDialog::init()

@@ -88,7 +88,7 @@ MLItem::MLItem( const MLModel *p_model,
     if( p_media )
         ml_gc_incref( p_media );
     this->media = p_media;
-    p_ml = ml_Hold( _p_intf );
+    p_ml = ml_Get( _p_intf );
 }
 
 MLItem::~MLItem()
@@ -96,7 +96,6 @@ MLItem::~MLItem()
     // Free private data
     if( this->media )
         ml_gc_decref( this->media );
-    ml_Release( p_intf );
     if( !children.isEmpty() )
         clearChildren();
 }

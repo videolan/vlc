@@ -387,18 +387,11 @@ vlm_t *vlm_New (vlc_object_t *obj)
 #ifndef MEDIA_LIBRARY
 #include<vlc_media_library.h>
 
-#undef ml_Hold
-media_library_t* ml_Hold ( vlc_object_t* p_this )
+#undef ml_Get
+media_library_t* ml_Get ( vlc_object_t* p_this )
 {
     VLC_UNUSED( p_this );
     return NULL;
-}
-
-#undef ml_Release
-void ml_Release ( vlc_object_t* p_this )
-{
-    VLC_UNUSED( p_this );
-    assert( 0 );
 }
 
 media_library_t* ml_Create ( vlc_object_t *p_this, char* psz_name )

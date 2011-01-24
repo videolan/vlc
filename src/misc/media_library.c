@@ -98,14 +98,14 @@ media_library_t *ml_Create( vlc_object_t *p_this, char *psz_name )
     return p_ml;
 }
 
-#undef ml_Hold
+#undef ml_Get
 /**
  * @brief Acquire a reference to the media library singleton
  * @param p_this Object that holds the reference
  * @return media_library_t The ml object. NULL if not compiled with
  * media library or if unable to load
  */
-media_library_t* ml_Hold( vlc_object_t* p_this )
+media_library_t* ml_Get( vlc_object_t* p_this )
 {
     media_library_t* p_ml;
     vlc_mutex_lock( &( libvlc_priv( p_this->p_libvlc )->ml_lock ) );
@@ -118,28 +118,8 @@ media_library_t* ml_Hold( vlc_object_t* p_this )
             = ml_Create( VLC_OBJECT( p_this->p_libvlc ), NULL );
         p_ml = libvlc_priv (p_this->p_libvlc)->p_ml;
     }
-    if( p_ml )
-        vlc_object_hold( p_ml );
     vlc_mutex_unlock( &( libvlc_priv( p_this->p_libvlc )->ml_lock ) );
     return p_ml;
-}
-
-#undef ml_Release
-/**
- * @brief Release a reference to the media library singleton
- * @param p_this Object that holds the reference
- */
-void ml_Release( vlc_object_t* p_this )
-{
-    media_library_t* p_ml;
-    p_ml = libvlc_priv (p_this->p_libvlc)->p_ml;
-    if( p_ml == NULL )
-    {
-        msg_Warn( p_this->p_libvlc , "Spurious release ML called");
-        return;
-    }
-    assert( VLC_OBJECT( p_ml ) != p_this );
-    vlc_object_release( p_ml );
 }
 
 /**

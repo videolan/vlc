@@ -397,15 +397,8 @@ struct ml_person_t
  * @return The media library object. NULL if the media library
  * object could not be loaded
  */
-VLC_EXPORT( media_library_t*, ml_Hold, ( vlc_object_t* p_this ) );
-#define ml_Hold( a ) ml_Hold( VLC_OBJECT(a) )
-
-/**
- * @brief Discard your ref to media library
- * @param p_this The object holding the media library
- */
-VLC_EXPORT( void, ml_Release, ( vlc_object_t* p_this ) );
-#define ml_Release(a) ml_Release( VLC_OBJECT(a) )
+VLC_EXPORT( media_library_t*, ml_Get, ( vlc_object_t* p_this ) );
+#define ml_Get( a ) ml_Get( VLC_OBJECT(a) )
 
 /**
  * @brief Create a Media Library VLC object.
