@@ -29,6 +29,7 @@
 # include <libintl.h>
 # if defined (__APPLE__) || defined (WIN32)
 #  include "config/configuration.h"
+#  include <vlc_charset.h>
 # endif
 #endif
 
@@ -41,13 +42,15 @@ int vlc_bindtextdomain (const char *domain)
 # if !defined (__APPLE__) && !defined (WIN32)
     static const char path[] = LOCALEDIR;
 # else
-    char *datadir = config_GetDataDirDefault();
-    char *path;
+    char *path = config_GetDataDirDefault();
+    char *buf;
 
-    if (unlikely(datadir == NULL))
+    if (unlikely(path == NULL))
         return -1;
-    ret = asprintf (&path, "%s" DIR_SEP "locale", datadir);
-    free (datadir);
+    ret = asprintf (&buf, "%s" DIR_SEP "locale", path);
+    free (path);
+    path = ToLocaleDup (buf);
+    free (buf);
 # endif
 
     if (bindtextdomain (domain, path) == NULL)
