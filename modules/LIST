@@ -30,6 +30,7 @@ $Id$
  * access_realrtsp: Real RTSP access
  * access_rtmp: RTMP network access
  * access_sftp: SFTP network access module
+ * access_shm: Shared memory framebuffer access module
  * access_smb: SMB shares access module
  * access_tcp: TCP Network access module
  * access_udp: UDP Network access module
