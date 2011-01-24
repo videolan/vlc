@@ -973,16 +973,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
     playlist_t    *p_playlist = libvlc_priv (p_libvlc)->p_playlist;
 
-#if defined(MEDIA_LIBRARY)
-    media_library_t* p_ml = priv->p_ml;
-    if( p_ml )
-    {
-        ml_Destroy( VLC_OBJECT( p_ml ) );
-        vlc_object_release( p_ml );
-        libvlc_priv(p_playlist->p_libvlc)->p_ml = NULL;
-    }
-#endif
-
     /* Deactivate the playlist */
     msg_Dbg( p_libvlc, "deactivating the playlist" );
     pl_Deactivate( p_libvlc );
@@ -1001,6 +991,16 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     if( priv->p_vlm )
     {
         vlm_Delete( priv->p_vlm );
+    }
+#endif
+
+#if defined(MEDIA_LIBRARY)
+    media_library_t* p_ml = priv->p_ml;
+    if( p_ml )
+    {
+        ml_Destroy( VLC_OBJECT( p_ml ) );
+        vlc_object_release( p_ml );
+        libvlc_priv(p_playlist->p_libvlc)->p_ml = NULL;
     }
 #endif
 
