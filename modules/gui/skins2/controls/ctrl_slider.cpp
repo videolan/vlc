@@ -297,7 +297,6 @@ void CtrlSliderCursor::CmdMove::execute()
 
 void CtrlSliderCursor::CmdScroll::execute()
 {
-    // XXX Two of these in this file, figure out where it really belongs.
     int dir = static_cast<EvtScroll*>(m_pParent->m_pEvt)->getDirection();
     m_pParent->m_rVariable.set( scroll( EvtScroll::kUp == dir,
                                         m_pParent->m_rVariable.get() ) );
@@ -486,7 +485,6 @@ void CtrlSliderBg::handleEvent( EvtGeneric &rEvent )
     }
     else if( rEvent.getAsString().find( "scroll" ) != string::npos )
     {
-        // XXX Two of these in this file, figure out where it really belongs.
         int dir = static_cast<EvtScroll*>(&rEvent)->getDirection();
         m_rVariable.set( scroll( EvtScroll::kUp == dir, m_rVariable.get() ) );
     }
