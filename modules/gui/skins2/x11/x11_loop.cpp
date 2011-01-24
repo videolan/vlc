@@ -300,19 +300,25 @@ void X11Loop::handleX11Event()
                 case 4:
                 {
                     // Scroll up
-                    EvtScroll evt( getIntf(), event.xbutton.x,
-                                   event.xbutton.y, EvtScroll::kUp,
-                                   mod );
-                    pWin->processEvent( evt );
+                    if( event.type == ButtonPress )
+                    {
+                        EvtScroll evt( getIntf(), event.xbutton.x,
+                                       event.xbutton.y, EvtScroll::kUp,
+                                       mod );
+                        pWin->processEvent( evt );
+                    }
                     break;
                 }
                 case 5:
                 {
                     // Scroll down
-                    EvtScroll evt( getIntf(), event.xbutton.x,
-                                   event.xbutton.y, EvtScroll::kDown,
-                                   mod );
-                    pWin->processEvent( evt );
+                    if( event.type == ButtonPress )
+                    {
+                        EvtScroll evt( getIntf(), event.xbutton.x,
+                                       event.xbutton.y, EvtScroll::kDown,
+                                       mod );
+                        pWin->processEvent( evt );
+                    }
                     break;
                 }
             }
