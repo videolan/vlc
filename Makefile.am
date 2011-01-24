@@ -754,7 +754,7 @@ endif
 	cp -r $(destdir)/include "$(win32_destdir)/sdk"
 	cp -r $(destdir)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
 	for file in libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la; do \
-        cp -r $(destdir)/lib/$$file "$(win32_destdir)/sdk/lib"; done
+        cp -rv $(destdir)/lib/$$file "$(win32_destdir)/sdk/lib"; done
 if !HAVE_WIN64
 if !HAVE_WINCE
 	mkdir -p "$(win32_destdir)/sdk/activex"
@@ -769,7 +769,7 @@ endif
 if USE_PEFLAGS
 	find $(win32_destdir) -type f \( -name '*$(LIBEXT)' -print -o -name '*$(EXEEXT)' -print \) -exec $(PEFLAGS) --dynamicbase=true --nxcompat=true {} \;
 endif
-	find $(win32_destdir) -type f \( -name '*.a' -or -name '*.la' \) -exec rm -rf {} \;
+	find $(win32_destdir)/plugins/ -type f \( -name '*.a' -or -name '*.la' \) -exec rm -rvf {} \;
 
 package-win-base: package-win-common
 	find $(win32_destdir) -type f \( -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' \) | while read i; \
