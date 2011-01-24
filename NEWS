@@ -5,6 +5,7 @@ Important changes for packagers:
  * The default builds now assume that the operating system uses UTF-8 for
    its file systems and files content (except the Windows port). If this is
    not acceptable, pass --enable-non-utf8 to the configure script.
+   Non-UTF-8 file systems support will be removed in future versions.
  * The default tarballs are now .tar.xz
 
  * The NPAPI webplugin has moved to git://git.videolan.org/npapi-vlc.git
