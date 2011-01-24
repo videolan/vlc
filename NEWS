@@ -1,4 +1,4 @@
-Changes between 1.1.5 and 1.2.0-git:
+Changes between 1.1.6 and 1.2.0-git:
 ------------------------------------
 
 Important changes for packagers:
@@ -104,11 +104,64 @@ Removed modules:
  * upnp: use upnp_intel
 
 
+Changes between 1.1.5 and 1.1.6:
+---------------------------------
+
+Audio output:
+ * Multiple fixes and improvements on PulseAudio output
+   PACKAGERS are VERY STRONGLY advised to update libpulse to 0.9.22.
+   Update is required to use PulseAudio with the Phonon-VLC backend (KDE)
+   and with the Mozilla VLC web browser plugin.
+
+Access:
+ * Fix the Audio CD crash when looking for CDDB metadata on Windows
+
+Decoders:
+ * Support for MPC SV7 and SV8 on Windows and Mac OS X (Unix was already working)
+ * Enabled FluidSynth MIDI playback plugin on Mac OS X
+ * Faster VP8/Webm decoding with recent codecs libraries
+
+Demuxers:
+ * Fix Buffer overflow in Real demuxer CVE-2010-3907 / VideoLAN-SA-1007
+ * Fix some asf/wmv seeking issues, notably when seek didn't go to a keyframe
+ * Support for 24-bits PCM over RTP (audio/L24)
+
+Subtitles and renderer:
+ * Do not auto-detect .txt files for subtitles
+ * Mark more freetype options as safe
+ * Mac OS X: fixed fontconfig cache creation
+ * Fix heap corruption in subtitle decoders, potentially exploitable,
+   discovered by Harry Sintonen - sintonen at iki.fi
+
+Visualization:
+ * Fix projectM visualization for Linux in all locales
+ * Fix projectM visualization support for Windows
+ * Various projectM improvements: the module should be working now
+ * Fix goom crash on Windows XP and Mac OS X
+
+Interfaces:
+ * Qt4: fixes for media keys processing and MCE remotes
+ * Qt4: various fixes and portability improvements
+ * KDE: work-around open dialog first slow opening because of KMimeTypeRepository
+
+Miscellaneous fixes:
+ * KDE device solid actions
+ * XDG screensaver
+ * Transcode integer overflow
+ * HTTP Icy metadata reading
+ * Windows: revert to 1.1.4 performance timers
+
+Translations:
+ * Update translations for Chinese, Nippon, Slovak, Estonian, Spanish, Galician,
+   Swedish, Bulgarian, French, Bengalese, German, Slovak, Japanese, Dutch,
+   Polish, Hungarian, Indonesian, Sinhala and Irish
+
+
 Changes between 1.1.4.1 and 1.1.5:
 ----------------------------------
 
 Security:
- * Fix a Windows crash on accessing Network Shared files/drives, 
+ * Fix a Windows crash on accessing Network Shared files/drives,
    VideoLAN-SA-1006
 
 Access:
