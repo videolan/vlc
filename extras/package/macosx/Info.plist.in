@@ -1349,6 +1349,23 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>@VERSION@</string>
+    <key>LSArchitecturePriority</key>
+	<array>
+		<string>x86_64</string>
+		<string>i386</string>
+		<string>ppc</string>
+	</array>
+	<key>LSMinimumSystemVersionByArchitecture</key>
+	<dict>
+		<key>i386</key>
+		<string>10.5.0</string>
+		<key>x86_64</key>
+		<string>10.6.0</string>
+		<key>ppc</key>
+		<string>10.5.0</string>
+		<key>ppc64</key>
+		<string>10.5.0</string>
+	</dict>
 	<key>NSAppleScriptEnabled</key>
 	<string>YES</string>
 	<key>NSMainNibFile</key>
