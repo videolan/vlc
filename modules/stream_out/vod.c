@@ -88,11 +88,13 @@ typedef enum
 {
     RTSP_CMD_TYPE_NONE,  /* Exit requested */
 
+#if 0
     RTSP_CMD_TYPE_PLAY,
     RTSP_CMD_TYPE_PAUSE,
+#endif
     RTSP_CMD_TYPE_STOP,
-    RTSP_CMD_TYPE_SEEK,
 #if 0
+    RTSP_CMD_TYPE_SEEK,
     RTSP_CMD_TYPE_REWIND,
     RTSP_CMD_TYPE_FORWARD,
 #endif
@@ -391,6 +393,7 @@ static void* CommandThread( vlc_object_t *p_this )
         /* */
         switch( cmd.i_type )
         {
+#if 0
         case RTSP_CMD_TYPE_PLAY:
             vod_MediaControl( p_vod, p_media, cmd.psz_session,
                               VOD_MEDIA_PLAY, cmd.psz_arg );
@@ -399,17 +402,18 @@ static void* CommandThread( vlc_object_t *p_this )
             vod_MediaControl( p_vod, p_media, cmd.psz_session,
                               VOD_MEDIA_PAUSE );
             break;
+#endif
 
         case RTSP_CMD_TYPE_STOP:
             vod_MediaControl( p_vod, p_media, cmd.psz_session, VOD_MEDIA_STOP );
             break;
 
+#if 0
         case RTSP_CMD_TYPE_SEEK:
             vod_MediaControl( p_vod, p_media, cmd.psz_session,
                               VOD_MEDIA_SEEK, cmd.i_arg );
             break;
 
-#if 0
         case RTSP_CMD_TYPE_REWIND:
             vod_MediaControl( p_vod, p_media, cmd.psz_session,
                               VOD_MEDIA_REWIND, cmd.f_arg );
@@ -522,33 +526,22 @@ int vod_check_range(vod_media_t *p_media, const char *psz_session,
 
 /* TODO: add support in the VLM for queueing proper PLAY requests with
  * start and end times, fetch whether the input is seekable... and then
- * clean this up and remove the running argument */
+ * clean this up */
 void vod_play(vod_media_t *p_media, const char *psz_session,
-              int64_t start, int64_t end, bool running)
+              int64_t *start, int64_t end)
 {
-    if (vod_check_range(p_media, psz_session, start, end) != VLC_SUCCESS)
+    if (vod_check_range(p_media, psz_session, *start, end) != VLC_SUCCESS)
         return;
 
-    /* We want to seek before unpausing, but it won't
-     * work if the instance is not running yet. */
-
-    if (!running)
-        /* We're passing the #vod{} sout chain here */
-        CommandPush(p_media->p_vod, RTSP_CMD_TYPE_PLAY, p_media,
-                    psz_session, 0, "vod");
-    if (start >= 0)
-        CommandPush(p_media->p_vod, RTSP_CMD_TYPE_SEEK, p_media,
-                    psz_session, start, NULL);
-    if (running)
-        /* This is the thing to do to unpause... */
-        CommandPush(p_media->p_vod, RTSP_CMD_TYPE_PLAY, p_media,
-                    psz_session, 0, "vod");
+    /* We're passing the #vod{} sout chain here */
+    vod_MediaControl(p_media->p_vod, p_media, psz_session,
+                     VOD_MEDIA_PLAY, "vod", start);
 }
 
-void vod_pause(vod_media_t *p_media, const char *psz_session)
+void vod_pause(vod_media_t *p_media, const char *psz_session, int64_t *npt)
 {
-    CommandPush(p_media->p_vod, RTSP_CMD_TYPE_PAUSE, p_media,
-                psz_session, 0, NULL);
+    vod_MediaControl(p_media->p_vod, p_media, psz_session,
+                     VOD_MEDIA_PAUSE, npt);
 }
 
 void vod_stop(vod_media_t *p_media, const char *psz_session)

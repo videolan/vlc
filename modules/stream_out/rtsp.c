@@ -934,7 +934,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             answer->i_status = 200;
 
             psz_session = httpd_MsgGet( query, "Session" );
-            int64_t start = -1, end = -1;
+            int64_t start = -1, end = -1, npt;
             const char *range = httpd_MsgGet (query, "Range");
             if (range != NULL)
             {
@@ -995,7 +995,8 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     }
                 }
                 int64_t ts = rtp_get_ts(vod ? NULL : (sout_stream_t *)owner,
-                                        sout_id, rtsp->vod_media, psz_session);
+                                        sout_id, rtsp->vod_media, psz_session,
+                                        vod ? NULL : &npt);
 
                 for( int i = 0; i < ses->trackc; i++ )
                 {
@@ -1045,11 +1046,17 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                 }
                 if (vod)
                 {
-                    bool running = (sout_id != NULL);
-                    vod_play(rtsp->vod_media, psz_session, start, end, running);
+                    vod_play(rtsp->vod_media, psz_session, &start, end);
+                    npt = start;
                 }
             }
             vlc_mutex_unlock( &rtsp->lock );
+
+            if (ses != NULL)
+            {
+                double f_npt = (double) npt / CLOCK_FREQ;
+                httpd_MsgAdd( answer, "Range", "npt=%f-", f_npt );
+            }
 
             if( httpd_MsgGet( query, "Scale" ) != NULL )
                 httpd_MsgAdd( answer, "Scale", "1." );
@@ -1076,8 +1083,11 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             {
                 if (id == NULL)
                 {
-                    if (vod)
-                        vod_pause(rtsp->vod_media, psz_session);
+                    assert(vod);
+                    int64_t npt;
+                    vod_pause(rtsp->vod_media, psz_session, &npt);
+                    double f_npt = (double) npt / CLOCK_FREQ;
+                    httpd_MsgAdd( answer, "Range", "npt=%f-", f_npt );
                 }
                 else /* "Mute" the selected track */
                 {

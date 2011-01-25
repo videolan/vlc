@@ -317,13 +317,40 @@ static int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
     switch( i_query )
     {
     case VOD_MEDIA_PLAY:
+    {
         psz = (const char *)va_arg( args, const char * );
+        int64_t *i_time = (int64_t *)va_arg( args, int64_t *);
+        bool b_retry = false;
+        if (*i_time < 0)
+        {
+            /* No start time requested: return the current NPT */
+            i_ret = vlm_ControlInternal( vlm, VLM_GET_MEDIA_INSTANCE_TIME, id, psz_id, i_time );
+            /* The instance is not running yet, it will start at 0 */
+            if (i_ret)
+                *i_time = 0;
+        }
+        else
+        {
+            /* We want to seek before unpausing, but it won't
+             * work if the instance is not running yet. */
+            b_retry = vlm_ControlInternal( vlm, VLM_SET_MEDIA_INSTANCE_TIME, id, psz_id, *i_time );
+        }
+
         i_ret = vlm_ControlInternal( vlm, VLM_START_MEDIA_VOD_INSTANCE, id, psz_id, 0, psz );
+
+        if (!i_ret && b_retry)
+            i_ret = vlm_ControlInternal( vlm, VLM_SET_MEDIA_INSTANCE_TIME, id, psz_id, *i_time );
         break;
+    }
 
     case VOD_MEDIA_PAUSE:
+    {
+        int64_t *i_time = (int64_t *)va_arg( args, int64_t *);
         i_ret = vlm_ControlInternal( vlm, VLM_PAUSE_MEDIA_INSTANCE, id, psz_id );
+        if (!i_ret)
+            i_ret = vlm_ControlInternal( vlm, VLM_GET_MEDIA_INSTANCE_TIME, id, psz_id, i_time );
         break;
+    }
 
     case VOD_MEDIA_STOP:
         i_ret = vlm_ControlInternal( vlm, VLM_STOP_MEDIA_INSTANCE, id, psz_id );

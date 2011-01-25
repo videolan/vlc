@@ -69,8 +69,8 @@ static inline int vod_MediaControl( vod_t *p_vod, vod_media_t *p_media,
 
 enum vod_query_e
 {
-    VOD_MEDIA_PLAY,         /* arg1= char *         res=    */
-    VOD_MEDIA_PAUSE,        /* arg1=                res=    */
+    VOD_MEDIA_PLAY,         /* arg1= char *, arg2= int64_t *, res=    */
+    VOD_MEDIA_PAUSE,        /* arg1= int64_t *      res=    */
     VOD_MEDIA_STOP,         /* arg1=                res=can fail    */
     VOD_MEDIA_SEEK,         /* arg1= double         res=    */
     VOD_MEDIA_REWIND,       /* arg1= double         res=    */

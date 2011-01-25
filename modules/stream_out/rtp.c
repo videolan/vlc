@@ -1552,11 +1552,16 @@ static int64_t rtp_init_ts( const vod_media_t *p_media,
 
 /* Return a timestamp corresponding to packets being sent now, and that
  * can be passed to rtp_compute_ts() to get rtptime values for each ES.
- * If the stream output is not started, the initial timestamp that will
- * be used with the first packets is returned instead. */
+ * Also return the NPT corresponding to this timestamp. If the stream
+ * output is not started, the initial timestamp that will be used with
+ * the first packets for NPT=0 is returned instead. */
 int64_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_t *id,
-                    const vod_media_t *p_media, const char *psz_vod_session )
+                    const vod_media_t *p_media, const char *psz_vod_session,
+                    int64_t *p_npt )
 {
+    if (p_npt != NULL)
+        *p_npt = 0;
+
     if (id != NULL)
         p_stream = id->p_stream;
 
@@ -1576,7 +1581,11 @@ int64_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_t *id,
     if( now < i_npt_zero )
         return p_sys->i_pts_zero;
 
-    return p_sys->i_pts_zero + (now - i_npt_zero); 
+    int64_t npt = now - i_npt_zero;
+    if (p_npt != NULL)
+        *p_npt = npt;
+
+    return p_sys->i_pts_zero + npt; 
 }
 
 void rtp_packetize_common( sout_stream_id_t *id, block_t *out,

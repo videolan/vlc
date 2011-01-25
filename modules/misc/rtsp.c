@@ -826,12 +826,14 @@ static void* CommandThread( vlc_object_t *p_this )
         switch( cmd.i_type )
         {
         case RTSP_CMD_TYPE_PLAY:
+            cmd.i_arg = -1;
             vod_MediaControl( p_vod, p_media, cmd.psz_session,
-                              VOD_MEDIA_PLAY, cmd.psz_arg );
+                              VOD_MEDIA_PLAY, cmd.psz_arg, &cmd.i_arg );
             break;
         case RTSP_CMD_TYPE_PAUSE:
+            cmd.i_arg = -1;
             vod_MediaControl( p_vod, p_media, cmd.psz_session,
-                              VOD_MEDIA_PAUSE );
+                              VOD_MEDIA_PAUSE, &cmd.i_arg );
             break;
 
         case RTSP_CMD_TYPE_STOP:

@@ -50,7 +50,8 @@ int rtp_add_sink( sout_stream_id_t *id, int fd, bool rtcp_mux, uint16_t *seq );
 void rtp_del_sink( sout_stream_id_t *id, int fd );
 uint16_t rtp_get_seq( sout_stream_id_t *id );
 int64_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_t *id,
-                    const vod_media_t *p_media, const char *psz_vod_session );
+                    const vod_media_t *p_media, const char *psz_vod_session,
+                    int64_t *p_npt );
 
 /* RTP packetization */
 void rtp_packetize_common (sout_stream_id_t *id, block_t *out,
@@ -95,8 +96,8 @@ void CloseVoD( vlc_object_t * );
 int vod_check_range(vod_media_t *p_media, const char *psz_session,
                     int64_t start, int64_t end);
 void vod_play(vod_media_t *p_media, const char *psz_session,
-              int64_t start, int64_t end, bool running);
-void vod_pause(vod_media_t *p_media, const char *psz_session);
+              int64_t *start, int64_t end);
+void vod_pause(vod_media_t *p_media, const char *psz_session, int64_t *npt);
 void vod_stop(vod_media_t *p_media, const char *psz_session);
 
 const char *vod_get_mux(const vod_media_t *p_media);
