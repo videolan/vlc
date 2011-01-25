@@ -143,7 +143,6 @@ Visualization:
 Interfaces:
  * Qt4: fixes for media keys processing and MCE remotes
  * Qt4: various fixes and portability improvements
- * KDE: work-around open dialog first slow opening because of KMimeTypeRepository
 
 Miscellaneous fixes:
  * KDE device solid actions
