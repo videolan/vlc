@@ -209,8 +209,6 @@ void CloseVoD( vlc_object_t * p_this )
 static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
                               input_item_t *p_item )
 {
-    vod_sys_t *p_sys = p_vod->p_sys;
-
     vod_media_t *p_media = calloc( 1, sizeof(vod_media_t) );
     if( !p_media )
         return NULL;
@@ -265,10 +263,24 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
         goto error;
     }
 
+    msg_Dbg(p_vod, "adding media '%s'", psz_name);
+
+    CommandPush( p_vod, RTSP_CMD_TYPE_ADD, p_media, NULL, 0, psz_name );
+    return p_media;
+
+error:
+    MediaDel(p_vod, p_media);
+    return NULL;
+}
+
+static void MediaSetup( vod_t *p_vod, vod_media_t *p_media,
+                        const char *psz_name )
+{
+    vod_sys_t *p_sys = p_vod->p_sys;
     char *psz_url;
 
     if( asprintf( &psz_url, "%s%s", p_sys->psz_rtsp_url, psz_name ) < 0 )
-        goto error;
+        return;
 
     vlc_url_t url;
     vlc_UrlParse( &url, psz_url, 0 );
@@ -279,25 +291,14 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     vlc_UrlClean( &url );
 
     if (p_media->rtsp == NULL)
-        goto error;
+        return;
 
     for (int i = 0; i < p_media->i_es; i++)
     {
         media_es_t *p_es = p_media->es[i];
         p_es->rtsp_id = RtspAddId(p_media->rtsp, NULL, 0,
                                   p_es->rtp_fmt.clock_rate, -1);
-        if (p_es->rtsp_id == NULL)
-            goto error;
     }
-
-    msg_Dbg(p_vod, "adding media '%s'", psz_name);
-
-    CommandPush( p_vod, RTSP_CMD_TYPE_ADD, p_media, NULL, 0, NULL );
-    return p_media;
-
-error:
-    MediaDel(p_vod, p_media);
-    return NULL;
 }
 
 static void MediaAskDel ( vod_t *p_vod, vod_media_t *p_media )
@@ -377,6 +378,7 @@ static void* CommandThread( vlc_object_t *p_this )
 
         if ( cmd.i_type == RTSP_CMD_TYPE_ADD )
         {
+            MediaSetup(p_vod, cmd.p_media, cmd.psz_arg);
             goto next;
         }
 
