@@ -86,19 +86,7 @@ struct vod_sys_t
 /* rtsp delayed command (to avoid deadlock between vlm/httpd) */
 typedef enum
 {
-    RTSP_CMD_TYPE_NONE,  /* Exit requested */
-
-#if 0
-    RTSP_CMD_TYPE_PLAY,
-    RTSP_CMD_TYPE_PAUSE,
-#endif
     RTSP_CMD_TYPE_STOP,
-#if 0
-    RTSP_CMD_TYPE_SEEK,
-    RTSP_CMD_TYPE_REWIND,
-    RTSP_CMD_TYPE_FORWARD,
-#endif
-
     RTSP_CMD_TYPE_ADD,
     RTSP_CMD_TYPE_DEL,
 } rtsp_cmd_type_t;
@@ -108,9 +96,7 @@ typedef struct
 {
     int i_type;
     vod_media_t *p_media;
-    char *psz_session;
     char *psz_arg;
-    int64_t i_arg;
 } rtsp_cmd_t;
 
 static vod_media_t *MediaNew( vod_t *, const char *, input_item_t * );
@@ -118,8 +104,8 @@ static void         MediaDel( vod_t *, vod_media_t * );
 static void         MediaAskDel ( vod_t *, vod_media_t * );
 
 static void* CommandThread( vlc_object_t *p_this );
-static void  CommandPush( vod_t *, rtsp_cmd_type_t, vod_media_t *, const char *psz_session,
-                          int64_t i_arg, const char *psz_arg );
+static void  CommandPush( vod_t *, rtsp_cmd_type_t, vod_media_t *,
+                          const char *psz_arg );
 
 /*****************************************************************************
  * Open: Starts the RTSP server module
@@ -185,7 +171,6 @@ void CloseVoD( vlc_object_t * p_this )
 
     /* Stop command thread */
     vlc_object_kill( p_vod );
-    CommandPush( p_vod, RTSP_CMD_TYPE_NONE, NULL, NULL, 0, NULL );
     vlc_thread_join( p_vod );
 
     while( block_FifoCount( p_sys->p_fifo_cmd ) > 0 )
@@ -196,7 +181,6 @@ void CloseVoD( vlc_object_t * p_this )
         block_Release( p_block_cmd );
         if ( cmd.i_type == RTSP_CMD_TYPE_DEL )
             MediaDel(p_vod, cmd.p_media);
-        free( cmd.psz_session );
         free( cmd.psz_arg );
     }
     block_FifoRelease( p_sys->p_fifo_cmd );
@@ -267,7 +251,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
 
     msg_Dbg(p_vod, "adding media '%s'", psz_name);
 
-    CommandPush( p_vod, RTSP_CMD_TYPE_ADD, p_media, NULL, 0, psz_name );
+    CommandPush( p_vod, RTSP_CMD_TYPE_ADD, p_media, psz_name );
     return p_media;
 
 error:
@@ -306,7 +290,7 @@ static void MediaSetup( vod_t *p_vod, vod_media_t *p_media,
 static void MediaAskDel ( vod_t *p_vod, vod_media_t *p_media )
 {
     msg_Dbg( p_vod, "deleting media" );
-    CommandPush( p_vod, RTSP_CMD_TYPE_DEL, p_media, NULL, 0, NULL );
+    CommandPush( p_vod, RTSP_CMD_TYPE_DEL, p_media, NULL );
 }
 
 static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
@@ -336,20 +320,18 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
     free( p_media );
 }
 
-static void CommandPush( vod_t *p_vod, rtsp_cmd_type_t i_type, vod_media_t *p_media, const char *psz_session,
-                         int64_t i_arg, const char *psz_arg )
+static void CommandPush( vod_t *p_vod, rtsp_cmd_type_t i_type,
+                         vod_media_t *p_media, const char *psz_arg )
 {
     rtsp_cmd_t cmd;
     block_t *p_cmd;
 
-    memset( &cmd, 0, sizeof(cmd) );
     cmd.i_type = i_type;
     cmd.p_media = p_media;
-    if( psz_session )
-        cmd.psz_session = strdup(psz_session);
-    cmd.i_arg = i_arg;
     if( psz_arg )
         cmd.psz_arg = strdup(psz_arg);
+    else
+        cmd.psz_arg = NULL;
 
     p_cmd = block_New( p_vod, sizeof(rtsp_cmd_t) );
     memcpy( p_cmd->p_buffer, &cmd, sizeof(cmd) );
@@ -361,80 +343,40 @@ static void* CommandThread( vlc_object_t *p_this )
 {
     vod_t *p_vod = (vod_t*)p_this;
     vod_sys_t *p_sys = p_vod->p_sys;
-    int canc = vlc_savecancel ();
 
     while( vlc_object_alive (p_vod) )
     {
         block_t *p_block_cmd = block_FifoGet( p_sys->p_fifo_cmd );
         rtsp_cmd_t cmd;
-        vod_media_t *p_media = cmd.p_media;
 
         if( !p_block_cmd )
             break;
 
+        int canc = vlc_savecancel ();
         memcpy( &cmd, p_block_cmd->p_buffer, sizeof(cmd) );
         block_Release( p_block_cmd );
-
-        if( cmd.i_type == RTSP_CMD_TYPE_NONE )
-            break;
-
-        if ( cmd.i_type == RTSP_CMD_TYPE_ADD )
-        {
-            MediaSetup(p_vod, cmd.p_media, cmd.psz_arg);
-            goto next;
-        }
-
-        if ( cmd.i_type == RTSP_CMD_TYPE_DEL )
-        {
-            MediaDel(p_vod, cmd.p_media);
-            goto next;
-        }
 
         /* */
         switch( cmd.i_type )
         {
-#if 0
-        case RTSP_CMD_TYPE_PLAY:
-            vod_MediaControl( p_vod, p_media, cmd.psz_session,
-                              VOD_MEDIA_PLAY, cmd.psz_arg );
+        case RTSP_CMD_TYPE_ADD:
+            MediaSetup(p_vod, cmd.p_media, cmd.psz_arg);
             break;
-        case RTSP_CMD_TYPE_PAUSE:
-            vod_MediaControl( p_vod, p_media, cmd.psz_session,
-                              VOD_MEDIA_PAUSE );
+        case RTSP_CMD_TYPE_DEL:
+            MediaDel(p_vod, cmd.p_media);
             break;
-#endif
-
         case RTSP_CMD_TYPE_STOP:
-            vod_MediaControl( p_vod, p_media, cmd.psz_session, VOD_MEDIA_STOP );
+            vod_MediaControl( p_vod, cmd.p_media, cmd.psz_arg, VOD_MEDIA_STOP );
             break;
-
-#if 0
-        case RTSP_CMD_TYPE_SEEK:
-            vod_MediaControl( p_vod, p_media, cmd.psz_session,
-                              VOD_MEDIA_SEEK, cmd.i_arg );
-            break;
-
-        case RTSP_CMD_TYPE_REWIND:
-            vod_MediaControl( p_vod, p_media, cmd.psz_session,
-                              VOD_MEDIA_REWIND, cmd.f_arg );
-            break;
-
-        case RTSP_CMD_TYPE_FORWARD:
-            vod_MediaControl( p_vod, p_media, cmd.psz_session,
-                              VOD_MEDIA_FORWARD, cmd.f_arg );
-            break;
-#endif
 
         default:
             break;
         }
 
-    next:
-        free( cmd.psz_session );
         free( cmd.psz_arg );
+        vlc_restorecancel (canc);
     }
 
-    vlc_restorecancel (canc);
     return NULL;
 }
 
@@ -546,8 +488,7 @@ void vod_pause(vod_media_t *p_media, const char *psz_session, int64_t *npt)
 
 void vod_stop(vod_media_t *p_media, const char *psz_session)
 {
-    CommandPush(p_media->p_vod, RTSP_CMD_TYPE_STOP, p_media,
-                psz_session, 0, NULL);
+    CommandPush(p_media->p_vod, RTSP_CMD_TYPE_STOP, p_media, psz_session);
 }
 
 
