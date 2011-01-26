@@ -148,6 +148,17 @@ static void segment_Free(segment_t *segment);
 /****************************************************************************
  *
  ****************************************************************************/
+static const char *const ext[] = {
+    "#EXT-X-TARGETDURATION",
+    "#EXT-X-MEDIA-SEQUENCE",
+    "#EXT-X-KEY",
+    "#EXT-X-ALLOW-CACHE",
+    "#EXT-X-ENDLIST",
+    "#EXT-X-STREAM-INF",
+    "#EXT-X-DISCONTINUITY",
+    "#EXT-X-VERSION"
+};
+
 static bool isHTTPLiveStreaming(stream_t *s)
 {
     const uint8_t *peek, *peek_end;
@@ -167,10 +178,12 @@ static bool isHTTPLiveStreaming(stream_t *s)
     {
         if (*peek == '#')
         {
-            if (strncasecmp((const char*)peek, "#EXT-X-TARGETDURATION", 21) == 0)
-                return true;
-            else if (strncasecmp((const char*)peek, "#EXT-X-STREAM-INF", 17) == 0)
-                return true;
+            for (unsigned int i = 0; i < ARRAY_SIZE(ext); i++)
+            {
+                char *p = strstr((const char*)peek, ext[i]);
+                if (p != NULL)
+                    return true;
+            }
         }
         peek++;
     };
