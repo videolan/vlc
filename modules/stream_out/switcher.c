@@ -147,7 +147,7 @@ struct sout_stream_sys_t
     int             i_qscale;
     int             i_aspect;
     sout_stream_id_t *pp_audio_ids[MAX_AUDIO];
-    bool      b_audio;
+    bool            b_audio;
 
     /* Pictures */
     picture_t       p_pictures[MAX_PICTURES];
@@ -161,8 +161,8 @@ struct sout_stream_sys_t
 struct sout_stream_id_t
 {
     void            *id;
-    bool      b_switcher_video;
-    bool      b_switcher_audio;
+    bool            b_switcher_video;
+    bool            b_switcher_audio;
     es_format_t     f_src;
     block_t         *p_queued;
 
