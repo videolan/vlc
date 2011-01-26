@@ -28,6 +28,8 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
@@ -1534,6 +1536,104 @@ static int AccessDownload(stream_t *s, segment_t *segment)
 
     AccessClose(s);
     return VLC_SUCCESS;
+}
+
+/* Read M3U8 file */
+static uint8_t *access_ReadM3U8(stream_t *s, vlc_url_t *url)
+{
+    stream_sys_t *p_sys = (stream_sys_t *) s->p_sys;
+
+    /* Download new playlist file from server */
+    if (AccessOpen(s, url) != VLC_SUCCESS)
+        return NULL;
+
+    ssize_t size = p_sys->p_access->info.i_size;
+    if (size == 0) size = 1024; /* no Content-Length */
+
+    msg_Err(s, "Stream size is %"PRId64, size);
+
+    uint8_t *buffer = calloc(1, size);
+    if (buffer == NULL)
+    {
+        AccessClose(s);
+        return NULL;
+    }
+
+    size_t length = 0, curlen = 0;
+    do
+    {
+        length = p_sys->p_access->pf_read(p_sys->p_access, buffer + curlen, size - curlen);
+        if ((length <= 0) || (length >= size))
+            break;
+        curlen += length;
+        if (curlen >= size)
+        {
+            uint8_t *tmp = realloc(*buffer, size + 1024);
+            if (tmp == NULL)
+                break;
+            size += 1024;
+            *buffer = tmp;
+        }
+    } while (vlc_object_alive(s));
+
+    AccessClose(s);
+    return buffer;
+}
+
+static uint8_t *ReadM3U8(stream_t *s)
+{
+    int64_t size = stream_Size(s->p_source);
+
+    msg_Err(s, "Stream size is %"PRId64, size);
+    if (size == 0) size = 1024; /* no Content-Length */
+
+    uint8_t *buffer = calloc(1, size);
+    if (buffer == NULL)
+        return NULL;
+
+    int64_t len = 0, curlen = 0;
+    do {
+        int read = ((size - curlen) >= INT_MAX) ? INT_MAX : (size - curlen);
+        len = stream_Read(s->p_source, *buffer + curlen, read);
+        if (len <= 0)
+            break;
+        curlen += len;
+        if (curlen >= size)
+        {
+            uint8_t *tmp = realloc(*buffer, size + 1024);
+            if (tmp == NULL)
+                break;
+            size += 1024;
+            *buffer = tmp;
+        }
+    } while (vlc_object_alive(s));
+    return buffer;
+}
+
+static char *ReadLine(uint8_t *buffer, uint8_t *remain, size_t len)
+{
+    assert(buffer);
+
+    char *line = NULL;
+    uint8_t *begin = buffer;
+    uint8_t *p = begin;
+    uint8_t *end = p + len;
+
+    while (p < end)
+    {
+        if (*p == '\n')
+            break;
+        p++;
+    }
+
+    /* copy line excluding \n */
+    line = strndup((char *)begin, p - begin);
+
+    /* next pass start after \n */
+    p++;
+    remain = p;
+
+    return line;
 }
 
 /****************************************************************************
