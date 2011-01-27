@@ -1485,7 +1485,7 @@ static bool HandleBrowseKey(intf_thread_t *p_intf, int key)
         playlist_Add(p_playlist, psz_uri, NULL, PLAYLIST_APPEND,
                       PLAYLIST_END, p_parent->p_input == p_input, false);
 
-        p_sys->i_box_type = BOX_PLAYLIST;
+        BoxSwitch(p_sys, BOX_PLAYLIST);
         free(psz_uri);
         return true;
     }
@@ -1625,13 +1625,24 @@ static void HandleCommonKey(intf_thread_t *p_intf, int key)
     case '/': /* Search */
         p_sys->psz_search_chain[0] = '\0';
         p_sys->b_plidx_follow = false;
-        p_sys->i_before_search = p_sys->i_box_idx;
-        p_sys->i_box_type = BOX_SEARCH;
+        if (p_sys->i_box_type == BOX_PLAYLIST)
+        {
+            p_sys->i_before_search = p_sys->i_box_idx;
+            p_sys->i_box_type = BOX_SEARCH;
+        }
+        else
+        {
+            p_sys->i_before_search = 0;
+            BoxSwitch(p_sys, BOX_SEARCH);
+        }
         return;
 
     case 'A': /* Open */
         p_sys->psz_open_chain[0] = '\0';
-        p_sys->i_box_type = BOX_OPEN;
+        if (p_sys->i_box_type == BOX_PLAYLIST)
+            p_sys->i_box_type = BOX_OPEN;
+        else
+            BoxSwitch(p_sys, BOX_OPEN);
         return;
 
     /* Navigation */
