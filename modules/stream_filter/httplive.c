@@ -1595,8 +1595,7 @@ static int Open(vlc_object_t *p_this)
 
     if (p_sys->b_live && (p_sys->playback.segment < 0))
     {
-        msg_Err(s, "not enough data available for live playback, try again later");
-        goto fail;
+        msg_Warn(s, "less data then 3 times 'target duration' available for live playback, playback may stall");
     }
 
     if (Prefetch(s, &current) != VLC_SUCCESS)
