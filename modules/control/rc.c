@@ -2061,6 +2061,8 @@ static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
     if( !psz_mrl ) return 0;
 
     psz_mrl = psz_orig = strdup( psz_mrl );
+    if( !psz_mrl )
+        return NULL;
     while( *psz_mrl )
     {
         SKIPSPACE( psz_mrl );
