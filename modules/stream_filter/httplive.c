@@ -136,13 +136,16 @@ static int  Read   (stream_t *, void *p_read, unsigned int i_read);
 static int  Peek   (stream_t *, const uint8_t **pp_peek, unsigned int i_peek);
 static int  Control(stream_t *, int i_query, va_list);
 
+static ssize_t access_ReadM3U8(stream_t *s, vlc_url_t *url, uint8_t **buffer);
+static ssize_t ReadM3U8(stream_t *s, uint8_t **buffer);
+static char *ReadLine(uint8_t *buffer, uint8_t **remain, size_t len);
+
 static int  AccessOpen(stream_t *s, vlc_url_t *url);
 static void AccessClose(stream_t *s);
-static char *AccessReadLine(access_t *p_access, uint8_t *psz_tmp, size_t i_len);
+
 static int AccessDownload(stream_t *s, segment_t *segment);
 
 static void* hls_Thread(vlc_object_t *);
-static int get_HTTPLivePlaylist(stream_t *s, hls_stream_t *hls);
 
 static segment_t *segment_GetSegment(hls_stream_t *hls, int wanted);
 static void segment_Free(segment_t *segment);
@@ -349,7 +352,7 @@ static segment_t *segment_Find(hls_stream_t *hls, int sequence)
     return NULL;
 }
 
-static int live_ChooseSegment(stream_t *s, int current)
+static int ChooseSegment(stream_t *s, int current)
 {
     stream_sys_t *p_sys = (stream_sys_t *)s->p_sys;
     hls_stream_t *hls = hls_Get(p_sys->hls_stream, current);
@@ -361,21 +364,34 @@ static int live_ChooseSegment(stream_t *s, int current)
     int wanted = -1;
     int duration = 0;
     int count = vlc_array_count(hls->segments);
-    for (int i = count; i >= 0; i--)
+    int i = p_sys->b_live ? count - 1 : 0;
+
+    while((i >= 0) && (i < count) && vlc_object_alive(s))
     {
         segment_t *segment = segment_GetSegment(hls, i);
-        if (segment)
+        assert(segment);
+
+        if (segment->duration > hls->duration)
         {
-            duration += segment->duration;
-            if (duration >= 3 * hls->duration)
-            {
-                /* Start point found */
-                wanted = i;
-                break;
-            }
+            msg_Err(s, "EXTINF:%d duration is larger then EXT-X-TARGETDURATION:%d",
+                    segment->duration, hls->duration);
         }
+
+        duration += segment->duration;
+        if (duration >= 3 * hls->duration)
+        {
+            /* Start point found */
+            wanted = p_sys->b_live ? i : 0;
+            break;
+        }
+
+        if (p_sys->b_live)
+            i-- ;
+        else
+          i++;
     }
 
+    msg_Info(s, "Choose segment %d/%d", wanted, count);
     return wanted;
 }
 
@@ -451,30 +467,32 @@ fail:
     return NULL;
 }
 
-static void parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_read, char *uri)
+static int parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_read, char *uri)
 {
-    stream_sys_t *p_sys = s->p_sys;
-
     assert(hls);
+    assert(p_read);
 
-    int duration;
-    int ret = sscanf(p_read, "#EXTINF:%d,", &duration);
-    if (ret != 1)
-    {
-        msg_Err(s, "expected #EXTINF:<s>,");
-        p_sys->b_error = true;
-        return;
-    }
+    /* strip of #EXTINF: */
+    char *p_next = NULL;
+    char *token = strtok_r(p_read, ":", &p_next);
+    if (token == NULL)
+        return VLC_EGENERIC;
 
+    /* read duration */
+    token = strtok_r(NULL, ",", &p_next);
+    if (token == NULL)
+        return VLC_EGENERIC;
+    int duration = atoi(token);
+
+    /* Ignore the rest of the line */
+
+    /* Store segment information */
     char *psz_path = NULL;
     if (hls->url.psz_path != NULL)
     {
         psz_path = strdup(hls->url.psz_path);
         if (psz_path == NULL)
-        {
-            p_sys->b_error = true;
-            return;
-        }
+            return VLC_ENOMEM;
         char *p = strrchr(psz_path, '/');
         if (p) *p = '\0';
     }
@@ -485,14 +503,10 @@ static void parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_rea
     segment_t *segment = segment_New(hls, duration, psz_uri ? psz_uri : uri);
     if (segment)
         segment->sequence = hls->sequence + vlc_array_count(hls->segments) - 1;
-    if (duration > hls->duration)
-    {
-        msg_Err(s, "EXTINF:%d duration is larger then EXT-X-TARGETDURATION:%d",
-                duration, hls->duration);
-    }
     vlc_mutex_unlock(&hls->lock);
 
     free(psz_uri);
+    return segment ? VLC_SUCCESS : VLC_ENOMEM;
 }
 
 static int parse_TargetDuration(stream_t *s, hls_stream_t *hls, char *p_read)
@@ -511,21 +525,20 @@ static int parse_TargetDuration(stream_t *s, hls_stream_t *hls, char *p_read)
     return VLC_SUCCESS;
 }
 
-static void parse_StreamInformation(stream_t *s, vlc_array_t **hls_stream,
-                                    char *p_read, char *uri)
+static int parse_StreamInformation(stream_t *s, vlc_array_t **hls_stream,
+                                   hls_stream_t **hls, char *p_read, char *uri)
 {
-    stream_sys_t *p_sys = s->p_sys;
-
     int id;
     uint64_t bw;
     char *attr;
+
+    assert(*hls == NULL);
 
     attr = parse_Attributes(p_read, "PROGRAM-ID");
     if (attr == NULL)
     {
         msg_Err(s, "#EXT-X-STREAM-INF: expected PROGRAM-ID=<value>");
-        p_sys->b_error = true;
-        return;
+        return VLC_EGENERIC;
     }
     id = atol(attr);
     free(attr);
@@ -534,8 +547,7 @@ static void parse_StreamInformation(stream_t *s, vlc_array_t **hls_stream,
     if (attr == NULL)
     {
         msg_Err(s, "#EXT-X-STREAM-INF: expected BANDWIDTH=<value>");
-        p_sys->b_error = true;
-        return;
+        return VLC_EGENERIC;
     }
     bw = atoll(attr);
     free(attr);
@@ -543,19 +555,18 @@ static void parse_StreamInformation(stream_t *s, vlc_array_t **hls_stream,
     if (bw == 0)
     {
         msg_Err(s, "#EXT-X-STREAM-INF: bandwidth cannot be 0");
-        p_sys->b_error = true;
-        return;
+        return VLC_EGENERIC;
     }
 
     msg_Info(s, "bandwidth adaption detected (program-id=%d, bandwidth=%"PRIu64").", id, bw);
 
     char *psz_uri = relative_URI(s, uri, NULL);
 
-    hls_stream_t *hls = hls_New(*hls_stream, id, bw, psz_uri ? psz_uri : uri);
-    if (hls == NULL)
-        p_sys->b_error = true;
+    *hls = hls_New(*hls_stream, id, bw, psz_uri ? psz_uri : uri);
 
     free(psz_uri);
+
+    return (*hls == NULL) ? VLC_ENOMEM : VLC_SUCCESS;
 }
 
 static int parse_MediaSequence(stream_t *s, hls_stream_t *hls, char *p_read)
@@ -684,105 +695,189 @@ static int parse_Discontinuity(stream_t *s, hls_stream_t *hls, char *p_read)
     return VLC_SUCCESS;
 }
 
-static void parse_M3U8ExtLine(stream_t *s, hls_stream_t *hls, char *line)
-{
-    if (*line == '#')
-    {
-        int err = VLC_SUCCESS;
-        if (strncmp(line, "#EXT-X-TARGETDURATION", 21) == 0)
-            err = parse_TargetDuration(s, hls, line);
-        else if (strncmp(line, "#EXT-X-MEDIA-SEQUENCE", 21) == 0)
-            err = parse_MediaSequence(s, hls, line);
-        else if (strncmp(line, "#EXT-X-KEY", 10) == 0)
-            err = parse_Key(s, hls, line);
-        else if (strncmp(line, "#EXT-X-PROGRAM-DATE-TIME", 24) == 0)
-            err = parse_ProgramDateTime(s, hls, line);
-        else if (strncmp(line, "#EXT-X-ALLOW-CACHE", 18) == 0)
-            err = parse_AllowCache(s, hls, line);
-        else if (strncmp(line, "#EXT-X-DISCONTINUITY", 20) == 0)
-            err = parse_Discontinuity(s, hls, line);
-        else if (strncmp(line, "#EXT-X-VERSION", 14) == 0)
-            err = parse_Version(s, hls, line);
-        else if (strncmp(line, "#EXT-X-ENDLIST", 14) == 0)
-            err = parse_EndList(s, hls);
-
-        if (err != VLC_SUCCESS)
-            s->p_sys->b_error = true;
-    }
-}
-
-#define HTTPLIVE_MAX_LINE 4096
-static int get_HTTPLivePlaylist(stream_t *s, hls_stream_t *hls)
+/* The http://tools.ietf.org/html/draft-pantos-http-live-streaming-04#page-8
+ * document defines the following new tags: EXT-X-TARGETDURATION,
+ * EXT-X-MEDIA-SEQUENCE, EXT-X-KEY, EXT-X-PROGRAM-DATE-TIME, EXT-X-
+ * ALLOW-CACHE, EXT-X-STREAM-INF, EXT-X-ENDLIST, EXT-X-DISCONTINUITY,
+ * and EXT-X-VERSION.
+ */
+static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, ssize_t len)
 {
     stream_sys_t *p_sys = s->p_sys;
+    uint8_t *p_read, *p_begin, *p_end;
 
-    /* Download new playlist file from server */
-    if (AccessOpen(s, &hls->url) != VLC_SUCCESS)
-        return VLC_EGENERIC;
+    assert(streams);
+    assert(buffer);
 
-    /* Parse the rest of the reply */
-    uint8_t *tmp = calloc(1, HTTPLIVE_MAX_LINE);
-    if (tmp == NULL)
-    {
-        AccessClose(s);
+    msg_Dbg(s, "parse_M3U8\n%s", buffer);
+    p_begin = buffer;
+    p_end = p_begin + len;
+
+    char *line = ReadLine(p_begin, &p_read, p_end - p_begin);
+    if (line == NULL)
         return VLC_ENOMEM;
-    }
 
-    char *line = AccessReadLine(p_sys->p_access, tmp, HTTPLIVE_MAX_LINE);
     if (strncmp(line, "#EXTM3U", 7) != 0)
     {
-        msg_Err(s, "missing #EXTM3U tag");
-        goto error;
+        msg_Err(s, "missing #EXTM3U tag .. aborting");
+        free(line);
+        return VLC_EGENERIC;
     }
+
     free(line);
     line = NULL;
 
-    for( ; ; )
+    /* What is the version ? */
+    int version = 1;
+    uint8_t *p = (uint8_t *)strstr((const char *)buffer, "#EXT-X-VERSION:");
+    if (p != NULL)
     {
-        line = AccessReadLine(p_sys->p_access, tmp, HTTPLIVE_MAX_LINE);
-        if (line == NULL)
+        uint8_t *tmp = NULL;
+        char *psz_version = ReadLine(p, &tmp, p_end - p);
+        if (psz_version == NULL)
+            return VLC_ENOMEM;
+        int ret = sscanf((const char*)psz_version, "#EXT-X-VERSION:%d", &version);
+        if (ret != 1)
         {
-            msg_Dbg(s, "end of data");
-            break;
+            msg_Warn(s, "#EXT-X-VERSION: no protocol version found, assuming version 1.");
+            version = 1;
         }
+        free(psz_version);
+        p = NULL;
+    }
 
-        if (!vlc_object_alive(s))
-            goto error;
+    /* Is it a live stream ? */
+    p_sys->b_live = (strstr((const char *)buffer, "#EXT-X-ENDLIST") == NULL) ? true : false;
 
-        /* some more checks for actual data */
-        if (strncmp(line, "#EXTINF", 7) == 0)
+    /* Is it a meta index file ? */
+    bool b_meta = (strstr((const char *)buffer, "#EXT-X-STREAM-INF") == NULL) ? false : true;
+
+    if (b_meta)
+        msg_Info(s, "Meta playlist");
+    else
+        msg_Info(s, "%s Playlist HLS protocol version: %d", p_sys->b_live ? "Live": "VOD", version);
+
+    /* */
+    int err = VLC_SUCCESS;
+    do
+    {
+        /* Next line */
+        p_begin = p_read;
+        line = ReadLine(p_begin, &p_read, p_end - p_begin);
+        if (line == NULL)
+            break;
+
+        /* */
+        p_begin = p_read;
+
+        /* M3U8 Meta Index file */
+        if (b_meta)
         {
-            char *uri = AccessReadLine(p_sys->p_access, tmp, HTTPLIVE_MAX_LINE);
-            if (uri == NULL)
-                p_sys->b_error = true;
-            else
+            if (strncmp(line, "#EXT-X-STREAM-INF", 17) == 0)
             {
-                parse_SegmentInformation(s, hls, line, uri);
-                free(uri);
+                p_sys->b_meta = true;
+                char *uri = ReadLine(p_begin, &p_read, p_end - p_begin);
+                if (uri == NULL)
+                    err = VLC_ENOMEM;
+                else
+                {
+                    hls_stream_t *hls = NULL;
+                    err = parse_StreamInformation(s, &streams, &hls, line, uri);
+                    free(uri);
+
+                    /* Download playlist file from server */
+                    uint8_t *buf = NULL;
+                    ssize_t len = access_ReadM3U8(s, &hls->url, &buf);
+                    if (len < 0)
+                        err = VLC_EGENERIC;
+                    else
+                    {
+                        /* Parse HLS m3u8 content. */
+                        err = parse_M3U8(s, streams, buf, len);
+                        free(buf);
+                    }
+
+                    if (hls)
+                    {
+                        hls->version = version;
+                        if (!p_sys->b_live)
+                            hls->size = hls_GetStreamSize(hls); /* Stream size (approximate) */
+                    }
+                }
             }
         }
         else
         {
-            parse_M3U8ExtLine(s, hls, line);
+            hls_stream_t *hls = hls_GetLast(streams);
+            if (hls == NULL)
+            {
+                /* No Meta playlist used */
+                hls = hls_New(streams, 0, -1, NULL);
+                if (hls == NULL)
+                {
+                    msg_Err(s, "No HLS structure created");
+                    err = VLC_ENOMEM;
+                    break;
+                }
+
+                /* Get TARGET-DURATION first */
+                p = (uint8_t *)strstr((const char *)buffer, "#EXT-X-TARGETDURATION:");
+                if (p)
+                {
+                    uint8_t *p_rest = NULL;
+                    char *psz_duration = ReadLine(p, &p_rest,  p_end - p);
+                    if (psz_duration)
+                    {
+                          err = parse_TargetDuration(s, hls, psz_duration);
+                          free(psz_duration);
+                          p = NULL;
+                    }
+                }
+
+                hls->version = version;
+            }
+
+            if (strncmp(line, "#EXTINF", 7) == 0)
+            {
+                char *uri = ReadLine(p_begin, &p_read, p_end - p_begin);
+                if (uri == NULL)
+                    err = VLC_EGENERIC;
+                else
+                {
+                    err = parse_SegmentInformation(s, hls, line, uri);
+                    free(uri);
+                }
+                p_begin = p_read;
+            }
+            else if (strncmp(line, "#EXT-X-TARGETDURATION", 21) == 0)
+                err = parse_TargetDuration(s, hls, line);
+            else if (strncmp(line, "#EXT-X-MEDIA-SEQUENCE", 21) == 0)
+                err = parse_MediaSequence(s, hls, line);
+            else if (strncmp(line, "#EXT-X-KEY", 10) == 0)
+                err = parse_Key(s, hls, line);
+            else if (strncmp(line, "#EXT-X-PROGRAM-DATE-TIME", 24) == 0)
+                err = parse_ProgramDateTime(s, hls, line);
+            else if (strncmp(line, "#EXT-X-ALLOW-CACHE", 18) == 0)
+                err = parse_AllowCache(s, hls, line);
+            else if (strncmp(line, "#EXT-X-DISCONTINUITY", 20) == 0)
+                err = parse_Discontinuity(s, hls, line);
+            else if (strncmp(line, "#EXT-X-VERSION", 14) == 0)
+                err = parse_Version(s, hls, line);
+            else if (strncmp(line, "#EXT-X-ENDLIST", 14) == 0)
+                err = parse_EndList(s, hls);
         }
 
-        /* Error during m3u8 parsing abort */
-        if (p_sys->b_error)
-            goto error;
-
         free(line);
-    }
+        line = NULL;
+
+        if (p_begin >= p_end)
+            break;
+
+    } while ((err == VLC_SUCCESS) && vlc_object_alive(s));
 
     free(line);
-    free(tmp);
-    AccessClose(s);
-    return VLC_SUCCESS;
 
-error:
-    free(line);
-    free(tmp);
-    AccessClose(s);
-    return VLC_EGENERIC;
+    return err;
 }
 
 static int get_HTTPLiveMetaPlaylist(stream_t *s, vlc_array_t **streams)
@@ -791,221 +886,16 @@ static int get_HTTPLiveMetaPlaylist(stream_t *s, vlc_array_t **streams)
     assert(*streams);
 
     /* Download new playlist file from server */
-    if (AccessOpen(s, &p_sys->m3u8) != VLC_SUCCESS)
+    uint8_t *buffer = NULL;
+    ssize_t len = access_ReadM3U8(s, &p_sys->m3u8, &buffer);
+    if (len < 0)
         return VLC_EGENERIC;
 
-    /* Parse the rest of the reply */
-    uint8_t *tmp = calloc(1, HTTPLIVE_MAX_LINE);
-    if (tmp == NULL)
-    {
-        AccessClose(s);
-        return VLC_ENOMEM;
-    }
+    /* Parse HLS m3u8 content. */
+    int err = parse_M3U8(s, *streams, buffer, len);
+    free(buffer);
 
-    char *line = AccessReadLine(p_sys->p_access, tmp, HTTPLIVE_MAX_LINE);
-    if (strncmp(line, "#EXTM3U", 7) != 0)
-    {
-        msg_Err(s, "missing #EXTM3U tag");
-        goto error;
-    }
-    free(line);
-    line = NULL;
-
-    for( ; ; )
-    {
-        line = AccessReadLine(p_sys->p_access, tmp, HTTPLIVE_MAX_LINE);
-        if (line == NULL)
-        {
-            msg_Dbg(s, "end of data");
-            break;
-        }
-
-        if (!vlc_object_alive(s))
-            goto error;
-
-        /* some more checks for actual data */
-        if (strncmp(line, "#EXT-X-STREAM-INF", 17) == 0)
-        {
-            p_sys->b_meta = true;
-            char *uri = AccessReadLine(p_sys->p_access, tmp, HTTPLIVE_MAX_LINE);
-            if (uri == NULL)
-                p_sys->b_error = true;
-            else
-            {
-                parse_StreamInformation(s, streams, line, uri);
-                free(uri);
-            }
-        }
-        else if (strncmp(line, "#EXTINF", 7) == 0)
-        {
-            char *uri = AccessReadLine(p_sys->p_access, tmp, HTTPLIVE_MAX_LINE);
-            if (uri == NULL)
-                p_sys->b_error = true;
-            else
-            {
-                hls_stream_t *hls = hls_GetLast(*streams);
-                if (hls)
-                    parse_SegmentInformation(s, hls, line, uri);
-                else
-                    p_sys->b_error = true;
-                free(uri);
-            }
-        }
-        else
-        {
-            hls_stream_t *hls = hls_GetLast(*streams);
-            if ((hls == NULL) && (!p_sys->b_meta))
-            {
-                hls = hls_New(*streams, -1, -1, NULL);
-                if (hls == NULL)
-                {
-                    p_sys->b_error = true;
-                    return VLC_ENOMEM;
-                }
-            }
-            parse_M3U8ExtLine(s, hls, line);
-        }
-
-        /* Error during m3u8 parsing abort */
-        if (p_sys->b_error)
-            goto error;
-
-        free(line);
-    }
-
-    free(line);
-    free(tmp);
-    AccessClose(s);
-    return VLC_SUCCESS;
-
-error:
-    free(line);
-    free(tmp);
-    AccessClose(s);
-    return VLC_EGENERIC;
-}
-#undef HTTPLIVE_MAX_LINE
-
-/* The http://tools.ietf.org/html/draft-pantos-http-live-streaming-04#page-8
- * document defines the following new tags: EXT-X-TARGETDURATION,
- * EXT-X-MEDIA-SEQUENCE, EXT-X-KEY, EXT-X-PROGRAM-DATE-TIME, EXT-X-
- * ALLOW-CACHE, EXT-X-STREAM-INF, EXT-X-ENDLIST, EXT-X-DISCONTINUITY,
- * and EXT-X-VERSION.
- */
-static int parse_HTTPLiveStreaming(stream_t *s)
-{
-    stream_sys_t *p_sys = s->p_sys;
-    char *p_read, *p_begin, *p_end;
-
-    assert(p_sys->hls_stream);
-
-    p_begin = p_read = stream_ReadLine(s->p_source);
-    if (!p_begin)
-        return VLC_ENOMEM;
-
-    /* */
-    int i_len = strlen(p_begin);
-    p_end = p_read + i_len;
-
-    if (strncmp(p_read, "#EXTM3U", 7) != 0)
-    {
-        msg_Err(s, "missing #EXTM3U tag .. aborting");
-        free(p_begin);
-        return VLC_EGENERIC;
-    }
-
-    do {
-        free(p_begin);
-
-        if (p_sys->b_error)
-            return VLC_EGENERIC;
-
-        /* Next line */
-        p_begin = stream_ReadLine(s->p_source);
-        if (p_begin == NULL)
-            break;
-
-        i_len = strlen(p_begin);
-        p_read = p_begin;
-        p_end = p_read + i_len;
-
-        if (strncmp(p_read, "#EXT-X-STREAM-INF", 17) == 0)
-        {
-            p_sys->b_meta = true;
-            char *uri = stream_ReadLine(s->p_source);
-            if (uri == NULL)
-                p_sys->b_error = true;
-            else
-            {
-                parse_StreamInformation(s, &p_sys->hls_stream, p_read, uri);
-                free(uri);
-            }
-        }
-        else if (strncmp(p_read, "#EXTINF", 7) == 0)
-        {
-            char *uri = stream_ReadLine(s->p_source);
-            if (uri == NULL)
-                p_sys->b_error = true;
-            else
-            {
-                hls_stream_t *hls = hls_GetLast(p_sys->hls_stream);
-                if (hls)
-                    parse_SegmentInformation(s, hls, p_read, uri);
-                else
-                    p_sys->b_error = true;
-                free(uri);
-            }
-        }
-        else
-        {
-            hls_stream_t *hls = hls_GetLast(p_sys->hls_stream);
-            if (hls == NULL)
-            {
-                if (!p_sys->b_meta)
-                {
-                    hls = hls_New(p_sys->hls_stream, -1, -1, NULL);
-                    if (hls == NULL)
-                    {
-                        p_sys->b_error = true;
-                        return VLC_ENOMEM;
-                    }
-                }
-            }
-            /* Parse M3U8 Ext Line */
-            parse_M3U8ExtLine(s, hls, p_read);
-        }
-    } while(p_read < p_end);
-
-    free(p_begin);
-
-    /* */
-    int count = vlc_array_count(p_sys->hls_stream);
-    for (int n = 0; n < count; n++)
-    {
-        hls_stream_t *hls = hls_Get(p_sys->hls_stream, n);
-        if (hls == NULL) break;
-
-        /* Is it a meta playlist? */
-        if (p_sys->b_meta)
-        {
-            msg_Dbg(s, "parsing %s", hls->url.psz_path);
-            if (get_HTTPLivePlaylist(s, hls) != VLC_SUCCESS)
-            {
-                msg_Err(s, "could not parse playlist file from meta index." );
-                return VLC_EGENERIC;
-            }
-        }
-
-        vlc_mutex_lock(&hls->lock);
-        if (!p_sys->b_live)
-        {
-            /* Stream size (approximate) */
-            hls->size = hls_GetStreamSize(hls);
-        }
-        vlc_mutex_unlock(&hls->lock);
-    }
-
-    return VLC_SUCCESS;
+    return err;
 }
 
 /* Reload playlist */
@@ -1077,23 +967,6 @@ static int hls_ReloadPlaylist(stream_t *s)
 
     int count = vlc_array_count(hls_streams);
 
-    /* Is it a meta playlist? */
-    if (p_sys->b_meta)
-    {
-        for (int n = 0; n < count; n++)
-        {
-            hls_stream_t *hls = hls_Get(hls_streams, n);
-            if (hls == NULL) goto fail;
-
-            msg_Info(s, "parsing %s", hls->url.psz_path);
-            if (get_HTTPLivePlaylist(s, hls) != VLC_SUCCESS)
-            {
-                msg_Err(s, "could not parse playlist file from meta index." );
-                goto fail;
-            }
-        }
-    }
-
     /* merge playlists */
     for (int n = 0; n < count; n++)
     {
@@ -1155,6 +1028,8 @@ static int BandwidthAdaptation(stream_t *s, int progid, uint64_t *bandwidth)
 
 static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur_stream)
 {
+    stream_sys_t *p_sys = s->p_sys;
+
     assert(hls);
     assert(segment);
 
@@ -1167,10 +1042,10 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
     }
 
     /* sanity check - can we download this segment on time? */
-    if (s->p_sys->bandwidth > 0)
+    if ((p_sys->bandwidth > 0) && (hls->bandwidth > 0))
     {
         uint64_t size = (segment->duration * hls->bandwidth); /* bits */
-        int estimated = (int)(size / s->p_sys->bandwidth);
+        int estimated = (int)(size / p_sys->bandwidth);
         if (estimated > segment->duration)
         {
             msg_Warn(s,"downloading of segment %d takes %ds, which is longer then its playback (%ds)",
@@ -1197,8 +1072,8 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
         return VLC_SUCCESS;
 
     uint64_t bw = ((double)(segment->size * 8) / ms) * 1000; /* bits / s */
-    s->p_sys->bandwidth = bw;
-    if (hls->bandwidth != bw)
+    p_sys->bandwidth = bw;
+    if (p_sys->b_meta && (hls->bandwidth != bw))
     {
         int newstream = BandwidthAdaptation(s, hls->id, &bw);
 
@@ -1321,7 +1196,7 @@ static int Prefetch(stream_t *s, int *current)
     stream_sys_t *p_sys = s->p_sys;
     int stream;
 
-    /* Try to pick best matching stream */
+    /* Try to pick best matching stream */;
 again:
     stream = *current;
 
@@ -1452,44 +1327,6 @@ static void AccessClose(stream_t *s)
     }
 }
 
-static char *AccessReadLine(access_t *p_access, uint8_t *psz_tmp, size_t i_len)
-{
-    char *line = NULL;
-    char *begin = (char *)psz_tmp;
-
-    assert(psz_tmp);
-
-    int skip = strlen(begin);
-    ssize_t len = p_access->pf_read(p_access, psz_tmp + skip, i_len - skip);
-    if (len < 0) return NULL;
-    if ((len == 0) && (skip == 0))
-        return NULL;
-
-    char *p = begin;
-    char *end = p + len + skip;
-
-    while (p < end)
-    {
-        if (*p == '\n')
-            break;
-
-        p++;
-    }
-
-    /* copy line excluding \n */
-    line = strndup(begin, p - begin);
-
-    p++;
-    if (p < end)
-    {
-        psz_tmp = memmove(begin, p, end - p);
-        psz_tmp[end - p] = '\0';
-    }
-    else memset(psz_tmp, 0, i_len);
-
-    return line;
-}
-
 static int AccessDownload(stream_t *s, segment_t *segment)
 {
     stream_sys_t *p_sys = (stream_sys_t *) s->p_sys;
@@ -1539,30 +1376,30 @@ static int AccessDownload(stream_t *s, segment_t *segment)
 }
 
 /* Read M3U8 file */
-static uint8_t *access_ReadM3U8(stream_t *s, vlc_url_t *url)
+static ssize_t access_ReadM3U8(stream_t *s, vlc_url_t *url, uint8_t **buffer)
 {
     stream_sys_t *p_sys = (stream_sys_t *) s->p_sys;
 
+    assert(*buffer == NULL);
+
     /* Download new playlist file from server */
     if (AccessOpen(s, url) != VLC_SUCCESS)
-        return NULL;
+        return VLC_EGENERIC;
 
     ssize_t size = p_sys->p_access->info.i_size;
     if (size == 0) size = 1024; /* no Content-Length */
 
-    msg_Err(s, "Stream size is %"PRId64, size);
-
-    uint8_t *buffer = calloc(1, size);
-    if (buffer == NULL)
+    *buffer = calloc(1, size);
+    if (*buffer == NULL)
     {
         AccessClose(s);
-        return NULL;
+        return VLC_ENOMEM;
     }
 
-    size_t length = 0, curlen = 0;
+    ssize_t length = 0, curlen = 0;
     do
     {
-        length = p_sys->p_access->pf_read(p_sys->p_access, buffer + curlen, size - curlen);
+        length = p_sys->p_access->pf_read(p_sys->p_access, *buffer + curlen, size - curlen);
         if ((length <= 0) || (length >= size))
             break;
         curlen += length;
@@ -1577,19 +1414,19 @@ static uint8_t *access_ReadM3U8(stream_t *s, vlc_url_t *url)
     } while (vlc_object_alive(s));
 
     AccessClose(s);
-    return buffer;
+    return size;
 }
 
-static uint8_t *ReadM3U8(stream_t *s)
+static ssize_t ReadM3U8(stream_t *s, uint8_t **buffer)
 {
-    int64_t size = stream_Size(s->p_source);
+    assert(*buffer == NULL);
 
-    msg_Err(s, "Stream size is %"PRId64, size);
+    int64_t size = stream_Size(s->p_source);
     if (size == 0) size = 1024; /* no Content-Length */
 
-    uint8_t *buffer = calloc(1, size);
-    if (buffer == NULL)
-        return NULL;
+    *buffer = calloc(1, size);
+    if (*buffer == NULL)
+        return VLC_ENOMEM;
 
     int64_t len = 0, curlen = 0;
     do {
@@ -1607,10 +1444,11 @@ static uint8_t *ReadM3U8(stream_t *s)
             *buffer = tmp;
         }
     } while (vlc_object_alive(s));
-    return buffer;
+
+    return size;
 }
 
-static char *ReadLine(uint8_t *buffer, uint8_t *remain, size_t len)
+static char *ReadLine(uint8_t *buffer, uint8_t **remain, size_t len)
 {
     assert(buffer);
 
@@ -1631,7 +1469,7 @@ static char *ReadLine(uint8_t *buffer, uint8_t *remain, size_t len)
 
     /* next pass start after \n */
     p++;
-    remain = p;
+    *remain = p;
 
     return line;
 }
@@ -1681,14 +1519,21 @@ static int Open(vlc_object_t *p_this)
     s->pf_peek = Peek;
     s->pf_control = Control;
 
-    /* Select first segment to play */
-    if (parse_HTTPLiveStreaming(s) != VLC_SUCCESS)
+    /* Parse HLS m3u8 content. */
+    uint8_t *buffer = NULL;
+    ssize_t len = ReadM3U8(s, &buffer);
+    if (len < 0)
         goto fail;
+    if (parse_M3U8(s, p_sys->hls_stream, buffer, len) != VLC_SUCCESS)
+    {
+        free(buffer);
+        goto fail;
+    }
+    free(buffer);
 
     /* Choose first HLS stream to start with */
     int current = p_sys->playback.stream = 0;
-    p_sys->playback.segment = p_sys->download.segment =
-            p_sys->b_live ? live_ChooseSegment(s, current) : 0;
+    p_sys->playback.segment = p_sys->download.segment = ChooseSegment(s, current);
 
     if (p_sys->b_live && (p_sys->playback.segment < 0))
     {
@@ -1697,7 +1542,7 @@ static int Open(vlc_object_t *p_this)
 
     if (Prefetch(s, &current) != VLC_SUCCESS)
     {
-        msg_Err(s, "fetching first segment.");
+        msg_Err(s, "fetching first segment failed.");
         goto fail;
     }
 
