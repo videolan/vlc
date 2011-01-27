@@ -2092,7 +2092,15 @@ static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
         if( *psz_item == '\'' && psz_item[strlen(psz_item)-1] == '\'' )
         { psz_item++; psz_item[strlen(psz_item)-1] = 0; }
 
-        if( !psz_item_mrl ) psz_item_mrl = psz_item;
+        if( !psz_item_mrl )
+        {
+            psz_item_mrl = make_URI( psz_item, NULL );
+            if( !psz_item_mrl )
+            {
+                free( psz_orig );
+                return NULL;
+            }
+        }
         else if( *psz_item )
         {
             i_options++;
@@ -2111,6 +2119,7 @@ static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
         {
             input_item_AddOption( p_item, ppsz_options[i], VLC_INPUT_OPTION_TRUSTED );
         }
+        free( psz_item_mrl );
     }
 
     if( i_options ) free( ppsz_options );
