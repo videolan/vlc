@@ -51,6 +51,7 @@
 #include <vlc_playlist.h>
 #include <vlc_meta.h>
 #include <vlc_fs.h>
+#include <vlc_url.h>
 
 #include <assert.h>
 
@@ -258,7 +259,7 @@ static bool IsFile(const char *current_dir, const char *entry)
     char *uri;
     struct stat st;
 
-    if (asprintf(&uri, "%s/%s", current_dir, entry) != -1)
+    if (asprintf(&uri, "%s" DIR_SEP "%s", current_dir, entry) != -1)
     {
         ret = vlc_stat(uri, &st) || !S_ISDIR(st.st_mode);
         free(uri);
@@ -1439,31 +1440,27 @@ static bool HandleBrowseKey(intf_thread_t *p_intf, int key)
     case '\n':
     case ' ':
         dir_entry = p_sys->pp_dir_entries[p_sys->i_box_idx];
+        char *psz_path;
+        if (asprintf(&psz_path, "%s" DIR_SEP "%s", p_sys->psz_current_dir,
+                     dir_entry->psz_path) == -1)
+            return true;
 
         if (!dir_entry->b_file && key != ' ')
         {
-            char *current_dir = p_sys->psz_current_dir;
-            if (asprintf(&p_sys->psz_current_dir, "%s/%s",
-                          p_sys->psz_current_dir, dir_entry->psz_path) != -1)
-            {
-                ReadDir(p_intf);
-                free(current_dir);
-            }
-            else
-                p_sys->psz_current_dir = current_dir;
+            free(p_sys->psz_current_dir);
+            p_sys->psz_current_dir = psz_path;
+            ReadDir(p_intf);
 
             p_sys->i_box_start = 0;
             p_sys->i_box_idx = 0;
             return true;
         }
 
-        char* psz_uri;
-        if (asprintf(&psz_uri, "%s://%s/%s",
-                    dir_entry->b_file ? "file" : "directory",
-                    p_sys->psz_current_dir, dir_entry->psz_path) == -1)
-        {
-            return false;
-        }
+        char *psz_uri = make_URI(psz_path, dir_entry->b_file ? "file"
+                                                             : "directory");
+        free(psz_path);
+        if (psz_uri == NULL)
+            return true;
 
         playlist_t *p_playlist = pl_Get(p_intf);
         playlist_item_t *p_parent = p_sys->p_node;
