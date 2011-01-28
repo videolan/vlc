@@ -1086,8 +1086,8 @@ endif
 
 PHONY += ffmpeg-svn ffmpeg-tar
 
-ffmpeg/.svn-$(FFMPEG_SVN_REV):
-	$(SVN) co -r $(FFMPEG_SVN_REV) $(FFMPEG_SVN) ffmpeg
+ffmpeg/.svn:
+	$(SVN) co $(FFMPEG_SVN) ffmpeg
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
 endif
@@ -1143,7 +1143,7 @@ FFMPEG_DEPS-$(HAVE_ANDROID) =
 FFMPEG_DEPS-$(HAVE_SYMBIAN) =
 
 ifdef SVN
-FFMPEG_MK_TARGET = ffmpeg/.svn-$(FFMPEG_SVN_REV)
+FFMPEG_MK_TARGET = ffmpeg/.svn
 else
 FFMPEG_MK_TARGET = ffmpeg/.untar
 endif
