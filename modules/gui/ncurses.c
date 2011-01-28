@@ -1516,6 +1516,13 @@ static void HandleEditBoxKey(intf_thread_t *p_intf, int key, int box)
         }
         else if (len)
         {
+            char *psz_uri = make_URI(p_sys->psz_open_chain, NULL);
+            if (psz_uri == NULL)
+            {
+                p_sys->i_box_type = BOX_PLAYLIST;
+                return;
+            }
+
             playlist_t *p_playlist = pl_Get(p_intf);
             playlist_item_t *p_parent = p_sys->p_node, *p_current;
 
@@ -1532,11 +1539,12 @@ static void HandleEditBoxKey(intf_thread_t *p_intf, int key, int box)
                 p_parent = p_parent->p_parent;
             PL_UNLOCK;
 
-            playlist_Add(p_playlist, p_sys->psz_open_chain, NULL,
+            playlist_Add(p_playlist, psz_uri, NULL,
                   PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
                   p_parent->p_input == p_playlist->p_local_onelevel->p_input,
                   false);
 
+            free(psz_uri);
             p_sys->b_plidx_follow = true;
         }
         p_sys->i_box_type = BOX_PLAYLIST;
