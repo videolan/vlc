@@ -38,7 +38,7 @@ void CmdPlay::execute()
     input_thread_t *pInput = playlist_CurrentInput( pPlaylist );
     if( pInput )
     {
-        var_SetFloat( pInput, "rate", 1.0 );
+        var_SetFloat( pPlaylist, "rate", 1.0 );
         vlc_object_release( pInput );
     }
 
@@ -81,7 +81,7 @@ void CmdSlower::execute()
 
     if( pInput )
     {
-        var_TriggerCallback( pInput, "rate-slower" );
+        var_TriggerCallback( pPlaylist, "rate-slower" );
         vlc_object_release( pInput );
     }
 }
@@ -94,7 +94,7 @@ void CmdFaster::execute()
 
     if( pInput )
     {
-        var_TriggerCallback( pInput, "rate-faster" );
+        var_TriggerCallback( pPlaylist, "rate-faster" );
         vlc_object_release( pInput );
     }
 }
