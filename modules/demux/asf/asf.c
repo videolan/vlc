@@ -501,7 +501,7 @@ static int DemuxPacket( demux_t *p_demux )
         asf_track_t   *tk;
 
         int i_packet_keyframe;
-        int i_stream_number;
+        unsigned int i_stream_number;
         int i_media_object_number;
         int i_media_object_offset;
         int i_replicated_data_length;
