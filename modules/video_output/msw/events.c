@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_vout_display.h>
 #include <vlc_vout_window.h>
+#include <vlc_interface.h>
 
 #include <windows.h>
 #include <windowsx.h>
@@ -745,6 +746,15 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         }
     }
     vout_display_t *vd = p_event->vd;
+
+    /* Close requested by user */
+    if( message == WM_SYSCOMMAND &&
+        (wParam & 0xFFF0) == SC_CLOSE )
+    {
+        msg_Dbg( vd, "SC_CLOSE received, leaving vlc" );
+        libvlc_Quit( vd->p_libvlc );
+        return 0;
+    }
 
 #ifndef UNDER_CE
     /* Catch the screensaver and the monitor turn-off */
