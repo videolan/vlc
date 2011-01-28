@@ -234,7 +234,7 @@ typedef enum vlc_dialog {
                           EXTENSIONS_PLAYLIST
 
 #define EXTENSIONS_SUBTITLE "*.cdg;*.idx;*.srt;*.sub;*.utf;*.ass;*.ssa;*.aqt;" \
-                            "*.jss;*.psb;*.rt;*.smi"
+                            "*.jss;*.psb;*.rt;*.smi;*.txt;*.smil"
 
 /** \defgroup vlc_interaction Interaction
  * \ingroup vlc_interface
