@@ -564,6 +564,14 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
                 for( i_input = vlc_optind; i_input < i_argc;i_input++ )
                 {
+                    /* Skip input options, we can't pass them through D-Bus */
+                    if( ppsz_argv[i_input][0] == ':' )
+                    {
+                        msg_Warn( p_libvlc, "Ignoring option %s",
+                                  ppsz_argv[i_input] );
+                        continue;
+                    }
+
                     /* We need to resolve relative paths in this instance */
                     char *psz_mrl = make_URI( ppsz_argv[i_input], NULL );
                     if( psz_mrl == NULL )
