@@ -66,24 +66,24 @@ LRESULT CALLBACK Win32Factory::Win32Proc( HWND hwnd, UINT uMsg,
         if( uMsg == WM_SYSCOMMAND )
         {
             // If closing parent window
-            if( wParam == SC_CLOSE )
+            if( (wParam & 0xFFF0) == SC_CLOSE )
             {
                 libvlc_Quit( p_intf->p_libvlc );
                 return 0;
             }
-            else if( wParam == SC_MINIMIZE )
+            else if( (wParam & 0xFFF0) == SC_MINIMIZE )
             {
                 pFactory->minimize();
                 return 0;
             }
-            else if( wParam == SC_RESTORE )
+            else if( (wParam & 0xFFF0) == SC_RESTORE )
             {
                 pFactory->restore();
                 return 0;
             }
             else
             {
-                msg_Dbg( p_intf, "WM_SYSCOMMAND %i", wParam );
+                msg_Dbg( p_intf, "WM_SYSCOMMAND %i", (wParam  & 0xFFF0) );
             }
         }
         // Handle systray notifications
