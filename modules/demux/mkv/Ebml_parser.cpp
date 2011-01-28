@@ -152,7 +152,7 @@ EbmlElement *EbmlParser::Get( void )
 
     if( m_el[mi_level] )
     {
-        m_el[mi_level]->SkipData( *m_es, m_el[mi_level]->Generic().Context );
+        m_el[mi_level]->SkipData( *m_es, EBML_CONTEXT(m_el[mi_level]) );
         if( !mb_keep )
         {
             if( MKV_IS_ID( m_el[mi_level], KaxBlockVirtual ) )
@@ -162,7 +162,7 @@ EbmlElement *EbmlParser::Get( void )
         mb_keep = false;
     }
 
-    m_el[mi_level] = m_es->FindNextElement( m_el[mi_level - 1]->Generic().Context, i_ulev, 0xFFFFFFFFL, mb_dummy != 0, 1 );
+    m_el[mi_level] = m_es->FindNextElement( EBML_CONTEXT(m_el[mi_level - 1]), i_ulev, 0xFFFFFFFFL, mb_dummy != 0, 1 );
 //    mi_remain_size[mi_level] = m_el[mi_level]->GetSize();
     if( i_ulev > 0 )
     {

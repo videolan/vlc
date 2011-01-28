@@ -55,7 +55,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
     bool b_keep_stream = false, b_keep_segment;
 
     // verify the EBML Header
-    p_l0 = p_estream->FindNextID(EbmlHead::ClassInfos, 0xFFFFFFFFL);
+    p_l0 = p_estream->FindNextID(EBML_INFO(EbmlHead), 0xFFFFFFFFL);
     if (p_l0 == NULL)
     {
         msg_Err( p_demux, "No EBML header found" );
@@ -63,7 +63,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
     }
 
     // verify we can read this Segment, we only support Matroska version 1 for now
-    p_l0->Read(*p_estream, EbmlHead::ClassInfos.Context, i_upper_lvl, p_l0, true);
+    p_l0->Read(*p_estream, EBML_CLASS_CONTEXT(EbmlHead), i_upper_lvl, p_l0, true);
 
     EDocType doc_type = GetChild<EDocType>(*static_cast<EbmlHead*>(p_l0));
     if (std::string(doc_type) != "matroska" && std::string(doc_type) != "webm" )
@@ -83,7 +83,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
 
 
     // find all segments in this file
-    p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFFLL);
+    p_l0 = p_estream->FindNextID(EBML_INFO(KaxSegment), 0xFFFFFFFFFLL);
     if (p_l0 == NULL)
     {
         return NULL;
@@ -110,7 +110,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
                     // find the families of this segment
                     KaxInfo *p_info = static_cast<KaxInfo*>(p_l1);
 
-                    p_info->Read(*p_estream, KaxInfo::ClassInfos.Context, i_upper_lvl, p_l2, true);
+                    p_info->Read(*p_estream, EBML_CLASS_CONTEXT(KaxInfo), i_upper_lvl, p_l2, true);
                     for( size_t i = 0; i < p_info->ListSize(); i++ )
                     {
                         EbmlElement *l = (*p_info)[i];
@@ -156,7 +156,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
         if (p_l0->IsFiniteSize() )
         {
             p_l0->SkipData(*p_estream, KaxMatroska_Context);
-            p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
+            p_l0 = p_estream->FindNextID(EBML_INFO(KaxSegment), 0xFFFFFFFFL);
         }
         else
         {

@@ -67,7 +67,7 @@ class KaxBlockVirtualWorkaround : public KaxBlockVirtual
 public:
     void Fix()
     {
-        if( Data == DataBlock )
+        if( GetBuffer() == DataBlock )
             SetBuffer( NULL, 0 );
     }
 };

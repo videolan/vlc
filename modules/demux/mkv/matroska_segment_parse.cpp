@@ -57,7 +57,7 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
     {
         if( MKV_IS_ID( l, KaxSeek ) )
         {
-            EbmlId id = EbmlVoid::ClassInfos.GlobalId;
+            EbmlId id = EBML_ID(EbmlVoid);
             int64_t i_pos = -1;
 
 #ifdef MKV_DEBUG
@@ -88,40 +88,40 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
 
             if( i_pos >= 0 )
             {
-                if( id == KaxCues::ClassInfos.GlobalId )
+                if( id == EBML_ID(KaxCues) )
                 {
                     msg_Dbg( &sys.demuxer, "|   - cues at %"PRId64, i_pos );
-                    LoadSeekHeadItem( KaxCues::ClassInfos, i_pos );
+                    LoadSeekHeadItem( EBML_INFO(KaxCues), i_pos );
                 }
-                else if( id == KaxInfo::ClassInfos.GlobalId )
+                else if( id == EBML_ID(KaxInfo) )
                 {
                     msg_Dbg( &sys.demuxer, "|   - info at %"PRId64, i_pos );
-                    LoadSeekHeadItem( KaxInfo::ClassInfos, i_pos );
+                    LoadSeekHeadItem( EBML_INFO(KaxInfo), i_pos );
                 }
-                else if( id == KaxChapters::ClassInfos.GlobalId )
+                else if( id == EBML_ID(KaxChapters) )
                 {
                     msg_Dbg( &sys.demuxer, "|   - chapters at %"PRId64, i_pos );
-                    LoadSeekHeadItem( KaxChapters::ClassInfos, i_pos );
+                    LoadSeekHeadItem( EBML_INFO(KaxChapters), i_pos );
                 }
-                else if( id == KaxTags::ClassInfos.GlobalId )
+                else if( id == EBML_ID(KaxTags) )
                 {
                     msg_Dbg( &sys.demuxer, "|   - tags at %"PRId64, i_pos );
-                    LoadSeekHeadItem( KaxTags::ClassInfos, i_pos );
+                    LoadSeekHeadItem( EBML_INFO(KaxTags), i_pos );
                 }
-                else if( id == KaxSeekHead::ClassInfos.GlobalId )
+                else if( id == EBML_ID(KaxSeekHead) )
                 {
                     msg_Dbg( &sys.demuxer, "|   - chained seekhead at %"PRId64, i_pos );
-                    LoadSeekHeadItem( KaxSeekHead::ClassInfos, i_pos );
+                    LoadSeekHeadItem( EBML_INFO(KaxSeekHead), i_pos );
                 }
-                else if( id == KaxTracks::ClassInfos.GlobalId )
+                else if( id == EBML_ID(KaxTracks) )
                 {
                     msg_Dbg( &sys.demuxer, "|   - tracks at %"PRId64, i_pos );
-                    LoadSeekHeadItem( KaxTracks::ClassInfos, i_pos );
+                    LoadSeekHeadItem( EBML_INFO(KaxTracks), i_pos );
                 }
-                else if( id == KaxAttachments::ClassInfos.GlobalId )
+                else if( id == EBML_ID(KaxAttachments) )
                 {
                     msg_Dbg( &sys.demuxer, "|   - attachments at %"PRId64, i_pos );
-                    LoadSeekHeadItem( KaxAttachments::ClassInfos, i_pos );
+                    LoadSeekHeadItem( EBML_INFO(KaxAttachments), i_pos );
                 }
 #ifdef MKV_DEBUG
                 else
@@ -439,21 +439,21 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                 }
             }
         }
-//        else if( EbmlId( *l ) == KaxCodecSettings::ClassInfos.GlobalId ) DEPRECATED by matroska
+//        else if( MKV_IS_ID( l, KaxCodecSettings) ) DEPRECATED by matroska
 //        {
 //            KaxCodecSettings &cset = *(KaxCodecSettings*)l;
 
 //            tk->psz_codec_settings = ToUTF8( UTFstring( cset ) );
 //            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Settings=%s", tk->psz_codec_settings );
 //        }
-//        else if( EbmlId( *l ) == KaxCodecInfoURL::ClassInfos.GlobalId ) DEPRECATED by matroska
+//        else if( MKV_IS_ID( l, KaxCodecInfoURL) ) DEPRECATED by matroska
 //        {
 //            KaxCodecInfoURL &ciurl = *(KaxCodecInfoURL*)l;
 
 //            tk->psz_codec_info_url = strdup( string( ciurl ).c_str() );
 //            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Info URL=%s", tk->psz_codec_info_url );
 //        }
-//        else if( EbmlId( *l ) == KaxCodecDownloadURL::ClassInfos.GlobalId ) DEPRECATED by matroska
+//        else if( MKV_IS_ID( l, KaxCodecDownloadURL) ) DEPRECATED by matroska
 //        {
 //            KaxCodecDownloadURL &cdurl = *(KaxCodecDownloadURL*)l;
 
@@ -565,7 +565,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                     tk->f_fps = float( vfps );
                     msg_Dbg( &sys.demuxer, "   |   |   |   + fps=%f", float( vfps ) );
                 }
-//                else if( EbmlId( *l ) == KaxVideoGamma::ClassInfos.GlobalId ) //DEPRECATED by Matroska
+//                else if( MKV_IS_ID( l, KaxVideoGamma) ) //DEPRECATED by Matroska
 //                {
 //                    KaxVideoGamma &gamma = *(KaxVideoGamma*)l;
 
@@ -664,7 +664,7 @@ void matroska_segment_c::ParseTracks( KaxTracks *tracks )
     int i_upper_level = 0;
 
     /* Master elements */
-    tracks->Read( es, tracks->Generic().Context, i_upper_level, el, true );
+    tracks->Read( es, EBML_CONTEXT(tracks), i_upper_level, el, true );
 
     for( size_t i = 0; i < tracks->ListSize(); i++ )
     {
@@ -692,7 +692,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
 
     /* Master elements */
     m = static_cast<EbmlMaster *>(info);
-    m->Read( es, info->Generic().Context, i_upper_level, el, true );
+    m->Read( es, EBML_CONTEXT(info), i_upper_level, el, true );
 
     for( size_t i = 0; i < m->ListSize(); i++ )
     {
@@ -801,7 +801,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
             KaxChapterTranslate *p_trans = static_cast<KaxChapterTranslate*>( l );
             chapter_translation_c *p_translate = new chapter_translation_c();
 
-            p_trans->Read( es, p_trans->Generic().Context, i_upper_level, el, true );
+            p_trans->Read( es, EBML_CONTEXT(p_trans), i_upper_level, el, true );
             for( size_t j = 0; j < p_trans->ListSize(); j++ )
             {
                 EbmlElement *l = (*p_trans)[j];
@@ -966,7 +966,7 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
     EbmlElement *el;
     int i_upper_level = 0;
 
-    attachments->Read( es, attachments->Generic().Context, i_upper_level, el, true );
+    attachments->Read( es, EBML_CONTEXT(attachments), i_upper_level, el, true );
 
     KaxAttached *attachedFile = FindChild<KaxAttached>( *attachments );
 
@@ -1010,7 +1010,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
     mtime_t i_dur;
 
     /* Master elements */
-    chapters->Read( es, chapters->Generic().Context, i_upper_level, el, true );
+    chapters->Read( es, EBML_CONTEXT(chapters), i_upper_level, el, true );
 
     for( size_t i = 0; i < chapters->ListSize(); i++ )
     {
@@ -1084,7 +1084,7 @@ void matroska_segment_c::ParseCluster( )
 
     /* Master elements */
     m = static_cast<EbmlMaster *>( cluster );
-    m->Read( es, cluster->Generic().Context, i_upper_level, el, true );
+    m->Read( es, EBML_CONTEXT(cluster), i_upper_level, el, true );
 
     for( unsigned int i = 0; i < m->ListSize(); i++ )
     {
