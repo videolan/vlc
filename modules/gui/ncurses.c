@@ -1570,8 +1570,8 @@ static void HandleEditBoxKey(intf_thread_t *p_intf, int key, int box)
         break;
 
     default:
-        if (len + 1 < search ? sizeof p_sys->psz_search_chain
-                             : sizeof p_sys->psz_open_chain)
+        if (len + 1 < (search ? sizeof p_sys->psz_search_chain
+                              : sizeof p_sys->psz_open_chain))
         {
             str[len + 0] = (char) key;
             str[len + 1] = '\0';
