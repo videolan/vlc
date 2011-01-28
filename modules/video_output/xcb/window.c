@@ -37,6 +37,7 @@ typedef xcb_atom_t Atom;
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
+#include <vlc_interface.h>
 
 #include "xcb_vlc.h"
 
@@ -99,6 +100,8 @@ struct vout_window_sys_t
     vlc_thread_t thread;
 
     xcb_window_t root;
+    xcb_atom_t wm_protocols;
+    xcb_atom_t wm_delete_window;
     xcb_atom_t wm_state;
     xcb_atom_t wm_state_above;
     xcb_atom_t wm_state_below;
@@ -138,6 +141,18 @@ void set_wm_hints (xcb_connection_t *conn, xcb_window_t window)
     };
     xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window, XA_WM_HINTS,
                          XA_WM_HINTS, 32, 8, wm_hints);
+}
+
+static inline
+void set_wm_protocols (vout_window_t *wnd, xcb_connection_t *conn,
+                       xcb_window_t window)
+{
+    const xcb_atom_t wm_protocols[1] = {
+        wnd->sys->wm_delete_window,
+    };
+    xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window,
+                         wnd->sys->wm_protocols, XA_ATOM,
+                         32, 1, wm_protocols);
 }
 
 /** Set the Window ICCCM client machine property */
@@ -188,9 +203,12 @@ xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
 static void CacheAtoms (vout_window_sys_t *p_sys)
 {
     xcb_connection_t *conn = p_sys->conn;
-    xcb_intern_atom_cookie_t wm_state_ck, wm_state_above_ck,
+    xcb_intern_atom_cookie_t wm_protocols_ck, wm_delete_window_ck,
+                             wm_state_ck, wm_state_above_ck,
                              wm_state_below_ck, wm_state_fs_ck;
 
+    wm_protocols_ck = intern_string (conn, "WM_PROTOCOLS");
+    wm_delete_window_ck = intern_string (conn, "WM_DELETE_WINDOW");
     wm_state_ck = intern_string (conn, "_NET_WM_STATE");
     wm_state_above_ck = intern_string (conn, "_NET_WM_STATE_ABOVE");
     wm_state_below_ck = intern_string (conn, "_NET_WM_STATE_BELOW");
@@ -202,6 +220,8 @@ static void CacheAtoms (vout_window_sys_t *p_sys)
                                              "_MB_CURRENT_APP_WINDOW");
 #endif
 
+    p_sys->wm_protocols = get_atom (conn, wm_protocols_ck);
+    p_sys->wm_delete_window = get_atom (conn, wm_delete_window_ck);
     p_sys->wm_state = get_atom (conn, wm_state_ck);
     p_sys->wm_state_above = get_atom (conn, wm_state_above_ck);
     p_sys->wm_state_below = get_atom (conn, wm_state_below_ck);
@@ -334,6 +354,10 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     /* Cache any EWMH atom we may need later */
     CacheAtoms (p_sys);
+
+    /* tell the WM which protocols we support */
+    set_wm_protocols (wnd, conn, window );
+
 #ifdef MATCHBOX_HACK
     if (p_sys->mb_current_app_window)
     {
@@ -394,6 +418,24 @@ static void Close (vout_window_t *wnd)
 }
 
 
+static int ProcessClientMessage (vout_window_t *wnd, xcb_generic_event_t *ev)
+{
+    if ((ev->response_type & 0x7f) != XCB_CLIENT_MESSAGE)
+        return -1;
+
+    xcb_client_message_event_t* evt = (xcb_client_message_event_t*)ev;
+    if (evt->type == wnd->sys->wm_protocols
+     && evt->data.data32[0] == wnd->sys->wm_delete_window)
+    {
+        msg_Dbg (wnd, "WM_DELETE_WINDOW received from the Window Manager");
+        libvlc_Quit (wnd->p_libvlc);
+    }
+    else
+        msg_Dbg (wnd, "unhandled client message");
+    return 0;
+}
+
+
 /** Background thread for X11 events handling */
 static void *Thread (void *data)
 {
@@ -415,6 +457,8 @@ static void *Thread (void *data)
         int canc = vlc_savecancel ();
         while ((ev = xcb_poll_for_event (conn)) != NULL)
         {
+            if (ProcessClientMessage (wnd, ev) == 0)
+                continue;
             if (ProcessKeyEvent (p_sys->keys, ev) == 0)
                 continue;
 #ifdef MATCHBOX_HACK
