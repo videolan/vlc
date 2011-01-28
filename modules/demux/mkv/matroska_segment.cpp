@@ -267,6 +267,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
             {
                 if( MKV_IS_ID( el, KaxTagTargets ) )
                     PARSE_TAG( "Targets" );
+#if 0 // not valid anymore
                 else if( MKV_IS_ID( el, KaxTagGeneral ) )
                     PARSE_TAG( "General" );
                 else if( MKV_IS_ID( el, KaxTagGenres ) )
@@ -303,6 +304,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                 {
                     msg_Dbg( &sys.demuxer, "|   + Multi Title" );
                 }
+#endif
                 else if( MKV_IS_ID( el, KaxTagSimple ) )
                     ParseSimpleTags( static_cast<KaxTagSimple*>( el ) );
                 else
