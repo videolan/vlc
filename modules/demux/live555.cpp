@@ -1886,7 +1886,8 @@ static void StreamRead( void *p_private, unsigned int i_size,
     }
 
     /* Update our global npt value */
-    if( tk->i_npt > 0 && tk->i_npt > p_sys->i_npt && tk->i_npt < p_sys->i_npt_length)
+    if( tk->i_npt > 0 && tk->i_npt > p_sys->i_npt &&
+        ( tk->i_npt < p_sys->i_npt_length || p_sys->i_npt_length <= 0 ) )
         p_sys->i_npt = tk->i_npt;
 
     if( p_block )
