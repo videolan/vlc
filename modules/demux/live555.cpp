@@ -222,7 +222,8 @@ struct demux_sys_t
     bool             b_no_data;     /* if we never received any data */
     int              i_no_data_ti;  /* consecutive number of TaskInterrupt */
 
-    char             event;
+    char             event_rtsp;
+    char             event_data;
 
     bool             b_get_param;   /* Does the server support GET_PARAMETER */
     bool             b_paused;      /* Are we paused? */
@@ -259,7 +260,8 @@ static int RollOverTcp  ( demux_t * );
 static void StreamRead  ( void *, unsigned int, unsigned int,
                           struct timeval, unsigned int );
 static void StreamClose ( void * );
-static void TaskInterrupt( void * );
+static void TaskInterruptData( void * );
+static void TaskInterruptRTSP( void * );
 
 static void* TimeoutPrevention( void * );
 
@@ -483,7 +485,7 @@ static void default_live555_callback( RTSPClient* client, int result_code, char*
     delete []result_string;
     p_sys->i_live555_ret = result_code;
     p_sys->b_error = p_sys->i_live555_ret != 0;
-    p_sys->event = 1;
+    p_sys->event_rtsp = 1;
 }
 
 /* return true if the RTSP command succeeded */
@@ -491,17 +493,18 @@ static bool wait_Live555_response( demux_t *p_demux, int i_timeout = 0 /* ms */ 
 {
     TaskToken task;
     demux_sys_t * p_sys = p_demux->p_sys;
-    p_sys->event = 0;
+    p_sys->event_rtsp = 0;
     if( i_timeout > 0 )
     {
         /* Create a task that will be called if we wait more than timeout ms */
-        task = p_sys->scheduler->scheduleDelayedTask( i_timeout*1000, TaskInterrupt,
+        task = p_sys->scheduler->scheduleDelayedTask( i_timeout*1000,
+                                                      TaskInterruptRTSP,
                                                       p_demux );
     }
-    p_sys->event = 0;
+    p_sys->event_rtsp = 0;
     p_sys->b_error = true;
     p_sys->i_live555_ret = 0;
-    p_sys->scheduler->doEventLoop( &p_sys->event );
+    p_sys->scheduler->doEventLoop( &p_sys->event_rtsp );
     //here, if b_error is true and i_live555_ret = 0 we didn't receive a response
     if( i_timeout > 0 )
     {
@@ -531,7 +534,7 @@ static void continueAfterDESCRIBE( RTSPClient* client, int result_code,
     else
         p_sys->b_error = true;
     delete[] result_string;
-    p_sys->event = 1;
+    p_sys->event_rtsp = 1;
 }
 
 static void continueAfterOPTIONS( RTSPClient* client, int result_code,
@@ -543,7 +546,7 @@ static void continueAfterOPTIONS( RTSPClient* client, int result_code,
     if ( result_code != 0 )
     {
         p_sys->b_error = true;
-        p_sys->event = 1;
+        p_sys->event_rtsp = 1;
     }
     else
     {
@@ -1212,7 +1215,7 @@ static int Demux( demux_t *p_demux )
     }
 
     /* First warn we want to read data */
-    p_sys->event = 0;
+    p_sys->event_data = 0;
     for( i = 0; i < p_sys->i_track; i++ )
     {
         live_track_t *tk = p_sys->track[i];
@@ -1225,10 +1228,10 @@ static int Demux( demux_t *p_demux )
         }
     }
     /* Create a task that will be called if we wait more than 300ms */
-    task = p_sys->scheduler->scheduleDelayedTask( 300000, TaskInterrupt, p_demux );
+    task = p_sys->scheduler->scheduleDelayedTask( 300000, TaskInterruptData, p_demux );
 
     /* Do the read */
-    p_sys->scheduler->doEventLoop( &p_sys->event );
+    p_sys->scheduler->doEventLoop( &p_sys->event_data );
 
     /* remove the task */
     p_sys->scheduler->unscheduleDelayedTask( task );
@@ -1747,7 +1750,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
             if( qtState.sdAtomSize < 16 + 32 )
             {
                 /* invalid */
-                p_sys->event = 0xff;
+                p_sys->event_data = 0xff;
                 tk->waiting = 0;
                 return;
             }
@@ -1786,7 +1789,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
             if( qtState.sdAtomSize < 4 )
             {
                 /* invalid */
-                p_sys->event = 0xff;
+                p_sys->event_data = 0xff;
                 tk->waiting = 0;
                 return;
             }
@@ -1824,7 +1827,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
         if( tk->b_discard_trunc )
         {
-            p_sys->event = 0xff;
+            p_sys->event_data = 0xff;
             tk->waiting = 0;
             return;
         }
@@ -1905,7 +1908,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
     }
 
     /* warn that's ok */
-    p_sys->event = 0xff;
+    p_sys->event_data = 0xff;
 
     /* we have read data */
     tk->waiting = 0;
@@ -1929,7 +1932,8 @@ static void StreamClose( void *p_private )
 
     msg_Dbg( p_demux, "StreamClose" );
 
-    p_sys->event = 0xff;
+    p_sys->event_rtsp = 0xff;
+    p_sys->event_data = 0xff;
     p_sys->b_error = true;
 }
 
@@ -1937,14 +1941,22 @@ static void StreamClose( void *p_private )
 /*****************************************************************************
  *
  *****************************************************************************/
-static void TaskInterrupt( void *p_private )
+static void TaskInterruptRTSP( void *p_private )
+{
+    demux_t *p_demux = (demux_t*)p_private;
+
+    /* Avoid lock */
+    p_demux->p_sys->event_rtsp = 0xff;
+}
+
+static void TaskInterruptData( void *p_private )
 {
     demux_t *p_demux = (demux_t*)p_private;
 
     p_demux->p_sys->i_no_data_ti++;
 
     /* Avoid lock */
-    p_demux->p_sys->event = 0xff;
+    p_demux->p_sys->event_data = 0xff;
 }
 
 /*****************************************************************************
