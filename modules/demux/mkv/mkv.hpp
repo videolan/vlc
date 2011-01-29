@@ -115,7 +115,7 @@ extern "C" {
 
 #define MKVD_TIMECODESCALE 1000000
 
-#define MKV_IS_ID( el, C ) ( EbmlId( (*el) ) == C::ClassInfos.GlobalId )
+#define MKV_IS_ID( el, C ) ( el != NULL && typeid( *el ) == typeid( C ) )
 
 
 using namespace LIBMATROSKA_NAMESPACE;
