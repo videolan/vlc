@@ -333,7 +333,7 @@ void libvlc_video_set_callbacks( libvlc_media_player_t *mp,
  * \version LibVLC 1.1.1 or later
  * \bug All pixel planes are expected to have the same pitch.
  * To use the YCbCr color space with chrominance subsampling,
- * consider using libvlc_video_set_format_callback() instead.
+ * consider using libvlc_video_set_format_callbacks() instead.
  */
 VLC_PUBLIC_API
 void libvlc_video_set_format( libvlc_media_player_t *mp, const char *chroma,
