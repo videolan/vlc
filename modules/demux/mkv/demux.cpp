@@ -93,7 +93,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
 
     while (p_l0 != 0)
     {
-        if (EbmlId(*p_l0) == KaxSegment::ClassInfos.GlobalId)
+        if ( MKV_IS_ID( p_l0, KaxSegment) )
         {
             EbmlParser  *ep;
             matroska_segment_c *p_segment1 = new matroska_segment_c( *this, *p_estream );
