@@ -157,12 +157,11 @@ int main( int i_argc, const char *ppsz_argv[] )
     sigaddset (&set, SIGPIPE);
 
     /* SIGCHLD must be dequeued to clean up zombie child processes.
-     * Furthermore the handler must not be set to SIG_IGN (see above). */
-    /* Unfortunately, the QProcess class from Qt4 has a bug. It installs a
-     * custom signal handlers and gets stuck if it is not called. So we cannot
-     * use sigwait() for SIGCHLD:
-     * http://bugs.kde.org/show_bug.cgi?id=260719 */
-    //sigaddset (&set, SIGCHLD);
+     * Furthermore the handler must not be set to SIG_IGN (see above).
+     * We cannot pragmatically handle EINTR, short reads and short writes
+     * in every code paths (including underlying libraries). So we just
+     * block SIGCHLD in all threads, and dequeue it with sigwait() below. */
+    sigaddset (&set, SIGCHLD);
 
 #ifdef HAVE_MAEMO
     sigaddset (&set, SIGRTMIN);
