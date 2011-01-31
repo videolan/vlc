@@ -60,7 +60,7 @@ static int CreateInputItemFromMedia( media_library_t *p_ml,
 struct ml_table_elt
 {
     int column_id;
-    char* column_name;
+    const char* column_name;
 };
 
 static int compare_ml_elts( const void *a, const void *b )
