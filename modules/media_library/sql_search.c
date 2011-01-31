@@ -170,7 +170,7 @@ int BuildSelectVa( media_library_t *p_ml, char **ppsz_query,
                 break;
             case ML_ARTIST:
                 /* This is OK because of a shallow free find */
-                p_find->lvalue.str = ML_PERSON_ARTIST;
+                p_find->lvalue.str = (char *)ML_PERSON_ARTIST;
                 p_find->value.str = va_arg( criterias, char* );
                 p_ftree = ml_FtreeFastAnd( p_ftree, p_find );
                 break;
