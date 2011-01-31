@@ -250,56 +250,6 @@ static void Close(vlc_object_t *object)
 }
 
 #if 0
-/*****************************************************************************
- * Init: initialize Transform video thread output method
- *****************************************************************************/
-static int Init( vout_thread_t *p_vout )
-{
-    video_format_t fmt;
-
-    I_OUTPUTPICTURES = 0;
-    memset( &fmt, 0, sizeof(video_format_t ) );
-
-    /* Initialize the output structure */
-    p_vout->output.i_chroma = p_vout->render.i_chroma;
-    p_vout->output.i_width  = p_vout->render.i_width;
-    p_vout->output.i_height = p_vout->render.i_height;
-    p_vout->output.i_aspect = p_vout->render.i_aspect;
-    p_vout->fmt_out = p_vout->fmt_in;
-    fmt = p_vout->fmt_out;
-
-    /* Try to open the real video output */
-    msg_Dbg( p_vout, "spawning the real video output" );
-
-    if( p_vout->p_sys->b_rotation )
-    {
-        fmt.i_width = p_vout->fmt_out.i_height;
-        fmt.i_visible_width = p_vout->fmt_out.i_visible_height;
-        fmt.i_x_offset = p_vout->fmt_out.i_y_offset;
-
-        fmt.i_height = p_vout->fmt_out.i_width;
-        fmt.i_visible_height = p_vout->fmt_out.i_visible_width;
-        fmt.i_y_offset = p_vout->fmt_out.i_x_offset;
-
-        fmt.i_sar_num = p_vout->fmt_out.i_sar_den;
-        fmt.i_sar_den = p_vout->fmt_out.i_sar_num;
-    }
-
-    p_vout->p_sys->p_vout = vout_Create( p_vout, &fmt );
-
-    /* Everything failed */
-    if( p_vout->p_sys->p_vout == NULL )
-    {
-        msg_Err( p_vout, "cannot open vout, aborting" );
-        return VLC_EGENERIC;
-    }
-
-    vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
-
-    vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, MouseEvent );
-
-    return VLC_SUCCESS;
-}
 static void FilterI422( vout_thread_t *p_vout,
                         const picture_t *p_pic, picture_t *p_outpic )
 {
