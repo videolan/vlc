@@ -354,7 +354,7 @@ int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
 
     if( p_fmt->i_codec == VLC_CODEC_H264 )
     {
-        int offset=2;
+        unsigned offset=2;
         while(offset < p_es->i_buffer )
         {
             if( p_es->p_buffer[offset-2] == 0 &&
