@@ -350,12 +350,13 @@ static int Create( vlc_object_t *p_this )
 
 #ifdef HAVE_FONTCONFIG
     msg_Dbg( p_filter, "Building font databases.");
-    mtime_t t1, t2;
+    mtime_t t1;
     t1 = mdate();
 
 #ifdef WIN32
     dialog_progress_bar_t *p_dialog = NULL;
     FcConfig *fcConfig = FcInitLoadConfig();
+    mtime_t t2;
 
     p_dialog = dialog_ProgressCreate( p_filter,
             _("Building font cache"),
@@ -1094,7 +1095,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 #if defined(HAVE_FRIBIDI)
     {
         uint32_t *p_fribidi_string;
-        int32_t start_pos, pos = 0;
+        int32_t start_pos;
+        size_t pos = 0;
 
         p_fribidi_string = malloc( (i_string_length + 1) * sizeof(uint32_t) );
         if( !p_fribidi_string )
