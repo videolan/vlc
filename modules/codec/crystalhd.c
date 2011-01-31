@@ -149,6 +149,9 @@ static int OpenDecoder( vlc_object_t *p_this )
 /* Not ready for production yet
     case VLC_CODEC_MP4V:
         i_bcm_codec_subtype = BC_MSUBTYPE_DIVX;
+        break;
+    case VLC_CODEC_DIV3:
+        i_bcm_codec_subtype = BC_MSUBTYPE_DIVX311;
         break; */
     default:
         return VLC_EGENERIC;
@@ -463,6 +466,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 break; */
             p_dec->fmt_out.video.i_width  = proc_out.PicInfo.width;
             p_dec->fmt_out.video.i_height = proc_out.PicInfo.height;
+            if( proc_out.PicInfo.height == 1088 )
+                p_dec->fmt_out.video.i_height = 1080;
 #define setAR( a, b, c ) case a: p_dec->fmt_out.video.i_sar_num = b; p_dec->fmt_out.video.i_sar_den = c; break;
             switch( proc_out.PicInfo.aspect_ratio )
             {
