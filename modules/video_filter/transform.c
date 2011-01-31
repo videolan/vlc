@@ -71,16 +71,19 @@ vlc_module_end()
  *****************************************************************************/
 static void HFlip(int *sx, int *sy, int w, int h, int dx, int dy)
 {
+    VLC_UNUSED( h );
     *sx = w - 1 - dx;
     *sy = dy;
 }
 static void VFlip(int *sx, int *sy, int w, int h, int dx, int dy)
 {
+    VLC_UNUSED( w );
     *sx = dx;
     *sy = h - 1 - dy;
 }
 static void R90(int *sx, int *sy, int w, int h, int dx, int dy)
 {
+    VLC_UNUSED( h );
     *sx = dy;
     *sy = w - 1 - dx;
 }
@@ -91,6 +94,7 @@ static void R180(int *sx, int *sy, int w, int h, int dx, int dy)
 }
 static void R270(int *sx, int *sy, int w, int h, int dx, int dy)
 {
+    VLC_UNUSED( w );
     *sx = h - 1 - dy;
     *sy = dx;
 }
@@ -165,6 +169,8 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
 static int Mouse(filter_t *filter, vlc_mouse_t *mouse,
                  const vlc_mouse_t *mold, const vlc_mouse_t *mnew)
 {
+    VLC_UNUSED( mold );
+
     const video_format_t          *fmt = &filter->fmt_out.video;
     const transform_description_t *dsc = filter->p_sys->dsc;
 
