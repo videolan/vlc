@@ -695,9 +695,8 @@ while not vlc.misc.should_die() do
         if string.match(input,"\n$") then
             client.buffer = string.gsub(client.buffer..input,"\r?\n$","")
             done = true
-        elseif client.buffer == ""
-           and ((client.type == host.client_type.stdio and input == "")
-           or  (client.type == host.client_type.net and input == "\004")) then
+        elseif input == ""
+           or  (client.type == host.client_type.net and input == "\004") then
             -- Caught a ^D
             client.buffer = "quit"
             done = true
