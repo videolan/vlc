@@ -184,14 +184,14 @@ while not vlc.misc.should_die() do
         local str = client.cmds .. client:recv(1000)
 
         if not str then -- the telnet client program has left
-            client.cmds = "quit"
+            client.cmds = "quit\n"
         elseif string.match(str,"\n") then
             client.cmds = str
         elseif client.buffer == ""
            and ((client.type == host.client_type.stdio and str == "")
            or  (client.type == host.client_type.net and str == "\004")) then
             -- Caught a ^D
-            client.cmds = "quit"
+            client.cmds = "quit\n"
         end
 
         client.buffer = ""
