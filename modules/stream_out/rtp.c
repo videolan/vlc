@@ -344,6 +344,7 @@ struct sout_stream_id_t
     sout_stream_t *p_stream;
     /* rtp field */
     uint16_t    i_sequence;
+    bool        b_first_packet;
     bool        b_ts_init;
     uint32_t    i_ts_offset;
     uint8_t     ssrc[4];
@@ -948,6 +949,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->p_fifo = NULL;
     id->listen.fd = NULL;
 
+    id->b_first_packet = true;
     id->i_caching =
         (int64_t)1000 * var_GetInteger( p_stream, SOUT_CFG_PREFIX "caching");
 
@@ -1239,11 +1241,14 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
         /* Send a Vorbis/Theora Packed Configuration packet (RFC 5215 §3.1)
          * as the first packet of the stream */
-        if (id->i_sequence == id->i_seq_sent_next
-            && (!strcmp(id->rtp_fmt.ptname, "vorbis")
-                || !strcmp(id->rtp_fmt.ptname, "theora")))
+        if (id->b_first_packet)
+        {
+            id->b_first_packet = false;
+            if (!strcmp(id->rtp_fmt.ptname, "vorbis") ||
+                !strcmp(id->rtp_fmt.ptname, "theora"))
                 rtp_packetize_xiph_config(id, id->rtp_fmt.fmtp,
                                           p_buffer->i_pts);
+        }
 
         if( id->rtp_fmt.pf_packetize( id, p_buffer ) )
             break;
