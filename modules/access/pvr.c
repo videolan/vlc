@@ -41,14 +41,12 @@
 #include <unistd.h>
 #include <linux/types.h>
 #include <sys/ioctl.h>
-#ifdef HAVE_NEW_LINUX_VIDEODEV2_H
-#   ifdef VIDEODEV2_H_FILE
-#   include VIDEODEV2_H_FILE
-#   else
+#if defined(HAVE_LINUX_VIDEODEV2_H)
 #   include <linux/videodev2.h>
-#   endif
+#elif defined(HAVE_SYS_VIDEOIO_H)
+#   include <sys/videoio.h>
 #else
-#include "videodev2.h"
+#   error "No Video4Linux2 headers found."
 #endif
 
 /*****************************************************************************
@@ -307,8 +305,6 @@ static int ConfigureIVTV( access_t * p_access )
     return VLC_SUCCESS;
 }
 
-#ifdef HAVE_NEW_LINUX_VIDEODEV2_H
-
 #define MAX_V4L2_CTRLS (6)
 /*****************************************************************************
  * AddV4L2Ctrl: adds a control to the v4l2 controls list
@@ -535,8 +531,6 @@ static int ConfigureV4L2( access_t * p_access )
     free( controls.controls );
     return VLC_SUCCESS;
 }
-
-#endif /* HAVE_NEW_LINUX_VIDEODEV2_H */
 
 /*****************************************************************************
  * Open: open the device
@@ -856,17 +850,12 @@ static int Open( vlc_object_t * p_this )
     {
         if( p_sys->b_v4l2_api )
         {
-#ifdef HAVE_NEW_LINUX_VIDEODEV2_H
             result = ConfigureV4L2( p_access );
             if( result != VLC_SUCCESS )
             {
                 Close( VLC_OBJECT(p_access) );
                 return result;
             }
-#else
-            msg_Warn( p_access, "You have new ivtvdrivers, "
-                      "but this vlc was built against an old v4l2 version." );
-#endif
         }
         else
         {
