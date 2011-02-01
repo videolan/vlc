@@ -213,6 +213,8 @@ while not vlc.misc.should_die() do
                     client:send( IAC..WONT..ECHO.."\r\nWelcome, Master\r\n" )
                     client.buffer = ""
                     client:switch_status( host.status.write )
+                elseif client.buffer == "quit" then
+                    client_command( client )
                 else
                     client:send( "\r\nWrong password\r\nPassword: " )
                     client.buffer = ""
