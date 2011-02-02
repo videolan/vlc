@@ -330,10 +330,11 @@ static int Activate( vlc_object_t *p_this )
 
 #ifdef WIN32
     p_intf->p_sys->b_quiet = var_InheritBool( p_intf, "rc-quiet" );
-    if( !p_intf->p_sys->b_quiet ) { CONSOLE_INTRO_MSG; }
-#else
-    CONSOLE_INTRO_MSG;
+    if( !p_intf->p_sys->b_quiet )
 #endif
+    {
+        CONSOLE_INTRO_MSG;
+    }
 
     msg_rc( "%s", _("Remote control interface initialized. Type `help' for help.") );
     return VLC_SUCCESS;
