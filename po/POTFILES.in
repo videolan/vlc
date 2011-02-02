@@ -287,7 +287,6 @@ modules/access/vcdx/vcd.c
 modules/access/vcdx/vcd.h
 modules/access/vcdx/vcdplayer.c
 modules/access/vcdx/vcdplayer.h
-modules/access/videodev2.h
 modules/access/zip/zipstream.c
 modules/access_output/bonjour.c
 modules/access_output/bonjour.h
