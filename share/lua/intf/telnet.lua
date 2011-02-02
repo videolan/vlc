@@ -29,7 +29,7 @@ description=
 
  Differences are:
     * it's in Lua
-    * 'lock' command to lock the telnet promt
+    * 'lock' command to lock the telnet prompt
     * possibility to listen on different hosts including stdin
       for example:
         listen on stdin: vlc -I lua --lua-intf telnet --lua-config "telnet={host='*console'}"
