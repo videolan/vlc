@@ -160,7 +160,7 @@ int main( int i_argc, const char *ppsz_argv[] )
      * Furthermore the handler must not be set to SIG_IGN (see above).
      * We cannot pragmatically handle EINTR, short reads and short writes
      * in every code paths (including underlying libraries). So we just
-     * block SIGCHLD in all threads, and dequeue it with sigwait() below. */
+     * block SIGCHLD in all threads, and dequeue it below. */
     sigaddset (&set, SIGCHLD);
 
 #ifdef HAVE_MAEMO
@@ -171,7 +171,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     }
 #endif
     /* Block all these signals */
-    pthread_sigmask (SIG_BLOCK, &set, NULL);
+    pthread_sigmask (SIG_SETMASK, &set, NULL);
 
     /* Note that FromLocale() can be used before libvlc is initialized */
     const char *argv[i_argc + 4];
