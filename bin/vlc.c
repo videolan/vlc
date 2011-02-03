@@ -221,14 +221,19 @@ int main( int i_argc, const char *ppsz_argv[] )
     pthread_t self = pthread_self ();
     libvlc_set_exit_handler (vlc, vlc_kill, &self);
 
-    if (signal_ignored (SIGHUP)) /* <- needed to handle nohup properly */
+    /* Qt4 insists on catching SIGCHLD via signal handler. To work around that,
+     * unblock it after all our child threads are created. */
+    sigdelset (&set, SIGCHLD);
+    pthread_sigmask (SIG_SETMASK, &set, NULL);
+
+    /* Do not dequeue SIGHUP if it is ignored (nohup) */
+    if (signal_ignored (SIGHUP))
         sigdelset (&set, SIGHUP);
+    /* Ignore SIGPIPE */
     sigdelset (&set, SIGPIPE);
 
     int signum;
-    do
-        sigwait (&set, &signum);
-    while (signum == SIGCHLD);
+    sigwait (&set, &signum);
 
     /* Restore default signal behaviour after 3 seconds */
     sigemptyset (&set);
