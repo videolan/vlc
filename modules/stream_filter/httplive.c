@@ -361,7 +361,7 @@ static int ChooseSegment(stream_t *s, int current)
     /* Choose a segment to start which is no closer then
      * 3 times the target duration from the end of the playlist.
      */
-    int wanted = -1;
+    int wanted = 0;
     int duration = 0;
     int count = vlc_array_count(hls->segments);
     int i = p_sys->b_live ? count - 1 : 0;
