@@ -55,7 +55,7 @@ Interfaces
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
  * New video output for iOS platform
- * New video output using EGL
+ * Experimental work in progress on a video output using EGL
  * Adaptation of the OpenGL layer for OpenGL ES 1.1
  * Various vmem improvements
 
