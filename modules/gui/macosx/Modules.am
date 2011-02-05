@@ -51,5 +51,8 @@ SOURCES_macosx = \
 	fspanel.h \
 	eyetv.h \
 	eyetv.m \
+	vout.h \
+	vout.m \
+	voutgl.m \
 	$(NULL)
 

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout.m: MacOS X video output module
  *****************************************************************************
- * Copyright (C) 2001-2009 the VideoLAN team
+ * Copyright (C) 2001-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
@@ -51,6 +51,8 @@
 #import "embeddedwindow.h"
 
 #include <vlc_common.h>
+#include <vlc_vout_window.h>
+#include <vlc_vout_display.h>
 #include <vlc_keys.h>
 
 /*****************************************************************************

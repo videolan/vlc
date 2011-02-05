@@ -44,10 +44,8 @@
 int  OpenIntf     ( vlc_object_t * );
 void CloseIntf    ( vlc_object_t * );
 
-#if 0
 int  OpenVideoGL  ( vlc_object_t * );
 void CloseVideoGL ( vlc_object_t * );
-#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -123,7 +121,6 @@ vlc_module_begin ()
     add_bool( "macosx-mediakeys-background", true, USE_MEDIAKEYS_BACKGROUND_TEXT, USE_MEDIAKEYS_BACKGROUND_LONGTEXT,
              false )
 
-#if 0
     add_submodule ()
         set_description( "Mac OS X OpenGL" )
         set_capability( "opengl provider", 100 )
@@ -141,6 +138,5 @@ vlc_module_begin ()
                   false )
         add_bool( "macosx-background", false, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
                   false )
-#endif
 vlc_module_end ()
 
