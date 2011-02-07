@@ -697,7 +697,7 @@ static int FrontendInfo( access_t *p_access )
             p_frontend->info.notifier_delay );
 
     msg_Dbg(p_access, "Frontend Info capability list:");
-    if( p_frontend->info.caps & FE_IS_STUPID)
+    if( p_frontend->info.caps == FE_IS_STUPID)
         msg_Dbg(p_access, "  no capabilities - frontend is stupid!");
     if( p_frontend->info.caps & FE_CAN_INVERSION_AUTO)
         msg_Dbg(p_access, "  inversion auto");
