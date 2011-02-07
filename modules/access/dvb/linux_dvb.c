@@ -720,19 +720,19 @@ static int FrontendInfo( access_t *p_access )
     if( p_frontend->info.caps & FE_CAN_FEC_AUTO)
         msg_Dbg(p_access, "  forward error correction auto");
     if( p_frontend->info.caps & FE_CAN_QPSK)
-        msg_Dbg(p_access, "  card can do QPSK");
+        msg_Dbg(p_access, "  QPSK modulation");
     if( p_frontend->info.caps & FE_CAN_QAM_16)
-        msg_Dbg(p_access, "  card can do QAM 16");
+        msg_Dbg(p_access, "  QAM 16 modulation");
     if( p_frontend->info.caps & FE_CAN_QAM_32)
-        msg_Dbg(p_access, "  card can do QAM 32");
+        msg_Dbg(p_access, "  QAM 32 modulation");
     if( p_frontend->info.caps & FE_CAN_QAM_64)
-        msg_Dbg(p_access, "  card can do QAM 64");
+        msg_Dbg(p_access, "  QAM 64 modulation");
     if( p_frontend->info.caps & FE_CAN_QAM_128)
-        msg_Dbg(p_access, "  card can do QAM 128");
+        msg_Dbg(p_access, "  QAM 128 modulation");
     if( p_frontend->info.caps & FE_CAN_QAM_256)
-        msg_Dbg(p_access, "  card can do QAM 256");
+        msg_Dbg(p_access, "  QAM 256 modulation");
     if( p_frontend->info.caps & FE_CAN_QAM_AUTO)
-        msg_Dbg(p_access, "  card can do QAM auto");
+        msg_Dbg(p_access, "  QAM auto modulation");
     if( p_frontend->info.caps & FE_CAN_TRANSMISSION_MODE_AUTO)
         msg_Dbg(p_access, "  transmission mode auto");
     if( p_frontend->info.caps & FE_CAN_BANDWIDTH_AUTO)
@@ -741,15 +741,27 @@ static int FrontendInfo( access_t *p_access )
         msg_Dbg(p_access, "  guard interval mode auto");
     if( p_frontend->info.caps & FE_CAN_HIERARCHY_AUTO)
         msg_Dbg(p_access, "  hierarchy mode auto");
-    if( p_frontend->info.caps & FE_CAN_MUTE_TS)
-        msg_Dbg(p_access, "  card can mute TS");
-    if( p_frontend->info.caps & FE_CAN_RECOVER)
-        msg_Dbg(p_access, "  card can recover from a cable unplug");
     if( p_frontend->info.caps & FE_CAN_8VSB)
-        msg_Dbg(p_access, "  card can do 8vsb");
+        msg_Dbg(p_access, "  8-level VSB modulation");
     if( p_frontend->info.caps & FE_CAN_16VSB)
-        msg_Dbg(p_access, "  card can do 16vsb");
-    msg_Dbg(p_access, "End of capability list");
+        msg_Dbg(p_access, "  16-level VSB modulation");
+    if( p_frontend->info.caps & FE_HAS_EXTENDED_CAPS)
+        msg_Dbg(p_access, "  8-level VSB modulation");
+    /* 3 capabilities that don't exist yet HERE */
+#ifdef FE_CAN_TURBO_FEC
+    if( p_frontend->info.caps & FE_CAN_TURBO_FEC)
+        msg_Dbg(p_access, "  Turbo FEC modulation");
+#else
+# warning Please update your Linux kernel headers!
+#endif
+    if( p_frontend->info.caps & FE_CAN_2G_MODULATION)
+        msg_Dbg(p_access, "  2nd generation modulation (DVB-S2)");
+    /* FE_NEEDS_BENDING is deprecated */
+    if( p_frontend->info.caps & FE_CAN_RECOVER)
+        msg_Dbg(p_access, "  cable unplug recovery");
+    if( p_frontend->info.caps & FE_CAN_MUTE_TS)
+        msg_Dbg(p_access, "  spurious TS muting");
+   msg_Dbg(p_access, "End of capability list");
 
     return VLC_SUCCESS;
 }
