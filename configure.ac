@@ -3843,6 +3843,8 @@ then
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,IOKit])
   VLC_ADD_LDFLAGS([macosx],                           [-F${CONTRIB_DIR}/Sparkle -Wl,-framework,Sparkle])
   VLC_ADD_OBJCFLAGS([macosx],                         [-F${CONTRIB_DIR}/Sparkle])
+  VLC_ADD_LDFLAGS([macosx],                           [-F${CONTRIB_DIR}/BWToolKit -Wl,-framework,BWToolKitFramework])
+  VLC_ADD_OBJCFLAGS([macosx],                         [-F${CONTRIB_DIR}/BWToolKit])
   dnl For bug report
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,AddressBook])
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,WebKit])
