@@ -157,7 +157,7 @@ static int Open( vlc_object_t *p_this )
     /* define name and connect to jack server */
     char p_vlc_client_name[32];
     sprintf( p_vlc_client_name, "vlc-input-%d", getpid() );
-    p_sys->p_jack_client = jack_client_new( p_vlc_client_name );
+    p_sys->p_jack_client = jack_client_open( p_vlc_client_name, JackNullOption, NULL );
     if( p_sys->p_jack_client == NULL )
     {
         msg_Err( p_demux, "failed to connect to JACK server" );
