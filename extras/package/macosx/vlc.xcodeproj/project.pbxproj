@@ -169,6 +169,8 @@
 		CC62B9600FC600E90077BB8C /* play_big_down.png in Resources */ = {isa = PBXBuildFile; fileRef = CC62B9580FC600E90077BB8C /* play_big_down.png */; };
 		CC62B9610FC600E90077BB8C /* play_big.png in Resources */ = {isa = PBXBuildFile; fileRef = CC62B9590FC600E90077BB8C /* play_big.png */; };
 		CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = CC8062631021F8790021EB9A /* dsa_pub.pem */; };
+		CC84FB2D130083BB00816D38 /* BWToolkitFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BWToolkitFramework.framework */; };
+		CC84FB481300843200816D38 /* BWToolkitFramework.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BWToolkitFramework.framework */; };
 		CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBE999E0F922C51000705F8 /* CoreServices.framework */; };
 		CCF11B540F8BFB520088542D /* ErrorPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCF11B520F8BFB520088542D /* ErrorPanel.nib */; };
 /* End PBXBuildFile section */
@@ -180,6 +182,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				CC84FB481300843200816D38 /* BWToolkitFramework.framework in Copy Frameworks */,
 				CC426FD71020D47100A32659 /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
@@ -365,6 +368,7 @@
 		CC772DAC10E621C100675C9B /* VLCProgressPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCProgressPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.h; sourceTree = SOURCE_ROOT; };
 		CC772DAD10E621C100675C9B /* VLCProgressPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCProgressPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.m; sourceTree = SOURCE_ROOT; };
 		CC8062631021F8790021EB9A /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = Resources/dsa_pub.pem; sourceTree = "<group>"; };
+		CC84FB2C130083BB00816D38 /* BWToolkitFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BWToolkitFramework.framework; path = ../../contrib/BWToolkit/BWToolkitFramework.framework; sourceTree = SOURCE_ROOT; };
 		CC962E2C0CC7992800A56695 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		CC965D5D0DA5880F0088F222 /* display_middle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = display_middle.png; path = Resources/display_middle.png; sourceTree = "<group>"; };
 		CC965D5E0DA5880F0088F222 /* display_left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = display_left.png; path = Resources/display_left.png; sourceTree = "<group>"; };
@@ -439,6 +443,7 @@
 				CC402F440E00ABBB006A4BA4 /* WebKit.framework in Frameworks */,
 				CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */,
 				CC426FD11020D44F00A32659 /* Sparkle.framework in Frameworks */,
+				CC84FB2D130083BB00816D38 /* BWToolkitFramework.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -547,6 +552,7 @@
 		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CC84FB2C130083BB00816D38 /* BWToolkitFramework.framework */,
 				CC426FD01020D44F00A32659 /* Sparkle.framework */,
 				CCBE999E0F922C51000705F8 /* CoreServices.framework */,
 				CC962E2C0CC7992800A56695 /* WebKit.framework */,
@@ -1185,6 +1191,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"\"$(SRCROOT)/../../contrib/BWToolkit\"",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../contrib/Sparkle\"";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1219,6 +1226,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"\"$(SRCROOT)/../../contrib/BWToolkit\"",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../contrib/Sparkle\"";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -1249,6 +1257,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"\"$(SRCROOT)/../../contrib/BWToolkit\"",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../contrib/Sparkle\"";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
