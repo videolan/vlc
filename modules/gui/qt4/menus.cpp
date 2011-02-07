@@ -381,8 +381,6 @@ QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
     addDPStaticEntry( menu, qtr( I_MENU_CODECINFO ) ,
         ":/menu/info", SLOT( mediaCodecDialog() ), "Ctrl+J" );
 
-    addDPStaticEntry( menu, qtr( I_MENU_BOOKMARK ),"",
-                      SLOT( bookmarksDialog() ), "Ctrl+B" );
 #ifdef ENABLE_VLM
     addDPStaticEntry( menu, qtr( I_MENU_VLM ), "", SLOT( vlmDialog() ),
         "Ctrl+W" );
@@ -670,17 +668,18 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
     QAction *action;
 
-    QMenu *submenu = new QMenu( qtr( "&Bookmarks" ), menu );
-    addDPStaticEntry( submenu, qtr( "Manage &bookmarks" ), "",
-                      SLOT( bookmarksDialog() ) );
-    submenu->addSeparator();
-    action = menu->addMenu( submenu );
-    action->setData( "bookmark" );
-
     ACT_ADDMENU( menu, "title", qtr( "T&itle" ) );
     ACT_ADDMENU( menu, "chapter", qtr( "&Chapter" ) );
     ACT_ADDMENU( menu, "navigation", qtr( "&Navigation" ) );
     ACT_ADDMENU( menu, "program", qtr( "&Program" ) );
+
+    /* FixMe: sync I_MENU_BOOKMARK string */
+    QMenu *submenu = new QMenu( qtr( "Custom &Bookmarks" ), menu );
+    addDPStaticEntry( submenu, qtr( "&Manage" ), "",
+                      SLOT( bookmarksDialog() ), "Ctrl+B" );
+    submenu->addSeparator();
+    action = menu->addMenu( submenu );
+    action->setData( "bookmark" );
 
     menu->addSeparator();
     PopupMenuPlaylistControlEntries( menu, p_intf );
