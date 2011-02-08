@@ -89,7 +89,8 @@ static void MRLSections( input_thread_t *, char *, int *, int *, int *, int *);
 
 static input_source_t *InputSourceNew( input_thread_t *);
 static int  InputSourceInit( input_thread_t *, input_source_t *,
-                             const char *, const char *psz_forced_demux );
+                             const char *, const char *psz_forced_demux,
+                             bool b_in_can_fail );
 static void InputSourceClean( input_source_t * );
 static void InputSourceMeta( input_thread_t *, input_source_t *, vlc_meta_t * );
 
@@ -110,6 +111,7 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
 enum {
     SUB_NOFLAG = 0x00,
     SUB_FORCED = 0x01,
+    SUB_CANFAIL = 0x02,
 };
 static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, unsigned i_flags );
 
@@ -1032,6 +1034,7 @@ static void LoadSubtitles( input_thread_t *p_input )
         {
             if( !psz_subtitle || strcmp( psz_subtitle, ppsz_subs[i] ) )
             {
+                i_flags |= SUB_CANFAIL;
                 SubtitleAdd( p_input, ppsz_subs[i], i_flags );
                 i_flags = SUB_NOFLAG;
             }
@@ -1108,7 +1111,7 @@ static void LoadSlaves( input_thread_t *p_input )
         msg_Dbg( p_input, "adding slave input '%s'", uri );
 
         input_source_t *p_slave = InputSourceNew( p_input );
-        if( p_slave && !InputSourceInit( p_input, p_slave, uri, NULL ) )
+        if( p_slave && !InputSourceInit( p_input, p_slave, uri, NULL, false ) )
             TAB_APPEND( p_input->p->i_slave, p_input->p->slave, p_slave );
         else
             free( p_slave );
@@ -1238,7 +1241,7 @@ static int Init( input_thread_t * p_input )
 
     /* */
     if( InputSourceInit( p_input, &p_input->p->input,
-                         p_input->p->p_item->psz_uri, NULL ) )
+                         p_input->p->p_item->psz_uri, NULL, false ) )
     {
         goto error;
     }
@@ -2043,7 +2046,7 @@ static bool Control( input_thread_t *p_input,
 
                 input_source_t *slave = InputSourceNew( p_input );
 
-                if( slave && !InputSourceInit( p_input, slave, uri, NULL ) )
+                if( slave && !InputSourceInit( p_input, slave, uri, NULL, false ) )
                 {
                     vlc_meta_t *p_meta;
                     int64_t i_time;
@@ -2329,7 +2332,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input )
  *****************************************************************************/
 static int InputSourceInit( input_thread_t *p_input,
                             input_source_t *in, const char *psz_mrl,
-                            const char *psz_forced_demux )
+                            const char *psz_forced_demux, bool b_in_can_fail )
 {
     const char *psz_access;
     const char *psz_demux;
@@ -2445,9 +2448,10 @@ static int InputSourceInit( input_thread_t *p_input,
             if( vlc_object_alive( p_input ) )
             {
                 msg_Err( p_input, "open of `%s' failed", psz_mrl );
-                dialog_Fatal( p_input, _("Your input can't be opened"),
-                              _("VLC is unable to open the MRL '%s'."
-                                " Check the log for details."), psz_mrl );
+                if( !b_in_can_fail )
+                    dialog_Fatal( p_input, _("Your input can't be opened"),
+                                   _("VLC is unable to open the MRL '%s'."
+                                     " Check the log for details."), psz_mrl );
             }
             goto error;
         }
@@ -2561,10 +2565,11 @@ static int InputSourceInit( input_thread_t *p_input,
             {
                 msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
                          psz_access, psz_demux, psz_path );
-                dialog_Fatal( VLC_OBJECT( p_input ),
-                              _("VLC can't recognize the input's format"),
-                              _("The format of '%s' cannot be detected. "
-                                "Have a look at the log for details."), psz_mrl );
+                if( !b_in_can_fail )
+                    dialog_Fatal( VLC_OBJECT( p_input ),
+                                  _("VLC can't recognize the input's format"),
+                                  _("The format of '%s' cannot be detected. "
+                                    "Have a look at the log for details."), psz_mrl );
             }
             goto error;
         }
@@ -3185,7 +3190,7 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, unsigned i
 
     sub = InputSourceNew( p_input );
     if( !sub || !url
-     || InputSourceInit( p_input, sub, url, "subtitle" ) )
+     || InputSourceInit( p_input, sub, url, "subtitle", (i_flags & SUB_CANFAIL) ) )
     {
         free( sub );
         free( url );
