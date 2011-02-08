@@ -107,7 +107,11 @@ static void InputGetExtraFiles( input_thread_t *p_input,
 static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
                               int i_new, input_attachment_t **pp_new );
 
-static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_forced );
+enum {
+    SUB_NOFLAG = 0x00,
+    SUB_FORCED = 0x01,
+};
+static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, unsigned i_flags );
 
 static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO fix name */
 
@@ -1007,14 +1011,14 @@ static void LoadSubtitles( input_thread_t *p_input )
         var_SetTime( p_input, "spu-delay", (mtime_t)i_delay * 100000 );
 
     /* Look for and add subtitle files */
-    bool b_forced = true;
+    unsigned i_flags = SUB_FORCED;
 
     char *psz_subtitle = var_GetNonEmptyString( p_input, "sub-file" );
     if( psz_subtitle != NULL )
     {
         msg_Dbg( p_input, "forced subtitle: %s", psz_subtitle );
-        SubtitleAdd( p_input, psz_subtitle, b_forced );
-        b_forced = false;
+        SubtitleAdd( p_input, psz_subtitle, i_flags );
+        i_flags = SUB_NOFLAG;
     }
 
     if( var_GetBool( p_input, "sub-autodetect-file" ) )
@@ -1028,8 +1032,8 @@ static void LoadSubtitles( input_thread_t *p_input )
         {
             if( !psz_subtitle || strcmp( psz_subtitle, ppsz_subs[i] ) )
             {
-                SubtitleAdd( p_input, ppsz_subs[i], b_forced );
-                b_forced = false;
+                SubtitleAdd( p_input, ppsz_subs[i], i_flags );
+                i_flags = SUB_NOFLAG;
             }
 
             free( ppsz_subs[i] );
@@ -1066,9 +1070,9 @@ static void LoadSubtitles( input_thread_t *p_input )
         {
             var_SetString( p_input, "sub-description", a->psz_description ? a->psz_description : "");
 
-            SubtitleAdd( p_input, psz_mrl, b_forced );
+            SubtitleAdd( p_input, psz_mrl, i_flags );
 
-            b_forced = false;
+            i_flags = SUB_NOFLAG;
             free( psz_mrl );
         }
         vlc_input_attachment_Delete( a );
@@ -3146,7 +3150,7 @@ static void MRLSections( input_thread_t *p_input, char *psz_source,
 /*****************************************************************************
  * input_AddSubtitles: add a subtitles file and enable it
  *****************************************************************************/
-static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_forced )
+static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, unsigned i_flags )
 {
     input_source_t *sub;
     vlc_value_t count;
@@ -3191,7 +3195,7 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
     TAB_APPEND( p_input->p->i_slave, p_input->p->slave, sub );
 
     /* Select the ES */
-    if( b_forced && !var_Change( p_input, "spu-es", VLC_VAR_GETLIST, &list, NULL ) )
+    if( (i_flags & SUB_FORCED) && !var_Change( p_input, "spu-es", VLC_VAR_GETLIST, &list, NULL ) )
     {
         if( count.i_int == 0 )
             count.i_int++;
