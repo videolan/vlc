@@ -52,8 +52,7 @@
 static int  Activate     ( vlc_object_t * );
 static void Deactivate   ( vlc_object_t * );
 
-static int Inhibit( intf_thread_t *p_intf );
-static int UnInhibit( intf_thread_t *p_intf );
+static void UnInhibit( intf_thread_t *p_intf );
 
 static int InputChange( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
@@ -138,67 +137,47 @@ static void Deactivate( vlc_object_t *p_this )
  *
  * returns false if Out of memory, else true
  *****************************************************************************/
-static int Inhibit( intf_thread_t *p_intf )
+static void Inhibit( intf_thread_t *p_intf )
 {
-    DBusConnection *p_conn;
-    DBusMessage *p_msg;
-    DBusMessageIter args;
-    DBusMessage *p_reply;
-    dbus_uint32_t i_cookie;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
-    p_conn = p_intf->p_sys->p_conn;
+    DBusMessage *msg = dbus_message_new_method_call( PM_SERVICE, PM_PATH,
+                                                     PM_INTERFACE, "Inhibit" );
+    if( unlikely(msg == NULL) )
+        return;
 
-    p_msg = dbus_message_new_method_call( PM_SERVICE, PM_PATH, PM_INTERFACE,
-                                          "Inhibit" );
-    if( !p_msg )
-        return false;
+    const char *app = PACKAGE;
+    const char *reason = _("Playing some media.");
 
-    dbus_message_iter_init_append( p_msg, &args );
+    p_sys->i_cookie = 0;
 
-    char *psz_app = strdup( PACKAGE );
-    if( !psz_app ||
-        !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING, &psz_app ) )
+    if( !dbus_message_append_args( msg, DBUS_TYPE_STRING, &app,
+                                        DBUS_TYPE_STRING, &reason,
+                                        DBUS_TYPE_INVALID ) )
     {
-        free( psz_app );
-        dbus_message_unref( p_msg );
-        return false;
+        dbus_message_unref( msg );
+        return;
     }
-    free( psz_app );
 
-    char *psz_inhibit_reason = strdup( _("Playing some media.") );
-    if( !psz_inhibit_reason )
-    {
-        dbus_message_unref( p_msg );
-        return false;
-    }
-    if( !dbus_message_iter_append_basic( &args, DBUS_TYPE_STRING,
-                                         &psz_inhibit_reason ) )
-    {
-        free( psz_inhibit_reason );
-        dbus_message_unref( p_msg );
-        return false;
-    }
-    free( psz_inhibit_reason );
+    /* blocks 50ms maximum */
+    DBusMessage *reply;
 
-    p_reply = dbus_connection_send_with_reply_and_block( p_conn, p_msg,
-        50, NULL ); /* blocks 50ms maximum */
-    dbus_message_unref( p_msg );
-    if( p_reply == NULL )
-    {   /* g-p-m is not active, or too slow. Better luck next time? */
-        return true;
-    }
+    reply = dbus_connection_send_with_reply_and_block( p_sys->p_conn, msg,
+                                                       50, NULL );
+    dbus_message_unref( msg );
+    if( reply == NULL )
+        /* g-p-m is not active, or too slow. Better luck next time? */
+        return;
 
     /* extract the cookie from the reply */
-    if( dbus_message_get_args( p_reply, NULL,
-            DBUS_TYPE_UINT32, &i_cookie,
-            DBUS_TYPE_INVALID ) == FALSE )
-    {
-        return false;
-    }
+    dbus_uint32_t i_cookie;
 
-    /* Save the cookie */
-    p_intf->p_sys->i_cookie = i_cookie;
-    return true;
+    if( dbus_message_get_args( reply, NULL,
+                               DBUS_TYPE_UINT32, &i_cookie,
+                               DBUS_TYPE_INVALID ) )
+        p_sys->i_cookie = i_cookie;
+
+    dbus_message_unref( reply );
 }
 
 /*****************************************************************************
@@ -206,37 +185,24 @@ static int Inhibit( intf_thread_t *p_intf )
  *
  * returns false if Out of memory, else true
  *****************************************************************************/
-static int UnInhibit( intf_thread_t *p_intf )
+static void UnInhibit( intf_thread_t *p_intf )
 {
-    DBusConnection *p_conn;
-    DBusMessage *p_msg;
-    DBusMessageIter args;
-    dbus_uint32_t i_cookie;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
-    p_conn = p_intf->p_sys->p_conn;
+    DBusMessage *msg = dbus_message_new_method_call( PM_SERVICE, PM_PATH,
+                                                   PM_INTERFACE, "UnInhibit" );
+    if( unlikely(msg == NULL) )
+        return;
 
-    p_msg = dbus_message_new_method_call( PM_SERVICE, PM_PATH, PM_INTERFACE,
-                                          "UnInhibit" );
-    if( !p_msg )
-        return false;
-
-    dbus_message_iter_init_append( p_msg, &args );
-
-    i_cookie = p_intf->p_sys->i_cookie;
-    if( !dbus_message_iter_append_basic( &args, DBUS_TYPE_UINT32, &i_cookie ) )
+    dbus_uint32_t i_cookie = p_sys->i_cookie;
+    if( dbus_message_append_args( msg, DBUS_TYPE_UINT32, &i_cookie,
+                                       DBUS_TYPE_INVALID )
+     && dbus_connection_send( p_sys->p_conn, msg, NULL ) )
     {
-        dbus_message_unref( p_msg );
-        return false;
+        dbus_connection_flush( p_sys->p_conn );
+        p_sys->i_cookie = 0;
     }
-
-    if( !dbus_connection_send( p_conn, p_msg, NULL ) )
-        return false;
-    dbus_connection_flush( p_conn );
-
-    dbus_message_unref( p_msg );
-
-    p_intf->p_sys->i_cookie = 0;
-    return true;
+    dbus_message_unref( msg );
 }
 
 
