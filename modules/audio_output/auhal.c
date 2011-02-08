@@ -1,10 +1,11 @@
 /*****************************************************************************
  * auhal.c: AUHAL and Coreaudio output plugin
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005, 2011 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,31 +36,12 @@
 #include <vlc_dialog.h>
 #include <vlc_aout.h>
 
-// By pass part of header which compile with some warnings,
-// and that we don't require.
-#define __MACHINEEXCEPTIONS__
-
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
-#include <AudioUnit/AudioUnitProperties.h>
-#include <AudioUnit/AudioUnitParameters.h>
-#include <AudioUnit/AudioOutputUnit.h>
-#include <AudioToolbox/AudioFormat.h>
+#include <AudioToolbox/AudioFormat.h> 
 
 #ifndef verify_noerr
 #define verify_noerr(a) assert((a) == noErr)
-#endif
-
-#if AUDIO_UNIT_VERSION < 1060
-#define AudioComponent Component
-#define AudioComponentDescription ComponentDescription
-#define AudioComponentFindNext FindNextComponent
-#define AudioComponentInstanceNew OpenAComponent
-#define AudioComponentInstanceDispose CloseComponent
-#define AudioComponentInstanceNew OpenAComponent
-#define AudioComponentInstanceNew OpenAComponent
-#else
-#include <AudioUnit/AudioComponent.h>
 #endif
 
 #define STREAM_FORMAT_MSG( pre, sfm ) \
@@ -83,7 +65,6 @@
 /*
  * TODO:
  * - clean up the debug info
- * - clean up C99'isms
  * - be better at changing stream setup or devices setup changes while playing.
  * - fix 6.1 and 7.1
  */
@@ -98,13 +79,14 @@ struct aout_sys_t
 {
     AudioDeviceID               i_default_dev;  /* Keeps DeviceID of defaultOutputDevice */
     AudioDeviceID               i_selected_dev; /* Keeps DeviceID of the selected device */
+    AudioDeviceIOProcID         i_procID;       /* DeviceID of current device */
     UInt32                      i_devices;      /* Number of CoreAudio Devices */
-    bool                  b_supports_digital;/* Does the currently selected device support digital mode? */
-    bool                  b_digital;      /* Are we running in digital mode? */
+    bool                        b_supports_digital;/* Does the currently selected device support digital mode? */
+    bool                        b_digital;      /* Are we running in digital mode? */
     mtime_t                     clock_diff;     /* Difference between VLC clock and Device clock */
 
     /* AUHAL specific */
-    AudioComponent              au_component;   /* The Audiocomponent we use */
+    Component                   au_component;   /* The Audiocomponent we use */
     AudioUnit                   au_unit;        /* The AudioUnit we use */
     uint8_t                     p_remainder_buffer[BUFSIZE];
     uint32_t                    i_read_bytes;
@@ -116,8 +98,8 @@ struct aout_sys_t
     int                         i_stream_index; /* The index of i_stream_id in an AudioBufferList */
     AudioStreamBasicDescription stream_format;  /* The format we changed the stream to */
     AudioStreamBasicDescription sfmt_revert;    /* The original format of the stream */
-    bool                  b_revert;       /* Wether we need to revert the stream format */
-    bool                  b_changed_mixing;/* Wether we need to set the mixing mode back */
+    bool                        b_revert;       /* Wether we need to revert the stream format */
+    bool                        b_changed_mixing;/* Wether we need to set the mixing mode back */
 };
 
 /*****************************************************************************
@@ -300,7 +282,7 @@ static int OpenAnalog( aout_instance_t *p_aout )
     OSStatus                    err = noErr;
     UInt32                      i_param_size = 0, i = 0;
     int                         i_original;
-    AudioComponentDescription   desc;
+    ComponentDescription   desc;
     AudioStreamBasicDescription DeviceFormat;
     AudioChannelLayout          *layout;
     AudioChannelLayout          new_layout;
@@ -313,14 +295,14 @@ static int OpenAnalog( aout_instance_t *p_aout )
     desc.componentFlags = 0;
     desc.componentFlagsMask = 0;
 
-    p_sys->au_component = AudioComponentFindNext( NULL, &desc );
+    p_sys->au_component = FindNextComponent( NULL, &desc );
     if( p_sys->au_component == NULL )
     {
         msg_Warn( p_aout, "we cannot find our HAL component" );
         return false;
     }
 
-    err = AudioComponentInstanceNew( p_sys->au_component, &p_sys->au_unit );
+    err = OpenAComponent( p_sys->au_component, &p_sys->au_unit );
     if( err != noErr )
     {
         msg_Warn( p_aout, "we cannot open our HAL component" );
@@ -802,13 +784,13 @@ static int OpenSPDIF( aout_instance_t * p_aout )
     aout_VolumeNoneInit( p_aout );
 
     /* Add IOProc callback */
-    err = AudioDeviceAddIOProc( p_sys->i_selected_dev,
-                               (AudioDeviceIOProc)RenderCallbackSPDIF,
-                               (void *)p_aout );
-
+    err = AudioDeviceCreateIOProcID( p_sys->i_selected_dev,
+                                   (AudioDeviceIOProc)RenderCallbackSPDIF,
+                                   (void *)p_aout,
+                                   &p_sys->i_procID );
     if( err != noErr )
     {
-        msg_Err( p_aout, "AudioDeviceAddIOProc failed: [%4.4s]", (char *)&err );
+        msg_Err( p_aout, "AudioDeviceCreateIOProcID failed: [%4.4s]", (char *)&err );
         return false;
     }
 
@@ -818,16 +800,16 @@ static int OpenSPDIF( aout_instance_t * p_aout )
     p_sys->clock_diff += mdate();
  
     /* Start device */
-    err = AudioDeviceStart( p_sys->i_selected_dev, (AudioDeviceIOProc)RenderCallbackSPDIF );
+    err = AudioDeviceStart( p_sys->i_selected_dev, p_sys->i_procID );
     if( err != noErr )
     {
         msg_Err( p_aout, "AudioDeviceStart failed: [%4.4s]", (char *)&err );
 
-        err = AudioDeviceRemoveIOProc( p_sys->i_selected_dev,
-                                     (AudioDeviceIOProc)RenderCallbackSPDIF );
+        err = AudioDeviceDestroyIOProcID( p_sys->i_selected_dev,
+                                          p_sys->i_procID );
         if( err != noErr )
         {
-            msg_Err( p_aout, "AudioDeviceRemoveIOProc failed: [%4.4s]", (char *)&err );
+            msg_Err( p_aout, "AudioDeviceDestroyIOProcID failed: [%4.4s]", (char *)&err );
         }
         return false;
     }
@@ -850,25 +832,25 @@ static void Close( vlc_object_t * p_this )
     {
         verify_noerr( AudioOutputUnitStop( p_sys->au_unit ) );
         verify_noerr( AudioUnitUninitialize( p_sys->au_unit ) );
-        verify_noerr( AudioComponentInstanceDispose( p_sys->au_unit ) );
+        verify_noerr( CloseComponent( p_sys->au_unit ) );
     }
  
     if( p_sys->b_digital )
     {
         /* Stop device */
         err = AudioDeviceStop( p_sys->i_selected_dev,
-                               (AudioDeviceIOProc)RenderCallbackSPDIF );
+                               p_sys->i_procID );
         if( err != noErr )
         {
             msg_Err( p_aout, "AudioDeviceStop failed: [%4.4s]", (char *)&err );
         }
 
         /* Remove IOProc callback */
-        err = AudioDeviceRemoveIOProc( p_sys->i_selected_dev,
-                                      (AudioDeviceIOProc)RenderCallbackSPDIF );
+        err = AudioDeviceDestroyIOProcID( p_sys->i_selected_dev,
+                                          p_sys->i_procID );
         if( err != noErr )
         {
-            msg_Err( p_aout, "AudioDeviceRemoveIOProc failed: [%4.4s]", (char *)&err );
+            msg_Err( p_aout, "AudioDeviceDestroyIOProcID failed: [%4.4s]", (char *)&err );
         }
  
         if( p_sys->b_revert )
