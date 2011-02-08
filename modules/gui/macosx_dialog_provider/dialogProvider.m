@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dialogProvider.m: Minimal Dialog Provider for Mac OS X
  *****************************************************************************
- * Copyright (C) 2009-2010 the VideoLAN team
+ * Copyright (C) 2009-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
@@ -646,6 +646,15 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
             [imageView setImageFrameStyle:NSImageFramePhoto];
             [imageView setImageScaling:NSImageScaleProportionallyUpOrDown];
             return imageView;
+        }
+        case EXTENSION_WIDGET_SPIN_ICON:
+        {
+            NSProgressIndicator *spinner = [[NSProgressIndicator alloc] init];
+            [spinner setUsesThreadedAnimation:YES];
+            [spinner setStyle:NSProgressIndicatorSpinningStyle];
+            [spinner setDisplayedWhenStopped:YES];
+            [spinner startAnimation:self];
+            return spinner;
         }
         default:
             assert(0);
