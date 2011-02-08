@@ -2426,6 +2426,24 @@ CLEAN_PKG += Sparkle
 DISTCLEAN_PKG += Sparkle-$(SPARKLE_VERSION).zip
 
 # ***************************************************************************
+# BWToolKit
+# ***************************************************************************
+
+BWToolkit.zip:
+	$(WGET) $(BWTOOLKIT_URL)
+
+.BWToolKit: BWToolkit.zip
+	rm -rf $@ || true
+	(mkdir BWToolKit && cd BWToolKit && unzip ../$<)
+	rm -rf $(PREFIX)/BWToolkit
+	mv BWToolkit $(PREFIX)
+	touch $@
+
+CLEAN_FILE += .BWToolKit
+CLEAN_PKG += BWToolKit
+DISTCLEAN_PKG += BWToolkit.zip
+
+# ***************************************************************************
 # UPNP library
 # ***************************************************************************
 
