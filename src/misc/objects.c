@@ -294,7 +294,8 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 /**
  * select()-able pipes emulated using Winsock
  */
-static int pipe (int fd[2])
+# define vlc_pipe selectable_pipe
+static int selectable_pipe (int fd[2])
 {
     SOCKADDR_IN addr;
     int addrlen = sizeof (addr);
@@ -365,7 +366,7 @@ int vlc_object_waitpipe( vlc_object_t *obj )
         if (internals->pipes[0] == -1)
 #endif
         {
-            if (pipe (internals->pipes))
+            if (vlc_pipe (internals->pipes))
                 internals->pipes[0] = internals->pipes[1] = -1;
         }
 
