@@ -159,7 +159,7 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
         if( !p_txxx )
             continue;
         vlc_meta_AddExtra( p_meta, p_txxx->description().toCString( true ),
-                           p_txxx->fieldList().toString().toCString( true ) );
+                           p_txxx->fieldList().back().toCString( true ) );
     }
 
     // Get some more information
