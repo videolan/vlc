@@ -421,7 +421,7 @@ VLC-release.app: vlc
 	mkdir -p $(top_builddir)/tmp/extras/contrib/Sparkle
 	cp -R $(CONTRIB_DIR)/Sparkle/Sparkle.framework $(top_builddir)/tmp/extras/contrib/Sparkle
 	mkdir -p $(top_builddir)/tmp/extras/contrib/BWToolKit
-	cp -R $(CONTRIB_DIR)/Sparkle/BWToolKitFramework.framework $(top_builddir)/tmp/extras/contrib/BWToolKit
+	cp -R $(CONTRIB_DIR)/BWToolKit/BWToolKitFramework.framework $(top_builddir)/tmp/extras/contrib/BWToolKit
 	mkdir -p $(top_builddir)/tmp/modules/audio_output
 	mkdir -p $(top_builddir)/tmp/modules/gui/macosx
 	for i in \
@@ -576,7 +576,7 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 	mkdir -p $(top_builddir)/tmp/extras/contrib/Sparkle
 	cp -R $(CONTRIB_DIR)/Sparkle/Sparkle.framework $(top_builddir)/tmp/extras/contrib/Sparkle
 	mkdir -p $(top_builddir)/tmp/extras/contrib/BWToolKit
-	cp -R $(CONTRIB_DIR)/Sparkle/BWToolKitFramework.framework $(top_builddir)/tmp/extras/contrib/BWToolKit
+	cp -R $(CONTRIB_DIR)/BWToolKit/BWToolKitFramework.framework $(top_builddir)/tmp/extras/contrib/BWToolKit
 	mkdir -p $(top_builddir)/tmp/modules/audio_output
 	mkdir -p $(top_builddir)/tmp/modules/gui/macosx
 	for i in \
