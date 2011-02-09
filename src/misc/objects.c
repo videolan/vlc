@@ -53,6 +53,7 @@
 #endif
 
 #ifndef WIN32
+# include <vlc_fs.h>
 # include <unistd.h>
 #else
 # include <io.h>
