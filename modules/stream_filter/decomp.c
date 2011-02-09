@@ -26,6 +26,7 @@
 #include <vlc_plugin.h>
 #include <vlc_stream.h>
 #include <vlc_network.h>
+#include <vlc_fs.h>
 #include <assert.h>
 #include <unistd.h>
 #include <errno.h>
@@ -73,12 +74,6 @@ struct stream_sys_t
     pid_t        pid;
     int          write_fd, read_fd;
 };
-
-static void cloexec (int fd)
-{
-    int flags = fcntl (fd, F_GETFD);
-    fcntl (fd, F_SETFD, FD_CLOEXEC | ((flags != -1) ? flags : 0));
-}
 
 extern char **environ;
 
@@ -285,15 +280,13 @@ static int Open (stream_t *stream, const char *path)
 
     /* We use two pipes rather than one stream socket pair, so that we can
      * use vmsplice() on Linux. */
-    if (pipe (comp) == 0)
+    if (vlc_pipe (comp) == 0)
     {
-        cloexec (comp[1]);
         p_sys->write_fd = comp[1];
 
         int uncomp[2];
-        if (pipe (uncomp) == 0)
+        if (vlc_pipe (uncomp) == 0)
         {
-            cloexec (uncomp[0]);
             p_sys->read_fd = uncomp[0];
 
 #if (_POSIX_SPAWN >= 0)
@@ -303,9 +296,7 @@ static int Open (stream_t *stream, const char *path)
                 char *const argv[] = { (char *)path, NULL };
 
                 if (!posix_spawn_file_actions_adddup2 (&actions, comp[0], 0)
-                 && !posix_spawn_file_actions_addclose (&actions, comp[0])
                  && !posix_spawn_file_actions_adddup2 (&actions, uncomp[1], 1)
-                 && !posix_spawn_file_actions_addclose (&actions, uncomp[1])
                  && !posix_spawnp (&p_sys->pid, path, &actions, NULL, argv,
                                    environ))
                 {
@@ -328,9 +319,7 @@ static int Open (stream_t *stream, const char *path)
                     break;
                 case 0:
                     dup2 (comp[0], 0);
-                    close (comp[0]);
                     dup2 (uncomp[1], 1);
-                    close (uncomp[1]);
                     execlp (path, path, (char *)NULL);
                     exit (1); /* if we get, execlp() failed! */
                 default:
