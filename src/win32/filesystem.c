@@ -257,7 +257,13 @@ int vlc_dup (int oldfd)
 
 int vlc_pipe (int fds[2])
 {
+#ifdef UNDER_CE
+    (void) fds;
+    errno = ENOSYS;
+    return -1;
+#else
     return _pipe (fds, 32768, O_BINARY);
+#endif
 }
 
 #include <vlc_network.h>
