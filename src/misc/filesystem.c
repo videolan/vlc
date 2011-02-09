@@ -334,6 +334,26 @@ int vlc_dup (int oldfd)
     return newfd;
 }
 
+/**
+ * Creates a pipe (see "man pipe" for further reference).
+ */
+int vlc_pipe (int fds[2])
+{
+#ifdef HAVE_PIPE2
+    if (pipe2 (fds, O_CLOEXEC) == 0)
+        return 0;
+    if (errno != ENOSYS)
+        return -1;
+#endif
+
+    if (pipe (fds))
+        return -1;
+
+    fcntl (fds[0], F_SETFD, FD_CLOEXEC);
+    fcntl (fds[1], F_SETFD, FD_CLOEXEC);
+    return 0;
+}
+
 #include <vlc_network.h>
 
 /**

@@ -255,6 +255,11 @@ int vlc_dup (int oldfd)
 #endif
 }
 
+int vlc_pipe (int fds[2])
+{
+    return _pipe (fds, 32768, O_BINARY);
+}
+
 #include <vlc_network.h>
 
 int vlc_socket (int pf, int type, int proto, bool nonblock)

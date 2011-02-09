@@ -467,6 +467,7 @@ vlc_strcasestr
 vlc_unlink
 vlc_rename
 vlc_dup
+vlc_pipe
 vlc_accept
 utf8_vfprintf
 var_AddCallback

@@ -73,4 +73,5 @@ VLC_EXPORT( int, vlc_lstat, ( const char *filename, struct stat *buf ) );
 VLC_EXPORT( int, vlc_mkstemp, ( char * ) );
 
 VLC_EXPORT( int, vlc_dup, ( int ) );
+VLC_EXPORT( int, vlc_pipe, ( int[2] ) );
 #endif
