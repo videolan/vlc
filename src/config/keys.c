@@ -144,7 +144,12 @@ static char *utf8_cp (uint_fast32_t cp, char *buf)
     return buf;
 }
 
-uint_fast32_t ConfigStringToKey (const char *name)
+/**
+ * Parse a human-readable string representation of a VLC key code.
+ * @return a VLC key code, or KEY_UNSET on failure.
+ */
+static
+uint_fast32_t vlc_str2keycode (const char *name)
 {
     uint_fast32_t mods = 0;
     uint32_t cp;
@@ -259,8 +264,11 @@ int vlc_InitActions (libvlc_int_t *libvlc)
     /* Initialize from configuration */
     for (size_t i = 0; i < libvlc_actions_count; i++)
     {
+        char *str = var_InheritString (libvlc, libvlc_actions[i].name);
+        uint32_t code = str ? vlc_str2keycode (str) : KEY_UNSET;
+
         keys[i].psz_action = libvlc_actions[i].name;
-        keys[i].i_key = var_InheritInteger (libvlc, libvlc_actions[i].name );
+        keys[i].i_key = code;
         keys[i].i_action = libvlc_actions[i].value;
 #ifndef NDEBUG
         if (i > 0

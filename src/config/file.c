@@ -239,13 +239,6 @@ int config_LoadConfigFile( vlc_object_t *p_this )
                 item->saved.f = item->value.f;
                 break;
 
-            case CONFIG_ITEM_KEY:
-                if (!*psz_option_value)
-                    break;                    /* ignore empty option */
-                item->value.i = ConfigStringToKey(psz_option_value);
-                item->saved.i = item->value.i;
-                break;
-
             default:
                 free ((char *)item->value.psz);
                 free ((char *)item->saved.psz);
@@ -547,21 +540,11 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
             if (IsConfigIntegerType (p_item->i_type))
             {
                 int64_t val = b_retain ? p_item->saved.i : p_item->value.i;
-                if (p_item->i_type == CONFIG_ITEM_KEY)
-                {
-                    char *psz_key = vlc_keycode2str (val);
-                    config_Write (file, p_item->psz_text, N_("key"),
-                                  val == p_item->orig.i,
-                                  p_item->psz_name, "%s",
-                                  psz_key ? psz_key : "");
-                    free (psz_key);
-                }
-                else
-                    config_Write (file, p_item->psz_text,
-                                  (p_item->i_type == CONFIG_ITEM_BOOL)
-                                      ? N_("boolean") : N_("integer"),
-                                  val == p_item->orig.i,
-                                  p_item->psz_name, "%"PRId64, val);
+                config_Write (file, p_item->psz_text,
+                              (p_item->i_type == CONFIG_ITEM_BOOL)
+                                  ? N_("boolean") : N_("integer"),
+                              val == p_item->orig.i,
+                              p_item->psz_name, "%"PRId64, val);
                 p_item->saved.i = val;
             }
             else

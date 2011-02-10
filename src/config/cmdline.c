@@ -249,6 +249,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                     case CONFIG_ITEM_LOADFILE:
                     case CONFIG_ITEM_SAVEFILE:
                     case CONFIG_ITEM_DIRECTORY:
+                    case CONFIG_ITEM_KEY:
                     case CONFIG_ITEM_MODULE:
                     case CONFIG_ITEM_MODULE_LIST:
                     case CONFIG_ITEM_MODULE_LIST_CAT:
@@ -264,11 +265,6 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                     case CONFIG_ITEM_FLOAT:
                         var_Create( p_this, psz_name, VLC_VAR_FLOAT );
                         var_SetFloat( p_this, psz_name, us_atof(state.arg) );
-                        break;
-                    case CONFIG_ITEM_KEY:
-                        var_Create( p_this, psz_name, VLC_VAR_INTEGER );
-                        var_SetInteger( p_this, psz_name,
-                                        ConfigStringToKey( state.arg ) );
                         break;
                     case CONFIG_ITEM_BOOL:
                         var_Create( p_this, psz_name, VLC_VAR_BOOL );

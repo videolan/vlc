@@ -1522,6 +1522,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
             case CONFIG_ITEM_LOADFILE:
             case CONFIG_ITEM_SAVEFILE:
             case CONFIG_ITEM_DIRECTORY:
+            case CONFIG_ITEM_KEY:
             case CONFIG_ITEM_MODULE: /* We could also have "=<" here */
             case CONFIG_ITEM_MODULE_CAT:
             case CONFIG_ITEM_MODULE_LIST:
@@ -1549,7 +1550,6 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                 }
                 break;
             case CONFIG_ITEM_INTEGER:
-            case CONFIG_ITEM_KEY: /* FIXME: do something a bit more clever */
                 print_help_section( p_parser, p_section, b_color,
                                     b_description );
                 p_section = NULL;

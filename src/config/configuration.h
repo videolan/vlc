@@ -49,8 +49,6 @@ static inline int IsConfigFloatType (int type)
     return type == CONFIG_ITEM_FLOAT;
 }
 
-uint_fast32_t ConfigStringToKey( const char * );
-
 extern vlc_rwlock_t config_lock;
 
 /* The configuration file */

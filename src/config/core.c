@@ -48,8 +48,8 @@ int IsConfigStringType (int type)
 {
     static const unsigned char config_types[] =
     {
-        CONFIG_ITEM_STRING, CONFIG_ITEM_MODULE,
-        CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_MODULE_CAT, CONFIG_ITEM_PASSWORD,
+        CONFIG_ITEM_STRING, CONFIG_ITEM_MODULE, CONFIG_ITEM_DIRECTORY,
+        CONFIG_ITEM_KEY, CONFIG_ITEM_MODULE_CAT, CONFIG_ITEM_PASSWORD,
         CONFIG_ITEM_MODULE_LIST, CONFIG_ITEM_MODULE_LIST_CAT,
         CONFIG_ITEM_FONT, CONFIG_ITEM_LOADFILE, CONFIG_ITEM_SAVEFILE,
     };
@@ -63,7 +63,7 @@ int IsConfigIntegerType (int type)
 {
     static const unsigned char config_types[] =
     {
-        CONFIG_ITEM_INTEGER, CONFIG_ITEM_KEY, CONFIG_ITEM_BOOL,
+        CONFIG_ITEM_INTEGER, CONFIG_ITEM_BOOL,
         CONFIG_CATEGORY, CONFIG_SUBCATEGORY
     };
 
@@ -97,7 +97,6 @@ int config_GetType( vlc_object_t *p_this, const char *psz_name )
         break;
 
     case CONFIG_ITEM_INTEGER:
-    case CONFIG_ITEM_KEY:
         i_type = VLC_VAR_INTEGER;
         break;
 
@@ -114,6 +113,7 @@ int config_GetType( vlc_object_t *p_this, const char *psz_name )
     case CONFIG_ITEM_LOADFILE:
     case CONFIG_ITEM_SAVEFILE:
     case CONFIG_ITEM_DIRECTORY:
+    case CONFIG_ITEM_KEY:
         i_type = VLC_VAR_STRING;
         break;
 
