@@ -25,8 +25,6 @@
 #ifndef LIBVLC_LIBVLC_H
 # define LIBVLC_LIBVLC_H 1
 
-#include<vlc_media_library.h>
-
 typedef struct variable_t variable_t;
 
 /* Actions (hot keys) */
@@ -204,7 +202,7 @@ typedef struct libvlc_priv_t
     /* Singleton objects */
     module_t          *p_memcpy_module;  ///< Fast memcpy plugin used
     playlist_t        *p_playlist; ///< the playlist singleton
-    media_library_t   *p_ml;    ///< the ML singleton
+    struct media_library_t *p_ml;    ///< the ML singleton
     vlc_mutex_t       ml_lock; ///< Mutex for ML creation
     vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
     vlc_object_t      *p_dialog_provider; ///< dialog provider
