@@ -1,6 +1,6 @@
---- libupnp/configure.ac	2008-04-25 13:41:16.000000000 +0200
-+++ libupnp_new/configure.ac	2010-08-13 23:21:00.000000000 +0200
-@@ -286,7 +286,6 @@
+--- libupnp/configure.ac.orig	2011-02-09 00:55:44.000000000 +0100
++++ libupnp/configure.ac	2011-02-10 23:39:44.154929678 +0100
+@@ -397,7 +397,6 @@
  AC_PROG_MAKE_SET
  AC_PROG_EGREP
  
@@ -8,36 +8,7 @@
  # Default compilation flags
  #
  echo "--------------------- Default compilation flags -------------------------------"
-@@ -332,19 +331,13 @@
- # so just abort if a header file is not found.
- AC_CHECK_HEADERS(
- 	[ \
--	arpa/inet.h \
- 	fcntl.h \
- 	inttypes.h \
- 	limits.h \
--	netdb.h \
--	netinet/in.h \
- 	stdlib.h \
- 	string.h \
--	sys/ioctl.h \
--	sys/socket.h \
- 	sys/time.h \
- 	sys/timeb.h \
--	syslog.h \
- 	unistd.h \
- 	],
- 	[],
-@@ -355,7 +348,7 @@
- # Checks for typedefs, structures, and compiler characteristics
- #	
- AC_C_CONST
--TYPE_SOCKLEN_T
-+#TYPE_SOCKLEN_T
- 
- 
- #
-@@ -370,39 +363,46 @@
+@@ -531,39 +530,46 @@
  # Checks for POSIX Threads
  #
  echo "--------------------------- pthread stuff -------------------------------------"
@@ -109,13 +80,3 @@
  
  
  AC_CONFIG_FILES([
---- libupnp/libupnp.pc.in	2008-02-10 02:55:39.000000000 +0100
-+++ libupnp.new/libupnp.pc.in	2010-08-24 18:08:41.000000000 +0200
-@@ -6,6 +6,6 @@
- Name: libupnp
- Description: Linux SDK for UPnP Devices
- Version: @VERSION@
--Libs: @PTHREAD_LIBS@ -L${libdir} -lupnp -lthreadutil -lixml 
-+Libs: -L${libdir} -lupnp -lthreadutil -lixml @PTHREAD_LIBS@ 
- Cflags: @PTHREAD_CFLAGS@ -I${includedir}/upnp
- 
