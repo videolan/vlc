@@ -549,7 +549,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                 int64_t val = b_retain ? p_item->saved.i : p_item->value.i;
                 if (p_item->i_type == CONFIG_ITEM_KEY)
                 {
-                    char *psz_key = ConfigKeyToString (val);
+                    char *psz_key = vlc_keycode2str (val);
                     config_Write (file, p_item->psz_text, N_("key"),
                                   val == p_item->orig.i,
                                   p_item->psz_name, "%s",

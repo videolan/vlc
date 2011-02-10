@@ -87,7 +87,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( val & KEY_MODIFIER_COMMAND )
         [o_temp_str appendString: [NSString stringWithUTF8String: "\xE2\x8C\x98"]];
 
-    char *base = KeyToString( val & ~KEY_MODIFIER );
+    char *base = vlc_keycode2str( val & ~KEY_MODIFIER );
     if( base )
     {
         [o_temp_str appendString: [NSString stringWithUTF8String: base]];

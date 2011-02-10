@@ -285,27 +285,15 @@ int qtWheelEventToVLCKey( QWheelEvent *e )
     return i_vlck;
 }
 
-QString VLCKeyToString( int val )
+QString VLCKeyToString( unsigned val )
 {
-    char *base = KeyToString (val & ~KEY_MODIFIER);
+    char *base = vlc_keycode2str (val);
+    if (base == NULL)
+        return qtr( "Unset" );
 
-    QString r = "";
-    if( val & KEY_MODIFIER_CTRL )
-        r+= qfu( "Ctrl+" );
-    if( val & KEY_MODIFIER_ALT )
-        r+= qfu( "Alt+" );
-    if( val & KEY_MODIFIER_SHIFT )
-        r+= qfu( "Shift+" );
-    if( val & KEY_MODIFIER_META )
-        r+= qfu( "Meta+" );
+    QString r = qfu( base );
 
-    if (base)
-    {
-        r += qfu( base );
-        free( base );
-    }
-    else
-        r += qtr( "Unset" );
+    free( base );
     return r;
 }
 

@@ -679,4 +679,4 @@ xml_Delete
 xml_ReaderCreate
 xml_ReaderDelete
 xml_ReaderReset
-KeyToString
+vlc_keycode2str

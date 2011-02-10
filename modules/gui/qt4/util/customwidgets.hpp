@@ -163,7 +163,7 @@ class QInputEvent;
 int qtKeyModifiersToVLC( QInputEvent* e );
 int qtEventToVLCKey( QKeyEvent *e );
 int qtWheelEventToVLCKey( QWheelEvent *e );
-QString VLCKeyToString( int val );
+QString VLCKeyToString( unsigned val );
 
 #endif
 

@@ -148,22 +148,6 @@ static char *utf8_cp (uint_fast32_t cp, char *buf)
     return buf;
 }
 
-char *KeyToString (uint_fast32_t sym)
-{
-    key_descriptor_t *d;
-
-    d = bsearch ((void *)(uintptr_t)sym, vlc_keys, vlc_num_keys,
-                 sizeof (vlc_keys[0]), cmpkey);
-    if (d)
-        return strdup (d->psz_key_string);
-
-    char buf[5];
-    if (utf8_cp (sym, buf))
-        return strdup (buf);
-
-    return NULL;
-}
-
 uint_fast32_t ConfigStringToKey (const char *name)
 {
     uint_fast32_t mods = 0;
@@ -193,7 +177,7 @@ uint_fast32_t ConfigStringToKey (const char *name)
     return (vlc_towc (name, &cp) > 0) ? (mods | cp) : 0;
 }
 
-char *ConfigKeyToString (uint_fast32_t code)
+char *vlc_keycode2str (uint_fast32_t code)
 {
     char *str, buf[5];
     uintptr_t key = code & ~KEY_MODIFIER;
