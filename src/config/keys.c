@@ -176,6 +176,11 @@ uint_fast32_t ConfigStringToKey (const char *name)
     return (vlc_towc (name, &cp) > 0) ? (mods | cp) : KEY_UNSET;
 }
 
+/**
+ * Format a human-readable and unique representation of a VLC key code
+ * (including modifiers).
+ * @return a heap-allocated string, or NULL on error.
+ */
 char *vlc_keycode2str (uint_fast32_t code)
 {
     char *str, buf[5];
@@ -210,7 +215,7 @@ static int keycmp (const void *a, const void *b)
 }
 
 /**
- * Get the action associated with a VLC key code, if any.
+ * Get the action ID associated with a VLC key code, if any.
  */
 static
 vlc_key_t vlc_TranslateKey (const vlc_object_t *obj, uint_fast32_t keycode)
@@ -293,6 +298,10 @@ static int actcmp(const void *key, const void *ent)
     return strcmp(key, act->name);
 }
 
+/**
+ * Get the action ID from the action name in the configuration subsystem.
+ * @return the action ID or ACTIONID_NONE on error.
+ */
 vlc_key_t vlc_GetActionId(const char *name)
 {
     const struct action *act;
