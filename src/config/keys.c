@@ -40,17 +40,6 @@ typedef struct key_descriptor_s
     uint32_t i_key_code;
 } key_descriptor_t;
 
-static const struct key_descriptor_s vlc_modifiers[] =
-{
-    { "Alt", KEY_MODIFIER_ALT },
-    { "Shift", KEY_MODIFIER_SHIFT },
-    { "Ctrl", KEY_MODIFIER_CTRL },
-    { "Meta", KEY_MODIFIER_META },
-    { "Command", KEY_MODIFIER_COMMAND }
-};
-enum { vlc_num_modifiers=sizeof(vlc_modifiers)
-                        /sizeof(struct key_descriptor_s) };
-
 static const struct key_descriptor_s vlc_keys[] =
 {
     { "Unset", KEY_UNSET },
@@ -155,19 +144,22 @@ uint_fast32_t ConfigStringToKey (const char *name)
 
     for (;;)
     {
-        const char *psz_parser = strchr (name, '-');
-        if (psz_parser == NULL || psz_parser == name)
+        size_t len = strcspn (name, "-+");
+        if (name[len] == '\0')
             break;
 
-        for (size_t i = 0; i < vlc_num_modifiers; i++)
-        {
-            if (!strncasecmp (vlc_modifiers[i].psz_key_string, name,
-                              strlen (vlc_modifiers[i].psz_key_string)))
-            {
-                mods |= vlc_modifiers[i].i_key_code;
-            }
-        }
-        name = psz_parser + 1;
+        if (len == 4 && !strncasecmp (name, "Ctrl", 4))
+            mods |= KEY_MODIFIER_CTRL;
+        if (len == 3 && !strncasecmp (name, "Alt", 3))
+            mods |= KEY_MODIFIER_ALT;
+        if (len == 5 && !strncasecmp (name, "Shift", 5))
+            mods |= KEY_MODIFIER_SHIFT;
+        if (len == 4 && !strncasecmp (name, "Meta", 4))
+            mods |= KEY_MODIFIER_META;
+        if (len == 7 && !strncasecmp (name, "Command", 7))
+            mods |= KEY_MODIFIER_COMMAND;
+
+        name += len + 1;
     }
 
     for (size_t i = 0; i < vlc_num_keys; i++)
@@ -188,11 +180,11 @@ char *vlc_keycode2str (uint_fast32_t code)
         return NULL;
 
     if (asprintf (&str, "%s%s%s%s%s%s",
-                  (code & KEY_MODIFIER_CTRL) ? "Ctrl-" : "",
-                  (code & KEY_MODIFIER_ALT) ? "Alt-" : "",
-                  (code & KEY_MODIFIER_SHIFT) ? "Shift-" : "",
-                  (code & KEY_MODIFIER_META) ? "Meta-" : "",
-                  (code & KEY_MODIFIER_COMMAND) ? "Command-" : "",
+                  (code & KEY_MODIFIER_CTRL) ? "Ctrl+" : "",
+                  (code & KEY_MODIFIER_ALT) ? "Alt+" : "",
+                  (code & KEY_MODIFIER_SHIFT) ? "Shift+" : "",
+                  (code & KEY_MODIFIER_META) ? "Meta+" : "",
+                  (code & KEY_MODIFIER_COMMAND) ? "Command+" : "",
                   (d != NULL) ? d->psz_key_string : buf) == -1)
         return NULL;
 
