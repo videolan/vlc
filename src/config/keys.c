@@ -193,38 +193,24 @@ uint_fast32_t ConfigStringToKey (const char *name)
     return (vlc_towc (name, &cp) > 0) ? (mods | cp) : 0;
 }
 
-char *ConfigKeyToString (uint_fast32_t i_key)
+char *ConfigKeyToString (uint_fast32_t code)
 {
-    // Worst case appears to be 45 characters:
-    // "Command-Meta-Ctrl-Shift-Alt-Browser Favorites"
-    char *psz_key = malloc (64);
-    if (!psz_key)
+    char *str, buf[5];
+    uintptr_t key = code & ~KEY_MODIFIER;
+
+    key_descriptor_t *d = bsearch ((void *)key, vlc_keys, vlc_num_keys,
+                                   sizeof (vlc_keys[0]), cmpkey);
+    if (d == NULL && utf8_cp (key, buf) == NULL)
         return NULL;
 
-    char *p = psz_key, *psz_end = psz_key + 54;
-    *p = '\0';
-
-    for (size_t i = 0; i < vlc_num_modifiers; i++)
-    {
-        if (i_key & vlc_modifiers[i].i_key_code)
-        {
-            p += snprintf (p, psz_end - p, "%s-",
-                           vlc_modifiers[i].psz_key_string);
-        }
-    }
-
-    key_descriptor_t *d;
-    char buf[5];
-
-    i_key &= ~KEY_MODIFIER;
-    d = bsearch ((void *)(uintptr_t)i_key, vlc_keys, vlc_num_keys,
-                 sizeof (vlc_keys[0]), cmpkey);
-    if (d)
-        p += snprintf (p, psz_end - p, "%s", d->psz_key_string);
-    else if (utf8_cp (i_key, buf))
-        p += snprintf (p, psz_end - p, "%s", buf);
-    else
+    if (asprintf (&str, "%s%s%s%s%s%s",
+                  (code & KEY_MODIFIER_CTRL) ? "Ctrl-" : "",
+                  (code & KEY_MODIFIER_ALT) ? "Alt-" : "",
+                  (code & KEY_MODIFIER_SHIFT) ? "Shift-" : "",
+                  (code & KEY_MODIFIER_META) ? "Meta-" : "",
+                  (code & KEY_MODIFIER_COMMAND) ? "Command-" : "",
+                  (d != NULL) ? d->psz_key_string : buf) == -1)
         return NULL;
 
-    return psz_key;
+    return str;
 }
