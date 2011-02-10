@@ -680,4 +680,3 @@ xml_ReaderCreate
 xml_ReaderDelete
 xml_ReaderReset
 KeyToString
-StringToKey

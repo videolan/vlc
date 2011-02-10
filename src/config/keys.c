@@ -188,15 +188,6 @@ char *KeyToString (uint_fast32_t sym)
     return NULL;
 }
 
-uint_fast32_t StringToKey (char *name)
-{
-    for (size_t i = 0; i < vlc_num_keys; i++)
-        if (!strcmp (vlc_keys[i].psz_key_string, name))
-            return vlc_keys[i].i_key_code;
-
-    return cp_utf8 (name);
-}
-
 uint_fast32_t ConfigStringToKey (const char *name)
 {
     uint_fast32_t mods = 0;
