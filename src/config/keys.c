@@ -145,7 +145,7 @@ uint_fast32_t ConfigStringToKey (const char *name)
     for (;;)
     {
         size_t len = strcspn (name, "-+");
-        if (name[len] == '\0')
+        if (len == 0 || name[len] == '\0')
             break;
 
         if (len == 4 && !strncasecmp (name, "Ctrl", 4))
@@ -166,7 +166,7 @@ uint_fast32_t ConfigStringToKey (const char *name)
         if (!strcasecmp( vlc_keys[i].psz_key_string, name))
             return vlc_keys[i].i_key_code | mods;
 
-    return (vlc_towc (name, &cp) > 0) ? (mods | cp) : 0;
+    return (vlc_towc (name, &cp) > 0) ? (mods | cp) : KEY_UNSET;
 }
 
 char *vlc_keycode2str (uint_fast32_t code)
