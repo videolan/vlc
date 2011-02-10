@@ -221,7 +221,7 @@ int utf8_fprintf( FILE *stream, const char *fmt, ... )
  * number of bytes that the first character occupies (from 1 to 4) otherwise;
  * -1 if the byte sequence was not a valid UTF-8 sequence.
  */
-static size_t vlc_towc (const char *str, uint32_t *restrict pwc)
+size_t vlc_towc (const char *str, uint32_t *restrict pwc)
 {
     uint8_t *ptr = (uint8_t *)str;
     assert (str != NULL);

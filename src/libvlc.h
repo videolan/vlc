@@ -38,6 +38,8 @@ extern const size_t libvlc_actions_count;
 extern int vlc_InitActions (libvlc_int_t *);
 extern void vlc_DeinitActions (libvlc_int_t *);
 
+size_t vlc_towc (const char *str, uint32_t *restrict pwc);
+
 /*
  * OS-specific initialization
  */

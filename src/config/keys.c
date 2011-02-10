@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_keys.h>
 #include "configuration.h"
+#include "libvlc.h"
 
 typedef struct key_descriptor_s
 {
@@ -147,31 +148,6 @@ static char *utf8_cp (uint_fast32_t cp, char *buf)
     return buf;
 }
 
-/* Convert UTF-8 to Unicode code point */
-static uint_fast32_t cp_utf8 (const char *utf8)
-{
-    uint8_t f = utf8[0];
-    size_t l = strlen (utf8);
-
-    if (f < 0x80) /* ASCII (7 bits) */
-        return f;
-    if (f < 0xC0 || l < 2) /* bad */
-        return 0;
-    if (f < 0xE0) /* two bytes (11 bits) */
-        return ((f & 0x1F) << 6) | (utf8[1] & 0x3F);
-    if (l < 3) /* bad */
-        return 0;
-    if (f < 0xF0) /* three bytes (16 bits) */
-        return ((f & 0x0F) << 12) | ((utf8[1] & 0x3F) << 6)
-               | (utf8[2] & 0x3F);
-    if (l < 4)
-        return 0;
-    if (f < 0xF8) /* four bytes (21 bits) */
-        return ((f & 0x07) << 18) | ((utf8[1] & 0x3F) << 12)
-               | ((utf8[2] & 0x3F) << 6) | (utf8[3] & 0x3F);
-    return 0;
-}
-
 char *KeyToString (uint_fast32_t sym)
 {
     key_descriptor_t *d;
@@ -191,6 +167,7 @@ char *KeyToString (uint_fast32_t sym)
 uint_fast32_t ConfigStringToKey (const char *name)
 {
     uint_fast32_t mods = 0;
+    uint32_t cp;
 
     for (;;)
     {
@@ -213,7 +190,7 @@ uint_fast32_t ConfigStringToKey (const char *name)
         if (!strcasecmp( vlc_keys[i].psz_key_string, name))
             return vlc_keys[i].i_key_code | mods;
 
-    return cp_utf8 (name) | mods;
+    return (vlc_towc (name, &cp) > 0) ? (mods | cp) : 0;
 }
 
 char *ConfigKeyToString (uint_fast32_t i_key)
