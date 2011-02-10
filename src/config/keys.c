@@ -36,7 +36,7 @@
 
 typedef struct key_descriptor_s
 {
-    const char *psz_key_string;
+    const char psz_key_string[20];
     uint32_t i_key_code;
 } key_descriptor_t;
 
