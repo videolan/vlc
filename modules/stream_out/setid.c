@@ -6,8 +6,8 @@
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -16,8 +16,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -102,7 +102,6 @@ static int               Send    ( sout_stream_t *, sout_stream_id_t *, block_t 
 
 struct sout_stream_sys_t
 {
-    sout_stream_t    *p_out;
     int              i_id;
     int              i_new_id;
     char             *psz_language;
@@ -197,7 +196,7 @@ static sout_stream_id_t * AddId( sout_stream_t *p_stream, es_format_t *p_fmt )
         p_fmt->i_id = p_sys->i_new_id;
     }
 
-    return p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
+    return p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
 }
 
 static sout_stream_id_t * AddLang( sout_stream_t *p_stream, es_format_t *p_fmt )
@@ -212,20 +211,16 @@ static sout_stream_id_t * AddLang( sout_stream_t *p_stream, es_format_t *p_fmt )
         p_fmt->psz_language = strdup( p_sys->psz_language );
     }
 
-    return p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
+    return p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
 }
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
-    sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
-
-    return p_sys->p_out->pf_del( p_sys->p_out, id );
+    return p_stream->p_next->pf_del( p_stream->p_next, id );
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                  block_t *p_buffer )
 {
-    sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
-
-    return p_sys->p_out->pf_send( p_sys->p_out, id, p_buffer );
+    return p_stream->p_next->pf_send( p_stream->p_next, id, p_buffer );
 }

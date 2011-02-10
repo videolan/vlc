@@ -7,8 +7,8 @@
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -17,8 +17,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -90,7 +90,6 @@ static int               Send  ( sout_stream_t *, sout_stream_id_t *, block_t * 
 
 struct sout_stream_sys_t
 {
-    sout_stream_t *p_out;
     int i_id, i_magazine, i_page, i_row;
     char *psz_language, *psz_old_language;
     sout_stream_id_t *p_id, *p_telx;
@@ -161,17 +160,17 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             strcpy( p_fmt->psz_language, "unk" );
         p_fmt->psz_language[3] = '\0';
 
-        p_sys->p_id = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
+        p_sys->p_id = p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
         return p_sys->p_id;
     }
 
     if ( p_fmt->i_codec == VLC_CODEC_TELETEXT )
     {
-        p_sys->p_telx = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
+        p_sys->p_telx = p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
         return p_sys->p_telx;
     }
 
-    return p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
+    return p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
 }
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
@@ -181,7 +180,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     if ( id == p_sys->p_id ) p_sys->p_id = NULL;
     if ( id == p_sys->p_telx ) p_sys->p_telx = NULL;
 
-    return p_sys->p_out->pf_del( p_sys->p_out, id );
+    return p_stream->p_next->pf_del( p_stream->p_next, id );
 }
 
 static void SetLanguage( sout_stream_t *p_stream, char *psz_language )
@@ -312,5 +311,5 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     if ( id == p_sys->p_telx )
         HandleTelx( p_stream, p_buffer );
 
-    return p_sys->p_out->pf_send( p_sys->p_out, id, p_buffer );
+    return p_stream->p_next->pf_send( p_stream->p_next, id, p_buffer );
 }
