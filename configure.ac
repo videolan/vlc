@@ -2353,7 +2353,7 @@ if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
              #endif],
             [AC_MSG_RESULT([yes])
               AC_CHECK_HEADERS(matroska/KaxAttachments.h)
-              VLC_ADD_CXXFLAGS([mkv],[-DEBML_STRICT_API])
+              VLC_ADD_CXXFLAGS([mkv],[])
               if test "${SYS}" = "darwin"; then
                 VLC_ADD_CXXFLAGS([mkv],[-O1])
               fi
