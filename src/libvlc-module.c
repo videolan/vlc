@@ -2069,9 +2069,7 @@ vlc_module_begin ()
     add_bool( "plugins-cache", true, PLUGINS_CACHE_TEXT,
               PLUGINS_CACHE_LONGTEXT, true )
         change_need_restart ()
-    add_directory( "plugin-path", NULL, PLUGIN_PATH_TEXT,
-                   PLUGIN_PATH_LONGTEXT, true )
-        change_need_restart ()
+    add_obsolete_string( "plugin-path" )
     add_directory( "data-path", NULL, DATA_PATH_TEXT,
                    DATA_PATH_LONGTEXT, true )
         change_need_restart ()
