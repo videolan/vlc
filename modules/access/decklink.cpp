@@ -373,7 +373,7 @@ static int Open( vlc_object_t *p_this )
             goto finish;
         }
 
-        msg_Dbg( p_demux, "Setting video input format to 0x%x", conn);
+        msg_Dbg( p_demux, "Setting video input connection to 0x%x", conn);
         result = p_sys->p_config->SetInt( bmdDeckLinkConfigVideoInputConnection, conn );
         if( result != S_OK )
         {
