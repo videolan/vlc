@@ -91,24 +91,22 @@ int main( int i_argc, const char *ppsz_argv[] )
     /* Restore SIGCHLD in case our parent process ignores it. */
     signal (SIGCHLD, SIG_DFL);
 
-#ifdef HAVE_SETENV
-# ifndef NDEBUG
+#ifndef NDEBUG
     /* Activate malloc checking routines to detect heap corruptions. */
     setenv ("MALLOC_CHECK_", "2", 1);
 
     /* Disable the ugly Gnome crash dialog so that we properly segfault */
     setenv ("GNOME_DISABLE_CRASH_DIALOG", "1", 1);
-# endif
+#endif
 
-# ifdef TOP_BUILDDIR
+#ifdef TOP_BUILDDIR
     setenv ("VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1);
-# endif
+#endif
 
     /* Clear the X.Org startup notification ID. Otherwise the UI might try to
      * change the environment while the process is multi-threaded. That could
      * crash. Screw you X.Org. Next time write a thread-safe specification. */
     unsetenv ("DESKTOP_STARTUP_ID");
-#endif
 
 #ifndef ALLOW_RUN_AS_ROOT
     if (geteuid () == 0)
