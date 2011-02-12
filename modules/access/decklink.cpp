@@ -129,6 +129,10 @@ struct demux_sys_t
     IDeckLinkInput *p_input;
     DeckLinkCaptureDelegate *p_delegate;
 
+    /* We need to hold onto the IDeckLinkConfiguration object, or our settings will not apply.
+       See section 2.4.15 of the Blackmagic Decklink SDK documentation. */
+    IDeckLinkConfiguration *p_config;
+
     es_out_id_t *p_video_es;
     es_out_id_t *p_audio_es;
 
@@ -340,8 +344,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Set up the video and audio sources. */
-    IDeckLinkConfiguration *p_config;
-    if( p_sys->p_card->QueryInterface( IID_IDeckLinkConfiguration, (void**)&p_config) != S_OK )
+    if( p_sys->p_card->QueryInterface( IID_IDeckLinkConfiguration, (void**)&p_sys->p_config) != S_OK )
     {
         msg_Err( p_demux, "Failed to get configuration interface" );
         goto finish;
@@ -371,7 +374,7 @@ static int Open( vlc_object_t *p_this )
         }
 
         msg_Dbg( p_demux, "Setting video input format to 0x%x", conn);
-        result = p_config->SetInt( bmdDeckLinkConfigVideoInputConnection, conn );
+        result = p_sys->p_config->SetInt( bmdDeckLinkConfigVideoInputConnection, conn );
         if( result != S_OK )
         {
             msg_Err( p_demux, "Failed to set video input connection" );
@@ -397,7 +400,7 @@ static int Open( vlc_object_t *p_this )
         }
 
         msg_Dbg( p_demux, "Setting audio input format to 0x%x", conn);
-        result = p_config->SetInt( bmdDeckLinkConfigAudioInputConnection, conn );
+        result = p_sys->p_config->SetInt( bmdDeckLinkConfigAudioInputConnection, conn );
         if( result != S_OK )
         {
             msg_Err( p_demux, "Failed to set audio input connection" );
@@ -582,9 +585,6 @@ finish:
     if( decklink_iterator )
         decklink_iterator->Release();
 
-    if( p_config )
-        p_config->Release();
-
     free( psz_video_connection );
     free( psz_audio_connection );
     free( psz_display_mode );
@@ -602,6 +602,9 @@ static void Close( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys   = p_demux->p_sys;
+
+    if( p_sys->p_config )
+        p_sys->p_config->Release();
 
     if( p_sys->p_input )
     {
