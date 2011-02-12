@@ -128,7 +128,7 @@ static subpicture_region_t *OSDRegion(int x, int y, int width, int height)
     fmt.i_visible_width  = width;
     fmt.i_height         =
     fmt.i_visible_height = height;
-    fmt.i_sar_num        = 0;
+    fmt.i_sar_num        = 1;
     fmt.i_sar_den        = 1;
 
     subpicture_region_t *r = subpicture_region_New(&fmt);
@@ -264,12 +264,19 @@ static void OSDWidgetUpdate(subpicture_t *subpic,
     subpicture_updater_sys_t *sys = subpic->updater.p_sys;
     VLC_UNUSED(fmt_dst); VLC_UNUSED(ts);
 
-    subpic->i_original_picture_width  = fmt_src->i_width;
-    subpic->i_original_picture_height = fmt_src->i_height;
+    video_format_t fmt = *fmt_dst;
+    fmt.i_width         = fmt.i_width         * fmt.i_sar_num / fmt.i_sar_den;
+    fmt.i_visible_width = fmt.i_visible_width * fmt.i_sar_num / fmt.i_sar_den;
+    fmt.i_x_offset      = fmt.i_x_offset      * fmt.i_sar_num / fmt.i_sar_den;
+    fmt.i_sar_num       = 1;
+    fmt.i_sar_den       = 1;
+
+    subpic->i_original_picture_width  = fmt.i_width;
+    subpic->i_original_picture_height = fmt.i_height;
     if (sys->type == OSD_HOR_SLIDER || sys->type == OSD_VERT_SLIDER)
-        subpic->p_region = OSDSlider(sys->type, sys->position, fmt_src);
+        subpic->p_region = OSDSlider(sys->type, sys->position, &fmt);
     else
-        subpic->p_region = OSDIcon(sys->type, fmt_src);
+        subpic->p_region = OSDIcon(sys->type, &fmt);
 }
 
 static void OSDWidgetDestroy(subpicture_t *subpic)
