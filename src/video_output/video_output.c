@@ -959,7 +959,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     bool is_direct;
     picture_t *todisplay;
 
-    if (filtered && do_early_spu && vout->p->spu_blend && subpic) {
+    if (filtered && do_early_spu && subpic) {
         if (vd->info.is_slow) {
             is_direct = false;
             todisplay = picture_NewFromFormat(&vd->source); /* FIXME a pool ? */
@@ -970,7 +970,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         if (todisplay) {
             VideoFormatCopyCropAr(&todisplay->format, &filtered->format);
             picture_Copy(todisplay, filtered);
-            picture_BlendSubpicture(todisplay, vout->p->spu_blend, subpic);
+            if (vout->p->spu_blend)
+                picture_BlendSubpicture(todisplay, vout->p->spu_blend, subpic);
         }
         picture_Release(filtered);
         subpicture_Delete(subpic);
