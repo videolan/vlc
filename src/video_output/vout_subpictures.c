@@ -326,7 +326,7 @@ static spu_scale_t spu_scale_unit( void )
 {
     return spu_scale_create( SCALE_UNIT, SCALE_UNIT );
 }
-static spu_scale_t spu_scale_createq( int wn, int wd, int hn, int hd )
+static spu_scale_t spu_scale_createq( int64_t wn, int64_t wd, int64_t hn, int64_t hd )
 {
     return spu_scale_create( wn * SCALE_UNIT / wd,
                              hn * SCALE_UNIT / hd );
@@ -1075,8 +1075,6 @@ static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
         p_subtitle_area = calloc( i_subtitle_region_count, sizeof(*p_subtitle_area) );
 
     /* Process all subpictures and regions (in the right order) */
-    const int i_source_video_width  = p_fmt_src->i_width;
-    const int i_source_video_height = p_fmt_src->i_height;
     for( unsigned int i_index = 0; i_index < i_subpicture; i_index++ )
     {
         subpicture_t *p_subpic = pp_subpicture[i_index];
@@ -1085,57 +1083,31 @@ static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
         if( !p_subpic->p_region )
             continue;
 
-        /* FIXME when possible use a better rendering size than source size
-         * (max of display size and source size for example) FIXME */
-        int i_render_width  = p_subpic->i_original_picture_width;
-        int i_render_height = p_subpic->i_original_picture_height;
-        if( !i_render_width || !i_render_height )
+        if( p_subpic->i_original_picture_width  <= 0 ||
+            p_subpic->i_original_picture_height <= 0 )
         {
-            if( i_render_width != 0 || i_render_height != 0 )
-                msg_Err( p_spu, "unsupported original picture size %dx%d",
-                         i_render_width, i_render_height );
+            if( p_subpic->i_original_picture_width  > 0 ||
+                p_subpic->i_original_picture_height > 0 )
+                msg_Err( p_spu, "original picture size %dx%d is unsupported",
+                         p_subpic->i_original_picture_width,
+                         p_subpic->i_original_picture_height );
+            else
+                msg_Warn( p_spu, "original picture size is undefined" );
 
-            p_subpic->i_original_picture_width  = i_render_width = i_source_video_width;
-            p_subpic->i_original_picture_height = i_render_height = i_source_video_height;
+            p_subpic->i_original_picture_width  = p_fmt_src->i_width;
+            p_subpic->i_original_picture_height = p_fmt_src->i_height;
         }
 
         if( p_sys->p_text )
         {
+            /* FIXME aspect ratio ? */
             p_sys->p_text->fmt_out.video.i_width          =
-            p_sys->p_text->fmt_out.video.i_visible_width  = i_render_width;
+            p_sys->p_text->fmt_out.video.i_visible_width  = p_subpic->i_original_picture_width;
 
             p_sys->p_text->fmt_out.video.i_height         =
-            p_sys->p_text->fmt_out.video.i_visible_height = i_render_height;
+            p_sys->p_text->fmt_out.video.i_visible_height = p_subpic->i_original_picture_height;
 
             var_SetInteger( p_sys->p_text, "scale", SCALE_UNIT );
-        }
-
-        /* Compute scaling from picture to source size */
-        spu_scale_t scale = spu_scale_createq( i_source_video_width,  i_render_width,
-                                               i_source_video_height, i_render_height );
-
-        /* Update scaling from source size to display size(p_fmt_dst) */
-        scale.w = scale.w * p_fmt_dst->i_width  / i_source_video_width;
-        scale.h = scale.h * p_fmt_dst->i_height / i_source_video_height;
-
-        /* Set default subpicture aspect ratio
-         * FIXME if we only handle 1 aspect ratio per picture, why is it set per
-         * region ? */
-        p_region = p_subpic->p_region;
-        if( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den )
-        {
-            p_region->fmt.i_sar_den = p_fmt_src->i_sar_den;
-            p_region->fmt.i_sar_num = p_fmt_src->i_sar_num;
-        }
-
-        /* Take care of the aspect ratio */
-        if( p_region->fmt.i_sar_num * p_fmt_src->i_sar_den !=
-            p_region->fmt.i_sar_den * p_fmt_src->i_sar_num )
-        {
-            /* FIXME FIXME what about region->i_x/i_y ? */
-            scale.w = scale.w *
-                (int64_t)p_region->fmt.i_sar_num * p_fmt_dst->i_sar_den /
-                p_region->fmt.i_sar_den / p_fmt_dst->i_sar_num;
         }
 
         /* Render all regions
@@ -1145,6 +1117,23 @@ static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
         for( p_region = p_subpic->p_region; p_region != NULL; p_region = p_region->p_next )
         {
             spu_area_t area;
+
+            /* Compute region scale AR */
+            video_format_t region_fmt =p_region->fmt;
+            if( region_fmt.i_sar_num <= 0 || region_fmt.i_sar_den <= 0 )
+            {
+                region_fmt.i_sar_num = p_fmt_src->i_sar_num;
+                region_fmt.i_sar_den = p_fmt_src->i_sar_den;
+            }
+
+            /* Compute scaling from original size to destination size
+             * FIXME The current scaling ensure that the heights match, the width being
+             * cropped.
+             */
+            spu_scale_t scale= spu_scale_createq( (int64_t)p_fmt_dst->i_height                 * p_fmt_dst->i_sar_den * region_fmt.i_sar_num,
+                                                  (int64_t)p_subpic->i_original_picture_height * p_fmt_dst->i_sar_num * region_fmt.i_sar_den,
+                                                  p_fmt_dst->i_height,
+                                                  p_subpic->i_original_picture_height );
 
             /* Check scale validity */
             if( scale.w <= 0 || scale.h <= 0 )
@@ -1156,7 +1145,6 @@ static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
                              p_chroma_list, p_fmt_dst,
                              p_subtitle_area, i_subtitle_area,
                              p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
-
             if( *pp_output_last )
                 pp_output_last = &(*pp_output_last)->p_next;
 
