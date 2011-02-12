@@ -1172,7 +1172,7 @@ static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
                     p_subtitle_area[i_subtitle_area++] = area;
             }
         }
-        if( p_subpic->b_subtitle )
+        if( p_subpic->b_subtitle && p_subpic->p_region )
             p_subpic->b_absolute = true;
     }
 
