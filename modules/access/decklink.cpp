@@ -86,6 +86,13 @@ static const char *const ppsz_videoconns_text[] = {
     N_("SDI"), N_("HDMI"), N_("Optical SDI"), N_("Component"), N_("Composite"), N_("S-video")
 };
 
+static const char *const ppsz_audioconns[] = {
+    "embedded", "aesebu", "analog"
+};
+static const char *const ppsz_audioconns_text[] = {
+    N_("Embedded"), N_("AES/EBU"), N_("Analog")
+};
+
 #define ASPECT_RATIO_TEXT N_("Aspect ratio")
 #define ASPECT_RATIO_LONGTEXT N_( \
     "Aspect ratio (4:3, 16:9). Default assumes square pixels." )
@@ -104,6 +111,7 @@ vlc_module_begin ()
                  CACHING_TEXT, CACHING_LONGTEXT, true )
     add_string( "decklink-audio-connection", 0,
                  AUDIO_CONNECTION_TEXT, AUDIO_CONNECTION_LONGTEXT, true )
+        change_string_list( ppsz_audioconns, ppsz_audioconns_text, 0 )
     add_integer( "decklink-audio-rate", 48000,
                  RATE_TEXT, RATE_LONGTEXT, true )
     add_integer( "decklink-audio-channels", 2,
