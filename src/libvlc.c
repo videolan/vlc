@@ -473,8 +473,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( module_count <= 1 )
     {
-        msg_Err( p_libvlc, "No modules were found, refusing to start. Check "
-                "that you properly gave a module path with --plugin-path.");
+        msg_Err( p_libvlc, "No plugins found! Check your VLC installation.");
         b_exit = true;
         i_ret = VLC_ENOITEM;
     }

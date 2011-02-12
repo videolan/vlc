@@ -91,25 +91,22 @@ int main (int argc, char *argv[])
     {
         /* Note that FromLocale() can be used before libvlc is initialized */
         const char *path = FromLocale (argv[i]);
-        char *arg;
 
-        if (asprintf (&arg, "--plugin-path=%s", path) == -1)
+        if (setenv ("VLC_PLUGIN_PATH", path, 1))
             abort ();
 
-        const char *vlc_argv[5];
+        const char *vlc_argv[4];
         int vlc_argc = 0;
 
         vlc_argv[vlc_argc++] = "--quiet";
         if (force)
             vlc_argv[vlc_argc++] = "--reset-plugins-cache";
-        vlc_argv[vlc_argc++] = arg;
         vlc_argv[vlc_argc++] = "--"; /* end of options */
         vlc_argv[vlc_argc] = NULL;
 
         libvlc_instance_t *vlc = libvlc_new (vlc_argc, vlc_argv);
         if (vlc != NULL)
             libvlc_release (vlc);
-        free (arg);
         if (vlc == NULL)
             fprintf (stderr, "No plugins in %s\n", path);
         LocaleFree (path);

@@ -100,6 +100,10 @@ int main( int i_argc, const char *ppsz_argv[] )
     setenv ("GNOME_DISABLE_CRASH_DIALOG", "1", 1);
 # endif
 
+# ifdef TOP_BUILDDIR
+    setenv ("VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1);
+# endif
+
     /* Clear the X.Org startup notification ID. Otherwise the UI might try to
      * change the environment while the process is multi-threaded. That could
      * crash. Screw you X.Org. Next time write a thread-safe specification. */
@@ -174,14 +178,11 @@ int main( int i_argc, const char *ppsz_argv[] )
     pthread_sigmask (SIG_SETMASK, &set, NULL);
 
     /* Note that FromLocale() can be used before libvlc is initialized */
-    const char *argv[i_argc + 4];
+    const char *argv[i_argc + 3];
     int argc = 0;
 
     argv[argc++] = "--no-ignore-config";
     argv[argc++] = "--media-library";
-#ifdef TOP_BUILDDIR
-    argv[argc++] = FromLocale ("--plugin-path="TOP_BUILDDIR"/modules");
-#endif
 #ifdef TOP_SRCDIR
     argv[argc++] = FromLocale ("--data-path="TOP_SRCDIR"/share");
 #endif

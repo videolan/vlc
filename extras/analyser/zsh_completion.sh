@@ -22,6 +22,9 @@ esac
 #Distributors can run BUILDDIR=XXX ./zsh_completion.sh
 [ -z "$BUILDDIR" ] && BUILDDIR=../../
 
+VLC_PLUGIN_PATH="$BUILDDIR"
+export VLC_PLUGIN_PATH
+
 function find_libvlc {
     [ -z "$SUFFIX" ] && return 0 # linking will fail if lib isn't found
     for i in $BUILDDIR/src/.libs/libvlc.$SUFFIX $BUILDDIR/src/libvlc.$SUFFIX; do
@@ -66,15 +69,15 @@ eval $ZSH_BUILD || exit 1
 
 printf "Generating zsh completion in _vlc ... "
 
-if ! ./zsh_gen --plugin-path=$BUILDDIR >_vlc 2>/dev/null; then
+if ! ./zsh_gen >_vlc 2>/dev/null; then
     echo "
 ERROR: the generation failed.... :(
 Please press enter to verify that all the VLC modules are shown"
     read i
-    ./zsh_gen --plugin-path=$BUILDDIR -vv --list
+    ./zsh_gen -vv --list
     echo "
 If they are shown, press enter to see if you can debug the problem
-It will be reproduced by running \"./zsh_gen --plugin-path=$BUILDDIR -vvv\""
+It will be reproduced by running \"./zsh_gen -vvv\""
     read i
     ./zsh_gen --plugin-path=$BUILDDIR -vv
     exit 1

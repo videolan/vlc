@@ -53,7 +53,6 @@ static const char * test_defaults_args[] = {
     "-I",
     "dummy",
     "--no-media-library",
-    "--plugin-path=../modules",
     "--vout=dummy",
     "--aout=dummy"
 };
@@ -75,6 +74,7 @@ static inline void test_init (void)
 {
     (void)test_default_sample; /* This one may not be used */
     alarm (10); /* Make sure "make check" does not get stuck */
+    setenv( "VLC_PLUGIN_PATH", "../modules", 1 );
 }
 
 #endif /* TEST_H */

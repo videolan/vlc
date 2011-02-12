@@ -853,8 +853,12 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
     }
 
     /* If the user provided a plugin path, we add it to the list */
-    paths = var_InheritString( p_this, "plugin-path" );
+    paths = getenv( "VLC_PLUGIN_PATH" );
     if( paths == NULL )
+        return;
+
+    paths = strdup( paths ); /* don't harm the environment ! :) */
+    if( unlikely(paths == NULL) )
         return;
 
     for( char *buf, *path = strtok_r( paths, PATH_SEP, &buf );
@@ -966,7 +970,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
         p_module = p_cache_entry->p_module;
         p_module->b_loaded = false;
 
-        /* If plugin-path contains duplicate entries... */
+        /* If VLC_PLUGIN_PATH contains duplicate entries... */
         if( p_module->next != NULL )
             return 0; /* already taken care of that one */
 
