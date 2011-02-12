@@ -170,6 +170,11 @@ static inline char *getenv (const char *name)
 }
 #endif
 
+#ifndef HAVE_SETENV
+int setenv (const char *, const char *, int);
+int unsetenv (const char *);
+#endif
+
 /* Alignment of critical static data structures */
 #ifdef ATTRIBUTE_ALIGNED_MAX
 #   define ATTR_ALIGN(align) __attribute__ ((__aligned__ ((ATTRIBUTE_ALIGNED_MAX < align) ? ATTRIBUTE_ALIGNED_MAX : align)))
