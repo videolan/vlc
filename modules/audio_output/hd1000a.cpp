@@ -165,7 +165,7 @@ static int Open( vlc_object_t * p_this )
     pPlayer->SetVolume( (u32)__MIN( i_volume * 64, 0xFFFF ) );
 
     /* Create thread and wait for its readiness. */
-    if( vlc_thread_create( p_aout, "aout", Thread,
+    if( vlc_thread_create( p_aout, Thread,
                            VLC_THREAD_PRIORITY_OUTPUT ) )
     {
         msg_Err( p_aout, "cannot create OSS thread (%m)" );

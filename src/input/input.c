@@ -217,8 +217,7 @@ int input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
 int input_Start( input_thread_t *p_input )
 {
     /* Create thread and wait for its readiness. */
-    if( vlc_thread_create( p_input, "input", Run,
-                           VLC_THREAD_PRIORITY_INPUT ) )
+    if( vlc_thread_create( p_input, Run, VLC_THREAD_PRIORITY_INPUT ) )
     {
         input_ChangeState( p_input, ERROR_S );
         msg_Err( p_input, "cannot create input thread" );

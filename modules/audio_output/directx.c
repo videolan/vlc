@@ -315,7 +315,6 @@ static int OpenAudio( vlc_object_t *p_this )
     /* then launch the notification thread */
     msg_Dbg( p_aout, "creating DirectSoundThread" );
     if( vlc_thread_create( p_aout->output.p_sys->p_notif,
-                           "DirectSound Notification Thread",
                            DirectSoundThread,
                            VLC_THREAD_PRIORITY_HIGHEST ) )
     {

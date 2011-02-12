@@ -344,8 +344,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Then launch the notification thread */
     if( vlc_thread_create( p_aout->output.p_sys->p_notif,
-                           "waveOut Notification Thread", WaveOutThread,
-                           VLC_THREAD_PRIORITY_OUTPUT ) )
+                           WaveOutThread, VLC_THREAD_PRIORITY_OUTPUT ) )
     {
         msg_Err( p_aout, "cannot create WaveOutThread" );
     }

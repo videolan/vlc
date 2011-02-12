@@ -1562,8 +1562,7 @@ static int Open(vlc_object_t *p_this)
     vlc_mutex_init(&p_sys->download.lock_wait);
     vlc_cond_init(&p_sys->download.wait);
 
-    if (vlc_thread_create(s, "HTTP Live Streaming client",
-                          hls_Thread, VLC_THREAD_PRIORITY_INPUT))
+    if (vlc_thread_create(s, hls_Thread, VLC_THREAD_PRIORITY_INPUT))
     {
         goto fail_thread;
     }

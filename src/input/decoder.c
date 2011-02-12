@@ -301,7 +301,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         i_priority = VLC_THREAD_PRIORITY_VIDEO;
 
     /* Spawn the decoder thread */
-    if( vlc_thread_create( p_dec, "decoder", DecoderThread, i_priority ) )
+    if( vlc_thread_create( p_dec, DecoderThread, i_priority ) )
     {
         msg_Err( p_dec, "cannot spawn decoder thread" );
         module_unneed( p_dec, p_dec->p_module );

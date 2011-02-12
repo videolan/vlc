@@ -513,7 +513,7 @@ static int Open( vlc_object_t *p_this )
         var_InheritBool( p_aout, "oss-buggy" );
 
     /* Create OSS thread and wait for its readiness. */
-    if( vlc_thread_create( p_aout, "aout", OSSThread,
+    if( vlc_thread_create( p_aout, OSSThread,
                            VLC_THREAD_PRIORITY_OUTPUT ) )
     {
         msg_Err( p_aout, "cannot create OSS thread (%m)" );

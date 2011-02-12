@@ -300,8 +300,7 @@ static int Open( vlc_object_t *p_this )
     p_vod->pf_media_del = MediaAskDel;
 
     p_sys->p_fifo_cmd = block_FifoNew();
-    if( vlc_thread_create( p_vod, "rtsp vod thread", CommandThread,
-                           VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_thread_create( p_vod, CommandThread, VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_vod, "cannot spawn rtsp vod thread" );
         block_FifoRelease( p_sys->p_fifo_cmd );

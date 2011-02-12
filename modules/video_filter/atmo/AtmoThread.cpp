@@ -136,7 +136,6 @@ void CThread::Run()
 #if defined(_ATMO_VLC_PLUGIN_)
    m_pAtmoThread->b_die = false;
    if(vlc_thread_create( m_pAtmoThread,
-                         "Atmo-CThread-Class",
                          CThread::ThreadProc,
                          VLC_THREAD_PRIORITY_LOW ))
    {

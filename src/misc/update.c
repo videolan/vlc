@@ -405,8 +405,7 @@ void update_Check( update_t *p_update, void (*pf_callback)( void*, bool ), void 
     p_uct->pf_callback = pf_callback;
     p_uct->p_data = p_data;
 
-    vlc_thread_create( p_uct, "check for update", update_CheckReal,
-                       VLC_THREAD_PRIORITY_LOW );
+    vlc_thread_create( p_uct, update_CheckReal, VLC_THREAD_PRIORITY_LOW );
 }
 
 void* update_CheckReal( vlc_object_t* p_this )
@@ -518,8 +517,7 @@ void update_Download( update_t *p_update, const char *psz_destdir )
     p_update->p_download = p_udt;
     p_udt->psz_destdir = psz_destdir ? strdup( psz_destdir ) : NULL;
 
-    vlc_thread_create( p_udt, "download update", update_DownloadReal,
-                       VLC_THREAD_PRIORITY_LOW );
+    vlc_thread_create( p_udt, update_DownloadReal, VLC_THREAD_PRIORITY_LOW );
 }
 
 static void* update_DownloadReal( vlc_object_t *p_this )

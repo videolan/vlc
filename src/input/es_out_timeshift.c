@@ -764,8 +764,7 @@ static int TsStart( es_out_t *p_out )
     vlc_object_set_destructor( p_ts, TsDestructor );
 
     p_sys->b_delayed = true;
-    if( vlc_thread_create( p_ts, "es out timeshift",
-                           TsRun, VLC_THREAD_PRIORITY_INPUT ) )
+    if( vlc_thread_create( p_ts, TsRun, VLC_THREAD_PRIORITY_INPUT ) )
     {
         msg_Err( p_sys->p_input, "cannot create input thread" );
 

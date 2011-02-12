@@ -68,8 +68,7 @@ static void *thread_entry (void *data)
  * Note that i_priority is only taken into account on platforms supporting
  * userland real-time priority threads.
  *****************************************************************************/
-int vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line,
-                       const char *psz_name, void *(*func) ( vlc_object_t * ),
+int vlc_thread_create( vlc_object_t *p_this, void *(*func) ( vlc_object_t * ),
                        int i_priority )
 {
     int i_ret;
@@ -84,17 +83,14 @@ int vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line,
     /* Make sure we don't re-create a thread if the object has already one */
     assert( !p_priv->b_thread );
 
-    p_priv->b_thread = true;
     i_ret = vlc_clone( &p_priv->thread_id, thread_entry, boot, i_priority );
     if( i_ret == 0 )
-        msg_Dbg( p_this, "thread (%s) created at priority %d (%s:%d)",
-                 psz_name, i_priority, psz_file, i_line );
+        p_priv->b_thread = true;
     else
     {
-        p_priv->b_thread = false;
         errno = i_ret;
-        msg_Err( p_this, "%s thread could not be created at %s:%d (%m)",
-                         psz_name, psz_file, i_line );
+        msg_Err( p_this, "cannot create thread (%m)" );
+        free (boot);
     }
 
     return i_ret;
@@ -105,8 +101,7 @@ int vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line,
  * vlc_thread_set_priority: set the priority of the current thread when we
  * couldn't set it in vlc_thread_create (for instance for the main thread)
  *****************************************************************************/
-int vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
-                             int i_line, int i_priority )
+int vlc_thread_set_priority( vlc_object_t *p_this, int i_priority )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
@@ -141,14 +136,12 @@ int vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
                                               i_policy, &param )) )
         {
             errno = i_error;
-            msg_Warn( p_this, "couldn't set thread priority (%s:%d): %m",
-                      psz_file, i_line );
+            msg_Warn( p_this, "cannot set thread priority (%m)" );
             i_priority = 0;
         }
     }
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
-    VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
 #warning vlc_thread_set_priority() is BROKEN
     if( true /*!SetThreadPriority(p_priv->thread_id->id, i_priority)*/ )

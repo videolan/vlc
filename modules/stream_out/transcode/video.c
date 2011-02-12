@@ -275,7 +275,7 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         p_sys->i_last_pic = 0;
         p_sys->p_buffers = NULL;
         p_sys->b_die = p_sys->b_error = 0;
-        if( vlc_thread_create( p_sys, "encoder", EncoderThread, i_priority ) )
+        if( vlc_thread_create( p_sys, EncoderThread, i_priority ) )
         {
             msg_Err( p_stream, "cannot spawn encoder thread" );
             module_unneed( id->p_decoder, id->p_decoder->p_module );

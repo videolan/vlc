@@ -1118,7 +1118,6 @@ static void Atmo_Shutdown(filter_t *p_filter)
           p_sys->p_fadethread->i_steps  = p_sys->i_endfadesteps;
 
         if( vlc_thread_create( p_sys->p_fadethread,
-            "AtmoLight fadeing",
             FadeToColorThread,
             VLC_THREAD_PRIORITY_LOW ) )
         {
@@ -2492,7 +2491,6 @@ static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
                 p_sys->p_fadethread->i_steps  = p_sys->i_fadesteps;
 
                 if( vlc_thread_create( p_sys->p_fadethread,
-                    "AtmoLight fadeing",
                     FadeToColorThread,
                     VLC_THREAD_PRIORITY_LOW ) )
                 {

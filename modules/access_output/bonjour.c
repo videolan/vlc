@@ -234,7 +234,7 @@ void *bonjour_start_service( vlc_object_t *p_log, const char *psz_stype,
         goto error;
     p_sys->poll_thread->simple_poll = p_sys->simple_poll;
 
-    if( vlc_thread_create( p_sys->poll_thread, "Avahi Poll Iterate Thread",
+    if( vlc_thread_create( p_sys->poll_thread,
                            poll_iterate_thread,
                            VLC_THREAD_PRIORITY_HIGHEST ) )
     {

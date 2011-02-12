@@ -96,8 +96,7 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
 
     vlc_object_attach( s, p_obj );
 
-    if( vlc_thread_create( s, "stream out", DStreamThread,
-                           VLC_THREAD_PRIORITY_INPUT ) )
+    if( vlc_thread_create( s, DStreamThread, VLC_THREAD_PRIORITY_INPUT ) )
     {
         stream_CommonDelete( s );
         free( p_sys->psz_name );

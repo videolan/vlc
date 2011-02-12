@@ -98,8 +98,7 @@ int watch_Init( media_library_t *p_ml )
     vlc_cond_init( &p_wt->cond );
     vlc_mutex_init( &p_wt->lock );
 
-    if( vlc_thread_create( p_wt, "Media Library Auto-Update",
-                            watch_Thread, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_thread_create( p_wt, watch_Thread, VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Dbg( p_ml, "unable to launch the auto-updating thread" );
         vlc_object_release( p_wt );
