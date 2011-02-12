@@ -907,7 +907,13 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     const bool do_dr_spu = !do_snapshot &&
                            vd->info.subpicture_chromas &&
                            *vd->info.subpicture_chromas != 0;
-    const bool do_early_spu = true; /* TODO */
+    const bool do_early_spu = !do_dr_spu &&
+                              (vd->info.is_slow ||
+                               sys->display.use_dr ||
+                               do_snapshot ||
+                               !vout_IsDisplayFiltered(vd) ||
+                               vd->fmt.i_width * vd->fmt.i_height <= vd->source.i_width * vd->source.i_height);
+
     const vlc_fourcc_t *subpicture_chromas;
     video_format_t fmt_spu;
     if (do_dr_spu) {
