@@ -296,21 +296,17 @@ LRESULT CALLBACK WMHOTKEYPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
 
                 LONG_PTR ret = GetWindowLongPtr( hwnd, GWLP_USERDATA );
                 intf_thread_t *p_intf = (intf_thread_t*)ret;
-                const struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
 
                 if( !GlobalGetAtomNameA(
                         wParam, psz_atomName, sizeof( psz_atomName ) ) )
                     return 0;
 
                 /* search for key associated with VLC */
-                for( int i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+                vlc_key_t action = vlc_GetActionId( psz_atomName );
+                if( action != ACTIONID_NONE )
                 {
-                    if( strcmp( p_hotkeys[i].psz_action, psz_atomName ) )
-                        continue;
-
                     var_SetInteger( p_intf->p_libvlc,
-                            "key-action", p_hotkeys[i].i_action );
-
+                            "key-action", action );
                     return 1;
                 }
             }
