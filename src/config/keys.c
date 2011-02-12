@@ -209,6 +209,121 @@ char *vlc_keycode2str (uint_fast32_t code)
 }
 
 
+/**
+ */
+typedef struct action
+{
+    char name[24];
+    int  value;
+} action_t;
+
+static const struct action actions[] =
+{
+    /* *MUST* be sorted (ASCII order) */
+    { "key-aspect-ratio", ACTIONID_ASPECT_RATIO, },
+    { "key-audio-track", ACTIONID_AUDIO_TRACK, },
+    { "key-audiodelay-down", ACTIONID_AUDIODELAY_DOWN, },
+    { "key-audiodelay-up", ACTIONID_AUDIODELAY_UP, },
+    { "key-audiodevice-cycle", ACTIONID_AUDIODEVICE_CYCLE, },
+    { "key-chapter-next", ACTIONID_CHAPTER_NEXT, },
+    { "key-chapter-prev", ACTIONID_CHAPTER_PREV, },
+    { "key-crop", ACTIONID_CROP, },
+    { "key-crop-bottom", ACTIONID_CROP_BOTTOM, },
+    { "key-crop-left", ACTIONID_CROP_LEFT, },
+    { "key-crop-right", ACTIONID_CROP_RIGHT, },
+    { "key-crop-top", ACTIONID_CROP_TOP, },
+    { "key-decr-scalefactor", ACTIONID_SCALE_DOWN, },
+    { "key-deinterlace", ACTIONID_DEINTERLACE, },
+    { "key-disc-menu", ACTIONID_DISC_MENU, },
+    { "key-faster", ACTIONID_FASTER, },
+    { "key-frame-next", ACTIONID_FRAME_NEXT, },
+    { "key-incr-scalefactor", ACTIONID_SCALE_UP, },
+    { "key-intf-hide", ACTIONID_INTF_HIDE, },
+    { "key-intf-show", ACTIONID_INTF_SHOW, },
+    { "key-jump+extrashort", ACTIONID_JUMP_FORWARD_EXTRASHORT, },
+    { "key-jump+long", ACTIONID_JUMP_FORWARD_LONG, },
+    { "key-jump+medium", ACTIONID_JUMP_FORWARD_MEDIUM, },
+    { "key-jump+short", ACTIONID_JUMP_FORWARD_SHORT, },
+    { "key-jump-extrashort", ACTIONID_JUMP_BACKWARD_EXTRASHORT, },
+    { "key-jump-long", ACTIONID_JUMP_BACKWARD_LONG, },
+    { "key-jump-medium", ACTIONID_JUMP_BACKWARD_MEDIUM, },
+    { "key-jump-short", ACTIONID_JUMP_BACKWARD_SHORT, },
+    { "key-leave-fullscreen", ACTIONID_LEAVE_FULLSCREEN, },
+    { "key-loop", ACTIONID_LOOP, },
+    { "key-menu-down", ACTIONID_MENU_DOWN, },
+    { "key-menu-left", ACTIONID_MENU_LEFT, },
+    { "key-menu-off", ACTIONID_MENU_OFF, },
+    { "key-menu-on", ACTIONID_MENU_ON, },
+    { "key-menu-right", ACTIONID_MENU_RIGHT, },
+    { "key-menu-select", ACTIONID_MENU_SELECT, },
+    { "key-menu-up", ACTIONID_MENU_UP, },
+    { "key-nav-activate", ACTIONID_NAV_ACTIVATE, },
+    { "key-nav-down", ACTIONID_NAV_DOWN, },
+    { "key-nav-left", ACTIONID_NAV_LEFT, },
+    { "key-nav-right", ACTIONID_NAV_RIGHT, },
+    { "key-nav-up", ACTIONID_NAV_UP, },
+    { "key-next", ACTIONID_NEXT, },
+    { "key-pause", ACTIONID_PAUSE, },
+    { "key-play", ACTIONID_PLAY, },
+    { "key-play-bookmark1", ACTIONID_PLAY_BOOKMARK1, },
+    { "key-play-bookmark10", ACTIONID_PLAY_BOOKMARK10, },
+    { "key-play-bookmark2", ACTIONID_PLAY_BOOKMARK2, },
+    { "key-play-bookmark3", ACTIONID_PLAY_BOOKMARK3, },
+    { "key-play-bookmark4", ACTIONID_PLAY_BOOKMARK4, },
+    { "key-play-bookmark5", ACTIONID_PLAY_BOOKMARK5, },
+    { "key-play-bookmark6", ACTIONID_PLAY_BOOKMARK6, },
+    { "key-play-bookmark7", ACTIONID_PLAY_BOOKMARK7, },
+    { "key-play-bookmark8", ACTIONID_PLAY_BOOKMARK8, },
+    { "key-play-bookmark9", ACTIONID_PLAY_BOOKMARK9, },
+    { "key-play-pause", ACTIONID_PLAY_PAUSE, },
+    { "key-position", ACTIONID_POSITION, },
+    { "key-prev", ACTIONID_PREV, },
+    { "key-quit", ACTIONID_QUIT, },
+    { "key-random", ACTIONID_RANDOM, },
+    { "key-rate-faster-fine", ACTIONID_RATE_FASTER_FINE, },
+    { "key-rate-normal", ACTIONID_RATE_NORMAL, },
+    { "key-rate-slower-fine", ACTIONID_RATE_SLOWER_FINE, },
+    { "key-record", ACTIONID_RECORD, },
+    { "key-set-bookmark1", ACTIONID_SET_BOOKMARK1, },
+    { "key-set-bookmark10", ACTIONID_SET_BOOKMARK10, },
+    { "key-set-bookmark2", ACTIONID_SET_BOOKMARK2, },
+    { "key-set-bookmark3", ACTIONID_SET_BOOKMARK3, },
+    { "key-set-bookmark4", ACTIONID_SET_BOOKMARK4, },
+    { "key-set-bookmark5", ACTIONID_SET_BOOKMARK5, },
+    { "key-set-bookmark6", ACTIONID_SET_BOOKMARK6, },
+    { "key-set-bookmark7", ACTIONID_SET_BOOKMARK7, },
+    { "key-set-bookmark8", ACTIONID_SET_BOOKMARK8, },
+    { "key-set-bookmark9", ACTIONID_SET_BOOKMARK9, },
+    { "key-slower", ACTIONID_SLOWER, },
+    { "key-snapshot", ACTIONID_SNAPSHOT, },
+    { "key-stop", ACTIONID_STOP, },
+    { "key-subdelay-down", ACTIONID_SUBDELAY_DOWN, },
+    { "key-subdelay-up", ACTIONID_SUBDELAY_UP, },
+    { "key-subpos-down", ACTIONID_SUBPOS_DOWN, },
+    { "key-subpos-up", ACTIONID_SUBPOS_UP, },
+    { "key-subtitle-track", ACTIONID_SUBTITLE_TRACK, },
+    { "key-title-next", ACTIONID_TITLE_NEXT, },
+    { "key-title-prev", ACTIONID_TITLE_PREV, },
+    { "key-toggle-autoscale", ACTIONID_TOGGLE_AUTOSCALE, },
+    { "key-toggle-fullscreen", ACTIONID_TOGGLE_FULLSCREEN, },
+    { "key-uncrop-bottom", ACTIONID_UNCROP_BOTTOM, },
+    { "key-uncrop-left", ACTIONID_UNCROP_LEFT, },
+    { "key-uncrop-right", ACTIONID_UNCROP_RIGHT, },
+    { "key-uncrop-top", ACTIONID_UNCROP_TOP, },
+    { "key-unzoom", ACTIONID_UNZOOM, },
+    { "key-vol-down", ACTIONID_VOL_DOWN, },
+    { "key-vol-mute", ACTIONID_VOL_MUTE, },
+    { "key-vol-up", ACTIONID_VOL_UP, },
+    { "key-wallpaper", ACTIONID_WALLPAPER, },
+    { "key-zoom", ACTIONID_ZOOM, },
+    { "key-zoom-double", ACTIONID_ZOOM_DOUBLE, },
+    { "key-zoom-half", ACTIONID_ZOOM_HALF, },
+    { "key-zoom-original", ACTIONID_ZOOM_ORIGINAL, },
+    { "key-zoom-quarter", ACTIONID_ZOOM_QUARTER, },
+};
+
+#define ACTIONS_COUNT (sizeof (actions) / sizeof (actions[0]))
+
 static int keycmp (const void *a, const void *b)
 {
     const struct hotkey *ka = a, *kb = b;
@@ -228,7 +343,7 @@ vlc_key_t vlc_TranslateKey (const vlc_object_t *obj, uint_fast32_t keycode)
     struct hotkey k = { .psz_action = NULL, .i_key = keycode, .i_action = 0 };
     const struct hotkey *key;
 
-    key = bsearch (&k, obj->p_libvlc->p_hotkeys, libvlc_actions_count,
+    key = bsearch (&k, obj->p_libvlc->p_hotkeys, ACTIONS_COUNT,
                    sizeof (*key), keycmp);
     return (key != NULL) ? key->i_action : ACTIONID_NONE;
 }
@@ -254,7 +369,7 @@ int vlc_InitActions (libvlc_int_t *libvlc)
     var_Create (libvlc, "key-pressed", VLC_VAR_INTEGER);
     var_Create (libvlc, "key-action", VLC_VAR_INTEGER);
 
-    keys = malloc ((libvlc_actions_count + 1) * sizeof (*keys));
+    keys = malloc ((ACTIONS_COUNT + 1) * sizeof (*keys));
     if (keys == NULL)
     {
         libvlc->p_hotkeys = NULL;
@@ -262,29 +377,29 @@ int vlc_InitActions (libvlc_int_t *libvlc)
     }
 
     /* Initialize from configuration */
-    for (size_t i = 0; i < libvlc_actions_count; i++)
+    for (size_t i = 0; i < ACTIONS_COUNT; i++)
     {
-        char *str = var_InheritString (libvlc, libvlc_actions[i].name);
+        char *str = var_InheritString (libvlc, actions[i].name);
         uint32_t code = str ? vlc_str2keycode (str) : KEY_UNSET;
 
-        keys[i].psz_action = libvlc_actions[i].name;
+        keys[i].psz_action = actions[i].name;
         keys[i].i_key = code;
-        keys[i].i_action = libvlc_actions[i].value;
+        keys[i].i_action = actions[i].value;
 #ifndef NDEBUG
         if (i > 0
-         && strcmp (libvlc_actions[i-1].name, libvlc_actions[i].name) >= 0)
+         && strcmp (actions[i-1].name, actions[i].name) >= 0)
         {
             msg_Err (libvlc, "%s and %s are not ordered properly",
-                     libvlc_actions[i-1].name, libvlc_actions[i].name);
+                     actions[i-1].name, actions[i].name);
             abort ();
         }
 #endif
     }
-    qsort (keys, libvlc_actions_count, sizeof (*keys), keycmp);
+    qsort (keys, ACTIONS_COUNT, sizeof (*keys), keycmp);
 
-    keys[libvlc_actions_count].psz_action = NULL;
-    keys[libvlc_actions_count].i_key = 0;
-    keys[libvlc_actions_count].i_action = 0;
+    keys[ACTIONS_COUNT].psz_action = NULL;
+    keys[ACTIONS_COUNT].i_key = 0;
+    keys[ACTIONS_COUNT].i_action = 0;
 
     libvlc->p_hotkeys = keys;
     var_AddCallback (libvlc, "key-pressed", vlc_key_to_action, NULL);
@@ -314,7 +429,6 @@ vlc_key_t vlc_GetActionId(const char *name)
 {
     const struct action *act;
 
-    act = bsearch(name, libvlc_actions, libvlc_actions_count, sizeof(*act),
-                  actcmp);
+    act = bsearch(name, actions, ACTIONS_COUNT, sizeof(*act), actcmp);
     return (act != NULL) ? act->value : ACTIONID_NONE;
 }

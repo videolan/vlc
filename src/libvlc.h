@@ -28,13 +28,6 @@
 typedef struct variable_t variable_t;
 
 /* Actions (hot keys) */
-typedef struct action
-{
-    char name[24];
-    int  value;
-} action_t;
-extern const struct action libvlc_actions[];
-extern const size_t libvlc_actions_count;
 extern int vlc_InitActions (libvlc_int_t *);
 extern void vlc_DeinitActions (libvlc_int_t *);
 
