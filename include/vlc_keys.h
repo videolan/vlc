@@ -207,7 +207,6 @@ struct hotkey
 {
     const char *psz_action;
     vlc_key_t i_action;
-    uint_fast32_t i_key;
 };
 
 #endif
