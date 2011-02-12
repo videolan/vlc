@@ -50,9 +50,6 @@
 #define OBJECT_FLAGS_QUIET       0x0002
 #define OBJECT_FLAGS_NOINTERACT  0x0004
 
-/* Types */
-typedef void (*vlc_destructor_t)(struct vlc_object_t *);
-
 /*****************************************************************************
  * The vlc_object_t type. Yes, it's that simple :-)
  *****************************************************************************/
@@ -66,7 +63,6 @@ struct vlc_object_t
  * Prototypes
  *****************************************************************************/
 VLC_EXPORT( void *, vlc_object_create, ( vlc_object_t *, size_t ) ) LIBVLC_MALLOC LIBVLC_USED;
-VLC_EXPORT( void, vlc_object_set_destructor, ( vlc_object_t *, vlc_destructor_t ) );
 VLC_EXPORT( void, vlc_object_attach, ( vlc_object_t *, vlc_object_t * ) );
 #if defined (__GNUC__) && !defined __cplusplus
 __attribute__((deprecated))
@@ -86,9 +82,6 @@ VLC_EXPORT( char *, vlc_object_get_name, ( const vlc_object_t * ) ) LIBVLC_USED;
 /**}@*/
 
 #define vlc_object_create(a,b) vlc_object_create( VLC_OBJECT(a), b )
-
-#define vlc_object_set_destructor(a,b) \
-    vlc_object_set_destructor( VLC_OBJECT(a), b )
 
 #define vlc_object_attach(a,b) \
     vlc_object_attach( VLC_OBJECT(a), VLC_OBJECT(b) )

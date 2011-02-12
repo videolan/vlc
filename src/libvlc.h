@@ -129,6 +129,12 @@ vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
 extern int vlc_object_set_name(vlc_object_t *, const char *);
 #define vlc_object_set_name(o, n) vlc_object_set_name(VLC_OBJECT(o), n)
 
+/* Types */
+typedef void (*vlc_destructor_t) (struct vlc_object_t *);
+void vlc_object_set_destructor (vlc_object_t *, vlc_destructor_t);
+#define vlc_object_set_destructor(a,b) \
+        vlc_object_set_destructor (VLC_OBJECT(a), b)
+
 /*
  * To be cleaned-up module stuff:
  */
