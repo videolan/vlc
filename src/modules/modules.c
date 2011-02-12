@@ -68,6 +68,8 @@ int vlc_entry__main( module_t * );
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void AllocateAllPlugins( vlc_object_t *, module_bank_t * );
+static void AllocatePluginPath( vlc_object_t *, module_bank_t *, const char *,
+                                bool );
 static void AllocatePluginDir( vlc_object_t *, module_bank_t *, const char *,
                                unsigned );
 static int  AllocatePluginFile( vlc_object_t *, module_bank_t *, const char *,
@@ -827,111 +829,59 @@ void module_config_free( module_config_t *config )
  * Following functions are local.
  *****************************************************************************/
 
- /*****************************************************************************
- * copy_next_paths_token: from a PATH_SEP_CHAR (a ':' or a ';') separated paths
- * return first path.
- *****************************************************************************/
-static char * copy_next_paths_token( char * paths, char ** remaining_paths )
-{
-    char * path;
-    int i, done;
-    bool escaped = false;
-
-    assert( paths );
-
-    /* Alloc a buffer to store the path */
-    path = malloc( strlen( paths ) + 1 );
-    if( !path ) return NULL;
-
-    /* Look for PATH_SEP_CHAR (a ':' or a ';') */
-    for( i = 0, done = 0 ; paths[i]; i++ )
-    {
-        /* Take care of \\ and \: or \; escapement */
-        if( escaped )
-        {
-            escaped = false;
-            path[done++] = paths[i];
-        }
-#ifdef WIN32
-        else if( paths[i] == '/' )
-            escaped = true;
-#else
-        else if( paths[i] == '\\' )
-            escaped = true;
-#endif
-        else if( paths[i] == PATH_SEP_CHAR )
-            break;
-        else
-            path[done++] = paths[i];
-    }
-    path[done] = 0;
-
-    /* Return the remaining paths */
-    if( remaining_paths ) {
-        *remaining_paths = paths[i] ? &paths[i]+1 : NULL;
-    }
-
-    return path;
-}
-
 char *psz_vlcpath = NULL;
+
+#ifdef HAVE_DYNAMIC_PLUGINS
 
 /*****************************************************************************
  * AllocateAllPlugins: load all plugin modules we can find.
  *****************************************************************************/
-#ifdef HAVE_DYNAMIC_PLUGINS
 static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
 {
     const char *vlcpath = psz_vlcpath;
-    int count,i;
-    char * path;
-    vlc_array_t *arraypaths = vlc_array_new();
+    char *paths;
     const bool b_reset = var_InheritBool( p_this, "reset-plugins-cache" );
 
     /* Contruct the special search path for system that have a relocatable
      * executable. Set it to <vlc path>/plugins. */
     assert( vlcpath );
 
-    if( asprintf( &path, "%s" DIR_SEP "plugins", vlcpath ) != -1 )
-        vlc_array_append( arraypaths, path );
+    if( asprintf( &paths, "%s" DIR_SEP "plugins", vlcpath ) != -1 )
+    {
+        AllocatePluginPath( p_this, p_bank, paths, b_reset );
+        free( paths );
+    }
 
     /* If the user provided a plugin path, we add it to the list */
-    char *userpaths = var_InheritString( p_this, "plugin-path" );
-    char *paths_iter;
+    paths = var_InheritString( p_this, "plugin-path" );
+    if( paths == NULL )
+        return;
 
-    for( paths_iter = userpaths; paths_iter; )
-    {
-        path = copy_next_paths_token( paths_iter, &paths_iter );
-        if( path )
-            vlc_array_append( arraypaths, path );
-    }
+    for( char *buf, *path = strtok_r( paths, PATH_SEP, &buf );
+         path != NULL;
+         path = strtok_r( NULL, PATH_SEP, &buf ) )
+        AllocatePluginPath( p_this, p_bank, path, b_reset );
 
-    count = vlc_array_count( arraypaths );
-    for( i = 0 ; i < count ; i++ )
-    {
-        path = vlc_array_item_at_index( arraypaths, i );
-        if( !path )
-            continue;
+    free( paths );
+}
 
-        size_t offset = p_module_bank->i_cache;
-        if( b_reset )
-            CacheDelete( p_this, path );
-        else
-            CacheLoad( p_this, p_module_bank, path );
+static void AllocatePluginPath( vlc_object_t *p_this, module_bank_t *p_bank,
+                                const char *path, bool b_reset )
+{
+    size_t offset = p_module_bank->i_cache;
 
-        msg_Dbg( p_this, "recursively browsing `%s'", path );
+    if( b_reset )
+        CacheDelete( p_this, path );
+    else
+        CacheLoad( p_this, p_module_bank, path );
 
-        /* Don't go deeper than 5 subdirectories */
-        AllocatePluginDir( p_this, p_bank, path, 5 );
+    msg_Dbg( p_this, "recursively browsing `%s'", path );
 
+    /* Don't go deeper than 5 subdirectories */
+    AllocatePluginDir( p_this, p_bank, path, 5 );
 
-        CacheSave( p_this, path, p_module_bank->pp_cache + offset,
-                   p_module_bank->i_cache - offset );
-        free( path );
-    }
-
-    vlc_array_destroy( arraypaths );
-    free( userpaths );
+    CacheSave( p_this, path, p_module_bank->pp_cache + offset,
+               p_module_bank->i_cache - offset );
 }
 
 /*****************************************************************************
