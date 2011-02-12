@@ -194,8 +194,17 @@ VLC_EXPORT( int, vlc_threadvar_create, (vlc_threadvar_t * , void (*) (void *) ) 
 VLC_EXPORT( void, vlc_threadvar_delete, (vlc_threadvar_t *) );
 VLC_EXPORT( int, vlc_threadvar_set, (vlc_threadvar_t, void *) );
 VLC_EXPORT( void *, vlc_threadvar_get, (vlc_threadvar_t) );
+#if defined (__GNUC__) && !defined __cplusplus
+__attribute__((deprecated))
+#endif
 VLC_EXPORT( int,  vlc_thread_create, ( vlc_object_t *, const char *, int, const char *, void * ( * ) ( vlc_object_t * ), int ) LIBVLC_USED );
+#if defined (__GNUC__) && !defined __cplusplus
+__attribute__((deprecated))
+#endif
 VLC_EXPORT( int,  vlc_thread_set_priority, ( vlc_object_t *, const char *, int, int ) );
+#if defined (__GNUC__) && !defined __cplusplus
+__attribute__((deprecated))
+#endif
 VLC_EXPORT( void, vlc_thread_join,   ( vlc_object_t * ) );
 
 VLC_EXPORT( int, vlc_clone, (vlc_thread_t *, void * (*) (void *), void *, int) LIBVLC_USED );
@@ -393,21 +402,12 @@ static inline void barrier (void)
 #endif
 }
 
-/*****************************************************************************
- * vlc_thread_create: create a thread
- *****************************************************************************/
 #define vlc_thread_create( P_THIS, PSZ_NAME, FUNC, PRIORITY )         \
     vlc_thread_create( VLC_OBJECT(P_THIS), __FILE__, __LINE__, PSZ_NAME, FUNC, PRIORITY )
 
-/*****************************************************************************
- * vlc_thread_set_priority: set the priority of the calling thread
- *****************************************************************************/
 #define vlc_thread_set_priority( P_THIS, PRIORITY )                         \
     vlc_thread_set_priority( VLC_OBJECT(P_THIS), __FILE__, __LINE__, PRIORITY )
 
-/*****************************************************************************
- * vlc_thread_join: wait until a thread exits
- *****************************************************************************/
 #define vlc_thread_join( P_THIS )                                           \
     vlc_thread_join( VLC_OBJECT(P_THIS) )
 
