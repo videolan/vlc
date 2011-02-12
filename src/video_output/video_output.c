@@ -75,7 +75,8 @@ static void VoutDestructor(vlc_object_t *);
 static int VoutValidateFormat(video_format_t *dst,
                               const video_format_t *src)
 {
-    if (src->i_width <= 0 || src->i_height <= 0)
+    if (src->i_width <= 0  || src->i_width  > 8192 ||
+        src->i_height <= 0 || src->i_height > 8192)
         return VLC_EGENERIC;
     if (src->i_sar_num <= 0 || src->i_sar_den <= 0)
         return VLC_EGENERIC;
