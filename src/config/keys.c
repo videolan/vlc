@@ -334,6 +334,11 @@ static int keycmp (const void *a, const void *b)
 #endif
 }
 
+struct vlc_actions
+{
+    struct hotkey keys[0];
+};
+
 /**
  * Get the action ID associated with a VLC key code, if any.
  */
@@ -362,19 +367,17 @@ static int vlc_key_to_action (vlc_object_t *libvlc, const char *varname,
 }
 
 
-int vlc_InitActions (libvlc_int_t *libvlc)
+struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
 {
     struct hotkey *keys;
+    struct vlc_actions *as = malloc (sizeof (*as) + (ACTIONS_COUNT + 1) * sizeof (*keys));
+
+    if (unlikely(as == NULL))
+        return NULL;
+    keys = as->keys;
 
     var_Create (libvlc, "key-pressed", VLC_VAR_INTEGER);
     var_Create (libvlc, "key-action", VLC_VAR_INTEGER);
-
-    keys = malloc ((ACTIONS_COUNT + 1) * sizeof (*keys));
-    if (keys == NULL)
-    {
-        libvlc->p_hotkeys = NULL;
-        return VLC_ENOMEM;
-    }
 
     /* Initialize from configuration */
     for (size_t i = 0; i < ACTIONS_COUNT; i++)
@@ -382,9 +385,9 @@ int vlc_InitActions (libvlc_int_t *libvlc)
         char *str = var_InheritString (libvlc, actions[i].name);
         uint32_t code = str ? vlc_str2keycode (str) : KEY_UNSET;
 
-        keys[i].psz_action = actions[i].name;
-        keys[i].i_key = code;
-        keys[i].i_action = actions[i].value;
+        keys->psz_action = actions[i].name;
+        keys->i_key = code;
+        keys->i_action = actions[i].value;
 #ifndef NDEBUG
         if (i > 0
          && strcmp (actions[i-1].name, actions[i].name) >= 0)
@@ -394,24 +397,27 @@ int vlc_InitActions (libvlc_int_t *libvlc)
             abort ();
         }
 #endif
+        keys++;
     }
-    qsort (keys, ACTIONS_COUNT, sizeof (*keys), keycmp);
+    qsort (as->keys, ACTIONS_COUNT, sizeof (*keys), keycmp);
 
-    keys[ACTIONS_COUNT].psz_action = NULL;
-    keys[ACTIONS_COUNT].i_key = 0;
-    keys[ACTIONS_COUNT].i_action = 0;
+    keys->psz_action = NULL;
+    keys->i_key = 0;
+    keys->i_action = 0;
 
-    libvlc->p_hotkeys = keys;
-    var_AddCallback (libvlc, "key-pressed", vlc_key_to_action, NULL);
+    libvlc->p_hotkeys = as->keys;
+    var_AddCallback (libvlc, "key-pressed", vlc_key_to_action, as);
     return VLC_SUCCESS;
 }
 
-void vlc_DeinitActions (libvlc_int_t *libvlc)
+void vlc_DeinitActions (libvlc_int_t *libvlc, struct vlc_actions *as)
 {
-    if (unlikely(libvlc->p_hotkeys == NULL))
+    if (unlikely(as == NULL))
         return;
-    var_DelCallback (libvlc, "key-pressed", vlc_key_to_action, NULL);
-    free ((void *)libvlc->p_hotkeys);
+
+    var_DelCallback (libvlc, "key-pressed", vlc_key_to_action, as);
+    free (as);
+    libvlc->p_hotkeys = NULL;
 }
 
 

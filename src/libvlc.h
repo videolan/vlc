@@ -28,8 +28,9 @@
 typedef struct variable_t variable_t;
 
 /* Actions (hot keys) */
-extern int vlc_InitActions (libvlc_int_t *);
-extern void vlc_DeinitActions (libvlc_int_t *);
+struct vlc_actions;
+struct vlc_actions *vlc_InitActions (libvlc_int_t *);
+extern void vlc_DeinitActions (libvlc_int_t *, struct vlc_actions *);
 
 size_t vlc_towc (const char *str, uint32_t *restrict pwc);
 
@@ -211,6 +212,7 @@ typedef struct libvlc_priv_t
 #ifdef ENABLE_SOUT
     sap_handler_t     *p_sap; ///< SAP SDP advertiser
 #endif
+    struct vlc_actions *actions; ///< Hotkeys handler
 
     /* Interfaces */
     struct intf_thread_t *p_intf; ///< Interfaces linked-list

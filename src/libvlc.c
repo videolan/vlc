@@ -763,7 +763,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Initialize hotkey handling
      */
-    vlc_InitActions( p_libvlc );
+    priv->actions = vlc_InitActions( p_libvlc );
 
     /* Create a variable for showing the fullscreen interface */
     var_Create( p_libvlc, "intf-show", VLC_VAR_BOOL );
@@ -1054,7 +1054,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     /* Free module bank. It is refcounted, so we call this each time  */
     module_EndBank( p_libvlc, true );
 
-    vlc_DeinitActions( p_libvlc );
+    vlc_DeinitActions( p_libvlc, priv->actions );
 }
 
 /**
