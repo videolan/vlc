@@ -626,17 +626,18 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         current->addSeparator();
 
         ACT_ADDCHECK( current, "fullscreen", qtr( "&Fullscreen" ) );
-        ACT_ADDCHECK( current, "video-on-top", qtr( "Always &On Top" ) );
-        ACT_ADDCHECK( current, "video-wallpaper", qtr( "DirectX Wallpaper" ) );
+        ACT_ADDCHECK( current, "autoscale", qtr( "Always Fit &Window" ) );
+        ACT_ADDCHECK( current, "video-on-top", qtr( "Always &on Top" ) );
 #ifdef WIN32
-        ACT_ADDCHECK( current, "direct3d-desktop", qtr( "Direct3D Desktop mode" ) );
+        ACT_ADDCHECK( current, "direct3d-desktop", qtr( "Display on &Desktop" ) );
 #endif
-        ACT_ADD( current, "video-snapshot", qtr( "Sna&pshot" ) );
-
+        ACT_ADD( current, "video-snapshot", qtr( "Take &Snapshot" ) );
+#ifdef WIN32
+        ACT_ADDCHECK( current, "video-wallpaper", qtr( "Set as Wall&paper" ) );
+#endif
         current->addSeparator();
 
         ACT_ADDMENU( current, "zoom", qtr( "&Zoom" ) );
-        ACT_ADDCHECK( current, "autoscale", qtr( "Sca&le" ) );
         ACT_ADDMENU( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
         ACT_ADDMENU( current, "crop", qtr( "&Crop" ) );
         ACT_ADDMENU( current, "deinterlace", qtr( "&Deinterlace" ) );
