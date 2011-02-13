@@ -201,6 +201,9 @@ vlc_module_begin ()
     set_capability( "interface", 20 )
 
     set_callbacks( Activate, Deactivate )
+#ifdef WIN32
+    add_shortcut( "rc" )
+#endif
 vlc_module_end ()
 
 /*****************************************************************************

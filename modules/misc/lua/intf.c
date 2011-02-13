@@ -71,7 +71,9 @@ static const struct
     const char *psz_name;
 } pp_shortcuts[] = {
     { "luarc", "rc" },
+#ifndef WIN32
     { "rc", "rc" },
+#endif
     { "luahotkeys", "hotkeys" },
     /* { "hotkeys", "hotkeys" }, */
     { "luatelnet", "telnet" },
