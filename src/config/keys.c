@@ -49,60 +49,61 @@ typedef struct key_descriptor_s
 } key_descriptor_t;
 
 static const struct key_descriptor_s vlc_keys[] =
-{
-    { "Unset", KEY_UNSET },
-    { "Backspace", KEY_BACKSPACE },
-    { "Tab", KEY_TAB },
-    { "Enter", KEY_ENTER },
-    { "Esc", KEY_ESC },
-    { "Space", ' ' },
-    { "Left", KEY_LEFT },
-    { "Right", KEY_RIGHT },
-    { "Up", KEY_UP },
-    { "Down", KEY_DOWN },
-    { "F1", KEY_F1 },
-    { "F2", KEY_F2 },
-    { "F3", KEY_F3 },
-    { "F4", KEY_F4 },
-    { "F5", KEY_F5 },
-    { "F6", KEY_F6 },
-    { "F7", KEY_F7 },
-    { "F8", KEY_F8 },
-    { "F9", KEY_F9 },
-    { "F10", KEY_F10 },
-    { "F11", KEY_F11 },
-    { "F12", KEY_F12 },
-    { "Home", KEY_HOME },
-    { "End", KEY_END },
-    { "Insert", KEY_INSERT },
-    { "Delete", KEY_DELETE },
-    { "Menu", KEY_MENU },
-    { "Page Up", KEY_PAGEUP },
-    { "Page Down", KEY_PAGEDOWN },
-    { "Browser Back", KEY_BROWSER_BACK },
-    { "Browser Forward", KEY_BROWSER_FORWARD },
-    { "Browser Refresh", KEY_BROWSER_REFRESH },
-    { "Browser Stop", KEY_BROWSER_STOP },
-    { "Browser Search", KEY_BROWSER_SEARCH },
+{   /* Alphabetical order */
+    { "Backspace",         KEY_BACKSPACE         },
+    { "Browser Back",      KEY_BROWSER_BACK      },
     { "Browser Favorites", KEY_BROWSER_FAVORITES },
-    { "Browser Home", KEY_BROWSER_HOME },
-    { "Volume Mute", KEY_VOLUME_MUTE },
-    { "Volume Down", KEY_VOLUME_DOWN },
-    { "Volume Up", KEY_VOLUME_UP },
-    { "Media Next Track", KEY_MEDIA_NEXT_TRACK },
-    { "Media Prev Track", KEY_MEDIA_PREV_TRACK },
-    { "Media Stop", KEY_MEDIA_STOP },
-    { "Media Play Pause", KEY_MEDIA_PLAY_PAUSE },
-    { "Mouse Wheel Up", KEY_MOUSEWHEELUP },
-    { "Mouse Wheel Down", KEY_MOUSEWHEELDOWN },
-    { "Mouse Wheel Left", KEY_MOUSEWHEELLEFT },
-    { "Mouse Wheel Right", KEY_MOUSEWHEELRIGHT },
+    { "Browser Forward",   KEY_BROWSER_FORWARD   },
+    { "Browser Home",      KEY_BROWSER_HOME      },
+    { "Browser Refresh",   KEY_BROWSER_REFRESH   },
+    { "Browser Search",    KEY_BROWSER_SEARCH    },
+    { "Browser Stop",      KEY_BROWSER_STOP      },
+    { "Delete",            KEY_DELETE            },
+    { "Down",              KEY_DOWN              },
+    { "End",               KEY_END               },
+    { "Enter",             KEY_ENTER             },
+    { "Esc",               KEY_ESC               },
+    { "F1",                KEY_F1                },
+    { "F10",               KEY_F10               },
+    { "F11",               KEY_F11               },
+    { "F12",               KEY_F12               },
+    { "F2",                KEY_F2                },
+    { "F3",                KEY_F3                },
+    { "F4",                KEY_F4                },
+    { "F5",                KEY_F5                },
+    { "F6",                KEY_F6                },
+    { "F7",                KEY_F7                },
+    { "F8",                KEY_F8                },
+    { "F9",                KEY_F9                },
+    { "Home",              KEY_HOME              },
+    { "Insert",            KEY_INSERT            },
+    { "Left",              KEY_LEFT              },
+    { "Media Next Track",  KEY_MEDIA_NEXT_TRACK  },
+    { "Media Play Pause",  KEY_MEDIA_PLAY_PAUSE  },
+    { "Media Prev Track",  KEY_MEDIA_PREV_TRACK  },
+    { "Media Stop",        KEY_MEDIA_STOP        },
+    { "Menu",              KEY_MENU              },
+    { "Mouse Wheel Down",  KEY_MOUSEWHEELDOWN    },
+    { "Mouse Wheel Left",  KEY_MOUSEWHEELLEFT    },
+    { "Mouse Wheel Right", KEY_MOUSEWHEELRIGHT   },
+    { "Mouse Wheel Up",    KEY_MOUSEWHEELUP      },
+    { "Page Down",         KEY_PAGEDOWN          },
+    { "Page Up",           KEY_PAGEUP            },
+    { "Right",             KEY_RIGHT             },
+    { "Space",             ' '                   },
+    { "Tab",               KEY_TAB               },
+    { "Unset",             KEY_UNSET             },
+    { "Up",                KEY_UP                },
+    { "Volume Mute",       KEY_VOLUME_MUTE       },
+    { "Volume Down",       KEY_VOLUME_DOWN       },
+    { "Volume Up",         KEY_VOLUME_UP         },
 };
-enum { vlc_num_keys=sizeof(vlc_keys)/sizeof(struct key_descriptor_s) };
+#define KEYS_COUNT (sizeof(vlc_keys)/sizeof(vlc_keys[0]))
 
-static int cmpkey (const void *key, const void *elem)
+static int keystrcmp (const void *key, const void *elem)
 {
-    return ((uintptr_t)key) - ((key_descriptor_t *)elem)->i_key_code;
+    const char *sa = key, *sb = elem;
+    return strcmp (sa, sb);
 }
 
 /* Convert Unicode code point to UTF-8 */
@@ -153,7 +154,7 @@ static
 uint_fast32_t vlc_str2keycode (const char *name)
 {
     uint_fast32_t mods = 0;
-    uint32_t cp;
+    uint32_t code;
 
     for (;;)
     {
@@ -175,11 +176,17 @@ uint_fast32_t vlc_str2keycode (const char *name)
         name += len + 1;
     }
 
-    for (size_t i = 0; i < vlc_num_keys; i++)
-        if (!strcasecmp( vlc_keys[i].psz_key_string, name))
-            return vlc_keys[i].i_key_code | mods;
+    key_descriptor_t *d = bsearch (name, vlc_keys, KEYS_COUNT,
+                                   sizeof (vlc_keys[0]), keystrcmp);
+    if (d != NULL)
+        code = d->i_key_code;
+    else
+    if (vlc_towc (name, &code) <= 0)
+        code = KEY_UNSET;
 
-    return (vlc_towc (name, &cp) > 0) ? (mods | cp) : KEY_UNSET;
+    if (code != KEY_UNSET)
+        code |= mods;
+    return code;
 }
 
 /**
@@ -189,23 +196,29 @@ uint_fast32_t vlc_str2keycode (const char *name)
  */
 char *vlc_keycode2str (uint_fast32_t code)
 {
+    const char *name;
     char *str, buf[5];
     uintptr_t key = code & ~KEY_MODIFIER;
 
-    key_descriptor_t *d = bsearch ((void *)key, vlc_keys, vlc_num_keys,
-                                   sizeof (vlc_keys[0]), cmpkey);
-    if (d == NULL && utf8_cp (key, buf) == NULL)
-        return NULL;
+    for (size_t i = 0; i < KEYS_COUNT; i++)
+        if (vlc_keys[i].i_key_code == key)
+        {
+            name = vlc_keys[i].psz_key_string;
+            goto found;
+        }
 
+    if (utf8_cp (key, buf) == NULL)
+        return NULL;
+    name = buf;
+
+found:
     if (asprintf (&str, "%s%s%s%s%s%s",
                   (code & KEY_MODIFIER_CTRL) ? "Ctrl+" : "",
                   (code & KEY_MODIFIER_ALT) ? "Alt+" : "",
                   (code & KEY_MODIFIER_SHIFT) ? "Shift+" : "",
                   (code & KEY_MODIFIER_META) ? "Meta+" : "",
-                  (code & KEY_MODIFIER_COMMAND) ? "Command+" : "",
-                  (d != NULL) ? d->psz_key_string : buf) == -1)
+                  (code & KEY_MODIFIER_COMMAND) ? "Command+" : "", name) == -1)
         return NULL;
-
     return str;
 }
 
