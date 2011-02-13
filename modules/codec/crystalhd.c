@@ -88,7 +88,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static picture_t *DecodeBlock   ( decoder_t *p_dec, block_t **pp_block );
-static void crystal_CopyPicture ( picture_t *, BC_DTS_PROC_OUT* );
+// static void crystal_CopyPicture ( picture_t *, BC_DTS_PROC_OUT* );
 static int crystal_insert_sps_pps(decoder_t *, uint8_t *, uint32_t);
 
 /*****************************************************************************
@@ -419,14 +419,28 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     proc_out.PicInfo.width  = p_dec->fmt_out.video.i_width;
     proc_out.PicInfo.height = p_dec->fmt_out.video.i_height;
     proc_out.YbuffSz        = p_dec->fmt_out.video.i_width * p_dec->fmt_out.video.i_height  / 2;
-    proc_out.Ybuff          = malloc( proc_out.YbuffSz  * 4);               // Allocate in bytes
-    proc_out.PoutFlags      = BC_POUT_FLAGS_SIZE;                           //FIXME why?
+    proc_out.PoutFlags      = BC_POUT_FLAGS_SIZE;
 
 #ifdef DEBUG_CRYSTALHD
     msg_Dbg( p_dec, "%i, %i",  p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height );
 #endif
-    if( !proc_out.Ybuff )
-        return NULL;
+
+    if( proc_out.PicInfo.width == 0 || proc_out.PicInfo.height == 0 )
+    {
+        /* decoder_NewPicture would fail in this case */
+        proc_out.Ybuff      = NULL;
+        p_pic               = NULL;
+    }
+    else
+    {
+        /* Direct Rendering */
+        p_pic               = decoder_NewPicture( p_dec );
+        if( !p_pic )
+            return NULL;
+        proc_out.Ybuff      = p_pic->p[0].p_pixels;
+        proc_out.StrideSz   = p_pic->p[0].i_pitch /2 - p_dec->fmt_out.video.i_width;
+        proc_out.PoutFlags |= BC_POUT_FLAGS_STRIDE; /* trust Stride info */
+    }
 
     BC_STATUS sts = BC_FUNC_PSYS(DtsProcOutput)( p_sys->bcm_handle, 128, &proc_out );
 #ifdef DEBUG_CRYSTALHD
@@ -444,17 +458,16 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
-            p_pic = decoder_NewPicture( p_dec );
             if( !p_pic )
                 break;
 
-            crystal_CopyPicture( p_pic, &proc_out );
+            //  crystal_CopyPicture( p_pic, &proc_out );
             p_pic->date = proc_out.PicInfo.timeStamp > 0 ? FROM_BC_PTS(proc_out.PicInfo.timeStamp) : VLC_TS_INVALID;
             //p_pic->date += 100 * 1000;
 #ifdef DEBUG_CRYSTALHD
             msg_Dbg( p_dec, "TS Output is %"PRIu64, p_pic->date);
 #endif
-            free( proc_out.Ybuff );
+            // free( proc_out.Ybuff );
             return p_pic;
 
         case BC_STS_DEC_NOT_OPEN:
@@ -518,10 +531,12 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             msg_Err( p_dec, "Unknown return status. Please report %i", sts );
             break;
     }
-    free( proc_out.Ybuff );
+    if( p_pic )
+        decoder_DeletePicture( p_dec, p_pic );
     return NULL;
 }
 
+#if 0
 /* Copy the data
  * FIXME: this should not exist */
 static void crystal_CopyPicture ( picture_t *p_pic, BC_DTS_PROC_OUT* p_out )
@@ -537,6 +552,7 @@ static void crystal_CopyPicture ( picture_t *p_pic, BC_DTS_PROC_OUT* p_out )
     for( ; p_dst < p_dst_end; p_dst += i_dst_stride, p_src += (p_out->PicInfo.width * 2))
         vlc_memcpy( p_dst, p_src, p_out->PicInfo.width * 2); // Copy in bytes
 }
+#endif
 
 /* Parse the SPS/PPS Metadata to feed the decoder for avc1 */
 static int crystal_insert_sps_pps(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_size)
