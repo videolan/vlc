@@ -457,12 +457,12 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             boxlayout = new QGridLayout();
         }
         /* Only one hotkey control */
-        if( has_hotkey && p_item->i_type & CONFIG_ITEM && p_item->psz_name &&
-                                         strstr( p_item->psz_name, "key-" ) )
-            continue;
-        if( p_item->i_type & CONFIG_ITEM && p_item->psz_name &&
-                                            strstr( p_item->psz_name, "key-" ) )
+        if( (p_item->i_type & CONFIG_ITEM) == CONFIG_ITEM_KEY )
+        {
+            if( has_hotkey )
+                continue;
             has_hotkey = true;
+        }
 
         ConfigControl *control;
         if( ! box )
