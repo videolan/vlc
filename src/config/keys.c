@@ -225,117 +225,117 @@ found:
 
 /*** VLC key map ***/
 
+#define MAXACTION 20
 struct action
 {
-    char name[24];
-    int  value;
+    char name[MAXACTION];
+    vlc_key_t value;
 };
 
 static const struct action actions[] =
 {
     /* *MUST* be sorted (ASCII order) */
-    { "key-aspect-ratio", ACTIONID_ASPECT_RATIO, },
-    { "key-audio-track", ACTIONID_AUDIO_TRACK, },
-    { "key-audiodelay-down", ACTIONID_AUDIODELAY_DOWN, },
-    { "key-audiodelay-up", ACTIONID_AUDIODELAY_UP, },
-    { "key-audiodevice-cycle", ACTIONID_AUDIODEVICE_CYCLE, },
-    { "key-chapter-next", ACTIONID_CHAPTER_NEXT, },
-    { "key-chapter-prev", ACTIONID_CHAPTER_PREV, },
-    { "key-crop", ACTIONID_CROP, },
-    { "key-crop-bottom", ACTIONID_CROP_BOTTOM, },
-    { "key-crop-left", ACTIONID_CROP_LEFT, },
-    { "key-crop-right", ACTIONID_CROP_RIGHT, },
-    { "key-crop-top", ACTIONID_CROP_TOP, },
-    { "key-decr-scalefactor", ACTIONID_SCALE_DOWN, },
-    { "key-deinterlace", ACTIONID_DEINTERLACE, },
-    { "key-disc-menu", ACTIONID_DISC_MENU, },
-    { "key-faster", ACTIONID_FASTER, },
-    { "key-frame-next", ACTIONID_FRAME_NEXT, },
-    { "key-incr-scalefactor", ACTIONID_SCALE_UP, },
-    { "key-intf-hide", ACTIONID_INTF_HIDE, },
-    { "key-intf-show", ACTIONID_INTF_SHOW, },
-    { "key-jump+extrashort", ACTIONID_JUMP_FORWARD_EXTRASHORT, },
-    { "key-jump+long", ACTIONID_JUMP_FORWARD_LONG, },
-    { "key-jump+medium", ACTIONID_JUMP_FORWARD_MEDIUM, },
-    { "key-jump+short", ACTIONID_JUMP_FORWARD_SHORT, },
-    { "key-jump-extrashort", ACTIONID_JUMP_BACKWARD_EXTRASHORT, },
-    { "key-jump-long", ACTIONID_JUMP_BACKWARD_LONG, },
-    { "key-jump-medium", ACTIONID_JUMP_BACKWARD_MEDIUM, },
-    { "key-jump-short", ACTIONID_JUMP_BACKWARD_SHORT, },
-    { "key-leave-fullscreen", ACTIONID_LEAVE_FULLSCREEN, },
-    { "key-loop", ACTIONID_LOOP, },
-    { "key-menu-down", ACTIONID_MENU_DOWN, },
-    { "key-menu-left", ACTIONID_MENU_LEFT, },
-    { "key-menu-off", ACTIONID_MENU_OFF, },
-    { "key-menu-on", ACTIONID_MENU_ON, },
-    { "key-menu-right", ACTIONID_MENU_RIGHT, },
-    { "key-menu-select", ACTIONID_MENU_SELECT, },
-    { "key-menu-up", ACTIONID_MENU_UP, },
-    { "key-nav-activate", ACTIONID_NAV_ACTIVATE, },
-    { "key-nav-down", ACTIONID_NAV_DOWN, },
-    { "key-nav-left", ACTIONID_NAV_LEFT, },
-    { "key-nav-right", ACTIONID_NAV_RIGHT, },
-    { "key-nav-up", ACTIONID_NAV_UP, },
-    { "key-next", ACTIONID_NEXT, },
-    { "key-pause", ACTIONID_PAUSE, },
-    { "key-play", ACTIONID_PLAY, },
-    { "key-play-bookmark1", ACTIONID_PLAY_BOOKMARK1, },
-    { "key-play-bookmark10", ACTIONID_PLAY_BOOKMARK10, },
-    { "key-play-bookmark2", ACTIONID_PLAY_BOOKMARK2, },
-    { "key-play-bookmark3", ACTIONID_PLAY_BOOKMARK3, },
-    { "key-play-bookmark4", ACTIONID_PLAY_BOOKMARK4, },
-    { "key-play-bookmark5", ACTIONID_PLAY_BOOKMARK5, },
-    { "key-play-bookmark6", ACTIONID_PLAY_BOOKMARK6, },
-    { "key-play-bookmark7", ACTIONID_PLAY_BOOKMARK7, },
-    { "key-play-bookmark8", ACTIONID_PLAY_BOOKMARK8, },
-    { "key-play-bookmark9", ACTIONID_PLAY_BOOKMARK9, },
-    { "key-play-pause", ACTIONID_PLAY_PAUSE, },
-    { "key-position", ACTIONID_POSITION, },
-    { "key-prev", ACTIONID_PREV, },
-    { "key-quit", ACTIONID_QUIT, },
-    { "key-random", ACTIONID_RANDOM, },
-    { "key-rate-faster-fine", ACTIONID_RATE_FASTER_FINE, },
-    { "key-rate-normal", ACTIONID_RATE_NORMAL, },
-    { "key-rate-slower-fine", ACTIONID_RATE_SLOWER_FINE, },
-    { "key-record", ACTIONID_RECORD, },
-    { "key-set-bookmark1", ACTIONID_SET_BOOKMARK1, },
-    { "key-set-bookmark10", ACTIONID_SET_BOOKMARK10, },
-    { "key-set-bookmark2", ACTIONID_SET_BOOKMARK2, },
-    { "key-set-bookmark3", ACTIONID_SET_BOOKMARK3, },
-    { "key-set-bookmark4", ACTIONID_SET_BOOKMARK4, },
-    { "key-set-bookmark5", ACTIONID_SET_BOOKMARK5, },
-    { "key-set-bookmark6", ACTIONID_SET_BOOKMARK6, },
-    { "key-set-bookmark7", ACTIONID_SET_BOOKMARK7, },
-    { "key-set-bookmark8", ACTIONID_SET_BOOKMARK8, },
-    { "key-set-bookmark9", ACTIONID_SET_BOOKMARK9, },
-    { "key-slower", ACTIONID_SLOWER, },
-    { "key-snapshot", ACTIONID_SNAPSHOT, },
-    { "key-stop", ACTIONID_STOP, },
-    { "key-subdelay-down", ACTIONID_SUBDELAY_DOWN, },
-    { "key-subdelay-up", ACTIONID_SUBDELAY_UP, },
-    { "key-subpos-down", ACTIONID_SUBPOS_DOWN, },
-    { "key-subpos-up", ACTIONID_SUBPOS_UP, },
-    { "key-subtitle-track", ACTIONID_SUBTITLE_TRACK, },
-    { "key-title-next", ACTIONID_TITLE_NEXT, },
-    { "key-title-prev", ACTIONID_TITLE_PREV, },
-    { "key-toggle-autoscale", ACTIONID_TOGGLE_AUTOSCALE, },
-    { "key-toggle-fullscreen", ACTIONID_TOGGLE_FULLSCREEN, },
-    { "key-uncrop-bottom", ACTIONID_UNCROP_BOTTOM, },
-    { "key-uncrop-left", ACTIONID_UNCROP_LEFT, },
-    { "key-uncrop-right", ACTIONID_UNCROP_RIGHT, },
-    { "key-uncrop-top", ACTIONID_UNCROP_TOP, },
-    { "key-unzoom", ACTIONID_UNZOOM, },
-    { "key-vol-down", ACTIONID_VOL_DOWN, },
-    { "key-vol-mute", ACTIONID_VOL_MUTE, },
-    { "key-vol-up", ACTIONID_VOL_UP, },
-    { "key-wallpaper", ACTIONID_WALLPAPER, },
-    { "key-zoom", ACTIONID_ZOOM, },
-    { "key-zoom-double", ACTIONID_ZOOM_DOUBLE, },
-    { "key-zoom-half", ACTIONID_ZOOM_HALF, },
-    { "key-zoom-original", ACTIONID_ZOOM_ORIGINAL, },
-    { "key-zoom-quarter", ACTIONID_ZOOM_QUARTER, },
+    { "aspect-ratio", ACTIONID_ASPECT_RATIO, },
+    { "audio-track", ACTIONID_AUDIO_TRACK, },
+    { "audiodelay-down", ACTIONID_AUDIODELAY_DOWN, },
+    { "audiodelay-up", ACTIONID_AUDIODELAY_UP, },
+    { "audiodevice-cycle", ACTIONID_AUDIODEVICE_CYCLE, },
+    { "chapter-next", ACTIONID_CHAPTER_NEXT, },
+    { "chapter-prev", ACTIONID_CHAPTER_PREV, },
+    { "crop", ACTIONID_CROP, },
+    { "crop-bottom", ACTIONID_CROP_BOTTOM, },
+    { "crop-left", ACTIONID_CROP_LEFT, },
+    { "crop-right", ACTIONID_CROP_RIGHT, },
+    { "crop-top", ACTIONID_CROP_TOP, },
+    { "decr-scalefactor", ACTIONID_SCALE_DOWN, },
+    { "deinterlace", ACTIONID_DEINTERLACE, },
+    { "disc-menu", ACTIONID_DISC_MENU, },
+    { "faster", ACTIONID_FASTER, },
+    { "frame-next", ACTIONID_FRAME_NEXT, },
+    { "incr-scalefactor", ACTIONID_SCALE_UP, },
+    { "intf-hide", ACTIONID_INTF_HIDE, },
+    { "intf-show", ACTIONID_INTF_SHOW, },
+    { "jump+extrashort", ACTIONID_JUMP_FORWARD_EXTRASHORT, },
+    { "jump+long", ACTIONID_JUMP_FORWARD_LONG, },
+    { "jump+medium", ACTIONID_JUMP_FORWARD_MEDIUM, },
+    { "jump+short", ACTIONID_JUMP_FORWARD_SHORT, },
+    { "jump-extrashort", ACTIONID_JUMP_BACKWARD_EXTRASHORT, },
+    { "jump-long", ACTIONID_JUMP_BACKWARD_LONG, },
+    { "jump-medium", ACTIONID_JUMP_BACKWARD_MEDIUM, },
+    { "jump-short", ACTIONID_JUMP_BACKWARD_SHORT, },
+    { "leave-fullscreen", ACTIONID_LEAVE_FULLSCREEN, },
+    { "loop", ACTIONID_LOOP, },
+    { "menu-down", ACTIONID_MENU_DOWN, },
+    { "menu-left", ACTIONID_MENU_LEFT, },
+    { "menu-off", ACTIONID_MENU_OFF, },
+    { "menu-on", ACTIONID_MENU_ON, },
+    { "menu-right", ACTIONID_MENU_RIGHT, },
+    { "menu-select", ACTIONID_MENU_SELECT, },
+    { "menu-up", ACTIONID_MENU_UP, },
+    { "nav-activate", ACTIONID_NAV_ACTIVATE, },
+    { "nav-down", ACTIONID_NAV_DOWN, },
+    { "nav-left", ACTIONID_NAV_LEFT, },
+    { "nav-right", ACTIONID_NAV_RIGHT, },
+    { "nav-up", ACTIONID_NAV_UP, },
+    { "next", ACTIONID_NEXT, },
+    { "pause", ACTIONID_PAUSE, },
+    { "play", ACTIONID_PLAY, },
+    { "play-bookmark1", ACTIONID_PLAY_BOOKMARK1, },
+    { "play-bookmark10", ACTIONID_PLAY_BOOKMARK10, },
+    { "play-bookmark2", ACTIONID_PLAY_BOOKMARK2, },
+    { "play-bookmark3", ACTIONID_PLAY_BOOKMARK3, },
+    { "play-bookmark4", ACTIONID_PLAY_BOOKMARK4, },
+    { "play-bookmark5", ACTIONID_PLAY_BOOKMARK5, },
+    { "play-bookmark6", ACTIONID_PLAY_BOOKMARK6, },
+    { "play-bookmark7", ACTIONID_PLAY_BOOKMARK7, },
+    { "play-bookmark8", ACTIONID_PLAY_BOOKMARK8, },
+    { "play-bookmark9", ACTIONID_PLAY_BOOKMARK9, },
+    { "play-pause", ACTIONID_PLAY_PAUSE, },
+    { "position", ACTIONID_POSITION, },
+    { "prev", ACTIONID_PREV, },
+    { "quit", ACTIONID_QUIT, },
+    { "random", ACTIONID_RANDOM, },
+    { "rate-faster-fine", ACTIONID_RATE_FASTER_FINE, },
+    { "rate-normal", ACTIONID_RATE_NORMAL, },
+    { "rate-slower-fine", ACTIONID_RATE_SLOWER_FINE, },
+    { "record", ACTIONID_RECORD, },
+    { "set-bookmark1", ACTIONID_SET_BOOKMARK1, },
+    { "set-bookmark10", ACTIONID_SET_BOOKMARK10, },
+    { "set-bookmark2", ACTIONID_SET_BOOKMARK2, },
+    { "set-bookmark3", ACTIONID_SET_BOOKMARK3, },
+    { "set-bookmark4", ACTIONID_SET_BOOKMARK4, },
+    { "set-bookmark5", ACTIONID_SET_BOOKMARK5, },
+    { "set-bookmark6", ACTIONID_SET_BOOKMARK6, },
+    { "set-bookmark7", ACTIONID_SET_BOOKMARK7, },
+    { "set-bookmark8", ACTIONID_SET_BOOKMARK8, },
+    { "set-bookmark9", ACTIONID_SET_BOOKMARK9, },
+    { "slower", ACTIONID_SLOWER, },
+    { "snapshot", ACTIONID_SNAPSHOT, },
+    { "stop", ACTIONID_STOP, },
+    { "subdelay-down", ACTIONID_SUBDELAY_DOWN, },
+    { "subdelay-up", ACTIONID_SUBDELAY_UP, },
+    { "subpos-down", ACTIONID_SUBPOS_DOWN, },
+    { "subpos-up", ACTIONID_SUBPOS_UP, },
+    { "subtitle-track", ACTIONID_SUBTITLE_TRACK, },
+    { "title-next", ACTIONID_TITLE_NEXT, },
+    { "title-prev", ACTIONID_TITLE_PREV, },
+    { "toggle-autoscale", ACTIONID_TOGGLE_AUTOSCALE, },
+    { "toggle-fullscreen", ACTIONID_TOGGLE_FULLSCREEN, },
+    { "uncrop-bottom", ACTIONID_UNCROP_BOTTOM, },
+    { "uncrop-left", ACTIONID_UNCROP_LEFT, },
+    { "uncrop-right", ACTIONID_UNCROP_RIGHT, },
+    { "uncrop-top", ACTIONID_UNCROP_TOP, },
+    { "unzoom", ACTIONID_UNZOOM, },
+    { "vol-down", ACTIONID_VOL_DOWN, },
+    { "vol-mute", ACTIONID_VOL_MUTE, },
+    { "vol-up", ACTIONID_VOL_UP, },
+    { "wallpaper", ACTIONID_WALLPAPER, },
+    { "zoom", ACTIONID_ZOOM, },
+    { "zoom-double", ACTIONID_ZOOM_DOUBLE, },
+    { "zoom-half", ACTIONID_ZOOM_HALF, },
+    { "zoom-original", ACTIONID_ZOOM_ORIGINAL, },
+    { "zoom-quarter", ACTIONID_ZOOM_QUARTER, },
 };
-
 #define ACTIONS_COUNT (sizeof (actions) / sizeof (actions[0]))
 
 struct mapping
@@ -442,7 +442,7 @@ struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
         if (i > 0
          && strcmp (actions[i-1].name, actions[i].name) >= 0)
         {
-            msg_Err (libvlc, "%s and %s are not ordered properly",
+            msg_Err (libvlc, "key-%s and key-%s are not ordered properly",
                      actions[i-1].name, actions[i].name);
             abort ();
         }
@@ -451,9 +451,9 @@ struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
         keys->i_action = actions[i].value;
         keys++;
 
-        char name[32];
+        char name[12 + MAXACTION];
 
-        snprintf (name, sizeof (name), "global-%s", actions[i].name);
+        snprintf (name, sizeof (name), "global-key-%s", actions[i].name);
         vlc_MapAction (obj, &as->map, name + 7, actions[i].value);
         vlc_MapAction (obj, &as->global_map, name, actions[i].value);
     }
@@ -500,6 +500,10 @@ static int actcmp(const void *key, const void *ent)
 vlc_key_t vlc_GetActionId(const char *name)
 {
     const struct action *act;
+
+    if (strncmp (name, "key-", 4))
+        return ACTIONID_NONE;
+    name += 4;
 
     act = bsearch(name, actions, ACTIONS_COUNT, sizeof(*act), actcmp);
     return (act != NULL) ? act->value : ACTIONID_NONE;
