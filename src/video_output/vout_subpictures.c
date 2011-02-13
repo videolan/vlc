@@ -990,6 +990,8 @@ static void SpuRenderRegion( spu_t *p_spu,
         p_dst->i_x       = i_x_offset;
         p_dst->i_y       = i_y_offset;
         p_dst->i_align   = 0;
+        if( p_dst->p_picture )
+            picture_Release( p_dst->p_picture );
         p_dst->p_picture = picture_Hold( p_region_picture );
         int i_fade_alpha = 255;
         if( p_subpic->b_fade )
