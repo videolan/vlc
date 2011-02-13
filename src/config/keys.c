@@ -450,7 +450,7 @@ struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
 
     libvlc->p_hotkeys = as->keys;
     var_AddCallback (libvlc, "key-pressed", vlc_key_to_action, as);
-    return VLC_SUCCESS;
+    return as;
 }
 
 /**
