@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 
+/* Workaround for some versions of libcrystalHD */
 #if !defined(_WIN32) && !defined(__APPLE__)
 #  define __LINUX_USER__
 #endif
@@ -168,6 +169,10 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_sps_pps_size = 0;
     p_sys->p_sps_pps_buf  = NULL;
 
+    /* Win32 code *
+     * We cannot link and ship BCM dll, even with LGPL license (too big)
+     * and if we don't ship it, the plugin would not work depending on the
+     * installation order => DLopen */
 #ifdef USE_DL_OPENING
 #  define DLL_NAME "bcmDIL.dll"
 #  define PATHS_NB 3
@@ -270,7 +275,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         }
     }
 
-    /* Always YUY2 color */
+    /* Always use YUY2 color */
     if( BC_FUNC(DtsSetColorSpace)( p_sys->bcm_handle, OUTPUT_MODE422_YUY2 ) != BC_STS_SUCCESS )
     {
         msg_Err( p_dec, "Couldn't set the color space. Please report this!" );
@@ -557,8 +562,8 @@ static int crystal_insert_sps_pps(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_b
     /* Read infos in first 6 bytes */
     i_profile         = (p_buf[1] << 16) | (p_buf[2] << 8) | p_buf[3];
     p_sys->i_nal_size = (p_buf[4] & 0x03) + 1;
-    p_buf += 5;
-    i_data_size -= 5;
+    p_buf            += 5;
+    i_data_size      -= 5;
 
     for ( unsigned int j = 0; j < 2; j++ )
     {
