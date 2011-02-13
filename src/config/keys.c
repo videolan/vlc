@@ -370,6 +370,7 @@ static int vlc_key_to_action (vlc_object_t *libvlc, const char *varname,
  */
 struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
 {
+    vlc_object_t *obj = VLC_OBJECT(libvlc);
     struct hotkey *keys;
     struct vlc_actions *as = malloc (sizeof (*as) + (ACTIONS_COUNT + 1) * sizeof (*keys));
 
@@ -397,26 +398,36 @@ struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
         keys->i_action = actions[i].value;
         keys++;
 
-        char *str = var_InheritString (libvlc, actions[i].name);
-        uint32_t code = str ? vlc_str2keycode (str) : KEY_UNSET;
-
-        if (code == KEY_UNSET)
+        char *str = var_InheritString (obj, actions[i].name);
+        if (str == NULL)
             continue;
 
-        struct mapping *entry = malloc (sizeof (*entry));
-        if (entry == NULL)
-            continue;
-        entry->key = code;
-        entry->action = actions[i].value;
-
-        struct mapping **pent = tsearch (entry, &as->map, keycmp);
-        if (unlikely(pent == NULL))
-            continue;
-        if (*pent != entry)
+        for (char *buf, *key = strtok_r (str, "\t", &buf);
+             key != NULL;
+             key = strtok_r (NULL, "\t", &buf))
         {
-            free (entry);
-            msg_Warn (libvlc, "Key code \"%s\" bound to multiple actions",
-                      str);
+            uint32_t code = vlc_str2keycode (key);
+
+            if (code == KEY_UNSET)
+            {
+                msg_Warn (obj, "Key \"%s\" unrecognized", key);
+                continue;
+            }
+
+            struct mapping *entry = malloc (sizeof (*entry));
+            if (entry == NULL)
+                continue;
+            entry->key = code;
+            entry->action = actions[i].value;
+
+            struct mapping **pent = tsearch (entry, &as->map, keycmp);
+            if (unlikely(pent == NULL))
+                continue;
+            if (*pent != entry)
+            {
+                free (entry);
+                msg_Warn (obj, "Key \"%s\" bound to multiple actions", key);
+            }
         }
         free (str);
     }
