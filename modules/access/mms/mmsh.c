@@ -107,7 +107,6 @@ int MMSHOpen( access_t *p_access )
         vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
         free( psz_proxy );
     }
-#ifdef HAVE_GETENV
     else
     {
         const char *http_proxy = getenv( "http_proxy" );
@@ -117,7 +116,6 @@ int MMSHOpen( access_t *p_access )
             vlc_UrlParse( &p_sys->proxy, http_proxy, 0 );
         }
     }
-#endif
 
     if( p_sys->b_proxy )
     {

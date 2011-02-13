@@ -465,7 +465,6 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
                           "in registry." );
         }
     }
-#elif defined( HAVE_GETENV )
     else
     {
         psz = getenv( "http_proxy" );
@@ -475,7 +474,6 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
             vlc_UrlParse( &p_sys->proxy, psz, 0 );
         }
     }
-#endif
 
     if( psz ) /* No, this is NOT a use-after-free error */
     {
