@@ -3681,8 +3681,8 @@ PKG_ENABLE_MODULES_VLC([JACK], [jack access_jack], [jack], [JACK audio I/O modul
 dnl
 dnl UPnP Plugin (Intel SDK)
 dnl
-PKG_ENABLE_MODULES_VLC([UPNP], [upnp_intel], [libupnp], [Intel UPnp SDK],[auto])
-VLC_ADD_CXXFLAGS([upnp_intel],[${UPNP_CFLAGS}])
+PKG_ENABLE_MODULES_VLC([UPNP], [upnp], [libupnp], [Intel UPnp SDK],[auto])
+VLC_ADD_CXXFLAGS([upnp],[${UPNP_CFLAGS}])
 
 dnl
 dnl  Interface plugins

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Upnp_intel.hpp :  UPnP discovery module (Intel SDK) header
+ * Upnp.hpp :  UPnP discovery module (libupnp) header
  *****************************************************************************
  * Copyright (C) 2004-2008 the VideoLAN team
  * $Id$

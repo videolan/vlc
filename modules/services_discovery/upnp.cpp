@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Upnp_intel.cpp :  UPnP discovery module (Intel SDK)
+ * Upnp_intel.cpp :  UPnP discovery module (libupnp)
  *****************************************************************************
  * Copyright (C) 2004-2008 the VideoLAN team
  * $Id$
@@ -33,7 +33,7 @@
 # include "config.h"
 #endif
 
-#include "upnp_intel.hpp"
+#include "upnp.hpp"
 
 #include <vlc_plugin.h>
 #include <vlc_services_discovery.h>
