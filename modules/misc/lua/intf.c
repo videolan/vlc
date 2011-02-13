@@ -262,10 +262,20 @@ int Open_LuaIntf( vlc_object_t *p_this )
         else if( !strcmp( psz_name, "telnet" ) )
         {
             char *psz_telnet_host = var_CreateGetString( p_intf, "telnet-host" );
+            vlc_url_t url;
+            vlc_UrlParse( &url, psz_telnet_host, 0 );
             int i_telnet_port = var_CreateGetInteger( p_intf, "telnet-port" );
+            if ( url.i_port != 0 )
+            {
+                if ( i_telnet_port == TELNETPORT_DEFAULT )
+                    i_telnet_port = url.i_port;
+                else if ( url.i_port != i_telnet_port )
+                    msg_Warn( p_intf, "ignoring port %d (using %d)", url.i_port, i_telnet_port );
+            }
+
             char *psz_telnet_passwd = var_CreateGetString( p_intf, "telnet-password" );
 
-            char *psz_esc_host = config_StringEscape( psz_telnet_host );
+            char *psz_esc_host = config_StringEscape( url.psz_host );
             char *psz_esc_passwd = config_StringEscape( psz_telnet_passwd );
 
             asprintf( &psz_config, "telnet={host='%s:%d',password='%s'}", psz_esc_host ? psz_esc_host : "", i_telnet_port, psz_esc_passwd );
@@ -274,6 +284,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
             free( psz_esc_passwd );
             free( psz_telnet_passwd );
             free( psz_telnet_host );
+            vlc_UrlClean( &url );
         }
         else if( !strcmp( psz_name, "rc" ) )
         {

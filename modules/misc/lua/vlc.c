@@ -78,7 +78,6 @@
 #define TELNETPORT_TEXT N_( "Port" )
 #define TELNETPORT_LONGTEXT N_( "This is the TCP port on which this " \
     "interface will listen. It defaults to 4212." )
-#define TELNETPORT_DEFAULT 4212
 #define TELNETPWD_TEXT N_( "Password" )
 #define TELNETPWD_LONGTEXT N_( "A single administration password is used " \
     "to protect this interface. The default value is \"admin\"." )

@@ -50,6 +50,7 @@ int FindArt( vlc_object_t * );
 int Import_LuaPlaylist( vlc_object_t * );
 void Close_LuaPlaylist( vlc_object_t * );
 
+#define TELNETPORT_DEFAULT 4212
 int Open_LuaIntf( vlc_object_t * );
 void Close_LuaIntf( vlc_object_t * );
 
