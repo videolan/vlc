@@ -358,23 +358,61 @@ static int keycmp (const void *a, const void *b)
 struct vlc_actions
 {
     void *map; /* Key map */
+    void *global_map; /* Grabbed/global key map */
     struct hotkey keys[0];
 };
 
-static int vlc_key_to_action (vlc_object_t *libvlc, const char *varname,
+static int vlc_key_to_action (vlc_object_t *obj, const char *varname,
                               vlc_value_t prevkey, vlc_value_t curkey, void *d)
 {
-    const struct vlc_actions *as = d;
+    void *const *map = d;
     const struct mapping **pent;
     uint32_t keycode = curkey.i_int;
 
-    pent = tfind (&keycode, &as->map, keycmp);
+    pent = tfind (&keycode, map, keycmp);
     if (pent == NULL)
         return VLC_SUCCESS;
 
     (void) varname;
     (void) prevkey;
-    return var_SetInteger (libvlc, "key-action", (*pent)->action);
+    return var_SetInteger (obj, "key-action", (*pent)->action);
+}
+
+
+static void vlc_MapAction (vlc_object_t *obj, void **map,
+                           const char *confname, vlc_key_t action)
+{
+    char *keys = var_InheritString (obj, confname);
+    if (keys == NULL)
+        return;
+
+    for (char *buf, *key = strtok_r (keys, "\t", &buf);
+         key != NULL;
+         key = strtok_r (NULL, "\t", &buf))
+    {
+        uint32_t code = vlc_str2keycode (key);
+        if (code == KEY_UNSET)
+        {
+            msg_Warn (obj, "Key \"%s\" unrecognized", key);
+            continue;
+        }
+
+        struct mapping *entry = malloc (sizeof (*entry));
+        if (entry == NULL)
+            continue;
+        entry->key = code;
+        entry->action = action;
+
+        struct mapping **pent = tsearch (entry, map, keycmp);
+        if (unlikely(pent == NULL))
+            continue;
+        if (*pent != entry)
+        {
+            free (entry);
+            msg_Warn (obj, "Key \"%s\" bound to multiple actions", key);
+        }
+    }
+    free (keys);
 }
 
 
@@ -390,10 +428,12 @@ struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
     if (unlikely(as == NULL))
         return NULL;
     as->map = NULL;
+    as->global_map = NULL;
     keys = as->keys;
 
-    var_Create (libvlc, "key-pressed", VLC_VAR_INTEGER);
-    var_Create (libvlc, "key-action", VLC_VAR_INTEGER);
+    var_Create (obj, "key-pressed", VLC_VAR_INTEGER);
+    var_Create (obj, "global-key-pressed", VLC_VAR_INTEGER);
+    var_Create (obj, "key-action", VLC_VAR_INTEGER);
 
     /* Initialize from configuration */
     for (size_t i = 0; i < ACTIONS_COUNT; i++)
@@ -411,45 +451,20 @@ struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
         keys->i_action = actions[i].value;
         keys++;
 
-        char *str = var_InheritString (obj, actions[i].name);
-        if (str == NULL)
-            continue;
+        char name[32];
 
-        for (char *buf, *key = strtok_r (str, "\t", &buf);
-             key != NULL;
-             key = strtok_r (NULL, "\t", &buf))
-        {
-            uint32_t code = vlc_str2keycode (key);
-
-            if (code == KEY_UNSET)
-            {
-                msg_Warn (obj, "Key \"%s\" unrecognized", key);
-                continue;
-            }
-
-            struct mapping *entry = malloc (sizeof (*entry));
-            if (entry == NULL)
-                continue;
-            entry->key = code;
-            entry->action = actions[i].value;
-
-            struct mapping **pent = tsearch (entry, &as->map, keycmp);
-            if (unlikely(pent == NULL))
-                continue;
-            if (*pent != entry)
-            {
-                free (entry);
-                msg_Warn (obj, "Key \"%s\" bound to multiple actions", key);
-            }
-        }
-        free (str);
+        snprintf (name, sizeof (name), "global-%s", actions[i].name);
+        vlc_MapAction (obj, &as->map, name + 7, actions[i].value);
+        vlc_MapAction (obj, &as->global_map, name, actions[i].value);
     }
 
     keys->psz_action = NULL;
     keys->i_action = 0;
 
     libvlc->p_hotkeys = as->keys;
-    var_AddCallback (libvlc, "key-pressed", vlc_key_to_action, as);
+    var_AddCallback (obj, "key-pressed", vlc_key_to_action, &as->map);
+    var_AddCallback (obj, "global-key-pressed", vlc_key_to_action,
+                     &as->global_map);
     return as;
 }
 
@@ -461,7 +476,11 @@ void vlc_DeinitActions (libvlc_int_t *libvlc, struct vlc_actions *as)
     if (unlikely(as == NULL))
         return;
 
-    var_DelCallback (libvlc, "key-pressed", vlc_key_to_action, as);
+    var_DelCallback (libvlc, "global-key-pressed", vlc_key_to_action,
+                     &as->global_map);
+    var_DelCallback (libvlc, "key-pressed", vlc_key_to_action, &as->map);
+
+    tdestroy (as->global_map, free);
     tdestroy (as->map, free);
     free (as);
     libvlc->p_hotkeys = NULL;
