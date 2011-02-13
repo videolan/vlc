@@ -169,12 +169,7 @@ static int Demux( demux_t *p_demux )
             if( !strncasecmp( psz_key, "Ref", sizeof("Ref") -1 ) )
             {
                 if( !strncasecmp( psz_mrl, "http://", sizeof("http://") -1 ) )
-                {
-                    psz_mrl++;
-                    psz_mrl[0] = 'm';
-                    psz_mrl[1] = 'm';
-                    psz_mrl[2] = 's';
-                }
+                    memcpy( psz_mrl, "mmsh", 4 );
             }
         }
         else if( !strncasecmp( psz_key, "title", sizeof("title") -1 ) )
