@@ -27,6 +27,7 @@
 
 int setenv (const char *name, const char *value, int override)
 {
+#ifdef HAVE_GETENV
     if (override == 0 && getenv (name) != NULL)
         return 0;
 
@@ -40,6 +41,9 @@ int setenv (const char *name, const char *value, int override)
     sprintf (var, "%s=%s", name, value);
     /* This leaks memory. This is unavoidable. */
     return putenv (var);
+#else
+    return -1;
+#endif
 }
 
 int unsetenv (const char *name)
