@@ -446,15 +446,15 @@ class KeyShortcutEdit: public QLineEdit
 {
     Q_OBJECT
 public:
-    void setValue( int _value ){ value = _value; }
-    int getValue() const { return value; }
+    void setValue( const QString& value ){ this->value = value; }
+    QString getValue() const { return value; }
 
     void setGlobal( bool _value ) { b_global = _value; }
     bool getGlobal()  const { return b_global; }
 public slots:
-    virtual void clear(void) { value = 0; QLineEdit::clear(); }
+    virtual void clear(void) { value = qfu(""); QLineEdit::clear(); }
 private:
-    int value;
+    QString value;
     bool b_global;
     virtual void mousePressEvent( QMouseEvent *event );
 signals:

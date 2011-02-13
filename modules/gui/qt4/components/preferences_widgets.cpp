@@ -1296,39 +1296,39 @@ void KeySelectorControl::finish()
         module_config_t *p_item = p_config + i;
 
         /* If we are a (non-global) key option not empty */
-        if( ((p_item->i_type & CONFIG_ITEM) == CONFIG_ITEM_KEY) &&
-            p_item->psz_name != NULL &&
-            strncmp( p_item->psz_name , "global-", 7 ) &&
-            !EMPTY_STR( p_item->psz_text ) )
+        if( (p_item->i_type & CONFIG_ITEM) && p_item->psz_name != NULL
+         && !strncmp( p_item->psz_name , "key-", 4 )
+         && !EMPTY_STR( p_item->psz_text ) )
         {
             /*
                Each tree item has:
                 - QString text in column 0
                 - QString name in data of column 0
                 - KeyValue in String in column 1
-                - KeyValue in int64_t in column 1
              */
             QTreeWidgetItem *treeItem = new QTreeWidgetItem();
             treeItem->setText( 0, qtr( p_item->psz_text ) );
             treeItem->setData( 0, Qt::UserRole,
                                QVariant( qfu( p_item->psz_name ) ) );
-            treeItem->setText( 1, VLCKeyToString( p_item->value.i ) );
-            treeItem->setData( 1, Qt::UserRole, QVariant( qlonglong( p_item->value.i ) ) );
+
+            QString keys = qfu( p_item->value.psz );
+            treeItem->setText( 1, keys );
+            treeItem->setData( 1, Qt::UserRole, QVariant( keys ) );
             table->addTopLevelItem( treeItem );
             continue;
         }
 
-        if( p_item->i_type & CONFIG_ITEM && p_item->psz_name
-                && strstr( p_item->psz_name , "global-key" )
-                && !EMPTY_STR( p_item->psz_text ) )
+        if( (p_item->i_type & CONFIG_ITEM) && p_item->psz_name != NULL
+         && !strncmp( p_item->psz_name , "global-key", 10 )
+         && !EMPTY_STR( p_item->psz_text ) )
         {
             QList<QTreeWidgetItem *> list =
                 table->findItems( qtr( p_item->psz_text ), Qt::MatchExactly );
             if( list.count() >= 1 )
             {
-                list[0]->setText( 2, VLCKeyToString( p_item->value.i ) );
-                list[0]->setData( 2, Qt::UserRole,
-                                  QVariant( qlonglong( p_item->value.i ) ) );
+                QString keys = qfu( p_item->value.psz );
+                list[0]->setText( 2, keys );
+                list[0]->setData( 2, Qt::UserRole, keys );
             }
             if( list.count() >= 2 )
                 msg_Dbg( p_this, "This is probably wrong, %s", p_item->psz_text );
@@ -1370,7 +1370,7 @@ void KeySelectorControl::select1Key()
 {
     QTreeWidgetItem *keyItem = table->currentItem();
     shortcutValue->setText( keyItem->text( 1 ) );
-    shortcutValue->setValue( keyItem->data( 1, Qt::UserRole ).toInt() );
+    shortcutValue->setValue( keyItem->data( 1, Qt::UserRole ).toString() );
     shortcutValue->setGlobal( false );
 }
 
@@ -1394,9 +1394,9 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
 
     if( d->result() == QDialog::Accepted )
     {
-        int newValue = d->keyValue;
-        shortcutValue->setText( VLCKeyToString( newValue ) );
-        shortcutValue->setValue( newValue );
+        QString newKey = VLCKeyToString( d->keyValue );
+        shortcutValue->setText( newKey );
+        shortcutValue->setValue( newKey );
         shortcutValue->setGlobal( b_global );
 
         if( d->conflicts )
@@ -1406,10 +1406,11 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
             {
                 it = table->topLevelItem(i);
                 if( ( keyItem != it ) &&
-                    ( it->data( b_global ? 2: 1, Qt::UserRole ).toInt() == newValue ) )
+                    ( it->data( 1 + b_global, Qt::UserRole ).toString() == newKey ) )
                 {
-                    it->setData( b_global ? 2 : 1, Qt::UserRole, QVariant( -1 ) );
-                    it->setText( b_global ? 2 : 1, qtr( "Unset" ) );
+                    it->setData( 1 + b_global, Qt::UserRole,
+                                 QVariant( qfu( "Unset" ) ) );
+                    it->setText( 1 + b_global, qtr( "Unset" ) );
                 }
             }
             /* We already made an OK once. */
@@ -1435,13 +1436,13 @@ void KeySelectorControl::doApply()
     {
         it = table->topLevelItem(i);
         if( it->data( 1, Qt::UserRole ).toInt() >= 0 )
-            config_PutInt( p_this,
+            config_PutPsz( p_this,
                            qtu( it->data( 0, Qt::UserRole ).toString() ),
-                           it->data( 1, Qt::UserRole ).toInt() );
+                           qtu( it->data( 1, Qt::UserRole ).toString() ) );
         if( it->data( 2, Qt::UserRole ).toInt() >= 0 )
-            config_PutInt( p_this,
+            config_PutPsz( p_this,
                            qtu( "global-" + it->data( 0, Qt::UserRole ).toString() ),
-                           it->data( 2, Qt::UserRole ).toInt() );
+                           qtu( it->data( 2, Qt::UserRole ).toString() ) );
 
     }
 }
