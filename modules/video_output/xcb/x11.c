@@ -74,7 +74,6 @@ struct vout_display_sys_t
     uint8_t bpp; /* bits per pixel */
     uint8_t pad; /* scanline pad */
     uint8_t depth; /* useful bits per pixel */
-    uint8_t byte_order; /* server byte order */
 
     picture_pool_t *pool; /* picture pool */
     picture_resource_t resource[MAX_PICTURES];
@@ -126,7 +125,6 @@ static int Open (vlc_object_t *obj)
     }
 
     const xcb_setup_t *setup = xcb_get_setup (p_sys->conn);
-    p_sys->byte_order = setup->image_byte_order;
 
     /* Determine our pixel format */
     xcb_visualid_t vid = 0;
