@@ -317,6 +317,7 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
         DWORD pEbp = pContext->Ebp;
         DWORD caller = *((DWORD*)pEbp + 1);
 
+        unsigned i_line = 0;
         do
         {
             VirtualQuery( (DWORD *)caller, &mbi, sizeof( mbi ) ) ;
@@ -325,8 +326,9 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
             fwprintf( fd, L"%08x|%s\n", caller, module );
             pEbp = *(DWORD*)pEbp ;
             caller = *((DWORD*)pEbp + 1) ;
+            i_line++;
             /*The last EBP points to NULL!*/
-        }while(caller);
+        }while(caller && i_line< 100);
 
         fclose( fd );
         fflush( stderr );
