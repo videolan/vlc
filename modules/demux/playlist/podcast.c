@@ -135,7 +135,7 @@ static int Demux( demux_t *p_demux )
                 {
                     if( !strcmp( node, "enclosure" ) )
                     {
-                        const char **p = NULL;
+                        char **p = NULL;
                         if( !strcmp( attr, "url" ) )
                             p = &psz_item_mrl;
                         else if( !strcmp( attr, "length" ) )
