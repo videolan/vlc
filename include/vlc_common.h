@@ -102,6 +102,12 @@
 #   define unlikely(p) (!!(p))
 #endif
 
+#if defined(__GNUC__) && !defined __cplusplus
+# define LIBVLC_DEPRECATED __attribute__((deprecated))
+#else
+# define LIBVLC_DEPRECATED
+#endif
+
 /*****************************************************************************
  * Basic types definitions
  *****************************************************************************/

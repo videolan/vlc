@@ -194,18 +194,9 @@ VLC_EXPORT( int, vlc_threadvar_create, (vlc_threadvar_t * , void (*) (void *) ) 
 VLC_EXPORT( void, vlc_threadvar_delete, (vlc_threadvar_t *) );
 VLC_EXPORT( int, vlc_threadvar_set, (vlc_threadvar_t, void *) );
 VLC_EXPORT( void *, vlc_threadvar_get, (vlc_threadvar_t) );
-#if defined (__GNUC__) && !defined __cplusplus
-__attribute__((deprecated))
-#endif
-VLC_EXPORT( int,  vlc_thread_create, ( vlc_object_t *, void * ( * ) ( vlc_object_t * ), int ) LIBVLC_USED );
-#if defined (__GNUC__) && !defined __cplusplus
-__attribute__((deprecated))
-#endif
-VLC_EXPORT( int,  vlc_thread_set_priority, ( vlc_object_t *, int ) );
-#if defined (__GNUC__) && !defined __cplusplus
-__attribute__((deprecated))
-#endif
-VLC_EXPORT( void, vlc_thread_join,   ( vlc_object_t * ) );
+VLC_EXPORT( int,  vlc_thread_create, ( vlc_object_t *, void * ( * ) ( vlc_object_t * ), int ) LIBVLC_USED LIBVLC_DEPRECATED );
+VLC_EXPORT( int,  vlc_thread_set_priority, ( vlc_object_t *, int ) LIBVLC_DEPRECATED );
+VLC_EXPORT( void, vlc_thread_join,   ( vlc_object_t * ) LIBVLC_DEPRECATED );
 
 VLC_EXPORT( int, vlc_clone, (vlc_thread_t *, void * (*) (void *), void *, int) LIBVLC_USED );
 VLC_EXPORT( void, vlc_cancel, (vlc_thread_t) );

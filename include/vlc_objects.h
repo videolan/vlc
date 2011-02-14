@@ -64,14 +64,8 @@ struct vlc_object_t
  *****************************************************************************/
 VLC_EXPORT( void *, vlc_object_create, ( vlc_object_t *, size_t ) ) LIBVLC_MALLOC LIBVLC_USED;
 VLC_EXPORT( void, vlc_object_attach, ( vlc_object_t *, vlc_object_t * ) );
-#if defined (__GNUC__) && !defined __cplusplus
-__attribute__((deprecated))
-#endif
-VLC_EXPORT( void *, vlc_object_find, ( vlc_object_t *, int, int ) ) LIBVLC_USED;
-#if defined (__GNUC__) && !defined __cplusplus
-__attribute__((deprecated))
-#endif
-VLC_EXPORT( vlc_object_t *, vlc_object_find_name, ( vlc_object_t *, const char *, int ) ) LIBVLC_USED;
+VLC_EXPORT( void *, vlc_object_find, ( vlc_object_t *, int, int ) ) LIBVLC_USED LIBVLC_DEPRECATED;
+VLC_EXPORT( vlc_object_t *, vlc_object_find_name, ( vlc_object_t *, const char *, int ) ) LIBVLC_USED LIBVLC_DEPRECATED;
 VLC_EXPORT( void *, vlc_object_hold, ( vlc_object_t * ) );
 VLC_EXPORT( void, vlc_object_release, ( vlc_object_t * ) );
 VLC_EXPORT( vlc_list_t *, vlc_list_children, ( vlc_object_t * ) ) LIBVLC_USED;
