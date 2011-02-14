@@ -71,8 +71,6 @@ struct vout_display_sys_t
     xcb_gcontext_t gc; /* context to put images */
     bool shm; /* whether to use MIT-SHM */
     bool visible; /* whether to draw */
-    uint8_t bpp; /* bits per pixel */
-    uint8_t pad; /* scanline pad */
     uint8_t depth; /* useful bits per pixel */
 
     picture_pool_t *pool; /* picture pool */
@@ -205,42 +203,37 @@ static int Open (vlc_object_t *obj)
                 fmt_pic.i_rmask = vt->red_mask;
                 fmt_pic.i_gmask = vt->green_mask;
                 fmt_pic.i_bmask = vt->blue_mask;
+            found_visual:
+                vd->fmt = fmt_pic;
+                vid = vt->visual_id;
+                msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32, vid);
+                p_sys->depth = fmt->depth;
+                msg_Dbg (vd, " %"PRIu8" bits depth", p_sys->depth);
+                msg_Dbg (vd, " %"PRIu8" bits per pixel", fmt->bits_per_pixel);
+                msg_Dbg (vd, " %"PRIu8" bits line pad", fmt->scanline_pad);
+                goto found_format;
+            }
+            vt++;
+        }
+
+        /* Then try Static Gray class */
+        if (fmt->depth != 8)
+            continue;
+        for (int i = xcb_depth_visuals_length (d); i > 0 && !vid; i--)
+        {
+            if (vt->_class == XCB_VISUAL_CLASS_STATIC_GRAY)
+            {
+                fmt_pic.i_chroma = VLC_CODEC_GREY;
                 goto found_visual;
             }
             vt++;
         }
-        /* Then try Static Gray class */
-        if (fmt->depth == 8)
-            for (int i = xcb_depth_visuals_length (d); i > 0 && !vid; i--)
-            {
-                if (vt->_class == XCB_VISUAL_CLASS_STATIC_GRAY)
-                    goto found_grey;
-                vt++;
-            }
-
-        continue; /* Fail: unusable pixel format */
-
-    found_grey:
-       fmt_pic.i_chroma = VLC_CODEC_GREY;
-    found_visual:
-        p_sys->bpp = fmt->bits_per_pixel;
-        p_sys->pad = fmt->scanline_pad;
-        p_sys->depth = fmt->depth;
-        vd->fmt = fmt_pic;
-        vid = vt->visual_id;
     }
 
-    if (!vid)
-    {
-        msg_Err (obj, "no supported pixel format & visual");
-        goto error;
-    }
+    msg_Err (obj, "no supported pixel format & visual");
+    goto error;
 
-    msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32, vid);
-    msg_Dbg (vd, " %"PRIu8" bits depth", p_sys->depth);
-    msg_Dbg (vd, " %"PRIu8" bits per pixel", p_sys->bpp);
-    msg_Dbg (vd, " %"PRIu8" bits line pad", p_sys->pad);
-
+found_format:;
     /* Create colormap (needed to select non-default visual) */
     xcb_colormap_t cmap;
     if (vid != scr->root_visual)
