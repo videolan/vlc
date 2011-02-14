@@ -155,7 +155,7 @@ DAAP_URL=http://craz.net/programs/itunes/files/libopendaap-$(DAAP_VERSION).tar.b
 NPAPI_HEADERS_SVN_URL=http://npapi-headers.googlecode.com/svn/trunk/
 # NPAPI_HEADERS_SVN_REVISION can be a revision number, or just HEAD for the latest
 NPAPI_HEADERS_SVN_REVISION=3
-TWOLAME_VERSION=0.3.12
+TWOLAME_VERSION=0.3.13
 TWOLAME_URL=$(SF)/twolame/twolame-$(TWOLAME_VERSION).tar.gz
 X264_VERSION=20050609
 X264_URL=$(CONTRIB_VIDEOLAN)/x264-$(X264_VERSION).tar.gz
