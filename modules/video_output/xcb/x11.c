@@ -219,6 +219,7 @@ static int Open (vlc_object_t *obj)
         /* Then try Static Gray class */
         if (fmt->depth != 8)
             continue;
+        vt = xcb_depth_visuals (d);
         for (int i = xcb_depth_visuals_length (d); i > 0 && !vid; i--)
         {
             if (vt->_class == XCB_VISUAL_CLASS_STATIC_GRAY)
