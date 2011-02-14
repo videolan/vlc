@@ -76,6 +76,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
 
     QLabel *uriLabel = new QLabel( qtr( "Location:" ) );
     uriLine = new QLineEdit;
+    uriLine->setReadOnly( true );
 
     layout->addWidget( infoTabW, 0, 0, 1, 8 );
     layout->addWidget( uriLabel, 1, 0, 1, 1 );
