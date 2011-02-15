@@ -179,13 +179,14 @@ static int Open (vlc_object_t *obj)
             continue;
         }
 
-        /* VLC pads lines to 16 pixels internally */
-        if ((fmt->bits_per_pixel << 4) % fmt->scanline_pad)
-            continue;
-
         /* Byte sex is a non-issue for 8-bits. It can be worked around with
          * RGB masks for 24-bits. Too bad for 15-bits and 16-bits. */
         if (fmt->bits_per_pixel == 16 && setup->image_byte_order != ORDER)
+            continue;
+
+        /* Make sure the X server is sane */
+        assert (fmt->bits_per_pixel > 0);
+        if (unlikely(fmt->scanline_pad % fmt->bits_per_pixel))
             continue;
 
         /* Check that the selected screen supports this depth */
