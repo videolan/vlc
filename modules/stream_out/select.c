@@ -69,7 +69,7 @@ static sout_stream_id_t *Add   (sout_stream_t *, es_format_t *);
 static int               Del   (sout_stream_t *, sout_stream_id_t *);
 static int               Send  (sout_stream_t *, sout_stream_id_t *, block_t *);
 
-static void* Command(vlc_object_t *);
+static void* Command(void *);
 
 struct sout_stream_id_t
 {
@@ -85,6 +85,8 @@ struct sout_stream_sys_t
     int i_es_num;
 
     vlc_mutex_t es_lock;
+    vlc_thread_t thread;
+
     int i_fd;
     int i_id_disable;
 };
@@ -135,7 +137,7 @@ static int Open(vlc_object_t *p_this)
 
     vlc_mutex_init(&p_sys->es_lock);
 
-    if (vlc_thread_create(p_stream, Command, VLC_THREAD_PRIORITY_LOW))
+    if(vlc_clone(&p_sys->thread, Command, p_stream, VLC_THREAD_PRIORITY_LOW))
     {
         vlc_mutex_destroy(&p_sys->es_lock);
         free(p_sys);
@@ -156,11 +158,12 @@ static void Close (vlc_object_t * p_this)
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
 
+    /* Stop the thread */
+    vlc_cancel(p_sys->thread);
+    vlc_join(p_sys->thread, NULL);
+
+    /* Free the ressources */
     net_Close( p_sys->i_fd );
-    p_sys->i_fd = -1;
-
-    vlc_thread_join(p_stream);
-
     vlc_mutex_destroy(&p_sys->es_lock);
 
     p_stream->p_sout->i_out_pace_nocontrol--;
@@ -171,18 +174,13 @@ static void Close (vlc_object_t * p_this)
 /****************************************************************************
  * Command Thread:
  ****************************************************************************/
-static void* Command(vlc_object_t *p_this)
+static void* Command(void *p_this)
 {
     sout_stream_t *p_stream = (sout_stream_t *)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    int canc = vlc_savecancel();
-
     while (vlc_object_alive(p_stream))
     {
-        if (p_sys->i_fd < 0)
-            break;
-
         char psz_buffer[20];
 
         int i_len = recv(p_sys->i_fd, psz_buffer, sizeof(psz_buffer)-1, 0);
@@ -195,6 +193,7 @@ static void* Command(vlc_object_t *p_this)
         if (strncmp(psz_buffer, "show", 4) == 0)
         {
             vlc_mutex_lock(&p_sys->es_lock);
+            mutex_cleanup_push(&p_sys->es_lock);
             for (int i = 0; i < p_sys->i_es_num; i++)
             {
                 i_len = snprintf(psz_buffer, sizeof(psz_buffer), "%.4s : %d",
@@ -203,7 +202,7 @@ static void* Command(vlc_object_t *p_this)
                 psz_buffer[i_len] = '\0';
                 msg_Info(p_stream, psz_buffer);
             }
-            vlc_mutex_unlock(&p_sys->es_lock);
+            vlc_cleanup_pop();
         }
         else
         {
@@ -226,6 +225,7 @@ static void* Command(vlc_object_t *p_this)
             if (b_apply)
             {
                 vlc_mutex_lock(&p_sys->es_lock);
+                mutex_cleanup_push(&p_sys->es_lock);
                 for (int i = 0; i < p_sys->i_es_num; i++)
                 {
                     msg_Info(p_stream, "elementary stream pid %d",
@@ -236,12 +236,11 @@ static void* Command(vlc_object_t *p_this)
                         msg_Info(p_stream, "%s: %d", b_select ? "enable" : "disable", i_pid);
                     }
                 }
-                vlc_mutex_unlock(&p_sys->es_lock);
+                vlc_cleanup_pop();
             }
         }
     }
 
-    vlc_restorecancel(canc);
     return NULL;
 }
 
