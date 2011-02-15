@@ -90,25 +90,8 @@ Stream output:
  * New langfromtelx module, to change lang of one ES, when streaming, based on
    a telextex page: #langfromtelx{id=12,magazine=7,page=0x99,row=1}:std...
  * New select module, to replace an existing ES with another ES in the same track
-   Here is an VLM example on how to use it (see Mic input):
-      # VLC media player VLM command batch
-      # http://www.videolan.org/vlc/
-    
-      # MPEG-TS stream
-      new ts broadcast enabled
-      setup ts input "file:///<path_to_some_file_to_play>"
-      setup ts output #duplicate{dst=bridge-out{id=1},select=video,dst=bridge-out{id=0xa3},select=audio}
-      setup ts loop
-    
-      # Mic input
-      new mic broadcast enabled
-      setup mic input "alsa://"
-      setup mic output #transcode{acodec=mpga,ab=192,channels=2}:bridge-in{id-offset=0}:select{disable=0}:setid{id=0,newid=0xa3}:autodel:std{access=udp,mux=ts,dst=127.0.0.1:1234}
-    
-      # Fire it up
-      control ts play
-      control mic play
-
+      #duplicate{dst=bridge-out{id=1},select=video,dst=bridge-out{id=0xa3},select=audio}
+      #transcode{...}:bridge-in{id-offset=0}:select{disable=0}:setid{id=0,newid=0xa3}:autodel:std{...}
 
 Services Discovery:
  * Search API to be able to query distant search APIs from the interfaces
