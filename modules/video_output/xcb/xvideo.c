@@ -147,7 +147,7 @@ static vlc_fourcc_t ParseFormat (vout_display_t *vd,
             {
               case 24:
                 if (f->bpp == 32 && f->depth == 32)
-                    return 0; /* ARGB -> VLC cannot do that currently */
+                    return VLC_CODEC_RGBA;
                 if (f->bpp == 32 && f->depth == 24)
                     return VLC_CODEC_RGB32;
                 if (f->bpp == 24 && f->depth == 24)
@@ -161,6 +161,11 @@ static vlc_fourcc_t ParseFormat (vout_display_t *vd,
                 if (f->bpp == 16 && f->depth == 15)
                     return VLC_CODEC_RGB15;
                 break;
+              case 12:
+                if (f->bpp == 16 && f->depth == 16)
+                    return VLC_CODEC_RGBA16;
+                if (f->bpp == 16 && f->depth == 12)
+                    return VLC_CODEC_RGB12;
               case 8:
                 if (f->bpp == 8 && f->depth == 8)
                     return VLC_CODEC_RGB8;
