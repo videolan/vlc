@@ -143,26 +143,26 @@ static vlc_fourcc_t ParseFormat (vout_display_t *vd,
         switch (f->num_planes)
         {
           case 1:
-            switch (f->bpp)
+            switch (popcount (f->red_mask | f->green_mask | f->blue_mask))
             {
-              case 32:
-                if (f->depth == 24)
-                    return VLC_CODEC_RGB32;
-                if (f->depth == 32)
-                    return 0; /* ARGB -> VLC cannot do that currently */
-                break;
               case 24:
-                if (f->depth == 24)
+                if (f->bpp == 32 && f->depth == 32)
+                    return 0; /* ARGB -> VLC cannot do that currently */
+                if (f->bpp == 32 && f->depth == 24)
+                    return VLC_CODEC_RGB32;
+                if (f->bpp == 24 && f->depth == 24)
                     return VLC_CODEC_RGB24;
                 break;
               case 16:
-                if (f->depth == 16)
+                if (f->bpp == 16 && f->depth == 16)
                     return VLC_CODEC_RGB16;
-                if (f->depth == 15)
+                break;
+              case 15:
+                if (f->bpp == 16 && f->depth == 15)
                     return VLC_CODEC_RGB15;
                 break;
               case 8:
-                if (f->depth == 8)
+                if (f->bpp == 8 && f->depth == 8)
                     return VLC_CODEC_RGB8;
                 break;
             }
