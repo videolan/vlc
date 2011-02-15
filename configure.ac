@@ -3693,48 +3693,42 @@ AS_IF([test "${enable_libtar}" != "no"], [
 
 AC_ARG_ENABLE(skins2,
   [AS_HELP_STRING([--enable-skins2],[Skins2 interface module (default
-   enabled except on MacOSX and WinCE)])])
-if test "${enable_skins2}" != "no" ||
-  (test "${SYS}" != "darwin" &&
-   test "${SYS}" != "mingwce" && test "${enable_skins2}" == "yes"); then
-
-  dnl test for the required libraries
-  skins2_missing_lib="no"
-
+   enabled except on MacOSX and WinCE)])],, [
+  AS_IF([test "${SYS}" != "darwin" && test "${SYS}" != "mingwce"], [
+    enable_skins2="yes"
+  ], [
+    enable_skins2="no"
+  ])
+])
+AS_IF([test "${enable_skins2}" = "yes"], [
   dnl freetype
-  if test "${have_freetype}" != "yes"; then
-    skins2_missing_lib="yes"
-    if test "${enable_skins2}" = "yes"; then
-      AC_MSG_ERROR([Could not find freetype (required for skins2)])
-    fi
-  fi
+  AS_IF([test "${have_freetype}" != "yes"], [
+    AC_MSG_ERROR([Could not find FreeType (required for skins2)])
+  ])
 
-  if test "${skins2_missing_lib}" = "no" && (test "${SYS}" = "mingw32"); then
-    VLC_ADD_PLUGIN([skins2])
-    ALIASES="${ALIASES} svlc"
+  AS_IF([test "${SYS}" = "mingw32"], [
     VLC_ADD_CPPFLAGS([skins2],[-U_OFF_T_ -U_off_t -Imodules/gui/skins2 -DWIN32_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
     VLC_ADD_LIBS([skins2],[-loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32  -lmsimg32 -luser32])
 
-  else if test "${skins2_missing_lib}" = "no" && (test "${SYS}" = "darwin"); then
-    VLC_ADD_PLUGIN([skins2])
-    ALIASES="${ALIASES} svlc"
+  ], [test "${SYS}" = "darwin"], [
     VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 -DMACOSX_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
     VLC_ADD_LDFLAGS([skins2],[-Wl,-framework,Carbon])
 
-  else if test "${skins2_missing_lib}" = "no"; then
-    VLC_ADD_PLUGIN([skins2])
-    ALIASES="${ALIASES} svlc"
-    VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 ${X_CFLAGS} -DX11_SKINS])
+  ], [
+    PKG_CHECK_MODULES([XPM], [xpm])
+    PKG_CHECK_MODULES([XEXT], [xext])
+    VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 ${X_CFLAGS} ${XEXT_CFLAGS} {XPM_CFLAGS} -DX11_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
-    VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} -lXext -lXpm -lX11])
+    VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} ${XEXT_LIBS} ${XPM_LIBS} -lX11])
     need_xid_provider="no"
-  fi fi fi
-fi
-AM_CONDITIONAL(BUILD_SKINS, [test "${enable_skins2}" = "yes" ||
-	 (test "${SYS}" != "darwin" &&
-	  test "${SYS}" != "mingwce" && test "${enable_skins2}" != "no")])
+
+  ])
+  VLC_ADD_PLUGIN([skins2])
+  ALIASES="${ALIASES} svlc"
+])
+AM_CONDITIONAL(BUILD_SKINS, [test "${enable_skins2}" = "yes"])
 
 dnl
 dnl Hildon UI
