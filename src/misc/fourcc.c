@@ -662,6 +662,10 @@ static const entry_t p_list_video[] = {
 
     B(VLC_CODEC_RGB8, "8 bits RGB"),
         A("RGB2"),
+    B(VLC_CODEC_RGB15, "12 bits RGB"),
+        A("RV12"),
+    B(VLC_CODEC_RGB15, "16 bits RGBA"),
+        A("AV16"),
     B(VLC_CODEC_RGB15, "15 bits RGB"),
         A("RV15"),
     B(VLC_CODEC_RGB16, "16 bits RGB"),
@@ -672,6 +676,7 @@ static const entry_t p_list_video[] = {
         A("RV32"),
     B(VLC_CODEC_RGBA, "32 bits RGBA"),
         A("RGBA"),
+        A("AV32"),
 
     B(VLC_CODEC_GREY, "8 bits greyscale"),
         A("GREY"),
@@ -1622,7 +1627,8 @@ static const struct
     { { VLC_CODEC_YUV_PACKED, 0 },             PACKED(2) },
     { { VLC_CODEC_RGB8, VLC_CODEC_GREY,
         VLC_CODEC_YUVP, VLC_CODEC_RGBP, 0 },   PACKED(1) },
-    { { VLC_CODEC_RGB16, VLC_CODEC_RGB15, 0 }, PACKED(2) },
+    { { VLC_CODEC_RGB16, VLC_CODEC_RGB15,
+        VLC_CODEC_RGB12, VLC_CODEC_RGBA16, 0 },PACKED(2) },
     { { VLC_CODEC_RGB24, 0 },                  PACKED(3) },
     { { VLC_CODEC_RGB32, VLC_CODEC_RGBA, 0 },  PACKED(4) },
 
@@ -1647,4 +1653,3 @@ const vlc_chroma_description_t *vlc_fourcc_GetChromaDescription( vlc_fourcc_t i_
     }
     return NULL;
 }
-
