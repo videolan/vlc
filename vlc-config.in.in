@@ -213,8 +213,6 @@ while test $# -gt 0; do
       ;;
     pic)
       ;;
-    mozilla)
-      ;;
     *)
       module="$tgt"
       ;;

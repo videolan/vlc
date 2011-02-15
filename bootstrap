@@ -114,7 +114,7 @@ mv -f INSTALL.git INSTALL
 ##
 rm -f vlc-config.in vlc-config
 rm -f src/misc/modules_builtin.h
-rm -f stamp-builtin stamp-h* mozilla/stamp-pic
+rm -f stamp-h*
 
 # Shut up
 set +x
