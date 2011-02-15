@@ -89,6 +89,8 @@ Stream output:
        #setid{id=12,new-id=42}:std...
  * New langfromtelx module, to change lang of one ES, when streaming, based on
    a telextex page: #langfromtelx{id=12,magazine=7,page=0x99,row=1}:std...
+ * New select module, to replace an existing ES with another ES in the same track
+   #duplicate{dst=bridge-out{id=1},select=video,dst=bridge-out{id=0xa3},select=audio}
 
 Services Discovery:
  * Search API to be able to query distant search APIs from the interfaces
