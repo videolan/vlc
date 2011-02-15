@@ -2830,18 +2830,6 @@ if test "${enable_realrtsp}" = "yes"; then
 fi
 
 dnl
-dnl skins2 module
-dnl
-AC_ARG_ENABLE(libtar,
-  [  --enable-libtar         libtar support for skins2 (default enabled)])
-
-AS_IF([test "${enable_libtar}" != "no"],[
-  AC_CHECK_HEADERS(libtar.h, [
-    VLC_ADD_LIBS([skins2],[-ltar])
-  ] )
-])
-
-dnl
 dnl A52/AC3 decoder plugin
 dnl
 AC_ARG_ENABLE(a52,
@@ -3695,6 +3683,14 @@ EXTEND_HELP_STRING([Interface plugins:])
 dnl
 dnl Skins2 module
 dnl
+AC_ARG_ENABLE(libtar,
+  [  --enable-libtar         libtar support for skins2 (default auto)])
+AS_IF([test "${enable_libtar}" != "no"], [
+  AC_CHECK_HEADERS(libtar.h, [
+    VLC_ADD_LIBS([skins2],[-ltar])
+  ])
+])
+
 AC_ARG_ENABLE(skins2,
   [AS_HELP_STRING([--enable-skins2],[Skins2 interface module (default
    enabled except on MacOSX and WinCE)])])
