@@ -625,6 +625,23 @@ static inline unsigned clz (unsigned x)
 /* XXX: this assumes that int is 32-bits or more */
 #define clz32( x ) (clz(x) - ((sizeof(unsigned) - sizeof (uint32_t)) * 8))
 
+/* Bit weight */
+LIBVLC_USED
+static inline unsigned popcount (unsigned x)
+{
+#ifdef __GNUC_
+    return __builtin_popcount (x);
+#else
+    unsigned count = 0;
+    while (x)
+    {
+        count += x & 1;
+        x = x >> 1;
+    }
+    return count;
+#endif
+}
+
 /* Free and set set the variable to NULL */
 #define FREENULL(a) do { free( a ); a = NULL; } while(0)
 
