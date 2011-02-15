@@ -992,7 +992,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     }
 
 #ifdef HAVE_SRTP
-    char *key = var_CreateGetNonEmptyString (p_stream, SOUT_CFG_PREFIX"key");
+    char *key = var_GetNonEmptyString (p_stream, SOUT_CFG_PREFIX"key");
     if (key)
     {
         id->srtp = srtp_create (SRTP_ENCR_AES_CM, SRTP_AUTH_HMAC_SHA1, 10,
@@ -1003,7 +1003,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             goto error;
         }
 
-        char *salt = var_CreateGetNonEmptyString (p_stream, SOUT_CFG_PREFIX"salt");
+        char *salt = var_GetNonEmptyString (p_stream, SOUT_CFG_PREFIX"salt");
         errno = srtp_setkeystring (id->srtp, key, salt ? salt : "");
         free (salt);
         free (key);

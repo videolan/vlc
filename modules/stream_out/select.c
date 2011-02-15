@@ -115,14 +115,14 @@ static int Open(vlc_object_t *p_this)
     config_ChainParse(p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                       p_stream->p_cfg);
 
-    int port = var_CreateGetInteger(p_stream, SOUT_CFG_PREFIX "port");
+    int port = var_GetInteger(p_stream, SOUT_CFG_PREFIX "port");
     p_sys->i_fd = net_ListenUDP1(VLC_OBJECT(p_stream), NULL, port);
     if (p_sys->i_fd < 0)
     {
         free( p_sys );
         return VLC_EGENERIC;
     }
-    p_sys->i_id_disable = var_CreateGetInteger(p_stream, SOUT_CFG_PREFIX "disable");
+    p_sys->i_id_disable = var_GetInteger(p_stream, SOUT_CFG_PREFIX "disable");
 
     p_sys->pp_es = NULL;
     p_sys->i_es_num = 0;
