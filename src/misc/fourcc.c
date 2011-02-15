@@ -662,9 +662,9 @@ static const entry_t p_list_video[] = {
 
     B(VLC_CODEC_RGB8, "8 bits RGB"),
         A("RGB2"),
-    B(VLC_CODEC_RGB15, "12 bits RGB"),
+    B(VLC_CODEC_RGB12, "12 bits RGB"),
         A("RV12"),
-    B(VLC_CODEC_RGB15, "16 bits RGBA"),
+    B(VLC_CODEC_RGBA16, "16 bits RGBA"),
         A("AV16"),
     B(VLC_CODEC_RGB15, "15 bits RGB"),
         A("RV15"),
