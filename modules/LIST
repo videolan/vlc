@@ -135,7 +135,6 @@ $Id$
  * growl: announce currently playing stream to growl
  * growl_udp: growl UDP notification plugin
  * h264: H264 decoder
- * hd1000a: audio output module for the Roku HD1000 Set-Top-Box
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
  * hildon: Maemo interface based on Hildon
  * hotkeys: hotkeys control module

@@ -105,7 +105,7 @@ libVLC:
 Removed modules:
  * asademux: use libass only
  * fake: use the new image demuxers
- * hal, v4l, gapi, omapfb, hd1000v: obsolete unmaintained modules
+ * hal, v4l, gapi, omapfb, hd1000a, hd1000v: obsolete unmaintained modules
  * id3tag: use taglib
  * upnp: use upnp_intel
 

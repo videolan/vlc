@@ -337,7 +337,6 @@ modules/audio_output/audioqueue.c
 modules/audio_output/auhal.c
 modules/audio_output/directx.c
 modules/audio_output/file.c
-modules/audio_output/hd1000a.cpp
 modules/audio_output/jack.c
 modules/audio_output/oss.c
 modules/audio_output/portaudio.c

@@ -3648,22 +3648,6 @@ then
 fi
 
 dnl
-dnl  Roku HD1000 audio
-dnl
-AC_ARG_ENABLE(hd1000a,
-  [  --enable-hd1000a        HD1000 audio module (default enabled on HD1000)])
-if test "${enable_hd1000a}" != "no" -a "${CXX}" != "" &&
-  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
-   test "${enable_hd1000a}" = "yes")
-then
-  AC_LANG_PUSH([C++])
-  AC_CHECK_HEADERS(deschutes/libraries/hdmachinex225/PCMAudioPlayer.h, [
-    VLC_ADD_PLUGIN([hd1000a])
-    AC_CHECK_LIB(HDMachineX225,main,VLC_ADD_LIBS([hd1000a],[-lHDMachineX225]))  ])
-  AC_LANG_POP([C++])
-fi
-
-dnl
 dnl  JACK modules
 dnl
 PKG_ENABLE_MODULES_VLC([JACK], [jack access_jack], [jack], [JACK audio I/O modules],[auto])
