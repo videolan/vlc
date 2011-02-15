@@ -4107,24 +4107,22 @@ AS_IF([test "${enable_gnutls}" != "no"], [
 dnl
 dnl RemoteOSD plugin (VNC client as video filter)
 dnl
-AC_ARG_ENABLE(remoteosd,
-  [  --disable-remoteosd     RemoteOSD plugin (default enabled)])
-
-AS_IF([test "${enable_remoteosd}" != "no"], [
-  AS_IF([test "${have_libgcrypt}" = "yes"],[
-    VLC_ADD_PLUGIN([remoteosd])
-    VLC_ADD_LIBS([remoteosd], ${GCRYPT_LIBS})
-    VLC_ADD_CFLAGS([remoteosd], ${GCRYPT_CFLAGS})
-  ], [
-    AC_MSG_ERROR([libgcrypt support required for RemoteOSD plugin])
-  ])
+AC_MSG_CHECKING([whether to enable the RemoteOSD plugin])
+AS_IF([test "${have_libgcrypt}" = "yes"],[
+  AC_MSG_RESULT(yes)
+  VLC_ADD_PLUGIN([remoteosd])
+  VLC_ADD_LIBS([remoteosd], ${GCRYPT_LIBS})
+  VLC_ADD_CFLAGS([remoteosd], ${GCRYPT_CFLAGS})
+], [
+  AC_MSG_RESULT(no)
+  AC_MSG_WARN([libgcrypt support required for RemoteOSD plugin])
 ])
 
 
 dnl
 dnl RAOP plugin
 dnl
-AC_MSG_CHECKING([whether to enable RAOP plugin])
+AC_MSG_CHECKING([whether to enable the RAOP plugin])
 AS_IF([test "${have_libgcrypt}" = "yes"], [
   AC_MSG_RESULT(yes)
   VLC_ADD_PLUGIN([stream_out_raop])
