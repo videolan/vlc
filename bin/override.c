@@ -109,32 +109,12 @@ static void *getsym (const char *name)
         logbug(&counter, level, __func__, __VA_ARGS__); \
     } while (0)
 
-#ifdef __clang__
-
-#define CALL(func, ...) \
-({ typeof (func) *sym = getsym ( # func); sym (__VA_ARGS__); })
-
-#else
-
 /* Evil non-standard GNU C macro ;)
  *  typeof keyword,
- *  statement-expression,
- *  nested function...
+ *  statement-expression
  */
 #define CALL(func, ...) \
-({ \
-    static typeof (func) *sym = NULL; \
-    static pthread_once_t once = PTHREAD_ONCE_INIT; \
-    auto void getsym_once (void); \
-    void getsym_once (void) \
-    { \
-        sym = getsym ( # func); \
-    } \
-    pthread_once (&once, getsym_once); \
-    sym (__VA_ARGS__); \
-})
-
-#endif
+({ typeof (func) *sym = getsym ( # func); sym (__VA_ARGS__); })
 
 /*** Environment ***
  *
