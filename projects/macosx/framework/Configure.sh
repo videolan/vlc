@@ -84,11 +84,27 @@ for arch in $ARCHS; do
     mkdir -p $arch
     cd $arch
 
+    echo "Running [$arch] configure $this_args"
     if test $arch = "x86_64"; then
-        this_args="--build=x86_64-apple-darwin10 $this_args"
+        export CFLAGS="-m64 -arch x86_64"
+        export CXXFLAGS="-m64 -arch x86_64"
+        export OBJCFLAGS="-m64 -arch x86_64"
+        export CPPFLAGS="-m64 -arch x86_64"
+        $top_srcdir/configure --build=x86_64-apple-darwin10 $this_args
     fi
-
-    echo "Running[$arch] configure $this_args"
-    $top_srcdir/configure $this_args
+    if test $arch = "i386"; then
+        export CFLAGS="-m32 -arch i686"
+        export CXXFLAGS="-m32 -arch i686"
+        export OBJCFLAGS="-m32 -arch i686"
+        export CPPFLAGS="-m32 -arch i686"
+        $top_srcdir/configure --build=i686-apple-darwin10 $this_args
+    fi
+    if test $arch = "ppc"; then
+        export CFLAGS="-m32 -arch ppc"
+        export CXXFLAGS="-m32 -arch ppc"
+        export OBJCFLAGS="-m32 -arch ppc"
+        export CPPFLAGS="-m32 -arch ppc"
+        $top_srcdir/configure --build=powerpc-apple-darwin9 $this_args
+    fi
     cd ..
 done
