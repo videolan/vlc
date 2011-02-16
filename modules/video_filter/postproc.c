@@ -59,9 +59,10 @@ static int PPNameCallback( vlc_object_t *, char const *,
 
 #define Q_TEXT N_("Post processing quality")
 #define Q_LONGTEXT N_( \
-    "Quality of post processing. Valid range is 0 to 6\n" \
-    "Higher levels require considerable more CPU power, but produce " \
-    "better looking pictures." )
+    "Quality of post processing. Valid range is 0 (disabled) to 6 (highest)\n"     \
+    "Higher levels require more CPU power, but produce higher quality pictures.\n" \
+    "With default filter chain, the values map to the following filters:\n"        \
+    "1: hb, 2-4: hb+vb, 5-6: hb+vb+dr" )
 
 #define NAME_TEXT N_("FFmpeg post processing filter chains")
 #define NAME_LONGTEXT NAME_TEXT
