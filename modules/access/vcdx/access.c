@@ -361,9 +361,9 @@ VCDEntryPoints( access_t * p_access )
                              - vcdinfo_get_track_lsn(p_vcdplayer->vcd,i_track))
                              * M2F2_SECTOR_SIZE;
     
-            dbg_print( INPUT_DBG_MRL, "%s, lsn %d,  byte_offset %ld",
+            dbg_print( INPUT_DBG_MRL, "%s, lsn %d,  byte_offset %"PRId64""
                        s->psz_name, p_vcdplayer->p_entries[i],
-                       (unsigned long int) s->i_byte_offset);
+                       s->i_byte_offset);
             TAB_APPEND( p_vcdplayer->p_title[i_track-1]->i_seekpoint,
                         p_vcdplayer->p_title[i_track-1]->seekpoint, s );
 
