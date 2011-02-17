@@ -52,7 +52,7 @@ vlc_module_begin ()
     set_description (N_("GLX video output (XCB)"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout display", 50)
+    set_capability ("vout display", 150)
     set_callbacks (Open, Close)
 
     add_shortcut ("xcb-glx", "glx", "opengl", "xid")

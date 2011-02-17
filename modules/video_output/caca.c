@@ -48,7 +48,7 @@ vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_description(N_("Color ASCII art video output"))
-    set_capability("vout display", 12)
+    set_capability("vout display", 15)
     set_callbacks(Open, Close)
 vlc_module_end()
 

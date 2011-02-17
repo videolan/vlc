@@ -63,7 +63,7 @@ vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_description(N_("Simple DirectMedia Layer video output"))
-    set_capability("vout display", 60)
+    set_capability("vout display", 70)
     add_shortcut("sdl")
     add_string("sdl-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
     add_obsolete_string("sdl-video-driver") /* obsolete since 1.1.0 */

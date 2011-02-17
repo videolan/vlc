@@ -56,11 +56,11 @@ vlc_module_begin ()
 #ifdef MODULE_NAME_IS_wingapi
     set_shortname("GAPI")
     set_description(N_("Windows GAPI video output"))
-    set_capability("vout display", 20)
+    set_capability("vout display", 120)
 #else
     set_shortname("GDI")
     set_description(N_("Windows GDI video output"))
-    set_capability("vout display", 10)
+    set_capability("vout display", 110)
 #endif
     set_callbacks(Open, Close)
 vlc_module_end ()

@@ -69,13 +69,13 @@ vlc_module_begin ()
 
     add_bool("direct3d-desktop", false, DESKTOP_TEXT, DESKTOP_LONGTEXT, true)
 
-    set_capability("vout display", 150)
+    set_capability("vout display", 240)
     add_shortcut("direct3d")
     set_callbacks(OpenVideoVista, Close)
 
     add_submodule()
         set_description(N_("Direct3D video output (XP)"))
-        set_capability("vout display", 70)
+        set_capability("vout display", 220)
         add_shortcut("direct3d_xp")
         set_callbacks(OpenVideoXP, Close)
 

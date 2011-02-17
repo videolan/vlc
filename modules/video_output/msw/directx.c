@@ -108,7 +108,7 @@ vlc_module_begin()
         change_string_list(device, device_text, FindDevicesCallback)
         change_action_add(FindDevicesCallback, N_("Refresh list"))
 
-    set_capability("vout display", 100)
+    set_capability("vout display", 230)
     add_shortcut("directx")
     set_callbacks(Open, Close)
 vlc_module_end()
