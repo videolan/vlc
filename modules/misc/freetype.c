@@ -1095,7 +1095,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 #if defined(HAVE_FRIBIDI)
     {
         uint32_t *p_fribidi_string;
-        int32_t start_pos;
+        size_t start_pos;
         size_t pos = 0;
 
         p_fribidi_string = malloc( (i_string_length + 1) * sizeof(uint32_t) );
