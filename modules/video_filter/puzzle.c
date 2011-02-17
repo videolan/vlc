@@ -442,7 +442,7 @@ static void Shuffle( filter_sys_t *p_sys )
     {
         for( unsigned i = 0; i < i_count; i++ )
         {
-            if( p_sys->pi_order[i] == i_count - 1 )
+            if( p_sys->pi_order[i] == (int)i_count - 1 )
             {
                 p_sys->i_selected = i;
                 break;
@@ -454,4 +454,3 @@ static void Shuffle( filter_sys_t *p_sys )
         p_sys->i_selected = -1;
     }
 }
-
