@@ -33,7 +33,7 @@
 #include "../libvlc.h"
 #include <vlc_charset.h>
 #include <vlc_configuration.h>
-#include "configuration.h"
+#include "config/configuration.h"
 
 static char *configdir = NULL;
 
