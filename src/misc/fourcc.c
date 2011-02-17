@@ -70,8 +70,9 @@ static const entry_t p_list_video[] = {
         E("PIM1", "Pinnacle DC1000 (MPEG-1 Video)"),
 
         E("hdv1", "HDV 720p30 (MPEG-2 Video)"),
-        E("hdv2", "Sony HDV (MPEG-2 Video)"),
-        E("hdv3", "FCP HDV (MPEG-2 Video)"),
+        E("hdv2", "Sony HDV 1080i60 (MPEG-2 Video)"),
+        E("hdv3", "FCP HDV 1080i50 (MPEG-2 Video)"),
+        E("hdv4", "HDV 720p24 (MPEG-2 Video)"),
         E("hdv5", "HDV 720p25 (MPEG-2 Video)"),
         E("hdv6", "HDV 1080p24 (MPEG-2 Video)"),
         E("hdv7", "HDV 1080p25 (MPEG-2 Video)"),
