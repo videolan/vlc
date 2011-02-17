@@ -75,8 +75,6 @@ src/config/chain.c
 src/config/cmdline.c
 src/config/configuration.h
 src/config/core.c
-src/config/dirs_macos.c
-src/config/dirs_xdg.c
 src/config/file.c
 src/config/intf.c
 src/control/audio.c
@@ -127,17 +125,14 @@ src/libvlc.h
 src/libvlc-module.c
 src/misc/block.c
 src/misc/cpu.c
-src/misc/darwin_specific.c
 src/misc/error.c
 src/misc/es_format.c
 src/misc/events.c
 src/misc/filter_chain.c
 src/misc/image.c
-src/misc/linux_specific.c
 src/misc/md5.c
 src/misc/messages.c
 src/misc/mtime.c
-src/misc/not_specific.c
 src/misc/objects.c
 src/misc/rand.c
 src/misc/stats.c
