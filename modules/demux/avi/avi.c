@@ -206,7 +206,7 @@ static int AVI_PacketSearch   ( demux_t * );
 static void AVI_IndexLoad    ( demux_t * );
 static void AVI_IndexCreate  ( demux_t * );
 
-static void AVI_ExtractSubtitle( demux_t *, int i_stream, avi_chunk_list_t *, avi_chunk_STRING_t * );
+static void AVI_ExtractSubtitle( demux_t *, unsigned int i_stream, avi_chunk_list_t *, avi_chunk_STRING_t * );
 
 static mtime_t  AVI_MovieGetLength( demux_t * );
 
@@ -432,7 +432,7 @@ static int Open( vlc_object_t * p_this )
                 msg_Dbg( p_demux,
                     "stream[%d] audio(0x%x) %d channels %dHz %dbits",
                     i, p_auds->p_wf->wFormatTag, p_auds->p_wf->nChannels,
-                    p_auds->p_wf->nSamplesPerSec, 
+                    p_auds->p_wf->nSamplesPerSec,
                     p_auds->p_wf->wBitsPerSample );
 
                 fmt.i_extra = __MIN( p_auds->p_wf->cbSize,
@@ -2508,7 +2508,7 @@ static void AVI_MetaLoad( demux_t *p_demux,
  * Subtitles
  *****************************************************************************/
 static void AVI_ExtractSubtitle( demux_t *p_demux,
-                                 int i_stream,
+                                 unsigned int i_stream,
                                  avi_chunk_list_t *p_strl,
                                  avi_chunk_STRING_t *p_strn )
 {
