@@ -309,8 +309,8 @@ static int Control(vout_display_t *vd, int query, va_list args)
         caca_refresh_display(sys->dp);
 
         /* Not quite good but not sure how to resize it */
-        if (cfg->display.width  != caca_get_display_width(sys->dp) ||
-            cfg->display.height != caca_get_display_height(sys->dp))
+        if ((int)cfg->display.width  != caca_get_display_width(sys->dp) ||
+            (int)cfg->display.height != caca_get_display_height(sys->dp))
             return VLC_EGENERIC;
         return VLC_SUCCESS;
     }
