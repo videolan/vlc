@@ -389,7 +389,8 @@ static block_t *Block( access_t *p_access )
 
         if( t->i_seekpoint > 0 &&
             p_access->info.i_seekpoint + 1 < t->i_seekpoint &&
-            p_access->info.i_pos + i_read * VCD_DATA_SIZE >=
+            (int64_t) /* Unlikely to go over 8192 PetaB */
+                (p_access->info.i_pos + i_read * VCD_DATA_SIZE) >=
             t->seekpoint[p_access->info.i_seekpoint+1]->i_byte_offset )
         {
             msg_Dbg( p_access, "seekpoint change" );
@@ -423,7 +424,8 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     for( i_seekpoint = 0; i_seekpoint < t->i_seekpoint; i_seekpoint++ )
     {
         if( i_seekpoint + 1 >= t->i_seekpoint ) break;
-        if( i_pos < t->seekpoint[i_seekpoint + 1]->i_byte_offset ) break;
+        if( 0 < t->seekpoint[i_seekpoint + 1]->i_byte_offset &&
+            i_pos < (uint64_t)t->seekpoint[i_seekpoint + 1]->i_byte_offset ) break;
     }
 
     if( i_seekpoint != p_access->info.i_seekpoint )
