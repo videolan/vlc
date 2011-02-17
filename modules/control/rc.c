@@ -1925,7 +1925,7 @@ static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
 }
 
 #ifdef WIN32
-bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
+static bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
 {
     INPUT_RECORD input_record;
     DWORD i_dw;
