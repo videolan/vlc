@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dirs_xdg.c: XDG directories configuration
+ * dirs.c: XDG directories configuration
  *****************************************************************************
  * Copyright (C) 2001-2007 the VideoLAN team
  * Copyright © 2007-2009 Rémi Denis-Courmont

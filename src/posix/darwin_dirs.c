@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dirs_macos.c: Mac OS X directories configuration
+ * darwin_dirs.c: Mac OS X directories configuration
  *****************************************************************************
  * Copyright (C) 2001-2009 the VideoLAN team
  * Copyright © 2007-2009 Rémi Denis-Courmont

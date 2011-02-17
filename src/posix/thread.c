@@ -1,5 +1,5 @@
 /*****************************************************************************
- * pthread.c : pthread back-end for LibVLC
+ * thread.c : pthread back-end for LibVLC
  *****************************************************************************
  * Copyright (C) 1999-2009 the VideoLAN team
  *

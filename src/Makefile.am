@@ -275,27 +275,27 @@ endif
 endif
 
 SOURCES_libvlc_darwin = \
-	config/dirs_macos.c \
+	config/darwin_dirs.c \
 	misc/atomic.c \
-	misc/filesystem.c \
-	misc/pthread.c \
-	misc/darwin_specific.c \
+	posix/filesystem.c \
+	posix/thread.c \
+	posix/darwin_specific.c \
 	$(NULL)
 
 SOURCES_libvlc_linux = \
-	config/dirs_xdg.c \
+	posix/dirs.c \
 	misc/atomic.c \
-	misc/filesystem.c \
-	misc/pthread.c \
-	misc/linux_specific.c \
+	posix/filesystem.c \
+	posix/thread.c \
+	posix/linux_specific.c \
 	$(NULL)
 
 SOURCES_libvlc_win32 = \
 	win32/dirs.c \
-	win32/specific.c \
 	win32/atomic.c \
 	win32/filesystem.c \
 	win32/thread.c \
+	win32/specific.c \
 	win32/winsock.c \
 	$(NULL)
 
@@ -306,11 +306,12 @@ SOURCES_libvlc_symbian = \
 	$(NULL)
 
 SOURCES_libvlc_other = \
-	config/dirs_xdg.c \
+	posix/dirs.c \
 	misc/atomic.c \
-	misc/filesystem.c \
-	misc/pthread.c \
-	misc/not_specific.c
+	posix/filesystem.c \
+	posix/thread.c \
+	posix/specific.c \
+	$(NULL)
 
 SOURCES_libvlc_common = \
 	libvlc.c \

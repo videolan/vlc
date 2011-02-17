@@ -1,5 +1,5 @@
 /*****************************************************************************
- * not_specific.c: stubs for OS-specific initialization
+ * specific.c: stubs for POSIX OS-specific initialization
  *****************************************************************************
  * Copyright © 2008 Rémi Denis-Courmont
  *
