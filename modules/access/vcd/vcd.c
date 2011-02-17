@@ -331,7 +331,6 @@ static block_t *Block( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
     int i_blocks = VCD_BLOCKS_ONCE;
     block_t *p_block;
-    int i_read;
 
     /* Check end of file */
     if( p_access->info.b_eof ) return NULL;
@@ -349,8 +348,7 @@ static block_t *Block( access_t *p_access )
             INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT | INPUT_UPDATE_SIZE;
         p_access->info.i_title++;
         p_access->info.i_seekpoint = 0;
-        p_access->info.i_size =
-            p_sys->title[p_access->info.i_title]->i_size;
+        p_access->info.i_size = p_sys->title[p_access->info.i_title]->i_size;
         p_access->info.i_pos = 0;
     }
 
@@ -358,12 +356,11 @@ static block_t *Block( access_t *p_access )
     if( p_sys->i_sector + i_blocks >=
         p_sys->p_sectors[p_access->info.i_title + 2] )
     {
-        i_blocks = p_sys->p_sectors[p_access->info.i_title + 2 ] -
-                   p_sys->i_sector;
+        i_blocks = p_sys->p_sectors[p_access->info.i_title + 2 ] - p_sys->i_sector;
     }
 
     /* Do the actual reading */
-    if( !( p_block = block_New( p_access, i_blocks * VCD_DATA_SIZE ) ) )
+    if( i_blocks < 0 || !( p_block = block_New( p_access, i_blocks * VCD_DATA_SIZE ) ) )
     {
         msg_Err( p_access, "cannot get a new block of size: %i",
                  i_blocks * VCD_DATA_SIZE );
@@ -383,7 +380,7 @@ static block_t *Block( access_t *p_access )
     }
 
     /* Update seekpoints */
-    for( i_read = 0; i_read < i_blocks; i_read++ )
+    for( int i_read = 0; i_read < i_blocks; i_read++ )
     {
         input_title_t *t = p_sys->title[p_access->info.i_title];
 
