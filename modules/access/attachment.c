@@ -117,7 +117,7 @@ static ssize_t Read(access_t *access, uint8_t *buffer, size_t size)
 {
     access_sys_t *sys = access->p_sys;
 
-    access->info.b_eof = access->info.i_pos >= sys->a->i_data;
+    access->info.b_eof = access->info.i_pos >= (uint64_t)sys->a->i_data;
     if (access->info.b_eof)
         return 0;
 
