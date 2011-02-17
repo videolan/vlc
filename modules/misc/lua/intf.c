@@ -127,6 +127,58 @@ static char *GetModuleName( intf_thread_t *p_intf )
     return var_CreateGetString( p_intf, "lua-intf" );
 }
 
+static char *StripPasswords( const char *psz_config )
+{
+    unsigned n = 0;
+    const char *p = psz_config;
+    while ((p = strstr(p, "password=")) != NULL)
+    {
+        n++;
+        p++;
+    }
+    if (n == 0)
+        return strdup(psz_config);
+ 
+    char *psz_log = malloc(strlen(psz_config) + n * strlen("******") + 1);
+    if (psz_log == NULL)
+        return NULL;
+    psz_log[0] = '\0';
+
+    for (p = psz_config; ; )
+    {
+        const char *pwd = strstr(p, "password=");
+        if (pwd == NULL)
+        {
+            /* Copy the last, ending bit */
+            strcat(psz_log, p);
+            break;
+        }
+        pwd += strlen("password=");
+
+        char delim[3] = ",}";
+        if (*pwd == '\'' || *pwd == '"')
+        {
+            delim[0] = *pwd++;
+            delim[1] = '\0';
+        }
+
+        strncat(psz_log, p, pwd - p);
+        strcat(psz_log, "******");
+
+        /* Advance to the delimiter at the end of the password */
+        p = pwd - 1;
+        do
+        {
+            p = strpbrk(p + 1, delim);
+            if (p == NULL)
+                /* Oops, unbalanced quotes or brackets */
+                return psz_log;
+        }
+        while (*(p - 1) == '\\');
+    }
+    return psz_log;
+}
+
 static const luaL_Reg p_reg[] = { { NULL, NULL } };
 
 int Open_LuaIntf( vlc_object_t *p_this )
@@ -314,7 +366,13 @@ int Open_LuaIntf( vlc_object_t *p_this )
         char *psz_buffer;
         if( asprintf( &psz_buffer, "config={%s}", psz_config ) != -1 )
         {
-            msg_Dbg( p_intf, "Setting config variable: %s", psz_buffer );
+            char *psz_log = StripPasswords( psz_buffer );
+            if( psz_log != NULL )
+            {
+                msg_Dbg( p_intf, "Setting config variable: %s", psz_log );
+                free( psz_log );
+            }
+
             if( luaL_dostring( L, psz_buffer ) == 1 )
                 msg_Err( p_intf, "Error while parsing \"lua-config\"." );
             free( psz_buffer );
