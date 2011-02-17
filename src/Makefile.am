@@ -275,7 +275,7 @@ endif
 endif
 
 SOURCES_libvlc_darwin = \
-	config/darwin_dirs.c \
+	posix/darwin_dirs.c \
 	misc/atomic.c \
 	posix/filesystem.c \
 	posix/thread.c \
