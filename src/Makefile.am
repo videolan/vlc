@@ -71,6 +71,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_fourcc.h \
 	../include/vlc_fs.h \
 	../include/vlc_gcrypt.h \
+	../include/vlc_opengl.h \
 	../include/vlc_http.h \
 	../include/vlc_httpd.h \
 	../include/vlc_image.h \
@@ -393,6 +394,7 @@ SOURCES_libvlc_common = \
 	video_output/video_widgets.c \
 	video_output/vout_subpictures.c \
 	video_output/window.c \
+	video_output/opengl.c \
 	video_output/vout_intf.c \
 	video_output/vout_internal.h \
 	video_output/vout_control.h \

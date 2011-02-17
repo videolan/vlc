@@ -627,6 +627,8 @@ vlc_epg_Delete
 vlc_epg_AddEvent
 vlc_epg_SetCurrent
 vlc_epg_Merge
+vlc_gl_Create
+vlc_gl_Destroy
 vlm_Control
 vlm_Delete
 vlm_ExecuteCommand
