@@ -1450,7 +1450,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
                 p_access->info.i_pos = i_ntell;
                 p_sys->i_icy_offset  = i_ntell;
                 p_sys->i_remaining = i_nend+1-i_ntell;
-                int64_t i_size = (i_nsize > i_nend) ? i_nsize : (i_nend + 1);
+                uint64_t i_size = (i_nsize > i_nend) ? i_nsize : (i_nend + 1);
                 if(i_size > p_access->info.i_size) {
                     p_sys->b_has_size = true;
                     p_access->info.i_size = i_size;
