@@ -77,6 +77,7 @@ static const entry_t p_list_video[] = {
         E("hdv6", "HDV 1080p24 (MPEG-2 Video)"),
         E("hdv7", "HDV 1080p25 (MPEG-2 Video)"),
         E("hdv8", "HDV 1080p30 (MPEG-2 Video)"),
+        E("hdv9", "JVC HDV (MPEG-2 Video)"),
 
         E("mx5n", "MPEG2 IMX NTSC 525/60 50mb/s (FCP)"),
         E("mx5p", "MPEG2 IMX PAL 625/60 50mb/s (FCP)"),
