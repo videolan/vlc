@@ -1496,7 +1496,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_sys_t *media,
                 struct tm tm;
                 char psz_date[32];
 
-                strftime( psz_date, sizeof(psz_date), "%F %H:%M:%S (%a)",
+                strftime( psz_date, sizeof(psz_date), "%Y-%m-%d %H:%M:%S (%a)",
                           localtime_r( &i_date, &tm ) );
                 vlm_MessageAdd( msg_schedule,
                                 vlm_MessageNew( "next launch", "%s", psz_date ) );
