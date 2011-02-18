@@ -32,6 +32,7 @@
 #include <vlc_input.h>
 
 #include "qt4.hpp"
+#include "util/singleton.hpp"
 
 #include <QObject>
 #include <QEvent>
@@ -241,22 +242,11 @@ signals:
     void epgChanged();
 };
 
-class MainInputManager : public QObject
+class MainInputManager : public QObject, public Singleton<MainInputManager>
 {
     Q_OBJECT
+    friend class Singleton<MainInputManager>;
 public:
-    static MainInputManager *getInstance( intf_thread_t *_p_intf )
-    {
-        if( !instance )
-            instance = new MainInputManager( _p_intf );
-        return instance;
-    }
-    static void killInstance()
-    {
-        delete instance;
-        instance = NULL;
-    }
-
     input_thread_t *getInput() { return p_input; }
     InputManager *getIM() { return im; }
     inline input_item_t *currentInputItem()
@@ -271,8 +261,6 @@ public:
 private:
     MainInputManager( intf_thread_t * );
     virtual ~MainInputManager();
-
-    static MainInputManager *instance;
 
     void customEvent( QEvent * );
 

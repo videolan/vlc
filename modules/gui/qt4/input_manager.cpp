@@ -939,7 +939,6 @@ void InputManager::AtoBLoop( float, int64_t i_time, int )
  * take care of updating the main playlist input.
  * Used in the main playlist Dialog
  **********************************************************************/
-MainInputManager * MainInputManager::instance = NULL;
 
 MainInputManager::MainInputManager( intf_thread_t *_p_intf )
                  : QObject(NULL), p_intf( _p_intf )
