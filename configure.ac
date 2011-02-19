@@ -3249,14 +3249,7 @@ AC_SUBST([GL_LIBS])
 dnl
 dnl  EGL
 dnl
-AC_ARG_ENABLE(egl,
-  [  --enable-egl            EGL support (default disabled)],, [
-  enable_egl="no"
-])
-AS_IF([test "${enable_egl}" != "no"], [
-  PKG_CHECK_MODULES(EGL, [egl])
-  VLC_ADD_PLUGIN([egl])
-])
+PKG_ENABLE_MODULES_VLC([EGL], [], [egl], [EGL support], [auto])
 
 dnl
 dnl  SDL module

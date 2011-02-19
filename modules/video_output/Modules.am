@@ -94,14 +94,9 @@ libvlc_LTLIBRARIES += libdrawable_plugin.la
 endif
 
 ### EGL ###
-libegl_plugin_la_SOURCES = \
-	opengl.h opengl.c \
-	egl.c
-#FIXME FIXME FIXME
-libegl_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(EGL_CFLAGS) $(GL_CFLAGS)
-libegl_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(EGL_LIBS) $(GL_LIBS)
+libegl_plugin_la_SOURCES = egl.c
+libegl_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS)
+libegl_plugin_la_LIBADD = $(AM_LIBADD) $(EGL_LIBS)
 if !HAVE_WIN32
 libegl_plugin_la_LIBADD += -ldl $(X_LIBS) $(X_PRE_LIBS) -lX11
 endif
