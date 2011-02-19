@@ -87,6 +87,7 @@
 #define KEY_MOUSEWHEELRIGHT  0x00F30000
 
 VLC_EXPORT( char *, vlc_keycode2str, (uint_fast32_t i_key) ) LIBVLC_USED;
+VLC_EXPORT( uint_fast32_t, vlc_str2keycode, (const char *str) ) LIBVLC_USED;
 
 typedef enum vlc_key {
     ACTIONID_NONE = 0,

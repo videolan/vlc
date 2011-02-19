@@ -150,7 +150,6 @@ static char *utf8_cp (uint_fast32_t cp, char *buf)
  * Parse a human-readable string representation of a VLC key code.
  * @return a VLC key code, or KEY_UNSET on failure.
  */
-static
 uint_fast32_t vlc_str2keycode (const char *name)
 {
     uint_fast32_t mods = 0;
