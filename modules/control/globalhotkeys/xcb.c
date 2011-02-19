@@ -62,7 +62,7 @@ typedef struct
     xcb_keycode_t *p_keys;
 #endif
     unsigned      i_modifier;
-    int           i_action;
+    uint32_t      i_vlc;
 } hotkey_mapping_t;
 
 struct intf_sys_t
@@ -307,7 +307,6 @@ static bool Mapping( intf_thread_t *p_intf )
             p_hotkey->psz_action != NULL;
             p_hotkey++ )
     {
-        const int i_vlc_action = p_hotkey->i_action;
         char varname[12 + strlen( p_hotkey->psz_action )];
         sprintf( varname, "global-key-%s", p_hotkey->psz_action );
 
@@ -357,7 +356,7 @@ static bool Mapping( intf_thread_t *p_intf )
             p_map->p_keys = p_keys;
 #endif
             p_map->i_modifier = i_modifier|i_ignored;
-            p_map->i_action = i_vlc_action;
+            p_map->i_vlc = i_vlc_key;
             active = true;
         }
     }
@@ -432,8 +431,8 @@ static void *Thread( void *p_data )
                 if( p_map->i_x11 == e->detail &&
                     p_map->i_modifier == e->state )
                 {
-                    var_SetInteger( p_intf->p_libvlc, "key-action",
-                            p_map->i_action );
+                    var_SetInteger( p_intf->p_libvlc, "global-key-pressed",
+                                    p_map->i_vlc );
                     break;
                 }
 #else
@@ -442,8 +441,8 @@ static void *Thread( void *p_data )
                 if( p_map->p_keys[j] == e->detail &&
                     p_map->i_modifier == e->state )
                 {
-                    var_SetInteger( p_intf->p_libvlc, "key-action",
-                            p_map->i_action );
+                    var_SetInteger( p_intf->p_libvlc, "global-key-pressed",
+                                    p_map->i_vlc );
                     loop_break = true;
                     break;
                 }
