@@ -34,9 +34,7 @@
 #include "opengl.h"
 
 /* Plugin callbacks */
-static int OpenGL (vlc_object_t *);
-static int OpenGLES2 (vlc_object_t *);
-static int OpenGLES (vlc_object_t *);
+static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
 #define GL_TEXT N_("OpenGL extension")
@@ -46,34 +44,40 @@ static void Close (vlc_object_t *);
     "Extension through which to use the Open Graphics Library (OpenGL).")
 
 vlc_module_begin ()
+#if USE_OPENGL_ES == 2
+# define API VLC_OPENGL_ES2
+# define MODULE_VARNAME "gles2"
+    set_shortname (N_("OpenGL ES2"))
+    set_description (N_("OpenGL for Embedded Systems 2 video output"))
+    set_capability ("vout display", /*165*/0)
+    set_callbacks (Open, Close)
+    add_shortcut ("opengles2", "gles2")
+    add_module ("gles2", "opengl es2", NULL, NULL,
+                GLES2_TEXT, PROVIDER_LONGTEXT, true)
+
+#elif USE_OPENGL_ES == 1
+# define API VLC_OPENGL_ES
+# define MODULE_VARNAME "gles"
+    set_shortname (N_("OpenGL ES"))
+    set_description (N_("OpenGL for Embedded Systems video output"))
+    set_capability ("vout display", /*160*/0)
+    set_callbacks (Open, Close)
+    add_shortcut ("opengles", "gles")
+    add_module ("gles", "opengl es", NULL, NULL,
+                GLES_TEXT, PROVIDER_LONGTEXT, true)
+#else
+# define API VLC_OPENGL
+# define MODULE_VARNAME "gl"
     set_shortname (N_("OpenGL"))
     set_description (N_("Open Graphics Library video output"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout display", /*170*/0)
-    set_callbacks (OpenGL, Close)
+    set_callbacks (Open, Close)
     add_shortcut ("opengl", "gl")
     add_module ("gl", "opengl", NULL, NULL,
                 GL_TEXT, PROVIDER_LONGTEXT, true)
-
-    add_submodule ()
-    set_shortname (N_("OpenGL ES2"))
-    set_description (N_("OpenGL for Embedded Systems 2 video output"))
-    set_capability ("vout display", /*165*/0)
-    set_callbacks (OpenGLES2, Close)
-    add_shortcut ("opengles2", "gles2")
-    add_module ("gles2", "opengl es2", NULL, NULL,
-                GLES2_TEXT, PROVIDER_LONGTEXT, true)
-
-    add_submodule ()
-    set_shortname (N_("OpenGL ES"))
-    set_description (N_("OpenGL for Embedded Systems video output"))
-    set_capability ("vout display", /*160*/0)
-    set_callbacks (OpenGLES, Close)
-    add_shortcut ("opengles", "gles")
-    add_module ("gles", "opengl es", NULL, NULL,
-                GLES_TEXT, PROVIDER_LONGTEXT, true)
-
+#endif
 vlc_module_end ()
 
 struct vout_display_sys_t
@@ -111,7 +115,7 @@ static vout_window_t *MakeWindow (vout_display_t *vd)
 /**
  * Allocates a surface and an OpenGL context for video output.
  */
-static int Open (vlc_object_t *obj, unsigned api, const char *name)
+static int Open (vlc_object_t *obj)
 {
     vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = malloc (sizeof (*sys));
@@ -125,7 +129,7 @@ static int Open (vlc_object_t *obj, unsigned api, const char *name)
     if (sys->window == NULL)
         goto error;
 
-    sys->gl = vlc_gl_Create (sys->window, api, name);
+    sys->gl = vlc_gl_Create (sys->window, API, "$" MODULE_VARNAME);
     if (sys->gl == NULL)
         goto error;
 
@@ -153,21 +157,6 @@ error:
         vout_display_DeleteWindow (vd, sys->window);
     free (sys);
     return VLC_EGENERIC;
-}
-
-static int OpenGL (vlc_object_t *obj)
-{
-    return Open (obj, VLC_OPENGL, "$gl");
-}
-
-static int OpenGLES2 (vlc_object_t *obj)
-{
-    return Open (obj, VLC_OPENGL_ES2, "$gles2");
-}
-
-static int OpenGLES (vlc_object_t *obj)
-{
-    return Open (obj, VLC_OPENGL_ES2, "$gles");
 }
 
 /**
