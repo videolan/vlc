@@ -130,9 +130,6 @@ static void Close( vlc_object_t *p_this )
 static void *Thread( void *p_data )
 {
     MSG message;
-    UINT i_key, i_keyMod, i_vk;
-    ATOM atom;
-    char *psz_hotkey = NULL;
 
     intf_thread_t *p_intf = p_data;
     intf_sys_t *p_sys = p_intf->p_sys;
@@ -172,14 +169,19 @@ static void *Thread( void *p_data )
             p_hotkey->psz_action != NULL;
             p_hotkey++ )
     {
-        if( asprintf( &psz_hotkey, "global-%s", p_hotkey->psz_action ) < 0 )
-            break;
+        char varname[12 + strlen( p_hotkey->psz_action )];
+        sprintf( varname, "global-key-%s", p_hotkey->psz_action );
 
-        i_key = var_InheritInteger( p_intf, psz_hotkey );
+        char *key = var_InheritString( p_intf, varname );
+        if( key == NULL )
+            continue;
 
-        free( psz_hotkey );
+        UINT i_key = vlc_str2keycode( key );
+        free( key );
+        if( i_key == KEY_UNSET )
+            continue;
 
-        i_keyMod = 0;
+        UINT i_keyMod = 0;
         if( i_key & KEY_MODIFIER_SHIFT ) i_keyMod |= MOD_SHIFT;
         if( i_key & KEY_MODIFIER_ALT ) i_keyMod |= MOD_ALT;
         if( i_key & KEY_MODIFIER_CTRL ) i_keyMod |= MOD_CONTROL;
@@ -206,7 +208,7 @@ static void *Thread( void *p_data )
 #define VK_PAGEDOWN             0x22
 #endif
 
-        i_vk = 0;
+        UINT i_vk = 0;
         switch( i_key & ~KEY_MODIFIER )
         {
             HANDLE( LEFT );
@@ -250,7 +252,7 @@ static void *Thread( void *p_data )
 #undef HANDLE
 #undef HANDLE2
 
-        atom = GlobalAddAtomA( p_hotkey->psz_action );
+        ATOM atom = GlobalAddAtomA( p_hotkey->psz_action );
         if( !atom ) continue;
 
         if( !RegisterHotKey( p_sys->hotkeyWindow, atom, i_keyMod, i_vk ) )
@@ -266,7 +268,7 @@ static void *Thread( void *p_data )
             p_hotkey->psz_action != NULL;
             p_hotkey++ )
     {
-        atom = GlobalFindAtomA( p_hotkey->psz_action );
+        ATOM atom = GlobalFindAtomA( p_hotkey->psz_action );
         if( !atom ) continue;
 
         if( UnregisterHotKey( p_sys->hotkeyWindow, atom ) )
