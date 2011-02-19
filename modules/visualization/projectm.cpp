@@ -33,6 +33,7 @@
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 #include <vlc_vout_wrapper.h>
+#include <vlc_opengl.h>
 #include <vlc_filter.h>
 #include <vlc_rand.h>
 
