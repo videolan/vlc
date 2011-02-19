@@ -138,9 +138,10 @@ typedef struct {
 #define CUSTOM_PTS -1
 struct filter_sys_t
 {
-    int  i_mode;        /* Deinterlace mode */
-    bool b_double_rate; /* Shall we double the framerate? */
-    bool b_half_height; /* Shall be divide the height by 2 */
+    int  i_mode;              /* Deinterlace mode */
+    bool b_double_rate;       /* Shall we double the framerate? */
+    bool b_half_height;       /* Shall be divide the height by 2 */
+    bool b_use_frame_history; /* Does the algorithm need the input frame history buffer? */
 
     void (*pf_merge) ( void *, const void *, const void *, size_t );
     void (*pf_end_merge) ( void );
@@ -151,7 +152,7 @@ struct filter_sys_t
     /* Output frame timing / framerate doubler control (see below) */
     int i_frame_offset;
 
-    /* Yadif */
+    /* Input frame history buffer for algorithms that perform temporal filtering. */
     picture_t *pp_history[HISTORY_SIZE];
 };
 
@@ -232,6 +233,7 @@ static void SetFilterMethod( filter_t *p_filter, const char *psz_method, vlc_fou
         p_sys->i_mode = DEINTERLACE_MEAN;
         p_sys->b_double_rate = false;
         p_sys->b_half_height = true;
+        p_sys->b_use_frame_history = false;
     }
     else if( !strcmp( psz_method, "bob" )
              || !strcmp( psz_method, "progressive-scan" ) )
@@ -239,30 +241,35 @@ static void SetFilterMethod( filter_t *p_filter, const char *psz_method, vlc_fou
         p_sys->i_mode = DEINTERLACE_BOB;
         p_sys->b_double_rate = true;
         p_sys->b_half_height = false;
+        p_sys->b_use_frame_history = false;
     }
     else if( !strcmp( psz_method, "linear" ) )
     {
         p_sys->i_mode = DEINTERLACE_LINEAR;
         p_sys->b_double_rate = true;
         p_sys->b_half_height = false;
+        p_sys->b_use_frame_history = false;
     }
     else if( !strcmp( psz_method, "x" ) )
     {
         p_sys->i_mode = DEINTERLACE_X;
         p_sys->b_double_rate = false;
         p_sys->b_half_height = false;
+        p_sys->b_use_frame_history = false;
     }
     else if( !strcmp( psz_method, "yadif" ) )
     {
         p_sys->i_mode = DEINTERLACE_YADIF;
         p_sys->b_double_rate = false;
         p_sys->b_half_height = false;
+        p_sys->b_use_frame_history = true;
     }
     else if( !strcmp( psz_method, "yadif2x" ) )
     {
         p_sys->i_mode = DEINTERLACE_YADIF2X;
         p_sys->b_double_rate = true;
         p_sys->b_half_height = false;
+        p_sys->b_use_frame_history = true;
     }
     else if( !strcmp( psz_method, "discard" ) )
     {
@@ -272,6 +279,7 @@ static void SetFilterMethod( filter_t *p_filter, const char *psz_method, vlc_fou
         p_sys->i_mode = DEINTERLACE_DISCARD;
         p_sys->b_double_rate = false;
         p_sys->b_half_height = !b_i422;
+        p_sys->b_use_frame_history = false;
     }
     else
     {
@@ -282,6 +290,7 @@ static void SetFilterMethod( filter_t *p_filter, const char *psz_method, vlc_fou
         p_sys->i_mode = DEINTERLACE_BLEND;
         p_sys->b_double_rate = false;
         p_sys->b_half_height = false;
+        p_sys->b_use_frame_history = false;
     }
 
     p_sys->i_frame_offset = 0; /* reset to default when method changes */
@@ -1514,28 +1523,13 @@ typedef intptr_t x86_reg;
 
 static int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src, int i_order, int i_field )
 {
+    VLC_UNUSED(p_src);
+
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /* */
     assert( i_order >= 0 && i_order <= 2 ); /* 2 = soft field repeat */
     assert( i_field == 0 || i_field == 1 );
-
-    if( i_order == 0 )
-    {
-        /* Duplicate the picture
-         * TODO when the vout rework is finished, picture_Hold() might be enough
-         * but becarefull, the pitches must match */
-        picture_t *p_dup = picture_NewFromFormat( &p_src->format );
-        if( p_dup )
-            picture_Copy( p_dup, p_src );
-
-        /* Slide the history */
-        if( p_sys->pp_history[0] )
-            picture_Release( p_sys->pp_history[0]  );
-        for( int i = 1; i < HISTORY_SIZE; i++ )
-            p_sys->pp_history[i-1] = p_sys->pp_history[i];
-        p_sys->pp_history[HISTORY_SIZE-1] = p_dup;
-    }
 
     /* As the pitches must match, use ONLY pictures coming from picture_New()! */
     picture_t *p_prev = p_sys->pp_history[0];
@@ -1670,6 +1664,24 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     /* Any unused p_dst pointers must be NULL, because they are used to check how many output frames we have. */
     for( int i = 1; i < DEINTERLACE_DST_SIZE; ++i )
         p_dst[i] = NULL;
+
+    /* Update the input frame history, if the currently active algorithm needs it. */
+    if( p_sys->b_use_frame_history )
+    {
+        /* Duplicate the picture
+         * TODO when the vout rework is finished, picture_Hold() might be enough
+         * but becarefull, the pitches must match */
+        picture_t *p_dup = picture_NewFromFormat( &p_pic->format );
+        if( p_dup )
+            picture_Copy( p_dup, p_pic );
+
+        /* Slide the history */
+        if( p_sys->pp_history[0] )
+            picture_Release( p_sys->pp_history[0] );
+        for( int i = 1; i < HISTORY_SIZE; i++ )
+            p_sys->pp_history[i-1] = p_sys->pp_history[i];
+        p_sys->pp_history[HISTORY_SIZE-1] = p_dup;
+    }
 
     /* Slide the metadata history. */
     for( int i = 1; i < METADATA_SIZE; i++ )
@@ -1925,6 +1937,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_mode = DEINTERLACE_BLEND;
     p_sys->b_double_rate = false;
     p_sys->b_half_height = true;
+    p_sys->b_use_frame_history = false;
     for( int i = 0; i < METADATA_SIZE; i++ )
     {
         p_sys->meta.pi_date[i] = VLC_TS_INVALID;
