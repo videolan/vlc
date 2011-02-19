@@ -447,7 +447,6 @@ struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
         }
 #endif
         keys->psz_action = actions[i].name;
-        keys->i_action = actions[i].value;
         keys++;
 
         char name[12 + MAXACTION];
@@ -458,7 +457,6 @@ struct vlc_actions *vlc_InitActions (libvlc_int_t *libvlc)
     }
 
     keys->psz_action = NULL;
-    keys->i_action = 0;
 
     libvlc->p_hotkeys = as->keys;
     var_AddCallback (obj, "key-pressed", vlc_key_to_action, &as->map);

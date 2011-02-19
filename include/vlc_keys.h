@@ -207,7 +207,6 @@ VLC_EXPORT( vlc_key_t, vlc_GetActionId, (const char *psz_key) ) LIBVLC_USED;
 struct hotkey
 {
     const char *psz_action;
-    vlc_key_t i_action;
 };
 
 #endif
