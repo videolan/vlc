@@ -3,7 +3,7 @@
  * @brief EGL video output module
  */
 /*****************************************************************************
- * Copyright © 2010 Rémi Denis-Courmont
+ * Copyright © 2010-2011 Rémi Denis-Courmont
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -161,6 +161,7 @@ static int Open (vlc_object_t *obj)
     sys->gl.sys = NULL;
     sys->pool = NULL;
 
+#ifdef __unix__
     /* XXX Explicit hack!
      * Mesa EGL plugins (as of version 7.8.2) are not properly linked to
      * libEGL.so even though they import some of its symbols. This is
@@ -168,8 +169,10 @@ static int Open (vlc_object_t *obj)
      * RTLD_LOCAL so that they do not pollute the namespace. Then the
      * libEGL symbols are not visible to EGL plugins, and the run-time
      * linker exits the whole process. */
-#ifdef __unix__
-    dlopen ("libEGL.so", RTLD_GLOBAL|RTLD_LAZY);
+    if (dlopen ("libEGL.so", RTLD_GLOBAL|RTLD_NOW) == NULL)
+        msg_Warn (gl, "libEGL cannot be loaded. Process might crash.");
+    if (dlopen ("libGL.so", RTLD_GLOBAL|RTLD_NOW) == NULL)
+        msg_Warn (gl, "libGL cannot be loaded. Process might crash.");
 #endif
 
     EGLint major, minor;
