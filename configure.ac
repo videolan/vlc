@@ -3247,8 +3247,11 @@ AC_SUBST([GL_CFLAGS])
 AC_SUBST([GL_LIBS])
 
 dnl
-dnl  EGL
+dnl  OpenGL
 dnl
+PKG_ENABLE_MODULES_VLC([GL], [], [gl], [OpenGL support], [auto])
+PKG_ENABLE_MODULES_VLC([GLES1], [], [glesv1_cm], [OpenGL ES v1 support], [auto])
+PKG_ENABLE_MODULES_VLC([GLES2], [], [glesv2], [OpenGL ES v2 support], [auto])
 PKG_ENABLE_MODULES_VLC([EGL], [], [egl], [EGL support], [auto])
 
 dnl

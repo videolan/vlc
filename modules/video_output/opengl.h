@@ -36,17 +36,25 @@
 
 #define VLCGL_TEXTURE_COUNT 1
 
-#if USE_OPENGL_ES == 1
-# include <OpenGLES/ES1/gl.h>
-#elif USE_OPENGL_ES == 2
-# include <OpenGLES/ES2/gl.h>
-#elif defined(__APPLE__)
-# define MACOS_OPENGL
-# include <OpenGL/gl.h>
-# undef VLCGL_TEXTURE_COUNT
-# define VLCGL_TEXTURE_COUNT 2
+#if !defined (__APPLE__)
+# if USE_OPENGL_ES == 2
+#  include <GLES2/gl2.h>
+# elif USE_OPENGL_ES == 1
+#  include <GLES/gl.h>
+# else
+#  include <GL/gl.h>
+# endif
 #else
-# include <GL/gl.h>
+# if USE_OPENGL_ES == 2
+#  include <OpenGLES/ES2/gl.h>
+# elif USE_OPENGL_ES == 1
+#  include <OpenGLES/ES1/gl.h>
+# else
+#  define MACOS_OPENGL
+#  include <OpenGL/gl.h>
+#  undef VLCGL_TEXTURE_COUNT
+#  define VLCGL_TEXTURE_COUNT 2
+# endif
 #endif
 
 typedef struct {

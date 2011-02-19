@@ -32,13 +32,23 @@
 #include "opengl.h"
 // Define USE_OPENGL_ES to the GL ES Version you want to select
 
-#if USE_OPENGL_ES == 1
-# include <OpenGLES/ES1/glext.h>
-#elif USE_OPENGL_ES == 2
-# include <OpenGLES/ES2/glext.h>
-#elif defined(__APPLE__)
-# define MACOS_OPENGL
-# include <OpenGL/glext.h>
+#if !defined (__APPLE__)
+# if USE_OPENGL_ES == 2
+#  include <GLES2/gl2ext.h>
+# elif USE_OPENGL_ES == 1
+#  include <GLES/glext.h>
+//# else
+//# include <GL/glext.h>
+# endif
+#else
+# if USE_OPENGL_ES == 2
+#  include <OpenGLES/ES2/gl.h>
+# elif USE_OPENGL_ES == 1
+#  include <OpenGLES/ES1/gl.h>
+# else
+#  define MACOS_OPENGL
+#  include <OpenGL/glext.h>
+# endif
 #endif
 
 #ifndef YCBCR_MESA

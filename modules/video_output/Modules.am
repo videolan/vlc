@@ -15,16 +15,33 @@ SOURCES_yuv = yuv.c
 SOURCES_vout_macosx = macosx.m opengl.h opengl.c
 SOURCES_vout_ios = ios.m opengl.h opengl.c
 
+
 ### OpenGL ###
 # TODO: merge all three source files (?)
-libopengl_plugin_la_SOURCES = \
-	opengl.c opengl.h \
-	gl.c
-libopengl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
-libopengl_plugin_la_LIBADD = $(AM_LIBADD) $(GL_LIBS)
-libopengl_plugin_la_DEPENDENCIES =
-EXTRA_LTLIBRARIES += libopengl_plugin.la
-libvlc_LTLIBRARIES += $(LTLIBopengl)
+libgles2_plugin_la_SOURCES = opengl.c opengl.h gl.c
+libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES=2
+libgles2_plugin_la_LIBADD = $(AM_LIBADD) $(GLES2_LIBS)
+libgles2_plugin_la_DEPENDENCIES =
+
+libgles1_plugin_la_SOURCES = opengl.c opengl.h gl.c
+libgles1_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES1_CFLAGS) -DUSE_OPENGL_ES=1
+libgles1_plugin_la_LIBADD = $(AM_LIBADD) $(GLES1_LIBS)
+libgles1_plugin_la_DEPENDENCIES =
+
+libgl_plugin_la_SOURCES = opengl.c opengl.h gl.c
+libgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
+libgl_plugin_la_LIBADD = $(AM_LIBADD) $(GL_LIBS)
+libgl_plugin_la_DEPENDENCIES =
+
+EXTRA_LTLIBRARIES += \
+	libgles2_plugin.la \
+	libgles1_plugin.la \
+	libgl_plugin.la
+libvlc_LTLIBRARIES += \
+	$(LTLIBgles2) \
+	$(LTLIBgles1) \
+	$(LTLIBgl)
+
 
 ### XCB ###
 libxcb_x11_plugin_la_SOURCES = \
