@@ -42,7 +42,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_vout_opengl.h>
+#include <vlc_opengl.h>
 #include "opengl.h"
 
 /**
@@ -56,9 +56,9 @@ static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subp
 static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
 static int Control (vout_display_t *vd, int query, va_list ap);
 
-static int OpenglLock(vout_opengl_t *gl);
-static void OpenglUnlock(vout_opengl_t *gl);
-static void OpenglSwap(vout_opengl_t *gl);
+static int OpenglLock(vlc_gl_t *gl);
+static void OpenglUnlock(vlc_gl_t *gl);
+static void OpenglSwap(vlc_gl_t *gl);
 
 /**
  * Module declaration
@@ -99,7 +99,7 @@ struct vout_display_sys_t
     id<VLCOpenGLVideoViewEmbedding> container;
 
     vout_window_t *embed;
-    vout_opengl_t gl;
+    vlc_gl_t gl;
     vout_display_opengl_t vgl;
 
     picture_pool_t *pool;
@@ -303,7 +303,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
         case VOUT_DISPLAY_GET_OPENGL:
         {
-            vout_opengl_t **gl = va_arg (ap, vout_opengl_t **);
+            vlc_gl_t **gl = va_arg (ap, vlc_gl_t **);
             *gl = &sys->gl;
             return VLC_SUCCESS;
         }
@@ -319,7 +319,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 /*****************************************************************************
  * vout opengl callbacks
  *****************************************************************************/
-static int OpenglLock(vout_opengl_t *gl)
+static int OpenglLock(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
     NSOpenGLContext *context = [sys->glView openGLContext];
@@ -332,13 +332,13 @@ static int OpenglLock(vout_opengl_t *gl)
     return 1;
 }
 
-static void OpenglUnlock(vout_opengl_t *gl)
+static void OpenglUnlock(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
     CGLUnlockContext([[sys->glView openGLContext] CGLContextObj]);
 }
 
-static void OpenglSwap(vout_opengl_t *gl)
+static void OpenglSwap(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = (vout_display_sys_t *)gl->sys;
     [[sys->glView openGLContext] flushBuffer];

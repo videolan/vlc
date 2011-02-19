@@ -27,7 +27,7 @@
 
 #include <vlc_common.h>
 #include <vlc_picture_pool.h>
-#include <vlc_vout_opengl.h>
+#include <vlc_opengl.h>
 
 #include "opengl.h"
 // Define USE_OPENGL_ES to the GL ES Version you want to select
@@ -102,7 +102,7 @@ static inline int GetAlignedSize(unsigned size)
 
 int vout_display_opengl_Init(vout_display_opengl_t *vgl,
                              video_format_t *fmt,
-                             vout_opengl_t *gl)
+                             vlc_gl_t *gl)
 {
     vgl->gl = gl;
 
@@ -171,14 +171,14 @@ int vout_display_opengl_Init(vout_display_opengl_t *vgl,
 #endif
 
 #if defined(__APPLE__) && USE_OPENGL_ES == 1
-    if (!vout_opengl_Lock(vgl->gl)) {
+    if (!vlc_gl_Lock(vgl->gl)) {
         const char* extensions = (char*) glGetString(GL_EXTENSIONS);
         if (extensions) {
             bool npot = strstr(extensions, "GL_APPLE_texture_2D_limited_npot") != 0;
             if (npot)
                 supports_npot = true;
         }
-        vout_opengl_Unlock(vgl->gl);
+        vlc_gl_Unlock(vgl->gl);
     }
 #endif
 
@@ -195,7 +195,7 @@ int vout_display_opengl_Init(vout_display_opengl_t *vgl,
 
 
     /* */
-    if (!vout_opengl_Lock(vgl->gl)) {
+    if (!vlc_gl_Lock(vgl->gl)) {
 
         glDisable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
@@ -204,7 +204,7 @@ int vout_display_opengl_Init(vout_display_opengl_t *vgl,
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        vout_opengl_Unlock(vgl->gl);
+        vlc_gl_Unlock(vgl->gl);
     }
     return VLC_SUCCESS;
 }
@@ -212,13 +212,13 @@ int vout_display_opengl_Init(vout_display_opengl_t *vgl,
 void vout_display_opengl_Clean(vout_display_opengl_t *vgl)
 {
     /* */
-    if (!vout_opengl_Lock(vgl->gl)) {
+    if (!vlc_gl_Lock(vgl->gl)) {
 
         glFinish();
         glFlush();
         glDeleteTextures(VLCGL_TEXTURE_COUNT, vgl->texture);
 
-        vout_opengl_Unlock(vgl->gl);
+        vlc_gl_Unlock(vgl->gl);
     }
     if (vgl->pool) {
         picture_pool_Delete(vgl->pool);
@@ -229,7 +229,7 @@ void vout_display_opengl_Clean(vout_display_opengl_t *vgl)
 
 int vout_display_opengl_ResetTextures(vout_display_opengl_t *vgl)
 {
-    if (vout_opengl_Lock(vgl->gl))
+    if (vlc_gl_Lock(vgl->gl))
         return VLC_EGENERIC;
 
     glDeleteTextures(VLCGL_TEXTURE_COUNT, vgl->texture);
@@ -274,7 +274,7 @@ int vout_display_opengl_ResetTextures(vout_display_opengl_t *vgl)
         }
     }
 
-    vout_opengl_Unlock(vgl->gl);
+    vlc_gl_Unlock(vgl->gl);
     return VLC_SUCCESS;
 }
 
@@ -297,13 +297,13 @@ static int PictureLock(picture_t *picture)
         return VLC_SUCCESS;
 
     vout_display_opengl_t *vgl = picture->p_sys->vgl;
-    if (!vout_opengl_Lock(vgl->gl)) {
+    if (!vlc_gl_Lock(vgl->gl)) {
         glBindTexture(VLCGL_TARGET, get_texture(picture));
         glTexSubImage2D(VLCGL_TARGET, 0, 0, 0,
                         vgl->fmt.i_width, vgl->fmt.i_height,
                         VLCGL_FORMAT, VLCGL_TYPE, picture->p[0].p_pixels);
 
-        vout_opengl_Unlock(vgl->gl);
+        vlc_gl_Unlock(vgl->gl);
     }
     return VLC_SUCCESS;
 }
@@ -394,7 +394,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
        lock(/unlock) managed picture pool.
      */
 
-    if (vout_opengl_Lock(vgl->gl))
+    if (vlc_gl_Lock(vgl->gl))
         return VLC_EGENERIC;
 
 #ifdef MACOS_OPENGL
@@ -407,14 +407,14 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                     VLCGL_FORMAT, VLCGL_TYPE, picture->p[0].p_pixels);
 #endif
 
-    vout_opengl_Unlock(vgl->gl);
+    vlc_gl_Unlock(vgl->gl);
     return VLC_SUCCESS;
 }
 
 int vout_display_opengl_Display(vout_display_opengl_t *vgl,
                                 const video_format_t *source)
 {
-    if (vout_opengl_Lock(vgl->gl))
+    if (vlc_gl_Lock(vgl->gl))
         return VLC_EGENERIC;
 
     /* glTexCoord works differently with GL_TEXTURE_2D and
@@ -475,9 +475,9 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
     glDisable(VLCGL_TARGET);
 
-    vout_opengl_Swap(vgl->gl);
+    vlc_gl_Swap(vgl->gl);
 
-    vout_opengl_Unlock(vgl->gl);
+    vlc_gl_Unlock(vgl->gl);
     return VLC_SUCCESS;
 }
 

@@ -36,7 +36,7 @@
 #include <vlc_plugin.h>
 #include <vlc_xlib.h>
 #include <vlc_vout_display.h>
-#include <vlc_vout_opengl.h>
+#include <vlc_opengl.h>
 #include "../opengl.h"
 
 #include "xcb_vlc.h"
@@ -70,7 +70,7 @@ struct vout_display_sys_t
     bool v1_3; /* whether GLX >= 1.3 is available */
 
     GLXContext ctx;
-    vout_opengl_t gl;
+    vlc_gl_t gl;
     vout_display_opengl_t vgl;
     picture_pool_t *pool; /* picture pool */
 };
@@ -81,7 +81,7 @@ static void PictureDisplay (vout_display_t *, picture_t *, subpicture_t *);
 static int Control (vout_display_t *, int, va_list);
 static void Manage (vout_display_t *);
 
-static void SwapBuffers (vout_opengl_t *gl);
+static void SwapBuffers (vlc_gl_t *gl);
 
 static vout_window_t *MakeWindow (vout_display_t *vd)
 {
@@ -436,7 +436,7 @@ static void Close (vlc_object_t *obj)
     free (sys);
 }
 
-static void SwapBuffers (vout_opengl_t *gl)
+static void SwapBuffers (vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = gl->sys;
 
@@ -553,7 +553,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
     case VOUT_DISPLAY_GET_OPENGL:
     {
-        vout_opengl_t **gl = va_arg (ap, vout_opengl_t **);
+        vlc_gl_t **gl = va_arg (ap, vlc_gl_t **);
         *gl = &sys->gl;
         return VLC_SUCCESS;
     }

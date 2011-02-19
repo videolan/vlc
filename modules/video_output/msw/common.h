@@ -151,7 +151,7 @@ struct vout_display_sys_t
 #ifdef MODULE_NAME_IS_glwin32
     HDC                   hGLDC;
     HGLRC                 hGLRC;
-    vout_opengl_t         gl;
+    vlc_gl_t              gl;
     vout_display_opengl_t vgl;
 #endif
 

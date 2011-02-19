@@ -27,7 +27,7 @@
 
 #include <vlc_common.h>
 #include <vlc_picture_pool.h>
-#include <vlc_vout_opengl.h>
+#include <vlc_opengl.h>
 
 // Define USE_OPENGL_ES to the GL ES Version you want to select
 #ifndef USE_OPENGL_ES
@@ -50,7 +50,7 @@
 #endif
 
 typedef struct {
-    vout_opengl_t  *gl;
+    vlc_gl_t   *gl;
 
     video_format_t fmt;
 
@@ -65,7 +65,7 @@ typedef struct {
 } vout_display_opengl_t;
 
 int vout_display_opengl_Init(vout_display_opengl_t *vgl,
-                             video_format_t *fmt, vout_opengl_t *gl);
+                             video_format_t *fmt, vlc_gl_t *gl);
 void vout_display_opengl_Clean(vout_display_opengl_t *vgl);
 
 int vout_display_opengl_ResetTextures(vout_display_opengl_t *vgl);

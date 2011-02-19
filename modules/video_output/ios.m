@@ -37,7 +37,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_vout_opengl.h>
+#include <vlc_opengl.h>
 
 #define USE_OPENGL_ES 1
 
@@ -54,8 +54,8 @@ static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subp
 static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
 static int Control (vout_display_t *vd, int query, va_list ap);
 
-static int OpenglClean(vout_opengl_t *gl);
-static void OpenglSwap(vout_opengl_t *gl);
+static int OpenglClean(vlc_gl_t *gl);
+static void OpenglSwap(vlc_gl_t *gl);
 
 /**
  * Module declaration
@@ -93,7 +93,7 @@ struct vout_display_sys_t
     VLCOpenGLESVideoView *glView;
     UIView * container;
 
-    vout_opengl_t gl;
+    vlc_gl_t gl;
     vout_display_opengl_t vgl;
 
     picture_pool_t *pool;
@@ -254,7 +254,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
         case VOUT_DISPLAY_GET_OPENGL:
         {
-            vout_opengl_t **gl = va_arg (ap, vout_opengl_t **);
+            vlc_gl_t **gl = va_arg (ap, vlc_gl_t **);
             *gl = &sys->gl;
             return VLC_SUCCESS;
         }
@@ -271,13 +271,13 @@ static int Control (vout_display_t *vd, int query, va_list ap)
  * vout opengl callbacks
  *****************************************************************************/
 
-static int OpenglClean(vout_opengl_t *gl) {
+static int OpenglClean(vlc_gl_t *gl) {
     vout_display_sys_t *sys = gl->sys;
     [sys->glView cleanFramebuffer];
     return 0;
 }
 
-static void OpenglSwap(vout_opengl_t *gl)
+static void OpenglSwap(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = gl->sys;
     EAGLContext *context = [sys->glView context];

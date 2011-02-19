@@ -285,7 +285,7 @@ static void *Thread( void *p_data )
     filter_sys_t *p_sys = p_filter->p_sys;
     int cancel = vlc_savecancel();
     video_format_t fmt;
-    vout_opengl_t *gl;
+    vlc_gl_t *gl;
     int i_last_width  = 0;
     int i_last_height = 0;
     locale_t loc;
@@ -442,10 +442,10 @@ static void *Thread( void *p_data )
         /* */
         mwait( i_deadline );
 
-        if( !vout_opengl_Lock(gl) )
+        if( !vlc_gl_Lock(gl) )
         {
-            vout_opengl_Swap( gl );
-            vout_opengl_Unlock( gl );
+            vlc_gl_Swap( gl );
+            vlc_gl_Unlock( gl );
         }
     }
     abort();

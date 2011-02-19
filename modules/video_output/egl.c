@@ -31,7 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_vout_opengl.h>
+#include <vlc_opengl.h>
 #include "opengl.h"
 #ifdef __unix__
 # include <vlc_xlib.h>
@@ -73,7 +73,7 @@ struct vout_display_sys_t
     EGLDisplay display;
     EGLSurface surface;
 
-    vout_opengl_t gl;
+    vlc_gl_t gl;
     vout_display_opengl_t vgl;
 
     picture_pool_t *pool;
@@ -86,7 +86,7 @@ static void PictureRender (vout_display_t *, picture_t *, subpicture_t *);
 static void PictureDisplay (vout_display_t *, picture_t *, subpicture_t *);
 static int Control (vout_display_t *, int, va_list);
 /* OpenGL callbacks */
-static void SwapBuffers (vout_opengl_t *gl);
+static void SwapBuffers (vlc_gl_t *gl);
 
 static bool CheckAPI (EGLDisplay dpy, const char *api)
 {
@@ -297,7 +297,7 @@ static void Close (vlc_object_t *obj)
     free (sys);
 }
 
-static void SwapBuffers (vout_opengl_t *gl)
+static void SwapBuffers (vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = gl->sys;
 
@@ -400,7 +400,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
       case VOUT_DISPLAY_GET_OPENGL:
       {
-        vout_opengl_t **gl = va_arg (ap, vout_opengl_t **);
+        vlc_gl_t **gl = va_arg (ap, vlc_gl_t **);
 
         *gl = &sys->gl;
         return VLC_SUCCESS;

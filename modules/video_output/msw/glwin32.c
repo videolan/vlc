@@ -67,7 +67,7 @@ static void           Display(vout_display_t *, picture_t *, subpicture_t *);
 static int            Control(vout_display_t *, int, va_list);
 static void           Manage (vout_display_t *);
 
-static void           Swap   (vout_opengl_t *);
+static void           Swap   (vlc_gl_t *);
 
 /**
  * It creates an OpenGL vout display.
@@ -199,7 +199,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
 {
     switch (query) {
     case VOUT_DISPLAY_GET_OPENGL: {
-        vout_opengl_t **gl = va_arg(args, vout_opengl_t **);
+        vlc_gl_t **gl = va_arg(args, vlc_gl_t **);
         *gl = &vd->sys->gl;
 
         CommonDisplay(vd);
@@ -221,7 +221,7 @@ static void Manage (vout_display_t *vd)
     glViewport(0, 0, width, height);
 }
 
-static void Swap(vout_opengl_t *gl)
+static void Swap(vlc_gl_t *gl)
 {
     vout_display_t *vd = gl->sys;
 

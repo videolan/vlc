@@ -172,7 +172,7 @@ enum {
     VOUT_DISPLAY_CHANGE_SOURCE_CROP,   /* const video_format_t *p_source */
 
     /* Ask an opengl interface if available. */
-    VOUT_DISPLAY_GET_OPENGL,           /* vout_opengl_t ** */
+    VOUT_DISPLAY_GET_OPENGL,           /* vlc_gl_t ** */
 };
 
 /**
