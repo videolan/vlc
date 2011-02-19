@@ -15,6 +15,17 @@ SOURCES_yuv = yuv.c
 SOURCES_vout_macosx = macosx.m opengl.h opengl.c
 SOURCES_vout_ios = ios.m opengl.h opengl.c
 
+### OpenGL ###
+# TODO: merge all three source files (?)
+libopengl_plugin_la_SOURCES = \
+	opengl.c opengl.h \
+	gl.c
+libopengl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
+libopengl_plugin_la_LIBADD = $(AM_LIBADD) $(GL_LIBS)
+libopengl_plugin_la_DEPENDENCIES =
+EXTRA_LTLIBRARIES += libopengl_plugin.la
+libvlc_LTLIBRARIES += $(LTLIBopengl)
+
 ### XCB ###
 libxcb_x11_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
