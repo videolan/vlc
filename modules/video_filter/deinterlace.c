@@ -126,7 +126,16 @@ static const char *const ppsz_filter_options[] = {
     "mode", NULL
 };
 
+/* Used for framerate doublers */
+#define METADATA_SIZE (3)
+typedef struct {
+    mtime_t pi_date[METADATA_SIZE];
+    int     pi_nb_fields[METADATA_SIZE];
+    bool    pb_top_field_first[METADATA_SIZE];
+} metadata_history_t;
+
 #define HISTORY_SIZE (3)
+#define CUSTOM_PTS -1
 struct filter_sys_t
 {
     int  i_mode;        /* Deinterlace mode */
@@ -136,11 +145,77 @@ struct filter_sys_t
     void (*pf_merge) ( void *, const void *, const void *, size_t );
     void (*pf_end_merge) ( void );
 
-    mtime_t i_last_date;
+    /* Metadata history (PTS, nb_fields, TFF). Used for framerate doublers. */
+    metadata_history_t meta;
+
+    /* Output frame timing / framerate doubler control (see below) */
+    int i_frame_offset;
 
     /* Yadif */
     picture_t *pp_history[HISTORY_SIZE];
 };
+
+/*  NOTE on i_frame_offset:
+
+    This value indicates the offset between input and output frames in the currently active deinterlace algorithm.
+    See the rationale below for why this is needed and how it is used.
+
+    Valid range: 0 <= i_frame_offset < METADATA_SIZE, or i_frame_offset = CUSTOM_PTS.
+                 The special value CUSTOM_PTS is only allowed if b_double_rate is false.
+
+                 If CUSTOM_PTS is used, the algorithm must compute the outgoing PTSs itself,
+                 and additionally, read the TFF/BFF information itself (if it needs it)
+                 from the incoming frames.
+
+    Meaning of values:
+    0 = output frame corresponds to the current input frame
+        (no frame offset; default if not set),
+    1 = output frame corresponds to the previous input frame
+        (e.g. Yadif and Yadif2x work like this),
+    ...
+
+    If necessary, i_frame_offset should be updated by the active deinterlace algorithm
+    to indicate the correct delay for the *next* input frame. It does not matter at which i_order
+    the algorithm updates this information, but the new value will only take effect upon the
+    next call to Deinterlace() (i.e. at the next incoming frame).
+
+    The first-ever frame that arrives to the filter after Open() is always handled as having
+    i_frame_offset = 0. For the second and all subsequent frames, each algorithm is responsible
+    for setting the offset correctly. (The default is 0, so if that is correct, there's no need
+    to do anything.)
+
+    This solution guarantees that i_frame_offset:
+      1) is up to date at the start of each frame,
+      2) does not change (as far as Deinterlace() is concerned) during a frame, and
+      3) does not need a special API for setting the value at the start of each input frame,
+         before the algorithm starts rendering the (first) output frame for that input frame.
+
+    The deinterlace algorithm is allowed to behave differently for different input frames.
+    This is especially important for startup, when full history (as defined by each algorithm)
+    is not yet available. During the first-ever input frame, it is clear that it is the
+    only possible source for information, so i_frame_offset = 0 is necessarily correct.
+    After that, what to do is up to each algorithm.
+
+    Having the correct offset at the start of each input frame is critically important in order to:
+      1) Allocate the correct number of output frames for framerate doublers, and to
+      2) Pass correct TFF/BFF information to the algorithm.
+
+    These points are important for proper soft field repeat support. This feature is used in some
+    streams originating from film. In soft NTSC telecine, the number of fields alternates as 3,2,3,2,...
+    and the video field dominance flips every two frames (after every "3"). Also, some streams
+    request an occasional field repeat (nb_fields = 3), after which the video field dominance flips.
+    To render such streams correctly, the nb_fields and TFF/BFF information must be taken from
+    the specific input frame that the algorithm intends to render.
+
+    Additionally, the output PTS is automatically computed by Deinterlace() from i_frame_offset and i_order.
+
+    It is possible to use the special value CUSTOM_PTS to indicate that the algorithm computes
+    the output PTSs itself. In this case, Deinterlace() will pass them through. This special value
+    is not valid for framerate doublers, as by definition they are field renderers, so they need to
+    use the original field timings to work correctly. Basically, this special value is only intended
+    for algorithms that need to perform nontrivial framerate conversions (such as IVTC).
+*/
+
 
 /*****************************************************************************
  * SetFilterMethod: setup the deinterlace method to use.
@@ -208,6 +283,8 @@ static void SetFilterMethod( filter_t *p_filter, const char *psz_method, vlc_fou
         p_sys->b_double_rate = false;
         p_sys->b_half_height = false;
     }
+
+    p_sys->i_frame_offset = 0; /* reset to default when method changes */
 
     msg_Dbg( p_filter, "using %s deinterlace method", psz_method );
 }
@@ -1440,7 +1517,7 @@ static int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src, 
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /* */
-    assert( i_order == 0 || i_order == 1 );
+    assert( i_order >= 0 && i_order <= 2 ); /* 2 = soft field repeat */
     assert( i_field == 0 || i_field == 1 );
 
     if( i_order == 0 )
@@ -1465,6 +1542,41 @@ static int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src, 
     picture_t *p_cur  = p_sys->pp_history[1];
     picture_t *p_next = p_sys->pp_history[2];
 
+    /* Account for soft field repeat.
+
+       The "parity" parameter affects the algorithm like this (from yadif.h):
+       uint8_t *prev2= parity ? prev : cur ;
+       uint8_t *next2= parity ? cur  : next;
+
+       The original parity expression that was used here is:
+       (i_field ^ (i_order == i_field)) & 1
+
+       Truth table:
+       i_field = 0, i_order = 0  => 1
+       i_field = 1, i_order = 1  => 0
+       i_field = 1, i_order = 0  => 1
+       i_field = 0, i_order = 1  => 0
+
+       => equivalent with e.g.  (1 - i_order)  or  (i_order + 1) % 2
+
+       Thus, in a normal two-field frame,
+             parity 1 = first field  (i_order == 0)
+             parity 0 = second field (i_order == 1)
+
+       Now, with three fields, where the third is a copy of the first,
+             i_order = 0  =>  parity 1 (as usual)
+             i_order = 1  =>  due to the repeat, prev = cur, but also next = cur.
+                              Because in such a case there is no motion (otherwise field repeat makes no sense),
+                              we don't actually need to invoke Yadif's filter(). Thus, set "parity" to 2,
+                              and use this to bypass the filter.
+             i_order = 2  =>  parity 0 (as usual)
+    */
+    int yadif_parity;
+    if( p_cur  &&  p_cur->i_nb_fields > 2 )
+        yadif_parity = (i_order + 1) % 3; /* 1, *2*, 0; where 2 is a special value meaning "bypass filter". */
+    else
+        yadif_parity = (i_order + 1) % 2; /* 1, 0 */
+
     /* Filter if we have all the pictures we need */
     if( p_prev && p_cur && p_next )
     {
@@ -1486,7 +1598,7 @@ static int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src, 
 
             for( int y = 1; y < dstp->i_visible_lines - 1; y++ )
             {
-                if( (y % 2) == i_field )
+                if( (y % 2) == i_field  ||  yadif_parity == 2 )
                 {
                     vlc_memcpy( &dstp->p_pixels[y * dstp->i_pitch],
                                 &curp->p_pixels[y * curp->i_pitch], dstp->i_visible_pitch );
@@ -1505,7 +1617,7 @@ static int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src, 
                             &nextp->p_pixels[y * nextp->i_pitch],
                             dstp->i_visible_pitch,
                             curp->i_pitch,
-                            (i_field ^ (i_order == i_field)) & 1 );
+                            yadif_parity );
                 }
 
                 /* We duplicate the first and last lines */
@@ -1516,18 +1628,23 @@ static int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src, 
             }
         }
 
-        /* */
-        p_dst->date = (p_next->date - p_cur->date) * i_order / 2 + p_cur->date;
+        p_sys->i_frame_offset = 1; /* p_curr will be rendered at next frame, too */
+
         return VLC_SUCCESS;
     }
     else if( !p_prev && !p_cur && p_next )
     {
+        /* NOTE: For the first frame, we use the default frame offset
+                 as set by Open() or SetFilterMethod(). It is always 0. */
+
         /* FIXME not good as it does not use i_order/i_field */
         RenderX( p_dst, p_next );
         return VLC_SUCCESS;
     }
     else
     {
+        p_sys->i_frame_offset = 1; /* p_curr will be rendered at next frame */
+
         return VLC_EGENERIC;
     }
 }
@@ -1535,10 +1652,11 @@ static int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src, 
 /*****************************************************************************
  * video filter2 functions
  *****************************************************************************/
+#define DEINTERLACE_DST_SIZE 3
 static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    picture_t *p_dst[2];
+    picture_t *p_dst[DEINTERLACE_DST_SIZE];
 
     /* Request output picture */
     p_dst[0] = filter_NewPicture( p_filter );
@@ -1549,25 +1667,116 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     }
     picture_CopyProperties( p_dst[0], p_pic );
 
-    if( p_sys->b_double_rate )
+    /* Any unused p_dst pointers must be NULL, because they are used to check how many output frames we have. */
+    for( int i = 1; i < DEINTERLACE_DST_SIZE; ++i )
+        p_dst[i] = NULL;
+
+    /* Slide the metadata history. */
+    for( int i = 1; i < METADATA_SIZE; i++ )
     {
-        p_dst[0]->p_next =
-        p_dst[1]         = filter_NewPicture( p_filter );
-        if( p_dst[1] )
-        {
-            picture_CopyProperties( p_dst[1], p_pic );
-            /* XXX it's not really good especially for the first picture, but
-             * I don't think that delaying by one frame is worth it */
-            if( p_sys->i_last_date > VLC_TS_INVALID && p_pic->date > VLC_TS_INVALID )
-                p_dst[1]->date = p_pic->date + (p_pic->date - p_sys->i_last_date) / 2;
-        }
-        p_sys->i_last_date = p_pic->date;
+        p_sys->meta.pi_date[i-1]            = p_sys->meta.pi_date[i];
+        p_sys->meta.pi_nb_fields[i-1]       = p_sys->meta.pi_nb_fields[i];
+        p_sys->meta.pb_top_field_first[i-1] = p_sys->meta.pb_top_field_first[i];
+    }
+    /* The last element corresponds to the current input frame. */
+    p_sys->meta.pi_date[METADATA_SIZE-1]            = p_pic->date;
+    p_sys->meta.pi_nb_fields[METADATA_SIZE-1]       = p_pic->i_nb_fields;
+    p_sys->meta.pb_top_field_first[METADATA_SIZE-1] = p_pic->b_top_field_first;
+
+    /* Remember the frame offset that we should use for this frame.
+       The value in p_sys will be updated to reflect the correct value
+       for the *next* frame when we call the renderer. */
+    int i_frame_offset = p_sys->i_frame_offset;
+    int i_meta_idx     = (METADATA_SIZE-1) - i_frame_offset;
+
+    /* These correspond to the current *outgoing* frame. */
+    bool b_top_field_first;
+    int i_nb_fields;
+    if( i_frame_offset != CUSTOM_PTS )
+    {
+        /* Pick the correct values from the history. */
+        b_top_field_first = p_sys->meta.pb_top_field_first[i_meta_idx];
+        i_nb_fields       = p_sys->meta.pi_nb_fields[i_meta_idx];
     }
     else
     {
-        p_dst[1] = NULL;
+        /* Framerate doublers must not request CUSTOM_PTS, as they need the original field timings,
+           and need Deinterlace() to allocate the correct number of output frames. */
+        assert( !p_sys->b_double_rate );
+
+        /* NOTE: i_nb_fields is only used for framerate doublers, so it is unused in this case.
+                 b_top_field_first is only passed to the algorithm. We assume that algorithms that
+                 request CUSTOM_PTS will, if necessary, extract the TFF/BFF information themselves.
+        */
+        b_top_field_first = p_pic->b_top_field_first; /* this is not guaranteed to be meaningful */
+        i_nb_fields       = p_pic->i_nb_fields;       /* unused */
     }
 
+    /* For framerate doublers, determine field duration and allocate output frames. */
+    mtime_t i_field_dur = 0;
+    int i_double_rate_alloc_end = 0; /* One past last for allocated output frames in p_dst[].
+                                        Used only for framerate doublers. Will be inited below.
+                                        Declared here because the PTS logic needs the result. */
+    if( p_sys->b_double_rate )
+    {
+        /* Calculate one field duration. */
+        int i = 0;
+        int iend = METADATA_SIZE-1;
+        /* Find oldest valid logged date. Note: the current input frame doesn't count. */
+        for( ; i < iend; i++ )
+            if( p_sys->meta.pi_date[i] > VLC_TS_INVALID )
+                break;
+        if( i < iend )
+        {
+            /* Count how many fields the valid history entries (except the new frame) represent. */
+            int i_fields_total = 0;
+            for( int j = i ; j < iend; j++ )
+                i_fields_total += p_sys->meta.pi_nb_fields[j];
+            /* One field took this long. */
+            i_field_dur = (p_pic->date - p_sys->meta.pi_date[i]) / i_fields_total;
+        }
+        /* Note that we default to field duration 0 if it could not be determined.
+           This behaves the same as the old code - leaving the extra output frame
+           dates the same as p_pic->date if the last cached date was not valid.
+        */
+
+        i_double_rate_alloc_end = i_nb_fields;
+        if( i_nb_fields > DEINTERLACE_DST_SIZE )
+        {
+            /* Note that the effective buffer size depends also on the constant private_picture in vout_wrapper.c,
+               since that determines the maximum number of output pictures filter_NewPicture() will successfully
+               allocate for one input frame.
+            */
+            msg_Err( p_filter, "Framerate doubler: output buffer too small; fields = %d, buffer size = %d. Dropping the remaining fields.", i_nb_fields, DEINTERLACE_DST_SIZE );
+            i_double_rate_alloc_end = DEINTERLACE_DST_SIZE;
+        }
+
+        /* Allocate output frames. */
+        for( int i = 1; i < i_double_rate_alloc_end ; ++i )
+        {
+            p_dst[i-1]->p_next =
+            p_dst[i]           = filter_NewPicture( p_filter );
+            if( p_dst[i] )
+            {
+                picture_CopyProperties( p_dst[i], p_pic );
+            }
+            else
+            {
+                msg_Err( p_filter, "Framerate doubler: could not allocate output frame %d", i+1 );
+                i_double_rate_alloc_end = i; /* Inform the PTS logic about the correct end position. */
+                break; /* If this happens, the rest of the allocations aren't likely to work, either... */
+            }
+        }
+        /* Now we have allocated *up to* the correct number of frames; normally, exactly the correct number.
+           Upon alloc failure, we may have succeeded in allocating *some* output frames, but fewer than
+           were desired. In such a case, as many will be rendered as were successfully allocated.
+
+           Note that now p_dst[i] != NULL for 0 <= i < i_double_rate_alloc_end. */
+    }
+    assert( p_sys->b_double_rate == true  ||  p_dst[1] == NULL );
+    assert( i_nb_fields > 2  ||  p_dst[2] == NULL );
+
+    /* Render */
     switch( p_sys->i_mode )
     {
         case DEINTERLACE_DISCARD:
@@ -1575,15 +1784,19 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             break;
 
         case DEINTERLACE_BOB:
-            RenderBob( p_filter, p_dst[0], p_pic, !p_pic->b_top_field_first );
+            RenderBob( p_filter, p_dst[0], p_pic, !b_top_field_first );
             if( p_dst[1] )
-                RenderBob( p_filter, p_dst[1], p_pic, p_pic->b_top_field_first );
+                RenderBob( p_filter, p_dst[1], p_pic, b_top_field_first );
+            if( p_dst[2] )
+                RenderBob( p_filter, p_dst[2], p_pic, !b_top_field_first );
             break;;
 
         case DEINTERLACE_LINEAR:
-            RenderLinear( p_filter, p_dst[0], p_pic, !p_pic->b_top_field_first );
+            RenderLinear( p_filter, p_dst[0], p_pic, !b_top_field_first );
             if( p_dst[1] )
-                RenderLinear( p_filter, p_dst[1], p_pic, p_pic->b_top_field_first );
+                RenderLinear( p_filter, p_dst[1], p_pic, b_top_field_first );
+            if( p_dst[2] )
+                RenderLinear( p_filter, p_dst[2], p_pic, !b_top_field_first );
             break;
 
         case DEINTERLACE_MEAN:
@@ -1604,24 +1817,58 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             break;
 
         case DEINTERLACE_YADIF2X:
-            if( RenderYadif( p_filter, p_dst[0], p_pic, 0, !p_pic->b_top_field_first ) )
+            if( RenderYadif( p_filter, p_dst[0], p_pic, 0, !b_top_field_first ) )
                 goto drop;
             if( p_dst[1] )
-                RenderYadif( p_filter, p_dst[1], p_pic, 1, p_pic->b_top_field_first );
+                RenderYadif( p_filter, p_dst[1], p_pic, 1, b_top_field_first );
+            if( p_dst[2] )
+                RenderYadif( p_filter, p_dst[2], p_pic, 2, !b_top_field_first );
             break;
     }
 
+    /* Set output timestamps, if the algorithm didn't request CUSTOM_PTS for this frame. */
+    assert( i_frame_offset <= METADATA_SIZE  ||  i_frame_offset == CUSTOM_PTS );
+    if( i_frame_offset != CUSTOM_PTS )
+    {
+        mtime_t i_base_pts = p_sys->meta.pi_date[i_meta_idx];
+
+        /* Note: in the usual case (i_frame_offset = 0  and  b_double_rate = false),
+                 this effectively does nothing. This is needed to correct the timestamp
+                 when i_frame_offset > 0. */
+        p_dst[0]->date = i_base_pts;
+
+        if( p_sys->b_double_rate )
+        {
+            /* Processing all actually allocated output frames. */
+            for( int i = 1; i < i_double_rate_alloc_end; ++i )
+            {
+                /* XXX it's not really good especially for the first picture, but
+                 * I don't think that delaying by one frame is worth it */
+                if( i_base_pts > VLC_TS_INVALID )
+                    p_dst[i]->date = i_base_pts + i * i_field_dur;
+                else
+                    p_dst[i]->date = VLC_TS_INVALID;
+            }
+        }
+    }
+
     p_dst[0]->b_progressive = true;
-    if( p_dst[1] )
-        p_dst[1]->b_progressive = true;
+    for( int i = 1; i < DEINTERLACE_DST_SIZE; ++i )
+    {
+        if( p_dst[i] )
+            p_dst[i]->b_progressive = true;
+    }
 
     picture_Release( p_pic );
     return p_dst[0];
 
 drop:
     picture_Release( p_dst[0] );
-    if( p_dst[1] )
-        picture_Release( p_dst[1] );
+    for( int i = 1; i < DEINTERLACE_DST_SIZE; ++i )
+    {
+        if( p_dst[i] )
+            picture_Release( p_dst[i] );
+    }
     picture_Release( p_pic );
     return NULL;
 }
@@ -1630,7 +1877,13 @@ static void Flush( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    p_sys->i_last_date = VLC_TS_INVALID;
+    for( int i = 0; i < METADATA_SIZE; i++ )
+    {
+        p_sys->meta.pi_date[i] = VLC_TS_INVALID;
+        p_sys->meta.pi_nb_fields[i] = 2;
+        p_sys->meta.pb_top_field_first[i] = true;
+    }
+    p_sys->i_frame_offset = 0; /* reset to default value (first frame after flush cannot have offset) */
     for( int i = 0; i < HISTORY_SIZE; i++ )
     {
         if( p_sys->pp_history[i] )
@@ -1669,7 +1922,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_mode = DEINTERLACE_BLEND;
     p_sys->b_double_rate = false;
     p_sys->b_half_height = true;
-    p_sys->i_last_date = VLC_TS_INVALID;
+    for( int i = 0; i < METADATA_SIZE; i++ )
+    {
+        p_sys->meta.pi_date[i] = VLC_TS_INVALID;
+        p_sys->meta.pi_nb_fields[i] = 2;
+        p_sys->meta.pb_top_field_first[i] = true;
+    }
+    p_sys->i_frame_offset = 0; /* start with default value (first-ever frame cannot have offset) */
     for( int i = 0; i < HISTORY_SIZE; i++ )
         p_sys->pp_history[i] = NULL;
 
