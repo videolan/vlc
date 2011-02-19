@@ -58,6 +58,7 @@
 #include <vlc_playlist.h>
 #include <vlc_meta.h>
 #include <vlc_mtime.h>
+#include <vlc_fs.h>
 
 #include <assert.h>
 #include <string.h>
@@ -171,7 +172,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_input = NULL;
     p_sys->i_playing_state = -1;
 
-    if( pipe( p_sys->p_pipe_fds ) )
+    if( vlc_pipe( p_sys->p_pipe_fds ) )
     {
         free( p_sys );
         msg_Err( p_intf, "Could not create pipe" );
