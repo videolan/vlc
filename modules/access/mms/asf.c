@@ -123,7 +123,7 @@ void  asf_HeaderParse ( asf_header_t *hdr,
                 i_len = var_buffer_get16( &buffer );
                 var_buffer_getmemory( &buffer, NULL, i_len );
 
-                i_subsize = 4 + i_len;
+                i_subsize += 4 + i_len;
             }
 
             for( i = 0; i < i_count2; i++ )
