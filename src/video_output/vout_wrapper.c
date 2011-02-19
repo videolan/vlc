@@ -134,7 +134,7 @@ int vout_InitWrapper(vout_thread_t *vout)
 
     sys->display.use_dr = !vout_IsDisplayFiltered(vd);
     const bool allow_dr = !vd->info.has_pictures_invalid && sys->display.use_dr;
-    const unsigned private_picture  = 3; /* XXX 2 for filter, 1 for SPU */
+    const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
     const unsigned decoder_picture  = 1 + sys->dpb_size;
     const unsigned kept_picture     = 1; /* last displayed picture */
     const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
