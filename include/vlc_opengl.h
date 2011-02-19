@@ -34,9 +34,9 @@ struct vout_window_t;
 /**
  * A VLC GL context (and its underlying surface)
  */
-typedef struct vlc_gl vlc_gl_t;
+typedef struct vlc_gl_t vlc_gl_t;
 
-struct vlc_gl
+struct vlc_gl_t
 {
     VLC_COMMON_MEMBERS
 
