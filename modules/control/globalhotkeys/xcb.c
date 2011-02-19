@@ -307,16 +307,19 @@ static bool Mapping( intf_thread_t *p_intf )
             p_hotkey->psz_action != NULL;
             p_hotkey++ )
     {
-        char *psz_hotkey;
-        if( asprintf( &psz_hotkey, "global-%s", p_hotkey->psz_action ) < 0 )
-            break;
-
         const int i_vlc_action = p_hotkey->i_action;
-        const int i_vlc_key = var_InheritInteger( p_intf, psz_hotkey );
-        free( psz_hotkey );
+        char varname[12 + strlen( p_hotkey->psz_action )];
+        sprintf( varname, "global-key-%s", p_hotkey->psz_action );
 
-        if( !i_vlc_key )
+        char *key = var_InheritString( p_intf, varname );
+        if( key == NULL )
             continue;
+
+        uint_fast32_t i_vlc_key = vlc_str2keycode( key );
+        free( key );
+        if( i_vlc_key == KEY_UNSET )
+            continue;
+
 #ifdef XCB_KEYSYM_OLD_API /* as seen in Debian Lenny */
         const xcb_keycode_t key = xcb_key_symbols_get_keycode(
                 p_sys->p_symbols, GetX11Key( i_vlc_key & ~KEY_MODIFIER ) );
