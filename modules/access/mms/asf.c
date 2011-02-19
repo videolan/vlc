@@ -60,12 +60,11 @@ void  asf_HeaderParse ( asf_header_t *hdr,
     var_buffer_t buffer;
     guid_t      guid;
     uint64_t    i_size;
-    int         i;
 
     hdr->i_file_size = 0;
     hdr->i_data_packets_count = 0;
     hdr->i_min_data_packet_size = 0;
-    for( i = 0; i < 128; i++ )
+    for( unsigned i = 0; i < 128; i++ )
     {
         hdr->stream[i].i_cat = ASF_STREAM_UNKNOWN;
         hdr->stream[i].i_selected = 0;
@@ -107,7 +106,6 @@ void  asf_HeaderParse ( asf_header_t *hdr,
             /* Grrrrrr */
             int16_t i_count1, i_count2;
             int i_subsize;
-            int i;
 
             var_buffer_getmemory( &buffer, NULL, 84 - 24 );
 
@@ -115,7 +113,7 @@ void  asf_HeaderParse ( asf_header_t *hdr,
             i_count2 = var_buffer_get16( &buffer );
 
             i_subsize = 88;
-            for( i = 0; i < i_count1; i++ )
+            for( int i = 0; i < i_count1; i++ )
             {
                 int i_len;
 
@@ -126,7 +124,7 @@ void  asf_HeaderParse ( asf_header_t *hdr,
                 i_subsize += 4 + i_len;
             }
 
-            for( i = 0; i < i_count2; i++ )
+            for( int i = 0; i < i_count2; i++ )
             {
                 int i_len;
                 var_buffer_getmemory( &buffer, NULL, 16 + 2 );
@@ -199,7 +197,7 @@ void  asf_StreamSelect  ( asf_header_t *hdr,
                               bool b_all, bool b_audio, bool b_video )
 {
     /* XXX FIXME use mututal eclusion information */
-    int i;
+    unsigned i;
     int i_audio, i_video;
     int i_bitrate_total;
 #if 0
