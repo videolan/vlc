@@ -571,7 +571,7 @@ static int OSDMenuCallback( vlc_object_t *p_this, char const *psz_var,
     if( !p_sys )
         return VLC_SUCCESS;
 
-    if( !strncmp( psz_var, OSD_CFG"position", 16) )
+    if( !strcmp( psz_var, OSD_CFG"position") )
     {
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
         unsigned int i;
@@ -585,8 +585,8 @@ static int OSDMenuCallback( vlc_object_t *p_this, char const *psz_var,
         }
 #undef ARRAY_SIZE
     }
-    else if( !strncmp( psz_var, OSD_CFG"x", 9) ||
-             !strncmp( psz_var, OSD_CFG"y", 9))
+    else if( !strcmp( psz_var, OSD_CFG"x") ||
+             !strcmp( psz_var, OSD_CFG"y"))
     {
         p_sys->b_absolute = true;
         if( (p_sys->i_x < 0) || (p_sys->i_y < 0) )
@@ -601,11 +601,11 @@ static int OSDMenuCallback( vlc_object_t *p_this, char const *psz_var,
             p_sys->p_menu->i_y = p_sys->i_y;
         }
     }
-    else if( !strncmp( psz_var, OSD_CFG"update", 14) )
+    else if( !strcmp( psz_var, OSD_CFG"update") )
         p_sys->i_update =  newval.i_int * INT64_C(1000);
-    else if( !strncmp( psz_var, OSD_CFG"timeout", 15) )
+    else if( !strcmp( psz_var, OSD_CFG"timeout") )
         p_sys->i_update = newval.i_int % 1000;
-    else if( !strncmp( psz_var, OSD_CFG"alpha", 13) )
+    else if( !strcmp( psz_var, OSD_CFG"alpha") )
         p_sys->i_alpha = newval.i_int % 256;
 
     p_sys->b_update = p_sys->b_visible ? true : false;
