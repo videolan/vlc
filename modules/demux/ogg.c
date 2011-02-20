@@ -1834,7 +1834,7 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
 
             p_stream->b_force_backup = 1;
         }
-        else if( !strncmp(content_type_string, "audio/x-speex", 14) )
+        else if( !strncmp(content_type_string, "audio/x-speex", 13) )
         {
             p_stream->fmt.i_cat = AUDIO_ES;
             p_stream->fmt.i_codec = VLC_CODEC_SPEEX;
@@ -1848,14 +1848,14 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
 
             p_stream->b_force_backup = 1;
         }
-        else if( !strncmp(content_type_string, "video/x-xvid", 14) )
+        else if( !strncmp(content_type_string, "video/x-xvid", 12) )
         {
             p_stream->fmt.i_cat = VIDEO_ES;
             p_stream->fmt.i_codec = VLC_FOURCC( 'x','v','i','d' );
 
             p_stream->b_force_backup = 1;
         }
-        else if( !strncmp(content_type_string, "video/mpeg", 14) )
+        else if( !strncmp(content_type_string, "video/mpeg", 10) )
         {
             /* n.b. MPEG streams are unsupported right now */
             p_stream->fmt.i_cat = VIDEO_ES;
