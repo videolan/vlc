@@ -345,7 +345,7 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED(p_this);
 
     vlc_mutex_lock( &p_sys->lock );
-    if( !strncmp( psz_var, "marq-marquee", 7 ) )
+    if( !strncmp( psz_var, "marq-marquee", 12 ) )
     {
         free( p_sys->psz_marquee );
         p_sys->psz_marquee = strdup( newval.psz_string );
@@ -358,15 +358,15 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
     {
         p_sys->i_yoff = newval.i_int;
     }
-    else if ( !strncmp( psz_var, "marq-color", 8 ) )  /* "marq-col" */
+    else if ( !strncmp( psz_var, "marq-color", 10 ) )
     {
         p_sys->p_style->i_font_color = newval.i_int;
     }
-    else if ( !strncmp( psz_var, "marq-opacity", 8 ) ) /* "marq-opa" */
+    else if ( !strncmp( psz_var, "marq-opacity", 12 ) )
     {
         p_sys->p_style->i_font_alpha = 255 - newval.i_int;
     }
-    else if ( !strncmp( psz_var, "marq-size", 6 ) )
+    else if ( !strncmp( psz_var, "marq-size", 9 ) )
     {
         p_sys->p_style->i_font_size = newval.i_int;
     }
@@ -378,7 +378,7 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
     {
         p_sys->i_refresh = newval.i_int * 1000;
     }
-    else if ( !strncmp( psz_var, "marq-position", 8 ) )
+    else if ( !strncmp( psz_var, "marq-position", 13 ) )
     /* willing to accept a match against marq-pos */
     {
         p_sys->i_pos = newval.i_int;
