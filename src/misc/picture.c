@@ -107,7 +107,7 @@ void picture_Reset( picture_t *p_picture )
     p_picture->date = VLC_TS_INVALID;
     p_picture->b_force = false;
     p_picture->b_progressive = false;
-    p_picture->i_nb_fields = 0;
+    p_picture->i_nb_fields = 2;
     p_picture->b_top_field_first = false;
     picture_CleanupQuant( p_picture );
 }
@@ -135,6 +135,8 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma,
     p_picture->pf_release = NULL;
     p_picture->p_release_sys = NULL;
     p_picture->i_refcount = 0;
+
+    p_picture->i_nb_fields = 2;
 
     p_picture->i_qtype = QTYPE_NONE;
     p_picture->i_qstride = 0;
