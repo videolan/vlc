@@ -4388,10 +4388,10 @@ AC_CONFIG_FILES([
   modules/gui/macosx_dialog_provider/Makefile
   modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
+  modules/lua/Makefile
   modules/meta_engine/Makefile
   modules/misc/Makefile
   modules/misc/dummy/Makefile
-  modules/misc/lua/Makefile
   modules/misc/notify/Makefile
   modules/misc/playlist/Makefile
   modules/misc/osd/Makefile

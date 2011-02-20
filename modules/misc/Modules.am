@@ -1,12 +1,7 @@
 BASE_SUBDIRS = dummy notify playlist stats osd
-EXTRA_SUBDIRS = lua
 
 SUBDIRS = $(BASE_SUBDIRS)
-DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
-
-if BUILD_LUA
-SUBDIRS += lua
-endif
+DIST_SUBDIRS = $(BASE_SUBDIRS)
 
 SOURCES_freetype = freetype.c text_renderer.h
 SOURCES_win32text = win32text.c

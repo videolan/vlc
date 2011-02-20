@@ -28,6 +28,7 @@ EXTRA_SUBDIRS = \
 	3dnow \
 	altivec \
 	arm_neon \
+	lua \
 	$(NULL)
 
 SUBDIRS = $(BASE_SUBDIRS)
@@ -52,6 +53,9 @@ SUBDIRS += altivec
 endif
 if HAVE_ARM_NEON
 SUBDIRS += arm_neon
+endif
+if BUILD_LUA
+SUBDIRS += lua
 endif
 SUBDIRS += .
 
