@@ -138,7 +138,7 @@ static int rtsp_get_status_code( rtsp_client_t *rtsp, const char *psz_string )
         psz_buffer[3] = 0;
         i_code = atoi( psz_buffer );
     }
-    else if( !strncmp( psz_string, "SET_PARAMETER", 8 ) )
+    else if( !strncmp( psz_string, "SET_PARAMETER", sizeof("SET_PARAMETER") - 1 ) )
     {
         return RTSP_STATUS_SET_PARAMETER;
     }
