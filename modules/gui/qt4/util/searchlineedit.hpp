@@ -69,7 +69,7 @@ private:
 #endif
 
 #ifndef Q_WS_MAC
-class QVLCFramelessButton;
+class QFramelessButton;
 class SearchLineEdit : public QLineEdit
 {
     Q_OBJECT
@@ -82,7 +82,7 @@ private:
     void focusOutEvent( QFocusEvent *event );
     void paintEvent( QPaintEvent *event );
     void setMessageVisible( bool on );
-    QVLCFramelessButton   *clearButton;
+    QFramelessButton   *clearButton;
     bool message;
 
 public slots:

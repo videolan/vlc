@@ -106,7 +106,7 @@ void ClickLineEdit::focusOutEvent( QFocusEvent *ev )
 #ifndef Q_WS_MAC
 SearchLineEdit::SearchLineEdit( QWidget *parent ) : QLineEdit( parent )
 {
-    clearButton = new QVLCFramelessButton( this );
+    clearButton = new QFramelessButton( this );
     clearButton->setIcon( QIcon( ":/toolbar/clear" ) );
     clearButton->setIconSize( QSize( 16, 16 ) );
     clearButton->setCursor( Qt::ArrowCursor );

@@ -36,21 +36,21 @@
 #include <QTimer>
 class QPixmap;
 
-class QVLCFramelessButton : public QPushButton
+class QFramelessButton : public QPushButton
 {
     Q_OBJECT
 public:
-    QVLCFramelessButton( QWidget *parent = NULL );
+    QFramelessButton( QWidget *parent = NULL );
     virtual QSize sizeHint() const { return iconSize(); }
 protected:
     virtual void paintEvent( QPaintEvent * event );
 };
 
 
-class QVLCElidingLabel : public QLabel
+class QElidingLabel : public QLabel
 {
 public:
-    QVLCElidingLabel( const QString &s = QString(),
+    QElidingLabel( const QString &s = QString(),
                       Qt::TextElideMode mode = Qt::ElideRight,
                       QWidget * parent = NULL );
     void setElideMode( Qt::TextElideMode );
@@ -71,14 +71,14 @@ public:
     }
 };
 
-class DebugLevelSpinBox : public QSpinBox
+class QVLCDebugLevelSpinBox : public QSpinBox
 {
     Q_OBJECT
 public:
-    DebugLevelSpinBox( QWidget *parent ) : QSpinBox( parent ) { };
+    QVLCDebugLevelSpinBox( QWidget *parent ) : QSpinBox( parent ) { };
 protected:
     virtual QString textFromValue( int ) const;
-    /* DebugLevelSpinBox is read-only */
+    /* QVLCDebugLevelSpinBox is read-only */
     virtual int valueFromText( const QString& ) const { return -1; }
 };
 

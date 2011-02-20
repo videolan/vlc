@@ -30,7 +30,7 @@
 #endif
 
 #include "qt4.hpp"
-#include "util/customwidgets.hpp" /* QVLCFramelessButton */
+#include "util/customwidgets.hpp" /* QFramelessButton */
 
 #include <QTreeWidget>
 
@@ -68,7 +68,7 @@ enum ItemAction {
 };
 
 
-class SelectorActionButton : public QVLCFramelessButton
+class SelectorActionButton : public QFramelessButton
 {
 protected:
     virtual void paintEvent( QPaintEvent * );
@@ -101,7 +101,7 @@ private:
     inline void leaveEvent( QEvent* ){ hideAction(); }
 
     QTreeWidgetItem*     qitem;
-    QVLCFramelessButton* lblAction;
+    QFramelessButton* lblAction;
     QLabel*              lbl;
     QHBoxLayout*         layout;
 };

@@ -54,7 +54,7 @@ void SelectorActionButton::paintEvent( QPaintEvent *event )
     int frame = style()->pixelMetric( QStyle::PM_DefaultFrameWidth, 0, this );
     p.drawLine( rect().topLeft() + QPoint( 0, frame ),
                 rect().bottomLeft() - QPoint( 0, frame ) );
-    QVLCFramelessButton::paintEvent( event );
+    QFramelessButton::paintEvent( event );
 }
 
 PLSelItem::PLSelItem ( QTreeWidgetItem *i, const QString& text )
@@ -64,7 +64,7 @@ PLSelItem::PLSelItem ( QTreeWidgetItem *i, const QString& text )
     layout->setContentsMargins(0,0,0,0);
     layout->addSpacing( 3 );
 
-    lbl = new QVLCElidingLabel( text );
+    lbl = new QElidingLabel( text );
     layout->addWidget(lbl, 1);
 
     int height = qMax( 22, fontMetrics().height() + 8 );

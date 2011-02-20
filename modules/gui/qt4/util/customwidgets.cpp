@@ -38,13 +38,13 @@
 #include <QPixmap>
 #include <vlc_keys.h>
 
-QVLCFramelessButton::QVLCFramelessButton( QWidget *parent )
+QFramelessButton::QFramelessButton( QWidget *parent )
                     : QPushButton( parent )
 {
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 }
 
-void QVLCFramelessButton::paintEvent( QPaintEvent * )
+void QFramelessButton::paintEvent( QPaintEvent * )
 {
     QPainter painter( this );
     QPixmap pix = icon().pixmap( size() );
@@ -52,17 +52,17 @@ void QVLCFramelessButton::paintEvent( QPaintEvent * )
     painter.drawPixmap( QRect( pos.x(), pos.y(), pix.width(), pix.height() ), pix );
 }
 
-QVLCElidingLabel::QVLCElidingLabel( const QString &s, Qt::TextElideMode mode, QWidget * parent )
+QElidingLabel::QElidingLabel( const QString &s, Qt::TextElideMode mode, QWidget * parent )
                  : elideMode( mode ), QLabel( s, parent )
 { }
 
-void QVLCElidingLabel::setElideMode( Qt::TextElideMode mode )
+void QElidingLabel::setElideMode( Qt::TextElideMode mode )
 {
     elideMode = mode;
     repaint();
 }
 
-void QVLCElidingLabel::paintEvent( QPaintEvent * event )
+void QElidingLabel::paintEvent( QPaintEvent * event )
 {
     QPainter p( this );
     int space = frameWidth() + margin();
@@ -70,7 +70,7 @@ void QVLCElidingLabel::paintEvent( QPaintEvent * event )
     p.drawText( r, fontMetrics().elidedText( text(), elideMode, r.width() ), alignment() );
 }
 
-QString DebugLevelSpinBox::textFromValue( int v ) const
+QString QVLCDebugLevelSpinBox::textFromValue( int v ) const
 {
     QString const texts[] = {
     /* Note that min level 0 is 'errors' in Qt Ui
