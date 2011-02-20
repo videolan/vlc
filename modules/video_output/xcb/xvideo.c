@@ -247,11 +247,7 @@ FindFormat (vout_display_t *vd,
     xcb_connection_t *conn = vd->sys->conn;
     const xcb_xv_image_format_info_t *f, *end;
 
-#ifndef XCB_XV_OLD
     f = xcb_xv_list_image_formats_format (list);
-#else
-    f = (xcb_xv_image_format_info_t *) (list + 1);
-#endif
     end = f + xcb_xv_list_image_formats_format_length (list);
     for (; f < end; f++)
     {

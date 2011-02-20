@@ -3187,11 +3187,6 @@ AS_IF([test "${enable_xcb}" != "no"], [
   AS_IF([test "${enable_xvideo}" != "no"], [
     PKG_CHECK_MODULES(XCB_XV, [xcb-xv >= 1.1.90.1], [
       VLC_ADD_PLUGIN([xcb_xv])
-    ], [
-      PKG_CHECK_MODULES(XCB_XV, [xcb-xv], [
-        VLC_ADD_PLUGIN([xcb_xv])
-        VLC_ADD_CFLAGS([xcb_xv], [-DXCB_XV_OLD])
-      ])
     ])
   ])
 
