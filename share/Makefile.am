@@ -15,7 +15,7 @@ dist_appdata_DATA = vlc.desktop
 dist_vlcdata_DATA = icons/vlc.ico
 dist_icons16_DATA = icons/16x16/vlc.png icons/16x16/vlc.xpm
 dist_icons32_DATA = icons/32x32/vlc.png icons/32x32/vlc.xpm \
-		    icons/32x32/vlc-xmas.xpm
+			icons/32x32/vlc-xmas.xpm
 dist_icons48_DATA = icons/48x48/vlc.png icons/48x48/vlc-xmas.png
 dist_icons128_DATA = icons/128x128/vlc.png icons/128x128/vlc-xmas.png
 dist_icons256_DATA = icons/256x256/vlc.png
@@ -69,7 +69,7 @@ DIST_skins2 = \
 	skins2/winamp2.xml
 
 skins2_default_vlt_FILES = \
-        skins2/default/theme.xml \
+	    skins2/default/theme.xml \
 	skins2/default/subX/about.png \
 	skins2/default/subX/eq.png \
 	skins2/default/subX/font.otf \
@@ -202,7 +202,6 @@ luac_verbose_0 = @echo "  LUAC   $@";
 if BUILD_LUA
 nobase_vlclib_DATA = \
 	lua/extensions/allocine-fr.luac \
-	lua/extensions/imdb.luac \
 	lua/intf/dummy.luac \
 	lua/intf/dumpmeta.luac \
 	lua/intf/hotkeys.luac \
@@ -236,19 +235,17 @@ nobase_vlclib_DATA = \
 	lua/playlist/lelombrik.luac \
 	lua/playlist/megavideo.luac \
 	lua/playlist/metacafe.luac \
-    lua/playlist/metachannels.luac \
+	lua/playlist/metachannels.luac \
 	lua/playlist/mpora.luac \
 	lua/playlist/pinkbike.luac \
 	lua/playlist/rockbox_fm_presets.luac \
 	lua/playlist/youtube.luac \
 	lua/playlist/youtube_homepage.luac \
-	lua/sd/appletrailers.luac \
 	lua/sd/fmc.luac \
 	lua/sd/freebox.luac \
-	lua/sd/frenchtv.luac \
 	lua/sd/icecast.luac \
 	lua/sd/jamendo.luac \
-    lua/sd/metachannels.luac \
+	lua/sd/metachannels.luac \
 	$(NULL)
 if BUILD_HTTPD
 nobase_vlclib_DATA += \
@@ -263,7 +260,6 @@ EXTRA_DIST += \
 	lua/README.txt \
 	lua/extensions/README.txt \
 	lua/extensions/allocine-fr.lua \
-	lua/extensions/imdb.lua \
 	lua/intf/README.txt \
 	lua/intf/dummy.lua \
 	lua/intf/dumpmeta.lua \
@@ -303,20 +299,18 @@ EXTRA_DIST += \
 	lua/playlist/lelombrik.lua \
 	lua/playlist/megavideo.lua \
 	lua/playlist/metacafe.lua \
-    lua/playlist/metachannels.lua \
+	lua/playlist/metachannels.lua \
 	lua/playlist/mpora.lua \
 	lua/playlist/pinkbike.lua \
 	lua/playlist/rockbox_fm_presets.lua \
 	lua/playlist/youtube.lua \
 	lua/playlist/youtube_homepage.lua \
 	lua/sd/README.txt \
-	lua/sd/appletrailers.lua \
 	lua/sd/fmc.lua \
 	lua/sd/freebox.lua \
-	lua/sd/frenchtv.lua \
 	lua/sd/icecast.lua \
 	lua/sd/jamendo.lua \
-    lua/sd/metachannels.lua
+	lua/sd/metachannels.lua
 
 DIST_http_lua = \
 	lua/http/.hosts \
