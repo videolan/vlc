@@ -3200,24 +3200,14 @@ AS_IF([test "${enable_xcb}" != "no"], [
 
   dnl xcb-utils
   PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms >= 0.3.4], [
-    have_xcb_keysyms="yes"
-  ], [
-    PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms], [
-      have_xcb_keysyms="yes"
-      VLC_ADD_CFLAGS([globalhotkeys], [-DXCB_KEYSYM_OLD_API])
-    ], [
-      have_xcb_keysyms="no"
-      need_xid_provider="yes"
-      AC_MSG_WARN([libxcb-keysyms not found. Hotkeys will not be supported.])
-    ])
-  ])
-
-  AS_IF([test "${have_xcb_keysyms}" = "yes"], [
     PKG_CHECK_MODULES(XPROTO, [xproto])
     VLC_ADD_PLUGIN([globalhotkeys])
     VLC_ADD_CFLAGS([globalhotkeys], [${XCB_KEYSYMS_CFLAGS} ${XCB_CFLAGS}])
     VLC_ADD_LIBS([globalhotkeys], [${XCB_KEYSYMS_LIBS} ${XCB_LIBS}])
     VLC_ADD_CFLAGS([xcb_window], [-DHAVE_XCB_KEYSYMS])
+  ], [
+    need_xid_provider="yes"
+    AC_MSG_WARN([libxcb-keysyms (0.3.4 or later) not found. Hotkeys will work.])
   ])
 ])
 AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
