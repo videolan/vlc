@@ -123,6 +123,9 @@ $Id$
  * freetype: Utility to put text on video using freetype2
  * gaussianblur: gaussian blur video filter
  * gestures: mouse gestures control plugin
+ * gl: OpenGL video output using the generic OpenGL provider
+ * gles1: OpenGL ES video output using the generic OpenGL provider
+ * gles2: OpenGL ES2 video output using the generic OpenGL provider
  * globalhotkeys: module to catch hotkeys when application doesn't have the focus
  * glwin32: a opengl provider using DirectX OpenGL
  * gme: old console games music playback using Game Music Emu
