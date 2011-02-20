@@ -34,7 +34,6 @@
 #include <vlc_vout_window.h>
 #ifdef __unix__
 # include <vlc_xlib.h>
-# include <dlfcn.h>
 #endif
 
 /* Plugin callbacks */
@@ -126,20 +125,6 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
         return VLC_ENOMEM;
     gl->sys = sys;
     sys->display = dpy;
-
-#ifdef __unix__
-    /* XXX Explicit hack!
-     * Mesa EGL plugins (as of version 7.8.2) are not properly linked to
-     * libEGL.so even though they import some of its symbols. This is
-     * typically not a problem. Unfortunately, LibVLC loads plugins as
-     * RTLD_LOCAL so that they do not pollute the namespace. Then the
-     * libEGL symbols are not visible to EGL plugins, and the run-time
-     * linker exits the whole process. */
-    if (dlopen ("libEGL.so", RTLD_GLOBAL|RTLD_NOW) == NULL)
-        msg_Warn (gl, "libEGL cannot be loaded. Process might crash.");
-    if (dlopen ("libGL.so", RTLD_GLOBAL|RTLD_NOW) == NULL)
-        msg_Warn (gl, "libGL cannot be loaded. Process might crash.");
-#endif
 
     EGLint major, minor;
     if (eglInitialize (dpy, &major, &minor) != EGL_TRUE)
