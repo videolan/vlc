@@ -3228,8 +3228,6 @@ AS_IF([test "${enable_glx}" != "no"], [
   ])
   VLC_ADD_PLUGIN([xcb_glx])
 ])
-AC_SUBST([GL_CFLAGS])
-AC_SUBST([GL_LIBS])
 
 dnl
 dnl  OpenGL
