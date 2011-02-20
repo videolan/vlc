@@ -80,7 +80,6 @@ struct demux_sys_t
     dc1394camera_t      *camera;
     int                 selected_camera;
     uint64_t            selected_uid;
-    picture_t           pic;
     uint32_t            dma_buffers;
     dc1394featureset_t  features;
     quadlet_t           supported_framerates;
@@ -194,8 +193,6 @@ static int Open( vlc_object_t *p_this )
     demux_sys_t  *p_sys;
     es_format_t   fmt;
     dc1394error_t res;
-    int           i_width;
-    int           i_height;
 
     if( strncmp(p_demux->psz_access, "dc1394", 6) != 0 )
         return VLC_EGENERIC;
@@ -378,21 +375,10 @@ static int Open( vlc_object_t *p_this )
     /* TODO - UYV444 chroma converter is missing, when it will be available
      * fourcc will become variable (and not just a fixed value for UYVY)
      */
-    i_width = p_sys->width;
-    i_height = p_sys->height;
-
-    if( picture_Setup( &p_sys->pic, VLC_CODEC_UYVY,
-                       i_width, i_height, 1, 1 ) )
-    {
-        msg_Err( p_demux ,"unknown chroma" );
-        Close( p_this );
-        return VLC_EGENERIC;
-    }
-
     es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_UYVY );
 
-    fmt.video.i_width = i_width;
-    fmt.video.i_height = i_height;
+    fmt.video.i_width = p_sys->width;
+    fmt.video.i_height = p_sys->height;
 
     msg_Dbg( p_demux, "Added new video es %4.4s %dx%d",
              (char*)&fmt.i_codec, fmt.video.i_width, fmt.video.i_height );
