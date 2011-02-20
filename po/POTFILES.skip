@@ -1,10 +1,5 @@
-bindings/python/vlcwidget.py
 extras/misc/mpris.glade
 libs/loader/driver.c
 libs/loader/ldt_keeper.c
-modules/access_filter/bandwidth.c
-modules/access_filter/dump.c
 modules/codec/wmafixed/bswap.h
-modules/gui/pda/pda.glade
-modules/video_output/xcb/xcb.c
 modules/video_output/xcb/window.c
