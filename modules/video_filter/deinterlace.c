@@ -1856,7 +1856,10 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     for( int i = 1; i < DEINTERLACE_DST_SIZE; ++i )
     {
         if( p_dst[i] )
+        {
             p_dst[i]->b_progressive = true;
+            p_dst[i]->i_nb_fields = 2;
+        }
     }
 
     picture_Release( p_pic );
