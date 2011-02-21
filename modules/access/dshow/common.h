@@ -227,6 +227,7 @@ typedef enum tagAMTunerModeType {
     AMTUNER_MODE_DSS        = 0x0008 
 } AMTunerModeType;
 
+#define AMPROPERTY_PIN_CATEGORY 0
 typedef enum tagAMTunerSubChannel {
     AMTUNER_SUBCHAN_NO_TUNE = -2,
     AMTUNER_SUBCHAN_DEFAULT = -1
@@ -238,4 +239,42 @@ typedef enum tagTunerInputType {
     TunerInputAntenna = TunerInputCable + 1
 } TunerInputType;
 
-#define AMPROPERTY_PIN_CATEGORY 0
+/* http://msdn.microsoft.com/en-us/library/dd407352%28v=vs.85%29.aspx */
+typedef struct _VIDEO_STREAM_CONFIG_CAPS {
+    GUID     guid;
+    ULONG    VideoStandard;
+    SIZE     InputSize;
+    SIZE     MinCroppingSize;
+    SIZE     MaxCroppingSize;
+    int      CropGranularityX;
+    int      CropGranularityY;
+    int      CropAlignX;
+    int      CropAlignY;
+    SIZE     MinOutputSize;
+    SIZE     MaxOutputSize;
+    int      OutputGranularityX;
+    int      OutputGranularityY;
+    int      StretchTapsX;
+    int      StretchTapsY;
+    int      ShrinkTapsX;
+    int      ShrinkTapsY;
+    LONGLONG MinFrameInterval;
+    LONGLONG MaxFrameInterval;
+    LONG     MinBitsPerSecond;
+    LONG     MaxBitsPerSecond;
+} VIDEO_STREAM_CONFIG_CAPS;
+
+/* http://msdn.microsoft.com/en-us/library/dd317597%28v=vs.85%29.aspx */
+typedef struct _AUDIO_STREAM_CONFIG_CAPS {
+    GUID  guid;
+    ULONG MinimumChannels;
+    ULONG MaximumChannels;
+    ULONG ChannelsGranularity;
+    ULONG MinimumBitsPerSample;
+    ULONG MaximumBitsPerSample;
+    ULONG BitsPerSampleGranularity;
+    ULONG MinimumSampleFrequency;
+    ULONG MaximumSampleFrequency;
+    ULONG SampleFrequencyGranularity;
+} AUDIO_STREAM_CONFIG_CAPS;
+
