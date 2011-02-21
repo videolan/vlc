@@ -3209,7 +3209,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
     VLC_ADD_LIBS([globalhotkeys], [${XCB_KEYSYMS_LIBS} ${XCB_LIBS}])
     VLC_ADD_CFLAGS([xcb_window], [-DHAVE_XCB_KEYSYMS])
   ], [
-    AC_MSG_WARN([libxcb-keysyms (0.3.4 or later) not found. Hotkeys will work.])
+    AC_MSG_WARN([libxcb-keysyms (0.3.4 or later) not found. Hotkeys will not work.])
   ])
 ])
 AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
