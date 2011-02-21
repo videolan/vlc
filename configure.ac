@@ -4151,11 +4151,7 @@ dnl
 AC_ARG_ENABLE(media-library, [--enable-media-library media library (default disabled)])
 if test "${enable_media_library}" == "yes"; then
     if test "${enable_sqlite}" != "yes"; then
-        if test "${enable_media_library}" == "yes"; then
-            AC_MSG_ERROR([SQLite module is required for the media library])
-        else
-            AC_MSG_WARN([SQLite module is required for the media library])
-        fi
+       AC_MSG_ERROR([SQLite module is required for the media library])
     else
        AC_DEFINE([MEDIA_LIBRARY], 1, [Define if you want to use the VLC media library])
        VLC_ADD_CPPFLAGS([qt4],"-DMEDIA_LIBRARY")
