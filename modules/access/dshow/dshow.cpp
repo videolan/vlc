@@ -45,6 +45,7 @@
 
 #include "common.h"
 #include "filter.h"
+const GUID IID_IAMStreamConfig = {0xC6E13340, 0x30AC, 0x11d0, {0xA1, 0x8C, 0x00, 0xA0, 0xC9, 0x11, 0x89, 0x56}};
 
 /*****************************************************************************
  * Access: local prototypes
