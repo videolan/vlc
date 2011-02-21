@@ -4045,11 +4045,8 @@ AS_IF([test "${enable_gnutls}" != "no"], [
       dnl pkg-config --libs gnutls omits these
       VLC_ADD_LIBS([gnutls], [-lz ${LTLIBINTL}])
     ])
-    dnl The GnuTLS plugin invokes gcry_control directly.
-    AS_IF([test "${have_libgcrypt}" = "yes"],[
-      VLC_ADD_LIBS([gnutls], [${GCRYPT_LIBS}])
-      VLC_ADD_CFLAGS([gnutls], [${GCRYPT_CFLAGS}])
-    ])
+    VLC_ADD_LIBS([gnutls], [${GCRYPT_LIBS}])
+    VLC_ADD_CFLAGS([gnutls], [${GCRYPT_CFLAGS}])
     VLC_ADD_LIBS([gnutls], [$GNUTLS_LIBS])
   ], [
     AS_IF([test "${enable_gnutls}" = "yes"], [
