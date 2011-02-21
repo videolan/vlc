@@ -2452,7 +2452,7 @@ dnl
 dnl CrystalHD codec plugin
 dnl
 AC_ARG_ENABLE(crystalhd,
-  [  --enable-crystalhd       crystalhd codec plugin (default disabled)])
+  [  --enable-crystalhd       crystalhd codec plugin (default auto)])
 if test "${enable_crystalhd}" != "no"; then
     AC_CHECK_HEADER(libcrystalhd/libcrystalhd_if.h, [
       VLC_ADD_PLUGIN([crystalhd])
