@@ -108,7 +108,6 @@ struct access_sys_t
 static const GUID PROPSETID_TUNER = {0x6a2e0605, 0x28e4, 0x11d0, {0xa1, 0x8c, 0x00, 0xa0, 0xc9, 0x11, 0x89, 0x56}};
 const GUID IID_IAMBufferNegotiation = {0x56ed71a0, 0xaf5f, 0x11d0, {0xb3, 0xf0, 0x00, 0xaa, 0x00, 0x37, 0x61, 0xc5}};
 const GUID IID_IAMTVAudio      = {0x83EC1C30, 0x23D1, 0x11d1, {0x99, 0xE6, 0x00, 0xA0, 0xC9, 0x56, 0x02, 0x66}};
-const GUID IID_IAMStreamConfig = {0xC6E13340, 0x30AC, 0x11d0, {0xA1, 0x8C, 0x00, 0xA0, 0xC9, 0x11, 0x89, 0x56}};
 const GUID IID_IAMCrossbar     = {0xC6E13380, 0x30AC, 0x11d0, {0xA1, 0x8C, 0x00, 0xA0, 0xC9, 0x11, 0x89, 0x56}};
 const GUID IID_IAMTVTuner      = {0x211A8766, 0x03AC, 0x11d1, {0x8D, 0x13, 0x00, 0xAA, 0x00, 0xBD, 0x83, 0x39}};
 
@@ -245,6 +244,35 @@ typedef enum tagTunerInputType {
     TunerInputAntenna = TunerInputCable + 1
 } TunerInputType;
 
+/* http://msdn.microsoft.com/en-us/library/dd377421%28v=vs.85%29.aspx */
+typedef enum tagPhysicalConnectorType {
+    PhysConn_Video_Tuner             = 1,
+    PhysConn_Video_Composite,
+    PhysConn_Video_SVideo,
+    PhysConn_Video_RGB,
+    PhysConn_Video_YRYBY,
+    PhysConn_Video_SerialDigital,
+    PhysConn_Video_ParallelDigital,
+    PhysConn_Video_SCSI,
+    PhysConn_Video_AUX,
+    PhysConn_Video_1394,
+    PhysConn_Video_USB,
+    PhysConn_Video_VideoDecoder,
+    PhysConn_Video_VideoEncoder,
+    PhysConn_Video_SCART,
+    PhysConn_Video_Black,
+    PhysConn_Audio_Tuner             = 4096, /* 0x1000 */
+    PhysConn_Audio_Line,
+    PhysConn_Audio_Mic,
+    PhysConn_Audio_AESDigital,
+    PhysConn_Audio_SPDIFDigital,
+    PhysConn_Audio_SCSI,
+    PhysConn_Audio_AUX,
+    PhysConn_Audio_1394,
+    PhysConn_Audio_USB,
+    PhysConn_Audio_AudioDecoder 
+} PhysicalConnectorType;
+
 /* http://msdn.microsoft.com/en-us/library/dd407352%28v=vs.85%29.aspx */
 typedef struct _VIDEO_STREAM_CONFIG_CAPS {
     GUID     guid;
@@ -283,4 +311,83 @@ typedef struct _AUDIO_STREAM_CONFIG_CAPS {
     ULONG MaximumSampleFrequency;
     ULONG SampleFrequencyGranularity;
 } AUDIO_STREAM_CONFIG_CAPS;
+
+/* http://msdn.microsoft.com/en-us/library/dd389142%28v=vs.85%29.aspx */
+#undef INTERFACE
+#define INTERFACE IAMBufferNegotiation
+DECLARE_INTERFACE_(IAMBufferNegotiation, IUnknown)
+{
+    STDMETHOD(QueryInterface) (THIS_ REFIID, PVOID*) PURE;
+    STDMETHOD_(ULONG,AddRef )(THIS);
+    STDMETHOD_(ULONG,Release )(THIS);
+    STDMETHOD(SuggestAllocatorProperties )(THIS_ const ALLOCATOR_PROPERTIES *);
+    STDMETHOD(GetAllocatorProperties )(THIS_ ALLOCATOR_PROPERTIES *);
+};
+
+/* http://msdn.microsoft.com/en-us/library/dd389171%28v=vs.85%29.aspx */
+#undef INTERFACE
+#define INTERFACE IAMCrossbar
+DECLARE_INTERFACE_(IAMCrossbar, IUnknown)
+{
+    STDMETHOD(QueryInterface) (THIS_ REFIID, PVOID*) PURE;
+    STDMETHOD_(ULONG, AddRef) (THIS);
+    STDMETHOD_(ULONG, Release) (THIS);
+    STDMETHOD(get_PinCounts) (THIS_ long *, long *);
+    STDMETHOD(CanRoute) (THIS_ long, long);
+    STDMETHOD(Route) (THIS_ long, long);
+    STDMETHOD(get_IsRoutedTo) (THIS_ long, long *);
+    STDMETHOD(get_CrossbarPinInfo) (THIS_ BOOL, long, long *, long *);
+};
+
+/* http://msdn.microsoft.com/en-us/library/dd375971%28v=vs.85%29.aspx */
+#undef INTERFACE
+#define INTERFACE IAMTVTuner
+DECLARE_INTERFACE_(IAMTVTuner, IUnknown)
+{
+    STDMETHOD(QueryInterface) (THIS_ REFIID, PVOID*) PURE;
+    STDMETHOD_(ULONG, AddRef) (THIS);
+    STDMETHOD_(ULONG, Release) (THIS);
+    STDMETHOD(put_Channel) (THIS_ long, long, long);
+    STDMETHOD(get_Channel) (THIS_ long *, long *, long *);
+    STDMETHOD(ChannelMinMax) (THIS_ long *, long *);
+    STDMETHOD(put_CountryCode) (THIS_ long);
+    STDMETHOD(get_CountryCode) (THIS_ long *);
+    STDMETHOD(put_TuningSpace) (THIS_ long);
+    STDMETHOD(get_TuningSpace) (THIS_ long *);
+    STDMETHOD(Logon) (THIS_ HANDLE);
+    STDMETHOD(Logout) (IAMTVTuner *);
+    STDMETHOD(SignalPresen) (THIS_ long *);
+    STDMETHOD(put_Mode) (THIS_ AMTunerModeType);
+    STDMETHOD(get_Mode) (THIS_ AMTunerModeType *);
+    STDMETHOD(GetAvailableModes) (THIS_ long *);
+//    STDMETHOD(RegisterNotificationCallBack) (THIS_ LPAMTUNERNOTIFICATION, long);
+//    STDMETHOD(UnRegisterNotificationCallBack) (THIS_ LPAMTUNERNOTIFICATION);
+    STDMETHOD(get_AvailableTVFormats) (THIS_ long *);
+    STDMETHOD(get_TVFormat) (THIS_ long *);
+    STDMETHOD(AutoTune) (THIS_ long, long *);
+    STDMETHOD(StoreAutoTune) (IAMTVTuner *);
+    STDMETHOD(get_NumInputConnections) (THIS_ long *);
+    STDMETHOD(put_InputType) (THIS_ long, TunerInputType);
+    STDMETHOD(get_InputType) (THIS_ long, TunerInputType *);
+    STDMETHOD(put_ConnectInput) (THIS_ long);
+    STDMETHOD(get_ConnectInput) (THIS_ long *);
+    STDMETHOD(get_VideoFrequency) (THIS_ long *);
+    STDMETHOD(get_AudioFrequency) (THIS_ long *);
+};
+
+/* http://msdn.microsoft.com/en-us/library/dd375962%28v=vs.85%29.aspx */
+#undef INTERFACE
+#define INTERFACE IAMTVAudio
+DECLARE_INTERFACE_(IAMTVAudio, IUnknown)
+{
+    STDMETHOD(QueryInterface) (THIS_ REFIID, PVOID*) PURE;
+    STDMETHOD_(ULONG, AddRef) (THIS);
+    STDMETHOD_(ULONG, Release) (THIS);
+    STDMETHOD(GetHardwareSupportedTVAudioModes) (THIS_ long *);
+    STDMETHOD(GetAvailableTVAudioModes) (THIS_ long *);
+    STDMETHOD(get_TVAudioMode) (THIS_ long *);
+    STDMETHOD(put_TVAudioMode) (THIS_ long);
+//    STDMETHOD(RegisterNotificationCallBack) (THIS_ LPAMTUNERNOTIFICATION, long);
+//    STDMETHOD(UnRegisterNotificationCallBack) (THIS_ LPAMTUNERNOTIFICATION);
+};
 
