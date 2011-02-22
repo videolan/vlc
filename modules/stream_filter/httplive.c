@@ -40,9 +40,6 @@
 #include <vlc_stream.h>
 #include <vlc_url.h>
 
-#include <vlc_modules.h>
-#include <vlc_access.h>
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -89,7 +86,6 @@ typedef struct hls_stream_s
 
 struct stream_sys_t
 {
-    access_t    *p_access;  /* HTTP access input */
     vlc_url_t   m3u8;       /* M3U8 url */
 
     /* */
@@ -136,14 +132,11 @@ static int  Read   (stream_t *, void *p_read, unsigned int i_read);
 static int  Peek   (stream_t *, const uint8_t **pp_peek, unsigned int i_peek);
 static int  Control(stream_t *, int i_query, va_list);
 
-static ssize_t access_ReadM3U8(stream_t *s, vlc_url_t *url, uint8_t **buffer);
+static ssize_t read_M3U8(stream_t *s, vlc_url_t *url, uint8_t **buffer);
 static ssize_t ReadM3U8(stream_t *s, uint8_t **buffer);
 static char *ReadLine(uint8_t *buffer, uint8_t **remain, size_t len);
 
-static int  AccessOpen(stream_t *s, vlc_url_t *url);
-static void AccessClose(stream_t *s);
-
-static int AccessDownload(stream_t *s, segment_t *segment);
+static int hls_Download(stream_t *s, segment_t *segment);
 
 static void* hls_Thread(vlc_object_t *);
 
@@ -467,6 +460,40 @@ fail:
     return NULL;
 }
 
+static char *ConstructUrl(vlc_url_t *url)
+{
+    if ((url->psz_protocol == NULL) ||
+        (url->psz_path == NULL))
+        return NULL;
+
+    if (url->i_port <= 0)
+    {
+        if (strncmp(url->psz_protocol, "https", 5) == 0)
+            url->i_port = 443;
+        else
+            url->i_port = 80;
+    }
+
+    char *psz_url = NULL;
+    if (url->psz_password || url->psz_username)
+    {
+        if (asprintf(&psz_url, "%s://%s:%s@%s:%d%s",
+                     url->psz_protocol,
+                     url->psz_username, url->psz_password,
+                     url->psz_host, url->i_port, url->psz_path) < 0)
+            return NULL;
+    }
+    else
+    {
+        if (asprintf(&psz_url, "%s://%s:%d%s",
+                     url->psz_protocol,
+                     url->psz_host, url->i_port, url->psz_path) < 0)
+            return NULL;
+    }
+
+    return psz_url;
+}
+
 static int parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_read, char *uri)
 {
     assert(hls);
@@ -787,7 +814,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, ssize_
 
                     /* Download playlist file from server */
                     uint8_t *buf = NULL;
-                    ssize_t len = access_ReadM3U8(s, &hls->url, &buf);
+                    ssize_t len = read_M3U8(s, &hls->url, &buf);
                     if (len < 0)
                         err = VLC_EGENERIC;
                     else
@@ -887,7 +914,7 @@ static int get_HTTPLiveMetaPlaylist(stream_t *s, vlc_array_t **streams)
 
     /* Download new playlist file from server */
     uint8_t *buffer = NULL;
-    ssize_t len = access_ReadM3U8(s, &p_sys->m3u8, &buffer);
+    ssize_t len = read_M3U8(s, &p_sys->m3u8, &buffer);
     if (len < 0)
         return VLC_EGENERIC;
 
@@ -1054,7 +1081,7 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
     }
 
     mtime_t start = mdate();
-    if (AccessDownload(s, segment) != VLC_SUCCESS)
+    if (hls_Download(s, segment) != VLC_SUCCESS)
     {
         vlc_mutex_unlock(&segment->lock);
         return VLC_EGENERIC;
@@ -1249,171 +1276,104 @@ again:
 }
 
 /****************************************************************************
- * Access
+ *
  ****************************************************************************/
-static int AccessOpen(stream_t *s, vlc_url_t *url)
+static int hls_Download(stream_t *s, segment_t *segment)
 {
-    stream_sys_t *p_sys = (stream_sys_t *) s->p_sys;
-
-    if ((url->psz_protocol == NULL) ||
-        (url->psz_path == NULL))
-        return VLC_EGENERIC;
-
-    p_sys->p_access = vlc_object_create(s, sizeof(access_t));
-    if (p_sys->p_access == NULL)
-        return VLC_ENOMEM;
-
-    if (url->i_port <= 0)
-    {
-        if (strncmp(url->psz_protocol, "https", 5) == 0)
-            url->i_port = 443;
-        else
-            url->i_port = 80;
-    }
-
-    p_sys->p_access->psz_access = strdup(url->psz_protocol);
-    p_sys->p_access->psz_filepath = strdup(url->psz_path);
-    if (url->psz_password || url->psz_username)
-    {
-        if (asprintf(&p_sys->p_access->psz_location, "%s:%s@%s:%d%s",
-                     url->psz_username, url->psz_password,
-                     url->psz_host, url->i_port, url->psz_path) < 0)
-        {
-            msg_Err(s, "creating http access module");
-            goto fail;
-        }
-    }
-    else
-    {
-        if (asprintf(&p_sys->p_access->psz_location, "%s:%d%s",
-                     url->psz_host, url->i_port, url->psz_path) < 0)
-        {
-            msg_Err(s, "creating http access module");
-            goto fail;
-        }
-    }
-
-    vlc_object_attach(p_sys->p_access, s);
-    p_sys->p_access->p_module =
-        module_need(p_sys->p_access, "access", p_sys->p_access->psz_access, true);
-    if (p_sys->p_access->p_module == NULL)
-    {
-        msg_Err(s, "could not load http access module");
-        goto fail;
-    }
-
-    return VLC_SUCCESS;
-
-fail:
-    vlc_object_release(p_sys->p_access);
-    p_sys->p_access = NULL;
-    return VLC_EGENERIC;
-}
-
-static void AccessClose(stream_t *s)
-{
-    stream_sys_t *p_sys = (stream_sys_t *) s->p_sys;
-
-    if (p_sys->p_access)
-    {
-        vlc_object_kill(p_sys->p_access);
-        free(p_sys->p_access->psz_access);
-        if (p_sys->p_access->p_module)
-            module_unneed(p_sys->p_access,
-                          p_sys->p_access->p_module);
-
-        vlc_object_release(p_sys->p_access);
-        p_sys->p_access = NULL;
-    }
-}
-
-static int AccessDownload(stream_t *s, segment_t *segment)
-{
-    stream_sys_t *p_sys = (stream_sys_t *) s->p_sys;
-
     assert(segment);
 
-    /* Download new playlist file from server */
-    if (AccessOpen(s, &segment->url) != VLC_SUCCESS)
+    /* Construct URL */
+    char *psz_url = ConstructUrl(&segment->url);
+    if (psz_url == NULL)
+           return VLC_ENOMEM;
+
+    stream_t *p_ts = stream_UrlNew(s, psz_url);
+    free(psz_url);
+    if (p_ts == NULL)
         return VLC_EGENERIC;
 
-    segment->size = p_sys->p_access->info.i_size;
+    segment->size = stream_Size(p_ts);
     assert(segment->size > 0);
 
     segment->data = block_Alloc(segment->size);
     if (segment->data == NULL)
     {
-        AccessClose(s);
+        stream_Delete(p_ts);
         return VLC_ENOMEM;
     }
 
     assert(segment->data->i_buffer == segment->size);
 
     ssize_t length = 0, curlen = 0;
+    uint64_t size;
     do
     {
-        if (p_sys->p_access->info.i_size > segment->size)
+        size = stream_Size(p_ts);
+        if (size > segment->size)
         {
             msg_Dbg(s, "size changed %"PRIu64, segment->size);
-            segment->data = block_Realloc(segment->data, 0, p_sys->p_access->info.i_size);
+            segment->data = block_Realloc(segment->data, 0, size);
             if (segment->data == NULL)
             {
-                AccessClose(s);
+                stream_Delete(p_ts);
                 return VLC_ENOMEM;
             }
-            segment->size = p_sys->p_access->info.i_size;
+            segment->size = size;
             assert(segment->data->i_buffer == segment->size);
         }
-        length = p_sys->p_access->pf_read(p_sys->p_access,
-                    segment->data->p_buffer + curlen, segment->size - curlen);
-        if ((length <= 0) || ((uint64_t)length >= segment->size))
+        length = stream_Read(p_ts, segment->data->p_buffer + curlen, segment->size - curlen);
+        if (length <= 0)
             break;
         curlen += length;
     } while (vlc_object_alive(s));
 
-    AccessClose(s);
+    stream_Delete(p_ts);
     return VLC_SUCCESS;
 }
 
 /* Read M3U8 file */
-static ssize_t access_ReadM3U8(stream_t *s, vlc_url_t *url, uint8_t **buffer)
+static ssize_t read_M3U8(stream_t *s, vlc_url_t *url, uint8_t **buffer)
 {
-    stream_sys_t *p_sys = (stream_sys_t *) s->p_sys;
-
     assert(*buffer == NULL);
 
-    /* Download new playlist file from server */
-    if (AccessOpen(s, url) != VLC_SUCCESS)
+    /* Construct URL */
+    char *psz_url = ConstructUrl(url);
+    if (psz_url == NULL)
+           return VLC_ENOMEM;
+
+    stream_t *p_m3u8 = stream_UrlNew(s, psz_url);
+    free(psz_url);
+    if (p_m3u8 == NULL)
         return VLC_EGENERIC;
 
-    ssize_t size = p_sys->p_access->info.i_size;
-    if (size == 0) size = 1024; /* no Content-Length */
+    int64_t size = stream_Size(p_m3u8);
+    if (size == 0) size = 8192; /* no Content-Length */
 
     *buffer = calloc(1, size);
     if (*buffer == NULL)
     {
-        AccessClose(s);
+        stream_Delete(p_m3u8);
         return VLC_ENOMEM;
     }
 
-    ssize_t length = 0, curlen = 0;
-    do
-    {
-        length = p_sys->p_access->pf_read(p_sys->p_access, *buffer + curlen, size - curlen);
-        if (length <= 0)
+    int64_t len = 0, curlen = 0;
+    do {
+        int read = ((size - curlen) >= INT_MAX) ? INT_MAX : (size - curlen);
+        len = stream_Read(p_m3u8, *buffer + curlen, read);
+        if (len <= 0)
             break;
-        curlen += length;
+        curlen += len;
         if (curlen >= size)
         {
-            uint8_t *tmp = realloc(*buffer, size + 1024);
+            uint8_t *tmp = realloc(*buffer, size + 8192);
             if (tmp == NULL)
                 break;
-            size += 1024;
+            size += 8192;
             *buffer = tmp;
         }
     } while (vlc_object_alive(s));
+    stream_Delete(p_m3u8);
 
-    AccessClose(s);
     return size;
 }
 
