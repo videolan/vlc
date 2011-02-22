@@ -2143,7 +2143,7 @@ DISTCLEAN_PKG += win32-dx7headers.tgz
 # *************************************************************************
 # DirectShow headers
 # *************************************************************************
-dshow-headers.tgz:
+dshow-headers-oss.tar.bz2:
 	$(WGET) $(DSHOW_HEADERS_URL)
 
 dxva2api.h:
@@ -2154,15 +2154,15 @@ CLEAN_FILE += dxva2api.h
 d2d_headers.tar.gz:
 	$(WGET) $(D2D_URL) -O $@
 
-.dshow_headers: dshow-headers.tgz dxva2api.h d2d_headers.tar.gz
+.dshow_headers: dshow-headers-oss.tar.bz2 dxva2api.h d2d_headers.tar.gz
 	mkdir -p $(PREFIX)/include
-	tar xzf $< -C $(PREFIX)/include
+	tar xjf $< -C $(PREFIX)/include
 	tar xzf d2d_headers.tar.gz -C $(PREFIX)/include --wildcards --no-anchored '*.h' --strip-components=1
 	cp dxva2api.h $(PREFIX)/include
 	touch $@
 
 CLEAN_FILE += .dshow_headers
-DISTCLEAN_PKG += dshow-headers.tgz dxva2api.h
+DISTCLEAN_PKG += dshow-headers-oss.tar.bz2 dxva2api.h
 
 # ***************************************************************************
 # libexpat
