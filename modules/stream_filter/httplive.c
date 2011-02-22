@@ -1,7 +1,7 @@
 /*****************************************************************************
  * httplive.c: HTTP Live Streaming stream filter
  *****************************************************************************
- * Copyright (C) 2010 M2X BV
+ * Copyright (C) 2010-2011 M2X BV
  * $Id$
  *
  * Author: Jean-Paul Saman <jpsaman _AT_ videolan _DOT_ org>
@@ -1400,7 +1400,7 @@ static ssize_t access_ReadM3U8(stream_t *s, vlc_url_t *url, uint8_t **buffer)
     do
     {
         length = p_sys->p_access->pf_read(p_sys->p_access, *buffer + curlen, size - curlen);
-        if ((length <= 0) || (length >= size))
+        if (length <= 0)
             break;
         curlen += length;
         if (curlen >= size)
