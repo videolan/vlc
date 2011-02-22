@@ -1121,6 +1121,8 @@ static void* hls_Thread(void *p_this)
     stream_t *s = (stream_t *)p_this;
     stream_sys_t *p_sys = s->p_sys;
 
+    int canc = vlc_savecancel();
+
     while (vlc_object_alive(s))
     {
         hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->download.stream);
@@ -1213,6 +1215,7 @@ static void* hls_Thread(void *p_this)
         vlc_mutex_unlock(&p_sys->download.lock_wait);
     }
 
+    vlc_restorecancel(canc);
     return NULL;
 }
 
