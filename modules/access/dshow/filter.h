@@ -1,5 +1,6 @@
 /*****************************************************************************
- * filter.h : DirectShow access module for vlc
+ * filter.h : DirectShow access module for vlc:
+ * CapturePin, CaptureFilter, CaptureEnumPins implementations
  *****************************************************************************
  * Copyright (C) 2002-2004, 2008 the VideoLAN team
  * $Id$
