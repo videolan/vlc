@@ -86,11 +86,12 @@ typedef struct hls_stream_s
 
 struct stream_sys_t
 {
-    vlc_url_t   m3u8;       /* M3U8 url */
+    vlc_url_t     m3u8;         /* M3U8 url */
+    vlc_thread_t  thread;       /* Thread function */
 
     /* */
-    vlc_array_t  *hls_stream;/* bandwidth adaptation */
-    uint64_t      bandwidth; /* measured bandwidth (bits per second) */
+    vlc_array_t  *hls_stream;   /* bandwidth adaptation */
+    uint64_t      bandwidth;    /* measured bandwidth (bits per second) */
 
     /* Download */
     struct hls_download_s
@@ -138,7 +139,7 @@ static char *ReadLine(uint8_t *buffer, uint8_t **remain, size_t len);
 
 static int hls_Download(stream_t *s, segment_t *segment);
 
-static void* hls_Thread(vlc_object_t *);
+static void* hls_Thread(void *);
 
 static segment_t *segment_GetSegment(hls_stream_t *hls, int wanted);
 static void segment_Free(segment_t *segment);
@@ -1115,12 +1116,10 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
     return VLC_SUCCESS;
 }
 
-static void* hls_Thread(vlc_object_t *p_this)
+static void* hls_Thread(void *p_this)
 {
     stream_t *s = (stream_t *)p_this;
     stream_sys_t *p_sys = s->p_sys;
-
-    int canc = vlc_savecancel();
 
     while (vlc_object_alive(s))
     {
@@ -1214,7 +1213,6 @@ static void* hls_Thread(vlc_object_t *p_this)
         vlc_mutex_unlock(&p_sys->download.lock_wait);
     }
 
-    vlc_restorecancel(canc);
     return NULL;
 }
 
@@ -1522,7 +1520,7 @@ static int Open(vlc_object_t *p_this)
     vlc_mutex_init(&p_sys->download.lock_wait);
     vlc_cond_init(&p_sys->download.wait);
 
-    if (vlc_thread_create(s, hls_Thread, VLC_THREAD_PRIORITY_INPUT))
+    if (vlc_clone(&p_sys->thread, hls_Thread, s, VLC_THREAD_PRIORITY_INPUT))
     {
         goto fail_thread;
     }
@@ -1565,7 +1563,7 @@ static void Close(vlc_object_t *p_this)
     vlc_mutex_unlock(&p_sys->download.lock_wait);
 
     /* */
-    vlc_thread_join(s);
+    vlc_join(p_sys->thread, NULL);
     vlc_mutex_destroy(&p_sys->download.lock_wait);
     vlc_cond_destroy(&p_sys->download.wait);
 
