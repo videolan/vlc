@@ -229,7 +229,7 @@ typedef enum tagAMTunerModeType {
     AMTUNER_MODE_TV         = 0x0001,
     AMTUNER_MODE_FM_RADIO   = 0x0002,
     AMTUNER_MODE_AM_RADIO   = 0x0004,
-    AMTUNER_MODE_DSS        = 0x0008 
+    AMTUNER_MODE_DSS        = 0x0008
 } AMTunerModeType;
 
 #define AMPROPERTY_PIN_CATEGORY 0
@@ -243,6 +243,10 @@ typedef enum tagTunerInputType {
     TunerInputCable = 0,
     TunerInputAntenna = TunerInputCable + 1
 } TunerInputType;
+
+typedef enum tagAMTunerEventType {
+    AMTUNER_EVENT_CHANGED = 0x1
+} AMTunerEventType;
 
 /* http://msdn.microsoft.com/en-us/library/dd377421%28v=vs.85%29.aspx */
 typedef enum tagPhysicalConnectorType {
@@ -270,7 +274,7 @@ typedef enum tagPhysicalConnectorType {
     PhysConn_Audio_AUX,
     PhysConn_Audio_1394,
     PhysConn_Audio_USB,
-    PhysConn_Audio_AudioDecoder 
+    PhysConn_Audio_AudioDecoder
 } PhysicalConnectorType;
 
 /* http://msdn.microsoft.com/en-us/library/dd407352%28v=vs.85%29.aspx */
@@ -339,6 +343,17 @@ DECLARE_INTERFACE_(IAMCrossbar, IUnknown)
     STDMETHOD(get_CrossbarPinInfo) (THIS_ BOOL, long, long *, long *);
 };
 
+/* http://msdn.microsoft.com/en-us/library/dd375945%28v=vs.85%29.aspx */
+#undef INTERFACE
+#define INTERFACE IAMTunerNotification
+DECLARE_INTERFACE_( IAMTunerNotification, IUnknown)
+{
+    STDMETHOD(QueryInterface) (THIS_ REFIID, PVOID*) PURE;
+    STDMETHOD_(ULONG, AddRef) (THIS);
+    STDMETHOD_(ULONG, Release) (THIS);
+    STDMETHOD(OnEvent) (THIS_ AMTunerEventType);
+};
+
 /* http://msdn.microsoft.com/en-us/library/dd375971%28v=vs.85%29.aspx */
 #undef INTERFACE
 #define INTERFACE IAMTVTuner
@@ -360,8 +375,8 @@ DECLARE_INTERFACE_(IAMTVTuner, IUnknown)
     STDMETHOD(put_Mode) (THIS_ AMTunerModeType);
     STDMETHOD(get_Mode) (THIS_ AMTunerModeType *);
     STDMETHOD(GetAvailableModes) (THIS_ long *);
-//    STDMETHOD(RegisterNotificationCallBack) (THIS_ LPAMTUNERNOTIFICATION, long);
-//    STDMETHOD(UnRegisterNotificationCallBack) (THIS_ LPAMTUNERNOTIFICATION);
+    STDMETHOD(RegisterNotificationCallBack) (THIS_ IAMTunerNotification *, long);
+    STDMETHOD(UnRegisterNotificationCallBack) (THIS_ IAMTunerNotification *);
     STDMETHOD(get_AvailableTVFormats) (THIS_ long *);
     STDMETHOD(get_TVFormat) (THIS_ long *);
     STDMETHOD(AutoTune) (THIS_ long, long *);
@@ -387,7 +402,7 @@ DECLARE_INTERFACE_(IAMTVAudio, IUnknown)
     STDMETHOD(GetAvailableTVAudioModes) (THIS_ long *);
     STDMETHOD(get_TVAudioMode) (THIS_ long *);
     STDMETHOD(put_TVAudioMode) (THIS_ long);
-//    STDMETHOD(RegisterNotificationCallBack) (THIS_ LPAMTUNERNOTIFICATION, long);
-//    STDMETHOD(UnRegisterNotificationCallBack) (THIS_ LPAMTUNERNOTIFICATION);
+    STDMETHOD(RegisterNotificationCallBack) (THIS_ IAMTunerNotification*, long);
+    STDMETHOD(UnRegisterNotificationCallBack) (THIS_ IAMTunerNotification*);
 };
 
