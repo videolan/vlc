@@ -195,7 +195,7 @@ VLC_EXPORT( int64_t, config_GetInt,  (vlc_object_t *, const char *) LIBVLC_USED 
 VLC_EXPORT( void,   config_PutInt,   (vlc_object_t *, const char *, int64_t) );
 VLC_EXPORT( float,  config_GetFloat, (vlc_object_t *, const char *) LIBVLC_USED );
 VLC_EXPORT( void,   config_PutFloat, (vlc_object_t *, const char *, float) );
-VLC_EXPORT( char *, config_GetPsz,   (vlc_object_t *, const char *) LIBVLC_USED );
+VLC_EXPORT( char *, config_GetPsz,   (vlc_object_t *, const char *) LIBVLC_USED LIBVLC_MALLOC );
 VLC_EXPORT( void,   config_PutPsz,   (vlc_object_t *, const char *, const char *) );
 
 VLC_EXPORT( int,    config_SaveConfigFile, ( vlc_object_t *, const char * ) );
@@ -203,8 +203,8 @@ VLC_EXPORT( int,    config_SaveConfigFile, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( void,   config_ResetAll, ( vlc_object_t * ) );
 #define config_ResetAll(a) config_ResetAll(VLC_OBJECT(a))
 
-VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char * ) LIBVLC_USED );
-VLC_EXPORT(char *, config_GetDataDir, ( vlc_object_t * ) LIBVLC_USED);
+VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char * ) LIBVLC_USED LIBVLC_MALLOC );
+VLC_EXPORT(char *, config_GetDataDir, ( vlc_object_t * ) LIBVLC_USED LIBVLC_MALLOC );
 #define config_GetDataDir(a) config_GetDataDir(VLC_OBJECT(a))
 VLC_EXPORT(const char *, config_GetLibDir, ( void ) LIBVLC_USED);
 VLC_EXPORT(const char *, config_GetConfDir, ( void ) LIBVLC_USED);
@@ -226,7 +226,7 @@ typedef enum vlc_userdir
     VLC_VIDEOS_DIR,
 } vlc_userdir_t;
 
-VLC_EXPORT(char *, config_GetUserDir, ( vlc_userdir_t ) LIBVLC_USED);
+VLC_EXPORT(char *, config_GetUserDir, ( vlc_userdir_t ) LIBVLC_USED LIBVLC_MALLOC );
 
 VLC_EXPORT( void, config_AddIntf,    ( vlc_object_t *, const char * ) );
 VLC_EXPORT( void, config_RemoveIntf, ( vlc_object_t *, const char * ) );
@@ -287,7 +287,7 @@ VLC_EXPORT( void, config_ChainDestroy, ( config_chain_t * ) );
 /**
  * This function will duplicate a linked list of config_chain_t
  */
-VLC_EXPORT( config_chain_t *, config_ChainDuplicate, ( const config_chain_t * ) );
+VLC_EXPORT( config_chain_t *, config_ChainDuplicate, ( const config_chain_t * ) LIBVLC_USED LIBVLC_MALLOC );
 
 /**
  * This function will unescape a string in place and will return a pointer on
@@ -309,7 +309,7 @@ VLC_EXPORT( char *, config_StringUnescape, ( char *psz_string ) );
  *
  * The escaped characters are ' " and \
  */
-VLC_EXPORT( char *, config_StringEscape, ( const char *psz_string ) LIBVLC_USED);
+VLC_EXPORT( char *, config_StringEscape, ( const char *psz_string ) LIBVLC_USED LIBVLC_MALLOC );
 
 # ifdef __cplusplus
 }
