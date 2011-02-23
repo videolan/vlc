@@ -1673,7 +1673,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
 
     /* FIXME find real max size */
     /* const int i_max = */ block_ChainExtract( p_pes, header, 34 );
-    
+
     if( header[0] != 0 || header[1] != 0 || header[2] != 1 )
     {
         if( !p_demux->p_sys->b_silent )
@@ -2809,7 +2809,7 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
                 {
                     const size_t i_length = strlen(ppsz_broken_providers[i]);
                     if( pD->i_service_provider_name_length == i_length &&
-                        !strncmp( pD->i_service_provider_name, ppsz_broken_providers[i], i_length ) )
+                        !strncmp( (char *)pD->i_service_provider_name, ppsz_broken_providers[i], i_length ) )
                         p_sys->b_broken_charset = true;
                 }
 
@@ -3505,7 +3505,7 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pid_t *pid,
 
             /* */
             const dvbpsi_subtitle_t *p = &p_sub->p_subtitle[i];
-            p_es->fmt.psz_language = strndup( p->i_iso6392_language_code, 3 );
+            p_es->fmt.psz_language = strndup( (char *)p->i_iso6392_language_code, 3 );
             switch( p->i_subtitling_type )
             {
             case 0x10: /* unspec. */
