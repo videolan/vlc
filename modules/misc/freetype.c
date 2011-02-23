@@ -389,8 +389,8 @@ static int Create( vlc_object_t *p_this )
         goto error;
     }
 
-    FcPatternAddString( fontpattern, FC_FAMILY, psz_fontfamily);
-    FcPatternAddString( fontpattern, FC_SIZE, psz_fontsize );
+    FcPatternAddString( fontpattern, FC_FAMILY, (const FcChar8 *)psz_fontfamily );
+    FcPatternAddString( fontpattern, FC_SIZE, (const FcChar8 *)psz_fontsize );
     free( psz_fontsize );
 
     if( FcConfigSubstitute( NULL, fontpattern, FcMatchPattern ) == FcFalse )
@@ -1123,7 +1123,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
             }
             if (pos > start_pos)
             {
-                FriBidiCharType base_dir = FRIBIDI_TYPE_LTR;
+                FriBidiParType base_dir = FRIBIDI_PAR_LTR;
                 fribidi_log2vis((FriBidiChar*)psz_unicode + start_pos,
                                 pos - start_pos,
                                 &base_dir,
@@ -1809,7 +1809,7 @@ static int ProcessLines( filter_t *p_filter,
             }
             if (pos > start_pos)
             {
-                FriBidiCharType base_dir = FRIBIDI_TYPE_LTR;
+                FriBidiParType base_dir = FRIBIDI_PAR_LTR;
                 fribidi_log2vis((FriBidiChar*)psz_text + start_pos,
                         pos - start_pos, &base_dir,
                         (FriBidiChar*)p_fribidi_string + start_pos,
