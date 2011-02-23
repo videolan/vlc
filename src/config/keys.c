@@ -35,7 +35,9 @@
 
 #include <stdlib.h>
 #include <limits.h>
-#include <search.h>
+#ifdef HAVE_SEARCH_H
+# include <search.h>
+#endif
 
 #include <vlc_common.h>
 #include <vlc_keys.h>
