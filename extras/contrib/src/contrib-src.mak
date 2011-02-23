@@ -178,7 +178,7 @@ endef
 # bundle. For instance if you're building a library named libtoto.dylib,
 # which depends on the contrib library libtata.dylib, you should have the
 # following entry :
-# .toto: toto_directory .tata
+# .toto: toto_.tata
 #	cd $< ; ./configure --prefix=$(PREFIX)
 #	$(MAKE) -C $<
 #	$(MAKE) -C $< install
@@ -2131,14 +2131,14 @@ DISTCLEAN_PKG += dirac-$(DIRAC_VERSION).tar.gz
 # *************************************************************************
 # DirectX headers
 # *************************************************************************
-win32-dx7headers.tgz:
+directx-oss.tar.bz2:
 	$(WGET) $(DX_HEADERS_URL)
-.dx_headers: win32-dx7headers.tgz
+.dx_headers: directx-oss.tar.bz2
 	mkdir -p $(PREFIX)/include
-	tar xzf $< -C $(PREFIX)/include
+	tar xjf $< -C $(PREFIX)/include
 	touch $@
 CLEAN_FILE += .dx_headers
-DISTCLEAN_PKG += win32-dx7headers.tgz
+DISTCLEAN_PKG += directx-oss.tar.bz2
 
 # *************************************************************************
 # DirectShow headers
