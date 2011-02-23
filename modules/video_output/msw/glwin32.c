@@ -32,7 +32,6 @@
 #include <ddraw.h>
 #include <commctrl.h>
 
-#include <multimon.h>
 #undef GetSystemMetrics
 
 #ifndef MONITOR_DEFAULTTONEAREST
