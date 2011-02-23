@@ -1,7 +1,8 @@
 /*****************************************************************************
- * common.h : DirectShow access module for vlc
+ * access.h : DirectShow access module for vlc
+ * access_sys_t definition
  *****************************************************************************
- * Copyright (C) 2002, 2004, 2010 the VideoLAN team
+ * Copyright (C) 2002, 2004, 2010-2011 the VideoLAN team
  * $Id$
  *
  * Author: Gildas Bazin <gbazin@videolan.org>
@@ -24,9 +25,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <string>
-#include <list>
-#include <deque>
 using namespace std;
 
 #ifndef _MSC_VER

@@ -25,8 +25,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <string>
-#include <list>
+
 #include <deque>
 using namespace std;
 
@@ -58,8 +57,7 @@ typedef struct VLCMediaSample
 
 } VLCMediaSample;
 
-class CaptureFilter;
-
+/* */
 void WINAPI FreeMediaType( AM_MEDIA_TYPE& mt );
 HRESULT WINAPI CopyMediaType( AM_MEDIA_TYPE *pmtTarget,
                               const AM_MEDIA_TYPE *pmtSource );
@@ -69,6 +67,7 @@ int GetFourCCFromMediaType(const AM_MEDIA_TYPE &media_type);
 /****************************************************************************
  * Declaration of our dummy directshow filter pin class
  ****************************************************************************/
+class CaptureFilter;
 class CapturePin: public IPin, public IMemInputPin
 {
     friend class CaptureEnumMediaTypes;
