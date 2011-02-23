@@ -94,11 +94,15 @@ size_t strlcpy (char *, const char *, size_t);
 #endif
 
 #ifndef HAVE_STRTOF
+#ifndef HAVE_ANDROID
 float strtof (const char *, char **);
+#endif
 #endif
 
 #ifndef HAVE_ATOF
+#ifndef HAVE_ANDROID
 double atof (const char *);
+#endif
 #endif
 
 #ifndef HAVE_STRTOLL
