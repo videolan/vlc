@@ -49,9 +49,7 @@ using namespace std;
 #endif
 
 #include <dshow.h>
-
-extern const GUID MEDIASUBTYPE_I420;
-extern const GUID MEDIASUBTYPE_PREVIEW_VIDEO;
+#include "vlc_dshow.h"
 
 typedef struct VLCMediaSample
 {

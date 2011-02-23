@@ -37,8 +37,7 @@
 #endif
 
 #include "access.h"
-
-
+#include "vlc_dshow.h"
 
 // Helper function to associate a crossbar pin name with the type.
 static const char * GetPhysicalPinName(long lType)
