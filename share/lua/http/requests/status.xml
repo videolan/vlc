@@ -38,7 +38,7 @@ end
 ---[[]] vlc.msg.err("requests/status.xml got:","input: "..tostring(input),"command: "..tostring(command),"id: "..tostring(id),"val: "..tostring(val))
 
 local function stripslashes(s)
-  return string.gsub(s,"\\(%.)","%1")
+  return string.gsub(s,"\\(.)","%1")
 end
 
 local status = vlc.playlist.status()
