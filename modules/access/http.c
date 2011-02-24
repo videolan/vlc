@@ -417,10 +417,10 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
                               0, KEY_READ, &h_key ) == ERROR_SUCCESS )
             {
                 DWORD i_dataReadSize = 4; /* sizeof( DWORD ); */
-                DWORD proxyEnable = 0;
+                BYTE proxyEnable = 0;
                 /* Get the proxy enable value */
                 if( RegQueryValueEx( h_key, "ProxyEnable", NULL, NULL,
-                                     (char *)&proxyEnable, &i_dataReadSize )
+                                     &proxyEnable, &i_dataReadSize )
                                      == ERROR_SUCCESS )
                 {
                     if( proxyEnable )
@@ -429,7 +429,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
                         char psz_key[256];
                         i_dataReadSize = 256;
                         if( RegQueryValueEx( h_key, "ProxyServer",
-                                             NULL, NULL, psz_key,
+                                             NULL, NULL, (unsigned char *)psz_key,
                                              &i_dataReadSize )
                                              == ERROR_SUCCESS )
                         {
