@@ -25,10 +25,6 @@
 #ifndef WIN32_FACTORY_HPP
 #define WIN32_FACTORY_HPP
 
-#ifndef _WIN32_WINNT
-#   define _WIN32_WINNT 0x0500
-#endif
-
 #include <windows.h>
 #include <shellapi.h>
 // #include <wingdi.h>
