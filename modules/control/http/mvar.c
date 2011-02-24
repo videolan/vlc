@@ -595,9 +595,8 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
                       (int64_t)stat_info.st_size );
             mvar_AppendNewVar( f, "size", psz_buf );
 
-            /* FIXME memory leak FIXME */
             struct tm tm;
-            strftime( psz_buf, sizeof( psz_buf ), "%F %H:%M:%S",
+            strftime( psz_buf, sizeof( psz_buf ), "Y-%m-%d %H:%M:%S",
                       localtime_r( &stat_info.st_mtime, &tm ) );
             mvar_AppendNewVar( f, "date", psz_buf );
 #else
