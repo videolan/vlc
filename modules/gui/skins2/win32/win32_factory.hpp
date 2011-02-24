@@ -25,6 +25,10 @@
 #ifndef WIN32_FACTORY_HPP
 #define WIN32_FACTORY_HPP
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <windows.h>
 #include <shellapi.h>
 // #include <wingdi.h>
