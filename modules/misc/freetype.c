@@ -1123,7 +1123,11 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
             }
             if (pos > start_pos)
             {
+#if (FRIBIDI_MINOR_VERSION < 19) && (FRIBIDI_MAJOR_VERSION == 0)
+                FriBidiCharType base_dir = FRIBIDI_TYPE_LTR;
+#else
                 FriBidiParType base_dir = FRIBIDI_PAR_LTR;
+#endif
                 fribidi_log2vis((FriBidiChar*)psz_unicode + start_pos,
                                 pos - start_pos,
                                 &base_dir,
@@ -1809,7 +1813,11 @@ static int ProcessLines( filter_t *p_filter,
             }
             if (pos > start_pos)
             {
+#if (FRIBIDI_MINOR_VERSION < 19) && (FRIBIDI_MAJOR_VERSION == 0)
+                FriBidiCharType base_dir = FRIBIDI_TYPE_LTR;
+#else
                 FriBidiParType base_dir = FRIBIDI_PAR_LTR;
+#endif
                 fribidi_log2vis((FriBidiChar*)psz_text + start_pos,
                         pos - start_pos, &base_dir,
                         (FriBidiChar*)p_fribidi_string + start_pos,
