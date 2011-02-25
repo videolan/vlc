@@ -465,7 +465,7 @@ if test "$DISTRO" = "macosx32"; then
     info "*****************************************************************"
     info "* VLC will be compiled in 32bit mode using the 10.5 & later SDK.*"
     info "*                                                               *"
-    info "* Re-run with the x86_64-apple-darwin* argument to turn on      *"
+    info "* Re-run with the -t x86_64-apple-darwin* argument to turn on   *"
     info "* 64bit compilation for Intel-based Macs, whereas * is either   *"
     info "* 9 or 10 depending on your Darwin version.                     *"
     info "* There is no PPC64 support.                                    *"
