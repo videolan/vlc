@@ -2456,8 +2456,8 @@ libupnp: libupnp-$(UPNP_VERSION).tar.bz2
 ifdef HAVE_WIN32
 	patch -p0 < Patches/libupnp-configure.patch
 	patch -p0 < Patches/libupnp-win32.patch
-	cd $@; libtoolize&& autoreconf
 endif
+	cd $@; libtoolize && autoreconf
 
 ifdef HAVE_WIN32
 LIBUPNP_ECFLAGS=-DPTW32_STATIC_LIB
