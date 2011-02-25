@@ -949,11 +949,11 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
                 (p->duration != segment->duration) ||
                 (strcmp(p->url.psz_path, segment->url.psz_path) != 0))
             {
-                msg_Err(s, "existing segment %d found with different content",
-                        p->sequence);
+                msg_Err(s, "existing segment found with different content");
                 msg_Err(s, "- sequence: new=%d, old=%d", p->sequence, segment->sequence);
                 msg_Err(s, "- duration: new=%d, old=%d", p->duration, segment->duration);
-                msg_Err(s, "- file: new=%s, old=%s", p->url.psz_path, segment->url.psz_path);
+                msg_Err(s, "- file: new=%s", p->url.psz_path);
+                msg_Err(s, "        old=%s", segment->url.psz_path);
             }
         }
         else
