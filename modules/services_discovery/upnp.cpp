@@ -114,10 +114,9 @@ static int Open( vlc_object_t *p_this )
 
     i_res = UpnpSearchAsync( p_sys->client_handle, 5,
             MEDIA_SERVER_DEVICE_TYPE, p_sd );
-
     if( i_res != UPNP_E_SUCCESS )
     {
-        msg_Err( p_sd, "%s", UpnpGetErrorMessage( i_res ) );
+        msg_Err( p_sd, "Search failed: %s", UpnpGetErrorMessage( i_res ) );
         Close( (vlc_object_t*) p_sd );
         return VLC_EGENERIC;
     }
@@ -125,7 +124,7 @@ static int Open( vlc_object_t *p_this )
     i_res = UpnpSetMaxContentLength( 262144 );
     if( i_res != UPNP_E_SUCCESS )
     {
-        msg_Err( p_sd, "%s", UpnpGetErrorMessage( i_res ) );
+        msg_Err( p_sd, "Failed to set maximum content length: %s", UpnpGetErrorMessage( i_res ) );
         Close( (vlc_object_t*) p_sd );
         return VLC_EGENERIC;
     }
@@ -223,6 +222,8 @@ static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data
             msg_Dbg( p_sd,
                     "%s:%d: Could not download device description!",
                     __FILE__, __LINE__ );
+            msg_Dbg( p_sd, "Fetching data from %s failed: %s",
+					 p_discovery->Location, UpnpGetErrorMessage( i_res ) );
             return i_res;
         }
 
@@ -353,8 +354,8 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
 	    // Check if server is already added
             if ( p_sd->p_sys->p_server_list->getServer( psz_udn ) != 0 )
 	    {
-		msg_Dbg( p_sd, "%s:%d: server already exists.",
-                        __FILE__, __LINE__ );
+		msg_Dbg( p_sd, "%s:%d: server with uuid '%s' already exists.",
+                        __FILE__, __LINE__, psz_udn );
                 continue;
 	    }
 
@@ -670,7 +671,7 @@ void MediaServer::fetchContents()
     }
 
     Container* root = new Container( 0, "0", getFriendlyName() );
-    
+
     _fetchContents( root );
 
     _p_contents = root;
@@ -868,8 +869,8 @@ bool MediaServerList::addServer( MediaServer* p_server )
 {
     input_item_t* p_input_item = NULL;
     if ( getServer( p_server->getUDN() ) != 0 ) return false;
-    
-    msg_Dbg( _p_sd, "Adding server '%s'", p_server->getFriendlyName() );
+
+    msg_Dbg( _p_sd, "Adding server '%s' with uuid '%s'", p_server->getFriendlyName(), p_server->getUDN() );
 
     p_input_item = input_item_New( _p_sd, "vlc://nop",
 				  p_server->getFriendlyName() );
