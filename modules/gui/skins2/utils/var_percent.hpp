@@ -45,6 +45,9 @@ public:
     virtual void set( float percentage );
     virtual float get() const { return m_value; }
 
+    /// Get the variable preferred step
+    virtual float getStep() const { return .05f; }
+
 private:
     /// Variable type
     static const string m_type;

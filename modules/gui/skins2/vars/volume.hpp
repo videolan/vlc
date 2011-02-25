@@ -37,11 +37,19 @@ public:
     Volume( intf_thread_t *pIntf );
     virtual ~Volume() { }
 
-    virtual void set( float percentage, bool updateVLC );
+    virtual void set( float percentage, bool updateVLC = true );
+    virtual void set( int volume, bool updateVLC = true);
 
     virtual void set( float percentage ) { set( percentage, true ); }
 
+    virtual float getStep() const { return m_step; }
+
     virtual string getAsStringPercent() const;
+
+private:
+    float m_step;
+    int m_max;
+    int m_volumeMax;
 };
 
 
