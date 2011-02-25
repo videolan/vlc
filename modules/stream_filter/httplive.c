@@ -992,16 +992,29 @@ static int hls_ReloadPlaylist(stream_t *s)
         return VLC_ENOMEM;
 
     msg_Info(s, "Reloading HLS live meta playlist");
-    if (get_HTTPLiveMetaPlaylist(s, &hls_streams) != VLC_SUCCESS)
-        goto fail;
 
-    int count = vlc_array_count(hls_streams);
+    if (get_HTTPLiveMetaPlaylist(s, &hls_streams) != VLC_SUCCESS)
+    {
+        /* Free hls streams */
+        for (int i = 0; i < vlc_array_count(hls_streams); i++)
+        {
+            hls_stream_t *hls;
+            hls = (hls_stream_t *)vlc_array_item_at_index(hls_streams, i);
+            if (hls) hls_Free(hls);
+        }
+        vlc_array_destroy(hls_streams);
+
+        msg_Err(s, "reloading playlist failed");
+        return VLC_EGENERIC;
+    }
 
     /* merge playlists */
+    int count = vlc_array_count(hls_streams);
     for (int n = 0; n < count; n++)
     {
         hls_stream_t *hls_new = hls_Get(hls_streams, n);
-        if (hls_new == NULL) goto fail;
+        if (hls_new == NULL)
+            continue;
 
         hls_stream_t *hls_old = hls_Find(p_sys->hls_stream, hls_new);
         if (hls_old == NULL)
@@ -1011,16 +1024,12 @@ static int hls_ReloadPlaylist(stream_t *s)
                      hls_new->id, hls_new->bandwidth);
         }
         else if (hls_UpdatePlaylist(s, hls_new, &hls_old) != VLC_SUCCESS)
-            goto fail;
+            msg_Info(s, "failed updating HLS stream (id=%d, bandwidth=%"PRIu64")",
+                     hls_new->id, hls_new->bandwidth);
     }
 
     vlc_array_destroy(hls_streams);
     return VLC_SUCCESS;
-
-fail:
-    msg_Err(s, "reloading playlist failed");
-    vlc_array_destroy(hls_streams);
-    return VLC_EGENERIC;
 }
 
 /****************************************************************************
