@@ -136,7 +136,9 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
 
+    UpnpUnRegisterClient( p_sd->p_sys->client_handle );
     UpnpFinish();
+
     delete p_sd->p_sys->p_server_list;
     vlc_mutex_destroy( &p_sd->p_sys->callback_lock );
 
