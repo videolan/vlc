@@ -103,6 +103,10 @@ struct decoder_sys_t
 
     uint32_t i_nal_size;     /* NAL header size */
 
+    /* Callback */
+    picture_t       *p_pic;
+    BC_DTS_PROC_OUT *proc_out;
+
 #ifdef USE_DL_OPENING
     HINSTANCE p_bcm_dll;
     BC_STATUS (WINAPI *OurDtsCloseDecoder)( HANDLE hDevice );
@@ -366,6 +370,24 @@ error:
     free( p_sys );
 }
 
+static BC_STATUS ourCallback(void *shnd, uint32_t width, uint32_t height, uint32_t stride, void *pOut)
+{
+    decoder_t *p_dec          = (decoder_t *)shnd;
+    BC_DTS_PROC_OUT *proc_out = p_dec->p_sys->proc_out;
+
+    /* Direct Rendering */
+    picture_t *p_pic     = p_dec->p_sys->p_pic = decoder_NewPicture( p_dec );
+    if( !p_pic )
+        return BC_STS_ERROR;
+
+    proc_out->Ybuff      = p_pic->p[0].p_pixels;
+    proc_out->YbuffSz    = p_dec->fmt_out.video.i_width * p_dec->fmt_out.video.i_height  / 2;
+    proc_out->StrideSz   = p_pic->p[0].i_pitch /2 - p_dec->fmt_out.video.i_width;
+    proc_out->PoutFlags |= BC_POUT_FLAGS_STRIDE; /* Trust Stride info */
+
+    return BC_STS_SUCCESS;
+}
+
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************/
@@ -376,8 +398,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     BC_DTS_PROC_OUT proc_out;
     BC_DTS_STATUS driver_stat;
-
-    picture_t *p_pic;
 
     /* First check the status of the decode to produce pictures */
     if( BC_FUNC_PSYS(DtsGetDriverStatus)( p_sys->bcm_handle, &driver_stat ) != BC_STS_SUCCESS )
@@ -420,27 +440,14 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     proc_out.PicInfo.height = p_dec->fmt_out.video.i_height;
     proc_out.YbuffSz        = p_dec->fmt_out.video.i_width * p_dec->fmt_out.video.i_height  / 2;
     proc_out.PoutFlags      = BC_POUT_FLAGS_SIZE;
+    proc_out.AppCallBack    = ourCallback;
+    proc_out.hnd            = p_dec;
+    p_sys->proc_out         = &proc_out;
+    p_sys->p_pic            = NULL;
 
 #ifdef DEBUG_CRYSTALHD
     msg_Dbg( p_dec, "%i, %i",  p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height );
 #endif
-
-    if( proc_out.PicInfo.width == 0 || proc_out.PicInfo.height == 0 )
-    {
-        /* decoder_NewPicture would fail in this case */
-        proc_out.Ybuff      = NULL;
-        p_pic               = NULL;
-    }
-    else
-    {
-        /* Direct Rendering */
-        p_pic               = decoder_NewPicture( p_dec );
-        if( !p_pic )
-            return NULL;
-        proc_out.Ybuff      = p_pic->p[0].p_pixels;
-        proc_out.StrideSz   = p_pic->p[0].i_pitch /2 - p_dec->fmt_out.video.i_width;
-        proc_out.PoutFlags |= BC_POUT_FLAGS_STRIDE; /* trust Stride info */
-    }
 
     BC_STATUS sts = BC_FUNC_PSYS(DtsProcOutput)( p_sys->bcm_handle, 128, &proc_out );
 #ifdef DEBUG_CRYSTALHD
@@ -449,6 +456,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 #endif
 
     uint8_t b_eos;
+    picture_t *p_pic = p_sys->p_pic;
     switch( sts )
     {
         case BC_STS_SUCCESS:
@@ -467,7 +475,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 #ifdef DEBUG_CRYSTALHD
             msg_Dbg( p_dec, "TS Output is %"PRIu64, p_pic->date);
 #endif
-            // free( proc_out.Ybuff );
             return p_pic;
 
         case BC_STS_DEC_NOT_OPEN:
