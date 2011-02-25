@@ -87,7 +87,8 @@ typedef struct hls_stream_s
 struct stream_sys_t
 {
     vlc_url_t     m3u8;         /* M3U8 url */
-    vlc_thread_t  thread;       /* Thread function */
+    vlc_thread_t  reload;       /* HLS m3u8 reload thread */
+    vlc_thread_t  thread;       /* HLS segment download thread */
 
     /* */
     vlc_array_t  *hls_stream;   /* bandwidth adaptation */
@@ -140,6 +141,7 @@ static char *ReadLine(uint8_t *buffer, uint8_t **remain, size_t len);
 static int hls_Download(stream_t *s, segment_t *segment);
 
 static void* hls_Thread(void *);
+static void* hls_Reload(void *);
 
 static segment_t *segment_GetSegment(hls_stream_t *hls, int wanted);
 static void segment_Free(segment_t *segment);
@@ -1143,7 +1145,7 @@ static void* hls_Thread(void *p_this)
                     (p_sys->download.segment >= count)) &&
                    (p_sys->download.seek == -1))
             {
-                if (p_sys->b_live && (mdate() >= p_sys->playlist.wakeup))
+                if (p_sys->b_live /*&& (mdate() >= p_sys->playlist.wakeup)*/)
                     break;
                 vlc_cond_wait(&p_sys->download.wait, &p_sys->download.lock_wait);
                 if (!vlc_object_alive(s)) break;
@@ -1158,32 +1160,6 @@ static void* hls_Thread(void *p_this)
         }
 
         if (!vlc_object_alive(s)) break;
-
-        /* reload the m3u8 index file */
-        if (p_sys->b_live)
-        {
-            double wait = 1;
-            mtime_t now = mdate();
-            if (now >= p_sys->playlist.wakeup)
-            {
-                if (hls_ReloadPlaylist(s) != VLC_SUCCESS)
-                {
-                    /* No change in playlist, then backoff */
-                    p_sys->playlist.tries++;
-                    if (p_sys->playlist.tries == 1) wait = 0.5;
-                    else if (p_sys->playlist.tries == 2) wait = 1;
-                    else if (p_sys->playlist.tries >= 3) wait = 3;
-                }
-                else p_sys->playlist.tries = 0;
-
-                /* determine next time to update playlist */
-                p_sys->playlist.last = now;
-                p_sys->playlist.wakeup = now + ((mtime_t)(hls->duration * wait)
-                                                * (mtime_t)1000000);
-            }
-
-            if (!vlc_object_alive(s)) break;
-        }
 
         vlc_mutex_lock(&hls->lock);
         segment_t *segment = segment_GetSegment(hls, p_sys->download.segment);
@@ -1213,6 +1189,48 @@ static void* hls_Thread(void *p_this)
             p_sys->download.segment++;
         vlc_cond_signal(&p_sys->download.wait);
         vlc_mutex_unlock(&p_sys->download.lock_wait);
+    }
+
+    vlc_restorecancel(canc);
+    return NULL;
+}
+
+static void* hls_Reload(void *p_this)
+{
+    stream_t *s = (stream_t *)p_this;
+    stream_sys_t *p_sys = s->p_sys;
+
+    assert(p_sys->b_live);
+
+    int canc = vlc_savecancel();
+
+    while (vlc_object_alive(s))
+    {
+        double wait = 1;
+        mtime_t now = mdate();
+        if (now >= p_sys->playlist.wakeup)
+        {
+            /* reload the m3u8 */
+            if (hls_ReloadPlaylist(s) != VLC_SUCCESS)
+            {
+                /* No change in playlist, then backoff */
+                p_sys->playlist.tries++;
+                if (p_sys->playlist.tries == 1) wait = 0.5;
+                else if (p_sys->playlist.tries == 2) wait = 1;
+                else if (p_sys->playlist.tries >= 3) wait = 3;
+            }
+            else p_sys->playlist.tries = 0;
+
+            hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->download.stream);
+            assert(hls);
+
+            /* determine next time to update playlist */
+            p_sys->playlist.last = now;
+            p_sys->playlist.wakeup = now + ((mtime_t)(hls->duration * wait)
+                                                   * (mtime_t)1000000);
+        }
+
+        mwait(p_sys->playlist.wakeup);
     }
 
     vlc_restorecancel(canc);
@@ -1507,14 +1525,6 @@ static int Open(vlc_object_t *p_this)
         goto fail;
     }
 
-    /* Initialize HLS live stream */
-    if (p_sys->b_live)
-    {
-        hls_stream_t *hls = hls_Get(p_sys->hls_stream, current);
-        p_sys->playlist.last = mdate();
-        p_sys->playlist.wakeup = p_sys->playlist.last +
-                ((mtime_t)hls->duration * UINT64_C(1000000));
-    }
 
     p_sys->download.stream = current;
     p_sys->playback.stream = current;
@@ -1523,8 +1533,24 @@ static int Open(vlc_object_t *p_this)
     vlc_mutex_init(&p_sys->download.lock_wait);
     vlc_cond_init(&p_sys->download.wait);
 
+    /* Initialize HLS live stream */
+    if (p_sys->b_live)
+    {
+        hls_stream_t *hls = hls_Get(p_sys->hls_stream, current);
+        p_sys->playlist.last = mdate();
+        p_sys->playlist.wakeup = p_sys->playlist.last +
+                ((mtime_t)hls->duration * UINT64_C(1000000));
+
+        if (vlc_clone(&p_sys->reload, hls_Reload, s, VLC_THREAD_PRIORITY_LOW))
+        {
+            goto fail_thread;
+        }
+    }
+
     if (vlc_clone(&p_sys->thread, hls_Thread, s, VLC_THREAD_PRIORITY_INPUT))
     {
+        if (p_sys->b_live)
+            vlc_join(p_sys->reload, NULL);
         goto fail_thread;
     }
 
@@ -1566,6 +1592,8 @@ static void Close(vlc_object_t *p_this)
     vlc_mutex_unlock(&p_sys->download.lock_wait);
 
     /* */
+    if (p_sys->b_live)
+        vlc_join(p_sys->reload, NULL);
     vlc_join(p_sys->thread, NULL);
     vlc_mutex_destroy(&p_sys->download.lock_wait);
     vlc_cond_destroy(&p_sys->download.wait);
