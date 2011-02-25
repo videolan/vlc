@@ -75,7 +75,7 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
     {
         availableMediaDiscoverer = [[NSArray arrayWithObjects:
                                 [[[VLCMediaDiscoverer alloc] initWithName:@"sap"] autorelease],
-                                [[[VLCMediaDiscoverer alloc] initWithName:@"upnp_intel"] autorelease],
+                                [[[VLCMediaDiscoverer alloc] initWithName:@"upnp"] autorelease],
                                 [[[VLCMediaDiscoverer alloc] initWithName:@"freebox"] autorelease],
                                 [[[VLCMediaDiscoverer alloc] initWithName:@"video_dir"] autorelease], nil] retain];
     }

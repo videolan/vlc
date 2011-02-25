@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Upnp_intel.cpp :  UPnP discovery module (libupnp)
+ * Upnp.cpp :  UPnP discovery module (libupnp)
  *****************************************************************************
  * Copyright (C) 2004-2008 the VideoLAN team
  * $Id$
@@ -55,7 +55,7 @@ struct services_discovery_sys_t
 // VLC callback prototypes
 static int Open( vlc_object_t* );
 static void Close( vlc_object_t* );
-VLC_SD_PROBE_HELPER("upnp_intel", "Universal Plug'n'Play", SD_CAT_LAN)
+VLC_SD_PROBE_HELPER("upnp", "Universal Plug'n'Play", SD_CAT_LAN)
 
 // Module descriptor
 
