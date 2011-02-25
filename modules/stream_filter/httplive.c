@@ -962,17 +962,13 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
             segment_t *l = segment_GetSegment(*hls, last);
             if (l == NULL) goto fail_and_unlock;
 
-            if ((l->sequence + 1) == p->sequence)
+            if ((l->sequence + 1) != p->sequence)
             {
-                vlc_array_append((*hls)->segments, p);
-                msg_Info(s, "- segment %d appended", p->sequence);
+                msg_Err(s, "gap in sequence numbers found: new=%d expected %d",
+                        p->sequence, l->sequence+1);
             }
-            else /* there is a gap */
-            {
-                msg_Err(s, "gap in sequence numbers found: new=%d expected old=%d",
-                        p->sequence, l->sequence);
-                goto fail_and_unlock;
-            }
+            vlc_array_append((*hls)->segments, p);
+            msg_Info(s, "- segment %d appended", p->sequence);
         }
         vlc_mutex_unlock(&(*hls)->lock);
     }
