@@ -592,7 +592,7 @@ int vlc_execve( vlc_object_t *p_object, int i_argc, char *const *ppsz_argv,
     HANDLE hChildStdinRd, hChildStdinWr, hChildStdoutRd, hChildStdoutWr;
     DWORD i_status;
     char *psz_cmd = NULL, *p_env = NULL, *p = NULL;
-    char **ppsz_parser;
+    char *const *ppsz_parser;
     int i_size;
 
     /* Set the bInheritHandle flag so pipe handles are inherited. */
