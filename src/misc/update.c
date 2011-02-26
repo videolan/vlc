@@ -724,7 +724,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     {
         wchar_t psz_wdestfile[MAX_PATH];
         MultiByteToWideChar( CP_UTF8, 0, psz_destfile, -1, psz_wdestfile, MAX_PATH );
-        answer = ShellExecuteW( NULL, L"open", psz_wdestfile, NULL, NULL, SW_SHOW);
+        answer = (int)ShellExecuteW( NULL, L"open", psz_wdestfile, NULL, NULL, SW_SHOW);
         if(answer > 32)
             libvlc_Quit(p_this->p_libvlc);
     }
