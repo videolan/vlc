@@ -72,7 +72,7 @@ struct filter_sys_t
     size_t i_buf_size;
 
     double d_old_factor;
-    int i_old_wing;
+    size_t i_old_wing;
 
     unsigned int i_remainder;                /* remainder of previous sample */
     bool b_first;
