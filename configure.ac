@@ -3995,16 +3995,6 @@ fi
 EXTEND_HELP_STRING([Misc options:])
 
 dnl
-dnl compiling for android?
-dnl
-
-AC_ARG_ENABLE(android,
-  [  --enable-android       compile for android (default disable)])
-AS_IF([test "${enable_android}" = "yes"], [
-  AC_DEFINE([HAVE_ANDROID], 1, [Define to 1 if building for android])
-])
-
-dnl
 dnl libgcrypt
 dnl
 AC_ARG_ENABLE(libgcrypt,
