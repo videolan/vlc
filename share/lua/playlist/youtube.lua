@@ -35,7 +35,7 @@ end
 
 -- Probe function.
 function probe()
-    if vlc.access ~= "http" then
+    if vlc.access ~= "http" and vlc.access ~= "https" then
         return false
     end
     options = {":demux=avformat,ffmpeg"}
