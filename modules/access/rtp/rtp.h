@@ -52,6 +52,7 @@ rtp_session_t *rtp_session_create (demux_t *);
 void rtp_session_destroy (demux_t *, rtp_session_t *);
 void rtp_queue (demux_t *, rtp_session_t *, block_t *);
 bool rtp_dequeue (demux_t *, const rtp_session_t *, mtime_t *);
+void rtp_dequeue_force (demux_t *, const rtp_session_t *);
 int rtp_add_type (demux_t *demux, rtp_session_t *ses, const rtp_pt_t *pt);
 
 void *rtp_dgram_thread (void *data);

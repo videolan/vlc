@@ -163,7 +163,6 @@ void *rtp_stream_thread (void *opaque)
     for (;;)
     {
         /* There is no reordering on stream sockets, so no timeout. */
-        /* FIXME: hack rtp_dequeue() to skip the reordering/timer */
         ssize_t val;
 
         uint16_t frame_len;
@@ -186,6 +185,7 @@ void *rtp_stream_thread (void *opaque)
 
         int canc = vlc_savecancel ();
         rtp_process (demux, block);
+        rtp_dequeue_force (demux, sys->session);
         vlc_restorecancel (canc);
     }
 #else
