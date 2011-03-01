@@ -507,8 +507,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             #ifdef WIN32
             TestCaC( "dshow-caching" );
             #else
-            if (module_exists ("v4l"))
-                TestCaC( "v4l-caching" );
             if (module_exists ("access_jack"))
                 TestCaC( "jack-input-caching" );
             if (module_exists ("v4l2"))
@@ -803,8 +801,6 @@ void SPrefsPanel::apply()
             #ifdef WIN32
             CaC( "dshow-caching" );
             #else
-            if (module_exists ( "v4l" ))
-                CaC( "v4l-caching" );
             if (module_exists ( "access_jack" ))
             CaC( "jack-input-caching" );
             if (module_exists ( "v4l2" ))

@@ -65,7 +65,7 @@
         .replaceInStrings( QRegExp("^"), "/dev/" ) \
     );
 
-static const char *psz_devModule[] = { "v4l", "v4l2", "pvr", "dvb", "bda",
+static const char *psz_devModule[] = { "v4l2", "pvr", "dvb", "bda",
                                        "dshow", "screen", "jack" };
 
 /**************************************************************************
@@ -872,51 +872,6 @@ void CaptureOpenPanel::initialize()
     }
 
     /*******
-     * V4L *
-     *******/
-    if( module_exists( "v4l" ) ){
-    addModuleAndLayouts( V4L_DEVICE, v4l, "Video for Linux", QGridLayout );
-
-    /* V4l Main panel */
-    QLabel *v4lVideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
-    v4lDevLayout->addWidget( v4lVideoDeviceLabel, 0, 0 );
-
-    v4lVideoDevice = new QLineEdit;
-    v4lDevLayout->addWidget( v4lVideoDevice, 0, 1 );
-
-    QLabel *v4lAudioDeviceLabel = new QLabel( qtr( "Audio device name" ) );
-    v4lDevLayout->addWidget( v4lAudioDeviceLabel, 1, 0 );
-
-    v4lAudioDevice = new QLineEdit;
-    v4lDevLayout->addWidget( v4lAudioDevice, 1, 1 );
-
-    /* V4l Props panel */
-    QLabel *v4lNormLabel = new QLabel( qtr( "Norm" ) );
-    v4lPropLayout->addWidget( v4lNormLabel, 0 , 0 );
-
-    v4lNormBox = new QComboBox;
-    setfillVLCConfigCombo( "v4l-norm", p_intf, v4lNormBox );
-    v4lPropLayout->addWidget( v4lNormBox, 0 , 1 );
-
-    QLabel *v4lFreqLabel = new QLabel( qtr( "Frequency" ) );
-    v4lPropLayout->addWidget( v4lFreqLabel, 1 , 0 );
-
-    v4lFreq = new QSpinBox;
-    v4lFreq->setAlignment( Qt::AlignRight );
-    v4lFreq->setSuffix(" kHz");
-    setSpinBoxFreq( v4lFreq );
-    v4lPropLayout->addWidget( v4lFreq, 1 , 1 );
-    v4lPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
-            2, 0, 2, 1 );
-
-    /* v4l CONNECTs */
-    CuMRL( v4lVideoDevice, textChanged( const QString& ) );
-    CuMRL( v4lAudioDevice, textChanged( const QString& ) );
-    CuMRL( v4lFreq, valueChanged ( int ) );
-    CuMRL( v4lNormBox,  currentIndexChanged ( int ) );
-    }
-
-    /*******
      * JACK *
      *******/
     if( module_exists( "jack" ) ){
@@ -1197,12 +1152,6 @@ void CaptureOpenPanel::updateMRL()
         emit methodChanged( "dshow-caching" );
         break;
 #else
-    case V4L_DEVICE:
-        fileList << "v4l://" + v4lVideoDevice->text();
-        mrl += " :input-slave=alsa://" + v4lAudioDevice->text();
-        mrl += " :v4l-norm=" + QString::number( v4lNormBox->currentIndex() );
-        mrl += " :v4l-frequency=" + QString::number( v4lFreq->value() );
-        break;
     case V4L2_DEVICE:
         fileList << "v4l2://" + v4l2VideoDevice->currentText();
         mrl += " :input-slave=alsa://" + v4l2AudioDevice->currentText();

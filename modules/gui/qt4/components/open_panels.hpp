@@ -48,7 +48,6 @@
 
 enum
 {
-    V4L_DEVICE,
     V4L2_DEVICE,
     PVR_DEVICE,
     DVB_DEVICE,
@@ -211,11 +210,10 @@ private:
 #else
     QRadioButton *dvbs, *dvbt, *dvbc;
     QLabel *dvbBandLabel, *dvbSrateLabel;
-    QSpinBox  *v4lFreq, *pvrFreq, *pvrBitr;
-    QLineEdit *v4lVideoDevice, *v4lAudioDevice;
+    QSpinBox  *pvrFreq, *pvrBitr;
     QComboBox *v4l2VideoDevice, *v4l2AudioDevice;
     QLineEdit *pvrDevice, *pvrRadioDevice;
-    QComboBox *v4lNormBox, *v4l2StdBox, *pvrNormBox, *dvbBandBox;
+    QComboBox *v4l2StdBox, *pvrNormBox, *dvbBandBox;
     QSpinBox *dvbCard, *dvbFreq, *dvbSrate;
     QSpinBox *jackChannels, *jackCaching;
     QCheckBox *jackPace, *jackConnect;
