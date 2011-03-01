@@ -29,6 +29,7 @@
 #include <vlc_block.h>
 #include <vlc_network.h>
 
+#include <limits.h>
 #include <unistd.h>
 #ifdef HAVE_POLL
 # include <poll.h>
@@ -39,189 +40,156 @@
 # include <srtp.h>
 #endif
 
-static bool fd_dead (int fd)
-{
-    struct pollfd ufd = { .fd = fd, };
-    return (poll (&ufd, 1, 0) > 0) && (ufd.revents & POLLHUP);
-}
-
 /**
- * Gets a datagram from the network.
- * @param fd datagram file descriptor
- * @return a block or NULL on fatal error (socket dead)
+ * Processes a packet received from the RTP socket.
  */
-static block_t *rtp_dgram_recv (vlc_object_t *obj, int fd)
+static void rtp_process (demux_t *demux, block_t *block)
 {
-    block_t *block = block_Alloc (0xffff);
-    ssize_t len;
+    demux_sys_t *sys = demux->p_sys;
 
-    block_cleanup_push (block);
-    do
-    {
-        len = net_Read (obj, fd, NULL,
-                        block->p_buffer, block->i_buffer, false);
+    if (block->i_buffer < 2)
+        goto drop;
+    const uint8_t ptype = rtp_ptype (block);
+    if (ptype >= 72 && ptype <= 76)
+        goto drop; /* Muxed RTCP, ignore for now FIXME */
 
-        if (((len <= 0) && fd_dead (fd)) || !vlc_object_alive (obj))
-        {   /* POLLHUP -> permanent (DCCP) socket error */
-            block_Release (block);
-            block = NULL;
-            break;
-        }
-    }
-    while (len == -1);
-    vlc_cleanup_pop ();
-
-    return block ? block_Realloc (block, 0, len) : NULL;
-}
-
-
-/**
- * Gets a framed RTP packet.
- * @param fd stream file descriptor
- * @return a block or NULL in case of fatal error
- */
-static block_t *rtp_stream_recv (vlc_object_t *obj, int fd)
-{
-    ssize_t len = 0;
-    uint8_t hdr[2]; /* frame header */
-
-    /* Receives the RTP frame header */
-    do
-    {
-        ssize_t val = net_Read (obj, fd, NULL, hdr + len, 2 - len, false);
-        if (val <= 0)
-            return NULL;
-        len += val;
-    }
-    while (len < 2);
-
-    block_t *block = block_Alloc (GetWBE (hdr));
-
-    /* Receives the RTP packet */
-    for (ssize_t i = 0; i < len;)
-    {
-        ssize_t val;
-
-        block_cleanup_push (block);
-        val = net_Read (obj, fd, NULL,
-                        block->p_buffer + i, block->i_buffer - i, false);
-        vlc_cleanup_pop ();
-
-        if (val <= 0)
-        {
-            block_Release (block);
-            return NULL;
-        }
-        i += val;
-    }
-
-    return block;
-}
-
-
-static block_t *rtp_recv (demux_t *demux)
-{
-    demux_sys_t *p_sys = demux->p_sys;
-
-    for (block_t *block;; block_Release (block))
-    {
-        block = p_sys->framed_rtp
-                ? rtp_stream_recv (VLC_OBJECT (demux), p_sys->fd)
-                : rtp_dgram_recv (VLC_OBJECT (demux), p_sys->fd);
-        if (block == NULL)
-        {
-            msg_Err (demux, "RTP flow stopped");
-            break; /* fatal error */
-        }
-
-        if (block->i_buffer < 2)
-            continue;
-
-        /* FIXME */
-        const uint8_t ptype = rtp_ptype (block);
-        if (ptype >= 72 && ptype <= 76)
-            continue; /* Muxed RTCP, ignore for now */
 #ifdef HAVE_SRTP
-        if (p_sys->srtp)
+    if (sys->srtp != NULL)
+    {
+        size_t len = block->i_buffer;
+        if (srtp_recv (sys->srtp, block->p_buffer, &len))
         {
-            size_t len = block->i_buffer;
-            int canc, err;
-
-            canc = vlc_savecancel ();
-            err = srtp_recv (p_sys->srtp, block->p_buffer, &len);
-            vlc_restorecancel (canc);
-            if (err)
-            {
-                msg_Dbg (demux, "SRTP authentication/decryption failed");
-                continue;
-            }
-            block->i_buffer = len;
+            msg_Dbg (demux, "SRTP authentication/decryption failed");
+            goto drop;
         }
-#endif
-        return block; /* success! */
+        block->i_buffer = len;
     }
-    return NULL;
+#endif
+
+    /* TODO: use SDP and get rid of this hack */
+    if (unlikely(sys->autodetect))
+    {   /* Autodetect payload type, _before_ rtp_queue() */
+        if (rtp_autodetect (demux, sys->session, block))
+            goto drop;
+        sys->autodetect = false;
+    }
+
+    rtp_queue (demux, sys->session, block);
+    return;
+drop:
+    block_Release (block);
 }
 
-
-static void timer_cleanup (void *timer)
+static int rtp_timeout (mtime_t deadline)
 {
-    vlc_timer_destroy ((vlc_timer_t)timer);
+    if (deadline == VLC_TS_INVALID)
+        return -1; /* infinite */
+
+    mtime_t t = mdate ();
+    if (t >= deadline)
+        return 0;
+
+    t = (deadline - t) / (CLOCK_FREQ / INT64_C(1000));
+    if (unlikely(t > INT_MAX))
+        return INT_MAX;
+    return t;
 }
 
-static void rtp_process (void *data);
-
-void *rtp_thread (void *data)
+/**
+ * RTP/RTCP session thread for datagram sockets
+ */
+void *rtp_dgram_thread (void *opaque)
 {
-    demux_t *demux = data;
-    demux_sys_t *p_sys = demux->p_sys;
-    bool autodetect = true;
+    demux_t *demux = opaque;
+    demux_sys_t *sys = demux->p_sys;
+    mtime_t deadline = VLC_TS_INVALID;
+    int rtp_fd = sys->fd;
 
-    if (vlc_timer_create (&p_sys->timer, rtp_process, data))
-        return NULL;
-    vlc_cleanup_push (timer_cleanup, (void *)p_sys->timer);
+    struct pollfd ufd[1];
+    ufd[0].fd = rtp_fd;
+    ufd[0].events = POLLIN;
 
     for (;;)
     {
-        block_t *block = rtp_recv (demux);
-        if (block == NULL)
-            break;
-
-        if (autodetect)
-        {   /* Autodetect payload type, _before_ rtp_queue() */
-            /* No need for lock - the queue is empty. */
-            if (rtp_autodetect (demux, p_sys->session, block))
-            {
-                block_Release (block);
-                continue;
-            }
-            autodetect = false;
-        }
+        int n = poll (ufd, 1, rtp_timeout (deadline));
+        if (n == -1)
+            continue;
 
         int canc = vlc_savecancel ();
-        vlc_mutex_lock (&p_sys->lock);
-        rtp_queue (demux, p_sys->session, block);
-        vlc_mutex_unlock (&p_sys->lock);
-        vlc_restorecancel (canc);
+        if (n == 0)
+            goto dequeue;
 
-        rtp_process (demux);
+        if (ufd[0].revents)
+        {
+            n--;
+            if (unlikely(ufd[0].revents & POLLHUP))
+                break; /* RTP socket dead (DCCP only) */
+
+            block_t *block = block_Alloc (0xffff); /* TODO: p_sys->mru */
+            if (unlikely(block == NULL))
+                break; /* we are totallly screwed */
+
+            ssize_t len = recv (rtp_fd, block->p_buffer, block->i_buffer, 0);
+            if (len != -1)
+            {
+                block->i_buffer = len;
+                rtp_process (demux, block);
+            }
+            else
+            {
+                msg_Warn (demux, "RTP network error: %m");
+                block_Release (block);
+            }
+        }
+
+    dequeue:
+        if (!rtp_dequeue (demux, sys->session, &deadline))
+            deadline = VLC_TS_INVALID;
+        vlc_restorecancel (canc);
     }
-    vlc_cleanup_run ();
     return NULL;
 }
 
-
 /**
- * Process one RTP packet from the de-jitter queue.
+ * RTP/RTCP session thread for stream sockets (framed RTP)
  */
-static void rtp_process (void *data)
+void *rtp_stream_thread (void *opaque)
 {
-    demux_t *demux = data;
-    demux_sys_t *p_sys = demux->p_sys;
-    mtime_t deadline;
+#ifndef WIN32
+    demux_t *demux = opaque;
+    demux_sys_t *sys = demux->p_sys;
+    int fd = sys->fd;
 
-    vlc_mutex_lock (&p_sys->lock);
-    if (rtp_dequeue (demux, p_sys->session, &deadline))
-        vlc_timer_schedule (p_sys->timer, true, deadline, 0);
-    vlc_mutex_unlock (&p_sys->lock);
+    for (;;)
+    {
+        /* There is no reordering on stream sockets, so no timeout. */
+        /* FIXME: hack rtp_dequeue() to skip the reordering/timer */
+        ssize_t val;
+
+        uint16_t frame_len;
+        if (recv (fd, &frame_len, 2, MSG_WAITALL) != 2)
+            break;
+
+        block_t *block = block_Alloc (ntohs (frame_len));
+        if (unlikely(block == NULL))
+            break;
+
+        block_cleanup_push (block);
+        val = recv (fd, block->p_buffer, block->i_buffer, MSG_WAITALL);
+        vlc_cleanup_pop ();
+
+        if (val != (ssize_t)block->i_buffer)
+        {
+            block_Release (block);
+            break;
+        }
+
+        int canc = vlc_savecancel ();
+        rtp_process (demux, block);
+        vlc_restorecancel (canc);
+    }
+#else
+    (void) opaque;
+#endif
+    return NULL;
 }

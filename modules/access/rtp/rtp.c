@@ -257,7 +257,6 @@ static int Open (vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
-    vlc_mutex_init (&p_sys->lock);
 #ifdef HAVE_SRTP
     p_sys->srtp         = NULL;
 #endif
@@ -269,7 +268,8 @@ static int Open (vlc_object_t *obj)
                         * CLOCK_FREQ;
     p_sys->max_dropout  = var_CreateGetInteger (obj, "rtp-max-dropout");
     p_sys->max_misorder = var_CreateGetInteger (obj, "rtp-max-misorder");
-    p_sys->framed_rtp   = (tp == IPPROTO_TCP);
+    p_sys->thread_ready = false;
+    p_sys->autodetect   = true;
 
     demux->pf_demux   = NULL;
     demux->pf_control = Control;
@@ -303,8 +303,9 @@ static int Open (vlc_object_t *obj)
     }
 #endif
 
-    if (vlc_clone (&p_sys->thread, rtp_thread, demux,
-                   VLC_THREAD_PRIORITY_INPUT))
+    if (vlc_clone (&p_sys->thread,
+                   (tp != IPPROTO_TCP) ? rtp_dgram_thread : rtp_stream_thread,
+                   demux, VLC_THREAD_PRIORITY_INPUT))
         goto error;
     p_sys->thread_ready = true;
     return VLC_SUCCESS;
@@ -328,7 +329,6 @@ static void Close (vlc_object_t *obj)
         vlc_cancel (p_sys->thread);
         vlc_join (p_sys->thread, NULL);
     }
-    vlc_mutex_destroy (&p_sys->lock);
 
 #ifdef HAVE_SRTP
     if (p_sys->srtp)
