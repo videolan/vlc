@@ -104,7 +104,6 @@ static int Control( stream_t *s, int i_query, va_list args )
 
     bool *p_bool;
     uint64_t   *pi_64, i_64;
-    int        i_int;
 
     switch( i_query )
     {
@@ -138,7 +137,6 @@ static int Control( stream_t *s, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case STREAM_CONTROL_ACCESS:
-            i_int = (int) va_arg( args, int );
             msg_Err( s, "Hey, what are you thinking ?"
                      "DON'T USE STREAM_CONTROL_ACCESS !!!" );
             return VLC_EGENERIC;

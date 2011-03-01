@@ -211,7 +211,6 @@ int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
 {
     int i;
     char psz_addr[NI_MAXNUMERICHOST];
-    bool b_ipv6 = false, b_ssm = false;
     sap_session_t *p_sap_session;
     mtime_t i_hash;
     union
@@ -243,18 +242,11 @@ int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
             memcpy( a6->s6_addr + 2, "\x00\x00\x00\x00\x00\x00"
                    "\x00\x00\x00\x00\x00\x02\x7f\xfe", 14 );
             if( IN6_IS_ADDR_MULTICAST( a6 ) )
-            {
-                /* SSM <=> ff3x::/32 */
-                b_ssm = (U32_AT (a6->s6_addr) & 0xfff0ffff) == 0xff300000;
-
                 /* force flags to zero, preserve scope */
                 a6->s6_addr[1] &= 0xf;
-            }
             else
                 /* Unicast IPv6 - assume global scope */
                 memcpy( a6->s6_addr, "\xff\x0e", 2 );
-
-            b_ipv6 = true;
             break;
         }
 #endif
@@ -280,11 +272,7 @@ int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
                 ipv4 = 0;
             else
             /* other addresses => 224.2.127.254 */
-            {
-                /* SSM: 232.0.0.0/8 */
-                b_ssm = (ipv4 & htonl (255 << 24)) == htonl (232 << 24);
                 ipv4 = htonl (0xe0027ffe);
-            }
 
             if( ipv4 == 0 )
             {
