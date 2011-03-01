@@ -64,7 +64,7 @@ private:
     /**
      * Expects a string from the current locale.
      */
-    bool extractFileInZip( unzFile file, const string &rootDir );
+    bool extractFileInZip( unzFile file, const string &rootDir, bool isWsz );
 
     /// Clean up the temporary files created by the extraction
     /**
