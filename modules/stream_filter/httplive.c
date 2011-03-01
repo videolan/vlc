@@ -136,7 +136,7 @@ static int  Control(stream_t *, int i_query, va_list);
 
 static ssize_t read_M3U8(stream_t *s, vlc_url_t *url, uint8_t **buffer);
 static ssize_t ReadM3U8(stream_t *s, uint8_t **buffer);
-static char *ReadLine(uint8_t *buffer, uint8_t **remain, size_t len);
+static char *ReadLine(uint8_t *buffer, uint8_t **pos, size_t len);
 
 static int hls_Download(stream_t *s, segment_t *segment);
 
@@ -359,6 +359,7 @@ static int ChooseSegment(stream_t *s, int current)
      */
     int wanted = 0;
     int duration = 0;
+    int sequence = 0;
     int count = vlc_array_count(hls->segments);
     int i = p_sys->b_live ? count - 1 : 0;
 
@@ -378,6 +379,7 @@ static int ChooseSegment(stream_t *s, int current)
         {
             /* Start point found */
             wanted = p_sys->b_live ? i : 0;
+            sequence = segment->sequence;
             break;
         }
 
@@ -387,7 +389,7 @@ static int ChooseSegment(stream_t *s, int current)
           i++;
     }
 
-    msg_Info(s, "Choose segment %d/%d", wanted, count);
+    msg_Info(s, "Choose segment %d/%d (sequence=%d)", wanted, count, sequence);
     return wanted;
 }
 
@@ -612,7 +614,8 @@ static int parse_MediaSequence(stream_t *s, hls_stream_t *hls, char *p_read)
     }
 
     if (hls->sequence > 0)
-        msg_Err(s, "EXT-X-MEDIA-SEQUENCE already present in playlist");
+        msg_Err(s, "EXT-X-MEDIA-SEQUENCE already present in playlist (new=%d, old=%d)",
+                    sequence, hls->sequence);
 
     hls->sequence = sequence;
     return VLC_SUCCESS;
@@ -746,6 +749,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, ssize_
     char *line = ReadLine(p_begin, &p_read, p_end - p_begin);
     if (line == NULL)
         return VLC_ENOMEM;
+    p_begin = p_read;
 
     if (strncmp(line, "#EXTM3U", 7) != 0)
     {
@@ -782,27 +786,21 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, ssize_
     /* Is it a meta index file ? */
     bool b_meta = (strstr((const char *)buffer, "#EXT-X-STREAM-INF") == NULL) ? false : true;
 
-    if (b_meta)
-        msg_Info(s, "Meta playlist");
-    else
-        msg_Info(s, "%s Playlist HLS protocol version: %d", p_sys->b_live ? "Live": "VOD", version);
-
-    /* */
     int err = VLC_SUCCESS;
-    do
-    {
-        /* Next line */
-        p_begin = p_read;
-        line = ReadLine(p_begin, &p_read, p_end - p_begin);
-        if (line == NULL)
-            break;
 
-        /* */
-        p_begin = p_read;
+    if (b_meta)
+    {
+        msg_Info(s, "Meta playlist");
 
         /* M3U8 Meta Index file */
-        if (b_meta)
-        {
+        do {
+            /* Next line */
+            line = ReadLine(p_begin, &p_read, p_end - p_begin);
+            if (line == NULL)
+                break;
+            p_begin = p_read;
+
+            /* */
             if (strncmp(line, "#EXT-X-STREAM-INF", 17) == 0)
             {
                 p_sys->b_meta = true;
@@ -834,38 +832,59 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, ssize_
                             hls->size = hls_GetStreamSize(hls); /* Stream size (approximate) */
                     }
                 }
+                p_begin = p_read;
             }
-        }
+
+            free(line);
+            line = NULL;
+
+            if (p_begin >= p_end)
+                break;
+
+        } while ((err == VLC_SUCCESS) && vlc_object_alive(s));
+
+    }
+    else
+    {
+        msg_Info(s, "%s Playlist HLS protocol version: %d", p_sys->b_live ? "Live": "VOD", version);
+
+        hls_stream_t *hls = NULL;
+        if (p_sys->b_meta)
+            hls = hls_GetLast(streams);
         else
         {
-            hls_stream_t *hls = hls_GetLast(streams);
-            if (hls == NULL)
+            /* No Meta playlist used */
+            hls = hls_New(streams, 0, -1, NULL);
+            if (hls)
             {
-                /* No Meta playlist used */
-                hls = hls_New(streams, 0, -1, NULL);
-                if (hls == NULL)
-                {
-                    msg_Err(s, "No HLS structure created");
-                    err = VLC_ENOMEM;
-                    break;
-                }
-
                 /* Get TARGET-DURATION first */
                 p = (uint8_t *)strstr((const char *)buffer, "#EXT-X-TARGETDURATION:");
                 if (p)
                 {
                     uint8_t *p_rest = NULL;
                     char *psz_duration = ReadLine(p, &p_rest,  p_end - p);
-                    if (psz_duration)
-                    {
-                          err = parse_TargetDuration(s, hls, psz_duration);
-                          free(psz_duration);
-                          p = NULL;
-                    }
+                    if (psz_duration == NULL)
+                        return VLC_EGENERIC;
+                    err = parse_TargetDuration(s, hls, psz_duration);
+                    free(psz_duration);
+                    p = NULL;
                 }
 
+                /* Store version */
                 hls->version = version;
             }
+            else return VLC_ENOMEM;
+        }
+        assert(hls);
+
+        /* */
+        do
+        {
+            /* Next line */
+            line = ReadLine(p_begin, &p_read, p_end - p_begin);
+            if (line == NULL)
+                break;
+            p_begin = p_read;
 
             if (strncmp(line, "#EXTINF", 7) == 0)
             {
@@ -895,17 +914,17 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, ssize_
                 err = parse_Version(s, hls, line);
             else if (strncmp(line, "#EXT-X-ENDLIST", 14) == 0)
                 err = parse_EndList(s, hls);
-        }
+
+            free(line);
+            line = NULL;
+
+            if (p_begin >= p_end)
+                break;
+
+        } while ((err == VLC_SUCCESS) && vlc_object_alive(s));
 
         free(line);
-        line = NULL;
-
-        if (p_begin >= p_end)
-            break;
-
-    } while ((err == VLC_SUCCESS) && vlc_object_alive(s));
-
-    free(line);
+    }
 
     return err;
 }
@@ -949,11 +968,18 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
                 (p->duration != segment->duration) ||
                 (strcmp(p->url.psz_path, segment->url.psz_path) != 0))
             {
-                msg_Err(s, "existing segment found with different content");
+                msg_Err(s, "existing segment found with different content - resetting");
                 msg_Err(s, "- sequence: new=%d, old=%d", p->sequence, segment->sequence);
                 msg_Err(s, "- duration: new=%d, old=%d", p->duration, segment->duration);
                 msg_Err(s, "- file: new=%s", p->url.psz_path);
                 msg_Err(s, "        old=%s", segment->url.psz_path);
+
+                /* Resetting content */
+                segment->sequence = p->sequence;
+                segment->duration = p->duration;
+                vlc_UrlClean(&segment->url);
+                vlc_UrlParse(&segment->url, p->url.psz_buffer, 0);
+                segment_Free(p);
             }
         }
         else
@@ -1398,6 +1424,7 @@ static ssize_t read_M3U8(stream_t *s, vlc_url_t *url, uint8_t **buffer)
     } while (vlc_object_alive(s));
     stream_Delete(p_m3u8);
 
+    (*buffer)[curlen-1] = '\0';
     return size;
 }
 
@@ -1432,7 +1459,7 @@ static ssize_t ReadM3U8(stream_t *s, uint8_t **buffer)
     return size;
 }
 
-static char *ReadLine(uint8_t *buffer, uint8_t **remain, size_t len)
+static char *ReadLine(uint8_t *buffer, uint8_t **pos, size_t len)
 {
     assert(buffer);
 
@@ -1443,17 +1470,22 @@ static char *ReadLine(uint8_t *buffer, uint8_t **remain, size_t len)
 
     while (p < end)
     {
-        if (*p == '\n')
+        if ((*p == '\n') || (*p == '\0'))
             break;
         p++;
     }
 
-    /* copy line excluding \n */
+    /* copy line excluding \n or \0 */
     line = strndup((char *)begin, p - begin);
 
-    /* next pass start after \n */
-    p++;
-    *remain = p;
+    if (*p == '\0')
+        *pos = end;
+    else
+    {
+        /* next pass start after \n */
+        p++;
+        *pos = p;
+    }
 
     return line;
 }
