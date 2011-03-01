@@ -193,7 +193,7 @@ static bool isHTTPLiveStreaming(stream_t *s)
 }
 
 /* HTTP Live Streaming */
-static hls_stream_t *hls_New(vlc_array_t *hls_stream, int id, uint64_t bw, char *uri)
+static hls_stream_t *hls_New(vlc_array_t *hls_stream, const int id, const uint64_t bw, const char *uri)
 {
     hls_stream_t *hls = (hls_stream_t *)malloc(sizeof(hls_stream_t));
     if (hls == NULL) return NULL;
@@ -231,7 +231,7 @@ static void hls_Free(hls_stream_t *hls)
     hls = NULL;
 }
 
-static hls_stream_t *hls_Get(vlc_array_t *hls_stream, int wanted)
+static hls_stream_t *hls_Get(vlc_array_t *hls_stream, const int wanted)
 {
     int count = vlc_array_count(hls_stream);
     if (count <= 0)
@@ -292,7 +292,7 @@ static uint64_t hls_GetStreamSize(hls_stream_t *hls)
 }
 
 /* Segment */
-static segment_t *segment_New(hls_stream_t* hls, int duration, char *uri)
+static segment_t *segment_New(hls_stream_t* hls, const int duration, const char *uri)
 {
     segment_t *segment = (segment_t *)malloc(sizeof(segment_t));
     if (segment == NULL)
@@ -320,7 +320,7 @@ static void segment_Free(segment_t *segment)
     segment = NULL;
 }
 
-static segment_t *segment_GetSegment(hls_stream_t *hls, int wanted)
+static segment_t *segment_GetSegment(hls_stream_t *hls, const int wanted)
 {
     assert(hls);
 
@@ -332,7 +332,7 @@ static segment_t *segment_GetSegment(hls_stream_t *hls, int wanted)
     return (segment_t *) vlc_array_item_at_index(hls->segments, wanted);
 }
 
-static segment_t *segment_Find(hls_stream_t *hls, int sequence)
+static segment_t *segment_Find(hls_stream_t *hls, const int sequence)
 {
     assert(hls);
 
@@ -348,7 +348,7 @@ static segment_t *segment_Find(hls_stream_t *hls, int sequence)
     return NULL;
 }
 
-static int ChooseSegment(stream_t *s, int current)
+static int ChooseSegment(stream_t *s, const int current)
 {
     stream_sys_t *p_sys = (stream_sys_t *)s->p_sys;
     hls_stream_t *hls = hls_Get(p_sys->hls_stream, current);
@@ -499,7 +499,7 @@ static char *ConstructUrl(vlc_url_t *url)
     return psz_url;
 }
 
-static int parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_read, char *uri)
+static int parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_read, const char *uri)
 {
     assert(hls);
     assert(p_read);
@@ -558,7 +558,7 @@ static int parse_TargetDuration(stream_t *s, hls_stream_t *hls, char *p_read)
 }
 
 static int parse_StreamInformation(stream_t *s, vlc_array_t **hls_stream,
-                                   hls_stream_t **hls, char *p_read, char *uri)
+                                   hls_stream_t **hls, char *p_read, const char *uri)
 {
     int id;
     uint64_t bw;
@@ -734,7 +734,7 @@ static int parse_Discontinuity(stream_t *s, hls_stream_t *hls, char *p_read)
  * ALLOW-CACHE, EXT-X-STREAM-INF, EXT-X-ENDLIST, EXT-X-DISCONTINUITY,
  * and EXT-X-VERSION.
  */
-static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, ssize_t len)
+static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const ssize_t len)
 {
     stream_sys_t *p_sys = s->p_sys;
     uint8_t *p_read, *p_begin, *p_end;
@@ -1459,7 +1459,7 @@ static ssize_t ReadM3U8(stream_t *s, uint8_t **buffer)
     return size;
 }
 
-static char *ReadLine(uint8_t *buffer, uint8_t **pos, size_t len)
+static char *ReadLine(uint8_t *buffer, uint8_t **pos, const size_t len)
 {
     assert(buffer);
 
@@ -1914,7 +1914,7 @@ static uint64_t GetStreamSize(stream_t *s)
     return size;
 }
 
-static int segment_Seek(stream_t *s, uint64_t pos)
+static int segment_Seek(stream_t *s, const uint64_t pos)
 {
     stream_sys_t *p_sys = s->p_sys;
 
