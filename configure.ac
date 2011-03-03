@@ -1970,107 +1970,36 @@ dnl
 dnl  libdvbpsi ts demux/mux
 dnl
 AC_ARG_ENABLE(dvbpsi,
-  [  --enable-dvbpsi         dvbpsi ts mux and demux module (default enabled)])
+  [  --enable-dvbpsi         dvbpsi ts mux and demux module (default auto)])
 have_dvbpsi=no
-if test "${enable_dvbpsi}" != "no"
-then
-  AC_ARG_WITH(dvbpsi,
-  [  --with-dvbpsi=PATH      libdvbpsi headers and libraries])
-  AC_ARG_WITH(dvbpsi,
-  [  --with-dvbpsi-tree=PATH libdvbpsi tree for static linking])
-  case "${with_dvbpsi}" in
-  ""|yes)
-    if test -z "${with_dvbpsi_tree}"
-    then
-      AC_CHECK_HEADERS(dvbpsi/dr.h,
-        [ VLC_ADD_PLUGIN([ts])
-          if test "${enable_sout}" != "no"; then
-            VLC_ADD_PLUGIN([mux_ts])
-          fi
-          VLC_ADD_LIBS([mux_ts ts dvb],[-ldvbpsi])
-	  have_dvbpsi=yes],
-        [  AC_MSG_WARN([cannot find libdvbpsi headers]) ],
-        [#if defined( HAVE_STDINT_H )
-#   include <stdint.h>
-#elif defined( HAVE_INTTYPES_H )
-#   include <inttypes.h>
-#endif
-#include <dvbpsi/dvbpsi.h>
-#include <dvbpsi/descriptor.h>
-#include <dvbpsi/pat.h>
-#include <dvbpsi/pmt.h>])
-    else
-      AC_MSG_CHECKING(for libdvbpsi.a in ${with_dvbpsi_tree})
-      real_dvbpsi_tree="`cd ${with_dvbpsi_tree} 2>/dev/null && pwd`"
-      if test -z "${real_dvbpsi_tree}"
-      then
-        dnl  The given directory can't be found
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot cd to ${with_dvbpsi_tree}])
-      fi
-      if test -f "${real_dvbpsi_tree}/src/.libs/libdvbpsi.a"
-      then
-        dnl  Use a custom libdvbpsi
-        AC_MSG_RESULT(${real_dvbpsi_tree}/src/.libs/libdvbpsi.a)
-        VLC_ADD_PLUGIN([ts])
-        if test "${enable_sout}" != "no"; then
-          VLC_ADD_PLUGIN([mux_ts])
-        fi
-        VLC_ADD_CPPFLAGS([mux_ts ts dvb],[-I${real_dvbpsi_tree}/src])
-        VLC_ADD_LIBS([mux_ts ts dvb],[${real_dvbpsi_tree}/src/.libs/libdvbpsi.a])
-	have_dvbpsi=yes
-      else
-        dnl  The given libdvbpsi wasn't built
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot find ${real_dvbpsi_tree}/src/.libs/libdvbpsi.a, make sure you compiled libdvbpsi in ${with_dvbpsi_tree}])
-      fi
-    fi
-  ;;
-  no)
-    dnl  Compile without dvbpsi
-  ;;
-  *)
-    AC_MSG_CHECKING(for dvbpsi headers in ${with_dvbpsi})
-    if test -z "${with_dvbpsi}"
-    then
-      LDFLAGS_test=""
-      CPPFLAGS_test=""
-    else
-      LDFLAGS_test="-L${with_dvbpsi}/lib"
-      CPPFLAGS_test="-I${with_dvbpsi}/include"
-    fi
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_test}"
+if test "${enable_dvbpsi}" != "no"; then
     AC_CHECK_HEADERS([dvbpsi/dr.h],[
       VLC_ADD_PLUGIN([ts])
       if test "${enable_sout}" != "no"; then
-        AC_CHECK_LIB(dvbpsi, dvbpsi_SDTServiceAddDescriptor,
-           [VLC_ADD_PLUGIN([mux_ts])], [], [${LDFLAGS_test} -ldvbpsi])
+        AC_CHECK_LIB(dvbpsi, dvbpsi_SDTServiceAddDescriptor, [VLC_ADD_PLUGIN([mux_ts])], [], [-ldvbpsi])
       fi
-      VLC_ADD_CPPFLAGS([mux_ts ts dvb],[${CPPFLAGS_test}])
-      VLC_ADD_LIBS([mux_ts ts dvb],[${LDFLAGS_test} -ldvbpsi])
+      VLC_ADD_LIBS([mux_ts ts dvb],[-ldvbpsi])
       have_dvbpsi=yes
-    ],[
-      if test -n "${enable_dvbpsi}"
-      then
-        AC_MSG_ERROR([Could not find libdvbpsi on your system: you may get it from www.videolan.org, you'll need at least version 0.1.6])
-      fi
-    ],
-    [#if defined( HAVE_STDINT_H )
-#   include <stdint.h>
-#elif defined( HAVE_INTTYPES_H )
-#   include <inttypes.h>
-#endif
-#include <dvbpsi/dvbpsi.h>
-#include <dvbpsi/descriptor.h>
-#include <dvbpsi/pat.h>
-#include <dvbpsi/pmt.h>])
-    CPPFLAGS="${CPPFLAGS_save}"
-  ;;
-  esac
-  AC_CHECK_LIB(dvbpsi, dvbpsi_GenSDTSections, [
-    AC_DEFINE(HAVE_DVBPSI_SDT, 1, [Define if you have dvbpsi_GenSDTSections.])
-  ], [], [${LIBS_ts}])
 
+      AC_CHECK_LIB(dvbpsi, dvbpsi_GenSDTSections, [
+        AC_DEFINE(HAVE_DVBPSI_SDT, 1, [Define if you have dvbpsi_GenSDTSections.])
+      ], [], [${LIBS_ts}])
+    ],[
+      if test -n "${enable_dvbpsi}"; then
+        AC_MSG_ERROR([Could not find libdvbpsi on your system: you need at least version 0.1.6])
+      else
+        AC_MSG_WARN([Could not find libdvbpsi on your system: you need at least version 0.1.6])
+      fi
+    ],[ #if defined( HAVE_STDINT_H )
+        #   include <stdint.h>
+        #elif defined( HAVE_INTTYPES_H )
+        #   include <inttypes.h>
+        #endif
+        #include <dvbpsi/dvbpsi.h>
+        #include <dvbpsi/descriptor.h>
+        #include <dvbpsi/pat.h>
+        #include <dvbpsi/pmt.h>
+    ])
 fi
 
 dnl
