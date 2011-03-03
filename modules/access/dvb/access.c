@@ -140,7 +140,12 @@ static const char *const voltages_text[] = { N_("off"), N_("13 V"), N_("18 V") }
 
 /* Cable */
 #define MODULATION_TEXT N_("Modulation type")
-#define MODULATION_LONGTEXT N_("Modulation type for front-end device.")
+#define MODULATION_LONGTEXT ""
+static const int modulations[] = {
+    -1, 0, 8, 16, 32, 64, 128, 256 };
+static const char *const modulations_text[] = {
+    N_("QPSK"), N_("Auto (QAM)"), N_("VSB 8"), N_("QAM 16"), N_("QAM 32"),
+    N_("QAM 64"), N_("QAM 128"), N_("QAM 256") };
 
 /* Terrestrial */
 #define CODE_RATE_HP_TEXT N_("Terrestrial high priority stream code rate (FEC)")
@@ -240,6 +245,7 @@ vlc_module_begin ()
     /* DVB-C (cable) */
     add_integer( "dvb-modulation", 0, MODULATION_TEXT,
                  MODULATION_LONGTEXT, true )
+        change_integer_list( modulations, modulations_text )
     /* DVB-T (terrestrial) */
     add_integer( "dvb-code-rate-hp", 9, CODE_RATE_HP_TEXT,
                  CODE_RATE_HP_LONGTEXT, true )
