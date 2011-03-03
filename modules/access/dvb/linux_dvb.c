@@ -1042,7 +1042,7 @@ static int FrontendSetQAM( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
     frontend_t *p_frontend = p_sys->p_frontend;
     struct dvb_frontend_parameters fep;
-    int i_val;
+    unsigned int i_val;
 
     /* Prepare the fep structure */
 

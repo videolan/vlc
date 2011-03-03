@@ -786,7 +786,7 @@ void scan_session_Clean( scan_t *p_scan, scan_session_t *p_session )
                     if( s )
                     {
                         if( !s->psz_name )
-                            s->psz_name = dvbsi_to_utf8( pD->i_service_name, pD->i_service_name_length );
+                            s->psz_name = dvbsi_to_utf8( (const char *)pD->i_service_name, pD->i_service_name_length );
 
                         if( s->type == SERVICE_UNKNOWN )
                         {
