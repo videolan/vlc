@@ -185,7 +185,7 @@ int FrontendOpen( access_t *p_access )
 
         if( psz_expected != NULL )
         {
-            msg_Err( p_access, "the user asked for %s, and the tuner is %s",
+            msg_Err( p_access, "requested type %s not supported by %s tuner",
                      psz_expected, psz_real );
             close( p_sys->i_frontend_handle );
             free( p_frontend );
@@ -242,42 +242,42 @@ int FrontendSet( access_t *p_access )
     {
     /* DVB-S */
     case FE_QPSK:
-        if( FrontendSetQPSK( p_access ) < 0 )
+        if( FrontendSetQPSK( p_access ) )
         {
-            msg_Err( p_access, "DVB-S: tuning failed" );
+            msg_Err( p_access, "DVB-S tuning error" );
             return VLC_EGENERIC;
         }
         break;
 
     /* DVB-C */
     case FE_QAM:
-        if( FrontendSetQAM( p_access ) < 0 )
+        if( FrontendSetQAM( p_access ) )
         {
-            msg_Err( p_access, "DVB-C: tuning failed" );
+            msg_Err( p_access, "DVB-C tuning error" );
             return VLC_EGENERIC;
         }
         break;
 
     /* DVB-T */
     case FE_OFDM:
-        if( FrontendSetOFDM( p_access ) < 0 )
+        if( FrontendSetOFDM( p_access ) )
         {
-            msg_Err( p_access, "DVB-T: tuning failed" );
+            msg_Err( p_access, "DVB-T tuning error" );
             return VLC_EGENERIC;
         }
         break;
 
     /* ATSC */
     case FE_ATSC:
-        if( FrontendSetATSC( p_access ) < 0 )
+        if( FrontendSetATSC( p_access ) )
         {
-            msg_Err( p_access, "ATSC: tuning failed" );
+            msg_Err( p_access, "ATSC tuning error" );
             return VLC_EGENERIC;
         }
         break;
 
     default:
-        msg_Err( p_access, "Could not determine frontend type on %s",
+        msg_Err( p_access, "tuner type %s not supported",
                  p_sys->p_frontend->info.name );
         return VLC_EGENERIC;
     }
@@ -298,15 +298,10 @@ void FrontendPoll( access_t *p_access )
 
     for( ;; )
     {
-        int i_ret = ioctl( p_sys->i_frontend_handle, FE_GET_EVENT, &event );
-
-        if( i_ret < 0 )
+        if( ioctl( p_sys->i_frontend_handle, FE_GET_EVENT, &event ) < 0 )
         {
-            if( errno == EWOULDBLOCK )
-                return; /* no more events */
-
-            msg_Err( p_access, "reading frontend event failed (%d): %m",
-                     i_ret );
+            if( errno != EWOULDBLOCK )
+                msg_Err( p_access, "frontend event error: %m" );
             return;
         }
 
@@ -478,7 +473,7 @@ int  FrontendGetScanParameter( access_t *p_access, scan_parameter_t *p_scan )
     else if( p_frontend->info.type == FE_QPSK )
         return ScanParametersDvbS( p_access, p_scan );  /* DVB-S */
 
-    msg_Err( p_access, "Frontend type not supported for scanning" );
+    msg_Err( p_access, "frontend scanning not supported" );
     return VLC_EGENERIC;
 }
 
@@ -492,15 +487,13 @@ void FrontendStatus( access_t *p_access )
     frontend_t *p_frontend = p_sys->p_frontend;
     char *p = p_sys->psz_frontend_info = malloc( 10000 );
     fe_status_t i_status;
-    int i_ret;
 
     /* Determine type of frontend */
-    if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_GET_INFO,
-                        &p_frontend->info )) < 0 )
+    if( ioctl( p_sys->i_frontend_handle, FE_GET_INFO,  &p_frontend->info ) < 0 )
     {
         char buf[1000];
         strerror_r( errno, buf, sizeof( buf ) );
-        p += sprintf( p, "ioctl FE_GET_INFO failed (%d) %s\n", i_ret, buf );
+        p += sprintf( p, "ioctl FE_GET_INFO failed %s\n", buf );
         goto out;
     }
 
@@ -583,13 +576,11 @@ void FrontendStatus( access_t *p_access )
 
     p += sprintf( p, "</table><p>Current frontend status:\n<table border=1>" );
 
-    if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_READ_STATUS, &i_status ))
-           < 0 )
+    if( ioctl( p_sys->i_frontend_handle, FE_READ_STATUS, &i_status ) < 0 )
     {
         char buf[1000];
         strerror_r( errno, buf, sizeof( buf ) );
-        p += sprintf( p, "</table>ioctl FE_READ_STATUS failed (%d) %s\n",
-                      i_ret, buf );
+        p += sprintf( p, "</table>ioctl FE_READ_STATUS failed %s\n", buf );
         goto out;
     }
 
@@ -639,13 +630,11 @@ static int FrontendInfo( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     frontend_t *p_frontend = p_sys->p_frontend;
-    int i_ret;
 
     /* Determine type of frontend */
-    if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_GET_INFO,
-                        &p_frontend->info )) < 0 )
+    if( ioctl( p_sys->i_frontend_handle, FE_GET_INFO, &p_frontend->info ) < 0 )
     {
-        msg_Err( p_access, "ioctl FE_GET_INFO failed (%d): %m", i_ret );
+        msg_Err( p_access, "frontend info request error: %m" );
         return VLC_EGENERIC;
     }
 
@@ -863,7 +852,6 @@ static int DoDiseqc( access_t *p_access )
     int i_frequency, i_lnb_slof;
     fe_sec_voltage_t fe_voltage;
     fe_sec_tone_mode_t fe_tone;
-    int i_err;
 
     i_frequency = var_GetInteger( p_access, "dvb-frequency" );
     i_lnb_slof = var_GetInteger( p_access, "dvb-lnb-slof" );
@@ -882,28 +870,24 @@ static int DoDiseqc( access_t *p_access )
     fe_tone = DecodeTone( p_access );
 
     /* Switch off continuous tone. */
-    if( (i_err = ioctl( p_sys->i_frontend_handle, FE_SET_TONE, SEC_TONE_OFF )) < 0 )
+    if( ioctl( p_sys->i_frontend_handle, FE_SET_TONE, SEC_TONE_OFF ) < 0 )
     {
-        msg_Err( p_access, "ioctl FE_SET_TONE failed, tone=%s (%d) %m",
-                 fe_tone == SEC_TONE_ON ? "on" : "off", i_err );
-        return i_err;
+        msg_Err( p_access, "switching tone %s error: %m", "off" );
+        return VLC_EGENERIC;
     }
 
     /* Configure LNB voltage. */
-    if( (i_err = ioctl( p_sys->i_frontend_handle, FE_SET_VOLTAGE, fe_voltage )) < 0 )
+    if( ioctl( p_sys->i_frontend_handle, FE_SET_VOLTAGE, fe_voltage ) < 0 )
     {
-        msg_Err( p_access, "ioctl FE_SET_VOLTAGE failed, voltage=%d (%d) %m",
-                 fe_voltage, i_err );
-        return i_err;
+        msg_Err( p_access, "voltage error: %m" );
+        return VLC_EGENERIC;
     }
 
     b_val = var_GetBool( p_access, "dvb-high-voltage" );
-    if( (i_err = ioctl( p_sys->i_frontend_handle, FE_ENABLE_HIGH_LNB_VOLTAGE,
-                        b_val )) < 0 && b_val )
+    if( ioctl( p_sys->i_frontend_handle,
+               FE_ENABLE_HIGH_LNB_VOLTAGE, b_val ) < 0 && b_val )
     {
-        msg_Err( p_access,
-                 "ioctl FE_ENABLE_HIGH_LNB_VOLTAGE failed, val=%d (%d) %m",
-                 b_val, i_err );
+        msg_Err( p_access, "high LNB voltage error: %m" );
     }
 
     /* Wait for at least 15 ms. */
@@ -927,33 +911,31 @@ static int DoDiseqc( access_t *p_access )
                           | (fe_voltage == SEC_VOLTAGE_13 ? 0 : 2)
                           | (fe_tone == SEC_TONE_ON ? 1 : 0);
 
-        if( (i_err = ioctl( p_sys->i_frontend_handle, FE_DISEQC_SEND_MASTER_CMD,
-                           &cmd.cmd )) < 0 )
+        if( ioctl( p_sys->i_frontend_handle, FE_DISEQC_SEND_MASTER_CMD,
+                   &cmd.cmd ) )
         {
-            msg_Err( p_access, "ioctl FE_SEND_MASTER_CMD failed (%d) %m",
-                     i_err );
-            return i_err;
+            msg_Err( p_access, "master command sending error: %m" );
+            return VLC_EGENERIC;
         }
 
         msleep(15000 + cmd.wait * 1000);
 
         /* A or B simple diseqc ("diseqc-compatible") */
-        if( (i_err = ioctl( p_sys->i_frontend_handle, FE_DISEQC_SEND_BURST,
-                      ((i_val - 1) % 2) ? SEC_MINI_B : SEC_MINI_A )) < 0 )
+        if( ioctl( p_sys->i_frontend_handle, FE_DISEQC_SEND_BURST,
+                  ((i_val - 1) % 2) ? SEC_MINI_B : SEC_MINI_A ) )
         {
-            msg_Err( p_access, "ioctl FE_SEND_BURST failed (%d) %m",
-                     i_err );
-            return i_err;
+            msg_Err( p_access, "burst sending error: %m" );
+            return VLC_EGENERIC;
         }
 
         msleep(15000);
     }
 
-    if( (i_err = ioctl( p_sys->i_frontend_handle, FE_SET_TONE, fe_tone )) < 0 )
+    if( ioctl( p_sys->i_frontend_handle, FE_SET_TONE, fe_tone ) )
     {
-        msg_Err( p_access, "ioctl FE_SET_TONE failed, tone=%s (%d) %m",
-                 fe_tone == SEC_TONE_ON ? "on" : "off", i_err );
-        return i_err;
+        msg_Err( p_access, "switching tone %s error: %m",
+                 (fe_tone == SEC_TONE_ON) ? "on" : "off" );
+        return VLC_EGENERIC;
     }
 
     msleep(50000);
@@ -964,7 +946,6 @@ static int FrontendSetQPSK( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     struct dvb_frontend_parameters fep;
-    int i_ret;
     int i_val;
     int i_frequency, i_lnb_slof = 0, i_lnb_lof1, i_lnb_lof2 = 0;
 
@@ -1055,9 +1036,9 @@ static int FrontendSetQPSK( access_t *p_access )
     }
 
     /* Now send it all to the frontend device */
-    if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep )) < 0 )
+    if( ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep ) < 0 )
     {
-        msg_Err( p_access, "DVB-S: setting frontend failed (%d) %m", i_ret );
+        msg_Err( p_access, "frontend error: %m" );
         return VLC_EGENERIC;
     }
 
@@ -1073,7 +1054,6 @@ static int FrontendSetQAM( access_t *p_access )
     frontend_t *p_frontend = p_sys->p_frontend;
     struct dvb_frontend_parameters fep;
     int i_val;
-    int i_ret;
 
     /* Prepare the fep structure */
 
@@ -1106,9 +1086,9 @@ static int FrontendSetQAM( access_t *p_access )
     }
 
     /* Now send it all to the frontend device */
-    if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep )) < 0 )
+    if( ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep ) < 0 )
     {
-        msg_Err( p_access, "DVB-C: setting frontend failed (%d): %m", i_ret );
+        msg_Err( p_access, "frontend error: %m" );
         return VLC_EGENERIC;
     }
 
@@ -1207,7 +1187,6 @@ static int FrontendSetOFDM( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     struct dvb_frontend_parameters fep;
-    int ret;
 
     /* Prepare the fep structure */
 
@@ -1233,10 +1212,10 @@ static int FrontendSetOFDM( access_t * p_access )
     }
 
     /* Now send it all to the frontend device */
-    if( (ret = ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep )) < 0 )
+    if( ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep ) < 0 )
     {
-        msg_Err( p_access, "DVB-T: setting frontend failed (%d): %m", ret );
-        return -1;
+        msg_Err( p_access, "frontend error: %m" );
+        return VLC_EGENERIC;
     }
 
     return VLC_SUCCESS;
@@ -1249,7 +1228,6 @@ static int FrontendSetATSC( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     struct dvb_frontend_parameters fep;
-    int i_ret;
 
     /* Prepare the fep structure */
 
@@ -1267,9 +1245,9 @@ static int FrontendSetATSC( access_t *p_access )
     }
 
     /* Now send it all to the frontend device */
-    if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep )) < 0 )
+    if( ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep ) < 0 )
     {
-        msg_Err( p_access, "ATSC: setting frontend failed (%d): %m", i_ret );
+        msg_Err( p_access, "frontend error: %m" );
         return VLC_EGENERIC;
     }
 
@@ -1287,7 +1265,6 @@ static int FrontendSetATSC( access_t *p_access )
 int DMXSetFilter( access_t * p_access, int i_pid, int * pi_fd, int i_type )
 {
     struct dmx_pes_filter_params s_filter_params;
-    int i_ret;
     unsigned int i_adapter, i_device;
     char dmx[128];
 
@@ -1408,9 +1385,9 @@ int DMXSetFilter( access_t * p_access, int i_pid, int * pi_fd, int i_type )
     }
 
     /* We then give the order to the device : */
-    if( (i_ret = ioctl( *pi_fd, DMX_SET_PES_FILTER, &s_filter_params )) < 0 )
+    if( ioctl( *pi_fd, DMX_SET_PES_FILTER, &s_filter_params ) )
     {
-        msg_Err( p_access, "DMXSetFilter: failed with %d (%m)", i_ret );
+        msg_Err( p_access, "setting demux PES filter failed: %m" );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -1421,12 +1398,10 @@ int DMXSetFilter( access_t * p_access, int i_pid, int * pi_fd, int i_type )
  *****************************************************************************/
 int DMXUnsetFilter( access_t * p_access, int i_fd )
 {
-    int i_ret;
-
-    if( (i_ret = ioctl( i_fd, DMX_STOP )) < 0 )
+    if( ioctl( i_fd, DMX_STOP ) < 0 )
     {
-        msg_Err( p_access, "DMX_STOP failed for demux (%d): %m", i_ret );
-        return i_ret;
+        msg_Err( p_access, "stopping demux failed: %m" );
+        return VLC_EGENERIC;
     }
 
     msg_Dbg( p_access, "DMXUnsetFilter: closing demux %d", i_fd );
