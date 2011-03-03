@@ -48,44 +48,22 @@
 #include "../mux/mpeg/csa.h"
 
 /* Include dvbpsi headers */
-#ifdef HAVE_DVBPSI_DR_H
-#   include <dvbpsi/dvbpsi.h>
-#   include <dvbpsi/demux.h>
-#   include <dvbpsi/descriptor.h>
-#   include <dvbpsi/pat.h>
-#   include <dvbpsi/pmt.h>
-#   include <dvbpsi/sdt.h>
-#   include <dvbpsi/dr.h>
-#   include <dvbpsi/psi.h>
-#else
-#   include "dvbpsi.h"
-#   include "demux.h"
-#   include "descriptor.h"
-#   include "tables/pat.h"
-#   include "tables/pmt.h"
-#   include "tables/sdt.h"
-#   include "descriptors/dr.h"
-#   include "psi.h"
-#endif
+# include <dvbpsi/dvbpsi.h>
+# include <dvbpsi/demux.h>
+# include <dvbpsi/descriptor.h>
+# include <dvbpsi/pat.h>
+# include <dvbpsi/pmt.h>
+# include <dvbpsi/sdt.h>
+# include <dvbpsi/dr.h>
+# include <dvbpsi/psi.h>
 
 /* EIT support */
-#ifdef _DVBPSI_DR_4D_H_
-#   define TS_USE_DVB_SI 1
-#   ifdef HAVE_DVBPSI_DR_H
-#       include <dvbpsi/eit.h>
-#   else
-#       include "tables/eit.h"
-#   endif
-#endif
+# include <dvbpsi/eit.h>
 
 /* TDT support */
 #ifdef _DVBPSI_DR_58_H_
 #   define TS_USE_TDT 1
-#   ifdef HAVE_DVBPSI_DR_H
-#       include <dvbpsi/tot.h>
-#   else
-#       include "tables/tot.h"
-#   endif
+#   include <dvbpsi/tot.h>
 #else
 #   include <time.h>
 #endif
@@ -406,10 +384,8 @@ static int  PIDFillFormat( ts_pid_t *pid, int i_stream_type );
 
 static void PATCallBack( demux_t *, dvbpsi_pat_t * );
 static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt );
-#ifdef TS_USE_DVB_SI
 static void PSINewTableCallBack( demux_t *, dvbpsi_handle,
                                  uint8_t  i_table_id, uint16_t i_extension );
-#endif
 static int ChangeKeyCallback( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
 
 static inline int PIDGet( block_t *p )
@@ -676,7 +652,6 @@ static int Open( vlc_object_t *p_this )
     PIDInit( pat, true, NULL );
     pat->psi->handle = dvbpsi_AttachPAT( (dvbpsi_pat_callback)PATCallBack,
                                          p_demux );
-#ifdef TS_USE_DVB_SI
     if( p_sys->b_dvb_meta )
     {
         ts_pid_t *sdt = &p_sys->pid[0x11];
@@ -707,7 +682,6 @@ static int Open( vlc_object_t *p_this )
                 p_sys->b_access_control = false;
         }
     }
-#endif
 
     /* Init PMT array */
     TAB_INIT( p_sys->i_pmt, p_sys->pmt );
@@ -2611,7 +2585,6 @@ static void ValidateDVBMeta( demux_t *p_demux, int i_pid )
 }
 
 
-#ifdef TS_USE_DVB_SI
 /* FIXME same than dvbsi_to_utf8 from dvb access */
 static char *EITConvertToUTF8( const unsigned char *psz_instring,
                                size_t i_length,
@@ -3129,7 +3102,6 @@ static void PSINewTableCallBack( demux_t *p_demux, dvbpsi_handle h,
 #endif
 
 }
-#endif
 
 /*****************************************************************************
  * PMT callback and helpers
