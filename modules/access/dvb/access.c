@@ -111,8 +111,10 @@ static void Close( vlc_object_t *p_this );
 #define SATNO_TEXT N_("Satellite number in the Diseqc system")
 #define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=satellite number].")
 
-#define VOLTAGE_TEXT N_("LNB voltage")
-#define VOLTAGE_LONGTEXT N_("In Volts [0, 13=vertical, 18=horizontal].")
+#define VOLTAGE_TEXT N_("LNB voltage (V)")
+#define VOLTAGE_LONGTEXT ""
+static const int voltages[] = { 0, 13, 18 };
+static const char *const voltages_text[] = { N_("off"), N_("13 V"), N_("18 V") };
 
 #define HIGH_VOLTAGE_TEXT N_("High LNB voltage")
 #define HIGH_VOLTAGE_LONGTEXT N_("Enable high voltage if your cables are " \
@@ -221,6 +223,7 @@ vlc_module_begin ()
                  true )
     add_integer( "dvb-voltage", 13, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
                  true )
+        change_integer_list( voltages, voltages_text )
     add_bool( "dvb-high-voltage", false, HIGH_VOLTAGE_TEXT,
               HIGH_VOLTAGE_LONGTEXT, true )
     add_integer( "dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT,
