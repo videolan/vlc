@@ -110,7 +110,7 @@ AUTOMAKE_OPTIONS = \
 ChangeLog: Makefile.am
 	rm -f -- "$@"
 	cd doc && $(MAKE) $(AM_MAKEFLAGS) changelogs
-	ln -sf doc/ChangeLog-2009 "$@"
+	$(LN_S) -f doc/ChangeLog-2009 "$@"
 
 ###############################################################################
 # MacOS X project
@@ -388,7 +388,7 @@ noinst_SCRIPTS += vlc$(EXEEXT)
 endif
 
 vlc$(EXEEXT):
-	$(AM_V_GEN)ln -sf bin/vlc-static$(EXEEXT) vlc$(EXEEXT)
+	$(AM_V_GEN)$(LN_S) -f bin/vlc-static$(EXEEXT) vlc$(EXEEXT)
 
 if HAVE_DARWIN
 if BUILD_MACOSX_VLC_APP
@@ -546,9 +546,9 @@ VLC-release.app: vlc
 	  $(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/locale/$${i}/LC_MESSAGES ; \
 	  $(INSTALL) $(srcdir)/po/$${i}.gmo $(top_builddir)/VLC-release.app/Contents/MacOS/share/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	  mkdir -p $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
-	  ln -sf ../English.lproj/InfoPlist.strings \
+	  $(LN_S) -f ../English.lproj/InfoPlist.strings \
 	      $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
-	  ln -sf ../English.lproj/MainMenu.nib \
+	  $(LN_S) -f ../English.lproj/MainMenu.nib \
 	      $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
 	done
 	printf "APPLVLC#" >| $(top_builddir)/VLC-release.app/Contents/PkgInfo
@@ -635,19 +635,19 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 	touch $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	chmod +x $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	$(INSTALL) $(top_builddir)/bin/.libs/vlc $(top_builddir)/VLC.app/Contents/MacOS/VLC
-	ln -sf ../../../modules $(top_builddir)/VLC.app/Contents/MacOS/plugins
+	$(LN_S) -f ../../../modules $(top_builddir)/VLC.app/Contents/MacOS/plugins
 	install -d $(top_builddir)/VLC.app/Contents/MacOS/share
 	for i in `ls $(srcdir)/share`; do \
-	   ln -sf `pwd`/$(srcdir)/share/$$i $(top_builddir)/VLC.app/Contents/MacOS/share/; \
+	   $(LN_S) -f `pwd`/$(srcdir)/share/$$i $(top_builddir)/VLC.app/Contents/MacOS/share/; \
 	done
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/share/locale/$${i}/LC_MESSAGES ; \
-	  ln -sfn `pwd`/$(srcdir)/po/$${i}.gmo $(top_builddir)/VLC.app/Contents/MacOS/share/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+	  $(LN_S) -f `pwd`/$(srcdir)/po/$${i}.gmo $(top_builddir)/VLC.app/Contents/MacOS/share/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	  mkdir -p $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
-	  ln -sf ../English.lproj/InfoPlist.strings \
+	  $(LN_S) -f ../English.lproj/InfoPlist.strings \
 	      $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
-	  ln -sf ../English.lproj/MainMenu.nib \
+	  $(LN_S) -f ../English.lproj/MainMenu.nib \
 	      $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
 	done
 	printf "APPLVLC#" >| $(top_builddir)/VLC.app/Contents/PkgInfo
@@ -913,7 +913,7 @@ package-macosx: VLC-release.app ChangeLog
 	cp -L $(top_builddir)/ChangeLog $(top_builddir)/vlc-$(VERSION)/Goodies/
 
 # Place a link to the application folder
-	ln -s /Applications $(top_builddir)/vlc-$(VERSION)/Applications
+	$(LN_S) /Applications $(top_builddir)/vlc-$(VERSION)/Applications
 
 # Create disk image (temporarily taken from the 0.8.6-bugfix branch to provide reliable NBs)
 	echo "Creating disk image"
