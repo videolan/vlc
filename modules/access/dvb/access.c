@@ -934,7 +934,6 @@ static int ParseMRL( access_t *p_access )
 {
     char *psz_dup = strdup( p_access->psz_location );
     char *psz_parser = psz_dup;
-    char *psz_next;
     vlc_value_t         val;
 
 #define GET_OPTION_INT( option )                                            \
