@@ -21,16 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA    02111, USA.
  *****************************************************************************/
 
-#ifdef HAVE_DVBPSI_DR_H
 #ifdef _DVBPSI_DR_43_H_
 #   define DVBPSI_USE_NIT 1
 #   include <dvbpsi/nit.h>
-#endif
-#else
-#ifdef _DVBPSI_DR_43_H_
-#   define DVBPSI_USE_NIT 1
-#   include "nit.h"
-#endif
 #endif
 
 #ifndef DVBPSI_USE_NIT

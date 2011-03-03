@@ -38,25 +38,14 @@
 #include <sys/types.h>
 
 /* Include dvbpsi headers */
-#ifdef HAVE_DVBPSI_DR_H
-#   include <dvbpsi/dvbpsi.h>
-#   include <dvbpsi/descriptor.h>
-#   include <dvbpsi/pat.h>
-#   include <dvbpsi/pmt.h>
-#   include <dvbpsi/dr.h>
-#   include <dvbpsi/psi.h>
-#   include <dvbpsi/demux.h>
-#   include <dvbpsi/sdt.h>
-#else
-#   include "dvbpsi.h"
-#   include "descriptor.h"
-#   include "tables/pat.h"
-#   include "tables/pmt.h"
-#   include "descriptors/dr.h"
-#   include "psi.h"
-#   include "demux.h"
-#   include "tables/sdt.h"
-#endif
+# include <dvbpsi/dvbpsi.h>
+# include <dvbpsi/descriptor.h>
+# include <dvbpsi/pat.h>
+# include <dvbpsi/pmt.h>
+# include <dvbpsi/dr.h>
+# include <dvbpsi/psi.h>
+# include <dvbpsi/demux.h>
+# include <dvbpsi/sdt.h>
 
 #ifdef ENABLE_HTTPD
 #   include <vlc_httpd.h>
