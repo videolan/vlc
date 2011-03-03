@@ -46,25 +46,14 @@
 #include "pes.h"
 #include "csa.h"
 
-#ifdef HAVE_DVBPSI_DR_H
-#   include <dvbpsi/dvbpsi.h>
-#   include <dvbpsi/demux.h>
-#   include <dvbpsi/descriptor.h>
-#   include <dvbpsi/pat.h>
-#   include <dvbpsi/pmt.h>
-#   include <dvbpsi/sdt.h>
-#   include <dvbpsi/dr.h>
-#   include <dvbpsi/psi.h>
-#else
-#   include "dvbpsi.h"
-#   include "demux.h"
-#   include "descriptor.h"
-#   include "tables/pat.h"
-#   include "tables/pmt.h"
-#   include "tables/sdt.h"
-#   include "descriptors/dr.h"
-#   include "psi.h"
-#endif
+# include <dvbpsi/dvbpsi.h>
+# include <dvbpsi/demux.h>
+# include <dvbpsi/descriptor.h>
+# include <dvbpsi/pat.h>
+# include <dvbpsi/pmt.h>
+# include <dvbpsi/sdt.h>
+# include <dvbpsi/dr.h>
+# include <dvbpsi/psi.h>
 
 /*
  * TODO:
@@ -2724,7 +2713,6 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                                            p_stream->i_decoder_specific_info,
                                            p_stream->p_decoder_specific_info );
             }
-#ifdef _DVBPSI_DR_59_H_
             else
             {
                 /* from the dvbsub transcoder */
@@ -2745,7 +2733,6 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                 dvbpsi_PMTESAddDescriptor( p_es, p_descr->i_tag,
                                            p_descr->i_length, p_descr->p_data );
             }
-#endif /* _DVBPSI_DR_59_H_ */
             continue;
         }
 
