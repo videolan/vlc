@@ -380,12 +380,17 @@ case "${host_os}" in
   symbian*)
     SYS=symbian
     ;;
+  *os2*)
+    SYS=os2
+    LDFLAGS_save="${LDFLAGS_save} -Zomf -Zbin-files -Zargs-wild"; LDFLAGS="${LDFLAGS_save}"
+    ;;
   *)
     SYS="${host_os}"
     ;;
 esac
 AM_CONDITIONAL(HAVE_DARWIN, test "${SYS}" = "darwin")
 AM_CONDITIONAL(HAVE_LINUX, [test "${SYS}" = "linux"])
+AM_CONDITIONAL(HAVE_OS2, [test "${SYS}" = "os2"])
 AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64, test "${HAVE_WIN64}" = "1")
 AM_CONDITIONAL(HAVE_WINCE, test "${SYS}" = "mingwce")
