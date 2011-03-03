@@ -790,31 +790,22 @@ static fe_spectral_inversion_t DecodeInversion( access_t *p_access )
     return fe_inversion;
 }
 
-static fe_code_rate_t DecodeFEC( access_t *p_access, int i_val )
+static fe_code_rate_t DecodeFEC( access_t *p_access, const char *varname )
 {
-    fe_code_rate_t fe_fec = FEC_NONE;
-
-    msg_Dbg( p_access, "using fec=%d", i_val );
-
-    switch( i_val )
+    switch( var_GetInteger(p_access, varname) )
     {
-        case 0: fe_fec = FEC_NONE; break;
-        case 1: fe_fec = FEC_1_2; break;
-        case 2: fe_fec = FEC_2_3; break;
-        case 3: fe_fec = FEC_3_4; break;
-        case 4: fe_fec = FEC_4_5; break;
-        case 5: fe_fec = FEC_5_6; break;
-        case 6: fe_fec = FEC_6_7; break;
-        case 7: fe_fec = FEC_7_8; break;
-        case 8: fe_fec = FEC_8_9; break;
-        case 9: fe_fec = FEC_AUTO; break;
-        default:
-            /* cannot happen */
-            fe_fec = FEC_NONE;
-            msg_Err( p_access, "argument has invalid FEC (%d)", i_val);
-            break;
+        case 0:  return FEC_NONE;
+        case 1:  return FEC_1_2;
+        case 2:  return FEC_2_3;
+        case 3:  return FEC_3_4;
+        case 4:  return FEC_4_5;
+        case 5:  return FEC_5_6;
+        case 6:  return FEC_6_7;
+        case 7:  return FEC_7_8;
+        case 8:  return FEC_8_9;
+        case 9:  return FEC_AUTO;
+        default: return FEC_NONE;
     }
-    return fe_fec;
 }
 
 static fe_modulation_t DecodeModulation( access_t *p_access,
@@ -839,43 +830,23 @@ static fe_modulation_t DecodeModulation( access_t *p_access,
  *****************************************************************************/
 static fe_sec_voltage_t DecodeVoltage( access_t *p_access )
 {
-    int i_val;
-    fe_sec_voltage_t    fe_voltage;
-
-    i_val = var_GetInteger( p_access, "dvb-voltage" );
-    msg_Dbg( p_access, "using voltage=%d", i_val );
-
-    switch( i_val )
+    switch( var_GetInteger( p_access, "dvb-voltage" ) )
     {
-        case 0: fe_voltage = SEC_VOLTAGE_OFF; break;
-        case 13: fe_voltage = SEC_VOLTAGE_13; break;
-        case 18: fe_voltage = SEC_VOLTAGE_18; break;
-        default:
-            fe_voltage = SEC_VOLTAGE_OFF;
-            msg_Err( p_access, "argument has invalid voltage (%d)", i_val );
-            break;
+        case 0:  return SEC_VOLTAGE_OFF;
+        case 13: return SEC_VOLTAGE_13;
+        case 18: return SEC_VOLTAGE_18;
+        default: return SEC_VOLTAGE_OFF;
     }
-    return fe_voltage;
 }
 
 static fe_sec_tone_mode_t DecodeTone( access_t *p_access )
 {
-    int i_val;
-    fe_sec_tone_mode_t  fe_tone;
-
-    i_val = var_GetInteger( p_access, "dvb-tone" );
-    msg_Dbg( p_access, "using tone=%d", i_val );
-
-    switch( i_val )
+    switch( var_GetInteger( p_access, "dvb-tone" ) )
     {
-        case 0: fe_tone = SEC_TONE_OFF; break;
-        case 1: fe_tone = SEC_TONE_ON; break;
-        default:
-            fe_tone = SEC_TONE_OFF;
-            msg_Err( p_access, "argument has invalid tone mode (%d)", i_val );
-            break;
+        case 0:  return SEC_TONE_OFF;
+        case 1:  return SEC_TONE_ON;
+        default: return SEC_TONE_OFF;
     }
-    return fe_tone;
 }
 
 struct diseqc_cmd_t
@@ -1067,7 +1038,7 @@ static int FrontendSetQPSK( access_t *p_access )
 
     fep.u.qpsk.symbol_rate = var_GetInteger( p_access, "dvb-srate" );
 
-    fep.u.qpsk.fec_inner = DecodeFEC( p_access, var_GetInteger( p_access, "dvb-fec" ) );
+    fep.u.qpsk.fec_inner = DecodeFEC( p_access, "dvb-fec" );
 
     if( DoDiseqc( p_access ) < 0 )
     {
@@ -1121,8 +1092,7 @@ static int FrontendSetQAM( access_t *p_access )
     else
         fep.u.qam.symbol_rate = 6875000;
 
-    fep.u.qam.fec_inner = DecodeFEC( p_access, var_GetInteger( p_access,
-                                                               "dvb-fec" ) );
+    fep.u.qam.fec_inner = DecodeFEC( p_access, "dvb-fec" );
 
     fep.u.qam.modulation = DecodeModulation( p_access, QAM_AUTO );
 
@@ -1246,10 +1216,8 @@ static int FrontendSetOFDM( access_t * p_access )
     fep.inversion = DecodeInversion( p_access );
 
     fep.u.ofdm.bandwidth = DecodeBandwidth( p_access );
-    fep.u.ofdm.code_rate_HP = DecodeFEC( p_access, var_GetInteger( p_access,
-                                                        "dvb-code-rate-hp" ) );
-    fep.u.ofdm.code_rate_LP = DecodeFEC( p_access, var_GetInteger( p_access,
-                                                        "dvb-code-rate-lp" ) );
+    fep.u.ofdm.code_rate_HP = DecodeFEC( p_access, "dvb-code-rate-hp" );
+    fep.u.ofdm.code_rate_LP = DecodeFEC( p_access, "dvb-code-rate-lp" );
     fep.u.ofdm.constellation = DecodeModulation( p_access, QAM_AUTO );
     fep.u.ofdm.transmission_mode = DecodeTransmission( p_access );
     fep.u.ofdm.guard_interval = DecodeGuardInterval( p_access );
