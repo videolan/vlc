@@ -68,7 +68,7 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QRectF mapped = deviceTransform( viewPortTransform ).mapRect( boundingRect() );
 
     if ( m_current )
-        gradientColor.setRgb( 244, 102, 146 );
+        gradientColor.setRgb( 244, 125, 0 );
     else
         gradientColor.setRgb( 201, 217, 242 );
 
