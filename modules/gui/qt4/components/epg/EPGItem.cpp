@@ -28,6 +28,9 @@
 #include <QDateTime>
 #include <QFocusEvent>
 #include <QGraphicsScene>
+#include <QStyleOptionGraphicsItem>
+#include <QGraphicsSceneHoverEvent>
+#include <QStyle>
 
 #include "EPGItem.hpp"
 #include "EPGView.hpp"
@@ -40,6 +43,7 @@ EPGItem::EPGItem( EPGView *view )
 
     m_boundingRect.setHeight( TRACKS_HEIGHT );
     setFlags( QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
+    setAcceptHoverEvents( true );
 }
 
 QRectF EPGItem::boundingRect() const
@@ -47,8 +51,9 @@ QRectF EPGItem::boundingRect() const
     return m_boundingRect;
 }
 
-void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
+void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget*)
 {
+    QPen pen;
     // Draw in view's coordinates
     painter->setWorldMatrixEnabled( false );
 
@@ -62,14 +67,21 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem*, QWidget
     if ( m_current )
     {
         painter->setBrush( QBrush( QColor( 244, 102, 146 ) ) );
-        painter->setPen( QPen( QColor( 244, 102, 146 ) ) );
+        pen.setColor( QColor( 244, 102, 146 ) );
     }
     else
     {
         painter->setBrush( QBrush( QColor( 201, 217, 242 ) ) );
-        painter->setPen( QPen( QColor( 201, 217, 242 ) ) );
+        pen.setColor( QColor( 201, 217, 242 ) );
     }
 
+    pen.setColor( option->state & QStyle::State_MouseOver || hasFocus()
+                  ? QColor( 0, 0, 0 ) : QColor( 192, 192, 192 ) );
+
+    pen.setStyle( option->state & QStyle::State_MouseOver && !hasFocus()
+                  ? Qt::DashLine : Qt::SolidLine );
+
+    painter->setPen( pen );
     mapped.adjust( 1, 2, -1, -2 );
     painter->drawRoundedRect( mapped, 10, 10 );
 
@@ -162,6 +174,12 @@ void EPGItem::updatePos()
     setPos( x, m_channelNb * TRACKS_HEIGHT );
 }
 
+void EPGItem::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
+{
+    event->accept();
+    update();
+}
+
 void EPGItem::focusInEvent( QFocusEvent * event )
 {
     EPGEvent *evEPG = new EPGEvent( m_name );
@@ -170,4 +188,5 @@ void EPGItem::focusInEvent( QFocusEvent * event )
     evEPG->start = m_start;
     evEPG->duration = m_duration;
     m_view->eventFocused( evEPG );
+    update();
 }
