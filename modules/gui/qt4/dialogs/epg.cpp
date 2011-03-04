@@ -34,6 +34,7 @@
 #include <QGroupBox>
 #include <QPushButton>
 #include <QTextEdit>
+#include <QDialogButtonBox>
 
 #include "qt4.hpp"
 #include "input_manager.hpp"
@@ -73,15 +74,18 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     CONNECT( epg, itemSelectionChanged( EPGEvent *), this, showEvent( EPGEvent *) );
     CONNECT( THEMIM->getIM(), epgChanged(), this, updateInfos() );
 
+    QDialogButtonBox *buttonsBox = new QDialogButtonBox( this );
+
 #if 0
     QPushButton *update = new QPushButton( qtr( "Update" ) ); // Temporary to test
-    boxLayout->addWidget( update, 0, Qt::AlignRight );
+    buttonsBox->addButton( update, QDialogButtonBox::ActionRole );
     BUTTONACT( update, updateInfos() );
 #endif
 
-    QPushButton *close = new QPushButton( qtr( "&Close" ) );
-    boxLayout->addWidget( close, 0, Qt::AlignRight );
-    BUTTONACT( close, close() );
+    buttonsBox->addButton( new QPushButton( qtr( "&Close" ) ),
+                           QDialogButtonBox::RejectRole );
+    boxLayout->addWidget( buttonsBox );
+    CONNECT( buttonsBox, rejected(), this, close() );
 
     updateInfos();
     readSettings( "EPGDialog", QSize( 650, 450 ) );
