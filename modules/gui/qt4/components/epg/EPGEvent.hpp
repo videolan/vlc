@@ -48,6 +48,12 @@ public:
                && current == other.current;
     }
 
+    bool ends_before( const QDateTime & ref ) const
+    {
+        QDateTime start_ = start;
+        return start_.addSecs( duration ) < ref;
+    }
+
     QDateTime   start;
     int         duration;
     QString     name;

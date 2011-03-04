@@ -31,6 +31,7 @@
 #include <QScrollBar>
 #include <QDebug>
 #include <QLabel>
+#include <QStringList>
 #include "qt4.hpp"
 
 EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
@@ -72,20 +73,32 @@ void EPGWidget::setZoom( int level )
 
 void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
 {
+    QStringList channelsList;
+    EPGEvent* item;
+    /* FIXME: dvb time might be from the next timezone */
+    QDateTime timeReference = QDateTime::currentDateTime();
+
+    /* flag all entries as non updated */
+    foreach( const QString &str, m_events.uniqueKeys() )
+        foreach( item, m_events.values( str ) )
+            item->updated = false;
+
     for ( int i = 0; i < i_epg; ++i )
     {
         vlc_epg_t *p_epg = pp_epg[i];
         QString channelName = qfu( p_epg->psz_name );
-
+        channelsList.append( channelName );
+        /* Read current epg events from libvlc and try to insert them */
         for ( int j = 0; j < p_epg->i_event; ++j )
         {
             vlc_epg_event_t *p_event = p_epg->pp_event[j];
             QString eventName = qfu( p_event->psz_name );
             QDateTime eventStart = QDateTime::fromTime_t( p_event->i_start );
-
+            /* ensure we display ongoing item */
+            if ( eventStart < timeReference ) timeReference = eventStart;
             QList<EPGEvent*> events = m_events.values( channelName );
 
-            EPGEvent *item = new EPGEvent( eventName );
+            item = new EPGEvent( eventName );
             item->description = qfu( p_event->psz_description );
             item->shortDescription = qfu( p_event->psz_short_description );
             item->start = eventStart;
@@ -110,27 +123,34 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
                 m_events.insert( channelName, item );
                 m_epgView->addEvent( item );
             }
-            else
+            else /* the new item is unused */
                 delete item;
         }
     }
 
-    // Remove old items
+    /* Remove old (not in current epg list) items for current tuned channels */
+    /* and try to keep previously tuned in channels data */
     QMultiMap<QString, EPGEvent*>::iterator i = m_events.begin();
     while ( i != m_events.end() )
     {
-        EPGEvent* item = i.value();
-        if ( !item->updated )
+        item = i.value();
+        if ( channelsList.contains( item->channelName ) && !item->updated )
         {
             m_epgView->delEvent( item );
             delete item;
-            --i;
-            m_events.erase( i + 1 );
+            i = m_events.erase( i );
         }
         else
-            item->updated = false;
-
-        ++i;
+        {/* If it's known but not in current libvlc data, try to expire it */
+            if ( item->ends_before( timeReference ) )
+            {
+                m_epgView->delEvent( item );
+                delete item;
+                i = m_events.erase( i );
+            }
+            else
+                ++i;
+        }
     }
 
     // Update the global duration and start time.
