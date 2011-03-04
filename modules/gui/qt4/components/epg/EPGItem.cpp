@@ -151,6 +151,7 @@ void EPGItem::setDuration( int duration )
 void EPGItem::setName( const QString& name )
 {
     m_name = name;
+    setToolTip( m_name );
 }
 
 void EPGItem::setDescription( const QString& description )
