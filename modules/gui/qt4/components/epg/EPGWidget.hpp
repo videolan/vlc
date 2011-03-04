@@ -57,6 +57,7 @@ private:
     QMultiMap<QString, EPGEvent*> m_events;
     uint8_t i_event_source_type;
     bool b_input_type_known;
+    QDateTime timeReference;
 
 signals:
     void itemSelectionChanged( EPGEvent * );

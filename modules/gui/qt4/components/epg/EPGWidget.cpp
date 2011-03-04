@@ -40,6 +40,7 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
     m_rulerWidget = new EPGRuler( this );
     m_epgView = new EPGView( this );
     m_channelsWidget = new EPGChannels( this, m_epgView );
+    timeReference = QDateTime::currentDateTime().addDays( 1 );
 
     m_channelsWidget->setMinimumWidth( 100 );
 
@@ -97,8 +98,10 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
 {
     QStringList channelsList;
     EPGEvent* item;
-    /* FIXME: dvb time might be from the next timezone */
-    QDateTime timeReference = QDateTime::currentDateTime();
+
+    /* if we have epg time available take new minimum time */
+    if ( i_epg > 0 && pp_epg[0]->i_event > 0 )
+        timeReference = QDateTime::fromTime_t( pp_epg[0]->pp_event[0]->i_start );
 
     /* flush our EPG data if input type has changed */
     if ( b_input_type_known && i_input_type != i_event_source_type ) reset();
@@ -123,6 +126,7 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
             QDateTime eventStart = QDateTime::fromTime_t( p_event->i_start );
             /* ensure we display ongoing item */
             if ( eventStart < timeReference ) timeReference = eventStart;
+            /* FIXME: EPGView timechanged signal is duplicate */
             QList<EPGEvent*> events = m_events.values( channelName );
 
             item = new EPGEvent( eventName );
