@@ -54,6 +54,9 @@ QRectF EPGItem::boundingRect() const
 void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget*)
 {
     QPen pen;
+    QColor gradientColor;
+    QLinearGradient gradient( m_boundingRect.topLeft(), m_boundingRect.bottomLeft() );
+
     // Draw in view's coordinates
     painter->setWorldMatrixEnabled( false );
 
@@ -65,15 +68,12 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QRectF mapped = deviceTransform( viewPortTransform ).mapRect( boundingRect() );
 
     if ( m_current )
-    {
-        painter->setBrush( QBrush( QColor( 244, 102, 146 ) ) );
-        pen.setColor( QColor( 244, 102, 146 ) );
-    }
+        gradientColor.setRgb( 244, 102, 146 );
     else
-    {
-        painter->setBrush( QBrush( QColor( 201, 217, 242 ) ) );
-        pen.setColor( QColor( 201, 217, 242 ) );
-    }
+        gradientColor.setRgb( 201, 217, 242 );
+
+    gradient.setColorAt( 0.0, gradientColor.lighter( 120 ) );
+    gradient.setColorAt( 1.0, gradientColor );
 
     pen.setColor( option->state & QStyle::State_MouseOver || hasFocus()
                   ? QColor( 0, 0, 0 ) : QColor( 192, 192, 192 ) );
@@ -81,6 +81,7 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
     pen.setStyle( option->state & QStyle::State_MouseOver && !hasFocus()
                   ? Qt::DashLine : Qt::SolidLine );
 
+    painter->setBrush( QBrush( gradient ) );
     painter->setPen( pen );
     mapped.adjust( 1, 2, -1, -2 );
     painter->drawRoundedRect( mapped, 10, 10 );
