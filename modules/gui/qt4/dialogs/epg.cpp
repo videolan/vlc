@@ -73,6 +73,7 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 
     CONNECT( epg, itemSelectionChanged( EPGEvent *), this, showEvent( EPGEvent *) );
     CONNECT( THEMIM->getIM(), epgChanged(), this, updateInfos() );
+    CONNECT( THEMIM, inputChanged( input_thread_t * ), this, updateInfos() );
 
     QDialogButtonBox *buttonsBox = new QDialogButtonBox( this );
 
@@ -121,8 +122,10 @@ void EpgDialog::showEvent( EPGEvent *event )
 void EpgDialog::updateInfos()
 {
     if( !THEMIM->getInput() ) return;
-
-    msg_Dbg( p_intf, "Found %i EPG items", input_GetItem( THEMIM->getInput())->i_epg);
-    epg->updateEPG( input_GetItem( THEMIM->getInput())->pp_epg, input_GetItem( THEMIM->getInput())->i_epg );
+    int i_nbitems = input_GetItem( THEMIM->getInput())->i_epg;
+    if ( i_nbitems > 0 ) msg_Dbg( p_intf, "Found %i EPG items", i_nbitems );
+    epg->updateEPG( input_GetItem( THEMIM->getInput())->pp_epg,
+                    input_GetItem( THEMIM->getInput())->i_epg,
+                    input_GetItem( THEMIM->getInput())->i_type);
 
 }

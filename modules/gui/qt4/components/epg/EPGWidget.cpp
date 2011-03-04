@@ -36,6 +36,7 @@
 
 EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
 {
+    b_input_type_known = false;
     m_rulerWidget = new EPGRuler( this );
     m_epgView = new EPGView( this );
     m_channelsWidget = new EPGChannels( this, m_epgView );
@@ -71,6 +72,20 @@ EPGWidget::~EPGWidget()
             delete item;
 }
 
+void EPGWidget::reset()
+{
+    foreach( const QString &str, m_events.uniqueKeys() )
+        foreach( EPGEvent *item, m_events.values( str ) )
+        {
+            m_epgView->delEvent( item );
+            m_events.remove( str, item );
+            delete item;
+        }
+    m_epgView->updateDuration();
+    m_epgView->updateStartTime();
+    m_channelsWidget->update();
+}
+
 void EPGWidget::setZoom( int level )
 {
     double scale = (double)level / 20;
@@ -78,12 +93,17 @@ void EPGWidget::setZoom( int level )
     m_rulerWidget->setScale( scale );
 }
 
-void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
+void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
 {
     QStringList channelsList;
     EPGEvent* item;
     /* FIXME: dvb time might be from the next timezone */
     QDateTime timeReference = QDateTime::currentDateTime();
+
+    /* flush our EPG data if input type has changed */
+    if ( b_input_type_known && i_input_type != i_event_source_type ) reset();
+    i_event_source_type = i_input_type;
+    b_input_type_known = true;
 
     /* flag all entries as non updated */
     foreach( const QString &str, m_events.uniqueKeys() )

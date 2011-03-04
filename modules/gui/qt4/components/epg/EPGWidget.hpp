@@ -43,10 +43,11 @@ class EPGWidget : public QWidget
 public:
     explicit EPGWidget( QWidget* parent = 0 );
     ~EPGWidget();
+    void reset();
 
 public slots:
     void setZoom( int level );
-    void updateEPG( vlc_epg_t **pp_epg, int i_epg );
+    void updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type );
 
 private:
     EPGRuler* m_rulerWidget;
@@ -54,6 +55,8 @@ private:
     EPGChannels *m_channelsWidget;
 
     QMultiMap<QString, EPGEvent*> m_events;
+    uint8_t i_event_source_type;
+    bool b_input_type_known;
 
 signals:
     void itemSelectionChanged( EPGEvent * );
