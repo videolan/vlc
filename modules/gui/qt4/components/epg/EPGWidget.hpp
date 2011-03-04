@@ -42,6 +42,7 @@ class EPGWidget : public QWidget
     Q_OBJECT
 public:
     explicit EPGWidget( QWidget* parent = 0 );
+    ~EPGWidget();
 
 public slots:
     void setZoom( int level );

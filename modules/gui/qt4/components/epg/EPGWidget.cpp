@@ -64,6 +64,13 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
              this, SIGNAL(itemSelectionChanged(EPGEvent*)) );
 }
 
+EPGWidget::~EPGWidget()
+{
+    foreach( const QString &str, m_events.uniqueKeys() )
+        foreach( EPGEvent *item, m_events.values( str ) )
+            delete item;
+}
+
 void EPGWidget::setZoom( int level )
 {
     double scale = (double)level / 20;
