@@ -783,7 +783,7 @@ static int SessionsSetup( demux_t *p_demux )
                      * use and try again */
                     if( p_sys->i_live555_ret == 461 )
                         p_sys->rtsp->sendSetupCommand( *sub, default_live555_callback, False,
-                                                       toBool( b_rtsp_tcp ), False );
+                                                       !toBool( b_rtsp_tcp ), False );
                     if( p_sys->i_live555_ret != 461 || !wait_Live555_response( p_demux ) )
                     {
                         msg_Err( p_demux, "SETUP of'%s/%s' failed %s",
