@@ -956,16 +956,14 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
      * - be sure to end up with a direct buffer.
      * - blend subtitles, and in a fast access buffer
      */
-    bool is_direct;
-    picture_t *todisplay;
-
-    if (filtered && do_early_spu && subpic) {
-        if (vd->info.is_slow) {
+    bool is_direct = vout->p->decoder_pool == vout->p->display_pool;
+    picture_t *todisplay = filtered;
+    if (do_early_spu && subpic) {
+        if (vout->p->is_decoder_pool_slow) {
             is_direct = false;
             todisplay = picture_NewFromFormat(&vd->source); /* FIXME a pool ? */
         } else {
-            is_direct = true;
-            todisplay = picture_pool_Get(vout->p->display_pool);
+            todisplay = picture_pool_Get(vout->p->private_pool);
         }
         if (todisplay) {
             VideoFormatCopyCropAr(&todisplay->format, &filtered->format);
@@ -979,9 +977,6 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
         if (!todisplay)
             return VLC_EGENERIC;
-    } else {
-        is_direct = vout->p->decoder_pool == vout->p->display_pool;
-        todisplay = filtered;
     }
 
     picture_t *direct;
