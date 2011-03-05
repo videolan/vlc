@@ -93,4 +93,12 @@ void EPGRuler::paintEvent( QPaintEvent *event )
         posx += spacing;
         current = current.addSecs( 60 * 60 );
     }
+
+    /* draw current time line */
+    posx = localStartTime.secsTo( QDateTime::currentDateTime() ) * m_scale;
+    if ( posx <= width() && posx >= 0 )
+    {
+        p.setPen( QPen( QColor( 255, 0 , 0, 128 ) ) );
+        p.drawLine( posx, 15, posx, 30 );
+    }
 }
