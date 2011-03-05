@@ -48,6 +48,33 @@
 #include "dvb.h"
 #include "scan.h"
 
+typedef enum
+{
+    SERVICE_UNKNOWN = 0,
+    SERVICE_DIGITAL_RADIO,
+    SERVICE_DIGITAL_TELEVISION,
+    SERVICE_DIGITAL_TELEVISION_AC_SD,
+    SERVICE_DIGITAL_TELEVISION_AC_HD,
+} scan_service_type_t;
+
+typedef struct
+{
+    int  i_program;     /* program number (service id) */
+    scan_configuration_t cfg;
+    int i_snr;
+
+    scan_service_type_t type;
+    char *psz_name;     /* channel name in utf8 or NULL */
+    int  i_channel;     /* -1 if unknown */
+    bool b_crypted;     /* True if potentially crypted */
+
+    int i_network_id;
+
+    int i_nit_version;
+    int i_sdt_version;
+
+} scan_service_t;
+
 struct scan_t
 {
     vlc_object_t *p_obj;
@@ -61,7 +88,8 @@ struct scan_t
 };
 
 /* */
-scan_service_t *scan_service_New( int i_program, const scan_configuration_t *p_cfg  )
+static scan_service_t *scan_service_New( int i_program,
+                                         const scan_configuration_t *p_cfg )
 {
     scan_service_t *p_srv = malloc( sizeof(*p_srv) );
     if( !p_srv )
@@ -83,7 +111,7 @@ scan_service_t *scan_service_New( int i_program, const scan_configuration_t *p_c
     return p_srv;
 }
 
-void scan_service_Delete( scan_service_t *p_srv )
+static void scan_service_Delete( scan_service_t *p_srv )
 {
     free( p_srv->psz_name );
     free( p_srv );
