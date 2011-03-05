@@ -58,5 +58,6 @@ SOURCES_bandlimited_resampler = \
 SOURCES_ugly_resampler = resampler/ugly.c
 
 libvlc_LTLIBRARIES += \
-	libbandlimited_resampler_plugin.la \
 	libugly_resampler_plugin.la
+EXTRA_LTLIBRARIES += \
+	libbandlimited_resampler_plugin.la
