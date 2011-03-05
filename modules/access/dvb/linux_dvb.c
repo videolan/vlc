@@ -61,6 +61,7 @@
 #endif
 
 #include "dvb.h"
+#include "scan.h"
 
 #define DMX      "/dev/dvb/adapter%d/demux%d"
 #define FRONTEND "/dev/dvb/adapter%d/frontend%d"
@@ -402,6 +403,8 @@ static int ScanParametersDvbS( access_t *p_access, scan_parameter_t *p_scan )
 
     p_scan->frequency.i_min = p_frontend->info.frequency_min;
     p_scan->frequency.i_max = p_frontend->info.frequency_max;
+    /* set satellite config file path */
+    p_scan->sat_info.psz_name = var_InheritString( p_access, "dvb-satellite" );
 
     return VLC_SUCCESS;
 }
@@ -409,7 +412,6 @@ static int ScanParametersDvbS( access_t *p_access, scan_parameter_t *p_scan )
 static int ScanParametersDvbC( access_t *p_access, scan_parameter_t *p_scan )
 {
     const frontend_t *p_frontend = p_access->p_sys->p_frontend;
-
 
     memset( p_scan, 0, sizeof(*p_scan) );
     p_scan->type = SCAN_DVB_C;
@@ -433,7 +435,6 @@ static int ScanParametersDvbC( access_t *p_access, scan_parameter_t *p_scan )
 static int ScanParametersDvbT( access_t *p_access, scan_parameter_t *p_scan )
 {
     const frontend_t *p_frontend = p_access->p_sys->p_frontend;
-
 
     memset( p_scan, 0, sizeof(*p_scan) );
     p_scan->type = SCAN_DVB_T;

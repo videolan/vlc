@@ -53,6 +53,7 @@
 # include <dvbpsi/sdt.h>
 
 #include "dvb.h"
+#include "scan.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -338,8 +339,8 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* */
-    p_sys->b_scan_mode = var_GetInteger( p_access, "dvb-frequency" ) == 0;
-    if( p_sys->b_scan_mode )
+    bool b_scan_mode = var_GetInteger( p_access, "dvb-frequency" ) == 0;
+    if( b_scan_mode )
     {
         msg_Dbg( p_access, "DVB scan mode selected" );
         p_access->pf_block = BlockScan;
@@ -364,9 +365,10 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( p_sys->b_scan_mode )
+    if( b_scan_mode )
     {
         scan_parameter_t parameter;
+        scan_t *p_scan;
 
         msg_Dbg( p_access, "setting filter on PAT/NIT/SDT (DVB only)" );
         FilterSet( p_access, 0x00, OTHER_TYPE );    // PAT
@@ -374,11 +376,13 @@ static int Open( vlc_object_t *p_this )
         FilterSet( p_access, 0x11, OTHER_TYPE );    // SDT
 
         if( FrontendGetScanParameter( p_access, &parameter ) ||
-            scan_Init( VLC_OBJECT(p_access), &p_sys->scan, &parameter ) )
+            (p_scan = scan_New( VLC_OBJECT(p_access), &parameter )) == NULL )
         {
             Close( VLC_OBJECT(p_access) );
             return VLC_EGENERIC;
         }
+        p_sys->scan = p_scan;
+        p_sys->i_read_once = DVB_READ_ONCE_SCAN;
     }
     else
     {
@@ -387,11 +391,13 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Dbg( p_access, "setting filter on all PIDs" );
             FilterSet( p_access, 0x2000, OTHER_TYPE );
+            p_sys->i_read_once = DVB_READ_ONCE;
         }
         else
         {
             msg_Dbg( p_access, "setting filter on PAT" );
             FilterSet( p_access, 0x0, OTHER_TYPE );
+            p_sys->i_read_once = DVB_READ_ONCE_START;
         }
 
         CAMOpen( p_access );
@@ -401,15 +407,8 @@ static int Open( vlc_object_t *p_this )
 #endif
     }
 
-    if( p_sys->b_scan_mode )
-        p_sys->i_read_once = DVB_READ_ONCE_SCAN;
-    else if( p_sys->b_budget_mode )
-        p_sys->i_read_once = DVB_READ_ONCE;
-    else
-        p_sys->i_read_once = DVB_READ_ONCE_START;
-
     free( p_access->psz_demux );
-    p_access->psz_demux = strdup( p_sys->b_scan_mode ? "m3u8" : "ts" );
+    p_access->psz_demux = strdup( p_sys->scan ? "m3u8" : "ts" );
     return VLC_SUCCESS;
 }
 
@@ -421,19 +420,19 @@ static void Close( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
-    FilterUnset( p_access, p_sys->b_budget_mode && !p_sys->b_scan_mode ? 1 : MAX_DEMUX );
+    FilterUnset( p_access, p_sys->b_budget_mode && !p_sys->scan ? 1 : MAX_DEMUX );
 
     DVRClose( p_access );
     FrontendClose( p_access );
-    if( p_sys->b_scan_mode )
-        scan_Clean( &p_sys->scan );
+    if( p_sys->scan != NULL )
+        scan_Destroy( p_sys->scan );
     else
+    {
         CAMClose( p_access );
-
 #ifdef ENABLE_HTTPD
-    if( !p_sys->b_scan_mode )
         HTTPClose( p_access );
 #endif
+    }
 
     free( p_sys );
 }
@@ -554,13 +553,9 @@ static block_t *Block( access_t *p_access )
 static block_t *BlockScan( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    scan_t *p_scan = &p_sys->scan;
+    scan_t *p_scan = p_sys->scan;
     scan_configuration_t cfg;
     scan_session_t session;
-
-    /* set satellite config file path */
-    if( p_scan->parameter.type == SCAN_DVB_S )
-        p_scan->parameter.sat_info.psz_name = var_GetString( p_access, "dvb-satellite" );
 
     /* */
     if( scan_Next( p_scan, &cfg ) )
@@ -581,23 +576,15 @@ static block_t *BlockScan( access_t *p_access )
         return NULL;
 
     /* */
-    if( p_scan->parameter.type == SCAN_DVB_S )
-    {
-        msg_Dbg( p_access,
-                 "Scanning frequency %d, symbol rate = %d, fec = %d",
-                 cfg.i_frequency,
-                 cfg.i_bandwidth,
-                 cfg.i_fec );
-    }
-    else
-        msg_Dbg( p_access, "Scanning frequency %d, bandwidth = %d",
-                 cfg.i_frequency,
-                 cfg.i_bandwidth );
-
+    msg_Dbg( p_access, "Scanning frequency %d", cfg.i_frequency );
     var_SetInteger( p_access, "dvb-frequency", cfg.i_frequency );
+    msg_Dbg( p_access, " bandwidth %d", cfg.i_bandwidth );
     var_SetInteger( p_access, "dvb-bandwidth", cfg.i_bandwidth );
     if ( cfg.i_fec )
+    {
+        msg_Dbg( p_access, " FEC %d", cfg.i_fec );
         var_SetInteger( p_access, "dvb-fec", cfg.i_fec );
+    }
     if ( cfg.c_polarization )
         var_SetInteger( p_access, "dvb-voltage", cfg.c_polarization == 'H' ? 18 : 13 );
 
@@ -766,7 +753,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case ACCESS_SET_PRIVATE_ID_STATE:
-            if( p_sys->b_scan_mode )
+            if( p_sys->scan )
                 return VLC_EGENERIC;
 
             i_int  = (int)va_arg( args, int );               /* Private data (pid for now)*/
@@ -782,7 +769,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_SET_PRIVATE_ID_CA:
-            if( p_sys->b_scan_mode )
+            if( p_sys->scan )
                 return VLC_EGENERIC;
 
             p_pmt = (dvbpsi_pmt_t *)va_arg( args, dvbpsi_pmt_t * );

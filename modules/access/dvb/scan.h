@@ -46,7 +46,7 @@ typedef struct
     char c_polarization;
 } scan_dvbs_transponder_t;
 
-typedef struct
+struct scan_parameter_t
 {
     scan_type_t type;
     bool b_exhaustive;
@@ -80,8 +80,7 @@ typedef struct
         scan_dvbs_transponder_t *p_transponders;
         int i_count;
     } sat_info;
-
-} scan_parameter_t;
+};
 
 typedef struct
 {
@@ -143,24 +142,11 @@ typedef struct
 
 } scan_session_t;
 
-typedef struct
-{
-    vlc_object_t *p_obj;
-    struct dialog_progress_bar_t *p_dialog;
-    int64_t i_index;
-    scan_parameter_t parameter;
-    int64_t i_time_start;
-
-    int            i_service;
-    scan_service_t **pp_service;
-} scan_t;
-
-
 scan_service_t *scan_service_New( int i_program, const scan_configuration_t *p_cfg  );
 void scan_service_Delete( scan_service_t *p_srv );
 
-int  scan_Init( vlc_object_t *p_obj, scan_t *p_scan, const scan_parameter_t *p_parameter );
-void scan_Clean( scan_t *p_scan );
+scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter );
+void scan_Destroy( scan_t *p_scan );
 
 int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg );
 

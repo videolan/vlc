@@ -46,6 +46,19 @@
 # include <dvbpsi/sdt.h>
 
 #include "dvb.h"
+#include "scan.h"
+
+struct scan_t
+{
+    vlc_object_t *p_obj;
+    struct dialog_progress_bar_t *p_dialog;
+    int64_t i_index;
+    scan_parameter_t parameter;
+    int64_t i_time_start;
+
+    int            i_service;
+    scan_service_t **pp_service;
+};
 
 /* */
 scan_service_t *scan_service_New( int i_program, const scan_configuration_t *p_cfg  )
@@ -77,7 +90,7 @@ void scan_service_Delete( scan_service_t *p_srv )
 }
 
 /* */
-int scan_Init( vlc_object_t *p_obj, scan_t *p_scan, const scan_parameter_t *p_parameter )
+scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
 {
     if( p_parameter->type == SCAN_DVB_T )
     {
@@ -104,10 +117,14 @@ int scan_Init( vlc_object_t *p_obj, scan_t *p_scan, const scan_parameter_t *p_pa
     }
     else
     {
-        return VLC_EGENERIC;
+        return NULL;
     }
     msg_Dbg( p_obj, " - use NIT %s", p_parameter->b_use_nit ? "on" : "off" );
     msg_Dbg( p_obj, " - FTA only %s", p_parameter->b_free_only ? "on" : "off" );
+
+    scan_t *p_scan = malloc( sizeof( *p_scan ) );
+    if( unlikely(p_scan == NULL) )
+        return NULL;
 
     p_scan->p_obj = VLC_OBJECT(p_obj);
     p_scan->i_index = 0;
@@ -116,10 +133,10 @@ int scan_Init( vlc_object_t *p_obj, scan_t *p_scan, const scan_parameter_t *p_pa
     p_scan->parameter = *p_parameter;
     p_scan->i_time_start = mdate();
 
-    return VLC_SUCCESS;
+    return p_scan;
 }
 
-void scan_Clean( scan_t *p_scan )
+void scan_Destroy( scan_t *p_scan )
 {
     if( p_scan->p_dialog != NULL )
         dialog_ProgressDestroy( p_scan->p_dialog );
@@ -127,6 +144,7 @@ void scan_Clean( scan_t *p_scan )
     for( int i = 0; i < p_scan->i_service; i++ )
         scan_service_Delete( p_scan->pp_service[i] );
     TAB_CLEAN( p_scan->i_service, p_scan->pp_service );
+    free( p_scan );
 }
 
 static int ScanDvbSNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )

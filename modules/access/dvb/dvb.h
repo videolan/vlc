@@ -23,9 +23,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA    02111, USA.
  *****************************************************************************/
 
-
-#include "scan.h"
-
 /*****************************************************************************
  * Local structures
  *****************************************************************************/
@@ -50,6 +47,9 @@ typedef struct
     bool b_has_carrier;
     bool b_has_lock;
 } frontend_status_t;
+
+typedef struct scan_parameter_t scan_parameter_t;
+typedef struct scan_t scan_t;
 
 typedef struct en50221_session_t
 {
@@ -145,7 +145,6 @@ struct access_sys_t
     demux_handle_t p_demux_handles[MAX_DEMUX];
     frontend_t *p_frontend;
     bool b_budget_mode;
-    bool b_scan_mode;
 
     /* CA management */
     int i_ca_handle;
@@ -180,7 +179,7 @@ struct access_sys_t
 #endif
 
     /* Scan */
-    scan_t scan;
+    scan_t *scan;
 };
 
 #define VIDEO0_TYPE     1
