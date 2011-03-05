@@ -44,8 +44,7 @@ public:
                && name == other.name
                && description == other.description
                && shortDescription == other.shortDescription
-               && channelName == other.channelName
-               && current == other.current;
+               && channelName == other.channelName;
     }
 
     bool ends_before( const QDateTime & ref ) const
