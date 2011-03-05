@@ -729,7 +729,7 @@ static int FrontendInfo( access_t *p_access )
     if( p_frontend->info.caps & FE_CAN_16VSB)
         msg_Dbg(p_access, "  16-level VSB modulation");
     if( p_frontend->info.caps & FE_HAS_EXTENDED_CAPS)
-        msg_Dbg(p_access, "  8-level VSB modulation");
+        msg_Dbg(p_access, "  extended capabilities");
     /* 3 capabilities that don't exist yet HERE */
 #if (DVB_API_VERSION > 5) \
  || ((DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 2))
