@@ -136,7 +136,6 @@ struct vout_thread_sys_t
     picture_pool_t  *display_pool;
     picture_pool_t  *decoder_pool;
     picture_fifo_t  *decoder_fifo;
-    bool            is_decoder_pool_slow;
     vout_chrono_t   render;           /**< picture render time estimator */
 };
 

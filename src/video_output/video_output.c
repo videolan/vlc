@@ -959,12 +959,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     bool is_direct = vout->p->decoder_pool == vout->p->display_pool;
     picture_t *todisplay = filtered;
     if (do_early_spu && subpic) {
-        if (vout->p->is_decoder_pool_slow) {
-            is_direct = false;
-            todisplay = picture_NewFromFormat(&vd->source); /* FIXME a pool ? */
-        } else {
-            todisplay = picture_pool_Get(vout->p->private_pool);
-        }
+        todisplay = picture_pool_Get(vout->p->private_pool);
         if (todisplay) {
             VideoFormatCopyCropAr(&todisplay->format, &filtered->format);
             picture_Copy(todisplay, filtered);

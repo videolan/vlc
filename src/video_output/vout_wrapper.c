@@ -133,7 +133,7 @@ int vout_InitWrapper(vout_thread_t *vout)
     video_format_t source = vd->source;
 
     sys->display.use_dr = !vout_IsDisplayFiltered(vd);
-    const bool allow_dr = !vd->info.has_pictures_invalid && sys->display.use_dr;
+    const bool allow_dr = !vd->info.has_pictures_invalid && !vd->info.is_slow && sys->display.use_dr;
     const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
     const unsigned decoder_picture  = 1 + sys->dpb_size;
     const unsigned kept_picture     = 1; /* last displayed picture */
@@ -148,7 +148,6 @@ int vout_InitWrapper(vout_thread_t *vout)
         sys->dpb_size     = picture_pool_GetSize(display_pool) - reserved_picture;
         sys->decoder_pool = display_pool;
         sys->display_pool = display_pool;
-        sys->is_decoder_pool_slow = vd->info.is_slow;
     } else if (!sys->decoder_pool) {
         sys->decoder_pool =
             picture_pool_NewFromFormat(&source,
@@ -161,7 +160,6 @@ int vout_InitWrapper(vout_thread_t *vout)
             sys->dpb_size = picture_pool_GetSize(sys->decoder_pool) - reserved_picture;
         }
         NoDrInit(vout);
-        sys->is_decoder_pool_slow = false;
     }
     sys->private_pool = picture_pool_Reserve(sys->decoder_pool, private_picture);
     sys->display.filtered = NULL;
