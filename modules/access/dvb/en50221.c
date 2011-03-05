@@ -27,7 +27,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_access.h>
 #include <vlc_charset.h>
 
 #include <errno.h>
@@ -61,11 +60,11 @@
 #define CAM_PROG_MAX MAX_PROGRAMS
 //#define CAPMT_WAIT 100             /* uncomment this for slow CAMs */
 
-static void ResourceManagerOpen( access_t * p_access, int i_session_id );
-static void ApplicationInformationOpen( access_t * p_access, int i_session_id );
-static void ConditionalAccessOpen( access_t * p_access, int i_session_id );
-static void DateTimeOpen( access_t * p_access, int i_session_id );
-static void MMIOpen( access_t * p_access, int i_session_id );
+static void ResourceManagerOpen( cam_t *, unsigned i_session_id );
+static void ApplicationInformationOpen( cam_t *, unsigned i_session_id );
+static void ConditionalAccessOpen( cam_t *, unsigned i_session_id );
+static void DateTimeOpen( cam_t *, unsigned i_session_id );
+static void MMIOpen( cam_t *, unsigned i_session_id );
 
 /*****************************************************************************
  * Utility functions
@@ -166,10 +165,9 @@ static void Dump( bool b_outgoing, uint8_t *p_data, int i_size )
 /*****************************************************************************
  * TPDUSend
  *****************************************************************************/
-static int TPDUSend( access_t * p_access, uint8_t i_slot, uint8_t i_tag,
+static int TPDUSend( cam_t * p_cam, uint8_t i_slot, uint8_t i_tag,
                      const uint8_t *p_content, int i_length )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     uint8_t i_tcid = i_slot + 1;
     uint8_t p_data[MAX_TPDU_SIZE];
     int i_size;
@@ -219,9 +217,9 @@ static int TPDUSend( access_t * p_access, uint8_t i_slot, uint8_t i_tag,
     }
     Dump( true, p_data, i_size );
 
-    if ( write( p_sys->i_ca_handle, p_data, i_size ) != i_size )
+    if ( write( p_cam->fd, p_data, i_size ) != i_size )
     {
-        msg_Err( p_access, "cannot write to CAM device (%m)" );
+        msg_Err( p_cam->obj, "cannot write to CAM device (%m)" );
         return VLC_EGENERIC;
     }
 
@@ -234,27 +232,26 @@ static int TPDUSend( access_t * p_access, uint8_t i_slot, uint8_t i_tag,
  *****************************************************************************/
 #define CAM_READ_TIMEOUT  3500 // ms
 
-static int TPDURecv( access_t * p_access, uint8_t i_slot, uint8_t *pi_tag,
+static int TPDURecv( cam_t *p_cam, uint8_t i_slot, uint8_t *pi_tag,
                      uint8_t *p_data, int *pi_size )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     uint8_t i_tcid = i_slot + 1;
     int i_size;
     struct pollfd pfd[1];
 
-    pfd[0].fd = p_sys->i_ca_handle;
+    pfd[0].fd = p_cam->fd;
     pfd[0].events = POLLIN;
 
     while( poll(pfd, 1, CAM_READ_TIMEOUT ) == -1 )
         if( errno != EINTR )
         {
-            msg_Err( p_access, "poll error: %m" );
+            msg_Err( p_cam->obj, "poll error: %m" );
             return VLC_EGENERIC;
         }
 
     if ( !(pfd[0].revents & POLLIN) )
     {
-        msg_Err( p_access, "CAM device poll time-out" );
+        msg_Err( p_cam->obj, "CAM device poll time-out" );
         return VLC_EGENERIC;
     }
 
@@ -265,7 +262,7 @@ static int TPDURecv( access_t * p_access, uint8_t i_slot, uint8_t *pi_tag,
 
     for ( ; ; )
     {
-        i_size = read( p_sys->i_ca_handle, p_data, MAX_TPDU_SIZE );
+        i_size = read( p_cam->fd, p_data, MAX_TPDU_SIZE );
 
         if ( i_size >= 0 || errno != EINTR )
             break;
@@ -273,7 +270,7 @@ static int TPDURecv( access_t * p_access, uint8_t i_slot, uint8_t *pi_tag,
 
     if ( i_size < 5 )
     {
-        msg_Err( p_access, "cannot read from CAM device (%d:%m)", i_size );
+        msg_Err( p_cam->obj, "cannot read from CAM device (%d:%m)", i_size );
         if( pi_size == NULL )
             free( p_data );
         return VLC_EGENERIC;
@@ -281,7 +278,7 @@ static int TPDURecv( access_t * p_access, uint8_t i_slot, uint8_t *pi_tag,
 
     if ( p_data[1] != i_tcid )
     {
-        msg_Err( p_access, "invalid read from CAM device (%d instead of %d)",
+        msg_Err( p_cam->obj, "invalid read from CAM device (%d instead of %d)",
                  p_data[1], i_tcid );
         if( pi_size == NULL )
             free( p_data );
@@ -289,7 +286,7 @@ static int TPDURecv( access_t * p_access, uint8_t i_slot, uint8_t *pi_tag,
     }
 
     *pi_tag = p_data[2];
-    p_sys->pb_tc_has_data[i_slot] = (i_size >= 4
+    p_cam->pb_tc_has_data[i_slot] = (i_size >= 4
                                       && p_data[i_size - 4] == T_SB
                                       && p_data[i_size - 3] == 2
                                       && (p_data[i_size - 1] & DATA_INDICATOR))
@@ -337,14 +334,13 @@ static int ResourceIdToInt( uint8_t *p_data )
 /*****************************************************************************
  * SPDUSend
  *****************************************************************************/
-static int SPDUSend( access_t * p_access, int i_session_id,
+static int SPDUSend( cam_t * p_cam, int i_session_id,
                      uint8_t *p_data, int i_size )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     uint8_t *p_spdu = xmalloc( i_size + 4 );
     uint8_t *p = p_spdu;
     uint8_t i_tag;
-    uint8_t i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+    uint8_t i_slot = p_cam->p_sessions[i_session_id - 1].i_slot;
 
     *p++ = ST_SESSION_NUMBER;
     *p++ = 0x02;
@@ -360,10 +356,10 @@ static int SPDUSend( access_t * p_access, int i_session_id,
     {
         if ( i_size > MAX_TPDU_DATA )
         {
-            if ( TPDUSend( p_access, i_slot, T_DATA_MORE, p,
+            if ( TPDUSend( p_cam, i_slot, T_DATA_MORE, p,
                            MAX_TPDU_DATA ) != VLC_SUCCESS )
             {
-                msg_Err( p_access, "couldn't send TPDU on session %d",
+                msg_Err( p_cam->obj, "couldn't send TPDU on session %d",
                          i_session_id );
                 free( p_spdu );
                 return VLC_EGENERIC;
@@ -373,10 +369,10 @@ static int SPDUSend( access_t * p_access, int i_session_id,
         }
         else
         {
-            if ( TPDUSend( p_access, i_slot, T_DATA_LAST, p, i_size )
+            if ( TPDUSend( p_cam, i_slot, T_DATA_LAST, p, i_size )
                     != VLC_SUCCESS )
             {
-                msg_Err( p_access, "couldn't send TPDU on session %d",
+                msg_Err( p_cam->obj, "couldn't send TPDU on session %d",
                          i_session_id );
                 free( p_spdu );
                 return VLC_EGENERIC;
@@ -384,10 +380,10 @@ static int SPDUSend( access_t * p_access, int i_session_id,
             i_size = 0;
         }
 
-        if ( TPDURecv( p_access, i_slot, &i_tag, NULL, NULL ) != VLC_SUCCESS
+        if ( TPDURecv( p_cam, i_slot, &i_tag, NULL, NULL ) != VLC_SUCCESS
                || i_tag != T_SB )
         {
-            msg_Err( p_access, "couldn't recv TPDU on session %d",
+            msg_Err( p_cam->obj, "couldn't recv TPDU on session %d",
                      i_session_id );
             free( p_spdu );
             return VLC_EGENERIC;
@@ -401,12 +397,11 @@ static int SPDUSend( access_t * p_access, int i_session_id,
 /*****************************************************************************
  * SessionOpen
  *****************************************************************************/
-static void SessionOpen( access_t * p_access, uint8_t i_slot,
+static void SessionOpen( cam_t * p_cam, uint8_t i_slot,
                          uint8_t *p_spdu, int i_size )
 {
     VLC_UNUSED( i_size );
 
-    access_sys_t *p_sys = p_access->p_sys;
     int i_session_id;
     int i_resource_id = ResourceIdToInt( &p_spdu[2] );
     uint8_t p_response[16];
@@ -415,18 +410,18 @@ static void SessionOpen( access_t * p_access, uint8_t i_slot,
 
     for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
     {
-        if ( !p_sys->p_sessions[i_session_id - 1].i_resource_id )
+        if ( !p_cam->p_sessions[i_session_id - 1].i_resource_id )
             break;
     }
     if ( i_session_id > MAX_SESSIONS )
     {
-        msg_Err( p_access, "too many sessions !" );
+        msg_Err( p_cam->obj, "too many sessions !" );
         return;
     }
-    p_sys->p_sessions[i_session_id - 1].i_slot = i_slot;
-    p_sys->p_sessions[i_session_id - 1].i_resource_id = i_resource_id;
-    p_sys->p_sessions[i_session_id - 1].pf_close = NULL;
-    p_sys->p_sessions[i_session_id - 1].pf_manage = NULL;
+    p_cam->p_sessions[i_session_id - 1].i_slot = i_slot;
+    p_cam->p_sessions[i_session_id - 1].i_resource_id = i_resource_id;
+    p_cam->p_sessions[i_session_id - 1].pf_close = NULL;
+    p_cam->p_sessions[i_session_id - 1].pf_manage = NULL;
 
     if ( i_resource_id == RI_RESOURCE_MANAGER
           || i_resource_id == RI_APPLICATION_INFORMATION
@@ -447,16 +442,16 @@ static void SessionOpen( access_t * p_access, uint8_t i_slot,
     p_response[7] = i_session_id >> 8;
     p_response[8] = i_session_id & 0xff;
 
-    if ( TPDUSend( p_access, i_slot, T_DATA_LAST, p_response, 9 ) !=
+    if ( TPDUSend( p_cam, i_slot, T_DATA_LAST, p_response, 9 ) !=
             VLC_SUCCESS )
     {
-        msg_Err( p_access,
+        msg_Err( p_cam->obj,
                  "SessionOpen: couldn't send TPDU on slot %d", i_slot );
         return;
     }
-    if ( TPDURecv( p_access, i_slot, &i_tag, NULL, NULL ) != VLC_SUCCESS )
+    if ( TPDURecv( p_cam, i_slot, &i_tag, NULL, NULL ) != VLC_SUCCESS )
     {
-        msg_Err( p_access,
+        msg_Err( p_cam->obj,
                  "SessionOpen: couldn't recv TPDU on slot %d", i_slot );
         return;
     }
@@ -464,20 +459,20 @@ static void SessionOpen( access_t * p_access, uint8_t i_slot,
     switch ( i_resource_id )
     {
     case RI_RESOURCE_MANAGER:
-        ResourceManagerOpen( p_access, i_session_id ); break;
+        ResourceManagerOpen( p_cam, i_session_id ); break;
     case RI_APPLICATION_INFORMATION:
-        ApplicationInformationOpen( p_access, i_session_id ); break;
+        ApplicationInformationOpen( p_cam, i_session_id ); break;
     case RI_CONDITIONAL_ACCESS_SUPPORT:
-        ConditionalAccessOpen( p_access, i_session_id ); break;
+        ConditionalAccessOpen( p_cam, i_session_id ); break;
     case RI_DATE_TIME:
-        DateTimeOpen( p_access, i_session_id ); break;
+        DateTimeOpen( p_cam, i_session_id ); break;
     case RI_MMI:
-        MMIOpen( p_access, i_session_id ); break;
+        MMIOpen( p_cam, i_session_id ); break;
 
     case RI_HOST_CONTROL:
     default:
-        msg_Err( p_access, "unknown resource id (0x%x)", i_resource_id );
-        p_sys->p_sessions[i_session_id - 1].i_resource_id = 0;
+        msg_Err( p_cam->obj, "unknown resource id (0x%x)", i_resource_id );
+        p_cam->p_sessions[i_session_id - 1].i_resource_id = 0;
     }
 }
 
@@ -486,48 +481,43 @@ static void SessionOpen( access_t * p_access, uint8_t i_slot,
 /*****************************************************************************
  * SessionCreate
  *****************************************************************************/
-static void SessionCreate( access_t * p_access, int i_slot, int i_resource_id )
+static void SessionCreate( cam_t * p_cam, int i_slot, int i_resource_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     uint8_t p_response[16];
     uint8_t i_tag;
     int i_session_id;
 
     for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
     {
-        if ( !p_sys->p_sessions[i_session_id - 1].i_resource_id )
+        if ( !p_cam->p_sessions[i_session_id - 1].i_resource_id )
             break;
     }
     if ( i_session_id == MAX_SESSIONS )
     {
-        msg_Err( p_access, "too many sessions !" );
+        msg_Err( p_cam->obj, "too many sessions !" );
         return;
     }
-    p_sys->p_sessions[i_session_id - 1].i_slot = i_slot;
-    p_sys->p_sessions[i_session_id - 1].i_resource_id = i_resource_id;
-    p_sys->p_sessions[i_session_id - 1].pf_close = NULL;
-    p_sys->p_sessions[i_session_id - 1].pf_manage = NULL;
-    p_sys->p_sessions[i_session_id - 1].p_sys = NULL;
+    p_cam->p_sessions[i_session_id - 1].i_slot = i_slot;
+    p_cam->p_sessions[i_session_id - 1].i_resource_id = i_resource_id;
+    p_cam->p_sessions[i_session_id - 1].pf_close = NULL;
+    p_cam->p_sessions[i_session_id - 1].pf_manage = NULL;
+    p_cam->p_sessions[i_session_id - 1].p_sys = NULL;
 
     p_response[0] = ST_CREATE_SESSION;
     p_response[1] = 0x6;
-    p_response[2] = i_resource_id >> 24;
-    p_response[3] = (i_resource_id >> 16) & 0xff;
-    p_response[4] = (i_resource_id >> 8) & 0xff;
-    p_response[5] = i_resource_id & 0xff;
-    p_response[6] = i_session_id >> 8;
-    p_response[7] = i_session_id & 0xff;
+    SetDWBE( &p_resource[2], i_resource_id );
+    SetWBE( &p_response[6]. i_session_id);
 
-    if ( TPDUSend( p_access, i_slot, T_DATA_LAST, p_response, 4 ) !=
+    if ( TPDUSend( p_cam, i_slot, T_DATA_LAST, p_response, 4 ) !=
             VLC_SUCCESS )
     {
-        msg_Err( p_access,
+        msg_Err( p_cam->obj,
                  "SessionCreate: couldn't send TPDU on slot %d", i_slot );
         return;
     }
-    if ( TPDURecv( p_access, i_slot, &i_tag, NULL, NULL ) != VLC_SUCCESS )
+    if ( TPDURecv( p_cam, i_slot, &i_tag, NULL, NULL ) != VLC_SUCCESS )
     {
-        msg_Err( p_access,
+        msg_Err( p_cam->obj,
                  "SessionCreate: couldn't recv TPDU on slot %d", i_slot );
         return;
     }
@@ -537,71 +527,68 @@ static void SessionCreate( access_t * p_access, int i_slot, int i_resource_id )
 /*****************************************************************************
  * SessionCreateResponse
  *****************************************************************************/
-static void SessionCreateResponse( access_t * p_access, uint8_t i_slot,
+static void SessionCreateResponse( cam_t * p_cam, uint8_t i_slot,
                                    uint8_t *p_spdu, int i_size )
 {
     VLC_UNUSED( i_size );
     VLC_UNUSED( i_slot );
 
-    access_sys_t *p_sys = p_access->p_sys;
     int i_status = p_spdu[2];
     int i_resource_id = ResourceIdToInt( &p_spdu[3] );
     int i_session_id = ((int)p_spdu[7] << 8) | p_spdu[8];
 
     if ( i_status != SS_OK )
     {
-        msg_Err( p_access, "SessionCreateResponse: failed to open session %d"
+        msg_Err( p_cam->obj, "SessionCreateResponse: failed to open session %d"
                  " resource=0x%x status=0x%x", i_session_id, i_resource_id,
                  i_status );
-        p_sys->p_sessions[i_session_id - 1].i_resource_id = 0;
+        p_cam->p_sessions[i_session_id - 1].i_resource_id = 0;
         return;
     }
 
     switch ( i_resource_id )
     {
     case RI_RESOURCE_MANAGER:
-        ResourceManagerOpen( p_access, i_session_id ); break;
+        ResourceManagerOpen( p_cam, i_session_id ); break;
     case RI_APPLICATION_INFORMATION:
-        ApplicationInformationOpen( p_access, i_session_id ); break;
+        ApplicationInformationOpen( p_cam, i_session_id ); break;
     case RI_CONDITIONAL_ACCESS_SUPPORT:
-        ConditionalAccessOpen( p_access, i_session_id ); break;
+        ConditionalAccessOpen( p_cam, i_session_id ); break;
     case RI_DATE_TIME:
-        DateTimeOpen( p_access, i_session_id ); break;
+        DateTimeOpen( p_cam, i_session_id ); break;
     case RI_MMI:
-        MMIOpen( p_access, i_session_id ); break;
+        MMIOpen( p_cam, i_session_id ); break;
 
     case RI_HOST_CONTROL:
     default:
-        msg_Err( p_access, "unknown resource id (0x%x)", i_resource_id );
-        p_sys->p_sessions[i_session_id - 1].i_resource_id = 0;
+        msg_Err( p_cam->obj, "unknown resource id (0x%x)", i_resource_id );
+        p_cam->p_sessions[i_session_id - 1].i_resource_id = 0;
     }
 }
 
 /*****************************************************************************
  * SessionSendClose
  *****************************************************************************/
-static void SessionSendClose( access_t * p_access, int i_session_id )
+static void SessionSendClose( cam_t *p_cam, int i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     uint8_t p_response[16];
     uint8_t i_tag;
-    uint8_t i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+    uint8_t i_slot = p_cam->p_sessions[i_session_id - 1].i_slot;
 
     p_response[0] = ST_CLOSE_SESSION_REQUEST;
     p_response[1] = 0x2;
-    p_response[2] = i_session_id >> 8;
-    p_response[3] = i_session_id & 0xff;
+    SetWBE( &p_response[2], i_session_id );
 
-    if ( TPDUSend( p_access, i_slot, T_DATA_LAST, p_response, 4 ) !=
+    if ( TPDUSend( p_cam, i_slot, T_DATA_LAST, p_response, 4 ) !=
             VLC_SUCCESS )
     {
-        msg_Err( p_access,
+        msg_Err( p_cam->obj,
                  "SessionSendClose: couldn't send TPDU on slot %d", i_slot );
         return;
     }
-    if ( TPDURecv( p_access, i_slot, &i_tag, NULL, NULL ) != VLC_SUCCESS )
+    if ( TPDURecv( p_cam, i_slot, &i_tag, NULL, NULL ) != VLC_SUCCESS )
     {
-        msg_Err( p_access,
+        msg_Err( p_cam->obj,
                  "SessionSendClose: couldn't recv TPDU on slot %d", i_slot );
         return;
     }
@@ -610,16 +597,15 @@ static void SessionSendClose( access_t * p_access, int i_session_id )
 /*****************************************************************************
  * SessionClose
  *****************************************************************************/
-static void SessionClose( access_t * p_access, int i_session_id )
+static void SessionClose( cam_t * p_cam, int i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     uint8_t p_response[16];
     uint8_t i_tag;
-    uint8_t i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+    uint8_t i_slot = p_cam->p_sessions[i_session_id - 1].i_slot;
 
-    if ( p_sys->p_sessions[i_session_id - 1].pf_close != NULL )
-        p_sys->p_sessions[i_session_id - 1].pf_close( p_access, i_session_id );
-    p_sys->p_sessions[i_session_id - 1].i_resource_id = 0;
+    if ( p_cam->p_sessions[i_session_id - 1].pf_close != NULL )
+        p_cam->p_sessions[i_session_id - 1].pf_close( p_cam, i_session_id );
+    p_cam->p_sessions[i_session_id - 1].i_resource_id = 0;
 
     p_response[0] = ST_CLOSE_SESSION_RESPONSE;
     p_response[1] = 0x3;
@@ -627,16 +613,16 @@ static void SessionClose( access_t * p_access, int i_session_id )
     p_response[3] = i_session_id >> 8;
     p_response[4] = i_session_id & 0xff;
 
-    if ( TPDUSend( p_access, i_slot, T_DATA_LAST, p_response, 5 ) !=
+    if ( TPDUSend( p_cam, i_slot, T_DATA_LAST, p_response, 5 ) !=
             VLC_SUCCESS )
     {
-        msg_Err( p_access,
+        msg_Err( p_cam->obj,
                  "SessionClose: couldn't send TPDU on slot %d", i_slot );
         return;
     }
-    if ( TPDURecv( p_access, i_slot, &i_tag, NULL, NULL ) != VLC_SUCCESS )
+    if ( TPDURecv( p_cam, i_slot, &i_tag, NULL, NULL ) != VLC_SUCCESS )
     {
-        msg_Err( p_access,
+        msg_Err( p_cam->obj,
                  "SessionClose: couldn't recv TPDU on slot %d", i_slot );
         return;
     }
@@ -645,10 +631,9 @@ static void SessionClose( access_t * p_access, int i_session_id )
 /*****************************************************************************
  * SPDUHandle
  *****************************************************************************/
-static void SPDUHandle( access_t * p_access, uint8_t i_slot,
+static void SPDUHandle( cam_t * p_cam, uint8_t i_slot,
                         uint8_t *p_spdu, int i_size )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     int i_session_id;
 
     switch ( p_spdu[0] )
@@ -657,27 +642,27 @@ static void SPDUHandle( access_t * p_access, uint8_t i_slot,
         if ( i_size <= 4 )
             return;
         i_session_id = ((int)p_spdu[2] << 8) | p_spdu[3];
-        p_sys->p_sessions[i_session_id - 1].pf_handle( p_access, i_session_id,
+        p_cam->p_sessions[i_session_id - 1].pf_handle( p_cam, i_session_id,
                                                        p_spdu + 4, i_size - 4 );
         break;
 
     case ST_OPEN_SESSION_REQUEST:
         if ( i_size != 6 || p_spdu[1] != 0x4 )
             return;
-        SessionOpen( p_access, i_slot, p_spdu, i_size );
+        SessionOpen( p_cam, i_slot, p_spdu, i_size );
         break;
 
     case ST_CREATE_SESSION_RESPONSE:
         if ( i_size != 9 || p_spdu[1] != 0x7 )
             return;
-        SessionCreateResponse( p_access, i_slot, p_spdu, i_size );
+        SessionCreateResponse( p_cam, i_slot, p_spdu, i_size );
         break;
 
     case ST_CLOSE_SESSION_REQUEST:
         if ( i_size != 4 || p_spdu[1] != 0x2 )
             return;
         i_session_id = ((int)p_spdu[2] << 8) | p_spdu[3];
-        SessionClose( p_access, i_session_id );
+        SessionClose( p_cam, i_session_id );
         break;
 
     case ST_CLOSE_SESSION_RESPONSE:
@@ -686,20 +671,21 @@ static void SPDUHandle( access_t * p_access, uint8_t i_slot,
         i_session_id = ((int)p_spdu[3] << 8) | p_spdu[4];
         if ( p_spdu[2] )
         {
-            msg_Err( p_access, "closing a session which is not allocated (%d)",
+            msg_Err( p_cam->obj,
+                     "closing a session which is not allocated (%d)",
                      i_session_id );
         }
         else
         {
-            if ( p_sys->p_sessions[i_session_id - 1].pf_close != NULL )
-                p_sys->p_sessions[i_session_id - 1].pf_close( p_access,
+            if ( p_cam->p_sessions[i_session_id - 1].pf_close != NULL )
+                p_cam->p_sessions[i_session_id - 1].pf_close( p_cam,
                                                               i_session_id );
-            p_sys->p_sessions[i_session_id - 1].i_resource_id = 0;
+            p_cam->p_sessions[i_session_id - 1].i_resource_id = 0;
         }
         break;
 
     default:
-        msg_Err( p_access, "unexpected tag in SPDUHandle (%x)", p_spdu[0] );
+        msg_Err( p_cam->obj, "unexpected tag in SPDUHandle (%x)", p_spdu[0] );
         break;
     }
 }
@@ -785,10 +771,9 @@ static uint8_t *APDUGetLength( uint8_t *p_apdu, int *pi_size )
 /*****************************************************************************
  * APDUSend
  *****************************************************************************/
-static int APDUSend( access_t * p_access, int i_session_id, int i_tag,
+static int APDUSend( cam_t * p_cam, int i_session_id, int i_tag,
                      uint8_t *p_data, int i_size )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     uint8_t *p_apdu = xmalloc( i_size + 12 );
     uint8_t *p = p_apdu;
     ca_msg_t ca_msg;
@@ -800,15 +785,15 @@ static int APDUSend( access_t * p_access, int i_session_id, int i_tag,
     p = SetLength( p, i_size );
     if ( i_size )
         memcpy( p, p_data, i_size );
-    if ( p_sys->i_ca_type == CA_CI_LINK )
+    if ( p_cam->i_ca_type == CA_CI_LINK )
     {
-        i_ret = SPDUSend( p_access, i_session_id, p_apdu, i_size + p - p_apdu );
+        i_ret = SPDUSend( p_cam, i_session_id, p_apdu, i_size + p - p_apdu );
     }
     else
     {
         if ( i_size + p - p_apdu > 256 )
         {
-            msg_Err( p_access, "CAM: apdu overflow" );
+            msg_Err( p_cam->obj, "CAM: apdu overflow" );
             i_ret = VLC_EGENERIC;
         }
         else
@@ -816,10 +801,10 @@ static int APDUSend( access_t * p_access, int i_session_id, int i_tag,
             ca_msg.length = i_size + p - p_apdu;
             if ( i_size == 0 ) ca_msg.length=3;
             memcpy( ca_msg.msg, p_apdu, i_size + p - p_apdu );
-            i_ret = ioctl(p_sys->i_ca_handle, CA_SEND_MSG, &ca_msg );
+            i_ret = ioctl( p_cam->fd, CA_SEND_MSG, &ca_msg );
             if ( i_ret < 0 )
             {
-                msg_Err( p_access, "Error sending to CAM: %m" );
+                msg_Err( p_cam->obj, "Error sending to CAM: %m" );
                 i_ret = VLC_EGENERIC;
             }
         }
@@ -835,7 +820,7 @@ static int APDUSend( access_t * p_access, int i_session_id, int i_tag,
 /*****************************************************************************
  * ResourceManagerHandle
  *****************************************************************************/
-static void ResourceManagerHandle( access_t * p_access, int i_session_id,
+static void ResourceManagerHandle( cam_t * p_cam, int i_session_id,
                                    uint8_t *p_apdu, int i_size )
 {
     int i_tag = APDUGetTag( p_apdu, i_size );
@@ -850,16 +835,16 @@ static void ResourceManagerHandle( access_t * p_access, int i_session_id,
                             htonl(RI_DATE_TIME),
                             htonl(RI_MMI)
                           };
-        APDUSend( p_access, i_session_id, AOT_PROFILE, (uint8_t*)resources,
+        APDUSend( p_cam, i_session_id, AOT_PROFILE, (uint8_t*)resources,
                   sizeof(resources) );
         break;
     }
     case AOT_PROFILE:
-        APDUSend( p_access, i_session_id, AOT_PROFILE_CHANGE, NULL, 0 );
+        APDUSend( p_cam, i_session_id, AOT_PROFILE_CHANGE, NULL, 0 );
         break;
 
     default:
-        msg_Err( p_access, "unexpected tag in ResourceManagerHandle (0x%x)",
+        msg_Err( p_cam->obj, "unexpected tag in ResourceManagerHandle (0x%x)",
                  i_tag );
     }
 }
@@ -867,15 +852,12 @@ static void ResourceManagerHandle( access_t * p_access, int i_session_id,
 /*****************************************************************************
  * ResourceManagerOpen
  *****************************************************************************/
-static void ResourceManagerOpen( access_t * p_access, int i_session_id )
+static void ResourceManagerOpen( cam_t * p_cam, unsigned i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-
-    msg_Dbg( p_access, "opening ResourceManager session (%d)", i_session_id );
-
-    p_sys->p_sessions[i_session_id - 1].pf_handle = ResourceManagerHandle;
-
-    APDUSend( p_access, i_session_id, AOT_PROFILE_ENQ, NULL, 0 );
+    msg_Dbg( p_cam->obj, "opening ResourceManager session (%u)",
+             i_session_id );
+    p_cam->p_sessions[i_session_id - 1].pf_handle = ResourceManagerHandle;
+    APDUSend( p_cam, i_session_id, AOT_PROFILE_ENQ, NULL, 0 );
 }
 
 /*
@@ -885,21 +867,19 @@ static void ResourceManagerOpen( access_t * p_access, int i_session_id )
 /*****************************************************************************
  * ApplicationInformationEnterMenu
  *****************************************************************************/
-static void ApplicationInformationEnterMenu( access_t * p_access,
-                                             int i_session_id )
+static void ApplicationInformationEnterMenu( cam_t * p_cam, int i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+    int i_slot = p_cam->p_sessions[i_session_id - 1].i_slot;
 
-    msg_Dbg( p_access, "entering MMI menus on session %d", i_session_id );
-    APDUSend( p_access, i_session_id, AOT_ENTER_MENU, NULL, 0 );
-    p_sys->pb_slot_mmi_expected[i_slot] = true;
+    msg_Dbg( p_cam->obj, "entering MMI menus on session %d", i_session_id );
+    APDUSend( p_cam, i_session_id, AOT_ENTER_MENU, NULL, 0 );
+    p_cam->pb_slot_mmi_expected[i_slot] = true;
 }
 
 /*****************************************************************************
  * ApplicationInformationHandle
  *****************************************************************************/
-static void ApplicationInformationHandle( access_t * p_access, int i_session_id,
+static void ApplicationInformationHandle( cam_t * p_cam, int i_session_id,
                                           uint8_t *p_apdu, int i_size )
 {
     VLC_UNUSED(i_session_id);
@@ -923,12 +903,12 @@ static void ApplicationInformationHandle( access_t * p_access, int i_session_id,
         d += 2;
         d = GetLength( d, &l );
         d[l] = '\0';
-        msg_Info( p_access, "CAM: %s, %02X, %04X, %04X",
+        msg_Info( p_cam->obj, "CAM: %s, %02X, %04X, %04X",
                   d, i_type, i_manufacturer, i_code );
         break;
     }
     default:
-        msg_Err( p_access,
+        msg_Err( p_cam->obj,
                  "unexpected tag in ApplicationInformationHandle (0x%x)",
                  i_tag );
     }
@@ -937,15 +917,13 @@ static void ApplicationInformationHandle( access_t * p_access, int i_session_id,
 /*****************************************************************************
  * ApplicationInformationOpen
  *****************************************************************************/
-static void ApplicationInformationOpen( access_t * p_access, int i_session_id )
+static void ApplicationInformationOpen( cam_t * p_cam, unsigned i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-
-    msg_Dbg( p_access, "opening ApplicationInformation session (%d)", i_session_id );
-
-    p_sys->p_sessions[i_session_id - 1].pf_handle = ApplicationInformationHandle;
-
-    APDUSend( p_access, i_session_id, AOT_APPLICATION_INFO_ENQ, NULL, 0 );
+    msg_Dbg( p_cam->obj, "opening ApplicationInformation session (%u)",
+             i_session_id );
+    p_cam->p_sessions[i_session_id - 1].pf_handle =
+        ApplicationInformationHandle;
+    APDUSend( p_cam, i_session_id, AOT_APPLICATION_INFO_ENQ, NULL, 0 );
 }
 
 /*
@@ -1132,13 +1110,12 @@ static uint8_t *CAPMTES( system_ids_t *p_ids, uint8_t *p_capmt,
     return p_data;
 }
 
-static uint8_t *CAPMTBuild( access_t * p_access, int i_session_id,
+static uint8_t *CAPMTBuild( cam_t * p_cam, int i_session_id,
                             dvbpsi_pmt_t *p_pmt, uint8_t i_list_mgt,
                             uint8_t i_cmd, int *pi_capmt_size )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     system_ids_t *p_ids =
-        (system_ids_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+        (system_ids_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
     dvbpsi_pmt_es_t *p_es;
     int i_cad_size, i_cad_program_size;
     uint8_t *p_capmt;
@@ -1152,7 +1129,7 @@ static uint8_t *CAPMTBuild( access_t * p_access, int i_session_id,
 
     if ( !i_cad_size )
     {
-        msg_Warn( p_access,
+        msg_Warn( p_cam->obj,
                   "no compatible scrambling system for SID %d on session %d",
                   p_pmt->i_program_number, i_session_id );
         *pi_capmt_size = 0;
@@ -1190,22 +1167,22 @@ static uint8_t *CAPMTBuild( access_t * p_access, int i_session_id,
 /*****************************************************************************
  * CAPMTFirst
  *****************************************************************************/
-static void CAPMTFirst( access_t * p_access, int i_session_id,
+static void CAPMTFirst( cam_t * p_cam, int i_session_id,
                         dvbpsi_pmt_t *p_pmt )
 {
     uint8_t *p_capmt;
     int i_capmt_size;
 
-    msg_Dbg( p_access, "adding first CAPMT for SID %d on session %d",
+    msg_Dbg( p_cam->obj, "adding first CAPMT for SID %d on session %d",
              p_pmt->i_program_number, i_session_id );
 
-    p_capmt = CAPMTBuild( p_access, i_session_id, p_pmt,
+    p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
                           0x3 /* only */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
 
     if( i_capmt_size )
     {
-        APDUSend( p_access, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
+        APDUSend( p_cam, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
         free( p_capmt );
     }
 }
@@ -1213,22 +1190,22 @@ static void CAPMTFirst( access_t * p_access, int i_session_id,
 /*****************************************************************************
  * CAPMTAdd
  *****************************************************************************/
-static void CAPMTAdd( access_t * p_access, int i_session_id,
+static void CAPMTAdd( cam_t * p_cam, int i_session_id,
                       dvbpsi_pmt_t *p_pmt )
 {
     uint8_t *p_capmt;
     int i_capmt_size;
 
-    if( p_access->p_sys->i_selected_programs >= CAM_PROG_MAX )
+    if( p_cam->i_selected_programs >= CAM_PROG_MAX )
     {
-        msg_Warn( p_access, "Not adding CAPMT for SID %d, too many programs",
+        msg_Warn( p_cam->obj, "Not adding CAPMT for SID %d, too many programs",
                   p_pmt->i_program_number );
         return;
     }
-    p_access->p_sys->i_selected_programs++;
-    if( p_access->p_sys->i_selected_programs == 1 )
+    p_cam->i_selected_programs++;
+    if( p_cam->i_selected_programs == 1 )
     {
-        CAPMTFirst( p_access, i_session_id, p_pmt );
+        CAPMTFirst( p_cam, i_session_id, p_pmt );
         return;
     }
  
@@ -1236,16 +1213,16 @@ static void CAPMTAdd( access_t * p_access, int i_session_id,
     msleep( CAPMT_WAIT * 1000 );
 #endif
  
-    msg_Dbg( p_access, "adding CAPMT for SID %d on session %d",
+    msg_Dbg( p_cam->obj, "adding CAPMT for SID %d on session %d",
              p_pmt->i_program_number, i_session_id );
 
-    p_capmt = CAPMTBuild( p_access, i_session_id, p_pmt,
+    p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
                           0x4 /* add */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
 
     if( i_capmt_size )
     {
-        APDUSend( p_access, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
+        APDUSend( p_cam, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
         free( p_capmt );
     }
 }
@@ -1253,22 +1230,22 @@ static void CAPMTAdd( access_t * p_access, int i_session_id,
 /*****************************************************************************
  * CAPMTUpdate
  *****************************************************************************/
-static void CAPMTUpdate( access_t * p_access, int i_session_id,
+static void CAPMTUpdate( cam_t * p_cam, int i_session_id,
                          dvbpsi_pmt_t *p_pmt )
 {
     uint8_t *p_capmt;
     int i_capmt_size;
 
-    msg_Dbg( p_access, "updating CAPMT for SID %d on session %d",
+    msg_Dbg( p_cam->obj, "updating CAPMT for SID %d on session %d",
              p_pmt->i_program_number, i_session_id );
 
-    p_capmt = CAPMTBuild( p_access, i_session_id, p_pmt,
+    p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
                           0x5 /* update */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
 
     if( i_capmt_size )
     {
-        APDUSend( p_access, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
+        APDUSend( p_cam, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
         free( p_capmt );
     }
 }
@@ -1276,23 +1253,23 @@ static void CAPMTUpdate( access_t * p_access, int i_session_id,
 /*****************************************************************************
  * CAPMTDelete
  *****************************************************************************/
-static void CAPMTDelete( access_t * p_access, int i_session_id,
+static void CAPMTDelete( cam_t * p_cam, int i_session_id,
                          dvbpsi_pmt_t *p_pmt )
 {
     uint8_t *p_capmt;
     int i_capmt_size;
 
-    p_access->p_sys->i_selected_programs--;
-    msg_Dbg( p_access, "deleting CAPMT for SID %d on session %d",
+    p_cam->i_selected_programs--;
+    msg_Dbg( p_cam->obj, "deleting CAPMT for SID %d on session %d",
              p_pmt->i_program_number, i_session_id );
 
-    p_capmt = CAPMTBuild( p_access, i_session_id, p_pmt,
+    p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
                           0x5 /* update */, 0x4 /* not selected */,
                           &i_capmt_size );
 
     if( i_capmt_size )
     {
-        APDUSend( p_access, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
+        APDUSend( p_cam, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
         free( p_capmt );
     }
 }
@@ -1300,12 +1277,11 @@ static void CAPMTDelete( access_t * p_access, int i_session_id,
 /*****************************************************************************
  * ConditionalAccessHandle
  *****************************************************************************/
-static void ConditionalAccessHandle( access_t * p_access, int i_session_id,
+static void ConditionalAccessHandle( cam_t * p_cam, int i_session_id,
                                      uint8_t *p_apdu, int i_size )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     system_ids_t *p_ids =
-        (system_ids_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+        (system_ids_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
     int i_tag = APDUGetTag( p_apdu, i_size );
 
     switch ( i_tag )
@@ -1315,29 +1291,29 @@ static void ConditionalAccessHandle( access_t * p_access, int i_session_id,
         int i;
         int l = 0;
         uint8_t *d = APDUGetLength( p_apdu, &l );
-        msg_Dbg( p_access, "CA system IDs supported by the application :" );
+        msg_Dbg( p_cam->obj, "CA system IDs supported by the application :" );
 
         for ( i = 0; i < l / 2; i++ )
         {
             p_ids->pi_system_ids[i] = ((uint16_t)d[0] << 8) | d[1];
             d += 2;
-            msg_Dbg( p_access, "- 0x%x", p_ids->pi_system_ids[i] );
+            msg_Dbg( p_cam->obj, "- 0x%x", p_ids->pi_system_ids[i] );
         }
         p_ids->pi_system_ids[i] = 0;
 
         for ( i = 0; i < MAX_PROGRAMS; i++ )
         {
-            if ( p_sys->pp_selected_programs[i] != NULL )
+            if ( p_cam->pp_selected_programs[i] != NULL )
             {
-                CAPMTAdd( p_access, i_session_id,
-                          p_sys->pp_selected_programs[i] );
+                CAPMTAdd( p_cam, i_session_id,
+                          p_cam->pp_selected_programs[i] );
             }
         }
         break;
     }
 
     default:
-        msg_Err( p_access,
+        msg_Err( p_cam->obj,
                  "unexpected tag in ConditionalAccessHandle (0x%x)",
                  i_tag );
     }
@@ -1346,29 +1322,25 @@ static void ConditionalAccessHandle( access_t * p_access, int i_session_id,
 /*****************************************************************************
  * ConditionalAccessClose
  *****************************************************************************/
-static void ConditionalAccessClose( access_t * p_access, int i_session_id )
+static void ConditionalAccessClose( cam_t * p_cam, int i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-
-    msg_Dbg( p_access, "closing ConditionalAccess session (%d)", i_session_id );
-
-    free( p_sys->p_sessions[i_session_id - 1].p_sys );
+    msg_Dbg( p_cam->obj, "closing ConditionalAccess session (%d)",
+             i_session_id );
+    free( p_cam->p_sessions[i_session_id - 1].p_sys );
 }
 
 /*****************************************************************************
  * ConditionalAccessOpen
  *****************************************************************************/
-static void ConditionalAccessOpen( access_t * p_access, int i_session_id )
+static void ConditionalAccessOpen( cam_t * p_cam, unsigned i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
+    msg_Dbg( p_cam->obj, "opening ConditionalAccess session (%u)",
+             i_session_id );
+    p_cam->p_sessions[i_session_id - 1].pf_handle = ConditionalAccessHandle;
+    p_cam->p_sessions[i_session_id - 1].pf_close = ConditionalAccessClose;
+    p_cam->p_sessions[i_session_id - 1].p_sys = calloc( 1, sizeof(system_ids_t) );
 
-    msg_Dbg( p_access, "opening ConditionalAccess session (%d)", i_session_id );
-
-    p_sys->p_sessions[i_session_id - 1].pf_handle = ConditionalAccessHandle;
-    p_sys->p_sessions[i_session_id - 1].pf_close = ConditionalAccessClose;
-    p_sys->p_sessions[i_session_id - 1].p_sys = calloc( 1, sizeof(system_ids_t) );
-
-    APDUSend( p_access, i_session_id, AOT_CA_INFO_ENQ, NULL, 0 );
+    APDUSend( p_cam, i_session_id, AOT_CA_INFO_ENQ, NULL, 0 );
 }
 
 /*
@@ -1384,11 +1356,10 @@ typedef struct
 /*****************************************************************************
  * DateTimeSend
  *****************************************************************************/
-static void DateTimeSend( access_t * p_access, int i_session_id )
+static void DateTimeSend( cam_t * p_cam, int i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     date_time_t *p_date =
-        (date_time_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+        (date_time_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
 
     time_t t = time(NULL);
     struct tm tm_gmt;
@@ -1412,7 +1383,7 @@ static void DateTimeSend( access_t * p_access, int i_session_id )
         p_response[4] = DEC2BCD(tm_gmt.tm_sec);
         SetWBE( &p_response[5], tm_loc.tm_gmtoff / 60 );
 
-        APDUSend( p_access, i_session_id, AOT_DATE_TIME, p_response, 7 );
+        APDUSend( p_cam, i_session_id, AOT_DATE_TIME, p_response, 7 );
 
         p_date->i_last = mdate();
     }
@@ -1421,12 +1392,11 @@ static void DateTimeSend( access_t * p_access, int i_session_id )
 /*****************************************************************************
  * DateTimeHandle
  *****************************************************************************/
-static void DateTimeHandle( access_t * p_access, int i_session_id,
+static void DateTimeHandle( cam_t *p_cam, int i_session_id,
                             uint8_t *p_apdu, int i_size )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     date_time_t *p_date =
-        (date_time_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+        (date_time_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
 
     int i_tag = APDUGetTag( p_apdu, i_size );
 
@@ -1440,63 +1410,59 @@ static void DateTimeHandle( access_t * p_access, int i_session_id,
         if ( l > 0 )
         {
             p_date->i_interval = *d;
-            msg_Dbg( p_access, "DateTimeHandle : interval set to %d",
+            msg_Dbg( p_cam->obj, "DateTimeHandle : interval set to %d",
                      p_date->i_interval );
         }
         else
             p_date->i_interval = 0;
 
-        DateTimeSend( p_access, i_session_id );
+        DateTimeSend( p_cam, i_session_id );
         break;
     }
     default:
-        msg_Err( p_access, "unexpected tag in DateTimeHandle (0x%x)", i_tag );
+        msg_Err( p_cam->obj, "unexpected tag in DateTimeHandle (0x%x)",
+                 i_tag );
     }
 }
 
 /*****************************************************************************
  * DateTimeManage
  *****************************************************************************/
-static void DateTimeManage( access_t * p_access, int i_session_id )
+static void DateTimeManage( cam_t * p_cam, int i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     date_time_t *p_date =
-        (date_time_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+        (date_time_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
 
     if ( p_date->i_interval
           && mdate() > p_date->i_last + (mtime_t)p_date->i_interval * 1000000 )
     {
-        DateTimeSend( p_access, i_session_id );
+        DateTimeSend( p_cam, i_session_id );
     }
 }
 
 /*****************************************************************************
  * DateTimeClose
  *****************************************************************************/
-static void DateTimeClose( access_t * p_access, int i_session_id )
+static void DateTimeClose( cam_t * p_cam, int i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
+    msg_Dbg( p_cam->obj, "closing DateTime session (%d)", i_session_id );
 
-    msg_Dbg( p_access, "closing DateTime session (%d)", i_session_id );
-
-    free( p_sys->p_sessions[i_session_id - 1].p_sys );
+    free( p_cam->p_sessions[i_session_id - 1].p_sys );
 }
 
 /*****************************************************************************
  * DateTimeOpen
  *****************************************************************************/
-static void DateTimeOpen( access_t * p_access, int i_session_id )
+static void DateTimeOpen( cam_t * p_cam, unsigned i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
+    msg_Dbg( p_cam->obj, "opening DateTime session (%u)", i_session_id );
 
-    msg_Dbg( p_access, "opening DateTime session (%d)", i_session_id );
+    p_cam->p_sessions[i_session_id - 1].pf_handle = DateTimeHandle;
+    p_cam->p_sessions[i_session_id - 1].pf_manage = DateTimeManage;
+    p_cam->p_sessions[i_session_id - 1].pf_close = DateTimeClose;
+    p_cam->p_sessions[i_session_id - 1].p_sys = calloc( 1, sizeof(date_time_t) );
 
-    p_sys->p_sessions[i_session_id - 1].pf_handle = DateTimeHandle;
-    p_sys->p_sessions[i_session_id - 1].pf_manage = DateTimeManage;
-    p_sys->p_sessions[i_session_id - 1].pf_close = DateTimeClose;
-    p_sys->p_sessions[i_session_id - 1].p_sys = calloc( 1, sizeof(date_time_t) );
-
-    DateTimeSend( p_access, i_session_id );
+    DateTimeSend( p_cam, i_session_id );
 }
 
 /*
@@ -1545,11 +1511,10 @@ typedef struct
 /*****************************************************************************
  * MMISendObject
  *****************************************************************************/
-static void MMISendObject( access_t *p_access, int i_session_id,
+static void MMISendObject( cam_t *p_cam, int i_session_id,
                            en50221_mmi_object_t *p_object )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+    int i_slot = p_cam->p_sessions[i_session_id - 1].i_slot;
     uint8_t *p_data;
     int i_size, i_tag;
 
@@ -1571,48 +1536,47 @@ static void MMISendObject( access_t *p_access, int i_session_id,
         break;
 
     default:
-        msg_Err( p_access, "unknown MMI object %d", p_object->i_object_type );
+        msg_Err( p_cam->obj, "unknown MMI object %d", p_object->i_object_type );
         return;
     }
 
-    APDUSend( p_access, i_session_id, i_tag, p_data, i_size );
+    APDUSend( p_cam, i_session_id, i_tag, p_data, i_size );
     free( p_data );
 
-    p_sys->pb_slot_mmi_expected[i_slot] = true;
+    p_cam->pb_slot_mmi_expected[i_slot] = true;
 }
 
 /*****************************************************************************
  * MMISendClose
  *****************************************************************************/
-static void MMISendClose( access_t *p_access, int i_session_id )
+static void MMISendClose( cam_t *p_cam, int i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+    int i_slot = p_cam->p_sessions[i_session_id - 1].i_slot;
 
-    APDUSend( p_access, i_session_id, AOT_CLOSE_MMI, NULL, 0 );
+    APDUSend( p_cam, i_session_id, AOT_CLOSE_MMI, NULL, 0 );
 
-    p_sys->pb_slot_mmi_expected[i_slot] = true;
+    p_cam->pb_slot_mmi_expected[i_slot] = true;
 }
 
 /*****************************************************************************
  * MMIDisplayReply
  *****************************************************************************/
-static void MMIDisplayReply( access_t *p_access, int i_session_id )
+static void MMIDisplayReply( cam_t *p_cam, int i_session_id )
 {
     uint8_t p_response[2];
 
     p_response[0] = DRI_MMI_MODE_ACK;
     p_response[1] = MM_HIGH_LEVEL;
 
-    APDUSend( p_access, i_session_id, AOT_DISPLAY_REPLY, p_response, 2 );
+    APDUSend( p_cam, i_session_id, AOT_DISPLAY_REPLY, p_response, 2 );
 
-    msg_Dbg( p_access, "sending DisplayReply on session (%d)", i_session_id );
+    msg_Dbg( p_cam->obj, "sending DisplayReply on session (%d)", i_session_id );
 }
 
 /*****************************************************************************
  * MMIGetText
  *****************************************************************************/
-static char *MMIGetText( access_t *p_access, uint8_t **pp_apdu, int *pi_size )
+static char *MMIGetText( cam_t *p_cam, uint8_t **pp_apdu, int *pi_size )
 {
     int i_tag = APDUGetTag( *pp_apdu, *pi_size );
     int l;
@@ -1620,7 +1584,7 @@ static char *MMIGetText( access_t *p_access, uint8_t **pp_apdu, int *pi_size )
 
     if ( i_tag != AOT_TEXT_LAST )
     {
-        msg_Err( p_access, "unexpected text tag: %06x", i_tag );
+        msg_Err( p_cam->obj, "unexpected text tag: %06x", i_tag );
         *pi_size = 0;
         return strdup( "" );
     }
@@ -1636,14 +1600,13 @@ static char *MMIGetText( access_t *p_access, uint8_t **pp_apdu, int *pi_size )
 /*****************************************************************************
  * MMIHandleEnq
  *****************************************************************************/
-static void MMIHandleEnq( access_t *p_access, int i_session_id,
+static void MMIHandleEnq( cam_t *p_cam, int i_session_id,
                           uint8_t *p_apdu, int i_size )
 {
     VLC_UNUSED( i_size );
 
-    access_sys_t *p_sys = p_access->p_sys;
-    mmi_t *p_mmi = (mmi_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
-    int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+    mmi_t *p_mmi = (mmi_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
+    int i_slot = p_cam->p_sessions[i_session_id - 1].i_slot;
     int l;
     uint8_t *d = APDUGetLength( p_apdu, &l );
 
@@ -1656,22 +1619,22 @@ static void MMIHandleEnq( access_t *p_access, int i_session_id,
     strncpy( p_mmi->last_object.u.enq.psz_text, (char *)d, l );
     p_mmi->last_object.u.enq.psz_text[l] = '\0';
 
-    msg_Dbg( p_access, "MMI enq: %s%s", p_mmi->last_object.u.enq.psz_text,
+    msg_Dbg( p_cam->obj, "MMI enq: %s%s", p_mmi->last_object.u.enq.psz_text,
              p_mmi->last_object.u.enq.b_blind == true ? " (blind)" : "" );
-    p_sys->pb_slot_mmi_expected[i_slot] = false;
-    p_sys->pb_slot_mmi_undisplayed[i_slot] = true;
+    p_cam->pb_slot_mmi_expected[i_slot] = false;
+    p_cam->pb_slot_mmi_undisplayed[i_slot] = true;
 }
 
 /*****************************************************************************
  * MMIHandleMenu
  *****************************************************************************/
-static void MMIHandleMenu( access_t *p_access, int i_session_id, int i_tag,
+static void MMIHandleMenu( cam_t *p_cam, int i_session_id, int i_tag,
                            uint8_t *p_apdu, int i_size )
 {
     VLC_UNUSED(i_size);
-    access_sys_t *p_sys = p_access->p_sys;
-    mmi_t *p_mmi = (mmi_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
-    int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+
+    mmi_t *p_mmi = (mmi_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
+    int i_slot = p_cam->p_sessions[i_session_id - 1].i_slot;
     int l;
     uint8_t *d = APDUGetLength( p_apdu, &l );
 
@@ -1689,8 +1652,8 @@ static void MMIHandleMenu( access_t *p_access, int i_session_id, int i_tag,
         if ( l > 0 )                                                        \
         {                                                                   \
             p_mmi->last_object.u.menu.psz_##x                               \
-                            = MMIGetText( p_access, &d, &l );               \
-            msg_Dbg( p_access, "MMI " STRINGIFY( x ) ": %s",                \
+                            = MMIGetText( p_cam, &d, &l );               \
+            msg_Dbg( p_cam->obj, "MMI " STRINGIFY( x ) ": %s",                \
                      p_mmi->last_object.u.menu.psz_##x );                   \
         }
 
@@ -1701,21 +1664,21 @@ static void MMIHandleMenu( access_t *p_access, int i_session_id, int i_tag,
 
         while ( l > 0 )
         {
-            char *psz_text = MMIGetText( p_access, &d, &l );
+            char *psz_text = MMIGetText( p_cam, &d, &l );
             TAB_APPEND( p_mmi->last_object.u.menu.i_choices,
                         p_mmi->last_object.u.menu.ppsz_choices,
                         psz_text );
-            msg_Dbg( p_access, "MMI choice: %s", psz_text );
+            msg_Dbg( p_cam->obj, "MMI choice: %s", psz_text );
         }
     }
-    p_sys->pb_slot_mmi_expected[i_slot] = false;
-    p_sys->pb_slot_mmi_undisplayed[i_slot] = true;
+    p_cam->pb_slot_mmi_expected[i_slot] = false;
+    p_cam->pb_slot_mmi_undisplayed[i_slot] = true;
 }
 
 /*****************************************************************************
  * MMIHandle
  *****************************************************************************/
-static void MMIHandle( access_t *p_access, int i_session_id,
+static void MMIHandle( cam_t *p_cam, int i_session_id,
                        uint8_t *p_apdu, int i_size )
 {
     int i_tag = APDUGetTag( p_apdu, i_size );
@@ -1733,13 +1696,13 @@ static void MMIHandle( access_t *p_access, int i_session_id,
             {
             case DCC_SET_MMI_MODE:
                 if ( l == 2 && d[1] == MM_HIGH_LEVEL )
-                    MMIDisplayReply( p_access, i_session_id );
+                    MMIDisplayReply( p_cam, i_session_id );
                 else
-                    msg_Err( p_access, "unsupported MMI mode %02x", d[1] );
+                    msg_Err( p_cam->obj, "unsupported MMI mode %02x", d[1] );
                 break;
 
             default:
-                msg_Err( p_access, "unsupported display control command %02x",
+                msg_Err( p_cam->obj, "unsupported display control command %02x",
                          *d );
                 break;
             }
@@ -1748,54 +1711,52 @@ static void MMIHandle( access_t *p_access, int i_session_id,
     }
 
     case AOT_ENQ:
-        MMIHandleEnq( p_access, i_session_id, p_apdu, i_size );
+        MMIHandleEnq( p_cam, i_session_id, p_apdu, i_size );
         break;
 
     case AOT_LIST_LAST:
     case AOT_MENU_LAST:
-        MMIHandleMenu( p_access, i_session_id, i_tag, p_apdu, i_size );
+        MMIHandleMenu( p_cam, i_session_id, i_tag, p_apdu, i_size );
         break;
 
     case AOT_CLOSE_MMI:
-        SessionSendClose( p_access, i_session_id );
+        SessionSendClose( p_cam, i_session_id );
         break;
 
     default:
-        msg_Err( p_access, "unexpected tag in MMIHandle (0x%x)", i_tag );
+        msg_Err( p_cam->obj, "unexpected tag in MMIHandle (0x%x)", i_tag );
     }
 }
 
 /*****************************************************************************
  * MMIClose
  *****************************************************************************/
-static void MMIClose( access_t *p_access, int i_session_id )
+static void MMIClose( cam_t *p_cam, int i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
-    mmi_t *p_mmi = (mmi_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+    int i_slot = p_cam->p_sessions[i_session_id - 1].i_slot;
+    mmi_t *p_mmi = (mmi_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
 
     en50221_MMIFree( &p_mmi->last_object );
-    free( p_sys->p_sessions[i_session_id - 1].p_sys );
+    free( p_cam->p_sessions[i_session_id - 1].p_sys );
 
-    msg_Dbg( p_access, "closing MMI session (%d)", i_session_id );
-    p_sys->pb_slot_mmi_expected[i_slot] = false;
-    p_sys->pb_slot_mmi_undisplayed[i_slot] = true;
+    msg_Dbg( p_cam->obj, "closing MMI session (%d)", i_session_id );
+    p_cam->pb_slot_mmi_expected[i_slot] = false;
+    p_cam->pb_slot_mmi_undisplayed[i_slot] = true;
 }
 
 /*****************************************************************************
  * MMIOpen
  *****************************************************************************/
-static void MMIOpen( access_t *p_access, int i_session_id )
+static void MMIOpen( cam_t *p_cam, unsigned i_session_id )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     mmi_t *p_mmi;
 
-    msg_Dbg( p_access, "opening MMI session (%d)", i_session_id );
+    msg_Dbg( p_cam->obj, "opening MMI session (%u)", i_session_id );
 
-    p_sys->p_sessions[i_session_id - 1].pf_handle = MMIHandle;
-    p_sys->p_sessions[i_session_id - 1].pf_close = MMIClose;
-    p_sys->p_sessions[i_session_id - 1].p_sys = xmalloc(sizeof(mmi_t));
-    p_mmi = (mmi_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+    p_cam->p_sessions[i_session_id - 1].pf_handle = MMIHandle;
+    p_cam->p_sessions[i_session_id - 1].pf_close = MMIClose;
+    p_cam->p_sessions[i_session_id - 1].p_sys = xmalloc(sizeof(mmi_t));
+    p_mmi = (mmi_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
     p_mmi->last_object.i_object_type = EN50221_MMI_NONE;
 }
 
@@ -1809,43 +1770,39 @@ static void MMIOpen( access_t *p_access, int i_session_id )
  *****************************************************************************/
 #define MAX_TC_RETRIES 20
 
-static int InitSlot( access_t * p_access, int i_slot )
+static int InitSlot( cam_t * p_cam, int i_slot )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    int i;
-
-    if ( TPDUSend( p_access, i_slot, T_CREATE_TC, NULL, 0 )
-            != VLC_SUCCESS )
+    if ( TPDUSend( p_cam, i_slot, T_CREATE_TC, NULL, 0 ) != VLC_SUCCESS )
     {
-        msg_Err( p_access, "en50221_Init: couldn't send TPDU on slot %d",
+        msg_Err( p_cam->obj, "en50221_Init: couldn't send TPDU on slot %d",
                  i_slot );
         return VLC_EGENERIC;
     }
 
     /* This is out of the spec */
-    for ( i = 0; i < MAX_TC_RETRIES; i++ )
+    for ( int i = 0; i < MAX_TC_RETRIES; i++ )
     {
         uint8_t i_tag;
-        if ( TPDURecv( p_access, i_slot, &i_tag, NULL, NULL ) == VLC_SUCCESS
+        if ( TPDURecv( p_cam, i_slot, &i_tag, NULL, NULL ) == VLC_SUCCESS
               && i_tag == T_CTC_REPLY )
         {
-            p_sys->pb_active_slot[i_slot] = true;
+            p_cam->pb_active_slot[i_slot] = true;
             break;
         }
 
-        if ( TPDUSend( p_access, i_slot, T_CREATE_TC, NULL, 0 )
+        if ( TPDUSend( p_cam, i_slot, T_CREATE_TC, NULL, 0 )
                 != VLC_SUCCESS )
         {
-            msg_Err( p_access,
+            msg_Err( p_cam->obj,
                      "en50221_Init: couldn't send TPDU on slot %d",
                      i_slot );
             continue;
         }
     }
 
-    if ( p_sys->pb_active_slot[i_slot] )
+    if ( p_cam->pb_active_slot[i_slot] )
     {
-        p_sys->i_ca_timeout = 100000;
+        p_cam->i_timeout = CLOCK_FREQ / 10;
         return VLC_SUCCESS;
     }
 
@@ -1860,25 +1817,22 @@ static int InitSlot( access_t * p_access, int i_slot )
 /*****************************************************************************
  * en50221_Init : Initialize the CAM for en50221
  *****************************************************************************/
-int en50221_Init( access_t * p_access )
+int en50221_Init( cam_t * p_cam )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-
-    if( p_sys->i_ca_type & CA_CI_LINK )
+    if( p_cam->i_ca_type & CA_CI_LINK )
     {
-        int i_slot;
-        for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
+        for ( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
         {
-            if ( ioctl( p_sys->i_ca_handle, CA_RESET, 1 << i_slot) != 0 )
+            if ( ioctl( p_cam->fd, CA_RESET, 1 << i_slot) != 0 )
             {
-                msg_Err( p_access, "en50221_Init: couldn't reset slot %d",
+                msg_Err( p_cam->obj, "en50221_Init: couldn't reset slot %d",
                          i_slot );
             }
         }
 
-        p_sys->i_ca_timeout = 100000;
+        p_cam->i_timeout = CLOCK_FREQ / 10;
         /* Wait a bit otherwise it doesn't initialize properly... */
-        msleep( 1000000 );
+        msleep( CLOCK_FREQ / 10 );
 
         return VLC_SUCCESS;
     }
@@ -1889,23 +1843,23 @@ int en50221_Init( access_t * p_access )
 
         /* We don't reset the CAM in that case because it's done by the
          * ASIC. */
-        if ( ioctl( p_sys->i_ca_handle, CA_GET_SLOT_INFO, &info ) < 0 )
+        if ( ioctl( p_cam->fd, CA_GET_SLOT_INFO, &info ) < 0 )
         {
-            msg_Err( p_access, "en50221_Init: couldn't get slot info" );
-            close( p_sys->i_ca_handle );
-            p_sys->i_ca_handle = 0;
+            msg_Err( p_cam->obj, "en50221_Init: couldn't get slot info" );
+            close( p_cam->fd );
+            p_cam->fd = -1;
             return VLC_EGENERIC;
         }
         if( info.flags == 0 )
         {
-            msg_Err( p_access, "en50221_Init: no CAM inserted" );
-            close( p_sys->i_ca_handle );
-            p_sys->i_ca_handle = 0;
+            msg_Err( p_cam->obj, "en50221_Init: no CAM inserted" );
+            close( p_cam->fd );
+            p_cam->fd = -1;
             return VLC_EGENERIC;
         }
 
         /* Allocate a dummy sessions */
-        p_sys->p_sessions[ 0 ].i_resource_id = RI_CONDITIONAL_ACCESS_SUPPORT;
+        p_cam->p_sessions[ 0 ].i_resource_id = RI_CONDITIONAL_ACCESS_SUPPORT;
 
         /* Get application info to find out which cam we are using and make
            sure everything is ready to play */
@@ -1915,40 +1869,40 @@ int en50221_Init( access_t * p_access )
         ca_msg.msg[1] = ( AOT_APPLICATION_INFO & 0x00FF00 ) >> 8;
         ca_msg.msg[2] = ( AOT_APPLICATION_INFO & 0x0000FF ) >> 0;
         memset( &ca_msg.msg[3], 0, 253 );
-        APDUSend( p_access, 1, AOT_APPLICATION_INFO_ENQ, NULL, 0 );
-        if ( ioctl( p_sys->i_ca_handle, CA_GET_MSG, &ca_msg ) < 0 )
+        APDUSend( p_cam, 1, AOT_APPLICATION_INFO_ENQ, NULL, 0 );
+        if ( ioctl( p_cam->fd, CA_GET_MSG, &ca_msg ) < 0 )
         {
-            msg_Err( p_access, "en50221_Init: failed getting message" );
+            msg_Err( p_cam->obj, "en50221_Init: failed getting message" );
             return VLC_EGENERIC;
         }
 
 #if HLCI_WAIT_CAM_READY
         while( ca_msg.msg[8] == 0xff && ca_msg.msg[9] == 0xff )
         {
-            if( !vlc_object_alive (p_access) ) return VLC_EGENERIC;
+            if( !vlc_object_alive (p_cam) ) return VLC_EGENERIC;
             msleep(1);
-            msg_Dbg( p_access, "CAM: please wait" );
-            APDUSend( p_access, 1, AOT_APPLICATION_INFO_ENQ, NULL, 0 );
+            msg_Dbg( p_cam->obj, "CAM: please wait" );
+            APDUSend( p_cam, 1, AOT_APPLICATION_INFO_ENQ, NULL, 0 );
             ca_msg.length=3;
             ca_msg.msg[0] = ( AOT_APPLICATION_INFO & 0xFF0000 ) >> 16;
             ca_msg.msg[1] = ( AOT_APPLICATION_INFO & 0x00FF00 ) >> 8;
             ca_msg.msg[2] = ( AOT_APPLICATION_INFO & 0x0000FF ) >> 0;
             memset( &ca_msg.msg[3], 0, 253 );
-            if ( ioctl( p_sys->i_ca_handle, CA_GET_MSG, &ca_msg ) < 0 )
+            if ( ioctl( p_cam->fd, CA_GET_MSG, &ca_msg ) < 0 )
             {
-                msg_Err( p_access, "en50221_Init: failed getting message" );
+                msg_Err( p_cam->obj, "en50221_Init: failed getting message" );
                 return VLC_EGENERIC;
             }
-            msg_Dbg( p_access, "en50221_Init: Got length: %d, tag: 0x%x", ca_msg.length, APDUGetTag( ca_msg.msg, ca_msg.length ) );
+            msg_Dbg( p_cam->obj, "en50221_Init: Got length: %d, tag: 0x%x", ca_msg.length, APDUGetTag( ca_msg.msg, ca_msg.length ) );
         }
 #else
         if( ca_msg.msg[8] == 0xff && ca_msg.msg[9] == 0xff )
         {
-            msg_Err( p_access, "CAM returns garbage as application info!" );
+            msg_Err( p_cam->obj, "CAM returns garbage as application info!" );
             return VLC_EGENERIC;
         }
 #endif
-        msg_Dbg( p_access, "found CAM %s using id 0x%x", &ca_msg.msg[12],
+        msg_Dbg( p_cam->obj, "found CAM %s using id 0x%x", &ca_msg.msg[12],
                  (ca_msg.msg[8]<<8)|ca_msg.msg[9] );
         return VLC_SUCCESS;
     }
@@ -1957,113 +1911,105 @@ int en50221_Init( access_t * p_access )
 /*****************************************************************************
  * en50221_Poll : Poll the CAM for TPDUs
  *****************************************************************************/
-int en50221_Poll( access_t * p_access )
+int en50221_Poll( cam_t * p_cam )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    int i_slot;
-    int i_session_id;
-
-    for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
+    for ( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
     {
         uint8_t i_tag;
         ca_slot_info_t sinfo;
 
         sinfo.num = i_slot;
-        if ( ioctl( p_sys->i_ca_handle, CA_GET_SLOT_INFO, &sinfo ) != 0 )
+        if ( ioctl( p_cam->fd, CA_GET_SLOT_INFO, &sinfo ) != 0 )
         {
-            msg_Err( p_access, "en50221_Poll: couldn't get info on slot %d",
+            msg_Err( p_cam->obj, "en50221_Poll: couldn't get info on slot %d",
                      i_slot );
             continue;
         }
 
         if ( !(sinfo.flags & CA_CI_MODULE_READY) )
         {
-            if ( p_sys->pb_active_slot[i_slot] )
+            if ( p_cam->pb_active_slot[i_slot] )
             {
-                msg_Dbg( p_access, "en50221_Poll: slot %d has been removed",
+                msg_Dbg( p_cam->obj, "en50221_Poll: slot %d has been removed",
                          i_slot );
-                p_sys->pb_active_slot[i_slot] = false;
-                p_sys->pb_slot_mmi_expected[i_slot] = false;
-                p_sys->pb_slot_mmi_undisplayed[i_slot] = false;
+                p_cam->pb_active_slot[i_slot] = false;
+                p_cam->pb_slot_mmi_expected[i_slot] = false;
+                p_cam->pb_slot_mmi_undisplayed[i_slot] = false;
 
                 /* Close all sessions for this slot. */
-                for ( i_session_id = 1; i_session_id <= MAX_SESSIONS;
-                      i_session_id++ )
+                for ( unsigned i = 1; i <= MAX_SESSIONS; i++ )
                 {
-                    if ( p_sys->p_sessions[i_session_id - 1].i_resource_id
-                          && p_sys->p_sessions[i_session_id - 1].i_slot
-                               == i_slot )
+                    if ( p_cam->p_sessions[i - 1].i_resource_id
+                          && p_cam->p_sessions[i - 1].i_slot == i_slot )
                     {
-                        if ( p_sys->p_sessions[i_session_id - 1].pf_close
-                              != NULL )
+                        if ( p_cam->p_sessions[i - 1].pf_close != NULL )
                         {
-                            p_sys->p_sessions[i_session_id - 1].pf_close(
-                                                p_access, i_session_id );
+                            p_cam->p_sessions[i - 1].pf_close( p_cam, i );
                         }
-                        p_sys->p_sessions[i_session_id - 1].i_resource_id = 0;
+                        p_cam->p_sessions[i - 1].i_resource_id = 0;
                     }
                 }
             }
 
             continue;
         }
-        else if ( !p_sys->pb_active_slot[i_slot] )
+        else if ( !p_cam->pb_active_slot[i_slot] )
         {
-            InitSlot( p_access, i_slot );
+            InitSlot( p_cam, i_slot );
 
-            if ( !p_sys->pb_active_slot[i_slot] )
+            if ( !p_cam->pb_active_slot[i_slot] )
             {
-                msg_Dbg( p_access, "en50221_Poll: resetting slot %d", i_slot );
+                msg_Dbg( p_cam->obj, "en50221_Poll: resetting slot %d", i_slot );
 
-                if ( ioctl( p_sys->i_ca_handle, CA_RESET, 1 << i_slot) != 0 )
+                if ( ioctl( p_cam->fd, CA_RESET, 1 << i_slot) != 0 )
                 {
-                    msg_Err( p_access, "en50221_Poll: couldn't reset slot %d",
+                    msg_Err( p_cam->obj, "en50221_Poll: couldn't reset slot %d",
                              i_slot );
                 }
                 continue;
             }
 
-            msg_Dbg( p_access, "en50221_Poll: slot %d is active",
+            msg_Dbg( p_cam->obj, "en50221_Poll: slot %d is active",
                      i_slot );
         }
 
-        if ( !p_sys->pb_tc_has_data[i_slot] )
+        if ( !p_cam->pb_tc_has_data[i_slot] )
         {
-            if ( TPDUSend( p_access, i_slot, T_DATA_LAST, NULL, 0 ) !=
+            if ( TPDUSend( p_cam, i_slot, T_DATA_LAST, NULL, 0 ) !=
                     VLC_SUCCESS )
             {
-                msg_Err( p_access,
+                msg_Err( p_cam->obj,
                          "en50221_Poll: couldn't send TPDU on slot %d",
                          i_slot );
                 continue;
             }
-            if ( TPDURecv( p_access, i_slot, &i_tag, NULL, NULL ) !=
+            if ( TPDURecv( p_cam, i_slot, &i_tag, NULL, NULL ) !=
                     VLC_SUCCESS )
             {
-                msg_Err( p_access,
+                msg_Err( p_cam->obj,
                          "en50221_Poll: couldn't recv TPDU on slot %d",
                          i_slot );
                 continue;
             }
         }
 
-        while ( p_sys->pb_tc_has_data[i_slot] )
+        while ( p_cam->pb_tc_has_data[i_slot] )
         {
             uint8_t p_tpdu[MAX_TPDU_SIZE];
             int i_size, i_session_size;
             uint8_t *p_session;
 
-            if ( TPDUSend( p_access, i_slot, T_RCV, NULL, 0 ) != VLC_SUCCESS )
+            if ( TPDUSend( p_cam, i_slot, T_RCV, NULL, 0 ) != VLC_SUCCESS )
             {
-                msg_Err( p_access,
+                msg_Err( p_cam->obj,
                          "en50221_Poll: couldn't send TPDU on slot %d",
                          i_slot );
                 continue;
             }
-            if ( TPDURecv( p_access, i_slot, &i_tag, p_tpdu, &i_size ) !=
+            if ( TPDURecv( p_cam, i_slot, &i_tag, p_tpdu, &i_size ) !=
                     VLC_SUCCESS )
             {
-                msg_Err( p_access,
+                msg_Err( p_cam->obj,
                          "en50221_Poll: couldn't recv TPDU on slot %d",
                          i_slot );
                 continue;
@@ -2078,21 +2024,21 @@ int en50221_Poll( access_t * p_access )
 
             if ( i_tag != T_DATA_LAST )
             {
-                msg_Err( p_access,
+                msg_Err( p_cam->obj,
                          "en50221_Poll: fragmented TPDU not supported" );
                 break;
             }
 
-            SPDUHandle( p_access, i_slot, p_session, i_session_size );
+            SPDUHandle( p_cam, i_slot, p_session, i_session_size );
         }
     }
 
-    for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+    for ( int i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
     {
-        if ( p_sys->p_sessions[i_session_id - 1].i_resource_id
-              && p_sys->p_sessions[i_session_id - 1].pf_manage )
+        if ( p_cam->p_sessions[i_session_id - 1].i_resource_id
+              && p_cam->p_sessions[i_session_id - 1].pf_manage )
         {
-            p_sys->p_sessions[i_session_id - 1].pf_manage( p_access,
+            p_cam->p_sessions[i_session_id - 1].pf_manage( p_cam,
                                                            i_session_id );
         }
     }
@@ -2104,17 +2050,15 @@ int en50221_Poll( access_t * p_access )
 /*****************************************************************************
  * en50221_SetCAPMT :
  *****************************************************************************/
-int en50221_SetCAPMT( access_t * p_access, dvbpsi_pmt_t *p_pmt )
+int en50221_SetCAPMT( cam_t * p_cam, dvbpsi_pmt_t *p_pmt )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    int i, i_session_id;
     bool b_update = false;
     bool b_needs_descrambling = CAPMTNeedsDescrambling( p_pmt );
 
-    for ( i = 0; i < MAX_PROGRAMS; i++ )
+    for ( unsigned i = 0; i < MAX_PROGRAMS; i++ )
     {
-        if ( p_sys->pp_selected_programs[i] != NULL
-              && p_sys->pp_selected_programs[i]->i_program_number
+        if ( p_cam->pp_selected_programs[i] != NULL
+              && p_cam->pp_selected_programs[i]->i_program_number
                   == p_pmt->i_program_number )
         {
             b_update = true;
@@ -2122,13 +2066,13 @@ int en50221_SetCAPMT( access_t * p_access, dvbpsi_pmt_t *p_pmt )
             if ( !b_needs_descrambling )
             {
                 dvbpsi_DeletePMT( p_pmt );
-                p_pmt = p_sys->pp_selected_programs[i];
-                p_sys->pp_selected_programs[i] = NULL;
+                p_pmt = p_cam->pp_selected_programs[i];
+                p_cam->pp_selected_programs[i] = NULL;
             }
-            else if( p_pmt != p_sys->pp_selected_programs[i] )
+            else if( p_pmt != p_cam->pp_selected_programs[i] )
             {
-                dvbpsi_DeletePMT( p_sys->pp_selected_programs[i] );
-                p_sys->pp_selected_programs[i] = p_pmt;
+                dvbpsi_DeletePMT( p_cam->pp_selected_programs[i] );
+                p_cam->pp_selected_programs[i] = p_pmt;
             }
 
             break;
@@ -2137,11 +2081,11 @@ int en50221_SetCAPMT( access_t * p_access, dvbpsi_pmt_t *p_pmt )
 
     if ( !b_update && b_needs_descrambling )
     {
-        for ( i = 0; i < MAX_PROGRAMS; i++ )
+        for ( unsigned i = 0; i < MAX_PROGRAMS; i++ )
         {
-            if ( p_sys->pp_selected_programs[i] == NULL )
+            if ( p_cam->pp_selected_programs[i] == NULL )
             {
-                p_sys->pp_selected_programs[i] = p_pmt;
+                p_cam->pp_selected_programs[i] = p_pmt;
                 break;
             }
         }
@@ -2149,17 +2093,17 @@ int en50221_SetCAPMT( access_t * p_access, dvbpsi_pmt_t *p_pmt )
 
     if ( b_update || b_needs_descrambling )
     {
-        for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+        for ( unsigned i = 1; i <= MAX_SESSIONS; i++ )
         {
-            if ( p_sys->p_sessions[i_session_id - 1].i_resource_id
+            if ( p_cam->p_sessions[i - 1].i_resource_id
                     == RI_CONDITIONAL_ACCESS_SUPPORT )
             {
                 if ( b_update && b_needs_descrambling )
-                    CAPMTUpdate( p_access, i_session_id, p_pmt );
+                    CAPMTUpdate( p_cam, i, p_pmt );
                 else if ( b_update )
-                    CAPMTDelete( p_access, i_session_id, p_pmt );
+                    CAPMTDelete( p_cam, i, p_pmt );
                 else
-                    CAPMTAdd( p_access, i_session_id, p_pmt );
+                    CAPMTAdd( p_cam, i, p_pmt );
             }
         }
     }
@@ -2175,42 +2119,39 @@ int en50221_SetCAPMT( access_t * p_access, dvbpsi_pmt_t *p_pmt )
 /*****************************************************************************
  * en50221_OpenMMI :
  *****************************************************************************/
-int en50221_OpenMMI( access_t * p_access, int i_slot )
+int en50221_OpenMMI( cam_t * p_cam, unsigned i_slot )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-
-    if( p_sys->i_ca_type & CA_CI_LINK )
+    if( p_cam->i_ca_type & CA_CI_LINK )
     {
-        int i_session_id;
-        for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+        for ( unsigned i = 1; i <= MAX_SESSIONS; i++ )
         {
-            if ( p_sys->p_sessions[i_session_id - 1].i_resource_id == RI_MMI
-                  && p_sys->p_sessions[i_session_id - 1].i_slot == i_slot )
+            if ( p_cam->p_sessions[i - 1].i_resource_id == RI_MMI
+                  && p_cam->p_sessions[i - 1].i_slot == i_slot )
             {
-                msg_Dbg( p_access,
-                         "MMI menu is already opened on slot %d (session=%d)",
-                         i_slot, i_session_id );
+                msg_Dbg( p_cam->obj,
+                         "MMI menu is already opened on slot %d (session=%u)",
+                         i_slot, i );
                 return VLC_SUCCESS;
             }
         }
 
-        for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+        for ( unsigned i = 1; i <= MAX_SESSIONS; i++ )
         {
-            if ( p_sys->p_sessions[i_session_id - 1].i_resource_id
+            if ( p_cam->p_sessions[i - 1].i_resource_id
                     == RI_APPLICATION_INFORMATION
-                  && p_sys->p_sessions[i_session_id - 1].i_slot == i_slot )
+                  && p_cam->p_sessions[i - 1].i_slot == i_slot )
             {
-                ApplicationInformationEnterMenu( p_access, i_session_id );
+                ApplicationInformationEnterMenu( p_cam, i );
                 return VLC_SUCCESS;
             }
         }
 
-        msg_Err( p_access, "no application information on slot %d", i_slot );
+        msg_Err( p_cam->obj, "no application information on slot %d", i_slot );
         return VLC_EGENERIC;
     }
     else
     {
-        msg_Err( p_access, "MMI menu not supported" );
+        msg_Err( p_cam->obj, "MMI menu not supported" );
         return VLC_EGENERIC;
     }
 }
@@ -2218,30 +2159,27 @@ int en50221_OpenMMI( access_t * p_access, int i_slot )
 /*****************************************************************************
  * en50221_CloseMMI :
  *****************************************************************************/
-int en50221_CloseMMI( access_t * p_access, int i_slot )
+int en50221_CloseMMI( cam_t * p_cam, unsigned i_slot )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-
-    if( p_sys->i_ca_type & CA_CI_LINK )
+    if( p_cam->i_ca_type & CA_CI_LINK )
     {
-        int i_session_id;
-        for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+        for( unsigned i = 1; i <= MAX_SESSIONS; i++ )
         {
-            if ( p_sys->p_sessions[i_session_id - 1].i_resource_id == RI_MMI
-                  && p_sys->p_sessions[i_session_id - 1].i_slot == i_slot )
+            if ( p_cam->p_sessions[i - 1].i_resource_id == RI_MMI
+                  && p_cam->p_sessions[i - 1].i_slot == i_slot )
             {
-                MMISendClose( p_access, i_session_id );
+                MMISendClose( p_cam, i );
                 return VLC_SUCCESS;
             }
         }
 
-        msg_Warn( p_access, "closing a non-existing MMI session on slot %d",
+        msg_Warn( p_cam->obj, "closing a non-existing MMI session on slot %d",
                   i_slot );
         return VLC_EGENERIC;
     }
     else
     {
-        msg_Err( p_access, "MMI menu not supported" );
+        msg_Err( p_cam->obj, "MMI menu not supported" );
         return VLC_EGENERIC;
     }
 }
@@ -2249,22 +2187,18 @@ int en50221_CloseMMI( access_t * p_access, int i_slot )
 /*****************************************************************************
  * en50221_GetMMIObject :
  *****************************************************************************/
-en50221_mmi_object_t *en50221_GetMMIObject( access_t * p_access,
-                                                int i_slot )
+en50221_mmi_object_t *en50221_GetMMIObject( cam_t * p_cam, unsigned i_slot )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    int i_session_id;
-
-    if ( p_sys->pb_slot_mmi_expected[i_slot] == true )
+    if( p_cam->pb_slot_mmi_expected[i_slot] == true )
         return NULL; /* should not happen */
 
-    for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+    for( unsigned i = 1; i <= MAX_SESSIONS; i++ )
     {
-        if ( p_sys->p_sessions[i_session_id - 1].i_resource_id == RI_MMI
-              && p_sys->p_sessions[i_session_id - 1].i_slot == i_slot )
+        if ( p_cam->p_sessions[i - 1].i_resource_id == RI_MMI
+              && p_cam->p_sessions[i - 1].i_slot == i_slot )
         {
             mmi_t *p_mmi =
-                (mmi_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+                (mmi_t *)p_cam->p_sessions[i - 1].p_sys;
             if ( p_mmi == NULL )
                 return NULL; /* should not happen */
             return &p_mmi->last_object;
@@ -2278,48 +2212,41 @@ en50221_mmi_object_t *en50221_GetMMIObject( access_t * p_access,
 /*****************************************************************************
  * en50221_SendMMIObject :
  *****************************************************************************/
-void en50221_SendMMIObject( access_t * p_access, int i_slot,
+void en50221_SendMMIObject( cam_t * p_cam, unsigned i_slot,
                                 en50221_mmi_object_t *p_object )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    int i_session_id;
-
-    for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+    for( unsigned i = 1; i <= MAX_SESSIONS; i++ )
     {
-        if ( p_sys->p_sessions[i_session_id - 1].i_resource_id == RI_MMI
-              && p_sys->p_sessions[i_session_id - 1].i_slot == i_slot )
+        if ( p_cam->p_sessions[i - 1].i_resource_id == RI_MMI
+              && p_cam->p_sessions[i - 1].i_slot == i_slot )
         {
-            MMISendObject( p_access, i_session_id, p_object );
+            MMISendObject( p_cam, i, p_object );
             return;
         }
     }
 
-    msg_Err( p_access, "SendMMIObject when no MMI session is opened !" );
+    msg_Err( p_cam->obj, "SendMMIObject when no MMI session is opened !" );
 }
 
 /*****************************************************************************
  * en50221_End :
  *****************************************************************************/
-void en50221_End( access_t * p_access )
+void en50221_End( cam_t * p_cam )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    int i_session_id, i;
-
-    for ( i = 0; i < MAX_PROGRAMS; i++ )
+    for( unsigned i = 0; i < MAX_PROGRAMS; i++ )
     {
-        if ( p_sys->pp_selected_programs[i] != NULL )
+        if( p_cam->pp_selected_programs[i] != NULL )
         {
-            dvbpsi_DeletePMT( p_sys->pp_selected_programs[i] );
+            dvbpsi_DeletePMT( p_cam->pp_selected_programs[i] );
         }
     }
 
-    for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+    for( unsigned i = 1; i <= MAX_SESSIONS; i++ )
     {
-        if ( p_sys->p_sessions[i_session_id - 1].i_resource_id
-              && p_sys->p_sessions[i_session_id - 1].pf_close != NULL )
+        if( p_cam->p_sessions[i - 1].i_resource_id
+              && p_cam->p_sessions[i - 1].pf_close != NULL )
         {
-            p_sys->p_sessions[i_session_id - 1].pf_close( p_access,
-                                                          i_session_id );
+            p_cam->p_sessions[i - 1].pf_close( p_cam, i );
         }
     }
 

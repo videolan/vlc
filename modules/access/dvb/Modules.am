@@ -1,9 +1,8 @@
 SOURCES_dvb = \
 	access.c \
-	scan.c \
-	scan.h \
+	scan.c scan.h \
 	linux_dvb.c \
-	en50221.c \
+	en50221.c en50221.h \
 	http.c \
 	dvb.h \
 	$(NULL)

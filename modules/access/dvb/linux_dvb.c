@@ -1462,10 +1462,12 @@ void DVRClose( access_t * p_access )
  *****************************************************************************/
 int CAMOpen( access_t *p_access )
 {
-    access_sys_t *p_sys = p_access->p_sys;
+    cam_t *p_cam = &p_access->p_sys->cam;
     char ca[128];
     int i_adapter, i_device;
     ca_caps_t caps;
+
+    p_cam->obj = VLC_OBJECT(p_access);
 
     i_adapter = var_GetInteger( p_access, "dvb-adapter" );
     i_device = var_GetInteger( p_access, "dvb-device" );
@@ -1478,19 +1480,17 @@ int CAMOpen( access_t *p_access )
     memset( &caps, 0, sizeof( ca_caps_t ));
 
     msg_Dbg( p_access, "Opening device %s", ca );
-    if( (p_sys->i_ca_handle = vlc_open(ca, O_RDWR | O_NONBLOCK)) < 0 )
+    p_cam->fd = vlc_open(ca, O_RDWR | O_NONBLOCK);
+    if( p_cam->fd == -1 )
     {
         msg_Warn( p_access, "CAMInit: opening CAM device failed (%m)" );
-        p_sys->i_ca_handle = 0;
         return VLC_EGENERIC;
     }
 
-    if ( ioctl( p_sys->i_ca_handle, CA_GET_CAP, &caps ) != 0 )
+    if ( ioctl( p_cam->fd, CA_GET_CAP, &caps ) < 0 )
     {
         msg_Err( p_access, "CAMInit: ioctl() error getting CAM capabilities" );
-        close( p_sys->i_ca_handle );
-        p_sys->i_ca_handle = 0;
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /* Output CA capabilities */
@@ -1519,35 +1519,35 @@ int CAMOpen( access_t *p_access )
     if ( caps.slot_num == 0 )
     {
         msg_Err( p_access, "CAMInit: CAM module with no slots" );
-        close( p_sys->i_ca_handle );
-        p_sys->i_ca_handle = 0;
-        return VLC_EGENERIC;
+        goto error;
     }
 
     if( caps.slot_type & CA_CI_LINK )
     {
-        p_sys->i_ca_type = CA_CI_LINK;
+        p_cam->i_ca_type = CA_CI_LINK;
     }
     else if( caps.slot_type & CA_CI )
     {
-        p_sys->i_ca_type = CA_CI;
+        p_cam->i_ca_type = CA_CI;
     }
     else
     {
-        p_sys->i_ca_type = -1;
+        p_cam->i_ca_type = -1;
         msg_Err( p_access, "CAMInit: incompatible CAM interface" );
-        close( p_sys->i_ca_handle );
-        p_sys->i_ca_handle = 0;
-        return VLC_EGENERIC;
+        goto error;
     }
 
-    p_sys->i_nb_slots = caps.slot_num;
-    memset( p_sys->pb_active_slot, 0, sizeof(bool) * MAX_CI_SLOTS );
-    memset( p_sys->pb_slot_mmi_expected, 0, sizeof(bool) * MAX_CI_SLOTS );
-    memset( p_sys->pb_slot_mmi_undisplayed, 0,
+    p_cam->i_nb_slots = caps.slot_num;
+    memset( p_cam->pb_active_slot, 0, sizeof(bool) * MAX_CI_SLOTS );
+    memset( p_cam->pb_slot_mmi_expected, 0, sizeof(bool) * MAX_CI_SLOTS );
+    memset( p_cam->pb_slot_mmi_undisplayed, 0,
             sizeof(bool) * MAX_CI_SLOTS );
 
-    return en50221_Init( p_access );
+    return en50221_Init( p_cam );
+error:
+    close( p_cam->fd );
+    p_cam->fd = -1;
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -1555,28 +1555,25 @@ int CAMOpen( access_t *p_access )
  *****************************************************************************/
 int CAMPoll( access_t * p_access )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    int i_ret = VLC_EGENERIC;
+    cam_t *p_cam = &p_access->p_sys->cam;
 
-    if ( p_sys->i_ca_handle == 0 )
-    {
+    if ( p_cam->fd == -1 )
         return VLC_EGENERIC;
-    }
 
-    switch( p_sys->i_ca_type )
+    switch( p_cam->i_ca_type )
     {
     case CA_CI_LINK:
-        i_ret = en50221_Poll( p_access );
-        break;
+        if ( mdate() > p_cam->i_next_event )
+        {
+            int ret = en50221_Poll( p_cam );
+            p_cam->i_next_event = mdate() + p_cam->i_timeout;
+            return ret;
+        }
     case CA_CI:
-        i_ret = VLC_SUCCESS;
-        break;
-    default:
-        msg_Err( p_access, "CAMPoll: This should not happen" );
-        break;
+        return VLC_SUCCESS;
     }
-
-    return i_ret;
+    msg_Err( p_access, "CAMPoll: This should not happen" );
+    return VLC_EGENERIC;;
 }
 
 #ifdef ENABLE_HTTPD
@@ -1586,17 +1583,18 @@ int CAMPoll( access_t * p_access )
 void CAMStatus( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    cam_t *p_cam = &p_sys->cam;
     char *p;
     ca_caps_t caps;
-    int i_slot, i;
+    int i;
 
     if ( p_sys->psz_request != NULL && *p_sys->psz_request )
     {
         /* Check if we have an undisplayed MMI message : in that case we ignore
          * the user input to avoid confusing the CAM. */
-        for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
+        for ( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
         {
-            if ( p_sys->pb_slot_mmi_undisplayed[i_slot] == true )
+            if ( p_cam->pb_slot_mmi_undisplayed[i_slot] == true )
             {
                 p_sys->psz_request = NULL;
                 msg_Dbg( p_access,
@@ -1628,14 +1626,14 @@ void CAMStatus( access_t * p_access )
         if ( HTTPExtractValue( psz_request, "open", psz_value,
                                    sizeof(psz_value) ) != NULL )
         {
-            en50221_OpenMMI( p_access, i_slot );
+            en50221_OpenMMI( p_cam, i_slot );
             return;
         }
 
         if ( HTTPExtractValue( psz_request, "close", psz_value,
                                    sizeof(psz_value) ) != NULL )
         {
-            en50221_CloseMMI( p_access, i_slot );
+            en50221_CloseMMI( p_cam, i_slot );
             return;
         }
 
@@ -1689,20 +1687,20 @@ void CAMStatus( access_t * p_access )
             }
         }
 
-        en50221_SendMMIObject( p_access, i_slot, &mmi_object );
+        en50221_SendMMIObject( p_cam, i_slot, &mmi_object );
         return;
     }
 
     /* Check that we have all necessary MMI information. */
-    for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
+    for( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
     {
-        if ( p_sys->pb_slot_mmi_expected[i_slot] == true )
+        if ( p_cam->pb_slot_mmi_expected[i_slot] == true )
             return;
     }
 
     p = p_sys->psz_mmi_info = malloc( 10000 );
 
-    if ( ioctl( p_sys->i_ca_handle, CA_GET_CAP, &caps ) != 0 )
+    if ( ioctl( p_cam->fd, CA_GET_CAP, &caps ) != 0 )
     {
         char buf[1000];
         strerror_r( errno, buf, sizeof( buf ) );
@@ -1737,15 +1735,15 @@ void CAMStatus( access_t * p_access )
 
     p += sprintf( p, "</table>" );
 
-    for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
+    for( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
     {
         ca_slot_info_t sinfo;
 
-        p_sys->pb_slot_mmi_undisplayed[i_slot] = false;
+        p_cam->pb_slot_mmi_undisplayed[i_slot] = false;
         p += sprintf( p, "<p>CA slot #%d: ", i_slot );
 
         sinfo.num = i_slot;
-        if ( ioctl( p_sys->i_ca_handle, CA_GET_SLOT_INFO, &sinfo ) != 0 )
+        if ( ioctl( p_cam->fd, CA_GET_SLOT_INFO, &sinfo ) != 0 )
         {
             char buf[1000];
             strerror_r( errno, buf, sizeof( buf ) );
@@ -1764,8 +1762,8 @@ void CAMStatus( access_t * p_access )
 
         if ( sinfo.flags & CA_CI_MODULE_READY )
         {
-            en50221_mmi_object_t *p_object = en50221_GetMMIObject( p_access,
-                                                                       i_slot );
+            en50221_mmi_object_t *p_object = en50221_GetMMIObject( p_cam,
+                                                                      i_slot );
 
             p += sprintf( p, "module present and ready<p>\n" );
             p += sprintf( p, "<form action=index.html method=get>\n" );
@@ -1845,15 +1843,15 @@ out:
  *****************************************************************************/
 int CAMSet( access_t * p_access, dvbpsi_pmt_t *p_pmt )
 {
-    access_sys_t *p_sys = p_access->p_sys;
+    cam_t *p_cam = &p_access->p_sys->cam;
 
-    if( p_sys->i_ca_handle == 0 )
+    if( p_cam->fd == -1 )
     {
         dvbpsi_DeletePMT( p_pmt );
         return VLC_EGENERIC;
     }
 
-    en50221_SetCAPMT( p_access, p_pmt );
+    en50221_SetCAPMT( p_cam, p_pmt );
 
     return VLC_SUCCESS;
 }
@@ -1863,13 +1861,11 @@ int CAMSet( access_t * p_access, dvbpsi_pmt_t *p_pmt )
  *****************************************************************************/
 void CAMClose( access_t * p_access )
 {
-    access_sys_t *p_sys = p_access->p_sys;
+    cam_t *p_cam = &p_access->p_sys->cam;
 
-    en50221_End( p_access );
+    if ( p_cam->fd == -1 )
+         return;
 
-    if ( p_sys->i_ca_handle )
-    {
-        close( p_sys->i_ca_handle );
-    }
+    en50221_End( p_cam );
+    close( p_cam->fd );
 }
-

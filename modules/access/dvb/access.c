@@ -473,11 +473,7 @@ static block_t *Block( access_t *p_access )
             return NULL;
         }
 
-        if ( p_sys->i_ca_handle && mdate() > p_sys->i_ca_next_event )
-        {
-            CAMPoll( p_access );
-            p_sys->i_ca_next_event = mdate() + p_sys->i_ca_timeout;
-        }
+        CAMPoll( p_access );
 
         if ( ufds[1].revents )
         {
