@@ -190,6 +190,8 @@ QVLCProgressDialog::QVLCProgressDialog (DialogHandler *parent,
 {
     setLabelText( qfu(data->message) );
     setRange( 0, 0 );
+    if ( data->cancel )
+        setWindowModality ( Qt::ApplicationModal );
 
     if( data->cancel )
         setCancelButton( new QPushButton( "&" + qfu(data->cancel) ) );
