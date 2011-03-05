@@ -28,20 +28,16 @@
 
 #include <vlc_common.h>
 #include <vlc_access.h>
+#include <vlc_charset.h>
 
-#include <sys/ioctl.h>
 #include <errno.h>
-
-#include <sys/types.h>
 #include <time.h>
-#include <unistd.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
 #include <poll.h>
 #include <netinet/in.h>
 
 /* DVB Card Drivers */
-#include <linux/dvb/version.h>
-#include <linux/dvb/dmx.h>
-#include <linux/dvb/frontend.h>
 #include <linux/dvb/ca.h>
 
 /* Include dvbpsi headers */
@@ -59,8 +55,6 @@
 #endif
 
 #include "dvb.h"
-
-#include <vlc_charset.h>
 
 #undef DEBUG_TPDU
 #define HLCI_WAIT_CAM_READY 0

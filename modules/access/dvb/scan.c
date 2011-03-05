@@ -29,17 +29,11 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_plugin.h>
-#include <vlc_access.h>
+#include <vlc_block.h>
 #include <vlc_dialog.h>
 #include <vlc_fs.h>
 
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
-
 #include <sys/types.h>
-#include <poll.h>
 
 /* Include dvbpsi headers */
 # include <dvbpsi/dvbpsi.h>
@@ -50,10 +44,6 @@
 # include <dvbpsi/psi.h>
 # include <dvbpsi/demux.h>
 # include <dvbpsi/sdt.h>
-
-#ifdef ENABLE_HTTPD
-#   include <vlc_httpd.h>
-#endif
 
 #include "dvb.h"
 

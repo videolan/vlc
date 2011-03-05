@@ -27,14 +27,6 @@
 #include "scan.h"
 
 /*****************************************************************************
- * Devices location
- *****************************************************************************/
-#define DMX      "/dev/dvb/adapter%d/demux%d"
-#define FRONTEND "/dev/dvb/adapter%d/frontend%d"
-#define DVR      "/dev/dvb/adapter%d/dvr%d"
-#define CA       "/dev/dvb/adapter%d/ca%d"
-
-/*****************************************************************************
  * Local structures
  *****************************************************************************/
 typedef struct demux_handle_t

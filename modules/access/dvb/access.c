@@ -36,12 +36,6 @@
 #include <vlc_plugin.h>
 #include <vlc_access.h>
 #include <vlc_input.h>
-#include <vlc_interface.h>
-#include <vlc_fs.h>
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
 
 #include <sys/types.h>
 #include <poll.h>
@@ -57,10 +51,6 @@
 # include <dvbpsi/psi.h>
 # include <dvbpsi/demux.h>
 # include <dvbpsi/sdt.h>
-
-#ifdef ENABLE_HTTPD
-#   include <vlc_httpd.h>
-#endif
 
 #include "dvb.h"
 

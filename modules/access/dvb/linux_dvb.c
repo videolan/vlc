@@ -31,15 +31,14 @@
 
 #include <vlc_common.h>
 #include <vlc_access.h>
-#include <sys/ioctl.h>
-#include <errno.h>
+#include <vlc_fs.h>
 
+#include <errno.h>
 #include <sys/types.h>
+#include <sys/ioctl.h>
 #include <fcntl.h>
-#include <time.h>
 #include <unistd.h>
 #include <poll.h>
-#include <vlc_fs.h>
 
 /* DVB Card Drivers */
 #include <linux/dvb/version.h>
@@ -62,6 +61,11 @@
 #endif
 
 #include "dvb.h"
+
+#define DMX      "/dev/dvb/adapter%d/demux%d"
+#define FRONTEND "/dev/dvb/adapter%d/frontend%d"
+#define DVR      "/dev/dvb/adapter%d/dvr%d"
+#define CA       "/dev/dvb/adapter%d/ca%d"
 
 /*
  * Frontends

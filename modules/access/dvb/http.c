@@ -28,12 +28,11 @@
 # include "config.h"
 #endif
 
+#ifdef ENABLE_HTTPD
 #include <vlc_common.h>
 #include <vlc_access.h>
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
+#include <vlc_httpd.h>
+#include <vlc_acl.h>
 
 #include <sys/types.h>
 
@@ -47,14 +46,8 @@
 # include <dvbpsi/demux.h>
 # include <dvbpsi/sdt.h>
 
-#ifdef ENABLE_HTTPD
-#   include <vlc_httpd.h>
-#   include <vlc_acl.h>
-#endif
-
 #include "dvb.h"
 
-#ifdef ENABLE_HTTPD
 struct httpd_file_sys_t
 {
     access_t         *p_access;
