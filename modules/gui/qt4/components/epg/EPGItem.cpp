@@ -55,7 +55,6 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 {
     QPen pen;
     QColor gradientColor;
-    QLinearGradient gradient( m_boundingRect.topLeft(), m_boundingRect.bottomLeft() );
 
     // Draw in view's coordinates
     painter->setWorldMatrixEnabled( false );
@@ -66,6 +65,8 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
     // Get the transformations required to map the text on the viewport
     QTransform viewPortTransform = m_view->viewportTransform();
     QRectF mapped = deviceTransform( viewPortTransform ).mapRect( boundingRect() );
+
+    QLinearGradient gradient( mapped.topLeft(), mapped.bottomLeft() );
 
     if ( m_current || m_simultaneous )
         gradientColor.setRgb( 244, 125, 0 , m_simultaneous ? 192 : 255 );
