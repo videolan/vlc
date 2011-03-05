@@ -731,7 +731,8 @@ static int FrontendInfo( access_t *p_access )
     if( p_frontend->info.caps & FE_HAS_EXTENDED_CAPS)
         msg_Dbg(p_access, "  8-level VSB modulation");
     /* 3 capabilities that don't exist yet HERE */
-#ifdef FE_CAN_TURBO_FEC
+#if (DVB_API_VERSION > 5) \
+ || ((DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 2))
     if( p_frontend->info.caps & FE_CAN_TURBO_FEC)
         msg_Dbg(p_access, "  Turbo FEC modulation");
 #else
