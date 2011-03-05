@@ -53,6 +53,11 @@ public:
         return start_.addSecs( duration ) < ref;
     }
 
+    bool plays_at( const QDateTime & ref ) const
+    {
+        return (start <= ref) && !ends_before( ref );
+    }
+
     QDateTime   start;
     int         duration;
     QString     name;

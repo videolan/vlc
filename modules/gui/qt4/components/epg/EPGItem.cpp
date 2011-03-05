@@ -40,6 +40,7 @@ EPGItem::EPGItem( EPGView *view )
     : m_view( view )
 {
     m_current = false;
+    m_simultaneous = false;
     m_boundingRect.setHeight( TRACKS_HEIGHT );
     setFlags( QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
     setAcceptHoverEvents( true );
@@ -66,8 +67,8 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QTransform viewPortTransform = m_view->viewportTransform();
     QRectF mapped = deviceTransform( viewPortTransform ).mapRect( boundingRect() );
 
-    if ( m_current )
-        gradientColor.setRgb( 244, 125, 0 );
+    if ( m_current || m_simultaneous )
+        gradientColor.setRgb( 244, 125, 0 , m_simultaneous ? 192 : 255 );
     else
         gradientColor.setRgb( 201, 217, 242 );
 
@@ -147,6 +148,7 @@ void EPGItem::setData( EPGEvent *event )
     setDuration( event->duration );
     updatePos();
     setToolTip( m_name );
+    update();
 }
 
 void EPGItem::setDuration( int duration )

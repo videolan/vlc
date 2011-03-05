@@ -61,6 +61,7 @@ private:
     QRectF      m_boundingRect;
     int         m_channelNb;
 
+    /*FIXME: Bad object design. We shouldn't need to clone this EPGEvent data */
     QDateTime   m_start;
     int         m_duration;
     QString     m_name;

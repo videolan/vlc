@@ -26,6 +26,7 @@
 #endif
 
 #include "EPGWidget.hpp"
+#include "EPGItem.hpp"
 
 #include <QVBoxLayout>
 #include <QScrollBar>
@@ -97,7 +98,7 @@ void EPGWidget::setZoom( int level )
 void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
 {
     QStringList channelsList;
-    EPGEvent* item;
+    EPGEvent* epgEvent;
 
     /* if we have epg time available take new minimum time */
     if ( i_epg > 0 && pp_epg[0]->i_event > 0 )
@@ -110,8 +111,11 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
 
     /* flag all entries as non updated */
     foreach( const QString &str, m_events.uniqueKeys() )
-        foreach( item, m_events.values( str ) )
-            item->updated = false;
+        foreach( epgEvent, m_events.values( str ) )
+        {
+            epgEvent->updated = false;
+            epgEvent->current = false;
+        }
 
     for ( int i = 0; i < i_epg; ++i )
     {
@@ -129,19 +133,19 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
             /* FIXME: EPGView timechanged signal is duplicate */
             QList<EPGEvent*> events = m_events.values( channelName );
 
-            item = new EPGEvent( eventName );
-            item->description = qfu( p_event->psz_description );
-            item->shortDescription = qfu( p_event->psz_short_description );
-            item->start = eventStart;
-            item->duration = p_event->i_duration;
-            item->channelName = channelName;
-            item->current = ( p_epg->p_current == p_event ) ? true : false;
+            epgEvent = new EPGEvent( eventName );
+            epgEvent->description = qfu( p_event->psz_description );
+            epgEvent->shortDescription = qfu( p_event->psz_short_description );
+            epgEvent->start = eventStart;
+            epgEvent->duration = p_event->i_duration;
+            epgEvent->channelName = channelName;
+            epgEvent->current = ( p_epg->p_current == p_event ) ? true : false;
 
             bool alreadyIn = false;
 
             for ( int k = 0; k < events.count(); ++k )
             {
-                if ( *events.at( k ) == *item )
+                if ( *events.at( k ) == *epgEvent )
                 {
                     alreadyIn = true;
                     events.at( k )->updated = true;
@@ -151,11 +155,11 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
 
             if ( !alreadyIn )
             {
-                m_events.insert( channelName, item );
-                m_epgView->addEvent( item );
+                m_events.insert( channelName, epgEvent );
+                m_epgView->addEvent( epgEvent );
             }
-            else /* the new item is unused */
-                delete item;
+            else /* the new epgEvent is unused */
+                delete epgEvent;
         }
     }
 
@@ -164,23 +168,28 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
     QMultiMap<QString, EPGEvent*>::iterator i = m_events.begin();
     while ( i != m_events.end() )
     {
-        item = i.value();
-        if ( channelsList.contains( item->channelName ) && !item->updated )
+        epgEvent = i.value();
+        if ( channelsList.contains( epgEvent->channelName ) && !epgEvent->updated )
         {
-            m_epgView->delEvent( item );
-            delete item;
+            m_epgView->delEvent( epgEvent );
+            delete epgEvent;
             i = m_events.erase( i );
         }
         else
         {/* If it's known but not in current libvlc data, try to expire it */
-            if ( item->ends_before( timeReference ) )
+            if ( epgEvent->ends_before( timeReference ) )
             {
-                m_epgView->delEvent( item );
-                delete item;
+                m_epgView->delEvent( epgEvent );
+                delete epgEvent;
                 i = m_events.erase( i );
             }
             else
+            {
                 ++i;
+                epgEvent->simultaneous = ( !epgEvent->current
+                            && epgEvent->plays_at( QDateTime::currentDateTime() ) );
+                epgEvent->item->setData( epgEvent ); /* update data */
+            }
         }
     }
 
