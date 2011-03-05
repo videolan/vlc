@@ -555,7 +555,6 @@ static block_t *BlockScan( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
     scan_t *p_scan = p_sys->scan;
     scan_configuration_t cfg;
-    scan_session_t session;
 
     /* */
     if( scan_Next( p_scan, &cfg ) )
@@ -571,8 +570,8 @@ static block_t *BlockScan( access_t *p_access )
     }
 
     /* */
-
-    if( scan_session_Init( VLC_OBJECT(p_access), &session, &cfg ) )
+    scan_session_t *session = scan_session_New( VLC_OBJECT(p_access), &cfg );
+    if( session == NULL )
         return NULL;
 
     /* */
@@ -593,6 +592,7 @@ static block_t *BlockScan( access_t *p_access )
     {
         msg_Err( p_access, "Failed to tune the frontend" );
         p_access->info.b_eof = true;
+        scan_session_Destroy( p_scan, session );
         return NULL;
     }
 
@@ -647,7 +647,7 @@ static block_t *BlockScan( access_t *p_access )
                 continue;
 
             msg_Err( p_access, "poll error: %m" );
-            scan_session_Clean( p_scan, &session );
+            scan_session_Destroy( p_scan, session );
 
             p_access->info.b_eof = true;
             return NULL;
@@ -687,7 +687,7 @@ static block_t *BlockScan( access_t *p_access )
             p_block->i_buffer = i_ret;
 
             /* */
-            if( scan_session_Push( &session, p_block ) )
+            if( scan_session_Push( session, p_block ) )
             {
                 msg_Dbg( p_access, "finished scanning current frequency" );
                 break;
@@ -697,9 +697,9 @@ static block_t *BlockScan( access_t *p_access )
 
     /* */
     if( i_best_snr > 0 )
-        scan_service_SetSNR( &session, i_best_snr );
+        scan_service_SetSNR( session, i_best_snr );
 
-    scan_session_Clean( p_scan, &session );
+    scan_session_Destroy( p_scan, session );
     return NULL;
 }
 

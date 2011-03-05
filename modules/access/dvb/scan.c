@@ -36,14 +36,18 @@
 #include <sys/types.h>
 
 /* Include dvbpsi headers */
-# include <dvbpsi/dvbpsi.h>
-# include <dvbpsi/descriptor.h>
-# include <dvbpsi/pat.h>
-# include <dvbpsi/pmt.h>
-# include <dvbpsi/dr.h>
-# include <dvbpsi/psi.h>
-# include <dvbpsi/demux.h>
-# include <dvbpsi/sdt.h>
+#include <dvbpsi/dvbpsi.h>
+#include <dvbpsi/descriptor.h>
+#include <dvbpsi/pat.h>
+#include <dvbpsi/pmt.h>
+#include <dvbpsi/dr.h>
+#include <dvbpsi/psi.h>
+#include <dvbpsi/demux.h>
+#include <dvbpsi/sdt.h>
+#ifdef _DVBPSI_DR_43_H_
+#   define DVBPSI_USE_NIT 1
+#   include <dvbpsi/nit.h>
+#endif
 
 #include "dvb.h"
 #include "scan.h"
@@ -85,6 +89,29 @@ struct scan_t
 
     int            i_service;
     scan_service_t **pp_service;
+};
+
+struct scan_session_t
+{
+    vlc_object_t *p_obj;
+
+    scan_configuration_t cfg;
+    int i_snr;
+
+    dvbpsi_handle pat;
+    dvbpsi_pat_t *p_pat;
+    int i_nit_pid;
+
+    dvbpsi_handle sdt;
+    dvbpsi_sdt_t *p_sdt;
+
+#ifdef DVBPSI_USE_NIT
+    dvbpsi_handle nit;
+    dvbpsi_nit_t *p_nit;
+#else
+#   warning NIT is not supported by your libdvbpsi version
+#endif
+
 };
 
 /* */
@@ -757,11 +784,12 @@ static void PSINewTableCallBack( scan_session_t *p_session, dvbpsi_handle h, uin
 #endif
 }
 
-
-int scan_session_Init( vlc_object_t *p_obj, scan_session_t *p_session, const scan_configuration_t *p_cfg )
+scan_session_t *scan_session_New( vlc_object_t *p_obj,
+                                  const scan_configuration_t *p_cfg )
 {
-    /* */
-    memset( p_session, 0, sizeof(*p_session) );
+    scan_session_t *p_session = malloc( sizeof( *p_session ) );
+    if( unlikely(p_session == NULL) )
+        return NULL;
     p_session->p_obj = p_obj;
     p_session->cfg = *p_cfg;
     p_session->i_snr = -1;
@@ -774,10 +802,10 @@ int scan_session_Init( vlc_object_t *p_obj, scan_session_t *p_session, const sca
     p_session->nit = NULL;
     p_session->p_nit = NULL;
 #endif
-    return VLC_SUCCESS;
+    return p_session;;
 }
 
-void scan_session_Clean( scan_t *p_scan, scan_session_t *p_session )
+void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
 {
     const int i_service_start = p_scan->i_service;
 
@@ -910,6 +938,7 @@ void scan_session_Clean( scan_t *p_scan, scan_session_t *p_session )
     if( p_session->p_nit )
         dvbpsi_DeleteNIT( p_session->p_nit );
 #endif
+    free( p_session );
 }
 
 static int ScanServiceCmp( const void *a, const void *b )

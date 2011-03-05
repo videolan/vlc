@@ -21,15 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA    02111, USA.
  *****************************************************************************/
 
-#ifdef _DVBPSI_DR_43_H_
-#   define DVBPSI_USE_NIT 1
-#   include <dvbpsi/nit.h>
-#endif
-
-#ifndef DVBPSI_USE_NIT
-#   warning NIT is not supported by your libdvbpsi version
-#endif
-
 typedef enum
 {
     SCAN_NONE,
@@ -94,27 +85,6 @@ typedef struct
     char c_polarization;
 } scan_configuration_t;
 
-typedef struct
-{
-    vlc_object_t *p_obj;
-
-    scan_configuration_t cfg;
-    int i_snr;
-
-    dvbpsi_handle pat;
-    dvbpsi_pat_t *p_pat;
-    int i_nit_pid;
-
-    dvbpsi_handle sdt;
-    dvbpsi_sdt_t *p_sdt;
-
-#ifdef DVBPSI_USE_NIT
-    dvbpsi_handle nit;
-    dvbpsi_nit_t *p_nit;
-#endif
-
-} scan_session_t;
-
 scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter );
 void scan_Destroy( scan_t *p_scan );
 
@@ -123,8 +93,11 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg );
 block_t *scan_GetM3U( scan_t *p_scan );
 bool scan_IsCancelled( scan_t *p_scan );
 
-int  scan_session_Init( vlc_object_t *p_obj, scan_session_t *p_session, const scan_configuration_t *p_cfg );
-void scan_session_Clean( scan_t *p_scan, scan_session_t *p_session );
+typedef struct scan_session_t scan_session_t;
+
+scan_session_t *scan_session_New( vlc_object_t *,
+                                  const scan_configuration_t * );
+void scan_session_Destroy( scan_t *, scan_session_t * );
 bool scan_session_Push( scan_session_t *p_scan, block_t *p_block );
 void scan_service_SetSNR( scan_session_t *p_scan, int i_snr );
 
