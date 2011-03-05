@@ -1412,13 +1412,11 @@ static void DateTimeSend( access_t * p_access, int i_session_id )
 
 #define DEC2BCD(d) (((d / 10) << 4) + (d % 10))
 
-        p_response[0] = htons(MJD) >> 8;
-        p_response[1] = htons(MJD) & 0xff;
+        SetWBE( &p_response[0], MJD );
         p_response[2] = DEC2BCD(tm_gmt.tm_hour);
         p_response[3] = DEC2BCD(tm_gmt.tm_min);
         p_response[4] = DEC2BCD(tm_gmt.tm_sec);
-        p_response[5] = htons(tm_loc.tm_gmtoff / 60) >> 8;
-        p_response[6] = htons(tm_loc.tm_gmtoff / 60) & 0xff;
+        SetWBE( &p_response[5], tm_loc.tm_gmtoff / 60 );
 
         APDUSend( p_access, i_session_id, AOT_DATE_TIME, p_response, 7 );
 
