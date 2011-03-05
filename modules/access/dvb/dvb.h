@@ -48,12 +48,11 @@ typedef struct
     bool b_has_lock;
 } frontend_status_t;
 
-typedef struct scan_parameter_t scan_parameter_t;
-typedef struct scan_t scan_t;
-
 #define MAX_DEMUX 256
 
 #include "en50221.h"
+struct scan_t;
+struct scan_parameter_t;
 
 struct access_sys_t
 {
@@ -85,7 +84,7 @@ struct access_sys_t
 #endif
 
     /* Scan */
-    scan_t *scan;
+    struct scan_t *scan;
 };
 
 #define VIDEO0_TYPE     1
@@ -110,7 +109,7 @@ void FrontendStatus( access_t * );
 
 int  FrontendGetStatistic( access_t *, frontend_statistic_t * );
 void FrontendGetStatus( access_t *, frontend_status_t * );
-int  FrontendGetScanParameter( access_t *, scan_parameter_t * );
+int  FrontendGetScanParameter( access_t *, struct scan_parameter_t * );
 
 int DMXSetFilter( access_t *, int i_pid, int * pi_fd, int i_type );
 int DMXUnsetFilter( access_t *, int i_fd );

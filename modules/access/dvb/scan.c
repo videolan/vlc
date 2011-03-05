@@ -49,8 +49,8 @@
 #   include <dvbpsi/nit.h>
 #endif
 
-#include "dvb.h"
 #include "scan.h"
+#include "en50221.h" // FIXME
 
 typedef enum
 {

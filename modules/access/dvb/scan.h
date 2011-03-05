@@ -37,7 +37,7 @@ typedef struct
     char c_polarization;
 } scan_dvbs_transponder_t;
 
-struct scan_parameter_t
+typedef struct scan_parameter_t
 {
     scan_type_t type;
     bool b_exhaustive;
@@ -71,7 +71,7 @@ struct scan_parameter_t
         scan_dvbs_transponder_t *p_transponders;
         int i_count;
     } sat_info;
-};
+} scan_parameter_t;
 
 typedef struct
 {
@@ -84,6 +84,8 @@ typedef struct
     int i_fec;
     char c_polarization;
 } scan_configuration_t;
+
+typedef struct scan_t scan_t;
 
 scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter );
 void scan_Destroy( scan_t *p_scan );
