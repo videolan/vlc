@@ -4282,10 +4282,6 @@ AC_CONFIG_FILES([
   modules/access/zip/Makefile
   modules/access_output/Makefile
   modules/audio_filter/Makefile
-  modules/audio_filter/channel_mixer/Makefile
-  modules/audio_filter/converter/Makefile
-  modules/audio_filter/resampler/Makefile
-  modules/audio_filter/spatializer/Makefile
   modules/audio_mixer/Makefile
   modules/audio_output/Makefile
   modules/codec/Makefile

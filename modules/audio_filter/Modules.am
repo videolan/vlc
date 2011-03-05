@@ -1,4 +1,3 @@
-SUBDIRS = channel_mixer converter resampler spatializer
 SOURCES_equalizer = equalizer.c equalizer_presets.h
 SOURCES_compressor = compressor.c
 SOURCES_normvol = normvol.c
@@ -6,6 +5,13 @@ SOURCES_audiobargraph_a = audiobargraph_a.c
 SOURCES_param_eq = param_eq.c
 SOURCES_scaletempo = scaletempo.c
 SOURCES_chorus_flanger = chorus_flanger.c
+SOURCES_spatializer = \
+	spatializer/allpass.cpp spatializer/allpass.hpp \
+	spatializer/comb.cpp spatializer/comb.hpp \
+	spatializer/denormals.h spatializer/denormals.c \
+	spatializer/tuning.h \
+	spatializer/revmodel.cpp spatializer/revmodel.hpp \
+	spatializer/spatializer.cpp
 
 libvlc_LTLIBRARIES += \
 	libaudiobargraph_a_plugin.la \
@@ -15,4 +21,42 @@ libvlc_LTLIBRARIES += \
 	libnormvol_plugin.la \
 	libparam_eq_plugin.la \
 	libscaletempo_plugin.la \
-	$(NULL)
+	libspatializer_plugin.la
+
+# Channel mixers
+SOURCES_trivial_channel_mixer = channel_mixer/trivial.c
+SOURCES_simple_channel_mixer = channel_mixer/simple.c
+SOURCES_headphone_channel_mixer = channel_mixer/headphone.c
+SOURCES_dolby_surround_decoder = channel_mixer/dolby.c
+SOURCES_mono = channel_mixer/mono.c
+
+libvlc_LTLIBRARIES += \
+	libdolby_surround_decoder_plugin.la \
+	libheadphone_channel_mixer_plugin.la \
+	libmono_plugin.la \
+	libsimple_channel_mixer_plugin.la \
+	libtrivial_channel_mixer_plugin.la
+
+# Converters
+SOURCES_converter_fixed = converter/fixed.c
+SOURCES_a52tospdif = converter/a52tospdif.c
+SOURCES_a52tofloat32 = converter/a52tofloat32.c
+SOURCES_dtstospdif = converter/dtstospdif.c
+SOURCES_dtstofloat32 = converter/dtstofloat32.c
+SOURCES_mpgatofixed32 = converter/mpgatofixed32.c
+SOURCES_audio_format = converter/format.c
+
+libvlc_LTLIBRARIES += \
+	liba52tospdif_plugin.la \
+	libaudio_format_plugin.la \
+	libconverter_fixed_plugin.la \
+	libdtstospdif_plugin.la
+
+# Resamplers
+SOURCES_bandlimited_resampler = \
+	resampler/bandlimited.c resampler/bandlimited.h
+SOURCES_ugly_resampler = resampler/ugly.c
+
+libvlc_LTLIBRARIES += \
+	libbandlimited_resampler_plugin.la \
+	libugly_resampler_plugin.la

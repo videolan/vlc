@@ -1,4 +1,0 @@
-SOURCES_spatializer = spatializer.cpp \
-    allpass.cpp allpass.hpp comb.cpp comb.hpp \
-    denormals.h denormals.c tuning.h revmodel.cpp revmodel.hpp
-libvlc_LTLIBRARIES += libspatializer_plugin.la
