@@ -108,7 +108,7 @@ typedef struct en50221_mmi_object_t
     } u;
 } en50221_mmi_object_t;
 
-static __inline__ void en50221_MMIFree( en50221_mmi_object_t *p_object )
+static inline void en50221_MMIFree( en50221_mmi_object_t *p_object )
 {
     int i;
 

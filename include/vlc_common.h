@@ -780,7 +780,6 @@ static inline uint64_t ntoh64 (uint64_t ll)
 /* win32, cl and icl support */
 #   if defined( _MSC_VER ) || !defined( __MINGW32__ )
 #       define __attribute__(x)
-#       define __inline__      __inline
 #       define S_IFBLK         0x3000  /* Block */
 #       define S_ISBLK(m)      (0)
 #       define S_ISCHR(m)      (0)
