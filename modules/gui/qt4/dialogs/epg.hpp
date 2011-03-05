@@ -29,6 +29,7 @@
 
 class QLabel;
 class QTextEdit;
+class QTimer;
 class EPGEvent;
 class EPGWidget;
 
@@ -42,6 +43,7 @@ private:
     EPGWidget *epg;
     QTextEdit *description;
     QLabel *title;
+    QTimer *timer;
 
     friend class    Singleton<EpgDialog>;
 

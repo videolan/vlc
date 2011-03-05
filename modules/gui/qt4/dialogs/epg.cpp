@@ -35,6 +35,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QDialogButtonBox>
+#include <QTimer>
 
 #include "qt4.hpp"
 #include "input_manager.hpp"
@@ -88,6 +89,11 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     boxLayout->addWidget( buttonsBox );
     CONNECT( buttonsBox, rejected(), this, close() );
 
+    timer = new QTimer( this );
+    timer->setSingleShot( true );
+    timer->setInterval( 1000 * 60 );
+    CONNECT( timer, timeout(), this, updateInfos() );
+
     updateInfos();
     readSettings( "EPGDialog", QSize( 650, 450 ) );
 }
@@ -122,10 +128,11 @@ void EpgDialog::showEvent( EPGEvent *event )
 void EpgDialog::updateInfos()
 {
     if( !THEMIM->getInput() ) return;
+    timer->stop();
     int i_nbitems = input_GetItem( THEMIM->getInput())->i_epg;
     if ( i_nbitems > 0 ) msg_Dbg( p_intf, "Found %i EPG items", i_nbitems );
     epg->updateEPG( input_GetItem( THEMIM->getInput())->pp_epg,
                     input_GetItem( THEMIM->getInput())->i_epg,
                     input_GetItem( THEMIM->getInput())->i_type);
-
+    if ( isVisible() ) timer->start();
 }
