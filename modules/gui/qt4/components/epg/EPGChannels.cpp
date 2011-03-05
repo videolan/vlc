@@ -52,10 +52,16 @@ void EPGChannels::paintEvent( QPaintEvent *event )
 
     for( int i = 0; i < channels.count(); ++i )
     {
-        p.drawText( 0, - m_offset + ( i + 0.5 ) * TRACKS_HEIGHT - 4,
-                    width(), 20, Qt::AlignLeft, channels[i] );
+        QString text( channels[i] );
+        /* try to remove the " [Program xxx]" end */
+        int i_idx_channel = text.lastIndexOf(" [Program ");
+        if (i_idx_channel > 0)
+            text = text.left( i_idx_channel );
 
-        int i_width = fontMetrics().width( channels[i] );
+        p.drawText( 0, - m_offset + ( i + 0.5 ) * TRACKS_HEIGHT - 4,
+                    width(), 20, Qt::AlignLeft, text );
+
+        int i_width = fontMetrics().width( text );
         if( width() < i_width )
             setMinimumWidth( i_width );
     }
