@@ -32,7 +32,7 @@ class EPGEvent
 {
 public:
     EPGEvent( const QString& eventName )
-        : current( false ), updated( true ), item( NULL )
+        : current( false ), updated( true ), simultaneous( false ), item( NULL )
     {
         name = eventName;
     }
@@ -62,6 +62,7 @@ public:
     QString     channelName;
     bool        current;
     bool        updated;
+    bool        simultaneous;
 
     EPGItem     *item;
 };

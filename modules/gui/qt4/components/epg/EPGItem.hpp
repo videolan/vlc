@@ -31,6 +31,7 @@ class QString;
 class QDateTime;
 
 class EPGView;
+class EPGEvent;
 
 class EPGItem : public QGraphicsItem
 {
@@ -46,13 +47,9 @@ public:
     int duration() const;
     int getChannelNb() const;
 
+    void setData( EPGEvent * );
     void setChannelNb( int channelNb );
-    void setStart( const QDateTime& start );
     void setDuration( int duration );
-    void setName( const QString& name );
-    void setDescription( const QString& description );
-    void setShortDescription( const QString& shortDescription );
-    void setCurrent( bool current );
     void updatePos();
 
 protected:
@@ -70,6 +67,7 @@ private:
     QString     m_description;
     QString     m_shortDescription;
     bool        m_current;
+    bool        m_simultaneous;
 };
 
 #endif // EPGITEM_H

@@ -40,7 +40,6 @@ EPGItem::EPGItem( EPGView *view )
     : m_view( view )
 {
     m_current = false;
-
     m_boundingRect.setHeight( TRACKS_HEIGHT );
     setFlags( QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
     setAcceptHoverEvents( true );
@@ -137,37 +136,23 @@ void EPGItem::setChannelNb( int channelNb )
     updatePos();
 }
 
-void EPGItem::setStart( const QDateTime& start )
+void EPGItem::setData( EPGEvent *event )
 {
-    m_start = start;
+    m_start = event->start;
+    m_name = event->name;
+    m_description = event->description;
+    m_shortDescription = event->shortDescription;
+    m_current = event->current;
+    m_simultaneous = event->simultaneous;
+    setDuration( event->duration );
     updatePos();
+    setToolTip( m_name );
 }
 
 void EPGItem::setDuration( int duration )
 {
     m_duration = duration;
     m_boundingRect.setWidth( duration );
-}
-
-void EPGItem::setName( const QString& name )
-{
-    m_name = name;
-    setToolTip( m_name );
-}
-
-void EPGItem::setDescription( const QString& description )
-{
-    m_description = description;
-}
-
-void EPGItem::setShortDescription( const QString& shortDescription )
-{
-    m_shortDescription = shortDescription;
-}
-
-void EPGItem::setCurrent( bool current )
-{
-    m_current = current;
 }
 
 void EPGItem::updatePos()

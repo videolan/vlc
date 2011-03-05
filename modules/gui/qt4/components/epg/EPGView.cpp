@@ -92,13 +92,9 @@ void EPGView::addEvent( EPGEvent* event )
         m_channels.append( event->channelName );
 
     EPGItem* item = new EPGItem( this );
+    item->setData( event );
     item->setChannelNb( m_channels.indexOf( event->channelName ) );
-    item->setStart( event->start );
     item->setDuration( event->duration );
-    item->setName( event->name );
-    item->setDescription( event->description );
-    item->setShortDescription( event->shortDescription );
-    item->setCurrent( event->current );
 
     event->item = item;
 
