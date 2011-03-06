@@ -54,6 +54,7 @@
 #endif
 
 #include "dvb.h"
+#include "../../demux/dvb-text.h"
 
 #undef DEBUG_TPDU
 #define HLCI_WAIT_CAM_READY 0
@@ -1594,7 +1595,7 @@ static char *MMIGetText( cam_t *p_cam, uint8_t **pp_apdu, int *pi_size )
     *pp_apdu += l + 4;
     *pi_size -= l + 4;
 
-    return dvbsi_to_utf8((char*)d,l);
+    return vlc_from_EIT(d,l);
 }
 
 /*****************************************************************************
@@ -2252,111 +2253,4 @@ void en50221_End( cam_t * p_cam )
 
     /* Leave the CAM configured, so that it can be reused in another
      * program. */
-}
-
-/* FIXME same than EITConvertToUTF8 from TS demux */
-char *dvbsi_to_utf8( const char *psz_instring, size_t i_length )
-{
-    const char *psz_encoding;
-    char psz_encbuf[sizeof( "ISO_8859-123" )];
-    size_t offset = 1;
-
-    if( i_length < 1 ) return NULL;
-    if( psz_instring[0] >= 0x20 )
-    {
-        psz_encoding = "ISO_6937";
-        offset = 0;
-    }
-    else switch( psz_instring[0] )
-    {
-    case 0x01:
-        psz_encoding = "ISO_8859-5";
-        break;
-    case 0x02:
-        psz_encoding = "ISO_8859-6";
-        break;
-    case 0x03:
-        psz_encoding = "ISO_8859-7";
-        break;
-    case 0x04:
-        psz_encoding = "ISO_8859-8";
-        break;
-    case 0x05:
-        psz_encoding = "ISO_8859-9";
-        break;
-    case 0x06:
-        psz_encoding = "ISO_8859-10";
-        break;
-    case 0x07:
-        psz_encoding = "ISO_8859-11";
-        break;
-    case 0x08:
-        psz_encoding = "ISO_8859-12";
-        break;
-    case 0x09:
-        psz_encoding = "ISO_8859-13";
-        break;
-    case 0x0a:
-        psz_encoding = "ISO_8859-14";
-        break;
-    case 0x0b:
-        psz_encoding = "ISO_8859-15";
-        break;
-    case 0x10:
-#warning Is Latin-10 (psz_instring[2] == 16) really illegal?
-        if( i_length < 3 || psz_instring[1] != 0x00 || psz_instring[2] > 15
-         || psz_instring[2] == 0 )
-        {
-            psz_encoding = "UTF-8";
-            offset = 0;
-        }
-        else
-        {
-            sprintf( psz_encbuf, "ISO_8859-%u", psz_instring[2] );
-            psz_encoding = psz_encbuf;
-            offset = 3;
-        }
-        break;
-    case 0x11:
-#warning Is there a BOM or do we use a fixed endianess?
-        psz_encoding = "UTF-16";
-        break;
-    case 0x12:
-        psz_encoding = "KSC5601-1987";
-        break;
-    case 0x13:
-        psz_encoding = "GB2312"; /* GB-2312-1980 */
-        break;
-    case 0x14:
-        psz_encoding = "BIG-5";
-        break;
-    case 0x15:
-        psz_encoding = "UTF-8";
-        break;
-    default:
-        /* invalid */
-        psz_encoding = "UTF-8";
-        offset = 0;
-    }
-
-    psz_instring += offset;
-    i_length -= offset;
-
-    char *psz = FromCharset( psz_encoding, psz_instring, i_length );
-    if( psz == NULL )
-    {    /* Invalid character set (e.g. ISO_8859-12) */
-        psz = strndup( (const char *)psz_instring, i_length );
-        if( unlikely(psz == NULL) )
-            return NULL;
-        EnsureUTF8( psz );
-    }
-
-    /* Convert EIT-coded CR/LFs */
-    for(char *p = strstr( psz, "\xc2\x8a" ); p != NULL;
-        p = strstr( p, "\xc2\x8a" ))
-    {
-        p[0] = ' ';
-        p[1] = '\n';
-    }
-    return psz;
 }

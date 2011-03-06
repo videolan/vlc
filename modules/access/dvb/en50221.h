@@ -139,5 +139,3 @@ int en50221_CloseMMI( cam_t *, unsigned i_slot );
 en50221_mmi_object_t *en50221_GetMMIObject( cam_t *, unsigned i_slot );
 void en50221_SendMMIObject( cam_t *, unsigned i_slot, en50221_mmi_object_t * );
 void en50221_End( cam_t * );
-
-char *dvbsi_to_utf8( const char *psz_instring, size_t i_length );

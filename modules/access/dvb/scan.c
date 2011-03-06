@@ -32,6 +32,7 @@
 #include <vlc_block.h>
 #include <vlc_dialog.h>
 #include <vlc_fs.h>
+#include <vlc_charset.h>
 
 #include <sys/types.h>
 
@@ -50,7 +51,7 @@
 #endif
 
 #include "scan.h"
-#include "en50221.h" // FIXME
+#include "../../demux/dvb-text.h"
 
 typedef enum
 {
@@ -850,7 +851,8 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
                     if( s )
                     {
                         if( !s->psz_name )
-                            s->psz_name = dvbsi_to_utf8( (const char *)pD->i_service_name, pD->i_service_name_length );
+                            s->psz_name = vlc_from_EIT( pD->i_service_name,
+                                                   pD->i_service_name_length );
 
                         if( s->type == SERVICE_UNKNOWN )
                         {

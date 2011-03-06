@@ -1,8 +1,9 @@
 SOURCES_dvb = \
 	access.c \
-	scan.c scan.h \
 	linux_dvb.c \
+	scan.c scan.h \
 	en50221.c en50221.h \
+	../../demux/dvb-text.h \
 	http.c \
 	dvb.h \
 	$(NULL)
