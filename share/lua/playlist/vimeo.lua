@@ -64,9 +64,9 @@ function parse()
                 ishd = true
             end
         end
-        table.insert( p, { path = "http://vimeo.com/moogaloop/play/clip:"..id.."/"..rsig.."/"..rsigtime; name = name; arturl = arturl; options = {":demux=avformat,ffmpeg"} } )
+        table.insert( p, { path = "http://vimeo.com/moogaloop/play/clip:"..id.."/"..rsig.."/"..rsigtime; name = name; arturl = arturl } )
         if ishd == true then
-            table.insert( p, { path = "http://vimeo.com/moogaloop/play/clip:"..id.."/"..rsig.."/"..rsigtime.."/?q=hd"; name = name.." (HD)"; arturl = arturl; options = {":demux=avformat,ffmpeg"} } )
+            table.insert( p, { path = "http://vimeo.com/moogaloop/play/clip:"..id.."/"..rsig.."/"..rsigtime.."/?q=hd"; name = name.." (HD)"; arturl = arturl } )
         end
     end
     return p
