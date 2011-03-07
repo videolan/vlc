@@ -38,7 +38,6 @@ function probe()
     if vlc.access ~= "http" and vlc.access ~= "https" then
         return false
     end
-    options = {":demux=avformat,ffmpeg"}
     youtube_site = string.match( string.sub( vlc.path, 1, 8 ), "youtube" )
     if not youtube_site then
         -- FIXME we should be using a builtin list of known youtube websites
@@ -152,7 +151,7 @@ function parse()
                 path = "http://www.youtube.com/v/"..video_id
             end
         end
-        return { { path = path; name = name; description = description; artist = artist; arturl = arturl; options = options } }
+        return { { path = path; name = name; description = description; artist = artist; arturl = arturl } }
     else -- This is the flash player's URL
         if string.match( vlc.path, "title=" ) then
             name = vlc.strings.decode_uri(get_url_param( vlc.path, "title" ))
@@ -168,8 +167,8 @@ function parse()
         if not string.match( vlc.path, "t=" ) then
             -- This sucks, we're missing "t" which is now mandatory. Let's
             -- try using another url
-            return { { path = "http://www.youtube.com/v/"..video_id; name = name; arturl = arturl; options=options } }
+            return { { path = "http://www.youtube.com/v/"..video_id; name = name; arturl = arturl } }
         end
-        return { { path = "http://www.youtube.com/get_video.php?video_id="..video_id.."&t="..get_url_param( vlc.path, "t" )..format; name = name; arturl = arturl; options=options } }
+        return { { path = "http://www.youtube.com/get_video.php?video_id="..video_id.."&t="..get_url_param( vlc.path, "t" )..format; name = name; arturl = arturl } }
     end
 end
