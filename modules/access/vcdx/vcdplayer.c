@@ -557,16 +557,6 @@ vcdplayer_pbc_nav ( access_t * p_access, uint8_t *wait_time )
       }
       break;
     }
-  case VCDINFO_ITEM_TYPE_NOTFOUND:
-    LOG_ERR( "NOTFOUND in PBC -- not supposed to happen" );
-    break;
-  case VCDINFO_ITEM_TYPE_SPAREID2:
-    LOG_ERR( "SPAREID2 in PBC -- not supposed to happen" );
-    break;
-  case VCDINFO_ITEM_TYPE_LID:
-    LOG_ERR( "LID in PBC -- not supposed to happen" );
-    break;
- 
   default:
     ;
   }
