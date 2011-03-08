@@ -82,7 +82,7 @@ function parse()
                 table.insert( playlist, { path = urlline,
                                           name = description ..  '(' .. resolution .. ')',
                                           arturl = art_url,
-                                          options = {":http-user-agent=QuickTime/7.2", ":demux=avformat,ffmpeg",":play-and-pause"} } )
+                                          options = {":http-user-agent=QuickTime/7.2", ":play-and-pause"} } )
             end
         end
     end
