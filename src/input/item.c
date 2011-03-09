@@ -898,6 +898,9 @@ input_item_t *input_item_Copy( vlc_object_t *p_obj, input_item_t *p_input )
         }
     }
 
+    p_new_input->p_meta = vlc_meta_New();
+    vlc_meta_Merge( p_new_input->p_meta, p_input->p_meta );
+
     vlc_mutex_unlock( &p_input->lock );
 
     return p_new_input;
