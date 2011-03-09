@@ -183,14 +183,15 @@ static int Open ( vlc_object_t *p_this )
     }
 
     /* Reduce overall latency to 200mS to reduce audible clicks
-     * Also pulse minreq and internal buffers are now 20mS which reduces resampling
+     * Also pulse minreq and internal buffers are now 100mS which reduces resampling
+     * but still shouldn't drop samples with some usb sound cards
      */
     a.tlength = pa_bytes_per_second(&ss)/5;
     a.maxlength = a.tlength * 2;
     a.prebuf = a.tlength / 2;
-    a.minreq = a.tlength / 10;
+    a.minreq = a.tlength / 2;
 
-    /* Buffer size is 20mS */
+    /* Buffer size is 100mS */
     p_sys->buffer_size = a.minreq;
 
     /* Initialise the speaker map setup above */
