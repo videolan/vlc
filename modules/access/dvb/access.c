@@ -583,6 +583,9 @@ static block_t *BlockScan( access_t *p_access )
     if ( cfg.c_polarization )
         var_SetInteger( p_access, "dvb-voltage", cfg.c_polarization == 'H' ? 18 : 13 );
 
+    if ( cfg.i_modulation )
+        var_SetInteger( p_access, "dvb-modulation", cfg.i_modulation );
+
     /* Setting frontend parameters for tuning the hardware */
     if( FrontendSet( p_access ) < 0 )
     {

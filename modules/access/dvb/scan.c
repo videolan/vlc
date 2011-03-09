@@ -165,6 +165,7 @@ scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
         msg_Dbg( p_obj, " - bandwidth [%d,%d]",
                  p_parameter->bandwidth.i_min, p_parameter->bandwidth.i_max );
         msg_Dbg( p_obj, " - exhaustive mode %s", p_parameter->b_exhaustive ? "on" : "off" );
+        msg_Dbg( p_obj, " - scannin modulations %s", p_parameter->b_modulation_set ? "off" : "on" );
     }
     else if( p_parameter->type == SCAN_DVB_S )
     {
@@ -553,7 +554,23 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
         free( psz_text );
     }
 
-    p_scan->i_index++;
+    if( i_service == 0 &&
+        p_scan->parameter.type == SCAN_DVB_C &&
+        !p_scan->parameter.b_modulation_set )
+    {
+        p_scan->parameter.i_modulation = (p_scan->parameter.i_modulation << 1 ) % 512;
+        /* if we iterated all modulations, move on */
+        if( !p_cfg->i_modulation )
+        {
+            p_scan->parameter.i_modulation = 16;
+            p_scan->i_index++;
+        }
+        msg_Dbg( p_scan->p_obj, "modulation %d ", p_cfg->i_modulation );
+    } else {
+       p_scan->i_index++;
+    }
+    if( p_scan->parameter.type == SCAN_DVB_C )
+       p_cfg->i_modulation = p_scan->parameter.i_modulation;
     return VLC_SUCCESS;
 }
 
@@ -1010,10 +1027,10 @@ block_t *scan_GetM3U( scan_t *p_scan )
             psz_type = "Unknown";
             break;
         }
-        msg_Warn( p_obj, "scan_GetM3U: service number %d type '%s' name '%s' channel %d cypted=%d| network_id %d (nit:%d sdt:%d)| f=%d bw=%d snr=%d",
+        msg_Warn( p_obj, "scan_GetM3U: service number %d type '%s' name '%s' channel %d cypted=%d| network_id %d (nit:%d sdt:%d)| f=%d bw=%d snr=%d modulation=%d",
                   s->i_program, psz_type, s->psz_name, s->i_channel, s->b_crypted,
                   s->i_network_id, s->i_nit_version, s->i_sdt_version,
-                  s->cfg.i_frequency, s->cfg.i_bandwidth, s->i_snr );
+                  s->cfg.i_frequency, s->cfg.i_bandwidth, s->i_snr, s->cfg.i_modulation );
 
         if( !s->cfg.i_fec )
             s->cfg.i_fec = 9;   /* FEC_AUTO */
@@ -1021,14 +1038,15 @@ block_t *scan_GetM3U( scan_t *p_scan )
         char *psz;
         if( asprintf( &psz, "#EXTINF:,,%s\n"
                         "#EXTVLCOPT:program=%d\n"
-                        "dvb://frequency=%d:bandwidth=%d:voltage=%d:fec=%d\n"
+                        "dvb://frequency=%d:bandwidth=%d:voltage=%d:fec=%d:modulation=%d\n"
                         "\n",
                       s->psz_name && * s->psz_name ? s->psz_name : "Unknown",
                       s->i_program,
                       s->cfg.i_frequency,
                       s->cfg.i_bandwidth,
                       s->cfg.c_polarization == 'H' ? 18 : 13,
-                      s->cfg.i_fec ) < 0 )
+                      s->cfg.i_fec,
+                      s->cfg.i_modulation ) < 0 )
             psz = NULL;
         if( psz )
         {

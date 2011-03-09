@@ -43,7 +43,9 @@ typedef struct scan_parameter_t
     bool b_exhaustive;
     bool b_use_nit;
     bool b_free_only;
+    bool b_modulation_set;
 
+    int i_modulation;
     struct
     {
         int i_min;
@@ -82,6 +84,7 @@ typedef struct
         int i_symbol_rate;
     };
     int i_fec;
+    int i_modulation;
     char c_polarization;
 } scan_configuration_t;
 

@@ -424,6 +424,17 @@ static int ScanParametersDvbC( access_t *p_access, scan_parameter_t *p_scan )
         ? p_frontend->info.frequency_stepsize : 166667;
     p_scan->frequency.i_count = (p_scan->frequency.i_max-p_scan->frequency.i_min)/p_scan->frequency.i_step;
 
+    /* if user supplies modulation or frontend can do auto, dont scan them */
+    if( var_GetInteger( p_access, "dvb-modulation" ) ||
+        p_frontend->info.caps & FE_CAN_QAM_AUTO )
+    {
+        p_scan->b_modulation_set = true;
+    } else {
+        p_scan->b_modulation_set = false;
+        /* our scanning code flips modulation from 16..256 automaticly*/
+        p_scan->i_modulation = 0;
+    }
+
     /* */
     p_scan->bandwidth.i_min  = 6;
     p_scan->bandwidth.i_max  = 8;
