@@ -560,12 +560,12 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
     {
         p_scan->parameter.i_modulation = (p_scan->parameter.i_modulation << 1 ) % 512;
         /* if we iterated all modulations, move on */
-        if( !p_cfg->i_modulation )
+        if( !p_scan->parameter.i_modulation )
         {
             p_scan->parameter.i_modulation = 16;
             p_scan->i_index++;
         }
-        msg_Dbg( p_scan->p_obj, "modulation %d ", p_cfg->i_modulation );
+        msg_Dbg( p_scan->p_obj, "modulation %d ", p_scan->parameter.i_modulation);
     } else {
        p_scan->i_index++;
     }
