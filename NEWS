@@ -17,6 +17,7 @@ Access
  * Multiple files are now supported inside RAR files
  * BDA: experimental support for ClearQam devices
  * DVB-S scanning support
+ * DVB-C scanning scans correct modulation too if needed
  * DShow: support for freq and video standard selection
  * Support for VDR recordings (http://www.tvdr.de/) folders
  * Blu-Ray Discs integration using libbluray
