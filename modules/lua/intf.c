@@ -390,7 +390,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
         free( psz_config );
     }
 
-    if( b_config_set == false )
+    if( !b_config_set )
     {
         lua_newtable( L );
         lua_setglobal( L, "config" );
