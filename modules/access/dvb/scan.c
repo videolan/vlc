@@ -384,7 +384,10 @@ static int ScanDvbCNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
     if( p_scan->i_index < num_frequencies )
     {
         p_cfg->i_frequency = 1000000 * ( frequencies[ p_scan->i_index ] );
-        *pf_pos = (double)p_scan->i_index / num_frequencies;
+        *pf_pos = (double)(p_scan->i_index * 1000 +
+                           p_scan->parameter.i_symbolrate * 100 +
+                           (p_scan->parameter.i_modulation >> 4) )
+                           / (num_frequencies * 1000 + 900 + 16);
         return VLC_SUCCESS;
     }
     return VLC_EGENERIC;
