@@ -260,7 +260,7 @@ HRESULT CapturePin::CustomGetSample( VLCMediaSample *vlc_sample )
     msg_Dbg( p_input, "CapturePin::CustomGetSample" );
 #endif
 
-    if( samples_queue.size() )
+    if( !samples_queue.empty() )
     {
         *vlc_sample = samples_queue.back();
         samples_queue.pop_back();
@@ -592,7 +592,7 @@ STDMETHODIMP CapturePin::EndFlush( void )
     VLCMediaSample vlc_sample;
 
     vlc_mutex_lock( &p_sys->lock );
-    while( samples_queue.size() )
+    while( !samples_queue.empty() )
     {
         vlc_sample = samples_queue.back();
         samples_queue.pop_back();

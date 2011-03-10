@@ -1015,7 +1015,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
 
     /* Enumerate devices and display their names */
     FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
-    if( !list_devices.size() )
+    if( list_devices.empty() )
         return VLC_EGENERIC;
 
     list<string>::iterator iter;
