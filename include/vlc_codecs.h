@@ -235,6 +235,9 @@ ATTR_PACKED
 #define WAVE_FORMAT_WMAP                0x0162 /* WMA 9 Professional */
 #define WAVE_FORMAT_WMAL                0x0163 /* WMA 9 Lossless */
 
+#define WAVE_FORMAT_AAC_2               0x1601 /* Other AAC */
+#define WAVE_FORMAT_AAC_LATM            0x1602 /* AAC/LATM */
+
 #define WAVE_FORMAT_A52                 0x2000 /* a52 */
 #define WAVE_FORMAT_DTS                 0x2001 /* DTS */
 #define WAVE_FORMAT_FFMPEG_AAC          0x706D
@@ -345,6 +348,8 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_DTS_MS,     VLC_CODEC_DTS,                    "DTS Coherent Acoustics" },
     { WAVE_FORMAT_DIVIO_AAC,  VLC_CODEC_MP4A,                   "MPEG-4 Audio (Divio)" },
     { WAVE_FORMAT_AAC,        VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
+    { WAVE_FORMAT_AAC_2,      VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
+    { WAVE_FORMAT_AAC_LATM,   VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_FFMPEG_AAC, VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_VORBIS,     VLC_CODEC_VORBIS,                 "Vorbis Audio" },
     { WAVE_FORMAT_VORB_1,     VLC_FOURCC( 'v', 'o', 'r', '1' ), "Vorbis 1 Audio" },
