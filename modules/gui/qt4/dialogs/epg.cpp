@@ -129,10 +129,13 @@ void EpgDialog::updateInfos()
 {
     if( !THEMIM->getInput() ) return;
     timer->stop();
-    int i_nbitems = input_GetItem( THEMIM->getInput())->i_epg;
+    input_item_t *p_input_item = input_GetItem( THEMIM->getInput() );
+    vlc_mutex_lock(  & p_input_item->lock );
+    int i_nbitems = p_input_item->i_epg;
     if ( i_nbitems > 0 ) msg_Dbg( p_intf, "Found %i EPG items", i_nbitems );
-    epg->updateEPG( input_GetItem( THEMIM->getInput())->pp_epg,
-                    input_GetItem( THEMIM->getInput())->i_epg,
-                    input_GetItem( THEMIM->getInput())->i_type);
+    epg->updateEPG( p_input_item->pp_epg,
+                    p_input_item->i_epg,
+                    p_input_item->i_type);
+    vlc_mutex_unlock( & p_input_item->lock );
     if ( isVisible() ) timer->start();
 }
