@@ -214,7 +214,7 @@ vlc_module_begin ()
     add_integer( "dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT,
                  true )
     add_integer( "dvb-fec", 9, FEC_TEXT, FEC_LONGTEXT, true )
-    add_integer( "dvb-srate", 27500000, SRATE_TEXT, SRATE_LONGTEXT,
+    add_integer( "dvb-srate", 0, SRATE_TEXT, SRATE_LONGTEXT,
                  false )
     add_integer( "dvb-lnb-lof1", 0, LNB_LOF1_TEXT,
                  LNB_LOF1_LONGTEXT, true )
@@ -585,6 +585,9 @@ static block_t *BlockScan( access_t *p_access )
 
     if ( cfg.i_modulation )
         var_SetInteger( p_access, "dvb-modulation", cfg.i_modulation );
+
+    if ( cfg.i_symbolrate )
+        var_SetInteger( p_access, "dvb-srate", cfg.i_symbolrate );
 
     /* Setting frontend parameters for tuning the hardware */
     if( FrontendSet( p_access ) < 0 )

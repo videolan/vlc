@@ -555,22 +555,49 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
     }
 
     if( i_service == 0 &&
-        p_scan->parameter.type == SCAN_DVB_C &&
-        !p_scan->parameter.b_modulation_set )
+        p_scan->parameter.type == SCAN_DVB_C )
     {
-        p_scan->parameter.i_modulation = (p_scan->parameter.i_modulation << 1 ) % 512;
-        /* if we iterated all modulations, move on */
-        if( !p_scan->parameter.i_modulation )
+        bool b_rotate=true;
+        if( !p_scan->parameter.b_modulation_set )
         {
-            p_scan->parameter.i_modulation = 16;
-            p_scan->i_index++;
+            p_scan->parameter.i_modulation = (p_scan->parameter.i_modulation << 1 ) % 512;
+            /* if we iterated all modulations, move on */
+            if( !p_scan->parameter.i_modulation )
+            {
+                p_scan->parameter.i_modulation = 16;
+            } else {
+                b_rotate=false;
+            }
+            msg_Dbg( p_scan->p_obj, "modulation %d ", p_scan->parameter.i_modulation);
         }
-        msg_Dbg( p_scan->p_obj, "modulation %d ", p_scan->parameter.i_modulation);
+        if( !p_scan->parameter.b_symbolrate_set )
+        {
+            /* symbol rates from dvb-tools dvb-c files */
+            static const unsigned short symbolrates[] = {
+             6900, 6875, 6950, 7000, 3450, 6111,
+             6428, 6952, 5900, 5000 };
+
+            enum { num_symbols = (sizeof(symbolrates)/sizeof(*symbolrates)) };
+
+            /* if we rotated modulations, rotate symbolrate */
+            if( b_rotate )
+               p_scan->parameter.i_symbolrate = (++p_scan->parameter.i_symbolrate % num_symbols );
+            p_cfg->i_symbolrate = 1000 * (symbolrates[ p_scan->parameter.i_symbolrate ] );
+            msg_Dbg( p_scan->p_obj, "symbolrate %d", p_cfg->i_symbolrate );
+            if( p_scan->parameter.i_symbolrate )
+                b_rotate=false;
+        }
+        if( b_rotate )
+            p_scan->i_index++;
     } else {
        p_scan->i_index++;
     }
     if( p_scan->parameter.type == SCAN_DVB_C )
+    {
        p_cfg->i_modulation = p_scan->parameter.i_modulation;
+       if( !p_cfg->i_symbolrate )
+           p_cfg->i_symbolrate = var_GetInteger( p_scan->p_obj, "dvb-srate" );
+    }
     return VLC_SUCCESS;
 }
 
@@ -1038,7 +1065,7 @@ block_t *scan_GetM3U( scan_t *p_scan )
         char *psz;
         if( asprintf( &psz, "#EXTINF:,,%s\n"
                         "#EXTVLCOPT:program=%d\n"
-                        "dvb://frequency=%d:bandwidth=%d:voltage=%d:fec=%d:modulation=%d\n"
+                        "dvb://frequency=%d:bandwidth=%d:voltage=%d:fec=%d:modulation=%d:srate=%d\n"
                         "\n",
                       s->psz_name && * s->psz_name ? s->psz_name : "Unknown",
                       s->i_program,
@@ -1046,7 +1073,8 @@ block_t *scan_GetM3U( scan_t *p_scan )
                       s->cfg.i_bandwidth,
                       s->cfg.c_polarization == 'H' ? 18 : 13,
                       s->cfg.i_fec,
-                      s->cfg.i_modulation ) < 0 )
+                      s->cfg.i_modulation,
+                      s->cfg.i_symbolrate ) < 0 )
             psz = NULL;
         if( psz )
         {

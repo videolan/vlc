@@ -435,6 +435,12 @@ static int ScanParametersDvbC( access_t *p_access, scan_parameter_t *p_scan )
         p_scan->i_modulation = 0;
     }
 
+    /* if user supplies symbolrate, don't scan those */
+    if( var_GetInteger( p_access, "dvb-srate" ) )
+        p_scan->b_symbolrate_set = true;
+    else
+        p_scan->b_symbolrate_set = false;
+
     /* */
     p_scan->bandwidth.i_min  = 6;
     p_scan->bandwidth.i_max  = 8;
