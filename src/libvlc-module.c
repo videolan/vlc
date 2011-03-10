@@ -2230,141 +2230,141 @@ vlc_module_begin ()
 #if defined(__APPLE__)
 /* Don't use the following combo's */
 
-/*  copy                          KEY_MODIFIER_COMMAND|'c'
- *  cut                           KEY_MODIFIER_COMMAND|'x'
- *  paste                         KEY_MODIFIER_COMMAND|'v'
- *  select all                    KEY_MODIFIER_COMMAND|'a'
- *  preferences                   KEY_MODIFIER_COMMAND|','
- *  hide vlc                      KEY_MODIFIER_COMMAND|'h'
- *  hide other                    KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|'h'
- *  open file                     KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'o'
- *  open                          KEY_MODIFIER_COMMAND|'o'
- *  open disk                     KEY_MODIFIER_COMMAND|'d'
- *  open network                  KEY_MODIFIER_COMMAND|'n'
- *  open capture                  KEY_MODIFIER_COMMAND|'r'
- *  save playlist                 KEY_MODIFIER_COMMAND|'s'
- *  playlist repeat all           KEY_MODIFIER_COMMAND|'l'
- *  playlist repeat               KEY_MODIFIER_COMMAND|'r'
- *  video fit to screen           KEY_MODIFIER_COMMAND|'3'
- *  minimize window               KEY_MODIFIER_COMMAND|'m'
- *  close window                  KEY_MODIFIER_COMMAND|'w'
- *  streaming wizard              KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'w'
- *  show controller               KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'c'
- *  show playlist                 KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'p'
- *  show info                     KEY_MODIFIER_COMMAND|'i'
- *  show extended controls        KEY_MODIFIER_COMMAND|'e'
- *  show equaliser                KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'e'
- *  show bookmarks                KEY_MODIFIER_COMMAND|'b'
- *  show messages                 KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'m'
- *  show errors and warnings      KEY_MODIFIER_COMMAND|KEY_MODIFIER_CTRL|'m'
- *  help                          KEY_MODIFIER_COMMAND|'?'
- *  readme / FAQ                  KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|'?'
+/*  copy                          "Command+c"
+ *  cut                           "Command+x"
+ *  paste                         "Command+v"
+ *  select all                    "Command+a"
+ *  preferences                   "Command+,"
+ *  hide vlc                      "Command+h"
+ *  hide other                    "Command+Alt+h"
+ *  open file                     "Command+Shift+o"
+ *  open                          "Command+o"
+ *  open disk                     "Command+d"
+ *  open network                  "Command+n"
+ *  open capture                  "Command+r"
+ *  save playlist                 "Command+s"
+ *  playlist repeat all           "Command+l"
+ *  playlist repeat               "Command+r"
+ *  video fit to screen           "Command+3"
+ *  minimize window               "Command+m"
+ *  close window                  "Command+w"
+ *  streaming wizard              "Command+Shift+w"
+ *  show controller               "Command+Shift+c"
+ *  show playlist                 "Command+Shift+p"
+ *  show info                     "Command+i"
+ *  show extended controls        "Command+e"
+ *  show equaliser                "Command+Shift+e"
+ *  show bookmarks                "Command+b"
+ *  show messages                 "Command+Shift+m"
+ *  show errors and warnings      "Command+Ctrl+m"
+ *  help                          "Command+?"
+ *  readme / FAQ                  "Command+Alt+?"
  */
-#   define KEY_TOGGLE_FULLSCREEN  KEY_MODIFIER_COMMAND|'f'
-#   define KEY_LEAVE_FULLSCREEN   KEY_ESC
-#   define KEY_PLAY_PAUSE         KEY_MODIFIER_COMMAND|'p'
-#   define KEY_PAUSE              KEY_UNSET
-#   define KEY_PLAY               KEY_UNSET
-#   define KEY_FASTER             KEY_MODIFIER_COMMAND|'='
-#   define KEY_SLOWER             KEY_MODIFIER_COMMAND|'-'
-#   define KEY_RATE_NORMAL        KEY_UNSET
-#   define KEY_RATE_FASTER_FINE   KEY_UNSET
-#   define KEY_RATE_SLOWER_FINE   KEY_UNSET
-#   define KEY_NEXT               KEY_MODIFIER_COMMAND|KEY_RIGHT
-#   define KEY_PREV               KEY_MODIFIER_COMMAND|KEY_LEFT
-#   define KEY_STOP               KEY_MODIFIER_COMMAND|'.'
-#   define KEY_POSITION           't'
-#   define KEY_JUMP_MEXTRASHORT   KEY_MODIFIER_COMMAND|KEY_MODIFIER_CTRL|KEY_LEFT
-#   define KEY_JUMP_PEXTRASHORT   KEY_MODIFIER_COMMAND|KEY_MODIFIER_CTRL|KEY_RIGHT
-#   define KEY_JUMP_MSHORT        KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_LEFT
-#   define KEY_JUMP_PSHORT        KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_RIGHT
-#   define KEY_JUMP_MMEDIUM       KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_LEFT
-#   define KEY_JUMP_PMEDIUM       KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_RIGHT
-#   define KEY_JUMP_MLONG         KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|KEY_LEFT
-#   define KEY_JUMP_PLONG         KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|KEY_RIGHT
-#   define KEY_FRAME_NEXT         'e'
-#   define KEY_NAV_ACTIVATE       KEY_ENTER
-#   define KEY_NAV_UP             KEY_UP
-#   define KEY_NAV_DOWN           KEY_DOWN
-#   define KEY_NAV_LEFT           KEY_LEFT
-#   define KEY_NAV_RIGHT          KEY_RIGHT
-#   define KEY_QUIT               KEY_MODIFIER_COMMAND|'q'
-#   define KEY_VOL_UP             KEY_MODIFIER_COMMAND|KEY_UP
-#   define KEY_VOL_DOWN           KEY_MODIFIER_COMMAND|KEY_DOWN
-#   define KEY_VOL_MUTE           KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_DOWN
-#   define KEY_SUBDELAY_UP        'j'
-#   define KEY_SUBDELAY_DOWN      'h'
-#   define KEY_SUBPOS_DOWN        KEY_UNSET
-#   define KEY_SUBPOS_UP          KEY_UNSET
-#   define KEY_AUDIODELAY_UP      'g'
-#   define KEY_AUDIODELAY_DOWN    'f'
-#   define KEY_AUDIO_TRACK        'l'
-#   define KEY_SUBTITLE_TRACK     's'
-#   define KEY_ASPECT_RATIO       'a'
-#   define KEY_CROP               'c'
-#   define KEY_TOGGLE_AUTOSCALE   'o'
-#   define KEY_SCALE_UP           KEY_MODIFIER_ALT|'o'
-#   define KEY_SCALE_DOWN         KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|'o'
-#   define KEY_DEINTERLACE        'd'
-#   define KEY_INTF_SHOW          'i'
-#   define KEY_INTF_HIDE          KEY_MODIFIER_SHIFT|'i'
-#   define KEY_DISC_MENU          KEY_MODIFIER_CTRL|'m'
-#   define KEY_TITLE_PREV         KEY_MODIFIER_CTRL|'p'
-#   define KEY_TITLE_NEXT         KEY_MODIFIER_CTRL|'n'
-#   define KEY_CHAPTER_PREV       KEY_MODIFIER_CTRL|'u'
-#   define KEY_CHAPTER_NEXT       KEY_MODIFIER_CTRL|'d'
-#   define KEY_SNAPSHOT           KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|'s'
-#   define KEY_ZOOM               'z'
-#   define KEY_UNZOOM             KEY_MODIFIER_SHIFT|'z'
-#   define KEY_RANDOM             KEY_MODIFIER_COMMAND|'z'
-#   define KEY_LOOP               KEY_MODIFIER_SHIFT|'l'
+#   define KEY_TOGGLE_FULLSCREEN  "Command+f"
+#   define KEY_LEAVE_FULLSCREEN   "Esc"
+#   define KEY_PLAY_PAUSE         "Command+p"
+#   define KEY_PAUSE              NULL
+#   define KEY_PLAY               NULL
+#   define KEY_FASTER             "Command+="
+#   define KEY_SLOWER             "Command+-"
+#   define KEY_RATE_NORMAL        NULL
+#   define KEY_RATE_FASTER_FINE   NULL
+#   define KEY_RATE_SLOWER_FINE   NULL
+#   define KEY_NEXT               "Command+Right"
+#   define KEY_PREV               "Command+Left"
+#   define KEY_STOP               "Command+."
+#   define KEY_POSITION           "t"
+#   define KEY_JUMP_MEXTRASHORT   "Command+Ctrl+Left"
+#   define KEY_JUMP_PEXTRASHORT   "Command+Ctrl+Right"
+#   define KEY_JUMP_MSHORT        "Command+Alt+Left"
+#   define KEY_JUMP_PSHORT        "Command+Alt+Right"
+#   define KEY_JUMP_MMEDIUM       "Command+Shift+Left"
+#   define KEY_JUMP_PMEDIUM       "Command+Shift+Right"
+#   define KEY_JUMP_MLONG         "Command+Shift+Alt+Left"
+#   define KEY_JUMP_PLONG         "Command+Shift+Alt+Right"
+#   define KEY_FRAME_NEXT         "e"
+#   define KEY_NAV_ACTIVATE       "Enter"
+#   define KEY_NAV_UP             "Up"
+#   define KEY_NAV_DOWN           "Down"
+#   define KEY_NAV_LEFT           "Left"
+#   define KEY_NAV_RIGHT          "Right"
+#   define KEY_QUIT               "Command+q"
+#   define KEY_VOL_UP             "Command+Up"
+#   define KEY_VOL_DOWN           "Command+Down"
+#   define KEY_VOL_MUTE           "Command+Alt+Down"
+#   define KEY_SUBDELAY_UP        "j"
+#   define KEY_SUBDELAY_DOWN      "h"
+#   define KEY_SUBPOS_DOWN        NULL
+#   define KEY_SUBPOS_UP          NULL
+#   define KEY_AUDIODELAY_UP      "g"
+#   define KEY_AUDIODELAY_DOWN    "f"
+#   define KEY_AUDIO_TRACK        "l"
+#   define KEY_SUBTITLE_TRACK     "s"
+#   define KEY_ASPECT_RATIO       "a"
+#   define KEY_CROP               "c"
+#   define KEY_TOGGLE_AUTOSCALE   "o"
+#   define KEY_SCALE_UP           "Alt+o"
+#   define KEY_SCALE_DOWN         "Shift+Alt+o"
+#   define KEY_DEINTERLACE        "d"
+#   define KEY_INTF_SHOW          "i"
+#   define KEY_INTF_HIDE          "Shift+i"
+#   define KEY_DISC_MENU          "Ctrl+m"
+#   define KEY_TITLE_PREV         "Ctrl+p"
+#   define KEY_TITLE_NEXT         "Ctrl+n"
+#   define KEY_CHAPTER_PREV       "Ctrl+u"
+#   define KEY_CHAPTER_NEXT       "Ctrl+d"
+#   define KEY_SNAPSHOT           "Command+Alt+s"
+#   define KEY_ZOOM               "z"
+#   define KEY_UNZOOM             "Shift+z"
+#   define KEY_RANDOM             "Command+z"
+#   define KEY_LOOP               "Shift+l"
 
-#   define KEY_CROP_TOP           KEY_MODIFIER_ALT|'i'
-#   define KEY_UNCROP_TOP         KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'i'
-#   define KEY_CROP_LEFT          KEY_MODIFIER_ALT|'j'
-#   define KEY_UNCROP_LEFT        KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'j'
-#   define KEY_CROP_BOTTOM        KEY_MODIFIER_ALT|'k'
-#   define KEY_UNCROP_BOTTOM      KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'k'
-#   define KEY_CROP_RIGHT         KEY_MODIFIER_ALT|'l'
-#   define KEY_UNCROP_RIGHT       KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'l'
+#   define KEY_CROP_TOP           "Alt+i"
+#   define KEY_UNCROP_TOP         "Alt+Shift+i"
+#   define KEY_CROP_LEFT          "Alt+j"
+#   define KEY_UNCROP_LEFT        "Alt+Shift+j"
+#   define KEY_CROP_BOTTOM        "Alt+k"
+#   define KEY_UNCROP_BOTTOM      "Alt+Shift+k"
+#   define KEY_CROP_RIGHT         "Alt+l"
+#   define KEY_UNCROP_RIGHT       "Alt+Shift+l"
 
 /* the macosx-interface already has bindings */
-#   define KEY_ZOOM_QUARTER       KEY_UNSET
-#   define KEY_ZOOM_HALF          KEY_MODIFIER_COMMAND|'0'
-#   define KEY_ZOOM_ORIGINAL      KEY_MODIFIER_COMMAND|'1'
-#   define KEY_ZOOM_DOUBLE        KEY_MODIFIER_COMMAND|'2'
+#   define KEY_ZOOM_QUARTER       NULL
+#   define KEY_ZOOM_HALF          "Command+0"
+#   define KEY_ZOOM_ORIGINAL      "Command+1"
+#   define KEY_ZOOM_DOUBLE        "Command+2"
 
-#   define KEY_SET_BOOKMARK1      KEY_MODIFIER_COMMAND|KEY_F1
-#   define KEY_SET_BOOKMARK2      KEY_MODIFIER_COMMAND|KEY_F2
-#   define KEY_SET_BOOKMARK3      KEY_MODIFIER_COMMAND|KEY_F3
-#   define KEY_SET_BOOKMARK4      KEY_MODIFIER_COMMAND|KEY_F4
-#   define KEY_SET_BOOKMARK5      KEY_MODIFIER_COMMAND|KEY_F5
-#   define KEY_SET_BOOKMARK6      KEY_MODIFIER_COMMAND|KEY_F6
-#   define KEY_SET_BOOKMARK7      KEY_MODIFIER_COMMAND|KEY_F7
-#   define KEY_SET_BOOKMARK8      KEY_MODIFIER_COMMAND|KEY_F8
-#   define KEY_SET_BOOKMARK9      KEY_UNSET
-#   define KEY_SET_BOOKMARK10     KEY_UNSET
-#   define KEY_PLAY_BOOKMARK1     KEY_F1
-#   define KEY_PLAY_BOOKMARK2     KEY_F2
-#   define KEY_PLAY_BOOKMARK3     KEY_F3
-#   define KEY_PLAY_BOOKMARK4     KEY_F4
-#   define KEY_PLAY_BOOKMARK5     KEY_F5
-#   define KEY_PLAY_BOOKMARK6     KEY_F6
-#   define KEY_PLAY_BOOKMARK7     KEY_F7
-#   define KEY_PLAY_BOOKMARK8     KEY_F8
-#   define KEY_PLAY_BOOKMARK9     KEY_UNSET
-#   define KEY_PLAY_BOOKMARK10    KEY_UNSET
-#   define KEY_RECORD             KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'r'
-#   define KEY_WALLPAPER          KEY_MODIFIER_COMMAND|'w'
+#   define KEY_SET_BOOKMARK1      "Command+F1"
+#   define KEY_SET_BOOKMARK2      "Command+F2"
+#   define KEY_SET_BOOKMARK3      "Command+F3"
+#   define KEY_SET_BOOKMARK4      "Command+F4"
+#   define KEY_SET_BOOKMARK5      "Command+F5"
+#   define KEY_SET_BOOKMARK6      "Command+F6"
+#   define KEY_SET_BOOKMARK7      "Command+F7"
+#   define KEY_SET_BOOKMARK8      "Command+F8"
+#   define KEY_SET_BOOKMARK9      NULL
+#   define KEY_SET_BOOKMARK10     NULL
+#   define KEY_PLAY_BOOKMARK1     "F1"
+#   define KEY_PLAY_BOOKMARK2     "F2"
+#   define KEY_PLAY_BOOKMARK3     "F3"
+#   define KEY_PLAY_BOOKMARK4     "F4"
+#   define KEY_PLAY_BOOKMARK5     "F5"
+#   define KEY_PLAY_BOOKMARK6     "F6"
+#   define KEY_PLAY_BOOKMARK7     "F7"
+#   define KEY_PLAY_BOOKMARK8     "F8"
+#   define KEY_PLAY_BOOKMARK9     NULL
+#   define KEY_PLAY_BOOKMARK10    NULL
+#   define KEY_RECORD             "Command+Shift+r"
+#   define KEY_WALLPAPER          "w"
 
-#   define KEY_MENU_ON            KEY_MODIFIER_ALT|'m'
-#   define KEY_MENU_OFF           KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'m'
-#   define KEY_MENU_RIGHT         KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_RIGHT
-#   define KEY_MENU_LEFT          KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_LEFT
-#   define KEY_MENU_UP            KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_UP
-#   define KEY_MENU_DOWN          KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_DOWN
-#   define KEY_MENU_SELECT        KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|KEY_ENTER
-#   define KEY_AUDIODEVICE_CYCLE  KEY_MODIFIER_SHIFT|'a'
+#   define KEY_MENU_ON            "Alt+m"
+#   define KEY_MENU_OFF           "Alt+Shift+m"
+#   define KEY_MENU_RIGHT         "Alt+Shift+Right"
+#   define KEY_MENU_LEFT          "Alt+Shift+Left"
+#   define KEY_MENU_UP            "Alt+Shift+Up"
+#   define KEY_MENU_DOWN          "Alt+Shift+Down"
+#   define KEY_MENU_SELECT        "Alt+Shift+Enter"
+#   define KEY_AUDIODEVICE_CYCLE  "Shift+a"
 
 #else /* Non Mac OS X */
     /*
