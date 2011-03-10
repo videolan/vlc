@@ -1081,8 +1081,6 @@ static int FrontendSetQAM( access_t *p_access )
     if( i_val < p_frontend->info.symbol_rate_max &&
         i_val > p_frontend->info.symbol_rate_min )
         fep.u.qam.symbol_rate = i_val;
-    else
-        fep.u.qam.symbol_rate = 6875000;
 
     fep.u.qam.fec_inner = DecodeFEC( p_access, "dvb-fec" );
 
