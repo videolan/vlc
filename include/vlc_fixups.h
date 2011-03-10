@@ -284,4 +284,16 @@ long jrand48 (unsigned short subi[3]);
 long nrand48 (unsigned short subi[3]);
 #endif
 
+#ifdef __ANDROID__
+# undef __linux__
+# ifndef __cplusplus
+#  define __cplusplus 0
+# endif
+# include <pthread.h>
+# if __cplusplus == 0
+#  undef __cplusplus
+# endif
+char *tempnam(const char *, const char *);
+#endif // ANDROID
+
 #endif /* !LIBVLC_FIXUPS_H */
