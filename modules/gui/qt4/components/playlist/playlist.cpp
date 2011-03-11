@@ -138,6 +138,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
              mainView, search( const QString& ) );
     CONNECT( searchEdit, searchDelayedChanged( const QString& ),
              mainView, searchDelayed( const QString & ) );
+
     CONNECT( mainView, viewChanged( const QModelIndex& ),
              this, changeView( const QModelIndex &) );
     layout->setColumnStretch( 3, 3 );
@@ -145,6 +146,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     /* Connect the activation of the selector to a redefining of the PL */
     DCONNECT( selector, activated( playlist_item_t * ),
               mainView, setRoot( playlist_item_t * ) );
+    mainView->setRoot( p_root );
 
 
     split = new PlaylistSplitter( this );
