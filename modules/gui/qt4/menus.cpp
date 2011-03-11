@@ -34,10 +34,9 @@
 # include "config.h"
 #endif
 
+#include <vlc_common.h>
 #include <vlc_intf_strings.h>
-#include <vlc_services_discovery.h> /*vlc_sd_GetNames*/
-#include <vlc_aout.h>
-#include <vlc_vout.h>
+#include <vlc_vout.h>              /* vout_thread_t */
 
 #include "menus.hpp"
 
@@ -692,37 +691,6 @@ QMenu *QVLCMenu::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
 
     EnableStaticEntries( menu, (p_object != NULL ) );
     return Populate( p_intf, menu, varnames, objects );
-}
-
-/**
- * Service Discovery SubMenu
- **/
-QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf, QWidget *parent )
-{
-    QMenu *menu = new QMenu( parent );
-    menu->setTitle( qtr( I_PL_SD ) );
-
-    char **ppsz_longnames;
-    char **ppsz_names = vlc_sd_GetNames( p_intf, &ppsz_longnames, NULL );
-    if( !ppsz_names )
-        return menu;
-
-    char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
-    for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
-    {
-        if( !strcmp( *ppsz_name, "podcast" ) )
-        {
-            QAction *b = new QAction( qtr( "Configure podcasts..." ), menu );
-            //b->setEnabled( a->isChecked() );
-            menu->addAction( b );
-            CONNECT( b, triggered(), THEDP, podcastConfigureDialog() );
-        }
-        free( *ppsz_name );
-        free( *ppsz_longname );
-    }
-    free( ppsz_names );
-    free( ppsz_longnames );
-    return menu;
 }
 
 /**
