@@ -99,7 +99,6 @@ private:
     static QMenu *ToolsMenu( QMenu * );
     static QMenu *ToolsMenu( QWidget * );
 
-    static QMenu *ViewMenu( intf_thread_t *, QWidget * );
     static QMenu *ViewMenu( intf_thread_t *, QMenu *, MainInterface * mi = NULL );
 
     static QMenu *InterfacesMenu( intf_thread_t *p_intf, QMenu * );

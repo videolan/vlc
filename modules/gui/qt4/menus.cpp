@@ -263,23 +263,28 @@ static int AudioAutoMenuBuilder( aout_instance_t *p_object,
  * Simple Code
  *****************************************************************************/
 
+// Static menu
 #define BAR_ADD( func, title ) { \
     QMenu *_menu = func; _menu->setTitle( title ); bar->addMenu( _menu ); }
 
+// Dynamic menu
 #define BAR_DADD( func, title, id ) { \
     QMenu *_menu = func; _menu->setTitle( title ); bar->addMenu( _menu ); \
     MenuFunc *f = new MenuFunc( _menu, id ); \
     CONNECT( _menu, aboutToShow(), THEDP->menusUpdateMapper, map() ); \
     THEDP->menusUpdateMapper->setMapping( _menu, f ); }
 
+// Add a simple action
 #define ACT_ADD( _menu, val, title ) { \
     QAction *_action = new QAction( title, _menu ); _action->setData( val ); \
     _menu->addAction( _action ); }
 
+// Add an action with a submenu
 #define ACT_ADDMENU( _menu, val, title ) { \
     QAction *_action = new QAction( title, _menu ); _action->setData( val ); \
     _action->setMenu( new QMenu( _menu ) ); _menu->addAction( _action ); }
 
+// Add an action that is a checkbox
 #define ACT_ADDCHECK( _menu, val, title ) { \
     QAction *_action = new QAction( title, _menu ); _action->setData( val ); \
     _action->setCheckable( true ); _menu->addAction( _action ); }
@@ -303,15 +308,15 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
     BAR_DADD( VideoMenu( p_intf, bar ), qtr( "&Video" ), 2 );
 
     BAR_ADD( ToolsMenu( bar ), qtr( "&Tools" ) );
-    QMenu *_menu = ViewMenu( p_intf, bar );
-    _menu->setTitle( qtr( "V&iew" ) );
-    bar->addMenu( _menu );
-    ViewMenu( p_intf, _menu, mi );
+
+    /* View menu, a bit different */
+    BAR_DADD( ViewMenu( p_intf, _menu, mi ), qtr( "V&iew" ), 4 );
+
     BAR_ADD( HelpMenu( bar ), qtr( "&Help" ) );
 
 }
 #undef BAR_ADD
-#undef BAR_DADD
+//#undef BAR_DADD
 
 /**
  * Media ( File ) Menu
@@ -409,19 +414,6 @@ QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
 QMenu *QVLCMenu::ToolsMenu( QWidget *parent )
 {
     return ToolsMenu( new QMenu( parent ) );
-}
-
-/**
- * Dynamic View Menu
- * Connect signal "aboutToShow" to the creation of the View Menu
- **/
-QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QWidget* parent )
-{
-    QMenu *viewMenu = new QMenu( parent );
-    MenuFunc *f = new MenuFunc( viewMenu, 4 );
-    CONNECT( viewMenu, aboutToShow(), THEDP->menusUpdateMapper, map() );
-    THEDP->menusUpdateMapper->setMapping( viewMenu, f );
-    return viewMenu;
 }
 
 /**
@@ -1058,8 +1050,8 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
         }
         else
         {
-            QMenu *viewmenu = menu->addMenu( qtr( "V&iew" ) );
-            ViewMenu( p_intf, viewmenu );
+            QMenu *bar = menu;
+            BAR_DADD( ViewMenu( p_intf, _menu, mi ), qtr( "V&iew" ), 4 );
         }
 
         menu->addMenu( submenu );
