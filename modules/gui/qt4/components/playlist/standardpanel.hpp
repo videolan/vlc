@@ -101,13 +101,14 @@ private:
 public slots:
     void setRoot( playlist_item_t * );
     void browseInto( const QModelIndex& );
-    void browseInto( );
 
 private slots:
     void deleteSelection();
     void handleExpansion( const QModelIndex& );
     void handleRootChange();
     void activate( const QModelIndex & );
+
+    void browseInto();
     void browseInto( input_item_t * );
 
     void gotoPlayingItem();
