@@ -29,11 +29,11 @@
 
 #include <QObject>
 #include <QAction>
+#include <QMenu>
 #include <vector>
 
 using namespace std;
 
-class QMenu;
 class QMenuBar;
 class QSystemTrayIcon;
 
@@ -97,7 +97,7 @@ private:
     static QMenu *SDMenu( intf_thread_t *, QWidget * );
 
     static QMenu *ToolsMenu( QMenu * );
-    static QMenu *ToolsMenu( QWidget * );
+    static QMenu *ToolsMenu( QWidget *parent ) { return ToolsMenu( new QMenu( parent ) ); }
 
     static QMenu *ViewMenu( intf_thread_t *, QMenu *, MainInterface * mi = NULL );
 
@@ -105,14 +105,20 @@ private:
     static void ExtensionsMenu( intf_thread_t *p_intf, QMenu * );
 
     static QMenu *NavigMenu( intf_thread_t *, QMenu * );
-    static QMenu *NavigMenu( intf_thread_t *, QWidget * );
+    static QMenu *NavigMenu( intf_thread_t *p_intf, QWidget *parent ) {
+        return NavigMenu( p_intf, new QMenu( parent ) );
+    }
     static QMenu *RebuildNavigMenu( intf_thread_t *, QMenu *);
 
     static QMenu *VideoMenu( intf_thread_t *, QMenu * );
-    static QMenu *VideoMenu( intf_thread_t *, QWidget * );
+    static QMenu *VideoMenu( intf_thread_t *p_intf, QWidget *parent ) {
+        return VideoMenu( p_intf, new QMenu( parent ) );
+    }
 
     static QMenu *AudioMenu( intf_thread_t *, QMenu * );
-    static QMenu *AudioMenu( intf_thread_t *, QWidget * );
+    static QMenu *AudioMenu( intf_thread_t *p_intf, QWidget *parent ) {
+        return AudioMenu( p_intf, new QMenu( parent ) );
+    }
 
     static QMenu *HelpMenu( QWidget * );
 

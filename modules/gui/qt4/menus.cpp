@@ -411,11 +411,6 @@ QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
     return menu;
 }
 
-QMenu *QVLCMenu::ToolsMenu( QWidget *parent )
-{
-    return ToolsMenu( new QMenu( parent ) );
-}
-
 /**
  * View Menu
  * Interface modification, load other interfaces, activate Extensions
@@ -588,11 +583,6 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     return Populate( p_intf, current, varnames, objects );
 }
 
-QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QWidget *parent )
-{
-    return AudioMenu( p_intf, new QMenu( parent ) );
-}
-
 /**
  * Main Video Menu
  * Subtitles are part of Video.
@@ -648,11 +638,6 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     return Populate( p_intf, current, varnames, objects );
 }
 
-QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QWidget *parent )
-{
-    return VideoMenu( p_intf, new QMenu( parent ) );
-}
-
 /**
  * Navigation Menu
  * For DVD, MP4, MOV and other chapter based format
@@ -704,11 +689,6 @@ QMenu *QVLCMenu::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
 
     EnableStaticEntries( menu, (p_object != NULL ) );
     return Populate( p_intf, menu, varnames, objects );
-}
-
-QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QWidget *parent )
-{
-    return NavigMenu( p_intf, new QMenu( parent ) );
 }
 
 /**
