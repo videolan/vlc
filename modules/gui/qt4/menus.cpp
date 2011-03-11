@@ -976,13 +976,14 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
     /* Add some special entries for windowed mode: Interface Menu */
     if( !b_isFullscreen )
     {
-        QMenu *submenu = new QMenu( qtr( "Interface" ), menu );
+        QMenu *submenu = new QMenu( qtr( "Tools" ), menu );
         /*QMenu *tools =*/ ToolsMenu( submenu );
         submenu->addSeparator();
 
         /* In skins interface, append some items */
         if( !mi )
         {
+            submenu->setTitle( qtr( "Interface" ) );
             if( p_intf->p_sys->b_isDialogProvider )
             {
                 vlc_object_t* p_object = p_intf->p_parent;
