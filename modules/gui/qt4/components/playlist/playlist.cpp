@@ -230,7 +230,7 @@ void PlaylistWidget::changeView( const QModelIndex& index )
 {
     searchEdit->clear();
     locationBar->setIndex( index );
-    int i = mainView->getViewNumber();
+    int i = mainView->currentViewIndex();
     viewActions[i]->setChecked(true);
 }
 

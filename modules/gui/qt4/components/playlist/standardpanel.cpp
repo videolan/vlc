@@ -378,7 +378,7 @@ void StandardPLPanel::showView( int i_view )
     gotoPlayingItem();
 }
 
-const int StandardPLPanel::getViewNumber()
+const int StandardPLPanel::currentViewIndex()
 {
     if( currentView == treeView )
         return TREE_VIEW;

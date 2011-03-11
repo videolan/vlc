@@ -67,7 +67,7 @@ public:
            PICTUREFLOW_VIEW,
            VIEW_COUNT };
 
-    const int getViewNumber();
+    const int currentViewIndex();
 
 protected:
 
