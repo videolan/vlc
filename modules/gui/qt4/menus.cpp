@@ -1,7 +1,7 @@
 /*****************************************************************************
  * menus.cpp : Qt menus
  *****************************************************************************
- * Copyright © 2006-2009 the VideoLAN team
+ * Copyright © 2006-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -35,18 +35,18 @@
 #endif
 
 #include <vlc_intf_strings.h>
-#include <vlc_services_discovery.h>
+#include <vlc_services_discovery.h> /*vlc_sd_GetNames*/
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 
 #include "menus.hpp"
 
-#include "main_interface.hpp"    /* View modifications */
-#include "dialogs_provider.hpp"  /* Dialogs display */
-#include "input_manager.hpp"     /* Input Management */
-#include "recents.hpp"           /* Recent Items */
-#include "actions_manager.hpp"
-#include "extensions_manager.hpp"
+#include "main_interface.hpp"      /* View modifications */
+#include "dialogs_provider.hpp"    /* Dialogs display */
+#include "input_manager.hpp"       /* Input Management */
+#include "recents.hpp"             /* Recent Items */
+#include "actions_manager.hpp"     /* Actions Management: play+volume */
+#include "extensions_manager.hpp"  /* Extensions menu*/
 
 #include <QMenu>
 #include <QMenuBar>
@@ -54,15 +54,14 @@
 #include <QActionGroup>
 #include <QSignalMapper>
 #include <QSystemTrayIcon>
-#include <QList>
 
 /*
   This file defines the main menus and the pop-up menu (right-click menu)
   and the systray menu (in that order in the file)
 
-  There are 3 menus that have to be rebuilt everytime there are called:
-  Audio, Video, Navigation
-  3 functions are building those menus: AudioMenu, VideoMenu, NavigMenu
+  There are 4 menus that have to be rebuilt everytime there are called:
+  Audio, Video, Navigation, view
+  4 functions are building those menus: AudioMenu, VideoMenu, NavigMenu, View
   and 3 functions associated are collecting the objects :
   InputAutoMenuBuilder, AudioAutoMenuBuilder, VideoAutoMenuBuilder.
 
@@ -75,20 +74,18 @@
 
 enum
 {
-    ITEM_NORMAL,
-    ITEM_CHECK,
-    ITEM_RADIO
+    ITEM_NORMAL, /* not a checkbox, nor a radio */
+    ITEM_CHECK,  /* Checkbox */
+    ITEM_RADIO   /* Radiobox */
 };
 
 static QActionGroup *currentGroup;
 
 QMenu *QVLCMenu::recentsMenu = NULL;
 
-/****************************************************************************
- * Menu code helpers:
- ****************************************************************************
- * Add static entries to DP in menus
- ***************************************************************************/
+/**
+ * @brief Add static entries to DP in menus
+ **/
 void addDPStaticEntry( QMenu *menu,
                        const QString& text,
                        const char *icon,
@@ -118,9 +115,9 @@ void addDPStaticEntry( QMenu *menu,
     action->setData( STATIC_ENTRY );
 }
 
-/***
- * Same for MIM
- ***/
+/**
+ * @brief Add static entries to MIM in menus
+ **/
 QAction* addMIMStaticEntry( intf_thread_t *p_intf,
                             QMenu *menu,
                             const QString& text,
@@ -145,9 +142,10 @@ QAction* addMIMStaticEntry( intf_thread_t *p_intf,
 }
 
 /**
- * @brief Enable all static entries, disable the others
+ * @brief Enable all static entries of a menu, disable the others
+ * @param menu the menu in which the entries will be disabled
  * @param enable if false, disable all entries
- */
+ **/
 void EnableStaticEntries( QMenu *menu, bool enable = true )
 {
     if( !menu ) return;
@@ -164,7 +162,7 @@ void EnableStaticEntries( QMenu *menu, bool enable = true )
 
 /**
  * \return Number of static entries
- */
+ **/
 inline int DeleteNonStaticEntries( QMenu *menu )
 {
     if( !menu ) return VLC_EGENERIC;
@@ -345,8 +343,7 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
     addDPStaticEntry( menu, qtr( "Open &Network Stream..." ),
         ":/type/network", SLOT( openNetDialog() ), "Ctrl+N" );
     addDPStaticEntry( menu, qtr( "Open &Capture Device..." ),
-        ":/type/capture-card", SLOT( openCaptureDialog() ),
-        "Ctrl+C" );
+        ":/type/capture-card", SLOT( openCaptureDialog() ), "Ctrl+C" );
 
     menu->addSeparator();
     addDPStaticEntry( menu, qtr( "Open &Location from clipboard" ),
@@ -368,8 +365,7 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
     addDPStaticEntry( menu, qtr( "Conve&rt / Save..." ), "",
         SLOT( openAndTranscodingDialogs() ), "Ctrl+R" );
     addDPStaticEntry( menu, qtr( "&Streaming..." ),
-        ":/menu/stream", SLOT( openAndStreamingDialogs() ),
-        "Ctrl+S" );
+        ":/menu/stream", SLOT( openAndStreamingDialogs() ), "Ctrl+S" );
     menu->addSeparator();
 #endif
 
@@ -403,8 +399,7 @@ QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
         "" );
 
     addDPStaticEntry( menu, qtr( I_MENU_MSG ),
-        ":/menu/messages", SLOT( messagesDialog() ),
-        "Ctrl+M" );
+        ":/menu/messages", SLOT( messagesDialog() ), "Ctrl+M" );
 
     addDPStaticEntry( menu, qtr( "Plu&gins and extensions" ),
         "", SLOT( pluginDialog() ) );
@@ -498,8 +493,8 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
     CONNECT( action, triggered( bool ), THEMIM, activatePlayQuit( bool ) );
 
 #if 0 /* For Visualisations. Not yet working */
-    adv = menu->addAction( qtr( "Visualizations selector" ),
-            mi, SLOT( visual() ) );
+    adv = menu->addAction( qtr( "Visualizations selector" ), mi,
+                           SLOT( visual() ) );
     adv->setCheckable( true );
     if( visual_selector_enabled ) adv->setChecked( true );
 #endif
@@ -1064,9 +1059,6 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
                                   intf_thread_t *p_intf,
                                   bool b_force_visible )
 {
-    unsigned int i_last_separator = 0;
-    vector<vlc_object_t *> objects;
-    vector<const char *> varnames;
     input_thread_t *p_input = THEMIM->getInput();
 
     /* Get the systray menu and clean it */
@@ -1121,18 +1113,15 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
 
     currentGroup = NULL;
 
-    vlc_object_t *p_object;
-
-    for( int i = 0; i < ( int )objects.size() ; i++ )
+    for( int i = 0; i < (int)objects.size() ; i++ )
     {
         if( !varnames[i] || !*varnames[i] )
         {
             menu->addSeparator();
             continue;
         }
-        p_object = objects[i];
 
-        UpdateItem( p_intf, menu, varnames[i], p_object, true );
+        UpdateItem( p_intf, menu, varnames[i], objects[i], true );
     }
     return menu;
 }
