@@ -120,7 +120,6 @@ function quit(client)
     end
 end
 function lock(client)
-    client:send("\r\n")
     client:switch_status( host.status.password )
     client.buffer = ""
     return false
