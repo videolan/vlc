@@ -486,11 +486,6 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
     action->setChecked( mi->isPlDocked() );
     CONNECT( action, triggered( bool ), mi, dockPlaylist( bool ) );
 
-    action = menu->addAction( qtr( "Quit after Playback" ) );
-    action->setCheckable( true );
-    action->setChecked( THEMIM->getPlayExitState() );
-    CONNECT( action, triggered( bool ), THEMIM, activatePlayQuit( bool ) );
-
 #if 0 /* For Visualisations. Not yet working */
     adv = menu->addAction( qtr( "Visualizations selector" ), mi,
                            SLOT( visual() ) );
@@ -820,6 +815,12 @@ void QVLCMenu::PopupMenuPlaylistControlEntries( QMenu *menu,
         ":/menu/previous", SLOT( prev() ) );
     addMIMStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
         ":/menu/next", SLOT( next() ) );
+
+    action = addMIMStaticEntry( p_intf, menu, qtr( "Quit after Playback" ), "",
+                               SLOT( activatePlayQuit( bool ) ) );
+    action->setCheckable( true );
+    action->setChecked( THEMIM->getPlayExitState() );
+
     menu->addSeparator();
 }
 
