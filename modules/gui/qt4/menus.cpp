@@ -264,8 +264,10 @@ static int AudioAutoMenuBuilder( aout_instance_t *p_object,
  *****************************************************************************/
 
 // Static menu
-#define BAR_ADD( func, title ) { \
-    QMenu *_menu = func; _menu->setTitle( title ); bar->addMenu( _menu ); }
+static inline void addMenuToMainbar( QMenu *func, QString title, QMenuBar *bar ) {
+    func->setTitle( title );
+    bar->addMenu( func);
+}
 
 // Dynamic menu
 #define BAR_DADD( func, title, id ) { \
@@ -275,19 +277,27 @@ static int AudioAutoMenuBuilder( aout_instance_t *p_object,
     THEDP->menusUpdateMapper->setMapping( _menu, f ); }
 
 // Add a simple action
-#define ACT_ADD( _menu, val, title ) { \
-    QAction *_action = new QAction( title, _menu ); _action->setData( val ); \
-    _menu->addAction( _action ); }
+static inline void addAction( QMenu *_menu, QVariant val, QString title ) {
+    QAction *_action = new QAction( title, _menu );
+    _action->setData( val );
+    _menu->addAction( _action );
+}
 
 // Add an action with a submenu
-#define ACT_ADDMENU( _menu, val, title ) { \
-    QAction *_action = new QAction( title, _menu ); _action->setData( val ); \
-    _action->setMenu( new QMenu( _menu ) ); _menu->addAction( _action ); }
+static inline void addActionWithSubmenu( QMenu *_menu, QVariant val, QString title ) {
+    QAction *_action = new QAction( title, _menu );
+    _action->setData( val );
+    _action->setMenu( new QMenu( _menu ) );
+    _menu->addAction( _action );
+}
 
 // Add an action that is a checkbox
-#define ACT_ADDCHECK( _menu, val, title ) { \
-    QAction *_action = new QAction( title, _menu ); _action->setData( val ); \
-    _action->setCheckable( true ); _menu->addAction( _action ); }
+static inline void addActionWithCheckbox( QMenu *_menu, QVariant val, QString title ) {
+    QAction *_action = new QAction( title, _menu );
+    _action->setData( val );
+    _action->setCheckable( true );
+    _menu->addAction( _action );
+}
 
 /**
  * Main Menu Bar Creation
@@ -300,23 +310,21 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
        setDesktopAware set to false */
     QMenuBar *bar = mi->menuBar();
 
-    BAR_ADD( FileMenu( p_intf, bar ), qtr( "&Media" ) );
+    addMenuToMainbar( FileMenu( p_intf, bar ), qtr( "&Media" ), bar );
 
     /* Dynamic menus, rebuilt before being showed */
     BAR_DADD( NavigMenu( p_intf, bar ), qtr( "P&layback" ), 3 );
     BAR_DADD( AudioMenu( p_intf, bar ), qtr( "&Audio" ), 1 );
     BAR_DADD( VideoMenu( p_intf, bar ), qtr( "&Video" ), 2 );
 
-    BAR_ADD( ToolsMenu( bar ), qtr( "&Tools" ) );
+    addMenuToMainbar( ToolsMenu( bar ), qtr( "&Tools" ), bar );
 
     /* View menu, a bit different */
     BAR_DADD( ViewMenu( p_intf, _menu, mi ), qtr( "V&iew" ), 4 );
 
-    BAR_ADD( HelpMenu( bar ), qtr( "&Help" ) );
+    addMenuToMainbar( HelpMenu( bar ), qtr( "&Help" ), bar );
 
 }
-#undef BAR_ADD
-//#undef BAR_DADD
 
 /**
  * Media ( File ) Menu
@@ -451,7 +459,7 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
 
     menu->addSeparator();
 
-    QMenu *intfmenu = InterfacesMenu( p_intf, menu );
+    InterfacesMenu( p_intf, menu );
     menu->addSeparator();
 
     /* Minimal View */
@@ -552,12 +560,12 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 
     if( current->isEmpty() )
     {
-        ACT_ADDMENU( current, "audio-es", qtr( "Audio &Track" ) );
-        ACT_ADDMENU( current, "audio-channels", qtr( "Audio &Channels" ) );
-        ACT_ADDMENU( current, "audio-device", qtr( "Audio &Device" ) );
+        addActionWithSubmenu( current, "audio-es", qtr( "Audio &Track" ) );
+        addActionWithSubmenu( current, "audio-channels", qtr( "Audio &Channels" ) );
+        addActionWithSubmenu( current, "audio-device", qtr( "Audio &Device" ) );
         current->addSeparator();
 
-        ACT_ADDMENU( current, "visual", qtr( "&Visualizations" ) );
+        addActionWithSubmenu( current, "visual", qtr( "&Visualizations" ) );
         current->addSeparator();
 
         QAction *action = current->addAction( qtr( "Increase Volume" ),
@@ -596,7 +604,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 
     if( current->isEmpty() )
     {
-        ACT_ADDMENU( current, "video-es", qtr( "Video &Track" ) );
+        addActionWithSubmenu( current, "video-es", qtr( "Video &Track" ) );
 
         QAction *action;
         QMenu *submenu = new QMenu( qtr( "&Subtitles Track" ), current );
@@ -607,24 +615,24 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         submenu->addSeparator();
         current->addSeparator();
 
-        ACT_ADDCHECK( current, "fullscreen", qtr( "&Fullscreen" ) );
-        ACT_ADDCHECK( current, "autoscale", qtr( "Always Fit &Window" ) );
-        ACT_ADDCHECK( current, "video-on-top", qtr( "Always &on Top" ) );
+        addActionWithCheckbox( current, "fullscreen", qtr( "&Fullscreen" ) );
+        addActionWithCheckbox( current, "autoscale", qtr( "Always Fit &Window" ) );
+        addActionWithCheckbox( current, "video-on-top", qtr( "Always &on Top" ) );
 #ifdef WIN32
-        ACT_ADDCHECK( current, "direct3d-desktop", qtr( "Display on &Desktop" ) );
+        addActionWithCheckbox( current, "direct3d-desktop", qtr( "Display on &Desktop" ) );
 #endif
-        ACT_ADD( current, "video-snapshot", qtr( "Take &Snapshot" ) );
+        addAction( current, "video-snapshot", qtr( "Take &Snapshot" ) );
 #ifdef WIN32
-        ACT_ADDCHECK( current, "video-wallpaper", qtr( "Set as Wall&paper" ) );
+        addActionWithCheckbox( current, "video-wallpaper", qtr( "Set as Wall&paper" ) );
 #endif
         current->addSeparator();
 
-        ACT_ADDMENU( current, "zoom", qtr( "&Zoom" ) );
-        ACT_ADDMENU( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
-        ACT_ADDMENU( current, "crop", qtr( "&Crop" ) );
-        ACT_ADDMENU( current, "deinterlace", qtr( "&Deinterlace" ) );
-        ACT_ADDMENU( current, "deinterlace-mode", qtr( "&Deinterlace mode" ) );
-        ACT_ADDMENU( current, "postprocess", qtr( "&Post processing" ) );
+        addActionWithSubmenu( current, "zoom", qtr( "&Zoom" ) );
+        addActionWithSubmenu( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
+        addActionWithSubmenu( current, "crop", qtr( "&Crop" ) );
+        addActionWithSubmenu( current, "deinterlace", qtr( "&Deinterlace" ) );
+        addActionWithSubmenu( current, "deinterlace-mode", qtr( "&Deinterlace mode" ) );
+        addActionWithSubmenu( current, "postprocess", qtr( "&Post processing" ) );
     }
 
     p_input = THEMIM->getInput();
@@ -646,10 +654,10 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
     QAction *action;
 
-    ACT_ADDMENU( menu, "title", qtr( "T&itle" ) );
-    ACT_ADDMENU( menu, "chapter", qtr( "&Chapter" ) );
-    ACT_ADDMENU( menu, "navigation", qtr( "&Navigation" ) );
-    ACT_ADDMENU( menu, "program", qtr( "&Program" ) );
+    addActionWithSubmenu( menu, "title", qtr( "T&itle" ) );
+    addActionWithSubmenu( menu, "chapter", qtr( "&Chapter" ) );
+    addActionWithSubmenu( menu, "navigation", qtr( "&Navigation" ) );
+    addActionWithSubmenu( menu, "program", qtr( "&Program" ) );
 
     /* FixMe: sync I_MENU_BOOKMARK string */
     QMenu *submenu = new QMenu( qtr( "Custom &Bookmarks" ), menu );
@@ -1030,7 +1038,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
         }
         else
         {
-            QMenu *bar = menu;
+            QMenu *bar = menu; // Needed for next macro
             BAR_DADD( ViewMenu( p_intf, _menu, mi ), qtr( "V&iew" ), 4 );
         }
 
@@ -1043,12 +1051,9 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
     menu->popup( QCursor::pos() );
 }
 
-#undef ACT_ADD
-#undef ACT_ADDMENU
-#undef ACT_ADDCHECK
-
 #undef CREATE_POPUP
 #undef POPUP_BOILERPLATE
+#undef BAR_DADD
 
 #ifndef HAVE_MAEMO
 /************************************************************************
