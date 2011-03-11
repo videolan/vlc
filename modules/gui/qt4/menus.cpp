@@ -165,7 +165,7 @@ void EnableStaticEntries( QMenu *menu, bool enable = true )
 /**
  * \return Number of static entries
  */
-int DeleteNonStaticEntries( QMenu *menu )
+inline int DeleteNonStaticEntries( QMenu *menu )
 {
     if( !menu ) return VLC_EGENERIC;
 
