@@ -268,6 +268,29 @@ VLC_API int vlc_getnameinfo( const struct sockaddr *, int, char *, int, int *, i
 VLC_API int vlc_getaddrinfo( vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo ** );
 
 
+#ifdef __OS2__
+/* OS/2 does not support IPv6, yet. But declare these only for compilation */
+struct in6_addr
+{
+    uint8_t s6_addr[16];
+};
+
+struct sockaddr_in6
+{
+    uint8_t         sin6_len;
+    uint8_t         sin6_family;
+    uint16_t        sin6_port;
+    uint32_t        sin6_flowinfo;
+    struct in6_addr sin6_addr;
+    uint32_t        sin6_scope_id;
+};
+
+# define IN6_IS_ADDR_MULTICAST(a)   (((__const uint8_t *) (a))[0] == 0xff)
+
+static const struct in6_addr in6addr_any =
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+#endif
+
 static inline bool
 net_SockAddrIsMulticast (const struct sockaddr *addr, socklen_t len)
 {
