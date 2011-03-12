@@ -180,14 +180,14 @@ while not vlc.misc.should_die() do
 
     -- Handle reads
     for _, client in pairs(r) do
-        local str = client.cmds .. client:recv(1000)
+        local str = client:recv(1000)
 
-        if string.match(str,"\n") then
-            client.cmds = str
-        elseif not str or str == "" -- the telnet client program has left
+        if not str or str == "" -- the telnet client program has left
            or  (client.type == host.client_type.net and str == "\004") then
             -- Caught a ^D
             client.cmds = "quit\n"
+        else
+            client.cmds = client.cmds .. str
         end
 
         client.buffer = ""
