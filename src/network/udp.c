@@ -53,6 +53,10 @@
 #   endif
 #endif
 
+#ifdef __OS2__
+#   define if_nametoindex( str ) atoi( str )
+#endif
+
 #ifdef HAVE_LINUX_DCCP_H
 # include <linux/dccp.h>
 # ifndef SOCK_DCCP /* provisional API */
