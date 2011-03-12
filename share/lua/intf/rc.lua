@@ -137,7 +137,7 @@ end
 
 function logout(name,client)
     if client.type == host.client_type.net then
-        client:send("Bye-bye!")
+        client:send("Bye-bye!\r\n")
         client:del()
     else
         client:append("Error: Can't logout of stdin/stdout. Use quit or shutdown to close VLC.")
