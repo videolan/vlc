@@ -34,7 +34,9 @@
 #include <sys/socket.h>
 #include <sys/uio.h>
 #include <sys/resource.h> /* getrlimit() */
+#ifdef RLIMIT_RTPRIO
 #include <sched.h>
+#endif
 #include <errno.h>
 #include <netinet/in.h>
 
