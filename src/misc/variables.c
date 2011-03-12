@@ -1079,8 +1079,49 @@ cleanup:
     free( psz_name );
 }
 
+#undef var_LocationParse
+/**
+ * Parses a set of colon-separated <variable name>=<value> pairs. Some access
+ * (or access_demux) plugins uses this scheme in media resource location.
+ * @note Only trusted/safe variables are allowed. This is intended.
+ *
+ * @warning Only use this for plugins implementing VLC-specific resource
+ * location schemes. This would not make any sense for standardized ones.
+ *
+ * @param obj VLC object on which to set variables (and emit error messages)
+ * @param mrl string to parse
+ * @param pref prefix to prepend to option names in the string
+ *
+ * @return VLC_ENOMEM on error, VLC_SUCCESS on success.
+ */
+int var_LocationParse (vlc_object_t *obj, const char *mrl, const char *pref)
+{
+    int ret = VLC_SUCCESS;
+    size_t preflen = strlen (pref);
 
-/* Following functions are local */
+    assert(mrl != NULL);
+    while (*mrl != '\0')
+    {
+        mrl += strspn (mrl, ":"); /* skip leading colon(s) */
+
+        size_t len = strcspn (mrl, ":");
+        char *buf = malloc (preflen + len);
+
+        if (likely(buf != NULL))
+        {
+            /* NOTE: this does not support the "no-<varname>" bool syntax. */
+            /* DO NOT use asprintf() here; it won't work! Think again. */
+            snprintf (buf, preflen + len, "%s%s", pref, mrl);
+            var_OptionParse (obj, buf, false);
+            free (buf);
+        }
+        else
+            ret = VLC_ENOMEM;
+        mrl += len;
+    }
+
+    return ret;
+}
 
 /**
  * Waits until the variable is inactive (i.e. not executing a callback)

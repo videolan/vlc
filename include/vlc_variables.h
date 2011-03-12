@@ -736,6 +736,9 @@ VLC_EXPORT( int, var_InheritURational, ( vlc_object_t *, unsigned *num, unsigned
 #define var_GetNonEmptyString(a,b)   var_GetNonEmptyString( VLC_OBJECT(a),b)
 #define var_GetAddress(a,b)  var_GetAddress( VLC_OBJECT(a),b)
 
+VLC_EXPORT( int, var_LocationParse, (vlc_object_t *, const char *mrl, const char *prefix) );
+#define var_LocationParse(o, m, p) var_LocationParse(VLC_OBJECT(o), m, p)
+
 /**
  * @}
  */
