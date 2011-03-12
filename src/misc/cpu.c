@@ -53,7 +53,7 @@ static uint32_t cpu_flags;
 
 #if defined( __i386__ ) || defined( __x86_64__ ) || defined( __powerpc__ ) \
  || defined( __ppc__ ) || defined( __ppc64__ ) || defined( __powerpc64__ )
-# ifndef WIN32
+# if !defined( WIN32 ) && !defined( __OS2__ )
 static bool check_OS_capability( const char *psz_capability, pid_t pid )
 {
     int status;
@@ -86,7 +86,7 @@ static bool check_OS_capability( const char *psz_capability, pid_t pid )
             i_capabilities |= (flag);                   \
      } while(0)
 
-# else /* WIN32 */
+# else /* WIN32 || __OS2__ */
 #  define check_capability(name, flag, code, input)   \
         i_capabilities |= (flag);
 # endif
