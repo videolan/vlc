@@ -1969,10 +1969,10 @@ fi
 dnl
 dnl  libdvbpsi ts demux/mux
 dnl
-AC_ARG_ENABLE(dvbpsi,
-  [  --enable-dvbpsi         dvbpsi ts mux and demux module (default auto)])
+AC_ARG_ENABLE(dvb,
+  [  --enable-dvb            MPEG-TS and DVB support (default auto)])
 have_dvbpsi=no
-if test "${enable_dvbpsi}" != "no"; then
+AS_IF([test "${enable_dvb}" != "no"], [
     AC_CHECK_HEADERS([dvbpsi/dr.h],[
       VLC_ADD_PLUGIN([ts])
       if test "${enable_sout}" != "no"; then
@@ -1985,11 +1985,11 @@ if test "${enable_dvbpsi}" != "no"; then
         AC_DEFINE(HAVE_DVBPSI_SDT, 1, [Define if you have dvbpsi_GenSDTSections.])
       ], [], [${LIBS_ts}])
     ],[
-      if test -n "${enable_dvbpsi}"; then
+      AS_IF([test -n "${enable_dvb}"], [
         AC_MSG_ERROR([Could not find libdvbpsi on your system: you need at least version 0.1.6])
-      else
+      ], [
         AC_MSG_WARN([Could not find libdvbpsi on your system: you need at least version 0.1.6])
-      fi
+      ])
     ],[ #if defined( HAVE_STDINT_H )
         #   include <stdint.h>
         #elif defined( HAVE_INTTYPES_H )
@@ -2000,7 +2000,7 @@ if test "${enable_dvbpsi}" != "no"; then
         #include <dvbpsi/pat.h>
         #include <dvbpsi/pmt.h>
     ])
-fi
+])
 
 dnl
 dnl  Video4Linux2 plugin
@@ -2157,29 +2157,13 @@ then
 fi
 
 dnl
-dnl  DVB-S/DVB-T/DVB-C satellite/teresterial/cable input using v4l2
+dnl  DVB-S/DVB-T/DVB-C satellite/teresterial/cable input
 dnl
-AC_ARG_ENABLE(dvb,
-  [  --enable-dvb            DVB-S/T/C card support (default enabled)])
-
-if test "${enable_dvb}" != "no"
-then
-    AS_IF([test "${have_dvbpsi}" = "yes" ],[
-    AC_ARG_WITH(dvb,
-     [  --with-dvb=PATH         path to a dvb- and v4l2-enabled kernel tree],[],[])
-     if test "${with_dvb}" != "no" -a -n "${with_dvb}"
-     then
-       VLC_ADD_CFLAGS([dvb],[-I${with_dvb}/include])
-     fi
-     CPPFLAGS="${CPPFLAGS_save} -I${with_dvb}/include"
-     AC_CHECK_HEADERS(linux/dvb/version.h linux/dvb/frontend.h, [
-     VLC_ADD_PLUGIN([dvb])
-     ],[AC_MSG_WARN(linux-dvb headers not found, dvb disabled)])
-     CPPFLAGS="${CPPFLAGS_save}"
-   ],[
-     AC_MSG_WARN([the dvb access module requires libdvbpsi])
-    ])
-fi
+AS_IF([test "${have_dvbpsi}" = "yes" ], [
+  AC_CHECK_HEADER([linux/dvb/version.h], [
+    VLC_ADD_PLUGIN([dvb])
+  ])
+])
 
 dnl
 dnl  Screen capture module
