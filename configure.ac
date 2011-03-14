@@ -3352,14 +3352,10 @@ fi
 dnl
 dnl  Linux framebuffer module
 dnl
-AC_ARG_ENABLE(fb,
-  [  --enable-fb             Linux framebuffer support (default enabled on Linux)])
-    if test "${enable_fb}" != "no"
-    then
-      AC_CHECK_HEADERS(linux/fb.h, [
-        VLC_ADD_PLUGIN([fb])
-      ])
-    fi
+AC_CHECK_HEADER([linux/fb.h], [
+  VLC_ADD_PLUGIN([fb])
+])
+
 
 dnl
 dnl  DirectFB module
