@@ -871,11 +871,11 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 # libvp8
 # ***************************************************************************
 
-#ibvpx-$(VPX_VERSION).tar.bz2:
-#$(WGET) $(VPX_URL)
+libvpx-$(VPX_VERSION).tar.bz2:
+	$(WGET) $(VPX_URL)
 
-libvpx:
-	$(GIT) clone git://review.webmproject.org/libvpx.git
+libvpx: libvpx-$(VPX_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 
 ifdef HAVE_WIN32
 CROSS=$(HOST)-
@@ -898,7 +898,7 @@ VPX_DEPS-$(HAVE_MACOSX_ON_INTEL) += .yasm
 
 CLEAN_FILE += .libvpx
 CLEAN_PKG += libvpx
-#DISTCLEAN_PKG += libvpx-$(VPX_VERSION).tar.bz2
+DISTCLEAN_PKG += libvpx-$(VPX_VERSION).tar.bz2
 
 # ***************************************************************************
 # lame
