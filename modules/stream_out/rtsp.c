@@ -466,6 +466,7 @@ int RtspTrackAttach( rtsp_stream_t *rtsp, const char *name,
         vlc_rand_bytes (&track.ssrc, sizeof (track.ssrc));
 
         INSERT_ELEM(session->trackv, session->trackc, session->trackc, track);
+        tr = session->trackv + session->trackc - 1;
     }
 
     *ssrc = ntohl(tr->ssrc);
