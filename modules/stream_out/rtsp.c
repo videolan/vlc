@@ -442,7 +442,7 @@ int RtspTrackAttach( rtsp_stream_t *rtsp, const char *name,
         goto out;
 
     rtsp_strack_t *tr = NULL;
-    for (int i = 0; session->trackc; i++)
+    for (int i = 0; i < session->trackc; i++)
     {
         if (session->trackv[i].id == id)
         {
@@ -500,7 +500,7 @@ void RtspTrackDetach( rtsp_stream_t *rtsp, const char *name,
     if (session == NULL)
         goto out;
 
-    for (int i = 0; session->trackc; i++)
+    for (int i = 0; i < session->trackc; i++)
     {
         rtsp_strack_t *tr = session->trackv + i;
         if (tr->sout_id == sout_id)
