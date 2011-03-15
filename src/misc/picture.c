@@ -290,7 +290,12 @@ void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src )
     const unsigned i_height = __MIN( p_dst->i_visible_lines,
                                      p_src->i_visible_lines );
 
-    if( p_src->i_pitch == p_dst->i_pitch )
+    /* The 2x visible pitch check does two things:
+       1) Makes field plane_t's work correctly (see the deinterlacer module)
+       2) Moves less data if the pitch and visible pitch differ much.
+    */
+    if( p_src->i_pitch == p_dst->i_pitch  &&
+        p_src->i_pitch < 2*p_src->i_visible_pitch )
     {
         /* There are margins, but with the same width : perfect ! */
         vlc_memcpy( p_dst->p_pixels, p_src->p_pixels,
