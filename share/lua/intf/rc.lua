@@ -608,8 +608,7 @@ end
 function call_libvlc_command(cmd,client,arg)
     local ok, vlcerr = pcall( vlc.var.libvlc_command, cmd, arg )
     if not ok then
-        local a = arg or ""
-        if a ~= "" then a = " " .. a end
+        local a = arg and " "..arg or ""
         client:append("Error in `"..cmd..a.."' ".. vlcerr) -- when pcall fails, the 2nd arg is the error message.
     end
     return vlcerr
