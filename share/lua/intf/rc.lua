@@ -600,8 +600,7 @@ function call_command(cmd,client,arg)
         ok, msg = pcall( commands[cmd].func, cmd, client )
     end
     if not ok then
-        local a = arg or ""
-        if a ~= "" then a = " " .. a end
+        local a = arg and " "..arg or ""
         client:append("Error in `"..cmd..a.."' ".. msg)
     end
 end
@@ -623,10 +622,8 @@ function call_object_command(cmd,client,arg)
     end
     local ok, vlcmsg, vlcerr = pcall( vlc.var.command, cmd, var, val )
     if not ok then
-        local v = var or ""
-        if v ~= "" then v = " " .. v end
-        local v2 = val or ""
-        if v2 ~= "" then v2 = " " .. v2 end
+        local v = var and " "..var or ""
+        local v2 = val and " "..val or ""
         client:append("Error in `"..cmd..v..v2.."' ".. vlcmsg) -- when pcall fails the 2nd arg is the error message
     end
     if vlcmsg ~= "" then
