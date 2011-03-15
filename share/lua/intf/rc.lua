@@ -40,8 +40,6 @@ description=
  Configuration options setable throught the --lua-config option are:
     * hosts: A list of hosts to listen on.
     * host: A host to listen on. (won't be used if `hosts' is set)
-    * eval: Add eval command to evaluate lua expressions. Set to any value to
-            enable.
  The following can be set using the --lua-config option or in the interface
  itself using the `set' command:
     * prompt: The prompt.
@@ -129,10 +127,6 @@ function alias(client,value)
             end
         end
     end
-end
-
-function fixme(name,client)
-    client:append( "FIXME: unimplemented command `"..name.."'." )
 end
 
 function logout(name,client)
@@ -489,10 +483,6 @@ function hotkey(name, client, value)
     end
 end
 
-function eval(client,val)
-    client:append(tostring(loadstring("return "..val)()))
-end
-
 --[[ Declare commands, register their callback functions and provide
      help strings here.
      Syntax is:
@@ -566,10 +556,6 @@ commands_ordered = {
     { "shutdown"; { func = shutdown; help = "shutdown VLC" } };
     }
 
-if config.eval then
-    commands_ordered[#commands_ordered] = { "eval"; { func = skip(eval); help = "eval some lua (*debug*)"; adv =true } }
-end
-
 commands = {}
 for i, cmd in ipairs( commands_ordered ) do
     if #cmd == 2 then
@@ -591,25 +577,6 @@ for c,_ in pairs(commands) do
     if #c > env.colwidth then env.colwidth = #c end
 end
 env.coldwidth = env.colwidth + 1
-
--- Count unimplemented functions
-do
-    local count = 0
-    local list = "("
-    for c,v in pairs(commands) do
-        if v.func == fixme then
-            count = count + 1
-            if count ~= 1 then
-                list = list..","
-            end
-            list = list..c
-        end
-    end
-    list = list..")"
-    if count ~= 0 and env.welcome and env.welcome ~= "" then
-        env.welcome = env.welcome .. "\r\nWarning: "..count.." functions are still unimplemented "..list.."."
-    end
-end
 
 --[[ Utils ]]
 function split_input(input)
