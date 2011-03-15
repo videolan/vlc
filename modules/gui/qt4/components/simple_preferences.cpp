@@ -819,9 +819,10 @@ void SPrefsPanel::apply()
     case SPrefsInterface:
     {
         if( qobject_cast<QRadioButton *>(optionWidgets[skinRB])->isChecked() )
-            config_PutPsz( p_intf, "intf", "skins2" );
-        if( qobject_cast<QRadioButton *>(optionWidgets[qtRB])->isChecked() )
-            config_PutPsz( p_intf, "intf", "qt" );
+            config_PutPsz( p_intf, "intf", "skins2,any" );
+        else
+        //if( qobject_cast<QRadioButton *>(optionWidgets[qtRB])->isChecked() )
+            config_PutPsz( p_intf, "intf", "" );
         if( qobject_cast<QComboBox *>(optionWidgets[styleCB]) )
             getSettings()->setValue( "MainWindow/QtStyle",
                 qobject_cast<QComboBox *>(optionWidgets[styleCB])->currentText() );
