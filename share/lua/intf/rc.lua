@@ -607,7 +607,7 @@ function call_command(cmd,client,arg)
 end
 
 function call_libvlc_command(cmd,client,arg)
-    local ok, vlcerr, vlcmsg = pcall( vlc.var.libvlc_command, cmd, arg )
+    local ok, vlcerr = pcall( vlc.var.libvlc_command, cmd, arg )
     if not ok then
         local a = arg or ""
         if a ~= "" then a = " " .. a end
@@ -621,7 +621,7 @@ function call_object_command(cmd,client,arg)
     if arg ~= nil then
         var, val = split_input(arg)
     end
-    local ok, vlcmsg, vlcerr, vlcerrmsg = pcall( vlc.var.command, cmd, var, val )
+    local ok, vlcmsg, vlcerr = pcall( vlc.var.command, cmd, var, val )
     if not ok then
         local v = var or ""
         if v ~= "" then v = " " .. v end
