@@ -257,17 +257,14 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
         item = new QTreeWidgetItem( ui.modulesTree );
 
     char *name = vlc_object_get_name( p_obj );
-    if( name != NULL )
-    {
-        item->setText( 0, qfu( p_obj->psz_object_type ) + " \"" +
-                       qfu( name ) + "\" (" +
-                       QString::number((uintptr_t)p_obj) + ")" );
-        free( name );
-    }
-    else
-        item->setText( 0, qfu( p_obj->psz_object_type ) + " (" +
-                       QString::number((uintptr_t)p_obj) + ")" );
-
+    item->setText( 0, QString("%1 \"%2\" (%3)")
+                   .arg( qfu( p_obj->psz_object_type ) )
+                   .arg( ( name != NULL )
+                         ? QString( " \"%1\"" ).arg( qfu( name ) )
+                             : "" )
+                   .arg( QString::number((uintptr_t)p_obj) )
+                 );
+    free( name );
     item->setExpanded( true );
 
     vlc_list_t *l = vlc_list_children( p_obj );
