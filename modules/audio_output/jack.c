@@ -87,10 +87,10 @@ vlc_module_begin ()
     set_capability( "audio output", 100 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
-    add_bool( AUTO_CONNECT_OPTION, false, AUTO_CONNECT_TEXT,
-              AUTO_CONNECT_LONGTEXT, true )
-    add_string( CONNECT_REGEX_OPTION, NULL, CONNECT_REGEX_TEXT,
-                CONNECT_REGEX_LONGTEXT, true )
+    add_bool( AUTO_CONNECT_OPTION, true, AUTO_CONNECT_TEXT,
+              AUTO_CONNECT_LONGTEXT, false )
+    add_string( CONNECT_REGEX_OPTION, "system", CONNECT_REGEX_TEXT,
+                CONNECT_REGEX_LONGTEXT, false )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
