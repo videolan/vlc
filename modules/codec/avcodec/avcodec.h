@@ -256,7 +256,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
    "for encoding the audio bitstream. It takes the following options: " \
    "main, low, ssr (not supported) and ltp (default: main)" )
 
-#define FFMPEG_COMMON_MEMBERS   \
+#define AVCODEC_COMMON_MEMBERS   \
     int i_cat;                  \
     int i_codec_id;             \
     const char *psz_namecodec;  \

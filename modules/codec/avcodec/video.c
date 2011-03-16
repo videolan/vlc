@@ -61,7 +61,7 @@
  *****************************************************************************/
 struct decoder_sys_t
 {
-    FFMPEG_COMMON_MEMBERS
+    AVCODEC_COMMON_MEMBERS
 
     /* Video decoder specific part */
     mtime_t i_pts;

@@ -50,7 +50,7 @@
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 25, 0 )
 
 struct decoder_sys_t {
-    FFMPEG_COMMON_MEMBERS
+    AVCODEC_COMMON_MEMBERS
 };
 
 static subpicture_t *ConvertSubtitle(decoder_t *, AVSubtitle *, mtime_t pts);

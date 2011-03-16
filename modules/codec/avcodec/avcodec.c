@@ -59,7 +59,7 @@
 struct decoder_sys_t
 {
     /* Common part between video and audio decoder */
-    FFMPEG_COMMON_MEMBERS
+    AVCODEC_COMMON_MEMBERS
 };
 
 /****************************************************************************

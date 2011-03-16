@@ -50,7 +50,7 @@
  *****************************************************************************/
 struct decoder_sys_t
 {
-    FFMPEG_COMMON_MEMBERS
+    AVCODEC_COMMON_MEMBERS
 
     /* Temporary buffer for libavcodec */
     int     i_output_max;
