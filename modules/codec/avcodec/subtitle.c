@@ -39,8 +39,6 @@
 #   ifdef HAVE_AVCODEC_VAAPI
 #       include <libavcodec/vaapi.h>
 #   endif
-#elif defined(HAVE_FFMPEG_AVCODEC_H)
-#   include <ffmpeg/avcodec.h>
 #else
 #   include <avcodec.h>
 #endif

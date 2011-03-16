@@ -35,11 +35,7 @@
 #include <vlc_filter.h>
 #include <vlc_cpu.h>
 
-#ifdef HAVE_LIBSWSCALE_SWSCALE_H
-#   include <libswscale/swscale.h>
-#elif defined(HAVE_FFMPEG_SWSCALE_H)
-#   include <ffmpeg/swscale.h>
-#endif
+#include <libswscale/swscale.h>
 
 #include "../codec/avcodec/chroma.h" // Chroma Avutil <-> VLC conversion
 

@@ -2473,8 +2473,8 @@ AS_IF([test "${enable_avcodec}" != "no"], [
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
       CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
-      AC_CHECK_HEADERS(libavcodec/avcodec.h ffmpeg/avcodec.h)
-      AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
+      AC_CHECK_HEADERS(libavcodec/avcodec.h)
+      AC_CHECK_HEADERS(libavutil/avutil.h)
       VLC_ADD_PLUGIN([avcodec])
       VLC_ADD_LIBS([avcodec],[$AVCODEC_LIBS])
       AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
@@ -2590,8 +2590,8 @@ then
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${AVFORMAT_CFLAGS}"
       CFLAGS="${CFLAGS} ${AVFORMAT_CFLAGS}"
-      AC_CHECK_HEADERS(libavformat/avformat.h ffmpeg/avformat.h libavformat/avio.h)
-      AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
+      AC_CHECK_HEADERS(libavformat/avformat.h libavformat/avio.h)
+      AC_CHECK_HEADERS(libavutil/avutil.h)
       AS_IF([test "$enable_merge_ffmpeg" = "no"], [
         VLC_ADD_PLUGIN([avformat access_avio])
         VLC_ADD_LIBS([avformat access_avio],[$AVFORMAT_LIBS $AVUTIL_LIBS])
@@ -2623,7 +2623,7 @@ then
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${SWSCALE_CFLAGS}"
       CFLAGS="${CFLAGS} ${SWSCALE_CFLAGS}"
-      AC_CHECK_HEADERS(libswscale/swscale.h ffmpeg/swscale.h)
+      AC_CHECK_HEADERS(libswscale/swscale.h)
       VLC_ADD_PLUGIN([swscale])
       VLC_ADD_LIBS([swscale],[$SWSCALE_LIBS])
       VLC_ADD_CFLAGS([swscale],[$SWSCALE_CFLAGS])

@@ -38,12 +38,7 @@
 #include <vlc_charset.h>
 #include <vlc_avcodec.h>
 
-/* ffmpeg header */
-#if defined(HAVE_LIBAVFORMAT_AVFORMAT_H)
-#   include <libavformat/avformat.h>
-#elif defined(HAVE_FFMPEG_AVFORMAT_H)
-#   include <ffmpeg/avformat.h>
-#endif
+#include <libavformat/avformat.h>
 
 #include "../../codec/avcodec/avcodec.h"
 #include "../../codec/avcodec/chroma.h"

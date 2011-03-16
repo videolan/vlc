@@ -39,8 +39,6 @@
 #       define DXVA2API_USE_BITFIELDS
 #       include <libavcodec/dxva2.h>
 #   endif
-#elif defined(HAVE_FFMPEG_AVCODEC_H)
-#   include <ffmpeg/avcodec.h>
 #else
 #   include <avcodec.h>
 #endif
