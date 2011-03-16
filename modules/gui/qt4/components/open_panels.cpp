@@ -355,7 +355,9 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
         while( *drive )
         {
             if( GetDriveTypeA(drive) == DRIVE_CDROM )
+            {
                 ui.deviceCombo->addItem( drive );
+            }
 
             /* go to next drive */
             while( *(drive++) );
@@ -475,17 +477,23 @@ void DiscOpenPanel::updateButtons()
 /* Update the current MRL */
 void DiscOpenPanel::updateMRL()
 {
-    QString mrl = "";
+    QString mrl;
+    QString discPath;
     QStringList fileList;
+
+    if( ui.deviceCombo->itemData( ui.deviceCombo->currentIndex() ) != QVariant::Invalid )
+        discPath = ui.deviceCombo->itemData( ui.deviceCombo->currentIndex() ).toString();
+    else
+        discPath = ui.deviceCombo->currentText();
 
     /* CDDAX and VCDX not implemented. TODO ? No. */
     /* DVD */
     if( ui.dvdRadioButton->isChecked() ) {
         if( !ui.dvdsimple->isChecked() )
-            mrl = "dvd://" LOCALHOST;
+            mrl = "dvd://" LOCALHOST + discPath;
         else
-            mrl = "dvdsimple://" LOCALHOST;
-        mrl += ui.deviceCombo->currentText();
+            mrl = "dvdsimple://" LOCALHOST + discPath;
+
         if( !ui.dvdsimple->isChecked() )
             emit methodChanged( "dvdnav-caching" );
         else
@@ -500,7 +508,7 @@ void DiscOpenPanel::updateMRL()
 
     /* VCD */
     } else if ( ui.vcdRadioButton->isChecked() ) {
-        mrl = "vcd://" LOCALHOST + ui.deviceCombo->currentText();
+        mrl = "vcd://" LOCALHOST + discPath;
         emit methodChanged( "vcd-caching" );
 
         if( ui.titleSpin->value() > 0 ) {
@@ -509,7 +517,7 @@ void DiscOpenPanel::updateMRL()
 
     /* CDDA */
     } else {
-        mrl = "cdda://" LOCALHOST + ui.deviceCombo->currentText();
+        mrl = "cdda://" LOCALHOST + discPath;
         emit methodChanged( "cdda-caching" );
     }
 
