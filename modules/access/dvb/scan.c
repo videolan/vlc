@@ -607,7 +607,7 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
 
     for( int i = 0; i < p_scan->i_service; i++ )
     {
-        if( p_scan->pp_service[i]->type != SERVICE_UNKNOWN )
+        if( p_scan->pp_service[i]->psz_name )
             i_service++;
     }
 
