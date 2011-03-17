@@ -809,7 +809,9 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                     break;
                 }
 
+#ifndef NDEBUG
                 msg_Dbg( p_input, "control type=%d", i_type );
+#endif
 
                 if( Control( p_input, i_type, val ) )
                 {

@@ -72,7 +72,7 @@ void playlist_Deactivate( playlist_t *p_playlist )
     /* */
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    msg_Dbg( p_playlist, "Deactivate" );
+    msg_Dbg( p_playlist, "deactivating the playlist" );
 
     PL_LOCK;
     vlc_object_kill( p_playlist );
@@ -103,7 +103,7 @@ void playlist_Deactivate( playlist_t *p_playlist )
 
     PL_UNLOCK;
 
-    msg_Dbg( p_playlist, "Deactivated" );
+    msg_Dbg( p_playlist, "playlist correctly deactivated" );
 }
 
 /* */

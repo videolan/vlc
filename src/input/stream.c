@@ -384,7 +384,7 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
 
     if( p_sys->method == STREAM_METHOD_BLOCK )
     {
-        msg_Dbg( s, "Using AStream*Block" );
+        msg_Dbg( s, "Using block method for AStream*" );
         s->pf_read = AStreamReadBlock;
         s->pf_peek = AStreamPeekBlock;
 
@@ -411,7 +411,7 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
 
         assert( p_sys->method == STREAM_METHOD_STREAM );
 
-        msg_Dbg( s, "Using AStream*Stream" );
+        msg_Dbg( s, "Using stream method for AStream*" );
 
         s->pf_read = AStreamReadStream;
         s->pf_peek = AStreamPeekStream;
