@@ -945,7 +945,7 @@ char *str_format( vlc_object_t *p_this, const char *psz_src )
  */
 void filename_sanitize( char *str )
 {
-#if defined( WIN32 )
+#if defined( WIN32 ) || defined( __OS2__ )
     char *str_base = str;
 #endif
 
@@ -959,7 +959,7 @@ void filename_sanitize( char *str )
         return;
     }
 
-#if defined( WIN32 )
+#if defined( WIN32 ) || defined( __OS2__ )
     // Change leading spaces into underscores
     while( *str && *str == ' ' )
         *str++ = '_';
@@ -972,7 +972,7 @@ void filename_sanitize( char *str )
             case '/':
 #if defined( __APPLE__ )
             case ':':
-#elif defined( WIN32 )
+#elif defined( WIN32 ) || defined( __OS2__ )
             case '\\':
             case '*':
             case '"':
@@ -987,7 +987,7 @@ void filename_sanitize( char *str )
         str++;
     }
 
-#if defined( WIN32 )
+#if defined( WIN32 ) || defined( __OS2__ )
     // Change trailing spaces into underscores
     str--;
     while( str != str_base )
@@ -1004,7 +1004,7 @@ void filename_sanitize( char *str )
  */
 void path_sanitize( char *str )
 {
-#ifdef WIN32
+#if defined( WIN32 ) || defined( __OS2__ )
     /* check drive prefix if path is absolute */
     if( (((unsigned char)(str[0] - 'A') < 26)
       || ((unsigned char)(str[0] - 'a') < 26)) && (':' == str[1]) )
@@ -1015,7 +1015,7 @@ void path_sanitize( char *str )
 #if defined( __APPLE__ )
         if( *str == ':' )
             *str = '_';
-#elif defined( WIN32 )
+#elif defined( WIN32 ) || defined( __OS2__ )
         if( strchr( "*\"?:|<>", *str ) )
             *str = '_';
         if( *str == '/' )
@@ -1050,7 +1050,7 @@ char *make_URI (const char *path, const char *scheme)
      * scheme name (such as mailto: or news:). */
 
     char *buf;
-#ifdef WIN32
+#if defined( WIN32 ) || defined( __OS2__ )
     /* Drive letter */
     if (isalpha (path[0]) && (path[1] == ':'))
     {
@@ -1066,7 +1066,7 @@ char *make_URI (const char *path, const char *scheme)
 #endif
     if (!strncmp (path, "\\\\", 2))
     {   /* Windows UNC paths */
-#ifndef WIN32
+#if !defined( WIN32 ) && !defined( __OS2__ )
         if (scheme != NULL)
             return NULL; /* remote files not supported */
 
@@ -1183,7 +1183,7 @@ char *make_path (const char *url)
 #endif
         /* Leading slash => local path */
         if (*path == DIR_SEP_CHAR)
-#if !defined (WIN32) || defined (UNDER_CE)
+#if (!defined (WIN32) && !defined (__OS2__)) || defined (UNDER_CE)
             return path;
 #else
             return memmove (path, path + 1, strlen (path + 1) + 1);
@@ -1193,7 +1193,7 @@ char *make_path (const char *url)
         if (!strncasecmp (path, "localhost"DIR_SEP, 10))
             return memmove (path, path + 9, strlen (path + 9) + 1);
 
-#ifdef WIN32
+#if defined( WIN32 ) || defined( __OS2__ )
         if (*path && asprintf (&ret, "\\\\%s", path) == -1)
             ret = NULL;
 #endif
@@ -1207,7 +1207,7 @@ char *make_path (const char *url)
         if (*end)
             goto out;
 
-#ifndef WIN32
+#if !defined( WIN32 ) && !defined( __OS2__ )
         switch (fd)
         {
             case 0:

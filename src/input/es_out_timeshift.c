@@ -1584,7 +1584,7 @@ static char *GetTmpPath( char *psz_path )
         return strdup( "C:" );
     }
 #else
-    psz_path = strdup( "/tmp" );
+    psz_path = strdup( DIR_SEP"tmp" );
 #endif
 
     return psz_path;

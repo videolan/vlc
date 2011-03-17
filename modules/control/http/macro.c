@@ -919,7 +919,7 @@ void Execute( httpd_file_sys_t *p_args,
                     char *p;
                     char sep;
 
-#if defined( WIN32 )
+#if defined( WIN32 ) || defined( __OS2__ )
                     sep = '\\';
 #else
                     sep = '/';

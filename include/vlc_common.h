@@ -891,7 +891,7 @@ VLC_EXPORT( const char *, VLC_Compiler, ( void ) LIBVLC_USED );
 #include "vlc_main.h"
 #include "vlc_configuration.h"
 
-#if defined( WIN32 ) || defined( UNDER_CE ) || defined( __SYMBIAN32__ )
+#if defined( WIN32 ) || defined( UNDER_CE ) || defined( __SYMBIAN32__ ) || defined( __OS2__ )
 #   define DIR_SEP_CHAR '\\'
 #   define DIR_SEP "\\"
 #   define PATH_SEP_CHAR ';'

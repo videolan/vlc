@@ -58,6 +58,8 @@
 #   include <io.h>
 #   include <ctype.h>
 #   include <shlwapi.h>
+#elif defined( __OS2__ )
+#   include <ctype.h>
 #else
 #   include <unistd.h>
 #endif
@@ -87,7 +89,7 @@ struct access_sys_t
     bool b_pace_control;
 };
 
-#ifndef WIN32
+#if !defined (WIN32) && !defined (__OS2__)
 static bool IsRemote (int fd)
 {
 #if defined (HAVE_FSTATVFS) && defined (MNT_LOCAL)
@@ -284,7 +286,7 @@ ssize_t FileRead( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     int fd = p_sys->fd;
     ssize_t i_ret;
 
-#ifndef WIN32
+#if !defined (WIN32) && !defined (__OS2__)
     if (p_access->pf_seek == NoSeek)
         i_ret = net_Read (p_access, fd, NULL, p_buffer, i_len, false);
     else

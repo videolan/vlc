@@ -847,7 +847,7 @@ static const char *const ppsz_clock_descriptions[] =
 #define VCD_DEV_TEXT N_("VCD device")
 #define CDAUDIO_DEV_TEXT N_("Audio CD device")
 
-#ifdef WIN32
+#if defined( WIN32 ) || defined( __OS2__ )
 # define DVD_DEV_LONGTEXT N_( \
     "This is the default DVD drive (or file) to use. Don't forget the colon " \
     "after the drive letter (e.g. D:)")
@@ -1795,7 +1795,7 @@ vlc_module_begin ()
                  SUB_AUTO_TEXT, SUB_AUTO_LONGTEXT, false )
     add_integer( "sub-autodetect-fuzzy", 3,
                  SUB_FUZZY_TEXT, SUB_FUZZY_LONGTEXT, true )
-#ifdef WIN32
+#if defined( WIN32 ) || defined( __OS2__ )
 #   define SUB_PATH ".\\subtitles"
 #else
 #   define SUB_PATH "./Subtitles, ./subtitles"

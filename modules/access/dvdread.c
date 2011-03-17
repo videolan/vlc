@@ -178,7 +178,7 @@ static int Open( vlc_object_t *p_this )
     else
         psz_file = strdup( p_demux->psz_file );
 
-#ifdef WIN32
+#if defined( WIN32 ) || defined( __OS2__ )
     if( psz_file != NULL )
     {
         size_t flen = strlen( psz_file );

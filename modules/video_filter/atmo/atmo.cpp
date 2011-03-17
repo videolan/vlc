@@ -1765,7 +1765,7 @@ static void Atmo_SetupParameters(filter_t *p_filter)
     if(psz_path != NULL)
     {
         strcpy(p_sys->sz_framepath, psz_path);
-#if defined( WIN32 )
+#if defined( WIN32 ) || defined( __OS2__ )
         size_t i_strlen = strlen(p_sys->sz_framepath);
         if((i_strlen>0) && (p_sys->sz_framepath[i_strlen-1] != '\\'))
         {
