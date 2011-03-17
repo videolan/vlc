@@ -569,8 +569,16 @@ static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
         {
             /* symbol rates from dvb-tools dvb-c files */
             static const unsigned short symbolrates[] = {
-             6900, 6875, 6950, 7000, 3450, 6111,
-             6428, 6952, 5900, 5000 };
+             6900, 6875, 6950
+             /* With DR_44 we can cover other symbolrates from NIT-info
+                as all channel-seed files have atleast one channel that
+                has one of these symbolrate
+              */
+#ifndef _DVBPSI_DR_44_H_
+             ,7000, 3450, 6111,
+             6428, 6952, 5900, 5000
+#endif
+             };
 
             enum { num_symbols = (sizeof(symbolrates)/sizeof(*symbolrates)) };
 
