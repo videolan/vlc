@@ -5,6 +5,7 @@
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *          David Kaplan <david@2of1.org>
+ *          Ilkka Ollakka <ileoo@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +34,7 @@
 #include <vlc_dialog.h>
 #include <vlc_fs.h>
 #include <vlc_charset.h>
+#include <vlc_access.h>
 
 #include <sys/types.h>
 
@@ -50,6 +52,7 @@
 #   include <dvbpsi/nit.h>
 #endif
 
+#include "dvb.h"
 #include "scan.h"
 #include "../../demux/dvb-text.h"
 
@@ -507,12 +510,44 @@ static int ScanDvbTNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
 static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
 {
     bool b_servicefound = false;
+#ifdef _DVBPSI_DR_44_H_
+    /* We iterate frequencies/modulations/symbolrates until we get first hit and find NIT,
+       from that we fill pp_service with configurations and after that we iterate over
+       pp_services for all that doesn't have name yet (tune to that cfg and get SDT and name
+       for channel).
+     */
     for( int i = 0; i < p_scan->i_service; i++ )
     {
-        b_servicefound = (p_scan->pp_service[i]->type != SERVICE_UNKNOWN);
+        /* We found radio/tv config that doesn't have a name,
+           lets tune to that mux
+         */
+        if( !p_scan->pp_service[i]->psz_name && ( p_scan->pp_service[i]->type != SERVICE_UNKNOWN ) )
+        {
+            p_cfg->i_frequency  = p_scan->pp_service[i]->cfg.i_frequency;
+            p_cfg->i_symbolrate = p_scan->pp_service[i]->cfg.i_symbolrate;
+            p_cfg->i_modulation = p_scan->pp_service[i]->cfg.i_modulation;
+            p_scan->i_index = i+1;
+            msg_Dbg( p_scan->p_obj, "iterating to freq: %u, symbolrate %u, modulation %u index %d/%d",
+                     p_cfg->i_frequency, p_cfg->i_symbolrate, p_cfg->i_modulation, p_scan->i_index, p_scan->i_service );
+            *pf_pos = (double)i/p_scan->i_service;
+            return VLC_SUCCESS;
+        }
+    }
+    /* We should have iterated all channels by now */
+    if( p_scan->i_service )
+        return VLC_EGENERIC;
+#else
+    /* fallback to old, so when we get one channe, use that
+       symbolrate/modulation until bitter end
+     */
+    for( int i=0; i < p_scan->i_service; i++ )
+    {
+        b_servicefound = p_scan->pp_service[i]->type != SERVICE_UNKNOWN;
         if( b_servicefound )
             break;
     }
+#endif
+
     if( !b_servicefound )
     {
         bool b_rotate=true;
@@ -742,6 +777,9 @@ static void SDTCallBack( scan_session_t *p_session, dvbpsi_sdt_t *p_sdt )
 static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
 {
     vlc_object_t *p_obj = p_session->p_obj;
+    access_t *p_access = (access_t*)p_obj;
+    access_sys_t *p_sys = p_access->p_sys;
+    scan_t *p_scan = p_sys->scan;
 
     msg_Dbg( p_obj, "NITCallBack" );
     msg_Dbg( p_obj, "new NIT network_id=%d version=%d current_next=%d",
@@ -800,6 +838,9 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
 
         uint32_t i_private_data_id = 0;
         dvbpsi_descriptor_t *p_dsc;
+        scan_configuration_t *p_cfg = malloc(sizeof(*p_cfg));
+        if(!p_cfg) return VLC_ENOMEM;
+        memset(p_cfg,0,sizeof(*p_cfg));
         for( p_dsc = p_ts->p_first_descriptor; p_dsc != NULL; p_dsc = p_dsc->p_next )
         {
             if( p_dsc->i_tag == 0x41 )
@@ -810,6 +851,17 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                     uint16_t i_service_id = GetWBE( &p_dsc->p_data[3*i+0] );
                     uint8_t  i_service_type = p_dsc->p_data[3*i+2];
                     msg_Dbg( p_obj, "           * service_id=%d type=%d", i_service_id, i_service_type );
+#ifdef _DVBPSI_DR_44_H_
+                    if( (ScanFindService( p_scan, 0, i_service_id ) == NULL) &&
+                         scan_service_type( i_service_type ) != SERVICE_UNKNOWN )
+                    {
+                       scan_service_t *s = scan_service_New( i_service_id, p_cfg );
+                       s->type          = scan_service_type( i_service_type );
+                       s->i_network_id  = p_nit->i_network_id;
+                       s->i_nit_version = p_nit->i_version;
+                       TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
+                    }
+#endif
                 }
             }
             else if( p_dsc->i_tag == 0x5a )
@@ -825,6 +877,24 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                 msg_Dbg( p_obj, "           * transmission_mode %d", p_t->i_transmission_mode );
                 msg_Dbg( p_obj, "           * other_frequency_flag %d", p_t->i_other_frequency_flag );
             }
+#ifdef _DVBPSI_DR_44_H_
+            else if( p_dsc->i_tag == 0x44 )
+            {
+                dvbpsi_cable_deliv_sys_dr_t *p_t = dvbpsi_DecodeCableDelivSysDr( p_dsc );
+                msg_Dbg( p_obj, "       * Cable delivery system");
+
+                if( decode_BCD( p_t->i_frequency, &p_cfg->i_frequency ) < 0 )
+                    return;
+                p_cfg->i_frequency *= 100;
+                msg_Dbg( p_obj, "           * frequency %d", p_cfg->i_frequency );
+                if( decode_BCD( p_t->i_symbol_rate, &p_cfg->i_symbolrate ) < 0 )
+                    return;
+                p_cfg->i_symbolrate *= 100;
+                msg_Dbg( p_obj, "           * symbolrate %u", p_cfg->i_symbolrate );
+                p_cfg->i_modulation = (8 << p_t->i_modulation);
+                msg_Dbg( p_obj, "           * modulation %u", p_cfg->i_modulation );
+            }
+#endif
             else if( p_dsc->i_tag == 0x5f )
             {
                 msg_Dbg( p_obj, "       * private data specifier descriptor" );
@@ -839,6 +909,8 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                     uint16_t i_service_id = GetWBE( &p_dsc->p_data[4*i+0] );
                     int i_channel_number = GetWBE( &p_dsc->p_data[4*i+2] ) & 0x3ff;
                     msg_Dbg( p_obj, "           * service_id=%d channel_number=%d", i_service_id, i_channel_number );
+                    scan_service_t *s = ScanFindService( p_scan, 0, i_service_id );
+                    if( s && s->i_channel < 0 ) s->i_channel = i_channel_number;
                 }
 
             }
@@ -856,7 +928,7 @@ static void PSINewTableCallBack( scan_session_t *p_session, dvbpsi_handle h, uin
     if( i_table_id == 0x42 )
         dvbpsi_AttachSDT( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_session );
 #ifdef DVBPSI_USE_NIT
-    else if( i_table_id == 0x40 )
+    else if( i_table_id == 0x40 || i_table_id == 0x41 )
         dvbpsi_AttachNIT( h, i_table_id, i_extension, (dvbpsi_nit_callback)NITCallBack, p_session );
 #endif
 }
@@ -902,8 +974,12 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
             if( p_program->i_number == 0 )  /* NIT */
                 continue;
 
-            scan_service_t *s = scan_service_New( p_program->i_number, &p_session->cfg );
-            TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
+            scan_service_t *s = ScanFindService( p_scan, 0, p_program->i_number );
+            if( s == NULL )
+            {
+                s = scan_service_New( p_program->i_number, &p_session->cfg );
+                TAB_APPEND( p_scan->i_service, p_scan->pp_service, s );
+            }
         }
     }
     /* Parse SDT */
@@ -912,7 +988,7 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
         dvbpsi_sdt_service_t *p_srv;
         for( p_srv = p_sdt->p_first_service; p_srv; p_srv = p_srv->p_next )
         {
-            scan_service_t *s = ScanFindService( p_scan, i_service_start, p_srv->i_service_id );
+            scan_service_t *s = ScanFindService( p_scan, 0, p_srv->i_service_id );
             dvbpsi_descriptor_t *p_dr;
 
             if( s )
@@ -1137,7 +1213,7 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
         if( p_scan->sdt )
             dvbpsi_PushPacket( p_scan->sdt, p_block->p_buffer );
     }
-    else if( i_pid == p_scan->i_nit_pid )
+    else /*if( i_pid == p_scan->i_nit_pid )*/
     {
 #ifdef DVBPSI_USE_NIT
         if( !p_scan->nit )
