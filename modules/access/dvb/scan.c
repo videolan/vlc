@@ -555,7 +555,9 @@ static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
         {
             p_scan->parameter.i_modulation = (p_scan->parameter.i_modulation >> 1 );
             /* if we iterated all modulations, move on */
-            if( p_scan->parameter.i_modulation < 16)
+            /* dvb utils dvb-c channels files seems to have only
+               QAM64...QAM256, so lets just iterate over those */
+            if( p_scan->parameter.i_modulation < 64)
             {
                 p_scan->parameter.i_modulation = 256;
             } else {
