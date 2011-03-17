@@ -64,7 +64,7 @@ void playlist_Activate( playlist_t *p_playlist )
     {
         msg_Err( p_playlist, "cannot spawn playlist thread" );
     }
-    msg_Dbg( p_playlist, "Activated" );
+    msg_Dbg( p_playlist, "playlist threads correctly activated" );
 }
 
 void playlist_Deactivate( playlist_t *p_playlist )
@@ -312,7 +312,7 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
     {
         p_new = p_sys->request.p_item;
         int i_skip = p_sys->request.i_skip;
-        PL_DEBUG( "processing request item %s node %s skip %i",
+        PL_DEBUG( "processing request item: %s, node: %s, skip: %i",
                         PLI_NAME( p_sys->request.p_item ),
                         PLI_NAME( p_sys->request.p_node ), i_skip );
 
@@ -543,7 +543,7 @@ static void LoopRequest( playlist_t *p_playlist )
     playlist_item_t *p_item = NextItem( p_playlist );
     if( p_item )
     {
-        msg_Dbg( p_playlist, "starting new item" );
+        msg_Dbg( p_playlist, "starting playback of the new playlist item" );
         PlayItem( p_playlist, p_item );
         return;
     }

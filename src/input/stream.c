@@ -667,7 +667,7 @@ static void AStreamPrebufferBlock( stream_t *s )
     int64_t i_first = 0;
     int64_t i_start;
 
-    msg_Dbg( s, "pre buffering" );
+    msg_Dbg( s, "starting pre-buffering" );
     i_start = mdate();
     for( ;; )
     {
@@ -1420,7 +1420,7 @@ static void AStreamPrebufferStream( stream_t *s )
     int64_t i_first = 0;
     int64_t i_start;
 
-    msg_Dbg( s, "pre buffering" );
+    msg_Dbg( s, "starting pre-buffering" );
     i_start = mdate();
     for( ;; )
     {
