@@ -128,7 +128,7 @@ vlc_module_begin ()
         change_integer_range( 0, 2 )
     add_bool( "ffmpeg-fast", false, FAST_TEXT, FAST_LONGTEXT, false )
     add_integer ( "ffmpeg-skiploopfilter", 0, SKIPLOOPF_TEXT,
-                  SKIPLOOPF_LONGTEXT, true )
+                  SKIPLOOPF_LONGTEXT, false)
         change_safe ()
         change_integer_list( nloopf_list, nloopf_list_text )
 
