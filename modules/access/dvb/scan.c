@@ -145,6 +145,32 @@ static void scan_service_Delete( scan_service_t *p_srv )
     free( p_srv );
 }
 
+static int decode_BCD( uint32_t input, uint32_t *output )
+{
+    char *psz_decoded="";
+    do
+    {
+        if(asprintf( &psz_decoded, "%1d%1d%s", ( input & 0xf0 ) >> 4, input & 0x0f, psz_decoded ? psz_decoded : "" ) < 0 )
+            return VLC_ENOMEM;
+        input >>= 8;
+    } while( input );
+    *output = atol( psz_decoded );
+    free( psz_decoded );
+    return VLC_SUCCESS;
+}
+
+static int scan_service_type( int service_type )
+{
+    switch( service_type )
+    {
+    case 0x01: return SERVICE_DIGITAL_TELEVISION; break;
+    case 0x02: return SERVICE_DIGITAL_RADIO; break;
+    case 0x16: return SERVICE_DIGITAL_TELEVISION_AC_SD; break;
+    case 0x19: return SERVICE_DIGITAL_TELEVISION_AC_HD; break;
+    default:   return SERVICE_UNKNOWN; break;
+    }
+}
+
 /* */
 scan_t *scan_New( vlc_object_t *p_obj, const scan_parameter_t *p_parameter )
 {
@@ -903,15 +929,7 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
                                                    pD->i_service_name_length );
 
                         if( s->type == SERVICE_UNKNOWN )
-                        {
-                            switch( pD->i_service_type )
-                            {
-                            case 0x01: s->type = SERVICE_DIGITAL_TELEVISION; break;
-                            case 0x02: s->type = SERVICE_DIGITAL_RADIO; break;
-                            case 0x16: s->type = SERVICE_DIGITAL_TELEVISION_AC_SD; break;
-                            case 0x19: s->type = SERVICE_DIGITAL_TELEVISION_AC_HD; break;
-                            }
-                        }
+                            s->type = scan_service_type( pD->i_service_type );
                     }
                 }
             }
