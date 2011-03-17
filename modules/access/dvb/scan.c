@@ -410,7 +410,7 @@ static int ScanDvbCNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
         p_cfg->i_frequency = 10000 * ( frequencies[ p_scan->i_index ] );
         *pf_pos = (double)(p_scan->i_index * 1000 +
                            p_scan->parameter.i_symbolrate * 100 +
-                           (p_scan->parameter.i_modulation >> 4) )
+                           (256 - (p_scan->parameter.i_modulation >> 4)) )
                            / (num_frequencies * 1000 + 900 + 16);
         return VLC_SUCCESS;
     }
@@ -518,11 +518,11 @@ static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf
         bool b_rotate=true;
         if( !p_scan->parameter.b_modulation_set )
         {
-            p_scan->parameter.i_modulation = (p_scan->parameter.i_modulation << 1 ) % 512;
+            p_scan->parameter.i_modulation = (p_scan->parameter.i_modulation >> 1 );
             /* if we iterated all modulations, move on */
-            if( !p_scan->parameter.i_modulation )
+            if( p_scan->parameter.i_modulation < 16)
             {
-                p_scan->parameter.i_modulation = 16;
+                p_scan->parameter.i_modulation = 256;
             } else {
                 b_rotate=false;
             }
