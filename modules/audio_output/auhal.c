@@ -39,6 +39,9 @@
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
 #include <AudioToolbox/AudioFormat.h> 
+#include <AudioUnit/AudioComponent.h>
+
+#include <CoreServices/CoreServices.h>
 
 #ifndef verify_noerr
 #define verify_noerr(a) assert((a) == noErr)
@@ -282,7 +285,7 @@ static int OpenAnalog( aout_instance_t *p_aout )
     OSStatus                    err = noErr;
     UInt32                      i_param_size = 0, i = 0;
     int                         i_original;
-    ComponentDescription   desc;
+    ComponentDescription        desc;
     AudioStreamBasicDescription DeviceFormat;
     AudioChannelLayout          *layout;
     AudioChannelLayout          new_layout;
