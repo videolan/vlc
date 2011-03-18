@@ -890,7 +890,7 @@ VPX_DEPS-$(ENABLED)                =
 VPX_DEPS-$(HAVE_MACOSX_ON_INTEL) += .yasm
 
 .libvpx: libvpx $(VPX_DEPS-1)
-#	(cd $<; CROSS=$(CROSS) ./configure --target=$(VPX_TARGET-1) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-install-docs --disable-examples --disable-vp8-decoder && make && make install)
+	(cd $<; CROSS=$(CROSS) ./configure --target=$(VPX_TARGET-1) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-install-docs --disable-examples --disable-vp8-decoder && make && make install)
 	(rm -rf $(PREFIX)/include/vpx/ && mkdir -p $(PREFIX)/include/vpx/; cd $< && cp vpx/*.h vpx_ports/*.h $(PREFIX)/include/vpx/) # Of course, why the hell would one expect it to be listed or in make install?
 	rm $(PREFIX)/include/vpx/config.h
 	(cd $<; $(RANLIB) libvpx.a && mkdir -p $(PREFIX)/lib && cp libvpx.a $(PREFIX)/lib/) # Of course, why the hell would one expect it to be listed or in make install?
@@ -1088,7 +1088,7 @@ endif
 PHONY += ffmpeg-svn ffmpeg-tar
 
 ffmpeg/.svn:
-#	$(SVN) co $(FFMPEG_SVN) ffmpeg
+	$(SVN) co $(FFMPEG_SVN) ffmpeg
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
 endif
