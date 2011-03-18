@@ -1025,11 +1025,12 @@ endif
 
 ifdef HAVE_MACOSX32
 FFMPEGCONF += --enable-libvpx
-FFMPEGCONF += --cc=gcc-4.0
+FFMPEGCONF += --cc=gcc-4.2
 endif
 
 ifdef HAVE_MACOSX64
 FFMPEGCONF += --enable-libvpx
+FFMPEGCONF += --cc=gcc-4.2
 FFMPEGCONF += --cpu=core2
 endif
 
