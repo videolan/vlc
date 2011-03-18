@@ -557,7 +557,7 @@ AC_CHECK_FUNCS(fdatasync,,
 AC_FUNC_STRCOLL
 
 dnl Check for non-standard system calls
-AC_CHECK_FUNCS([accept4 dup3 pipe2 eventfd vmsplice sched_getaffinity])
+AC_CHECK_FUNCS([accept4 pipe2 eventfd vmsplice sched_getaffinity])
 
 AH_BOTTOM([#include <vlc_fixups.h>])
 
