@@ -267,7 +267,7 @@ vlc_module_begin ()
 
 #ifdef WIN32
     add_bool( "qt-disable-volume-keys"             /* name */,
-              false                                /* default value */,
+              true                                 /* default value */,
               QT_DISABLE_VOLUME_KEYS_TEXT          /* text */,
               QT_DISABLE_VOLUME_KEYS_LONGTEXT      /* longtext */,
               false                                /* advanced mode only */)
