@@ -275,7 +275,7 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
     char **ppsz_dir_list = NULL;
     int i_ret;
 
-    if((i_ret = vlclua_dir_list( p_this, luadirname, &ppsz_dir_list ) != VLC_SUCCESS))
+    if( (i_ret = vlclua_dir_list( p_this, luadirname, &ppsz_dir_list )) != VLC_SUCCESS)
         return i_ret;
 
     i_ret = VLC_EGENERIC;
