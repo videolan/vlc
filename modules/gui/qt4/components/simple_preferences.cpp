@@ -687,6 +687,14 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     p_config, this, false, gLayout, line );
             controls.append( control );
 
+#ifdef WIN32
+            line++;
+
+            p_config = config_FindConfig( VLC_OBJECT(p_intf), "qt-disable-volume-keys" );
+            control = new BoolConfigControl( VLC_OBJECT(p_intf), p_config, this, gLayout, line );
+            controls.append( control );
+#endif
+
             break;
         }
     }
