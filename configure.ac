@@ -2222,7 +2222,27 @@ AS_IF([test "${enable_gme}" != "no"], [
 dnl
 dnl  SIDPlay plugin
 dnl
-PKG_ENABLE_MODULES_VLC([SID], [], [libsidplay2], [C64 sid demux support], [auto], [], [-lresid-builder])
+PKG_WITH_MODULES([SID], [libsidplay2],
+		AC_LANG_PUSH(C++)
+		oldCPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$CPPFLAGS $SID_CFLAGS"
+		AC_CHECK_HEADER([sidplay/builders/resid.h], [
+			VLC_ADD_PLUGIN([sid])
+			VLC_ADD_CFLAGS([sid], [$SID_CFLAGS])
+			VLC_ADD_LIBS([sid], [$SID_LIBS] [-lresid-builder])
+		], [
+			AS_IF([test "x${enable_sid}" = "xyes"],
+				[AC_MSG_ERROR(Library libresid-builder needed for sid was not found)],
+				[AC_MSG_WARN(Library libresid-builder needed for sid was not found)]
+				)
+		])
+		CPPFLAGS="$oldCPPFLAGS"
+		AC_LANG_POP(C++),
+		AS_IF([test "x${enable_sid}" = "xyes"],
+			[AC_MSG_ERROR(Library libsidplay2 needed for sid was not found)],
+			[AC_MSG_WARN(Library libsidplay2 needed for sid was not found)]
+			),
+		[C64 sid demux support], [auto])
 
 
 dnl
