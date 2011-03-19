@@ -1097,7 +1097,7 @@ cleanup:
 int var_LocationParse (vlc_object_t *obj, const char *mrl, const char *pref)
 {
     int ret = VLC_SUCCESS;
-    size_t preflen = strlen (pref);
+    size_t preflen = strlen (pref) + 1;
 
     assert(mrl != NULL);
     while (*mrl != '\0')
