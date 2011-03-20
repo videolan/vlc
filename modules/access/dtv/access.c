@@ -168,11 +168,6 @@ vlc_module_begin ()
                  MODULATION_TEXT, MODULATION_LONGTEXT, false)
         change_string_list (modulation_vlc, modulation_user, NULL)
         change_safe ()
-    /* Legacy modulation option for backward compatibility: TODO */
-    /*add_integer ("dvb-modulation", 0, " ", " ", true)
-        change_integer_range (-1, 256)
-        change_private ()
-        change_safe ()*/
     add_integer ("dvb-inversion", -1, INVERSION_TEXT, INVERSION_LONGTEXT, true)
         change_integer_list (inversion_vlc, auto_off_on)
         change_safe ()
@@ -476,11 +471,42 @@ static char *var_InheritCodeRate (vlc_object_t *obj)
     return NULL;
 }
 
+static char *var_InheritModulation (vlc_object_t *obj)
+{
+    char *mod = var_InheritString (obj, "dvb-modulation");
+    if (mod == NULL)
+        return mod;
+
+    char *end;
+    unsigned long l = strtol (mod, &end, 0);
+    if (*end != '\0') /* not a number = not from VLC < 1.2 */
+        return mod;
+
+    /* Backward compatibility with VLC < 1.2 */
+    const char *str;
+    switch (l)
+    {
+        case -1:  str = "QPSK";   break;
+        case 0:   str = "QAM";    break;
+        case 8:   str = "8VSB";   break;
+        case 16:  str = "16QAM";  break;
+        case 32:  str = "32QAM";  break;
+        case 64:  str = "64QAM";  break;
+        case 128: str = "128QAM"; break;
+        case 256: str = "256QAM"; break;
+        default:  return mod;
+    }
+
+    msg_Warn (obj, "\"modulation=%ld\" option is obsolete. "
+                   "Use \"modulation=%s\" instead.", l, str);
+    return strdup (str);
+}
+
 
 /*** ATSC ***/
 static int atsc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
-    char *mod = var_InheritString (obj, "dvb-modulation");
+    char *mod = var_InheritModulation (obj);
 
     int ret = dvb_set_atsc (dev, freq, mod);
     free (mod);
@@ -493,7 +519,7 @@ const delsys_t atsc = { .setup = atsc_setup };
 /*** DVB-C ***/
 static int dvbc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
-    char *mod = var_InheritString (obj, "dvb-modulation");
+    char *mod = var_InheritModulation (obj);
     char *fec = var_InheritCodeRate (obj);
     unsigned srate = var_InheritInteger (obj, "dvb-srate");
 
@@ -528,7 +554,7 @@ const delsys_t dvbs2 = { .setup = dvbs2_setup };
 /*** DVB-T ***/
 static int dvbt_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
-    char *mod = var_InheritString (obj, "dvb-modulation");
+    char *mod = var_InheritModulation (obj);
     char *fec_hp = var_InheritString (obj, "dvb-code-rate-hp");
     char *fec_lp = var_InheritString (obj, "dvb-code-rate-lp");
     char *guard = var_InheritString (obj, "dvb-guard");
