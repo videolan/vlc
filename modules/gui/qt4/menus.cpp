@@ -580,11 +580,23 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     return Populate( p_intf, current, varnames, objects );
 }
 
+/* Subtitles */
+void QVLCMenu::SubMenu( intf_thread_t *p_intf, QMenu *current )
+{
+    QAction *action;
+    QMenu *submenu = new QMenu( qtr( "&Subtitles Track" ), current );
+    action = current->addMenu( submenu );
+    action->setData( "spu-es" );
+    addDPStaticEntry( submenu, qtr( "Open File..." ), "",
+                      SLOT( loadSubtitlesFile() ) );
+    submenu->addSeparator();
+}
+
 /**
  * Main Video Menu
  * Subtitles are part of Video.
  **/
-QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
+QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b_subtitle )
 {
     vout_thread_t *p_vout;
     input_thread_t *p_input;
@@ -594,14 +606,9 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     if( current->isEmpty() )
     {
         addActionWithSubmenu( current, "video-es", qtr( "Video &Track" ) );
+        if( b_subtitle)
+            SubMenu( p_intf, current );
 
-        QAction *action;
-        QMenu *submenu = new QMenu( qtr( "&Subtitles Track" ), current );
-        action = current->addMenu( submenu );
-        action->setData( "spu-es" );
-        addDPStaticEntry( submenu, qtr( "Open File..." ), "",
-                          SLOT( loadSubtitlesFile() ) );
-        submenu->addSeparator();
         current->addSeparator();
 
         addActionWithCheckbox( current, "fullscreen", qtr( "&Fullscreen" ) );

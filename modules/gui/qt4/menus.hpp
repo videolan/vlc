@@ -109,10 +109,11 @@ private:
     }
     static QMenu *RebuildNavigMenu( intf_thread_t *, QMenu *);
 
-    static QMenu *VideoMenu( intf_thread_t *, QMenu * );
+    static QMenu *VideoMenu( intf_thread_t *, QMenu *, bool b_subtitle = true );
     static QMenu *VideoMenu( intf_thread_t *p_intf, QWidget *parent ) {
         return VideoMenu( p_intf, new QMenu( parent ) );
     }
+    static void SubMenu(intf_thread_t *p_intf, QMenu *current);
 
     static QMenu *AudioMenu( intf_thread_t *, QMenu * );
     static QMenu *AudioMenu( intf_thread_t *p_intf, QWidget *parent ) {
