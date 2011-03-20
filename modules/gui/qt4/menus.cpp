@@ -581,7 +581,7 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 }
 
 /* Subtitles */
-void QVLCMenu::SubMenu( intf_thread_t *p_intf, QMenu *current )
+QMenu *QVLCMenu::SubMenu( intf_thread_t *p_intf, QMenu *current )
 {
     QAction *action;
     QMenu *submenu = new QMenu( qtr( "&Subtitles Track" ), current );
@@ -590,6 +590,7 @@ void QVLCMenu::SubMenu( intf_thread_t *p_intf, QMenu *current )
     addDPStaticEntry( submenu, qtr( "Open File..." ), "",
                       SLOT( loadSubtitlesFile() ) );
     submenu->addSeparator();
+    return submenu;
 }
 
 /**
@@ -965,10 +966,12 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 
         /* Video menu */
         submenu = new QMenu( menu );
-        action = menu->addMenu( VideoMenu( p_intf, submenu ) );
+        action = menu->addMenu( VideoMenu( p_intf, submenu, false ) );
         action->setText( qtr( "&Video" ) );
         if( action->menu()->isEmpty() )
             action->setEnabled( false );
+
+        SubMenu( p_intf, menu )->setTitle( qtr( "Subti&tle") );
 
         /* Playback menu for chapters */
         submenu = new QMenu( menu );

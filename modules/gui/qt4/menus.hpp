@@ -113,7 +113,7 @@ private:
     static QMenu *VideoMenu( intf_thread_t *p_intf, QWidget *parent ) {
         return VideoMenu( p_intf, new QMenu( parent ) );
     }
-    static void SubMenu(intf_thread_t *p_intf, QMenu *current);
+    static QMenu *SubMenu(intf_thread_t *p_intf, QMenu *current);
 
     static QMenu *AudioMenu( intf_thread_t *, QMenu * );
     static QMenu *AudioMenu( intf_thread_t *p_intf, QWidget *parent ) {
