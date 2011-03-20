@@ -81,9 +81,6 @@ static const char *const modulation_user[] = { N_("Undefined"),
 #define INVERSION_LONGTEXT N_( \
     "If the demodulator cannot detect spectral inversion correctly, " \
     "it needs to be configured manually.")
-//TODO const int inversion_linux[] = { INVERSION_AUTO,
-//    INVERSION_OFF, INVERSION_ON,
-//};
 const int inversion_vlc[] = { -1, 0, 1 };
 static const char *const auto_off_on[] = { N_("Automatic"),
     N_("Off"), N_("On") };
@@ -247,49 +244,14 @@ struct access_sys_t
 
 struct delsys
 {
-    int (*tune) (vlc_object_t *, dvb_device_t *, uint64_t freq);
+    int (*setup) (vlc_object_t *, dvb_device_t *, uint64_t freq);
     /* TODO: scan stuff */
 };
 
 static block_t *Read (access_t *);
 static int Control (access_t *, int, va_list);
-
-static const delsys_t *GuessSystem (const char *scheme, dvb_device_t *dev)
-{
-    /* NOTE: We should guess the delivery system for the "cable", "satellite"
-     * and "terrestrial" shortcuts (i.e. DVB, ISDB, ATSC...). But there is
-     * seemingly no sane way to do get the info with Linux DVB version 5.2.
-     * In particular, the frontend infos distinguish only the modulator class
-     * (QPSK, QAM, OFDM or ATSC).
-     *
-     * Furthermore, if the demodulator supports 2G, we cannot guess whether
-     * 1G or 2G is intended. For backward compatibility, 1G is assumed
-     * (this is not a limitation of Linux DVB). We will probably need something
-     * smarter when 2G (semi automatic) scanning is implemented. */
- 
-    if (!strcasecmp (scheme, "cable"))
-        scheme = "dvb-c";
-    else
-    if (!strcasecmp (scheme, "satellite"))
-        scheme = "dvb-s";
-    else
-    if (!strcasecmp (scheme, "terrestrial"))
-        scheme = "dvb-t";
-
-    if (!strcasecmp (scheme, "atsc"))
-        return &atsc;
-    if (!strcasecmp (scheme, "dvb-c"))
-        return &dvbc;
-    if (!strcasecmp (scheme, "dvb-s"))
-        return &dvbs;
-    if (!strcasecmp (scheme, "dvb-s2"))
-        return &dvbs2;
-    if (!strcasecmp (scheme, "dvb-t"))
-        return &dvbt;
-
-    return dvb_guess_system (dev);
-}
-
+static const delsys_t *GuessSystem (const char *, dvb_device_t *);
+static int Tune (vlc_object_t *, dvb_device_t *, const delsys_t *, uint64_t);
 
 static int Open (vlc_object_t *obj)
 {
@@ -314,12 +276,12 @@ static int Open (vlc_object_t *obj)
     if (freq != 0)
     {
         const delsys_t *delsys = GuessSystem (access->psz_access, dev);
-        if (delsys == NULL || delsys->tune (obj, dev, freq))
+        if (delsys == NULL || Tune (obj, dev, delsys, freq))
         {
             msg_Err (obj, "tuning to %"PRIu64" Hz failed", freq);
             dialog_Fatal (obj, N_("Digital broadcasting"),
                           N_("The selected digital tuner does not support "
-                             "the specified parameters. "
+                             "the specified parameters.\n"
                              "Please check the preferences."));
             goto error;
         }
@@ -447,23 +409,71 @@ static int Control (access_t *access, int query, va_list args)
 }
 
 
+/*** Generic tuning ***/
+
+/** Determines which delivery system to use. */
+static const delsys_t *GuessSystem (const char *scheme, dvb_device_t *dev)
+{
+    /* NOTE: We should guess the delivery system for the "cable", "satellite"
+     * and "terrestrial" shortcuts (i.e. DVB, ISDB, ATSC...). But there is
+     * seemingly no sane way to do get the info with Linux DVB version 5.2.
+     * In particular, the frontend infos distinguish only the modulator class
+     * (QPSK, QAM, OFDM or ATSC).
+     *
+     * Furthermore, if the demodulator supports 2G, we cannot guess whether
+     * 1G or 2G is intended. For backward compatibility, 1G is assumed
+     * (this is not a limitation of Linux DVB). We will probably need something
+     * smarter when 2G (semi automatic) scanning is implemented. */
+    if (!strcasecmp (scheme, "cable"))
+        scheme = "dvb-c";
+    else
+    if (!strcasecmp (scheme, "satellite"))
+        scheme = "dvb-s";
+    else
+    if (!strcasecmp (scheme, "terrestrial"))
+        scheme = "dvb-t";
+
+    if (!strcasecmp (scheme, "atsc"))
+        return &atsc;
+    if (!strcasecmp (scheme, "dvb-c"))
+        return &dvbc;
+    if (!strcasecmp (scheme, "dvb-s"))
+        return &dvbs;
+    if (!strcasecmp (scheme, "dvb-s2"))
+        return &dvbs2;
+    if (!strcasecmp (scheme, "dvb-t"))
+        return &dvbt;
+
+    return dvb_guess_system (dev);
+}
+
+/** Set parameters and tune the device */
+static int Tune (vlc_object_t *obj, dvb_device_t *dev, const delsys_t *delsys,
+                 uint64_t freq)
+{
+    if (delsys->setup (obj, dev, freq)
+     || dvb_set_inversion (dev, var_InheritInteger (obj, "dvb-inversion"))
+     || dvb_tune (dev))
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
+}
+
+
 /*** ATSC ***/
-static int atsc_tune (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
+static int atsc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     char *mod = var_InheritString (obj, "dvb-modulation");
 
     int ret = dvb_set_atsc (dev, freq, mod);
     free (mod);
-    if (ret == 0)
-        ret = dvb_tune (dev);
     return ret;
 }
 
-const delsys_t atsc = { .tune = atsc_tune };
+const delsys_t atsc = { .setup = atsc_setup };
 
 
 /*** DVB-C ***/
-static int dvbc_tune (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
+static int dvbc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     char *mod = var_InheritString (obj, "dvb-modulation");
     char *fec = var_InheritString (obj, "dvb-code-rate");
@@ -472,29 +482,33 @@ static int dvbc_tune (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
     int ret = dvb_set_dvbc (dev, freq, mod, srate, fec);
     free (fec);
     free (mod);
-    if (ret == 0)
-        ret = dvb_tune (dev);
     return ret;
 }
 
-const delsys_t dvbc = { .tune = dvbc_tune };
+const delsys_t dvbc = { .setup = dvbc_setup };
 
 
 /*** DVB-S ***/
-static int dvbs_tune (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
+static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     (void) dev; (void) freq;
     msg_Err (obj, "DVB-S not implemented");
     return -1;
 }
 
+static int dvbs2_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
+{
+    (void) dev; (void) freq;
+    msg_Err (obj, "DVB-S2 not implemented");
+    return -1;
+}
 
-const delsys_t dvbs = { .tune = dvbs_tune };
-const delsys_t dvbs2 = { .tune = dvbs_tune };
+const delsys_t dvbs = { .setup = dvbs_setup };
+const delsys_t dvbs2 = { .setup = dvbs2_setup };
 
 
 /*** DVB-T ***/
-static int dvbt_tune (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
+static int dvbt_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     char *mod = var_InheritString (obj, "dvb-modulation");
     char *fec_hp = var_InheritString (obj, "dvb-code-rate-hp");
@@ -509,9 +523,7 @@ static int dvbt_tune (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
     free (fec_lp);
     free (fec_hp);
     free (mod);
-    if (ret == 0)
-        ret = dvb_tune (dev);
     return ret;
 }
 
-const delsys_t dvbt = { .tune = dvbt_tune };
+const delsys_t dvbt = { .setup = dvbt_setup };
