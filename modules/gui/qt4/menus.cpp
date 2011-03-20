@@ -835,7 +835,7 @@ void QVLCMenu::PopupMenuPlaylistControlEntries( QMenu *menu,
 
 void QVLCMenu::PopupMenuStaticEntries( QMenu *menu )
 {
-    QMenu *openmenu = new QMenu( qtr( "Open Media" ), menu );
+    QMenu *openmenu = new QMenu( qtr( "Open a Media" ), menu );
     addDPStaticEntry( openmenu, qtr( "&Open File..." ),
         ":/type/file-asym", SLOT( openFileDialog() ) );
     addDPStaticEntry( openmenu, qtr( I_OP_OPDIR ),
@@ -1067,7 +1067,7 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     PopupMenuPlaylistControlEntries( sysMenu, p_intf);
     PopupMenuControlEntries( sysMenu, p_intf);
 
-    addDPStaticEntry( sysMenu, qtr( "&Open Media" ),
+    addDPStaticEntry( sysMenu, qtr( "&Open a Media" ),
             ":/type/file-wide", SLOT( openFileDialog() ) );
     addDPStaticEntry( sysMenu, qtr( "&Quit" ) ,
             ":/menu/quit", SLOT( quit() ) );
