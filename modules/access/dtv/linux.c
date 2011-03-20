@@ -159,6 +159,16 @@ struct dvb_device
     vlc_object_t *obj;
     int frontend;
     int demux;
+#ifndef USE_DMX
+# define MAX_PIDS 256
+    int dir;
+    uint8_t dev_id;
+    struct
+    {
+        int fd;
+        uint16_t pid;
+    } pids[MAX_PIDS];
+#endif
     int ca;
     struct dvb_frontend_info info;
     bool budget;
@@ -188,26 +198,28 @@ dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
     }
 
     d->obj = obj;
-
-    d->demux = dvb_open_node (dirfd, device, "demux", O_RDONLY);
-    if (d->demux == -1)
-    {
-        msg_Err (obj, "cannot access demux %"PRIu8" of adapter %"PRIu8": %m",
-                 device, adapter);
-        free (d);
-        close (dirfd);
-        return NULL;
-    }
-
-    /* Use the same size as socket receive buffer. This is enough for IPTV so
-     * it should be enough for DVB too. */
-    if (ioctl (d->demux, DMX_SET_BUFFER_SIZE, 1 << 18) < 0)
-        msg_Warn (obj, "cannot expand demultiplexing buffer: %m");
-
-    /* We need to filter at least one PID. The tap for TS demultiplexing cannot
-     * be configured otherwise. So add the PAT. */
+    d->frontend = -1;
+    d->ca = -1;
     d->budget = var_InheritBool (obj, "dvb-budget-mode");
+
+#ifndef USE_DMX
+    if (d->budget)
+#endif
     {
+       d->demux = dvb_open_node (dirfd, device, "demux", O_RDONLY);
+       if (d->demux == -1)
+       {
+           msg_Err (obj, "cannot access demultiplexer: %m");
+           free (d);
+           close (dirfd);
+           return NULL;
+       }
+
+       if (ioctl (d->demux, DMX_SET_BUFFER_SIZE, 1 << 20) < 0)
+           msg_Warn (obj, "cannot expand demultiplexing buffer: %m");
+
+       /* We need to filter at least one PID. The tap for TS demultiplexing
+        * cannot be configured otherwise. So add the PAT. */
         struct dmx_pes_filter_params param;
 
         param.pid = d->budget ? 0x2000 : 0x000;
@@ -217,12 +229,28 @@ dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
         param.flags = DMX_IMMEDIATE_START;
         if (ioctl (d->demux, DMX_SET_PES_FILTER, &param) < 0)
         {
-            msg_Err (obj, "cannot setup TS demultiplexer");
+            msg_Err (obj, "cannot setup TS demultiplexer: %m");
             goto error;
         }
+#ifndef USE_DMX
     }
-    d->frontend = -1;
-    d->ca = -1;
+    else
+    {
+        d->dir = fcntl (dirfd, F_DUPFD_CLOEXEC);
+        d->dev_id = device;
+
+        for (size_t i = 0; i < MAX_PIDS; i++)
+            d->pids[i].pid = d->pids[i].fd = -1;
+        d->demux = dvb_open_node (d->dir, device, "dvr", O_RDONLY);
+        if (d->demux == -1)
+        {
+            msg_Err (obj, "cannot access DVR: %m");
+            free (d);
+            close (dirfd);
+            return NULL;
+        }
+#endif
+    }
 
     if (tune)
     {
@@ -260,6 +288,15 @@ error:
 
 void dvb_close (dvb_device_t *d)
 {
+#ifndef USE_DMX
+    if (!d->budget)
+    {
+        close (d->dir);
+        for (size_t i = 0; i < MAX_PIDS; i++)
+            if (d->pids[i].fd != -1)
+                close (d->pids[i].fd);
+    }
+#endif
     if (d->ca != -1)
         close (d->ca);
     if (d->frontend != -1)
@@ -330,19 +367,66 @@ ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len)
 
 int dvb_add_pid (dvb_device_t *d, uint16_t pid)
 {
-    if (d->budget || pid == 0)
+    if (d->budget)
         return 0;
-    if (ioctl (d->demux, DMX_ADD_PID, &pid) >= 0)
+#ifdef USE_DMX
+    if (pid == 0 || ioctl (d->demux, DMX_ADD_PID, &pid) >= 0)
         return 0;
+#else
+    for (size_t i = 0; i < MAX_PIDS; i++)
+    {
+        if (d->pids[i].pid == pid)
+            return 0;
+        if (d->pids[i].fd != -1)
+            continue;
+
+        int fd = dvb_open_node (d->dir, d->dev_id, "demux", O_RDONLY);
+        if (fd == -1)
+            goto error;
+
+       /* We need to filter at least one PID. The tap for TS demultiplexing
+        * cannot be configured otherwise. So add the PAT. */
+        struct dmx_pes_filter_params param;
+
+        param.pid = pid;
+        param.input = DMX_IN_FRONTEND;
+        param.output = DMX_OUT_TS_TAP;
+        param.pes_type = DMX_PES_OTHER;
+        param.flags = DMX_IMMEDIATE_START;
+        if (ioctl (fd, DMX_SET_PES_FILTER, &param) < 0)
+        {
+            close (fd);
+            goto error;
+        }
+        d->pids[i].fd = fd;
+        d->pids[i].pid = pid;
+        return 0;
+    }
+    errno = EMFILE;
+error:
+#endif
     msg_Err (d->obj, "cannot add PID 0x%04"PRIu16": %m", pid);
     return -1;
 }
 
 void dvb_remove_pid (dvb_device_t *d, uint16_t pid)
 {
-    if (d->budget || pid == 0)
+    if (d->budget)
         return;
-    ioctl (d->demux, DMX_REMOVE_PID, &pid);
+#ifdef USE_DMX
+    if (pid != 0)
+        ioctl (d->demux, DMX_REMOVE_PID, &pid);
+#else
+    for (size_t i = 0; i < MAX_PIDS; i++)
+    {
+        if (d->pids[i].pid == pid)
+        {
+            close (d->pids[i].fd);
+            d->pids[i].pid = d->pids[i].fd = -1;
+            return;
+        }
+    }
+#endif
 }
 
 const delsys_t *dvb_guess_system (dvb_device_t *d)
