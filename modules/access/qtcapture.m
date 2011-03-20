@@ -111,7 +111,7 @@ vlc_module_end ()
         imageBufferToRelease = currentImageBuffer;
         currentImageBuffer = videoFrame;
         currentPts = (mtime_t)(1000000L / [sampleBuffer presentationTime].timeScale * [sampleBuffer presentationTime].timeValue);
-        
+
         /* Try to use hosttime of the sample if available, because iSight Pts seems broken */
         NSNumber *hosttime = (NSNumber *)[sampleBuffer attributeForKey:QTSampleBufferHostTimeAttribute];
         if( hosttime ) currentPts = (mtime_t)AudioConvertHostTimeToNanos([hosttime unsignedLongLongValue])/1000;
@@ -200,7 +200,7 @@ static int Open( vlc_object_t *p_this )
     /* Only when selected */
     if( *p_demux->psz_access == '\0' )
         return VLC_EGENERIC;
-    
+
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
     /* Set up p_demux */
@@ -209,13 +209,13 @@ static int Open( vlc_object_t *p_this )
     p_demux->info.i_update = 0;
     p_demux->info.i_title = 0;
     p_demux->info.i_seekpoint = 0;
-    
+
     p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
-    
-    memset( &fmt, 0, sizeof( es_format_t ) );    
-    
+
+    memset( &fmt, 0, sizeof( es_format_t ) );
+
     QTCaptureDeviceInput * input = nil;
     NSError *o_returnedError;
 
@@ -226,7 +226,7 @@ static int Open( vlc_object_t *p_this )
                         _("Your Mac does not seem to be equipped with a suitable input device. "
                           "Please check your connectors and drivers.") );
         msg_Err( p_demux, "Can't find any Video device" );
-        
+
         goto error;
     }
 
@@ -291,7 +291,7 @@ static int Open( vlc_object_t *p_this )
     NSLog( @"encoded_size %d %d", (int)encoded_size.width, (int)encoded_size.height );
     NSLog( @"display_size %d %d", (int)display_size.width, (int)display_size.height );
     NSLog( @"PAR size %d %d", (int)par_size.width, (int)par_size.height );
-    
+
     [p_sys->output setPixelBufferAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
         [NSNumber numberWithInt: p_sys->height], kCVPixelBufferHeightKey,
         [NSNumber numberWithInt: p_sys->width], kCVPixelBufferWidthKey,
