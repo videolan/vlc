@@ -528,7 +528,7 @@ int dvb_set_dvbc (dvb_device_t *d, uint32_t freq, const char *modstr,
     unsigned mod = dvb_parse_modulation (modstr, QAM_AUTO);
     unsigned fec = dvb_parse_fec (fecstr);
 
-    return dvb_set_props (d, 5, DTV_CLEAR, 0,
+    return dvb_set_props (d, 6, DTV_CLEAR, 0,
                           DTV_DELIVERY_SYSTEM, SYS_DVBC_ANNEX_AC,
                           DTV_FREQUENCY, freq, DTV_MODULATION, mod,
                           DTV_SYMBOL_RATE, srate, DTV_INNER_FEC, fec);
