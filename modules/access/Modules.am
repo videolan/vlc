@@ -116,6 +116,15 @@ if HAVE_XCB
 libvlc_LTLIBRARIES += libxcb_screen_plugin.la
 endif
 
+libdtv_plugin_la_SOURCES = \
+	dtv/dtv.h \
+	dtv/linux.c \
+	dtv/access.c
+libdtv_plugin_la_CFLAGS = $(AM_CFLAGS)
+libdtv_plugin_la_LIBADD = $(AM_LIBADD)
+libdtv_plugin_la_DEPENDENCIES =
+
 EXTRA_LTLIBRARIES += \
 	libaccess_rtmp_plugin.la \
+	libdtv_plugin.la \
 	libaccess_shm_plugin.la
