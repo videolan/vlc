@@ -207,7 +207,6 @@ vlc_module_begin ()
     add_string ("dvb-code-rate", "", CODE_RATE_TEXT, CODE_RATE_LONGTEXT, true)
         change_string_list (code_rate_vlc, code_rate_user, NULL)
         change_safe ()
-    /* Legacy FEC option for backward compatibility: TODO */
     add_integer ("dvb-fec", 9, " ", " ", true)
         change_integer_range (0, 9)
         change_private ()
@@ -458,6 +457,25 @@ static int Tune (vlc_object_t *obj, dvb_device_t *dev, const delsys_t *delsys,
     return VLC_SUCCESS;
 }
 
+static char *var_InheritCodeRate (vlc_object_t *obj)
+{
+    char *code_rate = var_InheritString (obj, "dvb-code-rate");
+    if (code_rate != NULL)
+        return code_rate;
+
+    /* Backward compatibility with VLC < 1.2 (= Linux DVBv3 enum) */
+    unsigned fec = var_InheritInteger (obj, "dvb-fec");
+    if (fec < 9)
+    {
+        static const char linux_dvb[9][5] = {
+            "none", "1/2", "2/3", "3/4", "4/5", "5/6", "6/7", "7/8" };
+        msg_Warn (obj, "\"fec=%u\" option is obsolete. "
+                       "Use \"code-rate=%s\" instead.", fec, linux_dvb[fec]);
+        return strdup (linux_dvb[fec]);
+    }
+    return NULL;
+}
+
 
 /*** ATSC ***/
 static int atsc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
@@ -476,7 +494,7 @@ const delsys_t atsc = { .setup = atsc_setup };
 static int dvbc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     char *mod = var_InheritString (obj, "dvb-modulation");
-    char *fec = var_InheritString (obj, "dvb-code-rate");
+    char *fec = var_InheritCodeRate (obj);
     unsigned srate = var_InheritInteger (obj, "dvb-srate");
 
     int ret = dvb_set_dvbc (dev, freq, mod, srate, fec);
