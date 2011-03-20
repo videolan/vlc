@@ -286,7 +286,7 @@ static int Demux( demux_t *p_demux )
                     vlc_gc_decref( p_input );
                     b_item = false;
                 }
-                else if( !strcmp( psz_elname, "image" ) )
+                else if( !strcmp( node, "image" ) )
                 {
                     b_image = false;
                 }
