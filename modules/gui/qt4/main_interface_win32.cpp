@@ -183,8 +183,7 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
         case WM_APPCOMMAND:
             cmd = GET_APPCOMMAND_LPARAM(msg->lParam);
 
-            bool disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
-            if( disable_volume_keys &&
+            if( p_intf->p_sys->disable_volume_keys &&
                     (   cmd == APPCOMMAND_VOLUME_DOWN   ||
                         cmd == APPCOMMAND_VOLUME_UP     ||
                         cmd == APPCOMMAND_VOLUME_MUTE ) )

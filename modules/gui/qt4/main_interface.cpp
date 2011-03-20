@@ -122,6 +122,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     settings = getSettings();
     settings->beginGroup( "MainWindow" );
 
+#ifdef WIN32
+    /* Volume keys */
+    p_intf->p_sys->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
+#endif
+
     /* */
     b_plDocked = getSettings()->value( "pl-dock-status", true ).toBool();
 

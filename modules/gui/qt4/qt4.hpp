@@ -74,6 +74,9 @@ struct intf_sys_t
 
     QString filepath;        /* Last path used in dialogs */
 
+#ifdef WIN32
+    bool disable_volume_keys;
+#endif
 };
 
 #define THEPL pl_Get(p_intf)
