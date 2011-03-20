@@ -453,9 +453,6 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
 
     menu->addSeparator();
 
-    InterfacesMenu( p_intf, menu );
-    menu->addSeparator();
-
     /* Minimal View */
     action = menu->addAction( qtr( "Mi&nimal View" ) );
     action->setShortcut( qtr( "Ctrl+H" ) );
@@ -494,6 +491,10 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
 #endif
 
     menu->addSeparator();
+
+    InterfacesMenu( p_intf, menu );
+    menu->addSeparator();
+
     /* Extensions */
     ExtensionsMenu( p_intf, menu );
 
