@@ -536,7 +536,44 @@ int dvb_set_dvbc (dvb_device_t *d, uint32_t freq, const char *modstr,
 
 
 /*** DVB-S ***/
-/* TODO */
+int dvb_set_dvbs (dvb_device_t *d, uint64_t freq,
+                  uint32_t srate, const char *fecstr)
+{
+    unsigned f = freq / 1000;
+    unsigned fec = dvb_parse_fec (fecstr);
+
+    return dvb_set_props (d, 5, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBS,
+                          DTV_FREQUENCY, f, DTV_SYMBOL_RATE, srate,
+                          DTV_INNER_FEC, fec);
+}
+
+int dvb_set_dvbs2 (dvb_device_t *d, uint64_t freq, const char *modstr,
+                   uint32_t srate, const char *fecstr, int pilot, int rolloff)
+{
+    unsigned f = freq / 1000;
+    unsigned mod = dvb_parse_modulation (modstr, QPSK);
+    unsigned fec = dvb_parse_fec (fecstr);
+
+    switch (pilot)
+    {
+        case 0:  pilot = PILOT_OFF;  break;
+        case 1:  pilot = PILOT_ON;   break;
+        default: pilot = PILOT_AUTO; break;
+    }
+
+    switch (rolloff)
+    {
+        case 20: rolloff = ROLLOFF_20;  break;
+        case 25: rolloff = ROLLOFF_25;  break;
+        case 35: rolloff = ROLLOFF_35;  break;
+        default: rolloff = PILOT_AUTO; break;
+    }
+
+    return dvb_set_props (d, 8, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBS2,
+                          DTV_FREQUENCY, f, DTV_MODULATION, mod,
+                          DTV_SYMBOL_RATE, srate, DTV_INNER_FEC, fec,
+                          DTV_PILOT, pilot, DTV_ROLLOFF, rolloff);
+}
 
 
 /*** DVB-T ***/

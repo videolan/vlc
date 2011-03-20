@@ -81,8 +81,8 @@ static const char *const modulation_user[] = { N_("Undefined"),
 #define INVERSION_LONGTEXT N_( \
     "If the demodulator cannot detect spectral inversion correctly, " \
     "it needs to be configured manually.")
-const int inversion_vlc[] = { -1, 0, 1 };
-static const char *const auto_off_on[] = { N_("Automatic"),
+const int auto_off_on_vlc[] = { -1, 0, 1 };
+static const char *const auto_off_on_user[] = { N_("Automatic"),
     N_("Off"), N_("On") };
 
 #define CODE_RATE_TEXT N_("FEC code rate")
@@ -131,6 +131,15 @@ static const char *const hierarchy_user[] = { N_("Automatic"),
     N_("None"), "1", "2", "4",
 };
 
+#define PILOT_TEXT N_("Pilot")
+#define ROLLOFF_TEXT N_("Roll-off factor")
+const int rolloff_vlc[] = { -1,
+    35, 20, 25,
+};
+static const char *const rolloff_user[] = { N_("Automatic"),
+    N_("0.35 (same as DVB-S)"), N_("0.20"), N_("0.25"),
+};
+
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
@@ -165,7 +174,7 @@ vlc_module_begin ()
         change_integer_range (0, UINT64_C(0xffffffff) * 1000)
         change_safe ()
     add_integer ("dvb-inversion", -1, INVERSION_TEXT, INVERSION_LONGTEXT, true)
-        change_integer_list (inversion_vlc, auto_off_on)
+        change_integer_list (auto_off_on_vlc, auto_off_on_user)
         change_safe ()
 
     set_section (N_("Terrestrial reception parameters"), NULL)
@@ -229,6 +238,13 @@ vlc_module_begin ()
         change_integer_range (0, 0x7fffffff)
         change_safe ()
 #endif
+    set_section (N_("DVB-S2 parameters"), NULL)
+    add_integer ("dvb-pilot", -1, PILOT_TEXT, PILOT_TEXT, true)
+        change_integer_list (auto_off_on_vlc, auto_off_on_user)
+        change_safe ()
+    add_integer ("dvb-rolloff", -1, ROLLOFF_TEXT, ROLLOFF_TEXT, true)
+        change_integer_list (rolloff_vlc, rolloff_user)
+        change_safe ()
 vlc_module_end ()
 
 struct access_sys_t
@@ -535,16 +551,30 @@ const delsys_t dvbc = { .setup = dvbc_setup };
 /*** DVB-S ***/
 static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
-    (void) dev; (void) freq;
-    msg_Err (obj, "DVB-S not implemented");
-    return -1;
+    char *fec = var_InheritCodeRate (obj);
+    uint32_t srate = var_InheritInteger (obj, "dvb-srate");
+
+    /* FIXME: adjust frequency (offset) */
+    int ret = dvb_set_dvbs (dev, freq, srate, fec);
+    free (fec);
+
+    /* TODO: setup SEC */
+    return ret;
 }
 
 static int dvbs2_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
-    (void) dev; (void) freq;
-    msg_Err (obj, "DVB-S2 not implemented");
-    return -1;
+    char *mod = var_InheritModulation (obj);
+    char *fec = var_InheritCodeRate (obj);
+    uint32_t srate = var_InheritInteger (obj, "dvb-srate");
+    int pilot = var_InheritInteger (obj, "dvb-pilot");
+    int rolloff = var_InheritInteger (obj, "dvb-rolloff");
+
+    /* FIXME: adjust frequency (offset)? SEC? */
+    int ret = dvb_set_dvbs2 (dev, freq, mod, srate, fec, pilot, rolloff);
+    free (fec);
+    free (mod);
+    return ret;
 }
 
 const delsys_t dvbs = { .setup = dvbs_setup };
