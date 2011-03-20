@@ -950,4 +950,6 @@ VLC development is NOT about being a sed god.
 < ILEoo> you smoked some capacitors from your motherboard? they're full of vitamins
  -- #videolan, one _morning_
 %
-
+< mru> documentation only attracts users too stupid to rtfs
+ -- #videolan, speaking of documentation
+%
