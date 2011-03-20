@@ -240,17 +240,9 @@ vlc_module_begin ()
 #endif
 vlc_module_end ()
 
-typedef struct
-{
-    uint16_t pid;
-    uint16_t refs;
-} pid_ref_t;
-
 struct access_sys_t
 {
     dvb_device_t *dev;
-    pid_ref_t *refv;
-    size_t refc;
 };
 
 struct delsys
@@ -317,8 +309,6 @@ static int Open (vlc_object_t *obj)
     }
 
     sys->dev = dev;
-    sys->refv = NULL;
-    sys->refc = 0;
     access->p_sys = sys;
 
     if (freq != 0)
@@ -356,7 +346,6 @@ static void Close (vlc_object_t *obj)
     access_t *access = (access_t *)obj;
     access_sys_t *sys = access->p_sys;
 
-    free (sys->refv);
     dvb_close (sys->dev);
     free (sys);
 }
@@ -381,44 +370,6 @@ static block_t *Read (access_t *access)
 
     block->i_buffer = val;
     return block;
-}
-
-/* A PID can be enabled multiple times by the demux, but packets must not be
- * duplicated, so we need to do some reference counting. */
-static int pid_ref (access_sys_t *sys, uint16_t pid)
-{
-    pid_ref_t *tab = sys->refv;
-    size_t n = sys->refc;
-
-    for (size_t i = 0; i < n; i++)
-    {
-        if (tab[i].pid == pid)
-            return ++tab[i].refs;
-    }
-
-    tab = realloc (tab, (n + 1) * sizeof (*tab));
-    if (unlikely(tab == NULL))
-        return -1;
-
-    tab[n].pid = pid;
-    tab[n].refs = 1;
-    sys->refv = tab;
-    sys->refc = n;
-    return 0;
-}
-
-static int pid_unref (access_sys_t *sys, uint16_t pid)
-{
-    pid_ref_t *tab = sys->refv;
-    size_t n = sys->refc;
-
-    /* FIXME? bound memory leak (worst case 32kb) until Close() */
-    for (size_t i = 0; i < n; i++)
-    {
-        if (tab[i].pid == pid)
-            return --tab[i].refs;
-    }
-    return -1;
 }
 
 static int Control (access_t *access, int query, va_list args)
@@ -475,14 +426,11 @@ static int Control (access_t *access, int query, va_list args)
                 return VLC_EGENERIC;
             if (add)
             {
-                if (pid_ref (sys, pid) == 0 && dvb_add_pid (dev, pid))
+                if (dvb_add_pid (dev, pid))
                     return VLC_EGENERIC;
             }
             else
-            {
-                if (pid_unref (sys, pid) == 0)
-                    dvb_remove_pid (sys->dev, pid);
-            }
+                dvb_remove_pid (dev, pid);
             return VLC_SUCCESS;
         }
 
