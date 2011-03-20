@@ -49,18 +49,10 @@ static int Control( access_t *, int, va_list );
     "value should be set in milliseconds." )
 
 #define ADAPTER_TEXT N_("Adapter card to tune")
-#define ADAPTER_LONGTEXT N_("Adapter cards have a device file in directory " \
-    "named /dev/dvb/adapter[n] with n>=0.")
-
-#define DEVICE_TEXT N_("Device number to use on adapter")
-#define DEVICE_LONGTEXT NULL
+#define ADAPTER_LONGTEXT ADAPTER_TEXT
 
 #define FREQ_TEXT N_("Transponder/multiplex frequency")
-#if defined(WIN32) || defined(WINCE)
-#    define FREQ_LONGTEXT N_("In kHz for DVB-S or Hz for DVB-C/T")
-#else
-#    define FREQ_LONGTEXT N_("In kHz for DVB-C/S/T")
-#endif
+#define FREQ_LONGTEXT N_("In kHz for DVB-S or Hz for DVB-C/T")
 
 #define INVERSION_TEXT N_("Inversion mode")
 #define INVERSION_LONGTEXT N_("Inversion mode [0=off, 1=on, 2=auto]")
@@ -68,36 +60,9 @@ static const int i_inversion_list[] = { -1, 0, 1, 2 };
 static const char *const ppsz_inversion_text[] = { N_("Undefined"), N_("Off"),
     N_("On"), N_("Auto") };
 
-#define PROBE_TEXT N_("Probe DVB card for capabilities")
-#define PROBE_LONGTEXT N_("Some DVB cards do not like to be probed for their " \
-    "capabilities, you can disable this feature if you experience some " \
-    "trouble.")
-
-#define BUDGET_TEXT N_("Budget mode")
-#define BUDGET_LONGTEXT N_("This allows you to stream an entire transponder " \
-    "with a \"budget\" card.")
-
 /* Satellite */
-#if defined(WIN32) || defined(WINCE)
-#    define NETID_TEXT N_("Network Identifier")
-#    define NETID_LONGTEXT NULL
-#else
-#    define SATNO_TEXT N_("Satellite number in the Diseqc system")
-#    define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=satellite number].")
-#endif
-
-#define VOLTAGE_TEXT N_("LNB voltage")
-#define VOLTAGE_LONGTEXT N_("In Volts [0, 13=vertical, 18=horizontal].")
-
-#define HIGH_VOLTAGE_TEXT N_("High LNB voltage")
-#define HIGH_VOLTAGE_LONGTEXT N_("Enable high voltage if your cables are " \
-    "particularly long. This is not supported by all frontends.")
-
-#define TONE_TEXT N_("22 kHz tone")
-#define TONE_LONGTEXT N_("[0=off, 1=on, -1=auto].")
-
-#define FEC_TEXT N_("Transponder FEC")
-#define FEC_LONGTEXT N_("FEC=Forward Error Correction mode [9=auto].")
+#define NETID_TEXT N_("Network Identifier")
+#define NETID_LONGTEXT NULL
 
 #define SRATE_TEXT N_("Transponder symbol rate in kHz")
 #define SRATE_LONGTEXT NULL
@@ -202,27 +167,17 @@ vlc_module_begin ()
     add_integer( "dvb-frequency", 0, FREQ_TEXT, FREQ_LONGTEXT,
                  false )
         change_safe()
-#   if defined(WIN32) || defined(WINCE)
         add_string( "dvb-network-name", NULL, NAME_TEXT, NAME_LONGTEXT,
                     true )
         add_string( "dvb-create-name", NULL, CREATE_TEXT,
                     CREATE_LONGTEXT, true )
         add_integer( "dvb-adapter", -1, ADAPTER_TEXT, ADAPTER_LONGTEXT,
                      true )
-#   else
-        /* dvb-device refers to a frontend within an adapter */
-        add_integer( "dvb-device", 0, DEVICE_TEXT, DEVICE_LONGTEXT,
-                     true )
-        add_bool( "dvb-probe", true, PROBE_TEXT, PROBE_LONGTEXT, true )
-        add_bool( "dvb-budget-mode", false, BUDGET_TEXT, BUDGET_LONGTEXT,
-                  true )
-#   endif
 
     /* DVB-S (satellite) */
     add_integer( "dvb-inversion", 2, INVERSION_TEXT,
         INVERSION_LONGTEXT, true )
         change_integer_list( i_inversion_list, ppsz_inversion_text )
-#   if defined(WIN32) || defined(WINCE)
         add_string( "dvb-polarisation", NULL, POLARISATION_TEXT,
             POLARISATION_LONGTEXT, false )
             change_string_list( ppsz_polar_list, ppsz_polar_text, 0 )
@@ -239,17 +194,6 @@ vlc_module_begin ()
             RANGE_LONGTEXT, true )
         /* dvb-range corresponds to the BDA InputRange parameter which is
          * used by some drivers to control the diseqc */
-#   else
-        add_integer( "dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT,
-            true )
-        add_integer( "dvb-voltage", 13, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
-            true )
-        add_bool( "dvb-high-voltage", false, HIGH_VOLTAGE_TEXT,
-            HIGH_VOLTAGE_LONGTEXT, true )
-        add_integer( "dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT,
-            true )
-        add_integer( "dvb-fec", 9, FEC_TEXT, FEC_LONGTEXT, true )
-#   endif
     add_integer( "dvb-lnb-lof1", 0, LNB_LOF1_TEXT,
         LNB_LOF1_LONGTEXT, true )
     add_integer( "dvb-lnb-lof2", 0, LNB_LOF2_TEXT,
