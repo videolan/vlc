@@ -1575,6 +1575,10 @@ static int RollOverTcp( demux_t *p_demux )
     var_SetBool( p_demux, "rtsp-tcp", true );
 
     /* We close the old RTSP session */
+    p_sys->rtsp->sendTeardownCommand( *p_sys->ms, NULL );
+    Medium::close( p_sys->ms );
+    RTSPClient::close( p_sys->rtsp );
+
     for( i = 0; i < p_sys->i_track; i++ )
     {
         live_track_t *tk = p_sys->track[i];
@@ -1588,10 +1592,6 @@ static int RollOverTcp( demux_t *p_demux )
     }
     if( p_sys->i_track ) free( p_sys->track );
     if( p_sys->p_out_asf ) stream_Delete( p_sys->p_out_asf );
-
-    p_sys->rtsp->sendTeardownCommand( *p_sys->ms, NULL );
-    Medium::close( p_sys->ms );
-    RTSPClient::close( p_sys->rtsp );
 
     p_sys->ms = NULL;
     p_sys->rtsp = NULL;
