@@ -103,8 +103,11 @@ static const entry_t p_list_video[] = {
         E("xdve", "XDCAM"),
         E("xdvf", "XDCAM"),
 
-        E("xd5a", "XDCAM"),
-        E("xd5b", "XDCAM"),
+        E("xd54", "XDCAM HD422 720p24 CBR"),
+        E("xd55", "XDCAM HD422 720p25 CBR"),
+        E("xd59", "XDCAM HD422 720p60 CBR"),
+        E("xd5a", "XDCAM HD422 720p50 CBR"),
+        E("xd5b", "XDCAM HD422 1080i60 CBR"),
         E("xd5c", "XDCAM"),
         E("xd5d", "XDCAM"),
         E("xd5e", "XDCAM"),
