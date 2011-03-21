@@ -150,15 +150,12 @@ static void scan_service_Delete( scan_service_t *p_srv )
 
 static int decode_BCD( uint32_t input, uint32_t *output )
 {
-    char *psz_decoded="";
-    do
+    *output = 0;
+    for( short index=28; index >= 0 ; index -= 4 )
     {
-        if(asprintf( &psz_decoded, "%1d%1d%s", ( input & 0xf0 ) >> 4, input & 0x0f, psz_decoded ? psz_decoded : "" ) < 0 )
-            return VLC_ENOMEM;
-        input >>= 8;
-    } while( input );
-    *output = atol( psz_decoded );
-    free( psz_decoded );
+        *output *= 10;
+        *output += ((input >> index) & 0x0f);
+    };
     return VLC_SUCCESS;
 }
 
