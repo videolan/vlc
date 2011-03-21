@@ -1980,6 +1980,7 @@ cam_t *en50221_Init( vlc_object_t *obj, int fd )
         p_cam->i_timeout = CLOCK_FREQ / 10;
         /* Wait a bit otherwise it doesn't initialize properly... */
         msleep( CLOCK_FREQ / 10 );
+        p_cam->i_next_event = 0;
     }
     else
     if( caps.slot_type & CA_CI )
