@@ -2500,22 +2500,26 @@ char *en50221_Status( cam_t *p_cam, char *psz_request )
             return NULL;
     }
 
-    char *buf = xmalloc( 10000 ), *p = buf;
+    char *buf;
+    size_t len;
+    FILE *p = open_memstream( &buf, &len );
+    if( unlikely(p == NULL) )
+        return NULL;
 
     ca_caps_t caps;
 
     if( ioctl( p_cam->fd, CA_GET_CAP, &caps ) < 0 )
     {
-        p += sprintf( p, "ioctl CA_GET_CAP failed (%m)\n" );
-        return buf;
+        fprintf( p, "ioctl CA_GET_CAP failed (%m)\n" );
+        goto out;
     }
 
     /* Output CA capabilities */
-    p += sprintf( p, "CA interface with %d %s, type:\n<table>", caps.slot_num,
-                  caps.slot_num == 1 ? "slot" : "slots" );
+    fprintf( p, "CA interface with %d %s, type:\n<table>", caps.slot_num,
+             caps.slot_num == 1 ? "slot" : "slots" );
 #define CHECK_CAPS( x, s )                                                  \
     if ( caps.slot_type & (CA_##x) )                                        \
-        p += sprintf( p, "<tr><td>" s "</td></tr>\n" );
+        fprintf( p, "<tr><td>%s</td></tr>\n", s )
 
     CHECK_CAPS( CI, "CI high level interface" );
     CHECK_CAPS( CI_LINK, "CI link layer level interface" );
@@ -2524,36 +2528,36 @@ char *en50221_Status( cam_t *p_cam, char *psz_request )
     CHECK_CAPS( SC, "simple smartcard interface" );
 #undef CHECK_CAPS
 
-    p += sprintf( p, "</table>%d available %s\n<table>", caps.descr_num,
-        caps.descr_num == 1 ? "descrambler (key)" : "descramblers (keys)" );
+    fprintf( p, "</table>%d available %s\n<table>", caps.descr_num,
+           caps.descr_num == 1 ? "descrambler (key)" : "descramblers (keys)" );
 #define CHECK_DESC( x )                                                     \
     if ( caps.descr_type & (CA_##x) )                                       \
-        p += sprintf( p, "<tr><td>" STRINGIFY(x) "</td></tr>\n" );
+        fprintf( p, "<tr><td>%s</td></tr>", STRINGIFY(x) )
 
     CHECK_DESC( ECD );
     CHECK_DESC( NDS );
     CHECK_DESC( DSS );
 #undef CHECK_DESC
 
-    p += sprintf( p, "</table>" );
+    fputs( "</table>", p );
 
     for( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
     {
         ca_slot_info_t sinfo;
 
         p_cam->pb_slot_mmi_undisplayed[i_slot] = false;
-        p += sprintf( p, "<p>CA slot #%d: ", i_slot );
+        fprintf( p, "<p>CA slot #%d: ", i_slot );
 
         sinfo.num = i_slot;
         if ( ioctl( p_cam->fd, CA_GET_SLOT_INFO, &sinfo ) < 0 )
         {
-            p += sprintf( p, "ioctl CA_GET_SLOT_INFO failed (%m)<br>\n" );
+            fprintf( p, "ioctl CA_GET_SLOT_INFO failed (%m)<br>\n" );
             continue;
         }
 
 #define CHECK_TYPE( x, s )                                                  \
         if ( sinfo.type & (CA_##x) )                                        \
-            p += sprintf( p, "%s", s );
+            fputs( s, p )
 
         CHECK_TYPE( CI, "high level, " );
         CHECK_TYPE( CI_LINK, "link layer level, " );
@@ -2564,70 +2568,74 @@ char *en50221_Status( cam_t *p_cam, char *psz_request )
         {
             mmi_t *p_object = en50221_GetMMIObject( p_cam, i_slot );
 
-            p += sprintf( p, "module present and ready<p>\n" );
-            p += sprintf( p, "<form action=index.html method=get>\n" );
-            p += sprintf( p, "<input type=hidden name=slot value=\"%d\">\n",
-                          i_slot );
+            fputs( "module present and ready<p>\n", p );
+            fputs( "<form action=index.html method=get>\n", p );
+            fprintf( p, "<input type=hidden name=slot value=\"%d\">\n",
+                     i_slot );
 
             if ( p_object == NULL )
             {
-                p += sprintf( p, "<input type=submit name=open value=\"Open session\">\n" );
+                fputs( "<input type=submit name=open"
+                       " value=\"Open session\">\n", p );
             }
             else
             {
                 switch ( p_object->i_object_type )
                 {
                 case EN50221_MMI_ENQ:
-                    p += sprintf( p, "<input type=hidden name=type value=enq>\n" );
-                    p += sprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
-                                  p_object->u.enq.psz_text );
-                    if ( p_object->u.enq.b_blind == false )
-                        p += sprintf( p, "<tr><td><input type=text name=answ></td></tr>\n" );
-                    else
-                        p += sprintf( p, "<tr><td><input type=password name=answ></td></tr>\n" );
+                    fputs( "<input type=hidden name=type value=enq>\n", p );
+                    fprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
+                             p_object->u.enq.psz_text );
+                    fprintf( p, "<tr><td><input type=%s name=answ>"
+                             "</td></tr>\n",
+                             p_object->u.enq.b_blind ? "password" : "text" );
                     break;
 
                 case EN50221_MMI_MENU:
-                    p += sprintf( p, "<input type=hidden name=type value=menu>\n" );
-                    p += sprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
-                                  p_object->u.menu.psz_title );
-                    p += sprintf( p, "<tr><td>%s</td></tr><tr><td>\n",
-                                  p_object->u.menu.psz_subtitle );
+                    fputs( "<input type=hidden name=type value=menu>\n", p );
+                    fprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
+                             p_object->u.menu.psz_title );
+                    fprintf( p, "<tr><td>%s</td></tr><tr><td>\n",
+                             p_object->u.menu.psz_subtitle );
                     for ( int i = 0; i < p_object->u.menu.i_choices; i++ )
-                        p += sprintf( p, "<input type=radio name=choice value=\"%d\">%s<br>\n", i + 1, p_object->u.menu.ppsz_choices[i] );
-                    p += sprintf( p, "</td></tr><tr><td>%s</td></tr>\n",
-                                  p_object->u.menu.psz_bottom );
+                        fprintf( p, "<input type=radio name=choice"
+                                 " value=\"%d\">%s<br>\n", i + 1,
+                                 p_object->u.menu.ppsz_choices[i] );
+                    fprintf( p, "</td></tr><tr><td>%s</td></tr>\n",
+                             p_object->u.menu.psz_bottom );
                     break;
 
                 case EN50221_MMI_LIST:
-                    p += sprintf( p, "<input type=hidden name=type value=menu>\n" );
-                    p += sprintf( p, "<input type=hidden name=choice value=0>\n" );
-                    p += sprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
-                                  p_object->u.menu.psz_title );
-                    p += sprintf( p, "<tr><td>%s</td></tr><tr><td>\n",
-                                  p_object->u.menu.psz_subtitle );
+                    fputs( "<input type=hidden name=type value=menu>\n", p );
+                    fputs( "<input type=hidden name=choice value=0>\n", p );
+                    fprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
+                             p_object->u.menu.psz_title );
+                    fprintf( p, "<tr><td>%s</td></tr><tr><td>\n",
+                             p_object->u.menu.psz_subtitle );
                     for ( int i = 0; i < p_object->u.menu.i_choices; i++ )
-                        p += sprintf( p, "%s<br>\n",
-                                      p_object->u.menu.ppsz_choices[i] );
-                    p += sprintf( p, "</td></tr><tr><td>%s</td></tr>\n",
-                                  p_object->u.menu.psz_bottom );
+                        fprintf( p, "%s<br>\n",
+                                 p_object->u.menu.ppsz_choices[i] );
+                    fprintf( p, "</td></tr><tr><td>%s</td></tr>\n",
+                             p_object->u.menu.psz_bottom );
                     break;
 
                 default:
-                    p += sprintf( p, "<table><tr><th>Unknown MMI object type</th></tr>\n" );
+                    fputs( "<table><tr><th>Unknown MMI object type</th></tr>\n", p );
                 }
 
-                p += sprintf( p, "</table><p><input type=submit name=ok value=\"OK\">\n" );
-                p += sprintf( p, "<input type=submit name=cancel value=\"Cancel\">\n" );
-                p += sprintf( p, "<input type=submit name=close value=\"Close Session\">\n" );
+                fputs( "</table><p><input type=submit name=ok value=\"OK\">\n", p );
+                fputs( "<input type=submit name=cancel value=\"Cancel\">\n", p );
+                fputs( "<input type=submit name=close value=\"Close Session\">\n", p );
             }
-            p += sprintf( p, "</form>\n" );
+            fputs( "</form>\n", p );
         }
         else if ( sinfo.flags & CA_CI_MODULE_PRESENT )
-            p += sprintf( p, "module present, not ready<br>\n" );
+            fputs( "module present, not ready<br>\n", p );
         else
-            p += sprintf( p, "module not present<br>\n" );
+            fputs( "module not present<br>\n", p );
     }
+out:
+    fclose( p );
     return buf;
 }
 #endif
