@@ -15,8 +15,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -26,6 +26,12 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+/* TODO
+ * - pts = 0?
+ * - mpeg4-asp
+ * - win32 testing
+ */
 
 /* VLC includes */
 #include <vlc_common.h>
@@ -113,10 +119,12 @@ struct decoder_sys_t
     BC_STATUS (WINAPI *OurDtsDeviceClose)( HANDLE hDevice );
     BC_STATUS (WINAPI *OurDtsFlushInput)( HANDLE hDevice, U32 Mode );
     BC_STATUS (WINAPI *OurDtsStopDecoder)( HANDLE hDevice );
-    BC_STATUS (WINAPI *OurDtsGetDriverStatus)( HANDLE hDevice, BC_DTS_STATUS *pStatus );
+    BC_STATUS (WINAPI *OurDtsGetDriverStatus)( HANDLE hDevice,
+                            BC_DTS_STATUS *pStatus );
     BC_STATUS (WINAPI *OurDtsProcInput)( HANDLE hDevice, U8 *pUserData,
                             U32 ulSizeInBytes, U64 timeStamp, BOOL encrypted );
-    BC_STATUS (WINAPI *OurDtsProcOutput)( HANDLE hDevice, U32 milliSecWait, BC_DTS_PROC_OUT *pOut );
+    BC_STATUS (WINAPI *OurDtsProcOutput)( HANDLE hDevice, U32 milliSecWait,
+                            BC_DTS_PROC_OUT *pOut );
     BC_STATUS (WINAPI *OurDtsIsEndOfStream)( HANDLE hDevice, U8* bEOS );
 #endif
 };
@@ -168,11 +176,12 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Fill decoder_sys_t */
-    p_dec->p_sys          = p_sys;
-    p_sys->i_nal_size     = 4; // assume 4 byte start codes
-    p_sys->i_sps_pps_size = 0;
-    p_sys->p_sps_pps_buf  = NULL;
-    p_dec->p_sys->p_pic   = NULL;
+    p_dec->p_sys            = p_sys;
+    p_sys->i_nal_size       = 4; // assume 4 byte start codes
+    p_sys->i_sps_pps_size   = 0;
+    p_sys->p_sps_pps_buf    = NULL;
+    p_dec->p_sys->p_pic     = NULL;
+    p_dec->p_sys->proc_out  = NULL;
 
     /* Win32 code *
      * We cannot link and ship BCM dll, even with LGPL license (too big)
@@ -202,12 +211,14 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
 #define LOAD_SYM( a ) \
-    BC_FUNC( a )  = (void *)GetProcAddress(p_sys->p_bcm_dll, TEXT( #a ) ); \
-    if( !BC_FUNC( a ) ) { msg_Err( p_dec, "missing symbol " # a ); return VLC_EGENERIC; }
+    BC_FUNC( a )  = (void *)GetProcAddress( p_sys->p_bcm_dll, TEXT( #a ) ); \
+    if( !BC_FUNC( a ) ) { \
+        msg_Err( p_dec, "missing symbol " # a ); return VLC_EGENERIC; }
 
 #define LOAD_SYM_PSYS( a ) \
-    p_sys->BC_FUNC( a )  = (void *)GetProcAddress(p_sys->p_bcm_dll, #a ); \
-    if( !p_sys->BC_FUNC( a ) ) { msg_Err( p_dec, "missing symbol " # a ); return VLC_EGENERIC; }
+    p_sys->BC_FUNC( a )  = (void *)GetProcAddress( p_sys->p_bcm_dll, #a ); \
+    if( !p_sys->BC_FUNC( a ) ) { \
+        msg_Err( p_dec, "missing symbol " # a ); return VLC_EGENERIC; }
 
     BC_STATUS (WINAPI *OurDtsDeviceOpen)( HANDLE *hDevice, U32 mode );
     LOAD_SYM( DtsDeviceOpen );
@@ -241,9 +252,9 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Get the handle for the device */
     if( BC_FUNC(DtsDeviceOpen)( &p_sys->bcm_handle,
-                    (DTS_PLAYBACK_MODE | DTS_LOAD_FILE_PLAY_FW | DTS_SKIP_TX_CHK_CPB ) )
-                    // | DTS_DFLT_RESOLUTION(vdecRESOLUTION_720p29_97) ) )
-                    != BC_STS_SUCCESS )
+             (DTS_PLAYBACK_MODE | DTS_LOAD_FILE_PLAY_FW | DTS_SKIP_TX_CHK_CPB) )
+             // | DTS_DFLT_RESOLUTION(vdecRESOLUTION_720p29_97) ) )
+             != BC_STS_SUCCESS )
     {
         msg_Err( p_dec, "Couldn't find and open the BCM CrystalHD device" );
         free( p_sys );
@@ -255,11 +266,13 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( BC_FUNC(DtsCrystalHDVersion)( p_sys->bcm_handle, &info ) == BC_STS_SUCCESS )
     {
         msg_Dbg( p_dec, "Using CrystalHD Driver version: %i.%i.%i, "
-            "Library version: %i.%i.%i, "
-            "Firmware version: %i.%i.%i",
-            info.drvVersion.drvRelease, info.drvVersion.drvMajor, info.drvVersion.drvMinor,
-            info.dilVersion.dilRelease, info.dilVersion.dilMajor, info.dilVersion.dilMinor,
-            info.fwVersion.fwRelease, info.fwVersion.fwMajor, info.fwVersion.fwMinor );
+            "Library version: %i.%i.%i, Firmware version: %i.%i.%i",
+            info.drvVersion.drvRelease, info.drvVersion.drvMajor,
+            info.drvVersion.drvMinor,
+            info.dilVersion.dilRelease, info.dilVersion.dilMajor,
+            info.dilVersion.dilMinor,
+            info.fwVersion.fwRelease,   info.fwVersion.fwMajor,
+            info.fwVersion.fwMinor );
     }
 #endif
 
@@ -281,7 +294,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Always use YUY2 color */
-    if( BC_FUNC(DtsSetColorSpace)( p_sys->bcm_handle, OUTPUT_MODE422_YUY2 ) != BC_STS_SUCCESS )
+    if( BC_FUNC(DtsSetColorSpace)( p_sys->bcm_handle, OUTPUT_MODE422_YUY2 )
+            != BC_STS_SUCCESS )
     {
         msg_Err( p_dec, "Couldn't set the color space. Please report this!" );
         goto error;
@@ -306,7 +320,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Open a decoder */
-    if( BC_FUNC(DtsOpenDecoder)( p_sys->bcm_handle, BC_STREAM_TYPE_ES ) != BC_STS_SUCCESS )
+    if( BC_FUNC(DtsOpenDecoder)( p_sys->bcm_handle, BC_STREAM_TYPE_ES )
+            != BC_STS_SUCCESS )
     {
         msg_Err( p_dec, "Couldn't open the CrystalHD decoder" );
         goto error;
@@ -373,6 +388,8 @@ error:
 
 static BC_STATUS ourCallback(void *shnd, uint32_t width, uint32_t height, uint32_t stride, void *pOut)
 {
+    VLC_UNUSED(width); VLC_UNUSED(height); VLC_UNUSED(stride);
+
     decoder_t *p_dec          = (decoder_t *)shnd;
     BC_DTS_PROC_OUT *proc_out = p_dec->p_sys->proc_out;
     BC_DTS_PROC_OUT *proc_in  = (BC_DTS_PROC_OUT*)pOut;
@@ -456,16 +473,12 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     memset( &proc_out, 0, sizeof(BC_DTS_PROC_OUT) );
     proc_out.PicInfo.width  = p_dec->fmt_out.video.i_width;
     proc_out.PicInfo.height = p_dec->fmt_out.video.i_height;
-    proc_out.YbuffSz        = p_dec->fmt_out.video.i_width * p_dec->fmt_out.video.i_height  / 2;
     proc_out.PoutFlags      = BC_POUT_FLAGS_SIZE;
     proc_out.AppCallBack    = ourCallback;
     proc_out.hnd            = p_dec;
     p_sys->proc_out         = &proc_out;
 
-#ifdef DEBUG_CRYSTALHD
-    msg_Dbg( p_dec, "%i, %i",  p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height );
-#endif
-
+    /* */
     BC_STATUS sts = BC_FUNC_PSYS(DtsProcOutput)( p_sys->bcm_handle, 128, &proc_out );
 #ifdef DEBUG_CRYSTALHD
     if( sts != BC_STS_SUCCESS )
@@ -492,7 +505,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 return NULL;
 
             //  crystal_CopyPicture( p_pic, &proc_out );
-            p_pic->date = proc_out.PicInfo.timeStamp > 0 ? FROM_BC_PTS(proc_out.PicInfo.timeStamp) : VLC_TS_INVALID;
+            p_pic->date = proc_out.PicInfo.timeStamp > 0 ?
+                          FROM_BC_PTS(proc_out.PicInfo.timeStamp) : VLC_TS_INVALID;
             //p_pic->date += 100 * 1000;
 #ifdef DEBUG_CRYSTALHD
             msg_Dbg( p_dec, "TS Output is %"PRIu64, p_pic->date);
@@ -515,7 +529,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_dec->fmt_out.video.i_height = proc_out.PicInfo.height;
             if( proc_out.PicInfo.height == 1088 )
                 p_dec->fmt_out.video.i_height = 1080;
-#define setAR( a, b, c ) case a: p_dec->fmt_out.video.i_sar_num = b; p_dec->fmt_out.video.i_sar_den = c; break;
+#define setAR( a, b, c ) case a: p_dec->fmt_out.video.i_sar_num = b; \
+                                 p_dec->fmt_out.video.i_sar_den = c; break;
             switch( proc_out.PicInfo.aspect_ratio )
             {
                 setAR( vdecAspectRatioSquare, 1, 1 )
@@ -539,12 +554,14 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 #undef setAR
             msg_Dbg( p_dec, "Format Change Detected [%i, %i], AR: %i/%i",
                     proc_out.PicInfo.width, proc_out.PicInfo.height,
-                    p_dec->fmt_out.video.i_sar_num, p_dec->fmt_out.video.i_sar_den );
+                    p_dec->fmt_out.video.i_sar_num,
+                    p_dec->fmt_out.video.i_sar_den );
             break;
 
         /* Nothing is documented here... */
         case BC_STS_NO_DATA:
-            if( BC_FUNC_PSYS(DtsIsEndOfStream)( p_sys->bcm_handle, &b_eos ) == BC_STS_SUCCESS )
+            if( BC_FUNC_PSYS(DtsIsEndOfStream)( p_sys->bcm_handle, &b_eos )
+                    == BC_STS_SUCCESS )
                 if( b_eos )
                     msg_Dbg( p_dec, "End of Stream" );
             break;
@@ -584,7 +601,9 @@ static void crystal_CopyPicture ( picture_t *p_pic, BC_DTS_PROC_OUT* p_out )
 #endif
 
 /* Parse the SPS/PPS Metadata to feed the decoder for avc1 */
-static int crystal_insert_sps_pps(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_size)
+static int crystal_insert_sps_pps( decoder_t *p_dec,
+                                   uint8_t *p_buf,
+                                   uint32_t i_buf_size)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_profile;
@@ -613,8 +632,10 @@ static int crystal_insert_sps_pps(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_b
     for ( unsigned int j = 0; j < 2; j++ )
     {
         /* First time is SPS, Second is PPS */
-        if (i_data_size < 1) {
-            msg_Err( p_dec, "PPS too small after processing SPS/PPS %u", i_data_size );
+        if( i_data_size < 1 )
+        {
+            msg_Err( p_dec, "PPS too small after processing SPS/PPS %u",
+                    i_data_size );
             goto error;
         }
         i_loop_end = p_buf[0] & (j == 0 ? 0x1f : 0xff);
@@ -622,7 +643,8 @@ static int crystal_insert_sps_pps(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_b
 
         for ( unsigned int i = 0; i < i_loop_end; i++)
         {
-            if (i_data_size < 2 ) {
+            if( i_data_size < 2 )
+            {
                 msg_Err( p_dec, "SPS is too small %u", i_data_size );
                 goto error;
             }
@@ -631,8 +653,10 @@ static int crystal_insert_sps_pps(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_b
             p_buf += 2;
             i_data_size -= 2;
 
-            if (i_data_size < i_nal_size ) {
-                msg_Err( p_dec, "SPS size does not match NAL specified size %u", i_data_size );
+            if( i_data_size < i_nal_size )
+            {
+                msg_Err( p_dec, "SPS size does not match NAL specified size %u",
+                        i_data_size );
                 goto error;
             }
 
@@ -641,7 +665,7 @@ static int crystal_insert_sps_pps(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_b
             p_sys->p_sps_pps_buf[p_sys->i_sps_pps_size++] = 0;
             p_sys->p_sps_pps_buf[p_sys->i_sps_pps_size++] = 1;
 
-            memcpy(p_sys->p_sps_pps_buf + p_sys->i_sps_pps_size, p_buf, i_nal_size);
+            memcpy( p_sys->p_sps_pps_buf + p_sys->i_sps_pps_size, p_buf, i_nal_size );
             p_sys->i_sps_pps_size += i_nal_size;
 
             p_buf += i_nal_size;
