@@ -278,6 +278,7 @@ function host()
         return wclients, rclients
     end
 
+    -- FIXME: this is never called, client sockets are leaked
     local function destructor( h )
         print "destructor"
         for _,client in pairs(clients) do
@@ -307,15 +308,6 @@ function host()
                 accept_and_select = _accept_and_select,
                 broadcast = _broadcast,
               }
-
-    -- the metatable
-    local m = { -- data
-                __metatable = "Nothing to see here. Move along.",
-                -- methods
-                __gc = destructor,
-              }
-
-    setmetatable( h, m )
 
     return h
 end
