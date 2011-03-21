@@ -50,7 +50,6 @@ typedef struct
 
 #define MAX_DEMUX 256
 
-#include "en50221.h"
 struct scan_t;
 struct scan_parameter_t;
 
@@ -62,7 +61,7 @@ struct access_sys_t
     mtime_t i_frontend_timeout;
     bool b_budget_mode;
 
-    cam_t cam;
+    struct cam *p_cam;
 
     /* */
     int i_read_once;
@@ -118,7 +117,7 @@ int  DVROpen( access_t * );
 void DVRClose( access_t * );
 
 int  CAMOpen( access_t * );
-int  CAMPoll( access_t * );
+void CAMPoll( access_t * );
 int  CAMSet( access_t *, dvbpsi_pmt_t * );
 void CAMClose( access_t * );
 #ifdef ENABLE_HTTPD
@@ -131,9 +130,3 @@ void HTTPClose( access_t *p_access );
 const char *HTTPExtractValue( const char *psz_uri, const char *psz_name,
                               char *psz_value, int i_value_max );
 #endif
-/*****************************************************************************
- * Hacks
- *****************************************************************************/
-#define STRINGIFY( z )   UGLY_KLUDGE( z )
-#define UGLY_KLUDGE( z ) #z
-

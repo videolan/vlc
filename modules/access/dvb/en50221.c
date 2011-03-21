@@ -31,6 +31,7 @@
 
 #include <errno.h>
 #include <time.h>
+#include <assert.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <poll.h>
@@ -55,6 +56,57 @@
 
 #include "dvb.h"
 #include "../../demux/dvb-text.h"
+#include "en50221.h"
+
+typedef struct en50221_session_t
+{
+    unsigned i_slot;
+    int i_resource_id;
+    void (* pf_handle)( cam_t *, int, uint8_t *, int );
+    void (* pf_close)( cam_t *, int );
+    void (* pf_manage)( cam_t *, int );
+    void *p_sys;
+} en50221_session_t;
+
+#define EN50221_MMI_NONE 0
+#define EN50221_MMI_ENQ 1
+#define EN50221_MMI_ANSW 2
+#define EN50221_MMI_MENU 3
+#define EN50221_MMI_MENU_ANSW 4
+#define EN50221_MMI_LIST 5
+
+typedef struct en50221_mmi_object_t
+{
+    int i_object_type;
+
+    union
+    {
+        struct
+        {
+            bool b_blind;
+            char *psz_text;
+        } enq;
+
+        struct
+        {
+            bool b_ok;
+            char *psz_answ;
+        } answ;
+
+        struct
+        {
+            char *psz_title, *psz_subtitle, *psz_bottom;
+            char **ppsz_choices;
+            int i_choices;
+        } menu; /* menu and list are the same */
+
+        struct
+        {
+            int i_choice;
+        } menu_answ;
+    } u;
+} mmi_t;
+
 
 #undef DEBUG_TPDU
 #define HLCI_WAIT_CAM_READY 0
@@ -66,6 +118,28 @@ static void ApplicationInformationOpen( cam_t *, unsigned i_session_id );
 static void ConditionalAccessOpen( cam_t *, unsigned i_session_id );
 static void DateTimeOpen( cam_t *, unsigned i_session_id );
 static void MMIOpen( cam_t *, unsigned i_session_id );
+
+#define MAX_CI_SLOTS 16
+#define MAX_SESSIONS 32
+#define MAX_PROGRAMS 24
+
+struct cam
+{
+    vlc_object_t *obj;
+    int fd;
+    int i_ca_type;
+    mtime_t i_timeout, i_next_event;
+
+    unsigned i_nb_slots;
+    bool pb_active_slot[MAX_CI_SLOTS];
+    bool pb_tc_has_data[MAX_CI_SLOTS];
+    bool pb_slot_mmi_expected[MAX_CI_SLOTS];
+    bool pb_slot_mmi_undisplayed[MAX_CI_SLOTS];
+    en50221_session_t p_sessions[MAX_SESSIONS];
+
+    dvbpsi_pmt_t *pp_selected_programs[MAX_PROGRAMS];
+    int i_selected_programs;
+};
 
 /*****************************************************************************
  * Utility functions
@@ -1504,16 +1578,44 @@ static void DateTimeOpen( cam_t * p_cam, unsigned i_session_id )
 #define AI_CANCEL  0x00
 #define AI_ANSWER  0x01
 
-typedef struct
+static void MMIFree( mmi_t *p_object )
 {
-    en50221_mmi_object_t last_object;
-} mmi_t;
+    switch ( p_object->i_object_type )
+    {
+    case EN50221_MMI_ENQ:
+        FREENULL( p_object->u.enq.psz_text );
+        break;
+
+    case EN50221_MMI_ANSW:
+        if ( p_object->u.answ.b_ok )
+        {
+            FREENULL( p_object->u.answ.psz_answ );
+        }
+        break;
+
+    case EN50221_MMI_MENU:
+    case EN50221_MMI_LIST:
+        FREENULL( p_object->u.menu.psz_title );
+        FREENULL( p_object->u.menu.psz_subtitle );
+        FREENULL( p_object->u.menu.psz_bottom );
+        for ( int i = 0; i < p_object->u.menu.i_choices; i++ )
+        {
+            free( p_object->u.menu.ppsz_choices[i] );
+        }
+        FREENULL( p_object->u.menu.ppsz_choices );
+        break;
+
+    default:
+        break;
+    }
+}
+
 
 /*****************************************************************************
  * MMISendObject
  *****************************************************************************/
 static void MMISendObject( cam_t *p_cam, int i_session_id,
-                           en50221_mmi_object_t *p_object )
+                           mmi_t *p_object )
 {
     int i_slot = p_cam->p_sessions[i_session_id - 1].i_slot;
     uint8_t *p_data;
@@ -1611,17 +1713,17 @@ static void MMIHandleEnq( cam_t *p_cam, int i_session_id,
     int l;
     uint8_t *d = APDUGetLength( p_apdu, &l );
 
-    en50221_MMIFree( &p_mmi->last_object );
-    p_mmi->last_object.i_object_type = EN50221_MMI_ENQ;
-    p_mmi->last_object.u.enq.b_blind = (*d & 0x1) ? true : false;
+    MMIFree( p_mmi );
+    p_mmi->i_object_type = EN50221_MMI_ENQ;
+    p_mmi->u.enq.b_blind = (*d & 0x1) ? true : false;
     d += 2; /* skip answer_text_length because it is not mandatory */
     l -= 2;
-    p_mmi->last_object.u.enq.psz_text = xmalloc( l + 1 );
-    strncpy( p_mmi->last_object.u.enq.psz_text, (char *)d, l );
-    p_mmi->last_object.u.enq.psz_text[l] = '\0';
+    p_mmi->u.enq.psz_text = xmalloc( l + 1 );
+    strncpy( p_mmi->u.enq.psz_text, (char *)d, l );
+    p_mmi->u.enq.psz_text[l] = '\0';
 
-    msg_Dbg( p_cam->obj, "MMI enq: %s%s", p_mmi->last_object.u.enq.psz_text,
-             p_mmi->last_object.u.enq.b_blind == true ? " (blind)" : "" );
+    msg_Dbg( p_cam->obj, "MMI enq: %s%s", p_mmi->u.enq.psz_text,
+             p_mmi->u.enq.b_blind == true ? " (blind)" : "" );
     p_cam->pb_slot_mmi_expected[i_slot] = false;
     p_cam->pb_slot_mmi_undisplayed[i_slot] = true;
 }
@@ -1639,11 +1741,11 @@ static void MMIHandleMenu( cam_t *p_cam, int i_session_id, int i_tag,
     int l;
     uint8_t *d = APDUGetLength( p_apdu, &l );
 
-    en50221_MMIFree( &p_mmi->last_object );
-    p_mmi->last_object.i_object_type = (i_tag == AOT_MENU_LAST) ?
+    MMIFree( p_mmi );
+    p_mmi->i_object_type = (i_tag == AOT_MENU_LAST) ?
                                        EN50221_MMI_MENU : EN50221_MMI_LIST;
-    p_mmi->last_object.u.menu.i_choices = 0;
-    p_mmi->last_object.u.menu.ppsz_choices = NULL;
+    p_mmi->u.menu.i_choices = 0;
+    p_mmi->u.menu.ppsz_choices = NULL;
 
     if ( l > 0 )
     {
@@ -1652,10 +1754,9 @@ static void MMIHandleMenu( cam_t *p_cam, int i_session_id, int i_tag,
 #define GET_FIELD( x )                                                      \
         if ( l > 0 )                                                        \
         {                                                                   \
-            p_mmi->last_object.u.menu.psz_##x                               \
-                            = MMIGetText( p_cam, &d, &l );               \
-            msg_Dbg( p_cam->obj, "MMI " STRINGIFY( x ) ": %s",                \
-                     p_mmi->last_object.u.menu.psz_##x );                   \
+            p_mmi->u.menu.psz_##x = MMIGetText( p_cam, &d, &l );            \
+            msg_Dbg( p_cam->obj, "MMI " STRINGIFY( x ) ": %s",              \
+                     p_mmi->u.menu.psz_##x );                               \
         }
 
         GET_FIELD( title );
@@ -1666,8 +1767,8 @@ static void MMIHandleMenu( cam_t *p_cam, int i_session_id, int i_tag,
         while ( l > 0 )
         {
             char *psz_text = MMIGetText( p_cam, &d, &l );
-            TAB_APPEND( p_mmi->last_object.u.menu.i_choices,
-                        p_mmi->last_object.u.menu.ppsz_choices,
+            TAB_APPEND( p_mmi->u.menu.i_choices,
+                        p_mmi->u.menu.ppsz_choices,
                         psz_text );
             msg_Dbg( p_cam->obj, "MMI choice: %s", psz_text );
         }
@@ -1737,7 +1838,7 @@ static void MMIClose( cam_t *p_cam, int i_session_id )
     int i_slot = p_cam->p_sessions[i_session_id - 1].i_slot;
     mmi_t *p_mmi = (mmi_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
 
-    en50221_MMIFree( &p_mmi->last_object );
+    MMIFree( p_mmi );
     free( p_cam->p_sessions[i_session_id - 1].p_sys );
 
     msg_Dbg( p_cam->obj, "closing MMI session (%d)", i_session_id );
@@ -1758,7 +1859,7 @@ static void MMIOpen( cam_t *p_cam, unsigned i_session_id )
     p_cam->p_sessions[i_session_id - 1].pf_close = MMIClose;
     p_cam->p_sessions[i_session_id - 1].p_sys = xmalloc(sizeof(mmi_t));
     p_mmi = (mmi_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
-    p_mmi->last_object.i_object_type = EN50221_MMI_NONE;
+    p_mmi->i_object_type = EN50221_MMI_NONE;
 }
 
 
@@ -1818,10 +1919,55 @@ static int InitSlot( cam_t * p_cam, int i_slot )
 /*****************************************************************************
  * en50221_Init : Initialize the CAM for en50221
  *****************************************************************************/
-int en50221_Init( cam_t * p_cam )
+cam_t *en50221_Init( vlc_object_t *obj, int fd )
 {
-    if( p_cam->i_ca_type & CA_CI_LINK )
+    ca_caps_t caps;
+
+    memset( &caps, 0, sizeof( caps ));
+    if( ioctl( fd, CA_GET_CAP, &caps ) < 0 )
     {
+        msg_Err( obj, "CAMInit: ioctl() error getting CAM capabilities" );
+        return NULL;
+    }
+
+    /* Output CA capabilities */
+    msg_Dbg( obj, "CA interface with %d slot(s)", caps.slot_num );
+    if( caps.slot_type & CA_CI )
+        msg_Dbg( obj, " CI high level interface type" );
+    if( caps.slot_type & CA_CI_LINK )
+        msg_Dbg( obj, " CI link layer level interface type" );
+    if( caps.slot_type & CA_CI_PHYS )
+        msg_Dbg( obj, " CI physical layer level interface type (not supported) " );
+    if( caps.slot_type & CA_DESCR )
+        msg_Dbg( obj, " built-in descrambler detected" );
+    if( caps.slot_type & CA_SC )
+        msg_Dbg( obj, " simple smart card interface" );
+
+    msg_Dbg( obj, "%d available descrambler(s) (keys)", caps.descr_num );
+    if( caps.descr_type & CA_ECD )
+        msg_Dbg( obj, " ECD scrambling system supported" );
+    if( caps.descr_type & CA_NDS )
+        msg_Dbg( obj, " NDS scrambling system supported" );
+    if( caps.descr_type & CA_DSS )
+        msg_Dbg( obj, " DSS scrambling system supported" );
+
+    if( caps.slot_num == 0 )
+    {
+        msg_Err( obj, "CAM module without slots" );
+        return NULL;
+    }
+
+    cam_t *p_cam = malloc( sizeof( *p_cam ) );
+    if( unlikely(p_cam == NULL) )
+        goto error;
+
+    p_cam->obj = obj;
+    p_cam->fd = fd;
+
+    if( caps.slot_type & CA_CI_LINK )
+    {
+        p_cam->i_ca_type = CA_CI_LINK;
+
         for ( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
         {
             if ( ioctl( p_cam->fd, CA_RESET, 1 << i_slot) != 0 )
@@ -1834,29 +1980,25 @@ int en50221_Init( cam_t * p_cam )
         p_cam->i_timeout = CLOCK_FREQ / 10;
         /* Wait a bit otherwise it doesn't initialize properly... */
         msleep( CLOCK_FREQ / 10 );
-
-        return VLC_SUCCESS;
     }
     else
+    if( caps.slot_type & CA_CI )
     {
+        p_cam->i_ca_type = CA_CI;
+
         struct ca_slot_info info;
         info.num = 0;
-
         /* We don't reset the CAM in that case because it's done by the
          * ASIC. */
-        if ( ioctl( p_cam->fd, CA_GET_SLOT_INFO, &info ) < 0 )
+        if ( ioctl( fd, CA_GET_SLOT_INFO, &info ) < 0 )
         {
-            msg_Err( p_cam->obj, "en50221_Init: couldn't get slot info" );
-            close( p_cam->fd );
-            p_cam->fd = -1;
-            return VLC_EGENERIC;
+            msg_Err( obj, "cannot get slot info: %m" );
+            goto error;
         }
         if( info.flags == 0 )
         {
-            msg_Err( p_cam->obj, "en50221_Init: no CAM inserted" );
-            close( p_cam->fd );
-            p_cam->fd = -1;
-            return VLC_EGENERIC;
+            msg_Err( obj, "no CAM inserted" );
+            goto error;
         }
 
         /* Allocate a dummy sessions */
@@ -1871,49 +2013,71 @@ int en50221_Init( cam_t * p_cam )
         ca_msg.msg[2] = ( AOT_APPLICATION_INFO & 0x0000FF ) >> 0;
         memset( &ca_msg.msg[3], 0, 253 );
         APDUSend( p_cam, 1, AOT_APPLICATION_INFO_ENQ, NULL, 0 );
-        if ( ioctl( p_cam->fd, CA_GET_MSG, &ca_msg ) < 0 )
+        if ( ioctl( fd, CA_GET_MSG, &ca_msg ) < 0 )
         {
-            msg_Err( p_cam->obj, "en50221_Init: failed getting message" );
-            return VLC_EGENERIC;
+            msg_Err( obj, "en50221_Init: failed getting message" );
+            goto error;
         }
 
 #if HLCI_WAIT_CAM_READY
         while( ca_msg.msg[8] == 0xff && ca_msg.msg[9] == 0xff )
         {
-            if( !vlc_object_alive (p_cam) ) return VLC_EGENERIC;
+            if( !vlc_object_alive (obj) )
+                goto error;
             msleep(1);
-            msg_Dbg( p_cam->obj, "CAM: please wait" );
+            msg_Dbg( obj, "CAM: please wait" );
             APDUSend( p_cam, 1, AOT_APPLICATION_INFO_ENQ, NULL, 0 );
             ca_msg.length=3;
             ca_msg.msg[0] = ( AOT_APPLICATION_INFO & 0xFF0000 ) >> 16;
             ca_msg.msg[1] = ( AOT_APPLICATION_INFO & 0x00FF00 ) >> 8;
             ca_msg.msg[2] = ( AOT_APPLICATION_INFO & 0x0000FF ) >> 0;
             memset( &ca_msg.msg[3], 0, 253 );
-            if ( ioctl( p_cam->fd, CA_GET_MSG, &ca_msg ) < 0 )
+            if ( ioctl( fd, CA_GET_MSG, &ca_msg ) < 0 )
             {
-                msg_Err( p_cam->obj, "en50221_Init: failed getting message" );
-                return VLC_EGENERIC;
+                msg_Err( obj, "en50221_Init: failed getting message" );
+                goto error;
             }
             msg_Dbg( p_cam->obj, "en50221_Init: Got length: %d, tag: 0x%x", ca_msg.length, APDUGetTag( ca_msg.msg, ca_msg.length ) );
         }
 #else
         if( ca_msg.msg[8] == 0xff && ca_msg.msg[9] == 0xff )
         {
-            msg_Err( p_cam->obj, "CAM returns garbage as application info!" );
-            return VLC_EGENERIC;
+            msg_Err( obj, "CAM returns garbage as application info!" );
+            goto error;
         }
 #endif
-        msg_Dbg( p_cam->obj, "found CAM %s using id 0x%x", &ca_msg.msg[12],
+        msg_Dbg( obj, "found CAM %s using id 0x%x", &ca_msg.msg[12],
                  (ca_msg.msg[8]<<8)|ca_msg.msg[9] );
-        return VLC_SUCCESS;
     }
+    else
+    {
+        msg_Err( obj, "CAM interface incompatible" );
+        goto error;
+    }
+    return p_cam;
+
+error:
+    free( p_cam );
+    return NULL;
 }
+
 
 /*****************************************************************************
  * en50221_Poll : Poll the CAM for TPDUs
  *****************************************************************************/
-int en50221_Poll( cam_t * p_cam )
+void en50221_Poll( cam_t * p_cam )
 {
+    switch( p_cam->i_ca_type )
+    {
+    case CA_CI_LINK:
+        if( mdate() > p_cam->i_next_event )
+            break;
+    case CA_CI:
+        return;
+    default:
+        assert( 0 );
+    }
+
     for ( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
     {
         uint8_t i_tag;
@@ -2044,7 +2208,7 @@ int en50221_Poll( cam_t * p_cam )
         }
     }
 
-    return VLC_SUCCESS;
+    p_cam->i_next_event = mdate() + p_cam->i_timeout;
 }
 
 
@@ -2120,7 +2284,7 @@ int en50221_SetCAPMT( cam_t * p_cam, dvbpsi_pmt_t *p_pmt )
 /*****************************************************************************
  * en50221_OpenMMI :
  *****************************************************************************/
-int en50221_OpenMMI( cam_t * p_cam, unsigned i_slot )
+static int en50221_OpenMMI( cam_t * p_cam, unsigned i_slot )
 {
     if( p_cam->i_ca_type & CA_CI_LINK )
     {
@@ -2160,7 +2324,7 @@ int en50221_OpenMMI( cam_t * p_cam, unsigned i_slot )
 /*****************************************************************************
  * en50221_CloseMMI :
  *****************************************************************************/
-int en50221_CloseMMI( cam_t * p_cam, unsigned i_slot )
+static int en50221_CloseMMI( cam_t * p_cam, unsigned i_slot )
 {
     if( p_cam->i_ca_type & CA_CI_LINK )
     {
@@ -2188,7 +2352,7 @@ int en50221_CloseMMI( cam_t * p_cam, unsigned i_slot )
 /*****************************************************************************
  * en50221_GetMMIObject :
  *****************************************************************************/
-en50221_mmi_object_t *en50221_GetMMIObject( cam_t * p_cam, unsigned i_slot )
+static mmi_t *en50221_GetMMIObject( cam_t * p_cam, unsigned i_slot )
 {
     if( p_cam->pb_slot_mmi_expected[i_slot] == true )
         return NULL; /* should not happen */
@@ -2202,7 +2366,7 @@ en50221_mmi_object_t *en50221_GetMMIObject( cam_t * p_cam, unsigned i_slot )
                 (mmi_t *)p_cam->p_sessions[i - 1].p_sys;
             if ( p_mmi == NULL )
                 return NULL; /* should not happen */
-            return &p_mmi->last_object;
+            return p_mmi;
         }
     }
 
@@ -2213,8 +2377,8 @@ en50221_mmi_object_t *en50221_GetMMIObject( cam_t * p_cam, unsigned i_slot )
 /*****************************************************************************
  * en50221_SendMMIObject :
  *****************************************************************************/
-void en50221_SendMMIObject( cam_t * p_cam, unsigned i_slot,
-                                en50221_mmi_object_t *p_object )
+static void en50221_SendMMIObject( cam_t * p_cam, unsigned i_slot,
+                                   mmi_t *p_object )
 {
     for( unsigned i = 1; i <= MAX_SESSIONS; i++ )
     {
@@ -2228,6 +2392,246 @@ void en50221_SendMMIObject( cam_t * p_cam, unsigned i_slot,
 
     msg_Err( p_cam->obj, "SendMMIObject when no MMI session is opened !" );
 }
+
+#ifdef ENABLE_HTTPD
+char *en50221_Status( cam_t *p_cam, char *psz_request )
+{
+    if( psz_request != NULL && *psz_request )
+    {
+        /* Check if we have an undisplayed MMI message : in that case we ignore
+         * the user input to avoid confusing the CAM. */
+        for ( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
+        {
+            if ( p_cam->pb_slot_mmi_undisplayed[i_slot] == true )
+            {
+                psz_request = NULL;
+                msg_Dbg( p_cam->obj,
+                         "ignoring user request because of a new MMI object" );
+                break;
+            }
+        }
+    }
+
+    if( psz_request != NULL && *psz_request )
+    {
+        /* We have a mission to accomplish. */
+        mmi_t mmi_object;
+        char psz_value[255];
+        int i_slot;
+        bool b_ok = false;
+
+        if ( HTTPExtractValue( psz_request, "slot", psz_value,
+                                   sizeof(psz_value) ) == NULL )
+        {
+            return strdup( "invalid request parameter\n" );
+        }
+        i_slot = atoi(psz_value);
+
+        if ( HTTPExtractValue( psz_request, "open", psz_value,
+                                   sizeof(psz_value) ) != NULL )
+        {
+            en50221_OpenMMI( p_cam, i_slot );
+            return NULL;
+        }
+
+        if ( HTTPExtractValue( psz_request, "close", psz_value,
+                                   sizeof(psz_value) ) != NULL )
+        {
+            en50221_CloseMMI( p_cam, i_slot );
+            return NULL;
+        }
+
+        if ( HTTPExtractValue( psz_request, "cancel", psz_value,
+                                   sizeof(psz_value) ) == NULL )
+        {
+            b_ok = true;
+        }
+
+        if ( HTTPExtractValue( psz_request, "type", psz_value,
+                                   sizeof(psz_value) ) == NULL )
+        {
+            return strdup( "invalid request parameter\n" );
+        }
+
+        if ( !strcmp( psz_value, "enq" ) )
+        {
+            mmi_object.i_object_type = EN50221_MMI_ANSW;
+            mmi_object.u.answ.b_ok = b_ok;
+            if ( b_ok == false )
+            {
+                mmi_object.u.answ.psz_answ = strdup("");
+            }
+            else
+            {
+                if ( HTTPExtractValue( psz_request, "answ", psz_value,
+                                           sizeof(psz_value) ) == NULL )
+                {
+                    return strdup( "invalid request parameter\n" );
+                }
+
+                mmi_object.u.answ.psz_answ = strdup(psz_value);
+            }
+        }
+        else
+        {
+            mmi_object.i_object_type = EN50221_MMI_MENU_ANSW;
+            if ( b_ok == false )
+            {
+                mmi_object.u.menu_answ.i_choice = 0;
+            }
+            else
+            {
+                if ( HTTPExtractValue( psz_request, "choice", psz_value,
+                                           sizeof(psz_value) ) == NULL )
+                    mmi_object.u.menu_answ.i_choice = 0;
+                else
+                    mmi_object.u.menu_answ.i_choice = atoi(psz_value);
+            }
+        }
+
+        en50221_SendMMIObject( p_cam, i_slot, &mmi_object );
+        return NULL;
+    }
+
+    /* Check that we have all necessary MMI information. */
+    for( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
+    {
+        if ( p_cam->pb_slot_mmi_expected[i_slot] == true )
+            return NULL;
+    }
+
+    char *buf = xmalloc( 10000 ), *p = buf;
+
+    ca_caps_t caps;
+
+    if( ioctl( p_cam->fd, CA_GET_CAP, &caps ) < 0 )
+    {
+        p += sprintf( p, "ioctl CA_GET_CAP failed (%m)\n" );
+        return buf;
+    }
+
+    /* Output CA capabilities */
+    p += sprintf( p, "CA interface with %d %s, type:\n<table>", caps.slot_num,
+                  caps.slot_num == 1 ? "slot" : "slots" );
+#define CHECK_CAPS( x, s )                                                  \
+    if ( caps.slot_type & (CA_##x) )                                        \
+        p += sprintf( p, "<tr><td>" s "</td></tr>\n" );
+
+    CHECK_CAPS( CI, "CI high level interface" );
+    CHECK_CAPS( CI_LINK, "CI link layer level interface" );
+    CHECK_CAPS( CI_PHYS, "CI physical layer level interface (not supported)" );
+    CHECK_CAPS( DESCR, "built-in descrambler" );
+    CHECK_CAPS( SC, "simple smartcard interface" );
+#undef CHECK_CAPS
+
+    p += sprintf( p, "</table>%d available %s\n<table>", caps.descr_num,
+        caps.descr_num == 1 ? "descrambler (key)" : "descramblers (keys)" );
+#define CHECK_DESC( x )                                                     \
+    if ( caps.descr_type & (CA_##x) )                                       \
+        p += sprintf( p, "<tr><td>" STRINGIFY(x) "</td></tr>\n" );
+
+    CHECK_DESC( ECD );
+    CHECK_DESC( NDS );
+    CHECK_DESC( DSS );
+#undef CHECK_DESC
+
+    p += sprintf( p, "</table>" );
+
+    for( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
+    {
+        ca_slot_info_t sinfo;
+
+        p_cam->pb_slot_mmi_undisplayed[i_slot] = false;
+        p += sprintf( p, "<p>CA slot #%d: ", i_slot );
+
+        sinfo.num = i_slot;
+        if ( ioctl( p_cam->fd, CA_GET_SLOT_INFO, &sinfo ) < 0 )
+        {
+            p += sprintf( p, "ioctl CA_GET_SLOT_INFO failed (%m)<br>\n" );
+            continue;
+        }
+
+#define CHECK_TYPE( x, s )                                                  \
+        if ( sinfo.type & (CA_##x) )                                        \
+            p += sprintf( p, "%s", s );
+
+        CHECK_TYPE( CI, "high level, " );
+        CHECK_TYPE( CI_LINK, "link layer level, " );
+        CHECK_TYPE( CI_PHYS, "physical layer level, " );
+#undef CHECK_TYPE
+
+        if ( sinfo.flags & CA_CI_MODULE_READY )
+        {
+            mmi_t *p_object = en50221_GetMMIObject( p_cam, i_slot );
+
+            p += sprintf( p, "module present and ready<p>\n" );
+            p += sprintf( p, "<form action=index.html method=get>\n" );
+            p += sprintf( p, "<input type=hidden name=slot value=\"%d\">\n",
+                          i_slot );
+
+            if ( p_object == NULL )
+            {
+                p += sprintf( p, "<input type=submit name=open value=\"Open session\">\n" );
+            }
+            else
+            {
+                switch ( p_object->i_object_type )
+                {
+                case EN50221_MMI_ENQ:
+                    p += sprintf( p, "<input type=hidden name=type value=enq>\n" );
+                    p += sprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
+                                  p_object->u.enq.psz_text );
+                    if ( p_object->u.enq.b_blind == false )
+                        p += sprintf( p, "<tr><td><input type=text name=answ></td></tr>\n" );
+                    else
+                        p += sprintf( p, "<tr><td><input type=password name=answ></td></tr>\n" );
+                    break;
+
+                case EN50221_MMI_MENU:
+                    p += sprintf( p, "<input type=hidden name=type value=menu>\n" );
+                    p += sprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
+                                  p_object->u.menu.psz_title );
+                    p += sprintf( p, "<tr><td>%s</td></tr><tr><td>\n",
+                                  p_object->u.menu.psz_subtitle );
+                    for ( int i = 0; i < p_object->u.menu.i_choices; i++ )
+                        p += sprintf( p, "<input type=radio name=choice value=\"%d\">%s<br>\n", i + 1, p_object->u.menu.ppsz_choices[i] );
+                    p += sprintf( p, "</td></tr><tr><td>%s</td></tr>\n",
+                                  p_object->u.menu.psz_bottom );
+                    break;
+
+                case EN50221_MMI_LIST:
+                    p += sprintf( p, "<input type=hidden name=type value=menu>\n" );
+                    p += sprintf( p, "<input type=hidden name=choice value=0>\n" );
+                    p += sprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
+                                  p_object->u.menu.psz_title );
+                    p += sprintf( p, "<tr><td>%s</td></tr><tr><td>\n",
+                                  p_object->u.menu.psz_subtitle );
+                    for ( int i = 0; i < p_object->u.menu.i_choices; i++ )
+                        p += sprintf( p, "%s<br>\n",
+                                      p_object->u.menu.ppsz_choices[i] );
+                    p += sprintf( p, "</td></tr><tr><td>%s</td></tr>\n",
+                                  p_object->u.menu.psz_bottom );
+                    break;
+
+                default:
+                    p += sprintf( p, "<table><tr><th>Unknown MMI object type</th></tr>\n" );
+                }
+
+                p += sprintf( p, "</table><p><input type=submit name=ok value=\"OK\">\n" );
+                p += sprintf( p, "<input type=submit name=cancel value=\"Cancel\">\n" );
+                p += sprintf( p, "<input type=submit name=close value=\"Close Session\">\n" );
+            }
+            p += sprintf( p, "</form>\n" );
+        }
+        else if ( sinfo.flags & CA_CI_MODULE_PRESENT )
+            p += sprintf( p, "module present, not ready<br>\n" );
+        else
+            p += sprintf( p, "module not present<br>\n" );
+    }
+    return buf;
+}
+#endif
+
 
 /*****************************************************************************
  * en50221_End :
@@ -2251,6 +2655,6 @@ void en50221_End( cam_t * p_cam )
         }
     }
 
-    /* Leave the CAM configured, so that it can be reused in another
-     * program. */
+    close( p_cam->fd );
+    free( p_cam );
 }

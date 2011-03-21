@@ -44,7 +44,6 @@
 #include <linux/dvb/version.h>
 #include <linux/dvb/dmx.h>
 #include <linux/dvb/frontend.h>
-#include <linux/dvb/ca.h>
 
 /* Include dvbpsi headers */
 # include <dvbpsi/dvbpsi.h>
@@ -56,12 +55,9 @@
 # include <dvbpsi/demux.h>
 # include <dvbpsi/sdt.h>
 
-#ifdef ENABLE_HTTPD
-#   include <vlc_httpd.h>
-#endif
-
 #include "dvb.h"
 #include "scan.h"
+#include "en50221.h"
 
 #define DMX      "/dev/dvb/adapter%d/demux%d"
 #define FRONTEND "/dev/dvb/adapter%d/frontend%d"
@@ -1478,118 +1474,40 @@ void DVRClose( access_t * p_access )
  *****************************************************************************/
 int CAMOpen( access_t *p_access )
 {
-    cam_t *p_cam = &p_access->p_sys->cam;
+    int i_adapter = var_GetInteger( p_access, "dvb-adapter" );
+    int i_device = var_GetInteger( p_access, "dvb-device" );
+
     char ca[128];
-    int i_adapter, i_device;
-    ca_caps_t caps;
-
-    p_cam->obj = VLC_OBJECT(p_access);
-
-    i_adapter = var_GetInteger( p_access, "dvb-adapter" );
-    i_device = var_GetInteger( p_access, "dvb-device" );
-
     if( snprintf( ca, sizeof(ca), CA, i_adapter, i_device ) >= (int)sizeof(ca) )
     {
         msg_Err( p_access, "snprintf() truncated string for CA" );
         ca[sizeof(ca) - 1] = '\0';
     }
-    memset( &caps, 0, sizeof( ca_caps_t ));
 
     msg_Dbg( p_access, "Opening device %s", ca );
-    p_cam->fd = vlc_open(ca, O_RDWR | O_NONBLOCK);
-    if( p_cam->fd == -1 )
+    int fd = vlc_open(ca, O_RDWR | O_NONBLOCK);
+    if( fd == -1 )
     {
         msg_Warn( p_access, "CAMInit: opening CAM device failed (%m)" );
         return VLC_EGENERIC;
     }
 
-    if ( ioctl( p_cam->fd, CA_GET_CAP, &caps ) < 0 )
+    if( !(p_access->p_sys->p_cam = en50221_Init( VLC_OBJECT(p_access), fd )) )
     {
-        msg_Err( p_access, "CAMInit: ioctl() error getting CAM capabilities" );
-        goto error;
+        close( fd );
+        return VLC_EGENERIC;
     }
-
-    /* Output CA capabilities */
-    msg_Dbg( p_access, "CAMInit: CA interface with %d %s", caps.slot_num,
-        caps.slot_num == 1 ? "slot" : "slots" );
-    if ( caps.slot_type & CA_CI )
-        msg_Dbg( p_access, "CAMInit: CI high level interface type" );
-    if ( caps.slot_type & CA_CI_LINK )
-        msg_Dbg( p_access, "CAMInit: CI link layer level interface type" );
-    if ( caps.slot_type & CA_CI_PHYS )
-        msg_Dbg( p_access, "CAMInit: CI physical layer level interface type (not supported) " );
-    if ( caps.slot_type & CA_DESCR )
-        msg_Dbg( p_access, "CAMInit: built-in descrambler detected" );
-    if ( caps.slot_type & CA_SC )
-        msg_Dbg( p_access, "CAMInit: simple smart card interface" );
-
-    msg_Dbg( p_access, "CAMInit: %d available %s", caps.descr_num,
-        caps.descr_num == 1 ? "descrambler (key)" : "descramblers (keys)" );
-    if ( caps.descr_type & CA_ECD )
-        msg_Dbg( p_access, "CAMInit: ECD scrambling system supported" );
-    if ( caps.descr_type & CA_NDS )
-        msg_Dbg( p_access, "CAMInit: NDS scrambling system supported" );
-    if ( caps.descr_type & CA_DSS )
-        msg_Dbg( p_access, "CAMInit: DSS scrambling system supported" );
- 
-    if ( caps.slot_num == 0 )
-    {
-        msg_Err( p_access, "CAMInit: CAM module with no slots" );
-        goto error;
-    }
-
-    if( caps.slot_type & CA_CI_LINK )
-    {
-        p_cam->i_ca_type = CA_CI_LINK;
-    }
-    else if( caps.slot_type & CA_CI )
-    {
-        p_cam->i_ca_type = CA_CI;
-    }
-    else
-    {
-        p_cam->i_ca_type = -1;
-        msg_Err( p_access, "CAMInit: incompatible CAM interface" );
-        goto error;
-    }
-
-    p_cam->i_nb_slots = caps.slot_num;
-    memset( p_cam->pb_active_slot, 0, sizeof(bool) * MAX_CI_SLOTS );
-    memset( p_cam->pb_slot_mmi_expected, 0, sizeof(bool) * MAX_CI_SLOTS );
-    memset( p_cam->pb_slot_mmi_undisplayed, 0,
-            sizeof(bool) * MAX_CI_SLOTS );
-
-    return en50221_Init( p_cam );
-error:
-    close( p_cam->fd );
-    p_cam->fd = -1;
-    return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * CAMPoll :
  *****************************************************************************/
-int CAMPoll( access_t * p_access )
+void CAMPoll( access_t * p_access )
 {
-    cam_t *p_cam = &p_access->p_sys->cam;
-
-    if ( p_cam->fd == -1 )
-        return VLC_EGENERIC;
-
-    switch( p_cam->i_ca_type )
-    {
-    case CA_CI_LINK:
-        if ( mdate() > p_cam->i_next_event )
-        {
-            int ret = en50221_Poll( p_cam );
-            p_cam->i_next_event = mdate() + p_cam->i_timeout;
-            return ret;
-        }
-    case CA_CI:
-        return VLC_SUCCESS;
-    }
-    msg_Err( p_access, "CAMPoll: This should not happen" );
-    return VLC_EGENERIC;;
+    cam_t *p_cam = p_access->p_sys->p_cam;
+    if( p_cam != NULL )
+        en50221_Poll( p_cam );
 }
 
 #ifdef ENABLE_HTTPD
@@ -1599,258 +1517,17 @@ int CAMPoll( access_t * p_access )
 void CAMStatus( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    cam_t *p_cam = &p_sys->cam;
-    char *p;
-    ca_caps_t caps;
-    int i;
+    cam_t *p_cam = p_sys->p_cam;
 
-    if ( p_sys->psz_request != NULL && *p_sys->psz_request )
+    p_sys->psz_mmi_info = en50221_Status( p_cam, p_sys->psz_request );
+    p_sys->psz_request = NULL;
+    if( p_sys->psz_mmi_info != NULL )
     {
-        /* Check if we have an undisplayed MMI message : in that case we ignore
-         * the user input to avoid confusing the CAM. */
-        for ( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
-        {
-            if ( p_cam->pb_slot_mmi_undisplayed[i_slot] == true )
-            {
-                p_sys->psz_request = NULL;
-                msg_Dbg( p_access,
-                         "ignoring user request because of a new MMI object" );
-                break;
-            }
-        }
+        vlc_mutex_lock( &p_sys->httpd_mutex );
+        p_sys->b_request_mmi_info = false;
+        vlc_cond_signal( &p_sys->httpd_cond );
+        vlc_mutex_unlock( &p_sys->httpd_mutex );
     }
-
-    if ( p_sys->psz_request != NULL && *p_sys->psz_request )
-    {
-        /* We have a mission to accomplish. */
-        en50221_mmi_object_t mmi_object;
-        char *psz_request = p_sys->psz_request;
-        char psz_value[255];
-        int i_slot;
-        bool b_ok = false;
-
-        p_sys->psz_request = NULL;
-
-        if ( HTTPExtractValue( psz_request, "slot", psz_value,
-                                   sizeof(psz_value) ) == NULL )
-        {
-            p_sys->psz_mmi_info = strdup( "invalid request parameter\n" );
-            goto out;
-        }
-        i_slot = atoi(psz_value);
-
-        if ( HTTPExtractValue( psz_request, "open", psz_value,
-                                   sizeof(psz_value) ) != NULL )
-        {
-            en50221_OpenMMI( p_cam, i_slot );
-            return;
-        }
-
-        if ( HTTPExtractValue( psz_request, "close", psz_value,
-                                   sizeof(psz_value) ) != NULL )
-        {
-            en50221_CloseMMI( p_cam, i_slot );
-            return;
-        }
-
-        if ( HTTPExtractValue( psz_request, "cancel", psz_value,
-                                   sizeof(psz_value) ) == NULL )
-        {
-            b_ok = true;
-        }
-
-        if ( HTTPExtractValue( psz_request, "type", psz_value,
-                                   sizeof(psz_value) ) == NULL )
-        {
-            p_sys->psz_mmi_info = strdup( "invalid request parameter\n" );
-            goto out;
-        }
-
-        if ( !strcmp( psz_value, "enq" ) )
-        {
-            mmi_object.i_object_type = EN50221_MMI_ANSW;
-            mmi_object.u.answ.b_ok = b_ok;
-            if ( b_ok == false )
-            {
-                mmi_object.u.answ.psz_answ = strdup("");
-            }
-            else
-            {
-                if ( HTTPExtractValue( psz_request, "answ", psz_value,
-                                           sizeof(psz_value) ) == NULL )
-                {
-                    p_sys->psz_mmi_info = strdup( "invalid request parameter\n" );
-                    goto out;
-                }
-
-                mmi_object.u.answ.psz_answ = strdup(psz_value);
-            }
-        }
-        else
-        {
-            mmi_object.i_object_type = EN50221_MMI_MENU_ANSW;
-            if ( b_ok == false )
-            {
-                mmi_object.u.menu_answ.i_choice = 0;
-            }
-            else
-            {
-                if ( HTTPExtractValue( psz_request, "choice", psz_value,
-                                           sizeof(psz_value) ) == NULL )
-                    mmi_object.u.menu_answ.i_choice = 0;
-                else
-                    mmi_object.u.menu_answ.i_choice = atoi(psz_value);
-            }
-        }
-
-        en50221_SendMMIObject( p_cam, i_slot, &mmi_object );
-        return;
-    }
-
-    /* Check that we have all necessary MMI information. */
-    for( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
-    {
-        if ( p_cam->pb_slot_mmi_expected[i_slot] == true )
-            return;
-    }
-
-    p = p_sys->psz_mmi_info = malloc( 10000 );
-
-    if ( ioctl( p_cam->fd, CA_GET_CAP, &caps ) != 0 )
-    {
-        char buf[1000];
-        strerror_r( errno, buf, sizeof( buf ) );
-        p += sprintf( p, "ioctl CA_GET_CAP failed (%s)\n", buf );
-        goto out;
-    }
-
-    /* Output CA capabilities */
-    p += sprintf( p, "CA interface with %d %s, type:\n<table>", caps.slot_num,
-                  caps.slot_num == 1 ? "slot" : "slots" );
-#define CHECK_CAPS( x, s )                                                  \
-    if ( caps.slot_type & (CA_##x) )                                        \
-        p += sprintf( p, "<tr><td>" s "</td></tr>\n" );
-
-    CHECK_CAPS( CI, "CI high level interface" );
-    CHECK_CAPS( CI_LINK, "CI link layer level interface" );
-    CHECK_CAPS( CI_PHYS, "CI physical layer level interface (not supported)" );
-    CHECK_CAPS( DESCR, "built-in descrambler" );
-    CHECK_CAPS( SC, "simple smartcard interface" );
-#undef CHECK_CAPS
-
-    p += sprintf( p, "</table>%d available %s\n<table>", caps.descr_num,
-        caps.descr_num == 1 ? "descrambler (key)" : "descramblers (keys)" );
-#define CHECK_DESC( x )                                                     \
-    if ( caps.descr_type & (CA_##x) )                                       \
-        p += sprintf( p, "<tr><td>" STRINGIFY(x) "</td></tr>\n" );
-
-    CHECK_DESC( ECD );
-    CHECK_DESC( NDS );
-    CHECK_DESC( DSS );
-#undef CHECK_DESC
-
-    p += sprintf( p, "</table>" );
-
-    for( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
-    {
-        ca_slot_info_t sinfo;
-
-        p_cam->pb_slot_mmi_undisplayed[i_slot] = false;
-        p += sprintf( p, "<p>CA slot #%d: ", i_slot );
-
-        sinfo.num = i_slot;
-        if ( ioctl( p_cam->fd, CA_GET_SLOT_INFO, &sinfo ) != 0 )
-        {
-            char buf[1000];
-            strerror_r( errno, buf, sizeof( buf ) );
-            p += sprintf( p, "ioctl CA_GET_SLOT_INFO failed (%s)<br>\n", buf );
-            continue;
-        }
-
-#define CHECK_TYPE( x, s )                                                  \
-        if ( sinfo.type & (CA_##x) )                                        \
-            p += sprintf( p, "%s", s );
-
-        CHECK_TYPE( CI, "high level, " );
-        CHECK_TYPE( CI_LINK, "link layer level, " );
-        CHECK_TYPE( CI_PHYS, "physical layer level, " );
-#undef CHECK_TYPE
-
-        if ( sinfo.flags & CA_CI_MODULE_READY )
-        {
-            en50221_mmi_object_t *p_object = en50221_GetMMIObject( p_cam,
-                                                                      i_slot );
-
-            p += sprintf( p, "module present and ready<p>\n" );
-            p += sprintf( p, "<form action=index.html method=get>\n" );
-            p += sprintf( p, "<input type=hidden name=slot value=\"%d\">\n",
-                          i_slot );
-
-            if ( p_object == NULL )
-            {
-                p += sprintf( p, "<input type=submit name=open value=\"Open session\">\n" );
-            }
-            else
-            {
-                switch ( p_object->i_object_type )
-                {
-                case EN50221_MMI_ENQ:
-                    p += sprintf( p, "<input type=hidden name=type value=enq>\n" );
-                    p += sprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
-                                  p_object->u.enq.psz_text );
-                    if ( p_object->u.enq.b_blind == false )
-                        p += sprintf( p, "<tr><td><input type=text name=answ></td></tr>\n" );
-                    else
-                        p += sprintf( p, "<tr><td><input type=password name=answ></td></tr>\n" );
-                    break;
-
-                case EN50221_MMI_MENU:
-                    p += sprintf( p, "<input type=hidden name=type value=menu>\n" );
-                    p += sprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
-                                  p_object->u.menu.psz_title );
-                    p += sprintf( p, "<tr><td>%s</td></tr><tr><td>\n",
-                                  p_object->u.menu.psz_subtitle );
-                    for ( i = 0; i < p_object->u.menu.i_choices; i++ )
-                        p += sprintf( p, "<input type=radio name=choice value=\"%d\">%s<br>\n", i + 1, p_object->u.menu.ppsz_choices[i] );
-                    p += sprintf( p, "</td></tr><tr><td>%s</td></tr>\n",
-                                  p_object->u.menu.psz_bottom );
-                    break;
-
-                case EN50221_MMI_LIST:
-                    p += sprintf( p, "<input type=hidden name=type value=menu>\n" );
-                    p += sprintf( p, "<input type=hidden name=choice value=0>\n" );
-                    p += sprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
-                                  p_object->u.menu.psz_title );
-                    p += sprintf( p, "<tr><td>%s</td></tr><tr><td>\n",
-                                  p_object->u.menu.psz_subtitle );
-                    for ( i = 0; i < p_object->u.menu.i_choices; i++ )
-                        p += sprintf( p, "%s<br>\n",
-                                      p_object->u.menu.ppsz_choices[i] );
-                    p += sprintf( p, "</td></tr><tr><td>%s</td></tr>\n",
-                                  p_object->u.menu.psz_bottom );
-                    break;
-
-                default:
-                    p += sprintf( p, "<table><tr><th>Unknown MMI object type</th></tr>\n" );
-                }
-
-                p += sprintf( p, "</table><p><input type=submit name=ok value=\"OK\">\n" );
-                p += sprintf( p, "<input type=submit name=cancel value=\"Cancel\">\n" );
-                p += sprintf( p, "<input type=submit name=close value=\"Close Session\">\n" );
-            }
-            p += sprintf( p, "</form>\n" );
-        }
-        else if ( sinfo.flags & CA_CI_MODULE_PRESENT )
-            p += sprintf( p, "module present, not ready<br>\n" );
-        else
-            p += sprintf( p, "module not present<br>\n" );
-    }
-
-out:
-    vlc_mutex_lock( &p_sys->httpd_mutex );
-    p_sys->b_request_mmi_info = false;
-    vlc_cond_signal( &p_sys->httpd_cond );
-    vlc_mutex_unlock( &p_sys->httpd_mutex );
 }
 #endif
 
@@ -1859,16 +1536,15 @@ out:
  *****************************************************************************/
 int CAMSet( access_t * p_access, dvbpsi_pmt_t *p_pmt )
 {
-    cam_t *p_cam = &p_access->p_sys->cam;
+    cam_t *p_cam = p_access->p_sys->p_cam;
 
-    if( p_cam->fd == -1 )
+    if( p_cam == NULL )
     {
         dvbpsi_DeletePMT( p_pmt );
         return VLC_EGENERIC;
     }
 
     en50221_SetCAPMT( p_cam, p_pmt );
-
     return VLC_SUCCESS;
 }
 
@@ -1877,11 +1553,8 @@ int CAMSet( access_t * p_access, dvbpsi_pmt_t *p_pmt )
  *****************************************************************************/
 void CAMClose( access_t * p_access )
 {
-    cam_t *p_cam = &p_access->p_sys->cam;
+    cam_t *p_cam = p_access->p_sys->p_cam;
 
-    if ( p_cam->fd == -1 )
-         return;
-
-    en50221_End( p_cam );
-    close( p_cam->fd );
+    if ( p_cam != NULL )
+         en50221_End( p_cam );
 }
