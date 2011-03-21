@@ -956,7 +956,8 @@ static int BuildWhere( media_library_t* p_ml, char **ppsz_where, ml_ftree_t* tre
             if( i_ret != VLC_SUCCESS )
                 goto parsefail;
             /* Ignore right parse tree as this is a special node */
-            if( asprintf( ppsz_where, "%s", psz_left ? psz_left : "" ) == -1 )
+            *ppsz_where = strdup( psz_left ? psz_left : "" );
+            if( !*ppsz_where )
             {
                 i_ret = VLC_ENOMEM;
                 goto parsefail;
