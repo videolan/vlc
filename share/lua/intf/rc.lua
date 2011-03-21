@@ -1,10 +1,11 @@
 --[==========================================================================[
  rc.lua: remote control module for VLC
 --[==========================================================================[
- Copyright (C) 2007-2009 the VideoLAN team
+ Copyright (C) 2007-2011 the VideoLAN team
  $Id$
 
  Authors: Antoine Cellerier <dionoea at videolan dot org>
+          Pierre Ynard
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -25,14 +26,17 @@ description=
 [============================================================================[
  Remote control interface for VLC
 
- This is a modules/control/rc.c look alike (with a bunch of new features)
+ This is a modules/control/rc.c look alike (with a bunch of new features).
+ It also provides a VLM interface copied from the telnet interface.
 
  Use on local term:
     vlc -I rc
  Use on tcp connection:
     vlc -I rc --lua-config "rc={host='localhost:4212'}"
- Use on multiple hosts (term + 2 tcp ports):
-    vlc -I rc --lua-config "rc={hosts={'*console','localhost:4212','localhost:5678'}}"
+ Use on telnet connection:
+    vlc -I rc --lua-config "rc={host='telnet://localhost:4212'}"
+ Use on multiple hosts (term + plain tcp port + telnet):
+    vlc -I rc --lua-config "rc={hosts={'*console','localhost:4212','telnet://localhost:5678'}}"
 
  Note:
     -I rc and -I luarc are aliases for -I lua --lua-intf rc
@@ -40,6 +44,7 @@ description=
  Configuration options setable throught the --lua-config option are:
     * hosts: A list of hosts to listen on.
     * host: A host to listen on. (won't be used if `hosts' is set)
+    * password: The password used for telnet clients.
  The following can be set using the --lua-config option or in the interface
  itself using the `set' command:
     * prompt: The prompt.
@@ -129,8 +134,18 @@ function alias(client,value)
     end
 end
 
+function lock(name,client)
+    if client.type == host.client_type.telnet then
+        client:switch_status( host.status.password )
+        client.buffer = ""
+    else
+        client:append("Error: the prompt can only be locked when logged in through telnet")
+    end
+end
+
 function logout(name,client)
-    if client.type == host.client_type.net then
+    if client.type == host.client_type.net
+    or client.type == host.client_type.telnet then
         client:send("Bye-bye!\r\n")
         client:del()
     else
@@ -140,13 +155,14 @@ end
 
 function shutdown(name,client)
     client:append("Bye-bye!")
-    h:broadcast("Shutting down.")
+    h:broadcast("Shutting down.\r\n")
     vlc.msg.info("Requested shutdown.")
     vlc.misc.quit()
 end
 
 function quit(name,client)
-    if client.type == host.client_type.net then
+    if client.type == host.client_type.net
+    or client.type == host.client_type.telnet then
         logout(name,client)
     else
         shutdown(name,client)
@@ -279,6 +295,12 @@ function print_text(label,text)
 end
 
 function help(name,client,arg)
+    if arg == nil then
+        client:append("+----[ VLM commands ]")
+        local message, vlc_err = vlm:execute_command("help")
+        vlm_message_to_string( client, message, "|" )
+    end
+
     local width = client.env.width
     local long = (name == "longhelp")
     local extra = ""
@@ -551,6 +573,7 @@ commands_ordered = {
     { "license"; { func = print_text("License message",vlc.misc.license()); help = "print VLC's license message"; adv = true } };
     { "help"; { func = help; args = "[pattern]"; help = "a help message"; aliases = { "?" } } };
     { "longhelp"; { func = help; args = "[pattern]"; help = "a longer help message" } };
+    { "lock"; { func = lock; help = "lock the telnet prompt" } };
     { "logout"; { func = logout; help = "exit (if in a socket connection)" } };
     { "quit"; { func = quit; help = "quit VLC (or logout if in a socket connection)" } };
     { "shutdown"; { func = shutdown; help = "shutdown VLC" } };
@@ -589,6 +612,21 @@ function split_input(input)
     end
 end
 
+function vlm_message_to_string(client,message,prefix)
+    local prefix = prefix or ""
+    if message.value then
+        client:append(prefix .. message.name .. " : " .. message.value)
+    else
+        client:append(prefix .. message.name)
+    end
+    if message.children then
+        for i,c in ipairs(message.children) do
+            vlm_message_to_string(client,c,prefix.."    ")
+        end
+    end
+end
+
+--[[ Command dispatch ]]
 function call_command(cmd,client,arg)
     if type(commands[cmd]) == type("") then
         cmd = commands[cmd]
@@ -603,6 +641,15 @@ function call_command(cmd,client,arg)
         local a = arg and " "..arg or ""
         client:append("Error in `"..cmd..a.."' ".. msg)
     end
+end
+
+function call_vlm_command(cmd,client,arg)
+    if arg ~= nil then
+        cmd = cmd.." "..arg
+    end
+    local message, vlc_err = vlm:execute_command( cmd )
+    vlm_message_to_string( client, message )
+    return vlc_err
 end
 
 function call_libvlc_command(cmd,client,arg)
@@ -631,23 +678,98 @@ function call_object_command(cmd,client,arg)
     return vlcerr
 end
 
+function client_command( client )
+    local cmd,arg = split_input(client.buffer)
+    client.buffer = ""
+
+    if commands[cmd] then
+        call_command(cmd,client,arg)
+    elseif string.sub(cmd,0,1)=='@'
+    and call_object_command(string.sub(cmd,2,#cmd),client,arg) == 0 then
+        --
+    elseif call_vlm_command(cmd,client,arg) == 0 then
+        --
+    elseif client.type == host.client_type.stdio
+    and call_libvlc_command(cmd,client,arg) == 0 then
+        --
+    else
+        local choices = {}
+        if client.env.autocompletion ~= 0 then
+            for v,_ in common.pairs_sorted(commands) do
+                if string.sub(v,0,#cmd)==cmd then
+                    table.insert(choices, v)
+                end
+            end
+        end
+        if #choices == 1 and client.env.autoalias ~= 0 then
+            -- client:append("Aliasing to \""..choices[1].."\".")
+            cmd = choices[1]
+            call_command(cmd,client,arg)
+        else
+            client:append("Unknown command `"..cmd.."'. Type `help' for help.")
+            if #choices ~= 0 then
+                client:append("Possible choices are:")
+                local cols = math.floor(client.env.width/(client.env.colwidth+1))
+                local fmt = "%-"..client.env.colwidth.."s"
+                for i = 1, #choices do
+                    choices[i] = string.format(fmt,choices[i])
+                end
+                for i = 1, #choices, cols do
+                    local j = i + cols - 1
+                    if j > #choices then j = #choices end
+                    client:append("  "..table.concat(choices," ",i,j))
+                end
+            end
+        end
+    end
+end
+
+--[[ Some telnet command special characters ]]
+WILL = "\251" -- Indicates the desire to begin performing, or confirmation that you are now performing, the indicated option.
+WONT = "\252" -- Indicates the refusal to perform, or continue performing, the indicated option.
+DO   = "\253" -- Indicates the request that the other party perform, or confirmation that you are expecting the other party to perform, the indicated option.
+DONT = "\254" -- Indicates the demand that the other party stop performing, or confirmation that you are no longer expecting the other party to perform, the indicated option.
+IAC  = "\255" -- Interpret as command
+
+ECHO = "\001"
+
+function telnet_commands( client )
+    -- remove telnet command replies from the client's data
+    client.buffer = string.gsub( client.buffer, IAC.."["..DO..DONT..WILL..WONT.."].", "" )
+end
+
+--[[ Client status change callbacks ]]
+function on_password( client )
+    client.env = common.table_copy( env )
+    if client.type == host.client_type.telnet then
+        client:send( "Password: " ..IAC..WILL..ECHO )
+    else
+        if client.env.welcome ~= "" then
+            client:send( client.env.welcome .. "\r\n")
+        end
+        client:switch_status( host.status.read )
+    end
+end
+-- Print prompt when switching a client's status to `read'
+function on_read( client )
+    client:send( client.env.prompt )
+end
+function on_write( client )
+end
+
 --[[ Setup host ]]
 require("host")
 h = host.host()
--- No auth
-h.status_callbacks[host.status.password] = function(client)
-    client.env = common.table_copy( env )
-    if client.env.welcome ~= "" then
-        client:send( client.env.welcome .. "\r\n")
-    end
-    client:switch_status(host.status.read)
-end
--- Print prompt when switching a client's status to `read'
-h.status_callbacks[host.status.read] = function(client)
-    client:send( client.env.prompt )
-end
+
+h.status_callbacks[host.status.password] = on_password
+h.status_callbacks[host.status.read] = on_read
+h.status_callbacks[host.status.write] = on_write
 
 h:listen( config.hosts or config.host or "*console" )
+password = config.password or "admin"
+
+--[[ Launch vlm ]]
+vlm = vlc.vlm()
 
 --[[ The main loop ]]
 while not vlc.misc.should_die() do
@@ -661,60 +783,53 @@ while not vlc.misc.should_die() do
 
     for _, client in pairs(read) do
         local input = client:recv(1000)
-        local done = false
-        if string.match(input,"\n$") then
-            client.buffer = string.gsub(client.buffer..input,"\r?\n$","")
-            done = true
-        elseif input == ""
-           or  (client.type == host.client_type.net and input == "\004") then
+
+        if input == "" -- the telnet client program has left
+            or ((client.type == host.client_type.net
+                 or client.type == host.client_type.telnet)
+                and input == "\004") then
             -- Caught a ^D
-            client.buffer = "quit"
-            done = true
+            client.cmds = "quit\n"
         else
-            client.buffer = client.buffer .. input
+            client.cmds = client.cmds .. input
         end
-        if done then
-            local cmd,arg = split_input(client.buffer)
-            client.buffer = ""
-            client:switch_status(host.status.write)
-            if commands[cmd] then
-                call_command(cmd,client,arg)
-            elseif string.sub(cmd,0,1)=='@'
-            and call_object_command(string.sub(cmd,2,#cmd),client,arg) == 0 then
-                --
-            elseif client.type == host.client_type.stdio
-            and call_libvlc_command(cmd,client,arg) == 0 then
-                --
-            else
-                local choices = {}
-                if client.env.autocompletion ~= 0 then
-                    for v,_ in common.pairs_sorted(commands) do
-                        if string.sub(v,0,#cmd)==cmd then
-                            table.insert(choices, v)
-                        end
-                    end
-                end
-                if #choices == 1 and client.env.autoalias ~= 0 then
-                    -- client:append("Aliasing to \""..choices[1].."\".")
-                    cmd = choices[1]
-                    call_command(cmd,client,arg)
-                else
-                    client:append("Unknown command `"..cmd.."'. Type `help' for help.")
-                    if #choices ~= 0 then
-                        client:append("Possible choices are:")
-                        local cols = math.floor(client.env.width/(client.env.colwidth+1))
-                        local fmt = "%-"..client.env.colwidth.."s"
-                        for i = 1, #choices do
-                            choices[i] = string.format(fmt,choices[i])
-                        end
-                        for i = 1, #choices, cols do
-                            local j = i + cols - 1
-                            if j > #choices then j = #choices end
-                            client:append("  "..table.concat(choices," ",i,j))
-                        end
-                    end
-                end
+
+        client.buffer = ""
+        -- split the command at the first '\n'
+        while string.find(client.cmds, "\n") do
+            -- save the buffer to send to the client
+            local saved_buffer = client.buffer
+
+            -- get the next command
+            local index = string.find(client.cmds, "\n")
+            client.buffer = string.gsub(string.sub(client.cmds, 0, index - 1), "^%s*(.-)%s*$", "%1")
+            client.cmds = string.sub(client.cmds, index + 1)
+
+            -- Remove telnet commands from the command line
+            if client.type == host.client_type.telnet then
+                telnet_commands( client )
             end
+
+            -- Run the command
+            if client.status == host.status.password then
+                if client.buffer == password then
+                    client:send( IAC..WONT..ECHO.."\r\nWelcome, Master\r\n" )
+                    client.buffer = ""
+                    client:switch_status( host.status.write )
+                elseif client.buffer == "quit" then
+                    client_command( client )
+                else
+                    client:send( "\r\nWrong password\r\nPassword: " )
+                    client.buffer = ""
+                end
+            else
+                client:switch_status( host.status.write )
+                client_command( client )
+            end
+            client.buffer = saved_buffer .. client.buffer
         end
     end
 end
+
+--[[ Clean up ]]
+vlm = nil

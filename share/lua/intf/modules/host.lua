@@ -64,7 +64,7 @@ For complete examples see existing VLC Lua interface modules (ie telnet.lua)
 module("host",package.seeall)
 
 status = { init = 0, read = 1, write = 2, password = 3 }
-client_type = { net = 1, stdio = 2, fifo = 3 }
+client_type = { net = 1, stdio = 2, fifo = 3, telnet = 4 }
 
 function is_flag_set(val, flag)
     return (((val - (val % flag)) / flag) % 2 ~= 0)
@@ -120,7 +120,8 @@ function host()
         end
         for i, c in pairs(clients) do
             if c == client then
-                if client.type == client_type.net then
+                if client.type == client_type.net
+                or client.type == client_type.telnet then
                     if client.wfd ~= client.rfd then
                         vlc.net.close( client.rfd )
                     end
@@ -149,7 +150,7 @@ function host()
     local function new_client( h, fd, wfd, t )
         if fd < 0 then return end
         local w, r
-        if t == client_type.net then
+        if t == client_type.net or t == client_type.telnet then
             w = send
             r = recv
         else if t == client_type.stdio or t == client_type.fifo then
@@ -179,7 +180,7 @@ function host()
     end
 
     -- public methods
-    local function _listen_tcp( h, host, port )
+    local function _listen_tcp( h, host, port, telnet )
         if listeners.tcp and listeners.tcp[host]
                          and listeners.tcp[host][port] then
             error("Already listening on tcp host `"..host..":"..tostring(port).."'")
@@ -190,15 +191,16 @@ function host()
         if not listeners.tcp[host] then
             listeners.tcp[host] = {}
         end
-        local listener = vlc.net.listen_tcp( host, port )
-        listeners.tcp[host][port] = listener
+        listeners.tcp[host][port] = true
         if not listeners.tcp.list then
             -- FIXME: if host == "list" we'll have a problem
             listeners.tcp.list = {}
-            local m = { __mode = "v" } -- week values
-            setmetatable( listeners.tcp.list, m )
         end
-        table.insert( listeners.tcp.list, listener )
+        local listener = vlc.net.listen_tcp( host, port )
+        local type = telnet and client_type.telnet or client_type.net;
+        table.insert( listeners.tcp.list, { data = listener,
+                                            type = type,
+                                          } )
     end
 
     local function _listen_stdio( h )
@@ -221,7 +223,7 @@ function host()
                 h:listen_stdio()
             else
                 u = vlc.net.url_parse( url )
-                h:listen_tcp( u.host, u.port )
+                h:listen_tcp( u.host, u.port, (u.protocol == "telnet") )
             end
         end
     end
@@ -241,7 +243,7 @@ function host()
         filter_client( pollfds, status.write, vlc.net.POLLOUT )
         if listeners.tcp then
             for _, listener in pairs(listeners.tcp.list) do
-                for _, fd in pairs({listener:fds()}) do
+                for _, fd in pairs({listener.data:fds()}) do
                     pollfds[fd] = vlc.net.POLLIN
                 end
             end
@@ -264,10 +266,10 @@ function host()
             end
             if listeners.tcp then
                 for _, listener in pairs(listeners.tcp.list) do
-                    for _, fd in pairs({listener:fds()}) do
+                    for _, fd in pairs({listener.data:fds()}) do
                         if is_flag_set(pollfds[fd], vlc.net.POLLIN) then
-                            local afd = listener:accept()
-                            new_client( h, afd, afd, client_type.net )
+                            local afd = listener.data:accept()
+                            new_client( h, afd, afd, listener.type )
                             break
                         end
                     end
@@ -282,8 +284,9 @@ function host()
     local function destructor( h )
         print "destructor"
         for _,client in pairs(clients) do
-            client:send("Shutting down.")
-            if client.type == client_type.tcp then
+            --client:send("Shutting down.")
+            if client.type == client_type.net
+            or client.type == client_type.telnet then
                 if client.wfd ~= client.rfd then
                     vlc.net.close(client.rfd)
                 end
