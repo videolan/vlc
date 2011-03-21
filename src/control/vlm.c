@@ -232,100 +232,98 @@ static char* recurse_answer( vlm_message_t *p_answer, const char* psz_delim,
     vlm_message_t *aw_child, **paw_child;
 
     i_success = asprintf( &psz_childdelim, "%s\t", psz_delim);
+    if( i_success == -1 )
+        return psz_response;
 
-    /* starting with the children of root node */
-    if( i_success != -1 && p_answer->i_child )
+    paw_child = p_answer->child;
+    aw_child = *( paw_child );
+    /* Iterate over children */
+    for( i = 0; i < p_answer->i_child; i++ )
     {
-        paw_child = p_answer->child;
-        aw_child = *( paw_child );
-        /* Iterate over children */
-        for( i = 0; i < p_answer->i_child; i++ )
-        {
-            /* Spare comma if it is the last element */
-            char c_comma = ',';
-            if( i == (p_answer->i_child - 1) )
-                c_comma = ' ';
+        /* Spare comma if it is the last element */
+        char c_comma = ',';
+        if( i == (p_answer->i_child - 1) )
+            c_comma = ' ';
 
-            /* Append name of child node, if not in a list */
-            if( !i_list )
+        /* Append name of child node, if not in a list */
+        if( !i_list )
+        {
+            i_success = asprintf( &psz_response, "%s\"%s\": ",
+                          psz_response, aw_child->psz_name );
+            if( i_success == -1 ) break;
+        }
+
+        /* If child node has children, */
+        if( aw_child->i_child )
+        {
+            /* If the parent node is a list (hence the child node is
+             * inside a list), create a property of its name as if it
+             * had a name value node
+             */
+            if( i_list )
             {
-                i_success = asprintf( &psz_response, "%s\"%s\": ",
-                              psz_response, aw_child->psz_name );
+                i_success = asprintf( &psz_nametag, "\"name\": \"%s\",%s",
+                              aw_child->psz_name, psz_childdelim );
                 if( i_success == -1 ) break;
             }
-
-            /* If child node has children, */
-            if( aw_child->i_child )
+            else
             {
-                /* If the parent node is a list (hence the child node is
-                 * inside a list), create a property of its name as if it
-                 * had a name value node
-                 */
-                if( i_list )
-                {
-                    i_success = asprintf( &psz_nametag, "\"name\": \"%s\",%s",
-                                  aw_child->psz_name, psz_childdelim );
-                    if( i_success == -1 ) break;
-                }
-                else
-                {
-                    psz_nametag = strdup( "" );
-                }
-                /* If the child is a list itself, format it accordingly and
-                 * recurse through the child's children, telling them that
-                 * they are inside a list.
-                 */
-                if( strcmp( aw_child->psz_name, "media" ) == 0 ||
-                    strcmp( aw_child->psz_name, "inputs" ) == 0 ||
-                    strcmp( aw_child->psz_name, "options" ) == 0 )
-                {
-                    i_success = asprintf( &psz_response, "%s[%s%s%s]%c%s",
-                                          psz_response, psz_childdelim,
-                                          recurse_answer( aw_child,
-                                                          psz_childdelim, 1 ),
-                                          psz_delim, c_comma, psz_delim );
-                    if( i_success == -1 ) break;
-                }
-                /* Not a list, so format the child as a JSON object and
-                 * recurse through the child's children
-                 */
-                else
-                {
-                    i_success = asprintf( &psz_response, "%s{%s%s%s%s}%c%s",
-                                          psz_response, psz_childdelim, psz_nametag,
-                                          recurse_answer( aw_child,
-                                                          psz_childdelim, 0 ),
-                                          psz_delim, c_comma, psz_delim );
-                    if( i_success == -1 ) break;
-                }
+                psz_nametag = strdup( "" );
             }
-            /* Otherwise - when no children are present - the node is a
-             * value node. So print the value string
+            /* If the child is a list itself, format it accordingly and
+             * recurse through the child's children, telling them that
+             * they are inside a list.
+             */
+            if( strcmp( aw_child->psz_name, "media" ) == 0 ||
+                strcmp( aw_child->psz_name, "inputs" ) == 0 ||
+                strcmp( aw_child->psz_name, "options" ) == 0 )
+            {
+                i_success = asprintf( &psz_response, "%s[%s%s%s]%c%s",
+                                      psz_response, psz_childdelim,
+                                      recurse_answer( aw_child,
+                                                      psz_childdelim, 1 ),
+                                      psz_delim, c_comma, psz_delim );
+                if( i_success == -1 ) break;
+            }
+            /* Not a list, so format the child as a JSON object and
+             * recurse through the child's children
              */
             else
             {
-                /* If value is equivalent to NULL, print it as null */
-                if( aw_child->psz_value == NULL
-                    || strcmp( aw_child->psz_value, "(null)" ) == 0 )
-                {
-                    i_success = asprintf( &psz_response, "%snull%c%s",
-                                          psz_response, c_comma, psz_delim );
-                    if( i_success == -1 )
-                        break;
-                }
-                /* Otherwise print the value in quotation marks */
-                else
-                {
-                    i_success = asprintf( &psz_response, "%s\"%s\"%c%s",
-                                          psz_response, aw_child->psz_value,
-                                          c_comma, psz_delim );
-                    if( i_success == -1 ) break;
-                }
+                i_success = asprintf( &psz_response, "%s{%s%s%s%s}%c%s",
+                                      psz_response, psz_childdelim, psz_nametag,
+                                      recurse_answer( aw_child,
+                                                      psz_childdelim, 0 ),
+                                      psz_delim, c_comma, psz_delim );
+                if( i_success == -1 ) break;
             }
-            /* getting next child */
-            paw_child++;
-            aw_child = *( paw_child );
         }
+        /* Otherwise - when no children are present - the node is a
+         * value node. So print the value string
+         */
+        else
+        {
+            /* If value is equivalent to NULL, print it as null */
+            if( aw_child->psz_value == NULL
+                || strcmp( aw_child->psz_value, "(null)" ) == 0 )
+            {
+                i_success = asprintf( &psz_response, "%snull%c%s",
+                                      psz_response, c_comma, psz_delim );
+                if( i_success == -1 )
+                    break;
+            }
+            /* Otherwise print the value in quotation marks */
+            else
+            {
+                i_success = asprintf( &psz_response, "%s\"%s\"%c%s",
+                                      psz_response, aw_child->psz_value,
+                                      c_comma, psz_delim );
+                if( i_success == -1 ) break;
+            }
+        }
+        /* getting next child */
+        paw_child++;
+        aw_child = *( paw_child );
     }
     free( psz_nametag );
     free( psz_childdelim );
