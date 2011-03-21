@@ -236,7 +236,7 @@ static int RegisterToGrowl( vlc_object_t *p_this )
     psz_encoded[4] = j;
     for( j = 0 ; psz_notifications[j] != NULL ; j++)
     {
-        if(pb_defaults[j] == true)
+        if(pb_defaults[j])
         {
             psz_encoded[i++] = (uint8_t)j;
             i_defaults++;

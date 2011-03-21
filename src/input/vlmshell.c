@@ -1592,12 +1592,12 @@ static char *Save( vlm_t *vlm )
         else
             i_length += strlen( "new * broadcast " ) + strlen(p_cfg->psz_name);
 
-        if( p_cfg->b_enabled == true )
+        if( p_cfg->b_enabled )
             i_length += strlen( "enabled" );
         else
             i_length += strlen( "disabled" );
 
-        if( !p_cfg->b_vod && p_cfg->broadcast.b_loop == true )
+        if( !p_cfg->b_vod && p_cfg->broadcast.b_loop )
             i_length += strlen( " loop\n" );
         else
             i_length += strlen( "\n" );
@@ -1621,7 +1621,7 @@ static char *Save( vlm_t *vlm )
 
         i_length += strlen( "new  schedule " ) + strlen( schedule->psz_name );
 
-        if( schedule->b_enabled == true )
+        if( schedule->b_enabled )
         {
             i_length += strlen( "date //-:: enabled\n" ) + 14;
         }
@@ -1712,7 +1712,7 @@ static char *Save( vlm_t *vlm )
         localtime_r( &i_time, &date);
         p += sprintf( p, "new %s schedule ", schedule->psz_name);
 
-        if( schedule->b_enabled == true )
+        if( schedule->b_enabled )
         {
             p += sprintf( p, "date %d/%d/%d-%d:%d:%d enabled\n",
                           date.tm_year + 1900, date.tm_mon + 1, date.tm_mday,

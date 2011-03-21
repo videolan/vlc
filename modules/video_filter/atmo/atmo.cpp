@@ -1086,7 +1086,7 @@ static void Atmo_Shutdown(filter_t *p_filter)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if(p_sys->b_enabled == true)
+    if(p_sys->b_enabled)
     {
         msg_Dbg( p_filter, "shut down atmo!");
         /*
@@ -2252,7 +2252,7 @@ static void CreateMiniImage( filter_t *p_filter, picture_t *p_inpic)
     /*
     if debugging enabled save every 128th image to disk
     */
-    if((p_sys->b_saveframes == true) && (p_sys->sz_framepath[0] != 0 ))
+    if(p_sys->b_saveframes && p_sys->sz_framepath[0] != 0 )
     {
 
         if((p_sys->ui_frame_counter & 127) == 0)
@@ -2301,9 +2301,8 @@ static picture_t * Filter( filter_t *p_filter, picture_t *p_pic )
     
     vlc_mutex_lock( &p_sys->filter_lock );
 
-    if((p_sys->b_enabled == true) &&
-        (p_sys->pf_extract_mini_image != NULL) &&
-        (p_sys->b_pause_live == false))
+    if(p_sys->b_enabled && p_sys->pf_extract_mini_image &&
+       !p_sys->b_pause_live)
     {
         p_sys->i_crop_x_offset  = p_filter->fmt_in.video.i_x_offset;
         p_sys->i_crop_y_offset  = p_filter->fmt_in.video.i_y_offset;
@@ -2458,7 +2457,7 @@ static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
     filter_t *p_filter = (filter_t *)p_data;
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
 
-    if((p_sys->b_usepausecolor == true) && (p_sys->b_enabled == true))
+    if(p_sys->b_usepausecolor && p_sys->b_enabled)
     {
         msg_Dbg(p_filter, "state change from: %"PRId64" to %"PRId64, oldval.i_int,
             newval.i_int);

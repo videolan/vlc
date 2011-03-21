@@ -1122,7 +1122,7 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
 
 void BoolConfigControl::finish()
 {
-    checkbox->setChecked( p_item->value.i == true );
+    checkbox->setChecked( p_item->value.i );
     if( p_item->psz_longtext )
         checkbox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }

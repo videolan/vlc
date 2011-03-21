@@ -1012,7 +1012,7 @@ static bool process_server_message ( filter_t *p_filter,
             msg->scme.nColours = htons(msg->scme.nColours);
             msg->scme.firstColour = htons(msg->scme.firstColour);
             int i_datasize;
-            if ( p_sys->b_alpha_from_vnc == true )
+            if ( p_sys->b_alpha_from_vnc )
             {
                 i_datasize = 2 * msg->scme.nColours * 4;
             }
@@ -1041,7 +1041,7 @@ static bool process_server_message ( filter_t *p_filter,
             for (int i = 0; i < msg->scme.nColours; i++)
             {
                 i_color_index = i+msg->scme.firstColour;
-                if ( p_sys->b_alpha_from_vnc == true )
+                if ( p_sys->b_alpha_from_vnc )
                 {
                     i_alpha = p_sys->read_buffer[i_offset];
                     i_offset += 2;

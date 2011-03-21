@@ -783,7 +783,7 @@ static inline void ml_GenericFreeFindTree( ml_ftree_t* tree, bool freestrings )
         free( tree->right );
     }
     if( tree->op == ML_OP_NONE && ml_AttributeIsString( tree->criteria )
-            && freestrings == true)
+            && freestrings)
     {
         free( tree->value.str );
         if( tree->criteria == ML_PEOPLE )

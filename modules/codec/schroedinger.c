@@ -822,7 +822,7 @@ static int OpenEncoder( vlc_object_t *p_this )
 
 
     b_tmp = var_GetBool( p_enc, ENC_CFG_PREFIX ENC_CODINGMODE );
-    if( b_tmp == true )
+    if( b_tmp )
         p_sys->b_auto_field_coding = true;
     else
         p_sys->b_auto_field_coding = false;

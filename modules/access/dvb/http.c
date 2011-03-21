@@ -187,12 +187,12 @@ void HTTPClose( access_t *p_access )
         {
             /* Unlock the thread if it is stuck in HttpCallback */
             vlc_mutex_lock( &p_sys->httpd_mutex );
-            if ( p_sys->b_request_frontend_info == true )
+            if ( p_sys->b_request_frontend_info )
             {
                 p_sys->b_request_frontend_info = false;
                 p_sys->psz_frontend_info = strdup("");
             }
-            if ( p_sys->b_request_mmi_info == true )
+            if ( p_sys->b_request_mmi_info )
             {
                 p_sys->b_request_mmi_info = false;
                 p_sys->psz_mmi_info = strdup("");

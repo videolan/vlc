@@ -65,7 +65,7 @@ void ClickLineEdit::setText( const QString &txt )
 void ClickLineEdit::paintEvent( QPaintEvent *pe )
 {
     QLineEdit::paintEvent( pe );
-    if ( mDrawClickMsg == true && !hasFocus() ) {
+    if ( mDrawClickMsg && !hasFocus() ) {
         QPainter p( this );
         QPen tmp = p.pen();
         p.setPen( palette().color( QPalette::Disabled, QPalette::Text ) );
@@ -86,7 +86,7 @@ void ClickLineEdit::dropEvent( QDropEvent *ev )
 
 void ClickLineEdit::focusInEvent( QFocusEvent *ev )
 {
-    if ( mDrawClickMsg == true ) {
+    if ( mDrawClickMsg ) {
         mDrawClickMsg = false;
         repaint();
     }

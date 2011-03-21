@@ -664,7 +664,7 @@ static int exec_GetVisibility( filter_t *p_filter,
     if( p_ovl == NULL )
         return VLC_EGENERIC;
 
-    p_results->b_visible = ( p_ovl->b_active == true ) ? 1 : 0;
+    p_results->b_visible = p_ovl->b_active ? 1 : 0;
     return VLC_SUCCESS;
 }
 

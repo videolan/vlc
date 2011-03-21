@@ -441,7 +441,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ( p_item->i_type == CONFIG_CATEGORY ||
               p_item->i_type == CONFIG_SUBCATEGORY ) )
             break;
-        if( p_item->b_internal == true ) continue;
+        if( p_item->b_internal ) continue;
 
         if( p_item->i_type == CONFIG_SECTION )
         {

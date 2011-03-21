@@ -764,7 +764,7 @@ int BuildSelect( media_library_t *p_ml,
                         psz_on2 == NULL ? "" : " AND " );
             }
         }
-        if( join == true )
+        if( join )
         {
             if( psz_peoplerole && *psz_peoplerole )
             {

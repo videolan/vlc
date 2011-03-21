@@ -1785,7 +1785,7 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
 
            Note that now p_dst[i] != NULL for 0 <= i < i_double_rate_alloc_end. */
     }
-    assert( p_sys->b_double_rate == true  ||  p_dst[1] == NULL );
+    assert( p_sys->b_double_rate  ||  p_dst[1] == NULL );
     assert( i_nb_fields > 2  ||  p_dst[2] == NULL );
 
     /* Render */

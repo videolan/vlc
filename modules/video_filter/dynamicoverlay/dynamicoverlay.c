@@ -273,8 +273,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             p_cmddesc->p_command->pf_parser( p_cmd, p_end,
                                              &p_cmddesc->params );
 
-            if( ( p_cmddesc->p_command->b_atomic == true ) &&
-                ( p_sys->b_atomic == true ) )
+            if( p_cmddesc->p_command->b_atomic && p_sys->b_atomic )
                 QueueEnqueue( &p_sys->atomic, p_cmddesc );
             else
                 QueueEnqueue( &p_sys->pending, p_cmddesc );

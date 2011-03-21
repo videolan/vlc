@@ -753,7 +753,7 @@ static void CloseClient (vlc_object_t *obj)
     tls_session_t *client = (tls_session_t *)obj;
     tls_client_sys_t *p_sys = (tls_client_sys_t *)(client->p_sys);
 
-    if (p_sys->session.b_handshaked == true)
+    if (p_sys->session.b_handshaked)
         gnutls_bye (p_sys->session.session, GNUTLS_SHUT_WR);
     gnutls_deinit (p_sys->session.session);
     /* credentials must be free'd *after* gnutls_deinit() */
@@ -902,7 +902,7 @@ gnutls_SessionClose (tls_server_t *p_server, tls_session_t *p_session)
     tls_session_sys_t *p_sys = p_session->p_sys;
     (void)p_server;
 
-    if( p_sys->b_handshaked == true )
+    if( p_sys->b_handshaked )
         gnutls_bye( p_sys->session, GNUTLS_SHUT_WR );
     gnutls_deinit( p_sys->session );
 

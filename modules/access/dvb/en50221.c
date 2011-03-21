@@ -1627,7 +1627,7 @@ static void MMISendObject( cam_t *p_cam, int i_session_id,
         i_tag = AOT_ANSW;
         i_size = 1 + strlen( p_object->u.answ.psz_answ );
         p_data = xmalloc( i_size );
-        p_data[0] = (p_object->u.answ.b_ok == true) ? 0x1 : 0x0;
+        p_data[0] = p_object->u.answ.b_ok ? 0x1 : 0x0;
         strncpy( (char *)&p_data[1], p_object->u.answ.psz_answ, i_size - 1 );
         break;
 
@@ -1723,7 +1723,7 @@ static void MMIHandleEnq( cam_t *p_cam, int i_session_id,
     p_mmi->u.enq.psz_text[l] = '\0';
 
     msg_Dbg( p_cam->obj, "MMI enq: %s%s", p_mmi->u.enq.psz_text,
-             p_mmi->u.enq.b_blind == true ? " (blind)" : "" );
+             p_mmi->u.enq.b_blind ? " (blind)" : "" );
     p_cam->pb_slot_mmi_expected[i_slot] = false;
     p_cam->pb_slot_mmi_undisplayed[i_slot] = true;
 }
@@ -2355,7 +2355,7 @@ static int en50221_CloseMMI( cam_t * p_cam, unsigned i_slot )
  *****************************************************************************/
 static mmi_t *en50221_GetMMIObject( cam_t * p_cam, unsigned i_slot )
 {
-    if( p_cam->pb_slot_mmi_expected[i_slot] == true )
+    if( p_cam->pb_slot_mmi_expected[i_slot] )
         return NULL; /* should not happen */
 
     for( unsigned i = 1; i <= MAX_SESSIONS; i++ )
@@ -2403,7 +2403,7 @@ char *en50221_Status( cam_t *p_cam, char *psz_request )
          * the user input to avoid confusing the CAM. */
         for ( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
         {
-            if ( p_cam->pb_slot_mmi_undisplayed[i_slot] == true )
+            if ( p_cam->pb_slot_mmi_undisplayed[i_slot] )
             {
                 psz_request = NULL;
                 msg_Dbg( p_cam->obj,
@@ -2497,7 +2497,7 @@ char *en50221_Status( cam_t *p_cam, char *psz_request )
     /* Check that we have all necessary MMI information. */
     for( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )
     {
-        if ( p_cam->pb_slot_mmi_expected[i_slot] == true )
+        if ( p_cam->pb_slot_mmi_expected[i_slot] )
             return NULL;
     }
 

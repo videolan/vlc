@@ -289,7 +289,7 @@ void stats_TimerStart( vlc_object_t *p_obj, const char *psz_name,
                      p_counter->i_samples, p_sample );
         p_sample->date = 0; p_sample->value.i_int = 0;
     }
-    if( p_counter->pp_samples[0]->value.b_bool == true )
+    if( p_counter->pp_samples[0]->value.b_bool )
     {
         msg_Warn( p_obj, "timer '%s' was already started !", psz_name );
         goto out;
@@ -568,7 +568,7 @@ static void TimerDump( vlc_object_t *p_obj, counter_t *p_counter,
     }
     i_total = p_counter->pp_samples[1]->value.i_int;
     total = p_counter->pp_samples[1]->date;
-    if( p_counter->pp_samples[0]->value.b_bool == true )
+    if( p_counter->pp_samples[0]->value.b_bool )
     {
         last = mdate() - p_counter->pp_samples[0]->date;
         i_total += 1;

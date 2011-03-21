@@ -130,7 +130,7 @@ overlay_t *ListWalk( list_t *p_list )
     for( ; pp_cur < p_list->pp_tail; ++pp_cur )
     {
         if( ( *pp_cur != NULL ) &&
-            ( (*pp_cur)->b_active == true )&&
+            ( (*pp_cur)->b_active )&&
             ( (*pp_cur)->format.i_chroma != VLC_FOURCC( '\0','\0','\0','\0') ) )
         {
             return *pp_cur;

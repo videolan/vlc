@@ -472,7 +472,7 @@ static void* Manage( void* p_object )
         {
             mtime_t i_real_date = vlm->schedule[i]->i_date;
 
-            if( vlm->schedule[i]->b_enabled == true )
+            if( vlm->schedule[i]->b_enabled )
             {
                 if( vlm->schedule[i]->i_date == 0 ) // now !
                 {

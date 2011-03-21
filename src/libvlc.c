@@ -799,7 +799,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
 #if defined(MEDIA_LIBRARY)
     /* Get the ML */
-    if( var_GetBool( p_libvlc, "load-media-library-on-startup" ) == true )
+    if( var_GetBool( p_libvlc, "load-media-library-on-startup" ) )
     {
         priv->p_ml = ml_Create( VLC_OBJECT( p_libvlc ), NULL );
         if( !priv->p_ml )

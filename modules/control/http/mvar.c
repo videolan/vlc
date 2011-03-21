@@ -625,7 +625,7 @@ static void mvar_VlmSetNewLoop( char *name, vlm_t *vlm, mvar_t *s,
 
     /* Add a node with name and info */
     set = mvar_New( name, "set" );
-    if( b_name == true )
+    if( b_name )
     {
         mvar_AppendNewVar( set, "name", el->psz_name );
     }
