@@ -246,7 +246,7 @@ static picture_t *FilterPlanar( filter_t *p_filter, picture_t *p_pic )
     /*
      * Threshold mode drops out everything about luma, contrast and gamma.
      */
-    if( b_thres != true )
+    if( !b_thres )
     {
 
         /* Contrast is a fast but kludged function, so I put this gap to be
@@ -485,7 +485,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     /*
      * Threshold mode drops out everything about luma, contrast and gamma.
      */
-    if( b_thres != true )
+    if( !b_thres )
     {
 
         /* Contrast is a fast but kludged function, so I put this gap to be

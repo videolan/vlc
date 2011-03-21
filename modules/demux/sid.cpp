@@ -109,7 +109,7 @@ static int Open (vlc_object_t *obj)
 
     result = tune->read (data, size);
     free (data);
-    if (result==false)
+    if (!result)
         goto error;
 
     player = new sidplay2();
@@ -163,7 +163,7 @@ static int Open (vlc_object_t *obj)
     sys->tune->selectSong (0);
     result = (sys->player->load (sys->tune) >=0 );
     sys->player->fastForward (100);
-    if (result==false)
+    if (!result)
         goto error;
 
     /* Callbacks */
@@ -202,7 +202,7 @@ static int Demux (demux_t *demux)
     if (unlikely(block==NULL))
         return 0;
 
-    if (sys->tune->getStatus() == false) {
+    if (!sys->tune->getStatus()) {
         block_Release (block);
         return 0;
     }
@@ -268,7 +268,7 @@ static int Control (demux_t *demux, int query, va_list args)
             int i_idx = (int) va_arg (args, int);
             sys->tune->selectSong (i_idx+1);
             bool result = (sys->player->load (sys->tune) >=0 );
-            if (result == false)
+            if (!result)
                 return  VLC_EGENERIC;
 
             demux->info.i_title = i_idx;

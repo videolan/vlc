@@ -530,7 +530,7 @@ static int PresetCallback( vlc_object_t *p_aout, char const *psz_cmd,
                 free( psz_newbands );
                 psz_newbands = psz;
             }
-            if( p_sys->b_first == false )
+            if( !p_sys->b_first )
             {
                 vlc_mutex_unlock( &p_sys->lock );
                 var_SetString( p_aout, "equalizer-bands", psz_newbands );

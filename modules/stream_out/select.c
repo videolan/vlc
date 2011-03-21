@@ -283,7 +283,7 @@ static int Del(sout_stream_t *p_stream, sout_stream_id_t *p_es)
 static int Send(sout_stream_t *p_stream, sout_stream_id_t *p_es,
                 block_t *p_buffer)
 {
-    if (p_es->id == NULL && p_es->b_error != true)
+    if (p_es->id == NULL && !p_es->b_error)
     {
         p_es->id = p_stream->p_next->pf_add(p_stream->p_next, &p_es->fmt);
         if (p_es->id == NULL)
@@ -294,7 +294,7 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_t *p_es,
         }
     }
 
-    if ((p_es->b_error != true) && p_es->b_enabled)
+    if (!p_es->b_error && p_es->b_enabled)
         p_stream->p_next->pf_send(p_stream->p_next, p_es->id, p_buffer);
     else
         block_ChainRelease(p_buffer);

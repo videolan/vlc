@@ -537,7 +537,7 @@ static void ScanFiles( monitoring_thread_t *p_mon, int i_dir_id,
     vlc_array_t* delete_ids = vlc_array_new();
     for( i = 0; i < i_mon_rows; i++ )
     {
-       if( pb_processed[i] == false )
+       if( !pb_processed[i] )
         {
             /* This file doesn't exist anymore. Let's...urm...delete it. */
             ml_element_t* find = ( ml_element_t* ) calloc( 1, sizeof( ml_element_t ) );

@@ -112,7 +112,7 @@ media_library_t* ml_Get( vlc_object_t* p_this )
     p_ml = libvlc_priv (p_this->p_libvlc)->p_ml;
     assert( VLC_OBJECT( p_ml ) != p_this );
     if( p_ml == NULL &&
-            var_GetBool( p_this->p_libvlc, "load-media-library-on-startup" ) == false )
+        !var_GetBool( p_this->p_libvlc, "load-media-library-on-startup" ) )
     {
         libvlc_priv (p_this->p_libvlc)->p_ml
             = ml_Create( VLC_OBJECT( p_this->p_libvlc ), NULL );

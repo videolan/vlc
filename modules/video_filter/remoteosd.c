@@ -803,8 +803,8 @@ static void* update_request_thread( vlc_object_t *p_thread_obj )
     udr.w = htons(p_sys->i_vnc_width);
     udr.h = htons(p_sys->i_vnc_height);
 
-    if( write_exact(p_filter, p_sys->i_socket, (char*)&udr,
-           sz_rfbFramebufferUpdateRequestMsg) == false)
+    if( !write_exact(p_filter, p_sys->i_socket, (char*)&udr,
+                     sz_rfbFramebufferUpdateRequestMsg) )
     {
         msg_Err( p_filter, "Could not write rfbFramebufferUpdateRequestMsg." );
         p_sys->b_continue = false;
@@ -819,8 +819,8 @@ static void* update_request_thread( vlc_object_t *p_thread_obj )
         while( vlc_object_alive( p_thread_obj ) )
         {
             msleep( i_poll_interval_microsec );
-            if( write_exact(p_filter, p_sys->i_socket, (char*)&udr,
-                   sz_rfbFramebufferUpdateRequestMsg) == false)
+            if( !write_exact(p_filter, p_sys->i_socket, (char*)&udr,
+                             sz_rfbFramebufferUpdateRequestMsg))
             {
                 msg_Err( p_filter, "Could not write rfbFramebufferUpdateRequestMsg." );
                 break;

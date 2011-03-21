@@ -332,7 +332,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         }
     }
 
-    if( p_sys->b_updated == false )
+    if( !p_sys->b_updated )
         return NULL;
 
     subpicture_t *p_spu = NULL;

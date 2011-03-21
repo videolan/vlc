@@ -532,7 +532,7 @@ static int vlclua_del_callback( lua_State *L )
         lua_pop( L, 1 );
         /* obj var func data callbacks index */
     }
-    if( b_found == false )
+    if( !b_found )
         /* obj var func data callbacks */
         return luaL_error( L, "Couldn't find matching callback." );
     /* else */

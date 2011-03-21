@@ -2458,7 +2458,7 @@ char *en50221_Status( cam_t *p_cam, char *psz_request )
         {
             mmi_object.i_object_type = EN50221_MMI_ANSW;
             mmi_object.u.answ.b_ok = b_ok;
-            if ( b_ok == false )
+            if ( !b_ok )
             {
                 mmi_object.u.answ.psz_answ = strdup("");
             }
@@ -2476,7 +2476,7 @@ char *en50221_Status( cam_t *p_cam, char *psz_request )
         else
         {
             mmi_object.i_object_type = EN50221_MMI_MENU_ANSW;
-            if ( b_ok == false )
+            if ( !b_ok )
             {
                 mmi_object.u.menu_answ.i_choice = 0;
             }

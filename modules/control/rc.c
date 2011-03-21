@@ -1270,8 +1270,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
 
         if( strlen( newval.psz_string ) > 0 )
         {
-            if ( ( !strncmp( newval.psz_string, "on", 2 ) && ( val.b_bool ) ) ||
-                 ( !strncmp( newval.psz_string, "off", 3 ) && ( val.b_bool == false ) ) )
+            if ( ( !strncmp( newval.psz_string, "on", 2 )  &&  val.b_bool ) ||
+                 ( !strncmp( newval.psz_string, "off", 3 ) && !val.b_bool ) )
             {
                 b_update = false;
             }
@@ -1292,8 +1292,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
 
         if( strlen( newval.psz_string ) > 0 )
         {
-            if ( ( !strncmp( newval.psz_string, "on", 2 ) && ( val.b_bool ) ) ||
-                 ( !strncmp( newval.psz_string, "off", 3 ) && ( val.b_bool == false ) ) )
+            if ( ( !strncmp( newval.psz_string, "on", 2 )  &&  val.b_bool ) ||
+                 ( !strncmp( newval.psz_string, "off", 3 ) && !val.b_bool ) )
             {
                 b_update = false;
             }
@@ -1314,8 +1314,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
 
         if( strlen( newval.psz_string ) > 0 )
         {
-            if ( ( !strncmp( newval.psz_string, "on", 2 ) && ( val.b_bool ) ) ||
-                 ( !strncmp( newval.psz_string, "off", 3 ) && ( val.b_bool == false ) ) )
+            if ( ( !strncmp( newval.psz_string, "on", 2 )  &&  val.b_bool ) ||
+                 ( !strncmp( newval.psz_string, "off", 3 ) && !val.b_bool ) )
             {
                 b_update = false;
             }

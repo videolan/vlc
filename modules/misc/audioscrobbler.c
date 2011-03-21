@@ -270,7 +270,7 @@ static void Run( intf_thread_t *p_intf )
             continue; /* holding on until next_exchange */
 
         /* handshake if needed */
-        if( p_sys->b_handshaked == false )
+        if( !p_sys->b_handshaked )
         {
             msg_Dbg( p_intf, "Handshaking with last.fm ..." );
 
@@ -307,7 +307,7 @@ static void Run( intf_thread_t *p_intf )
                     break;
             }
             /* if handshake failed let's restart the loop */
-            if( p_sys->b_handshaked == false )
+            if( !p_sys->b_handshaked )
                 continue;
         }
 
@@ -475,7 +475,7 @@ static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
     var_Get( p_input, "state", &state_value );
 
 
-    if( p_sys->b_meta_read == false && state_value.i_int >= PLAYING_S )
+    if( !p_sys->b_meta_read && state_value.i_int >= PLAYING_S )
     {
         ReadMetaData( p_intf );
         return VLC_SUCCESS;

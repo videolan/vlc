@@ -229,7 +229,7 @@ static int Open( vlc_object_t * p_this )
         b_alive = false;
     }
 
-    if( b_alive == false )
+    if( !b_alive )
     {
         msg_Warn( p_aout, "selected audio device is not alive, switching to default device" );
         p_sys->i_selected_dev = p_sys->i_default_dev;
@@ -720,7 +720,7 @@ static int OpenSPDIF( aout_instance_t * p_aout )
             p_sys->i_stream_id = p_streams[i];
             p_sys->i_stream_index = i;
 
-            if( p_sys->b_revert == false )
+            if( !p_sys->b_revert )
             {
                 /* Retrieve the original format of this stream first if not done so already */
                 i_param_size = sizeof( p_sys->sfmt_revert );

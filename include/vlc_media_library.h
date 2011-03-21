@@ -537,7 +537,7 @@ static inline void ml_gc_decref( ml_media_t* p_media )
     pool = p_gc->pool;
     vlc_spin_unlock (&p_gc->spin);
 
-    if( refs == 0 && pool == false )
+    if( refs == 0 && !pool )
     {
         vlc_spin_destroy (&p_gc->spin);
         p_gc->pf_destructor (p_gc);

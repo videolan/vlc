@@ -816,7 +816,7 @@ static int32_t AtmoInitialize(filter_t *p_filter, bool b_for_thread)
     filter_sys_t *p_sys = p_filter->p_sys;
     if(p_sys->p_atmo_config)
     {
-        if(b_for_thread == false)
+        if(!b_for_thread)
         {
             /* open com port */
             /* setup Output Threads ... */

@@ -279,7 +279,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     vlc_mutex_lock( &p_sys->lock );
     if( p_sys->last_time + p_sys->i_refresh > date )
         goto out;
-    if( p_sys->b_need_update == false )
+    if( !p_sys->b_need_update )
         goto out;
 
     p_spu = filter_NewSubpicture( p_filter );

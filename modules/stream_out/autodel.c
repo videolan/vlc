@@ -152,7 +152,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *p_es,
     int i;
 
     p_es->i_last = p_buffer->i_dts;
-    if ( p_es->id == NULL && p_es->b_error != true )
+    if ( !p_es->id && !p_es->b_error )
     {
         p_es->id = p_stream->p_next->pf_add( p_stream->p_next, &p_es->fmt );
         if ( p_es->id == NULL )
@@ -163,7 +163,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *p_es,
         }
     }
 
-    if ( p_es->b_error != true )
+    if ( !p_es->b_error )
         p_stream->p_next->pf_send( p_stream->p_next, p_es->id, p_buffer );
     else
         block_ChainRelease( p_buffer );
