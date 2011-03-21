@@ -172,6 +172,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_nal_size     = 4; // assume 4 byte start codes
     p_sys->i_sps_pps_size = 0;
     p_sys->p_sps_pps_buf  = NULL;
+    p_dec->p_sys->p_pic   = NULL;
 
     /* Win32 code *
      * We cannot link and ship BCM dll, even with LGPL license (too big)
@@ -374,16 +375,33 @@ static BC_STATUS ourCallback(void *shnd, uint32_t width, uint32_t height, uint32
 {
     decoder_t *p_dec          = (decoder_t *)shnd;
     BC_DTS_PROC_OUT *proc_out = p_dec->p_sys->proc_out;
+    BC_DTS_PROC_OUT *proc_in  = (BC_DTS_PROC_OUT*)pOut;
 
     /* Direct Rendering */
-    picture_t *p_pic     = p_dec->p_sys->p_pic = decoder_NewPicture( p_dec );
+    /* Do not allocate for the second-field in the pair, in interlaced */
+    if( !(proc_in->PicInfo.flags & VDEC_FLAG_INTERLACED_SRC) ||
+        !(proc_in->PicInfo.flags & VDEC_FLAG_FIELDPAIR) )
+        p_dec->p_sys->p_pic = decoder_NewPicture( p_dec );
+
+    /* */
+    picture_t *p_pic = p_dec->p_sys->p_pic;
     if( !p_pic )
         return BC_STS_ERROR;
 
-    proc_out->Ybuff      = p_pic->p[0].p_pixels;
-    proc_out->YbuffSz    = p_dec->fmt_out.video.i_width * p_dec->fmt_out.video.i_height  / 2;
-    proc_out->StrideSz   = p_pic->p[0].i_pitch /2 - p_dec->fmt_out.video.i_width;
-    proc_out->PoutFlags |= BC_POUT_FLAGS_STRIDE; /* Trust Stride info */
+    /* Interlacing */
+    p_pic->b_progressive     = !(proc_in->PicInfo.flags & VDEC_FLAG_INTERLACED_SRC);
+    p_pic->b_top_field_first = !(proc_in->PicInfo.flags & VDEC_FLAG_BOTTOM_FIRST);
+    p_pic->i_nb_fields       = p_pic->b_progressive? 1: 2;
+
+    /* Filling out the struct */
+    proc_out->Ybuff      = !(proc_in->PicInfo.flags & VDEC_FLAG_FIELDPAIR) ?
+                             &p_pic->p[0].p_pixels[0] :
+                             &p_pic->p[0].p_pixels[p_pic->p[0].i_pitch];
+    proc_out->YbuffSz    = 2 * p_pic->p[0].i_pitch;
+    proc_out->StrideSz   = (proc_in->PicInfo.flags & VDEC_FLAG_INTERLACED_SRC)?
+                            2 * (p_pic->p[0].i_pitch/2) - p_dec->fmt_out.video.i_width:
+                            p_pic->p[0].i_pitch/2 - p_dec->fmt_out.video.i_width;
+    proc_out->PoutFlags |= BC_POUT_FLAGS_STRIDE;              /* Trust Stride info */
 
     return BC_STS_SUCCESS;
 }
@@ -443,7 +461,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     proc_out.AppCallBack    = ourCallback;
     proc_out.hnd            = p_dec;
     p_sys->proc_out         = &proc_out;
-    p_sys->p_pic            = NULL;
 
 #ifdef DEBUG_CRYSTALHD
     msg_Dbg( p_dec, "%i, %i",  p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height );
@@ -468,6 +485,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             if( !p_pic )
                 break;
+
+            /* In interlaced mode, do not push the first field in the pipeline */
+            if( (proc_out.PicInfo.flags & VDEC_FLAG_INTERLACED_SRC) &&
+               !(proc_out.PicInfo.flags & VDEC_FLAG_FIELDPAIR) )
+                return NULL;
 
             //  crystal_CopyPicture( p_pic, &proc_out );
             p_pic->date = proc_out.PicInfo.timeStamp > 0 ? FROM_BC_PTS(proc_out.PicInfo.timeStamp) : VLC_TS_INVALID;
