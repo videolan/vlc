@@ -697,7 +697,7 @@ static int SessionsSetup( demux_t *p_demux )
     unsigned int   i_buffer = 0;
     unsigned const thresh = 200000; /* RTP reorder threshold .2 second (default .1) */
 
-    b_rtsp_tcp    = var_InheritBool( p_demux, "rtsp-tcp" ) ||
+    b_rtsp_tcp    = var_CreateGetBool( p_demux, "rtsp-tcp" ) ||
                     var_InheritBool( p_demux, "rtsp-http" );
     i_client_port = var_InheritInteger( p_demux, "rtp-client-port" );
 
