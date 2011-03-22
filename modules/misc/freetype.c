@@ -78,6 +78,10 @@
 #define DEFAULT_FONT FC_DEFAULT_FONT
 #endif
 
+#ifdef HAVE_FONTCONFIG
+# define HAVE_STYLES
+#endif
+
 #include <assert.h>
 
 /*****************************************************************************
@@ -190,9 +194,12 @@ vlc_module_end ()
 /* The RenderText call maps to pf_render_string, defined in vlc_filter.h */
 static int RenderText( filter_t *, subpicture_region_t *,
                        subpicture_region_t * );
-#ifdef HAVE_FONTCONFIG
+
+#ifdef HAVE_STYLES
 static int RenderHtml( filter_t *, subpicture_region_t *,
                        subpicture_region_t * );
+#endif
+#ifdef HAVE_FONTCONFIG
 static char *FontConfig_Select( FcConfig *, const char *,
                                 bool, bool, int * );
 #endif
@@ -267,7 +274,7 @@ struct filter_sys_t
 
     int            i_default_font_size;
     int            i_display_height;
-#ifdef HAVE_FONTCONFIG
+#ifdef HAVE_STYLES
     char*          psz_fontfamily;
     xml_reader_t  *p_xml;
 #endif
@@ -308,7 +315,7 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
-#ifdef HAVE_FONTCONFIG
+#ifdef HAVE_STYLES
     p_sys->psz_fontfamily = NULL;
     p_sys->p_xml = NULL;
 #endif
@@ -332,8 +339,8 @@ static int Create( vlc_object_t *p_this )
     if( !psz_fontfamily || !*psz_fontfamily )
     {
         free( psz_fontfamily );
-#ifdef HAVE_FONTCONFIG
-        psz_fontfamily=strdup( DEFAULT_FONT );
+#ifdef HAVE_STYLES
+        psz_fontfamily = strdup( DEFAULT_FONT );
 #else
         psz_fontfamily = (char *)malloc( PATH_MAX + 1 );
         if( !psz_fontfamily )
@@ -467,8 +474,9 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_font_attachments = 0;
 
     p_filter->pf_render_text = RenderText;
-#ifdef HAVE_FONTCONFIG
+#ifdef HAVE_STYLES
     p_filter->pf_render_html = RenderHtml;
+#ifdef HAVE_FONTCONFIG
     FcPatternDestroy( fontmatch );
     FcPatternDestroy( fontpattern );
 #else
@@ -518,7 +526,7 @@ static void Destroy( vlc_object_t *p_this )
         free( p_sys->pp_font_attachments );
     }
 
-#ifdef HAVE_FONTCONFIG
+#ifdef HAVE_STYLES
     if( p_sys->p_xml ) xml_ReaderDelete( p_sys->p_xml );
     free( p_sys->psz_fontfamily );
 #endif
@@ -1309,7 +1317,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     return VLC_EGENERIC;
 }
 
-#ifdef HAVE_FONTCONFIG
+#ifdef HAVE_STYLES
 static ft_style_t *CreateStyle( char *psz_fontname, int i_font_size,
         uint32_t i_font_color, uint32_t i_karaoke_bg_color, bool b_bold,
         bool b_italic, bool b_uline, bool b_through )
@@ -1934,14 +1942,18 @@ static int ProcessLines( filter_t *p_filter,
             {
                 char *psz_fontfile = NULL;
 
+#ifdef HAVE_FONTCONFIG
                 psz_fontfile = FontConfig_Select( NULL,
                                                   p_style->psz_fontname,
                                                   p_style->b_bold,
                                                   p_style->b_italic,
                                                   &i_idx );
+#else
+#error FIXME
+#endif
                 if( psz_fontfile && ! *psz_fontfile )
                 {
-                    msg_Warn( p_filter, "Fontconfig was unable to find a font: \"%s\" %s"
+                    msg_Warn( p_filter, "We were not able to find a matching font: \"%s\" %s,"
                         " so using default font", p_style->psz_fontname,
                         ((p_style->b_bold && p_style->b_italic) ? "(Bold,Italic)" :
                                                (p_style->b_bold ? "(Bold)" :
@@ -2266,6 +2278,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
     return rv;
 }
 
+#ifdef HAVE_FONTCONFIG
 static char* FontConfig_Select( FcConfig* priv, const char* family,
                           bool b_bold, bool b_italic, int *i_idx )
 {
@@ -2327,7 +2340,8 @@ static char* FontConfig_Select( FcConfig* priv, const char* family,
     FcPatternDestroy( p_pat );
     return strdup( (const char*)val_s );
 }
-#else
+#endif
+#else /* from now no styles */
 
 static void SetupLine( filter_t *p_filter, const char *psz_text_in,
                        uint32_t **psz_text_out, uint32_t *pi_runs,
