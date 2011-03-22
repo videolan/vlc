@@ -202,6 +202,8 @@ static int RenderHtml( filter_t *, subpicture_region_t *,
 #ifdef HAVE_FONTCONFIG
 static char *FontConfig_Select( FcConfig *, const char *,
                                 bool, bool, int * );
+
+static int FontConfig_FindFont( filter_t *, char *, char **, int * );
 #endif
 
 
@@ -303,14 +305,6 @@ static int Create( vlc_object_t *p_this )
     char          *psz_fontfamily=NULL;
     int            i_error,fontindex;
 
-#ifdef HAVE_FONTCONFIG
-    FcPattern     *fontpattern = NULL, *fontmatch = NULL;
-    /* Initialise result to Match, as fontconfig doesnt
-     * really set this other than some error-cases */
-    FcResult       fontresult = FcResultMatch;
-#endif
-
-
     /* Allocate structure */
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
@@ -356,83 +350,11 @@ static int Create( vlc_object_t *p_this )
     }
 
 #ifdef HAVE_FONTCONFIG
-    msg_Dbg( p_filter, "Building font databases.");
-    mtime_t t1;
-    t1 = mdate();
-
-#ifdef WIN32
-    dialog_progress_bar_t *p_dialog = NULL;
-    FcConfig *fcConfig = FcInitLoadConfig();
-    mtime_t t2;
-
-    p_dialog = dialog_ProgressCreate( p_filter,
-            _("Building font cache"),
-            _("Please wait while your font cache is rebuilt.\n"
-                "This should take less than a few minutes."), NULL );
-
-/*    if( p_dialog )
-        dialog_ProgressSet( p_dialog, NULL, 0.5 ); */
-
-    FcConfigBuildFonts( fcConfig );
-    t2 = mdate();
-    msg_Dbg( p_filter, "Took %ld microseconds", (long)((t2 - t1)) );
-
-    if( p_dialog )
-    {
-//        dialog_ProgressSet( p_dialog, NULL, 1.0 );
-        dialog_ProgressDestroy( p_dialog );
-        p_dialog = NULL;
-    }
-#endif
-    /* Lets find some fontfile from freetype-font variable family */
-    char *psz_fontsize;
-    if( asprintf( &psz_fontsize, "%d", p_sys->i_default_font_size ) == -1 )
-        goto error;
-
-    fontpattern = FcPatternCreate();
-    if( !fontpattern )
-    {
-        msg_Err( p_filter, "Creating fontpattern failed");
-        goto error;
-    }
-
-    FcPatternAddString( fontpattern, FC_FAMILY, (const FcChar8 *)psz_fontfamily );
-    FcPatternAddString( fontpattern, FC_SIZE, (const FcChar8 *)psz_fontsize );
-    free( psz_fontsize );
-
-    if( FcConfigSubstitute( NULL, fontpattern, FcMatchPattern ) == FcFalse )
-    {
-        msg_Err( p_filter, "FontSubstitute failed");
-        goto error;
-    }
-    FcDefaultSubstitute( fontpattern );
-
-    /* testing fontresult here doesn't do any good really, but maybe it will
-     * in future as fontconfig code doesn't set it in all cases and just
-     * returns NULL or doesn't set to to Match on all Match cases.*/
-    fontmatch = FcFontMatch( NULL, fontpattern, &fontresult );
-    if( !fontmatch || fontresult == FcResultNoMatch )
-    {
-        msg_Err( p_filter, "Fontmatching failed");
-        goto error;
-    }
-
-    FcPatternGetString( fontmatch, FC_FILE, 0, &psz_fontfile);
-    FcPatternGetInteger( fontmatch, FC_INDEX, 0, &fontindex );
-    if( !psz_fontfile )
-    {
-        msg_Err( p_filter, "Failed to get fontfile");
-        goto error;
-    }
-
-    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily,
-             psz_fontfile ? psz_fontfile : "(null)" );
-    p_sys->psz_fontfamily = strdup( psz_fontfamily );
-
+    if( FontConfig_FindFont( p_filter, psz_fontfamily, &psz_fontfile, &fontindex )
+            != VLC_SUCCESS )
+        psz_fontfile = psz_fontfamily;
 #else
-
     psz_fontfile = psz_fontfamily;
-
 #endif
 
     i_error = FT_Init_FreeType( &p_sys->p_library );
@@ -476,9 +398,6 @@ static int Create( vlc_object_t *p_this )
     p_filter->pf_render_text = RenderText;
 #ifdef HAVE_STYLES
     p_filter->pf_render_html = RenderHtml;
-#ifdef HAVE_FONTCONFIG
-    FcPatternDestroy( fontmatch );
-    FcPatternDestroy( fontpattern );
 #else
     p_filter->pf_render_html = NULL;
 #endif
@@ -489,16 +408,6 @@ static int Create( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
-#ifdef HAVE_FONTCONFIG
-    if( fontmatch ) FcPatternDestroy( fontmatch );
-    if( fontpattern ) FcPatternDestroy( fontpattern );
-
-#ifdef WIN32
-    if( p_dialog )
-        dialog_ProgressDestroy( p_dialog );
-#endif
-#endif
-
     if( p_sys->p_face ) FT_Done_Face( p_sys->p_face );
     if( p_sys->p_library ) FT_Done_FreeType( p_sys->p_library );
     free( psz_fontfamily );
@@ -2279,6 +2188,103 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
 }
 
 #ifdef HAVE_FONTCONFIG
+static int FontConfig_FindFont( filter_t *p_filter, char *psz_fontfamily,
+                             char **psz_fontfile, int *fontindex )
+{
+    filter_sys_t  *p_sys = p_filter->p_sys;
+
+    FcPattern     *fontpattern = NULL, *fontmatch = NULL;
+    /* Initialise result to Match, as fontconfig doesnt
+     * really set this other than some error-cases */
+    FcResult       fontresult = FcResultMatch;
+
+    /* */
+    msg_Dbg( p_filter, "Building font databases.");
+    mtime_t t1;
+    t1 = mdate();
+
+#ifdef WIN32
+    dialog_progress_bar_t *p_dialog = NULL;
+    FcConfig *fcConfig = FcInitLoadConfig();
+    mtime_t t2;
+
+    p_dialog = dialog_ProgressCreate( p_filter,
+            _("Building font cache"),
+            _("Please wait while your font cache is rebuilt.\n"
+                "This should take less than a few minutes."), NULL );
+
+/*    if( p_dialog )
+        dialog_ProgressSet( p_dialog, NULL, 0.5 ); */
+
+    FcConfigBuildFonts( fcConfig );
+    t2 = mdate();
+    msg_Dbg( p_filter, "Took %ld microseconds", (long)((t2 - t1)) );
+
+    if( p_dialog )
+    {
+//        dialog_ProgressSet( p_dialog, NULL, 1.0 );
+        dialog_ProgressDestroy( p_dialog );
+        p_dialog = NULL;
+    }
+#endif
+
+    /* Lets find some fontfile from freetype-font variable family */
+    char *psz_fontsize;
+    if( asprintf( &psz_fontsize, "%d", p_sys->i_default_font_size ) == -1 )
+        goto error;
+
+    fontpattern = FcPatternCreate();
+    if( !fontpattern )
+    {
+        msg_Err( p_filter, "Creating fontpattern failed");
+        goto error;
+    }
+
+    FcPatternAddString( fontpattern, FC_FAMILY, (const FcChar8 *)psz_fontfamily );
+    FcPatternAddString( fontpattern, FC_SIZE, (const FcChar8 *)psz_fontsize );
+
+    if( FcConfigSubstitute( NULL, fontpattern, FcMatchPattern ) == FcFalse )
+    {
+        msg_Err( p_filter, "FontSubstitute failed");
+        goto error;
+    }
+    FcDefaultSubstitute( fontpattern );
+
+    /* testing fontresult here doesn't do any good really, but maybe it will
+     * in future as fontconfig code doesn't set it in all cases and just
+     * returns NULL or doesn't set to to Match on all Match cases.*/
+    fontmatch = FcFontMatch( NULL, fontpattern, &fontresult );
+    if( !fontmatch || fontresult == FcResultNoMatch )
+    {
+        msg_Err( p_filter, "Fontmatching failed");
+        goto error;
+    }
+
+    FcPatternGetString( fontmatch, FC_FILE, 0, psz_fontfile);
+    FcPatternGetInteger( fontmatch, FC_INDEX, 0, fontindex );
+    if( !psz_fontfile )
+    {
+        msg_Err( p_filter, "Failed to get fontfile");
+        goto error;
+    }
+
+    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily,
+             *psz_fontfile ? *psz_fontfile : "(null)" );
+    p_sys->psz_fontfamily = strdup( psz_fontfamily );
+
+    return VLC_SUCCESS;
+
+error:
+#ifdef WIN32
+    if( p_dialog )
+        dialog_ProgressDestroy( p_dialog );
+#endif
+
+    if( fontmatch ) FcPatternDestroy( fontmatch );
+    if( fontpattern ) FcPatternDestroy( fontpattern );
+    return VLC_EGENERIC;
+}
+
 static char* FontConfig_Select( FcConfig* priv, const char* family,
                           bool b_bold, bool b_italic, int *i_idx )
 {
