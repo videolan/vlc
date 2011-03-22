@@ -1611,7 +1611,7 @@ bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
              {.w = {1,    1}, .h = {1,    1}} }, \
       .pixel_size = 1 }
 
-#define PACKED(size) \
+#define PACKED_FMT(size) \
     { .plane_count = 1, \
       .p = { {.w = {1,1}, .h = {1,1}} }, \
       .pixel_size = size }
@@ -1629,20 +1629,20 @@ static const struct
     { { VLC_CODEC_YUV_PLANAR_444, 0 },         PLANAR(3, 1, 1) },
     { { VLC_CODEC_YUVA, 0 },                   PLANAR(4, 1, 1) },
 
-    { { VLC_CODEC_YUV_PACKED, 0 },             PACKED(2) },
+    { { VLC_CODEC_YUV_PACKED, 0 },             PACKED_FMT(2) },
     { { VLC_CODEC_RGB8, VLC_CODEC_GREY,
-        VLC_CODEC_YUVP, VLC_CODEC_RGBP, 0 },   PACKED(1) },
+        VLC_CODEC_YUVP, VLC_CODEC_RGBP, 0 },   PACKED_FMT(1) },
     { { VLC_CODEC_RGB16, VLC_CODEC_RGB15,
-        VLC_CODEC_RGB12, VLC_CODEC_RGBA16, 0 },PACKED(2) },
-    { { VLC_CODEC_RGB24, 0 },                  PACKED(3) },
-    { { VLC_CODEC_RGB32, VLC_CODEC_RGBA, 0 },  PACKED(4) },
+        VLC_CODEC_RGB12, VLC_CODEC_RGBA16, 0 },PACKED_FMT(2) },
+    { { VLC_CODEC_RGB24, 0 },                  PACKED_FMT(3) },
+    { { VLC_CODEC_RGB32, VLC_CODEC_RGBA, 0 },  PACKED_FMT(4) },
 
     { { VLC_CODEC_Y211, 0 },                   { 1, { {{1,4}, {1,1}} }, 4 } },
 
     { {0}, { 0, {}, 0 } }
 };
 
-#undef PACKED
+#undef PACKED_FMT
 #undef PLANAR
 
 const vlc_chroma_description_t *vlc_fourcc_GetChromaDescription( vlc_fourcc_t i_fourcc )
