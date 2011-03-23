@@ -1045,7 +1045,7 @@ void CaptureOpenPanel::initialize()
 
     dvbSrate = new QSpinBox;
     dvbSrate->setAlignment( Qt::AlignRight );
-    dvbSrate->setSuffix(" kHz");
+    dvbSrate->setSuffix(" bauds");
     setSpinBoxFreq( dvbSrate );
     dvbPropLayout->addWidget( dvbSrate, 1, 1 );
 
