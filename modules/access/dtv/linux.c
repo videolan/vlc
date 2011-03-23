@@ -548,16 +548,68 @@ static unsigned dvb_parse_polarization (char pol)
     return dvb_parse_int (pol, tab, 5, SEC_VOLTAGE_OFF);
 }
 
-int dvb_set_sec (dvb_device_t *d, char pol)
+int dvb_set_sec (dvb_device_t *d, uint32_t freq, char pol,
+                 uint32_t lowf, uint32_t highf, uint32_t switchf)
 {
     /* Always try to configure high voltage, but only warn on enable failure */
     int val = var_InheritBool (d->obj, "dvb-high-voltage");
     if (ioctl (d->frontend, FE_ENABLE_HIGH_LNB_VOLTAGE, &val) < 0 && val)
         msg_Err (d->obj, "cannot enable high LNB voltage: %m");
 
+    /* Windows BDA exposes a higher-level API covering LNB oscillators.
+     * So lets pretend this is platform-specific stuff and do it here. */
+    if (!lowf)
+    {   /* Default oscillator frequencies */
+        static const struct
+        {
+             uint16_t min, max, low, high;
+        } tab[] =
+        {    /*  min    max    low   high */
+             { 10700, 13250,  9750, 10600 }, /* Ku band */
+             {  4500,  4800,  5950,     0 }, /* C band (high) */
+             {  3400,  4200,  5150,     0 }, /* C band (low) */
+             {  2500,  2700,  3650,     0 }, /* S band */
+             {   950,  2150,     0,     0 }, /* adjusted IF (L band) */
+        };
+        uint_fast16_t mhz = freq / 1000;
+
+        for (size_t i = 0; i < sizeof (tab) / sizeof (tab[0]); i++)
+             if (mhz >= tab[i].min && mhz <= tab[i].max)
+             {
+                 lowf = tab[i].low * 1000;
+                 highf = tab[i].high * 1000;
+                 goto known;
+             }
+
+        msg_Err (d->obj, "no known band for frequency %u kHz", freq);
+known:
+        msg_Dbg (d->obj, "selected LNB low: %u kHz, LNB high: %u kHz",
+                 lowf, highf);
+    }
+
+    /* Use high oscillator frequency? */
+    bool high = highf != 0 && freq > switchf;
+
+    freq -= high ? highf : lowf;
+    if ((int32_t)freq < 0)
+        freq *= -1;
+    assert (freq < 0x7fffffff);
+
+    /* TODO: DiSEqC */
+
+    /* Continuous tone (to select high oscillator frequency) */
+    int tone;
+    switch (var_InheritInteger (d->obj, "dvb-tone"))
+    {
+        case 0:  tone = SEC_TONE_OFF; break;
+        case 1:  tone = SEC_TONE_ON;  break;
+        default: tone = high ? SEC_TONE_ON : SEC_TONE_OFF;
+    }
+
     unsigned voltage = dvb_parse_polarization (pol);
 
-    return dvb_set_prop (d, DTV_VOLTAGE, voltage);
+    return dvb_set_props (d, 3, DTV_FREQUENCY, freq,
+                          DTV_VOLTAGE, voltage, DTV_TONE, tone);
 }
 
 int dvb_set_dvbs (dvb_device_t *d, uint32_t freq,

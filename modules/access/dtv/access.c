@@ -132,6 +132,7 @@ static const char *const hierarchy_user[] = { N_("Automatic"),
 };
 
 #define PILOT_TEXT N_("Pilot")
+
 #define ROLLOFF_TEXT N_("Roll-off factor")
 const int rolloff_vlc[] = { -1,
     35, 20, 25,
@@ -155,6 +156,31 @@ static const char *const polarization_user[] = { N_("Unspecified (0V)"),
     "the receiver are long, higher voltage may be required.\n" \
     "Not all receivers support this.")
 
+#define LNB_LOW_TEXT N_("Local oscillator low frequency (kHz)")
+#define LNB_HIGH_TEXT N_("Local oscillator high frequency (kHz)")
+#define LNB_LONGTEXT N_( \
+    "The downconverter (LNB) will substract the local oscillator frequency " \
+    "from the satellite transmission frequency. " \
+    "The intermediate frequency (IF) on the RF cable is the result.")
+#define LNB_SWITCH_TEXT N_("Universal LNB switch frequency (kHz)")
+#define LNB_SWITCH_LONGTEXT N_( \
+    "If the satellite transmission frequency exceeds the switch frequency, " \
+    "the oscillator high frequency will be used as reference. " \
+    "Furthermore the automatic continuous 22kHz tone will be sent.")
+#define TONE_TEXT N_("Continuous 22kHz tone")
+#define TONE_LONGTEXT N_( \
+    "A continuous tone at 22kHz can be sent on the cable. " \
+    "This normally selects the higher frequency band from a universal LNB.")
+
+#if 0
+#define SATNO_TEXT N_("DiSEqC LNB number")
+#define SATNO_LONGTEXT N_( \
+    "If the satellite receiver is connected to multiple " \
+    "low noise block-downconverters (LNB) through a DiSEqC 1.0 switch, " \
+    "the correct LNB can be selected (1 to 4). " \
+    "If there is no switch, this parameter should be 0.")
+#endif
+
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
@@ -166,7 +192,7 @@ vlc_module_begin ()
     set_capability ("access", 0)
     set_callbacks (Open, Close)
     add_shortcut ("dtv", "tv", "dvb", /* "radio", "dab",*/
-                  "cable", "dvb-c", /*"satellite", "dvb-s", "dvb-s2",*/
+                  "cable", "dvb-c", "satellite", "dvb-s", "dvb-s2",
                   "terrestrial", "dvb-t", "atsc")
 
     /* All options starting with dvb- can be overriden in the MRL, so they
@@ -250,21 +276,21 @@ vlc_module_begin ()
     add_bool ("dvb-high-voltage", false,
               HIGH_VOLTAGE_TEXT, HIGH_VOLTAGE_LONGTEXT, false)
 #endif
-#if 0
+    add_integer ("dvb-lnb-low", 0, LNB_LOW_TEXT, LNB_LONGTEXT, true)
+        change_integer_range (0, 0x7fffffff)
+        add_deprecated_alias ("dvb-lnb-lof1")
+    add_integer ("dvb-lnb-high", 0, LNB_HIGH_TEXT, LNB_LONGTEXT, true)
+        change_integer_range (0, 0x7fffffff)
+        add_deprecated_alias ("dvb-lnb-lof2")
+    add_integer ("dvb-lnb-switch", 11700000,
+                 LNB_SWITCH_TEXT, LNB_SWITCH_LONGTEXT, true)
+        change_integer_range (0, 0x7fffffff)
+        add_deprecated_alias ("dvb-lnb-slof")
     add_integer ("dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT, true)
-        change_integer_list (tone_vlc, auto_off_on)
-        change_safe ()
-    add_integer ("dvb-lnb-lof1", 0, LNB_LOF1_TEXT, LNB_LOF1_LONGTEXT, true)
-        change_integer_range (0, 0x7fffffff)
-        change_safe ()
-    add_integer ("dvb-lnb-lof2", 0, LNB_LOF2_TEXT, LNB_LOF2_LONGTEXT, true)
-        change_integer_range (0, 0x7fffffff)
-        change_safe ()
-    add_integer ("dvb-lnb-slof", 0, LNB_SLOF_TEXT, LNB_SLOF_LONGTEXT, true)
-        change_integer_range (0, 0x7fffffff)
-        change_safe ()
+        change_integer_list (auto_off_on_vlc, auto_off_on_user)
+#if 0
     add_integer ("dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT, true)
-        change_integer_list (satno_vlc, satno_user)
+        change_integer_range (0, 4)
         change_safe ()
 #endif
 vlc_module_end ()
@@ -611,11 +637,14 @@ static char var_InheritPolarization (vlc_object_t *obj)
     return pol;
 }
 
-static int sec_setup (vlc_object_t *obj, dvb_device_t *dev)
+static int sec_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 {
     char pol = var_InheritPolarization (obj);
+    unsigned lowf = var_InheritInteger (obj, "dvb-lnb-low");
+    unsigned highf = var_InheritInteger (obj, "dvb-lnb-high");
+    unsigned switchf = var_InheritInteger (obj, "dvb-lnb-switch");
 
-    return dvb_set_sec (dev, pol);
+    return dvb_set_sec (dev, freq, pol, lowf, highf, switchf);
 }
 
 static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
@@ -627,7 +656,7 @@ static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
     int ret = dvb_set_dvbs (dev, freq, srate, fec);
     free (fec);
     if (ret == 0)
-        ret = sec_setup (obj, dev);
+        ret = sec_setup (obj, dev, freq);
     return ret;
 }
 
@@ -644,7 +673,7 @@ static int dvbs2_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
     free (fec);
     free (mod);
     if (ret == 0)
-        ret = sec_setup (obj, dev);
+        ret = sec_setup (obj, dev, freq);
     return ret;
 }
 
