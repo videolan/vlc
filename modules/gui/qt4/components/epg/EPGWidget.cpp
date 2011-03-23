@@ -52,14 +52,14 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
     layout->setSpacing( 0 );
     setLayout( layout );
 
-    connect( m_epgView, SIGNAL( startTimeChanged(QDateTime) ),
-             m_rulerWidget, SLOT( setStartTime(QDateTime) ) );
-    connect( m_epgView, SIGNAL( durationChanged(int) ),
-             m_rulerWidget, SLOT( setDuration(int) ) );
-    connect( m_epgView->horizontalScrollBar(), SIGNAL( valueChanged(int) ),
-             m_rulerWidget, SLOT( setOffset(int) ) );
-    connect( m_epgView->verticalScrollBar(), SIGNAL( valueChanged(int) ),
-             m_channelsWidget, SLOT( setOffset(int) ) );
+    CONNECT( m_epgView, startTimeChanged(QDateTime),
+             m_rulerWidget, setStartTime(QDateTime) );
+    CONNECT( m_epgView, durationChanged(int),
+             m_rulerWidget, setDuration(int) );
+    CONNECT( m_epgView->horizontalScrollBar(), valueChanged(int),
+             m_rulerWidget, setOffset(int) );
+    CONNECT( m_epgView->verticalScrollBar(), valueChanged(int),
+             m_channelsWidget, setOffset(int) );
     connect( m_epgView, SIGNAL( itemFocused(EPGItem*)),
              this, SIGNAL(itemSelectionChanged(EPGItem*)) );
     CONNECT( m_epgView, channelAdded(QString), m_channelsWidget, addChannel(QString) );
