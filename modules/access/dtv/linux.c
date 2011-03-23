@@ -550,6 +550,11 @@ static unsigned dvb_parse_polarization (char pol)
 
 int dvb_set_sec (dvb_device_t *d, char pol)
 {
+    /* Always try to configure high voltage, but only warn on enable failure */
+    int val = var_InheritBool (d->obj, "dvb-high-voltage");
+    if (ioctl (d->frontend, FE_ENABLE_HIGH_LNB_VOLTAGE, &val) < 0 && val)
+        msg_Err (d->obj, "cannot enable high LNB voltage: %m");
+
     unsigned voltage = dvb_parse_polarization (pol);
 
     return dvb_set_prop (d, DTV_VOLTAGE, voltage);

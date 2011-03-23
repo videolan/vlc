@@ -149,6 +149,12 @@ static const char *const polarization_user[] = { N_("Unspecified (0V)"),
     N_("Vertical (13V)"), N_("Horizontal (18V)"),
     N_("Circular Right Hand (13V)"), N_("Circular Left Hand (18V)") };
 
+#define HIGH_VOLTAGE_TEXT N_("High LNB voltage")
+#define HIGH_VOLTAGE_LONGTEXT N_( \
+    "If the cables between the satellilte low noise block-downconverter and " \
+    "the receiver are long, higher voltage may be required.\n" \
+    "Not all receivers support this.")
+
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
@@ -240,14 +246,14 @@ vlc_module_begin ()
         change_integer_range (0, 18)
         change_private ()
         change_safe ()
-#if 0 //def __linux__
+#ifdef __linux__
     add_bool ("dvb-high-voltage", false,
               HIGH_VOLTAGE_TEXT, HIGH_VOLTAGE_LONGTEXT, false)
+#endif
+#if 0
     add_integer ("dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT, true)
         change_integer_list (tone_vlc, auto_off_on)
         change_safe ()
-#endif
-#if 0
     add_integer ("dvb-lnb-lof1", 0, LNB_LOF1_TEXT, LNB_LOF1_LONGTEXT, true)
         change_integer_range (0, 0x7fffffff)
         change_safe ()
