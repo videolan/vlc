@@ -36,9 +36,14 @@ EPGGraphicsScene::EPGGraphicsScene( QObject *parent ) : QGraphicsScene( parent )
 
 void EPGGraphicsScene::drawBackground( QPainter *painter, const QRectF &rect)
 {
+    EPGView *epgView;
     painter->setPen( QPen( QColor( 224, 224, 224 ) ) );
     for( int y = rect.top() + TRACKS_HEIGHT ; y < rect.bottom() ; y += TRACKS_HEIGHT )
        painter->drawLine( QLineF( rect.left(), y, rect.right(), y ) );
+    epgView = qobject_cast<EPGView *>(parent());
+    int x = epgView->startTime().secsTo( epgView->baseTime() );
+    painter->setPen( QPen( QColor( 255, 192, 192 ) ) );
+        painter->drawLine( QLineF( x, rect.top(), x, rect.bottom() ) );
 }
 
 EPGView::EPGView( QWidget *parent ) : QGraphicsView( parent )
