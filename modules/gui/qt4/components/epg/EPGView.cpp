@@ -276,21 +276,13 @@ EPGView::~EPGView()
 
 void EPGView::updateDuration()
 {
-    QDateTime lastItem;
+    QDateTime maxItemTime;
     mutex.lock();
-    QList<QGraphicsItem*> list = items();
-
-    for ( int i = 0; i < list.count(); ++i )
-    {
-        EPGItem* item = qgraphicsitem_cast<EPGItem*>( list.at( i ) );
-        if ( !item ) continue;
-        QDateTime itemEnd = item->start().addSecs( item->duration() );
-
-        if ( itemEnd > lastItem )
-            lastItem = itemEnd;
-    }
+    foreach( EPGEventByTimeQMap *epgItemByTime, epgitemsByChannel.values() )
+        foreach( EPGItem *epgItem, epgItemByTime->values() )
+            if ( epgItem->end() > maxItemTime ) maxItemTime = epgItem->end();
     mutex.unlock();
-    m_duration = m_startTime.secsTo( lastItem );
+    m_duration = m_startTime.secsTo( maxItemTime );
     emit durationChanged( m_duration );
 }
 
