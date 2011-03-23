@@ -345,7 +345,6 @@ noinst_HEADERS = \
 	components/controller.hpp \
 	components/controller_widget.hpp \
 	components/epg/EPGChannels.hpp \
-	components/epg/EPGEvent.hpp \
 	components/epg/EPGItem.hpp \
 	components/epg/EPGRuler.hpp \
 	components/epg/EPGView.hpp \
