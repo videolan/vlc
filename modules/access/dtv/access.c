@@ -140,6 +140,15 @@ static const char *const rolloff_user[] = { N_("Automatic"),
     N_("0.35 (same as DVB-S)"), N_("0.20"), N_("0.25"),
 };
 
+#define POLARIZATION_TEXT N_("Polarization (Voltage)")
+#define POLARIZATION_LONGTEXT N_( \
+    "To select the polarization of the transponder, a different voltage " \
+    "is normally applied to the low noise block-downconverter (LNB).")
+static const char *const polarization_vlc[] = { "", "V", "H", "R", "L" };
+static const char *const polarization_user[] = { N_("Unspecified (0V)"),
+    N_("Vertical (13V)"), N_("Horizontal (18V)"),
+    N_("Circular Right Hand (13V)"), N_("Circular Left Hand (18V)") };
+
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
@@ -215,19 +224,30 @@ vlc_module_begin ()
         change_integer_range (0, 9)
         change_private ()
         change_safe ()
-#ifdef FIXME
-    set_section (N_("Satellite (DVB-S) parameters"), NULL)
-    add_integer ("dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT, true)
-        change_integer_list (satno_vlc, satno_user)
+    set_section (N_("DVB-S2 parameters"), NULL)
+    add_integer ("dvb-pilot", -1, PILOT_TEXT, PILOT_TEXT, true)
+        change_integer_list (auto_off_on_vlc, auto_off_on_user)
         change_safe ()
-    add_integer ("dvb-voltage", 13, VOLTAGE_TEXT, VOLTAGE_LONGTEXT, true)
-        change_integer_list (voltage_vlc, voltage_user)
+    add_integer ("dvb-rolloff", -1, ROLLOFF_TEXT, ROLLOFF_TEXT, true)
+        change_integer_list (rolloff_vlc, rolloff_user)
         change_safe ()
+    set_section (N_("Satellite equipment control"), NULL)
+    add_string ("dvb-polarization", "",
+                POLARIZATION_TEXT, POLARIZATION_LONGTEXT, false)
+        change_string_list (polarization_vlc, polarization_user, NULL)
+        change_safe ()
+    add_integer ("dvb-voltage", 13, " ", " ", true)
+        change_integer_range (0, 18)
+        change_private ()
+        change_safe ()
+#if 0 //def __linux__
     add_bool ("dvb-high-voltage", false,
               HIGH_VOLTAGE_TEXT, HIGH_VOLTAGE_LONGTEXT, false)
     add_integer ("dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT, true)
         change_integer_list (tone_vlc, auto_off_on)
         change_safe ()
+#endif
+#if 0
     add_integer ("dvb-lnb-lof1", 0, LNB_LOF1_TEXT, LNB_LOF1_LONGTEXT, true)
         change_integer_range (0, 0x7fffffff)
         change_safe ()
@@ -237,14 +257,10 @@ vlc_module_begin ()
     add_integer ("dvb-lnb-slof", 0, LNB_SLOF_TEXT, LNB_SLOF_LONGTEXT, true)
         change_integer_range (0, 0x7fffffff)
         change_safe ()
+    add_integer ("dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT, true)
+        change_integer_list (satno_vlc, satno_user)
+        change_safe ()
 #endif
-    set_section (N_("DVB-S2 parameters"), NULL)
-    add_integer ("dvb-pilot", -1, PILOT_TEXT, PILOT_TEXT, true)
-        change_integer_list (auto_off_on_vlc, auto_off_on_user)
-        change_safe ()
-    add_integer ("dvb-rolloff", -1, ROLLOFF_TEXT, ROLLOFF_TEXT, true)
-        change_integer_list (rolloff_vlc, rolloff_user)
-        change_safe ()
 vlc_module_end ()
 
 struct access_sys_t
@@ -562,6 +578,40 @@ const delsys_t dvbc = { .setup = dvbc_setup };
 
 
 /*** DVB-S ***/
+static char var_InheritPolarization (vlc_object_t *obj)
+{
+    char pol;
+    char *polstr = var_InheritString (obj, "dvb-polarization");
+    if (polstr != NULL)
+    {
+        pol = *polstr;
+        free (polstr);
+        if (unlikely(pol >= 'a' && pol <= 'z'))
+            pol -= 'a' - 'A';
+        return pol;
+    }
+
+    /* Backward compatibility with VLC for Linux < 1.2 */
+    unsigned voltage = var_InheritInteger (obj, "dvb-voltage");
+    switch (voltage)
+    {
+        case 13:  pol = 'V'; break;
+        case 18:  pol = 'H'; break;
+        default:  return 0;
+    }
+
+    msg_Warn (obj, "\"voltage=%u\" option is obsolete. "
+                   "Use \"polarization=%c\" instead.", voltage, pol);
+    return pol;
+}
+
+static int sec_setup (vlc_object_t *obj, dvb_device_t *dev)
+{
+    char pol = var_InheritPolarization (obj);
+
+    return dvb_set_sec (dev, pol);
+}
+
 static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 {
     char *fec = var_InheritCodeRate (obj);
@@ -570,8 +620,8 @@ static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
     /* FIXME: adjust frequency (offset) */
     int ret = dvb_set_dvbs (dev, freq, srate, fec);
     free (fec);
-
-    /* TODO: setup SEC */
+    if (ret == 0)
+        ret = sec_setup (obj, dev);
     return ret;
 }
 
@@ -583,10 +633,12 @@ static int dvbs2_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
     int pilot = var_InheritInteger (obj, "dvb-pilot");
     int rolloff = var_InheritInteger (obj, "dvb-rolloff");
 
-    /* FIXME: adjust frequency (offset)? SEC? */
+    /* FIXME: adjust frequency (offset)? */
     int ret = dvb_set_dvbs2 (dev, freq, mod, srate, fec, pilot, rolloff);
     free (fec);
     free (mod);
+    if (ret == 0)
+        ret = sec_setup (obj, dev);
     return ret;
 }
 

@@ -536,6 +536,25 @@ int dvb_set_dvbc (dvb_device_t *d, uint32_t freq, const char *modstr,
 
 
 /*** DVB-S ***/
+static unsigned dvb_parse_polarization (char pol)
+{
+    static const dvb_int_map_t tab[5] = {
+        { 0,   SEC_VOLTAGE_OFF },
+        { 'H', SEC_VOLTAGE_18  },
+        { 'L', SEC_VOLTAGE_18  },
+        { 'R', SEC_VOLTAGE_13  },
+        { 'V', SEC_VOLTAGE_13  },
+    };
+    return dvb_parse_int (pol, tab, 5, SEC_VOLTAGE_OFF);
+}
+
+int dvb_set_sec (dvb_device_t *d, char pol)
+{
+    unsigned voltage = dvb_parse_polarization (pol);
+
+    return dvb_set_prop (d, DTV_VOLTAGE, voltage);
+}
+
 int dvb_set_dvbs (dvb_device_t *d, uint32_t freq,
                   uint32_t srate, const char *fecstr)
 {
