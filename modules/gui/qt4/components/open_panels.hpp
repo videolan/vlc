@@ -209,11 +209,11 @@ private:
     QLineEdit *dshowVSizeLine;
 #else
     QRadioButton *dvbs, *dvbt, *dvbc;
-    QLabel *dvbBandLabel, *dvbSrateLabel;
+    QLabel *dvbBandLabel, *dvbSrateLabel, *dvbModLabel;
     QSpinBox  *pvrFreq, *pvrBitr;
     QComboBox *v4l2VideoDevice, *v4l2AudioDevice;
     QLineEdit *pvrDevice, *pvrRadioDevice;
-    QComboBox *v4l2StdBox, *pvrNormBox, *dvbBandBox;
+    QComboBox *v4l2StdBox, *pvrNormBox, *dvbModBox, *dvbBandBox;
     QSpinBox *dvbCard, *dvbFreq, *dvbSrate;
     QSpinBox *jackChannels, *jackCaching;
     QCheckBox *jackPace, *jackConnect;
