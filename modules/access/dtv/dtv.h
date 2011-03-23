@@ -45,9 +45,9 @@ int dvb_set_dvbc (dvb_device_t *, uint32_t freq, const char *mod,
                   uint32_t srate, const char *fec);
 
 /* DVB-S */
-int dvb_set_dvbs (dvb_device_t *, uint64_t freq, uint32_t srate,
+int dvb_set_dvbs (dvb_device_t *, uint32_t freq, uint32_t srate,
                   const char *fec);
-int dvb_set_dvbs2 (dvb_device_t *, uint64_t freq, const char *mod,
+int dvb_set_dvbs2 (dvb_device_t *, uint32_t freq, const char *mod,
                    uint32_t srate, const char *fec, int pilot, int rolloff);
 int dvb_set_sec (dvb_device_t *, bool tone, int voltage, bool high_voltage);
 /* XXX^^ */

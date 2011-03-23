@@ -50,7 +50,7 @@
     "Only useful programs are normally demultiplexed from the transponder. " \
     "This option will disable demultiplexing and receive all programs.")
 
-#define FREQ_TEXT N_("Frequency (Hz)")
+#define FREQ_TEXT N_("Frequency (kHz)")
 #define FREQ_LONGTEXT N_( \
     "TV channels are grouped by transponder (a.k.a. multiplex) " \
     "on a given frequency. This is required to tune the receiver.")
@@ -171,7 +171,7 @@ vlc_module_begin ()
     add_bool ("dvb-budget-mode", false, BUDGET_TEXT, BUDGET_LONGTEXT, true)
 #endif
     add_integer ("dvb-frequency", 0, FREQ_TEXT, FREQ_LONGTEXT, false)
-        change_integer_range (0, UINT64_C(0xffffffff) * 1000)
+        change_integer_range (0, 107999999)
         change_safe ()
     add_integer ("dvb-inversion", -1, INVERSION_TEXT, INVERSION_LONGTEXT, true)
         change_integer_list (auto_off_on_vlc, auto_off_on_user)
@@ -200,7 +200,7 @@ vlc_module_begin ()
         change_integer_list (hierarchy_vlc, hierarchy_user)
         change_safe ()
 
-    set_section (N_("Cable and satellite parameters"), NULL)
+    set_section (N_("Cable and satellite reception parameters"), NULL)
     add_string ("dvb-modulation", 0,
                  MODULATION_TEXT, MODULATION_LONGTEXT, false)
         change_string_list (modulation_vlc, modulation_user, NULL)
@@ -254,14 +254,15 @@ struct access_sys_t
 
 struct delsys
 {
-    int (*setup) (vlc_object_t *, dvb_device_t *, uint64_t freq);
+    int (*setup) (vlc_object_t *, dvb_device_t *, unsigned freq);
     /* TODO: scan stuff */
 };
 
 static block_t *Read (access_t *);
 static int Control (access_t *, int, va_list);
 static const delsys_t *GuessSystem (const char *, dvb_device_t *);
-static int Tune (vlc_object_t *, dvb_device_t *, const delsys_t *, uint64_t);
+static int Tune (vlc_object_t *, dvb_device_t *, const delsys_t *, unsigned);
+static unsigned var_InheritFrequency (vlc_object_t *);
 
 static int Open (vlc_object_t *obj)
 {
@@ -271,7 +272,7 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
 
     var_LocationParse (obj, access->psz_location, "dvb-");
-    uint64_t freq = var_InheritInteger (obj, "dvb-frequency");
+    unsigned freq = var_InheritFrequency (obj);
 
     dvb_device_t *dev = dvb_open (obj, freq != 0);
     if (dev == NULL)
@@ -288,7 +289,7 @@ static int Open (vlc_object_t *obj)
         const delsys_t *delsys = GuessSystem (access->psz_access, dev);
         if (delsys == NULL || Tune (obj, dev, delsys, freq))
         {
-            msg_Err (obj, "tuning to %"PRIu64" Hz failed", freq);
+            msg_Err (obj, "tuning to %u kHz failed", freq);
             dialog_Fatal (obj, N_("Digital broadcasting"),
                           N_("The selected digital tuner does not support "
                              "the specified parameters.\n"
@@ -459,13 +460,25 @@ static const delsys_t *GuessSystem (const char *scheme, dvb_device_t *dev)
 
 /** Set parameters and tune the device */
 static int Tune (vlc_object_t *obj, dvb_device_t *dev, const delsys_t *delsys,
-                 uint64_t freq)
+                 unsigned freq)
 {
     if (delsys->setup (obj, dev, freq)
      || dvb_set_inversion (dev, var_InheritInteger (obj, "dvb-inversion"))
      || dvb_tune (dev))
         return VLC_EGENERIC;
     return VLC_SUCCESS;
+}
+
+static unsigned var_InheritFrequency (vlc_object_t *obj)
+{
+    unsigned freq = var_InheritInteger (obj, "dvb-frequency");
+    if (freq >= 108000000)
+    {
+        msg_Err (obj, "%u kHz frequency is too high.", freq);
+        freq /= 1000;
+        msg_Info (obj, "Assuming %u kHz carrier frequency instead.", freq);
+    }
+    return freq;
 }
 
 static char *var_InheritCodeRate (vlc_object_t *obj)
@@ -520,7 +533,7 @@ static char *var_InheritModulation (vlc_object_t *obj)
 
 
 /*** ATSC ***/
-static int atsc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
+static int atsc_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 {
     char *mod = var_InheritModulation (obj);
 
@@ -533,7 +546,7 @@ const delsys_t atsc = { .setup = atsc_setup };
 
 
 /*** DVB-C ***/
-static int dvbc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
+static int dvbc_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 {
     char *mod = var_InheritModulation (obj);
     char *fec = var_InheritCodeRate (obj);
@@ -549,7 +562,7 @@ const delsys_t dvbc = { .setup = dvbc_setup };
 
 
 /*** DVB-S ***/
-static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
+static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 {
     char *fec = var_InheritCodeRate (obj);
     uint32_t srate = var_InheritInteger (obj, "dvb-srate");
@@ -562,7 +575,7 @@ static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
     return ret;
 }
 
-static int dvbs2_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
+static int dvbs2_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 {
     char *mod = var_InheritModulation (obj);
     char *fec = var_InheritCodeRate (obj);
@@ -582,7 +595,7 @@ const delsys_t dvbs2 = { .setup = dvbs2_setup };
 
 
 /*** DVB-T ***/
-static int dvbt_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
+static int dvbt_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 {
     char *mod = var_InheritModulation (obj);
     char *fec_hp = var_InheritString (obj, "dvb-code-rate-hp");
