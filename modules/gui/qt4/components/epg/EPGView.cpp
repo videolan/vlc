@@ -277,9 +277,9 @@ EPGView::~EPGView()
 void EPGView::updateDuration()
 {
     QDateTime lastItem;
+    mutex.lock();
     QList<QGraphicsItem*> list = items();
 
-    mutex.lock();
     for ( int i = 0; i < list.count(); ++i )
     {
         EPGItem* item = qgraphicsitem_cast<EPGItem*>( list.at( i ) );
