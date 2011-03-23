@@ -1018,14 +1018,14 @@ void CaptureOpenPanel::initialize()
     dvbDevLayout->addWidget( dvbDeviceLabel, 0, 0 );
     dvbDevLayout->addWidget( dvbCard, 0, 2, 1, 2 );
 
-    dvbs = new QRadioButton( "DVB-S" );
-    dvbs->setChecked( true );
     dvbc = new QRadioButton( "DVB-C" );
+    dvbs = new QRadioButton( "DVB-S" );
     dvbt = new QRadioButton( "DVB-T" );
+    dvbt->setChecked( true );
 
     dvbDevLayout->addWidget( dvbTypeLabel, 1, 0 );
-    dvbDevLayout->addWidget( dvbs, 1, 1 );
-    dvbDevLayout->addWidget( dvbc, 1, 2 );
+    dvbDevLayout->addWidget( dvbc, 1, 1 );
+    dvbDevLayout->addWidget( dvbs, 1, 2 );
     dvbDevLayout->addWidget( dvbt, 1, 3 );
 
     /* DVB Props panel */
