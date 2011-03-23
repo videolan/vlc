@@ -228,7 +228,7 @@ struct line_desc_t
     uint32_t       *p_fg_rgb;
     uint32_t       *p_bg_rgb;
     uint8_t        *p_fg_bg_ratio; /* 0x00=100% FG --> 0x7F=100% BG */
-    bool      b_new_color_mode;
+    bool            b_new_color_mode;
     /** underline information -- only supplied if text should be underlined */
     int            *pi_underline_offset;
     uint16_t       *pi_underline_thickness;
@@ -247,10 +247,10 @@ typedef struct
     int         i_font_size;
     uint32_t    i_font_color;         /* ARGB */
     uint32_t    i_karaoke_bg_color;   /* ARGB */
-    bool  b_italic;
-    bool  b_bold;
-    bool  b_underline;
-    bool  b_through;
+    bool        b_italic;
+    bool        b_bold;
+    bool        b_underline;
+    bool        b_through;
     char       *psz_fontname;
 } ft_style_t;
 
@@ -268,7 +268,7 @@ struct filter_sys_t
 {
     FT_Library     p_library;   /* handle to library     */
     FT_Face        p_face;      /* handle to face object */
-    bool     i_use_kerning;
+    bool           i_use_kerning;
     uint8_t        i_font_opacity;
     int            i_font_color;
     int            i_font_size;
@@ -283,7 +283,6 @@ struct filter_sys_t
 
     input_attachment_t **pp_font_attachments;
     int                  i_font_attachments;
-
 };
 
 #define UCHAR uint32_t
@@ -301,21 +300,22 @@ static int Create( vlc_object_t *p_this )
 {
     filter_t      *p_filter = (filter_t *)p_this;
     filter_sys_t  *p_sys;
-    char          *psz_fontfile=NULL;
-    char          *psz_fontfamily=NULL;
-    int            i_error,fontindex;
+    char          *psz_fontfile = NULL;
+    char          *psz_fontfamily = NULL;
+    int            i_error, fontindex;
 
     /* Allocate structure */
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
+
 #ifdef HAVE_STYLES
-    p_sys->psz_fontfamily = NULL;
-    p_sys->p_xml = NULL;
+    p_sys->psz_fontfamily   = NULL;
+    p_sys->p_xml            = NULL;
 #endif
-    p_sys->p_face = 0;
-    p_sys->p_library = 0;
-    p_sys->i_font_size = 0;
+    p_sys->p_face           = 0;
+    p_sys->p_library        = 0;
+    p_sys->i_font_size      = 0;
     p_sys->i_display_height = 0;
 
     var_Create( p_filter, "freetype-rel-fontsize",
@@ -329,7 +329,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_font_color = var_InheritInteger( p_filter, "freetype-color" );
     p_sys->i_font_color = __MAX( __MIN( p_sys->i_font_color , 0xFFFFFF ), 0 );
 
-    fontindex=0;
+    /* Set default psz_fontfamily */
     if( !psz_fontfamily || !*psz_fontfamily )
     {
         free( psz_fontfamily );
@@ -340,7 +340,7 @@ static int Create( vlc_object_t *p_this )
         if( !psz_fontfamily )
             goto error;
 # ifdef WIN32
-        GetWindowsDirectory( psz_fontfamily , PATH_MAX + 1 );
+        GetWindowsDirectory( psz_fontfamily, PATH_MAX + 1 );
         strcat( psz_fontfamily, "\\fonts\\arial.ttf" );
 # else
         strcpy( psz_fontfamily, DEFAULT_FONT );
@@ -349,6 +349,8 @@ static int Create( vlc_object_t *p_this )
 #endif
     }
 
+    /* Set the font file */
+    fontindex = 0;
 #ifdef HAVE_FONTCONFIG
     if( FontConfig_FindFont( p_filter, psz_fontfamily, &psz_fontfile, &fontindex )
             != VLC_SUCCESS )
@@ -357,6 +359,7 @@ static int Create( vlc_object_t *p_this )
     psz_fontfile = psz_fontfamily;
 #endif
 
+    /* */
     i_error = FT_Init_FreeType( &p_sys->p_library );
     if( i_error )
     {
@@ -2131,15 +2134,15 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( p_xml_reader )
     {
         uint32_t   *psz_text;
-        int         i_len = 0;
-        uint32_t    i_runs = 0;
-        uint32_t    i_k_runs = 0;
-        uint32_t   *pi_run_lengths = NULL;
+        int         i_len            = 0;
+        uint32_t    i_runs           = 0;
+        uint32_t    i_k_runs         = 0;
+        uint32_t   *pi_run_lengths   = NULL;
         uint32_t   *pi_k_run_lengths = NULL;
-        uint32_t   *pi_k_durations = NULL;
-        ft_style_t  **pp_styles = NULL;
-        FT_Vector    result;
-        line_desc_t  *p_lines = NULL;
+        uint32_t   *pi_k_durations   = NULL;
+        ft_style_t  **pp_styles      = NULL;
+        FT_Vector    result          = {0, 0};
+        line_desc_t  *p_lines        = NULL;
 
         psz_text = (uint32_t *)malloc( strlen( p_region_in->psz_html ) *
                                        sizeof( uint32_t ) );
