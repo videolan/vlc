@@ -1054,11 +1054,11 @@ void CaptureOpenPanel::initialize()
 
     dvbModBox = new QComboBox;
     dvbModBox->addItem( qtr( "Automatic" ), 0 );
-    dvbModBox->addItem( qtr( "256-QAM" ), 256 );
-    dvbModBox->addItem( qtr( "128-QAM" ), 128 );
-    dvbModBox->addItem( qtr( "64-QAM" ), 64 );
-    dvbModBox->addItem( qtr( "32-QAM" ), 32 );
-    dvbModBox->addItem( qtr( "16-QAM" ), 16 );
+    dvbModBox->addItem( "256-QAM", 256 );
+    dvbModBox->addItem( "128-QAM", 128 );
+    dvbModBox->addItem( "64-QAM", 64 );
+    dvbModBox->addItem( "32-QAM", 32 );
+    dvbModBox->addItem( "16-QAM", 16 );
     dvbPropLayout->addWidget( dvbModBox, 2, 1 );
 
     dvbModLabel->hide();
