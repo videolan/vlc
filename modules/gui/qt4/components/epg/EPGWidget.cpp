@@ -57,7 +57,7 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
     containerWidget->setLayout( layout );
     rootWidget->addWidget( containerWidget ); /* index 0 */
 
-    QLabel *noepgLabel = new QLabel( tr("No EPG Data Available"), this );
+    QLabel *noepgLabel = new QLabel( qtr("No EPG Data Available"), this );
     noepgLabel->setAlignment( Qt::AlignCenter );
     rootWidget->addWidget( noepgLabel ); /* index 1 */
 
