@@ -25,7 +25,7 @@
 #define EPGWIDGET_H
 
 #include "EPGView.hpp"
-#include "EPGEvent.hpp"
+#include "EPGItem.hpp"
 #include "EPGRuler.hpp"
 #include "EPGChannels.hpp"
 
@@ -33,7 +33,6 @@
 #include <vlc_epg.h>
 
 #include <QWidget>
-#include <QMultiMap>
 
 class QDateTime;
 
@@ -42,7 +41,6 @@ class EPGWidget : public QWidget
     Q_OBJECT
 public:
     explicit EPGWidget( QWidget* parent = 0 );
-    ~EPGWidget();
     void reset();
 
 public slots:
@@ -54,13 +52,11 @@ private:
     EPGView* m_epgView;
     EPGChannels *m_channelsWidget;
 
-    QMultiMap<QString, EPGEvent*> m_events;
     uint8_t i_event_source_type;
     bool b_input_type_known;
-    QDateTime timeReference;
 
 signals:
-    void itemSelectionChanged( EPGEvent * );
+    void itemSelectionChanged( EPGItem * );
 };
 
 #endif // EPGWIDGET_H

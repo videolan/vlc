@@ -34,13 +34,14 @@
 
 #include "EPGItem.hpp"
 #include "EPGView.hpp"
-#include "EPGEvent.hpp"
 
-EPGItem::EPGItem( EPGView *view )
+#include "qt4.hpp"
+
+EPGItem::EPGItem( vlc_epg_event_t *data, EPGView *view )
     : m_view( view )
 {
+    setData( data );
     m_current = false;
-    m_simultaneous = false;
     m_boundingRect.setHeight( TRACKS_HEIGHT );
     setFlags( QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
     setAcceptHoverEvents( true );
@@ -68,8 +69,9 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     QLinearGradient gradient( mapped.topLeft(), mapped.bottomLeft() );
 
-    if ( m_current || m_simultaneous )
-        gradientColor.setRgb( 244, 125, 0 , m_simultaneous ? 192 : 255 );
+    bool b_simultaneous = playsAt( m_view->baseTime() );
+    if ( m_current || b_simultaneous )
+        gradientColor.setRgb( 244, 125, 0 , b_simultaneous ? 192 : 255 );
     else
         gradientColor.setRgb( 201, 217, 242 );
 
@@ -111,7 +113,7 @@ void EPGItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     /* Draw the hours. */
     painter->drawText( mapped, Qt::AlignTop | Qt::AlignLeft,
-                       fm.elidedText( m_start.toString( "hh:mm" ) + " - " +
+                       fm.elidedText( start().toString( "hh:mm" ) + " - " +
                                       m_end.toString( "hh:mm" ),
                                       Qt::ElideRight, mapped.width() ) );
 }
@@ -121,35 +123,46 @@ const QDateTime& EPGItem::start() const
     return m_start;
 }
 
+QDateTime EPGItem::end()
+{
+    return QDateTime( m_start ).addSecs( m_duration );
+}
+
 int EPGItem::duration() const
 {
     return m_duration;
 }
 
-int EPGItem::getChannelNb() const
+void EPGItem::setRow( unsigned int i_row_ )
 {
-    return m_channelNb;
-}
-
-void EPGItem::setChannelNb( int channelNb )
-{
-    //qDebug() << "Channel" << channelNb;
-    m_channelNb = channelNb;
+    i_row = i_row_;
     updatePos();
 }
 
-void EPGItem::setData( EPGEvent *event )
+void EPGItem::setData( vlc_epg_event_t *data )
 {
-    m_start = event->start;
-    m_name = event->name;
-    m_description = event->description;
-    m_shortDescription = event->shortDescription;
-    m_current = event->current;
-    m_simultaneous = event->simultaneous;
-    setDuration( event->duration );
-    updatePos();
-    setToolTip( m_name );
+    m_start = QDateTime::fromTime_t( data->i_start );
+    m_name = qfu( data->psz_name );
+    setToolTip( qfu( data->psz_name ) );
+    m_description = qfu( data->psz_description );
+    m_shortDescription = qfu( data->psz_short_description );
+    setDuration( data->i_duration );
     update();
+}
+
+void EPGItem::setCurrent( bool b_current )
+{
+    m_current = b_current;
+}
+
+bool EPGItem::endsBefore( const QDateTime &ref ) const
+{
+    return m_start.addSecs( m_duration ) < ref;
+}
+
+bool EPGItem::playsAt( const QDateTime & ref ) const
+{
+    return (m_start <= ref) && !endsBefore( ref );
 }
 
 void EPGItem::setDuration( int duration )
@@ -158,10 +171,21 @@ void EPGItem::setDuration( int duration )
     m_boundingRect.setWidth( duration );
 }
 
+QString EPGItem::description()
+{
+    if( m_description.isEmpty() )
+        return m_shortDescription;
+
+    QString text( m_description );
+    if( !m_shortDescription.isEmpty() )
+        text += QString(" - ") += m_shortDescription;
+    return text;
+}
+
 void EPGItem::updatePos()
 {
     int x = m_view->startTime().secsTo( m_start );
-    setPos( x, m_channelNb * TRACKS_HEIGHT );
+    setPos( x, i_row * TRACKS_HEIGHT );
 }
 
 void EPGItem::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
@@ -172,11 +196,7 @@ void EPGItem::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 
 void EPGItem::focusInEvent( QFocusEvent * event )
 {
-    EPGEvent *evEPG = new EPGEvent( m_name );
-    evEPG->description = m_description;
-    evEPG->shortDescription = m_shortDescription;
-    evEPG->start = m_start;
-    evEPG->duration = m_duration;
-    m_view->eventFocused( evEPG );
+    event->accept();
+    m_view->focusItem( this );
     update();
 }

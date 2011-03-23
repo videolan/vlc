@@ -72,7 +72,7 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     layout->addWidget( epg, 10 );
     layout->addWidget( descBox );
 
-    CONNECT( epg, itemSelectionChanged( EPGEvent *), this, showEvent( EPGEvent *) );
+    CONNECT( epg, itemSelectionChanged( EPGItem *), this, showEvent( EPGItem *) );
     CONNECT( THEMIM->getIM(), epgChanged(), this, updateInfos() );
     CONNECT( THEMIM, inputChanged( input_thread_t * ), this, updateInfos() );
 
@@ -103,26 +103,17 @@ EpgDialog::~EpgDialog()
     writeSettings( "EPGDialog" );
 }
 
-void EpgDialog::showEvent( EPGEvent *event )
+void EpgDialog::showEvent( EPGItem *epgItem )
 {
-    if( !event ) return;
+    if( !epgItem ) return;
 
-    QString titleDescription, textDescription;
-    if( event->description.isEmpty() )
-        textDescription = event->shortDescription;
-    else
-    {
-        textDescription = event->description;
-        if( !event->shortDescription.isEmpty() )
-            titleDescription = " - " + event->shortDescription;
-    }
-
-    QDateTime end = event->start.addSecs( event->duration );
-    title->setText( event->start.toString( "hh:mm" ) + " - "
-                    + end.toString( "hh:mm" ) + " : "
-                    + event->name + titleDescription );
-
-    description->setText( textDescription );
+    QDateTime end = epgItem->start().addSecs( epgItem->duration() );
+    title->setText( QString("%1 - %2 : %3")
+                   .arg( epgItem->start().toString( "hh:mm" ) )
+                   .arg( end.toString( "hh:mm" ) )
+                   .arg( epgItem->name() )
+                   );
+    description->setText( epgItem->description() );
 }
 
 void EpgDialog::updateInfos()

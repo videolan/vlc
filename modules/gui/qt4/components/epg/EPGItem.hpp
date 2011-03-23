@@ -24,33 +24,37 @@
 #ifndef EPGITEM_H
 #define EPGITEM_H
 
+#include <vlc_common.h>
+#include <vlc_epg.h>
 #include <QGraphicsItem>
+#include <QDateTime>
 
 class QPainter;
 class QString;
-class QDateTime;
 
 class EPGView;
-class EPGEvent;
 
 class EPGItem : public QGraphicsItem
 {
 public:
-    EPGItem( EPGView *view );
-    virtual ~EPGItem() { }
+    EPGItem( vlc_epg_event_t *data, EPGView *view );
 
     virtual QRectF boundingRect() const;
     virtual void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0 );
 
     const QDateTime& start() const;
+    QDateTime end();
 
     int duration() const;
-    int getChannelNb() const;
-
-    void setData( EPGEvent * );
-    void setChannelNb( int channelNb );
+    const QString& name() { return m_name; };
+    QString description();
+    void setData( vlc_epg_event_t * );
+    void setRow( unsigned int );
+    void setCurrent( bool );
     void setDuration( int duration );
     void updatePos();
+    bool endsBefore( const QDateTime & ) const;
+    bool playsAt( const QDateTime & ) const;
 
 protected:
     virtual void focusInEvent( QFocusEvent * event );
@@ -59,16 +63,14 @@ protected:
 private:
     EPGView     *m_view;
     QRectF      m_boundingRect;
-    int         m_channelNb;
+    unsigned int i_row;
 
-    /*FIXME: Bad object design. We shouldn't need to clone this EPGEvent data */
     QDateTime   m_start;
     int         m_duration;
     QString     m_name;
     QString     m_description;
     QString     m_shortDescription;
     bool        m_current;
-    bool        m_simultaneous;
 };
 
 #endif // EPGITEM_H

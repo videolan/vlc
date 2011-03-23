@@ -32,10 +32,11 @@ class EPGChannels : public QWidget
     Q_OBJECT
 public:
     EPGChannels( QWidget *parent, EPGView *m_epgView );
-    virtual ~EPGChannels() { }
 
 public slots:
     void setOffset( int offset );
+    void addChannel( QString );
+    void removeChannel( QString );
 
 protected:
     virtual void paintEvent( QPaintEvent *event );
@@ -43,6 +44,7 @@ protected:
 private:
     EPGView *m_epgView;
     int m_offset;
+    QStringList channelList;
 };
 
 #endif // EPGCHANNELS_HPP

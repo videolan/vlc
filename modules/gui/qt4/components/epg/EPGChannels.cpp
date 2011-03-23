@@ -39,6 +39,21 @@ void EPGChannels::setOffset( int offset )
     update();
 }
 
+void EPGChannels::addChannel( QString channelName )
+{
+    if ( !channelList.contains( channelName ) )
+    {
+        channelList << channelName;
+        channelList.sort();
+        update();
+    }
+}
+
+void EPGChannels::removeChannel( QString channelName )
+{
+    if ( channelList.removeOne( channelName ) ) update();
+}
+
 void EPGChannels::paintEvent( QPaintEvent *event )
 {
     Q_UNUSED( event );
@@ -48,17 +63,15 @@ void EPGChannels::paintEvent( QPaintEvent *event )
     /* Draw the top and the bottom lines. */
     p.drawLine( 0, 0, width() - 1, 0 );
 
-    QList<QString> channels = m_epgView->getChannelList();
-
-    for( int i = 0; i < channels.count(); ++i )
+    unsigned int i=0;
+    foreach( QString text, channelList )
     {
-        QString text( channels[i] );
         /* try to remove the " [Program xxx]" end */
         int i_idx_channel = text.lastIndexOf(" [Program ");
         if (i_idx_channel > 0)
             text = text.left( i_idx_channel );
 
-        p.drawText( 0, - m_offset + ( i + 0.5 ) * TRACKS_HEIGHT - 4,
+        p.drawText( 0, - m_offset + ( i++ + 0.5 ) * TRACKS_HEIGHT - 4,
                     width(), 20, Qt::AlignLeft, text );
 
         int i_width = fontMetrics().width( text );
