@@ -1222,25 +1222,25 @@ void CaptureOpenPanel::updateMRL()
         mrl = "dvb://";
         mrl += "frequency=" + QString::number( dvbFreq->value() );
         if( dvbc->isChecked() || dvbt->isChecked() )
-            mrl +="000";
-        fileList << mrl; mrl= "";
+            mrl += "000";
 
-        mrl += " :dvb-adapter=" + QString::number( dvbCard->value() );
         if( dvbc->isChecked() )
         {
             unsigned qam =
                 dvbModBox->itemData( dvbModBox->currentIndex() ).toInt();
             if( qam != 0 )
-                mrl += " :dvb-modulation=" + QString::number( qam );
-            mrl += " :dvb-srate=" + QString::number( dvbSrate->value() );
+                mrl += ":modulation=" + QString::number( qam );
+            mrl += ":srate=" + QString::number( dvbSrate->value() );
         }
         else if( dvbs->isChecked() )
-            mrl += " :dvb-srate=" + QString::number( dvbSrate->value() );
+            mrl += ":srate=" + QString::number( dvbSrate->value() );
         else if( dvbt->isChecked() )
-            mrl += " :dvb-bandwidth=" +
+            mrl += ":bandwidth=" +
                 QString::number( dvbBandBox->itemData(
                     dvbBandBox->currentIndex() ).toInt() );
 
+        fileList << mrl; mrl= "";
+        mrl += " :dvb-adapter=" + QString::number( dvbCard->value() );
         break;
 #endif
     case SCREEN_DEVICE:
