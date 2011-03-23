@@ -1219,7 +1219,12 @@ void CaptureOpenPanel::updateMRL()
             mrl += " :pvr-bitrate=" + QString::number( pvrBitr->value() );
         break;
     case DVB_DEVICE:
-        mrl = "dvb://";
+        if( dvbc->isChecked() ) mrl = "dvb-c://";
+        else
+        if( dvbs->isChecked() ) mrl = "dvb-s://";
+        else
+        if( dvbt->isChecked() ) mrl = "dvb-t://";
+
         mrl += "frequency=" + QString::number( dvbFreq->value() );
         if( dvbc->isChecked() || dvbt->isChecked() )
             mrl += "000";
