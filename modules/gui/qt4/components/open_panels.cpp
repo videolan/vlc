@@ -772,7 +772,7 @@ void CaptureOpenPanel::initialize()
     addModuleAndLayouts( BDA_DEVICE, bda, "DVB DirectShow", QGridLayout );
 
     /* bda Main */
-    QLabel *bdaTypeLabel = new QLabel( qtr( "DVB Type:" ) );
+    QLabel *bdaTypeLabel = new QLabel( qtr( "Delivery system:" ) );
 
     bdas = new QRadioButton( "DVB-S" );
     bdas->setChecked( true );
@@ -1009,7 +1009,7 @@ void CaptureOpenPanel::initialize()
 
     /* DVB Main */
     QLabel *dvbDeviceLabel = new QLabel( qtr( "Adapter card to tune" ) );
-    QLabel *dvbTypeLabel = new QLabel( qtr( "DVB Type:" ) );
+    QLabel *dvbTypeLabel = new QLabel( qtr( "Delivery system:" ) );
 
     dvbCard = new QSpinBox;
     dvbCard->setAlignment( Qt::AlignRight );
