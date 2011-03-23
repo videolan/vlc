@@ -33,6 +33,7 @@
 #include <vlc_epg.h>
 
 #include <QWidget>
+#include <QStackedWidget>
 
 class QDateTime;
 
@@ -51,6 +52,7 @@ private:
     EPGRuler* m_rulerWidget;
     EPGView* m_epgView;
     EPGChannels *m_channelsWidget;
+    QStackedWidget *rootWidget;
 
     uint8_t i_event_source_type;
     bool b_input_type_known;

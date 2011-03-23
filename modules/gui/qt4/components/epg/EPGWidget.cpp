@@ -27,6 +27,7 @@
 
 #include "EPGWidget.hpp"
 
+#include <QStackedWidget>
 #include <QVBoxLayout>
 #include <QScrollBar>
 #include <QLabel>
@@ -45,11 +46,24 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
     m_epgView->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
     setZoom( 1 );
 
+    rootWidget = new QStackedWidget( this );
+
+    QWidget *containerWidget = new QWidget( this );
     QGridLayout* layout = new QGridLayout( this );
     layout->addWidget( m_rulerWidget, 0, 1 );
     layout->addWidget( m_channelsWidget, 1, 0 );
     layout->addWidget( m_epgView, 1, 1 );
     layout->setSpacing( 0 );
+    containerWidget->setLayout( layout );
+    rootWidget->addWidget( containerWidget ); /* index 0 */
+
+    QLabel *noepgLabel = new QLabel( tr("No EPG Data Available"), this );
+    noepgLabel->setAlignment( Qt::AlignCenter );
+    rootWidget->addWidget( noepgLabel ); /* index 1 */
+
+    rootWidget->setCurrentIndex( 1 );
+    layout = new QGridLayout( this );
+    layout->addWidget( rootWidget );
     setLayout( layout );
 
     CONNECT( m_epgView, startTimeChanged(QDateTime),
@@ -88,6 +102,7 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
     b_input_type_known = true;
 
     m_epgView->cleanup(); /* expire items and flags */
+    rootWidget->setCurrentIndex( ( i_epg > 0 ) ? 0 : 1 );
 
     for ( int i = 0; i < i_epg; ++i )
     {
