@@ -27,6 +27,7 @@
 #include "EPGItem.hpp"
 
 #include <QGraphicsView>
+#include <QGraphicsScene>
 #include <QList>
 #include <QMap>
 #include <QMutex>
@@ -36,6 +37,15 @@
 
 typedef QMap<QDateTime, EPGItem *> EPGEventByTimeQMap;
 typedef QMap<QString, EPGEventByTimeQMap* > EPGTimeMapByChannelQMap;
+
+class EPGGraphicsScene : public QGraphicsScene
+{
+Q_OBJECT
+public:
+    explicit EPGGraphicsScene( QObject *parent = 0 );
+protected:
+    void drawBackground ( QPainter *, const QRectF &);
+};
 
 class EPGView : public QGraphicsView
 {

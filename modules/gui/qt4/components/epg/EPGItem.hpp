@@ -59,6 +59,7 @@ public:
 protected:
     virtual void focusInEvent( QFocusEvent * event );
     virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * );
+    virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * );
 
 private:
     EPGView     *m_view;

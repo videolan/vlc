@@ -31,6 +31,16 @@
 #include <QtDebug>
 #include <QGraphicsTextItem>
 
+EPGGraphicsScene::EPGGraphicsScene( QObject *parent ) : QGraphicsScene( parent )
+{}
+
+void EPGGraphicsScene::drawBackground( QPainter *painter, const QRectF &rect)
+{
+    painter->setPen( QPen( QColor( 224, 224, 224 ) ) );
+    for( int y = rect.top() + TRACKS_HEIGHT ; y < rect.bottom() ; y += TRACKS_HEIGHT )
+       painter->drawLine( QLineF( rect.left(), y, rect.right(), y ) );
+}
+
 EPGView::EPGView( QWidget *parent ) : QGraphicsView( parent )
 {
     setContentsMargins( 0, 0, 0, 0 );
@@ -39,7 +49,7 @@ EPGView::EPGView( QWidget *parent ) : QGraphicsView( parent )
 
     m_startTime = QDateTime::currentDateTime();
 
-    QGraphicsScene *EPGscene = new QGraphicsScene( this );
+    EPGGraphicsScene *EPGscene = new EPGGraphicsScene( this );
 
     setScene( EPGscene );
 }

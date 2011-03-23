@@ -191,7 +191,12 @@ void EPGItem::updatePos()
 void EPGItem::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 {
     event->accept();
-    update();
+    scene()->update();
+}
+
+void EPGItem::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event )
+{ /* required to redraw our background without flaws */
+    hoverEnterEvent( event );
 }
 
 void EPGItem::focusInEvent( QFocusEvent * event )
