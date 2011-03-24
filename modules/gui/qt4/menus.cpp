@@ -85,7 +85,7 @@ QMenu *QVLCMenu::recentsMenu = NULL;
 /**
  * @brief Add static entries to DP in menus
  **/
-void addDPStaticEntry( QMenu *menu,
+QAction *addDPStaticEntry( QMenu *menu,
                        const QString& text,
                        const char *icon,
                        const char *member,
