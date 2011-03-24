@@ -111,6 +111,44 @@ Removed modules:
  * upnp: use upnp_intel
 
 
+Changes between 1.1.7 and 1.1.8:
+--------------------------------
+
+Mac OS X Interface:
+ * New UI graphics by Damien Erambert
+
+Interfaces:
+ * Oldrc interface is again the default RC interface, on Windows
+ * Luarc, luahttp and luatelnet fixes
+ * Qt and Mac OS X fixes
+ * numerous Skins2 fixes, notably winamp2 skins
+
+Encoder:
+ * new libschroedinger-based Dirac codec encoder, faster than the current one
+
+Access/Demuxers/Codecs:
+ * Subtitles auto-detection is back for .txt files
+ * vod/rtsp server and rtsp input fixes
+ * mp4 demuxer improvements
+ * ogg, rstp input, video filters minor fixes
+ * taglib's replaygain is fixed for mp3
+ * vobsub support has an improved auto-detection
+ * fix a crash in malformed ape files
+
+Miscellaneous fixes in:
+ * Pulseaudio audio output, notably for usb cards
+ * Stacktraces are now limited in size on Windows
+ * Video resolution is now limited to 8192x8192, for security reasons
+   See CORE-2011-0208
+ * Configure and build system improvements
+ * DirectShow and BDA build headers have been updated
+
+Translations:
+ * Update for Finnish, Galician, Dutch, Chinese, German, Japanese, Lithuanian,
+   Slovak, French, Polish, Estonian, Brazillian Portuguese and Hebrew
+ * New icelandic translation
+
+
 Changes between 1.1.6 and 1.1.7:
 --------------------------------
 
