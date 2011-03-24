@@ -90,10 +90,10 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
     text.psz_string = (char *)_("Console");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = (char *)"telnet";
-    text.psz_string = (char *)_("Telnet Interface");
+    text.psz_string = (char *)_("Telnet");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = (char *)"http";
-    text.psz_string = (char *)_("Web Interface");
+    text.psz_string = (char *)_("Web");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = (char *)"logger";
     text.psz_string = (char *)_("Debug logging");
@@ -228,7 +228,7 @@ static void* RunInterface( vlc_object_t *p_this )
 /**
  * MonitorLibVLCDeath: Used when b_should_run_on_first_thread is set.
  *
- * @param p_this: the interface object
+ * @param p_this: the interface object
  */
 static void * MonitorLibVLCDeath( vlc_object_t * p_this )
 {
