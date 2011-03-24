@@ -330,6 +330,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
 QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
 {
     QMenu *menu = new QMenu( parent );
+    QAction *action;
 
     addDPStaticEntry( menu, qtr( "&Open File..." ),
         ":/type/file-asym", SLOT( simpleOpenDialog() ), "Ctrl+O" );
@@ -367,6 +368,11 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
         ":/menu/stream", SLOT( openAndStreamingDialogs() ), "Ctrl+S" );
     menu->addSeparator();
 #endif
+
+    action = addMIMStaticEntry( p_intf, menu, qtr( "Quit at the end of playlist" ), "",
+                               SLOT( activatePlayQuit( bool ) ) );
+    action->setCheckable( true );
+    action->setChecked( THEMIM->getPlayExitState() );
 
     addDPStaticEntry( menu, qtr( "&Quit" ) ,
         ":/menu/quit", SLOT( quit() ), "Ctrl+Q" );
@@ -824,11 +830,6 @@ void QVLCMenu::PopupMenuPlaylistControlEntries( QMenu *menu,
         ":/menu/previous", SLOT( prev() ) );
     addMIMStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
         ":/menu/next", SLOT( next() ) );
-
-    action = addMIMStaticEntry( p_intf, menu, qtr( "Quit after Playback" ), "",
-                               SLOT( activatePlayQuit( bool ) ) );
-    action->setCheckable( true );
-    action->setChecked( THEMIM->getPlayExitState() );
 
     menu->addSeparator();
 }
