@@ -68,40 +68,6 @@ static void Close( vlc_object_t *p_this );
 #define SATELLITE_TEXT N_("Satellite scanning config")
 #define SATELLITE_LONGTEXT N_("filename of config file in share/dvb/dvb-s")
 
-#define HOST_TEXT N_( "HTTP Host address" )
-#define HOST_LONGTEXT N_( \
-    "To enable the internal HTTP server, set its address and port here." )
-
-#define USER_TEXT N_( "HTTP user name" )
-#define USER_LONGTEXT N_( \
-    "User name the administrator will use to log into " \
-    "the internal HTTP server." )
-
-#define PASSWORD_TEXT N_( "HTTP password" )
-#define PASSWORD_LONGTEXT N_( \
-    "Password the administrator will use to log into " \
-    "the internal HTTP server." )
-
-#define ACL_TEXT N_( "HTTP ACL" )
-#define ACL_LONGTEXT N_( \
-    "Access control list (equivalent to .hosts) file path, " \
-    "which will limit the range of IPs entitled to log into the internal " \
-    "HTTP server." )
-
-#define CERT_TEXT N_( "Certificate file" )
-#define CERT_LONGTEXT N_( "HTTP interface x509 PEM certificate file " \
-                          "(enables SSL)" )
-
-#define KEY_TEXT N_( "Private key file" )
-#define KEY_LONGTEXT N_( "HTTP interface x509 PEM private key file" )
-
-#define CA_TEXT N_( "Root CA file" )
-#define CA_LONGTEXT N_( "HTTP interface x509 PEM trusted root CA " \
-                        "certificates file" )
-
-#define CRL_TEXT N_( "CRL file" )
-#define CRL_LONGTEXT N_( "HTTP interface Certificates Revocation List file" )
-
 vlc_module_begin ()
     set_shortname( N_("DVB") )
     set_description( N_("DVB input with v4l2 support") )
@@ -112,34 +78,12 @@ vlc_module_begin ()
     /* DVB-S (satellite) */
     add_string( "dvb-satellite", NULL, SATELLITE_TEXT, SATELLITE_LONGTEXT,
                 true )
-#ifdef ENABLE_HTTPD
-    /* MMI HTTP interface */
-    set_section( N_("HTTP server" ), 0 )
-    add_string( "dvb-http-host", NULL, HOST_TEXT, HOST_LONGTEXT,
-                true )
-    add_string( "dvb-http-user", NULL, USER_TEXT, USER_LONGTEXT,
-                true )
-    add_password( "dvb-http-password", NULL, PASSWORD_TEXT,
-                  PASSWORD_LONGTEXT, true )
-    add_string( "dvb-http-acl", NULL, ACL_TEXT, ACL_LONGTEXT,
-                true )
-    add_loadfile( "dvb-http-intf-cert", NULL, CERT_TEXT, CERT_LONGTEXT,
-                true )
-    add_loadfile( "dvb-http-intf-key",  NULL, KEY_TEXT,  KEY_LONGTEXT,
-                true )
-    add_loadfile( "dvb-http-intf-ca",   NULL, CA_TEXT,   CA_LONGTEXT,
-                true )
-    add_loadfile( "dvb-http-intf-crl",  NULL, CRL_TEXT,  CRL_LONGTEXT,
-                true )
-#endif
 
     set_capability( "access", 0 )
     add_shortcut( "dvb",                        /* Generic name */
                   "dvb-s", "qpsk", "satellite", /* Satellite */
                   "dvb-c", "cable",             /* Cable */
-                  "dvb-t", "terrestrial",       /* Terrestrial */
-                  "atsc" )                      /* Atsc */
-    add_shortcut( "usdigital" )
+                  "dvb-t", "terrestrial" )      /* Terrestrial */
 
     set_callbacks( Open, Close )
 
@@ -149,7 +93,6 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static block_t *Block( access_t * );
 static int Control( access_t *, int, va_list );
 
 static block_t *BlockScan( access_t * );
@@ -164,7 +107,6 @@ static block_t *BlockScan( access_t * );
 #define DVB_SCAN_MAX_PROBE_TIME (45000*1000)
 
 static void FilterUnset( access_t *, int i_max );
-static void FilterUnsetPID( access_t *, int i_pid );
 static void FilterSet( access_t *, int i_pid, int i_type );
 
 static void VarInit( access_t * );
@@ -184,7 +126,6 @@ static int Open( vlc_object_t *p_this )
 
     /* Set up access */
     p_access->pf_read = NULL;
-    p_access->pf_block = Block;
     p_access->pf_control = Control;
     p_access->pf_seek = NULL;
 
@@ -204,14 +145,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* Getting frontend info */
-    if( FrontendOpen( p_access) )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
-
-    /* */
     bool b_scan_mode = var_GetInteger( p_access, "dvb-frequency" ) == 0;
     if( b_scan_mode )
     {
@@ -219,15 +152,13 @@ static int Open( vlc_object_t *p_this )
         p_access->pf_block = BlockScan;
     }
     else
+        return VLC_EGENERIC; /* let the DTV plugin do the work */
+
+    /* Getting frontend info */
+    if( FrontendOpen( p_access) )
     {
-        /* Setting frontend parameters for tuning the hardware */
-        msg_Dbg( p_access, "trying to tune the frontend...");
-        if( FrontendSet( p_access ) < 0 )
-        {
-            FrontendClose( p_access );
-            free( p_sys );
-            return VLC_EGENERIC;
-        }
+        free( p_sys );
+        return VLC_EGENERIC;
     }
 
     /* Opening DVR device */
@@ -238,7 +169,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( b_scan_mode )
     {
         scan_parameter_t parameter;
         scan_t *p_scan;
@@ -257,31 +187,9 @@ static int Open( vlc_object_t *p_this )
         p_sys->scan = p_scan;
         p_sys->i_read_once = DVB_READ_ONCE_SCAN;
     }
-    else
-    {
-        p_sys->b_budget_mode = var_GetBool( p_access, "dvb-budget-mode" );
-        if( p_sys->b_budget_mode )
-        {
-            msg_Dbg( p_access, "setting filter on all PIDs" );
-            FilterSet( p_access, 0x2000, OTHER_TYPE );
-            p_sys->i_read_once = DVB_READ_ONCE;
-        }
-        else
-        {
-            msg_Dbg( p_access, "setting filter on PAT" );
-            FilterSet( p_access, 0x0, OTHER_TYPE );
-            p_sys->i_read_once = DVB_READ_ONCE_START;
-        }
-
-        CAMOpen( p_access );
-
-#ifdef ENABLE_HTTPD
-        HTTPOpen( p_access );
-#endif
-    }
 
     free( p_access->psz_demux );
-    p_access->psz_demux = strdup( p_sys->scan ? "m3u8" : "ts" );
+    p_access->psz_demux = strdup( "m3u8" );
     return VLC_SUCCESS;
 }
 
@@ -293,127 +201,13 @@ static void Close( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
-    FilterUnset( p_access, p_sys->b_budget_mode && !p_sys->scan ? 1 : MAX_DEMUX );
+    FilterUnset( p_access, MAX_DEMUX );
 
     DVRClose( p_access );
     FrontendClose( p_access );
-    if( p_sys->scan != NULL )
-        scan_Destroy( p_sys->scan );
-    else
-    {
-        CAMClose( p_access );
-#ifdef ENABLE_HTTPD
-        HTTPClose( p_access );
-#endif
-    }
+    scan_Destroy( p_sys->scan );
 
     free( p_sys );
-}
-
-/*****************************************************************************
- * Block:
- *****************************************************************************/
-static block_t *Block( access_t *p_access )
-{
-    access_sys_t *p_sys = p_access->p_sys;
-    block_t *p_block;
-
-    for ( ; ; )
-    {
-        struct pollfd ufds[2];
-        int i_ret;
-
-        /* Initialize file descriptor sets */
-        memset (ufds, 0, sizeof (ufds));
-        ufds[0].fd = p_sys->i_handle;
-        ufds[0].events = POLLIN;
-        ufds[1].fd = p_sys->i_frontend_handle;
-        ufds[1].events = POLLPRI;
-
-        /* We'll wait 0.5 second if nothing happens */
-        /* Find if some data is available */
-        i_ret = poll( ufds, 2, 500 );
-
-        if ( !vlc_object_alive (p_access) )
-            return NULL;
-
-        if ( i_ret < 0 )
-        {
-            if( errno == EINTR )
-                continue;
-
-            msg_Err( p_access, "poll error: %m" );
-            return NULL;
-        }
-
-        CAMPoll( p_access );
-
-        if ( ufds[1].revents )
-        {
-            FrontendPoll( p_access );
-        }
-
-#ifdef ENABLE_HTTPD
-        if ( p_sys->i_httpd_timeout && mdate() > p_sys->i_httpd_timeout )
-        {
-            vlc_mutex_lock( &p_sys->httpd_mutex );
-            if ( p_sys->b_request_frontend_info )
-            {
-                msg_Warn( p_access, "frontend timeout for HTTP interface" );
-                p_sys->b_request_frontend_info = false;
-                p_sys->psz_frontend_info = strdup( "Timeout getting info\n" );
-            }
-            if ( p_sys->b_request_mmi_info )
-            {
-                msg_Warn( p_access, "MMI timeout for HTTP interface" );
-                p_sys->b_request_mmi_info = false;
-                p_sys->psz_mmi_info = strdup( "Timeout getting info\n" );
-            }
-            vlc_cond_signal( &p_sys->httpd_cond );
-            vlc_mutex_unlock( &p_sys->httpd_mutex );
-        }
-
-        if ( p_sys->b_request_frontend_info )
-        {
-            FrontendStatus( p_access );
-        }
-
-        if ( p_sys->b_request_mmi_info )
-        {
-            CAMStatus( p_access );
-        }
-#endif
-
-        if ( p_sys->i_frontend_timeout && mdate() > p_sys->i_frontend_timeout )
-        {
-            msg_Warn( p_access, "no lock, tuning again" );
-            FrontendSet( p_access );
-        }
-
-        if ( ufds[0].revents )
-        {
-            p_block = block_New( p_access,
-                                 p_sys->i_read_once * TS_PACKET_SIZE );
-            if( ( i_ret = read( p_sys->i_handle, p_block->p_buffer,
-                                p_sys->i_read_once * TS_PACKET_SIZE ) ) <= 0 )
-            {
-                msg_Warn( p_access, "read failed (%m)" );
-                block_Release( p_block );
-                continue;
-            }
-            p_block->i_buffer = i_ret;
-            break;
-        }
-    }
-
-    if( p_sys->i_read_once < DVB_READ_ONCE )
-        p_sys->i_read_once++;
-
-    /* Update moderatly the signal properties */
-    if( (p_sys->i_stat_counter++ % 100) == 0 )
-        p_access->info.i_update |= INPUT_UPDATE_SIGNAL;
-
-    return p_block;
 }
 
 /*****************************************************************************
@@ -583,12 +377,9 @@ static block_t *BlockScan( access_t *p_access )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    bool         *pb_bool, b_bool;
-    int          i_int;
+    bool         *pb_bool;
     int64_t      *pi_64;
     double       *pf1, *pf2;
-    dvbpsi_pmt_t *p_pmt;
     frontend_statistic_t stat;
 
     switch( i_query )
@@ -628,29 +419,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case ACCESS_SET_PRIVATE_ID_STATE:
-            if( p_sys->scan )
-                return VLC_EGENERIC;
-
-            i_int  = (int)va_arg( args, int );               /* Private data (pid for now)*/
-            b_bool = (bool)va_arg( args, int ); /* b_selected */
-            if( !p_sys->b_budget_mode )
-            {
-                /* FIXME we may want to give the real type (me ?, I don't ;) */
-                if( b_bool )
-                    FilterSet( p_access, i_int, OTHER_TYPE );
-                else
-                    FilterUnsetPID( p_access, i_int );
-            }
-            break;
-
         case ACCESS_SET_PRIVATE_ID_CA:
-            if( p_sys->scan )
-                return VLC_EGENERIC;
-
-            p_pmt = (dvbpsi_pmt_t *)va_arg( args, dvbpsi_pmt_t * );
-
-            CAMSet( p_access, p_pmt );
-            break;
+            return VLC_EGENERIC;
 
         default:
             msg_Warn( p_access, "unimplemented query in control" );
@@ -712,22 +482,6 @@ static void FilterUnset( access_t *p_access, int i_max )
     }
 }
 
-static void FilterUnsetPID( access_t *p_access, int i_pid )
-{
-    access_sys_t *p_sys = p_access->p_sys;
-    int i;
-
-    for( i = 0; i < MAX_DEMUX; i++ )
-    {
-        if( p_sys->p_demux_handles[i].i_type &&
-            p_sys->p_demux_handles[i].i_pid == i_pid )
-        {
-            DMXUnsetFilter( p_access, p_sys->p_demux_handles[i].i_handle );
-            p_sys->p_demux_handles[i].i_type = 0;
-        }
-    }
-}
-
 /*****************************************************************************
  * VarInit/ParseMRL:
  *****************************************************************************/
@@ -742,7 +496,6 @@ static void VarInit( access_t *p_access )
     var_Create( p_access, "dvb-frequency", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-inversion", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-probe", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-budget-mode", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* */
     var_Create( p_access, "dvb-satellite", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -766,17 +519,6 @@ static void VarInit( access_t *p_access )
     var_Create( p_access, "dvb-transmission", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-guard", VLC_VAR_INTEGER );
     var_Create( p_access, "dvb-hierarchy", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
-#ifdef ENABLE_HTTPD
-    var_Create( p_access, "dvb-http-host", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-http-user", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-http-password", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-http-acl", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-http-intf-cert", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-http-intf-key", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-http-intf-ca", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-http-intf-crl", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-#endif
 }
 
 /* */

@@ -68,20 +68,6 @@ struct access_sys_t
 
     int i_stat_counter;
 
-#ifdef ENABLE_HTTPD
-    /* Local HTTP server */
-    httpd_host_t        *p_httpd_host;
-    httpd_file_sys_t    *p_httpd_file;
-    httpd_redirect_t    *p_httpd_redir;
-
-    vlc_mutex_t         httpd_mutex;
-    vlc_cond_t          httpd_cond;
-    mtime_t             i_httpd_timeout;
-    bool                b_request_frontend_info, b_request_mmi_info;
-    char                *psz_frontend_info, *psz_mmi_info;
-    char                *psz_request;
-#endif
-
     /* Scan */
     struct scan_t *scan;
 };
@@ -102,9 +88,6 @@ int  FrontendOpen( access_t * );
 void FrontendPoll( access_t *p_access );
 int  FrontendSet( access_t * );
 void FrontendClose( access_t * );
-#ifdef ENABLE_HTTPD
-void FrontendStatus( access_t * );
-#endif
 
 int  FrontendGetStatistic( access_t *, frontend_statistic_t * );
 void FrontendGetStatus( access_t *, frontend_status_t * );
@@ -115,18 +98,3 @@ int DMXUnsetFilter( access_t *, int i_fd );
 
 int  DVROpen( access_t * );
 void DVRClose( access_t * );
-
-int  CAMOpen( access_t * );
-void CAMPoll( access_t * );
-int  CAMSet( access_t *, dvbpsi_pmt_t * );
-void CAMClose( access_t * );
-#ifdef ENABLE_HTTPD
-void CAMStatus( access_t * );
-#endif
-
-#ifdef ENABLE_HTTPD
-int HTTPOpen( access_t *p_access );
-void HTTPClose( access_t *p_access );
-const char *HTTPExtractValue( const char *psz_uri, const char *psz_name,
-                              char *psz_value, int i_value_max );
-#endif
