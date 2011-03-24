@@ -208,7 +208,7 @@ private:
     StringListConfigControl *vdevDshowW, *adevDshowW;
     QLineEdit *dshowVSizeLine;
 #else
-    QRadioButton *dvbs, *dvbt, *dvbc;
+    QRadioButton *dvbs, *dvbt, *dvbc, *atsc, *cqam;
     QLabel *dvbBandLabel, *dvbSrateLabel, *dvbModLabel;
     QSpinBox  *pvrFreq, *pvrBitr;
     QComboBox *v4l2VideoDevice, *v4l2AudioDevice;
