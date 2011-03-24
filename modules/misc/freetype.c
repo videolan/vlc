@@ -2191,16 +2191,8 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
 }
 
 #ifdef HAVE_FONTCONFIG
-static int FontConfig_FindFont( filter_t *p_filter, char *psz_fontfamily,
-                             char **psz_fontfile, int *fontindex )
+static void FontConfig_BuildCache( filter_t *p_filter )
 {
-    filter_sys_t  *p_sys = p_filter->p_sys;
-
-    FcPattern     *fontpattern = NULL, *fontmatch = NULL;
-    /* Initialise result to Match, as fontconfig doesnt
-     * really set this other than some error-cases */
-    FcResult       fontresult = FcResultMatch;
-
     /* */
     msg_Dbg( p_filter, "Building font databases.");
     mtime_t t1;
@@ -2230,6 +2222,22 @@ static int FontConfig_FindFont( filter_t *p_filter, char *psz_fontfamily,
         p_dialog = NULL;
     }
 #endif
+}
+
+/**
+ * \brief Returns the path of a font matching a fontfamily, using Fc
+ ***/
+static int FontConfig_FindFont( filter_t *p_filter, char *psz_fontfamily,
+                             char **psz_fontfile, int *fontindex )
+{
+    filter_sys_t  *p_sys = p_filter->p_sys;
+
+    FcPattern     *fontpattern = NULL, *fontmatch = NULL;
+    /* Initialise result to Match, as fontconfig doesnt
+     * really set this other than some error-cases */
+    FcResult       fontresult = FcResultMatch;
+
+    FontConfig_BuildCache( p_filter );
 
     /* Lets find some fontfile from freetype-font variable family */
     char *psz_fontsize;
@@ -2237,11 +2245,7 @@ static int FontConfig_FindFont( filter_t *p_filter, char *psz_fontfamily,
         goto error;
 
     fontpattern = FcPatternCreate();
-    if( !fontpattern )
-    {
-        msg_Err( p_filter, "Creating fontpattern failed");
-        goto error;
-    }
+    if( !fontpattern ) return VLC_EGENERIC;
 
     FcPatternAddString( fontpattern, FC_FAMILY, (const FcChar8 *)psz_fontfamily );
     FcPatternAddString( fontpattern, FC_SIZE, (const FcChar8 *)psz_fontsize );
@@ -2278,24 +2282,23 @@ static int FontConfig_FindFont( filter_t *p_filter, char *psz_fontfamily,
     return VLC_SUCCESS;
 
 error:
-#ifdef WIN32
-    if( p_dialog )
-        dialog_ProgressDestroy( p_dialog );
-#endif
-
     if( fontmatch ) FcPatternDestroy( fontmatch );
     if( fontpattern ) FcPatternDestroy( fontpattern );
     return VLC_EGENERIC;
 }
 
-static char* FontConfig_Select( FcConfig* priv, const char* family,
+/***
+ * \brief Selects a font matching family, bold, italic provided
+ ***/
+static char* FontConfig_Select( FcConfig* config, const char* family,
                           bool b_bold, bool b_italic, int *i_idx )
 {
-    FcResult result;
+    FcResult result = FcResultMatch;
     FcPattern *pat, *p_pat;
     FcChar8* val_s;
     FcBool val_b;
 
+    /* Create a pattern and fills it */
     pat = FcPatternCreate();
     if (!pat) return NULL;
 
@@ -2306,16 +2309,19 @@ static char* FontConfig_Select( FcConfig* priv, const char* family,
 
     FcDefaultSubstitute( pat );
 
-    if( !FcConfigSubstitute( priv, pat, FcMatchPattern ) )
+    /* Replace the config (or current config) with the new pattern */
+    if( !FcConfigSubstitute( config, pat, FcMatchPattern ) )
     {
         FcPatternDestroy( pat );
         return NULL;
     }
 
-    p_pat = FcFontMatch( priv, pat, &result );
+    /* Find the best font for the pattern, destroy the pattern */
+    p_pat = FcFontMatch( config, pat, &result );
     FcPatternDestroy( pat );
     if( !p_pat ) return NULL;
 
+    /* Check the new pattern */
     if( ( FcResultMatch != FcPatternGetBool( p_pat, FC_OUTLINE, 0, &val_b ) )
         || ( val_b != FcTrue ) )
     {
@@ -2333,12 +2339,10 @@ static char* FontConfig_Select( FcConfig* priv, const char* family,
         return NULL;
     }
 
-    /*
-    if( strcasecmp((const char*)val_s, family ) != 0 )
+    /* if( strcasecmp((const char*)val_s, family ) != 0 )
         msg_Warn( p_filter, "fontconfig: selected font family is not"
                             "the requested one: '%s' != '%s'\n",
-                            (const char*)val_s, family );
-    */
+                            (const char*)val_s, family );   */
 
     if( FcResultMatch != FcPatternGetString( p_pat, FC_FILE, 0, &val_s ) )
     {
