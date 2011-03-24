@@ -461,7 +461,7 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
     menu->addSeparator();
 
     /* Minimal View */
-    action = menu->addAction( qtr( "Mi&nimal View" ) );
+    action = menu->addAction( qtr( "Mi&nimal Interface" ) );
     action->setShortcut( qtr( "Ctrl+H" ) );
     action->setCheckable( true );
     action->setChecked( (mi->getControlsVisibilityStatus() & CONTROLS_HIDDEN ) );
