@@ -50,8 +50,7 @@ enum
 {
     V4L2_DEVICE,
     PVR_DEVICE,
-    DVB_DEVICE,
-    BDA_DEVICE,
+    DTV_DEVICE,
     DSHOW_DEVICE,
     SCREEN_DEVICE,
     JACK_DEVICE
@@ -201,24 +200,22 @@ private:
     QString advMRL;
     QDialog *adv;
 #ifdef WIN32
-    QRadioButton *bdas, *bdat, *bdac, *bdaa, *bdaq;
-    QSpinBox *bdaCard, *bdaFreq, *bdaSrate;
-    QLabel *bdaSrateLabel, *bdaBandLabel;
-    QComboBox *bdaBandBox;
     StringListConfigControl *vdevDshowW, *adevDshowW;
     QLineEdit *dshowVSizeLine;
+# define DTV_PLUGIN "bda"
 #else
-    QRadioButton *dvbs, *dvbt, *dvbc, *atsc, *cqam;
-    QLabel *dvbBandLabel, *dvbSrateLabel, *dvbModLabel;
     QSpinBox  *pvrFreq, *pvrBitr;
     QComboBox *v4l2VideoDevice, *v4l2AudioDevice;
     QLineEdit *pvrDevice, *pvrRadioDevice;
     QComboBox *v4l2StdBox, *pvrNormBox, *dvbModBox, *dvbBandBox;
-    QSpinBox *dvbCard, *dvbFreq, *dvbSrate;
     QSpinBox *jackChannels, *jackCaching;
     QCheckBox *jackPace, *jackConnect;
     QLineEdit *jackPortsSelected;
+# define DTV_PLUGIN "dtv"
 #endif
+    QRadioButton *dvbs, *dvbt, *dvbc, *atsc, *cqam;
+    QLabel *dvbBandLabel, *dvbSrateLabel, *dvbModLabel;
+    QSpinBox *dvbCard, *dvbFreq, *dvbSrate;
     QDoubleSpinBox *screenFPS;
 
 public slots:
