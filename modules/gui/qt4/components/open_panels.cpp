@@ -68,7 +68,7 @@
         .replaceInStrings( QRegExp("^"), "/dev/" ) \
     );
 
-static const char *psz_devModule[] = { "v4l2", "pvr", "dvb", "bda",
+static const char psz_devModule[][8] = { "v4l2", "pvr", "dtv", "bda",
                                        "dshow", "screen", "jack" };
 
 /**************************************************************************
@@ -1004,8 +1004,8 @@ void CaptureOpenPanel::initialize()
     /**************
      * DVB Stuffs *
      **************/
-    if( module_exists( "dvb" ) ){
-    addModuleAndLayouts( DVB_DEVICE, dvb, "DVB", QGridLayout );
+    if( module_exists( "dtv" ) ){
+    addModuleAndLayouts( DVB_DEVICE, dvb, N_("TV (digital)"), QGridLayout );
 
     /* DVB Main */
     QLabel *dvbDeviceLabel = new QLabel( qtr( "Adapter card to tune" ) );
@@ -1068,14 +1068,7 @@ void CaptureOpenPanel::initialize()
     dvbPropLayout->addWidget( dvbBandLabel, 2, 0 );
 
     dvbBandBox = new QComboBox;
-    /* This doesn't work since dvb-bandwidth doesn't seem to be a
-       list of Integers
-       setfillVLCConfigCombo( "dvb-bandwidth", p_intf, bdaBandBox );
-     */
-    dvbBandBox->addItem( qtr( "Auto" ), 0 );
-    dvbBandBox->addItem( qtr( "6 MHz" ), 6 );
-    dvbBandBox->addItem( qtr( "7 MHz" ), 7 );
-    dvbBandBox->addItem( qtr( "8 MHz" ), 8 );
+    setfillVLCConfigCombo( "dvb-bandwidth", p_intf, dvbBandBox );
     dvbPropLayout->addWidget( dvbBandBox, 2, 1 );
 
     dvbBandLabel->hide();
@@ -1226,15 +1219,16 @@ void CaptureOpenPanel::updateMRL()
         if( dvbt->isChecked() ) mrl = "dvb-t://";
 
         mrl += "frequency=" + QString::number( dvbFreq->value() );
-        if( dvbc->isChecked() || dvbt->isChecked() )
-            mrl += "000";
 
         if( dvbc->isChecked() )
         {
             unsigned qam =
                 dvbModBox->itemData( dvbModBox->currentIndex() ).toInt();
             if( qam != 0 )
+            {
                 mrl += ":modulation=" + QString::number( qam );
+                mrl += "QAM";
+            }
             mrl += ":srate=" + QString::number( dvbSrate->value() );
         }
         else if( dvbs->isChecked() )
