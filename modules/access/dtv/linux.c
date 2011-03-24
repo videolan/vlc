@@ -726,3 +726,12 @@ int dvb_set_atsc (dvb_device_t *d, uint32_t freq, const char *modstr)
     return dvb_set_props (d, 4, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_ATSC,
                           DTV_FREQUENCY, freq * 1000, DTV_MODULATION, mod);
 }
+
+int dvb_set_cqam (dvb_device_t *d, uint32_t freq, const char *modstr)
+{
+    unsigned mod = dvb_parse_modulation (modstr, QAM_AUTO);
+
+    return dvb_set_props (d, 4, DTV_CLEAR, 0,
+                          DTV_DELIVERY_SYSTEM, SYS_DVBC_ANNEX_B,
+                          DTV_FREQUENCY, freq * 1000, DTV_MODULATION, mod);
+}

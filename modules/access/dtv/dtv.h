@@ -22,7 +22,7 @@
 
 typedef struct delsys delsys_t;
 
-extern const delsys_t dvbc, dvbs, dvbs2, dvbt, atsc;
+extern const delsys_t dvbc, dvbs, dvbs2, dvbt, atsc, cqam;
 
 typedef struct dvb_device dvb_device_t;
 
@@ -59,6 +59,7 @@ int dvb_set_dvbt (dvb_device_t *, uint32_t freq, const char *mod,
 
 /* ATSC */
 int dvb_set_atsc (dvb_device_t *, uint32_t freq, const char *mod);
+int dvb_set_cqam (dvb_device_t *, uint32_t freq, const char *mod);
 
 /* ISDB-T */
 typedef struct isdbt_layer

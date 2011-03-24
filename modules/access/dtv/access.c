@@ -193,7 +193,7 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
     add_shortcut ("dtv", "tv", "dvb", /* "radio", "dab",*/
                   "cable", "dvb-c", "satellite", "dvb-s", "dvb-s2",
-                  "terrestrial", "dvb-t", "atsc")
+                  "terrestrial", "dvb-t", "atsc", "cqam")
 
     /* All options starting with dvb- can be overriden in the MRL, so they
      * must all be "safe". Nevertheless, we do not mark as safe those that are
@@ -494,6 +494,8 @@ static const delsys_t *GuessSystem (const char *scheme, dvb_device_t *dev)
 
     if (!strcasecmp (scheme, "atsc"))
         return &atsc;
+    if (!strcasecmp (scheme, "cqam"))
+        return &cqam;
     if (!strcasecmp (scheme, "dvb-c"))
         return &dvbc;
     if (!strcasecmp (scheme, "dvb-s"))
@@ -591,6 +593,17 @@ static int atsc_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 }
 
 const delsys_t atsc = { .setup = atsc_setup };
+
+static int cqam_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
+{
+    char *mod = var_InheritModulation (obj);
+
+    int ret = dvb_set_cqam (dev, freq, mod);
+    free (mod);
+    return ret;
+}
+
+const delsys_t cqam = { .setup = cqam_setup };
 
 
 /*** DVB-C ***/
