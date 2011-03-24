@@ -112,6 +112,7 @@ QAction *addDPStaticEntry( QMenu *menu,
             action = menu->addAction( text, THEDP, member );
     }
     action->setData( STATIC_ENTRY );
+    return action;
 }
 
 /**
