@@ -350,7 +350,7 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
 
     if( var_InheritBool( p_intf, "qt-recentplay" ) )
     {
-        recentsMenu = new QMenu( qtr( "&Recent Media" ), menu );
+        recentsMenu = new QMenu( qtr( "Open &Recent Media" ), menu );
         updateRecents( p_intf );
         menu->addMenu( recentsMenu );
     }
@@ -363,7 +363,7 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
 #ifdef ENABLE_SOUT
     addDPStaticEntry( menu, qtr( "Conve&rt / Save..." ), "",
         SLOT( openAndTranscodingDialogs() ), "Ctrl+R" );
-    addDPStaticEntry( menu, qtr( "&Streaming..." ),
+    addDPStaticEntry( menu, qtr( "&Stream..." ),
         ":/menu/stream", SLOT( openAndStreamingDialogs() ), "Ctrl+S" );
     menu->addSeparator();
 #endif
