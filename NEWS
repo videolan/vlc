@@ -1,4 +1,4 @@
-Changes between 1.1.7 and 1.2.0-git:
+Changes between 1.1.x and 1.2.0-git:
 ------------------------------------
 
 Important changes for packagers:
@@ -139,7 +139,7 @@ Miscellaneous fixes in:
  * Pulseaudio audio output, notably for usb cards
  * Stacktraces are now limited in size on Windows
  * Video resolution is now limited to 8192x8192, for security reasons
-   See CORE-2011-0208
+   See CORE-2011-0208, CVE-2010-3275, CVE-2010-3276
  * Configure and build system improvements
  * DirectShow and BDA build headers have been updated
 
