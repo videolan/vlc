@@ -1440,6 +1440,7 @@ static inline void XDeintBand8x8MMXEXT( uint8_t *dst, int i_dst,
 static void RenderX( picture_t *p_outpic, picture_t *p_pic )
 {
     int i_plane;
+    unsigned u_cpu = vlc_CPU();
 
     /* Copy image and skip lines */
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
@@ -1461,7 +1462,7 @@ static void RenderX( picture_t *p_outpic, picture_t *p_pic )
             uint8_t *src = &p_pic->p[i_plane].p_pixels[8*y*i_src];
 
 #ifdef CAN_COMPILE_MMXEXT
-            if( vlc_CPU() & CPU_CAPABILITY_MMXEXT )
+            if( u_cpu & CPU_CAPABILITY_MMXEXT )
                 XDeintBand8x8MMXEXT( dst, i_dst, src, i_src, i_mbx, i_modx );
             else
 #endif
@@ -1488,7 +1489,7 @@ static void RenderX( picture_t *p_outpic, picture_t *p_pic )
     }
 
 #ifdef CAN_COMPILE_MMXEXT
-    if( vlc_CPU() & CPU_CAPABILITY_MMXEXT )
+    if( u_cpu & CPU_CAPABILITY_MMXEXT )
         emms();
 #endif
 }
