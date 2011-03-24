@@ -595,9 +595,6 @@ known:
         freq *= -1;
     assert (freq < 0x7fffffff);
 
-    /* TODO: DiSEqC */
-
-    /* Continuous tone (to select high oscillator frequency) */
     int tone;
     switch (var_InheritInteger (d->obj, "dvb-tone"))
     {
@@ -606,10 +603,48 @@ known:
         default: tone = high ? SEC_TONE_ON : SEC_TONE_OFF;
     }
 
+    /*** LNB selection / DiSEqC ***/
     unsigned voltage = dvb_parse_polarization (pol);
+    if (dvb_set_props (d, 2, DTV_TONE, SEC_TONE_OFF, DTV_VOLTAGE, voltage))
+        return -1;
 
-    return dvb_set_props (d, 3, DTV_FREQUENCY, freq,
-                          DTV_VOLTAGE, voltage, DTV_TONE, tone);
+    unsigned satno = var_InheritInteger (d->obj, "dvb-satno");
+    if (satno > 0)
+    {
+        /* DiSEqC 1.0 */
+#undef msleep /* we know what we are doing! */
+        struct dvb_diseqc_master_cmd cmd;
+
+        satno = (satno - 1) & 3;
+        cmd.msg[0] = 0xE0; /* framing: master, no reply, 1st TX */
+        cmd.msg[1] = 0x10; /* address: all LNB/switch */
+        cmd.msg[2] = 0x38; /* command: Write Port Group 0 */
+        cmd.msg[3] = 0xF0  /* data[0]: clear all bits */
+                   | (satno << 2) /* LNB (A, B, C or D) */
+                   | ((voltage == SEC_VOLTAGE_18) << 1) /* polarization */
+                   | (tone == SEC_TONE_ON); /* option */
+        cmd.msg[4] = cmd.msg[5] = 0; /* unused */
+        msleep (15000); /* wait 15 ms before DiSEqC command */
+        if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) < 0)
+        {
+            msg_Err (d->obj, "cannot send DiSEqC command: %m");
+            return -1;
+        }
+        msleep (54000 + 15000);
+
+        /* Mini-DiSEqC */
+        satno &= 1;
+        if (ioctl (d->frontend, FE_DISEQC_SEND_BURST,
+                   satno ? SEC_MINI_B : SEC_MINI_A) < 0)
+        {
+            msg_Err (d->obj, "cannot send Mini-DiSEqC tone burst: %m");
+            return -1;
+        }
+        msleep (15000);
+    }
+
+    /* Continuous tone (to select high oscillator frequency) */
+    return dvb_set_props (d, 2, DTV_FREQUENCY, freq, DTV_TONE, tone);
 }
 
 int dvb_set_dvbs (dvb_device_t *d, uint32_t freq,

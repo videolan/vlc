@@ -68,9 +68,6 @@ static void Close( vlc_object_t *p_this );
 #define SATELLITE_TEXT N_("Satellite scanning config")
 #define SATELLITE_LONGTEXT N_("filename of config file in share/dvb/dvb-s")
 
-#define SATNO_TEXT N_("Satellite number in the Diseqc system")
-#define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=satellite number].")
-
 #define HOST_TEXT N_( "HTTP Host address" )
 #define HOST_LONGTEXT N_( \
     "To enable the internal HTTP server, set its address and port here." )
@@ -115,8 +112,6 @@ vlc_module_begin ()
     /* DVB-S (satellite) */
     add_string( "dvb-satellite", NULL, SATELLITE_TEXT, SATELLITE_LONGTEXT,
                 true )
-    add_integer( "dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT,
-                 true )
 #ifdef ENABLE_HTTPD
     /* MMI HTTP interface */
     set_section( N_("HTTP server" ), 0 )

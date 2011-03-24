@@ -172,13 +172,16 @@ static const char *const polarization_user[] = { N_("Unspecified (0V)"),
     "A continuous tone at 22kHz can be sent on the cable. " \
     "This normally selects the higher frequency band from a universal LNB.")
 
-#if 0
 #define SATNO_TEXT N_("DiSEqC LNB number")
 #define SATNO_LONGTEXT N_( \
     "If the satellite receiver is connected to multiple " \
     "low noise block-downconverters (LNB) through a DiSEqC 1.0 switch, " \
     "the correct LNB can be selected (1 to 4). " \
     "If there is no switch, this parameter should be 0.")
+#ifdef __linux__
+static const int satno_vlc[] = { 0, 1, 2, 3, 4 };
+static const char *const satno_user[] = { N_("Unspecified"),
+    "A/1", "B/2", "C/3", "D/4" };
 #endif
 
 static int  Open (vlc_object_t *);
@@ -286,13 +289,12 @@ vlc_module_begin ()
                  LNB_SWITCH_TEXT, LNB_SWITCH_LONGTEXT, true)
         change_integer_range (0, 0x7fffffff)
         add_deprecated_alias ("dvb-lnb-slof")
+#ifdef __linux
+    add_integer ("dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT, true)
+        change_integer_list (satno_vlc, satno_user)
+#endif
     add_integer ("dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT, true)
         change_integer_list (auto_off_on_vlc, auto_off_on_user)
-#if 0
-    add_integer ("dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT, true)
-        change_integer_range (0, 4)
-        change_safe ()
-#endif
 vlc_module_end ()
 
 struct access_sys_t
