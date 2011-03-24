@@ -200,10 +200,9 @@ static int RenderHtml( filter_t *, subpicture_region_t *,
                        subpicture_region_t * );
 #endif
 #ifdef HAVE_FONTCONFIG
+static void FontConfig_BuildCache( filter_t * );
 static char *FontConfig_Select( FcConfig *, const char *,
-                                bool, bool, int * );
-
-static int FontConfig_FindFont( filter_t *, char *, char **, int * );
+                                bool, bool, int, int * );
 #endif
 
 
@@ -352,11 +351,17 @@ static int Create( vlc_object_t *p_this )
     /* Set the font file */
     fontindex = 0;
 #ifdef HAVE_FONTCONFIG
-    if( FontConfig_FindFont( p_filter, psz_fontfamily, &psz_fontfile, &fontindex )
-            != VLC_SUCCESS )
-        psz_fontfile = psz_fontfamily;
+    FontConfig_BuildCache( p_filter );
+
+    /* */
+    psz_fontfile = FontConfig_Select( NULL, psz_fontfamily, false, false,
+                                      p_sys->i_default_font_size, &fontindex );
+
+    p_sys->psz_fontfamily = psz_fontfamily;
+    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily, psz_fontfile );
+    if( !psz_fontfile )
 #else
-    psz_fontfile = psz_fontfamily;
+        psz_fontfile = psz_fontfamily;
 #endif
 
     /* */
@@ -1859,6 +1864,7 @@ static int ProcessLines( filter_t *p_filter,
                                                   p_style->psz_fontname,
                                                   p_style->b_bold,
                                                   p_style->b_italic,
+                                                  -1,
                                                   &i_idx );
 #else
 #error FIXME
@@ -2224,74 +2230,11 @@ static void FontConfig_BuildCache( filter_t *p_filter )
 #endif
 }
 
-/**
- * \brief Returns the path of a font matching a fontfamily, using Fc
- ***/
-static int FontConfig_FindFont( filter_t *p_filter, char *psz_fontfamily,
-                             char **psz_fontfile, int *fontindex )
-{
-    filter_sys_t  *p_sys = p_filter->p_sys;
-
-    FcPattern     *fontpattern = NULL, *fontmatch = NULL;
-    /* Initialise result to Match, as fontconfig doesnt
-     * really set this other than some error-cases */
-    FcResult       fontresult = FcResultMatch;
-
-    FontConfig_BuildCache( p_filter );
-
-    /* Lets find some fontfile from freetype-font variable family */
-    char *psz_fontsize;
-    if( asprintf( &psz_fontsize, "%d", p_sys->i_default_font_size ) == -1 )
-        goto error;
-
-    fontpattern = FcPatternCreate();
-    if( !fontpattern ) return VLC_EGENERIC;
-
-    FcPatternAddString( fontpattern, FC_FAMILY, (const FcChar8 *)psz_fontfamily );
-    FcPatternAddString( fontpattern, FC_SIZE, (const FcChar8 *)psz_fontsize );
-
-    if( FcConfigSubstitute( NULL, fontpattern, FcMatchPattern ) == FcFalse )
-    {
-        msg_Err( p_filter, "FontSubstitute failed");
-        goto error;
-    }
-    FcDefaultSubstitute( fontpattern );
-
-    /* testing fontresult here doesn't do any good really, but maybe it will
-     * in future as fontconfig code doesn't set it in all cases and just
-     * returns NULL or doesn't set to to Match on all Match cases.*/
-    fontmatch = FcFontMatch( NULL, fontpattern, &fontresult );
-    if( !fontmatch || fontresult == FcResultNoMatch )
-    {
-        msg_Err( p_filter, "Fontmatching failed");
-        goto error;
-    }
-
-    FcPatternGetString( fontmatch, FC_FILE, 0, psz_fontfile);
-    FcPatternGetInteger( fontmatch, FC_INDEX, 0, fontindex );
-    if( !psz_fontfile )
-    {
-        msg_Err( p_filter, "Failed to get fontfile");
-        goto error;
-    }
-
-    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily,
-             *psz_fontfile ? *psz_fontfile : "(null)" );
-    p_sys->psz_fontfamily = strdup( psz_fontfamily );
-
-    return VLC_SUCCESS;
-
-error:
-    if( fontmatch ) FcPatternDestroy( fontmatch );
-    if( fontpattern ) FcPatternDestroy( fontpattern );
-    return VLC_EGENERIC;
-}
-
 /***
  * \brief Selects a font matching family, bold, italic provided
  ***/
 static char* FontConfig_Select( FcConfig* config, const char* family,
-                          bool b_bold, bool b_italic, int *i_idx )
+                          bool b_bold, bool b_italic, int i_size, int *i_idx )
 {
     FcResult result = FcResultMatch;
     FcPattern *pat, *p_pat;
@@ -2302,14 +2245,20 @@ static char* FontConfig_Select( FcConfig* config, const char* family,
     pat = FcPatternCreate();
     if (!pat) return NULL;
 
+    /* */
     FcPatternAddString( pat, FC_FAMILY, (const FcChar8*)family );
     FcPatternAddBool( pat, FC_OUTLINE, FcTrue );
     FcPatternAddInteger( pat, FC_SLANT, b_italic ? FC_SLANT_ITALIC : FC_SLANT_ROMAN );
     FcPatternAddInteger( pat, FC_WEIGHT, b_bold ? FC_WEIGHT_EXTRABOLD : FC_WEIGHT_NORMAL );
+    if( i_size != -1 )
+    {
+        char *psz_fontsize;
+        if( asprintf( &psz_fontsize, "%d", i_size ) != -1 )
+            FcPatternAddString( pat, FC_SIZE, (const FcChar8 *)psz_fontsize );
+    }
 
+    /* */
     FcDefaultSubstitute( pat );
-
-    /* Replace the config (or current config) with the new pattern */
     if( !FcConfigSubstitute( config, pat, FcMatchPattern ) )
     {
         FcPatternDestroy( pat );
@@ -2319,7 +2268,7 @@ static char* FontConfig_Select( FcConfig* config, const char* family,
     /* Find the best font for the pattern, destroy the pattern */
     p_pat = FcFontMatch( config, pat, &result );
     FcPatternDestroy( pat );
-    if( !p_pat ) return NULL;
+    if( !p_pat || result == FcResultNoMatch ) return NULL;
 
     /* Check the new pattern */
     if( ( FcResultMatch != FcPatternGetBool( p_pat, FC_OUTLINE, 0, &val_b ) )
