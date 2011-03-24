@@ -24,8 +24,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "ml_configuration.hpp"
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #ifdef MEDIA_LIBRARY
+
+#include "ml_configuration.hpp"
 
 #include <QTreeView>
 #include <QPushButton>
