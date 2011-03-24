@@ -61,28 +61,8 @@
 static int  Open( vlc_object_t *p_this );
 static void Close( vlc_object_t *p_this );
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for DVB streams. This " \
-    "value should be set in milliseconds." )
-
-#define ADAPTER_TEXT N_("Adapter card to tune")
-#define ADAPTER_LONGTEXT N_("Adapter cards have a device file in directory named /dev/dvb/adapter[n] with n>=0.")
-
-#define DEVICE_TEXT N_("Device number to use on adapter")
-#define DEVICE_LONGTEXT ""
-
-#define FREQ_TEXT N_("Transponder/multiplex frequency")
-#define FREQ_LONGTEXT N_("In kHz for DVB-S or Hz for DVB-C/T")
-
-#define INVERSION_TEXT N_("Inversion mode")
-#define INVERSION_LONGTEXT N_("Inversion mode [0=off, 1=on, 2=auto]")
-
 #define PROBE_TEXT N_("Probe DVB card for capabilities")
 #define PROBE_LONGTEXT N_("Some DVB cards do not like to be probed for their capabilities, you can disable this feature if you experience some trouble.")
-
-#define BUDGET_TEXT N_("Budget mode")
-#define BUDGET_LONGTEXT N_("This allows you to stream an entire transponder with a \"budget\" card.")
 
 /* Satellite */
 #define SATELLITE_TEXT N_("Satellite scanning config")
@@ -90,61 +70,6 @@ static void Close( vlc_object_t *p_this );
 
 #define SATNO_TEXT N_("Satellite number in the Diseqc system")
 #define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=satellite number].")
-
-#define VOLTAGE_TEXT N_("LNB voltage (V)")
-#define VOLTAGE_LONGTEXT ""
-static const int voltages[] = { 0, 13, 18 };
-static const char *const voltages_text[] = { N_("off"), N_("13 V"), N_("18 V") };
-
-#define HIGH_VOLTAGE_TEXT N_("High LNB voltage")
-#define HIGH_VOLTAGE_LONGTEXT N_("Enable high voltage if your cables are " \
-    "particularly long. This is not supported by all frontends.")
-
-#define TONE_TEXT N_("22 kHz tone")
-#define TONE_LONGTEXT N_("[0=off, 1=on, -1=auto].")
-
-#define FEC_TEXT N_("Transponder FEC")
-#define FEC_LONGTEXT N_("FEC=Forward Error Correction mode [9=auto].")
-
-#define SRATE_TEXT N_("Transponder symbol rate in kHz")
-#define SRATE_LONGTEXT ""
-
-#define LNB_LOF1_TEXT N_("Antenna lnb_lof1 (kHz)")
-#define LNB_LOF1_LONGTEXT ""
-
-#define LNB_LOF2_TEXT N_("Antenna lnb_lof2 (kHz)")
-#define LNB_LOF2_LONGTEXT ""
-
-#define LNB_SLOF_TEXT N_("Antenna lnb_slof (kHz)")
-#define LNB_SLOF_LONGTEXT ""
-
-/* Cable */
-#define MODULATION_TEXT N_("Modulation type")
-#define MODULATION_LONGTEXT ""
-static const int modulations[] = {
-    -1, 0, 8, 16, 32, 64, 128, 256 };
-static const char *const modulations_text[] = {
-    N_("QPSK"), N_("Auto (QAM)"), N_("VSB 8"), N_("QAM 16"), N_("QAM 32"),
-    N_("QAM 64"), N_("QAM 128"), N_("QAM 256") };
-
-/* Terrestrial */
-#define CODE_RATE_HP_TEXT N_("Terrestrial high priority stream code rate (FEC)")
-#define CODE_RATE_HP_LONGTEXT ""
-
-#define CODE_RATE_LP_TEXT N_("Terrestrial low priority stream code rate (FEC)")
-#define CODE_RATE_LP_LONGTEXT ""
-
-#define BANDWIDTH_TEXT N_("Terrestrial bandwidth")
-#define BANDWIDTH_LONGTEXT N_("Terrestrial bandwidth [0=auto,6,7,8 in MHz]")
-
-#define GUARD_TEXT N_("Terrestrial guard interval")
-#define GUARD_LONGTEXT ""
-
-#define TRANSMISSION_TEXT N_("Terrestrial transmission mode")
-#define TRANSMISSION_LONGTEXT ""
-
-#define HIERARCHY_TEXT N_("Terrestrial hierarchy mode")
-#define HIERARCHY_LONGTEXT ""
 
 #define HOST_TEXT N_( "HTTP Host address" )
 #define HOST_LONGTEXT N_( \
@@ -186,58 +111,11 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT,
-                 CACHING_LONGTEXT, true )
-        change_safe()
-    add_integer( "dvb-adapter", 0, ADAPTER_TEXT, ADAPTER_LONGTEXT,
-                 false )
-    add_integer( "dvb-device", 0, DEVICE_TEXT, DEVICE_LONGTEXT,
-                 true )
-    add_integer( "dvb-frequency", 0, FREQ_TEXT, FREQ_LONGTEXT,
-                 false )
-        change_safe()
-    add_integer( "dvb-inversion", 2, INVERSION_TEXT, INVERSION_LONGTEXT,
-                 true )
     add_bool( "dvb-probe", true, PROBE_TEXT, PROBE_LONGTEXT, true )
-    add_bool( "dvb-budget-mode", false, BUDGET_TEXT, BUDGET_LONGTEXT,
-              true )
     /* DVB-S (satellite) */
     add_string( "dvb-satellite", NULL, SATELLITE_TEXT, SATELLITE_LONGTEXT,
                 true )
     add_integer( "dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT,
-                 true )
-    add_integer( "dvb-voltage", 13, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
-                 true )
-        change_integer_list( voltages, voltages_text )
-    add_bool( "dvb-high-voltage", false, HIGH_VOLTAGE_TEXT,
-              HIGH_VOLTAGE_LONGTEXT, true )
-    add_integer( "dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT,
-                 true )
-    add_integer( "dvb-fec", 9, FEC_TEXT, FEC_LONGTEXT, true )
-    add_integer( "dvb-srate", 0, SRATE_TEXT, SRATE_LONGTEXT,
-                 false )
-    add_integer( "dvb-lnb-lof1", 0, LNB_LOF1_TEXT,
-                 LNB_LOF1_LONGTEXT, true )
-    add_integer( "dvb-lnb-lof2", 0, LNB_LOF2_TEXT,
-                 LNB_LOF2_LONGTEXT, true )
-    add_integer( "dvb-lnb-slof", 0, LNB_SLOF_TEXT,
-                 LNB_SLOF_LONGTEXT, true )
-    /* DVB-C (cable) */
-    add_integer( "dvb-modulation", 0, MODULATION_TEXT,
-                 MODULATION_LONGTEXT, true )
-        change_integer_list( modulations, modulations_text )
-    /* DVB-T (terrestrial) */
-    add_integer( "dvb-code-rate-hp", 9, CODE_RATE_HP_TEXT,
-                 CODE_RATE_HP_LONGTEXT, true )
-    add_integer( "dvb-code-rate-lp", 9, CODE_RATE_LP_TEXT,
-                 CODE_RATE_LP_LONGTEXT, true )
-    add_integer( "dvb-bandwidth", 0, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
-                 true )
-        change_safe()
-    add_integer( "dvb-guard", 0, GUARD_TEXT, GUARD_LONGTEXT, true )
-    add_integer( "dvb-transmission", 0, TRANSMISSION_TEXT,
-                 TRANSMISSION_LONGTEXT, true )
-    add_integer( "dvb-hierarchy", 0, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
                  true )
 #ifdef ENABLE_HTTPD
     /* MMI HTTP interface */
@@ -877,21 +755,21 @@ static void VarInit( access_t *p_access )
     var_Create( p_access, "dvb-voltage", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-high-voltage", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-tone", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-fec", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-fec", VLC_VAR_INTEGER );
     var_Create( p_access, "dvb-srate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-lnb-lof1", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-lnb-lof2", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-lnb-slof", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-lnb-lof1", VLC_VAR_INTEGER );
+    var_Create( p_access, "dvb-lnb-lof2", VLC_VAR_INTEGER );
+    var_Create( p_access, "dvb-lnb-slof", VLC_VAR_INTEGER );
 
     /* */
-    var_Create( p_access, "dvb-modulation", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-modulation", VLC_VAR_INTEGER );
 
     /* */
-    var_Create( p_access, "dvb-code-rate-hp", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-code-rate-lp", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-code-rate-hp", VLC_VAR_INTEGER );
+    var_Create( p_access, "dvb-code-rate-lp", VLC_VAR_INTEGER );
     var_Create( p_access, "dvb-bandwidth", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-transmission", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-guard", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-guard", VLC_VAR_INTEGER );
     var_Create( p_access, "dvb-hierarchy", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
 #ifdef ENABLE_HTTPD
