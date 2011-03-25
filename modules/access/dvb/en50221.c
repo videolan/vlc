@@ -1957,7 +1957,7 @@ cam_t *en50221_Init( vlc_object_t *obj, int fd )
         return NULL;
     }
 
-    cam_t *p_cam = malloc( sizeof( *p_cam ) );
+    cam_t *p_cam = calloc( 1, sizeof( *p_cam ) );
     if( unlikely(p_cam == NULL) )
         goto error;
 
