@@ -40,24 +40,25 @@ float dvb_get_snr (dvb_device_t *);
 int dvb_set_inversion (dvb_device_t *, int);
 int dvb_tune (dvb_device_t *);
 
+#define VLC_FEC(a,b)   (((a) << 16u) | (b))
+#define VLC_FEC_AUTO   0xFFFFFFFF
 #define VLC_GUARD(a,b) (((a) << 16u) | (b))
 #define VLC_GUARD_AUTO 0xFFFFFFFF
 
 /* DVB-C */
 int dvb_set_dvbc (dvb_device_t *, uint32_t freq, const char *mod,
-                  uint32_t srate, const char *fec);
+                  uint32_t srate, uint32_t fec);
 
 /* DVB-S */
-int dvb_set_dvbs (dvb_device_t *, uint32_t freq, uint32_t srate,
-                  const char *fec);
+int dvb_set_dvbs (dvb_device_t *, uint32_t freq, uint32_t srate, uint32_t fec);
 int dvb_set_dvbs2 (dvb_device_t *, uint32_t freq, const char *mod,
-                   uint32_t srate, const char *fec, int pilot, int rolloff);
+                   uint32_t srate, uint32_t fec, int pilot, int rolloff);
 int dvb_set_sec (dvb_device_t *, uint32_t freq, char pol,
                  uint32_t lowf, uint32_t highf, uint32_t switchf);
 
 /* DVB-T */
 int dvb_set_dvbt (dvb_device_t *, uint32_t freq, const char *mod,
-                  const char *fec_hp, const char *fec_lp, uint32_t bandwidth,
+                  uint32_t fec_hp, uint32_t fec_lp, uint32_t bandwidth,
                   int transmission, uint32_t guard, int hierarchy);
 
 /* ATSC */

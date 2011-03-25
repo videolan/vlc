@@ -140,24 +140,26 @@ static int dvb_parse_modulation (const char *str, int def)
     return dvb_parse_str (str, mods, sizeof (mods) / sizeof (*mods), def);
 }
 
-static int dvb_parse_fec (const char *str)
+static int dvb_parse_fec (uint32_t fec)
 {
-    static const dvb_str_map_t rates[] =
+    static const dvb_int_map_t rates[] =
     {
-        { "",     FEC_AUTO },
-        { "1/2",  FEC_1_2  },
+        { 0,             FEC_NONE },
+        { VLC_FEC(1,2),  FEC_1_2  },
         // TODO: 1/3
         // TODO: 1/4
-        { "2/3",  FEC_2_3  },
-        { "3/4",  FEC_3_4  },
-        { "4/5",  FEC_4_5  },
-        { "5/6",  FEC_5_6  },
-        { "6/7",  FEC_6_7  },
-        { "7/8",  FEC_7_8  },
-        { "8/9",  FEC_8_9  },
-        { "9/10", FEC_9_10 },
+        { VLC_FEC(2,3),  FEC_2_3  },
+        { VLC_FEC(3,4),  FEC_3_4  },
+        { VLC_FEC(3,5),  FEC_3_5  },
+        { VLC_FEC(4,5),  FEC_4_5  },
+        { VLC_FEC(5,6),  FEC_5_6  },
+        { VLC_FEC(6,7),  FEC_6_7  },
+        { VLC_FEC(7,8),  FEC_7_8  },
+        { VLC_FEC(8,9),  FEC_8_9  },
+        { VLC_FEC(9,10), FEC_9_10 },
+        { VLC_FEC_AUTO,  FEC_AUTO },
     };
-    return dvb_parse_str (str, rates, sizeof (rates) / sizeof (*rates),
+    return dvb_parse_int (fec, rates, sizeof (rates) / sizeof (*rates),
                           FEC_AUTO);
 }
 
@@ -531,10 +533,10 @@ int dvb_tune (dvb_device_t *d)
 
 /*** DVB-C ***/
 int dvb_set_dvbc (dvb_device_t *d, uint32_t freq, const char *modstr,
-                  uint32_t srate, const char *fecstr)
+                  uint32_t srate, uint32_t fec)
 {
     unsigned mod = dvb_parse_modulation (modstr, QAM_AUTO);
-    unsigned fec = dvb_parse_fec (fecstr);
+    fec = dvb_parse_fec (fec);
 
     return dvb_set_props (d, 6, DTV_CLEAR, 0,
                           DTV_DELIVERY_SYSTEM, SYS_DVBC_ANNEX_AC,
@@ -655,10 +657,9 @@ known:
     return dvb_set_props (d, 2, DTV_FREQUENCY, freq, DTV_TONE, tone);
 }
 
-int dvb_set_dvbs (dvb_device_t *d, uint32_t freq,
-                  uint32_t srate, const char *fecstr)
+int dvb_set_dvbs (dvb_device_t *d, uint32_t freq, uint32_t srate, uint32_t fec)
 {
-    unsigned fec = dvb_parse_fec (fecstr);
+    fec = dvb_parse_fec (fec);
 
     return dvb_set_props (d, 5, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBS,
                           DTV_FREQUENCY, freq, DTV_SYMBOL_RATE, srate,
@@ -666,10 +667,10 @@ int dvb_set_dvbs (dvb_device_t *d, uint32_t freq,
 }
 
 int dvb_set_dvbs2 (dvb_device_t *d, uint32_t freq, const char *modstr,
-                   uint32_t srate, const char *fecstr, int pilot, int rolloff)
+                   uint32_t srate, uint32_t fec, int pilot, int rolloff)
 {
     unsigned mod = dvb_parse_modulation (modstr, QPSK);
-    unsigned fec = dvb_parse_fec (fecstr);
+    fec = dvb_parse_fec (fec);
 
     switch (pilot)
     {
@@ -742,12 +743,12 @@ static int dvb_parse_hierarchy (int i)
 }
 
 int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char *modstr,
-                  const char *fechstr, const char *feclstr, uint32_t bandwidth,
+                  uint32_t fec_hp, uint32_t fec_lp, uint32_t bandwidth,
                   int transmit_mode, uint32_t guard, int hierarchy)
 {
     uint32_t mod = dvb_parse_modulation (modstr, QAM_AUTO);
-    uint32_t fec_hp = dvb_parse_fec (fechstr);
-    uint32_t fec_lp = dvb_parse_fec (feclstr);
+    fec_hp = dvb_parse_fec (fec_hp);
+    fec_lp = dvb_parse_fec (fec_lp);
     bandwidth *= 1000000;
     transmit_mode = dvb_parse_transmit_mode (transmit_mode);
     guard = dvb_parse_guard (guard);

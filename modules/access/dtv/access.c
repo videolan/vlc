@@ -91,7 +91,7 @@ static const char *const auto_off_on_user[] = { N_("Automatic"),
 #define CODE_RATE_LONGTEXT N_( \
     "The code rate for Forward Error Correction can be specified.")
 static const char *const code_rate_vlc[] = { "",
-    "none", /*"1/4", "1/3",*/ "1/2", "3/5", "2/3", "3/4",
+    "0", /*"1/4", "1/3",*/ "1/2", "3/5", "2/3", "3/4",
     "4/5", "5/6", "6/7", "7/8", "8/9", "9/10",
 };
 static const char *const code_rate_user[] = { N_("Automatic"),
@@ -252,12 +252,8 @@ vlc_module_begin ()
     add_integer ("dvb-srate", 0, SRATE_TEXT, SRATE_LONGTEXT, false)
         change_integer_range (0, UINT64_C(0xffffffff))
         change_safe ()
-    add_string ("dvb-code-rate", "", CODE_RATE_TEXT, CODE_RATE_LONGTEXT, true)
+    add_string ("dvb-fec", "", CODE_RATE_TEXT, CODE_RATE_LONGTEXT, true)
         change_string_list (code_rate_vlc, code_rate_user, NULL)
-        change_safe ()
-    add_integer ("dvb-fec", 9, " ", " ", true)
-        change_integer_range (0, 9)
-        change_private ()
         change_safe ()
     set_section (N_("DVB-S2 parameters"), NULL)
     add_integer ("dvb-pilot", -1, PILOT_TEXT, PILOT_TEXT, true)
@@ -533,23 +529,34 @@ static unsigned var_InheritFrequency (vlc_object_t *obj)
     return freq;
 }
 
-static char *var_InheritCodeRate (vlc_object_t *obj)
+static uint32_t var_InheritCodeRate (vlc_object_t *obj, const char *varname)
 {
-    char *code_rate = var_InheritString (obj, "dvb-code-rate");
-    if (code_rate != NULL)
-        return code_rate;
+    char *code_rate = var_InheritString (obj, varname);
+    if (code_rate == NULL)
+        return VLC_FEC_AUTO;
 
-    /* Backward compatibility with VLC < 1.2 (= Linux DVBv3 enum) */
-    unsigned fec = var_InheritInteger (obj, "dvb-fec");
-    if (fec < 9)
+    uint16_t a, b;
+    int v = sscanf (code_rate, "%"SCNu16"/%"SCNu16, &a, &b);
+    free (code_rate);
+    switch (v)
     {
-        static const char linux_dvb[9][5] = {
-            "none", "1/2", "2/3", "3/4", "4/5", "5/6", "6/7", "7/8" };
-        msg_Warn (obj, "\"fec=%u\" option is obsolete. "
-                       "Use \"code-rate=%s\" instead.", fec, linux_dvb[fec]);
-        return strdup (linux_dvb[fec]);
+        case 2:
+            return VLC_FEC(a, b);
+        case 1:
+            if (a == 0)
+                return 0;
+            /* Backward compatibility with VLC < 1.2 (= Linux DVBv3 enum) */
+            if (a < 9)
+            {
+                msg_Warn (obj, "\"%s=%"PRIu16"\" option is obsolete. "
+                          "Use \"%s=%"PRIu16"/%"PRIu16"\" instead.",
+                          varname + 4, a, varname + 4, a, a + 1);
+                return VLC_FEC(a, a + 1);
+            }
+            else
+                msg_Warn (obj, "\"fec=9\" option is obsolete.");
     }
-    return NULL;
+    return VLC_FEC_AUTO;
 }
 
 static char *var_InheritModulation (vlc_object_t *obj)
@@ -637,11 +644,10 @@ const delsys_t cqam = { .setup = cqam_setup };
 static int dvbc_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 {
     char *mod = var_InheritModulation (obj);
-    char *fec = var_InheritCodeRate (obj);
+    uint32_t fec = var_InheritCodeRate (obj, "dvb-fec");
     unsigned srate = var_InheritInteger (obj, "dvb-srate");
 
     int ret = dvb_set_dvbc (dev, freq, mod, srate, fec);
-    free (fec);
     free (mod);
     return ret;
 }
@@ -689,11 +695,10 @@ static int sec_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 
 static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 {
-    char *fec = var_InheritCodeRate (obj);
+    uint32_t fec = var_InheritCodeRate (obj, "dvb-fec");
     uint32_t srate = var_InheritInteger (obj, "dvb-srate");
 
     int ret = dvb_set_dvbs (dev, freq, srate, fec);
-    free (fec);
     if (ret == 0)
         ret = sec_setup (obj, dev, freq);
     return ret;
@@ -702,13 +707,12 @@ static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 static int dvbs2_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 {
     char *mod = var_InheritModulation (obj);
-    char *fec = var_InheritCodeRate (obj);
+    uint32_t fec = var_InheritCodeRate (obj, "dvb-fec");
     uint32_t srate = var_InheritInteger (obj, "dvb-srate");
     int pilot = var_InheritInteger (obj, "dvb-pilot");
     int rolloff = var_InheritInteger (obj, "dvb-rolloff");
 
     int ret = dvb_set_dvbs2 (dev, freq, mod, srate, fec, pilot, rolloff);
-    free (fec);
     free (mod);
     if (ret == 0)
         ret = sec_setup (obj, dev, freq);
@@ -723,16 +727,14 @@ const delsys_t dvbs2 = { .setup = dvbs2_setup };
 static int dvbt_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 {
     char *mod = var_InheritModulation (obj);
-    char *fec_hp = var_InheritString (obj, "dvb-code-rate-hp");
-    char *fec_lp = var_InheritString (obj, "dvb-code-rate-lp");
+    uint32_t fec_hp = var_InheritCodeRate (obj, "dvb-code-rate-hp");
+    uint32_t fec_lp = var_InheritCodeRate (obj, "dvb-code-rate-lp");
     uint32_t guard = var_InheritGuardInterval (obj);
     uint32_t bw = var_InheritInteger (obj, "dvb-bandwidth");
     int tx = var_InheritInteger (obj, "dvb-transmission");
     int h = var_InheritInteger (obj, "dvb-hierarchy");
 
     int ret = dvb_set_dvbt (dev, freq, mod, fec_hp, fec_lp, bw, tx, guard, h);
-    free (fec_lp);
-    free (fec_hp);
     free (mod);
     return ret;
 }
