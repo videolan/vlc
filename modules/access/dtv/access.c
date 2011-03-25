@@ -222,7 +222,7 @@ vlc_module_begin ()
         change_safe ()
 
     set_section (N_("Terrestrial reception parameters"), NULL)
-    add_integer ("dvb-bandwidth", -1, BANDWIDTH_TEXT, BANDWIDTH_TEXT, true)
+    add_integer ("dvb-bandwidth", 0, BANDWIDTH_TEXT, BANDWIDTH_TEXT, true)
         change_integer_list (bandwidth_vlc, bandwidth_user)
         change_safe ()
     add_string ("dvb-code-rate-hp", "",
