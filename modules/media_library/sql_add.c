@@ -258,7 +258,7 @@ int AddPeople( media_library_t *p_ml, const char *psz_name,
 int AddInputItem( media_library_t *p_ml, input_item_t *p_input )
 {
     assert( p_ml );
-    if( !p_input )
+    if( !p_input || !p_input->psz_uri )
         return VLC_EGENERIC;
     int i_ret = VLC_SUCCESS;
 
