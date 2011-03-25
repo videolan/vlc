@@ -667,7 +667,6 @@ static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
     char *fec = var_InheritCodeRate (obj);
     uint32_t srate = var_InheritInteger (obj, "dvb-srate");
 
-    /* FIXME: adjust frequency (offset) */
     int ret = dvb_set_dvbs (dev, freq, srate, fec);
     free (fec);
     if (ret == 0)
@@ -683,7 +682,6 @@ static int dvbs2_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
     int pilot = var_InheritInteger (obj, "dvb-pilot");
     int rolloff = var_InheritInteger (obj, "dvb-rolloff");
 
-    /* FIXME: adjust frequency (offset)? */
     int ret = dvb_set_dvbs2 (dev, freq, mod, srate, fec, pilot, rolloff);
     free (fec);
     free (mod);
