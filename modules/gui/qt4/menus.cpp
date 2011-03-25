@@ -333,9 +333,6 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
     QMenu *menu = new QMenu( parent );
     QAction *action;
 
-    addDPStaticEntry( menu, qtr( "&Open (advanced)..." ),
-        ":/type/file-asym", SLOT( openFileDialog() ), "Ctrl+Shift+O" );
-    menu->addSeparator();
     addDPStaticEntry( menu, qtr( "Open &File..." ),
         ":/type/file-asym", SLOT( simpleOpenDialog() ), "Ctrl+O" );
     addDPStaticEntry( menu, qtr( I_OP_OPDIR ),
@@ -348,6 +345,11 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
         ":/type/capture-card", SLOT( openCaptureDialog() ), "Ctrl+C" );
 
     menu->addSeparator();
+
+    addDPStaticEntry( menu, qtr( "&Open (advanced)..." ),
+        ":/type/file-asym", SLOT( openFileDialog() ), "Ctrl+Shift+O" );
+    menu->addSeparator();
+
     addDPStaticEntry( menu, qtr( "Open &Location from clipboard" ),
                       NULL, SLOT( openUrlDialog() ), "Ctrl+V" );
 
