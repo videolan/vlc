@@ -712,19 +712,19 @@ static int dvb_parse_transmit_mode (int i)
                           TRANSMISSION_MODE_AUTO);
 }
 
-static int dvb_parse_guard (const char *str)
+static int dvb_parse_guard (uint32_t guard)
 {
-    static const dvb_str_map_t tab[] = {
-        { "",       GUARD_INTERVAL_AUTO },
-      /*{ "1/128",  GUARD_INTERVAL_1_128 },*/
-        { "1/16",   GUARD_INTERVAL_1_16 },
-        { "1/32",   GUARD_INTERVAL_1_32 },
-        { "1/4",    GUARD_INTERVAL_1_4 },
-        { "1/8",    GUARD_INTERVAL_1_8 },
-      /*{ "19/128", GUARD_INTERVAL_19_128 },*/
-      /*{ "9/256",  GUARD_INTERVAL_9_256 },*/
+    static const dvb_int_map_t tab[] = {
+      /*{ VLC_GUARD(1,128),  GUARD_INTERVAL_1_128 },*/
+        { VLC_GUARD(1,16),   GUARD_INTERVAL_1_16 },
+        { VLC_GUARD(1,32),   GUARD_INTERVAL_1_32 },
+        { VLC_GUARD(1,4),    GUARD_INTERVAL_1_4 },
+        { VLC_GUARD(1,8),    GUARD_INTERVAL_1_8 },
+      /*{ VLC_GUARD(19,128), GUARD_INTERVAL_19_128 },*/
+      /*{ VLC_GUARD(9,256),  GUARD_INTERVAL_9_256 },*/
+        { VLC_GUARD_AUTO,    GUARD_INTERVAL_AUTO },
     };
-    return dvb_parse_str (str, tab, sizeof (tab) / sizeof (*tab),
+    return dvb_parse_int (guard, tab, sizeof (tab) / sizeof (*tab),
                           GUARD_INTERVAL_AUTO);
 }
 
@@ -743,22 +743,22 @@ static int dvb_parse_hierarchy (int i)
 
 int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char *modstr,
                   const char *fechstr, const char *feclstr, uint32_t bandwidth,
-                  int transmit_val, const char *guardstr, int hierarchy_val)
+                  int transmit_mode, uint32_t guard, int hierarchy)
 {
     uint32_t mod = dvb_parse_modulation (modstr, QAM_AUTO);
     uint32_t fec_hp = dvb_parse_fec (fechstr);
     uint32_t fec_lp = dvb_parse_fec (feclstr);
     bandwidth *= 1000000;
-    uint32_t transmit_mode = dvb_parse_transmit_mode (transmit_val);
-    uint32_t guard_it = dvb_parse_guard (guardstr);
-    uint32_t hierarchy = dvb_parse_hierarchy (hierarchy_val);
+    transmit_mode = dvb_parse_transmit_mode (transmit_mode);
+    guard = dvb_parse_guard (guard);
+    hierarchy = dvb_parse_hierarchy (hierarchy);
 
     return dvb_set_props (d, 10, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBT,
                           DTV_FREQUENCY, freq * 1000, DTV_MODULATION, mod,
                           DTV_CODE_RATE_HP, fec_hp, DTV_CODE_RATE_LP, fec_lp,
                           DTV_BANDWIDTH_HZ, bandwidth,
                           DTV_TRANSMISSION_MODE, transmit_mode,
-                          DTV_GUARD_INTERVAL, guard_it,
+                          DTV_GUARD_INTERVAL, guard,
                           DTV_HIERARCHY, hierarchy);
 }
 

@@ -583,6 +583,31 @@ static char *var_InheritModulation (vlc_object_t *obj)
     return strdup (str);
 }
 
+static unsigned var_InheritGuardInterval (vlc_object_t *obj)
+{
+    char *guard = var_InheritString (obj, "dvb-guard");
+    if (guard == NULL)
+        return VLC_GUARD_AUTO;
+
+    uint16_t a, b;
+    int v = sscanf (guard, "%"SCNu16"/%"SCNu16, &a, &b);
+    free (guard);
+    switch (v)
+    {
+        case 1:
+            /* Backward compatibility with VLC < 1.2 */
+            if (a == 0)
+                break;
+            msg_Warn (obj, "\"guard=%"PRIu16"\" option is obsolete. "
+                           "Use \"guard=1/%"PRIu16" instead.", a, a);
+            b = a;
+            a = 1;
+        case 2:
+            return VLC_GUARD(a, b);
+    }
+    return VLC_GUARD_AUTO;
+}
+
 
 /*** ATSC ***/
 static int atsc_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
@@ -700,13 +725,12 @@ static int dvbt_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
     char *mod = var_InheritModulation (obj);
     char *fec_hp = var_InheritString (obj, "dvb-code-rate-hp");
     char *fec_lp = var_InheritString (obj, "dvb-code-rate-lp");
-    char *guard = var_InheritString (obj, "dvb-guard");
+    uint32_t guard = var_InheritGuardInterval (obj);
     uint32_t bw = var_InheritInteger (obj, "dvb-bandwidth");
     int tx = var_InheritInteger (obj, "dvb-transmission");
     int h = var_InheritInteger (obj, "dvb-hierarchy");
 
     int ret = dvb_set_dvbt (dev, freq, mod, fec_hp, fec_lp, bw, tx, guard, h);
-    free (guard);
     free (fec_lp);
     free (fec_hp);
     free (mod);

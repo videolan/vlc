@@ -40,6 +40,9 @@ float dvb_get_snr (dvb_device_t *);
 int dvb_set_inversion (dvb_device_t *, int);
 int dvb_tune (dvb_device_t *);
 
+#define VLC_GUARD(a,b) (((a) << 16u) | (b))
+#define VLC_GUARD_AUTO 0xFFFFFFFF
+
 /* DVB-C */
 int dvb_set_dvbc (dvb_device_t *, uint32_t freq, const char *mod,
                   uint32_t srate, const char *fec);
@@ -55,7 +58,7 @@ int dvb_set_sec (dvb_device_t *, uint32_t freq, char pol,
 /* DVB-T */
 int dvb_set_dvbt (dvb_device_t *, uint32_t freq, const char *mod,
                   const char *fec_hp, const char *fec_lp, uint32_t bandwidth,
-                  int transmission, const char *guard, int hierarchy);
+                  int transmission, uint32_t guard, int hierarchy);
 
 /* ATSC */
 int dvb_set_atsc (dvb_device_t *, uint32_t freq, const char *mod);
