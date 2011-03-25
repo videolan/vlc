@@ -691,7 +691,9 @@ static int dvb_parse_transmit_mode (int i)
     static const dvb_int_map_t tab[] = {
         { -1, TRANSMISSION_MODE_AUTO },
         {  2, TRANSMISSION_MODE_2K   },
+#if DVBv5(1)
         {  4, TRANSMISSION_MODE_4K   },
+#endif
         {  8, TRANSMISSION_MODE_8K   },
 #if 0
         { 16, TRANSMISSION_MODE_16K  },
