@@ -142,6 +142,11 @@ static int Open( vlc_object_t *p_this )
     if( ParseMRL( p_access ) )
     {
         free( p_sys );
+        var_Destroy( p_access, "dvb-modulation" );
+        var_Destroy( p_access, "dvb-fec" );
+        var_Destroy( p_access, "dvb-code-rate-hp" );
+        var_Destroy( p_access, "dvb-code-rate-lp" );
+        var_Destroy( p_access, "dvb-guard" );
         return VLC_EGENERIC;
     }
 
@@ -487,6 +492,12 @@ static void FilterUnset( access_t *p_access, int i_max )
  *****************************************************************************/
 static void VarInit( access_t *p_access )
 {
+    var_Destroy( p_access, "dvb-modulation" );
+    var_Destroy( p_access, "dvb-fec" );
+    var_Destroy( p_access, "dvb-code-rate-hp" );
+    var_Destroy( p_access, "dvb-code-rate-lp" );
+    var_Destroy( p_access, "dvb-guard" );
+
     /* */
     var_Create( p_access, "dvb-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
