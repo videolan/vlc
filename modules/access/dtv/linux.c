@@ -32,6 +32,7 @@
 #include <poll.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <linux/dvb/version.h>
 #include <linux/dvb/frontend.h>
 #include <linux/dvb/dmx.h>
 
@@ -39,6 +40,13 @@
 
 #ifndef O_SEARCH
 # define O_SEARCH O_RDONLY
+#endif
+
+#define DVBv5(minor) \
+        (DVB_API_VERSION > 5 \
+     || (DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= (minor)))
+#if !DVBv5(0)
+# error Linux DVB kernel headers version 2.6.28 or later required.
 #endif
 
 /** Opens the device directory for the specified DVB adapter */
