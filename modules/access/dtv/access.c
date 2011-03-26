@@ -289,9 +289,9 @@ vlc_module_begin ()
 #ifdef __linux
     add_integer ("dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT, true)
         change_integer_list (satno_vlc, satno_user)
-#endif
     add_integer ("dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT, true)
         change_integer_list (auto_off_on_vlc, auto_off_on_user)
+#endif
 vlc_module_end ()
 
 struct access_sys_t
