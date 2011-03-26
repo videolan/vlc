@@ -4,12 +4,12 @@
 LIBTOOL=@LIBTOOL@ --tag=CC
 
 BASE_SUBDIRS = dvb mms rtp rtsp vcd vcdx screen bd zip
-EXTRA_SUBDIRS = bda dshow
+EXTRA_SUBDIRS = dshow
 SUBDIRS = $(BASE_SUBDIRS)
 DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 
 if HAVE_WIN32
-SUBDIRS += bda dshow
+SUBDIRS += dshow
 endif
 
 libfilesystem_plugin_la_SOURCES = \
@@ -116,17 +116,36 @@ if HAVE_XCB
 libvlc_LTLIBRARIES += libxcb_screen_plugin.la
 endif
 
-# Digital TV
+
+### Digital TV ###
+
 libdtv_plugin_la_SOURCES = \
 	dtv/dtv.h \
 	dtv/access.c
 libdtv_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdtv_plugin_la_LIBADD = $(AM_LIBADD)
 libdtv_plugin_la_DEPENDENCIES =
+
 if HAVE_LINUX
 libdtv_plugin_la_SOURCES += dtv/linux.c
 libvlc_LTLIBRARIES += libdtv_plugin.la
 endif
+
+if HAVE_WIN32
+# Work-around automake bug:
+# Use an import library for C++ to retain C linker on other platforms.
+libbda_la_SOURCES = dtv/bdadefs.h dtv/bdagraph.cpp dtv/bdagraph.hpp
+libbda_la_CXXFLAGS = $(AM_CXXFLAGS)
+libbda_la_LDFLAGS = -static
+libbda_la_LIBADD = -lstrmiids -lole32 -loleaut32 -luuid
+noinst_LTLIBRARIES = libbda.la
+
+libdtv_plugin_la_DEPENDENCIES += libbda.la
+libdtv_plugin_la_LIBADD += libbda.la -lstdc++
+libvlc_LTLIBRARIES += libdtv_plugin.la
+endif
+
+
 
 EXTRA_LTLIBRARIES += \
 	libaccess_rtmp_plugin.la \

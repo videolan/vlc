@@ -1,7 +1,8 @@
 /*****************************************************************************
  * bdagraph.cpp : DirectShow BDA graph for vlc
  *****************************************************************************
- * Copyright( C ) 2007 the VideoLAN team
+ * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2011 Rémi Denis-Courmont
  *
  * Author: Ken Self <kenself(at)optusnet(dot)com(dot)au>
  *
@@ -23,82 +24,251 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "bdagraph.h"
-#include <ctype.h>
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
+#include <vlc_common.h>
+#include <vlc_block.h>
+#include "dtv/bdagraph.hpp"
+#include "dtv/dtv.h"
+
+
+static ModulationType dvb_parse_modulation (const char *mod)
+{
+    if (!strcmp (mod, "16QAM"))   return BDA_MOD_16QAM;
+    if (!strcmp (mod, "32QAM"))   return BDA_MOD_32QAM;
+    if (!strcmp (mod, "64QAM"))   return BDA_MOD_64QAM;
+    if (!strcmp (mod, "128QAM"))  return BDA_MOD_128QAM;
+    if (!strcmp (mod, "256QAM"))  return BDA_MOD_256QAM;
+    return BDA_MOD_NOT_SET;
+}
+
+static BinaryConvolutionCodeRate dvb_parse_fec (uint32_t fec)
+{
+    switch (fec)
+    {
+        case VLC_FEC(1,2): return BDA_BCC_RATE_1_2;
+        case VLC_FEC(2,3): return BDA_BCC_RATE_2_3;
+        case VLC_FEC(3,4): return BDA_BCC_RATE_3_4;
+        case VLC_FEC(5,6): return BDA_BCC_RATE_5_6;
+        case VLC_FEC(7,8): return BDA_BCC_RATE_7_8;
+    }
+    return BDA_BCC_RATE_NOT_SET;
+}
+
+static GuardInterval dvb_parse_guard (uint32_t guard)
+{
+    switch (guard)
+    {
+        case VLC_GUARD(1, 4): return BDA_GUARD_1_4;
+        case VLC_GUARD(1, 8): return BDA_GUARD_1_8;
+        case VLC_GUARD(1,16): return BDA_GUARD_1_16;
+        case VLC_GUARD(1,32): return BDA_GUARD_1_32;
+    }
+    return BDA_GUARD_NOT_SET;
+}
+
+static TransmissionMode dvb_parse_transmission (int transmit)
+{
+    switch (transmit)
+    {
+        case 2: return BDA_XMIT_MODE_2K;
+        case 8: return BDA_XMIT_MODE_8K;
+    }
+    return BDA_XMIT_MODE_NOT_SET;
+}
+
+static HierarchyAlpha dvb_parse_hierarchy (int hierarchy)
+{
+    switch (hierarchy)
+    {
+        case 1: return BDA_HALPHA_1;
+        case 2: return BDA_HALPHA_2;
+        case 4: return BDA_HALPHA_4;
+    }
+    return BDA_HALPHA_NOT_SET;
+}
+
+static Polarisation dvb_parse_polarization (char pol)
+{
+    switch (pol)
+    {
+        case 'H': return BDA_POLARISATION_LINEAR_H;
+        case 'V': return BDA_POLARISATION_LINEAR_V;
+        case 'L': return BDA_POLARISATION_CIRCULAR_L;
+        case 'R': return BDA_POLARISATION_CIRCULAR_R;
+    }
+    return BDA_POLARISATION_NOT_SET;
+}
+
+static SpectralInversion dvb_parse_inversion (int inversion)
+{
+    switch (inversion)
+    {
+        case  0: return BDA_SPECTRAL_INVERSION_NORMAL;
+        case  1: return BDA_SPECTRAL_INVERSION_INVERTED;
+        case -1: return BDA_SPECTRAL_INVERSION_AUTOMATIC;
+    }
+    /* should never happen */
+    return BDA_SPECTRAL_INVERSION_NOT_SET;
+}
 
 /****************************************************************************
  * Interfaces for calls from C
  ****************************************************************************/
-extern "C" {
+struct dvb_device
+{
+    BDAGraph *module;
 
-    void dvb_newBDAGraph( access_t* p_access )
-    {
-        p_access->p_sys->p_bda_module = new BDAGraph( p_access );
-    };
-
-    void dvb_deleteBDAGraph( access_t* p_access )
-    {
-        delete p_access->p_sys->p_bda_module;
-    };
-
-    int dvb_SubmitCQAMTuneRequest( access_t* p_access )
-    {
-        if( p_access->p_sys->p_bda_module )
-            return p_access->p_sys->p_bda_module->SubmitCQAMTuneRequest();
-        return VLC_EGENERIC;
-    };
-
-    int dvb_SubmitATSCTuneRequest( access_t* p_access )
-    {
-        if( p_access->p_sys->p_bda_module )
-            return p_access->p_sys->p_bda_module->SubmitATSCTuneRequest();
-        return VLC_EGENERIC;
-    };
-
-    int dvb_SubmitDVBTTuneRequest( access_t* p_access )
-    {
-        if( p_access->p_sys->p_bda_module )
-            return p_access->p_sys->p_bda_module->SubmitDVBTTuneRequest();
-        return VLC_EGENERIC;
-    };
-
-    int dvb_SubmitDVBCTuneRequest( access_t* p_access )
-    {
-        if( p_access->p_sys->p_bda_module )
-            return p_access->p_sys->p_bda_module->SubmitDVBCTuneRequest();
-        return VLC_EGENERIC;
-    };
-
-    int dvb_SubmitDVBSTuneRequest( access_t* p_access )
-    {
-        if( p_access->p_sys->p_bda_module )
-            return p_access->p_sys->p_bda_module->SubmitDVBSTuneRequest();
-        return VLC_EGENERIC;
-    };
-
-    block_t *dvb_Pop( access_t* p_access )
-    {
-        if( p_access->p_sys->p_bda_module )
-            return p_access->p_sys->p_bda_module->Pop();
-        return NULL;
-    };
+    /* DVB-S property cache */
+    uint32_t frequency;
+    uint32_t srate;
+    uint32_t fec;
+    char inversion;
+    char pol;
+    uint32_t lowf, highf, switchf;
 };
+
+dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
+{
+    if (!tune)
+        return NULL; /* not implemented (yet?) */
+
+    dvb_device_t *d = new dvb_device_t;
+
+    d->module = new BDAGraph (obj);
+    d->frequency = 0;
+    d->srate = 0;
+    d->fec = VLC_FEC_AUTO;
+    d->inversion = -1;
+    d->pol = 0;
+    d->lowf = d->highf = d->switchf = 0;
+    return d;
+}
+
+void dvb_close (dvb_device_t *d)
+{
+    delete d->module;
+    delete d;
+}
+
+ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len)
+{
+    return d->module->Pop(buf, len);
+}
+
+int dvb_add_pid (dvb_device_t *, uint16_t)
+{
+    return 0;
+}
+
+void dvb_remove_pid (dvb_device_t *, uint16_t)
+{
+}
+
+const delsys_t *dvb_guess_system (dvb_device_t *d)
+{
+    return NULL;
+}
+
+float dvb_get_signal_strength (dvb_device_t *)
+{
+    return 0.;
+}
+
+float dvb_get_snr (dvb_device_t *)
+{
+    return 0.;
+}
+
+int dvb_set_inversion (dvb_device_t *d, int inversion)
+{
+    d->inversion = inversion;
+    if (d->frequency == 0)
+        return 0; /* not DVB-S */
+    return d->module->SetDVBS(d->frequency, d->srate, d->fec, d->inversion,
+                              d->pol, d->lowf, d->highf, d->switchf);
+}
+
+int dvb_tune (dvb_device_t *d)
+{
+    return d->module->SubmitTuneRequest ();
+}
+
+/* DVB-C */
+int dvb_set_dvbc (dvb_device_t *d, uint32_t freq, const char *mod,
+                  uint32_t srate, uint32_t fec)
+{
+    return d->module->SetDVBC (freq, mod, srate);
+}
+
+/* DVB-S */
+int dvb_set_dvbs (dvb_device_t *d, uint32_t freq, uint32_t srate, uint32_t fec)
+{
+    d->frequency = freq;
+    d->srate = srate;
+    d->fec = fec;
+    return d->module->SetDVBS(d->frequency, d->srate, d->fec, d->inversion,
+                              d->pol, d->lowf, d->highf, d->switchf);
+}
+
+int dvb_set_dvbs2 (dvb_device_t *d, uint32_t freq, const char *mod,
+                   uint32_t srate, uint32_t fec, int pilot, int rolloff)
+{
+    return VLC_EGENERIC;
+}
+
+int dvb_set_sec (dvb_device_t *d, uint32_t freq, char pol,
+                 uint32_t lowf, uint32_t highf, uint32_t switchf)
+{
+    d->frequency = freq;
+    d->pol = pol;
+    d->lowf = lowf;
+    d->highf = highf;
+    d->switchf = switchf;
+    return d->module->SetDVBS(d->frequency, d->srate, d->fec, d->inversion,
+                              d->pol, d->lowf, d->highf, d->switchf);
+}
+
+/* DVB-T */
+int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char *mod,
+                  uint32_t fec_hp, uint32_t fec_lp, uint32_t bandwidth,
+                  int transmission, uint32_t guard, int hierarchy)
+{
+    return d->module->SetDVBT(freq, fec_hp, fec_lp,
+                              bandwidth, transmission, guard, hierarchy);
+}
+
+/* ATSC */
+int dvb_set_atsc (dvb_device_t *d, uint32_t freq, const char *mod)
+{
+    return d->module->SetATSC(freq);
+}
+
+int dvb_set_cqam (dvb_device_t *d, uint32_t freq, const char *mod)
+{
+    return d->module->SetCQAM(freq);
+}
+
 
 /*****************************************************************************
 * BDAOutput
 *****************************************************************************/
-BDAOutput::BDAOutput( access_t *p_access ) :
+BDAOutput::BDAOutput( vlc_object_t *p_access ) :
     p_access(p_access), p_first(NULL), pp_next(&p_first)
 {
     vlc_mutex_init( &lock );
     vlc_cond_init( &wait );
 }
+
 BDAOutput::~BDAOutput()
 {
     Empty();
     vlc_mutex_destroy( &lock );
     vlc_cond_destroy( &wait );
 }
+
 void BDAOutput::Push( block_t *p_block )
 {
     vlc_mutex_locker l( &lock );
@@ -106,20 +276,33 @@ void BDAOutput::Push( block_t *p_block )
     block_ChainLastAppend( &pp_next, p_block );
     vlc_cond_signal( &wait );
 }
-block_t *BDAOutput::Pop()
+
+ssize_t BDAOutput::Pop(void *buf, size_t len)
 {
-    vlc_mutex_locker l( &lock );
+    block_t *block;
+    {
+        vlc_mutex_locker l( &lock );
 
-    if( !p_first )
-        vlc_cond_timedwait( &wait, &lock, mdate() + 250*1000 );
+        if( !p_first )
+            vlc_cond_timedwait( &wait, &lock, mdate() + 250*1000 );
 
-    block_t *p_ret = p_first;
+        block = p_first;
+        p_first = NULL;
+        pp_next = &p_first;
+    }
 
-    p_first = NULL;
-    pp_next = &p_first;
+    if(block == NULL)
+        return -1;
 
-    return p_ret;
+    if(len < block->i_buffer)
+        msg_Err(p_access, "buffer overflow!");
+    else
+        len = block->i_buffer;
+    vlc_memcpy(buf, block->p_buffer, len);
+    block_Release(block);
+    return len;
 }
+
 void BDAOutput::Empty()
 {
     vlc_mutex_locker l( &lock );
@@ -133,7 +316,7 @@ void BDAOutput::Empty()
 /*****************************************************************************
 * Constructor
 *****************************************************************************/
-BDAGraph::BDAGraph( access_t* p_this ):
+BDAGraph::BDAGraph( vlc_object_t *p_this ):
     p_access( p_this ),
     guid_network_type(GUID_NULL),
     l_tuner_used(-1),
@@ -164,10 +347,34 @@ BDAGraph::~BDAGraph()
     CoUninitialize();
 }
 
+
+int BDAGraph::SubmitTuneRequest(void)
+{
+    HRESULT hr;
+
+    /* Build and Run the Graph. If a Tuner device is in use the graph will
+     * fail to run. Repeated calls to build will check successive tuner
+     * devices */
+    do
+    {
+        hr = Build();
+        if( FAILED( hr ) )
+        {
+            msg_Warn( p_access, "SubmitTuneRequest: "
+                      "Cannot Build the Graph: hr=0x%8lx", hr );
+            return VLC_EGENERIC;
+        }
+        hr = Start();
+    }
+    while( hr != S_OK );
+
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
-* Submit an Clear QAM Tune Request (US Cable Shit)
+* Set clear QAM (US cable)
 *****************************************************************************/
-int BDAGraph::SubmitCQAMTuneRequest()
+int BDAGraph::SetCQAM(long l_frequency)
 {
     HRESULT hr = S_OK;
     class localComPtr
@@ -184,18 +391,17 @@ int BDAGraph::SubmitCQAMTuneRequest()
                 p_cqam_locator->Release();
         }
     } l;
-    long l_minor_channel, l_physical_channel, l_frequency;
+    long l_minor_channel, l_physical_channel;
 
     l_physical_channel = var_GetInteger( p_access, "dvb-physical-channel" );
     l_minor_channel    = var_GetInteger( p_access, "dvb-minor-channel" );
-    l_frequency        = var_GetInteger( p_access, "dvb-frequency" );
 
     guid_network_type = CLSID_DigitalCableNetworkType;
     hr = CreateTuneRequest();
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
-            "Cannot create Tuning Space: hr=0x%8lx", hr );
+                 "Cannot create Tuning Space: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
@@ -204,7 +410,7 @@ int BDAGraph::SubmitCQAMTuneRequest()
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
-            "Cannot QI for IDigitalCableTuneRequest: hr=0x%8lx", hr );
+                  "Cannot QI for IDigitalCableTuneRequest: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
     hr = ::CoCreateInstance( CLSID_DigitalCableLocator, 0, CLSCTX_INPROC,
@@ -212,7 +418,7 @@ int BDAGraph::SubmitCQAMTuneRequest()
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
-            "Cannot create the CQAM locator: hr=0x%8lx", hr );
+                  "Cannot create the CQAM locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
@@ -226,7 +432,7 @@ int BDAGraph::SubmitCQAMTuneRequest()
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
-            "Cannot set tuning parameters: hr=0x%8lx", hr );
+                 "Cannot set tuning parameters: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
 
@@ -234,33 +440,17 @@ int BDAGraph::SubmitCQAMTuneRequest()
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
-            "Cannot put the locator: hr=0x%8lx", hr );
+                  "Cannot put the locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
-
-    /* Build and Run the Graph. If a Tuner device is in use the graph will
-     * fail to run. Repeated calls to build will check successive tuner
-     * devices */
-    do
-    {
-        hr = Build();
-        if( FAILED( hr ) )
-        {
-            msg_Warn( p_access, "SubmitCQAMTuneRequest: "\
-                "Cannot Build the Graph: hr=0x%8lx", hr );
-            return VLC_EGENERIC;
-        }
-        hr = Start();
-    }
-    while( hr != S_OK );
 
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
-* Submit an ATSC Tune Request
+* Set ATSC
 *****************************************************************************/
-int BDAGraph::SubmitATSCTuneRequest()
+int BDAGraph::SetATSC(long l_frequency)
 {
     HRESULT hr = S_OK;
     class localComPtr
@@ -278,12 +468,10 @@ int BDAGraph::SubmitATSCTuneRequest()
         }
     } l;
     long l_major_channel, l_minor_channel, l_physical_channel;
-    long l_frequency;
 
     l_major_channel     = var_GetInteger( p_access, "dvb-major-channel" );
     l_minor_channel     = var_GetInteger( p_access, "dvb-minor-channel" );
     l_physical_channel  = var_GetInteger( p_access, "dvb-physical-channel" );
-    l_frequency         = var_GetInteger( p_access, "dvb-frequency" );
 
     guid_network_type = CLSID_ATSCNetworkProvider;
     hr = CreateTuneRequest();
@@ -334,30 +522,14 @@ int BDAGraph::SubmitATSCTuneRequest()
             "Cannot put the locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
-
-    /* Build and Run the Graph. If a Tuner device is in use the graph will
-     * fail to run. Repeated calls to build will check successive tuner
-     * devices */
-    do
-    {
-        hr = Build();
-        if( FAILED( hr ) )
-        {
-            msg_Warn( p_access, "SubmitATSCTuneRequest: "\
-                "Cannot Build the Graph: hr=0x%8lx", hr );
-            return VLC_EGENERIC;
-        }
-        hr = Start();
-    }
-    while( hr != S_OK );
-
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
-* Submit a DVB-T Tune Request
+* Set DVB-T
 ******************************************************************************/
-int BDAGraph::SubmitDVBTTuneRequest()
+int BDAGraph::SetDVBT(long l_frequency, uint32_t fec_hp, uint32_t fec_lp,
+    long l_bandwidth, int transmission, uint32_t guard, int hierarchy)
 {
     HRESULT hr = S_OK;
     class localComPtr
@@ -378,88 +550,12 @@ int BDAGraph::SubmitDVBTTuneRequest()
                 p_dvb_tuning_space->Release();
         }
     } l;
-    long l_frequency, l_bandwidth, l_hp_fec, l_lp_fec, l_guard;
-    long l_transmission, l_hierarchy;
-    BinaryConvolutionCodeRate i_hp_fec, i_lp_fec;
-    GuardInterval             i_guard;
-    TransmissionMode          i_transmission;
-    HierarchyAlpha            i_hierarchy;
 
-    l_frequency    = var_GetInteger( p_access, "dvb-frequency" ) / 1000;
-    l_bandwidth    = var_GetInteger( p_access, "dvb-bandwidth" );
-    l_hp_fec       = var_GetInteger( p_access, "dvb-code-rate-hp" );
-    l_lp_fec       = var_GetInteger( p_access, "dvb-code-rate-lp" );
-    l_guard        = var_GetInteger( p_access, "dvb-guard" );
-    l_transmission = var_GetInteger( p_access, "dvb-transmission" );
-    l_hierarchy    = var_GetInteger( p_access, "dvb-hierarchy" );
-
-    switch( l_hp_fec )
-    {
-    case 1:
-        i_hp_fec = BDA_BCC_RATE_1_2; break;
-    case 2:
-        i_hp_fec = BDA_BCC_RATE_2_3; break;
-    case 3:
-        i_hp_fec = BDA_BCC_RATE_3_4; break;
-    case 4:
-        i_hp_fec = BDA_BCC_RATE_5_6; break;
-    case 5:
-        i_hp_fec = BDA_BCC_RATE_7_8;break;
-    default:
-        i_hp_fec = BDA_BCC_RATE_NOT_SET;
-    }
-
-    switch( l_lp_fec )
-    {
-    case 1:
-        i_lp_fec = BDA_BCC_RATE_1_2; break;
-    case 2:
-        i_lp_fec = BDA_BCC_RATE_2_3; break;
-    case 3:
-        i_lp_fec = BDA_BCC_RATE_3_4; break;
-    case 4:
-        i_lp_fec = BDA_BCC_RATE_5_6; break;
-    case 5:
-        i_lp_fec = BDA_BCC_RATE_7_8; break;
-    default:
-        i_lp_fec = BDA_BCC_RATE_NOT_SET;
-    }
-
-    switch( l_guard )
-    {
-    case 32:
-        i_guard = BDA_GUARD_1_32; break;
-    case 16:
-        i_guard = BDA_GUARD_1_16; break;
-    case 8:
-        i_guard = BDA_GUARD_1_8; break;
-    case 4:
-        i_guard = BDA_GUARD_1_4; break;
-    default:
-        i_guard = BDA_GUARD_NOT_SET;
-    }
-
-    switch( l_transmission )
-    {
-    case 2:
-        i_transmission = BDA_XMIT_MODE_2K; break;
-    case 8:
-        i_transmission = BDA_XMIT_MODE_8K; break;
-    default:
-        i_transmission = BDA_XMIT_MODE_NOT_SET;
-    }
-
-    switch( l_hierarchy )
-    {
-    case 1:
-        i_hierarchy = BDA_HALPHA_1; break;
-    case 2:
-        i_hierarchy = BDA_HALPHA_2; break;
-    case 4:
-        i_hierarchy = BDA_HALPHA_4; break;
-    default:
-        i_hierarchy = BDA_HALPHA_NOT_SET;
-    }
+    BinaryConvolutionCodeRate i_hp_fec = dvb_parse_fec(fec_hp);
+    BinaryConvolutionCodeRate i_lp_fec = dvb_parse_fec(fec_lp);
+    GuardInterval i_guard = dvb_parse_guard(guard);
+    TransmissionMode i_transmission = dvb_parse_transmission(transmission);
+    HierarchyAlpha i_hierarchy = dvb_parse_hierarchy(hierarchy);
 
     guid_network_type = CLSID_DVBTNetworkProvider;
     hr = CreateTuneRequest();
@@ -531,29 +627,13 @@ int BDAGraph::SubmitDVBTTuneRequest()
         return VLC_EGENERIC;
     }
 
-    /* Build and Run the Graph. If a Tuner device is in use the graph will
-     * fail to run. Repeated calls to build will check successive tuner
-     * devices */
-    do
-    {
-        hr = Build();
-        if( FAILED( hr ) )
-        {
-            msg_Warn( p_access, "SubmitDVBTTuneRequest: "\
-                "Cannot Build the Graph: hr=0x%8lx", hr );
-            return VLC_EGENERIC;
-        }
-        hr = Start();
-    }
-    while( hr != S_OK );
-
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
-* Submit a DVB-C Tune Request
+* Set DVB-C
 ******************************************************************************/
-int BDAGraph::SubmitDVBCTuneRequest()
+int BDAGraph::SetDVBC(long l_frequency, const char *mod, long l_symbolrate)
 {
     HRESULT hr = S_OK;
 
@@ -577,29 +657,7 @@ int BDAGraph::SubmitDVBCTuneRequest()
         }
     } l;
 
-    long l_frequency, l_symbolrate;
-    int  i_qam;
-    ModulationType i_qam_mod;
-
-    l_frequency  = var_GetInteger( p_access, "dvb-frequency" ) / 1000;
-    l_symbolrate = var_GetInteger( p_access, "dvb-srate" );
-    i_qam        = var_GetInteger( p_access, "dvb-modulation" );
-
-    switch( i_qam )
-    {
-    case 16:
-        i_qam_mod = BDA_MOD_16QAM; break;
-    case 32:
-        i_qam_mod = BDA_MOD_32QAM; break;
-    case 64:
-        i_qam_mod = BDA_MOD_64QAM; break;
-    case 128:
-        i_qam_mod = BDA_MOD_128QAM; break;
-    case 256:
-        i_qam_mod = BDA_MOD_256QAM; break;
-    default:
-        i_qam_mod = BDA_MOD_NOT_SET;
-    }
+    ModulationType i_qam_mod = dvb_parse_modulation(mod);
 
     guid_network_type = CLSID_DVBCNetworkProvider;
     hr = CreateTuneRequest();
@@ -664,29 +722,15 @@ int BDAGraph::SubmitDVBCTuneRequest()
         return VLC_EGENERIC;
     }
 
-    /* Build and Run the Graph. If a Tuner device is in use the graph will
-     * fail to run. Repeated calls to build will check successive tuner
-     * devices */
-    do
-    {
-        hr = Build();
-        if( FAILED( hr ) )
-        {
-            msg_Warn( p_access, "SubmitDVBCTuneRequest: "\
-                "Cannot Build the Graph: hr=0x%8lx", hr );
-            return VLC_EGENERIC;
-        }
-        hr = Start();
-    }
-    while( hr != S_OK );
-
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
-* Submit a DVB-S Tune Request
+* Set DVB-S
 ******************************************************************************/
-int BDAGraph::SubmitDVBSTuneRequest()
+int BDAGraph::SetDVBS(long l_frequency, long l_symbolrate, uint32_t fec,
+                      int inversion, char pol,
+                      long l_lnb_lof1, long l_lnb_lof2, long l_lnb_slof)
 {
     HRESULT hr = S_OK;
 
@@ -719,95 +763,24 @@ int BDAGraph::SubmitDVBSTuneRequest()
             free( psz_polarisation );
         }
     } l;
-    long l_frequency, l_symbolrate, l_azimuth, l_elevation, l_longitude;
-    long l_lnb_lof1, l_lnb_lof2, l_lnb_slof, l_inversion, l_network_id;
-    long l_hp_fec;
-    int  i_mod;
-    Polarisation i_polar;
-    SpectralInversion i_inversion;
+    long l_azimuth, l_elevation, l_longitude;
+    long l_network_id;
     VARIANT_BOOL b_west;
-    BinaryConvolutionCodeRate i_hp_fec;
-    ModulationType i_mod_typ;
 
-    l_frequency        = var_GetInteger( p_access, "dvb-frequency" );
-    l_symbolrate       = var_GetInteger( p_access, "dvb-srate" );
+    BinaryConvolutionCodeRate i_hp_fec = dvb_parse_fec( fec );
+    Polarisation i_polar = dvb_parse_polarization( pol );
+    SpectralInversion i_inversion = dvb_parse_inversion( inversion );
+
     l_azimuth          = var_GetInteger( p_access, "dvb-azimuth" );
     l_elevation        = var_GetInteger( p_access, "dvb-elevation" );
     l_longitude        = var_GetInteger( p_access, "dvb-longitude" );
-    l_lnb_lof1         = var_GetInteger( p_access, "dvb-lnb-lof1" );
-    l_lnb_lof2         = var_GetInteger( p_access, "dvb-lnb-lof2" );
-    l_lnb_slof         = var_GetInteger( p_access, "dvb-lnb-slof" );
-    i_mod              = var_GetInteger( p_access, "dvb-modulation" );
-    l_hp_fec           = var_GetInteger( p_access, "dvb-code-rate-hp" );
-    l_inversion        = var_GetInteger( p_access, "dvb-inversion" );
     l_network_id       = var_GetInteger( p_access, "dvb-network-id" );
 
     l.psz_input_range  = var_GetNonEmptyString( p_access, "dvb-range" );
-    l.psz_polarisation = var_GetNonEmptyString( p_access, "dvb-polarisation" );
+    if( asprintf( &l.psz_polarisation, "%c", pol ) == -1 )
+        abort();
 
     b_west = ( l_longitude < 0 );
-
-    i_polar = BDA_POLARISATION_NOT_SET;
-    if( l.psz_polarisation != NULL )
-    {
-        switch( toupper( l.psz_polarisation[0] ) )
-        {
-        case 'H':
-            i_polar = BDA_POLARISATION_LINEAR_H;
-            break;
-        case 'V':
-            i_polar = BDA_POLARISATION_LINEAR_V;
-            break;
-        case 'L':
-            i_polar = BDA_POLARISATION_CIRCULAR_L;
-            break;
-        case 'R':
-            i_polar = BDA_POLARISATION_CIRCULAR_R;
-            break;
-        }
-    }
-
-    switch( l_inversion )
-    {
-    case 0:
-        i_inversion = BDA_SPECTRAL_INVERSION_NORMAL; break;
-    case 1:
-        i_inversion = BDA_SPECTRAL_INVERSION_INVERTED; break;
-    case 2:
-        i_inversion = BDA_SPECTRAL_INVERSION_AUTOMATIC; break;
-    default:
-        i_inversion = BDA_SPECTRAL_INVERSION_NOT_SET;
-    }
-
-    switch( i_mod )
-    {
-    case 16:
-        i_mod_typ = BDA_MOD_16QAM; break;
-    case 128:
-        i_mod_typ = BDA_MOD_128QAM; break;
-    case 256:
-        i_mod_typ = BDA_MOD_256QAM; break;
-    case 10004:
-        i_mod_typ = BDA_MOD_QPSK; break;
-    default:
-        i_mod_typ = BDA_MOD_NOT_SET;
-    }
-
-    switch( l_hp_fec )
-    {
-    case 1:
-        i_hp_fec = BDA_BCC_RATE_1_2; break;
-    case 2:
-        i_hp_fec = BDA_BCC_RATE_2_3; break;
-    case 3:
-        i_hp_fec = BDA_BCC_RATE_3_4; break;
-    case 4:
-        i_hp_fec = BDA_BCC_RATE_5_6; break;
-    case 5:
-        i_hp_fec = BDA_BCC_RATE_7_8; break;
-    default:
-        i_hp_fec = BDA_BCC_RATE_NOT_SET;
-    }
 
     l.i_range_len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,
         l.psz_input_range, -1, l.pwsz_input_range, 0 );
@@ -879,8 +852,8 @@ int BDAGraph::SubmitDVBSTuneRequest()
         hr = l.p_dvbs_locator->put_SymbolRate( l_symbolrate );
     if( SUCCEEDED( hr ) && i_polar != BDA_POLARISATION_NOT_SET )
         hr = l.p_dvbs_locator->put_SignalPolarisation( i_polar );
-    if( SUCCEEDED( hr ) && i_mod_typ != BDA_MOD_NOT_SET )
-        hr = l.p_dvbs_locator->put_Modulation( i_mod_typ );
+    if( SUCCEEDED( hr ) )
+        hr = l.p_dvbs_locator->put_Modulation( BDA_MOD_QPSK );
     if( SUCCEEDED( hr ) && i_hp_fec != BDA_BCC_RATE_NOT_SET )
         hr = l.p_dvbs_locator->put_InnerFECRate( i_hp_fec );
 
@@ -906,22 +879,6 @@ int BDAGraph::SubmitDVBSTuneRequest()
             "Cannot put the locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
-
-    /* Build and Run the Graph. If a Tuner device is in use the graph will
-     * fail to run. Repeated calls to build will check successive tuner
-     * devices */
-    do
-    {
-        hr = Build();
-        if( FAILED( hr ) )
-        {
-            msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
-                "Cannot Build the Graph: hr=0x%8lx", hr );
-            return VLC_EGENERIC;
-        }
-        hr = Start();
-    }
-    while( hr != S_OK );
 
     return VLC_SUCCESS;
 }
@@ -1894,9 +1851,9 @@ HRESULT BDAGraph::Start()
 /*****************************************************************************
 * Pop the stream of data
 *****************************************************************************/
-block_t *BDAGraph::Pop()
+ssize_t BDAGraph::Pop(void *buf, size_t len)
 {
-    return output.Pop();
+    return output.Pop(buf, len);
 }
 
 /******************************************************************************

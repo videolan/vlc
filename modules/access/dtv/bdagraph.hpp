@@ -24,8 +24,6 @@
  * Preamble
  *****************************************************************************/
 
-#include "bda.h"
-
 using namespace std;
 #ifndef _MSC_VER
 #   include <wtypes.h>
@@ -50,23 +48,23 @@ using namespace std;
 
 #include <dshow.h>
 #include <comcat.h>
-#include "bdadefs.h"
+#include "dtv/bdadefs.h"
 
 class BDAOutput
 {
 public:
-    BDAOutput( access_t * );
+    BDAOutput( vlc_object_t * );
     ~BDAOutput();
 
     void    Push( block_t * );
-    block_t *Pop();
+    ssize_t Pop(void *, size_t);
     void    Empty();
 
 private:
-    access_t    *p_access;
-    vlc_mutex_t lock;
-    vlc_cond_t  wait;
-    block_t     *p_first;
+    vlc_object_t *p_access;
+    vlc_mutex_t   lock;
+    vlc_cond_t    wait;
+    block_t      *p_first;
     block_t     **pp_next;
 };
 
@@ -74,18 +72,20 @@ private:
 class BDAGraph : public ISampleGrabberCB
 {
 public:
-    BDAGraph( access_t* p_access );
+    BDAGraph( vlc_object_t * );
     virtual ~BDAGraph();
 
     /* */
-    int SubmitCQAMTuneRequest();
-    int SubmitATSCTuneRequest();
-    int SubmitDVBTTuneRequest();
-    int SubmitDVBCTuneRequest();
-    int SubmitDVBSTuneRequest();
+    int SubmitTuneRequest(void);
+
+    int SetCQAM(long);
+    int SetATSC(long);
+    int SetDVBT(long, uint32_t, uint32_t, long, int, uint32_t, int);
+    int SetDVBC(long, const char *, long);
+    int SetDVBS(long, long, uint32_t, int, char, long, long, long);
 
     /* */
-    block_t *Pop();
+    ssize_t Pop(void *, size_t);
 
 private:
     /* ISampleGrabberCB methods */
@@ -97,7 +97,7 @@ private:
     STDMETHODIMP SampleCB( double d_time, IMediaSample* p_sample );
     STDMETHODIMP BufferCB( double d_time, BYTE* p_buffer, long l_buffer_len );
 
-    access_t* p_access;
+    vlc_object_t *p_access;
     CLSID     guid_network_type;
     long      l_tuner_used;        /* Index of the Tuning Device */
     /* registration number for the RunningObjectTable */

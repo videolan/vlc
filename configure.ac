@@ -1911,24 +1911,6 @@ then
 fi
 
 dnl
-dnl  Windows DirectShow BDA access module
-dnl
-AC_ARG_ENABLE(bda,
-  AS_HELP_STRING([--enable-bda],[Win32 DirectShow BDA support (default
-		  enabled on Win32)]))
-if test "${enable_bda}" != "no"
-then
-  if test "${SYS}" = "mingw32"
-  then
-      AC_CHECK_HEADERS(dshow.h,
-      [ VLC_ADD_PLUGIN([bda])
-        VLC_ADD_CXXFLAGS([bda],[])
-        VLC_ADD_LIBS([bda],[-lstrmiids -lole32 -loleaut32 -luuid]) ])
-  fi
-fi
-
-
-dnl
 dnl  Blu-ray Disc Support with libbluray
 dnl
 PKG_ENABLE_MODULES_VLC([BLURAY], [libbluray], [libbluray >= 0.2 ], (libbluray for Blu-ray disc support ) )
@@ -4270,7 +4252,6 @@ AC_CONFIG_FILES([
   test/Makefile
   modules/access/Makefile
   modules/access/bd/Makefile
-  modules/access/bda/Makefile
   modules/access/dshow/Makefile
   modules/access/dvb/Makefile
   modules/access/mms/Makefile
