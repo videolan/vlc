@@ -1137,22 +1137,13 @@ void CaptureOpenPanel::updateMRL()
         if( cqam->isChecked() ) mrl = "cqam://";
 
         mrl += "frequency=" + QString::number( dvbFreq->value() );
-#ifdef WIN32 /* TODO: harmonize frequencies!! */
-        if( !dvbs->isChecked() )
-            mrl +="000";
-#endif
 
         if( dvbc->isChecked() || cqam->isChecked() )
         {
             unsigned qam =
                 dvbModBox->itemData( dvbModBox->currentIndex() ).toInt();
             if( qam != 0 )
-            {
-                mrl += ":modulation=" + QString::number( qam );
-#ifndef WIN32
-                mrl += "QAM";
-#endif
-            }
+                mrl += ":modulation=" + QString::number( qam ) + "QAM";
             mrl += ":srate=" + QString::number( dvbSrate->value() );
         }
         if( dvbc->isChecked() || dvbs->isChecked() )
