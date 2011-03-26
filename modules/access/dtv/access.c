@@ -51,6 +51,12 @@
     "Only useful programs are normally demultiplexed from the transponder. " \
     "This option will disable demultiplexing and receive all programs.")
 
+#define NAME_TEXT N_("Network name")
+#define NAME_LONGTEXT N_("Unique network name in the System Tuning Spaces")
+
+#define CREATE_TEXT N_("Network name to create")
+#define CREATE_LONGTEXT N_("Create unique name in the System Tuning Spaces")
+
 #define FREQ_TEXT N_("Frequency (kHz)")
 #define FREQ_LONGTEXT N_( \
     "TV channels are grouped by transponder (a.k.a. multiplex) " \
@@ -185,6 +191,25 @@ static const char *const satno_user[] = { N_("Unspecified"),
     "A/1", "B/2", "C/3", "D/4" };
 #endif
 
+/* BDA module additional DVB-S Parameters */
+#define NETID_TEXT N_("Network Identifier")
+#define AZIMUTH_TEXT N_("Satellite azimuth")
+#define AZIMUTH_LONGTEXT N_("Satellite azimuth in tenths of degree")
+#define ELEVATION_TEXT N_("Satellite elevation")
+#define ELEVATION_LONGTEXT N_("Satellite elevation in tenths of degree")
+#define LONGITUDE_TEXT N_("Satellite longitude")
+#define LONGITUDE_LONGTEXT N_( \
+    "Satellite longitude in tenths of degree. West is negative.")
+
+#define RANGE_TEXT N_("Satellite range code")
+#define RANGE_LONGTEXT N_("Satellite range code as defined by manufacturer " \
+   "e.g. DISEqC switch code")
+
+/* ATSC */
+#define MAJOR_CHANNEL_TEXT N_("Major channel")
+#define MINOR_CHANNEL_TEXT N_("ATSC minor channel")
+#define PHYSICAL_CHANNEL_TEXT N_("Physical channel")
+
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
@@ -214,6 +239,13 @@ vlc_module_begin ()
     add_integer ("dvb-device", 0, DEVICE_TEXT, DEVICE_LONGTEXT, false)
         change_integer_range (0, 255)
     add_bool ("dvb-budget-mode", false, BUDGET_TEXT, BUDGET_LONGTEXT, true)
+#endif
+#ifdef WIN32
+    add_integer ("dvb-adapter", -1, ADAPTER_TEXT, ADAPTER_LONGTEXT, true)
+    add_string ("dvb-network-name", NULL, NAME_TEXT, NAME_LONGTEXT, true)
+    /* Hmm: is this one really safe??: */
+    add_string ("dvb-create-name", NULL, CREATE_TEXT, CREATE_LONGTEXT, true)
+        change_private ()
 #endif
     add_integer ("dvb-frequency", 0, FREQ_TEXT, FREQ_LONGTEXT, false)
         change_integer_range (0, 107999999)
@@ -256,6 +288,7 @@ vlc_module_begin ()
     add_string ("dvb-fec", "", CODE_RATE_TEXT, CODE_RATE_LONGTEXT, true)
         change_string_list (code_rate_vlc, code_rate_user, NULL)
         change_safe ()
+
     set_section (N_("DVB-S2 parameters"), NULL)
     add_integer ("dvb-pilot", -1, PILOT_TEXT, PILOT_TEXT, true)
         change_integer_list (auto_off_on_vlc, auto_off_on_user)
@@ -263,6 +296,7 @@ vlc_module_begin ()
     add_integer ("dvb-rolloff", -1, ROLLOFF_TEXT, ROLLOFF_TEXT, true)
         change_integer_list (rolloff_vlc, rolloff_user)
         change_safe ()
+
     set_section (N_("Satellite equipment control"), NULL)
     add_string ("dvb-polarization", "",
                 POLARIZATION_TEXT, POLARIZATION_LONGTEXT, false)
@@ -291,6 +325,20 @@ vlc_module_begin ()
         change_integer_list (satno_vlc, satno_user)
     add_integer ("dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT, true)
         change_integer_list (auto_off_on_vlc, auto_off_on_user)
+#endif
+#ifdef WIN23
+    add_integer ("dvb-network-id", 0, NETID_TEXT, NULL, true)
+    add_integer ("dvb-azimuth", 0, AZIMUTH_TEXT, AZIMUTH_LONGTEXT, true)
+    add_integer ("dvb-elevation", 0, ELEVATION_TEXT, ELEVATION_LONGTEXT, true)
+    add_integer ("dvb-longitude", 0, LONGITUDE_TEXT, LONGITUDE_LONGTEXT, true)
+    add_string ("dvb-range", NULL, RANGE_TEXT, RANGE_LONGTEXT, true)
+    /* dvb-range corresponds to the BDA InputRange parameter which is
+    * used by some drivers to control the diseqc */
+
+    set_section (N_("ATSC reception parameters"))
+    add_integer ("dvb-major-channel", 0, MAJOR_CHANNEL_TEXT, NULL, true)
+    add_integer ("dvb-minor-channel", 0, MINOR_CHANNEL_TEXT, NULL, true)
+    add_integer ("dvb-physical-channel", 0, PHYSICAL_CHANNEL_TEXT, NULL, true)
 #endif
 vlc_module_end ()
 
