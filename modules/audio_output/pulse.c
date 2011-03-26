@@ -182,17 +182,14 @@ static int Open ( vlc_object_t *p_this )
         goto fail;
     }
 
-    /* Reduce overall latency to 200mS to reduce audible clicks
+    /* Reduce overall latency to 100mS to reduce audible clicks
      * Also pulse minreq and internal buffers are now 100mS which reduces resampling
      * but still shouldn't drop samples with some usb sound cards
      */
-    a.tlength = pa_bytes_per_second(&ss)/5;
+    a.tlength = pa_bytes_per_second(&ss)/10;
     a.maxlength = a.tlength * 2;
-    a.prebuf = a.tlength / 2;
-    a.minreq = a.tlength / 2;
-
-    /* Buffer size is 100mS */
-    p_sys->buffer_size = a.minreq;
+    a.prebuf = -1;
+    a.minreq = -1;
 
     /* Initialise the speaker map setup above */
     pa_channel_map_init_auto(&map, ss.channels, PA_CHANNEL_MAP_ALSA);
@@ -278,6 +275,9 @@ static int Open ( vlc_object_t *p_this )
 
     buffer_attr = pa_stream_get_buffer_attr(p_sys->stream);
     p_aout->output.i_nb_samples = buffer_attr->minreq / pa_frame_size(&ss);
+
+    /* Set buffersize from pulseaudio defined minrequest */
+    p_sys->buffer_size = buffer_attr->minreq;
     p_aout->output.pf_play = Play;
     aout_VolumeSoftInit(p_aout);
     msg_Dbg(p_aout, "Pulse initialized successfully");
@@ -476,10 +476,10 @@ static void stream_request_cb(pa_stream *s, size_t length, void *userdata) {
         else
         {
             PULSE_DEBUG( "Pulse stream request write zeroes");
-            void *data = pa_xmalloc(buffer_size);
-            memset(data, 0, buffer_size);
-            pa_stream_write(p_sys->stream, data, buffer_size, pa_xfree, 0, PA_SEEK_RELATIVE);
-            length -= buffer_size;
+            void *data = pa_xmalloc(length);
+            memset(data, 0, length);
+            pa_stream_write(p_sys->stream, data, length, pa_xfree, 0, PA_SEEK_RELATIVE);
+            length = 0;
         }
     }while(length > buffer_size);
 
