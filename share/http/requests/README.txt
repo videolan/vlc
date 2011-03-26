@@ -23,6 +23,15 @@ status.xml:
 > add <mrl> to playlist:
   ?command=in_enqueue&input=<mrl>
 
+> pause playback, do nothing if paused:
+  ?command=pl_forcepause
+
+> resume playback, do nothing if playing:
+  ?command=pl_resume
+
+> Start playback if in stopped or paused mode, if paused will resume, not restart playback:
+  ?command=pl_forceplay
+
 > play playlist item <id>:
   ?command=pl_play&id=<id>
 

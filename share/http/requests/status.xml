@@ -38,6 +38,25 @@
   <vlc id="end" />
 
   <!-- playlist commands -->
+  <vlc id="if" param1="command value 'pl_forceplay' strcmp 0 =" />
+    <vlc id="if" param1="stream_state value 'stop' strcmp 0 =" />
+      <vlc id="rpn" param1="id value vlc_play"/>
+    <vlc id="else" />
+      <vlc id="if" param1="stream_state value 'paused' strcmp 0 =" />
+        <vlc id="rpn" param1="vlc_pause"/>
+      <vlc id="end" />
+    <vlc id="end" />
+  <vlc id="end" />
+  <vlc id="if" param1="command value 'pl_forcepause' strcmp 0 =" />
+    <vlc id="if" param1="stream_state value 'playing' strcmp 0 =" />
+      <vlc id="rpn" param1="vlc_pause"/>
+    <vlc id="end" />
+  <vlc id="end" />
+  <vlc id="if" param1="command value 'pl_resume' strcmp 0 =" />
+    <vlc id="if" param1="stream_state value 'paused' strcmp 0 =" />
+      <vlc id="rpn" param1="vlc_pause"/>
+    <vlc id="end" />
+  <vlc id="end" />
   <vlc id="if" param1="command value 'pl_play' strcmp 0 =" />
     <vlc id="rpn" param1="id value vlc_play" />
   <vlc id="end" />
