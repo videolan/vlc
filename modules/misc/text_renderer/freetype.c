@@ -347,6 +347,7 @@ static int Create( vlc_object_t *p_this )
         msg_Err( p_filter,"User didn't specify fontfile, using %s", psz_fontfamily);
 #endif
     }
+    p_sys->psz_fontfamily = psz_fontfamily;
 
     /* Set the font file */
 #ifdef HAVE_FONTCONFIG
@@ -356,11 +357,11 @@ static int Create( vlc_object_t *p_this )
     psz_fontfile = FontConfig_Select( NULL, psz_fontfamily, false, false,
                                       p_sys->i_default_font_size, &fontindex );
 
-    p_sys->psz_fontfamily = psz_fontfamily;
     msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily, psz_fontfile );
     if( !psz_fontfile )
-#else
         psz_fontfile = psz_fontfamily;
+#else
+    psz_fontfile = psz_fontfamily;
 #endif
 
     /* */
@@ -409,7 +410,6 @@ static int Create( vlc_object_t *p_this )
     p_filter->pf_render_html = NULL;
 #endif
 
-    free( psz_fontfamily );
     LoadFontsFromAttachments( p_filter );
 
     return VLC_SUCCESS;
@@ -444,8 +444,8 @@ static void Destroy( vlc_object_t *p_this )
 
 #ifdef HAVE_STYLES
     if( p_sys->p_xml ) xml_ReaderDelete( p_sys->p_xml );
-    free( p_sys->psz_fontfamily );
 #endif
+    free( p_sys->psz_fontfamily );
 
     /* FcFini asserts calling the subfunction FcCacheFini()
      * even if no other library functions have been made since FcInit(),
