@@ -299,9 +299,9 @@ static int Create( vlc_object_t *p_this )
 {
     filter_t      *p_filter = (filter_t *)p_this;
     filter_sys_t  *p_sys;
-    char          *psz_fontfile = NULL;
+    char          *psz_fontfile   = NULL;
     char          *psz_fontfamily = NULL;
-    int            i_error, fontindex;
+    int            i_error = 0, fontindex = 0;
 
     /* Allocate structure */
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
@@ -349,7 +349,6 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Set the font file */
-    fontindex = 0;
 #ifdef HAVE_FONTCONFIG
     FontConfig_BuildCache( p_filter );
 
