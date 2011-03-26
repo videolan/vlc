@@ -984,17 +984,17 @@ void CaptureOpenPanel::initialize()
     dvbModLabel = new QLabel( qtr( "Modulation / Constellation" ) );
     dvbPropLayout->addWidget( dvbModLabel, 2, 0 );
 
-    dvbModBox = new QComboBox;
-    dvbModBox->addItem( qtr( "Automatic" ), 0 );
-    dvbModBox->addItem( "256-QAM", 256 );
-    dvbModBox->addItem( "128-QAM", 128 );
-    dvbModBox->addItem( "64-QAM", 64 );
-    dvbModBox->addItem( "32-QAM", 32 );
-    dvbModBox->addItem( "16-QAM", 16 );
-    dvbPropLayout->addWidget( dvbModBox, 2, 1 );
+    dvbQamBox = new QComboBox;
+    dvbQamBox->addItem( qtr( "Automatic" ), 0 );
+    dvbQamBox->addItem( "256-QAM", 256 );
+    dvbQamBox->addItem( "128-QAM", 128 );
+    dvbQamBox->addItem( "64-QAM", 64 );
+    dvbQamBox->addItem( "32-QAM", 32 );
+    dvbQamBox->addItem( "16-QAM", 16 );
+    dvbPropLayout->addWidget( dvbQamBox, 2, 1 );
 
     dvbModLabel->hide();
-    dvbModBox->hide();
+    dvbQamBox->hide();
 
     dvbBandLabel = new QLabel( qtr( "Bandwidth" ) );
     dvbPropLayout->addWidget( dvbBandLabel, 2, 0 );
@@ -1013,7 +1013,7 @@ void CaptureOpenPanel::initialize()
     CuMRL( dvbCard, valueChanged ( int ) );
     CuMRL( dvbFreq, valueChanged ( int ) );
     CuMRL( dvbSrate, valueChanged ( int ) );
-    CuMRL( dvbModBox, currentIndexChanged ( int ) );
+    CuMRL( dvbQamBox, currentIndexChanged ( int ) );
     CuMRL( dvbBandBox, currentIndexChanged ( int ) );
 
     BUTTONACT( dvbs, updateButtons() );
@@ -1141,7 +1141,7 @@ void CaptureOpenPanel::updateMRL()
         if( dvbc->isChecked() || cqam->isChecked() )
         {
             unsigned qam =
-                dvbModBox->itemData( dvbModBox->currentIndex() ).toInt();
+                dvbQamBox->itemData( dvbQamBox->currentIndex() ).toInt();
             if( qam != 0 )
                 mrl += ":modulation=" + QString::number( qam ) + "QAM";
             mrl += ":srate=" + QString::number( dvbSrate->value() );
@@ -1187,7 +1187,7 @@ void CaptureOpenPanel::updateButtons()
     case DTV_DEVICE:
         dvbSrate->hide();
         dvbSrateLabel->hide();
-        dvbModBox->hide();
+        dvbQamBox->hide();
         dvbModLabel->hide();
         dvbBandBox->hide();
         dvbBandLabel->hide();
@@ -1196,7 +1196,7 @@ void CaptureOpenPanel::updateButtons()
         {
             dvbSrate->show();
             dvbSrateLabel->show();
-            dvbModBox->show();
+            dvbQamBox->show();
             dvbModLabel->show();
         }
         else if( dvbs->isChecked() )

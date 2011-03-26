@@ -207,7 +207,7 @@ private:
     QSpinBox  *pvrFreq, *pvrBitr;
     QComboBox *v4l2VideoDevice, *v4l2AudioDevice;
     QLineEdit *pvrDevice, *pvrRadioDevice;
-    QComboBox *v4l2StdBox, *pvrNormBox, *dvbModBox, *dvbBandBox;
+    QComboBox *v4l2StdBox, *pvrNormBox;
     QSpinBox *jackChannels, *jackCaching;
     QCheckBox *jackPace, *jackConnect;
     QLineEdit *jackPortsSelected;
@@ -215,6 +215,7 @@ private:
 #endif
     QRadioButton *dvbs, *dvbt, *dvbc, *atsc, *cqam;
     QLabel *dvbBandLabel, *dvbSrateLabel, *dvbModLabel;
+    QComboBox *dvbQamBox, *dvbBandBox;
     QSpinBox *dvbCard, *dvbFreq, *dvbSrate;
     QDoubleSpinBox *screenFPS;
 
