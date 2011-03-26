@@ -20,6 +20,12 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  ****************************************************************************/
 
+#ifndef VLC_DTV_H
+# define VLC_DTV_H 1
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 typedef struct delsys delsys_t;
 
 extern const delsys_t dvbc, dvbs, dvbs2, dvbt, atsc, cqam;
@@ -83,3 +89,7 @@ typedef struct isdbt_sound
 int dvb_set_isdbt (dvb_device_t *, uint32_t freq, const isdbt_layer_t *a,
                    const isdbt_layer_t *b, const isdbt_layer_t *c,
                    const isdbt_sound_t *sb);
+# ifdef __cplusplus
+}
+# endif
+#endif
