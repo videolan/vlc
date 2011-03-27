@@ -942,9 +942,14 @@ void CaptureOpenPanel::initialize()
     dvbCard->setAlignment( Qt::AlignRight );
 #ifdef __linux__
     dvbCard->setPrefix( "/dev/dvb/adapter" );
+    dvbFE = new QSpinBox;
+    dvbFE->setPrefix( "/frontend" );
 #endif
     dvbDevLayout->addWidget( dvbDeviceLabel, 0, 0 );
-    dvbDevLayout->addWidget( dvbCard, 0, 2, 1, 2 );
+    dvbDevLayout->addWidget( dvbCard, 0, 1, 1, 2 );
+#ifdef __linux__
+    dvbDevLayout->addWidget( dvbFE, 0, 3 );
+#endif
 
     dvbc = new QRadioButton( "DVB-C" );
     dvbs = new QRadioButton( "DVB-S" );
@@ -1011,6 +1016,9 @@ void CaptureOpenPanel::initialize()
 
     /* DVB CONNECTs */
     CuMRL( dvbCard, valueChanged ( int ) );
+#ifdef __linux__
+    CuMRL( dvbFE, valueChanged ( int ) );
+#endif
     CuMRL( dvbFreq, valueChanged ( int ) );
     CuMRL( dvbSrate, valueChanged ( int ) );
     CuMRL( dvbQamBox, currentIndexChanged ( int ) );
@@ -1155,6 +1163,9 @@ void CaptureOpenPanel::updateMRL()
 
         fileList << mrl; mrl= "";
         mrl += " :dvb-adapter=" + QString::number( dvbCard->value() );
+#ifdef __linux__
+        mrl += " :dvb-device=" + QString::number( dvbFE->value() );
+#endif
         break;
     case SCREEN_DEVICE:
         fileList << "screen://";
