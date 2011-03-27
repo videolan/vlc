@@ -435,7 +435,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     uint8_t *p_out, *p_out_v;
     int i_y_offset, i_u_offset, i_v_offset;
 
-    int i_lines, i_visible_lines, i_pitch, i_visible_pitch;
+    int i_visible_lines, i_pitch, i_visible_pitch;
 
     bool b_thres;
     double  f_hue;
@@ -448,7 +448,6 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
 
     if( !p_pic ) return NULL;
 
-    i_lines = p_pic->p->i_lines;
     i_visible_lines = p_pic->p->i_visible_lines;
     i_pitch = p_pic->p->i_pitch;
     i_visible_pitch = p_pic->p->i_visible_pitch;
