@@ -208,7 +208,6 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t *p_sys;
     const uint8_t *p_peek;
     frame_header_t fh;
-    bool  b_extended;
 
     /* Check id */
     if( stream_Peek( p_demux->s, &p_peek, 12 ) != 12 ||
@@ -270,8 +269,6 @@ static int Open( vlc_object_t * p_this )
         goto error;
     if( p_peek[0] == 'X' )
     {
-        b_extended = true;
-
         if( FrameHeaderLoad( p_demux, &fh ) )
             goto error;
         if( fh.i_length != 512 )
@@ -290,11 +287,9 @@ static int Open( vlc_object_t * p_this )
     }
     else
     {
-        b_extended = false;
-
         /* XXX: for now only file with extended chunk are supported
          * why: because else we need to have support for rtjpeg+stupid nuv shit */
-        msg_Err( p_demux, "incomplete NUV support (upload samples)" );
+        msg_Err( p_demux, "VLC doesn't support NUV without extended chunks (please upload samples)" );
         goto error;
     }
 
