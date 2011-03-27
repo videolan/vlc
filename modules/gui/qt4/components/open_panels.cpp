@@ -992,16 +992,25 @@ void CaptureOpenPanel::initialize()
     dvbPropLayout->addWidget( dvbModLabel, 2, 0 );
 
     dvbQamBox = new QComboBox;
-    dvbQamBox->addItem( qtr( "Automatic" ), 0 );
-    dvbQamBox->addItem( "256-QAM", 256 );
-    dvbQamBox->addItem( "128-QAM", 128 );
-    dvbQamBox->addItem( "64-QAM", 64 );
-    dvbQamBox->addItem( "32-QAM", 32 );
-    dvbQamBox->addItem( "16-QAM", 16 );
+    dvbQamBox->addItem( qtr( "Automatic" ), qfu("QAM") );
+    dvbQamBox->addItem( "256-QAM", qfu("256QAM") );
+    dvbQamBox->addItem( "128-QAM", qfu("128QAM") );
+    dvbQamBox->addItem( "64-QAM", qfu("64QAM") );
+    dvbQamBox->addItem( "32-QAM", qfu("32QAM") );
+    dvbQamBox->addItem( "16-QAM", qfu("16QAM") );
     dvbPropLayout->addWidget( dvbQamBox, 2, 1 );
+
+    dvbPskBox = new QComboBox;
+    dvbPskBox->addItem( "QPSK", qfu("QPSK") );
+    dvbPskBox->addItem( "DQPSK", qfu("DQPSK") );
+    dvbPskBox->addItem( "8-PSK", qfu("8PSK") );
+    dvbPskBox->addItem( "16-APSK", qfu("16APSK") );
+    dvbPskBox->addItem( "32-APSK", qfu("32APSK") );
+    dvbPropLayout->addWidget( dvbPskBox, 2, 1 );
 
     dvbModLabel->hide();
     dvbQamBox->hide();
+    dvbPskBox->hide();
 
     dvbBandLabel = new QLabel( qtr( "Bandwidth" ) );
     dvbPropLayout->addWidget( dvbBandLabel, 2, 0 );
@@ -1024,6 +1033,7 @@ void CaptureOpenPanel::initialize()
     CuMRL( dvbFreq, valueChanged ( int ) );
     CuMRL( dvbSrate, valueChanged ( int ) );
     CuMRL( dvbQamBox, currentIndexChanged ( int ) );
+    CuMRL( dvbPskBox, currentIndexChanged ( int ) );
     CuMRL( dvbBandBox, currentIndexChanged ( int ) );
 
     BUTTONACT( dvbc, updateButtons() );
@@ -1153,13 +1163,11 @@ void CaptureOpenPanel::updateMRL()
         mrl += "frequency=" + QString::number( dvbFreq->value() );
 
         if( dvbc->isChecked() || cqam->isChecked() )
-        {
-            unsigned qam =
-                dvbQamBox->itemData( dvbQamBox->currentIndex() ).toInt();
-            if( qam != 0 )
-                mrl += ":modulation=" + QString::number( qam ) + "QAM";
-            mrl += ":srate=" + QString::number( dvbSrate->value() );
-        }
+            mrl += ":modulation="
+                + dvbQamBox->itemData( dvbQamBox->currentIndex() ).toString();
+        if( dvbs2->isChecked() )
+            mrl += ":modulation="
+                + dvbPskBox->itemData( dvbPskBox->currentIndex() ).toString();
         if( dvbc->isChecked() || dvbs->isChecked() || dvbs2->isChecked() )
             mrl += ":srate=" + QString::number( dvbSrate->value() );
         if( dvbt->isChecked() )
@@ -1205,6 +1213,7 @@ void CaptureOpenPanel::updateButtons()
         dvbSrate->hide();
         dvbSrateLabel->hide();
         dvbQamBox->hide();
+        dvbPskBox->hide();
         dvbModLabel->hide();
         dvbBandBox->hide();
         dvbBandLabel->hide();
@@ -1225,6 +1234,8 @@ void CaptureOpenPanel::updateButtons()
         {
             dvbSrate->show();
             dvbSrateLabel->show();
+            dvbPskBox->show();
+            dvbModLabel->show();
         }
         else if( dvbt->isChecked() )
         {

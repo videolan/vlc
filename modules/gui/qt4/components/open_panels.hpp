@@ -215,7 +215,7 @@ private:
 #endif
     QRadioButton *dvbc, *dvbs, *dvbs2, *dvbt, *atsc, *cqam;
     QLabel *dvbBandLabel, *dvbSrateLabel, *dvbModLabel;
-    QComboBox *dvbQamBox, *dvbBandBox;
+    QComboBox *dvbQamBox, *dvbPskBox, *dvbBandBox;
     QSpinBox *dvbCard, *dvbFE, *dvbFreq, *dvbSrate;
     QDoubleSpinBox *screenFPS;
 
