@@ -380,7 +380,6 @@ static void ParsePES( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t     *p_pes = p_sys->p_pes;
     uint8_t     hdr[30];
-    int         i_pes_size;
 
     unsigned    i_skip;
     mtime_t     i_dts = -1;
@@ -398,7 +397,7 @@ static void ParsePES( demux_t *p_demux )
         block_ChainRelease( p_pes );
         return;
     }
-    i_pes_size = GetWBE( &hdr[4] );
+    GetWBE( &hdr[4] ); /* i_pes_size */
 
     /* we assume mpeg2 PES */
     i_skip = hdr[8] + 9;
