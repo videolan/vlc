@@ -1,7 +1,7 @@
 /*****************************************************************************
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
- * Copyright (C) 2002 - 2007 the VideoLAN team
+ * Copyright (C) 2002 - 2011 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
@@ -19,8 +19,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -33,18 +33,29 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_filter.h>
-#include <vlc_stream.h>
-#include <vlc_xml.h>
-#include <vlc_input.h>
-#include <vlc_strings.h>
-#include <vlc_dialog.h>
-#include <vlc_memory.h>
-#include <vlc_charset.h>
+#include <vlc_stream.h>                        /* stream_MemoryNew */
+#include <vlc_input.h>                         /* vlc_input_attachment_* */
+#include <vlc_xml.h>                           /* xml_reader */
+#include <vlc_strings.h>                       /* resolve_xml_special_chars */
+#include <vlc_charset.h>                       /* ToCharset */
+#include <vlc_dialog.h>                        /* FcCache dialog */
 
-#include <math.h>
+/* Default fonts */
+#ifdef __APPLE__
+# define DEFAULT_FONT "/Library/Fonts/Arial Black.ttf"
+# define FC_DEFAULT_FONT "Arial Black"
+#elif defined( WIN32 )
+# define DEFAULT_FONT "" /* Default font found at run-time */
+# define FC_DEFAULT_FONT "Arial"
+#elif defined( HAVE_MAEMO )
+# define DEFAULT_FONT "/usr/share/fonts/nokia/nosnb.ttf"
+# define FC_DEFAULT_FONT "Nokia Sans Bold"
+#else
+# define DEFAULT_FONT "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
+# define FC_DEFAULT_FONT "Serif Bold"
+#endif
 
-#include <ft2build.h>
+/* Freetype */
 #include <freetype/ftsynth.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
@@ -54,31 +65,16 @@
  #define FT_MulFix(v, s) (((v)*(s))>>16)
 #endif
 
-#ifdef __APPLE__
-#define DEFAULT_FONT "/Library/Fonts/Arial Black.ttf"
-#define FC_DEFAULT_FONT "Arial Black"
-#elif defined( WIN32 )
-#define DEFAULT_FONT "" /* Default font found at run-time */
-#define FC_DEFAULT_FONT "Arial"
-#elif defined( HAVE_MAEMO )
-#define DEFAULT_FONT "/usr/share/fonts/nokia/nosnb.ttf"
-#define FC_DEFAULT_FONT "Nokia Sans Bold"
-#else
-#define DEFAULT_FONT "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
-#define FC_DEFAULT_FONT "Serif Bold"
-#endif
-
+/* RTL */
 #if defined(HAVE_FRIBIDI)
-#include <fribidi/fribidi.h>
+# include <fribidi/fribidi.h>
 #endif
 
+/* FontConfig */
 #ifdef HAVE_FONTCONFIG
-#include <fontconfig/fontconfig.h>
-#undef DEFAULT_FONT
-#define DEFAULT_FONT FC_DEFAULT_FONT
-#endif
-
-#ifdef HAVE_FONTCONFIG
+# include <fontconfig/fontconfig.h>
+# undef DEFAULT_FONT
+# define DEFAULT_FONT FC_DEFAULT_FONT
 # define HAVE_STYLES
 #endif
 
@@ -159,7 +155,7 @@ vlc_module_begin ()
 
     /* opacity valid on 0..255, with default 255 = fully opaque */
     add_integer_with_range( "freetype-opacity", 255, 0, 255, NULL,
-        OPACITY_TEXT, OPACITY_LONGTEXT, true )
+        OPACITY_TEXT, OPACITY_LONGTEXT, false )
         change_safe()
 
     /* hook to the color values list, with default 0x00ffffff = white */
@@ -184,7 +180,6 @@ vlc_module_begin ()
     add_shortcut( "text" )
     set_callbacks( Create, Destroy )
 vlc_module_end ()
-
 
 
 /*****************************************************************************

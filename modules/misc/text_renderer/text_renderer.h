@@ -18,11 +18,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <vlc_memory.h>
+#include <vlc_memory.h>                                   /* realloc_or_free */
+#include <vlc_text_style.h>                                   /* text_style_t*/
+#include <vlc_filter.h>                                      /* filter_sys_t */
 
 typedef struct font_stack_t font_stack_t;
 struct font_stack_t
