@@ -1032,7 +1032,7 @@ void CaptureOpenPanel::initialize()
     BUTTONACT( dvbt, updateButtons() );
     BUTTONACT( atsc, updateButtons() );
     BUTTONACT( cqam, updateButtons() );
-    BUTTONACT( dvbs, updateMRL() );
+    BUTTONACT( dvbc, updateMRL() );
     BUTTONACT( dvbt, updateMRL() );
     BUTTONACT( dvbs, updateMRL() );
     BUTTONACT( dvbs2, updateMRL() );
