@@ -190,11 +190,6 @@ modules/access/alsa.c
 modules/access/attachment.c
 modules/access/avio.h
 modules/access/bd/bd.c
-modules/access/bda/bda.c
-modules/access/bda/bda.h
-modules/access/bda/bdadefs.h
-modules/access/bda/bdagraph.cpp
-modules/access/bda/bdagraph.h
 modules/access/cdda.c
 modules/access/dc1394.c
 modules/access/decklink.cpp
@@ -203,6 +198,7 @@ modules/access/dshow/crossbar.cpp
 modules/access/dshow/dshow.cpp
 modules/access/dshow/filter.cpp
 modules/access/dshow/filter.h
+modules/access/dtv/access.c
 modules/access/dv.c
 modules/access/dvb/access.c
 modules/access/dvb/dvb.h
@@ -934,7 +930,6 @@ modules/misc/dummy/input.c
 modules/misc/dummy/interface.c
 modules/misc/dummy/renderer.c
 modules/misc/dummy/vout.c
-modules/misc/freetype.c
 modules/misc/gnutls.c
 modules/misc/inhibit.c
 modules/misc/inhibit/osso.c
@@ -957,7 +952,6 @@ modules/misc/playlist/html.c
 modules/misc/playlist/m3u.c
 modules/misc/playlist/xspf.c
 modules/misc/playlist/xspf.h
-modules/misc/quartztext.c
 modules/misc/rtsp.c
 modules/misc/sqlite.c
 modules/misc/stats/decoder.c
@@ -965,9 +959,11 @@ modules/misc/stats/demux.c
 modules/misc/stats/encoder.c
 modules/misc/stats/stats.c
 modules/misc/stats/stats.h
-modules/misc/svg.c
-modules/misc/text_renderer.h
-modules/misc/win32text.c
+modules/misc/text_renderer/freetype.c
+modules/misc/text_renderer/quartztext.c
+modules/misc/text_renderer/svg.c
+modules/misc/text_renderer/text_renderer.h
+modules/misc/text_renderer/win32text.c
 modules/misc/xml/libxml.c
 modules/mmx/memcpy.c
 modules/mmxext/memcpy.c
