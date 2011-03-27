@@ -281,6 +281,14 @@ dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
         msg_Dbg (obj, "using frontend: %s", d->info.name);
         msg_Dbg (obj, " type %u, capabilities 0x%08X", d->info.type,
                  d->info.caps);
+        msg_Dbg (obj, " frequencies %10"PRIu32" to %10"PRIu32,
+                 d->info.frequency_min, d->info.frequency_max);
+        msg_Dbg (obj, " (%"PRIu32" tolerance, %"PRIu32" per step)",
+                 d->info.frequency_tolerance, d->info.frequency_stepsize);
+        msg_Dbg (obj, " bauds rates %10"PRIu32" to %10"PRIu32,
+                 d->info.symbol_rate_min, d->info.symbol_rate_max);
+        msg_Dbg (obj, " (%"PRIu32" tolerance)",
+                 d->info.symbol_rate_tolerance);
 
         d->ca = dvb_open_node (dirfd, device, "ca", O_RDWR);
         if (d->ca == -1)
