@@ -84,7 +84,7 @@ static int Open( vlc_object_t *p_this )
     es_format_t  fmt;
     const uint8_t *p_peek;
 
-    if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 ) return VLC_EGENERIC;
+    if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 ) return VLC_EGENERIC;
     if( p_peek[0] != 'A' || p_peek[1] != 'V' || p_peek[4] != 0x55 )
     {
         /* In case we had forced this demuxer we try to resynch */
@@ -133,6 +133,8 @@ static void Close( vlc_object_t *p_this )
 
 /*****************************************************************************
  * Demux:
+ *****************************************************************************
+ * See http://multimedia.cx/mirror/av_format_v1.pdf
  *****************************************************************************/
 static int Demux( demux_t *p_demux )
 {
@@ -254,7 +256,7 @@ static int Demux( demux_t *p_demux )
                 p_frame->p_buffer += 8;
                 p_frame->i_buffer -= 8;
                 /* XXX this a hack, some streams aren't compliant and
-                 * doesn't set pes_start flag */
+                 * don't set pes_start flag */
                 if( p_sys->p_pes && p_frame->i_buffer > 4 &&
                     p_frame->p_buffer[0] == 0x00 &&
                     p_frame->p_buffer[1] == 0x00 &&
@@ -390,6 +392,7 @@ static void ParsePES( demux_t *p_demux )
     /* FIXME find real max size */
     block_ChainExtract( p_pes, hdr, 30 );
 
+    /* See §2.4.3.6 of ISO 13818-1 */
     if( hdr[0] != 0 || hdr[1] != 0 || hdr[2] != 1 )
     {
         msg_Warn( p_demux, "invalid hdr [0x%2.2x:%2.2x:%2.2x:%2.2x]",
@@ -397,7 +400,8 @@ static void ParsePES( demux_t *p_demux )
         block_ChainRelease( p_pes );
         return;
     }
-    GetWBE( &hdr[4] ); /* i_pes_size */
+    // hdr[4] i_pes_size, 2 bytes
+    // hdr[6] Marker -> original_or_copy
 
     /* we assume mpeg2 PES */
     i_skip = hdr[8] + 9;
