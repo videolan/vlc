@@ -2200,13 +2200,12 @@ static void FontConfig_BuildCache( filter_t *p_filter )
 {
     /* */
     msg_Dbg( p_filter, "Building font databases.");
-    mtime_t t1;
+    mtime_t t1, t2;
     t1 = mdate();
 
 #ifdef WIN32
     dialog_progress_bar_t *p_dialog = NULL;
     FcConfig *fcConfig = FcInitLoadConfig();
-    mtime_t t2;
 
     p_dialog = dialog_ProgressCreate( p_filter,
             _("Building font cache"),
@@ -2217,9 +2216,6 @@ static void FontConfig_BuildCache( filter_t *p_filter )
         dialog_ProgressSet( p_dialog, NULL, 0.5 ); */
 
     FcConfigBuildFonts( fcConfig );
-    t2 = mdate();
-    msg_Dbg( p_filter, "Took %ld microseconds", (long)((t2 - t1)) );
-
     if( p_dialog )
     {
 //        dialog_ProgressSet( p_dialog, NULL, 1.0 );
@@ -2227,6 +2223,8 @@ static void FontConfig_BuildCache( filter_t *p_filter )
         p_dialog = NULL;
     }
 #endif
+    t2 = mdate();
+    msg_Dbg( p_filter, "Took %ld microseconds", (long)((t2 - t1)) );
 }
 
 /***
