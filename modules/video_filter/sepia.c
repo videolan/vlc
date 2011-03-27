@@ -31,9 +31,9 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_filter.h>
 
 #include <assert.h>
-#include <vlc_filter.h>
 #include "filter_picture.h"
 
 /*****************************************************************************
@@ -229,7 +229,7 @@ static void PlanarI420Sepia( picture_t *p_pic, picture_t *p_outpic,
         const int i_du_line_start = (y/2) * p_outpic->p[U_PLANE].i_pitch;
         const int i_dv_line_start = (y/2) * p_outpic->p[V_PLANE].i_pitch;
         /* iterate for every two visible line in the frame */
-	    for( int x = 0; x < p_pic->p[Y_PLANE].i_visible_pitch - 1; x += 2)
+        for( int x = 0; x < p_pic->p[Y_PLANE].i_visible_pitch - 1; x += 2)
         {
             uint8_t sy1, sy2, sy3, sy4, su, sv;
             uint8_t dy1, dy2, dy3, dy4, du, dv;
@@ -242,8 +242,8 @@ static void PlanarI420Sepia( picture_t *p_pic, picture_t *p_outpic,
             sy2 = p_pic->p[Y_PLANE].p_pixels[i_sy_line1_offset + 1];
             sy3 = p_pic->p[Y_PLANE].p_pixels[i_sy_line2_offset];
             sy4 = p_pic->p[Y_PLANE].p_pixels[i_sy_line2_offset + 1];
-		    su = p_pic->p[U_PLANE].p_pixels[i_su_line_start + (x/2)];
-		    sv = p_pic->p[V_PLANE].p_pixels[i_sv_line_start + (x/2)];
+            su = p_pic->p[U_PLANE].p_pixels[i_su_line_start + (x/2)];
+            sv = p_pic->p[V_PLANE].p_pixels[i_sv_line_start + (x/2)];
             /* calculate sepia values */
             YuvSepia4( &dy1, &dy2, &dy3, &dy4, &du, &dv,
                       sy1, sy2, sy3, sy4, su, sv, i_intensity );
@@ -254,7 +254,7 @@ static void PlanarI420Sepia( picture_t *p_pic, picture_t *p_outpic,
             p_outpic->p[Y_PLANE].p_pixels[i_dy_line2_offset + 1] = dy4;
             p_outpic->p[U_PLANE].p_pixels[i_du_line_start + (x/2)] = du;
             p_outpic->p[V_PLANE].p_pixels[i_dv_line_start + (x/2)] = dv;
-	    }
+        }
     }
 }
 
@@ -268,7 +268,7 @@ static void PlanarI420Sepia( picture_t *p_pic, picture_t *p_outpic,
 static void PackedYUVSepia( picture_t *p_pic, picture_t *p_outpic,
                            int i_intensity )
 {
-    uint8_t *p_in, *p_in_end, *p_line_start, *p_line_end, *p_out;
+    uint8_t *p_in, *p_in_end, *p_line_end, *p_out;
     int i_yindex = 1, i_uindex = 2, i_vindex = 0;
 
     GetPackedYuvOffsets( p_outpic->format.i_chroma,
@@ -281,7 +281,6 @@ static void PackedYUVSepia( picture_t *p_pic, picture_t *p_outpic,
 
     while( p_in < p_in_end )
     {
-        p_line_start = p_in;
         p_line_end = p_in + p_pic->p[0].i_visible_pitch;
         while( p_in < p_line_end )
         {
@@ -307,7 +306,7 @@ static void PackedYUVSepia( picture_t *p_pic, picture_t *p_outpic,
  *****************************************************************************/
 static void RVSepia( picture_t *p_pic, picture_t *p_outpic, int i_intensity )
 {
-    uint8_t *p_in, *p_in_end, *p_line_start, *p_line_end, *p_out;
+    uint8_t *p_in, *p_in_end, *p_line_end, *p_out;
     int i_r, i_g, i_b;
     bool b_isRV32 = p_pic->format.i_chroma == VLC_CODEC_RGB32;
     int i_rindex = 0, i_gindex = 1, i_bindex = 2;
@@ -321,7 +320,6 @@ static void RVSepia( picture_t *p_pic, picture_t *p_outpic, int i_intensity )
 
     while( p_in < p_in_end )
     {
-        p_line_start = p_in;
         p_line_end = p_in + p_pic->p[0].i_visible_pitch;
         while( p_in < p_line_end )
         {
