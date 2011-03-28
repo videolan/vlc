@@ -326,7 +326,7 @@ vlc_module_begin ()
     add_integer ("dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT, true)
         change_integer_list (auto_off_on_vlc, auto_off_on_user)
 #endif
-#ifdef WIN23
+#ifdef WIN32
     add_integer ("dvb-network-id", 0, NETID_TEXT, NETID_TEXT, true)
     add_integer ("dvb-azimuth", 0, AZIMUTH_TEXT, AZIMUTH_LONGTEXT, true)
     add_integer ("dvb-elevation", 0, ELEVATION_TEXT, ELEVATION_LONGTEXT, true)
