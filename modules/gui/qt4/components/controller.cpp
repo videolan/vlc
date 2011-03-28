@@ -43,6 +43,7 @@
 #include <QSpacerItem>
 #include <QToolButton>
 #include <QHBoxLayout>
+#include <QRegion>
 #include <QSignalMapper>
 #include <QTimer>
 
@@ -649,7 +650,12 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
 
     vout.clear();
 
+#ifdef Q_WS_X11
+    setWindowFlags( Qt::Window | Qt::FramelessWindowHint );
+    setWindowModality( Qt::ApplicationModal );
+#else
     setWindowFlags( Qt::ToolTip );
+#endif
     setMinimumWidth( 600 );
 
     setFrameShape( QFrame::StyledPanel );
@@ -746,6 +752,11 @@ void FullscreenControllerWidget::showFSC()
 
 #if HAVE_TRANSPARENCY
     setWindowOpacity( var_InheritFloat( p_intf, "qt-fs-opacity" )  );
+#endif
+
+#ifdef Q_WS_X11
+    // Tell kwin that we do not want a shadow around the fscontroller
+    setMask( QRegion( 0, 0, width(), height() ) );
 #endif
 
     show();
