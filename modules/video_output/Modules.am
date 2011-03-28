@@ -38,7 +38,6 @@ EXTRA_LTLIBRARIES += \
 	libgles1_plugin.la \
 	libgl_plugin.la
 libvlc_LTLIBRARIES += \
-	$(LTLIBgles2) \
 	$(LTLIBgles1) \
 	$(LTLIBgl)
 
