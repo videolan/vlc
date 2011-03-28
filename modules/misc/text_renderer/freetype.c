@@ -270,8 +270,8 @@ struct filter_sys_t
 
     int            i_default_font_size;
     int            i_display_height;
-#ifdef HAVE_STYLES
     char*          psz_fontfamily;
+#ifdef HAVE_STYLES
     xml_reader_t  *p_xml;
 #endif
 
