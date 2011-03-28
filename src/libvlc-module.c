@@ -482,11 +482,11 @@ static const char * const  ppsz_deinterlace_text[] = {
     "Deinterlace method to use for video processing.")
 static const char * const ppsz_deinterlace_mode[] = {
     "discard", "blend", "mean", "bob",
-    "linear", "x", "yadif", "yadif2x"
+    "linear", "x", "yadif", "yadif2x", "phosphor"
 };
 static const char * const ppsz_deinterlace_mode_text[] = {
     N_("Discard"), N_("Blend"), N_("Mean"), N_("Bob"),
-    N_("Linear"), "X", "Yadif", "Yadif (2x)"
+    N_("Linear"), "X", "Yadif", "Yadif (2x)", N_("Phosphor")
 };
 
 static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };

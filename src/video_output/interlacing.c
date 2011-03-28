@@ -48,6 +48,7 @@ static const char *deinterlace_modes[] = {
     "x",
     "yadif",
     "yadif2x",
+    "phosphor",
     NULL
 };
 static bool DeinterlaceIsModeValid(const char *mode)

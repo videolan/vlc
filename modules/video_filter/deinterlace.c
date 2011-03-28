@@ -1,10 +1,11 @@
 /*****************************************************************************
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2009 the VideoLAN team
+ * Copyright (C) 2000-2011 the VideoLAN team
  * $Id$
  *
  * Author: Sam Hocevar <sam@zoy.org>
+ *         Juha Jeronen <juha.jeronen@jyu.fi> (Phosphor mode)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,14 +45,15 @@
 #   include "mmx.h"
 #endif
 
-#define DEINTERLACE_DISCARD 1
-#define DEINTERLACE_MEAN    2
-#define DEINTERLACE_BLEND   3
-#define DEINTERLACE_BOB     4
-#define DEINTERLACE_LINEAR  5
-#define DEINTERLACE_X       6
-#define DEINTERLACE_YADIF   7
-#define DEINTERLACE_YADIF2X 8
+#define DEINTERLACE_DISCARD  1
+#define DEINTERLACE_MEAN     2
+#define DEINTERLACE_BLEND    3
+#define DEINTERLACE_BOB      4
+#define DEINTERLACE_LINEAR   5
+#define DEINTERLACE_X        6
+#define DEINTERLACE_YADIF    7
+#define DEINTERLACE_YADIF2X  8
+#define DEINTERLACE_PHOSPHOR 9
 
 /*****************************************************************************
  * Module descriptor
@@ -68,9 +70,63 @@ static void Close( vlc_object_t * );
 #define FILTER_CFG_PREFIX "sout-deinterlace-"
 
 static const char *const mode_list[] = {
-    "discard", "blend", "mean", "bob", "linear", "x", "yadif", "yadif2x" };
+    "discard", "blend", "mean", "bob", "linear", "x",
+    "yadif", "yadif2x", "phosphor" };
 static const char *const mode_list_text[] = {
-    N_("Discard"), N_("Blend"), N_("Mean"), N_("Bob"), N_("Linear"), "X", "Yadif", "Yadif (2x)" };
+    N_("Discard"), N_("Blend"), N_("Mean"), N_("Bob"), N_("Linear"), "X",
+    "Yadif", "Yadif (2x)", N_("Phosphor") };
+
+/* Tooltips drop linefeeds (at least in the Qt GUI);
+   thus the space before each set of consecutive \n. */
+#define PHOSPHOR_CHROMA_TEXT N_("Phosphor chroma mode for 4:2:0 input")
+#define PHOSPHOR_CHROMA_LONGTEXT N_("Choose handling for colours in those "\
+                                    "output frames that fall across input "\
+                                    "frame boundaries. \n"\
+                                    "\n"\
+                                    "Latest: take chroma from new (bright) "\
+                                    "field only. Good for interlaced input, "\
+                                    "such as videos from a camcorder. \n"\
+                                    "\n"\
+                                    "AltLine: take chroma line 1 from top "\
+                                    "field, line 2 from bottom field, etc. \n"\
+                                    "Default, good for NTSC telecined input "\
+                                    "(anime DVDs, etc.). \n"\
+                                    "\n"\
+                                    "Blend: average input field chromas. "\
+                                    "May distort the colours of the new "\
+                                    "(bright) field, too. \n"\
+                                    "\n"\
+                                    "Upconvert: output in 4:2:2 format "\
+                                    "(independent chroma for each field). "\
+                                    "Best simulation, but requires more CPU "\
+                                    "and memory bandwidth.")
+
+#define PHOSPHOR_DIMMER_TEXT N_("Phosphor old field dimmer strength")
+#define PHOSPHOR_DIMMER_LONGTEXT N_("This controls the strength of the "\
+                                    "darkening filter that simulates CRT TV "\
+                                    "phosphor light decay for the old field "\
+                                    "in the Phosphor framerate doubler. "\
+                                    "Default: Low.")
+
+/* These numbers, and phosphor_chroma_list[], should be in the same order
+   as phosphor_chroma_list_text[]. The value 0 is reserved, because
+   var_GetInteger() returns 0 in case of error. */
+typedef enum { PC_LATEST = 1, PC_ALTLINE   = 2,
+               PC_BLEND  = 3, PC_UPCONVERT = 4 } phosphor_chroma_t;
+static const int phosphor_chroma_list[] = { PC_LATEST, PC_ALTLINE,
+                                            PC_BLEND,  PC_UPCONVERT };
+static const char *const phosphor_chroma_list_text[] = { N_("Latest"),
+                                                         N_("AltLine"),
+                                                         N_("Blend"),
+                                                         N_("Upconvert") };
+
+/* Same here. Same order as in phosphor_dimmer_list_text[],
+   and the value 0 is reserved for config error. */
+static const int phosphor_dimmer_list[] = { 1, 2, 3, 4 };
+static const char *const phosphor_dimmer_list_text[] = { N_("Off"),
+                                                         N_("Low"),
+                                                         N_("Medium"),
+                                                         N_("High") };
 
 vlc_module_begin ()
     set_description( N_("Deinterlacing video filter") )
@@ -83,6 +139,14 @@ vlc_module_begin ()
                 SOUT_MODE_LONGTEXT, false )
         change_string_list( mode_list, mode_list_text, 0 )
         change_safe ()
+    add_integer( FILTER_CFG_PREFIX "phosphor-chroma", 2, PHOSPHOR_CHROMA_TEXT,
+                PHOSPHOR_CHROMA_LONGTEXT, true )
+        change_integer_list( phosphor_chroma_list, phosphor_chroma_list_text )
+        change_safe ()
+    add_integer( FILTER_CFG_PREFIX "phosphor-dimmer", 2, PHOSPHOR_DIMMER_TEXT,
+                PHOSPHOR_DIMMER_LONGTEXT, true )
+        change_integer_list( phosphor_dimmer_list, phosphor_dimmer_list_text )
+        change_safe ()
     add_shortcut( "deinterlace" )
     set_callbacks( Open, Close )
 vlc_module_end ()
@@ -91,13 +155,14 @@ vlc_module_end ()
 /*****************************************************************************
  * Local protypes
  *****************************************************************************/
-static void RenderDiscard( filter_t *, picture_t *, picture_t *, int );
-static void RenderBob    ( filter_t *, picture_t *, picture_t *, int );
-static void RenderMean   ( filter_t *, picture_t *, picture_t * );
-static void RenderBlend  ( filter_t *, picture_t *, picture_t * );
-static void RenderLinear ( filter_t *, picture_t *, picture_t *, int );
-static void RenderX      ( picture_t *, picture_t * );
-static int  RenderYadif  ( filter_t *, picture_t *, picture_t *, int, int );
+static void RenderDiscard ( filter_t *, picture_t *, picture_t *, int );
+static void RenderBob     ( filter_t *, picture_t *, picture_t *, int );
+static void RenderMean    ( filter_t *, picture_t *, picture_t * );
+static void RenderBlend   ( filter_t *, picture_t *, picture_t * );
+static void RenderLinear  ( filter_t *, picture_t *, picture_t *, int );
+static void RenderX       ( picture_t *, picture_t * );
+static int  RenderYadif   ( filter_t *, picture_t *, picture_t *, int, int );
+static int  RenderPhosphor( filter_t *, picture_t *, picture_t *, int, int );
 
 static void MergeGeneric ( void *, const void *, const void *, size_t );
 #if defined(CAN_COMPILE_C_ALTIVEC)
@@ -122,8 +187,19 @@ static void End3DNow     ( void );
 static void MergeNEON (void *, const void *, const void *, size_t);
 #endif
 
+/* Converts a full-frame plane_t to a field plane_t */
+static void FieldFromPlane( plane_t *p_dst, const plane_t *p_src,
+                            int i_field );
+
+/* Composes a frame from the given field pair */
+typedef enum { CC_ALTLINE, CC_UPCONVERT, CC_SOURCE_TOP, CC_SOURCE_BOTTOM,
+               CC_MERGE } compose_chroma_t;
+static void ComposeFrame( filter_t *, picture_t *, picture_t *, picture_t *,
+                          compose_chroma_t );
+
 static const char *const ppsz_filter_options[] = {
-    "mode", NULL
+    "mode", "phosphor-chroma", "phosphor-dimmer",
+    NULL
 };
 
 /* Used for framerate doublers */
@@ -134,6 +210,14 @@ typedef struct {
     bool    pb_top_field_first[METADATA_SIZE];
 } metadata_history_t;
 
+/* Algorithm-specific state */
+typedef struct
+{
+    phosphor_chroma_t i_chroma_for_420;
+    int i_dimmer_strength;
+} phosphor_sys_t;
+
+/* Top-level subsystem state */
 #define HISTORY_SIZE (3)
 #define CUSTOM_PTS -1
 struct filter_sys_t
@@ -154,6 +238,9 @@ struct filter_sys_t
 
     /* Input frame history buffer for algorithms that perform temporal filtering. */
     picture_t *pp_history[HISTORY_SIZE];
+
+    /* Algorithm-specific substructures */
+    phosphor_sys_t phosphor;
 };
 
 /*  NOTE on i_frame_offset:
@@ -271,6 +358,13 @@ static void SetFilterMethod( filter_t *p_filter, const char *psz_method, vlc_fou
         p_sys->b_half_height = false;
         p_sys->b_use_frame_history = true;
     }
+    else if( !strcmp( psz_method, "phosphor" ) )
+    {
+        p_sys->i_mode = DEINTERLACE_PHOSPHOR;
+        p_sys->b_double_rate = true;
+        p_sys->b_half_height = false;
+        p_sys->b_use_frame_history = true;
+    }
     else if( !strcmp( psz_method, "discard" ) )
     {
         const bool b_i422 = i_chroma == VLC_CODEC_I422 ||
@@ -322,6 +416,7 @@ static void GetOutputFormat( filter_t *p_filter,
         case DEINTERLACE_X:
         case DEINTERLACE_YADIF:
         case DEINTERLACE_YADIF2X:
+        case DEINTERLACE_PHOSPHOR:
             p_dst->i_chroma = p_src->i_chroma;
             break;
         default:
@@ -329,6 +424,12 @@ static void GetOutputFormat( filter_t *p_filter,
                                                                   VLC_CODEC_J420;
             break;
         }
+    }
+    else if( p_sys->i_mode == DEINTERLACE_PHOSPHOR  &&
+             p_sys->phosphor.i_chroma_for_420 == PC_UPCONVERT )
+    {
+        p_dst->i_chroma = p_src->i_chroma == VLC_CODEC_J420 ? VLC_CODEC_J422 :
+                                                              VLC_CODEC_I422;
     }
 }
 
@@ -674,8 +775,6 @@ static void RenderBlend( filter_t *p_filter,
     }
     EndMerge();
 }
-
-#undef Merge
 
 static void MergeGeneric( void *_p_dest, const void *_p_s1,
                           const void *_p_s2, size_t i_bytes )
@@ -1645,6 +1744,593 @@ static int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src, 
 }
 
 /*****************************************************************************
+* Phosphor - a framerate doubler that simulates gradual light decay of a CRT.
+*****************************************************************************/
+
+/**
+ * This function converts a normal (full frame) plane_t into a field plane_t.
+ *
+ * Field plane_t's can be used e.g. for a weaving copy operation from two
+ * source frames into one destination frame.
+ *
+ * The pixels themselves will not be touched; only the metadata is generated.
+ * The same pixel data is shared by both the original plane_t and the field
+ * plane_t. Note, however, that the bottom field's data starts from the
+ * second line, so for the bottom field, the actual pixel pointer value
+ * does not exactly match the original plane pixel pointer value. (It points
+ * one line further down.)
+ *
+ * The caller must allocate p_dst (creating a local variable is fine).
+ *
+ * @param p_dst Field plane_t is written here. Must be non-NULL.
+ * @param p_src Original full-frame plane_t. Must be non-NULL.
+ * @param i_field Extract which field? 0 = top field, 1 = bottom field.
+ * @see plane_CopyPixels()
+ * @see ComposeFrame()
+ * @see RenderPhosphor()
+ */
+static void FieldFromPlane( plane_t *p_dst, const plane_t *p_src, int i_field )
+{
+    assert( p_dst != NULL );
+    assert( p_src != NULL );
+    assert( i_field == 0  ||  i_field == 1 );
+
+    /* Start with a copy of the metadata, and then update it to refer
+       to one field only.
+
+       We utilize the fact that plane_CopyPixels() differentiates between
+       visible_pitch and pitch.
+
+       The other field will be defined as the "margin" by doubling the pitch.
+       The visible pitch will be left as in the original.
+    */
+    (*p_dst) = (*p_src);
+    p_dst->i_lines /= 2;
+    p_dst->i_visible_lines /= 2;
+    p_dst->i_pitch *= 2;
+    /* For the bottom field, skip the first line in the pixel data. */
+    if( i_field == 1 )
+        p_dst->p_pixels += p_src->i_pitch;
+}
+
+/**
+ * Helper function: composes a frame from the given field pair.
+ *
+ * Caller must manage allocation/deallocation of p_outpic.
+ *
+ * The inputs are full pictures (frames); only one field
+ * will be used from each.
+ *
+ * Chroma formats of the inputs must match. It is also desirable that the
+ * visible pitches of both inputs are the same, so that this will do something
+ * sensible. The pitch or visible pitch of the output does not need to match
+ * with the input; the compatible (smaller) part of the visible pitch will
+ * be filled.
+ *
+ * The i_output_chroma parameter must always be supplied, but it is only used
+ * when the chroma format of the input is detected as 4:2:0. Available modes:
+ *   - CC_ALTLINE:       Alternate line copy, like for luma. Chroma line 0
+ *                       comes from top field picture, chroma line 1 comes
+ *                       from bottom field picture, chroma line 2 from top
+ *                       field picture, and so on. This is usually the right
+ *                       choice for IVTCing NTSC DVD material, but rarely
+ *                       for any other use cases.
+ *   - CC_UPCONVERT:     The output will have 4:2:2 chroma. All 4:2:0 chroma
+ *                       data from both input fields will be used to generate
+ *                       the 4:2:2 chroma data of the output. Each output line
+ *                       will thus have independent chroma. This is a good
+ *                       choice for most purposes except IVTC, if the machine
+ *                       can handle the increased throughput. (Make sure to
+ *                       allocate a 4:2:2 output picture first!)
+ *                       This mode can also be used for converting a 4:2:0
+ *                       frame to 4:2:2 format (by passing the same input
+ *                       picture for both input fields).
+ *                       Conversions: I420, YV12 --> I422
+ *                                    J420       --> J422
+ *   - CC_SOURCE_TOP:    Copy chroma of source top field picture.
+ *                       Ignore chroma of source bottom field picture.
+ *   - CC_SOURCE_BOTTOM: Copy chroma of source bottom field picture.
+ *                       Ignore chroma of source top field picture.
+ *   - CC_MERGE:         Average the chroma of the input field pictures.
+ *                       (Note that this has no effect if the input fields
+ *                        come from the same frame.)
+ *
+ * @param p_outpic Composed picture is written here. Allocated by caller.
+ * @param p_inpic_top Picture to extract the top field from.
+ * @param p_inpic_bottom Picture to extract the bottom field from.
+ * @param i_output_chroma Chroma operation mode for 4:2:0 (see function doc)
+ * @see compose_chroma_t
+ * @see RenderPhosphor()
+ */
+static void ComposeFrame( filter_t *p_filter, picture_t *p_outpic,
+                          picture_t *p_inpic_top, picture_t *p_inpic_bottom,
+                          compose_chroma_t i_output_chroma )
+{
+    assert( p_filter != NULL );
+    assert( p_outpic != NULL );
+    assert( p_inpic_top != NULL );
+    assert( p_inpic_bottom != NULL );
+
+    /* Valid 4:2:0 chroma handling modes. */
+    assert( i_output_chroma == CC_ALTLINE       ||
+            i_output_chroma == CC_UPCONVERT     ||
+            i_output_chroma == CC_SOURCE_TOP    ||
+            i_output_chroma == CC_SOURCE_BOTTOM ||
+            i_output_chroma == CC_MERGE );
+
+    const int i_chroma = p_filter->fmt_in.video.i_chroma;
+    const bool b_i422 = i_chroma == VLC_CODEC_I422 ||
+                        i_chroma == VLC_CODEC_J422;
+    const bool b_upconvert_chroma = ( !b_i422  &&
+                                      i_output_chroma == CC_UPCONVERT );
+
+    for( int i_plane = 0 ; i_plane < p_inpic_top->i_planes ; i_plane++ )
+    {
+        bool b_is_chroma_plane = ( i_plane == U_PLANE || i_plane == V_PLANE );
+
+        /* YV12 is YVU, but I422 is YUV. For such input, swap chroma planes
+           in output when converting to 4:2:2. */
+        int i_out_plane;
+        if( b_is_chroma_plane  &&  b_upconvert_chroma  &&
+            i_chroma == VLC_CODEC_YV12 )
+        {
+            if( i_plane == U_PLANE )
+                i_out_plane = V_PLANE;
+            else /* V_PLANE */
+                i_out_plane = U_PLANE;
+        }
+        else
+        {
+            i_out_plane = i_plane;
+        }
+
+        /* Copy luma or chroma, alternating between input fields. */
+        if( !b_is_chroma_plane  ||  b_i422  ||  i_output_chroma == CC_ALTLINE )
+        {
+            /* Do an alternating line copy. This is always done for luma,
+               and for 4:2:2 chroma. It can be requested for 4:2:0 chroma
+               using CC_ALTLINE (see function doc).
+
+               Note that when we get here, the number of lines matches
+               in input and output.
+            */
+            plane_t dst_top;
+            plane_t dst_bottom;
+            plane_t src_top;
+            plane_t src_bottom;
+            FieldFromPlane( &dst_top,    &p_outpic->p[i_out_plane],   0 );
+            FieldFromPlane( &dst_bottom, &p_outpic->p[i_out_plane],   1 );
+            FieldFromPlane( &src_top,    &p_inpic_top->p[i_plane],    0 );
+            FieldFromPlane( &src_bottom, &p_inpic_bottom->p[i_plane], 1 );
+
+            /* Copy each field from the corresponding source. */
+            plane_CopyPixels( &dst_top,    &src_top    );
+            plane_CopyPixels( &dst_bottom, &src_bottom );
+        }
+        else /* Input 4:2:0, on a chroma plane, and not in altline mode. */
+        {
+            if( i_output_chroma == CC_UPCONVERT )
+            {
+                /* Upconverting copy - use all data from both input fields.
+
+                   This produces an output picture with independent chroma
+                   for each field. It can be used for general input when
+                   the two input frames are different.
+
+                   The output is 4:2:2, but the input is 4:2:0. Thus the output
+                   has twice the lines of the input, and each full chroma plane
+                   in the input corresponds to a field chroma plane in the
+                   output.
+                */
+                plane_t dst_top;
+                plane_t dst_bottom;
+                FieldFromPlane( &dst_top,    &p_outpic->p[i_out_plane], 0 );
+                FieldFromPlane( &dst_bottom, &p_outpic->p[i_out_plane], 1 );
+
+                /* Copy each field from the corresponding source. */
+                plane_CopyPixels( &dst_top,    &p_inpic_top->p[i_plane]    );
+                plane_CopyPixels( &dst_bottom, &p_inpic_bottom->p[i_plane] );
+            }
+            else if( i_output_chroma == CC_SOURCE_TOP )
+            {
+                /* Copy chroma of input top field. Ignore chroma of input
+                   bottom field. Input and output are both 4:2:0, so we just
+                   copy the whole plane. */
+                plane_CopyPixels( &p_outpic->p[i_out_plane],
+                                  &p_inpic_top->p[i_plane] );
+            }
+            else if( i_output_chroma == CC_SOURCE_BOTTOM )
+            {
+                /* Copy chroma of input bottom field. Ignore chroma of input
+                   top field. Input and output are both 4:2:0, so we just
+                   copy the whole plane. */
+                plane_CopyPixels( &p_outpic->p[i_out_plane],
+                                  &p_inpic_bottom->p[i_plane] );
+            }
+            else /* i_output_chroma == CC_MERGE */
+            {
+                /* Average the chroma of the input fields.
+                   Input and output are both 4:2:0. */
+                uint8_t *p_in_top, *p_in_bottom, *p_out_end, *p_out;
+                p_in_top    = p_inpic_top->p[i_plane].p_pixels;
+                p_in_bottom = p_inpic_bottom->p[i_plane].p_pixels;
+                p_out = p_outpic->p[i_out_plane].p_pixels;
+                p_out_end = p_out + p_outpic->p[i_out_plane].i_pitch
+                                  * p_outpic->p[i_out_plane].i_visible_lines;
+
+                int w = FFMIN3( p_inpic_top->p[i_plane].i_visible_pitch,
+                                p_inpic_bottom->p[i_plane].i_visible_pitch,
+                                p_outpic->p[i_plane].i_visible_pitch );
+
+                for( ; p_out < p_out_end ; )
+                {
+                    Merge( p_out, p_in_top, p_in_bottom, w );
+                    p_out       += p_outpic->p[i_out_plane].i_pitch;
+                    p_in_top    += p_inpic_top->p[i_plane].i_pitch;
+                    p_in_bottom += p_inpic_bottom->p[i_plane].i_pitch;
+                }
+                EndMerge();
+            }
+        }
+    }
+}
+
+#undef Merge
+
+/**
+ * Helper function: dims (darkens) the given field of the given picture.
+ *
+ * This is used for simulating CRT light output decay in RenderPhosphor().
+ *
+ * The strength "1" is recommended. It's a matter of taste,
+ * so it's parametrized.
+ *
+ * Note on chroma formats:
+ *   - If input is 4:2:2, all planes are processed.
+ *   - If input is 4:2:0, only the luma plane is processed, because both fields
+ *     have the same chroma. This will distort colours, especially for high
+ *     filter strengths, especially for pixels whose U and/or V values are
+ *     far away from the origin (which is at 128 in uint8 format).
+ *
+ * @param p_dst Input/output picture. Will be modified in-place.
+ * @param i_field Darken which field? 0 = top, 1 = bottom.
+ * @param i_strength Strength of effect: 1, 2 or 3 (division by 2, 4 or 8).
+ * @see RenderPhosphor()
+ * @see ComposeFrame()
+ */
+static void DarkenField( picture_t *p_dst, const int i_field,
+                                           const int i_strength )
+{
+    assert( p_dst != NULL );
+    assert( i_field == 0 || i_field == 1 );
+    assert( i_strength >= 1 && i_strength <= 3 );
+
+    unsigned u_cpu = vlc_CPU();
+
+    /* Bitwise ANDing with this clears the i_strength highest bits
+       of each byte */
+#ifdef CAN_COMPILE_MMXEXT
+    uint64_t i_strength_u64 = i_strength; /* for MMX version (needs to know
+                                             number of bits) */
+#endif
+    const uint8_t  remove_high_u8 = 0xFF >> i_strength;
+    const uint64_t remove_high_u64 = remove_high_u8 *
+                                            INT64_C(0x0101010101010101);
+
+    /* Process luma.
+
+       For luma, the operation is just a shift + bitwise AND, so we vectorize
+       even in the C version.
+
+       There is an MMX version, too, because it performs about twice faster.
+    */
+    int i_plane = Y_PLANE;
+    uint8_t *p_out, *p_out_end;
+    int w = p_dst->p[i_plane].i_visible_pitch;
+    p_out = p_dst->p[i_plane].p_pixels;
+    p_out_end = p_out + p_dst->p[i_plane].i_pitch
+                      * p_dst->p[i_plane].i_visible_lines;
+
+    /* skip first line for bottom field */
+    if( i_field == 1 )
+        p_out += p_dst->p[i_plane].i_pitch;
+
+    int wm8 = w % 8;   /* remainder */
+    int w8  = w - wm8; /* part of width that is divisible by 8 */
+    for( ; p_out < p_out_end ; p_out += 2*p_dst->p[i_plane].i_pitch )
+    {
+        uint64_t *po = (uint64_t *)p_out;
+#ifdef CAN_COMPILE_MMXEXT
+        if( u_cpu & CPU_CAPABILITY_MMXEXT )
+        {
+            movq_m2r( i_strength_u64,  mm1 );
+            movq_m2r( remove_high_u64, mm2 );
+            for( int x = 0 ; x < w8; x += 8 )
+            {
+                movq_m2r( (*po), mm0 );
+
+                psrlq_r2r( mm1, mm0 );
+                pand_r2r(  mm2, mm0 );
+
+                movq_r2m( mm0, (*po++) );
+            }
+        }
+        else
+        {
+#endif
+            for( int x = 0 ; x < w8; x += 8, ++po )
+                (*po) = ( ((*po) >> i_strength) & remove_high_u64 );
+#ifdef CAN_COMPILE_MMXEXT
+        }
+#endif
+        /* handle the width remainder */
+        if( wm8 )
+        {
+            uint8_t *po_temp = (uint8_t *)po;
+            for( int x = 0 ; x < wm8; ++x, ++po_temp )
+                (*po_temp) = ( ((*po_temp) >> i_strength) & remove_high_u8 );
+        }
+    }
+
+    /* Process chroma if the field chromas are independent.
+
+       The origin (black) is at YUV = (0, 128, 128) in the uint8 format.
+       The chroma processing is a bit more complicated than luma,
+       and needs MMX for vectorization.
+    */
+    if( p_dst->format.i_chroma == VLC_CODEC_I422  ||
+        p_dst->format.i_chroma == VLC_CODEC_J422 )
+    {
+        for( i_plane = 0 ; i_plane < p_dst->i_planes ; i_plane++ )
+        {
+            if( i_plane == Y_PLANE )
+                continue; /* luma already handled */
+
+            int w = p_dst->p[i_plane].i_visible_pitch;
+#ifdef CAN_COMPILE_MMXEXT
+            int wm8 = w % 8;   /* remainder */
+            int w8  = w - wm8; /* part of width that is divisible by 8 */
+#endif
+            p_out = p_dst->p[i_plane].p_pixels;
+            p_out_end = p_out + p_dst->p[i_plane].i_pitch
+                              * p_dst->p[i_plane].i_visible_lines;
+
+            /* skip first line for bottom field */
+            if( i_field == 1 )
+                p_out += p_dst->p[i_plane].i_pitch;
+
+            for( ; p_out < p_out_end ; p_out += 2*p_dst->p[i_plane].i_pitch )
+            {
+#ifdef CAN_COMPILE_MMXEXT
+                /* See also easy-to-read C version below. */
+                if( u_cpu & CPU_CAPABILITY_MMXEXT )
+                {
+                    static const mmx_t b128 = { .uq = 0x8080808080808080ULL };
+                    movq_m2r( b128, mm5 );
+                    movq_m2r( i_strength_u64,  mm6 );
+                    movq_m2r( remove_high_u64, mm7 );
+
+                    uint64_t *po = (uint64_t *)p_out;
+                    for( int x = 0 ; x < w8; x += 8 )
+                    {
+                        movq_m2r( (*po), mm0 );
+
+                        movq_r2r( mm5, mm2 ); /* 128 */
+                        movq_r2r( mm0, mm1 ); /* copy of data */
+                        psubusb_r2r( mm2, mm1 ); /* mm1 = max(data - 128, 0) */
+                        psubusb_r2r( mm0, mm2 ); /* mm2 = max(128 - data, 0) */
+
+                        /* >> i_strength */
+                        psrlq_r2r( mm6, mm1 );
+                        psrlq_r2r( mm6, mm2 );
+                        pand_r2r(  mm7, mm1 );
+                        pand_r2r(  mm7, mm2 );
+
+                        /* collect results from pos./neg. parts */
+                        psubb_r2r( mm2, mm1 );
+                        paddb_r2r( mm5, mm1 );
+
+                        movq_r2m( mm1, (*po++) );
+                    }
+
+                    /* handle the width remainder */
+                    if( wm8 )
+                    {
+                        /* The output is closer to 128 than the input;
+                           the result always fits in uint8. */
+                        uint8_t *po8 = (uint8_t *)po;
+                        for( int x = 0 ; x < wm8; ++x, ++po8 )
+                            (*po8) = 128 + ( ((*po8) - 128) /
+                                                  (1 << i_strength) );
+                    }
+                }
+                else
+                {
+#endif
+                    /* 4:2:2 chroma handler, C version */
+                    uint8_t *po = p_out;
+                    for( int x = 0 ; x < w; ++x, ++po )
+                        (*po) = 128 + ( ((*po) - 128) / (1 << i_strength) );
+#ifdef CAN_COMPILE_MMXEXT
+                }
+#endif
+            } /* for p_out... */
+        } /* for i_plane... */
+    } /* if b_i422 */
+
+#ifdef CAN_COMPILE_MMXEXT
+    if( u_cpu & CPU_CAPABILITY_MMXEXT )
+        emms();
+#endif
+}
+
+/**
+ * Deinterlace filter. Simulates an interlaced CRT TV (to some extent).
+ *
+ * The main use case for this filter is anime for which IVTC is not applicable.
+ * This is the case, if 24fps telecined material has been mixed with 60fps
+ * interlaced effects, such as in Sol Bianca or Silent Mobius. It can also
+ * be used for true interlaced video, such as most camcorder recordings.
+ *
+ * The filter has several modes for handling 4:2:0 chroma for those output
+ * frames that fall across input frame temporal boundaries (i.e. fields come
+ * from different frames). Upconvert (to 4:2:2) provides the most accurate
+ * CRT simulation, but requires more CPU and memory bandwidth than the other
+ * modes. The other modes keep the chroma at 4:2:0.
+ *
+ * About these modes: telecined input (such as NTSC anime DVDs) works better
+ * with AltLine, while true interlaced input works better with Latest.
+ * Merge is a compromise, which may or may not look acceptable.
+ * The mode can be set in the VLC advanced configuration,
+ * All settings > Video > Filters > Deinterlace
+ *
+ * Technically speaking, this is an interlaced field renderer targeted for
+ * progressive displays. It works by framerate doubling, and simulating one
+ * step of light output decay of the "old" field during the "new" field,
+ * until the next new field comes in to replace the "old" one.
+ *
+ * While playback is running, the simulated light decay gives the picture an
+ * appearance of visible "scanlines", much like on a real TV. Only when the
+ * video is paused, it is clearly visible that one of the fields is actually
+ * brighter than the other.
+ *
+ * The main differences to the Bob algorithm are:
+ *  - in addition to the current field, the previous one (fading out)
+ *    is also rendered
+ *  - some horizontal lines don't seem to flicker as much
+ *  - scanline visual effect (adjustable; the dimmer strength can be set
+ *    in the VLC advanced configuration)
+ *  - the picture appears 25%, 38% or 44% darker on average (for dimmer
+ *    strengths 1, 2 and 3)
+ *  - if the input has 4:2:0 chroma, the colours may look messed up in some
+ *    output frames. This is a limitation of the 4:2:0 chroma format, and due
+ *    to the fact that both fields are present in each output picture. Usually
+ *    this doesn't matter in practice, but see the 4:2:0 chroma mode setting
+ *    in the configuration if needed (it may help a bit).
+ *
+ * In addition, when this filter is used on an LCD computer monitor,
+ * the main differences to a real CRT TV are:
+ *  - Pixel shape and grid layout; CRT TVs were designed for interlaced
+ *    field rendering, while LCD monitors weren't.
+ *  - No scan flicker even though the display runs (usually) at 60Hz.
+ *    (This at least is a good thing.)
+ *
+ * The output vertical resolution should be large enough for the scaling
+ * not to have a too adverse effect on the regular scanline pattern.
+ * In practice, NTSC video can be acceptably rendered already at 1024x600
+ * if fullscreen even on an LCD. PAL video requires more.
+ *
+ * Just like Bob, this filter works properly only if the input framerate
+ * is stable. Otherwise the scanline effect breaks down and the picture
+ * will flicker.
+ *
+ * Soft field repeat (repeat_pict) is supported. Note that the generated
+ * "repeated" output picture is unique because of the simulated light decay.
+ * Its "old" field comes from the same input frame as the "new" one, unlike
+ * the first output picture of the same frame.
+ *
+ * As many output frames should be requested for each input frame as is
+ * indicated by p_src->i_nb_fields. This is done by calling this function
+ * several times, first with i_order = 0, and then with all other parameters
+ * the same, but a new p_dst, increasing i_order (1 for second field,
+ * and then if i_nb_fields = 3, also i_order = 2 to get the repeated first
+ * field), and alternating i_field (starting, at i_order = 0, with the field
+ * according to p_src->b_top_field_first). See Deinterlace() for an example.
+ *
+ * @param p_filter The filter instance. Must be non-NULL.
+ * @param p_dst Output frame. Must be allocated by caller.
+ * @param p_src Input frame. Must exist.
+ * @param i_order Temporal field number: 0 = first, 1 = second, 2 = rep. first.
+ * @param i_field Render which field? 0 = top field, 1 = bottom field.
+ * @return VLC error code (int).
+ * @retval VLC_SUCCESS The requested field was rendered into p_dst.
+ * @retval VLC_EGENERIC No pictures in history buffer, cannot render.
+ * @see RenderBob()
+ * @see RenderLinear()
+ * @see Deinterlace()
+ */
+static int RenderPhosphor( filter_t *p_filter,
+                           picture_t *p_dst, picture_t *p_src,
+                           int i_order, int i_field )
+{
+    assert( p_filter != NULL );
+    assert( p_dst != NULL );
+    assert( p_src != NULL );
+    assert( i_order >= 0 && i_order <= 2 ); /* 2 = soft field repeat */
+    assert( i_field == 0 || i_field == 1 );
+
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    /* Last two input frames */
+    picture_t *p_in  = p_sys->pp_history[HISTORY_SIZE-1];
+    picture_t *p_old = p_sys->pp_history[HISTORY_SIZE-2];
+
+    /* Use the same input picture as "old" at the first frame after startup */
+    if( !p_old )
+        p_old = p_in;
+
+    /* If the history mechanism has failed, we can't do anything. */
+    if( !p_in )
+        return VLC_EGENERIC;
+
+    assert( p_old != NULL );
+    assert( p_in != NULL );
+
+    /* Decide sources for top & bottom fields of output. */
+    picture_t *p_in_top    = p_in;
+    picture_t *p_in_bottom = p_in;
+    /* For the first output field this frame,
+       grab "old" field from previous frame. */
+    if( i_order == 0 )
+    {
+        if( i_field == 0 ) /* rendering top field */
+            p_in_bottom = p_old;
+        else /* i_field == 1, rendering bottom field */
+            p_in_top = p_old;
+    }
+
+    compose_chroma_t cc;
+    switch( p_sys->phosphor.i_chroma_for_420 )
+    {
+        case PC_BLEND:
+            cc = CC_MERGE;
+            break;
+        case PC_LATEST:
+            if( i_field == 0 )
+                cc = CC_SOURCE_TOP;
+            else /* i_field == 1 */
+                cc = CC_SOURCE_BOTTOM;
+            break;
+        case PC_ALTLINE:
+            cc = CC_ALTLINE;
+            break;
+        case PC_UPCONVERT:
+            cc = CC_UPCONVERT;
+            break;
+        default:
+            /* The above are the only possibilities, if there are no bugs. */
+            assert(0);
+            break;
+    }
+
+    ComposeFrame( p_filter, p_dst, p_in_top, p_in_bottom, cc );
+
+    /* Simulate phosphor light output decay for the old field.
+
+       The dimmer can also be switched off in the configuration, but that is
+       more of a technical curiosity or an educational toy for advanced users
+       than a useful deinterlacer mode (although it does make telecined
+       material look slightly better than without any filtering).
+
+       In most use cases the dimmer is used.
+    */
+    if( p_sys->phosphor.i_dimmer_strength > 0 )
+        DarkenField( p_dst, !i_field, p_sys->phosphor.i_dimmer_strength );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
  * video filter2 functions
  *****************************************************************************/
 #define DEINTERLACE_DST_SIZE 3
@@ -1837,6 +2523,18 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
             if( p_dst[2] )
                 RenderYadif( p_filter, p_dst[2], p_pic, 2, !b_top_field_first );
             break;
+
+        case DEINTERLACE_PHOSPHOR:
+            if( RenderPhosphor( p_filter, p_dst[0], p_pic, 0,
+                                !b_top_field_first ) )
+                goto drop;
+            if( p_dst[1] )
+                RenderPhosphor( p_filter, p_dst[1], p_pic, 1,
+                                b_top_field_first );
+            if( p_dst[2] )
+                RenderPhosphor( p_filter, p_dst[2], p_pic, 2,
+                                !b_top_field_first );
+            break;
     }
 
     /* Set output timestamps, if the algorithm didn't request CUSTOM_PTS for this frame. */
@@ -2001,6 +2699,42 @@ static int Open( vlc_object_t *p_this )
     char *psz_mode = var_GetNonEmptyString( p_filter, FILTER_CFG_PREFIX "mode" );
     SetFilterMethod( p_filter, psz_mode, p_filter->fmt_in.video.i_chroma );
     free( psz_mode );
+
+    if( p_sys->i_mode == DEINTERLACE_PHOSPHOR )
+    {
+        int i_c420 = var_GetInteger( p_filter,
+                                     FILTER_CFG_PREFIX "phosphor-chroma" );
+        if( i_c420 != PC_LATEST  &&  i_c420 != PC_ALTLINE  &&
+            i_c420 != PC_BLEND   && i_c420 != PC_UPCONVERT )
+        {
+            msg_Dbg( p_filter, "Phosphor 4:2:0 input chroma mode not set"\
+                               "or out of range (valid: 1, 2, 3 or 4), "\
+                               "using default" );
+            i_c420 = PC_ALTLINE;
+        }
+        msg_Dbg( p_filter, "using Phosphor 4:2:0 input chroma mode %d",
+                           i_c420 );
+        /* This maps directly to the phosphor_chroma_t enum. */
+        p_sys->phosphor.i_chroma_for_420 = i_c420;
+
+        int i_dimmer = var_GetInteger( p_filter,
+                                       FILTER_CFG_PREFIX "phosphor-dimmer" );
+        if( i_dimmer < 1  ||  i_dimmer > 4 )
+        {
+            msg_Dbg( p_filter, "Phosphor dimmer strength not set "\
+                               "or out of range (valid: 1, 2, 3 or 4), "\
+                               "using default" );
+            i_dimmer = 2; /* low */
+        }
+        msg_Dbg( p_filter, "using Phosphor dimmer strength %d", i_dimmer );
+        /* The internal value ranges from 0 to 3. */
+        p_sys->phosphor.i_dimmer_strength = i_dimmer - 1;
+    }
+    else
+    {
+        p_sys->phosphor.i_chroma_for_420 = PC_ALTLINE;
+        p_sys->phosphor.i_dimmer_strength = 1;
+    }
 
     /* */
     video_format_t fmt;
