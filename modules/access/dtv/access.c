@@ -192,7 +192,7 @@ static const char *const satno_user[] = { N_("Unspecified"),
 #endif
 
 /* BDA module additional DVB-S Parameters */
-#define NETID_TEXT N_("Network Identifier")
+#define NETID_TEXT N_("Network identifier")
 #define AZIMUTH_TEXT N_("Satellite azimuth")
 #define AZIMUTH_LONGTEXT N_("Satellite azimuth in tenths of degree")
 #define ELEVATION_TEXT N_("Satellite elevation")
@@ -242,9 +242,9 @@ vlc_module_begin ()
 #endif
 #ifdef WIN32
     add_integer ("dvb-adapter", -1, ADAPTER_TEXT, ADAPTER_LONGTEXT, true)
-    add_string ("dvb-network-name", NULL, NAME_TEXT, NAME_LONGTEXT, true)
+    add_string ("dvb-network-name", "", NAME_TEXT, NAME_LONGTEXT, true)
     /* Hmm: is this one really safe??: */
-    add_string ("dvb-create-name", NULL, CREATE_TEXT, CREATE_LONGTEXT, true)
+    add_string ("dvb-create-name", "", CREATE_TEXT, CREATE_LONGTEXT, true)
         change_private ()
 #endif
     add_integer ("dvb-frequency", 0, FREQ_TEXT, FREQ_LONGTEXT, false)
@@ -327,11 +327,11 @@ vlc_module_begin ()
         change_integer_list (auto_off_on_vlc, auto_off_on_user)
 #endif
 #ifdef WIN23
-    add_integer ("dvb-network-id", 0, NETID_TEXT, NULL, true)
+    add_integer ("dvb-network-id", 0, NETID_TEXT, NETID_TEXT, true)
     add_integer ("dvb-azimuth", 0, AZIMUTH_TEXT, AZIMUTH_LONGTEXT, true)
     add_integer ("dvb-elevation", 0, ELEVATION_TEXT, ELEVATION_LONGTEXT, true)
     add_integer ("dvb-longitude", 0, LONGITUDE_TEXT, LONGITUDE_LONGTEXT, true)
-    add_string ("dvb-range", NULL, RANGE_TEXT, RANGE_LONGTEXT, true)
+    add_string ("dvb-range", "", RANGE_TEXT, RANGE_LONGTEXT, true)
     /* dvb-range corresponds to the BDA InputRange parameter which is
     * used by some drivers to control the diseqc */
 
