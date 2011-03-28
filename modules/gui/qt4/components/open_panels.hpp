@@ -202,7 +202,6 @@ private:
 #ifdef WIN32
     StringListConfigControl *vdevDshowW, *adevDshowW;
     QLineEdit *dshowVSizeLine;
-# define DTV_PLUGIN "bda"
 #else
     QSpinBox  *pvrFreq, *pvrBitr;
     QComboBox *v4l2VideoDevice, *v4l2AudioDevice;
@@ -211,7 +210,6 @@ private:
     QSpinBox *jackChannels, *jackCaching;
     QCheckBox *jackPace, *jackConnect;
     QLineEdit *jackPortsSelected;
-# define DTV_PLUGIN "dtv"
 #endif
     QRadioButton *dvbc, *dvbs, *dvbs2, *dvbt, *atsc, *cqam;
     QLabel *dvbBandLabel, *dvbSrateLabel, *dvbModLabel;

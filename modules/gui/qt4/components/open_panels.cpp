@@ -68,7 +68,7 @@
         .replaceInStrings( QRegExp("^"), "/dev/" ) \
     );
 
-static const char psz_devModule[][8] = { "v4l2", "pvr", DTV_PLUGIN,
+static const char psz_devModule[][8] = { "v4l2", "pvr", "dtv",
                                        "dshow", "screen", "jack" };
 
 /**************************************************************************
@@ -931,7 +931,7 @@ void CaptureOpenPanel::initialize()
     /*************
      * DVB Stuff *
      *************/
-    if( module_exists( DTV_PLUGIN ) ){
+    if( module_exists( "dtv" ) ){
     addModuleAndLayouts( DTV_DEVICE, dvb, N_("TV (digital)"), QGridLayout );
 
     /* DVB Main */
