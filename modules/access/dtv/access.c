@@ -335,7 +335,7 @@ vlc_module_begin ()
     /* dvb-range corresponds to the BDA InputRange parameter which is
     * used by some drivers to control the diseqc */
 
-    set_section (N_("ATSC reception parameters"))
+    set_section (N_("ATSC reception parameters"), NULL)
     add_integer ("dvb-major-channel", 0, MAJOR_CHANNEL_TEXT, NULL, true)
     add_integer ("dvb-minor-channel", 0, MINOR_CHANNEL_TEXT, NULL, true)
     add_integer ("dvb-physical-channel", 0, PHYSICAL_CHANNEL_TEXT, NULL, true)
