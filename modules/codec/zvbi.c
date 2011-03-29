@@ -666,7 +666,7 @@ static int EventKey( vlc_object_t *p_this, char const *psz_cmd,
     decoder_t *p_dec = p_data;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED( p_this );
 
     /* FIXME: Capture + and - key for subpage browsing */
     if( newval.i_int == '-' || newval.i_int == '+' )
