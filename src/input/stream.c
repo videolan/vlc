@@ -260,16 +260,8 @@ stream_t *stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
     strcpy( psz_dup, psz_url );
     input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_dup );
 
-    /* Get a weak link to the parent input */
-    /* FIXME: This should probably be removed in favor of a NULL input. */
-    input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_parent, VLC_OBJECT_INPUT, FIND_PARENT );
-    
     /* Now try a real access */
-    p_access = access_New( p_parent, p_input, psz_access, psz_demux, psz_path );
-
-    if(p_input)
-        vlc_object_release((vlc_object_t*)p_input);
-
+    p_access = access_New( p_parent, NULL, psz_access, psz_demux, psz_path );
     if( p_access == NULL )
     {
         msg_Err( p_parent, "no suitable access module for `%s'", psz_url );
