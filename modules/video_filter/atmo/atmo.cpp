@@ -2535,7 +2535,7 @@ static void AddStateVariableCallback(filter_t *p_filter)
 *****************************************************************************
 * Delete the callback function to the "state" variable of the input thread...
 * first find the PlayList and get the input thread from there to attach
-* my callback? is vlc_object_find the right way for this??
+* my callback.
 *****************************************************************************/
 static void DelStateVariableCallback( filter_t *p_filter )
 {
