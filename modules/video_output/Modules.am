@@ -8,7 +8,6 @@ SOURCES_aa = aa.c
 SOURCES_caca = caca.c
 SOURCES_fb = fb.c
 SOURCES_vout_sdl = sdl.c
-SOURCES_snapshot = snapshot.c
 SOURCES_directfb = directfb.c
 SOURCES_vmem = vmem.c
 SOURCES_yuv = yuv.c

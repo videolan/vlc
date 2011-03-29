@@ -3250,16 +3250,6 @@ dnl
 PKG_ENABLE_MODULES_VLC([SVG], [], [librsvg-2.0 >= 2.9.0], [SVG rendering library],[auto])
 
 dnl
-dnl Snapshot vout module (with cache)
-dnl
-AC_ARG_ENABLE(snapshot,
-  [  --enable-snapshot       snapshot module (default disabled)])
-if test "${enable_snapshot}" = "yes"
-then
-  VLC_ADD_PLUGIN([snapshot])
-fi
-
-dnl
 dnl  iOS vout module
 dnl
 AC_ARG_ENABLE(ios-vout,

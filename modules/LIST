@@ -281,7 +281,6 @@ $Id$
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation
  * smf: Standard MIDI file demuxer
- * snapshot: a output module to save pictures from the vout
  * spatializer: A spatializer audio filter
  * spdif_mixer: dummy audio mixer for the S/PDIF output
  * speex: a speex audio decoder/packetizer using the libspeex library
