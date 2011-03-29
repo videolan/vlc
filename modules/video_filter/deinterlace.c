@@ -2563,8 +2563,7 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
         }
     }
 
-    p_dst[0]->b_progressive = true;
-    for( int i = 1; i < DEINTERLACE_DST_SIZE; ++i )
+    for( int i = 0; i < DEINTERLACE_DST_SIZE; ++i )
     {
         if( p_dst[i] )
         {
