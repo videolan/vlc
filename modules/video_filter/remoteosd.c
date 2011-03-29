@@ -222,8 +222,6 @@ struct filter_sys_t
 
     picture_t     *p_pic;              /* The picture with OSD data from VNC */
 
-    vout_thread_t *p_vout;             /* Pointer to video-out thread */
-
     int           i_socket;            /* Socket used for VNC */
 
     uint16_t      i_vnc_width;          /* The with of the VNC screen */
@@ -309,13 +307,7 @@ static int CreateFilter ( vlc_object_t *p_this )
     p_filter->pf_sub_filter = Filter;
     p_filter->pf_sub_mouse  = MouseEvent;
 
-    p_sys->p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT, FIND_PARENT );
-
-    if( p_sys->p_vout )
-    {
-        var_AddCallback( p_sys->p_vout->p_libvlc, "key-pressed",
-                         KeyEvent, p_this );
-    }
+    var_AddCallback( p_filter->p_libvlc, "key-pressed", KeyEvent, p_this );
 
     es_format_Init( &p_filter->fmt_out, SPU_ES, VLC_CODEC_SPU );
     p_filter->fmt_out.i_priority = 0;
@@ -363,13 +355,7 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     stop_osdvnc( p_filter );
 
-    if( p_sys->p_vout )
-    {
-        var_DelCallback( p_sys->p_vout->p_libvlc, "key-pressed",
-                         KeyEvent, p_this );
-
-        vlc_object_release( p_sys->p_vout );
-    }
+    var_DelCallback( p_filter->p_libvlc, "key-pressed", KeyEvent, p_this );
 
     var_Destroy( p_this, RMTOSD_CFG "host" );
     var_Destroy( p_this, RMTOSD_CFG "port" );
