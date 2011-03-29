@@ -81,9 +81,6 @@ static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
 
 struct sout_stream_sys_t
 {
-    input_thread_t *p_input;
-    unsigned        i_es;
-
     bool     b_audio;
     bool     b_video;
 
@@ -105,8 +102,6 @@ static int Open( vlc_object_t *p_this )
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                    p_stream->p_cfg );
 
-    p_sys->p_input = NULL;
-    p_sys->i_es    = 0;
     p_sys->b_audio = var_GetBool( p_stream, SOUT_CFG_PREFIX"audio" );
     p_sys->b_video = var_GetBool( p_stream, SOUT_CFG_PREFIX "video" );
     p_sys->i_delay = var_GetInteger( p_stream, SOUT_CFG_PREFIX "delay" );
@@ -153,21 +148,10 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         return NULL;
     }
 
+#if 0
     id = malloc( sizeof( sout_stream_id_t ) );
     if( id == NULL )
         return NULL;
-
-    if( p_sys->i_es == 0 )
-    {
-        p_sys->p_input = vlc_object_find( p_stream, VLC_OBJECT_INPUT,
-                                          FIND_PARENT );
-        if( p_sys->p_input == NULL )
-        {
-            msg_Err( p_stream, "cannot find input" );
-            free( id );
-            return NULL;
-        }
-    }
 
     id->p_dec = input_DecoderNew( p_sys->p_input, p_fmt, NULL, NULL );
     if( id->p_dec == NULL )
@@ -175,21 +159,18 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         msg_Err( p_stream, "cannot create decoder for fcc=`%4.4s'",
                  (char*)&p_fmt->i_codec );
         free( id );
-        if( p_sys->i_es == 0 )
-            vlc_object_release( p_sys->p_input );
         return NULL;
     }
-
-    p_sys->i_es++;
     return id;
+#else
+# warning FIXME! sout_display does not work!
+    return NULL;
+#endif
 }
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     input_DecoderDelete( id->p_dec );
-    if( --p_stream->p_sys->i_es == 0)
-        vlc_object_release( p_stream->p_sys->p_input );
-
     free( id );
     return VLC_SUCCESS;
 }
