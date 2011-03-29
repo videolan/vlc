@@ -131,8 +131,6 @@ int transcode_spu_process( sout_stream_t *p_stream,
     if( !p_subpic )
         return VLC_EGENERIC;
 
-    sout_UpdateStatistic( p_stream->p_sout, SOUT_STATISTIC_DECODED_SUBTITLE, 1 );
-
     if( p_sys->b_master_sync && p_sys->i_master_drift )
     {
         p_subpic->i_start -= p_sys->i_master_drift;

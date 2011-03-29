@@ -313,12 +313,6 @@ sout_stream_t *sout_StreamChainNew (sout_instance_t *p_sout, char *psz_chain,
     assert (0);
 }
 
-void sout_UpdateStatistic (sout_instance_t *instance, sout_statistic_t stat,
-                           int value)
-{
-    assert (0);
-}
-
 char *vlc_sdp_Start (vlc_object_t *obj, const char *cfg,
                      const struct sockaddr *src, size_t srclen,
                      const struct sockaddr *addr, size_t addrlen)

@@ -356,7 +356,6 @@ int transcode_audio_process( sout_stream_t *p_stream,
     while( (p_audio_buf = id->p_decoder->pf_decode_audio( id->p_decoder,
                                                           &in )) )
     {
-        sout_UpdateStatistic( p_stream->p_sout, SOUT_STATISTIC_DECODED_AUDIO, 1 );
         if( p_sys->b_master_sync )
         {
             mtime_t i_dts = date_Get( &id->interpolated_pts ) + 1;

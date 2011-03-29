@@ -627,8 +627,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
     while( (p_pic = id->p_decoder->pf_decode_video( id->p_decoder, &in )) )
     {
 
-        sout_UpdateStatistic( p_stream->p_sout, SOUT_STATISTIC_DECODED_VIDEO, 1 );
-
         if( p_stream->p_sout->i_out_pace_nocontrol && p_sys->b_hurry_up )
         {
             mtime_t current_date = mdate();

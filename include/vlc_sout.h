@@ -59,21 +59,6 @@ struct sout_instance_t
     sout_instance_sys_t *p_sys;
 };
 
-/** Stream output statistics */
-typedef enum
-{
-    SOUT_STATISTIC_DECODED_VIDEO,
-    SOUT_STATISTIC_DECODED_AUDIO,
-    SOUT_STATISTIC_DECODED_SUBTITLE,
-
-    /* Use them only if you do not goes through a access_out module */
-    SOUT_STATISTIC_SENT_PACKET,
-    SOUT_STATISTIC_SENT_BYTE,
-
-} sout_statistic_t;
-
-VLC_EXPORT( void, sout_UpdateStatistic, ( sout_instance_t *p_sout, sout_statistic_t, int ) );
-
 /****************************************************************************
  * sout_stream_id_t: opaque (private for all sout_stream_t)
  ****************************************************************************/
