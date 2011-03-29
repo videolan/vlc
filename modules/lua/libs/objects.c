@@ -82,26 +82,6 @@ int vlclua_gc_release( lua_State *L )
     return 0;
 }
 
-static int vlc_object_type_from_string( const char *psz_name )
-{
-    static const struct
-    {
-        int i_type;
-        const char *psz_name;
-    } pp_objects[] =
-        { { VLC_OBJECT_INPUT, "input" },
-          { VLC_OBJECT_VOUT, "vout" },
-          { VLC_OBJECT_AOUT, "aout" },
-          { 0, "" } };
-    int i;
-    for( i = 0; pp_objects[i].i_type; i++ )
-    {
-        if( !strcmp( psz_name, pp_objects[i].psz_name ) )
-            return pp_objects[i].i_type;
-    }
-    return 0;
-}
-
 static int vlc_object_search_mode_from_string( const char *psz_name )
 {
     static const struct
@@ -124,32 +104,7 @@ static int vlc_object_search_mode_from_string( const char *psz_name )
 
 static int vlclua_object_find( lua_State *L )
 {
-    const char *psz_type = luaL_checkstring( L, 2 );
-    const char *psz_mode = luaL_checkstring( L, 3 );
-
-    vlc_object_t *p_this;
-    int i_type = vlc_object_type_from_string( psz_type );
-    int i_mode = vlc_object_search_mode_from_string( psz_mode );
-    vlc_object_t *p_result;
-
-    if( !i_type )
-        return luaL_error( L, "\"%s\" is not a valid object type.", psz_type );
-    if( !i_mode )
-        return luaL_error( L, "\"%s\" is not a valid search mode.", psz_mode );
-
-    if( lua_type( L, 1 ) == LUA_TNIL )
-        p_this = vlclua_get_this( L );
-    else
-    {
-        vlc_object_t **p_obj = luaL_checkudata( L, 1, "vlc_object" );
-        p_this = *p_obj;
-    }
-
-    p_result = vlc_object_find( p_this, i_type, i_mode );
-    if( !p_result )
-        lua_pushnil( L );
-    else
-        vlclua_push_vlc_object( L, p_result, vlclua_gc_release );
+    lua_pushnil( L );
     return 1;
 }
 

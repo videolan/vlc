@@ -64,7 +64,6 @@ struct vlc_object_t
  *****************************************************************************/
 VLC_EXPORT( void *, vlc_object_create, ( vlc_object_t *, size_t ) ) LIBVLC_MALLOC LIBVLC_USED;
 VLC_EXPORT( void, vlc_object_attach, ( vlc_object_t *, vlc_object_t * ) );
-VLC_EXPORT( void *, vlc_object_find, ( vlc_object_t *, int, int ) ) LIBVLC_USED LIBVLC_DEPRECATED;
 VLC_EXPORT( vlc_object_t *, vlc_object_find_name, ( vlc_object_t *, const char *, int ) ) LIBVLC_USED LIBVLC_DEPRECATED;
 VLC_EXPORT( void *, vlc_object_hold, ( vlc_object_t * ) );
 VLC_EXPORT( void, vlc_object_release, ( vlc_object_t * ) );
@@ -79,9 +78,6 @@ VLC_EXPORT( char *, vlc_object_get_name, ( const vlc_object_t * ) ) LIBVLC_USED;
 
 #define vlc_object_attach(a,b) \
     vlc_object_attach( VLC_OBJECT(a), VLC_OBJECT(b) )
-
-#define vlc_object_find(a,b,c) \
-    vlc_object_find( VLC_OBJECT(a),b,c)
 
 #define vlc_object_find_name(a,b,c) \
     vlc_object_find_name( VLC_OBJECT(a),b,c)
