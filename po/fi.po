@@ -923,7 +923,7 @@ msgstr "%s [%s %d]"
 #: src/libvlc-module.c:686 modules/gui/macosx/intf.m:660
 #: modules/gui/macosx/intf.m:661
 msgid "Program"
-msgstr "Ohjelma"
+msgstr "Kanava"
 
 #: src/input/es_out.c:1355 src/input/es_out.c:1357
 #, fuzzy
@@ -13303,9 +13303,8 @@ msgstr ""
 
 #: modules/demux/ts.c:195 modules/gui/macosx/controls.m:1132
 #: modules/gui/macosx/intf.m:703 modules/gui/qt4/dialogs/toolbar.cpp:407
-#, fuzzy
 msgid "Teletext"
-msgstr "Sivukoko"
+msgstr "Tekstitv"
 
 #: modules/demux/ts.c:196
 #, fuzzy
@@ -13318,9 +13317,8 @@ msgid "Teletext: additional information"
 msgstr "Mediatiedot"
 
 #: modules/demux/ts.c:198
-#, fuzzy
 msgid "Teletext: program schedule"
-msgstr "Sivukoko"
+msgstr "Tekstitv: ohjelma-aikataulu"
 
 #: modules/demux/ts.c:199
 #, fuzzy
@@ -17776,9 +17774,8 @@ msgid "&Track Synchronization"
 msgstr "Synkronointi"
 
 #: modules/gui/qt4/menus.cpp:382
-#, fuzzy
 msgid "Program Guide"
-msgstr "Ohjelma"
+msgstr "Ohjelmaopas"
 
 #: modules/gui/qt4/menus.cpp:389
 msgid "Plu&gins and extensions"
@@ -17921,7 +17918,7 @@ msgstr "&Ohjaus"
 
 #: modules/gui/qt4/menus.cpp:674
 msgid "&Program"
-msgstr "&Ohjelma"
+msgstr "&Kanava"
 
 #: modules/gui/qt4/menus.cpp:731
 msgid "Configure podcasts..."
@@ -20564,9 +20561,8 @@ msgid "Assign a fixed Network ID (for SDT table)"
 msgstr ""
 
 #: modules/mux/mpeg/ts.c:112
-#, fuzzy
 msgid "PMT Program numbers"
-msgstr "Näytä r&ivinumerot"
+msgstr "PMT Ohjelmanumerot"
 
 #: modules/mux/mpeg/ts.c:113
 msgid ""
