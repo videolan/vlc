@@ -38,10 +38,6 @@
 #include <vlc_playlist.h>
 #include <vlc_vout.h>
 
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
-
 #ifdef __APPLE__
 # include "TargetConditionals.h"
 # if !TARGET_OS_IPHONE
