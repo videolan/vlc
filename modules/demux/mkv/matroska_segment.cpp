@@ -1140,7 +1140,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         else if( !strcmp( p_tk->psz_codec, "S_TEXT/ASCII" ) )
         {
             p_fmt->i_codec = VLC_CODEC_SUBT;
-            p_fmt->subs.psz_encoding = NULL; /* Is there a place where it is stored ? */
+            p_fmt->subs.psz_encoding = strdup( "ASCII" );
         }
         else if( !strcmp( p_tk->psz_codec, "S_TEXT/UTF8" ) )
         {
