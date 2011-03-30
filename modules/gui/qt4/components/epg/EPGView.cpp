@@ -111,15 +111,18 @@ bool EPGView::hasValidData()
 
 static void cleanOverlapped( EPGEventByTimeQMap *epgItemByTime, EPGItem *epgItem, QGraphicsScene *scene )
 {
+    QDateTime epgItemTime = epgItem->start();
+    QDateTime epgItemTimeEnd = epgItem->end();
     /* Clean overlapped programs */
     foreach(const QDateTime existingTimes, epgItemByTime->keys())
     {
-        if ( existingTimes != epgItem->start() )
+        if ( existingTimes > epgItemTimeEnd ) break; /* Can't overlap later items */
+        if ( existingTimes != epgItemTime )
         {
             EPGItem *otherEPGItem = epgItemByTime->value( existingTimes );
-            if ( otherEPGItem->playsAt( epgItem->start().addSecs( 1 ) )
+            if ( otherEPGItem->playsAt( epgItemTime.addSecs( 1 ) )
                 || /* add/minus one sec because next one can start at prev end min */
-                 otherEPGItem->playsAt( epgItem->end().addSecs( -1 ) ) )
+                 otherEPGItem->playsAt( epgItemTimeEnd.addSecs( -1 ) ) )
             {
                 epgItemByTime->remove( otherEPGItem->start() );
                 scene->removeItem( otherEPGItem );
@@ -158,9 +161,9 @@ bool EPGView::addEPGEvent( vlc_epg_event_t *data, QString channelName, bool b_cu
     {
         /* Update our existing programs */
         epgItem = epgItemByTime->value( eventStart );
-        epgItem->setData( data ); /* updates our entry */
         epgItem->setCurrent( b_current );
-        cleanOverlapped( epgItemByTime, epgItem, scene() );
+        if ( epgItem->setData( data ) ) /* updates our entry */
+            cleanOverlapped( epgItemByTime, epgItem, scene() );
         mutex.unlock();
         return false;
     } else {

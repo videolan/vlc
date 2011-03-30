@@ -139,7 +139,7 @@ void EPGItem::setRow( unsigned int i_row_ )
     updatePos();
 }
 
-void EPGItem::setData( vlc_epg_event_t *data )
+bool EPGItem::setData( vlc_epg_event_t *data )
 {
     QDateTime newtime = QDateTime::fromTime_t( data->i_start );
     QString newname = qfu( data->psz_name );
@@ -159,7 +159,9 @@ void EPGItem::setData( vlc_epg_event_t *data )
         m_shortDescription = newshortdesc;
         setDuration( data->i_duration );
         update();
+        return true;
     }
+    return false;
 }
 
 void EPGItem::setCurrent( bool b_current )

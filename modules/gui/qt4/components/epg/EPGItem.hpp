@@ -48,7 +48,7 @@ public:
     int duration() const;
     const QString& name() { return m_name; };
     QString description();
-    void setData( vlc_epg_event_t * );
+    bool setData( vlc_epg_event_t * );
     void setRow( unsigned int );
     void setCurrent( bool );
     void setDuration( int duration );
