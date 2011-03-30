@@ -141,13 +141,25 @@ void EPGItem::setRow( unsigned int i_row_ )
 
 void EPGItem::setData( vlc_epg_event_t *data )
 {
-    m_start = QDateTime::fromTime_t( data->i_start );
-    m_name = qfu( data->psz_name );
-    setToolTip( qfu( data->psz_name ) );
-    m_description = qfu( data->psz_description );
-    m_shortDescription = qfu( data->psz_short_description );
-    setDuration( data->i_duration );
-    update();
+    QDateTime newtime = QDateTime::fromTime_t( data->i_start );
+    QString newname = qfu( data->psz_name );
+    QString newdesc = qfu( data->psz_description );
+    QString newshortdesc = qfu( data->psz_short_description );
+
+    if ( m_start != newtime ||
+         m_name != newname ||
+         m_description != newdesc ||
+         m_shortDescription != newshortdesc ||
+         m_duration != data->i_duration )
+    {
+        m_start = newtime;
+        m_name = newname;
+        setToolTip( newname );
+        m_description = newdesc;
+        m_shortDescription = newshortdesc;
+        setDuration( data->i_duration );
+        update();
+    }
 }
 
 void EPGItem::setCurrent( bool b_current )
