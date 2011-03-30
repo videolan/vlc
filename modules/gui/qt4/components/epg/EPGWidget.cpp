@@ -102,7 +102,6 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
     b_input_type_known = true;
 
     m_epgView->cleanup(); /* expire items and flags */
-    rootWidget->setCurrentIndex( ( i_epg > 0 ) ? 0 : 1 );
 
     for ( int i = 0; i < i_epg; ++i )
     {
@@ -116,6 +115,9 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
                                     ( p_epg->p_current == p_event ) );
         }
     }
+
+    /* toggle our widget view */
+    rootWidget->setCurrentIndex( m_epgView->hasValidData() ? 0 : 1 );
 
     // Update the global duration and start time.
     m_epgView->updateDuration();

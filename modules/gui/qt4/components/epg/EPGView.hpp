@@ -66,6 +66,7 @@ public:
     void            updateDuration();
     void            reset();
     void            cleanup();
+    bool            hasValidData();
 
 signals:
     void            startTimeChanged( const QDateTime& startTime );

@@ -104,6 +104,11 @@ const QDateTime& EPGView::baseTime()
     return m_baseTime;
 }
 
+bool EPGView::hasValidData()
+{
+    return !epgitemsByChannel.empty();
+}
+
 static void cleanOverlapped( EPGEventByTimeQMap *epgItemByTime, EPGItem *epgItem, QGraphicsScene *scene )
 {
     /* Clean overlapped programs */
