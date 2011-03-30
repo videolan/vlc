@@ -46,7 +46,7 @@ public:
 
 public slots:
     void setZoom( int level );
-    void updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type );
+    void updateEPG( input_item_t * );
 
 private:
     EPGRuler* m_rulerWidget;

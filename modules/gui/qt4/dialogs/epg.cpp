@@ -118,15 +118,8 @@ void EpgDialog::showEvent( EPGItem *epgItem )
 
 void EpgDialog::updateInfos()
 {
-    if( !THEMIM->getInput() ) return;
     timer->stop();
-    input_item_t *p_input_item = input_GetItem( THEMIM->getInput() );
-    vlc_mutex_lock(  & p_input_item->lock );
-    int i_nbitems = p_input_item->i_epg;
-    if ( i_nbitems > 0 ) msg_Dbg( p_intf, "Found %i EPG items", i_nbitems );
-    epg->updateEPG( p_input_item->pp_epg,
-                    p_input_item->i_epg,
-                    p_input_item->i_type);
-    vlc_mutex_unlock( & p_input_item->lock );
+    if( !THEMIM->getInput() ) return;
+    epg->updateEPG( input_GetItem( THEMIM->getInput() ) );
     if ( isVisible() ) timer->start();
 }

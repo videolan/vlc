@@ -33,6 +33,9 @@
 #include <QLabel>
 #include <QStringList>
 #include "qt4.hpp"
+#include "input_manager.hpp"
+#include <vlc_common.h>
+#include <vlc_epg.h>
 
 EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
 {
@@ -94,18 +97,22 @@ void EPGWidget::setZoom( int level )
     m_rulerWidget->setScale( scale );
 }
 
-void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
+void EPGWidget::updateEPG( input_item_t *p_input_item )
 {
+    if( !p_input_item ) return;
+
     /* flush our EPG data if input type has changed */
-    if ( b_input_type_known && i_input_type != i_event_source_type ) m_epgView->reset();
-    i_event_source_type = i_input_type;
+    if ( b_input_type_known && p_input_item->i_type != i_event_source_type ) m_epgView->reset();
+    i_event_source_type = p_input_item->i_type;
     b_input_type_known = true;
 
     m_epgView->cleanup(); /* expire items and flags */
-
-    for ( int i = 0; i < i_epg; ++i )
+    /* Fixme: input could have dissapeared */
+    vlc_mutex_lock(  & p_input_item->lock );
+    int i_nbitems = p_input_item->i_epg;
+    for ( int i = 0; i < p_input_item->i_epg; ++i )
     {
-        vlc_epg_t *p_epg = pp_epg[i];
+        vlc_epg_t *p_epg = p_input_item->pp_epg[i];
 
         /* Read current epg events from libvlc and try to insert them */
         for ( int j = 0; j < p_epg->i_event; ++j )
@@ -115,6 +122,7 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
                                     ( p_epg->p_current == p_event ) );
         }
     }
+    vlc_mutex_unlock( & p_input_item->lock );
 
     /* toggle our widget view */
     rootWidget->setCurrentIndex( m_epgView->hasValidData() ? 0 : 1 );
@@ -123,3 +131,4 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg, uint8_t i_input_type )
     m_epgView->updateDuration();
     m_epgView->updateStartTime();
 }
+
