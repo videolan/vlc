@@ -68,6 +68,7 @@ Video Filter:
  * New posterize filter for lowering the number of colors
  * Atmo ambilight: improve Fnordlicht up to 254 channels
  * New sepia filter for creating sepia effect in videos
+ * New deinterlacer mode Phosphor, a framerate doubling CRT TV simulator
 
 Audio Output:
  * New audio output based on AudioQueue API for iOS
