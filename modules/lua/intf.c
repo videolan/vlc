@@ -333,7 +333,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
                 free( psz_telnet_host );
                 vlc_UrlClean( &url );
 
-                asprintf( &psz_telnet_host, "%s:%d", psz_esc_host ? psz_esc_host : "", i_telnet_port );
+                asprintf( &psz_telnet_host, "telnet://%s:%d", psz_esc_host ? psz_esc_host : "", i_telnet_port );
                 free( psz_esc_host );
             }
 
@@ -394,6 +394,23 @@ int Open_LuaIntf( vlc_object_t *p_this )
     {
         lua_newtable( L );
         lua_setglobal( L, "config" );
+    }
+
+    /* Wrapper for legacy telnet config */
+    if ( !strcmp( psz_name, "telnet" ) )
+    {
+        char *wrapped_file = vlclua_find_file( p_this, "intf", "rc" );
+        if( !wrapped_file )
+        {
+            msg_Err( p_intf, "Couldn't find lua interface script \"rc\", "
+                             "needed by telnet wrapper" );
+            p_intf->psz_header = NULL;
+            lua_close( p_sys->L );
+            goto error;
+        }
+        lua_pushstring( L, wrapped_file );
+        lua_setglobal( L, "wrapped_file" );
+        free( wrapped_file );
     }
 
     p_sys->L = L;
