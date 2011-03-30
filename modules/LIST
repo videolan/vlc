@@ -60,7 +60,6 @@ $Id$
  * avi: AVI File stream demuxer
  * ball: Augmented reality ball video filter module
  * bandlimited_resampler: Bandlimited interpolation audio resampler
- * bda: DVB support for Windows BDA drivers
  * blend: a picture filter that blends two pictures
  * blendbench: a picture filter that test performance of blending routines
  * bluescreen: Bluescreen (weather channel like) video filter
@@ -99,6 +98,7 @@ $Id$
  * dts: DTS basic parser/packetizer
  * dtstofloat32: DTS Audio converter
  * dtstospdif: Audio converter that encapsulates DTS into S/PDIF
+ * dtv: DVB support (superseds bda module for Windows)
  * dummy: dummy audio output, video output, interface and input modules
  * dvb: input module for DVB-S/C/T streaming using v4l2 API
  * dvbsub: decoder module for subs in dvb streams
