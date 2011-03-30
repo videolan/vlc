@@ -148,15 +148,15 @@ static void scan_service_Delete( scan_service_t *p_srv )
     free( p_srv );
 }
 
-static int decode_BCD( uint32_t input, uint32_t *output )
+static uint32_t decode_BCD( uint32_t input )
 {
-    *output = 0;
+    uint32_t output = 0;
     for( short index=28; index >= 0 ; index -= 4 )
     {
-        *output *= 10;
-        *output += ((input >> index) & 0x0f);
+        output *= 10;
+        output += ((input >> index) & 0x0f);
     };
-    return VLC_SUCCESS;
+    return output;
 }
 
 static int scan_service_type( int service_type )
@@ -890,13 +890,9 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
                 dvbpsi_cable_deliv_sys_dr_t *p_t = dvbpsi_DecodeCableDelivSysDr( p_dsc );
                 msg_Dbg( p_obj, "       * Cable delivery system");
 
-                if( decode_BCD( p_t->i_frequency, &p_cfg->i_frequency ) < 0 )
-                    return;
-                p_cfg->i_frequency *= 100;
+                pcfg->i_freqency =  decode_BCD( p_t->i_frequency ) * 100;
                 msg_Dbg( p_obj, "           * frequency %d", p_cfg->i_frequency );
-                if( decode_BCD( p_t->i_symbol_rate, &p_cfg->i_symbolrate ) < 0 )
-                    return;
-                p_cfg->i_symbolrate *= 100;
+                p_cfg->i_symbolrate =  decode_BCD( p_t->i_symbol_rate ) * 100;
                 msg_Dbg( p_obj, "           * symbolrate %u", p_cfg->i_symbolrate );
                 p_cfg->i_modulation = (8 << p_t->i_modulation);
                 msg_Dbg( p_obj, "           * modulation %u", p_cfg->i_modulation );
