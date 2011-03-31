@@ -135,8 +135,13 @@ static ssize_t Read (access_t *access, uint8_t *buf, size_t len)
     if ((code / 100) != 2)
     {
         msg_Err (access, "server error %u", code);
-        dialog_FatalWait (access, N_("Coffee pot"),
-            N_("The pot failed to brew coffee (server error %u)."), code);
+        if (code == 418)
+            dialog_FatalWait (access, N_("Teapot"), "%s",
+                N_("The server is a teapot. You can't brew coffee with "
+                   "a teapot."));
+        else
+            dialog_FatalWait (access, N_("Coffee pot"),
+                N_("The pot failed to brew coffee (server error %u)."), code);
         goto error;
     }
 
