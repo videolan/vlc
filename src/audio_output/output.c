@@ -272,6 +272,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
                                        bool b_can_sleek )
 {
     aout_buffer_t * p_buffer;
+    mtime_t now = mdate();
 
     aout_lock_output_fifo( p_aout );
 
@@ -281,10 +282,10 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
      * In the case of b_can_sleek, we don't use a resampler so we need to be
      * a lot more severe. */
     while ( p_buffer && p_buffer->i_pts <
-            (b_can_sleek ? start_date : mdate()) - AOUT_PTS_TOLERANCE )
+            (b_can_sleek ? start_date : now) - AOUT_PTS_TOLERANCE )
     {
         msg_Dbg( p_aout, "audio output is too slow (%"PRId64"), "
-                 "trashing %"PRId64"us", mdate() - p_buffer->i_pts,
+                 "trashing %"PRId64"us", now - p_buffer->i_pts,
                  p_buffer->i_length );
         p_buffer = p_buffer->p_next;
         aout_BufferFree( p_aout->output.fifo.p_first );
