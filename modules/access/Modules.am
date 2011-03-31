@@ -63,6 +63,7 @@ SOURCES_access_attachment = attachment.c
 SOURCES_access_vdr = vdr.c
 SOURCES_libbluray = bluray.c
 SOURCES_decklink = decklink.cpp
+SOURCES_htcpcp = htcpcp.c
 
 
 SOURCES_access_rar = rar/rar.c rar/rar.h rar/access.c
