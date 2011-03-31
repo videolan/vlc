@@ -389,6 +389,15 @@ static void stream_state_cb(pa_stream *s, void *userdata)
     }
 }
 
+/* Memory free callback. The block_t address is in front of the data. */
+static void block_free_cb(void *data)
+{
+    block_t **pp = data, *block;
+
+    memcpy(&block, pp - 1, sizeof (block));
+    block_Release(block);
+}
+
 static void stream_request_cb(pa_stream *s, size_t length, void *userdata)
 {
     aout_instance_t *aout = userdata;
@@ -396,7 +405,7 @@ static void stream_request_cb(pa_stream *s, size_t length, void *userdata)
     size_t buffer_size = sys->buffer_size;
 
     do {
-        aout_buffer_t *p_buffer = NULL;
+        block_t *block = NULL;
 
         if (sys->start_date != VLC_TS_INVALID) {
             pa_usec_t latency;
@@ -414,18 +423,22 @@ static void stream_request_cb(pa_stream *s, size_t length, void *userdata)
             //msg_Dbg(p_aout, "latency=%"PRId64, latency);
             mtime_t next_date = mdate() + latency;
 
-            if (sys->start_date < next_date + AOUT_PTS_TOLERANCE )
-                p_buffer = aout_OutputNextBuffer(aout, next_date, 0);
+            if (sys->start_date < next_date + AOUT_PTS_TOLERANCE)
+                block = aout_OutputNextBuffer(aout, next_date, 0);
         }
 
-        if (p_buffer != NULL)
-        {
-            pa_stream_write(s, p_buffer->p_buffer, p_buffer->i_buffer, NULL, 0, PA_SEEK_RELATIVE);
-            length -= p_buffer->i_buffer;
-            aout_BufferFree( p_buffer );
-        }
-        else
-        {
+        if (block != NULL)
+            /* PA won't let us pass a reference to the buffer meta data... */
+            block = block_Realloc (block, sizeof (block), block->i_buffer);
+        if (block != NULL) {
+            memcpy(block->p_buffer, &block, sizeof (block));
+            block->p_buffer += sizeof (block);
+            block->i_buffer -= sizeof (block);
+
+            length -= block->i_buffer;
+            pa_stream_write(s, block->p_buffer, block->i_buffer,
+                            block_free_cb, 0, PA_SEEK_RELATIVE);
+        } else {
             void *data = pa_xmalloc(length);
             memset(data, 0, length);
             pa_stream_write(s, data, length, pa_xfree, 0, PA_SEEK_RELATIVE);
