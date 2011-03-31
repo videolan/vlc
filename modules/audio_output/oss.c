@@ -95,7 +95,7 @@ static mtime_t BufferDuration( aout_instance_t * p_aout );
  *****************************************************************************/
 vlc_module_begin ()
     set_shortname( "OSS" )
-    set_description( N_("UNIX OSS audio output") )
+    set_description( N_("Open Sound System") )
 
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
