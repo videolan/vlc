@@ -36,7 +36,9 @@
 #include <errno.h>
 
 static int OpenV4L (vlc_object_t *);
+#ifdef HAVE_ALSA
 static int OpenALSA (vlc_object_t *);
+#endif
 static int OpenDisc (vlc_object_t *);
 static void Close (vlc_object_t *);
 static int vlc_sd_probe_Open (vlc_object_t *);
@@ -52,7 +54,7 @@ vlc_module_begin ()
     set_capability ("services_discovery", 0)
     set_callbacks (OpenV4L, Close)
     add_shortcut ("v4l")
-
+#ifdef HAVE_ALSA
     add_submodule ()
     set_shortname (N_("Audio capture"))
     set_description (N_("Audio capture (ALSA)"))
@@ -61,7 +63,7 @@ vlc_module_begin ()
     set_capability ("services_discovery", 0)
     set_callbacks (OpenALSA, Close)
     add_shortcut ("alsa")
-
+#endif
     add_submodule ()
     set_shortname (N_("Discs"))
     set_description (N_("Discs"))
@@ -88,8 +90,10 @@ static int vlc_sd_probe_Open (vlc_object_t *obj)
     {
         vlc_sd_probe_Add (probe, "v4l{longname=\"Video capture\"}",
                           N_("Video capture"), SD_CAT_DEVICES);
+#ifdef HAVE_ALSA
         vlc_sd_probe_Add (probe, "alsa{longname=\"Audio capture\"}",
                           N_("Audio capture"), SD_CAT_DEVICES);
+#endif
         vlc_sd_probe_Add (probe, "disc{longname=\"Discs\"}", N_("Discs"),
                           SD_CAT_DEVICES);
         udev_monitor_unref (mon);
