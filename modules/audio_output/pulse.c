@@ -2,6 +2,7 @@
  * pulse.c : Pulseaudio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2008 the VideoLAN team
+ * Copyright (C) 2009-2011 Rémi Denis-Courmont
  *
  * Authors: Martin Hamrle <hamrle @ post . cz>
  *
@@ -35,8 +36,6 @@
 
 #include <pulse/pulseaudio.h>
 
-#include <assert.h>
-
 /*****************************************************************************
  * aout_sys_t: Pulseaudio output method descriptor
  *****************************************************************************
@@ -45,36 +44,12 @@
  *****************************************************************************/
 struct aout_sys_t
 {
-    /** PulseAudio playback stream object */
-    struct pa_stream *stream;
-
-    /** PulseAudio connection context */
-    struct pa_context *context;
-
-    /** Main event loop object */
-    struct pa_threaded_mainloop *mainloop;
-
-    int started;
+    struct pa_stream *stream; /**< PulseAudio playback stream object */
+    struct pa_context *context; /**< PulseAudio connection context */
+    struct pa_threaded_mainloop *mainloop; /**< PulseAudio event loop */
     size_t buffer_size;
     mtime_t start_date;
 };
-
-#if 0
-#define PULSE_DEBUG( ...) \
-    msg_Dbg( p_aout, __VA_ARGS__ )
-#else
-#define PULSE_DEBUG( ...) \
-    (void) 0
-#endif
-
-
-#define CHECK_DEAD_GOTO(label) do { \
-if (!p_sys->context || pa_context_get_state(p_sys->context) != PA_CONTEXT_READY || \
-    !p_sys->stream || pa_stream_get_state(p_sys->stream) != PA_STREAM_READY) { \
-        msg_Err(p_aout, "Connection died: %s", p_sys->context ? pa_strerror(pa_context_errno(p_sys->context)) : "NULL"); \
-        goto label; \
-    }  \
-} while(0);
 
 /*****************************************************************************
  * Local prototypes
@@ -86,9 +61,7 @@ static void Play        ( aout_instance_t * );
 static void context_state_cb(pa_context *c, void *userdata);
 static void stream_state_cb(pa_stream *s, void * userdata);
 static void stream_request_cb(pa_stream *s, size_t length, void *userdata);
-static void stream_latency_update_cb(pa_stream *s, void *userdata);
 static void success_cb(pa_stream *s, int sucess, void *userdata);
-static void uninit(aout_instance_t *p_aout);
 
 /*****************************************************************************
  * Module descriptor
@@ -109,406 +82,363 @@ vlc_module_end ()
 static int Open ( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    struct aout_sys_t * p_sys;
+
+    /* Sample format specification */
     struct pa_sample_spec ss;
-    const struct pa_buffer_attr *buffer_attr;
-    struct pa_buffer_attr a;
-    struct pa_channel_map map;
-    char * p_client_name;
 
-    /* Allocate structures */
-    p_aout->output.p_sys = p_sys = calloc( 1, sizeof( aout_sys_t ) );
-    if( p_sys == NULL )
-        return VLC_ENOMEM;
-
-    PULSE_DEBUG( "Pulse start initialization");
-
-    ss.channels = aout_FormatNbChannels( &p_aout->output.output ); /* Get the input stream channel count */
-
-    /* Setup the pulse audio stream based on the input stream count */
-    switch(ss.channels)
+    switch(p_aout->output.output.i_format)
     {
-        case 8:
-            p_aout->output.output.i_physical_channels
-                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-                | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
-                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-                | AOUT_CHAN_LFE;
+        case VLC_CODEC_F64B:
+            p_aout->output.output.i_format = VLC_CODEC_F32B;
+        case VLC_CODEC_F32B:
+            ss.format = PA_SAMPLE_FLOAT32BE;
             break;
-        case 6:
-            p_aout->output.output.i_physical_channels
-                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-                | AOUT_CHAN_LFE;
+        case VLC_CODEC_F64L:
+            p_aout->output.output.i_format = VLC_CODEC_F32L;
+        case VLC_CODEC_F32L:
+            ss.format = PA_SAMPLE_FLOAT32LE;
             break;
-
-        case 4:
-            p_aout->output.output.i_physical_channels
-                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+        case VLC_CODEC_FI32:
+            p_aout->output.output.i_format = VLC_CODEC_FL32;
+            ss.format = PA_SAMPLE_FLOAT32NE;
             break;
-
-        case 2:
-            p_aout->output.output.i_physical_channels
-                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+        case VLC_CODEC_S32B:
+            ss.format = PA_SAMPLE_S32BE;
             break;
-
-        case 1:
-            p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+        case VLC_CODEC_S32L:
+            ss.format = PA_SAMPLE_S32LE;
             break;
-
+        case VLC_CODEC_S24B:
+            ss.format = PA_SAMPLE_S24BE;
+            break;
+        case VLC_CODEC_S24L:
+            ss.format = PA_SAMPLE_S24LE;
+            break;
+        case VLC_CODEC_S16B:
+            ss.format = PA_SAMPLE_S16BE;
+            break;
+        case VLC_CODEC_S16L:
+            ss.format = PA_SAMPLE_S16LE;
+            break;
+        case VLC_CODEC_S8:
+            p_aout->output.output.i_format = VLC_CODEC_U8;
+        case VLC_CODEC_U8:
+            ss.format = PA_SAMPLE_U8;
+            break;
         default:
-            msg_Err(p_aout,"Invalid number of channels");
-        goto fail;
+            if (HAVE_FPU)
+            {
+                p_aout->output.output.i_format = VLC_CODEC_FL32;
+                ss.format = PA_SAMPLE_FLOAT32NE;
+            }
+            else
+            {
+                p_aout->output.output.i_format = VLC_CODEC_S16N;
+                ss.format = PA_SAMPLE_S16NE;
+            }
+            break;
     }
-
-    /* Add a quick command line info message */
-    msg_Dbg(p_aout, "%d audio channels", ss.channels);
 
     ss.rate = p_aout->output.output.i_rate;
-    if (HAVE_FPU)
-    {
-        ss.format = PA_SAMPLE_FLOAT32NE;
-        p_aout->output.output.i_format = VLC_CODEC_FL32;
-    }
-    else
-    {
-        ss.format = PA_SAMPLE_S16NE;
-        p_aout->output.output.i_format = VLC_CODEC_S16N;
-    }
-
+    ss.channels = aout_FormatNbChannels(&p_aout->output.output);
     if (!pa_sample_spec_valid(&ss)) {
-        msg_Err(p_aout,"Invalid sample spec");
-        goto fail;
+        msg_Err(p_aout, "unsupported sample specification");
+        return VLC_EGENERIC;
     }
 
-    /* Reduce overall latency to 100mS to reduce audible clicks
-     * Also pulse minreq and internal buffers are now 100mS which reduces resampling
-     * but still shouldn't drop samples with some usb sound cards
-     */
-    a.tlength = pa_bytes_per_second(&ss)/10;
-    a.maxlength = a.tlength * 2;
-    a.prebuf = -1;
-    a.minreq = -1;
+    /* Channel mapping */
+    struct pa_channel_map map;
+    map.channels = 0;
 
-    /* Initialise the speaker map setup above */
-    pa_channel_map_init_auto(&map, ss.channels, PA_CHANNEL_MAP_ALSA);
-
-    if (!(p_sys->mainloop = pa_threaded_mainloop_new())) {
-        msg_Err(p_aout, "Failed to allocate main loop");
-        goto fail;
-    }
-
-    if ((p_client_name = var_InheritString(p_aout, "user-agent")) == NULL) {
-        msg_Err(p_aout, "No user-agent string available.");
-        goto fail;
-    }
-
-    p_sys->context = pa_context_new(pa_threaded_mainloop_get_api(p_sys->mainloop), p_client_name);
-    free(p_client_name);
-    if(!p_sys->context)
+    if (p_aout->output.output.i_physical_channels & AOUT_CHAN_CENTER)
     {
-        msg_Err(p_aout, "Failed to allocate context");
+        if (ss.channels == 1)
+            map.map[map.channels++] = PA_CHANNEL_POSITION_MONO;
+        else
+            map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_CENTER;
+    }
+    if (p_aout->output.output.i_physical_channels & AOUT_CHAN_LEFT)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_LEFT;
+    if (p_aout->output.output.i_physical_channels & AOUT_CHAN_RIGHT)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_RIGHT;
+
+    if (p_aout->output.output.i_physical_channels & AOUT_CHAN_REARCENTER)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_CENTER;
+    if (p_aout->output.output.i_physical_channels & AOUT_CHAN_REARLEFT)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_LEFT;
+    if (p_aout->output.output.i_physical_channels & AOUT_CHAN_REARRIGHT)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_RIGHT;
+
+    if (p_aout->output.output.i_physical_channels & AOUT_CHAN_MIDDLELEFT)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_LEFT_OF_CENTER;
+    if (p_aout->output.output.i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_RIGHT_OF_CENTER;
+
+    if (p_aout->output.output.i_physical_channels & AOUT_CHAN_LFE)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_LFE;
+
+    for (unsigned i = 0; map.channels < ss.channels; i++) {
+        map.map[map.channels++] = PA_CHANNEL_POSITION_AUX0 + i;
+        msg_Warn(p_aout, "mapping channel %"PRIu8" to AUX%u", map.channels, i);
+    }
+
+    if (!pa_channel_map_valid(&map)) {
+        msg_Err(p_aout, "unsupported channel map");
+        return VLC_EGENERIC;
+    } else {
+        const char *name = pa_channel_map_to_pretty_name(&map);
+        msg_Dbg(p_aout, "using %s channel map", (name != NULL) ? name : "?");
+    }
+
+    const pa_stream_flags_t flags = PA_STREAM_INTERPOLATE_TIMING
+                                  | PA_STREAM_AUTO_TIMING_UPDATE
+                                  | PA_STREAM_ADJUST_LATENCY;
+
+    struct pa_buffer_attr attr;
+    /* Reduce overall latency to 100mS to reduce audible clicks
+     * Also minreq and internal buffers are now 100ms to reduce resampling.
+     * But it still should not drop samples even with USB sound cards. */
+    attr.tlength = pa_bytes_per_second(&ss)/10;
+    attr.maxlength = attr.tlength * 2;
+    attr.prebuf = -1;
+    attr.minreq = -1;
+    attr.fragsize = 0; /* not used for output */
+
+    /* Allocate structures */
+    struct aout_sys_t *sys = malloc(sizeof(*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+    sys->stream = NULL;
+    sys->start_date = VLC_TS_INVALID;
+
+    sys->mainloop = pa_threaded_mainloop_new();
+    if (unlikely(sys->mainloop == NULL)) {
+        free(sys);
+        return VLC_ENOMEM;
+    }
+
+    char *ua = var_InheritString(p_aout, "user-agent");
+
+    sys->context = pa_context_new(
+                              pa_threaded_mainloop_get_api(sys->mainloop), ua);
+    free(ua);
+    if (unlikely(sys->context == NULL)) {
+        pa_threaded_mainloop_free(sys->mainloop);
+        free(sys);
+        return VLC_ENOMEM;
+    }
+
+    p_aout->output.p_sys = sys;
+    pa_context_set_state_callback(sys->context, context_state_cb, sys);
+    if (pa_context_connect(sys->context, NULL, 0, NULL) < 0) {
+connect_fail:
+        msg_Err(p_aout, "cannot connect to server: %s",
+                pa_strerror(pa_context_errno(sys->context)));
         goto fail;
     }
 
-    pa_context_set_state_callback(p_sys->context, context_state_cb, p_aout);
-
-    PULSE_DEBUG( "Pulse before context connect");
-
-    if (pa_context_connect(p_sys->context, NULL, 0, NULL) < 0) {
-        msg_Err(p_aout, "Failed to connect to server: %s", pa_strerror(pa_context_errno(p_sys->context)));
+    if (pa_threaded_mainloop_start(sys->mainloop) < 0) {
+        msg_Err(p_aout, "cannot start main loop");
         goto fail;
     }
 
-    PULSE_DEBUG( "Pulse after context connect");
-
-    pa_threaded_mainloop_lock(p_sys->mainloop);
-
-    if (pa_threaded_mainloop_start(p_sys->mainloop) < 0) {
-        msg_Err(p_aout, "Failed to start main loop");
-        goto unlock_and_fail;
-    }
-
-    msg_Dbg(p_aout, "Pulse mainloop started");
-
+    pa_threaded_mainloop_lock(sys->mainloop);
     /* Wait until the context is ready */
-    pa_threaded_mainloop_wait(p_sys->mainloop);
+    while (pa_context_get_state(sys->context) != PA_CONTEXT_READY) {
+        if (pa_context_get_state(sys->context) == PA_CONTEXT_FAILED)
+            goto connect_fail;
+        pa_threaded_mainloop_wait(sys->mainloop);
+    }
 
-    if (pa_context_get_state(p_sys->context) != PA_CONTEXT_READY) {
-        msg_Dbg(p_aout, "Failed to connect to server: %s", pa_strerror(pa_context_errno(p_sys->context)));
+    /* Create a stream */
+    sys->stream = pa_stream_new(sys->context, "audio stream", &ss, &map);
+    if (sys->stream == NULL) {
+        msg_Err(p_aout, "cannot create stream: %s",
+                pa_strerror(pa_context_errno(sys->context)));
+        goto unlock_and_fail;
+    }
+    pa_stream_set_state_callback(sys->stream, stream_state_cb, sys);
+    pa_stream_set_write_callback(sys->stream, stream_request_cb, p_aout);
+    if (pa_stream_connect_playback(sys->stream, NULL, &attr,
+                                   flags, NULL, NULL) < 0) {
+stream_fail:
+        msg_Err(p_aout, "cannot connect stream: %s",
+                pa_strerror(pa_context_errno(sys->context)));
         goto unlock_and_fail;
     }
 
-    if (!(p_sys->stream = pa_stream_new(p_sys->context, "audio stream", &ss, &map))) {
-        msg_Err(p_aout, "Failed to create stream: %s", pa_strerror(pa_context_errno(p_sys->context)));
-        goto unlock_and_fail;
+    while (pa_stream_get_state(sys->stream) != PA_STREAM_READY) {
+        if (pa_stream_get_state(sys->stream) == PA_STREAM_FAILED)
+            goto stream_fail;
+        pa_threaded_mainloop_wait(sys->mainloop);
     }
 
-    PULSE_DEBUG( "Pulse after new stream");
+    msg_Dbg(p_aout, "Connected to device %s (%u, %ssuspended).",
+            pa_stream_get_device_name(sys->stream),
+            pa_stream_get_device_index(sys->stream),
+            pa_stream_is_suspended(sys->stream) ? "" : "not ");
 
-    pa_stream_set_state_callback(p_sys->stream, stream_state_cb, p_aout);
-    pa_stream_set_write_callback(p_sys->stream, stream_request_cb, p_aout);
-    pa_stream_set_latency_update_callback(p_sys->stream, stream_latency_update_cb, p_aout);
+    const struct pa_buffer_attr *pba = pa_stream_get_buffer_attr(sys->stream);
 
-    if (pa_stream_connect_playback(p_sys->stream, NULL, &a, PA_STREAM_INTERPOLATE_TIMING|PA_STREAM_AUTO_TIMING_UPDATE|PA_STREAM_ADJUST_LATENCY, NULL, NULL) < 0) {
-        msg_Err(p_aout, "Failed to connect stream: %s", pa_strerror(pa_context_errno(p_sys->context)));
-        goto unlock_and_fail;
-    }
-
-     PULSE_DEBUG("Pulse stream connect");
-
-    /* Wait until the stream is ready */
-    pa_threaded_mainloop_wait(p_sys->mainloop);
-
-    msg_Dbg(p_aout,"Pulse stream connected");
-
-    if (pa_stream_get_state(p_sys->stream) != PA_STREAM_READY) {
-        msg_Err(p_aout, "Failed to connect to server: %s", pa_strerror(pa_context_errno(p_sys->context)));
-        goto unlock_and_fail;
-    }
-
-
-    PULSE_DEBUG("Pulse after stream get status");
-
-    pa_threaded_mainloop_unlock(p_sys->mainloop);
-
-    buffer_attr = pa_stream_get_buffer_attr(p_sys->stream);
-    p_aout->output.i_nb_samples = buffer_attr->minreq / pa_frame_size(&ss);
-
+    p_aout->output.i_nb_samples = pba->minreq / pa_frame_size(&ss);
     /* Set buffersize from pulseaudio defined minrequest */
-    p_sys->buffer_size = buffer_attr->minreq;
+    sys->buffer_size = pba->minreq;
+    msg_Dbg(p_aout, "using buffer metrics: maxlength=%u, tlength=%u, "
+            "prebuf=%u, minreq=%u",
+            pba->maxlength, pba->tlength, pba->prebuf, pba->minreq);
+    {
+        char sst[PA_SAMPLE_SPEC_SNPRINT_MAX];
+        msg_Dbg(p_aout, "using sample specification: %s",
+                pa_sample_spec_snprint(sst, sizeof(sst),
+                                     pa_stream_get_sample_spec(sys->stream)));
+    }
+    {
+        char cmt[PA_CHANNEL_MAP_SNPRINT_MAX];
+        msg_Dbg(p_aout, "using channel map: %s",
+                pa_channel_map_snprint(cmt, sizeof(cmt),
+                                      pa_stream_get_channel_map(sys->stream)));
+    }
+    pa_threaded_mainloop_unlock(sys->mainloop);
+
     p_aout->output.pf_play = Play;
     aout_VolumeSoftInit(p_aout);
-    msg_Dbg(p_aout, "Pulse initialized successfully");
-    {
-        char cmt[PA_CHANNEL_MAP_SNPRINT_MAX], sst[PA_SAMPLE_SPEC_SNPRINT_MAX];
-
-        msg_Dbg(p_aout, "Buffer metrics: maxlength=%u, tlength=%u, prebuf=%u, minreq=%u", buffer_attr->maxlength, buffer_attr->tlength, buffer_attr->prebuf, buffer_attr->minreq);
-        msg_Dbg(p_aout, "Using sample spec '%s', channel map '%s'.",
-                pa_sample_spec_snprint(sst, sizeof(sst), pa_stream_get_sample_spec(p_sys->stream)),
-                pa_channel_map_snprint(cmt, sizeof(cmt), pa_stream_get_channel_map(p_sys->stream)));
-
-            msg_Dbg(p_aout, "Connected to device %s (%u, %ssuspended).",
-                        pa_stream_get_device_name(p_sys->stream),
-                        pa_stream_get_device_index(p_sys->stream),
-                        pa_stream_is_suspended(p_sys->stream) ? "" : "not ");
-    }
-
     return VLC_SUCCESS;
 
 unlock_and_fail:
-    msg_Dbg(p_aout, "Pulse initialization unlock and fail");
-
-    if (p_sys->mainloop)
-        pa_threaded_mainloop_unlock(p_sys->mainloop);
+    pa_threaded_mainloop_unlock(sys->mainloop);
 fail:
-    msg_Dbg(p_aout, "Pulse initialization failed");
-    uninit(p_aout);
+    Close(p_this);
     return VLC_EGENERIC;
 }
 
 /*****************************************************************************
  * Play: play a sound samples buffer
  *****************************************************************************/
-static void Play( aout_instance_t * p_aout )
+static void Play(aout_instance_t * aout)
 {
-    struct aout_sys_t * p_sys = (struct aout_sys_t *) p_aout->output.p_sys;
+    struct aout_sys_t *sys = aout->output.p_sys;
 
-    if(!p_sys->started){
-        msg_Dbg(p_aout, "Pulse stream started");
-        pa_threaded_mainloop_lock(p_sys->mainloop);
-        p_sys->start_date =
-            aout_FifoFirstDate( p_aout, &p_aout->output.fifo );
-        p_sys->started = 1;
-
-        pa_threaded_mainloop_signal(p_sys->mainloop, 0);
-        pa_threaded_mainloop_unlock(p_sys->mainloop);
-    }
+    if (likely(sys->start_date != VLC_TS_INVALID))
+        return;
+    pa_threaded_mainloop_lock(sys->mainloop);
+    sys->start_date = aout_FifoFirstDate(aout, &aout->output.fifo);
+    pa_threaded_mainloop_unlock(sys->mainloop);
 }
 
 /*****************************************************************************
  * Close: close the audio device
  *****************************************************************************/
-static void Close ( vlc_object_t *p_this )
+static void Close (vlc_object_t *obj)
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    aout_instance_t *aout = (aout_instance_t *)obj;
+    struct aout_sys_t *sys = aout->output.p_sys;
 
-    msg_Dbg(p_aout, "Pulse Close");
-
-    if(p_sys->stream){
-        pa_threaded_mainloop_lock(p_sys->mainloop);
-        pa_stream_set_write_callback(p_sys->stream, NULL, NULL);
-
+    if (sys->stream) {
         pa_operation *o;
 
-        o = pa_stream_flush(p_sys->stream, success_cb, p_aout);
-        while( pa_operation_get_state(o) == PA_OPERATION_RUNNING )
-            pa_threaded_mainloop_wait(p_sys->mainloop);
+        pa_threaded_mainloop_lock(sys->mainloop);
+        pa_stream_set_write_callback(sys->stream, NULL, NULL);
+
+        o = pa_stream_flush(sys->stream, success_cb, sys);
+        while (pa_operation_get_state(o) == PA_OPERATION_RUNNING)
+            pa_threaded_mainloop_wait(sys->mainloop);
         pa_operation_unref(o);
 
-        o = pa_stream_drain(p_sys->stream, success_cb, p_aout);
-        while( pa_operation_get_state(o) == PA_OPERATION_RUNNING )
-            pa_threaded_mainloop_wait(p_sys->mainloop);
+        o = pa_stream_drain(sys->stream, success_cb, sys);
+        while (pa_operation_get_state(o) == PA_OPERATION_RUNNING)
+            pa_threaded_mainloop_wait(sys->mainloop);
         pa_operation_unref(o);
 
-        pa_threaded_mainloop_unlock(p_sys->mainloop);
+        pa_threaded_mainloop_unlock(sys->mainloop);
     }
-    uninit(p_aout);
+
+    pa_threaded_mainloop_stop(sys->mainloop);
+    if (sys->stream) {
+        pa_stream_disconnect(sys->stream);
+        pa_stream_unref(sys->stream);
+    }
+    pa_context_disconnect(sys->context);
+    pa_context_unref(sys->context);
+    pa_threaded_mainloop_free(sys->mainloop);
+    free(sys);
 }
 
-static void uninit(aout_instance_t *p_aout){
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
-
-    if (p_sys->mainloop)
-        pa_threaded_mainloop_stop(p_sys->mainloop);
-
-    if (p_sys->stream) {
-        pa_stream_disconnect(p_sys->stream);
-        pa_stream_unref(p_sys->stream);
-        p_sys->stream = NULL;
-    }
-
-    if (p_sys->context) {
-        pa_context_disconnect(p_sys->context);
-        pa_context_unref(p_sys->context);
-        p_sys->context = NULL;
-    }
-
-    if (p_sys->mainloop) {
-        pa_threaded_mainloop_free(p_sys->mainloop);
-        p_sys->mainloop = NULL;
-    }
-
-    free(p_sys);
-    p_aout->output.p_sys = NULL;
-}
-
-static void context_state_cb(pa_context *c, void *userdata) {
-    aout_instance_t *p_aout = (aout_instance_t *)userdata;
-    struct aout_sys_t * p_sys = (struct aout_sys_t *) p_aout->output.p_sys;
-
-    assert(c);
-
-    PULSE_DEBUG( "Pulse context state changed");
+static void context_state_cb(pa_context *c, void *userdata)
+{
+    struct aout_sys_t *sys = userdata;
 
     switch (pa_context_get_state(c)) {
         case PA_CONTEXT_READY:
-        case PA_CONTEXT_TERMINATED:
         case PA_CONTEXT_FAILED:
-        PULSE_DEBUG( "Pulse context state changed signal");
-            pa_threaded_mainloop_signal(p_sys->mainloop, 0);
-            break;
-
-        case PA_CONTEXT_UNCONNECTED:
-        case PA_CONTEXT_CONNECTING:
-        case PA_CONTEXT_AUTHORIZING:
-        case PA_CONTEXT_SETTING_NAME:
-        PULSE_DEBUG( "Pulse context state changed no signal");
+            pa_threaded_mainloop_signal(sys->mainloop, 0);
+        default:
             break;
     }
 }
 
-static void stream_state_cb(pa_stream *s, void * userdata) {
-    aout_instance_t *p_aout = (aout_instance_t *)userdata;
-    struct aout_sys_t * p_sys = (struct aout_sys_t *) p_aout->output.p_sys;
-
-    assert(s);
-
-    PULSE_DEBUG( "Pulse stream state changed");
+static void stream_state_cb(pa_stream *s, void *userdata)
+{
+    struct aout_sys_t *sys = userdata;
 
     switch (pa_stream_get_state(s)) {
-
         case PA_STREAM_READY:
         case PA_STREAM_FAILED:
-        case PA_STREAM_TERMINATED:
-            pa_threaded_mainloop_signal(p_sys->mainloop, 0);
-            break;
-
-        case PA_STREAM_UNCONNECTED:
-        case PA_STREAM_CREATING:
+            pa_threaded_mainloop_signal(sys->mainloop, 0);
+        default:
             break;
     }
 }
 
-static void stream_request_cb(pa_stream *s, size_t length, void *userdata) {
-    VLC_UNUSED( s );
-    aout_instance_t *p_aout = (aout_instance_t *)userdata;
-    struct aout_sys_t * p_sys = (struct aout_sys_t *) p_aout->output.p_sys;
-    mtime_t next_date;
+static void stream_request_cb(pa_stream *s, size_t length, void *userdata)
+{
+    aout_instance_t *aout = userdata;
+    struct aout_sys_t *sys = aout->output.p_sys;
+    size_t buffer_size = sys->buffer_size;
 
-    assert(s);
-    assert(p_sys);
+    do {
+        aout_buffer_t *p_buffer = NULL;
 
-    size_t buffer_size = p_sys->buffer_size;
-
-    PULSE_DEBUG( "Pulse stream request %d", length);
-
-    do{
-        aout_buffer_t *   p_buffer = NULL;
-        if(p_sys->started){
+        if (sys->start_date != VLC_TS_INVALID) {
             pa_usec_t latency;
             int negative;
-            if(pa_stream_get_latency(p_sys->stream, &latency, &negative)<0){
-                if (pa_context_errno(p_sys->context) != PA_ERR_NODATA) {
-                    msg_Err(p_aout, "pa_stream_get_latency() failed: %s", pa_strerror(pa_context_errno(p_sys->context)));
+
+            if (pa_stream_get_latency(s, &latency, &negative) < 0){
+                if (pa_context_errno(sys->context) != PA_ERR_NODATA) {
+                    msg_Err(aout, "cannot determine latency: %s",
+                            pa_strerror(pa_context_errno(sys->context)));
                 }
                 latency = 0;
 
             }
 
-            PULSE_DEBUG( "Pulse stream request latency=%"PRId64"", latency);
-            next_date = mdate() + latency;
+            //msg_Dbg(p_aout, "latency=%"PRId64, latency);
+            mtime_t next_date = mdate() + latency;
 
-            if(p_sys->start_date < next_date + AOUT_PTS_TOLERANCE ){
-                p_buffer = aout_OutputNextBuffer( p_aout, next_date, 0);
-            }
+            if (sys->start_date < next_date + AOUT_PTS_TOLERANCE )
+                p_buffer = aout_OutputNextBuffer(aout, next_date, 0);
         }
 
-        if ( p_buffer != NULL )
+        if (p_buffer != NULL)
         {
-            PULSE_DEBUG( "Pulse stream request write buffer %d", p_buffer->i_buffer);
-            pa_stream_write(p_sys->stream, p_buffer->p_buffer, p_buffer->i_buffer, NULL, 0, PA_SEEK_RELATIVE);
+            pa_stream_write(s, p_buffer->p_buffer, p_buffer->i_buffer, NULL, 0, PA_SEEK_RELATIVE);
             length -= p_buffer->i_buffer;
             aout_BufferFree( p_buffer );
         }
         else
         {
-            PULSE_DEBUG( "Pulse stream request write zeroes");
             void *data = pa_xmalloc(length);
             memset(data, 0, length);
-            pa_stream_write(p_sys->stream, data, length, pa_xfree, 0, PA_SEEK_RELATIVE);
+            pa_stream_write(s, data, length, pa_xfree, 0, PA_SEEK_RELATIVE);
             length = 0;
         }
-    }while(length > buffer_size);
-
-    pa_threaded_mainloop_signal(p_sys->mainloop, 0);
-}
-
-static void stream_latency_update_cb(pa_stream *s, void *userdata) {
-    VLC_UNUSED( s );
-    aout_instance_t *p_aout = (aout_instance_t *)userdata;
-    struct aout_sys_t * p_sys = (struct aout_sys_t *) p_aout->output.p_sys;
-
-    assert(s);
-
-    PULSE_DEBUG( "Pulse stream latency update");
-
-    pa_threaded_mainloop_signal(p_sys->mainloop, 0);
+    } while (length > buffer_size);
 }
 
 static void success_cb(pa_stream *s, int sucess, void *userdata)
 {
-    VLC_UNUSED( s );
-    aout_instance_t *p_aout = (aout_instance_t *)userdata;
-    struct aout_sys_t * p_sys = (struct aout_sys_t *) p_aout->output.p_sys;
+    struct aout_sys_t *sys = userdata;
 
-    VLC_UNUSED(sucess);
-
-    assert(s);
-
-    pa_threaded_mainloop_signal(p_sys->mainloop, 0);
+    (void) s;
+    (void) sucess;
+    pa_threaded_mainloop_signal(sys->mainloop, 0);
 }
-
-#undef PULSE_DEBUG
