@@ -129,7 +129,7 @@ static ssize_t Read (access_t *access, uint8_t *buf, size_t len)
     unsigned code;
     if (sscanf (resp, "HTTP/%*u.%*u %u", &code) != 1)
     {
-        msg_Err (access, "cannot parse response frmo coffee server");
+        msg_Err (access, "cannot parse response from coffee server");
         goto error;
     }
     if ((code / 100) != 2)
