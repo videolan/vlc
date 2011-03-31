@@ -340,14 +340,18 @@ static void Close (vlc_object_t *obj)
         pa_stream_set_write_callback(sys->stream, NULL, NULL);
 
         o = pa_stream_flush(sys->stream, success_cb, sys);
-        while (pa_operation_get_state(o) == PA_OPERATION_RUNNING)
-            pa_threaded_mainloop_wait(sys->mainloop);
-        pa_operation_unref(o);
+        if (o != NULL) {
+            while (pa_operation_get_state(o) == PA_OPERATION_RUNNING)
+                pa_threaded_mainloop_wait(sys->mainloop);
+            pa_operation_unref(o);
+        }
 
         o = pa_stream_drain(sys->stream, success_cb, sys);
-        while (pa_operation_get_state(o) == PA_OPERATION_RUNNING)
-            pa_threaded_mainloop_wait(sys->mainloop);
-        pa_operation_unref(o);
+        if (o != NULL) {
+            while (pa_operation_get_state(o) == PA_OPERATION_RUNNING)
+                pa_threaded_mainloop_wait(sys->mainloop);
+            pa_operation_unref(o);
+        }
 
         pa_threaded_mainloop_unlock(sys->mainloop);
     }
