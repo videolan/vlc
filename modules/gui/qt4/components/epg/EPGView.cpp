@@ -140,6 +140,8 @@ bool EPGView::addEPGEvent( vlc_epg_event_t *data, QString channelName, bool b_cu
     bool b_refresh_channels = false;
 
     QDateTime eventStart = QDateTime::fromTime_t( data->i_start );
+    if ( eventStart.addSecs( data->i_duration ) < m_baseTime )
+        return false; /* EPG feed sent expired item */
     if ( eventStart < m_startTime )
     {
         m_startTime = eventStart;
