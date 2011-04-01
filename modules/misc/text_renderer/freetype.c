@@ -136,13 +136,14 @@ static const char *const ppsz_sizes_text[] = {
 #define EFFECT_LONGTEXT N_("It is possible to apply effects to the rendered " \
 "text to improve its readability." )
 
-#define EFFECT_BACKGROUND  1
-#define EFFECT_OUTLINE     2
-#define EFFECT_OUTLINE_FAT 3
-
-static int const pi_effects[] = { 1, 2, 3 };
+enum { EFFECT_BACKGROUND  = 1,
+       EFFECT_OUTLINE     = 2,
+       EFFECT_OUTLINE_FAT = 3,
+};
+static int const pi_effects[] = { EFFECT_BACKGROUND, EFFECT_OUTLINE, EFFECT_OUTLINE_FAT };
 static const char *const ppsz_effects_text[] = {
     N_("Background"),N_("Outline"), N_("Fat Outline") };
+
 static const int pi_color_values[] = {
   0x00000000, 0x00808080, 0x00C0C0C0, 0x00FFFFFF, 0x00800000,
   0x00FF0000, 0x00FF00FF, 0x00FFFF00, 0x00808000, 0x00008000, 0x00008080,
@@ -159,8 +160,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
-    add_font( "freetype-font", DEFAULT_FONT, FONT_TEXT, FONT_LONGTEXT,
-              false )
+    add_font( "freetype-font", DEFAULT_FONT, FONT_TEXT, FONT_LONGTEXT, false )
 
     add_integer( "freetype-fontsize", 0, FONTSIZE_TEXT,
                  FONTSIZE_LONGTEXT, true )
