@@ -1949,42 +1949,6 @@ if test "${enable_sftp}" = "yes"; then
 fi
 
 dnl
-dnl  libdvbpsi ts demux/mux
-dnl
-AC_ARG_ENABLE(dvb,
-  [  --enable-dvb            MPEG-TS and DVB support (default auto)])
-have_dvbpsi=no
-AS_IF([test "${enable_dvb}" != "no"], [
-    AC_CHECK_HEADERS([dvbpsi/dr.h],[
-      VLC_ADD_PLUGIN([ts])
-      if test "${enable_sout}" != "no"; then
-        AC_CHECK_LIB(dvbpsi, dvbpsi_SDTServiceAddDescriptor, [VLC_ADD_PLUGIN([mux_ts])], [], [-ldvbpsi])
-      fi
-      VLC_ADD_LIBS([mux_ts ts dvb],[-ldvbpsi])
-      have_dvbpsi=yes
-
-      AC_CHECK_LIB(dvbpsi, dvbpsi_GenSDTSections, [
-        AC_DEFINE(HAVE_DVBPSI_SDT, 1, [Define if you have dvbpsi_GenSDTSections.])
-      ], [], [${LIBS_ts}])
-    ],[
-      AS_IF([test -n "${enable_dvb}"], [
-        AC_MSG_ERROR([Could not find libdvbpsi on your system: you need at least version 0.1.6])
-      ], [
-        AC_MSG_WARN([Could not find libdvbpsi on your system: you need at least version 0.1.6])
-      ])
-    ],[ #if defined( HAVE_STDINT_H )
-        #   include <stdint.h>
-        #elif defined( HAVE_INTTYPES_H )
-        #   include <inttypes.h>
-        #endif
-        #include <dvbpsi/dvbpsi.h>
-        #include <dvbpsi/descriptor.h>
-        #include <dvbpsi/pat.h>
-        #include <dvbpsi/pmt.h>
-    ])
-])
-
-dnl
 dnl  Video4Linux2 plugin
 dnl
 AC_ARG_ENABLE(v4l2,
@@ -2139,13 +2103,15 @@ then
 fi
 
 dnl
-dnl  DVB-S/DVB-T/DVB-C satellite/teresterial/cable input
+dnl  libdvbpsi check for ts mux/demux
 dnl
-AS_IF([test "${have_dvbpsi}" = "yes" ], [
-  AC_CHECK_HEADER([linux/dvb/version.h], [
-    VLC_ADD_PLUGIN([dvb])
-  ])
-])
+PKG_WITH_MODULES([DVBPSI], [libdvbpsi],
+    VLC_ADD_PLUGIN([ts])
+if test "${enable_sout}" != "no"; then
+    VLC_ADD_PLUGIN([mux_ts])
+    VLC_ADD_LIBS([mux_ts],[-ldvbpsi])
+fi
+)
 
 dnl
 dnl  Screen capture module
@@ -4243,7 +4209,6 @@ AC_CONFIG_FILES([
   modules/access/Makefile
   modules/access/bd/Makefile
   modules/access/dshow/Makefile
-  modules/access/dvb/Makefile
   modules/access/mms/Makefile
   modules/access/rtp/Makefile
   modules/access/rtsp/Makefile
