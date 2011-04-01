@@ -37,6 +37,12 @@
 #include <vlc_common.h>
 #include <vlc_epg.h>
 
+enum
+{
+    EPGVIEW_WIDGET = 0,
+    NOEPG_WIDGET = 1
+};
+
 EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
 {
     b_input_type_known = false;
@@ -58,11 +64,11 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
     layout->addWidget( m_epgView, 1, 1 );
     layout->setSpacing( 0 );
     containerWidget->setLayout( layout );
-    rootWidget->addWidget( containerWidget ); /* index 0 */
+    rootWidget->insertWidget( EPGVIEW_WIDGET, containerWidget );
 
     QLabel *noepgLabel = new QLabel( qtr("No EPG Data Available"), this );
     noepgLabel->setAlignment( Qt::AlignCenter );
-    rootWidget->addWidget( noepgLabel ); /* index 1 */
+    rootWidget->insertWidget( NOEPG_WIDGET, noepgLabel );
 
     rootWidget->setCurrentIndex( 1 );
     layout = new QGridLayout( this );
@@ -125,7 +131,8 @@ void EPGWidget::updateEPG( input_item_t *p_input_item )
     vlc_mutex_unlock( & p_input_item->lock );
 
     /* toggle our widget view */
-    rootWidget->setCurrentIndex( m_epgView->hasValidData() ? 0 : 1 );
+    rootWidget->setCurrentIndex(
+            m_epgView->hasValidData() ? EPGVIEW_WIDGET : NOEPG_WIDGET );
 
     // Update the global duration and start time.
     m_epgView->updateDuration();
