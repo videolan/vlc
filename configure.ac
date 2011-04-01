@@ -2107,6 +2107,7 @@ dnl  libdvbpsi check for ts mux/demux
 dnl
 PKG_WITH_MODULES([DVBPSI], [libdvbpsi],
     VLC_ADD_PLUGIN([ts])
+    VLC_ADD_LIBS([ts],[-ldvbpsi])
 if test "${enable_sout}" != "no"; then
     VLC_ADD_PLUGIN([mux_ts])
     VLC_ADD_LIBS([mux_ts],[-ldvbpsi])
