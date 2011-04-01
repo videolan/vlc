@@ -205,12 +205,12 @@ static int RenderHtml( filter_t *, subpicture_region_t *,
 #endif
 #ifdef HAVE_FONTCONFIG
 static void FontConfig_BuildCache( filter_t * );
-static char *FontConfig_Select( FcConfig *, const char *,
+static char* FontConfig_Select( FcConfig *, const char *,
                                 bool, bool, int, int * );
 #endif
 #ifdef WIN32
-static char* Win32_Select( filter_t *p_filter, const char* family, bool b_bold,
-                           bool b_italic, int i_size, int *i_idx );
+static char* Win32_Select( filter_t *, const char *,
+                           bool, bool, int, int * );
 #endif
 
 static int LoadFontsFromAttachments( filter_t *p_filter );
@@ -464,9 +464,7 @@ static void Destroy( vlc_object_t *p_this )
 
     if( p_sys->pp_font_attachments )
     {
-        int   k;
-
-        for( k = 0; k < p_sys->i_font_attachments; k++ )
+        for( int k = 0; k < p_sys->i_font_attachments; k++ )
             vlc_input_attachment_Delete( p_sys->pp_font_attachments[k] );
 
         free( p_sys->pp_font_attachments );
@@ -674,7 +672,6 @@ static void UnderlineGlyphYUVA( int i_line_thickness, int i_line_offset, bool b_
                                 uint8_t i_y, uint8_t i_u, uint8_t i_v,
                                 subpicture_region_t *p_region)
 {
-    int y, x, z;
     int i_pitch;
     uint8_t *p_dst_y,*p_dst_u,*p_dst_v,*p_dst_a;
 
@@ -687,7 +684,7 @@ static void UnderlineGlyphYUVA( int i_line_thickness, int i_line_offset, bool b_
     int i_offset = ( p_this_glyph_pos->y + i_glyph_tmax + i_line_offset + 3 ) * i_pitch +
                      p_this_glyph_pos->x + p_this_glyph->left + 3 + i_align_offset;
 
-    for( y = 0; y < i_line_thickness; y++ )
+    for( int y = 0; y < i_line_thickness; y++ )
     {
         int i_extra = p_this_glyph->bitmap.width;
 
@@ -696,13 +693,13 @@ static void UnderlineGlyphYUVA( int i_line_thickness, int i_line_offset, bool b_
             i_extra = (p_next_glyph_pos->x + p_next_glyph->left) -
                       (p_this_glyph_pos->x + p_this_glyph->left);
         }
-        for( x = 0; x < i_extra; x++ )
+        for( int x = 0; x < i_extra; x++ )
         {
             bool b_ok = true;
 
             /* break the underline around the tails of any glyphs which cross it */
             /* Strikethrough doesn't get broken */
-            for( z = x - i_line_thickness;
+            for( int z = x - i_line_thickness;
                  z < x + i_line_thickness && b_ok && (i_line_offset >= 0);
                  z++ )
             {
@@ -744,7 +741,7 @@ static void DrawBlack( line_desc_t *p_line, int i_width, subpicture_region_t *p_
 {
     uint8_t *p_dst = p_region->p_picture->A_PIXELS;
     int i_pitch = p_region->p_picture->A_PITCH;
-    int x,y;
+    int y;
 
     for( ; p_line != NULL; p_line = p_line->p_next )
     {
@@ -779,7 +776,7 @@ static void DrawBlack( line_desc_t *p_line, int i_width, subpicture_region_t *p_
 
             for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
             {
-                for( x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
+                for( int x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
                 {
                     if( p_glyph->bitmap.buffer[i_bitmap_offset] )
                         if( p_dst[i_offset+x] <
@@ -791,7 +788,6 @@ static void DrawBlack( line_desc_t *p_line, int i_width, subpicture_region_t *p_
             }
         }
     }
-
 }
 
 /*****************************************************************************
@@ -804,7 +800,7 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
 {
     uint8_t *p_dst_y,*p_dst_u,*p_dst_v,*p_dst_a;
     video_format_t fmt;
-    int i, x, y, i_pitch, i_alpha;
+    int i, y, i_pitch, i_alpha;
     uint8_t i_y, i_u, i_v; /* YUV values, derived from incoming RGB */
 
     if( i_width == 0 || i_height == 0 )
@@ -926,7 +922,7 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
 
             for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
             {
-                for( x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
+                for( int x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
                 {
                     uint8_t i_y_local = i_y;
                     uint8_t i_u_local = i_u;
@@ -1379,7 +1375,7 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
     line.xMin = line.xMax = line.yMin = line.yMax = 0;
 
     /* Account for part of line already in position */
-    for( i=0; i<*pi_start; i++ )
+    for( i = 0; i<*pi_start; i++ )
     {
         FT_BBox glyph_size;
 
@@ -1622,9 +1618,7 @@ static void SetupLine( filter_t *p_filter, const char *psz_text_in,
 
 static int CheckForEmbeddedFont( filter_sys_t *p_sys, FT_Face *pp_face, ft_style_t *p_style )
 {
-    int k;
-
-    for( k=0; k < p_sys->i_font_attachments; k++ )
+    for( int k = 0; k < p_sys->i_font_attachments; k++ )
     {
         input_attachment_t *p_attach   = p_sys->pp_font_attachments[k];
         int                 i_font_idx = 0;
