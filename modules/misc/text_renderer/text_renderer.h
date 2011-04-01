@@ -1,7 +1,7 @@
 /*****************************************************************************
  * text_renderer.h: common text renderer code
  *****************************************************************************
- * Copyright (C) 2007-2008 the VideoLAN team
+ * Copyright (C) 2007-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Bernie Purcell <bitmap@videolan.org>
