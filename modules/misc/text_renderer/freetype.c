@@ -45,7 +45,7 @@
 # define DEFAULT_FONT "/Library/Fonts/Arial Black.ttf"
 # define FC_DEFAULT_FONT "Arial Black"
 #elif defined( WIN32 )
-# define DEFAULT_FONT "" /* Default font found at run-time */
+# define DEFAULT_FONT "arial.ttf" /* Default font found at run-time */
 # define FC_DEFAULT_FONT "Arial"
 #elif defined( HAVE_MAEMO )
 # define DEFAULT_FONT "/usr/share/fonts/nokia/nosnb.ttf"
@@ -289,6 +289,9 @@ struct filter_sys_t
     char*          psz_fontfamily;
 #ifdef HAVE_STYLES
     xml_reader_t  *p_xml;
+#ifdef WIN32
+    char*          psz_win_fonts_path;
+#endif
 #endif
 
     input_attachment_t **pp_font_attachments;
@@ -339,6 +342,17 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_font_color = var_InheritInteger( p_filter, "freetype-color" );
     p_sys->i_font_color = __MAX( __MIN( p_sys->i_font_color , 0xFFFFFF ), 0 );
 
+#ifdef WIN32
+    /* Get Windows Font folder */
+    wchar_t wdir[MAX_PATH];
+    if( S_OK != SHGetFolderPathW( NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, wdir ) )
+    {
+        GetWindowsDirectoryW( wdir, MAX_PATH );
+        wcscat( wdir, L"\\fonts" );
+    }
+    p_sys->psz_win_fonts_path = FromWide( wdir );
+#endif
+
     /* Set default psz_fontfamily */
     if( !psz_fontfamily || !*psz_fontfamily )
     {
@@ -350,8 +364,8 @@ static int Create( vlc_object_t *p_this )
         if( !psz_fontfamily )
             goto error;
 # ifdef WIN32
-        GetWindowsDirectory( psz_fontfamily, PATH_MAX + 1 );
-        strcat( psz_fontfamily, "\\fonts\\arial.ttf" );
+        strcat( psz_fontfamily, p_sys->psz_win_fonts_path );
+        strcat( psz_fontfamily, DEFAULT_FONT );
 # else
         strcpy( psz_fontfamily, DEFAULT_FONT );
 # endif
@@ -371,11 +385,12 @@ static int Create( vlc_object_t *p_this )
 #elif defined(WIN32)
     psz_fontfile = Win32_Select( p_filter, psz_fontfamily, false, false,
                                  p_sys->i_default_font_size, &fontindex );
+
 #endif
     msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily, psz_fontfile );
     if( !psz_fontfile )
         psz_fontfile = psz_fontfamily;
-#else
+#else /* !HAVE_STYLES */
     psz_fontfile = psz_fontfamily;
 #endif
 
@@ -2297,14 +2312,9 @@ static char* Win32_Select( filter_t *p_filter, const char* family,
     /* FIXME: increase i_idx, when concatenated strings  */
     i_idx = 0;
 
-    /* Get Windows Font folder */
-    wchar_t wdir[MAX_PATH];
-    if( S_OK != SHGetFolderPathW( NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, wdir ) )
-        return NULL;
-
     /* */
     char *psz_tmp;
-    if( asprintf( &psz_tmp, "%s\\%s", FromWide( wdir ), psz_filename ) == -1 )
+    if( asprintf( &psz_tmp, "%s\\%s", p_filter->p_sys->psz_win_fonts_path, psz_filename ) == -1 )
         return NULL;
     return psz_tmp;
 }
