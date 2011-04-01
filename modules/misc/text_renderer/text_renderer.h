@@ -533,7 +533,7 @@ static int ProcessNodes( filter_t *p_filter,
         if( p_font_style->i_style_flags & STYLE_STRIKEOUT )
             b_through = true;
     }
-#ifdef HAVE_FONTCONFIG
+#ifdef HAVE_STYLES
     else
     {
         rv = PushFont( &p_fonts,

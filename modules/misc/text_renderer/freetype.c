@@ -43,16 +43,16 @@
 /* Default fonts */
 #ifdef __APPLE__
 # define DEFAULT_FONT "/Library/Fonts/Arial Black.ttf"
-# define FC_DEFAULT_FONT "Arial Black"
+# define DEFAULT_FAMILY "Arial Black"
 #elif defined( WIN32 )
-# define DEFAULT_FONT "arial.ttf" /* Default font found at run-time */
-# define FC_DEFAULT_FONT "Arial"
+# define DEFAULT_FONT "arial.ttf" /* Default path font found at run-time */
+# define DEFAULT_FAMILY "Arial"
 #elif defined( HAVE_MAEMO )
 # define DEFAULT_FONT "/usr/share/fonts/nokia/nosnb.ttf"
-# define FC_DEFAULT_FONT "Nokia Sans Bold"
+# define DEFAULT_FAMILY "Nokia Sans Bold"
 #else
 # define DEFAULT_FONT "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
-# define FC_DEFAULT_FONT "Serif Bold"
+# define DEFAULT_FAMILY "Serif Bold"
 #endif
 
 /* Freetype */
@@ -85,12 +85,6 @@
 # define HAVE_STYLES
 #endif
 
-/* If we have font/styles support, use a fontfamily */
-#ifdef HAVE_STYLES
-# undef DEFAULT_FONT
-# define DEFAULT_FONT FC_DEFAULT_FONT
-#endif
-
 #include <assert.h>
 
 /*****************************************************************************
@@ -101,11 +95,8 @@ static void Destroy( vlc_object_t * );
 
 #define FONT_TEXT N_("Font")
 
-#ifdef HAVE_STYLES
-#define FONT_LONGTEXT N_("Font family for the font you want to use")
-#else
+#define FAMILY_LONGTEXT N_("Font family for the font you want to use")
 #define FONT_LONGTEXT N_("Font file for the font you want to use")
-#endif
 
 #define FONTSIZE_TEXT N_("Font size in pixels")
 #define FONTSIZE_LONGTEXT N_("This is the default size of the fonts " \
@@ -160,7 +151,11 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
+#ifdef HAVE_STYLES
+    add_font( "freetype-font", DEFAULT_FAMILY, FONT_TEXT, FAMILY_LONGTEXT, false )
+#else
     add_font( "freetype-font", DEFAULT_FONT, FONT_TEXT, FONT_LONGTEXT, false )
+#endif
 
     add_integer( "freetype-fontsize", 0, FONTSIZE_TEXT,
                  FONTSIZE_LONGTEXT, true )
@@ -286,8 +281,8 @@ struct filter_sys_t
 
     int            i_default_font_size;
     int            i_display_height;
-    char*          psz_fontfamily;
 #ifdef HAVE_STYLES
+    char*          psz_fontfamily;
     xml_reader_t  *p_xml;
 #ifdef WIN32
     char*          psz_win_fonts_path;
@@ -358,7 +353,7 @@ static int Create( vlc_object_t *p_this )
     {
         free( psz_fontfamily );
 #ifdef HAVE_STYLES
-        psz_fontfamily = strdup( DEFAULT_FONT );
+        psz_fontfamily = strdup( DEFAULT_FAMILY );
 #else
         psz_fontfamily = (char *)malloc( PATH_MAX + 1 );
         if( !psz_fontfamily )
@@ -369,13 +364,13 @@ static int Create( vlc_object_t *p_this )
 # else
         strcpy( psz_fontfamily, DEFAULT_FONT );
 # endif
-        msg_Err( p_filter,"User didn't specify fontfile, using %s", psz_fontfamily);
+        msg_Err( p_filter,"User specified an empty fontfile, using %s", psz_fontfamily );
 #endif
     }
-    p_sys->psz_fontfamily = psz_fontfamily;
 
-    /* Set the font file */
+    /* Set the current font file */
 #ifdef HAVE_STYLES
+    p_sys->psz_fontfamily = psz_fontfamily;
 #ifdef HAVE_FONTCONFIG
     FontConfig_BuildCache( p_filter );
 
@@ -388,9 +383,13 @@ static int Create( vlc_object_t *p_this )
 
 #endif
     msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily, psz_fontfile );
+
+    /* If nothing is found, use the default family */
     if( !psz_fontfile )
         psz_fontfile = psz_fontfamily;
+
 #else /* !HAVE_STYLES */
+    /* Use the default file */
     psz_fontfile = psz_fontfamily;
 #endif
 
@@ -474,8 +473,8 @@ static void Destroy( vlc_object_t *p_this )
 
 #ifdef HAVE_STYLES
     if( p_sys->p_xml ) xml_ReaderDelete( p_sys->p_xml );
-#endif
     free( p_sys->psz_fontfamily );
+#endif
 
     /* FcFini asserts calling the subfunction FcCacheFini()
      * even if no other library functions have been made since FcInit(),
