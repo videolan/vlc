@@ -1,5 +1,5 @@
 --[==========================================================================[
- rc.lua: remote control module for VLC
+ cli.lua: CLI module for VLC
 --[==========================================================================[
  Copyright (C) 2007-2011 the VideoLAN team
  $Id$
@@ -24,22 +24,22 @@
 
 description=
 [============================================================================[
- Remote control interface for VLC
+ Command Line Interface for VLC
 
  This is a modules/control/rc.c look alike (with a bunch of new features).
  It also provides a VLM interface copied from the telnet interface.
 
  Use on local term:
-    vlc -I rc
+    vlc -I cli
  Use on tcp connection:
-    vlc -I rc --lua-config "rc={host='localhost:4212'}"
+    vlc -I cli --lua-config "cli={host='localhost:4212'}"
  Use on telnet connection:
-    vlc -I rc --lua-config "rc={host='telnet://localhost:4212'}"
+    vlc -I cli --lua-config "cli={host='telnet://localhost:4212'}"
  Use on multiple hosts (term + plain tcp port + telnet):
-    vlc -I rc --lua-config "rc={hosts={'*console','localhost:4212','telnet://localhost:5678'}}"
+    vlc -I cli --lua-config "cli={hosts={'*console','localhost:4212','telnet://localhost:5678'}}"
 
  Note:
-    -I rc and -I luarc are aliases for -I lua --lua-intf rc
+    -I cli and -I luacli are aliases for -I lua --lua-intf cli
 
  Configuration options setable throught the --lua-config option are:
     * hosts: A list of hosts to listen on.
@@ -72,7 +72,7 @@ env = { prompt = "> ";
         width = 70;
         autocompletion = 1;
         autoalias = 1;
-        welcome = _("Remote control interface initialized. Type `help' for help.");
+        welcome = _("Command Line Interface initialized. Type `help' for help.");
         flatplaylist = 0;
       }
 
@@ -305,7 +305,7 @@ function help(name,client,arg)
     local long = (name == "longhelp")
     local extra = ""
     if arg then extra = "matching `" .. arg .. "' " end
-    client:append("+----[ Remote control commands "..extra.."]")
+    client:append("+----[ CLI commands "..extra.."]")
     for i, cmd in ipairs(commands_ordered) do
         if (cmd == "" or not commands[cmd].adv or long)
         and (not arg or string.match(cmd,arg)) then

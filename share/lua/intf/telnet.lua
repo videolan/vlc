@@ -21,8 +21,6 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]==========================================================================]
 
---vlc.msg.warn("The telnet lua interface script was replaced by rc, please update your configuration!")
-
 if config.hosts == nil and config.host == nil then
     config.host = "telnet://localhost:4212"
 else
