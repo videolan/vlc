@@ -27,6 +27,7 @@
 #include "dialogs/epg.hpp"
 
 #include "components/epg/EPGWidget.hpp"
+#include <vlc_playlist.h>
 
 #include <QVBoxLayout>
 #include <QSplitter>
@@ -119,7 +120,21 @@ void EpgDialog::showEvent( EPGItem *epgItem )
 void EpgDialog::updateInfos()
 {
     timer->stop();
-    if( !THEMIM->getInput() ) return;
-    epg->updateEPG( input_GetItem( THEMIM->getInput() ) );
-    if ( isVisible() ) timer->start();
+    input_item_t *p_input_item = NULL;
+    playlist_t *p_playlist = THEPL;
+    input_thread_t *p_input_thread = playlist_CurrentInput( p_playlist ); /* w/hold */
+    if( p_input_thread )
+    {
+        PL_LOCK; /* as input_GetItem still unfixed */
+        p_input_item = input_GetItem( p_input_thread );
+        if ( p_input_item ) vlc_gc_incref( p_input_item );
+        PL_UNLOCK;
+        vlc_object_release( p_input_thread );
+        if ( p_input_item )
+        {
+            epg->updateEPG( p_input_item );
+            vlc_gc_decref( p_input_item );
+            if ( isVisible() ) timer->start();
+        }
+    }
 }
