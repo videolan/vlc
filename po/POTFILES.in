@@ -200,13 +200,6 @@ modules/access/dshow/filter.cpp
 modules/access/dshow/filter.h
 modules/access/dtv/access.c
 modules/access/dv.c
-modules/access/dvb/access.c
-modules/access/dvb/dvb.h
-modules/access/dvb/en50221.c
-modules/access/dvb/http.c
-modules/access/dvb/linux_dvb.c
-modules/access/dvb/scan.c
-modules/access/dvb/scan.h
 modules/access/dvdnav.c
 modules/access/dvdread.c
 modules/access/eyetv.m
