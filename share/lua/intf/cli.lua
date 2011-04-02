@@ -802,7 +802,7 @@ while not vlc.misc.should_die() do
 
             -- get the next command
             local index = string.find(client.cmds, "\n")
-            client.buffer = string.gsub(string.sub(client.cmds, 0, index - 1), "^%s*(.-)%s*$", "%1")
+            client.buffer = strip(string.sub(client.cmds, 0, index - 1))
             client.cmds = string.sub(client.cmds, index + 1)
 
             -- Remove telnet commands from the command line
