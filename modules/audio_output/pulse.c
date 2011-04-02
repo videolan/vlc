@@ -368,6 +368,7 @@ static int Open(vlc_object_t *obj)
     aout_sys_t *sys = malloc(sizeof(*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
+    aout->output.p_sys = sys;
     sys->context = NULL;
     sys->stream = NULL;
     //sys->byterate = byterate;
@@ -428,7 +429,6 @@ static int Open(vlc_object_t *obj)
     aout->output.i_nb_samples = pba->minreq / pa_frame_size(&ss);
     pa_threaded_mainloop_unlock(mainloop);
 
-    aout->output.p_sys = sys;
     aout->output.pf_play = Play;
     aout_VolumeSoftInit(aout);
     return VLC_SUCCESS;
