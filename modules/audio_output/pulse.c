@@ -167,6 +167,7 @@ static void Play(aout_instance_t *aout)
         msg_Dbg(aout, "uncorking");
     }
 
+#if 0
     /* This function should be called by the LibVLC core a header of time,
      * but not more than AOUT_MAX_PREPARE. The PulseAudio latency should be
      * shorter than that (though it might not be the case with some evil piece
@@ -183,23 +184,11 @@ static void Play(aout_instance_t *aout)
 
     mtime_t gap = aout_FifoFirstDate(aout, &aout->output.fifo) - mdate()
                 - latency;
-    if (gap > AOUT_PTS_TOLERANCE) {
-#if 0   /* FIXME: we need to take buffer status into account as well... */
-        size_t len = sys->byterate * gap / CLOCK_FREQ;
-        void *ptr = calloc(1, len);
-
-        msg_Dbg(aout, "buffer too early (%"PRId64" us), stuffing %zu bytes",
-                gap, len);
-        if (likely(ptr != NULL))
-            if (pa_stream_write(sys->stream, ptr, len, free,
-                                0, PA_SEEK_RELATIVE) < 0)
-                free(ptr);
+    if (gap > AOUT_PTS_TOLERANCE)
+        msg_Dbg(aout, "buffer too early (%"PRId64" us)", gap);
+    else if (latency != 0 && gap < -AOUT_PTS_TOLERANCE)
+        msg_Err(aout, "buffer too late (%"PRId64" us)", -gap);
 #endif
-        msleep(gap);
-    }
-    /*else if (latency != 0 && gap < -AOUT_PTS_TOLERANCE)
-        msg_Err(aout, "buffer too late (%"PRId64" us)", -gap);*/
-
 #if 0 /* Fault injector to test underrun recovery */
     static unsigned u = 0;
     if ((++u % 500) == 0) {
