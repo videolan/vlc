@@ -2256,7 +2256,7 @@ ifdef HAVE_CYGWIN
 endif
 
 .tag: taglib
-	(cd $<; $(HOSTCC)  ./configure $(HOSTCONF) --enable-mp4 --enable-asf --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) CPPFLAGS="$(CPPFLAGS)" cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DENABLE_STATIC:BOOL=ON -DWITH_ASF:BOOL=ON -DWITH_MP4:BOOL=ON && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
