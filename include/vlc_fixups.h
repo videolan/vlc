@@ -73,16 +73,39 @@ typedef struct
 extern "C" {
 #endif
 
-#ifndef HAVE_STRDUP
-char *strdup (const char *);
+/* stdio.h */
+#ifndef HAVE_ASPRINTF
+int asprintf (char **, const char *, ...);
+#endif
+
+#ifndef HAVE_GETDELIM
+ssize_t getdelim (char **, size_t *, int, FILE *);
+ssize_t getline (char **, size_t *, FILE *);
+#endif
+
+#ifndef HAVE_REWIND
+void rewind (FILE *);
 #endif
 
 #ifndef HAVE_VASPRINTF
 int vasprintf (char **, const char *, va_list);
 #endif
 
-#ifndef HAVE_ASPRINTF
-int asprintf (char **, const char *, ...);
+/* string.h */
+#ifndef HAVE_STRCASECMP
+int strcasecmp (const char *, const char *);
+#endif
+
+#ifndef HAVE_STRCASESTR
+char *strcasestr (const char *, const char *);
+#endif
+
+#ifndef HAVE_STRDUP
+char *strdup (const char *);
+#endif
+
+#ifndef HAVE_STRNCASECMP
+int strncasecmp (const char *, const char *, size_t);
 #endif
 
 #ifndef HAVE_STRNLEN
@@ -97,24 +120,19 @@ char *strndup (const char *, size_t);
 size_t strlcpy (char *, const char *, size_t);
 #endif
 
-#ifndef HAVE_STRTOF
-#ifndef __ANDROID__
-float strtof (const char *, char **);
-#endif
+#ifndef HAVE_STRSEP
+char *strsep (char **, const char *);
 #endif
 
+#ifndef HAVE_STRTOK_R
+char *strtok_r(char *, const char *, char **);
+#endif
+
+/* stdlib.h */
 #ifndef HAVE_ATOF
 #ifndef __ANDROID__
 double atof (const char *);
 #endif
-#endif
-
-#ifndef HAVE_STRTOLL
-long long int strtoll (const char *, char **, int);
-#endif
-
-#ifndef HAVE_STRSEP
-char *strsep (char **, const char *);
 #endif
 
 #ifndef HAVE_ATOLL
@@ -125,18 +143,17 @@ long long atoll (const char *);
 lldiv_t lldiv (long long, long long);
 #endif
 
-#ifndef HAVE_STRCASECMP
-int strcasecmp (const char *, const char *);
+#ifndef HAVE_STRTOF
+#ifndef __ANDROID__
+float strtof (const char *, char **);
+#endif
 #endif
 
-#ifndef HAVE_STRNCASECMP
-int strncasecmp (const char *, const char *, size_t);
+#ifndef HAVE_STRTOLL
+long long int strtoll (const char *, char **, int);
 #endif
 
-#ifndef HAVE_STRCASESTR
-char *strcasestr (const char *, const char *);
-#endif
-
+/* time.h */
 #ifndef HAVE_GMTIME_R
 struct tm *gmtime_r (const time_t *, struct tm *);
 #endif
@@ -145,25 +162,13 @@ struct tm *gmtime_r (const time_t *, struct tm *);
 struct tm *localtime_r (const time_t *, struct tm *);
 #endif
 
-#ifndef HAVE_REWIND
-void rewind (FILE *);
-#endif
-
+/* unistd.h */
 #ifndef HAVE_GETCWD
 char *getcwd (char *buf, size_t size);
 #endif
 
-#ifndef HAVE_GETDELIM
-ssize_t getdelim (char **, size_t *, int, FILE *);
-ssize_t getline (char **, size_t *, FILE *);
-#endif
-
 #ifndef HAVE_GETPID
 pid_t getpid (void);
-#endif
-
-#ifndef HAVE_STRTOK_R
-char *strtok_r(char *, const char *, char **);
 #endif
 
 /* dirent.h */
@@ -175,6 +180,7 @@ int dirfd (DIR *);
 } /* extern "C" */
 #endif
 
+/* stdlib.h */
 #ifndef HAVE_GETENV
 static inline char *getenv (const char *name)
 {
@@ -188,13 +194,7 @@ int setenv (const char *, const char *, int);
 int unsetenv (const char *);
 #endif
 
-/* Alignment of critical static data structures */
-#ifdef ATTRIBUTE_ALIGNED_MAX
-#   define ATTR_ALIGN(align) __attribute__ ((__aligned__ ((ATTRIBUTE_ALIGNED_MAX < align) ? ATTRIBUTE_ALIGNED_MAX : align)))
-#else
-#   define ATTR_ALIGN(align)
-#endif
-
+/* locale.h */
 #ifndef HAVE_USELOCALE
 #define LC_NUMERIC_MASK  0
 #define LC_MESSAGES_MASK 0
@@ -213,6 +213,13 @@ static inline locale_t newlocale(int mask, const char * locale, locale_t base)
     (void)mask; (void)locale; (void)base;
     return NULL;
 }
+#endif
+
+/* Alignment of critical static data structures */
+#ifdef ATTRIBUTE_ALIGNED_MAX
+#   define ATTR_ALIGN(align) __attribute__ ((__aligned__ ((ATTRIBUTE_ALIGNED_MAX < align) ? ATTRIBUTE_ALIGNED_MAX : align)))
+#else
+#   define ATTR_ALIGN(align)
 #endif
 
 /* libintl support */
@@ -258,6 +265,7 @@ struct pollfd
 int vlc_poll (struct pollfd *, unsigned, int);
 #endif
 
+/* search.h */
 #ifndef HAVE_SEARCH_H
 typedef struct entry {
     char *key;
