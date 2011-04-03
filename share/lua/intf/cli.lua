@@ -182,7 +182,8 @@ function add(name,client,arg)
         table.insert(options,o)
     end
     arg = string.gsub(arg," +:.*$","")
-    f({{path=arg,options=options}})
+    local uri = vlc.strings.make_uri(arg)
+    f({{path=uri,options=options}})
 end
 
 function playlist_is_tree( client )
