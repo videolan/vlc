@@ -147,10 +147,10 @@ static char *encode_URI_bytes (const char *psz_uri, size_t len)
 }
 
 /**
- * Encodes an URI component (RFC3986 §2).
+ * Encodes a URI component (RFC3986 §2).
  *
  * @param psz_uri nul-terminated UTF-8 representation of the component.
- * Obviously, you can't pass an URI containing a nul character, but you don't
+ * Obviously, you can't pass a URI containing a nul character, but you don't
  * want to do that, do you?
  *
  * @return encoded string (must be free()'d), or NULL for ENOMEM.
@@ -1031,8 +1031,8 @@ void path_sanitize( char *str )
 #endif
 
 /**
- * Convert a file path to an URI.
- * If already an URI, return a copy of the string.
+ * Convert a file path to a URI.
+ * If already a URI, return a copy of the string.
  * @param path path to convert (or URI to copy)
  * @param scheme URI scheme to use (default is auto: "file", "fd" or "smb")
  * @return a nul-terminated URI string (use free() to release it),
@@ -1045,7 +1045,7 @@ char *make_URI (const char *path, const char *scheme)
     if (scheme == NULL && !strcmp (path, "-"))
         return strdup ("fd://0"); // standard input
     if (strstr (path, "://") != NULL)
-        return strdup (path); /* Already an URI */
+        return strdup (path); /* Already a URI */
     /* Note: VLC cannot handle URI schemes without double slash after the
      * scheme name (such as mailto: or news:). */
 
@@ -1145,7 +1145,7 @@ char *make_URI (const char *path, const char *scheme)
 }
 
 /**
- * Tries to convert an URI to a local (UTF-8-encoded) file path.
+ * Tries to convert a URI to a local (UTF-8-encoded) file path.
  * @param url URI to convert
  * @return NULL on error, a nul-terminated string otherwise
  * (use free() to release it)

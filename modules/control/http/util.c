@@ -39,7 +39,7 @@
  * File and directory functions
  ****************************************************************************/
 
-/* ToUrl: create a good name for an url from filename */
+/* ToUrl: create a good name for a url from filename */
 static char *FileToUrl( const char *name, bool *pb_index )
 {
     *pb_index = false;

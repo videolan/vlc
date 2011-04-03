@@ -182,7 +182,7 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
     char *psz_arturl = input_item_GetArtURL( p_item );
     if( psz_arturl )
     {
-        /* We already have an URL */
+        /* We already have a URL */
         if( !strncmp( psz_arturl, "file://", strlen( "file://" ) ) )
         {
             free( psz_arturl );

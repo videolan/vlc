@@ -77,7 +77,7 @@
 #define SDP_TEXT N_("SDP")
 #define SDP_LONGTEXT N_( \
     "This allows you to specify how the SDP (Session Descriptor) for this RTP "\
-    "session will be made available. You must use an url: http://location to " \
+    "session will be made available. You must use a url: http://location to " \
     "access the SDP via HTTP, rtsp://location for RTSP access, and sap:// " \
     "for the SDP to be announced via SAP." )
 #define SAP_TEXT N_("SAP announcing")
@@ -97,7 +97,7 @@
     "that will be announced in the SDP (Session Descriptor)." )
 #define URL_TEXT N_("Session URL")
 #define URL_LONGTEXT N_( \
-    "This allows you to give an URL with more details about the stream " \
+    "This allows you to give a URL with more details about the stream " \
     "(often the website of the streaming organization), that will " \
     "be announced in the SDP (Session Descriptor)." )
 #define EMAIL_TEXT N_("Session email")

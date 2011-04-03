@@ -103,7 +103,7 @@ bool OpenUrlDialog::shouldEnqueue() const
 }
 
 /** Show Event:
- * When the dialog is shown, try to extract an URL from the clipboard
+ * When the dialog is shown, try to extract a URL from the clipboard
  * and paste it in the Edit box.
  * showEvent can happen not only on exec() but I think it's cool to
  * actualize the URL on showEvent (eg. change virtual desktop...)

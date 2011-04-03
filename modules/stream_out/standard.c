@@ -75,7 +75,7 @@
     "that will be announced in the SDP (Session Descriptor)." )
 #define URL_TEXT N_("Session URL")
 #define URL_LONGTEXT N_( \
-    "This allows you to give an URL with more details about the stream " \
+    "This allows you to give a URL with more details about the stream " \
     "(often the website of the streaming organization), that will " \
     "be announced in the SDP (Session Descriptor)." )
 #define EMAIL_TEXT N_("Session email")

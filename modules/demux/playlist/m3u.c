@@ -97,7 +97,7 @@ static bool ContainsURL( demux_t *p_demux )
 
     while( p_peek + sizeof( "https://" ) < p_peek_end )
     {
-        /* One line starting with an URL is enough */
+        /* One line starting with a URL is enough */
         if( !strncasecmp( (const char *)p_peek, "http://", 7 ) ||
             !strncasecmp( (const char *)p_peek, "mms://", 6 ) ||
             !strncasecmp( (const char *)p_peek, "rtsp://", 7 ) ||

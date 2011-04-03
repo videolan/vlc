@@ -1283,7 +1283,7 @@ int httpd_UrlCatch( httpd_url_t *url, int i_msg, httpd_callback_t cb,
     return VLC_SUCCESS;
 }
 
-/* delete an url */
+/* delete a url */
 void httpd_UrlDelete( httpd_url_t *url )
 {
     httpd_host_t *host = url->host;

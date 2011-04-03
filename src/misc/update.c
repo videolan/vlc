@@ -70,7 +70,7 @@
  *      * Z is the revision number
  *      * e is an OPTIONAL extra letter
  *      * AKA "0.8.6d" or "0.9.0"
- * Second line is an url of the binary for this last version
+ * Second line is a url of the binary for this last version
  * Remaining text is a required description of the update
  */
 
