@@ -302,6 +302,8 @@
 		CC426FD01020D44F00A32659 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = ../../contrib/Sparkle/Sparkle.framework; sourceTree = SOURCE_ROOT; };
 		CC4A33210F8CB017000FC4A7 /* coredialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = coredialogs.m; path = ../../../modules/gui/macosx/coredialogs.m; sourceTree = SOURCE_ROOT; };
 		CC4A33220F8CB017000FC4A7 /* coredialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = coredialogs.h; path = ../../../modules/gui/macosx/coredialogs.h; sourceTree = SOURCE_ROOT; };
+		CC4D67F51348F587003FCC5B /* quartztext.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = quartztext.c; path = ../../../modules/misc/text_renderer/quartztext.c; sourceTree = "<group>"; };
+		CC4D67F71348F601003FCC5B /* darwin_specific.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = darwin_specific.c; path = ../../../src/posix/darwin_specific.c; sourceTree = "<group>"; };
 		CC4ED9AC0ABE07C800CA4CC5 /* add_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_embedded_blue.png; path = Resources/add_embedded_blue.png; sourceTree = "<group>"; };
 		CC4ED9AD0ABE07C800CA4CC5 /* add_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_embedded.png; path = Resources/add_embedded.png; sourceTree = "<group>"; };
 		CC4ED9AE0ABE07C800CA4CC5 /* repeat_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = repeat_embedded_blue.png; path = Resources/repeat_embedded_blue.png; sourceTree = "<group>"; };
@@ -357,10 +359,8 @@
 		CC6C01B10DDF3E9200C7D754 /* voutgl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = voutgl.m; path = ../../../modules/gui/minimal_macosx/voutgl.m; sourceTree = SOURCE_ROOT; };
 		CC6C01B20DDF3E9200C7D754 /* VLCOpenGLVoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCOpenGLVoutView.h; path = ../../../modules/gui/minimal_macosx/VLCOpenGLVoutView.h; sourceTree = SOURCE_ROOT; };
 		CC6C01B30DDF3E9200C7D754 /* voutagl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = voutagl.m; path = ../../../modules/gui/minimal_macosx/voutagl.m; sourceTree = SOURCE_ROOT; };
-		CC6C01B90DDF3EBC00C7D754 /* darwin_specific.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = darwin_specific.c; path = ../../../src/misc/darwin_specific.c; sourceTree = SOURCE_ROOT; };
 		CC6C01BA0DDF3EEC00C7D754 /* auhal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = auhal.c; path = ../../../modules/audio_output/auhal.c; sourceTree = SOURCE_ROOT; };
 		CC6C01BB0DDF3F0700C7D754 /* opengl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = opengl.c; path = ../../../modules/video_output/opengl.c; sourceTree = SOURCE_ROOT; };
-		CC6C01BD0DDF3F2100C7D754 /* quartztext.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = quartztext.c; path = ../../../modules/misc/quartztext.c; sourceTree = SOURCE_ROOT; };
 		CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppleRemote.h; path = ../../../modules/gui/macosx/AppleRemote.h; sourceTree = SOURCE_ROOT; };
 		CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppleRemote.m; path = ../../../modules/gui/macosx/AppleRemote.m; sourceTree = SOURCE_ROOT; };
 		CC6EDD4F0B9CA2140096068A /* eyetv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = eyetv.h; path = ../../../modules/gui/macosx/eyetv.h; sourceTree = SOURCE_ROOT; };
@@ -775,9 +775,9 @@
 		CCC8957F0D9A8A61005AE59C /* OSX-specific source files */ = {
 			isa = PBXGroup;
 			children = (
-				CC6C01BD0DDF3F2100C7D754 /* quartztext.c */,
+				CC4D67F51348F587003FCC5B /* quartztext.c */,
 				CC6C01BB0DDF3F0700C7D754 /* opengl.c */,
-				CC6C01B90DDF3EBC00C7D754 /* darwin_specific.c */,
+				CC4D67F71348F601003FCC5B /* darwin_specific.c */,
 				CC6C01BA0DDF3EEC00C7D754 /* auhal.c */,
 				CCC895830D9A8A82005AE59C /* eyetv.m */,
 			);

@@ -3,3 +3,5 @@
 *.pbxuser
 build
 Info.plist
+*.xcworkspace
+xcuserdata
