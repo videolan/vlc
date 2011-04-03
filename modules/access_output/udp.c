@@ -81,8 +81,6 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT, CACHING_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "group", 1, GROUP_TEXT, GROUP_LONGTEXT,
                                  true )
-    add_obsolete_integer( SOUT_CFG_PREFIX "late" )
-    add_obsolete_bool( SOUT_CFG_PREFIX "raw" )
 
     set_capability( "sout access", 0 )
     add_shortcut( "udp" )

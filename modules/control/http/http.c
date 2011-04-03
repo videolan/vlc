@@ -72,7 +72,6 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INTERFACE_MAIN )
         add_string ( "http-host", NULL, HOST_TEXT, HOST_LONGTEXT, true )
         add_string ( "http-src",  NULL, SRC_TEXT,  SRC_LONGTEXT,  true )
-        add_obsolete_string ( "http-charset" )
 #if defined( HAVE_FORK ) || defined( WIN32 )
         add_string ( "http-handlers", NULL, HANDLERS_TEXT, HANDLERS_LONGTEXT, true )
 #endif

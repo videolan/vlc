@@ -91,9 +91,6 @@ vlc_module_begin ()
     set_category( CAT_ADVANCED )
     set_subcategory( SUBCAT_ADVANCED_MISC )
 
-    add_obsolete_bool( "tls-check-cert" )
-    add_obsolete_bool( "tls-check-hostname" )
-
     add_submodule ()
         set_description( N_("GnuTLS server") )
         set_capability( "tls server", 1 )
@@ -101,7 +98,6 @@ vlc_module_begin ()
         set_subcategory( SUBCAT_ADVANCED_MISC )
         set_callbacks( OpenServer, CloseServer )
 
-        add_obsolete_integer( "gnutls-dh-bits" )
         add_integer( "gnutls-cache-timeout", CACHE_TIMEOUT,
                     CACHE_TIMEOUT_TEXT, CACHE_TIMEOUT_LONGTEXT, true )
         add_integer( "gnutls-cache-size", CACHE_SIZE, CACHE_SIZE_TEXT,

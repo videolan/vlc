@@ -129,8 +129,6 @@ vlc_module_begin ()
                                         true )
     add_string( SOUT_CFG_PREFIX "phone", "", PHONE_TEXT, PHONE_LONGTEXT,
                                         true )
-    add_obsolete_bool( SOUT_CFG_PREFIX "sap-ipv6" )
-
     set_callbacks( Open, Close )
 vlc_module_end ()
 

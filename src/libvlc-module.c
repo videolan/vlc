@@ -2018,7 +2018,6 @@ vlc_module_begin ()
                 PACKETIZER_TEXT, PACKETIZER_LONGTEXT, true )
 
     set_subcategory( SUBCAT_SOUT_SAP )
-    add_obsolete_bool( "sap-flow-control" )
     add_integer( "sap-interval", 5, ANN_SAPINTV_TEXT,
                                ANN_SAPINTV_LONGTEXT, true )
 
@@ -2075,11 +2074,6 @@ vlc_module_begin ()
         change_need_restart ()
 
     set_section( N_("Performance options"), NULL )
-    add_obsolete_bool( "minimize-threads" )
-
-    add_obsolete_bool( "use-stream-immediate" )
-
-    add_obsolete_bool( "auto-adjust-pts-delay" )
 
 #ifdef LIBVLC_USE_PTHREAD
 # ifndef __APPLE__
@@ -2201,8 +2195,6 @@ vlc_module_begin ()
         change_need_restart ()
     add_bool( "interact", true, INTERACTION_TEXT,
               INTERACTION_LONGTEXT, false )
-
-    add_obsolete_bool( "show-intf" );
 
     add_bool ( "stats", true, STATS_TEXT, STATS_LONGTEXT, true )
         change_need_restart ()

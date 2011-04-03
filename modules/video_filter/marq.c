@@ -177,13 +177,6 @@ vlc_module_begin ()
                  REFRESH_LONGTEXT, false )
 
     add_shortcut( "time" )
-    add_obsolete_string( "time-format" )
-    add_obsolete_string( "time-x" )
-    add_obsolete_string( "time-y" )
-    add_obsolete_string( "time-position" )
-    add_obsolete_string( "time-opacity" )
-    add_obsolete_string( "time-color" )
-    add_obsolete_string( "time-size" )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {

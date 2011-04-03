@@ -143,8 +143,6 @@ vlc_module_begin ()
     add_bool( "http-use-IE-proxy", false, USE_IE_PROXY_TEXT,
               USE_IE_PROXY_LONGTEXT, true )
 #endif
-    add_obsolete_string("http-user")
-    add_obsolete_string("http-pwd")
     /* 'itpc' = iTunes Podcast */
     add_shortcut( "http", "https", "unsv", "itpc", "icyx" )
     set_callbacks( Open, Close )
