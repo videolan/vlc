@@ -38,7 +38,7 @@
 
 #include <TargetConditionals.h>
 
-#ifdef TARGET_OS_IPHONE
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 #include <CoreText/CoreText.h>
 #include <CoreGraphics/CoreGraphics.h>
 
