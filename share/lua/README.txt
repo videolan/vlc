@@ -373,6 +373,7 @@ strings.decode_uri( [uri1, [uri2, [...]]] ): Decode a list of URIs. This
   function returns as many variables as it had arguments.
 strings.encode_uri_component( [uri1, [uri2, [...]]] ): Encode a list of URI
   components. This function returns as many variables as it had arguments.
+strings.make_uri( path, [scheme] ): Convert a file path to a URI.
 strings.resolve_xml_special_chars( [str1, [str2, [...]]] ): Resolve XML
   special characters in a list of strings. This function returns as many
   variables as it had arguments.

@@ -81,6 +81,16 @@ static int vlclua_encode_uri_component( lua_State *L )
     return i_top;
 }
 
+static int vlclua_make_uri( lua_State *L )
+{
+    const char *psz_input = luaL_checkstring( L, 1 );
+    const char *psz_scheme = luaL_optstring( L, 2, NULL );
+    char *psz_uri = make_URI( psz_input, psz_scheme );
+    lua_pushstring( L, psz_uri );
+    free( psz_uri );
+    return 1;
+}
+
 static int vlclua_resolve_xml_special_chars( lua_State *L )
 {
     int i_top = lua_gettop( L );
@@ -134,6 +144,7 @@ static int vlclua_from_charset( lua_State *L )
 static const luaL_Reg vlclua_strings_reg[] = {
     { "decode_uri", vlclua_decode_uri },
     { "encode_uri_component", vlclua_encode_uri_component },
+    { "make_uri", vlclua_make_uri },
     { "resolve_xml_special_chars", vlclua_resolve_xml_special_chars },
     { "convert_xml_special_chars", vlclua_convert_xml_special_chars },
     { "from_charset", vlclua_from_charset },
