@@ -173,6 +173,9 @@ pid_t getpid (void);
 
 /* dirent.h */
 #ifndef HAVE_DIRFD
+#ifdef __APPLE__
+#undef dirfd
+#endif
 int dirfd (DIR *);
 #endif
 
