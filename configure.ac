@@ -238,10 +238,6 @@ case "${host_os}" in
     then
         echo ""
         echo "Building with Mac OS X defaults:"
-        with_macosx_version_min="10.5"
-        echo "  Assuming --with-macosx-version-min=10.5"
-        with_macosx_sdk="/Developer/SDKs/MacOSX${with_macosx_version_min}.sdk"
-        echo "  Assuming --with-macosx-sdk=/Developer/SDKs/MacOSX${with_macosx_version_min}.sdk"
         build_dir=`pwd`
         echo "  Assuming --prefix=${build_dir}/vlc_install_dir"
         ac_default_prefix="${build_dir}/vlc_install_dir"
@@ -282,6 +278,15 @@ case "${host_os}" in
         CXX="${CXX} -isysroot ${with_macosx_sdk}"
         OBJC="${OBJC} -isysroot ${with_macosx_sdk}"
         LD="${LD} -syslibroot ${with_macosx_sdk}"
+    else
+        echo "  No desired SDK version given, falling back to 10.5"
+        CPP="${CPP} -isysroot /Developer/SDKs/MacOSX10.5.sdk"
+        CC="${CC} -isysroot /Developer/SDKs/MacOSX10.5.sdk"
+        CXX="${CXX} -isysroot /Developer/SDKs/MacOSX10.5.sdk"
+        OBJC="${OBJC} -isysroot /Developer/SDKs/MacOSX10.5.sdk"
+        LD="${LD} -syslibroot /Developer/SDKs/MacOSX10.5.sdk"
+        with_macosx_version_min="10.5"
+        echo "  Assuming --with-macosx-version-min=10.5"
     fi
     AC_ARG_WITH(macosx-version-min,
        [  --with-macosx-version-min=VERSION compile for MacOSX VERSION and above])
@@ -3732,7 +3737,6 @@ AC_ARG_ENABLE(macosx-vlc-app,
   [  --enable-macosx-vlc-app build the VLC media player (default enabled on Mac OS X)])
 AM_CONDITIONAL(BUILD_MACOSX_VLC_APP, [test "${enable_macosx_vlc_app}" != "no" &&
     (test "${SYS}" = "darwin" || test "${enable_macosx_vlc_app}" = "yes") ])
-
 
 dnl
 dnl  ncurses module
