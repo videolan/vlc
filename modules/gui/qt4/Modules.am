@@ -70,6 +70,9 @@ nodist_SOURCES_qt4 = \
 		util/searchlineedit.moc.cpp \
 		util/qvlcapp.moc.cpp \
 		util/pictureflow.moc.cpp \
+		util/buttons/RoundButton.moc.cpp \
+		util/buttons/DeckButtonsLayout.moc.cpp \
+		util/buttons/BrowseButton.moc.cpp \
 		resources.cpp \
 		ui/equalizer.h \
 		ui/video_effects.h \
@@ -297,7 +300,10 @@ SOURCES_qt4 = 	qt4.cpp \
 		util/searchlineedit.cpp \
 		util/registry.cpp \
 		util/qt_dirs.cpp \
-		util/pictureflow.cpp
+		util/pictureflow.cpp \
+		util/buttons/BrowseButton.cpp \
+		util/buttons/DeckButtonsLayout.cpp \
+		util/buttons/RoundButton.cpp
 
 if HAVE_DARWIN
 SOURCES_qt4 +=  util/searchlineedit_mac.mm
@@ -370,7 +376,10 @@ noinst_HEADERS = \
 	util/qt_dirs.hpp \
 	util/registry.hpp \
 	util/pictureflow.hpp \
-	util/singleton.hpp
+	util/singleton.hpp \
+	util/buttons/RoundButton.hpp \
+	util/buttons/DeckButtonsLayout.hpp \
+	util/buttons/BrowseButton.hpp
 
 
 EXTRA_DIST += \
