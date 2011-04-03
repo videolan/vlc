@@ -1681,7 +1681,7 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
             continue;
         }
     }
-	
+
     while( psz_text[ strlen( psz_text ) - 1 ] == '\\' )
     {
         const char *s2 = TextGetLine( txt );
@@ -1702,7 +1702,7 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         if( !psz_text )
              return VLC_ENOMEM;
 
-		psz_orig = psz_text;
+        psz_orig = psz_text;
         strcat( psz_text, s2 );
     }
 
@@ -1787,7 +1787,7 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
             else if( *(psz_text + 1 ) == '\r' ||  *(psz_text + 1 ) == '\n' ||
                      *(psz_text + 1 ) == '\0' )
             {
-				psz_text++;
+                psz_text++;
             }
             break;
         default:

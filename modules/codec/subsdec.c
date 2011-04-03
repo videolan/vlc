@@ -981,10 +981,31 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
             /* Hide {\stupidity} */
             psz_subtitle = strchr( psz_subtitle, '}' ) + 1;
         }
-        else if( psz_subtitle[0] == '{' && ( psz_subtitle[1] == 'Y' || psz_subtitle[1] == 'y' )
+        else if( psz_subtitle[0] == '{' &&
+                ( psz_subtitle[1] == 'Y' || psz_subtitle[1] == 'y' )
                 && psz_subtitle[2] == ':' && strchr( psz_subtitle, '}' ) )
         {
-            /* Hide {Y:stupidity} */
+            // FIXME: We don't do difference between Y and y, and we should.
+            if( psz_subtitle[3] == 'i' )
+            {
+                HtmlPut( &psz_html, "<i>" );
+                strcat( psz_tag, "i" );
+            }
+            if( psz_subtitle[3] == 'b' )
+            {
+                HtmlPut( &psz_html, "<b>" );
+                strcat( psz_tag, "b" );
+            }
+            if( psz_subtitle[3] == 'u' )
+            {
+                HtmlPut( &psz_html, "<u>" );
+                strcat( psz_tag, "u" );
+            }
+            psz_subtitle = strchr( psz_subtitle, '}' ) + 1;
+        }
+        else if( psz_subtitle[0] == '{' &&  psz_subtitle[2] == ':' && strchr( psz_subtitle, '}' ) )
+        {
+            // Hide other {x:y} atrocities, like {c:$bbggrr} or {P:x}
             psz_subtitle = strchr( psz_subtitle, '}' ) + 1;
         }
         else if( psz_subtitle[0] == '\\' && psz_subtitle[1] )
