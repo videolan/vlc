@@ -53,6 +53,7 @@
 #include <QActionGroup>
 #include <QSignalMapper>
 #include <QSystemTrayIcon>
+#include <QStatusBar>
 
 /*
   This file defines the main menus and the pop-up menu (right-click menu)
@@ -493,6 +494,10 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
     action->setChecked( mi->isPlDocked() );
     CONNECT( action, triggered( bool ), mi, dockPlaylist( bool ) );
 
+    action = menu->addAction( qtr( "Status Bar" ) );
+    action->setCheckable( true );
+    action->setChecked( mi->statusBar()->isVisible() );
+    CONNECT( action, triggered( bool ), mi, setStatusBarVisibility( bool) );
 #if 0 /* For Visualisations. Not yet working */
     adv = menu->addAction( qtr( "Visualizations selector" ), mi,
                            SLOT( visual() ) );

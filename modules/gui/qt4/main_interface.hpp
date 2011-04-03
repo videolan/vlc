@@ -191,6 +191,8 @@ public slots:
     void toggleInterfaceFullScreen();
     void toggleFSC();
 
+    void setStatusBarVisibility(bool b_visible);
+
     void popupMenu( const QPoint& );
     void changeThumbbarButtons( int );
 

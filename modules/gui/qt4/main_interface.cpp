@@ -136,6 +136,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      * Status Bar *
      **************/
     createStatusBar();
+    statusBar()->setVisible( getSettings()->value( "status-bar-visible", false ).toBool() );
 
     /**************************
      *  UI and Widgets design
@@ -304,6 +305,7 @@ MainInterface::~MainInterface()
 
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
+    settings->setValue( "status-bar-visible", statusBar()->isVisible() );
 
     /* Save the stackCentralW sizes */
     settings->setValue( "bgSize", stackWidgetsSizes[bgWidget] );
@@ -865,6 +867,11 @@ int MainInterface::getControlsVisibilityStatus()
     if( !controls ) return 0;
     return( (controls->isVisible() ? CONTROLS_VISIBLE : CONTROLS_HIDDEN )
                 + CONTROLS_ADVANCED * controls->b_advancedVisible );
+}
+
+void MainInterface::setStatusBarVisibility( bool b_visible )
+{
+    statusBar()->setVisible( b_visible );
 }
 
 #if 0
