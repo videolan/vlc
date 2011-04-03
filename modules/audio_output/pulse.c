@@ -295,10 +295,24 @@ static int Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
-    /* Channel mapping */
+    /* Channel mapping (order defined in vlc_aout.h) */
     struct pa_channel_map map;
     map.channels = 0;
 
+    if (aout->output.output.i_physical_channels & AOUT_CHAN_LEFT)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_LEFT;
+    if (aout->output.output.i_physical_channels & AOUT_CHAN_RIGHT)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_RIGHT;
+    if (aout->output.output.i_physical_channels & AOUT_CHAN_MIDDLELEFT)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_LEFT_OF_CENTER;
+    if (aout->output.output.i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_RIGHT_OF_CENTER;
+    if (aout->output.output.i_physical_channels & AOUT_CHAN_REARLEFT)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_LEFT;
+    if (aout->output.output.i_physical_channels & AOUT_CHAN_REARRIGHT)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_RIGHT;
+    if (aout->output.output.i_physical_channels & AOUT_CHAN_REARCENTER)
+        map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_CENTER;
     if (aout->output.output.i_physical_channels & AOUT_CHAN_CENTER)
     {
         if (ss.channels == 1)
@@ -306,23 +320,6 @@ static int Open(vlc_object_t *obj)
         else
             map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_CENTER;
     }
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_LEFT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_LEFT;
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_RIGHT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_RIGHT;
-
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_REARCENTER)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_CENTER;
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_REARLEFT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_LEFT;
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_REARRIGHT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_RIGHT;
-
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_MIDDLELEFT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_LEFT_OF_CENTER;
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_RIGHT_OF_CENTER;
-
     if (aout->output.output.i_physical_channels & AOUT_CHAN_LFE)
         map.map[map.channels++] = PA_CHANNEL_POSITION_LFE;
 
