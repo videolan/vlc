@@ -46,13 +46,6 @@
 #   include <io.h>
 #endif
 
-#ifdef __sun__
-static inline int dirfd (DIR *dir)
-{
-    return dir->dd_fd;
-}
-#endif
-
 #include <vlc_fs.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>

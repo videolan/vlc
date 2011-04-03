@@ -65,6 +65,10 @@ typedef struct
 # include <sys/types.h> /* ssize_t, pid_t */
 #endif
 
+#ifndef HAVE_DIRFD
+# include <dirent.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -160,6 +164,11 @@ pid_t getpid (void);
 
 #ifndef HAVE_STRTOK_R
 char *strtok_r(char *, const char *, char **);
+#endif
+
+/* dirent.h */
+#ifndef HAVE_DIRFD
+int dirfd (DIR *);
 #endif
 
 #ifdef __cplusplus
