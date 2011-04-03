@@ -1402,11 +1402,14 @@ static void* ThreadSend( void *data )
                 out->i_buffer = len;
         }
         if (out)
-#endif
             mwait (out->i_dts + i_caching);
         vlc_cleanup_pop ();
         if (out == NULL)
             continue;
+#else
+        mwait (out->i_dts + i_caching);
+        vlc_cleanup_pop ();
+#endif
 
         ssize_t len = out->i_buffer;
         int canc = vlc_savecancel ();
