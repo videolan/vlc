@@ -40,23 +40,30 @@ class InputSlider : public QSlider
 public:
     InputSlider( QWidget *_parent );
     InputSlider( Qt::Orientation q, QWidget *_parent );
-    virtual ~InputSlider() {};
+
 protected:
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent* event);
     virtual void mouseReleaseEvent(QMouseEvent* event);
     virtual void wheelEvent(QWheelEvent *event);
+
+    virtual void paintEvent( QPaintEvent* event );
+
+    QSize handleSize() const;
+    QSize sizeHint() const;
+
 private:
-    bool b_isSliding; /* Whether we are currently sliding by user action */
-    int inputLength;  /* InputLength that can change */
+    bool b_isSliding;       /* Whether we are currently sliding by user action */
+    int inputLength;        /* InputLength that can change */
     char psz_length[MSTRTIME_MAX_SIZE]; /* Used for the ToolTip */
-    QTimer *timer;
+    QTimer *seekLimitTimer;
 
 public slots:
     void setPosition( float, int64_t, int );
+
 private slots:
-    void userDrag( int );
-    void seekTick();
+    void startSeekTimer( int );
+    void updatePos();
 
 signals:
     void sliderDragged( float );
@@ -71,7 +78,6 @@ class SoundSlider : public QAbstractSlider
     Q_OBJECT
 public:
     SoundSlider( QWidget *_parent, int _i_step, bool b_softamp, char * );
-    virtual ~SoundSlider() {};
     void setMuted( bool ); /* Set Mute status */
 
 protected:

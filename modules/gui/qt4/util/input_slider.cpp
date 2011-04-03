@@ -31,23 +31,30 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QBitmap>
+#include <QPainter>
+#include <QStyleOptionSlider>
+#include <QLinearGradient>
+
+
+#define MINIMUM 0
+#define MAXIMUM 1000
 
 InputSlider::InputSlider( QWidget *_parent ) : QSlider( _parent )
 {
     InputSlider( Qt::Horizontal, _parent );
 }
 
-InputSlider::InputSlider( Qt::Orientation q, QWidget *_parent ) :
-                                 QSlider( q, _parent )
+InputSlider::InputSlider( Qt::Orientation q, QWidget *_parent )
+            : QSlider( q, _parent )
 {
     b_isSliding = false;
 
-    /* Timer used to fire intermediate seekTick() when sliding */
-    timer = new QTimer(this);
-    timer->setSingleShot(true);
+    /* Timer used to fire intermediate updatePos() when sliding */
+    seekLimitTimer = new QTimer(this);
+    seekLimitTimer->setSingleShot(true);
 
     /* Properties */
-    setRange( 0, 1000 );
+    setRange( MINIMUM, MAXIMUM );
     setSingleStep( 2 );
     setPageStep( 10 );
     setMouseTracking(true);
@@ -58,10 +65,13 @@ InputSlider::InputSlider( Qt::Orientation q, QWidget *_parent ) :
     setPosition( -1.0, 0, 0 );
     secstotimestr( psz_length, 0 );
 
-    CONNECT( this, sliderMoved(int), this, userDrag( int ) );
-    CONNECT( timer, timeout(), this, seekTick() );
+    CONNECT( this, sliderMoved(int), this, startSeekTimer( int ) );
+    CONNECT( seekLimitTimer, timeout(), this, updatePos() );
 }
 
+/***
+ * \brief Public interface, like setValue,  but disabling the slider too
+ ***/
 void InputSlider::setPosition( float pos, int64_t a, int b )
 {
     if( pos == -1.0 )
@@ -78,31 +88,31 @@ void InputSlider::setPosition( float pos, int64_t a, int b )
     inputLength = b;
 }
 
-void InputSlider::userDrag( int new_value )
+void InputSlider::startSeekTimer( int new_value )
 {
     /* Only fire one update, when sliding, every 150ms */
-    if( b_isSliding && !timer->isActive() )
-        timer->start( 150 );
+    if( b_isSliding && !seekLimitTimer->isActive() )
+        seekLimitTimer->start( 150 );
 }
 
-void InputSlider::seekTick()
+void InputSlider::updatePos()
 {
     float f_pos = (float)(value())/1000.0;
-    emit sliderDragged( f_pos ); /* Send new position to our video */
+    emit sliderDragged( f_pos ); /* Send new position to VLC's core */
 }
 
 void InputSlider::mouseReleaseEvent( QMouseEvent *event )
 {
-    timer->stop(); /* We're not sliding anymore: only last seek on release */
-    b_isSliding = false;
     event->accept();
+    b_isSliding = false;
+    seekLimitTimer->stop(); /* We're not sliding anymore: only last seek on release */
     QSlider::mouseReleaseEvent( event );
-    seekTick();
+    updatePos();
 }
 
 void InputSlider::mousePressEvent(QMouseEvent* event)
 {
-    b_isSliding = true ;
+    /* Right-click */
     if( event->button() != Qt::LeftButton &&
         event->button() != Qt::MidButton )
     {
@@ -110,20 +120,19 @@ void InputSlider::mousePressEvent(QMouseEvent* event)
         return;
     }
 
-    QMouseEvent newEvent( event->type(), event->pos(), event->globalPos(),
-        Qt::MouseButton( event->button() ^ Qt::LeftButton ^ Qt::MidButton ),
-        Qt::MouseButtons( event->buttons() ^ Qt::LeftButton ^ Qt::MidButton ),
-        event->modifiers() );
-    QSlider::mousePressEvent( &newEvent );
+    b_isSliding = true ;
+    setValue( QStyle::sliderValueFromPosition( MINIMUM, MAXIMUM, event->x(), width(), false) );
+    event->accept();
 }
 
 void InputSlider::mouseMoveEvent(QMouseEvent *event)
 {
     if( b_isSliding )
     {
-        QSlider::mouseMoveEvent( event );
+        setValue( QStyle::sliderValueFromPosition( MINIMUM, MAXIMUM, event->x(), width(), false) );
     }
 
+    /* Tooltip */
     secstotimestr( psz_length, ( event->x() * inputLength) / size().width() );
     setToolTip( psz_length );
     event->accept();
@@ -144,6 +153,131 @@ void InputSlider::wheelEvent( QWheelEvent *event)
        vol */
     event->accept();
 }
+
+QSize InputSlider::sizeHint() const
+{
+    return ( orientation() == Qt::Horizontal ) ? QSize( 100, 18 )
+                                               : QSize( 18, 100 );
+}
+
+QSize InputSlider::handleSize() const
+{
+    const int size = ( orientation() == Qt::Horizontal ? height() : width() );
+    return QSize( size, size );
+}
+
+void InputSlider::paintEvent( QPaintEvent *event )
+{
+    Q_UNUSED( event );
+
+    QStyleOptionSlider option;
+    initStyleOption( &option );
+
+    /* */
+    QPainter painter( this );
+    painter.setRenderHints( QPainter::Antialiasing );
+
+    // draw bar
+    const int barCorner = 3;
+    qreal sliderPos     = -1;
+    int range           = MAXIMUM;
+    QRect barRect = rect();
+
+    if ( option.sliderPosition != 0 ) {
+        switch ( orientation() ) {
+            case Qt::Horizontal:
+                sliderPos = ( ( (qreal)width() ) /(qreal)range ) *(qreal)option.sliderPosition;
+                break;
+            case Qt::Vertical:
+                sliderPos = ( ( (qreal)height() ) /(qreal)range ) *(qreal)option.sliderPosition;
+                break;
+        }
+    }
+
+    switch ( orientation() ) {
+        case Qt::Horizontal:
+            barRect.setHeight( handleSize().height() /2 );
+            break;
+        case Qt::Vertical:
+            barRect.setWidth( handleSize().width() /2 );
+            break;
+    }
+
+    barRect.moveCenter( rect().center() );
+
+    QLinearGradient backgroundGradient( 0, 0, 0, height() );
+    backgroundGradient.setColorAt( 0.0, QColor( 126, 126, 126 ) );
+    backgroundGradient.setColorAt( 0.30, QColor( 110, 110, 110 ) );
+    backgroundGradient.setColorAt( 0.31, QColor( 101, 101, 101 ) );
+    backgroundGradient.setColorAt( 1.0, QColor( 86, 86, 86 ) );
+
+    QLinearGradient foregroundGradient( 0, 0, 0, height() );
+    foregroundGradient.setColorAt( 0.0,  QColor( 26, 49, 128 ) );
+    foregroundGradient.setColorAt( 0.30, QColor( 28, 77, 175) );
+    foregroundGradient.setColorAt( 0.32, QColor( 32, 85, 177) );
+    foregroundGradient.setColorAt( 1.0,  QColor( 81, 50, 210 ) );
+
+    //foregroundGradient.setColorAt( 0.0, palette().color( QPalette::Inactive, QPalette::Mid ) );
+    //foregroundGradient.setColorAt( 0.30, palette().color( QPalette::Inactive, QPalette::Light ) );
+    //foregroundGradient.setColorAt( 1.0, palette().color( QPalette::Inactive, QPalette::Midlight ) );
+
+    //foregroundGradient.setColorAt( 0.0, QColor( 35, 213, 7 ) );
+    //foregroundGradient.setColorAt( 0.30, QColor( 37, 133, 21 ) );
+    //foregroundGradient.setColorAt( 1.0, QColor( 81, 215, 55 ) );
+
+    painter.setPen( Qt::NoPen );
+    painter.setBrush( backgroundGradient );
+    painter.drawRoundedRect( barRect.adjusted( 0, 0, 0, 0 ), barCorner, barCorner );
+
+    switch ( orientation() ) {
+        case Qt::Horizontal:
+            barRect.setWidth( qMin( width(), int( sliderPos ) ) );
+            break;
+        case Qt::Vertical:
+            barRect.setHeight( qMin( height(), int( sliderPos ) ) );
+            barRect.moveBottom( rect().bottom() );
+            break;
+    }
+
+    if ( option.sliderPosition > minimum() && option.sliderPosition <= maximum() ) {
+        painter.setPen( Qt::black );
+        painter.setBrush( foregroundGradient );
+        painter.drawRoundedRect( barRect.adjusted( 1, 1, -1, -1 ), barCorner, barCorner );
+    }
+
+    // draw handle
+    if ( option.state & QStyle::State_MouseOver ) {
+        QLinearGradient buttonGradient( 0, 0, 0, height() );
+        buttonGradient.setColorAt( 0.0, QColor( 1, 92, 195 ) );
+        buttonGradient.setColorAt( 0.40, QColor( 41, 80, 124 ) );
+        buttonGradient.setColorAt( 1.0, QColor( 1, 92, 195 ) );
+
+        painter.setPen( QPen( Qt::blue ) );
+        painter.setBrush( buttonGradient );
+
+        if ( sliderPos != -1 ) {
+            const int margin = 5;
+            QSize hs = handleSize() -QSize( 2, 2 );
+            QPoint pos;
+
+            switch ( orientation() ) {
+                case Qt::Horizontal:
+                    pos = QPoint( sliderPos -( handleSize().width() /2 ), 1 );
+                    pos.rx() = qMax( margin, pos.x() );
+                    pos.rx() = qMin( width() -hs.width() -margin, pos.x() );
+                    break;
+                case Qt::Vertical:
+                    pos = QPoint( 1, height() -( sliderPos +( handleSize().height() /2 ) ) );
+                    pos.ry() = qMax( margin, pos.y() );
+                    pos.ry() = qMin( height() -hs.height() -margin, pos.y() );
+                    break;
+            }
+
+            painter.drawEllipse( pos.x(), pos.y(), hs.width(), hs.height() );
+        }
+    }
+}
+
 
 /* This work is derived from Amarok's work under GPLv2+
     - Mark Kretschmann
