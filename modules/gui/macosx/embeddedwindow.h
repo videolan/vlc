@@ -41,6 +41,8 @@
     IBOutlet id o_btn_volume_down;
     IBOutlet id o_volumeslider;
     IBOutlet id o_btn_volume_up;
+    IBOutlet id o_backgroundimg_right;
+    IBOutlet id o_backgroundimg_middle;
     IBOutlet id o_timeslider;
     IBOutlet id o_main_pgbar;
     IBOutlet id o_time;
