@@ -50,6 +50,10 @@ static void Close   ( vlc_object_t * );
 #define DISABLE_LONGTEXT N_( \
     "Disable ES id at startup." )
 
+#define ENABLE_TEXT N_("Enable ES id")
+#define ENABLE_LONGTEXT N_( \
+    "Only enable ES id at startup." )
+
 #define SOUT_CFG_PREFIX "sout-select-"
 
 vlc_module_begin ()
@@ -58,6 +62,7 @@ vlc_module_begin ()
     set_capability("sout stream", 50 )
     add_integer(SOUT_CFG_PREFIX "port", 5001, PORT_TEXT, PORT_LONGTEXT, true)
     add_integer(SOUT_CFG_PREFIX "disable", -1, DISABLE_TEXT, DISABLE_LONGTEXT, false)
+    add_integer(SOUT_CFG_PREFIX "enable", -1, ENABLE_TEXT, ENABLE_LONGTEXT, false)
     add_shortcut("select")
     set_callbacks(Open, Close)
 vlc_module_end ()
@@ -89,10 +94,11 @@ struct sout_stream_sys_t
 
     int i_fd;
     int i_id_disable;
+    int i_id_enable;
 };
 
 static const char *const ppsz_sout_options[] = {
-    "disable", "port", NULL
+    "enable", "disable", "port", NULL
 };
 
 /*****************************************************************************
@@ -125,6 +131,7 @@ static int Open(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
     p_sys->i_id_disable = var_GetInteger(p_stream, SOUT_CFG_PREFIX "disable");
+    p_sys->i_id_enable = var_GetInteger(p_stream, SOUT_CFG_PREFIX "enable");
 
     p_sys->pp_es = NULL;
     p_sys->i_es_num = 0;
@@ -254,7 +261,10 @@ static sout_stream_id_t *Add(sout_stream_t *p_stream, es_format_t *p_fmt)
     p_es->fmt = *p_fmt;
     p_es->id = NULL;
     p_es->b_error = false;
-    p_es->b_enabled = (p_es->fmt.i_id == p_sys->i_id_disable) ? false : true;
+    if (p_sys->i_id_disable >= -1)
+        p_es->b_enabled = (p_es->fmt.i_id == p_sys->i_id_disable) ? false : true;
+    else if (p_sys->i_id_enable >= -1)
+        p_es->b_enabled = (p_es->fmt.i_id == p_sys->i_id_enable) ? true: false;
 
     vlc_mutex_lock(&p_sys->es_lock);
     TAB_APPEND(p_sys->i_es_num, p_sys->pp_es, p_es);
