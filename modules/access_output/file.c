@@ -45,6 +45,8 @@
 #if defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
 #   define lseek _lseeki64
+#elif defined( __OS2__ )
+#   include <io.h>
 #else
 #   include <unistd.h>
 #endif
@@ -144,7 +146,7 @@ static int Open( vlc_object_t *p_this )
     else
     if( !strcmp( p_access->psz_path, "-" ) )
     {
-#ifdef WIN32
+#if defined( WIN32 ) || defined( __OS2__ )
         setmode (fileno (stdout), O_BINARY);
 #endif
         fd = vlc_dup (fileno (stdout));

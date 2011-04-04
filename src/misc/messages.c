@@ -531,7 +531,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
                   p_item->psz_msg,
                   priv->b_color ? GRAY : "" );
 
-#ifdef WIN32
+#if defined( WIN32 ) || defined( __OS2__ )
     fflush( stderr );
 #endif
     vlc_restorecancel (canc);

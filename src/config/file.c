@@ -84,7 +84,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
                  psz_filename );
 
     }
-#if !( defined(WIN32) || defined(__APPLE__) )
+#if !( defined(WIN32) || defined(__APPLE__) || defined(__OS2__) )
     else if( p_stream == NULL && errno == ENOENT )
     {
         /* This is the fallback for pre XDG Base Directory
@@ -622,7 +622,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         clearerr (file);
         goto error;
     }
-#ifndef WIN32
+#if !defined( WIN32 ) && !defined( __OS2__ )
 #ifdef __APPLE__
     fsync (fd); /* Flush from OS */
 #else
@@ -636,7 +636,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     vlc_mutex_unlock (&lock);
 #endif
     fclose (file);
-#ifdef WIN32
+#if defined( WIN32 ) || defined( __OS2__ )
     /* Windows cannot remove open files nor overwrite existing ones */
     vlc_unlink (permanent);
     if (vlc_rename (temporary, permanent))
