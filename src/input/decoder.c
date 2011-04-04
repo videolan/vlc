@@ -1249,7 +1249,6 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
 static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    input_thread_t  *p_input = p_owner->p_input;
     aout_buffer_t   *p_aout_buf;
     int i_decoded = 0;
     int i_lost = 0;
@@ -1290,7 +1289,9 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Update ugly stat */
-    if( i_decoded > 0 || i_lost > 0 || i_played > 0 )
+    input_thread_t  *p_input = p_owner->p_input;
+
+    if( p_input != NULL && (i_decoded > 0 || i_lost > 0 || i_played > 0) )
     {
         vlc_mutex_lock( &p_input->p->counters.counters_lock);
 
@@ -1475,7 +1476,6 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
 static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    input_thread_t *p_input = p_owner->p_input;
     picture_t      *p_pic;
     int i_lost = 0;
     int i_decoded = 0;
@@ -1516,7 +1516,11 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 
         DecoderPlayVideo( p_dec, p_pic, &i_displayed, &i_lost );
     }
-    if( i_decoded > 0 || i_lost > 0 || i_displayed > 0 )
+
+    /* Update ugly stat */
+    input_thread_t *p_input = p_owner->p_input;
+
+    if( p_input != NULL && (i_decoded > 0 || i_lost > 0 || i_displayed > 0) )
     {
         vlc_mutex_lock( &p_input->p->counters.counters_lock );
 
@@ -1917,9 +1921,13 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block, bool b_flush 
 
     while( (p_spu = p_dec->pf_decode_sub( p_dec, p_block ? &p_block : NULL ) ) )
     {
-        vlc_mutex_lock( &p_input->p->counters.counters_lock );
-        stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_sub, 1, NULL );
-        vlc_mutex_unlock( &p_input->p->counters.counters_lock );
+        if( p_input != NULL )
+        {
+            vlc_mutex_lock( &p_input->p->counters.counters_lock );
+            stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_sub, 1,
+                                 NULL );
+            vlc_mutex_unlock( &p_input->p->counters.counters_lock );
+        }
 
         p_vout = input_resource_HoldVout( p_owner->p_resource );
         if( p_vout && p_owner->p_spu_vout == p_vout )
