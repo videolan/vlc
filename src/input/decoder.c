@@ -2088,7 +2088,8 @@ static void DeleteDecoder( decoder_t * p_dec )
     if( p_owner->p_aout )
     {
         input_resource_RequestAout( p_owner->p_resource, p_owner->p_aout );
-        input_SendEventAout( p_owner->p_input );
+        if( p_owner->p_input != NULL )
+            input_SendEventAout( p_owner->p_input );
         p_owner->p_aout = NULL;
     }
     if( p_owner->p_vout )
@@ -2100,7 +2101,8 @@ static void DeleteDecoder( decoder_t * p_dec )
         /* */
         input_resource_RequestVout( p_owner->p_resource, p_owner->p_vout, NULL,
                                     0, true );
-        input_SendEventVout( p_owner->p_input );
+        if( p_owner->p_input != NULL )
+            input_SendEventVout( p_owner->p_input );
     }
 
 #ifdef ENABLE_SOUT
@@ -2182,7 +2184,8 @@ static vout_thread_t *aout_request_vout( void *p_private,
 
     p_vout = input_resource_RequestVout( p_owner->p_resource, p_vout, p_fmt, 1,
                                          b_recyle );
-    input_SendEventVout( p_input );
+    if( p_input != NULL )
+        input_SendEventVout( p_input );
 
     return p_vout;
 }
@@ -2257,7 +2260,8 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
 
         vlc_mutex_unlock( &p_owner->lock );
 
-        input_SendEventAout( p_owner->p_input );
+        if( p_owner->p_input != NULL )
+            input_SendEventAout( p_owner->p_input );
 
         if( p_owner->p_aout_input == NULL )
         {
@@ -2382,7 +2386,8 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
         vlc_mutex_unlock( &p_owner->lock );
 
-        input_SendEventVout( p_owner->p_input );
+        if( p_owner->p_input != NULL )
+            input_SendEventVout( p_owner->p_input );
         if( p_vout == NULL )
         {
             msg_Err( p_dec, "failed to create video output" );
