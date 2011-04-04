@@ -53,7 +53,8 @@
 
 #include "../video_output/vout_control.h"
 
-static decoder_t *CreateDecoder( input_thread_t *, es_format_t *, bool,
+static decoder_t *CreateDecoder( vlc_object_t *, input_thread_t *,
+                                 es_format_t *, bool, input_resource_t *,
                                  sout_instance_t *p_sout );
 static void       DeleteDecoder( decoder_t * );
 
@@ -259,27 +260,23 @@ int decoder_GetDisplayRate( decoder_t *p_dec )
     return p_dec->pf_get_display_rate( p_dec );
 }
 
-/**
- * Spawns a new decoder thread
- *
- * \param p_input the input thread
- * \param p_es the es descriptor
- * \return the spawned decoder object
- */
-decoder_t *input_DecoderNew( input_thread_t *p_input,
-                             es_format_t *fmt, input_clock_t *p_clock,
-                             sout_instance_t *p_sout  )
+/* TODO: pass p_sout through p_resource? -- Courmisch */
+static decoder_t *decoder_New( vlc_object_t *p_parent, input_thread_t *p_input,
+                               es_format_t *fmt, input_clock_t *p_clock,
+                               input_resource_t *p_resource,
+                               sout_instance_t *p_sout  )
 {
     decoder_t *p_dec = NULL;
     const char *psz_type = p_sout ? N_("packetizer") : N_("decoder");
     int i_priority;
 
     /* Create the decoder configuration structure */
-    p_dec = CreateDecoder( p_input, fmt, p_sout != NULL, p_sout );
+    p_dec = CreateDecoder( p_parent, p_input, fmt,
+                           p_sout != NULL, p_resource, p_sout );
     if( p_dec == NULL )
     {
-        msg_Err( p_input, "could not create %s", psz_type );
-        dialog_Fatal( p_input, _("Streaming / Transcoding failed"),
+        msg_Err( p_parent, "could not create %s", psz_type );
+        dialog_Fatal( p_parent, _("Streaming / Transcoding failed"),
                       _("VLC could not open the %s module."),
                       vlc_gettext( psz_type ) );
         return NULL;
@@ -312,6 +309,32 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
 
     return p_dec;
 }
+
+
+/**
+ * Spawns a new decoder thread from the input thread
+ *
+ * \param p_input the input thread
+ * \param p_es the es descriptor
+ * \return the spawned decoder object
+ */
+decoder_t *input_DecoderNew( input_thread_t *p_input,
+                             es_format_t *fmt, input_clock_t *p_clock,
+                             sout_instance_t *p_sout  )
+{
+    return decoder_New( VLC_OBJECT(p_input), p_input, fmt, p_clock,
+                        p_input->p->p_resource, p_sout );
+}
+
+/**
+ * Spawn a decoder thread outside of the input thread.
+ */
+decoder_t *input_DecoderCreate( vlc_object_t *p_parent, es_format_t *fmt,
+                                input_resource_t *p_resource )
+{
+    return decoder_New( p_parent, NULL, fmt, NULL, p_resource, NULL );
+}
+
 
 /**
  * Kills a decoder thread and waits until it's finished
@@ -438,7 +461,8 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         es_format_t fmt;
 
         es_format_Init( &fmt, SPU_ES, fcc[i_channel] );
-        p_cc = CreateDecoder( p_owner->p_input, &fmt, false, p_owner->p_sout );
+        p_cc = CreateDecoder( VLC_OBJECT(p_dec), p_owner->p_input, &fmt,
+                              false, p_owner->p_resource, p_owner->p_sout );
         if( !p_cc )
         {
             msg_Err( p_dec, "could not create decoder" );
@@ -713,15 +737,17 @@ static void DecoderUnsupportedCodec( decoder_t *p_dec, vlc_fourcc_t codec )
  * \param b_packetizer instead of a decoder
  * \return the decoder object
  */
-static decoder_t * CreateDecoder( input_thread_t *p_input,
+static decoder_t * CreateDecoder( vlc_object_t *p_parent,
+                                  input_thread_t *p_input,
                                   es_format_t *fmt, bool b_packetizer,
+                                  input_resource_t *p_resource,
                                   sout_instance_t *p_sout )
 {
     decoder_t *p_dec;
     decoder_owner_sys_t *p_owner;
     es_format_t null_es_format;
 
-    p_dec = vlc_custom_create( p_input, sizeof( *p_dec ), VLC_OBJECT_DECODER,
+    p_dec = vlc_custom_create( p_parent, sizeof( *p_dec ), VLC_OBJECT_DECODER,
                                "decoder" );
     if( p_dec == NULL )
         return NULL;
@@ -751,7 +777,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_owner->i_preroll_end = VLC_TS_INVALID;
     p_owner->i_last_rate = INPUT_RATE_DEFAULT;
     p_owner->p_input = p_input;
-    p_owner->p_resource = p_input->p->p_resource;
+    p_owner->p_resource = p_resource;
     p_owner->p_aout = NULL;
     p_owner->p_aout_input = NULL;
     p_owner->p_vout = NULL;
@@ -786,7 +812,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_dec->pf_get_display_date = DecoderGetDisplayDate;
     p_dec->pf_get_display_rate = DecoderGetDisplayRate;
 
-    vlc_object_attach( p_dec, p_input );
+    vlc_object_attach( p_dec, p_parent );
 
     /* Find a suitable decoder/packetizer module */
     if( !b_packetizer )
@@ -799,7 +825,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
         p_dec->b_need_packetized && !p_dec->fmt_in.b_packetized )
     {
         p_owner->p_packetizer =
-            vlc_custom_create( p_input, sizeof( decoder_t ),
+            vlc_custom_create( p_dec, sizeof( decoder_t ),
                                VLC_OBJECT_DECODER, "packetizer" );
         if( p_owner->p_packetizer )
         {
@@ -809,7 +835,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
             es_format_Copy( &p_owner->p_packetizer->fmt_out,
                             &null_es_format );
 
-            vlc_object_attach( p_owner->p_packetizer, p_input );
+            vlc_object_attach( p_owner->p_packetizer, p_parent );
 
             p_owner->p_packetizer->p_module =
                 module_need( p_owner->p_packetizer,

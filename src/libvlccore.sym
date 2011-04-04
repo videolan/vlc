@@ -185,6 +185,7 @@ input_CreateAndStart
 input_CreateFilename
 input_DecoderDecode
 input_DecoderDelete
+input_DecoderCreate
 input_DecoderNew
 input_GetItem
 input_item_AddInfo
