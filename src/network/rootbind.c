@@ -58,6 +58,11 @@ int rootwrap_bind (int, int, int, const struct sockaddr *, size_t);
 # define CMSG_LEN(len) (CMSG_ALIGN(sizeof(struct cmsghdr)) + (len))
 #endif
 
+#if defined(__OS2__) && !defined(ALIGN)
+/* CMSG_NXTHDR requires this */
+# define ALIGN(p) _ALIGN(p)
+#endif
+
 /**
  * Receive a file descriptor from another process
  */
