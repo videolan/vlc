@@ -738,29 +738,30 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
 
     /* Allocate our private structure for the decoder */
     p_dec->p_owner = p_owner = malloc( sizeof( decoder_owner_sys_t ) );
-    if( p_dec->p_owner == NULL )
+    if( unlikely(p_owner == NULL) )
     {
         vlc_object_release( p_dec );
         return NULL;
     }
-    p_dec->p_owner->i_preroll_end = VLC_TS_INVALID;
-    p_dec->p_owner->i_last_rate = INPUT_RATE_DEFAULT;
-    p_dec->p_owner->p_input = p_input;
-    p_dec->p_owner->p_aout = NULL;
-    p_dec->p_owner->p_aout_input = NULL;
-    p_dec->p_owner->p_vout = NULL;
-    p_dec->p_owner->p_spu_vout = NULL;
-    p_dec->p_owner->i_spu_channel = 0;
-    p_dec->p_owner->i_spu_order = 0;
-    p_dec->p_owner->p_sout = p_sout;
-    p_dec->p_owner->p_sout_input = NULL;
-    p_dec->p_owner->p_packetizer = NULL;
-    p_dec->p_owner->b_packetizer = b_packetizer;
+    p_owner->i_preroll_end = VLC_TS_INVALID;
+    p_owner->i_last_rate = INPUT_RATE_DEFAULT;
+    p_owner->p_input = p_input;
+    p_owner->p_aout = NULL;
+    p_owner->p_aout_input = NULL;
+    p_owner->p_vout = NULL;
+    p_owner->p_spu_vout = NULL;
+    p_owner->i_spu_channel = 0;
+    p_owner->i_spu_order = 0;
+    p_owner->p_sout = p_sout;
+    p_owner->p_sout_input = NULL;
+    p_owner->p_packetizer = NULL;
+    p_owner->b_packetizer = b_packetizer;
 
     /* decoder fifo */
-    if( ( p_dec->p_owner->p_fifo = block_FifoNew() ) == NULL )
+    p_owner->p_fifo = block_FifoNew();
+    if( unlikely(p_owner->p_fifo == NULL) )
     {
-        free( p_dec->p_owner );
+        free( p_owner );
         vlc_object_release( p_dec );
         return NULL;
     }
@@ -791,27 +792,27 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     if( !b_packetizer &&
         p_dec->b_need_packetized && !p_dec->fmt_in.b_packetized )
     {
-        p_dec->p_owner->p_packetizer =
+        p_owner->p_packetizer =
             vlc_custom_create( p_input, sizeof( decoder_t ),
                                VLC_OBJECT_DECODER, "packetizer" );
-        if( p_dec->p_owner->p_packetizer )
+        if( p_owner->p_packetizer )
         {
-            es_format_Copy( &p_dec->p_owner->p_packetizer->fmt_in,
+            es_format_Copy( &p_owner->p_packetizer->fmt_in,
                             &p_dec->fmt_in );
 
-            es_format_Copy( &p_dec->p_owner->p_packetizer->fmt_out,
+            es_format_Copy( &p_owner->p_packetizer->fmt_out,
                             &null_es_format );
 
-            vlc_object_attach( p_dec->p_owner->p_packetizer, p_input );
+            vlc_object_attach( p_owner->p_packetizer, p_input );
 
-            p_dec->p_owner->p_packetizer->p_module =
-                module_need( p_dec->p_owner->p_packetizer,
+            p_owner->p_packetizer->p_module =
+                module_need( p_owner->p_packetizer,
                              "packetizer", "$packetizer", false );
 
-            if( !p_dec->p_owner->p_packetizer->p_module )
+            if( !p_owner->p_packetizer->p_module )
             {
-                es_format_Clean( &p_dec->p_owner->p_packetizer->fmt_in );
-                vlc_object_release( p_dec->p_owner->p_packetizer );
+                es_format_Clean( &p_owner->p_packetizer->fmt_in );
+                vlc_object_release( p_owner->p_packetizer );
             }
         }
     }
