@@ -4343,7 +4343,7 @@ build flavour         : "
 test "${enable_debug}" = "yes" && printf "debug "
 test "${enable_cprof}" = "yes" && printf "cprof "
 test "${enable_gprof}" = "yes" && printf "gprof "
-test "${enable_optimizations}" = "yes" && printf "optim "
+test "${enable_optimizations}" != "no" && printf ${enable_optimizations}
 echo ""
 if test "${enable_vlc}" != "no"; then
 echo "vlc aliases           :${ALIASES}"
