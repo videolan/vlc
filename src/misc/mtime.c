@@ -527,7 +527,7 @@ static int gettimeofday (struct timeval *tv, void *tz )
 uint64_t NTPtime64 (void)
 {
     struct timespec ts;
-#if defined (CLOCK_REALTIME)
+#if defined (CLOCK_REALTIME) && !defined (__OS2__)
     clock_gettime (CLOCK_REALTIME, &ts);
 #else
     {
