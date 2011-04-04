@@ -406,7 +406,8 @@ static mtime_t EsOutGetWakeup( es_out_t *out )
     /* We do not have a wake up date if the input cannot have its speed
      * controlled or sout is imposing its own or while buffering
      *
-     * FIXME for !p_input->p->b_can_pace_control a wkeup time is still needed to avoid too strong buffering */
+     * FIXME for !p_input->p->b_can_pace_control a wake-up time is still needed
+     * to avoid too heavy buffering */
     if( !p_input->p->b_can_pace_control ||
         p_input->p->b_out_pace_control ||
         p_sys->b_buffering )
