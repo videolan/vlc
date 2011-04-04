@@ -84,6 +84,7 @@ struct decoder_owner_sys_t
     int64_t         i_preroll_end;
 
     input_thread_t  *p_input;
+    input_resource_t*p_resource;
     input_clock_t   *p_clock;
     int             i_last_rate;
 
@@ -746,6 +747,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_owner->i_preroll_end = VLC_TS_INVALID;
     p_owner->i_last_rate = INPUT_RATE_DEFAULT;
     p_owner->p_input = p_input;
+    p_owner->p_resource = p_input->p->p_resource;
     p_owner->p_aout = NULL;
     p_owner->p_aout_input = NULL;
     p_owner->p_vout = NULL;
@@ -1915,7 +1917,7 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block, bool b_flush 
         stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_sub, 1, NULL );
         vlc_mutex_unlock( &p_input->p->counters.counters_lock );
 
-        p_vout = input_resource_HoldVout( p_input->p->p_resource );
+        p_vout = input_resource_HoldVout( p_owner->p_resource );
         if( p_vout && p_owner->p_spu_vout == p_vout )
         {
             /* Preroll does not work very well with subtitle */
@@ -1940,7 +1942,7 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block, bool b_flush 
 
     if( b_flush && p_owner->p_spu_vout )
     {
-        p_vout = input_resource_HoldVout( p_input->p->p_resource );
+        p_vout = input_resource_HoldVout( p_owner->p_resource );
 
         if( p_vout && p_owner->p_spu_vout == p_vout )
             vout_FlushSubpictureChannel( p_vout, p_owner->i_spu_channel );
@@ -2073,8 +2075,7 @@ static void DeleteDecoder( decoder_t * p_dec )
         aout_DecDelete( p_owner->p_aout, p_owner->p_aout_input );
     if( p_owner->p_aout )
     {
-        input_resource_RequestAout( p_owner->p_input->p->p_resource,
-                                     p_owner->p_aout );
+        input_resource_RequestAout( p_owner->p_resource, p_owner->p_aout );
         input_SendEventAout( p_owner->p_input );
         p_owner->p_aout = NULL;
     }
@@ -2085,7 +2086,8 @@ static void DeleteDecoder( decoder_t * p_dec )
         vout_Reset( p_owner->p_vout );
 
         /* */
-        input_resource_RequestVout( p_owner->p_input->p->p_resource, p_owner->p_vout, NULL, 0, true );
+        input_resource_RequestVout( p_owner->p_resource, p_owner->p_vout, NULL,
+                                    0, true );
         input_SendEventVout( p_owner->p_input );
     }
 
@@ -2101,7 +2103,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     {
         vout_thread_t *p_vout;
 
-        p_vout = input_resource_HoldVout( p_owner->p_input->p->p_resource );
+        p_vout = input_resource_HoldVout( p_owner->p_resource );
         if( p_vout )
         {
             if( p_owner->p_spu_vout == p_vout )
@@ -2163,9 +2165,11 @@ static vout_thread_t *aout_request_vout( void *p_private,
                                          vout_thread_t *p_vout, video_format_t *p_fmt, bool b_recyle )
 {
     decoder_t *p_dec = p_private;
-    input_thread_t *p_input = p_dec->p_owner->p_input;
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    input_thread_t *p_input = p_owner->p_input;
 
-    p_vout = input_resource_RequestVout( p_input->p->p_resource, p_vout, p_fmt, 1, b_recyle );
+    p_vout = input_resource_RequestVout( p_owner->p_resource, p_vout, p_fmt, 1,
+                                         b_recyle );
     input_SendEventVout( p_input );
 
     return p_vout;
@@ -2229,7 +2233,7 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
 
         p_aout = p_owner->p_aout;
         if( !p_aout )
-            p_aout = input_resource_RequestAout( p_owner->p_input->p->p_resource, NULL );
+            p_aout = input_resource_RequestAout( p_owner->p_resource, NULL );
         p_aout_input = aout_DecNew( p_dec, &p_aout,
                                     &format, &p_dec->fmt_out.audio_replay_gain, &request_vout );
 
@@ -2355,7 +2359,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             dpb_size = 2;
             break;
         }
-        p_vout = input_resource_RequestVout( p_owner->p_input->p->p_resource,
+        p_vout = input_resource_RequestVout( p_owner->p_resource,
                                              p_vout, &fmt,
                                              dpb_size + 1 + DECODER_MAX_BUFFERING_COUNT,
                                              true );
@@ -2428,7 +2432,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
         if( p_dec->b_die || p_dec->b_error )
             break;
 
-        p_vout = input_resource_HoldVout( p_owner->p_input->p->p_resource );
+        p_vout = input_resource_HoldVout( p_owner->p_resource );
         if( p_vout )
             break;
 
@@ -2472,7 +2476,7 @@ static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     vout_thread_t *p_vout = NULL;
 
-    p_vout = input_resource_HoldVout( p_owner->p_input->p->p_resource );
+    p_vout = input_resource_HoldVout( p_owner->p_resource );
     if( !p_vout || p_owner->p_spu_vout != p_vout )
     {
         if( p_vout )
