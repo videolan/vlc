@@ -71,17 +71,26 @@ int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
     abort ();
 }
 
-#elif defined (WIN32)
+#elif defined (WIN32) || defined(__OS2__)
 
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#ifndef __OS2__
 #ifdef FD_SETSIZE
 /* No, it's not as simple as #undef FD_SETSIZE */
 # error Header inclusion order compromised!
 #endif
 #define FD_SETSIZE 0
+#endif
 #include <vlc_network.h>
+
+#ifdef __OS2__
+#include <sys/time.h>
+#include <sys/select.h>
+
+#define SOCKET unsigned
+#endif
 
 int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 {
