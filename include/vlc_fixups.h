@@ -316,4 +316,8 @@ long nrand48 (unsigned short subi[3]);
 char *tempnam(const char *, const char *);
 #endif // ANDROID
 
+#ifdef __OS2__
+# undef HAVE_FORK   /* Implementation of fork() is imperfect on OS/2 */
+#endif
+
 #endif /* !LIBVLC_FIXUPS_H */
