@@ -1,8 +1,7 @@
 /*****************************************************************************
  * display.c: display stream output module
  *****************************************************************************
- * Copyright (C) 2001, 2002 the VideoLAN team
- * $Id$
+ * Copyright (C) 2001-2011 the VideoLAN team
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -85,6 +84,7 @@ struct sout_stream_sys_t
     bool     b_video;
 
     mtime_t        i_delay;
+    input_resource_t *p_resource;
 };
 
 /*****************************************************************************
@@ -98,6 +98,13 @@ static int Open( vlc_object_t *p_this )
     p_sys = malloc( sizeof( sout_stream_sys_t ) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
+
+    p_sys->p_resource = input_resource_New( p_this );
+    if( unlikely(p_sys->p_resource == NULL) )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
 
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                    p_stream->p_cfg );
@@ -129,18 +136,14 @@ static void Close( vlc_object_t * p_this )
     /* update p_sout->i_out_pace_nocontrol */
     p_stream->p_sout->i_out_pace_nocontrol--;
 
+    input_resource_Terminate( p_sys->p_resource );
+    input_resource_Release( p_sys->p_resource );
     free( p_sys );
 }
-
-struct sout_stream_id_t
-{
-    decoder_t *p_dec;
-};
 
 static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    sout_stream_id_t *id;
 
     if( ( p_fmt->i_cat == AUDIO_ES && !p_sys->b_audio )||
         ( p_fmt->i_cat == VIDEO_ES && !p_sys->b_video ) )
@@ -148,30 +151,21 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         return NULL;
     }
 
-#if 0
-    id = malloc( sizeof( sout_stream_id_t ) );
-    if( id == NULL )
-        return NULL;
-
-    id->p_dec = input_DecoderNew( p_sys->p_input, p_fmt, NULL, NULL );
-    if( id->p_dec == NULL )
+    decoder_t *p_dec = input_DecoderCreate( VLC_OBJECT(p_stream), p_fmt,
+                                            p_sys->p_resource );
+    if( p_dec == NULL )
     {
         msg_Err( p_stream, "cannot create decoder for fcc=`%4.4s'",
                  (char*)&p_fmt->i_codec );
-        free( id );
         return NULL;
     }
-    return id;
-#else
-# warning FIXME! sout_display does not work!
-    return NULL;
-#endif
+    return (sout_stream_id_t *)p_dec;
 }
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
-    input_DecoderDelete( id->p_dec );
-    free( id );
+    (void) p_stream;
+    input_DecoderDelete( (decoder_t *)id );
     return VLC_SUCCESS;
 }
 
@@ -186,7 +180,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
         p_buffer->p_next = NULL;
 
-        if( id->p_dec && p_buffer->i_buffer > 0 )
+        if( id != NULL && p_buffer->i_buffer > 0 )
         {
             if( p_buffer->i_dts <= VLC_TS_INVALID )
                 p_buffer->i_dts = 0;
@@ -198,7 +192,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             else
                 p_buffer->i_pts += p_sys->i_delay;
 
-            input_DecoderDecode( id->p_dec, p_buffer, false );
+            input_DecoderDecode( (decoder_t *)id, p_buffer, false );
         }
 
         p_buffer = p_next;
