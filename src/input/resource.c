@@ -95,7 +95,6 @@ static sout_instance_t *RequestSout( input_resource_t *p_resource,
         return NULL;
     }
 
-    assert( p_resource->p_input );
     assert( !p_sout || ( !p_resource->p_sout && !psz_sout ) );
 
     /* Check the validity of the sout */
@@ -149,7 +148,8 @@ static void DestroyVout( input_resource_t *p_resource )
 static void DisplayVoutTitle( input_resource_t *p_resource,
                               vout_thread_t *p_vout )
 {
-    assert( p_resource->p_input );
+    if( p_resource->p_input == NULL )
+        return;
 
     /* TODO display the title only one time for the same input ? */
 
@@ -206,7 +206,6 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
         return NULL;
     }
 
-    assert( p_resource->p_input );
     if( p_fmt )
     {
         /* */
@@ -333,7 +332,6 @@ static void DestroyAout( input_resource_t *p_resource )
 static aout_instance_t *RequestAout( input_resource_t *p_resource, aout_instance_t *p_aout )
 {
     vlc_assert_locked( &p_resource->lock );
-    assert( p_resource->p_input );
 
     if( p_aout )
     {
