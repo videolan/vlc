@@ -337,6 +337,8 @@ struct intf_sys_t
 
     AppleRemote * o_remote;
     BOOL b_remote_button_hold; /* true as long as the user holds the left,right,plus or minus on the remote control */
+
+    NSArray *o_usedHotkeys;
 }
 
 + (VLCMain *)sharedInstance;
@@ -368,6 +370,7 @@ struct intf_sys_t
 - (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event;
 - (NSString *)VLCKeyToString:(NSString *)theString;
 - (unsigned int)VLCModifiersToCocoa:(NSString *)theString;
+- (void)updateCurrentlyUsedHotkeys;
 
 - (void)initStrings;
 

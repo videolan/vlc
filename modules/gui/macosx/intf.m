@@ -34,6 +34,7 @@
 #include <vlc_keys.h>
 #include <vlc_dialog.h>
 #include <vlc_url.h>
+#include <vlc_modules.h>
 #include <unistd.h> /* execl() */
 
 #import "intf.h"
@@ -64,6 +65,8 @@
 static void Run ( intf_thread_t *p_intf );
 
 static void * ManageThread( void *user_data );
+
+static unsigned int VLCModifiersToCocoa( unsigned int i_key );
 
 static void updateProgressPanel (void *, const char *, float);
 static bool checkProgressPanel (void *);
@@ -1325,7 +1328,6 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 - (NSString *)VLCKeyToString:(NSString *)theString
 {
-    NSLog( @"got: %@", theString );
     if (![theString isEqualToString:@""]) {
         theString = [theString stringByReplacingOccurrencesOfString:@"Command" withString:@""];
         theString = [theString stringByReplacingOccurrencesOfString:@"Alt" withString:@""];
@@ -1334,7 +1336,6 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
         theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
     }
-    NSLog( @"returning: %@", theString );
     return theString;
 }
 
@@ -1351,21 +1352,38 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     unsigned int i_pressed_modifiers = 0;
     const struct hotkey *p_hotkeys;
     int i;
-
+    NSMutableString *tempString = [[[NSMutableString alloc] init] autorelease];
+    NSMutableString *tempStringPlus = [[[NSMutableString alloc] init] autorelease];
+    
     val.i_int = 0;
     p_hotkeys = p_intf->p_libvlc->p_hotkeys;
 
     i_pressed_modifiers = [o_event modifierFlags];
 
-    if( i_pressed_modifiers & NSShiftKeyMask )
+    if( i_pressed_modifiers & NSShiftKeyMask ) {
         val.i_int |= KEY_MODIFIER_SHIFT;
-    if( i_pressed_modifiers & NSControlKeyMask )
+        [tempString appendString:@"Shift-"];
+        [tempStringPlus appendString:@"Shift+"];
+    }
+    if( i_pressed_modifiers & NSControlKeyMask ) {
         val.i_int |= KEY_MODIFIER_CTRL;
-    if( i_pressed_modifiers & NSAlternateKeyMask )
+        [tempString appendString:@"Ctrl-"];
+        [tempStringPlus appendString:@"Ctrl+"];
+    }
+    if( i_pressed_modifiers & NSAlternateKeyMask ) {
         val.i_int |= KEY_MODIFIER_ALT;
-    if( i_pressed_modifiers & NSCommandKeyMask )
+        [tempString appendString:@"Alt-"];
+        [tempStringPlus appendString:@"Alt+"];
+    }
+    if( i_pressed_modifiers & NSCommandKeyMask ) {
         val.i_int |= KEY_MODIFIER_COMMAND;
-
+        [tempString appendString:@"Command-"];
+        [tempStringPlus appendString:@"Command+"];
+    }
+    
+    [tempString appendString:[[o_event charactersIgnoringModifiers] lowercaseString]];
+    [tempStringPlus appendString:[[o_event charactersIgnoringModifiers] lowercaseString]];
+    
     key = [[o_event charactersIgnoringModifiers] characterAtIndex: 0];
 
     switch( key )
@@ -1385,14 +1403,43 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
     val.i_int |= CocoaKeyToVLC( key );
 
-    if( p_hotkeys[i].psz_action != NULL )
+    if( [o_usedHotkeys indexOfObject: tempString] != NSNotFound || [o_usedHotkeys indexOfObject: tempStringPlus] != NSNotFound )
     {
-        var_SetInteger( p_intf->p_libvlc, "key-pressed", val.i_int );
+        var_Set( p_intf->p_libvlc, "key-pressed", val );
         return YES;
     }
 
     return NO;
 }
+
+- (void)updateCurrentlyUsedHotkeys
+{
+    NSMutableArray *o_tempArray = [[NSMutableArray alloc] init];
+    /* Get the main Module */
+    module_t *p_main = module_get_main();
+    assert( p_main );
+    unsigned confsize;
+    module_config_t *p_config;
+    
+    p_config = module_config_get (p_main, &confsize);
+    
+    for (size_t i = 0; i < confsize; i++)
+    {
+        module_config_t *p_item = p_config + i;
+        
+        if( (p_item->i_type & CONFIG_ITEM) && p_item->psz_name != NULL
+           && !strncmp( p_item->psz_name , "key-", 4 )
+           && !EMPTY_STR( p_item->psz_text ) )
+        {
+            if (p_item->value.psz)
+                [o_tempArray addObject: [NSString stringWithUTF8String:p_item->value.psz]];
+        }
+    }
+    module_config_free (p_config);
+    module_release (p_main);
+    o_usedHotkeys = [[NSArray alloc] initWithArray: o_usedHotkeys copyItems: YES];    
+}
+
 
 #pragma mark -
 #pragma mark Other objects getters

@@ -84,6 +84,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         theString = [theString stringByReplacingOccurrencesOfString:@"Ctrl" withString: [NSString stringWithUTF8String: "\xE2\x8C\x83"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
         theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
+        theString = [theString capitalizedString];
     }
     else
         theString = [NSString stringWithString:_NS("Not Set")];
@@ -104,7 +105,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_sprefs_win setToolbar: o_sprefs_toolbar];
 
     /* setup useful stuff */
-    o_hotkeysNonUseableKeys = [[NSArray arrayWithObjects: @"Command-c", @"Command-x", @"Command-v", @"Command-a", @"Command-," , @"Command-h", @"Command-Alt-h", @"Command-Shift-o", @"Command-o", @"Command-d", @"Command-n", @"Command-s", @"Command-z", @"Command-l", @"Command-r", @"Command-0", @"Command-1", @"Command-2", @"Command-3", @"Command-m", @"Command-w", @"Command-Shift-w", @"Command-Shift-c", @"Command-Shift-p", @"Command-i", @"Command-e", @"Command-Shift-e", @"Command-b", @"Command-Shift-m", @"Command-Ctrl-m", @"Command-?", @"Command-Alt-?", nil] retain];
+    o_hotkeysNonUseableKeys = [[NSArray arrayWithObjects: @"Command-c", @"Command-x", @"Command-v", @"Command-a", @"Command-," , @"Command-h", @"Command-Alt-h", @"Command-Shift-o", @"Command-o", @"Command-d", @"Command-n", @"Command-s", @"Command-z", @"Command-l", @"Command-r", @"Command-3", @"Command-m", @"Command-w", @"Command-Shift-w", @"Command-Shift-c", @"Command-Shift-p", @"Command-i", @"Command-e", @"Command-Shift-e", @"Command-b", @"Command-Shift-m", @"Command-Ctrl-m", @"Command-?", @"Command-Alt-?", nil] retain];
 }
 
 #define CreateToolbarItem( o_name, o_desc, o_img, sel ) \
@@ -1243,6 +1244,11 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         i_returnValue = [o_hotkeySettings indexOfObject: o_keyInTransition];
         if( i_returnValue != NSNotFound )
             [o_hotkeySettings replaceObjectAtIndex: i_returnValue withObject: [NSString string]];
+        NSString *tempString;
+        tempString = [o_keyInTransition stringByReplacingOccurrencesOfString:@"-" withString:@"+"];
+        i_returnValue = [o_hotkeySettings indexOfObject: tempString];
+        if( i_returnValue != NSNotFound )
+            [o_hotkeySettings replaceObjectAtIndex: i_returnValue withObject: [NSString string]];
 
         [o_hotkeySettings replaceObjectAtIndex: [o_hotkeys_listbox selectedRow] withObject: [o_keyInTransition retain]];
 
@@ -1284,8 +1290,9 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
 - (BOOL)changeHotkeyTo: (NSString *)theKey
 {
-    NSInteger i_returnValue;
+    NSInteger i_returnValue, i_returnValue2;
     i_returnValue = [o_hotkeysNonUseableKeys indexOfObject: theKey];
+
     if( i_returnValue != NSNotFound || [theKey isEqualToString:@""] )
     {
         [o_hotkeys_change_keys_lbl setStringValue: _NS("Invalid combination")];
@@ -1298,10 +1305,16 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         [o_hotkeys_change_keys_lbl setStringValue: [self OSXStringKeyToString:theKey]];
 
         i_returnValue = [o_hotkeySettings indexOfObject: theKey];
+        i_returnValue2 = [o_hotkeySettings indexOfObject: [theKey stringByReplacingOccurrencesOfString:@"-" withString:@"+"]];
         if( i_returnValue != NSNotFound )
             [o_hotkeys_change_taken_lbl setStringValue: [NSString stringWithFormat:
                                                          _NS("This combination is already taken by \"%@\"."),
                                                          [o_hotkeyDescriptions objectAtIndex: i_returnValue]]];
+        else if( i_returnValue2 != NSNotFound )
+            [o_hotkeys_change_taken_lbl setStringValue: [NSString stringWithFormat:
+                                                         _NS("This combination is already taken by \"%@\"."),
+                                                         [o_hotkeyDescriptions objectAtIndex: i_returnValue2]]];
+        
         else
             [o_hotkeys_change_taken_lbl setStringValue: @""];
 
