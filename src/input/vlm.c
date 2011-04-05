@@ -226,7 +226,7 @@ static void vlm_Destructor( vlm_t *p_vlm )
     TAB_CLEAN( p_vlm->i_media, p_vlm->media );
 
     vlm_ControlInternal( p_vlm, VLM_CLEAR_SCHEDULES );
-    TAB_CLEAN( p_vlm->schedule, p_vlm->schedule );
+    TAB_CLEAN( p_vlm->i_schedule, p_vlm->schedule );
     vlc_mutex_unlock( &p_vlm->lock );
 
     libvlc_priv(p_vlm->p_libvlc)->p_vlm = NULL;
