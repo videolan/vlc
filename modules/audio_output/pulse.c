@@ -171,23 +171,24 @@ static void Play(aout_instance_t *aout)
     /* This function should be called by the LibVLC core a header of time,
      * but not more than AOUT_MAX_PREPARE. The PulseAudio latency should be
      * shorter than that (though it might not be the case with some evil piece
-     * of audio output hardware). So we need to prepend the buffer with zeroes
-     * to keep audio and video in sync. */
+     * of audio output hardware). So we may need to trigger playback early,
+     * (that is to say, short cut the PulseAudio prebuffering). Otherwise,
+     * audio and video may be out of synchronization. */
     pa_usec_t latency;
     int negative;
     if (pa_stream_get_latency(s, &latency, &negative) < 0) {
         /* Especially at start of stream, latency may not be known (yet). */
         if (pa_context_errno(sys->context) != PA_ERR_NODATA)
             error(aout, "cannot determine latency", sys->context);
-        latency = 0;
-    }
-
-    mtime_t gap = aout_FifoFirstDate(aout, &aout->output.fifo) - mdate()
+    } else {
+        mtime_t gap = aout_FifoFirstDate(aout, &aout->output.fifo) - mdate()
                 - latency;
-    if (gap > AOUT_PTS_TOLERANCE)
-        msg_Dbg(aout, "buffer too early (%"PRId64" us)", gap);
-    else if (latency != 0 && gap < -AOUT_PTS_TOLERANCE)
-        msg_Err(aout, "buffer too late (%"PRId64" us)", -gap);
+
+        if (gap > AOUT_PTS_TOLERANCE)
+            msg_Dbg(aout, "buffer too early (%"PRId64" us)", gap);
+        else if (gap < -AOUT_PTS_TOLERANCE)
+            msg_Err(aout, "buffer too late (%"PRId64" us)", -gap);
+    }
 #endif
 #if 0 /* Fault injector to test underrun recovery */
     static unsigned u = 0;
@@ -346,7 +347,7 @@ static int Open(vlc_object_t *obj)
     /* no point in larger buffers on PA side than VLC */
     attr.maxlength = -1;
     attr.tlength = byterate * AOUT_MAX_ADVANCE_TIME / CLOCK_FREQ;
-    attr.prebuf = byterate * AOUT_MIN_PREPARE_TIME / CLOCK_FREQ;
+    attr.prebuf = byterate * AOUT_MAX_PREPARE_TIME / CLOCK_FREQ;
     attr.minreq = -1;
     attr.fragsize = 0; /* not used for output */
 
