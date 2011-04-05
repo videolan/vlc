@@ -49,6 +49,7 @@
 #include <vlc_charset.h>
 #include <vlc_fs.h>
 #include <vlc_sout.h>
+#include <vlc_url.h>
 #include "../stream_output/stream_output.h"
 #include "../libvlc.h"
 
@@ -522,9 +523,11 @@ error:
     return VLC_EGENERIC;
 }
 
-static int ExecuteLoad( vlm_t *p_vlm, const char *psz_url, vlm_message_t **pp_status )
+static int ExecuteLoad( vlm_t *p_vlm, const char *psz_path, vlm_message_t **pp_status )
 {
+    char *psz_url = make_URI( psz_path, NULL );
     stream_t *p_stream = stream_UrlNew( p_vlm, psz_url );
+    free( psz_url );
     uint64_t i_size;
     char *psz_buffer;
 
