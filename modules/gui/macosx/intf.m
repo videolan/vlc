@@ -65,9 +65,6 @@ static void Run ( intf_thread_t *p_intf );
 
 static void * ManageThread( void *user_data );
 
-static unichar VLCKeyToCocoa( unsigned int i_key );
-static unsigned int VLCModifiersToCocoa( unsigned int i_key );
-
 static void updateProgressPanel (void *, const char *, float);
 static bool checkProgressPanel (void *);
 static void destroyProgressPanel (void *);
@@ -380,7 +377,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)awakeFromNib
 {
-    unsigned int i_key = 0;
+    NSString* o_key;
     playlist_t *p_playlist;
     vlc_value_t val;
 
@@ -405,76 +402,76 @@ static VLCMain *_o_sharedMainInstance = nil;
     [toolbar setAutosavesConfiguration:YES];
     [o_window setToolbar:toolbar];
 
-    i_key = config_GetInt( p_intf, "key-quit" );
-    [o_mi_quit setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_quit setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-play-pause" );
-    [o_mi_play setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_play setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-stop" );
-    [o_mi_stop setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_stop setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-faster" );
-    [o_mi_faster setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_faster setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-slower" );
-    [o_mi_slower setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_slower setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-rate-normal" );
-    [o_mi_normalSpeed setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_normalSpeed setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-prev" );
-    [o_mi_previous setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_previous setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-next" );
-    [o_mi_next setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_next setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-jump+short" );
-    [o_mi_fwd setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_fwd setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-jump-short" );
-    [o_mi_bwd setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_bwd setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-jump+medium" );
-    [o_mi_fwd1m setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_fwd1m setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-jump-medium" );
-    [o_mi_bwd1m setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_bwd1m setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-jump+long" );
-    [o_mi_fwd5m setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_fwd5m setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-jump-long" );
-    [o_mi_bwd5m setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_bwd5m setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-vol-up" );
-    [o_mi_vol_up setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_vol_up setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-vol-down" );
-    [o_mi_vol_down setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_vol_down setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-vol-mute" );
-    [o_mi_mute setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_mute setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-toggle-fullscreen" );
-    [o_mi_fullscreen setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_fullscreen setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-snapshot" );
-    [o_mi_snapshot setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_snapshot setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-random" );
-    [o_mi_random setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_random setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-zoom-half" );
-    [o_mi_half_window setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_half_window setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-zoom-original" );
-    [o_mi_normal_window setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_normal_window setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-    i_key = config_GetInt( p_intf, "key-zoom-double" );
-    [o_mi_double_window setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
-    [o_mi_double_window setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
-
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-quit" )];
+    [o_mi_quit setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_quit setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-play-pause" )];
+    [o_mi_play setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_play setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-stop" )];
+    [o_mi_stop setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_stop setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-faster" )];
+    [o_mi_faster setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_faster setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-slower" )];
+    [o_mi_slower setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_slower setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-rate-normal" )];
+    [o_mi_normalSpeed setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_normalSpeed setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-prev" )];
+    [o_mi_previous setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_previous setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-next" )];
+    [o_mi_next setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_next setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-jump+short" )];
+    [o_mi_fwd setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_fwd setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-jump-short" )];
+    [o_mi_bwd setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_bwd setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-jump+medium" )];
+    [o_mi_fwd1m setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_fwd1m setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-jump-medium" )];
+    [o_mi_bwd1m setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_bwd1m setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-jump+long" )];
+    [o_mi_fwd5m setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_fwd5m setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-jump-long" )];
+    [o_mi_bwd5m setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_bwd5m setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-vol-up" )];
+    [o_mi_vol_up setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_vol_up setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-vol-down" )];
+    [o_mi_vol_down setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_vol_down setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-vol-mute" )];
+    [o_mi_mute setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_mute setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-toggle-fullscreen" )];
+    [o_mi_fullscreen setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_fullscreen setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-snapshot" )];
+    [o_mi_snapshot setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_snapshot setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-random" )];
+    [o_mi_random setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_random setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-zoom-half" )];
+    [o_mi_half_window setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_half_window setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-zoom-original" )];
+    [o_mi_normal_window setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_normal_window setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-zoom-double" )];
+    [o_mi_double_window setKeyEquivalent: [self VLCKeyToString: o_key]];
+    [o_mi_double_window setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
+    
     var_Create( p_intf, "intf-change", VLC_VAR_BOOL );
 
     [self setSubmenusEnabled: FALSE];
@@ -1297,20 +1294,6 @@ static struct
     {0,0}
 };
 
-static unichar VLCKeyToCocoa( unsigned int i_key )
-{
-    unsigned int i;
-
-    for( i = 0; nskeys_to_vlckeys[i].i_vlckey != 0; i++ )
-    {
-        if( nskeys_to_vlckeys[i].i_vlckey == (i_key & ~KEY_MODIFIER) )
-        {
-            return nskeys_to_vlckeys[i].i_nskey;
-        }
-    }
-    return (unichar)(i_key & ~KEY_MODIFIER);
-}
-
 unsigned int CocoaKeyToVLC( unichar i_key )
 {
     unsigned int i;
@@ -1325,19 +1308,36 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     return (unsigned int)i_key;
 }
 
-static unsigned int VLCModifiersToCocoa( unsigned int i_key )
+- (unsigned int)VLCModifiersToCocoa:(NSString *)theString
 {
     unsigned int new = 0;
-    if( i_key & KEY_MODIFIER_COMMAND )
+
+    if([theString rangeOfString:@"Command"].location != NSNotFound)
         new |= NSCommandKeyMask;
-    if( i_key & KEY_MODIFIER_ALT )
+    if([theString rangeOfString:@"Alt"].location != NSNotFound)
         new |= NSAlternateKeyMask;
-    if( i_key & KEY_MODIFIER_SHIFT )
+    if([theString rangeOfString:@"Shift"].location != NSNotFound)
         new |= NSShiftKeyMask;
-    if( i_key & KEY_MODIFIER_CTRL )
+    if([theString rangeOfString:@"Ctrl"].location != NSNotFound)
         new |= NSControlKeyMask;
     return new;
 }
+
+- (NSString *)VLCKeyToString:(NSString *)theString
+{
+    NSLog( @"got: %@", theString );
+    if (![theString isEqualToString:@""]) {
+        theString = [theString stringByReplacingOccurrencesOfString:@"Command" withString:@""];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Alt" withString:@""];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Shift" withString:@""];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Ctrl" withString:@""];
+        theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
+        theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
+    }
+    NSLog( @"returning: %@", theString );
+    return theString;
+}
+
 
 /*****************************************************************************
  * hasDefinedShortcutKey: Check to see if the key press is a defined VLC
@@ -1385,13 +1385,10 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
     val.i_int |= CocoaKeyToVLC( key );
 
-    for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+    if( p_hotkeys[i].psz_action != NULL )
     {
-        if( p_hotkeys[i].i_key == val.i_int )
-        {
-            var_Set( p_intf->p_libvlc, "key-pressed", val );
-            return YES;
-        }
+        var_SetInteger( p_intf->p_libvlc, "key-pressed", val.i_int );
+        return YES;
     }
 
     return NO;

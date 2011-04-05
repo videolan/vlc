@@ -366,6 +366,8 @@ struct intf_sys_t
 - (char *)delocalizeString:(NSString *)psz;
 - (NSString *)wrapString: (NSString *)o_in_string toWidth: (int)i_width;
 - (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event;
+- (NSString *)VLCKeyToString:(NSString *)theString;
+- (unsigned int)VLCModifiersToCocoa:(NSString *)theString;
 
 - (void)initStrings;
 
