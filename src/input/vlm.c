@@ -506,7 +506,7 @@ static void* Manage( void* p_object )
                         }
                     }
                 }
-                else
+                else if( i_nextschedule == 0 || i_real_date < i_nextschedule )
                 {
                     i_nextschedule = i_real_date;
                 }
