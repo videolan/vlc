@@ -584,7 +584,9 @@
     [openPanel setCanChooseFiles: YES];
     [openPanel setCanChooseDirectories: NO];
     [openPanel setAllowsMultipleSelection: YES];
-    i_returnValue = [openPanel runModalForDirectory: [NSString stringWithUTF8String: path] file: nil types: [NSArray arrayWithObjects: @"cdg",@"@idx",@"srt",@"sub",@"utf",@"ass",@"ssa",@"aqt",@"jss",@"psb",@"rt",@"smi",@"txt",@"smil", nil]];
+    [openPanel setAllowedFileTypes: [NSArray arrayWithObjects: @"cdg",@"@idx",@"srt",@"sub",@"utf",@"ass",@"ssa",@"aqt",@"jss",@"psb",@"rt",@"smi",@"txt",@"smil", nil]];
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:[[NSString stringWithUTF8String:path] stringByExpandingTildeInPath]]];
+    i_returnValue = [openPanel runModal];
     free( path );
 
     if( i_returnValue == NSOKButton )
@@ -592,14 +594,14 @@
         NSUInteger c = 0;
         if( !p_input ) return;
 
-        c = [[openPanel filenames] count];
+        c = [[openPanel URLs] count];
 
-        for (int i = 0; i < [[openPanel filenames] count] ; i++)
+        for (int i = 0; i < c ; i++)
         {
-            msg_Dbg( VLCIntf, "loading subs from %s", [[[openPanel filenames] objectAtIndex: i] UTF8String] );
-            if( input_AddSubtitle( p_input, [[[openPanel filenames] objectAtIndex: i] UTF8String], TRUE ) )
+            msg_Dbg( VLCIntf, "loading subs from %s", [[[[openPanel URLs] objectAtIndex: i] path] UTF8String] );
+            if( input_AddSubtitle( p_input, [[[[openPanel URLs] objectAtIndex: i] path] UTF8String], TRUE ) )
                 msg_Warn( VLCIntf, "unable to load subtitles from '%s'",
-                         [[[openPanel filenames] objectAtIndex: i] UTF8String] );
+                         [[[[openPanel URLs] objectAtIndex: i] path] UTF8String] );
         }
     }
 }

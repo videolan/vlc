@@ -528,7 +528,7 @@
     if( [o_save_panel runModalForDirectory: nil
             file: o_name] == NSOKButton )
     {
-        NSString *o_filename = [o_save_panel filename];
+        NSString *o_filename = [[o_save_panel URL] path];
         [o_file_field setStringValue: o_filename];
         [self outputInfoChanged: nil];
     }

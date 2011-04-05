@@ -1145,7 +1145,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     {
         if( contextInfo == o_video_snap_folder_btn )
         {
-            [o_video_snap_folder_fld setStringValue: [o_selectFolderPanel filename]];
+            [o_video_snap_folder_fld setStringValue: [[o_selectFolderPanel URL] path]];
             b_videoSettingChanged = YES;
         }
     }

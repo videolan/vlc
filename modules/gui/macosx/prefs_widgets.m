@@ -1255,7 +1255,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 {
     if( i_return_code == NSOKButton )
     {
-        NSString *o_path = [[o_sheet filenames] objectAtIndex: 0];
+        NSString *o_path = [[[o_sheet URLs] objectAtIndex: 0] path];
         [o_textfield setStringValue: o_path];
     }
 }

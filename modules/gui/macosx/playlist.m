@@ -750,7 +750,7 @@
     if( [o_save_panel runModalForDirectory: nil
             file: o_name] == NSOKButton )
     {
-        NSString *o_filename = [o_save_panel filename];
+        NSString *o_filename = [[o_save_panel URL] path];
 
         if( [o_save_accessory_popup indexOfSelectedItem] == 0 )
         {

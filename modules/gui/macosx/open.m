@@ -508,11 +508,11 @@ static VLCOpen *_o_sharedMainInstance = nil;
         o_open_panel = [NSOpenPanel openPanel];
         [o_open_panel setCanChooseFiles: YES];
         [o_open_panel setCanChooseDirectories: NO];
-        if( [o_open_panel runModalForDirectory: nil file: nil types: nil] == NSOKButton )
+        if( [o_open_panel runModal] == NSOKButton )
         {
             if( o_file_slave_path )
                 [o_file_slave_path release];
-            o_file_slave_path = [[o_open_panel filenames] objectAtIndex: 0];
+            o_file_slave_path = [[[o_open_panel URLs] objectAtIndex: 0] path];
             [o_file_slave_path retain];
         }
         else
@@ -602,7 +602,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     if (returnCode == NSFileHandlingPanelOKButton)
     {
-        NSString *o_filename = [[sheet filenames] objectAtIndex: 0];
+        NSString *o_filename = [[[sheet URLs] objectAtIndex: 0] path];
         [o_file_path setStringValue: o_filename];
         [self openFilePathChanged: nil];
     }
@@ -778,10 +778,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_open_panel setTitle: _NS("Open VIDEO_TS Directory")];
     [o_open_panel setPrompt: _NS("Open")];
 
-    if( [o_open_panel runModalForDirectory: nil
-            file: nil types: nil] == NSOKButton )
+    if( [o_open_panel runModal] == NSOKButton )
     {
-        NSString *o_dirname = [[o_open_panel filenames] objectAtIndex: 0];
+        NSString *o_dirname = [[[o_open_panel URLs] objectAtIndex: 0] path];
         [o_disc_videots_folder setStringValue: o_dirname];
         [self openDiscInfoChanged: nil];
     }
@@ -953,17 +952,16 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_open_panel setTitle: _NS("Open File")];
     [o_open_panel setPrompt: _NS("Open")];
  
-    if( [o_open_panel runModalForDirectory: nil
-            file: nil types: nil] == NSOKButton )
+    if( [o_open_panel runModal] == NSOKButton )
     {
         NSArray *o_array = [NSArray array];
-        NSArray *o_values = [[o_open_panel filenames]
+        NSArray *o_values = [[o_open_panel URLs]
                 sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 
         for( i = 0; i < (int)[o_values count]; i++)
         {
             NSDictionary *o_dic;
-            char *psz_uri = make_URI([[o_values objectAtIndex:i] UTF8String], "file");
+            char *psz_uri = make_URI([[[o_values objectAtIndex:i] path] UTF8String], "file");
             if( !psz_uri )
                 continue;
 
@@ -1196,10 +1194,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_open_panel setTitle: _NS("Open File")];
     [o_open_panel setPrompt: _NS("Open")];
 
-    if( [o_open_panel runModalForDirectory: nil
-            file: nil types: nil] == NSOKButton )
+    if( [o_open_panel runModal] == NSOKButton )
     {
-        NSString *o_filename = [[o_open_panel filenames] objectAtIndex: 0];
+        NSString *o_filename = [[[o_open_panel URLs] objectAtIndex: 0] path];
         [o_file_sub_path setStringValue: o_filename];
     }
 }

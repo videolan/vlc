@@ -1150,9 +1150,9 @@ static VLCWizard *_o_sharedInstance = nil;
                     /* check whether the extension is hidden or not.
                      * if not, remove it
                      * we need the casting to make GCC4 happy */
-                    if( [[[NSFileManager defaultManager] fileAttributesAtPath:
+                    if( [[[NSFileManager defaultManager] attributesOfItemAtPath:
                         [[o_userSelections objectForKey:@"pathToStrm"]
-                        objectAtIndex: x] traverseLink: NO] objectForKey:
+                         objectAtIndex: x] error:nil] objectForKey:
                         NSFileExtensionHidden] )
                         fileNameToUse = [NSString stringWithString:
                             [[NSFileManager defaultManager] displayNameAtPath:
@@ -1679,8 +1679,7 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     if (returnCode == NSOKButton)
     {
-        [o_t2_fld_pathToNewStrm setStringValue: [@"file://"
-            stringByAppendingString: [sheet filename]]];
+        [o_t2_fld_pathToNewStrm setStringValue: [[sheet URL] absoluteString]];
     }
 }
 
@@ -1898,9 +1897,9 @@ static VLCWizard *_o_sharedInstance = nil;
         [[o_userSelections objectForKey:@"encapFormat"] intValue]]
         objectAtIndex:0];
         if( theEncapFormat != @"ps" )
-            [saveFilePanel setRequiredFileType: theEncapFormat];
+            [saveFilePanel setAllowedFileTypes: [NSArray arrayWithObject:theEncapFormat]];
         else
-            [saveFilePanel setRequiredFileType: @"mpg"];
+            [saveFilePanel setAllowedFileTypes: [NSArray arrayWithObject:@"mpg"]];
 
         [saveFilePanel setCanSelectHiddenExtension: YES];
         [saveFilePanel setCanCreateDirectories: YES];
@@ -1918,9 +1917,9 @@ static VLCWizard *_o_sharedInstance = nil;
          * selected a folder */
         if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
             [o_t7_fld_filePath setStringValue: [NSString stringWithFormat:
-                @"%@/", [sheet filename]]];
+                @"%@/", [[sheet URL] path]]];
         else
-            [o_t7_fld_filePath setStringValue:[sheet filename]];
+            [o_t7_fld_filePath setStringValue:[[sheet URL] path]];
     }
     [sheet release];
 }

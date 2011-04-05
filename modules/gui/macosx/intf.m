@@ -66,8 +66,6 @@ static void Run ( intf_thread_t *p_intf );
 
 static void * ManageThread( void *user_data );
 
-static unsigned int VLCModifiersToCocoa( unsigned int i_key );
-
 static void updateProgressPanel (void *, const char *, float);
 static bool checkProgressPanel (void *);
 static void destroyProgressPanel (void *);
@@ -1405,7 +1403,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
     if( [o_usedHotkeys indexOfObject: tempString] != NSNotFound || [o_usedHotkeys indexOfObject: tempStringPlus] != NSNotFound )
     {
-        var_Set( p_intf->p_libvlc, "key-pressed", val );
+        var_SetInteger( p_intf->p_libvlc, "key-pressed", val.i_int );
         return YES;
     }
 
@@ -2637,7 +2635,7 @@ end:
     [saveFolderPanel setCanChooseFiles: YES];
     [saveFolderPanel setCanSelectHiddenExtension: NO];
     [saveFolderPanel setCanCreateDirectories: YES];
-    [saveFolderPanel setRequiredFileType: @"rtfd"];
+    [saveFolderPanel setAllowedFileTypes: [NSArray arrayWithObject:@"rtfd"]];
     [saveFolderPanel beginSheetForDirectory:nil file: [NSString stringWithFormat: _NS("VLC Debug Log (%s).rtfd"), VERSION_MESSAGE] modalForWindow: o_msgs_panel modalDelegate:self didEndSelector:@selector(saveDebugLogAsRTF:returnCode:contextInfo:) contextInfo:nil];
 }
 
@@ -2646,7 +2644,7 @@ end:
     BOOL b_returned;
     if( returnCode == NSOKButton )
     {
-        b_returned = [o_messages writeRTFDToFile: [sheet filename] atomically: YES];
+        b_returned = [o_messages writeRTFDToFile: [[sheet URL] path] atomically: YES];
         if(! b_returned )
             msg_Warn( p_intf, "Error while saving the debug log" );
     }
