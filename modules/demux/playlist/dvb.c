@@ -109,6 +109,8 @@ static int Demux( demux_t *p_demux )
         char **ppsz_options = NULL;
         int  i_options = 0;
         char *psz_name = NULL;
+        char *psz_uri = strdup( "dvb://" );
+        int i_optionslen = 0;
 
         if( !ParseLine( psz_line, &psz_name, &ppsz_options, &i_options ) )
         {
@@ -118,9 +120,33 @@ static int Demux( demux_t *p_demux )
 
         EnsureUTF8( psz_name );
         for( int i = 0; i< i_options; i++ )
+        {
             EnsureUTF8( ppsz_options[i] );
+            i_optionslen += ( strlen( ppsz_options[i] ) + 2 );
+        }
 
-        p_input = input_item_NewExt( p_demux, "dvb://", psz_name,
+        if ( i_optionslen )
+        {
+            /* ensure uri is also generated dvb:// :op1 :op2 */
+            char *psz_localuri = calloc( i_optionslen + 6 + 1, sizeof(char) );
+            if ( psz_localuri )
+            {
+                char *psz_tmp;
+                char *psz_forward;
+                psz_forward = strcat( psz_localuri, psz_uri ) + 6;
+                for( int i = 0; i< i_options; i++ )
+                {
+                    psz_tmp = ppsz_options[i]; /* avoid doing i*strcat */
+                    *psz_forward++ = ' ';
+                    *psz_forward++ = ':';
+                    while( *psz_tmp ) *psz_forward++ = *psz_tmp++;
+                }
+                free( psz_uri );
+                psz_uri = psz_localuri;
+            }
+        }
+
+        p_input = input_item_NewExt( p_demux, psz_uri, psz_name,
                                      i_options, (const char**)ppsz_options, VLC_INPUT_OPTION_TRUSTED, -1 );
         input_item_node_AppendItem( p_subitems, p_input );
         vlc_gc_decref( p_input );
@@ -129,6 +155,7 @@ static int Demux( demux_t *p_demux )
             free( ppsz_options[i_options] );
         free( ppsz_options );
 
+        free( psz_uri );
         free( psz_line );
     }
 
