@@ -728,16 +728,12 @@ static void Close( vlc_object_t *p_this )
     vlc_join( p_sys->thread, NULL );
     vlc_sem_destroy( &p_sys->wait );
 
+    snd_pcm_drop( p_sys->p_snd_pcm );
     snd_pcm_close( p_sys->p_snd_pcm );
 #ifdef ALSA_DEBUG
     snd_output_close( p_sys->p_snd_stderr );
 #endif
     free( p_sys );
-}
-
-static void pcm_drop(void *pcm)
-{
-    snd_pcm_drop(pcm);
 }
 
 /*****************************************************************************
@@ -752,12 +748,10 @@ static void* ALSAThread( void *data )
     vlc_sem_wait( &p_sys->wait );
     mwait( p_sys->start_date - AOUT_PTS_TOLERANCE / 4 );
 
-    vlc_cleanup_push( pcm_drop, p_sys->p_snd_pcm );
     for(;;)
         ALSAFill( p_aout );
 
     assert(0);
-    vlc_cleanup_pop();
 }
 
 /*****************************************************************************
