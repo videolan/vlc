@@ -155,14 +155,15 @@
 
     NSOpenPanel *o_selectFolderPanel;
     NSArray *o_hotkeyDescriptions;
+    NSArray *o_hotkeyNames;
     NSArray *o_hotkeysNonUseableKeys;
     NSMutableArray *o_hotkeySettings;
-    NSNumber *o_keyInTransition;
+    NSString *o_keyInTransition;
 
     intf_thread_t *p_intf;
 }
 + (VLCSimplePrefs *)sharedInstance;
-- (NSString *)OSXKeyToString:(int)val;
+- (NSString *)OSXStringKeyToString:(NSString *)theString;
 
 /* toolbar */
 - (NSToolbarItem *) toolbar: (NSToolbar *)o_toolbar 
@@ -209,7 +210,7 @@
 - (void)showHotkeySettings;
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
-- (BOOL)changeHotkeyTo: (int)i_theNewKey;
+- (BOOL)changeHotkeyTo: (NSString *)theKey;
 
 @end
 

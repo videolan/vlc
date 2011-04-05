@@ -67,6 +67,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     [o_hotkeySettings release];
     [o_hotkeyDescriptions release];
+    [o_hotkeyNames release];
     [o_hotkeysNonUseableKeys release];
 
     [o_keyInTransition release];
@@ -74,28 +75,19 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [super dealloc];
 }
 
-
-- (NSString *)OSXKeyToString:(int)val
+- (NSString *)OSXStringKeyToString:(NSString *)theString
 {
-    NSMutableString *o_temp_str = [[[NSMutableString alloc] init] autorelease];
-    if( val & KEY_MODIFIER_CTRL )
-        [o_temp_str appendString: [NSString stringWithUTF8String: "\xE2\x8C\x83"]];
-    if( val & KEY_MODIFIER_ALT )
-        [o_temp_str appendString: [NSString stringWithUTF8String: "\xE2\x8C\xA5"]];
-    if( val & KEY_MODIFIER_SHIFT )
-        [o_temp_str appendString: [NSString stringWithUTF8String: "\xE2\x87\xA7"]];
-    if( val & KEY_MODIFIER_COMMAND )
-        [o_temp_str appendString: [NSString stringWithUTF8String: "\xE2\x8C\x98"]];
-
-    char *base = vlc_keycode2str( val & ~KEY_MODIFIER );
-    if( base )
-    {
-        [o_temp_str appendString: [NSString stringWithUTF8String: base]];
-        free( base );
+    if (![theString isEqualToString:@""]) {
+        theString = [theString stringByReplacingOccurrencesOfString:@"Command" withString: [NSString stringWithUTF8String: "\xE2\x8C\x98"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Alt" withString: [NSString stringWithUTF8String: "\xE2\x8C\xA5"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Shift" withString: [NSString stringWithUTF8String: "\xE2\x87\xA7"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Ctrl" withString: [NSString stringWithUTF8String: "\xE2\x8C\x83"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
+        theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
     }
     else
-        o_temp_str = [NSMutableString stringWithString:_NS("Not Set")];
-    return o_temp_str;
+        theString = [NSString stringWithString:_NS("Not Set")];
+    return theString;
 }
 
 - (void)awakeFromNib
@@ -112,40 +104,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_sprefs_win setToolbar: o_sprefs_toolbar];
 
     /* setup useful stuff */
-    o_hotkeysNonUseableKeys = [[NSArray arrayWithObjects:
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'c'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'x'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'v'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'a'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|','],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'h'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|'h'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'o'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'o'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'d'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'n'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'s'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'z'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'l'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'r'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'0'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'1'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'2'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'3'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'m'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'w'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'w'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'c'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'p'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'i'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'e'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'e'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'b'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'m'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_CTRL|'m'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|'?'],
-                                [NSNumber numberWithInt: KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|'?'],
-                                nil] retain];
+    o_hotkeysNonUseableKeys = [[NSArray arrayWithObjects: @"Command-c", @"Command-x", @"Command-v", @"Command-a", @"Command-," , @"Command-h", @"Command-Alt-h", @"Command-Shift-o", @"Command-o", @"Command-d", @"Command-n", @"Command-s", @"Command-z", @"Command-l", @"Command-r", @"Command-0", @"Command-1", @"Command-2", @"Command-3", @"Command-m", @"Command-w", @"Command-Shift-w", @"Command-Shift-c", @"Command-Shift-p", @"Command-i", @"Command-e", @"Command-Shift-e", @"Command-b", @"Command-Shift-m", @"Command-Ctrl-m", @"Command-?", @"Command-Alt-?", nil] retain];
 }
 
 #define CreateToolbarItem( o_name, o_desc, o_img, sel ) \
@@ -649,22 +608,41 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [o_hotkeySettings release];
     o_hotkeySettings = [[NSMutableArray alloc] init];
     NSMutableArray *o_tempArray_desc = [[NSMutableArray alloc] init];
-    i = 1;
+    NSMutableArray *o_tempArray_names = [[NSMutableArray alloc] init];
 
-    while( i < 100 )
+    /* Get the main Module */
+    module_t *p_main = module_get_main();
+    assert( p_main );
+    unsigned confsize;
+    module_config_t *p_config;
+    
+    p_config = module_config_get (p_main, &confsize);
+    
+    for (size_t i = 0; i < confsize; i++)
     {
-        p_item = config_FindConfig( VLC_OBJECT(p_intf), p_hotkeys[i].psz_action );
-        if( !p_item )
-            break;
+        module_config_t *p_item = p_config + i;
 
-        [o_tempArray_desc addObject: _NS( p_item->psz_text )];
-        [o_hotkeySettings addObject: [NSNumber numberWithInt: p_item->value.i]];
-
-        i++;
+        if( (p_item->i_type & CONFIG_ITEM) && p_item->psz_name != NULL
+           && !strncmp( p_item->psz_name , "key-", 4 )
+           && !EMPTY_STR( p_item->psz_text ) )
+        {
+            [o_tempArray_desc addObject: _NS( p_item->psz_text )];
+            [o_tempArray_names addObject: [NSString stringWithUTF8String:p_item->psz_name]];
+            if (p_item->value.psz)
+                [o_hotkeySettings addObject: [NSString stringWithUTF8String:p_item->value.psz]];
+            else
+                [o_hotkeySettings addObject: [NSString string]];
+        }
     }
+    module_config_free (p_config);
+    module_release (p_main);
+                  
     [o_hotkeyDescriptions release];
     o_hotkeyDescriptions = [[NSArray alloc] initWithArray: o_tempArray_desc copyItems: YES];
     [o_tempArray_desc release];
+    [o_hotkeyNames release];
+    o_hotkeyNames = [[NSArray alloc] initWithArray: o_tempArray_names copyItems: YES];
+    [o_tempArray_names release];
     [o_hotkeys_listbox reloadData];
 }
 
@@ -1035,11 +1013,10 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
      ********************/
     if( b_hotkeyChanged )
     {
-        const struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
-        i = 1;
+        i = 0;
         while( i < [o_hotkeySettings count] )
         {
-            config_PutInt( p_intf, p_hotkeys[i].psz_action, [[o_hotkeySettings objectAtIndex: i-1] intValue] );
+            config_PutPsz( p_intf, [[o_hotkeyNames objectAtIndex:i] UTF8String], [[o_hotkeySettings objectAtIndex:i]UTF8String] );
             i++;
         }
 
@@ -1239,7 +1216,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     {
         [o_hotkeys_change_lbl setStringValue: [NSString stringWithFormat: _NS("Press new keys for\n\"%@\""),
                                                [o_hotkeyDescriptions objectAtIndex: [o_hotkeys_listbox selectedRow]]]];
-        [o_hotkeys_change_keys_lbl setStringValue: [self OSXKeyToString:[[o_hotkeySettings objectAtIndex: [o_hotkeys_listbox selectedRow]] intValue]]];
+        [o_hotkeys_change_keys_lbl setStringValue: [self OSXStringKeyToString:[o_hotkeySettings objectAtIndex: [o_hotkeys_listbox selectedRow]]]];
         [o_hotkeys_change_taken_lbl setStringValue: @""];
         [o_hotkeys_change_win setInitialFirstResponder: [o_hotkeys_change_win contentView]];
         [o_hotkeys_change_win makeFirstResponder: [o_hotkeys_change_win contentView]];
@@ -1265,7 +1242,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
         i_returnValue = [o_hotkeySettings indexOfObject: o_keyInTransition];
         if( i_returnValue != NSNotFound )
-            [o_hotkeySettings replaceObjectAtIndex: i_returnValue withObject: [[NSNumber numberWithInt: 0] retain]];
+            [o_hotkeySettings replaceObjectAtIndex: i_returnValue withObject: [NSString string]];
 
         [o_hotkeySettings replaceObjectAtIndex: [o_hotkeys_listbox selectedRow] withObject: [o_keyInTransition retain]];
 
@@ -1276,7 +1253,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     }
     else if( sender == o_hotkeys_clear_btn )
     {
-        [o_hotkeySettings replaceObjectAtIndex: [o_hotkeys_listbox selectedRow] withObject: [NSNumber numberWithInt: 0]];
+        [o_hotkeySettings replaceObjectAtIndex: [o_hotkeys_listbox selectedRow] withObject: [NSString string]];
         [o_hotkeys_listbox reloadData];
         b_hotkeyChanged = YES;
     }
@@ -1297,7 +1274,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     if( [[aTableColumn identifier] isEqualToString: @"action"] )
         return [o_hotkeyDescriptions objectAtIndex: rowIndex];
     else if( [[aTableColumn identifier] isEqualToString: @"shortcut"] )
-        return [self OSXKeyToString: [[o_hotkeySettings objectAtIndex: rowIndex] intValue]];
+        return [self OSXStringKeyToString:[o_hotkeySettings objectAtIndex: rowIndex]];
     else
     {
         msg_Err( p_intf, "unknown TableColumn identifier (%s)!", [[aTableColumn identifier] UTF8String] );
@@ -1305,11 +1282,11 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     }
 }
 
-- (BOOL)changeHotkeyTo: (int)i_theNewKey
+- (BOOL)changeHotkeyTo: (NSString *)theKey
 {
     NSInteger i_returnValue;
-    i_returnValue = [o_hotkeysNonUseableKeys indexOfObject: [NSNumber numberWithInt: i_theNewKey]];
-    if( i_returnValue != NSNotFound || i_theNewKey == 0 )
+    i_returnValue = [o_hotkeysNonUseableKeys indexOfObject: theKey];
+    if( i_returnValue != NSNotFound || [theKey isEqualToString:@""] )
     {
         [o_hotkeys_change_keys_lbl setStringValue: _NS("Invalid combination")];
         [o_hotkeys_change_taken_lbl setStringValue: _NS("Regrettably, these keys cannot be assigned as hotkey shortcuts.")];
@@ -1318,16 +1295,9 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     }
     else
     {
-        NSString *o_temp;
-        if( o_keyInTransition )
-            [o_keyInTransition release];
-        o_keyInTransition = [[NSNumber numberWithInt: i_theNewKey] retain];
+        [o_hotkeys_change_keys_lbl setStringValue: [self OSXStringKeyToString:theKey]];
 
-        o_temp = [self OSXKeyToString: i_theNewKey];
-
-        [o_hotkeys_change_keys_lbl setStringValue: o_temp];
-
-        i_returnValue = [o_hotkeySettings indexOfObject: o_keyInTransition];
+        i_returnValue = [o_hotkeySettings indexOfObject: theKey];
         if( i_returnValue != NSNotFound )
             [o_hotkeys_change_taken_lbl setStringValue: [NSString stringWithFormat:
                                                          _NS("This combination is already taken by \"%@\"."),
@@ -1336,6 +1306,9 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             [o_hotkeys_change_taken_lbl setStringValue: @""];
 
         [o_hotkeys_change_ok_btn setEnabled: YES];
+        [o_keyInTransition release];
+        o_keyInTransition = theKey;
+        [o_keyInTransition retain];
         return YES;
     }
 }
@@ -1366,28 +1339,24 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
 - (BOOL)performKeyEquivalent:(NSEvent *)o_theEvent
 {
-    unichar key;
-    int i_key = 0;
-
+    NSMutableString *tempString = [[[NSMutableString alloc] init] autorelease];
     if( [o_theEvent modifierFlags] & NSControlKeyMask )
-        i_key |= KEY_MODIFIER_CTRL;
-
+        [tempString appendString:@"Ctrl-"];
+    
     if( [o_theEvent modifierFlags] & NSAlternateKeyMask  )
-        i_key |= KEY_MODIFIER_ALT;
-
+        [tempString appendString:@"Alt-"];
+    
     if( [o_theEvent modifierFlags] & NSShiftKeyMask )
-        i_key |= KEY_MODIFIER_SHIFT;
-
+        [tempString appendString:@"Shift-"];
+    
     if( [o_theEvent modifierFlags] & NSCommandKeyMask )
-        i_key |= KEY_MODIFIER_COMMAND;
+        [tempString appendString:@"Command-"];
 
-    key = [[[o_theEvent charactersIgnoringModifiers] lowercaseString] characterAtIndex: 0];
-    if( key )
-    {
-        i_key |= CocoaKeyToVLC( key );
-        return [[[VLCMain sharedInstance] simplePreferences] changeHotkeyTo: i_key];
+    if (![[[o_theEvent charactersIgnoringModifiers] lowercaseString] isEqualToString:@""]) {
+        [tempString appendString:[[o_theEvent charactersIgnoringModifiers] lowercaseString]];
+            return [[[VLCMain sharedInstance] simplePreferences] changeHotkeyTo: tempString];
     }
-    return FALSE;
+    return NO;
 }
 
 @end
