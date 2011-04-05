@@ -97,7 +97,6 @@ static void* ALSAThread   ( void * );
 static void  ALSAFill     ( aout_instance_t * );
 static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
                                 vlc_value_t newval, vlc_value_t oldval, void *p_unused );
-static void GetDevicesForCard( vlc_object_t *, module_config_t *, int card );
 static void GetDevices( vlc_object_t *, module_config_t * );
 
 /*****************************************************************************
@@ -934,89 +933,46 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 }
 
 
-static void GetDevicesForCard( vlc_object_t *obj, module_config_t *p_item,
-                               int i_card )
+static void GetDevices (vlc_object_t *obj, module_config_t *item)
 {
-    int i_pcm_device = -1;
-    int i_err = 0;
-    snd_pcm_info_t *p_pcm_info;
-    snd_ctl_t *p_ctl;
-    char psz_dev[4 + 3 * sizeof(int)];
-    char *psz_card_name;
+    void **hints;
 
-    snprintf( psz_dev, sizeof (psz_dev), "hw:%u", i_card );
+    msg_Dbg(obj, "Available ALSA PCM devices:");
 
-    if( ( i_err = snd_ctl_open( &p_ctl, psz_dev, 0 ) ) < 0 )
+    if (snd_device_name_hint(-1, "pcm", &hints) < 0)
         return;
 
-    if( ( i_err = snd_card_get_name( i_card, &psz_card_name ) ) != 0)
-        psz_card_name = _("Unknown soundcard");
-
-    snd_pcm_info_alloca( &p_pcm_info );
-
-    for (;;)
+    for (size_t i = 0; hints[i] != NULL; i++)
     {
-        char *psz_device, *psz_descr;
-        if( ( i_err = snd_ctl_pcm_next_device( p_ctl, &i_pcm_device ) ) < 0 )
-            i_pcm_device = -1;
-        if( i_pcm_device < 0 )
-            break;
+        void *hint = hints[i];
+        char *name = snd_device_name_get_hint(hint, "NAME");
+        char *desc = snd_device_name_get_hint (hint, "DESC");
 
-        snd_pcm_info_set_device( p_pcm_info, i_pcm_device );
-        snd_pcm_info_set_subdevice( p_pcm_info, 0 );
-        snd_pcm_info_set_stream( p_pcm_info, SND_PCM_STREAM_PLAYBACK );
+        if (likely(desc != NULL && name != NULL))
+            msg_Dbg(obj, " %s (%s)", desc, name);
 
-        if( ( i_err = snd_ctl_pcm_info( p_ctl, p_pcm_info ) ) < 0 )
+        if (item != NULL)
         {
-            if( i_err != -ENOENT )
-                msg_Err( obj, "cannot get PCM device %d:%d infos: %s", i_card,
-                         i_pcm_device, snd_strerror( -i_err ) );
-            continue;
-        }
-
-        if( asprintf( &psz_device, "plughw:%u,%u", i_card, i_pcm_device ) == -1 )
-            continue;
-        if( asprintf( &psz_descr, "%s: %s (%s)", psz_card_name,
-                  snd_pcm_info_get_name(p_pcm_info), psz_device ) == -1 )
-        {
-            free( psz_device );
-            continue;
-        }
-
-        msg_Dbg( obj, "  %s", psz_descr );
-
-        if( p_item )
-        {
-            p_item->ppsz_list = xrealloc( p_item->ppsz_list,
-                                  (p_item->i_list + 2) * sizeof(char *) );
-            p_item->ppsz_list_text = xrealloc( p_item->ppsz_list_text,
-                                  (p_item->i_list + 2) * sizeof(char *) );
-            p_item->ppsz_list[ p_item->i_list ] = psz_device;
-            p_item->ppsz_list_text[ p_item->i_list ] = psz_descr;
-            p_item->i_list++;
-            p_item->ppsz_list[ p_item->i_list ] = NULL;
-            p_item->ppsz_list_text[ p_item->i_list ] = NULL;
+            item->ppsz_list = xrealloc(item->ppsz_list,
+                                       (item->i_list + 2) * sizeof(char *));
+            item->ppsz_list_text = xrealloc(item->ppsz_list_text,
+                                          (item->i_list + 2) * sizeof(char *));
+            item->ppsz_list[item->i_list] = name;
+            item->ppsz_list_text[item->i_list] = desc;
+            item->i_list++;
         }
         else
         {
-            free( psz_device );
-            free( psz_descr );
+            free(desc);
+            free(name);
         }
     }
 
-    snd_ctl_close( p_ctl );
-}
+    snd_device_name_free_hint(hints);
 
-
-static void GetDevices( vlc_object_t *obj, module_config_t *p_item )
-{
-    int i_card = -1;
-    int i_err;
-
-    msg_Dbg( obj, "Available alsa output devices:" );
-    while( (i_err = snd_card_next( &i_card )) == 0 && i_card > -1 )
-        GetDevicesForCard( obj, p_item, i_card );
-
-    if( i_err )
-        msg_Err( obj, "cannot enumerate cards: %s", snd_strerror( -i_err ) );
+    if (item != NULL)
+    {
+        item->ppsz_list[item->i_list] = NULL;
+        item->ppsz_list_text[item->i_list] = NULL;
+    }
 }
