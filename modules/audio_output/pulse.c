@@ -100,9 +100,11 @@ static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
         return;
     (void) c;
 
-    /* PulseAudio maps 100% to no SW amplification and maximum HW amplification.
-     * VLC maps 100% to no amplification at all. Thus we need to use the sink
-     * base_volume as a multiplier, if and only if flat volume is active. */
+    /* PulseAudio flat volume NORM / 100% / 0dB corresponds to no software
+     * amplification and maximum hardware amplification.
+     * VLC maps DEFAULT / 100% to no gain at all (software/hardware).
+     * Thus we need to use the sink base_volume as a multiplier,
+     * if and only if flat volume is active for our current sink. */
     if (i->flags & PA_SINK_FLAT_VOLUME)
         sys->base_volume = i->base_volume;
     else
@@ -132,8 +134,10 @@ static void stream_moved_cb(pa_stream *s, void *userdata)
     pa_operation *op;
     uint32_t idx = pa_stream_get_device_index(s);
 
-    msg_Dbg(aout, "connected to device %s (%u)", pa_stream_get_device_name(s), idx);
-    op = pa_context_get_sink_info_by_index(sys->context, idx, sink_info_cb, aout);
+    msg_Dbg(aout, "connected to sink %"PRIu32": %s", idx,
+                  pa_stream_get_device_name(s));
+    op = pa_context_get_sink_info_by_index(sys->context, idx,
+                                           sink_info_cb, aout);
     if (likely(op != NULL))
         pa_operation_unref(op);
 }
