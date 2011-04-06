@@ -281,11 +281,14 @@ static int VolumeSet(aout_instance_t *aout, audio_volume_t vol)
 
     pa_threaded_mainloop_lock(mainloop);
     op = pa_context_set_sink_input_volume(sys->context, idx, &cvolume, NULL, NULL);
+    if (likely(op != NULL))
+        pa_operation_unref(op);
+    op = pa_context_set_sink_input_mute(sys->context, idx, volume == PA_VOLUME_MUTED,
+                                        NULL, NULL);
+    if (likely(op != NULL))
+        pa_operation_unref(op);
     pa_threaded_mainloop_unlock(mainloop);
 
-    if (unlikely(op == NULL))
-        return -1;
-    pa_operation_unref(op);
     return 0;
 }
 
