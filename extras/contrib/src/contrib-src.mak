@@ -2427,22 +2427,22 @@ CLEAN_PKG += Sparkle
 DISTCLEAN_PKG += Sparkle-$(SPARKLE_VERSION).zip
 
 # ***************************************************************************
-# BWToolKit
+# BGHUDAppKit
 # ***************************************************************************
 
-BWToolkit.zip:
-	$(WGET) $(BWTOOLKIT_URL)
+BGHUDAppKit-$(BGHUDAPPKIT_VERSION).zip:
+	$(WGET) $(BGHUDAPPKIT_URL)
 
-.BWToolKit: BWToolkit.zip
+.BGHUDAppKit: BGHUDAppKit-$(BGHUDAPPKIT_VERSION).zip
 	rm -rf $@ || true
-	(mkdir BWToolKit && cd BWToolKit && unzip ../$<)
-	rm -rf $(PREFIX)/BWToolkit
-	mv BWToolkit $(PREFIX)
+	(mkdir BGHUDAppKit && cd BGHUDAppKit && unzip ../$<)
+	rm -rf $(PREFIX)/BGHUDAppKit
+	mv BGHUDAppKit $(PREFIX)
 	touch $@
 
-CLEAN_FILE += .BWToolKit
-CLEAN_PKG += BWToolKit
-DISTCLEAN_PKG += BWToolkit.zip
+CLEAN_FILE += .BGHUDAppKit
+CLEAN_PKG += BGHUDAppKit
+DISTCLEAN_PKG += BGHUDAppKit-$(BGHUDAPPKIT_VERSION).zip
 
 # ***************************************************************************
 # UPNP library

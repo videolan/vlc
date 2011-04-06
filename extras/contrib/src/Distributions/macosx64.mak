@@ -8,7 +8,7 @@ all: .freetype \
     .png .jpeg .tiff .gpg-error .gcrypt .gnutls .cddb .cdio .vcdimager \
     .gecko .mpcdec \
     .dca .tag .x264 .lua .zvbi .fontconfig .ncurses \
-    .schroedinger .libass .libupnp .kate .sqlite3 .BWToolKit .Sparkle
+    .schroedinger .libass .libupnp .kate .sqlite3 .BGHUDAppKit .Sparkle
 
 # .expat don't work with SDK yet
 # .glib .IDL .gecko are required to build the mozilla plugin

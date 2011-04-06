@@ -99,7 +99,7 @@ package-macosx:
 		exit 1 ; \
 	fi
 	mkdir tmp
-	(cd $(PREFIX); tar cf - Sparkle bin sbin include lib share/aclocal* share/autoconf* \
+	(cd $(PREFIX); tar cf - Sparkle BGHUDAppKit bin sbin include lib share/aclocal* share/autoconf* \
 		share/automake* share/gettext* share/libtool*) | (cd tmp; tar xf -)
 	./change_prefix.sh tmp $(PREFIX) @@CONTRIB_PREFIX@@
 	(cd tmp; tar cf - .) | bzip2 -c > contrib-macosx.tar.bz2
