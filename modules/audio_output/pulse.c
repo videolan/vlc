@@ -45,11 +45,14 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
+/* TODO: single static mainloop */
+
 struct aout_sys_t
 {
     pa_stream *stream; /**< PulseAudio playback stream object */
     pa_context *context; /**< PulseAudio connection context */
     pa_threaded_mainloop *mainloop; /**< PulseAudio event loop */
+    pa_cvolume cvolume; /**< PulseAudio sink input volume */
     //uint32_t byterate; /**< bytes per second */
 };
 
@@ -225,6 +228,37 @@ static void Play(aout_instance_t *aout)
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
 
+static int VolumeGet(aout_instance_t *aout, audio_volume_t *volp)
+{
+    aout_sys_t *sys = aout->output.p_sys;
+    pa_volume_t volume = pa_cvolume_avg(&sys->cvolume);
+
+    *volp = pa_sw_volume_to_linear(volume) * AOUT_VOLUME_DEFAULT;
+    return 0;
+}
+
+static int VolumeSet(aout_instance_t *aout, audio_volume_t vol)
+{
+    aout_sys_t *sys = aout->output.p_sys;
+    pa_threaded_mainloop *mainloop = sys->mainloop;
+    pa_operation *op;
+
+    uint32_t idx = pa_stream_get_index(sys->stream);
+    pa_volume_t volume = pa_sw_volume_from_linear(vol / (float)AOUT_VOLUME_DEFAULT);
+
+    pa_cvolume_set(&sys->cvolume, sys->cvolume.channels, volume);
+    assert(pa_cvolume_valid(&sys->cvolume));
+
+    pa_threaded_mainloop_lock(mainloop);
+    op = pa_context_set_sink_input_volume(sys->context, idx, &sys->cvolume,
+                                          NULL, NULL);
+    pa_threaded_mainloop_unlock(mainloop);
+
+    if (unlikely(op == NULL))
+        return -1;
+    pa_operation_unref(op);
+    return 0;
+}
 
 /*****************************************************************************
  * Open: open the audio device
@@ -337,6 +371,7 @@ static int Open(vlc_object_t *obj)
         msg_Dbg(aout, "using %s channel map", (name != NULL) ? name : "?");
     }
 
+    /* Stream parameters */
     const pa_stream_flags_t flags = PA_STREAM_INTERPOLATE_TIMING
                                   | PA_STREAM_AUTO_TIMING_UPDATE
                                   | PA_STREAM_ADJUST_LATENCY
@@ -359,6 +394,10 @@ static int Open(vlc_object_t *obj)
     sys->context = NULL;
     sys->stream = NULL;
     //sys->byterate = byterate;
+
+    /* Channel volume */
+    pa_cvolume_init(&sys->cvolume);
+    pa_cvolume_set(&sys->cvolume, ss.channels, PA_VOLUME_NORM);
 
     /* Allocate threaded main loop */
     pa_threaded_mainloop *mainloop = pa_threaded_mainloop_new();
@@ -401,7 +440,7 @@ static int Open(vlc_object_t *obj)
     pa_stream_set_state_callback(s, stream_state_cb, mainloop);
     pa_stream_set_moved_callback(s, stream_moved_cb, aout);
 
-    if (pa_stream_connect_playback(s, NULL, &attr, flags, NULL, NULL) < 0
+    if (pa_stream_connect_playback(s, NULL, &attr, flags, &sys->cvolume, NULL) < 0
      || stream_wait(mainloop, s)) {
         error(aout, "cannot connect stream", ctx);
         goto fail;
@@ -417,7 +456,8 @@ static int Open(vlc_object_t *obj)
     pa_threaded_mainloop_unlock(mainloop);
 
     aout->output.pf_play = Play;
-    aout_VolumeSoftInit(aout);
+    aout->output.pf_volume_get = VolumeGet;
+    aout->output.pf_volume_set = VolumeSet;
     return VLC_SUCCESS;
 
 fail:
