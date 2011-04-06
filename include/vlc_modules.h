@@ -50,7 +50,7 @@ int module_start(vlc_object_t *, module_t *);
 void module_stop(vlc_object_t *, module_t *);
 #define module_stop(o, m) module_stop(VLC_OBJECT(o),m)
 
-VLC_EXPORT( module_config_t *, module_config_get, ( const module_t *, unsigned * ) );
+VLC_EXPORT( module_config_t *, module_config_get, ( const module_t *, unsigned * ) LIBVLC_USED );
 VLC_EXPORT( void, module_config_free, ( module_config_t * ) );
 
 VLC_EXPORT( module_t *, module_hold, (module_t *module) );
