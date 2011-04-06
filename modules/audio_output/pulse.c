@@ -52,7 +52,8 @@ struct aout_sys_t
     pa_stream *stream; /**< PulseAudio playback stream object */
     pa_context *context; /**< PulseAudio connection context */
     pa_threaded_mainloop *mainloop; /**< PulseAudio event loop */
-    pa_cvolume cvolume; /**< PulseAudio sink input volume */
+    pa_volume_t base_volume; /**< 0dB reference volume */
+    pa_cvolume cvolume; /**< actual sink input volume */
     //uint32_t byterate; /**< bytes per second */
 };
 
@@ -88,6 +89,27 @@ static void error(aout_instance_t *aout, const char *msg, pa_context *context)
     msg_Err(aout, "%s: %s", msg, pa_strerror(pa_context_errno(context)));
 }
 
+/* Sink */
+static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
+                         void *userdata)
+{
+    aout_instance_t *aout = userdata;
+    aout_sys_t *sys = aout->output.p_sys;
+
+    if (eol)
+        return;
+    (void) c;
+
+    /* PulseAudio maps 100% to no SW amplification and maximum HW amplification.
+     * VLC maps 100% to no amplification at all. Thus we need to use the sink
+     * base_volume as a multiplier, if and only if flat volume is active. */
+    if (i->flags & PA_SINK_FLAT_VOLUME)
+        sys->base_volume = i->base_volume;
+    else
+        sys->base_volume = PA_VOLUME_NORM;
+    msg_Dbg(aout, "base volume: %f", pa_sw_volume_to_linear(sys->base_volume));
+}
+
 /* Stream helpers */
 static void stream_state_cb(pa_stream *s, void *userdata)
 {
@@ -105,11 +127,15 @@ static void stream_state_cb(pa_stream *s, void *userdata)
 
 static void stream_moved_cb(pa_stream *s, void *userdata)
 {
-    vlc_object_t *obj = userdata;
+    aout_instance_t *aout = userdata;
+    aout_sys_t *sys = aout->output.p_sys;
+    pa_operation *op;
+    uint32_t idx = pa_stream_get_device_index(s);
 
-    msg_Dbg(obj, "connected to device %s (%u)",
-            pa_stream_get_device_name(s),
-            pa_stream_get_device_index(s));
+    msg_Dbg(aout, "connected to device %s (%u)", pa_stream_get_device_name(s), idx);
+    op = pa_context_get_sink_info_by_index(sys->context, idx, sink_info_cb, aout);
+    if (likely(op != NULL))
+        pa_operation_unref(op);
 }
 
 static int stream_wait(pa_threaded_mainloop *mainloop, pa_stream *stream)
@@ -231,7 +257,7 @@ static void Play(aout_instance_t *aout)
 static int VolumeGet(aout_instance_t *aout, audio_volume_t *volp)
 {
     aout_sys_t *sys = aout->output.p_sys;
-    pa_volume_t volume = pa_cvolume_avg(&sys->cvolume);
+    pa_volume_t volume = pa_cvolume_max(&sys->cvolume);
 
     *volp = pa_sw_volume_to_linear(volume) * AOUT_VOLUME_DEFAULT;
     return 0;
@@ -245,13 +271,16 @@ static int VolumeSet(aout_instance_t *aout, audio_volume_t vol)
 
     uint32_t idx = pa_stream_get_index(sys->stream);
     pa_volume_t volume = pa_sw_volume_from_linear(vol / (float)AOUT_VOLUME_DEFAULT);
+    pa_cvolume cvolume;
 
+    /* TODO: do not ruin the channel balance (if set outside VLC) */
+    /* TODO: notify UI about volume changes by other PulseAudio clients */
     pa_cvolume_set(&sys->cvolume, sys->cvolume.channels, volume);
-    assert(pa_cvolume_valid(&sys->cvolume));
+    pa_sw_cvolume_multiply_scalar(&cvolume, &sys->cvolume, sys->base_volume);
+    assert(pa_cvolume_valid(&cvolume));
 
     pa_threaded_mainloop_lock(mainloop);
-    op = pa_context_set_sink_input_volume(sys->context, idx, &sys->cvolume,
-                                          NULL, NULL);
+    op = pa_context_set_sink_input_volume(sys->context, idx, &cvolume, NULL, NULL);
     pa_threaded_mainloop_unlock(mainloop);
 
     if (unlikely(op == NULL))
@@ -396,7 +425,7 @@ static int Open(vlc_object_t *obj)
     //sys->byterate = byterate;
 
     /* Channel volume */
-    pa_cvolume_init(&sys->cvolume);
+    sys->base_volume = PA_VOLUME_NORM;
     pa_cvolume_set(&sys->cvolume, ss.channels, PA_VOLUME_NORM);
 
     /* Allocate threaded main loop */
@@ -440,7 +469,7 @@ static int Open(vlc_object_t *obj)
     pa_stream_set_state_callback(s, stream_state_cb, mainloop);
     pa_stream_set_moved_callback(s, stream_moved_cb, aout);
 
-    if (pa_stream_connect_playback(s, NULL, &attr, flags, &sys->cvolume, NULL) < 0
+    if (pa_stream_connect_playback(s, NULL, &attr, flags, NULL, NULL) < 0
      || stream_wait(mainloop, s)) {
         error(aout, "cannot connect stream", ctx);
         goto fail;
