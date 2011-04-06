@@ -1377,13 +1377,13 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             if( module_is_main( p_parser) )
                 continue;
             unsigned int confsize, unused;
-            module_config_get( p_parser, &confsize );
+            module_config_t *p_config = module_config_get( p_parser, &confsize );
             for ( i = 0; i < confsize; i++ )
             {
-                module_config_t *p_config = module_config_get( p_parser, &unused ) + i;
+                module_config_t *p_item = p_config + i;
                 /* Hack: required subcategory is stored in i_min */
-                if( p_config->i_type == CONFIG_SUBCATEGORY &&
-                    p_config->value.i == p_item->min.i )
+                if( p_item->i_type == CONFIG_SUBCATEGORY &&
+                    p_item->value.i == p_item->min.i )
                 {
                     NSString *o_description = [[VLCMain sharedInstance]
                         localizedString: module_get_name( p_parser, TRUE )];
@@ -1394,6 +1394,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                     }
                 }
             }
+            module_config_free( p_config );
         }
     }
     module_list_free( p_list );
