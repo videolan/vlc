@@ -513,7 +513,6 @@ static void Close (vlc_object_t *obj)
     if (s != NULL) {
         pa_operation *op;
 
-        pa_stream_set_write_callback(s, NULL, NULL);
         op = pa_stream_flush(s, NULL, NULL);
         if (op != NULL)
             pa_operation_unref(op);
