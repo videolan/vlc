@@ -27,7 +27,11 @@
 #ifndef _SEARCHLINEEDIT_H_
 #define _SEARCHLINEEDIT_H_
 
+#ifdef __APPLE__
+#include "../qt4.hpp"
+#else
 #include "qt4.hpp"
+#endif
 #include <QLineEdit>
 
 #if HAS_QT47
