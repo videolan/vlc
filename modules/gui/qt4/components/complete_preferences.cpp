@@ -491,6 +491,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         layout->addWidget( box, i_line, 0, 1, -1 );
     }
 
+    module_config_free( p_config );
     module_release (p_module);
 
     scrolled_area->setSizePolicy( QSizePolicy::Preferred,QSizePolicy::Fixed );
