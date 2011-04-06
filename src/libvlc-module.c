@@ -1996,7 +1996,7 @@ vlc_module_begin ()
                                 SOUT_MUX_CACHING_LONGTEXT, true )
 
     set_section( N_("VLM"), NULL )
-    add_string( "vlm-conf", NULL, VLM_CONF_TEXT,
+    add_loadfile( "vlm-conf", NULL, VLM_CONF_TEXT,
                     VLM_CONF_LONGTEXT, true )
 
 
