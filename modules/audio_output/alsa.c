@@ -85,7 +85,7 @@ struct aout_sys_t
 /* Why not ? --Bozo */
 /* Right. --Meuuh */
 
-#define DEFAULT_ALSA_DEVICE N_("default")
+#define DEFAULT_ALSA_DEVICE "default"
 
 /*****************************************************************************
  * Local prototypes
