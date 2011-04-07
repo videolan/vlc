@@ -154,7 +154,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
                          NULL );
     }
-    var_SetBool( p_aout, "intf-change", true );
+    var_TriggerCallback( p_aout, "intf-change" );
 
     aout_FormatPrepare( &p_aout->output.output );
 

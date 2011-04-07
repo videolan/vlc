@@ -95,7 +95,7 @@ static int commitVolume (vlc_object_t *obj, aout_instance_t *aout,
         aout_unlock_mixer (aout);
 
         if (ret == 0)
-            var_SetBool (aout, "intf-change", true);
+            var_TriggerCallback (aout, "intf-change");
         aout_unlock_volume (aout);
         vlc_object_release (aout);
     }

@@ -473,7 +473,7 @@ static void Probe( aout_instance_t * p_aout )
     }
 
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
-    var_SetBool( p_aout, "intf-change", true );
+    var_TriggerCallback( p_aout, "intf-change" );
 }
 
 /*****************************************************************************

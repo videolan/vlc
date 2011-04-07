@@ -98,8 +98,7 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
     p_aout->output.b_error = 1;
     p_aout->output.b_starving = 1;
 
-    var_Create( p_aout, "intf-change", VLC_VAR_BOOL );
-    var_SetBool( p_aout, "intf-change", true );
+    var_Create( p_aout, "intf-change", VLC_VAR_VOID );
 
     vlc_object_set_destructor( p_aout, aout_Destructor );
 
