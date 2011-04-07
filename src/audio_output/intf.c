@@ -58,29 +58,6 @@ static aout_instance_t *findAout (vlc_object_t *obj)
 }
 #define findAout(o) findAout(VLC_OBJECT(o))
 
-/*
- * Volume management
- *
- * The hardware volume cannot be set if the output module gets deleted, so
- * we must take the mixer lock. The software volume cannot be set while the
- * mixer is running, so we need the mixer lock (too).
- *
- * Here is a schematic of the i_volume range :
- *
- * |------------------------------+---------------------------------------|
- * 0                           pi_soft                                   1024
- *
- * Between 0 and pi_soft, the volume is done in hardware by the output
- * module. Above, the output module will change p_aout->mixer.i_multiplier
- * (done in software). This scaling may result * in cropping errors and
- * should be avoided as much as possible.
- *
- * It is legal to have *pi_soft == 0, and do everything in software.
- * It is also legal to have *pi_soft == 1024, and completely avoid
- * software scaling. However, some streams (esp. A/52) are encoded with
- * a very low volume and users may complain.
- */
-
 enum {
     SET_MUTE=1,
     SET_VOLUME=2,
