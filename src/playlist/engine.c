@@ -432,7 +432,7 @@ static void VariablesInit( playlist_t *p_playlist )
     var_Create( p_playlist, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* Audio output parameters */
-    var_Create( p_playlist, "volume-muted", VLC_VAR_BOOL );
+    var_Create( p_playlist, "mute", VLC_VAR_BOOL );
     var_Create( p_playlist, "saved-volume", VLC_VAR_INTEGER );
     var_Create( p_playlist, "volume-change", VLC_VAR_VOID );
     /* FIXME: horrible hack for audio output interface code */

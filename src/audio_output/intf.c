@@ -71,7 +71,7 @@ static void prepareVolume (vlc_object_t *obj, aout_instance_t **aoutp,
     if (volp != NULL)
         *volp = config_GetInt (obj, "volume");
     if (mutep != NULL)
-        *mutep = var_GetBool (obj, "volume-muted");
+        *mutep = var_GetBool (obj, "mute");
 }
 
 /** Commit a volume change transaction. */
@@ -83,7 +83,7 @@ static int commitVolume (vlc_object_t *obj, aout_instance_t *aout,
     config_PutInt (obj, "volume", volume);
     if (mute)
         volume = AOUT_VOLUME_MIN;
-    var_SetBool (obj, "volume-muted", mute);
+    var_SetBool (obj, "mute", mute);
 
     if (aout != NULL)
     {
@@ -213,7 +213,7 @@ bool aout_IsMuted (vlc_object_t *obj)
     cancelVolume (obj, aout);
     return mute;
 #else
-    return var_GetBool (obj, "volume-muted");
+    return var_GetBool (obj, "mute");
 #endif
 }
 

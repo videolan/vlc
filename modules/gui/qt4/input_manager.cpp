@@ -957,7 +957,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     var_AddCallback( THEPL, "loop", LoopChanged, this );
 
     var_AddCallback( THEPL, "volume-change", VolumeChanged, this );
-    var_AddCallback( THEPL, "volume-muted", SoundMuteChanged, this );
+    var_AddCallback( THEPL, "mute", SoundMuteChanged, this );
 
     /* Warn our embedded IM about input changes */
     DCONNECT( this, inputChanged( input_thread_t * ),
@@ -988,7 +988,7 @@ MainInputManager::~MainInputManager()
     }
 
     var_DelCallback( THEPL, "volume-change", VolumeChanged, this );
-    var_DelCallback( THEPL, "volume-muted", SoundMuteChanged, this );
+    var_DelCallback( THEPL, "mute", SoundMuteChanged, this );
 
     var_DelCallback( THEPL, "activity", PLItemChanged, this );
     var_DelCallback( THEPL, "item-change", ItemChanged, im );
