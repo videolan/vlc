@@ -1078,7 +1078,8 @@ static int SessionsSetup( demux_t *p_demux )
                 sub->rtcpInstance()->setByeHandler( StreamClose, tk );
             }
 
-            if( tk->p_es || tk->b_quicktime || tk->b_muxed || tk->b_asf )
+            if( tk->p_es || tk->b_quicktime || ( tk->b_muxed && tk->p_out_muxed ) ||
+                ( tk->b_asf && p_sys->p_out_asf ) )
             {
                 /* Append */
                 p_sys->track = (live_track_t**)xrealloc( p_sys->track,
