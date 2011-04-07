@@ -76,16 +76,9 @@ static void prepareVolume (vlc_object_t *obj, aout_instance_t **aoutp,
 
 /** Commit a volume change transaction. */
 static int commitVolume (vlc_object_t *obj, aout_instance_t *aout,
-                         audio_volume_t *volp, bool mute)
+                         audio_volume_t volume, bool mute)
 {
     int ret = 0;
-
-    audio_volume_t volume = *volp;
-    if (volume < AOUT_VOLUME_MIN)
-        volume = AOUT_VOLUME_MIN;
-    if (volume > AOUT_VOLUME_MAX)
-        volume = AOUT_VOLUME_MAX;
-    *volp = volume;
 
     var_SetInteger (obj, "volume", volume);
     var_SetBool (obj, "mute", mute);
@@ -149,7 +142,7 @@ int aout_VolumeSet (vlc_object_t *obj, audio_volume_t volume)
     bool mute;
 
     prepareVolume (obj, &aout, NULL, &mute);
-    return commitVolume (obj, aout, &volume, mute);
+    return commitVolume (obj, aout, volume, mute);
 }
 
 #undef aout_VolumeUp
@@ -161,13 +154,18 @@ int aout_VolumeUp (vlc_object_t *obj, int steps, audio_volume_t *volp)
 {
     aout_instance_t *aout;
     int ret;
-    int stepsize = var_InheritInteger (obj, "volume-step");
-    audio_volume_t volume;
+    int volume;
     bool mute;
 
+    steps *= var_InheritInteger (obj, "volume-step");
+
     prepareVolume (obj, &aout, &volume, &mute);
-    volume += stepsize * steps;
-    ret = commitVolume (obj, aout, &volume, mute);
+    volume += steps;
+    if (volume < AOUT_VOLUME_MIN)
+        volume = AOUT_VOLUME_MIN;
+    if (volume > AOUT_VOLUME_MAX)
+        volume = AOUT_VOLUME_MAX;
+    ret = commitVolume (obj, aout, volume, mute);
     if (volp != NULL)
         *volp = volume;
     return ret;
@@ -195,7 +193,7 @@ int aout_ToggleMute (vlc_object_t *obj, audio_volume_t *volp)
 
     prepareVolume (obj, &aout, &volume, &mute);
     mute = !mute;
-    ret = commitVolume (obj, aout, &volume, mute);
+    ret = commitVolume (obj, aout, volume, mute);
     if (volp != NULL)
         *volp = mute ? AOUT_VOLUME_MIN : volume;
     return ret;
@@ -228,7 +226,7 @@ int aout_SetMute (vlc_object_t *obj, audio_volume_t *volp, bool mute)
     audio_volume_t volume;
 
     prepareVolume (obj, &aout, &volume, NULL);
-    ret = commitVolume (obj, aout, &volume, mute);
+    ret = commitVolume (obj, aout, volume, mute);
     if (volp != NULL)
         *volp = mute ? AOUT_VOLUME_MIN : volume;
     return ret;
