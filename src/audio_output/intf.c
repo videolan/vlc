@@ -69,7 +69,7 @@ static void prepareVolume (vlc_object_t *obj, aout_instance_t **aoutp,
     if (aout != NULL)
         aout_lock_volume (aout);
     if (volp != NULL)
-        *volp = config_GetInt (obj, "volume");
+        *volp = var_GetInteger (obj, "volume");
     if (mutep != NULL)
         *mutep = var_GetBool (obj, "mute");
 }
@@ -80,7 +80,7 @@ static int commitVolume (vlc_object_t *obj, aout_instance_t *aout,
 {
     int ret = 0;
 
-    config_PutInt (obj, "volume", volume);
+    var_SetInteger (obj, "volume", volume);
     if (mute)
         volume = AOUT_VOLUME_MIN;
     var_SetBool (obj, "mute", mute);
@@ -99,10 +99,6 @@ static int commitVolume (vlc_object_t *obj, aout_instance_t *aout,
         aout_unlock_volume (aout);
         vlc_object_release (aout);
     }
-
-    /* trigger callbacks */
-    var_TriggerCallback (obj, "volume-change");
-
     return ret;
 }
 
@@ -133,7 +129,7 @@ audio_volume_t aout_VolumeGet (vlc_object_t *obj)
     cancelVolume (obj, aout);
     return 0;
 #else
-    return config_GetInt (obj, "volume");
+    return var_GetInteger (obj, "volume");
 #endif
 }
 
@@ -245,7 +241,7 @@ void aout_VolumeSoftInit( aout_instance_t * p_aout )
 
     p_aout->output.pf_volume_set = aout_VolumeSoftSet;
 
-    i_volume = config_GetInt( p_aout, "volume" );
+    i_volume = var_InheritInteger( p_aout, "volume" );
     if ( i_volume < AOUT_VOLUME_MIN )
     {
         i_volume = AOUT_VOLUME_DEFAULT;

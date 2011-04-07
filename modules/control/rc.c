@@ -462,7 +462,7 @@ static void Run( intf_thread_t *p_intf )
 
     /* status callbacks */
     /* Listen to audio volume updates */
-    var_AddCallback( p_playlist, "volume-change", VolumeChanged, p_intf );
+    var_AddCallback( p_playlist, "volume", VolumeChanged, p_intf );
 
 #ifdef WIN32
     /* Get the file descriptor of the console input */
@@ -792,7 +792,7 @@ static void Run( intf_thread_t *p_intf )
         vlc_object_release( p_input );
     }
 
-    var_DelCallback( p_playlist, "volume-change", VolumeChanged, p_intf );
+    var_DelCallback( p_playlist, "volume", VolumeChanged, p_intf );
     vlc_restorecancel( canc );
 }
 
@@ -903,8 +903,7 @@ static int VolumeChanged( vlc_object_t *p_this, char const *psz_cmd,
     intf_thread_t *p_intf = (intf_thread_t*)p_data;
 
     vlc_mutex_lock( &p_intf->p_sys->status_lock );
-    msg_rc( STATUS_CHANGE "( audio volume: %d )",
-            (int)config_GetInt( p_this, "volume") );
+    msg_rc( STATUS_CHANGE "( audio volume: %d )", newval.i_int );
     vlc_mutex_unlock( &p_intf->p_sys->status_lock );
     return VLC_SUCCESS;
 }

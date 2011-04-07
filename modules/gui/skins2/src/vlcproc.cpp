@@ -151,7 +151,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
 #define ADD_CALLBACK( p_object, var ) \
     var_AddCallback( p_object, var, onGenericCallback, this );
 
-    ADD_CALLBACK( pIntf->p_sys->p_playlist, "volume-change" )
+    ADD_CALLBACK( pIntf->p_sys->p_playlist, "volume" )
     ADD_CALLBACK( pIntf->p_libvlc, "intf-show" )
 
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "item-current" )
@@ -203,7 +203,7 @@ VlcProc::~VlcProc()
 
     interaction_Unregister( getIntf() );
 
-    var_DelCallback( getIntf()->p_sys->p_playlist, "volume-change",
+    var_DelCallback( getIntf()->p_sys->p_playlist, "volume",
                      onGenericCallback, this );
     var_DelCallback( getIntf()->p_libvlc, "intf-show",
                      onGenericCallback, this );
@@ -385,7 +385,7 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     }
 
     ADD_CALLBACK_ENTRY( "item-current", on_item_current_changed, false )
-    ADD_CALLBACK_ENTRY( "volume-change", on_volume_changed, true )
+    ADD_CALLBACK_ENTRY( "volume", on_volume_changed, true )
 
     ADD_CALLBACK_ENTRY( "bit-rate", on_bit_rate_changed, false )
     ADD_CALLBACK_ENTRY( "sample-rate", on_sample_rate_changed, false )
