@@ -118,7 +118,6 @@ int aout_MixerNew( aout_instance_t * p_aout );
 void aout_MixerDelete( aout_instance_t * p_aout );
 void aout_MixerRun( aout_instance_t * p_aout );
 int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier );
-int aout_MixerMultiplierGet( aout_instance_t * p_aout, float * pf_multiplier );
 
 /* From output.c : */
 int aout_OutputNew( aout_instance_t * p_aout,

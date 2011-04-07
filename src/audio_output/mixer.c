@@ -394,16 +394,3 @@ int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier )
 
     return 0;
 }
-
-/*****************************************************************************
- * aout_MixerMultiplierGet: get p_aout->mixer.f_multiplier
- *****************************************************************************
- * Please note that we assume that you own the mixer lock when entering this
- * function. This function returns -1 on error.
- *****************************************************************************/
-int aout_MixerMultiplierGet( aout_instance_t * p_aout, float * pf_multiplier )
-{
-    *pf_multiplier = p_aout->mixer_multiplier;
-    return 0;
-}
-
