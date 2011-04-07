@@ -1032,6 +1032,104 @@ static void Direct3DDestroyScene(vout_display_t *vd)
     msg_Dbg(vd, "Direct3D scene released successfully");
 }
 
+static int Direct3DSetupVertices(vout_display_t *vd,
+                                 LPDIRECT3DVERTEXBUFFER9 d3dvtc,
+                                 float f_x, float f_y,
+                                 float f_width, float f_height)
+{
+    HRESULT hr;
+
+    CUSTOMVERTEX *vertices;
+    hr = IDirect3DVertexBuffer9_Lock(d3dvtc, 0, 0, (void **)&vertices, D3DLOCK_DISCARD);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        return -1;
+    }
+
+    /* -0.5f is a "feature" of DirectX and it seems to apply to Direct3d also */
+    /* http://www.sjbrown.co.uk/2003/05/01/fix-directx-rasterisation/ */
+    vertices[0].x       = f_x - 0.5f;       // left
+    vertices[0].y       = f_y - 0.5f;       // top
+    vertices[0].z       = 0.0f;
+    vertices[0].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
+    vertices[0].rhw     = 1.0f;
+    vertices[0].tu      = 0.0f;
+    vertices[0].tv      = 0.0f;
+
+    vertices[1].x       = f_x + f_width - 0.5f;    // right
+    vertices[1].y       = f_y - 0.5f;              // top
+    vertices[1].z       = 0.0f;
+    vertices[1].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
+    vertices[1].rhw     = 1.0f;
+    vertices[1].tu      = 1.0f;
+    vertices[1].tv      = 0.0f;
+
+    vertices[2].x       = f_x + f_width - 0.5f;    // right
+    vertices[2].y       = f_y + f_height - 0.5f;   // bottom
+    vertices[2].z       = 0.0f;
+    vertices[2].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
+    vertices[2].rhw     = 1.0f;
+    vertices[2].tu      = 1.0f;
+    vertices[2].tv      = 1.0f;
+
+    vertices[3].x       = f_x - 0.5f;       // left
+    vertices[3].y       = f_y + f_height - 0.5f;   // bottom
+    vertices[3].z       = 0.0f;
+    vertices[3].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
+    vertices[3].rhw     = 1.0f;
+    vertices[3].tu      = 0.0f;
+    vertices[3].tv      = 1.0f;
+
+    hr= IDirect3DVertexBuffer9_Unlock(d3dvtc);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        return -1;
+    }
+    return 0;
+}
+
+static int Direct3DRenderTexture(vout_display_t *vd,
+                                 LPDIRECT3DVERTEXBUFFER9 d3dvtc,
+                                 LPDIRECT3DTEXTURE9 d3dtex)
+{
+    HRESULT hr;
+
+    LPDIRECT3DDEVICE9 d3ddev = vd->sys->d3ddev;
+
+    // Setup our texture. Using textures introduces the texture stage states,
+    // which govern how textures get blended together (in the case of multiple
+    // textures) and lighting information. In this case, we are modulating
+    // (blending) our texture with the diffuse color of the vertices.
+    hr = IDirect3DDevice9_SetTexture(d3ddev, 0, (LPDIRECT3DBASETEXTURE9)d3dtex);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        return -1;
+    }
+
+    // Render the vertex buffer contents
+    hr = IDirect3DDevice9_SetStreamSource(d3ddev, 0, d3dvtc, 0, sizeof(CUSTOMVERTEX));
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        return -1;
+    }
+
+    // we use FVF instead of vertex shader
+    hr = IDirect3DDevice9_SetFVF(d3ddev, D3DFVF_CUSTOMVERTEX);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        return -1;
+    }
+
+    // draw rectangle
+    hr = IDirect3DDevice9_DrawPrimitive(d3ddev, D3DPT_TRIANGLEFAN, 0, 2);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        return -1;
+    }
+    return 0;
+}
+
+
 /**
  * It copies picture surface into a texture and renders into a scene.
  *
@@ -1091,58 +1189,6 @@ static void Direct3DRenderScene(vout_display_t *vd, LPDIRECT3DSURFACE9 surface)
         return;
     }
 
-    /* Update the vertex buffer */
-    CUSTOMVERTEX *vertices;
-    hr = IDirect3DVertexBuffer9_Lock(d3dvtc, 0, 0, (void **)&vertices, D3DLOCK_DISCARD);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
-        return;
-    }
-
-    /* Setup vertices */
-    const float f_width  = vd->sys->d3dpp.BackBufferWidth;
-    const float f_height = vd->sys->d3dpp.BackBufferHeight;
-
-    /* -0.5f is a "feature" of DirectX and it seems to apply to Direct3d also */
-    /* http://www.sjbrown.co.uk/2003/05/01/fix-directx-rasterisation/ */
-    vertices[0].x       = -0.5f;       // left
-    vertices[0].y       = -0.5f;       // top
-    vertices[0].z       = 0.0f;
-    vertices[0].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
-    vertices[0].rhw     = 1.0f;
-    vertices[0].tu      = 0.0f;
-    vertices[0].tv      = 0.0f;
-
-    vertices[1].x       = f_width - 0.5f;    // right
-    vertices[1].y       = -0.5f;       // top
-    vertices[1].z       = 0.0f;
-    vertices[1].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
-    vertices[1].rhw     = 1.0f;
-    vertices[1].tu      = 1.0f;
-    vertices[1].tv      = 0.0f;
-
-    vertices[2].x       = f_width - 0.5f;    // right
-    vertices[2].y       = f_height - 0.5f;   // bottom
-    vertices[2].z       = 0.0f;
-    vertices[2].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
-    vertices[2].rhw     = 1.0f;
-    vertices[2].tu      = 1.0f;
-    vertices[2].tv      = 1.0f;
-
-    vertices[3].x       = -0.5f;       // left
-    vertices[3].y       = f_height - 0.5f;   // bottom
-    vertices[3].z       = 0.0f;
-    vertices[3].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
-    vertices[3].rhw     = 1.0f;
-    vertices[3].tu      = 0.0f;
-    vertices[3].tv      = 1.0f;
-
-    hr= IDirect3DVertexBuffer9_Unlock(d3dvtc);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
-        return;
-    }
-
     // Begin the scene
     hr = IDirect3DDevice9_BeginScene(d3ddev);
     if (FAILED(hr)) {
@@ -1150,37 +1196,17 @@ static void Direct3DRenderScene(vout_display_t *vd, LPDIRECT3DSURFACE9 surface)
         return;
     }
 
-    // Setup our texture. Using textures introduces the texture stage states,
-    // which govern how textures get blended together (in the case of multiple
-    // textures) and lighting information. In this case, we are modulating
-    // (blending) our texture with the diffuse color of the vertices.
-    hr = IDirect3DDevice9_SetTexture(d3ddev, 0, (LPDIRECT3DBASETEXTURE9)d3dtex);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+    /* Update the vertex buffer */
+    if (Direct3DSetupVertices(vd, d3dvtc,
+                              0, 0,
+                              vd->sys->d3dpp.BackBufferWidth,
+                              vd->sys->d3dpp.BackBufferHeight)) {
         IDirect3DDevice9_EndScene(d3ddev);
         return;
     }
 
-    // Render the vertex buffer contents
-    hr = IDirect3DDevice9_SetStreamSource(d3ddev, 0, d3dvtc, 0, sizeof(CUSTOMVERTEX));
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
-        IDirect3DDevice9_EndScene(d3ddev);
-        return;
-    }
-
-    // we use FVF instead of vertex shader
-    hr = IDirect3DDevice9_SetFVF(d3ddev, D3DFVF_CUSTOMVERTEX);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
-        IDirect3DDevice9_EndScene(d3ddev);
-        return;
-    }
-
-    // draw rectangle
-    hr = IDirect3DDevice9_DrawPrimitive(d3ddev, D3DPT_TRIANGLEFAN, 0, 2);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+    /* Render the texture */
+    if (Direct3DRenderTexture(vd, d3dvtc, d3dtex)) {
         IDirect3DDevice9_EndScene(d3ddev);
         return;
     }
