@@ -82,12 +82,7 @@ aout_input_t *aout_DecNew( aout_instance_t *p_aout,
     /* We can only be called by the decoder, so no need to lock
      * p_input->lock. */
     aout_lock_mixer( p_aout );
-
-    if ( p_aout->i_nb_inputs >= AOUT_MAX_INPUTS )
-    {
-        msg_Err( p_aout, "too many inputs already (%d)", p_aout->i_nb_inputs );
-        goto error;
-    }
+    assert( p_aout->i_nb_inputs == 0 );
 
     p_input = calloc( 1, sizeof(aout_input_t));
     if( !p_input )
@@ -194,9 +189,8 @@ int aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
     }
 
     /* Remove the input from the list. */
-    memmove( &p_aout->pp_inputs[i_input], &p_aout->pp_inputs[i_input + 1],
-             (AOUT_MAX_INPUTS - i_input - 1) * sizeof(aout_input_t *) );
     p_aout->i_nb_inputs--;
+    assert( p_aout->i_nb_inputs == 0 );
 
     aout_InputDelete( p_aout, p_input );
 

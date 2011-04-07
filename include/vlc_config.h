@@ -92,9 +92,6 @@
 /* Max number of pre-filters per input, and max number of post-filters */
 #define AOUT_MAX_FILTERS                10
 
-/* Max number of inputs */
-#define AOUT_MAX_INPUTS                 5
-
 /* Buffers which arrive in advance of more than AOUT_MAX_ADVANCE_TIME
  * will be considered as bogus and be trashed */
 #define AOUT_MAX_ADVANCE_TIME           (DEFAULT_PTS_DELAY * 5)
