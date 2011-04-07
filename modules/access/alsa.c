@@ -335,32 +335,10 @@ static int Demux( demux_t *p_demux )
             p_block = NULL;
         }
 
-        /* Wait for data */
-        int i_wait = snd_pcm_wait( p_sys->p_alsa_pcm, 10 ); /* See poll() comment in oss.c */
-        switch( i_wait )
-        {
-            case 1:
-            {
-                p_block = GrabAudio( p_demux );
-                if( p_block )
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
-            }
+        p_block = GrabAudio( p_demux );
+        if( p_block )
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
 
-            /* FIXME: this is a copy paste from below. Shouldn't be needed
-             * twice. */
-            case -EPIPE:
-                /* xrun */
-                snd_pcm_prepare( p_sys->p_alsa_pcm );
-                break;
-            case -ESTRPIPE:
-            {
-                /* suspend */
-                int i_resume = snd_pcm_resume( p_sys->p_alsa_pcm );
-                if( i_resume < 0 && i_resume != -EAGAIN ) snd_pcm_prepare( p_sys->p_alsa_pcm );
-                break;
-            }
-            /* </FIXME> */
-        }
     } while( p_block && p_sys->i_next_demux_date > 0 &&
              p_block->i_pts < p_sys->i_next_demux_date );
 
@@ -393,22 +371,27 @@ static block_t* GrabAudio( demux_t *p_demux )
 
     /* ALSA */
     i_read = snd_pcm_readi( p_sys->p_alsa_pcm, p_block->p_buffer, p_sys->i_alsa_chunk_size );
+    if( i_read == -EAGAIN )
+    {
+        snd_pcm_wait( p_sys->p_alsa_pcm, 10 ); /* See poll() comment in oss.c */
+        return NULL;
+    }
+
     if( i_read <= 0 )
     {
-        int i_resume;
         switch( i_read )
         {
-            case -EAGAIN:
-                break;
             case -EPIPE:
                 /* xrun */
                 snd_pcm_prepare( p_sys->p_alsa_pcm );
                 break;
             case -ESTRPIPE:
+            {
                 /* suspend */
-                i_resume = snd_pcm_resume( p_sys->p_alsa_pcm );
+                int i_resume = snd_pcm_resume( p_sys->p_alsa_pcm );
                 if( i_resume < 0 && i_resume != -EAGAIN ) snd_pcm_prepare( p_sys->p_alsa_pcm );
                 break;
+            }
             default:
                 msg_Err( p_demux, "Failed to read alsa frame (%s)", snd_strerror( i_read ) );
                 return 0;
