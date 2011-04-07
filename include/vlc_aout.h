@@ -201,10 +201,6 @@ typedef struct aout_output_t
     int                  (* pf_volume_set )( aout_instance_t *, audio_volume_t, bool );
     int                     i_nb_samples;
 
-    /* Current volume for the output - it's just a placeholder, the plug-in
-     * may or may not use it. */
-    audio_volume_t          i_volume;
-
     /* If b_error == 1, there is no audio output pipeline. */
     bool              b_error;
 } aout_output_t;
