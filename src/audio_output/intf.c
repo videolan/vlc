@@ -185,8 +185,6 @@ int aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
     int i_result = 0;
     aout_instance_t * p_aout = findAout( p_object );
 
-    if ( pi_volume == NULL ) return -1;
-
     if ( p_aout == NULL )
     {
         *pi_volume = (audio_volume_t)config_GetInt( p_object, "volume" );
