@@ -140,10 +140,6 @@ void aout_FifoDestroy( aout_instance_t * p_aout, aout_fifo_t * p_fifo );
 void aout_FormatsPrint( aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format1, const audio_sample_format_t * p_format2 );
 bool aout_ChangeFilterString( vlc_object_t *, aout_instance_t *, const char *psz_variable, const char *psz_name, bool b_add );
 
-/* From intf.c :*/
-int aout_VolumeSoftSet( aout_instance_t *, audio_volume_t );
-int aout_VolumeNoneSet( aout_instance_t *, audio_volume_t );
-
 /* From dec.c */
 aout_input_t *aout_DecNew( aout_instance_t *, audio_sample_format_t *,
                    const audio_replay_gain_t *, const aout_request_vout_t * );

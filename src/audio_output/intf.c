@@ -81,8 +81,6 @@ static int commitVolume (vlc_object_t *obj, aout_instance_t *aout,
     int ret = 0;
 
     var_SetInteger (obj, "volume", volume);
-    if (mute)
-        volume = AOUT_VOLUME_MIN;
     var_SetBool (obj, "mute", mute);
 
     if (aout != NULL)
@@ -90,7 +88,7 @@ static int commitVolume (vlc_object_t *obj, aout_instance_t *aout,
         aout_lock_mixer (aout);
         aout_lock_input_fifos (aout);
         if (aout->p_mixer != NULL)
-            ret = aout->output.pf_volume_set (aout, volume);
+            ret = aout->output.pf_volume_set (aout, volume, mute);
         aout_unlock_input_fifos (aout);
         aout_unlock_mixer (aout);
 
@@ -229,55 +227,46 @@ int aout_SetMute (vlc_object_t *obj, audio_volume_t *volp, bool mute)
     return ret;
 }
 
+
 /*
  * The next functions are not supposed to be called by the interface, but
  * are placeholders for software-only scaling.
  */
-
-/* Meant to be called by the output plug-in's Open(). */
-void aout_VolumeSoftInit( aout_instance_t * p_aout )
+static int aout_VolumeSoftSet (aout_instance_t *aout, audio_volume_t volume,
+                               bool mute)
 {
-    int i_volume;
-
-    p_aout->output.pf_volume_set = aout_VolumeSoftSet;
-
-    i_volume = var_InheritInteger( p_aout, "volume" );
-    if ( i_volume < AOUT_VOLUME_MIN )
-    {
-        i_volume = AOUT_VOLUME_DEFAULT;
-    }
-    else if ( i_volume > AOUT_VOLUME_MAX )
-    {
-        i_volume = AOUT_VOLUME_MAX;
-    }
-
-    aout_VolumeSoftSet( p_aout, (audio_volume_t)i_volume );
-}
-
-/* Placeholder for pf_volume_set(). */
-int aout_VolumeSoftSet( aout_instance_t * p_aout, audio_volume_t i_volume )
-{
-    aout_MixerMultiplierSet( p_aout, (float)i_volume / AOUT_VOLUME_DEFAULT );
-    p_aout->output.i_volume = i_volume;
+    float f = mute ? 0. : (volume / (float)AOUT_VOLUME_DEFAULT);
+    aout_MixerMultiplierSet (aout, f);
+    aout->output.i_volume = volume;
     return 0;
 }
+
+/* Meant to be called by the output plug-in's Open(). */
+void aout_VolumeSoftInit (aout_instance_t *aout)
+{
+    audio_volume_t volume = var_InheritInteger (aout, "volume");
+    bool mute = var_InheritBool (aout, "mute");
+
+    aout->output.pf_volume_set = aout_VolumeSoftSet;
+    aout_VolumeSoftSet (aout, volume, mute);
+}
+
 
 /*
  * The next functions are not supposed to be called by the interface, but
  * are placeholders for unsupported scaling.
  */
+static int aout_VolumeNoneSet (aout_instance_t *aout, audio_volume_t volume,
+                               bool mute)
+{
+    (void)aout; (void)volume; (void)mute;
+    return -1;
+}
 
 /* Meant to be called by the output plug-in's Open(). */
 void aout_VolumeNoneInit( aout_instance_t * p_aout )
 {
     p_aout->output.pf_volume_set = aout_VolumeNoneSet;
-}
-
-/* Placeholder for pf_volume_set(). */
-int aout_VolumeNoneSet( aout_instance_t * p_aout, audio_volume_t i_volume )
-{
-    (void)p_aout; (void)i_volume;
-    return -1;
 }
 
 

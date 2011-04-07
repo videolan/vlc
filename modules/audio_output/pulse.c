@@ -258,7 +258,7 @@ static void Play(aout_instance_t *aout)
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
 
-static int VolumeSet(aout_instance_t *aout, audio_volume_t vol)
+static int VolumeSet(aout_instance_t *aout, audio_volume_t vol, bool mute)
 {
     aout_sys_t *sys = aout->output.p_sys;
     pa_threaded_mainloop *mainloop = sys->mainloop;
@@ -278,8 +278,7 @@ static int VolumeSet(aout_instance_t *aout, audio_volume_t vol)
     op = pa_context_set_sink_input_volume(sys->context, idx, &cvolume, NULL, NULL);
     if (likely(op != NULL))
         pa_operation_unref(op);
-    op = pa_context_set_sink_input_mute(sys->context, idx, volume == PA_VOLUME_MUTED,
-                                        NULL, NULL);
+    op = pa_context_set_sink_input_mute(sys->context, idx, mute, NULL, NULL);
     if (likely(op != NULL))
         pa_operation_unref(op);
     pa_threaded_mainloop_unlock(mainloop);

@@ -1019,8 +1019,12 @@ static void* WaveOutThread( vlc_object_t *p_this )
     return NULL;
 }
 
-static int VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume )
+static int VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume,
+                      bool mute )
 {
+    if( mute )
+        i_volume = AOUT_VOLUME_MIN;
+
     unsigned long i_waveout_vol = i_volume * 0xFFFF * 2 / AOUT_VOLUME_MAX;
     i_waveout_vol |= (i_waveout_vol << 16);
 
@@ -1029,8 +1033,6 @@ static int VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 #else
     waveOutSetVolume( p_aout->output.p_sys->h_waveout, i_waveout_vol );
 #endif
-
-    p_aout->output.i_volume = i_volume;
     return 0;
 }
 
