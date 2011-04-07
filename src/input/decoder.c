@@ -2275,8 +2275,12 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         p_aout = p_owner->p_aout;
         if( !p_aout )
             p_aout = input_resource_RequestAout( p_owner->p_resource, NULL );
-        p_aout_input = aout_DecNew( p_dec, &p_aout,
-                                    &format, &p_dec->fmt_out.audio_replay_gain, &request_vout );
+        if( p_aout )
+            p_aout_input = aout_DecNew( p_aout, &format,
+                                        &p_dec->fmt_out.audio_replay_gain,
+                                        &request_vout );
+        else
+            p_aout_input = NULL;
 
         vlc_mutex_lock( &p_owner->lock );
 

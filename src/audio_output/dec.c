@@ -37,13 +37,14 @@
 
 #include "aout_internal.h"
 
-/*****************************************************************************
- * aout_DecNew : create a decoder
- *****************************************************************************/
-static aout_input_t * DecNew( aout_instance_t * p_aout,
-                              audio_sample_format_t *p_format,
-                              const audio_replay_gain_t *p_replay_gain,
-                              const aout_request_vout_t *p_request_vout )
+#undef aout_DecNew
+/**
+ * Creates an audio output
+ */
+aout_input_t *aout_DecNew( aout_instance_t *p_aout,
+                           audio_sample_format_t *p_format,
+                           const audio_replay_gain_t *p_replay_gain,
+                           const aout_request_vout_t *p_request_vout )
 {
     aout_input_t * p_input;
 
@@ -164,29 +165,6 @@ static aout_input_t * DecNew( aout_instance_t * p_aout,
 error:
     aout_unlock_mixer( p_aout );
     return NULL;
-}
-
-aout_input_t * __aout_DecNew( vlc_object_t * p_this,
-                              aout_instance_t ** pp_aout,
-                              audio_sample_format_t * p_format,
-                              const audio_replay_gain_t *p_replay_gain,
-                              const aout_request_vout_t *p_request_video )
-{
-    aout_instance_t *p_aout = *pp_aout;
-    if ( p_aout == NULL )
-    {
-        msg_Dbg( p_this, "no aout present, spawning one" );
-        p_aout = aout_New( p_this );
-
-        /* Everything failed, I'm a loser, I just wanna die */
-        if( p_aout == NULL )
-            return NULL;
-
-        vlc_object_attach( p_aout, p_this );
-        *pp_aout = p_aout;
-    }
-
-    return DecNew( p_aout, p_format, p_replay_gain, p_request_video );
 }
 
 /*****************************************************************************
