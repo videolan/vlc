@@ -942,7 +942,10 @@ static void GetDevices (vlc_object_t *obj, module_config_t *item)
     {
         void *hint = hints[i];
         char *name = snd_device_name_get_hint(hint, "NAME");
-        char *desc = snd_device_name_get_hint (hint, "DESC");
+        char *desc = snd_device_name_get_hint(hint, "DESC");
+
+        for (char *lf = strchr(desc, '\n'); lf; lf = strchr(lf, '\n'))
+             *lf = ' ';
 
         if (likely(desc != NULL && name != NULL))
             msg_Dbg(obj, " %s (%s)", desc, name);
