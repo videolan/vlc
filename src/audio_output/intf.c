@@ -243,7 +243,6 @@ void aout_VolumeSoftInit( aout_instance_t * p_aout )
 {
     int i_volume;
 
-    p_aout->output.pf_volume_get = aout_VolumeSoftGet;
     p_aout->output.pf_volume_set = aout_VolumeSoftSet;
 
     i_volume = config_GetInt( p_aout, "volume" );
@@ -258,14 +257,6 @@ void aout_VolumeSoftInit( aout_instance_t * p_aout )
 
     aout_VolumeSoftSet( p_aout, (audio_volume_t)i_volume );
 }
-
-/* Placeholder for pf_volume_get(). */
-int aout_VolumeSoftGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
-{
-    *pi_volume = p_aout->output.i_volume;
-    return 0;
-}
-
 
 /* Placeholder for pf_volume_set(). */
 int aout_VolumeSoftSet( aout_instance_t * p_aout, audio_volume_t i_volume )
@@ -283,15 +274,7 @@ int aout_VolumeSoftSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 /* Meant to be called by the output plug-in's Open(). */
 void aout_VolumeNoneInit( aout_instance_t * p_aout )
 {
-    p_aout->output.pf_volume_get = aout_VolumeNoneGet;
     p_aout->output.pf_volume_set = aout_VolumeNoneSet;
-}
-
-/* Placeholder for pf_volume_get(). */
-int aout_VolumeNoneGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
-{
-    (void)p_aout; (void)pi_volume;
-    return -1;
 }
 
 /* Placeholder for pf_volume_set(). */

@@ -258,15 +258,6 @@ static void Play(aout_instance_t *aout)
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
 
-static int VolumeGet(aout_instance_t *aout, audio_volume_t *volp)
-{
-    aout_sys_t *sys = aout->output.p_sys;
-    pa_volume_t volume = pa_cvolume_max(&sys->cvolume);
-
-    *volp = pa_sw_volume_to_linear(volume) * AOUT_VOLUME_DEFAULT;
-    return 0;
-}
-
 static int VolumeSet(aout_instance_t *aout, audio_volume_t vol)
 {
     aout_sys_t *sys = aout->output.p_sys;
@@ -492,7 +483,6 @@ static int Open(vlc_object_t *obj)
     pa_threaded_mainloop_unlock(mainloop);
 
     aout->output.pf_play = Play;
-    aout->output.pf_volume_get = VolumeGet;
     aout->output.pf_volume_set = VolumeSet;
     return VLC_SUCCESS;
 

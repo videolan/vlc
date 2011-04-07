@@ -68,7 +68,6 @@ static int PlayWaveOut   ( aout_instance_t *, HWAVEOUT, WAVEHDR *,
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD, DWORD, DWORD );
 static void* WaveOutThread( vlc_object_t * );
 
-static int VolumeGet( aout_instance_t *, audio_volume_t * );
 static int VolumeSet( aout_instance_t *, audio_volume_t );
 
 static int WaveOutClearDoneBuffers(aout_sys_t *p_sys);
@@ -305,7 +304,6 @@ static int Open( vlc_object_t *p_this )
             if( waveOutGetVolume( p_aout->output.p_sys->h_waveout, &i_dummy )
                 == MMSYSERR_NOERROR )
             {
-                p_aout->output.pf_volume_get = VolumeGet;
                 p_aout->output.pf_volume_set = VolumeSet;
             }
         }
@@ -1019,22 +1017,6 @@ static void* WaveOutThread( vlc_object_t *p_this )
 #undef waveout_warn
     vlc_restorecancel (canc);
     return NULL;
-}
-
-static int VolumeGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
-{
-    DWORD i_waveout_vol;
-
-#ifdef UNDER_CE
-    waveOutGetVolume( 0, &i_waveout_vol );
-#else
-    waveOutGetVolume( p_aout->output.p_sys->h_waveout, &i_waveout_vol );
-#endif
-
-    i_waveout_vol &= 0xFFFF;
-    *pi_volume = p_aout->output.i_volume =
-        (i_waveout_vol * AOUT_VOLUME_MAX + 0xFFFF /*rounding*/) / 2 / 0xFFFF;
-    return 0;
 }
 
 static int VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume )
