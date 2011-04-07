@@ -312,8 +312,8 @@ VLC_EXPORT( aout_buffer_t *, aout_FifoPop, ( aout_instance_t * p_aout, aout_fifo
 /* From intf.c : */
 VLC_EXPORT( void, aout_VolumeSoftInit, ( aout_instance_t * ) );
 VLC_EXPORT( void, aout_VolumeNoneInit, ( aout_instance_t * ) );
-VLC_EXPORT( int, aout_VolumeGet, ( vlc_object_t *, audio_volume_t * ) );
-#define aout_VolumeGet(a, b) aout_VolumeGet(VLC_OBJECT(a), b)
+VLC_EXPORT( audio_volume_t, aout_VolumeGet, ( vlc_object_t * ) );
+#define aout_VolumeGet(a) aout_VolumeGet(VLC_OBJECT(a))
 VLC_EXPORT( int, aout_VolumeSet, ( vlc_object_t *, audio_volume_t ) );
 #define aout_VolumeSet(a, b) aout_VolumeSet(VLC_OBJECT(a), b)
 VLC_EXPORT( int, aout_VolumeUp, ( vlc_object_t *, int, audio_volume_t * ) );

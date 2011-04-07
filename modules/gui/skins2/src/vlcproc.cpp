@@ -694,8 +694,7 @@ void VlcProc::on_volume_changed( vlc_object_t* p_obj, vlc_value_t newVal )
     (void)p_obj; (void)newVal;
     playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
 
-    audio_volume_t volume;
-    aout_VolumeGet( pPlaylist, &volume );
+    audio_volume_t volume = aout_VolumeGet( pPlaylist );
     SET_VOLUME( m_cVarVolume, volume, false );
     SET_BOOL( m_cVarMute, volume == 0 );
 }
@@ -797,8 +796,7 @@ void VlcProc::init_variables()
     SET_BOOL( m_cVarLoop, var_GetBool( pPlaylist, "loop" ) );
     SET_BOOL( m_cVarRepeat, var_GetBool( pPlaylist, "repeat" ) );
 
-    audio_volume_t volume;
-    aout_VolumeGet( pPlaylist, &volume );
+    audio_volume_t volume = aout_VolumeGet( pPlaylist );
     SET_VOLUME( m_cVarVolume, volume, false );
     SET_BOOL( m_cVarMute, volume == 0 );
 

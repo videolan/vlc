@@ -123,24 +123,17 @@ static void cancelVolume (vlc_object_t *obj, aout_instance_t *aout)
 /**
  * Gets the volume of the output device (independent of mute).
  */
-int aout_VolumeGet (vlc_object_t *obj, audio_volume_t *volp)
+audio_volume_t aout_VolumeGet (vlc_object_t *obj)
 {
 #if 0
     aout_instance_t *aout;
-    int ret;
     audio_volume_t volume;
-    bool mute;
 
-    prepareVolume (obj, &aout, &volume, &mute);
+    prepareVolume (obj, &aout, &volume, NULL);
     cancelVolume (obj, aout);
-    mute = !mute;
-    ret = commitVolume (obj, aout, volume, mute);
-    if (volp != NULL)
-        *volp = mute ? AOUT_VOLUME_MIN : volume;
-    return ret;
-#else
-    *volp = config_GetInt (obj, "volume");
     return 0;
+#else
+    return config_GetInt (obj, "volume");
 #endif
 }
 

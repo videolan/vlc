@@ -882,8 +882,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                     break;
                 case 'V':
                 {
-                    audio_volume_t volume;
-                    aout_VolumeGet( p_object, &volume );
+                    audio_volume_t volume = aout_VolumeGet( p_object );
                     snprintf( buf, 10, "%d", volume );
                     INSERT_STRING_NO_FREE( buf );
                     break;

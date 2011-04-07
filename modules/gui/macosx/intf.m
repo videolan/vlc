@@ -1667,7 +1667,7 @@ static void manage_cleanup( void * args )
     audio_volume_t i_volume;
     playlist_t * p_playlist = pl_Get( p_intf );
 
-    aout_VolumeGet( p_playlist, &i_volume );
+    i_volume = aout_VolumeGet( p_playlist );
 
     if( i_volume != i_lastShownVolume )
     {

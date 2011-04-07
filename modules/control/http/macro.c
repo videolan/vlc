@@ -256,7 +256,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     int i_value;
 
                     ExtractURIValue( p_request, "value", vol, 8 );
-                    aout_VolumeGet( p_sys->p_playlist, &i_volume );
+                    i_volume = aout_VolumeGet( p_sys->p_playlist );
                     decode_URI( vol );
 
                     if( vol[0] == '+' )

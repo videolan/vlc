@@ -326,9 +326,7 @@ void libvlc_audio_set_mute( libvlc_media_player_t *mp, int mute )
  *****************************************************************************/
 int libvlc_audio_get_volume( libvlc_media_player_t *mp )
 {
-    audio_volume_t i_volume;
-
-    aout_VolumeGet( mp, &i_volume );
+    audio_volume_t i_volume = aout_VolumeGet( mp );
 
     return (i_volume*200+AOUT_VOLUME_MAX/2)/AOUT_VOLUME_MAX;
 }

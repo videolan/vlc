@@ -1132,7 +1132,7 @@ static int DrawStatus(intf_thread_t *p_intf)
 
             mvnprintw(y++, 0, COLS, _(" Position : %s/%s"), buf1, buf2);
 
-            aout_VolumeGet(p_playlist, &i_volume);
+            i_volume = aout_VolumeGet(p_playlist);
             mvnprintw(y++, 0, COLS, _(" Volume   : %i%%"),
                        i_volume*200/AOUT_VOLUME_MAX);
 

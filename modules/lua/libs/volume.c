@@ -61,11 +61,8 @@ static int vlclua_volume_set( lua_State *L )
 static int vlclua_volume_get( lua_State *L )
 {
     playlist_t *p_this = vlclua_get_playlist_internal( L );
-    audio_volume_t i_volume;
-    if( aout_VolumeGet( p_this, &i_volume ) == VLC_SUCCESS )
-        lua_pushnumber( L, i_volume );
-    else
-        lua_pushnil( L );
+    audio_volume_t i_volume = aout_VolumeGet( p_this );
+    lua_pushnumber( L, i_volume );
     return 1;
 }
 

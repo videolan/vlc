@@ -921,7 +921,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             char *psz_vol = SSPop( st );
             int i_value;
             audio_volume_t i_volume;
-            aout_VolumeGet( p_sys->p_playlist, &i_volume );
+            i_volume = aout_VolumeGet( p_sys->p_playlist );
             if( psz_vol[0] == '+' )
             {
                 i_value = atoi( psz_vol );
@@ -952,7 +952,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 if( i_value < AOUT_VOLUME_MIN ) i_value = AOUT_VOLUME_MIN;
                 aout_VolumeSet( p_sys->p_playlist, i_value );
             }
-            aout_VolumeGet( p_sys->p_playlist, &i_volume );
+            i_volume = aout_VolumeGet( p_sys->p_playlist );
             free( psz_vol );
         }
         else if( !strcmp( s, "vlc_get_meta" ) )

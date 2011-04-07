@@ -1516,12 +1516,9 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
     else
     {
         /* Get. */
-        audio_volume_t i_volume;
-        if ( !aout_VolumeGet( p_playlist, &i_volume ) )
-        {
-            msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );
-            i_error = VLC_SUCCESS;
-        }
+        audio_volume_t i_volume = aout_VolumeGet( p_playlist );
+        msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );
+        i_error = VLC_SUCCESS;
     }
 
     return i_error;

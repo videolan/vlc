@@ -160,7 +160,7 @@ void SoundWidget::libUpdateVolume()
     audio_volume_t i_volume;
     playlist_t *p_playlist = pl_Get( p_intf );
 
-    aout_VolumeGet( p_playlist, &i_volume );
+    i_volume = aout_VolumeGet( p_playlist );
     i_volume = ( ( i_volume + 1 ) *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2);
     int i_gauge = volumeSlider->value();
     if ( !b_is_muted && /* do not show mute effect on volume (set to 0) */

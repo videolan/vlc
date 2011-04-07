@@ -154,12 +154,10 @@ DBUS_METHOD( VolumeGet )
     REPLY_INIT;
     OUT_ARGUMENTS;
     dbus_int32_t i_dbus_vol;
-    audio_volume_t i_vol;
 
-    /* 2nd argument of aout_VolumeGet is int32 */
-    aout_VolumeGet( PL, &i_vol );
-
+    audio_volume_t i_vol = aout_VolumeGet( PL );
     double f_vol = 100. * i_vol / AOUT_VOLUME_MAX;
+
     i_dbus_vol = round( f_vol );
     ADD_INT32( &i_dbus_vol );
     REPLY_SEND;
