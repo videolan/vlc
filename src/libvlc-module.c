@@ -270,11 +270,6 @@ static const char *const ppsz_snap_formats[] =
     "You can set the default audio output volume here, in a range from 0 to " \
     "1024.")
 
-#define VOLUME_SAVE_TEXT N_("Audio output saved volume")
-#define VOLUME_SAVE_LONGTEXT N_( \
-    "This saves the audio output volume when you use the mute function. " \
-    "You should not change this option manually.")
-
 #define VOLUME_STEP_TEXT N_("Audio output volume step")
 #define VOLUME_STEP_LONGTEXT N_( \
     "The step size of the volume is adjustable using this option, " \
