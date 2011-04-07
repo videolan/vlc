@@ -328,12 +328,8 @@ static int Open( vlc_object_t *p_this )
     char *psz_device = var_InheritString( p_aout, "alsa-audio-device" );
     if( unlikely(psz_device == NULL) )
     {
-        psz_device = strdup( DEFAULT_ALSA_DEVICE );
-        if( unlikely(psz_device == NULL) )
-        {
-            free( p_sys );
-            return VLC_ENOMEM;
-        }
+        free( p_sys );
+        return VLC_EGENERIC;
     }
 
     /* Choose the IEC device for S/PDIF output:
