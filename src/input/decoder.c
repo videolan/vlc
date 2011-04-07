@@ -423,7 +423,7 @@ bool input_DecoderIsEmpty( decoder_t * p_dec )
         /* TODO subtitles support */
         if( p_dec->fmt_out.i_cat == VIDEO_ES && p_owner->p_vout )
             b_empty = vout_IsEmpty( p_owner->p_vout );
-        else if( p_dec->fmt_out.i_cat == AUDIO_ES && p_owner->p_aout && p_owner->p_aout_input )
+        else if( p_dec->fmt_out.i_cat == AUDIO_ES && p_owner->p_aout )
             b_empty = aout_InputIsEmpty( p_owner->p_aout, p_owner->p_aout_input );
         vlc_mutex_unlock( &p_owner->lock );
     }
@@ -1054,7 +1054,7 @@ static void DecoderOutputChangePause( decoder_t *p_dec, bool b_paused, mtime_t i
      */
     if( p_dec->fmt_out.i_cat == AUDIO_ES )
     {
-        if( p_owner->p_aout && p_owner->p_aout_input )
+        if( p_owner->p_aout )
             aout_DecChangePause( p_owner->p_aout, p_owner->p_aout_input,
                                  b_paused, i_date );
     }
@@ -1930,7 +1930,7 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block, bool b_flus
         DecoderDecodeAudio( p_dec, p_block );
     }
 
-    if( b_flush && p_owner->p_aout && p_owner->p_aout_input )
+    if( b_flush && p_owner->p_aout )
         aout_DecFlush( p_owner->p_aout, p_owner->p_aout_input );
 }
 
@@ -2109,14 +2109,12 @@ static void DeleteDecoder( decoder_t * p_dec )
     vlc_mutex_unlock( &p_owner->lock );
 
     /* Cleanup */
-    if( p_owner->p_aout_input )
-        aout_DecDelete( p_owner->p_aout, p_owner->p_aout_input );
     if( p_owner->p_aout )
     {
+        aout_DecDelete( p_owner->p_aout, p_owner->p_aout_input );
         input_resource_RequestAout( p_owner->p_resource, p_owner->p_aout );
         if( p_owner->p_input != NULL )
             input_SendEventAout( p_owner->p_input );
-        p_owner->p_aout = NULL;
     }
     if( p_owner->p_vout )
     {
@@ -2229,16 +2227,19 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
               p_owner->audio.i_bytes_per_frame ) )
     {
         aout_input_t *p_aout_input = p_owner->p_aout_input;
+        aout_instance_t *p_aout = p_owner->p_aout;
 
         /* Parameters changed, restart the aout */
         vlc_mutex_lock( &p_owner->lock );
 
         DecoderFlushBuffering( p_dec );
 
+        p_owner->p_aout = NULL;
         p_owner->p_aout_input = NULL;
         aout_DecDelete( p_owner->p_aout, p_aout_input );
 
         vlc_mutex_unlock( &p_owner->lock );
+        input_resource_RequestAout( p_owner->p_resource, p_aout );
     }
 
     if( p_owner->p_aout_input == NULL )
@@ -2272,13 +2273,19 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         request_vout.pf_request_vout = aout_request_vout;
         request_vout.p_private = p_dec;
 
-        p_aout = p_owner->p_aout;
-        if( !p_aout )
-            p_aout = input_resource_RequestAout( p_owner->p_resource, NULL );
+        assert( p_owner->p_aout == NULL );
+        p_aout = input_resource_RequestAout( p_owner->p_resource, NULL );
         if( p_aout )
+        {
             p_aout_input = aout_DecNew( p_aout, &format,
                                         &p_dec->fmt_out.audio_replay_gain,
                                         &request_vout );
+            if( p_aout_input == NULL )
+            {
+                input_resource_RequestAout( p_owner->p_resource, p_aout );
+                p_aout = NULL;
+            }
+        }
         else
             p_aout_input = NULL;
 
