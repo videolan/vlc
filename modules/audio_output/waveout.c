@@ -18,8 +18,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -33,7 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include <vlc_charset.h>
+#include <vlc_charset.h>                        /* FromLocaleDup, LocaleFree */
 
 #include "windows_audio_common.h"
 
@@ -82,7 +82,6 @@ static const char *const ppsz_adev[] = { "wavemapper", };
 static const char *const ppsz_adev_text[] = { N_("Microsoft Soundmapper") };
 
 
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -106,7 +105,6 @@ vlc_module_begin ()
        change_string_list( ppsz_adev, ppsz_adev_text, ReloadWaveoutDevices )
        change_need_restart ()
        change_action_add( ReloadWaveoutDevices, N_("Refresh list") )
-
 
     set_callbacks( Open, Close )
 vlc_module_end ()
@@ -586,14 +584,13 @@ static int OpenWaveOut( aout_instance_t *p_aout, uint32_t i_device_id, int i_for
                         bool b_probe )
 {
     MMRESULT result;
-    unsigned int i;
 
     /* Set sound format */
 
 #define waveformat p_aout->output.p_sys->waveformat
 
     waveformat.dwChannelMask = 0;
-    for( i = 0; i < sizeof(pi_channels_src)/sizeof(uint32_t); i++ )
+    for( unsigned i = 0; i < sizeof(pi_channels_src)/sizeof(uint32_t); i++ )
     {
         if( i_channels & pi_channels_src[i] )
             waveformat.dwChannelMask |= pi_channels_in[i];
@@ -754,7 +751,7 @@ static int PlayWaveOut( aout_instance_t *p_aout, HWAVEOUT h_waveout,
     /* Prepare the buffer */
     if( p_buffer != NULL )
     {
-        p_waveheader->lpData = p_buffer->p_buffer;
+        p_waveheader->lpData = (LPSTR)p_buffer->p_buffer;
         /*
           copy the buffer to the silence buffer :) so in case we don't
           get the next buffer fast enough (I will repeat this one a time
@@ -779,7 +776,7 @@ static int PlayWaveOut( aout_instance_t *p_aout, HWAVEOUT h_waveout,
                            0x00, p_aout->output.p_sys->i_buffer_size );
            }
         }
-        p_waveheader->lpData = p_aout->output.p_sys->p_silence_buffer;
+        p_waveheader->lpData = (LPSTR)p_aout->output.p_sys->p_silence_buffer;
     }
 
     p_waveheader->dwUser = p_buffer ? (DWORD_PTR)p_buffer : (DWORD_PTR)1;
@@ -813,14 +810,14 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
 {
     (void)h_waveout;    (void)dwParam1;    (void)dwParam2;
     aout_instance_t *p_aout = (aout_instance_t *)_p_aout;
-    int i, i_queued_frames = 0;
+    int i_queued_frames = 0;
 
     if( uMsg != WOM_DONE ) return;
 
     if( !vlc_object_alive (p_aout) ) return;
 
     /* Find out the current latency */
-    for( i = 0; i < FRAMES_NUM; i++ )
+    for( int i = 0; i < FRAMES_NUM; i++ )
     {
         /* Check if frame buf is available */
         if( !(p_aout->output.p_sys->waveheader[i].dwFlags & WHDR_DONE) )
@@ -1108,18 +1105,19 @@ static int ReloadWaveoutDevices( vlc_object_t *p_this, char const *psz_name,
 */
 static uint32_t findDeviceID(char *psz_device_name)
 {
-    if(!psz_device_name)
+    if( !psz_device_name )
        return WAVE_MAPPER;
 
     uint32_t wave_devices = waveOutGetNumDevs();
     WAVEOUTCAPS caps;
     char sz_dev_name[MAXPNAMELEN+32];
-    for(uint32_t i=0; i<wave_devices; i++)
+
+    for( uint32_t i = 0; i < wave_devices; i++ )
     {
-        if(waveOutGetDevCaps(i, &caps, sizeof(WAVEOUTCAPS))
+        if( waveOutGetDevCaps( i, &caps, sizeof(WAVEOUTCAPS) )
            == MMSYSERR_NOERROR)
         {
-            sprintf(sz_dev_name, psz_device_name_fmt, caps.szPname,
+            sprintf( sz_dev_name, psz_device_name_fmt, caps.szPname,
                                                caps.wMid,
                                                caps.wPid
                                               );
