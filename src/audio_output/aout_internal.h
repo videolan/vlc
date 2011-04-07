@@ -141,12 +141,8 @@ void aout_FormatsPrint( aout_instance_t * p_aout, const char * psz_text, const a
 bool aout_ChangeFilterString( vlc_object_t *, aout_instance_t *, const char *psz_variable, const char *psz_name, bool b_add );
 
 /* From intf.c :*/
-int aout_VolumeSoftGet( aout_instance_t *, audio_volume_t * );
 int aout_VolumeSoftSet( aout_instance_t *, audio_volume_t );
-int aout_VolumeSoftInfos( aout_instance_t *, audio_volume_t * );
-int aout_VolumeNoneGet( aout_instance_t *, audio_volume_t * );
 int aout_VolumeNoneSet( aout_instance_t *, audio_volume_t );
-int aout_VolumeNoneInfos( aout_instance_t *, audio_volume_t * );
 
 /* From dec.c */
 aout_input_t *aout_DecNew( aout_instance_t *, audio_sample_format_t *,
