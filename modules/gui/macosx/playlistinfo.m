@@ -386,7 +386,7 @@ static VLCInfo *_o_sharedInstance = nil;
     playlist_t * p_playlist = pl_Get( VLCIntf );
     input_item_WriteMeta( VLC_OBJECT(p_playlist), p_item );
 
-    var_SetBool( p_playlist, "intf-change", true );
+    var_SetBool( p_playlist, "intf-change" );
     [self updatePanelWithItem: p_item];
 
     [o_saveMetaData_btn setEnabled: NO];
