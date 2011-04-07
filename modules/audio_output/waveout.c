@@ -68,7 +68,7 @@ static int PlayWaveOut   ( aout_instance_t *, HWAVEOUT, WAVEHDR *,
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD, DWORD, DWORD );
 static void* WaveOutThread( vlc_object_t * );
 
-static int VolumeSet( aout_instance_t *, audio_volume_t );
+static int VolumeSet( aout_instance_t *, audio_volume_t, bool );
 
 static int WaveOutClearDoneBuffers(aout_sys_t *p_sys);
 
