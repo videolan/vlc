@@ -80,10 +80,7 @@ static void DoWork( aout_mixer_t * p_mixer, aout_buffer_t * p_buffer )
 {
     VLC_UNUSED( p_buffer );
 
-    unsigned i = 0;
-    aout_mixer_input_t * p_input = p_mixer->input[i];
-    while ( p_input->is_invalid )
-        p_input = p_mixer->input[++i];
+    aout_mixer_input_t * p_input = p_mixer->input;
 
     aout_buffer_t * p_old_buffer = aout_FifoPop( NULL, &p_input->fifo );
     /* We don't free the old buffer because,
@@ -91,15 +88,4 @@ static void DoWork( aout_mixer_t * p_mixer, aout_buffer_t * p_buffer )
      * to mix is the same as the one in the first active input fifo.
      * So the ownership of that buffer belongs to our caller */
     assert( p_old_buffer == p_buffer );
-
-    /* Empty other FIFOs to avoid a memory leak. */
-    for ( i++; i < p_mixer->input_count; i++ )
-    {
-        p_input = p_mixer->input[i];
-        if ( p_input->is_invalid )
-            continue;
-        while ((p_old_buffer = aout_FifoPop( NULL, &p_input->fifo )))
-            aout_BufferFree( p_old_buffer );
-    }
 }
-

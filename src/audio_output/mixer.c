@@ -53,10 +53,7 @@ int aout_MixerNew( aout_instance_t * p_aout )
     p_mixer->fmt = p_aout->mixer_format;
     p_mixer->allocation = p_aout->mixer_allocation;
     p_mixer->multiplier = p_aout->mixer_multiplier;
-    p_mixer->input_count = p_aout->i_nb_inputs;
-    p_mixer->input = calloc( p_mixer->input_count, sizeof(*p_mixer->input) );
-    for( int i = 0; i < p_aout->i_nb_inputs; i++ )
-        p_mixer->input[i] = &p_aout->pp_inputs[i]->mixer;
+    p_mixer->input = &p_aout->pp_inputs[0]->mixer;
     p_mixer->mix = NULL;
     p_mixer->sys = NULL;
 
@@ -88,7 +85,6 @@ void aout_MixerDelete( aout_instance_t * p_aout )
 
     module_unneed( p_aout->p_mixer, p_aout->p_mixer->module );
 
-    free( p_aout->p_mixer->input );
     vlc_object_release( p_aout->p_mixer );
 
     /* */

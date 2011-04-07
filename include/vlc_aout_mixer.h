@@ -84,8 +84,7 @@ struct aout_mixer_t {
     float                 multiplier;
 
     /* Array of mixer inputs */
-    unsigned              input_count;
-    aout_mixer_input_t    **input;
+    aout_mixer_input_t    *input;
 
     /* Mix input into the given buffer (mandatory) */
     void (*mix)(aout_mixer_t *, aout_buffer_t *);

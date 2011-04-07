@@ -75,20 +75,13 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static void DoWork( aout_mixer_t *p_mixer, aout_buffer_t * p_buffer )
 {
-    unsigned i = 0;
-    aout_mixer_input_t * p_input = p_mixer->input[i];
+    aout_mixer_input_t *p_input = p_mixer->input;
     int i_nb_channels = aout_FormatNbChannels( &p_mixer->fmt );
     int i_buffer = p_buffer->i_nb_samples * sizeof(int32_t)
                       * i_nb_channels;
     uint8_t * p_in;
     uint8_t * p_out;
 
-    while ( p_input->is_invalid )
-    {
-        p_input = p_mixer->input[++i];
-        /* This can't crash because if no input has b_error == 0, the
-         * audio mixer cannot run and we can't be here. */
-    }
     p_in = p_input->begin;
     p_out = p_buffer->p_buffer;
 
@@ -125,26 +118,4 @@ static void DoWork( aout_mixer_t *p_mixer, aout_buffer_t * p_buffer )
             break;
         }
     }
-
-    /* Empty other FIFOs to avoid a memory leak. */
-    for ( i++; i < p_mixer->input_count; i++ )
-    {
-        aout_fifo_t * p_fifo;
-        aout_buffer_t * p_deleted;
-
-        p_input = p_mixer->input[i];
-        if ( p_input->is_invalid )
-            continue;
-        p_fifo = &p_input->fifo;
-        p_deleted = p_fifo->p_first;
-        while ( p_deleted != NULL )
-        {
-            aout_buffer_t * p_next = p_deleted->p_next;
-            aout_BufferFree( p_deleted );
-            p_deleted = p_next;
-        }
-        p_fifo->p_first = NULL;
-        p_fifo->pp_last = &p_fifo->p_first;
-    }
 }
-
