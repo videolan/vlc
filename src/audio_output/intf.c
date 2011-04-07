@@ -58,230 +58,186 @@ static aout_instance_t *findAout (vlc_object_t *obj)
 }
 #define findAout(o) findAout(VLC_OBJECT(o))
 
-enum {
-    SET_MUTE=1,
-    SET_VOLUME=2,
-    INCREMENT_VOLUME=4,
-    TOGGLE_MUTE=8
-};
-
-/*****************************************************************************
- * doVolumeChanges : handle all volume changes. Internal use only to ease
- *                   variables locking.
- *****************************************************************************/
-static
-int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
-                audio_volume_t i_volume, audio_volume_t * i_return_volume,
-                bool b_mute )
+/** Start a volume change transaction. */
+static void prepareVolume (vlc_object_t *obj, aout_instance_t **aoutp,
+                           audio_volume_t *volp, bool *mutep)
 {
-    int i_result = VLC_SUCCESS;
-    int i_volume_step = 1, i_new_volume = 0;
-    bool b_var_mute = false;
-    aout_instance_t *p_aout = findAout( p_object );
+    aout_instance_t *aout = findAout (obj);
 
-    if ( p_aout ) aout_lock_volume( p_aout );
+    /* FIXME: we need interlocking even if aout does not exist! */
+    *aoutp = aout;
+    if (aout != NULL)
+        aout_lock_volume (aout);
+    if (volp != NULL)
+        *volp = config_GetInt (obj, "volume");
+    if (mutep != NULL)
+        *mutep = var_GetBool (obj, "volume-muted");
+}
 
-    b_var_mute = var_GetBool( p_object, "volume-muted");
+/** Commit a volume change transaction. */
+static int commitVolume (vlc_object_t *obj, aout_instance_t *aout,
+                         audio_volume_t volume, bool mute)
+{
+    int ret = 0;
 
-    const bool b_unmute_condition = ( b_var_mute
-                && ( /* Unmute: on increments */
-                    ( action == INCREMENT_VOLUME )
-                    || /* On explicit unmute */
-                    ( ( action == SET_MUTE ) && !b_mute )
-                    || /* On toggle from muted */
-                    ( action == TOGGLE_MUTE )
-                ));
+    config_PutInt (obj, "volume", volume);
+    if (mute)
+        volume = AOUT_VOLUME_MIN;
+    var_SetBool (obj, "volume-muted", mute);
 
-    const bool b_mute_condition = ( !b_var_mute
-                    && ( /* explicit */
-                        ( ( action == SET_MUTE ) && b_mute )
-                        || /* or toggle */
-                        ( action == TOGGLE_MUTE )
-                    ));
-
-    /* If muting or unmuting when play hasn't started */
-    if ( action == SET_MUTE && !b_unmute_condition && !b_mute_condition )
+    if (aout != NULL)
     {
-        if ( p_aout )
-        {
-            aout_unlock_volume( p_aout );
-            vlc_object_release( p_aout );
-        }
-        return i_result;
-    }
+        aout_lock_mixer (aout);
+        aout_lock_input_fifos (aout);
+        if (aout->p_mixer != NULL)
+            ret = aout->output.pf_volume_set (aout, volume);
+        aout_unlock_input_fifos (aout);
+        aout_unlock_mixer (aout);
 
-    /* On UnMute */
-    if ( b_unmute_condition )
-    {
-        /* Restore saved volume */
-        i_volume = var_GetInteger( p_object, "saved-volume" );
-        var_SetBool( p_object, "volume-muted", false );
-    }
-    else if ( b_mute_condition )
-    {
-        /* We need an initial value to backup later */
-        i_volume = config_GetInt( p_object, "volume" );
-    }
-
-    if ( action == INCREMENT_VOLUME )
-    {
-        i_volume_step = var_InheritInteger( p_object, "volume-step" );
-
-        if ( !b_unmute_condition )
-            i_volume = config_GetInt( p_object, "volume" );
-
-        i_new_volume = (int) i_volume + i_volume_step * i_nb_steps;
-
-        if ( i_new_volume > AOUT_VOLUME_MAX )
-            i_volume = AOUT_VOLUME_MAX;
-        else if ( i_new_volume < AOUT_VOLUME_MIN )
-            i_volume = AOUT_VOLUME_MIN;
-        else
-            i_volume = i_new_volume;
-    }
-
-    var_SetInteger( p_object, "saved-volume" , i_volume );
-
-    /* On Mute */
-    if ( b_mute_condition )
-    {
-        i_volume = AOUT_VOLUME_MIN;
-        var_SetBool( p_object, "volume-muted", true );
-    }
-
-    /* Commit volume changes */
-    config_PutInt( p_object, "volume", i_volume );
-
-    if ( p_aout )
-    {
-        aout_lock_mixer( p_aout );
-        aout_lock_input_fifos( p_aout );
-            if ( p_aout->p_mixer )
-                i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
-        aout_unlock_input_fifos( p_aout );
-        aout_unlock_mixer( p_aout );
+        if (ret == 0)
+            var_SetBool (aout, "intf-change", true);
+        aout_unlock_volume (aout);
+        vlc_object_release (aout);
     }
 
     /* trigger callbacks */
-    var_TriggerCallback( p_object, "volume-change" );
-    if ( p_aout )
-    {
-        var_SetBool( p_aout, "intf-change", true );
-        aout_unlock_volume( p_aout );
-        vlc_object_release( p_aout );
-    }
+    var_TriggerCallback (obj, "volume-change");
 
-    if ( i_return_volume != NULL )
-         *i_return_volume = i_volume;
-    return i_result;
+    return ret;
 }
 
-#undef aout_VolumeGet
-/*****************************************************************************
- * aout_VolumeGet : get the volume of the output device
- *****************************************************************************/
-int aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
+#if 0
+/** Cancel a volume change transaction. */
+static void cancelVolume (vlc_object_t *obj, aout_instance_t *aout)
 {
-    int i_result = 0;
-    aout_instance_t * p_aout = findAout( p_object );
-
-    if ( p_aout == NULL )
+    (void) obj;
+    if (aout != NULL)
     {
-        *pi_volume = (audio_volume_t)config_GetInt( p_object, "volume" );
-        return 0;
+        aout_unlock_volume (aout);
+        vlc_object_release (aout);
     }
+}
+#endif
 
-    aout_lock_volume( p_aout );
-    aout_lock_mixer( p_aout );
-    if ( p_aout->p_mixer )
-    {
-        i_result = p_aout->output.pf_volume_get( p_aout, pi_volume );
-    }
-    else
-    {
-        *pi_volume = (audio_volume_t)config_GetInt( p_object, "volume" );
-    }
-    aout_unlock_mixer( p_aout );
-    aout_unlock_volume( p_aout );
+#undef aout_VolumeGet
+/**
+ * Gets the volume of the output device (independent of mute).
+ */
+int aout_VolumeGet (vlc_object_t *obj, audio_volume_t *volp)
+{
+#if 0
+    aout_instance_t *aout;
+    int ret;
+    audio_volume_t volume;
+    bool mute;
 
-    vlc_object_release( p_aout );
-    return i_result;
+    prepareVolume (obj, &aout, &volume, &mute);
+    cancelVolume (obj, aout);
+    mute = !mute;
+    ret = commitVolume (obj, aout, volume, mute);
+    if (volp != NULL)
+        *volp = mute ? AOUT_VOLUME_MIN : volume;
+    return ret;
+#else
+    *volp = config_GetInt (obj, "volume");
+    return 0;
+#endif
 }
 
 #undef aout_VolumeSet
-/*****************************************************************************
- * aout_VolumeSet : set the volume of the output device
- *****************************************************************************/
-int aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
+/**
+ * Sets the volume of the output device.
+ * The mute status is not changed.
+ */
+int aout_VolumeSet (vlc_object_t *obj, audio_volume_t volume)
 {
-    return doVolumeChanges( SET_VOLUME, p_object, 1, i_volume, NULL, true );
+    aout_instance_t *aout;
+    bool mute;
+
+    prepareVolume (obj, &aout, NULL, &mute);
+    return commitVolume (obj, aout, volume, mute);
 }
 
 #undef aout_VolumeUp
-/*****************************************************************************
- * aout_VolumeUp : raise the output volume
- *****************************************************************************
- * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
- * function.
- *****************************************************************************/
-int aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
-                   audio_volume_t * pi_volume )
+/**
+ * Raises the volume.
+ * \param volp if non-NULL, will contain contain the resulting volume
+ */
+int aout_VolumeUp (vlc_object_t *obj, int steps, audio_volume_t *volp)
 {
-    return doVolumeChanges( INCREMENT_VOLUME, p_object, i_nb_steps, 0, pi_volume, true );
+    aout_instance_t *aout;
+    int ret;
+    int stepsize = var_InheritInteger (obj, "volume-step");
+    audio_volume_t volume;
+    bool mute;
+
+    prepareVolume (obj, &aout, &volume, &mute);
+    volume += stepsize * steps;
+    ret = commitVolume (obj, aout, volume, mute);
+    if (volp != NULL)
+        *volp = volume;
+    return ret;
 }
 
 #undef aout_VolumeDown
-/*****************************************************************************
- * aout_VolumeDown : lower the output volume
- *****************************************************************************
- * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
- * function.
- *****************************************************************************/
-int aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
-                     audio_volume_t * pi_volume )
+/**
+ * Lowers the volume. See aout_VolumeUp().
+ */
+int aout_VolumeDown (vlc_object_t *obj, int steps, audio_volume_t *volp)
 {
-    return aout_VolumeUp( p_object, -i_nb_steps, pi_volume );
+    return aout_VolumeUp (obj, -steps, volp);
 }
 
 #undef aout_ToggleMute
-/*****************************************************************************
- * aout_ToggleMute : Mute/un-mute the output volume
- *****************************************************************************
- * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
- * function (muted => 0).
- *****************************************************************************/
-int aout_ToggleMute( vlc_object_t * p_object, audio_volume_t * pi_volume )
+/**
+ * Toggles the mute state.
+ */
+int aout_ToggleMute (vlc_object_t *obj, audio_volume_t *volp)
 {
-    return doVolumeChanges( TOGGLE_MUTE, p_object, 1, 0, pi_volume, true );
+    aout_instance_t *aout;
+    int ret;
+    audio_volume_t volume;
+    bool mute;
+
+    prepareVolume (obj, &aout, &volume, &mute);
+    mute = !mute;
+    ret = commitVolume (obj, aout, volume, mute);
+    if (volp != NULL)
+        *volp = mute ? AOUT_VOLUME_MIN : volume;
+    return ret;
 }
 
-/*****************************************************************************
- * aout_IsMuted : Get the output volume mute status
- *****************************************************************************/
-bool aout_IsMuted( vlc_object_t * p_object )
+/**
+ * Gets the output mute status.
+ */
+bool aout_IsMuted (vlc_object_t *obj)
 {
-    bool b_return_val;
-    aout_instance_t * p_aout = findAout( p_object );
-    if ( p_aout ) aout_lock_volume( p_aout );
-    b_return_val = var_GetBool( p_object, "volume-muted");
-    if ( p_aout )
-    {
-        aout_unlock_volume( p_aout );
-        vlc_object_release( p_aout );
-    }
-    return b_return_val;
+#if 0
+    aout_instance_t *aout;
+    bool mute;
+
+    prepareVolume (obj, &aout, NULL, &mute);
+    cancelVolume (obj, aout);
+    return mute;
+#else
+    return var_GetBool (obj, "volume-muted");
+#endif
 }
 
-/*****************************************************************************
- * aout_SetMute : Sets mute status
- *****************************************************************************
- * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
- * function (muted => 0).
- *****************************************************************************/
-int aout_SetMute( vlc_object_t * p_object, audio_volume_t * pi_volume,
-                  bool b_mute )
+/**
+ * Sets mute status.
+ */
+int aout_SetMute (vlc_object_t *obj, audio_volume_t *volp, bool mute)
 {
-    return doVolumeChanges( SET_MUTE, p_object, 1, 0, pi_volume, b_mute );
+    aout_instance_t *aout;
+    int ret;
+    audio_volume_t volume;
+
+    prepareVolume (obj, &aout, &volume, NULL);
+    ret = commitVolume (obj, aout, volume, mute);
+    if (volp != NULL)
+        *volp = mute ? AOUT_VOLUME_MIN : volume;
+    return ret;
 }
 
 /*
