@@ -63,12 +63,8 @@
     "Left coordinate of the subscreen top left corner." )
 
 #define WIDTH_TEXT N_( "Subscreen width" )
-#define WIDTH_LONGTEXT N_( \
-    "Subscreen width" )
 
 #define HEIGHT_TEXT N_( "Subscreen height" )
-#define HEIGHT_LONGTEXT N_( \
-    "Subscreen height"  )
 
 #define FOLLOW_MOUSE_TEXT N_( "Follow the mouse" )
 #define FOLLOW_MOUSE_LONGTEXT N_( \
@@ -99,25 +95,24 @@ vlc_module_begin ()
 
     add_integer( "screen-caching", DEFAULT_PTS_DELAY / 1000,
         CACHING_TEXT, CACHING_LONGTEXT, true )
-    add_float( "screen-fps", SCREEN_FPS, FPS_TEXT, FPS_LONGTEXT, true )
+    add_float( "screen-fps", SCREEN_FPS, FPS_TEXT, FPS_LONGTEXT, false )
 
 #ifdef SCREEN_SUBSCREEN
     add_integer( "screen-top", 0, TOP_TEXT, TOP_LONGTEXT, true )
     add_integer( "screen-left", 0, LEFT_TEXT, LEFT_LONGTEXT, true )
-    add_integer( "screen-width", 0, WIDTH_TEXT, WIDTH_LONGTEXT, true )
-    add_integer( "screen-height", 0, HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
+    add_integer( "screen-width", 0, WIDTH_TEXT, WIDTH_TEXT, true )
+    add_integer( "screen-height", 0, HEIGHT_TEXT, HEIGHT_TEXT, true )
+
     add_bool( "screen-follow-mouse", false, FOLLOW_MOUSE_TEXT,
-              FOLLOW_MOUSE_LONGTEXT, true )
+              FOLLOW_MOUSE_LONGTEXT, false )
 #endif
 
 #ifdef SCREEN_MOUSE
-    add_loadfile( "screen-mouse-image", "", MOUSE_TEXT, MOUSE_LONGTEXT,
-                  true )
+    add_loadfile( "screen-mouse-image", "", MOUSE_TEXT, MOUSE_LONGTEXT, true )
 #endif
 
 #ifdef WIN32
-    add_integer( "screen-fragment-size", 0, FRAGS_TEXT,
-        FRAGS_LONGTEXT, true )
+    add_integer( "screen-fragment-size", 0, FRAGS_TEXT, FRAGS_LONGTEXT, true )
 #endif
 
     set_capability( "access_demux", 0 )
