@@ -67,7 +67,7 @@ void EPGChannels::paintEvent( QPaintEvent *event )
     foreach( QString text, channelList )
     {
         /* try to remove the " [Program xxx]" end */
-        int i_idx_channel = text.lastIndexOf(" [Program ");
+        int i_idx_channel = text.lastIndexOf(" [");
         if (i_idx_channel > 0)
             text = text.left( i_idx_channel );
 
