@@ -101,11 +101,6 @@ static int Seek ( sout_access_out_t *, off_t  );
 static ssize_t Read ( sout_access_out_t *, block_t * );
 static int Control( sout_access_out_t *, int, va_list );
 
-struct sout_access_out_sys_t
-{
-    int i_handle;
-};
-
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
