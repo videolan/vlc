@@ -1,7 +1,7 @@
 /*****************************************************************************
  * win32.c: Screen capture module.
  *****************************************************************************
- * Copyright (C) 2004-2008 the VideoLAN team
+ * Copyright (C) 2004-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -17,8 +17,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -32,10 +32,6 @@
 #include <vlc_common.h>
 
 #include "screen.h"
-
-#ifndef CAPTUREBLT
-#   define CAPTUREBLT (DWORD)0x40000000 /* Include layered windows */
-#endif
 
 struct screen_data_t
 {
@@ -90,8 +86,7 @@ int screen_InitCapture( demux_t *p_demux )
     case 32:
         i_chroma = VLC_CODEC_RGB32; break;
     default:
-        msg_Err( p_demux, "unknown screen depth %i",
-                 p_sys->fmt.video.i_bits_per_pixel );
+        msg_Err( p_demux, "unknown screen depth %i", i_bits_per_pixel );
         DeleteDC( p_data->hdc_dst );
         ReleaseDC( 0, p_data->hdc_src );
         free( p_data );
@@ -99,12 +94,12 @@ int screen_InitCapture( demux_t *p_demux )
     }
 
     es_format_Init( &p_sys->fmt, VIDEO_ES, i_chroma );
-    p_sys->fmt.video.i_visible_width =
-    p_sys->fmt.video.i_width  = GetDeviceCaps( p_data->hdc_src, HORZRES );
+    p_sys->fmt.video.i_visible_width  =
+    p_sys->fmt.video.i_width          = GetDeviceCaps( p_data->hdc_src, HORZRES );
     p_sys->fmt.video.i_visible_height =
-    p_sys->fmt.video.i_height = GetDeviceCaps( p_data->hdc_src, VERTRES );
+    p_sys->fmt.video.i_height         = GetDeviceCaps( p_data->hdc_src, VERTRES );
     p_sys->fmt.video.i_bits_per_pixel = i_bits_per_pixel;
-    p_sys->fmt.video.i_chroma = i_chroma;
+    p_sys->fmt.video.i_chroma         = i_chroma;
 
     switch( i_chroma )
     {
@@ -127,7 +122,6 @@ int screen_InitCapture( demux_t *p_demux )
         msg_Warn( p_demux, "Unknown RGB masks" );
         break;
     }
-
 
     return VLC_SUCCESS;
 }
@@ -174,17 +168,17 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
     {
         int i_val;
         /* Create the bitmap info header */
-        p_data->bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-        p_data->bmi.bmiHeader.biWidth = p_sys->fmt.video.i_width;
-        p_data->bmi.bmiHeader.biHeight = - p_sys->fmt.video.i_height;
-        p_data->bmi.bmiHeader.biPlanes = 1;
-        p_data->bmi.bmiHeader.biBitCount = p_sys->fmt.video.i_bits_per_pixel;
-        p_data->bmi.bmiHeader.biCompression = BI_RGB;
-        p_data->bmi.bmiHeader.biSizeImage = 0;
-        p_data->bmi.bmiHeader.biXPelsPerMeter =
-            p_data->bmi.bmiHeader.biYPelsPerMeter = 0;
-        p_data->bmi.bmiHeader.biClrUsed = 0;
-        p_data->bmi.bmiHeader.biClrImportant = 0;
+        p_data->bmi.bmiHeader.biSize          = sizeof(BITMAPINFOHEADER);
+        p_data->bmi.bmiHeader.biWidth         = p_sys->fmt.video.i_width;
+        p_data->bmi.bmiHeader.biHeight        = - p_sys->fmt.video.i_height;
+        p_data->bmi.bmiHeader.biPlanes        = 1;
+        p_data->bmi.bmiHeader.biBitCount      = p_sys->fmt.video.i_bits_per_pixel;
+        p_data->bmi.bmiHeader.biCompression   = BI_RGB;
+        p_data->bmi.bmiHeader.biSizeImage     = 0;
+        p_data->bmi.bmiHeader.biXPelsPerMeter = 0;
+        p_data->bmi.bmiHeader.biYPelsPerMeter = 0;
+        p_data->bmi.bmiHeader.biClrUsed       = 0;
+        p_data->bmi.bmiHeader.biClrImportant  = 0;
 
         i_val = var_CreateGetInteger( p_demux, "screen-fragment-size" );
         p_data->i_fragment_size = i_val > 0 ? i_val : (int)p_sys->fmt.video.i_height;
@@ -204,8 +198,7 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
     if( !hbmp || !p_buffer )
     {
         msg_Err( p_demux, "cannot create bitmap" );
-        if( hbmp ) DeleteObject( hbmp );
-        return NULL;
+        goto error;
     }
 
     /* Select the bitmap into the compatible DC */
@@ -217,16 +210,13 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
     if( !p_data->hgdi_backup )
     {
         msg_Err( p_demux, "cannot select bitmap" );
-        DeleteObject( hbmp );
-        return NULL;
+        goto error;
     }
 
     /* Build block */
     if( !(p_block = malloc( sizeof( block_t ) + sizeof( block_sys_t ) )) )
-    {
-        DeleteObject( hbmp );
-        return NULL;
-    }
+        goto error;
+
     /* Fill all fields */
     i_buffer = (p_sys->fmt.video.i_bits_per_pixel + 7) / 8 *
         p_sys->fmt.video.i_width * p_sys->fmt.video.i_height;
@@ -235,6 +225,10 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
     p_block->hbmp            = hbmp;
 
     return &p_block->self;
+
+error:
+    if( hbmp ) DeleteObject( hbmp );
+    return NULL;
 }
 
 block_t *screen_Capture( demux_t *p_demux )
