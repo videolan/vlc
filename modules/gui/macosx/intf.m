@@ -473,7 +473,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_double_window setKeyEquivalent: [self VLCKeyToString: o_key]];
     [o_mi_double_window setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
     
-    var_Create( p_intf, "intf-change", VLC_VAR_VOID );
+    var_Create( p_intf, "intf-change", VLC_VAR_BOOL );
 
     [self setSubmenusEnabled: FALSE];
     [o_volumeslider setEnabled: YES];
