@@ -702,14 +702,14 @@ void ExtV4l2::Refresh( void )
             {
                 case VLC_VAR_INTEGER:
                 {
-                    QLabel *label = new QLabel( psz_label, box );
+                    QLabel *label = new QLabel( qtr( psz_label ), box );
                     QHBoxLayout *hlayout = new QHBoxLayout();
                     hlayout->addWidget( label );
                     int i_val = var_GetInteger( p_obj, psz_var );
                     if( i_type & VLC_VAR_HASCHOICE )
                     {
                         QComboBox *combobox = new QComboBox( box );
-                        combobox->setObjectName( psz_var );
+                        combobox->setObjectName( qtr( psz_var ) );
 
                         vlc_value_t val2, text2;
                         var_Change( p_obj, psz_var, VLC_VAR_GETCHOICES,
@@ -731,7 +731,7 @@ void ExtV4l2::Refresh( void )
                     else
                     {
                         QSlider *slider = new QSlider( box );
-                        slider->setObjectName( psz_var );
+                        slider->setObjectName( qtr( psz_var ) );
                         slider->setOrientation( Qt::Horizontal );
                         vlc_value_t val2;
                         var_Change( p_obj, psz_var, VLC_VAR_GETMIN,
@@ -754,8 +754,8 @@ void ExtV4l2::Refresh( void )
                 }
                 case VLC_VAR_BOOL:
                 {
-                    QCheckBox *button = new QCheckBox( psz_label, box );
-                    button->setObjectName( psz_var );
+                    QCheckBox *button = new QCheckBox( qtr( psz_label ), box );
+                    button->setObjectName( qtr( psz_var ) );
                     button->setChecked( var_GetBool( p_obj, psz_var ) );
 
                     CONNECT( button, clicked( bool ), this,
@@ -767,8 +767,8 @@ void ExtV4l2::Refresh( void )
                 {
                     if( i_type & VLC_VAR_ISCOMMAND )
                     {
-                        QPushButton *button = new QPushButton( psz_label, box );
-                        button->setObjectName( psz_var );
+                        QPushButton *button = new QPushButton( qtr( psz_label ), box );
+                        button->setObjectName( qtr( psz_var ) );
 
                         CONNECT( button, clicked( bool ), this,
                                  ValueChange( bool ) );
@@ -776,7 +776,7 @@ void ExtV4l2::Refresh( void )
                     }
                     else
                     {
-                        QLabel *label = new QLabel( psz_label, box );
+                        QLabel *label = new QLabel( qtr( psz_label ), box );
                         layout->addWidget( label );
                     }
                     break;
