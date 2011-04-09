@@ -347,7 +347,6 @@ static int aout_Restart( aout_instance_t * p_aout )
     {
         aout_input_t * p_input = p_aout->pp_inputs[i];
         b_error |= aout_InputNew( p_aout, p_input, &p_input->request_vout );
-        p_input->b_changed = 1;
         aout_unlock_input( p_aout, p_input );
     }
 

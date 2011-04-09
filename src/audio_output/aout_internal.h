@@ -74,9 +74,6 @@ struct aout_input_t
     /* If b_error == 1, there is no input pipeline. */
     bool              b_error;
 
-    /* Did we just change the output format? (expect buffer inconsistencies) */
-    bool              b_changed;
-
     /* last rate from input */
     int               i_last_input_rate;
 

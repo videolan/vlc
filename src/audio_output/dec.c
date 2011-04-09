@@ -90,7 +90,6 @@ aout_input_t *aout_DecNew( aout_instance_t *p_aout,
 
     vlc_mutex_init( &p_input->lock );
 
-    p_input->b_changed = false;
     p_input->b_error = true;
     p_input->b_paused = false;
     p_input->i_pause_date = 0;
@@ -236,9 +235,6 @@ aout_buffer_t * aout_DecNewBuffer( aout_input_t * p_input,
                           / p_input->input.i_frame_length;
     block = block_Alloc( length );
 
-    /* Suppose the decoder doesn't have more than one buffered buffer */
-    p_input->b_changed = false;
-
     aout_unlock_input( NULL, p_input );
 
     if( likely(block != NULL) )
@@ -283,25 +279,6 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
         aout_BufferFree( p_buffer );
         return -1;
-    }
-
-    if( p_input->b_changed )
-    {
-        /* Maybe the allocation size has changed. Re-allocate a buffer. */
-        aout_buffer_t * p_new_buffer;
-        mtime_t duration = (1000000 * (mtime_t)p_buffer->i_nb_samples)
-                            / p_input->input.i_rate;
-
-        p_new_buffer = aout_BufferAlloc( &p_input->input_alloc, duration, NULL);
-        vlc_memcpy( p_new_buffer->p_buffer, p_buffer->p_buffer,
-                    p_buffer->i_buffer );
-        p_new_buffer->i_nb_samples = p_buffer->i_nb_samples;
-        p_new_buffer->i_buffer = p_buffer->i_buffer;
-        p_new_buffer->i_pts = p_buffer->i_pts;
-        p_new_buffer->i_length = p_buffer->i_length;
-        aout_BufferFree( p_buffer );
-        p_buffer = p_new_buffer;
-        p_input->b_changed = false;
     }
 
     aout_InputCheckAndRestart( p_aout, p_input );
